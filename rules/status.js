@@ -62,10 +62,11 @@ function st_SetElTags( i_status, i_elTags)
 			text += ' '+i_status.tags[i];
 	i_elTags.textContent = text;
 }
-function st_SetElColor( i_status, i_elB, i_elC)
+function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
 {
 	if( i_elB == null ) i_elB = st_elRoot;
 	if( i_elC == null ) i_elC = i_elB;
+	if( i_setNone == null ) i_setNone = true;
 
 	if( i_status &&  i_status.color)
 	{
@@ -76,12 +77,14 @@ function st_SetElColor( i_status, i_elB, i_elC)
 		else
 			i_elC.style.color = '#FFF';
 //window.console.log(c[0]+c[1]+c[2])
+		return true;
 	}
-	else
+	else if( i_setNone )
 	{
 		i_elB.style.background = '';
-		i_elC.style.color = '#000';
+		i_elC.style.color = 'inherit';
 	}
+	return false;
 }
 function st_SetElFinish( i_status, i_elFinish, i_full)
 {
@@ -91,8 +94,7 @@ function st_SetElFinish( i_status, i_elFinish, i_full)
 	var alpha = 0;
 	if( i_status && i_status.finish )
 	{
-		var secs = i_status.finish - (new Date()/1000);
-		var days = secs / ( 60 * 60 * 24 );
+		var days = c_DT_DaysLeft ( i_status.finish );
 		var alpha = 1 /( 1 + days );
 		days = Math.round( days*10) / 10;
 		if( alpha < 0 ) alpha = 0;

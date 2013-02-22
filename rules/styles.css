@@ -309,6 +309,9 @@ padding: 20px;
 }
 #asset > div.button { padding: 4px;}
 
+#asset .filter .body div { margin: 1px 4px; }
+#asset .filter .body .button { margin: 1px 8px; padding: 2px 8px; }
+
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
 .shot .status .btn_edit { float: right; font-size: 10px; }
@@ -358,6 +361,7 @@ height: 44px;
 .scene .shot .status .progress { clear:both;}
 .scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
 .scene .shot .status .artists, .scene .shot .status .tags { clear:both; font-size: 10px;}
+.scene .shot .status .finish { position: absolute; top: 10px; }
 .scene .shot img {
 position: absolute;
 width: 182px;
@@ -369,6 +373,8 @@ box-shadow: 0 0 4px rgba(255,255,255,.7);
 opacity:.9;
 }
 
+/* ========================================================= */
+/* =================== COMMENTS ============================ */
 .comment {
 box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
 border-radius: 4px;

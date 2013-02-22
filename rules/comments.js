@@ -81,6 +81,12 @@ function cm_Add( i_obj)
 	elDel.m_el = el;
 	el.m_elDel = elDel;
 
+	var elType = document.createElement('div');
+	elPanel.appendChild( elType);
+	elType.classList.add('tag');
+	elType.style.cssFloat = 'left';
+	el.m_elType = elType;
+
 	var elInfo = document.createElement('div');
 	elInfo.classList.add('info');
 	elPanel.appendChild( elInfo);
@@ -88,8 +94,25 @@ function cm_Add( i_obj)
 
 	var elText = document.createElement('div');
 	el.appendChild( elText);
-	el.m_elText = elText;
 	elText.classList.add('text');
+	el.m_elText = elText;
+
+	var elTypesDiv = document.createElement('div');
+	el.appendChild( elTypesDiv);
+	elTypesDiv.classList.add('types');
+	el.m_elTypesDiv = elTypesDiv;
+	el.m_elTypes = [];
+	for( var type in RULES.comments )
+	{
+		eltp = document.createElement('div');
+		elTypesDiv.appendChild( eltp);
+		eltp.classList.add('tag');
+		eltp.textContent = RULES.comments[type].title;
+		eltp.m_type = type;
+		eltp.m_el = el;
+		eltp.onclick = function(e){ cm_TypeOnClick( e.currentTarget.m_el, e.currentTarget.m_type);};
+		st_SetElColor({"color":RULES.comments[type].color}, eltp);
+	}
 
 	el.m_obj = i_obj;
 	cm_Init( el);
@@ -105,6 +128,7 @@ function cm_Init( i_el)
 	i_el.m_elCancel.style.display = 'none';
 	i_el.m_elSave.style.display = 'none';
 	i_el.m_elEdit.style.display = 'block';
+	i_el.m_elTypesDiv.style.display = 'none';
 
 	i_el.m_elText.contentEditable = 'false';
 	i_el.m_elText.classList.remove('editing');
@@ -122,6 +146,9 @@ function cm_Init( i_el)
 
 	var date = c_DT_StrFromMSec( i_el.m_obj.ctime);
 
+	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
+	i_el.m_type = i_el.m_obj.type;
+
 	var info = c_GetUserTitle(i_el.m_obj.user_name)+' '+date;
 	if( i_el.m_obj.duration )
 		info = i_el.m_obj.duration+' '+info;
@@ -137,11 +164,35 @@ function cm_Init( i_el)
 	if( i_el.m_obj.text )
 		i_el.m_elText.innerHTML = i_el.m_obj.text;
 
-	i_el.color = i_el.m_obj.color;
-	st_SetElColor( i_el, i_el);
+	i_el.m_color = i_el.m_obj.color;
+
+	st_SetElColor({"color":i_el.m_color}, i_el, null, false);
 
 	if( i_el.m_obj.deleted )
 		i_el.style.display = 'none';
+}
+
+function cm_SetElType( i_type, i_elType, i_elColor)
+{
+	if( i_elColor == null ) i_elColor = i_elType;
+	if( i_type )
+	{
+		if( RULES.comments[i_type] )
+		{
+			i_elType.textContent = RULES.comments[i_type].title;
+			st_SetElColor({"color":RULES.comments[i_type].color}, i_elColor);
+		}
+		else
+		{
+			i_elType.textContent = i_type;
+			i_elColor.style.color = 'inherit';
+		}
+	}
+	else
+	{
+		i_elType.textContent = '';
+		i_elColor.style.color = 'inherit';
+	}
 }
 
 function cm_Edit( i_el)
@@ -151,6 +202,7 @@ function cm_Edit( i_el)
 	i_el.m_elCancel.style.display = 'block';
 	i_el.m_elSave.style.display = 'block';
 	i_el.m_elEdit.style.display = 'none';
+	i_el.m_elTypesDiv.style.display = 'block';
 
 	var elDCtrl = document.createElement('div');
 	i_el.appendChild( elDCtrl);
@@ -188,13 +240,21 @@ function cm_Edit( i_el)
 	i_el.m_elText.focus();
 }
 
+function cm_TypeOnClick( i_el, i_type)
+{
+	i_el.m_type = i_type;
+//	i_el.m_elType.textContent = RULES.comments[i_type].title;
+	cm_SetElType( i_type, i_el.m_elType, i_el);
+	st_SetElColor({"color":i_el.m_color}, i_el, null, false);
+}
+
 function cm_ColorOnclick( e)
 {
-	var el = e.currentTarget;
-	var color = el.m_color;
-	el = el.parentNode.parentNode.parentNode;
-	el.color = color;
-	st_SetElColor( el, el);
+	var clrEl = e.currentTarget;
+	el = clrEl.parentNode.parentNode.parentNode;
+	el.m_color = clrEl.m_color;
+	cm_SetElType( el.m_type, el.m_elType, el);
+	st_SetElColor({"color":el.m_color}, el, null, false);
 }
 
 function cm_Cancel( i_el)
@@ -224,7 +284,8 @@ function cm_Save( i_el)
 {
 	i_el.m_obj.text = i_el.m_elText.innerHTML;
 	i_el.m_obj.duration = i_el.m_elDrtn.textContent;
-	i_el.m_obj.color = i_el.color;
+	i_el.m_obj.color = i_el.m_color;
+	i_el.m_obj.type = i_el.m_type;
 
 	if( i_el.m_new != true )
 	{

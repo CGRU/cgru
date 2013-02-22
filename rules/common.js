@@ -171,6 +171,7 @@ function c_DT_FormStrFromSec( i_sec)
     str += ':'+c_PadZero(date.getMinutes(),2);
 	return str;
 }
+function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
 
 function c_ElDisplayToggle( i_el)
@@ -240,4 +241,17 @@ function c_ElSetSelected( i_e, i_selected )
 }
 
 function c_Strip( i_str) { return i_str.replace(/^\s+|\s+$|^<br>|<br>$/g,''); }
+
+function c_GetElInteger( i_el)
+{
+	var str = c_Strip( i_el.textContent );
+	if( str.length == 0 ) return null;
+	var num = parseInt( str);
+	if( isNaN( num ))
+	{
+		c_Error('Invalid number: "'+str+'"');
+		return null;
+	}
+	return num;
+}
 

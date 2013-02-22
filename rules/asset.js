@@ -361,23 +361,11 @@ function a_ShowThumbnails()
 	a_elFilter.appendChild( elBody);
 	a_elFilter.m_elBody = elBody;
 	elBody.style.display = 'none';
+	elBody.classList.add('body');
 
 	var elBtnsDiv = document.createElement('div');
 	elBody.appendChild( elBtnsDiv);
-
-	var elBtnFilter = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnFilter);
-	elBtnFilter.classList.add('button');
-	elBtnFilter.textContent = 'Filter';
-	elBtnFilter.style.cssFloat = 'left';
-	elBtnFilter.onclick = a_ThumbFilterApply;
-
-	var elBtnShowAll = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnShowAll);
-	elBtnShowAll.textContent = 'Show All';
-	elBtnShowAll.onclick = function(e){g_SetLocationArgs({"a_TFilter":null});};
-	elBtnShowAll.classList.add('button');
-	elBtnShowAll.style.cssFloat = 'left';
+	elBtnsDiv.style.cssFloat = 'right';
 
 	var elBtnClose = document.createElement('div');
 	elBtnsDiv.appendChild( elBtnClose);
@@ -390,6 +378,73 @@ function a_ShowThumbnails()
 		a_elFilter.m_elBody.style.display = 'none';
 		a_elFilter.m_elLabel.style.display = 'block';
 	};
+
+	var elBtnShowAll = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnShowAll);
+	elBtnShowAll.textContent = 'Show All';
+	elBtnShowAll.onclick = function(e){g_SetLocationArgs({"a_TFilter":null});};
+	elBtnShowAll.classList.add('button');
+	elBtnShowAll.style.cssFloat = 'right';
+
+	var elBtnFilter = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnFilter);
+	elBtnFilter.classList.add('button');
+	elBtnFilter.textContent = 'Filter';
+	elBtnFilter.style.cssFloat = 'right';
+	elBtnFilter.onclick = a_ThumbFilterApply;
+
+	var elPercentDiv = document.createElement('div');
+	elBody.appendChild( elPercentDiv);
+	elPercentDiv.style.cssFloat = 'left';
+	elPercentDiv.style.textAlign = 'center';
+	var elPercentLabel = document.createElement('div');
+	elPercentDiv.appendChild( elPercentLabel);
+	elPercentLabel.textContent = 'Percent:';
+	elPercentLabel.style.cssFloat = 'left';
+	var elPercentMin = document.createElement('div');
+	elPercentDiv.appendChild( elPercentMin);
+	elPercentMin.style.cssFloat = 'left';
+	elPercentMin.contentEditable = 'true';
+	elPercentMin.classList.add('editing');
+	elPercentMin.style.width = '40px';
+	var elPercentLabel = document.createElement('div');
+	elPercentDiv.appendChild( elPercentLabel);
+	elPercentLabel.textContent = '-';
+	elPercentLabel.style.cssFloat = 'left';
+	var elPercentMax = document.createElement('div');
+	elPercentDiv.appendChild( elPercentMax);
+	elPercentMax.style.cssFloat = 'left';
+	elPercentMax.contentEditable = 'true';
+	elPercentMax.classList.add('editing');
+	elPercentMax.style.width = '40px';
+	a_elFilter.m_elPercentMin = elPercentMin;
+	a_elFilter.m_elPercentMax = elPercentMax;
+
+	var elFinishDiv = document.createElement('div');
+	elBody.appendChild( elFinishDiv);
+	elFinishDiv.style.textAlign = 'center';
+	var elFinishLabel = document.createElement('div');
+	elFinishDiv.appendChild( elFinishLabel);
+	elFinishLabel.textContent = 'Finish:';
+	elFinishLabel.style.cssFloat = 'left';
+	var elFinishMin = document.createElement('div');
+	elFinishDiv.appendChild( elFinishMin);
+	elFinishMin.style.cssFloat = 'left';
+	elFinishMin.contentEditable = 'true';
+	elFinishMin.classList.add('editing');
+	elFinishMin.style.width = '40px';
+	var elFinishLabel = document.createElement('div');
+	elFinishDiv.appendChild( elFinishLabel);
+	elFinishLabel.textContent = '-';
+	elFinishLabel.style.cssFloat = 'left';
+	var elFinishMax = document.createElement('div');
+	elFinishDiv.appendChild( elFinishMax);
+	elFinishMax.style.cssFloat = 'left';
+	elFinishMax.contentEditable = 'true';
+	elFinishMax.classList.add('editing');
+	elFinishMax.style.width = '40px';
+	a_elFilter.m_elFinishMin = elFinishMin;
+	a_elFilter.m_elFinishMax = elFinishMax;
 
 	var elStatusDiv = document.createElement('div');
 	elBody.appendChild( elStatusDiv);
@@ -434,7 +489,7 @@ function a_ShowThumbnails()
 	var elTags = document.createElement('div');
 	elTagsDiv.appendChild( elTags);
 	elTags.classList.add('tags');
-	a_elFilter.m_elTags = []
+	a_elFilter.m_elTags = [];
 	for( var i = 0; i < RULES.tags.length; i++)
 	{
 		el = document.createElement('div');
@@ -591,9 +646,6 @@ function a_ShowThumbnails()
 				elShot.appendChild( elShot.m_elStatus);
 				elShot.m_elStatus.classList.add('status');
 
-				elShot.m_elFinish = document.createElement('div');
-//				elShot.m_elStatus.appendChild( elShot.m_elFinish);
-
 				elShot.m_elAnn = document.createElement('div');
 				elShot.m_elStatus.appendChild( elShot.m_elAnn);
 				elShot.m_elAnn.classList.add('annotation');
@@ -624,6 +676,10 @@ function a_ShowThumbnails()
 				elShot.m_elStatus.appendChild( elShot.m_elArtists);
 				elShot.m_elArtists.classList.add('artists');
 
+				elShot.m_elFinish = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elFinish);
+				elShot.m_elFinish.classList.add('finish');
+
 				a_elCurEditStatus = elShot;
 				a_ThumbStatusApply( fobj.status);
 				a_elCurEditStatus = null;
@@ -639,7 +695,7 @@ function a_ThumbStatusApply( i_status)
 	st_SetElArtists( i_status, a_elCurEditStatus.m_elArtists);
 	st_SetElTags( i_status, a_elCurEditStatus.m_elTags);
 	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);
-	st_SetElFinish( i_status, a_elCurEditStatus.m_elFinish);
+	st_SetElFinish( i_status, a_elCurEditStatus.m_elFinish, ASSET.thumbnails === 0 );
 	st_SetElColor( i_status, a_elCurEditStatus);
 }
 
@@ -663,6 +719,16 @@ function a_ThumbFilterApply()
 			args.tags.push( a_elFilter.m_elTags[i].m_tag);
 		}
 
+	var permin = c_GetElInteger( a_elFilter.m_elPercentMin);
+	var permax = c_GetElInteger( a_elFilter.m_elPercentMax);
+	if(( permin != null ) || ( permax != null ))
+		args.percent = [permin,permax];
+
+	var finmin = c_GetElInteger( a_elFilter.m_elFinishMin);
+	var finmax = c_GetElInteger( a_elFilter.m_elFinishMax);
+	if(( finmin != null ) || ( finmax != null ))
+		args.finish = [finmin,finmax];
+
 	g_SetLocationArgs({"a_TFilter":args});
 }
 function a_TFilter( i_args)
@@ -672,9 +738,11 @@ function a_TFilter( i_args)
 	{
 		a_elFilter.m_elLabel.style.display = 'none';
 		a_elFilter.m_elBody.style.display = 'block';
-		if( i_args )
-			if( i_args.ann )
-				a_elFilter.m_elStatus.textContent = i_args.ann;
+	}
+	else
+	{
+		c_Error('Can`t find filter element.');
+		return;
 	}
 
 	if( a_elThumbnails == null )
@@ -683,31 +751,48 @@ function a_TFilter( i_args)
 		return;
 	}
 
-	var anns = null;
-	var artists = null;
-	var tags = null;
+	if( i_args == null ) i_args = {};
 
-	if( i_args )
+	var anns = null;
+	if( i_args.ann )
 	{
-		if( i_args.ann )
+		a_elFilter.m_elStatus.textContent = i_args.ann;
+		var anns_or = i_args.ann.split(',');
+		anns = [];
+		for( var o = 0; o < anns_or.length; o++)
+			anns.push( anns_or[o].split(' '));
+	}
+	if( i_args.artists )
+	{
+		for( i = 0; i < a_elFilter.m_elArtists.length; i++ )
+			c_ElSetSelected( a_elFilter.m_elArtists[i], i_args.artists.indexOf( a_elFilter.m_elArtists[i].m_user ) != -1 )
+	}
+	if( i_args.tags ) 
+	{
+		for( i = 0; i < a_elFilter.m_elTags.length; i++ )
+			c_ElSetSelected( a_elFilter.m_elTags[i], i_args.tags.indexOf( a_elFilter.m_elTags[i].m_tag ) != -1 )
+	}
+	if( i_args.percent )
+	{
+		if(( i_args.percent[0] != null ) && ( i_args.percent[1] != null ) && ( i_args.percent[0] > i_args.percent[1] ))
 		{
-			var anns_or = i_args.ann.split(',');
-			anns = [];
-			for( var o = 0; o < anns_or.length; o++)
-				anns.push( anns_or[o].split(' '));
+			i_args.percent[0]+= i_args.percent[1];
+			i_args.percent[1] = i_args.percent[0] - i_args.percent[1];
+			i_args.percent[0] = i_args.percent[0] - i_args.percent[1];
 		}
-		if( i_args.artists )
+		a_elFilter.m_elPercentMin.textContent = i_args.percent[0];
+		a_elFilter.m_elPercentMax.textContent = i_args.percent[1];
+	}
+	if( i_args.finish )
+	{
+		if(( i_args.finish[0] != null ) && ( i_args.finish[1] != null ) && ( i_args.finish[0] > i_args.finish[1] ))
 		{
-			artists = i_args.artists;
-			for( i = 0; i < a_elFilter.m_elArtists.length; i++ )
-				c_ElSetSelected( a_elFilter.m_elArtists[i], artists.indexOf( a_elFilter.m_elArtists[i].m_user ) != -1 )
+			i_args.finish[0]+= i_args.finish[1];
+			i_args.finish[1] = i_args.finish[0] - i_args.finish[1];
+			i_args.finish[0] = i_args.finish[0] - i_args.finish[1];
 		}
-		if( i_args.tags ) 
-		{
-			tags = i_args.tags;
-			for( i = 0; i < a_elFilter.m_elTags.length; i++ )
-				c_ElSetSelected( a_elFilter.m_elTags[i], tags.indexOf( a_elFilter.m_elTags[i].m_tag ) != -1 )
-		}
+		a_elFilter.m_elFinishMin.textContent = i_args.finish[0];
+		a_elFilter.m_elFinishMax.textContent = i_args.finish[1];
 	}
 
 	for( var th = 0; th < a_elThumbnails.length; th++)
@@ -740,22 +825,43 @@ function a_TFilter( i_args)
 		}
 		else founded = true;
 
-		if( tags && founded )
+		if( i_args.tags && founded )
 		{
 			founded = false;
 			if( el.m_status.tags )
-				for( i = 0; i < tags.length; i++ )
-					if( el.m_status.tags.indexOf( tags[i]) != -1 )
+				for( i = 0; i < i_args.tags.length; i++ )
+					if( el.m_status.tags.indexOf( i_args.tags[i]) != -1 )
 						{ founded = true; break; }
 		}
 
-		if( artists && founded )
+		if( i_args.artists && founded )
 		{
 			founded = false;
 			if( el.m_status.artists )
-				for( i = 0; i < artists.length; i++ )
-					if( el.m_status.artists.indexOf( artists[i]) != -1 )
+				for( i = 0; i < i_args.artists.length; i++ )
+					if( el.m_status.artists.indexOf( i_args.artists[i]) != -1 )
 						{ founded = true; break; }
+		}
+
+		if( i_args.percent && founded )
+		{
+			founded = false;
+			if( el.m_status.progress &&
+				(( i_args.percent[0] == null ) || ( el.m_status.progress >= i_args.percent[0] )) &&
+				(( i_args.percent[1] == null ) || ( el.m_status.progress <= i_args.percent[1] )))
+				founded = true;
+		}
+
+		if( i_args.finish && founded )
+		{
+			founded = false;
+			if( el.m_status.finish )
+			{
+				var days = c_DT_DaysLeft( el.m_status.finish);
+				if( (( i_args.finish[0] == null ) ||  days >= i_args.finish[0] ) &&
+					(( i_args.finish[1] == null ) ||  days <= i_args.finish[1] ))
+					founded = true;
+			}
 		}
 
 		if( founded )
