@@ -56,11 +56,27 @@ function st_SetElArtists( i_status, i_elArtists)
 }
 function st_SetElTags( i_status, i_elTags)
 {
-	var text = '';
+	if( i_elTags.m_elTags )
+		for( i = 0; i < i_elTags.m_elTags.length; i++ )
+			i_elTags.removeChild( i_elTags.m_elTags[i]);
+	i_elTags.m_elTags = [];
+
 	if( i_status && i_status.tags )
 		for( var i = 0; i < i_status.tags.length; i++)
-			text += ' '+i_status.tags[i];
-	i_elTags.textContent = text;
+		{
+			var el = document.createElement('div');
+			i_elTags.appendChild( el);
+			i_elTags.m_elTags.push( el);
+			el.classList.add('tag');
+			st_SetElTag( el, i_status.tags[i]);
+		}
+}
+function st_SetElTag( i_el, i_tag)
+{
+	if( RULES.tags[i_tag] && RULES.tags[i_tag].title )
+		i_el.textContent = RULES.tags[i_tag].title;
+	else
+		i_el.textContent = i_tag;
 }
 function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
 {
@@ -72,7 +88,7 @@ function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
 	{
 		var c = i_status.color;
 		i_elB.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
-		if( c[0]+c[1]+c[2] > 200 )
+		if( c[0]+c[1]+.3*c[2] > 300 )
 			i_elC.style.color = '#000';
 		else
 			i_elC.style.color = '#FFF';
@@ -248,7 +264,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 		{
 			var el = document.createElement('div');
 			st_elTags.m_elList.appendChild( el);
-			el.textContent = st_status.tags[i];
+			st_SetElTag( el, st_status.tags[i]);
 			el.classList.add('tag');
 			el.classList.add('selected');
 		}
@@ -298,10 +314,7 @@ function st_DestroyEditUI()
 
 function st_EditTagsShow( i_evt)
 {
-	var tags = {};
-	for( var i = 0; i < RULES.tags.length; i++)
-		tags[RULES.tags[i]] = RULES.tags[i];
-	st_EditShowList( st_elTags, 'tags', tags);
+	st_EditShowList( st_elTags, 'tags', RULES.tags);
 }
 function st_EditArtistsShow( i_evt)
 {
@@ -320,11 +333,10 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 		i_elParent.appendChild( el);
 		el.classList.add('tag');
 		if( i_list[item].title )
-//			el.textContent = i_list[item].title;
-			el.textContent = c_GetUserTitle( item);
+			el.textContent = i_list[item].title;
 		else
 			el.textContent = item;
-		el.m_item = i_list[item];
+		el.m_item = item;
 		if( st_status[i_stParam] && ( st_status[i_stParam].indexOf( item) != -1 ))
 		{
 			el.m_selected = true;
@@ -360,7 +372,7 @@ function st_SaveOnClick()
 		st_status.artists = [];
 		for( var i = 0; i < st_elArtists.m_elListAll.length; i++)
 			if( st_elArtists.m_elListAll[i].m_selected )
-				st_status.artists.push( st_elArtists.m_elListAll[i].m_item.id);
+				st_status.artists.push( st_elArtists.m_elListAll[i].m_item);
 	}
 	if( st_elTags.m_elListAll )
 	{

@@ -490,13 +490,13 @@ function a_ShowThumbnails()
 	elTagsDiv.appendChild( elTags);
 	elTags.classList.add('tags');
 	a_elFilter.m_elTags = [];
-	for( var i = 0; i < RULES.tags.length; i++)
+	for( var tag in RULES.tags)
 	{
 		el = document.createElement('div');
 		elTags.appendChild( el);
 		el.style.cssFloat = 'left';
-		el.textContent = RULES.tags[i];
-		el.m_tag = RULES.tags[i];
+		st_SetElTag( el, tag);
+		el.m_tag = tag;
 		el.classList.add('tag');
 		el.onclick = function(e){ c_ElToggleSelected(e); a_ThumbFilterApply()};
 		a_elFilter.m_elTags.push( el);

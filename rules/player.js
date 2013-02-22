@@ -4,6 +4,8 @@ RULES_TOP = {};
 
 cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
 
+p_imgTypes = ['jpg','jpeg','png'];
+
 p_path = null;
 p_elImg = [];
 p_images = [];
@@ -143,7 +145,8 @@ function p_PathChanged()
 	for( var i = 0; i < walk.files.length; i++)
 	{
 		var file = walk.files[i];
-		if( file.split('.').pop() != 'jpg') continue;
+		var type = file.split('.').pop().toLowerCase();
+		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
 		img.src = p_path + '/' + file;
 		img.onload = function(){p_ImgLoaded();}
@@ -157,7 +160,7 @@ function p_PathChanged()
 		if( walk.error )
 			c_Error( walk.error);
 		else
-			c_Error('No JPEG Files Founded.');
+			c_Error('No JPEG or PNG Files Founded.');
 		return;
 	}
 

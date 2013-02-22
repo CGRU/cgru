@@ -3,21 +3,19 @@
 "rufolder":"rules",
 "company":"CGRU",
 "playlist":"rules/playlist.json",
-"tags":["done","error","hold","started","animatic"],
+
+"tags":{
+	"done"    :{"title":"DONE"},
+	"error"   :{"title":"ERROR"},
+	"hold"    :{"title":"HOLD"},
+	"started" :{"title":"Started"},
+	"animatic":{"title":"Animatic"}
+},
 
 "comments":{
-	"message":{
-		"title":"Message",
-		"color":[150,150,150]
-	},
-	"report":{
-		"title":"Report",
-		"color":[200,200,150]
-	},
-	"review":{
-		"title":"Review",
-		"color":[200,150,150]
-	},
+	"message":{"title":"Message","color":[150,150,150]},
+	"report" :{"title":"Report" ,"color":[200,200,100]},
+	"review" :{"title":"Review" ,"color":[200,100,100]},
 	"generic":{"title":"generic"}
 },
 

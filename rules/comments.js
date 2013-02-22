@@ -186,12 +186,13 @@ function cm_SetElType( i_type, i_elType, i_elColor)
 		{
 			i_elType.textContent = i_type;
 			i_elColor.style.color = 'inherit';
+			st_SetElColor( null, i_elColor);
 		}
 	}
 	else
 	{
 		i_elType.textContent = '';
-		i_elColor.style.color = 'inherit';
+		st_SetElColor( null, i_elColor);
 	}
 }
 
