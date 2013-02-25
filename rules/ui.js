@@ -370,6 +370,9 @@ function u_SkipFile( i_filename)
 
 function u_SearchOnClick()
 {
+	$('search_result').textContent = '';
+	$('search_result').style.display = 'none';
+
 	if( $('search_btn').m_opened )
 	{
 		$('search_btn').m_opened = false;
@@ -438,6 +441,9 @@ function u_SearchSearch()
 
 function u_Search( i_args)
 {
+	$('search_result').textContent = '';
+	$('search_result').style.display = 'none';
+
 	if( $('search_btn').m_opened !== true ) u_SearchOnClick();
 
 	if( i_args == null ) i_args = {};
@@ -480,17 +486,41 @@ function u_Search( i_args)
 		return;
 	}
 
-	i_args.path = RULES.root + g_CurPath();
-	i_args.rufolder = RULES.rufolder;
-	i_args.rufiles = ['status'];
-	i_args.depth = 4;
+	var args = {};
+	args.status = i_args;
+	args.path = RULES.root + g_CurPath();
+	args.rufolder = RULES.rufolder;
+	args.rufiles = ['status'];
+	args.depth = 4;
 
-	var res = c_Parse( n_Request({"search":i_args}));
+	var res = c_Parse( n_Request({"search":args}));
 
 	if( res.error )
 	{
 		c_Error( res.error);
 		return;
+	}
+
+	if( res.result == null )
+	{
+		c_Error('Search returned null result.');
+		return;
+	}
+
+	$('search_result').style.display = 'block';
+	res.result.sort();
+	for( var i = 0; i < res.result.length; i++)
+	{
+		var path = res.result[i];
+		path = path.replace( RULES.root, '');
+		path = path.replace( /\/\//g, '/');
+		var el = document.createElement('div');
+		$('search_result').appendChild( el);
+		var elLink = document.createElement('a');
+		el.appendChild( elLink);
+		elLink.href = '#'+path;
+		elLink.target = '_blank';
+		elLink.textContent = path;
 	}
 }
 

@@ -1012,7 +1012,7 @@ function search( $i_args, &$o_out)
 	}
 
 	$o_out['search'] = $i_args;
-	$o_out['results'] = array();
+	$o_out['result'] = array();
 
 	searchFolder( $i_args, $o_out, $path, 0);
 }
@@ -1039,19 +1039,30 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 		$rufolder = "$path/".$i_args['rufolder'];
 		if( false == is_dir( $rufolder)) continue;
 
+		$founded = false;
 		foreach( $i_args['rufiles'] as $rufile )
 		{
 			$rufile = "$rufolder/$rufile.json";
 			if( false == is_file( $rufile)) continue;
 
+			$founded = false;
 			if( $fHandle = fopen( $rufile, 'r'))
 			{
 				$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
-				if( searchStatus( $i_args, $obj))
-					array_push( $o_out['results'], $path);
+				$founded = true;
+
+				if( $founded && array_key_exists('status', $i_args ))
+					if( searchStatus( $i_args['status'], $obj))
+						$founded = true;
+					else
+						$founded = false;
+
 				fclose($fHandle);
 			}
 		}
+
+		if( $founded )
+			array_push( $o_out['result'], $path);
 
 		if( $i_depth < $i_args['depth'] )
 			searchFolder( $i_args, $o_out, $path, $i_depth);
@@ -1062,7 +1073,38 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 
 function searchStatus( &$i_args, &$i_obj)
 {
-	return true;
+	if( false == array_key_exists('status', $i_obj))
+		return false;
+
+	$founded = true;
+
+	if( $founded && array_key_exists('ann', $i_args))
+	{
+		$founded = false;
+		if( array_key_exists('annotation', $i_obj['status']))
+			if( strpos( $i_obj['status']['annotation'], $i_args['ann']) !== false )
+				$founded = true;
+	}
+
+	if( $founded && array_key_exists('artists', $i_args))
+	{
+		$founded = false;
+		if( array_key_exists('artists', $i_obj['status']))
+			foreach( $i_args['artists'] as $artist )
+				if( in_array( $artist, $i_obj['status']['artists']))
+					$founded = true;
+	}
+
+	if( $founded && array_key_exists('tags', $i_args))
+	{
+		$founded = false;
+		if( array_key_exists('tags', $i_obj['status']))
+			foreach( $i_args['tags'] as $tag )
+				if( in_array( $tag, $i_obj['status']['tags']))
+					$founded = true;
+	}
+
+	return $founded;
 }
 
 ?>
