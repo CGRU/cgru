@@ -46,6 +46,24 @@ function u_Process()
 	nw_Process();
 	cm_Process();
 }
+
+function u_InitUsers()
+{
+	var elArtists = document.getElementById('search_artists');
+	elArtists.m_elArtists = [];
+	for( var user in g_users )
+	{
+		el = document.createElement('div');
+		elArtists.appendChild( el);
+		el.style.cssFloat = 'left';
+		el.textContent = c_GetUserTitle( user);
+		el.m_user = user;
+		el.classList.add('tag');
+		el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};
+		elArtists.m_elArtists.push( el);
+	}
+}
+
 function u_StatusApply( i_status)
 {
 	if( i_status != null )
@@ -348,5 +366,131 @@ function u_SkipFile( i_filename)
 		if( i_filename.indexOf( RULES.skipfiles[i]) == 0 )
 			return true;
 	return false;
+}
+
+function u_SearchOnClick()
+{
+	if( $('search_btn').m_opened )
+	{
+		$('search_btn').m_opened = false;
+		$('search_btn').textContent = 'Search';
+		$('search').style.display = 'none';
+		g_ClearLocationArgs();
+		a_ShowAllThumbnails();
+	}
+	else
+	{
+		$('search_btn').m_opened = true;
+		$('search_btn').textContent = 'Close Search';
+		$('search').style.display = 'block';
+
+		if( $('search_tags').m_elTags )
+			for( var i = 0; i < $('search_tags').m_elTags.length; i++ )
+				$('search_tags').removeChild( $('search_tags').m_elTags[i]);
+		$('search_tags').m_elTags = [];
+		for( var tag in RULES.tags )
+		{
+			el = document.createElement('div');
+			$('search_tags').appendChild( el);
+			el.style.cssFloat = 'left';
+			st_SetElTag( el, tag);
+			el.m_tag = tag;
+			el.classList.add('tag');
+			el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};
+			$('search_tags').m_elTags.push( el);
+		}
+	}
+}
+
+function u_SearchSearch()
+{
+	var args = {};
+	if( $('search_annotation').textContent.length )
+		args.ann = $('search_annotation').textContent;
+
+
+	for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
+		if( $('search_artists').m_elArtists[i].m_selected )
+		{
+			if( args.artists == null ) args.artists = [];
+			args.artists.push( $('search_artists').m_elArtists[i].m_user);
+		}
+
+	for( var i = 0; i < $('search_tags').m_elTags.length; i++)
+		if( $('search_tags').m_elTags[i].m_selected )
+		{
+			if( args.tags == null ) args.tags = [];
+			args.tags.push( $('search_tags').m_elTags[i].m_tag);
+		}
+
+	var permin = c_GetElInteger( $('search_percentmin'));
+	var permax = c_GetElInteger( $('search_percentmax'));
+	if(( permin != null ) || ( permax != null ))
+		args.percent = [permin,permax];
+
+	var finmin = c_GetElInteger( $('search_finishmin'));
+	var finmax = c_GetElInteger( $('search_finishmax'));
+	if(( finmin != null ) || ( finmax != null ))
+		args.finish = [finmin,finmax];
+
+	g_SetLocationArgs({"u_Search":args});
+}
+
+function u_Search( i_args)
+{
+	if( $('search_btn').m_opened !== true ) u_SearchOnClick();
+
+	if( i_args == null ) i_args = {};
+
+	var anns = null;
+	if( i_args.ann )
+		$('search_annotation').textContent = i_args.ann;
+	if( i_args.artists )
+		for( i = 0; i < $('search_artists').m_elArtists.length; i++ )
+			c_ElSetSelected( $('search_artists').m_elArtists[i], i_args.artists.indexOf( $('search_artists').m_elArtists[i].m_user ) != -1 )
+	if( i_args.tags ) 
+		for( i = 0; i < $('search_tags').m_elTags.length; i++ )
+			c_ElSetSelected( $('search_tags').m_elTags[i], i_args.tags.indexOf( $('search_tags').m_elTags[i].m_tag ) != -1 )
+	if( i_args.percent )
+	{
+		if(( i_args.percent[0] != null ) && ( i_args.percent[1] != null ) && ( i_args.percent[0] > i_args.percent[1] ))
+		{
+			i_args.percent[0]+= i_args.percent[1];
+			i_args.percent[1] = i_args.percent[0] - i_args.percent[1];
+			i_args.percent[0] = i_args.percent[0] - i_args.percent[1];
+		}
+		$('search_percentmin').textContent = i_args.percent[0];
+		$('search_percentmax').textContent = i_args.percent[1];
+	}
+	if( i_args.finish )
+	{
+		if(( i_args.finish[0] != null ) && ( i_args.finish[1] != null ) && ( i_args.finish[0] > i_args.finish[1] ))
+		{
+			i_args.finish[0]+= i_args.finish[1];
+			i_args.finish[1] = i_args.finish[0] - i_args.finish[1];
+			i_args.finish[0] = i_args.finish[0] - i_args.finish[1];
+		}
+		$('search_finishmin').textContent = i_args.finish[0];
+		$('search_finishmax').textContent = i_args.finish[1];
+	}
+
+	if( a_elThumbnails )
+	{
+		a_ThumbFilter( i_args);
+		return;
+	}
+
+	i_args.path = RULES.root + g_CurPath();
+	i_args.rufolder = RULES.rufolder;
+	i_args.rufiles = ['status'];
+	i_args.depth = 4;
+
+	var res = c_Parse( n_Request({"search":i_args}));
+
+	if( res.error )
+	{
+		c_Error( res.error);
+		return;
+	}
 }
 

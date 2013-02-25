@@ -30,8 +30,6 @@ box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 15px #FFF inset;
 #header .panel {
 position: absolute;
 left: 40px; right: 10px; bottom: 5px; height: 30px;
-/*box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
-border-radius: 5px;*/
 }
 #header .panel .button { float: left; padding: 4px 8px; margin: 1px 8px; }
 
@@ -73,7 +71,38 @@ top: 38px; bottom: 38px;
 -moz-user-select: none;
 -webkit-user-select: none;
 }
+/* =========== NAVIGATION: ============ */
 #navig { overflow-y: scroll; width: 300px; left: 0; }
+#navig .folder {
+position: relative;
+cursor: pointer;
+border: 1px solid rgba(255,255,255,.2);
+padding: 0px 0px 0px 16px;
+border-radius: 4px;
+font-weight: normal;
+}
+#navig .folder.opened {
+padding-top: 4px;
+padding-bottom: 4px;
+background: rgba(200,255,255,.1);
+font-weight: bold;
+}
+#navig .folder.current { background: rgba(200,255,255,.7); }
+#navig .folder:hover { box-shadow: 0px 0px 3px rgba(200,255,255,1.0)}
+#navig .folder .fcolor {
+position: absolute;
+left:0;right:0;top:0;bottom:0;
+box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
+opacity: 0.9;
+}
+#navig .folder.current .fcolor { opacity: 0.7; }
+#navig .folder .fname {position: relative;}
+#navig .folder .fstatus {position: relative;
+float: right;
+font-weight: normal;
+padding-right:4px;
+}
+#navig .folder .progressbar { height: 6px; }
 
 
 /* ========================================== */
@@ -101,8 +130,7 @@ background: #DDD;
 color: #000;
 border-radius: 4px;
 box-shadow: 0 0 2px #000 inset;
-padding-left: 6px;
-padding: 2px;/* width: 30px;*/
+padding: 2px 4px;
 top: 0px; bottom: 0px; position: relative; left: 0; right: 0;
 min-height: 19px;
 }
@@ -121,6 +149,8 @@ min-height: 19px;
 .colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
 .colorbars div div { float:left;}
 
+/* ========================================================= */
+/* =============== SIDE PANEL: ============================= */
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
 #sidepanel #sidepanel_hide { display: none;}
@@ -132,7 +162,7 @@ min-height: 19px;
 #sidepanel .body { display: none; }
 #sidepanel.opened .opened .body { display: block; }
 #sidepanel .label:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
-
+/* ============= NEWS: =============== */
 #news_count {
 float:right;
 cursor: pointer;
@@ -162,7 +192,7 @@ padding: 0px 4px 0px 4px;
 font-size: 10px;
 }
 #news .news_label { font-size:12px; }
-
+/* ============= PLAYLIST: =============== */
 #playlist .folder, #playlist .link {
 box-shadow: 0 0 2px rgba(0,0,0,.5) inset;
 border-radius: 4px;
@@ -180,7 +210,13 @@ color: rgba(0,0,0,.8);
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); color: rgba(0,0,0,1.0);}
 #playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); color: #00A;}
+/* ======= USERS: ======== */
+#users > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
+#users > div div { padding: 0px 4px;}
+#users > div .button { float: left; margin: 0px;}
 
+/* ============================================================================= */
+/* ================================ CONTENT: =================================== */
 #content {
 position: absolute;
 left: 300px;
@@ -214,42 +250,14 @@ padding: 4px;
 .status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
 
-#navig .folder {
-position: relative;
-cursor: pointer;
-/*box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;*/
-border: 1px solid rgba(255,255,255,.2);
-padding: 0px 0px 0px 16px;
-border-radius: 4px;
-font-weight: normal;
+#search {
+margin: 4px 0 0 0;
+box-shadow: 0 0 4px #000000 inset;
+border-radius: 8px;
+padding: 4px;
 }
-#navig .folder.opened {
-padding-top: 4px;
-padding-bottom: 4px;
-background: rgba(200,255,255,.1);
-font-weight: bold;
-}
-#navig .folder.current { background: rgba(200,255,255,.7); }
-/*#navig .folder:hover { box-shadow: 0px 0px 3px rgba(0,0,0,1.0) inset}*/
-#navig .folder:hover { box-shadow: 0px 0px 3px rgba(200,255,255,1.0)}
-#navig .folder .fcolor {
-position: absolute;
-/*height: 22px;
-border-radius: 4px;
-left:2px;right:2px;top:2px;bottom:2px;*/
-left:0;right:0;top:0;bottom:0;
-box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
-opacity: 0.9;
-}
-#navig .folder.current .fcolor { opacity: 0.7; }
-/*#navig .folder .fcolor:hover { box-shadow: 0px 0px 3px rgba(255,0,0,1.0) inset}*/
-#navig .folder .fname {position: relative;}
-#navig .folder .fstatus {position: relative;
-float: right;
-font-weight: normal;
-padding-right:4px;
-}
-#navig .folder .progressbar { height: 6px; }
+#search div { margin: 1px 4px; }
+#search .button { margin: 1px 8px; padding: 2px 8px; }
 
 #assets {
 background: rgba(200,255,255,.3);
@@ -300,6 +308,8 @@ font-size: 14px;
 }
 #content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
 
+/* ============================================================================*/
+/* ============================= ASSETS: ======================================*/
 #asset {}
 #asset > div {
 box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
@@ -342,7 +352,6 @@ left: 0; right: 0;
 height: 170px;
 border: 2px solid #FF0;
 }
-/*.scene .shot:hover {border: 2px solid #5AA;}*/
 /*.scene .shot .name,*/
 .scene .shot .status {
 position:absolute;
@@ -407,6 +416,8 @@ border-radius: 4px;
 box-shadow: 0 0 4px #000 inset;
 }
 
+/* ====================================================================== */
+/* ==================== WINDOWS: ======================================== */
 .dailies div { margin: 4px; border-radius: 4px;}
 .dailies .label { float: left;}
 .dailies div .param, .dailies div div { margin: 4px 8px; padding: 3px 6px;}
@@ -415,8 +426,4 @@ box-shadow: 0 0 4px #000 inset;
 .dailies .rules { padding: 12px; }
 
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); }
-
-#users > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
-#users > div div { padding: 0px 4px;}
-#users > div .button { float: left; margin: 0px;}
 

@@ -1,2 +1,0 @@
-H.264 KeyFrames
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_keyframes.ffpreset" -b 20000k "@OUTPUT@.@CONTAINER@"

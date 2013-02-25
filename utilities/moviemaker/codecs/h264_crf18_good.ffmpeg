@@ -1,2 +1,2 @@
 H.264 Good
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_common.ffpreset" -crf 18 "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -crf 18 "@OUTPUT@.@CONTAINER@"

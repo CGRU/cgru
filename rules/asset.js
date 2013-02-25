@@ -3,7 +3,6 @@ ASSET = null;
 
 a_elThumbnails = null;
 a_elFolders = null;
-a_elFilter = null;
 a_elCurEditStatus = null;
 
 function a_Finish()
@@ -16,7 +15,6 @@ function a_Finish()
 
 	a_elThumbnails = null;
 	a_elFolders = null;
-	a_elFilter = null;
 }
 
 function a_Process()
@@ -338,136 +336,7 @@ function a_ShowThumbnails()
 {
 	a_elThumbnails = [];
 
-	a_elFilter = document.createElement('div');
-	u_el.asset.appendChild( a_elFilter);
-	a_elFilter.style.padding = '4px';
-	a_elFilter.style.position = 'relative';
-	a_elFilter.classList.add('filter');
-
-	var elLabel = document.createElement('div');
-	a_elFilter.appendChild( elLabel);
-	a_elFilter.m_elLabel = elLabel;
-	elLabel.textContent = 'Filter Thumbnails';
-	elLabel.style.textAlign = 'center';
-	elLabel.style.cursor = 'pointer';
-	elLabel.style.width = '50%';
-	elLabel.onclick = function(e){
-		var el = e.currentTarget.parentNode;
-		el.m_elLabel.style.display = 'none';
-		el.m_elBody.style.display='block';
-	};
-
-	var elBody = document.createElement('div');
-	a_elFilter.appendChild( elBody);
-	a_elFilter.m_elBody = elBody;
-	elBody.style.display = 'none';
-	elBody.classList.add('body');
-
-	var elBtnsDiv = document.createElement('div');
-	elBody.appendChild( elBtnsDiv);
-	elBtnsDiv.style.cssFloat = 'right';
-
-	var elBtnClose = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnClose);
-	elBtnClose.textContent = 'Close';
-	elBtnClose.style.cssFloat = 'right';
-	elBtnClose.classList.add('button');
-	elBtnClose.onclick = function(e){
-		g_ClearLocationArgs();
-		a_ShowAllThumbnails();
-		a_elFilter.m_elBody.style.display = 'none';
-		a_elFilter.m_elLabel.style.display = 'block';
-	};
-
-	var elBtnShowAll = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnShowAll);
-	elBtnShowAll.textContent = 'Show All';
-	elBtnShowAll.onclick = function(e){g_SetLocationArgs({"a_TFilter":null});};
-	elBtnShowAll.classList.add('button');
-	elBtnShowAll.style.cssFloat = 'right';
-
-	var elBtnFilter = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnFilter);
-	elBtnFilter.classList.add('button');
-	elBtnFilter.textContent = 'Filter';
-	elBtnFilter.style.cssFloat = 'right';
-	elBtnFilter.onclick = a_ThumbFilterApply;
-
-	var elPercentDiv = document.createElement('div');
-	elBody.appendChild( elPercentDiv);
-	elPercentDiv.style.cssFloat = 'left';
-	elPercentDiv.style.textAlign = 'center';
-	var elPercentLabel = document.createElement('div');
-	elPercentDiv.appendChild( elPercentLabel);
-	elPercentLabel.textContent = 'Percent:';
-	elPercentLabel.style.cssFloat = 'left';
-	var elPercentMin = document.createElement('div');
-	elPercentDiv.appendChild( elPercentMin);
-	elPercentMin.style.cssFloat = 'left';
-	elPercentMin.contentEditable = 'true';
-	elPercentMin.classList.add('editing');
-	elPercentMin.style.width = '40px';
-	var elPercentLabel = document.createElement('div');
-	elPercentDiv.appendChild( elPercentLabel);
-	elPercentLabel.textContent = '-';
-	elPercentLabel.style.cssFloat = 'left';
-	var elPercentMax = document.createElement('div');
-	elPercentDiv.appendChild( elPercentMax);
-	elPercentMax.style.cssFloat = 'left';
-	elPercentMax.contentEditable = 'true';
-	elPercentMax.classList.add('editing');
-	elPercentMax.style.width = '40px';
-	a_elFilter.m_elPercentMin = elPercentMin;
-	a_elFilter.m_elPercentMax = elPercentMax;
-
-	var elFinishDiv = document.createElement('div');
-	elBody.appendChild( elFinishDiv);
-	elFinishDiv.style.textAlign = 'center';
-	var elFinishLabel = document.createElement('div');
-	elFinishDiv.appendChild( elFinishLabel);
-	elFinishLabel.textContent = 'Finish:';
-	elFinishLabel.style.cssFloat = 'left';
-	var elFinishMin = document.createElement('div');
-	elFinishDiv.appendChild( elFinishMin);
-	elFinishMin.style.cssFloat = 'left';
-	elFinishMin.contentEditable = 'true';
-	elFinishMin.classList.add('editing');
-	elFinishMin.style.width = '40px';
-	var elFinishLabel = document.createElement('div');
-	elFinishDiv.appendChild( elFinishLabel);
-	elFinishLabel.textContent = '-';
-	elFinishLabel.style.cssFloat = 'left';
-	var elFinishMax = document.createElement('div');
-	elFinishDiv.appendChild( elFinishMax);
-	elFinishMax.style.cssFloat = 'left';
-	elFinishMax.contentEditable = 'true';
-	elFinishMax.classList.add('editing');
-	elFinishMax.style.width = '40px';
-	a_elFilter.m_elFinishMin = elFinishMin;
-	a_elFilter.m_elFinishMax = elFinishMax;
-
-	var elStatusDiv = document.createElement('div');
-	elBody.appendChild( elStatusDiv);
-	var elStatusLabel = document.createElement('div');
-	elStatusDiv.appendChild( elStatusLabel);
-	elStatusLabel.textContent = 'Status:';
-	elStatusLabel.style.cssFloat = 'left';
-	var elStatus = document.createElement('div');
-	elStatusDiv.appendChild( elStatus);
-	elStatus.contentEditable = 'true';
-	elStatus.classList.add('editing');
-	a_elFilter.m_elStatus = elStatus;
-
-	var elArtistsDiv = document.createElement('div');
-	elBody.appendChild( elArtistsDiv);
-	var elArtistsLabel = document.createElement('div');
-	elArtistsDiv.appendChild( elArtistsLabel);
-	elArtistsLabel.textContent = 'Artists:';
-	elArtistsLabel.style.cssFloat = 'left';
-	var elArtists = document.createElement('div');
-	elArtistsDiv.appendChild( elArtists);
-	elArtists.classList.add('artists');
-	a_elFilter.m_elArtists = [];
+/*	a_elFilter = document.createElement('div');
 	for( var user in g_users )
 	{
 		el = document.createElement('div');
@@ -501,7 +370,7 @@ function a_ShowThumbnails()
 		el.onclick = function(e){ c_ElToggleSelected(e); a_ThumbFilterApply()};
 		a_elFilter.m_elTags.push( el);
 	}
-
+*/
 	if( ASSET.thumbnails === 0 )
 	{
 		var folders = g_elCurFolder.m_dir.folders;
@@ -699,100 +568,20 @@ function a_ThumbStatusApply( i_status)
 	st_SetElColor( i_status, a_elCurEditStatus);
 }
 
-function a_ThumbFilterApply()
+function a_ThumbFilter( i_args)
 {
-	var args = {};
-	if( a_elFilter.m_elStatus.textContent.length )
-		args.ann = a_elFilter.m_elStatus.textContent;
+	if( a_elThumbnails == null ) return;
 
-	for( var i = 0; i < a_elFilter.m_elArtists.length; i++)
-		if( a_elFilter.m_elArtists[i].m_selected )
-		{
-			if( args.artists == null ) args.artists = [];
-			args.artists.push( a_elFilter.m_elArtists[i].m_user);
-		}
-
-	for( var i = 0; i < a_elFilter.m_elTags.length; i++)
-		if( a_elFilter.m_elTags[i].m_selected )
-		{
-			if( args.tags == null ) args.tags = [];
-			args.tags.push( a_elFilter.m_elTags[i].m_tag);
-		}
-
-	var permin = c_GetElInteger( a_elFilter.m_elPercentMin);
-	var permax = c_GetElInteger( a_elFilter.m_elPercentMax);
-	if(( permin != null ) || ( permax != null ))
-		args.percent = [permin,permax];
-
-	var finmin = c_GetElInteger( a_elFilter.m_elFinishMin);
-	var finmax = c_GetElInteger( a_elFilter.m_elFinishMax);
-	if(( finmin != null ) || ( finmax != null ))
-		args.finish = [finmin,finmax];
-
-	g_SetLocationArgs({"a_TFilter":args});
-}
-function a_TFilter( i_args)
-{
 //c_Info( JSON.stringify(i_args));
-	if( a_elFilter )
-	{
-		a_elFilter.m_elLabel.style.display = 'none';
-		a_elFilter.m_elBody.style.display = 'block';
-	}
-	else
-	{
-		c_Error('Can`t find filter element.');
-		return;
-	}
-
-	if( a_elThumbnails == null )
-	{
-		c_Error('Asset does not have any thumbnails.');
-		return;
-	}
-
 	if( i_args == null ) i_args = {};
 
 	var anns = null;
 	if( i_args.ann )
 	{
-		a_elFilter.m_elStatus.textContent = i_args.ann;
 		var anns_or = i_args.ann.split(',');
 		anns = [];
 		for( var o = 0; o < anns_or.length; o++)
 			anns.push( anns_or[o].split(' '));
-	}
-	if( i_args.artists )
-	{
-		for( i = 0; i < a_elFilter.m_elArtists.length; i++ )
-			c_ElSetSelected( a_elFilter.m_elArtists[i], i_args.artists.indexOf( a_elFilter.m_elArtists[i].m_user ) != -1 )
-	}
-	if( i_args.tags ) 
-	{
-		for( i = 0; i < a_elFilter.m_elTags.length; i++ )
-			c_ElSetSelected( a_elFilter.m_elTags[i], i_args.tags.indexOf( a_elFilter.m_elTags[i].m_tag ) != -1 )
-	}
-	if( i_args.percent )
-	{
-		if(( i_args.percent[0] != null ) && ( i_args.percent[1] != null ) && ( i_args.percent[0] > i_args.percent[1] ))
-		{
-			i_args.percent[0]+= i_args.percent[1];
-			i_args.percent[1] = i_args.percent[0] - i_args.percent[1];
-			i_args.percent[0] = i_args.percent[0] - i_args.percent[1];
-		}
-		a_elFilter.m_elPercentMin.textContent = i_args.percent[0];
-		a_elFilter.m_elPercentMax.textContent = i_args.percent[1];
-	}
-	if( i_args.finish )
-	{
-		if(( i_args.finish[0] != null ) && ( i_args.finish[1] != null ) && ( i_args.finish[0] > i_args.finish[1] ))
-		{
-			i_args.finish[0]+= i_args.finish[1];
-			i_args.finish[1] = i_args.finish[0] - i_args.finish[1];
-			i_args.finish[0] = i_args.finish[0] - i_args.finish[1];
-		}
-		a_elFilter.m_elFinishMin.textContent = i_args.finish[0];
-		a_elFilter.m_elFinishMax.textContent = i_args.finish[1];
 	}
 
 	for( var th = 0; th < a_elThumbnails.length; th++)
@@ -897,6 +686,8 @@ function a_TFilter( i_args)
 
 function a_ShowAllThumbnails()
 {
+	if( a_elThumbnails == null ) return;
+
 	for( var i = 0; i < a_elThumbnails.length; i++)
 		a_elThumbnails[i].style.display = 'block';
 

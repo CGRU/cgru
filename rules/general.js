@@ -33,6 +33,7 @@ function g_Init()
 		g_auth_user = config.user;
 		ad_Init();
 		nw_Init();
+		u_InitUsers();
 
 		if( localStorage.user_name != config.user.id )
 		{

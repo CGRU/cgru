@@ -991,5 +991,79 @@ function usersget( $i_args, &$o_out)
 	$o_out['users'] = $users;
 }
 
+function search( $i_args, &$o_out)
+{
+	if( false == array_key_exists('path', $i_args))
+	{
+		$o_out['error'] = 'Search path is not specified.';
+		return;
+	}
+
+	if( false == array_key_exists('depth', $i_args))
+		$i_args['depth'] = 1;
+
+	$path = $i_args['path'];
+	$rem = array('../','../','..');
+	$path = str_replace( $rem, '', $path);
+	if( false == is_dir( $path))
+	{
+		$o_out['error'] = "Search path '$path' does not exist.";
+		return;
+	}
+
+	$o_out['search'] = $i_args;
+	$o_out['results'] = array();
+
+	searchFolder( $i_args, $o_out, $path, 0);
+}
+
+function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
+{
+	global $RuleMaxLength;
+
+	$i_depth++;
+	if( $i_depth > $i_args['depth'] ) return;
+
+	if( false == is_dir( $i_path)) return;
+	$dHandle = opendir($i_path);
+	if( $dHandle === false ) return;
+
+	while (false !== ( $entry = readdir( $dHandle)))
+	{
+		if( $entry == '.') continue;
+		if( $entry == '..') continue;
+
+		$path = "$i_path/$entry";
+		if( false == is_dir( $path)) continue;
+
+		$rufolder = "$path/".$i_args['rufolder'];
+		if( false == is_dir( $rufolder)) continue;
+
+		foreach( $i_args['rufiles'] as $rufile )
+		{
+			$rufile = "$rufolder/$rufile.json";
+			if( false == is_file( $rufile)) continue;
+
+			if( $fHandle = fopen( $rufile, 'r'))
+			{
+				$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
+				if( searchStatus( $i_args, $obj))
+					array_push( $o_out['results'], $path);
+				fclose($fHandle);
+			}
+		}
+
+		if( $i_depth < $i_args['depth'] )
+			searchFolder( $i_args, $o_out, $path, $i_depth);
+	}
+
+	closedir($dHandle);
+}
+
+function searchStatus( &$i_args, &$i_obj)
+{
+	return true;
+}
+
 ?>
 

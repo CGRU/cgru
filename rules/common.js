@@ -1,5 +1,7 @@
 c_logCount = 0;
 
+var $ = function( id ) { return document.getElementById( id ); };
+
 function c_Init()
 {
 	cgru_ConstructSettingsGUI();
