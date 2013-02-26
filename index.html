@@ -33,6 +33,42 @@
 			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
 		</div>
 	</div>
+	<div id="search" style="display:none">
+		<div>
+			<div style="float:left">Percent:</div>
+			<div id="search_percentmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left"> - </div>
+			<div id="search_percentmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left">Finish:</div>
+			<div id="search_finishmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left"> - </div>
+			<div id="search_finishmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div class="button" style="float:right" onclick="u_SearchSearch()">Search</div>
+		</div>
+		<div>
+			<div style="float:left;">Annotation:</div>
+			<div id="search_annotation" class="editing" contenteditable="true"></div>
+		</div>
+		<div id="search_artists_div" style="display:none">
+			<div style="float:left;">Artists:</div>
+			<div id="search_artists"></div>
+		</div>
+		<div>
+			<div style="float:left;">Tags:</div>
+			<div id="search_tags"></div>
+		</div>
+		<div id="search_comment_div">
+			<div style="float:left;">Comments:</div>
+			<div id="search_comment" class="editing" style="" contenteditable="true"></div>
+		</div>
+		<div id="search_result_div" style="display:none;border-radius:6px; box-shadow:0 0 3px #000 inset;">
+			<div id="search_info">
+				<div style="float:left;">Search Path = </div>
+				<a id="search_path"></a>
+			</div>
+			<div id="search_result" style="border-radius:6px; box-shadow:0 0 3px #000 inset;"></div>
+		</div>
+	</div>
 	<div style="text-align: center"><img id="thumbnail" class="thumbnail" ></div>
 	<div id="content_info">
 		<div id="content_status">
@@ -49,34 +85,6 @@
 				<span id="status_description"></span>
 			</div>
 		</div>
-	</div>
-	<div id="search" style="display:none">
-		<div>
-			<div style="float:left">Percent:</div>
-			<div id="search_percentmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left"> - </div>
-			<div id="search_percentmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left">Finish:</div>
-			<div id="search_finishmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left"> - </div>
-			<div id="search_finishmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<!--div class="button" style="float:right" onclick="u_SearchClose()">Close</div-->
-			<!--div class="button" style="float:right">Show All</div-->
-			<div class="button" style="float:right" onclick="u_SearchSearch()">Search</div>
-		</div>
-		<div>
-			<div style="float:left;">Annotation:</div>
-			<div id="search_annotation" class="editing" contenteditable="true"></div>
-		</div>
-		<div>
-			<div style="float:left;">Artists:</div>
-			<div id="search_artists"></div>
-		</div>
-		<div>
-			<div style="float:left;">Tags:</div>
-			<div id="search_tags"></div>
-		</div>
-		<div id="search_result" style="display:none; border-radius:6px; box-shadow:0 0 4px #000 inset;"></div>
 	</div>
 	<div id="asset"></div>
 	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">

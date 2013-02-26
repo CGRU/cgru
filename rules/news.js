@@ -178,13 +178,13 @@ function nw_NewsOpen()
 function nw_MakeNewsDialog()
 {
 	if( g_auth_user == null ) return;
-	new cgru_Dialog( window, window, 'nw_MakeNews', null, 'str', '', 'news',
+	new cgru_Dialog( window, window, 'nw_MakeNewsDialogApply', null, 'str', '', 'news',
 		'Create News', 'Enter News Title');
 }
-
-function nw_MakeNews( i_value, i_path)
+function nw_MakeNewsDialogApply( i_not_used, i_title) { nw_MakeNews( i_title); }
+function nw_MakeNews( i_title, i_path)
 {
-//window.console.log(i_value);
+//window.console.log(i_title);
 	if( g_auth_user == null ) return;
 
 	if( i_path == null ) i_path = g_CurPath();
@@ -192,7 +192,7 @@ function nw_MakeNews( i_value, i_path)
 	var news = {};
 	news.time = c_DT_CurSeconds();
 	news.path = i_path;
-	news.title = i_value;
+	news.title = i_title;
 	news.id = g_auth_user.id+'_'+news.time+'_'+news.path;
 
 	var msg = c_Parse( n_Request({"makenews":news}));

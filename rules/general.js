@@ -100,7 +100,7 @@ function g_ClearLocationArgs()
 function g_PathChanged()
 {
 	var old_path = null;
-	if( g_elCurFolder ) old_path =  g_elCurFolder.m_path;
+	if( g_elCurFolder ) old_path = g_elCurFolder.m_path;
 
 	var new_path = c_GetHashPath();
 	var args = null;
@@ -113,7 +113,7 @@ function g_PathChanged()
 	}
 
 	if( new_path != old_path )
-	g_Navigate( new_path);
+		g_Navigate( new_path);
 
 	if( args == null ) return;
 

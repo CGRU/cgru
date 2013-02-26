@@ -1039,25 +1039,37 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 		$rufolder = "$path/".$i_args['rufolder'];
 		if( false == is_dir( $rufolder)) continue;
 
-		$founded = false;
-		foreach( $i_args['rufiles'] as $rufile )
+		$founded = true;
+
+		if( $founded && array_key_exists('status', $i_args ))
 		{
-			$rufile = "$rufolder/$rufile.json";
-			if( false == is_file( $rufile)) continue;
-
 			$founded = false;
-			if( $fHandle = fopen( $rufile, 'r'))
+			$rufile = "$rufolder/status.json";
+			if( is_file( $rufile))
 			{
-				$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
-				$founded = true;
+				if( $fHandle = fopen( $rufile, 'r'))
+				{
+					$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
+						if( searchStatus( $i_args['status'], $obj))
+							$founded = true;
+					fclose($fHandle);
+				}
+			}
+		}
 
-				if( $founded && array_key_exists('status', $i_args ))
-					if( searchStatus( $i_args['status'], $obj))
-						$founded = true;
-					else
-						$founded = false;
-
-				fclose($fHandle);
+		if( $founded && array_key_exists('comment', $i_args ))
+		{
+			$founded = false;
+			$rufile = "$rufolder/comments.json";
+			if( is_file( $rufile))
+			{
+				if( $fHandle = fopen( $rufile, 'r'))
+				{
+					$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
+						if( searchComment( $i_args['comment'], $obj))
+							$founded = true;
+					fclose($fHandle);
+				}
 			}
 		}
 
@@ -1073,8 +1085,8 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 
 function searchStatus( &$i_args, &$i_obj)
 {
-	if( false == array_key_exists('status', $i_obj))
-		return false;
+	if( false == is_array( $i_obj)) return false;
+	if( false == array_key_exists('status', $i_obj)) return false;
 
 	$founded = true;
 
@@ -1082,7 +1094,10 @@ function searchStatus( &$i_args, &$i_obj)
 	{
 		$founded = false;
 		if( array_key_exists('annotation', $i_obj['status']))
-			if( strpos( $i_obj['status']['annotation'], $i_args['ann']) !== false )
+			if( stripos( $i_obj['status']['annotation'], $i_args['ann']) !== false )
+				$founded = true;
+		if( array_key_exists('description', $i_obj['status']))
+			if( stripos( $i_obj['status']['description'], $i_args['ann']) !== false )
 				$founded = true;
 	}
 
@@ -1104,7 +1119,39 @@ function searchStatus( &$i_args, &$i_obj)
 					$founded = true;
 	}
 
+	if( $founded && array_key_exists('percent', $i_args))
+	{
+		$founded = false;
+		if( array_key_exists('progress', $i_obj['status']))
+			if( ($i_obj['status']['progress'] >= $i_args['percent'][0]) &&
+				($i_obj['status']['progress'] <= $i_args['percent'][1]) )
+					$founded = true;
+	}
+
+	if( $founded && array_key_exists('finish', $i_args))
+	{
+		$founded = false;
+		if( array_key_exists('finish', $i_obj['status']))
+		{
+			$days = ($i_obj['status']['finish'] - time()) / ( 60 * 60 * 24 );
+			if( ($days >= $i_args['finish'][0]) &&
+				($days <= $i_args['finish'][1]) )
+					$founded = true;
+		}
+	}
+
 	return $founded;
+}
+
+function searchComment( &$i_args, &$i_obj)
+{
+	if( false == is_array( $i_obj)) return false;
+	if( false == array_key_exists('comments', $i_obj)) return false;
+	foreach( $i_obj['comments'] as &$comment )
+		if( array_key_exists('text', $comment))
+			if( stripos( $comment['text'], $i_args) !== false )
+				return true;
+	return false;
 }
 
 ?>

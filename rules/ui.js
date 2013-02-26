@@ -17,6 +17,8 @@ function u_Init()
 
 	if( localStorage.header_opened == 'true' ) u_OpenCloseHeader();
 	if( localStorage.footer_opened == 'true' ) u_OpenCloseFooter();
+
+	$('search_artists').m_elArtists = [];
 }
 function u_OpenCloseHeader(){u_OpenCloseHeaderFooter(document.getElementById('headeropenbtn'),'header',-200,0);}
 function u_OpenCloseFooter(){u_OpenCloseHeaderFooter(document.getElementById('footeropenbtn'),'footer',38,238);}
@@ -49,8 +51,8 @@ function u_Process()
 
 function u_InitUsers()
 {
-	var elArtists = document.getElementById('search_artists');
-	elArtists.m_elArtists = [];
+	$('search_artists_div').style.display = 'block';
+	var elArtists = $('search_artists');
 	for( var user in g_users )
 	{
 		el = document.createElement('div');
@@ -371,7 +373,7 @@ function u_SkipFile( i_filename)
 function u_SearchOnClick()
 {
 	$('search_result').textContent = '';
-	$('search_result').style.display = 'none';
+	$('search_result_div').style.display = 'none';
 
 	if( $('search_btn').m_opened )
 	{
@@ -380,6 +382,7 @@ function u_SearchOnClick()
 		$('search').style.display = 'none';
 		g_ClearLocationArgs();
 		a_ShowAllThumbnails();
+		$('search').m_path = null;
 	}
 	else
 	{
@@ -402,15 +405,30 @@ function u_SearchOnClick()
 			el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};
 			$('search_tags').m_elTags.push( el);
 		}
+
+		if( ASSET && ( ASSET.thumbnails != null))
+			$('search_comment_div').style.display = 'none';
+		else
+			$('search_comment_div').style.display = 'block';
 	}
 }
 
 function u_SearchSearch()
 {
-	var args = {};
-	if( $('search_annotation').textContent.length )
-		args.ann = $('search_annotation').textContent;
+//console.log('g_CurPath(): ' + g_CurPath());
+//console.log('search path: ' + $('search').m_path);
+	if( $('search').m_path && ( $('search').m_path != g_CurPath() ))
+	{
+console.log('g_GO: ' + $('search').m_path);
+		g_GO($('search').m_path);
+		g_PathChanged();
+	}
+	$('search').m_path = g_CurPath();
+//console.log(g_CurPath());
 
+	var args = {};
+	if( c_Strip($('search_annotation').textContent).length )
+		args.ann = c_Strip($('search_annotation').textContent);
 
 	for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
 		if( $('search_artists').m_elArtists[i].m_selected )
@@ -436,13 +454,16 @@ function u_SearchSearch()
 	if(( finmin != null ) || ( finmax != null ))
 		args.finish = [finmin,finmax];
 
+	if( c_Strip($('search_comment').textContent).length )
+		args.comment = c_Strip($('search_comment').textContent);
+
 	g_SetLocationArgs({"u_Search":args});
 }
 
 function u_Search( i_args)
 {
 	$('search_result').textContent = '';
-	$('search_result').style.display = 'none';
+	$('search_result_div').style.display = 'none';
 
 	if( $('search_btn').m_opened !== true ) u_SearchOnClick();
 
@@ -479,6 +500,8 @@ function u_Search( i_args)
 		$('search_finishmin').textContent = i_args.finish[0];
 		$('search_finishmax').textContent = i_args.finish[1];
 	}
+	if( i_args.comment )
+		$('search_comment').textContent = i_args.comment;
 
 	if( a_elThumbnails )
 	{
@@ -486,11 +509,22 @@ function u_Search( i_args)
 		return;
 	}
 
+	$('search_path').textContent = g_CurPath();
+	$('search_path').href = '#'+g_CurPath();
+
 	var args = {};
-	args.status = i_args;
+	for( arg in i_args )
+	{
+		if( arg == 'comment' )
+		{
+			args.comment = i_args['comment'];
+			continue;
+		}
+		if( args.status == null ) args.status = {};
+		args.status[arg] = i_args[arg];
+	}
 	args.path = RULES.root + g_CurPath();
 	args.rufolder = RULES.rufolder;
-	args.rufiles = ['status'];
 	args.depth = 4;
 
 	var res = c_Parse( n_Request({"search":args}));
@@ -507,7 +541,7 @@ function u_Search( i_args)
 		return;
 	}
 
-	$('search_result').style.display = 'block';
+	$('search_result_div').style.display = 'block';
 	res.result.sort();
 	for( var i = 0; i < res.result.length; i++)
 	{
@@ -519,7 +553,7 @@ function u_Search( i_args)
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
 		elLink.href = '#'+path;
-		elLink.target = '_blank';
+//		elLink.target = '_blank';
 		elLink.textContent = path;
 	}
 }
