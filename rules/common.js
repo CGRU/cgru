@@ -9,6 +9,18 @@ function c_Init()
 
 	document.getElementById('platform').textContent = cgru_Platform;
 	document.getElementById('browser').textContent = cgru_Browser;
+
+	c_ApplyStyles();
+}
+
+function c_ApplyStyles()
+{
+	document.body.style.background = localStorage.background;
+	document.body.style.color = localStorage.text_color;
+	$('header').style.background = localStorage.background;
+	$('footer').style.background = localStorage.background;
+	$('navig').style.background = localStorage.background;
+	$('sidepanel').style.background = localStorage.background;
 }
 
 function c_GetHashPath()
@@ -209,6 +221,7 @@ function cgru_params_OnChange( i_param, i_value)
 {
 //window.console.log( i_param+':'+i_value);
 	if( i_param == 'user_title' && g_auth_user ) ad_ChangeTitle( g_auth_user.id, i_value);
+	else c_ApplyStyles();
 }
 
 function c_CompareFolders(a,b)

@@ -7,6 +7,8 @@ g_auth_user = null;
 g_users = null;
 
 cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
+cgru_params.push(['background','Background', '#A0A0A0', 'Enter Background Style']);
+cgru_params.push(['text_color','Text Color', '#000000', 'Enter Text Color']);
 
 function g_Init()
 {

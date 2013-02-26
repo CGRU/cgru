@@ -1,6 +1,6 @@
 body {
 font: 16px Arial;
-background: #ab8;
+background: #A0A0A0;
 }
 
 /* ================================ */
@@ -15,9 +15,9 @@ background: #ab8;
 * { margin: 0; padding: 0; overflow: hidden; }
 
 #header, #footer, #navig, #sidepanel {
-background: #ab7;
+background: #A0A0A0;
 position: absolute;
-box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 15px #FFF inset;
+box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 10px rgba(255,255,255,0.5) inset;
 }
 
 #header, #footer { left: 0; right: 0; }
@@ -34,12 +34,12 @@ left: 40px; right: 10px; bottom: 5px; height: 30px;
 #header .panel .button { float: left; padding: 4px 8px; margin: 1px 8px; }
 
 #footer #info {
-background: #DDD;
+background: rgba(255,255,255,0.2);
 border-radius: 4px;
 margin: 8px 40px;
 padding: 3px 10px;
 height: 20px;
-box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.5);
+box-shadow: 0px 0px 4px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
 }
 #footer #log {
 display: none;
@@ -47,7 +47,7 @@ position: absolute;
 overflow: auto;
 border-radius: 6px;
 left: 10px; right: 10px; top: 40px; bottom: 5px;
-box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.5);
+box-shadow: 0px 0px 4px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
 padding: 2px 6px;
 font-size: 12px;
 }
@@ -84,10 +84,10 @@ font-weight: normal;
 #navig .folder.opened {
 padding-top: 4px;
 padding-bottom: 4px;
-background: rgba(200,255,255,.1);
+background: rgba(0,255,255,.02);
 font-weight: bold;
 }
-#navig .folder.current { background: rgba(200,255,255,.7); }
+#navig .folder.current { background: rgba(200,255,255,.2); /*color:#000000;*/ }
 #navig .folder:hover { box-shadow: 0px 0px 3px rgba(200,255,255,1.0)}
 #navig .folder .fcolor {
 position: absolute;
@@ -108,18 +108,21 @@ padding-right:4px;
 /* ========================================== */
 /* ============== GLOBALS: ================== */
 
+a { color: inherit; text-shadow: 0 0 2px rgba(0,0,255,.3);}
+a:hover { text-shadow: 0 0 2px rgba(100,200,255,.5); }
+
 .button {
 -moz-user-select: none;
 -webkit-user-select: none;
 cursor: pointer;
 text-align: center;
 border-radius: 4px;
-background: rgba(200,200,200,.2);
-box-shadow: 0 0 3px #000, 0 0 4px rgba(255,255,255,.5) inset;
+background: rgba(200,200,100,.1);
+box-shadow: 0 0 3px #000, 0 0 3px rgba(255,255,255,.3) inset;
 margin: 2px;
 padding: 2px;
 }
-.button:hover { background: rgba(200,255,255,.2);}
+.button:hover { background: rgba(200,255,255,.1);}
 .button.pushed {
 background: transparent;
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
@@ -135,7 +138,7 @@ top: 0px; bottom: 0px; position: relative; left: 0; right: 0;
 min-height: 19px;
 }
 
-.thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
+.thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
 .tag { float:left; cursor: pointer; border-radius: 3px; box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
 .tag.selected { background: rgba(200,255,255,.4);}
@@ -148,6 +151,8 @@ min-height: 19px;
 
 .colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
 .colorbars div div { float:left;}
+
+.cmdexec { opacity: 0.8; }
 
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
@@ -200,16 +205,16 @@ cursor: pointer;
 font-weight: normal;
 border: 1px solid rgba(255,255,255,.2);
 padding: 0px 0px 0px 8px;
-color: rgba(0,0,0,.8);
+/*color: rgba(0,0,0,.8);*/
 }
 #playlist .folder { font-size: 16px; }
-#playlist .link { font-size: 14px; color: #005;}
-#playlist .folder.opened { background: rgba(200,255,255,.2);/*font-weight: bold;*/}
+#playlist .link { font-size: 14px; /*color: #005;*/}
+#playlist .folder.opened { background: rgba(0,255,255,.03);/*font-weight: bold;*/}
 #playlist .folder > div { display: none;}
 #playlist .folder.opened > div { display: block;}
 #playlist .current {font-weight: bold;}
-#playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); color: rgba(0,0,0,1.0);}
-#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); color: #00A;}
+#playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
+#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: #00A;*/}
 /* ======= USERS: ======== */
 #users > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
 #users > div div { padding: 0px 4px;}
@@ -260,7 +265,7 @@ padding: 4px;
 #search .button { margin: 1px 8px; padding: 2px 8px; }
 
 #assets {
-background: rgba(200,255,255,.3);
+background: rgba(100,255,255,.1);
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
 border-radius: 12px;
 height: 30px;
@@ -425,5 +430,6 @@ box-shadow: 0 0 4px #000 inset;
 .dailies div .param { background: #DDD;}
 .dailies .rules { padding: 12px; }
 
+.administrate { color: #000000; }
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); }
 
