@@ -1,6 +1,8 @@
 <?php
 
-$AccessFileName = '.htaccess';
+$HT_AccessFileName = '.htaccess';
+$HT_GroupsFileName = '.htgroups';
+
 $RuleMaxLength = 100000;
 $UserName = null;
 
@@ -13,11 +15,11 @@ if( isset($_SERVER['PHP_AUTH_USER']))
 
 function htaccessFolder( $i_folder)
 {
-	global $RuleMaxLength, $AccessFileName, $UserName;
+	global $RuleMaxLength, $HT_AccessFileName, $UserName;
 
 	if( $UserName == null ) return true;
 
-	$htaccess = $i_folder.'/'.$AccessFileName;
+	$htaccess = $i_folder.'/'.$HT_AccessFileName;
 //error_log('checking file '.$htaccess);
 	if( is_file( $htaccess))
 	{
@@ -201,7 +203,7 @@ function readConfig( $i_file, &$o_out)
 	}
 }
 
-function readobj( $i_file, &$o_out)
+function jsf_readobj( $i_file, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -310,7 +312,7 @@ function replaceObject( &$o_obj, $i_obj)
 //	if( array_key_exists( $i_attr, $o_obj))
 //		$o_obj[$i_attr] = $i_obj;
 }
-function editobj( $i_edit, &$o_out)
+function jsf_editobj( $i_edit, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -347,7 +349,7 @@ function editobj( $i_edit, &$o_out)
 	}
 }
 
-function cmdexec( $i_obj, &$o_out)
+function jsf_cmdexec( $i_obj, &$o_out)
 {
 	$o_out['cmdexec'] = array();
 	foreach( $i_obj['cmds'] as $cmd)
@@ -385,7 +387,7 @@ function afanasy( $i_obj, &$o_out)
 //	$o_out['header'] = $header;
 }
 
-function save( $i_save, &$o_out)
+function jsf_save( $i_save, &$o_out)
 {
 	$filename = $i_save['file'];
 	$dirname = dirname($filename);
@@ -436,16 +438,19 @@ else if( array_key_exists('afanasy', $recv))
 }
 else if( count( $recv))
 {
-	foreach( $recv as $func => $args )
+	foreach( $recv as $key => $args )
+	{
+		$func = "jsf_$key";
 		if( function_exists($func))
 			$func( $args, $out);
 		else
-			$out['error'] = 'Function "'.$func.'" does not exist.';
+			$out['error'] = 'Function "'.$key.'" does not exist.';
+	}
 }
 
 echo json_encode( $out);
 
-function initialize( $i_arg, &$o_out)
+function jsf_initialize( $i_arg, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -461,7 +466,7 @@ function initialize( $i_arg, &$o_out)
 	}
 
 	$out = array();
-	getallusers( null, $out);
+	jsf_getallusers( null, $out);
 	if( array_key_exists('error', $out))
 	{
 		$o_out['error'] = $out['error'];
@@ -513,10 +518,10 @@ function processUser( &$o_out)
 
 		$editobj['object'] = $user;
 		$out = array();
-		editobj( $editobj, $out);
+		jsf_editobj( $editobj, $out);
 	}
 
-	readobj( $filename, &$user);
+	jsf_readobj( $filename, &$user);
 
 	if( array_key_exists('error', $user))
 	{
@@ -528,7 +533,7 @@ function processUser( &$o_out)
 //	$user['title'] = $i_user['title'];
 	$editobj['object'] = $user;
 	$out = array();
-	editobj( $editobj, $out);
+	jsf_editobj( $editobj, $out);
 	if( array_key_exists('error', $out))
 	{
 		$o_out['error'] = $out['error'];
@@ -538,7 +543,7 @@ function processUser( &$o_out)
 	$o_out['user'] = $user;
 }
 
-function makenews( $i_news, &$o_out)
+function jsf_makenews( $i_news, &$o_out)
 {
 	global $UserName, $RuleMaxLength;
 
@@ -612,28 +617,27 @@ function makenews( $i_news, &$o_out)
 	}
 }
 
-function isAdmin()
+function isAdmin( &$o_out)
 {
 	global $RuleMaxLength, $UserName;
 	if( is_null( $UserName )) return false;
 	$user = array();
-	readobj( "users/$UserName.json", &$user);
+	jsf_readobj( "users/$UserName.json", &$user);
 	if( array_key_exists( 'role', $user))
 		if( $user['role'] == 'admin')
 			return true;
+
+	$o_out['error'] = 'Access denied.';
 	return false;
 }
 
-function htdigest( $i_recv, &$o_out)
+function jsf_htdigest( $i_recv, &$o_out)
 {
 	global $RuleMaxLength, $UserName;
 
 	# Only admin can change or set password
-	if( false == isAdmin())
-	{
-		$o_out['error'] = 'Access denied.';
+	if( false == isAdmin( $o_out))
 		return;
-	}
 
 	$htdigest_file = '.htdigest';
 
@@ -685,15 +689,12 @@ function htdigest( $i_recv, &$o_out)
 //error_log($data);
 }
 
-function deleteuser( $i_user_id, &$o_out)
+function jsf_deleteuser( $i_user_id, &$o_out)
 {
 	global $RuleMaxLength;
 
-	if( false == isAdmin())
-	{
-		$o_out['error'] = 'Access denied.';
+	if( false == isAdmin( $o_out))
 		return;
-	}
 
 	$dHandle = opendir('users');
 	if( $dHandle === false )
@@ -744,7 +745,7 @@ function deleteuser( $i_user_id, &$o_out)
 	else $o_out['error'] = 'Unable to write into the file.';
 }
 
-function getallusers( $i_args, &$o_out)
+function jsf_getallusers( $i_args, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -772,20 +773,16 @@ function getallusers( $i_args, &$o_out)
 	closedir($dHandle);
 }
 
-function getallgroups( $i_args, &$o_out)
+function jsf_getallgroups( $i_args, &$o_out)
 {
-	global $RuleMaxLength;
-
-	$htgroups_file = '.htgroups';
-
-	if( false == is_file( $htgroups_file))
+	global $RuleMaxLength, $HT_GroupsFileName;
+	if( false == is_file( $HT_GroupsFileName))
 	{
 		$o_out['error'] = 'Groups file does not exist.';
 		return;
 	}
 
-
-	if( $fHandle = fopen( $htgroups_file, 'r'))
+	if( $fHandle = fopen( $HT_GroupsFileName, 'r'))
 	{
 		$o_out['groups'] = array();
 		$data = fread( $fHandle, $RuleMaxLength);
@@ -812,14 +809,68 @@ function getallgroups( $i_args, &$o_out)
 	}
 }
 
-function usersadd( $i_args, &$o_out)
+function jsf_creategroup( $i_args, &$o_out)
 {
-	global $RuleMaxLength;
-	if( false == isAdmin())
+	jsf_getallgroups( null, $o_out);
+	if( isset( $o_out['error'])) return;
+
+	$new_group = $i_args;
+	$groups = $o_out['groups'];
+	if( array_key_exists( $new_group, $groups))
 	{
-		$o_out['error'] = 'Access denied.';
+		$o_out['error'] = "Group $new_group already exists.";
 		return;
 	}
+	$groups[$new_group] = array();
+	writeGroups( $groups, $o_out);
+}
+
+function jsf_deletegroup( $i_args, &$o_out)
+{
+	jsf_getallgroups( null, $o_out);
+	if( isset( $o_out['error'])) return;
+
+	$del_group = $i_args;
+	$groups = $o_out['groups'];
+	if( false == array_key_exists( $del_group, $groups))
+	{
+		$o_out['error'] = "Group $del_group does not exist.";
+		return;
+	}
+	unset( $groups[$del_group]);
+	writeGroups( $groups, $o_out);
+}
+
+function writeGroups( $i_groups, &$o_out)
+{
+	global $HT_GroupsFileName;
+	if( false == is_file( $HT_GroupsFileName))
+	{
+		$o_out['error'] = 'Groups file does not exist.';
+		return;
+	}
+
+	$data = '';
+	foreach( $i_groups as $group => $users )
+		$data = $data."$group:".implode(' ',$users)."\n";
+
+	if( $fHandle = fopen( $HT_GroupsFileName, 'w'))
+	{
+		fwrite( $fHandle, $data );
+		fclose( $fHandle);
+	}
+	else
+	{
+		$o_out['error'] = 'Unable to write in groups file.';
+		return;
+	}
+}
+
+function jsf_usersadd( $i_args, &$o_out)
+{
+	global $RuleMaxLength;
+	if( false == isAdmin( $o_out))
+		return;
 
 	$htaccess = $i_args['path'].'/.htaccess';
 
@@ -886,14 +937,11 @@ function usersadd( $i_args, &$o_out)
 		$o_out['error'] = 'Unable to write into the file.';
 }
 
-function usersdel( $i_args, &$o_out)
+function jsf_usersdel( $i_args, &$o_out)
 {
 	global $RuleMaxLength;
-	if( false == isAdmin())
-	{
-		$o_out['error'] = 'Access denied.';
+	if( false == isAdmin( $o_out))
 		return;
-	}
 
 	$htaccess = $i_args['path'].'/.htaccess';
 
@@ -952,13 +1000,10 @@ function usersdel( $i_args, &$o_out)
 		$o_out['error'] = 'Unable to write into the file.';
 }
 
-function usersclear( $i_args, &$o_out)
+function jsf_usersclear( $i_args, &$o_out)
 {
-	if( false == isAdmin())
-	{
-		$o_out['error'] = 'Access denied.';
+	if( false == isAdmin( $o_out))
 		return;
-	}
 
 	$htaccess = $i_args['path'].'/.htaccess';
 	if( false === is_file( $htaccess))
@@ -976,14 +1021,11 @@ function usersclear( $i_args, &$o_out)
 	}
 }
 
-function usersget( $i_args, &$o_out)
+function jsf_usersget( $i_args, &$o_out)
 {
 	global $RuleMaxLength;
-	if( false == isAdmin())
-	{
-		$o_out['error'] = 'Access denied.';
+	if( false == isAdmin( $o_out))
 		return;
-	}
 
 	$o_out['users'] = array();
 	$htaccess = $i_args['path'].'/.htaccess';
@@ -1025,7 +1067,7 @@ function usersget( $i_args, &$o_out)
 	$o_out['users'] = $users;
 }
 
-function search( $i_args, &$o_out)
+function jsf_search( $i_args, &$o_out)
 {
 	if( false == array_key_exists('path', $i_args))
 	{

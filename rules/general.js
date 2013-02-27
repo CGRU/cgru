@@ -2,6 +2,8 @@ RULES = {};
 RULES.rufolder = 'rules';
 RULES_TOP = {};
 
+p_PLAYER = false;
+
 g_elCurFolder = null;
 g_auth_user = null;
 g_users = null;

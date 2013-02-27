@@ -18,7 +18,7 @@ function u_Init()
 	if( localStorage.header_opened == 'true' ) u_OpenCloseHeader();
 	if( localStorage.footer_opened == 'true' ) u_OpenCloseFooter();
 
-	$('search_artists').m_elArtists = [];
+	if( p_PLAYER != true) $('search_artists').m_elArtists = [];
 }
 function u_OpenCloseHeader(){u_OpenCloseHeaderFooter(document.getElementById('headeropenbtn'),'header',-200,0);}
 function u_OpenCloseFooter(){u_OpenCloseHeaderFooter(document.getElementById('footeropenbtn'),'footer',38,238);}

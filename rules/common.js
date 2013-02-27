@@ -15,6 +15,7 @@ function c_Init()
 
 function c_ApplyStyles()
 {
+	if( p_PLAYER ) return;
 	document.body.style.background = localStorage.background;
 	document.body.style.color = localStorage.text_color;
 	$('header').style.background = localStorage.background;
