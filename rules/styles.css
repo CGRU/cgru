@@ -141,7 +141,7 @@ min-height: 19px;
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
 .tag { float:left; cursor: pointer; border-radius: 3px; box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
-.tag.selected { background: rgba(200,255,255,.4);}
+.tag.selected { background: rgba(100,255,255,.2);}
 .artists, .tags { box-shadow: 0 0 2px #000 inset; border-radius: 3px; padding: 0 4px; }
 .tags { font-style:italic;}
 
@@ -431,5 +431,7 @@ box-shadow: 0 0 4px #000 inset;
 .dailies .rules { padding: 12px; }
 
 .administrate { color: #000000; }
+.administrate .button { float: left; }
+.admin_groups div { margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); }
 

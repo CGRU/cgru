@@ -40,7 +40,7 @@ function d_Make( i_path, i_outfolder)
 	params.input = i_path;
 	params.output = i_outfolder;
 
-	params.artist = localStorage.user_title;
+	params.artist = c_GetUserTitle();
 	params.activity = RULES.dailies.activity;
 
 	var dateObj = new Date();

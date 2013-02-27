@@ -212,16 +212,10 @@ function c_MakeThumbnail( i_sources, i_path)
 
 function c_GetUserTitle( i_uid)
 {
+	if( i_uid == null ) i_uid = localStorage.user_name;
 	if( g_users && g_users[i_uid] && g_users[i_uid].title && ( g_users[i_uid].title != 'Coordinator'))
 		return g_users[i_uid].title;
 	return i_uid;
-}
-
-function cgru_params_OnChange( i_param, i_value)
-{
-//window.console.log( i_param+':'+i_value);
-	if( i_param == 'user_title' && g_auth_user ) ad_ChangeTitle( g_auth_user.id, i_value);
-	else c_ApplyStyles();
 }
 
 function c_CompareFolders(a,b)

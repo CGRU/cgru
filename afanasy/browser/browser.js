@@ -19,6 +19,7 @@ g_FooterOpened = false;
 g_Images = [];
 
 cgru_params.push(['run_symbol','Run Symbol', '★','Enter Any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">Unicode<a/><br/>You Should Copy&Paste<br/>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
+function cgru_params_OnChange( i_param, i_value) { cm_ApplyStyles();}
 
 function g_Init()
 {
@@ -33,6 +34,7 @@ function g_Init()
 
 	cgru_ConstructSettingsGUI();
 	cgru_InitParameters();
+	cm_ApplyStyles();
 
 	document.getElementById('platform').textContent = cgru_Platform;
 	document.getElementById('browser').textContent = cgru_Browser;

@@ -13,6 +13,16 @@ cm_Attrs.push(['str',             'Starts',   'Starts Count']);
 cm_Attrs.push(['err',             'Errors',   'Errors Count']);
 cm_Attrs.push(['hst',             'Host',     'Host Name']);
 
+function cm_ApplyStyles()
+{
+	document.body.style.background = localStorage.background;
+	document.body.style.color = localStorage.text_color;
+//	$('header').style.background = localStorage.background;
+//	$('footer').style.background = localStorage.background;
+//	$('navig').style.background = localStorage.background;
+//	$('sidepanel').style.background = localStorage.background;
+}
+
 function cm_CompareItems( i_itemA, i_itemB, i_param, i_greater )
 {
 	if( i_greater == null ) i_greater = false;

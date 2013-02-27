@@ -2,8 +2,6 @@ RULES = {};
 RULES.rufolder = 'rules';
 RULES_TOP = {};
 
-cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
-
 p_imgTypes = ['jpg','jpeg','png'];
 
 p_path = null;
@@ -56,10 +54,7 @@ function p_Init()
 		p_elb[p_buttons[i]] = document.getElementById('btn_'+p_buttons[i]);
 
 	var request = {};
-//	request.user = {};
-//	request.user.title = localStorage.user_title;
 	var config = c_Parse( n_Request({"initialize":request}));
-//	var config = n_ReadConfig();
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 

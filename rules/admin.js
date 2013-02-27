@@ -7,8 +7,6 @@ function ad_Init()
 {
 	if( g_auth_user == null ) return;
 
-	document.getElementById('set_password').style.display = 'block';
-
 	if( g_auth_user.role != 'admin' ) return;
 
 	document.getElementById('admin_window').style.display = 'block';
@@ -144,11 +142,13 @@ function ad_OpenWindow()
 {
 	ad_wnd = new cgru_Window('Administrate');
 
-	var users = ad_GetAllUsers();
+	var users = ad_GetAll('users');
 	if( users == null ) return;
 
+	var groups = ad_GetAll('groups');
+	if( groups == null ) return;
+
 	ad_wnd.elContent.classList.add('administrate');
-	ad_wnd.elContent.classList.add('admin_users');
 
 	var elBtnsDiv = document.createElement('div');
 	ad_wnd.elContent.appendChild( elBtnsDiv );
@@ -159,20 +159,38 @@ function ad_OpenWindow()
 	elBtnRefresh.textContent = 'Refresh';
 	elBtnRefresh.onclick = ad_WndRefresh;
 
-	var elBtnCreate = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnCreate);
-	elBtnCreate.classList.add('button');
-	elBtnCreate.textContent = 'Create';
-	elBtnCreate.onclick = ad_CreateUserOnClick;
+	var elBtnCreateUsr = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnCreateUsr);
+	elBtnCreateUsr.classList.add('button');
+	elBtnCreateUsr.textContent = 'Create';
+	elBtnCreateUsr.onclick = ad_CreateUserOnClick;
 
-	var elBtnDelete = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnDelete);
-	elBtnDelete.classList.add('button');
-	elBtnDelete.textContent = 'Delete';
-	elBtnDelete.onclick = ad_DeleteUserOnClick;
+	var elBtnDeleteUsr = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnDeleteUsr);
+	elBtnDeleteUsr.classList.add('button');
+	elBtnDeleteUsr.textContent = 'Delete';
+	elBtnDeleteUsr.onclick = ad_DeleteUserOnClick;
+
+	var elBtnCreateGrp = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnCreateGrp);
+	elBtnCreateGrp.classList.add('button');
+	elBtnCreateGrp.textContent = 'Create Group';
+	elBtnCreateGrp.onclick = ad_CreateGrpOnClick;
+
+	ad_wnd.elGroups = document.createElement('div');
+	ad_wnd.elContent.appendChild( ad_wnd.elGroups);
+	ad_wnd.elGroups.classList.add('admin_groups');
+
+	for( grp in groups )
+	{
+		var el = document.createElement('div');
+		ad_wnd.elGroups.appendChild( el);
+		el.textContent = grp;
+	}
 
 	ad_wnd.elUsers = document.createElement('div');
 	ad_wnd.elContent.appendChild( ad_wnd.elUsers);
+	ad_wnd.elUsers.classList.add('admin_users');
 
 	ad_WndDrawUsers( users);
 }
@@ -185,6 +203,7 @@ function ad_WndDrawUsers( i_users)
 	labels.id = 'Name';
 	labels.title = 'Title';
 	labels.role = 'Role';
+	labels.group = 'Group';
 	labels.channels = {}; labels.channels.length = 'Cnls';
 	labels.news = {}; labels.news.length = 'News';
 
@@ -194,26 +213,29 @@ function ad_WndDrawUsers( i_users)
 		ad_WndAddUser( ad_wnd.elUsers, i_users[user], row++);
 }
 
-function ad_GetAllUsers()
+function ad_GetAll( i_type)
 {
-	var res = c_Parse( n_Request({"getallusers":true}));
+	var request = {};
+	request['getall'+i_type] = true;
+	var res = c_Parse( n_Request( request));
 	if( res == null )
 	{
-		ad_wnd.elContent.innerHTML = 'Error getting users.';
+		ad_wnd.elContent.innerHTML = 'Error getting '+i_type+'.';
 		return null;
 	}
 	if( res.error )
 	{
-		ad_wnd.elContent.innerHTML = 'Error getting users:<br>'+res.error;
+		ad_wnd.elContent.innerHTML = 'Error getting '+i_type+':<br>'+res.error;
 		return null;
 	}
-	if( res.users == null )
+	if( res[i_type] == null )
 	{
 		ad_wnd.elContent.innerHTML = 'Users are NULL.';
 		return null;
 	}
-	g_users = res.users;
-	return res.users;
+	if( i_type == 'users' ) g_users = res[i_type];
+	else if( i_type == 'groups') g_groups = res[i_type];
+	return res[i_type];
 }
 
 function ad_WndRefresh()
@@ -249,7 +271,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elTitle.m_user_id = i_user.id;
 	elTitle.title = 'Double click edit title';
 	if( i_row ) elTitle.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
-
+/*
 	var elRole = document.createElement('div');
 	el.appendChild( elRole);
 	elRole.style.width = '100px';
@@ -257,6 +279,14 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elRole.m_user_id = i_user.id;
 	elRole.title = 'Double click edit role';
 	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
+*/
+	var elGroup = document.createElement('div');
+	el.appendChild( elGroup);
+	elGroup.style.width = '100px';
+	elGroup.textContent = i_user.group;
+	elGroup.m_user_id = i_user.id;
+	elGroup.title = 'Double click edit group';
+	if( i_row ) elGroup.ondblclick = function(e){ad_ChangeGroupOnCkick(e.currentTarget.m_user_id);};
 
 	var elPasswd = document.createElement('div');
 	el.appendChild( elPasswd);
@@ -290,10 +320,17 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elRTime.style.width = '200px';
 }
 
-function ad_ChangeRoleOnCkick( i_user_id)
+function ad_CreateGrpOnClick() { new cgru_Dialog( window, window, 'ad_CreateGroup', null, 'str', '', 'users', 'Create Group', 'Enter Group Name');}
+function ad_CreateGroup( i_not_used, i_group)
 {
-	new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role');
+	var res = c_Parse( n_Request({"creategroup":i_group}));
+	if( res == null ) return;
+	if( res.error ) { c_Error( res.error ); return; }
+	c_Info('Group "'+i_group+'" created.');
+	ad_WndRefresh();
 }
+
+function ad_ChangeRoleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role'); }
 function ad_ChangeRole( i_user_id, i_role)
 {
 	var obj = {};
@@ -376,12 +413,6 @@ function ad_DeleteUser( not_used, i_user_id)
 	}
 	c_Info('User "'+i_user_id+'" deleted.');
 	ad_WndRefresh();
-}
-
-function ad_SetPasswordOnclick()
-{
-	if( g_auth_user == null ) return;
-	ad_SetPasswordDialog( null, g_auth_user.id )
 }
 
 function ad_SetPasswordDialog( not_used, i_user_id)

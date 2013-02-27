@@ -5,10 +5,9 @@ RULES_TOP = {};
 g_elCurFolder = null;
 g_auth_user = null;
 g_users = null;
+g_groups = null;
 
-cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
-cgru_params.push(['background','Background', '#A0A0A0', 'Enter Background Style']);
-cgru_params.push(['text_color','Text Color', '#000000', 'Enter Text Color']);
+function cgru_params_OnChange( i_param, i_value) { c_ApplyStyles();}
 
 function g_Init()
 {
@@ -17,8 +16,6 @@ function g_Init()
 	c_Init();
 
 	var request = {};
-//	request.user = {};
-//	request.user.title = localStorage.user_title;
 	var config = c_Parse( n_Request({"initialize":request}));
 	if( config == null ) return;
 	if( config.error )

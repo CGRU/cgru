@@ -627,22 +627,17 @@ function isAdmin()
 function htdigest( $i_recv, &$o_out)
 {
 	global $RuleMaxLength, $UserName;
-	$htdigest_file = '.htdigest';
 
-	if( is_null( $UserName))
+	# Only admin can change or set password
+	if( false == isAdmin())
 	{
 		$o_out['error'] = 'Access denied.';
 		return;
 	}
 
+	$htdigest_file = '.htdigest';
+
 	$user = $i_recv['user'];
-	# Only admin can change or set other user password
-	if( $user != $UserName )
-		if( false == isAdmin())
-		{
-			$o_out['error'] = 'Access denied.';
-			return;
-		}
 
 	# Construct md5 hash
 	$p = $i_recv['p'];
@@ -775,7 +770,46 @@ function getallusers( $i_args, &$o_out)
 		}
 	}
 	closedir($dHandle);
-	ksort($o_out['users']);
+}
+
+function getallgroups( $i_args, &$o_out)
+{
+	global $RuleMaxLength;
+
+	$htgroups_file = '.htgroups';
+
+	if( false == is_file( $htgroups_file))
+	{
+		$o_out['error'] = 'Groups file does not exist.';
+		return;
+	}
+
+
+	if( $fHandle = fopen( $htgroups_file, 'r'))
+	{
+		$o_out['groups'] = array();
+		$data = fread( $fHandle, $RuleMaxLength);
+		$lines = explode("\n", $data);
+		foreach( $lines as $line )
+		{
+			if( strlen($line) < 3 ) continue;
+			$fields = explode(':', $line);
+			if( count( $fields) == 0 ) continue;
+			if( strlen( $fields[0]) < 1 ) continue;
+			$o_out['groups'][$fields[0]] = array();
+			if( count( $fields) < 2 ) continue;
+			$users = explode(' ', $fields[1]);
+			foreach( $users as $user)
+				if( strlen( $user) > 0 )
+					array_push( $o_out['groups'][$fields[0]], $user);
+		}
+		fclose($fHandle);
+	}
+	else
+	{
+		$o_out['error'] = 'Unable to open groups file.';
+		return;
+	}
 }
 
 function usersadd( $i_args, &$o_out)
@@ -1094,10 +1128,10 @@ function searchStatus( &$i_args, &$i_obj)
 	{
 		$founded = false;
 		if( array_key_exists('annotation', $i_obj['status']))
-			if( stripos( $i_obj['status']['annotation'], $i_args['ann']) !== false )
+			if( mb_stripos( $i_obj['status']['annotation'], $i_args['ann'], 0, 'utf-8') !== false )
 				$founded = true;
 		if( array_key_exists('description', $i_obj['status']))
-			if( stripos( $i_obj['status']['description'], $i_args['ann']) !== false )
+			if( mb_stripos( $i_obj['status']['description'], $i_args['ann'], 0, 'utf-8') !== false )
 				$founded = true;
 	}
 
@@ -1149,7 +1183,7 @@ function searchComment( &$i_args, &$i_obj)
 	if( false == array_key_exists('comments', $i_obj)) return false;
 	foreach( $i_obj['comments'] as &$comment )
 		if( array_key_exists('text', $comment))
-			if( stripos( $comment['text'], $i_args) !== false )
+			if( mb_stripos( $comment['text'], $i_args, 0, 'utf-8') !== false )
 				return true;
 	return false;
 }
