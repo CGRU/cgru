@@ -11,25 +11,31 @@ function cm_Process()
 {
 //window.console.log('cm_Process():');
 //cm_OpenOnClick();
+	if( cm_opened )
+		cm_Load();
 }
 
 function cm_Finish()
 {
-	u_el.comments.textContent = '';
-	cm_opened = false;
-	document.getElementById('comments_open_btn').classList.add('button');
+	$('comments').textContent = '';
+//	document.getElementById('comments_open_btn').classList.add('button');
 }
 
 function cm_OpenOnClick()
 {
 	if( cm_opened ) return;
-
 	document.getElementById('comments_open_btn').classList.remove('button');
+	cm_Load();
+}
 
+function cm_Load()
+{
 	var obj = c_Parse( n_Request({"readobj":cm_CurFileName()}));
 //window.console.log( JSON.stringify( obj));
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
+
+	$('comments').textContent = '';
 
 	cm_opened = true;
 	for( key in obj.comments )
@@ -40,8 +46,8 @@ function cm_Add( i_obj)
 {
 //window.console.log( JSON.stringify( i_obj));
 	var el = document.createElement('div');
-//	u_el.comments.appendChild( el);
-	u_el.comments.insertBefore( el, u_el.comments.firstChild);
+//	$('comments').appendChild( el);
+	$('comments').insertBefore( el, $('comments').firstChild);
 	el.classList.add('comment');
 
 	var elPanel = document.createElement('div');
@@ -261,7 +267,7 @@ function cm_ColorOnclick( e)
 function cm_Cancel( i_el)
 {
 	if( i_el.m_new )
-		u_el.comments.removeChild( i_el);
+		$('comments').removeChild( i_el);
 	else
 		cm_Init( i_el);
 }

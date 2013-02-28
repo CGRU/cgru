@@ -11,6 +11,7 @@ function c_Init()
 	document.getElementById('browser').textContent = cgru_Browser;
 
 	c_ApplyStyles();
+	u_el.log.m_elLogs = [];
 }
 
 function c_ApplyStyles()
@@ -130,10 +131,10 @@ function c_Log( i_msg)
 	var time = c_PadZero(date.getHours())+':'+c_PadZero(date.getMinutes())+':'+c_PadZero(date.getSeconds())+'.'+c_PadZero(date.getMilliseconds(),3);
 	var elLine = document.createElement('div');
 	elLine.innerHTML = '<i><b>#</b>'+c_logCount+' '+time+':</i> '+i_msg;
-	var lines = log.getElementsByTagName('div');
-	u_el.log.insertBefore( elLine, lines[0]);
-	if( lines.length > 100 )
-		u_el.log.removeChild( lines[100]);
+	u_el.log.insertBefore( elLine, u_el.log.childNodes[0]);
+	u_el.log.m_elLogs.push( elLine);
+	if( u_el.log.m_elLogs.length > 100 )
+		u_el.log.removeChild( u_el.log.m_elLogs.shift());
 	c_logCount++;
 
 	if( u_el && u_el.cycle )
@@ -263,5 +264,17 @@ function c_GetElInteger( i_el)
 		return null;
 	}
 	return num;
+}
+
+function c_CreateOpenButton( i_el, i_path)
+{
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.textContent = 'Open';
+	el.classList.add('cmdexec');
+	var cmd = RULES.cmdexec.open_folder;
+	cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+	el.setAttribute('cmdexec', JSON.stringify([cmd]));
+	return el;
 }
 

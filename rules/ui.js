@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','status_description','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','comments','files','content_info','content_status','thumbnail','sidepanel','status_description_div','status_finish'];
+u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','status_description','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','files','content_info','content_status','thumbnail','sidepanel','status_description_div','status_finish'];
 u_el = {};
 
 u_status_description_brief = 1;
@@ -18,10 +18,12 @@ function u_Init()
 	if( localStorage.header_opened == 'true' ) u_OpenCloseHeader();
 	if( localStorage.footer_opened == 'true' ) u_OpenCloseFooter();
 
-	if( localStorage.show_hidden == null ) localStorage.show_hidden = 'OFF';
-	$('show_hidden').textContent = localStorage.show_hidden;
-
-	if( p_PLAYER != true) $('search_artists').m_elArtists = [];
+	if( p_PLAYER != true)
+	{
+		if( localStorage.show_hidden == null ) localStorage.show_hidden = 'OFF';
+		$('show_hidden').textContent = localStorage.show_hidden;
+		$('search_artists').m_elArtists = [];
+	}
 }
 function u_OpenCloseHeader(){u_OpenCloseHeaderFooter(document.getElementById('headeropenbtn'),'header',-200,0);}
 function u_OpenCloseFooter(){u_OpenCloseHeaderFooter(document.getElementById('footeropenbtn'),'footer',38,238);}
@@ -319,7 +321,7 @@ function u_ShowSequence( i_element, i_path, i_name)
 	elLinkA.setAttribute('target', '_blank');
 	elLinkA.textContent = i_name;
 
-	var cmds = RULES.cmdexec.play_sequence;
+	var cmds = c_CloneObj( RULES.cmdexec.play_sequence);
 	cmds.push({"name":"Open","cmd":RULES.cmdexec.open_folder});
 	for( var c = 0; c < cmds.length; c++)
 	{

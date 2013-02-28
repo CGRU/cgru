@@ -56,8 +56,8 @@
 				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""}
 		],
 		"play_movie":[
-			{"name":"DJV View",
-				"cmd":"djv_view @PATH@"},
+			{"name":"VLC",
+				"cmd":"vlc @PATH@"},
 			{"name":"Totem",
 				"cmd":"totem @PATH@"}
 		]
@@ -73,10 +73,10 @@
 				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"}
 		],
 		"play_movie":[
-			{"name":"Pdplayer",
-				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
-			{"name":"Pd++",
-				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"}
+			{"name":"QT",
+				"cmd":"QuickTimePlayer @PATH@"},
+			{"name":"VLC",
+				"cmd":"vlc @PATH@"}
 		]
 	}
 },

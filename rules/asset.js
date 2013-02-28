@@ -95,9 +95,13 @@ function a_ShowBody()
 			if( folders == null ) continue;
 			if( folders.length )
 			{
+				var elOpen = c_CreateOpenButton( elResult, path);
+				elOpen.style.cssFloat = 'right';
+				elOpen.style.marginTop = '-2px';
+				elOpen.style.fontSize = '12px';
 				var elPath = document.createElement('div');
 				elResult.appendChild( elPath);
-				elPath.textContent = ASSET.result.path[i];
+				elPath.innerHTML = '<b> '+ASSET.name+' </b>'+ASSET.result.path[i];
 			}
 			else
 				continue;
@@ -127,9 +131,14 @@ function a_ShowBody()
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				elPath = document.createElement('div');
+				var elOpen = c_CreateOpenButton( elDailies, path);
+				elOpen.style.cssFloat = 'right';
+				elOpen.style.marginTop = '-2px';
+				elOpen.style.fontSize = '12px';
+
+				var elPath = document.createElement('div');
 				elDailies.appendChild( elPath);
-				elPath.textContent = ASSET.dailies.path[i];
+				elPath.innerHTML = '<b> '+ASSET.name+' </b>'+ASSET.dailies.path[i];
 				u_ShowFolder( elDailies, path, walk.walks[walk.dailies[i]]);
 				if( thumbnails.length == 0 )
 					thumbnails.push( path);
