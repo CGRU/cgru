@@ -1,4 +1,3 @@
-ad_elements = ['sidepanel_users','users'];
 ad_el = {};
 ad_initialized = false;
 ad_wnd = null;
@@ -9,64 +8,60 @@ function ad_Init()
 
 	if( g_auth_user.role != 'admin' ) return;
 
-	document.getElementById('admin_window').style.display = 'block';
+	$('admin_window').style.display = 'block';
+	$('sidepanel_permissions').style.display = 'block';
 
-	for( var i = 0; i < ad_elements.length; i++)
-		ad_el[ad_elements[i]] = document.getElementById( ad_elements[i]);
-
-	ad_el.sidepanel_users.style.display = 'block';
-
-	if( localStorage.users_opened == "true" ) ad_UsersOpen();
-	else ad_UsersClose();
+	if( localStorage.users_opened == "true" ) ad_PermissionsOpen();
+	else ad_PermissionsClose();
 
 	ad_initialized = true;
 }
 
-function ad_UsersProcess()
+function ad_PermissionsProcess()
 {
 	if( false == ad_initialized ) return;
-	if( localStorage.users_opened == "true" )
-		ad_UsersLoad();
+	if( localStorage.permissions_opened == "true" )
+		ad_PermissionsLoad();
 }
 
-function ad_UsersFinish()
+function ad_PermissionsFinish()
 {
 	if( false == ad_initialized ) return;
-	ad_el.users.innerHTML = '';
+	$('permissions').innerHTML = '';
 }
 
-function ad_UsersOnClick()
+function ad_PermissionsOnClick()
 {
 	if( u_el['sidepanel'].classList.contains('opened'))
 	{
-		if( ad_el.sidepanel_users.classList.contains('opened'))
-			ad_UsersClose();
+		if( $('sidepanel_permissions').classList.contains('opened'))
+			ad_PermissionsClose();
 		else
-			ad_UsersOpen();
+			ad_PermissionsOpen();
 	}
 	else
 	{
 		u_SidePanelOpen();
-		ad_UsersOpen();
+		ad_PermissionsOpen();
 	}
 }
 
-function ad_UsersClose()
+function ad_PermissionsClose()
 {
-	ad_el.sidepanel_users.classList.remove('opened');
-	ad_el.users.innerHTML = '';
-	localStorage.users_opened = "false";
+	$('sidepanel_permissions').classList.remove('opened');
+	$('permissions').innerHTML = '';
+	localStorage.permissions_opened = "false";
 }
-function ad_UsersOpen()
+function ad_PermissionsOpen()
 {
-	ad_el.sidepanel_users.classList.add('opened');
-	localStorage.users_opened = "true";
-	ad_UsersLoad();
+	$('sidepanel_permissions').classList.add('opened');
+	localStorage.permissions_opened = "true";
+	ad_PermissionsLoad();
 }
 
-function ad_UsersLoad()
+function ad_PermissionsLoad()
 {
-	ad_el.users.innerHTML = '';
+	$('permissions').innerHTML = '';
 
 	var path = g_CurPath();
 	if( path == null ) return;
@@ -86,14 +81,14 @@ function ad_UsersLoad()
 	for( var i = 0; i < res.users.length; i++)
 	{
 		var el = document.createElement('div');
-		ad_el.users.appendChild( el);
+		$('permissions').appendChild( el);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
 		elBtn.m_user_id = res.users[i];
-		elBtn.ondblclick = function(e){ad_UsersDel(e.currentTarget.m_user_id)};
+		elBtn.ondblclick = function(e){ad_PermUserDel(e.currentTarget.m_user_id)};
 
 		var elName = document.createElement('div');
 		el.appendChild( elName);
@@ -101,11 +96,11 @@ function ad_UsersLoad()
 	}
 }
 
-function ad_UsersAddOnClick()
+function ad_PermUserAddOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_UsersAdd', null, 'str', g_auth_user.id, 'users', 'Add User', 'Enter User ID');
+	new cgru_Dialog( window, window, 'ad_PermUserAdd', null, 'str', g_auth_user.id, 'users', 'Add User', 'Enter User ID');
 }
-function ad_UsersAdd( i_not_used, i_user_id)
+function ad_PermUserAdd( i_not_used, i_user_id)
 {
 	var res = c_Parse( n_Request({"usersadd":{"path":RULES.root+g_CurPath(),"id":i_user_id}}));
 	if( res.error )
@@ -113,10 +108,10 @@ function ad_UsersAdd( i_not_used, i_user_id)
 		c_Error( res.error );
 		return;
 	}
-	ad_UsersLoad();
+	ad_PermissionsLoad();
 }
 
-function ad_UsersDel( i_user_id)
+function ad_PermUserDel( i_user_id)
 {
 	var res = c_Parse( n_Request({"usersdel":{"path":RULES.root+g_CurPath(),"id":i_user_id}}));
 	if( res.error )
@@ -124,10 +119,10 @@ function ad_UsersDel( i_user_id)
 		c_Error( res.error );
 		return;
 	}
-	ad_UsersLoad();
+	ad_PermissionsLoad();
 }
 
-function ad_UsersClearOnClick()
+function ad_PermUsersClearOnClick()
 {
 	var res = c_Parse( n_Request({"usersclear":{"path":RULES.root+g_CurPath()}}));
 	if( res.error )
@@ -135,7 +130,7 @@ function ad_UsersClearOnClick()
 		c_Error( res.error );
 		return;
 	}
-	ad_UsersLoad();
+	ad_PermissionsLoad();
 }
 
 function ad_OpenWindow()
@@ -152,18 +147,6 @@ function ad_OpenWindow()
 	elBtnRefresh.textContent = 'Refresh';
 	elBtnRefresh.onclick = ad_WndRefresh;
 
-	var elBtnCreateUsr = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnCreateUsr);
-	elBtnCreateUsr.classList.add('button');
-	elBtnCreateUsr.textContent = 'Create';
-	elBtnCreateUsr.onclick = ad_CreateUserOnClick;
-
-	var elBtnDeleteUsr = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnDeleteUsr);
-	elBtnDeleteUsr.classList.add('button');
-	elBtnDeleteUsr.textContent = 'Delete';
-	elBtnDeleteUsr.onclick = ad_DeleteUserOnClick;
-
 	var elBtnCreateGrp = document.createElement('div');
 	elBtnsDiv.appendChild( elBtnCreateGrp);
 	elBtnCreateGrp.classList.add('button');
@@ -175,6 +158,18 @@ function ad_OpenWindow()
 	elBtnDeleteGrp.classList.add('button');
 	elBtnDeleteGrp.textContent = 'Delete Group';
 	elBtnDeleteGrp.onclick = ad_DeleteGrpOnClick;
+
+	var elBtnCreateUsr = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnCreateUsr);
+	elBtnCreateUsr.classList.add('button');
+	elBtnCreateUsr.textContent = 'Create User';
+	elBtnCreateUsr.onclick = ad_CreateUserOnClick;
+
+	var elBtnDeleteUsr = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnDeleteUsr);
+	elBtnDeleteUsr.classList.add('button');
+	elBtnDeleteUsr.textContent = 'Delete User';
+	elBtnDeleteUsr.onclick = ad_DeleteUserOnClick;
 
 	ad_wnd.elGroups = document.createElement('div');
 	ad_wnd.elContent.appendChild( ad_wnd.elGroups);
@@ -211,7 +206,6 @@ function ad_WndDrawUsers( i_users)
 	labels.id = 'Name';
 	labels.title = 'Title';
 	labels.role = 'Role';
-//	labels.group = 'Group';
 	labels.channels = {}; labels.channels.length = 'Cnls';
 	labels.news = {}; labels.news.length = 'News';
 
@@ -261,7 +255,7 @@ function ad_WndGrpOnClick( i_evt)
 			elU.classList.add('selected');
 		else
 			elU.classList.remove('selected');
-console.log( elU.m_user.id+' '+elU.m_user.groups+' '+ el.m_group);
+//console.log( elU.m_user.id+' '+elU.m_user.groups+' '+ el.m_group);
 	}
 }
 
@@ -302,6 +296,15 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	}
 	else el.style.backgroundColor = 'rgba(0,0,0,.2)';
 
+	var elGroup = document.createElement('div');
+	el.appendChild( elGroup);
+	elGroup.style.width = '20px';
+	elGroup.textContent = 'G';
+	elGroup.title = 'Double click edit group';
+	elGroup.style.cursor = 'pointer';
+	elGroup.m_user = i_user;
+	if( i_row ) elGroup.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
+
 	var elName = document.createElement('div');
 	el.appendChild( elName);
 	elName.style.width = '100px';
@@ -322,15 +325,6 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elRole.m_user_id = i_user.id;
 	elRole.title = 'Double click edit role';
 	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
-*/
-/*
-	var elGroup = document.createElement('div');
-	el.appendChild( elGroup);
-	elGroup.style.width = '100px';
-	elGroup.textContent = i_user.group;
-	elGroup.m_user_id = i_user.id;
-	elGroup.title = 'Double click edit group';
-	if( i_row ) elGroup.ondblclick = function(e){ad_ChangeGroupOnCkick(e.currentTarget.m_user_id);};
 */
 	var elPasswd = document.createElement('div');
 	el.appendChild( elPasswd);
@@ -367,23 +361,64 @@ function ad_WndAddUser( i_el, i_user, i_row)
 function ad_CreateGrpOnClick() { new cgru_Dialog( window, window, 'ad_CreateGroup', null, 'str', '', 'users', 'Create Group', 'Enter Group Name');}
 function ad_CreateGroup( i_not_used, i_group)
 {
-	var res = c_Parse( n_Request({"creategroup":i_group}));
-	if( res == null ) return;
-	if( res.error ) { c_Error( res.error ); return; }
-	c_Info('Group "'+i_group+'" created.');
-	ad_WndRefresh();
+	if( g_groups[i_group] != null )
+	{
+		c_Error('Group "'+i_group+'" already exists.');
+		return;
+	}
+	g_groups[i_group] = {};
+	ad_WriteGroups();
 }
 
 function ad_DeleteGrpOnClick() { new cgru_Dialog( window, window, 'ad_DeleteGroup', null, 'str', '', 'users', 'Delete Group', 'Enter Group Name');}
 function ad_DeleteGroup( i_not_used, i_group)
 {
-	var res = c_Parse( n_Request({"deletegroup":i_group}));
-	if( res == null ) return;
-	if( res.error ) { c_Error( res.error ); return; }
-	c_Info('Group "'+i_group+'" deleted.');
-	ad_WndRefresh();
+	if( g_groups[i_group] == null )
+	{
+		c_Error('Group "'+i_group+'" does not exist.');
+		return;
+	}
+	delete g_groups[i_group];
+	ad_WriteGroups();
 }
 
+function ad_WndUserGroupOnCkick( i_user)
+{
+	var grp = null;
+	for( var i = 0; i < ad_wnd.elGrpBnts.length; i++)
+		if( ad_wnd.elGrpBnts[i].classList.contains('selected'))
+			grp = ad_wnd.elGrpBnts[i].m_group;
+
+	if( i_user.groups.indexOf( grp ) == -1  )
+	{
+		if( g_groups[grp].indexOf( i_user.id ) != -1 )
+		{
+			c_Error('User '+i_user.id+' already in group '+grp);
+			return;
+		}
+		g_groups[grp].push( i_user.id );
+	}
+	else
+	{
+		if( g_groups[grp].indexOf( i_user.id ) == -1 )
+		{
+			c_Error('User '+i_user.id+' is not in group '+grp);
+			return;
+		}
+		g_groups[grp].splice( g_groups[grp].indexOf( i_user.id ), 1);
+	}
+
+	ad_WriteGroups();
+}
+
+function ad_WriteGroups()
+{
+	var res = c_Parse( n_Request({"writegroups":g_groups}));
+	if( res == null ) return;
+	if( res.error ) { c_Error( res.error ); return; }
+	ad_WndRefresh();
+}
+/*
 function ad_ChangeRoleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role'); }
 function ad_ChangeRole( i_user_id, i_role)
 {
@@ -401,7 +436,7 @@ function ad_ChangeRole( i_user_id, i_role)
 	}
 	ad_WndRefresh();
 }
-
+*/
 function ad_ChangeTitleOnCkick( i_user_id)
 {
 	new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');

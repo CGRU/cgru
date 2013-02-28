@@ -18,10 +18,20 @@ function u_Init()
 	if( localStorage.header_opened == 'true' ) u_OpenCloseHeader();
 	if( localStorage.footer_opened == 'true' ) u_OpenCloseFooter();
 
+	if( localStorage.show_hidden == null ) localStorage.show_hidden = 'OFF';
+	$('show_hidden').textContent = localStorage.show_hidden;
+
 	if( p_PLAYER != true) $('search_artists').m_elArtists = [];
 }
 function u_OpenCloseHeader(){u_OpenCloseHeaderFooter(document.getElementById('headeropenbtn'),'header',-200,0);}
 function u_OpenCloseFooter(){u_OpenCloseHeaderFooter(document.getElementById('footeropenbtn'),'footer',38,238);}
+
+function u_ShowHiddenToggle()
+{
+	if( localStorage.show_hidden == 'ON') localStorage.show_hidden = 'OFF';
+	else localStorage.show_hidden = 'ON';
+	$('show_hidden').textContent = localStorage.show_hidden;
+}
 
 function u_Process()
 {
@@ -310,6 +320,7 @@ function u_ShowSequence( i_element, i_path, i_name)
 	elLinkA.textContent = i_name;
 
 	var cmds = RULES.cmdexec.play_sequence;
+	cmds.push({"name":"Open","cmd":RULES.cmdexec.open_folder});
 	for( var c = 0; c < cmds.length; c++)
 	{
 		var elCmd = document.createElement('div');
@@ -351,6 +362,19 @@ function u_ShowFile( i_element, i_path)
 
 	if( RULES.movtypes.indexOf(type) != -1)
 	{
+		var cmds = RULES.cmdexec.play_movie;
+		for( var c = 0; c < cmds.length; c++)
+		{
+			var elCmd = document.createElement('div');
+			elFile.appendChild( elCmd);
+			elCmd.classList.add('cmdexec');
+			elCmd.textContent = cmds[c].name;
+			var cmd = cmds[c].cmd;
+			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+			cmd = cmd.replace('@FPS@', RULES.fps);
+			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
+		}
+
 		var elExplode = document.createElement('div');
 		elFile.appendChild( elExplode);
 		elExplode.classList.add('button');

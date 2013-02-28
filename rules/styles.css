@@ -84,10 +84,12 @@ font-weight: normal;
 #navig .folder.opened {
 padding-top: 4px;
 padding-bottom: 4px;
-background: rgba(0,255,255,.02);
+/*background: rgba(0,255,255,.02);*/
 font-weight: bold;
 }
-#navig .folder.current { background: rgba(200,255,255,.2); /*color:#000000;*/ }
+#navig .folder.hidden { display: none; }
+#navig .folder.current { background: rgba(200,255,255,.5); border: 1px solid #000; }
+#navig .folder.current .fname { color:#000000; }
 #navig .folder:hover { box-shadow: 0px 0px 3px rgba(200,255,255,1.0)}
 #navig .folder .fcolor {
 position: absolute;
@@ -216,9 +218,9 @@ padding: 0px 0px 0px 8px;
 #playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
 #playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: #00A;*/}
 /* ======= USERS: ======== */
-#users > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
-#users > div div { padding: 0px 4px;}
-#users > div .button { float: left; margin: 0px;}
+#permissions > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
+#permissions > div div { padding: 0px 4px;}
+#permissions > div .button { float: left; margin: 0px;}
 
 /* ============================================================================= */
 /* ================================ CONTENT: =================================== */
@@ -433,6 +435,6 @@ box-shadow: 0 0 4px #000 inset;
 .administrate { color: #000000; }
 .administrate .button { float: left; }
 .admin_groups div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
-.admin_groups .selected, .admin_users .selected { background: rgba(100,255,255,.2); }
+.admin_groups .selected, .admin_users .selected div { background: rgba(100,255,255,.2); }
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); }
 

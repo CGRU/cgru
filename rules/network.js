@@ -2,13 +2,6 @@ n_sendCount = 0;
 n_recvCount = 0;
 n_server = 'rules.php';
 
-/*function n_ReadConfig()
-{
-	var request = {};
-	request.readconfig = 'config_default.json';
-	return c_Parse( n_Request( request));
-}
-*/
 function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 {
 	if( typeof( i_paths) != 'object')
@@ -29,6 +22,7 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 	var request = {};
 	request.walkdir = paths;
 	request.depth = i_depth;
+	request.showhidden = ( localStorage.show_hidden == 'ON' );
 	if( i_rufolder ) request.rufolder = i_rufolder;
 	if( i_rufiles ) request.rufiles = i_rufiles;
 	if( i_lookahead ) request.lookahead = i_lookahead;

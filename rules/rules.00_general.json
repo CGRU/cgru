@@ -47,28 +47,36 @@
 },
 
 "OS_unix":{
-	"open":"nautilus \"@PATH@\"",
 	"cmdexec":{
+		"open_folder":"nautilus \"@PATH@\"",
 		"play_sequence":[
 			{"name":"DJV View",
 				"cmd":"djv_view @PATH@"},
 			{"name":"ls -l",
-				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""},
-			{"name":"open",
-				"cmd":"nautilus \"@PATH@\""}
+				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""}
+		],
+		"play_movie":[
+			{"name":"DJV View",
+				"cmd":"djv_view @PATH@"},
+			{"name":"Totem",
+				"cmd":"totem @PATH@"}
 		]
 	}
 },
 "OS_windows":{
-	"open":"start @PATH@",
 	"cmdexec":{
+		"open_folder":"start @PATH@",
 		"play_sequence":[
 			{"name":"Pdplayer",
 				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
 			{"name":"Pd++",
-				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"},
-			{"name":"open",
-				"cmd":"start @PATH@"}
+				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"}
+		],
+		"play_movie":[
+			{"name":"Pdplayer",
+				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
+			{"name":"Pd++",
+				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"}
 		]
 	}
 },

@@ -136,17 +136,17 @@
 				id="playlist"></div>
 		</div>
 	</div>
-	<div id="sidepanel_users" style="display:none">
-		<div class="label button" onclick="ad_UsersOnClick()">Users</div>
+	<div id="sidepanel_permissions" style="display:none">
+		<div class="label button" onclick="ad_PermissionsOnClick()">Permissions</div>
 		<div class="body">
 			<div style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="ad_UsersClearOnClick()">Clear</div>
+					onclick="ad_PermUsersClearOnClick()">Clear</div>
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="ad_UsersAddOnClick()">Add</div>
+					onclick="ad_PermUserAddOnClick()">Add</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
-				id="users"></div>
+				id="permissions"></div>
 		</div>
 	</div>
 </div>
@@ -170,6 +170,14 @@
 			<div class="cgru_parameter">
 				<div class="label">Browser:</div>
 				<div class="variable" id="browser" style="left:70px;right:15px">unknown</div>
+			</div>
+			<div class="cgru_parameter" title="Show Hidden Foolders.
+Need restart (F5).
+Create '.hidden' in folder to hide.
+Link with hidden folder will not works.
+Hidden folders increase system speed.">
+				<div class="label">Show Hidden:</div>
+				<div class="variable" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
 			</div>
 		</div>
 		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 300px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>

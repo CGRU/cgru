@@ -4,7 +4,9 @@ $HT_AccessFileName = '.htaccess';
 $HT_GroupsFileName = '.htgroups';
 
 $RuleMaxLength = 100000;
+
 $UserName = null;
+$Groups = null;
 
 if( isset($_SERVER['PHP_AUTH_USER']))
 {
@@ -154,6 +156,9 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					ksort($o_out['rules']);
 				}
 			}
+
+			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden"))
+				continue;
 
 			if( false == htaccessFolder( $path))
 				continue;
@@ -619,12 +624,27 @@ function jsf_makenews( $i_news, &$o_out)
 
 function isAdmin( &$o_out)
 {
-	global $RuleMaxLength, $UserName;
+	global $Groups, $UserName;
 	if( is_null( $UserName )) return false;
-	$user = array();
-	jsf_readobj( "users/$UserName.json", &$user);
-	if( array_key_exists( 'role', $user))
-		if( $user['role'] == 'admin')
+
+	if( is_null( $Groups))
+	{
+		$out = array();
+		readGroups( $out);
+		if( array_key_exists('error', $out))
+		{
+			$o_out['error'] = $out['error'];
+			return false;
+		}
+		if( is_null( $Groups))
+		{
+			$o_out['error'] = 'Error reading permissions.';
+			return false;
+		}
+	}
+
+	foreach( $Groups as $group)
+		if( in_array( $UserName, $group))
 			return true;
 
 	$o_out['error'] = 'Access denied.';
@@ -775,75 +795,56 @@ function jsf_getallusers( $i_args, &$o_out)
 
 function jsf_getallgroups( $i_args, &$o_out)
 {
-	global $RuleMaxLength, $HT_GroupsFileName;
+	global $Groups;
+	if( false == isAdmin( $o_out)) return;
+	$o_out['groups'] = $Groups;
+}
+
+function readGroups( &$o_out)
+{
+	global $Groups, $RuleMaxLength, $HT_GroupsFileName;
+	if( false == is_null( $Groups)) return;
+
 	if( false == is_file( $HT_GroupsFileName))
 	{
 		$o_out['error'] = 'Groups file does not exist.';
 		return;
 	}
-
-	if( $fHandle = fopen( $HT_GroupsFileName, 'r'))
-	{
-		$o_out['groups'] = array();
-		$data = fread( $fHandle, $RuleMaxLength);
-		$lines = explode("\n", $data);
-		foreach( $lines as $line )
-		{
-			if( strlen($line) < 3 ) continue;
-			$fields = explode(':', $line);
-			if( count( $fields) == 0 ) continue;
-			if( strlen( $fields[0]) < 1 ) continue;
-			$o_out['groups'][$fields[0]] = array();
-			if( count( $fields) < 2 ) continue;
-			$users = explode(' ', $fields[1]);
-			foreach( $users as $user)
-				if( strlen( $user) > 0 )
-					array_push( $o_out['groups'][$fields[0]], $user);
-		}
-		fclose($fHandle);
-	}
-	else
+	$fHandle = fopen( $HT_GroupsFileName, 'r');
+	if( $fHandle === false )
 	{
 		$o_out['error'] = 'Unable to open groups file.';
 		return;
 	}
-}
 
-function jsf_creategroup( $i_args, &$o_out)
-{
-	jsf_getallgroups( null, $o_out);
-	if( isset( $o_out['error'])) return;
+	$Groups = array();
 
-	$new_group = $i_args;
-	$groups = $o_out['groups'];
-	if( array_key_exists( $new_group, $groups))
+	$data = fread( $fHandle, $RuleMaxLength);
+	$lines = explode("\n", $data);
+	foreach( $lines as $line )
 	{
-		$o_out['error'] = "Group $new_group already exists.";
-		return;
+		if( strlen($line) < 3 ) continue;
+		$fields = explode(':', $line);
+		if( count( $fields) == 0 ) continue;
+		if( strlen( $fields[0]) < 1 ) continue;
+		$Groups[$fields[0]] = array();
+		if( count( $fields) < 2 ) continue;
+		$users = explode(' ', $fields[1]);
+		foreach( $users as $user)
+			if( strlen( $user) > 0 )
+				array_push( $Groups[$fields[0]], $user);
 	}
-	$groups[$new_group] = array();
-	writeGroups( $groups, $o_out);
+	fclose($fHandle);
 }
 
-function jsf_deletegroup( $i_args, &$o_out)
+function jsf_writegroups( $i_groups, &$o_out)
 {
-	jsf_getallgroups( null, $o_out);
-	if( isset( $o_out['error'])) return;
+	if( false == isAdmin( $o_out)) return;
 
-	$del_group = $i_args;
-	$groups = $o_out['groups'];
-	if( false == array_key_exists( $del_group, $groups))
-	{
-		$o_out['error'] = "Group $del_group does not exist.";
-		return;
-	}
-	unset( $groups[$del_group]);
-	writeGroups( $groups, $o_out);
-}
+	global $Groups, $HT_GroupsFileName;
 
-function writeGroups( $i_groups, &$o_out)
-{
-	global $HT_GroupsFileName;
+	$Groups = $i_groups;
+
 	if( false == is_file( $HT_GroupsFileName))
 	{
 		$o_out['error'] = 'Groups file does not exist.';

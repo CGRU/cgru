@@ -135,7 +135,7 @@ function g_Navigate( i_path)
 	cgru_ClosePopus();
 	u_Finish();
 	a_Finish();
-	ad_UsersFinish();
+	ad_PermissionsFinish();
 
 	RULES = c_CloneObj( RULES_TOP);
 
@@ -181,7 +181,7 @@ function g_Navigate( i_path)
 
 	a_Process();
 	u_Process();
-	ad_UsersProcess();
+	ad_PermissionsProcess();
 }
 
 function g_Goto( i_folder, i_path, i_walk, i_last)
