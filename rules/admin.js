@@ -1,17 +1,16 @@
-ad_el = {};
 ad_initialized = false;
+ad_permissions = null;
 ad_wnd = null;
 
 function ad_Init()
 {
 	if( g_auth_user == null ) return;
-
-	if( g_auth_user.role != 'admin' ) return;
+	if( false == g_admin ) return;
 
 	$('admin_window').style.display = 'block';
 	$('sidepanel_permissions').style.display = 'block';
 
-	if( localStorage.users_opened == "true" ) ad_PermissionsOpen();
+	if( localStorage.permissions_opened == "true" ) ad_PermissionsOpen();
 	else ad_PermissionsClose();
 
 	ad_initialized = true;
@@ -65,21 +64,59 @@ function ad_PermissionsLoad()
 
 	var path = g_CurPath();
 	if( path == null ) return;
-	var res = c_Parse( n_Request({"usersget":{"path":RULES.root+path}}));
-	if( res == null ) return;
-	if( res.error )
+	ad_permissions = {};
+	ad_permissions.path = RULES.root + path;
+	ad_permissions = c_Parse( n_Request({"permissionsget": ad_permissions}));
+	if( ad_permissions == null ) return;
+	if( ad_permissions.error )
 	{
-		c_Error( res.error );
+		c_Error( ad_permissions.error );
 		return;
 	}
-	if( res.users == null )
+	if(( ad_permissions.users == null ) || ( ad_permissions.groups == null ))
 	{
-		c_Error('Error getting users.');
+		c_Error('Error loading permissions.');
 		return;
 	}
 
-	for( var i = 0; i < res.users.length; i++)
+	ad_permissions.path = RULES.root + path;
+
+	if( ad_permissions.groups.length )
 	{
+		var el = document.createElement('div');
+		$('permissions').appendChild( el);
+		el.textContent = 'Groups:';
+	}
+	for( var i = 0; i < ad_permissions.groups.length; i++)
+	{
+		var group = ad_permissions.groups[i];
+		var el = document.createElement('div');
+		$('permissions').appendChild( el);
+
+		if( group != 'admins' )
+		{
+			var elBtn = document.createElement('div');
+			el.appendChild( elBtn);
+			elBtn.classList.add('button');
+			elBtn.textContent = '-';
+			elBtn.m_group_id = group;
+			elBtn.ondblclick = function(e){ad_PermissionsRemove('groups', e.currentTarget.m_group_id)};
+		}
+
+		var elName = document.createElement('div');
+		el.appendChild( elName);
+		elName.textContent = group;
+	}
+
+	if( ad_permissions.users.length )
+	{
+		var el = document.createElement('div');
+		$('permissions').appendChild( el);
+		el.textContent = 'Users:';
+	}
+	for( var i = 0; i < ad_permissions.users.length; i++)
+	{
+		var user = ad_permissions.users[i];
 		var el = document.createElement('div');
 		$('permissions').appendChild( el);
 
@@ -87,44 +124,53 @@ function ad_PermissionsLoad()
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
-		elBtn.m_user_id = res.users[i];
-		elBtn.ondblclick = function(e){ad_PermUserDel(e.currentTarget.m_user_id)};
+		elBtn.m_user_id = user;
+		elBtn.ondblclick = function(e){ad_PermissionsRemove('users', e.currentTarget.m_user_id)};
 
 		var elName = document.createElement('div');
 		el.appendChild( elName);
-		elName.textContent = res.users[i];
+		elName.textContent = user;
 	}
 }
 
-function ad_PermUserAddOnClick()
+function ad_PermissionsGrpAddOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_PermUserAdd', null, 'str', g_auth_user.id, 'users', 'Add User', 'Enter User ID');
+	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'groups', 'str', '', 'permissions', 'Add Group', 'Enter Group ID');
 }
-function ad_PermUserAdd( i_not_used, i_user_id)
+function ad_PermissionsUsrAddOnClick()
 {
-	var res = c_Parse( n_Request({"usersadd":{"path":RULES.root+g_CurPath(),"id":i_user_id}}));
-	if( res.error )
+	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'users', 'str', '', 'permssions', 'Add User', 'Enter User ID');
+}
+function ad_PermissionsAdd( i_type, i_id)
+{
+	if( ad_permissions[i_type].indexOf( i_id) != -1 )
 	{
-		c_Error( res.error );
+		c_Error( i_id+' is already in '+i_type);
 		return;
 	}
+	ad_permissions[i_type].push( i_id);
+	var res = c_Parse( n_Request({"permissionsset":ad_permissions}));
+	if( res.error ) c_Error( res.error );
 	ad_PermissionsLoad();
 }
 
-function ad_PermUserDel( i_user_id)
+function ad_PermissionsRemove( i_type, i_id)
 {
-	var res = c_Parse( n_Request({"usersdel":{"path":RULES.root+g_CurPath(),"id":i_user_id}}));
-	if( res.error )
+	var index = ad_permissions[i_type].indexOf( i_id);
+	if( index == -1 )
 	{
-		c_Error( res.error );
+		c_Error( i_id+' is not in '+i_type);
 		return;
 	}
+	ad_permissions[i_type].splice( index, 1);
+	var res = c_Parse( n_Request({"permissionsset":ad_permissions}));
+	if( res.error ) c_Error( res.error );
 	ad_PermissionsLoad();
 }
 
-function ad_PermUsersClearOnClick()
+function ad_PermissionsClearOnClick()
 {
-	var res = c_Parse( n_Request({"usersclear":{"path":RULES.root+g_CurPath()}}));
+	var res = c_Parse( n_Request({"permissionsclear":{"path":RULES.root+g_CurPath()}}));
 	if( res.error )
 	{
 		c_Error( res.error );

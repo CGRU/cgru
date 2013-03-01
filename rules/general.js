@@ -6,6 +6,7 @@ p_PLAYER = false;
 
 g_elCurFolder = null;
 g_auth_user = null;
+g_admin = false;
 g_users = null;
 g_groups = null;
 
@@ -25,6 +26,8 @@ function g_Init()
 		c_Error( config.error);
 		return;
 	}
+
+	if( config.admin ) g_admin = true;
 
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );

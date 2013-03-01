@@ -285,6 +285,10 @@ padding: 5px 4px;
 #assets .asset .type { padding: 0px 4px; float: left; }
 #assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
 
+.show_folder .panel div { float: left; margin: 0px 8px; }
+.show_folder .panel .title { font-weight: bold;}
+.show_folder .panel .cmdexec { padding: 0px 8px;}
+
 #content #rules, .rules {
 font-family: courier;
 overflow: hidden;

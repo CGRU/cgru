@@ -25,7 +25,8 @@ function a_Process()
 
 	a_ShowHeaders();
 
-	a_ShowBody();
+	if( ASSET.path == g_CurPath())
+		a_ShowBody();
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
 	c_Info( path);
@@ -85,33 +86,17 @@ function a_ShowBody()
 	{
 		var elResult = document.createElement('div');
 		u_el.asset.appendChild( elResult);
-//		elResult.classList.add('sequences');
 
 		var founded = false;
 		for( var i = 0; i < walk.result.length; i++)
 		{
 			var folders = walk.walks[walk.result[i]].folders;
 			var path = walk.paths[walk.result[i]];
-			if( folders == null ) continue;
-			if( folders.length )
-			{
-				var elOpen = c_CreateOpenButton( elResult, path);
-				elOpen.style.cssFloat = 'right';
-				elOpen.style.marginTop = '-2px';
-				elOpen.style.fontSize = '12px';
-				var elPath = document.createElement('div');
-				elResult.appendChild( elPath);
-				elPath.innerHTML = '<b> '+ASSET.name+' </b>'+ASSET.result.path[i];
-			}
-			else
-				continue;
+			if(( folders == null ) || ( folders.length == 0 )) continue;
 
-			if( folders.length )
-			{
-				thumbnails.push( path);
-				u_ShowFolder( elResult, path, {"folders":folders})
-				founded = true;
-			}
+			thumbnails.push( path);
+			u_ShowFolder( elResult, path, {"folders":folders})
+			founded = true;
 		}
 
 		if( false == founded )
@@ -131,14 +116,6 @@ function a_ShowBody()
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				var elOpen = c_CreateOpenButton( elDailies, path);
-				elOpen.style.cssFloat = 'right';
-				elOpen.style.marginTop = '-2px';
-				elOpen.style.fontSize = '12px';
-
-				var elPath = document.createElement('div');
-				elDailies.appendChild( elPath);
-				elPath.innerHTML = '<b> '+ASSET.name+' </b>'+ASSET.dailies.path[i];
 				u_ShowFolder( elDailies, path, walk.walks[walk.dailies[i]]);
 				if( thumbnails.length == 0 )
 					thumbnails.push( path);

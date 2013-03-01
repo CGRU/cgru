@@ -79,17 +79,16 @@
 			<div id="status_tags" class="tags"></div>
 			<div id="status_finish" class="finish"></div>
 			<div id="status_progress" class="progress"><div id="status_progressbar" class="progressbar"></div></div>
-			<div id="status_description_div" style="clear:both">
-				<div class="button" style="width:25px;float:left;padding:0;margin:0 3px"
-					onclick="u_StatusShowDescription(this)">+</div>
-				<span id="status_description"></span>
-			</div>
 		</div>
 	</div>
 	<div id="asset"></div>
 	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
 		<div class="button" id="files_btn" onclick="u_FilesOnClick()"=>Files</div>
 		<div id="files"></div>
+	</div>
+	<div id="description_div" style="clear:both">
+		<div class="button" style="width:25px;float:left;padding:0;margin:0 3px" onclick="u_ShowDescription(this)">-</div>
+		<span id="description"></span>
 	</div>
 	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
 		<div>
@@ -141,9 +140,11 @@
 		<div class="body">
 			<div style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="ad_PermUsersClearOnClick()">Clear</div>
+					onclick="ad_PermissionsClearOnClick()">Clear</div>
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="ad_PermUserAddOnClick()">Add</div>
+					onclick="ad_PermissionsGrpAddOnClick()">Add Group</div>
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="ad_PermissionsUsrAddOnClick()">Add User</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="permissions"></div>

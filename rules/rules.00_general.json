@@ -13,7 +13,7 @@
 },
 
 "comments":{
-	"message":{"title":"Message","color":[150,150,150]},
+	"message":{"title":"Message","color":[150,200,100]},
 	"report" :{"title":"Report" ,"color":[200,200,100]},
 	"review" :{"title":"Review" ,"color":[200,100,100]},
 	"generic":{"title":"generic"}

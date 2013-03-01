@@ -86,11 +86,11 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 		return;
 	}
 
-	if( false == htaccessPath($i_dir))
+/*	if( false == htaccessPath($i_dir))
 	{
 		$o_out['error'] = 'Access denied.';
 		return;
-	}
+	}*/
 
 	$rufolder = null;
 	if( array_key_exists('rufolder', $i_recv))
@@ -157,11 +157,8 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 				}
 			}
 
-			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden"))
-				continue;
-
-			if( false == htaccessFolder( $path))
-				continue;
+			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden")) continue;
+//			if( false == htaccessFolder( $path)) continue;
 
 			$folderObj = array();
 			$folderObj['name'] = $entry;
@@ -493,6 +490,8 @@ function jsf_initialize( $i_arg, &$o_out)
 		$o_out['version'] = fread( $fHandle, $RuleMaxLength);
 		fclose($fHandle);
 	}
+
+	if( isAdmin( $out)) $o_out['admin'] = true;
 }
 
 function processUser( &$o_out)
@@ -654,10 +653,7 @@ function isAdmin( &$o_out)
 function jsf_htdigest( $i_recv, &$o_out)
 {
 	global $RuleMaxLength, $UserName;
-
-	# Only admin can change or set password
-	if( false == isAdmin( $o_out))
-		return;
+	if( false == isAdmin( $o_out)) return;
 
 	$htdigest_file = '.htdigest';
 
@@ -667,8 +663,6 @@ function jsf_htdigest( $i_recv, &$o_out)
 	$p = $i_recv['p'];
 	$hash = md5("$user:RULES:$p");
 	$new_line = "$user:RULES:$hash";
-
-//error_log($new_line);
 
 	$data = '';
 	if( $fHandle = fopen( $htdigest_file, 'r'))
@@ -712,9 +706,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 function jsf_deleteuser( $i_user_id, &$o_out)
 {
 	global $RuleMaxLength;
-
-	if( false == isAdmin( $o_out))
-		return;
+	if( false == isAdmin( $o_out)) return;
 
 	$dHandle = opendir('users');
 	if( $dHandle === false )
@@ -867,131 +859,26 @@ function jsf_writegroups( $i_groups, &$o_out)
 	}
 }
 
-function jsf_usersadd( $i_args, &$o_out)
+function jsf_permissionsset( $i_args, &$o_out)
 {
-	global $RuleMaxLength;
-	if( false == isAdmin( $o_out))
-		return;
+	global $RuleMaxLength, $HT_AccessFileName;
+	if( false == isAdmin( $o_out)) return;
 
-	$htaccess = $i_args['path'].'/.htaccess';
+	if( false == array_key_exists('groups', $i_args)) $i_args['groups'] = array();
+	if( false == in_array('admins', $i_args['groups'])) array_unshift( $i_args['groups'], 'admins');
 
-	$htaccess_read = $htaccess;
-	if( false === is_file( $htaccess_read ))
-	$htaccess_read = '.htaccess';
-	if( false === is_file( $htaccess_read ))
+	$lines = array();
+	array_push( $lines, 'Require group '.implode(' ', $i_args['groups']));
+	if( array_key_exists('users', $i_args) && count( $i_args['users']))
 	{
-		$o_out['error'] = 'Can`t find access file.';
-		return;
+		array_push( $lines, 'Require user '.implode(' ', $i_args['users']));
+		array_push( $lines, 'Satisfy Any');
 	}
 
-	$fHandle = fopen( $htaccess_read, 'r');
-	if( $fHandle === false )
-	{
-		$o_out['error'] = 'Can`t read access file.';
-		return;
-	}
-	$data = fread( $fHandle, $RuleMaxLength);
-	fclose( $fHandle);
-
-	$old_lines = explode("\n", $data);
-	$new_lines = array();
-	$users = array();
-	$founded = false;
-	foreach( $old_lines as $line )
-	{
-		if( strlen($line) <= 1 ) continue;
-		$users = explode(' ', $line);
-
-		if( $users[0] == 'Require' )
-		{
-			if( $users[1] == 'valid-user')
-				$users = array('Require','user');
-			foreach( $users as $user)
-				if( $user == $i_args['id'])
-				{
-					$o_out['error'] = 'User "'.$i_args['id'].'" aready exists.';
-					return;
-				}
-			$founded = true;
-			break;
-		}
-		array_push( $new_lines, $line);
-	}
-	if( false == $founded )
-	{
-		$o_out['error'] = 'Unable to find users in the file.';
-		return;
-	}
-
-	array_push( $users, $i_args['id']);
-	array_push( $new_lines, implode(' ', $users));
-
-	$data = implode("\n", $new_lines)."\n";
-//error_log($data);
-
-	if( $fHandle = fopen( $htaccess, 'w' ))
-	{
-		fwrite( $fHandle, $data );
-		fclose( $fHandle );
-	}
-	else
-		$o_out['error'] = 'Unable to write into the file.';
-}
-
-function jsf_usersdel( $i_args, &$o_out)
-{
-	global $RuleMaxLength;
-	if( false == isAdmin( $o_out))
-		return;
-
-	$htaccess = $i_args['path'].'/.htaccess';
-
-	if( false === is_file( $htaccess ))
-	{
-		$o_out['error'] = 'Can`t find access file.';
-		return;
-	}
-
-	$fHandle = fopen( $htaccess, 'r');
-	if( $fHandle === false )
-	{
-		$o_out['error'] = 'Can`t read access file.';
-		return;
-	}
-	$data = fread( $fHandle, $RuleMaxLength);
-	fclose( $fHandle);
-
-	$old_lines = explode("\n", $data);
-	$new_lines = array();
-	$users = array();
-	$founded = false;
-	foreach( $old_lines as $line )
-	{
-		if( strlen($line) <= 1 ) continue;
-		$words = explode(' ', $line);
-
-		if(( $words[0] == 'Require') && ( $words[1] == 'user'))
-		{
-			foreach( $words as $user)
-				if( $user == $i_args['id'])
-					$founded = true;
-				else
-					array_push( $users, $user);
-			continue;
-		}
-		array_push( $new_lines, $line);
-	}
-	if( false == $founded )
-	{
-		$o_out['error'] = 'Unable to find user in the file.';
-		return;
-	}
-
-	array_push( $new_lines, implode(' ', $users));
-
-	$data = implode("\n", $new_lines)."\n";
+	$data = implode("\n", $lines)."\n";
 //error_log($data);return;
 
+	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( $fHandle = fopen( $htaccess, 'w' ))
 	{
 		fwrite( $fHandle, $data );
@@ -1001,12 +888,12 @@ function jsf_usersdel( $i_args, &$o_out)
 		$o_out['error'] = 'Unable to write into the file.';
 }
 
-function jsf_usersclear( $i_args, &$o_out)
+function jsf_permissionsclear( $i_args, &$o_out)
 {
-	if( false == isAdmin( $o_out))
-		return;
+	global $HT_AccessFileName;
+	if( false == isAdmin( $o_out)) return;
 
-	$htaccess = $i_args['path'].'/.htaccess';
+	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( false === is_file( $htaccess))
 	{
 		$o_out['error'] = 'Can`t find the file.';
@@ -1015,22 +902,19 @@ function jsf_usersclear( $i_args, &$o_out)
 
 	unlink( $htaccess);
 
-	if( is_file( $htaccess))
-	{
-		$o_out['error'] = 'Can`t remove the file.';
-		return;
-	}
+	if( is_file( $htaccess)) $o_out['error'] = 'Can`t remove the file.';
 }
 
-function jsf_usersget( $i_args, &$o_out)
+function jsf_permissionsget( $i_args, &$o_out)
 {
-	global $RuleMaxLength;
-	if( false == isAdmin( $o_out))
-		return;
+	global $RuleMaxLength, $HT_AccessFileName;
+	if( false == isAdmin( $o_out)) return;
 
+	$o_out['groups'] = array();
 	$o_out['users'] = array();
-	$htaccess = $i_args['path'].'/.htaccess';
+	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( false === is_file( $htaccess)) return;
+
 	$fHandle = fopen( $htaccess, 'r');
 	if( $fHandle === false )
 	{
@@ -1040,32 +924,34 @@ function jsf_usersget( $i_args, &$o_out)
 	$data = fread( $fHandle, $RuleMaxLength);
 	fclose( $fHandle);
 
+	$founded = false;
 	$lines = explode("\n", $data);
-	$users = array();
 	foreach( $lines as $line )
 	{
-		if( strlen($line) <= 1 ) continue;
+		if( strlen( $line) <= 1 ) continue;
 		$words = explode(' ', $line);
+		if( $words[0] != 'Require' ) continue;
+
+		unset($words[0]);
 //error_log( implode(' ',$words));
-		if( $words[0] == 'Require' )
+		if( $words[1] == 'group' )
 		{
-			if( $words[1] == 'user' )
-			{
-				unset($words[0]);
-				unset($words[1]);
-				foreach( $words as $user) array_push( $users, $user);
-			}
+			unset($words[1]);
+			foreach( $words as $group) array_push( $o_out['groups'], $group);
 			$founded = true;
-			break;
+		}
+		else if( $words[1] == 'user' )
+		{
+			unset($words[1]);
+			foreach( $words as $user) array_push( $o_out['users'], $user);
+			$founded = true;
 		}
 	}
 	if( false == $founded )
 	{
-		$o_out['error'] = 'Unable to find users in the file.';
+		$o_out['error'] = 'Unable to find users or groups in the file.';
 		return;
 	}
-
-	$o_out['users'] = $users;
 }
 
 function jsf_search( $i_args, &$o_out)
