@@ -98,8 +98,8 @@ function u_ShowDescription( i_elToggleBrief)
 	if( i_elToggleBrief )
 	{
 		u_show_description_brief = 1 - u_show_description_brief;
-		if( u_show_description_brief ) i_elToggleBrief.textContent = '-';
-		else i_elToggleBrief.textContent = '+';
+		if( u_show_description_brief ) i_elToggleBrief.textContent = '+';
+		else i_elToggleBrief.textContent = '-';
 	}
 	if( RULES.status && RULES.status.description && c_Strip(RULES.status.description).length )
 	{
@@ -112,8 +112,13 @@ function u_ShowDescription( i_elToggleBrief)
 				text = text.substr(0,maxlen)+'...';
 		}
 		$('description').innerHTML = text;
+		$('description_div').style.display = 'block';
 	}
-	else $('description').innerHTML = '';
+	else
+	{
+		$('description').innerHTML = '';
+		$('description_div').style.display = 'none';
+	}
 }
 
 function u_StatusEditOnClick()
@@ -303,7 +308,7 @@ function u_ShowFolder( i_element, i_path, i_walk)
 	elPath.classList.add('path');
 	elPath.textContent = path;
 
-	c_CreateOpenButton( elPath, path);
+	c_CreateOpenButton( elPath, i_path);
 
 	if( i_walk.folders)
 	{

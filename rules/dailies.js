@@ -244,6 +244,6 @@ function d_ExpProcessGUI( i_wnd)
 	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
 
 //	i_wnd.destroy();
-	window.location.reload();
+//	window.location.reload();
 }
 

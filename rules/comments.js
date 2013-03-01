@@ -23,17 +23,28 @@ function cm_OpenOnClick()
 	cm_Load();
 }
 
+function cm_FileExists()
+{
+//console.log( g_elCurFolder.m_dir.rufiles);
+	if( g_elCurFolder.m_dir == null ) return false;
+	if( g_elCurFolder.m_dir.rufiles == null ) return false;
+	if( g_elCurFolder.m_dir.rufiles.length == 0 ) return false;
+	if( g_elCurFolder.m_dir.rufiles.indexOf( cm_file) == -1 ) return false;
+	return true;
+}
+
 function cm_Load()
 {
+	cm_opened = true;
 	$('comments_open_btn').classList.remove('button');
 	$('comments').textContent = '';
 
+	if( false == cm_FileExists()) return;
+
 	var obj = c_Parse( n_Request({"readobj":cm_CurFileName()}));
-//window.console.log( JSON.stringify( obj));
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
-	cm_opened = true;
 	for( key in obj.comments )
 		cm_Add( obj.comments[key]);
 }
