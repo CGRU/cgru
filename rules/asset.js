@@ -25,7 +25,7 @@ function a_Process()
 
 	a_ShowHeaders();
 
-	if( ASSET.path == g_CurPath())
+	if( ASSET && (ASSET.path == g_CurPath()))
 		a_ShowBody();
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
@@ -95,7 +95,7 @@ function a_ShowBody()
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
 			thumbnails.push( path);
-			u_ShowFolder( elResult, path, {"folders":folders})
+			u_ShowDirectory( elResult, path, {"folders":folders})
 			founded = true;
 		}
 
@@ -116,7 +116,7 @@ function a_ShowBody()
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				u_ShowFolder( elDailies, path, walk.walks[walk.dailies[i]]);
+				u_ShowDirectory( elDailies, path, walk.walks[walk.dailies[i]]);
 				if( thumbnails.length == 0 )
 					thumbnails.push( path);
 				founded = true;
@@ -442,6 +442,7 @@ function a_ShowThumbnails()
 		a_elFolders = [];
 
 		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
+		if( walk.folders == null ) return;
 		walk.folders.sort( c_CompareFolders );
 
 		for( var sc = 0; sc < walk.folders.length; sc++)

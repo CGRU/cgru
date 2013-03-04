@@ -557,7 +557,7 @@ function p_Save()
 		var folder = p_path.substr( p_path.lastIndexOf('/')+1);
 		path = path+'/'+folder+'.painted/'+p_files[f];
 
-		n_Request({"save":{"file":path,"data":data}}, false);
+		n_Request({"save":{"file":path,"data":data,"type":"base64"}}, false);
 	}
 
 	if( p_filestosave == 0 )

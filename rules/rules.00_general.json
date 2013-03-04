@@ -3,6 +3,7 @@
 "rufolder":"rules",
 "company":"CGRU",
 "playlist":"rules/playlist.json",
+"newsrefresh":60,
 
 "tags":{
 	"done"    :{"title":"DONE"},
@@ -51,9 +52,7 @@
 		"open_folder":"nautilus \"@PATH@\"",
 		"play_sequence":[
 			{"name":"DJV View",
-				"cmd":"djv_view @PATH@"},
-			{"name":"ls -l",
-				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""}
+				"cmd":"djv_view @PATH@"}
 		],
 		"play_movie":[
 			{"name":"VLC",

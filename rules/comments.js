@@ -2,11 +2,6 @@ cm_file = 'comments.json';
 cm_opened = false;
 cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','18','24','36','48','60'];
 
-function cm_CurFileName()
-{
-	return RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/'+cm_file;
-}
-
 function cm_Process()
 {
 	if( cm_opened ) cm_Load();
@@ -23,25 +18,15 @@ function cm_OpenOnClick()
 	cm_Load();
 }
 
-function cm_FileExists()
-{
-//console.log( g_elCurFolder.m_dir.rufiles);
-	if( g_elCurFolder.m_dir == null ) return false;
-	if( g_elCurFolder.m_dir.rufiles == null ) return false;
-	if( g_elCurFolder.m_dir.rufiles.length == 0 ) return false;
-	if( g_elCurFolder.m_dir.rufiles.indexOf( cm_file) == -1 ) return false;
-	return true;
-}
-
 function cm_Load()
 {
 	cm_opened = true;
 	$('comments_open_btn').classList.remove('button');
 	$('comments').textContent = '';
 
-	if( false == cm_FileExists()) return;
+	if( false == c_RuFileExists( cm_file)) return;
 
-	var obj = c_Parse( n_Request({"readobj":cm_CurFileName()}));
+	var obj = c_Parse( n_Request({"readobj":c_GetRuFilePath( cm_file)}));
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
@@ -320,11 +305,16 @@ function cm_Save( i_el)
 	var edit = {};
 	edit.object = {"comments":comments};
 	edit.add = true;
-	edit.file = cm_CurFileName();
+	edit.file = c_GetRuFilePath( cm_file);
 
 //window.console.log( JSON.stringify( edit));
-	n_Request({"editobj":edit});
-
+	res = c_Parse( n_Request({"editobj":edit}));
+	if( res == null ) return;
+	if( res.error )
+	{
+		c_Error( res.error);
+		return;
+	}
 	nw_MakeNews('<i>comments</i>');
 }
 

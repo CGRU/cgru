@@ -17,58 +17,67 @@ if( isset($_SERVER['PHP_AUTH_USER']))
 
 function htaccessFolder( $i_folder)
 {
-	global $RuleMaxLength, $HT_AccessFileName, $UserName;
+	global $UserName, $Groups;
 
+	if( $i_folder == '.' ) return true;
 	if( $UserName == null ) return true;
 
-	$htaccess = $i_folder.'/'.$HT_AccessFileName;
-//error_log('checking file '.$htaccess);
-	if( is_file( $htaccess))
+	$out = array();
+	readGroups( $out);
+	if( array_key_exists('error', $out))
 	{
-		if( $fHandle = fopen( $htaccess, 'r'))
-		{
-			$data = fread( $fHandle, $RuleMaxLength);
-			fclose( $fHandle);
-
-			$pos = strrpos( $data, 'Require user ');
-			if( $pos !== false )
-			{
-				$data = substr( $data, $pos+13);
-//error_log('checking string1['.$pos.':]: '.$data);
-				$end = strpos( $data, PHP_EOL);
-//error_log('checking string2['.$pos.':'.$end.']: '.substr( $data, 0, $end));
-				if( $end !== false )
-				{
-					$list = explode(' ', substr( $data, 0, $end));
-					foreach( $list as $user )
-					{
-//error_log('checking user: "'.$user.'"');
-						if( $user == $UserName )
-							return true;
-					}
-					return false;
-				}
-			}
-		}
+		error_log( $out['error']);
+		return false;
+	}
+	if( is_null( $Groups))
+	{
+		error_log('Groups are null.');
+		return false;
 	}
 
-	return true;
+	$args = array();
+	$args['path'] = $i_folder;
+	permissionsGet( $args, $out);
+	if( array_key_exists('error', $out))
+	{
+		error_log( $out['error']);
+		return false;
+	}
+
+	if(( count( $out['users']) == 0 ) && ( count( $out['groups']) == 0 )) return null;
+
+	foreach( $out['groups'] as $grp )
+		if( array_key_exists( $grp, $Groups))
+			if( in_array( $UserName, $Groups[$grp]))
+				return true;
+
+	if( in_array( $UserName, $out['users'])) return true;
+
+	return false;
 }
 
 function htaccessPath( $i_path)
 {
+//return true;
 //error_log('Checking access path "'.$i_path.'"');
 	$folders = explode('/', $i_path);
 	$path = null;
+	$paths = array();
 	foreach( $folders as $folder)
 	{
 		if( $path != null )
 			$path = $path.'/'.$folder;
 		else
 			$path = $folder;
+		array_push( $paths, $path);
+	}
+	$paths = array_reverse( $paths);
+	foreach( $paths as $path)
+	{
 //error_log('Checking access folder "'.$path.'"');
-		if( false == htaccessFolder($path))
-			return false;
+		$access = htaccessFolder($path);
+		if( $access === false ) return false;
+		if( $access === true  ) return true;
 	}
 
 	return true;
@@ -86,11 +95,11 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 		return;
 	}
 
-/*	if( false == htaccessPath($i_dir))
+	if( false == htaccessPath($i_dir))
 	{
-		$o_out['error'] = 'Access denied.';
+		$o_out['denied'] = true;
 		return;
-	}*/
+	}
 
 	$rufolder = null;
 	if( array_key_exists('rufolder', $i_recv))
@@ -158,7 +167,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 			}
 
 			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden")) continue;
-//			if( false == htaccessFolder( $path)) continue;
+			if( false === htaccessFolder( $path)) continue;
 
 			$folderObj = array();
 			$folderObj['name'] = $entry;
@@ -205,6 +214,20 @@ function readConfig( $i_file, &$o_out)
 	}
 }
 
+function jsf_getfile( $i_file, &$o_out)
+{
+	global $RuleMaxLength;
+
+	if( $fHandle = fopen( $i_file, 'r'))
+	{
+		echo fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+		$o_out = null;
+	}
+	else
+		$o_out['error'] = 'Unable to load file '.$i_file;
+}
+
 function jsf_readobj( $i_file, &$o_out)
 {
 	global $RuleMaxLength;
@@ -216,10 +239,7 @@ function jsf_readobj( $i_file, &$o_out)
 		$o_out = json_decode( $data, true);
 	}
 	else
-	{
-		$o_out['status'] = 'error';
 		$o_out['error'] = 'Unable to load file '.$i_file;
-	}
 }
 
 function mergeObjs( &$o_obj, $i_obj)
@@ -316,7 +336,13 @@ function replaceObject( &$o_obj, $i_obj)
 }
 function jsf_editobj( $i_edit, &$o_out)
 {
-	global $RuleMaxLength;
+	global $UserName, $RuleMaxLength;
+
+	if( $UserName == null )
+	{
+		$o_out['error'] = 'You have no permissions.';
+		return;
+	}
 
 	$mode = 'w+';
 	if( file_exists( $i_edit['file'])) $mode = 'r+';
@@ -353,6 +379,13 @@ function jsf_editobj( $i_edit, &$o_out)
 
 function jsf_cmdexec( $i_obj, &$o_out)
 {
+	global $UserName;
+	if( $UserName == null )
+	{
+		$o_out['error'] = 'You have no permissions to run commands.';
+		return;
+	}
+
 	$o_out['cmdexec'] = array();
 	foreach( $i_obj['cmds'] as $cmd)
 	{
@@ -364,6 +397,13 @@ function jsf_cmdexec( $i_obj, &$o_out)
 
 function afanasy( $i_obj, &$o_out)
 {
+	global $UserName;
+	if( $UserName == null )
+	{
+		$o_out['error'] = 'You have no permissions to send jobs.';
+		return;
+	}
+
 	$socket = fsockopen( $i_obj['address'], $i_obj['port'], $errno, $errstr);
 	if( !$socket)
 	{
@@ -391,6 +431,13 @@ function afanasy( $i_obj, &$o_out)
 
 function jsf_save( $i_save, &$o_out)
 {
+	global $UserName;
+	if( $UserName == null )
+	{
+		$o_out['error'] = 'You have no permissions to save files.';
+		return;
+	}
+
 	$filename = $i_save['file'];
 	$dirname = dirname($filename);
 
@@ -406,14 +453,21 @@ function jsf_save( $i_save, &$o_out)
 		}		
 	}
 
-	if( $fHandle = fopen( $filename, 'wb'))
+	$fHandle = fopen( $filename, 'wb');
+	if( false === $fHandle )
 	{
-		fwrite( $fHandle, base64_decode( $i_save['data']));
-		fclose( $fHandle );
+		$o_out['error'] = 'Unable to open file for writing '.$filename;
 		return;
 	}
 
-	$o_out['error'] = 'Unable to open file for writing '.$filename;
+	$data = $i_save['data'];
+	if( array_key_exists('type', $i_save))
+	{
+		if( $i_save['type'] == 'base64' ) $data = base64_decode( $data);
+	}
+
+	fwrite( $fHandle, $data);
+	fclose( $fHandle );
 }
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
@@ -450,7 +504,8 @@ else if( count( $recv))
 	}
 }
 
-echo json_encode( $out);
+if( false == is_null( $out))
+	echo json_encode( $out);
 
 function jsf_initialize( $i_arg, &$o_out)
 {
@@ -637,14 +692,19 @@ function isAdmin( &$o_out)
 		}
 		if( is_null( $Groups))
 		{
-			$o_out['error'] = 'Error reading permissions.';
+			$o_out['error'] = 'Error reading groups.';
 			return false;
 		}
 	}
 
-	foreach( $Groups as $group)
-		if( in_array( $UserName, $group))
-			return true;
+	if( false == array_key_exists('admins', $Groups))
+	{
+		$o_out['error'] = 'No admins group founded.';
+		return false;
+	}
+
+	if( in_array( $UserName, $Groups['admins']))
+		return true;
 
 	$o_out['error'] = 'Access denied.';
 	return false;
@@ -907,8 +967,13 @@ function jsf_permissionsclear( $i_args, &$o_out)
 
 function jsf_permissionsget( $i_args, &$o_out)
 {
-	global $RuleMaxLength, $HT_AccessFileName;
 	if( false == isAdmin( $o_out)) return;
+	permissionsGet( $i_args, $o_out);
+
+}
+function permissionsGet( $i_args, &$o_out)
+{
+	global $RuleMaxLength, $HT_AccessFileName;
 
 	$o_out['groups'] = array();
 	$o_out['users'] = array();
@@ -1020,6 +1085,22 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 			}
 		}
 
+		if( $founded && array_key_exists('body', $i_args ))
+		{
+			$founded = false;
+			$rufile = "$rufolder/body.html";
+			if( is_file( $rufile))
+			{
+				if( $fHandle = fopen( $rufile, 'r'))
+				{
+					$data = fread( $fHandle, $RuleMaxLength);
+					fclose($fHandle);
+					if( mb_stripos( $data, $i_args['body'], 0, 'utf-8') !== false )
+						$founded = true;
+				}
+			}
+		}
+
 		if( $founded && array_key_exists('comment', $i_args ))
 		{
 			$founded = false;
@@ -1059,9 +1140,6 @@ function searchStatus( &$i_args, &$i_obj)
 		if( array_key_exists('annotation', $i_obj['status']))
 			if( mb_stripos( $i_obj['status']['annotation'], $i_args['ann'], 0, 'utf-8') !== false )
 				$founded = true;
-		if( array_key_exists('description', $i_obj['status']))
-			if( mb_stripos( $i_obj['status']['description'], $i_args['ann'], 0, 'utf-8') !== false )
-				$founded = true;
 	}
 
 	if( $founded && array_key_exists('artists', $i_args))
@@ -1091,17 +1169,25 @@ function searchStatus( &$i_args, &$i_obj)
 					$founded = true;
 	}
 
-	if( $founded && array_key_exists('finish', $i_args))
-	{
-		$founded = false;
-		if( array_key_exists('finish', $i_obj['status']))
+	$parms = array('finish','statmod','bodymod');
+	foreach( $parms as $parm )
+		if( $founded && array_key_exists( $parm, $i_args))
 		{
-			$days = ($i_obj['status']['finish'] - time()) / ( 60 * 60 * 24 );
-			if( ($days >= $i_args['finish'][0]) &&
-				($days <= $i_args['finish'][1]) )
-					$founded = true;
+			$founded = false;
+			$val = $parm;
+			if( $parm == 'statmod' ) $val = 'mtime';
+			else if( $parm == 'bodymod' ) $val = 'body';
+//error_log('checking '.$parm.' : '.$val);
+			if( array_key_exists( $val, $i_obj['status']))
+			{
+				if( $val == 'body' ) $val = $i_obj['status']['body']['mtime'];
+				else $val = $i_obj['status'][$val];
+				$val = ($val - time()) / ( 60 * 60 * 24 );
+				if( ($val >= $i_args[$parm][0]) &&
+					($val <= $i_args[$parm][1]) )
+						$founded = true;
+			}
 		}
-	}
 
 	return $founded;
 }

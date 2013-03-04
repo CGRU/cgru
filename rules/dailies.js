@@ -234,7 +234,7 @@ function d_ExpProcessGUI( i_wnd)
 	for( var p = 0; p < d_expguiparams.length; p++)
 		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
 
-	var cmd = 'python utilities/moviemaker/mov2seq.py -t jpg';
+	var cmd = 'utilities/moviemaker/mov2seq.py -t jpg';
 	cmd += ' -a ' + RULES.avconv;
 	cmd += ' -q ' + params.quality;
 	if( params.resolution.length && ( params.resolution != '-1' ))
@@ -242,8 +242,7 @@ function d_ExpProcessGUI( i_wnd)
 	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
 
 	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
-
 //	i_wnd.destroy();
-//	window.location.reload();
+	window.location.reload();
 }
 

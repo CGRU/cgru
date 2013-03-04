@@ -186,7 +186,8 @@ function p_Action( i_obj, i_action)
 		return;
 	}
 	obj.file = p_file;
-	n_Request({"editobj":obj});
+	var res = c_Parse( n_Request({"editobj":obj}));
+	if( res && res.error ) c_Error( res.error);
 	p_Load();
 }
 

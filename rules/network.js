@@ -40,7 +40,7 @@ function n_Request( i_obj, i_wait, i_encode)
 	if( i_wait == null) i_wait = true;
 	var obj_str = JSON.stringify( i_obj);
 	if( i_encode == true )
-		var obj_str = btoa(obj_str);
+		obj_str = btoa( obj_str);
 
 	var log = '<b style="color:';
 	if( i_wait ) log += '#040';
@@ -56,7 +56,13 @@ function n_Request( i_obj, i_wait, i_encode)
 //window.console.log('n_Requestr='+obj_str);
 
 	if( i_wait )
-		log += '<br/><b style="color:#040"><i>recv'+(n_recvCount++)+':</i></b> '+ xhr.responseText;
+	{
+		log += '<br/><b style="color:#040"><i>recv'+(n_recvCount++)+':</i></b> ';
+		if( i_obj.getfile )
+			log += i_obj.getfile;
+		else
+			log += xhr.responseText;
+	}
 
 	c_Log( log);
 
@@ -105,28 +111,26 @@ function n_SendJob( job)
 	
 	n_Request( obj);
 }
-/*
-function n_Get( i_file)
+
+function n_Get( i_path)
 {
-	var path = i_file;
-	if( path == null ) return;
-
-	if( RULES['root'])
-		path = RULES['root'] + path;
-
-	var log = '<b><i>send:</i></b> GET '+ path;
-
+	var log = '<b><i>get:</i></b> '+ i_path;
 	var xhr = new XMLHttpRequest;
-	xhr.open('GET', path, false); 
+	xhr.open('GET', i_path, false); 
 	xhr.setRequestHeader('Pragma','no-cache');
 	xhr.setRequestHeader('Cache-Control','no-cache');
 //	xhr.overrideMimeType('application/json');
 	xhr.send( null);
-
-	log += '<br/><b><i>recv:</i></b> '+ xhr.responseText;
+//	log += '<br/><b><i>recv:</i></b> '+ xhr.responseText;
 	c_Log( log);
-
 	return xhr.responseText;
 }
-*/
+
+
+function n_GetRuFile( i_file )
+{
+	if( false == c_RuFileExists( i_file)) return null;
+//	return n_Request({"getfile":c_GetRuFilePath( i_file)});
+	return n_Get( c_GetRuFilePath( i_file));
+}
 

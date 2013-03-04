@@ -29,7 +29,6 @@ function st_SetElLabel( i_status, i_el, i_full)
 	st_SetElAnnotation( i_status, i_el, i_full);
 }
 function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
-function st_SetElDescription( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'description', i_full);}
 function st_SetElText( i_status, i_el, i_field, i_full)
 {
 	if( i_full == null ) i_full = true;
@@ -80,7 +79,7 @@ function st_SetElTag( i_el, i_tag)
 }
 function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
 {
-	if( i_elB == null ) i_elB = st_elRoot;
+	if( i_elB == null ) i_elB = st_elParent;
 	if( i_elC == null ) i_elC = i_elB;
 	if( i_setNone == null ) i_setNone = true;
 
@@ -200,7 +199,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elRoot.appendChild( elAnnDiv);
 	var elAnnLabel = document.createElement('div');
 	elAnnDiv.appendChild( elAnnLabel);
-	elAnnLabel.textContent = 'Status:';
+	elAnnLabel.textContent = 'Annotation:';
 	elAnnLabel.style.cssFloat = 'left';
 	st_elAnn = document.createElement('div');
 	elAnnDiv.appendChild( st_elAnn);
@@ -269,24 +268,12 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			el.classList.add('selected');
 		}
 
-	var elDescDiv = document.createElement('div');
-	st_elRoot.appendChild( elDescDiv);
-	var elDescLabel = document.createElement('div');
-	elDescDiv.appendChild( elDescLabel);
-	elDescLabel.textContent = 'Description:';
-	elDescLabel.style.cssFloat = 'left';
-	st_elDesc = document.createElement('div');
-	elDescDiv.appendChild( st_elDesc);
-	st_elDesc.classList.add('editing');
-	st_elDesc.contentEditable = 'true';
-
 	st_elColor = document.createElement('div');
 	st_elRoot.appendChild( st_elColor);
 	st_elColor.classList.add('color');
 	u_DrawColorBars( st_elColor, st_EditColorOnClick);
 
 	st_SetElAnnotation( st_status, st_elAnn);
-	st_SetElDescription( st_status, st_elDesc);
 	st_SetElColor( st_status);
 	if( st_status.finish )
 		st_elFinish.textContent = c_DT_FormStrFromSec( st_status.finish);
@@ -351,6 +338,7 @@ function st_EditColorOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
 	st_status.color = el.m_color
+console.log( st_status);
 	st_SetElColor( st_status);
 }
 
@@ -365,7 +353,6 @@ function st_SaveOnClick()
 	}
 
 	st_status.annotation = c_Strip( st_elAnn.innerHTML);
-	st_status.description = c_Strip( st_elDesc.innerHTML);
 	st_status.progress = parseInt( c_Strip( st_elProgress.textContent));
 	if( st_elArtists.m_elListAll )
 	{
@@ -382,17 +369,14 @@ function st_SaveOnClick()
 				st_status.tags.push( st_elTags.m_elListAll[i].m_item);
 	}
 
+	st_status.muser = g_auth_user.id;
+	st_status.mtime = c_DT_CurSeconds();
+
 	st_FuncApply( st_status);
 	if( g_CurPath() == st_path )
 		g_FolderSetStatus( st_status);
 
-	var obj = {};
-	obj.object = {"status":st_status};
-	obj.add = true;
-	obj.file = RULES.root + st_path + '/' + RULES.rufolder + '/status.json';
-
-	n_Request({"editobj":obj});
-
+	st_Save( st_status, st_path);
 	nw_MakeNews('<i>status</i>', st_path);
 
 	if( st_elProgress.textContent.length )
@@ -400,6 +384,17 @@ function st_SaveOnClick()
 			st_UpdateProgresses( st_path);
 
 	st_DestroyEditUI();
+}
+
+function st_Save( i_status, i_path)
+{
+	if( i_status == null ) i_status = RULES.status;
+	if( i_path == null ) i_path = g_CurPath();
+	var obj = {};
+	obj.object = {"status":i_status};
+	obj.add = true;
+	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
+	n_Request({"editobj":obj});
 }
 
 function st_UpdateProgresses( i_path)

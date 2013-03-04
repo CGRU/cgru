@@ -249,7 +249,7 @@ padding: 4px;
 { margin: 0px 5px; float:left;}
 #status_progress { clear: both; border-radius: 4px; }
 #status_progressbar { height: 10px; border-radius: 4px; }
-#status_description {/*clear: both;*/ }
+#status_modified { clear: both; float:right; font-style:italic; font-size: 14px; }
 
 .status_edit { clear: both; }
 .status_edit .percent { float:left; margin: 0px 6px; }
@@ -306,8 +306,9 @@ border-radius: 10px;
 }
 
 #content .folder {
-border-radius: 4px;
-box-shadow: 0 0 3px #000 inset;
+/*border-radius: 4px;*/
+/*box-shadow: 0 0 3px #000 inset;*/
+border-top: 1px solid #777;
 padding: 2px 6px;
 margin: 2px;
 }
@@ -318,6 +319,11 @@ margin: 0px 10px;
 font-size: 14px;
 }
 #content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
+
+/*#body_body { border: 1px solid #000; border-radius: 4px; }*/
+#body_info { font-style: italic; font-size: 14px; }
+#body_panel_edit div { margin: 1px 8px;}
+#body_panel_edit .selected { background: rgba(200,255,255,.3);}
 
 /* ============================================================================*/
 /* ============================= ASSETS: ======================================*/

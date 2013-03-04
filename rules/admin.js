@@ -135,7 +135,7 @@ function ad_PermissionsLoad()
 
 function ad_PermissionsGrpAddOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'groups', 'str', '', 'permissions', 'Add Group', 'Enter Group ID');
+	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'groups', 'str', 'admins', 'permissions', 'Add Group', 'Enter Group ID');
 }
 function ad_PermissionsUsrAddOnClick()
 {
@@ -143,6 +143,12 @@ function ad_PermissionsUsrAddOnClick()
 }
 function ad_PermissionsAdd( i_type, i_id)
 {
+	i_id = c_Strip( i_id);
+	if( i_id.length < 1 )
+	{
+		c_Error('Empty name.');
+		return;
+	}
 	if( ad_permissions[i_type].indexOf( i_id) != -1 )
 	{
 		c_Error( i_id+' is already in '+i_type);

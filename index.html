@@ -57,6 +57,20 @@
 			<div style="float:left;">Tags:</div>
 			<div id="search_tags"></div>
 		</div>
+		<div>
+			<div style="float:left">Status Modified:</div>
+			<div id="search_statmodmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left"> - </div>
+			<div id="search_statmodmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left">Body Modified:</div>
+			<div id="search_bodymodmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			<div style="float:left"> - </div>
+			<div id="search_bodymodmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+		</div>
+		<div>
+			<div style="float:left;">Body:</div>
+			<div id="search_body" class="editing" contenteditable="true"></div>
+		</div>
 		<div id="search_comment_div">
 			<div style="float:left;">Comments:</div>
 			<div id="search_comment" class="editing" style="" contenteditable="true"></div>
@@ -79,6 +93,7 @@
 			<div id="status_tags" class="tags"></div>
 			<div id="status_finish" class="finish"></div>
 			<div id="status_progress" class="progress"><div id="status_progressbar" class="progressbar"></div></div>
+			<div id="status_modified"></div>
 		</div>
 	</div>
 	<div id="asset"></div>
@@ -90,16 +105,25 @@
 		<div class="button" style="width:25px;float:left;padding:0;margin:0 3px" onclick="u_ShowDescription(this)">-</div>
 		<span id="description"></span>
 	</div>
+	<div id="body_div">
+		<div id="body_panel">
+			<div class="button" id="body_edit_btn" style="float:right;display:none" onclick="u_BodyEditStart()">Edit</div>
+			<div id="body_info"></div>
+		</div>
+		<div id="body_panel_edit" style="display:none">
+			<div class="button" style="float:right" onclick="u_BodyEditChancel()">Chancel</div>
+			<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
+			<div style="float:right;border:1px solid #000;cursor:pointer;padding:2px 6px;"
+				id="body_edit_markup" onclick="u_BodyEditMarkup()">Markup</div>
+		</div>
+		<div id="body_body"></div>
+	</div>
 	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
 		<div>
 			<div class="button" style="float:left" id="comments_open_btn" onclick="cm_OpenOnClick()">Comments</div>
 			<div class="button" style="float:right" onclick="cm_NewOnClick()">New Comment</div>
 		</div>
 		<div id="comments" style="/*display:none*/"></div>
-	</div>
-	<div>
-		<div id="rules_button" class="button" onclick="u_RulesOnClick()">CG-RULES</div>
-		<div id="rules" style="display:none"></div>
 	</div>
 </div>
 
@@ -171,6 +195,10 @@
 			<div class="cgru_parameter">
 				<div class="label">Browser:</div>
 				<div class="variable" id="browser" style="left:70px;right:15px">unknown</div>
+			</div>
+			<div class="cgru_parameter">
+				<div class="label" id="rules_label">RULES</div>
+				<div class="button" style="left:120px;width:80px" onclick="u_RulesShow()">Show Current</div>
 			</div>
 			<div class="cgru_parameter" title="Show Hidden Folders.
 Need restart (F5).

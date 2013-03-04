@@ -278,3 +278,13 @@ function c_CreateOpenButton( i_el, i_path)
 	return el;
 }
 
+function c_GetRuFilePath( i_file ) { return RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + i_file; }
+function c_RuFileExists( i_file)
+{
+	if( g_elCurFolder.m_dir == null ) return false;
+	if( g_elCurFolder.m_dir.rufiles == null ) return false;
+	if( g_elCurFolder.m_dir.rufiles.length == 0 ) return false;
+	if( g_elCurFolder.m_dir.rufiles.indexOf( i_file) == -1 ) return false;
+	return true;
+}
+

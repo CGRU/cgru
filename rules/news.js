@@ -2,6 +2,8 @@ nw_initialized = false;
 nw_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels','news_count'];
 nw_el = {};
 
+//	setTimeout("g_Refresh()", 1000);
+
 function nw_Init()
 {
 	if( g_auth_user == null ) return;
@@ -19,6 +21,14 @@ function nw_Init()
 
 	nw_Finish();
 	nw_UpdateChannels();
+}
+
+function nw_InitConfigured()
+{
+//console.log( RULES.newsrefresh);
+	if( RULES.newsrefresh == null ) return;
+	if( RULES.newsrefresh < 1 ) return;
+	setInterval( nw_NewsLoad, RULES.newsrefresh * 1000);
 }
 
 function nw_UpdateChannels()
