@@ -2,17 +2,28 @@
 
 $HT_AccessFileName = '.htaccess';
 $HT_GroupsFileName = '.htgroups';
+$HT_DigestFileName = '.htdigest';
 
 $RuleMaxLength = 100000;
 
 $UserName = null;
 $Groups = null;
 
+$SkipFiles = array( '.', '..', $HT_AccessFileName, $HT_GroupsFileName, $HT_DigestFileName);
+
 if( isset($_SERVER['PHP_AUTH_USER']))
 {
 	global $UserName;
 
 	$UserName = $_SERVER['PHP_AUTH_USER'];
+}
+
+function skipFile( $file)
+{
+	global $SkipFiles;
+	if( in_array( $file, $SkipFiles))
+		return true;
+	return false;
 }
 
 function htaccessFolder( $i_folder)
@@ -95,12 +106,6 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 		return;
 	}
 
-	if( false == htaccessPath($i_dir))
-	{
-		$o_out['denied'] = true;
-		return;
-	}
-
 	$rufolder = null;
 	if( array_key_exists('rufolder', $i_recv))
 		$rufolder = $i_recv['rufolder'];
@@ -111,6 +116,19 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 	if( array_key_exists('lookahead', $i_recv))
 		$lookahead = $i_recv['lookahead'];
 
+	$access = false;
+	$denied = true;
+	if( htaccessPath( $i_dir))
+	{
+		$access = true;
+		$denied = false;
+	}
+	else
+	{
+		$rufiles = array('rules');
+		$o_out['denied'] = true;
+	}
+
 	if( $handle = opendir( $i_dir))
 	{
 		$o_out['folders'] = array();
@@ -118,10 +136,11 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 		while (false !== ( $entry = readdir( $handle)))
 		{
-			if( $entry == '.') continue;
-			if( $entry == '..') continue;
+			if( skipFile( $entry)) continue;
+//			if( $entry == '.') continue;
+//			if( $entry == '..') continue;
 			$path = $i_dir.'/'.$entry;
-			if( false == is_dir( $path))
+			if( $access && ( false == is_dir( $path)))
 			{
 				array_push( $o_out['files'], $entry);
 				continue;
@@ -167,6 +186,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 			}
 
 			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden")) continue;
+			if( $denied ) continue;
 			if( false === htaccessFolder( $path)) continue;
 
 			$folderObj = array();
@@ -712,10 +732,8 @@ function isAdmin( &$o_out)
 
 function jsf_htdigest( $i_recv, &$o_out)
 {
-	global $RuleMaxLength, $UserName;
+	global $RuleMaxLength, $UserName, $HT_DigestFileName;
 	if( false == isAdmin( $o_out)) return;
-
-	$htdigest_file = '.htdigest';
 
 	$user = $i_recv['user'];
 
@@ -725,7 +743,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 	$new_line = "$user:RULES:$hash";
 
 	$data = '';
-	if( $fHandle = fopen( $htdigest_file, 'r'))
+	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
 		$data = fread( $fHandle, $RuleMaxLength);
 		fclose($fHandle);
@@ -751,7 +769,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 	$data = implode("\n", $new_lines)."\n";
 
-	if( $fHandle = fopen( $htdigest_file, 'w' ))
+	if( $fHandle = fopen( $HT_DigestFileName, 'w' ))
 	{
 		fwrite( $fHandle, $data );
 		fclose( $fHandle );
@@ -765,7 +783,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 function jsf_deleteuser( $i_user_id, &$o_out)
 {
-	global $RuleMaxLength;
+	global $RuleMaxLength, $HT_DigestFileName;
 	if( false == isAdmin( $o_out)) return;
 
 	$dHandle = opendir('users');
@@ -784,9 +802,8 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 	}
 	closedir($dHandle);
 
-	$htdigest_file = '.htdigest';
 	$data = '';
-	if( $fHandle = fopen( $htdigest_file, 'r'))
+	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
 		$data = fread( $fHandle, $RuleMaxLength);
 		fclose($fHandle);
@@ -809,7 +826,7 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 	}
 	$data = implode("\n", $new_lines)."\n";
 
-	if( $fHandle = fopen( $htdigest_file, 'w' ))
+	if( $fHandle = fopen( $HT_DigestFileName, 'w' ))
 	{
 		fwrite( $fHandle, $data );
 		fclose( $fHandle );

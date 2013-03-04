@@ -1,6 +1,7 @@
 ad_initialized = false;
 ad_permissions = null;
 ad_wnd = null;
+ad_wnd_curgroup = null;
 
 function ad_Init()
 {
@@ -246,6 +247,8 @@ function ad_WndDrawGroups( i_groups)
 		el.textContent = grp;
 		el.m_group = grp;
 		el.onclick = ad_WndGrpOnClick;
+		if( grp == ad_wnd_curgroup )
+			el.classList.add('selected');
 	}
 }
 
@@ -300,6 +303,7 @@ function ad_WndGrpOnClick( i_evt)
 	var el = i_evt.currentTarget;
 	el.classList.add('selected');
 
+	ad_wnd_curgroup = el.m_group;
 	for( var i = 0; i < ad_wnd.elUsrRows.length; i++)
 	{
 		var elU = ad_wnd.elUsrRows[i];
@@ -345,6 +349,8 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.classList.add('user');
 		if( i_row % 2) el.style.backgroundColor = 'rgba(255,255,255,.1)';
 		else el.style.backgroundColor = 'rgba(0,0,0,.1)';
+		if( i_user.groups.indexOf( ad_wnd_curgroup ) != -1 )
+			el.classList.add('selected');
 	}
 	else el.style.backgroundColor = 'rgba(0,0,0,.2)';
 
@@ -391,6 +397,13 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	el.appendChild( elChannels);
 	elChannels.textContent = i_user.channels.length;
 	elChannels.style.width = '50px';
+	if( i_user.channels && i_user.channels.length )
+	{
+		var channels = '';
+		for( var i = 0; i < i_user.channels.length; i++)
+		 channels += i_user.channels[i].id+'\n';
+		elChannels.title = channels;
+	}
 
 	var elNews = document.createElement('div');
 	el.appendChild( elNews);
@@ -436,7 +449,12 @@ function ad_DeleteGroup( i_not_used, i_group)
 
 function ad_WndUserGroupOnCkick( i_user)
 {
-	var grp = null;
+	var grp = ad_wnd_curgroup;
+	if( grp == null )
+	{
+		c_Error('No group selected');
+		return;
+	}
 	for( var i = 0; i < ad_wnd.elGrpBnts.length; i++)
 		if( ad_wnd.elGrpBnts[i].classList.contains('selected'))
 			grp = ad_wnd.elGrpBnts[i].m_group;

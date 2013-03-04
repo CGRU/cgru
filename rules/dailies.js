@@ -242,7 +242,7 @@ function d_ExpProcessGUI( i_wnd)
 	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
 
 	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
-//	i_wnd.destroy();
-	window.location.reload();
+	i_wnd.destroy();
+//	window.location.reload();
 }
 

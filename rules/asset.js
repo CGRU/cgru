@@ -288,10 +288,11 @@ function a_OpenCloseSourceOnClick( i_evt)
 			var elPath = document.createElement('div');
 			elSource.appendChild( elPath);
 			elPath.textContent = ASSET.source.path[i];
+//console.log('flist='+JSON.stringify(flist));
 			for( var f = 0; f < flist.length; f++)
 			{
 				var fname = flist[f];
-				u_ShowSequence( elSource, paths[i]+'/'+fname);
+				u_ShowFolder( elSource, paths[i]+'/'+fname);
 				founded = true;
 			}
 		}
@@ -309,6 +310,7 @@ function a_SourceWalkFind( i_walk, o_list, i_path)
 	for( var f = 0; f < i_walk.folders.length; f++)
 	{
 		var fobj = i_walk.folders[f];
+//console.log(JSON.stringify(fobj));
 		var path = i_path;
 		if( path ) path += '/' + fobj.name;
 		else path = fobj.name;
@@ -322,41 +324,6 @@ function a_ShowThumbnails()
 {
 	a_elThumbnails = [];
 
-/*	a_elFilter = document.createElement('div');
-	for( var user in g_users )
-	{
-		el = document.createElement('div');
-		elArtists.appendChild( el);
-		el.style.cssFloat = 'left';
-		el.textContent = c_GetUserTitle( user);
-		el.m_user = user;
-		el.classList.add('tag');
-		el.onclick = function(e){ c_ElToggleSelected(e); a_ThumbFilterApply()};
-		a_elFilter.m_elArtists.push( el);
-	}
-
-	var elTagsDiv = document.createElement('div');
-	elBody.appendChild( elTagsDiv);
-	var elTagsLabel = document.createElement('div');
-	elTagsDiv.appendChild( elTagsLabel);
-	elTagsLabel.textContent = 'Tags:';
-	elTagsLabel.style.cssFloat = 'left';
-	var elTags = document.createElement('div');
-	elTagsDiv.appendChild( elTags);
-	elTags.classList.add('tags');
-	a_elFilter.m_elTags = [];
-	for( var tag in RULES.tags)
-	{
-		el = document.createElement('div');
-		elTags.appendChild( el);
-		el.style.cssFloat = 'left';
-		st_SetElTag( el, tag);
-		el.m_tag = tag;
-		el.classList.add('tag');
-		el.onclick = function(e){ c_ElToggleSelected(e); a_ThumbFilterApply()};
-		a_elFilter.m_elTags.push( el);
-	}
-*/
 	if( ASSET.thumbnails === 0 )
 	{
 		var folders = g_elCurFolder.m_dir.folders;

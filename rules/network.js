@@ -127,10 +127,11 @@ function n_Get( i_path)
 }
 
 
-function n_GetRuFile( i_file )
+function n_GetRuFile( i_file, i_nockeck )
 {
-	if( false == c_RuFileExists( i_file)) return null;
-//	return n_Request({"getfile":c_GetRuFilePath( i_file)});
-	return n_Get( c_GetRuFilePath( i_file));
+	if( i_nockeck != true )
+		if( false == c_RuFileExists( i_file)) return null;
+	return n_Request({"getfile":c_GetRuFilePath( i_file)});
+//	return n_Get( c_GetRuFilePath( i_file));
 }
 
