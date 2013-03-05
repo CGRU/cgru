@@ -132,7 +132,7 @@ function p_LinkOnClick( i_evt)
 	i_evt.stopPropagation();
 	p_SetCurItem( i_evt.currentTarget);
 	p_elCurFolder = p_elCurItem.parentNode;
-	g_GO( p_elCurItem.m_path );
+//	g_GO( p_elCurItem.m_path );
 //g_elCurFolder.scrollIntoView(false);
 }
 function p_DelOnClick()
@@ -251,7 +251,7 @@ function p_CompareItems(a,b)
 }
 function p_CreateFolder( i_obj, i_elParent)
 {
-	var el = p_CreateElement( i_obj, i_elParent);
+	var el = p_CreateElement( i_obj, i_elParent, 'div');
 	el.classList.add('folder');
 	el.onclick = p_FolderOnClick;
 //	el.ondblclick = p_FolderOnDblClick;
@@ -259,15 +259,15 @@ function p_CreateFolder( i_obj, i_elParent)
 }
 function p_CreateLink( i_obj, i_elParent)
 {
-	var el = p_CreateElement( i_obj, i_elParent);
+	var el = p_CreateElement( i_obj, i_elParent, 'a');
 	el.m_path = i_obj.path;
-	el.classList.add('link');
+	el.href = '#' + i_obj.path;
 	el.onclick = p_LinkOnClick;
 	return el;
 }
-function p_CreateElement( i_obj, i_elParent)
+function p_CreateElement( i_obj, i_elParent, i_type)
 {
-	var el = document.createElement('div');
+	var el = document.createElement( i_type);
 	i_elParent.appendChild( el);
 	el.textContent = i_obj.label;
 	el.m_label = i_obj.label;

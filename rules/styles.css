@@ -98,12 +98,9 @@ box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 opacity: 0.9;
 }
 #navig .folder.current .fcolor { opacity: 0.7; }
-#navig .folder .fname {position: relative;}
-#navig .folder .fstatus {position: relative;
-float: right;
-font-weight: normal;
-padding-right:4px;
-}
+#navig .folder .fname { position: relative; }
+#navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
+#navig .folder .fstatus { position: relative; float: right; font-weight: normal; padding-right:4px; }
 #navig .folder .progressbar { height: 6px; }
 
 
@@ -200,23 +197,23 @@ font-size: 10px;
 }
 #news .news_label { font-size:12px; }
 /* ============= PLAYLIST: =============== */
-#playlist .folder, #playlist .link {
+#playlist .folder, #playlist a {
+font-weight: normal;
+}
+#playlist .folder {
+cursor: pointer;
+border: 1px solid rgba(255,255,255,.2);
 box-shadow: 0 0 2px rgba(0,0,0,.5) inset;
 border-radius: 4px;
-cursor: pointer;
-font-weight: normal;
-border: 1px solid rgba(255,255,255,.2);
-padding: 0px 0px 0px 8px;
-/*color: rgba(0,0,0,.8);*/
+font-size: 16px;
+padding: 4px 0px 4px 8px;
 }
-#playlist .folder { font-size: 16px; }
-#playlist .link { font-size: 14px; /*color: #005;*/}
-#playlist .folder.opened { background: rgba(0,255,255,.03);/*font-weight: bold;*/}
-#playlist .folder > div { display: none;}
-#playlist .folder.opened > div { display: block;}
+#playlist a { display: block; font-size: 14px; padding: 0px 0px 0px 8px; }
+#playlist .folder > .folder, #playlist .folder > a { display: none;}
+#playlist .folder.opened > .folder, #playlist .folder.opened > a { display: block;}
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
-#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: #00A;*/}
+/*#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); }*/
 /* ======= USERS: ======== */
 #permissions > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
 #permissions > div div { padding: 0px 4px;}

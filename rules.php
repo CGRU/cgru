@@ -54,6 +54,10 @@ function htaccessFolder( $i_folder)
 		error_log( $out['error']);
 		return false;
 	}
+	if( array_key_exists('valid_user', $out))
+	{
+		return true;
+	}
 
 	if(( count( $out['users']) == 0 ) && ( count( $out['groups']) == 0 )) return null;
 
@@ -71,6 +75,13 @@ function htaccessPath( $i_path)
 {
 //return true;
 //error_log('Checking access path "'.$i_path.'"');
+	if( is_file( $i_path)) $i_path = dirname( $i_path);
+	if( false == is_dir( $i_path))
+	{
+		error_log("htaccessPath: no such directory:\n$i_path");
+		return false;
+	}
+
 	$folders = explode('/', $i_path);
 	$path = null;
 	$paths = array();
@@ -158,7 +169,8 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 						if( $ruentry == '.') continue;
 						if( $ruentry == '..') continue;
 
-						array_push( $o_out['rufiles'], $ruentry);
+						if( $access )
+							array_push( $o_out['rufiles'], $ruentry);
 
 						if( strrpos( $ruentry,'.json') === false ) continue;
 
@@ -238,6 +250,17 @@ function jsf_getfile( $i_file, &$o_out)
 {
 	global $RuleMaxLength;
 
+	if( false == is_file( $i_file))
+	{
+		$o_out['error'] = 'No such file '.$i_file;
+		return;
+	}
+	if( false == htaccessPath( $i_file))
+	{
+		$o_out['error'] = 'Permissions denied';
+		return;
+	}
+
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
 		echo fread( $fHandle, $RuleMaxLength);
@@ -250,7 +273,22 @@ function jsf_getfile( $i_file, &$o_out)
 
 function jsf_readobj( $i_file, &$o_out)
 {
+	if( false == htaccessPath( $i_file))
+	{
+		$o_out['error'] = 'Permissions denied';
+		return;
+	}
+	readObj( $i_file, $o_out);
+}
+function readObj( $i_file, &$o_out)
+{
 	global $RuleMaxLength;
+
+	if( false == is_file( $i_file))
+	{
+		$o_out['error'] = 'No such file '.$i_file;
+		return;
+	}
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
@@ -360,7 +398,7 @@ function jsf_editobj( $i_edit, &$o_out)
 
 	if( $UserName == null )
 	{
-		$o_out['error'] = 'You have no permissions.';
+		$o_out['error'] = 'Guests are not allowed to edit objects.';
 		return;
 	}
 
@@ -402,7 +440,7 @@ function jsf_cmdexec( $i_obj, &$o_out)
 	global $UserName;
 	if( $UserName == null )
 	{
-		$o_out['error'] = 'You have no permissions to run commands.';
+		$o_out['error'] = 'Guests are not allowed to run commands.';
 		return;
 	}
 
@@ -420,7 +458,7 @@ function afanasy( $i_obj, &$o_out)
 	global $UserName;
 	if( $UserName == null )
 	{
-		$o_out['error'] = 'You have no permissions to send jobs.';
+		$o_out['error'] = 'Guests are not allowed to send jobs.';
 		return;
 	}
 
@@ -454,7 +492,7 @@ function jsf_save( $i_save, &$o_out)
 	global $UserName;
 	if( $UserName == null )
 	{
-		$o_out['error'] = 'You have no permissions to save files.';
+		$o_out['error'] = 'Guests are not allowed to save files.';
 		return;
 	}
 
@@ -536,11 +574,7 @@ function jsf_initialize( $i_arg, &$o_out)
 	$o_out['config'] = $configs;
 
 	processUser( $o_out);
-	if( array_key_exists('error', $o_out))
-	{
-		$o_out['error'] = $out['error'];
-		return;
-	}
+	if( array_key_exists('error', $o_out)) return;
 
 	$out = array();
 	jsf_getallusers( null, $out);
@@ -600,7 +634,7 @@ function processUser( &$o_out)
 		jsf_editobj( $editobj, $out);
 	}
 
-	jsf_readobj( $filename, &$user);
+	readObj( $filename, &$user);
 
 	if( array_key_exists('error', $user))
 	{
@@ -628,7 +662,7 @@ function jsf_makenews( $i_news, &$o_out)
 
 	if( $UserName == null )
 	{
-		$o_out['error'] = 'No authentificated user founded.';
+		$o_out['error'] = 'Guests are not allowed to make news.';
 		return;
 	}
 
@@ -994,6 +1028,13 @@ function permissionsGet( $i_args, &$o_out)
 
 	$o_out['groups'] = array();
 	$o_out['users'] = array();
+
+	if( false == is_dir( $i_args['path'] ))
+	{
+		$o_out['error'] = 'No such directory.';
+		return;
+	}
+
 	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( false === is_file( $htaccess)) return;
 
@@ -1028,12 +1069,19 @@ function permissionsGet( $i_args, &$o_out)
 			foreach( $words as $user) array_push( $o_out['users'], $user);
 			$founded = true;
 		}
+		else if( $words[1] == 'valid-user' )
+		{
+			$o_out['valid_user'] = true;
+			$founded = true;
+		}
 	}
-	if( false == $founded )
+/*	if( false == $founded )
 	{
 		$o_out['error'] = 'Unable to find users or groups in the file.';
+		error_log( $htaccess);
+		error_log( $data);
 		return;
-	}
+	}*/
 }
 
 function jsf_search( $i_args, &$o_out)
@@ -1084,7 +1132,8 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 		$rufolder = "$path/".$i_args['rufolder'];
 		if( false == is_dir( $rufolder)) continue;
 
-		$founded = true;
+		$founded = false;
+		if( htaccessPath( $i_path)) $founded = true;
 
 		if( $founded && array_key_exists('status', $i_args ))
 		{

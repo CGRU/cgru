@@ -222,13 +222,21 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	if(( false == exists ) && ( g_elCurFolder.m_dir != null ) && ( i_folder != '' ))
 	{
-//		g_elCurFolder.m_dir.folders.push({"name":i_folder});
-		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
+//		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
+//		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
 		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder});
-//		i_walk.folders.push( {"name":i_folder});
-		c_Info('Dummy folder "'+i_folder+'" pushed to "'+g_elCurFolder.m_path+'"');
+		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
 	}
+
+	if( i_walk.error || i_walk.denied )
+	{
+		g_elCurFolder.classList.add('dummy');
+	}
+/*	else
+	{
+		g_access = true;
+		g_denied = false;
+	}*/
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
@@ -304,8 +312,6 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
 
 	elFolder.onclick = g_FolderOnClick;
-//	elFolder.ondblclick = g_FolderOnDblClick;
-//	elFolder.ondblclick = g_FolderOnClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
 
@@ -342,6 +348,7 @@ function g_FolderOnClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
+	if( elFolder.classList.contains('dummy')) return;
 
 	if( elFolder.classList.contains('current'))
 	{
