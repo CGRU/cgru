@@ -184,7 +184,6 @@ function g_Navigate( i_path)
 	else
 		window.document.title = g_elCurFolder.m_path;
 
-	a_Process();
 	u_Process();
 	ad_PermissionsProcess();
 }

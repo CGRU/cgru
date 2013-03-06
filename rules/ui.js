@@ -1,10 +1,13 @@
 u_elements = ['asset','assets','content','info','open','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','files','content_info','content_status','thumbnail','sidepanel','status_finish'];
 u_el = {};
+u_views = ['asset','files','body','comments'];
 
 u_body_brief = 0;
 u_body_filename = 'body.html';
 u_body_edit_markup = 0;
 u_body_text = '';
+
+function View_body_Opened() { u_BodyLoad(); }
 
 function u_Init()
 {
@@ -21,12 +24,12 @@ function u_Init()
 	if( localStorage.header_opened == 'true' ) u_OpenCloseHeader();
 	if( localStorage.footer_opened == 'true' ) u_OpenCloseFooter();
 
-	if( p_PLAYER != true)
-	{
-		if( localStorage.show_hidden == null ) localStorage.show_hidden = 'OFF';
-		$('show_hidden').textContent = localStorage.show_hidden;
-		$('search_artists').m_elArtists = [];
-	}
+	if( p_PLAYER == true) return;
+
+	if( localStorage.show_hidden == null ) localStorage.show_hidden = 'OFF';
+	$('show_hidden').textContent = localStorage.show_hidden;
+	$('search_artists').m_elArtists = [];
+
 }
 function u_OpenCloseHeader(){ u_OpenCloseHeaderFooter( $('headeropenbtn'),'header', -200, 0);}
 function u_OpenCloseFooter(){ u_OpenCloseHeaderFooter( $('footeropenbtn'),'footer', 38, 238);}
@@ -52,14 +55,21 @@ function u_Process()
 	}
 
 	if( ASSET && ( ASSET.path == g_elCurFolder.m_path ))
-		u_el.files.parentNode.style.display = 'none';
+	{
+		$('files_div').style.display = 'none';
+	}
 	else
-		u_FilesOnClick();
+	{
+		$('files_div').style.display = 'block';
+		u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir);
+	}
 
+	a_Process();
 	u_StatusApply();
 	nw_Process();
-	cm_Process();
-	u_BodyLoad();
+
+	for( var i = 0; i < u_views.length; i++)
+		u_OpenCloseView( u_views[i], false);
 }
 
 function u_InitAuth()
@@ -110,19 +120,19 @@ function u_StatusEditOnClick()
 
 function u_FilesOnClick( i_el)
 {
-	if( u_el.files.m_opened ) return;
-	u_el.files.parentNode.style.display = 'block';
-	u_el.files.m_opened = true;
-	$('files_btn').style.display = 'none';
-	u_ShowDirectory( u_el.files, g_elCurFolder.m_path, g_elCurFolder.m_dir);
+//	if( u_el.files.m_opened ) return;
+//	u_el.files.parentNode.style.display = 'block';
+//	u_el.files.m_opened = true;
+//	$('files_btn').style.display = 'none';
+//	u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir);
 }
 
 function u_Finish()
 {
 	u_BodyEditChancel('');
 
-	$('files_btn').style.display = 'block';
-	u_el.files.m_opened = false;
+//	$('files_btn').style.display = 'block';
+//	u_el.files.m_opened = false;
 
 	st_DestroyEditUI();
 	u_el.files.textContent = '';
@@ -134,7 +144,7 @@ function u_Finish()
 	u_el.thumbnail.style.display = 'none';
 
 	nw_Finish();
-	cm_Finish();
+//	cm_Finish();
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
@@ -665,6 +675,46 @@ function u_BodyEditMarkup()
 	{
 		$('body_body').innerHTML = $('body_body').textContent;
 		$('body_edit_markup').classList.remove('selected');
+	}
+}
+
+function u_OpenCloseView( i_id, i_toggle, i_callfuncs)
+{
+//console.log(i_id+': '+localStorage['view'+i_id]);
+	if( localStorage['view'+i_id] == null ) localStorage['view'+i_id] = 'true';
+	if( i_toggle !== false )
+	{
+		if( localStorage['view'+i_id] !== 'true' )
+			localStorage['view'+i_id] = 'true';
+		else
+			localStorage['view'+i_id] = 'false';
+	}
+
+	if( localStorage['view'+i_id] === 'true' )
+	{
+		$(i_id).style.display = 'block';
+		$(i_id+'_label').style.display = 'block';
+		$(i_id+'_div').style.display = 'block';
+		$(i_id+'_div').style.clear = 'both';
+		$(i_id+'_btn').innerHTML = '-';
+		$(i_id+'_btn').classList.add('opened');
+		$(i_id+'_btn').classList.remove('closed');
+		for( var i = 0; i < 10; i++ ) if($(i_id+'_btn_'+i)) $(i_id+'_btn_'+i).style.display = 'block';
+		if( i_callfuncs !== false )
+			if( window['View_'+i_id+'_Opened'] ) window['View_'+i_id+'_Opened']();
+	}
+	else
+	{
+		$(i_id).style.display = 'none';
+		$(i_id+'_label').style.display = 'none';
+		$(i_id+'_div').style.display = 'inline';
+		$(i_id+'_div').style.clear = 'none';
+		$(i_id+'_btn').innerHTML = $(i_id+'_label').innerHTML;
+		$(i_id+'_btn').classList.remove('opened');
+		$(i_id+'_btn').classList.add('closed');
+		for( var i = 0; i < 10; i++ ) if($(i_id+'_btn_'+i)) $(i_id+'_btn_'+i).style.display = 'none';
+		if( i_callfuncs !== false )
+			if( window['View_'+i_id+'_Closed'] ) window['View_'+i_id+'_Closed']();
 	}
 }
 

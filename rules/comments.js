@@ -1,27 +1,10 @@
 cm_file = 'comments.json';
-cm_opened = false;
 cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','18','24','36','48','60'];
 
-function cm_Process()
-{
-	if( cm_opened ) cm_Load();
-}
-
-function cm_Finish()
-{
-	$('comments').textContent = '';
-}
-
-function cm_OpenOnClick()
-{
-	if( cm_opened ) return;
-	cm_Load();
-}
+function View_comments_Opened() { cm_Load(); }
 
 function cm_Load()
 {
-	cm_opened = true;
-	$('comments_open_btn').classList.remove('button');
 	$('comments').textContent = '';
 
 	if( false == c_RuFileExists( cm_file)) return;
@@ -38,7 +21,6 @@ function cm_Add( i_obj)
 {
 //window.console.log( JSON.stringify( i_obj));
 	var el = document.createElement('div');
-//	$('comments').appendChild( el);
 	$('comments').insertBefore( el, $('comments').firstChild);
 	el.classList.add('comment');
 
@@ -262,13 +244,7 @@ function cm_Cancel( i_el)
 		cm_Init( i_el);
 }
 
-function cm_NewOnClick()
-{
-	if( false == cm_opened )
-		cm_OpenOnClick();
-	var el = cm_Add();
-	cm_Edit( el);
-}
+function cm_NewOnClick() { cm_Edit( cm_Add()); }
 
 function cm_Delete( i_el)
 {

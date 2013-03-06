@@ -127,6 +127,12 @@ background: transparent;
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 }
 
+.button.openclose { float:left; }
+.button.openclose.opened { font-size:14px; width: 14px; height: 14px; }
+.button.openclose.closed { }
+
+.view { border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
+
 .editing {
 background: #DDD;
 color: #000;
@@ -206,7 +212,7 @@ border: 1px solid rgba(255,255,255,.2);
 box-shadow: 0 0 2px rgba(0,0,0,.5) inset;
 border-radius: 4px;
 font-size: 16px;
-padding: 4px 0px 4px 8px;
+padding: 2px 0px 2px 8px;
 }
 #playlist a { display: block; font-size: 14px; padding: 0px 0px 0px 8px; }
 #playlist .folder > .folder, #playlist .folder > a { display: none;}
@@ -326,7 +332,7 @@ font-size: 14px;
 /* ============================= ASSETS: ======================================*/
 #asset {}
 #asset > div {
-box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
+box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
 border-radius: 10px;
 margin: 6px;
 padding: 20px;
@@ -432,6 +438,7 @@ box-shadow: 0 0 4px #000 inset;
 
 /* ====================================================================== */
 /* ==================== WINDOWS: ======================================== */
+.dailies { color: #000; }
 .dailies div { margin: 4px; border-radius: 4px;}
 .dailies .label { float: left;}
 .dailies div .param, .dailies div div { margin: 4px 8px; padding: 3px 6px;}

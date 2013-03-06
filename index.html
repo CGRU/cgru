@@ -96,30 +96,38 @@
 			<div id="status_modified"></div>
 		</div>
 	</div>
-	<div id="asset"></div>
-	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
-		<div class="button" id="files_btn" onclick="u_FilesOnClick()"=>Files</div>
+	<div id="asset_div" class="view">
+		<div id="asset_btn" class="button openclose" onclick="u_OpenCloseView('asset')">-</div>
+		<div id="asset_label" style="text-align:center; margin-top: 4px;">Asset</div>
+		<div id="asset"></div>
+	</div>
+	<div id="files_div" class="view">
+		<div id="files_btn" class="button openclose" onclick="u_OpenCloseView('files')">-</div>
+		<div id="files_label" style="text-align:center; margin-top: 4px;">Files</div>
 		<div id="files"></div>
 	</div>
-	<div id="body_div">
-		<div id="body_panel">
-			<div class="button" id="body_edit_btn" style="float:right;display:none" onclick="u_BodyEditStart()">Edit</div>
-			<div id="body_info"></div>
+	<div id="body_div" class="view">
+		<div id="body_btn" class="button openclose" onclick="u_OpenCloseView('body')">-</div>
+		<div id="body_label" style="text-align:center; margin-top: 4px;">Body</div>
+		<div id="body">
+			<div id="body_panel">
+				<div class="button" id="body_edit_btn" style="float:right;display:none" onclick="u_BodyEditStart()">Edit</div>
+				<div id="body_info"></div>
+			</div>
+			<div id="body_panel_edit" style="display:none">
+				<div class="button" style="float:right" onclick="u_BodyEditChancel()">Chancel</div>
+				<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
+				<div style="float:right;border:1px solid #000;cursor:pointer;padding:2px 6px;"
+					id="body_edit_markup" onclick="u_BodyEditMarkup()">Markup</div>
+			</div>
+			<div id="body_body"></div>
 		</div>
-		<div id="body_panel_edit" style="display:none">
-			<div class="button" style="float:right" onclick="u_BodyEditChancel()">Chancel</div>
-			<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
-			<div style="float:right;border:1px solid #000;cursor:pointer;padding:2px 6px;"
-				id="body_edit_markup" onclick="u_BodyEditMarkup()">Markup</div>
-		</div>
-		<div id="body_body"></div>
 	</div>
-	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
-		<div>
-			<div class="button" style="float:left" id="comments_open_btn" onclick="cm_OpenOnClick()">Comments</div>
-			<div class="button" style="float:right" onclick="cm_NewOnClick()">New Comment</div>
-		</div>
-		<div id="comments" style="/*display:none*/"></div>
+	<div id="comments_div" class="view">
+		<div id="comments_btn" class="button openclose" onclick="u_OpenCloseView('comments')">-</div>
+		<div id="comments_btn_0" class="button" style="float:right;padding:0px 6px;" onclick="cm_NewOnClick()">New Comment</div>
+		<div id="comments_label" style="text-align:center; margin-top: 4px;">Comments</div>
+		<div id="comments"></div>
 	</div>
 </div>
 
