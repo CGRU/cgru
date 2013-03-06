@@ -47,7 +47,9 @@
 }
 },
 
-"OS_unix":{
+"cmdexec":{"open_folder":"open \"@PATH@\""},
+
+"OS_linux":{
 	"cmdexec":{
 		"open_folder":"nautilus \"@PATH@\"",
 		"play_sequence":[
@@ -62,6 +64,17 @@
 		]
 	}
 },
+
+"OS_macosx":{
+	"cmdexec":{
+		"open_folder":"open \"@PATH@\"",
+		"play_movie":[
+			{"name":"QT",
+				"cmd":"open @PATH@"}
+		]
+	}
+},
+
 "OS_windows":{
 	"cmdexec":{
 		"open_folder":"start @PATH@",

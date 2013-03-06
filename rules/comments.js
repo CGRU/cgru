@@ -1,7 +1,7 @@
 cm_file = 'comments.json';
 cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','18','24','36','48','60'];
 
-function View_comments_Opened() { cm_Load(); }
+function View_comments_Open() { cm_Load(); }
 
 function cm_Load()
 {
@@ -67,6 +67,11 @@ function cm_Add( i_obj)
 	elType.style.cssFloat = 'left';
 	el.m_elType = elType;
 
+	var elModified = document.createElement('div');
+	elModified.classList.add('modified');
+	elPanel.appendChild( elModified);
+	el.m_elModified = elModified;
+
 	var elInfo = document.createElement('div');
 	elInfo.classList.add('info');
 	elPanel.appendChild( elInfo);
@@ -112,6 +117,8 @@ function cm_Init( i_el)
 
 	i_el.m_elText.contentEditable = 'false';
 	i_el.m_elText.classList.remove('editing');
+	i_el.m_elText.style.color = localStorage.text_color;
+	i_el.m_elText.style.background = localStorage.background;
 
 	if( i_el.m_obj == null )
 	{
@@ -130,14 +137,13 @@ function cm_Init( i_el)
 	var info = c_GetUserTitle(i_el.m_obj.user_name)+' '+date;
 	if( i_el.m_obj.duration )
 		info = i_el.m_obj.duration+' '+info;
+	i_el.m_elInfo.innerHTML = info;
+
 	if( i_el.m_obj.mtime )
 	{
 		var date = c_DT_StrFromMSec( i_el.m_obj.mtime);
-		info += '<br>Modified: ';
-		info += c_GetUserTitle(i_el.m_obj.muser_name)+' '+date;
+		i_el.m_elModified.textContent = 'Modified: ' + c_GetUserTitle(i_el.m_obj.muser_name)+' '+date;
 	}
-
-	i_el.m_elInfo.innerHTML = info;
 
 	if( i_el.m_obj.text )
 		i_el.m_elText.innerHTML = i_el.m_obj.text;
@@ -216,6 +222,8 @@ function cm_Edit( i_el)
 
 	i_el.m_elText.classList.add('editing');
 	i_el.m_elText.contentEditable = 'true';
+	i_el.m_elText.style.color = '#000000';
+	i_el.m_elText.style.background = '#DDDDDD';
 	i_el.m_elText.focus();
 }
 

@@ -330,6 +330,7 @@ font-size: 14px;
 
 /* ============================================================================*/
 /* ============================= ASSETS: ======================================*/
+/*
 #asset {}
 #asset > div {
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
@@ -341,7 +342,16 @@ padding: 20px;
 
 #asset .filter .body div { margin: 1px 4px; }
 #asset .filter .body .button { margin: 1px 8px; padding: 2px 8px; }
+*/
+#asset .source, #asset .result, #asset .resdailies {
+box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
+border-radius: 10px;
+margin: 6px;
+padding: 20px;
+}
+#asset .source.button { padding: 4px;}
 
+.shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
 .shot .status .btn_edit { float: right; font-size: 10px; }
@@ -351,7 +361,7 @@ padding: 20px;
 .shot .status .tags { float: left; margin-right: 5px; }
 .shot .status .progressbar { clear: both; height: 8px; }
 
-/*.scene { cursor: pointer; }*/
+.scene { padding: 4px; }
 .scene a { color: inherit; /*display:block;*/ }
 .scene a:hover { color: #AFF;}
 .scene .shot {
@@ -418,6 +428,7 @@ margin-top: 0px;
 }
 .comment .panel { margin: 0px;}
 .comment .panel .info { font-size: 14px; padding: 2px 4px;}
+.comment .panel .modified { margin-top: 2px; float: right; font-size: 12px; font-style:italic; opacity: .8; padding: 2px 4px;}
 .comment .panel .button { font-size: 12px; float: right;}
 .comment .duration div { float: left; margin: 1px;}
 .comment .duration .sample {

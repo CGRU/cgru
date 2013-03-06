@@ -5,6 +5,15 @@ a_elThumbnails = null;
 a_elFolders = null;
 a_elCurEditStatus = null;
 
+function View_asset_Open() { a_ShowBody(); }
+
+function a_Process()
+{
+	a_AutoSeek();
+//	if( ASSET ) c_RulesMergeObjs( ASSET, RULES.assets[ASSET.type]);
+	a_ShowHeaders();
+}
+
 function a_Finish()
 {
 	ASSETS = {};
@@ -17,26 +26,12 @@ function a_Finish()
 	a_elFolders = null;
 }
 
-function a_Process()
-{
-	a_AutoSeek();
-
-//	if( ASSET ) c_RulesMergeObjs( ASSET, RULES.assets[ASSET.type]);
-
-	a_ShowHeaders();
-
-	if( ASSET && (ASSET.path == g_CurPath()))
-		a_ShowBody();
-
-	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
-	c_Info( path);
-	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.cmdexec.open_folder.replace(/@PATH@/g, path)]));
-}
-
 function a_ShowBody()
 {
-	u_el.asset.innerHTML = '';
 	if( ASSET == null ) return;
+	if( ASSET.path != g_CurPath()) return;
+
+	u_el.asset.innerHTML = '';
 
 	thumbnails = [];
 
@@ -52,7 +47,7 @@ function a_ShowBody()
 	{
 		var elSource = document.createElement('div');
 		u_el.asset.appendChild( elSource);
-		elSource.classList.add('sequences');
+		elSource.classList.add('source');
 		elSource.classList.add('button');
 		elSource.textContent = 'Scan Sources';
 		elSource.onclick = a_OpenCloseSourceOnClick;
@@ -86,6 +81,7 @@ function a_ShowBody()
 	{
 		var elResult = document.createElement('div');
 		u_el.asset.appendChild( elResult);
+		elResult.classList.add('result');
 
 		var founded = false;
 		for( var i = 0; i < walk.result.length; i++)
@@ -107,6 +103,7 @@ function a_ShowBody()
 	{
 		var elDailies = document.createElement('div');
 		u_el.asset.appendChild( elDailies);
+		elDailies.classList.add('resdailies');
 
 		var founded = false;
 		for( var i = 0; i < walk.dailies.length; i++)

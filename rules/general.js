@@ -139,7 +139,6 @@ function g_Navigate( i_path)
 
 	cgru_ClosePopus();
 	u_Finish();
-	a_Finish();
 	ad_PermissionsFinish();
 
 	RULES = c_CloneObj( RULES_TOP);

@@ -1,13 +1,15 @@
-u_elements = ['asset','assets','content','info','open','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','files','content_info','content_status','thumbnail','sidepanel','status_finish'];
+u_elements = ['asset','assets','content','info','open','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','content_info','content_status','thumbnail','sidepanel','status_finish'];
 u_el = {};
 u_views = ['asset','files','body','comments'];
 
-u_body_brief = 0;
 u_body_filename = 'body.html';
 u_body_edit_markup = 0;
 u_body_text = '';
 
-function View_body_Opened() { u_BodyLoad(); }
+function View_body_Open() { u_BodyLoad(); }
+function View_body_Close() { u_BodyEditChancel(''); }
+function View_files_Open() { u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir); }
+function View_files_Close() { $('files').textContent = ''; }
 
 function u_Init()
 {
@@ -30,48 +32,9 @@ function u_Init()
 	$('show_hidden').textContent = localStorage.show_hidden;
 	$('search_artists').m_elArtists = [];
 
-}
-function u_OpenCloseHeader(){ u_OpenCloseHeaderFooter( $('headeropenbtn'),'header', -200, 0);}
-function u_OpenCloseFooter(){ u_OpenCloseHeaderFooter( $('footeropenbtn'),'footer', 38, 238);}
-
-function u_ShowHiddenToggle()
-{
-	if( localStorage.show_hidden == 'ON') localStorage.show_hidden = 'OFF';
-	else localStorage.show_hidden = 'ON';
-	$('show_hidden').textContent = localStorage.show_hidden;
-}
-
-function u_Process()
-{
-	if( g_elCurFolder.m_dir.rufiles && ( g_elCurFolder.m_dir.rufiles.indexOf( RULES.thumbnail.filename ) != -1 ))
-	{
-		u_el.thumbnail.setAttribute('src', RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/'+RULES.thumbnail.filename);
-		u_el.thumbnail.style.display = 'inline';
-	}
-	else
-	{
-//		u_el.thumbnail.setAttribute('src', null );
-		u_el.thumbnail.style.display = 'none';
-	}
-
-	if( ASSET && ( ASSET.path == g_elCurFolder.m_path ))
-	{
-		$('files_div').style.display = 'none';
-	}
-	else
-	{
-		$('files_div').style.display = 'block';
-		u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir);
-	}
-
-	a_Process();
-	u_StatusApply();
-	nw_Process();
-
 	for( var i = 0; i < u_views.length; i++)
-		u_OpenCloseView( u_views[i], false);
+		u_OpenCloseView( u_views[i], false, false);
 }
-
 function u_InitAuth()
 {
 	$('body_edit_btn').style.display = 'block';
@@ -88,6 +51,79 @@ function u_InitAuth()
 		el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};
 		elArtists.m_elArtists.push( el);
 	}
+}
+
+function u_Process()
+{
+	if( g_elCurFolder.m_dir.rufiles && ( g_elCurFolder.m_dir.rufiles.indexOf( RULES.thumbnail.filename ) != -1 ))
+	{
+		u_el.thumbnail.setAttribute('src', RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/'+RULES.thumbnail.filename);
+		u_el.thumbnail.style.display = 'inline';
+	}
+	else
+	{
+//		u_el.thumbnail.setAttribute('src', null );
+		u_el.thumbnail.style.display = 'none';
+	}
+
+	a_Process();
+	u_StatusApply();
+	nw_Process();
+
+	if( ASSET && ( ASSET.path == g_elCurFolder.m_path ))
+	{
+		if( localStorage.view_asset === 'true' )
+			$('asset_div').style.display = 'block';
+		else
+			$('asset_div').style.display = 'inline';
+		$('files_div').style.display = 'none';
+	}
+	else
+	{
+		$('asset_div').style.display = 'none';
+		if( localStorage.view_files === 'true' )
+			$('files_div').style.display = 'block';
+		else
+			$('files_div').style.display = 'inline';
+	}
+
+	u_ViewsFuncsOpen();
+
+	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
+	c_Info( path);
+	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.cmdexec.open_folder.replace(/@PATH@/g, path)]));
+}
+
+function u_Finish()
+{
+//	u_BodyEditChancel('');
+
+//	$('files_btn').style.display = 'block';
+//	u_el.files.m_opened = false;
+
+	st_DestroyEditUI();
+//	u_el.files.textContent = '';
+
+	u_StatusApply( null);
+//	u_el.status_annotation.textContent = '';
+//	st_StatusSetColor( null, u_el.content_info);
+
+	u_el.thumbnail.style.display = 'none';
+
+	nw_Finish();
+//	cm_Finish();
+	a_Finish();
+
+	u_ViewsFuncsClose();
+}
+
+function u_OpenCloseHeader(){ u_OpenCloseHeaderFooter( $('headeropenbtn'),'header', -200, 0);}
+function u_OpenCloseFooter(){ u_OpenCloseHeaderFooter( $('footeropenbtn'),'footer', 38, 238);}
+function u_ShowHiddenToggle()
+{
+	if( localStorage.show_hidden == 'ON') localStorage.show_hidden = 'OFF';
+	else localStorage.show_hidden = 'ON';
+	$('show_hidden').textContent = localStorage.show_hidden;
 }
 
 function u_StatusApply( i_status)
@@ -125,26 +161,6 @@ function u_FilesOnClick( i_el)
 //	u_el.files.m_opened = true;
 //	$('files_btn').style.display = 'none';
 //	u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir);
-}
-
-function u_Finish()
-{
-	u_BodyEditChancel('');
-
-//	$('files_btn').style.display = 'block';
-//	u_el.files.m_opened = false;
-
-	st_DestroyEditUI();
-	u_el.files.textContent = '';
-
-	u_StatusApply( null);
-//	u_el.status_annotation.textContent = '';
-//	st_StatusSetColor( null, u_el.content_info);
-
-	u_el.thumbnail.style.display = 'none';
-
-	nw_Finish();
-//	cm_Finish();
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
@@ -343,7 +359,7 @@ function u_ShowFolder( i_element, i_path, i_name)
 	elLinkA.style.cssFloat = 'right';
 
 	var cmds = RULES.cmdexec.play_sequence;
-	for( var c = 0; c < cmds.length; c++)
+	if( cmds ) for( var c = 0; c < cmds.length; c++)
 	{
 		var elCmd = document.createElement('div');
 		elFolder.appendChild( elCmd);
@@ -385,7 +401,7 @@ function u_ShowFile( i_element, i_path)
 	if( RULES.movtypes.indexOf(type) != -1)
 	{
 		var cmds = RULES.cmdexec.play_movie;
-		for( var c = 0; c < cmds.length; c++)
+		if( cmds ) for( var c = 0; c < cmds.length; c++)
 		{
 			var elCmd = document.createElement('div');
 			elFile.appendChild( elCmd);
@@ -678,19 +694,36 @@ function u_BodyEditMarkup()
 	}
 }
 
+function u_OpenCloseViewsAll()
+{
+	for( var i = 0; i < u_views.length; i++)
+		au_OpenCloseView( u_views[i], false, false);
+}
+function u_ViewsFuncsOpen()
+{
+	for( var i = 0; i < u_views.length; i++)
+		if( localStorage['view_'+u_views[i]] === 'true' )
+			if( window['View_'+u_views[i]+'_Open'] ) window['View_'+u_views[i]+'_Open']();
+}
+function u_ViewsFuncsClose()
+{
+	for( var i = 0; i < u_views.length; i++)
+		if( localStorage['view_'+u_views[i]] === 'true' )
+			if( window['View_'+u_views[i]+'_Close'] ) window['View_'+u_views[i]+'_Close']();
+}
 function u_OpenCloseView( i_id, i_toggle, i_callfuncs)
 {
-//console.log(i_id+': '+localStorage['view'+i_id]);
-	if( localStorage['view'+i_id] == null ) localStorage['view'+i_id] = 'true';
+//console.log(i_id+': '+localStorage['view_'+i_id]);
+	if( localStorage['view_'+i_id] == null ) localStorage['view_'+i_id] = 'true';
 	if( i_toggle !== false )
 	{
-		if( localStorage['view'+i_id] !== 'true' )
-			localStorage['view'+i_id] = 'true';
+		if( localStorage['view_'+i_id] !== 'true' )
+			localStorage['view_'+i_id] = 'true';
 		else
-			localStorage['view'+i_id] = 'false';
+			localStorage['view_'+i_id] = 'false';
 	}
 
-	if( localStorage['view'+i_id] === 'true' )
+	if( localStorage['view_'+i_id] === 'true' )
 	{
 		$(i_id).style.display = 'block';
 		$(i_id+'_label').style.display = 'block';
@@ -701,7 +734,7 @@ function u_OpenCloseView( i_id, i_toggle, i_callfuncs)
 		$(i_id+'_btn').classList.remove('closed');
 		for( var i = 0; i < 10; i++ ) if($(i_id+'_btn_'+i)) $(i_id+'_btn_'+i).style.display = 'block';
 		if( i_callfuncs !== false )
-			if( window['View_'+i_id+'_Opened'] ) window['View_'+i_id+'_Opened']();
+			if( window['View_'+i_id+'_Open'] ) window['View_'+i_id+'_Open']();
 	}
 	else
 	{
@@ -714,7 +747,7 @@ function u_OpenCloseView( i_id, i_toggle, i_callfuncs)
 		$(i_id+'_btn').classList.add('closed');
 		for( var i = 0; i < 10; i++ ) if($(i_id+'_btn_'+i)) $(i_id+'_btn_'+i).style.display = 'none';
 		if( i_callfuncs !== false )
-			if( window['View_'+i_id+'_Closed'] ) window['View_'+i_id+'_Closed']();
+			if( window['View_'+i_id+'_Close'] ) window['View_'+i_id+'_Close']();
 	}
 }
 
