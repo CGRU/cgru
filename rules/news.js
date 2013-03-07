@@ -16,7 +16,7 @@ function nw_Init()
 	nw_el.sidepanel_news.style.display = 'block';
 	nw_initialized = true;
 
-	if( localStorage.newnw_opened == "true" ) nw_NewsOpen();
+	if( localStorage.news_opened == "true" ) nw_NewsOpen();
 	else nw_NewsClose();
 
 	nw_Finish();
@@ -175,13 +175,13 @@ function nw_NewsClose()
 {
 	nw_el.sidepanel_news.classList.remove('opened');
 	nw_el.news.innerHTML = '';
-	localStorage.newnw_opened = false;
+	localStorage.news_opened = false;
 	g_auth_user.news = null;
 }
 function nw_NewsOpen()
 {
 	nw_el.sidepanel_news.classList.add('opened');
-	localStorage.newnw_opened = true;
+	localStorage.news_opened = true;
 	nw_NewsLoad();
 }
 

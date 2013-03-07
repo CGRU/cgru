@@ -291,26 +291,19 @@ padding: 5px 4px;
 .show_folder .panel div { float: left; margin: 0px 8px; }
 .show_folder .panel .title { font-weight: bold;}
 .show_folder .panel .cmdexec { padding: 0px 8px;}
-
+/*
 #content #rules, .rules {
 font-family: courier;
 overflow: hidden;
-/*background-color: #010;
-color: #7F4;
-font-weight: bold;*/
 font-size: 12px;
 padding: 10px 20px;
 margin: 6px;
 opacity: 0.9;
 box-shadow: 0px 0px 5px #000 inset;
 border-radius: 10px;
-/*border: 3px solid #000;*/
-/*text-shadow: 0px 0px 20px #060, 20px 1px 2px #010;*/
 }
-
+*/
 #content .folder {
-/*border-radius: 4px;*/
-/*box-shadow: 0 0 3px #000 inset;*/
 border-top: 1px solid #777;
 padding: 2px 6px;
 margin: 2px;

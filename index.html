@@ -73,7 +73,7 @@
 		</div>
 		<div id="search_comment_div">
 			<div style="float:left;">Comments:</div>
-			<div id="search_comment" class="editing" style="" contenteditable="true"></div>
+			<div id="search_comment" class="editing" contenteditable="true"></div>
 		</div>
 		<div id="search_result_div" style="display:none;border-radius:6px; box-shadow:0 0 3px #000 inset;">
 			<div id="search_info">
@@ -108,14 +108,14 @@
 	</div>
 	<div id="body_div" class="view">
 		<div id="body_btn" class="button openclose" onclick="u_OpenCloseView('body')">-</div>
+		<div id="body_btn_0" class="button" style="padding:0px 4px;float:right;display:none" onclick="u_BodyEditStart()">Edit</div>
 		<div id="body_label" style="text-align:center; margin-top: 4px;">Body</div>
 		<div id="body">
 			<div id="body_panel" style="padding: 1px 10px;">
-				<div class="button" id="body_edit_btn" style="float:right;display:none" onclick="u_BodyEditStart()">Edit</div>
 				<div id="body_info"></div>
 			</div>
 			<div id="body_panel_edit" style="display:none">
-				<div class="button" style="float:right" onclick="u_BodyEditChancel()">Chancel</div>
+				<!--div class="button" style="float:right" onclick="u_BodyEditChancel()">Chancel</div-->
 				<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
 				<div style="float:right;border:1px solid #000;cursor:pointer;padding:2px 6px;"
 					id="body_edit_markup" onclick="u_BodyEditMarkup()">Markup</div>
@@ -214,7 +214,13 @@ Hidden folders increase system speed.">
 			</div>
 		</div>
 		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 300px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
-		<div style="position:absolute; left: 550px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">
+		<div style="position:absolute; left: 550px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
+			<div class="cgru_parameter">
+				<div class="label">Hide ScrollBars:</div>
+				<div class="variable" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_ScrollBarsToggle()">unknown</div>
+			</div>
+		</div>
+		<div style="position:absolute; left: 750px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">
 			<div class="button" id="admin_window" style="display:none" onclick="ad_OpenWindow()">Administrate</div>
 			<div style="text-align:center; padding: 10px 0 0 0;">
 				<a href="http://cgru.info" target="_blank">Documentation</a></div>

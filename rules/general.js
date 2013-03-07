@@ -310,6 +310,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
 
 	elFolder.onclick = g_FolderOnClick;
+	elFolder.ondblclick = g_FolderOnDblClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
 
@@ -364,7 +365,8 @@ function g_FolderOnDblClick( i_evt)
 {
 window.console.log('g_FolderOnDblClick( i_evt)');
 return;
-g_FolderOnClick( i_evt);
+//g_FolderOnClick( i_evt);
+//return;
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
 

@@ -26,6 +26,14 @@
 
 	"platforms":["linux","mac","windows"],
 
+	"":"To open shot in RULES:",
+	"rules_url":"http://rules:55555/#/",
+	"rules_projects":["/mnt/prj/","/projects/"],
+	"rules_scenes":["/nuke/","/work/"],
+		"":"It will cut projects and all after scenes:",
+		"":"Example: /mnt/prj/PROJECT/SCENES/SCENE/SHOT/work/script.nk",
+		"":"Result:  http://rules:55555/#/PROJECT/SCENES/SCENE/SHOT",
+
 	"-nuke_filenamefilter":true,
 
 	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],

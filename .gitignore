@@ -10,6 +10,7 @@ playlist.json
 # Access
 .htaccess
 .htdigest
+.htgroups
 
 # Override scripts
 override.sh

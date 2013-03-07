@@ -133,16 +133,16 @@ class Config:
 			return
 
 		self.getVars( self.Vars, obj, filename)
+		if 'include' in obj:
+			for afile in obj['include']:
+				afile = os.path.join( os.path.dirname( filename), afile)
+				self.load( afile)
+				continue
 
 	def getVars( self, o_vars, i_obj, i_filename):
 		for key in i_obj:
 			if len(key) == 0: continue
 			if key[0] == '-': continue
-			if key == 'include' and self.recursion:
-				for afile in i_obj[key]:
-					afile = os.path.join( os.path.dirname( i_filename), afile)
-					self.load( afile)
-					continue
 			if key[:3] == 'OS_':
 				if key[3:] in VARS['platform']:
 					self.getVars( o_vars, i_obj[key], i_filename)
