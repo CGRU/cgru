@@ -314,7 +314,7 @@ padding: 2px 6px;
 margin: 0px 10px;
 font-size: 14px;
 }
-#content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
+/*#content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }*/
 
 /*#body_body { border: 1px solid #000; border-radius: 4px; }*/
 #body_info { font-style: italic; font-size: 14px; }

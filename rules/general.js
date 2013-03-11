@@ -310,7 +310,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
 
 	elFolder.onclick = g_FolderOnClick;
-	elFolder.ondblclick = g_FolderOnDblClick;
+//	elFolder.ondblclick = g_FolderOnDblClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
 
@@ -343,12 +343,21 @@ function g_CloseFolder( i_elFolder )
 	i_elFolder.classList.remove('opened');
 }
 
-function g_FolderOnClick( i_evt)
+g_clickedFolder = null;
+function g_FolderOnClick( i_evt, i_double)
 {
+if( i_double !== true ) window.console.log('Clicked');
+
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
 	if( elFolder.classList.contains('dummy')) return;
+	g_clickedFolder = elFolder;
+	setTimeout( g_FolderClicked, 100);
+}
 
+function g_FolderClicked()
+{
+	elFolder = g_clickedFolder;
 	if( elFolder.classList.contains('current'))
 	{
 		if( elFolder.classList.contains('opened'))
@@ -363,9 +372,9 @@ function g_FolderOnClick( i_evt)
 
 function g_FolderOnDblClick( i_evt)
 {
-window.console.log('g_FolderOnDblClick( i_evt)');
+window.console.log('Double Clicked');
+//g_FolderOnClick( i_evt, true);
 return;
-//g_FolderOnClick( i_evt);
 //return;
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
@@ -380,3 +389,14 @@ return;
 	}
 }
 
+function n_MessageReceived( i_msg)
+{
+	if( i_msg == null ) return;
+
+	if( i_msg.thumbnail )
+		u_UpdateThumbnail( i_msg.thumbnail);
+
+	if( i_msg.cmdexec )
+		for( var i = 0; i < i_msg.cmdexec.length; i++)
+			n_MessageReceived( i_msg.cmdexec[i]);
+}

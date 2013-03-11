@@ -449,7 +449,10 @@ function jsf_cmdexec( $i_obj, &$o_out)
 	{
 		$rem = array('../','../','..','&','|','>','<');
 		$cmd = str_replace( $rem, '', $cmd);
-		array_push( $o_out['cmdexec'], shell_exec("./$cmd"));
+		$out = shell_exec("./$cmd");
+		$obj = json_decode( $out, true);
+		if( false == is_null( $obj )) $out = $obj;
+		array_push( $o_out['cmdexec'], $out);
 	}
 }
 

@@ -45,7 +45,8 @@ function n_Request( i_obj, i_wait, i_encode)
 	var log = '<b style="color:';
 	if( i_wait ) log += '#040';
 	else log += '#044';
-	log += '"><i>send'+(n_sendCount++)+':</i></b> '+ obj_str;
+	log += '"><i>send:</i></b> '+ obj_str;
+//	log += '"><i>send'+(n_sendCount++)+':</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.overrideMimeType('application/json');
@@ -57,7 +58,8 @@ function n_Request( i_obj, i_wait, i_encode)
 
 	if( i_wait )
 	{
-		log += '<br/><b style="color:#040"><i>recv'+(n_recvCount++)+':</i></b> ';
+		log += '<br/><b style="color:#040"><i>recv:</i></b> ';
+//		log += '<br/><b style="color:#040"><i>recv'+(n_recvCount++)+':</i></b> ';
 		if( i_obj.getfile )
 			log += i_obj.getfile;
 		else

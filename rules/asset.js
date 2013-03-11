@@ -126,7 +126,21 @@ function a_ShowBody()
 
 
 	if( thumbnails.length )
-		c_MakeThumbnail( thumbnails, ASSET.path);
+		a_MakeThumbnail( thumbnails, ASSET.path);
+}
+
+function a_MakeThumbnail( i_sources, i_path)
+{
+	var input = null;
+	for( var i = 0; i < i_sources.length; i++ )
+	{
+		if( input ) input += ',';
+		else input = '';
+			input += cgru_PM('/' + RULES.root + i_sources[i], true);
+	}
+	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
+	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
+	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
 function a_Create( i_type, i_name, i_path)

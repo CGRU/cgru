@@ -95,7 +95,9 @@
 
 "thumbnail":{
 	"filename":"thumbnail.jpg",
-	"create_cmd":"rules/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
+	"cmd_asset":"rules/thumbnail.py -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
+	"create_pic":"rules/thumbnail.py -n 1 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
+	"create_mov":"rules/thumbnail.py -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
 
 "avconv":"ffmpeg",

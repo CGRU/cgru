@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import re, os, sys, time
+import json, re, os, sys, time
 
 ImgExtensions = ['dpx','exr','jpg','jpeg','png','tif']
 MovExtensions = ['mov','avi','mp4','mpg','mpeg']
@@ -30,9 +30,20 @@ Parser.add_option('-D', '--debug',   dest='debug',      action='store_true', def
 
 (Options, Args) = Parser.parse_args()
 
-if Options.input == '':
-	print('ERROR: :Input not specified.')
+out = dict()
+out['thumbnail'] = Options.output
+
+def errorExit( i_err):
+	out['error'] = i_err
+	print( json.dumps( out))
 	sys.exit(1)
+
+def statusExit( i_msg):
+	out['status'] = i_msg
+	print( json.dumps( out))
+	sys.exit(0)
+
+if Options.input == '': errorExit('Input not specified.')
 
 Images = []
 Movie = None
@@ -41,10 +52,9 @@ if os.path.isfile( Options.output):
 	MTime = os.path.getmtime( Options.output)
 	if Options.verbose:
 		print('Thumbnail "%s" already exists.' % Options.output)
-	if Options.time > 0:
+	if Options.time > 0 and Options.force == False:
 		if time.time() - MTime < Options.time:
-			print('thumbnail is up to date:'+Options.output)
-			sys.exit(0)
+			statusExit('uptodate')
 
 if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 	folders = [Options.input]
@@ -54,7 +64,7 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 	for folder in folders:
 		if Options.verbose: print('Scanning folder "%s"...' % folder)
 		if not os.path.isdir( folder):
-			print('ERROR: folder "%s" does not exist.' % folder)
+#			print('ERROR: folder "%s" does not exist.' % folder)
 			continue
 		for root, dirs, files in os.walk( folder):
 			if len( files) == 0: continue
@@ -82,13 +92,13 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 					Images.append( os.path.join( root, images[num]))
 				cur_mtime = new_mtime
 else:
-	if not os.path.isfile( Options.input):
-		print('ERROR: Input does not exist:\n' + str( Options.input))
-		sys.exit(1)
+	if not os.path.isfile( Options.input): errorExit('Input does not exist.')
+	if Options.verbose: print('Input is a file.')
+	Images.append( Options.input)
+	cur_mtime = int( os.path.getmtime( Options.input))
 
 if len( Images ) == 0 and Movie is None:
-	print('ERROR: Can`t find images in "%s"' % Options.input)
-	sys.exit(1)
+	errorExit('Can`t find images.')
 
 if Options.verbose:
 	if Movie is not None:
@@ -104,16 +114,14 @@ if MTime >= cur_mtime:
 			print('Forcing thumbnail creation')
 	else:
 		os.utime( Options.output, None)
-		print('thumbnail time updated:'+Options.output)
-		sys.exit(0)
+		statusExit('updated')
 
 OutDir = os.path.dirname( Options.output )
 if OutDir != '':
 	if not os.path.isdir( OutDir):
 		os.makedirs( OutDir)
 		if not os.path.isdir( OutDir):
-			print('ERROR: Can`t create output folder "%s"' % OutDir)
-			sys.exit(1)
+			errorExit('Can`t create output folder "%s"' % OutDir)
 
 Cmds = []
 Thumbnails = []
@@ -139,18 +147,22 @@ if Movie is None:
 		elif imgtype == 'cin': cmd += ' -set colorspace Log'
 cmd += ' -resize %dx%d' % (Options.xres, Options.yres)
 cmd += ' "%s"'
-for i in range( len( Images)):
-	thumbnail = os.path.join( OutDir, 'thumbnail_%d.jpg' % i)
-	Cmds.append( cmd % ( Images[i], thumbnail))
-	Thumbnails.append( thumbnail)
+if len( Images) == 1:
+	Cmds.append( cmd % ( Images[0], Options.output))
+else:
+	for i in range( len( Images)):
+		thumbnail = os.path.join( OutDir, 'thumbnail_%d.jpg' % i)
+		Cmds.append( cmd % ( Images[i], thumbnail))
+		Thumbnails.append( thumbnail)
 
-cmd = 'montage'
-cmd += ' -geometry +0+0'
-for img in Thumbnails:
-	cmd += ' "%s"' % img
-cmd += ' -alpha Off -strip'
-cmd += ' "%s"' % Options.output
-Cmds.append( cmd)
+if len( Images ) > 1:
+	cmd = 'montage'
+	cmd += ' -geometry +0+0'
+	for img in Thumbnails:
+		cmd += ' "%s"' % img
+	cmd += ' -alpha Off -strip'
+	cmd += ' "%s"' % Options.output
+	Cmds.append( cmd)
 
 if Options.verbose or Options.debug:
 	for cmd in Cmds:
@@ -163,5 +175,5 @@ if Options.debug:
 for cmd in Cmds:
 	os.system( cmd)
 
-print('thumbnail generated:'+Options.output)
+print( json.dumps( out))
 

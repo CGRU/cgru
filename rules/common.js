@@ -1,4 +1,7 @@
 c_logCount = 0;
+c_elLogs = [];
+c_lastLog = null;
+c_lastLogCount = 1;
 
 var $ = function( id ) { return document.getElementById( id ); };
 
@@ -11,7 +14,6 @@ function c_Init()
 	document.getElementById('browser').textContent = cgru_Browser;
 
 	c_ApplyStyles();
-	u_el.log.m_elLogs = [];
 }
 
 function c_ApplyStyles()
@@ -130,11 +132,24 @@ function c_Log( i_msg)
 	var date = new Date();
 	var time = c_PadZero(date.getHours())+':'+c_PadZero(date.getMinutes())+':'+c_PadZero(date.getSeconds())+'.'+c_PadZero(date.getMilliseconds(),3);
 	var elLine = document.createElement('div');
-	elLine.innerHTML = '<i><b>#</b>'+c_logCount+' '+time+':</i> '+i_msg;
-	u_el.log.insertBefore( elLine, u_el.log.childNodes[0]);
-	u_el.log.m_elLogs.push( elLine);
-	if( u_el.log.m_elLogs.length > 100 )
-		u_el.log.removeChild( u_el.log.m_elLogs.shift());
+	var lastEl = c_elLogs[c_elLogs.length-1];
+	var elLine = lastEl;
+	var innerHTML = '<i><b>#</b>'+c_logCount+' '+time+':</i> '+i_msg;
+	if( c_lastLog == i_msg )
+	{
+		c_lastLogCount++;
+		innerHTML = c_lastLogCount + 'x ' + innerHTML;
+	}
+	else
+	{
+		c_lastLog = i_msg;
+		c_lastLogCount = 1;
+		elLine = document.createElement('div');
+		u_el.log.insertBefore( elLine, lastEl);
+		c_elLogs.push( elLine);
+		if( c_elLogs.length > 100 ) u_el.log.removeChild( c_elLogs.shift());
+	}
+	elLine.innerHTML = innerHTML;
 	c_logCount++;
 
 	if( u_el && u_el.cycle )
@@ -196,20 +211,6 @@ function c_ElDisplayToggle( i_el)
 		i_el.style.display = 'block';
 	else
 		i_el.style.display = 'none';
-}
-
-function c_MakeThumbnail( i_sources, i_path)
-{
-	var input = null;
-	for( var i = 0; i < i_sources.length; i++ )
-	{
-		if( input ) input += ',';
-		else input = '';
-			input += cgru_PM('/' + RULES.root + i_sources[i], true);
-	}
-	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
-	var cmd = RULES.thumbnail.create_cmd.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
-	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
 function c_GetUserTitle( i_uid)
