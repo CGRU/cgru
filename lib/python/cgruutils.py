@@ -182,7 +182,7 @@ def webbrowse( i_url):
 		i_url = 'http://'+i_url
 
 	if 'webbrowser' in cgruconfig.VARS:
-		cmd = cgruconfig.VARS['webbrowser']
+		cmd = '"%s"' % cgruconfig.VARS['webbrowser']
 		if cmd.find('%s') != -1:
 			cmd = cmd % i_url
 		else:
