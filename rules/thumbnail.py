@@ -2,7 +2,7 @@
 
 import json, re, os, sys, time
 
-ImgExtensions = ['dpx','exr','jpg','jpeg','png','tif']
+ImgExtensions = ['dpx','exr','jpg','jpeg','png','tif','psd','xcf']
 MovExtensions = ['mov','avi','mp4','mpg','mpeg']
 
 from optparse import OptionParser
@@ -13,7 +13,7 @@ Parser.add_option('-x', '--xres',    dest='xres',       type  ='int',        def
 	help='X Resolution')
 Parser.add_option('-y', '--yres',    dest='yres',       type  ='int',        default=90,
 	help='Y Resolution')
-Parser.add_option('-n', '--number',  dest='number',     type  ='int',        default=3,
+Parser.add_option('-n', '--number',  dest='number',     type  ='int',        default=0,
 	help='Number of images')
 Parser.add_option('-i', '--input',   dest='input',      type  ='string',     default='',
 	help='Input image')
@@ -43,6 +43,18 @@ def statusExit( i_msg):
 	print( json.dumps( out))
 	sys.exit(0)
 
+def isImage( i_file):
+	split = i_file.split('.')
+	if len(split) > 1 and split[-1].lower() in ImgExtensions:
+		return True
+	return False
+
+def isMovie( i_file):
+	split = i_file.split('.')
+	if len(split) > 1 and split[-1].lower() in MovExtensions:
+		return True
+	return False
+
 if Options.input == '': errorExit('Input not specified.')
 
 Images = []
@@ -57,6 +69,7 @@ if os.path.isfile( Options.output):
 			statusExit('uptodate')
 
 if Options.input.find(',') != -1 or os.path.isdir( Options.input):
+	if Options.number == 0: Options.number = 3
 	folders = [Options.input]
 	if folders[0].find(',') != -1:
 		folders = folders[0].split(',')
@@ -71,16 +84,14 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 			images = []
 			for afile in files:
 				split = re.split( r'\d\.', afile)
-				if len(split) > 1 and split[-1] in ImgExtensions:
+				if len(split) > 1 and split[-1].lower() in ImgExtensions:
 					images.append( afile)
-				else:
-					split = afile.split('.')
-					if len(split) > 1 and split[-1] in MovExtensions:
-						new_movie = os.path.join( root, afile)
-						new_mtime = int( os.path.getmtime( new_movie))
-						if new_movie > cur_mtime:
-							Movie = new_movie
-							cur_mtime = new_mtime
+				elif isMovie( afile):
+					new_movie = os.path.join( root, afile)
+					new_mtime = int( os.path.getmtime( new_movie))
+					if new_movie > cur_mtime:
+						Movie = new_movie
+						cur_mtime = new_mtime
 			if len( images) == 0: continue
 			new_mtime = int( os.path.getmtime(os.path.join( root, images[0])))
 			if new_mtime > cur_mtime:
@@ -94,7 +105,15 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 else:
 	if not os.path.isfile( Options.input): errorExit('Input does not exist.')
 	if Options.verbose: print('Input is a file.')
-	Images.append( Options.input)
+
+	if isImage( Options.input):
+		if Options.number == 0: Options.number = 1
+		Images.append( Options.input)
+	elif isMovie( Options.input):
+		Movie = Options.input
+		if Options.number == 0: Options.number = 3
+	else:
+		statusExit('skipped')
 	cur_mtime = int( os.path.getmtime( Options.input))
 
 if len( Images ) == 0 and Movie is None:
@@ -138,6 +157,7 @@ if Movie is not None:
 
 cmd = 'convert'
 cmd += ' "%s"'
+cmd += ' -layers flatten'
 if Movie is None:
 	imgtype = Images[0].rfind('.');
 	if imgtype > 0:

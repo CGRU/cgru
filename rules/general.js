@@ -394,7 +394,7 @@ function n_MessageReceived( i_msg)
 	if( i_msg == null ) return;
 
 	if( i_msg.thumbnail )
-		u_UpdateThumbnail( i_msg.thumbnail);
+		u_UpdateThumbnail( i_msg);
 
 	if( i_msg.cmdexec )
 		for( var i = 0; i < i_msg.cmdexec.length; i++)
