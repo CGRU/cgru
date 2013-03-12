@@ -103,7 +103,7 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 					Images.append( os.path.join( root, images[num]))
 				cur_mtime = new_mtime
 else:
-	if not os.path.isfile( Options.input): errorExit('Input does not exist.')
+	if not os.path.isfile( Options.input): errorExit('Input does not exist '+Options.input)
 	if Options.verbose: print('Input is a file.')
 
 	if isImage( Options.input):
@@ -117,7 +117,7 @@ else:
 	cur_mtime = int( os.path.getmtime( Options.input))
 
 if len( Images ) == 0 and Movie is None:
-	errorExit('Can`t find images.')
+	errorExit('Can`t find images in '+Options.input)
 
 if Options.verbose:
 	if Movie is not None:
@@ -140,7 +140,7 @@ if OutDir != '':
 	if not os.path.isdir( OutDir):
 		os.makedirs( OutDir)
 		if not os.path.isdir( OutDir):
-			errorExit('Can`t create output folder "%s"' % OutDir)
+			errorExit('Can`t create output folder '+OutDir)
 
 Cmds = []
 Thumbnails = []

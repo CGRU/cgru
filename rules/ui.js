@@ -390,7 +390,7 @@ function u_ShowFolder( i_element, i_path, i_walk)
 	elFolder.classList.add('folder');
 	i_element.appendChild( elFolder);
 
-	u_MakeFileThumbEl( elFolder, i_path, name, i_walk);
+	u_MakeFileThumbEl( elFolder, i_path, name, i_walk, 'folder');
 
 	var elOpen = c_CreateOpenButton( elFolder, i_path);
 	elOpen.style.cssFloat = 'left';
@@ -443,7 +443,7 @@ function u_ShowFile( i_element, i_path, i_walk)
 	elFile.classList.add('folder');
 	elFile.classList.add('file');
 
-	u_MakeFileThumbEl( elFile, i_path, name, i_walk);
+	u_MakeFileThumbEl( elFile, i_path, name, i_walk, 'file');
 
 	var elLinkA = document.createElement('a');
 	elFile.appendChild( elLinkA);
@@ -477,13 +477,15 @@ function u_ShowFile( i_element, i_path, i_walk)
 	return elFile;
 }
 
-function u_MakeFileThumbEl( i_el, i_path, i_name, i_walk)
+function u_MakeFileThumbEl( i_el, i_path, i_name, i_walk, i_type)
 {
 //	var elThumbnal = document.createElement('img');
 	var elThumbnal = document.createElement('div');
 	i_el.appendChild( elThumbnal);
 	i_el.m_elThumbnail = elThumbnal;
 	elThumbnal.classList.add('thumbnail');
+	elThumbnal.m_type = i_type;
+
 	var thumbName = 'thumbnail.' + i_name + '.jpg';
 	var thumbFile = RULES.root + i_path.substr( 0, i_path.lastIndexOf('/'));
 	thumbFile += '/' + RULES.rufolder + '/' + thumbName;
@@ -494,7 +496,7 @@ function u_MakeFileThumbEl( i_el, i_path, i_name, i_walk)
 	var elImg = document.createElement('img');
 	elThumbnal.appendChild( elImg);
 	elThumbnal.m_elImg = elImg;
-	if( i_walk.rufiles && ( i_walk.rufiles.indexOf( thumbName) != -1))
+	if( i_walk && i_walk.rufiles && ( i_walk.rufiles.indexOf( thumbName) != -1))
 		elImg.src = thumbFile;
 	else
 		elThumbnal.style.display = 'none';
@@ -532,25 +534,21 @@ function u_FileThumbResizeAll() { for( var i = 0; i < u_elThumbnails.length; i++
 function u_FileThumbOnLoad() { u_FileThumbResize( this);}
 function u_FileThumbResize( i_img)
 {
-	var ih = i_img.height;
-	var iw = i_img.width;
-
-	if( i_img.orig_w == null )
-	{
-//		i_img.orig_w = 
-	}
+	var iw = i_img.naturalWidth;
+	var ih = i_img.naturalHeight;
 
 	var loaded = (( ih > 0 ) && ( iw > 0 ));
-	var w = parseInt( localStorage.thumb_file_size);
 	var crop = ( localStorage.thumb_file_crop === 'true' );
+	var w = parseInt( localStorage.thumb_file_size);
 	var h = Math.round( w * 9 / 16);
 
-	if( c_FileIsMov( i_img.parentNode.m_path )) w *= 3;
+	if( c_FileIsMov( i_img.parentNode.m_path ) || ( i_img.parentNode.m_type == 'folder')) w *= 3;
 
 	if( false == crop )
 	{
 //		i_img.width = w;
 		i_img.height = h;
+		i_img.width = iw * h / ih;
 		i_img.style.marginTop = '0';
 		i_img.style.marginLeft = '0';
 		i_img.parentNode.style.width = 'auto';
