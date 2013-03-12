@@ -289,3 +289,10 @@ function c_RuFileExists( i_file)
 	return true;
 }
 
+function c_FileIsMov( i_file)
+{
+	var type = i_file.substr( i_file.lastIndexOf('.')+1);
+	if( RULES.movtypes.indexOf( type) != -1) return true;
+	return false;
+}
+

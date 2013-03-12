@@ -75,7 +75,7 @@ function a_ShowBody()
 	}
 
 	if( walk.paths.length )
-		walk.walks = n_WalkDir( walk.paths, 0);
+		walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder);
 
 	if( ASSET.result )
 	{
@@ -91,7 +91,7 @@ function a_ShowBody()
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
 			thumbnails.push( path);
-			u_ShowDirectory( elResult, path, {"folders":folders})
+			u_ShowDirectory( elResult, path, walk.walks[walk.result[i]])
 			founded = true;
 		}
 

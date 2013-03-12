@@ -288,9 +288,12 @@ padding: 5px 4px;
 #assets .asset .type { padding: 0px 4px; float: left; }
 #assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
 
+.show_folder .panel { /*border: 1px solid #000;*/ }
 .show_folder .panel div { float: left; margin: 0px 8px; }
 .show_folder .panel .title { font-weight: bold;}
 .show_folder .panel .cmdexec { padding: 0px 8px;}
+.show_folder .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
+.show_folder .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
 /*
 #content #rules, .rules {
 font-family: courier;
@@ -314,7 +317,19 @@ padding: 2px 6px;
 margin: 0px 10px;
 font-size: 14px;
 }
-/*#content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }*/
+#content .folder .thumbnail {
+border: 1px solid #000;
+border-radius: 4px;
+float: left;
+padding: 0;
+margin: 0;
+margin-right: 10px;
+}
+#content .folder .thumbnail img {
+margin: 0;
+padding: 0;
+margin-bottom: -4px;
+}
 
 /*#body_body { border: 1px solid #000; border-radius: 4px; }*/
 #body_info { font-style: italic; font-size: 14px; }
