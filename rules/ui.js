@@ -135,7 +135,7 @@ function u_ShowHiddenToggle()
 
 function u_ScrollBarsToggle( i_toggle)
 {
-	var barW = 20;
+	var barW = $('navig').offsetWidth - $('navig').clientWidth;
 	var sideW = parseInt( localStorage.sidepanel_width );
 	var sideClosedW = parseInt( localStorage.sidepanel_closed_width );
 	var navigW = parseInt( localStorage.navig_width );
