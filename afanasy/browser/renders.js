@@ -415,9 +415,10 @@ RenderNode.createActions = function()
 {
 	if( RenderNode.actionsCreated ) return;
 
-	for( var i = 0; i < cgru_Config.af_rendercmds.length; i++)
+	if( cgru_Config.af_rendercmds ) for( var i = 0; i < cgru_Config.af_rendercmds.length; i++)
 		RenderNode.actions.push(['cmd', 'cmd', null, cgru_Config.af_rendercmds[i], cgru_Config.af_rendercmds[i]]);
-	for( var i = 0; i < cgru_Config.af_rendercmds_admin.length; i++)
+
+	if( cgru_Config.af_rendercmds_admin ) for( var i = 0; i < cgru_Config.af_rendercmds_admin.length; i++)
 		RenderNode.actions.push(['cmd', 'cmd', null, cgru_Config.af_rendercmds_admin[i], cgru_Config.af_rendercmds_admin[i], 'god']);
 
 	RenderNode.actionsCreated = true;

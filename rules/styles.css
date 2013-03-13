@@ -3,6 +3,10 @@ font: 16px Arial;
 background: #A0A0A0;
 }
 
+body, #header, #footer, #navig, #sidepanel, #content {
+background: #A0A0A0;
+}
+
 /* ================================ */
 /* ========== LAYOUT: ============= */
 
@@ -14,10 +18,9 @@ background: #A0A0A0;
 
 * { margin: 0; padding: 0; overflow: hidden; }
 
-#header, #footer, #navig, #sidepanel {
-background: #A0A0A0;
+#header, #footer, #navig, #sidepanel, #content {
 position: absolute;
-box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 10px rgba(255,255,255,0.5) inset;
+box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,255,0.5) inset;
 }
 
 #header, #footer { left: 0; right: 0; }

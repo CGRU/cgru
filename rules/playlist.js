@@ -33,7 +33,7 @@ function p_Open()
 
 function p_OnClick()
 {
-	if( u_el.sidepanel.classList.contains('opened'))
+	if( $('sidepanel').classList.contains('opened'))
 	{
 		if( p_el.sidepanel_playlist.classList.contains('opened'))
 			p_Close();

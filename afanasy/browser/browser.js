@@ -18,6 +18,8 @@ g_FooterOpened = false;
 
 g_Images = [];
 
+cgru_params.push(['user_name','User Name', 'coord', 'Enter User Name<br/>Need Restart (F5)']);
+cgru_params.push(['host_name','Host Name', 'pc','Enter Host Name<br/>Needed For Logs Only']);
 cgru_params.push(['run_symbol','Run Symbol', '★','Enter Any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">Unicode<a/><br/>You Should Copy&Paste<br/>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
 function cgru_params_OnChange( i_param, i_value) { cm_ApplyStyles();}
 

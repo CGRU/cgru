@@ -20,6 +20,8 @@
 </head>
 <body onload="g_Init()">
 
+<div id="navig"></div>
+
 <div id="content">
 	<div id="panel">
 		<div id="subscribe" style="display:none">
@@ -28,6 +30,7 @@
 			<div id="unsubscribe_btn" class="button" onclick="nw_Unsubscribe()">Unsubscribe</div>
 			<div id="subscribe_path"></div>
 			<div id="subscribe_makenew" class="button" onclick="nw_MakeNewsDialog()">Make News</div>
+			<div id="news_disable" class="button" onclick="nw_DisableNews()">Disable News</div>
 		</div>
 		<div id="search_panel" style="float:right">
 			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
@@ -131,7 +134,6 @@
 	</div>
 </div>
 
-<div id="navig"></div>
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
 	<div id="sidepanel_news" style="display:none">
@@ -204,6 +206,12 @@
 				<div class="label" id="rules_label">RULES</div>
 				<div class="button" style="left:120px;width:80px" onclick="u_RulesShow()">Show Current</div>
 			</div>
+			<div class="cgru_parameter">
+				<div class="label" id="auth_user">Undefined User</div>
+			</div>
+		</div>
+		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 250px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
+		<div style="position:absolute; left: 500px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
 			<div class="cgru_parameter" title="Show Hidden Folders.
 Need restart (F5).
 Create '.hidden' in folder to hide.
@@ -212,9 +220,6 @@ Hidden folders increase system speed.">
 				<div class="label">Show Hidden:</div>
 				<div class="variable" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
 			</div>
-		</div>
-		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 250px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
-		<div style="position:absolute; left: 500px; width: 200px; top:0px;bottom:0; /*border: 1px solid #000;*/">
 			<div class="cgru_parameter">
 				<div class="label">Hide ScrollBars:</div>
 				<div class="variable" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_ScrollBarsToggle()">unknown</div>

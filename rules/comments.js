@@ -118,7 +118,11 @@ function cm_Init( i_el)
 	i_el.m_elText.contentEditable = 'false';
 	i_el.m_elText.classList.remove('editing');
 	i_el.m_elText.style.color = localStorage.text_color;
-	i_el.m_elText.style.background = localStorage.background;
+
+	if( localStorage.back_comments && ( localStorage.back_comments != ''))
+		i_el.m_elText.style.background = localStorage.back_comments;
+	else if( localStorage.background && ( localStorage.background != '' ))
+		i_el.m_elText.style.background = localStorage.background;
 
 	if( i_el.m_obj == null )
 	{

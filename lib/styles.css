@@ -37,6 +37,7 @@ background: #999;
 top: 10%; bottom: 10%; left: 10%; right: 10%;
 border-radius: 10px;
 box-shadow: 0px 0px 10px #000;
+color: #000000;
 }
 .cgru_window_content {
 overflow: auto;

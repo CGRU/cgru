@@ -13,18 +13,7 @@ function c_Init()
 	document.getElementById('platform').textContent = cgru_Platform;
 	document.getElementById('browser').textContent = cgru_Browser;
 
-	c_ApplyStyles();
-}
-
-function c_ApplyStyles()
-{
-	if( p_PLAYER ) return;
-	document.body.style.background = localStorage.background;
-	document.body.style.color = localStorage.text_color;
-	$('header').style.background = localStorage.background;
-	$('footer').style.background = localStorage.background;
-	$('navig').style.background = localStorage.background;
-	$('sidepanel').style.background = localStorage.background;
+	u_ApplyStyles();
 }
 
 function c_GetHashPath()
@@ -215,7 +204,8 @@ function c_ElDisplayToggle( i_el)
 
 function c_GetUserTitle( i_uid)
 {
-	if( i_uid == null ) i_uid = localStorage.user_name;
+	if( g_auth_user == null ) return null;
+	if( i_uid == null ) i_uid = g_auth_user.id;
 	if( g_users && g_users[i_uid] && g_users[i_uid].title && ( g_users[i_uid].title != 'Coordinator'))
 		return g_users[i_uid].title;
 	return i_uid;

@@ -10,7 +10,7 @@ g_admin = false;
 g_users = null;
 g_groups = null;
 
-function cgru_params_OnChange( i_param, i_value) { c_ApplyStyles();}
+function cgru_params_OnChange( i_param, i_value) { u_ApplyStyles();}
 
 function g_Init()
 {
@@ -38,7 +38,7 @@ function g_Init()
 		ad_Init();
 		nw_Init();
 		u_InitAuth();
-
+/*
 		if( localStorage.user_name != config.user.id )
 		{
 			if( cgru_SetUserName( config.user.id ))
@@ -48,6 +48,7 @@ function g_Init()
 			else
 			c_Error('Invalid user name recieved: '+JSON.stringify(config.user.id)+'.');
 		}
+*/
 	}
 	if( config.version )
 		document.getElementById('version').innerHTML = config.version;

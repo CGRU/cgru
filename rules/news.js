@@ -1,6 +1,7 @@
 nw_initialized = false;
 nw_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels','news_count'];
 nw_el = {};
+nw_disabled = 0;
 
 //	setTimeout("g_Refresh()", 1000);
 
@@ -29,6 +30,21 @@ function nw_InitConfigured()
 	if( RULES.newsrefresh == null ) return;
 	if( RULES.newsrefresh < 1 ) return;
 	setInterval( nw_NewsLoad, RULES.newsrefresh * 1000);
+}
+
+function nw_DisableNews()
+{
+	nw_disabled = 1 - nw_disabled;
+	if( nw_disabled )
+	{
+		$('news_disable').innerHTML = '<b>News Disabled</b>';
+		$('news_disable').style.background = '#FF0000';
+	}
+	else
+	{
+		$('news_disable').innerHTML = 'Disable News';
+		$('news_disable').style.background = 'none';
+	}
 }
 
 function nw_UpdateChannels()
@@ -157,7 +173,7 @@ function nw_Unsubscribe( i_path)
 
 function nw_NewsOnClick()
 {
-	if( u_el['sidepanel'].classList.contains('opened'))
+	if( $('sidepanel').classList.contains('opened'))
 	{
 		if( nw_el.sidepanel_news.classList.contains('opened'))
 			nw_NewsClose();
@@ -194,6 +210,7 @@ function nw_MakeNewsDialog()
 function nw_MakeNewsDialogApply( i_not_used, i_title) { nw_MakeNews( i_title); }
 function nw_MakeNews( i_title, i_path)
 {
+	if( nw_disabled ) return;
 //window.console.log(i_title);
 	if( g_auth_user == null ) return;
 

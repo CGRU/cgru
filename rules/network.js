@@ -98,10 +98,16 @@ function n_Request( i_obj, i_wait, i_encode)
 
 function n_SendJob( job)
 {
+	if( g_auth_user == null )
+	{
+		c_Error('Guests can`t send jobs.');
+		return;
+	}
+
 	if( job.user_name == null )
-		job.user_name = localStorage.user_name;
+		job.user_name = g_auth_user.id;
 	if( job.host_name == null )
-		job.host_name = localStorage.host_name;
+		job.host_name = cgru_Browser;
 
 	var obj = {};
 	obj.afanasy = 1;
