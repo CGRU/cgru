@@ -6,6 +6,8 @@ re_frame   = re.compile(r'Frame [0-9]{1,} completed')
 re_percent = re.compile(r'progr:[ ]{,}[0-9]{1,2}.*%[ ]{,}rendered')
 re_number  = re.compile(r'[0-9]{1,}')
 
+Errors = ['Error occured while rendering job.']
+
 class max(parser.parser):
    '3ds Max'
    def __init__( self, frames = 1):
@@ -13,6 +15,12 @@ class max(parser.parser):
       self.firstframe = True
 
    def do( self, data):
+
+      for error in Errors:
+         if data.find(error) != -1:
+            self.error = True
+            break
+
       needcalc = False
       frame    = False
 
