@@ -38,17 +38,6 @@ function g_Init()
 		ad_Init();
 		nw_Init();
 		u_InitAuth();
-/*
-		if( localStorage.user_name != config.user.id )
-		{
-			if( cgru_SetUserName( config.user.id ))
-			{
-				c_Info('<span style="font-size:20px;font-weight:bold;color:#550055">User is set to "'+localStorage.user_name+'".</span>');
-			}
-			else
-			c_Error('Invalid user name recieved: '+JSON.stringify(config.user.id)+'.');
-		}
-*/
 	}
 	if( config.version )
 		document.getElementById('version').innerHTML = config.version;

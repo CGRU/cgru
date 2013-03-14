@@ -39,11 +39,13 @@ function nw_DisableNews()
 	{
 		$('news_disable').innerHTML = '<b>News Disabled</b>';
 		$('news_disable').style.background = '#FF0000';
+		$('news_make').style.display = 'none';
 	}
 	else
 	{
 		$('news_disable').innerHTML = 'Disable News';
 		$('news_disable').style.background = 'none';
+		$('news_make').style.display = 'block';
 	}
 }
 

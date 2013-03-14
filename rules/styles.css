@@ -162,6 +162,9 @@ min-height: 19px;
 
 .cmdexec { opacity: 0.8; }
 
+.textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; }
+.textedit_panel div { float: left; border-radius: 3px; margin: 2px; padding: 1px; width: 30px; box-shadow: 0 0 2px #000; }
+
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
 #sidepanel { right: 0; }
@@ -336,31 +339,21 @@ margin-bottom: -4px;
 
 /*#body_body { border: 1px solid #000; border-radius: 4px; }*/
 #body_info { font-style: italic; font-size: 14px; }
-#body_panel_edit div { margin: 1px 8px;}
+#body_panel_edit > div { margin: 1px 8px;}
 #body_panel_edit .selected { background: rgba(200,255,255,.3);}
 
 /* ============================================================================*/
 /* ============================= ASSETS: ======================================*/
-/*
-#asset {}
-#asset > div {
-box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
-border-radius: 10px;
-margin: 6px;
-padding: 20px;
-}
-#asset > div.button { padding: 4px;}
-
-#asset .filter .body div { margin: 1px 4px; }
-#asset .filter .body .button { margin: 1px 8px; padding: 2px 8px; }
-*/
 #asset .source, #asset .result, #asset .resdailies {
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
 border-radius: 10px;
 margin: 6px;
-padding: 20px;
+padding: 5px 20px 20px 20px;
 }
 #asset .source.button { padding: 4px;}
+
+#asset .filelimit { float: left; margin: 2px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }
+#asset .filelimit.selected { background: rgba(100,255,255,.2); }
 
 .shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}

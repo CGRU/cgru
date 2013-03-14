@@ -4,6 +4,7 @@ ASSET = null;
 a_elThumbnails = null;
 a_elFolders = null;
 a_elCurEditStatus = null;
+a_elFileLimits = [];
 
 function View_asset_Open() { a_ShowBody(); }
 
@@ -34,6 +35,7 @@ function a_ShowBody()
 	u_el.asset.innerHTML = '';
 
 	thumbnails = [];
+	a_elFileLimits = [];
 
 	window.document.title = ASSET.name + ' ' + window.document.title;
 
@@ -90,9 +92,13 @@ function a_ShowBody()
 			var path = walk.paths[walk.result[i]];
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
+			var elFileLimit = a_FileLimitAdd( elResult);
+
 			thumbnails.push( path);
-			u_ShowDirectory( elResult, path, walk.walks[walk.result[i]])
+			elFileLimit.m_elFiles = u_ShowDirectory( elResult, path, walk.walks[walk.result[i]])
 			founded = true;
+
+			a_elFileLimits.push( elFileLimit);
 		}
 
 		if( false == founded )
@@ -113,10 +119,12 @@ function a_ShowBody()
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				u_ShowDirectory( elDailies, path, walk.walks[walk.dailies[i]]);
+				var elFileLimit = a_FileLimitAdd( elDailies);
+				elFileLimit.m_elFiles = u_ShowDirectory( elDailies, path, walk.walks[walk.dailies[i]]);
 				if( thumbnails.length == 0 )
 					thumbnails.push( path);
 				founded = true;
+				a_elFileLimits.push( elFileLimit);
 			}
 		}
 
@@ -124,6 +132,7 @@ function a_ShowBody()
 			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
+	a_FileLimitsApplyAll();
 
 	if( thumbnails.length )
 		a_MakeThumbnail( thumbnails, ASSET.path);
@@ -659,5 +668,67 @@ function a_ShowAllThumbnails()
 	if( a_elFolders )
 		for( var i = 0; i < a_elFolders.length; i++)
 			a_elFolders[i].style.display = 'block';
+}
+
+function a_FileLimitAdd( i_el)
+{
+	var elPanel = document.createElement('div');
+	i_el.appendChild( elPanel);
+
+	if( localStorage.asset_filelimit == null ) localStorage.asset_filelimit = '0';
+
+	var limits = [3,10,30,0];
+
+	elPanel.m_elLimits = [];
+
+	for( var i = 0; i < limits.length; i++)
+	{
+		var elLimit = document.createElement('div');
+		elPanel.appendChild( elLimit);
+		elPanel.m_elLimits.push( elLimit);
+		elLimit.classList.add('filelimit');
+
+		var text = limits[i];
+		if( text == 0 ) text = 'all';
+		elLimit.textContent = text;
+
+		elLimit.m_limit = limits[i];
+		elLimit.onclick = function(e){
+			localStorage.asset_filelimit = ''+e.currentTarget.m_limit;
+			a_FileLimitsApplyAll();
+		}
+	}
+
+	return elPanel;
+}
+
+function a_FileLimitsApplyAll()
+{
+	for( var i = 0; i < a_elFileLimits.length; i++)
+	{
+		var limit = 0;
+		for( var j = 0; j < a_elFileLimits[i].m_elLimits.length; j++)
+		{
+			var el = a_elFileLimits[i].m_elLimits[j];
+			if( parseInt( localStorage.asset_filelimit ) == el.m_limit )
+			{
+				limit = el.m_limit;
+				el.classList.remove('button');
+				if( limit ) el.classList.add('selected');
+			}
+			else
+			{
+				el.classList.add('button');
+				el.classList.remove('selected');
+			}
+		}
+
+		var elFiles = a_elFileLimits[i].m_elFiles;
+		for( var f = 0; f < elFiles.length; f++)
+			if( limit && ( f < ( elFiles.length-limit )))
+				elFiles[f].style.display = 'none';
+			else
+				elFiles[f].style.display = 'block';
+	}
 }
 

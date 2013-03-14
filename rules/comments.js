@@ -27,6 +27,7 @@ function cm_Add( i_obj)
 	var elPanel = document.createElement('div');
 	el.appendChild( elPanel);
 	elPanel.classList.add('panel');
+	el.m_elPanel = elPanel;
 
 	var elEdit = document.createElement('div');
 	elPanel.appendChild( elEdit);
@@ -36,6 +37,14 @@ function cm_Add( i_obj)
 	elEdit.m_el = el;
 	el.m_elEdit = elEdit;
 
+	var elCancel = document.createElement('div');
+	elPanel.appendChild( elCancel);
+	elCancel.classList.add('button');
+	elCancel.textContent = 'Cancel';
+	elCancel.onclick = function(e){cm_Cancel(e.currentTarget.m_el)};
+	elCancel.m_el = el;
+	el.m_elCancel = elCancel;
+
 	var elSave = document.createElement('div');
 	elPanel.appendChild( elSave);
 	elSave.classList.add('button');
@@ -44,14 +53,6 @@ function cm_Add( i_obj)
 	elSave.onclick = function(e){cm_Save(e.currentTarget.m_el)};
 	elSave.m_el = el;
 	el.m_elSave = elSave;
-
-	var elCancel = document.createElement('div');
-	elPanel.appendChild( elCancel);
-	elCancel.classList.add('button');
-	elCancel.textContent = 'Cancel';
-	elCancel.onclick = function(e){cm_Cancel(e.currentTarget.m_el)};
-	elCancel.m_el = el;
-	el.m_elCancel = elCancel;
 
 	var elDel = document.createElement('div');
 	elPanel.appendChild( elDel);
@@ -108,6 +109,7 @@ function cm_Init( i_el)
 {
 	if( i_el.m_elDCtrl ) i_el.removeChild( i_el.m_elDCtrl );
 	if( i_el.m_elColor ) i_el.removeChild( i_el.m_elColor );
+	if( i_el.m_elEditPanel ) i_el.m_elPanel.removeChild( i_el.m_elEditPanel);
 
 	i_el.m_elDel.style.display = 'none';
 	i_el.m_elCancel.style.display = 'none';
@@ -192,6 +194,8 @@ function cm_Edit( i_el)
 	i_el.m_elSave.style.display = 'block';
 	i_el.m_elEdit.style.display = 'none';
 	i_el.m_elTypesDiv.style.display = 'block';
+
+	i_el.m_elEditPanel = u_EditPanelCreate( i_el.m_elPanel);
 
 	var elDCtrl = document.createElement('div');
 	i_el.appendChild( elDCtrl);
