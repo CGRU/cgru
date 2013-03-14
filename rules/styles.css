@@ -162,7 +162,7 @@ min-height: 19px;
 
 .cmdexec { opacity: 0.8; }
 
-.textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; }
+.textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; margin: 4px; }
 .textedit_panel div { float: left; border-radius: 3px; margin: 2px; padding: 1px; width: 30px; box-shadow: 0 0 2px #000; }
 
 /* ========================================================= */
@@ -300,18 +300,7 @@ padding: 5px 4px;
 .show_folder .panel .cmdexec { padding: 0px 8px;}
 .show_folder .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
 .show_folder .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
-/*
-#content #rules, .rules {
-font-family: courier;
-overflow: hidden;
-font-size: 12px;
-padding: 10px 20px;
-margin: 6px;
-opacity: 0.9;
-box-shadow: 0px 0px 5px #000 inset;
-border-radius: 10px;
-}
-*/
+
 #content .folder {
 border-top: 1px solid #777;
 padding: 2px 6px;
@@ -352,7 +341,7 @@ padding: 5px 20px 20px 20px;
 }
 #asset .source.button { padding: 4px;}
 
-#asset .filelimit { float: left; margin: 2px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }
+#asset .filelimit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }
 #asset .filelimit.selected { background: rgba(100,255,255,.2); }
 
 .shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
@@ -433,7 +422,7 @@ margin-top: 0px;
 .comment .panel { margin: 0px;}
 .comment .panel .info { font-size: 14px; padding: 2px 4px;}
 .comment .panel .modified { margin-top: 2px; float: right; font-size: 12px; font-style:italic; opacity: .8; padding: 2px 4px;}
-.comment .panel .button { font-size: 12px; float: right;}
+.comment .panel > .button { font-size: 12px; float: right;}
 .comment .duration div { float: left; margin: 1px;}
 .comment .duration .sample {
 text-align: center;

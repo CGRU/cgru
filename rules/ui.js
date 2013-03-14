@@ -1059,25 +1059,25 @@ function u_EditPanelCreate( i_el)
 	elPanel.classList.add('textedit_panel');
 
 	var cmds = [];
-	cmds.push(['Tx','removeFormat', null]);
-	cmds.push(['<b>B</b>','bold', null]);
-	cmds.push(['<i>I</i>','italic', null]);
+	cmds.push(['Tx','removeFormat', null,'Remove Formatting']);
+	cmds.push(['<b>B</b>','bold', null,'Bold']);
+	cmds.push(['<i>I</i>','italic', null,'Italic']);
 //	cmds.push(['>','indent', null]);
 //	cmds.push(['<','outdent', null]);
 //	cmds.push(['1','insertOrderedList', '']);
 //	cmds.push(['*','insertUnorderedList', null]);
-	cmds.push(['&uarr;','superscript', null]);
-	cmds.push(['&darr;','subscript', null]);
-	cmds.push(['s','decreaseFontSize', null]);
-	cmds.push(['S','increaseFontSize', null]);
+	cmds.push(['&uarr;','superscript', null,'Super']);
+	cmds.push(['&darr;','subscript', null,'Sub']);
+	cmds.push(['s','decreaseFontSize', null,'Smaller']);
+	cmds.push(['S','increaseFontSize', null,'Bigger']);
 //	cmds.push(['k','formatBlock', 'kbd']);
 //	cmds.push(['c','formatBlock', 'code']);
-	cmds.push(['F','formatBlock', 'pre']);
-	cmds.push(['P','formatBlock', 'p']);
-	cmds.push(['Q','formatBlock', 'DL']);
+	cmds.push(['F','formatBlock', 'pre','Pre Formatted']);
+	cmds.push(['p','formatBlock', 'p','Paragraph']);
+//	cmds.push(['Q','formatBlock', 'DL']);
 
 	for( var i = 1; i < 4; i++ )
-		cmds.push([('H'+i),'heading',('h'+i)]);
+		cmds.push([('H'+i),'heading',('h'+i),'Header '+i]);
 
 	for( var i = 0; i < cmds.length; i++ )
 	{
@@ -1085,7 +1085,9 @@ function u_EditPanelCreate( i_el)
 		elPanel.appendChild( el);
 		el.classList.add('button');
 		el.innerHTML = cmds[i][0];
+		el.title = cmds[i][3];
 		el.m_cmd = cmds[i];
+//		el.style.cssFloat = 'left';
 		el.onclick = function(e){
 			var el = e.currentTarget;
 			document.execCommand( el.m_cmd[1], false, el.m_cmd[2]);
