@@ -138,7 +138,7 @@ function u_ShowHiddenToggle()
 
 function u_CalcGUI( i_toggle_scrollbars)
 {
-	var barW = $('navig').offsetWidth - $('navig').clientWidth;
+	var barW = u_el.navig.offsetWidth - u_el.navig.clientWidth;
 	var sideW = parseInt( localStorage.sidepanel_width );
 	var sideClosedW = parseInt( localStorage.sidepanel_closed_width );
 	var navigW = parseInt( localStorage.navig_width );
@@ -151,44 +151,87 @@ function u_CalcGUI( i_toggle_scrollbars)
 	}
 	$('hide_scrollbars').textContent = localStorage.hide_scrollbars;
 
+	if( localStorage.sidepanel_opened == 'true')
+	{
+		$('sidepanel_handle').style.display = 'block';
+		$('sidepanel').style.left = '6px';
+	}
+	else
+	{
+		$('sidepanel_handle').style.display = 'none';
+		$('sidepanel').style.left = '0px';
+	}
+
 	if( localStorage.hide_scrollbars == 'ON')
 	{
-		$('navig').style.width = navigW + .7*barW +'px';
-		$('navig').style.clip = 'rect(auto,'+(navigW-(.3*barW))+'px,auto,-10px)';
-		$('sidepanel').style.clip = 'rect(auto,'+(sideW-barW)+'px,auto,-10px)';
+		$('navig_div').style.width = (navigW - barW) +'px';
+		$('navig').style.marginRight = (-barW) +'px';
+
+		$('content').style.left = (navigW - barW) +'px';
+
+		$('sidepanel').style.marginRight = (-barW) +'px';
 
 		if( localStorage.sidepanel_opened == 'true')
 		{
 			$('content').style.right = (sideW - (2*barW)) + 'px';
-			$('sidepanel').style.right = -barW + 'px';
-			$('sidepanel').style.width = sideW + 'px';
+			$('sidepanel_div').style.width = (sideW - barW) + 'px';
 		}
 		else
 		{
-			$('content').style.right = sideClosedW - 2*barW + 'px';
-			$('sidepanel').style.right = '0';
-			$('sidepanel').style.width = sideClosedW + 'px';
+			$('content').style.right = sideClosedW - barW + 'px';
+			$('sidepanel_div').style.width = sideClosedW + 'px';
 		}
 	}
 	else
 	{
-		$('navig').style.width = navigW +'px';
-		$('navig').style.clip = 'auto';
+		$('navig_div').style.width = navigW +'px';
+		$('navig').style.marginRight = '0px';
 
-		$('sidepanel').style.right = '0';
-		$('sidepanel').style.clip = 'rect(auto,'+sideW+'px,auto,-10px)';
+		$('content').style.left = navigW +'px';
+
+		$('sidepanel').style.marginRight = '0px';
 
 		if( localStorage.sidepanel_opened == 'true')
 		{
 			$('content').style.right = sideW + 'px';
-			$('sidepanel').style.width = sideW + 'px';
+			$('sidepanel_div').style.width = sideW + 'px';
 		}
 		else
 		{
 			$('content').style.right = sideClosedW + 'px';
-			$('sidepanel').style.width = sideClosedW + 'px';
+			$('sidepanel_div').style.width = sideClosedW + 'px';
 		}
 	}
+}
+
+function u_ResizeGUIStart( i_name, i_koeff)
+{
+	u_resizing_name = i_name;
+	u_resizing_koeff = i_koeff;
+	u_resizing_x = null;
+	document.onmousemove = u_ResizeGUI;
+	document.onmouseup = u_ResizeGUIFinish;
+}
+function u_ResizeGUI( i_e)
+{
+	if( u_resizing_name == null ) u_ResizeGUIFinish();
+	if( u_resizing_x == null ) u_resizing_x = i_e.screenX;
+
+	var size = parseInt( localStorage[u_resizing_name]);
+	var delta = i_e.screenX - u_resizing_x;
+	var size = size + delta*u_resizing_koeff;
+	if( size < 50 ) return;
+	if( size > 500 ) return;
+	u_resizing_x = i_e.screenX;
+//console.log( size+'+'+i_e.screenX+'-'+u_resizing_x+'='+size);
+	localStorage[u_resizing_name] = '' + size;
+	u_CalcGUI();
+}
+function u_ResizeGUIFinish()
+{
+	u_resizing_name = null;
+	document.onmousemove = null;
+	document.onmouseup = null;
 }
 
 function u_ApplyStyles()
@@ -196,7 +239,7 @@ function u_ApplyStyles()
 	if( p_PLAYER ) return;
 	document.body.style.background = localStorage.background;
 	document.body.style.color = localStorage.text_color;
-	var backs = ['header','footer','navig','sidepanel','content'];
+	var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle'];
 	for( var i = 0; i < backs.length; i++ )
 		$(backs[i]).style.background = localStorage.background;
 	var backs = ['asset','body','files','comments'];

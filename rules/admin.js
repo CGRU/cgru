@@ -32,7 +32,7 @@ function ad_PermissionsFinish()
 
 function ad_PermissionsOnClick()
 {
-	if( u_el['sidepanel'].classList.contains('opened'))
+	if( $('sidepanel').classList.contains('opened'))
 	{
 		if( $('sidepanel_permissions').classList.contains('opened'))
 			ad_PermissionsClose();

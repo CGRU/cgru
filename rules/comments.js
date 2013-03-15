@@ -1,5 +1,5 @@
 cm_file = 'comments.json';
-cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','14','16','20','24','32','40','48','60'];
+cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','14','16','20','24','32','40','48','66','99'];
 
 function View_comments_Open() { cm_Load(); }
 
@@ -62,9 +62,10 @@ function cm_Add( i_obj)
 	elDel.m_el = el;
 	el.m_elDel = elDel;
 
-	var elType = document.createElement('div');
+	var elType = document.createElement('a');
 	elPanel.appendChild( elType);
 	elType.classList.add('tag');
+	elType.classList.add('type');
 	elType.style.cssFloat = 'left';
 	el.m_elType = elType;
 
@@ -73,10 +74,20 @@ function cm_Add( i_obj)
 	elPanel.appendChild( elModified);
 	el.m_elModified = elModified;
 
-	var elInfo = document.createElement('div');
-	elInfo.classList.add('info');
-	elPanel.appendChild( elInfo);
-	el.m_elInfo = elInfo;
+	var elUser = document.createElement('div');
+	elUser.classList.add('user');
+	elPanel.appendChild( elUser);
+	el.m_elUser = elUser;
+
+	var elDuration = document.createElement('div');
+	elDuration.classList.add('duration');
+	elPanel.appendChild( elDuration);
+	el.m_elDuration = elDuration;
+
+	var elDate = document.createElement('div');
+	elDate.classList.add('date');
+	elPanel.appendChild( elDate);
+	el.m_elDate = elDate;
 
 	var elText = document.createElement('div');
 	el.appendChild( elText);
@@ -135,15 +146,15 @@ function cm_Init( i_el)
 		i_el.m_new = true;
 	}
 
-	var date = c_DT_StrFromMSec( i_el.m_obj.ctime);
 
 	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
+	i_el.m_elType.href = '#' + i_el.m_obj.ctime;
 	i_el.m_type = i_el.m_obj.type;
 
-	var info = c_GetUserTitle(i_el.m_obj.user_name)+' '+date;
-	if( i_el.m_obj.duration )
-		info = i_el.m_obj.duration+' '+info;
-	i_el.m_elInfo.innerHTML = info;
+	i_el.m_elUser.textContent = c_GetUserTitle(i_el.m_obj.user_name);
+	i_el.m_elDate.textContent = c_DT_StrFromMSec( i_el.m_obj.ctime);
+	if( i_el.m_obj.duration ) i_el.m_elDuration.textContent = i_el.m_obj.duration;
+	else i_el.m_elDuration.textContent = ' ';
 
 	if( i_el.m_obj.mtime )
 	{
@@ -199,7 +210,7 @@ function cm_Edit( i_el)
 
 	var elDCtrl = document.createElement('div');
 	i_el.appendChild( elDCtrl);
-	elDCtrl.classList.add('duration');
+	elDCtrl.classList.add('edit_duration');
 	i_el.m_elDCtrl = elDCtrl;
 
 	var elDLabel = document.createElement('div');

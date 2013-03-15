@@ -1,16 +1,7 @@
-body {
-font: 16px Arial;
-background: #A0A0A0;
-}
+body { font: 16px Arial; }
+body, #header, #footer, #navig_div, #sidepanel_div, #content { background: #A0A0A0; }
 
-body, #header, #footer, #navig, #sidepanel, #content {
-background: #A0A0A0;
-}
-
-/* ================================ */
-/* ========== LAYOUT: ============= */
-
-#header, #footer, #sidepanel, #content {
+#header, #footer {
 -o-transition: all .3s ease-in-out;
 -moz-transition: all .3s ease-in-out;
 -webkit-transition: all .3s ease-in-out;
@@ -18,12 +9,14 @@ background: #A0A0A0;
 
 * { margin: 0; padding: 0; overflow: hidden; }
 
-#header, #footer, #navig, #sidepanel, #content {
-position: absolute;
+#header, #footer, #sidepanel_div, #content {
 box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,255,0.5) inset;
 }
 
-#header, #footer { left: 0; right: 0; }
+/* ================================ */
+/* ========== LAYOUT: ============= */
+
+#header, #footer { left: 0; right: 0; position: absolute; }
 #header { top: -200px; height: 238px; }
 #footer { bottom: 0px; height: 38px; }
 
@@ -68,14 +61,20 @@ box-shadow: 0px 0px 5px #FA6;
 -webkit-transition: all 1s ease-out;
 }
 
-#navig, #sidepanel {
+#navig_div, #sidepanel_div {
 top: 38px; bottom: 38px;
 /*user-select: none;*/
 -moz-user-select: none;
 -webkit-user-select: none;
 }
 /* =========== NAVIGATION: ============ */
-#navig { overflow-y: scroll; width: 300px; left: 0; }
+#navig_div { position: absolute; width: 300px; left: 0; }
+#navig_handle {
+position: absolute;
+right: 0; top: 0; bottom: 0;
+width: 6px;
+}
+#navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 0; bottom: 0; /*padding-right: 6px;*/ }
 #navig .folder {
 position: relative;
 cursor: pointer;
@@ -165,10 +164,15 @@ min-height: 19px;
 .textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; margin: 4px; }
 .textedit_panel div { float: left; border-radius: 3px; margin: 2px; padding: 1px; width: 30px; box-shadow: 0 0 2px #000; }
 
+.gui_size_handle { cursor: col-resize; box-shadow: 0 0 1px #000 inset;}
+.gui_size_handle:hover { box-shadow: 0 0 2px #000 inset;}
+
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
-#sidepanel { right: 0; }
-#sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
+#sidepanel_div { position: absolute; right: 0; }
+#sidepanel_handle { position: absolute; width: 6px; left: 0; top: 0; bottom: 0;/* background: #FFFF00;*/ }
+#sidepanel { position: absolute; right: 0; left: 6px; top: 0; bottom: 0; }
+#sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;/* margin-left: 6px;*/ }
 #sidepanel #sidepanel_hide { display: none;}
 #sidepanel.opened { overflow-y: scroll;}
 #sidepanel.opened #sidepanel_hide { display: block;}
@@ -420,19 +424,25 @@ margin: 4px;
 margin-top: 0px;
 }
 .comment .panel { margin: 0px;}
-.comment .panel .info { font-size: 14px; padding: 2px 4px;}
-.comment .panel .modified { margin-top: 2px; float: right; font-size: 12px; font-style:italic; opacity: .8; padding: 2px 4px;}
+.comment .panel .type { width: 100px; text-align: center; display: block; }
+.comment .panel .user,.comment .panel .duration,.comment .panel .date {
+float: left; margin: 1px 8px;
+}
+.comment .panel .user { width: 150px; }
+.comment .panel .duration { width: 50px; text-align:center; box-shadow: 0 0 2px #000 inset; border-radius: 4px; }
+.comment .panel .date { font-size: 14px; margin-top: 2px; }
+.comment .panel .modified { margin-top: 2px; float: right; font-size: 10px; font-style:italic; opacity: .8; padding: 2px 4px;}
 .comment .panel > .button { font-size: 12px; float: right;}
-.comment .duration div { float: left; margin: 1px;}
-.comment .duration .sample {
+.comment .edit_duration div { float: left; margin: 1px;}
+.comment .edit_duration .sample {
 text-align: center;
 border: 1px solid rgba(0,0,0,.3);
 width: 20px;
 border-radius: 4px;
 cursor: pointer;
 }
-.comment .duration .sample:hover { border: 1px solid rgba(200,255,255,.3);}
-.comment .duration .editing {
+.comment .edit_duration .sample:hover { border: 1px solid rgba(200,255,255,.3);}
+.comment .edit_duration .editing {
 text-align: center;
 border: 1px solid rgba(200,255,255,.3);
 width: 30px; height: 20px;
