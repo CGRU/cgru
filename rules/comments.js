@@ -14,10 +14,10 @@ function cm_Load()
 	if( obj.comments == null ) return;
 
 	for( key in obj.comments )
-		cm_Add( obj.comments[key]);
+		cm_Add( obj.comments[key], key);
 }
 
-function cm_Add( i_obj)
+function cm_Add( i_obj, i_key)
 {
 //window.console.log( JSON.stringify( i_obj));
 	var el = document.createElement('div');
@@ -69,11 +69,6 @@ function cm_Add( i_obj)
 	elType.style.cssFloat = 'left';
 	el.m_elType = elType;
 
-	var elModified = document.createElement('div');
-	elModified.classList.add('modified');
-	elPanel.appendChild( elModified);
-	el.m_elModified = elModified;
-
 	var elUser = document.createElement('div');
 	elUser.classList.add('user');
 	elPanel.appendChild( elUser);
@@ -88,6 +83,11 @@ function cm_Add( i_obj)
 	elDate.classList.add('date');
 	elPanel.appendChild( elDate);
 	el.m_elDate = elDate;
+
+	var elModified = document.createElement('div');
+	elModified.classList.add('modified');
+	elPanel.appendChild( elModified);
+	el.m_elModified = elModified;
 
 	var elText = document.createElement('div');
 	el.appendChild( elText);
@@ -112,11 +112,11 @@ function cm_Add( i_obj)
 	}
 
 	el.m_obj = i_obj;
-	cm_Init( el);
+	cm_Init( el, i_key);
 	return el;
 }
 
-function cm_Init( i_el)
+function cm_Init( i_el, i_key)
 {
 	if( i_el.m_elDCtrl ) i_el.removeChild( i_el.m_elDCtrl );
 	if( i_el.m_elColor ) i_el.removeChild( i_el.m_elColor );
@@ -148,7 +148,8 @@ function cm_Init( i_el)
 
 
 	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
-	i_el.m_elType.href = '#' + i_el.m_obj.ctime;
+	i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
+	i_el.id = i_key;
 	i_el.m_type = i_el.m_obj.type;
 
 	i_el.m_elUser.textContent = c_GetUserTitle(i_el.m_obj.user_name);
@@ -192,7 +193,7 @@ function cm_SetElType( i_type, i_elType, i_elColor)
 	}
 	else
 	{
-		i_elType.textContent = '';
+		i_elType.textContent = 'comment';
 		st_SetElColor( null, i_elColor);
 	}
 }
@@ -298,10 +299,10 @@ function cm_Save( i_el)
 		i_el.m_obj.muser_name = localStorage.user_name;
 	}
 
-	cm_Init( i_el);
-
 	var cm = i_el.m_obj;
 	var key = cm.ctime+'_'+cm.user_name;
+
+	cm_Init( i_el, key);
 
 	var comments = {};
 	comments[key] = cm;
@@ -319,5 +320,18 @@ function cm_Save( i_el)
 		return;
 	}
 	nw_MakeNews('<i>comments</i>');
+}
+
+function cm_Goto( i_name )
+{
+	if( localStorage['view_comments'] !== 'true' )
+		u_OpenCloseView( 'comments', true, true);
+	var el = $(i_name);
+	if( el == null )
+	{
+		c_Error('Comment with key='+i_name+' not founded.');
+		return;
+	}
+	el.scrollIntoView();
 }
 

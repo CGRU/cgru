@@ -13,13 +13,21 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 	{
 		if( i_elProgressBar) i_elProgressBar.style.width = i_status.progress+'%';
 		if( i_elPercentage) i_elPercentage.textContent = i_status.progress+'%';
-		if( i_elProgressHide) i_elProgressHide.style.display = 'block';
+		if( i_elProgressHide)
+		{
+			i_elProgressHide.style.display = 'block';
+			i_elProgressHide.title = i_status.progress+'%';
+		}
 	}
 	else
 	{
 		if( i_elProgressBar) i_elProgressBar.style.width = '0';
 		if( i_elPercentage) i_elPercentage.textContent = '';
-		if( i_elProgressHide) i_elProgressHide.style.display = 'none';
+		if( i_elProgressHide)
+		{
+			i_elProgressHide.style.display = 'none';
+			i_elProgressHide.title = null;
+		}
 	}
 }
 

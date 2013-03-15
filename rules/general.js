@@ -83,6 +83,11 @@ function g_GO( i_path)
 	window.location.hash = i_path;
 }
 
+function g_GetLocationArgs( i_args)
+{
+	return '#' + g_elCurFolder.m_path + '?' + encodeURI( JSON.stringify( i_args));
+}
+
 function g_SetLocationArgs( i_args)
 {
 	g_GO( g_elCurFolder.m_path + '?' + encodeURI( JSON.stringify( i_args)));

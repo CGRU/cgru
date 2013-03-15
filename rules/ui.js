@@ -45,7 +45,6 @@ function u_Init()
 	u_CalcGUI();
 
 	$('body_panel_edit').m_panel_edit = u_EditPanelCreate( $('body_panel_edit'));
-//	u_EditPanelCreate( $('body_div'));
 
 	for( var i = 0; i < u_views.length; i++)
 		u_OpenCloseView( u_views[i], false, false);
@@ -169,17 +168,18 @@ function u_CalcGUI( i_toggle_scrollbars)
 
 		$('content').style.left = (navigW - barW) +'px';
 
-		$('sidepanel').style.marginRight = (-barW) +'px';
 
 		if( localStorage.sidepanel_opened == 'true')
 		{
 			$('content').style.right = (sideW - (2*barW)) + 'px';
 			$('sidepanel_div').style.width = (sideW - barW) + 'px';
+			$('sidepanel').style.marginRight = (-barW) +'px';
 		}
 		else
 		{
 			$('content').style.right = sideClosedW - barW + 'px';
 			$('sidepanel_div').style.width = sideClosedW + 'px';
+			$('sidepanel').style.marginRight = '-10px';
 		}
 	}
 	else
@@ -189,17 +189,17 @@ function u_CalcGUI( i_toggle_scrollbars)
 
 		$('content').style.left = navigW +'px';
 
-		$('sidepanel').style.marginRight = '0px';
-
 		if( localStorage.sidepanel_opened == 'true')
 		{
 			$('content').style.right = sideW + 'px';
 			$('sidepanel_div').style.width = sideW + 'px';
+			$('sidepanel').style.marginRight = '0px';
 		}
 		else
 		{
 			$('content').style.right = sideClosedW + 'px';
 			$('sidepanel_div').style.width = sideClosedW + 'px';
+			$('sidepanel').style.marginRight = '-10px';
 		}
 	}
 }
