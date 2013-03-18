@@ -193,7 +193,7 @@ function cm_SetElType( i_type, i_elType, i_elColor)
 	}
 	else
 	{
-		i_elType.textContent = 'comment';
+		i_elType.textContent = 'Comment';
 		st_SetElColor( null, i_elColor);
 	}
 }

@@ -284,7 +284,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.m_elPercent = document.createElement('div');
 	elFolder.appendChild( elFolder.m_elPercent);
 	elFolder.m_elPercent.classList.add('percent');
-	if( i_fobject.status && i_fobject.status.progress )
+	if( i_fobject.status && ( i_fobject.status.progress != null ) && ( i_fobject.status.progress >= 0 ))
 		elFolder.m_elPercent.textContent = i_fobject.status.progress + '%';
 //	else
 //		elFolder.m_elPercent.style.display = 'none';
