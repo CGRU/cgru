@@ -90,7 +90,7 @@ class service:
          thumbnail_path = cgruconfig.VARS['af_thumbnail_naming'] % self.taskInfo
          http_adress = "%s%s" % ( cgruconfig.VARS['af_thumbnail_http'], thumbnail_path)
          
-         convert_command = cgruconfig,VARS['af_thumbnail_cmd'] % self.taskInfo
+         convert_command = cgruconfig.VARS['af_thumbnail_cmd'] % self.taskInfo
          if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
             
