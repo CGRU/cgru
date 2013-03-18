@@ -88,7 +88,7 @@ class service:
          tmp_path = "%s/thumbnails" % cgruconfig.VARS['af_tempdirectory']
          self.taskInfo['thumbnail_tmp_filepath'] = os.path.join(tmp_path, self.taskInfo['thumbnail_filename'])
          thumbnail_path = cgruconfig.VARS['af_thumbnail_naming'] % self.taskInfo
-         http_adress = "%s%s" % ( cgruconfig.VARS['af_thumbnail_http'], thumbnail_path)
+         http_address = "%s%s" % ( cgruconfig.VARS['af_thumbnail_http'], thumbnail_path)
          
          convert_command = cgruconfig.VARS['af_thumbnail_cmd'] % self.taskInfo
          if not os.path.exists(tmp_path):
@@ -96,7 +96,7 @@ class service:
             
          os.system(convert_command)
          
-         match = re.match("(\w+)://([\w\d:]+)(/.*)", http_adress)
+         match = re.match("(\w+)://([\w\d:]+)(/.*)", http_address)
          if match:
             protocol, servername, http_path = match.groups()
             port = 80
