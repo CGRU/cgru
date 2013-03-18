@@ -94,9 +94,13 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
       action = new QAction( "Set Exclude Hosts Mask", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
       menu.addAction( action);
-      action = new QAction( "Set Prority", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-      menu.addAction( action);
+
+		if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModHisPriority()))
+		{
+			action = new QAction( "Set Prority", this);
+			connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
+			menu.addAction( action);
+		}
 
       menu.addSeparator();
 

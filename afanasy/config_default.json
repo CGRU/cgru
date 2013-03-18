@@ -38,6 +38,9 @@
 		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep"
 	},
 
+	"af_perm_user_mod_his_priority":true,
+	"af_perm_user_mod_job_priority":true,
+
 	"af_cmdprefix":"",
 		"":"If 'AF_CMD_PREFIX' environment variable exists, it will be used. All commands with be prefixed with it.",
 

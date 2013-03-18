@@ -26,6 +26,9 @@ using namespace af;
 int Environment::magic_mode_index = MMM_Reject;
 std::string Environment::magic_mode;
 
+bool Environment::perm_user_mod_his_priority = AFGENERAL::PERM_USER_MOD_HIS_PRIORITY;
+bool Environment::perm_user_mod_job_priority = AFGENERAL::PERM_USER_MOD_JOB_PRIORITY;
+
 int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORITY;
 int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
@@ -174,6 +177,9 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, af::Msg::Magic,                    "af_magic_number"                      );
 	getVar( i_obj, magic_mode,                        "af_magic_mode"                        );
 
+	getVar( i_obj, perm_user_mod_his_priority,        "af_perm_user_mod_his_priority"      );
+	getVar( i_obj, perm_user_mod_job_priority,        "af_perm_user_mod_job_priority"      );
+
 	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"              );
 	getVar( i_obj, afnode_logs_rotate,                "af_node_logs_rotate"                );
 	getVar( i_obj, priority,                          "af_priority"                          );
@@ -270,6 +276,16 @@ bool Environment::getVar( const JSON & i_obj, std::string & o_value, const char 
 bool Environment::getVar( const JSON & i_obj, int & o_value, const char * i_name)
 {
 	if( af::jr_int( i_name, o_value, i_obj))
+	{
+		PRINT("\t%s = %d\n", i_name, o_value);
+		return true;
+	}
+	return false;
+}
+
+bool Environment::getVar( const JSON & i_obj, bool & o_value, const char * i_name)
+{
+	if( af::jr_bool( i_name, o_value, i_obj))
 	{
 		PRINT("\t%s = %d\n", i_name, o_value);
 		return true;

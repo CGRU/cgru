@@ -185,9 +185,14 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
     action = new QAction( "Hosts Exclude Mask", this);
     connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
     submenu->addAction( action);
-    action = new QAction( "Priority", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-    submenu->addAction( action);
+
+	if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModJobPriority()))
+	{
+	    action = new QAction( "Priority", this);
+	    connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
+	    submenu->addAction( action);
+	}
+
     action = new QAction( "Depend Mask", this);
     connect( action, SIGNAL( triggered() ), this, SLOT( actDependMask() ));
     submenu->addAction( action);

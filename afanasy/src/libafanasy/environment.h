@@ -46,6 +46,7 @@ public:
     static void setVerboseInit( bool value = true) { m_verbose_init = value;}
 	static bool getVar( const JSON & i_obj, std::string & o_value, const char * i_name );
 	static bool getVar( const JSON & i_obj, int & o_value, const char * i_name );
+	static bool getVar( const JSON & i_obj, bool & o_value, const char * i_name );
 	static bool getVar( const JSON & i_obj, std::vector<std::string> & o_value, const char * i_name );
 
 	static const std::string & getConfigData() { return m_config_data;}
@@ -55,6 +56,9 @@ public:
 
     static inline bool VISOR() { return visor_mode;  } ///< check user VISOR mode
     static inline bool GOD()   { return god_mode;    } ///< check user GOD   mode
+
+	static inline bool getPermUserModHisPriority() { return perm_user_mod_his_priority; }
+	static inline bool getPermUserModJobPriority() { return perm_user_mod_job_priority; }
 
     /// Set client port. Client can change its port.
     static void setClientPort( uint16_t port) { clientport = port;}
@@ -242,6 +246,9 @@ private:
    static int serverport;
 
    static int clientport;
+
+	static bool perm_user_mod_his_priority;
+	static bool perm_user_mod_job_priority;
 
 	static std::vector<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
 	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
