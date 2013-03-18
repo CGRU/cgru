@@ -5,7 +5,7 @@ import os, sys, re
 
 if sys.version_info[0] == 2 and sys.version_info[1] >= 6:
    import httplib as http_client
-elif sys.version[0] == 3:
+elif sys.version[0] == '3':
    import http.client as http_client
 
 
@@ -77,7 +77,7 @@ class service:
    
    def generatethumbnail(self):
       print("Generating thumbnails")
-      files_list = self.files.split(";")
+      files_list = self.files.decode("utf-8").split(";")
       for filename in files_list:
          self.taskInfo['filename'] = filename
          
