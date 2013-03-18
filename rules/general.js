@@ -63,6 +63,8 @@ function g_Init()
 	window.onhashchange = g_PathChanged;
 	document.body.onkeydown = g_OnKeyDown;
 
+	g_ShowPercent();
+
 	g_PathChanged();
 }
 
@@ -279,11 +281,19 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.m_elColor = elColor;
 	elColor.classList.add('fcolor');
 
-	var elStatus = document.createElement('div');
-//	elColor.appendChild( elStatus);
-	elFolder.appendChild( elStatus);
-	elFolder.m_elStatus = elStatus;
-	elStatus.classList.add('fstatus');
+	elFolder.m_elPercent = document.createElement('div');
+	elFolder.appendChild( elFolder.m_elPercent);
+	elFolder.m_elPercent.classList.add('percent');
+	if( i_fobject.status && i_fobject.status.progress )
+		elFolder.m_elPercent.textContent = i_fobject.status.progress + '%';
+//	else
+//		elFolder.m_elPercent.style.display = 'none';
+
+	var elAnn = document.createElement('div');
+//	elColor.appendChild( elAnn);
+	elFolder.appendChild( elAnn);
+	elFolder.m_elAnn = elAnn;
+	elAnn.classList.add('annotation');
 
 	var elName = document.createElement('div');
 //	elColor.appendChild( elName);
@@ -321,7 +331,7 @@ function g_FolderSetStatus( i_status, i_elFolder)
 
 	i_elFolder.m_fobject.status = i_status;
 
-	st_SetElLabel( i_status, i_elFolder.m_elStatus);
+	st_SetElLabel( i_status, i_elFolder.m_elAnn);
 	st_SetElColor( i_status, i_elFolder.m_elColor, i_elFolder);
 	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
 }
@@ -382,6 +392,21 @@ return;
 			elFolder.m_dir = n_ReadDir( elFolder.m_path, ['status']);
 		g_OpenFolder( elFolder);
 	}
+}
+
+function g_ShowPercent( i_toggle)
+{
+	if( localStorage.show_percent == null ) localStorage.show_percent = 'OFF';
+	if( i_toggle )
+	{	
+		if( localStorage.show_percent == 'ON' ) localStorage.show_percent = 'OFF';
+		else localStorage.show_percent = 'ON';
+	}
+	if( localStorage.show_percent == 'ON' )
+		u_el.navig.classList.add('show_percent');
+	else
+		u_el.navig.classList.remove('show_percent');
+	$('show_percent').textContent = localStorage.show_percent;
 }
 
 function n_MessageReceived( i_msg)

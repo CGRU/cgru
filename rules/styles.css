@@ -100,11 +100,22 @@ box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 opacity: 0.9;
 }
 #navig .folder.current .fcolor { opacity: 0.7; }
-#navig .folder .fname { position: relative; }
+#navig .folder .fname { position: relative; /*font-family: monospace;*/ }
 #navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
-#navig .folder .fstatus { position: relative; float: right; font-weight: normal; padding-right:4px; }
+#navig .folder .annotation { position: relative; float: right; font-weight: normal; padding-right:4px; }
 #navig .folder .progressbar { height: 6px; }
-
+#navig .folder .percent {
+font: 12px monospace;
+text-align:center;
+width: 30px; height: 14px;
+border: 1px solid rgba(0,0,0,.3);
+border-radius: 4px;
+position: relative;
+float: right;
+margin: 2px 4px 0 0;
+display: none;
+}
+#navig.show_percent .folder .percent { display: block; }
 
 /* ========================================== */
 /* ============== GLOBALS: ================== */
