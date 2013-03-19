@@ -114,10 +114,10 @@ if nuke.toNode('root').knob('proxy').value(): fileknob = writenode['proxy']
 else: fileknob = writenode['file']
 # Get views and images folders:
 imagesdirs = []
+filenames = []
 views_str = None
 views = []
 views_num = 0
-multiview_file = False
 try:
 	views_str = writenode['views'].value()
 	print('Views = "%s"' % views_str)
@@ -134,14 +134,25 @@ try:
 			octx.setView( 1 + nuke.views().index( view))
 			filename = fileknob.getEvaluatedValue( octx)
 			imagesdirs.append( os.path.dirname( filename))
-			if len( views) > 1:
-				if filename.find('%V') == -1 and filename.find('%v') == -1:
-					multiview_file = True
+			filenames.append( filename)
 except:
 	errorExit('Can`t process views on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
 # Check for valid view founded:
 if views_num < 1:
 	errorExit('Can`t find valid views on "%s" write node.' % xnode, True)
+
+# Check for multiview file (stereo EXR)
+multiview_file = False
+if views_num > 1:
+	name = None
+	multiview_file = True
+	for img in filenames:
+		if name is None:
+			name = img
+			continue
+		if name != img:
+			multiview_file = False
+			break
 
 # Change render images folder to temporary:
 if not options.notmpimage:
