@@ -102,7 +102,7 @@ opacity: 0.9;
 #navig .folder.current .fcolor { opacity: 0.7; }
 #navig .folder .fname { position: relative; /*font-family: monospace;*/ }
 #navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
-#navig .folder .annotation { position: relative; float: right; font-weight: normal; padding-right:4px; }
+#navig .folder .annotation { position: relative; float: right; font: 14px Arial; margin:2px 4px 0px 0px; }
 #navig .folder .progressbar { height: 6px; }
 #navig .folder .percent {
 font: 12px monospace;

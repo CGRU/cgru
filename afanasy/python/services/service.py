@@ -5,7 +5,7 @@ import os, sys, re
 
 if sys.version_info[0] == 2 and sys.version_info[1] >= 6:
    import httplib as http_client
-elif sys.version[0] == 3:
+elif sys.version[0] == '3':
    import http.client as http_client
 
 
@@ -77,7 +77,7 @@ class service:
    
    def generatethumbnail(self):
       print("Generating thumbnails")
-      files_list = self.files.split(";")
+      files_list = self.files.decode("utf-8").split(";")
       for filename in files_list:
          self.taskInfo['filename'] = filename
          
@@ -88,15 +88,15 @@ class service:
          tmp_path = "%s/thumbnails" % cgruconfig.VARS['af_tempdirectory']
          self.taskInfo['thumbnail_tmp_filepath'] = os.path.join(tmp_path, self.taskInfo['thumbnail_filename'])
          thumbnail_path = cgruconfig.VARS['af_thumbnail_naming'] % self.taskInfo
-         http_adress = "%s%s" % ( cgruconfig.VARS['af_thumbnail_http'], thumbnail_path)
+         http_address = "%s%s" % ( cgruconfig.VARS['af_thumbnail_http'], thumbnail_path)
          
-         convert_command = cgruconfig,VARS['af_thumbnail_cmd'] % self.taskInfo
+         convert_command = cgruconfig.VARS['af_thumbnail_cmd'] % self.taskInfo
          if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
             
          os.system(convert_command)
          
-         match = re.match("(\w+)://([\w\d:]+)(/.*)", http_adress)
+         match = re.match("(\w+)://([\w\d:]+)(/.*)", http_address)
          if match:
             protocol, servername, http_path = match.groups()
             port = 80
