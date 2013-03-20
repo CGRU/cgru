@@ -37,7 +37,8 @@ public:
 		FMultiHost        = 1 << 2,
 		FMasterOnSlave    = 1 << 3,
 		FDependSubTask    = 1 << 4,
-		FNonSequential    = 1 << 5
+		FNonSequential    = 1 << 5,
+		FDoPost           = 1 << 6
 	};
 
 	static const char DataMode_Progress[];
