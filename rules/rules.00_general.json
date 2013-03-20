@@ -20,7 +20,7 @@
 "comments":{
 	"message":{"title":"Message","color":[150,200,100]},
 	"report" :{"title":"Report" ,"color":[200,200,100]},
-	"review" :{"title":"Review" ,"color":[200,100,100]},
+	"review" :{"title":"Review" ,"color":[150,10,10]},
 	"client" :{"title":"Client" ,"color":[20,100,20]},
 	"generic":{"title":"generic"}
 },
@@ -58,7 +58,7 @@
 	"cmdexec":{
 		"open_folder":"nautilus \"@PATH@\"",
 		"play_sequence":[
-			{"name":"DJV View",
+			{"name":"DJV",
 				"cmd":"djv_view @PATH@"}
 		],
 		"play_movie":[
