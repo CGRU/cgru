@@ -1,7 +1,5 @@
 import os, re, sys
 
-#import nuke
-
 Input = sys.argv[-1]
 
 print( Input)
@@ -38,6 +36,17 @@ if os.path.isdir( InDir):
 		elif( len(Prefixes)):
 			Ends[-1] = frame
 
+InDir = InDir.replace('\\','/')
+
 for i in range( len(Prefixes)):
 	print('%s[%d-%d/%d]%s' % (Prefixes[i], Starts[i], Ends[i], Paddings[i], Suffixes[i]))
+	filename = Prefixes[i] + '#'*Paddings[i] + Suffixes[i]
+	filename = InDir + '/' + filename
+	filename = filename.replace('//','/')
+	print( filename)
+	nuke = __import__('nuke', globals(), locals(), [])
+	node = nuke.createNode('Read')
+	node.knob('file').setValue( filename)
+	node.knob('first').setValue( Starts[i])
+	node.knob('last').setValue( Ends[i])
 

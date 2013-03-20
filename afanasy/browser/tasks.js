@@ -245,14 +245,17 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 
 TaskItem.prototype.onContextMenu = function( i_menu)
 {
+	var maxShownOutputs = 5;
 	if( this.params.str && ( this.params.str > 1 ))
 	{
 		for( var i = this.params.str; i > 0; i--)
 		{
-			if( i <= this.params.str - 3) break;
-			i_menu.addItem('output', this, 'menuHandleOutput', 'Output '+i, true, i);
+			if( i <= this.params.str - maxShownOutputs) break;
+			var num = i;
+			if( i == this.params.str ) num = 0;
+			i_menu.addItem('output', this, 'menuHandleOutput', 'Output '+i, true, num);
 		}
-		if( this.params.str > 3 )
+		if( this.params.str > maxShownOutputs )
 			i_menu.addItem('output', this, 'menuHandleOutput', 'Output...', true, -1);
 	}
 	else
