@@ -326,7 +326,7 @@ function a_SourceWalkFind( i_walk, o_list, i_path)
 //window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
 	if( i_walk.folders == null ) return;
 
-	i_walk.folders.sort( c_CompareFolders );
+	i_walk.folders.sort( c_CompareFiles );
 	for( var f = 0; f < i_walk.folders.length; f++)
 	{
 		var fobj = i_walk.folders[f];
@@ -430,7 +430,7 @@ function a_ShowThumbnails()
 
 		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
 		if( walk.folders == null ) return;
-		walk.folders.sort( c_CompareFolders );
+		walk.folders.sort( c_CompareFiles );
 
 		for( var sc = 0; sc < walk.folders.length; sc++)
 		{
@@ -459,7 +459,7 @@ function a_ShowThumbnails()
 			st_SetElLabel( fobj.status, elStatus);
 			st_SetElColor( fobj.status, elScene);
 
-			walk.folders[sc].folders.sort( c_CompareFolders );
+			walk.folders[sc].folders.sort( c_CompareFiles );
 			for( var s = 0; s < walk.folders[sc].folders.length; s++)
 			{
 				var fobj = walk.folders[sc].folders[s];

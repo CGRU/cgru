@@ -513,7 +513,7 @@ function u_ShowFolder( i_element, i_path, i_walk)
 		var elMakeDailies = document.createElement('div');
 		elFolder.appendChild( elMakeDailies);
 		elMakeDailies.classList.add('button');
-		elMakeDailies.textContent = 'Make Dailies';
+		elMakeDailies.textContent = 'Dailies';
 		elMakeDailies.m_path = i_path;
 		elMakeDailies.onclick = function(e){
 			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
