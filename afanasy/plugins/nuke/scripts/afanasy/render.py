@@ -135,7 +135,7 @@ class BlockParameters:
 			self.hostsmask         = afnode.knob('hostsmask').value()
 			self.hostsmaskexclude  = afnode.knob('hostsmaskexcl').value()
 
-		self.writename = str( wnode.name())
+		self.writename = str( wnode.fullName())
 
 		if wnode.Class() == RenderNodeClassName:
 			afcommon = __import__('afcommon', globals(), locals(), [])
