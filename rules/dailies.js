@@ -22,7 +22,7 @@ function d_Make( i_path, i_outfolder)
 	if( readir && readir.files && readir.files.length )
 	for( var f = 0; f < readir.files.length; f++ )
 	{
-		var file = readir.files[f];
+		var file = readir.files[f].name;
 		var match = file.match(/\d{1,}\./g);
 		if( match )
 		{

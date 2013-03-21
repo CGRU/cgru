@@ -50,19 +50,36 @@ function st_SetElText( i_status, i_el, i_field, i_full)
 	else
 		i_el.innerHTML = '';
 }
-function st_SetElArtists( i_status, i_elArtists)
+function st_SetElArtists( i_status, i_elArtists, i_short)
 {
 	var text = '';
 	if( i_status && i_status.artists )
 		for( var i = 0; i < i_status.artists.length; i++)
 		{
-			if( i ) text += ', ';
-			text += c_GetUserTitle( i_status.artists[i]);
+			if( i )
+			{
+				if( i_short ) text += ',';
+				else text += ', ';
+			}
+			text += c_GetUserTitle( i_status.artists[i], i_short);
 		}
 	i_elArtists.textContent = text;
 }
-function st_SetElTags( i_status, i_elTags)
+function st_SetElTags( i_status, i_elTags, i_short)
 {
+	if( i_short )
+	{
+		var tags = '';
+		if( i_status && i_status.tags )
+			for( var i = 0; i < i_status.tags.length; i++)
+			{
+				if( i ) tags += ' ';
+				tags += c_GetTagTitle( i_status.tags[i], i_short);
+			}
+		i_elTags.textContent = tags;
+		return;
+	}
+
 	if( i_elTags.m_elTags )
 		for( i = 0; i < i_elTags.m_elTags.length; i++ )
 			i_elTags.removeChild( i_elTags.m_elTags[i]);
@@ -75,15 +92,8 @@ function st_SetElTags( i_status, i_elTags)
 			i_elTags.appendChild( el);
 			i_elTags.m_elTags.push( el);
 			el.classList.add('tag');
-			st_SetElTag( el, i_status.tags[i]);
+			el.textContent = c_GetTagTitle( i_status.tags[i], i_short);
 		}
-}
-function st_SetElTag( i_el, i_tag)
-{
-	if( RULES.tags[i_tag] && RULES.tags[i_tag].title )
-		i_el.textContent = RULES.tags[i_tag].title;
-	else
-		i_el.textContent = i_tag;
 }
 function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
 {
@@ -271,7 +281,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 		{
 			var el = document.createElement('div');
 			st_elTags.m_elList.appendChild( el);
-			st_SetElTag( el, st_status.tags[i]);
+			el.textContent = c_GetTagTitle( i_status.tags[i]);
 			el.classList.add('tag');
 			el.classList.add('selected');
 		}

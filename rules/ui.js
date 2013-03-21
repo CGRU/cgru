@@ -450,7 +450,7 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 	elFiles = [];
 	if( i_walk.folders)
 	{
-		i_walk.folders.sort( c_CompareFolders );
+		i_walk.folders.sort( c_CompareFiles );
 		for( var i = 0; i < i_walk.folders.length; i++)
 			if( false == u_SkipFile( i_walk.folders[i].name))
 				elFiles.push( u_ShowFolder( i_element, i_path + '/' + i_walk.folders[i].name, i_walk));
@@ -458,10 +458,10 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 
 	if( i_walk.files)
 	{
-		i_walk.files.sort();
+		i_walk.files.sort( c_CompareFiles );
 		for( var i = 0; i < i_walk.files.length; i++)
-			if( false == u_SkipFile( i_walk.files[i]))
-				elFiles.push( u_ShowFile( i_element, i_path + '/' + i_walk.files[i], i_walk));
+			if( false == u_SkipFile( i_walk.files[i].name))
+				elFiles.push( u_ShowFile( i_element, i_path, i_walk.files[i], i_walk));
 	}
 
 	elMakeThumbnails.m_elFiles = elFiles;
@@ -522,24 +522,24 @@ function u_ShowFolder( i_element, i_path, i_walk)
 	return elFolder;
 }
 
-function u_ShowFile( i_element, i_path, i_walk)
+function u_ShowFile( i_element, i_path, i_file, i_walk)
 {
-	var name = i_path.substr( i_path.lastIndexOf('/')+1);
+	var path = i_path + '/' + i_file.name;
 
 	var elFile = document.createElement('div');
 	i_element.appendChild( elFile);
 	elFile.classList.add('folder');
 	elFile.classList.add('file');
 
-	u_MakeFileThumbEl( elFile, i_path, name, i_walk, 'file');
+	u_MakeFileThumbEl( elFile, path, i_file.name, i_walk, 'file');
 
 	var elLinkA = document.createElement('a');
 	elFile.appendChild( elLinkA);
-	elLinkA.href = RULES.root + i_path;
+	elLinkA.href = RULES.root + path;
 	elLinkA.target = '_blank';
-	elLinkA.textContent = name;
+	elLinkA.textContent = i_file.name;
 
-	if( c_FileIsMov( name))
+	if( c_FileIsMov( i_file.name))
 	{
 		var cmds = RULES.cmdexec.play_movie;
 		if( cmds ) for( var c = 0; c < cmds.length; c++)
@@ -549,7 +549,7 @@ function u_ShowFile( i_element, i_path, i_walk)
 			elCmd.classList.add('cmdexec');
 			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
-			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 		}
@@ -558,9 +558,14 @@ function u_ShowFile( i_element, i_path, i_walk)
 		elFile.appendChild( elExplode);
 		elExplode.classList.add('button');
 		elExplode.textContent = 'Explode';
-		elExplode.m_path = i_path;
+		elExplode.m_path = path;
 		elExplode.onclick = function(e){ d_Explode( e.currentTarget.m_path)};
 	}
+
+	var elSize = document.createElement('div');
+	elFile.appendChild( elSize);
+	elSize.classList.add('size');
+	elSize.textContent = c_Bytes2KMG( i_file.size);
 
 	return elFile;
 }
@@ -1117,10 +1122,26 @@ function u_EditPanelCreate( i_el)
 //	cmds.push(['c','formatBlock', 'code']);
 	cmds.push(['F','formatBlock', 'pre','Pre Formatted']);
 	cmds.push(['p','formatBlock', 'p','Paragraph']);
+	cmds.push(['C','foreColor', '#990000','Text Color']);
+	cmds.push(['C','foreColor', '#666600','Text Color']);
+	cmds.push(['C','foreColor', '#008800','Text Color']);
+	cmds.push(['C','foreColor', '#007777','Text Color']);
+	cmds.push(['C','foreColor', '#000099','Text Color']);
+	cmds.push(['C','foreColor', '#880088','Text Color']);
+	cmds.push(['C','foreColor', '#FFFFFF','Text Color']);
+	cmds.push(['C','foreColor', '#000000','Text Color']);
+	cmds.push(['B','backColor', '#DD4444','Back Color']);
+	cmds.push(['B','backColor', '#DDDD44','Back Color']);
+	cmds.push(['B','backColor', '#66DD66','Back Color']);
+	cmds.push(['B','backColor', '#66DDDD','Back Color']);
+	cmds.push(['B','backColor', '#6666FF','Back Color']);
+	cmds.push(['B','backColor', '#DD66DD','Back Color']);
+	cmds.push(['B','backColor', '#FFFFFF','Back Color']);
+	cmds.push(['B','backColor', '#000000','Back Color']);
 //	cmds.push(['Q','formatBlock', 'DL']);
 
 	for( var i = 1; i < 4; i++ )
-		cmds.push([('H'+i),'heading',('h'+i),'Header '+i]);
+		cmds.push([('h'+i),'heading',('h'+i),'Header '+i]);
 
 	for( var i = 0; i < cmds.length; i++ )
 	{
@@ -1131,6 +1152,8 @@ function u_EditPanelCreate( i_el)
 		el.title = cmds[i][3];
 		el.m_cmd = cmds[i];
 //		el.style.cssFloat = 'left';
+		if(( el.m_cmd[1] == 'foreColor') && ( el.m_cmd[1] != null )) el.style.color = el.m_cmd[2];
+		if(( el.m_cmd[1] == 'backColor') && ( el.m_cmd[1] != null )) el.style.background = el.m_cmd[2];
 		el.onclick = function(e){
 			var el = e.currentTarget;
 			document.execCommand( el.m_cmd[1], false, el.m_cmd[2]);

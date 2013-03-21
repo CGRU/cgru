@@ -12,7 +12,8 @@ p_images = [];
 p_frame = null;
 p_playing = null;
 p_timer = null;
-p_files = null;
+p_filenames = null;
+p_fileObjs = null;
 p_loaded = false;
 p_numloaded = 0;
 p_top = '38px';
@@ -136,23 +137,26 @@ function p_PathChanged()
 	p_path = c_GetHashPath();
 	p_path = RULES_TOP.root + p_path;
 	var walk = n_WalkDir([p_path])[0];
-	p_files = [];
+	p_filenames = [];
+	p_fileObjs = {};
 
-	walk.files.sort();
+	walk.files.sort( c_CompareFiles );
+
 	for( var i = 0; i < walk.files.length; i++)
 	{
-		var file = walk.files[i];
+		var file = walk.files[i].name;
+		p_fileObjs[file] = walk.files[i];
 		var type = file.split('.').pop().toLowerCase();
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
 		img.src = p_path + '/' + file;
 		img.onload = function(){p_ImgLoaded();}
 		img.onerror = function(){p_ImgLoaded();}
-		p_files.push( file)
+		p_filenames.push( file)
 		p_images.push( img);
 	}
 
-	if( p_files == null || ( p_files.length == 0 ))
+	if( p_filenames == null || ( p_filenames.length == 0 ))
 	{
 		if( walk.error )
 			c_Error( walk.error);
@@ -161,16 +165,16 @@ function p_PathChanged()
 		return;
 	}
 
-	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_files[0];
+	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_filenames[0];
 }
 
 function p_ImgLoaded()
 {
 	p_numloaded++;
-	c_Info('Loaded '+p_numloaded+' of '+p_files.length+' images', false);
-	p_el.progress.style.width = Math.round(100.0*p_numloaded/p_files.length) + '%';
+	c_Info('Loaded '+p_numloaded+' of '+p_filenames.length+' images', false);
+	p_el.progress.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
 
-	if( p_numloaded < p_files.length ) return;
+	if( p_numloaded < p_filenames.length ) return;
 
 	p_loaded = true;
 	p_PushButton();
@@ -200,7 +204,7 @@ function p_CreateImages()
 	{
 		var elImg = document.createElement('img');
 		p_el.view.appendChild( elImg);
-		elImg.src = p_path + '/' + p_files[i];
+		elImg.src = p_path + '/' + p_filenames[i];
 		if( localStorage.player_precreate == 'ON' )
 			elImg.style.display = 'none';
 		elImg.onmousedown = function(){return false;}
@@ -374,13 +378,13 @@ function p_NextFrame( i_val)
 		if( localStorage.player_precreate == 'ON' )
 			p_elImg[p_frame].style.display = 'block';
 		else
-			p_elImg[0].src = p_path + '/' + p_files[p_frame];
+			p_elImg[0].src = p_path + '/' + p_filenames[p_frame];
 	}
 
 	if( p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'block';
 
-	c_Info( p_files[p_frame], false);
+	c_Info( p_filenames[p_frame], false);
 	var width = '100%';
 	if( p_images.length > 1 )
 		width = 100.0*p_frame/(p_images.length-1) + '%';
@@ -476,7 +480,7 @@ i_evt.stopPropagation();
 		canvas.height = p_images[0].height;
 		canvas.style.width = canvas.width + 'px';
 		canvas.style.height = canvas.height + 'px';
-		c_Info('Canvas for "'+p_files[p_frame]+'" created.');
+		c_Info('Canvas for "'+p_filenames[p_frame]+'" created.');
 	}
 
 	var c = p_GetCtxCoords( i_evt);
@@ -555,7 +559,7 @@ function p_Save()
 
 		var path = p_path.substr( 0, p_path.lastIndexOf('/'));
 		var folder = p_path.substr( p_path.lastIndexOf('/')+1);
-		path = path+'/'+folder+'.painted/'+p_files[f];
+		path = path+'/'+folder+'.painted/'+p_filenames[f];
 
 		n_Request({"save":{"file":path,"data":data,"type":"base64"}}, false);
 	}
@@ -577,7 +581,7 @@ function n_MessageReceived( i_msg)
 	{
 		p_filessaved++;
 		var name = file.substr( file.lastIndexOf('/')+1);
-		var frame = p_files.indexOf(name);
+		var frame = p_filenames.indexOf(name);
 		if( p_paintElCanvas[frame])
 			p_paintElCanvas[frame].m_saved = true;
 		p_SetPaintState();
