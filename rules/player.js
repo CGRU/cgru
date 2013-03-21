@@ -14,6 +14,9 @@ p_playing = null;
 p_timer = null;
 p_filenames = null;
 p_fileObjs = null;
+p_fileSizeTotal = null;
+p_fileSizeLoaded = null;
+p_loadStartMS = null;
 p_loaded = false;
 p_numloaded = 0;
 p_top = '38px';
@@ -139,6 +142,9 @@ function p_PathChanged()
 	var walk = n_WalkDir([p_path])[0];
 	p_filenames = [];
 	p_fileObjs = {};
+	p_fileSizeTotal = 0;
+	p_fileSizeLoaded = 0;
+	p_loadStartMS = (new Date()).valueOf();
 
 	walk.files.sort( c_CompareFiles );
 
@@ -146,12 +152,14 @@ function p_PathChanged()
 	{
 		var file = walk.files[i].name;
 		p_fileObjs[file] = walk.files[i];
+		p_fileSizeTotal += walk.files[i].size;
 		var type = file.split('.').pop().toLowerCase();
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
 		img.src = p_path + '/' + file;
-		img.onload = function(){p_ImgLoaded();}
-		img.onerror = function(){p_ImgLoaded();}
+		img.onload = function(e){p_ImgLoaded(e);}
+		img.onerror = function(e){p_ImgLoaded(e);}
+		img.m_file = walk.files[i];
 		p_filenames.push( file)
 		p_images.push( img);
 	}
@@ -165,13 +173,28 @@ function p_PathChanged()
 		return;
 	}
 
+	c_Info('Loading '+p_images.length+' images: '+c_Bytes2KMG( p_fileSizeTotal));
+
 	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_filenames[0];
 }
 
-function p_ImgLoaded()
+function p_ImgLoaded(e)
 {
+	var img = e.currentTarget;
 	p_numloaded++;
-	c_Info('Loaded '+p_numloaded+' of '+p_filenames.length+' images', false);
+	if( img.m_file && img.m_file.size ) p_fileSizeLoaded += img.m_file.size;
+
+	var info = 'Loaded '+p_numloaded+' of '+p_filenames.length+' images';
+	info += ': '+c_Bytes2KMG( p_fileSizeLoaded)+' of '+c_Bytes2KMG( p_fileSizeTotal);
+
+	var sec = ((new Date()).valueOf() - p_loadStartMS) / 1000;
+	if( sec > 0 )
+	{
+		var speed = p_fileSizeLoaded / sec;
+		info += ': '+c_Bytes2KMG( speed)+'/s';
+	}
+
+	c_Info( info, false);
 	p_el.progress.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
 
 	if( p_numloaded < p_filenames.length ) return;
@@ -189,7 +212,15 @@ function p_ImgLoaded()
 	p_HomeView();
 //	setTimeout('p_HomeView();',100);
 
-	c_Info('Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height);
+	var info = 'Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height;
+	info += ': '+c_Bytes2KMG( p_fileSizeTotal);
+	info += ': '+sec.toFixed(1)+' seconds';
+	if( sec > 0 )
+	{
+		var speed = p_fileSizeLoaded / sec;
+		info += ': '+c_Bytes2KMG( speed)+'/s';
+	}
+	c_Info( info);
 }
 
 function p_CreateImages()

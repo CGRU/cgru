@@ -356,7 +356,7 @@ function st_EditColorOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
 	st_status.color = el.m_color
-console.log( st_status);
+//console.log( st_status);
 	st_SetElColor( st_status);
 }
 
@@ -404,7 +404,7 @@ function st_SaveOnClick()
 	st_DestroyEditUI();
 }
 
-function st_Save( i_status, i_path)
+function st_Save( i_status, i_path, i_wait)
 {
 	if( i_status == null ) i_status = RULES.status;
 	if( i_path == null ) i_path = g_CurPath();
@@ -412,7 +412,7 @@ function st_Save( i_status, i_path)
 	obj.object = {"status":i_status};
 	obj.add = true;
 	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
-	n_Request({"editobj":obj});
+	n_Request({"editobj":obj}, i_wait);
 }
 
 function st_UpdateProgresses( i_path)
@@ -451,6 +451,7 @@ function st_UpdateProgresses( i_path)
 		for( var f = 0; f < walks[w].folders.length; f++ )
 		{
 			var folder = walks[w].folders[f];
+			if( folder.name == RULES.rufolder ) continue;
 			var path = paths[w] + '/' + folder.name;
 			if( progresses[path] != null )
 			{
@@ -458,12 +459,15 @@ function st_UpdateProgresses( i_path)
 			}
 			else
 			{
-
-				if( folder.status == null ) continue;
-				if( folder.status.progress == null ) continue;
-				if( folder.status.progress < 0 ) continue;
-
-				progress += folder.status.progress;
+//if( folder.status ) console.log( folder.name+': '+folder.status.progress);
+				if(( folder.status == null ) || ( folder.status.progress == null ))
+				{
+//console.log(folder.name+': null');
+					if( w != (walks.length-1)) continue;
+					st_Save({"progress":0}, path, false);		
+				}
+				else if( folder.status.progress < 0 ) continue;
+				else progress += folder.status.progress;
 			}
 			progress_count++;
 		}
@@ -475,18 +479,11 @@ function st_UpdateProgresses( i_path)
 
 		progress = Math.round( progress / progress_count);
 		progresses[paths[w]] = progress;
+
+//console.log(paths[w]+': '+progress_count+': '+progress);
 	}
 
 	for( var path in progresses)
-	{
-//window.console.log( path +':'+ progresses[path]);
-		var obj = {};
-		obj.object = {"status":{"progress":progresses[path]}};
-		obj.add = true;
-		obj.file = RULES.root + path + '/' + RULES.rufolder + '/status.json';
-
-		n_Request({"editobj":obj}, false);
-//window.console.log( obj);
-	}
+		st_Save({"progress":progresses[path]}, path, false);
 }
 
