@@ -1,6 +1,15 @@
 d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
-d_guiparams = ['input','output','artist','activity','version','filename'];
+d_guiparams = [];
+d_guiparams.push({"name":'input'});
+d_guiparams.push({"name":'output'});
+d_guiparams.push({"name":'filename'});
+d_guiparams.push({"name":'artist',"width":'50%'});
+d_guiparams.push({"name":'activity',"width":'25%'});
+d_guiparams.push({"name":'version',"width":'25%'});
+d_guiparams.push({"name":'resolution',"width":'30%'});
+d_guiparams.push({"name":'fps',"label":'FPS',"width":'20%'});
+d_guiparams.push({"name":'codec',"width":'50%'});
 
 d_expguiparams = [];
 d_expguiparams.push({"name":'quality',"label":'Compression rate, 1 is the best quality'});
@@ -76,23 +85,40 @@ function d_Make( i_path, i_outfolder)
 		var elDiv = document.createElement('div');
 		wnd.elContent.appendChild( elDiv);
 
+		if( d_guiparams[p].width != null )
+		{
+			elDiv.style.cssFloat = 'left';
+			elDiv.style.width = d_guiparams[p].width;
+		}
+		else
+			elDiv.style.clear = 'both';
+
 		var elLabel = document.createElement('div');
 		elDiv.appendChild( elLabel);
 		elLabel.classList.add('label');
-		elLabel.textContent = d_guiparams[p]+':';
-		elLabel.style.textTransform = 'capitalize';
+		if( d_guiparams[p].label )
+			elLabel.textContent = d_guiparams[p].label+':';
+		else
+		{
+			elLabel.textContent = d_guiparams[p].name+':';
+			elLabel.style.textTransform = 'capitalize';
+		}
 
 		var elParam = document.createElement('div');
 		elDiv.appendChild( elParam);
 		elParam.classList.add('param');
-		elParam.textContent = params[d_guiparams[p]];
+		if( params[d_guiparams[p].name] )
+			elParam.textContent = params[d_guiparams[p].name];
+		else
+			elParam.textContent = RULES.dailies[d_guiparams[p].name];
 		elParam.contentEditable = 'true';
 
-		wnd.m_elements[d_guiparams[p]] = elParam;
+		wnd.m_elements[d_guiparams[p].name] = elParam;
 	}
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
 
 	var elAfDiv = document.createElement('div');
 	elBtns.appendChild( elAfDiv);
@@ -116,7 +142,7 @@ function d_ProcessGUI( i_wnd)
 {
 	var params = {};
 	for( var p = 0; p < d_guiparams.length; p++)
-		params[d_guiparams[p]] = i_wnd.m_elements[d_guiparams[p]].textContent;
+		params[d_guiparams[p].name] = i_wnd.m_elements[d_guiparams[p].name].textContent;
 
 	i_wnd.destroy();
 
@@ -144,31 +170,35 @@ function d_ProcessGUI( i_wnd)
 
 function d_MakeCmd( i_params)
 {
-	var input = cgru_PM('/'+RULES.root+i_params.input, true);
-	var output = cgru_PM('/'+RULES.root+i_params.output+'/'+i_params.filename, true);
+	var params = c_CloneObj( RULES.dailies);
+	for( var parm in i_params )
+		params[parm] = i_params[parm];
+
+	var input = cgru_PM('/'+RULES.root+params.input, true);
+	var output = cgru_PM('/'+RULES.root+params.output+'/'+params.filename, true);
 
 	var cmd = 'python';
 
 	cmd += ' "'+cgru_PM( d_makemovie, true)+'"';
 
-	cmd += ' -c "'+RULES.dailies.codec+'"';
-	cmd += ' -f '+RULES.dailies.fps;
-	cmd += ' -r '+RULES.dailies.resolution;
-	cmd += ' -s '+RULES.dailies.slate;
-	cmd += ' -t '+RULES.dailies.template;
-	cmd += ' --lgspath "'+RULES.dailies.logo_slate_path+'"';
-	cmd += ' --lgssize '+RULES.dailies.logo_slate_size;
-	cmd += ' --lgsgrav '+RULES.dailies.logo_slate_grav;
-	cmd += ' --lgfpath "'+RULES.dailies.logo_frame_path+'"';
-	cmd += ' --lgfsize '+RULES.dailies.logo_frame_size;
-	cmd += ' --lgfgrav '+RULES.dailies.logo_frame_grav;
+	cmd += ' -c "'+params.codec+'"';
+	cmd += ' -f '+params.fps;
+	cmd += ' -r '+params.resolution;
+	cmd += ' -s '+params.slate;
+	cmd += ' -t '+params.template;
+	cmd += ' --lgspath "'+params.logo_slate_path+'"';
+	cmd += ' --lgssize '+params.logo_slate_size;
+	cmd += ' --lgsgrav '+params.logo_slate_grav;
+	cmd += ' --lgfpath "'+params.logo_frame_path+'"';
+	cmd += ' --lgfsize '+params.logo_frame_size;
+	cmd += ' --lgfgrav '+params.logo_frame_grav;
 
 	cmd += ' --project "'+ASSETS.project.name+'"';
 	cmd += ' --shot "'+ASSETS.shot.name+'"';
 
-	cmd += ' --ver "'+i_params.version+'"';
-	cmd += ' --artist "'+i_params.artist+'"';
-	cmd += ' --activity "'+i_params.activity+'"';
+	cmd += ' --ver "'+params.version+'"';
+	cmd += ' --artist "'+params.artist+'"';
+	cmd += ' --activity "'+params.activity+'"';
 
 	cmd += ' "'+input+'"';
 	cmd += ' "'+output+'"';
