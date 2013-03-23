@@ -572,8 +572,7 @@ function u_ShowFile( i_element, i_path, i_file, i_walk)
 
 function u_MakeFileThumbEl( i_el, i_path, i_name, i_walk, i_type)
 {
-//	var elThumbnal = document.createElement('img');
-	var elThumbnal = document.createElement('div');
+	var elThumbnal = document.createElement('span');
 	i_el.appendChild( elThumbnal);
 	i_el.m_elThumbnail = elThumbnal;
 	elThumbnal.classList.add('thumbnail');
