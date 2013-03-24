@@ -84,7 +84,7 @@
 	"cmdexec":{
 		"open_folder":"start @PATH@",
 		"play_sequence":[
-			{"name":"Pdplayer",
+			{"name":"PdP",
 				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
 			{"name":"Pd++",
 				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"}

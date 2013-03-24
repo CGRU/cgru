@@ -22,6 +22,12 @@
 
 <div id="navig_div">
 	<div id="navig"></div>
+	<div id="navig_panel">
+		<div class="button" id="navig_show_artists"    onclick="g_NavigShowInfo(this)">ART</div>
+		<div class="button" id="navig_show_tags"       onclick="g_NavigShowInfo(this)">TAG</div>
+		<div class="button" id="navig_show_annotation" onclick="g_NavigShowInfo(this)">ANN</div>
+		<div class="button" id="navig_show_percent"    onclick="g_NavigShowInfo(this)">%</div>
+	</div>
 	<div id="navig_handle" class="gui_size_handle" onmousedown="u_ResizeGUIStart('navig_width',1)"></div>
 </div>
 
@@ -227,10 +233,6 @@ Hidden folders increase system speed.">
 			<div class="cgru_parameter">
 				<div class="label">Hide ScrollBars:</div>
 				<div class="variable" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
-			</div>
-			<div class="cgru_parameter" title="Navigation Show Percent Number">
-				<div class="label">Show Percent:</div>
-				<div class="variable" id="show_percent" style="left:110px;right:15px;cursor:pointer" onclick="g_ShowPercent(true)">unknown</div>
 			</div>
 		</div>
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">

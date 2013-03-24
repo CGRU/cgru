@@ -63,7 +63,7 @@ function g_Init()
 	window.onhashchange = g_PathChanged;
 	document.body.onkeydown = g_OnKeyDown;
 
-	g_ShowPercent();
+	g_NavigShowInfo();
 
 	g_PathChanged();
 }
@@ -235,7 +235,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-	g_elCurFolder.m_dir.folders.sort( c_CompareFolders );
+	g_elCurFolder.m_dir.folders.sort( c_CompareFiles );
 
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
@@ -281,25 +281,34 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.m_elColor = elColor;
 	elColor.classList.add('fcolor');
 
-	elFolder.m_elPercent = document.createElement('div');
-	elFolder.appendChild( elFolder.m_elPercent);
-	elFolder.m_elPercent.classList.add('percent');
-	if( i_fobject.status && ( i_fobject.status.progress != null ) && ( i_fobject.status.progress >= 0 ))
-		elFolder.m_elPercent.textContent = i_fobject.status.progress + '%';
-//	else
-//		elFolder.m_elPercent.style.display = 'none';
-
-	var elAnn = document.createElement('div');
-//	elColor.appendChild( elAnn);
-	elFolder.appendChild( elAnn);
-	elFolder.m_elAnn = elAnn;
-	elAnn.classList.add('annotation');
-
 	var elName = document.createElement('div');
-//	elColor.appendChild( elName);
 	elFolder.appendChild( elName);
 	elName.classList.add('fname');
 	elName.textContent = folder;
+
+	var elPercent = document.createElement('div');
+	elFolder.appendChild( elPercent);
+	elFolder.m_elPercent = elPercent;
+	elPercent.classList.add('percent');
+	elPercent.classList.add('info');
+
+	var elAnn = document.createElement('div');
+	elFolder.appendChild( elAnn);
+	elFolder.m_elAnn = elAnn;
+	elAnn.classList.add('annotation');
+	elAnn.classList.add('info');
+
+	var elTags = document.createElement('div');
+	elFolder.appendChild( elTags);
+	elFolder.m_elTags = elTags;
+	elTags.classList.add('tags');
+	elTags.classList.add('info');
+
+	var elArtists = document.createElement('div');
+	elFolder.appendChild( elArtists);
+	elFolder.m_elArtists = elArtists;
+	elArtists.classList.add('artists');
+	elArtists.classList.add('info');
 
 	elFolder.m_elProgress = document.createElement('div');
 	elFolder.appendChild( elFolder.m_elProgress);
@@ -334,6 +343,11 @@ function g_FolderSetStatus( i_status, i_elFolder)
 	st_SetElLabel( i_status, i_elFolder.m_elAnn);
 	st_SetElColor( i_status, i_elFolder.m_elColor, i_elFolder);
 	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
+	st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
+	st_SetElTags( i_status, i_elFolder.m_elTags, true);
+
+	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
+		i_elFolder.m_elPercent.textContent = i_status.progress + '%';
 }
 
 function g_CloseFolder( i_elFolder )
@@ -394,19 +408,35 @@ return;
 	}
 }
 
-function g_ShowPercent( i_toggle)
+function g_NavigShowInfo( i_toggle)
 {
-	if( localStorage.show_percent == null ) localStorage.show_percent = 'OFF';
-	if( i_toggle )
-	{	
-		if( localStorage.show_percent == 'ON' ) localStorage.show_percent = 'OFF';
-		else localStorage.show_percent = 'ON';
+	var infos = ['annotation','artists','tags','percent'];
+	for( var i = 0; i < infos.length; i++ )
+	{
+		var name = 'navig_show_'+infos[i];
+		if( localStorage[name] == null )
+		{
+			if( i == 0 )
+				localStorage[name] = 'true';
+			else
+				localStorage[name] = 'false';
+		}
+		if( i_toggle && ( i_toggle.id == name ))
+		{
+			if( localStorage[name] == 'true' ) localStorage[name] = 'false';
+			else localStorage[name] = 'true';
+		}
+		if( localStorage[name] == 'true' )
+		{
+			$(name).classList.add('selected');
+			u_el.navig.classList.add( name);
+		}
+		else
+		{
+			$(name).classList.remove('selected');
+			u_el.navig.classList.remove( name);
+		}
 	}
-	if( localStorage.show_percent == 'ON' )
-		u_el.navig.classList.add('show_percent');
-	else
-		u_el.navig.classList.remove('show_percent');
-	$('show_percent').textContent = localStorage.show_percent;
 }
 
 function n_MessageReceived( i_msg)

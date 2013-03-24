@@ -202,16 +202,35 @@ function c_ElDisplayToggle( i_el)
 		i_el.style.display = 'none';
 }
 
-function c_GetUserTitle( i_uid)
+function c_GetUserTitle( i_uid, i_short)
 {
 	if( g_auth_user == null ) return null;
 	if( i_uid == null ) i_uid = g_auth_user.id;
-	if( g_users && g_users[i_uid] && g_users[i_uid].title && ( g_users[i_uid].title != 'Coordinator'))
-		return g_users[i_uid].title;
-	return i_uid;
+	var title = i_uid;
+	if( g_users && g_users[i_uid] && g_users[i_uid].title )
+		title = g_users[i_uid].title;
+	if( i_short && ( title.length > 4 ))
+	{
+		title = title.split(' ');
+		if( title.length > 1 )
+			title = title[0].substr(0,1)+title[1].substr(0,3);
+		else
+			title = title[0].substr(0,4);
+	}
+	return title;
 }
 
-function c_CompareFolders(a,b)
+function c_GetTagTitle( i_tag, i_short)
+{
+	var tag = i_tag;
+	if( RULES.tags[tag] && RULES.tags[tag].title )
+		tag = RULES.tags[tag].title;
+	if( i_short && (tag.length > 3))
+		tag = tag.substr(0,3);
+	return tag;
+}
+
+function c_CompareFiles(a,b)
 {
 	var attr = 'name';
 	if( a[attr] < b[attr]) return -1;
@@ -286,3 +305,11 @@ function c_FileIsMov( i_file)
 	return false;
 }
 
+function c_Bytes2KMG( i_bytes)
+{
+	var lables = ['B','KB','MB','GB','TB'];
+	var th = 1, log = 0;
+	while( th*1024 < i_bytes ) { th *= 1024, log++ };
+//console.log( i_bytes + ': ' + th + ', ' + log);
+	return (i_bytes/th).toFixed(1) + ' ' + lables[log];
+}

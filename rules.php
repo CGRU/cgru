@@ -153,7 +153,13 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 			$path = $i_dir.'/'.$entry;
 			if( $access && ( false == is_dir( $path)))
 			{
-				array_push( $o_out['files'], $entry);
+				if( is_file( $path))
+				{
+					$fileObj = array();
+					$fileObj['name'] = $entry;
+					$fileObj['size'] = filesize( $path);
+					array_push( $o_out['files'], $fileObj);
+				}
 				continue;
 			}
 

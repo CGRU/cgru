@@ -1,2 +1,2 @@
 H.264 Ugly
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -crf 40 "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec libx264 -pix_fmt yuv420p -crf 40 "@OUTPUT@.@CONTAINER@"

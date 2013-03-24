@@ -74,8 +74,12 @@ position: absolute;
 right: 0; top: 0; bottom: 0;
 width: 6px;
 }
-#navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 0; bottom: 0; /*padding-right: 6px;*/ }
+#navig_panel { position: absolute; height: 20px; left:0;right:0;top:0; box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;}
+#navig_panel .button { font-size: 12px; padding: 0px; margin: 3px; float: left; width: 40px; text-align: center; border-radius: 4px; box-shadow: 0 0 2px #000; }
+#navig_panel .button.selected { background: rgba(100,200,200,.3); }
+#navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/ }
 #navig .folder {
+clear: both;
 position: relative;
 cursor: pointer;
 border: 1px solid rgba(255,255,255,.2);
@@ -86,7 +90,6 @@ font-weight: normal;
 #navig .folder.opened {
 padding-top: 4px;
 padding-bottom: 4px;
-/*background: rgba(0,255,255,.02);*/
 font-weight: bold;
 }
 #navig .folder.hidden { display: none; }
@@ -100,22 +103,24 @@ box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 opacity: 0.9;
 }
 #navig .folder.current .fcolor { opacity: 0.7; }
-#navig .folder .fname { position: relative; /*font-family: monospace;*/ }
+#navig .folder .fname { position: relative; float:left; /*font-family: monospace;*/ }
 #navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
-#navig .folder .annotation { position: relative; float: right; font: 14px Arial; margin:2px 4px 0px 0px; }
+#navig .folder .progress { clear: both; }
 #navig .folder .progressbar { height: 6px; }
+#navig .folder .info { display: none; margin:2px 4px 0px 0px; position: relative; float: right;font: 14px Arial; } 
+#navig .folder .annotation { }
+#navig .folder .tags { font-style: italic; }
 #navig .folder .percent {
 font: 12px monospace;
 text-align:center;
 width: 30px; height: 14px;
 border: 1px solid rgba(0,0,0,.3);
 border-radius: 4px;
-position: relative;
-float: right;
-margin: 2px 4px 0 0;
-display: none;
 }
-#navig.show_percent .folder .percent { display: block; }
+#navig.navig_show_tags       .folder .tags       { display: inline; }
+#navig.navig_show_artists    .folder .artists    { display: inline; }
+#navig.navig_show_annotation .folder .annotation { display: inline; }
+#navig.navig_show_percent    .folder .percent    { display: inline; }
 
 /* ========================================== */
 /* ============== GLOBALS: ================== */
@@ -173,7 +178,7 @@ min-height: 19px;
 .cmdexec { opacity: 0.8; }
 
 .textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; margin: 4px; }
-.textedit_panel div { float: left; border-radius: 3px; margin: 2px; padding: 1px; width: 30px; box-shadow: 0 0 2px #000; }
+.textedit_panel div { float: left; border-radius: 3px; margin: 1px; padding: 0px; width: 20px; box-shadow: 0 0 2px #000; font-size: 14px; }
 
 .gui_size_handle { cursor: col-resize; box-shadow: 0 0 1px #000 inset;}
 .gui_size_handle:hover { box-shadow: 0 0 2px #000 inset;}
@@ -316,6 +321,8 @@ padding: 5px 4px;
 .show_folder .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
 .show_folder .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
 
+/*#content .folder .*/
+
 #content .folder {
 border-top: 1px solid #777;
 padding: 2px 6px;
@@ -324,7 +331,7 @@ margin: 2px;
 #content .folder div {
 float: right;
 padding: 2px 6px;
-margin: 0px 10px;
+margin: 0px 4px;
 font-size: 14px;
 }
 #content .folder .thumbnail {
@@ -463,13 +470,11 @@ box-shadow: 0 0 4px #000 inset;
 
 /* ====================================================================== */
 /* ==================== WINDOWS: ======================================== */
-.dailies { color: #000; }
-.dailies div { margin: 4px; border-radius: 4px;}
-.dailies .label { float: left;}
-.dailies div .param, .dailies div div { margin: 4px 8px; padding: 3px 6px;}
+.dailies .label { float: left; width: 100px;  text-align: right; }
+.dailies div div { margin: 4px 8px; padding: 3px 6px; border-radius: 4px;}
 .dailies div .param, .dailies .rules { box-shadow: 0 0 4px #000 inset;}
 .dailies div .param { background: #DDD;}
-.dailies .rules { padding: 12px; }
+.dailies .rules { padding: 12px;  border-radius: 6px;}
 
 .administrate { color: #000000; }
 .administrate .button { float: left; }
