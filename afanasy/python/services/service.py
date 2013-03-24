@@ -122,6 +122,8 @@ class service:
          os.unlink(self.taskInfo['thumbnail_tmp_filepath'])
    
    def doPost(self):
+      errorMessage = ""
       print("Doing post process")
       self.generatethumbnail()
+      return errorMessage
 

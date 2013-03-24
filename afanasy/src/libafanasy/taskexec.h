@@ -6,6 +6,7 @@
 #include "addresseslist.h"
 #include "render.h"
 #include "msgclasses/mctaskup.h"
+#include "blockdata.h"
 
 namespace af
 {
@@ -51,6 +52,16 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
+   enum BlockFlags{
+      FNumeric          = 1 << 0,
+      FVarCapacity      = 1 << 1,
+      FMultiHost        = 1 << 2,
+      FMasterOnSlave    = 1 << 3,
+      FDependSubTask    = 1 << 4,
+      FNonSequential    = 1 << 5,
+      FDoPost           = 1 << 6
+   };
+
    inline const std::string & getName()        const { return m_name;       }///< Get task name.
    inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
    inline const std::string & getParserType()  const { return m_parser; }///< Get task parser type.
@@ -74,6 +85,7 @@ public:
    inline bool hasWDir()    const { return m_working_directory.size();    } ///< Whether working directory exists.
    inline bool hasEnv()     const { return m_environment.size();     } ///< Whether extra environment.
    inline bool hasFiles()   const { return m_files.size();   } ///< Whether files exist.
+   inline bool doPost()     const { return m_block_flags & FDoPost; }
 
    inline const std::string & getCommand()  const { return m_command; } ///< Get command.
    inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
