@@ -95,6 +95,9 @@ class Block:
 		self.data["frames_per_task"] = pertask
 		self.data["frames_inc"] = increment
 
+	def setFlags(self, flags):
+		self.data['flags'] = flags
+
 	def setCapacity( self, capacity):
 		if capacity > 0:
 			self.data["capacity"] = capacity
@@ -156,6 +159,8 @@ class Block:
 	def setNeedProperties(   self, value):
 		if checkRegExp(value): self.data["need_properties"] = value
 
+	def setDoPost( self, value = True ): self.data["do_post"] = value
+	
 	def setMultiHost( self, h_min, h_max, h_max_wait, master_on_slave = False, service = None, service_wait = -1):
 		if h_min < 1:
 			print('Error: Block::setMultiHost: Minimum must be greater then zero.')

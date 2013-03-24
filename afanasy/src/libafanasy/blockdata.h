@@ -85,6 +85,8 @@ public:
 	inline bool isNonSequential() const { return m_flags & FNonSequential; }
 	inline void setNonSequential( bool i_value ) { if(i_value) m_flags |= FNonSequential; else m_flags &= (~FNonSequential);}
 
+	inline void setDoPost( bool i_value ) { if(i_value) m_flags |= FDoPost; else m_flags &= (~FDoPost);}
+
 	inline void setParserCoeff( int value ) { m_parser_coeff = value; }
 
 	inline void setName(  const std::string & str) {  m_name        = str;   }
@@ -159,6 +161,7 @@ public:
 	inline void setErrorsForgiveTime(     int value) { m_errors_forgive_time  = value; }
 
 	bool setNumeric( long long start, long long end, long long perTask = 1, long long increment = 1);
+	bool setFlags( unsigned int flags);
 	void setFramesPerTask( long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string & getName()         const { return m_name;                }  ///< Get name.

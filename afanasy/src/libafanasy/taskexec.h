@@ -35,6 +35,7 @@ public:
 
          int numjob,
          int numblock,
+         unsigned int blockflags,
          int num,
 
          int ParserCoeff = 1,
@@ -56,6 +57,7 @@ public:
    inline int getParserCoeff()            const { return m_parser_coeff;}///< Get parser koeff.
    inline int getJobId()    const { return m_job_id;      }///< Get task job id.
    inline int getBlockNum() const { return m_block_num;   }///< Get task block number.
+   inline unsigned int getBlockFlags() const { return m_block_flags; }///< Get block flags
    inline int getTaskNum()  const { return m_task_num;    }///< Get task number in block.
    inline int getNumber()   const { return m_number;     }///< Get task number (aux).
 
@@ -177,6 +179,7 @@ private:
 
 	int32_t m_job_id;         ///< Job id number.
 	int32_t m_block_num;      ///< Block number.
+	uint32_t m_block_flags;   ///< Block type flags.
 	int32_t m_task_num;       ///< Task number in block.
 	int32_t m_number;         ///< Task number (aux).
 
