@@ -159,6 +159,8 @@ class Block:
 	def setNeedProperties(   self, value):
 		if checkRegExp(value): self.data["need_properties"] = value
 
+	def setGenThumbnails(self, value = True): self.data["gen_thumbnails"] = value;
+	
 	def setDoPost( self, value = True ): self.data["do_post"] = value
 	
 	def setMultiHost( self, h_min, h_max, h_max_wait, master_on_slave = False, service = None, service_wait = -1):
