@@ -337,12 +337,14 @@ void TaskProcess::sendTaskSate()
     int percent        = 0;
     int frame          = 0;
     int percentframe   = 0;
+	std::string activity = "";
 
     if( m_parser)
     {
         percent        = m_parser->getPercent();
         frame          = m_parser->getFrame();
         percentframe   = m_parser->getPercentFrame();
+		activity       = m_parser->getActivity();
     }
 
     af::MCTaskUp taskup(
@@ -357,6 +359,7 @@ void TaskProcess::sendTaskSate()
                      percent,
                      frame,
                      percentframe,
+						activity,
 
                      stdout_size,
                      stdout_data
@@ -417,17 +420,12 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
     }
     else
     {
-
-		if (m_taskexec->doPost()) {
-		   std::string errMsg;
-		   errMsg = m_service.doPost();
-           if( errMsg.empty())
-               m_update_status = af::TaskExec::UPFinishedSuccess;
-           else
-               m_update_status = af::TaskExec::UPFinishedError;
-
-//	NEW_VERSION			m_update_status = af::TaskExec::UPFinishedFailedPost;
-		}
+		std::string errMsg;
+		errMsg = m_service.doPost();
+		if( errMsg.empty())
+			m_update_status = af::TaskExec::UPFinishedSuccess;
+		else
+			m_update_status = af::TaskExec::UPFinishedFailedPost;
     }
 }
 

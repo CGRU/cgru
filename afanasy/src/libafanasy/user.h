@@ -111,8 +111,5 @@ private:
 private:
    void construct();
    void readwrite( Msg * msg);   ///< Read or write user in buffer.
-
-// DEPRECATED:
-   float DEPRECATED;                   ///< User need for hosts.
 };
 }

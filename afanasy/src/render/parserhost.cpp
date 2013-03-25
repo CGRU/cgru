@@ -8,11 +8,11 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const int ParserHost::DataSizeMax   = 1 << 20;
-const int ParserHost::DataSizeHalf  = ParserHost::DataSizeMax  >> 1;
-const int ParserHost::DataSizeShift = ParserHost::DataSizeHalf >> 1;
+const int ParserHost::ms_DataSizeMax   = 1 << 20;
+const int ParserHost::ms_DataSizeHalf  = ParserHost::ms_DataSizeMax  >> 1;
+const int ParserHost::ms_DataSizeShift = ParserHost::ms_DataSizeHalf >> 1;
 
-const char* ParserHost::overload_string =
+const char* ParserHost::ms_overload_string =
 "\n\n\n\
 	###########################################################   \n\
 	###   Maximum size reached. Output middle trunctated.   ###   \n\
@@ -20,44 +20,44 @@ const char* ParserHost::overload_string =
 \n\n\n";
 
 ParserHost::ParserHost( const std::string & task_type, int num_frames):
-	parser( NULL),
-	type( task_type),
-	numframes( num_frames),
-	percent( 0),
-	frame( 0),
-	percentframe( 0),
-	error( false),
-	warning( false),
-	badresult( false),
-	finishedsuccess( false),
-	data( NULL),
-	datasize( 0),
-	overload( false)
+	m_parser( NULL),
+	m_type( task_type),
+	m_numframes( num_frames),
+	m_percent( 0),
+	m_frame( 0),
+	m_percentframe( 0),
+	m_error( false),
+	m_warning( false),
+	m_badresult( false),
+	m_finishedsuccess( false),
+	m_data( NULL),
+	m_datasize( 0),
+	m_overload( false)
 {
-	data = new char[DataSizeMax];
-	overload_string_length = int(strlen(overload_string)+1);
+	m_data = new char[ms_DataSizeMax];
+	m_overload_string_length = int(strlen(ms_overload_string)+1);
 
-	if( data == NULL )
+	if( m_data == NULL )
 	{
 		printf( "ParserHost::ParserHost(): Can`t allocate memory for data.");
 		return;
 	}
 
-	if( false == type.empty())
+	if( false == m_type.empty())
 	{
-		parser = new af::Parser( type, numframes);
-		if( parser->isInitialized() == false)
+		m_parser = new af::Parser( m_type, m_numframes);
+		if( m_parser->isInitialized() == false)
 		{
-			delete parser;
-			parser = NULL;
+			delete m_parser;
+			m_parser = NULL;
 		}
 	}
 }
 
 ParserHost::~ParserHost()
 {
-	if( parser != NULL) delete parser;
-	if( data   != NULL) delete [] data;
+	if( m_parser != NULL) delete m_parser;
+	if( m_data   != NULL) delete [] m_data;
 }
 
 void ParserHost::read( std::string & output)
@@ -75,35 +75,35 @@ printf("\"");for(int c=0;c<out_size;c++)if(out_data[c]>=32)printf("%c", out_data
 //printf("\nParser::read: size = %d ( datasize = %d )\n", size, datasize);
 	const char * copy_data = out_data;
 	int          copy_size = out_size;
-	if( (datasize+output.size()) > DataSizeMax )
+	if( (m_datasize+output.size()) > ms_DataSizeMax )
 	{
 //printf("(datasize+size) > DataSizeMax : (%d+%d)>%d\n", datasize, size, DataSizeMax);
-		if( datasize < DataSizeHalf )
+		if( m_datasize < ms_DataSizeHalf )
 		{
-			memcpy( data+datasize, out_data, DataSizeHalf-datasize);
-			copy_data = out_data + DataSizeHalf - datasize ;
-			copy_size = out_size - ( DataSizeHalf - datasize);
-			datasize = DataSizeHalf;
+			memcpy( m_data+m_datasize, out_data, ms_DataSizeHalf-m_datasize);
+			copy_data = out_data + ms_DataSizeHalf - m_datasize ;
+			copy_size = out_size - ( ms_DataSizeHalf - m_datasize);
+			m_datasize = ms_DataSizeHalf;
 		}
 
-		int sizeShift = DataSizeShift;
-		if( datasize+copy_size-sizeShift > DataSizeMax ) sizeShift = datasize + copy_size - DataSizeMax;
+		int sizeShift = ms_DataSizeShift;
+		if( m_datasize+copy_size-sizeShift > ms_DataSizeMax ) sizeShift = m_datasize + copy_size - ms_DataSizeMax;
 //printf("sizeShift=%d\n", sizeShift);
-		if( sizeShift < datasize-DataSizeHalf ) shiftData( sizeShift);
+		if( sizeShift < m_datasize-ms_DataSizeHalf ) shiftData( sizeShift);
 		else
 		{
-			copy_data = out_data + copy_size - DataSizeHalf;
-			copy_size = DataSizeHalf;
-			datasize  = DataSizeHalf;
+			copy_data = out_data + copy_size - ms_DataSizeHalf;
+			copy_size = ms_DataSizeHalf;
+			m_datasize  = ms_DataSizeHalf;
 //printf("sizeShift >= datasize-DataSizeHalf ( %d >= %d-%d )\n", sizeShift, datasize, DataSizeHalf);
 		}
-		if( overload == false ) setOverload();
+		if( m_overload == false ) setOverload();
 	}
 
 //printf("memcpy: datasize=%d, copysize=%d, size=%d\n", datasize, copy_size, size);
 
-	memcpy( data+datasize, copy_data, copy_size);
-	datasize += copy_size;
+	memcpy( m_data+m_datasize, copy_data, copy_size);
+	m_datasize += copy_size;
 
 /*#ifdef AFOUTPUT
 fflush( stdout);
@@ -126,34 +126,36 @@ bool ParserHost::shiftData( int shift)
 		return false;
 	}
 	if( shift == 0 ) return true;
-	memcpy( data+DataSizeHalf, data+DataSizeHalf+shift, datasize-DataSizeHalf-shift);
-	datasize -= shift;
+	memcpy( m_data+ms_DataSizeHalf, m_data+ms_DataSizeHalf+shift, m_datasize-ms_DataSizeHalf-shift);
+	m_datasize -= shift;
 	return true;
 }
 
 void ParserHost::setOverload()
 {
-	strcpy( data+DataSizeHalf-overload_string_length, overload_string);
-	overload = true;
+	strcpy( m_data+ms_DataSizeHalf-m_overload_string_length, ms_overload_string);
+	m_overload = true;
 }
 
 void ParserHost::parse( std::string & output)
 {
-	if( parser )
+	if( m_parser )
 	{
 		bool _warning         = false;
 		bool _error           = false;
 		bool _badresult       = false;
 		bool _finishedsuccess = false;
-		parser->parse( output, percent, frame, percentframe, _warning, _error, _badresult, _finishedsuccess);
-		if ( _error           ) error           = true;
-		if ( _warning         ) warning         = true;
-		if ( _badresult       ) badresult       = true;
-		if ( _finishedsuccess ) finishedsuccess = true;
-#ifdef AFOUTPUT
-		printf("PERCENT: %d%%", percent);
-		printf("; FRAME: %d", frame);
-		printf("; PERCENTFRAME: %d%%", percentframe);
+
+		m_parser->parse( output, m_percent, m_frame, m_percentframe, m_activity, _warning, _error, _badresult, _finishedsuccess);
+
+		if ( _error           ) m_error           = true;
+		if ( _warning         ) m_warning         = true;
+		if ( _badresult       ) m_badresult       = true;
+		if ( _finishedsuccess ) m_finishedsuccess = true;
+#ifdef AFOUTPUds
+		printf("PERCENT: %d%%", m_percent);
+		printf("; FRAME: %d", m_frame);
+		printf("; PERCENTFRAME: %d%%", m_percentframe);
 		if( _error           ) printf("; ERROR");
 		if( _warning         ) printf("; WARNING");
 		if( _badresult       ) printf("; BAD RESULT");

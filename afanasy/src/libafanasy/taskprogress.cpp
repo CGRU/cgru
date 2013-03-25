@@ -38,6 +38,7 @@ void TaskProgress::readwrite( Msg * msg)
    rw_int64_t ( time_start,   msg);
    rw_int64_t ( time_done,    msg);
    rw_String  ( hostname,     msg);
+	rw_String  ( activity,     msg);
 }
 
 void TaskProgress::jsonWrite( std::ostringstream & o_str) const
@@ -52,6 +53,7 @@ void TaskProgress::jsonWrite( std::ostringstream & o_str) const
 	if( time_start   > 0 ) o_str << ",\"tst\":" << time_start;
 	if( time_done    > 0 ) o_str << ",\"tdn\":" << time_done;
 	if( hostname.size()  ) o_str << ",\"hst\":\"" << hostname << "\"";
+	if( activity.size()  ) o_str << ",\"act\":\"" << activity << "\"";
 	o_str << "}";
 }
 

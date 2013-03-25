@@ -14,38 +14,39 @@ public:
 
 	void read( std::string & output);
 
-	inline int getPercent()        const { return percent;         }
-	inline int getFrame()          const { return frame;           }
-	inline int getPercentFrame()   const { return percentframe;    }
-	inline int hasWarning()        const { return warning;         }
-	inline int hasError()          const { return error;           }
-	inline int isBadResult()       const { return badresult;       }
-	inline int isFinishedSuccess() const { return finishedsuccess; }
-
-	inline char* getData( int *size ) const { *size = datasize; return data;}
+	inline int getPercent()           const { return m_percent;         }
+	inline int getFrame()             const { return m_frame;           }
+	inline int getPercentFrame()      const { return m_percentframe;    }
+	inline std::string getActivity()  const { return m_activity;        }
+	inline int hasWarning()           const { return m_warning;         }
+	inline int hasError()             const { return m_error;           }
+	inline int isBadResult()          const { return m_badresult;       }
+	inline int isFinishedSuccess()    const { return m_finishedsuccess; }
+	inline char* getData( int *size ) const { *size = m_datasize; return m_data;}
 
 private:
-	af::Parser * parser;
+	af::Parser * m_parser;
 
-	std::string type;
-	int numframes;
+	std::string m_type;
+	int m_numframes;
 
-	int  percent;
-	int  frame;
-	int  percentframe;
-	bool error;
-	bool warning;
-	bool badresult;
-	bool finishedsuccess;
+	int  m_percent;
+	int  m_frame;
+	int  m_percentframe;
+	bool m_error;
+	bool m_warning;
+	bool m_badresult;
+	bool m_finishedsuccess;
+	std::string m_activity;
 
-	char*              data;
-	int                datasize;
-	static const int   DataSizeMax;
-	static const int   DataSizeHalf;
-	static const int   DataSizeShift;
-	bool               overload;
-	static const char* overload_string;
-	int                overload_string_length;
+	char*              m_data;
+	int                m_datasize;
+	static const int   ms_DataSizeMax;
+	static const int   ms_DataSizeHalf;
+	static const int   ms_DataSizeShift;
+	bool               m_overload;
+	static const char* ms_overload_string;
+	int                m_overload_string_length;
 
 private:
 	void setOverload();

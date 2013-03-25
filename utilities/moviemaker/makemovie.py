@@ -591,7 +591,8 @@ else:
       os.mkdir( TmpDir, 0o777)
    if len(cmd_precomp):
       n = 0
-      print('Precomositing...')
+      print('ACTIVITY: Precomp')
+      sys.stdout.flush()
       for cmd in cmd_precomp:
          print( name_precomp[n])
          os.system( cmd)
@@ -599,7 +600,8 @@ else:
       print('')
    if need_convert:
       n = 0
-      print('Converting...')
+      print('ACTIVITY: Convert')
+      sys.stdout.flush()
       for cmd in cmd_convert:
          print( name_convert[n])
 #         print(cmd)
@@ -614,6 +616,8 @@ else:
          print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
          sys.stdout.flush()
       print('')
+   print('ACTIVITY: Encode')
+   sys.stdout.flush()
    os.system( cmd_encode)
    if not Debug:
       if os.path.isdir( TmpDir):

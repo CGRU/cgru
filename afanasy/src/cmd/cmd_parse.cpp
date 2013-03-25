@@ -46,16 +46,18 @@ bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
 		int percent          = 0;
 		int frame            = 0;
 		int percentframe     = 0;
+		std::string activity = "";
 		bool error           = false;
 		bool warning         = false;
 		bool badresult       = false;
 		bool finishedsuccess = false;
 		std::string output( buffer, size);
-		if( parser.parse( output, percent, frame, percentframe, error, warning, badresult, finishedsuccess))
+		if( parser.parse( output, percent, frame, percentframe, activity, error, warning, badresult, finishedsuccess))
 		{
 			printf("PERCENT: %d%%", percent);
 			printf("; FRAME: %d", frame);
 			printf("; PERCENTFRAME: %d%%", percentframe);
+			printf("; ACTIVITY: %s", activity.c_str());
 			if( error           ) printf("; ERROR");
 			if( warning         ) printf("; WARNING");
 			if( badresult       ) printf("; BAD RESULT");

@@ -43,6 +43,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().c_str(), block->
    progress->frame = -1;
    progress->percentframe = -1;
    progress->hostname.clear();
+	progress->activity.clear();
 
 	// Skip starting task if executable is not set (multihost task)
 	if( exec == NULL) return;
@@ -114,6 +115,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       progress->percent      = taskup.getPercent();
       progress->frame        = taskup.getFrame();
       progress->percentframe = taskup.getPercentFrame();
+		if( taskup.getActivity().size() > 0 ) progress->activity = taskup.getActivity();
       task->monitor( monitoring );
    case af::TaskExec::UPStarted:
    case af::TaskExec::UPNULL:
@@ -266,6 +268,7 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
 
    stopTime = 0;
    progress->state = progress->state & (~AFJOB::STATE_RUNNING_MASK);
+	progress->activity.clear();
 
    if((hostId != 0) && exec)
    {

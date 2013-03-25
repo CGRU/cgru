@@ -99,6 +99,7 @@ public:
 /**/TMonitorUpdateId/**/,           ///< Update Monitor with given id ( No information for updating Monitor needed).
 /**/TMonitorsListRequest/**/,       ///< Request online Monitors list.
 /**/TMonitorDeregister/**/,         ///< Deregister monitor with given id.
+/**/TMonitorLogRequestId/**/,       ///< Request a log of a Monitor with given id.
 
 /*- Render messages -*/
 /** When Server successfully registered new Render it's send back it's id.**/
@@ -138,7 +139,7 @@ TRESERVED04,
 TRESERVED05,
 TRESERVED06,
 TRESERVED07,
-/**/TMonitorLogRequestId/**/,       ///< Request a log of a Monitor with given id.
+TRESERVED08,
 TRESERVED09,
 
 /*---------------------------------------------------------------------------------------------------------*/
@@ -148,6 +149,8 @@ TRESERVED09,
 
 /**/TDATA/**/,                      ///< Some data.
 /**/TTESTDATA/**/,                  ///< Test some data transfer.
+/**/THTTP/**/,                      ///< HTTP - with JSON POST data
+/**/TJSON/**/,                      ///< JSON
 /**/TString/**/,                    ///< String message.
 /**/TStringList/**/,                ///< Strings list message.
 
@@ -234,6 +237,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRenderAnnotate/**/,            ///< Set Render annotation,
 /**/TRenderExit/**/,                ///< Ask server to shutdown client application(s),
 /**/TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
+/**/TRenderHideShow/**/,			///< Hide or show renders.
 
 
 /*- Users messages -*/
@@ -289,6 +293,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TJobCmdPost/**/,                ///< Set job post command.
 /**/TJobAnnotate/**/,               ///< Set Job annotation,
 /**/TJobSetUser/**/,                ///< Change job owner.
+/**/TJobHideShow/**/,				///< Hide or show jobs.
 /**/TJob/**/,                       ///< Job (all job data).
 
 /**/TBlockDependMask/**/,           ///< Set block depend mask.
@@ -321,6 +326,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TBlockNeedPower/**/,            ///< Set block render power need.
 /**/TBlockNeedHDD/**/,              ///< Set block render hdd need.
 /**/TBlockNeedProperties/**/,       ///< Set block render properties need.
+/**/TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
 /**/TBlocksProgress/**/,            ///< Blocks running progress data.
 /**/TBlocksProperties/**/,          ///< Blocks progress and properties data.
 /**/TBlocks/**/,                    ///< Blocks data.
@@ -343,11 +349,11 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRESERVED12/**/,
 /**/TRESERVED13/**/,
 /**/TRESERVED14/**/,
-/**/THTTP/**/,                      ///< HTTP - with JSON POST data
-/**/TJSON/**/,                      ///< JSON
-/**/TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
-/**/TRenderHideShow/**/,			///< Hide or show renders.
-/**/TJobHideShow/**/,				///< Hide or show jobs.
+/**/TRESERVED15/**/,
+/**/TRESERVED16/**/,
+/**/TRESERVED17/**/,
+/**/TRESERVED18/**/,
+/**/TRESERVED19/**/,
 
 /**/TLAST/**/                       ///< The last type number.
 };

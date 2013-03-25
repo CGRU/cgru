@@ -13,6 +13,7 @@ class parser:
 		self.percent = 0
 		self.frame = 0
 		self.percentframe = 0
+		self.activity = ''
 		self.error = False
 		self.warning = False
 		self.badresult = False
@@ -24,7 +25,8 @@ class parser:
 	def parse( self, data):
 		
 		if not isinstance( data, str): data = str( data,'utf-8')
-		
+
+		self.activity = ''
 		self.warning = False
 		self.error = False
 		self.badresult = False
@@ -38,7 +40,7 @@ class parser:
 		except:
 			print('Error parsing output:')
 			print( str(sys.exc_info()[1]))
-		return result, self.percent, self.frame, self.percentframe, self.warning, self.error, self.badresult, self.finishedsuccess
+		return result, self.percent, self.frame, self.percentframe, self.warning, self.error, self.badresult, self.finishedsuccess, self.activity
 
 	def calculate( self):
 		if self.frame < 0: self.frame = 0

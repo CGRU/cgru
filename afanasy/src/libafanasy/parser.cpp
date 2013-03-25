@@ -31,7 +31,7 @@ Parser::~Parser()
 }
 
 bool Parser::parse(  std::string & data,
-							int & percent, int & frame, int & percentframe,
+							int & percent, int & frame, int & percentframe, std::string & activity,
 							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
 {
 	bool result = false;
@@ -39,12 +39,13 @@ bool Parser::parse(  std::string & data,
 
 	PyObject * pArgs = PyTuple_New( 1);
 	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( data.data(), data.size()));
+
 	PyObject * pTuple = PyObject_CallObject( PyObj_FuncParse, pArgs);
 	if( pTuple != NULL)
 	{
 		if( PyTuple_Check( pTuple))
 		{
-			if( PyTuple_Size( pTuple) == 8)
+			if( PyTuple_Size( pTuple) == 9)
 			{
 				percent           = PyLong_AsLong(   PyTuple_GetItem( pTuple, 1));
 				frame             = PyLong_AsLong(   PyTuple_GetItem( pTuple, 2));
@@ -53,24 +54,36 @@ bool Parser::parse(  std::string & data,
 				error             = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
 				badresult         = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
 				finishedsuccess   = PyObject_IsTrue( PyTuple_GetItem( pTuple, 7));
-				PyObject * output = PyTuple_GetItem( pTuple, 0);
-				if( output == NULL)
+
+				PyObject * pActivity = PyTuple_GetItem( pTuple, 8);
+				if( pActivity == NULL)
 				{
 					if( PyErr_Occurred()) PyErr_Print();
 				}
-				else if( output == Py_None)
+				else
+				{
+					af::PyGetString( pActivity, activity, "Parser::parse: activity");
+//printf("Activity: %s\n", activity.c_str());
+				}
+
+				PyObject * pOutput = PyTuple_GetItem( pTuple, 0);
+				if( pOutput == NULL)
+				{
+					if( PyErr_Occurred()) PyErr_Print();
+				}
+				else if( pOutput == Py_None)
 				{
 					result = true;
 				}
 				else
 				{
-					if( af::PyGetString( output, data, "Parser::parse"))
+					if( af::PyGetString( pOutput, data, "Parser::parse: output"))
 						result = true;
 				}
 			}
 			else
 			{
-				AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 8\n", name.c_str());
+				AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 9\n", name.c_str());
 			}
 		}
 		else

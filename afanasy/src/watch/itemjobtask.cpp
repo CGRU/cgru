@@ -72,6 +72,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    if( taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK ) rightString += "Bad Result! ";
    if( taskprogress.state & AFJOB::STATE_PARSERSUCCESS_MASK   ) rightString += "Parser Success. ";
    if( false == taskprogress.hostname.empty() ) rightString += afqt::stoq( taskprogress.hostname);
+   if( false == taskprogress.activity.empty() ) rightString += QString(": ") + afqt::stoq( taskprogress.activity);
 
    if( taskprogress.state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK)) percent = 100;
    else

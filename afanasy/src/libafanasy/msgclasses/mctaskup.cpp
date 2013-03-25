@@ -13,98 +13,102 @@ using namespace af;
 
 MCTaskUp::MCTaskUp
 (
-   int ClientId,
+	int clientId,
 
-   int NumJob,
-   int NumBlock,
-   int NumTask,
-   int Number,
+	int numJob,
+	int numBlock,
+	int numTask,
+	int number,
 
-   int UpStatus,
-   int UpPercent,
-   int UpFrame,
-   int UpPercentFrame,
-   int DataLen,
-   char * Data
+	int UpStatus,
+	int UpPercent,
+	int UpFrame,
+	int UpPercentFrame,
+	std::string activity,
+	int dataLen,
+	char * data
 ):
-   clientid       ( ClientId),
+	m_clientid      ( clientId),
 
-   numjob         ( NumJob),
-   numblock       ( NumBlock),
-   numtask        ( NumTask),
-   number         ( Number),
+	m_numjob        ( numJob),
+	m_numblock      ( numBlock),
+	m_numtask       ( numTask),
+	m_number        ( number),
 
-   status         ( UpStatus),
-   percent        ( UpPercent),
-   frame          ( UpFrame),
-   percent_frame  ( UpPercentFrame),
-   datalen        ( DataLen ),
-   data           ( Data ),
-   deleteData     ( false) // Don not delete data on client side, as it is not copied
+	m_status        ( UpStatus),
+	m_percent       ( UpPercent),
+	m_frame         ( UpFrame),
+	m_percent_frame ( UpPercentFrame),
+	m_activity      ( activity),
+	m_datalen       ( dataLen ),
+	m_data          ( data ),
+	m_deleteData    ( false) // Don not delete data on client side, as it is not copied
 {
 }
 
 MCTaskUp::MCTaskUp( Msg * msg):
-   data ( NULL),
-   deleteData( true)       // Delete data on server side, as it was allocated and copied from incoming message
+	m_data ( NULL),
+	m_deleteData( true)       // Delete data on server side, as it was allocated and copied from incoming message
 {
-   read( msg);
+	read( msg);
 }
 
 MCTaskUp::~MCTaskUp()
 {
-   if( deleteData && data ) delete [] data;
+	if( m_deleteData && m_data ) delete [] m_data;
 }
 
 void MCTaskUp::readwrite( Msg * msg)
 {
-   rw_int32_t( clientid,       msg);
+	rw_int32_t( m_clientid,       msg);
 
-   rw_int32_t( numjob,         msg);
-   rw_int32_t( numblock,       msg);
-   rw_int32_t( numtask,        msg);
-   rw_int32_t( number,         msg);
+	rw_int32_t( m_numjob,         msg);
+	rw_int32_t( m_numblock,       msg);
+	rw_int32_t( m_numtask,        msg);
+	rw_int32_t( m_number,         msg);
 
-   rw_int8_t ( status,         msg);
-   rw_int8_t ( percent,        msg);
-   rw_int32_t( frame,          msg);
-   rw_int8_t ( percent_frame,  msg);
-   rw_int32_t( datalen,        msg);
+	rw_int8_t ( m_status,         msg);
+	rw_int8_t ( m_percent,        msg);
+	rw_int32_t( m_frame,          msg);
+	rw_int8_t ( m_percent_frame,  msg);
+	rw_String ( m_activity,      msg);
+	rw_int32_t( m_datalen,        msg);
 
-   if( datalen == 0 ) return;
+	if( m_datalen == 0 ) return;
 
-   if( msg->isWriting() )
-   {
-      if( data == NULL )
-      {
-         AFERROR("MCTaskUp::readwrite: data == NULL.")
-         return;
-      }
-      rw_data( data, msg, datalen);
-   }
-   else
-   {
-      data = new char[datalen];
-      if( data == NULL )
-      {
-         AFERROR("MCTaskUp::readwrite: Can't allocate memory for data.")
-         datalen = 0;
-         return;
-      }
-      rw_data( data, msg, datalen);
-   }
+	if( msg->isWriting() )
+	{
+		if( m_data == NULL )
+		{
+			AFERROR("MCTaskUp::readwrite: data == NULL.")
+			return;
+		}
+		rw_data( m_data, msg, m_datalen);
+	}
+	else
+	{
+		m_data = new char[m_datalen];
+		if( m_data == NULL )
+		{
+			AFERROR("MCTaskUp::readwrite: Can't allocate memory for data.")
+			m_datalen = 0;
+			return;
+		}
+		rw_data( m_data, msg, m_datalen);
+	}
 }
 
 void MCTaskUp::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "TaskUp: client=" << clientid
-         << ", job=" << numjob
-         << ", block=" << numblock
-         << ", task=" << numtask
-         << ", number=" << number
-         << ", datalen=" << datalen
-         << ", status=" << status
-         << ", percent=" << percent;
+	stream << "TaskUp: client=" << m_clientid
+			<< ", job="      << m_numjob
+			<< ", block="    << m_numblock
+			<< ", task="     << m_numtask
+			<< ", number="   << m_number
+			<< ", datalen="  << m_datalen
+			<< ", status="   << m_status
+			<< ", percent="  << m_percent
+			<< ", activity=" << m_activity;
 
-   if( full && datalen && data) stream << "\ndata:\n" << std::string( data, datalen) << std::endl;
+	if( full && m_datalen && m_data) stream << "\ndata:\n" << std::string( m_data, m_datalen) << std::endl;
 }

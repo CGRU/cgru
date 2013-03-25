@@ -184,8 +184,10 @@ while frame <= flast:
 	view_num = 0
 	for view in views:
 		if views_num > 1:
-			if multiview_file == False: print('Executing view "%s":' % view)
+			# 'EXECUTING VIEW: "%s"' - needed for Afanasy to parse task activity
+			if multiview_file == False: print('EXECUTING VIEW "%s":' % view)
 			else: print('Trying to execute several views in the same file.')
+			sys.stdout.flush()
 
 		# Try to execute write node:
 		try:

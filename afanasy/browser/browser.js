@@ -359,6 +359,8 @@ function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 		wnd.document.write('</head><body></body></html>');
 		wnd.document.body.onkeydown = g_OnKeyDown;
 	}
+	if( localStorage.background ) wnd.document.body.style.background = localStorage.background;
+	if( localStorage.text_color ) wnd.document.body.style.color = localStorage.text_color;
 	wnd.focus();
 
 	return wnd;

@@ -8,6 +8,7 @@
 #include "jobprogress.h"
 #include "msg.h"
 #include "taskdata.h"
+#include "taskexec.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -167,9 +168,9 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_bool("non_sequential", non_sequential, i_object, io_changes);
 	setNonSequential( non_sequential);
 
-	bool do_post = false;
-	jr_bool("do_post", do_post, i_object, io_changes);
-	setDoPost(do_post);
+	bool gen_thumbnails = false;
+	jr_bool("gen_thumbnails", gen_thumbnails, i_object, io_changes);
+	setGenTHumbnails( gen_thumbnails);
 
 	if( m_capacity < 1 )
 		m_capacity = 1;
@@ -221,7 +222,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int64 ("frame_last",      frame_last,      i_object);
 	jr_int64 ("frames_per_task", frames_per_task, i_object);
 	jr_int64 ("frames_inc",      frames_inc,      i_object);
-	jr_uint32 ("flags",          flags,           i_object);
+//	jr_uint32 ("flags",          flags,           i_object);
 	jr_int32 ("capacity_coeff_min", capacity_coeff_min, i_object);
 	jr_int32 ("capacity_coeff_max", capacity_coeff_max, i_object);
 	jr_int8  ("multihost_min",             multihost_min,             i_object);
@@ -262,7 +263,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	else if( frames_per_task != 0 )
 		m_frames_per_task = frames_per_task;
 
-	setFlags(flags);
+//	setFlags(flags);
 
 	if(( capacity_coeff_min != -1 ) || ( capacity_coeff_max != -1 ))
 		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
@@ -758,12 +759,12 @@ bool BlockData::setNumeric( long long start, long long end, long long perTask, l
 
    return true;
 }
-
+/*
 bool BlockData::setFlags (unsigned int flags) {
    m_flags = m_flags | FDoPost;
    return true;
 }
-
+*/
 bool BlockData::genNumbers( long long & start, long long & end, int num, long long * frames_num) const
 {
    start = 0;

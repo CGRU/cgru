@@ -6,7 +6,6 @@
 #include "msg.h"
 #include "name_af.h"
 #include "regexp.h"
-#include "taskexec.h"
 
 namespace af
 {
@@ -38,7 +37,7 @@ public:
 		FMasterOnSlave    = 1 << 3,
 		FDependSubTask    = 1 << 4,
 		FNonSequential    = 1 << 5,
-		FDoPost           = 1 << 6
+		FGenThumbnails    = 1 << 6
 	};
 
 	static const char DataMode_Progress[];
@@ -85,7 +84,7 @@ public:
 	inline bool isNonSequential() const { return m_flags & FNonSequential; }
 	inline void setNonSequential( bool i_value ) { if(i_value) m_flags |= FNonSequential; else m_flags &= (~FNonSequential);}
 
-	inline void setDoPost( bool i_value ) { if(i_value) m_flags |= FDoPost; else m_flags &= (~FDoPost);}
+	inline void setGenTHumbnails( bool i_value ) { if(i_value) m_flags |= FGenThumbnails; else m_flags &= (~FGenThumbnails);}
 
 	inline void setParserCoeff( int value ) { m_parser_coeff = value; }
 
@@ -161,7 +160,7 @@ public:
 	inline void setErrorsForgiveTime(     int value) { m_errors_forgive_time  = value; }
 
 	bool setNumeric( long long start, long long end, long long perTask = 1, long long increment = 1);
-	bool setFlags( unsigned int flags);
+//	bool setFlags( unsigned int flags);
 	void setFramesPerTask( long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string & getName()         const { return m_name;                }  ///< Get name.

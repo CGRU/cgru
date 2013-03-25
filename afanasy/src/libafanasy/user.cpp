@@ -44,7 +44,6 @@ void User::construct()
 {
 	m_jobs_num = 0;
 	m_running_jobs_num = 0;
-	DEPRECATED = 0.0f;
 	m_running_tasks_num = 0;
 	m_time_online = 0;
 
@@ -147,7 +146,6 @@ void User::readwrite( Msg * msg)
 	rw_int32_t ( m_jobs_num,              msg);
 	rw_int32_t ( m_running_jobs_num,      msg);
 	rw_int32_t ( m_running_tasks_num,     msg);
-	rw_float   ( DEPRECATED,              msg);
 	rw_RegExp  ( m_hosts_mask,            msg);
 	rw_RegExp  ( m_hosts_mask_exclude,    msg);
 	rw_String  ( m_annotation,            msg);

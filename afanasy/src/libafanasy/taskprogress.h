@@ -34,6 +34,7 @@ public:
 	inline bool isNotSolved() const { return false == (state & AFJOB::STATE_SOLVED_MASK); }
 
    std::string hostname;           ///< Host, last event occurs where.
+	std::string activity;			///< Task activity that was parsed.
 
    void readwrite( Msg * msg); ///< Read or write progress in buffer.
 

@@ -51,7 +51,7 @@ public:
    ~TaskExec();
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
-
+/*
    enum BlockFlags{
       FNumeric          = 1 << 0,
       FVarCapacity      = 1 << 1,
@@ -61,7 +61,7 @@ public:
       FNonSequential    = 1 << 5,
       FDoPost           = 1 << 6
    };
-
+*/
    inline const std::string & getName()        const { return m_name;       }///< Get task name.
    inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
    inline const std::string & getParserType()  const { return m_parser; }///< Get task parser type.
@@ -81,11 +81,11 @@ public:
    inline const std::string & getJobName()    const { return m_job_name;   }///< Get task job name.
    inline const std::string & getUserName()   const { return m_user_name;  }///< Get task user name.
 
-   inline bool hasCommand() const { return m_command.size(); } ///< Whether command exists.
-   inline bool hasWDir()    const { return m_working_directory.size();    } ///< Whether working directory exists.
-   inline bool hasEnv()     const { return m_environment.size();     } ///< Whether extra environment.
-   inline bool hasFiles()   const { return m_files.size();   } ///< Whether files exist.
-   inline bool doPost()     const { return m_block_flags & FDoPost; }
+   inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
+   inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
+   inline bool hasEnv()       const { return m_environment.size();     } ///< Whether extra environment.
+   inline bool hasFiles()     const { return m_files.size();   } ///< Whether files exist.
+   inline bool genTumbnails() const { return m_block_flags & BlockData::FGenThumbnails; }
 
    inline const std::string & getCommand()  const { return m_command; } ///< Get command.
    inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
@@ -124,7 +124,7 @@ public:
       UPFinishedParserError,
       UPFinishedParserBadResult,
       UPFinishedParserSuccess,
-// NEW_VERSION UPFinishedFailedPost,
+		UPFinishedFailedPost,
 
       UPRenderDeregister,
       UPRenderExit,
@@ -191,9 +191,13 @@ private:
 
 	int32_t m_job_id;         ///< Job id number.
 	int32_t m_block_num;      ///< Block number.
-	uint32_t m_block_flags;   ///< Block type flags.
 	int32_t m_task_num;       ///< Task number in block.
 	int32_t m_number;         ///< Task number (aux).
+
+	uint32_t m_block_flags;   ///< Block flags.
+	uint32_t m_job_flags;     ///< Job flags.
+	uint32_t m_user_flags;    ///< User flags.
+	uint32_t m_render_flags;  ///< Render flags.
 
 	int64_t m_frame_start;   ///< First frame.
 	int64_t m_frame_finish;  ///< Last frame.

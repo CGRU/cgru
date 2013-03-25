@@ -77,6 +77,9 @@ while frame <= frame_end:
 	time.sleep(sleepsec)
 	for p in range(100):
 		print( 'PROGRESS: ' + str(p+1)+'%')
+		if( p ) == 10: print('ACTIVITY: Generating')
+		if( p ) == 50: print('ACTIVITY: Rendering')
+		if( p ) == 90: print('ACTIVITY: Finalizing')
 		if( random.random()*100*100 < options.pkp ):
 			print( ParserKeys[parserKey_CurIndex])
 			parserKey_CurIndex += 1

@@ -73,8 +73,9 @@ TaskItem.prototype.init = function()
 	this.elTime = cm_ElCreateFloatText( this.elBody, 'right', 'Run Time');
 	this.elStarts = cm_ElCreateFloatText( this.elBody, 'right', 'Starts Count');
 	this.elErrors = cm_ElCreateFloatText( this.elBody, 'right', 'Errors Count');
-	this.elHost = cm_ElCreateFloatText( this.elBody, 'right', 'Last Running Host');
 	this.elState = cm_ElCreateFloatText( this.elBody, 'right', 'Task State');
+	this.elActivity = cm_ElCreateFloatText( this.elBody, 'right', 'Activity');
+	this.elHost = cm_ElCreateFloatText( this.elBody, 'right', 'Last Running Host');
 
 	this.params = {};
 	this.params.order = this.task_num;
@@ -98,6 +99,7 @@ TaskItem.prototype.updateProgress = function( i_progress)
 		this.params[attr] = i_progress[attr];
 
 	if( this.params.hst == null ) this.params.hst = '';
+	if( this.params.act == null ) this.params.act = '';
 	if( this.params.str == null ) this.params.str = 0;
 	if( this.params.err == null ) this.params.err = 0;
 
@@ -107,6 +109,11 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	this.elStarts.textContent = 's' + this.params.str;
 	this.elErrors.textContent = 'e' + this.params.err;
 	this.elHost.textContent = this.params.hst;
+	if( this.params.act != '' )
+		this.elActivity.textContent = ': '+this.params.act;
+	else
+		this.elActivity.textContent = '';
+//console.log( this.params.act)
 
 	if( this.params.tst )
 		if( this.params.tdn && ( this.state.RUN != true ))
