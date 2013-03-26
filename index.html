@@ -17,6 +17,7 @@
 <script type="text/javascript" src="rules/playlist.js"></script>
 <script type="text/javascript" src="rules/status.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
+<script type="text/javascript" src="rules/upload.js"></script>
 </head>
 <body onload="g_Init()">
 
@@ -173,15 +174,29 @@
 				id="playlist"></div>
 		</div>
 	</div>
+	<div id="sidepanel_upload" style="display:none;">
+		<div class="label button" onclick="up_OnClick()">Upload</div>
+		<div class="body">
+			<div style="padding-left:8px;">
+				<div class="button" id="upload_start" style="display:none;float:left;font-size:11px;padding:2px 4px"
+					onclick="up_Start()">Start</div>
+				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
+					onclick="ad_Clear()">Clear Done</div>
+			</div>
+			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;" id="upload">
+				<!--div><input type="file" id="upload_file" onchange="up_FileSelected()" style="float:left;width:100px"></input></div-->
+			</div>
+		</div>
+	</div>
 	<div id="sidepanel_permissions" style="display:none; font-size: 12px; background: rgba(200,0,0,.2);">
 		<div class="label button" onclick="ad_PermissionsOnClick()">PERMISSIONS</div>
 		<div class="body">
 			<div style="padding-left:8px;">
-				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					onclick="ad_PermissionsClearOnClick()">Clear</div>
-				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					onclick="ad_PermissionsGrpAddOnClick()">Add Group</div>
-				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					onclick="ad_PermissionsUsrAddOnClick()">Add User</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"

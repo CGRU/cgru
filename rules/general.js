@@ -38,6 +38,7 @@ function g_Init()
 		ad_Init();
 		nw_Init();
 		u_InitAuth();
+		up_Init();
 	}
 	if( config.version )
 		document.getElementById('version').innerHTML = config.version;
