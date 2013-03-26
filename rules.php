@@ -537,12 +537,19 @@ function jsf_save( $i_save, &$o_out)
 	fclose( $fHandle );
 }
 
-$recv = json_decode( $HTTP_RAW_POST_DATA, true);
-if( is_null($recv))
-	$recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
-
 $out = array();
+$recv = array();
 umask(0000);
+
+if( isset($_POST['upload_path']))
+	upload( $_POST['upload_path'], $out);
+else
+{
+	$recv = json_decode( $HTTP_RAW_POST_DATA, true);
+	if( is_null($recv))
+		$recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
+}
+
 if( array_key_exists('walkdir', $recv))
 {
 	$out['walkdir'] = array();
@@ -602,6 +609,12 @@ function jsf_initialize( $i_arg, &$o_out)
 		if( isset( $obj['title'])) $user['title'] = $obj['title'];
 		$o_out['users'][$obj['id']] = $user;
 	}
+
+	$server = array();
+	$server['upload_max_filesize'] = ini_get('upload_max_filesize');
+	$server['post_max_size'] = ini_get('post_max_size');
+	$server['memory_limit'] = ini_get('memory_limit');
+	$o_out['server'] = $server;
 
 	if( $fHandle = fopen('version.txt','r'))
 	{
@@ -1276,6 +1289,46 @@ function searchComment( &$i_args, &$i_obj)
 			if( mb_stripos( $comment['text'], $i_args, 0, 'utf-8') !== false )
 				return true;
 	return false;
+}
+
+function upload( $i_path, &$o_out)
+{
+	$o_out['path'] = $i_path;
+
+	if( false == is_dir($i_path))
+	{
+		$o_out['error'] = 'No such directory: '.$i_path;
+		return;
+	}
+
+	$o_out['files'] = array();
+
+	foreach( $_FILES as $key => $file)
+	{
+//		foreach( $file as $pname => $pval) echo $pname.' = '.$pval.'<br>';
+		if( $_FILES[$key]['error'] != UPLOAD_ERR_OK )
+		{
+			$o_out['error'] = 'Error upload: '.$key;
+			return;
+		}
+		if( false == is_uploaded_file($_FILES[$key]['tmp_name']))
+		{
+			$o_out['error'] = 'Invalid upload: '.$key;
+			return;
+		}
+
+		$path = $i_path.'/'.$_FILES[$key]['name'];
+		$path_orig = $path; $i = 1;
+		while( is_file( $path)) $path = $path_orig.'-'.$i++;
+
+		if( false == move_uploaded_file( $_FILES[$key]['tmp_name'], $path))
+		{
+			$o_out['error'] = 'Can`t save upload: '.$key;
+			return;
+		}
+
+		array_push( $o_out['files'], basename( $path));
+	}
 }
 
 ?>

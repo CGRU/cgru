@@ -140,7 +140,7 @@ function cm_Init( i_el, i_key)
 	if( i_el.m_obj == null )
 	{
 		var cm = {};
-		cm.user_name = localStorage.user_name;
+		cm.user_name = g_auth_user.id;
 		cm.ctime = (new Date()).getTime();
 		i_el.m_obj = cm;
 		i_el.m_new = true;
@@ -272,7 +272,15 @@ function cm_Cancel( i_el)
 		cm_Init( i_el);
 }
 
-function cm_NewOnClick() { cm_Edit( cm_Add()); }
+function cm_NewOnClick()
+{
+	if( g_auth_user == null )
+	{
+		c_Error('Guests can`t leave comments.');
+		return;
+	}
+	cm_Edit( cm_Add());
+}
 
 function cm_Delete( i_el)
 {
@@ -296,7 +304,7 @@ function cm_Save( i_el)
 	else
 	{
 		i_el.m_obj.mtime = (new Date()).getTime();
-		i_el.m_obj.muser_name = localStorage.user_name;
+		i_el.m_obj.muser_name = g_auth_user.id;
 	}
 
 	var cm = i_el.m_obj;
