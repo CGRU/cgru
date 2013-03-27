@@ -1,15 +1,16 @@
 d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
 d_guiparams = [];
-d_guiparams.push({"name":'input'});
-d_guiparams.push({"name":'output'});
-d_guiparams.push({"name":'filename'});
 d_guiparams.push({"name":'artist',"width":'50%'});
 d_guiparams.push({"name":'activity',"width":'25%',"lwidth":'70px'});
 d_guiparams.push({"name":'version',"width":'25%',"lwidth":'70px'});
+d_guiparams.push({"name":'input'});
+d_guiparams.push({"name":'output'});
+d_guiparams.push({"name":'filename'});
 d_guiparams.push({"name":'resolution',"width":'32%'});
 d_guiparams.push({"name":'fps',"label":'FPS',"width":'18%',"lwidth":'30px'});
 d_guiparams.push({"name":'codec',"width":'50%',"lwidth":'70px'});
+d_guiparams.push({"name":'aspect_in',"label":'Aspect In'});
 
 d_expguiparams = [];
 d_expguiparams.push({"name":'quality',"label":'Compression rate, 1 is the best quality'});
@@ -109,9 +110,10 @@ function d_Make( i_path, i_outfolder)
 		var elParam = document.createElement('div');
 		elDiv.appendChild( elParam);
 		elParam.classList.add('param');
+		elParam.classList.add('editing');
 		if( params[d_guiparams[p].name] )
 			elParam.textContent = params[d_guiparams[p].name];
-		else
+		else if( RULES.dailies[d_guiparams[p].name])
 			elParam.textContent = RULES.dailies[d_guiparams[p].name];
 		elParam.contentEditable = 'true';
 
@@ -201,6 +203,9 @@ function d_MakeCmd( i_params)
 	cmd += ' --ver "'+params.version+'"';
 	cmd += ' --artist "'+params.artist+'"';
 	cmd += ' --activity "'+params.activity+'"';
+
+	if(( params.aspect_in != null ) && ( params.aspect_in != '' ))
+		cmd += ' --aspect_in '+params.aspect_in;
 
 	cmd += ' "'+input+'"';
 	cmd += ' "'+output+'"';

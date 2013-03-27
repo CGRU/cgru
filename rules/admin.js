@@ -235,11 +235,11 @@ function ad_OpenWindow()
 	ad_WndRefresh();
 }
 
-function ad_WndDrawGroups( i_groups)
+function ad_WndDrawGroups()
 {
 	ad_wnd.elGroups.innerHTML = '';
 	ad_wnd.elGrpBnts = [];
-	for( var grp in i_groups )
+	for( var grp in g_groups )
 	{
 		var el = document.createElement('div');
 		ad_wnd.elGroups.appendChild( el);
@@ -252,7 +252,7 @@ function ad_WndDrawGroups( i_groups)
 	}
 }
 
-function ad_WndDrawUsers( i_users)
+function ad_WndDrawUsers()
 {
 	ad_wnd.elUsers.innerHTML = '';
 	ad_wnd.elUsrRows = [];
@@ -266,8 +266,8 @@ function ad_WndDrawUsers( i_users)
 
 	var row = 0;
 	ad_WndAddUser( ad_wnd.elUsers, labels, row++);
-	for( var user in i_users )
-		ad_WndAddUser( ad_wnd.elUsers, i_users[user], row++);
+	for( var user in g_users )
+		ad_WndAddUser( ad_wnd.elUsers, g_users[user], row++);
 }
 
 function ad_GetAll( i_type)
@@ -287,11 +287,9 @@ function ad_GetAll( i_type)
 	}
 	if( res[i_type] == null )
 	{
-		ad_wnd.elContent.innerHTML = 'Users are NULL.';
+		ad_wnd.elContent.innerHTML = '"'+i_type+'" are NULL.';
 		return null;
 	}
-	if( i_type == 'users' ) g_users = res[i_type];
-	else if( i_type == 'groups') g_groups = res[i_type];
 	return res[i_type];
 }
 
@@ -318,23 +316,23 @@ function ad_WndGrpOnClick( i_evt)
 function ad_WndRefresh()
 {
 	if( ad_wnd == null ) return;
-	var groups = ad_GetAll('groups');
-	if( groups == null ) return;
+	g_groups = ad_GetAll('groups');
+	if( g_groups == null ) return;
 
-	var users = ad_GetAll('users');
-	if( users == null ) return;
+	g_users = ad_GetAll('users');
+	if( g_users == null ) return;
 
-	for( var u in users )
+	for( var u in g_users )
 	{
 //window.console.log(user);
-		users[u].groups = [];
-		for( var grp in groups )
-			if( groups[grp].indexOf( users[u].id ) != -1 )
-				users[u].groups.push( grp);
+		g_users[u].groups = [];
+		for( var grp in g_groups )
+			if( g_groups[grp].indexOf( g_users[u].id ) != -1 )
+				g_users[u].groups.push( grp);
 	}
 
-	ad_WndDrawGroups( groups);
-	ad_WndDrawUsers( users);
+	ad_WndDrawGroups();
+	ad_WndDrawUsers();
 }
 
 function ad_WndAddUser( i_el, i_user, i_row)
@@ -370,7 +368,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var elTitle = document.createElement('div');
 	el.appendChild( elTitle);
-	elTitle.style.width = '150px';
+	elTitle.style.width = '200px';
 	elTitle.textContent = i_user.title;
 	elTitle.m_user_id = i_user.id;
 	elTitle.title = 'Double click edit title';

@@ -486,7 +486,7 @@ box-shadow: 0 0 4px #000 inset;
 .dailies .label { float: left; width: 100px;  text-align: right; }
 .dailies div div { margin: 4px 8px; padding: 3px 6px; border-radius: 4px;}
 .dailies div .param, .dailies .rules { box-shadow: 0 0 4px #000 inset;}
-.dailies div .param { background: #DDD;}
+/*.dailies div .param { background: #DDD;}*/
 .dailies .rules { padding: 12px;  border-radius: 6px;}
 
 .administrate { color: #000000; }

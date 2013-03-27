@@ -92,15 +92,10 @@ function up_CreateFile( i_file, i_el)
 	el.m_reader = reader;
 	el.m_file = file;
 	el.m_path = RULES.root + g_CurPath();
-	el.title = el.m_path;
-
-	var elPanel = document.createElement('div');
-	el.appendChild( elPanel);
-	el.m_elPanel = elPanel;
-	elPanel.classList.add('panel');
+	el.title = g_CurPath();
 
 	var elBtnAdd = document.createElement('div');
-	elPanel.appendChild( elBtnAdd);
+	el.appendChild( elBtnAdd);
 	el.m_elBtnAdd = elBtnAdd;
 	elBtnAdd.classList.add('button');
 	elBtnAdd.textContent = '+';
@@ -110,7 +105,7 @@ function up_CreateFile( i_file, i_el)
 	elBtnAdd.style.display = 'none';
 
 	var elBtnDel = document.createElement('div');
-	elPanel.appendChild( elBtnDel);
+	el.appendChild( elBtnDel);
 	el.m_elBtnDel = elBtnDel;
 	elBtnDel.classList.add('button');
 	elBtnDel.textContent = '-';
@@ -118,14 +113,15 @@ function up_CreateFile( i_file, i_el)
 	elBtnDel.onclick = function(e){ up_Remove( e.currentTarget.m_elFile);};
 	elBtnDel.style.cssFloat = 'right';
 
-	var elInfo = document.createElement('div');
-	elPanel.appendChild( elInfo);
+	var elInfo = document.createElement('a');
+	el.appendChild( elInfo);
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
 	elInfo.innerHTML = '<i>Processing<br>' + el.m_file.name + '</i>';
+	elInfo.href = '#' + g_CurPath();
 
 	var elProgress = document.createElement('div');
-	elPanel.appendChild( elProgress);
+	el.appendChild( elProgress);
 	elProgress.classList.add('progress');
 	elProgress.style.display = 'none';
 	el.m_elProgress = elProgress;
@@ -137,7 +133,6 @@ function up_CreateFile( i_file, i_el)
 	elProgress.appendChild( elUpInfo);
 	elUpInfo.classList.add('upinfo');
 	el.m_elUpInfo = elUpInfo;
-
 }
 
 function up_FileLoaded( e)
@@ -154,6 +149,7 @@ function up_Start( i_el)
 {
 	i_el.m_uploading = true;
 	i_el.m_elBtnAdd.style.display = 'none';
+	i_el.m_elBtnDel.style.display = 'none';
 	i_el.m_elBtnAdd.onclick = null;
 	i_el.classList.add('started');
 
@@ -216,6 +212,7 @@ function up_Finished( i_el, i_status)
 	i_el.m_upfinished = true;
 	i_el.m_elBar.style.width = '100%';
 	i_el.m_elBar.classList.add( i_status);
+	i_el.m_elBtnDel.style.display = 'block';
 }
 
 function up_Received( i_msg)
@@ -279,7 +276,8 @@ function up_Done( i_el, i_msg)
 
 function up_Remove( i_el)
 {
-	if( i_el.m_loaded !== true ) i_el.m_reader.abort();
+	if(( i_el.selected == true ) && ( i_el.m_loaded !== true ))
+		i_el.m_reader.abort();
 
 	var index = up_elFiles.indexOf( i_el);
 	if( index == -1 )
@@ -294,7 +292,6 @@ function up_Remove( i_el)
 function up_StartAll()
 {
 	for( var i = 0; i < up_elFiles.length; i++)
-		if( up_elFiles[i].m_selected == true )
 		if( up_elFiles[i].m_loaded == true )
 		if( up_elFiles[i].m_uploading !== true )
 			up_Start( up_elFiles[i]);
@@ -304,7 +301,7 @@ function up_ClearAll()
 {
 	var dels = [];
 	for( var i = 0; i < up_elFiles.length; i++)
-		if( up_elFiles[i].m_selected == true )
+		if( up_elFiles[i].m_loaded == true )
 		if(( up_elFiles[i].m_done == true ) || ( up_elFiles[i].m_uploading !== true ))
 			dels.push( up_elFiles[i]);
 
