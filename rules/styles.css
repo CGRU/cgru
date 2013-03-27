@@ -34,7 +34,7 @@ background: rgba(255,255,255,0.2);
 border-radius: 4px;
 margin: 8px 40px;
 padding: 3px 10px;
-height: 20px;
+height: 19px;
 box-shadow: 0px 0px 4px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
 }
 #footer #log {
@@ -471,11 +471,15 @@ box-shadow: 0 0 4px #000 inset;
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */
 #upload > div { border-radius: 4px; box-shadow: 0 0 3px #000 inset; margin: 1px 0px; font-size: 14px; }
-#upload .button { float: left; }
+#upload > div.started { background: rgba(200,200,0,.3); }
+#upload > div.done { background: rgba(0,150,0,.3); }
+#upload > div.error { background: rgba(150,0,0,.3); }
+#upload input { font-size: 40px; }
 #upload .info { padding: 1px 2px; }
 #upload .progress { background: rgba(0,0,0,.5); border-radius:4px; box-shadow: 0 0 4px inset; clear: both; position:relative; }
 #upload .bar { background: rgba( 0,200,0,.5); height: 16px; width: 0; left: 0px; }
 #upload .upinfo { font-size: 12px; text-align: center; position: absolute; top:0;left:0;right:0;bottom:0; }
+#upload > div.error .progress { color: #FF0000; }
 
 /* ====================================================================== */
 /* ==================== WINDOWS: ======================================== */

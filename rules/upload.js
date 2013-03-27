@@ -1,4 +1,5 @@
 up_elFiles = [];
+up_counter = 0;
 
 function up_Init()
 {
@@ -6,7 +7,7 @@ function up_Init()
 	if( localStorage.upload_opened == 'true' ) up_Open();
 	else up_Close();
 
-	up_AddEmptyFile();
+	up_CreateInput();
 }
 
 function up_Close()
@@ -36,7 +37,7 @@ function up_OnClick()
 	}
 }
 
-function up_AddEmptyFile()
+function up_InsertElement()
 {
 	var el = document.createElement('div');
 	if( up_elFiles.length )
@@ -44,33 +45,84 @@ function up_AddEmptyFile()
 	else
 		$('upload').appendChild( el);
 	up_elFiles.push( el);
+	return el;
+}
 
+
+function up_CreateInput()
+{
+	var el = up_InsertElement();
 	var elInput = document.createElement('input');
 	el.appendChild( elInput);
 	el.m_elInput = elInput;
 	elInput.type = 'file';
-	elInput.size = '7';
+	elInput.size = '99';
 	elInput.onchange = up_FileSelected;
 	elInput.m_elFile = el;
+}
+
+function up_FileSelected( e)
+{
+	var el = e.currentTarget.m_elFile;
+	var files = el.m_elInput.files;
+	el.m_elInput.style.display = 'none';
+	for( var i = 0; i < files.length; i++)
+	{
+		if( i > 0 )
+		{
+			el = up_InsertElement();
+		}
+		up_CreateFile( files[i], el );
+	}
+	up_CreateInput();
+}
+
+function up_CreateFile( i_file, i_el)
+{
+	var file = i_file;
+	var el = i_el;
+
+	var reader = new FileReader();
+	reader.m_file = file;
+	reader.onload = up_FileLoaded;
+	reader.readAsDataURL( file);
+	reader.m_elFile = el;
+
+	el.m_selected = true;
+	el.m_reader = reader;
+	el.m_file = file;
+	el.m_path = RULES.root + g_CurPath();
+	el.title = el.m_path;
 
 	var elPanel = document.createElement('div');
 	el.appendChild( elPanel);
 	el.m_elPanel = elPanel;
 	elPanel.classList.add('panel');
-	elPanel.style.display = 'none';
 
-	var elBtn = document.createElement('div');
-	elPanel.appendChild( elBtn);
-	el.m_elBtn = elBtn;
-	elBtn.classList.add('button');
-	elBtn.textContent = '+';
-	elBtn.m_elFile = el;
-	elBtn.onclick = up_FileBtnOnClick;
+	var elBtnAdd = document.createElement('div');
+	elPanel.appendChild( elBtnAdd);
+	el.m_elBtnAdd = elBtnAdd;
+	elBtnAdd.classList.add('button');
+	elBtnAdd.textContent = '+';
+	elBtnAdd.m_elFile = el;
+	elBtnAdd.onclick = function(e){ up_Start( e.currentTarget.m_elFile);};
+	elBtnAdd.style.cssFloat = 'left';
+	elBtnAdd.style.display = 'none';
+
+	var elBtnDel = document.createElement('div');
+	elPanel.appendChild( elBtnDel);
+	el.m_elBtnDel = elBtnDel;
+	elBtnDel.classList.add('button');
+	elBtnDel.textContent = '-';
+	elBtnDel.m_elFile = el;
+	elBtnDel.onclick = function(e){ up_Remove( e.currentTarget.m_elFile);};
+	elBtnDel.style.cssFloat = 'right';
 
 	var elInfo = document.createElement('div');
 	elPanel.appendChild( elInfo);
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
+	elInfo.innerHTML = '<i>Processing<br>' + el.m_file.name + '</i>';
 
 	var elProgress = document.createElement('div');
 	elPanel.appendChild( elProgress);
@@ -84,66 +136,29 @@ function up_AddEmptyFile()
 	var elUpInfo = document.createElement('div');
 	elProgress.appendChild( elUpInfo);
 	elUpInfo.classList.add('upinfo');
-//elUpInfo.textContent = 'upinfo';
 	el.m_elUpInfo = elUpInfo;
-}
 
-function up_FileSelected( e)
-{
-	var el = e.currentTarget.m_elFile;
-	var file = el.m_elInput.files[0];
-	var reader = new FileReader();
-
-	reader.m_file = file;
-	reader.onload = up_FileLoaded;
-	reader.readAsDataURL( file);
-	reader.m_elFile = el;
-	el.m_reader = reader;
-	el.m_file = file;
-	el.m_path = g_CurPath();
-	el.title = el.m_path;
 }
 
 function up_FileLoaded( e)
 {
 	var el = e.currentTarget.m_elFile;
 	var file = el.m_file;
-
-	el.m_elInput.style.display = 'none';
-	el.m_elPanel.style.display = 'block';
-
-	var info = file.name;
-	info += ' ' + c_Bytes2KMG(file.size);
-//	info += ' ' + file.type;
-	el.m_elInfo.textContent = info;
-
-	up_AddEmptyFile();
-}
-
-function up_FileBtnOnClick( e)
-{
-	var el = e.currentTarget.m_elFile;
-	if( el.m_upfinished )
-	{
-		up_Remove( el);
-	}
-	else if( el.m_uploading )
-	{
-		return;
-	}
-	else
-	{
-		el.m_elBtn.style.display = 'none';
-		up_Start( el);
-	}
+	var info = c_Bytes2KMG(file.size) + ' ' + file.name;
+	el.m_loaded = true;
+	el.m_elInfo.innerHTML = info;
+	el.m_elBtnAdd.style.display = 'block';
 }
 
 function up_Start( i_el)
 {
 	i_el.m_uploading = true;
+	i_el.m_elBtnAdd.style.display = 'none';
+	i_el.m_elBtnAdd.onclick = null;
+	i_el.classList.add('started');
 
 	var formData = new FormData();
-	formData.append('upload_path', RULES.root + '/' + i_el.m_path);
+	formData.append('upload_path', i_el.m_path);
 	formData.append('upload_file', i_el.m_file);
 
 	var xhr = new XMLHttpRequest();
@@ -162,7 +177,7 @@ function up_Start( i_el)
 		{
 			if( xhr.status == 200 )
 			{
-				c_Log('<b style="color:#404"><i>upload'+(n_recvCount++)+':</i></b> '+ xhr.responseText);
+				c_Log('<b style="color:#404"><i>upload'+(up_counter++)+':</i></b> '+ xhr.responseText);
 				up_Received( c_Parse( xhr.responseText));
 				return;
 			}
@@ -191,15 +206,13 @@ function up_Progress( e)
 	}
 }
 
-function up_Load( e) { up_Finished( e.currentTarget.m_elFile,'DONE'); }
-function up_Error( e) { up_Finished( e.currentTarget.m_elFile,'ERROR');}
-function up_Abort( e) { up_Finished( e.currentTarget.m_elFile,'ABORT');}
+function up_Load( e) { up_Finished( e.currentTarget.m_elFile,'saving'); }
+function up_Error( e) { up_Finished( e.currentTarget.m_elFile,'error');}
+function up_Abort( e) { up_Finished( e.currentTarget.m_elFile,'abort');}
 
 function up_Finished( i_el, i_status)
 {
 	i_el.m_elUpInfo.textContent = i_status;
-	i_el.m_elBtn.style.display = 'block';
-	i_el.m_elBtn.textContent = '-';
 	i_el.m_upfinished = true;
 	i_el.m_elBar.style.width = '100%';
 	i_el.m_elBar.classList.add( i_status);
@@ -212,24 +225,90 @@ function up_Received( i_msg)
 		c_Error('Upload undefined error.');
 		return;
 	}
-	if( i_msg.error )
+	if(( i_msg.files == null ) || ( i_msg.files.length == 0 ))
 	{
-		c_Error('Upload: ' + i_msg.error);
+		if( i_msg.error )
+			c_Error('Upload: ' + i_msg.error);
+		else
+			c_Error('Uploaded no files.');
 		return;
 	}
-	c_Info('File uploaded to ' + i_msg.path);
+
+	var els = [];
+	for( var f = 0; f < i_msg.files.length; f++)
+	{
+		for( var e = 0; e < up_elFiles.length; e++)
+		{
+//			if( ( up_elFiles[e].m_upfinished ) &&
+			if( ( i_msg.path == up_elFiles[e].m_path ) &&
+				( i_msg.files[f].name == up_elFiles[e].m_file.name))
+			{
+				els.push( up_elFiles[e]);
+				up_Done( up_elFiles[e], i_msg.files[f]);
+			}
+		}
+	}
+
+	if( els.length == 0 )
+	{
+		c_Error('Upload elemants not fonded.');
+		return;
+	}
+
 //console.log( JSON.stringify( i_msg));
+}
+
+function up_Done( i_el, i_msg)
+{
+	i_el.m_done = true;
+	i_el.classList.remove('started');
+
+	if( i_msg.error )
+	{
+		c_Error('Upload: ' + i_msg.error + ': file="'+i_el.m_file.name+'" path="'+i_el.m_path+'"');
+		i_el.classList.add('error');
+		i_el.m_elProgress.textContent = i_msg.error;
+	}
+	else
+	{
+		c_Info('Uploaded "'+i_el.m_file.name+'" to "' + i_el.m_path + '"');
+		i_el.m_elProgress.style.display = 'none';
+		i_el.classList.add('done');
+	}
 }
 
 function up_Remove( i_el)
 {
+	if( i_el.m_loaded !== true ) i_el.m_reader.abort();
+
 	var index = up_elFiles.indexOf( i_el);
 	if( index == -1 )
 	{
-		c_Error('up_Remove: index not founded.');
+		c_Error('Upload: Removing index not founded.');
 		return;
 	}
 	$('upload').removeChild( up_elFiles[index]);
 	up_elFiles.splice( index, 1);
+}
+
+function up_StartAll()
+{
+	for( var i = 0; i < up_elFiles.length; i++)
+		if( up_elFiles[i].m_selected == true )
+		if( up_elFiles[i].m_loaded == true )
+		if( up_elFiles[i].m_uploading !== true )
+			up_Start( up_elFiles[i]);
+}
+
+function up_ClearAll()
+{
+	var dels = [];
+	for( var i = 0; i < up_elFiles.length; i++)
+		if( up_elFiles[i].m_selected == true )
+		if(( up_elFiles[i].m_done == true ) || ( up_elFiles[i].m_uploading !== true ))
+			dels.push( up_elFiles[i]);
+
+	for( var i = 0; i < dels.length; i++)
+		up_Remove( dels[i]);
 }
 

@@ -1296,38 +1296,42 @@ function upload( $i_path, &$o_out)
 	$o_out['path'] = $i_path;
 
 	if( false == is_dir($i_path))
-	{
-		$o_out['error'] = 'No such directory: '.$i_path;
-		return;
-	}
+		$o_out['error'] = 'No such directory';
+	if( false == is_writable($i_path))
+		$o_out['error'] = 'Destination not writeable';
 
 	$o_out['files'] = array();
 
 	foreach( $_FILES as $key => $file)
 	{
-//		foreach( $file as $pname => $pval) echo $pname.' = '.$pval.'<br>';
-		if( $_FILES[$key]['error'] != UPLOAD_ERR_OK )
+		$fileObj = array();
+		$fileObj['path'] = $i_path;
+		$fileObj['name'] = $_FILES[$key]['name'];
+
+		if( isset( $o_out['error']))
 		{
-			$o_out['error'] = 'Error upload: '.$key;
-			return;
+			$fileObj['error'] = $o_out['error'];
 		}
-		if( false == is_uploaded_file($_FILES[$key]['tmp_name']))
+		else if( $_FILES[$key]['error'] != UPLOAD_ERR_OK )
 		{
-			$o_out['error'] = 'Invalid upload: '.$key;
-			return;
+			$fileObj['error'] = 'Error upload';
+		}
+		else if( false == is_uploaded_file($_FILES[$key]['tmp_name']))
+		{
+			$fileObj['error'] = 'Invalid upload';
+		}
+		else
+		{
+			$path = $i_path.'/'.$_FILES[$key]['name'];
+			$path_orig = $path; $i = 1;
+			while( is_file( $path)) $path = $path_orig.'-'.$i++;
+			if( false == move_uploaded_file( $_FILES[$key]['tmp_name'], $path))
+			{
+				$fileObj['error'] = 'Can`t save upload';
+			}
 		}
 
-		$path = $i_path.'/'.$_FILES[$key]['name'];
-		$path_orig = $path; $i = 1;
-		while( is_file( $path)) $path = $path_orig.'-'.$i++;
-
-		if( false == move_uploaded_file( $_FILES[$key]['tmp_name'], $path))
-		{
-			$o_out['error'] = 'Can`t save upload: '.$key;
-			return;
-		}
-
-		array_push( $o_out['files'], basename( $path));
+		array_push( $o_out['files'], $fileObj);
 	}
 }
 
