@@ -313,3 +313,21 @@ function c_Bytes2KMG( i_bytes)
 //console.log( i_bytes + ': ' + th + ', ' + log);
 	return (i_bytes/th).toFixed(1) + ' ' + lables[log];
 }
+
+function c_GetThumbFileName( i_file)
+{
+	var name = c_PathBase( i_file);
+	var path = c_PathDir( i_file);
+	return path + '/' + RULES.rufolder + '/thumbnail.' + name + '.jpg';
+}
+
+function c_MakeThumbnail( i_file)
+{
+	var cmd = RULES.thumbnail.create_file;
+	cmd = cmd.replace(/@INPUT@/g, i_file).replace(/@OUTPUT@/g, c_GetThumbFileName( i_file));
+	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
+}
+
+function c_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}
+function c_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));}
+

@@ -27,19 +27,23 @@
 
 "assets":{
 "project":{
-	"seek":["/"]
+	"seek":["/"],
+	"upload_dir":"_UPLOADS/@DATE@_@USER@"
 },
 "scenes":{
 	"seek":["[project]/SCENES","[project]/SHOTS"],
+	"upload_dir":"_UPLOADS/@DATE@_@USER@",
 	"name":"",
 	"thumbnails":1
 },
 "scene":{
 	"seek":["[scenes]/"],
+	"upload_dir":"_UPLOADS/@DATE@_@USER@",
 	"thumbnails":0
 },
 "shot":{
 	"seek":["[scene]/"],
+	"upload_dir":"_UPLOADS/@DATE@_@USER@",
 	"source":{
 		"path":["SOURCE/SCAN"]
 	},

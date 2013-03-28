@@ -467,6 +467,7 @@ width: 30px; height: 20px;
 border-radius: 4px;
 box-shadow: 0 0 4px #000 inset;
 }
+/*.comment .uploads { margin:6px; padding:4px; border-radius: 6px; box-shadow: 0 0 4px #000 inset; }*/
 
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */

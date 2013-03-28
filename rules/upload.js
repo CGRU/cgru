@@ -63,8 +63,16 @@ function up_CreateInput()
 
 function up_FileSelected( e)
 {
+	var path = g_CurPath();
+	if( ASSET && ASSET.upload_dir && ( ASSET.path == path ))
+	{
+		path += '/' + ASSET.upload_dir;
+		path = path.replace('@DATE@', c_DT_FormStrNow().split(' ')[0]);
+		path = path.replace('@USER@', g_auth_user.id);
+	}
 	var el = e.currentTarget.m_elFile;
 	var files = el.m_elInput.files;
+
 	el.m_elInput.style.display = 'none';
 	for( var i = 0; i < files.length; i++)
 	{
@@ -72,27 +80,28 @@ function up_FileSelected( e)
 		{
 			el = up_InsertElement();
 		}
-		up_CreateFile( files[i], el );
+		up_CreateFile( files[i], path, el );
 	}
 	up_CreateInput();
 }
 
-function up_CreateFile( i_file, i_el)
+function up_CreateFile( i_file, i_path, i_el)
 {
 	var file = i_file;
 	var el = i_el;
 
 	var reader = new FileReader();
-	reader.m_file = file;
+	reader.m_upfile = file;
 	reader.onload = up_FileLoaded;
 	reader.readAsDataURL( file);
 	reader.m_elFile = el;
 
 	el.m_selected = true;
 	el.m_reader = reader;
-	el.m_file = file;
-	el.m_path = RULES.root + g_CurPath();
-	el.title = g_CurPath();
+	el.m_upfile = file;
+	el.m_path = i_path + '/' + file.name;
+	el.m_uppath = RULES.root + i_path;
+	el.title = i_path;
 
 	var elBtnAdd = document.createElement('div');
 	el.appendChild( elBtnAdd);
@@ -117,8 +126,8 @@ function up_CreateFile( i_file, i_el)
 	el.appendChild( elInfo);
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
-	elInfo.innerHTML = '<i>Processing<br>' + el.m_file.name + '</i>';
-	elInfo.href = '#' + g_CurPath();
+	elInfo.innerHTML = '<i>Processing<br>' + el.m_upfile.name + '</i>';
+	elInfo.href = '#' + i_path;
 
 	var elProgress = document.createElement('div');
 	el.appendChild( elProgress);
@@ -138,7 +147,7 @@ function up_CreateFile( i_file, i_el)
 function up_FileLoaded( e)
 {
 	var el = e.currentTarget.m_elFile;
-	var file = el.m_file;
+	var file = el.m_upfile;
 	var info = c_Bytes2KMG(file.size) + ' ' + file.name;
 	el.m_loaded = true;
 	el.m_elInfo.innerHTML = info;
@@ -154,8 +163,8 @@ function up_Start( i_el)
 	i_el.classList.add('started');
 
 	var formData = new FormData();
-	formData.append('upload_path', i_el.m_path);
-	formData.append('upload_file', i_el.m_file);
+	formData.append('upload_path', i_el.m_uppath);
+	formData.append('upload_file', i_el.m_upfile);
 
 	var xhr = new XMLHttpRequest();
 	xhr.upload.addEventListener('progress', up_Progress, false);
@@ -237,8 +246,8 @@ function up_Received( i_msg)
 		for( var e = 0; e < up_elFiles.length; e++)
 		{
 //			if( ( up_elFiles[e].m_upfinished ) &&
-			if( ( i_msg.path == up_elFiles[e].m_path ) &&
-				( i_msg.files[f].name == up_elFiles[e].m_file.name))
+			if( ( i_msg.path == up_elFiles[e].m_uppath ) &&
+				( i_msg.files[f].name == up_elFiles[e].m_upfile.name))
 			{
 				els.push( up_elFiles[e]);
 				up_Done( up_elFiles[e], i_msg.files[f]);
@@ -262,16 +271,18 @@ function up_Done( i_el, i_msg)
 
 	if( i_msg.error )
 	{
-		c_Error('Upload: ' + i_msg.error + ': file="'+i_el.m_file.name+'" path="'+i_el.m_path+'"');
+		c_Error('Upload: ' + i_msg.error + ': file="'+i_el.m_upfile.name+'" path="'+i_el.m_uppath+'"');
 		i_el.classList.add('error');
 		i_el.m_elProgress.textContent = i_msg.error;
 	}
 	else
 	{
-		c_Info('Uploaded "'+i_el.m_file.name+'" to "' + i_el.m_path + '"');
+		c_Info('Uploaded "'+i_el.m_upfile.name+'" to "' + i_el.m_uppath + '"');
 		i_el.m_elProgress.style.display = 'none';
 		i_el.classList.add('done');
 	}
+
+	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
 }
 
 function up_Remove( i_el)

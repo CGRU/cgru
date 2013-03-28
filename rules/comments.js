@@ -111,6 +111,16 @@ function cm_Add( i_obj, i_key)
 		st_SetElColor({"color":RULES.comments[type].color}, eltp);
 	}
 
+	var elForEdit = document.createElement('div');
+	el.appendChild( elForEdit);
+	el.m_elForEdit = elForEdit;
+
+	var elUploads = document.createElement('div');
+	el.appendChild( elUploads);
+	elUploads.classList.add('uploads');
+	elUploads.style.display = 'none';
+	el.m_elUploads = elUploads;
+
 	el.m_obj = i_obj;
 	cm_Init( el, i_key);
 	return el;
@@ -118,8 +128,8 @@ function cm_Add( i_obj, i_key)
 
 function cm_Init( i_el, i_key)
 {
-	if( i_el.m_elDCtrl ) i_el.removeChild( i_el.m_elDCtrl );
-	if( i_el.m_elColor ) i_el.removeChild( i_el.m_elColor );
+	if( i_el.m_elDCtrl ) i_el.m_elForEdit.removeChild( i_el.m_elDCtrl );
+	if( i_el.m_elColor ) i_el.m_elForEdit.removeChild( i_el.m_elColor );
 	if( i_el.m_elEditPanel ) i_el.m_elPanel.removeChild( i_el.m_elEditPanel);
 
 	i_el.m_elDel.style.display = 'none';
@@ -146,7 +156,6 @@ function cm_Init( i_el, i_key)
 		i_el.m_new = true;
 	}
 
-
 	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
 	i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
 	i_el.id = i_key;
@@ -165,6 +174,20 @@ function cm_Init( i_el, i_key)
 
 	if( i_el.m_obj.text )
 		i_el.m_elText.innerHTML = i_el.m_obj.text;
+
+	if( i_el.m_obj.uploads && ( i_el.m_uploads_created != true ))
+	{
+		i_el.m_uploads_created = true;
+		i_el.m_elUploads.style.display = 'block';
+		for( var i = 0; i < i_el.m_obj.uploads.length; i++)
+		{
+			var href = i_el.m_obj.uploads[i];
+			var name = c_PathBase( href);
+			var el = document.createElement('div');
+			i_el.m_elUploads.appendChild( el);
+			u_ShowFile( el, c_PathDir( href), {"name":name});
+		}
+	}
 
 	i_el.m_color = i_el.m_obj.color;
 
@@ -210,7 +233,7 @@ function cm_Edit( i_el)
 	i_el.m_elEditPanel = u_EditPanelCreate( i_el.m_elPanel);
 
 	var elDCtrl = document.createElement('div');
-	i_el.appendChild( elDCtrl);
+	i_el.m_elForEdit.appendChild( elDCtrl);
 	elDCtrl.classList.add('edit_duration');
 	i_el.m_elDCtrl = elDCtrl;
 
@@ -236,7 +259,7 @@ function cm_Edit( i_el)
 	}
 
 	var elColor = document.createElement('div');
-	i_el.appendChild( elColor);
+	i_el.m_elForEdit.appendChild( elColor);
 	i_el.m_elColor = elColor;
 	u_DrawColorBars( elColor, cm_ColorOnclick);
 
@@ -294,6 +317,7 @@ function cm_Save( i_el)
 	i_el.m_obj.text = i_el.m_elText.innerHTML;
 	i_el.m_obj.color = i_el.m_color;
 	i_el.m_obj.type = i_el.m_type;
+	cm_ProcessUploads( i_el.m_obj);
 
 	var duration = parseFloat( i_el.m_elDrtn.textContent);
 	if( false == isNaN( duration ))
@@ -341,5 +365,22 @@ function cm_Goto( i_name )
 		return;
 	}
 	el.scrollIntoView();
+}
+
+function cm_ProcessUploads( i_obj)
+{
+	var uploads = [];
+	for( var i = 0; i < up_elFiles.length; i++)
+	{
+		var el = up_elFiles[i];
+		if( el.m_selected != true ) continue;
+		if( el.m_uploading == true ) continue;
+
+		up_Start( el);
+		uploads.push( el.m_path);
+	}
+
+	if( uploads.length )
+		i_obj.uploads = uploads;
 }
 

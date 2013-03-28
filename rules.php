@@ -1296,7 +1296,12 @@ function upload( $i_path, &$o_out)
 	$o_out['path'] = $i_path;
 
 	if( false == is_dir($i_path))
-		$o_out['error'] = 'No such directory';
+	{
+		if( false == mkdir( $i_path, 0777, true))
+		{
+			$o_out['error'] = 'Unable to create directory';
+		}
+	}
 	if( false == is_writable($i_path))
 		$o_out['error'] = 'Destination not writeable';
 
