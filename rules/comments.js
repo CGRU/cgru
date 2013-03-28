@@ -181,11 +181,16 @@ function cm_Init( i_el, i_key)
 		i_el.m_elUploads.style.display = 'block';
 		for( var i = 0; i < i_el.m_obj.uploads.length; i++)
 		{
-			var href = i_el.m_obj.uploads[i];
-			var name = c_PathBase( href);
-			var el = document.createElement('div');
-			i_el.m_elUploads.appendChild( el);
-			u_ShowFile( el, c_PathDir( href), {"name":name});
+			var file = i_el.m_obj.uploads[i];
+			var dir = c_PathDir( file);
+			var name = c_PathBase( file);
+			var el = u_ShowFile( i_el.m_elUploads, c_PathDir( file), {"name":name});
+			c_CreateOpenButton( el, dir);
+			var elLink = document.createElement('a');
+			el.appendChild( elLink);
+			elLink.textContent = dir.replace( g_CurPath(), '');
+			elLink.href = '#' + dir;
+			elLink.style.cssFloat = 'right';
 		}
 	}
 

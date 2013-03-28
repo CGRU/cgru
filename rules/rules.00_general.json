@@ -14,7 +14,9 @@
 	"back"    :{"title":"Back"},
 	"cleanup" :{"title":"CleanUp"},
 	"animatic":{"title":"Animatic"},
-	"fullcg"  :{"title":"FullCG"}
+	"fullcg"  :{"title":"FullCG"},
+	"other"   :{"title":"Other"},
+	"titles"  :{"title":"Titles"}
 },
 
 "comments":{
@@ -26,34 +28,34 @@
 },
 
 "assets":{
-"project":{
-	"seek":["/"],
-	"upload_dir":"_UPLOADS/@DATE@_@USER@"
-},
-"scenes":{
-	"seek":["[project]/SCENES","[project]/SHOTS"],
-	"upload_dir":"_UPLOADS/@DATE@_@USER@",
-	"name":"",
-	"thumbnails":1
-},
-"scene":{
-	"seek":["[scenes]/"],
-	"upload_dir":"_UPLOADS/@DATE@_@USER@",
-	"thumbnails":0
-},
-"shot":{
-	"seek":["[scene]/"],
-	"upload_dir":"_UPLOADS/@DATE@_@USER@",
-	"source":{
-		"path":["SOURCE/SCAN"]
+	"project":{
+		"seek":["/"],
+		"upload_dir":"_UPLOADS/@DATE@_@USER@"
 	},
-	"result":{
-		"path":["RESULT/DPX","RESULT/JPG"]
+	"scenes":{
+		"seek":["[project]/SCENES","[project]/SHOTS"],
+		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"name":"",
+		"thumbnails":1
 	},
-	"dailies":{
-		"path":["RESULT/DAILIES"]
+	"scene":{
+		"seek":["[scenes]/"],
+		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"thumbnails":0
+	},
+	"shot":{
+		"seek":["[scene]/"],
+		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"source":{
+			"path":["SOURCE/SCAN"]
+		},
+		"result":{
+			"path":["RESULT/DPX","RESULT/JPG"]
+		},
+		"dailies":{
+			"path":["RESULT/DAILIES"]
+		}
 	}
-}
 },
 
 "cmdexec":{"open_folder":"open \"@PATH@\""},

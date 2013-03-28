@@ -420,7 +420,7 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 	elPath.classList.add('path');
 	elPath.textContent = path;
 
-	c_CreateOpenButton( elPath, i_path);
+	c_CreateOpenButton( elPanel, i_path);
 
 	var elThumbDiv = document.createElement('div');
 	elPanel.appendChild( elThumbDiv);
