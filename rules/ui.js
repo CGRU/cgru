@@ -457,7 +457,7 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 		i_walk.folders.sort( c_CompareFiles );
 		for( var i = 0; i < i_walk.folders.length; i++)
 			if( false == u_SkipFile( i_walk.folders[i].name))
-				elFiles.push( u_ShowFolder( i_element, i_path + '/' + i_walk.folders[i].name, i_walk));
+				elFiles.push( u_ShowFolder( i_element, i_path, i_walk.folders[i], i_walk));
 	}
 
 	if( i_walk.files)
@@ -472,11 +472,10 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 	return elFiles;
 }
 
-function u_ShowFolder( i_element, i_path, i_walk)
+function u_ShowFolder( i_element, i_path, i_folder, i_walk)
 {
-	i_path = i_path.replace( /\/\//g, '/');
-	var name = i_path.split('/');
-	name = name[name.length-1];
+	var name = i_folder.name;
+	i_path = (i_path + '/' + name).replace( /\/\//g, '/');
 
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
@@ -523,6 +522,14 @@ function u_ShowFolder( i_element, i_path, i_walk)
 			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
 	}
 
+	if( i_folder.mtime != null )
+	{
+		var elMTime = document.createElement('div');
+		elFolder.appendChild( elMTime);
+		elMTime.classList.add('mtime');
+		elMTime.textContent = c_DT_FormStrFromSec( i_folder.mtime);
+	}
+
 	return elFolder;
 }
 
@@ -543,7 +550,7 @@ function u_ShowFile( i_element, i_path, i_file, i_walk)
 	elLinkA.target = '_blank';
 	elLinkA.textContent = i_file.name;
 
-	if( c_FileIsMov( i_file.name))
+	if( c_FileIsMovie( i_file.name))
 	{
 		var cmds = RULES.cmdexec.play_movie;
 		if( cmds ) for( var c = 0; c < cmds.length; c++)
@@ -574,6 +581,14 @@ function u_ShowFile( i_element, i_path, i_file, i_walk)
 		elSize.textContent = c_Bytes2KMG( i_file.size);
 	}
 
+	if( i_file.mtime != null )
+	{
+		var elMTime = document.createElement('div');
+		elFile.appendChild( elMTime);
+		elMTime.classList.add('mtime');
+		elMTime.textContent = c_DT_FormStrFromSec( i_file.mtime);
+	}
+
 	return elFile;
 }
 
@@ -595,7 +610,7 @@ function u_MakeFileThumbEl( i_el, i_path, i_walk, i_type)
 	elThumbnal.appendChild( elImg);
 	elThumbnal.m_elImg = elImg;
 //	if( i_walk && i_walk.rufiles && ( i_walk.rufiles.indexOf( thumbName) != -1))
-	if(( i_walk == null ) || ( i_walk.rufiles && ( i_walk.rufiles.indexOf( thumbName) != -1)))
+	if( c_FileCanThumbnail( i_path) && (( i_walk == null ) || ( i_walk.rufiles && ( i_walk.rufiles.indexOf( thumbName) != -1))))
 		elImg.src = thumbFile;
 	else
 		elThumbnal.style.display = 'none';
@@ -641,7 +656,7 @@ function u_FileThumbResize( i_img)
 	var w = parseInt( localStorage.thumb_file_size);
 	var h = Math.round( w * 9 / 16);
 
-	if( c_FileIsMov( i_img.parentNode.m_path ) || ( i_img.parentNode.m_type == 'folder')) w *= 3;
+	if( c_FileIsMovie( i_img.parentNode.m_path ) || ( i_img.parentNode.m_type == 'folder')) w *= 3;
 
 	if( false == crop )
 	{
@@ -721,7 +736,7 @@ function u_SearchOnClick()
 			el = document.createElement('div');
 			$('search_tags').appendChild( el);
 			el.style.cssFloat = 'left';
-			st_SetElTag( el, tag);
+			el.textContent = c_GetTagTitle( tag);
 			el.m_tag = tag;
 			el.classList.add('tag');
 			el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};

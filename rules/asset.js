@@ -310,7 +310,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 			elPath.textContent = ASSET.source.path[i];
 //console.log('flist='+JSON.stringify(flist));
 			for( var f = 0; f < flist.length; f++)
-				u_ShowFolder( elSource, paths[i]+'/'+flist[f].path, flist[f].walk);
+				u_ShowFolder( elSource, paths[i], flist[f], flist[f]);
 			founded = true;
 		}
 	}
@@ -332,7 +332,10 @@ function a_SourceWalkFind( i_walk, o_list, i_path)
 		if( path ) path += '/' + fobj.name;
 		else path = fobj.name;
 		if( fobj.files && fobj.files.length)
-			o_list.push( {"path":path,"walk":fobj});
+		{
+			fobj.name = path;
+			o_list.push( fobj);
+		}
 		a_SourceWalkFind( fobj, o_list, path);
 	}
 }

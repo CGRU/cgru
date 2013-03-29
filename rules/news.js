@@ -1,7 +1,7 @@
 nw_initialized = false;
-nw_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels','news_count'];
+nw_elements = ['subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels','news_count'];
 nw_el = {};
-nw_disabled = 0;
+//nw_disabled = 0;
 
 //	setTimeout("g_Refresh()", 1000);
 
@@ -13,15 +13,20 @@ function nw_Init()
 
 	nw_ShowCount();
 
-	nw_el.subscribe.style.display = 'block';
+	$('subscribe').style.display = 'block';
 	nw_el.sidepanel_news.style.display = 'block';
 	nw_initialized = true;
+
+	if( localStorage.news_disabled == null ) localStorage.news_disabled = 'false';
+	if( localStorage.news_ignore_own == null ) localStorage.news_ignore_own = 'false';
 
 	if( localStorage.news_opened == "true" ) nw_NewsOpen();
 	else nw_NewsClose();
 
 	nw_Finish();
 	nw_UpdateChannels();
+	nw_DisableNewsToggle( false);
+	nw_IgnoreOwnToggle( false);
 }
 
 function nw_InitConfigured()
@@ -32,20 +37,49 @@ function nw_InitConfigured()
 	setInterval( nw_NewsLoad, RULES.newsrefresh * 1000);
 }
 
-function nw_DisableNews()
+function nw_DisableNewsToggle( i_toggle)
 {
-	nw_disabled = 1 - nw_disabled;
-	if( nw_disabled )
+	if( i_toggle === true )
 	{
-		$('news_disable').innerHTML = '<b>News Disabled</b>';
-		$('news_disable').style.background = '#FF0000';
+		if( localStorage.news_disabled == 'true')
+			localStorage.news_disabled = 'false';
+		else
+			localStorage.news_disabled = 'true';
+	}
+
+	if( localStorage.news_disabled == 'true')
+	{
+		$('news_disable').textContent = 'News Disabled';
+		$('news_disable').classList.add('disabled');
 		$('news_make').style.display = 'none';
 	}
 	else
 	{
-		$('news_disable').innerHTML = 'Disable News';
-		$('news_disable').style.background = 'none';
+		$('news_disable').textContent = 'Disable News';
+		$('news_disable').classList.remove('disabled');
 		$('news_make').style.display = 'block';
+	}
+}
+
+function nw_IgnoreOwnToggle( i_toggle)
+{
+	if( i_toggle === true )
+	{
+		if( localStorage.news_ignore_own == 'true')
+			localStorage.news_ignore_own = 'false';
+		else
+			localStorage.news_ignore_own = 'true';
+	}
+
+	if( localStorage.news_ignore_own == 'true')
+	{
+		$('news_ignore_own').textContent = 'Ignoring Own';
+		$('news_ignore_own').classList.add('ignore');
+	}
+	else
+	{
+		$('news_ignore_own').textContent = 'Listening Own';
+		$('news_ignore_own').classList.remove('ignore');
 	}
 }
 
@@ -212,7 +246,7 @@ function nw_MakeNewsDialog()
 function nw_MakeNewsDialogApply( i_not_used, i_title) { nw_MakeNews( i_title); }
 function nw_MakeNews( i_title, i_path)
 {
-	if( nw_disabled ) return;
+	if( localStorage.news_disabled == 'true') return;
 //window.console.log(i_title);
 	if( g_auth_user == null ) return;
 
@@ -223,6 +257,8 @@ function nw_MakeNews( i_title, i_path)
 	news.path = i_path;
 	news.title = i_title;
 	news.id = g_auth_user.id+'_'+news.time+'_'+news.path;
+	if( localStorage.news_ignore_own == 'true' )
+		news.ignore_own = true;
 
 	var msg = c_Parse( n_Request({"makenews":news}));
 	if( msg.error )

@@ -90,14 +90,7 @@ function up_CreateFile( i_file, i_path, i_el)
 	var file = i_file;
 	var el = i_el;
 
-	var reader = new FileReader();
-	reader.m_upfile = file;
-	reader.onload = up_FileLoaded;
-	reader.readAsDataURL( file);
-	reader.m_elFile = el;
-
 	el.m_selected = true;
-	el.m_reader = reader;
 	el.m_upfile = file;
 	el.m_path = i_path + '/' + file.name;
 	el.m_uppath = RULES.root + i_path;
@@ -111,7 +104,6 @@ function up_CreateFile( i_file, i_path, i_el)
 	elBtnAdd.m_elFile = el;
 	elBtnAdd.onclick = function(e){ up_Start( e.currentTarget.m_elFile);};
 	elBtnAdd.style.cssFloat = 'left';
-	elBtnAdd.style.display = 'none';
 
 	var elBtnDel = document.createElement('div');
 	el.appendChild( elBtnDel);
@@ -126,7 +118,7 @@ function up_CreateFile( i_file, i_path, i_el)
 	el.appendChild( elInfo);
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
-	elInfo.innerHTML = '<i>Processing<br>' + el.m_upfile.name + '</i>';
+	elInfo.innerHTML = c_Bytes2KMG(file.size) + ' ' + file.name;
 	elInfo.href = '#' + i_path;
 
 	var elProgress = document.createElement('div');
@@ -142,16 +134,6 @@ function up_CreateFile( i_file, i_path, i_el)
 	elProgress.appendChild( elUpInfo);
 	elUpInfo.classList.add('upinfo');
 	el.m_elUpInfo = elUpInfo;
-}
-
-function up_FileLoaded( e)
-{
-	var el = e.currentTarget.m_elFile;
-	var file = el.m_upfile;
-	var info = c_Bytes2KMG(file.size) + ' ' + file.name;
-	el.m_loaded = true;
-	el.m_elInfo.innerHTML = info;
-	el.m_elBtnAdd.style.display = 'block';
 }
 
 function up_Start( i_el)
@@ -287,9 +269,6 @@ function up_Done( i_el, i_msg)
 
 function up_Remove( i_el)
 {
-	if(( i_el.selected == true ) && ( i_el.m_loaded !== true ))
-		i_el.m_reader.abort();
-
 	var index = up_elFiles.indexOf( i_el);
 	if( index == -1 )
 	{
@@ -303,7 +282,6 @@ function up_Remove( i_el)
 function up_StartAll()
 {
 	for( var i = 0; i < up_elFiles.length; i++)
-		if( up_elFiles[i].m_loaded == true )
 		if( up_elFiles[i].m_uploading !== true )
 			up_Start( up_elFiles[i]);
 }
@@ -312,7 +290,6 @@ function up_ClearAll()
 {
 	var dels = [];
 	for( var i = 0; i < up_elFiles.length; i++)
-		if( up_elFiles[i].m_loaded == true )
 		if(( up_elFiles[i].m_done == true ) || ( up_elFiles[i].m_uploading !== true ))
 			dels.push( up_elFiles[i]);
 

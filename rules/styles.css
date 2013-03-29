@@ -263,11 +263,16 @@ overflow-y: scroll;
 }
 #content #panel { padding: 2px;}
 #content #panel div {
+font-size: 14px;
 float: left;
 text-align: center;
-margin: 0px 8px;
-padding: 2px 8px;
+margin: 0px 2px;
+padding: 1px 8px;
 }
+
+#content #panel #subscribe .button.disabled { font-weight: bold; background: #FF0000; padding: 1px 20px; }
+#content #panel #subscribe .button.ignore { background: rgba(255,255,0,.1); }
+
 #content #content_info {
 box-shadow: 0 0 2px #000 inset;
 border-radius: 10px;
@@ -347,6 +352,8 @@ margin: 0;
 padding: 0;
 margin-bottom: -4px;
 }
+#content .folder .size { font: 12px monospace; width: 60px; text-align: right; }
+#content .folder .mtime { font: 12px monospace; }
 
 /*#body_body { border: 1px solid #000; border-radius: 4px; }*/
 #body_info { font-style: italic; font-size: 14px; }

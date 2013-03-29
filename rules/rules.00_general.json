@@ -111,7 +111,6 @@
 },
 
 "avconv":"ffmpeg",
-"movtypes":["mov","avi","mp4","mpg","mpeg"],
 "skipfiles":[".","Thumbs.db"],
 
 "fps":"24",

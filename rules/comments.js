@@ -181,16 +181,23 @@ function cm_Init( i_el, i_key)
 		i_el.m_elUploads.style.display = 'block';
 		for( var i = 0; i < i_el.m_obj.uploads.length; i++)
 		{
-			var file = i_el.m_obj.uploads[i];
-			var dir = c_PathDir( file);
-			var name = c_PathBase( file);
-			var el = u_ShowFile( i_el.m_elUploads, c_PathDir( file), {"name":name});
+			var up = i_el.m_obj.uploads[i];
+			var dir = c_PathDir( up.file);
+			var name = c_PathBase( up.file);
+			var el = u_ShowFile( i_el.m_elUploads, c_PathDir( up.file), {"name":name,"size":up.size});
 			c_CreateOpenButton( el, dir);
+
 			var elLink = document.createElement('a');
 			el.appendChild( elLink);
-			elLink.textContent = dir.replace( g_CurPath(), '');
 			elLink.href = '#' + dir;
 			elLink.style.cssFloat = 'right';
+			dir = dir.replace( g_CurPath(), '');
+			if( dir[0] == '/' ) dir = dir.substr( 1);
+			elLink.textContent = dir;
+/*
+			var elSize = document.createElement('div');
+			el.appendChild( elSize);
+			elSize.textContent = up.size;*/
 		}
 	}
 
@@ -382,7 +389,11 @@ function cm_ProcessUploads( i_obj)
 		if( el.m_uploading == true ) continue;
 
 		up_Start( el);
-		uploads.push( el.m_path);
+
+		var up = {};
+		up.file = el.m_path;
+		up.size = el.m_upfile.size;
+		uploads.push( up);
 	}
 
 	if( uploads.length )

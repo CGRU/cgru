@@ -158,6 +158,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					$fileObj = array();
 					$fileObj['name'] = $entry;
 					$fileObj['size'] = filesize( $path);
+					$fileObj['mtime'] = filemtime( $path);
 					array_push( $o_out['files'], $fileObj);
 				}
 				continue;
@@ -209,6 +210,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 			$folderObj = array();
 			$folderObj['name'] = $entry;
+			$folderObj['mtime'] = filemtime( $path);
 
 			if( $rufolder && $lookahead )
 				foreach( $lookahead as $sfile )
@@ -712,10 +714,21 @@ function jsf_makenews( $i_news, &$o_out)
 		return;
 	}
 
+	$ignore_own = false;
+	if( isset( $i_news['ignore_own']))
+	{
+		if( $i_news['ignore_own'])
+			$ignore_own = true;
+		unset( $i_news['ignore_own']);
+	}
+
 	$o_out['users'] = array();
 
 	foreach( $users as &$user )
 	{
+		if( $ignore_own && ( $UserName == $user['id']))
+			continue;
+
 		foreach( $user['channels'] as $channel )
 		{
 			if( strpos( $i_news['path'], $channel['id'] ) === 0 )
