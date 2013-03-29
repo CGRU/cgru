@@ -67,7 +67,7 @@ for i in range( len(Prefixes)):
 	if Options.copy:
 		CopyText += 'Read {\n'
 		CopyText += ' inputs 0\n'
-		CopyText += ' file %s\n' % filename
+		CopyText += ' file "%s"\n' % filename
 		CopyText += ' first %d\n' % Starts[i]
 		CopyText += ' last %d\n' % Ends[i]
 		CopyText += ' selected true\n'
