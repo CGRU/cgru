@@ -282,6 +282,7 @@ function up_Remove( i_el)
 function up_StartAll()
 {
 	for( var i = 0; i < up_elFiles.length; i++)
+		if( up_elFiles[i].m_selected == true )
 		if( up_elFiles[i].m_uploading !== true )
 			up_Start( up_elFiles[i]);
 }
@@ -290,6 +291,7 @@ function up_ClearAll()
 {
 	var dels = [];
 	for( var i = 0; i < up_elFiles.length; i++)
+		if( up_elFiles[i].m_selected == true )
 		if(( up_elFiles[i].m_done == true ) || ( up_elFiles[i].m_uploading !== true ))
 			dels.push( up_elFiles[i]);
 

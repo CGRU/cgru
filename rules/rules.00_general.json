@@ -9,6 +9,7 @@
 	"done"    :{"title":"DONE"},
 	"error"   :{"title":"ERROR"},
 	"hold"    :{"title":"HOLD"},
+	"omit"    :{"title":"OMIT"},
 	"started" :{"title":"Started"},
 	"wirem"   :{"title":"WiRem"},
 	"back"    :{"title":"Back"},
@@ -65,13 +66,13 @@
 		"open_folder":"nautilus \"@PATH@\"",
 		"play_sequence":[
 			{"name":"DJV",
-				"cmd":"djv_view @PATH@"}
+				"cmd":"djv_view \"@PATH@\""}
 		],
 		"play_movie":[
 			{"name":"VLC",
-				"cmd":"vlc @PATH@"},
+				"cmd":"vlc \"@PATH@\""},
 			{"name":"Totem",
-				"cmd":"totem @PATH@"}
+				"cmd":"totem \"@PATH@\""}
 		]
 	}
 },
@@ -81,7 +82,7 @@
 		"open_folder":"open \"@PATH@\"",
 		"play_movie":[
 			{"name":"QT",
-				"cmd":"open @PATH@"}
+				"cmd":"open \"@PATH@\""}
 		]
 	}
 },

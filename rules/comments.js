@@ -177,27 +177,27 @@ function cm_Init( i_el, i_key)
 
 	if( i_el.m_obj.uploads && ( i_el.m_uploads_created != true ))
 	{
+//console.log( JSON.stringify(i_el.m_obj.uploads));
 		i_el.m_uploads_created = true;
 		i_el.m_elUploads.style.display = 'block';
 		for( var i = 0; i < i_el.m_obj.uploads.length; i++)
 		{
 			var up = i_el.m_obj.uploads[i];
-			var dir = c_PathDir( up.file);
-			var name = c_PathBase( up.file);
-			var el = u_ShowFile( i_el.m_elUploads, c_PathDir( up.file), {"name":name,"size":up.size});
-			c_CreateOpenButton( el, dir);
+
+			var el = document.createElement('div');
+			i_el.m_elUploads.appendChild( el);
+
+			c_CreateOpenButton( el, up.path);
 
 			var elLink = document.createElement('a');
 			el.appendChild( elLink);
-			elLink.href = '#' + dir;
-			elLink.style.cssFloat = 'right';
-			dir = dir.replace( g_CurPath(), '');
+			elLink.href = '#' + up.path;
+			var dir = up.path.replace( g_CurPath(), '');
 			if( dir[0] == '/' ) dir = dir.substr( 1);
 			elLink.textContent = dir;
-/*
-			var elSize = document.createElement('div');
-			el.appendChild( elSize);
-			elSize.textContent = up.size;*/
+
+			for( var f = 0; f < up.files.length; f++)
+				u_ShowFile( el, up.path, up.files[f]);
 		}
 	}
 
@@ -319,8 +319,7 @@ function cm_NewOnClick()
 
 function cm_Delete( i_el)
 {
-	var cm = i_el.m_obj;
-	cm.deleted = true;
+	i_el.m_obj.deleted = true;
 	cm_Save( i_el);
 }
 
@@ -329,7 +328,8 @@ function cm_Save( i_el)
 	i_el.m_obj.text = i_el.m_elText.innerHTML;
 	i_el.m_obj.color = i_el.m_color;
 	i_el.m_obj.type = i_el.m_type;
-	cm_ProcessUploads( i_el.m_obj);
+	if( i_el.m_obj.deleted != true )
+		cm_ProcessUploads( i_el.m_obj);
 
 	var duration = parseFloat( i_el.m_elDrtn.textContent);
 	if( false == isNaN( duration ))
@@ -381,7 +381,7 @@ function cm_Goto( i_name )
 
 function cm_ProcessUploads( i_obj)
 {
-	var uploads = [];
+	var upfiles = [];
 	for( var i = 0; i < up_elFiles.length; i++)
 	{
 		var el = up_elFiles[i];
@@ -390,13 +390,32 @@ function cm_ProcessUploads( i_obj)
 
 		up_Start( el);
 
-		var up = {};
-		up.file = el.m_path;
-		up.size = el.m_upfile.size;
-		uploads.push( up);
+		var path = c_PathDir( el.m_path);
+		var file = {};
+		file.name = el.m_upfile.name;
+		file.size = el.m_upfile.size;
+		upfiles.push({"path":path,"file":file});
 	}
 
-	if( uploads.length )
-		i_obj.uploads = uploads;
+	if( upfiles.length == 0 ) return;
+
+	upfiles.sort( function(a,b){if(a.path<b.path)return -1;if(a.path>b.path)return 1;return 0;});
+
+	var uploads = [];
+	var u = -1;
+	for( var f = 0; f < upfiles.length; f++)
+	{
+		if(( u == -1 ) || ( upfiles[f].path != uploads[u].path ))
+		{
+			uploads.push({});
+			u++;
+			uploads[u].path = upfiles[f].path;
+			uploads[u].files = [];
+		}
+		uploads[u].files.push( upfiles[f].file);
+	}
+
+//console.log( JSON.stringify( uploads));
+	i_obj.uploads = uploads;
 }
 

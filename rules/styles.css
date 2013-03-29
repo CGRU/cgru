@@ -103,7 +103,7 @@ box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 opacity: 0.9;
 }
 #navig .folder.current .fcolor { opacity: 0.7; }
-#navig .folder .fname { position: relative; float:left; /*font-family: monospace;*/ }
+#navig .folder .fname { position: relative; float:left; }
 #navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
 #navig .folder .progress { clear: both; }
 #navig .folder .progressbar { height: 6px; }
@@ -125,7 +125,7 @@ border-radius: 4px;
 /* ========================================== */
 /* ============== GLOBALS: ================== */
 
-a { color: inherit; text-shadow: 0 0 2px rgba(0,0,255,.3);}
+a { color: inherit; text-shadow: 0 0 1px rgba(0,0,255,.4);}
 a:hover { text-shadow: 0 0 2px rgba(100,200,255,.5); }
 
 .button {
@@ -301,7 +301,7 @@ padding: 4px;
 #search .button { margin: 1px 8px; padding: 2px 8px; }
 
 #assets {
-background: rgba(100,255,255,.1);
+background: rgba(255,255,100,.1);
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
 border-radius: 12px;
 height: 30px;
@@ -315,9 +315,8 @@ border-radius: 8px;
 margin: 1px 4px;
 padding: 5px 4px;
 }
-#assets .asset:hover {box-shadow:0 0 6px rgba(0,0,0,.3) inset, 0 0 8px rgba(255,255,255,.5);/* background: rgba(200,255,255,.1);*/}
-#assets .asset .type { padding: 0px 4px; float: left; }
-#assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
+#assets .asset .type { padding: 0px 4px; float: left; text-decoration: none; }
+#assets .asset .name { padding: 0px 4px; float: left; font: bold 16px monospace;}
 
 .show_folder .panel { /*border: 1px solid #000;*/ }
 .show_folder .panel div { float: left; margin: 0px 8px; }
@@ -326,9 +325,8 @@ padding: 5px 4px;
 .show_folder .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
 .show_folder .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
 
-/*#content .folder .*/
-
 #content .folder {
+clear: both;
 border-top: 1px solid #777;
 padding: 2px 6px;
 margin: 2px;
@@ -475,7 +473,10 @@ border-radius: 4px;
 box-shadow: 0 0 4px #000 inset;
 }
 /*.comment .uploads { margin:6px; padding:4px; border-radius: 6px; box-shadow: 0 0 4px #000 inset; }*/
-/*.comment .uploads .cmdexec { float: left; }*/
+.comment .uploads > div { margin: 6px 4px; padding: 6px; border-radius: 4px; box-shadow: 0 0 2px #000 inset, 0 0 2px rgba(255,255,255,.5); }
+.comment .uploads > div > a { margin: 3px 9px; }
+.comment .uploads .cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
+/*.comment .uploads .file { border: none; border-top: none; }*/
 
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */

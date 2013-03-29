@@ -265,22 +265,23 @@ function a_ShowHeaders()
 //		if( RULES.assets[a_type].showontop === false ) continue;
 		var a_type = asset.type;
 		var a_name = asset.name;
+		var href = '#' + asset.path;
 
 		elHeader = document.createElement('div');
 		u_el.assets.appendChild( elHeader);
 		elHeader.classList.add('asset');
-		elHeader.m_path = asset.path;
-		elHeader.onclick = function(e){g_GO(e.currentTarget.m_path)};
 
-		elType = document.createElement('div');
+		elType = document.createElement('a');
 		elHeader.appendChild( elType);
 		elType.classList.add('type');
 		elType.textContent = a_type + ':';
+		elType.href = href;
 
-		elName = document.createElement('div');
+		elName = document.createElement('a');
 		elHeader.appendChild( elName);
 		elName.classList.add('name');
 		elName.textContent = a_name;
+		elName.href = href;
 	}
 }
 
