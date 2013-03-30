@@ -6,18 +6,18 @@
 "newsrefresh":60,
 
 "tags":{
-	"done"    :{"title":"DONE"},
-	"error"   :{"title":"ERROR"},
-	"hold"    :{"title":"HOLD"},
-	"omit"    :{"title":"OMIT"},
-	"started" :{"title":"Started"},
-	"wirem"   :{"title":"WiRem"},
-	"back"    :{"title":"Back"},
-	"cleanup" :{"title":"CleanUp"},
-	"animatic":{"title":"Animatic"},
-	"fullcg"  :{"title":"FullCG"},
-	"other"   :{"title":"Other"},
-	"titles"  :{"title":"Titles"}
+	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
+	"error"   :{"title":"ERROR",    "short":"Err", "tip":"Error"},
+	"hold"    :{"title":"HOLD",     "short":"Hl",  "tip":"On hold"},
+	"omit"    :{"title":"OMIT",     "short":"Om",  "tip":"Omit"},
+	"started" :{"title":"Started",  "short":"St",  "tip":"Started"},
+	"wirem"   :{"title":"WiRem",    "short":"WR",  "tip":"Wire remove"},
+	"back"    :{"title":"Back",     "short":"Bk",  "tip":"Back placement"},
+	"cleanup" :{"title":"CleanUp",  "short":"Cl",  "tip":"Cleanup"},
+	"animatic":{"title":"Animatic", "short":"An",  "tip":"Animiatic"},
+	"fullcg"  :{"title":"FullCG",   "short":"FCG", "tip":"Full CG Shot"},
+	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"},
+	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"}
 },
 
 "comments":{

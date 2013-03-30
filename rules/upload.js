@@ -59,6 +59,7 @@ function up_CreateInput()
 	elInput.size = '99';
 	elInput.onchange = up_FileSelected;
 	elInput.m_elFile = el;
+	elInput.title = 'Drag and drop files or click to browse';
 }
 
 function up_FileSelected( e)

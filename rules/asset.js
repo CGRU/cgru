@@ -690,7 +690,13 @@ function a_FileLimitAdd( i_el)
 		elLimit.classList.add('filelimit');
 
 		var text = limits[i];
-		if( text == 0 ) text = 'all';
+		if( text == 0 )
+		{
+			text = 'all';
+			elLimit.title = 'Show all items';
+		}
+		else
+			elLimit.title = 'Show last '+limits[i]+' items';
 		elLimit.textContent = text;
 
 		elLimit.m_limit = limits[i];

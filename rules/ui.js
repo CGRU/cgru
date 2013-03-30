@@ -431,18 +431,21 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 	elThumbBigger.classList.add('button');
 	elThumbBigger.textContent = '+';
 	elThumbBigger.onclick = u_FileThumbsBigger;
+	elThumbBigger.title = 'Show thumbnails bigger';
 
 	var elThumbSmaller = document.createElement('div');
 	elThumbDiv.appendChild( elThumbSmaller);
 	elThumbSmaller.classList.add('button');
 	elThumbSmaller.textContent = '-';
 	elThumbSmaller.onclick = u_FileThumbsSmaller;
+	elThumbSmaller.title = 'Show thumbnails smaller';
 
 	var elThumbCrop = document.createElement('div');
 	elThumbDiv.appendChild( elThumbCrop);
 	elThumbCrop.classList.add('button');
 	elThumbCrop.textContent = '[c]';
 	elThumbCrop.onclick = u_FileThumbsCrop;
+	elThumbCrop.title = 'Show thumbnails cropped';
 
 	var elMakeThumbnails = document.createElement('div');
 	elThumbDiv.appendChild( elMakeThumbnails);
@@ -450,6 +453,7 @@ function u_ShowDirectory( i_element, i_path, i_walk)
 	elMakeThumbnails.textContent = 'Thumbs:';
 	elMakeThumbnails.onclick = u_MakeThumbnails;
 	u_thumbnails_elMakeBtns.push( elMakeThumbnails);
+	elMakeThumbnails.title = 'Generate thumbnails';
 
 	elFiles = [];
 	if( i_walk.folders)
@@ -517,6 +521,7 @@ function u_ShowFolder( i_element, i_path, i_folder, i_walk)
 		elFolder.appendChild( elMakeDailies);
 		elMakeDailies.classList.add('button');
 		elMakeDailies.textContent = 'Dailies';
+		elMakeDailies.title = 'Make dailies';
 		elMakeDailies.m_path = i_path;
 		elMakeDailies.onclick = function(e){
 			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
@@ -569,6 +574,7 @@ function u_ShowFile( i_element, i_path, i_file, i_walk)
 		elFile.appendChild( elExplode);
 		elExplode.classList.add('button');
 		elExplode.textContent = 'Explode';
+		elExplode.title = 'Explode movie to images sequence';
 		elExplode.m_path = path;
 		elExplode.onclick = function(e){ d_Explode( e.currentTarget.m_path)};
 	}

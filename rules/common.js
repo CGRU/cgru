@@ -223,12 +223,28 @@ function c_GetUserTitle( i_uid, i_short)
 	return title;
 }
 
-function c_GetTagTitle( i_tag, i_short)
+function c_GetTagTitle( i_tag)
 {
 	var tag = i_tag;
 	if( RULES.tags[tag] && RULES.tags[tag].title )
 		tag = RULES.tags[tag].title;
-	if( i_short && (tag.length > 3))
+	return tag;
+}
+
+function c_GetTagTip( i_tag)
+{
+	var tag = i_tag;
+	if( RULES.tags[tag] && RULES.tags[tag].tip )
+		tag = RULES.tags[tag].tip;
+	return tag;
+}
+
+function c_GetTagShort( i_tag)
+{
+	var tag = i_tag;
+	if( RULES.tags[tag] && RULES.tags[tag].short )
+		tag = RULES.tags[tag].short;
+	else if( tag.length > 3 )
 		tag = tag.substr(0,3);
 	return tag;
 }

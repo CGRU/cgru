@@ -74,7 +74,7 @@ function st_SetElTags( i_status, i_elTags, i_short)
 			for( var i = 0; i < i_status.tags.length; i++)
 			{
 				if( i ) tags += ' ';
-				tags += c_GetTagTitle( i_status.tags[i], i_short);
+				tags += c_GetTagShort( i_status.tags[i]);
 			}
 		i_elTags.textContent = tags;
 		return;
@@ -92,7 +92,8 @@ function st_SetElTags( i_status, i_elTags, i_short)
 			i_elTags.appendChild( el);
 			i_elTags.m_elTags.push( el);
 			el.classList.add('tag');
-			el.textContent = c_GetTagTitle( i_status.tags[i], i_short);
+			el.textContent = c_GetTagTitle( i_status.tags[i]);
+			el.title = c_GetTagTip( i_status.tags[i]);
 		}
 }
 function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
@@ -282,6 +283,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			var el = document.createElement('div');
 			st_elTags.m_elList.appendChild( el);
 			el.textContent = c_GetTagTitle( i_status.tags[i]);
+			el.title = c_GetTagTip( i_status.tags[i]);
 			el.classList.add('tag');
 			el.classList.add('selected');
 		}
@@ -341,6 +343,7 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 			el.textContent = i_list[item].title;
 		else
 			el.textContent = item;
+		if( i_list[item].tip ) el.title = i_list[item].tip;
 		el.m_item = item;
 		if( st_status[i_stParam] && ( st_status[i_stParam].indexOf( item) != -1 ))
 		{

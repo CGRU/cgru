@@ -24,10 +24,10 @@
 <div id="navig_div">
 	<div id="navig"></div>
 	<div id="navig_panel">
-		<div class="button" id="navig_show_artists"    onclick="g_NavigShowInfo(this)">ART</div>
-		<div class="button" id="navig_show_tags"       onclick="g_NavigShowInfo(this)">TAG</div>
-		<div class="button" id="navig_show_annotation" onclick="g_NavigShowInfo(this)">ANN</div>
-		<div class="button" id="navig_show_percent"    onclick="g_NavigShowInfo(this)">%</div>
+		<div class="button" id="navig_show_artists"    title="Show artists" onclick="g_NavigShowInfo(this)">ART</div>
+		<div class="button" id="navig_show_tags"       title="Show tags" onclick="g_NavigShowInfo(this)">TAG</div>
+		<div class="button" id="navig_show_annotation" title="Show annotation" onclick="g_NavigShowInfo(this)">ANN</div>
+		<div class="button" id="navig_show_percent"    title="Show percentage" onclick="g_NavigShowInfo(this)">%</div>
 	</div>
 	<div id="navig_handle" class="gui_size_handle" onmousedown="u_ResizeGUIStart('navig_width',1)"></div>
 </div>
@@ -35,13 +35,13 @@
 <div id="content">
 	<div id="panel">
 		<div id="subscribe" style="display:none">
-			<div id="subscribe_btn" class="button" onclick="nw_Subscribe()">Subscribe</div>
+			<div id="subscribe_btn" class="button" title="Receive this location changes" onclick="nw_Subscribe()">Subscribe</div>
 			<div id="subscribe_label">Subscribed</div>
-			<div id="unsubscribe_btn" class="button" onclick="nw_Unsubscribe()">Unsubscribe</div>
-			<div id="subscribe_path"></div>
-			<div id="news_make" class="button" onclick="nw_MakeNewsDialog()">Make News</div>
-			<div id="news_disable" class="button" onclick="nw_DisableNewsToggle( true)"></div>
-			<div id="news_ignore_own" class="button" onclick="nw_IgnoreOwnToggle( true)"></div>
+			<div id="unsubscribe_btn" class="button" title="Do not receive changes from this location" onclick="nw_Unsubscribe()">Unsubscribe</div>
+			<div id="subscribe_path" title="Subscribed parent location"></div>
+			<div id="news_make" class="button" title="Create some custom news" onclick="nw_MakeNewsDialog()">Make News</div>
+			<div id="news_disable" class="button" title="If news disabled, your changes does not produce any news" onclick="nw_DisableNewsToggle( true)"></div>
+			<div id="news_ignore_own" class="button" title="If you ignoring own news, you do not receive changes performed by yourself" onclick="nw_IgnoreOwnToggle( true)"></div>
 		</div>
 		<div id="search_panel" style="float:right">
 			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
@@ -145,15 +145,15 @@
 
 <div id="sidepanel_div">
 <div id="sidepanel">
-	<div id="sidepanel_hide" class="button" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
+	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
 			<div id="news" style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"></div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;">
 				<div style="font-size:14px;">
-					<div class="button" style="float:left;padding:2px 4px;" ondblclick="nw_RemoveNews()">Clear News</div>
-					<div class="button" onclick="c_ElDisplayToggle(document.getElementById('channels'))">Channels</div>
+					<div class="button" title="Double click to clear all received news" style="float:left;padding:2px 4px;" ondblclick="nw_RemoveNews()">Clear News</div>
+					<div class="button" title="Click to open/close subsribed locations" onclick="c_ElDisplayToggle(document.getElementById('channels'))">Channels</div>
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>
@@ -180,9 +180,9 @@
 		<div class="body">
 			<div style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
-					onclick="up_StartAll()">Start</div>
+					title="Start unload all selected files" onclick="up_StartAll()">Start</div>
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
-					onclick="up_ClearAll()">Clear</div>
+					title="Remove not started and uploaded items" onclick="up_ClearAll()">Clear</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;" id="upload">
 				<!--div><input type="file" id="upload_file" onchange="up_FileSelected()" style="float:left;width:100px"></input></div-->

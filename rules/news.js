@@ -99,6 +99,7 @@ function nw_UpdateChannels()
 		elBtn.textContent = '-';
 		elBtn.m_path = nw_path;
 		elBtn.ondblclick = function(e){ nw_Unsubscribe( e.currentTarget.m_path);};
+		elBtn.title = 'Double click to remove channel';
 
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
@@ -331,6 +332,7 @@ function nw_NewsLoad()
 		elBtn.textContent = '-';
 		elBtn.m_id = news.id;
 		elBtn.ondblclick = function(e){ nw_RemoveNews( e.currentTarget.m_id);};
+		elBtn.title = 'Double click to remove link';
 
 		var elLabel = document.createElement('div');
 		el.appendChild( elLabel);
