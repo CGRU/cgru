@@ -329,12 +329,15 @@ width: 15%;
 border-radius: 2px;
 box-shadow: 0px 0px 2px #000 inset;
 }
-.wolidlesleep_bar {
-background: #00A;
+.wolidlesleep_box .wolidlesleep_bar {
+background: #000;
 opacity: .3;
 position: absolute;
 left: 0; top: 0; bottom: 0;
 border-radius: 2px;
+}
+.wolidlesleep_box.wol .wolidlesleep_bar {
+background: #00A;
 }
 /*.item.render .task {*/
 .rendertask {

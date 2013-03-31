@@ -51,9 +51,6 @@
 	"af_priority":99,
 	"af_maxrunningtasks":-1,
 
-	"af_srv_so_rcvtimeo_sec":2,
-	"af_srv_so_sndtimeo_sec":2,
- 
 "":"Job:",
 	"af_task_default_capacity":1000,
 	"af_task_update_timeout":300,
@@ -100,20 +97,21 @@
 	"af_errors_forgivetime":18000,
 	"af_user_zombietime":2,
 
-"":"Watch",
-	"af_watch_connectretries":3,
-	"af_watch_waitforconnected":8000,
-	"af_watch_waitforreadyread":8000,
-	"af_watch_waitforbyteswritten":8000,
-	"af_watch_refreshinterval":5,
-
-"":"Monitor:",
+"":"Monitor: (any gui)",
+	"af_monitor_render_idle_bar_max":3600,
 	"af_monitor_updateperiod":10,
 	"af_monitor_zombietime":40,
 	"af_monitor_connectretries":3,
 	"af_monitor_waitforconnected":8000,
 	"af_monitor_waitforreadyread":8000,
 	"af_monitor_waitforbyteswritten":8000,
+
+"":"Watch",
+	"af_watch_connectretries":3,
+	"af_watch_waitforconnected":8000,
+	"af_watch_waitforreadyread":8000,
+	"af_watch_waitforbyteswritten":8000,
+	"af_watch_refreshinterval":5,
 
 "":"Talk:",
 	"af_talk_updateperiod":5,
@@ -136,5 +134,9 @@
 	"af_sysjob_wol_service":"wakeonlan",
 	"af_sysjob_postcmd_service":"postcmd",
 
+"":"Network:",
+	"af_srv_so_rcvtimeo_sec":2,
+	"af_srv_so_sndtimeo_sec":2,
+ 
 	"":""
 }}

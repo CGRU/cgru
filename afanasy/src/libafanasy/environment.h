@@ -121,6 +121,7 @@ public:
 
     static inline int getUserZombieTime()                { return user_zombietime;              }
 
+    static inline int getMonitorRenderIdleBarMax()       { return monitor_render_idle_bar_max;  }
     static inline int getMonitorUpdatePeriod()           { return monitor_updateperiod;         }
     static inline int getMonitorConnectRetries()         { return monitor_connectretries;       }
     static inline int getMonitorWaitForConnected()       { return monitor_waitforconnected;     }
@@ -304,6 +305,7 @@ private:
 
    static int user_zombietime;
 
+	static int monitor_render_idle_bar_max;
    static int monitor_updateperiod;
    static int monitor_connectretries;
    static int monitor_waitforconnected;

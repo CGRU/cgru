@@ -86,6 +86,7 @@ std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_BLOCKSERVICE
 
 int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
 
+int     Environment::monitor_render_idle_bar_max =     AFMONITOR::RENDER_IDLE_BAR_MAX;
 int     Environment::monitor_updateperiod =            AFMONITOR::UPDATEPERIOD;
 int     Environment::monitor_connectretries =          AFMONITOR::CONNECTRETRIES;
 int     Environment::monitor_waitforconnected =        AFMONITOR::WAITFORCONNECTED;
@@ -255,6 +256,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, talk_waitforreadyread,             "af_talk_waitforreadyread"             );
 	getVar( i_obj, talk_waitforbyteswritten,          "af_talk_waitforbyteswritten"          );
 
+	getVar( i_obj, monitor_render_idle_bar_max,       "af_monitor_render_idle_bar_max"       );
 	getVar( i_obj, monitor_updateperiod,              "af_monitor_updateperiod"              );
 	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
 	getVar( i_obj, monitor_connectretries,            "af_monitor_connectretries"            );

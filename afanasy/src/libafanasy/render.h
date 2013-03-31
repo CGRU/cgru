@@ -32,11 +32,12 @@ public:
 	inline bool isOffline() const { return false == (m_state & SOnline );}///< Whether Render is offline.
 	inline bool isDirty()   const { return m_state & SDirty;}  ///< Whether Render is dirty.
 
-	inline bool isWOLFalling()   const { return m_state & SWOLFalling;  }
-	inline bool isWOLSleeping()  const { return m_state & SWOLSleeping; }
-	inline bool isWOLWaking()    const { return m_state & SWOLWaking;   }
-	inline long long getWOLTime()const { return m_wol_operation_time;   }
-	inline void setWOLFalling(   bool value) { if( value ) m_state = m_state | SWOLFalling;  else m_state = m_state & (~SWOLFalling); }
+	inline bool isWOLFalling()     const { return m_state & SWOLFalling;  }
+	inline bool isWOLSleeping()    const { return m_state & SWOLSleeping; }
+	inline bool isWOLWaking()      const { return m_state & SWOLWaking;   }
+	inline long long getWOLTime()  const { return m_wol_operation_time;   }
+	inline long long getIdleTime() const { return m_idle_time;            }
+	inline void setWOLFalling(     bool value) { if( value ) m_state = m_state | SWOLFalling;  else m_state = m_state & (~SWOLFalling); }
 	inline void setWOLSleeping(  bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
 	inline void setWOLWaking(    bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
 

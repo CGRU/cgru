@@ -264,21 +264,35 @@ RenderNode.prototype.refresh = function()
 	var stateTime = 'NEW';
 	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval( this.params.idle_time);
 	stateTimeTitle += '\nIdle CPU < ' + this.params.host.idle_cpu + '%';
-	if( this.params.host.wol_idlesleep_time )
+	if(( this.params.host.wol_idlesleep_time > 0 ) || ( cgru_Config.af_monitor_render_idle_bar_max > 0 ))
 	{
-		stateTimeTitle += '\nWOL idle sleep time: ' + cm_TimeStringFromSeconds( this.params.host.wol_idlesleep_time);
 		var curtime = new Date();
 		var seconds = curtime.valueOf() / 1000.0 - this.params.idle_time;
-		var percent = Math.round( 100.0 * seconds / this.params.host.wol_idlesleep_time );
+		if( seconds < 0 ) seconds = 0;
+		var percent = null;
+
+		if( this.params.host.wol_idlesleep_time > 0 )
+		{
+			stateTimeTitle += '\nWOL idle sleep time: ' + cm_TimeStringFromSeconds( this.params.host.wol_idlesleep_time);
+			percent = Math.round( 100.0 * seconds / this.params.host.wol_idlesleep_time );
+
+			seconds = Math.round( this.params.host.wol_idlesleep_time - seconds);
+			if( seconds > 0 )
+				this.elWOLIdleSleepBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
+			else
+				this.elWOLIdleSleepBox.title = 'WOL sleep';
+			this.elWOLIdleSleepBox.classList.add('wol');
+		}
+		else
+		{
+			stateTimeTitle += '\nIdle bar time: ' + cm_TimeStringFromSeconds( cgru_Config.af_monitor_render_idle_bar_max);
+			percent = Math.round( 100.0 * seconds / cgru_Config.af_monitor_render_idle_bar_max );
+		}
+
 		if( percent > 100 ) percent = 100;
 		if( percent <   0 ) percent = 0;
 		this.elWOLIdleSleepBox.style.display = 'block';
 		this.elWOLIdleSleepBar.style.width = percent+'%';
-		seconds = Math.round( this.params.host.wol_idlesleep_time - seconds);
-		if( seconds > 0 )
-			this.elWOLIdleSleepBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
-		else
-			this.elWOLIdleSleepBox.title = 'WOL sleep';
 	}
 	else
 		this.elWOLIdleSleepBox.style.display = 'none';

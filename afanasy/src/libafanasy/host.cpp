@@ -120,13 +120,15 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 
 void Host::readwrite( Msg * msg)
 {
-	rw_int32_t( m_max_tasks,     msg);
-	rw_int32_t( m_capacity,     msg);
-	rw_int32_t( m_power,        msg);
-	rw_String ( m_os,           msg);
-	rw_String ( m_properties,   msg);
-	rw_String ( m_resources,    msg);
-	rw_String ( m_data,         msg);
+	rw_int32_t( m_max_tasks,          msg );
+	rw_int32_t( m_capacity,           msg );
+	rw_int32_t( m_idle_cpu,           msg );
+	rw_int32_t( m_wol_idlesleep_time, msg );
+	rw_int32_t( m_power,              msg );
+	rw_String ( m_os,                 msg );
+	rw_String ( m_properties,         msg );
+	rw_String ( m_resources,          msg );
+	rw_String ( m_data,               msg );
 }
 
 void Host::generateInfoStream( std::ostringstream & stream, bool full) const

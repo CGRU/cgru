@@ -144,6 +144,7 @@ namespace AFTALK
 /// Monitor options:
 namespace AFMONITOR
 {
+    const int RENDER_IDLE_BAR_MAX = 3600;     ///< Seconds - idle bar "width"
     const int UPDATEPERIOD        = 10;       ///< Update status period ( seconds).
     const int MAXCOUNT            = 100000;   ///< Maximum allowed online Monitors.
     const int CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.

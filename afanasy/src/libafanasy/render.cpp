@@ -170,6 +170,7 @@ void Render::readwrite( Msg * msg)
    case Msg::TRenderUpdate:
    case Msg::TRendersResources:
 
+		rw_int64_t( m_idle_time, msg);
 	  m_hres.readwrite( msg);
 
       break;
