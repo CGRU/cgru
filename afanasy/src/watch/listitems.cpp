@@ -203,16 +203,16 @@ void ListItems::currentItemChanged( const QModelIndex & current, const QModelInd
 		displayInfo( qVariantValue<Item*>( current.data())->getSelectString());
 }
 
-void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_numeric) const
+void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted) const
 {
 	std::ostringstream str;
 
 	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
 
 	str << "\n\"" << i_name << "\":";
-	if( i_numeric != true ) str << "\"";
+	if( i_quoted ) str << "\"";
 	str << i_value;
-	if( i_numeric != true ) str << "\"";
+	if( i_quoted ) str << "\"";
 
 	af::jsonActionParamsFinish( str);
 

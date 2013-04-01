@@ -87,14 +87,17 @@ CmdRenderNimby::CmdRenderNimby()
 	setArgsCount(1);
 	setInfo("Set render nimby.");
 	setHelp("rnimby [name] Set render to nimby state.");
-	setMsgType( af::Msg::TRenderSetNimby);
+	setMsgType( af::Msg::TJSON);
 }
 CmdRenderNimby::~CmdRenderNimby(){}
 bool CmdRenderNimby::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string name = argv[0];
-	af::MCGeneral mcgeneral( name, 0);
-	msg.set( getMsgType(), &mcgeneral);
+
+	af::jsonActionParamsStart( m_str, "renders", name);
+	m_str << "\n\"nimby\":true";
+	af::jsonActionParamsFinish( m_str);
+
 	return true;
 }
 
@@ -104,14 +107,17 @@ CmdRenderNIMBY::CmdRenderNIMBY()
 	setArgsCount(1);
 	setInfo("Set render NIMBY.");
 	setHelp("rNIMBY [name] Set render to NIMBY state.");
-	setMsgType( af::Msg::TRenderSetNIMBY);
+	setMsgType( af::Msg::TJSON);
 }
 CmdRenderNIMBY::~CmdRenderNIMBY(){}
 bool CmdRenderNIMBY::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string name = argv[0];
-	af::MCGeneral mcgeneral( name, 0);
-	msg.set( getMsgType(), &mcgeneral);
+
+	af::jsonActionParamsStart( m_str, "renders", name);
+	m_str << "\n\"NIMBY\":true";
+	af::jsonActionParamsFinish( m_str);
+
 	return true;
 }
 
@@ -142,14 +148,17 @@ CmdRenderFree::CmdRenderFree()
 	setArgsCount(1);
 	setInfo("Set render free.");
 	setHelp("rfree [name] Set render free - unset nimby and NIMBY state.");
-	setMsgType( af::Msg::TRenderSetFree);
+	setMsgType( af::Msg::TJSON);
 }
 CmdRenderFree::~CmdRenderFree(){}
 bool CmdRenderFree::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string name = argv[0];
-	af::MCGeneral mcgeneral( name, 0);
-	msg.set( getMsgType(), &mcgeneral);
+
+	af::jsonActionParamsStart( m_str, "renders", name);
+	m_str << "\n\"nimby\":false";
+	af::jsonActionParamsFinish( m_str);
+
 	return true;
 }
 

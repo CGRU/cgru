@@ -226,10 +226,10 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/__TO_DELETE__TRenderSetMaxTasks/**/,         ///< Set Render maximum tasks,
 /**/TRenderSetService/**/,          ///< Enable or disable Render service,
 /**/TRenderRestoreDefaults/**/,     ///< Restore default Render settings,
-/**/TRenderSetNIMBY/**/,            ///< Set Render NIMBY,
+/**/__TO_DELETE__TRenderSetNIMBY/**/,            ///< Set Render NIMBY,
 /**/__TO_DELETE__TRenderSetUser/**/,             ///< Set Render user,
-/**/TRenderSetNimby/**/,            ///< Set Render nimby,
-/**/TRenderSetFree/**/,             ///< Set Render free,
+/**/__TO_DELETE__TRenderSetNimby/**/,            ///< Set Render nimby,
+/**/__TO_DELETE__TRenderSetFree/**/,             ///< Set Render free,
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
 /**/TRenderEjectTasks/**/,          ///< Stop all tasks on Render,
@@ -242,7 +242,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/__TO_DELETE__TRenderAnnotate/**/,            ///< Set Render annotation,
 /**/TRenderExit/**/,                ///< Ask server to shutdown client application(s),
 /**/TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
-/**/TRenderHideShow/**/,			///< Hide or show renders.
+/**/__TO_DELETE__TRenderHideShow/**/,			///< Hide or show renders.
 
 
 /*- Users messages -*/

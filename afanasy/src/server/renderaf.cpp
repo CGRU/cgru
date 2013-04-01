@@ -326,7 +326,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
 		break;
 	}*/
-	case af::Msg::TRenderHideShow:
+/*	case af::Msg::TRenderHideShow:
 	{
 		if( isHidden() == mcgeneral.getNumber())
 			return true;
@@ -337,7 +337,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 			appendLog("Unset hidden by " + userhost);
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_flags);
 		break;
-	}
+	}*/
 /*	case af::Msg::TRenderSetCapacity:
 	{
 		appendLog( std::string("Capacity set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
@@ -372,7 +372,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
 		break;
 	}
-	case af::Msg::TRenderSetNIMBY:
+/*	case af::Msg::TRenderSetNIMBY:
 	{
 		appendLog( std::string("NIMBY set by ") + userhost_string);
 		setNIMBY();
@@ -392,7 +392,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 		setFree();
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
 		break;
-	}
+	}*/
 	case af::Msg::TRenderEjectTasks:
 	{
 		if( isBusy() == false ) return true;

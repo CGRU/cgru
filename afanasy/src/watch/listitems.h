@@ -50,8 +50,8 @@ protected:
 	void action( af::MCGeneral & mcgeneral, int type);
 
 	inline void setParameter( const std::string & i_name, long long i_value) const
-		{ setParameter( i_name, af::itos( i_value), true);}
-	void setParameter( const std::string & i_name, const std::string & i_value, bool i_numeric = false) const;
+		{ setParameter( i_name, af::itos( i_value), false);}
+	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
 
 	void deleteItems( af::MCGeneral & ids);
 

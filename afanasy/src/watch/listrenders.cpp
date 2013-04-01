@@ -480,17 +480,17 @@ void ListRenders::actMaxTasks()
 void ListRenders::actNIMBY()
 {
 	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderSetNIMBY);
+	setParameter("NIMBY", "true", false);
 }
 void ListRenders::actNimby()
 {
 	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderSetNimby);
+	setParameter("nimby", "true", false);
 }
 void ListRenders::actFree()
 {
 	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderSetFree);
+	setParameter("nimby", "false", false);
 }
 void ListRenders::actUser()
 {
@@ -552,7 +552,7 @@ void ListRenders::actSetHidden()
 {
 	af::MCGeneral mcgeneral;
 	mcgeneral.setNumber(1);
-	action( mcgeneral, af::Msg::TRenderHideShow);
+	setParameter("hidden", "true", false);
 	displayInfo("Hide render.");
 }
 
@@ -560,7 +560,7 @@ void ListRenders::actUnsetHidden()
 {
 	af::MCGeneral mcgeneral;
 	mcgeneral.setNumber(0);
-	action( mcgeneral, af::Msg::TRenderHideShow);
+	setParameter("hidden", "false", false);
 	displayInfo("Unhide render.");
 }
 
