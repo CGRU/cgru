@@ -14,7 +14,7 @@ CmdSrvCapacity::CmdSrvCapacity()
    setHelp("srvcap [servicename] [command] [capacity]");
 }
 CmdSrvCapacity::~CmdSrvCapacity(){}
-bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdSrvCapacity::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    Py_InitializeEx(0);
 
@@ -50,7 +50,7 @@ CmdSrvHosts::CmdSrvHosts()
    setHelp("srvcap [servicename] [command] [hosts1 host2 ...]");
 }
 CmdSrvHosts::~CmdSrvHosts(){}
-bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdSrvHosts::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    Py_InitializeEx(0);
 

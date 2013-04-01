@@ -21,9 +21,9 @@ protected:
 
    void doubleClicked( Item * item);
 
-   void shownFunc();
+   void v_shownFunc();
 
-   void connectionLost();
+   void v_connectionLost();
 
    void resetSorting();
 

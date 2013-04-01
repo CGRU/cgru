@@ -478,13 +478,13 @@ void AfContainer::action( AfNodeSrv * node, const af::MCGeneral & mcgeneral, int
       AFCommon::QueueLogError( std::string("Unknown  action: ") + af::Msg::TNAMES[type]);
       return;
    }
-   switch( type)
+/*   switch( type)
    {
       case af::Msg::TRenderSetPriority:
       case af::Msg::TJobPriority:
       case af::Msg::TUserPriority:
          sortPriority( node);
-   }
+   }*/
 }
 
 void AfContainer::sortPriority( AfNodeSrv * i_node)

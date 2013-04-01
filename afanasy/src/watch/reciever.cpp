@@ -16,5 +16,5 @@ Reciever::~Reciever()
    Watch::removeReciever( this);
 }
 
-void Reciever::connectionLost(){}
-void Reciever::connectionEstablished(){}
+void Reciever::v_connectionLost(){}
+void Reciever::v_connectionEstablished(){}

@@ -8,28 +8,28 @@
 #include "../include/macrooutput.h"
 
 Cmd::Cmd():
-   msgtype( 0),
-   msgouttype( 0),
-   argscount( 0),
-   recieving( false)
+   m_msgtype( 0),
+   m_msgouttype( 0),
+   m_argscount( 0),
+   m_recieving( false)
 {
 }
 
 Cmd::~Cmd(){}
 
-void Cmd::printInfo() const
+void Cmd::v_printInfo() const
 {
-   std::cout << " \t" << cmd;
-   if( msgtype ) std::cout << " \t- Msg::" << af::Msg::TNAMES[msgtype];
-   std::cout << " \t" << info;
-   if( recieving ) std::cout << " [" << af::Msg::TNAMES[msgouttype] << "]";
+   std::cout << " \t" << m_cmd;
+   if( m_msgtype ) std::cout << " \t- Msg::" << af::Msg::TNAMES[m_msgtype];
+   std::cout << " \t" << m_info;
+   if( m_recieving ) std::cout << " [" << af::Msg::TNAMES[m_msgouttype] << "]";
    std::cout << std::endl;
 }
 
-void Cmd::printHelp() const
+void Cmd::v_printHelp() const
 {
-   printInfo();
-   if( false == help.empty() ) std::cout << help << std::endl;
+   v_printInfo();
+   if( false == m_help.empty() ) std::cout << m_help << std::endl;
 }
 
-void Cmd::msgOut( af::Msg& msg) {}
+void Cmd::v_msgOut( af::Msg& msg) {}

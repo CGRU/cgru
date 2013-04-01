@@ -16,8 +16,8 @@
 
 uint32_t ListNodes::ms_flagsHideShow = e_HideHidden;
 
-ListNodes::ListNodes( QWidget* parent, int RequestMsgType):
-   ListItems( parent, RequestMsgType),
+ListNodes::ListNodes( QWidget* parent, const std::string & type, int RequestMsgType):
+   ListItems( parent, type, RequestMsgType),
    ctrl( NULL),
    sorting( false),
    sortascending( false),
@@ -36,13 +36,13 @@ bool ListNodes::init( bool createModelView)
 {
    if( createModelView)
    {
-      model = new ModelNodes(this);
-      view = new ViewItems( this);
-      view->setModel( model);
+      m_model = new ModelNodes(this);
+      m_view = new ViewItems( this);
+      m_view->setModel( m_model);
 
-      if( ctrl ) layout->addWidget( ctrl);
-      layout->addWidget( view);
-      layout->addWidget( infoline);
+      if( ctrl ) m_layout->addWidget( ctrl);
+      m_layout->addWidget( m_view);
+      m_layout->addWidget( m_infoline);
    }
 
    if( ListItems::init( false) == false) return false;
@@ -68,7 +68,7 @@ void ListNodes::initSortFilterCtrl()
 
 bool ListNodes::updateItems( af::Msg * msg)
 {
-   QMutexLocker lock( &mutex);
+   QMutexLocker lock( &m_mutex);
 
    af::MCAfNodes mcNodes( msg);
    std::vector<af::Af*> * list = mcNodes.getList();
@@ -88,9 +88,9 @@ bool ListNodes::updateItems( af::Msg * msg)
    // store items need to be resorted
    QList<ItemNode*> itemsToSort;
 
-   for( int i = 0; i < model->count(); i++)
+   for( int i = 0; i < m_model->count(); i++)
    {
-      ItemNode * itemnode = (ItemNode*)(model->item(i));
+      ItemNode * itemnode = (ItemNode*)(m_model->item(i));
 //printf("ListNodes::updateItems: loonking for '%s':\n", itemnode->getName().toUtf8().data());
       for( int j = 0; j < quantity; j++)
       {
@@ -117,7 +117,7 @@ bool ListNodes::updateItems( af::Msg * msg)
             itemnode->updateValues(  node, msg->type());
 
             // check for item new geometry height
-            if( oldheight != itemnode->getHeight()) view->emitSizeHintChanged( model->index(i));
+            if( oldheight != itemnode->getHeight()) m_view->emitSizeHintChanged( m_model->index(i));
 
 				// process show/hide node if we are not going to sort all of them
 				if( itemsToSort.size() == 0 )
@@ -144,14 +144,14 @@ bool ListNodes::updateItems( af::Msg * msg)
    if( itemsToSort.size() > 0 )
    {
       QList<Item*> selectedItems = getSelectedItems();
-      ((ModelNodes*)model)->sortnodes( itemsToSort, sortascending);
+      ((ModelNodes*)m_model)->sortnodes( itemsToSort, sortascending);
       setSelectedItems( selectedItems);
    }
-   else if( firstChangedRow != -1 ) model->emit_dataChanged( firstChangedRow, lastChangedRow);
+   else if( firstChangedRow != -1 ) m_model->emit_dataChanged( firstChangedRow, lastChangedRow);
 
 //
 // close widgets with zero (non-existing) ids
-   model->deleteZeroItems();
+   m_model->deleteZeroItems();
 
 //
 // adding new items
@@ -160,9 +160,9 @@ bool ListNodes::updateItems( af::Msg * msg)
    {
       af::Node * node = (af::Node*)((*list)[j]);
       bool exists = false;
-      for( int i = 0; i < model->count(); i++)
+      for( int i = 0; i < m_model->count(); i++)
       {
-         Item * item = model->item(i);
+         Item * item = m_model->item(i);
          int cur_id = item->getId();
          if( node->getId() == cur_id)
          {
@@ -178,9 +178,9 @@ bool ListNodes::updateItems( af::Msg * msg)
       if ( sorting )
       {
          new_item->setSortType( ctrl->getSortType());
-         row = ((ModelNodes*)model)->addNodeSorted( new_item, sortascending);
+         row = ((ModelNodes*)m_model)->addNodeSorted( new_item, sortascending);
       }
-      else row = ((ModelNodes*)model)->addNode( new_item);
+      else row = ((ModelNodes*)m_model)->addNode( new_item);
 
 		if( filtering )
 			new_item->setFilterType( ctrl->getFilterType() );
@@ -210,7 +210,7 @@ void ListNodes::sort()
 //printf("ListNodes::sort:\n");
    if( sorting == false ) return;
    QList<Item*> selectedItems( getSelectedItems());
-   ((ModelNodes*)model)->sortnodes( sortascending);
+   ((ModelNodes*)m_model)->sortnodes( sortascending);
    setSelectedItems( selectedItems);
 
 	if( filtering ) filter();
@@ -232,7 +232,7 @@ bool ListNodes::setFilter( const QString & str)
 
 void ListNodes::filter()
 {
-   for( int i = 0; i < model->count(); i++) processHidden((ItemNode*)(model->item(i)), i);
+   for( int i = 0; i < m_model->count(); i++) processHidden((ItemNode*)(m_model->item(i)), i);
 }
 
 void ListNodes::processHidden( ItemNode * i_item, int i_row)
@@ -257,15 +257,15 @@ void ListNodes::processHidden( ItemNode * i_item, int i_row)
 	if( hidden == false )
 		hidden = i_item->getHidden( ms_flagsHideShow);
 
-	if( hidden != view->isRowHidden( i_row))
-		view->setRowHidden( i_row , hidden);
+	if( hidden != m_view->isRowHidden( i_row))
+		m_view->setRowHidden( i_row , hidden);
 
 //if(hidden)printf("Hidding node '%s'\n", i_item->getName().toUtf8().data()); else printf("Showing node '%s'\n", i_item->getName().toUtf8().data());
 }
 
 void ListNodes::sortTypeChanged()
 {
-   for( int i = 0; i < model->count(); i++) ((ItemNode*)(model->item(i)))->setSortType( ctrl->getSortType());
+   for( int i = 0; i < m_model->count(); i++) ((ItemNode*)(m_model->item(i)))->setSortType( ctrl->getSortType());
 
    if((ctrl->getSortType() == CtrlSortFilter::TNONE) || (ctrl->getSortType() >= CtrlSortFilter::TLAST))
    {
@@ -297,8 +297,8 @@ void ListNodes::filterChanged()
 
 void ListNodes::filterTypeChanged()
 {
-	for( int i = 0; i < model->count(); i++)
-		((ItemNode*)(model->item(i)))->setFilterType( ctrl->getFilterType());
+	for( int i = 0; i < m_model->count(); i++)
+		((ItemNode*)(m_model->item(i)))->setFilterType( ctrl->getFilterType());
 
    if((ctrl->getFilterType() == CtrlSortFilter::TNONE) || (ctrl->getFilterType() >= CtrlSortFilter::TLAST))
    {
@@ -327,6 +327,6 @@ void ListNodes::actHideShow( int i_type )
 void ListNodes::sortMatch( const std::vector<int32_t> & i_list)
 {
    QList<Item*> selectedItems( getSelectedItems());
-   ((ModelNodes*)model)->sortMatch( i_list);
+   ((ModelNodes*)m_model)->sortMatch( i_list);
    setSelectedItems( selectedItems);
 }

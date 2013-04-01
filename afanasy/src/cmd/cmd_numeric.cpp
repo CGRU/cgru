@@ -18,7 +18,7 @@ CmdNumeric::CmdNumeric()
 
 CmdNumeric::~CmdNumeric(){}
 
-bool CmdNumeric::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string command = argv[0];
    int number1 = atoi(argv[1]);
@@ -39,7 +39,7 @@ CmdNumericGen::CmdNumericGen()
 
 CmdNumericGen::~CmdNumericGen(){}
 
-bool CmdNumericGen::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdNumericGen::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	int quantity = atoi(argv[0]);
 	if( quantity < 1 )
@@ -86,7 +86,7 @@ CmdNumericCmd::CmdNumericCmd()
 
 CmdNumericCmd::~CmdNumericCmd(){}
 
-bool CmdNumericCmd::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdNumericCmd::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string command = argv[0];
    long long start = af::stoi(argv[1]);
@@ -125,7 +125,7 @@ CmdNumericCalcTask::CmdNumericCalcTask()
 
 CmdNumericCalcTask::~CmdNumericCalcTask(){}
 
-bool CmdNumericCalcTask::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdNumericCalcTask::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    long long start = af::stoi(argv[0]);
    long long end   = af::stoi(argv[1]);

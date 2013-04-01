@@ -31,27 +31,27 @@ const QString Watch::BtnName[WLAST] = { "NULL","JOBS","USERS","RENDERS","T","M"}
 const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Talks","Monitors"};
 WndList* Watch::opened[WLAST] = {0,0,0,0,0,0};
 
-QLinkedList<Wnd*>      Watch::windows;
-QLinkedList<Reciever*> Watch::recievers;
-QLinkedList<int>       Watch::listenjobids;
-QLinkedList<int>       Watch::watchtasksjobids;
-QLinkedList<QWidget*>  Watch::watchtaskswindows;
+QLinkedList<Wnd*>      Watch::ms_windows;
+QLinkedList<Reciever*> Watch::ms_recievers;
+QLinkedList<int>       Watch::ms_listenjobids;
+QLinkedList<int>       Watch::ms_watchtasksjobids;
+QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
 
-QStringList Watch::previewcmds;
-QStringList Watch::rendercmds;
+QStringList Watch::ms_previewcmds;
+QStringList Watch::ms_rendercmds;
 
-QMap<QString, QPixmap *> Watch::services_icons_large;
-QMap<QString, QPixmap *> Watch::services_icons_small;
+QMap<QString, QPixmap *> Watch::ms_services_icons_large;
+QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 
-QApplication * Watch::app = NULL;
-Dialog * Watch::d = NULL;
-MonitorHost * Watch::m = NULL;
+QApplication * Watch::ms_app = NULL;
+Dialog * Watch::ms_d = NULL;
+MonitorHost * Watch::ms_m = NULL;
 
 Watch::Watch( Dialog * pDialog, QApplication * pApplication)
 {
-   app = pApplication;
-   d = pDialog;
-   m = d->getMonitor();
+   ms_app = pApplication;
+   ms_d = pDialog;
+   ms_m = ms_d->getMonitor();
 
 // Get services icons:
    QDir dir( afqt::stoq( af::Environment::getCGRULocation()) + "/icons/software");
@@ -61,71 +61,71 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    for( int i = 0; i < files.size(); i++)
    {
       if( false == files[i].isFile()) continue;
-      if( services_icons_large.contains( files[i].completeBaseName()) || services_icons_small.contains( files[i].completeBaseName())) continue;
+      if( ms_services_icons_large.contains( files[i].completeBaseName()) || ms_services_icons_small.contains( files[i].completeBaseName())) continue;
       QPixmap icon( files[i].filePath());
       if( icon.isNull())
       {
          AFERRAR("Invalid service icon:\n%s", files[i].filePath().toUtf8().data())
          continue;
       }
-      services_icons_large[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::Height,        Qt::SmoothTransformation));
-      services_icons_small[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::HeightCompact, Qt::SmoothTransformation));
+      ms_services_icons_large[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::Height,        Qt::SmoothTransformation));
+      ms_services_icons_small[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::HeightCompact, Qt::SmoothTransformation));
    }
 }
 
 Watch::~Watch()
 {
 // Delete services icons:
-   for( QMap<QString, QPixmap *>::iterator it = services_icons_large.begin(); it != services_icons_large.end(); it++) delete *it;
-   for( QMap<QString, QPixmap *>::iterator it = services_icons_small.begin(); it != services_icons_small.end(); it++) delete *it;
+   for( QMap<QString, QPixmap *>::iterator it = ms_services_icons_large.begin(); it != ms_services_icons_large.end(); it++) delete *it;
+   for( QMap<QString, QPixmap *>::iterator it = ms_services_icons_small.begin(); it != ms_services_icons_small.end(); it++) delete *it;
 }
 
-void Watch::destroy() { d = NULL; m = NULL;}
+void Watch::destroy() { ms_d = NULL; ms_m = NULL;}
 
-void Watch::sendMsg(              af::Msg * msg   ){if(d) d->sendMsg(        msg    );}
-void Watch::displayInfo(    const QString &message){if(d){d->displayInfo(    message);if(d->isHidden())d->show();}}
-void Watch::displayWarning( const QString &message){if(d){d->displayWarning( message);if(d->isHidden())d->show();}}
-void Watch::displayError(   const QString &message){if(d){d->displayError(   message);if(d->isHidden())d->show();}}
-void Watch::setWindowTitle( const QString & title ){if(d){d->setWindowTitle( title  );if(d->isHidden())d->show();}}
-void Watch::keyPressEvent( QKeyEvent * event) { if(d) d->keyPressEvent( event);}
+void Watch::sendMsg(              af::Msg * msg   ){if(ms_d) ms_d->sendMsg(        msg    );}
+void Watch::displayInfo(    const QString &message){if(ms_d){ms_d->displayInfo(    message);if(ms_d->isHidden())ms_d->show();}}
+void Watch::displayWarning( const QString &message){if(ms_d){ms_d->displayWarning( message);if(ms_d->isHidden())ms_d->show();}}
+void Watch::displayError(   const QString &message){if(ms_d){ms_d->displayError(   message);if(ms_d->isHidden())ms_d->show();}}
+void Watch::setWindowTitle( const QString & title ){if(ms_d){ms_d->setWindowTitle( title  );if(ms_d->isHidden())ms_d->show();}}
+void Watch::keyPressEvent( QKeyEvent * event) { if(ms_d) ms_d->keyPressEvent( event);}
 
-bool Watch::isInitialized() { if(d) return d->isInitialized(); else return false;  }
-bool Watch::isConnected()   { if(d) return d->isConnected();   else return false;  }
-int  Watch::getUid()        { if(d) return d->getUid();        else return 0;      }
-int  Watch::getId()         { if(m) return m->getId();         else return 0;      }
+bool Watch::isInitialized() { if(ms_d) return ms_d->isInitialized(); else return false;  }
+bool Watch::isConnected()   { if(ms_d) return ms_d->isConnected();   else return false;  }
+int  Watch::getUid()        { if(ms_d) return ms_d->getUid();        else return 0;      }
+int  Watch::getId()         { if(ms_m) return ms_m->getId();         else return 0;      }
 
-const af::Address & Watch::getClientAddress() { return m->getAddress();}
+const af::Address & Watch::getClientAddress() { return ms_m->getAddress();}
 
-void Watch::subscribe(   const QList<int> & events) { if(m) m->  subscribe( events );}
-void Watch::unsubscribe( const QList<int> & events) { if(m) m->unsubscribe( events );}
-void Watch::addJobId( int jId ) { if(m) m->addJobId( jId );}
-void Watch::delJobId( int jId ) { if(m) m->delJobId( jId );}
-void Watch::setUid(   int uid ) { if(m) m->setUid(   uid );}
+void Watch::subscribe(   const QList<int> & events) { if(ms_m) ms_m->  subscribe( events );}
+void Watch::unsubscribe( const QList<int> & events) { if(ms_m) ms_m->unsubscribe( events );}
+void Watch::addJobId( int jId ) { if(ms_m) ms_m->addJobId( jId );}
+void Watch::delJobId( int jId ) { if(ms_m) ms_m->delJobId( jId );}
+void Watch::setUid(   int uid ) { if(ms_m) ms_m->setUid(   uid );}
 
 void Watch::addWindow( Wnd * wnd)
 {
-   if( windows.contains( wnd))
+   if( ms_windows.contains( wnd))
    {
       AFERROR("Watch::addWindow: Window already exists.")
    }
-   else windows.append( wnd);
+   else ms_windows.append( wnd);
 }
 void Watch::addReciever( Reciever * reciever)
 {
-   if( recievers.contains( reciever))
+   if( ms_recievers.contains( reciever))
    {
       AFERROR("Watch::addReciever: Reciever already exists.")
    }
-   else recievers.append( reciever);
+   else ms_recievers.append( reciever);
 }
-void Watch::removeWindow(   Wnd      * wnd      ) {   windows.removeAll( wnd);      }
-void Watch::removeReciever( Reciever * reciever ) { recievers.removeAll( reciever); }
+void Watch::removeWindow(   Wnd      * wnd      ) {   ms_windows.removeAll( wnd);      }
+void Watch::removeReciever( Reciever * reciever ) { ms_recievers.removeAll( reciever); }
 
 void Watch::caseMessage( af::Msg * msg)
 {
    bool recieved = false;
    QLinkedList<Reciever*>::iterator rIt;
-   for( rIt = recievers.begin(); rIt != recievers.end(); ++rIt)
+   for( rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
    {
       msg->resetWrittenSize();
       if( (*rIt)->caseMessage( msg) && (false == recieved)) recieved = true;
@@ -139,11 +139,11 @@ void Watch::caseMessage( af::Msg * msg)
 
 void Watch::listenJob( int id, const QString & name)
 {
-   if( listenjobids.contains( id))
+   if( ms_listenjobids.contains( id))
       displayWarning("This job is already listening.");
    else
    {
-      listenjobids.append( id);
+      ms_listenjobids.append( id);
       new WndListenJob( id, name);
    }
 }
@@ -156,9 +156,9 @@ void Watch::listenTask( int jobid, int block, int task, const QString & name)
 void Watch::watchJodTasksWindowAdd( int id, const QString & name)
 {
 AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.", name.toUtf8().data(), id)
-   QLinkedList<int>::const_iterator iIt = watchtasksjobids.begin();
-   QLinkedList<QWidget*>::iterator wIt = watchtaskswindows.begin();
-   while( iIt != watchtasksjobids.end())
+   QLinkedList<int>::const_iterator iIt = ms_watchtasksjobids.begin();
+   QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
+   while( iIt != ms_watchtasksjobids.end())
    {
       if( *iIt == id)
       {
@@ -172,22 +172,22 @@ AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.", name.to
    WndList * wnd = new WndList("Tasks");
    ListTasks *listtasks = new ListTasks( wnd, id, name);
    wnd->setList( listtasks);
-   watchtasksjobids.append( id);
-   watchtaskswindows.append( wnd);
+   ms_watchtasksjobids.append( id);
+   ms_watchtaskswindows.append( wnd);
    displayInfo(QString("Opening '%1' tasks window.").arg(name));
 AFINFA("Watch::watchTasks: \"%s\" window opened.", name.toUtf8().data())
 }
 
 void Watch::watchJodTasksWindowRem( int id)
 {
-   QLinkedList<int>::iterator iIt = watchtasksjobids.begin();
-   QLinkedList<QWidget*>::iterator wIt = watchtaskswindows.begin();
-   while( iIt != watchtasksjobids.end())
+   QLinkedList<int>::iterator iIt = ms_watchtasksjobids.begin();
+   QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
+   while( iIt != ms_watchtasksjobids.end())
    {
       if( *iIt == id)
       {
-         iIt = watchtasksjobids.erase( iIt);
-         wIt = watchtaskswindows.erase( wIt);
+         iIt = ms_watchtasksjobids.erase( iIt);
+         wIt = ms_watchtaskswindows.erase( wIt);
       }
       else
       {
@@ -199,27 +199,27 @@ void Watch::watchJodTasksWindowRem( int id)
 
 void Watch::connectionLost()
 {
-   for( QLinkedList<Reciever*>::iterator rIt = recievers.begin(); rIt != recievers.end(); ++rIt)
-      (*rIt)->connectionLost();
-   if(m) m->connectionLost();
+   for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+      (*rIt)->v_connectionLost();
+   if(ms_m) ms_m->connectionLost();
 }
 
 void Watch::connectionEstablished()
 {
-   for( QLinkedList<Reciever*>::iterator rIt = recievers.begin(); rIt != recievers.end(); ++rIt)
-      (*rIt)->connectionEstablished();
-   if(m) m->connectionEstablished();
+   for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+      (*rIt)->v_connectionEstablished();
+   if(ms_m) ms_m->connectionEstablished();
 }
 
 bool Watch::openMonitor( int type, bool open)
 {
-   if( d == NULL ) return false;
+   if( ms_d == NULL ) return false;
    if( opened[type])
    {
       raiseWindow( opened[type], &WndName[type]);
       return false;
    }
-   return d->openMonitor( type, open);
+   return ms_d->openMonitor( type, open);
 }
 
 void Watch::raiseWindow( QWidget * wnd, const QString * name)
@@ -273,8 +273,8 @@ void Watch::someJobError()
         QSound::play( afqt::QEnvironment::soundJobError.str );
 }
 
-void Watch::repaintStart()  { if( d) d->repaintStart(100); }
-void Watch::repaintFinish() { if( d) d->repaintFinish(); refreshGui(); }
+void Watch::repaintStart()  { if( ms_d) ms_d->repaintStart(100); }
+void Watch::repaintFinish() { if( ms_d) ms_d->repaintFinish(); refreshGui(); }
 
 void Watch::refreshGui()
 {
@@ -283,7 +283,7 @@ void Watch::refreshGui()
 
     // Refresh Images:
     ButtonMonitor::refreshImages();
-    if( d) d->reloadImages();
+    if( ms_d) ms_d->reloadImages();
 
     // Repaint:
     repaint();
@@ -356,13 +356,13 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
 void Watch::repaint()
 {
 //printf("Watch::repaint: start\n");
-    QPalette palette = app->palette();
+    QPalette palette = ms_app->palette();
     afqt::QEnvironment::setPalette( palette);
     afqt::QEnvironment::initFonts();
-    app->setPalette( palette);
+    ms_app->setPalette( palette);
 
-    if( d) d->repaint();
+    if( ms_d) ms_d->repaint();
     for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
-    for( QLinkedList<Wnd*>::iterator wIt = windows.begin(); wIt != windows.end(); wIt++) (*wIt)->update();
+    for( QLinkedList<Wnd*>::iterator wIt = ms_windows.begin(); wIt != ms_windows.end(); wIt++) (*wIt)->update();
 //printf("Watch::repaint: finish\n");
 }

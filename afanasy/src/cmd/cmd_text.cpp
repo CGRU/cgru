@@ -17,7 +17,7 @@ CmdText::CmdText()
 
 CmdText::~CmdText(){}
 
-bool CmdText::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdText::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.setData( strlen(argv[0]), argv[0]);
    return true;
@@ -34,7 +34,7 @@ CmdTextGenerate::CmdTextGenerate()
 
 CmdTextGenerate::~CmdTextGenerate(){}
 
-bool CmdTextGenerate::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTextGenerate::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int lenght = atoi(argv[0]);
    char* text = new char[lenght];

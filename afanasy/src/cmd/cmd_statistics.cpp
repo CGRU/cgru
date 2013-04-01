@@ -19,7 +19,7 @@ CmdStatistics::CmdStatistics():
 
 CmdStatistics::~CmdStatistics(){}
 
-bool CmdStatistics::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdStatistics::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    if( argc >= 1 ) columns = atoi(argv[0]);
    if( argc >= 2 ) sorting = atoi(argv[1]);
@@ -27,7 +27,7 @@ bool CmdStatistics::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-void CmdStatistics::msgOut( af::Msg& msg)
+void CmdStatistics::v_msgOut( af::Msg& msg)
 {
    af::statread( &msg);
    af::statout( columns, sorting);

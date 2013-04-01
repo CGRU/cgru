@@ -197,12 +197,24 @@ bool Msg::setData( int i_size, const char * i_msgData, int i_type)
 
    m_int32 = i_size;
 
+	// Default header type for JSON - not binary
+	// So we should skip binary header at all
 	if( m_type == Msg::TJSON )
 		m_header_offset = Msg::SizeHeader;
 
 	rw_header( true);
 
    return true;
+}
+
+bool Msg::setJSON_headerBin( const std::string & i_str)
+{
+	bool result = setData( i_str.size(), i_str.c_str(), TJSON);
+
+	// Reset header offset, as it was set above to Msg::SizeHeader
+	m_header_offset = 0;
+
+	return result;
 }
 
 bool Msg::set( int msgType, Af * afClass, bool i_receiving)
@@ -639,13 +651,13 @@ const char * Msg::TNAMES[]=
     "TRendersResourcesRequestIds",///< Request a list of resources of Renders with given ids.
     "TRendersList",               ///< Message with a list of Renders.
     "TRendersResources",          ///< Message with a list of resources of Renders.
-    "TRenderSetPriority",         ///< Set Render priority,
-    "TRenderSetCapacity",         ///< Set Render capacity,
-    "TRenderSetMaxTasks",         ///< Set Render maximum tasks,
+    "__TO_DELETE__TRenderSetPriority",         ///< Set Render priority,
+    "__TO_DELETE__TRenderSetCapacity",         ///< Set Render capacity,
+    "__TO_DELETE__TRenderSetMaxTasks",         ///< Set Render maximum tasks,
     "TRenderSetService",          ///< Enable or disable Render service,
     "TRenderRestoreDefaults",     ///< Restore default Render settings,
     "TRenderSetNIMBY",            ///< Set Render NIMBY,
-    "TRenderSetUser",             ///< Set Render user,
+    "__TO_DELETE__TRenderSetUser",             ///< Set Render user,
     "TRenderSetNimby",            ///< Set Render nimby,
     "TRenderSetFree",             ///< Set Render free,
     "TRenderStopTask",            ///< Signal from Afanasy to Render to stop task.
@@ -657,7 +669,7 @@ const char * Msg::TNAMES[]=
     "TRenderWOLWake",             ///< Ask sleeping render(s) to wake up
     "TRenderReboot",              ///< Reboot Render host computer,
     "TRenderShutdown",            ///< Shutdown Render host computer,
-    "TRenderAnnotate",            ///< Set Render annotation,
+    "__TO_DELETE__TRenderAnnotate",            ///< Set Render annotation,
     "TRenderExit",                ///< Ask server to shutdown client application(s),
     "TRenderEjectNotMyTasks",     ///< Stop mot my (based on username of message) tasks on Render,
 	"TRenderHideShow",            ///< Hide or show renders.

@@ -14,7 +14,7 @@ CmdString::CmdString()
 
 CmdString::~CmdString(){}
 
-bool CmdString::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdString::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string operation( argv[0]);
    std::string str( argv[1]);

@@ -16,7 +16,7 @@ CmdPasswd::CmdPasswd()
 
 CmdPasswd::~CmdPasswd(){}
 
-bool CmdPasswd::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdPasswd::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int times = 1;
    if( argc > 1)

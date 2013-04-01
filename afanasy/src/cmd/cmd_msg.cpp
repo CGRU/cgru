@@ -15,7 +15,7 @@ CmdMsg::CmdMsg()
 
 CmdMsg::~CmdMsg(){}
 
-bool CmdMsg::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdMsg::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.setString( argv[0]);
    return true;

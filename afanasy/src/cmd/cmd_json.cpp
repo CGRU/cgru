@@ -66,7 +66,7 @@ void outJSON( rapidjson::Value & i_value, int i_depth = 0)
 	}
 }
 
-bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	char * data = NULL;
 	bool send = false;

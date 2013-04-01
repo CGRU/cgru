@@ -68,7 +68,7 @@ bool WndListenJob::caseMessage( af::Msg * msg)
    return true;
 }
 
-void WndListenJob::connectionLost()
+void WndListenJob::v_connectionLost()
 {
    close();
 }

@@ -19,7 +19,7 @@ class ListNodes : public ListItems
 
 public:
 
-   ListNodes( QWidget* parent, int RequestMsgType = 0);
+   ListNodes( QWidget* parent, const std::string & type, int RequestMsgType = 0);
    virtual ~ListNodes();
 
 	enum e_HideShow {

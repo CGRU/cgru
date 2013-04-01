@@ -71,13 +71,13 @@ switch ( i_msg->type())
         i_args->monitors->setInterest( i_msg->type(), ids);
         break;
     }
-    case af::Msg::TRenderAnnotate:
-    case af::Msg::TRenderSetPriority:
-    case af::Msg::TRenderSetCapacity:
-    case af::Msg::TRenderSetMaxTasks:
+//    case af::Msg::TRenderAnnotate:
+//    case af::Msg::TRenderSetPriority:
+//    case af::Msg::TRenderSetCapacity:
+//    case af::Msg::TRenderSetMaxTasks:
     case af::Msg::TRenderSetService:
     case af::Msg::TRenderRestoreDefaults:
-    case af::Msg::TRenderSetUser:
+//    case af::Msg::TRenderSetUser:
     case af::Msg::TRenderSetNIMBY:
     case af::Msg::TRenderSetNimby:
     case af::Msg::TRenderSetFree:

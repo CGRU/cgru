@@ -7,7 +7,7 @@ class CmdNumeric : public Cmd
 public:
 	CmdNumeric();
 	~CmdNumeric();
-	bool processArguments( int argc, char** argv, af::Msg &msg);
+	bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };
 
 class CmdNumericGen : public Cmd
@@ -15,7 +15,7 @@ class CmdNumericGen : public Cmd
 public:
 	CmdNumericGen();
 	~CmdNumericGen();
-	bool processArguments( int argc, char** argv, af::Msg &msg);
+	bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };
 
 class CmdNumericCmd : public Cmd
@@ -23,7 +23,7 @@ class CmdNumericCmd : public Cmd
 public:
 	CmdNumericCmd();
 	~CmdNumericCmd();
-	bool processArguments( int argc, char** argv, af::Msg &msg);
+	bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };
 
 class CmdNumericCalcTask : public Cmd
@@ -31,5 +31,5 @@ class CmdNumericCalcTask : public Cmd
 public:
 	CmdNumericCalcTask();
 	~CmdNumericCalcTask();
-	bool processArguments( int argc, char** argv, af::Msg &msg);
+	bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };

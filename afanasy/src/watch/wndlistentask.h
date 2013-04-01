@@ -13,7 +13,7 @@ public:
 
    bool caseMessage( af::Msg * msg);
 
-   void connectionLost();
+   void v_connectionLost();
 
 protected:
    void closeEvent( QCloseEvent * event);

@@ -66,12 +66,12 @@ public:
     static bool openMonitor( int type, bool open);
 
     static void listenJob(  int id, const QString & name);
-    inline static void listenJob_rem(  int id) { listenjobids.removeAll(id);}
+    inline static void listenJob_rem(  int id) { ms_listenjobids.removeAll(id);}
     static void watchJodTasksWindowAdd( int id, const QString & name);
     static void watchJodTasksWindowRem( int id);
     static void listenTask( int jobid, int block, int task, const QString & name);
 
-    inline static Dialog * getDialog()  { return d;}
+    inline static Dialog * getDialog()  { return ms_d;}
     static const af::Address & getClientAddress();
     static void keyPressEvent( QKeyEvent * event);
 
@@ -97,8 +97,8 @@ public:
 
 	static void startProcess( const QString & cmd, const QString & wdir = QString());
 
-    inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return services_icons_large.value( service_name, NULL);}
-    inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return services_icons_small.value( service_name, NULL);}
+    inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return ms_services_icons_large.value( service_name, NULL);}
+    inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return ms_services_icons_small.value( service_name, NULL);}
 
     void static refreshGui();
 
@@ -107,20 +107,20 @@ public:
 	void static browseImages( const QString & i_image, const QString & i_wdir);
 
 private:
-    static MonitorHost * m;
-    static Dialog * d;
-    static QApplication * app;
+    static MonitorHost * ms_m;
+    static Dialog * ms_d;
+    static QApplication * ms_app;
 
-    static QLinkedList<Wnd*> windows;
-    static QLinkedList<Reciever*> recievers;
+    static QLinkedList<Wnd*> ms_windows;
+    static QLinkedList<Reciever*> ms_recievers;
 
-    static QStringList previewcmds;
-    static QStringList rendercmds;
+    static QStringList ms_previewcmds;
+    static QStringList ms_rendercmds;
 
-    static QLinkedList<int> listenjobids;
-    static QLinkedList<int> watchtasksjobids;
-    static QLinkedList<QWidget*> watchtaskswindows;
+    static QLinkedList<int> ms_listenjobids;
+    static QLinkedList<int> ms_watchtasksjobids;
+    static QLinkedList<QWidget*> ms_watchtaskswindows;
 
-    static QMap<QString, QPixmap *> services_icons_large;
-    static QMap<QString, QPixmap *> services_icons_small;
+    static QMap<QString, QPixmap *> ms_services_icons_large;
+    static QMap<QString, QPixmap *> ms_services_icons_small;
 };

@@ -12,192 +12,221 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-ListItems::ListItems( QWidget* parent, int RequestMsgType):
-   QWidget( parent),
-   parentWindow( parent),
-   requestmsgtype( RequestMsgType),
-   subscribed( false),
-   subscribeFirstTime( true)
+ListItems::ListItems( QWidget* parent, const std::string & type, int RequestMsgType):
+	QWidget( parent),
+	m_type( type),
+	m_parentWindow( parent),
+	m_requestmsgtype( RequestMsgType),
+	m_subscribed( false),
+	m_subscribeFirstTime( true)
 {
 AFINFO("ListItems::ListItems.\n");
-   setAttribute ( Qt::WA_DeleteOnClose, true );
+	setAttribute ( Qt::WA_DeleteOnClose, true );
 
-   layout = new QVBoxLayout( this);
-   layout->setSpacing( 0);
+	m_layout = new QVBoxLayout( this);
+	m_layout->setSpacing( 0);
 #if QT_VERSION >= 0x040300
-   layout->setContentsMargins( 0, 0, 0, 0);
+	m_layout->setContentsMargins( 0, 0, 0, 0);
 #endif
-   infoline = new InfoLine( this);
+	m_infoline = new InfoLine( this);
 
-   if( parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);
+	if( m_parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);
 }
 
 bool ListItems::init( bool createModelView)
 {
-   if( createModelView)
-   {
-      model = new ModelItems(this);
-      view = new ViewItems( this);
-      view->setModel( model);
+	if( createModelView)
+	{
+		m_model = new ModelItems(this);
+		m_view = new ViewItems( this);
+		m_view->setModel( m_model);
 
-      layout->addWidget( view);
-      layout->addWidget( infoline);
-   }
+		m_layout->addWidget( m_view);
+		m_layout->addWidget( m_infoline);
+	}
 
-   connect( view, SIGNAL(doubleClicked( const QModelIndex &)), this, SLOT( doubleClicked_slot( const QModelIndex &)));
+	connect( m_view, SIGNAL(doubleClicked( const QModelIndex &)), this, SLOT( doubleClicked_slot( const QModelIndex &)));
 
-   connect( view->selectionModel(), SIGNAL(     currentChanged( const QModelIndex &, const QModelIndex &)),
-                              this,   SLOT( currentItemChanged( const QModelIndex &, const QModelIndex &)));
+	connect( m_view->selectionModel(), SIGNAL(     currentChanged( const QModelIndex &, const QModelIndex &)),
+	                             this, SLOT(   currentItemChanged( const QModelIndex &, const QModelIndex &)));
 
-   return true;
+	return true;
 }
 
 ListItems::~ListItems()
 {
 AFINFO("ListItems::~ListItems.\n");
 
-   Watch::unsubscribe( eventsOnOff);
+	Watch::unsubscribe( m_eventsOnOff);
 }
 
-int ListItems::count() const { return model->count();}
+int ListItems::count() const { return m_model->count();}
 
 bool ListItems::mousePressed( QMouseEvent * event) { return false;}
 
 void ListItems::showEvent( QShowEvent * event)
 {
-   shownFunc();
+	v_shownFunc();
 }
 
-void ListItems::shownFunc()
+void ListItems::v_shownFunc()
 {
-   if( Watch::isConnected() && requestmsgtype ) Watch::sendMsg( new af::Msg( requestmsgtype, 0, true));
+	if( Watch::isConnected() && m_requestmsgtype ) Watch::sendMsg( new af::Msg( m_requestmsgtype, 0, true));
 }
 
 void ListItems::hideEvent( QHideEvent * event)
 {
-   unSubscribe();
+	v_unSubscribe();
 }
 
-void ListItems::subscribe()
+void ListItems::v_subscribe()
 {
-   if( subscribed) return;
-   if( subscribeFirstTime )
-   {
-      QList<int> eventsAll;
-      eventsAll << eventsOnOff;
-      eventsAll << eventsShowHide;
-      Watch::subscribe( eventsAll);
-      subscribeFirstTime = false;
-   }
-   else
-   {
-      Watch::subscribe( eventsShowHide);
-   }
-   subscribed = true;
+	if( m_subscribed) return;
+	if( m_subscribeFirstTime )
+	{
+		QList<int> eventsAll;
+		eventsAll << m_eventsOnOff;
+		eventsAll << m_eventsShowHide;
+		Watch::subscribe( eventsAll);
+		m_subscribeFirstTime = false;
+	}
+	else
+	{
+		Watch::subscribe( m_eventsShowHide);
+	}
+	m_subscribed = true;
 }
 
-void ListItems::unSubscribe()
+void ListItems::v_unSubscribe()
 {
-   if( subscribed == false) return;
-   Watch::unsubscribe( eventsShowHide);
-   subscribed = false;
+	if( m_subscribed == false) return;
+	Watch::unsubscribe( m_eventsShowHide);
+	m_subscribed = false;
 }
 
-void ListItems::connectionLost()
+void ListItems::v_connectionLost()
 {
-   unSubscribe();
-   Watch::unsubscribe( eventsOnOff);
-   deleteAllItems();
+	v_unSubscribe();
+	Watch::unsubscribe( m_eventsOnOff);
+	deleteAllItems();
 }
 
-void ListItems::connectionEstablished() { if( isVisible()) shownFunc(); }
-void ListItems::deleteAllItems() { model->deleteAllItems();}
+void ListItems::v_connectionEstablished() { if( isVisible()) v_shownFunc(); }
+void ListItems::deleteAllItems() { m_model->deleteAllItems();}
 void ListItems::doubleClicked( Item * item) {}
-void ListItems::revertModel()  { model->revert();}
-void ListItems::itemsHeightCahnged() { model->itemsHeightCahnged();}
-void ListItems::repaintItems() { view->repaintViewport();}
+void ListItems::revertModel()  { m_model->revert();}
+void ListItems::itemsHeightCahnged() { m_model->itemsHeightCahnged();}
+void ListItems::repaintItems() { m_view->repaintViewport();}
 
 void ListItems::deleteItems( af::MCGeneral & ids)
 {
-   int row = 0;
-   while( row < model->count())
-      if( ids.hasId( model->item(row)->getId()))
-         model->delItem( row);
-      else
-         row++;
+	int row = 0;
+	while( row < m_model->count())
+		if( ids.hasId( m_model->item(row)->getId()))
+			m_model->delItem( row);
+		else
+			row++;
 }
 
 void ListItems::setAllowSelection( bool allow)
 {
-   if( allow ) view->setSelectionMode( QAbstractItemView::ExtendedSelection  );
-   else        view->setSelectionMode( QAbstractItemView::NoSelection        );
+	if( allow ) m_view->setSelectionMode( QAbstractItemView::ExtendedSelection  );
+	else        m_view->setSelectionMode( QAbstractItemView::NoSelection        );
 }
 
 Item* ListItems::getCurrentItem() const
 {
-   QModelIndex index( view->selectionModel()->currentIndex());
-   if( false == index.isValid()) return NULL;
-   if( false == qVariantCanConvert<Item*>(index.data())) return NULL;
-   return qVariantValue<Item*>( index.data());
+	QModelIndex index( m_view->selectionModel()->currentIndex());
+	if( false == index.isValid()) return NULL;
+	if( false == qVariantCanConvert<Item*>(index.data())) return NULL;
+	return qVariantValue<Item*>( index.data());
 }
 
 int ListItems::getSelectedItemsCount() const
 {
-   return view->selectionModel()->selectedIndexes().size();
+	return m_view->selectionModel()->selectedIndexes().size();
 }
 
 const QList<Item*> ListItems::getSelectedItems() const
 {
-   QList<Item*> items;
+	QList<Item*> items;
 
-   QModelIndexList indexes( view->selectionModel()->selectedIndexes());
-   for( int i = 0; i < indexes.count(); i++)
-      if( qVariantCanConvert<Item*>( indexes[i].data()))
-         items << qVariantValue<Item*>( indexes[i].data());
+	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
+	for( int i = 0; i < indexes.count(); i++)
+		if( qVariantCanConvert<Item*>( indexes[i].data()))
+			items << qVariantValue<Item*>( indexes[i].data());
 
-   return items;
+	return items;
 }
 
 void ListItems::setSelectedItems( const QList<Item*> & items, bool resetSelection)
 {
-   if( resetSelection ) view->clearSelection();
-   if( items.count() < 1 ) return;
-   int modelcount = model->count();
-   int lastselectedrow = -1;
-   for( int i = 0; i < modelcount; i++)
-   {
-      if( items.contains( model->item(i)))
-      {
-         view->selectionModel()->select( model->index(i), QItemSelectionModel::Select);
-         lastselectedrow = i;
-      }
-   }
-   if( lastselectedrow != -1)
-      view->selectionModel()->setCurrentIndex( model->index(lastselectedrow), QItemSelectionModel::Current);
+	if( resetSelection ) m_view->clearSelection();
+	if( items.count() < 1 ) return;
+	int modelcount = m_model->count();
+	int lastselectedrow = -1;
+	for( int i = 0; i < modelcount; i++)
+	{
+		if( items.contains( m_model->item(i)))
+		{
+			m_view->selectionModel()->select( m_model->index(i), QItemSelectionModel::Select);
+			lastselectedrow = i;
+		}
+	}
+	if( lastselectedrow != -1)
+		m_view->selectionModel()->setCurrentIndex( m_model->index(lastselectedrow), QItemSelectionModel::Current);
 }
 
 void ListItems::action( af::MCGeneral& mcgeneral, int type)
 {
-   QModelIndexList indexes( view->selectionModel()->selectedIndexes());
-   for( int i = 0; i < indexes.count(); i++)
-      if( qVariantCanConvert<Item*>( indexes[i].data()))
-         mcgeneral.addId( qVariantValue<Item*>( indexes[i].data())->getId());
+	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
+	for( int i = 0; i < indexes.count(); i++)
+		if( qVariantCanConvert<Item*>( indexes[i].data()))
+			mcgeneral.addId( qVariantValue<Item*>( indexes[i].data())->getId());
 
-   if( mcgeneral.getCount() == 0) return;
+	if( mcgeneral.getCount() == 0) return;
 //printf("ListNodes::action:\n"); mcgeneral.stdOut( true);
 
-   af::Msg * msg = new af::Msg( type, &mcgeneral);
+	af::Msg * msg = new af::Msg( type, &mcgeneral);
 
-   Watch::sendMsg( msg);
+	Watch::sendMsg( msg);
 }
 
 void ListItems::doubleClicked_slot( const QModelIndex & index )
 {
-   if( qVariantCanConvert<Item*>( index.data())) doubleClicked( qVariantValue<Item*>( index.data()));
+	if( qVariantCanConvert<Item*>( index.data())) doubleClicked( qVariantValue<Item*>( index.data()));
 }
 
 void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )
 {
-   if( qVariantCanConvert<Item*>( current.data()))
-      displayInfo( qVariantValue<Item*>( current.data())->getSelectString());
+	if( qVariantCanConvert<Item*>( current.data()))
+		displayInfo( qVariantValue<Item*>( current.data())->getSelectString());
 }
+
+void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_numeric) const
+{
+	std::ostringstream str;
+
+	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
+
+	str << "\n\"" << i_name << "\":";
+	if( i_numeric != true ) str << "\"";
+	str << i_value;
+	if( i_numeric != true ) str << "\"";
+
+	af::jsonActionParamsFinish( str);
+
+	Watch::sendMsg( af::jsonMsg( str));
+printf("ListItems::setParameter:\n%s\n", str.str().c_str());
+}
+
+const std::vector<int> ListItems::getSelectedIds() const
+{
+	std::vector<int> ids;
+	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
+	for( int i = 0; i < indexes.count(); i++)
+		if( qVariantCanConvert<Item*>( indexes[i].data()))
+			ids.push_back( qVariantValue<Item*>( indexes[i].data())->getId());
+	return ids;
+}
+

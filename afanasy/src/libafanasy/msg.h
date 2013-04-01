@@ -18,42 +18,47 @@ namespace af
 class Msg : public Af, public AfQueueItem
 {
 public:
-    /// Default constructor.
-    Msg( int msgType = 0, int msgInt = 0, bool i_receiving = false);
+	/// Default constructor.
+	Msg( int msgType = 0, int msgInt = 0, bool i_receiving = false);
 
-    /// Constructor from \c Af class.
-    Msg( int msgType, Af * afClass, bool i_receiving = false );
+	/// Constructor from \c Af class.
+	Msg( int msgType, Af * afClass, bool i_receiving = false );
 
-    /// Construct a message and set an address
-    Msg( const struct sockaddr_storage * ss);
+	/// Construct a message and set an address
+	Msg( const struct sockaddr_storage * ss);
 
-    Msg( const char * rawData, int rawDataLen, bool i_receiving = false);
+	Msg( const char * rawData, int rawDataLen, bool i_receiving = false);
 
-    ~Msg();///< Destructor.
+	~Msg();///< Destructor.
 
-    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+	void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
-    /// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
-    bool set( int msgType, int msgInt = 0, bool i_receiving = false);
+	/// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
+	bool set( int msgType, int msgInt = 0, bool i_receiving = false);
 
-    /// Write \c Af class to message.
-    bool set( int msgType, Af * afClass, bool i_receiving = false);
+	/// Write \c Af class to message.
+	bool set( int msgType, Af * afClass, bool i_receiving = false);
 
-    /// To set zero (\c Msg::TNone ) message to data message. Return \c true on success.
-    bool setData( int i_size, const char * i_msgData, int i_type = TDATA);
+	/// To set zero (\c Msg::TNone ) message to data message. Return \c true on success.
+		/// On TJSON header type will be not binary - binary header will be skipped at all.
+	bool setData( int i_size, const char * i_msgData, int i_type = TDATA);
 
-    /// To set zero (\c Msg::TNone ) message to QString message. Return \c true on success.
-    bool setString( const std::string & qstring);
+	/// To JSON data message with binary header (not for python or browser).
+	bool setJSON_headerBin( const std::string & i_str);
+	inline bool setJSON_headerBin( const std::ostringstream & i_str) { return setJSON_headerBin( i_str.str());}
 
-    /// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
-    bool setStringList( const std::list<std::string> & stringlist);
+	/// To set zero (\c Msg::TNone ) message to QString message. Return \c true on success.
+	bool setString( const std::string & qstring);
 
-    /// Get String ( if message type is TString ).
-    bool getString( std::string & string);
-    const std::string getString();
+	/// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
+	bool setStringList( const std::list<std::string> & stringlist);
 
-    /// Get String ( if message type is TStringList ).
-    bool getStringList( std::list<std::string> & stringlist);
+	/// Get String ( if message type is TString ).
+	bool getString( std::string & string);
+	const std::string getString();
+
+	/// Get String ( if message type is TStringList ).
+	bool getStringList( std::list<std::string> & stringlist);
 
 /**   IMPORTANT!
 ***   messages with (type < MText) MUST NOT have any data to be valid:
@@ -216,13 +221,13 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRendersResourcesRequestIds/**/,///< Request a list of resources of Renders with given ids.
 /**/TRendersList/**/,               ///< Message with a list of Renders.
 /**/TRendersResources/**/,          ///< Message with a list of resources of Renders.
-/**/TRenderSetPriority/**/,         ///< Set Render priority,
-/**/TRenderSetCapacity/**/,         ///< Set Render capacity,
-/**/TRenderSetMaxTasks/**/,         ///< Set Render maximum tasks,
+/**/__TO_DELETE__TRenderSetPriority/**/,         ///< Set Render priority,
+/**/__TO_DELETE__TRenderSetCapacity/**/,         ///< Set Render capacity,
+/**/__TO_DELETE__TRenderSetMaxTasks/**/,         ///< Set Render maximum tasks,
 /**/TRenderSetService/**/,          ///< Enable or disable Render service,
 /**/TRenderRestoreDefaults/**/,     ///< Restore default Render settings,
 /**/TRenderSetNIMBY/**/,            ///< Set Render NIMBY,
-/**/TRenderSetUser/**/,             ///< Set Render user,
+/**/__TO_DELETE__TRenderSetUser/**/,             ///< Set Render user,
 /**/TRenderSetNimby/**/,            ///< Set Render nimby,
 /**/TRenderSetFree/**/,             ///< Set Render free,
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
@@ -234,7 +239,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
 /**/TRenderReboot/**/,              ///< Reboot Render host computer,
 /**/TRenderShutdown/**/,            ///< Shutdown Render host computer,
-/**/TRenderAnnotate/**/,            ///< Set Render annotation,
+/**/__TO_DELETE__TRenderAnnotate/**/,            ///< Set Render annotation,
 /**/TRenderExit/**/,                ///< Ask server to shutdown client application(s),
 /**/TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
 /**/TRenderHideShow/**/,			///< Hide or show renders.
@@ -358,85 +363,85 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TLAST/**/                       ///< The last type number.
 };
 
-    static const char * TNAMES[]; ///< Type names.
+	static const char * TNAMES[]; ///< Type names.
 
-    inline int   type()    const { return m_type;  }///< Get message type.
-    inline char* data()    const { return m_data;  }///< Get data pointer.
-    inline int   dataLen() const { return m_int32; }///< Get data length.
-    inline int   int32()   const { return m_int32; }///< Get 32-bit integer, data lenght for data messages.
-    inline int   sid()     const { return m_sid;   }///< Get sender id.
+	inline int   type()    const { return m_type;  }///< Get message type.
+	inline char* data()    const { return m_data;  }///< Get data pointer.
+	inline int   dataLen() const { return m_int32; }///< Get data length.
+	inline int   int32()   const { return m_int32; }///< Get 32-bit integer, data lenght for data messages.
+	inline int   sid()     const { return m_sid;   }///< Get sender id.
 
-    inline char* buffer() const { return m_buffer;}///< Get buffer pointer.
+	inline char* buffer() const { return m_buffer;}///< Get buffer pointer.
 
-    /// Get message full size (with data).
-    inline int writeSize() const { return m_type<TDATA ? Msg::SizeHeader : Msg::SizeHeader+m_int32;}
+	/// Get message full size (with data).
+	inline int writeSize() const { return m_type<TDATA ? Msg::SizeHeader : Msg::SizeHeader+m_int32;}
 
-    /// Get buffer at already written postition to write \c size bytes in it.
-    char * writtenBuffer( int size);
-    inline bool isWriting() const { return  m_writing; } ///< Writing or reading data in message.
-    inline bool isReading() const { return !m_writing; } ///< Writing or reading data in message.
+	/// Get buffer at already written postition to write \c size bytes in it.
+	char * writtenBuffer( int size);
+	inline bool isWriting() const { return  m_writing; } ///< Writing or reading data in message.
+	inline bool isReading() const { return !m_writing; } ///< Writing or reading data in message.
 
-    void setInvalid();             ///< Set message invalidness.
-    void readHeader( int bytes);   ///< Read header from message buffer, \c bytes - number of already written bytes in it's buffer.
+	void setInvalid();             ///< Set message invalidness.
+	void readHeader( int bytes);   ///< Read header from message buffer, \c bytes - number of already written bytes in it's buffer.
 
 	// Set header to specified values, that are get from text data
 	// i_offset and i_bytes to shift message data, to remove HTTP header for example
 	void setHeader( int i_magic, int i_sid, int i_type, int i_size, int i_offset = 0, int i_bytes = 0);
 
-    inline bool      isNull() const { return m_type == TNULL;    }///< Whether message is null.
-    inline bool   isInvalid() const { return m_type == TInvalid; }///< Whether message is invalid.
+	inline bool      isNull() const { return m_type == TNULL;    }///< Whether message is null.
+	inline bool   isInvalid() const { return m_type == TInvalid; }///< Whether message is invalid.
 
-    void stdOutData( bool withHeader = true);
+	void stdOutData( bool withHeader = true);
 
-    static const int SizeHeader;     ///< size of message header.
-    static const int SizeBuffer;     ///< message reading buffer size.
-    static const int SizeBufferLimit;///< message buffer maximum size.
-    static const int SizeDataMax;    ///< maximum data size that can handle a message.
+	static const int SizeHeader;     ///< size of message header.
+	static const int SizeBuffer;     ///< message reading buffer size.
+	static const int SizeBufferLimit;///< message buffer maximum size.
+	static const int SizeDataMax;    ///< maximum data size that can handle a message.
 
-    static const int Version;    ///< Current afanasy version.
-    static int Magic;     ///< Current afanasy magick number.
+	static const int Version;    ///< Current afanasy version.
+	static int Magic;     ///< Current afanasy magick number.
 
-    inline int version() const { return m_version; } ///< Get message afanasy version.
+	inline int version() const { return m_version; } ///< Get message afanasy version.
 
-    inline void resetWrittenSize() { m_writtensize = 0; }
+	inline void resetWrittenSize() { m_writtensize = 0; }
 
-    inline bool addressIsEmpty() const { return m_address.isEmpty();}
+	inline bool addressIsEmpty() const { return m_address.isEmpty();}
 
-    inline const size_t addressesCount() const { return m_addresses.size();}
+	inline const size_t addressesCount() const { return m_addresses.size();}
 
-    /// Set to recieve an answer from the same socket after send
-    void setReceiving( bool i_value = true ) { m_receive = i_value; }
+	/// Set to recieve an answer from the same socket after send
+	void setReceiving( bool i_value = true ) { m_receive = i_value; }
 
-    /// Set to recieve an answer from the same socket after send
-    bool isReceiving() const { return m_receive; }
+	/// Set to recieve an answer from the same socket after send
+	bool isReceiving() const { return m_receive; }
 
-    /// Set to recieve an answer from the same socket after send
-    void setSendFailed( bool i_value = true ) { m_sendfailed = i_value; }
+	/// Set to recieve an answer from the same socket after send
+	void setSendFailed( bool i_value = true ) { m_sendfailed = i_value; }
 
-    /// Set to recieve an answer from the same socket after send
-    bool wasSendFailed() { return m_sendfailed; }
+	/// Set to recieve an answer from the same socket after send
+	bool wasSendFailed() { return m_sendfailed; }
 
-    /// Set message address
-    inline void setAddress( const Address & i_address)
-        { m_address = i_address;}
+	/// Set message address
+	inline void setAddress( const Address & i_address)
+		{ m_address = i_address;}
 
-    /// Set message address to \c client
-    inline void setAddress( const Client* i_client)
-        { m_address = i_client->getAddress();}
+	/// Set message address to \c client
+	inline void setAddress( const Client* i_client)
+		{ m_address = i_client->getAddress();}
 
-    /// Set message address to \c client
-    inline void setAddresses( const std::list<Address> & i_addresses)
-        { m_addresses = i_addresses;}
+	/// Set message address to \c client
+	inline void setAddresses( const std::list<Address> & i_addresses)
+		{ m_addresses = i_addresses;}
 
-    /// Add dispatch address
-    inline void addAddress( const Client* client)
-        { m_addresses.push_back( client->getAddress());}
+	/// Add dispatch address
+	inline void addAddress( const Client* client)
+		{ m_addresses.push_back( client->getAddress());}
 
-    /// Get address constant pointer
-    inline const Address & getAddress() const { return m_address;}
+	/// Get address constant pointer
+	inline const Address & getAddress() const { return m_address;}
 
-    /// Get addresses constant list pointer
-    inline const std::list<Address> * getAddresses() const { return &m_addresses;}
+	/// Get addresses constant list pointer
+	inline const std::list<Address> * getAddresses() const { return &m_addresses;}
 
 	inline int  getMagicNumber() const { return m_magic;               }
 	inline bool isMagicValid()   const { return m_magic == Msg::Magic; }
@@ -451,39 +456,40 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 private:
 
 // header:
-    int32_t m_version;   ///< Afanasy network protocol version.
-    int32_t m_magic;     ///< Magic number.
-    int32_t m_sid;       ///< Sender id.
-    int32_t m_type;      ///< Message type.
-    int32_t m_int32;     ///< Some 32-bit integer, data length for data messages.
+	int32_t m_version;   ///< Afanasy network protocol version.
+	int32_t m_magic;     ///< Magic number.
+	int32_t m_sid;       ///< Sender id.
+	int32_t m_type;      ///< Message type.
+	int32_t m_int32;     ///< Some 32-bit integer, data length for data messages.
 
 // data poiters:
 	char * m_buffer;     ///< Internal buffer pointer, for header and data
 	char * m_data;       ///< Message data pointer = buffer + header_size.
 
 // buffering parameters:
-    bool m_writing;                  ///< Writing or reading data in message.
-    int  m_buffer_size;              ///< Buffer size.
-    int  m_data_maxsize;             ///< Data maximum size ( = buffer size - header size).
-    int  m_writtensize;              ///< Number of bytes already written in message buffer.
-	int  m_header_offset;            ///< Header offset
+	bool m_writing;                  ///< Writing or reading data in message.
+	int  m_buffer_size;              ///< Buffer size.
+	int  m_data_maxsize;             ///< Data maximum size ( = buffer size - header size).
+	int  m_writtensize;              ///< Number of bytes already written in message buffer.
+	int  m_header_offset;            ///< From where begin to write, for exampl to send json to browser
+	                                 ///< we should skip header at all ( m_header_offset = Msg::SizeHeader )
 
 // communication parameters:
-    Address m_address;                ///< Address, where message came from or will be send.
-    std::list<Address> m_addresses;   ///< Addresses to dispatch message to.
-    bool m_receive;                   ///< Whether to recieve an answer on message request.
-    bool m_sendfailed;                ///< Message was failed to send.
+	Address m_address;                ///< Address, where message came from or will be send.
+	std::list<Address> m_addresses;   ///< Addresses to dispatch message to.
+	bool m_receive;                   ///< Whether to recieve an answer on message request.
+	bool m_sendfailed;                ///< Message was failed to send.
 
 private:
 
-    void construct();                ///< Called from constuctors.
-    bool checkZero( bool outerror ); ///< Check Zero type, data length and pointer.
-    bool checkValidness( bool checkMagic = true); ///< Check message header validness and magic number;
+	void construct();                ///< Called from constuctors.
+	bool checkZero( bool outerror ); ///< Check Zero type, data length and pointer.
+	bool checkValidness( bool checkMagic = true); ///< Check message header validness and magic number;
 
 	/// Allocate memory for buffer, copy \c to_copy_len bytes in new buffer if any
 	bool allocateBuffer( int i_size, int i_copy_len = 0, int i_copy_offset = Msg::SizeHeader);
 
-    void rw_header( bool write); ///< Read or write message header.
-    void readwrite( Msg * msg);
+	void rw_header( bool write); ///< Read or write message header.
+	void readwrite( Msg * msg);
 };
 }

@@ -7,5 +7,5 @@ class CmdInvalid : public Cmd
 public:
    CmdInvalid();
    ~CmdInvalid();
-   bool processArguments( int argc, char** argv, af::Msg &msg);
+   bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };

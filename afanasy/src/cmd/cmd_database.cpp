@@ -13,7 +13,7 @@ CmdDBCheck::CmdDBCheck()
    setInfo("Check database connection.");
 }
 CmdDBCheck::~CmdDBCheck(){}
-bool CmdDBCheck::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBCheck::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
       afsql::DBConnection DB( "afanasy.cmd.Check");
       if( DB.isWorking()) printf("\nDatabase connection is working.\n");
@@ -27,7 +27,7 @@ CmdDBResetUsers::CmdDBResetUsers()
    setInfo("Reset (create) users table.");
 }
 CmdDBResetUsers::~CmdDBResetUsers(){}
-bool CmdDBResetUsers::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBResetUsers::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetUsers");
    DB.DBOpen();
@@ -42,7 +42,7 @@ CmdDBResetRenders::CmdDBResetRenders()
    setInfo("Reset (create) renders table.");
 }
 CmdDBResetRenders::~CmdDBResetRenders(){}
-bool CmdDBResetRenders::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBResetRenders::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetRenders");
    DB.DBOpen();
@@ -57,7 +57,7 @@ CmdDBResetJobs::CmdDBResetJobs()
    setInfo("Reset (create) jobs table.");
 }
 CmdDBResetJobs::~CmdDBResetJobs(){}
-bool CmdDBResetJobs::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBResetJobs::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetOnline");
    DB.DBOpen();
@@ -72,7 +72,7 @@ CmdDBResetStat::CmdDBResetStat()
    setInfo("Reset (create) statistics table.");
 }
 CmdDBResetStat::~CmdDBResetStat(){}
-bool CmdDBResetStat::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBResetStat::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetArchive");
    DB.DBOpen();
@@ -87,7 +87,7 @@ CmdDBResetAll::CmdDBResetAll()
    setInfo("Reset (create) all tables.");
 }
 CmdDBResetAll::~CmdDBResetAll(){}
-bool CmdDBResetAll::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBResetAll::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetAll");
    DB.DBOpen();
@@ -102,7 +102,7 @@ CmdDBJobsList::CmdDBJobsList()
    setInfo("List database jobs.");
 }
 CmdDBJobsList::~CmdDBJobsList(){}
-bool CmdDBJobsList::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.JobsList");
    DB.DBOpen();
@@ -125,7 +125,7 @@ CmdDBJobsClean::CmdDBJobsClean()
    setInfo("Clean invalid database jobs.");
 }
 CmdDBJobsClean::~CmdDBJobsClean(){}
-bool CmdDBJobsClean::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBJobsClean::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.JobsClean");
    DB.DBOpen();
@@ -153,7 +153,7 @@ CmdDBSysJobDel::CmdDBSysJobDel()
    setInfo("Delete system job.");
 }
 CmdDBSysJobDel::~CmdDBSysJobDel(){}
-bool CmdDBSysJobDel::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBSysJobDel::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.SysJobDel");
    DB.DBOpen();
@@ -197,7 +197,7 @@ CmdDBUpdateTables::CmdDBUpdateTables()
 "\nWith any argument will show sql commands only without execution.");
 }
 CmdDBUpdateTables::~CmdDBUpdateTables(){}
-bool CmdDBUpdateTables::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdDBUpdateTables::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.UpdateTables");
    DB.DBOpen();

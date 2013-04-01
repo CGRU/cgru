@@ -14,7 +14,7 @@ CmdInvalid::CmdInvalid()
 
 CmdInvalid::~CmdInvalid(){}
 
-bool CmdInvalid::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdInvalid::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.set( af::Msg::TInvalid);
    return true;

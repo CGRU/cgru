@@ -12,8 +12,8 @@ public:
 
    virtual bool caseMessage( af::Msg * msg) = 0;
 
-   virtual void connectionLost();
-   virtual void connectionEstablished();
+   virtual void v_connectionLost();
+   virtual void v_connectionEstablished();
 
 private:
 };

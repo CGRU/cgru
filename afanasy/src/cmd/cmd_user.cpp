@@ -19,12 +19,12 @@ CmdUserList::CmdUserList()
     setRecieving();
 }
 CmdUserList::~CmdUserList(){}
-bool CmdUserList::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     msg.set( getMsgType());
     return true;
 }
-void CmdUserList::msgOut( af::Msg& msg)
+void CmdUserList::v_msgOut( af::Msg& msg)
 {
     af::MCAfNodes list( &msg);
     list.stdOut( Verbose);
@@ -41,13 +41,13 @@ CmdUserJobsList::CmdUserJobsList()
     setRecieving();
 }
 CmdUserJobsList::~CmdUserJobsList(){}
-bool CmdUserJobsList::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }
-void CmdUserJobsList::msgOut( af::Msg& msg)
+void CmdUserJobsList::v_msgOut( af::Msg& msg)
 {
     af::MCAfNodes list( &msg);
     list.stdOut( Verbose);
@@ -62,7 +62,7 @@ CmdUserAdd::CmdUserAdd()
     setMsgType( af::Msg::TUserAdd);
 }
 CmdUserAdd::~CmdUserAdd(){}
-bool CmdUserAdd::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserAdd::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     std::string name = argv[0];
     af::MCGeneral mcgeneral( name, 1);
@@ -79,7 +79,7 @@ CmdUserDelete::CmdUserDelete()
     setMsgType( af::Msg::TUserDel);
 }
 CmdUserDelete::~CmdUserDelete(){}
-bool CmdUserDelete::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserDelete::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     std::string name = argv[0];
     af::MCGeneral mcgeneral( name, 0);
@@ -96,7 +96,7 @@ CmdUserPriority::CmdUserPriority()
     setMsgType( af::Msg::TUserPriority);
 }
 CmdUserPriority::~CmdUserPriority(){}
-bool CmdUserPriority::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserPriority::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     std::string name = argv[0];
     int number = atoi(argv[1]);
@@ -114,7 +114,7 @@ CmdUserRunningTasksMaximum::CmdUserRunningTasksMaximum()
     setMsgType( af::Msg::TUserMaxRunningTasks);
 }
 CmdUserRunningTasksMaximum::~CmdUserRunningTasksMaximum(){}
-bool CmdUserRunningTasksMaximum::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserRunningTasksMaximum::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     std::string name = argv[0];
     int number = atoi(argv[1]);
@@ -132,7 +132,7 @@ CmdUserHostsMask::CmdUserHostsMask()
     setMsgType( af::Msg::TUserHostsMask);
 }
 CmdUserHostsMask::~CmdUserHostsMask(){}
-bool CmdUserHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdUserHostsMask::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     std::string name = argv[0];
     std::string mask = argv[1];

@@ -24,12 +24,12 @@ CmdJobsList::CmdJobsList()
    setRecieving();
 }
 CmdJobsList::~CmdJobsList(){}
-bool CmdJobsList::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.set( getMsgType());
    return true;
 }
-void CmdJobsList::msgOut( af::Msg& msg)
+void CmdJobsList::v_msgOut( af::Msg& msg)
 {
    af::MCAfNodes list( &msg);
    list.stdOut();
@@ -44,12 +44,12 @@ CmdJobsWeight::CmdJobsWeight()
    setRecieving();
 }
 CmdJobsWeight::~CmdJobsWeight(){}
-bool CmdJobsWeight::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsWeight::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.set( getMsgType());
    return true;
 }
-void CmdJobsWeight::msgOut( af::Msg& msg)
+void CmdJobsWeight::v_msgOut( af::Msg& msg)
 {
    af::MCJobsWeight jobsWeight( &msg);
    jobsWeight.stdOut( true);
@@ -64,7 +64,7 @@ CmdJobPriority::CmdJobPriority()
    setMsgType( af::Msg::TJobPriority);
 }
 CmdJobPriority::~CmdJobPriority(){}
-bool CmdJobPriority::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobPriority::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    int number = atoi(argv[1]);
@@ -82,7 +82,7 @@ CmdJobRunningTasksMaximum::CmdJobRunningTasksMaximum()
    setMsgType( af::Msg::TJobMaxRunningTasks);
 }
 CmdJobRunningTasksMaximum::~CmdJobRunningTasksMaximum(){}
-bool CmdJobRunningTasksMaximum::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobRunningTasksMaximum::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    int number = atoi(argv[1]);
@@ -100,7 +100,7 @@ CmdJobHostsMask::CmdJobHostsMask()
    setMsgType( af::Msg::TJobHostsMask);
 }
 CmdJobHostsMask::~CmdJobHostsMask(){}
-bool CmdJobHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobHostsMask::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    std::string mask = argv[1];
@@ -119,7 +119,7 @@ CmdJobsSetUser::CmdJobsSetUser()
    setMsgType( af::Msg::TJobSetUser);
 }
 CmdJobsSetUser::~CmdJobsSetUser(){}
-bool CmdJobsSetUser::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsSetUser::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    std::string user = argv[1];
@@ -139,13 +139,13 @@ CmdJobId::CmdJobId()
    setRecieving();
 }
 CmdJobId::~CmdJobId(){}
-bool CmdJobId::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobId::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }
-void CmdJobId::msgOut( af::Msg& msg)
+void CmdJobId::v_msgOut( af::Msg& msg)
 {
    af::Job job( &msg);
    job.stdOut( true);
@@ -162,7 +162,7 @@ CmdJobLog::CmdJobLog()
    setRecieving();
 }
 CmdJobLog::~CmdJobLog(){}
-bool CmdJobLog::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
@@ -180,13 +180,13 @@ CmdJobProgress::CmdJobProgress()
    setRecieving();
 }
 CmdJobProgress::~CmdJobProgress(){}
-bool CmdJobProgress::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobProgress::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }
-void CmdJobProgress::msgOut( af::Msg& msg)
+void CmdJobProgress::v_msgOut( af::Msg& msg)
 {
    af::JobProgress jobprogress( &msg);
    jobprogress.stdOut();
@@ -201,7 +201,7 @@ CmdJobsDelete::CmdJobsDelete()
    setMsgType( af::Msg::TJobDelete);
 }
 CmdJobsDelete::~CmdJobsDelete(){}
-bool CmdJobsDelete::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsDelete::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string mask = argv[0];
    if( af::RegExp::Validate( mask) == false ) return false;
@@ -219,7 +219,7 @@ CmdJobsPause::CmdJobsPause()
    setMsgType( af::Msg::TJobPause);
 }
 CmdJobsPause::~CmdJobsPause(){}
-bool CmdJobsPause::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsPause::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string mask = argv[0];
    if( af::RegExp::Validate( mask) == false ) return false;
@@ -237,7 +237,7 @@ CmdJobsStart::CmdJobsStart()
    setMsgType( af::Msg::TJobStart);
 }
 CmdJobsStart::~CmdJobsStart(){}
-bool CmdJobsStart::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsStart::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string mask = argv[0];
    if( af::RegExp::Validate( mask) == false ) return false;
@@ -255,7 +255,7 @@ CmdJobsStop::CmdJobsStop()
    setMsgType( af::Msg::TJobStop);
 }
 CmdJobsStop::~CmdJobsStop(){}
-bool CmdJobsStop::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsStop::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string mask = argv[0];
    if( af::RegExp::Validate( mask) == false ) return false;
@@ -273,7 +273,7 @@ CmdJobsRestart::CmdJobsRestart()
    setMsgType( af::Msg::TJobRestart);
 }
 CmdJobsRestart::~CmdJobsRestart(){}
-bool CmdJobsRestart::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdJobsRestart::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string mask = argv[0];
    if( af::RegExp::Validate( mask) == false ) return false;

@@ -20,7 +20,7 @@ CmdRegExp::CmdRegExp()
 
 CmdRegExp::~CmdRegExp(){}
 
-bool CmdRegExp::processArguments( int argc, char** argv, af::Msg & msg)
+bool CmdRegExp::v_processArguments( int argc, char** argv, af::Msg & msg)
 {
    af::RegExp rx;
    std::string str = argv[0];

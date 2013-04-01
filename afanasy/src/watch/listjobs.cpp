@@ -37,11 +37,11 @@ bool    ListJobs::FilterMatch_SU    = false;
 QString ListJobs::FilterString_SU = "";
 
 ListJobs::ListJobs( QWidget* parent):
-   ListNodes( parent)
+   ListNodes( parent, "jobs")
 {
-   eventsShowHide << af::Msg::TMonitorJobsAdd;
-   eventsShowHide << af::Msg::TMonitorJobsChanged;
-   eventsOnOff    << af::Msg::TMonitorJobsDel;
+   m_eventsShowHide << af::Msg::TMonitorJobsAdd;
+   m_eventsShowHide << af::Msg::TMonitorJobsChanged;
+   m_eventsOnOff    << af::Msg::TMonitorJobsDel;
 
    if( af::Environment::VISOR())
    {
@@ -87,10 +87,10 @@ Press RMB for Options.\
    timer->start( 1000 * af::Environment::getWatchRefreshInterval());
    connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 
-   parentWindow->setWindowTitle("Jobs:");
+   m_parentWindow->setWindowTitle("Jobs:");
 }
 
-void ListJobs::shownFunc()
+void ListJobs::v_shownFunc()
 {
    if( Watch::isConnected() == false) return;
 
@@ -101,13 +101,13 @@ void ListJobs::shownFunc()
       if( Watch::getUid())
          Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestUserId, Watch::getUid(), true));
       else
-         if( parentWindow != (QWidget*)Watch::getDialog()) close();
+         if( m_parentWindow != (QWidget*)Watch::getDialog()) close();
    }
 }
 
-void ListJobs::connectionLost()
+void ListJobs::v_connectionLost()
 {
-   if( parentWindow != (QWidget*)Watch::getDialog()) parentWindow->close();
+   if( m_parentWindow != (QWidget*)Watch::getDialog()) m_parentWindow->close();
 }
 
 void ListJobs::contextMenuEvent( QContextMenuEvent *event)
@@ -314,9 +314,9 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
       {
          if( af::Environment::VISOR() == false )
          {
-            view->scrollToBottom();
+            m_view->scrollToBottom();
          }
-         subscribe();
+         v_subscribe();
       }
       break;
    }
@@ -379,14 +379,14 @@ void ListJobs::calcTotals()
    int numjobs = count();
    if( numjobs == 0)
    {
-      parentWindow->setWindowTitle("Jobs: (none)");
+      m_parentWindow->setWindowTitle("Jobs: (none)");
       return;
    }
    else
    {
       for( int i = 0; i < numjobs; i++)
       {
-         ItemJob * itemjob = (ItemJob*)(model->item(i));
+         ItemJob * itemjob = (ItemJob*)(m_model->item(i));
          if( itemjob->state & AFJOB::STATE_DONE_MASK )
          {
             done++;
@@ -410,16 +410,16 @@ void ListJobs::calcTotals()
 
    if( af::Environment::VISOR())
    {
-      parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E")
+      m_parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E")
          .arg( numjobs).arg( running).arg( done).arg( error));
    }
    else
    {
       if( blocksrun )
-         parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E B%5-%6%")
+         m_parentWindow->setWindowTitle(QString("J[%1]: R%2/%3D/%4E B%5-%6%")
             .arg( numjobs).arg( running).arg( done).arg( error).arg( blocksrun).arg( percent / blocksrun));
       else
-         parentWindow->setWindowTitle(QString("J[%1]: Done").arg( numjobs));
+         m_parentWindow->setWindowTitle(QString("J[%1]: Done").arg( numjobs));
    }
 }
 

@@ -7,5 +7,5 @@ class CmdNetwork : public Cmd
 public:
    CmdNetwork();
    ~CmdNetwork();
-   bool processArguments( int argc, char** argv, af::Msg &msg);
+   bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };

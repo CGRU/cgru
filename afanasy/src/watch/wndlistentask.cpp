@@ -73,7 +73,7 @@ bool WndListenTask::caseMessage( af::Msg * msg)
    return true;
 }
 
-void WndListenTask::connectionLost()
+void WndListenTask::v_connectionLost()
 {
    close();
 }

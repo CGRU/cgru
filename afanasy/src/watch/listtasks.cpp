@@ -47,21 +47,21 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 {
    init();
 
-   view->setSpacing( 1);
+   m_view->setSpacing( 1);
 //   view->setUniformItemSizes( true);
 //   view->setBatchSize( 10000);
 
-   view->setListItems( this);
+   m_view->setListItems( this);
 
    Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, jobid, true));
 
-   parentWindow->setWindowTitle( jobname);
+   m_parentWindow->setWindowTitle( jobname);
 }
 
 void ListTasks::construct( af::Job * job)
 {
    constructed = true;
-   view->viewport()->hide();
+   m_view->viewport()->hide();
 
    blocksnum = job->getBlocksNum();
    if( blocksnum == 0 ) return;
@@ -76,20 +76,20 @@ void ListTasks::construct( af::Job * job)
       wblocks[b] = new ItemJobBlock( block, this);
       tasksnum[b] = block->getTasksNum();
       wblocks[b]->tasksHidded = ((blocksnum > 1) && (tasksnum[b] > 1));
-      model->addItem( wblocks[b]);
+      m_model->addItem( wblocks[b]);
       row++;
       wtasks[b] = new ItemJobTask*[tasksnum[b]];
       for( int t = 0; t < tasksnum[b]; t++)
       {
          ItemJobTask *wtask =  new ItemJobTask( block, t);
-         model->addItem( wtask);
-         if( wblocks[b]->tasksHidded) view->setRowHidden( row , true);
+         m_model->addItem( wtask);
+         if( wblocks[b]->tasksHidded) m_view->setRowHidden( row , true);
          row++;
          wtasks[b][t] = wtask;
       }
    }
 
-   view->viewport()->show();
+   m_view->viewport()->show();
 }
 
 ListTasks::~ListTasks()
@@ -104,9 +104,9 @@ ListTasks::~ListTasks()
    Watch::watchJodTasksWindowRem( jobid);
 }
 
-void ListTasks::connectionLost()
+void ListTasks::v_connectionLost()
 {
-   if( parentWindow != (QWidget*)Watch::getDialog()) parentWindow->close();
+   if( m_parentWindow != (QWidget*)Watch::getDialog()) m_parentWindow->close();
 }
 
 void ListTasks::contextMenuEvent(QContextMenuEvent *event)
@@ -309,7 +309,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
          {
             printf("Tasks update error. Closing tasks window.\n");
             displayWarning( "Tasks update error.");
-            parentWindow->close();
+            m_parentWindow->close();
          }
       }
       delete progress;
@@ -331,7 +331,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
    {  // this messages sent if where is no job with given id.
       printf("The job does not exist any more. Closing tasks window.\n");
       displayWarning( "The job does not exist any more.");
-      parentWindow->close();
+      m_parentWindow->close();
       break;
    }
    case af::Msg::TMonitorJobsAdd:
@@ -357,14 +357,14 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
          wblocks[blocknum]->update( block, msg->type());
 
          if( msg->type() == af::Msg::TBlocks)
-            model->emit_dataChanged();
+            m_model->emit_dataChanged();
          else
          {
             int row = getRow( b);
-            if( row != -1 ) model->emit_dataChanged( getRow( blocknum));
+            if( row != -1 ) m_model->emit_dataChanged( getRow( blocknum));
          }
       }
-      if( msg->type() == af::Msg::TBlocks) model->emit_dataChanged();
+      if( msg->type() == af::Msg::TBlocks) m_model->emit_dataChanged();
       break;
    }
    default:
@@ -459,7 +459,7 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
       tIt++; bIt++; trIt++;
    }
 
-   if( firstChangedRow != -1 ) model->emit_dataChanged( firstChangedRow, lastChangedRow);
+   if( firstChangedRow != -1 ) m_model->emit_dataChanged( firstChangedRow, lastChangedRow);
 
    setWindowTitleProgress();
 
@@ -481,7 +481,7 @@ void ListTasks::setWindowTitleProgress()
          total_tasks++;
       }
 
-   parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(jobname));
+   m_parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(jobname));
 }
 
 void ListTasks::actTasksSkip()              { do_Skip_Restart( af::Msg::TTasksSkip,     ItemJobTask::ItemId); }
@@ -504,7 +504,7 @@ void ListTasks::doubleClicked( Item * item)
       wblocks[blockNum]->tasksHidded = hide;
       int row_start = getRow( blockNum, 0);
       int row_end   = getRow( blockNum, tasksnum[blockNum]-1);
-      for( int row = row_start; row <= row_end; row++) view->setRowHidden( row, hide);
+      for( int row = row_start; row <= row_end; row++) m_view->setRowHidden( row, hide);
 //   view->updateGeometries();
       if( block->resetSortingParameters()) sortBlock( block->getNumBlock());
    }
@@ -745,12 +745,12 @@ void ListTasks::blockAction( int id_block, int id_action, int i_number)
 
 bool ListTasks::mousePressed( QMouseEvent * event)
 {
-   QModelIndex index = view->indexAt( event->pos());
+   QModelIndex index = m_view->indexAt( event->pos());
    if( qVariantCanConvert<Item*>( index.data()))
    {
       Item * item = qVariantValue<Item*>( index.data());
       if( item->getId() == ItemJobBlock::ItemId)
-         return ((ItemJobBlock*)item)->mousePressed( event->pos(), view->visualRect( index));
+         return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
    }
    return false;
 }
@@ -786,7 +786,7 @@ void ListTasks::sortBlock( int numblock)
    for( int b = 0; b < numblock; b++) start += tasksnum[b];
 
    const QList<Item*> selection = getSelectedItems();
-   model->setItems( start, (Item**)array, tasksnum[numblock]);
+   m_model->setItems( start, (Item**)array, tasksnum[numblock]);
    setSelectedItems( selection);
 
    delete [] array;

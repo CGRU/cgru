@@ -16,7 +16,7 @@ CmdNetwork::CmdNetwork()
 
 CmdNetwork::~CmdNetwork(){}
 
-bool CmdNetwork::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdNetwork::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string operation( argv[0]);
    if( operation == "if")

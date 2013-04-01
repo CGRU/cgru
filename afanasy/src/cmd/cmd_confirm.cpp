@@ -15,7 +15,7 @@ CmdConfirm::CmdConfirm()
 
 CmdConfirm::~CmdConfirm(){}
 
-bool CmdConfirm::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdConfirm::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.set( af::Msg::TConfirm);
    return true;

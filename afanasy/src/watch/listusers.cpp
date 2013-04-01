@@ -27,7 +27,7 @@ bool    ListUsers::FilterMatch    = false;
 QString ListUsers::FilterString   = "";
 
 ListUsers::ListUsers( QWidget* parent):
-   ListNodes(  parent, af::Msg::TUsersListRequest)
+   ListNodes(  parent, "users", af::Msg::TUsersListRequest)
 {
    ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
@@ -41,17 +41,17 @@ ListUsers::ListUsers( QWidget* parent):
    ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
    initSortFilterCtrl();
 
-   eventsShowHide << af::Msg::TMonitorUsersAdd;
-   eventsShowHide << af::Msg::TMonitorUsersChanged;
-   eventsOnOff    << af::Msg::TMonitorUsersDel;
+   m_eventsShowHide << af::Msg::TMonitorUsersAdd;
+   m_eventsShowHide << af::Msg::TMonitorUsersChanged;
+   m_eventsOnOff    << af::Msg::TMonitorUsersDel;
 
-   parentWindow->setWindowTitle("Users");
+   m_parentWindow->setWindowTitle("Users");
 
    init();
 
    if( false == af::Environment::VISOR()) setAllowSelection( false);
 
-   connect( (ModelNodes*)model, SIGNAL( nodeAdded( ItemNode *, const QModelIndex &)),
+   connect( (ModelNodes*)m_model, SIGNAL( nodeAdded( ItemNode *, const QModelIndex &)),
                           this,   SLOT( userAdded( ItemNode *, const QModelIndex &)));
 }
 
@@ -166,7 +166,7 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
    {
       updateItems( msg);
       calcTitle();
-      subscribe();
+      v_subscribe();
       break;
    }
    case af::Msg::TMonitorUsersDel:
@@ -203,7 +203,7 @@ ItemNode* ListUsers::createNewItem( af::Node *node)
 void ListUsers::userAdded( ItemNode * node, const QModelIndex & index)
 {
 //printf("node->getId()=%d ,   Watch::getUid()=%d,  row=%d\n", node->getId(), Watch::getUid(), index.row());
-   if( node->getId() == Watch::getUid()) view->selectionModel()->select( index, QItemSelectionModel::Select);
+   if( node->getId() == Watch::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
 }
 
 void ListUsers::calcTitle()
@@ -212,10 +212,10 @@ void ListUsers::calcTitle()
    int running = 0;
    for( int i = 0; i < total; i++)
    {
-      ItemUser * itemuser = (ItemUser*)(model->item(i));
+      ItemUser * itemuser = (ItemUser*)(m_model->item(i));
       if( itemuser->numrunningtasks > 0 ) running++;
    }
-   parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
+   m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
 }
 
 void ListUsers::actAnnotate()

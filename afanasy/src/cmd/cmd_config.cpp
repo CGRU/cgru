@@ -15,7 +15,7 @@ CmdConfigLoad::CmdConfigLoad()
     setRecieving();
 }
 CmdConfigLoad::~CmdConfigLoad(){}
-bool CmdConfigLoad::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdConfigLoad::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     msg.set( af::Msg::TConfigLoad);
     return true;
@@ -31,7 +31,7 @@ CmdConfigMagic::CmdConfigMagic()
     setRecieving();
 }
 CmdConfigMagic::~CmdConfigMagic(){}
-bool CmdConfigMagic::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdConfigMagic::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     msg.set( af::Msg::TMagicNumber, atoi(argv[0]));
     return true;

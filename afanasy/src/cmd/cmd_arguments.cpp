@@ -10,7 +10,7 @@ CmdVerbose::CmdVerbose()
    setInfo("Set verbose mode.");
 }
 CmdVerbose::~CmdVerbose(){}
-bool CmdVerbose::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdVerbose::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    Verbose = true;
    return true;
@@ -22,7 +22,7 @@ CmdHelp::CmdHelp()
    setInfo("Set help mode.");
 }
 CmdHelp::~CmdHelp(){}
-bool CmdHelp::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdHelp::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    Help = true;
    return true;
@@ -36,7 +36,7 @@ CmdProtocol::CmdProtocol()
    setHelp("IP [4|6] Force protocol to use to connect to server. Server name may be solved with several protocols.");
 }
 CmdProtocol::~CmdProtocol(){}
-bool CmdProtocol::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdProtocol::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    if( argv[0][0] == '4')
       Protocol = AF_INET;
@@ -55,7 +55,7 @@ CmdServerName::CmdServerName()
    setHelp("server [name] Force server name to connect (to try to solve).");
 }
 CmdServerName::~CmdServerName(){}
-bool CmdServerName::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdServerName::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    ServerName = argv[0];
    return true;
@@ -69,7 +69,7 @@ CmdServerPort::CmdServerPort()
    setHelp("port [number] Force server port to connect.");
 }
 CmdServerPort::~CmdServerPort(){}
-bool CmdServerPort::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdServerPort::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int port = atoi(argv[0]);
    ServerPort = port;
@@ -85,7 +85,7 @@ CmdFork::CmdFork()
    setHelp("fork [count] Fork command process. For debug purposes only !");
 }
 CmdFork::~CmdFork(){}
-bool CmdFork::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdFork::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    int count = atoi(argv[0]);
    for( int i = 0; i < count; i++) fork();

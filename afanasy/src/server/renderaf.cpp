@@ -319,20 +319,13 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 	JobContainer * jobs = (JobContainer*)pointer;
 	switch( type)
 	{
-	case af::Msg::TRenderAnnotate:
-	{
-		appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
-		m_annotation = mcgeneral.getString();
-		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
-		break;
-	}
-	case af::Msg::TRenderSetPriority:
+/*	case af::Msg::TRenderSetPriority:
 	{
 		appendLog( std::string("Priority set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
 		setPriority( mcgeneral.getNumber());
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
 		break;
-	}
+	}*/
 	case af::Msg::TRenderHideShow:
 	{
 		if( isHidden() == mcgeneral.getNumber())
@@ -345,20 +338,20 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_flags);
 		break;
 	}
-	case af::Msg::TRenderSetCapacity:
+/*	case af::Msg::TRenderSetCapacity:
 	{
 		appendLog( std::string("Capacity set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
 		setCapacity( mcgeneral.getNumber());
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
 		break;
-	}
-	case af::Msg::TRenderSetMaxTasks:
+	}*/
+/*	case af::Msg::TRenderSetMaxTasks:
 	{
 		appendLog( std::string("Max tasks set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
 		setMaxTasks( mcgeneral.getNumber());
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
 		break;
-	}
+	}*/
 	case af::Msg::TRenderSetService:
 	{
 		appendLog( std::string("Service \"") + mcgeneral.getString() + "\" "
@@ -398,13 +391,6 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 		appendLog( std::string("Set free by ") + userhost_string);
 		setFree();
 		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
-		break;
-	}
-	case af::Msg::TRenderSetUser:
-	{
-		appendLog( std::string("User set to \"") + mcgeneral.getString() + "\" by " + userhost);
-		m_user_name = mcgeneral.getString();
-		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_username);
 		break;
 	}
 	case af::Msg::TRenderEjectTasks:

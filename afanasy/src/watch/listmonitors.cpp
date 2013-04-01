@@ -26,7 +26,7 @@ bool    ListMonitors::FilterMatch    = false;
 QString ListMonitors::FilterString   = "";
 
 ListMonitors::ListMonitors( QWidget* parent):
-   ListNodes(  parent, af::Msg::TMonitorsListRequest)
+   ListNodes(  parent, "monitors", af::Msg::TMonitorsListRequest)
 {
    ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
@@ -42,11 +42,11 @@ ListMonitors::ListMonitors( QWidget* parent):
    ctrl->addFilterType( CtrlSortFilter::TADDRESS);
    initSortFilterCtrl();
 
-   eventsShowHide << af::Msg::TMonitorMonitorsAdd;
-   eventsShowHide << af::Msg::TMonitorMonitorsChanged;
-   eventsOnOff    << af::Msg::TMonitorMonitorsDel;
+   m_eventsShowHide << af::Msg::TMonitorMonitorsAdd;
+   m_eventsShowHide << af::Msg::TMonitorMonitorsChanged;
+   m_eventsOnOff    << af::Msg::TMonitorMonitorsDel;
 
-   parentWindow->setWindowTitle("Monitors");
+   m_parentWindow->setWindowTitle("Monitors");
 
    init();
 }
@@ -82,7 +82,7 @@ AFINFO("ListMonitors::caseMessage( Msg msg)\n");
    case af::Msg::TMonitorsList:
    {
       updateItems( msg);
-      subscribe();
+      v_subscribe();
       calcTitle();
       break;
    }
@@ -126,10 +126,10 @@ void ListMonitors::calcTitle()
    int super = 0;
    for( int i = 0; i < total; i++)
    {
-      ItemMonitor * itemmonitor = (ItemMonitor*)(model->item(i));
+      ItemMonitor * itemmonitor = (ItemMonitor*)(m_model->item(i));
       if( itemmonitor->superuser ) super++;
    }
-   parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
+   m_parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
 }
 
 void ListMonitors::actSendMessage()

@@ -14,7 +14,7 @@ CmdPath::CmdPath()
 
 CmdPath::~CmdPath(){}
 
-bool CmdPath::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdPath::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string operation( argv[0]);
 	std::string path( argv[1]);

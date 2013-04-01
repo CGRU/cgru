@@ -33,7 +33,7 @@ signals:
 protected:
    void contextMenuEvent(QContextMenuEvent *event);
    void doubleClicked( Item * item);
-   void connectionLost();
+   void v_connectionLost();
 
 private slots:
 

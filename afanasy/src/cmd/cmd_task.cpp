@@ -17,7 +17,7 @@ CmdTaskLog::CmdTaskLog()
     setRecieving();
 }
 CmdTaskLog::~CmdTaskLog(){}
-bool CmdTaskLog::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTaskLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     bool ok; int job; int block; int task; int number;
     job    = af::stoi(argv[0], &ok);
@@ -43,7 +43,7 @@ CmdTaskOutput::CmdTaskOutput()
     setRecieving();
 }
 CmdTaskOutput::~CmdTaskOutput(){}
-bool CmdTaskOutput::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     bool ok; int job; int block; int task; int number;
     job    = af::stoi(argv[0], &ok);
@@ -68,7 +68,7 @@ CmdTaskRestart::CmdTaskRestart()
     setMsgType( af::Msg::TTasksRestart);
 }
 CmdTaskRestart::~CmdTaskRestart(){}
-bool CmdTaskRestart::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTaskRestart::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
     bool ok; int job; int block; int task;
     job    = af::stoi(argv[0], &ok);

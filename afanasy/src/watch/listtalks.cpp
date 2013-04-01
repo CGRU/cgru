@@ -26,7 +26,7 @@ bool    ListTalks::FilterMatch    = false;
 QString ListTalks::FilterString   = "";
 
 ListTalks::ListTalks( QWidget* parent):
-   ListNodes(  parent, af::Msg::TTalksListRequest)
+   ListNodes(  parent, "talks", af::Msg::TTalksListRequest)
 {
    ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
@@ -35,10 +35,10 @@ ListTalks::ListTalks( QWidget* parent):
    ctrl->addFilterType( CtrlSortFilter::TNAME);
    initSortFilterCtrl();
 
-   eventsShowHide << af::Msg::TMonitorTalksAdd;
-   eventsOnOff    << af::Msg::TMonitorTalksDel;
+   m_eventsShowHide << af::Msg::TMonitorTalksAdd;
+   m_eventsOnOff    << af::Msg::TMonitorTalksDel;
 
-   parentWindow->setWindowTitle("Talks");
+   m_parentWindow->setWindowTitle("Talks");
 
    init();
 }
@@ -74,15 +74,15 @@ AFINFO("void ListTalks::caseMessage( Msg msg)\n");
    case af::Msg::TTalksList:
    {
       updateItems( msg);
-      subscribe();
-      parentWindow->setWindowTitle(QString("Talks:%1").arg( count()));
+      v_subscribe();
+      m_parentWindow->setWindowTitle(QString("Talks:%1").arg( count()));
       break;
    }
    case af::Msg::TMonitorTalksDel:
    {
       af::MCGeneral ids( msg);
       deleteItems( ids);
-      parentWindow->setWindowTitle(QString("Talks:%1").arg( count()));
+      m_parentWindow->setWindowTitle(QString("Talks:%1").arg( count()));
       break;
    }
    case af::Msg::TMonitorTalksAdd:

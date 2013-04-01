@@ -245,4 +245,12 @@ namespace af
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::list<std::string> & i_list);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::string & i_string);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, char * i_data, int i_size);
+
+	void jsonActionStart(  std::ostringstream & i_str, const std::string & i_type,
+		const std::string & i_mask, const std::vector<int> & i_ids = std::vector<int>());
+	void jsonActionFinish( std::ostringstream & i_str);
+
+	void jsonActionParamsStart(  std::ostringstream & i_str, const std::string & i_type,
+		const std::string & i_mask, const std::vector<int> & i_ids = std::vector<int>());
+	void jsonActionParamsFinish( std::ostringstream & i_str);
 }

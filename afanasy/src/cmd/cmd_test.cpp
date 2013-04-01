@@ -17,7 +17,7 @@ CmdTest::CmdTest()
 
 CmdTest::~CmdTest(){}
 
-bool CmdTest::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdTest::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string qstring( argv[0]);
    int count = atoi(argv[1]);
@@ -28,4 +28,4 @@ bool CmdTest::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-void CmdTest::msgOut( af::Msg& msg) {}
+void CmdTest::v_msgOut( af::Msg& msg) {}

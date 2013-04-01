@@ -2,6 +2,7 @@
 
 #include "../include/afjob.h"
 
+#include "environment.h"
 #include "msg.h"
 #include "regexp.h"
 #include "render.h"
@@ -292,4 +293,44 @@ void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 	}
 
 	o_str << "\"";
-} 
+}
+ 
+void af::jsonActionStart( std::ostringstream & i_str, const std::string & i_type, const std::string & i_mask, const std::vector<int> & i_ids)
+{
+	i_str << "{\"action\":{";
+	i_str << "\n\"user_name\":\"" << af::Environment::getUserName() << "\"";
+	i_str << ",\n\"host_name\":\"" << af::Environment::getHostName() << "\"";
+	i_str << ",\n\"type\":\"" << i_type << "\"";
+	if( i_mask.size())
+		i_str << ",\n\"mask\":\"" << i_mask << "\"";
+	else
+	{
+		i_str << ",\n\"ids\":[";
+		if( i_ids.size() == 0 )
+		{
+			AFERROR("af::jsonActionStart: And mask and ids are empty.")
+		}
+		for( int i = 0; i < i_ids.size(); i++)
+		{
+			if( i ) i_str << ",";
+			i_str << i_ids[i];
+		}
+		i_str << "]";
+	}
+}
+void af::jsonActionFinish( std::ostringstream & i_str)
+{
+	i_str << "\n}}";
+}
+
+void af::jsonActionParamsStart( std::ostringstream & i_str, const std::string & i_type, const std::string & i_mask, const std::vector<int> & i_ids)
+{
+	af::jsonActionStart( i_str, i_type, i_mask, i_ids);
+	i_str << ",\n\"params\":{";
+}
+void af::jsonActionParamsFinish( std::ostringstream & i_str)
+{
+	i_str << "\n}";
+	jsonActionFinish( i_str);
+}
+

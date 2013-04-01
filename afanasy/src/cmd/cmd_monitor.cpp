@@ -17,12 +17,12 @@ CmdMonitorList::CmdMonitorList()
    setRecieving();
 }
 CmdMonitorList::~CmdMonitorList(){}
-bool CmdMonitorList::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdMonitorList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
    msg.set( af::Msg::TMonitorsListRequest);
    return true;
 }
-void CmdMonitorList::msgOut( af::Msg& msg)
+void CmdMonitorList::v_msgOut( af::Msg& msg)
 {
    af::MCAfNodes list( &msg);
    list.stdOut( Verbose);
@@ -38,7 +38,7 @@ CmdMonitorLog::CmdMonitorLog()
 	setRecieving();
 }
 CmdMonitorLog::~CmdMonitorLog(){}
-bool CmdMonitorLog::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdMonitorLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	int number = atoi(argv[0]);
 	msg.set( getMsgType(), number);

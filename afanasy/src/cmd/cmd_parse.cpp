@@ -14,7 +14,7 @@ CmdParse::CmdParse()
 	setHelp("parse [parsername] [numframes=1] Check parser.");
 }
 CmdParse::~CmdParse(){}
-bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdParse::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	int numframes = 1;
 	if( argc > 0)
