@@ -117,29 +117,29 @@ switch ( i_msg->type())
 		i_args->users->setPermanent( mcgeneral, true, i_args->monitors);
 		break;
 	}
-	case af::Msg::TJobAnnotate:
-	case af::Msg::TJobSetUser:
-	case af::Msg::TJobHostsMask:
-	case af::Msg::TJobHostsMaskExclude:
-	case af::Msg::TJobDependMask:
-	case af::Msg::TJobDependMaskGlobal:
-	case af::Msg::TJobMaxRunningTasks:
-	case af::Msg::TJobMaxRunTasksPerHost:
-	case af::Msg::TJobWaitTime:
-	case af::Msg::TJobLifeTime:
-	case af::Msg::TJobPriority:
-	case af::Msg::TJobStart:
-	case af::Msg::TJobStop:
-	case af::Msg::TJobRestart:
-	case af::Msg::TJobRestartErrors:
-	case af::Msg::TJobResetErrorHosts:
-	case af::Msg::TJobPause:
-	case af::Msg::TJobRestartPause:
-	case af::Msg::TJobDelete:
-	case af::Msg::TJobNeedOS:
-	case af::Msg::TJobNeedProperties:
-	case af::Msg::TJobCmdPost:
-	case af::Msg::TJobHideShow:
+//	case af::Msg::TJobAnnotate:
+//	case af::Msg::TJobSetUser:
+//	case af::Msg::TJobHostsMask:
+//	case af::Msg::TJobHostsMaskExclude:
+//	case af::Msg::TJobDependMask:
+//	case af::Msg::TJobDependMaskGlobal:
+//	case af::Msg::TJobMaxRunningTasks:
+//	case af::Msg::TJobMaxRunTasksPerHost:
+//	case af::Msg::TJobWaitTime:
+//	case af::Msg::TJobLifeTime:
+//	case af::Msg::TJobPriority:
+//	case af::Msg::TJobStart:
+//	case af::Msg::TJobStop:
+//	case af::Msg::TJobRestart:
+//	case af::Msg::TJobRestartErrors:
+//	case af::Msg::TJobResetErrorHosts:
+//	case af::Msg::TJobPause:
+//	case af::Msg::TJobRestartPause:
+//	case af::Msg::TJobDelete:
+//	case af::Msg::TJobNeedOS:
+//	case af::Msg::TJobNeedProperties:
+//	case af::Msg::TJobCmdPost:
+//	case af::Msg::TJobHideShow:
 	case af::Msg::TBlockErrorsAvoidHost:
 	case af::Msg::TBlockErrorRetries:
 	case af::Msg::TBlockErrorsSameHost:

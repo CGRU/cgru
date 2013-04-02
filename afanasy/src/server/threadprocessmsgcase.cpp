@@ -748,29 +748,29 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TBlockNeedProperties:
 	case af::Msg::TBlockNonSequential:
 	case af::Msg::TTasksRestart:
-	case af::Msg::TJobAnnotate:
-	case af::Msg::TJobSetUser:
-	case af::Msg::TJobHostsMask:
-	case af::Msg::TJobHostsMaskExclude:
-	case af::Msg::TJobDependMask:
-	case af::Msg::TJobDependMaskGlobal:
-	case af::Msg::TJobMaxRunningTasks:
-	case af::Msg::TJobMaxRunTasksPerHost:
-	case af::Msg::TJobWaitTime:
-	case af::Msg::TJobLifeTime:
-	case af::Msg::TJobPriority:
-	case af::Msg::TJobNeedOS:
-	case af::Msg::TJobNeedProperties:
-	case af::Msg::TJobCmdPost:
-	case af::Msg::TJobStart:
-	case af::Msg::TJobStop:
-	case af::Msg::TJobRestart:
-	case af::Msg::TJobRestartErrors:
-	case af::Msg::TJobResetErrorHosts:
-	case af::Msg::TJobPause:
-	case af::Msg::TJobRestartPause:
-	case af::Msg::TJobDelete:
-	case af::Msg::TJobHideShow:
+//	case af::Msg::TJobAnnotate:
+//	case af::Msg::TJobSetUser:
+//	case af::Msg::TJobHostsMask:
+//	case af::Msg::TJobHostsMaskExclude:
+//	case af::Msg::TJobDependMask:
+//	case af::Msg::TJobDependMaskGlobal:
+//	case af::Msg::TJobMaxRunningTasks:
+//	case af::Msg::TJobMaxRunTasksPerHost:
+//	case af::Msg::TJobWaitTime:
+//	case af::Msg::TJobLifeTime:
+//	case af::Msg::TJobPriority:
+//	case af::Msg::TJobNeedOS:
+//	case af::Msg::TJobNeedProperties:
+//	case af::Msg::TJobCmdPost:
+//	case af::Msg::TJobStart:
+//	case af::Msg::TJobStop:
+//	case af::Msg::TJobRestart:
+//	case af::Msg::TJobRestartErrors:
+//	case af::Msg::TJobResetErrorHosts:
+//	case af::Msg::TJobPause:
+//	case af::Msg::TJobRestartPause:
+//	case af::Msg::TJobDelete:
+//	case af::Msg::TJobHideShow:
 	case af::Msg::TRenderDeregister:
 //	case af::Msg::TUserAnnotate:
 	case af::Msg::TUserAdd:

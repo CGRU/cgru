@@ -441,7 +441,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
     std::string userhost = mcgeneral.getUserName() + '@' + mcgeneral.getHostName();
     switch( type)
     {
-    case af::Msg::TJobAnnotate:
+/*    case af::Msg::TJobAnnotate:
     {
         m_annotation = mcgeneral.getString();
         appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
@@ -660,7 +660,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       for( int b = 0; b < m_blocksnum; b++) m_blocks[b]->action( mcgeneral, af::Msg::TBlockResetErrorHosts, NULL, monitoring);
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
-   }
+   }*/
    case af::Msg::TBlockErrorsForgiveTime:
    case af::Msg::TBlockErrorsAvoidHost:
    case af::Msg::TBlockErrorRetries:

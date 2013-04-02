@@ -112,34 +112,39 @@ void ListJobs::v_connectionLost()
 
 void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 {
-	 QMenu menu(this);
-	 QMenu * submenu;
-	 QAction *action;
+	QMenu menu(this);
+	QMenu * submenu;
+	QAction *action;
 
-	 ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	 if( jobitem == NULL ) return;
-	 int selectedItemsCount = getSelectedItemsCount();
+	ItemJob* jobitem = (ItemJob*)getCurrentItem();
+	if( jobitem == NULL ) return;
+	int selectedItemsCount = getSelectedItemsCount();
 
-	 action = new QAction( "Show Log", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
-	 menu.addAction( action);
+	action = new QAction( "Show Log", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
+	menu.addAction( action);
 
-	 action = new QAction( "Show Error Hosts", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actRequestErrorHostsList() ));
-	 menu.addAction( action);
+	action = new QAction( "Show Error Hosts", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestErrorHostsList() ));
+	menu.addAction( action);
 
-	 action = new QAction( "Reset Error Hosts", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
-	 menu.addAction( action);
+	action = new QAction( "Reset Error Hosts", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
+	menu.addAction( action);
 
-	 action = new QAction( "Restart Errors", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
-	 if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
-	 menu.addAction( action);
+	action = new QAction( "Restart Errors", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
+	menu.addAction( action);
 
-	 menu.addSeparator();
-	 if( af::Environment::VISOR() == false)
-	 {
+	action = new QAction( "Restart Running", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartRunning() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
+	menu.addAction( action);
+
+	menu.addSeparator();
+	if( af::Environment::VISOR() == false)
+	{
 		  action = new QAction( "Move Up", this);
 		  connect( action, SIGNAL( triggered() ), this, SLOT( actMoveUp() ));
 		  menu.addAction( action);
@@ -152,20 +157,20 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 		  action = new QAction( "Move Bottom", this);
 		  connect( action, SIGNAL( triggered() ), this, SLOT( actMoveBottom() ));
 		  menu.addAction( action);
-	 }
-	 else
-	 {
+	}
+	else
+	{
 		  action = new QAction("Change Owner", this);
 		  connect( action, SIGNAL( triggered() ), this, SLOT( actSetUser() ));
 		  menu.addAction( action);
-	 }
-	 menu.addSeparator();
+	}
+	menu.addSeparator();
 
-	 action = new QAction( "Annotate", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-	 menu.addAction( action);
+	action = new QAction( "Annotate", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+	menu.addAction( action);
 
-	 submenu = new QMenu( "Set Parameter", this);
+	submenu = new QMenu( "Set Parameter", this);
 
 	action = new QAction( "Hidden", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
@@ -173,51 +178,51 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Not Hidden", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
 	submenu->addAction( action);
-	 action = new QAction( "Max Running Tasks", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Max Run Tasks Per Host", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunTasksPerHost() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Hosts Mask", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Hosts Exclude Mask", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
-	 submenu->addAction( action);
+	action = new QAction( "Max Running Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
+	submenu->addAction( action);
+	action = new QAction( "Max Run Tasks Per Host", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunTasksPerHost() ));
+	submenu->addAction( action);
+	action = new QAction( "Hosts Mask", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
+	submenu->addAction( action);
+	action = new QAction( "Hosts Exclude Mask", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
+	submenu->addAction( action);
 
 	if(( af::Environment::VISOR()) || ( af::Environment::getPermUserModJobPriority()))
 	{
-	    action = new QAction( "Priority", this);
-	    connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-	    submenu->addAction( action);
+	   action = new QAction( "Priority", this);
+	   connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
+	   submenu->addAction( action);
 	}
 
-	 action = new QAction( "Depend Mask", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actDependMask() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Global Depend Mask", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actDependMaskGlobal() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Wait Time", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actWaitTime() ));
-	 submenu->addAction( action);
-	 action = new QAction( "OS Needed", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actNeedOS() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Properties Needed", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actNeedProperties() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Post Command", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
-	 submenu->addAction( action);
-	 action = new QAction( "Life Time", this);
-	 connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
-	 submenu->addAction( action);
+	action = new QAction( "Depend Mask", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actDependMask() ));
+	submenu->addAction( action);
+	action = new QAction( "Global Depend Mask", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actDependMaskGlobal() ));
+	submenu->addAction( action);
+	action = new QAction( "Wait Time", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actWaitTime() ));
+	submenu->addAction( action);
+	action = new QAction( "OS Needed", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actNeedOS() ));
+	submenu->addAction( action);
+	action = new QAction( "Properties Needed", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actNeedProperties() ));
+	submenu->addAction( action);
+	action = new QAction( "Post Command", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
+	submenu->addAction( action);
+	action = new QAction( "Life Time", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
+	submenu->addAction( action);
 
-	 menu.addMenu( submenu);
+	menu.addMenu( submenu);
 
-	 menu.addSeparator();
+	menu.addSeparator();
 
 	if( selectedItemsCount == 1)
 	{
@@ -446,13 +451,23 @@ void ListJobs::moveJobs( const std::string & i_operation)
 	displayInfo( afqt::stoq( i_operation));
 }
 
+void ListJobs::actStart()           { operation("start"            );}
+void ListJobs::actStop()            { operation("stop"             );}
+void ListJobs::actRestart()         { operation("restart"          );}
+void ListJobs::actRestartErrors()   { operation("restart_errors"   );}
+void ListJobs::actRestartRunning()  { operation("restart_running"  );}
+void ListJobs::actResetErrorHosts() { operation("reset_error_hosts");}
+void ListJobs::actPause()           { operation("pause"            );}
+void ListJobs::actRestartPause()    { operation("restart_pause"    );}
+void ListJobs::actDelete()          { operation("delete"           );}
+
+/*
 void ListJobs::actStart()
 {
 	af::MCGeneral mcgeneral;
 	action( mcgeneral, af::Msg::TJobStart);
 	displayInfo( "Start job.");
 }
-
 void ListJobs::actStop()
 {
 	af::MCGeneral mcgeneral;
@@ -495,23 +510,7 @@ void ListJobs::actDelete()
 	action( mcgeneral, af::Msg::TJobDelete);
 	displayInfo( "Delete job.");
 }
-
-void ListJobs::actSetHidden()
-{
-	af::MCGeneral mcgeneral;
-	mcgeneral.setNumber(1);
-	action( mcgeneral, af::Msg::TJobHideShow);
-	displayInfo( "Hide job.");
-}
-
-void ListJobs::actUnsetHidden()
-{
-	af::MCGeneral mcgeneral;
-	mcgeneral.setNumber(0);
-	action( mcgeneral, af::Msg::TJobHideShow);
-	displayInfo( "Unhide job.");
-}
-
+*/
 void ListJobs::actRequestLog()
 {
 	displayInfo( "Job log request.");
@@ -530,28 +529,31 @@ void ListJobs::actRequestErrorHostsList()
 	Watch::sendMsg( msg);
 }
 
+void ListJobs::actSetHidden()   { setParameter("hidden", "true",  false); }
+void ListJobs::actUnsetHidden() { setParameter("hidden", "false", false); }
+
 void ListJobs::actAnnotate()
 {
-	 ItemJob* item = (ItemJob*)getCurrentItem();
-	 if( item == NULL ) return;
-	 QString current = item->annotation;
+	ItemJob* item = (ItemJob*)getCurrentItem();
+	if( item == NULL ) return;
+	QString current = item->annotation;
 
-	 bool ok;
-	 QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
-	 if( !ok) return;
+	bool ok;
+	QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
+	if( !ok) return;
 
 	setParameter("annotation", afqt::qtos( text));
 }
 
 void ListJobs::actSetUser()
 {
-	 ItemJob* item = (ItemJob*)getCurrentItem();
-	 if( item == NULL ) return;
-	 QString current = item->username;
+	ItemJob* item = (ItemJob*)getCurrentItem();
+	if( item == NULL ) return;
+	QString current = item->username;
 
-	 bool ok;
-	 QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
-	 if( !ok) return;
+	bool ok;
+	QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
+	if( !ok) return;
 
 	setParameter("user_name", afqt::qtos( text));
 }
@@ -591,9 +593,8 @@ void ListJobs::actWaitTime()
 		displayError( "Time format : " + format);
 		return;
 	}
-	af::MCGeneral mcgeneral( waittime);
-	action( mcgeneral, af::Msg::TJobWaitTime);
-	displayInfo( "Set job wait time.");
+
+	setParameter("time_wait", waittime);
 }
 
 void ListJobs::actMaxRunningTasks()
@@ -606,9 +607,7 @@ void ListJobs::actMaxRunningTasks()
 	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
 	if( !ok) return;
 
-	af::MCGeneral mcgeneral( max);
-	action( mcgeneral, af::Msg::TJobMaxRunningTasks);
-	displayInfo( "Change job maximum running tasks.");
+	setParameter("max_running_tasks", max);
 }
 
 void ListJobs::actMaxRunTasksPerHost()
@@ -621,9 +620,7 @@ void ListJobs::actMaxRunTasksPerHost()
 	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
 	if( !ok) return;
 
-	af::MCGeneral mcgeneral( max);
-	action( mcgeneral, af::Msg::TJobMaxRunTasksPerHost);
-	displayInfo( "Change job maximum running tasks pet host.");
+	setParameter("max_running_tasks_per_host", max);
 }
 
 void ListJobs::actHostsMask()
@@ -643,9 +640,7 @@ void ListJobs::actHostsMask()
 		return;
 	}
 
-	af::MCGeneral mcgeneral( mask.toUtf8().data() );
-	action( mcgeneral, af::Msg::TJobHostsMask);
-	displayInfo( "Change job hosts mask.");
+	setParameter("hosts_mask", afqt::qtos( mask));
 }
 
 void ListJobs::actHostsMaskExclude()
@@ -665,9 +660,7 @@ void ListJobs::actHostsMaskExclude()
 		return;
 	}
 
-	af::MCGeneral mcgeneral( mask.toUtf8().data() );
-	action( mcgeneral, af::Msg::TJobHostsMaskExclude);
-	displayInfo( "Change job exclude hosts mask.");
+	setParameter("hosts_mask_exclude", afqt::qtos( mask));
 }
 
 void ListJobs::actDependMask()
@@ -687,9 +680,7 @@ void ListJobs::actDependMask()
 		return;
 	}
 
-	af::MCGeneral mcgeneral( mask.toUtf8().data());
-	action( mcgeneral, af::Msg::TJobDependMask);
-	displayInfo( "Change job depend mask.");
+	setParameter("depend_mask", afqt::qtos( mask));
 }
 
 void ListJobs::actDependMaskGlobal()
@@ -709,9 +700,7 @@ void ListJobs::actDependMaskGlobal()
 		return;
 	}
 
-	af::MCGeneral mcgeneral( mask.toUtf8().data() );
-	action( mcgeneral, af::Msg::TJobDependMaskGlobal);
-	displayInfo( "Change job depend mask.");
+	setParameter("depend_mask_global", afqt::qtos( mask));
 }
 
 void ListJobs::actNeedOS()
@@ -731,9 +720,7 @@ void ListJobs::actNeedOS()
 		return;
 	}
 
-	af::MCGeneral mcgeneral( mask.toUtf8().data() );
-	action( mcgeneral, af::Msg::TJobNeedOS);
-	displayInfo( "Change job OS needed.");
+	setParameter("need_os", afqt::qtos( mask));
 }
 
 void ListJobs::actNeedProperties()
@@ -753,9 +740,7 @@ void ListJobs::actNeedProperties()
 		return;
 	}
 
-	af::MCGeneral mcgeneral( mask.toUtf8().data() );
-	action( mcgeneral, af::Msg::TJobNeedProperties);
-	displayInfo( "Change job needed properties.");
+	setParameter("need_properties", afqt::qtos( mask));
 }
 
 void ListJobs::actPostCommand()
@@ -768,9 +753,7 @@ void ListJobs::actPostCommand()
 	QString cmd = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	af::MCGeneral mcgeneral( cmd.toUtf8().data() );
-	action( mcgeneral, af::Msg::TJobCmdPost);
-	displayInfo( "Change post command.");
+	setParameter("command_post", afqt::qtos( cmd));
 }
 
 void ListJobs::actLifeTime()
@@ -785,8 +768,7 @@ void ListJobs::actLifeTime()
 
 	int seconds = hours * 60.0 * 60.0;
 	if( seconds < -1 ) seconds = -1;
-	af::MCGeneral mcgeneral( seconds);
-	action( mcgeneral, af::Msg::TJobLifeTime);
+	setParameter("time_life", seconds);
 }
 
 void ListJobs::doubleClicked( Item * item)

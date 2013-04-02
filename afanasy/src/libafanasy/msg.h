@@ -271,34 +271,34 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 
 /*- Job messages -*/
 /**/TJobRegister/**/,               ///< Register job.
-/**/TJobStart/**/,                  ///< Start offline (paused) job.
-/**/TJobStop/**/,                   ///< Stop job ( stop running tasks and set offline state).
-/**/TJobRestart/**/,                ///< Restart job.
-/**/TJobRestartErrors/**/,          ///< Restart tasks with errors.
-/**/TJobResetErrorHosts/**/,        ///< Reset all job blocks error hosts.
-/**/TJobPause/**/,                  ///< Pause job ( set offline state, keep running tasks running).
-/**/TJobRestartPause/**/,           ///< Restart and pause job.
-/**/TJobDelete/**/,                 ///< Delete a job.
+/**/__TO_DELETE__TJobStart/**/,                  ///< Start offline (paused) job.
+/**/__TO_DELETE__TJobStop/**/,                   ///< Stop job ( stop running tasks and set offline state).
+/**/__TO_DELETE__TJobRestart/**/,                ///< Restart job.
+/**/__TO_DELETE__TJobRestartErrors/**/,          ///< Restart tasks with errors.
+/**/__TO_DELETE__TJobResetErrorHosts/**/,        ///< Reset all job blocks error hosts.
+/**/__TO_DELETE__TJobPause/**/,                  ///< Pause job ( set offline state, keep running tasks running).
+/**/__TO_DELETE__TJobRestartPause/**/,           ///< Restart and pause job.
+/**/__TO_DELETE__TJobDelete/**/,                 ///< Delete a job.
 /**/TJobsListRequestIds/**/,        ///< Request a list of Jobs with given ids.
 /**/TJobsListRequestUsersIds/**/,   ///< Request brief of jobs od users with given ids.
 /**/TJobsList/**/,                  ///< Jobs list information.
 /**/TJobProgress/**/,               ///< Jobs progress.
-/**/TJobHostsMask/**/,              ///< Set job hosts mask.
-/**/TJobHostsMaskExclude/**/,       ///< Set job exclude hosts mask.
-/**/TJobDependMask/**/,             ///< Set job depend mask.
-/**/TJobDependMaskGlobal/**/,       ///< Set job global depend mask.
-/**/TJobMaxRunningTasks/**/,        ///< Set job maximum running tasks number.
-/**/TJobMaxRunTasksPerHost/**/,     ///< Set job maximum running tasks per host.
-/**/TJobWaitTime/**/,               ///< Set job wait time.
-/**/TJobLifeTime/**/,               ///< Set job life time.
-/**/TJobPriority/**/,               ///< Set job priority.
-/**/TJobNeedOS/**/,                 ///< Set a job os needed.
-/**/TJobNeedProperties/**/,         ///< Set a job properties needed.
+/**/__TO_DELETE__TJobHostsMask/**/,              ///< Set job hosts mask.
+/**/__TO_DELETE__TJobHostsMaskExclude/**/,       ///< Set job exclude hosts mask.
+/**/__TO_DELETE__TJobDependMask/**/,             ///< Set job depend mask.
+/**/__TO_DELETE__TJobDependMaskGlobal/**/,       ///< Set job global depend mask.
+/**/__TO_DELETE__TJobMaxRunningTasks/**/,        ///< Set job maximum running tasks number.
+/**/__TO_DELETE__TJobMaxRunTasksPerHost/**/,     ///< Set job maximum running tasks per host.
+/**/__TO_DELETE__TJobWaitTime/**/,               ///< Set job wait time.
+/**/__TO_DELETE__TJobLifeTime/**/,               ///< Set job life time.
+/**/__TO_DELETE__TJobPriority/**/,               ///< Set job priority.
+/**/__TO_DELETE__TJobNeedOS/**/,                 ///< Set a job os needed.
+/**/__TO_DELETE__TJobNeedProperties/**/,         ///< Set a job properties needed.
 /**/TJobsWeight/**/,                ///< All jobs weight data.
-/**/TJobCmdPost/**/,                ///< Set job post command.
-/**/TJobAnnotate/**/,               ///< Set Job annotation,
-/**/TJobSetUser/**/,                ///< Change job owner.
-/**/TJobHideShow/**/,				///< Hide or show jobs.
+/**/__TO_DELETE__TJobCmdPost/**/,                ///< Set job post command.
+/**/__TO_DELETE__TJobAnnotate/**/,               ///< Set Job annotation,
+/**/__TO_DELETE__TJobSetUser/**/,                ///< Change job owner.
+/**/__TO_DELETE__TJobHideShow/**/,				///< Hide or show jobs.
 /**/TJob/**/,                       ///< Job (all job data).
 
 /**/TBlockDependMask/**/,           ///< Set block depend mask.
