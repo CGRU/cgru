@@ -335,18 +335,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 			menu.addMenu( submenu);
 		}
-/*
-		{
-			QMenu * submenu = new QMenu( "Restart", this);
 
-			action = new QAction( "Render", this);
-			if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
-			submenu->addAction( action);
-
-			menu.addMenu( submenu);
-		}
-*/
 		{
 			QMenu * submenu = new QMenu( "Reboot", this);
 
@@ -477,21 +466,13 @@ void ListRenders::actMaxTasks()
 	if( !ok) return;
 	setParameter("max_tasks", max_tasks);
 }
-void ListRenders::actNIMBY()
-{
-	af::MCGeneral mcgeneral;
-	setParameter("NIMBY", "true", false);
-}
-void ListRenders::actNimby()
-{
-	af::MCGeneral mcgeneral;
-	setParameter("nimby", "true", false);
-}
-void ListRenders::actFree()
-{
-	af::MCGeneral mcgeneral;
-	setParameter("nimby", "false", false);
-}
+
+void ListRenders::actNIMBY()       { setParameter("NIMBY",  "true",  false); }
+void ListRenders::actNimby()       { setParameter("nimby",  "true",  false); }
+void ListRenders::actFree()        { setParameter("nimby",  "false", false); }
+void ListRenders::actSetHidden()   { setParameter("hidden", "true",  false); }
+void ListRenders::actUnsetHidden() { setParameter("hidden", "false", false); }
+
 void ListRenders::actUser()
 {
 	QString current = afqt::stoq( af::Environment::getUserName());
@@ -502,67 +483,16 @@ void ListRenders::actUser()
 
 	setParameter("user_name", afqt::qtos( text));
 }
-void ListRenders::actEjectTasks()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderEjectTasks);
-}
-void ListRenders::actEjectNotMyTasks()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderEjectNotMyTasks);
-}
-void ListRenders::actExit()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderExit);
-}
-void ListRenders::actDelete()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderDelete);
-}
-void ListRenders::actRestart()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderRestart);
-}
-void ListRenders::actReboot()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderReboot);
-}
-void ListRenders::actShutdown()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderShutdown);
-}
-void ListRenders::actWOLSleep()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderWOLSleep);
-}
-void ListRenders::actWOLWake()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderWOLWake);
-}
 
-void ListRenders::actSetHidden()
-{
-	af::MCGeneral mcgeneral;
-	mcgeneral.setNumber(1);
-	setParameter("hidden", "true", false);
-	displayInfo("Hide render.");
-}
-
-void ListRenders::actUnsetHidden()
-{
-	af::MCGeneral mcgeneral;
-	mcgeneral.setNumber(0);
-	setParameter("hidden", "false", false);
-	displayInfo("Unhide render.");
-}
+void ListRenders::actEjectTasks()      { operation("eject_tasks"); }
+void ListRenders::actEjectNotMyTasks() { operation("eject_tasks_keep_my"); }
+void ListRenders::actExit()            { operation("exit"); }
+void ListRenders::actDelete()          { operation("delete"); }
+void ListRenders::actReboot()          { operation("reboot"); }
+void ListRenders::actShutdown()        { operation("shutdown"); }
+void ListRenders::actWOLSleep()        { operation("wol_sleep"); }
+void ListRenders::actWOLWake()         { operation("wol_wake"); }
+void ListRenders::actRestoreDefaults() { operation("restore_defaults"); }
 
 void ListRenders::actRequestLog()
 {
@@ -617,16 +547,12 @@ void ListRenders::setService( bool enable)
 	QString service = QInputDialog::getText(this, caption, "Enter Service Name", QLineEdit::Normal, QString(), &ok);
 	if( !ok) return;
 
-	af::MCGeneral mcgeneral;
-	mcgeneral.setString( afqt::qtos( service));
-	mcgeneral.setNumber( enable);
-	action( mcgeneral, af::Msg::TRenderSetService);
-}
-
-void ListRenders::actRestoreDefaults()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TRenderRestoreDefaults);
+	std::ostringstream str;
+	af::jsonActionOperationStart( str, "renders", "service", "", getSelectedIds());
+	str << ",\n\"name\":\"" << afqt::qtos( service) << "\"";
+	str << ",\n\"enable\":" << ( enable ? "true": "false" );
+	af::jsonActionOperationFinish( str);
+	Watch::sendMsg( af::jsonMsg( str));
 }
 
 void ListRenders::actCommand( int number)

@@ -661,6 +661,7 @@ JobNode.actions.push(['context', 'restart',           null, 'menuHandleOperation
 JobNode.actions.push(['context', 'restart_pause',     null, 'menuHandleOperation', 'Restart&Pause']);
 JobNode.actions.push(['context', 'delete',            null, 'menuHandleOperation', 'Delete']);
 
+JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleDialog', 'Annotation']);
 JobNode.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDialog', 'Depend Mask']);
 JobNode.actions.push(['set', 'depend_mask_global',         'reg', 'menuHandleDialog', 'Global Depend Mask']);
 JobNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleDialog', 'Max Runnig Tasks']);
@@ -672,10 +673,9 @@ JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleDia
 JobNode.actions.push(['set', 'need_os',                    'reg', 'menuHandleDialog', 'OS Needed']);
 JobNode.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Need Properties']);
 JobNode.actions.push(['set', 'time_life',                  'hrs', 'menuHandleDialog', 'Life Time']);
+JobNode.actions.push(['set', 'user_name',                  'str', 'menuHandleDialog', 'Owner', 'visor']);
 JobNode.actions.push(['set',  null,                         null,  null,               null]);
 JobNode.actions.push(['set', 'hidden',                     'bl1', 'menuHandleDialog', 'Hidden']);
-JobNode.actions.push(['set',  null,                         null,  null,               null]);
-JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleDialog', 'Annotation']);
 
 JobBlock.actions = [];
 JobBlock.actions.push(['set', 'capacity',                   'num', 'menuHandleDialog', 'Capacity']);

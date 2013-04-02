@@ -771,44 +771,24 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TJobRestartPause:
 	case af::Msg::TJobDelete:
 	case af::Msg::TJobHideShow:
-//	 case af::Msg::TRenderAnnotate:
-//	 case af::Msg::TRenderSetPriority:
-//	 case af::Msg::TRenderSetCapacity:
-//	 case af::Msg::TRenderSetMaxTasks:
-	case af::Msg::TRenderSetService:
-	case af::Msg::TRenderRestoreDefaults:
-//	 case af::Msg::TRenderSetNIMBY:
-//	 case af::Msg::TRenderSetNimby:
-//	 case af::Msg::TRenderSetUser:
-//	 case af::Msg::TRenderSetFree:
-	case af::Msg::TRenderEjectTasks:
-	case af::Msg::TRenderEjectNotMyTasks:
-	case af::Msg::TRenderDelete:
-	case af::Msg::TRenderRestart:
-	case af::Msg::TRenderReboot:
-	case af::Msg::TRenderShutdown:
 	case af::Msg::TRenderDeregister:
-	case af::Msg::TRenderExit:
-	case af::Msg::TRenderWOLSleep:
-	case af::Msg::TRenderWOLWake:
-//	case af::Msg::TRenderHideShow:
-	case af::Msg::TUserAnnotate:
+//	case af::Msg::TUserAnnotate:
 	case af::Msg::TUserAdd:
-	case af::Msg::TUserDel:
-	case af::Msg::TUserHostsMask:
-	case af::Msg::TUserHostsMaskExclude:
-	case af::Msg::TUserMaxRunningTasks:
-	case af::Msg::TUserPriority:
-	case af::Msg::TUserJobsLifeTime:
-	case af::Msg::TUserJobsSolveMethod:
-	case af::Msg::TUserErrorsAvoidHost:
-	case af::Msg::TUserErrorRetries:
-	case af::Msg::TUserErrorsTaskSameHost:
-	case af::Msg::TUserErrorsForgiveTime:
-	case af::Msg::TUserMoveJobsUp:
-	case af::Msg::TUserMoveJobsDown:
-	case af::Msg::TUserMoveJobsTop:
-	case af::Msg::TUserMoveJobsBottom:
+//	case af::Msg::TUserDel:
+//	case af::Msg::TUserHostsMask:
+//	case af::Msg::TUserHostsMaskExclude:
+//	case af::Msg::TUserMaxRunningTasks:
+//	case af::Msg::TUserPriority:
+//	case af::Msg::TUserJobsLifeTime:
+//	case af::Msg::TUserJobsSolveMethod:
+//	case af::Msg::TUserErrorsAvoidHost:
+//	case af::Msg::TUserErrorRetries:
+//	case af::Msg::TUserErrorsTaskSameHost:
+//	case af::Msg::TUserErrorsForgiveTime:
+//	case af::Msg::TUserMoveJobsUp:
+//	case af::Msg::TUserMoveJobsDown:
+//	case af::Msg::TUserMoveJobsTop:
+//	case af::Msg::TUserMoveJobsBottom:
 	case af::Msg::TTalkExit:
 	case af::Msg::TTalkDeregister:
 /*	{

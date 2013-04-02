@@ -653,10 +653,10 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 			if( permission == 'user') return;
 			if( g_GOD())
 			{
-				if( permission != 'god' )
+				if( false == (( permission == 'visor') || ( permission == 'god')))
 					return;
 			}
-			else if( permission != 'visor' )
+			else if( permission != 'visor')
 				return;
 		}
 		else if( permission != 'user')

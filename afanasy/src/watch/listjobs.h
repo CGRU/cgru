@@ -67,6 +67,9 @@ private slots:
    void actListenJob();
 
 private:
+	void moveJobs( const std::string & i_operation);
+
+private:
    // Sorting filtering settings ordinary user:
    static int     SortType;
    static bool    SortAscending;

@@ -323,12 +323,32 @@ void af::jsonActionFinish( std::ostringstream & i_str)
 	i_str << "\n}}";
 }
 
-void af::jsonActionParamsStart( std::ostringstream & i_str, const std::string & i_type, const std::string & i_mask, const std::vector<int> & i_ids)
+void af::jsonActionParamsStart( std::ostringstream & i_str, const std::string & i_type,
+	const std::string & i_mask, const std::vector<int> & i_ids)
 {
 	af::jsonActionStart( i_str, i_type, i_mask, i_ids);
 	i_str << ",\n\"params\":{";
 }
 void af::jsonActionParamsFinish( std::ostringstream & i_str)
+{
+	i_str << "\n}";
+	jsonActionFinish( i_str);
+}
+
+void af::jsonActionOperation( std::ostringstream & i_str, const std::string & i_type, const std::string & i_operation,
+	const std::string & i_mask, const std::vector<int> & i_ids)
+{
+	af::jsonActionOperationStart( i_str, i_type, i_operation, i_mask, i_ids);
+	af::jsonActionOperationFinish( i_str);
+}
+void af::jsonActionOperationStart( std::ostringstream & i_str, const std::string & i_type, const std::string & i_operation,
+	const std::string & i_mask, const std::vector<int> & i_ids)
+{
+	af::jsonActionStart( i_str, i_type, i_mask, i_ids);
+	i_str << ",\n\"operation\":{";
+	i_str << "\n\"type\":\"" << i_operation << "\"";
+}
+void af::jsonActionOperationFinish( std::ostringstream & i_str)
 {
 	i_str << "\n}";
 	jsonActionFinish( i_str);

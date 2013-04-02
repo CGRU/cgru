@@ -391,9 +391,35 @@ void JobAf::v_action( Action & i_action)
 		return;
 	}
 
+	// Store user name before parameters read, to check whether it changed
+	const std::string user_name = m_user_name;
+
 	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
 		jsonRead( params, &i_action.log);
+
+	if( m_user_name != user_name )
+	{
+		// User name was changed
+        UserAf * user = UserContainer::getUser( m_user_name);
+        if( user == NULL )
+		{
+			return;
+		}
+
+        i_action.monitors->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
+        i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), m_user->getId());
+
+        m_user->removeJob( this);
+        user->addJob( this);
+
+        i_action.monitors->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
+        i_action.monitors->addJobEvent( af::Msg::TMonitorJobsAdd, getId(), m_user->getId());
+
+        AFCommon::QueueDBUpdateItem( this);
+
+		return;
+	}
 
 	if( i_action.log.size() )
 	{

@@ -52,6 +52,7 @@ protected:
 	inline void setParameter( const std::string & i_name, long long i_value) const
 		{ setParameter( i_name, af::itos( i_value), false);}
 	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
+	void operation( const std::string & i_operation) const;
 
 	void deleteItems( af::MCGeneral & ids);
 
@@ -59,6 +60,7 @@ protected:
 	Item* getCurrentItem() const;
 	int getSelectedItemsCount() const;
 	const QList<Item*> getSelectedItems() const;
+	const std::vector<int> getSelectedIds() const;
 	void setSelectedItems( const QList<Item*> & items, bool resetSelection = true);
 
 	virtual void showEvent(       QShowEvent  * event );
@@ -90,9 +92,6 @@ protected:
 private slots:
 	void currentItemChanged( const QModelIndex & current, const QModelIndex & previous );
 	void doubleClicked_slot( const QModelIndex & index );
-
-private:
-	const std::vector<int> getSelectedIds() const;
 
 private:
 	std::string m_type;

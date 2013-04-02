@@ -71,31 +71,6 @@ switch ( i_msg->type())
 		i_args->monitors->setInterest( i_msg->type(), ids);
 		break;
 	}
-//    case af::Msg::TRenderAnnotate:
-//    case af::Msg::TRenderSetPriority:
-//    case af::Msg::TRenderSetCapacity:
-//    case af::Msg::TRenderSetMaxTasks:
-	case af::Msg::TRenderSetService:
-	case af::Msg::TRenderRestoreDefaults:
-//    case af::Msg::TRenderSetUser:
-//    case af::Msg::TRenderSetNIMBY:
-//    case af::Msg::TRenderSetNimby:
-//    case af::Msg::TRenderSetFree:
-	case af::Msg::TRenderEjectTasks:
-	case af::Msg::TRenderEjectNotMyTasks:
-	case af::Msg::TRenderDelete:
-	case af::Msg::TRenderRestart:
-	case af::Msg::TRenderReboot:
-	case af::Msg::TRenderShutdown:
-	case af::Msg::TRenderExit:
-	case af::Msg::TRenderWOLSleep:
-	case af::Msg::TRenderWOLWake:
-/*	case af::Msg::TRenderHideShow:
-	{
-		af::MCGeneral mcgeneral( i_msg);
-		i_args->renders->action( mcgeneral, i_msg->type(), i_args->jobs, i_args->monitors);
-		break;
-	}*/
 	case af::Msg::TRenderDeregister:
 	{
 		RenderContainerIt rendersIt( i_args->renders);
@@ -103,23 +78,23 @@ switch ( i_msg->type())
 		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
 		break;
 	}
-	case af::Msg::TUserAnnotate:
-	case af::Msg::TUserHostsMask:
-	case af::Msg::TUserHostsMaskExclude:
-	case af::Msg::TUserMaxRunningTasks:
-	case af::Msg::TUserPriority:
-	case af::Msg::TUserErrorsAvoidHost:
-	case af::Msg::TUserErrorRetries:
-	case af::Msg::TUserErrorsTaskSameHost:
-	case af::Msg::TUserErrorsForgiveTime:
-	case af::Msg::TUserJobsLifeTime:
-	case af::Msg::TUserJobsSolveMethod:
-	{
-		af::MCGeneral mcgeneral( i_msg);
-		i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
-		break;
-	}
-	case af::Msg::TUserMoveJobsUp:
+//	case af::Msg::TUserAnnotate:
+//	case af::Msg::TUserHostsMask:
+//	case af::Msg::TUserHostsMaskExclude:
+//	case af::Msg::TUserMaxRunningTasks:
+//	case af::Msg::TUserPriority:
+//	case af::Msg::TUserErrorsAvoidHost:
+//	case af::Msg::TUserErrorRetries:
+//	case af::Msg::TUserErrorsTaskSameHost:
+//	case af::Msg::TUserErrorsForgiveTime:
+//	case af::Msg::TUserJobsLifeTime:
+//	case af::Msg::TUserJobsSolveMethod:
+//	{
+//		af::MCGeneral mcgeneral( i_msg);
+//		i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
+//		break;
+//	}
+/*	case af::Msg::TUserMoveJobsUp:
 	case af::Msg::TUserMoveJobsDown:
 	case af::Msg::TUserMoveJobsTop:
 	case af::Msg::TUserMoveJobsBottom:
@@ -130,15 +105,16 @@ switch ( i_msg->type())
 		user->moveJobs( mcgeneral, i_msg->type());
 		i_args->monitors->addUser( user);
 		break;
-	}
-	case af::Msg::TUserDel:
+	}*/
+//	case af::Msg::TUserDel:
 	case af::Msg::TUserAdd:
 	{
 		af::MCGeneral mcgeneral( i_msg);
 		// If existing users IDs provided, it's simple action to change users permanent property
-		if( mcgeneral.getCount()) i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
+//		if( mcgeneral.getCount()) i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
 		// If user with specified name does not exisit, new user must be created and put in container
-		else i_args->users->setPermanent( mcgeneral, (i_msg->type()==af::Msg::TUserAdd)?true:false, i_args->monitors);
+//		else
+		i_args->users->setPermanent( mcgeneral, true, i_args->monitors);
 		break;
 	}
 	case af::Msg::TJobAnnotate:

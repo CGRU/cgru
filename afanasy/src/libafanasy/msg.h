@@ -224,24 +224,24 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/__TO_DELETE__TRenderSetPriority/**/,         ///< Set Render priority,
 /**/__TO_DELETE__TRenderSetCapacity/**/,         ///< Set Render capacity,
 /**/__TO_DELETE__TRenderSetMaxTasks/**/,         ///< Set Render maximum tasks,
-/**/TRenderSetService/**/,          ///< Enable or disable Render service,
-/**/TRenderRestoreDefaults/**/,     ///< Restore default Render settings,
+/**/__TO_DELETE__TRenderSetService/**/,          ///< Enable or disable Render service,
+/**/__TO_DELETE__TRenderRestoreDefaults/**/,     ///< Restore default Render settings,
 /**/__TO_DELETE__TRenderSetNIMBY/**/,            ///< Set Render NIMBY,
 /**/__TO_DELETE__TRenderSetUser/**/,             ///< Set Render user,
 /**/__TO_DELETE__TRenderSetNimby/**/,            ///< Set Render nimby,
 /**/__TO_DELETE__TRenderSetFree/**/,             ///< Set Render free,
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
-/**/TRenderEjectTasks/**/,          ///< Stop all tasks on Render,
-/**/TRenderDelete/**/,              ///< Delete Render from afanasy server container and database,
-/**/TRenderRestart/**/,             ///< Restart Render client program,
-/**/TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
-/**/TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
-/**/TRenderReboot/**/,              ///< Reboot Render host computer,
-/**/TRenderShutdown/**/,            ///< Shutdown Render host computer,
+/**/__TO_DELETE__TRenderEjectTasks/**/,          ///< Stop all tasks on Render,
+/**/__TO_DELETE__TRenderDelete/**/,              ///< Delete Render from afanasy server container and database,
+/**/__TO_DELETE__TRenderRestart/**/,             ///< Restart Render client program,
+/**/__TO_DELETE__TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
+/**/__TO_DELETE__TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
+/**/__TO_DELETE__TRenderReboot/**/,              ///< Reboot Render host computer,
+/**/__TO_DELETE__TRenderShutdown/**/,            ///< Shutdown Render host computer,
 /**/__TO_DELETE__TRenderAnnotate/**/,            ///< Set Render annotation,
-/**/TRenderExit/**/,                ///< Ask server to shutdown client application(s),
-/**/TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
+/**/__TO_DELETE__TRenderExit/**/,                ///< Ask server to shutdown client application(s),
+/**/__TO_DELETE__TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
 /**/__TO_DELETE__TRenderHideShow/**/,			///< Hide or show renders.
 
 
@@ -249,24 +249,24 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TUsersListRequestIds/**/,       ///< Request a list of Users with given ids.
 /**/TUsersList/**/,                 ///< Active users information.
 /**/TUserAdd/**/,                   ///< Add a permatent user.
-/**/TUserDel/**/,                   ///< Remove a permatent user.
-/**/TUserJobsLifeTime/**/,          ///< Set user jobs default life time.
-/**/TUserHostsMask/**/,             ///< Set user hosts mask.
-/**/TUserHostsMaskExclude/**/,      ///< Set user exclude hosts mask.
-/**/TUserMaxRunningTasks/**/,       ///< Set user maximum running tasks number.
-/**/TUserPriority/**/,              ///< Set user priority.
-/**/TUserErrorsAvoidHost/**/,       ///< Set number of errors on host to avoid it.
-/**/TUserErrorRetries/**/,          ///< Set number of automatic retries task with errors.
-/**/TUserErrorsTaskSameHost/**/,    ///< Set number of errors for task on same host.
-/**/TUserErrorsForgiveTime/**/,     ///< Set time to forgive error host.
+/**/__TO_DELETE__TUserDel/**/,                   ///< Remove a permatent user.
+/**/__TO_DELETE__TUserJobsLifeTime/**/,          ///< Set user jobs default life time.
+/**/__TO_DELETE__TUserHostsMask/**/,             ///< Set user hosts mask.
+/**/__TO_DELETE__TUserHostsMaskExclude/**/,      ///< Set user exclude hosts mask.
+/**/__TO_DELETE__TUserMaxRunningTasks/**/,       ///< Set user maximum running tasks number.
+/**/__TO_DELETE__TUserPriority/**/,              ///< Set user priority.
+/**/__TO_DELETE__TUserErrorsAvoidHost/**/,       ///< Set number of errors on host to avoid it.
+/**/__TO_DELETE__TUserErrorRetries/**/,          ///< Set number of automatic retries task with errors.
+/**/__TO_DELETE__TUserErrorsTaskSameHost/**/,    ///< Set number of errors for task on same host.
+/**/__TO_DELETE__TUserErrorsForgiveTime/**/,     ///< Set time to forgive error host.
 /**/TUserIdRequest/**/,             ///< Request an id of user with given name.
-/**/TUserMoveJobsUp/**/,            ///< Move jobs one position up in user jobs list.
-/**/TUserMoveJobsDown/**/,          ///< Move jobs one position down in user jobs list.
-/**/TUserMoveJobsTop/**/,           ///< Move jobs to top position in user jobs list.
-/**/TUserMoveJobsBottom/**/,        ///< Move jobs to bottom position up in user jobs list.
+/**/__TO_DELETE__TUserMoveJobsUp/**/,            ///< Move jobs one position up in user jobs list.
+/**/__TO_DELETE__TUserMoveJobsDown/**/,          ///< Move jobs one position down in user jobs list.
+/**/__TO_DELETE__TUserMoveJobsTop/**/,           ///< Move jobs to top position in user jobs list.
+/**/__TO_DELETE__TUserMoveJobsBottom/**/,        ///< Move jobs to bottom position up in user jobs list.
 /**/TUserJobsOrder/**/,             ///< Jobs ids in server list order.
-/**/TUserAnnotate/**/,              ///< Set User annotation,
-/**/TUserJobsSolveMethod/**/,       ///< Set jobs solving mode.
+/**/__TO_DELETE__TUserAnnotate/**/,              ///< Set User annotation,
+/**/__TO_DELETE__TUserJobsSolveMethod/**/,       ///< Set jobs solving mode.
 
 
 /*- Job messages -*/

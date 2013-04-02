@@ -57,6 +57,8 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
 	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
+	jr_string("user_name",     m_user_name,     i_object);
+
 	bool offline = false;
 	jr_bool("offline",  offline, i_object, io_changes);
 	if( offline )
@@ -69,7 +71,6 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
-	jr_string("user_name",     m_user_name,     i_object);
 	jr_string("host_name",     m_host_name,     i_object);
 	//jr_uint32("flags",       m_flags,         i_object);
 	//jr_uint32("state",       m_state,         i_object);

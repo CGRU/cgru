@@ -49,7 +49,7 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-    void moveJobs( const af::MCGeneral & mcgeneral, int type);
+//    void moveJobs( const af::MCGeneral & mcgeneral, int type);
 
     virtual int calcWeight() const; ///< Calculate and return memory size.
 

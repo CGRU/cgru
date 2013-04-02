@@ -253,4 +253,10 @@ namespace af
 	void jsonActionParamsStart(  std::ostringstream & i_str, const std::string & i_type,
 		const std::string & i_mask, const std::vector<int> & i_ids = std::vector<int>());
 	void jsonActionParamsFinish( std::ostringstream & i_str);
+
+	void jsonActionOperation(  std::ostringstream & i_str, const std::string & i_type, const std::string & i_operation,
+		const std::string & i_mask, const std::vector<int> & i_ids = std::vector<int>());
+	void jsonActionOperationStart(  std::ostringstream & i_str, const std::string & i_type, const std::string & i_operation,
+		const std::string & i_mask, const std::vector<int> & i_ids = std::vector<int>());
+	void jsonActionOperationFinish( std::ostringstream & i_str);
 }
