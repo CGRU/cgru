@@ -362,7 +362,7 @@ bool Block::action( Action & i_action)
 		}
 		else
 		{
-			appendJobLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			appendJobLog("Unknown block operation \"" + type + "\" by " + i_action.author);
 			return false;
 		}
 

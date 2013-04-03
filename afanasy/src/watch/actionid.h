@@ -78,3 +78,23 @@ private slots:
 private:
 	QString m_string;
 };
+
+class ActionIdString : public QAction
+{
+
+Q_OBJECT
+
+public:
+	ActionIdString( int i_id, const QString & i_string, const QString & i_text, QObject * i_parent );
+
+signals:
+	void triggeredId( int, QString);
+
+private slots:
+	void triggeredId_Slot();
+
+private:
+	int m_id;
+	QString m_string;
+};
+

@@ -54,7 +54,7 @@ public:
 
    void generateMenu( int id_block, QMenu * menu, QWidget * qwidget);
 
-   af::MCGeneral * blockAction( int id_block, int id_action, int i_number, ListItems * listitems) const;
+   bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const;
 
    inline const QString & getBlockName( int num) const { return blockinfo[num].getName();}
 

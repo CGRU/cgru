@@ -82,7 +82,16 @@ Watch::~Watch()
 
 void Watch::destroy() { ms_d = NULL; ms_m = NULL;}
 
-void Watch::sendMsg(              af::Msg * msg   ){if(ms_d) ms_d->sendMsg(        msg    );}
+void Watch::sendMsg( af::Msg * msg)
+{
+	if( msg->type() == af::Msg::TJSON )
+	{
+		std::string str( msg->data(), msg->dataLen());
+		printf("\n%s\n", str.c_str());
+	}
+	if( ms_d ) ms_d->sendMsg( msg);
+}
+
 void Watch::displayInfo(    const QString &message){if(ms_d){ms_d->displayInfo(    message);if(ms_d->isHidden())ms_d->show();}}
 void Watch::displayWarning( const QString &message){if(ms_d){ms_d->displayWarning( message);if(ms_d->isHidden())ms_d->show();}}
 void Watch::displayError(   const QString &message){if(ms_d){ms_d->displayError(   message);if(ms_d->isHidden())ms_d->show();}}

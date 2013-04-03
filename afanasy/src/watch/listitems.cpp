@@ -217,7 +217,6 @@ void ListItems::setParameter( const std::string & i_name, const std::string & i_
 	af::jsonActionParamsFinish( str);
 
 	Watch::sendMsg( af::jsonMsg( str));
-printf("ListItems::setParameter:\n%s\n", str.str().c_str());
 }
 
 void ListItems::operation( const std::string & i_operation) const
@@ -225,7 +224,6 @@ void ListItems::operation( const std::string & i_operation) const
 	std::ostringstream str;
 	af::jsonActionOperation( str, m_type, i_operation, "", getSelectedIds());
 	Watch::sendMsg( af::jsonMsg( str));
-printf("ListItems::operation:\n%s\n", str.str().c_str());
 }
 
 const std::vector<int> ListItems::getSelectedIds() const

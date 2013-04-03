@@ -726,21 +726,37 @@ void ListTasks::actTaskListen()
       jobname + '(' + itemTask->getName() + ')');
 }
 
-void ListTasks::blockAction( int id_block, int id_action, int i_number)
+void ListTasks::blockAction( int id_block, QString i_action)
 {
    if( id_block >= blocksnum)
    {
       AFERRAR("ListTasks::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return;
    }
-   af::MCGeneral * mcgeneral = wblocks[id_block]->blockAction( id_block, id_action, i_number, this);
-   if( mcgeneral != NULL )
-   {
-      mcgeneral->addId( jobid);
-      af::Msg * msg = new af::Msg( id_action, mcgeneral);
-      Watch::sendMsg( msg);
-      delete mcgeneral;
-   }
+
+	std::ostringstream str;
+	std::vector<int> ids;
+	ids.push_back( jobid);
+	af::jsonActionStart( str, "jobs", "", ids);
+
+	// Collect selected blocks ids:
+	str << ",\n\"block_ids\":[";
+	const QList<Item*> items( getSelectedItems());
+	int counter = 0;
+	for( int i = 0; i < items.count(); i++)
+		if( items[i]->getId() == ItemJobBlock::ItemId )
+		{
+			if( counter ) str << ',';
+			str << ((ItemJobBlock*)items[i])->getNumBlock();
+			counter++;
+		}
+	str << ']';
+
+	if( wblocks[id_block]->blockAction( str, id_block, i_action, this))
+	{
+		af::jsonActionFinish( str);
+		Watch::sendMsg( af::jsonMsg( str));
+	}
 }
 
 bool ListTasks::mousePressed( QMouseEvent * event)

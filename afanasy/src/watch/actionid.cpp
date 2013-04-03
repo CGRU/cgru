@@ -48,3 +48,16 @@ void ActionString::triggeredString_Slot()
 {
 	emit triggeredString( m_string);
 }
+
+ActionIdString::ActionIdString( int i_id, const QString & i_string, const QString & i_text, QObject * i_parent ):
+	QAction( i_text, i_parent),
+	m_id( i_id),
+	m_string( i_string)
+{
+	connect( this, SIGNAL(triggered()), this, SLOT( triggeredId_Slot() ));
+}
+void ActionIdString::triggeredId_Slot()
+{
+	emit triggeredId( m_id, m_string);
+}
+

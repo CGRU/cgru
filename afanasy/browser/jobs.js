@@ -128,7 +128,7 @@ JobNode.prototype.update = function( i_obj)
 		if( this.blocks[b].params.running_tasks_counter )
 			this.running_tasks += this.blocks[b].params.running_tasks_counter;
 		if( this.blocks[b].params.p_percentage )
-			this.percentage += this.blocks[b].params.p_percentage/this.params.blocks.length;
+			this.percentage += Math.round( this.blocks[b].params.p_percentage/this.params.blocks.length);
 	}
 
 	if( this.running_tasks )

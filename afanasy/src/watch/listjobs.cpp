@@ -461,56 +461,6 @@ void ListJobs::actPause()           { operation("pause"            );}
 void ListJobs::actRestartPause()    { operation("restart_pause"    );}
 void ListJobs::actDelete()          { operation("delete"           );}
 
-/*
-void ListJobs::actStart()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobStart);
-	displayInfo( "Start job.");
-}
-void ListJobs::actStop()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobStop);
-	displayInfo( "Stop job.");
-}
-void ListJobs::actRestart()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobRestart);
-	displayInfo( "Restart job.");
-}
-void ListJobs::actRestartErrors()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobRestartErrors);
-	displayInfo( "Restart error tasks.");
-}
-void ListJobs::actResetErrorHosts()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobResetErrorHosts);
-	displayInfo( "Reset error hosts.");
-}
-void ListJobs::actPause()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobPause);
-	displayInfo( "Pause job.");
-}
-void ListJobs::actRestartPause()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobRestartPause);
-	displayInfo( "Restart job and set offline.");
-}
-void ListJobs::actDelete()
-{
-	af::MCGeneral mcgeneral;
-	action( mcgeneral, af::Msg::TJobDelete);
-	displayInfo( "Delete job.");
-}
-*/
 void ListJobs::actRequestLog()
 {
 	displayInfo( "Job log request.");
@@ -784,14 +734,18 @@ void ListJobs::actListenJob()
 }
 
 
-void ListJobs::blockAction( int id_block, int id_action, int i_number)
+void ListJobs::blockAction( int id_block, QString i_action)
 {
 	ItemJob* jobitem = (ItemJob*)getCurrentItem();
 	if( jobitem == NULL ) return;
-	af::MCGeneral * mcgeneral = jobitem->blockAction( id_block, id_action, i_number, this);
-	if( mcgeneral != NULL)
+
+	std::ostringstream str;
+	af::jsonActionStart( str, "jobs", "", getSelectedIds());
+	str << ",\n\"block_ids\":[" << id_block << ']';
+
+	if( jobitem->blockAction( str, id_block, i_action, this))
 	{
-		action( *mcgeneral, id_action);
-		delete mcgeneral;
+		af::jsonActionFinish( str);
+		Watch::sendMsg( af::jsonMsg( str));
 	}
 }
