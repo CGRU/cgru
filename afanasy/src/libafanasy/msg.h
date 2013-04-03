@@ -301,37 +301,37 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/__TO_DELETE__TJobHideShow/**/,				///< Hide or show jobs.
 /**/TJob/**/,                       ///< Job (all job data).
 
-/**/TBlockDependMask/**/,           ///< Set block depend mask.
-/**/TBlockTasksDependMask/**/,      ///< Set block tasks depend mask.
-/**/TBlockTasksMaxRunTime/**/,      ///< Set block tasks maximum run time.
-/**/TBlockHostsMask/**/,            ///< Set block hosts mask.
-/**/TBlockHostsMaskExclude/**/,     ///< Set block exclude hosts mask.
-/**/TBlockMaxRunningTasks/**/,      ///< Set block maximum running tasks number.
-/**/TBlockMaxRunTasksPerHost/**/,   ///< Set block maximum running tasks number on the same host.
-/**/TBlockCommand/**/,              ///< Set block command.
-/**/TBlockWorkingDir/**/,           ///< Set block working directory.
-/**/TBlockFiles/**/,                ///< Set block files.
-/**/TBlockCmdPost/**/,              ///< Set block post command.
-/**/TBlockService/**/,              ///< Set block task type.
-/**/TBlockParser/**/,               ///< Set block parser type.
-/**/TBlockParserCoeff/**/,          ///< Set block parser coefficient.
-/**/TBlockResetErrorHosts/**/,      ///< Reset block avoid hosts.
-/**/TBlockErrorsAvoidHost/**/,      ///< Set number of errors on host to avoid it.
-/**/TBlockErrorRetries/**/,         ///< Set number of automatic retries task with errors.
-/**/TBlockErrorsSameHost/**/,       ///< Set number of errors for the task on same host to make task to avoid host.
-/**/TBlockErrorsForgiveTime/**/,    ///< Set time to forgive error host.
-/**/TBlockCapacity/**/,             ///< Set block capacity.
-/**/TBlockCapacityCoeffMin/**/,     ///< Set block capacity minimum coefficient.
-/**/TBlockCapacityCoeffMax/**/,     ///< Set block capacity maximum coefficient.
-/**/TBlockMultiHostMin/**/,         ///< Set block multihost minimum hosts count.
-/**/TBlockMultiHostMax/**/,         ///< Set block multihost maximum hosts count.
-/**/TBlockMultiHostWaitMax/**/,     ///< Set block multihost maximum hosts wait time.
-/**/TBlockMultiHostWaitSrv/**/,     ///< Set block multihost service start wait time.
-/**/TBlockNeedMemory/**/,           ///< Set block render memory need.
-/**/TBlockNeedPower/**/,            ///< Set block render power need.
-/**/TBlockNeedHDD/**/,              ///< Set block render hdd need.
-/**/TBlockNeedProperties/**/,       ///< Set block render properties need.
-/**/TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
+/**/__TO_DELETE__TBlockDependMask/**/,           ///< Set block depend mask.
+/**/__TO_DELETE__TBlockTasksDependMask/**/,      ///< Set block tasks depend mask.
+/**/__TO_DELETE__TBlockTasksMaxRunTime/**/,      ///< Set block tasks maximum run time.
+/**/__TO_DELETE__TBlockHostsMask/**/,            ///< Set block hosts mask.
+/**/__TO_DELETE__TBlockHostsMaskExclude/**/,     ///< Set block exclude hosts mask.
+/**/__TO_DELETE__TBlockMaxRunningTasks/**/,      ///< Set block maximum running tasks number.
+/**/__TO_DELETE__TBlockMaxRunTasksPerHost/**/,   ///< Set block maximum running tasks number on the same host.
+/**/__TO_DELETE__TBlockCommand/**/,              ///< Set block command.
+/**/__TO_DELETE__TBlockWorkingDir/**/,           ///< Set block working directory.
+/**/__TO_DELETE__TBlockFiles/**/,                ///< Set block files.
+/**/__TO_DELETE__TBlockCmdPost/**/,              ///< Set block post command.
+/**/__TO_DELETE__TBlockService/**/,              ///< Set block task type.
+/**/__TO_DELETE__TBlockParser/**/,               ///< Set block parser type.
+/**/__TO_DELETE__TBlockParserCoeff/**/,          ///< Set block parser coefficient.
+/**/__TO_DELETE__TBlockResetErrorHosts/**/,      ///< Reset block avoid hosts.
+/**/__TO_DELETE__TBlockErrorsAvoidHost/**/,      ///< Set number of errors on host to avoid it.
+/**/__TO_DELETE__TBlockErrorRetries/**/,         ///< Set number of automatic retries task with errors.
+/**/__TO_DELETE__TBlockErrorsSameHost/**/,       ///< Set number of errors for the task on same host to make task to avoid host.
+/**/__TO_DELETE__TBlockErrorsForgiveTime/**/,    ///< Set time to forgive error host.
+/**/__TO_DELETE__TBlockCapacity/**/,             ///< Set block capacity.
+/**/__TO_DELETE__TBlockCapacityCoeffMin/**/,     ///< Set block capacity minimum coefficient.
+/**/__TO_DELETE__TBlockCapacityCoeffMax/**/,     ///< Set block capacity maximum coefficient.
+/**/__TO_DELETE__TBlockMultiHostMin/**/,         ///< Set block multihost minimum hosts count.
+/**/__TO_DELETE__TBlockMultiHostMax/**/,         ///< Set block multihost maximum hosts count.
+/**/__TO_DELETE__TBlockMultiHostWaitMax/**/,     ///< Set block multihost maximum hosts wait time.
+/**/__TO_DELETE__TBlockMultiHostWaitSrv/**/,     ///< Set block multihost service start wait time.
+/**/__TO_DELETE__TBlockNeedMemory/**/,           ///< Set block render memory need.
+/**/__TO_DELETE__TBlockNeedPower/**/,            ///< Set block render power need.
+/**/__TO_DELETE__TBlockNeedHDD/**/,              ///< Set block render hdd need.
+/**/__TO_DELETE__TBlockNeedProperties/**/,       ///< Set block render properties need.
+/**/__TO_DELETE__TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
 /**/TBlocksProgress/**/,            ///< Blocks running progress data.
 /**/TBlocksProperties/**/,          ///< Blocks progress and properties data.
 /**/TBlocks/**/,                    ///< Blocks data.

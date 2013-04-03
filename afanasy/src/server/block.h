@@ -48,7 +48,7 @@ public:
    /// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
-   uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+//   uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
 	bool action( Action & i_action);

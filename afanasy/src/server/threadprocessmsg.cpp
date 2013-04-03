@@ -93,10 +93,10 @@ printf("Request:  "); msg_request->stdOut();
 		case af::Msg::TConfigLoad:
 		case af::Msg::TFarmLoad:
 		case af::Msg::TJobRegister:
-	    case af::Msg::TBlockCommand:
-	    case af::Msg::TBlockWorkingDir:
-	    case af::Msg::TBlockFiles:
-	    case af::Msg::TBlockCmdPost:
+//	    case af::Msg::TBlockCommand:
+//	    case af::Msg::TBlockWorkingDir:
+//	    case af::Msg::TBlockFiles:
+//	    case af::Msg::TBlockCmdPost:
 		{
 			std::string err = "Magic Mismatch Mode: \"";
 			err += af::Environment::getMagicModeName();

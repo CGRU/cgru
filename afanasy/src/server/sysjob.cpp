@@ -552,7 +552,7 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
 		case af::Msg::TJobStart:
 		case af::Msg::TJobPause:
 		case af::Msg::TJobResetErrorHosts:*/
-		case af::Msg::TBlockService:
+/*		case af::Msg::TBlockService:
 		case af::Msg::TBlockParser:
 		case af::Msg::TBlockErrorsAvoidHost:
 		case af::Msg::TBlockErrorRetries:
@@ -573,7 +573,7 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
 		case af::Msg::TBlockCapacity:
 		case af::Msg::TBlockCapacityCoeffMin:
 		case af::Msg::TBlockCapacityCoeffMax:
-			return JobAf::action( mcgeneral, type, pointer, monitoring);
+			return JobAf::action( mcgeneral, type, pointer, monitoring);*/
 		default:
 			appendLog(std::string("Action \"") + af::Msg::TNAMES[type] + "\" is not available for the system job.");
 	}

@@ -437,7 +437,7 @@ void Block::skipRestartTasks( const Action & i_action, const JSON & i_operation,
 	}
 	AFCommon::QueueDBUpdateTask_end();
 }
-
+/*
 uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
 //printf("Block::action: %s\n", af::Msg::TNAMES[type]);mcgeneral.stdOut();
@@ -735,7 +735,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    if( monitoring && blockchanged_type) monitoring->addBlock( blockchanged_type, m_data);
    return jobchanged;
 }
-
+*/
 void Block::constructDependBlocks()
 {
 	if( m_job->getBlocksNum() <= 1 )

@@ -76,8 +76,8 @@ private:
 
    int getRow( int block, int task = -1);
 
+   void blockAction( int id_block, const QString & i_action, bool i_query);
    void do_Skip_Restart(  int type, int itemid);
    void do_Info_StdOut(   int type, int number, Item * item = NULL);
-   void setBlockProperty( int type, af::MCGeneral & mcgeneral);
    void setWindowTitleProgress();
 };

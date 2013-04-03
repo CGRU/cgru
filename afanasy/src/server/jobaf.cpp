@@ -661,6 +661,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
    }*/
+/*
    case af::Msg::TBlockErrorsForgiveTime:
    case af::Msg::TBlockErrorsAvoidHost:
    case af::Msg::TBlockErrorRetries:
@@ -708,7 +709,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       }
       if( monitoring && jobchanged) monitoring->addJobEvent( jobchanged, getId(), getUid());
       return true;
-   }
+   }*/
    default:
    {
       return false;
