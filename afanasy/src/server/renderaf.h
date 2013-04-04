@@ -62,9 +62,6 @@ public:
 /// Deregister render, on SIGINT client recieving.
 	void deregister( JobContainer * jobs, MonitorContainer * monitoring );
 
-/// Set some Render attribute.
-	bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
-
 	virtual void v_action( Action & i_action);
 
 	inline const std::list<std::string> & getTasksLog() { return tasksloglist; }  ///< Get tasks log list.

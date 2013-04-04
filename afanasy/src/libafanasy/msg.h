@@ -170,7 +170,6 @@ TRESERVED09,
 /**/TTalksList/**/,                 ///< Message with a list of online Talks.
 /**/TTalkDistributeData/**/,        ///< Message with a list Talk's users and a text to send to them.
 /**/TTalkData/**/,                  ///< Message to Talk with text.
-/**/TTalkExit/**/,                  ///< Ask server to shutdown client application(s),
 
 
 /*- Monitor messages -*/
@@ -185,7 +184,6 @@ TRESERVED09,
 /**/TMonitorJobsIdsSet/**/,         ///< Set jobs ids for monitoring.
 /**/TMonitorJobsIdsDel/**/,         ///< Delete monitoring jobs ids.
 /**/TMonitorMessage/**/,            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
-/**/TMonitorExit/**/,               ///< Ask server to shutdown client application(s),
 
 /**/TMonitorEvents_BEGIN/**/,       ///< Events types start.
 
@@ -221,124 +219,32 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRendersResourcesRequestIds/**/,///< Request a list of resources of Renders with given ids.
 /**/TRendersList/**/,               ///< Message with a list of Renders.
 /**/TRendersResources/**/,          ///< Message with a list of resources of Renders.
-/**/__TO_DELETE__TRenderSetPriority/**/,         ///< Set Render priority,
-/**/__TO_DELETE__TRenderSetCapacity/**/,         ///< Set Render capacity,
-/**/__TO_DELETE__TRenderSetMaxTasks/**/,         ///< Set Render maximum tasks,
-/**/__TO_DELETE__TRenderSetService/**/,          ///< Enable or disable Render service,
-/**/__TO_DELETE__TRenderRestoreDefaults/**/,     ///< Restore default Render settings,
-/**/__TO_DELETE__TRenderSetNIMBY/**/,            ///< Set Render NIMBY,
-/**/__TO_DELETE__TRenderSetUser/**/,             ///< Set Render user,
-/**/__TO_DELETE__TRenderSetNimby/**/,            ///< Set Render nimby,
-/**/__TO_DELETE__TRenderSetFree/**/,             ///< Set Render free,
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
-/**/__TO_DELETE__TRenderEjectTasks/**/,          ///< Stop all tasks on Render,
-/**/__TO_DELETE__TRenderDelete/**/,              ///< Delete Render from afanasy server container and database,
-/**/__TO_DELETE__TRenderRestart/**/,             ///< Restart Render client program,
-/**/__TO_DELETE__TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
-/**/__TO_DELETE__TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
-/**/__TO_DELETE__TRenderReboot/**/,              ///< Reboot Render host computer,
-/**/__TO_DELETE__TRenderShutdown/**/,            ///< Shutdown Render host computer,
-/**/__TO_DELETE__TRenderAnnotate/**/,            ///< Set Render annotation,
-/**/__TO_DELETE__TRenderExit/**/,                ///< Ask server to shutdown client application(s),
-/**/__TO_DELETE__TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
-/**/__TO_DELETE__TRenderHideShow/**/,			///< Hide or show renders.
 
 
 /*- Users messages -*/
 /**/TUsersListRequestIds/**/,       ///< Request a list of Users with given ids.
 /**/TUsersList/**/,                 ///< Active users information.
 /**/TUserAdd/**/,                   ///< Add a permatent user.
-/**/__TO_DELETE__TUserDel/**/,                   ///< Remove a permatent user.
-/**/__TO_DELETE__TUserJobsLifeTime/**/,          ///< Set user jobs default life time.
-/**/__TO_DELETE__TUserHostsMask/**/,             ///< Set user hosts mask.
-/**/__TO_DELETE__TUserHostsMaskExclude/**/,      ///< Set user exclude hosts mask.
-/**/__TO_DELETE__TUserMaxRunningTasks/**/,       ///< Set user maximum running tasks number.
-/**/__TO_DELETE__TUserPriority/**/,              ///< Set user priority.
-/**/__TO_DELETE__TUserErrorsAvoidHost/**/,       ///< Set number of errors on host to avoid it.
-/**/__TO_DELETE__TUserErrorRetries/**/,          ///< Set number of automatic retries task with errors.
-/**/__TO_DELETE__TUserErrorsTaskSameHost/**/,    ///< Set number of errors for task on same host.
-/**/__TO_DELETE__TUserErrorsForgiveTime/**/,     ///< Set time to forgive error host.
 /**/TUserIdRequest/**/,             ///< Request an id of user with given name.
-/**/__TO_DELETE__TUserMoveJobsUp/**/,            ///< Move jobs one position up in user jobs list.
-/**/__TO_DELETE__TUserMoveJobsDown/**/,          ///< Move jobs one position down in user jobs list.
-/**/__TO_DELETE__TUserMoveJobsTop/**/,           ///< Move jobs to top position in user jobs list.
-/**/__TO_DELETE__TUserMoveJobsBottom/**/,        ///< Move jobs to bottom position up in user jobs list.
 /**/TUserJobsOrder/**/,             ///< Jobs ids in server list order.
-/**/__TO_DELETE__TUserAnnotate/**/,              ///< Set User annotation,
-/**/__TO_DELETE__TUserJobsSolveMethod/**/,       ///< Set jobs solving mode.
 
 
 /*- Job messages -*/
 /**/TJobRegister/**/,               ///< Register job.
-/**/__TO_DELETE__TJobStart/**/,                  ///< Start offline (paused) job.
-/**/__TO_DELETE__TJobStop/**/,                   ///< Stop job ( stop running tasks and set offline state).
-/**/__TO_DELETE__TJobRestart/**/,                ///< Restart job.
-/**/__TO_DELETE__TJobRestartErrors/**/,          ///< Restart tasks with errors.
-/**/__TO_DELETE__TJobResetErrorHosts/**/,        ///< Reset all job blocks error hosts.
-/**/__TO_DELETE__TJobPause/**/,                  ///< Pause job ( set offline state, keep running tasks running).
-/**/__TO_DELETE__TJobRestartPause/**/,           ///< Restart and pause job.
-/**/__TO_DELETE__TJobDelete/**/,                 ///< Delete a job.
 /**/TJobsListRequestIds/**/,        ///< Request a list of Jobs with given ids.
 /**/TJobsListRequestUsersIds/**/,   ///< Request brief of jobs od users with given ids.
 /**/TJobsList/**/,                  ///< Jobs list information.
 /**/TJobProgress/**/,               ///< Jobs progress.
-/**/__TO_DELETE__TJobHostsMask/**/,              ///< Set job hosts mask.
-/**/__TO_DELETE__TJobHostsMaskExclude/**/,       ///< Set job exclude hosts mask.
-/**/__TO_DELETE__TJobDependMask/**/,             ///< Set job depend mask.
-/**/__TO_DELETE__TJobDependMaskGlobal/**/,       ///< Set job global depend mask.
-/**/__TO_DELETE__TJobMaxRunningTasks/**/,        ///< Set job maximum running tasks number.
-/**/__TO_DELETE__TJobMaxRunTasksPerHost/**/,     ///< Set job maximum running tasks per host.
-/**/__TO_DELETE__TJobWaitTime/**/,               ///< Set job wait time.
-/**/__TO_DELETE__TJobLifeTime/**/,               ///< Set job life time.
-/**/__TO_DELETE__TJobPriority/**/,               ///< Set job priority.
-/**/__TO_DELETE__TJobNeedOS/**/,                 ///< Set a job os needed.
-/**/__TO_DELETE__TJobNeedProperties/**/,         ///< Set a job properties needed.
 /**/TJobsWeight/**/,                ///< All jobs weight data.
-/**/__TO_DELETE__TJobCmdPost/**/,                ///< Set job post command.
-/**/__TO_DELETE__TJobAnnotate/**/,               ///< Set Job annotation,
-/**/__TO_DELETE__TJobSetUser/**/,                ///< Change job owner.
-/**/__TO_DELETE__TJobHideShow/**/,				///< Hide or show jobs.
 /**/TJob/**/,                       ///< Job (all job data).
 
-/**/__TO_DELETE__TBlockDependMask/**/,           ///< Set block depend mask.
-/**/__TO_DELETE__TBlockTasksDependMask/**/,      ///< Set block tasks depend mask.
-/**/__TO_DELETE__TBlockTasksMaxRunTime/**/,      ///< Set block tasks maximum run time.
-/**/__TO_DELETE__TBlockHostsMask/**/,            ///< Set block hosts mask.
-/**/__TO_DELETE__TBlockHostsMaskExclude/**/,     ///< Set block exclude hosts mask.
-/**/__TO_DELETE__TBlockMaxRunningTasks/**/,      ///< Set block maximum running tasks number.
-/**/__TO_DELETE__TBlockMaxRunTasksPerHost/**/,   ///< Set block maximum running tasks number on the same host.
-/**/__TO_DELETE__TBlockCommand/**/,              ///< Set block command.
-/**/__TO_DELETE__TBlockWorkingDir/**/,           ///< Set block working directory.
-/**/__TO_DELETE__TBlockFiles/**/,                ///< Set block files.
-/**/__TO_DELETE__TBlockCmdPost/**/,              ///< Set block post command.
-/**/__TO_DELETE__TBlockService/**/,              ///< Set block task type.
-/**/__TO_DELETE__TBlockParser/**/,               ///< Set block parser type.
-/**/__TO_DELETE__TBlockParserCoeff/**/,          ///< Set block parser coefficient.
-/**/__TO_DELETE__TBlockResetErrorHosts/**/,      ///< Reset block avoid hosts.
-/**/__TO_DELETE__TBlockErrorsAvoidHost/**/,      ///< Set number of errors on host to avoid it.
-/**/__TO_DELETE__TBlockErrorRetries/**/,         ///< Set number of automatic retries task with errors.
-/**/__TO_DELETE__TBlockErrorsSameHost/**/,       ///< Set number of errors for the task on same host to make task to avoid host.
-/**/__TO_DELETE__TBlockErrorsForgiveTime/**/,    ///< Set time to forgive error host.
-/**/__TO_DELETE__TBlockCapacity/**/,             ///< Set block capacity.
-/**/__TO_DELETE__TBlockCapacityCoeffMin/**/,     ///< Set block capacity minimum coefficient.
-/**/__TO_DELETE__TBlockCapacityCoeffMax/**/,     ///< Set block capacity maximum coefficient.
-/**/__TO_DELETE__TBlockMultiHostMin/**/,         ///< Set block multihost minimum hosts count.
-/**/__TO_DELETE__TBlockMultiHostMax/**/,         ///< Set block multihost maximum hosts count.
-/**/__TO_DELETE__TBlockMultiHostWaitMax/**/,     ///< Set block multihost maximum hosts wait time.
-/**/__TO_DELETE__TBlockMultiHostWaitSrv/**/,     ///< Set block multihost service start wait time.
-/**/__TO_DELETE__TBlockNeedMemory/**/,           ///< Set block render memory need.
-/**/__TO_DELETE__TBlockNeedPower/**/,            ///< Set block render power need.
-/**/__TO_DELETE__TBlockNeedHDD/**/,              ///< Set block render hdd need.
-/**/__TO_DELETE__TBlockNeedProperties/**/,       ///< Set block render properties need.
-/**/__TO_DELETE__TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
 /**/TBlocksProgress/**/,            ///< Blocks running progress data.
 /**/TBlocksProperties/**/,          ///< Blocks progress and properties data.
 /**/TBlocks/**/,                    ///< Blocks data.
 
 /**/TTask/**/,                      ///< A task of some job.
-/**/TTasksSkip/**/,                 ///< Skip some tasks.
-/**/TTasksRestart/**/,              ///< Restart some tasks.
 /**/TTaskRequest/**/,               ///< Get task information.
 /**/TTaskLogRequest/**/,            ///< Get task information log.
 /**/TTaskErrorHostsRequest/**/,     ///< Get task error hosts list.

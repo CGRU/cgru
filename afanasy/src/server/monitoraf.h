@@ -12,27 +12,25 @@ class MonitorAf: public af::Monitor, public AfNodeSrv
 {
 public:
 
-   MonitorAf( af::Msg * msg);
+	MonitorAf( af::Msg * msg);
 
 	MonitorAf( const JSON & i_obj, UserContainer * i_users);
 
-   ~MonitorAf();
+	~MonitorAf();
 
-   void setZombie();
+	void setZombie();
 
-   void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
-   bool setInterest( int type, const af::MCGeneral & ids);
-
-   bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+	bool setInterest( int type, const af::MCGeneral & ids);
 
 	virtual void v_action( Action & i_action);
 
-   bool hasJobUid( int uid) const;
+	bool hasJobUid( int uid) const;
 
-   bool hasJobEvent( int type, int uid) const;
+	bool hasJobEvent( int type, int uid) const;
 
-   bool hasJobId( int m_id) const;
+	bool hasJobId( int m_id) const;
 
 	static void setMonitorContainer( MonitorContainer * i_monitors) { m_monitors = i_monitors;}
 
@@ -49,11 +47,11 @@ public:
 	void addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids);
 
 private:
-   void setEvents( const std::vector<int32_t> & i_ids, bool value);
-   void setJobsUsersIds( const std::vector<int32_t> & i_ids);
-   void addJobIds( const std::vector<int32_t> & i_ids);
-   void setJobIds( const std::vector<int32_t> & i_ids);
-   void delJobIds( const std::vector<int32_t> & i_ids);
+	void setEvents( const std::vector<int32_t> & i_ids, bool value);
+	void setJobsUsersIds( const std::vector<int32_t> & i_ids);
+	void addJobIds( const std::vector<int32_t> & i_ids);
+	void setJobIds( const std::vector<int32_t> & i_ids);
+	void delJobIds( const std::vector<int32_t> & i_ids);
 
 private:
 	std::vector<std::vector<int> > m_event_nodeids;

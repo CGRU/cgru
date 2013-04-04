@@ -87,8 +87,7 @@ private:
    int errors_forgivetime;
    uint32_t tasksmaxruntime;
 
-   uint8_t  progress_done[AFJOB::PROGRESS_BYTES];
-   uint8_t  progress_running[AFJOB::PROGRESS_BYTES];
+   char progress[AFJOB::ASCII_PROGRESS_LENGTH];
 
    int     capacity;
    int     maxrunningtasks;
@@ -123,7 +122,6 @@ private:
    void drawProgress(
          QPainter * painter,
          int posx, int posy, int width, int height,
-         const uint8_t * data_a, const uint8_t * data_b,
          const QColor * backcolor = NULL
       ) const;
    void stdOutFlags( char* data, int size) const;

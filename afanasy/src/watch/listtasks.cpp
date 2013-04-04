@@ -484,8 +484,8 @@ void ListTasks::setWindowTitleProgress()
 	m_parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(jobname));
 }
 
-void ListTasks::actTasksSkip()              { do_Skip_Restart( af::Msg::TTasksSkip,     ItemJobTask::ItemId); }
-void ListTasks::actTasksRestart()           { do_Skip_Restart( af::Msg::TTasksRestart,  ItemJobTask::ItemId); }
+void ListTasks::actTasksSkip()    { tasksOpeation("skip"); }
+void ListTasks::actTasksRestart() { tasksOpeation("restart"); }
 
 void ListTasks::actTaskLog()               { do_Info_StdOut(  af::Msg::TTaskLogRequest,         0);}
 void ListTasks::actTaskInfo()              { do_Info_StdOut(  af::Msg::TTaskRequest,            0);}
@@ -510,54 +510,35 @@ void ListTasks::doubleClicked( Item * item)
 	}
 }
 
-void ListTasks::do_Skip_Restart( int type, int itemid)
+void ListTasks::tasksOpeation( const std::string & i_type)
 {
-	af::MCTasksPos taskspos( jobid, " (watch) ");
+	std::ostringstream str;
+	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, jobid));
+	str << ",\n\"operation\":{\n\"type\":\"" << i_type << '"';
+	str << ",\n\"task_ids\":[";
+
+	int blockId = -1;
+	// Collect tasks of the same block:
 	const QList<Item*> items( getSelectedItems());
 	for( int i = 0; i < items.count(); i++)
 	{
-		int id = items[i]->getId();
-		if( id != itemid ) continue;
-		switch( id)
+		if( items[i]->getId() != ItemJobTask::ItemId ) continue;
 		{
-			case ItemJobBlock::ItemId:
-			{
-				ItemJobBlock *itemBlock = (ItemJobBlock*)items[i];
-				if( taskspos.addBlock( itemBlock->getNumBlock()) == false) return;
-				break;
-			}
-			case ItemJobTask::ItemId:
-			{
-				ItemJobTask *itemTask = (ItemJobTask*)items[i];
-				if( taskspos.addTask( itemTask->getBlockNum(), itemTask->getTaskNum()) == false) return;
-				break;
-			}
-			default:
-			{
-				AFERRAR("ListTasks::do_Skip_Restart: Invalid item id = %d.", id)
-			}
+			ItemJobTask *itemTask = (ItemJobTask*)items[i];
+			if( blockId == -1 )
+				blockId = itemTask->getBlockNum();
+			else if( blockId != itemTask->getBlockNum())
+				continue;
+			else
+				str << ',';
+			str << itemTask->getTaskNum();
 		}
 	}
+	// Add one tasks block:
+	str << "]},\n\"block_ids\":[" << blockId << ']';
 
-	if( taskspos.getCount() < 1) return;
-
-	af::Msg * msg = new af::Msg( type, &taskspos);
-	switch ( type )
-	{
-		case af::Msg::TTasksSkip:
-		{
-			if( itemid == ItemJobBlock::ItemId ) displayInfo( "Skip blocks.");
-			else                                 displayInfo( "Skip tasks.");
-			break;
-		}
-		case af::Msg::TTasksRestart:
-		{
-			if( itemid == ItemJobBlock::ItemId ) displayInfo( "Restart blocks.");
-			else                                 displayInfo( "Restart tasks.");
-			break;
-		}
-	}
-	Watch::sendMsg( msg);
+	af::jsonActionFinish( str);
+	Watch::sendMsg( af::jsonMsg( str));
 }
 
 void ListTasks::do_Info_StdOut( int type, int number, Item * item)
@@ -710,9 +691,7 @@ void ListTasks::blockAction( int id_block, const QString & i_action, bool i_quer
 	}
 
 	std::ostringstream str;
-	std::vector<int> ids;
-	ids.push_back( jobid);
-	af::jsonActionStart( str, "jobs", "", ids);
+	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, jobid));
 
 	// Collect selected blocks ids:
 	str << ",\n\"block_ids\":[";

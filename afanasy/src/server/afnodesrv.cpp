@@ -26,12 +26,6 @@ AfNodeSrv::AfNodeSrv( af::Node * i_node):
 //printf("m_node = %p\n", (void*)(m_node));
 }
 
-bool AfNodeSrv::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-   AFERRAR("AfNodeSrv::action: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
-   return false;
-}
-
 void AfNodeSrv::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
    AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)

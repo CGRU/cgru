@@ -305,29 +305,6 @@ void RenderAf::v_action( Action & i_action)
 	}
 }
 
-bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-//printf("RenderAf::action: type = [%s]\n", af::Msg::TNAMES[type]);
-	if( pointer == NULL)
-	{
-		AFERROR("RenderAf::setAttr(): JobContainer pointer == NULL.")
-		return true;
-	}
-	std::string userhost( mcgeneral.getUserName() + '@' + mcgeneral.getHostName());
-	std::string userhost_string = userhost;
-	if( false == mcgeneral.getString().empty()) userhost_string += " " + mcgeneral.getString();
-	JobContainer * jobs = (JobContainer*)pointer;
-	switch( type)
-	{
-	default:
-	{
-		return false;
-	}
-	}
-	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-	return true;
-}
-
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )
 {
 	if( m_tasks.size() < 1) return;

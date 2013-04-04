@@ -47,7 +47,7 @@ public:
    void refresh( AfContainer * pointer, MonitorContainer * monitoring);
 
 /// Set some attributes of some nodes that came from message class.
-   void action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+//   void action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 	/// Perform an aciton described by JSON object:
 //	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
@@ -83,8 +83,4 @@ private:
    AfNodeSrv * last_ptr;       ///< Pointer to last node.
    AfNodeSrv ** nodesTable;          ///< Nodes pointers.
    bool initialized;          ///< Whether container was successfully initialized.
-
-private:
-/// Set some node attribute that came from message class.
-   void action( AfNodeSrv * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 };

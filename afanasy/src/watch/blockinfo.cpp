@@ -125,8 +125,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		tasksdone            = block->getProgressTasksDone();
 		taskserror           = block->getProgressTasksError();
 		percentage           = block->getProgressPercentage();
-		memcpy( progress_done,    block->getProgressBarDone(),    AFJOB::PROGRESS_BYTES);
-		memcpy( progress_running, block->getProgressBarRunning(), AFJOB::PROGRESS_BYTES);
+		memcpy( progress,      block->getProgressBar(), AFJOB::ASCII_PROGRESS_LENGTH);
 
 		break;
 
@@ -328,7 +327,6 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 	drawProgress
 	(
 		painter, x+1+xoffset, y+y_bars+8, w-progress_w_offset-xoffset, 6,
-		progress_done, progress_running,
 		backcolor
 	);
 
@@ -340,52 +338,62 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 void BlockInfo::drawProgress(
 			QPainter * painter,
 			int posx, int posy, int width, int height,
-			const uint8_t * data_a, const uint8_t * data_b,
 			const QColor * backcolor
 		) const
 {
 	painter->setPen( Qt::NoPen );
 
-	int bitsnum = AFJOB::PROGRESS_BYTES * 8;
-	int w = width / bitsnum;
-	int last_x = 0;
+	int w = width / AFJOB::ASCII_PROGRESS_LENGTH;
 	if( w < 1) w = 1;
-	for( int byte = 0; byte < AFJOB::PROGRESS_BYTES; byte++)
+
+	for( int last_x = 0, i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
 	{
-		int byte8 = byte*8;
-		int flag  = 1;
-		for( int bit = 0; bit < 8; bit++)
+		int x = posx + i * width / AFJOB::ASCII_PROGRESS_LENGTH;
+		int offset = 0; // offset to prevent extra pixel ( geomerty values are rounded to integer )
+		if( last_x < x ) offset = 1;
+		x = x - offset;
+
+		switch( progress[i] )
 		{
-			int x = posx + (byte8+bit)*width/bitsnum;
-			int offset = 0; // offset to prevent extra pixel ( geomerty values are rounded to integer )
-			if( last_x < x ) offset = 1;
-			x = x - offset;
-
-			if( data_a[byte] & flag) // done
-			{
-				painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
-				painter->drawRect( x, posy, w+offset, height);
-			}
-			if(( (data_a[byte] & flag) == false) && ( (data_b[byte] & flag) == false)) // not done, not running
-			{
-				painter->setBrush( QBrush( backcolor ? *backcolor : afqt::QEnvironment::clr_item.c , Qt::SolidPattern ));
-				painter->drawRect( x, posy, w+offset, height);
-			}
-			if( data_b[byte] & flag) // runnig
-			{
-				painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
-				painter->drawRect( x, posy, w+offset, height);
-			}
-			if( (data_a[byte] & flag) && (data_b[byte] & flag)) // error
-			{
-				painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
-				painter->drawRect( x, posy, w+offset, height);
-			}
-
-			flag <<= 1;
-			last_x = x + w + offset;
+		case ' ': // 0
+			painter->setBrush( QBrush( afqt::QEnvironment::qclr_black, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'r': // STATE_READY_MASK
+			break;
+		case 'D': // STATE_DONE_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'R': // STATE_RUNNING_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'E': // STATE_ERROR_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'W': // STATE_WAITDEP_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'S': // STATE_SKIPPED_MASK | STATE_DONE_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjoboff.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'G': // STATE_DONE_MASK | STATE_WARNING_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjoberror.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'N': // STATE_RUNNING_MASK_MASK | STATE_WARNING_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_star.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
 		}
+		last_x = x + w + offset;
+//printf("%c", progress[i]);
 	}
+//printf("\n");
 }
 
 void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu)

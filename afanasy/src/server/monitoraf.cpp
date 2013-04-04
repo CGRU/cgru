@@ -146,25 +146,6 @@ void MonitorAf::v_action( Action & i_action)
 	}
 }
 
-bool MonitorAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-   switch( type)
-   {
-   case af::Msg::TMonitorExit:
-   {
-      af::Msg * msg = new af::Msg( af::Msg::TClientExitRequest);
-      msg->setAddress( this);
-      AFCommon::QueueMsgDispatch( msg);
-      return true;
-   }
-   default:
-   {
-      return false;
-   }
-   }
-   return true;
-}
-
 bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 {
    m_time_activity = time( NULL);

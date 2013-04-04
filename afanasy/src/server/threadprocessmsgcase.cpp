@@ -716,80 +716,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TTaskUpdatePercent:
 	case af::Msg::TTaskListenOutput:
-	case af::Msg::TTasksSkip:
-//	case af::Msg::TBlockErrorsAvoidHost:
-//	case af::Msg::TBlockErrorRetries:
-//	case af::Msg::TBlockErrorsSameHost:
-//	case af::Msg::TBlockErrorsForgiveTime:
-//	case af::Msg::TBlockTasksMaxRunTime:
-//	case af::Msg::TBlockResetErrorHosts:
-//	case af::Msg::TBlockDependMask:
-//	case af::Msg::TBlockTasksDependMask:
-//	case af::Msg::TBlockHostsMask:
-//	case af::Msg::TBlockHostsMaskExclude:
-//	case af::Msg::TBlockMaxRunningTasks:
-//	case af::Msg::TBlockMaxRunTasksPerHost:
-//	case af::Msg::TBlockCommand:
-//	case af::Msg::TBlockWorkingDir:
-//	case af::Msg::TBlockFiles:
-//	case af::Msg::TBlockCmdPost:
-//	case af::Msg::TBlockService:
-//	case af::Msg::TBlockParser:
-//	case af::Msg::TBlockCapacity:
-//	case af::Msg::TBlockCapacityCoeffMin:
-//	case af::Msg::TBlockCapacityCoeffMax:
-//	case af::Msg::TBlockMultiHostMin:
-//	case af::Msg::TBlockMultiHostMax:
-//	case af::Msg::TBlockMultiHostWaitMax:
-//	case af::Msg::TBlockMultiHostWaitSrv:
-//	case af::Msg::TBlockNeedMemory:
-//	case af::Msg::TBlockNeedPower:
-//	case af::Msg::TBlockNeedHDD:
-//	case af::Msg::TBlockNeedProperties:
-//	case af::Msg::TBlockNonSequential:
-	case af::Msg::TTasksRestart:
-//	case af::Msg::TJobAnnotate:
-//	case af::Msg::TJobSetUser:
-//	case af::Msg::TJobHostsMask:
-//	case af::Msg::TJobHostsMaskExclude:
-//	case af::Msg::TJobDependMask:
-//	case af::Msg::TJobDependMaskGlobal:
-//	case af::Msg::TJobMaxRunningTasks:
-//	case af::Msg::TJobMaxRunTasksPerHost:
-//	case af::Msg::TJobWaitTime:
-//	case af::Msg::TJobLifeTime:
-//	case af::Msg::TJobPriority:
-//	case af::Msg::TJobNeedOS:
-//	case af::Msg::TJobNeedProperties:
-//	case af::Msg::TJobCmdPost:
-//	case af::Msg::TJobStart:
-//	case af::Msg::TJobStop:
-//	case af::Msg::TJobRestart:
-//	case af::Msg::TJobRestartErrors:
-//	case af::Msg::TJobResetErrorHosts:
-//	case af::Msg::TJobPause:
-//	case af::Msg::TJobRestartPause:
-//	case af::Msg::TJobDelete:
-//	case af::Msg::TJobHideShow:
 	case af::Msg::TRenderDeregister:
-//	case af::Msg::TUserAnnotate:
 	case af::Msg::TUserAdd:
-//	case af::Msg::TUserDel:
-//	case af::Msg::TUserHostsMask:
-//	case af::Msg::TUserHostsMaskExclude:
-//	case af::Msg::TUserMaxRunningTasks:
-//	case af::Msg::TUserPriority:
-//	case af::Msg::TUserJobsLifeTime:
-//	case af::Msg::TUserJobsSolveMethod:
-//	case af::Msg::TUserErrorsAvoidHost:
-//	case af::Msg::TUserErrorRetries:
-//	case af::Msg::TUserErrorsTaskSameHost:
-//	case af::Msg::TUserErrorsForgiveTime:
-//	case af::Msg::TUserMoveJobsUp:
-//	case af::Msg::TUserMoveJobsDown:
-//	case af::Msg::TUserMoveJobsTop:
-//	case af::Msg::TUserMoveJobsBottom:
-	case af::Msg::TTalkExit:
 	case af::Msg::TTalkDeregister:
 /*	{
 		// Check magic number mismatch mode:
@@ -816,7 +744,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TMonitorJobsIdsSet:
 	case af::Msg::TMonitorJobsIdsDel:
 	case af::Msg::TMonitorMessage:
-	case af::Msg::TMonitorExit:
 	{
 		// Push message for run cycle thread.
 		i_args->msgQueue->pushMsg( i_msg);

@@ -78,8 +78,6 @@ void BlockData::initDefaults()
 	p_tasks_warning  = 0;
 	p_tasks_run_time = 0;
 
-	memset( p_bar_running, 0, AFJOB::PROGRESS_BYTES);
-	memset( p_bar_done,    0, AFJOB::PROGRESS_BYTES);
 	memset( p_progressbar, AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
 }
 
@@ -432,7 +430,7 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 			o_str << ",\"p_progressbar\":\"";
 			for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
 			{
-				o_str << char(AFJOB::ASCII_PROGRESS_STATES[p_progressbar[i]*2]);
+				o_str << p_progressbar[i];
 			}
 			o_str << "\"";
 		}
@@ -544,8 +542,6 @@ void BlockData::readwrite( Msg * msg)
 	case Msg::TBlocksProgress:
 
 		rw_int32_t ( m_running_tasks_counter, msg);
-		rw_data(   (char*)p_bar_done,         msg, AFJOB::PROGRESS_BYTES);
-		rw_data(   (char*)p_bar_running,      msg, AFJOB::PROGRESS_BYTES);
 		rw_uint8_t ( p_percentage,            msg);
 		rw_int32_t ( p_error_hosts,         msg);
 		rw_int32_t ( p_avoid_hosts,         msg);
@@ -557,6 +553,8 @@ void BlockData::readwrite( Msg * msg)
 		rw_uint32_t( m_state,                 msg);
 		rw_int32_t ( m_job_id,                msg);
 		rw_int32_t ( m_block_num,             msg);
+
+		rw_data( p_progressbar, msg, AFJOB::ASCII_PROGRESS_LENGTH);
 
 	break;
 
@@ -1173,9 +1171,8 @@ void BlockData::generateInfoStream( std::ostringstream & o_str, bool full) const
 }
 
 
-// Functions to update tasks progress and progeress bar:
-// (for information purpoces only, no meaning for server)
-
+// Functions to update tasks progress and block progress bar:
+// (for monitoring purpoces only, no meaning for server)
 bool BlockData::updateProgress( JobProgress * progress)
 {
    bool changed = false;
@@ -1295,61 +1292,20 @@ bool BlockData::updateBars( JobProgress * progress)
 {
    bool changed = false;
 
-
-	// Binary bits for afwatch:
-   for( int pb = 0; pb < AFJOB::PROGRESS_BYTES; pb++)
-   {
-      p_bar_done[pb]    = 0;
-      p_bar_running[pb] = 0;
-   }
-
-   for( int t = 0; t < m_tasks_num; t++)
-   {
-      if( progress->tp[m_block_num][t]->state & AFJOB::STATE_DONE_MASK    )
-      {
-         setProgress( p_bar_done,    t, true  );
-         setProgress( p_bar_running, t, false );
-      }
-   }
-   for( int t = 0; t < m_tasks_num; t++)
-   {
-      if( progress->tp[m_block_num][t]->state & AFJOB::STATE_READY_MASK   )
-      {
-         setProgress( p_bar_done,    t, false  );
-         setProgress( p_bar_running, t, false  );
-      }
-   }
-   for( int t = 0; t < m_tasks_num; t++)
-   {
-      if( progress->tp[m_block_num][t]->state & AFJOB::STATE_RUNNING_MASK )
-      {
-         setProgress( p_bar_done,    t, false );
-         setProgress( p_bar_running, t, true  );
-      }
-   }
-   for( int t = 0; t < m_tasks_num; t++)
-   {
-      if( progress->tp[m_block_num][t]->state & AFJOB::STATE_ERROR_MASK   )
-      {
-         setProgress( p_bar_done,    t, true  );
-         setProgress( p_bar_running, t, true  );
-      }
-   }
-   //stdOutFlags();
-
-
-	// ASCII:
+	// Set to zeros:
 	for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
 		p_progressbar[i] = 0;
 
 	for( int t = 0; t < m_tasks_num; t++)
 	{
+		// Get maximum ASCII state for this task:
 		int value = 0;
 		for( int i = 0; i < AFJOB::ASCII_PROGRESS_COUNT; i++)
 			if(( progress->tp[m_block_num][t]->state & AFJOB::ASCII_PROGRESS_MASK ) == AFJOB::ASCII_PROGRESS_STATES[i*2+1] )
-				if( value < i)
+				if( value < i) // More important for monitoring value
 					value = i;
 
+		// Calculate range:
 		int pos_a = AFJOB::ASCII_PROGRESS_LENGTH * ( t   ) / m_tasks_num;
 		int pos_b = AFJOB::ASCII_PROGRESS_LENGTH * ( t+1 ) / m_tasks_num;
 		if( pos_b > pos_a )
@@ -1359,33 +1315,18 @@ bool BlockData::updateBars( JobProgress * progress)
 
 		for( int p = pos_a; p <= pos_b; p++)
 		{
+			// Set new value only if it is more important:
 			if( value > p_progressbar[p] )
 				p_progressbar[p] = value;
 		}
 	}
 
+	// Transfer values to characters:
+	for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
+		p_progressbar[i] = AFJOB::ASCII_PROGRESS_STATES[p_progressbar[i]*2];
+
+//for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)  printf("%c", p_progressbar[i]); printf("\n");
    return changed;
-}
-
-void BlockData::setProgressBit( uint8_t *array, int pos, bool value)
-{
-   int byte = pos / 8;
-   int bit = pos - byte*8;
-   uint8_t flag = 1 << bit;
-   if( value ) array[byte] = array[byte] |   flag;
-   else        array[byte] = array[byte] & (~flag);
-//printf(" %d %d %d ", byte, bit, flag);
-}
-
-void BlockData::setProgress( uint8_t *array, int task, bool value)
-{
-   int pos_a = AFJOB::PROGRESS_BYTES * 8 *  task    / m_tasks_num;
-   int pos_b = AFJOB::PROGRESS_BYTES * 8 * (task+1) / m_tasks_num;
-   if( pos_b > pos_a) pos_b--;
-   if( pos_b > AFJOB::PROGRESS_BYTES * 8 ) pos_b = AFJOB::PROGRESS_BYTES * 8 - 1;
-//printf("BlockData::setProgress: task=%d, pos_a=%d, pos_b=%d, value=%d\n", task, pos_a, pos_b, value);
-   for( int pos = pos_a; pos <= pos_b; pos++) setProgressBit( array, pos, value);
-//printf("\n");
 }
 
 void BlockData::stdOutProgress() const
@@ -1402,24 +1343,6 @@ const std::string BlockData::generateProgressString() const
 
 void BlockData::generateProgressStream( std::ostringstream & o_str) const
 {
-   for( int i = 0; i < AFJOB::PROGRESS_BYTES; i++)
-   {
-      uint8_t flags = 1;
-      for( int b = 0; b < 8; b++)
-      {
-         if( p_bar_done[i] & flags) o_str << "1"; else o_str << "0";
-         flags <<= 1;
-      }
-   }
-   o_str << std::endl;
-   for( int i = 0; i < AFJOB::PROGRESS_BYTES; i++)
-   {
-      uint8_t flags = 1;
-      for( int b = 0; b < 8; b++)
-      {
-         if( p_bar_running[i] & flags) o_str << "1"; else o_str << "0";
-         flags <<= 1;
-      }
-   }
-   o_str << std::endl;
+	o_str << std::string( p_progressbar, AFJOB::ASCII_PROGRESS_LENGTH);
+	o_str << std::endl;
 }

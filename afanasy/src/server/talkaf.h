@@ -11,17 +11,15 @@ class TalkAf: public af::Talk, public AfNodeSrv
 {
 public:
 
-   TalkAf( af::Msg * msg);
+	TalkAf( af::Msg * msg);
 
-   ~TalkAf();
+	~TalkAf();
 
-   void setZombie();
-
-   bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+	void setZombie();
 
 	virtual void v_action( Action & i_action);
 
-   void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 private:
 };

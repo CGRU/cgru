@@ -9,17 +9,7 @@ class AfNodeSrv
 public:
 	AfNodeSrv( af::Node * i_node);
 	virtual ~AfNodeSrv();
-/*
-	inline void setNode( af::Node * i_node) { m_node = i_node;
-printf("AfNodeSrv::setNode = %p\n", m_node);
-}
-	inline void printPointers()
-{
-printf("AfNodeSrv poniters:\n");
-printf("this = %p\n", this);
-printf("m_node = %p\n", m_node);
-}
-*/
+
 	inline af::Node * node() { return m_node; }
 
 	/// Nodes comparison by priority ( wich is private property).
@@ -31,13 +21,9 @@ printf("m_node = %p\n", m_node);
 	inline bool operator != ( const AfNodeSrv & other) const { return m_node->m_priority != other.m_node->m_priority;}
 
 	/// Set some node attribute by incoming message.
-//	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
 	void action( Action & i_action);
 
 	virtual void v_action( Action & i_action);
-
-/// Set some node attribute by incoming message.
-   virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 /// Refresh node information
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
@@ -62,17 +48,9 @@ printf("m_node = %p\n", m_node);
 	af::Msg * writeLog() const;
 	int calcLogWeight() const;
 
-//    inline void setHidden( bool i_hide = true) { if( i_hide ) m_flags = m_flags | FHidden; else m_flags = m_flags & (~FHidden); }
-
 	// Just interesting - good to show server load
 	static unsigned long long getSolvesCount() { return sm_solve_cycle; }
 
-   //Solving:
-/*   enum SolvingMethod{
-      SolveByOrder     = 0,
-      SolveByPriority  = 1
-   };
-*/
 	/// Can node run
 	/** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
 	virtual bool canRun();

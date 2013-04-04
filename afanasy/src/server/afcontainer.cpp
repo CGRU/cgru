@@ -380,7 +380,6 @@ void AfContainer::freeZombies()
    }
 }
 
-//void AfContainer::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
 void AfContainer::action( Action & i_action)
 {
 	if( i_action.ids.size())
@@ -394,7 +393,6 @@ void AfContainer::action( Action & i_action)
 			}
 			AfNodeSrv * node = nodesTable[i_action.ids[i]];
 			if( node == NULL ) continue;
-//			node->action( i_action, i_container, i_monitoring);
 			node->action( i_action);
 		}
 		return;
@@ -415,7 +413,6 @@ void AfContainer::action( Action & i_action)
 		{
 			if( rx.match( node->m_node->m_name))
 			{
-//				node->action( i_action, i_container, i_monitoring);
 				node->action( i_action);
 				if( false == namefounded) namefounded = true;
 			}
@@ -423,68 +420,6 @@ void AfContainer::action( Action & i_action)
 		if( false == namefounded )
 			AFCommon::QueueLog( name + ": No node matches \"" + i_action.mask + "\" founded.");
 	}
-}
-
-void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-   bool namefounded = false;
-   std::string pattern = mcgeneral.getName();
-   int getcount = mcgeneral.getCount();
-
-   if( getcount < 1 )
-   {
-      std::string errMsg;
-      af::RegExp rx;
-      rx.setPattern( pattern, &errMsg);
-      if( rx.empty())
-      {
-         AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + pattern + ("\" is invalid: ") + errMsg);
-         return;
-      }
-      for( AfNodeSrv *node = first_ptr; node != NULL; node = node->m_next_ptr )
-      {
-         if( rx.match( node->m_node->m_name))
-         {
-            action( node, mcgeneral, type, pointer, monitoring);
-            if( false == namefounded) namefounded = true;
-         }
-      }
-   }
-   else
-   {
-      for( int i = 0; i < getcount; i++)
-      {
-         int pos = mcgeneral.getId( i);
-         if( pos >= size)
-         {
-            AFERRAR("AfContainer::action: position >= size (%d>=%d)", pos, size)
-            continue;
-         }
-         AfNodeSrv *node = nodesTable[ pos];
-         if( node == NULL ) continue;
-         action( node, mcgeneral, type, pointer, monitoring);
-      }
-   }
-
-   if(( getcount == 0) && ( namefounded == false))
-      AFCommon::QueueLog( name + ": " + af::Msg::TNAMES[type] + ": No node matches \"" + pattern + "\" founded.");
-}
-
-void AfContainer::action( AfNodeSrv * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-   if( node->m_node->isLocked()) return;
-   if( node->action( mcgeneral, type, pointer, monitoring) == false )
-   {
-      AFCommon::QueueLogError( std::string("Unknown  action: ") + af::Msg::TNAMES[type]);
-      return;
-   }
-/*   switch( type)
-   {
-      case af::Msg::TRenderSetPriority:
-      case af::Msg::TJobPriority:
-      case af::Msg::TUserPriority:
-         sortPriority( node);
-   }*/
 }
 
 void AfContainer::sortPriority( AfNodeSrv * i_node)

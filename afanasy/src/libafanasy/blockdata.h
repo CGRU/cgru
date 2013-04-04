@@ -238,8 +238,7 @@ public:
 	inline int   getRunningTasksNumber() const { return  m_running_tasks_counter;}
 
 	bool updateProgress( JobProgress * progress);
-	inline const uint8_t * getProgressBarDone()    const { return p_bar_done;    }
-	inline const uint8_t * getProgressBarRunning() const { return p_bar_running; }
+	inline const char * getProgressBar()          const { return p_progressbar;    }
 	inline int       getProgressPercentage()      const { return p_percentage;     }
 	inline int       getProgressErrorHostsNum()   const { return p_error_hosts;    }
 	inline int       getProgressAvoidHostsNum()   const { return p_avoid_hosts;    }
@@ -367,8 +366,6 @@ private:
 	void setProgress( uint8_t *array, int task, bool value);
 
 private:
-	uint8_t  p_bar_done[AFJOB::PROGRESS_BYTES];          ///< Done tasks progress for each block.
-	uint8_t  p_bar_running[AFJOB::PROGRESS_BYTES];       ///< Running task progress for each block.
 	char    p_progressbar[AFJOB::ASCII_PROGRESS_LENGTH];
 	uint8_t p_percentage;      ///< Tasks average percentage.
 	int32_t p_error_hosts;     ///< Number of error host of the block.

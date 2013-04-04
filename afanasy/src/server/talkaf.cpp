@@ -41,25 +41,6 @@ void TalkAf::v_action( Action & i_action)
 	}
 }
 
-bool TalkAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-   switch( type)
-   {
-   case af::Msg::TTalkExit:
-   {
-      af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
-      msg->setAddress( this);
-      AFCommon::QueueMsgDispatch( msg);
-      return true;
-   }
-   default:
-   {
-      return false;
-   }
-   }
-   return true;
-}
-
 void TalkAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 //printf("TalkAf::refresh: \"%s\"\n", getName().toUtf8().data());
