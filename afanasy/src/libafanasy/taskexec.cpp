@@ -10,62 +10,57 @@
 using namespace af;
 
 TaskExec::TaskExec(
-		const std::string & Name,
-		const std::string & ServiceType,
-		const std::string & ParserType,
-		const std::string & Command,
-		int Capacity,
-		int fileSizeMin,
-		int fileSizeMax,
-		const std::string & Files,
+		const std::string & i_name,
+		const std::string & i_service_type,
+		const std::string & i_parser_type,
+		const std::string & i_command,
+		int i_capacity,
+		int i_file_size_min,
+		int i_file_size_max,
+		const std::string & i_files,
 
-		long long Start_Frame,
-		long long End_Frame,
-		long long FramesNum,
+		long long i_start_frame,
+		long long i_end_frame,
+		long long i_frames_num,
 
-		const std::string & WorkingDirectory,
-		const std::string & Environment,
+		const std::string & i_working_directory,
+		const std::string & i_environment,
 
-		int JobId,
-		int BlockNumber,
-		unsigned int BlockFlags,
-		int TaskNumber,
+		int i_job_id,
+		int i_block_number,
+		unsigned int i_block_flags,
+		int i_task_number,
 
-		int ParserCoeff,
-
-		const std::string * CustomDataBlock,
-		const std::string * CustomDataTask
+		int i_parser_coeff
 	):
 
-	m_name( Name),
-	m_working_directory( WorkingDirectory),
-	m_environment(  Environment),
-	m_command( Command),
-	m_files( Files),
-	m_service( ServiceType),
-	m_parser( ParserType),
-	m_parser_coeff( ParserCoeff),
-	m_capacity( Capacity),
+	m_name( i_name),
+	m_working_directory( i_working_directory),
+	m_environment(  i_environment),
+	m_command( i_command),
+	m_files( i_files),
+	m_service( i_service_type),
+	m_parser( i_parser_type),
+	m_parser_coeff( i_parser_coeff),
+	m_capacity( i_capacity),
 	m_capacity_coeff( 0),
-	m_file_size_min( fileSizeMin),
-	m_file_size_max( fileSizeMax),
+	m_file_size_min( i_file_size_min),
+	m_file_size_max( i_file_size_max),
 
-	m_job_id(    JobId),
-	m_block_num( BlockNumber),
-	m_block_flags( BlockFlags),
-	m_task_num(  TaskNumber),
+	m_job_id( i_job_id),
+	m_block_num( i_block_number),
+	m_block_flags( i_block_flags),
+	m_task_num(  i_task_number),
 	m_number( 0),
 
-	m_frame_start(   Start_Frame),
-	m_frame_finish(  End_Frame),
-	m_frames_num(    FramesNum),
+	m_frame_start(   i_start_frame),
+	m_frame_finish(  i_end_frame),
+	m_frames_num(    i_frames_num),
 
 	m_time_start( time(NULL)),
 	m_on_client( false)
 {
 AFINFA("TaskExec::TaskExec: %s:", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data())
-   if( CustomDataBlock ) m_custom_data_block = *CustomDataBlock;
-   if( CustomDataTask )  m_custom_data_task  = *CustomDataTask;
 }
 
 TaskExec::TaskExec( const std::string & Command):
@@ -144,10 +139,16 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 			o_str << ",\"files\":\"" << af::strEscape( m_files  ) << "\"";
 		if( m_working_directory.size())
 			o_str << ",\"working_directory\":\"" << af::strEscape( m_working_directory ) << "\"";
-		if( m_custom_data_block.size())
-			o_str << ",\"custom_data_block\":\"" << af::strEscape( m_custom_data_block ) << "\"";
 		if( m_custom_data_task.size())
 			o_str << ",\"custom_data_task\":\"" << af::strEscape( m_custom_data_task ) << "\"";
+		if( m_custom_data_block.size())
+			o_str << ",\"custom_data_block\":\"" << af::strEscape( m_custom_data_block ) << "\"";
+		if( m_custom_data_job.size())
+			o_str << ",\"custom_data_job\":\"" << af::strEscape( m_custom_data_job ) << "\"";
+		if( m_custom_data_user.size())
+			o_str << ",\"custom_data_user\":\"" << af::strEscape( m_custom_data_user ) << "\"";
+		if( m_custom_data_render.size())
+			o_str << ",\"custom_data_render\":\"" << af::strEscape( m_custom_data_render ) << "\"";
 		if( m_environment.size())
 			o_str << ",\"environment\":\"" << af::strEscape( m_environment ) << "\"";
 	}
@@ -160,14 +161,6 @@ void TaskExec::readwrite( Msg * msg)
 	switch( msg->type())
 	{
 	case Msg::TTask:
-		rw_String  ( m_working_directory, msg);
-		rw_String  ( m_environment,       msg);
-		rw_String  ( m_command,           msg);
-		rw_String  ( m_files,             msg);
-		rw_String  ( m_parser,            msg);
-		rw_String  ( m_custom_data_block, msg);
-		rw_String  ( m_custom_data_task,  msg);
-		rw_int32_t ( m_parser_coeff,      msg);
 		rw_int32_t ( m_job_id,            msg);
 		rw_int32_t ( m_block_num,         msg);
 		rw_uint32_t( m_block_flags,       msg);
@@ -178,8 +171,19 @@ void TaskExec::readwrite( Msg * msg)
 		rw_int64_t ( m_frames_num,        msg);
 		rw_int64_t ( m_frame_start,       msg);
 		rw_int64_t ( m_frame_finish,      msg);
+		rw_int32_t ( m_parser_coeff,      msg);
 		rw_int64_t ( m_file_size_min,     msg);
 		rw_int64_t ( m_file_size_max,     msg);
+		rw_String  ( m_command,           msg);
+		rw_String  ( m_working_directory, msg);
+		rw_String  ( m_environment,       msg);
+		rw_String  ( m_files,             msg);
+		rw_String  ( m_parser,            msg);
+		rw_String  ( m_custom_data_task,  msg);
+		rw_String  ( m_custom_data_block, msg);
+		rw_String  ( m_custom_data_job,   msg);
+		rw_String  ( m_custom_data_user,  msg);
+		rw_String  ( m_custom_data_render,msg);
 
 		rw_StringList( m_multihost_names, msg);
 

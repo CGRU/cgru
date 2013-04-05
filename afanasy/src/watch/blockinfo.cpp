@@ -378,15 +378,15 @@ void BlockInfo::drawProgress(
 			painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'S': // STATE_SKIPPED_MASK | STATE_DONE_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjoboff.c, Qt::SolidPattern ));
-			painter->drawRect( x, posy, w+offset, height);
-			break;
-		case 'G': // STATE_DONE_MASK | STATE_WARNING_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjoberror.c, Qt::SolidPattern ));
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern ));
 			painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'N': // STATE_RUNNING_MASK_MASK | STATE_WARNING_MASK
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_star.c, Qt::SolidPattern ));
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningrun.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'G': // STATE_DONE_MASK | STATE_WARNING_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningdone.c, Qt::SolidPattern ));
 			painter->drawRect( x, posy, w+offset, height);
 			break;
 		}

@@ -17,154 +17,147 @@ namespace af
 class TaskExec : public Af
 {
 public:
-   TaskExec(
-         const std::string & Name,
-         const std::string & ServiceType,
-         const std::string & ParserType,
-         const std::string & Command,
-         int Capacity,
-         int fileSizeMin,
-         int fileSizeMax,
-         const std::string & Files,
+	TaskExec(
+			const std::string & i_name,
+			const std::string & i_service_type,
+			const std::string & i_sarser_type,
+			const std::string & i_command,
+			int i_capacity,
+			int i_file_size_min,
+			int i_file_size_max,
+			const std::string & i_files,
 
-         long long Start_Frame,
-         long long End_Frame,
-         long long FramesNum,
+			long long i_start_frame,
+			long long i_end_frame,
+			long long i_frames_num,
 
-         const std::string & WorkingDirectory,
-         const std::string & Environment,
+			const std::string & i_working_directory,
+			const std::string & i_environment,
 
-         int numjob,
-         int numblock,
-         unsigned int blockflags,
-         int num,
+			int i_job_id,
+			int i_block_number,
+			unsigned int i_block_flags,
+			int i_tast_number,
 
-         int ParserCoeff = 1,
-
-         const std::string * CustomDataBlock = NULL,
-         const std::string * CustomDataTask = NULL
+			int i_parser_coeff = 1
 );
 
-   TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
+	TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
 
-   TaskExec( Msg * msg); ///< Read task from message.
-   ~TaskExec();
+	TaskExec( Msg * msg); ///< Read task from message.
+	~TaskExec();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
-/*
-   enum BlockFlags{
-      FNumeric          = 1 << 0,
-      FVarCapacity      = 1 << 1,
-      FMultiHost        = 1 << 2,
-      FMasterOnSlave    = 1 << 3,
-      FDependSubTask    = 1 << 4,
-      FNonSequential    = 1 << 5,
-      FDoPost           = 1 << 6
-   };
-*/
-   inline const std::string & getName()        const { return m_name;       }///< Get task name.
-   inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
-   inline const std::string & getParserType()  const { return m_parser; }///< Get task parser type.
-   inline int getParserCoeff()            const { return m_parser_coeff;}///< Get parser koeff.
-   inline int getJobId()    const { return m_job_id;      }///< Get task job id.
-   inline int getBlockNum() const { return m_block_num;   }///< Get task block number.
-   inline unsigned int getBlockFlags() const { return m_block_flags; }///< Get block flags
-   inline int getTaskNum()  const { return m_task_num;    }///< Get task number in block.
-   inline int getNumber()   const { return m_number;     }///< Get task number (aux).
+	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline int  getCapacity()      const { return m_capacity;   }///< Get task capacity.
-   inline int  getCapCoeff()      const { return m_capacity_coeff;   }///< Get task capacity koeff.
-   inline void setCapCoeff( int value ) { m_capacity_coeff = value;  }///< Set task capacity koeff.
-   inline int  getCapResult()     const { return m_capacity_coeff ? m_capacity*m_capacity_coeff : m_capacity;}
+	inline const std::string & getName()        const { return m_name;       }///< Get task name.
+	inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
+	inline const std::string & getParserType()  const { return m_parser; }///< Get task parser type.
+	inline int getParserCoeff()            const { return m_parser_coeff;}///< Get parser koeff.
+	inline int getJobId()    const { return m_job_id;      }///< Get task job id.
+	inline int getBlockNum() const { return m_block_num;   }///< Get task block number.
+	inline unsigned int getBlockFlags() const { return m_block_flags; }///< Get block flags
+	inline int getTaskNum()  const { return m_task_num;    }///< Get task number in block.
+	inline int getNumber()   const { return m_number;     }///< Get task number (aux).
 
-   inline const std::string & getBlockName()  const { return m_block_name; }///< Get task block name.
-   inline const std::string & getJobName()    const { return m_job_name;   }///< Get task job name.
-   inline const std::string & getUserName()   const { return m_user_name;  }///< Get task user name.
+	inline int  getCapacity()      const { return m_capacity;   }///< Get task capacity.
+	inline int  getCapCoeff()      const { return m_capacity_coeff;   }///< Get task capacity koeff.
+	inline void setCapCoeff( int value ) { m_capacity_coeff = value;  }///< Set task capacity koeff.
+	inline int  getCapResult()     const { return m_capacity_coeff ? m_capacity*m_capacity_coeff : m_capacity;}
 
-   inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
-   inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
-   inline bool hasEnv()       const { return m_environment.size();     } ///< Whether extra environment.
-   inline bool hasFiles()     const { return m_files.size();   } ///< Whether files exist.
-   inline bool genTumbnails() const { return m_block_flags & BlockData::FGenThumbnails; }
+	inline const std::string & getBlockName()  const { return m_block_name; }///< Get task block name.
+	inline const std::string & getJobName()    const { return m_job_name;   }///< Get task job name.
+	inline const std::string & getUserName()   const { return m_user_name;  }///< Get task user name.
 
-   inline const std::string & getCommand()  const { return m_command; } ///< Get command.
-   inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
-   inline const std::string & getEnv()      const { return m_environment;     } ///< Get extra environment.
-   inline const std::string & getFiles()    const { return m_files;   } ///< Get preview command.
+	inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
+	inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
+	inline bool hasEnv()       const { return m_environment.size();     } ///< Whether extra environment.
+	inline bool hasFiles()     const { return m_files.size();   } ///< Whether files exist.
+	inline bool genTumbnails() const { return m_block_flags & BlockData::FGenThumbnails; }
 
-   inline bool hasFileSizeCheck() const { return ((m_file_size_min != -1) || (m_file_size_max != -1));}
+	inline const std::string & getCommand()  const { return m_command; } ///< Get command.
+	inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
+	inline const std::string & getEnv()      const { return m_environment;     } ///< Get extra environment.
+	inline const std::string & getFiles()    const { return m_files;   } ///< Get preview command.
 
-   inline long long getFileSizeMin()   const { return m_file_size_min;}
-   inline long long getFileSizeMax()   const { return m_file_size_max;}
+	inline bool hasFileSizeCheck() const { return ((m_file_size_min != -1) || (m_file_size_max != -1));}
 
-   inline long long getFramesNum()   const { return m_frames_num;   } ///< Get frames number.
-   inline long long getFrameStart()  const { return m_frame_start;  } ///< Get first frame.
-   inline long long getFrameFinish() const { return m_frame_finish; } ///< Get last frame.
+	inline long long getFileSizeMin()   const { return m_file_size_min;}
+	inline long long getFileSizeMax()   const { return m_file_size_max;}
 
-   inline long long getTimeStart()  const { return m_time_start;   } ///< Get task started time.
+	inline long long getFramesNum()   const { return m_frames_num;   } ///< Get frames number.
+	inline long long getFrameStart()  const { return m_frame_start;  } ///< Get first frame.
+	inline long long getFrameFinish() const { return m_frame_finish; } ///< Get last frame.
 
-   inline bool equals( const MCTaskUp & up) const
-	  {return ((m_job_id == up.getNumJob()) && (m_block_num == up.getNumBlock()) && (m_task_num == up.getNumTask()) && (m_number == up.getNumber()));}
+	inline long long getTimeStart()  const { return m_time_start;   } ///< Get task started time.
 
-   inline bool equals( const TaskExec & other) const
-	  {return ((m_job_id == other.getJobId()) && (m_block_num == other.getBlockNum()) && (m_task_num == other.getTaskNum()) && (m_number == other.getNumber()));}
+	inline bool equals( const MCTaskUp & up) const
+		{return ((m_job_id == up.getNumJob()) && (m_block_num == up.getNumBlock()) && (m_task_num == up.getNumTask()) && (m_number == up.getNumber()));}
 
-   enum UpStatus
-   {
-      UPNULL,
-      UPNoUpdate,
+	inline bool equals( const TaskExec & other) const
+		{return ((m_job_id == other.getJobId()) && (m_block_num == other.getBlockNum()) && (m_task_num == other.getTaskNum()) && (m_number == other.getNumber()));}
 
-      UPStarted,
-      UPPercent,
-      UPWarning,
+	enum UpStatus
+	{
+		UPNULL,
+		UPNoUpdate,
 
-      UPFinishedSuccess,
-      UPFinishedError,
-      UPFinishedKilled,
-      UPFinishedParserError,
-      UPFinishedParserBadResult,
-      UPFinishedParserSuccess,
+		UPStarted,
+		UPPercent,
+		UPWarning,
+
+		UPFinishedSuccess,
+		UPFinishedError,
+		UPFinishedKilled,
+		UPFinishedParserError,
+		UPFinishedParserBadResult,
+		UPFinishedParserSuccess,
 		UPFinishedFailedPost,
 
-      UPRenderDeregister,
-      UPRenderExit,
-      UPRenderZombie,
+		UPRenderDeregister,
+		UPRenderExit,
+		UPRenderZombie,
 
-      UPTimeOut,
-      UPMaxRunTime,
+		UPTimeOut,
+		UPMaxRunTime,
 
-      UPStop,
-      UPSkip,
-      UPRestart,
-      UPEject,
+		UPStop,
+		UPSkip,
+		UPRestart,
+		UPEject,
 
-      UPFailedToStart,
-      UPNoTaskRunning,
-      UPNoJob,
+		UPFailedToStart,
+		UPNoTaskRunning,
+		UPNoJob,
 
-      UPLAST
-   };
+		UPLAST
+	};
 
-   inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }
-   inline bool      removeListenAddress( const Address & address) { return m_listen_addresses.removeAddress( address);  }
-   inline size_t getListenAddressesNum() const { return m_listen_addresses.getAddressesNum();              }
-   inline const std::list<Address> * getListenAddresses() const { return m_listen_addresses.getAddresses();       }
+	inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }
+	inline bool      removeListenAddress( const Address & address) { return m_listen_addresses.removeAddress( address);  }
+	inline size_t getListenAddressesNum() const { return m_listen_addresses.getAddressesNum();              }
+	inline const std::list<Address> * getListenAddresses() const { return m_listen_addresses.getAddresses();       }
 
-   inline void setName(      const std::string & str) { m_name      = str;}   ///< Set task name.
-   inline void setBlockName( const std::string & str) { m_block_name = str;}   ///< Set task block name.
-   inline void setJobName(   const std::string & str) { m_job_name   = str;}   ///< Set task job name.
-   inline void setUserName(  const std::string & str) { m_user_name  = str;}   ///< Set task user name.
-   inline void setCommand(   const std::string & str) { m_command   = str;}   ///< Set task command.
-   inline void setWDir(      const std::string & str) { m_working_directory      = str;}   ///< Set working directory.
-   inline void setTaskNumber(      int           num) { m_task_num   = num;}   ///< Set task number.
-   inline void setNumber(          int           num) { m_number    = num;}   ///< Set task aux number.
+	inline void setName(      const std::string & str) { m_name      = str;}   ///< Set task name.
+	inline void setBlockName( const std::string & str) { m_block_name = str;}   ///< Set task block name.
+	inline void setJobName(   const std::string & str) { m_job_name   = str;}   ///< Set task job name.
+	inline void setUserName(  const std::string & str) { m_user_name  = str;}   ///< Set task user name.
+	inline void setCommand(   const std::string & str) { m_command   = str;}   ///< Set task command.
+	inline void setWDir(      const std::string & str) { m_working_directory      = str;}   ///< Set working directory.
+	inline void setTaskNumber(      int           num) { m_task_num   = num;}   ///< Set task number.
+	inline void setNumber(          int           num) { m_number    = num;}   ///< Set task aux number.
 
-   inline void setHostNames( const std::list<std::string> & names)  { m_multihost_names = names;}
-   inline const std::list<std::string> & getMultiHostsNames() const { return m_multihost_names; }
+	inline void setHostNames( const std::list<std::string> & names)  { m_multihost_names = names;}
+	inline const std::list<std::string> & getMultiHostsNames() const { return m_multihost_names; }
 
-   int calcWeight() const;
+	int calcWeight() const;
 
-   void jsonWrite( std::ostringstream & o_str, int i_type) const;
+	void jsonWrite( std::ostringstream & o_str, int i_type) const;
+
+	std::string m_custom_data_task;
+	std::string m_custom_data_block;
+	std::string m_custom_data_job;
+	std::string m_custom_data_user;
+	std::string m_custom_data_render;
 
 private:
 	std::string m_name;               ///< Task name.
@@ -179,9 +172,6 @@ private:
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.
-
-	std::string m_custom_data_block;  ///< Block custom data.
-	std::string m_custom_data_task;   ///< Task custom data.
 
 	int32_t m_capacity;
 	int32_t m_capacity_coeff;

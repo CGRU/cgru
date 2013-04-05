@@ -48,9 +48,10 @@ public:
 
 	inline const std::string & getUserName()     const { return m_user_name;   }
 	inline const std::string & getHostName()     const { return m_host_name;   }
-	inline const std::string & getCmdPre()       const { return m_command_pre;     }
-	inline const std::string & getCmdPost()      const { return m_command_post;    }
+	inline const std::string & getCmdPre()       const { return m_command_pre; }
+	inline const std::string & getCmdPost()      const { return m_command_post;}
 	inline const std::string & getDescription()  const { return m_description; }
+	inline const std::string & getCustomData()   const { return m_custom_data; }
 
 	inline bool isStarted() const {return m_time_started != 0 ; }                ///< Whether a job is started.
 	inline bool isReady()   const {return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
@@ -156,6 +157,8 @@ protected:
 	RegExp m_depend_mask_global;
 	RegExp m_need_os;
 	RegExp m_need_properties;
+
+	std::string m_custom_data;
 
 	std::string m_tasks_output_dir;       ///< Tasks output directory.
 

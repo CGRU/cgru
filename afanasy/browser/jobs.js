@@ -4,7 +4,7 @@ Block_ProgressBarLength = 128;
 Block_ProgressBarHeight =  10;
 
 BarDONrgb = '#363';
-BarSKPrgb = '#266';
+BarSKPrgb = '#444';
 BarDWRrgb = '#141';
 BarWDPrgb = '#A2A';
 BarRUNrgb = '#FF0';
@@ -191,6 +191,7 @@ function JobBlock( i_elParent, i_block)
 
 	this.elRoot = document.createElement('div');
 	i_elParent.appendChild( this.elRoot);
+	this.elRoot.style.clear = 'both';
 	this.elRoot.block = this;
 	this.elRoot.oncontextmenu = function(e){ return e.currentTarget.block.onContextMenu(e);}
 
@@ -328,6 +329,7 @@ JobBlock.prototype.constructFull = function()
 
 	this.elFull = document.createElement('div');
 	this.element.appendChild( this.elFull);
+	this.elFull.style.clear = 'both';
 
 	this.elProgress = document.createElement('div');
 	this.elFull.appendChild( this.elProgress);

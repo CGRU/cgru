@@ -57,6 +57,8 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
 	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
+	jr_string("custom_data",        m_custom_data,         i_object, io_changes);
+
 	jr_string("user_name",     m_user_name,     i_object);
 
 	bool offline = false;
@@ -136,6 +138,8 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\"cmd_post\":\""     << af::strEscape( m_command_post    ) << "\"";
 	if( m_description.size())
 		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
+	if( m_custom_data.size())
+		o_str << ",\"custom_data\":\""  << af::strEscape( m_custom_data ) << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\"user_list_order\":"            << m_user_list_order;
@@ -221,30 +225,30 @@ void Job::readwrite( Msg * msg)
 {
 	Node::readwrite( msg);
 
-	rw_String  ( m_user_name,           msg);
-	rw_String  ( m_host_name,           msg);
-	rw_int32_t ( m_blocksnum,          msg);
-	rw_uint32_t( m_flags,              msg);
-	rw_uint32_t( m_state,              msg);
-	rw_int32_t ( m_max_running_tasks,    msg);
+	rw_int32_t ( m_blocksnum,                  msg);
+	rw_uint32_t( m_flags,                      msg);
+	rw_uint32_t( m_state,                      msg);
+	rw_int32_t ( m_max_running_tasks,          msg);
 	rw_int32_t ( m_max_running_tasks_per_host, msg);
-	rw_String  ( m_command_pre,            msg);
-	rw_String  ( m_command_post,           msg);
+	rw_int32_t ( m_user_list_order,            msg);
+	rw_int64_t ( m_time_creation,              msg);
+	rw_int64_t ( m_time_wait,                  msg);
+	rw_int64_t ( m_time_started,               msg);
+	rw_int64_t ( m_time_done,                  msg);
+	rw_int32_t ( m_time_life,                  msg);
 
-	rw_int32_t ( m_user_list_order,      msg);
-	rw_int64_t ( m_time_creation,      msg);
-	rw_int64_t ( m_time_wait,          msg);
-	rw_int64_t ( m_time_started,       msg);
-	rw_int64_t ( m_time_done,          msg);
-	rw_int32_t ( m_time_life,           msg);
+	rw_String  ( m_user_name,    msg);
+	rw_String  ( m_host_name,    msg);
+	rw_String  ( m_command_pre,  msg);
+	rw_String  ( m_command_post, msg);
+	rw_String  ( m_annotation,   msg);
+	rw_String  ( m_description,  msg);
+	rw_String  ( m_custom_data,  msg);
 
-	rw_String  ( m_description,        msg);
-	rw_String  ( m_annotation,         msg);
-
-	rw_RegExp  ( m_hosts_mask,          msg);
-	rw_RegExp  ( m_hosts_mask_exclude,  msg);
-	rw_RegExp  ( m_depend_mask,         msg);
-	rw_RegExp  ( m_depend_mask_global,  msg);
+	rw_RegExp  ( m_hosts_mask,         msg);
+	rw_RegExp  ( m_hosts_mask_exclude, msg);
+	rw_RegExp  ( m_depend_mask,        msg);
+	rw_RegExp  ( m_depend_mask_global, msg);
 	rw_RegExp  ( m_need_os,            msg);
 	rw_RegExp  ( m_need_properties,    msg);
 
