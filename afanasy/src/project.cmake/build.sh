@@ -61,4 +61,4 @@ case ${DISTRIBUTIVE} in
 esac
 
 # Build:
-cmake . && make
+cmake . && make $@
