@@ -44,7 +44,8 @@ Service::Service( const TaskExec & taskexec):
    files( taskexec.getFiles()),
    job_id(taskexec.getJobId()),
    block_id(taskexec.getBlockNum()),
-   task_id(taskexec.getTaskNum())
+   task_id(taskexec.getTaskNum()),
+   block_flags(taskexec.getBlockFlags())
 {
    initialize();
 }
@@ -84,6 +85,7 @@ void Service::initialize()
    PyDict_SetItemString(taskInfo, "job_id",           PyLong_FromLong(job_id));
    PyDict_SetItemString(taskInfo, "block_id",         PyLong_FromLong(block_id));
    PyDict_SetItemString(taskInfo, "task_id",          PyLong_FromLong(task_id));
+   PyDict_SetItemString(taskInfo, "block_flags",      PyLong_FromLong(block_flags));
 
    PyTuple_SetItem( pArgs, 0, taskInfo);
 

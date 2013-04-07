@@ -46,6 +46,7 @@ private:
    int job_id;
    int block_id;
    int task_id;
+   unsigned int block_flags;
    int capkoeff;
    std::list<std::string> hosts;
 };

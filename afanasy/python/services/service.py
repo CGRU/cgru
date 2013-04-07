@@ -25,7 +25,7 @@ class service:
       self.files = taskInfo.get('files', '')
       
       self.taskInfo = taskInfo
-
+      
       self.pm = cgrupathmap.PathMap()
 
       self.str_capacity = str_capacity
@@ -122,8 +122,18 @@ class service:
          os.unlink(self.taskInfo['thumbnail_tmp_filepath'])
    
    def doPost(self):
+      def check_flag(byte, flag_name):
+         flags = {'numeric': 0x01,
+                  'thumbnails': 0x64}
+         if flags[flag_name]:
+            mask = flags.get(flag_name)
+            return byte & mask
+         else:
+            return 0
+
       errorMessage = ""
       print("Doing post process")
-      self.generatethumbnail()
+      if check_flag(self.taskInfo.get('block_flags', 0), "thumbnails"):
+         self.generatethumbnail()
       return errorMessage
 
