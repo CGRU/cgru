@@ -966,9 +966,9 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		if( m_custom_data.size() || m_user->getCustomData().size())
 		{
 			std::string cmd = "{\n";
-			if( m_user->getCustomData().size()) cmd += "\"user\":" + m_user->getCustomData();
+			if( m_user->getCustomData().size()) cmd += "\"user\":\"" + m_user->getCustomData() + '"';
 			cmd += ",\n";
-			if( m_custom_data.size()) cmd += "\"job\":" + m_custom_data;
+			if( m_custom_data.size()) cmd += "\"job\":\"" + m_custom_data +'"';
 			cmd += ",\n";
 			cmd += "\"state\":\"";
 			std::string cmd_end = "\"\n}";

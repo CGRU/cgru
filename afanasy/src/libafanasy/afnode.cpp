@@ -39,7 +39,8 @@ void Node::v_priorityChanged( MonitorContainer * i_monitoring ){}
 
 void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorContainer * i_monitoring)
 {
-	jr_string("annotation", m_annotation, i_object, io_changes);
+	jr_string("annotation",  m_annotation,  i_object, io_changes);
+	jr_string("custom_data", m_custom_data, i_object, io_changes);
 
 	int32_t priority = -1;
 	jr_int32 ("priority", priority, i_object, io_changes);
@@ -76,6 +77,8 @@ void Node::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\"hidden\":true";
 	if( m_annotation.size())
 		o_str << ",\"annotation\":\"" << af::strEscape( m_annotation) << "\"";
+	if( m_custom_data.size())
+		o_str << ",\"custom_data\":\""  << af::strEscape( m_custom_data ) << "\"";
 }
 
 Msg * Node::jsonWrite( const std::string & i_type, const std::string & i_name ) const

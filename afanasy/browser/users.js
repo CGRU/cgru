@@ -183,6 +183,8 @@ UserNode.actions.push(['context']);
 UserNode.actions.push(['context', 'permanent'     ,        'bl1', 'menuHandleDialog', 'Set Permanent']);
 UserNode.actions.push(['context']);
 UserNode.actions.push(['context', 'annotation',            'str', 'menuHandleDialog', 'Annotate']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'custom_data',           'str', 'menuHandleDialog', 'Custom Data']);
 
 UserNode.sort = ['priority','name','host_name'];
 UserNode.filter = ['user_name','name','host_name'];

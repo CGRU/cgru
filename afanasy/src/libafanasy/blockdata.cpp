@@ -154,7 +154,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_string("command_post",          m_command_post,          i_object, io_changes);
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
-	//jr_string("custom_data",         m_custom_data,           i_object, io_changes);
+	jr_string("custom_data",           m_custom_data,           i_object, io_changes);
 	//jr_string("environment",         m_environment,           i_object, io_changes);
 	jr_int32 ("parser_coeff",          m_parser_coeff,          i_object, io_changes);
 
@@ -322,9 +322,10 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
             o_str << ",\"cmd_post\":\""          << af::strEscape( m_command_post ) << "\"";
 		if( m_multihost_service.size())
             o_str << ",\"multihost_service\":\"" << m_multihost_service         << "\"";
+		if( m_custom_data.size())
+	        o_str << ",\"custom_data\":\""       << m_custom_data               << "\"";
         //o_str << ",\"environment\":\""         << m_environment               << "\"";
         //o_str << ",\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
-        //o_str << ",\"custom_data\":\""         << m_custom_data               << "\"";
         o_str << ',';
 
 	case Msg::TJobsList:
