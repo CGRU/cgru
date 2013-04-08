@@ -101,9 +101,9 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
     GetResources( m_host, m_hres);
     for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
 
-    stdOut();
-    m_host.stdOut( true);
-    m_hres.stdOut( true);
+    v_stdOut();
+    m_host.v_stdOut( true);
+    m_hres.v_stdOut( true);
 }
 
 RenderHost::~RenderHost()
@@ -282,7 +282,7 @@ void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
         }
     }
     AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(ms_tasks.size()))
-    i_taskpos.stdOut();
+    i_taskpos.v_stdOut();
 }
 
 void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
@@ -298,7 +298,7 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
         }
     }
     AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(ms_tasks.size()))
-    i_taskpos.stdOut();
+    i_taskpos.v_stdOut();
 }
 
 void RenderHost::listenTasks( const af::MCListenAddress & i_mcaddr)
@@ -311,7 +311,7 @@ void RenderHost::listenTasks( const af::MCListenAddress & i_mcaddr)
             {
                 if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
                 else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
-                i_mcaddr.stdOut();
+                i_mcaddr.v_stdOut();
             }
         }
         else
@@ -320,7 +320,7 @@ void RenderHost::listenTasks( const af::MCListenAddress & i_mcaddr)
             {
                 if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
                 else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
-                i_mcaddr.stdOut();
+                i_mcaddr.v_stdOut();
             }
         }
     }
@@ -348,5 +348,5 @@ void RenderHost::getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg
         }
     }
     AFERROR("RenderHost::closeTask: No such task:\n")
-    i_taskpos.stdOut();
+    i_taskpos.v_stdOut();
 }

@@ -107,10 +107,10 @@ bool DBTaskData::dbPrepareInsertExec( int id_job, int id_block, int id_task, PGc
     return o_result;
 }
 
-void DBTaskData::readwrite( af::Msg * msg)
+void DBTaskData::v_readwrite( af::Msg * msg)
 {
 //printf("DBTaskData::readwrite:\n");
-   if( msg->isReading()) af::TaskData::readwrite(msg);
+   if( msg->isReading()) af::TaskData::v_readwrite(msg);
    else
    {
       static bool name_only = true;

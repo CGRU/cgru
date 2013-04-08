@@ -15,11 +15,11 @@ public:
 
 	~TalkAf();
 
-	void setZombie();
+	void v_setZombie();
 
 	virtual void v_action( Action & i_action);
 
-	void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 private:
 };

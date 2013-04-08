@@ -31,7 +31,7 @@ public:
 
 	~Msg();///< Destructor.
 
-	void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 	/// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
 	bool set( int msgType, int msgInt = 0, bool i_receiving = false);
@@ -396,6 +396,6 @@ private:
 	bool allocateBuffer( int i_size, int i_copy_len = 0, int i_copy_offset = Msg::SizeHeader);
 
 	void rw_header( bool write); ///< Read or write message header.
-	void readwrite( Msg * msg);
+	void v_readwrite( Msg * msg);
 };
 }

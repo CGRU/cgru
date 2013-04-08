@@ -67,13 +67,13 @@ public:
    const std::string generateIPString( bool full = false) const;
    void generatePortStream( std::ostringstream & stream, bool full = false) const;
    const std::string generatePortString( bool full = false) const;
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    int calcWeight() const;                   ///< Calculate and return memory size.
 
 //protected:
 /// Read or write address in buffer.
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 
    static bool readIpMask( const std::vector<std::string> & i_masks, bool i_verbose);
 

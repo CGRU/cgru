@@ -58,7 +58,7 @@ bool DBJobProgress::dbSelect( PGconn * i_conn)
       for( int t = 0; t < tasksnum[b]; t++)
       {
          std::string where = DBTaskProgress::dbWhereSelect( getJobId(), b, t);
-         if( ((DBTaskProgress*)(tp[b][t]))->dbSelect( i_conn, &where) == false) return false;
+         if( ((DBTaskProgress*)(tp[b][t]))->v_dbSelect( i_conn, &where) == false) return false;
       }
    }
    return true;

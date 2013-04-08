@@ -22,14 +22,14 @@ public:
 
    void write( Msg * msg );
 
-   virtual void stdOut( bool full = false ) const;
-   virtual const std::string generateInfoString( bool full = false) const;
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   virtual void v_stdOut( bool full = false ) const;
+   virtual const std::string v_generateInfoString( bool full = false) const;
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 
 protected:
    void read( Msg * msg );
-   virtual void readwrite( Msg * msg );
+   virtual void v_readwrite( Msg * msg );
 
    static void rw_bool(       bool     & boolean,  Msg * msg);
    static void rw_uint8_t (   uint8_t  & integer,  Msg * msg);

@@ -14,7 +14,7 @@ public:
 
    void addJob( const af::Job * job, std::list<std::string> * queries);
 
-   inline const std::string & dbGetTableName()  const { return TableName;}
+   inline const std::string & v_dbGetTableName()  const { return TableName;}
 
 private:
    std::string jobname;

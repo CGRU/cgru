@@ -114,7 +114,7 @@ AFINFA("JobProgress::~JobProgress: Job Id = %d", m_job_id)
    if( tasksnum != NULL ) delete [] tasksnum;
 }
 
-void JobProgress::readwrite( Msg * msg)
+void JobProgress::v_readwrite( Msg * msg)
 {
    rw_int32_t( m_job_id,     msg);
    rw_int32_t( m_blocks_num, msg);
@@ -142,7 +142,7 @@ void JobProgress::readwrite( Msg * msg)
       }
       for( int t = 0; t < tasksnum[b]; t++)
       {
-         tp[b][t]->readwrite( msg);
+         tp[b][t]->v_readwrite( msg);
       }
    }
 }
@@ -183,7 +183,7 @@ int JobProgress::calcWeight() const
    return weight;
 }
 
-void JobProgress::generateInfoStream( std::ostringstream & stream, bool full ) const
+void JobProgress::v_generateInfoStream( std::ostringstream & stream, bool full ) const
 {
     for( int b = 0; b < m_blocks_num; b++)
     {
@@ -192,7 +192,7 @@ void JobProgress::generateInfoStream( std::ostringstream & stream, bool full ) c
         for( int t = 0; t < tasksnum[b]; t++)
         {
             stream << std::endl;
-            tp[b][t]->generateInfoStream( stream);
+            tp[b][t]->v_generateInfoStream( stream);
         }
     }
 }

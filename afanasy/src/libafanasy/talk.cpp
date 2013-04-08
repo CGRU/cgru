@@ -24,7 +24,7 @@ Talk::~Talk()
 {
 }
 
-void Talk::readwrite( Msg * msg)
+void Talk::v_readwrite( Msg * msg)
 {
    rw_int32_t( m_id,            msg);
    rw_int64_t( m_time_launch,   msg);
@@ -33,10 +33,10 @@ void Talk::readwrite( Msg * msg)
    rw_String ( m_name,          msg);
    rw_String ( m_user_name,      msg);
    rw_String ( m_version,       msg);
-   m_address.readwrite( msg);
+   m_address.v_readwrite( msg);
 }
 
-void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
+void Talk::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full )
    {
@@ -50,6 +50,6 @@ void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
    {
       stream << m_name << "[" << m_id << "]";
       stream << " v'" << m_version << "' ";
-      m_address.generateInfoStream( stream, full);
+      m_address.v_generateInfoStream( stream, full);
    }
 }

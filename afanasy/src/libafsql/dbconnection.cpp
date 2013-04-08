@@ -153,7 +153,7 @@ bool DBConnection::dropAllTables()
 bool DBConnection::getItem( DBItem * item)
 {
    if( m_working == false ) return false;
-   return item->dbSelect( m_conn);
+   return item->v_dbSelect( m_conn);
 }
 
 bool DBConnection::addJob( DBJob * job)

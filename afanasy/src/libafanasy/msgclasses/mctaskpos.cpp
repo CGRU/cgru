@@ -25,7 +25,7 @@ MCTaskPos::~MCTaskPos()
 {
 }
 
-void MCTaskPos::readwrite( Msg * msg)
+void MCTaskPos::v_readwrite( Msg * msg)
 {
    rw_int32_t( jobid,    msg);
    rw_int32_t( blocknum, msg);
@@ -33,7 +33,7 @@ void MCTaskPos::readwrite( Msg * msg)
    rw_int32_t( number,   msg);
 }
 
-void MCTaskPos::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTaskPos::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "Job id = " << jobid << ", numblock = " << blocknum << ", numtask = " << tasknum;
 }

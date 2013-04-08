@@ -68,7 +68,7 @@ void processMessage( ThreadArgs * i_args)
     {
         // IP address does not match mask, no other operation allowed
         AFCommon::QueueLogError( std::string("Not allowed incoming message IP address: "
-                                             + msg_request->getAddress().generateInfoString()));
+                                             + msg_request->getAddress().v_generateInfoString()));
         delete msg_request;
         return;
     }
@@ -194,7 +194,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    {
       AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
       af::printAddress( &(i_args->ss));
-      i_msg->stdOut();
+      i_msg->v_stdOut();
       return;
    }
 
@@ -203,7 +203,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    {
       AFERROR("writeMessage: can't send message to client.")
       af::printAddress( &(i_args->ss));
-      i_msg->stdOut();
+      i_msg->v_stdOut();
       return;
    }
 

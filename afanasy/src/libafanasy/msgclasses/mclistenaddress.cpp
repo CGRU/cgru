@@ -30,9 +30,9 @@ MCListenAddress::~MCListenAddress()
 {
 }
 
-void MCListenAddress::readwrite( Msg * msg)
+void MCListenAddress::v_readwrite( Msg * msg)
 {
-   MsgClassUserHost::readwrite( msg);
+   MsgClassUserHost::v_readwrite( msg);
 
    rw_int32_t( jobid,        msg);
    rw_int32_t( blocknum,     msg);
@@ -40,16 +40,16 @@ void MCListenAddress::readwrite( Msg * msg)
    rw_int32_t( number,       msg);
    rw_uint8_t( flags,        msg);
 
-   address.readwrite( msg);
+   address.v_readwrite( msg);
 }
 
-void MCListenAddress::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCListenAddress::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "Listen";
    stream << " j" << jobid << " b" << blocknum << " t" << tasknum << " n" << number;
    stream << ": " << ((flags&TOLISTEN)?"ON":"OFF") << "-" << ((flags&JUSTTASK)?"TASK":"JOB") << "-" << ((flags&FROMRENDER)?"RENDER":"CLIENT");
    stream << " ";
-   address.generateInfoStream( stream, full);
+   address.v_generateInfoStream( stream, full);
    stream << " - ";
-   MsgClassUserHost::generateInfoStream( stream, false);
+   MsgClassUserHost::v_generateInfoStream( stream, false);
 }

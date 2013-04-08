@@ -156,7 +156,7 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << "}";
 }
 
-void TaskExec::readwrite( Msg * msg)
+void TaskExec::v_readwrite( Msg * msg)
 {
 	switch( msg->type())
 	{
@@ -202,14 +202,14 @@ void TaskExec::readwrite( Msg * msg)
 
 	default:
 		AFERROR("TaskExec::readwrite: Invalid message type:\n");
-		msg->stdOut( false);
+		msg->v_stdOut( false);
 		return;
 	}
 
-	m_listen_addresses.readwrite( msg);
+	m_listen_addresses.v_readwrite( msg);
 }
 
-void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
+void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "[" << m_service << ":" << m_capacity << "] " << m_user_name << ": ";
    stream << m_job_name;
@@ -218,7 +218,7 @@ void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
    if( m_number != 0 ) stream << "(" << m_number << ")";
    if( m_capacity_coeff) stream << "x" << m_capacity_coeff << " ";
    if( m_listen_addresses.getAddressesNum())
-	  m_listen_addresses.generateInfoStream( stream, false);
+	  m_listen_addresses.v_generateInfoStream( stream, false);
 
    if(full)
    {

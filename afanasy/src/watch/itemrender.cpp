@@ -153,7 +153,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 	    m_version            = afqt::stoq( render->getVersion());
 	    m_username           = afqt::stoq( render->getUserName());
-	    m_annotation         = afqt::stoq( render->getAnnontation());
+	    m_annotation         = afqt::stoq( render->getAnnotation());
 	    m_priority           = render->getPriority();
 	    m_capacity           = render->getCapacity();
 	    m_maxtasks           = render->getMaxTasks();
@@ -163,7 +163,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		if( render->getAddress().notEmpty())
 		{
 	        m_address_ip_str = render->getAddress().generateIPString().c_str();
-	        m_address_str = render->getAddress().generateInfoString().c_str();
+	        m_address_str = render->getAddress().v_generateInfoString().c_str();
 		}
 
 		bool becameOnline = false;
@@ -277,7 +277,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 	    m_state += '-' + QString::number( m_priority);
 		if( isLocked() ) m_state += " (LOCK)";
 
-		m_tooltip_base = render->generateInfoString( true);
+		m_tooltip_base = render->v_generateInfoString( true);
 
 		if( false == becameOnline) break;
 	}
@@ -288,7 +288,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 	    m_hres.copy( render->getHostRes());
 		m_idle_time = render->getIdleTime();
 
-	    m_tooltip_resources = m_hres.generateInfoString( true);
+	    m_tooltip_resources = m_hres.v_generateInfoString( true);
 
 	    int cpubusy = m_hres.cpu_user + m_hres.cpu_nice + m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq;
 	    int mem_used = m_hres.mem_total_mb - m_hres.mem_free_mb;

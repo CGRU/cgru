@@ -32,7 +32,7 @@ Client::Client( int i_flags, int Id):
 	  for( int i = 0; i < m_netIFs.size(); i++)
       {
          std::cout << "   ";
-		 m_netIFs[i]->stdOut(true);
+		 m_netIFs[i]->v_stdOut(true);
       }
 
 	  m_address.setPort( af::Environment::getClientPort());
@@ -89,9 +89,9 @@ void Client::setRegisterTime()
    m_time_update = m_time_register;
 }
 
-int Client::calcWeight() const
+int Client::v_calcWeight() const
 {
-   int weight = Node::calcWeight();
+   int weight = Node::v_calcWeight();
 //printf("Client::calcWeight: Node::calcWeight: %d bytes\n", weight);
    weight += sizeof(Client) - sizeof( Node);
    weight += weigh( m_user_name);

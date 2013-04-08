@@ -109,7 +109,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     if( m_pid <= 0 )
     {
         AFERROR("Failed to start a process")
-        m_taskexec->stdOut( true);
+        m_taskexec->v_stdOut( true);
         m_pid = 0;
         m_update_status = af::TaskExec::UPFailedToStart;
         sendTaskSate();
@@ -138,7 +138,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 #endif
 
     printf("Started PID=%d: ",m_pid);
-    m_taskexec->stdOut( af::Environment::isVerboseMode());
+    m_taskexec->v_stdOut( af::Environment::isVerboseMode());
 }
 
 TaskProcess::~TaskProcess()
@@ -187,7 +187,7 @@ void TaskProcess::refresh()
 		if( m_dead_cycle > 0 )
 		{
 	        // This class instance is not needed any more, but still exists due some error
-    	    printf("Dead Cycle #%d: ", m_dead_cycle); m_taskexec->stdOut();
+    	    printf("Dead Cycle #%d: ", m_dead_cycle); m_taskexec->v_stdOut();
 		}
 
 		// This is a first dead cycle.

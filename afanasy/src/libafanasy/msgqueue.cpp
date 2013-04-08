@@ -73,7 +73,7 @@ void MsgQueue::processItem( AfQueueItem* item)
     if( msg->addressIsEmpty() && ( msg->addressesCount() == 0 ))
     {
         AFERRAR("MsgQueue::processItem: '%s':\n   Message has no addresses to send to.", name.c_str());
-        msg->stdOut();
+        msg->v_stdOut();
         delete msg;
         return;
     }
@@ -92,9 +92,9 @@ void MsgQueue::processItem( AfQueueItem* item)
         {
             AFERRAR("MsgQueue::processItem: '%s':\n   Got an answer, but has no return queue set.", name.c_str())
             printf("Reuest: ");
-            msg->stdOut();
+            msg->v_stdOut();
             printf("Answer: ");
-            answer->stdOut();
+            answer->v_stdOut();
             delete answer;
         }
     }
@@ -110,7 +110,7 @@ void MsgQueue::processItem( AfQueueItem* item)
         else
         {
             AFERRAR("MsgQueue::processItem: '%s':\n   Can't return message as no return queue set.", name.c_str())
-            msg->stdOut();
+            msg->v_stdOut();
         }
     }
 

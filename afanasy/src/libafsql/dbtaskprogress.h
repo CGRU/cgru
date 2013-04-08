@@ -12,9 +12,9 @@ public:
    DBTaskProgress();
    virtual ~DBTaskProgress();
 
-   virtual int calcWeight() const;
+   virtual int v_calcWeight() const;
 
-   inline const std::string & dbGetTableName() const { return TableName;}
+   inline const std::string & v_dbGetTableName() const { return TableName;}
 
    inline static const std::string dbWhereSelect( int id_job,  int id_block,  int id_task)
    {
@@ -25,8 +25,8 @@ public:
    static bool dbPrepareInsertExec(  int i_id_job, int i_id_block, int i_id_task, PGconn * i_conn);
 
 protected:
-   inline const std::string & dbGetIDsString()  const { return IDs;      }
-   inline const std::string & dbGetKeysString() const { return Keys;     }
+   inline const std::string & v_dbGetIDsString()  const { return IDs;      }
+   inline const std::string & v_dbGetKeysString() const { return Keys;     }
 
 private:
    static const std::string TableName;

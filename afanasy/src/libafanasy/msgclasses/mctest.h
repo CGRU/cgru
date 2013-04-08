@@ -17,7 +17,7 @@ public:
    MCTest( Msg * msg);
    ~MCTest();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    void addString( const std::string & String);
 
@@ -34,6 +34,6 @@ private:
    int32_t * numberarray;
    std::string * stringarray;
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

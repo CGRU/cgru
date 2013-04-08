@@ -30,10 +30,10 @@ public:
    void readStat(  af::Msg * msg);        ///< Read statistics from buffer.
 
 /// Write statistics to \c stdout .
-   void stdOut( int columns = -1, int sorting = -1) const;
+   void v_stdOut( int columns = -1, int sorting = -1) const;
 
 /// Write statistics to \c stdout ( default function ).
-   void stdOut( bool full = false) const;
+   void v_stdOut( bool full = false) const;
 
 private:
 
@@ -55,7 +55,7 @@ private:
    uint32_t lasttime_S[STORE];      ///< Last time division in store was updated.
    int      lastmsgs_S[STORE];      ///< Last division in store was updated.
 
-   void readwrite( af::Msg * msg);  ///< Read | write statistics store.
+   void v_readwrite( af::Msg * msg);  ///< Read | write statistics store.
 };
 
 }

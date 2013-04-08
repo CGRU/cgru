@@ -13,7 +13,7 @@ public:
 
    virtual ~MsgClassUserHost();
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline const std::string & getUserName() const { return username; }
    inline const std::string & getHostName() const { return hostname; }
@@ -22,7 +22,7 @@ public:
    inline void setHostName( const std::string & value) { hostname = value;}
 
 protected:
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 
 private:
    std::string username;

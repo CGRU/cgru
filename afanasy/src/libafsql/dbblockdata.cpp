@@ -113,7 +113,7 @@ bool DBBlockData::dbAdd( PGconn * i_conn) const
 {
 AFINFA("DBBlockData::dbAdd: %s[%d,%d] %d tasks %s", m_name.c_str(), m_job_id, m_block_num, m_tasks_num, isNumeric() ? "NUMERIC":"NOT_NUMERIC")
    std::list<std::string> queries;
-   dbInsert( &queries);
+   v_dbInsert( &queries);
 
    if( false == execute( i_conn, &queries))
    {
@@ -142,9 +142,9 @@ AFINFA("DBBlockData::dbAdd: %s[%d,%d] %d tasks %s", m_name.c_str(), m_job_id, m_
    return true;
 }
 
-bool DBBlockData::dbSelect( PGconn * i_conn, const std::string * i_where)
+bool DBBlockData::v_dbSelect( PGconn * i_conn, const std::string * i_where)
 {
-   if( DBItem::dbSelect( i_conn) == false) return false;
+   if( DBItem::v_dbSelect( i_conn) == false) return false;
    if( isNumeric() || (m_tasks_num == 0)) return true;
 
    m_tasks_data = new af::TaskData*[m_tasks_num];
@@ -153,7 +153,7 @@ bool DBBlockData::dbSelect( PGconn * i_conn, const std::string * i_where)
    {
       DBTaskData * dbtaskdata = new DBTaskData;
       std::string where = DBTaskData::dbWhereSelect( m_job_id, m_block_num, t);
-      if( dbtaskdata->dbSelect( i_conn, &where) == false)
+      if( dbtaskdata->v_dbSelect( i_conn, &where) == false)
       {
          delete dbtaskdata;
          return false;

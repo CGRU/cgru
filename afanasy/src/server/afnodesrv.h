@@ -26,7 +26,7 @@ public:
 	virtual void v_action( Action & i_action);
 
 /// Refresh node information
-   virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+   virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
    friend class AfContainer;
    friend class AfContainerIt;
@@ -41,7 +41,7 @@ public:
 //	inline bool isLocked() const { return  m_node->m_locked; }
 //	inline bool unLocked() const { return !m_node->m_locked; }
 
-	virtual void setZombie() { m_node->m_flags = m_node->m_flags | af::Node::FZombie; } ///< Request to kill a node.
+	virtual void v_setZombie() { m_node->m_flags = m_node->m_flags | af::Node::FZombie; } ///< Request to kill a node.
 
 	void appendLog( const std::string & message);  ///< Append task log with a \c message .
 	inline const std::list<std::string> & getLog() { return m_log; }    ///< Get log.
@@ -53,18 +53,18 @@ public:
 
 	/// Can node run
 	/** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
-	virtual bool canRun();
+	virtual bool v_canRun();
 
 	/// Can node run on specified render
 	/** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
-	virtual bool canRunOn( RenderAf * i_render);
+	virtual bool v_canRunOn( RenderAf * i_render);
 
 	/// Solve nodes list:
 	static bool solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod i_method, RenderAf * i_render,
 				MonitorContainer * i_monitoring);
 
 	/// Main solving function should be implemented in child classes (if solving needed):
-	virtual bool solve( RenderAf * i_render, MonitorContainer * i_monitoring);
+	virtual bool v_solve( RenderAf * i_render, MonitorContainer * i_monitoring);
 
 	/// Compare nodes solving need:
 	bool greaterNeed( const AfNodeSrv * i_other) const;
@@ -76,7 +76,7 @@ protected:
 
 	/// Virtual function to calculate need.
 	/** Node should define what resource shoud be passed for need calculation.**/
-	virtual void calcNeed();
+	virtual void v_calcNeed();
 
 private:
 	// Try to solve a node

@@ -21,7 +21,7 @@ AddressesList::AddressesList( Msg * msg)
    read( msg);
 }
 
-void AddressesList::readwrite( Msg * msg)
+void AddressesList::v_readwrite( Msg * msg)
 {
    uint32_t size;
    if( msg->isWriting()) size = uint32_t( addresses.size());
@@ -75,7 +75,7 @@ int AddressesList::calcWeight() const
    return weight;
 }
 
-void AddressesList::generateInfoStream( std::ostringstream & stream, bool full) const
+void AddressesList::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
@@ -83,7 +83,7 @@ void AddressesList::generateInfoStream( std::ostringstream & stream, bool full) 
       for( std::list<Address>::const_iterator it = addresses.begin(); it != addresses.end(); it++)
       {
          stream << " ";
-         (*it).generateInfoStream( stream);
+         (*it).v_generateInfoStream( stream);
       }
    }
    else

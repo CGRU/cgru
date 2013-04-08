@@ -179,7 +179,7 @@ void AfContainer::refresh( AfContainer * pointer, MonitorContainer * monitoring)
    for( AfNodeSrv * node = first_ptr; node != NULL; node = node->m_next_ptr)
    {
       if( node->m_node->isZombie() ) continue;
-      node->refresh( currnetTime, pointer, monitoring);
+      node->v_refresh( currnetTime, pointer, monitoring);
    }
 }
 
@@ -339,7 +339,7 @@ bool AfContainer::setZombie( int id)
       AFERRAR("AfContainer::setZombie: Node with id=%d already a zombie.", id)
       return false;
    }
-   node->setZombie();
+   node->v_setZombie();
    return true;
 }
 

@@ -27,7 +27,7 @@ bool CmdUserList::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdUserList::v_msgOut( af::Msg& msg)
 {
 	af::MCAfNodes list( &msg);
-	list.stdOut( Verbose);
+	list.v_stdOut( Verbose);
 }
 
 CmdUserJobsList::CmdUserJobsList()
@@ -50,7 +50,7 @@ bool CmdUserJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdUserJobsList::v_msgOut( af::Msg& msg)
 {
 	af::MCAfNodes list( &msg);
-	list.stdOut( Verbose);
+	list.v_stdOut( Verbose);
 }
 
 CmdUserAdd::CmdUserAdd()

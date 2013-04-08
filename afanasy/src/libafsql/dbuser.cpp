@@ -62,10 +62,10 @@ const std::string DBUser::dbGetIDsCmd()
    return std::string("SELECT id FROM ") + TableName;
 }
 
-bool DBUser::dbSelect( PGconn * i_conn, const std::string * i_where)
+bool DBUser::v_dbSelect( PGconn * i_conn, const std::string * i_where)
 {
 //printf("DBUser::dbSelect:\n");
-   if( DBItem::dbSelect( i_conn, i_where) == false) return false;
+   if( DBItem::v_dbSelect( i_conn, i_where) == false) return false;
 
 // This user came from database on core init, so he is permanent
    setPermanent( true);

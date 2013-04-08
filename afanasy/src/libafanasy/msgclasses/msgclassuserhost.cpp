@@ -18,13 +18,13 @@ MsgClassUserHost::MsgClassUserHost( Msg * msg)
 
 MsgClassUserHost::~MsgClassUserHost(){};
 
-void MsgClassUserHost::readwrite( Msg * msg)
+void MsgClassUserHost::v_readwrite( Msg * msg)
 {
    rw_String( username, msg);
    rw_String( hostname, msg);
 }
 
-void MsgClassUserHost::generateInfoStream( std::ostringstream & stream, bool full) const
+void MsgClassUserHost::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full )
    {

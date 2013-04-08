@@ -18,9 +18,9 @@ public:
 
 	~MonitorAf();
 
-	void setZombie();
+	void v_setZombie();
 
-	void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 	bool setInterest( int type, const af::MCGeneral & ids);
 

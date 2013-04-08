@@ -33,7 +33,7 @@ void DBStatistics::addJob( const af::Job * job, std::list<std::string> * queries
    // Get job parameters:
    jobname        = job->getName();
    description    = job->getDescription();
-   annotation     = job->getAnnontation();
+   annotation     = job->getAnnotation();
    username       = job->getUserName();
    hostname       = job->getHostName();
    time_started   = job->getTimeStarted();
@@ -63,6 +63,6 @@ void DBStatistics::addJob( const af::Job * job, std::list<std::string> * queries
       if( taskssumruntime == 0 ) continue;
 
       // Insert row:
-      dbInsert( queries);
+      v_dbInsert( queries);
    }
 }

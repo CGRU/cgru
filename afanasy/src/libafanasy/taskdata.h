@@ -18,7 +18,7 @@ public:
 	virtual ~TaskData();
 
 	int calcWeight() const;                         ///< Calculate and return memory size.
-    void generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
+    void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
 	inline const std::string & getName()        const { return m_name;        }
 	inline const std::string & getCommand()     const { return m_command;     }
@@ -48,6 +48,6 @@ protected:
 
 protected:
 	/// Read or write task data.
-	virtual void readwrite( Msg * msg);
+	virtual void v_readwrite( Msg * msg);
 };
 }

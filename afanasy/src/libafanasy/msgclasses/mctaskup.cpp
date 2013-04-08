@@ -58,7 +58,7 @@ MCTaskUp::~MCTaskUp()
 	if( m_deleteData && m_data ) delete [] m_data;
 }
 
-void MCTaskUp::readwrite( Msg * msg)
+void MCTaskUp::v_readwrite( Msg * msg)
 {
 	rw_int32_t( m_clientid,       msg);
 
@@ -98,7 +98,7 @@ void MCTaskUp::readwrite( Msg * msg)
 	}
 }
 
-void MCTaskUp::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << "TaskUp: client=" << m_clientid
 			<< ", job="      << m_numjob

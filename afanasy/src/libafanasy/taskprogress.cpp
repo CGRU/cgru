@@ -27,7 +27,7 @@ TaskProgress::~TaskProgress()
 {
 }
 
-void TaskProgress::readwrite( Msg * msg)
+void TaskProgress::v_readwrite( Msg * msg)
 {
    rw_uint32_t( state,        msg);
    rw_int8_t  ( percent,      msg);
@@ -64,7 +64,7 @@ int TaskProgress::calcWeight() const
    return weight;
 }
 
-void TaskProgress::generateInfoStream( std::ostringstream & stream, bool full ) const
+void TaskProgress::v_generateInfoStream( std::ostringstream & stream, bool full ) const
 {
    static const char time_format[] = "%H:%M.%S";
    stream << "s" << state;

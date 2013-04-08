@@ -79,7 +79,7 @@ bool CmdFarmCheck::check( const std::string & hostname)
    {
       std::cout << "\"" << name << " - " << description;
       std::cout << std::endl;
-      host.stdOut( true);
+      host.v_stdOut( true);
       host.printServices();
       return true;
    }

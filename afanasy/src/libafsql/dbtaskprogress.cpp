@@ -72,9 +72,9 @@ bool DBTaskProgress::dbPrepareInsertExec(  int i_id_job, int i_id_block, int i_i
     return o_result;
 }
 
-int DBTaskProgress::calcWeight() const
+int DBTaskProgress::v_calcWeight() const
 {
     int o_weight = sizeof(DBTaskProgress) - sizeof(TaskProgress);
-    o_weight += DBItem::calcWeight();
+    o_weight += DBItem::v_calcWeight();
     return o_weight;
 }

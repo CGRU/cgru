@@ -27,7 +27,7 @@ bool CmdNetwork::v_processArguments( int argc, char** argv, af::Msg &msg)
       for( int i = 0; i < netIFs.size(); i++)
       {
          std::cout << "   ";
-         netIFs[i]->stdOut(true);
+         netIFs[i]->v_stdOut(true);
       }
    }
    else if( operation == "ip")
@@ -53,7 +53,7 @@ bool CmdNetwork::v_processArguments( int argc, char** argv, af::Msg &msg)
       for( int i = 0; i < netIFs.size(); i++)
       {
          std::cout << "   ";
-         netIFs[i]->stdOut(true);
+         netIFs[i]->v_stdOut(true);
       }
    }
    else if( operation == "pa")
@@ -65,7 +65,7 @@ bool CmdNetwork::v_processArguments( int argc, char** argv, af::Msg &msg)
       }
       af::Address addr(argv[1]);
       std::cout << "IP = \"" << addr.generateIPString() << "\"" << std::endl;
-      addr.stdOut( true);
+      addr.v_stdOut( true);
    }
    else
    {

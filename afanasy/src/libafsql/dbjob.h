@@ -18,23 +18,23 @@ public:
 
    bool dbAdd( PGconn * i_conn) const;
 
-   virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
-   virtual void dbDelete( std::list<std::string> * queries) const;
+   virtual bool v_dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
+   virtual void v_dbDelete( std::list<std::string> * queries) const;
    virtual void dbDeleteNoStatistics( std::list<std::string> * queries) const;
 
-   inline const std::string & dbGetTableName()  const { return TableName;}
+   inline const std::string & v_dbGetTableName()  const { return TableName;}
 
 protected:
-   inline const std::string & dbGetKeysString() const { return Keys;     }
-   inline       int           dbGetKeysNum()    const { return KeysNum;  }
+   inline const std::string & v_dbGetKeysString() const { return Keys;     }
+   inline       int           v_dbGetKeysNum()    const { return KeysNum;  }
 
 protected:
    DBJobProgress * progress;    ///< Tasks progress.
 
 private:
    void addDBAttributes();
-   virtual af::BlockData * newBlockData( af::Msg * msg);
-   virtual af::BlockData * newBlockData( const JSON & i_object, int i_num);
+   virtual af::BlockData * v_newBlockData( af::Msg * msg);
+   virtual af::BlockData * v_newBlockData( const JSON & i_object, int i_num);
 
 private:
    static const std::string TableName;

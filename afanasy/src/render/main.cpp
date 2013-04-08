@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
         af::sleep_msec(100);
         GetResources( host, hostres);
         printf("\n");
-        host.stdOut( true);
-        hostres.stdOut( true);
+        host.v_stdOut( true);
+        hostres.v_stdOut( true);
         Py_Finalize();
         return 0;
     }
@@ -282,7 +282,7 @@ printf("msgCase: "); msg->stdOut();
     default:
     {
         AFERROR("Unknown message recieved:")
-        msg->stdOut();
+        msg->v_stdOut();
         break;
     }
     }

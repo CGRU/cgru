@@ -78,7 +78,7 @@ switch ( i_msg->type())
 		JobContainerIt jobsIt( i_args->jobs);
 		JobAf* job = jobsIt.getJob( mclass.getJobId());
 		if( mclass.fromRender() == false ) mclass.setIP( i_msg->getAddress());
-mclass.stdOut();
+mclass.v_stdOut();
 		if( job ) job->listenOutput( mclass, i_args->renders);
 		break;
 	}
@@ -96,7 +96,7 @@ mclass.stdOut();
 	}
 	default:
 	{
-		AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + i_msg->generateInfoString( false));
+		AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + i_msg->v_generateInfoString( false));
 		break;
 	}
 }

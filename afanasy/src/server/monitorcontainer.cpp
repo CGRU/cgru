@@ -65,7 +65,7 @@ af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
 
 	if( id != 0 )
 	{
-		AFCommon::QueueLog("Monitor registered: " + i_monitor->generateInfoString( false));
+		AFCommon::QueueLog("Monitor registered: " + i_monitor->v_generateInfoString( false));
 		addEvent( af::Msg::TMonitorMonitorsAdd, id);
 	}
 

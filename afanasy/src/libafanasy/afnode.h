@@ -28,13 +28,14 @@ public:
    inline void  getName( std::string & str) const { str =  m_name;    } ///< Get Node name.
    inline const std::string & getName()     const { return m_name;    } ///< Get Node name.
 
-	inline const std::string & getAnnontation() const { return m_annotation;}
+	inline const std::string & getAnnotation() const { return m_annotation; }
+	inline const std::string & getCustomData() const { return m_custom_data;}
 
 	friend class ::AfNodeSrv;
 	friend class ::AfContainer;
 	friend class ::AfList;
 
-   virtual int calcWeight() const;                   ///< Calculate and return memory size.
+   virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 
 	enum Flags
 	{
@@ -62,7 +63,7 @@ public:
 	Msg * jsonWrite( const std::string & i_type, const std::string & i_name) const;
 
 protected:
-    virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
+    virtual void v_readwrite( Msg * msg);   ///< Read or write node attributes in message
 
 /// Node id, unique for nodes of the same type. It is a position in container where node is stoted.
 	int32_t m_id;

@@ -32,7 +32,7 @@ bool CmdJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdJobsList::v_msgOut( af::Msg& msg)
 {
 	af::MCAfNodes list( &msg);
-	list.stdOut();
+	list.v_stdOut();
 }
 
 CmdJobsWeight::CmdJobsWeight()
@@ -52,7 +52,7 @@ bool CmdJobsWeight::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdJobsWeight::v_msgOut( af::Msg& msg)
 {
 	af::MCJobsWeight jobsWeight( &msg);
-	jobsWeight.stdOut( true);
+	jobsWeight.v_stdOut( true);
 }
 
 CmdJobPriority::CmdJobPriority()
@@ -160,7 +160,7 @@ bool CmdJobId::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdJobId::v_msgOut( af::Msg& msg)
 {
 	af::Job job( &msg);
-	job.stdOut( true);
+	job.v_stdOut( true);
 }
 
 CmdJobLog::CmdJobLog()
@@ -201,7 +201,7 @@ bool CmdJobProgress::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdJobProgress::v_msgOut( af::Msg& msg)
 {
 	af::JobProgress jobprogress( &msg);
-	jobprogress.stdOut();
+	jobprogress.v_stdOut();
 }
 
 CmdJobsDelete::CmdJobsDelete()

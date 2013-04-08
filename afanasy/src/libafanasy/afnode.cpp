@@ -27,7 +27,7 @@ Node::~Node()
 AFINFO("Node::~Node():")
 }
 
-void Node::readwrite( Msg * msg)
+void Node::v_readwrite( Msg * msg)
 {
 	rw_int32_t( m_id,        msg);
 	rw_uint8_t( m_priority,  msg);
@@ -87,7 +87,7 @@ Msg * Node::jsonWrite( const std::string & i_type, const std::string & i_name ) 
 	return jsonMsg( str);
 }
 
-int Node::calcWeight() const
+int Node::v_calcWeight() const
 {
    int weight = sizeof( Node);
    weight += af::weigh( m_name);

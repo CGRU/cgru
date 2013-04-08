@@ -14,18 +14,18 @@ public:
 	DBTaskData( const JSON & i_object);
 	virtual ~DBTaskData();
 
-	inline const std::string & dbGetTableName() const { return TableName;}
+	inline const std::string & v_dbGetTableName() const { return TableName;}
 	static const std::string dbWhereSelect( int id_job, int id_block, int id_task);
 
 	static bool dbPrepareInsert( PGconn * i_conn);
 	bool dbPrepareInsertExec( int id_job, int id_block, int id_task, PGconn * i_conn) const;
 
 protected:
-	inline const std::string & dbGetIDsString()  const { return IDs;      }
-	inline const std::string & dbGetKeysString() const { return Keys;     }
+	inline const std::string & v_dbGetIDsString()  const { return IDs;      }
+	inline const std::string & v_dbGetKeysString() const { return Keys;     }
 
 protected:
-	virtual void readwrite( af::Msg * msg);
+	virtual void v_readwrite( af::Msg * msg);
 
 private:
 	static const std::string TableName;

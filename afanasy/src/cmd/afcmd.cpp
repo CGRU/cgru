@@ -116,5 +116,5 @@ void AfCmd::msgOutput( af::Msg &msg)
 				break;
 		}
 	}
-	if( Verbose) { printf("AfCmd::msgOut: "); msg.stdOut();}
+	if( Verbose) { printf("AfCmd::msgOut: "); msg.v_stdOut();}
 }

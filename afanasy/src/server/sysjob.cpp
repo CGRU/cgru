@@ -12,6 +12,7 @@
 #include "rendercontainer.h"
 #include "sysjob_cmdpost.h"
 #include "sysjob_wol.h"
+#include "sysjob_events.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -21,92 +22,101 @@
 //////////////////////////////////////////   COMMAND    ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysCmd::SysCmd( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName):
-	command( Command), workingdirectory( WorkingDirectory), username( UserName), jobname( JobName) {}
+SysCmd::SysCmd(
+		const std::string & i_command,
+		const std::string & i_working_directory,
+		const std::string & i_user_name,
+		const std::string & i_job_name
+	):
+	command( i_command),
+	working_directory( i_working_directory),
+	user_name( i_user_name),
+	job_name( i_job_name)
+{}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////   TASK    //////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysTask::SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, Block * block, int taskNumber):
-	Task( block, &taskProgress, taskNumber),
-	syscmd( SystemCommand),
-	birthtime(0)
+SysTask::SysTask( af::TaskExec * i_taskexec, SysCmd * i_system_command, Block * i_block, int i_task_number):
+	Task( i_block, &m_taskProgress, i_task_number),
+	m_syscmd( i_system_command),
+	m_birthtime(0)
 {
 AFINFO("SysTask::SysTask:");
-	progress = &taskProgress;
+	m_progress = &m_taskProgress;
 }
 
 SysTask::~SysTask()
 {
 // Delete system command data:
-	delete syscmd;
+	delete m_syscmd;
 }
 
-std::string const SysTask::getInfo(bool full) const
+std::string const SysTask::v_getInfo(bool full) const
 {
 	std::string info = "#";
 	info += af::itos( getNumber()) + ": ";
-	info += af::state2str( progress->state) + ": ";
-	info += syscmd->command;
+	info += af::state2str( m_progress->state) + ": ";
+	info += m_syscmd->command;
 	return info;
 }
 
-void SysTask::monitor( MonitorContainer * monitoring) const {}
-void SysTask::updateDatabase() const {}
-void SysTask::writeTaskOutput( const af::MCTaskUp& taskup) const {}
+void SysTask::v_monitor( MonitorContainer * monitoring) const {}
+void SysTask::v_updateDatabase() const {}
+void SysTask::v_writeTaskOutput( const af::MCTaskUp& taskup) const {}
 
-void SysTask::appendLog( const std::string & message)
+void SysTask::v_appendLog( const std::string & message)
 {
-	((SysBlock*)(block))->appendTaskLog( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
-						       + syscmd->username + ": \"" + syscmd->jobname + "\":\n"
-						       + syscmd->command);
+	((SysBlock*)(m_block))->appendTaskLog( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
+       + m_syscmd->user_name + ": \"" + m_syscmd->job_name + "\":\n"
+       + m_syscmd->command);
 }
 
 void SysTask::appendSysJobLog( const std::string & message)
 {
 	SysJob::appendJobLog( std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
-						    + syscmd->username + ": \"" + syscmd->jobname + "\":\n"
-						    + syscmd->command);
+	    + m_syscmd->user_name + ": \"" + m_syscmd->job_name + "\":\n"
+	    + m_syscmd->command);
 }
 
-void SysTask::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
+void SysTask::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-	std::string name = syscmd->command.substr( 0, AFJOB::SYSJOB_TASKSNAMEMAX);
+	std::string name = m_syscmd->command.substr( 0, AFJOB::SYSJOB_TASKSNAMEMAX);
 	size_t space = name.find(' ', 1);
 	if( space != std::string::npos )
 		name = name.substr( 0, space);
 
-	taskexec->setCommand(      syscmd->command            );
+	taskexec->setCommand(      m_syscmd->command          );
 	taskexec->setName(         name                       );
-	taskexec->setUserName(     syscmd->username           );
-	taskexec->setJobName(      syscmd->jobname            );
-	taskexec->setWDir(         syscmd->workingdirectory   );
+	taskexec->setUserName(     m_syscmd->user_name        );
+	taskexec->setJobName(      m_syscmd->job_name         );
+	taskexec->setWDir(         m_syscmd->working_directory);
 	taskexec->setTaskNumber(   getNumber()                );
 
-	Task::start( taskexec, runningtaskscounter, render, monitoring);
+	Task::v_start( taskexec, runningtaskscounter, render, monitoring);
 }
 
-void SysTask::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
+void SysTask::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
 AFINFO("SysTask::refresh:");
-	Task::refresh( currentTime, renders, monitoring, errorHostId);
-	if( birthtime == 0 ) birthtime = currentTime;
-	if((currentTime - birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
+	Task::v_refresh( currentTime, renders, monitoring, errorHostId);
+	if( m_birthtime == 0 ) m_birthtime = currentTime;
+	if((currentTime - m_birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
 	{
-		std::string message = std::string("Error: Task age(") + af::itos( currentTime - birthtime) + ") > " + af::itos( af::Environment::getSysJobTaskLife());
-		appendLog( message);
+		std::string message = std::string("Error: Task age(") + af::itos( currentTime - m_birthtime) + ") > " + af::itos( af::Environment::getSysJobTaskLife());
+		v_appendLog( message);
 		// Store error in job log
 		appendSysJobLog( message);
-		progress->state = AFJOB::STATE_ERROR_MASK;
+		m_progress->state = AFJOB::STATE_ERROR_MASK;
 	}
 //stdOut();
 }
 
-void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
+void SysTask::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
 {
 //printf("SysTask::updateState: "); taskup.stdOut( true);
-	Task::updateState( taskup, renders, monitoring, errorHost);
+	Task::v_updateState( taskup, renders, monitoring, errorHost);
 //stdOut();
 
 	// Store error messages and logs:
@@ -116,7 +126,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 	{
 		case af::TaskExec::UPWarning:                   message = "Warning";             break;
 		case af::TaskExec::UPFailedToStart:             message = "Failed to start";     break;
-		case af::TaskExec::UPFinishedKilled:             message = "Finished crashed";    break;
+		case af::TaskExec::UPFinishedKilled:            message = "Finished crashed";    break;
 		case af::TaskExec::UPFinishedParserError:       message = "Parser error";        break;
 		case af::TaskExec::UPFinishedParserBadResult:   message = "Parser bad result";   break;
 		case af::TaskExec::UPFinishedError:             message = "Finished error";      break;
@@ -148,7 +158,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 		message += std::string( taskup.getData(), taskup.getDataLen());
 		message += "\n";
 		message += "=======================================================";
-		((SysBlock*)(block))->appendTaskLog(message);
+		((SysBlock*)(m_block))->appendTaskLog(message);
 	}
 }
 
@@ -162,22 +172,22 @@ SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress
 	Block( blockJob, blockData, progress)
 {
 AFINFO("SysBlock::SysBlock:");
-	taskprogress = progress->tp[ m_data->getBlockNum()][0];
-	taskprogress->state &= ~AFJOB::STATE_READY_MASK;
-	taskprogress->starts_count = 0;
-	taskprogress->errors_count = 0;
+	m_taskprogress = progress->tp[ m_data->getBlockNum()][0];
+	m_taskprogress->state &= ~AFJOB::STATE_READY_MASK;
+	m_taskprogress->starts_count = 0;
+	m_taskprogress->errors_count = 0;
 }
 
 SysBlock::~SysBlock()
 {
-	for( std::list<SysCmd *>::iterator it = commands.begin(); it != commands.end(); it++) delete *it;
-	for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++) delete *it;
+	for( std::list<SysCmd *>::iterator it = m_commands.begin(); it != m_commands.end(); it++) delete *it;
+	for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++) delete *it;
 }
 
 void SysBlock::addCommand( SysCmd * syscmd)
 {
-	commands.push_back( syscmd);
-	taskprogress->state |= AFJOB::STATE_READY_MASK;
+	m_commands.push_back( syscmd);
+	m_taskprogress->state |= AFJOB::STATE_READY_MASK;
 }
 
 bool SysBlock::isReady() const
@@ -186,18 +196,19 @@ bool SysBlock::isReady() const
 
 	if( getReadySysTask() == NULL )
 	{
+		// Block is ready only if commands exists and tasks number below some limit:
 		if(( getNumCommands() < 1 ) || ( getNumSysTasks() >= af::Environment::getSysJobTasksMax() ))
 		{
-			taskprogress->state &= ~AFJOB::STATE_READY_MASK;
+			m_taskprogress->state &= ~AFJOB::STATE_READY_MASK;
 			ready = false;
 		}
 	}
-	if( ready ) taskprogress->state |= AFJOB::STATE_READY_MASK;
+	if( ready ) m_taskprogress->state |= AFJOB::STATE_READY_MASK;
 
 	return ready;
 }
 
-void SysBlock::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
+void SysBlock::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
 AFINFO("SysBlock::startTask:");
 	taskexec->setBlockName( m_data->getName());
@@ -208,17 +219,17 @@ AFINFO("SysBlock::startTask:");
 
 	if( systask == NULL ) return;
 
-	systask->start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
+	systask->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
 
-	taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
-	taskprogress->starts_count++;
+	m_taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
+	m_taskprogress->starts_count++;
 
-	if( monitoring ) m_tasks[0]->monitor( monitoring);
+	if( monitoring ) m_tasks[0]->v_monitor( monitoring);
 }
 
 SysTask * SysBlock::getReadySysTask() const
 {
-	for( std::list<SysTask*>::const_iterator it = systasks.begin(); it != systasks.end(); it++)
+	for( std::list<SysTask*>::const_iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
 		if( (*it)->isReady() ) return *it;
 	return NULL;
 }
@@ -226,14 +237,14 @@ SysTask * SysBlock::getReadySysTask() const
 SysTask * SysBlock::addTask( af::TaskExec * taskexec)
 {
 AFINFO("SysBlock::addTask:");
-	if( commands.size() == 0)
+	if( m_commands.size() == 0)
 	{
 		AFCommon::QueueLogError("SysBlock::addTask: commands.size() == 0");
 		return NULL;
 	}
 
 	// Get the first command:
-	SysCmd * command = commands.front();
+	SysCmd * command = m_commands.front();
 
 	// Get the smallest task number:
 	int number = 0;
@@ -241,7 +252,7 @@ AFINFO("SysBlock::addTask:");
 	for( ; number < af::Environment::getSysJobTasksMax(); number++)
 	{
 		founded = true;
-		for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
+		for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
 		{
 			if((*it)->getNumber() == number)
 			{
@@ -262,10 +273,10 @@ AFINFO("SysBlock::addTask:");
 	// Create system task:
 	SysTask * systask = new SysTask( taskexec, command, this, number);
 	// Delete first command pointer ( command data will be deleted in task destructor):
-	commands.pop_front();
+	m_commands.pop_front();
 
 	// Add system task:
-	systasks.push_back( systask);
+	m_systasks.push_back( systask);
 
 	return systask;
 }
@@ -273,26 +284,26 @@ AFINFO("SysBlock::addTask:");
 void SysBlock::clearCommands()
 {
 //printf("SysBlock::clearCommands:\n");
-	for( std::list<SysCmd *>::iterator it = commands.begin(); it != commands.end(); it++) delete *it;
-	commands.clear();
-	taskprogress->starts_count = 0;
-	taskprogress->errors_count = 0;
+	for( std::list<SysCmd *>::iterator it = m_commands.begin(); it != m_commands.end(); it++) delete *it;
+	m_commands.clear();
+	m_taskprogress->starts_count = 0;
+	m_taskprogress->errors_count = 0;
 }
 
-void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders)
+void SysBlock::v_errorHostsAppend( int task, int hostId, RenderContainer * renders)
 {
 	RenderContainerIt rendersIt( renders);
 	RenderAf* render = rendersIt.getRender( hostId);
 	if( render == NULL ) return;
-	if( Block::errorHostsAppend( render->getName())) appendJobLog( render->getName() + " - AVOIDING HOST !");
+	if( Block::v_errorHostsAppend( render->getName())) appendJobLog( render->getName() + " - AVOIDING HOST !");
 	SysTask * systask = getTask( task, "errorHostsAppend");
 	if( systask) systask->errorHostsAppend( render->getName());
 }
 
-void SysBlock::getErrorHostsList( std::list<std::string> & o_list) const
+void SysBlock::v_getErrorHostsList( std::list<std::string> & o_list) const
 {
-	Block::getErrorHostsList( o_list);
-	for( std::list<SysTask*>::const_iterator it = systasks.begin(); it != systasks.end(); it++)
+	Block::v_getErrorHostsList( o_list);
+	for( std::list<SysTask*>::const_iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
 		(*it)->getErrorHostsList( o_list);
 }
 
@@ -302,11 +313,11 @@ void SysBlock::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * r
 	SysTask * systask = getTask( taskup.getNumTask(), "updateTaskState");
 	if( systask == NULL ) return;
 	bool errorHost = false;
-	systask->updateState( taskup, renders, monitoring, errorHost);
-	if( errorHost) errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
+	systask->v_updateState( taskup, renders, monitoring, errorHost);
+	if( errorHost) v_errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
 }
 
-bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
+bool SysBlock::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
 {
 AFINFO("SysBlock::refresh:");
 	bool blockProgress_changed = false;
@@ -314,7 +325,7 @@ AFINFO("SysBlock::refresh:");
 
 	uint32_t blockstate_new = m_data->getState();
 	uint32_t blockstate_old = blockstate_new;
-	uint32_t taskstate_old = taskprogress->state;
+	uint32_t taskstate_old = m_taskprogress->state;
 	int tasksready_old = m_data->getProgressTasksReady();
 	int tasksdone_old  = m_data->getProgressTasksDone();
 	int taskserror_old = m_data->getProgressTasksError();
@@ -322,38 +333,38 @@ AFINFO("SysBlock::refresh:");
 	int tasksdone_new  = tasksdone_old;
 	int taskserror_new = 0;
 
-	taskprogress->state &= ~AFJOB::STATE_RUNNING_MASK;
-	taskprogress->state &= ~AFJOB::STATE_READY_MASK;
+	m_taskprogress->state &= ~AFJOB::STATE_RUNNING_MASK;
+	m_taskprogress->state &= ~AFJOB::STATE_READY_MASK;
 
-	for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
+	for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
 	{
 		int errorHostId = -1;
-		(*it)->refresh( currentTime, renders, monitoring, errorHostId);
-		if( errorHostId != -1 ) errorHostsAppend( 0, errorHostId, renders);
-		if((*it)->isRunning()) taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
-	  if((*it)->isReady()  )
+		(*it)->v_refresh( currentTime, renders, monitoring, errorHostId);
+		if( errorHostId != -1 ) v_errorHostsAppend( 0, errorHostId, renders);
+		if((*it)->isRunning()) m_taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
+		if((*it)->isReady()  )
 		{
-			taskprogress->state |= AFJOB::STATE_READY_MASK;
+			m_taskprogress->state |= AFJOB::STATE_READY_MASK;
 			taskserror_new ++;
 		}
 	}
 
 	tasksdone_new += deleteFinishedTasks( taskchanged);
 
-	if( commands.size())
+	if( m_commands.size())
 	{
-		taskprogress->state |= AFJOB::STATE_READY_MASK;
-		tasksready_new = commands.size();
+		m_taskprogress->state |= AFJOB::STATE_READY_MASK;
+		tasksready_new = m_commands.size();
 	}
 
 
 	// Set block state accoring to task state
-	if( taskprogress->state & AFJOB::STATE_READY_MASK )
+	if( m_taskprogress->state & AFJOB::STATE_READY_MASK )
 	   blockstate_new |= AFJOB::STATE_READY_MASK;
 	else
 	   blockstate_new &= ~AFJOB::STATE_READY_MASK;
 
-	if( taskprogress->state & AFJOB::STATE_RUNNING_MASK )
+	if( m_taskprogress->state & AFJOB::STATE_RUNNING_MASK )
 	   blockstate_new |= AFJOB::STATE_RUNNING_MASK;
 	else
 	   blockstate_new &= ~AFJOB::STATE_RUNNING_MASK;
@@ -361,17 +372,17 @@ AFINFO("SysBlock::refresh:");
 	m_data->setState( blockstate_new);
 
 	// Check changes:
-	if(  taskstate_old  != taskprogress->state ) taskchanged = true;
+	if(  taskstate_old  != m_taskprogress->state ) taskchanged = true;
 	if(( blockstate_old != blockstate_new ) ||
 		( tasksready_old != tasksready_new ) ||
 		( tasksdone_old  != tasksdone_new  ) ||
 		( taskserror_old != taskserror_new )  ) blockProgress_changed = true;
 
-	if( taskchanged && monitoring) m_tasks[0]->monitor( monitoring);
+	if( taskchanged && monitoring) m_tasks[0]->v_monitor( monitoring);
 
 
 	// For block in jobs list monitoring
-	if( Block::refresh( currentTime, renders, monitoring))
+	if( Block::v_refresh( currentTime, renders, monitoring))
 	{
 		// If block progress changed there, the function will add block in monitoring itself
 		blockProgress_changed = true;
@@ -393,18 +404,18 @@ int SysBlock::deleteFinishedTasks( bool & taskProgressChanged)
 {
 	int done_tasks = 0;
 	taskProgressChanged = false;
-	for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end();)
+	for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end();)
 	{
 		if(( false == (*it)->isRunning()) && ((*it)->isError() || (*it)->isDone()))
 		{
 			if((*it)->isError())
 			{
-				taskprogress->errors_count++;
+				m_taskprogress->errors_count++;
 				taskProgressChanged = true;
 			}
 			else done_tasks++;
 			delete *it;
-			it = systasks.erase( it);
+			it = m_systasks.erase( it);
 		}
 		else it++;
 	}
@@ -413,44 +424,46 @@ int SysBlock::deleteFinishedTasks( bool & taskProgressChanged)
 
 SysTask * SysBlock::getTask( int tasknum, const char * errorMessage)
 {
-	for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
+	for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
 		if( tasknum == (*it)->getNumber()) return *it;
 	if( errorMessage ) AFCommon::QueueLogError( std::string("SysJob::getTask: ") + errorMessage + ": Invalid task number = " + af::itos(tasknum));
 	else               AFCommon::QueueLogError( std::string("SysJob::getTask: Invalid task number = ") + af::itos(tasknum));
 	return NULL;
 }
 
-void SysBlock::errorHostsReset()
+void SysBlock::v_errorHostsReset()
 {
 //printf("SysBlock::errorHostsReset:\n");
-	Block::errorHostsReset();
-	for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++) (*it)->errorHostsReset();
+	Block::v_errorHostsReset();
+	for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++) (*it)->errorHostsReset();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////   JOB    ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysJob   * SysJob::sysjob        = NULL;
-SysBlock * SysJob::block_cmdpost = NULL;
-SysBlock * SysJob::block_wol     = NULL;
+SysJob   * SysJob::ms_sysjob        = NULL;
+SysBlock * SysJob::ms_block_cmdpost = NULL;
+SysBlock * SysJob::ms_block_wol     = NULL;
+SysBlock * SysJob::ms_block_events  = NULL;
 
 SysJob::SysJob( int flags):
 	JobAf( AFJOB::SYSJOB_ID)
 {
-	sysjob = this;
+	ms_sysjob = this;
 
 	if( flags != New ) return;
 
 	m_name              = AFJOB::SYSJOB_NAME;
-	m_user_name          = AFJOB::SYSJOB_USERNAME;
+	m_user_name         = AFJOB::SYSJOB_USERNAME;
 	m_priority          = AFGENERAL::DEFAULT_PRIORITY;
-	m_max_running_tasks   = AFGENERAL::MAXRUNNINGTASKS;
+	m_max_running_tasks = AFGENERAL::MAXRUNNINGTASKS;
 
 	m_blocksnum = BlockLastIndex;
 	m_blocksdata = new af::BlockData*[m_blocksnum];
 	m_blocksdata[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, m_id);
 	m_blocksdata[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     m_id);
+	m_blocksdata[BlockEventsIndex ] = new SysBlockData_Events(  BlockEventsIndex,  m_id);
 
 	progress = new afsql::DBJobProgress( this);
 
@@ -464,29 +477,34 @@ SysJob::~SysJob()
 {
 }
 
-void SysJob::dbDelete( std::list<std::string> * queries) const
+void SysJob::v_dbDelete( std::list<std::string> * queries) const
 {
 	AFCommon::QueueLogError("Trying to delete system job from database.");
 }
 
-void SysJob::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
+void SysJob::v_setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 {
 	AFCommon::QueueLogError("Trying to make system job a zomibe.");
 }
 
-Block * SysJob::newBlock( int numBlock)
+Block * SysJob::v_newBlock( int numBlock)
 {
 	switch( numBlock)
 	{
 	case BlockPostCmdIndex:
 	{
-	  block_cmdpost = new SysBlock_CmdPost( this, m_blocksdata[numBlock], progress);
-		return block_cmdpost;
+		ms_block_cmdpost = new SysBlock_CmdPost( this, m_blocksdata[numBlock], progress);
+		return ms_block_cmdpost;
 	}
 	case BlockWOLIndex:
 	{
-	  block_wol = new SysBlock_WOL( this, m_blocksdata[numBlock], progress);
-		return block_wol;
+		ms_block_wol = new SysBlock_WOL( this, m_blocksdata[numBlock], progress);
+		return ms_block_wol;
+	}
+	case BlockEventsIndex:
+	{
+		ms_block_events = new SysBlock_Events( this, m_blocksdata[numBlock], progress);
+		return ms_block_events;
 	}
 	default:
 		AFERRAR("SysJob::createBlock: Invalid block number = %d", numBlock)
@@ -494,26 +512,31 @@ Block * SysJob::newBlock( int numBlock)
 	return NULL;
 }
 
-void SysJob::AddPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
+void SysJob::AddPostCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name)
 {
-	block_cmdpost->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
+	ms_block_cmdpost->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name));
 }
-void SysJob::AddWOLCommand(  const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
+void SysJob::AddWOLCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name)
 {
-	block_wol->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
+	ms_block_wol->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name));
+}
+void SysJob::AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name)
+{
+printf("SysJob::AddEventCommand:\n%s\n", i_cmd.c_str());
+	ms_block_events->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name));
 }
 
-bool SysJob::solve( RenderAf *render, MonitorContainer * monitoring)
+bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("SysJob::solve:\n");
 	for( int b = 0; b < m_blocksnum; b++ )
 		if(((SysBlock*)(m_blocks[b]))->isReady())
-			return JobAf::solve( render, monitoring);
+			return JobAf::v_solve( render, monitoring);
 
 	return false;
 }
 
-void SysJob::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)
+void SysJob::v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("SysJob::updateTaskState:\n");
 //   JobAf::updateTaskState( taskup, renders, monitoring)
@@ -527,61 +550,13 @@ void SysJob::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * ren
 	((SysBlock*)(m_blocks[taskup.getNumBlock()]))->updateTaskState( taskup, renders, monitoring);
 }
 
-void SysJob::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void SysJob::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 AFINFO("SysJob::refresh:");
-	JobAf::refresh( currentTime, pointer, monitoring);
+	JobAf::v_refresh( currentTime, pointer, monitoring);
 }
 
-bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
-{
-//printf("SysJob::action:\n");
-
-	switch( type)
-	{
-/*		case af::Msg::TJobAnnotate:
-		case af::Msg::TJobHostsMask:
-		case af::Msg::TJobHostsMaskExclude:
-		case af::Msg::TJobDependMask:
-		case af::Msg::TJobDependMaskGlobal:
-		case af::Msg::TJobMaxRunningTasks:
-		case af::Msg::TJobWaitTime:
-		case af::Msg::TJobPriority:
-		case af::Msg::TJobNeedOS:
-		case af::Msg::TJobNeedProperties:
-		case af::Msg::TJobStart:
-		case af::Msg::TJobPause:
-		case af::Msg::TJobResetErrorHosts:*/
-/*		case af::Msg::TBlockService:
-		case af::Msg::TBlockParser:
-		case af::Msg::TBlockErrorsAvoidHost:
-		case af::Msg::TBlockErrorRetries:
-		case af::Msg::TBlockTasksMaxRunTime:
-		case af::Msg::TBlockErrorsSameHost:
-		case af::Msg::TBlockErrorsForgiveTime:
-		case af::Msg::TBlockResetErrorHosts:
-		case af::Msg::TBlockDependMask:
-		case af::Msg::TBlockTasksDependMask:
-		case af::Msg::TBlockWorkingDir:
-		case af::Msg::TBlockHostsMask:
-		case af::Msg::TBlockHostsMaskExclude:
-		case af::Msg::TBlockMaxRunningTasks:
-		case af::Msg::TBlockNeedMemory:
-		case af::Msg::TBlockNeedHDD:
-		case af::Msg::TBlockNeedPower:
-		case af::Msg::TBlockNeedProperties:
-		case af::Msg::TBlockCapacity:
-		case af::Msg::TBlockCapacityCoeffMin:
-		case af::Msg::TBlockCapacityCoeffMax:
-			return JobAf::action( mcgeneral, type, pointer, monitoring);*/
-		default:
-			appendLog(std::string("Action \"") + af::Msg::TNAMES[type] + "\" is not available for the system job.");
-	}
-
-	return true;
-}
-
-void SysJob::restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
+void SysJob::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("SysJob::restartTasks:\n");
 	for( int p = 0; p < taskspos.getCount(); p++)
@@ -594,10 +569,10 @@ void SysJob::restartTasks( const af::MCTasksPos &taskspos, RenderContainer * ren
 		}
 		((SysBlock*)(m_blocks[b]))->clearCommands();
 	}
-	JobAf::restartTasks( taskspos, renders, monitoring);
+	JobAf::v_restartTasks( taskspos, renders, monitoring);
 }
 
-const std::string SysJob::getErrorHostsListString( int b, int t) const
+const std::string SysJob::v_getErrorHostsListString( int b, int t) const
 {
 	return "This is an empty dummy task in s system job block.\nGet job error hosts list to see its tasks error hosts.";
 }
@@ -611,7 +586,7 @@ af::Msg * SysJob::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * 
 
 void SysJob::appendJobLog( const std::string & message)
 {
-	sysjob->appendLog( message);
+	ms_sysjob->appendLog( message);
 }
 
 bool SysJob::isValid() const

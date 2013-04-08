@@ -32,7 +32,7 @@ public:
    virtual ~TaskRun();
 
 /// When running session finishes this class became a zombie - ready to delete.
-   inline bool isZombie() const { return zombie;}
+   inline bool isZombie() const { return m_zombie;}
 
 /// Update task state by sent message, almost often from remote render host
    virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
@@ -52,9 +52,9 @@ public:
 /// Return special message for request output from its running render.
 	virtual af::Msg * v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const;
 
-   uint32_t getStopTime() const { return stopTime;}
-   int        getHostId() const { return hostId;}
-   bool isHostId( const int value) const { return hostId == value;}
+   uint32_t getStopTime() const { return m_stopTime;}
+   int        getHostId() const { return m_hostId;}
+   bool isHostId( const int value) const { return m_hostId == value;}
 
 /// Calculate memory totally allocated by class instance
    int calcWeight() const;
@@ -68,16 +68,15 @@ protected:
    virtual void finish(  const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 protected:
-   Task * task;
-   Block * block;
-   af::TaskExec * exec;
-   af::TaskProgress * progress;
-   int tasknum;
-   int hostId;       ///< Task Host Id
+   Task * m_task;
+   Block * m_block;
+   af::TaskExec * m_exec;
+   af::TaskProgress * m_progress;
+   int m_tasknum;
+   int m_hostId;       ///< Task Host Id
 
 private:
-   int * counter;
-//   QStringList * logStingList;
-   uint32_t stopTime;         ///< Time, when running task was asked to stop.
-   bool zombie;
+   int * m_counter;
+   uint32_t m_stopTime;         ///< Time, when running task was asked to stop.
+   bool m_zombie;
 };

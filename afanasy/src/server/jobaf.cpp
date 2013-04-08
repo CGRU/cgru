@@ -72,10 +72,10 @@ void JobAf::initializeValues()
     m_blackListsWeight = 0;
 }
 
-bool JobAf::dbSelect( PGconn * i_conn, const std::string * i_where)
+bool JobAf::v_dbSelect( PGconn * i_conn, const std::string * i_where)
 {
 //printf("JobAf::dbSelect:\n");
-    if( afsql::DBJob::dbSelect( i_conn) == false) return false;
+    if( afsql::DBJob::v_dbSelect( i_conn) == false) return false;
     return construct();
 }
 
@@ -108,7 +108,7 @@ AFINFA("JobAf::construct: \"%s\":", m_name.c_str())
     for( int b = 0; b < m_blocksnum; b++)
     {
         if( m_blocksdata[b]->isValid() == false) return false;
-        m_blocks[b] = newBlock(b);
+        m_blocks[b] = v_newBlock(b);
         if( m_blocks[b] == NULL )
         {
             AFERRAR("JobAf::construct: Can't create block %d of %d.", b, m_blocksnum)
@@ -129,7 +129,7 @@ JobAf::~JobAf()
     }
 }
 
-Block * JobAf::newBlock( int numBlock)
+Block * JobAf::v_newBlock( int numBlock)
 {
 	return new Block( this, m_blocksdata[numBlock], progress);
 }
@@ -218,7 +218,7 @@ bool JobAf::initialize()
 
    if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 
-   refresh( time(NULL), NULL, NULL);
+   v_refresh( time(NULL), NULL, NULL);
 
    m_initialized = true;
 
@@ -228,7 +228,7 @@ bool JobAf::initialize()
 
 int JobAf::getUid() const { return m_user->getId(); }
 
-void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
+void JobAf::v_setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 {
    if( m_deletion == false )
    {
@@ -262,14 +262,14 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
          appendLog( std::string("Executing block[") + m_blocksdata[b]->getName() + "] post command:\n" + m_blocksdata[b]->getCmdPost());
       }
    }
-   AfNodeSrv::setZombie();
+   AfNodeSrv::v_setZombie();
 
    // Queue job cleanup:
    AFCommon::QueueJobCleanUp( this);
 
    if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
-   AFCommon::QueueLog("Deleting a job: " + generateInfoString());
+   AFCommon::QueueLog("Deleting a job: " + v_generateInfoString());
    unLock();
 }
 
@@ -335,7 +335,7 @@ void JobAf::v_action( Action & i_action)
 		{
 			appendLog("Deleted by " + i_action.author);
 			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_action.author);
-			setZombie( i_action.renders, i_action.monitors);
+			v_setZombie( i_action.renders, i_action.monitors);
 			i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
 			return;
 		}
@@ -651,10 +651,16 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
       if( dependsnotdone ) return NULL;
    }
 
-   return m_blocksdata[block]->genTask( task);
+	af::TaskExec * taskExec = m_blocksdata[block]->genTask( task);
+
+	taskExec->m_custom_data_job = m_custom_data;
+	taskExec->m_custom_data_render = render->getCustomData();
+	taskExec->m_custom_data_user = m_user->getCustomData();
+
+	return taskExec;
 }
 
-bool JobAf::canRun()
+bool JobAf::v_canRun()
 {
 	if( isLocked() )
     {
@@ -700,9 +706,9 @@ bool JobAf::canRun()
     return true;
 }
 
-bool JobAf::canRunOn( RenderAf * i_render)
+bool JobAf::v_canRunOn( RenderAf * i_render)
 {
-    if( false == canRun())
+    if( false == v_canRun())
     {
         // Unable to run at all
         return false;
@@ -755,7 +761,7 @@ bool JobAf::canRunOn( RenderAf * i_render)
     return true;
 }
 
-bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
+bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("Job::solve: %s:\n", m_name.c_str());
 	for( int b = 0; b < m_blocksnum; b++)
@@ -828,7 +834,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 			taskexec->setJobName( m_name);
 			taskexec->setUserName( m_user_name);
 			listeners.process( *taskexec);
-			m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
+			m_blocks[taskexec->getBlockNum()]->v_startTask( taskexec, render, monitoring);
 
 			// If job was not started it became started
 			if( m_time_started == 0 )
@@ -844,15 +850,15 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 	return false;
 }
 
-void JobAf::updateTaskState( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring)
+void JobAf::v_updateTaskState( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring)
 {
    if( false == checkBlockTaskNumbers( taskup.getNumBlock(), taskup.getNumTask(), "updateTaskState")) return;
    bool errorHost = false;
-   m_blocks[taskup.getNumBlock()]->m_tasks[taskup.getNumTask()]->updateState( taskup, renders, monitoring, errorHost);
-   if( errorHost) m_blocks[taskup.getNumBlock()]->errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
+   m_blocks[taskup.getNumBlock()]->m_tasks[taskup.getNumTask()]->v_updateState( taskup, renders, monitoring, errorHost);
+   if( errorHost) m_blocks[taskup.getNumBlock()]->v_errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
 }
 
-void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 //printf("JobAf::refresh: \"%s\"\n", getName().toUtf8().data());
    RenderContainer * renders = (RenderContainer*)pointer;
@@ -861,8 +867,8 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    {
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
       for( int b = 0; b < m_blocksnum; b++)
-         m_blocks[b]->refresh( currentTime, renders, monitoring);
-      if( getRunningTasksNumber() == 0 ) setZombie( NULL, monitoring);
+         m_blocks[b]->v_refresh( currentTime, renders, monitoring);
+      if( getRunningTasksNumber() == 0 ) v_setZombie( NULL, monitoring);
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
    }
    if( isLocked() ) return;
@@ -886,7 +892,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    //
    // Update blocks (blocks will uptate its tasks):
    for( int b = 0; b < m_blocksnum; b++)
-      if( m_blocks[b]->refresh( currentTime, renders, monitoring))
+      if( m_blocks[b]->v_refresh( currentTime, renders, monitoring))
          jobchanged = af::Msg::TMonitorJobsChanged;
 
    //
@@ -955,6 +961,24 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    {
       jobchanged = af::Msg::TMonitorJobsChanged;
       if( monitoring ) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+
+		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
+		if( m_custom_data.size() || m_user->getCustomData().size())
+		{
+			std::string cmd = "{\n";
+			if( m_user->getCustomData().size()) cmd += "\"user\":" + m_user->getCustomData();
+			cmd += ",\n";
+			if( m_custom_data.size()) cmd += "\"job\":" + m_custom_data;
+			cmd += ",\n";
+			cmd += "\"state\":\"";
+			std::string cmd_end = "\"\n}";
+			if((  m_state & AFJOB::STATE_ERROR_MASK ) && ( false == ( old_state & AFJOB::STATE_ERROR_MASK )))
+				SysJob::AddEventCommand( cmd+"error"+cmd_end, "", m_user_name, m_name);
+			if((  m_state & AFJOB::STATE_DONE_MASK ) && ( false == ( old_state & AFJOB::STATE_DONE_MASK )))
+				SysJob::AddEventCommand( cmd+"done"+cmd_end, "", m_user_name, m_name);
+			if((  m_state & AFJOB::STATE_RUNNING_MASK ) && ( false == ( old_state & AFJOB::STATE_RUNNING_MASK )))
+				SysJob::AddEventCommand( cmd+"running"+cmd_end, "", m_user_name, m_name);
+		}
    }
 
    // Check age and delete if life finished:
@@ -966,7 +990,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
       {
          appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
          m_user->appendLog( std::string("Job \"") + m_name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
-         setZombie( renders, monitoring);
+         v_setZombie( renders, monitoring);
          jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
       }
    }
@@ -974,10 +998,10 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
 
    // Update solving parameters:
-   calcNeed();
+   v_calcNeed();
 }
 
-void JobAf::calcNeed()
+void JobAf::v_calcNeed()
 {
     // Need calculation based on running tasks number
     calcNeedResouces( getRunningTasksNumber());
@@ -990,7 +1014,7 @@ void JobAf::skipTasks( const af::MCTasksPos &taskspos, RenderContainer * renders
 //printf("JobAf::skipTasks: tasks skipped.\n");
 }
 
-void JobAf::restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
+void JobAf::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("JobAf::restartTasks:\n");
    tasks_Skip_Restart( taskspos, true, renders, monitoring);
@@ -1059,7 +1083,7 @@ void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, Rend
 		 m_blocks[b]->m_tasks[t]->restart( onlyRunning, message, renders, monitoring);
    }
    AFCommon::QueueDBUpdateTask_end();
-   refresh( time(NULL), renders, monitoring);
+   v_refresh( time(NULL), renders, monitoring);
 }
 
 void JobAf::restartErrors( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -1165,7 +1189,7 @@ const std::string JobAf::generateTaskName( int i_b, int i_t) const
 	else return m_blocks[i_b]->m_data->genTaskName( i_t);
 }
 
-const std::string JobAf::getErrorHostsListString() const
+const std::string JobAf::v_getErrorHostsListString() const
 {
    std::string str("Job \"");
    str += m_name + "\" error hosts:\n";
@@ -1178,7 +1202,7 @@ const std::string JobAf::getErrorHostsListString() const
 void JobAf::writeErrorHosts( std::list<std::string> & o_list) const
 {
 	for( int block = 0; block < m_blocksnum; block++)
-		m_blocks[block]->getErrorHostsList( o_list);
+		m_blocks[block]->v_getErrorHostsList( o_list);
 }
 
 af::Msg * JobAf::writeErrorHosts() const
@@ -1203,7 +1227,7 @@ af::Msg * JobAf::writeErrorHosts( int b, int t) const
 	return af::jsonMsg("error_hosts", m_name, list);
 }
 
-const std::string JobAf::getErrorHostsListString( int b, int t) const
+const std::string JobAf::v_getErrorHostsListString( int b, int t) const
 {
    if( false == checkBlockTaskNumbers( b, t, "getErrorHostsList"))
    {
@@ -1261,11 +1285,11 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
    }
 }
 
-int JobAf::calcWeight() const
+int JobAf::v_calcWeight() const
 {
 //printf("JobAf::calcWeight: '%s' runningtaskscounter=%d\n", name.toUtf8().data(), runningtaskscounter);
 
-   int weight = Job::calcWeight();
+   int weight = Job::v_calcWeight();
 //printf("JobAf::calcWeight: Job::calcWeight: %d bytes\n", weight);
    weight += sizeof(JobAf) - sizeof( Job);
 

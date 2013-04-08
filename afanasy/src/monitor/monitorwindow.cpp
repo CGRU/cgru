@@ -69,7 +69,7 @@ MonitorWindow::MonitorWindow():
    connect( qthreadClientSend, SIGNAL( connectionLost() ), this, SLOT( connectionLost()));
    monitor = new MonitorHost();
    initialized = true;
-   monitor->stdOut();
+   monitor->v_stdOut();
    sendRegister();
 }
 

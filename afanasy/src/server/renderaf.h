@@ -52,7 +52,7 @@ public:
 	void taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring);
 
 /// Refresh parameters.
-	void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 /// Get host parameters from farm.
 	bool getFarmHost( af::Host * newHost = NULL);
@@ -68,7 +68,7 @@ public:
 	const std::string getServicesString() const;							 ///< Get services information.
 	void jsonWriteServices( std::ostringstream & o_str) const; ///< Get services information.
 
-	virtual int calcWeight() const; ///< Calculate and return memory size.
+	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
 	bool canRunService( const std::string & type) const; ///< Check whether block can run a service
 
@@ -80,7 +80,11 @@ public:
 	// Need for server to write some farm parameters (gui double-click):
 	af::Msg * jsonWriteSrvFarm() const;
 
+	// Non json version:
+	af::Msg * writeFullInfo() const;
+
 	void wolWake(  MonitorContainer * i_monitoring, const std::string & i_msg = std::string());
+
 
 public:
 	/// Set container.

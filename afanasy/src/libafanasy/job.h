@@ -30,7 +30,7 @@ public:
 	inline bool isValid()   const { return          m_valid; }
 	inline bool isInvalid() const { return false == m_valid; }
 
-    void generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
+    void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
 	//inline unsigned getFlags() const { return flags;}
 	inline unsigned getState() const { return m_state;}
@@ -102,7 +102,7 @@ public:
 	/// Get block constant pointer.
 	inline BlockData* getBlock( int n) const { if(n<(m_blocksnum))return m_blocksdata[n];else return NULL;}
 
-	virtual int calcWeight() const;                   ///< Calculate and return memory size.
+	virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 
 	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
@@ -158,18 +158,16 @@ protected:
 	RegExp m_need_os;
 	RegExp m_need_properties;
 
-	std::string m_custom_data;
-
 	std::string m_tasks_output_dir;       ///< Tasks output directory.
 
 private:
 	void initDefaultValues();
 
-	void readwrite( Msg * msg); ///< Read or write data in buffer.
+	void v_readwrite( Msg * msg); ///< Read or write data in buffer.
 	void rw_blocks( Msg * msg); ///< Read or write blocks.
 
-	virtual BlockData * newBlockData( Msg * msg);
-	virtual BlockData * newBlockData( const JSON & i_object, int i_num);
+    virtual BlockData * v_newBlockData( Msg * msg);
+    virtual BlockData * v_newBlockData( const JSON & i_object, int i_num);
 
     void generateInfoStreamJob(    std::ostringstream & o_str, bool full = false) const; /// Generate information.
     void generateInfoStreamBlocks( std::ostringstream & o_str, bool full = false) const;

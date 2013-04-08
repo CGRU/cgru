@@ -26,7 +26,7 @@ AfNodeSrv::AfNodeSrv( af::Node * i_node):
 //printf("m_node = %p\n", (void*)(m_node));
 }
 
-void AfNodeSrv::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void AfNodeSrv::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
    AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
    return;
@@ -104,22 +104,22 @@ void AfNodeSrv::v_action( Action & i_action)
 void AfNodeSrv::v_priorityChanged( MonitorContainer * i_monitoring ){}
 
 /// Main solving functions should be implemented in child classes (if solving needed):
-bool AfNodeSrv::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
+bool AfNodeSrv::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
     AFERRAR("AfNodeSrv::solve(): Not implemented on '%s'.", m_node->m_name.c_str())
     return false;
 }
-void AfNodeSrv::calcNeed()
+void AfNodeSrv::v_calcNeed()
 {
     AFERRAR("AfNodeSrv::calcNeed(): Not implememted on '%s'.\n", m_node->m_name.c_str())
     calcNeedResouces(-1);
 }
-bool AfNodeSrv::canRun()
+bool AfNodeSrv::v_canRun()
 {
     AFERRAR("AfNodeSrv::canRun(): Not implememted on '%s'.\n", m_node->m_name.c_str())
     return false;
 }
-bool AfNodeSrv::canRunOn( RenderAf * i_render)
+bool AfNodeSrv::v_canRunOn( RenderAf * i_render)
 {
     AFERRAR("AfNodeSrv::canRunOn(): Not implememted on '%s'.\n", m_node->m_name.c_str())
     return false;
@@ -145,7 +145,7 @@ bool AfNodeSrv::greaterNeed( const AfNodeSrv * i_other) const
 /// Try so solve a Node
 bool AfNodeSrv::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-    if( false == solve( i_render, i_monitoring))
+    if( false == v_solve( i_render, i_monitoring))
     {
         // Returning that node was not solved
         return false;
@@ -158,7 +158,7 @@ bool AfNodeSrv::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
 
     // Calculace new need value as node got some more resource
     // ( nodes shoud increment resource value in solve function )
-    calcNeed();
+    v_calcNeed();
 
     // Icrement solve cycle
     sm_solve_cycle++;
@@ -179,7 +179,7 @@ void AfNodeSrv::calcNeedResouces( int i_resourcesquantity)
 		return;
 	}
 
-	if( false == canRun())
+	if( false == v_canRun())
 	{
 		// Cannot run at all - no solving needed
 		return;
@@ -213,7 +213,7 @@ bool AfNodeSrv::solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMeth
     for( std::list<AfNodeSrv*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
 	{
 //printf("AfNodeSrv::solvelist: name = %s\n", (*it)->m_node->m_name.c_str());
-        if((*it)->canRunOn( i_render))
+        if((*it)->v_canRunOn( i_render))
        {
 		   solvelist.push_back(*it);
        }

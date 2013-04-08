@@ -55,7 +55,7 @@ bool afqt::connect( const af::Address & address, QTcpSocket * qSocket)
       if( qSocket->waitForConnected( WAITFORCONNECTED) == false)
       {
          AFERROR("afqt::connect: Can't connect to address:")
-         printf(" %s", address.generateInfoString().c_str());
+         printf(" %s", address.v_generateInfoString().c_str());
          printf(" Q = %s", afqt::toQAddress( address).toString().toUtf8().data());
          printf("\n");
          return false;

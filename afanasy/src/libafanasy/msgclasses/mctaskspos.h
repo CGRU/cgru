@@ -20,7 +20,7 @@ public:
 
    inline bool hasTasks() const { return has_tasks;}
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline int    getJobId() const { return jobid;          }
    inline size_t getCount() const { return numbloks.size();}
@@ -38,6 +38,6 @@ private:
    std::vector<int32_t> numtasks;
    std::string message;
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

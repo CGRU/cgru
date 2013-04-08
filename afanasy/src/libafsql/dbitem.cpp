@@ -21,24 +21,24 @@ DBItem::~DBItem()
 
 void DBItem::dbCreateTable( std::list<std::string> * queries) const
 {
-   std::string str = std::string("CREATE TABLE ") + dbGetTableName() + "\n(\n";
-   if( dbGetIDsString().empty() == false )
-      str += dbGetIDsString() + ",\n";
+   std::string str = std::string("CREATE TABLE ") + v_dbGetTableName() + "\n(\n";
+   if( v_dbGetIDsString().empty() == false )
+      str += v_dbGetIDsString() + ",\n";
    for( int i = 0; i < dbAttributes.size(); i++)
    {
       if( i != 0 ) str += ",\n";
       str += "   " + dbAttributes[i]->createLine();
    }
-   if( dbGetKeysString().empty() == false)
-      str += ",\n " + dbGetKeysString();
+   if( v_dbGetKeysString().empty() == false)
+      str += ",\n " + v_dbGetKeysString();
    str += "\n)";
 
    queries->push_back( str);
 }
 
-void DBItem::dbInsert( std::list<std::string> * queries) const
+void DBItem::v_dbInsert( std::list<std::string> * queries) const
 {
-   std::string str = std::string("INSERT INTO ") + dbGetTableName() + " (";
+   std::string str = std::string("INSERT INTO ") + v_dbGetTableName() + " (";
    for( int i = 0; i < dbAttributes.size(); i++)
    {
       if( i != 0 ) str += ",";
@@ -55,24 +55,24 @@ void DBItem::dbInsert( std::list<std::string> * queries) const
    queries->push_back( str);
 }
 
-void DBItem::dbDelete( std::list<std::string> * queries) const
+void DBItem::v_dbDelete( std::list<std::string> * queries) const
 {
-   queries->push_back( std::string("DELETE FROM ") + dbGetTableName()
+   queries->push_back( std::string("DELETE FROM ") + v_dbGetTableName()
                        + " WHERE " + dbAttributes.front()->getName() + "=" + dbAttributes.front()->getString() + ";");
 }
 
-void DBItem::dbUpdate( std::list<std::string> * queries, int attr) const
+void DBItem::v_dbUpdate( std::list<std::string> * queries, int attr) const
 {
-   std::string str = std::string("UPDATE ") + dbGetTableName() + " SET";
+   std::string str = std::string("UPDATE ") + v_dbGetTableName() + " SET";
    bool attrfounded = false;
    int i = 0;
-   for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
+   for( int i = v_dbGetKeysNum(); i < dbAttributes.size(); i++)
    {
       if( attr > 0 )
       {
          if( dbAttributes[i]->getType() != attr ) continue;
       }
-      else if( i != dbGetKeysNum()) str += ",";
+      else if( i != v_dbGetKeysNum()) str += ",";
       str += " " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
       if( attr > 0 )
       {
@@ -86,25 +86,25 @@ void DBItem::dbUpdate( std::list<std::string> * queries, int attr) const
       return;
    }
    str += " WHERE " + dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();
-   for( int i = 1; i < dbGetKeysNum(); i++)
+   for( int i = 1; i < v_dbGetKeysNum(); i++)
       str += " AND " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
    str += ";";
    AFINFA("DBItem::dbUpdate:\n%s", str.c_str())
    queries->push_back( str);
 }
 
-bool DBItem::dbSelect( PGconn * i_conn, const std::string * i_where)
+bool DBItem::v_dbSelect( PGconn * i_conn, const std::string * i_where)
 {
     std::string query = "SELECT";
-    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
+    for( int i = v_dbGetKeysNum(); i < dbAttributes.size(); i++)
     {
-        if( i != dbGetKeysNum())
+        if( i != v_dbGetKeysNum())
         {
             query += ",";
         }
         query += " " + dbAttributes[i]->getName();
     }
-    query += " FROM " + dbGetTableName() + "\n WHERE ";
+    query += " FROM " + v_dbGetTableName() + "\n WHERE ";
     if( i_where )
     {
         query += *i_where;
@@ -112,7 +112,7 @@ bool DBItem::dbSelect( PGconn * i_conn, const std::string * i_where)
     else
     {
         query += dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();
-        for( int i = 1; i < dbGetKeysNum(); i++)
+        for( int i = 1; i < v_dbGetKeysNum(); i++)
             query += " AND " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
     }
     query += ";";
@@ -134,15 +134,15 @@ bool DBItem::dbSelect( PGconn * i_conn, const std::string * i_where)
 
     int columns_size = PQnfields( res);
 
-    if( columns_size != int( dbAttributes.size() - dbGetKeysNum()))
+    if( columns_size != int( dbAttributes.size() - v_dbGetKeysNum()))
     {
         AFERRAR("DBItem::dbSelect: Invalid number of columns ( %d != %d ) returned on query:\n%s",
-                columns_size, int( dbAttributes.size() - dbGetKeysNum()), query.c_str())
+                columns_size, int( dbAttributes.size() - v_dbGetKeysNum()), query.c_str())
         return false;
     }
 
     int a = 0;
-    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++, a++)
+    for( int i = v_dbGetKeysNum(); i < dbAttributes.size(); i++, a++)
     {
         const char * value = PQgetvalue( res, 0, a);
         if( dbAttributes[i]->getType() <= DBAttr::_NUMERIC_END_)
@@ -176,7 +176,7 @@ void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<st
       if( column_exists ) continue;
 
       std::string cmd("ALTER TABLE ");
-      cmd += dbGetTableName();
+      cmd += v_dbGetTableName();
       cmd += " DROP COLUMN ";
       cmd += *it;
       std::cout << cmd << std::endl;
@@ -184,7 +184,7 @@ void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<st
    }
 
    // Check for new columns:
-   for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
+   for( int i = v_dbGetKeysNum(); i < dbAttributes.size(); i++)
    {
       bool column_exists = false;
       for( std::list<std::string>::const_iterator it = columns.begin(); it != columns.end(); it++)
@@ -198,7 +198,7 @@ void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<st
       if( column_exists ) continue;
 
       std::string cmd("ALTER TABLE ");
-      cmd += dbGetTableName();
+      cmd += v_dbGetTableName();
       cmd += " ADD COLUMN ";
       cmd += dbAttributes[i]->createLine();
       std::cout << cmd << std::endl;
@@ -206,7 +206,7 @@ void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<st
    }
 }
 
-int DBItem::calcWeight() const
+int DBItem::v_calcWeight() const
 {
    int weight = sizeof(DBItem);
    for( int i = 0; i < dbAttributes.size(); i++)

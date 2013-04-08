@@ -27,7 +27,7 @@ ItemTalk::~ItemTalk()
 void ItemTalk::updateValues( af::Node *node, int type)
 {
    af::Talk * talk = (af::Talk*)node;
-   tooltip = afqt::stoq( talk->generateInfoString( true));
+   tooltip = afqt::stoq( talk->v_generateInfoString( true));
 }
 
 void ItemTalk::paint( QPainter *painter, const QStyleOptionViewItem &option) const

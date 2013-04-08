@@ -15,7 +15,7 @@ public:
    MCListenAddress( Msg * msg);
    ~MCListenAddress();
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline uint8_t getFlags()   const { return flags;}
    inline bool    toListen()   const { return flags & TOLISTEN;   }
@@ -44,6 +44,6 @@ private:
 
    Address address;
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

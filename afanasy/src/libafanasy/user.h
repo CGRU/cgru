@@ -26,7 +26,7 @@ public:
 
 	virtual ~User();                       ///< Destructor.
 
-	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 	void generateErrorsSolvingStream( std::ostringstream & stream) const;
 	const std::string generateErrorsSolvingString() const;
@@ -70,7 +70,7 @@ public:
 
 	void setJobsSolveMethod( int i_method );
 
-	virtual int calcWeight() const; ///< Calculate and return memory size.
+	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
 
@@ -110,6 +110,6 @@ private:
 
 private:
    void construct();
-   void readwrite( Msg * msg);   ///< Read or write user in buffer.
+   void v_readwrite( Msg * msg);   ///< Read or write user in buffer.
 };
 }

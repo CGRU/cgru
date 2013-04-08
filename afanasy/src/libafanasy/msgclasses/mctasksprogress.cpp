@@ -27,7 +27,7 @@ MCTasksProgress::~MCTasksProgress()
    }
 }
 
-void MCTasksProgress::readwrite( Msg * msg)
+void MCTasksProgress::v_readwrite( Msg * msg)
 {
    rw_int32_t    ( jobid        , msg );
    rw_Int32_List ( blocks       , msg );
@@ -38,7 +38,7 @@ void MCTasksProgress::readwrite( Msg * msg)
       std::list<TaskProgress*>::iterator trIt = tasksprogress.begin();
       while( trIt != tasksprogress.end())
       {
-         (*trIt)->readwrite( msg);
+         (*trIt)->v_readwrite( msg);
          trIt++;
       }
    }
@@ -64,7 +64,7 @@ void MCTasksProgress::add( int block, int task, TaskProgress * tp)
    tasksprogress.push_back(  tp  );
 }
 
-void MCTasksProgress::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTasksProgress::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    int count = int( tasks.size());
 
@@ -77,6 +77,6 @@ void MCTasksProgress::generateInfoStream( std::ostringstream & stream, bool full
    for( int i = 0; i < count; i++)
    {
       stream << "\n#[" << *(bIt++) << ",t" << *(tIt++) << "]:";
-      (*(trIt++))->generateInfoStream( stream, full);
+      (*(trIt++))->v_generateInfoStream( stream, full);
    }
 }

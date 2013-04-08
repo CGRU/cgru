@@ -69,7 +69,7 @@ void afsql::ResetUsers( DBConnection * dbconnenction)
       return;
    }
    DBUser user;
-   dbconnenction->dropTable( user.dbGetTableName());
+   dbconnenction->dropTable( user.v_dbGetTableName());
    std::list<std::string> queries;
    user.dbCreateTable( &queries);
    dbconnenction->execute( &queries);
@@ -84,7 +84,7 @@ void afsql::ResetRenders( DBConnection * dbconnenction)
       return;
    }
    DBRender render;
-   dbconnenction->dropTable( render.dbGetTableName());
+   dbconnenction->dropTable( render.v_dbGetTableName());
    std::list<std::string> queries;
    render.dbCreateTable( &queries);
    dbconnenction->execute( &queries);
@@ -104,10 +104,10 @@ void afsql::ResetJobs( DBConnection * dbconnenction)
    DBTaskData task;
    DBTaskProgress progress;
 
-   dbconnenction->dropTable( progress.dbGetTableName());
-   dbconnenction->dropTable( task.dbGetTableName());
-   dbconnenction->dropTable( block.dbGetTableName());
-   dbconnenction->dropTable( job.dbGetTableName());
+   dbconnenction->dropTable( progress.v_dbGetTableName());
+   dbconnenction->dropTable( task.v_dbGetTableName());
+   dbconnenction->dropTable( block.v_dbGetTableName());
+   dbconnenction->dropTable( job.v_dbGetTableName());
 
    std::list<std::string> queries;
    job.dbCreateTable( &queries);
@@ -126,7 +126,7 @@ void afsql::ResetStat( DBConnection * dbconnenction)
       return;
    }
    DBStatistics statistics;
-   dbconnenction->dropTable( statistics.dbGetTableName());
+   dbconnenction->dropTable( statistics.v_dbGetTableName());
    std::list<std::string> queries;
    statistics.dbCreateTable( &queries);
    dbconnenction->execute( &queries);
@@ -160,31 +160,31 @@ void afsql::UpdateTables( DBConnection * dbconnenction, bool showOnly )
    std::list<std::string> queries;
 
    DBTaskData taskdata;
-   columns = dbconnenction->getTableColumns( taskdata.dbGetTableName());
+   columns = dbconnenction->getTableColumns( taskdata.v_dbGetTableName());
    taskdata.dbUpdateTable( &queries, columns);
 
    DBTaskProgress taskprogress;
-   columns = dbconnenction->getTableColumns( taskprogress.dbGetTableName());
+   columns = dbconnenction->getTableColumns( taskprogress.v_dbGetTableName());
    taskprogress.dbUpdateTable( &queries, columns);
 
    DBBlockData blockdata;
-   columns = dbconnenction->getTableColumns( blockdata.dbGetTableName());
+   columns = dbconnenction->getTableColumns( blockdata.v_dbGetTableName());
    blockdata.dbUpdateTable( &queries, columns);
 
    DBJob job;
-   columns = dbconnenction->getTableColumns( job.dbGetTableName());
+   columns = dbconnenction->getTableColumns( job.v_dbGetTableName());
    job.dbUpdateTable( &queries, columns);
 
    DBUser user;
-   columns = dbconnenction->getTableColumns( user.dbGetTableName());
+   columns = dbconnenction->getTableColumns( user.v_dbGetTableName());
    user.dbUpdateTable( &queries, columns);
 
    DBRender render;
-   columns = dbconnenction->getTableColumns( render.dbGetTableName());
+   columns = dbconnenction->getTableColumns( render.v_dbGetTableName());
    render.dbUpdateTable( &queries, columns);
 
    DBStatistics statistics;
-   columns = dbconnenction->getTableColumns( statistics.dbGetTableName());
+   columns = dbconnenction->getTableColumns( statistics.v_dbGetTableName());
    statistics.dbUpdateTable( &queries, columns);
 
    if(( queries.size()) && ( false == showOnly )) dbconnenction->execute( &queries);

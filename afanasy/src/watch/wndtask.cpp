@@ -103,7 +103,7 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 	{
 		QTextCursor c( qTextEdit->textCursor());
 		c.insertText("WndTask::WndTask: Message is not of type 'Task:':\n");
-		c.insertText( afqt::stoq( msg->generateInfoString()));
+		c.insertText( afqt::stoq( msg->v_generateInfoString()));
 		return;
 	}
 

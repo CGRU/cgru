@@ -47,7 +47,7 @@ public:
 	TaskExec( Msg * msg); ///< Read task from message.
 	~TaskExec();
 
-	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 	inline const std::string & getName()        const { return m_name;       }///< Get task name.
 	inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
@@ -202,6 +202,6 @@ private:
 
 private:
 
-	void readwrite( Msg * msg); ///< Read or write task in message buffer.
+	void v_readwrite( Msg * msg); ///< Read or write task in message buffer.
 };
 }

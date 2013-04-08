@@ -19,9 +19,9 @@ public:
 
    virtual ~Talk();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 private:
-   void readwrite( Msg * msg); ///< Read or write Talk in buffer.
+   void v_readwrite( Msg * msg); ///< Read or write Talk in buffer.
 };
 }

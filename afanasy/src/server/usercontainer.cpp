@@ -59,7 +59,7 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
 
    if( monitoring) monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
 
-   AFCommon::QueueLog("User registered: " + user->generateInfoString( false));
+   AFCommon::QueueLog("User registered: " + user->v_generateInfoString( false));
    return user;
 }
 

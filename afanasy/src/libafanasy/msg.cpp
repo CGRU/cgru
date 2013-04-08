@@ -338,7 +338,7 @@ void Msg::readHeader( int bytes)
 	}
 }
 
-void Msg::readwrite( Msg * msg)
+void Msg::v_readwrite( Msg * msg)
 {
 AFERROR("Msg::readwrite( Msg * msg): - Invalid call, use Msg::readwrite( bool write )")
 }
@@ -373,7 +373,7 @@ void Msg::createHTTPHeader()
 	if( m_type != Msg::TJSON )
 	{
 		AFERROR("Msg::createHTTPHeader(): Type is not JSON.")
-		stdOut();
+		v_stdOut();
 		return;
 	}
 	m_type = Msg::THTTP;
@@ -445,7 +445,7 @@ void Msg::setInvalid()
 	rw_header( true);
 }
 
-void Msg::generateInfoStream( std::ostringstream & stream, bool full) const
+void Msg::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	if( m_type <= Msg::TLAST) stream << Msg::TNAMES[m_type];
 	else stream << "!UNKNOWN!";
@@ -454,7 +454,7 @@ void Msg::generateInfoStream( std::ostringstream & stream, bool full) const
 
 void Msg::stdOutData( bool withHeader)
 {
-	if( withHeader) stdOut( true);
+	if( withHeader) v_stdOut( true);
 
 	switch( m_type)
 	{
@@ -470,7 +470,7 @@ void Msg::stdOutData( bool withHeader)
 	}
 	case Msg::TTESTDATA:
 	{
-		MCTest( this).stdOut( true);
+		MCTest( this).v_stdOut( true);
 		break;
 	}
 	case Msg::TString:

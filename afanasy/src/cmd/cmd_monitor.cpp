@@ -25,7 +25,7 @@ bool CmdMonitorList::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdMonitorList::v_msgOut( af::Msg& msg)
 {
    af::MCAfNodes list( &msg);
-   list.stdOut( Verbose);
+   list.v_stdOut( Verbose);
 }
 
 CmdMonitorLog::CmdMonitorLog()

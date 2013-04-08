@@ -87,7 +87,7 @@ NetIF::~NetIF()
 {
 }
 
-void NetIF::readwrite( Msg * msg)
+void NetIF::v_readwrite( Msg * msg)
 {
    rw_String(  name,    msg);
    rw_data(    (char*)macaddr, msg, MacAddrLen);
@@ -112,7 +112,7 @@ const std::string NetIF::getMACAddrString( bool withSeparators) const
    return str;
 }
 
-void NetIF::generateInfoStream( std::ostringstream & stream, bool full) const
+void NetIF::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( false == name.empty()) stream << name << ": ";
    stream << getMACAddrString( true);
@@ -122,7 +122,7 @@ void NetIF::generateInfoStream( std::ostringstream & stream, bool full) const
       {
          if( full ) stream << "\n      ";
          else stream << " ";
-         addresses[i].generateInfoStream( stream, full);
+         addresses[i].v_generateInfoStream( stream, full);
       }
    }
 }

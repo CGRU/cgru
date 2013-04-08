@@ -128,9 +128,9 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 		setPermanent( permanent);
 }
 
-void User::readwrite( Msg * msg)
+void User::v_readwrite( Msg * msg)
 {
-	Node::readwrite( msg);
+	Node::v_readwrite( msg);
 
 	rw_uint32_t( m_state,                 msg);
 	rw_uint32_t( m_flags,                 msg);
@@ -176,9 +176,9 @@ void User::setJobsSolveMethod( int i_method )
     }
 }
 
-int User::calcWeight() const
+int User::v_calcWeight() const
 {
-	int weight = Node::calcWeight();
+	int weight = Node::v_calcWeight();
 	weight += sizeof(User) - sizeof( Node);
 	weight += weigh(m_host_name);
 	weight += m_hosts_mask.weigh();
@@ -202,7 +202,7 @@ void User::generateErrorsSolvingStream( std::ostringstream & stream) const
    if( m_errors_forgive_time > 0 ) stream << " F" << af::time2strHMS( m_errors_forgive_time, true);
 }
 
-void User::generateInfoStream( std::ostringstream & stream, bool full) const
+void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
@@ -246,6 +246,6 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
             << " " << time2str( m_time_online)
             << " " <<  m_host_name
             << " " << (isPermanent() == 1 ? "P" : "T")
-            << " - " << calcWeight() << " bytes.";
+            << " - " << v_calcWeight() << " bytes.";
    }
 }

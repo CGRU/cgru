@@ -29,7 +29,7 @@ bool CmdRenderList::v_processArguments( int argc, char** argv, af::Msg &msg)
 void CmdRenderList::v_msgOut( af::Msg& msg)
 {
 	af::MCAfNodes list( &msg);
-	list.stdOut( Verbose);
+	list.v_stdOut( Verbose);
 }
 
 CmdRenderResoucesList::CmdRenderResoucesList()
@@ -56,7 +56,7 @@ void CmdRenderResoucesList::v_msgOut( af::Msg& msg)
 	for( int i = 0; i < list.getCount(); i++)
 	{
 	   af::Render * render = (af::Render*)(list.getNode(i));
-	   render->getHostRes().stdOut( false);
+	   render->getHostRes().v_stdOut( false);
 	}
 }
 

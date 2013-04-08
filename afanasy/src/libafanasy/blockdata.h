@@ -51,7 +51,7 @@ public:
 	inline  void setJobId( int value) { m_job_id = value;}   ///< Set id of block job.
 	inline  int  getJobId() const { return m_job_id;}        ///< Get id of block job.
 
-	virtual void generateInfoStream( std::ostringstream & o_str, bool full = false) const;
+	virtual void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const;
 	virtual void generateInfoStreamTasks( std::ostringstream & o_str, bool full = false) const;
 	void generateInfoStreamTyped( std::ostringstream & o_str, int type, bool full = false) const;
 	const std::string generateInfoStringTyped( int type, bool full = false) const;
@@ -266,7 +266,7 @@ public:
 
 protected:
 	/// Read or write block.
-	virtual void readwrite( Msg * msg);
+	virtual void v_readwrite( Msg * msg);
 
 protected:
 	int32_t m_job_id;   ///< Block job id.

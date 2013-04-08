@@ -255,7 +255,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
         if( i_verbose == af::VerboseOn )
         {
             AFERRPA("af::msgsend: connect failure for msgType '%s':\n%s: ",
-                af::Msg::TNAMES[i_msg->type()], i_address.generateInfoString().c_str())
+                af::Msg::TNAMES[i_msg->type()], i_address.v_generateInfoString().c_str())
         }
         closesocket(socketfd);
 /*
@@ -280,13 +280,13 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
     if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
     {
         AFERRPE("af::msgsend: set socket SO_SNDTIMEO option failed")
-        i_address.stdOut(); printf("\n");
+        i_address.v_stdOut(); printf("\n");
     }
     int nodelay = 1;
     if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) != 0)
     {
        AFERRPE("af::msgsend: set socket TCP_NODELAY option failed");
-       i_address.stdOut(); printf("\n");
+       i_address.v_stdOut(); printf("\n");
     }
 #endif //WINNT
     //
@@ -294,7 +294,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
     if( false == af::msgwrite( socketfd, i_msg))
     {
         AFERRAR("af::msgsend: can't send message to client: %s",
-                i_address.generateInfoString().c_str())
+                i_address.v_generateInfoString().c_str())
         closesocket(socketfd);
         io_ok = false;
         return NULL;
@@ -369,7 +369,7 @@ void af::statread( af::Msg * msg)
 
 void af::statout( int columns, int sorting)
 {
-   mgstat.stdOut( columns, sorting);
+   mgstat.v_stdOut( columns, sorting);
 }
 
 const af::Address af::solveNetName( const std::string & i_name, int i_port, int i_type, VerboseMode i_verbose)
@@ -437,7 +437,7 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
         if( i_verbose == af::VerboseOn )
         {
             printf("Address = ");
-            addr.stdOut();
+            addr.v_stdOut();
         }
 
         // Free memory allocated for addresses:
@@ -543,7 +543,7 @@ af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
     {
         AFERROR("af::msgsend: Message has no addresses to send to.");
         io_ok = false;
-        i_msg->stdOut();
+        i_msg->v_stdOut();
         return NULL;
     }
 

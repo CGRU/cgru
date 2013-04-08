@@ -20,7 +20,7 @@ public:
          int WeightProgress,
          int Weight);
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline size_t getCount()                        const { return ids.size(); }
    inline int getId(                 unsigned pos) const { if(pos<ids.size())return ids[pos];            else return -1; }
@@ -38,6 +38,6 @@ private:
    std::vector<int32_t> weightProgress;
    std::vector<int32_t> weight;
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

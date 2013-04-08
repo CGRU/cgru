@@ -17,7 +17,7 @@ public:
     void copy(  const Host & other);
     void merge( const Host & other);
 
-    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
     void generateServicesStream( std::ostringstream & stream) const; /// Generate services information.
     void printServices() const;
@@ -40,7 +40,7 @@ public:
 	int32_t m_wol_idlesleep_time;
 	int32_t m_idle_cpu;
 
-    void readwrite( Msg * msg); ///< Read or write Host in message.
+    void v_readwrite( Msg * msg); ///< Read or write Host in message.
 
 	void jsonWrite( std::ostringstream & o_str) const;
 
@@ -77,9 +77,9 @@ public:
     std::string label;
     std::string tooltip;
 
-    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-    void readwrite( Msg * msg); ///< Read or write Host Resources in message.
+    void v_readwrite( Msg * msg); ///< Read or write Host Resources in message.
 };
 
 class HostRes : public Af
@@ -120,13 +120,13 @@ public:
     int32_t net_send_kbsec;
 
     /// Generate information.
-    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
     void copy( const HostRes & other);
 
 	void jsonWrite( std::ostringstream & o_str) const;
 
-    void readwrite( Msg * msg); ///< Read or write Host Resources in message.
+    void v_readwrite( Msg * msg); ///< Read or write Host Resources in message.
 
     std::vector<HostResMeter*> custom;
 };

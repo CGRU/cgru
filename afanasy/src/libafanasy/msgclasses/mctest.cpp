@@ -43,9 +43,9 @@ MCTest::~MCTest()
    if( stringarray != NULL) delete [] stringarray;
 }
 
-void MCTest::readwrite( Msg * msg)
+void MCTest::v_readwrite( Msg * msg)
 {
-   MsgClassUserHost::readwrite( msg);
+   MsgClassUserHost::v_readwrite( msg);
 
    rw_int32_t(    number,     msg);
    rw_String(     string,     msg);
@@ -69,9 +69,9 @@ void MCTest::addString( const std::string & String)
    stringlist.push_back( String);
 }
 
-void MCTest::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTest::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::generateInfoStream( stream);
+   MsgClassUserHost::v_generateInfoStream( stream);
    stream << ": String = \"" << string << "\", Number = " << number << ".";
 
    if( full == false ) return;

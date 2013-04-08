@@ -22,7 +22,7 @@ public:
 
    virtual ~JobProgress();
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const; ///< Print job progress information.
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; ///< Print job progress information.
 
    inline void setJobId( int id ) { m_job_id = id;   } ///< Set job id.
    inline int  getJobId() const   { return m_job_id; } ///< Get job id.
@@ -56,6 +56,6 @@ private:
    int32_t m_job_id;               ///< Job id.
 
 private:
-   void readwrite( Msg * msg); ///< Read or write progress in buffer.
+   void v_readwrite( Msg * msg); ///< Read or write progress in buffer.
 };
 }

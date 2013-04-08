@@ -14,7 +14,7 @@ public:
    MCTaskOutput( Msg * msg);
    ~MCTaskOutput();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline const std::string & getRenderName() const { return rendername; }
    inline int getJobId()         const { return jobid;      }
@@ -33,6 +33,6 @@ private:
 
 private:
    bool allocateData();
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

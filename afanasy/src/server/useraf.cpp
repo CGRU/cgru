@@ -96,10 +96,10 @@ void UserAf::v_action( Action & i_action)
 	}
 }
 
-void UserAf::setZombie( MonitorContainer * i_monitoring)
+void UserAf::v_setZombie( MonitorContainer * i_monitoring)
 {
-	 AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
-	 AfNodeSrv::setZombie();
+	 AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
+	 AfNodeSrv::v_setZombie();
 	 if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
 	 appendLog( "Became a zombie.");
 	AFCommon::saveLog( getLog(), af::Environment::getUsersLogsDir(), m_name, af::Environment::getAfNodeLogsRotate());
@@ -178,7 +178,7 @@ af::Msg * UserAf::writeJobdsOrder() const
 	return af::jsonMsg( str);
 }
 
-void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 /*    if( isLocked() )
 	 {
@@ -193,7 +193,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
 			if( (currentTime-m_zombietime) > af::Environment::getUserZombieTime() )
 			{
 				appendLog( std::string("ZOMBIETIME: " + af::itos( af::Environment::getUserZombieTime()) + " seconds with no job."));
-				setZombie( monitoring);
+				v_setZombie( monitoring);
 				return;
 			}
 		}
@@ -230,16 +230,16 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
 	m_running_tasks_num = _runningtasksnumber;
 
 	// Update solving parameters:
-	calcNeed();
+	v_calcNeed();
 }
 
-void UserAf::calcNeed()
+void UserAf::v_calcNeed()
 {
 	 // Need calculation based on running tasks number
 	 calcNeedResouces( m_running_tasks_num);
 }
 
-bool UserAf::canRun()
+bool UserAf::v_canRun()
 {
 /*    if( isLocked() )
 	 {
@@ -268,9 +268,9 @@ bool UserAf::canRun()
 	 return true;
 }
 
-bool UserAf::canRunOn( RenderAf * i_render)
+bool UserAf::v_canRunOn( RenderAf * i_render)
 {
-	 if( false == canRun())
+	 if( false == v_canRun())
 	 {
 		  // Unable to run at all
 		  return false;
@@ -288,7 +288,7 @@ bool UserAf::canRunOn( RenderAf * i_render)
 	return true;
 }
 
-bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
+bool UserAf::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	 af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
 
@@ -312,9 +312,9 @@ bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 	 return false;
 }
 
-int UserAf::calcWeight() const
+int UserAf::v_calcWeight() const
 {
-	int weight = User::calcWeight();
+	int weight = User::v_calcWeight();
 //printf("UserAf::calcWeight: User::calcWeight: %d bytes\n", weight);
 	weight += sizeof(UserAf) - sizeof( User);
 //printf("UserAf::calcWeight: %d bytes ( sizeof UserAf = %d)\n", weight, sizeof( UserAf));

@@ -38,7 +38,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 	case af::Msg::TVersionMismatch:
 	{
-		AFCommon::QueueLogError( i_msg->generateInfoString( false));
+		AFCommon::QueueLogError( i_msg->v_generateInfoString( false));
 		o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
 		break;
 	}
@@ -62,7 +62,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TInvalid:
 	{
-		AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->generateInfoString( false));
+		AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->v_generateInfoString( false));
 		break;
 	}
 	case af::Msg::TNULL:
@@ -353,19 +353,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  { // FIXME: Better to return some message in any case.
 		 break;
 	  }
-	  o_msg_response = new af::Msg();
-
-	  std::string str = render->generateInfoString( true);
-	  str += "\n";
-	  str += render->getServicesString();
-	  std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
-	  if( servicelimits.size())
-	  {
-		 str += "\n";
-		 str += servicelimits;
-	  }
-
-	  o_msg_response->setString( str);
+	  o_msg_response = render->writeFullInfo();
 	  break;
 	}
 
@@ -482,7 +470,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 break;
 	  }
 	  o_msg_response = new af::Msg();
-	  o_msg_response->setString( job->getErrorHostsListString());
+	  o_msg_response->setString( job->v_getErrorHostsListString());
 	  break;
 	}
 	case af::Msg::TJobProgressRequestId:
@@ -615,7 +603,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 break;
 	  }
 	  o_msg_response = new af::Msg();
-	  o_msg_response->setString( job->getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
+	  o_msg_response->setString( job->v_getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
 	  break;
 	}
 	case af::Msg::TTaskOutputRequest:
@@ -756,7 +744,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	// -------------------------------------------------------------------------//
 	default:
 	{
-		AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->generateInfoString( false));
+		AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->v_generateInfoString( false));
 		break;
 	}
 	}

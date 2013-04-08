@@ -31,7 +31,7 @@ public:
    inline const std::list<int32_t> * getJobsUsersIds() const { return &jobsUsersIds; }
    inline const std::list<int32_t> * getJobsIds()      const { return &jobsIds;      }
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
 	
@@ -53,7 +53,7 @@ protected:
 
 private:
    bool construct();
-   void readwrite( Msg * msg); ///< Read or write Monitor in buffer.
+   void v_readwrite( Msg * msg); ///< Read or write Monitor in buffer.
 	//bool m_listening_port;
 };
 }

@@ -42,7 +42,7 @@ public:
 
    inline void updateTime() {  m_time_update   = time( NULL );} ///< Update client last update time.
 
-   virtual int calcWeight() const; ///< Calculate and return memory size.
+   virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
 

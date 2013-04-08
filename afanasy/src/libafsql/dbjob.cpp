@@ -46,6 +46,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_os,            &m_need_os             ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,    &m_need_properties     ));
    dbAddAttr( new DBAttrString( DBAttr::_description,        &m_description         ));
+	dbAddAttr( new DBAttrString( DBAttr::_customdata,         &m_custom_data         ));
 
    dbAddAttr( new DBAttrString( DBAttr::_name,               &m_name                ));
    dbAddAttr( new DBAttrString( DBAttr::_hostname,           &m_host_name            ));
@@ -60,13 +61,13 @@ DBJob::~DBJob()
 	if( progress != NULL ) delete progress;
 }
 
-af::BlockData * DBJob::newBlockData( af::Msg * msg)
+af::BlockData * DBJob::v_newBlockData( af::Msg * msg)
 {
 //printf("DBJob::createBlock:\n");
 	return new DBBlockData( msg);
 }
 
-af::BlockData * DBJob::newBlockData( const JSON & i_object, int i_num)
+af::BlockData * DBJob::v_newBlockData( const JSON & i_object, int i_num)
 {
 	return new DBBlockData( i_object, i_num);
 }
@@ -81,7 +82,7 @@ bool DBJob::dbAdd( PGconn * i_conn) const
     AFINFA("DBJob::dbAdd: name = '%s', id = %d", m_name.c_str(), m_id);
 
     std::list<std::string> queries;
-    dbInsert( &queries);
+    v_dbInsert( &queries);
     if( false == execute( i_conn, &queries))
     {
         AFERROR("Adding job to database failed.\n")
@@ -114,11 +115,11 @@ bool DBJob::dbAdd( PGconn * i_conn) const
     return o_result;
 }
 
-bool DBJob::dbSelect( PGconn * i_conn, const std::string * i_where)
+bool DBJob::v_dbSelect( PGconn * i_conn, const std::string * i_where)
 {
     AFINFA("DBJob::dbSelect: id = %d", m_id);
 
-   if( DBItem::dbSelect( i_conn) == false) return false;
+   if( DBItem::v_dbSelect( i_conn) == false) return false;
    if( m_blocksnum == 0)
    {
       AFERROR("DBJob::dbSelect: blocksnum == 0")
@@ -129,7 +130,7 @@ bool DBJob::dbSelect( PGconn * i_conn, const std::string * i_where)
    for( int b = 0; b < m_blocksnum; b++)
    {
       DBBlockData * dbBlock = new DBBlockData( b, m_id);
-      if( dbBlock->dbSelect( i_conn) == false)
+      if( dbBlock->v_dbSelect( i_conn) == false)
       {
          delete dbBlock;
          return false;
@@ -147,14 +148,14 @@ bool DBJob::dbSelect( PGconn * i_conn, const std::string * i_where)
    return true;
 }
 
-void DBJob::dbDelete( std::list<std::string> * queries) const
+void DBJob::v_dbDelete( std::list<std::string> * queries) const
 {
-   DBItem::dbDelete( queries);
+   DBItem::v_dbDelete( queries);
    if( m_id != AFJOB::SYSJOB_ID) // Do not add system job to statistics
       statistics.addJob( this, queries);
 }
 
 void DBJob::dbDeleteNoStatistics( std::list<std::string> * queries) const
 {
-   DBItem::dbDelete( queries);
+   DBItem::v_dbDelete( queries);
 }

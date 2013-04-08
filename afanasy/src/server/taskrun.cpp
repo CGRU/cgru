@@ -26,97 +26,97 @@ TaskRun::TaskRun( Task * runningTask,
                   MonitorContainer * monitoring,
                   int * runningtaskscounter
                   ):
-   task( runningTask),
-   block( taskBlock),
-   exec( taskExec),
-   progress( taskProgress),
-   tasknum( 0),
-   hostId( 0),
-   counter( runningtaskscounter),
-   stopTime( 0),
-   zombie( false)
+   m_task( runningTask),
+   m_block( taskBlock),
+   m_exec( taskExec),
+   m_progress( taskProgress),
+   m_tasknum( 0),
+   m_hostId( 0),
+   m_counter( runningtaskscounter),
+   m_stopTime( 0),
+   m_zombie( false)
 {
-AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
-   (*counter)++;
+AFINFA("TaskRun::TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
+   (*m_counter)++;
 
-   progress->percent = -1;
-   progress->frame = -1;
-   progress->percentframe = -1;
-   progress->hostname.clear();
-	progress->activity.clear();
+   m_progress->percent = -1;
+   m_progress->frame = -1;
+   m_progress->percentframe = -1;
+   m_progress->hostname.clear();
+	m_progress->activity.clear();
 
 	// Skip starting task if executable is not set (multihost task)
-	if( exec == NULL) return;
+	if( m_exec == NULL) return;
 
-   progress->state = AFJOB::STATE_RUNNING_MASK;
-   progress->starts_count++;
-   progress->time_start = time( NULL);
-   progress->time_done = progress->time_start;
-   tasknum = exec->getTaskNum();
-   hostId = render->getId();
-   progress->hostname = render->getName();
-   render->setTask( exec, monitoring);
-   task->monitor( monitoring );
-   task->updateDatabase();
-   task->appendLog( std::string("SESSION #") + af::itos( progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
+   m_progress->state = AFJOB::STATE_RUNNING_MASK;
+   m_progress->starts_count++;
+   m_progress->time_start = time( NULL);
+   m_progress->time_done = m_progress->time_start;
+   m_tasknum = m_exec->getTaskNum();
+   m_hostId = render->getId();
+   m_progress->hostname = render->getName();
+   render->setTask( m_exec, monitoring);
+   m_task->v_monitor( monitoring );
+   m_task->v_updateDatabase();
+   m_task->v_appendLog( std::string("SESSION #") + af::itos( m_progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
 }
 
 TaskRun::~TaskRun()
 {
-AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
-   if   ( *counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *counter)
-   else ( *counter )--;
-   if( exec) delete exec;
+AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
+   if   ( *m_counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *m_counter)
+   else ( *m_counter )--;
+   if( m_exec) delete m_exec;
 
-   if( progress->state & AFJOB::STATE_DONE_MASK    ) return;
-   if( progress->state & AFJOB::STATE_ERROR_MASK   ) return;
-   if( progress->state & AFJOB::STATE_SKIPPED_MASK ) return;
+   if( m_progress->state & AFJOB::STATE_DONE_MASK    ) return;
+   if( m_progress->state & AFJOB::STATE_ERROR_MASK   ) return;
+   if( m_progress->state & AFJOB::STATE_SKIPPED_MASK ) return;
 
-   progress->state = AFJOB::STATE_READY_MASK;
+   m_progress->state = AFJOB::STATE_READY_MASK;
 }
 
 void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
 {
-   if( zombie )
+   if( m_zombie )
    {
-      AFERRAR("TaskRun::update: task is zombie: %d", tasknum)
+      AFERRAR("TaskRun::update: task is zombie: %d", m_tasknum)
       return;
    }
-   if( taskup.getClientId() != hostId)
+   if( taskup.getClientId() != m_hostId)
    {
-      AFERRAR("TaskRun::update: taskup.getClientId() != hostId (%d != %d)", taskup.getClientId(), hostId)
+      AFERRAR("TaskRun::update: taskup.getClientId() != hostId (%d != %d)", taskup.getClientId(), m_hostId)
       return;
    }
-   if((progress->state & AFJOB::STATE_RUNNING_MASK) == false)
+   if((m_progress->state & AFJOB::STATE_RUNNING_MASK) == false)
    {
-      AFERRAR("TaskRun::update: %s[%d][%d] task is not running.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::update: %s[%d][%d] task is not running.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return;
    }
-   if( exec == NULL)
+   if( m_exec == NULL)
    {
-      AFERRAR("TaskRun::update: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::update: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return;
    }
 
-   progress->time_done = time( NULL);
+   m_progress->time_done = time( NULL);
 
    std::string message;
 
    switch ( taskup.getStatus())
    {
    case af::TaskExec::UPWarning:
-      if( false == (progress->state & AFJOB::STATE_WARNING_MASK))
+      if( false == (m_progress->state & AFJOB::STATE_WARNING_MASK))
       {
-         progress->state = progress->state | AFJOB::STATE_WARNING_MASK;
-         task->updateDatabase();
+         m_progress->state = m_progress->state | AFJOB::STATE_WARNING_MASK;
+         m_task->v_updateDatabase();
       }
    case af::TaskExec::UPPercent:
 //printf("TaskRun::update: case af::TaskExec::UPPercent:\n");
-      progress->percent      = taskup.getPercent();
-      progress->frame        = taskup.getFrame();
-      progress->percentframe = taskup.getPercentFrame();
-		if( taskup.getActivity().size() > 0 ) progress->activity = taskup.getActivity();
-      task->monitor( monitoring );
+      m_progress->percent      = taskup.getPercent();
+      m_progress->frame        = taskup.getFrame();
+      m_progress->percentframe = taskup.getPercentFrame();
+		if( taskup.getActivity().size() > 0 ) m_progress->activity = taskup.getActivity();
+      m_task->v_monitor( monitoring );
    case af::TaskExec::UPStarted:
    case af::TaskExec::UPNULL:
    case af::TaskExec::UPNoTaskRunning:
@@ -129,7 +129,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 		if( message.size() == 0)
 		{
 			message = "Parser finished success.";
-			progress->state = progress->state | AFJOB::STATE_PARSERSUCCESS_MASK;
+			m_progress->state = m_progress->state | AFJOB::STATE_PARSERSUCCESS_MASK;
 		}
 	case af::TaskExec::UPFinishedSuccess:
 	{
@@ -137,7 +137,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 		{
 			message = "Finished success.";
 		}
-		progress->state = progress->state | AFJOB::STATE_DONE_MASK;
+		m_progress->state = m_progress->state | AFJOB::STATE_DONE_MASK;
 		finish( message, renders, monitoring);
 		break;
 	}
@@ -147,18 +147,18 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       if( message.size() == 0)
       {
          message = "Parser error.";
-         progress->state = progress->state | AFJOB::STATE_PARSERERROR_MASK;
+         m_progress->state = m_progress->state | AFJOB::STATE_PARSERERROR_MASK;
       }
    case af::TaskExec::UPFinishedParserBadResult:
       if( message.size() == 0)
       {
          message = "Parser bad result.";
-         progress->state = progress->state | AFJOB::STATE_PARSERBADRESULT_MASK;
+         m_progress->state = m_progress->state | AFJOB::STATE_PARSERBADRESULT_MASK;
       }
    case af::TaskExec::UPFinishedError:
    {
       if( message.size() == 0) message = "Finished error.";
-      if( stopTime )
+      if( m_stopTime )
       {
          // Task was asked to be stopped before (skipped, restarted, ejected)
          finish("Stopped.", renders, monitoring);
@@ -166,9 +166,9 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       else
       {
          // Task stop was not planned, it is an error in any case
-         progress->state = progress->state | AFJOB::STATE_ERROR_MASK;
+         m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;
          // Increment number of errors before Finish provedure
-         progress->errors_count++;
+         m_progress->errors_count++;
          // In Finish procedure task updates it's progress database (and write there new number of errors)
          finish( message, renders, monitoring);
          errorHost = true;
@@ -205,35 +205,35 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 
 bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
-   if( exec == NULL)
+   if( m_exec == NULL)
    {
-      AFERRAR("TaskRun::refresh: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::refresh: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return false;
    }
 //printf("TaskRun::refresh: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
-   if( zombie ) return false;
+   if( m_zombie ) return false;
    bool changed = false;
 
    // Tasks with running time > maximum set to errors: // If it TasksMaxRunTime > 0 ( 0 is "infinite" )
-   if((block->m_data->getTasksMaxRunTime() != 0) && (currentTime - progress->time_start > block->m_data->getTasksMaxRunTime()))
+   if((m_block->m_data->getTasksMaxRunTime() != 0) && (currentTime - m_progress->time_start > m_block->m_data->getTasksMaxRunTime()))
    {
       stop("Task maximum run time reached.", renders, monitoring);
-      errorHostId = hostId;
+      errorHostId = m_hostId;
    }
 
    // Tasks update timeout check:
-   if(( stopTime == 0) && ( currentTime > progress->time_done + af::Environment::getTaskUpdateTimeout()))
+   if(( m_stopTime == 0) && ( currentTime > m_progress->time_done + af::Environment::getTaskUpdateTimeout()))
    {
       stop("Task update timeout.", renders, monitoring);
-      errorHostId = hostId;
+      errorHostId = m_hostId;
    }
 
    // Tasks stop timeout check:
-   if( stopTime &&( currentTime - stopTime > AFJOB::TASK_STOP_TIMEOUT ))
+   if( m_stopTime &&( currentTime - m_stopTime > AFJOB::TASK_STOP_TIMEOUT ))
    {
       finish("Task stop timeout.", renders, monitoring);
       if( changed == false) changed = true;
-      errorHostId = hostId;
+      errorHostId = m_hostId;
    }
 
    return changed;
@@ -242,95 +242,95 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 void TaskRun::stop( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("TaskRun::stop: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
-   if( zombie ) return;
-   if( stopTime ) return;
-   if( exec == NULL)
+   if( m_zombie ) return;
+   if( m_stopTime ) return;
+   if( m_exec == NULL)
    {
-      AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return;
    }
-   stopTime = time( NULL);
+   m_stopTime = time( NULL);
 
-   if( hostId != 0 )
+   if( m_hostId != 0 )
    {
       RenderContainerIt rendersIt( renders);
-      RenderAf * render = rendersIt.getRender( hostId);
-      if( render ) render->stopTask( exec);
+      RenderAf * render = rendersIt.getRender( m_hostId);
+      if( render ) render->stopTask( m_exec);
    }
 
-   task->appendLog( message);
+   m_task->v_appendLog( message);
 }
 
 void TaskRun::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("TaskRun::finish: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
-   if( zombie ) return;
+   if( m_zombie ) return;
 
-   stopTime = 0;
-   progress->state = progress->state & (~AFJOB::STATE_RUNNING_MASK);
-	progress->activity.clear();
+   m_stopTime = 0;
+   m_progress->state = m_progress->state & (~AFJOB::STATE_RUNNING_MASK);
+	m_progress->activity.clear();
 
-   if((hostId != 0) && exec)
+   if((m_hostId != 0) && m_exec)
    {
       RenderContainerIt rendersIt( renders);
-      RenderAf * render = rendersIt.getRender( hostId);
+      RenderAf * render = rendersIt.getRender( m_hostId);
       if( render )
       {
-         render->taskFinished( exec, monitoring);
-         block->taskFinished( exec, render, monitoring);
+         render->taskFinished( m_exec, monitoring);
+         m_block->taskFinished( m_exec, render, monitoring);
       }
    }
 
-   task->monitor( monitoring );
-   task->updateDatabase();
+   m_task->v_monitor( monitoring );
+   m_task->v_updateDatabase();
 
-   task->appendLog( message);
-   zombie = true;
+   m_task->v_appendLog( message);
+   m_zombie = true;
 }
 
 void TaskRun::restart( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
-   if( zombie ) return;
+   if( m_zombie ) return;
    stop( message+" Is running.", renders, monitoring);
 }
 
 void TaskRun::skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
-   if( zombie ) return;
-   progress->state = progress->state | AFJOB::STATE_SKIPPED_MASK;
-   progress->state = progress->state | AFJOB::STATE_DONE_MASK;
+   if( m_zombie ) return;
+   m_progress->state = m_progress->state | AFJOB::STATE_SKIPPED_MASK;
+   m_progress->state = m_progress->state | AFJOB::STATE_DONE_MASK;
    stop( message+" Is running.", renders, monitoring);
 }
 
 void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
 {
-   if( zombie ) return;
-   if( hostId == 0 ) return;
-   if( exec == NULL)
+   if( m_zombie ) return;
+   if( m_hostId == 0 ) return;
+   if( m_exec == NULL)
    {
-      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return;
    }
-printf("Listening running task:"); mclisten.stdOut();
+printf("Listening running task:"); mclisten.v_stdOut();
    RenderContainerIt rendersIt( renders);
-   RenderAf * render = rendersIt.getRender( hostId);
-   if( render != NULL) render->sendOutput( mclisten, block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
+   RenderAf * render = rendersIt.getRender( m_hostId);
+   if( render != NULL) render->sendOutput( mclisten, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
 }
 
 af::Msg * TaskRun::v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const
 {
-	if( exec == NULL)
+	if( m_exec == NULL)
 	{
 		o_error = "Not started.";
 		return NULL;
 	}
-	if( hostId > 0 )
+	if( m_hostId > 0 )
 	{
 		RenderContainerIt rendersIt( i_renders);
-		RenderAf * render = rendersIt.getRender( hostId);
+		RenderAf * render = rendersIt.getRender( m_hostId);
 		if( render != NULL )
 		{
-			af::MCTaskPos taskpos( block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
+			af::MCTaskPos taskpos( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
 			af::Msg * msg = new af::Msg( af::Msg::TTaskOutputRequest, &taskpos);
 			msg->setAddress( render);
 			return msg;
@@ -349,6 +349,6 @@ af::Msg * TaskRun::v_getOutput( int i_startcount, RenderContainer * i_renders, s
 int TaskRun::calcWeight() const
 {
    int weight = sizeof( TaskRun);
-   if( exec) weight += exec->calcWeight();
+   if( m_exec) weight += m_exec->calcWeight();
    return weight;
 }

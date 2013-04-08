@@ -35,7 +35,7 @@ AFINFO("MCAfNodes::~MCAfNodes: deleing nodes.")
    for( unsigned i = 0; i < list.size(); i++) delete list[i];
 }
 
-void MCAfNodes::readwrite( Msg * msg)
+void MCAfNodes::v_readwrite( Msg * msg)
 {
    uint32_t count = uint32_t(list.size());
    rw_uint32_t( count, msg);
@@ -103,11 +103,11 @@ void MCAfNodes::addNode( Af * node)
    list.push_back( node );
 }
 
-void MCAfNodes::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCAfNodes::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( readonly == true) for( unsigned i = 0; i < list.size(); i++)
    {
-      list[i]->generateInfoStream( stream, full);
+      list[i]->v_generateInfoStream( stream, full);
       stream << std::endl;
    }
    stream << "Quantity = " << list.size();

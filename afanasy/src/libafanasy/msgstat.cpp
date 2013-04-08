@@ -139,7 +139,7 @@ void MsgStat::readStat( af::Msg * msg)
    read( msg);
 }
 
-void MsgStat::readwrite( af::Msg * msg)
+void MsgStat::v_readwrite( af::Msg * msg)
 {
    for( int s = 0; s < STORE; s++)
    {
@@ -155,12 +155,12 @@ void MsgStat::readwrite( af::Msg * msg)
    }
 }
 
-void MsgStat::stdOut( bool full ) const
+void MsgStat::v_stdOut( bool full ) const
 {
-   stdOut( DIVISIONS, true );
+   v_stdOut( DIVISIONS, true );
 }
 
-void MsgStat::stdOut( int columns, int sorting) const
+void MsgStat::v_stdOut( int columns, int sorting) const
 {
    if((columns > STORE) || ( columns < 0 )) columns = STORE;
 

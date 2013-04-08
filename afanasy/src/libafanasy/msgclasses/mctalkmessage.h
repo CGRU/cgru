@@ -15,11 +15,11 @@ public:
    inline void getUser( std::string & str) const { str=user; }
    inline void getText( std::string & str) const { str=text; }
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 private:
    std::string user;
    std::string text;
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

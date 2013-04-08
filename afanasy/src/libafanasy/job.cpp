@@ -100,7 +100,7 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
 	for( int b = 0; b < m_blocksnum; b++)
 	{
-		m_blocksdata[b] = newBlockData( blocks[b], b);
+		m_blocksdata[b] = v_newBlockData( blocks[b], b);
 		if( m_blocksdata[b] == NULL)
 		{
 			AFERROR("Job::jsonRead: Can not allocate memory for new block.\n");
@@ -221,9 +221,9 @@ Job::~Job()
    }
 }
 
-void Job::readwrite( Msg * msg)
+void Job::v_readwrite( Msg * msg)
 {
-	Node::readwrite( msg);
+	Node::v_readwrite( msg);
 
 	rw_int32_t ( m_blocksnum,                  msg);
 	rw_uint32_t( m_flags,                      msg);
@@ -276,7 +276,7 @@ void Job::rw_blocks( Msg * msg)
 	  for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
 	  for( int b = 0; b < m_blocksnum; b++)
       {
-		 m_blocksdata[b] = newBlockData( msg);
+		 m_blocksdata[b] = v_newBlockData( msg);
 		 if( m_blocksdata[b] == NULL)
          {
             AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
@@ -288,19 +288,19 @@ void Job::rw_blocks( Msg * msg)
 	m_valid = true;
 }
 
-BlockData * Job::newBlockData( Msg * msg)
+BlockData * Job::v_newBlockData( Msg * msg)
 {
    return new BlockData( msg);
 }
 
-BlockData * Job::newBlockData( const JSON & i_object, int i_num)
+BlockData * Job::v_newBlockData( const JSON & i_object, int i_num)
 {
    return new BlockData( i_object, i_num);
 }
 
-int Job::calcWeight() const
+int Job::v_calcWeight() const
 {
-	int weight = Node::calcWeight();
+	int weight = Node::v_calcWeight();
 	weight += sizeof(Job) - sizeof( Node);
 	for( int b = 0; b < m_blocksnum; b++) weight += m_blocksdata[b]->calcWeight();
 	weight += weigh( m_description);
@@ -332,7 +332,7 @@ void Job::generateInfoStreamBlocks( std::ostringstream & o_str, bool full) const
 	for( int b = 0; b < m_blocksnum; b++)
 	{
 		o_str << std::endl << std::endl;
-		m_blocksdata[b]->generateInfoStream( o_str, full);
+		m_blocksdata[b]->v_generateInfoStream( o_str, full);
 		o_str << std::endl << std::endl;
 		m_blocksdata[b]->generateInfoStreamTasks( o_str, full);
 		o_str << std::endl << std::endl;
@@ -374,7 +374,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
 
    if((full == false) && display_blocks)
    {
-	  o_str << " - " << calcWeight() << " bytes.";
+	  o_str << " - " << v_calcWeight() << " bytes.";
       return;
    }
 
@@ -408,7 +408,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
 }
  
-void Job::generateInfoStream( std::ostringstream & o_str, bool full) const
+void Job::v_generateInfoStream( std::ostringstream & o_str, bool full) const
 {
 	generateInfoStreamJob( o_str, full);
 
@@ -419,7 +419,7 @@ void Job::generateInfoStream( std::ostringstream & o_str, bool full) const
 		for( int b = 0; b < m_blocksnum; b++)
 		{
 			o_str << std::endl << std::endl;
-			m_blocksdata[b]->generateInfoStream( o_str, false);
+			m_blocksdata[b]->v_generateInfoStream( o_str, false);
 		}
 	}
 }

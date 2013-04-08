@@ -56,9 +56,9 @@ bool MCTasksPos::addTask( int numblock, int numtask)
    return true;
 }
 
-void MCTasksPos::readwrite( Msg * msg)
+void MCTasksPos::v_readwrite( Msg * msg)
 {
-   MsgClassUserHost::readwrite( msg);
+   MsgClassUserHost::v_readwrite( msg);
 
    rw_int32_t( jobid,      msg);
    rw_bool(    has_tasks,  msg);
@@ -71,9 +71,9 @@ void MCTasksPos::readwrite( Msg * msg)
    rw_Int32_Vect( numtasks, msg);
 }
 
-void MCTasksPos::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTasksPos::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::generateInfoStream( stream, full);
+   MsgClassUserHost::v_generateInfoStream( stream, full);
    stream << "\nJob id = " << jobid;
    for( unsigned p = 0; p < numbloks.size(); p++)
    {

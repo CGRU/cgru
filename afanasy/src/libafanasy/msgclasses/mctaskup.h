@@ -46,7 +46,7 @@ public:
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
 
-	void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 private:
 	int32_t m_clientid;
@@ -68,6 +68,6 @@ private:
 	bool m_deleteData;
 
 private:
-	void readwrite( Msg * msg);
+	void v_readwrite( Msg * msg);
 };
 }

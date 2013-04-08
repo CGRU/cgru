@@ -77,7 +77,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 	setDone(    job->isDone()    );
 	setError(   job->isError()   );
 
-   annotation           = afqt::stoq( job->getAnnontation().c_str());
+   annotation           = afqt::stoq( job->getAnnotation().c_str());
    priority             = job->getPriority();
    username             = afqt::stoq( job->getUserName().c_str());
    hostname             = afqt::stoq( job->getHostName().c_str());
@@ -136,7 +136,7 @@ void ItemJob::updateValues( af::Node *node, int type)
       user_time += " (LOCK)";
    }
 
-   tooltip = job->generateInfoString( true).c_str();
+   tooltip = job->v_generateInfoString( true).c_str();
 
    calcHeight();
 }

@@ -37,7 +37,7 @@ public:
 
 	virtual ~JobAf();
 
-	virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
+    virtual void v_setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
 
 	void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
@@ -51,8 +51,8 @@ public:
 	af::Msg * writeErrorHosts( int b, int t) const;
 	void writeErrorHosts( std::list<std::string> & o_list) const;
 
-	const std::string getErrorHostsListString() const; /// Get avoid hosts list.
-	virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
+    const std::string v_getErrorHostsListString() const; /// Get avoid hosts list.
+    virtual const std::string v_getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
 	const std::list<std::string> & getTaskLog( int block, int task) const;
@@ -68,30 +68,30 @@ public:
 
 /// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/
-	 bool canRun();
+     bool v_canRun();
 
 /// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/
-	 bool canRunOn( RenderAf * i_render);
+     bool v_canRunOn( RenderAf * i_render);
 
 /// Solve a job. Job send ready task to Render, if any.
-	virtual bool solve( RenderAf *render, MonitorContainer * monitoring);
+    virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
 
 /// Update task state.
-	virtual void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
+    virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Send tasks output to a specified address.
 	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 
 	void skipTasks(    const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Skip some tasks.
-	virtual void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
+    virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 /// Refresh job. Calculate attributes from tasks progress.
-	virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+    virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 	virtual void v_action( Action & i_action);
 
-	virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
+    virtual bool v_dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
 	void setUser( UserAf * i_user);
 
@@ -108,7 +108,7 @@ public:
 
 	int getUid() const;
 
-	virtual int calcWeight()          const;  ///< Calculate and return memory size.
+	virtual int v_calcWeight()          const;  ///< Calculate and return memory size.
 	inline  int getLogsWeight()       const { return m_logsWeight;}        ///< Get job and all its tasks logs weight ( this value is stored after \c calcWeight method).
 	inline  int getBlackListsWeight() const { return m_blackListsWeight;}  ///< Get job and all its tasks black lists weight ( this value is stored after \c calcWeight method).
 	inline  int getProgressWeight()   const { return progressWeight;}    ///< Get job tasks progress ( this value is stored after \c calcWeight method).
@@ -129,9 +129,9 @@ protected:
 	/// Allocate JobInfo, tasksLog.
 	bool construct();
 
-	virtual Block * newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
+    virtual Block * v_newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
 
-	void calcNeed();
+    void v_calcNeed();
 
 protected:
 	Block ** m_blocks;              ///< Blocks.

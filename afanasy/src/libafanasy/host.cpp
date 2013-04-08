@@ -118,7 +118,7 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 	o_str << "}";
 }
 
-void Host::readwrite( Msg * msg)
+void Host::v_readwrite( Msg * msg)
 {
 	rw_int32_t( m_max_tasks,          msg );
 	rw_int32_t( m_capacity,           msg );
@@ -131,7 +131,7 @@ void Host::readwrite( Msg * msg)
 	rw_String ( m_data,               msg );
 }
 
-void Host::generateInfoStream( std::ostringstream & stream, bool full) const
+void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "Host: ";
 
@@ -177,7 +177,7 @@ void Host::printServices() const
 HostResMeter::HostResMeter(){}
 HostResMeter::HostResMeter( Msg * msg){ read( msg);}
 
-void HostResMeter::readwrite( Msg * msg)
+void HostResMeter::v_readwrite( Msg * msg)
 {
     rw_int32_t( value,      msg);
     rw_int32_t( valuemax,   msg);
@@ -197,7 +197,7 @@ void HostResMeter::readwrite( Msg * msg)
     rw_String(  tooltip,    msg);
 }
 
-void HostResMeter::generateInfoStream( std::ostringstream & stream, bool full) const
+void HostResMeter::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
     stream << label   << ": ";
     stream << value   << " of " << valuemax;
@@ -327,7 +327,7 @@ void HostRes::jsonWrite( std::ostringstream & o_str) const
 	o_str << '}';
 }
 
-void HostRes::readwrite( Msg * msg)
+void HostRes::v_readwrite( Msg * msg)
 {
     rw_int32_t( cpu_num,      msg);
     rw_int32_t( cpu_mhz,      msg);
@@ -370,7 +370,7 @@ void HostRes::readwrite( Msg * msg)
         else custom.push_back( new HostResMeter( msg));
 }
 
-void HostRes::generateInfoStream( std::ostringstream & stream, bool full) const
+void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
     stream << "Resources: ";
     if( full)
@@ -420,6 +420,6 @@ void HostRes::generateInfoStream( std::ostringstream & stream, bool full) const
     for( unsigned i = 0; i < custom.size(); i++ )
     {
         stream << std::endl;
-        custom[i]->generateInfoStream( stream, full);
+        custom[i]->v_generateInfoStream( stream, full);
     }
 }

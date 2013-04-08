@@ -81,8 +81,9 @@ int     Environment::task_errors_same_host =           AFUSER::TASK_ERRORS_SAME_
 
 int         Environment::sysjob_tasklife =            AFJOB::SYSJOB_TASKLIFE;
 int         Environment::sysjob_tasksmax =            AFJOB::SYSJOB_TASKSMAX;
-std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_BLOCKSERVICE;
-std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_BLOCKSERVICE;
+std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_SERVICE;
+std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_SERVICE;
+std::string Environment::sysjob_events_service =      AFJOB::SYSJOB_EVENTS_SERVICE;
 
 int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
 
@@ -246,6 +247,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, sysjob_tasksmax,                   "af_sysjob_tasksmax"                   );
 	getVar( i_obj, sysjob_postcmd_service,            "af_sysjob_postcmd_service"            );
 	getVar( i_obj, sysjob_wol_service,                "af_sysjob_wol_service"                );
+	getVar( i_obj, sysjob_events_service,             "af_sysjob_events_service"             );
 
 	getVar( i_obj, user_zombietime,                   "af_user_zombietime"                   );
 

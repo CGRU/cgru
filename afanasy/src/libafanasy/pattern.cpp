@@ -56,7 +56,7 @@ void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 		stream << std::endl;
 	}
 
-	host.generateInfoStream( stream, full);
+	host.v_generateInfoStream( stream, full);
 	stream << std::endl;
 	host.generateServicesStream( stream);
 

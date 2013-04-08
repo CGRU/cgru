@@ -12,7 +12,7 @@ public:
    MCTaskPos( Msg * msg);
    ~MCTaskPos();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline int getJobId()    const { return jobid;    }
    inline int getNumBlock() const { return blocknum; }
@@ -25,6 +25,6 @@ private:
    int32_t tasknum;
    int32_t number;
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

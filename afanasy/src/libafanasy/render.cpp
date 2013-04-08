@@ -125,7 +125,7 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	}
 }
 
-void Render::readwrite( Msg * msg)
+void Render::v_readwrite( Msg * msg)
 {
    switch( msg->type())
    {
@@ -164,14 +164,14 @@ void Render::readwrite( Msg * msg)
 	  rw_uint32_t( m_flags,        msg);
 	  rw_uint8_t ( m_priority,     msg);
 	  rw_int64_t ( m_time_launch,  msg);
-	  m_host.readwrite( msg);
-	  m_address.readwrite( msg);
+	  m_host.v_readwrite( msg);
+	  m_address.v_readwrite( msg);
 
    case Msg::TRenderUpdate:
    case Msg::TRendersResources:
 
 		rw_int64_t( m_idle_time, msg);
-	  m_hres.readwrite( msg);
+	  m_hres.v_readwrite( msg);
 
       break;
    default:
@@ -202,15 +202,15 @@ void Render::checkDirty()
 	  m_state = m_state | SDirty;
 }
 
-int Render::calcWeight() const
+int Render::v_calcWeight() const
 {
-   int weight = Client::calcWeight();
+   int weight = Client::v_calcWeight();
    weight += sizeof(Render) - sizeof( Client);
    for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++) weight += (*it)->calcWeight();
    return weight;
 }
 
-void Render::generateInfoStream( std::ostringstream & stream, bool full) const
+void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
@@ -220,7 +220,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       if( isDirty()) stream << "\nDirty! Capacity|Max Tasks changed, or service(s) disabled.";
 
       stream << std::endl;
-	  m_address.generateInfoStream( stream ,full);
+	  m_address.v_generateInfoStream( stream ,full);
 
 		stream << "\n Status:";
 		if( isOnline()) stream << " Online";
@@ -243,7 +243,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 	  if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
 
       stream << std::endl;
-	  m_host.generateInfoStream( stream, full);
+	  m_host.v_generateInfoStream( stream, full);
 
 	  if( m_netIFs.size())
       {
@@ -251,7 +251,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 		 for( int i = 0; i < m_netIFs.size(); i++)
          {
             stream << "\n   ";
-			m_netIFs[i]->generateInfoStream( stream, true);
+			m_netIFs[i]->v_generateInfoStream( stream, true);
          }
       }
 
@@ -279,7 +279,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 
 		stream << " v'" << m_version << "'";
 		stream << " ";
-		m_address.generateInfoStream( stream ,full);
+		m_address.v_generateInfoStream( stream ,full);
 //      stream << " - " << calcWeight() << " bytes.";
    }
 }

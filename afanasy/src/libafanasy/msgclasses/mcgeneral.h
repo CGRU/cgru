@@ -26,7 +26,7 @@ public:
    inline void addId( int ID) { list.push_back( ID);}
    inline void setId( int ID) { id = ID;}
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline const std::string & getName()   const { return name;   }
    inline const std::string & getString() const { return string; }
@@ -53,6 +53,6 @@ private:
 
    std::vector<int32_t> list;
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

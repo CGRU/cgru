@@ -30,23 +30,23 @@ public:
 
 	/// Whether the user can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
-	bool canRun();
+	bool v_canRun();
 
 	/// Whether the user can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
-	bool canRunOn( RenderAf * i_render);
+	bool v_canRunOn( RenderAf * i_render);
 
-	bool solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
+	bool v_solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
 
 	void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 	
 	bool getJobs( std::ostringstream & o_str);
 
-	void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);///< Refresh user attributes corresponding on jobs information.
+	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);///< Refresh user attributes corresponding on jobs information.
 
 	virtual void v_action( Action & i_action);
 
-	virtual int calcWeight() const; ///< Calculate and return memory size.
+	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
 	inline AfList * getJobsList() { return &m_jobslist; }
 
@@ -58,12 +58,12 @@ public:
 	inline static void setUserContainer( UserContainer * i_users ) { ms_users = i_users;}
 
 protected:
-	void calcNeed();
+	void v_calcNeed();
 
 private:
 	void construct();
 	void updateJobsOrder( af::Job * newJob = NULL);
-	void setZombie( MonitorContainer * i_monitoring);    ///< Set user to zombie.
+	void v_setZombie( MonitorContainer * i_monitoring);    ///< Set user to zombie.
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:

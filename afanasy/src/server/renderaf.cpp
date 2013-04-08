@@ -80,19 +80,19 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 
 	if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
 
-	appendLog( m_hres.generateInfoString());
+	appendLog( m_hres.v_generateInfoString());
 
 	if( toZombie )
 	{
-		AFCommon::QueueLog("Render Deleting: " + generateInfoString( false));
+		AFCommon::QueueLog("Render Deleting: " + v_generateInfoString( false));
 		appendLog("Waiting for deletion.");
-		setZombie();
+		v_setZombie();
 	  AFCommon::saveLog( getLog(), af::Environment::getRendersLogsDir(), m_name, af::Environment::getAfNodeLogsRotate());
 		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, m_id);
 	}
 	else
 	{
-		AFCommon::QueueLog("Render Offline: " + generateInfoString( false));
+		AFCommon::QueueLog("Render Offline: " + v_generateInfoString( false));
 		appendLog("Offline.");
 		m_time_launch = 0;
 		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
@@ -176,13 +176,13 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 		msg->setAddress( this);
 		AFCommon::QueueMsgDispatch( msg);
 		std::string str = "Starting task: ";
-		str += taskexec->generateInfoString( false);
+		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
 	else
 	{
 		std::string str = "Captured by task: ";
-		str += taskexec->generateInfoString( false);
+		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
 }
@@ -203,14 +203,14 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 		AFCommon::QueueMsgDispatch( msg);
 
 		std::string str = "Starting service: ";
-		str += taskexec->generateInfoString( false);
+		str += taskexec->v_generateInfoString( false);
 		appendLog( str);
 
 		return;
 	}
 
 	AFERROR("RenderAf::startTask: No such task.")
-	taskexec->stdOut( false);
+	taskexec->v_stdOut( false);
 }
 
 void RenderAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_renders->sortPriority( this);}
@@ -322,7 +322,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
 		id_blocks.push_back( (*it)->getBlockNum());
 		id_tasks.push_back( (*it)->getTaskNum());
 		numbers.push_back( (*it)->getNumber());
-		appendLog( std::string("Ejecting task: ") + (*it)->generateInfoString( false));
+		appendLog( std::string("Ejecting task: ") + (*it)->v_generateInfoString( false));
 	}
 	JobContainerIt jobsIt( jobs);
 	std::list<int>::const_iterator jIt = id_jobs.begin();
@@ -336,7 +336,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
 		if( job != NULL )
 		{
 			af::MCTaskUp taskup( m_id, *jIt, *bIt, *tIt, *nIt, upstatus);
-			job->updateTaskState( taskup, ms_renders, monitoring);
+			job->v_updateTaskState( taskup, ms_renders, monitoring);
 		}
 	}
 }
@@ -441,13 +441,13 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 	if( taskexec->getNumber())
 	{
 		std::string str = "Finished service: ";
-		str += taskexec->generateInfoString( false);
+		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
 	else
 	{
 		std::string str = "Finished task: ";
-		str += taskexec->generateInfoString( false);
+		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
 	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
@@ -492,7 +492,7 @@ void RenderAf::removeTask( const af::TaskExec * taskexec)
 	else m_capacity_used -= taskexec->getCapResult();
 }
 
-void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
+void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
 {
 	if( isLocked() ) return;
 
@@ -775,6 +775,8 @@ af::Msg * RenderAf::jsonWriteSrvFarm() const
 	str << ",\"render\":";
 	af::Render::v_jsonWrite( str, af::Msg::TRendersList);
 
+	str << ",\"custom_data\":\"" << m_custom_data << '"';
+
 	str << ",";
 	jsonWriteServices( str);
 
@@ -791,9 +793,30 @@ af::Msg * RenderAf::jsonWriteSrvFarm() const
 	return af::jsonMsg( str);
 }
 
-int RenderAf::calcWeight() const
+af::Msg * RenderAf::writeFullInfo() const
 {
-	int weight = Render::calcWeight();
+	af::Msg * o_msg = new af::Msg();
+
+	std::string str = v_generateInfoString( true);
+	if( m_custom_data.size())
+		str += "\nCustom Data:\n" + m_custom_data;
+	str += "\n";
+	str += getServicesString();
+	std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
+	if( servicelimits.size())
+	{
+		str += "\n";
+		str += servicelimits;
+	}
+
+	o_msg->setString( str);
+
+	return o_msg;
+}
+
+int RenderAf::v_calcWeight() const
+{
+	int weight = Render::v_calcWeight();
 //printf("RenderAf::calcWeight: Render::calcWeight: %d bytes\n", weight);
 	weight += sizeof(RenderAf) - sizeof( Render);
 //printf("RenderAf::calcWeight: %d bytes ( sizeof RenderAf = %d)\n", weight, sizeof( Render));

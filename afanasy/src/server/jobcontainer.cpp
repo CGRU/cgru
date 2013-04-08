@@ -47,7 +47,7 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
     JobAf* job = jobsIt.getJob( taskup.getNumJob());
     if( job != NULL )
     {
-        job->updateTaskState( taskup, renders, monitoring);
+        job->v_updateTaskState( taskup, renders, monitoring);
         return;
     }
 
@@ -159,7 +159,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
             AfContainerLock jLock( this, AfContainerLock::WRITELOCK);
             AfContainerLock uLock( users, AfContainerLock::WRITELOCK);
             user->unLock();
-            job->setZombie( NULL, NULL);
+            job->v_setZombie( NULL, NULL);
         }
 
         return 0;
@@ -195,7 +195,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
         monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
     }
 
-    AFCommon::QueueLog("Job registered: " + job->generateInfoString());
+    AFCommon::QueueLog("Job registered: " + job->v_generateInfoString());
     int newJobId = job->getId();
 
     AFINFO("JobContainer::job_register: unlocking user and job.")
@@ -215,7 +215,7 @@ void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )
    JobContainerIt jobsIt( this);
    for( JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
    {
-      int weight = job->calcWeight();
+      int weight = job->v_calcWeight();
       jobsWeight.add(
             job->getName(),
             job->getId(),

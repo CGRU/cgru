@@ -67,7 +67,7 @@ Dialog::Dialog():
 
    talk = new TalkHost();
    init = true;
-   talk->stdOut();
+   talk->v_stdOut();
 
    sendRegister();
 }
@@ -165,7 +165,7 @@ void Dialog::caseMessage( af::Msg * msg)
    }
    default:
       AFERROR("Dialog::caseMessage Unknown message recieved.\n");
-      msg->stdOut();
+      msg->v_stdOut();
    }
    delete msg;
 }

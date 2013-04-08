@@ -41,19 +41,19 @@ void TalkAf::v_action( Action & i_action)
 	}
 }
 
-void TalkAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void TalkAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 //printf("TalkAf::refresh: \"%s\"\n", getName().toUtf8().data());
    if( getTimeUpdate() < (currentTime - af::Environment::getTalkZombieTime()))
    {
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksDel, m_id);
-      setZombie();
+      v_setZombie();
    }
 }
 
-void TalkAf::setZombie()
+void TalkAf::v_setZombie()
 {
-   AFCommon::QueueLog("Deleting talk: " + generateInfoString( false));
+   AFCommon::QueueLog("Deleting talk: " + v_generateInfoString( false));
 
-	AfNodeSrv::setZombie();
+	AfNodeSrv::v_setZombie();
 }

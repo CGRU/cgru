@@ -22,7 +22,7 @@ public:
 
    virtual ~Render();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 	inline bool isOnline()  const { return (m_state & SOnline ); }///< Whether Render is online.
 	inline bool isBusy()    const { return (m_state & SBusy   ); }///< Whether Render is busy.
@@ -83,7 +83,7 @@ public:
    void setCapacity( int value) { m_capacity = value; checkDirty();}
    void setMaxTasks( int value) { m_max_tasks = value; checkDirty();}
 
-   virtual int calcWeight() const; ///< Calculate and return memory size.
+   virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
    inline long long getTasksStartFinishTime() const { return m_task_start_finish_time; }///< Get tasks start or finish time.
    inline const std::list<TaskExec*> & getTasks() { return m_tasks;}
@@ -132,6 +132,6 @@ private:
    void construct();
 
 protected:
-   void readwrite( Msg * msg); ///< Read or write Render in message.
+   void v_readwrite( Msg * msg); ///< Read or write Render in message.
 };
 }

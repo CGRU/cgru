@@ -36,7 +36,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    else        setNotRunning();
 
    priority             = user->getPriority();
-   annotation           = afqt::stoq( user->getAnnontation());
+   annotation           = afqt::stoq( user->getAnnotation());
    hostname             = afqt::stoq( user->getHostName());
    numjobs              = user->getNumJobs();
    numrunningtasks      = user->getRunningTasksNumber();
@@ -76,7 +76,7 @@ void ItemUser::updateValues( af::Node *node, int type)
         strRightBottom = "Ord";
     }
 
-   tooltip = user->generateInfoString( true).c_str();
+   tooltip = user->v_generateInfoString( true).c_str();
 
    calcHeight();
 }

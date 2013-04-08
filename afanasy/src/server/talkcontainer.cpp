@@ -28,7 +28,7 @@ af::Msg * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring
    int id = addClient( newTalk, true, monitoring, af::Msg::TMonitorTalksDel);
    if( id != 0 )
    {
-      AFCommon::QueueLog("Talk registered: " + newTalk->generateInfoString( false));
+      AFCommon::QueueLog("Talk registered: " + newTalk->v_generateInfoString( false));
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksAdd, id);
       af::Msg* msg = generateList( af::Msg::TTalksList);
       msg->setAddress( newTalk);

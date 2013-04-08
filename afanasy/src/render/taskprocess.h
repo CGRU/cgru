@@ -8,8 +8,6 @@
 #include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"
 
-#include "childprocess.h"
-
 class ParserHost;
 
 class TaskProcess

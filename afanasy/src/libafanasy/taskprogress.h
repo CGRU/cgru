@@ -15,7 +15,7 @@ public:
 
    virtual ~TaskProgress();
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const; ///< Generate information string.
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; ///< Generate information string.
 
    virtual int calcWeight() const;
 
@@ -36,7 +36,7 @@ public:
    std::string hostname;           ///< Host, last event occurs where.
 	std::string activity;			///< Task activity that was parsed.
 
-   void readwrite( Msg * msg); ///< Read or write progress in buffer.
+   void v_readwrite( Msg * msg); ///< Read or write progress in buffer.
 
 	void jsonWrite( std::ostringstream & o_str) const;
 };

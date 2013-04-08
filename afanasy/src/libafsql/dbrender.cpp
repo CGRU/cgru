@@ -52,20 +52,20 @@ const std::string DBRender::dbGetIDsCmd()
    return std::string("SELECT id FROM ") + TableName;
 }
 
-void DBRender::dbInsert( std::list<std::string> * queries) const
+void DBRender::v_dbInsert( std::list<std::string> * queries) const
 {
    updateNetIFs();
-   DBItem::dbInsert( queries);
+   DBItem::v_dbInsert( queries);
 }
-void DBRender::dbUpdate( std::list<std::string> * queries, int attr) const
+void DBRender::v_dbUpdate( std::list<std::string> * queries, int attr) const
 {
    updateNetIFs();
-   DBItem::dbUpdate( queries, attr);
+   DBItem::v_dbUpdate( queries, attr);
 }
-bool DBRender::dbSelect( PGconn * i_conn, const std::string * i_where)
+bool DBRender::v_dbSelect( PGconn * i_conn, const std::string * i_where)
 {
 //printf("DBRender::dbSelect:\n");
-   if( DBItem::dbSelect( i_conn, i_where) == false) return false;
+   if( DBItem::v_dbSelect( i_conn, i_where) == false) return false;
 
 // This render came from database on core init, it can't be online or busy
    setOffline();

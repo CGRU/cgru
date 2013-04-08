@@ -53,13 +53,13 @@ int ClientContainer::addClient( AfNodeSrv * i_nodesrv, bool deleteSameAddress, M
 			{
 				if( deleteSameAddress)
 				{
-					node->setZombie();
+					node->v_setZombie();
 					if( monitoring ) monitoring->addEvent( msgEventType, client->getId());
 				}
 				else
 				{
-					AFCommon::QueueLogError( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
-					AFINFO( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
+					AFCommon::QueueLogError( std::string("Client with this address already exists: ") + newClient->getAddress().v_generateInfoString());
+					AFINFO( std::string("Client with this address already exists: ") + newClient->getAddress().v_generateInfoString());
 					delete newClient;
 					AFINFO("ClientContainer::addClient: Client deleted. Returning zero...");
 					return 0;

@@ -142,7 +142,7 @@ void Watch::caseMessage( af::Msg * msg)
    if( false == recieved)
    {
       AFERROR("Watch::caseMessage: Unknown message recieved:")
-      msg->stdOut();
+      msg->v_stdOut();
    }
 }
 

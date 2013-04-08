@@ -106,7 +106,7 @@ Monitor::~Monitor()
    if( events ) delete [] events;
 }
 
-void Monitor::readwrite( Msg * msg)
+void Monitor::v_readwrite( Msg * msg)
 {
    rw_int32_t( m_id,            msg);
    rw_int64_t( m_time_launch,   msg);
@@ -121,7 +121,7 @@ void Monitor::readwrite( Msg * msg)
    rw_Int32_List( jobsUsersIds, msg);
    rw_Int32_List( jobsIds,      msg);
 
-   m_address.readwrite( msg);
+   m_address.v_readwrite( msg);
 }
 
 void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const
@@ -146,7 +146,7 @@ bool Monitor::hasEvent( int type) const
    }
 }
 
-void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
+void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full )
    {
@@ -177,6 +177,6 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
    {
       stream << m_name << "[" << m_id << "]";
       stream << " v'" << m_version << "' ";
-      m_address.generateInfoStream( stream, full);
+      m_address.v_generateInfoStream( stream, full);
    }
 }

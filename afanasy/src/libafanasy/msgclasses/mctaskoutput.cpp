@@ -48,7 +48,7 @@ bool MCTaskOutput::allocateData()
    return true;
 }
 
-void MCTaskOutput::readwrite( Msg * msg)
+void MCTaskOutput::v_readwrite( Msg * msg)
 {
    rw_int32_t( jobid,        msg);
    rw_int32_t( blocknum,     msg);
@@ -61,7 +61,7 @@ void MCTaskOutput::readwrite( Msg * msg)
    if( datasize > 0 ) rw_data( data, msg, datasize);
 }
 
-void MCTaskOutput::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTaskOutput::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "Job id = " << jobid << ", numblock = " << blocknum << ", numtask = " << tasknum << ", data size= " << datasize;
    if( full )

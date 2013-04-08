@@ -45,7 +45,7 @@ void TaskData::jsonWrite( std::ostringstream & o_str) const
 	o_str << '}';
 }
 
-void TaskData::readwrite( Msg * msg)
+void TaskData::v_readwrite( Msg * msg)
 {
 	static bool name_only = false;
 	rw_bool(    name_only,  msg);
@@ -71,7 +71,7 @@ int TaskData::calcWeight() const
    return weight;
 }
 
-void TaskData::generateInfoStream( std::ostringstream & o_str, bool full) const
+void TaskData::v_generateInfoStream( std::ostringstream & o_str, bool full) const
 {
    if( full)
    {

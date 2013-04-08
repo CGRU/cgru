@@ -22,7 +22,7 @@ public:
 
    ~NetIF();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    const std::string getMACAddrString( bool withSeparators = false) const;
    const std::string & getName() const { return name;}
@@ -42,7 +42,7 @@ public:
    /// Parse string to get mac addresses
    static void getNetIFs( std::string str, std::vector<NetIF*> & netIFs);
 
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 
 private:
 

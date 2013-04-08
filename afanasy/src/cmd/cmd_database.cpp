@@ -112,7 +112,7 @@ bool CmdDBJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
    {
       afsql::DBJob job( *it);
       DB.getItem( &job);
-      job.stdOut( false);
+      job.v_stdOut( false);
    }
 
    DB.DBClose();
@@ -136,9 +136,9 @@ bool CmdDBJobsClean::v_processArguments( int argc, char** argv, af::Msg &msg)
       afsql::DBJob job( *it);
       if( DB.getItem( &job) == false)
       {
-         job.stdOut( false);
+         job.v_stdOut( false);
          std::list<std::string> queries;
-         job.dbDelete( &queries);
+         job.v_dbDelete( &queries);
          DB.execute( &queries);
       }
    }
@@ -173,9 +173,9 @@ bool CmdDBSysJobDel::v_processArguments( int argc, char** argv, af::Msg &msg)
    {
       afsql::DBJob job( AFJOB::SYSJOB_ID);
       DB.getItem( &job);
-      job.stdOut( false);
+      job.v_stdOut( false);
       std::list<std::string> queries;
-      job.dbDelete( &queries);
+      job.v_dbDelete( &queries);
       DB.execute( &queries);
    }
    else

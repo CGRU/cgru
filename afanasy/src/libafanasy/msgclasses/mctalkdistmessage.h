@@ -19,12 +19,12 @@ public:
 
    inline const std::list<std::string> * getList() const { return &list; }
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 private:
    std::string user;
    std::string text;
    std::list<std::string> list;
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

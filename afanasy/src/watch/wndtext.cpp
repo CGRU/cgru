@@ -54,7 +54,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
          }
          default:
             insertText("WndText::WndText: Invalid message:\n");
-            insertText( afqt::stoq( msg->generateInfoString()));
+            insertText( afqt::stoq( msg->v_generateInfoString()));
       }
    }
 }

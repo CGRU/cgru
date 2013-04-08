@@ -14,7 +14,7 @@ public:
    MCTasksProgress( Msg * msg);
    ~MCTasksProgress();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    void add( int block, int task, TaskProgress * tp);
 
@@ -35,6 +35,6 @@ private:
    std::list<TaskProgress*> tasksprogress;
 
 private:
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 };
 }

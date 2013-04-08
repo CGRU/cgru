@@ -27,13 +27,13 @@ public:
    inline Af * getNode( unsigned pos)      { return pos < list.size() ? list[pos] : NULL;}
    inline std::vector<af::Af*> * getList() { return &list;        }   ///< Get nodes list.
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 protected:
    af::Af* newNode( Msg * msg );
 
 private:
-   void readwrite( Msg * msg);
+   void v_readwrite( Msg * msg);
 
    bool readonly;             ///< If collector read nodes from buffer, it becomes readonly and unable to add more nodes.
    std::vector<af::Af*> list; ///< Nodes list.

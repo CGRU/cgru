@@ -128,7 +128,7 @@ void DBActionQueue::addItem( const afsql::DBItem * item)
     if( false == m_working ) return;
 
     Queries * queries = new Queries();
-    item->dbInsert( queries);
+    item->v_dbInsert( queries);
     push( queries);
 }
 
@@ -137,7 +137,7 @@ void DBActionQueue::updateItem( const afsql::DBItem * item, int attr)
     if( false == m_working ) return;
 
     Queries * queries = new Queries();
-    item->dbUpdate( queries, attr);
+    item->v_dbUpdate( queries, attr);
     push( queries);
 }
 
@@ -146,7 +146,7 @@ void DBActionQueue::delItem( const afsql::DBItem * item)
     if( false == m_working ) return;
 
     Queries * queries = new Queries();
-    item->dbDelete( queries);
+    item->v_dbDelete( queries);
     push( queries);
 }
 

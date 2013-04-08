@@ -59,7 +59,7 @@ void Block::appendJobLog( const std::string & message)
    m_job->appendLog("B[\"" + m_data->getName() + "\"]: " + message);
 }
 
-void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
+void Block::v_errorHostsAppend( int task, int hostId, RenderContainer * renders)
 {
    if( task >= m_data->getTasksNum())
    {
@@ -69,11 +69,11 @@ void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( errorHostsAppend( render->getName())) appendJobLog( render->getName()+ " - AVOIDING HOST !");
+   if( v_errorHostsAppend( render->getName())) appendJobLog( render->getName()+ " - AVOIDING HOST !");
    m_tasks[task]->errorHostsAppend( render->getName());
 }
 
-bool Block::errorHostsAppend( const std::string & hostname)
+bool Block::v_errorHostsAppend( const std::string & hostname)
 {
    std::list<std::string>::iterator hIt = m_errorHosts.begin();
    std::list<int>::iterator cIt = m_errorHostsCounts.begin();
@@ -115,7 +115,7 @@ bool Block::avoidHostsCheck( const std::string & hostname) const
    return false;
 }
 
-void Block::getErrorHostsList( std::list<std::string> & o_list) const
+void Block::v_getErrorHostsList( std::list<std::string> & o_list) const
 {
 	o_list.push_back( std::string("Block['") + m_data->getName() + "'] error hosts:");
    std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
@@ -132,7 +132,7 @@ void Block::getErrorHostsList( std::list<std::string> & o_list) const
 		m_tasks[t]->getErrorHostsList( o_list);
 }
 
-void Block::errorHostsReset()
+void Block::v_errorHostsReset()
 {
    m_errorHosts.clear();
    m_errorHostsCounts.clear();
@@ -140,7 +140,7 @@ void Block::errorHostsReset()
    for( int t = 0; t < m_data->getTasksNum(); t++) m_tasks[t]->errorHostsReset();
 }
 
-void Block::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
+void Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
    // Store block name in task executable:
    taskexec->setBlockName( m_data->getName());
@@ -163,7 +163,7 @@ void Block::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContai
    // Store render pointer:
    addRenderCounts( render);
 
-   m_tasks[taskexec->getTaskNum()]->start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
+   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
 }
 
 void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
@@ -244,7 +244,7 @@ void Block::remRenderCounts( RenderAf * render)
       }
 }
 
-bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
+bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
 {
    if( m_user == NULL)
    {
@@ -256,8 +256,8 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
    for( int t = 0; t < m_data->getTasksNum(); t++)
    {
       int errorHostId = -1;
-	  m_tasks[t]->refresh( currentTime, renders, monitoring, errorHostId);
-      if( errorHostId != -1 ) errorHostsAppend( t, errorHostId, renders);
+	  m_tasks[t]->v_refresh( currentTime, renders, monitoring, errorHostId);
+      if( errorHostId != -1 ) v_errorHostsAppend( t, errorHostId, renders);
    }
 
    // For block progress monitoring in jobs list and in tasks list
@@ -352,7 +352,7 @@ bool Block::action( Action & i_action)
 		af::jr_string("type", type, operation);
 		if( type == "reset_error_hosts")
 		{
-			errorHostsReset();
+			v_errorHostsReset();
 			if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;
 		}

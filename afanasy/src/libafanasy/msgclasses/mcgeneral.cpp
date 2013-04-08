@@ -60,9 +60,9 @@ MCGeneral::~MCGeneral()
 {
 }
 
-void MCGeneral::readwrite( Msg * msg)
+void MCGeneral::v_readwrite( Msg * msg)
 {
-   MsgClassUserHost::readwrite( msg);
+   MsgClassUserHost::v_readwrite( msg);
 
    rw_String(     name,   msg);
    rw_String(     string, msg);
@@ -90,9 +90,9 @@ void MCGeneral::setList( const std::list<int32_t> & i_list)
 	}
 }
 
-void MCGeneral::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCGeneral::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::generateInfoStream( stream, false);
+   MsgClassUserHost::v_generateInfoStream( stream, false);
 
    stream << "\nName = \"" << name << "\"" << ", Id = " << id << ", String = \"" << string << "\"" << ", Number = " << number;
 

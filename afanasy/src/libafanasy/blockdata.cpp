@@ -481,7 +481,7 @@ BlockData::~BlockData()
    }
 }
 
-void BlockData::readwrite( Msg * msg)
+void BlockData::v_readwrite( Msg * msg)
 {
 //printf("BlockData::readwrite: BEGIN\n");
 	switch( msg->type())
@@ -500,8 +500,8 @@ void BlockData::readwrite( Msg * msg)
 		rw_String  ( m_environment,           msg);
 		rw_String  ( m_command,               msg);
 		rw_String  ( m_files,                 msg);
-		rw_String  ( m_command_pre,               msg);
-		rw_String  ( m_command_post,              msg);
+		rw_String  ( m_command_pre,           msg);
+		rw_String  ( m_command_post,          msg);
 		rw_String  ( m_multihost_service,     msg);
 		rw_String  ( m_custom_data,           msg);
 
@@ -935,7 +935,7 @@ TaskExec * BlockData::genTask( int num) const
 
    if( false == genNumbers( start, end, num, &frames_num)) return NULL;
 
-	return new TaskExec(
+	TaskExec * taskExec = new TaskExec(
 			genTaskName( num, &start, &end),
 			m_service,
 			m_parser,
@@ -957,6 +957,12 @@ TaskExec * BlockData::genTask( int num) const
 			m_flags,
 			num
 		);
+
+	taskExec->m_custom_data_block = m_custom_data;
+	if( isNotNumeric())
+		taskExec->m_custom_data_task = m_tasks_data[num]->getCustomData();
+
+	return taskExec;
 }
 
 const std::string BlockData::genTaskName( int num, long long * fstart, long long * fend) const
@@ -1159,11 +1165,11 @@ void BlockData::generateInfoStreamTasks( std::ostringstream & o_str, bool full) 
 	{
 		if( t > 0 )
             o_str << std::endl;
-        m_tasks_data[t]->generateInfoStream( o_str, full);
+        m_tasks_data[t]->v_generateInfoStream( o_str, full);
 	}
 }
 
-void BlockData::generateInfoStream( std::ostringstream & o_str, bool full) const
+void BlockData::v_generateInfoStream( std::ostringstream & o_str, bool full) const
 {
    o_str << "Block[" << m_name << "] " << m_service << "[" << m_capacity << "] " << m_tasks_num << " tasks";
    generateInfoStreamTyped( o_str, Msg::TBlocksProgress,   full);

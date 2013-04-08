@@ -39,9 +39,9 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
             {
                std::string errLog = "Online render with the same name exists:";
                errLog += "\nNew render:\n";
-               errLog += newRender->generateInfoString( false);
+               errLog += newRender->v_generateInfoString( false);
                errLog += "\nExisting render:\n";
-               errLog += render->generateInfoString( false);
+               errLog += render->v_generateInfoString( false);
                AFCommon::QueueLogError( errLog);
                delete newRender;
                // Return -1 ID to render to tell that there is already registered render with the same name:
@@ -51,7 +51,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
             else if( render->online( newRender, monitoring))
             {
                int id = render->getId();
-               AFCommon::QueueLog("Render: " + render->generateInfoString( false));
+               AFCommon::QueueLog("Render: " + render->v_generateInfoString( false));
                delete newRender;
                // Return new render ID to render to tell that it was successfully registered:
                return new af::Msg( af::Msg::TRenderId, id);
@@ -65,7 +65,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
       {
          newRender->getFarmHost();
          if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersAdd, id);
-         AFCommon::QueueLog("New Render registered: " + newRender->generateInfoString());
+         AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
          if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
       }
       // Return new render ID to render to tell that it was successfully registered:

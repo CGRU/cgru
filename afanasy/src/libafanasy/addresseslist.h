@@ -14,7 +14,7 @@ public:
    AddressesList( Msg * msg); ///< Read adresses from message.
    ~AddressesList();
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+   void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    bool addAddress( const Address & address );
 
@@ -27,7 +27,7 @@ public:
    int calcWeight() const;
    inline int getWeight() const { return weight;}
 
-   void readwrite( Msg * msg); ///< Read or write task in message buffer.
+   void v_readwrite( Msg * msg); ///< Read or write task in message buffer.
 
 private:
    std::list<Address> addresses;

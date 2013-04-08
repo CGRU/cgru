@@ -34,19 +34,19 @@ public:
 	int logsWeight() const;
 	int blackListWeight() const;
 
-	virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
-	bool avoidHostsCheck( const std::string & hostname) const;
-	virtual void getErrorHostsList( std::list<std::string> & o_list) const;
-	virtual void errorHostsReset();
+    virtual void v_errorHostsAppend( int task, int hostId, RenderContainer * renders);
+    bool avoidHostsCheck( const std::string & hostname) const;
+    virtual void v_getErrorHostsList( std::list<std::string> & o_list) const;
+    virtual void v_errorHostsReset();
 
 	bool canRunOn( RenderAf * render);
 
-	virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+    virtual void v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
 	void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
-	virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+    virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
 	bool action( Action & i_action);
@@ -61,7 +61,7 @@ public:
 
 protected:
 	void appendJobLog( const std::string & message);
-	bool errorHostsAppend( const std::string & hostname);
+    bool v_errorHostsAppend( const std::string & hostname);
 
 private:
 	af::JobProgress * m_jobprogress;

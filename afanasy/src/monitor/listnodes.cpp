@@ -57,7 +57,7 @@ void ListNodes::unSubscribe()
 
 void ListNodes::setList( af::MCAfNodes & nodes)
 {
-nodes.stdOut();
+nodes.v_stdOut();
    if( subscribed == false) clear();
 
    int newNodesCount = int( nodes.getCount());

@@ -242,7 +242,7 @@ void threadAcceptClient( void * i_arg )
             {
                 AFERROR("writeMessage: can't send message to client.")
                 af::printAddress( &(ss));
-                msg_response->stdOut();
+                msg_response->v_stdOut();
             }
             delete msg_response;
             break;

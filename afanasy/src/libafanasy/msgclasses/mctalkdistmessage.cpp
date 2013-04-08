@@ -25,14 +25,14 @@ MCTalkdistmessage::~MCTalkdistmessage()
 {
 }
 
-void MCTalkdistmessage::readwrite( Msg * msg)
+void MCTalkdistmessage::v_readwrite( Msg * msg)
 {
    rw_String(     user, msg);
    rw_String(     text, msg);
    rw_StringList( list, msg);
 }
 
-void MCTalkdistmessage::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCTalkdistmessage::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << user << ": " << text;
 }

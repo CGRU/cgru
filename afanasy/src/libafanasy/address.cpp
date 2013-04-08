@@ -181,7 +181,7 @@ void Address::jsonWrite( std::ostringstream & o_str) const
 	o_str << "\",\"port\":" << int( port) << "}";
 }
 
-void Address::readwrite( Msg * msg)
+void Address::v_readwrite( Msg * msg)
 {
    rw_int8_t(   family, msg);
    rw_uint16_t( port,   msg);
@@ -298,7 +298,7 @@ const std::string Address::generatePortString( bool full) const
    return stream.str();
 }
 
-void Address::generateInfoStream( std::ostringstream & stream, bool full) const
+void Address::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full )
    {

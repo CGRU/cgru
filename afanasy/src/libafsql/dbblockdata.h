@@ -15,13 +15,13 @@ public:
    DBBlockData( int BlockNum, int JobId);
    virtual ~DBBlockData();
 
-   inline const std::string & dbGetTableName()  const { return TableName;}
+   inline const std::string & v_dbGetTableName()  const { return TableName;}
    bool dbAdd( PGconn * i_conn) const;
-   virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
+   virtual bool v_dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
 protected:
-   inline const std::string & dbGetKeysString() const { return Keys;     }
-   inline       int           dbGetKeysNum()    const { return KeysNum;  }
+   inline const std::string & v_dbGetKeysString() const { return Keys;     }
+   inline       int           v_dbGetKeysNum()    const { return KeysNum;  }
 
 private:
    void addDBAttributes();

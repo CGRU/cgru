@@ -39,7 +39,7 @@ void MCJobsWeight::add(
    weight.push_back( Weight);
 }
 
-void MCJobsWeight::readwrite( Msg * msg)
+void MCJobsWeight::v_readwrite( Msg * msg)
 {
    rw_StringVect( names,           msg);
    rw_Int32_Vect( ids,             msg);
@@ -49,7 +49,7 @@ void MCJobsWeight::readwrite( Msg * msg)
    rw_Int32_Vect( weight,          msg);
 }
 
-void MCJobsWeight::generateInfoStream( std::ostringstream & stream, bool full) const
+void MCJobsWeight::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "Jobs memory: ";
    if( full ) stream << std::endl;
