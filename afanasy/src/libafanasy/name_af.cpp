@@ -364,9 +364,14 @@ const std::string af::fillNumbers( const std::string & i_pattern, long long i_st
 	int nstart = -1;
 	int part = 0;
 	long long number = i_start;
-
 	while( pos < i_pattern.size())
 	{
+	    if( i_pattern[pos] == ';')
+	    {
+	        // If we find ";" character reset number to beginning.
+	        // Used for m_files
+	        number = i_start;
+	    }
 		if( i_pattern[pos] == '@')
 		{
 			if(( nstart != -1) && (( pos - nstart ) > 1))
