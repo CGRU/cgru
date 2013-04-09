@@ -954,32 +954,47 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
       if( false == has_done_tasks ) m_time_started = currentTime;
    }
 
-   // If it is no job monitoring, job just came to server and it is first it refresh,
-   // so no change event and database storing needed
 
-   if( m_state != old_state )
-   {
-      jobchanged = af::Msg::TMonitorJobsChanged;
-      if( monitoring ) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+	if( m_state != old_state )
+	{
+		jobchanged = af::Msg::TMonitorJobsChanged;
 
+		// If it is no job monitoring, job just came to server and it is first it refresh,
+		// so no change event and database storing needed
+		if( monitoring ) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+
+		// Proccess events:
 		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
 		if( m_custom_data.size() || m_user->getCustomData().size())
 		{
-			std::string cmd = "{\n";
-			if( m_user->getCustomData().size()) cmd += "\"user\":\"" + m_user->getCustomData() + '"';
-			cmd += ",\n";
-			if( m_custom_data.size()) cmd += "\"job\":\"" + m_custom_data +'"';
-			cmd += ",\n";
-			cmd += "\"state\":\"";
-			std::string cmd_end = "\"\n}";
-			if((  m_state & AFJOB::STATE_ERROR_MASK ) && ( false == ( old_state & AFJOB::STATE_ERROR_MASK )))
-				SysJob::AddEventCommand( cmd+"error"+cmd_end, "", m_user_name, m_name);
-			if((  m_state & AFJOB::STATE_DONE_MASK ) && ( false == ( old_state & AFJOB::STATE_DONE_MASK )))
-				SysJob::AddEventCommand( cmd+"done"+cmd_end, "", m_user_name, m_name);
-			if((  m_state & AFJOB::STATE_RUNNING_MASK ) && ( false == ( old_state & AFJOB::STATE_RUNNING_MASK )))
-				SysJob::AddEventCommand( cmd+"running"+cmd_end, "", m_user_name, m_name);
+			std::string events;
+
+			// Collect events in one string:
+			if(( m_state & AFJOB::STATE_ERROR_MASK ) && ( false == ( old_state & AFJOB::STATE_ERROR_MASK )))
+			{
+				if( events.size()) events += ',';
+				events += "\"JOB_ERROR\"";
+			}
+			if(( m_state & AFJOB::STATE_DONE_MASK ) && ( false == ( old_state & AFJOB::STATE_DONE_MASK )))
+			{
+				if( events.size()) events += ',';
+				events += "\"JOB_DONE\"";
+			}
+
+			// Processing command for system job is some events happened:
+			if( events.size())
+			{
+				std::string cmd = "{\n";
+				if( m_user->getCustomData().size()) cmd += "\"user\":" + m_user->getCustomData();
+				if( m_custom_data.size()) cmd += ",\n\"job\":" + m_custom_data;
+				cmd += ",\n\"events\":[" + events + "]\n}";
+
+				SysJob::AddEventCommand( cmd,
+					"", // working directory - no matter
+					m_user_name, m_name);
+			}
 		}
-   }
+	}
 
    // Check age and delete if life finished:
    if( m_id != AFJOB::SYSJOB_ID ) // skip system job

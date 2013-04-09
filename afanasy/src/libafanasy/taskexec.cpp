@@ -62,7 +62,7 @@ TaskExec::TaskExec(
 {
 AFINFA("TaskExec::TaskExec: %s:", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data())
 }
-
+/*
 TaskExec::TaskExec( const std::string & Command):
 	m_command( Command),
 	m_parser_coeff( 0),
@@ -85,16 +85,16 @@ TaskExec::TaskExec( const std::string & Command):
 	m_on_client( true)
 {
 }
-
+*/
 TaskExec::~TaskExec()
 {
 AFINFA("TaskExec:: ~ TaskExec: %s:\n", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data());
 }
 
 TaskExec::TaskExec( Msg * msg):
-   m_on_client( true)
+	m_on_client( true)
 {
-   read( msg);
+	read( msg);
 }
 
 void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
@@ -211,40 +211,40 @@ void TaskExec::v_readwrite( Msg * msg)
 
 void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "[" << m_service << ":" << m_capacity << "] " << m_user_name << ": ";
-   stream << m_job_name;
-   stream << "[" << m_block_name << "]";
-   stream << "[" << m_name << "]";
-   if( m_number != 0 ) stream << "(" << m_number << ")";
-   if( m_capacity_coeff) stream << "x" << m_capacity_coeff << " ";
-   if( m_listen_addresses.getAddressesNum())
-	  m_listen_addresses.v_generateInfoStream( stream, false);
+	stream << "[" << m_service << ":" << m_capacity << "] " << m_user_name << ": ";
+	stream << m_job_name;
+	stream << "[" << m_block_name << "]";
+	stream << "[" << m_name << "]";
+	if( m_number != 0 ) stream << "(" << m_number << ")";
+	if( m_capacity_coeff) stream << "x" << m_capacity_coeff << " ";
+	if( m_listen_addresses.getAddressesNum())
+		m_listen_addresses.v_generateInfoStream( stream, false);
 
-   if(full)
-   {
-      stream << std::endl;
-	  if( m_working_directory.size()) stream << "   Working directory = \"" << m_working_directory << "\".\n";
-	  if(  m_environment.size()) stream << "   Environment = \""       <<  m_environment << "\".\n";
-	  stream << m_command;
-//      stream << std::endl;
-   }
+	if(full)
+	{
+		stream << std::endl;
+		if( m_working_directory.size()) stream << "   Working directory = \"" << m_working_directory << "\".\n";
+		if(  m_environment.size()) stream << "   Environment = \""       <<  m_environment << "\".\n";
+		stream << m_command;
+	}
 }
 
 int TaskExec::calcWeight() const
 {
-   int weight = sizeof( TaskExec);
-   weight += weigh( m_name);
-   weight += weigh( m_block_name);
-   weight += weigh( m_job_name);
-   weight += weigh( m_user_name);
-   weight += weigh( m_working_directory);
-   weight += weigh( m_environment);
-   weight += weigh( m_command);
-   weight += weigh( m_files);
-   weight += weigh( m_service);
-   weight += weigh( m_parser);
-   weight += weigh( m_custom_data_block);
-   weight += weigh( m_custom_data_task);
-   weight += m_listen_addresses.calcWeight();
-   return weight;
+	int weight = sizeof( TaskExec);
+	weight += weigh( m_name);
+	weight += weigh( m_block_name);
+	weight += weigh( m_job_name);
+	weight += weigh( m_user_name);
+	weight += weigh( m_working_directory);
+	weight += weigh( m_environment);
+	weight += weigh( m_command);
+	weight += weigh( m_files);
+	weight += weigh( m_service);
+	weight += weigh( m_parser);
+	weight += weigh( m_custom_data_block);
+	weight += weigh( m_custom_data_task);
+	weight += m_listen_addresses.calcWeight();
+	return weight;
 }
+

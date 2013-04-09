@@ -9,45 +9,38 @@ namespace af
 class Service: public PyClass
 {
 public:
-   Service( const std::string & Type,
-            const std::string & WDir,
-            const std::string & Command,
-            const std::string & Files = std::string(),
-            int CapKoeff = 0,
-            const std::list<std::string> & Hosts = std::list<std::string>());
-   Service( const TaskExec & taskexec);
-   ~Service();
+	Service( const std::string & i_type,
+	         const std::string & i_wdir,
+	         const std::string & i_command,
+	         const std::string & i_files = std::string()
+		);
+	Service( const TaskExec & taskexec);
+	~Service();
 
-   inline bool isInitialized() const { return initialized;}
+	inline bool isInitialized() const { return initialized;}
 
-   const std::string getWDir()    const { return wdir;    }
-   const std::string getCommand() const { return command; }
-   const std::string getFiles() const   { return files;   }
+	const std::string getWDir()    const { return wdir;    }
+	const std::string getCommand() const { return command; }
+	const std::string getFiles() const   { return files;   }
 
 	// Return an empty string on sucess or an error message on error
 	const std::string doPost();
 
 private:
-   void initialize();
+	void initialize( const TaskExec & taskExec);
 
 private:
-   std::string name;
+	std::string name;
 
-   PyObject* PyObj_FuncGetWDir;
-   PyObject* PyObj_FuncGetCommand;
-   PyObject* PyObj_FuncGetFiles;
+	PyObject* PyObj_FuncGetWDir;
+	PyObject* PyObj_FuncGetCommand;
+	PyObject* PyObj_FuncGetFiles;
 	PyObject* PyObj_FuncDoPost;
 
-   bool initialized;
+	bool initialized;
 
-   std::string wdir;
-   std::string command;
-   std::string files;
-   int job_id;
-   int block_id;
-   int task_id;
-   unsigned int block_flags;
-   int capkoeff;
-   std::list<std::string> hosts;
+	std::string wdir;
+	std::string command;
+	std::string files;
 };
 }

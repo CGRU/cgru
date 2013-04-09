@@ -20,7 +20,7 @@ public:
 	TaskExec(
 			const std::string & i_name,
 			const std::string & i_service_type,
-			const std::string & i_sarser_type,
+			const std::string & i_parser_type,
 			const std::string & i_command,
 			int i_capacity,
 			int i_file_size_min,
@@ -42,7 +42,7 @@ public:
 			int i_parser_coeff = 1
 );
 
-	TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
+//	TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
 
 	TaskExec( Msg * msg); ///< Read task from message.
 	~TaskExec();
