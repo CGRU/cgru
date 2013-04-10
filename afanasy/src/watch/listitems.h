@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../libafqt/name_afqt.h"
+
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
@@ -8,9 +10,13 @@
 
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>
+#include <QtGui/QToolBar>
 
 class QVBoxLayout;
+class QHBoxLayout;
 class QMouseEvent;
+class QAction;
+class QIcon;
 
 class QModelIndex;
 
@@ -77,6 +83,13 @@ protected:
 
 protected:
 	QVBoxLayout * m_layout;
+	QVBoxLayout * m_toolbarvbox;
+	QHBoxLayout * m_viewlayout;
+
+	QToolBar * m_viewtoolbar;
+
+	QAction * m_thumbnailbutton;
+
 	InfoLine * m_infoline;
 
 	ViewItems * m_view;

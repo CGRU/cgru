@@ -7,6 +7,7 @@
 
 #include <QtCore/QEvent>
 #include <QtGui/QBoxLayout>
+#include <QtGui/QToolBar>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -24,6 +25,9 @@ AFINFO("ListItems::ListItems.\n");
 	setAttribute ( Qt::WA_DeleteOnClose, true );
 
 	m_layout = new QVBoxLayout( this);
+
+
+
 	m_layout->setSpacing( 0);
 #if QT_VERSION >= 0x040300
 	m_layout->setContentsMargins( 0, 0, 0, 0);
@@ -41,7 +45,22 @@ bool ListItems::init( bool createModelView)
 		m_view = new ViewItems( this);
 		m_view->setModel( m_model);
 
-		m_layout->addWidget( m_view);
+        m_viewlayout = new QHBoxLayout( );
+		m_layout->addLayout( m_viewlayout);
+
+		m_viewlayout->addWidget( m_view);
+
+		m_viewtoolbar = new QToolBar();
+
+		m_thumbnailbutton = m_viewtoolbar->addAction(QIcon( QString::fromStdString(af::Environment::getAfRoot()) + "/icons/watch/thumbnails.png"), "Thumbnails");
+
+		m_toolbarvbox = new QVBoxLayout( );
+
+		m_toolbarvbox->addWidget(m_viewtoolbar);
+		m_toolbarvbox->addStretch(1);
+
+		m_viewlayout->addLayout( m_toolbarvbox);
+
 		m_layout->addWidget( m_infoline);
 	}
 
