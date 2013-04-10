@@ -175,16 +175,16 @@ UserNode.actions.push(['context', 'errors_retries',        'num', 'menuHandleDia
 UserNode.actions.push(['context', 'errors_avoid_host',     'num', 'menuHandleDialog', 'Errors Avoid Host']);
 UserNode.actions.push(['context', 'errors_task_same_host', 'num', 'menuHandleDialog', 'Errors Task Same Host']);
 UserNode.actions.push(['context', 'errors_forgive_time',   'hrs', 'menuHandleDialog', 'Errors Forgive Time']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'solve_parallel',        'bl1', 'menuHandleDialog', 'Solve Jobs Parallel']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'jobs_life_time',        'hrs', 'menuHandleDialog', 'Jobs Life Time']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'permanent'     ,        'bl1', 'menuHandleDialog', 'Set Permanent']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'annotation',            'str', 'menuHandleDialog', 'Annotate']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'custom_data',           'str', 'menuHandleDialog', 'Custom Data']);
+
+UserNode.actions.push(['set', 'solve_parallel',        'bl1', 'menuHandleDialog', 'Solve Jobs Parallel']);
+UserNode.actions.push(['set']);
+UserNode.actions.push(['set', 'jobs_life_time',        'hrs', 'menuHandleDialog', 'Jobs Life Time']);
+UserNode.actions.push(['set']);
+UserNode.actions.push(['set', 'permanent'     ,        'bl1', 'menuHandleDialog', 'Set Permanent']);
+UserNode.actions.push(['set']);
+UserNode.actions.push(['set', 'annotation',            'str', 'menuHandleDialog', 'Annotate']);
+UserNode.actions.push(['set']);
+UserNode.actions.push(['set', 'custom_data',          'json', 'menuHandleDialog', 'Custom Data']);
 
 UserNode.sort = ['priority','name','host_name'];
 UserNode.filter = ['user_name','name','host_name'];

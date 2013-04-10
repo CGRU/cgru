@@ -68,21 +68,32 @@ void Service::initialize( const TaskExec & task_exec)
 	PyObject *task_info;
 	task_info = PyDict_New();
 
-	PyDict_SetItemString( task_info, "wdir",        PyBytes_FromString( task_exec.getWDir().c_str()));
-	PyDict_SetItemString( task_info, "command",     PyBytes_FromString( task_exec.getCommand().c_str()));
-	PyDict_SetItemString( task_info, "capacity",    PyLong_FromLong( task_exec.getCapCoeff()));
-	PyDict_SetItemString( task_info, "files",       PyBytes_FromString( task_exec.getFiles().c_str()));
-	PyDict_SetItemString( task_info, "job_id",      PyLong_FromLong( task_exec.getJobId()));
-	PyDict_SetItemString( task_info, "block_id",    PyLong_FromLong( task_exec.getBlockNum()));
-	PyDict_SetItemString( task_info, "task_id",     PyLong_FromLong( task_exec.getTaskNum()));
-	PyDict_SetItemString( task_info, "block_flags", PyLong_FromLong( task_exec.getBlockFlags()));
-	PyDict_SetItemString( task_info, "hosts",       pHostsList);
+	PyDict_SetItemString( task_info, "wdir",     PyBytes_FromString( task_exec.getWDir().c_str()));
+	PyDict_SetItemString( task_info, "command",  PyBytes_FromString( task_exec.getCommand().c_str()));
+	PyDict_SetItemString( task_info, "capacity", PyLong_FromLong( task_exec.getCapCoeff()));
+	PyDict_SetItemString( task_info, "files",    PyBytes_FromString( task_exec.getFiles().c_str()));
+	PyDict_SetItemString( task_info, "hosts",    pHostsList);
 
-	PyDict_SetItemString( task_info, "custom_data_task",   PyBytes_FromString( task_exec.m_custom_data_task.c_str()));
-	PyDict_SetItemString( task_info, "custom_data_block",  PyBytes_FromString( task_exec.m_custom_data_block.c_str()));
-	PyDict_SetItemString( task_info, "custom_data_job",    PyBytes_FromString( task_exec.m_custom_data_job.c_str()));
-	PyDict_SetItemString( task_info, "custom_data_render", PyBytes_FromString( task_exec.m_custom_data_render.c_str()));
-	PyDict_SetItemString( task_info, "custom_data_user",   PyBytes_FromString( task_exec.m_custom_data_user.c_str()));
+	PyDict_SetItemString( task_info, "task_id",          PyLong_FromLong( task_exec.getTaskNum()));
+	PyDict_SetItemString( task_info, "task_name",        PyBytes_FromString( task_exec.getName().c_str()));
+	PyDict_SetItemString( task_info, "task_custom_data", PyBytes_FromString( task_exec.m_custom_data_task.c_str()));
+
+	PyDict_SetItemString( task_info, "block_id",          PyLong_FromLong( task_exec.getBlockNum()));
+	PyDict_SetItemString( task_info, "block_name",        PyBytes_FromString( task_exec.getBlockName().c_str()));
+	PyDict_SetItemString( task_info, "block_flags",       PyLong_FromLong( task_exec.getBlockFlags()));
+	PyDict_SetItemString( task_info, "block_custom_data", PyBytes_FromString( task_exec.m_custom_data_block.c_str()));
+
+	PyDict_SetItemString( task_info, "job_id",          PyLong_FromLong( task_exec.getJobId()));
+	PyDict_SetItemString( task_info, "job_name",        PyBytes_FromString( task_exec.getJobName().c_str()));
+	PyDict_SetItemString( task_info, "job_flags",       PyLong_FromLong( task_exec.getJobFlags()));
+	PyDict_SetItemString( task_info, "job_custom_data", PyBytes_FromString( task_exec.m_custom_data_job.c_str()));
+
+	PyDict_SetItemString( task_info, "user_name",        PyBytes_FromString( task_exec.getUserName().c_str()));
+	PyDict_SetItemString( task_info, "user_flags",       PyLong_FromLong( task_exec.getUserFlags()));
+	PyDict_SetItemString( task_info, "user_custom_data", PyBytes_FromString( task_exec.m_custom_data_user.c_str()));
+
+	PyDict_SetItemString( task_info, "render_flags",       PyLong_FromLong( task_exec.getRenderFlags()));
+	PyDict_SetItemString( task_info, "render_custom_data", PyBytes_FromString( task_exec.m_custom_data_render.c_str()));
 
 	PyTuple_SetItem( pArgs, 0, task_info);
 
@@ -174,7 +185,7 @@ const std::string Service::doPost()
 	if( pResult )
 	{
 		if( false == af::PyGetString( pResult, o_errMsg))
-			AFERROR("Service:FuncGetCommand: Returned object is not a string.")
+			AFERROR("Service:FuncDoPost: Returned object is not a string.")
 
 		Py_DECREF( pResult);
 	}

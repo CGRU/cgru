@@ -42,7 +42,7 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	this.elCtrlButtons.style.position = 'absolute';
 
 	var buttons_width = 0;
-	if( this.type == 'jobs' || this.type == 'renders')
+	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
 	{
 		this.elCtrlSet = this.document.createElement('div');
 		this.elCtrlButtons.appendChild( this.elCtrlSet);
@@ -720,33 +720,37 @@ Monitor.prototype.menuHandleDialog = function( i_name)
 	var reciever = this;
 	var handle = 'setParameter';
 	var value = this.cur_item.params[parameter];
+
+	// Search actions by name to get other values
 	for( var i = 0; i < actions.length; i++)
 	{
 		if( i_name == actions[i][1])
 		{
 			ptype = actions[i][2];
+			// Parameter can be overriden:
 			if( actions[i][6] ) parameter = actions[i][6];
 		}
 	}
+
 	new cgru_Dialog( this.window, reciever, handle, parameter, ptype, value, this.name+'_parameter');
 }
 Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
 	var params = {};
 	params[i_parameter] = i_value;
-this.info('params.'+i_parameter+'="'+i_value+'";');
+//this.info('params.'+i_parameter+'="'+i_value+'";');
 	this.action( null, params);
 }
 Monitor.prototype.menuHandleOperation = function( i_name)
 {
-this.info('Operation = ' + i_name);
+//this.info('Operation = ' + i_name);
 	var operation = {};
 	operation.type = i_name;
 	this.action( operation, null);
 }
 Monitor.prototype.menuHandleGet = function( i_name)
 {
-this.info('Get = ' + i_name);
+//this.info('Get = ' + i_name);
 	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
 }
 

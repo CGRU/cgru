@@ -53,20 +53,32 @@ public:
 	inline const std::string & getServiceType() const { return m_service;}///< Get task parser type.
 	inline const std::string & getParserType()  const { return m_parser; }///< Get task parser type.
 	inline int getParserCoeff()            const { return m_parser_coeff;}///< Get parser koeff.
-	inline int getJobId()    const { return m_job_id;      }///< Get task job id.
-	inline int getBlockNum() const { return m_block_num;   }///< Get task block number.
-	inline unsigned int getBlockFlags() const { return m_block_flags; }///< Get block flags
-	inline int getTaskNum()  const { return m_task_num;    }///< Get task number in block.
-	inline int getNumber()   const { return m_number;     }///< Get task number (aux).
 
 	inline int  getCapacity()      const { return m_capacity;   }///< Get task capacity.
 	inline int  getCapCoeff()      const { return m_capacity_coeff;   }///< Get task capacity koeff.
 	inline void setCapCoeff( int value ) { m_capacity_coeff = value;  }///< Set task capacity koeff.
 	inline int  getCapResult()     const { return m_capacity_coeff ? m_capacity*m_capacity_coeff : m_capacity;}
 
-	inline const std::string & getBlockName()  const { return m_block_name; }///< Get task block name.
-	inline const std::string & getJobName()    const { return m_job_name;   }///< Get task job name.
-	inline const std::string & getUserName()   const { return m_user_name;  }///< Get task user name.
+	// Get task data:
+	inline int getTaskNum()  const { return m_task_num;    }///< Get task number in block.
+	inline int getNumber()   const { return m_number;     }///< Get task number (aux).
+
+	// Get block data:
+	inline const std::string & getBlockName() const { return m_block_name; }
+	inline int getBlockNum() const { return m_block_num; }
+	inline unsigned int getBlockFlags() const { return m_block_flags; }
+
+	// Get job data:
+	inline const std::string & getJobName() const { return m_job_name; }
+	inline int getJobId() const { return m_job_id; }
+	inline unsigned int getJobFlags() const { return m_job_flags; }
+
+	// Get user data:
+	inline const std::string & getUserName() const { return m_user_name;  }
+	inline unsigned int getUserFlags() const { return m_user_flags; }
+
+	// Get render data:
+	inline unsigned int getRenderFlags() const { return m_render_flags; }
 
 	inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
 	inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
