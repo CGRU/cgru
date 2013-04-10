@@ -89,6 +89,7 @@
     "af_thumbnail_naming":"%(job_id)d/%(block_id)d/%(task_id)d/%(thumbnail_filename)s",
     "af_thumbnail_http":"http://localhost:80/thumbnails/",
     "af_thumbnail_file":"//servername/sharename/thumbnails/",
+    "af_thumbnail_extensions":["exr", "dpx", "jpg", "png"],
 
 "":"User:",
 	"af_errors_avoid_host":3,
