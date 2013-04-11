@@ -1,3 +1,3 @@
 @echo off
 
-python %CGRU_LOCATION%\utilities\deletefiles.py %*
+%CGRU_PYTHONEXE% %CGRU_LOCATION%\utilities\deletefiles.py %*

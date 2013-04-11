@@ -26,13 +26,24 @@ SysCmd::SysCmd(
 		const std::string & i_command,
 		const std::string & i_working_directory,
 		const std::string & i_user_name,
-		const std::string & i_job_name
+		const std::string & i_job_name,
+		const std::string & i_task_name
 	):
 	command( i_command),
 	working_directory( i_working_directory),
 	user_name( i_user_name),
-	job_name( i_job_name)
-{}
+	job_name( i_job_name),
+	task_name( i_task_name)
+{
+	if( task_name.empty())
+	{
+		task_name = command.substr( 0, AFJOB::SYSJOB_TASKSNAMEMAX);
+		size_t space = task_name.find(' ', 1);
+		if( space != std::string::npos )
+			task_name = task_name.substr( 0, space);
+	}
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////   TASK    //////////////////////////////////////////////////////////
@@ -82,13 +93,8 @@ void SysTask::appendSysJobLog( const std::string & message)
 
 void SysTask::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-	std::string name = m_syscmd->command.substr( 0, AFJOB::SYSJOB_TASKSNAMEMAX);
-	size_t space = name.find(' ', 1);
-	if( space != std::string::npos )
-		name = name.substr( 0, space);
-
+	taskexec->setName(         m_syscmd->task_name        );
 	taskexec->setCommand(      m_syscmd->command          );
-	taskexec->setName(         name                       );
 	taskexec->setUserName(     m_syscmd->user_name        );
 	taskexec->setJobName(      m_syscmd->job_name         );
 	taskexec->setWDir(         m_syscmd->working_directory);
@@ -520,10 +526,10 @@ void SysJob::AddWOLCommand( const std::string & i_cmd, const std::string & i_wdi
 {
 	ms_block_wol->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name));
 }
-void SysJob::AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name)
+void SysJob::AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name, const std::string & i_task_name)
 {
-printf("SysJob::AddEventCommand:\n%s\n", i_cmd.c_str());
-	ms_block_events->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name));
+//printf("SysJob::AddEventCommand:\n%s\n", i_cmd.c_str());
+	ms_block_events->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name, i_task_name));
 }
 
 bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)

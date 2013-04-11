@@ -967,19 +967,14 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		if( m_id != AFJOB::SYSJOB_ID ) // skip system job
 		if( m_custom_data.size() || m_user->getCustomData().size())
 		{
-			std::string events;
+			std::vector<std::string> events;
 
-			// Collect events in one string:
+			// Collect events names:
 			if(( m_state & AFJOB::STATE_ERROR_MASK ) && ( false == ( old_state & AFJOB::STATE_ERROR_MASK )))
-			{
-				if( events.size()) events += ',';
-				events += "\"JOB_ERROR\"";
-			}
+				events.push_back("JOB_ERROR");
+
 			if(( m_state & AFJOB::STATE_DONE_MASK ) && ( false == ( old_state & AFJOB::STATE_DONE_MASK )))
-			{
-				if( events.size()) events += ',';
-				events += "\"JOB_DONE\"";
-			}
+				events.push_back("JOB_DONE");
 
 			// Processing command for system job is some events happened:
 			if( events.size())
@@ -987,11 +982,17 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 				std::string cmd = "{\n";
 				if( m_user->getCustomData().size()) cmd += "\"user\":" + m_user->getCustomData();
 				if( m_custom_data.size()) cmd += ",\n\"job\":" + m_custom_data;
-				cmd += ",\n\"events\":[" + events + "]\n}";
+				cmd += ",\n\"events\":[";
+				for( int i = 0; i < events.size(); i++ )
+				{
+					if( i ) cmd += ',';
+					cmd = cmd + '"' + events[i] + '"';
+				}
+				cmd += "]\n}";
 
 				SysJob::AddEventCommand( cmd,
 					"", // working directory - no matter
-					m_user_name, m_name);
+					m_user_name, m_name, events[0]);
 			}
 		}
 	}

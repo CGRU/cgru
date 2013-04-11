@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import json, sys
+import cgruconfig
+
+import json, os, sys
 
 from services import service
 
@@ -52,8 +54,9 @@ class events(service.service):
 			#print('No configured events founded.')
 			return
 
+		email_events = []
+
 		# Iterate all interested events:
-		founded = False
 		for event in obj['events']:
 
 			if not event in objects['events']:
@@ -81,10 +84,15 @@ class events(service.service):
 
 			if 'email' in methods and 'email' in obj:
 				print('EVENT: %s:%s %s:%s' % ( event, task_info['job_name'], task_info['user_name'], obj['email'] ))
+				email_events.append( event)
 
-			founded = True
-
-		#if not founded: print('No matching events founded')
-
-#		self.command = 'mailto.py'
+		if len(email_events):
+			cmd = cgruconfig.VARS['email_send_cmd']
+			cmd += ' -V' # Verbose mode
+			cmd += ' -f "%s@%s"' % (task_info['user_name'], cgruconfig.VARS['email_sender_address_host'])
+			cmd += ' -t "%s"' % obj['email']
+			cmd += ' -s "%s"' % (','.join( email_events))
+			cmd += ' ' + task_info['job_name']
+			print(cmd)
+			self.command = cmd
 

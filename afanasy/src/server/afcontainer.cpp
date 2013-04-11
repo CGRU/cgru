@@ -240,7 +240,7 @@ void AfContainer::generateListIDs( int i_type, af::MCAfNodes & o_mcnodes, std::o
 	{
 		if( i_ids[i] >= size)
 		{
-			AFCommon::QueueLogError("AfContainer::generateList: position >= size");
+			AFCommon::QueueLogError("AfContainer::generateListIDs: position >= size");
 			continue;
 		}
 		AfNodeSrv * node = nodesTable[ i_ids[i]];
@@ -272,11 +272,10 @@ void AfContainer::generateListMask( int i_type, af::MCAfNodes & o_mcnodes, std::
 	rx.setPattern( i_mask, &errMsg);
 	if( rx.empty())
 	{
-		AFCommon::QueueLogError( std::string("AfContainer::generateList: ") + errMsg);
+		AFCommon::QueueLogError( std::string("AfContainer::generateListMask: ") + errMsg);
 	}
 	else
 	{
-		bool namefounded = false;
 		for( AfNodeSrv *node = first_ptr; node != NULL; node = node->m_next_ptr )
 		{
 			if( node == NULL   ) continue;
@@ -292,13 +291,8 @@ void AfContainer::generateListMask( int i_type, af::MCAfNodes & o_mcnodes, std::
 					o_mcnodes.addNode( node->m_node);
 
 				added = true;
-
-				if( false == namefounded)
-					namefounded = true;
 			}
 		}
-		if( namefounded == false )
-		AFCommon::QueueLog(std::string("AfContainer::generateList: No node matches \"") + i_mask + ("\" founded."));
 	}
 }
 

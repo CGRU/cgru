@@ -18,13 +18,15 @@ struct SysCmd
 		const std::string & i_command,
 		const std::string & i_working_directory,
 		const std::string & i_user_name,
-		const std::string & i_job_name
+		const std::string & i_job_name,
+		const std::string & i_task_name = std::string()
 	);
 
 	std::string command;
 	std::string working_directory;
 	std::string user_name;
 	std::string job_name;
+	std::string task_name;
 };
 
 /// System job task:
@@ -97,7 +99,7 @@ class SysJob : public JobAf
 public:
 	static void AddPostCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name);
 	static void AddWOLCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name);
-	static void AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name);
+	static void AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name, const std::string & i_task_name);
 
 	enum CreationFlags
 	{

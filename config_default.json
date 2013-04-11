@@ -40,6 +40,16 @@
 
 	"docs_host":"cgru.info",
 
+	"":"Configure SMTP server to send emails from",
+	"email_smtp_server":"localhost",
+	"":"You can keep 'localhost', but configure machines with RULES server",
+	"":" and Afanasy 'events' service to have such service running",
+
+	"":"This command provided with CGRU and uses utilities/emailsend.py Python script",
+	"email_send_cmd":"emailsend",
+
+	"email_sender_address_host":"cgru.info",
+
 	"keeper_port":50999,
 
 	"timeformat":"%a %d %b %H:%M.%S",
