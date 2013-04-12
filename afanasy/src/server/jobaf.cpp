@@ -651,13 +651,13 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
       if( dependsnotdone ) return NULL;
    }
 
-	af::TaskExec * taskExec = m_blocksdata[block]->genTask( task);
+	af::TaskExec * task_exec = m_blocksdata[block]->genTask( task);
 
-	taskExec->m_custom_data_job = m_custom_data;
-	taskExec->m_custom_data_render = render->getCustomData();
-	taskExec->m_custom_data_user = m_user->getCustomData();
+	task_exec->m_custom_data_job = m_custom_data;
+	task_exec->m_custom_data_render = render->getCustomData();
+	task_exec->m_custom_data_user = m_user->getCustomData();
 
-	return taskExec;
+	return task_exec;
 }
 
 bool JobAf::v_canRun()
@@ -810,31 +810,31 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 
 			//static int cycle = 0;printf("cycle = %d\n", cycle++);
 			std::list<int> blocksIds;
-			af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
+			af::TaskExec *task_exec = genTask( render, b, t, &blocksIds, monitoring);
 
 			// Job may became paused, if recursion during task generation detected:
 			if( m_state & AFJOB::STATE_OFFLINE_MASK )
 			{
-				if( taskexec ) delete taskexec;
+				if( task_exec ) delete task_exec;
 				return false;
 			}
 
 			// Check if render is online
 			// It can be solved with offline render to check whether to WOL wake it
-			if( taskexec && render->isOffline())
+			if( task_exec && render->isOffline())
 			{
-				delete taskexec;
+				delete task_exec;
 				return true;
 			}
 
 			// No task was generated:
-			if( taskexec == NULL ) continue;
+			if( task_exec == NULL ) continue;
 
 			// Job successfully solved (produced a task)
-			taskexec->setJobName( m_name);
-			taskexec->setUserName( m_user_name);
-			listeners.process( *taskexec);
-			m_blocks[taskexec->getBlockNum()]->v_startTask( taskexec, render, monitoring);
+			task_exec->setJobName( m_name);
+			task_exec->setUserName( m_user_name);
+			listeners.process( *task_exec);
+			m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring);
 
 			// If job was not started it became started
 			if( m_time_started == 0 )

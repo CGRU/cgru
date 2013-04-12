@@ -7,6 +7,7 @@
 #include "render.h"
 #include "msgclasses/mctaskup.h"
 #include "blockdata.h"
+#include "taskprogress.h"
 
 namespace af
 {
@@ -165,6 +166,9 @@ public:
 
 	void jsonWrite( std::ostringstream & o_str, int i_type) const;
 
+	inline void setProgress( const TaskProgress * i_progress ) { m_progress = i_progress; }
+	inline int getPercent() const { if( m_progress ) return m_progress->percent; else return -1; }
+
 	std::string m_custom_data_task;
 	std::string m_custom_data_block;
 	std::string m_custom_data_job;
@@ -210,6 +214,9 @@ private:
 	AddressesList m_listen_addresses;     ///< Addresses to send task output to.
 
 private:
+	// Needed for render:
+	const TaskProgress * m_progress;
+
 	bool m_on_client;
 
 private:

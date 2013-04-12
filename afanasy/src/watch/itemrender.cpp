@@ -279,12 +279,17 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 		m_tooltip_base = render->v_generateInfoString( true);
 
-		if( false == becameOnline) break;
+		if( false == becameOnline)
+		{
+			m_tasks_percents = render->m_tasks_percents;
+			break;
+		}
 	}
 	case af::Msg::TRendersResources:
 	{
 	    if( m_online == false ) break;
 
+		m_tasks_percents = render->m_tasks_percents;
 	    m_hres.copy( render->getHostRes());
 		m_idle_time = render->getIdleTime();
 
@@ -575,8 +580,25 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 			if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
 			QRect rect_usertime;
-	        painter->drawText( x, y, w-5, m_plots_height + ms_HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
-				QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
+			QString user_time = QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str());
+
+			// Show task percent
+			if( m_tasks_percents.size() >= numtask )
+			if( m_tasks_percents[numtask-1] > 0 )
+			{
+				user_time += QString(" %1%").arg( m_tasks_percents[numtask-1]);
+
+				// Draw task percent bar:
+				painter->setPen( Qt::NoPen );
+				painter->setOpacity( .5);
+				painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
+		        painter->drawRect( x, y+m_plots_height + ms_HeightTask * (numtask-1),
+					(w-5)*m_tasks_percents[numtask-1]/100, ms_HeightTask - 2);
+				painter->setOpacity(1.0);
+			}
+
+			painter->setPen(   clrTextInfo( option) );
+	        painter->drawText( x, y, w-5, m_plots_height + ms_HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight, user_time, &rect_usertime );
 	        painter->drawText( x+18, y, w-30-rect_usertime.width(), m_plots_height + ms_HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
 
 			// Draw an icon only if pointer is not NULL:

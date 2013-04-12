@@ -50,6 +50,23 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	o_str << "{";
 
+	// Write running tasks percents in any case:
+	if( m_tasks.size())
+	{
+		o_str << "\"tasks_percents\":[";
+		bool first = true;
+		for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+		{
+			if( false == first )
+				o_str << ',';
+			else
+				first = false;
+
+			o_str << (*it)->getPercent();
+		}
+		o_str << "],";
+	}
+
 	if( i_type == af::Msg::TRendersResources )
 	{
 		o_str << "\"id\":"   << m_id;
@@ -169,6 +186,15 @@ void Render::v_readwrite( Msg * msg)
 
    case Msg::TRenderUpdate:
    case Msg::TRendersResources:
+
+		// Tasks percents, needed for GUI only:
+		if( msg->isWriting())
+		{
+			m_tasks_percents.clear();
+			for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+				m_tasks_percents.push_back((*it)->getPercent());
+		}
+		rw_Int32_Vect( m_tasks_percents, msg);
 
 		rw_int64_t( m_idle_time, msg);
 	  m_hres.v_readwrite( msg);

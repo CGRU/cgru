@@ -93,6 +93,9 @@ public:
 
    void jsonRead( const JSON & i_object, std::string * io_changes);
 
+	// Needed for GUI only:
+	std::vector<int32_t> m_tasks_percents;
+
 public:
 
 	enum State

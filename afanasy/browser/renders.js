@@ -91,11 +91,7 @@ RenderNode.prototype.init = function()
 
 RenderNode.prototype.update = function( i_obj)
 {
-//	var was_online = ( this.state.ONL == true )
-//	var became_online = false;
-//	if( this.state.ONL && ( was_online == false ))
-//		became_online = true;
-
+	// When render write resources, it writes resources only, event no name
 	if(( i_obj != null ) && ( i_obj.name == null ))
 	{
 		if( i_obj.idle_time )
@@ -158,6 +154,9 @@ RenderNode.prototype.update = function( i_obj)
 
 		this.plotterD.appendTitle('\nRead: '+Math.round(r.hdd_rd_kbsec/1024)+ 'MBytes/s\nWrite: '+Math.round(r.hdd_wr_kbsec/1024)+' MBytes/s\nBusy: '+r.hdd_busy+'%');
 		this.plotterD.addValues([ r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
+
+		this.params.tasks_percents = i_obj.tasks_percents;
+		this.updateTasksPercents();
 
 		return;
 	}
@@ -234,6 +233,7 @@ RenderNode.prototype.update = function( i_obj)
 	for( var t = 0; t < this.params.tasks.length; t++)
 		this.tasks.push( new RenderTask( this.params.tasks[t], this.element));
 
+	this.updateTasksPercents();
 	this.refresh();
 }
 
@@ -311,6 +311,13 @@ RenderNode.prototype.refresh = function()
 		this.tasks[t].refresh();
 }
 
+RenderNode.prototype.updateTasksPercents = function()
+{
+	if( this.params.tasks_percents )
+		for( var t = 0; t < this.tasks.length; t++)
+			this.tasks[t].setPercent( this.params.tasks_percents[t]);
+}
+
 RenderNode.prototype.onDoubleClick = function()
 {
 	nw_GetNodes('renders', [this.params.id], 'full');
@@ -355,22 +362,31 @@ function RenderTask( i_task, i_elParent)
 	this.element.style.marginLeft = '20px';
 	this.element.classList.add('rendertask');
 
-	this.elCapacity = cm_ElCreateText( this.element, 'Task Capacity');
+	this.elBar = document.createElement('div');
+	this.element.appendChild( this.elBar);
+	this.elBar.classList.add('bar');
+	this.elBar.style.display = 'none';
+
+	this.elBody = document.createElement('div');
+	this.element.appendChild( this.elBody);
+	this.elBody.classList.add('body');
+
+	this.elCapacity = cm_ElCreateText( this.elBody, 'Task Capacity');
 	this.elCapacity.textContent = '['+i_task.capacity+']';
 
-	this.elJob = cm_ElCreateText( this.element, 'Job Name');
+	this.elJob = cm_ElCreateText( this.elBody, 'Job Name');
 	this.elJob.textContent = i_task.job_name;
 
-	this.elBlock = cm_ElCreateText( this.element, 'Block Name');
+	this.elBlock = cm_ElCreateText( this.elBody, 'Block Name');
 	this.elBlock.textContent = '['+i_task.block_name+']';
 
-	this.elName = cm_ElCreateText( this.element, 'Task Name');
+	this.elName = cm_ElCreateText( this.elBody, 'Task Name');
 	this.elName.textContent = '['+i_task.name+']';
 
-	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
+	this.elTime = cm_ElCreateFloatText( this.elBody, 'right', 'Running Time');
 	this.time = i_task.time_start;
 
-	this.elUser = cm_ElCreateFloatText( this.element, 'right', 'User Name');
+	this.elUser = cm_ElCreateFloatText( this.elBody, 'right', 'User Name');
 	this.elUser.textContent = i_task.user_name;
 
 	this.refresh();
@@ -379,6 +395,14 @@ function RenderTask( i_task, i_elParent)
 RenderTask.prototype.refresh = function()
 {
 	this.elTime.textContent = cm_TimeStringInterval( this.time);
+}
+
+RenderTask.prototype.setPercent = function( i_percent)
+{
+	if( i_percent == null ) return;
+	if( i_percent < 1 ) return;
+	this.elBar.style.display = 'block';
+	this.elBar.style.width = i_percent+'%';
 }
 
 RenderTask.prototype.destroy = function()

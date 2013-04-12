@@ -55,6 +55,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_blo
    m_tasknum = m_exec->getTaskNum();
    m_hostId = render->getId();
    m_progress->hostname = render->getName();
+	m_exec->setProgress( m_progress);
    render->setTask( m_exec, monitoring);
    m_task->v_monitor( monitoring );
    m_task->v_updateDatabase();

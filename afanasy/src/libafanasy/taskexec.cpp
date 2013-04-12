@@ -58,6 +58,7 @@ TaskExec::TaskExec(
 	m_frames_num(    i_frames_num),
 
 	m_time_start( time(NULL)),
+	m_progress( NULL),
 	m_on_client( false)
 {
 AFINFA("TaskExec::TaskExec: %s:", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data())
