@@ -631,9 +631,12 @@ function processUser( &$o_out)
 {
 	global $UserName;
 
+	$dirname = 'users';
+	if( false == is_dir( $dirname ))
+		mkdir( $dirname);
+
 	if( $UserName == null ) return;
 
-	$dirname = 'users';
 	$filename = $dirname.'/'.$UserName.'.json';
 	$user = array();
 
@@ -647,11 +650,6 @@ function processUser( &$o_out)
 		$user['channels'] = array();
 		$user['news'] = array();
 		$user['ctime'] = time();
-
-		if( false == is_dir( $dirname ))
-			$user['role'] = 'admin';
-		else
-			$user['role'] = 'user';
 
 		$editobj['object'] = $user;
 		$out = array();
