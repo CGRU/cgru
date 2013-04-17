@@ -1,21 +1,211 @@
 <?php
 
+umask(0000);
+
 $HT_AccessFileName = '.htaccess';
 $HT_GroupsFileName = '.htgroups';
 $HT_DigestFileName = '.htdigest';
 
 $RuleMaxLength = 100000;
 
+$Out = array();
+$Recv = array();
+
 $UserName = null;
 $Groups = null;
 
 $SkipFiles = array( '.', '..', $HT_AccessFileName, $HT_GroupsFileName, $HT_DigestFileName);
 
-if( isset($_SERVER['PHP_AUTH_USER']))
+$Digest = http_digest_parse();
+if( $Digest !== false )
+{
+	global $UserName;
+	if( $Digest['username'] != 'null' )
+		$UserName = $Digest['username'];
+}
+
+if( isset($_POST['upload_path']))
+	upload( $_POST['upload_path'], $Out);
+else
+{
+	$Recv = json_decode( $HTTP_RAW_POST_DATA, true);
+	if( is_null($Recv))
+		$Recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
+}
+
+if( array_key_exists('walkdir', $Recv))
+{
+	$Out['walkdir'] = array();
+	foreach( $Recv['walkdir'] as $dir)
+	{
+		$rem = array('../','../','..');
+		$dir = str_replace( $rem, '', $dir);
+		$walkdir = array();
+		walkDir( $Recv, $dir, $walkdir, 0);
+		array_push( $Out['walkdir'], $walkdir);
+	}
+}
+else if( array_key_exists('afanasy', $Recv))
+{
+	afanasy( $Recv, $Out);
+}
+else if( count( $Recv))
+{
+	foreach( $Recv as $key => $args )
+	{
+		$func = "jsf_$key";
+		if( function_exists($func))
+			$func( $args, $Out);
+		else
+			$Out['error'] = 'Function "'.$key.'" does not exist.';
+	}
+}
+
+if( false == is_null( $Out))
+	echo json_encode( $Out);
+
+function jsf_initialize( $i_arg, &$o_out)
+{
+	global $RuleMaxLength;
+
+	$configs = array();
+	readConfig('config_default.json', $configs); 
+	$o_out['config'] = $configs;
+
+	processUser( $o_out);
+	if( array_key_exists('error', $o_out)) return;
+
+	$out = array();
+	jsf_getallusers( null, $out);
+	if( array_key_exists('error', $out))
+	{
+		$o_out['error'] = $out['error'];
+		return;
+	}
+
+	$o_out['users'] = array();
+	foreach( $out['users'] as $obj)
+	{
+		$user = array();
+		$user['id'] = $obj['id'];
+		if( isset( $obj['role'])) $user['role'] = $obj['role'];
+		if( isset( $obj['title'])) $user['title'] = $obj['title'];
+		$o_out['users'][$obj['id']] = $user;
+	}
+
+	$server = array();
+	$server['upload_max_filesize'] = ini_get('upload_max_filesize');
+	$server['post_max_size'] = ini_get('post_max_size');
+	$server['memory_limit'] = ini_get('memory_limit');
+	$o_out['server'] = $server;
+
+	if( $fHandle = fopen('version.txt','r'))
+	{
+		$o_out['version'] = fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+	}
+
+	if( isAdmin( $out)) $o_out['admin'] = true;
+}
+
+function processUser( &$o_out)
 {
 	global $UserName;
 
-	$UserName = $_SERVER['PHP_AUTH_USER'];
+	$dirname = 'users';
+	if( false == is_dir( $dirname ))
+		mkdir( $dirname);
+
+	if( $UserName == null ) return;
+
+	$filename = $dirname.'/'.$UserName.'.json';
+	$user = array();
+
+	$editobj = array();
+	$editobj['add'] = true;
+	$editobj['file'] = $filename;
+
+	if( false == is_file( $filename))
+	{
+		$user['id'] = $UserName;
+		$user['channels'] = array();
+		$user['news'] = array();
+		$user['ctime'] = time();
+
+		$editobj['object'] = $user;
+		$out = array();
+		jsf_editobj( $editobj, $out);
+	}
+
+	readObj( $filename, &$user);
+
+	if( array_key_exists('error', $user))
+	{
+		$o_out['error'] = $user['error'];
+		return;
+	}
+
+	$user['rtime'] = time();
+//	$user['title'] = $i_user['title'];
+	$editobj['object'] = $user;
+	$out = array();
+	jsf_editobj( $editobj, $out);
+	if( array_key_exists('error', $out))
+	{
+		$o_out['error'] = $out['error'];
+		return;
+	}
+
+	$o_out['user'] = $user;
+}
+
+function http_digest_parse()
+{
+	if( false == isset( $_SERVER['PHP_AUTH_DIGEST']))
+		return false;
+
+	// protect against missing data
+	$needed_parts = array('nonce'=>1, 'nc'=>1, 'cnonce'=>1, 'qop'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
+	$data = array();
+	$keys = implode('|', array_keys($needed_parts));
+
+	preg_match_all('@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $_SERVER['PHP_AUTH_DIGEST'], $matches, PREG_SET_ORDER);
+
+	foreach ($matches as $m) {
+		$data[$m[1]] = $m[3] ? $m[3] : $m[4];
+		unset($needed_parts[$m[1]]);
+	}
+
+	return $needed_parts ? false : $data;
+}
+
+function jsf_login( $i_arg, &$o_out)
+{
+	if( isset( $_SERVER['PHP_AUTH_DIGEST']))
+	{
+		$data = http_digest_parse();
+		if( $data === false )
+		{
+			$o_out['error'] = 'Wrong Digest!';
+			$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
+			return;
+		}
+		if( $data['username'] != 'null')
+		{
+			$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
+			return;
+		}
+	}
+
+	header('HTTP/1.1 401 Unauthorized');
+	header('WWW-Authenticate: Digest realm="'.$i_arg['realm'].'",qop="auth",nonce="'.uniqid().'"');
+	#die('Text to send if user hits Cancel button');
+	$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
+}
+
+function jsf_logout( $i_arg, &$o_out)
+{
+	header('HTTP/1.1 401 Unauthorized');
 }
 
 function skipFile( $file)
@@ -537,145 +727,6 @@ function jsf_save( $i_save, &$o_out)
 
 	fwrite( $fHandle, $data);
 	fclose( $fHandle );
-}
-
-$out = array();
-$recv = array();
-umask(0000);
-
-if( isset($_POST['upload_path']))
-	upload( $_POST['upload_path'], $out);
-else
-{
-	$recv = json_decode( $HTTP_RAW_POST_DATA, true);
-	if( is_null($recv))
-		$recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
-}
-
-if( array_key_exists('walkdir', $recv))
-{
-	$out['walkdir'] = array();
-	foreach( $recv['walkdir'] as $dir)
-	{
-		$rem = array('../','../','..');
-		$dir = str_replace( $rem, '', $dir);
-		$walkdir = array();
-		walkDir( $recv, $dir, $walkdir, 0);
-		array_push( $out['walkdir'], $walkdir);
-	}
-}
-else if( array_key_exists('afanasy', $recv))
-{
-	afanasy( $recv, $out);
-}
-else if( count( $recv))
-{
-	foreach( $recv as $key => $args )
-	{
-		$func = "jsf_$key";
-		if( function_exists($func))
-			$func( $args, $out);
-		else
-			$out['error'] = 'Function "'.$key.'" does not exist.';
-	}
-}
-
-if( false == is_null( $out))
-	echo json_encode( $out);
-
-function jsf_initialize( $i_arg, &$o_out)
-{
-	global $RuleMaxLength;
-
-	$configs = array();
-	readConfig('config_default.json', $configs); 
-	$o_out['config'] = $configs;
-
-	processUser( $o_out);
-	if( array_key_exists('error', $o_out)) return;
-
-	$out = array();
-	jsf_getallusers( null, $out);
-	if( array_key_exists('error', $out))
-	{
-		$o_out['error'] = $out['error'];
-		return;
-	}
-
-	$o_out['users'] = array();
-	foreach( $out['users'] as $obj)
-	{
-		$user = array();
-		$user['id'] = $obj['id'];
-		if( isset( $obj['role'])) $user['role'] = $obj['role'];
-		if( isset( $obj['title'])) $user['title'] = $obj['title'];
-		$o_out['users'][$obj['id']] = $user;
-	}
-
-	$server = array();
-	$server['upload_max_filesize'] = ini_get('upload_max_filesize');
-	$server['post_max_size'] = ini_get('post_max_size');
-	$server['memory_limit'] = ini_get('memory_limit');
-	$o_out['server'] = $server;
-
-	if( $fHandle = fopen('version.txt','r'))
-	{
-		$o_out['version'] = fread( $fHandle, $RuleMaxLength);
-		fclose($fHandle);
-	}
-
-	if( isAdmin( $out)) $o_out['admin'] = true;
-}
-
-function processUser( &$o_out)
-{
-	global $UserName;
-
-	$dirname = 'users';
-	if( false == is_dir( $dirname ))
-		mkdir( $dirname);
-
-	if( $UserName == null ) return;
-
-	$filename = $dirname.'/'.$UserName.'.json';
-	$user = array();
-
-	$editobj = array();
-	$editobj['add'] = true;
-	$editobj['file'] = $filename;
-
-	if( false == is_file( $filename))
-	{
-		$user['id'] = $UserName;
-		$user['channels'] = array();
-		$user['news'] = array();
-		$user['ctime'] = time();
-
-		$editobj['object'] = $user;
-		$out = array();
-		jsf_editobj( $editobj, $out);
-	}
-
-	readObj( $filename, &$user);
-
-	if( array_key_exists('error', $user))
-	{
-		$o_out['error'] = $user['error'];
-		return;
-	}
-
-	$user['rtime'] = time();
-//	$user['title'] = $i_user['title'];
-	$editobj['object'] = $user;
-	$out = array();
-	jsf_editobj( $editobj, $out);
-	if( array_key_exists('error', $out))
-	{
-		$o_out['error'] = $out['error'];
-		return;
-	}
-
-	$o_out['user'] = $user;
 }
 
 function jsf_makenews( $i_news, &$o_out)

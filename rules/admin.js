@@ -6,6 +6,10 @@ ad_wnd_curgroup = null;
 function ad_Init()
 {
 	if( g_auth_user == null ) return;
+
+	$('ad_logout').style.display = 'block';
+	$('ad_login').style.display = 'none';
+
 	if( false == g_admin ) return;
 
 	$('admin_window').style.display = 'block';
@@ -15,6 +19,36 @@ function ad_Init()
 	else ad_PermissionsClose();
 
 	ad_initialized = true;
+}
+
+function ad_Login()
+{
+	c_Info('Login');
+	var obj = {};
+	obj.login = {"realm":'RULES'};
+	var data = n_Request( obj);
+//c_Log( data);
+	window.location.reload();
+}
+
+function ad_Logout()
+{
+	c_Info('Logout');
+//*
+ 	var obj = {};
+	obj.logout = {"realm":'RULES'};
+	var data = n_Request( obj);
+//c_Log( data);
+//	*/
+///*
+	var xhr = new XMLHttpRequest;
+	xhr.open('GET', '/', true, 'null', 'null');
+	xhr.send('');
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) { window.location.reload(); }
+	}
+//*/
+//c_Log( data);
 }
 
 function ad_PermissionsProcess()
