@@ -66,11 +66,30 @@ if( false == is_null( $Out))
 
 function jsf_initialize( $i_arg, &$o_out)
 {
-	global $RuleMaxLength;
+	global $UserName, $Groups, $RuleMaxLength, $HT_AccessFileName, $HT_GroupsFileName;
 
 	$configs = array();
 	readConfig('config_default.json', $configs); 
 	$o_out['config'] = $configs;
+
+	if( $UserName != null )
+	{
+		if( false == is_file( $HT_AccessFileName))
+		{
+			if( copy('htaccess_example', $HT_AccessFileName))
+				error_log('HT access file copied.');
+			else
+				error_log('Unable to copy htaccess file.');
+		}
+		if( false == is_file( $HT_GroupsFileName))
+		{
+			$Groups = array();
+			$Groups['admins'] = array( $UserName);
+			jsf_writegroups( $Groups, $o_out);
+			if( array_key_exists('error', $o_out)) return;
+			error_log('HT Groups file created with "'.$UserName.'" in "admins".');
+		}
+	}
 
 	processUser( $o_out);
 	if( array_key_exists('error', $o_out)) return;
@@ -82,7 +101,6 @@ function jsf_initialize( $i_arg, &$o_out)
 		$o_out['error'] = $out['error'];
 		return;
 	}
-
 	$o_out['users'] = array();
 	foreach( $out['users'] as $obj)
 	{
@@ -188,7 +206,7 @@ function jsf_login( $i_arg, &$o_out)
 		{
 			$o_out['error'] = 'Wrong Digest!';
 			$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
-			return;
+//			return;
 		}
 		if( $data['username'] != 'null')
 		{
@@ -268,7 +286,7 @@ function htaccessPath( $i_path)
 	if( is_file( $i_path)) $i_path = dirname( $i_path);
 	if( false == is_dir( $i_path))
 	{
-		error_log("htaccessPath: no such directory:\n$i_path");
+		error_log('htaccessPath: no such directory: '.$i_path);
 		return false;
 	}
 
@@ -433,6 +451,9 @@ function readConfig( $i_file, &$o_out)
 {
 	global $RuleMaxLength;
 
+	if( false == is_file( $i_file))
+		return;
+
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
 		$data = fread( $fHandle, $RuleMaxLength);
@@ -471,6 +492,11 @@ function jsf_getfile( $i_file, &$o_out)
 
 function jsf_readobj( $i_file, &$o_out)
 {
+	if( false == is_file( $i_file))
+	{
+		$o_out['error'] = 'No such file: '.$i_file;
+		return;
+	}
 	if( false == htaccessPath( $i_file))
 	{
 		$o_out['error'] = 'Permissions denied';
@@ -994,7 +1020,7 @@ function readGroups( &$o_out)
 
 	if( false == is_file( $HT_GroupsFileName))
 	{
-		$o_out['error'] = 'Groups file does not exist.';
+		$o_out['error'] = 'HT Groups file does not exist.';
 		return;
 	}
 	$fHandle = fopen( $HT_GroupsFileName, 'r');
@@ -1031,13 +1057,13 @@ function jsf_writegroups( $i_groups, &$o_out)
 	global $Groups, $HT_GroupsFileName;
 
 	$Groups = $i_groups;
-
+/*
 	if( false == is_file( $HT_GroupsFileName))
 	{
-		$o_out['error'] = 'Groups file does not exist.';
+		$o_out['error'] = 'HT Groups file does not exist.';
 		return;
 	}
-
+*/
 	$data = '';
 	foreach( $i_groups as $group => $users )
 		$data = $data."$group:".implode(' ',$users)."\n";

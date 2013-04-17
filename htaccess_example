@@ -1,0 +1,8 @@
+AuthType Digest
+AuthName "RULES"
+AuthDigestDomain /cgru/ http://cgru.info
+
+AuthDigestProvider file
+AuthGroupFile /cgru/.htgroups
+AuthUserFile /cgru/.htdigest
+#Require valid-user
