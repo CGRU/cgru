@@ -197,28 +197,101 @@ function http_digest_parse()
 	return $needed_parts ? false : $data;
 }
 
+function http_digest_validate( $i_arg, &$o_out)
+{
+	global $Digest, $HT_DigestFileName, $RuleMaxLength;
+
+	if( $Digest === false ) return false;
+
+	if( false == is_file( $HT_DigestFileName))
+	{
+		$o_out['error'] = 'HT digest file does not exist.';
+		error_log( $o_out['error']);
+		return false;
+	}
+
+	$data = null;
+	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
+	{
+		$data = fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+	}
+	else
+	{
+		$o_out['error'] = 'Can`t open HT digest file.';
+		error_log( $o_out['error']);
+		return false;
+	}
+	
+	$data = explode("\n", $data);
+	$founded = false;
+	foreach( $data as $line )
+		if( strpos( $line, $Digest['username']) === 0)
+		{
+			$data = $line;
+			$founded = true;
+			break;
+		}
+
+	if( false == $founded )
+		return false;
+
+	$data = explode(':', $data);
+	if( count($data) != 3 )
+	{
+		$o_out['error'] = 'Invalid HT digest entry.';
+		error_log( $o_out['error']);
+		return false;
+	}
+
+	$data = $data[2];
+	$hget = md5( $_SERVER['REQUEST_METHOD'].':'.$Digest['uri']);
+	$valid_response = md5( $data.':'.$Digest['nonce'].':'.$Digest['nc'].':'.$Digest['cnonce'].':'.$Digest['qop'].':'.$hget);
+/*
+error_log( 'PHP_AUTH_DIGEST = '.$_SERVER['PHP_AUTH_DIGEST']);
+error_log( 'REQUEST_METHOD = '.$_SERVER['REQUEST_METHOD']);
+error_log( 'uri = '.$Digest['uri']);
+error_log( 'nonce = '.$Digest['nonce']);
+error_log( 'nc = '.$Digest['nc']);
+error_log( 'cnonce = '.$Digest['cnonce']);
+error_log( 'qop = '.$Digest['qop']);
+error_log( 'htdigest = '.$data);
+error_log( 'hash = '.md5($Digest['username'].':'.$i_arg['realm'].':www'));
+error_log( 'response = '.$Digest['response']);
+error_log( 'valid_response = '.$valid_response);
+*/
+	if( $Digest['response'] == $valid_response)
+		return true;
+
+	return false;
+}
+
 function jsf_login( $i_arg, &$o_out)
 {
+	global $Digest;
+
 	if( isset( $_SERVER['PHP_AUTH_DIGEST']))
 	{
-		$data = http_digest_parse();
-		if( $data === false )
+		if( $Digest === false )
 		{
 			$o_out['error'] = 'Wrong Digest!';
-			$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
-//			return;
+			//$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
 		}
-		if( $data['username'] != 'null')
+		else if( $Digest['username'] != 'null')
 		{
-			$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
-			return;
+			//$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
+			if( http_digest_validate( $i_arg, $o_out))
+				return;
+			else
+				$o_out['error'] = 'Wrong!';
+				//die('Wrong!');
 		}
 	}
 
 	header('HTTP/1.1 401 Unauthorized');
 	header('WWW-Authenticate: Digest realm="'.$i_arg['realm'].'",qop="auth",nonce="'.uniqid().'"');
 	#die('Text to send if user hits Cancel button');
-	$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
+	//$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
 }
 
 function jsf_logout( $i_arg, &$o_out)
@@ -239,7 +312,7 @@ function htaccessFolder( $i_folder)
 	global $UserName, $Groups;
 
 	if( $i_folder == '.' ) return true;
-	if( $UserName == null ) return true;
+//	if( $UserName == null ) return true;
 
 	$out = array();
 	readGroups( $out);
@@ -264,10 +337,15 @@ function htaccessFolder( $i_folder)
 	}
 	if( array_key_exists('valid_user', $out))
 	{
+		if( $UserName == null )
+			return false;
 		return true;
 	}
 
 	if(( count( $out['users']) == 0 ) && ( count( $out['groups']) == 0 )) return null;
+
+	if( $UserName == null )
+		return false;
 
 	foreach( $out['groups'] as $grp )
 		if( array_key_exists( $grp, $Groups))

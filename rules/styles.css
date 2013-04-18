@@ -503,5 +503,5 @@ box-shadow: 0 0 4px #000 inset;
 .administrate .button { float: left; }
 .admin_groups div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
 .admin_groups .selected, .admin_users .selected div { background: rgba(100,255,255,.2); }
-.admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); }
+.admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
 

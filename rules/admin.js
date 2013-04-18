@@ -2,6 +2,8 @@ ad_initialized = false;
 ad_permissions = null;
 ad_wnd = null;
 ad_wnd_curgroup = null;
+ad_wnd_sort_prop = 'id';
+ad_wnd_sort_dir = 0;
 
 function ad_Init()
 {
@@ -28,6 +30,7 @@ function ad_Login()
 	obj.login = {"realm":'RULES'};
 	var data = n_Request( obj);
 //c_Log( data);
+	g_GO('/');
 	window.location.reload();
 }
 
@@ -45,7 +48,7 @@ function ad_Logout()
 	xhr.open('GET', '/', true, 'null', 'null');
 	xhr.send('');
 	xhr.onreadystatechange = function() {
-		if (xhr.readyState == 4) { window.location.reload(); }
+		if (xhr.readyState == 4) { g_GO('/'); window.location.reload(); }
 	}
 //*/
 //c_Log( data);
@@ -292,16 +295,35 @@ function ad_WndDrawUsers()
 	ad_wnd.elUsrRows = [];
 
 	var labels = {};
-	labels.id = 'Name';
+	labels.id = 'ID';
 	labels.title = 'Title';
 	labels.role = 'Role';
+	labels.email = 'Email';
 	labels.channels = {}; labels.channels.length = 'Cnls';
 	labels.news = {}; labels.news.length = 'News';
 
+	var users = [];
+	for( var user in g_users ) users.push( g_users[user]);
+		users.sort( function( a, b ) {
+			var val_a = a[ad_wnd_sort_prop];
+			var val_b = b[ad_wnd_sort_prop];
+
+			if( val_a == null ) val_a = '';
+			if( val_b == null ) val_b = '';
+
+			if( val_a.length != null ) val_a = val_a.length;
+			if( val_b.length != null ) val_b = val_b.length;
+
+			if(( val_a > val_b ) == ad_wnd_sort_dir ) return -1;
+			if(( val_a < val_b ) == ad_wnd_sort_dir ) return  1;
+
+			return 0;
+		});
+	
 	var row = 0;
 	ad_WndAddUser( ad_wnd.elUsers, labels, row++);
-	for( var user in g_users )
-		ad_WndAddUser( ad_wnd.elUsers, g_users[user], row++);
+	for( var i = 0; i < users.length; i++ )
+		ad_WndAddUser( ad_wnd.elUsers, users[i], row++);
 }
 
 function ad_GetAll( i_type)
@@ -384,7 +406,11 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		if( i_user.groups.indexOf( ad_wnd_curgroup ) != -1 )
 			el.classList.add('selected');
 	}
-	else el.style.backgroundColor = 'rgba(0,0,0,.2)';
+	else
+	{
+		el.style.backgroundColor = 'rgba(0,0,0,.2)';
+		el.style.cursor = 'pointer';
+	}
 
 	var elGroup = document.createElement('div');
 	el.appendChild( elGroup);
@@ -399,6 +425,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	el.appendChild( elName);
 	elName.style.width = '100px';
 	elName.textContent = i_user.id;
+	if( i_row == 0 ) elName.onclick = function(e) { ad_WndSortUsers('id'); };
 
 	var elTitle = document.createElement('div');
 	el.appendChild( elTitle);
@@ -407,6 +434,16 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elTitle.m_user_id = i_user.id;
 	elTitle.title = 'Double click edit title';
 	if( i_row ) elTitle.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
+	else elTitle.onclick = function(e) { ad_WndSortUsers('title'); }
+
+	var elEmail = document.createElement('div');
+	el.appendChild( elEmail);
+	elEmail.style.width = '200px';
+	elEmail.textContent = i_user.email;
+	elEmail.m_user_id = i_user.id;
+	elEmail.title = 'Double click edit email';
+	if( i_row ) elEmail.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
+	else elEmail.onclick = function(e) { ad_WndSortUsers('email'); };
 /*
 	var elRole = document.createElement('div');
 	el.appendChild( elRole);
@@ -436,23 +473,36 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		 channels += i_user.channels[i].id+'\n';
 		elChannels.title = channels;
 	}
+	if( i_row == 0 ) elChannels.onclick = function(e) { ad_WndSortUsers('channels'); };
 
 	var elNews = document.createElement('div');
 	el.appendChild( elNews);
 	elNews.textContent = i_user.news.length;
 	elNews.style.width = '50px';
+	if( i_row == 0 ) elNews.onclick = function(e) { ad_WndSortUsers('news'); };
 
 	var elCTime = document.createElement('div');
 	el.appendChild( elCTime);
 	if( i_row ) elCTime.textContent = c_DT_StrFromSec( i_user.ctime).substr(4,11);
 	else elCTime.textContent = 'Created';
 	elCTime.style.width = '150px';
+	if( i_row == 0 ) elCTime.onclick = function(e) { ad_WndSortUsers('ctime'); };
 
 	var elRTime = document.createElement('div');
 	el.appendChild( elRTime);
 	if( i_row ) elRTime.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
 	else elRTime.textContent = 'Entered';
 	elRTime.style.width = '200px';
+	if( i_row == 0 ) elRTime.onclick = function(e) { ad_WndSortUsers('rtime'); };
+}
+
+function ad_WndSortUsers( i_prop)
+{
+	if( ad_wnd_sort_prop == i_prop )
+		ad_wnd_sort_dir = 1 - ad_wnd_sort_dir;
+	else
+		ad_wnd_sort_prop = i_prop;
+	ad_WndDrawUsers();
 }
 
 function ad_CreateGrpOnClick() { new cgru_Dialog( window, window, 'ad_CreateGroup', null, 'str', '', 'users', 'Create Group', 'Enter Group Name');}
@@ -539,16 +589,19 @@ function ad_ChangeRole( i_user_id, i_role)
 	ad_WndRefresh();
 }
 */
-function ad_ChangeTitleOnCkick( i_user_id)
-{
-	new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');
-}
-function ad_ChangeTitle( i_user_id, i_title)
+function ad_ChangeTitleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');}
+function ad_ChangeTitle( i_user_id, i_title) { ad_ChangeUserProp( i_user_id, 'title', i_title); }
+
+function ad_ChangeEmailOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeEmail', i_user_id, 'str', g_users[i_user_id].email, 'users', 'Change Email', 'Enter New Address');}
+function ad_ChangeEmail( i_user_id, i_email) { ad_ChangeUserProp( i_user_id, 'email', i_email); }
+
+function ad_ChangeUserProp( i_user_id, i_prop, i_value)
 {
 	var obj = {};
 
 	obj.add = true;
-	obj.object = {"title":i_title};
+	obj.object = {};
+	obj.object[i_prop] = i_value;
 	obj.file = 'users/' + i_user_id + '.json';
 
 	var res = c_Parse( n_Request({"editobj":obj}));
