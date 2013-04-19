@@ -308,11 +308,15 @@ function ad_WndDrawUsers()
 			var val_a = a[ad_wnd_sort_prop];
 			var val_b = b[ad_wnd_sort_prop];
 
+			var arrays = ['news','channels'];
+			if( arrays.indexOf( ad_wnd_sort_prop) != -1 )
+			{
+				val_a = val_a.length;
+				val_b = val_b.length;
+			}
+
 			if( val_a == null ) val_a = '';
 			if( val_b == null ) val_b = '';
-
-			if( val_a.length != null ) val_a = val_a.length;
-			if( val_b.length != null ) val_b = val_b.length;
 
 			if(( val_a > val_b ) == ad_wnd_sort_dir ) return -1;
 			if(( val_a < val_b ) == ad_wnd_sort_dir ) return  1;
@@ -661,8 +665,9 @@ function ad_DeleteUser( not_used, i_user_id)
 
 function ad_SetPasswordDialog( not_used, i_user_id)
 {
-	var pw = 'asdfasdf';
-	pw = btoa( pw);
+	var pw = '';
+	for( var i = 0; i < 10; i ++) pw += Math.random().toString(36).substring(2);
+	pw = btoa( pw).substr( 0, 60);
 	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', pw, 'password',
 		'Set Password', 'Enter New Password');
 }

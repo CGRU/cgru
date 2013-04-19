@@ -268,9 +268,11 @@ function g_OpenFolder( i_elFolder )
 
 	i_elFolder.m_elFolders = [];
 
-//	if( i_elFolder.m_dir == null ) return;
 	if( i_elFolder.m_dir == null )
+	{
 		i_elFolder.m_dir = n_WalkDir( [i_elFolder.m_path], 0, RULES.rufolder, [], ['status'])[0];
+		i_elFolder.m_dir.folders.sort( c_CompareFiles );
+	}
 
 	i_elFolder.classList.add('opened');
 
