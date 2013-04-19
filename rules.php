@@ -1506,5 +1506,11 @@ function upload( $i_path, &$o_out)
 	}
 }
 
+function jsf_sendmail( $i_args, &$o_out)
+{
+	$o_out = $i_args;
+	$o_out['status'] = 'email sent.';
+}
+
 ?>
 

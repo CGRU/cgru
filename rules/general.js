@@ -4,11 +4,13 @@ RULES_TOP = {};
 
 p_PLAYER = false;
 
-g_elCurFolder = null;
 g_auth_user = null;
 g_admin = false;
 g_users = null;
 g_groups = null;
+
+g_elCurFolder = null;
+g_nav_clicked = false;
 
 function cgru_params_OnChange( i_param, i_value) { u_ApplyStyles();}
 
@@ -118,6 +120,12 @@ function g_PathChanged()
 
 	if( new_path != old_path )
 		g_Navigate( new_path);
+
+	if( g_nav_clicked == false )
+	{
+		g_elCurFolder.scrollIntoView();
+	}
+	g_nav_clicked = false;
 
 	if( args == null ) return;
 
@@ -247,14 +255,22 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	return true;
 }
 
+function g_OpenCloseFolder( i_elFolder)
+{
+	if( i_elFolder.classList.contains('opened')) g_CloseFolder( i_elFolder);
+	else g_OpenFolder( i_elFolder);
+}
+
 function g_OpenFolder( i_elFolder )
 {
 	if( i_elFolder.classList.contains('opened'))
 		return;
 
 	i_elFolder.m_elFolders = [];
+
+//	if( i_elFolder.m_dir == null ) return;
 	if( i_elFolder.m_dir == null )
-		return;
+		i_elFolder.m_dir = n_WalkDir( [i_elFolder.m_path], 0, RULES.rufolder, [], ['status'])[0];
 
 	i_elFolder.classList.add('opened');
 
@@ -324,7 +340,9 @@ function g_AppendFolder( i_elParent, i_fobject)
 	else
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
 
+	
 	elFolder.onclick = g_FolderOnClick;
+	elFolder.oncontextmenu = function(e){ e.stopPropagation(); g_OpenCloseFolder( e.currentTarget); return false;};
 //	elFolder.ondblclick = g_FolderOnDblClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
@@ -363,7 +381,7 @@ function g_CloseFolder( i_elFolder )
 	i_elFolder.classList.remove('opened');
 }
 
-g_clickedFolder = null;
+//g_clicked_folder = null;
 function g_FolderOnClick( i_evt, i_double)
 {
 if( i_double !== true ) window.console.log('Clicked');
@@ -371,13 +389,13 @@ if( i_double !== true ) window.console.log('Clicked');
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
 	if( elFolder.classList.contains('dummy')) return;
-	g_clickedFolder = elFolder;
+/*	g_clicked_folder = elFolder;
 	setTimeout( g_FolderClicked, 100);
 }
 
 function g_FolderClicked()
 {
-	elFolder = g_clickedFolder;
+	elFolder = g_clicked_folder;*/
 	if( elFolder.classList.contains('current'))
 	{
 		if( elFolder.classList.contains('opened'))
@@ -387,6 +405,7 @@ function g_FolderClicked()
 		return;
 	}
 
+	g_nav_clicked = true;
 	window.location.hash = elFolder.m_path;
 }
 
@@ -402,11 +421,7 @@ return;
 	if( elFolder.classList.contains('opened'))
 		g_CloseFolder( elFolder);
 	else
-	{
-		if( elFolder.m_dir == null )
-			elFolder.m_dir = n_ReadDir( elFolder.m_path, ['status']);
 		g_OpenFolder( elFolder);
-	}
 }
 
 function g_NavigShowInfo( i_toggle)

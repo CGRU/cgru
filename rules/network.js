@@ -143,3 +143,15 @@ function n_GetRuFile( i_file, i_nockeck )
 //	return n_Get( c_GetRuFilePath( i_file));
 }
 
+function n_SendMail( i_address, i_subject, i_body)
+{
+console.log( i_address);
+console.log( i_subject);
+console.log( i_body);
+	var obj = {};
+	obj.address = i_address;
+	obj.subject = i_subject;
+	obj.body = i_body;
+	var result = c_Parse( n_Request({"sendmail":obj}, true, true));
+}
+

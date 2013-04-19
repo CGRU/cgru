@@ -17,7 +17,7 @@ cgru_params.push(['back_comments','Comments', '', 'Enter Background Style']);
 
 function View_body_Open() { u_BodyLoad(); }
 function View_body_Close() { u_BodyEditCancel(''); }
-function View_files_Open() { u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir); }
+function View_files_Open() { if( g_elCurFolder ) u_ShowDirectory( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir); }
 function View_files_Close() { $('files').textContent = ''; }
 
 function u_Init()
@@ -80,6 +80,14 @@ function u_Process()
 //		u_el.thumbnail.setAttribute('src', null );
 		u_el.thumbnail.style.display = 'none';
 	}
+
+	if( g_elCurFolder.classList.contains('dummy'))
+	{
+		$('content').style.display = 'none';
+		return;
+	}
+	else
+		$('content').style.display = 'block';
 
 	a_Process();
 	u_StatusApply();

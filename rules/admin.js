@@ -661,17 +661,41 @@ function ad_DeleteUser( not_used, i_user_id)
 
 function ad_SetPasswordDialog( not_used, i_user_id)
 {
-	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', '', 'password',
+	var pw = 'asdfasdf';
+	pw = btoa( pw);
+	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', pw, 'password',
 		'Set Password', 'Enter New Password');
 }
-
 function ad_SetPassword( i_user_id, i_passwd)
 {
 	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}, true, true));
 
 	if( result.error )
+	{
 		c_Error( result.error);
-	else if( result.status )
-		c_Info( result.status);
+		return;
+	}
+
+	var log = '';
+	if( result.status )
+		log = result.status;
+
+	var email = g_users[i_user_id].email;
+	if( email )
+	{
+		var subject = 'RULES Password';
+		var body = 'RULES password is set to:\n\n' + i_passwd;
+		body += '\n\nFor ';
+		if( g_users[i_user_id].title )
+			body += g_users[i_user_id].title+'['+i_user_id+']';
+		else
+			body += i_user_id;
+
+		n_SendMail( email, subject, body);
+
+		log += ' (emailed)';
+	}
+
+	c_Info( log);
 }
 

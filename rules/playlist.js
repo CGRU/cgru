@@ -10,6 +10,11 @@ function p_Init()
 {
 	for( var i = 0; i < p_elements.length; i++) p_el[p_elements[i]] = document.getElementById( p_elements[i]);
 
+	if( g_auth_user == null )
+		$('playlist_panel').style.display = 'none';
+	else
+		$('playlist_panel').style.display = 'block';
+
 	if( RULES_TOP.playlist ) p_file = RULES_TOP.playlist;
 	p_elCurFolder = p_el.playlist;
 	p_elCurFolder.m_id = '';
