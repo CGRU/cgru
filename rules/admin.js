@@ -4,17 +4,19 @@ ad_wnd = null;
 ad_wnd_curgroup = null;
 ad_wnd_sort_prop = 'id';
 ad_wnd_sort_dir = 0;
+ad_wnd_prof = null;
 
 function ad_Init()
 {
 	if( g_auth_user == null ) return;
 
+	$('profile_button').style.display = 'block';
 	$('ad_logout').style.display = 'block';
 	$('ad_login').style.display = 'none';
 
 	if( false == g_admin ) return;
 
-	$('admin_window').style.display = 'block';
+	$('admin_button').style.display = 'block';
 	$('sidepanel_permissions').style.display = 'block';
 
 	if( localStorage.permissions_opened == "true" ) ad_PermissionsOpen();
@@ -227,6 +229,7 @@ function ad_OpenWindow()
 {
 	ad_wnd = new cgru_Window('Administrate');
 	ad_wnd.elContent.classList.add('administrate');
+	ad_wnd.closeOnEsc = false;
 
 	var elBtnsDiv = document.createElement('div');
 	ad_wnd.elContent.appendChild( elBtnsDiv );
@@ -440,6 +443,14 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( i_row ) elTitle.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
 	else elTitle.onclick = function(e) { ad_WndSortUsers('title'); }
 
+	var elRole = document.createElement('div');
+	el.appendChild( elRole);
+	elRole.style.width = '100px';
+	elRole.textContent = i_user.role;
+	elRole.m_user_id = i_user.id;
+	elRole.title = 'Double click edit role';
+	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
+
 	var elEmail = document.createElement('div');
 	el.appendChild( elEmail);
 	elEmail.style.width = '200px';
@@ -448,15 +459,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elEmail.title = 'Double click edit email';
 	if( i_row ) elEmail.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
 	else elEmail.onclick = function(e) { ad_WndSortUsers('email'); };
-/*
-	var elRole = document.createElement('div');
-	el.appendChild( elRole);
-	elRole.style.width = '100px';
-	elRole.textContent = i_user.role;
-	elRole.m_user_id = i_user.id;
-	elRole.title = 'Double click edit role';
-	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
-*/
+
 	var elPasswd = document.createElement('div');
 	el.appendChild( elPasswd);
 	elPasswd.style.width = '50px';
@@ -574,32 +577,16 @@ function ad_WriteGroups()
 	if( res.error ) { c_Error( res.error ); return; }
 	ad_WndRefresh();
 }
-/*
-function ad_ChangeRoleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role'); }
-function ad_ChangeRole( i_user_id, i_role)
-{
-	var obj = {};
-
-	obj.add = true;
-	obj.object = {"role":i_role};
-	obj.file = 'users/' + i_user_id + '.json';
-
-	var res = c_Parse( n_Request({"editobj":obj}));
-	if( res && res.error )
-	{
-		c_Error( res.error );
-		return;
-	}
-	ad_WndRefresh();
-}
-*/
 function ad_ChangeTitleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');}
-function ad_ChangeTitle( i_user_id, i_title) { ad_ChangeUserProp( i_user_id, 'title', i_title); }
+function ad_ChangeTitle( i_user_id, i_title) { ad_SaveUserProp( i_user_id, 'title', i_title); ad_WndRefresh();}
+
+function ad_ChangeRoleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role'); }
+function ad_ChangeRole( i_user_id, i_role) { ad_SaveUserProp( i_user_id, 'role', i_role); ad_WndRefresh();}
 
 function ad_ChangeEmailOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeEmail', i_user_id, 'str', g_users[i_user_id].email, 'users', 'Change Email', 'Enter New Address');}
-function ad_ChangeEmail( i_user_id, i_email) { ad_ChangeUserProp( i_user_id, 'email', i_email); }
+function ad_ChangeEmail( i_user_id, i_email) { ad_SaveUserProp( i_user_id, 'email', i_email); ad_WndRefresh();}
 
-function ad_ChangeUserProp( i_user_id, i_prop, i_value)
+function ad_SaveUserProp( i_user_id, i_prop, i_value)
 {
 	var obj = {};
 
@@ -614,7 +601,6 @@ function ad_ChangeUserProp( i_user_id, i_prop, i_value)
 		c_Error( res.error );
 		return;
 	}
-	ad_WndRefresh();
 }
 
 function ad_CreateUserOnClick()
@@ -629,7 +615,6 @@ function ad_CreateUser( not_used, i_user_id)
 	user.channels = [];
 	user.news = [];
 	user.ctime = Math.round((new Date()).valueOf()/1000);
-	user.role = 'user';
 
 	var obj = {};
 	obj.add = true;
@@ -686,15 +671,19 @@ function ad_SetPassword( i_user_id, i_passwd)
 		log = result.status;
 
 	var email = g_users[i_user_id].email;
-	if( email )
+	if( email && email.length )
 	{
 		var subject = 'RULES Password';
-		var body = 'RULES password is set to:\n\n' + i_passwd;
-		body += '\n\nFor ';
+		var body = window.location.protocol + '//' + window.location.host;
+		body = '<a href="'+body+'" target="_blank">'+body+'</a>';
+		body += ' password for ';
 		if( g_users[i_user_id].title )
-			body += g_users[i_user_id].title+'['+i_user_id+']';
+			body += g_users[i_user_id].title+' ['+i_user_id+']';
 		else
 			body += i_user_id;
+		body += ' is set to:';
+		body += '<br><br>';
+		body += i_passwd;
 
 		n_SendMail( email, subject, body);
 
@@ -702,5 +691,85 @@ function ad_SetPassword( i_user_id, i_passwd)
 	}
 
 	c_Info( log);
+}
+
+
+ad_prof_props = [];
+ad_prof_props.push({"name":'id',     "label":'ID',     "edit":false});
+ad_prof_props.push({"name":'title',  "label":'Title',  "edit":false});
+ad_prof_props.push({"name":'role',   "label":'Role',   "edit":false});
+ad_prof_props.push({"name":'avatar', "label":'Avatar', "edit":true});
+ad_prof_props.push({"name":'email',  "label":'Email',  "edit":true});
+
+function ad_ProfileOpen()
+{
+	if( g_auth_user == null )
+	{
+		c_Error('No authenticated user founded.');
+		return;
+	}
+
+	var wnd = new cgru_Window('My Profile');
+	wnd.elContent.classList.add('profile');
+	wnd.closeOnEsc = false;
+	ad_wnd_prof = wnd;
+	ad_ProfileDraw();
+}
+function ad_ProfileDraw()
+{
+	var wnd = ad_wnd_prof;
+	wnd.elContent.innerHTML = '';
+
+	if( g_auth_user.avatar && g_auth_user.avatar.length )
+	{
+		var el = document.createElement('img');
+		wnd.elContent.appendChild( el);
+		el.classList.add('avatar');
+		el.src = g_auth_user.avatar;
+		el.width = 100;
+		el.height = 100;
+//console.log('avatar: ' + g_auth_user.avatar + ' ' + g_auth_user.avatar.length);
+	}
+
+	for( var i = 0; i < ad_prof_props.length; i++ )
+	{
+		var prop = ad_prof_props[i];
+
+		var el = document.createElement('div');
+		wnd.elContent.appendChild( el);
+
+		var elLabel = document.createElement('div');
+		el.appendChild( elLabel);
+		elLabel.textContent = prop.label;
+		elLabel.classList.add('label');
+
+		if( prop.edit )
+		{
+			var elEdit = document.createElement('div');
+			el.appendChild( elEdit);
+			elEdit.textContent = 'Edit';
+			elEdit.classList.add('button');
+			elEdit.onclick = function(e){
+				new cgru_Dialog( window, window, 'ad_ProfileEditProp', prop.name, 'str', g_auth_user[prop.name],
+					'users', 'Change '+prop.title, 'Enter New Value');}
+		}
+
+		var elProp = document.createElement('div');
+		el.appendChild( elProp);
+		elProp.textContent = g_auth_user[prop.name];
+		elProp.classList.add('prop');
+	}
+
+	return;
+var el = document.createElement('div');
+wnd.elContent.appendChild( el);
+el.textContent = JSON.stringify( g_auth_user);
+}
+
+function ad_ProfileEditProp( i_prop, i_value)
+{
+	g_auth_user[i_prop] = i_value;
+	ad_SaveUserProp( g_auth_user.id, i_prop, i_value)
+	ad_ProfileDraw();
 }
 

@@ -106,8 +106,8 @@ function jsf_initialize( $i_arg, &$o_out)
 	{
 		$user = array();
 		$user['id'] = $obj['id'];
-		if( isset( $obj['role'])) $user['role'] = $obj['role'];
 		if( isset( $obj['title'])) $user['title'] = $obj['title'];
+		if( isset( $obj['role'])) $user['role'] = $obj['role'];
 		$o_out['users'][$obj['id']] = $user;
 	}
 
@@ -164,7 +164,6 @@ function processUser( &$o_out)
 	}
 
 	$user['rtime'] = time();
-//	$user['title'] = $i_user['title'];
 	$editobj['object'] = $user;
 	$out = array();
 	jsf_editobj( $editobj, $out);
@@ -1508,8 +1507,10 @@ function upload( $i_path, &$o_out)
 
 function jsf_sendmail( $i_args, &$o_out)
 {
-	$o_out = $i_args;
-	$o_out['status'] = 'email sent.';
+	if( mail( $i_args['address'], $i_args['subject'], $i_args['body'], $i_args['headers']))
+		$o_out['status'] = 'email sent.';
+	else
+		$o_out['error'] = 'email was not sent.';
 }
 
 ?>

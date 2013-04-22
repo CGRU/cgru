@@ -280,7 +280,7 @@ function c_ElSetSelected( i_e, i_selected )
 	}
 }
 
-function c_Strip( i_str) { return i_str.replace(/^\s+|\s+$|^<br>|<br>$/g,''); }
+function c_Strip( i_str) { return i_str.replace(/^\s+|\s+$|^\n+|\n+$|^<br>|<br>$/g,''); }
 
 function c_GetElInteger( i_el)
 {

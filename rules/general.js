@@ -75,7 +75,7 @@ function g_CurPath() { if( g_elCurFolder ) return g_elCurFolder.m_path; else ret
 
 function g_OnKeyDown(e)
 {
-	if( e.keyCode == 27 ) cgru_ClosePopus();// ESC
+	if( e.keyCode == 27 ) cgru_EscapePopus();// ESC
 }
 
 function g_GO( i_path)

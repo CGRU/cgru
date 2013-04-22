@@ -21,7 +21,7 @@ Parser.add_option('-D', '--DEBUG',      dest='debug',      action='store_true', 
 if Options.debug: Options.verbose = True
 
 if Options.sender == '':
-	Options.sender = socket.gethostname() + '@' + cgruconfig.VARS['USERNAME']
+	Options.sender = cgruconfig.VARS['USERNAME'] + '@' + socket.gethostname() 
 
 if Options.smtpserver == '':
 	Options.smtpserver = cgruconfig.VARS['email_smtp_server']

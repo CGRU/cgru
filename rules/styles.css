@@ -505,3 +505,11 @@ box-shadow: 0 0 4px #000 inset;
 .admin_groups .selected, .admin_users .selected div { background: rgba(100,255,255,.2); }
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
 
+.profile > div { border-radius: 4px; border: 1px solid #888; margin: 4px 0px; padding: 4px; }
+.profile > div > div { padding: 4px 8px; }
+.profile > div .label { float: left; width: 150px; }
+.profile > div .prop { min-height: 20px; box-shadow: 0 0 2px #000 inset, 0 0 0 2px rgba(255,255,255,.2); border-radius: 4px; }
+.profile > div .button { float: right; margin: 1px 8px; font-size: 14px; }
+.profile .avatar { float: right; width: 100px; height: 100px; border: 1px solid #000; border-radius: 8px; margin: 8px; padding: 0px; box-shadow: 0 0 4px rgba(255,255,255,.8); }
+
+
