@@ -108,6 +108,12 @@ function jsf_initialize( $i_arg, &$o_out)
 		$user['id'] = $obj['id'];
 		if( isset( $obj['title'])) $user['title'] = $obj['title'];
 		if( isset( $obj['role'])) $user['role'] = $obj['role'];
+
+		if( isset( $obj['avatar']) && strlen($obj['avatar']))
+			$user['avatar'] = $obj['avatar'];
+		else if( isset( $obj['email']))
+			$user['avatar'] = 'http://www.gravatar.com/avatar/'.md5( strtolower( trim($obj['email'])));
+
 		$o_out['users'][$obj['id']] = $user;
 	}
 

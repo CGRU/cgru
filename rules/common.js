@@ -362,3 +362,5 @@ function c_MakeThumbnail( i_file)
 function c_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}
 function c_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));}
 
+function c_MD5( i_str) { return hex_md5( i_str);}
+

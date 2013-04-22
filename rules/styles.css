@@ -448,9 +448,10 @@ margin: 0px 4px 8px 4px;
 }
 .comment .panel { margin: 0px;}
 .comment .panel .type { width: 100px; text-align: center; display: block; }
-.comment .panel .user,.comment .panel .duration,.comment .panel .date {
+.comment .panel .avatar,.comment .panel .user,.comment .panel .duration,.comment .panel .date {
 float: left; margin: 1px 8px;
 }
+.comment .panel .avatar { height: 32px; width: 32px; border-radius: 4px; box-shadow: 0 0 2px #FFF; }
 .comment .panel .user { width: 140px; }
 .comment .panel .duration { width: 50px; text-align:center; box-shadow: 0 0 2px #000 inset; border-radius: 4px; }
 .comment .panel .date { font-size: 14px; margin-top: 2px; }

@@ -69,6 +69,11 @@ function cm_Add( i_obj, i_key)
 	elType.style.cssFloat = 'left';
 	el.m_elType = elType;
 
+	var elAvatar = document.createElement('img');
+	elAvatar.classList.add('avatar');
+	elPanel.appendChild( elAvatar);
+	el.m_elAvatar = elAvatar;
+
 	var elUser = document.createElement('div');
 	elUser.classList.add('user');
 	elPanel.appendChild( elUser);
@@ -160,6 +165,12 @@ function cm_Init( i_el, i_key)
 	i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
 	i_el.id = i_key;
 	i_el.m_type = i_el.m_obj.type;
+
+	var avatar = ad_GetAvatar( i_el.m_obj.user_name);
+	if( avatar != null )
+		i_el.m_elAvatar.src = ad_GetAvatar( i_el.m_obj.user_name);
+	else
+		i_el.m_elAvatar.style.display = 'none';
 
 	i_el.m_elUser.textContent = c_GetUserTitle(i_el.m_obj.user_name);
 	i_el.m_elDate.textContent = c_DT_StrFromMSec( i_el.m_obj.ctime);

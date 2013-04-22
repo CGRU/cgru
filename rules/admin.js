@@ -450,6 +450,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elRole.m_user_id = i_user.id;
 	elRole.title = 'Double click edit role';
 	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
+	else elRole.onclick = function(e) { ad_WndSortUsers('role'); }
 
 	var elEmail = document.createElement('div');
 	el.appendChild( elEmail);
@@ -720,15 +721,15 @@ function ad_ProfileDraw()
 	var wnd = ad_wnd_prof;
 	wnd.elContent.innerHTML = '';
 
-	if( g_auth_user.avatar && g_auth_user.avatar.length )
+	var avatar = ad_GetAvatar();
+	if( avatar )
 	{
 		var el = document.createElement('img');
 		wnd.elContent.appendChild( el);
 		el.classList.add('avatar');
-		el.src = g_auth_user.avatar;
+		el.src = avatar;
 		el.width = 100;
 		el.height = 100;
-//console.log('avatar: ' + g_auth_user.avatar + ' ' + g_auth_user.avatar.length);
 	}
 
 	for( var i = 0; i < ad_prof_props.length; i++ )
@@ -749,9 +750,8 @@ function ad_ProfileDraw()
 			el.appendChild( elEdit);
 			elEdit.textContent = 'Edit';
 			elEdit.classList.add('button');
-			elEdit.onclick = function(e){
-				new cgru_Dialog( window, window, 'ad_ProfileEditProp', prop.name, 'str', g_auth_user[prop.name],
-					'users', 'Change '+prop.title, 'Enter New Value');}
+			elEdit.m_prop = prop;
+			elEdit.onclick = ad_ProfileEditPropOnClick;
 		}
 
 		var elProp = document.createElement('div');
@@ -766,10 +766,47 @@ wnd.elContent.appendChild( el);
 el.textContent = JSON.stringify( g_auth_user);
 }
 
+function ad_ProfileEditPropOnClick( i_evt)
+{
+	var prop = i_evt.currentTarget.m_prop;
+	new cgru_Dialog( window, window, 'ad_ProfileEditProp', prop.name, 'str', g_auth_user[prop.name],
+		'users', 'Change '+prop.label, 'Enter New Value');
+}
 function ad_ProfileEditProp( i_prop, i_value)
 {
 	g_auth_user[i_prop] = i_value;
 	ad_SaveUserProp( g_auth_user.id, i_prop, i_value)
 	ad_ProfileDraw();
+}
+
+function ad_GetAvatar( i_user_id )
+{
+	var avatar = null;
+
+	var user = null;
+	if( i_user_id )
+		user = g_users[i_user_id];
+	else
+		user = g_auth_user; 
+
+	if( user == null )
+	{
+		avatar = null;
+	}
+	else if( user.avatar && user.avatar.length )
+	{
+		avatar = user.avatar; 
+	}
+	else if( user.email && user.email.length )
+	{
+		avatar = user.email;
+		avatar = c_MD5( avatar.toLowerCase());
+		avatar = 'http://www.gravatar.com/avatar/' + avatar;
+	}
+
+	if( avatar && avatar.length )
+		return avatar;
+
+	return null;
 }
 
