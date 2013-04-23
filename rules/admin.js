@@ -659,18 +659,6 @@ function ad_SetPasswordDialog( not_used, i_user_id)
 }
 function ad_SetPassword( i_user_id, i_passwd)
 {
-	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}, true, true));
-
-	if( result.error )
-	{
-		c_Error( result.error);
-		return;
-	}
-
-	var log = '';
-	if( result.status )
-		log = result.status;
-
 	var email = g_users[i_user_id].email;
 	if( email && email.length )
 	{
@@ -685,13 +673,21 @@ function ad_SetPassword( i_user_id, i_passwd)
 		body += ' is set to:';
 		body += '<br><br>';
 		body += i_passwd;
+		body += '<br><br>';
+		body += 'Login name: '+i_user_id;
 
 		n_SendMail( email, subject, body);
-
-		log += ' (emailed)';
 	}
 
-	c_Info( log);
+	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}, true, true));
+
+	if( result.error )
+	{
+		c_Error( result.error);
+		return;
+	}
+
+	if( result.status ) c_Info( result.status);
 }
 
 
