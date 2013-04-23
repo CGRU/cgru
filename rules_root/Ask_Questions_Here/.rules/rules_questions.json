@@ -1,0 +1,15 @@
+{
+
+"assets":{
+	"forum":{
+		"seek":["/"]
+	},
+	"topic":{
+		"seek":["[forum]/"],
+		"scripts":["rules/forum.js"]
+	}
+},
+
+"forum":"Questions"
+
+}
