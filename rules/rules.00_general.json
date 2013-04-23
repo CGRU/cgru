@@ -1,6 +1,6 @@
 {
-"root":".",
-"rufolder":"rules",
+"root":"rules_root",
+"rufolder":".rules",
 "company":"CGRU",
 "playlist":"rules/playlist.json",
 "newsrefresh":60,

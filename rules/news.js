@@ -334,6 +334,15 @@ function nw_NewsLoad()
 		elBtn.ondblclick = function(e){ nw_RemoveNews( e.currentTarget.m_id);};
 		elBtn.title = 'Double click to remove link';
 
+		var avatar = ad_GetAvatar( news.user);
+		if( avatar )
+		{
+			var elAvatar = document.createElement('img');
+			el.appendChild( elAvatar);
+			elAvatar.classList.add('avatar');
+			elAvatar.src = avatar;
+		}
+
 		var elLabel = document.createElement('div');
 		el.appendChild( elLabel);
 		elLabel.classList.add('news_label');

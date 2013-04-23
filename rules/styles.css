@@ -221,12 +221,14 @@ margin: 1px 0px;
 }
 #news .button, #channels .button {
 float: left;
-margin: 0px 8px 0px 0px;
+height: 14px;
+margin: 0px 4px 0px 0px;
 padding: 0px 4px 0px 4px;
 }
 #news a, #channels a {
 font-size: 10px;
 }
+#news .avatar { float:right; border-radius: 4px; width: 24px; height: 24px; margin: 2px; }
 #news .news_label { font-size:12px; }
 /* ============= PLAYLIST: =============== */
 #playlist .folder, #playlist a {

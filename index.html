@@ -101,7 +101,7 @@
 	<div style="text-align:center;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
 	<div id="content_info">
 		<div id="content_status">
-			<div class="button" style="float:right;font-size:10px;" onclick="u_StatusEditOnClick()">Edit</div>
+			<div id="status_edit" class="button" style="display:none; float:right; font-size:10px;" onclick="u_StatusEditOnClick()">Edit</div>
 			<div id="status_percentage"></div>
 			<div id="status_annotation"></div>
 			<div id="status_artists" class="artists"></div>
@@ -123,7 +123,10 @@
 	</div>
 	<div id="body_div" class="view">
 		<div id="body_btn" class="button openclose" onclick="u_OpenCloseView('body')">-</div>
-		<div id="body_btn_0" class="button" style="padding:0px 4px;float:right;display:none" onclick="u_BodyEditStart()">Edit</div>
+		<div id="body_edit" style="float:right; display:none;">
+			<div id="body_btn_0" class="button" style="padding:0px 4px; float:right; display:none;"
+				onclick="u_BodyEditStart()">Edit</div>
+		</div>
 		<div id="body_label" style="text-align:center; margin-top: 4px;">Body</div>
 		<div id="body">
 			<div id="body_panel" style="padding: 1px 10px;">

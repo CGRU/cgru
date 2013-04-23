@@ -136,6 +136,18 @@ function a_ShowBody()
 
 	if( thumbnails.length )
 		a_MakeThumbnail( thumbnails, ASSET.path);
+
+	if( ASSET.scripts )
+	for( var i = 0; i < ASSET.scripts.length; i++ )
+	{
+		var script = document.createElement('script');
+//		script.type = 'text/javascript';
+		//ga.async = true;
+		//ga.async = false;
+	    script.src = ASSET.scripts[i];
+	    var scripts = document.getElementsByTagName('script')[0];
+		scripts.parentNode.insertBefore( script, scripts);
+	}
 }
 
 function a_MakeThumbnail( i_sources, i_path)
@@ -206,6 +218,7 @@ function a_AutoSeek()
 		else
 			path += '/' + folders[i];
 //window.console.log('path='+path);
+
 		for( var asset_type in RULES.assets)
 		{
 			if( ASSETS[asset_type]) continue;
@@ -242,6 +255,19 @@ function a_AutoSeek()
 						if( apath == '/' ) apath = '/' + nextfolder;
 						else apath = apath + '/' + nextfolder;
 					}
+
+					var exists = false; // Verify whether an asset with the same path exists
+					for( var asset in ASSETS)
+					{
+//console.log( ASSETS[asset].path + ' == ' + apath);
+						if( ASSETS[asset].path == apath)
+						{
+							exists = true;
+							break;
+						}
+					}
+					if( exists ) break;
+
 					a_Create( asset_type, aname, apath);
 					c_Log('Asset founded: ' + asset_type + '=' + aname);
 					break;

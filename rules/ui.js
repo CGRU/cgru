@@ -51,9 +51,11 @@ function u_Init()
 }
 function u_InitAuth()
 {
-	$('body_btn_0').style.display = 'block';
+	$('body_edit').style.display = 'block';
 	$('search_artists_div').style.display = 'block';
+	$('status_edit').style.display = 'block';
 	$('auth_user').textContent = c_GetUserTitle()+' ['+g_auth_user.id+']';
+
 	var elArtists = $('search_artists');
 	for( var user in g_users )
 	{
