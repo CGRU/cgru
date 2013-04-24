@@ -481,6 +481,12 @@ box-shadow: 0 0 4px #000 inset;
 .comment .uploads .cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
 /*.comment .uploads .file { border: none; border-top: none; }*/
 
+/* ================== GUEST =================== */
+.guest_attrs .attr { margin: 4px; }
+.guest_attrs .attr > div { padding: 4px 8px; }
+.guest_attrs .attr .label { float: left; width: 150px; }
+.guest_attrs .attr .info { float: right; width: 200px; }
+
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */
 #upload > div { border-radius: 4px; box-shadow: 0 0 3px #000 inset; margin: 1px 0px; font-size: 14px; }

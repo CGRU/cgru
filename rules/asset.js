@@ -20,6 +20,7 @@ function a_Finish()
 	ASSETS = {};
 	ASSET = null;
 
+	$('asset_label').textContent = 'Asset';
 	u_el.assets.innerHTML = '';
 	u_el.asset.innerHTML = '';
 

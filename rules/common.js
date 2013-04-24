@@ -364,3 +364,9 @@ function c_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));
 
 function c_MD5( i_str) { return hex_md5( i_str);}
 
+function c_ValidateEmail( i_email)
+{ 
+	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test( i_email);
+}
+

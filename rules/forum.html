@@ -1,18 +1,49 @@
 <style type="text/css">
-#forum_topic { margin: 4px; padding: 4px; }
+#forum_new_question .param { margin: 4px; }
+#forum_new_question .param .label { float: left; width: 150px; }
+#forum_new_question .param .info { float: right; width: 200px; }
+#forum_new_question .param > div { padding: 4px 8px; }
 </style>
 
-<div id="forum_topic">
+<div id="forum_new_question" style="margin:4px; padding:4px;">
 
-This is a forum topic.
-
-<div id="forum_topic_new_question">
-	<div>Ask a new question</div>
-	<div>Name (required)</div>
-	<div>Title (optional)</div>
-	<div>Email (optional, will be hidden)</div>
-	<div>Avatar (optional, link, gravatar)</div>
-	<div class="button">Create Question</div>
+<div class="param">
+	<div class="label">Question Name</div>
+	<div class="info">required, 16 characters max</div>
+	<div id="forum_question_id" contenteditable="true" class="editing"></div>
 </div>
 
+<div class="param">
+	<div class="label">Question Body</div>
+	<div id="forum_question_body" contenteditable="true" class="editing"></div>
 </div>
+
+<div id="forum_guest_form" style="border: 1px solid #777; border-radius: 6px; margin: 8px 0px; display: none;">
+	<!--div style="padding: 4px 8px;">Fill in guest attributes:</div>
+	<div class="param">
+		<div class="label">Name</div>
+		<div class="info">required</div>
+		<div id="forum_guest_id" contenteditable="true" class="editing"></div>
+	</div>
+	<div class="param">
+		<div class="label">Title</div>
+		<div class="info">optional</div>
+		<div id="forum_guest_title" contenteditable="true" class="editing"></div>
+	</div>
+	<div class="param">
+		<div class="label">Email</div>
+		<div class="info">optional, gravatar, hidden</div>
+		<div id="forum_guest_email" contenteditable="true" class="editing"></div>
+	</div>
+	<div class="param">
+		<div class="label">Avatar</div>
+		<div class="info">optional, link</div>
+		<div id="forum_guest_avatar" contenteditable="true" class="editing"></div>
+	</div-->
+</div>
+
+<div class="button" onclick="forum_NewQuestionOnClick()">Create Question</div>
+<!--div id="forum_new_question_info"></div-->
+
+</div>
+

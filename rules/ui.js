@@ -2,6 +2,12 @@ u_elements = ['asset','assets','info','open','log','navig','status_annotation','
 u_el = {};
 u_views = ['asset','files','body','comments'];
 
+u_guest_attrs = []
+u_guest_attrs.push({"name":'id',     "label":'Login Name',"required":true});
+u_guest_attrs.push({"name":'title',  "label":'Full Name'});
+u_guest_attrs.push({"name":'email',  "label":'Email',  "info":'gravarar, hidden'});
+u_guest_attrs.push({"name":'avatar', "label":'Avatar', "info":'link'});
+
 u_body_filename = 'body.html';
 u_body_edit_markup = 0;
 u_body_text = '';
@@ -1184,5 +1190,69 @@ function u_EditPanelCreate( i_el)
 	}
 
 	return elPanel;
+}
+
+function u_GuestAttrsDraw( i_el)
+{
+	i_el.classList.add('guest_attrs');
+	i_el.m_guest_attrs = {};
+
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.classList.add('caption');
+	el.textContent = 'Guest attributes:';
+	
+	for( var i = 0; i < u_guest_attrs.length; i++)
+	{
+		var attr = u_guest_attrs[i];
+
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('attr');
+
+		var elLabel = document.createElement('div');
+		el.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = attr.label;
+
+		var elInfo = document.createElement('div');
+		el.appendChild( elInfo);
+		elInfo.classList.add('info');
+		var info = 'optional';
+		if( attr.required ) info = 'required';
+		if( attr.info ) info += ', ' + attr.info;
+		elInfo.textContent = info;
+
+		var elEdit = document.createElement('div');
+		el.appendChild( elEdit);
+		elEdit.contentEditable = true;
+		elEdit.classList.add('editing');
+
+		i_el.m_guest_attrs[attr.name] = elEdit;
+	}
+}
+function u_GuestAttrsGet( i_el)
+{
+	var guest = {};
+	for( var i = 0; i < u_guest_attrs.length; i++)
+	{
+		var attr = u_guest_attrs[i];
+		var value = i_el.m_guest_attrs[attr.name].textContent;
+		value = c_Strip( value);
+
+		if(( attr.name == 'id' ) && ( value.length == 0 ))
+		{
+			c_Error('Required guest ID attribute is empty.');
+			return null;
+		}
+		if(( attr.name == 'email' ) && ( value.length != 0 ) && ( false == c_ValidateEmail( value)))
+		{
+			c_Error('Invalid guest email.');
+			return null;
+		}
+		
+		guest[attr.name] = value;
+	}
+	return guest;
 }
 
