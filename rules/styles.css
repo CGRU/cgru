@@ -482,6 +482,7 @@ box-shadow: 0 0 4px #000 inset;
 /*.comment .uploads .file { border: none; border-top: none; }*/
 
 /* ================== GUEST =================== */
+.guest_attrs .caption { margin: 4px 8px; padding: 4px 8px; }
 .guest_attrs .attr { margin: 4px; }
 .guest_attrs .attr > div { padding: 4px 8px; }
 .guest_attrs .attr .label { float: left; width: 150px; }

@@ -6,7 +6,7 @@ a_elFolders = null;
 a_elCurEditStatus = null;
 a_elFileLimits = [];
 
-function View_asset_Open() { a_ShowBody(); }
+function View_asset_Open() { a_ShowAssets(); }
 
 function a_Process()
 {
@@ -21,6 +21,7 @@ function a_Finish()
 	ASSET = null;
 
 	$('asset_label').textContent = 'Asset';
+	$('asset_div').style.display = 'none';
 	u_el.assets.innerHTML = '';
 	u_el.asset.innerHTML = '';
 
@@ -28,25 +29,35 @@ function a_Finish()
 	a_elFolders = null;
 }
 
-function a_ShowBody()
+function a_ShowAssets()
 {
+	$('asset_div').style.display = 'none';
+
 	if( ASSET == null ) return;
-	if( ASSET.path != g_CurPath()) return;
 
-	u_el.asset.innerHTML = '';
+	if(( ASSET.show_in_subdirectories !== true ) && ( ASSET.path != g_CurPath()))
+		return;
 
-	thumbnails = [];
+	$('files_div').style.display = 'none';
+	$('asset_div').style.display = 'block';
+
+	a_ShowBody( ASSET);
+}
+
+function a_ShowBody( i_asset )
+{
+	var thumb_paths = [];
 	a_elFileLimits = [];
 
-	window.document.title = ASSET.name + ' ' + window.document.title;
+	window.document.title = i_asset.name + ' ' + window.document.title;
 
-	if( ASSET.thumbnails != null )
+	if( i_asset.thumbnails != null )
 	{
 		a_ShowThumbnails();
 		return;
 	}
 
-	if( ASSET.source )
+	if( i_asset.source )
 	{
 		var elSource = document.createElement('div');
 		u_el.asset.appendChild( elSource);
@@ -58,29 +69,29 @@ function a_ShowBody()
 
 	var walk = {};
 	walk.paths = [];
-	if( ASSET.result )
+	if( i_asset.result )
 	{
 		walk.result = [];
-		for( var r = 0; r < ASSET.result.path.length; r++)
+		for( var r = 0; r < i_asset.result.path.length; r++)
 		{
 			walk.result.push( walk.paths.length);
-			walk.paths.push( ASSET.path + '/' + ASSET.result.path[r]);
+			walk.paths.push( i_asset.path + '/' + i_asset.result.path[r]);
 		}
 	}
-	if( ASSET.dailies )
+	if( i_asset.dailies )
 	{
 		walk.dailies = [];
-		for( var r = 0; r < ASSET.dailies.path.length; r++)
+		for( var r = 0; r < i_asset.dailies.path.length; r++)
 		{
 			walk.dailies.push( walk.paths.length);
-			walk.paths.push( ASSET.path + '/' + ASSET.dailies.path[r]);
+			walk.paths.push( i_asset.path + '/' + i_asset.dailies.path[r]);
 		}
 	}
 
 	if( walk.paths.length )
 		walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder);
 
-	if( ASSET.result )
+	if( i_asset.result )
 	{
 		var elResult = document.createElement('div');
 		u_el.asset.appendChild( elResult);
@@ -95,7 +106,7 @@ function a_ShowBody()
 
 			var elFileLimit = a_FileLimitAdd( elResult);
 
-			thumbnails.push( path);
+			thumb_paths.push( path);
 			elFileLimit.m_elFiles = u_ShowDirectory( elResult, path, walk.walks[walk.result[i]])
 			founded = true;
 
@@ -103,10 +114,10 @@ function a_ShowBody()
 		}
 
 		if( false == founded )
-			elResult.textContent = JSON.stringify( ASSET.result.path );
+			elResult.textContent = JSON.stringify( i_asset.result.path );
 	}
 
-	if( ASSET.dailies )
+	if( i_asset.dailies )
 	{
 		var elDailies = document.createElement('div');
 		u_el.asset.appendChild( elDailies);
@@ -122,30 +133,30 @@ function a_ShowBody()
 			{
 				var elFileLimit = a_FileLimitAdd( elDailies);
 				elFileLimit.m_elFiles = u_ShowDirectory( elDailies, path, walk.walks[walk.dailies[i]]);
-				if( thumbnails.length == 0 )
-					thumbnails.push( path);
+				if( thumb_paths.length == 0 )
+					thumb_paths.push( path);
 				founded = true;
 				a_elFileLimits.push( elFileLimit);
 			}
 		}
 
 		if( false == founded )
-			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
+			elDailies.textContent = JSON.stringify( i_asset.dailies.path );
 	}
 
 	a_FileLimitsApplyAll();
 
-	if( thumbnails.length )
-		a_MakeThumbnail( thumbnails, ASSET.path);
+	if( thumb_paths.length )
+		a_MakeThumbnail( thumb_paths, i_asset.path);
 
-	if( ASSET.scripts )
-	for( var i = 0; i < ASSET.scripts.length; i++ )
+	if( i_asset.scripts )
+	for( var i = 0; i < i_asset.scripts.length; i++ )
 	{
 		var script = document.createElement('script');
 //		script.type = 'text/javascript';
 		//ga.async = true;
 		//ga.async = false;
-	    script.src = ASSET.scripts[i];
+	    script.src = i_asset.scripts[i];
 	    var scripts = document.getElementsByTagName('script')[0];
 		scripts.parentNode.insertBefore( script, scripts);
 	}

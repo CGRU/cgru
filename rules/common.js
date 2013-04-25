@@ -207,8 +207,8 @@ function c_ElDisplayToggle( i_el)
 
 function c_GetUserTitle( i_uid, i_short)
 {
-	if( g_auth_user == null ) return null;
 	if( i_uid == null ) i_uid = g_auth_user.id;
+	if( i_uid == null ) return null;
 	var title = i_uid;
 	if( g_users && g_users[i_uid] && g_users[i_uid].title )
 		title = g_users[i_uid].title;
@@ -368,5 +368,10 @@ function c_ValidateEmail( i_email)
 { 
 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test( i_email);
+}
+
+function c_FileNameValidate( i_file)
+{
+	return i_file;
 }
 

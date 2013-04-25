@@ -245,19 +245,27 @@ function nw_MakeNewsDialog()
 		'Create News', 'Enter News Title');
 }
 function nw_MakeNewsDialogApply( i_not_used, i_title) { nw_MakeNews( i_title); }
-function nw_MakeNews( i_title, i_path)
+function nw_MakeNews( i_title, i_path, i_user_id )
 {
 	if( localStorage.news_disabled == 'true') return;
 //window.console.log(i_title);
-	if( g_auth_user == null ) return;
+//	if( g_auth_user == null ) return;
+	if( i_user_id == null )
+	{
+		if( g_auth_user )
+			i_user_id = g_auth_user.id;
+		else
+			c_Error('Can`t make news with no user.');
+	}
 
 	if( i_path == null ) i_path = g_CurPath();
 
 	var news = {};
 	news.time = c_DT_CurSeconds();
+	news.user = i_user_id;
 	news.path = i_path;
 	news.title = i_title;
-	news.id = g_auth_user.id+'_'+news.time+'_'+news.path;
+	news.id = i_user_id+'_'+news.time+'_'+news.path;
 	if( localStorage.news_ignore_own == 'true' )
 		news.ignore_own = true;
 

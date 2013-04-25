@@ -705,12 +705,15 @@ function jsf_editobj( $i_edit, &$o_out)
 
 	if( $UserName == null )
 	{
-		$o_out['error'] = 'Guests are not allowed to edit objects.';
-		return;
+		if( is_file( $i_edit['file']) || ( basename( $i_edit['file']) != 'status.json'))
+		{
+			$o_out['error'] = 'Guests are not allowed to edit objects.';
+			return;
+		}
 	}
 
 	$mode = 'w+';
-	if( file_exists( $i_edit['file'])) $mode = 'r+';
+	if( is_file( $i_edit['file'])) $mode = 'r+';
 	if( false == is_dir( dirname($i_edit['file'])))
 		mkdir( dirname($i_edit['file']));
 	if( $fHandle = fopen( $i_edit['file'], $mode))
@@ -800,14 +803,18 @@ function afanasy( $i_obj, &$o_out)
 function jsf_save( $i_save, &$o_out)
 {
 	global $UserName;
-	if( $UserName == null )
-	{
-		$o_out['error'] = 'Guests are not allowed to save files.';
-		return;
-	}
 
 	$filename = $i_save['file'];
 	$dirname = dirname($filename);
+
+	if( $UserName == null )
+	{
+		if( is_file( $filename) || ( basename( $filename) != 'body.html'))
+		{
+			$o_out['error'] = 'Guests are not allowed to save files.';
+			return;
+		}
+	}
 
 	$o_out['save'] = $filename;
 
@@ -841,13 +848,13 @@ function jsf_save( $i_save, &$o_out)
 function jsf_makenews( $i_news, &$o_out)
 {
 	global $UserName, $RuleMaxLength;
-
+/*
 	if( $UserName == null )
 	{
 		$o_out['error'] = 'Guests are not allowed to make news.';
 		return;
 	}
-
+*/
 	$users = array();	
 	if( $fHandle = opendir('users'))
 	{
@@ -884,7 +891,7 @@ function jsf_makenews( $i_news, &$o_out)
 
 	foreach( $users as &$user )
 	{
-		if( $ignore_own && ( $UserName == $user['id']))
+		if( $ignore_own && ( $i_news['user'] == $user['id']))
 			continue;
 
 		foreach( $user['channels'] as $channel )
@@ -893,7 +900,7 @@ function jsf_makenews( $i_news, &$o_out)
 			{
 				array_push( $o_out['users'], $user['id']);
 
-				$i_news['user'] = $UserName;
+				$i_news['user'] = $i_news['user'];
 
 				$has_event = false;
 				foreach( $user['news'] as &$event )

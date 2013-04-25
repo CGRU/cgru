@@ -97,10 +97,19 @@ function u_Process()
 	else
 		$('content').style.display = 'block';
 
+	// Restore may be hidden views:
+	for( var i = 0; i < u_views.length; i++)
+	{
+		if( localStorage['view_'+u_views[i]] === 'true' )
+			$(u_views[i]+'_div').style.display = 'block';
+		else
+			$(u_views[i]+'_div').style.display = 'inline';
+	}
+
 	a_Process();
 	u_StatusApply();
 	nw_Process();
-
+/*
 	if( ASSET && ( ASSET.path == g_elCurFolder.m_path ))
 	{
 		if( localStorage.view_asset === 'true' )
@@ -117,7 +126,7 @@ function u_Process()
 		else
 			$('files_div').style.display = 'inline';
 	}
-
+*/
 	u_ViewsFuncsOpen();
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
@@ -1227,6 +1236,8 @@ function u_GuestAttrsDraw( i_el)
 		el.appendChild( elEdit);
 		elEdit.contentEditable = true;
 		elEdit.classList.add('editing');
+		if( localStorage['guest_'+attr.name] )
+			elEdit.textContent = localStorage['guest_'+attr.name];
 
 		i_el.m_guest_attrs[attr.name] = elEdit;
 	}
@@ -1237,7 +1248,8 @@ function u_GuestAttrsGet( i_el)
 	for( var i = 0; i < u_guest_attrs.length; i++)
 	{
 		var attr = u_guest_attrs[i];
-		var value = i_el.m_guest_attrs[attr.name].textContent;
+		var el = i_el.m_guest_attrs[attr.name];
+		var value = el.textContent;
 		value = c_Strip( value);
 
 		if(( attr.name == 'id' ) && ( value.length == 0 ))
@@ -1250,7 +1262,8 @@ function u_GuestAttrsGet( i_el)
 			c_Error('Invalid guest email.');
 			return null;
 		}
-		
+
+		localStorage['guest_'+attr.name] = value;	
 		guest[attr.name] = value;
 	}
 	return guest;

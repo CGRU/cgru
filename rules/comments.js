@@ -320,11 +320,11 @@ function cm_Cancel( i_el)
 
 function cm_NewOnClick()
 {
-	if( g_auth_user == null )
+/*	if( g_auth_user == null )
 	{
 		c_Error('Guests can`t leave comments.');
 		return;
-	}
+	}*/
 	cm_Edit( cm_Add());
 }
 

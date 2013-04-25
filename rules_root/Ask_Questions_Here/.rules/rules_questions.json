@@ -6,7 +6,8 @@
 	},
 	"topic":{
 		"seek":["[forum]/"],
-		"scripts":["rules/forum.js"]
+		"scripts":["rules/forum.js"],
+		"show_in_subdirectories":true
 	}
 },
 
