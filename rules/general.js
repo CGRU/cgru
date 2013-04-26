@@ -30,14 +30,7 @@ function g_Init()
 	}
 	if( SERVER.version ) document.getElementById('version').innerHTML = c_Strip( SERVER.version);
 
-	var obj = {};
-	obj.initialize = {};
-	if( SERVER.AUTH_RULES )
-	{
-		var digest = ad_ConstructDigest();
-		if( digest ) obj.digest = digest;
-	}
-	var config = c_Parse( n_Request( obj));
+	var config = c_Parse( n_Request({"initialize":{}}));
 	if( config == null ) return;
 	if( config.error )
 	{

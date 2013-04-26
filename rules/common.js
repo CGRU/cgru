@@ -52,6 +52,8 @@ function c_Parse( i_data)
 		obj = null;
 	}
 
+	if( obj.nonce && SERVER ) SERVER.nonce = obj.nonce;
+
 	return obj;
 }
 

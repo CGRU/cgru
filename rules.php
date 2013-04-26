@@ -2,7 +2,8 @@
 
 $CONF = array();
 $CONF['AUTH_RULES'] = false;
-//$CONF['AUTH_RULES'] = true;
+if( $_SERVER['SERVER_NAME'] == 'cgru.info') $CONF['AUTH_RULES'] = true;
+if( $_SERVER['SERVER_NAME'] == '127.0.0.1') $CONF['AUTH_RULES'] = true;
 
 umask(0000);
 
@@ -44,6 +45,7 @@ if( $CONF['AUTH_RULES'] )
 			$Out['auth_error'] = true;
 		}
 	}
+	$Out['nonce'] = md5(rand());
 }	
 else
 {
@@ -101,8 +103,12 @@ function jsf_start( $i_arg, &$o_out)
 		$o_out['version'] = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 	}
+	$o_out['name'] = $_SERVER['SERVER_NAME'];
+	$o_out['software'] = $_SERVER['SERVER_SOFTWARE'];
+	$o_out['remote_address'] = $_SERVER['REMOTE_ADDR'];
+	$o_out['php_version'] = phpversion();
 	foreach( $CONF as $key => $val ) $o_out[$key] = $val;
-	if( $CONF['AUTH_RULES']) $o_out['nonce'] = uniqid();
+	if( $CONF['AUTH_RULES']) $o_out['nonce'] = md5(rand());
 }
 
 function jsf_initialize( $i_arg, &$o_out)
@@ -115,7 +121,7 @@ function jsf_initialize( $i_arg, &$o_out)
 
 	if( $UserID != null )
 	{
-		if( false == is_file( $HT_AccessFileName))
+		if(( false == is_file( $HT_AccessFileName)) && ( is_file('htaccess_example')))
 		{
 			if( copy('htaccess_example', $HT_AccessFileName))
 				error_log('HT access file copied.');
@@ -332,7 +338,7 @@ function jsf_login( $i_arg, &$o_out)
 	}
 
 	header('HTTP/1.1 401 Unauthorized');
-	header('WWW-Authenticate: Digest realm="'.$i_arg['realm'].'",qop="auth",nonce="'.uniqid().'"');
+	header('WWW-Authenticate: Digest realm="'.$i_arg['realm'].'",qop="auth",nonce="'.md5(rand()).'"');
 	#die('Text to send if user hits Cancel button');
 	//$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
 }
@@ -971,7 +977,11 @@ function jsf_makenews( $i_news, &$o_out)
 function isAdmin( &$o_out)
 {
 	global $Groups, $UserID;
-	if( is_null( $UserID )) return false;
+	if( is_null( $UserID ))
+	{
+		$o_out['error'] = 'Access denied.';
+		return false;
+	}
 
 	if( is_null( $Groups))
 	{

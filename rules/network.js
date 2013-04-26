@@ -38,6 +38,13 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 function n_Request( i_obj, i_wait, i_encode)
 {
 	if( i_wait == null) i_wait = true;
+
+	if( SERVER && SERVER.AUTH_RULES )
+	{
+		var digest = ad_ConstructDigest();
+		if( digest ) i_obj.digest = digest;
+	}
+
 	var obj_str = JSON.stringify( i_obj);
 	if( i_encode == true )
 		obj_str = btoa( obj_str);
