@@ -1,29 +1,27 @@
 <?php
 
+$CONF = array();
+$CONF['AUTH_RULES'] = false;
+//$CONF['AUTH_RULES'] = true;
+
 umask(0000);
 
 $HT_AccessFileName = '.htaccess';
 $HT_GroupsFileName = '.htgroups';
 $HT_DigestFileName = '.htdigest';
 
-$RuleMaxLength = 100000;
+$FileMaxLength = 100000;
 
-$Out = array();
-$Recv = array();
-
-$UserName = null;
+$Digest = false;
+$UserID = null;
 $Groups = null;
 
 $SkipFiles = array( '.', '..', $HT_AccessFileName, $HT_GroupsFileName, $HT_DigestFileName);
 
-$Digest = http_digest_parse();
-if( $Digest !== false )
-{
-	global $UserName;
-	if( $Digest['username'] != 'null' )
-		$UserName = $Digest['username'];
-}
+$Out = array();
+$Recv = array();
 
+# Decode input:
 if( isset($_POST['upload_path']))
 	upload( $_POST['upload_path'], $Out);
 else
@@ -33,6 +31,32 @@ else
 		$Recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
 }
 
+# Authenticate:
+if( $CONF['AUTH_RULES'] )
+{
+	if( isset( $Recv['digest']))
+	{
+		$Digest = $Recv['digest'];
+		if( false == http_digest_validate( $Out))
+		{
+			$Digest = false;
+			$Out['auth_status'] = 'Wrong credentials.';
+			$Out['auth_error'] = true;
+		}
+	}
+}	
+else
+{
+	$Digest = http_digest_parse();
+}
+if( $Digest !== false )
+{
+	global $UserID;
+	if( $Digest['username'] != 'null' )
+		$UserID = $Digest['username'];
+}
+
+# Process response:
 if( array_key_exists('walkdir', $Recv))
 {
 	$Out['walkdir'] = array();
@@ -56,23 +80,40 @@ else if( count( $Recv))
 		$func = "jsf_$key";
 		if( function_exists($func))
 			$func( $args, $Out);
-		else
-			$Out['error'] = 'Function "'.$key.'" does not exist.';
+//		else
+//			$Out['error'] = 'Function "'.$key.'" does not exist.';
 	}
 }
 
+# Write response:
 if( false == is_null( $Out))
 	echo json_encode( $Out);
 
+# Functions:
+function jsf_start( $i_arg, &$o_out)
+{
+	global $CONF, $FileMaxLength;
+	$o_out['upload_max_filesize'] = ini_get('upload_max_filesize');
+	$o_out['post_max_size'] = ini_get('post_max_size');
+	$o_out['memory_limit'] = ini_get('memory_limit');
+	if( $fHandle = fopen('version.txt','r'))
+	{
+		$o_out['version'] = fread( $fHandle, $FileMaxLength);
+		fclose($fHandle);
+	}
+	foreach( $CONF as $key => $val ) $o_out[$key] = $val;
+	if( $CONF['AUTH_RULES']) $o_out['nonce'] = uniqid();
+}
+
 function jsf_initialize( $i_arg, &$o_out)
 {
-	global $UserName, $Groups, $RuleMaxLength, $HT_AccessFileName, $HT_GroupsFileName;
+	global $UserID, $Groups, $HT_AccessFileName, $HT_GroupsFileName;
 
 	$configs = array();
 	readConfig('config_default.json', $configs); 
 	$o_out['config'] = $configs;
 
-	if( $UserName != null )
+	if( $UserID != null )
 	{
 		if( false == is_file( $HT_AccessFileName))
 		{
@@ -84,10 +125,10 @@ function jsf_initialize( $i_arg, &$o_out)
 		if( false == is_file( $HT_GroupsFileName))
 		{
 			$Groups = array();
-			$Groups['admins'] = array( $UserName);
+			$Groups['admins'] = array( $UserID);
 			jsf_writegroups( $Groups, $o_out);
 			if( array_key_exists('error', $o_out)) return;
-			error_log('HT Groups file created with "'.$UserName.'" in "admins".');
+			error_log('HT Groups file created with "'.$UserID.'" in "admins".');
 		}
 	}
 
@@ -117,32 +158,20 @@ function jsf_initialize( $i_arg, &$o_out)
 		$o_out['users'][$obj['id']] = $user;
 	}
 
-	$server = array();
-	$server['upload_max_filesize'] = ini_get('upload_max_filesize');
-	$server['post_max_size'] = ini_get('post_max_size');
-	$server['memory_limit'] = ini_get('memory_limit');
-	$o_out['server'] = $server;
-
-	if( $fHandle = fopen('version.txt','r'))
-	{
-		$o_out['version'] = fread( $fHandle, $RuleMaxLength);
-		fclose($fHandle);
-	}
-
 	if( isAdmin( $out)) $o_out['admin'] = true;
 }
 
 function processUser( &$o_out)
 {
-	global $UserName;
+	global $UserID;
 
 	$dirname = 'users';
 	if( false == is_dir( $dirname ))
 		mkdir( $dirname);
 
-	if( $UserName == null ) return;
+	if( $UserID == null ) return;
 
-	$filename = $dirname.'/'.$UserName.'.json';
+	$filename = $dirname.'/'.$UserID.'.json';
 	$user = array();
 
 	$editobj = array();
@@ -151,7 +180,7 @@ function processUser( &$o_out)
 
 	if( false == is_file( $filename))
 	{
-		$user['id'] = $UserName;
+		$user['id'] = $UserID;
 		$user['channels'] = array();
 		$user['news'] = array();
 		$user['ctime'] = time();
@@ -202,9 +231,9 @@ function http_digest_parse()
 	return $needed_parts ? false : $data;
 }
 
-function http_digest_validate( $i_arg, &$o_out)
+function http_digest_validate( &$o_out)
 {
-	global $Digest, $HT_DigestFileName, $RuleMaxLength;
+	global $Digest, $HT_DigestFileName, $FileMaxLength;
 
 	if( $Digest === false ) return false;
 
@@ -218,7 +247,7 @@ function http_digest_validate( $i_arg, &$o_out)
 	$data = null;
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		$data = fread( $fHandle, $RuleMaxLength);
+		$data = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 	}
 	else
@@ -239,7 +268,10 @@ function http_digest_validate( $i_arg, &$o_out)
 		}
 
 	if( false == $founded )
+	{
+		$o_out['error'] = 'Wrong!';
 		return false;
+	}
 
 	$data = explode(':', $data);
 	if( count($data) != 3 )
@@ -255,11 +287,7 @@ function http_digest_validate( $i_arg, &$o_out)
 /*
 error_log( 'PHP_AUTH_DIGEST = '.$_SERVER['PHP_AUTH_DIGEST']);
 error_log( 'REQUEST_METHOD = '.$_SERVER['REQUEST_METHOD']);
-error_log( 'uri = '.$Digest['uri']);
-error_log( 'nonce = '.$Digest['nonce']);
-error_log( 'nc = '.$Digest['nc']);
-error_log( 'cnonce = '.$Digest['cnonce']);
-error_log( 'qop = '.$Digest['qop']);
+error_log( 'Digest = '.json_encode($Digest));
 error_log( 'htdigest = '.$data);
 error_log( 'hash = '.md5($Digest['username'].':'.$i_arg['realm'].':www'));
 error_log( 'response = '.$Digest['response']);
@@ -268,12 +296,13 @@ error_log( 'valid_response = '.$valid_response);
 	if( $Digest['response'] == $valid_response)
 		return true;
 
+	$o_out['error'] = 'Wrong!';
 	return false;
 }
 
 function jsf_login( $i_arg, &$o_out)
 {
-	global $Digest;
+	global $CONF, $Digest;
 
 	if( isset( $_SERVER['PHP_AUTH_DIGEST']))
 	{
@@ -285,12 +314,21 @@ function jsf_login( $i_arg, &$o_out)
 		else if( $Digest['username'] != 'null')
 		{
 			//$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
-			if( http_digest_validate( $i_arg, $o_out))
+			if( http_digest_validate( $o_out))
 				return;
-			else
-				$o_out['error'] = 'Wrong!';
-				//die('Wrong!');
 		}
+	}
+	else if( $CONF['AUTH_RULES'])
+	{
+		if( false == isset( $i_arg['digest']))
+			$o_out['error'] = 'No digest in login object.';
+		else
+		{
+			$Digest = $i_arg['digest'];
+			if( http_digest_validate( $o_out))
+				$o_out['status'] = 'success';
+		}
+		return;
 	}
 
 	header('HTTP/1.1 401 Unauthorized');
@@ -314,10 +352,10 @@ function skipFile( $file)
 
 function htaccessFolder( $i_folder)
 {
-	global $UserName, $Groups;
+	global $UserID, $Groups;
 
 	if( $i_folder == '.' ) return true;
-//	if( $UserName == null ) return true;
+//	if( $UserID == null ) return true;
 
 	$out = array();
 	readGroups( $out);
@@ -342,22 +380,22 @@ function htaccessFolder( $i_folder)
 	}
 	if( array_key_exists('valid_user', $out))
 	{
-		if( $UserName == null )
+		if( $UserID == null )
 			return false;
 		return true;
 	}
 
 	if(( count( $out['users']) == 0 ) && ( count( $out['groups']) == 0 )) return null;
 
-	if( $UserName == null )
+	if( $UserID == null )
 		return false;
 
 	foreach( $out['groups'] as $grp )
 		if( array_key_exists( $grp, $Groups))
-			if( in_array( $UserName, $Groups[$grp]))
+			if( in_array( $UserID, $Groups[$grp]))
 				return true;
 
-	if( in_array( $UserName, $out['users'])) return true;
+	if( in_array( $UserID, $out['users'])) return true;
 
 	return false;
 }
@@ -398,7 +436,7 @@ function htaccessPath( $i_path)
 
 function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 {
-	global $RuleMaxLength;
+	global $FileMaxLength;
 
 	if( $i_depth > $i_recv['depth'] ) return;
 
@@ -483,7 +521,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 						if( $fHandle = fopen( $path.'/'.$ruentry, 'r'))
 						{
-							$rudata = fread( $fHandle, $RuleMaxLength);
+							$rudata = fread( $fHandle, $FileMaxLength);
 							$ruobj = json_decode( $rudata, true);
 							$o_out['rules'][$ruentry] = $ruobj;
 							fclose($fHandle);
@@ -511,7 +549,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					{
 						if( $fHandle = fopen( $sfilepath, 'r'))
 						{
-							$data = fread( $fHandle, $RuleMaxLength);
+							$data = fread( $fHandle, $FileMaxLength);
 							fclose( $fHandle);
 							mergeObjs( $folderObj, json_decode( $data, true));
 						}
@@ -532,14 +570,14 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 function readConfig( $i_file, &$o_out)
 {
-	global $RuleMaxLength;
+	global $FileMaxLength;
 
 	if( false == is_file( $i_file))
 		return;
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		$data = fread( $fHandle, $RuleMaxLength);
+		$data = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 		$o_out[$i_file] = json_decode( $data, true);
 		if( array_key_exists( 'include', $o_out[$i_file]['cgru_config']))
@@ -550,7 +588,7 @@ function readConfig( $i_file, &$o_out)
 
 function jsf_getfile( $i_file, &$o_out)
 {
-	global $RuleMaxLength;
+	global $FileMaxLength;
 
 	if( false == is_file( $i_file))
 	{
@@ -565,7 +603,7 @@ function jsf_getfile( $i_file, &$o_out)
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		echo fread( $fHandle, $RuleMaxLength);
+		echo fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 		$o_out = null;
 	}
@@ -589,7 +627,7 @@ function jsf_readobj( $i_file, &$o_out)
 }
 function readObj( $i_file, &$o_out)
 {
-	global $RuleMaxLength;
+	global $FileMaxLength;
 
 	if( false == is_file( $i_file))
 	{
@@ -599,7 +637,7 @@ function readObj( $i_file, &$o_out)
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		$data = fread( $fHandle, $RuleMaxLength);
+		$data = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 		$o_out = json_decode( $data, true);
 	}
@@ -701,9 +739,9 @@ function replaceObject( &$o_obj, $i_obj)
 }
 function jsf_editobj( $i_edit, &$o_out)
 {
-	global $UserName, $RuleMaxLength;
+	global $UserID, $FileMaxLength;
 
-	if( $UserName == null )
+	if( $UserID == null )
 	{
 		if( is_file( $i_edit['file']) || ( basename( $i_edit['file']) != 'status.json'))
 		{
@@ -718,7 +756,7 @@ function jsf_editobj( $i_edit, &$o_out)
 		mkdir( dirname($i_edit['file']));
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
-		$data = fread( $fHandle, $RuleMaxLength);
+		$data = fread( $fHandle, $FileMaxLength);
 		$obj = json_decode( $data, true);
 		if( is_null( $obj)) $obj = array();
 		if( array_key_exists('add', $i_edit) && ( $i_edit['add'] == true ))
@@ -747,8 +785,8 @@ function jsf_editobj( $i_edit, &$o_out)
 
 function jsf_cmdexec( $i_obj, &$o_out)
 {
-	global $UserName;
-	if( $UserName == null )
+	global $UserID;
+	if( $UserID == null )
 	{
 		$o_out['error'] = 'Guests are not allowed to run commands.';
 		return;
@@ -768,8 +806,8 @@ function jsf_cmdexec( $i_obj, &$o_out)
 
 function afanasy( $i_obj, &$o_out)
 {
-	global $UserName;
-	if( $UserName == null )
+	global $UserID;
+	if( $UserID == null )
 	{
 		$o_out['error'] = 'Guests are not allowed to send jobs.';
 		return;
@@ -802,12 +840,12 @@ function afanasy( $i_obj, &$o_out)
 
 function jsf_save( $i_save, &$o_out)
 {
-	global $UserName;
+	global $UserID;
 
 	$filename = $i_save['file'];
 	$dirname = dirname($filename);
 
-	if( $UserName == null )
+	if( $UserID == null )
 	{
 		if( is_file( $filename) || ( basename( $filename) != 'body.html'))
 		{
@@ -847,9 +885,9 @@ function jsf_save( $i_save, &$o_out)
 
 function jsf_makenews( $i_news, &$o_out)
 {
-	global $UserName, $RuleMaxLength;
+	global $UserID, $FileMaxLength;
 /*
-	if( $UserName == null )
+	if( $UserID == null )
 	{
 		$o_out['error'] = 'Guests are not allowed to make news.';
 		return;
@@ -863,7 +901,7 @@ function jsf_makenews( $i_news, &$o_out)
 			if( strrpos( $uEntry,'.json') === false ) continue;
 			if( $uHandle = fopen( 'users/'.$uEntry, 'r'))
 			{
-				$udata = fread( $uHandle, $RuleMaxLength);
+				$udata = fread( $uHandle, $FileMaxLength);
 				fclose( $uHandle);
 				$uobj = json_decode( $udata, true);
 				if( is_null( $uobj)) continue;
@@ -932,8 +970,8 @@ function jsf_makenews( $i_news, &$o_out)
 
 function isAdmin( &$o_out)
 {
-	global $Groups, $UserName;
-	if( is_null( $UserName )) return false;
+	global $Groups, $UserID;
+	if( is_null( $UserID )) return false;
 
 	if( is_null( $Groups))
 	{
@@ -957,7 +995,7 @@ function isAdmin( &$o_out)
 		return false;
 	}
 
-	if( in_array( $UserName, $Groups['admins']))
+	if( in_array( $UserID, $Groups['admins']))
 		return true;
 
 	$o_out['error'] = 'Access denied.';
@@ -966,7 +1004,7 @@ function isAdmin( &$o_out)
 
 function jsf_htdigest( $i_recv, &$o_out)
 {
-	global $RuleMaxLength, $UserName, $HT_DigestFileName;
+	global $FileMaxLength, $UserID, $HT_DigestFileName;
 	if( false == isAdmin( $o_out)) return;
 
 	$user = $i_recv['user'];
@@ -979,7 +1017,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		$data = fread( $fHandle, $RuleMaxLength);
+		$data = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 	}
 	$old_lines = explode("\n", $data);
@@ -1017,7 +1055,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 function jsf_deleteuser( $i_user_id, &$o_out)
 {
-	global $RuleMaxLength, $HT_DigestFileName;
+	global $FileMaxLength, $HT_DigestFileName;
 	if( false == isAdmin( $o_out)) return;
 
 	$dHandle = opendir('users');
@@ -1039,7 +1077,7 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		$data = fread( $fHandle, $RuleMaxLength);
+		$data = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 	}
 	else
@@ -1070,7 +1108,7 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 
 function jsf_getallusers( $i_args, &$o_out)
 {
-	global $RuleMaxLength;
+	global $FileMaxLength;
 
 	$dHandle = opendir('users');
 	if( $dHandle === false )
@@ -1088,7 +1126,7 @@ function jsf_getallusers( $i_args, &$o_out)
 
 		if( $fHandle = fopen( "users/$entry", 'r'))
 		{
-			$user = json_decode( fread( $fHandle, $RuleMaxLength), true);
+			$user = json_decode( fread( $fHandle, $FileMaxLength), true);
 			$o_out['users'][$user['id']] = $user;
 			fclose($fHandle);
 		}
@@ -1105,7 +1143,7 @@ function jsf_getallgroups( $i_args, &$o_out)
 
 function readGroups( &$o_out)
 {
-	global $Groups, $RuleMaxLength, $HT_GroupsFileName;
+	global $Groups, $FileMaxLength, $HT_GroupsFileName;
 	if( false == is_null( $Groups)) return;
 
 	if( false == is_file( $HT_GroupsFileName))
@@ -1122,7 +1160,7 @@ function readGroups( &$o_out)
 
 	$Groups = array();
 
-	$data = fread( $fHandle, $RuleMaxLength);
+	$data = fread( $fHandle, $FileMaxLength);
 	$lines = explode("\n", $data);
 	foreach( $lines as $line )
 	{
@@ -1172,7 +1210,7 @@ function jsf_writegroups( $i_groups, &$o_out)
 
 function jsf_permissionsset( $i_args, &$o_out)
 {
-	global $RuleMaxLength, $HT_AccessFileName;
+	global $FileMaxLength, $HT_AccessFileName;
 	if( false == isAdmin( $o_out)) return;
 
 	if( false == array_key_exists('groups', $i_args)) $i_args['groups'] = array();
@@ -1224,7 +1262,7 @@ function jsf_permissionsget( $i_args, &$o_out)
 }
 function permissionsGet( $i_args, &$o_out)
 {
-	global $RuleMaxLength, $HT_AccessFileName;
+	global $FileMaxLength, $HT_AccessFileName;
 
 	$o_out['groups'] = array();
 	$o_out['users'] = array();
@@ -1244,7 +1282,7 @@ function permissionsGet( $i_args, &$o_out)
 		$o_out['error'] = 'Can`t open the file.';
 		return;
 	}
-	$data = fread( $fHandle, $RuleMaxLength);
+	$data = fread( $fHandle, $FileMaxLength);
 	fclose( $fHandle);
 
 	$founded = false;
@@ -1312,7 +1350,7 @@ function jsf_search( $i_args, &$o_out)
 
 function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 {
-	global $RuleMaxLength;
+	global $FileMaxLength;
 
 	$i_depth++;
 	if( $i_depth > $i_args['depth'] ) return;
@@ -1343,7 +1381,7 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 			{
 				if( $fHandle = fopen( $rufile, 'r'))
 				{
-					$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
+					$obj = json_decode( fread( $fHandle, $FileMaxLength), true);
 						if( searchStatus( $i_args['status'], $obj))
 							$founded = true;
 					fclose($fHandle);
@@ -1359,7 +1397,7 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 			{
 				if( $fHandle = fopen( $rufile, 'r'))
 				{
-					$data = fread( $fHandle, $RuleMaxLength);
+					$data = fread( $fHandle, $FileMaxLength);
 					fclose($fHandle);
 					if( mb_stripos( $data, $i_args['body'], 0, 'utf-8') !== false )
 						$founded = true;
@@ -1375,7 +1413,7 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 			{
 				if( $fHandle = fopen( $rufile, 'r'))
 				{
-					$obj = json_decode( fread( $fHandle, $RuleMaxLength), true);
+					$obj = json_decode( fread( $fHandle, $FileMaxLength), true);
 						if( searchComment( $i_args['comment'], $obj))
 							$founded = true;
 					fclose($fHandle);

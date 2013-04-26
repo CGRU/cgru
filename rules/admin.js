@@ -28,17 +28,83 @@ function ad_Init()
 function ad_Login()
 {
 	c_Info('Login');
-	var obj = {};
-	obj.login = {"realm":'RULES'};
-	var data = n_Request( obj);
-//c_Log( data);
+	if( SERVER.AUTH_RULES )
+	{
+		localStorage.auth_digest = '';
+		new cgru_Dialog( window, window, 'ad_LoginGetPassword', 'user_id', 'str', '', 'login', 'Login', 'Enter User ID');
+	}
+	else
+		ad_loginProcess({"realm":'RULES'});
+}
+function ad_loginProcess( i_obj)
+{
+	var data = c_Parse( n_Request({"login":i_obj}));
+	if( data == null ) return;
+	if( data.error )
+	{
+		if( SERVER.AUTH_RULES )
+		{
+			localStorage.auth_user = '';
+			localStorage.auth_digest = '';
+		}
+		c_Error( data.error);
+		return;
+	}
 	g_GO('/');
 	window.location.reload();
+}
+function ad_LoginGetPassword( i_notused, i_user_id)
+{
+	new cgru_Dialog( window, window, 'ad_LoginConstruct', i_user_id, 'str', '', 'login', 'Login', 'Enter Password');
+}
+function ad_LoginConstruct( i_user_id, i_password)
+{
+	var digest = ad_ConstructDigest( i_user_id, i_password);
+	ad_loginProcess({"digest":digest});
+}
+function ad_ConstructDigest( i_user_id, i_password)
+{
+	var obj = {};
+	obj.nc = 1;
+	obj.uri = 'cgru';
+	obj.qop = 'auth';
+	obj.cnonce = Math.random().toString(36).substring(2);
+	obj.nonce = SERVER.nonce;
+
+	if( i_user_id == null )
+	{
+		if( ( localStorage.auth_user          == null ) ||
+			( localStorage.auth_user.length   == 0    ) ||
+			( localStorage.auth_digest        == null ) ||
+			( localStorage.auth_digest.length == 0    ))
+			return null;
+		i_user_id = localStorage.auth_user;
+	}
+	else
+	{
+		localStorage.auth_user = i_user_id;
+		localStorage.auth_digest = c_MD5( i_user_id+':RULES:'+i_password);
+console.log('Digest: '+localStorage.auth_digest);
+	}
+
+	obj.response = c_MD5( localStorage.auth_digest+':'+SERVER.nonce+':'+obj.nc+':'+obj.cnonce+':'+obj.qop+':'+c_MD5('POST:'+obj.uri));
+	obj.username = i_user_id;
+
+	return obj;
 }
 
 function ad_Logout()
 {
 	c_Info('Logout');
+
+	if( SERVER.AUTH_RULES )
+	{
+		localStorage.auth_user = '';
+		localStorage.auth_digest = '';
+		g_GO('/');
+		window.location.reload();
+		return;
+	}
 //*
  	var obj = {};
 	obj.logout = {"realm":'RULES'};

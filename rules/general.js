@@ -1,3 +1,4 @@
+SERVER = null;
 RULES = {};
 RULES.rufolder = 'rules';
 RULES_TOP = {};
@@ -20,12 +21,33 @@ function g_Init()
 	u_Init();
 	c_Init();
 
-	var request = {};
-	var config = c_Parse( n_Request({"initialize":request}));
+	SERVER = c_Parse( n_Request({"start":{}}));
+	if( SERVER == null ) return;
+	if( SERVER.error )
+	{
+		c_Error( SERVER.error);
+		return;
+	}
+	if( SERVER.version ) document.getElementById('version').innerHTML = c_Strip( SERVER.version);
+
+	var obj = {};
+	obj.initialize = {};
+	if( SERVER.AUTH_RULES )
+	{
+		var digest = ad_ConstructDigest();
+		if( digest ) obj.digest = digest;
+	}
+	var config = c_Parse( n_Request( obj));
 	if( config == null ) return;
 	if( config.error )
 	{
 		c_Error( config.error);
+		if( config.auth_error )
+		{
+			c_Error( config.auth_status);
+			localStorage.auth_user = '';
+			localStorage.auth_digest = '';
+		}
 		return;
 	}
 
@@ -42,8 +64,6 @@ function g_Init()
 		u_InitAuth();
 		up_Init();
 	}
-	if( config.version )
-		document.getElementById('version').innerHTML = config.version;
 
 	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 
@@ -56,9 +76,7 @@ function g_Init()
 
 	document.getElementById('afanasy_webgui').innerHTML =
 		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
-
-	if( RULES_TOP.company )
-		$('rules_label').textContent = RULES_TOP.company+'-RULES';
+	$('rules_label').textContent = RULES_TOP.company+'-RULES';
 
 	u_el.navig.m_folder = '/';
 	u_el.navig.m_path = '/';
@@ -185,7 +203,7 @@ function g_Navigate( i_path)
 	g_elCurFolder.classList.add('current');
 
 	if( g_elCurFolder.m_path == '/')
-		window.document.title = 'CG-RULES';
+		window.document.title = RULES_TOP.company+'-RULES';
 	else
 		window.document.title = g_elCurFolder.m_path;
 
