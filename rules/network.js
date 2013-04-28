@@ -160,7 +160,7 @@ function n_SendMail( i_address, i_subject, i_body)
 	obj.headers += 'MIME-Version: 1.0\r\n';
 	obj.headers += 'Content-type: text/html; charset=utf-8\r\n';
 //	obj.headers += 'To: <'+i_address+'>\r\n';
-	obj.headers += 'From: CGRU <cgru@cgru.info>\r\n';
+	obj.headers += 'From: CGRU <noreply@cgru.info>\r\n';
 
 	obj.body = '<html><body>';
 	obj.body += '<div style="background:#DFA; color:#020; margin:8px; padding:8px; border:2px solid #070; border-radius:9px;">';

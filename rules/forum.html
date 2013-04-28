@@ -10,7 +10,8 @@
 <div class="param">
 	<div class="label">Question Name</div>
 	<div class="info">required, 16 characters max</div>
-	<div id="forum_question_id" contenteditable="true" class="editing"></div>
+	<div id="forum_question_id" contenteditable="true" class="editing"
+		onblur="this.textContent=this.textContent.replace(/\W/g,'_').substr(0,16)"></div>
 </div>
 
 <div class="param">
@@ -18,32 +19,9 @@
 	<div id="forum_question_body" contenteditable="true" class="editing"></div>
 </div>
 
-<div id="forum_guest_form" style="border: 1px solid #777; border-radius: 6px; margin: 8px 0px; display: none;">
-	<!--div style="padding: 4px 8px;">Fill in guest attributes:</div>
-	<div class="param">
-		<div class="label">Name</div>
-		<div class="info">required</div>
-		<div id="forum_guest_id" contenteditable="true" class="editing"></div>
-	</div>
-	<div class="param">
-		<div class="label">Title</div>
-		<div class="info">optional</div>
-		<div id="forum_guest_title" contenteditable="true" class="editing"></div>
-	</div>
-	<div class="param">
-		<div class="label">Email</div>
-		<div class="info">optional, gravatar, hidden</div>
-		<div id="forum_guest_email" contenteditable="true" class="editing"></div>
-	</div>
-	<div class="param">
-		<div class="label">Avatar</div>
-		<div class="info">optional, link</div>
-		<div id="forum_guest_avatar" contenteditable="true" class="editing"></div>
-	</div-->
-</div>
+<div id="forum_guest_form" style="border: 1px solid #777; border-radius: 6px; margin: 8px 0px; display: none;"></div>
 
 <div class="button" onclick="forum_NewQuestionOnClick()">Create Question</div>
-<!--div id="forum_new_question_info"></div-->
 
 </div>
 

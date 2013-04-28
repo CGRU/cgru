@@ -19,6 +19,22 @@
 <script type="text/javascript" src="rules/status.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
 <script type="text/javascript" src="rules/upload.js"></script>
+<script type="text/javascript">
+
+if( document.location.host.indexOf('cgru.info') != -1 )
+{
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36528898-2']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+}
+
+</script>
 </head>
 <body onload="g_Init()">
 
@@ -168,12 +184,15 @@
 		<div class="body">
 			<div id="playlist_panel" style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="p_NewOnClick()">+Folder</div>
-				<div class="button" style="float:left;width:14px;" onclick="p_AddOnClick()">+</div>
-				<div class="button" style="float:left;width:14px;" onclick="p_DelOnClick()">-</div>
+					onclick="p_NewOnClick()" title="Create New Folder">+Folder</div>
+				<div class="button" style="float:left;width:14px;"
+					onclick="p_AddOnClick()" title="Add Current Location To Selected Folder">+</div>
+				<div class="button" style="float:left;width:14px;"
+					onclick="p_DelOnClick()" title="Remove Current Item">-</div>
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="p_RenameOnClick()">Rename</div>
-				<div class="button" style="float:left;width:14px;" onclick="p_RefreshOnClick()">&#10227;</div>
+					onclick="p_RenameOnClick()" title="Rename Current Item">Rename</div>
+				<div class="button" style="float:left;width:14px;"
+					onclick="p_RefreshOnClick()" title="Refresh Playlist">&#10227;</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>

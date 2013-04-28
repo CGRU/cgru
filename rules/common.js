@@ -366,14 +366,17 @@ function c_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));
 
 function c_MD5( i_str) { return hex_md5( i_str);}
 
-function c_ValidateEmail( i_email)
+function c_EmailValidate( i_email)
 { 
 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test( i_email);
 }
-
-function c_FileNameValidate( i_file)
+function c_EmailEncode( i_email) { return btoa( JSON.stringify( i_email.split('@'))); }
+function c_EmailDecode( i_email)
 {
-	return i_file;
+	var email = null;
+	try { email = JSON.parse( atob( i_email)).join('@');}
+	catch( err) { email = null; c_Error( err);}
+	return email;
 }
 

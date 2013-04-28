@@ -1,9 +1,12 @@
 <?php
 
+$GuestSites = array('cgru.info','127.0.0.1');
 $CONF = array();
 $CONF['AUTH_RULES'] = false;
-if( $_SERVER['SERVER_NAME'] == 'cgru.info') $CONF['AUTH_RULES'] = true;
-if( $_SERVER['SERVER_NAME'] == '127.0.0.1') $CONF['AUTH_RULES'] = true;
+if( false !== array_search( $_SERVER['SERVER_NAME'], $GuestSites))
+{
+	$CONF['AUTH_RULES'] = true;
+}
 
 umask(0000);
 
@@ -18,6 +21,8 @@ $UserID = null;
 $Groups = null;
 
 $SkipFiles = array( '.', '..', $HT_AccessFileName, $HT_GroupsFileName, $HT_DigestFileName);
+$GuestCanCreate = array('status.json','comments.json');
+$GuestCanEdit = array('comments.json');
 
 $Out = array();
 $Recv = array();
@@ -44,8 +49,8 @@ if( $CONF['AUTH_RULES'] )
 			$Out['auth_status'] = 'Wrong credentials.';
 			$Out['auth_error'] = true;
 		}
+		$Out['nonce'] = md5(rand());
 	}
-	$Out['nonce'] = md5(rand());
 }	
 else
 {
@@ -196,7 +201,7 @@ function processUser( &$o_out)
 		jsf_editobj( $editobj, $out);
 	}
 
-	readObj( $filename, &$user);
+	readObj( $filename, $user);
 
 	if( array_key_exists('error', $user))
 	{
@@ -563,14 +568,12 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 				}
 
 			if( $i_depth < $i_recv['depth'] )
-				walkDir( $i_recv, $path, &$folderObj, $i_depth+1);
+				walkDir( $i_recv, $path, $folderObj, $i_depth+1);
 
 			array_push( $o_out['folders'], $folderObj);
 
 		}
 		closedir($handle);
-//		sort( $o_out['folders']);
-//		sort( $o_out['files']);
 	}
 }
 
@@ -745,14 +748,25 @@ function replaceObject( &$o_obj, $i_obj)
 }
 function jsf_editobj( $i_edit, &$o_out)
 {
-	global $UserID, $FileMaxLength;
+	global $UserID, $FileMaxLength, $GuestCanCreate, $GuestCanEdit;
 
 	if( $UserID == null )
 	{
-		if( is_file( $i_edit['file']) || ( basename( $i_edit['file']) != 'status.json'))
+		if( is_file( $i_edit['file']))
 		{
-			$o_out['error'] = 'Guests are not allowed to edit objects.';
-			return;
+			if( false === array_search( basename( $i_edit['file']), $GuestCanEdit))
+			{
+				$o_out['error'] = 'Guests are not allowed to edit here.';
+				return;
+			}
+		}
+		else
+		{
+			if( false === array_search( basename( $i_edit['file']), $GuestCanCreate))
+			{
+				$o_out['error'] = 'Guests are not allowed here.';
+				return;
+			}
 		}
 	}
 

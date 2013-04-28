@@ -12,7 +12,7 @@ function forum_InitTopic()
 function forum_NewQuestionOnClick()
 {
 	var question = {};
-	question.id = c_Strip( $('forum_question_id').textContent);
+	question.id = c_Strip( $('forum_question_id').textContent).replace(/\W/g,'_');
 	question.body = c_Strip( $('forum_question_body').innerHTML);
 	if( question.id.length == 0 )
 	{
@@ -25,8 +25,6 @@ function forum_NewQuestionOnClick()
 		return;
 	}
 
-	question.id = c_FileNameValidate( question.id);
-
 	var user_id = null;
 	if( g_auth_user == null )
 	{
@@ -38,7 +36,7 @@ function forum_NewQuestionOnClick()
 	else
 		user_id = g_auth_user.id;
 
-console.log( JSON.stringify( question));
+//console.log( JSON.stringify( question));
 
 	var folder = ASSETS.topic.path + '/' + question.id;
 	var path = RULES.root + '/' + folder  + '/' + RULES.rufolder + '/body.html';
@@ -53,7 +51,7 @@ console.log( JSON.stringify( question));
 	status.body = {};
 	status.body.cuser = user_id;
 	status.body.ctime = c_DT_CurSeconds();
-//{"status":{"body":{"cuser":"timurhai","ctime":1366827676}}}
+	if( question.guest ) status.body.guest = question.guest;
 	var result = st_Save( status, folder, true);
 	if( result.error )
 	{
@@ -61,12 +59,16 @@ console.log( JSON.stringify( question));
 		return;
 	}
 
-console.log( JSON.stringify( g_auth_user));
-console.log(user_id);
+//console.log( JSON.stringify( g_auth_user));
+//console.log(user_id);
 
 	nw_MakeNews('<i>question</i>', folder, user_id);
 	g_GO( folder);
 }
 
-if( ASSETS.topic ) forum_InitTopic();
+if( ASSETS.topic )
+{
+	if( ASSETS.topic.path == g_CurPath() ) forum_InitTopic();
+	else $('asset_div').style.display = 'none';
+}
 

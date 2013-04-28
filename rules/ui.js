@@ -109,24 +109,6 @@ function u_Process()
 	a_Process();
 	u_StatusApply();
 	nw_Process();
-/*
-	if( ASSET && ( ASSET.path == g_elCurFolder.m_path ))
-	{
-		if( localStorage.view_asset === 'true' )
-			$('asset_div').style.display = 'block';
-		else
-			$('asset_div').style.display = 'inline';
-		$('files_div').style.display = 'none';
-	}
-	else
-	{
-		$('asset_div').style.display = 'none';
-		if( localStorage.view_files === 'true' )
-			$('files_div').style.display = 'block';
-		else
-			$('files_div').style.display = 'inline';
-	}
-*/
 	u_ViewsFuncsOpen();
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
@@ -1236,11 +1218,31 @@ function u_GuestAttrsDraw( i_el)
 		el.appendChild( elEdit);
 		elEdit.contentEditable = true;
 		elEdit.classList.add('editing');
+		elEdit.m_attr = attr.name;
+		elEdit.onblur = u_GuestAttrValidate;
 		if( localStorage['guest_'+attr.name] )
-			elEdit.textContent = localStorage['guest_'+attr.name];
+		{
+			if( attr.name == 'email' )
+				elEdit.textContent = c_EmailDecode( localStorage['guest_'+attr.name]);
+			else
+				elEdit.textContent = localStorage['guest_'+attr.name];
+		}
 
 		i_el.m_guest_attrs[attr.name] = elEdit;
 	}
+}
+function u_GuestAttrValidate( i_e)
+{
+	var el = i_e.currentTarget;
+	var value = el.textContent;
+	if( el.m_attr == 'id' )
+	{
+		value = value.replace(/\W/g,'_');
+		value = value.substr(0,12);
+	}
+	else
+		value = value.substr(0,99);
+	el.textContent = value;
 }
 function u_GuestAttrsGet( i_el)
 {
@@ -1257,13 +1259,18 @@ function u_GuestAttrsGet( i_el)
 			c_Error('Required guest ID attribute is empty.');
 			return null;
 		}
-		if(( attr.name == 'email' ) && ( value.length != 0 ) && ( false == c_ValidateEmail( value)))
+		if(( attr.name == 'email' ) && ( value.length != 0 ))
 		{
-			c_Error('Invalid guest email.');
-			return null;
+	 		if( c_EmailValidate( value))
+				value = c_EmailEncode( value);
+			else
+			{
+				c_Error('Invalid guest email.');
+				return null;
+			}
 		}
 
-		localStorage['guest_'+attr.name] = value;	
+		localStorage['guest_'+attr.name] = value;
 		guest[attr.name] = value;
 	}
 	return guest;

@@ -1,11 +1,13 @@
 cm_file = 'comments.json';
 cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','14','16','20','24','32','40','48','66','99'];
+cm_all = {};
 
 function View_comments_Open() { cm_Load(); }
 
 function cm_Load()
 {
 	$('comments').textContent = '';
+	cm_all = {};
 
 	if( false == c_RuFileExists( cm_file)) return;
 
@@ -13,8 +15,9 @@ function cm_Load()
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
-	for( key in obj.comments )
-		cm_Add( obj.comments[key], key);
+	cm_all = obj.comments;
+	for( key in cm_all )
+		cm_Add( cm_all[key], key);
 }
 
 function cm_Add( i_obj, i_key)
@@ -133,8 +136,7 @@ function cm_Add( i_obj, i_key)
 
 function cm_Init( i_el, i_key)
 {
-	if( i_el.m_elDCtrl ) i_el.m_elForEdit.removeChild( i_el.m_elDCtrl );
-	if( i_el.m_elColor ) i_el.m_elForEdit.removeChild( i_el.m_elColor );
+	i_el.m_elForEdit.innerHTML = '';
 	if( i_el.m_elEditPanel ) i_el.m_elPanel.removeChild( i_el.m_elEditPanel);
 
 	i_el.m_elDel.style.display = 'none';
@@ -152,27 +154,32 @@ function cm_Init( i_el, i_key)
 	else if( localStorage.background && ( localStorage.background != '' ))
 		i_el.m_elText.style.background = localStorage.background;
 
+	var avatar = null;
 	if( i_el.m_obj == null )
 	{
-		var cm = {};
-		cm.user_name = g_auth_user.id;
-		cm.ctime = (new Date()).getTime();
-		i_el.m_obj = cm;
+		i_el.m_obj = {};
+		i_el.m_obj.ctime = (new Date()).getTime();
 		i_el.m_new = true;
+		if( g_auth_user )
+			i_el.m_obj.user_name = g_auth_user.id;
 	}
+
+	if( i_el.m_obj.user_name )
+	{
+		i_el.m_elUser.textContent = c_GetUserTitle( i_el.m_obj.user_name);
+		avatar = ad_GetAvatar( i_el.m_obj.user_name);
+	}
+
+	if( avatar != null )
+		i_el.m_elAvatar.src = avatar;
+	else
+		i_el.m_elAvatar.style.display = 'none';
 
 	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
 	i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
 	i_el.id = i_key;
 	i_el.m_type = i_el.m_obj.type;
 
-	var avatar = ad_GetAvatar( i_el.m_obj.user_name);
-	if( avatar != null )
-		i_el.m_elAvatar.src = ad_GetAvatar( i_el.m_obj.user_name);
-	else
-		i_el.m_elAvatar.style.display = 'none';
-
-	i_el.m_elUser.textContent = c_GetUserTitle(i_el.m_obj.user_name);
 	i_el.m_elDate.textContent = c_DT_StrFromMSec( i_el.m_obj.ctime);
 	if( i_el.m_obj.duration ) i_el.m_elDuration.textContent = i_el.m_obj.duration;
 	else i_el.m_elDuration.textContent = ' ';
@@ -247,7 +254,14 @@ function cm_SetElType( i_type, i_elType, i_elColor)
 function cm_Edit( i_el)
 {
 	if( i_el.m_new != true )
+	{
+	if( g_auth_user == null )
+	{
+		c_Error('Guests can`t edit comments.');
+		return;
+	}
 		i_el.m_elDel.style.display = 'block';
+	}
 	i_el.m_elCancel.style.display = 'block';
 	i_el.m_elSave.style.display = 'block';
 	i_el.m_elEdit.style.display = 'none';
@@ -286,6 +300,9 @@ function cm_Edit( i_el)
 	i_el.m_elColor = elColor;
 	u_DrawColorBars( elColor, cm_ColorOnclick);
 
+	if( g_auth_user == null )
+		u_GuestAttrsDraw( i_el.m_elForEdit);
+
 	i_el.m_elText.classList.add('editing');
 	i_el.m_elText.contentEditable = 'true';
 	i_el.m_elText.style.color = '#000000';
@@ -320,11 +337,6 @@ function cm_Cancel( i_el)
 
 function cm_NewOnClick()
 {
-/*	if( g_auth_user == null )
-	{
-		c_Error('Guests can`t leave comments.');
-		return;
-	}*/
 	cm_Edit( cm_Add());
 }
 
@@ -336,6 +348,12 @@ function cm_Delete( i_el)
 
 function cm_Save( i_el)
 {
+	if( g_auth_user == null )
+	{
+		i_el.m_obj.guest = u_GuestAttrsGet( i_el.m_elForEdit);
+		i_el.m_obj.user_name = i_el.m_obj.guest.id;
+	}
+
 	i_el.m_obj.text = i_el.m_elText.innerHTML;
 	i_el.m_obj.color = i_el.m_color;
 	i_el.m_obj.type = i_el.m_type;
@@ -354,13 +372,12 @@ function cm_Save( i_el)
 		i_el.m_obj.muser_name = g_auth_user.id;
 	}
 
-	var cm = i_el.m_obj;
-	var key = cm.ctime+'_'+cm.user_name;
+	var key = i_el.m_obj.ctime+'_'+i_el.m_obj.user_name;
 
 	cm_Init( i_el, key);
 
 	var comments = {};
-	comments[key] = cm;
+	comments[key] = i_el.m_obj;
 	var edit = {};
 	edit.object = {"comments":comments};
 	edit.add = true;
@@ -374,7 +391,39 @@ function cm_Save( i_el)
 		c_Error( res.error);
 		return;
 	}
-	nw_MakeNews('<i>comments</i>');
+	nw_MakeNews('<i>comments</i>', g_CurPath(), i_el.m_obj.user_name);
+
+	cm_all[key] = i_el.m_obj;
+	var emails = [];
+	if( RULES.status && RULES.status.body && RULES.status.body.guest && RULES.status.body.guest.email )
+		emails.push( RULES.status.body.guest.email);
+	for( key in cm_all )
+	{
+		var cm = cm_all[key];
+		if( cm.guest && cm.guest.email && cm.guest.email.length && ( emails.indexOf( cm.guest.email) == -1 ))
+			emails.push( cm.guest.email);
+	}
+	if( emails.length )
+		cm_EmailGuests( cm_all[key], emails);
+}
+
+function cm_EmailGuests( i_cm, i_emails)
+{
+	for( var i = 0; i < i_emails.length; i++)
+	{
+		var email = c_EmailDecode( i_emails[i]);
+		if( false == c_EmailValidate( email)) continue;
+		var subject = 'RULES Comment: '+g_CurPath();
+		var body = i_cm.text;
+
+		body += '<br><br>';
+		var user = c_GetUserTitle( i_cm.user_name);
+		if( i_cm.guest && i_cm.guest.title ) user = i_cm.guest.title;
+		body += user;
+		if( user != i_cm.user_name ) body += ' ['+i_cm.user_name+']';
+
+		n_SendMail( email, subject, body);
+	}
 }
 
 function cm_Goto( i_name )
