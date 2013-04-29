@@ -334,6 +334,7 @@ padding: 5px 4px;
 
 .show_folder .panel { /*border: 1px solid #000;*/ }
 .show_folder .panel div { float: left; margin: 0px 8px; }
+.show_folder .panel .path { margin: 0px 8px; }
 .show_folder .panel .title { font-weight: bold;}
 .show_folder .panel .cmdexec { padding: 0px 8px;}
 .show_folder .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }

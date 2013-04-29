@@ -23,7 +23,8 @@ function g_Init()
 		c_Error( SERVER.error);
 		return;
 	}
-	if( SERVER.version ) document.getElementById('version').innerHTML = c_Strip( SERVER.version);
+	if( SERVER.version )
+		$('version').innerHTML = c_Strip( SERVER.version);
 
 	var config = c_Parse( n_Request({"initialize":{}}));
 	if( config == null ) return;

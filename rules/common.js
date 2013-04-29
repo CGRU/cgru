@@ -304,6 +304,7 @@ function c_GetElInteger( i_el)
 
 function c_CreateOpenButton( i_el, i_path)
 {
+	if( RULES.has_filesystem === false ) return null;
 	var el = document.createElement('div');
 	i_el.appendChild( el);
 	el.textContent = 'Open';

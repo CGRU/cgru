@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','info','open','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','content_info','content_status','thumbnail','status_finish'];
+u_elements = ['asset','assets','info','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','content_info','content_status','thumbnail','status_finish'];
 u_el = {};
 u_views = ['asset','files','body','comments'];
 
@@ -113,7 +113,13 @@ function u_Process()
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
 	c_Info( path);
-	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.cmdexec.open_folder.replace(/@PATH@/g, path)]));
+	if( RULES.has_filesystem !== false )
+	{
+		$('open').setAttribute('cmdexec', JSON.stringify([RULES.cmdexec.open_folder.replace(/@PATH@/g, path)]));
+		$('open').style.display = 'block';
+	}
+	else
+		$('open').style.display = 'none';
 }
 
 function u_Finish()
@@ -495,7 +501,7 @@ function u_ShowFolder( i_element, i_path, i_folder, i_walk)
 	u_MakeFileThumbEl( elFolder, i_path, i_walk, 'folder');
 
 	var elOpen = c_CreateOpenButton( elFolder, i_path);
-	elOpen.style.cssFloat = 'left';
+	if( elOpen ) elOpen.style.cssFloat = 'left';
 
 	var elLinkA = document.createElement('a');
 	elFolder.appendChild( elLinkA);
@@ -509,20 +515,23 @@ function u_ShowFolder( i_element, i_path, i_folder, i_walk)
 	elLinkA.textContent = 'play';
 	elLinkA.style.cssFloat = 'right';
 
-	var cmds = RULES.cmdexec.play_sequence;
-	if( cmds ) for( var c = 0; c < cmds.length; c++)
+	if( RULES.has_filesystem !== false )
 	{
-		var elCmd = document.createElement('div');
-		elFolder.appendChild( elCmd);
-		elCmd.classList.add('cmdexec');
-		elCmd.textContent = cmds[c].name;
-		var cmd = cmds[c].cmd;
-		cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
-		cmd = cmd.replace('@FPS@', RULES.fps);
-		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
+		var cmds = RULES.cmdexec.play_sequence;
+		if( cmds ) for( var c = 0; c < cmds.length; c++)
+		{
+			var elCmd = document.createElement('div');
+			elFolder.appendChild( elCmd);
+			elCmd.classList.add('cmdexec');
+			elCmd.textContent = cmds[c].name;
+			var cmd = cmds[c].cmd;
+			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+			cmd = cmd.replace('@FPS@', RULES.fps);
+			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
+		}
 	}
 
-	if( ASSET && ( ASSET.dailies ))
+	if( ASSET && ( ASSET.dailies ) && ( RULES.afanasy_enabled !== false ))
 	{
 		var elMakeDailies = document.createElement('div');
 		elFolder.appendChild( elMakeDailies);

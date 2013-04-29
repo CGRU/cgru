@@ -3,7 +3,7 @@ body { background: #333; }
 #footer { height: 50px; }
 #header, #footer, #navig, #sidepanel { background: #333; box-shadow: 0px 0px 5px #000, 0px 0px 5px #555 inset; }
 #footer #log { background: #AAA; top: 55px;}
-#footer #info { background: #222; color: #777; margin-top: 20px; }
+#footer #info { background: #222; color: #777; margin: 20px 10px; }
 
 #footer .controls { float:left; margin: 20px 20px 0px 50px;}
 #footer .controls .button { float:left;width:50px; text-align:center;}
