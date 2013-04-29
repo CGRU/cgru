@@ -1,8 +1,3 @@
-SERVER = null;
-RULES = {};
-RULES.rufolder = 'rules';
-RULES_TOP = {};
-
 p_PLAYER = false;
 
 g_auth_user = null;

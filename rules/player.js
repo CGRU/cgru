@@ -1,7 +1,3 @@
-RULES = {};
-RULES.rufolder = 'rules';
-RULES_TOP = {};
-
 p_PLAYER = true;
 
 p_imgTypes = ['jpg','jpeg','png'];

@@ -1,3 +1,8 @@
+SERVER = null;
+RULES = {};
+RULES.rufolder = 'rules';
+RULES_TOP = {};
+
 c_movieTypes = ['mpg','mpeg','mov','avi','mp4'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 
