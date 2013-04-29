@@ -7,10 +7,14 @@ dest=$1
 [ -z "$dest" ] && dest=cgru.info
 cgru=$PWD
 
-#exts="js css html php txt"
+credentials=rules/export_credentials.sh
+if [ ! -f $credentials ]; then
+	echo $credentials file not founded
+	exit 1
+fi
+source $credentials
 
-source rules/export_credentials.sh
-
+echo USER=$FTP_USER
 echo DEST=$dest
 
 ftp -in $dest <<END_SCRIPT
