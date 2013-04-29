@@ -125,6 +125,18 @@ border-radius: 4px;
 /* ========================================== */
 /* ============== GLOBALS: ================== */
 
+.infotooltip {
+background: rgba(200,250,50,.3);
+cursor: help;
+font: 12px Times;
+font-style: italic;
+font-weight: bold;
+text-align: center;
+width: 16px;
+border: 1px solid #777;
+border-radius: 4px;
+}
+
 a { color: inherit; text-shadow: 0 0 1px rgba(0,0,255,.4);}
 a:hover { text-shadow: 0 0 2px rgba(100,200,255,.5); }
 

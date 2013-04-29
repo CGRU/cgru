@@ -2,7 +2,8 @@
 
 "assets":{
 	"forum":{
-		"seek":["/"]
+		"seek":["/"],
+		"show_files":true
 	},
 	"topic":{
 		"seek":["[forum]/"],

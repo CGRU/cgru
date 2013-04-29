@@ -38,7 +38,8 @@ function a_ShowAssets()
 	if(( ASSET.show_in_subdirectories !== true ) && ( ASSET.path != g_CurPath()))
 		return;
 
-	$('files_div').style.display = 'none';
+	if( ASSET.show_files !== true )
+		$('files_div').style.display = 'none';
 	$('asset_div').style.display = 'block';
 
 	a_ShowBody( ASSET);
