@@ -38,6 +38,7 @@ ls
 mkdir rules
 cd rules
 lcd rules
-mput *.html *.css *.js *.json
+mput *.html *.css *.js
+mput rules.00_general.json
 ls
 END_SCRIPT
