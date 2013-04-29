@@ -1146,12 +1146,13 @@ function jsf_getallusers( $i_args, &$o_out)
 	while (false !== ( $entry = readdir( $dHandle)))
 	{
 		if( false === is_file("users/$entry")) continue;
-		if( strrpos( $entry,'.json') === false ) continue;
+		if( strrpos( $entry,'.json') !== ( strlen($entry) - 5 )) continue;
 
 		if( $fHandle = fopen( "users/$entry", 'r'))
 		{
 			$user = json_decode( fread( $fHandle, $FileMaxLength), true);
-			$o_out['users'][$user['id']] = $user;
+			if( false == is_null( $user ))
+				$o_out['users'][$user['id']] = $user;
 			fclose($fHandle);
 		}
 	}
