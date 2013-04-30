@@ -62,7 +62,7 @@ function forum_NewQuestionOnClick()
 //console.log( JSON.stringify( g_auth_user));
 //console.log(user_id);
 
-	nw_MakeNews('<i>question</i>', folder, user_id);
+	nw_MakeNews('<i>question</i>', folder, user_id, question.guest);
 	g_GO( folder);
 }
 

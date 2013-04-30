@@ -171,13 +171,19 @@ function cm_Init( i_el, i_key)
 	}
 
 	if( avatar != null )
+	{
 		i_el.m_elAvatar.src = avatar;
+		i_el.m_elAvatar.style.display = 'block';
+	}
 	else
 		i_el.m_elAvatar.style.display = 'none';
 
 	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
-	i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
-	i_el.id = i_key;
+	if( i_key )
+	{
+		i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
+		i_el.id = i_key;
+	}
 	i_el.m_type = i_el.m_obj.type;
 
 	i_el.m_elDate.textContent = c_DT_StrFromMSec( i_el.m_obj.ctime);
@@ -391,7 +397,7 @@ function cm_Save( i_el)
 		c_Error( res.error);
 		return;
 	}
-	nw_MakeNews('<i>comments</i>', g_CurPath(), i_el.m_obj.user_name);
+	nw_MakeNews('<i>comments</i>', g_CurPath(), i_el.m_obj.user_name, i_el.m_obj.guest);
 
 	cm_all[key] = i_el.m_obj;
 	var emails = [];
@@ -404,22 +410,23 @@ function cm_Save( i_el)
 			emails.push( cm.guest.email);
 	}
 	if( emails.length )
-		cm_EmailGuests( cm_all[key], emails);
+		cm_EmailGuests( cm_all[key], key, emails);
 }
 
-function cm_EmailGuests( i_cm, i_emails)
+function cm_EmailGuests( i_cm, i_key, i_emails)
 {
 	for( var i = 0; i < i_emails.length; i++)
 	{
 		var email = c_EmailDecode( i_emails[i]);
 		if( false == c_EmailValidate( email)) continue;
 		var subject = 'RULES Comment: '+g_CurPath();
-		var body = i_cm.text;
-
+		var href = g_GetLocationArgs({"cm_Goto":i_key}, true);
+		var body = '<a href="'+href+'" target="_blank">'+href+'</a>';
+		body += '<br><br>';
+		body += i_cm.text;
 		body += '<br><br>';
 		var user = c_GetUserTitle( i_cm.user_name, i_cm.guest);
-//		if( i_cm.guest && i_cm.guest.title ) user = i_cm.guest.title;
-//		body += user;
+		body += user;
 		if( user != i_cm.user_name ) body += ' ['+i_cm.user_name+']';
 
 		n_SendMail( email, subject, body);

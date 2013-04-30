@@ -245,7 +245,7 @@ function nw_MakeNewsDialog()
 		'Create News', 'Enter News Title');
 }
 function nw_MakeNewsDialogApply( i_not_used, i_title) { nw_MakeNews( i_title); }
-function nw_MakeNews( i_title, i_path, i_user_id )
+function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
 {
 	if( localStorage.news_disabled == 'true') return;
 //window.console.log(i_title);
@@ -265,6 +265,7 @@ function nw_MakeNews( i_title, i_path, i_user_id )
 	news.user = i_user_id;
 	news.path = i_path;
 	news.title = i_title;
+	if( i_guest ) news.guest = i_guest;
 	news.id = i_user_id+'_'+news.time+'_'+news.path;
 	if( localStorage.news_ignore_own == 'true' )
 		news.ignore_own = true;
@@ -342,7 +343,7 @@ function nw_NewsLoad()
 		elBtn.ondblclick = function(e){ nw_RemoveNews( e.currentTarget.m_id);};
 		elBtn.title = 'Double click to remove link';
 
-		var avatar = c_GetAvatar( news.user);
+		var avatar = c_GetAvatar( news.user, news.guest);
 		if( avatar )
 		{
 			var elAvatar = document.createElement('img');
@@ -354,7 +355,7 @@ function nw_NewsLoad()
 		var elLabel = document.createElement('div');
 		el.appendChild( elLabel);
 		elLabel.classList.add('news_label');
-		elLabel.innerHTML = c_GetUserTitle(news.user)+': '+news.title;
+		elLabel.innerHTML = c_GetUserTitle(news.user, news.guest)+': '+news.title;
 
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
