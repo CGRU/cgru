@@ -1,1 +1,5 @@
+# Specific local files:
 *_local*
+
+# FTP login and password:
+export_credentials.sh

@@ -166,8 +166,8 @@ function cm_Init( i_el, i_key)
 
 	if( i_el.m_obj.user_name )
 	{
-		i_el.m_elUser.textContent = c_GetUserTitle( i_el.m_obj.user_name);
-		avatar = ad_GetAvatar( i_el.m_obj.user_name);
+		i_el.m_elUser.textContent = c_GetUserTitle( i_el.m_obj.user_name, i_el.m_obj.guest);
+		avatar = c_GetAvatar( i_el.m_obj.user_name, i_el.m_obj.guest);
 	}
 
 	if( avatar != null )
@@ -417,9 +417,9 @@ function cm_EmailGuests( i_cm, i_emails)
 		var body = i_cm.text;
 
 		body += '<br><br>';
-		var user = c_GetUserTitle( i_cm.user_name);
-		if( i_cm.guest && i_cm.guest.title ) user = i_cm.guest.title;
-		body += user;
+		var user = c_GetUserTitle( i_cm.user_name, i_cm.guest);
+//		if( i_cm.guest && i_cm.guest.title ) user = i_cm.guest.title;
+//		body += user;
 		if( user != i_cm.user_name ) body += ' ['+i_cm.user_name+']';
 
 		n_SendMail( email, subject, body);

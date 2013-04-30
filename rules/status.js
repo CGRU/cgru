@@ -61,7 +61,7 @@ function st_SetElArtists( i_status, i_elArtists, i_short)
 				if( i_short ) text += ',';
 				else text += ', ';
 			}
-			text += c_GetUserTitle( i_status.artists[i], i_short);
+			text += c_GetUserTitle( i_status.artists[i], null, i_short);
 		}
 	i_elArtists.textContent = text;
 }

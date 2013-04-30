@@ -917,7 +917,7 @@ function u_BodyLoad( i_nockeck)
 	var info = '';
 	if( RULES.status && RULES.status.body )
 	{
-		info += 'Created by '+c_GetUserTitle( RULES.status.body.cuser);
+		info += 'Created by '+c_GetUserTitle( RULES.status.body.cuser, RULES.status.body.guest);
 		info += ' at '+c_DT_StrFromSec( RULES.status.body.ctime);
 		if( RULES.status.body.muser )
 		{
@@ -1244,13 +1244,15 @@ function u_GuestAttrValidate( i_e)
 {
 	var el = i_e.currentTarget;
 	var value = el.textContent;
+	value = value.substr(0,99);
+	value = c_Strip( value);
 	if( el.m_attr == 'id' )
 	{
-		value = value.replace(/\W/g,'_');
+		value = value.toLowerCase();
 		value = value.substr(0,12);
+		value = c_Strip( value);
+		value = value.replace(/\W/g,'_');
 	}
-	else
-		value = value.substr(0,99);
 	el.textContent = value;
 }
 function u_GuestAttrsGet( i_el)

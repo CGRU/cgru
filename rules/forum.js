@@ -12,7 +12,7 @@ function forum_InitTopic()
 function forum_NewQuestionOnClick()
 {
 	var question = {};
-	question.id = c_Strip( $('forum_question_id').textContent).replace(/\W/g,'_');
+	question.id = c_Strip( $('forum_question_id').textContent).toLowerCase().replace(/\W/g,'_');
 	question.body = c_Strip( $('forum_question_body').innerHTML);
 	if( question.id.length == 0 )
 	{

@@ -212,13 +212,22 @@ function c_ElDisplayToggle( i_el)
 		i_el.style.display = 'none';
 }
 
-function c_GetUserTitle( i_uid, i_short)
+function c_GetUserTitle( i_uid, i_guest, i_short)
 {
 	if( i_uid == null ) i_uid = g_auth_user.id;
 	if( i_uid == null ) return null;
+
 	var title = i_uid;
-	if( g_users && g_users[i_uid] && g_users[i_uid].title )
-		title = g_users[i_uid].title;
+
+	if( g_users && g_users[i_uid] )
+	{
+		if( g_users[i_uid].title ) title = g_users[i_uid].title;
+	}
+	else if( i_guest && i_guest.title )
+	{
+		title = i_guest.title;
+	}
+	
 	if( i_short && ( title.length > 4 ))
 	{
 		title = title.split(' ');
@@ -384,5 +393,42 @@ function c_EmailDecode( i_email)
 	try { email = JSON.parse( atob( i_email)).join('@');}
 	catch( err) { email = null; c_Error( err);}
 	return email;
+}
+
+function c_GetAvatar( i_user_id, i_guest )
+{
+	var avatar = null;
+
+	var user = null;
+	if( i_user_id )
+		user = g_users[i_user_id];
+	else
+		user = g_auth_user; 
+
+	if( user == null )
+	{
+		if( i_guest )
+			user = i_guest;
+		else
+			return null
+	}
+
+	if( user.avatar && user.avatar.length )
+	{
+		avatar = user.avatar; 
+	}
+	else if( user.email && user.email.length )
+	{
+		avatar = user.email;
+		if( i_guest )
+			avatar = c_EmailDecode( avatar);
+		avatar = c_MD5( avatar.toLowerCase());
+		avatar = 'http://www.gravatar.com/avatar/' + avatar;
+	}
+
+	if( avatar && avatar.length )
+		return avatar;
+
+	return null;
 }
 

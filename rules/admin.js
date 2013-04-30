@@ -783,7 +783,7 @@ function ad_ProfileDraw()
 	var wnd = ad_wnd_prof;
 	wnd.elContent.innerHTML = '';
 
-	var avatar = ad_GetAvatar();
+	var avatar = c_GetAvatar();
 	if( avatar )
 	{
 		var el = document.createElement('img');
@@ -839,36 +839,5 @@ function ad_ProfileEditProp( i_prop, i_value)
 	g_auth_user[i_prop] = i_value;
 	ad_SaveUserProp( g_auth_user.id, i_prop, i_value)
 	ad_ProfileDraw();
-}
-
-function ad_GetAvatar( i_user_id )
-{
-	var avatar = null;
-
-	var user = null;
-	if( i_user_id )
-		user = g_users[i_user_id];
-	else
-		user = g_auth_user; 
-
-	if( user == null )
-	{
-		avatar = null;
-	}
-	else if( user.avatar && user.avatar.length )
-	{
-		avatar = user.avatar; 
-	}
-	else if( user.email && user.email.length )
-	{
-		avatar = user.email;
-		avatar = c_MD5( avatar.toLowerCase());
-		avatar = 'http://www.gravatar.com/avatar/' + avatar;
-	}
-
-	if( avatar && avatar.length )
-		return avatar;
-
-	return null;
 }
 

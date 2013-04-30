@@ -499,7 +499,7 @@ box-shadow: 0 0 4px #000 inset;
 .guest_attrs .attr { margin: 4px; }
 .guest_attrs .attr > div { padding: 4px 8px; }
 .guest_attrs .attr .label { float: left; width: 150px; }
-.guest_attrs .attr .info { float: right; width: 200px; }
+.guest_attrs .attr .info { float: right; width: 200px; font-style: italic; }
 
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */
