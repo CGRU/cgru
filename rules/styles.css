@@ -368,10 +368,13 @@ margin-bottom: -4px;
 #content .folder .size { font: 12px monospace; width: 60px; text-align: right; }
 #content .folder .mtime { font: 12px monospace; }
 
-/*#body_body { border: 1px solid #000; border-radius: 4px; }*/
+#body, #body_panel { overflow: visible; }
 #body_info { font-style: italic; font-size: 14px; }
+#body_avatar_c, #body_avatar_m { width: 50px; height: 50px; margin: -14px 10px 0px 20px; float: left; border: 1px solid #000; border-radius: 8px; }
+/*#body_avatar_c:hover, #body_avatar_m:hover { width: auto; height: auto; }*/
 #body_panel_edit > div { margin: 1px 8px;}
 #body_panel_edit .selected { background: rgba(200,255,255,.3);}
+#body_body { clear: both; }
 
 /* ============================================================================*/
 /* ============================= ASSETS: ======================================*/
