@@ -106,6 +106,9 @@ function u_Process()
 			$(u_views[i]+'_div').style.display = 'inline';
 	}
 
+	$('body_avatar_c').style.display = 'none';
+	$('body_avatar_m').style.display = 'none';
+
 	a_Process();
 	u_StatusApply();
 	nw_Process();
@@ -120,6 +123,7 @@ function u_Process()
 	}
 	else
 		$('open').style.display = 'none';
+
 }
 
 function u_Finish()
@@ -922,7 +926,7 @@ function u_BodyLoad( i_nockeck)
 		var avatar = c_GetAvatar( RULES.status.body.cuser, RULES.status.body.guest);
 		if( avatar )
 		{
-			$('body_avatar_c').style.display = 'inline';
+			$('body_avatar_c').style.display = 'block';
 			$('body_avatar_c').src = avatar;
 		}
 
@@ -935,7 +939,7 @@ function u_BodyLoad( i_nockeck)
 				var avatar = c_GetAvatar( RULES.status.body.muser);
 				if( avatar )
 				{
-					$('body_avatar_m').style.display = 'inline';
+					$('body_avatar_m').style.display = 'block';
 					$('body_avatar_m').src = avatar;
  				}
 			}
