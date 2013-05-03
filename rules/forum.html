@@ -10,8 +10,7 @@
 <div id="forum_new_question" style="margin:4px; padding:4px;">
 
 <div class="name_label">Question Label</div>
-<div id="forum_question_id" contenteditable="true" class="editing"
-		onblur="this.textContent=c_Strip( this.textContent.toLowerCase()).replace(/\W/g,'_').substr(0,16)"></div>
+<div id="forum_question_id" contenteditable="true" class="editing" onblur="forum_QuestionIDOnBlur()"></div>
 <div class="name_info">required for navigation, 16 characters max</div>
 
 <div class="label">Question Body</div>

@@ -9,19 +9,47 @@ function forum_InitTopic()
 	if( g_auth_user == null ) $('forum_guest_form').style.display = 'block';
 }
 
+function forum_QuestionIDOnBlur( i_e )
+{
+	forum_QuestionIDOnGet();
+}
+
+function forum_QuestionIDOnGet()
+{
+	var id = $('forum_question_id').textContent;
+	id = c_Strip( id.toLowerCase()).replace(/\W/g,'_').substr(0,16);
+	$('forum_question_id').textContent = id;
+	var walks = n_WalkDir([g_CurPath()]);
+	if( walks && walks.length && walks[0].folders && walks[0].folders.length )
+		for( var i = 0; i < walks[0].folders.length; i++)
+			if( walks[0].folders[i].name == id )
+			{
+				c_Error('Question "' + id + '" already exists. Try other.');
+				$('forum_question_id').classList.add('error');
+				return null;
+			}
+	$('forum_question_id').classList.remove('error');
+	return id;
+}
+
 function forum_NewQuestionOnClick()
 {
 	var question = {};
-	question.id = c_Strip( $('forum_question_id').textContent).toLowerCase().replace(/\W/g,'_');
-	question.body = c_Strip( $('forum_question_body').innerHTML);
+
+	question.id = forum_QuestionIDOnGet();
+	if( question.id == null ) return;
 	if( question.id.length == 0 )
 	{
 		c_Error('Required question ID attribute is empty.');
+		$('forum_question_id').classList.add('error');
 		return;
 	}
+	$('forum_question_id').classList.remove('error');
+
+	question.body = c_Strip( $('forum_question_body').innerHTML);
 	if( question.body.length == 0 )
 	{
-		c_Error('Required question body attribute is empty.');
+		c_Error('Question body is empty.');
 		return;
 	}
 

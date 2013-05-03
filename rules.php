@@ -33,8 +33,15 @@ if( isset($_POST['upload_path']))
 else
 {
 	$Recv = json_decode( $HTTP_RAW_POST_DATA, true);
-	if( is_null($Recv))
+	if( is_null( $Recv ))
+	{
 		$Recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
+	}
+	if( is_null( $Recv ))
+	{
+		$Recv = array();
+		$Out['error'] = 'Can`t decode request.';
+	}
 }
 
 # Authenticate:
@@ -1033,11 +1040,6 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 	$user = $i_recv['user'];
 
-	# Construct md5 hash
-	$p = $i_recv['p'];
-	$hash = md5("$user:RULES:$p");
-	$new_line = "$user:RULES:$hash";
-
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
@@ -1061,7 +1063,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 		}
 	}
 
-	array_push( $new_lines, $new_line);
+	array_push( $new_lines, $i_recv['digest']);
 
 	$data = implode("\n", $new_lines)."\n";
 
@@ -1583,7 +1585,10 @@ function upload( $i_path, &$o_out)
 
 function jsf_sendmail( $i_args, &$o_out)
 {
-	if( mail( $i_args['address'], $i_args['subject'], $i_args['body'], $i_args['headers']))
+	$addr = $i_args['address'];
+	if( strpos( $addr, '@' ) === false )
+		$addr = implode('@', json_decode( base64_decode( $addr)));
+	if( mail( $addr, $i_args['subject'], $i_args['body'], $i_args['headers']))
 		$o_out['status'] = 'email sent.';
 	else
 		$o_out['error'] = 'email was not sent.';

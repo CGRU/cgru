@@ -153,7 +153,7 @@ function n_GetRuFile( i_file, i_nockeck )
 function n_SendMail( i_address, i_subject, i_body)
 {
 	var obj = {};
-	obj.address = i_address;
+	obj.address = c_EmailEncode( i_address);
 	obj.subject = i_subject;
 
 	obj.headers = '';
@@ -170,7 +170,8 @@ function n_SendMail( i_address, i_subject, i_body)
 	obj.body += '</div><a href="cgru.info" style="padding:10px;margin:10px;" target="_blank">CGRU</a>';
 	obj.body += '</div></body></html>';
 
-	var result = c_Parse( n_Request({"sendmail":obj}, true, true));
+	var result = c_Parse( n_Request({"sendmail":obj}));
+//	var result = c_Parse( n_Request({"sendmail":obj}, true, true));
 	if( result == null ) return false;
 	if( result.error )
 	{

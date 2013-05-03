@@ -172,6 +172,8 @@ padding: 2px 4px;
 top: 0px; bottom: 0px; position: relative; left: 0; right: 0;
 min-height: 19px;
 }
+.editing.error { background: #FBA; }
+
 
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 

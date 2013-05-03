@@ -1280,6 +1280,9 @@ function u_GuestAttrValidate( i_e)
 }
 function u_GuestAttrsGet( i_el)
 {
+	for( var i = 0; i < u_guest_attrs.length; i++)
+		i_el.m_guest_attrs[u_guest_attrs[i].name].classList.remove('error');
+
 	var guest = {};
 	for( var i = 0; i < u_guest_attrs.length; i++)
 	{
@@ -1291,6 +1294,7 @@ function u_GuestAttrsGet( i_el)
 		if(( attr.name == 'id' ) && ( value.length == 0 ))
 		{
 			c_Error('Required guest ID attribute is empty.');
+			el.classList.add('error');
 			return null;
 		}
 		if(( attr.name == 'email' ) && ( value.length != 0 ))
@@ -1300,6 +1304,7 @@ function u_GuestAttrsGet( i_el)
 			else
 			{
 				c_Error('Invalid guest email.');
+				el.classList.add('error');
 				return null;
 			}
 		}

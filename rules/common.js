@@ -57,7 +57,7 @@ function c_Parse( i_data)
 		obj = null;
 	}
 
-	if( obj.nonce && SERVER ) SERVER.nonce = obj.nonce;
+	if( obj && obj.nonce && SERVER ) SERVER.nonce = obj.nonce;
 
 	return obj;
 }
@@ -386,9 +386,14 @@ function c_EmailValidate( i_email)
 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	return re.test( i_email);
 }
-function c_EmailEncode( i_email) { return btoa( JSON.stringify( i_email.split('@'))); }
+function c_EmailEncode( i_email)
+{
+	if( i_email.indexOf('@') == -1 ) return i_email;
+	return btoa( JSON.stringify( i_email.split('@')));
+}
 function c_EmailDecode( i_email)
 {
+	if( i_email.indexOf('@') != -1 ) return i_email;
 	var email = null;
 	try { email = JSON.parse( atob( i_email)).join('@');}
 	catch( err) { email = null; c_Error( err);}

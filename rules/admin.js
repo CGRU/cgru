@@ -729,7 +729,7 @@ function ad_SetPassword( i_user_id, i_passwd)
 	if( email && email.length )
 	{
 		var subject = 'RULES Password';
-		var body = window.location.protocol + '//' + window.location.host;
+		var body = window.location.protocol + '//' + window.location.host + window.location.pathname;
 		body = '<a href="'+body+'" target="_blank">'+body+'</a>';
 		body += ' password for ';
 		if( g_users[i_user_id].title )
@@ -745,8 +745,10 @@ function ad_SetPassword( i_user_id, i_passwd)
 		n_SendMail( email, subject, body);
 	}
 
-	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}, true, true));
-
+	var digest = c_MD5( i_user_id + ':RULES:' + i_passwd);
+	digest = i_user_id + ':RULES:' + digest;
+	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"digest":digest}}, true, true));
+	if( result == null ) return;
 	if( result.error )
 	{
 		c_Error( result.error);
