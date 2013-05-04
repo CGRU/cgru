@@ -177,12 +177,13 @@ function a_MakeThumbnail( i_sources, i_path)
 	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
-function a_Create( i_type, i_name, i_path)
+function a_Create( i_type, i_name, i_path, i_absolute)
 {
 	var asset = {};
 	asset.name = i_name;
 	asset.path = i_path;
 	asset.type = i_type;
+	asset.absolute = i_absolute;
 
 	c_RulesMergeObjs( asset, RULES.assets[i_type]);
 
@@ -194,6 +195,11 @@ function a_Create( i_type, i_name, i_path)
 	}
 	else
 		ASSET = asset;
+
+	if( i_absolute )
+		c_Log('Asset specified: ' + i_type + '=' + i_name);
+	else
+		c_Log('Asset founded: ' + i_type + '=' + i_name);
 }
 
 function a_Append( i_path, i_rules)
@@ -206,10 +212,9 @@ function a_Append( i_path, i_rules)
 //window.console.log('attr='+attr);
 		for( var atype in RULES.assets)
 		{
-			if( ASSETS[atype] ) continue;
+//			if( ASSETS[atype] ) continue;
 			if( attr != atype ) continue;
-			a_Create( atype, RULES[attr], i_path);
-			c_Log('Asset: ' + atype + '=' + RULES[attr]);
+			a_Create( atype, RULES[attr], i_path, true);
 		}
 	}
 }
@@ -281,8 +286,7 @@ function a_AutoSeek()
 					}
 					if( exists ) break;
 
-					a_Create( asset_type, aname, apath);
-					c_Log('Asset founded: ' + asset_type + '=' + aname);
+					a_Create( asset_type, aname, apath, false);
 					break;
 				}
 			}
