@@ -739,6 +739,7 @@ function u_SearchOnClick()
 {
 	$('search_result').textContent = '';
 	$('search_result_div').style.display = 'none';
+	$('search_result_none').style.display = 'none';
 
 	if( $('search_btn').m_opened )
 	{
@@ -829,6 +830,7 @@ function u_Search( i_args)
 {
 	$('search_result').textContent = '';
 	$('search_result_div').style.display = 'none';
+	$('search_result_none').style.display = 'none';
 
 	if( $('search_btn').m_opened !== true ) u_SearchOnClick();
 
@@ -899,6 +901,14 @@ function u_Search( i_args)
 	}
 
 	$('search_result_div').style.display = 'block';
+	if( res.result.length == 0 )
+	{
+		$('search_result').style.display = 'none';
+		$('search_result_none').style.display = 'block';
+		return;
+	}
+	$('search_result').style.display = 'block';
+
 	res.result.sort();
 	for( var i = 0; i < res.result.length; i++)
 	{
@@ -910,7 +920,6 @@ function u_Search( i_args)
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
 		elLink.href = '#'+path;
-//		elLink.target = '_blank';
 		elLink.textContent = path;
 	}
 }

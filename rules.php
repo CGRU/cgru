@@ -1394,11 +1394,10 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 		$path = "$i_path/$entry";
 		if( false == is_dir( $path)) continue;
 
-		$rufolder = "$path/".$i_args['rufolder'];
-		if( false == is_dir( $rufolder)) continue;
-
 		$founded = false;
-		if( htaccessPath( $i_path)) $founded = true;
+		$rufolder = "$path/".$i_args['rufolder'];
+		if( is_dir( $rufolder)) $founded = true;
+		if( $founded && htaccessPath( $i_path)) $founded = true;
 
 		if( $founded && array_key_exists('status', $i_args ))
 		{
@@ -1441,8 +1440,8 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 				if( $fHandle = fopen( $rufile, 'r'))
 				{
 					$obj = json_decode( fread( $fHandle, $FileMaxLength), true);
-						if( searchComment( $i_args['comment'], $obj))
-							$founded = true;
+					if( searchComment( $i_args['comment'], $obj))
+						$founded = true;
 					fclose($fHandle);
 				}
 			}

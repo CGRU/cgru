@@ -116,7 +116,9 @@ RMB - open/close folder"
 				<div style="float:left;">Search Path = </div>
 				<a id="search_path"></a>
 			</div>
-			<div id="search_result" style="border-radius:6px; box-shadow:0 0 3px #000 inset;"></div>
+			<div id="search_result" style="border-radius:6px; box-shadow:0 0 3px #000 inset; margin: 8px; padding: 8px;"></div>
+			<div id="search_result_none" style="display:none; border-radius:6px; box-shadow:0 0 3px #000 inset; margin: 8px; padding: 8px; text-align: center;">
+				No results founded.</div>
 		</div>
 	</div>
 	<div style="text-align:center;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
@@ -297,7 +299,7 @@ Hidden folders increase system speed.">
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
-		<div class="button" onclick="g_GO('/');window.location.reload();">Root</div>
+		<div class="button" onclick="window.onhashchange=null;g_GO('/');window.location.reload();">Root</div>
 		<div class="button" onclick="g_GO('..')">Up</div>
 		<div id="news_count" title="News Counter" onclick="u_SidePanelOpen();nw_NewsOpen()"></div>
 		<div id="assets"></div>
