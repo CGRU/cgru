@@ -161,7 +161,7 @@ box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 .button.openclose.opened { font-size:14px; width: 14px; height: 14px; }
 .button.openclose.closed { }
 
-.view { border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
+#content > .view { border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 
 .editing {
 background: #DDD;
@@ -334,13 +334,13 @@ padding: 5px 4px;
 #assets .asset .type { padding: 0px 4px; float: left; text-decoration: none; }
 #assets .asset .name { padding: 0px 4px; float: left; font: bold 16px monospace;}
 
-.show_folder .panel { /*border: 1px solid #000;*/ }
-.show_folder .panel div { float: left; margin: 0px 8px; }
-.show_folder .panel .path { margin: 0px 8px; }
-.show_folder .panel .title { font-weight: bold;}
-.show_folder .panel .cmdexec { padding: 0px 8px;}
-.show_folder .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
-.show_folder .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
+.files_view .panel { /*border: 1px solid #000;*/ }
+.files_view .panel div { float: left; margin: 0px 8px; }
+.files_view .panel .path { margin: 0px 8px; }
+.files_view .panel .title { font-weight: bold;}
+.files_view .panel .cmdexec { padding: 0px 8px;}
+.files_view .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
+.files_view .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
 
 #content .folder {
 clear: both;

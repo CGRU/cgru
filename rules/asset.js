@@ -354,7 +354,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 			elPath.textContent = ASSET.source.path[i];
 //console.log('flist='+JSON.stringify(flist));
 			for( var f = 0; f < flist.length; f++)
-				u_ShowFolder( elSource, paths[i], flist[f], flist[f]);
+				fv_ShowFolder( elSource, paths[i], flist[f], flist[f]);
 			founded = true;
 		}
 	}
