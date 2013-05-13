@@ -602,6 +602,16 @@ function u_ShowFile( i_element, i_path, i_file, i_walk)
 		elExplode.onclick = function(e){ d_Explode( e.currentTarget.m_path)};
 	}
 
+	if( c_FileIsImage( i_file.name))
+	{
+		var elCvt = document.createElement('div');
+		elFile.appendChild( elCvt);
+		elCvt.classList.add('button');
+		elCvt.textContent = 'JPG';
+		elCvt.m_file = i_file.name;
+		elCvt.onclick = function(e){ c_ImgConvertDialog( e.currentTarget.m_file)};
+	}
+
 	if( i_file.size != null )
 	{
 		var elSize = document.createElement('div');
