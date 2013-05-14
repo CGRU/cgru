@@ -107,8 +107,8 @@
 
 "thumbnail":{
 	"filename":"thumbnail.jpg",
-	"cmd_asset":"rules/thumbnail.py -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
-	"create_file":"rules/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
+	"cmd_asset":"rules/bin/thumbnail.py -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
+	"create_file":"rules/bin/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
 
 "avconv":"ffmpeg",

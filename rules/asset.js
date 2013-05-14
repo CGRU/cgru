@@ -4,7 +4,6 @@ ASSET = null;
 a_elThumbnails = null;
 a_elFolders = null;
 a_elCurEditStatus = null;
-a_elFileLimits = [];
 
 function View_asset_Open() { a_ShowAssets(); }
 
@@ -48,7 +47,6 @@ function a_ShowAssets()
 function a_ShowBody( i_asset )
 {
 	var thumb_paths = [];
-	a_elFileLimits = [];
 
 	window.document.title = i_asset.name + ' ' + window.document.title;
 
@@ -105,13 +103,9 @@ function a_ShowBody( i_asset )
 			var path = walk.paths[walk.result[i]];
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
-			var elFileLimit = a_FileLimitAdd( elResult);
-
 			thumb_paths.push( path);
-			elFileLimit.m_elFiles = u_ShowDirectory( elResult, path, walk.walks[walk.result[i]])
+			new FilesView( elResult, path, walk.walks[walk.result[i]])
 			founded = true;
-
-			a_elFileLimits.push( elFileLimit);
 		}
 
 		if( false == founded )
@@ -132,20 +126,16 @@ function a_ShowBody( i_asset )
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				var elFileLimit = a_FileLimitAdd( elDailies);
-				elFileLimit.m_elFiles = u_ShowDirectory( elDailies, path, walk.walks[walk.dailies[i]]);
+				new FilesView( elDailies, path, walk.walks[walk.dailies[i]]);
 				if( thumb_paths.length == 0 )
 					thumb_paths.push( path);
 				founded = true;
-				a_elFileLimits.push( elFileLimit);
 			}
 		}
 
 		if( false == founded )
 			elDailies.textContent = JSON.stringify( i_asset.dailies.path );
 	}
-
-	a_FileLimitsApplyAll();
 
 	if( thumb_paths.length )
 		a_MakeThumbnail( thumb_paths, i_asset.path);
@@ -338,26 +328,23 @@ function a_OpenCloseSourceOnClick( i_evt)
 	elSource.textContent = '';
 	elSource.classList.remove('button');
 
-	var founded = false;
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
 	var walkdir = n_WalkDir( paths, 5);
+
+	var founded = false;
 	for( var i = 0; i < walkdir.length; i++)
 	{
 		var flist = [];
 		a_SourceWalkFind( walkdir[i], flist);
 		if( flist.length )
 		{
-			var elPath = document.createElement('div');
-			elSource.appendChild( elPath);
-			elPath.textContent = ASSET.source.path[i];
-//console.log('flist='+JSON.stringify(flist));
-			for( var f = 0; f < flist.length; f++)
-				fv_ShowFolder( elSource, paths[i], flist[f], flist[f]);
+			new FilesView( elSource, paths[i], {"folders":flist}, false, false);
 			founded = true;
 		}
 	}
+
 	if( false == founded )
 		elSource.textContent = JSON.stringify( ASSET.source.path);
 }
@@ -712,73 +699,5 @@ function a_ShowAllThumbnails()
 	if( a_elFolders )
 		for( var i = 0; i < a_elFolders.length; i++)
 			a_elFolders[i].style.display = 'block';
-}
-
-function a_FileLimitAdd( i_el)
-{
-	var elPanel = document.createElement('div');
-	i_el.appendChild( elPanel);
-
-	if( localStorage.asset_filelimit == null ) localStorage.asset_filelimit = '0';
-
-	var limits = [3,10,30,0];
-
-	elPanel.m_elLimits = [];
-
-	for( var i = 0; i < limits.length; i++)
-	{
-		var elLimit = document.createElement('div');
-		elPanel.appendChild( elLimit);
-		elPanel.m_elLimits.push( elLimit);
-		elLimit.classList.add('filelimit');
-
-		var text = limits[i];
-		if( text == 0 )
-		{
-			text = 'all';
-			elLimit.title = 'Show all items';
-		}
-		else
-			elLimit.title = 'Show last '+limits[i]+' items';
-		elLimit.textContent = text;
-
-		elLimit.m_limit = limits[i];
-		elLimit.onclick = function(e){
-			localStorage.asset_filelimit = ''+e.currentTarget.m_limit;
-			a_FileLimitsApplyAll();
-		}
-	}
-
-	return elPanel;
-}
-
-function a_FileLimitsApplyAll()
-{
-	for( var i = 0; i < a_elFileLimits.length; i++)
-	{
-		var limit = 0;
-		for( var j = 0; j < a_elFileLimits[i].m_elLimits.length; j++)
-		{
-			var el = a_elFileLimits[i].m_elLimits[j];
-			if( parseInt( localStorage.asset_filelimit ) == el.m_limit )
-			{
-				limit = el.m_limit;
-				el.classList.remove('button');
-				if( limit ) el.classList.add('selected');
-			}
-			else
-			{
-				el.classList.add('button');
-				el.classList.remove('selected');
-			}
-		}
-
-		var elFiles = a_elFileLimits[i].m_elFiles;
-		for( var f = 0; f < elFiles.length; f++)
-			if( limit && ( f < ( elFiles.length-limit )))
-				elFiles[f].style.display = 'none';
-			else
-				elFiles[f].style.display = 'block';
-	}
 }
 

@@ -335,9 +335,11 @@ padding: 5px 4px;
 #assets .asset .name { padding: 0px 4px; float: left; font: bold 16px monospace;}
 
 .files_view .panel { /*border: 1px solid #000;*/ }
-.files_view .panel div { float: left; margin: 0px 8px; }
+.files_view .panel div, .files_view .panel a { float: left; margin: 0px 8px; }
+.files_view .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }
+.files_view .panel .limit.selected { background: rgba(100,255,255,.2); }
+.files_view .panel .title { clear: both; font-weight: bold;}
 .files_view .panel .path { margin: 0px 8px; }
-.files_view .panel .title { font-weight: bold;}
 .files_view .panel .cmdexec { padding: 0px 8px;}
 .files_view .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
 .files_view .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
@@ -393,9 +395,6 @@ margin: 6px;
 padding: 5px 20px 20px 20px;
 }
 #asset .source.button { padding: 4px;}
-
-#asset .filelimit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }
-#asset .filelimit.selected { background: rgba(100,255,255,.2); }
 
 .shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
@@ -546,4 +545,7 @@ box-shadow: 0 0 4px #000 inset;
 .profile > div .button { float: right; margin: 1px 8px; font-size: 14px; }
 .profile .avatar { float: right; width: 100px; height: 100px; border: 1px solid #000; border-radius: 8px; margin: 8px; padding: 0px; box-shadow: 0 0 4px rgba(255,255,255,.8); }
 
+.imgconvert > div > div { margin: 2px 8px; padding: 2px 8px;}
+.imgconvert > div .label { float: left; width: 100px; }
+.imgconvert > div .info { float: right; width: 150px; }
 

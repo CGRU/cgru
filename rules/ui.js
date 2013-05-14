@@ -19,7 +19,8 @@ cgru_params.push(['back_comments','Comments', '', 'Enter Background Style']);
 
 function View_body_Open() { u_BodyLoad(); }
 function View_body_Close() { u_BodyEditCancel(''); }
-function View_files_Open() { if( g_elCurFolder ) new FilesView( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir); }
+function View_files_Open() { if( g_elCurFolder ) new FilesView( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir,
+	/*show limits=*/false); }
 function View_files_Close() { $('files').textContent = ''; }
 
 function u_Init()
@@ -132,11 +133,9 @@ function u_Finish()
 
 	nw_Finish();
 	a_Finish();
+	fv_Finish();
 
 	u_ViewsFuncsClose();
-
-	u_elThumbnails = [];
-	u_thumbnails_elMakeBtns = [];
 
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
@@ -763,77 +762,6 @@ function u_OpenCloseView( i_id, i_toggle, i_callfuncs)
 	}
 }
 
-function u_UpdateThumbnail( i_msg)
-{
-	if( i_msg.thumbnail == null ) return;
-
-	u_MakeThumbnail();
-
-	if( i_msg.error )
-	{
-		c_Error('Make thumbnail: '+i_msg.error);
-		return;
-	}
-
-	if( i_msg.status == 'skipped' ) return;
-
-	i_msg.thumbnail = cgru_PM( i_msg.thumbnail, false);
-	var path = i_msg.thumbnail.replace( RULES.root, '');
-	var path = path.replace( /\/\//g, '/');
-	if( path == (g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename))
-	{
-		u_el.thumbnail.src = i_msg.thumbnail;
-		u_el.thumbnail.style.display = 'inline';
-		return;
-	}
-
-	for( var i = 0; i < u_elThumbnails.length; i++)
-	{
-		if( u_elThumbnails[i].m_thumbFile == i_msg.thumbnail )
-		{
-			u_elThumbnails[i].m_elImg.src = i_msg.thumbnail;
-			u_elThumbnails[i].style.display = 'block';
-			break;
-		}
-	}
-}
-
-function u_MakeThumbnails( i_evt)
-{
-	if( u_thumbnails_tomake > 0 ) return;
-
-	var elFiles = i_evt.currentTarget.m_elFiles;
-	u_thumbnails_tomake = elFiles.length;
-	if( u_thumbnails_tomake == 0 ) return;
-
-	for( var i = 0; i < u_thumbnails_elMakeBtns.length; i++)
-		u_thumbnails_elMakeBtns[i].classList.remove('button');
-
-	u_thumbnails_tomake_files = [];
-	for( var i = 0; i < elFiles.length; i++)
-		u_thumbnails_tomake_files.push( elFiles[i].m_elThumbnail.m_path);
-
-	u_MakeThumbnail();
-}
-
-function u_MakeThumbnail()
-{
-	if( u_thumbnails_tomake == 0 )
-	{
-		u_MakeThumbnailsFinish();
-		return;
-	}
-	u_thumbnails_tomake--;
-	c_MakeThumbnail( RULES.root + u_thumbnails_tomake_files.shift());
-}
-
-function u_MakeThumbnailsFinish()
-{
-	for( var i = 0; i < u_thumbnails_elMakeBtns.length; i++)
-		u_thumbnails_elMakeBtns[i].classList.add('button');
-	u_thumbnails_tomake = 0;
-}
-
 function u_EditPanelCreate( i_el)
 {
 	var elPanel = document.createElement('div');
@@ -995,5 +923,32 @@ function u_GuestAttrsGet( i_el)
 		guest[attr.name] = value;
 	}
 	return guest;
+}
+
+function u_UpdateThumbnail( i_msg)
+{
+	if( i_msg.thumbnail == null ) return;
+
+	fv_MakeThumbnail();
+
+	if( i_msg.error )
+	{
+		c_Error('Make thumbnail: '+i_msg.error);
+		return;
+	}
+
+	if( i_msg.status == 'skipped' ) return;
+
+	i_msg.thumbnail = cgru_PM( i_msg.thumbnail, false);
+	var path = i_msg.thumbnail.replace( RULES.root, '');
+	var path = path.replace( /\/\//g, '/');
+	if( path == (g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename))
+	{
+		u_el.thumbnail.src = i_msg.thumbnail;
+		u_el.thumbnail.style.display = 'inline';
+		return;
+	}
+
+	fv_UpdateThumbnail( i_msg);
 }
 
