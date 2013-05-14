@@ -509,12 +509,12 @@ function fv_ImgConvertDialog( i_file)
 	elQualityDiv.appendChild( elQualityLabel);
 	elQualityLabel.classList.add('label');
 	var elQualityInfo = document.createElement('div');
-	elQualityInfo.textContent = '1 is the best';
+	elQualityInfo.textContent = '100 is the best';
 	elQualityDiv.appendChild( elQualityInfo);
 	elQualityInfo.classList.add('info');
 
 	wnd.elQuality = document.createElement('div');
-	wnd.elQuality.textContent = '3';
+	wnd.elQuality.textContent = '75';
 	elQualityDiv.appendChild( wnd.elQuality);
 	wnd.elQuality.classList.add('editing');
 	wnd.elQuality.contentEditable = true;
@@ -531,7 +531,7 @@ function fv_ImgConvertDialog( i_file)
 	elResolutionInfo.classList.add('info');
 
 	wnd.elResolution = document.createElement('div');
-	wnd.elResolution.textContent = '-1';
+	wnd.elResolution.textContent = '1280';
 	elResolutionDiv.appendChild( wnd.elResolution);
 	wnd.elResolution.classList.add('editing');
 	wnd.elResolution.contentEditable = true;
@@ -555,10 +555,10 @@ function fv_ImgConvert( i_wnd)
 	out += '.jpg';
 
 	var cmd = 'rules/bin/convert.sh';
-	cmd += ' ' + i_wnd.m_file;
+	cmd += ' "' + i_wnd.m_file + '"';
 	cmd += ' -quality ' + quality;
 	if( resolution != '-1' ) cmd += ' -resize ' + resolution;
-	cmd += ' ' + out;
+	cmd += ' "' + out + '"';
 	i_wnd.destroy();
 
 	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
