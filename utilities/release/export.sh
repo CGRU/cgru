@@ -54,7 +54,7 @@ rcopy bin $dest
 rcopy examples $dest
 rcopy icons $dest
 rcopy lib $dest
-copy rules $dest/rules
+rcopy rules $dest
 rcopy software_setup $dest
 rcopy start $dest
 

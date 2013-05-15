@@ -43,6 +43,8 @@ cmd = 'convert'
 
 cmd += ' "%s"' % Options.input
 
+cmd += ' -flatten'
+
 imgtype = Options.input.rfind('.');
 if imgtype > 0:
 	imgtype = Options.input[imgtype+1:].lower()
