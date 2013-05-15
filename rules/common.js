@@ -5,6 +5,7 @@ RULES_TOP = {};
 
 c_movieTypes = ['mpg','mpeg','mov','avi','mp4'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
+c_imageEditableTypes = ['jpg','jpeg','png'];
 
 c_logCount = 0;
 c_elLogs = [];
@@ -344,6 +345,12 @@ function c_FileIsImage( i_file)
 {
 	var type = i_file.substr( i_file.lastIndexOf('.')+1).toLowerCase();
 	if( c_imageTypes.indexOf( type) != -1) return true;
+	return false;
+}
+function c_FileCanEdit( i_file)
+{
+	var type = i_file.substr( i_file.lastIndexOf('.')+1).toLowerCase();
+	if( c_imageEditableTypes.indexOf( type) != -1) return true;
 	return false;
 }
 function c_FileCanThumbnail( i_file)

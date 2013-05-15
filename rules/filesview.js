@@ -168,6 +168,12 @@ FilesView.prototype.limitApply = function()
 			this.elFiles[f].style.display = 'block';
 }
 
+FilesView.prototype.refresh = function()
+{
+	this.walk = n_WalkDir( [this.path], 0, RULES.rufolder)[0];
+	this.show();
+}
+
 FilesView.prototype.show = function()
 {
 	this.elView.innerHTML = '';
@@ -196,15 +202,26 @@ FilesView.prototype.show = function()
 	this.limitApply();
 }
 
+FilesView.prototype.createItem = function( i_path)
+{
+	var el = document.createElement('div');
+	el.classList.add('item');
+	this.elView.appendChild( el);
+	this.elFiles.push( el);
+	el.m_path = i_path;
+	el.m_view = this;
+	el.onclick = function(e) { e.currentTarget.m_view.onClick( e);};
+
+	return el;
+}
+
 FilesView.prototype.showFolder = function( i_folder)
 {
 	var name = i_folder.name;
 	var path = ( this.path + '/' + name).replace( /\/\//g, '/');
 
-	var elFolder = document.createElement('div');
+	var elFolder = this.createItem( path);
 	elFolder.classList.add('folder');
-	this.elView.appendChild( elFolder);
-	this.elFiles.push( elFolder);
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFolder, path, 'folder');
@@ -249,6 +266,7 @@ FilesView.prototype.showFolder = function( i_folder)
 		elMakeDailies.title = 'Make dailies';
 		elMakeDailies.m_path = path;
 		elMakeDailies.onclick = function(e){
+			e.stopPropagation();
 			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
 	}
 
@@ -265,11 +283,7 @@ FilesView.prototype.showFile = function( i_file)
 {
 	var path = this.path + '/' + i_file.name;
 
-	var elFile = document.createElement('div');
-	this.elView.appendChild( elFile);
-	this.elFiles.push( elFile);
-	elFile.classList.add('folder');
-	elFile.classList.add('file');
+	var elFile = this.createItem( path);
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFile, path, 'file');
@@ -279,6 +293,16 @@ FilesView.prototype.showFile = function( i_file)
 	elLinkA.href = RULES.root + path;
 	elLinkA.target = '_blank';
 	elLinkA.textContent = i_file.name;
+
+	if( c_FileCanEdit( i_file.name))
+	{
+		var elLinkA = document.createElement('a');
+		elFile.appendChild( elLinkA);
+		elLinkA.setAttribute('href', 'player.html#'+path);
+		elLinkA.setAttribute('target', '_blank');
+		elLinkA.textContent = 'edit';
+		elLinkA.style.cssFloat = 'right';
+	}
 
 	if( c_FileIsMovie( i_file.name))
 	{
@@ -301,7 +325,7 @@ FilesView.prototype.showFile = function( i_file)
 		elExplode.textContent = 'Explode';
 		elExplode.title = 'Explode movie to images sequence';
 		elExplode.m_path = path;
-		elExplode.onclick = function(e){ d_Explode( e.currentTarget.m_path)};
+		elExplode.onclick = function(e){ e.stopPropagation(); d_Explode( e.currentTarget.m_path)};
 	}
 
 	if( c_FileIsImage( i_file.name))
@@ -311,7 +335,7 @@ FilesView.prototype.showFile = function( i_file)
 		elCvt.classList.add('button');
 		elCvt.textContent = 'JPG';
 		elCvt.m_file = this.path + '/' + i_file.name;
-		elCvt.onclick = function(e){ fv_ImgConvertDialog( e.currentTarget.m_file)};
+		elCvt.onclick = function(e){ e.stopPropagation(); fv_ImgConvertDialog( e.currentTarget.m_file)};
 	}
 
 	if( i_file.size != null )
@@ -329,6 +353,20 @@ FilesView.prototype.showFile = function( i_file)
 		elMTime.classList.add('mtime');
 		elMTime.textContent = c_DT_FormStrFromSec( i_file.mtime);
 	}
+}
+
+FilesView.prototype.onClick = function( i_evt)
+{
+	i_evt.stopPropagation();
+	var el = i_evt.currentTarget;
+	this.selectNone();
+	el.classList.add('selected');
+}
+
+FilesView.prototype.selectNone = function()
+{
+	for( var i = 0; i < this.elFiles.length; i++)
+		this.elFiles[i].classList.remove('selected');
 }
 
 FilesView.prototype.makeThumbEl = function( i_el, i_path, i_type)
@@ -554,13 +592,40 @@ function fv_ImgConvert( i_wnd)
 		out += '.' + resolution;
 	out += '.jpg';
 
-	var cmd = 'rules/bin/convert.sh';
-	cmd += ' "' + i_wnd.m_file + '"';
-	cmd += ' -quality ' + quality;
-	if( resolution != '-1' ) cmd += ' -resize ' + resolution;
-	cmd += ' "' + out + '"';
+	var cmd = 'rules/bin/convert.py';
+	cmd += ' -i "' + i_wnd.m_file + '"';
+	cmd += ' -q ' + quality;
+	if( resolution != '-1' ) cmd += ' -r ' + resolution;
+	cmd += ' -o "' + out + '"';
 	i_wnd.destroy();
 
-	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
+	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
+}
+
+function fv_Converted( i_msg)
+{
+	var file = i_msg.convert;
+	if( i_msg.error )
+	{
+		c_Error( i_msg.error);
+		return;
+	}
+	if( file == null )
+	{
+		c_Error('Converted null file.');
+		return;
+	}
+
+	c_Info('Converted ' + c_PathBase( file));
+
+	for( var i = 0; i < fv_views.length; i++)
+		if( file.indexOf( fv_views[i].path ) != -1 )
+			fv_views[i].refresh();
+}
+
+function fv_ReloadAll()
+{
+	for( var i = 0; i < fv_views.length; i++)
+		fv_views[i].refresh();
 }
 

@@ -142,8 +142,11 @@ function cm_Init( i_el, i_key)
 	i_el.m_elDel.style.display = 'none';
 	i_el.m_elCancel.style.display = 'none';
 	i_el.m_elSave.style.display = 'none';
-	i_el.m_elEdit.style.display = 'block';
 	i_el.m_elTypesDiv.style.display = 'none';
+	if( g_admin )
+		i_el.m_elEdit.style.display = 'block';
+	else
+		i_el.m_elEdit.style.display = 'none';
 
 	i_el.m_elText.contentEditable = 'false';
 	i_el.m_elText.classList.remove('editing');
@@ -261,11 +264,16 @@ function cm_Edit( i_el)
 {
 	if( i_el.m_new != true )
 	{
-	if( g_auth_user == null )
-	{
-		c_Error('Guests can`t edit comments.');
-		return;
-	}
+		if( g_auth_user == null )
+		{
+			c_Error('Guests can`t edit comments.');
+			return;
+		}
+		if( g_admin == false )
+		{
+			c_Error('You can`t edit comments.');
+			return;
+		}
 		i_el.m_elDel.style.display = 'block';
 	}
 	i_el.m_elCancel.style.display = 'block';

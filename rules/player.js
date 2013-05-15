@@ -3,6 +3,7 @@ p_PLAYER = true;
 p_imgTypes = ['jpg','jpeg','png'];
 
 p_path = null;
+p_imageMode = false;
 p_elImg = [];
 p_images = [];
 p_frame = null;
@@ -135,7 +136,24 @@ function p_PathChanged()
 
 	p_path = c_GetHashPath();
 	p_path = RULES_TOP.root + p_path;
+
 	var walk = n_WalkDir([p_path])[0];
+	if( walk.files == null )
+	{
+		if( c_FileCanEdit( p_path))
+		{
+			walk.files = [{"name":c_PathBase( p_path)}];
+			p_path = c_PathDir( p_path);
+			p_imageMode = true;
+			$('playback_controls').style.display = 'none';
+		}
+		else
+		{
+			c_Error('Cant`t edit ' + p_path);
+			return;
+		}
+	}
+
 	p_filenames = [];
 	p_fileObjs = {};
 	p_fileSizeTotal = 0;
@@ -148,7 +166,8 @@ function p_PathChanged()
 	{
 		var file = walk.files[i].name;
 		p_fileObjs[file] = walk.files[i];
-		p_fileSizeTotal += walk.files[i].size;
+		if( walk.files[i].size )
+			p_fileSizeTotal += walk.files[i].size;
 		var type = file.split('.').pop().toLowerCase();
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
@@ -209,9 +228,9 @@ function p_ImgLoaded(e)
 //	setTimeout('p_HomeView();',100);
 
 	var info = 'Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height;
-	info += ': '+c_Bytes2KMG( p_fileSizeTotal);
+	if( p_fileSizeTotal ) info += ': '+c_Bytes2KMG( p_fileSizeTotal);
 	info += ': '+sec.toFixed(1)+' seconds';
-	if( sec > 0 )
+	if(( sec > 0 ) && p_fileSizeTotal )
 	{
 		var speed = p_fileSizeLoaded / sec;
 		info += ': '+c_Bytes2KMG( speed)+'/s';
@@ -315,6 +334,7 @@ function p_PushAllButtons()
 
 function p_Play()
 {
+	if( p_imageMode ) return;
 	if( p_loaded == false ) return;
 	if( p_playing > 0 )
 	{
@@ -329,6 +349,7 @@ function p_Play()
 
 function p_Reverse()
 {
+	if( p_imageMode ) return;
 	if( p_loaded == false ) return;
 	if( p_playing < 0 )
 	{
@@ -584,9 +605,17 @@ function p_Save()
 		var data = canvas.toDataURL('image/jpeg',.8);
 		data = data.substr( data.indexOf(',')+1);
 
-		var path = p_path.substr( 0, p_path.lastIndexOf('/'));
-		var folder = p_path.substr( p_path.lastIndexOf('/')+1);
-		path = path+'/'+folder+'.painted/'+p_filenames[f];
+		var path = p_path;
+		if( p_imageMode )
+		{
+			path += '/' + p_filenames[f] + '.painted.jpg';
+		}
+		else
+		{
+			var path = p_path.substr( 0, p_path.lastIndexOf('/'));
+			var folder = p_path.substr( p_path.lastIndexOf('/')+1);
+			path = path+'/'+folder+'.painted/'+p_filenames[f];
+		}
 
 		n_Request({"save":{"file":path,"data":data,"type":"base64"}}, false);
 	}
@@ -609,6 +638,7 @@ function n_MessageReceived( i_msg)
 		p_filessaved++;
 		var name = file.substr( file.lastIndexOf('/')+1);
 		var frame = p_filenames.indexOf(name);
+		if( p_imageMode ) frame = 0;
 		if( p_paintElCanvas[frame])
 			p_paintElCanvas[frame].m_saved = true;
 		p_SetPaintState();

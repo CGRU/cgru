@@ -246,6 +246,7 @@ function d_Explode( i_path)
 		var elParam = document.createElement('div');
 		elDiv.appendChild( elParam);
 		elParam.classList.add('param');
+		elParam.classList.add('editing');
 		elParam.textContent = params[name];
 		elParam.contentEditable = 'true';
 
@@ -281,5 +282,6 @@ function d_ExpProcessGUI( i_wnd)
 	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
 	i_wnd.destroy();
 //	window.location.reload();
+	fv_ReloadAll();
 }
 

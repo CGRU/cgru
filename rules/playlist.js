@@ -102,31 +102,38 @@ function p_FolderOnClick( i_evt)
 //window.console.log('fclick: '+el.m_id)
 	p_elCurFolder = el;
 	if( p_elCurItem == el)
-		p_FolderOnDblClick( i_evt);
+		p_FolderOpenClose( el);
 	else
-		p_SetCurItem( p_elCurFolder);
+	{
+		p_SetCurItem( el);
+		if( false == el.classList.contains('opened'))
+			p_FolderOpenClose( el);
+	}
 }
 function p_FolderOnDblClick( i_evt)
 {
 	i_evt.stopPropagation();
-	var el = i_evt.currentTarget;
+	p_FolderOpenClose( i_evt.currentTarget);
+}
+function p_FolderOpenClose( i_el)
+{
 //window.console.log('dbl fclick: '+el.m_id)
 //if( el == p_elCurItem )
 //{
-	if( el.classList.contains('opened'))
+	if( i_el.classList.contains('opened'))
 	{
-		el.classList.remove('opened');
-		p_elCurFolder = el.parentNode;
+		i_el.classList.remove('opened');
+		p_elCurFolder = i_el.parentNode;
 		var folders = localStorage.playlist_opened_folders.split(' ');
-		folders.splice( folders.indexOf( el.m_id), 1);
+		folders.splice( folders.indexOf( i_el.m_id), 1);
 		localStorage.playlist_opened_folders = folders.join(' ');
 	}
 	else
 	{
-		el.classList.add('opened');
-		p_elCurFolder = el;
+		i_el.classList.add('opened');
+		p_elCurFolder = i_el;
 		var folders = localStorage.playlist_opened_folders.split(' ');
-		folders.push( el.m_id);
+		folders.push( i_el.m_id);
 		localStorage.playlist_opened_folders = folders.join(' ');
 	}
 //}

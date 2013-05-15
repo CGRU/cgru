@@ -343,20 +343,19 @@ padding: 5px 4px;
 .files_view .panel .cmdexec { padding: 0px 8px;}
 .files_view .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
 .files_view .panel .thumbsdiv div { float: right; margin: 0px 6px; padding: 0px 6px; }
-
-#content .folder {
+.files_view .item {
 clear: both;
 border-top: 1px solid #777;
 padding: 2px 6px;
 margin: 2px;
 }
-#content .folder div {
+.files_view .item div {
 float: right;
 padding: 2px 6px;
 margin: 0px 4px;
 font-size: 14px;
 }
-#content .folder .thumbnail {
+.files_view .item .thumbnail {
 border: 1px solid #000;
 border-radius: 4px;
 float: left;
@@ -364,13 +363,14 @@ padding: 0;
 margin: 0;
 margin-right: 10px;
 }
-#content .folder .thumbnail img {
+.files_view .item .thumbnail img {
 margin: 0;
 padding: 0;
 margin-bottom: -4px;
 }
-#content .folder .size { font: 12px monospace; width: 60px; text-align: right; }
-#content .folder .mtime { font: 12px monospace; }
+.files_view .item .size { font: 12px monospace; width: 60px; text-align: right; }
+.files_view .item .mtime { font: 12px monospace; }
+.files_view .item.selected { background: rgba(150,250,250,.2); }
 
 #body, #body_panel { overflow: visible; }
 #body_info { font-style: italic; font-size: 14px; }

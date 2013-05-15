@@ -6,7 +6,7 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 {
 	if( typeof( i_paths) != 'object')
 	{
-		c_Error('PATH "'+i_paths+'" not on object.');
+		c_Error('PATH "'+i_paths+'" not an object.');
 		return null;
 	}
 
