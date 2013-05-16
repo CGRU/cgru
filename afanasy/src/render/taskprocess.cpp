@@ -421,7 +421,7 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
 	else
 	{
 		std::string errMsg;
-		errMsg = m_service.doPost();
+//		errMsg = m_service.doPost();
 		if( errMsg.empty())
 			m_update_status = af::TaskExec::UPFinishedSuccess;
 		else

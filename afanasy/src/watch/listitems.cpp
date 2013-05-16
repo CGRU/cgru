@@ -49,7 +49,7 @@ bool ListItems::init( bool createModelView)
 		m_layout->addLayout( m_viewlayout);
 
 		m_viewlayout->addWidget( m_view);
-
+/*
 		m_viewtoolbar = new QToolBar();
 
 		m_thumbnailbutton = m_viewtoolbar->addAction(QIcon( QString::fromStdString(af::Environment::getAfRoot()) + "/icons/watch/thumbnails.png"), "Thumbnails");
@@ -60,7 +60,7 @@ bool ListItems::init( bool createModelView)
 		m_toolbarvbox->addStretch(1);
 
 		m_viewlayout->addLayout( m_toolbarvbox);
-
+*/
 		m_layout->addWidget( m_infoline);
 	}
 
