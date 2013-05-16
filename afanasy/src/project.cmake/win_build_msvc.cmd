@@ -13,7 +13,7 @@ rem Specify Python:
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: %CGRU_PYTHONDIR%
    SET AF_PYTHON_INCLUDE_PATH=%CGRU_PYTHONDIR%\include
-   SET AF_PYTHON_LIBRARIES=%CGRU_PYTHONDIR%\libs\python32.lib
+   SET AF_PYTHON_LIBRARIES=%CGRU_PYTHONDIR%\libs\python33.lib
 )
 
 if exist override.cmd call override.cmd

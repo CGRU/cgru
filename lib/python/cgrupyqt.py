@@ -6,10 +6,10 @@ PythonQtType = None
 PySide = True
 
 try:
-	PythonQt = __import__('PySide', globals(), locals(), List, -1)
+	PythonQt = __import__('PySide', globals(), locals(), List)
 	PythonQtType = 'PySide'
 except:
-	PythonQt = __import__('PyQt4', globals(), locals(), List, -1)
+	PythonQt = __import__('PyQt4', globals(), locals(), List)
 	PythonQtType = 'PyQt4'
 
 QtCore = PythonQt.QtCore
