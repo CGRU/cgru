@@ -245,7 +245,7 @@ font-size: 10px;
 #news .avatar { float:right; border-radius: 4px; width: 24px; height: 24px; margin: 2px; }
 #news .news_label { font-size:12px; }
 /* ============= PLAYLIST: =============== */
-#playlist .folder, #playlist a {
+#playlist .item {
 font-weight: normal;
 }
 #playlist .folder {
@@ -256,9 +256,13 @@ border-radius: 4px;
 font-size: 16px;
 padding: 2px 0px 2px 8px;
 }
-#playlist a { display: block; font-size: 14px; padding: 0px 0px 0px 8px; }
-#playlist .folder > .folder, #playlist .folder > a { display: none;}
-#playlist .folder.opened > .folder, #playlist .folder.opened > a { display: block;}
+#playlist .location { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
+#playlist .location a { display: block; }
+#playlist .location .anchor { float: right; }
+#playlist .location .link { float: left; }
+#playlist .location .anchor { font-size: 10px; text-align: right; margin-bottom: 2px; padding: 1px 4px; }
+#playlist .folder > .folder, #playlist .folder > .location { display: none;}
+#playlist .folder.opened > .folder, #playlist .folder.opened > .location { display: block;}
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
 /*#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); }*/
@@ -346,14 +350,21 @@ padding: 5px 4px;
 .files_view .item {
 clear: both;
 border-top: 1px solid #777;
-padding: 2px 6px;
-margin: 2px;
+padding: 3px 6px;
 }
 .files_view .item div {
 float: right;
 padding: 2px 6px;
 margin: 0px 4px;
 font-size: 14px;
+}
+.files_view .item .anchor {
+font-size: 12px;
+border: 1px solid rgba(0,0,0,.5);
+border-radius: 4px;
+padding: 1px 4px;
+margin: 0px 4px 0px 0px;
+opacity: .5;
 }
 .files_view .item .thumbnail {
 border: 1px solid #000;

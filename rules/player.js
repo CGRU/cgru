@@ -24,7 +24,7 @@ p_slidertimer = null;
 
 p_painting = false;
 p_paintElCanvas = [];
-p_paintColor = null;
+p_paintColor = [255,255,0];
 p_paintSize = 5;
 p_paintCtx = null;
 
@@ -81,7 +81,7 @@ function p_Init()
 	}
 	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
 
-	u_DrawColorBars( p_el.colors, p_ColorChanged(), 25);
+	u_DrawColorBars( p_el.colors, p_ColorOnClick, 25);
 	p_el.view.onmousedown = p_ViewOnMouseDown;
 	p_el.view.onmousemove = p_ViewOnMouseMove;
 	p_el.view.onmouseup = p_ViewOnMouseUp;
@@ -94,6 +94,8 @@ function p_Init()
 	document.body.onkeydown = p_OnKeyDown;
 	window.onhashchange = p_PathChanged;
 	window.onresize = p_HomeView;
+
+	p_PaintSetColor( p_paintColor);
 
 	p_PathChanged();
 }
@@ -537,7 +539,7 @@ i_evt.stopPropagation();
 	p_paintCtx.beginPath();
 	p_paintCtx.lineWidth = 10;
 	p_paintCtx.lineCap = 'round';
-	p_paintCtx.strokeStyle = 'rgb(255,255,0)';
+	p_paintCtx.strokeStyle = 'rgb('+p_paintColor.join(',')+')';
 
 	p_SetPaintState();
 }
@@ -575,8 +577,17 @@ function p_ViewOnMouseOver()
 	p_paintCtx = null;
 }
 
-function p_ColorChanged()
+function p_ColorOnClick( e)
 {
+	var clrEl = e.currentTarget;
+	el = clrEl.parentNode.parentNode.parentNode;
+	p_PaintSetColor(clrEl.m_color);
+}
+
+function p_PaintSetColor( i_clr)
+{
+	$('paint_color').style.background = 'rgb(' + i_clr.join(',') + ')';
+	p_paintColor = i_clr;
 }
 
 function p_Save()

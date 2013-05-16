@@ -76,6 +76,8 @@ function p_NewFolder( i_param, i_value)
 	var obj = {};
 	obj.label = i_value;
 	obj.id = p_elCurFolder.m_id + '/' + i_value;
+	obj.user = g_auth_user.id;
+	obj.time = c_DT_CurSeconds();
 	obj.playlist = [];
 	p_Action( obj, 'add');
 }
@@ -83,8 +85,25 @@ function p_AddLink( i_param, i_value)
 {
 	var obj = {};
 	obj.label = i_value;
-	obj.path = g_elCurFolder.m_path;
 	obj.id = p_elCurFolder.m_id + '/' + i_value;
+
+	if( fv_cur_item )
+	{
+		obj.item = fv_cur_item.m_path;
+		obj.path = g_GetLocationArgs({"fv_Goto":fv_cur_item.m_path});
+		obj.id += '_' + c_PathBase( obj.item);
+	}
+	else
+		obj.path = document.location.hash;
+//		obj.path = g_CurPath();
+//	obj.path = g_elCurFolder.m_path;
+
+	if( obj.path.indexOf('#') == 0 )
+		obj.path = obj.path.substr(1);
+
+	obj.user = g_auth_user.id;
+	obj.time = c_DT_CurSeconds();
+	
 	p_Action( obj, 'add');
 }
 function p_Rename( i_param, i_value)
@@ -238,7 +257,10 @@ function p_Read( i_playlist, i_params, i_elParent)
 		{
 			var el = p_CreateFolder( i_playlist[i], i_elParent);
 			if( el.m_id == i_params.curfolderid )
+			{
 				p_elCurFolder = el;
+				p_SetCurItem( el);
+			}
 			if( i_params.wasopened.indexOf( el.m_id ) != -1 )
 			{
 				el.classList.add('opened');
@@ -263,27 +285,57 @@ function p_CompareItems(a,b)
 }
 function p_CreateFolder( i_obj, i_elParent)
 {
-	var el = p_CreateElement( i_obj, i_elParent, 'div');
+	var el = p_CreateElement( i_obj, i_elParent);
 	el.classList.add('folder');
+	el.textContent = i_obj.label;
 	el.onclick = p_FolderOnClick;
 //	el.ondblclick = p_FolderOnDblClick;
 	return el;
 }
 function p_CreateLink( i_obj, i_elParent)
 {
-	var el = p_CreateElement( i_obj, i_elParent, 'a');
+	var el = p_CreateElement( i_obj, i_elParent);
+	el.classList.add('location');
 	el.m_path = i_obj.path;
-	el.href = '#' + i_obj.path;
 	el.onclick = p_LinkOnClick;
 	return el;
 }
 function p_CreateElement( i_obj, i_elParent, i_type)
 {
-	var el = document.createElement( i_type);
+	var el = document.createElement('div');
+	el.classList.add('item');
 	i_elParent.appendChild( el);
-	el.textContent = i_obj.label;
 	el.m_label = i_obj.label;
 	el.m_id = i_obj.id;
+
+	var title = '';
+	if( i_obj.user ) el.title = c_GetUserTitle( i_obj.user);
+	if( i_obj.time ) el.title += '\n' + c_DT_StrFromSec( i_obj.time);
+	if( i_obj.path )
+	{
+		var path = i_obj.path.split('?')[0];
+		el.title += '\n' + path;
+
+		var elLink = document.createElement('a');
+		el.appendChild( elLink);
+		elLink.textContent = i_obj.label;
+		elLink.classList.add('link');
+		elLink.href = '#' + i_obj.path;
+
+		if( i_obj.item )
+		{
+			el.title += '\n @ ' + i_obj.item.replace( path, '');
+			var elAnchor = document.createElement('a');
+			el.appendChild( elAnchor);
+			elAnchor.textContent = c_PathBase( i_obj.item);
+			elAnchor.classList.add('anchor');
+			elAnchor.href = RULES.root + i_obj.item;
+			elAnchor.target = '_blank';
+		}
+	}
+
+	if( title != '' ) el.title = title;
+
 	return el;
 }
 

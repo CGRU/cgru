@@ -3,11 +3,14 @@ fv_views = [];
 fv_thumbnails_tomake = 0;
 fv_thumbnails_tomake_files = [];
 
+fv_cur_item = null;
+
 if( localStorage.filesview == null ) localStorage.filesview = '0';
 
 function fv_Finish()
 {
 	fv_views = [];
+	fv_cur_item = null;
 }
 
 function FilesView( i_elParent, i_path, i_walk, i_show_limits, i_show_thumbs)
@@ -161,11 +164,11 @@ FilesView.prototype.limitApply = function()
 		}
 	}
 
-	for( var f = 0; f < this.elFiles.length; f++)
-		if( limit && ( f < ( this.elFiles.length-limit )))
-			this.elFiles[f].style.display = 'none';
+	for( var f = 0; f < this.elItems.length; f++)
+		if( limit && ( f < ( this.elItems.length-limit )))
+			this.elItems[f].style.display = 'none';
 		else
-			this.elFiles[f].style.display = 'block';
+			this.elItems[f].style.display = 'block';
 }
 
 FilesView.prototype.refresh = function()
@@ -177,7 +180,7 @@ FilesView.prototype.refresh = function()
 FilesView.prototype.show = function()
 {
 	this.elView.innerHTML = '';
-	this.elFiles = [];
+	this.elItems = [];
 	this.elThumbnails = [];
 
 	if( this.walk == null )
@@ -207,10 +210,17 @@ FilesView.prototype.createItem = function( i_path)
 	var el = document.createElement('div');
 	el.classList.add('item');
 	this.elView.appendChild( el);
-	this.elFiles.push( el);
+	this.elItems.push( el);
 	el.m_path = i_path;
+	el.id = i_path;
 	el.m_view = this;
 	el.onclick = function(e) { e.currentTarget.m_view.onClick( e);};
+
+	var elAnchor = document.createElement('a');
+	el.appendChild( elAnchor);
+	elAnchor.classList.add('anchor');
+	elAnchor.textContent = '@';
+	elAnchor.href = g_GetLocationArgs({"fv_Goto":i_path});
 
 	return el;
 }
@@ -358,15 +368,28 @@ FilesView.prototype.showFile = function( i_file)
 FilesView.prototype.onClick = function( i_evt)
 {
 	i_evt.stopPropagation();
-	var el = i_evt.currentTarget;
+	this.selectItem( i_evt.currentTarget);
+}
+
+FilesView.prototype.selectItem = function( i_el)
+{
 	this.selectNone();
-	el.classList.add('selected');
+	i_el.classList.add('selected');
+	fv_cur_item = i_el;
 }
 
 FilesView.prototype.selectNone = function()
 {
-	for( var i = 0; i < this.elFiles.length; i++)
-		this.elFiles[i].classList.remove('selected');
+	for( var i = 0; i < this.elItems.length; i++)
+		this.elItems[i].classList.remove('selected');
+}
+
+FilesView.prototype.getItemPath = function( i_path)
+{
+	for( var i = 0; i < this.elItems.length; i++)
+		if( this.elItems[i].m_path == i_path )
+			return this.elItems[i];
+	return null;
 }
 
 FilesView.prototype.makeThumbEl = function( i_el, i_path, i_type)
@@ -627,5 +650,27 @@ function fv_ReloadAll()
 {
 	for( var i = 0; i < fv_views.length; i++)
 		fv_views[i].refresh();
+}
+
+function fv_SelectNone()
+{
+	for( var v = 0; v < fv_views.length; v++)
+		fv_views[v].selectNone();
+}
+
+function fv_Goto( i_path )
+{
+	fv_SelectNone();
+	for( var v = 0; v < fv_views.length; v++)
+	{
+		var el = fv_views[v].getItemPath( i_path )
+		if( el )
+		{
+			fv_views[v].selectItem( el);
+			el.scrollIntoView();
+			return;
+		}
+	}
+	c_Error('Item not founded: ' + i_path);
 }
 

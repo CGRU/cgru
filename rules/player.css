@@ -38,9 +38,8 @@ overflow: hidden;
 /*#player_content #view img { position: absolute; }*/
 #player_content #view canvas { position: absolute; top: 0px; left: 0px; /*border: 4px solid #F00;*/}
 
-#paint .button {
-float:left;
-}
+#paint .button { float:left; }
+#paint_color { float: left; margin: 5px; width: 20px; height: 20px; border-radius: 4px; border: 1px solid #000; }
 
 #FPS {float:left;margin:2px;}
 #framerate {
