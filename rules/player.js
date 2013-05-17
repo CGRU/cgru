@@ -25,7 +25,7 @@ p_slidertimer = null;
 p_painting = false;
 p_paintElCanvas = [];
 p_paintColor = [255,255,0];
-p_paintSize = 5;
+p_paintSize = 8;
 p_paintCtx = null;
 
 p_saving = false;
@@ -95,7 +95,10 @@ function p_Init()
 	window.onhashchange = p_PathChanged;
 	window.onresize = p_HomeView;
 
-	p_PaintSetColor( p_paintColor);
+	$('paint_size_num').onblur = function(e){ p_PaintSizeSet()};
+	$('paint_size_num').onkeydown = p_PaintSizeKeyDown;
+	p_PaintColorSet( p_paintColor);
+	p_PaintSizeSet( p_paintSize);
 
 	p_PathChanged();
 }
@@ -297,28 +300,30 @@ function p_OnKeyDown(e)
 	else if( e.keyCode == 32 ) p_Play(); // Space
 	else if( e.keyCode == 38 ) p_Play(); // Up
 	else if( e.keyCode == 40 ) p_Reverse(); // Down
-	else if( e.keyCode == 70 ) // F
-	{
-		if( p_el.header.hidden )
-		{
-			p_el.header.hidden = false;
-			p_el.header.style.display = 'block';
-			p_el.footer.style.display = 'block';
-			p_el.player_content.style.top = p_top;
-			p_el.player_content.style.bottom = p_bottom;
-		}
-		else
-		{
-			p_el.header.hidden = true;
-			p_el.header.style.display = 'none';
-			p_el.footer.style.display = 'none';
-			p_el.player_content.style.top = '0';
-			p_el.player_content.style.bottom = '0';
-		}
-		p_HomeView();
-	}
+	else if( e.keyCode == 70 ) p_FullScreen();// F
 	else if( e.keyCode == 83 ) p_Save(); // S
 	else if( e.keyCode == 72 ) p_HomeView(); // H
+}
+
+function p_FullScreen()
+{
+	if( p_el.header.m_hidden )
+	{
+		p_el.header.m_hidden = false;
+		p_el.header.style.display = 'block';
+		p_el.footer.style.display = 'block';
+		p_el.player_content.style.top = p_top;
+		p_el.player_content.style.bottom = p_bottom;
+	}
+	else
+	{
+		p_el.header.m_hidden = true;
+		p_el.header.style.display = 'none';
+		p_el.footer.style.display = 'none';
+		p_el.player_content.style.top = '0';
+		p_el.player_content.style.bottom = '0';
+	}
+	p_HomeView();
 }
 
 function p_PushButton( i_btn)
@@ -537,7 +542,7 @@ i_evt.stopPropagation();
 	p_paintCtx = canvas.getContext('2d');
 	p_paintCtx.globalCompositeOperation = 'source-over';
 	p_paintCtx.beginPath();
-	p_paintCtx.lineWidth = 10;
+	p_paintCtx.lineWidth = p_paintSize;
 	p_paintCtx.lineCap = 'round';
 	p_paintCtx.strokeStyle = 'rgb('+p_paintColor.join(',')+')';
 
@@ -581,13 +586,47 @@ function p_ColorOnClick( e)
 {
 	var clrEl = e.currentTarget;
 	el = clrEl.parentNode.parentNode.parentNode;
-	p_PaintSetColor(clrEl.m_color);
+	p_PaintColorSet(clrEl.m_color);
 }
-
-function p_PaintSetColor( i_clr)
+function p_PaintColorSet( i_clr)
 {
+	if( i_clr == null )
+		return;
 	$('paint_color').style.background = 'rgb(' + i_clr.join(',') + ')';
 	p_paintColor = i_clr;
+}
+
+function p_PaintSizeSet( i_px)
+{
+	if( i_px == null )
+	{
+		i_px = parseInt( $('paint_size_num').textContent);
+	}
+	if( false == isNaN( i_px))
+	{
+		p_paintSize = i_px;
+	}
+	
+	if( p_paintSize < 1 ) p_paintSize = 1;
+	$('paint_size_num').textContent = p_paintSize;
+}
+function p_PaintSizeChange( i_px) { p_PaintSizeSet( p_paintSize + i_px); }
+function p_PaintSizeKeyDown( e)
+{
+	if( e.keyCode == 13 ) return false; // Enter
+	if( e.keyCode == 38 ) { p_PaintSizeChange( 1); return false; }; // UP
+	if( e.keyCode == 40 ) { p_PaintSizeChange(-1); return false; }; // DOWN
+}
+
+function p_Clear()
+{
+	if( p_loaded == false ) return;
+	if( p_painting == false ) return;
+	if( p_paintElCanvas[p_frame] == null ) return;
+
+	var canvas = p_paintElCanvas[p_frame];
+	var ctx = canvas.getContext('2d');
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function p_Save()

@@ -1,15 +1,54 @@
 body { background: #333; }
 
-#footer { height: 50px; }
 #header, #footer, #navig, #sidepanel { background: #333; box-shadow: 0px 0px 5px #000, 0px 0px 5px #555 inset; }
-#footer #log { background: #AAA; top: 55px;}
-#footer #info { background: #222; color: #777; margin: 20px 40px; }
 
-#playback_controls { float:left; margin: 20px 20px 0px 50px;}
-#playback_controls .button { float:left;width:50px; text-align:center;}
+/* ==================== HEADER ======================= */
+#FPS {float:left;margin:2px;}
+#framerate {
+float:left;
+width:16px; height:18px;
+background:#222;
+color:#140;
+border-radius:4px;
+margin:3px; padding:2px 12px;
+box-shadow:0 0 4px #000 inset, 0 0 4px #555;
+}
+#FPS:hover #framerate { color:#291; }
+
+#paint .button { float:left; }
+#paint_size { float:left; }
+#paint_size > div { float:left; margin: 3px; padding: 2px; text-align: center; }
+#paint_size .button { width: 20px; }
+#paint_size .editing { width: 30px; }
+#paint_color { float: left; margin: 1px 8px; width: 25px; height: 25px; border-radius: 4px; border: 1px solid #000; }
+
+
+/* ==================== CONTENT ======================= */
+#player_content {
+position: absolute;
+top: 38px;
+bottom: 50px;
+left: 0px; right: 0px;
+overflow: hidden;
+}
+#player_content #view { position: absolute; box-shadow: 0 0 4px rgba(0,0,0,1); }
+/*#player_content #view.painting { box-shadow: 0 0 4px #0F0; }
+#player_content #view.changed  { box-shadow: 0 0 4px #F00; }
+#player_content #view.saved    { box-shadow: 0 0 4px #FF0; }*/
+
+/*#player_content #view img { position: absolute; }*/
+#player_content #view canvas { position: absolute; top: 0px; left: 0px; /*border: 4px solid #F00;*/}
+
+
+
+/* ==================== FOOTER ======================= */
+#footer { height: 50px; }
+
 #slider {
-/*-moz-user-select: none;
--webkit-user-select: none;*/
+/*
+-moz-user-select: none;
+-webkit-user-select: none;
+*/
 border-radius: 4px;
 position: absolute;
 top: 4px; left: 10px; right: 10px; height: 10px;
@@ -22,34 +61,15 @@ position: absolute;
 top: 0px; left: 0px; bottom: 0px;
 }
 
-#player_content {
-position: absolute;
-top: 38px;
-bottom: 50px;
-left: 0px; right: 0px;
-overflow: hidden;
-}
+#footer_panel { position: absolute; overflow: visible; top: 20px; right: 0px; height: 30px; left: 40px; /*border: 1px solid #999;*/ }
+#footer_panel > div { margin: 0px 8px; }
 
-#player_content #view { position: absolute; box-shadow: 0 0 4px rgba(0,0,0,1); }
-/*#player_content #view.painting { box-shadow: 0 0 4px #0F0; }
-#player_content #view.changed  { box-shadow: 0 0 4px #F00; }
-#player_content #view.saved    { box-shadow: 0 0 4px #FF0; }*/
+#playback_controls { float: left; }
+#playback_controls .button { float: left; width: 50px; text-align: center;}
 
-/*#player_content #view img { position: absolute; }*/
-#player_content #view canvas { position: absolute; top: 0px; left: 0px; /*border: 4px solid #F00;*/}
+#viewport_controls { float: left; }
+#viewport_controls > div { float: left; }
 
-#paint .button { float:left; }
-#paint_color { float: left; margin: 5px; width: 20px; height: 20px; border-radius: 4px; border: 1px solid #000; }
-
-#FPS {float:left;margin:2px;}
-#framerate {
-float:left;
-width:16px; height:18px;
-background:#222;
-color:#140;
-border-radius:4px;
-margin:2px; padding:2px 12px;
-box-shadow:0 0 4px #000 inset, 0 0 4px #555;
-}
-#FPS:hover #framerate { color:#291; }
+#footer #info { background: #222; color: #777; margin: 0px 8px; }
+#footer #log { background: #AAA; top: 55px; }
 

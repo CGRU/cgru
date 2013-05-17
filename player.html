@@ -67,15 +67,21 @@ Activated after reload (F5).">WebGL:</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="p_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
 		<div id="FPS">
-			<div style="float:left;margin:2px;padding:2px;">FPS:</div>
+			<div style="float:left;margin:3px;padding:2px;">FPS:</div>
 			<div id="framerate"></div>
 		</div>
 		<div class="button" id="btn_paint" onclick="p_Paint()">Paint</div>
 		<div id="paint" style="display:none">
-			<div class="button" id="btn_save" onclick="p_Save()">Save</div>
-			<div id="paint_color"></div>
-			<div id="colors">
+			<div class="button" id="btn_save" onclick="p_Save()" title="Save all changed images">Save</div>
+			<div class="button" ondblclick="p_Clear()"title="Double click to clear painted canvas">Clear</div>
+			<div id="paint_size">
+				<div class="label" title="Paint brush size">Size:</div>
+				<div class="button" onclick="p_PaintSizeChange(-1)" title="Increase brush size">-</div>
+				<div class="editing" id="paint_size_num" contenteditable="true"></div>
+				<div class="button" onclick="p_PaintSizeChange(1)" title="Decrease brush size">+</div>
 			</div>
+			<div id="paint_color" title="Brush color"></div>
+			<div id="colors"></div>
 		</div>
 	</div>
 </div>
@@ -86,15 +92,39 @@ Activated after reload (F5).">WebGL:</div>
 	</div>
 	<div id="footeropenbtn" class="headeropenbtn button" style="top:20px" onclick="p_OpenCloseFooter()">&uarr;</div>
 	<div id="cycle" style="top:30px"></div>
-	<div id="playback_controls">
-		<div id="btn_rewind" class="button" onclick="p_Rewind(0)">&laquo;</div>
-		<div id="btn_reverse" class="button" onclick="p_Reverse()">&lt;</div>
-		<div id="btn_prev" class="button" onclick="p_NextFrame(-1)">|&lt;</div>
-		<div id="btn_next" class="button" onclick="p_NextFrame(1)">&gt;|</div>
-		<div id="btn_play" class="button" onclick="p_Play()">&gt;</div>
-		<div id="btn_forward" class="button" onclick="p_Rewind(1)">&raquo;</div>
+	<div id="footer_panel">
+		<div id="playback_controls">
+			<div id="btn_rewind"  class="button" title="Rewind backwards to the begining
+Hotkey: Home"
+				onclick="p_Rewind(0)">&laquo;</div>
+			<div id="btn_reverse" class="button" title="PLay reverce
+Hotkey: Arrow Down"
+				onclick="p_Reverse()">&lt;</div>
+			<div id="btn_prev"    class="button" title="Previous frame
+Hotkey: Arrow Back
+Page UP for 10 frames"
+				onclick="p_NextFrame(-1)">|&lt;</div>
+			<div id="btn_next"    class="button" title="Next frame
+Hotkey: Arrow Forward
+Page UP for 10 frames"
+				onclick="p_NextFrame(1)">&gt;|</div>
+			<div id="btn_play"    class="button" title="Play
+Hotkey: Arrow Up, Space"
+				onclick="p_Play()">&gt;</div>
+			<div id="btn_forward" class="button" title="Rewind forward to the end
+Hotkey: End"
+				onclick="p_Rewind(1)">&raquo;</div>
+		</div>
+		<div id="viewport_controls">
+			<div class="button" title="Home view
+Hotkey: h"
+				onclick="p_HomeView()">H</div>
+			<div class="button" title="Full Screen
+Hotkey: f"
+				onclick="p_FullScreen()">F</div>
 	</div>
 	<div id="info"></div>
+	</div>
 	<div id="log"></div>
 </div>
 

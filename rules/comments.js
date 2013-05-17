@@ -213,6 +213,7 @@ function cm_Init( i_el, i_key)
 
 			var el = document.createElement('div');
 			i_el.m_elUploads.appendChild( el);
+			el.classList.add('path');
 
 			c_CreateOpenButton( el, up.path);
 
@@ -224,7 +225,7 @@ function cm_Init( i_el, i_key)
 			elLink.textContent = dir;
 
 			for( var f = 0; f < up.files.length; f++)
-				u_ShowFile( el, up.path, up.files[f]);
+				cm_ShowFile( el, up.path, up.files[f]);
 		}
 	}
 
@@ -492,5 +493,35 @@ function cm_ProcessUploads( i_obj)
 
 //console.log( JSON.stringify( uploads));
 	i_obj.uploads = uploads;
+}
+
+function cm_ShowFile( i_el, i_path, i_file)
+{
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.classList.add('file');
+
+	var elThumb = document.createElement('img');
+	el.appendChild( elThumb);
+	elThumb.classList.add('thumbnail');
+	elThumb.src = RULES.root + c_GetThumbFileName( i_path + '/' + i_file.name);
+
+	var elLink = document.createElement('a');
+	el.appendChild( elLink);
+	elLink.classList.add('link');
+	elLink.textContent = 'link';
+	elLink.target = '_blank';
+	elLink.href = RULES.root + i_path + '/' + i_file.name;
+
+	var elSize = document.createElement('div');
+	el.appendChild( elSize);
+	elSize.classList.add('size');
+	elSize.textContent = c_Bytes2KMG( i_file.size);
+
+	var elGoto = document.createElement('a');
+	el.appendChild( elGoto);
+	elGoto.classList.add('goto');
+	elGoto.textContent = i_file.name;
+	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto":i_path+'/'+i_file.name});
 }
 
