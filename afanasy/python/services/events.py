@@ -89,10 +89,12 @@ class events(service.service):
 		if len(email_events):
 			cmd = cgruconfig.VARS['email_send_cmd']
 			cmd += ' -V' # Verbose mode
-			cmd += ' -f "%s@%s"' % (task_info['user_name'], cgruconfig.VARS['email_sender_address_host'])
+			cmd += ' -f "noreply@%s"' % cgruconfig.VARS['email_sender_address_host']
 			cmd += ' -t "%s"' % obj['email']
 			cmd += ' -s "%s"' % (','.join( email_events))
-			cmd += ' ' + task_info['job_name']
+			cmd += ' "Events: %s<br>"' % (','.join( email_events))
+			cmd += ' "User Name: %s<br>"' % task_info['user_name']
+			cmd += ' "Job Name: %s"' % task_info['job_name']
 			print(cmd)
 			self.command = cmd
 
