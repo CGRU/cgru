@@ -1,7 +1,7 @@
 function forum_InitTopic()
 {
-	$('asset_label').textContent = 'Ask New Question'
-	var data = n_Request({"getfile":'rules/forum.html'});
+	a_SetLabel('Ask New Question');
+	var data = n_Request({"getfile":'rules/assets/forum.html'});
 	$('asset').innerHTML = data;
 
 	u_GuestAttrsDraw( $('forum_guest_form'));

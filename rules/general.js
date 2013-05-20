@@ -7,6 +7,7 @@ g_groups = null;
 
 g_elCurFolder = null;
 g_nav_clicked = false;
+g_arguments = null;
 
 function cgru_params_OnChange( i_param, i_value) { u_ApplyStyles();}
 
@@ -118,12 +119,12 @@ function g_PathChanged()
 	if( g_elCurFolder ) old_path = g_elCurFolder.m_path;
 
 	var new_path = c_GetHashPath();
-	var args = null;
+	g_arguments = null;
 	if( new_path.indexOf('?') != -1 )
 	{
 		new_path = new_path.split('?');
 		if( new_path.length > 0 )
-			args = new_path[1];
+			g_arguments = new_path[1];
 		new_path = new_path[0];
 	}
 
@@ -136,12 +137,12 @@ function g_PathChanged()
 	}
 	g_nav_clicked = false;
 
-	if( args == null ) return;
+	if( g_arguments == null ) return;
 
-	args = c_Parse( decodeURI( args));
-	for( var func in args)
+	g_arguments = c_Parse( decodeURI( g_arguments));
+	for( var func in g_arguments)
 		if( window[func])
-			window[func](args[func]);
+			window[func](g_arguments[func]);
 		else
 			c_Error('Function "'+func+'" does not exist.');
 }

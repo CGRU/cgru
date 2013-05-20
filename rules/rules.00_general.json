@@ -37,16 +37,19 @@
 		"seek":["[project]/SCENES","[project]/SHOTS"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"name":"",
-		"thumbnails":1
+		"filter":"sc_FilterShots",
+		"scripts":["scenes.js"]
 	},
 	"scene":{
 		"seek":["[scenes]/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
-		"thumbnails":0
+		"filter":"sc_FilterShots",
+		"scripts":["scenes.js"]
 	},
 	"shot":{
 		"seek":["[scene]/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"scripts":["shot.js"],
 		"source":{
 			"path":["SOURCE/SCAN"]
 		},

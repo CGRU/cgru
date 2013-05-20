@@ -407,6 +407,7 @@ padding: 5px 20px 20px 20px;
 }
 #asset .source.button { padding: 4px;}
 
+#asset .statistics > div { float: left; margin: 1px 4px; padding: 1px 4px; }
 .shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 .shot .status { clear:both; /*border: 1px solid #000;*/ }

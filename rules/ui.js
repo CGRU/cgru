@@ -68,7 +68,7 @@ function u_InitAuth()
 		el.textContent = c_GetUserTitle( user);
 		el.m_user = user;
 		el.classList.add('tag');
-		el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};
+		el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET.filter ) u_SearchSearch();};
 		elArtists.m_elArtists.push( el);
 	}
 }
@@ -419,7 +419,7 @@ function u_SearchOnClick()
 		$('search_btn').textContent = 'Search';
 		$('search').style.display = 'none';
 		g_ClearLocationArgs();
-		a_ShowAllThumbnails();
+		if( window[ASSET.filter] ) window[ASSET.filter]();
 		$('search').m_path = null;
 	}
 	else
@@ -440,7 +440,7 @@ function u_SearchOnClick()
 			el.textContent = c_GetTagTitle( tag);
 			el.m_tag = tag;
 			el.classList.add('tag');
-			el.onclick = function(e){ c_ElToggleSelected(e); if( a_elThumbnails ) u_SearchSearch();};
+			el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET.filter ) u_SearchSearch();};
 			$('search_tags').m_elTags.push( el);
 		}
 
@@ -457,7 +457,7 @@ function u_SearchSearch()
 //console.log('search path: ' + $('search').m_path);
 	if( $('search').m_path && ( $('search').m_path != g_CurPath() ))
 	{
-console.log('g_GO: ' + $('search').m_path);
+//console.log('g_GO: ' + $('search').m_path);
 		g_GO($('search').m_path);
 		g_PathChanged();
 	}
@@ -537,9 +537,10 @@ function u_Search( i_args)
 	if( i_args.comment )
 		$('search_comment').textContent = i_args.comment;
 
-	if( a_elThumbnails )
+	if( ASSET.filter )
 	{
-		a_ThumbFilter( i_args);
+		if( window[ASSET.filter])
+			window[ASSET.filter]( i_args);
 		return;
 	}
 
@@ -571,6 +572,8 @@ function u_Search( i_args)
 		c_Error('Search returned null result.');
 		return;
 	}
+
+	$('search_results_count').textContent = res.result.length;
 
 	$('search_result_div').style.display = 'block';
 	if( res.result.length == 0 )
