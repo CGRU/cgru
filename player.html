@@ -98,29 +98,41 @@ Activated after reload (F5).">WebGL:</div>
 Hotkey: Home"
 				onclick="p_Rewind(0)">&laquo;</div>
 			<div id="btn_reverse" class="button" title="PLay reverce
-Hotkey: Arrow Down"
+Hotkey: R, <"
 				onclick="p_Reverse()">&lt;</div>
 			<div id="btn_prev"    class="button" title="Previous frame
-Hotkey: Arrow Back
+Hotkey: [
 Page UP for 10 frames"
-				onclick="p_NextFrame(-1)">|&lt;</div>
+				onclick="p_NextFrame(-1)">[&lt;</div>
 			<div id="btn_next"    class="button" title="Next frame
-Hotkey: Arrow Forward
+Hotkey: ]
 Page UP for 10 frames"
-				onclick="p_NextFrame(1)">&gt;|</div>
+				onclick="p_NextFrame(1)">&gt;]</div>
 			<div id="btn_play"    class="button" title="Play
-Hotkey: Arrow Up, Space"
+Hotkey: P, >, Space"
 				onclick="p_Play()">&gt;</div>
 			<div id="btn_forward" class="button" title="Rewind forward to the end
 Hotkey: End"
 				onclick="p_Rewind(1)">&raquo;</div>
 		</div>
 		<div id="viewport_controls">
+			<div class="button" title="View left
+Hotkey: &larr;"
+				onclick="p_ViewLeft()">&larr;</div>
+			<div class="button" title="View right
+Hotkey: &rarr;"
+				onclick="p_ViewRight()">&rarr;</div>
+			<div class="button" title="View up
+Hotkey: &uarr;"
+				onclick="p_ViewUp()">&uarr;</div>
+			<div class="button" title="View down
+Hotkey: &darr;"
+				onclick="p_ViewDown()">&darr;</div>
 			<div class="button" title="Home view
-Hotkey: h"
-				onclick="p_HomeView()">H</div>
+Hotkey: H"
+				onclick="p_ViewHome()">H</div>
 			<div class="button" title="Full Screen
-Hotkey: f"
+Hotkey: F"
 				onclick="p_FullScreen()">F</div>
 	</div>
 	<div id="info"></div>

@@ -69,6 +69,7 @@ top: 0px; left: 0px; bottom: 0px;
 
 #viewport_controls { float: left; }
 #viewport_controls > div { float: left; }
+#viewport_controls .button { width: 16px; }
 
 #footer #info { background: #222; color: #777; margin: 0px 8px; }
 #footer #log { background: #AAA; top: 55px; }

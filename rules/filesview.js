@@ -368,7 +368,7 @@ FilesView.prototype.showFile = function( i_file)
 FilesView.prototype.onClick = function( i_evt)
 {
 	i_evt.stopPropagation();
-	this.selectItem( i_evt.currentTarget);
+	this.selectItemToggle( i_evt.currentTarget);
 }
 
 FilesView.prototype.selectItem = function( i_el)
@@ -376,6 +376,21 @@ FilesView.prototype.selectItem = function( i_el)
 	this.selectNone();
 	i_el.classList.add('selected');
 	fv_cur_item = i_el;
+}
+
+FilesView.prototype.selectItemToggle = function( i_el)
+{
+	if( i_el.classList.contains('selected'))
+		this.deselectItem( i_el);
+	else
+		this.selectItem( i_el);
+}
+
+FilesView.prototype.deselectItem = function( i_el)
+{
+	i_el.classList.remove('selected');
+	if( fv_cur_item == i_el )
+		fv_cur_item = null;
 }
 
 FilesView.prototype.selectNone = function()

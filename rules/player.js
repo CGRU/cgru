@@ -22,6 +22,13 @@ p_bottom = '50px';
 p_slidering = false;
 p_slidertimer = null;
 
+p_view_tx = 0;
+p_view_ty = 0;
+p_view_dx = 10;
+p_view_dy = 10;
+p_view_zoom = 1;
+p_view_dz = .1;
+
 p_painting = false;
 p_paintElCanvas = [];
 p_paintColor = [255,255,0];
@@ -93,7 +100,7 @@ function p_Init()
 	p_el.slider.onmouseout = p_SliderOnMouseOut;
 	document.body.onkeydown = p_OnKeyDown;
 	window.onhashchange = p_PathChanged;
-	window.onresize = p_HomeView;
+//	window.onresize = p_ViewHome;
 
 	$('paint_size_num').onblur = function(e){ p_PaintSizeSet()};
 	$('paint_size_num').onkeydown = p_PaintSizeKeyDown;
@@ -229,8 +236,8 @@ function p_ImgLoaded(e)
 
 	p_ShowFrame( p_frame);
 
-	p_HomeView();
-//	setTimeout('p_HomeView();',100);
+	p_ViewHome();
+//	setTimeout('p_ViewHome();',100);
 
 	var info = 'Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height;
 	if( p_fileSizeTotal ) info += ': '+c_Bytes2KMG( p_fileSizeTotal);
@@ -263,24 +270,42 @@ function p_CreateImages()
 	}
 }
 
-function p_HomeView()
+function p_ViewHome()    { p_ViewTransform( 0, 0, 1); }
+function p_ViewLeft()    { p_ViewTransform( p_view_tx - p_view_dx, p_view_ty, p_view_zoom ); }
+function p_ViewRight()   { p_ViewTransform( p_view_tx + p_view_dx, p_view_ty, p_view_zoom ); }
+function p_ViewUp()      { p_ViewTransform( p_view_tx, p_view_ty + p_view_dy, p_view_zoom ); }
+function p_ViewDown()    { p_ViewTransform( p_view_tx, p_view_ty - p_view_dy, p_view_zoom ); }
+function p_ViewZoomIn()  { p_ViewTransform( p_view_tx, p_view_ty, ( 1.0 + p_view_dz ) * p_view_zoom ); }
+function p_ViewZoomOut() { p_ViewTransform( p_view_tx, p_view_ty, ( 1.0 - p_view_dz ) * p_view_zoom ); }
+
+function p_ViewTransform( i_tx, i_ty, i_zoom)
 {
-//window.console.log(p_elImg[0].width+' x '+p_elImg[0].height);
-//window.console.log(p_el.player_content.clientWidth+' x '+p_el.player_content.clientHeight);
-	var ml = '0px', mt = '0px';
+console.log( 'p_ViewTransform: ' + i_tx + ',' + i_ty + 'x' + i_zoom);
+//console.log(p_elImg[0].width+' x '+p_elImg[0].height);
+//console.log(p_el.player_content.clientWidth+' x '+p_el.player_content.clientHeight);
+	if( i_zoom <= 0 ) return;
+
+	p_view_zoom = i_zoom;
+	p_view_tx = i_tx;
+	p_view_ty = i_ty;
+
+	var ml = 0, mt = 0;
 	var img_w = p_images[0].width;
 	var img_h = p_images[0].height;
 	if(( img_w > 0 ) && ( img_h > 0 ))
 	{
 		var wnd_w = p_el.player_content.clientWidth;
 		var wnd_h = p_el.player_content.clientHeight;
-		ml = Math.round((wnd_w - img_w) / 2)+'px';
-		mt = Math.round((wnd_h - img_h) / 2)+'px';
+		ml = Math.round((wnd_w - img_w) / 2);
+		mt = Math.round((wnd_h - img_h) / 2);
 	}
-	p_el.view.style.width = img_w+'px';
-	p_el.view.style.height = img_h+'px';
-	p_el.view.style.marginLeft = ml;
-	p_el.view.style.marginTop = mt;
+	ml += p_view_tx;
+	mt += p_view_ty;
+
+	p_el.view.style.width = img_w + 'px';
+	p_el.view.style.height = img_h + 'px';
+	p_el.view.style.marginLeft = ml + 'px';
+	p_el.view.style.marginTop = mt + 'px';
 }
 
 function p_OnKeyDown(e)
@@ -290,19 +315,31 @@ function p_OnKeyDown(e)
 	{
 		cgru_ClosePopus();
 		p_ShowFrame(0);
+		p_ViewHome();
 	}
-	else if( e.keyCode == 33 ) p_NextFrame(-10); // PageUp
-	else if( e.keyCode == 34 ) p_NextFrame(10); // PageDown
-	else if( e.keyCode == 35 ) p_ShowFrame(-1); // End
-	else if( e.keyCode == 36 ) p_ShowFrame(0); // Home
-	else if( e.keyCode == 39 ) p_NextFrame(1); // Right
-	else if( e.keyCode == 37 ) p_NextFrame(-1); // Left
-	else if( e.keyCode == 32 ) p_Play(); // Space
-	else if( e.keyCode == 38 ) p_Play(); // Up
-	else if( e.keyCode == 40 ) p_Reverse(); // Down
-	else if( e.keyCode == 70 ) p_FullScreen();// F
-	else if( e.keyCode == 83 ) p_Save(); // S
-	else if( e.keyCode == 72 ) p_HomeView(); // H
+
+	else if( e.keyCode == 33  ) p_NextFrame(-10); // PageUp
+	else if( e.keyCode == 34  ) p_NextFrame(10);  // PageDown
+	else if( e.keyCode == 35  ) p_ShowFrame(-1);  // End
+	else if( e.keyCode == 36  ) p_ShowFrame(0);   // Home
+	else if( e.keyCode == 219 ) p_NextFrame(-1);  // [
+	else if( e.keyCode == 221 ) p_NextFrame(1);   // ]
+	else if( e.keyCode == 32  ) p_Play();         // Space
+	else if( e.keyCode == 80  ) p_Play();         // P
+	else if( e.keyCode == 190 ) p_Play();         // >
+	else if( e.keyCode == 82  ) p_Reverse();      // R
+	else if( e.keyCode == 188 ) p_Reverse();      // <
+
+	else if( e.keyCode == 39  ) p_ViewRight();    // Right
+	else if( e.keyCode == 37  ) p_ViewLeft();     // Left
+	else if( e.keyCode == 38  ) p_ViewUp();       // Up
+	else if( e.keyCode == 40  ) p_ViewDown();     // Down
+	else if( e.keyCode == 173 ) p_ViewZoomOut();  // -
+	else if( e.keyCode == 61  ) p_ViewZoomIn();   // +
+	else if( e.keyCode == 72  ) p_ViewHome();     // H
+	else if( e.keyCode == 70  ) p_FullScreen();   // F
+
+	else if( e.keyCode == 83  ) p_Save(); // S
 }
 
 function p_FullScreen()
@@ -323,7 +360,7 @@ function p_FullScreen()
 		p_el.player_content.style.top = '0';
 		p_el.player_content.style.bottom = '0';
 	}
-	p_HomeView();
+//	p_ViewHome();
 }
 
 function p_PushButton( i_btn)

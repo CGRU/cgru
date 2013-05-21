@@ -68,7 +68,7 @@ function u_InitAuth()
 		el.textContent = c_GetUserTitle( user);
 		el.m_user = user;
 		el.classList.add('tag');
-		el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET.filter ) u_SearchSearch();};
+		el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
 		elArtists.m_elArtists.push( el);
 	}
 }
@@ -419,7 +419,7 @@ function u_SearchOnClick()
 		$('search_btn').textContent = 'Search';
 		$('search').style.display = 'none';
 		g_ClearLocationArgs();
-		if( window[ASSET.filter] ) window[ASSET.filter]();
+		if( ASSET && window[ASSET.filter] ) window[ASSET.filter]();
 		$('search').m_path = null;
 	}
 	else
@@ -440,7 +440,7 @@ function u_SearchOnClick()
 			el.textContent = c_GetTagTitle( tag);
 			el.m_tag = tag;
 			el.classList.add('tag');
-			el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET.filter ) u_SearchSearch();};
+			el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
 			$('search_tags').m_elTags.push( el);
 		}
 
@@ -537,7 +537,7 @@ function u_Search( i_args)
 	if( i_args.comment )
 		$('search_comment').textContent = i_args.comment;
 
-	if( ASSET.filter )
+	if( ASSET && ASSET.filter )
 	{
 		if( window[ASSET.filter])
 			window[ASSET.filter]( i_args);
