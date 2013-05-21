@@ -280,10 +280,14 @@ function p_ViewZoomOut() { p_ViewTransform( p_view_tx, p_view_ty, ( 1.0 - p_view
 
 function p_ViewTransform( i_tx, i_ty, i_zoom)
 {
-console.log( 'p_ViewTransform: ' + i_tx + ',' + i_ty + 'x' + i_zoom);
+//console.log( 'p_ViewTransform: ' + i_tx + ',' + i_ty + 'x' + i_zoom);
 //console.log(p_elImg[0].width+' x '+p_elImg[0].height);
 //console.log(p_el.player_content.clientWidth+' x '+p_el.player_content.clientHeight);
 	if( i_zoom <= 0 ) return;
+
+	// If we are near 1.0 we set to 1 (no zoom)
+	if( Math.abs( 1.0 - i_zoom ) < ( .7 * p_view_dz ))
+		i_zoom = 1;
 
 	p_view_zoom = i_zoom;
 	p_view_tx = i_tx;
@@ -306,6 +310,19 @@ console.log( 'p_ViewTransform: ' + i_tx + ',' + i_ty + 'x' + i_zoom);
 	p_el.view.style.height = img_h + 'px';
 	p_el.view.style.marginLeft = ml + 'px';
 	p_el.view.style.marginTop = mt + 'px';
+
+	if( p_view_zoom === 1 )
+	{
+		$('view_zoom').classList.remove('zoomed');
+		$('view_zoom').textContent = 'x1';
+		p_el.view.style.transform = '';
+	}
+	else
+	{
+		$('view_zoom').classList.add('zoomed');
+		$('view_zoom').textContent = 'x' + p_view_zoom.toFixed(2);
+		p_el.view.style.transform = 'scale('+p_view_zoom+','+p_view_zoom+')';
+	}
 }
 
 function p_OnKeyDown(e)
@@ -335,7 +352,9 @@ function p_OnKeyDown(e)
 	else if( e.keyCode == 38  ) p_ViewUp();       // Up
 	else if( e.keyCode == 40  ) p_ViewDown();     // Down
 	else if( e.keyCode == 173 ) p_ViewZoomOut();  // -
-	else if( e.keyCode == 61  ) p_ViewZoomIn();   // +
+	else if( e.keyCode == 109 ) p_ViewZoomOut();  // - (NumPad)
+	else if( e.keyCode == 61  ) p_ViewZoomIn();   // + 
+	else if( e.keyCode == 107 ) p_ViewZoomIn();   // + (NumPad)
 	else if( e.keyCode == 72  ) p_ViewHome();     // H
 	else if( e.keyCode == 70  ) p_FullScreen();   // F
 
@@ -597,6 +616,20 @@ window.console.log('e['+i_evt.clientX+','+i_evt.clientY+']'+
 	var c = {};
 	c.x = i_evt.clientX - p_el.view.offsetLeft - p_el.player_content.offsetLeft;
 	c.y = i_evt.clientY - p_el.view.offsetTop - p_el.player_content.offsetTop;
+	if( p_view_zoom !== 1 )
+	{
+		var img_w = p_images[0].width;
+		var img_h = p_images[0].height;
+		c.x -= 0.5 * img_w;
+		c.y -= 0.5 * img_h;
+		c.x /= p_view_zoom;
+		c.y /= p_view_zoom;
+		c.x += 0.5 * img_w;
+		c.y += 0.5 * img_h;
+		c.x = Math.round( c.x);
+		c.y = Math.round( c.y);
+	}
+//console.log(c);
 	return c;
 }
 function p_ViewOnMouseMove( i_evt)

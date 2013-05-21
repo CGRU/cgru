@@ -70,6 +70,14 @@ top: 0px; left: 0px; bottom: 0px;
 #viewport_controls { float: left; }
 #viewport_controls > div { float: left; }
 #viewport_controls .button { width: 16px; }
+#view_zoom {
+text-align: center;
+border-radius: 4px;
+margin: 2px; padding: 2px;
+width: 40px;
+box-shadow: 0 0 2px #000 inset;
+}
+#view_zoom.zoomed { color: #777; }
 
 #footer #info { background: #222; color: #777; margin: 0px 8px; }
 #footer #log { background: #AAA; top: 55px; }
