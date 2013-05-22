@@ -62,7 +62,7 @@
 		"maxtasks":100,
 		"power":10000,
 		"wol_idlesleep_time": 3600,
-		"nimby_idlefree_time": 8,
+		"nimby_idlefree_time": 1800,
 		"remservices":["afterfx","max","xsi"]
 
 	},{
