@@ -255,6 +255,8 @@ void ItemRender::updateValues( af::Node *node, int type)
 			setNotRunning();
 		}
 
+		m_idle_time = render->getIdleTime();
+
 	    m_wolFalling  = render->isWOLFalling();
 	    m_wolSleeping = render->isWOLSleeping();
 	    m_wolWaking   = render->isWOLWaking();
@@ -440,17 +442,23 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		int posx = x + w - width - 5;
 		int posy = y + 13;
 
-		int max = ( m_host.m_wol_idlesleep_time > 0 ) ? m_host.m_wol_idlesleep_time : af::Environment::getMonitorRenderIdleBarMax();
+		int max = af::Environment::getMonitorRenderIdleBarMax();
+		if( m_host.m_wol_idlesleep_time > 0 ) max = m_host.m_wol_idlesleep_time;
+		if(( m_host.m_nimby_idlefree_time > 0 ) && ( isNimby() || isNIMBY() )) max = m_host.m_nimby_idlefree_time;
 
 		if( max > 0 )
 		{
 			int idle_sec = time(0) - m_idle_time;
-//idle_sec = 1200;
 			int barw = width * idle_sec / max;
 			if( barw > width ) barw = width;
 
 			painter->setPen( Qt::NoPen );
-			if( m_host.m_wol_idlesleep_time > 0 )
+			if(( m_host.m_nimby_idlefree_time > 0 ) && ( isNimby() || isNIMBY() ))
+			{
+				painter->setOpacity( .5);
+				painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+			}
+			else if( m_host.m_wol_idlesleep_time > 0 )
 			{
 				painter->setOpacity( .5);
 				painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));

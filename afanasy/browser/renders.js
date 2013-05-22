@@ -6,12 +6,12 @@ RenderNode.prototype.init = function()
 
 	cm_CreateStart( this);
 
-	this.elWOLIdleSleepBox = document.createElement('div');
-	this.elWOLIdleSleepBox.classList.add('wolidlesleep_box');
-	this.element.appendChild( this.elWOLIdleSleepBox);
-	this.elWOLIdleSleepBar = document.createElement('div');
-	this.elWOLIdleSleepBar.classList.add('wolidlesleep_bar');
-	this.elWOLIdleSleepBox.appendChild( this.elWOLIdleSleepBar);
+	this.elIdleBox = document.createElement('div');
+	this.elIdleBox.classList.add('idle_box');
+	this.element.appendChild( this.elIdleBox);
+	this.elIdleBar = document.createElement('div');
+	this.elIdleBar.classList.add('idle_bar');
+	this.elIdleBox.appendChild( this.elIdleBar);
 
 	this.elName = cm_ElCreateText( this.element, 'Client Host Name');
 	this.elName.classList.add('name');
@@ -256,7 +256,7 @@ RenderNode.prototype.refresh = function()
 			this.elPower.style.color = '#FF0';
 		else
 			this.elPower.style.color = '#000';
-		this.elWOLIdleSleepBox.style.display = 'none';
+		this.elIdleBox.style.display = 'none';
 		if( this.state.OFF )
 			return;
 	}
@@ -271,31 +271,47 @@ RenderNode.prototype.refresh = function()
 		if( seconds < 0 ) seconds = 0;
 		var percent = null;
 
-		if( this.params.host.wol_idlesleep_time > 0 )
+		if(( this.params.host.nimby_idlefree_time > 0 ) && ( this.state.NbY || this.state.NBY ))
+		{
+			stateTimeTitle += '\nNimby idle free time: ' + cm_TimeStringFromSeconds( this.params.host.nimby_idlefree_time);
+			percent = Math.round( 100.0 * seconds / this.params.host.nimby_idlefree_time );
+
+			seconds = Math.round( this.params.host.nimby_idlefree_time - seconds);
+			if( seconds > 0 )
+				this.elIdleBox.title = 'Nimby idle free in '+cm_TimeStringFromSeconds( seconds);
+			else
+				this.elIdleBox.title = 'Nimby free';
+			this.elIdleBox.classList.add('nimby');
+			this.elIdleBox.classList.remove('wol');
+		}
+		else if( this.params.host.wol_idlesleep_time > 0 )
 		{
 			stateTimeTitle += '\nWOL idle sleep time: ' + cm_TimeStringFromSeconds( this.params.host.wol_idlesleep_time);
 			percent = Math.round( 100.0 * seconds / this.params.host.wol_idlesleep_time );
 
 			seconds = Math.round( this.params.host.wol_idlesleep_time - seconds);
 			if( seconds > 0 )
-				this.elWOLIdleSleepBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
+				this.elIdleBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
 			else
-				this.elWOLIdleSleepBox.title = 'WOL sleep';
-			this.elWOLIdleSleepBox.classList.add('wol');
+				this.elIdleBox.title = 'WOL sleep';
+			this.elIdleBox.classList.add('wol');
+			this.elIdleBox.classList.remove('nimby');
 		}
 		else
 		{
 			stateTimeTitle += '\nIdle bar time: ' + cm_TimeStringFromSeconds( cgru_Config.af_monitor_render_idle_bar_max);
 			percent = Math.round( 100.0 * seconds / cgru_Config.af_monitor_render_idle_bar_max );
+			this.elIdleBox.classList.remove('wol');
+			this.elIdleBox.classList.remove('nimby');
 		}
 
 		if( percent > 100 ) percent = 100;
 		if( percent <   0 ) percent = 0;
-		this.elWOLIdleSleepBox.style.display = 'block';
-		this.elWOLIdleSleepBar.style.width = percent+'%';
+		this.elIdleBox.style.display = 'block';
+		this.elIdleBar.style.width = percent+'%';
 	}
 	else
-		this.elWOLIdleSleepBox.style.display = 'none';
+		this.elIdleBox.style.display = 'none';
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{
 		stateTime = cm_TimeStringInterval( this.params.task_start_finish_time);

@@ -26,7 +26,7 @@ public:
     inline bool isOnline()        const { return m_online;           }
     inline bool isOffline()       const { return false == m_online;  }
     inline bool isBusy()          const { return m_busy;             }
-    inline bool isnimby()         const { return m_nimby;            }
+    inline bool isNimby()         const { return m_nimby;            }
     inline bool isNIMBY()         const { return m_NIMBY;            }
     inline bool isDirty()         const { return m_dirty;            }
     inline bool isWOLFalling()    const { return m_wolFalling;       }

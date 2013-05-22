@@ -194,6 +194,7 @@ bool Farm::getFarm( const JSON & i_obj)
 		jr_int32("power", host.m_power, patterns[i]);
 		jr_int32("maxtasks", host.m_max_tasks, patterns[i]);
 		jr_int32("wol_idlesleep_time", host.m_wol_idlesleep_time, patterns[i]);
+		jr_int32("nimby_idlefree_time", host.m_nimby_idlefree_time, patterns[i]);
 		jr_int32("idle_cpu", host.m_idle_cpu, patterns[i]);
 		if( jr_stringvec("remservices", remservices, patterns[i]))
 			if( remservices.size() == 0 )

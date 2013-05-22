@@ -321,7 +321,7 @@ font-size: 14px;
 /*font-weight: bold;*/
 }
 
-.wolidlesleep_box {
+.render .idle_box {
 display: none;
 position: absolute;
 height: 5px;
@@ -331,16 +331,16 @@ width: 15%;
 border-radius: 2px;
 box-shadow: 0px 0px 2px #000 inset;
 }
-.wolidlesleep_box .wolidlesleep_bar {
+.render .idle_box .idle_bar {
 background: #000;
 opacity: .3;
 position: absolute;
 left: 0; top: 0; bottom: 0;
 border-radius: 2px;
 }
-.wolidlesleep_box.wol .wolidlesleep_bar {
-background: #00A;
-}
+.render .idle_box.nimby .idle_bar { background: #F00; }
+.render .idle_box.wol .idle_bar { background: #AA0; }
+
 /*.item.render .task {*/
 .rendertask {
 background: #DD5;

@@ -518,14 +518,27 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	{	// Automatic WOL sleep:
 		if( currentTime - m_idle_time > m_host.m_wol_idlesleep_time )
 		{
-			std::string log("Automatic WOL sleep: ");
-			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu);
+			std::string log("Automatic WOL Sleep: ");
+			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu) + "%";
 			log += "\n WOL idle sleep time = " + af::time2strHMS( m_host.m_wol_idlesleep_time, true );
 			appendLog( log);
 			wolSleep( monitoring);
 		}
 	}
-//printf("Idle: c%li, i%li, Ci%u (w%d,c%d)\n", currentTime, m_idle_time, m_hres.cpu_idle, m_host.m_wol_idlesleep_time, m_host.m_idle_cpu);
+	else if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false))
+	{	// Automatic Nimby Free:
+		if( currentTime - m_idle_time > m_host.m_nimby_idlefree_time )
+		{
+			std::string log("Automatic Nimby Free: ");
+			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu) + "%";
+			log += "\n Nimby idle free time = " + af::time2strHMS( m_host.m_nimby_idlefree_time, true );
+			appendLog( log);
+			setFree();
+			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+			AFCommon::QueueDBUpdateItem( this);
+		}
+	}
+//printf("Idle: %li-%li=%li, CI%u%%(<%d%%) (w%d,n%d)\n", currentTime, m_idle_time, currentTime-m_idle_time, m_hres.cpu_idle, m_host.m_idle_cpu, m_host.m_wol_idlesleep_time, m_host.m_nimby_idlefree_time);
 }
 
 void RenderAf::notSolved()

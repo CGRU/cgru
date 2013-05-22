@@ -71,9 +71,13 @@ public:
    inline const Host    & getHost()    const { return m_host;}
    inline const HostRes & getHostRes() const { return m_hres;}
 
-   inline void setFree()   { m_state = m_state & (~Snimby); m_state = m_state & (~SNIMBY);}///< Set free (unset nimby and NIMBY).
-   inline void setNIMBY()  { m_state = m_state |   SNIMBY;  m_state = m_state & (~Snimby);}///< Set NIMBY.
-   inline void setNimby()  { m_state = m_state |   Snimby;  m_state = m_state & (~SNIMBY);}///< Set nimby.
+	/// Set free (unset nimby and NIMBY).
+	inline void setFree() { m_state = m_state & (~Snimby); m_state = m_state & (~SNIMBY); }
+
+	/// Set Nimby 
+	inline void setNIMBY() { m_state = m_state | SNIMBY; m_state = m_state & (~Snimby); m_idle_time = time(NULL); }
+	inline void setNimby() { m_state = m_state | Snimby; m_state = m_state & (~SNIMBY); m_idle_time = time(NULL); }
+	// if not to set idle time and to current, idle host with 'nimby_idlefree_time' will be set to free immediately
 
    inline void setOnline()  { m_state = m_state |   SOnline ; m_wol_operation_time = time(NULL);}
    inline void setOffline() { m_state = m_state & (~SOnline); m_wol_operation_time = time(NULL);}

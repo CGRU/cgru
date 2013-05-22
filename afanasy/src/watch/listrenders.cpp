@@ -207,11 +207,11 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 		connect( action, SIGNAL( triggered() ), this, SLOT( actNIMBY() ));
 		menu.addAction( action);
 		action = new QAction( "Set nimby", this);
-		if( selectedItemsCount == 1) action->setEnabled(false == render->isnimby());
+		if( selectedItemsCount == 1) action->setEnabled(false == render->isNimby());
 		connect( action, SIGNAL( triggered() ), this, SLOT( actNimby() ));
 		menu.addAction( action);
 		action = new QAction( "Set Free", this);
-		if( selectedItemsCount == 1) action->setEnabled(render->isnimby() || render->isNIMBY());
+		if( selectedItemsCount == 1) action->setEnabled(render->isNimby() || render->isNIMBY());
 		connect( action, SIGNAL( triggered() ), this, SLOT( actFree() ));
 		menu.addAction( action);
 		action = new QAction( "Set User", this);
@@ -427,7 +427,7 @@ void ListRenders::calcTitle()
 		ItemRender * itemrender = (ItemRender*)(m_model->item(i));
 		if( itemrender->isOnline()) online++;
 		if( itemrender->isBusy()) busy++;
-		if( itemrender->isnimby() || itemrender->isNIMBY()) nimby++;
+		if( itemrender->isNimby() || itemrender->isNIMBY()) nimby++;
 		else if( itemrender->isOnline() && (false == itemrender->isBusy())) free++;
 	}
 	m_parentWindow->setWindowTitle(QString("R[%1/%2]: B%3/%4F (n%5)").arg( total).arg( online).arg( busy).arg( free).arg( nimby));

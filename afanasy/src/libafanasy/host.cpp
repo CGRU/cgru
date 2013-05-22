@@ -16,6 +16,7 @@ Host::Host():
 	m_properties(""),
 	m_services_num(0),
 	m_wol_idlesleep_time(0),
+	m_nimby_idlefree_time(0),
 	m_idle_cpu(0)
 {
 }
@@ -91,7 +92,8 @@ void Host::mergeParameters( const Host & other)
 	if( other.m_resources.size() ) m_resources    = other.m_resources;
 	if( other.m_data.size()      ) m_data         = other.m_data;
 
-	if( other.m_wol_idlesleep_time ) m_wol_idlesleep_time = other.m_wol_idlesleep_time;
+	if( other.m_wol_idlesleep_time  ) m_wol_idlesleep_time  = other.m_wol_idlesleep_time;
+	if( other.m_nimby_idlefree_time ) m_nimby_idlefree_time = other.m_nimby_idlefree_time;
 	if( other.m_idle_cpu ) m_idle_cpu = other.m_idle_cpu;
 }
 
@@ -109,6 +111,8 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 		o_str << ",\"properties\":\"" << m_properties << "\"";
 	if( m_wol_idlesleep_time > 0 )
 		o_str << ",\"wol_idlesleep_time\":" << m_wol_idlesleep_time;
+	if( m_nimby_idlefree_time > 0 )
+		o_str << ",\"nimby_idlefree_time\":" << m_nimby_idlefree_time;
 	o_str << ",\"idle_cpu\":"  << m_idle_cpu;
 /*	if( m_resources.size())
 		o_str << ",\"resources\":\"" << m_resources << "\"";
@@ -120,15 +124,16 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 
 void Host::v_readwrite( Msg * msg)
 {
-	rw_int32_t( m_max_tasks,          msg );
-	rw_int32_t( m_capacity,           msg );
-	rw_int32_t( m_idle_cpu,           msg );
-	rw_int32_t( m_wol_idlesleep_time, msg );
-	rw_int32_t( m_power,              msg );
-	rw_String ( m_os,                 msg );
-	rw_String ( m_properties,         msg );
-	rw_String ( m_resources,          msg );
-	rw_String ( m_data,               msg );
+	rw_int32_t( m_max_tasks,           msg );
+	rw_int32_t( m_capacity,            msg );
+	rw_int32_t( m_idle_cpu,            msg );
+	rw_int32_t( m_wol_idlesleep_time,  msg );
+	rw_int32_t( m_nimby_idlefree_time, msg );
+	rw_int32_t( m_power,               msg );
+	rw_String ( m_os,                  msg );
+	rw_String ( m_properties,          msg );
+	rw_String ( m_resources,           msg );
+	rw_String ( m_data,                msg );
 }
 
 void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
@@ -144,6 +149,8 @@ void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
 
 		if( m_wol_idlesleep_time )
 			stream << "\n   WOL Sleep Idle Time = " << time2strHMS( m_wol_idlesleep_time, true );
+		if( m_nimby_idlefree_time )
+			stream << "\n   Nimby Free Idle Time = " << time2strHMS( m_nimby_idlefree_time, true );
 		stream << "\n   Idle CPU = " << m_idle_cpu << "%";
 
    }
@@ -154,6 +161,7 @@ void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
 	  stream << " MAX=" << m_max_tasks;
 	  stream << " P" << m_power;
 	  stream << " WOL" << time2str( m_wol_idlesleep_time );
+	  stream << " NIF" << time2str( m_nimby_idlefree_time );
    }
 }
 
