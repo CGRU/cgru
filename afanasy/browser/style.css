@@ -333,13 +333,13 @@ box-shadow: 0px 0px 2px #000 inset;
 }
 .render .idle_box .idle_bar {
 background: #000;
-opacity: .3;
 position: absolute;
 left: 0; top: 0; bottom: 0;
 border-radius: 2px;
+opacity: .3;
 }
-.render .idle_box.nimby .idle_bar { background: #F00; }
-.render .idle_box.wol .idle_bar { background: #AA0; }
+.render .idle_box.nimby .idle_bar { background: #F00; opacity: .3; }
+.render .idle_box.wol .idle_bar   { background: #FF0; opacity: .5; }
 
 /*.item.render .task {*/
 .rendertask {
