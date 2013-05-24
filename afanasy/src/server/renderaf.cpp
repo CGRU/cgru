@@ -63,6 +63,7 @@ void RenderAf::setRegisterTime()
 	m_task_start_finish_time = 0;
 	m_wol_operation_time = 0;
 	m_idle_time = time(NULL);
+	m_busy_time = m_idle_time;
 
 	if( isOnline()) appendLog("Registered online.");
 	else appendLog("Registered offline.");
@@ -123,6 +124,7 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 		return false;
 	}
 	m_idle_time = time( NULL);
+	m_busy_time = m_idle_time;
 	setBusy( false);
 	setWOLSleeping( false);
 	setWOLWaking( false);
@@ -511,6 +513,24 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		return;
 	}
 
+	// Update busy cpu with no task time:
+	if(( isFree() == false ) || isBusy() || ((100 - m_hres.cpu_idle) < m_host.m_busy_cpu ))
+		m_busy_time = currentTime;
+	else if(( m_host.m_nimby_busyfree_time > 0 ) && isOnline())
+	{	// Automatic Nimby ON:
+		if( currentTime - m_busy_time > m_host.m_nimby_busyfree_time )
+		{
+			std::string log("Automatic Nimby: ");
+			log += "\n CPU busy since: " + af::time2str( m_busy_time) + " CPU >= " + af::itos( m_host.m_busy_cpu) + "%";
+			log += "\n Nimby busy free time = " + af::time2strHMS( m_host.m_nimby_busyfree_time, true );
+			appendLog( log);
+			setNIMBY();
+			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+			AFCommon::QueueDBUpdateItem( this);
+		}
+	}
+//printf("CPU busy with no task: %li-%li=%li, C%u%%(>%d%%) nbf=%dsecs\n", currentTime, m_busy_time, currentTime-m_busy_time, 100-m_hres.cpu_idle, m_host.m_busy_cpu, m_host.m_nimby_busyfree_time);
+
 	// Update idle time:
 	if( isBusy() || ((100 - m_hres.cpu_idle) >= m_host.m_idle_cpu ))
 		m_idle_time = currentTime;
@@ -538,7 +558,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			AFCommon::QueueDBUpdateItem( this);
 		}
 	}
-//printf("Idle: %li-%li=%li, CI%u%%(<%d%%) (w%d,n%d)\n", currentTime, m_idle_time, currentTime-m_idle_time, m_hres.cpu_idle, m_host.m_idle_cpu, m_host.m_wol_idlesleep_time, m_host.m_nimby_idlefree_time);
+//printf("Idle: %li-%li=%li, C%u%%(<%d%%) (w%d,n%d)secs\n", currentTime, m_idle_time, currentTime-m_idle_time, 100-m_hres.cpu_idle, m_host.m_idle_cpu, m_host.m_wol_idlesleep_time, m_host.m_nimby_idlefree_time);
 }
 
 void RenderAf::notSolved()

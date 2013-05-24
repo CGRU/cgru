@@ -70,6 +70,7 @@ private:
     long long m_time_launched;
     long long m_wol_operation_time;
     long long m_idle_time;
+    long long m_busy_time;
 
     QString m_address_ip_str;
     QString m_address_str;      ///< Client address

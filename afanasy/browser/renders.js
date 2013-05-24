@@ -96,6 +96,8 @@ RenderNode.prototype.update = function( i_obj)
 	{
 		if( i_obj.idle_time )
 			this.params.idle_time = i_obj.idle_time;
+		if( i_obj.busy_time )
+			this.params.busy_time = i_obj.busy_time;
 
 		var r = i_obj.host_resources;
 
@@ -264,44 +266,74 @@ RenderNode.prototype.refresh = function()
 	var stateTime = 'NEW';
 	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval( this.params.idle_time);
 	stateTimeTitle += '\nIdle CPU < ' + this.params.host.idle_cpu + '%';
-	if(( this.params.host.wol_idlesleep_time > 0 ) || ( cgru_Config.af_monitor_render_idle_bar_max > 0 ))
+
+	// Draw idle bar (almost in all cases)
+	if(( this.params.host.wol_idlesleep_time > 0 ) ||
+		( this.params.host.nimby_idlefree_time > 0 ) ||
+		( this.params.host.nimby_busyfree_time > 0 ) ||
+		( cgru_Config.af_monitor_render_idle_bar_max > 0 ))
 	{
 		var curtime = new Date();
-		var seconds = curtime.valueOf() / 1000.0 - this.params.idle_time;
-		if( seconds < 0 ) seconds = 0;
+		var idle_sec = curtime.valueOf() / 1000.0 - this.params.idle_time;
+		if( idle_sec < 0 ) idle_sec = 0;
+		var busy_sec = curtime.valueOf() / 1000.0 - this.params.busy_time;
+		if( busy_sec < 0 ) busy_sec = 0;
 		var percent = null;
 
-		if(( this.params.host.nimby_idlefree_time > 0 ) && ( this.state.NbY || this.state.NBY ))
+		if(( this.params.host.nimby_idlefree_time > 0 ) &&
+			( this.state.RUN != true ) &&
+			( this.state.NbY || this.state.NBY ))
 		{
 			stateTimeTitle += '\nNimby idle free time: ' + cm_TimeStringFromSeconds( this.params.host.nimby_idlefree_time);
-			percent = Math.round( 100.0 * seconds / this.params.host.nimby_idlefree_time );
+			percent = Math.round( 100.0 * idle_sec / this.params.host.nimby_idlefree_time );
 
-			seconds = Math.round( this.params.host.nimby_idlefree_time - seconds);
-			if( seconds > 0 )
-				this.elIdleBox.title = 'Nimby idle free in '+cm_TimeStringFromSeconds( seconds);
+			idle_sec = Math.round( this.params.host.nimby_idlefree_time - idle_sec);
+			if( idle_sec > 0 )
+				this.elIdleBox.title = 'Nimby idle free in '+cm_TimeStringFromSeconds( idle_sec);
 			else
 				this.elIdleBox.title = 'Nimby free';
-			this.elIdleBox.classList.add('nimby');
 			this.elIdleBox.classList.remove('wol');
+			this.elIdleBox.classList.add('free');
+			this.elIdleBox.classList.remove('nimby');
 		}
-		else if( this.params.host.wol_idlesleep_time > 0 )
+		else if(( this.params.host.nimby_busyfree_time > 0 ) &&
+			( busy_sec > 6 ) &&
+			( this.state.RUN != true ) &&
+			( this.state.NbY != true ) && ( this.state.NBY != true ))
+		{
+			stateTimeTitle += '\nBusy free Nimby time: ' + cm_TimeStringFromSeconds( this.params.host.nimby_busyfree_time);
+			percent = Math.round( 100.0 * busy_sec / this.params.host.nimby_busyfree_time );
+
+			busy_sec = Math.round( this.params.host.nimby_busyfree_time - busy_sec);
+			if( busy_sec > 0 )
+				this.elIdleBox.title = 'Nimby busy in '+cm_TimeStringFromSeconds( busy_sec);
+			else
+				this.elIdleBox.title = 'Nimby busy';
+			this.elIdleBox.classList.remove('wol');
+			this.elIdleBox.classList.remove('free');
+			this.elIdleBox.classList.add('nimby');
+		}
+		else if(( this.params.host.wol_idlesleep_time > 0 ) &&
+			( this.state.RUN != true ))
 		{
 			stateTimeTitle += '\nWOL idle sleep time: ' + cm_TimeStringFromSeconds( this.params.host.wol_idlesleep_time);
-			percent = Math.round( 100.0 * seconds / this.params.host.wol_idlesleep_time );
+			percent = Math.round( 100.0 * idle_sec / this.params.host.wol_idlesleep_time );
 
-			seconds = Math.round( this.params.host.wol_idlesleep_time - seconds);
-			if( seconds > 0 )
-				this.elIdleBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
+			idle_sec = Math.round( this.params.host.wol_idlesleep_time - idle_sec);
+			if( idle_sec > 0 )
+				this.elIdleBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( idle_sec);
 			else
 				this.elIdleBox.title = 'WOL sleep';
 			this.elIdleBox.classList.add('wol');
+			this.elIdleBox.classList.remove('free');
 			this.elIdleBox.classList.remove('nimby');
 		}
 		else
 		{
 			stateTimeTitle += '\nIdle bar time: ' + cm_TimeStringFromSeconds( cgru_Config.af_monitor_render_idle_bar_max);
-			percent = Math.round( 100.0 * seconds / cgru_Config.af_monitor_render_idle_bar_max );
+			percent = Math.round( 100.0 * idle_sec / cgru_Config.af_monitor_render_idle_bar_max );
 			this.elIdleBox.classList.remove('wol');
+			this.elIdleBox.classList.remove('free');
 			this.elIdleBox.classList.remove('nimby');
 		}
 

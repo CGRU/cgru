@@ -20,6 +20,9 @@
 		"maxtasks":10,
 		"power":1000,
 		"idle_cpu": 5,
+		"busy_cpu": 50,
+		"nimby_idlefree_time": 1800,
+		"nimby_busyfree_time": 60,
 
 		"services":[
 			{"name":"generic"},
@@ -62,7 +65,6 @@
 		"maxtasks":100,
 		"power":10000,
 		"wol_idlesleep_time": 3600,
-		"nimby_idlefree_time": 1800,
 		"remservices":["afterfx","max","xsi"]
 
 	},{

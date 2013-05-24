@@ -37,6 +37,7 @@ public:
 	inline bool isWOLWaking()      const { return m_state & SWOLWaking;   }
 	inline long long getWOLTime()  const { return m_wol_operation_time;   }
 	inline long long getIdleTime() const { return m_idle_time;            }
+	inline long long getBusyTime() const { return m_busy_time;            }
 	inline void setWOLFalling(     bool value) { if( value ) m_state = m_state | SWOLFalling;  else m_state = m_state & (~SWOLFalling); }
 	inline void setWOLSleeping(  bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
 	inline void setWOLWaking(    bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
@@ -72,7 +73,7 @@ public:
    inline const HostRes & getHostRes() const { return m_hres;}
 
 	/// Set free (unset nimby and NIMBY).
-	inline void setFree() { m_state = m_state & (~Snimby); m_state = m_state & (~SNIMBY); }
+	inline void setFree() { m_state = m_state & (~Snimby); m_state = m_state & (~SNIMBY); m_busy_time = time(NULL); }
 
 	/// Set Nimby 
 	inline void setNIMBY() { m_state = m_state | SNIMBY; m_state = m_state & (~Snimby); m_idle_time = time(NULL); }
@@ -133,7 +134,8 @@ protected:
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
 	int64_t m_wol_operation_time;   ///< Last WOL operation time (to sleep or to wake).
-	int64_t m_idle_time; ///< Time when render became idle (free and cpu < idle_cpu).
+	int64_t m_idle_time; ///< Time when render became idle, no tasks and cpu < idle_cpu
+	int64_t m_busy_time; ///< Time when render cpu became busy with no tasks and cpu > busy_cpu
 
 private:
    void construct();

@@ -2,6 +2,7 @@ ASSETS = {};
 ASSET = null;
 
 function View_asset_Open() { a_Show(); }
+function View_asset_Close() { $('asset').textContent = ''; }
 
 function a_Process()
 {

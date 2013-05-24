@@ -338,7 +338,8 @@ left: 0; top: 0; bottom: 0;
 border-radius: 2px;
 opacity: .3;
 }
-.render .idle_box.nimby .idle_bar { background: #F00; opacity: .3; }
+.render .idle_box.nimby .idle_bar { background: #00F; opacity: .4; }
+.render .idle_box.free .idle_bar { background:  #F00; opacity: .3; }
 .render .idle_box.wol .idle_bar   { background: #FF0; opacity: .5; }
 
 /*.item.render .task {*/

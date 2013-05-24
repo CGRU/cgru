@@ -39,6 +39,7 @@ void Render::construct()
 	m_capacity_used = 0;
 	m_wol_operation_time = 0;
 	m_idle_time = 0;
+	m_busy_time = 0;
 }
 
 Render::~Render()
@@ -72,7 +73,9 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << "\"id\":"   << m_id;
 		if( isOnline())
 		{
-			o_str << ",\"idle_time\":" << m_idle_time << ",";
+			o_str << ",\"idle_time\":" << m_idle_time;
+			o_str << ",\"busy_time\":" << m_busy_time;
+			o_str << ",";
 			m_hres.jsonWrite( o_str);
 		}
 		o_str << "}";
@@ -93,6 +96,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( m_wol_operation_time > 0 )
 		o_str << ",\"wol_operation_time\":" << m_wol_operation_time;
 	o_str << ",\"idle_time\":" << m_idle_time;
+	o_str << ",\"busy_time\":" << m_busy_time;
 
 	if( m_tasks.size())
 	{
@@ -197,6 +201,7 @@ void Render::v_readwrite( Msg * msg)
 		rw_Int32_Vect( m_tasks_percents, msg);
 
 		rw_int64_t( m_idle_time, msg);
+		rw_int64_t( m_busy_time, msg);
 	  m_hres.v_readwrite( msg);
 
       break;
@@ -265,6 +270,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 
 	  if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
 		stream << "\n Idle Time = " << time2str( m_idle_time) << " CPU < " << m_host.m_idle_cpu << "%";
+		stream << "\n Busy Time = " << time2str( m_busy_time) << " CPU > " << m_host.m_busy_cpu << "%";
 	  if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
 	  if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
 
@@ -302,6 +308,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 
 		if( m_wol_operation_time ) stream << " W:" << time2str( m_wol_operation_time);
 		stream << " I:" << time2str( m_idle_time);
+		stream << " B:" << time2str( m_busy_time);
 
 		stream << " v'" << m_version << "'";
 		stream << " ";

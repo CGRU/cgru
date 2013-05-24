@@ -39,7 +39,9 @@ public:
 
 	int32_t m_wol_idlesleep_time;
 	int32_t m_nimby_idlefree_time;
+	int32_t m_nimby_busyfree_time;
 	int32_t m_idle_cpu;
+	int32_t m_busy_cpu;
 
     void v_readwrite( Msg * msg); ///< Read or write Host in message.
 
