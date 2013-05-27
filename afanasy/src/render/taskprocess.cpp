@@ -33,7 +33,10 @@ extern void (*fp_setupChildProcess)( void);
 // This function is called by child process just after fork() and before exec()
 void setupChildProcess( void)
 {
-//    printf("This is child process!\n");
+//printf("This is child process!\n");
+#ifdef MACOSX
+	if( setpgrp() == -1 ) AFERRPE("setpgrp")
+#endif
 	if( setsid() == -1) AFERRPE("setsid")
 	int nicenew = nice( af::Environment::getRenderNice());
 	if( nicenew == -1) AFERRPE("nice")
@@ -102,7 +105,8 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 
 #else
 	// For UNIX we can ask child prcocess to call a function to setup after fork()
-	fp_setupChildProcess = setupChildProcess;
+	
+fp_setupChildProcess = setupChildProcess;
 	m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr);
 #endif
 
@@ -129,15 +133,17 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 		AFERRAR("TaskProcess: AssignProcessToJobObject failed with code = %d.", GetLastError())
 	if( ResumeThread( m_pinfo.hThread) == -1)
 		AFERRAR("TaskProcess: ResumeThread failed with code = %d.", GetLastError())
+	printf("Started PID=%d: ", m_pid);
 #else
 	setbuf( m_io_output, m_filebuffer_out);
 	setbuf( m_io_outerr, m_filebuffer_err);
 	setNonblocking( fileno( m_io_input));
 	setNonblocking( fileno( m_io_output));
 	setNonblocking( fileno( m_io_outerr));
+	printf("Started PID=%d SID=%d(%d) GID=%d(%d): ", m_pid,
+		getsid(m_pid), setsid(), getpgid(m_pid), getpgrp());
 #endif
 
-	printf("Started PID=%d: ",m_pid);
 	m_taskexec->v_stdOut( af::Environment::isVerboseMode());
 }
 
