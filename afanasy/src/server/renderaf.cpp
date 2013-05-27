@@ -516,9 +516,11 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	// Update busy cpu with no task time:
 	if(( isFree() == false ) || isBusy() || ((100 - m_hres.cpu_idle) < m_host.m_busy_cpu ))
 		m_busy_time = currentTime;
-	else if(( m_host.m_nimby_busyfree_time > 0 ) && isOnline())
-	{	// Automatic Nimby ON:
-		if( currentTime - m_busy_time > m_host.m_nimby_busyfree_time )
+	else
+	{
+		// Automatic Nimby ON:
+		if(( m_host.m_nimby_busyfree_time > 0 ) && isOnline()
+			&& ( currentTime - m_busy_time > m_host.m_nimby_busyfree_time ))
 		{
 			std::string log("Automatic Nimby: ");
 			log += "\n CPU busy since: " + af::time2str( m_busy_time) + " CPU >= " + af::itos( m_host.m_busy_cpu) + "%";
@@ -534,9 +536,11 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	// Update idle time:
 	if( isBusy() || ((100 - m_hres.cpu_idle) >= m_host.m_idle_cpu ))
 		m_idle_time = currentTime;
-	else if(( m_host.m_wol_idlesleep_time > 0 ) && isOnline() && ( isWOLSleeping() == false) && ( isWOLFalling() == false))
-	{	// Automatic WOL sleep:
-		if( currentTime - m_idle_time > m_host.m_wol_idlesleep_time )
+	else 
+	{
+		// Automatic WOL sleep:
+		if(( m_host.m_wol_idlesleep_time > 0 ) && isOnline() && ( isWOLSleeping() == false) && ( isWOLFalling() == false)
+			&& ( currentTime - m_idle_time > m_host.m_wol_idlesleep_time ))
 		{
 			std::string log("Automatic WOL Sleep: ");
 			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu) + "%";
@@ -544,10 +548,10 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			appendLog( log);
 			wolSleep( monitoring);
 		}
-	}
-	else if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false))
-	{	// Automatic Nimby Free:
-		if( currentTime - m_idle_time > m_host.m_nimby_idlefree_time )
+
+		// Automatic Nimby Free:
+		if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false)
+			&& ( currentTime - m_idle_time > m_host.m_nimby_idlefree_time ))
 		{
 			std::string log("Automatic Nimby Free: ");
 			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu) + "%";
