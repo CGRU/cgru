@@ -119,7 +119,7 @@ public:
 	SysJob( int m_flags);
 	virtual ~SysJob();
 
-	bool isValid() const;
+	bool initSystem();
 
 	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);

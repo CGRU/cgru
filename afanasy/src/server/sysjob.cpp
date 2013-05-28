@@ -595,9 +595,10 @@ void SysJob::appendJobLog( const std::string & message)
 	ms_sysjob->appendLog( message);
 }
 
-bool SysJob::isValid() const
+bool SysJob::initSystem()
 {
 	if( m_blocksnum != BlockLastIndex ) return false;
+	m_time_creation = time(NULL);
 	return true;
 }
 
