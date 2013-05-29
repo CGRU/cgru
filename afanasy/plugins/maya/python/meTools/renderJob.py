@@ -68,6 +68,7 @@ class RenderJob ( object ) :
   def setup ( self )   : print '>> RenderJob setup...'
   def process ( self ) : print '>> RenderJob process...'
   #
+  # setup_range
   #
   def setup_range ( self, currentTime = 0 ) :
     if not self.animation :

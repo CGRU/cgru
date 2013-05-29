@@ -20,8 +20,9 @@ from renderJob import RenderJob, RenderBlock
 #
 class AfanasyRenderBlock ( RenderBlock ) :
   #
+  # __init__
   #
-  def __init__ ( self, name = '', service = None, parentJob = None, local = False ):
+  def __init__ ( self, name = '', service = None, parentJob = None, local = False ) :
     #
     RenderBlock.__init__ ( self, name, service )
     self.af_block = af.Block ( name, service )
@@ -45,8 +46,10 @@ class AfanasyRenderBlock ( RenderBlock ) :
       if local :
         self.af_block.setHostsMask ( parentJob.af_job.data [ 'host_name' ] ) 
   #
+  # setup
   #
-  def setup ( self ) : 
+  def setup ( self ) :
+    # 
     self.af_block.setCapacity ( self.capacity )
     if self.parentJob is not None :
       if self.parentJob.use_var_capacity :
@@ -102,19 +105,20 @@ class AfanasyRenderJob ( RenderJob ) :
     self.threads_limit = 0
     self.port = 39010 # mentalray standalone slave port
     self.hosts = ''
-    
-  #
+  #    
+  # setup
   #
   def setup ( self ) :
     print '>> AfanasyRenderJob setup...'
     self.af_job.setDescription ( self.description )
     self.af_job.setPriority ( self.priority )
-    if self.hostsmask != '': self.af_job.setHostsMask ( self.hostsmask )
-    if self.hostsexcl != '': self.af_job.setHostsMaskExclude ( self.hostsexcl )
-    if self.depmask   != '': self.af_job.setDependMask ( self.depmask )
-    if self.depglbl   != '': self.af_job.setDependMaskGlobal( self.depglbl )
-    if self.need_os   != '': self.af_job.setNeedOS ( self.need_os )
+    if self.hostsmask != '' : self.af_job.setHostsMask ( self.hostsmask )
+    if self.hostsexcl != '' : self.af_job.setHostsMaskExclude ( self.hostsexcl )
+    if self.depmask   != '' : self.af_job.setDependMask ( self.depmask )
+    if self.depglbl   != '' : self.af_job.setDependMaskGlobal( self.depglbl )
+    if self.need_os   != '' : self.af_job.setNeedOS ( self.need_os )
   #
+  # process
   #
   def process ( self ) :
     print '>> AfanasyJob process...'

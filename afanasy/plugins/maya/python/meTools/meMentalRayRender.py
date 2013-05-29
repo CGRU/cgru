@@ -1,6 +1,10 @@
 """
   meMentalRayRender
   
+  ver.0.4.7 (28 May 2013)
+    - fixed small bugs with deffered generation
+    - check if mentalRay is current renderer
+    
   ver.0.4.6 (7 Feb 2013) 
     - minor bug with single masterLayer case for deferred migen
     
@@ -73,7 +77,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meMentalRayRender_'
-meMentalRayRenderVer = '0.4.6'
+meMentalRayRenderVer = '0.4.7b'
 meMentalRayRenderMainWnd = self_prefix + 'MainWnd'
 
 # Nice Tip ( found at http://mayastation.typepad.com ) for enabling gzip compression option for Maya command line .mi export :
@@ -89,11 +93,11 @@ mr_verbosity_list = [ 'none', 'fatal', 'error', 'warning', 'info', 'progress', '
 #
 # meMentalRayRender
 #
-class meMentalRayRender ( object ):
+class meMentalRayRender ( object ) :
   #
+  # __init__
   #
-  #
-  def __init__ ( self, selection = '' ):
+  def __init__ ( self, selection = '' ) :
     #
     self.selection = selection
     self.winMain = ''
@@ -104,6 +108,10 @@ class meMentalRayRender ( object ):
     elif self.os == 'win32'           : self.os = 'win'
 
     print 'sys.platform = %s self.os = %s' % ( sys.platform, self.os )
+    
+    if cmds.getAttr ( 'defaultRenderGlobals.currentRenderer' ) != 'mentalRay' :
+      cmds.warning ( 'MentalRay is not current renderer!' )
+      return
 
     self.rootDir = cmds.workspace ( q = True, rootDirectory = True )
     self.rootDir = self.rootDir[ :-1 ]
@@ -132,7 +140,7 @@ class meMentalRayRender ( object ):
   #def __del__( self ): print( ">> meMentalRayRender: Class deleted" )
   #
   #
-  def initParameters ( self ): 
+  def initParameters ( self ) : 
     #
     # Job parameters
     #
@@ -212,7 +220,8 @@ class meMentalRayRender ( object ):
   #
   # getImageFileNamePrefix
   #
-  def getImageFileNamePrefix ( self ):
+  def getImageFileNamePrefix ( self ) :
+    #
     fileNamePrefix = cmds.getAttr ( 'defaultRenderGlobals.imageFilePrefix' )
     if fileNamePrefix == None or fileNamePrefix == '' :
       fileNamePrefix = getMayaSceneName ()
@@ -220,7 +229,8 @@ class meMentalRayRender ( object ):
   #
   # getImageFormat
   #
-  def getImageFormat ( self ):
+  def getImageFormat ( self ) :
+    #
     imageFormatStr = ''
     format_idx = cmds.getAttr ( 'defaultRenderGlobals.imageFormat' )
     if format_idx == 0 : # Gif
@@ -499,11 +509,12 @@ class meMentalRayRender ( object ):
       # generate uniquie maya scene name and save it
       # with current render and .mi generation settings
         print 'Use deferred .mi generation'
-        saveGlobals['imageFilePrefix'] = str ( cmds.getAttr ( defGlobals + '.imageFilePrefix' ) )
+        saveGlobals [ 'imageFilePrefix' ] = str ( cmds.getAttr ( defGlobals + '.imageFilePrefix' ) )
 
-        cmds.setAttr( defGlobals + '.imageFilePrefix', image_name, type = 'string' )
-        scene_name     = getMayaSceneName () # get scene name without extension
+        cmds.setAttr ( defGlobals + '.imageFilePrefix', image_name, type = 'string' )
+        scene_name     = getMayaSceneName ( withoutSubdir = False ) # get scene name without extension
         def_scene_name = scene_name + '_deferred'
+        
         cmds.file ( rename = def_scene_name )
         self.def_scene_name = cmds.file ( save = True, de = True ) # save it with default extension
         cmds.file ( rename = scene_name ) # rename scene back
@@ -522,7 +533,7 @@ class meMentalRayRender ( object ):
         for layer in renderLayers :   
         
           #if layer == 'masterLayer' : layer = 'defaultRenderLayer' 
-          saveGlobals ['renderableLayer'] = cmds.getAttr ( layer + '.renderable' ) 
+          saveGlobals [ 'renderableLayer' ] = cmds.getAttr ( layer + '.renderable' ) 
           cmds.setAttr ( layer + '.renderable', True )
           # print 'set current layer renderable (%s)' % layer
 
@@ -685,7 +696,7 @@ class meMentalRayRender ( object ):
   #
   # miFileNameChanged
   #
-  def miFileNameChanged ( self, name, value ):
+  def miFileNameChanged ( self, name, value ) :
     #
     if name in ( 'mi_filename', 'mi_compression' ) :
       setDefaultStrValue ( self_prefix, name, self.mi_param, value )
@@ -695,9 +706,9 @@ class meMentalRayRender ( object ):
   #
   # setResolvedPath
   #
-  def setResolvedPath ( self ):
+  def setResolvedPath ( self ) :
     #
-    filename = cmds.workspace ( expandName = self.mi_param[ 'mi_filename' ] )
+    filename = cmds.workspace ( expandName = self.mi_param [ 'mi_filename' ] )
     ( filename, ext ) = os.path.splitext ( filename )
 
     if not ( self.mi_param [ 'mi_deferred' ] and len ( getRenderLayersList ( False ) ) == 1 ) :
@@ -705,7 +716,7 @@ class meMentalRayRender ( object ):
       # during deferred migen
       filename += '_' + str ( self.layer )
       
-    if self.mi_param[ 'mi_padding' ] > 0 and self.mi_param[ 'mi_perframe' ] == True :
+    if self.mi_param[ 'mi_padding' ] > 0 and self.mi_param [ 'mi_perframe' ] == True :
       filename += '.'
       pad_str = getPadStr ( self.mi_param [ 'mi_padding' ], self.mi_param [ 'mi_perframe' ] )
       filename += pad_str
@@ -754,6 +765,7 @@ class meMentalRayRender ( object ):
   # enable_distributed
   #
   def enable_distributed ( self, arg ) :
+    #
     mr_distr_frame = self.winMain + '|f0|t0|tc2|fr2'
     mr_distr = mr_distr_frame + '|fc2|'
     setDefaultIntValue ( self_prefix, 'mr_distributed', self.mr_param, arg )
@@ -1080,7 +1092,7 @@ class meMentalRayRender ( object ):
     tab_render = cmds.columnLayout ( 'tc2', columnAttach = ( 'left', 0 ), 
                                       rowSpacing = 0, 
                                       adjustableColumn = True )
-    cmds.frameLayout ( 'fr2', label = ' Distributed render ', 
+    fr2 = cmds.frameLayout ( 'fr2', label = ' Distributed render ', 
                        borderVisible = True, 
                        borderStyle = 'etchedIn', 
                        marginHeight = mr_hi, 
@@ -1127,7 +1139,7 @@ class meMentalRayRender ( object ):
                        cc = partial ( setDefaultStrValue, self_prefix, 'mr_hosts', self.mr_param ) )                       
     bg_color = self.save_frame_bgc 
     if self.mr_param [ 'mr_distributed' ] : bg_color = self.def_frame_bgc
-    cmds.frameLayout ( self.winMain + '|f0|t0|tc2|fr2', edit = True, bgc = bg_color ) # , enableBackground=False
+    cmds.frameLayout ( fr2, edit = True, bgc = bg_color ) # , enableBackground=False
     cmds.setParent ( '..' )
     cmds.setParent ( '..' )
     cmds.frameLayout ( 'fr1', label = ' MentalRay options ', 
