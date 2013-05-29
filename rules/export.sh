@@ -23,22 +23,40 @@ quote PASS $FTP_PASS
 
 mkdir rules
 cd rules
-
-mkdir lib
-cd lib
-lcd lib
-mput *.css *.js
-ls
-
-cdup
-lcd ..
 mput *.html *.php *.txt
 ls
 
+mkdir lib
+mput lib/*.css lib/*.js
+ls lib
+
 mkdir rules
-cd rules
-lcd rules
-mput *.html *.css *.js
-mput rules.00_general.json
-ls
+mput rules/*.css rules/*.js
+mput rules/rules.00_general.json
+ls rules
+
+mkdir rules/bin
+mput rules/bin/*.py
+ls rules/bin
+
+mkdir rules/assets
+mput rules/assets/*.js rules/assets/*.html
+ls rules/assets
+
+
+
+mkdir rules_root
+cd rules_root
+lcd rules_root
+
+mkdir .rules
+mput .rules/*.html .rules/*.json
+ls .rules
+
+mkdir Ask_Questions_Here
+mkdir Ask_Questions_Here/.rules
+mput Ask_Questions_Here/.rules/*.html Ask_Questions_Here/.rules/*.json
+ls Ask_Questions_Here/.rules
+
+
 END_SCRIPT
