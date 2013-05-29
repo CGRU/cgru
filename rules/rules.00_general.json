@@ -31,7 +31,9 @@
 "assets":{
 	"project":{
 		"seek":["/"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@"
+		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"play_folders":false,
+		"show_files":true
 	},
 	"scenes":{
 		"seek":["[project]/SCENES","[project]/SHOTS"],

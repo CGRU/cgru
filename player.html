@@ -70,15 +70,23 @@ Activated after reload (F5).">WebGL:</div>
 			<div style="float:left;margin:3px;padding:2px;">FPS:</div>
 			<div id="framerate"></div>
 		</div>
-		<div class="button" id="btn_paint" onclick="p_Paint()">Paint</div>
+		<div class="button" id="btn_paint" onclick="p_Paint()" title="Start frame painting
+Hotkey: P">Paint</div>
 		<div id="paint" style="display:none">
-			<div class="button" id="btn_save" onclick="p_Save()" title="Save all changed images">Save</div>
+			<div class="button" onclick="p_NextPaintFrame(-1)" title="Previous paint frame
+Hotkey: ;" style="margin-right: 1px">&lt;</div>
+			<div class="button" onclick="p_NextPaintFrame(+1)" title="Next paint frame
+Hotkey: '" style="margin-left: 1px">&gt;</div>
+			<div class="button" id="btn_save" onclick="p_Save()" title="Save all changed images
+Hotkey: S">Save</div>
 			<div class="button" ondblclick="p_Clear()"title="Double click to clear painted canvas">Clear</div>
 			<div id="paint_size">
-				<div class="label" title="Paint brush size">Size:</div>
-				<div class="button" onclick="p_PaintSizeChange(-1)" title="Increase brush size">-</div>
+				<div class="label" title="Paint brush size" style="margin-right: 0px">Size:</div>
+				<div class="button" onclick="p_PaintSizeChange(-1)" title="Increase brush size
+Hotkey: 9" style="margin-right: 1px; margin-left: 2px">-</div>
 				<div class="editing" id="paint_size_num" contenteditable="true"></div>
-				<div class="button" onclick="p_PaintSizeChange(1)" title="Decrease brush size">+</div>
+				<div class="button" onclick="p_PaintSizeChange(1)" title="Decrease brush size
+Hotkey: 0" style="margin-left: 1px">+</div>
 			</div>
 			<div id="paint_color" title="Brush color"></div>
 			<div id="colors"></div>
@@ -87,8 +95,9 @@ Activated after reload (F5).">WebGL:</div>
 </div>
 
 <div id="footer">
-	<div id="slider">
-		<div id="progress"></div>
+	<div id="frame_bar">
+		<div id="play_slider"></div>
+		<canvas id="bar_canvas"></canvas>
 	</div>
 	<div id="footeropenbtn" class="headeropenbtn button" style="top:20px" onclick="p_OpenCloseFooter()">&uarr;</div>
 	<div id="cycle" style="top:30px"></div>

@@ -3,6 +3,7 @@
 "assets":{
 	"forum":{
 		"seek":["/"],
+		"play_folders":false,
 		"show_files":true
 	},
 	"topic":{

@@ -35,6 +35,12 @@ p_paintColor = [255,255,0];
 p_paintSize = 8;
 p_paintCtx = null;
 
+p_bar_clr_canvas = [ 255, 255, 0];
+p_bar_clr_edited = [ 255,   0, 0];
+p_bar_clr_saved  = [   0, 255, 0];
+p_frame_bar_height = 16;
+p_frame_bar_width = 2000;
+
 p_saving = false;
 p_filestosave = 0;
 p_filessaved = 0;
@@ -43,7 +49,7 @@ p_fps = 24.0;
 p_interval = 40;
 p_drawTime = new Date();
 
-p_elements = ['player_content','progress','slider','view','header','footer','paint','colors','btn_save','btn_paint','framerate'];
+p_elements = ['player_content','play_slider','frame_bar','view','header','footer','paint','colors','btn_save','btn_paint','framerate'];
 p_el = {};
 p_buttons = ['play','prev','next','reverse','rewind','forward'];
 p_elb = {};
@@ -94,10 +100,10 @@ function p_Init()
 	p_el.view.onmouseup = p_ViewOnMouseUp;
 	p_el.view.onmouseover = p_ViewOnMouseOver;
 
-	p_el.slider.onmousedown = p_SliderOnMouseDown;
-	p_el.slider.onmouseup = p_SliderOnMouseUp;
-	p_el.slider.onmousemove = p_SliderOnMouseMove;
-	p_el.slider.onmouseout = p_SliderOnMouseOut;
+	p_el.frame_bar.onmousedown = p_SliderOnMouseDown;
+	p_el.frame_bar.onmouseup = p_SliderOnMouseUp;
+	p_el.frame_bar.onmousemove = p_SliderOnMouseMove;
+	p_el.frame_bar.onmouseout = p_SliderOnMouseOut;
 	document.body.onkeydown = p_OnKeyDown;
 	window.onhashchange = p_PathChanged;
 //	window.onresize = p_ViewHome;
@@ -222,12 +228,20 @@ function p_ImgLoaded(e)
 	}
 
 	c_Info( info, false);
-	p_el.progress.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
+	p_el.play_slider.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
 
 	if( p_numloaded < p_filenames.length ) return;
 
 	p_loaded = true;
 	p_PushButton();
+
+	// Initialize frames bar canvas context:
+	$('bar_canvas').width = p_frame_bar_width;
+	$('bar_canvas').height = p_frame_bar_height;
+	p_bar_ctx = $('bar_canvas').getContext('2d');
+	p_bar_ctx.globalCompositeOperation = 'source-over';
+//p_bar_ctx.fillStyle = 'rgb('+p_bar_clr_canvas.join(',')+')';
+//p_bar_ctx.fillRect( 10, 0, 10, p_frame_bar_height);
 
 	if( localStorage.player_usewebgl == 'ON' )
 		gl_Start();
@@ -235,10 +249,10 @@ function p_ImgLoaded(e)
 		p_CreateImages();
 
 	p_ShowFrame( p_frame);
-
 	p_ViewHome();
 //	setTimeout('p_ViewHome();',100);
 
+	// Just information:
 	var info = 'Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height;
 	if( p_fileSizeTotal ) info += ': '+c_Bytes2KMG( p_fileSizeTotal);
 	info += ': '+sec.toFixed(1)+' seconds';
@@ -273,8 +287,8 @@ function p_CreateImages()
 function p_ViewHome()    { p_ViewTransform( 0, 0, 1); }
 function p_ViewLeft()    { p_ViewTransform( p_view_tx - p_view_dx, p_view_ty, p_view_zoom ); }
 function p_ViewRight()   { p_ViewTransform( p_view_tx + p_view_dx, p_view_ty, p_view_zoom ); }
-function p_ViewUp()      { p_ViewTransform( p_view_tx, p_view_ty + p_view_dy, p_view_zoom ); }
-function p_ViewDown()    { p_ViewTransform( p_view_tx, p_view_ty - p_view_dy, p_view_zoom ); }
+function p_ViewUp()      { p_ViewTransform( p_view_tx, p_view_ty - p_view_dy, p_view_zoom ); }
+function p_ViewDown()    { p_ViewTransform( p_view_tx, p_view_ty + p_view_dy, p_view_zoom ); }
 function p_ViewZoomIn()  { p_ViewTransform( p_view_tx, p_view_ty, ( 1.0 + p_view_dz ) * p_view_zoom ); }
 function p_ViewZoomOut() { p_ViewTransform( p_view_tx, p_view_ty, ( 1.0 - p_view_dz ) * p_view_zoom ); }
 
@@ -336,13 +350,12 @@ function p_OnKeyDown(e)
 	}
 
 	else if( e.keyCode == 33  ) p_NextFrame(-10); // PageUp
-	else if( e.keyCode == 34  ) p_NextFrame(10);  // PageDown
+	else if( e.keyCode == 34  ) p_NextFrame(+10); // PageDown
 	else if( e.keyCode == 35  ) p_ShowFrame(-1);  // End
 	else if( e.keyCode == 36  ) p_ShowFrame(0);   // Home
 	else if( e.keyCode == 219 ) p_NextFrame(-1);  // [
-	else if( e.keyCode == 221 ) p_NextFrame(1);   // ]
+	else if( e.keyCode == 221 ) p_NextFrame(+1);  // ]
 	else if( e.keyCode == 32  ) p_Play();         // Space
-	else if( e.keyCode == 80  ) p_Play();         // P
 	else if( e.keyCode == 190 ) p_Play();         // >
 	else if( e.keyCode == 82  ) p_Reverse();      // R
 	else if( e.keyCode == 188 ) p_Reverse();      // <
@@ -357,6 +370,12 @@ function p_OnKeyDown(e)
 	else if( e.keyCode == 107 ) p_ViewZoomIn();   // + (NumPad)
 	else if( e.keyCode == 72  ) p_ViewHome();     // H
 	else if( e.keyCode == 70  ) p_FullScreen();   // F
+
+	else if( e.keyCode == 80  ) p_Paint();             // P
+	else if( e.keyCode == 57  ) p_PaintSizeChange(-1); // 9
+	else if( e.keyCode == 48  ) p_PaintSizeChange(+1); // 0
+	else if( e.keyCode == 59  ) p_NextPaintFrame(-1);  // ;
+	else if( e.keyCode == 222 ) p_NextPaintFrame(+1);  // '
 
 	else if( e.keyCode == 83  ) p_Save(); // S
 }
@@ -499,7 +518,7 @@ function p_NextFrame( i_val)
 	var width = '100%';
 	if( p_images.length > 1 )
 		width = 100.0*p_frame/(p_images.length-1) + '%';
-	p_el.progress.style.width = width;
+	p_el.play_slider.style.width = width;
 
 	p_SetPaintState();
 
@@ -523,6 +542,18 @@ function p_NextFrame( i_val)
 	}
 }
 
+function p_NextPaintFrame( i_dir)
+{
+	if( p_loaded == false ) return;
+	f = p_frame + i_dir;
+	while( p_paintElCanvas[f] == null )
+	{
+		if(( f < 0 ) || ( f >= p_images.length )) return;
+		f += i_dir;
+	}
+	p_ShowFrame( f);
+}
+
 function p_SliderOnMouseDown( i_evt)
 {
 //window.console.log('p_SliderOnMouseDown');
@@ -539,9 +570,9 @@ function p_SliderOnMouseMove( i_evt)
 	if( p_slidertimer ) clearInterval( p_slidertimer);
 	if( p_loaded == false ) return;
 	if( false == p_slidering ) return;
-	var width = p_el.slider.clientWidth - 1;
-	var offset = i_evt.clientX - p_el.slider.offsetLeft;
-//	p_el.progress.style.width = 100.0*offset/width + '%';
+	var width = p_el.frame_bar.clientWidth - 1;
+	var offset = i_evt.clientX - p_el.frame_bar.offsetLeft;
+//	p_el.play_slider.style.width = 100.0*offset/width + '%';
 	p_ShowFrame( Math.floor( p_images.length * offset / width ));
 	return false;
 }
@@ -584,6 +615,7 @@ i_evt.stopPropagation();
 	}
 	else
 	{
+		// Create new canvas:
 		canvas = document.createElement('canvas');
 		p_paintElCanvas[p_frame] = canvas;
 		p_el.view.appendChild( canvas);
@@ -591,10 +623,11 @@ i_evt.stopPropagation();
 		canvas.height = p_images[0].height;
 		canvas.style.width = canvas.width + 'px';
 		canvas.style.height = canvas.height + 'px';
+
 		c_Info('Canvas for "'+p_filenames[p_frame]+'" created.');
 	}
 
-	var c = p_GetCtxCoords( i_evt);
+//var c = p_GetCtxCoords( i_evt);
 	p_paintCtx = canvas.getContext('2d');
 	p_paintCtx.globalCompositeOperation = 'source-over';
 	p_paintCtx.beginPath();
@@ -637,7 +670,7 @@ function p_ViewOnMouseMove( i_evt)
 	if( p_paintCtx == null ) return;
 	var c = p_GetCtxCoords( i_evt);
 	p_paintCtx.lineTo( c.x, c.y);
-	var wasedited = p_paintElCanvas[p_frame].m_edited;
+//var wasedited = p_paintElCanvas[p_frame].m_edited;
 	p_paintElCanvas[p_frame].m_edited = true;
 	p_paintElCanvas[p_frame].m_saved = false;
 	p_paintCtx.stroke();
@@ -680,7 +713,7 @@ function p_PaintSizeSet( i_px)
 	if( p_paintSize < 1 ) p_paintSize = 1;
 	$('paint_size_num').textContent = p_paintSize;
 }
-function p_PaintSizeChange( i_px) { p_PaintSizeSet( p_paintSize + i_px); }
+function p_PaintSizeChange( i_px) { if( p_painting ) p_PaintSizeSet( p_paintSize + i_px); }
 function p_PaintSizeKeyDown( e)
 {
 	if( e.keyCode == 13 ) return false; // Enter
@@ -692,16 +725,19 @@ function p_Clear()
 {
 	if( p_loaded == false ) return;
 	if( p_painting == false ) return;
-	if( p_paintElCanvas[p_frame] == null ) return;
 
 	var canvas = p_paintElCanvas[p_frame];
-	var ctx = canvas.getContext('2d');
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	if( canvas == null ) return;
+
+	p_paintElCanvas[p_frame] = null;
+	p_el.view.removeChild( canvas);
+
+	p_SetPaintState();
 }
 
 function p_Save()
 {
-	if( p_painting == false ) return;
+//if( p_painting == false ) return;
 	if( p_saving ) return;
 
 	p_saving = true;
@@ -761,7 +797,7 @@ function n_MessageReceived( i_msg)
 		if( p_imageMode ) frame = 0;
 		if( p_paintElCanvas[frame])
 			p_paintElCanvas[frame].m_saved = true;
-		p_SetPaintState();
+//p_SetPaintState();
 		c_Info('Saved "'+name +'" '+p_filessaved+' of '+p_filestosave);
 		if( p_filessaved >= p_filestosave )
 			p_SavingFinished( file.substr( 0, file.lastIndexOf('/')).substr( file.indexOf('/')));
@@ -776,9 +812,10 @@ function p_SavingFinished( folder)
 		c_Info('Saved '+p_filessaved+' files to "'+folder+'"');
 	else
 		c_Info('Saved '+p_filessaved+' files');
+	p_SetPaintState( true);
 }
 
-function p_SetPaintState()
+function p_SetPaintState( i_update_whole_bar )
 {
 	var shadow = '0 0 4px #000';
 	if( p_paintElCanvas[p_frame] )
@@ -791,6 +828,36 @@ function p_SetPaintState()
 				shadow = '0 0 4px #0F0';
 		}
 	}
+
+	// Draw frame bar:
+	var start_frame = p_frame;
+	var end_frame = p_frame;
+	if( i_update_whole_bar )
+	{
+		start_frame = 0;
+		end_frame = p_images.length-1;
+	}
+	var width = p_frame_bar_width / (p_images.length-1);
+	for( var f = start_frame; f <= end_frame; f++)
+	{
+		var pos = p_frame_bar_width * f / (p_images.length-1) - .5*width;
+
+		if( p_paintElCanvas[f] )
+		{
+			var color = p_bar_clr_canvas;
+			if( p_paintElCanvas[f].m_edited )
+			{
+				color = p_bar_clr_edited;
+				if( p_paintElCanvas[f].m_saved )
+					color = p_bar_clr_saved;
+			}
+			p_bar_ctx.fillStyle = 'rgb('+color.join(',')+')';
+			p_bar_ctx.fillRect( pos, 0, width, p_frame_bar_height);
+		}
+		else
+			p_bar_ctx.clearRect( pos, 0, width, p_frame_bar_height);
+	}
+
 	p_el.view.style.boxShadow = shadow;
 	p_el.btn_paint.style.boxShadow = shadow;
 }

@@ -18,7 +18,7 @@ box-shadow:0 0 4px #000 inset, 0 0 4px #555;
 #paint .button { float:left; }
 #paint_size { float:left; }
 #paint_size > div { float:left; margin: 3px; padding: 2px; text-align: center; }
-#paint_size .button { width: 20px; }
+#paint_size .button { width: 12px; }
 #paint_size .editing { width: 30px; }
 #paint_color { float: left; margin: 1px 8px; width: 25px; height: 25px; border-radius: 4px; border: 1px solid #000; }
 
@@ -44,7 +44,7 @@ overflow: hidden;
 /* ==================== FOOTER ======================= */
 #footer { height: 50px; }
 
-#slider {
+#frame_bar {
 /*
 -moz-user-select: none;
 -webkit-user-select: none;
@@ -55,10 +55,16 @@ top: 4px; left: 10px; right: 10px; height: 10px;
 box-shadow: 0 0 2px #999;
 background: #222;
 }
-#slider #progress {
+#frame_bar #play_slider {
 background: #777;
 position: absolute;
 top: 0px; left: 0px; bottom: 0px;
+}
+#frame_bar #bar_canvas {
+opacity: 0.5;
+position: absolute;
+top: 0px; left: 0px; bottom: 0px; right: 0px;
+width: 100%;
 }
 
 #footer_panel { position: absolute; overflow: visible; top: 20px; right: 0px; height: 30px; left: 40px; /*border: 1px solid #999;*/ }
