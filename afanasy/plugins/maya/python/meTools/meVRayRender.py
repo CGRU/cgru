@@ -1,6 +1,13 @@
 """
   meVRayRender.py
 
+  ver.0.3.7 (28 May 2013)
+    - fixed small bugs with deffered generation
+    - check if vray is current renderer
+    
+  ver.0.3.6 (16 Feb 2013)
+    - added image filename override option to render command
+    - get rid of 'multichannel' suffix for 'exr' image format
   ver.0.3.5 (29 Jan 2013)
     - distributed render support
   ver.0.3.3 (28 Jan 2013)
@@ -39,7 +46,7 @@
   reload( meVRayRender ) # for debugging purposes
   meVRayRender = meVRayRender.meVRayRender()
 
-  Important!!!
+  Important !!!
   Do not use another object name.
   Only meVRayRender.renderLayerSelected() will work with script job.
 
@@ -56,7 +63,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meVRayRender_'
-meVRayRenderVer = '0.3.5'
+meVRayRenderVer = '0.3.7b'
 meVRayRenderMainWnd = self_prefix + 'MainWnd'
 
 vray_transfer_assets_list = [ 'none', 'transfer', 'use_cache' ]
@@ -64,11 +71,11 @@ vray_verbosity_list = [ 'none', 'errors', 'warning', 'info', 'details' ]
 #
 # meVRayRender
 #
-class meVRayRender ( object ):
+class meVRayRender ( object ) :
   #
+  # __init__
   #
-  #
-  def __init__ ( self, selection = '' ):
+  def __init__ ( self, selection = '' ) :
     #
     self.selection = selection
     self.winMain = ''
@@ -79,7 +86,11 @@ class meVRayRender ( object ):
     elif self.os == 'win32'           : self.os = 'win'
 
     print 'sys.platform = %s self.os = %s' % ( sys.platform, self.os )
-
+    
+    if cmds.getAttr ( 'defaultRenderGlobals.currentRenderer' ) != 'vray' :
+      cmds.warning ( 'V-Ray is not current renderer!' )
+      return
+    
     self.rootDir = cmds.workspace ( q = True, rootDirectory = True )
     self.rootDir = self.rootDir[ :-1 ]
     self.layer   = cmds.editRenderLayerGlobals ( query = True, currentRenderLayer = True )
@@ -103,11 +114,9 @@ class meVRayRender ( object ):
     self.initParameters ()
     self.ui = self.setupUI ()
   #
+  # initParameters
   #
-  #def __del__( self ): print( ">> meVRayRender: Class deleted" )
-  #
-  #
-  def initParameters ( self ):
+  def initParameters ( self ) :
     #
     # Job parameters
     #
@@ -170,8 +179,8 @@ class meVRayRender ( object ):
     #
     # image parameters
     #
-    self.img_param ['img_filename_prfix']  = self.getImageFileNamePrefix ()
-    self.img_param ['img_format']          = self.getImageFormat ()
+    self.img_param [ 'img_filename_prfix' ]  = self.getImageFileNamePrefix ()
+    self.img_param [ 'img_format' ]          = self.getImageFormat ()
     #
     # Afanasy parameters
     #
@@ -192,7 +201,8 @@ class meVRayRender ( object ):
   #
   # getImageFileNamePrefix
   #
-  def getImageFileNamePrefix ( self ):
+  def getImageFileNamePrefix ( self ) :
+    #
     fileNamePrefix = cmds.getAttr ( 'vraySettings.fileNamePrefix' )
     if fileNamePrefix is None or fileNamePrefix == '' or fileNamePrefix == 'None':
       fileNamePrefix = getMayaSceneName ()
@@ -200,10 +210,16 @@ class meVRayRender ( object ):
   #
   # getImageFormat
   #
-  def getImageFormat ( self ):
+  def getImageFormat ( self ) :
+    #
     imageFormatStr = cmds.getAttr ( 'vraySettings.imageFormatStr' )
     if imageFormatStr is None : # Sometimes it happens ...
       imageFormatStr = 'png'
+    else :
+      if 'exr' in imageFormatStr : 
+        # !!! get rid of '(multichannel)'
+        imageFormatStr = 'exr'  
+      
     return imageFormatStr
   #
   # getDeferredCmd
@@ -230,7 +246,7 @@ class meVRayRender ( object ):
     options                 = str ( self.vray_param [ 'vray_options' ] ).strip ()
     vray_threads            = self.vray_param [ 'vray_threads' ]
     vray_progress_frequency = self.vray_param [ 'vray_progress_frequency' ]
-    vray_distributed = self.vray_param [ 'vray_distributed' ]
+    vray_distributed        = self.vray_param [ 'vray_distributed' ]
 
     if vray_verbosity_level < 3     : vray_verbosity_level = 3
     if vray_progress_frequency == 0 : vray_progress_frequency = 1
@@ -245,7 +261,7 @@ class meVRayRender ( object ):
       #  -distributed=1 -portNumber=20207 -renderhost="burn02.kpp;burn03.kpp;burn04.kpp"
       cmd += '-distributed=1 '
     if vray_threads != 0 : cmd += '-numThreads=' + str ( vray_threads ) + ' '
-    #cmd += '-imgFile=' + self.get_image_names ( False, layer ) + ' '
+    cmd += '-imgFile=' + self.get_image_names ( False, layer ) + ' '
 
     cmd += options
     
@@ -342,7 +358,7 @@ class meVRayRender ( object ):
     # TODO!!! check if files are exist and have to be overriden
     if isSubmitingJob and vr_reuse:
       skipExport = True
-      print "Skipping .vrscene files generation ..."
+      print 'Skipping .vrscene files generation ...'
 
     if not skipExport:
       if not animation :
@@ -415,7 +431,7 @@ class meVRayRender ( object ):
       # with current render and .vrscene generation settings
         print 'Use deferred .vrscene generation'
         #cmds.setAttr( defGlobals + '.imageFilePrefix', ( 'images/' + image_name ), type='string' )
-        scene_name = getMayaSceneName () # get scene name without extension
+        scene_name = getMayaSceneName ( withoutSubdir = False ) # get scene name without extension
         def_scene_name = scene_name + '_deferred'
 
         cmds.file ( rename=def_scene_name )
@@ -442,7 +458,7 @@ class meVRayRender ( object ):
           cmds.editRenderLayerGlobals ( currentRenderLayer = layer )
 
           vrgen_cmd = self.vrgenCommand  + ' ' + self.get_vrgen_options ( layer )
-          print "vrgen_cmd = %s" % vrgen_cmd
+          print 'vrgen_cmd = %s' % vrgen_cmd
           mel.eval ( vrgen_cmd )
 
           cmds.setAttr ( layer + '.renderable', saveMayaGlobals [ 'renderableLayer' ] )
@@ -482,7 +498,7 @@ class meVRayRender ( object ):
   #
   # submitJob
   #
-  def submitJob( self, param = None ):
+  def submitJob( self, param = None ) :
     #
     job_dispatcher   = self.job_param [ 'job_dispatcher' ]
     job_description  = self.job_param [ 'job_description' ]
@@ -516,7 +532,7 @@ class meVRayRender ( object ):
       deferred_capacity  = self.afanasy_param [ 'af_deferred_capacity' ]
 
     elif job_dispatcher == 'backburner' :
-      print 'backburner not supported in this version'
+      print 'backburner is not supported in this version'
       #self.job = MentalRayBackburnerJob ( job_name, job_description )
       return
     else :
@@ -615,7 +631,7 @@ class meVRayRender ( object ):
   #
   # vrFileNameChanged
   #
-  def vrFileNameChanged ( self, name, value ):
+  def vrFileNameChanged ( self, name, value ) :
     #
     if name == 'vr_filename' :
       setDefaultStrValue ( self_prefix, name, self.vr_param, value )
@@ -625,7 +641,7 @@ class meVRayRender ( object ):
   #
   # setResolvedPath
   #
-  def setResolvedPath ( self ):
+  def setResolvedPath ( self ) :
     #
     filename = cmds.workspace ( expandName = self.vr_param [ 'vr_filename' ] )
     ( filename, ext ) = os.path.splitext ( filename )
@@ -776,12 +792,11 @@ class meVRayRender ( object ):
   #
   # setupUI
   #
-  def setupUI ( self ):
-    #print ">> meMentalRayRender: setupUI()"
-    self.deleteUI ( True )
+  def setupUI ( self ) :
     #
     # Main window setup
     #
+    self.deleteUI ( True )
     self.winMain = cmds.window ( meVRayRenderMainWnd,
                                 title = 'meVRayRender ver.' + meVRayRenderVer + ' (' + self.os + ')' ,
                                 menuBar = True,
@@ -839,8 +854,8 @@ class meVRayRender ( object ):
     job_dispatcher = cmds.optionMenuGrp ( 'job_dispatcher', cw = ( ( 1, cw1 ), ), 
                         cal = ( 1, 'right' ),
                         label = 'Job Dispatcher ',
-                        cc = partial ( setDefaultStrValue, self_prefix, 'job_dispatcher',self.job_param ) )
-    for name in ( 'none', 'afanasy' ): cmds.menuItem ( label = name ) # 'backburner',
+                        cc = partial ( setDefaultStrValue, self_prefix, 'job_dispatcher', self.job_param ) )
+    for name in ( 'none', 'afanasy' ) : cmds.menuItem ( label = name ) # 'backburner',
     cmds.optionMenuGrp ( job_dispatcher, e = True, value = self.job_param [ 'job_dispatcher' ] )
     cmds.text ( label = '' )
     cmds.textFieldGrp ( 'job_name', cw = ( 1, cw1 ), adj = 2,
@@ -900,7 +915,8 @@ class meVRayRender ( object ):
     # .vrscene files generation tab
     #
     tab_vrparam = cmds.columnLayout ( 'tc1', columnAttach = ( 'left',0 ), rowSpacing = 0, adjustableColumn = True )
-    cmds.frameLayout ( 'fr3', label = ' Deferred .vrscene generation ',
+    # Deferred generation frame
+    fr3 = cmds.frameLayout ( 'fr3', label = ' Deferred .vrscene generation ',
                        borderVisible = True,
                        borderStyle = 'etchedIn',
                        marginHeight = mr_hi,
@@ -923,13 +939,12 @@ class meVRayRender ( object ):
                       value1 = self.vr_param [ 'vr_def_task_size' ],
                       enable = self.vr_param [ 'vr_deferred' ],
                       cc = partial ( setDefaultIntValue, self_prefix, 'vr_def_task_size', self.vr_param ) )
-    self.save_frame_bgc = cmds.frameLayout ( 'fr3', query = True, bgc = True )
-    self.def_frame_bgc = [ 0.75, 0.5, 0 ]
     bg_color = self.save_frame_bgc
     if self.vr_param [ 'vr_deferred' ] : bg_color = self.def_frame_bgc
-    cmds.frameLayout ( 'fr3', edit = True, bgc = bg_color ) # , enableBackground=False
+    cmds.frameLayout ( fr3, edit = True, bgc = bg_color ) # , enableBackground=False
     cmds.setParent ( '..' )
     cmds.setParent ( '..' )
+    # .vrscene Export Settings frame
     cmds.frameLayout ( 'fr1', label = ' Export Settings ',
                        borderVisible = True,
                        borderStyle = 'etchedIn',
@@ -975,6 +990,7 @@ class meVRayRender ( object ):
                        cc = partial ( setDefaultIntValue, self_prefix, 'vr_compression', self.vr_param ) )
     cmds.setParent ( '..' )
     cmds.setParent ( '..' )
+    # .vrscene Separate Files frame
     cmds.frameLayout ( 'fr4', label = ' Separate Files ',
                        borderVisible = True,
                        borderStyle = 'etchedIn',
@@ -1024,6 +1040,7 @@ class meVRayRender ( object ):
                        cc = partial ( setDefaultIntValue, self_prefix, 'vr_export_bitmaps', self.vr_param  ) )
     cmds.setParent ( '..' )
     cmds.setParent ( '..' )
+    # Resolved Path frame
     cmds.frameLayout ( 'fr2', label = ' Resolved Path ',
                        borderVisible = True,
                        borderStyle = 'etchedIn',
@@ -1217,16 +1234,17 @@ class meVRayRender ( object ):
     cmds.setParent ( '..' )
     cmds.setParent ( '..' )
     cmds.tabLayout ( tab, edit = True,
-                    tabLabel = ( ( tab_job, "Job" ),
-                               ( tab_vrparam, ".vrscene" ),
-                               ( tab_render, "Renderer" ),
-                               ( tab_afanasy, "Afanasy" )
+                    tabLabel = ( ( tab_job, 'Job' ),
+                               ( tab_vrparam, '.vrscene' ),
+                               ( tab_render, 'Renderer' ),
+                               ( tab_afanasy, 'Afanasy' )
                              )
                   )
     cmds.setParent ( form )
     btn_sbm = cmds.button ( label = 'Submit', command = self.submitJob, ann = 'Generate .vrscene files and submit to dispatcher' )
     btn_gen = cmds.button ( label = 'Generate .vrscene', command = self.generate_vrscene, ann = 'Force .vrscene files generation' )
     btn_cls = cmds.button ( label = 'Close', command = self.deleteUI )
+
     cmds.formLayout( form, edit = True,
                       attachForm = ( ( proj, 'top',    0 ),
                                    ( proj, 'left',    0 ),
@@ -1254,7 +1272,7 @@ class meVRayRender ( object ):
   #
   # deleteUI
   #
-  def deleteUI ( self, param ):
+  def deleteUI ( self, param ) :
     #
     winMain = meVRayRenderMainWnd
     if cmds.window ( winMain, exists = True )    : cmds.deleteUI ( winMain, window = True )
