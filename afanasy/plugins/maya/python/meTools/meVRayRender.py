@@ -1,6 +1,10 @@
 """
   meVRayRender.py
 
+  ver.0.3.8 (29 May 2013)
+    - create missing folders for Render Layers 
+    - add separator before frame number for multichannel exr (Vray4Maya bug?)
+  
   ver.0.3.7 (28 May 2013)
     - fixed small bugs with deffered generation
     - check if vray is current renderer
@@ -63,7 +67,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meVRayRender_'
-meVRayRenderVer = '0.3.7b'
+meVRayRenderVer = '0.3.8'
 meVRayRenderMainWnd = self_prefix + 'MainWnd'
 
 vray_transfer_assets_list = [ 'none', 'transfer', 'use_cache' ]
@@ -110,6 +114,8 @@ class meVRayRender ( object ) :
 
     self.save_frame_bgc = [ 0, 0, 0 ]
     self.def_frame_bgc = [ 0.75, 0.5, 0 ]
+    
+    self.exr_multichannel = False # Image Format Str = "exr (multichannel)"
     
     self.initParameters ()
     self.ui = self.setupUI ()
@@ -206,6 +212,9 @@ class meVRayRender ( object ) :
     fileNamePrefix = cmds.getAttr ( 'vraySettings.fileNamePrefix' )
     if fileNamePrefix is None or fileNamePrefix == '' or fileNamePrefix == 'None':
       fileNamePrefix = getMayaSceneName ()
+    if self.exr_multichannel :
+      # add separator before frame number for multichannel exr (Vray4Maya bug?)
+      fileNamePrefix += '.'  
     return fileNamePrefix
   #
   # getImageFormat
@@ -218,6 +227,8 @@ class meVRayRender ( object ) :
     else :
       if 'exr' in imageFormatStr : 
         # !!! get rid of '(multichannel)'
+        if '(multichannel)' in imageFormatStr :
+          self.exr_multichannel = True 
         imageFormatStr = 'exr'  
       
     return imageFormatStr
@@ -294,7 +305,7 @@ class meVRayRender ( object ) :
     #images = cmds.renderSettings( fullPath = True, genericFrameImageName = ('@' + pad_str + '@')  )
     # add layer to filename if there are some render layers
     # besides the masterLayer
-    if len ( getRenderLayersList ( False ) ) > 1 and layer is not None:
+    if len ( getRenderLayersList ( False ) ) > 1 and layer is not None :
       images_dir += '/' + layer
     imageFileName = images_dir + '/' + fileNamePrefix
     if frame_number and pad_str != '' :
@@ -449,7 +460,6 @@ class meVRayRender ( object ) :
           renderLayers.append ( current_layer )
 
         for layer in renderLayers :
-
           #if layer == 'masterLayer' : layer = 'defaultRenderLayer'
           saveMayaGlobals [ 'renderableLayer' ] = cmds.getAttr ( layer + '.renderable' )
           cmds.setAttr ( layer + '.renderable', True )
@@ -583,17 +593,29 @@ class meVRayRender ( object ) :
       else :
         # use only current layer
         renderLayers.append ( current_layer )
-
+      
+      createLayersFolders = len ( getRenderLayersList ( False ) ) > 1
+      
       for layer in renderLayers :
         cmds.editRenderLayerGlobals ( currentRenderLayer = layer )
         layer_name = layer
         if layer == 'defaultRenderLayer' : layer_name = 'masterLayer'
+        
+        if createLayersFolders :  
+          # create folders for Render Layers
+          images_rule = cmds.workspace ( fileRuleEntry = 'images' )
+          images_dir = cmds.workspace ( expandName = images_rule )
+          layer_dir = os.path.join ( images_dir, layer_name )
+          if not os.path.exists ( layer_dir ) : 
+            print '-> Create missing dir %s' % layer_dir    
+            os.makedirs ( layer_dir )
 
         frame_block = AfanasyRenderBlock ( ('render_' + layer_name ), service, self.job )
         frame_block.capacity = capacity
         frame_block.input_files = self.get_vr_file_names ( True, layer_name )
         frame_block.out_files = self.get_image_names ( True, layer_name )
-        render_cmd = self.getRenderCmd ( layer )
+        
+        render_cmd = self.getRenderCmd ( layer_name )
         
         if self.vray_param [ 'vray_distributed' ] :
           frame_block.distributed = True
