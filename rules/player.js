@@ -116,6 +116,8 @@ function p_Init()
 	p_PaintColorSet( p_paintColor);
 	p_PaintSizeSet( p_paintSize);
 
+	$('comments').onkeydown = c_CmOnKeyDown;
+
 	p_PathChanged();
 }
 
@@ -904,7 +906,7 @@ function p_Comment()
 	}
 }
 
-function c_Onclick( e) { e.stopPropagation(); }
+function c_CmOnKeyDown( e) { e.stopPropagation(); }
 
 // ====================== WEB GL ======================
 

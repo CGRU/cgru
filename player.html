@@ -18,7 +18,7 @@
 	<div id="view"></div>
 </div>
 
-<div id="comments" onclick="c_Onclick()">
+<div id="comments">
 	<div id="comments_label">Comments</div>
 	<div id="comments_body" contenteditable="true">body</div>
 </div>
@@ -75,6 +75,8 @@ Activated after reload (F5).">WebGL:</div>
 			<div style="float:left;margin:3px;padding:2px;">FPS:</div>
 			<div id="framerate"></div>
 		</div>
+			<div class="button" id="save_btn" onclick="p_Save()" title="Save all changed images
+Hotkey: S">Save</div>
 		<div class="button" id="comments_btn" onclick="p_Comment()" title="Show/Hide comments
 Hotkey: C">Comment</div>
 		<div class="button" id="paint_btn" onclick="p_Paint()" title="Show/Hide painting tools
@@ -85,8 +87,6 @@ Hotkey: P">Paint</div>
 Hotkey: ;" style="margin-right: 1px">&lt;</div>
 			<div class="button" onclick="p_NextPaintFrame(+1)" title="Next paint frame
 Hotkey: '" style="margin-left: 1px">&gt;</div>
-			<div class="button" id="save_btn" onclick="p_Save()" title="Save all changed images
-Hotkey: S">Save</div>
 			<div class="button" ondblclick="p_Clear()"title="Double click to clear painted canvas">Clear</div>
 			<div id="paint_size">
 				<div class="label" title="Paint brush size" style="margin-right: 0px">Size:</div>
