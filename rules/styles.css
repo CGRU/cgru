@@ -151,11 +151,11 @@ box-shadow: 0 0 3px #000, 0 0 3px rgba(255,255,255,.3) inset;
 margin: 2px;
 padding: 2px;
 }
-.button:hover { background: rgba(200,255,255,.1);}
 .button.pushed {
 background: transparent;
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 }
+.button:hover { background: rgba(200,255,255,.1);}
 
 .button.openclose { float:left; }
 .button.openclose.opened { font-size:14px; width: 14px; height: 14px; }

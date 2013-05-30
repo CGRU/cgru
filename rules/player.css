@@ -15,6 +15,14 @@ box-shadow:0 0 4px #000 inset, 0 0 4px #555;
 }
 #FPS:hover #framerate { color:#291; }
 
+#info_panel {
+text-align: center;
+background: #222; color: #777;
+margin: 2px; padding: 4px;
+border-radius: 4px;
+box-shadow: 0 0 2px #000 inset, 0 0 4px #555;
+}
+
 #paint .button { float:left; }
 #paint_size { float:left; }
 #paint_size > div { float:left; margin: 3px; padding: 2px; text-align: center; }
@@ -26,8 +34,10 @@ box-shadow:0 0 4px #000 inset, 0 0 4px #555;
 /* ==================== CONTENT ======================= */
 #player_content {
 position: absolute;
-top: 38px;
-bottom: 50px;
+/*top: 38px;
+bottom: 50px;*/
+top: 0px;
+bottom: 0px;
 left: 0px; right: 0px;
 overflow: hidden;
 }
@@ -38,6 +48,27 @@ overflow: hidden;
 
 /*#player_content #view img { position: absolute; }*/
 #player_content #view canvas { position: absolute; top: 0px; left: 0px; /*border: 4px solid #F00;*/}
+
+
+
+/* ==================== COMMENTS ======================= */
+#comments {
+position: absolute;
+bottom: 50px; left: 0px; right: 0px;
+height: 100px;
+background: #444;
+border: 1px solid #222;
+box-shadow: 0 0 4px #000, 0 0 4px #777 inset;
+}
+#comments_label { text-align: center; font-size: 14px; }
+#comments_body {
+position: absolute;
+top: 16px; left: 4px; right: 4px; bottom: 4px;
+background: #222;
+box-shadow: 0 0 2px #000 inset, 0 0 2px #777;
+border-radius: 4px;
+padding: 4px;
+}
 
 
 

@@ -41,6 +41,9 @@ p_bar_clr_saved  = [   0, 255, 0];
 p_frame_bar_height = 16;
 p_frame_bar_width = 2000;
 
+p_commenting = false;
+p_comments = [];
+
 p_saving = false;
 p_filestosave = 0;
 p_filessaved = 0;
@@ -49,13 +52,13 @@ p_fps = 24.0;
 p_interval = 40;
 p_drawTime = new Date();
 
-p_elements = ['player_content','play_slider','frame_bar','view','header','footer','paint','colors','btn_save','btn_paint','framerate'];
+p_elements = ['player_content','play_slider','frame_bar','view','framerate'];
 p_el = {};
 p_buttons = ['play','prev','next','reverse','rewind','forward'];
 p_elb = {};
 
-function p_OpenCloseHeader(){u_OpenCloseHeaderFooter(document.getElementById('headeropenbtn'),'header',-200,0);}
-function p_OpenCloseFooter(){u_OpenCloseHeaderFooter(document.getElementById('footeropenbtn'),'footer',50,250);}
+function p_OpenCloseHeader(){u_OpenCloseHeaderFooter($('headeropenbtn'),'header',-200,0);}
+function p_OpenCloseFooter(){u_OpenCloseHeaderFooter($('footeropenbtn'),'footer',50,250);}
 
 function p_Init()
 {
@@ -94,7 +97,7 @@ function p_Init()
 	}
 	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
 
-	u_DrawColorBars( p_el.colors, p_ColorOnClick, 25);
+	u_DrawColorBars( $('paint_palette'), p_ColorOnClick, 25);
 	p_el.view.onmousedown = p_ViewOnMouseDown;
 	p_el.view.onmousemove = p_ViewOnMouseMove;
 	p_el.view.onmouseup = p_ViewOnMouseUp;
@@ -114,6 +117,11 @@ function p_Init()
 	p_PaintSizeSet( p_paintSize);
 
 	p_PathChanged();
+}
+
+function p_Info( i_text)
+{
+	$('info_panel').innerHTML = i_text;
 }
 
 function p_PrecreateOnClick()
@@ -207,6 +215,7 @@ function p_PathChanged()
 	}
 
 	c_Info('Loading '+p_images.length+' images: '+c_Bytes2KMG( p_fileSizeTotal));
+	p_Info('Loading images sequence');
 
 	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_filenames[0];
 }
@@ -240,28 +249,32 @@ function p_ImgLoaded(e)
 	$('bar_canvas').height = p_frame_bar_height;
 	p_bar_ctx = $('bar_canvas').getContext('2d');
 	p_bar_ctx.globalCompositeOperation = 'source-over';
-//p_bar_ctx.fillStyle = 'rgb('+p_bar_clr_canvas.join(',')+')';
-//p_bar_ctx.fillRect( 10, 0, 10, p_frame_bar_height);
 
 	if( localStorage.player_usewebgl == 'ON' )
+	{
+		p_Info('Starting web GL');
 		gl_Start();
+	}
 	else
+	{
+		p_Info('Creating images');
 		p_CreateImages();
+	}
 
 	p_ShowFrame( p_frame);
 	p_ViewHome();
 //	setTimeout('p_ViewHome();',100);
 
 	// Just information:
-	var info = 'Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height;
-	if( p_fileSizeTotal ) info += ': '+c_Bytes2KMG( p_fileSizeTotal);
-	info += ': '+sec.toFixed(1)+' seconds';
+	var info = p_images.length+' images '+p_images[0].width+'x'+p_images[0].height;
+	if( p_fileSizeTotal ) info += ': loaded '+c_Bytes2KMG( p_fileSizeTotal);
+	info += ' at '+sec.toFixed(1)+' seconds';
 	if(( sec > 0 ) && p_fileSizeTotal )
 	{
 		var speed = p_fileSizeLoaded / sec;
 		info += ': '+c_Bytes2KMG( speed)+'/s';
 	}
-	c_Info( info);
+	p_Info( info);
 }
 
 function p_CreateImages()
@@ -342,6 +355,15 @@ function p_ViewTransform( i_tx, i_ty, i_zoom)
 function p_OnKeyDown(e)
 {
 //window.console.log(e.keyCode);
+	if( e.keyCode == 116) // F5
+	{
+		c_Info('Use CTRL+R to refresh. All loaded and painted images will be lost!');
+		return false;
+	}
+
+	if( e.ctrlKey ) return;
+	if( e.altKey  ) return;
+
 	if( e.keyCode == 27 ) // ESC
 	{
 		cgru_ClosePopus();
@@ -377,28 +399,30 @@ function p_OnKeyDown(e)
 	else if( e.keyCode == 59  ) p_NextPaintFrame(-1);  // ;
 	else if( e.keyCode == 222 ) p_NextPaintFrame(+1);  // '
 
+	else if( e.keyCode == 67  ) p_Comment(); // C
+
 	else if( e.keyCode == 83  ) p_Save(); // S
 }
 
 function p_FullScreen()
 {
-	if( p_el.header.m_hidden )
+	if( $('header').m_hidden )
 	{
-		p_el.header.m_hidden = false;
-		p_el.header.style.display = 'block';
-		p_el.footer.style.display = 'block';
-		p_el.player_content.style.top = p_top;
-		p_el.player_content.style.bottom = p_bottom;
+		$('header').m_hidden = false;
+		$('header').style.display = 'block';
+		$('footer').style.display = 'block';
+//p_el.player_content.style.top = p_top;
+//p_el.player_content.style.bottom = p_bottom;
 	}
 	else
 	{
-		p_el.header.m_hidden = true;
-		p_el.header.style.display = 'none';
-		p_el.footer.style.display = 'none';
-		p_el.player_content.style.top = '0';
-		p_el.player_content.style.bottom = '0';
+		$('header').m_hidden = true;
+		$('header').style.display = 'none';
+		$('footer').style.display = 'none';
+//p_el.player_content.style.top = '0';
+//p_el.player_content.style.bottom = '0';
 	}
-//	p_ViewHome();
+//p_ViewHome();
 }
 
 function p_PushButton( i_btn)
@@ -592,12 +616,16 @@ function p_Paint()
 {
 	if( p_painting )
 	{
-		p_el.paint.style.display = 'none';
+		$('info_panel').style.display = 'block';
+		$('paint_panel').style.display = 'none';
+		$('paint_btn').classList.remove('pushed');
 		p_painting = false;
 	}
 	else
 	{
-		p_el.paint.style.display = 'block';
+		$('info_panel').style.display = 'none';
+		$('paint_panel').style.display = 'block';
+		$('paint_btn').classList.add('pushed');
 		p_painting = true;
 	}
 }
@@ -670,7 +698,6 @@ function p_ViewOnMouseMove( i_evt)
 	if( p_paintCtx == null ) return;
 	var c = p_GetCtxCoords( i_evt);
 	p_paintCtx.lineTo( c.x, c.y);
-//var wasedited = p_paintElCanvas[p_frame].m_edited;
 	p_paintElCanvas[p_frame].m_edited = true;
 	p_paintElCanvas[p_frame].m_saved = false;
 	p_paintCtx.stroke();
@@ -737,14 +764,13 @@ function p_Clear()
 
 function p_Save()
 {
-//if( p_painting == false ) return;
 	if( p_saving ) return;
 
 	p_saving = true;
 	p_filestosave = 0;
 	p_filessaved = 0;
 
-	p_el.btn_save.classList.add('pushed');
+	$('save_btn').classList.add('pushed');
 	for( var f = 0; f < p_images.length; f++)
 	{
 		var canvas = p_paintElCanvas[f];
@@ -807,7 +833,7 @@ function n_MessageReceived( i_msg)
 function p_SavingFinished( folder)
 {
 	p_saving = false;
-	p_el.btn_save.classList.remove('pushed');
+	$('save_btn').classList.remove('pushed');
 	if( folder )
 		c_Info('Saved '+p_filessaved+' files to "'+folder+'"');
 	else
@@ -859,8 +885,26 @@ function p_SetPaintState( i_update_whole_bar )
 	}
 
 	p_el.view.style.boxShadow = shadow;
-	p_el.btn_paint.style.boxShadow = shadow;
+	$('paint_btn').style.boxShadow = shadow;
 }
+
+function p_Comment()
+{
+	if( p_commenting )
+	{
+		$('comments').style.display = 'none';
+		$('comments_btn').classList.remove('pushed');
+		p_commenting = false;
+	}
+	else
+	{
+		$('comments').style.display = 'block';
+		$('comments_btn').classList.add('pushed');
+		p_commenting = true;
+	}
+}
+
+function c_Onclick( e) { e.stopPropagation(); }
 
 // ====================== WEB GL ======================
 

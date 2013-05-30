@@ -18,6 +18,11 @@
 	<div id="view"></div>
 </div>
 
+<div id="comments" onclick="c_Onclick()">
+	<div id="comments_label">Comments</div>
+	<div id="comments_body" contenteditable="true">body</div>
+</div>
+
 <div id="header">
 	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; border-radius: 5px; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px; background: #AAA">
 		<div style="top: 0px; bottom: 0px; width: 250px; position: absolute; /*border: 1px solid #000;*/">
@@ -70,14 +75,17 @@ Activated after reload (F5).">WebGL:</div>
 			<div style="float:left;margin:3px;padding:2px;">FPS:</div>
 			<div id="framerate"></div>
 		</div>
-		<div class="button" id="btn_paint" onclick="p_Paint()" title="Start frame painting
+		<div class="button" id="comments_btn" onclick="p_Comment()" title="Show/Hide comments
+Hotkey: C">Comment</div>
+		<div class="button" id="paint_btn" onclick="p_Paint()" title="Show/Hide painting tools
 Hotkey: P">Paint</div>
-		<div id="paint" style="display:none">
+		<div id="info_panel">Initializing player</div>
+		<div id="paint_panel" style="display:none">
 			<div class="button" onclick="p_NextPaintFrame(-1)" title="Previous paint frame
 Hotkey: ;" style="margin-right: 1px">&lt;</div>
 			<div class="button" onclick="p_NextPaintFrame(+1)" title="Next paint frame
 Hotkey: '" style="margin-left: 1px">&gt;</div>
-			<div class="button" id="btn_save" onclick="p_Save()" title="Save all changed images
+			<div class="button" id="save_btn" onclick="p_Save()" title="Save all changed images
 Hotkey: S">Save</div>
 			<div class="button" ondblclick="p_Clear()"title="Double click to clear painted canvas">Clear</div>
 			<div id="paint_size">
@@ -89,7 +97,7 @@ Hotkey: 9" style="margin-right: 1px; margin-left: 2px">-</div>
 Hotkey: 0" style="margin-left: 1px">+</div>
 			</div>
 			<div id="paint_color" title="Brush color"></div>
-			<div id="colors"></div>
+			<div id="paint_palette"></div>
 		</div>
 	</div>
 </div>
