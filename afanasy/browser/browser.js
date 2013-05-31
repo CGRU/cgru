@@ -359,8 +359,11 @@ function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 		wnd.document.write('</head><body></body></html>');
 		wnd.document.body.onkeydown = g_OnKeyDown;
 	}
-	if( localStorage.background ) wnd.document.body.style.background = localStorage.background;
-	if( localStorage.text_color ) wnd.document.body.style.color = localStorage.text_color;
+	if( wnd.document.body )
+	{
+		if( localStorage.background ) wnd.document.body.style.background = localStorage.background;
+		if( localStorage.text_color ) wnd.document.body.style.color = localStorage.text_color;
+	}
 	wnd.focus();
 
 	return wnd;
@@ -595,7 +598,6 @@ function g_ShowTask( i_obj)
 	var wdir = i_obj.working_directory;
 	var wdirPM = cgru_PM( wdir);
 
-//	doc.body.classList.add('task_exec');
 	doc.write('</head><body class="task_exec">');
 	doc.write('<div><i>Name:</i> <b>'+i_obj.name+'</b></div>');
 	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
@@ -624,19 +626,22 @@ function g_ShowTask( i_obj)
 		doc.write('<div class="param">'+cmdPM+'</div>');
 	}
 
-	doc.write('<div><i>Files:</i></div>');
-	var files = i_obj.files.split(';');
-	for( var f = 0; f < files.length; f++)
+	if( i_obj.files && i_obj.files.length )
 	{
-		doc.write('<div>');
-		doc.write('<div class="param">'+files[f]+'</div>');
-		var cmds = cgru_Config.previewcmds;
-		for( var c = 0; c < cmds.length; c++ )
+		doc.write('<div><i>Files:</i></div>');
+		var files = i_obj.files.split(';');
+		for( var f = 0; f < files.length; f++)
 		{
-			cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, files[f]));
-			doc.write('<div class="cmdexec">'+cmd+'</div>');
+			doc.write('<div>');
+			doc.write('<div class="param">'+files[f]+'</div>');
+			var cmds = cgru_Config.previewcmds;
+			for( var c = 0; c < cmds.length; c++ )
+			{
+				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, files[f]));
+				doc.write('<div class="cmdexec">'+cmd+'</div>');
+			}
+			doc.write('</div>');
 		}
-		doc.write('</div>');
 	}
 
 	doc.write('<div>Raw Object:</div><div class="task_data">');

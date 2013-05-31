@@ -547,7 +547,7 @@ box-shadow: 0 0 4px #000 inset;
 .dailies div .param, .dailies .rules { box-shadow: 0 0 4px #000 inset;}
 /*.dailies div .param { background: #DDD;}*/
 .dailies .rules { padding: 12px;  border-radius: 6px;}
-.dailies .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; }
+.dailies .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; font-size: 14px; margin: 4px 4px 2px 0px; }
 .dailies .choise.selected { background: rgba(255,255,0,.2); box-shadow: 0 0 2px #000 inset; }
 
 .administrate { color: #000000; }
