@@ -1,8 +1,11 @@
+g_auth_user = null;
+
 p_PLAYER = true;
 
 p_imgTypes = ['jpg','jpeg','png'];
 
 p_path = null;
+p_rootpath = null;
 p_imageMode = false;
 p_elImg = [];
 p_images = [];
@@ -43,6 +46,8 @@ p_frame_bar_width = 2000;
 
 p_commenting = false;
 p_comments = [];
+p_cm_saved = [];
+p_cm_keytime = (new Date()).getTime();
 
 p_saving = false;
 p_filestosave = 0;
@@ -74,8 +79,11 @@ function p_Init()
 
 	var request = {};
 	var config = c_Parse( n_Request({"initialize":request}));
+	if( config == null ) return;
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
+	if( config.user )
+		g_auth_user = config.user;
 
 	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 
@@ -116,7 +124,8 @@ function p_Init()
 	p_PaintColorSet( p_paintColor);
 	p_PaintSizeSet( p_paintSize);
 
-	$('comments').onkeydown = c_CmOnKeyDown;
+	$('comments').onkeydown = p_CmOnKeyDown;
+	$('comments_body').onblur = p_CmProcess;
 
 	p_PathChanged();
 }
@@ -163,21 +172,21 @@ function p_PathChanged()
 	p_paintElCanvas = [];
 
 	p_path = c_GetHashPath();
-	p_path = RULES_TOP.root + p_path;
+	p_rootpath = RULES_TOP.root + p_path;
 
-	var walk = n_WalkDir([p_path])[0];
+	var walk = n_WalkDir([p_rootpath])[0];
 	if( walk.files == null )
 	{
-		if( c_FileCanEdit( p_path))
+		if( c_FileCanEdit( p_rootpath))
 		{
-			walk.files = [{"name":c_PathBase( p_path)}];
-			p_path = c_PathDir( p_path);
+			walk.files = [{"name":c_PathBase( p_rootpath)}];
+			p_rootpath = c_PathDir( p_rootpath);
 			p_imageMode = true;
 			$('playback_controls').style.display = 'none';
 		}
 		else
 		{
-			c_Error('Cant`t edit ' + p_path);
+			c_Error('Cant`t edit ' + p_rootpath);
 			return;
 		}
 	}
@@ -199,7 +208,7 @@ function p_PathChanged()
 		var type = file.split('.').pop().toLowerCase();
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
-		img.src = p_path + '/' + file;
+		img.src = p_rootpath + '/' + file;
 		img.onload = function(e){p_ImgLoaded(e);}
 		img.onerror = function(e){p_ImgLoaded(e);}
 		img.m_file = walk.files[i];
@@ -219,7 +228,7 @@ function p_PathChanged()
 	c_Info('Loading '+p_images.length+' images: '+c_Bytes2KMG( p_fileSizeTotal));
 	p_Info('Loading images sequence');
 
-	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_filenames[0];
+	window.document.title = p_rootpath.substr( p_rootpath.lastIndexOf('/')+1)+'/'+p_filenames[0];
 }
 
 function p_ImgLoaded(e)
@@ -291,7 +300,7 @@ function p_CreateImages()
 	{
 		var elImg = document.createElement('img');
 		p_el.view.appendChild( elImg);
-		elImg.src = p_path + '/' + p_filenames[i];
+		elImg.src = p_rootpath + '/' + p_filenames[i];
 		if( localStorage.player_precreate == 'ON' )
 			elImg.style.display = 'none';
 		elImg.onmousedown = function(){return false;}
@@ -398,10 +407,11 @@ function p_OnKeyDown(e)
 	else if( e.keyCode == 80  ) p_Paint();             // P
 	else if( e.keyCode == 57  ) p_PaintSizeChange(-1); // 9
 	else if( e.keyCode == 48  ) p_PaintSizeChange(+1); // 0
-	else if( e.keyCode == 59  ) p_NextPaintFrame(-1);  // ;
-	else if( e.keyCode == 222 ) p_NextPaintFrame(+1);  // '
 
 	else if( e.keyCode == 67  ) p_Comment(); // C
+
+	else if( e.keyCode == 59  ) p_NextEditedFrame(-1); // ;
+	else if( e.keyCode == 222 ) p_NextEditedFrame(+1); // '
 
 	else if( e.keyCode == 83  ) p_Save(); // S
 }
@@ -534,7 +544,7 @@ function p_NextFrame( i_val)
 		if( localStorage.player_precreate == 'ON' )
 			p_elImg[p_frame].style.display = 'block';
 		else
-			p_elImg[0].src = p_path + '/' + p_filenames[p_frame];
+			p_elImg[0].src = p_rootpath + '/' + p_filenames[p_frame];
 	}
 
 	if( p_paintElCanvas[p_frame])
@@ -546,7 +556,7 @@ function p_NextFrame( i_val)
 		width = 100.0*p_frame/(p_images.length-1) + '%';
 	p_el.play_slider.style.width = width;
 
-	p_SetPaintState();
+	p_SetEditingState();
 
 	var now = new Date();
 	var delta = now.valueOf() - p_drawTime.valueOf();
@@ -568,11 +578,11 @@ function p_NextFrame( i_val)
 	}
 }
 
-function p_NextPaintFrame( i_dir)
+function p_NextEditedFrame( i_dir)
 {
 	if( p_loaded == false ) return;
 	f = p_frame + i_dir;
-	while( p_paintElCanvas[f] == null )
+	while(( p_paintElCanvas[f] == null ) && ( p_comments[f] == null ))
 	{
 		if(( f < 0 ) || ( f >= p_images.length )) return;
 		f += i_dir;
@@ -612,6 +622,63 @@ function p_SliderOnMouseOut()
 //window.console.log('p_SliderOnMouseOut');
 	if( p_slidertimer ) clearInterval( p_slidertimer);
 	p_slidertimer = setTimeout('p_slidering = false;', 1000);
+}
+
+function p_Save()
+{
+	if( g_auth_user == null )
+	{
+		c_Error('Guests can`t save.');
+		return;
+	}
+
+	if( p_saving ) return;
+
+	p_saving = true;
+	$('save_btn').classList.add('pushed');
+
+	p_filestosave = 0;
+	p_filessaved = 0;
+
+	p_CommentsSave();
+	p_PaintSave();
+}
+
+function p_SetEditingState( i_update_whole_bar )
+{
+	p_PaintSetState();
+	p_CmSetState();
+
+	// Draw frame bar:
+	var start_frame = p_frame;
+	var end_frame = p_frame;
+	if( i_update_whole_bar )
+	{
+		start_frame = 0;
+		end_frame = p_images.length-1;
+	}
+	var width = p_frame_bar_width / (p_images.length-1);
+	for( var f = start_frame; f <= end_frame; f++)
+	{
+		var pos = p_frame_bar_width * f / (p_images.length-1) - .5*width;
+
+		if( p_paintElCanvas[f] || p_comments[f] )
+		{
+			var color = p_bar_clr_canvas;
+			if(( p_paintElCanvas[f] && p_paintElCanvas[f].m_edited ) || p_comments[f] )
+			{
+				color = p_bar_clr_edited;
+				if(( p_paintElCanvas[f] && p_paintElCanvas[f].m_saved && p_cm_saved[f] ) ||
+					(( p_paintElCanvas[f] == null ) && p_cm_saved[f] ) ||
+					(( p_comments[f] == null ) && p_paintElCanvas[f].m_saved ))
+					color = p_bar_clr_saved;
+			}
+			p_bar_ctx.fillStyle = 'rgb('+color.join(',')+')';
+			p_bar_ctx.fillRect( pos, 0, width, p_frame_bar_height);
+		}
+		else
+			p_bar_ctx.clearRect( pos, 0, width, p_frame_bar_height);
+	}
 }
 
 function p_Paint()
@@ -665,7 +732,7 @@ i_evt.stopPropagation();
 	p_paintCtx.lineCap = 'round';
 	p_paintCtx.strokeStyle = 'rgb('+p_paintColor.join(',')+')';
 
-	p_SetPaintState();
+	p_SetEditingState();
 }
 function p_GetCtxCoords( i_evt)
 {
@@ -703,7 +770,7 @@ function p_ViewOnMouseMove( i_evt)
 	p_paintElCanvas[p_frame].m_edited = true;
 	p_paintElCanvas[p_frame].m_saved = false;
 	p_paintCtx.stroke();
-	p_SetPaintState();
+	p_SetEditingState();
 }
 function p_ViewOnMouseUp()
 {
@@ -750,7 +817,7 @@ function p_PaintSizeKeyDown( e)
 	if( e.keyCode == 40 ) { p_PaintSizeChange(-1); return false; }; // DOWN
 }
 
-function p_Clear()
+function p_PaintClear()
 {
 	if( p_loaded == false ) return;
 	if( p_painting == false ) return;
@@ -761,18 +828,11 @@ function p_Clear()
 	p_paintElCanvas[p_frame] = null;
 	p_el.view.removeChild( canvas);
 
-	p_SetPaintState();
+	p_SetEditingState();
 }
 
-function p_Save()
+function p_PaintSave()
 {
-	if( p_saving ) return;
-
-	p_saving = true;
-	p_filestosave = 0;
-	p_filessaved = 0;
-
-	$('save_btn').classList.add('pushed');
 	for( var f = 0; f < p_images.length; f++)
 	{
 		var canvas = p_paintElCanvas[f];
@@ -789,15 +849,15 @@ function p_Save()
 		var data = canvas.toDataURL('image/jpeg',.8);
 		data = data.substr( data.indexOf(',')+1);
 
-		var path = p_path;
+		var path = p_rootpath;
 		if( p_imageMode )
 		{
 			path += '/' + p_filenames[f] + '.painted.jpg';
 		}
 		else
 		{
-			var path = p_path.substr( 0, p_path.lastIndexOf('/'));
-			var folder = p_path.substr( p_path.lastIndexOf('/')+1);
+			var path = p_rootpath.substr( 0, p_rootpath.lastIndexOf('/'));
+			var folder = p_rootpath.substr( p_rootpath.lastIndexOf('/')+1);
 			path = path+'/'+folder+'.painted/'+p_filenames[f];
 		}
 
@@ -825,7 +885,7 @@ function n_MessageReceived( i_msg)
 		if( p_imageMode ) frame = 0;
 		if( p_paintElCanvas[frame])
 			p_paintElCanvas[frame].m_saved = true;
-//p_SetPaintState();
+//p_SetEditingState();
 		c_Info('Saved "'+name +'" '+p_filessaved+' of '+p_filestosave);
 		if( p_filessaved >= p_filestosave )
 			p_SavingFinished( file.substr( 0, file.lastIndexOf('/')).substr( file.indexOf('/')));
@@ -836,14 +896,12 @@ function p_SavingFinished( folder)
 {
 	p_saving = false;
 	$('save_btn').classList.remove('pushed');
-	if( folder )
-		c_Info('Saved '+p_filessaved+' files to "'+folder+'"');
-	else
-		c_Info('Saved '+p_filessaved+' files');
-	p_SetPaintState( true);
+	if( folder && p_filessaved )
+		c_Info('Saved '+p_filessaved+' images to "'+folder+'"');
+	p_SetEditingState( true);
 }
 
-function p_SetPaintState( i_update_whole_bar )
+function p_PaintSetState()
 {
 	var shadow = '0 0 4px #000';
 	if( p_paintElCanvas[p_frame] )
@@ -857,38 +915,11 @@ function p_SetPaintState( i_update_whole_bar )
 		}
 	}
 
-	// Draw frame bar:
-	var start_frame = p_frame;
-	var end_frame = p_frame;
-	if( i_update_whole_bar )
-	{
-		start_frame = 0;
-		end_frame = p_images.length-1;
-	}
-	var width = p_frame_bar_width / (p_images.length-1);
-	for( var f = start_frame; f <= end_frame; f++)
-	{
-		var pos = p_frame_bar_width * f / (p_images.length-1) - .5*width;
-
-		if( p_paintElCanvas[f] )
-		{
-			var color = p_bar_clr_canvas;
-			if( p_paintElCanvas[f].m_edited )
-			{
-				color = p_bar_clr_edited;
-				if( p_paintElCanvas[f].m_saved )
-					color = p_bar_clr_saved;
-			}
-			p_bar_ctx.fillStyle = 'rgb('+color.join(',')+')';
-			p_bar_ctx.fillRect( pos, 0, width, p_frame_bar_height);
-		}
-		else
-			p_bar_ctx.clearRect( pos, 0, width, p_frame_bar_height);
-	}
-
 	p_el.view.style.boxShadow = shadow;
 	$('paint_btn').style.boxShadow = shadow;
 }
+
+// ===================== Comments: ===================
 
 function p_Comment()
 {
@@ -906,9 +937,79 @@ function p_Comment()
 	}
 }
 
-function c_CmOnKeyDown( e) { e.stopPropagation(); }
+function p_CmOnKeyDown( e) { e.stopPropagation(); }
 
+function p_CmProcess()
+{
+	var text = $('comments_body').innerHTML;
+	if( text.length )
+	{
+		if( p_comments[p_frame] == text )
+			return;
+		p_comments[p_frame] = text;
+	}
+	else
+		p_comments[p_frame] = null;
+
+	p_cm_saved[p_frame] = false;
+	p_SetEditingState();
+}
+
+function p_CmSetState()
+{
+	var shadow = '0 0 4px #000';
+	if( p_comments[p_frame] )
+	{
+		shadow = '0 0 4px #F00';
+		$('comments_body').innerHTML = p_comments[p_frame];
+		if( p_cm_saved[p_frame] )
+			shadow = '0 0 4px #0F0';
+	}
+	else
+		$('comments_body').innerHTML = '';
+	$('comments_btn').style.boxShadow = shadow;
+}
+
+function p_CommentsSave()
+{
+	var cm = {};
+	var key = p_cm_keytime + '_' + g_auth_user.id;
+	cm.user_name = g_auth_user.id;
+	cm.ctime = (new Date()).getTime();
+	cm.sequence = p_path;
+	cm.frames = [];
+
+	for( var f = 0; f < p_images.length; f++ )
+	{
+		if( p_comments[f] == null ) continue;
+		if( p_cm_saved[f] ) continue;
+		p_cm_saved[f] = true;
+
+		var fcm = {};
+		fcm.frame = f;
+		fcm.file = p_filenames[f];
+		fcm.text = p_comments[f];
+		cm.frames.push( fcm);
+	}
+
+	var comments = {};
+	comments[key] = cm;
+	var edit = {};
+	edit.object = {"comments":comments};
+	edit.add = true;
+	edit.file = p_rootpath + '/comments.json';
+
+	res = c_Parse( n_Request({"editobj":edit}));
+	if( c_NullOrErrorMsg( res)) return;
+
+	c_Info('Comments saved.');
+
+console.log(JSON.stringify( cm));
+}
+
+// ====================================================
 // ====================== WEB GL ======================
+// ====================================================
 
 var gl;
 

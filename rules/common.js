@@ -63,6 +63,17 @@ function c_Parse( i_data)
 	return obj;
 }
 
+function c_NullOrErrorMsg( i_obj)
+{
+	if( i_obj == null ) return true;
+	if( i_obj.error )
+	{
+		c_Error( i_obj.error);
+		return true;
+	}
+	return false;
+}
+
 function c_CloneObj( i_obj)
 {
 	return JSON.parse( JSON.stringify( i_obj));

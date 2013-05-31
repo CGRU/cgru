@@ -400,12 +400,7 @@ function cm_Save( i_el)
 
 //window.console.log( JSON.stringify( edit));
 	res = c_Parse( n_Request({"editobj":edit}));
-	if( res == null ) return;
-	if( res.error )
-	{
-		c_Error( res.error);
-		return;
-	}
+	if( c_NullOrErrorMsg( res)) return;
 	nw_MakeNews('<i>comments</i>', g_CurPath(), i_el.m_obj.user_name, i_el.m_obj.guest);
 
 	cm_all[key] = i_el.m_obj;

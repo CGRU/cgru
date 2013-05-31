@@ -18,9 +18,9 @@
 	<div id="view"></div>
 </div>
 
-<div id="comments">
+<div id="comments" style="display:none">
 	<div id="comments_label">Comments</div>
-	<div id="comments_body" contenteditable="true">body</div>
+	<div id="comments_body" contenteditable="true"></div>
 </div>
 
 <div id="header">
@@ -75,19 +75,19 @@ Activated after reload (F5).">WebGL:</div>
 			<div style="float:left;margin:3px;padding:2px;">FPS:</div>
 			<div id="framerate"></div>
 		</div>
-			<div class="button" id="save_btn" onclick="p_Save()" title="Save all changed images
+			<div class="button" id="save_btn" onclick="p_Save()" title="Save comments and changed images
 Hotkey: S">Save</div>
+		<div class="button" onclick="p_NextEditedFrame(-1)" title="Previous edited frame
+Hotkey: ;" style="margin-right: 1px">&lt;</div>
+		<div class="button" onclick="p_NextEditedFrame(+1)" title="Next edited frame
+Hotkey: '" style="margin-left: 1px">&gt;</div>
 		<div class="button" id="comments_btn" onclick="p_Comment()" title="Show/Hide comments
 Hotkey: C">Comment</div>
-		<div class="button" id="paint_btn" onclick="p_Paint()" title="Show/Hide painting tools
+		<div class="button" id="paint_btn" onclick="p_Paint()" title="Show/Hide painting tools and enable/disable painting
 Hotkey: P">Paint</div>
 		<div id="info_panel">Initializing player</div>
 		<div id="paint_panel" style="display:none">
-			<div class="button" onclick="p_NextPaintFrame(-1)" title="Previous paint frame
-Hotkey: ;" style="margin-right: 1px">&lt;</div>
-			<div class="button" onclick="p_NextPaintFrame(+1)" title="Next paint frame
-Hotkey: '" style="margin-left: 1px">&gt;</div>
-			<div class="button" ondblclick="p_Clear()"title="Double click to clear painted canvas">Clear</div>
+			<div class="button" ondblclick="p_PaintClear()"title="Double click to clear painted canvas">Clear</div>
 			<div id="paint_size">
 				<div class="label" title="Paint brush size" style="margin-right: 0px">Size:</div>
 				<div class="button" onclick="p_PaintSizeChange(-1)" title="Increase brush size

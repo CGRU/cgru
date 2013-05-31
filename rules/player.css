@@ -62,9 +62,10 @@ box-shadow: 0 0 4px #000, 0 0 4px #777 inset;
 }
 #comments_label { text-align: center; font-size: 14px; }
 #comments_body {
+background: #222;
+color: #999;
 position: absolute;
 top: 16px; left: 4px; right: 4px; bottom: 4px;
-background: #222;
 box-shadow: 0 0 2px #000 inset, 0 0 2px #777;
 border-radius: 4px;
 padding: 4px;
