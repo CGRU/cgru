@@ -136,6 +136,14 @@
 	"logo_frame_grav":"North",
 	"activity":"comp",
 
+	"codecs":{
+		"photojpg_high":"PhotoJPG High",
+		"photojpg_low":"PhotoJPG Low",
+		"h264_crf15_high":"H264 High",
+		"h264_crf15_mid":"H264 Mid",
+		"h264_crf15_low":"H264 Low"
+	},
+
 	"af_capacity":500
 }
 }

@@ -9,8 +9,8 @@ d_guiparams.push({"name":'output'});
 d_guiparams.push({"name":'filename'});
 d_guiparams.push({"name":'resolution',"width":'32%'});
 d_guiparams.push({"name":'fps',"label":'FPS',"width":'18%',"lwidth":'30px'});
-d_guiparams.push({"name":'codec',"width":'50%',"lwidth":'70px'});
-d_guiparams.push({"name":'aspect_in',"label":'Aspect In'});
+d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'50%',"lwidth":'70px'});
+//d_guiparams.push({"name":'codec'});
 
 d_expguiparams = [];
 d_expguiparams.push({"name":'quality',"label":'Compression rate, 1 is the best quality'});
@@ -120,6 +120,32 @@ function d_Make( i_path, i_outfolder)
 		wnd.m_elements[d_guiparams[p].name] = elParam;
 	}
 
+	wnd.m_codec = RULES.dailies.codec;
+	wnd.m_elCodecs = [];
+	var elCodecDiv = document.createElement('div');
+	wnd.elContent.appendChild( elCodecDiv);
+	elCodecDiv.style.clear = 'both';
+	var elCodecLabel = document.createElement('div');
+	elCodecDiv.appendChild( elCodecLabel);
+	elCodecLabel.textContent = 'Codec:';
+	elCodecLabel.classList.add('label');
+	for( var codec in RULES.dailies.codecs)
+	{
+		var el = document.createElement('div');
+		elCodecDiv.appendChild( el);
+		el.classList.add('choise');
+		el.classList.add('button');
+		el.textContent = RULES.dailies.codecs[codec];
+		el.onclick = d_CodecOnClick;
+		if( codec == wnd.m_codec )
+			el.classList.add('selected');
+
+		el.m_codec = codec;
+		el.m_wnd = wnd;
+
+		wnd.m_elCodecs.push( el);
+	}
+
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
 	elBtns.style.clear = 'both';
@@ -142,11 +168,21 @@ function d_Make( i_path, i_outfolder)
 	elRules.textContent = 'RULES.dailies='+JSON.stringify(RULES.dailies).replace(/,/g,', ');
 }
 
+function d_CodecOnClick( i_evt)
+{
+	var el = i_evt.currentTarget;
+	for( var i = 0; i < el.m_wnd.m_elCodecs.length; i++)
+		el.m_wnd.m_elCodecs[i].classList.remove('selected');
+	el.classList.add('selected');
+	el.m_wnd.m_codec = el.m_codec;
+}
+
 function d_ProcessGUI( i_wnd)
 {
 	var params = {};
 	for( var p = 0; p < d_guiparams.length; p++)
 		params[d_guiparams[p].name] = i_wnd.m_elements[d_guiparams[p].name].textContent;
+	params['codec'] = i_wnd.m_codec;
 
 	i_wnd.destroy();
 
