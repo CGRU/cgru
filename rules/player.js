@@ -1,11 +1,10 @@
-g_auth_user = null;
-
 p_PLAYER = true;
+
+p_savepath = '.commented';
 
 p_imgTypes = ['jpg','jpeg','png'];
 
 p_path = null;
-p_rootpath = null;
 p_imageMode = false;
 p_elImg = [];
 p_images = [];
@@ -62,6 +61,8 @@ p_el = {};
 p_buttons = ['play','prev','next','reverse','rewind','forward'];
 p_elb = {};
 
+g_auth_user = null;
+
 function p_OpenCloseHeader(){u_OpenCloseHeaderFooter($('headeropenbtn'),'header',-200,0);}
 function p_OpenCloseFooter(){u_OpenCloseHeaderFooter($('footeropenbtn'),'footer',50,250);}
 
@@ -85,11 +86,10 @@ function p_Init()
 	if( config.user )
 		g_auth_user = config.user;
 
-	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
+	c_RulesMergeDir( RULES, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 
-	if( RULES_TOP.cgru_config )
-		cgru_ConfigJoin( RULES_TOP.cgru_config );
-//	RULES = RULES_TOP;
+	if( RULES.cgru_config )
+		cgru_ConfigJoin( RULES.cgru_config );
 
 	if( localStorage.player_precreate == null ) localStorage.player_precreate = 'OFF';
 	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
@@ -172,21 +172,22 @@ function p_PathChanged()
 	p_paintElCanvas = [];
 
 	p_path = c_GetHashPath();
-	p_rootpath = RULES_TOP.root + p_path;
 
-	var walk = n_WalkDir([p_rootpath])[0];
+	var walk = n_WalkDir([p_path], 0, '.rules',['player'])[0];
+	c_RulesMergeDir( RULES, walk);
+	RULES.rufiles = walk.rufiles;
 	if( walk.files == null )
 	{
-		if( c_FileCanEdit( p_rootpath))
+		if( c_FileCanEdit( p_path))
 		{
-			walk.files = [{"name":c_PathBase( p_rootpath)}];
-			p_rootpath = c_PathDir( p_rootpath);
+			walk.files = [{"name":c_PathBase( p_path)}];
+			p_path = c_PathDir( p_path);
 			p_imageMode = true;
 			$('playback_controls').style.display = 'none';
 		}
 		else
 		{
-			c_Error('Cant`t edit ' + p_rootpath);
+			c_Error('Cant`t play ' + p_path);
 			return;
 		}
 	}
@@ -208,7 +209,7 @@ function p_PathChanged()
 		var type = file.split('.').pop().toLowerCase();
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
-		img.src = p_rootpath + '/' + file;
+		img.src = RULES.root + p_path + '/' + file;
 		img.onload = function(e){p_ImgLoaded(e);}
 		img.onerror = function(e){p_ImgLoaded(e);}
 		img.m_file = walk.files[i];
@@ -225,10 +226,21 @@ function p_PathChanged()
 		return;
 	}
 
+	if( p_imageMode )
+	{
+		p_savepath = p_path;
+	}
+	else
+	{
+		var path = p_path.substr( 0, p_path.lastIndexOf('/'));
+		var folder = p_path.substr( p_path.lastIndexOf('/')+1);
+		p_savepath = path+'/'+folder+p_savepath;
+	}
+
 	c_Info('Loading '+p_images.length+' images: '+c_Bytes2KMG( p_fileSizeTotal));
 	p_Info('Loading images sequence');
 
-	window.document.title = p_rootpath.substr( p_rootpath.lastIndexOf('/')+1)+'/'+p_filenames[0];
+	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_filenames[0];
 }
 
 function p_ImgLoaded(e)
@@ -286,6 +298,47 @@ function p_ImgLoaded(e)
 		info += ': '+c_Bytes2KMG( speed)+'/s';
 	}
 	p_Info( info);
+
+	// Process saved comments:
+	var walk = n_WalkDir([p_savepath], 0, '.rules',['player'])[0];
+	c_RulesMergeDir( RULES, walk);
+	if( RULES.player && RULES.player.comments )
+	{
+		for( var f = 0; f < p_filenames.length; f++)
+		{
+			var cm = RULES.player.comments[p_filenames[f]];
+			if( cm )
+			{
+				p_comments[f] = cm.text;
+				p_cm_saved[f] = true;
+			}
+		}
+	}
+
+	// Process saved painted images:
+	if( RULES.rufiles && RULES.rufiles.length )
+	for( var f = 0; f < p_filenames.length; f++ )
+	{
+		var pngname = p_filenames[f] + '.png';
+		if( RULES.rufiles.indexOf( pngname ) == -1 ) continue;
+		p_png = new Image();
+		p_png.src = RULES.root + p_path + '/.rules/' + pngname;
+		p_png.m_frame = f;
+		p_png.onload = function(e) {
+			var img = e.currentTarget;
+			var canvas = p_PaintCreateCanvas( img.m_frame);
+			if( img.m_frame != p_frame ) canvas.style.display = 'none';
+			canvas.m_edited = true;
+			canvas.m_saved = true;
+			var ctx = canvas.getContext('2d');
+			ctx.globalCompositeOperation = 'destination-over';
+			ctx.drawImage( img, 0, 0);
+			p_SetEditingState( true);
+		}
+	}
+
+	p_ShowFrame( p_frame);
+	p_SetEditingState( true);
 }
 
 function p_CreateImages()
@@ -300,7 +353,7 @@ function p_CreateImages()
 	{
 		var elImg = document.createElement('img');
 		p_el.view.appendChild( elImg);
-		elImg.src = p_rootpath + '/' + p_filenames[i];
+		elImg.src = RULES.root + p_path + '/' + p_filenames[i];
 		if( localStorage.player_precreate == 'ON' )
 			elImg.style.display = 'none';
 		elImg.onmousedown = function(){return false;}
@@ -544,7 +597,7 @@ function p_NextFrame( i_val)
 		if( localStorage.player_precreate == 'ON' )
 			p_elImg[p_frame].style.display = 'block';
 		else
-			p_elImg[0].src = p_rootpath + '/' + p_filenames[p_frame];
+			p_elImg[0].src = RULES.root + p_path + '/' + p_filenames[p_frame];
 	}
 
 	if( p_paintElCanvas[p_frame])
@@ -707,22 +760,9 @@ i_evt.stopPropagation();
 
 	var canvas = null;
 	if( p_paintElCanvas[p_frame] )
-	{
 		canvas = p_paintElCanvas[p_frame];
-	}
 	else
-	{
-		// Create new canvas:
-		canvas = document.createElement('canvas');
-		p_paintElCanvas[p_frame] = canvas;
-		p_el.view.appendChild( canvas);
-		canvas.width = p_images[0].width;
-		canvas.height = p_images[0].height;
-		canvas.style.width = canvas.width + 'px';
-		canvas.style.height = canvas.height + 'px';
-
-		c_Info('Canvas for "'+p_filenames[p_frame]+'" created.');
-	}
+		canvas = p_PaintCreateCanvas();
 
 //var c = p_GetCtxCoords( i_evt);
 	p_paintCtx = canvas.getContext('2d');
@@ -733,6 +773,19 @@ i_evt.stopPropagation();
 	p_paintCtx.strokeStyle = 'rgb('+p_paintColor.join(',')+')';
 
 	p_SetEditingState();
+}
+function p_PaintCreateCanvas( i_frame)
+{
+	if( i_frame == null ) i_frame = p_frame;
+	var canvas = document.createElement('canvas');
+	p_paintElCanvas[i_frame] = canvas;
+	p_el.view.appendChild( canvas);
+	canvas.width = p_images[i_frame].width;
+	canvas.height = p_images[i_frame].height;
+	canvas.style.width = canvas.width + 'px';
+	canvas.style.height = canvas.height + 'px';
+	c_Info('Canvas for "'+p_filenames[i_frame]+'" created.');
+	return canvas;
 }
 function p_GetCtxCoords( i_evt)
 {
@@ -836,30 +889,39 @@ function p_PaintSave()
 	for( var f = 0; f < p_images.length; f++)
 	{
 		var canvas = p_paintElCanvas[f];
-		if( canvas == null ) continue;
+		var canvas_dummy = false;
+		if( canvas == null )
+		{
+			if( p_comments[f] == null )
+				continue;
+			canvas = document.createElement("canvas");
+			canvas.width = p_images[f].width;
+			canvas.height = p_images[f].height;
+			canvas.m_edited = true;
+			canvas_dummy = true;
+		}
 		if( canvas.m_edited != true ) continue;
 		if( canvas.m_saved ) continue;
 
 		p_filestosave++;
 
+		var path = RULES.root + p_savepath + '/' + p_filenames[f];
+		if( p_imageMode )
+			path += '.painted.jpg';
+		else if( true != canvas_dummy )
+		{
+			var png = canvas.toDataURL('image/png');
+			png = png.substr( png.indexOf(',')+1);
+			var png_path = RULES.root + p_path + '/.rules/' + p_filenames[f] + '.png';
+			p_filestosave++;
+			n_Request({"save":{"file":png_path,"data":png,"type":"base64"}}, false);
+		}
+
 		var ctx = canvas.getContext('2d');
 		ctx.globalCompositeOperation = 'destination-over';
 		ctx.drawImage( p_images[f], 0, 0);
-
 		var data = canvas.toDataURL('image/jpeg',.8);
 		data = data.substr( data.indexOf(',')+1);
-
-		var path = p_rootpath;
-		if( p_imageMode )
-		{
-			path += '/' + p_filenames[f] + '.painted.jpg';
-		}
-		else
-		{
-			var path = p_rootpath.substr( 0, p_rootpath.lastIndexOf('/'));
-			var folder = p_rootpath.substr( p_rootpath.lastIndexOf('/')+1);
-			path = path+'/'+folder+'.painted/'+p_filenames[f];
-		}
 
 		n_Request({"save":{"file":path,"data":data,"type":"base64"}}, false);
 	}
@@ -972,12 +1034,13 @@ function p_CmSetState()
 
 function p_CommentsSave()
 {
-	var cm = {};
-	var key = p_cm_keytime + '_' + g_auth_user.id;
-	cm.user_name = g_auth_user.id;
-	cm.ctime = (new Date()).getTime();
-	cm.sequence = p_path;
-	cm.frames = [];
+	var pcms = {};
+
+	var rcm = {};
+	rcm.user_name = g_auth_user.id;
+	rcm.ctime = (new Date()).getTime();
+	rcm.sequence = p_path;
+	rcm.frames = [];
 
 	for( var f = 0; f < p_images.length; f++ )
 	{
@@ -986,25 +1049,39 @@ function p_CommentsSave()
 		p_cm_saved[f] = true;
 
 		var fcm = {};
-		fcm.frame = f;
 		fcm.file = p_filenames[f];
 		fcm.text = p_comments[f];
-		cm.frames.push( fcm);
+		rcm.frames.push( fcm);
+
+		var pcm = {};
+		pcm.ctime = rcm.ctime;
+		pcm.cuser = rcm.cuser;
+		pcm.text = p_comments[f];
+		pcms[p_filenames[f]] = pcm;
 	}
 
-	var comments = {};
-	comments[key] = cm;
-	var edit = {};
-	edit.object = {"comments":comments};
-	edit.add = true;
-	edit.file = p_rootpath + '/comments.json';
+	if( rcm.frames.length == 0 )
+		return;
 
-	res = c_Parse( n_Request({"editobj":edit}));
+	var key = p_cm_keytime + '_' + g_auth_user.id;
+	var edit = {};
+	edit.add = true;
+
+	edit.object = {"player":{"comments":pcms}};
+	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/player.json';
+	var res = c_Parse( n_Request({"editobj":edit}));
+	if( c_NullOrErrorMsg( res)) return;
+
+	var comments = {};
+	comments[key] = rcm;
+	edit.object = {"comments":comments};
+	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/comments.json';
+	var res = c_Parse( n_Request({"editobj":edit}));
 	if( c_NullOrErrorMsg( res)) return;
 
 	c_Info('Comments saved.');
 
-console.log(JSON.stringify( cm));
+console.log(JSON.stringify( rcm));
 }
 
 // ====================================================

@@ -780,7 +780,7 @@ function jsf_editobj( $i_edit, &$o_out)
 	$mode = 'w+';
 	if( is_file( $i_edit['file'])) $mode = 'r+';
 	if( false == is_dir( dirname($i_edit['file'])))
-		mkdir( dirname($i_edit['file']));
+		mkdir( dirname($i_edit['file']), 0777, true);
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
 		$data = fread( $fHandle, $FileMaxLength);
