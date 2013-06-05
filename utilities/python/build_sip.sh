@@ -8,7 +8,7 @@ if [ "$1" == "-h" ]; then
    exit 0
 fi
 
-pypath="$PWD/3.*/bin"
+pypath="$PWD/3.3.2/bin"
 [ -d $pypath ] && export PATH="$pypath:$PATH"
 
 python="python"
