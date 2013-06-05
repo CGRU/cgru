@@ -3,6 +3,7 @@ body { background: #333; }
 #header, #footer, #navig, #sidepanel { background: #333; box-shadow: 0px 0px 5px #000, 0px 0px 5px #555 inset; }
 
 /* ==================== HEADER ======================= */
+#rules_link { float:left; padding: 7px; cursor: pointer; }
 #FPS {float:left;margin:2px;}
 #framerate {
 float:left;

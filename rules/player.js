@@ -5,6 +5,7 @@ p_savepath = '.commented';
 p_imgTypes = ['jpg','jpeg','png'];
 
 p_path = null;
+p_rules_path = null;
 p_imageMode = false;
 p_elImg = [];
 p_images = [];
@@ -78,8 +79,15 @@ function p_Init()
 	for( var i = 0; i < p_buttons.length; i++)
 		p_elb[p_buttons[i]] = document.getElementById('btn_'+p_buttons[i]);
 
-	var request = {};
-	var config = c_Parse( n_Request({"initialize":request}));
+	SERVER = c_Parse( n_Request({"start":{}}));
+	if( SERVER == null ) return;
+	if( SERVER.error )
+	{
+		c_Error( SERVER.error);
+		return;
+	}
+
+	var config = c_Parse( n_Request({"initialize":{}}));
 	if( config == null ) return;
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
@@ -172,6 +180,12 @@ function p_PathChanged()
 	p_paintElCanvas = [];
 
 	p_path = c_GetHashPath();
+
+	p_rules_path = document.location.hash;
+	if( p_rules_path.indexOf('#') == 0 ) p_rules_path = p_rules_path.substr(1);
+	p_rules_path = c_PathDir( p_rules_path );
+	if( p_rules_path.indexOf('//') != -1 ) p_rules_path = p_rules_path.substr( 0, p_rules_path.indexOf('//'));
+	$('rules_link').href = window.location.protocol + '//' + window.location.host + c_PathDir(window.location.pathname ) + '/#' + p_rules_path;
 
 	var walk = n_WalkDir([p_path], 0, '.rules',['player'])[0];
 	c_RulesMergeDir( RULES, walk);
@@ -1040,18 +1054,20 @@ function p_CommentsSave()
 	rcm.user_name = g_auth_user.id;
 	rcm.ctime = (new Date()).getTime();
 	rcm.sequence = p_path;
-	rcm.frames = [];
+	rcm.text = 'Player comments:';
 
+	var has_comments = false;
 	for( var f = 0; f < p_images.length; f++ )
 	{
 		if( p_comments[f] == null ) continue;
+		has_comments = true;
+
+		rcm.text += '<br>';
+		rcm.text += '<br><a target="_blank" href="'+RULES.root+p_savepath+'/'+p_filenames[f]+'">'+p_filenames[f]+'</a>';
+		rcm.text += '<br>' + p_comments[f];
+
 		if( p_cm_saved[f] ) continue;
 		p_cm_saved[f] = true;
-
-		var fcm = {};
-		fcm.file = p_filenames[f];
-		fcm.text = p_comments[f];
-		rcm.frames.push( fcm);
 
 		var pcm = {};
 		pcm.ctime = rcm.ctime;
@@ -1060,7 +1076,7 @@ function p_CommentsSave()
 		pcms[p_filenames[f]] = pcm;
 	}
 
-	if( rcm.frames.length == 0 )
+	if( false == has_comments )
 		return;
 
 	var key = p_cm_keytime + '_' + g_auth_user.id;
@@ -1075,7 +1091,7 @@ function p_CommentsSave()
 	var comments = {};
 	comments[key] = rcm;
 	edit.object = {"comments":comments};
-	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/comments.json';
+	edit.file = RULES.root + p_rules_path + '/' + RULES.rufolder + '/comments.json';
 	var res = c_Parse( n_Request({"editobj":edit}));
 	if( c_NullOrErrorMsg( res)) return;
 

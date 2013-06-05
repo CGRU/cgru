@@ -246,9 +246,11 @@ FilesView.prototype.showFolder = function( i_folder)
 
 	if( ASSET && (( ASSET.path != g_CurPath()) || ( ASSET.play_folders !== false )))
 	{
+		var play_path = path;
+		if( ASSET.path ) play_path = play_path.replace(ASSET.path, ASSET.path + '/');
 		var elLinkA = document.createElement('a');
 		elFolder.appendChild( elLinkA);
-		elLinkA.setAttribute('href', 'player.html#'+path);
+		elLinkA.setAttribute('href', 'player.html#'+play_path);
 		elLinkA.setAttribute('target', '_blank');
 		elLinkA.textContent = 'play';
 		elLinkA.style.cssFloat = 'right';

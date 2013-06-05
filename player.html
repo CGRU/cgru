@@ -7,8 +7,10 @@
 <link type="text/css" rel="stylesheet" href="rules/styles.css">
 <link type="text/css" rel="stylesheet" href="rules/player.css">
 <script type="text/javascript" src="lib/cgru.js"></script>
+<script type="text/javascript" src="rules/admin.js"></script>
 <script type="text/javascript" src="rules/common.js"></script>
 <script type="text/javascript" src="rules/player.js"></script>
+<script type="text/javascript" src="rules/md5.js"></script>
 <script type="text/javascript" src="rules/network.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
 </head>
@@ -71,6 +73,7 @@ Activated after reload (F5).">WebGL:</div>
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="p_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
+		<a id="rules_link" target="_blank">RULES</a>
 		<div id="FPS">
 			<div style="float:left;margin:3px;padding:2px;">FPS:</div>
 			<div id="framerate"></div>
@@ -78,9 +81,9 @@ Activated after reload (F5).">WebGL:</div>
 			<div class="button" id="save_btn" onclick="p_Save()" title="Save comments and changed images
 Hotkey: S">Save</div>
 		<div class="button" onclick="p_NextEditedFrame(-1)" title="Previous edited frame
-Hotkey: ;" style="margin-right: 1px">&lt;</div>
+Hotkey: ;" style="margin-right: 1px">'&lt;</div>
 		<div class="button" onclick="p_NextEditedFrame(+1)" title="Next edited frame
-Hotkey: '" style="margin-left: 1px">&gt;</div>
+Hotkey: '" style="margin-left: 1px">&gt;'</div>
 		<div class="button" id="comments_btn" onclick="p_Comment()" title="Show/Hide comments
 Hotkey: C">Comment</div>
 		<div class="button" id="paint_btn" onclick="p_Paint()" title="Show/Hide painting tools and enable/disable painting
