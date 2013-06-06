@@ -35,7 +35,7 @@ p_view_dz = .1;
 p_painting = false;
 p_paintElCanvas = [];
 p_paintColor = [255,255,0];
-p_paintSize = 8;
+p_paintSize = 5;
 p_paintCtx = null;
 
 p_bar_clr_canvas = [ 255, 255, 0];

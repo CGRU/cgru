@@ -7,7 +7,7 @@ body, #header, #footer, #navig_div, #sidepanel_div, #content { background: #A0A0
 -webkit-transition: all .3s ease-in-out;
 }
 
-* { margin: 0; padding: 0; overflow: hidden; }
+div { margin: 0; padding: 0; overflow: hidden; }
 
 #header, #footer, #sidepanel_div, #content {
 box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,255,0.5) inset;

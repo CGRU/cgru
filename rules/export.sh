@@ -55,8 +55,35 @@ ls .rules
 
 mkdir Ask_Questions_Here
 mkdir Ask_Questions_Here/.rules
-mput Ask_Questions_Here/.rules/*.html Ask_Questions_Here/.rules/*.json
+mput Ask_Questions_Here/.rules/body.html Ask_Questions_Here/.rules/*.json
 ls Ask_Questions_Here/.rules
 
+mkdir CG_PROJECT
+cd CG_PROJECT
+lcd CG_PROJECT
+mkdir .rules
+mput .rules/body.html
+ls .rules
+
+mkdir SCENES
+cd SCENES
+lcd SCENES
+mkdir .rules
+mput .rules/body.html
+ls .rules
+
+mkdir A_SCENE
+cd A_SCENE
+lcd A_SCENE
+mkdir .rules
+mput .rules/body.html
+ls .rules
+
+mkdir A_SHOT
+cd A_SHOT
+lcd A_SHOT
+mkdir .rules
+mput .rules/body.html
+ls .rules
 
 END_SCRIPT
