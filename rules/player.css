@@ -119,5 +119,6 @@ box-shadow: 0 0 2px #000 inset;
 #view_zoom.zoomed { color: #777; }
 
 #footer #info { background: #222; color: #777; margin: 0px 8px; }
+#footer #info.error { color: #F44; }
 #footer #log { background: #AAA; top: 55px; }
 

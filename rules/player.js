@@ -46,7 +46,6 @@ p_frame_bar_width = 2000;
 
 p_commenting = false;
 p_comments = [];
-p_cm_saved = [];
 p_cm_keytime = (new Date()).getTime();
 
 p_saving = false;
@@ -63,6 +62,7 @@ p_buttons = ['play','prev','next','reverse','rewind','forward'];
 p_elb = {};
 
 g_auth_user = null;
+g_users = null;
 
 function p_OpenCloseHeader(){u_OpenCloseHeaderFooter($('headeropenbtn'),'header',-200,0);}
 function p_OpenCloseFooter(){u_OpenCloseHeaderFooter($('footeropenbtn'),'footer',50,250);}
@@ -91,6 +91,7 @@ function p_Init()
 	if( config == null ) return;
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
+	g_users = config.users;
 	if( config.user )
 		g_auth_user = config.user;
 
@@ -225,7 +226,7 @@ function p_PathChanged()
 		var img = new Image();
 		img.src = RULES.root + p_path + '/' + file;
 		img.onload = function(e){p_ImgLoaded(e);}
-		img.onerror = function(e){p_ImgLoaded(e);}
+		img.onerror = function(e){p_ImgLoadError(e);}
 		img.m_file = walk.files[i];
 		p_filenames.push( file)
 		p_images.push( img);
@@ -257,6 +258,13 @@ function p_PathChanged()
 	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_filenames[0];
 }
 
+function p_ImgLoadError(e)
+{
+	p_ImgLoaded(e);
+	img = e.currentTarget;
+	img.m_loaderror = true;
+	c_Error('Image load error: ' + img.m_file.name);
+}
 function p_ImgLoaded(e)
 {
 	var img = e.currentTarget;
@@ -275,6 +283,8 @@ function p_ImgLoaded(e)
 
 	c_Info( info, false);
 	p_el.play_slider.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
+
+//	if( img.complete != true ) c_Error('Image load imcopleted: ' + img.m_file.name);
 
 	if( p_numloaded < p_filenames.length ) return;
 
@@ -311,6 +321,10 @@ function p_ImgLoaded(e)
 		var speed = p_fileSizeLoaded / sec;
 		info += ': '+c_Bytes2KMG( speed)+'/s';
 	}
+	var loaderror = 0;
+	for( var f = 0; f < p_images.length; f++ ) if( p_images[f].m_loaderror ) loaderror++;
+	if( loaderror )
+		info += ' - ' + loaderror + ' errors!';
 	p_Info( info);
 
 	// Process saved comments:
@@ -322,10 +336,7 @@ function p_ImgLoaded(e)
 		{
 			var cm = RULES.player.comments[p_filenames[f]];
 			if( cm )
-			{
-				p_comments[f] = cm.text;
-				p_cm_saved[f] = true;
-			}
+				p_comments[f] = cm;
 		}
 	}
 
@@ -617,7 +628,16 @@ function p_NextFrame( i_val)
 	if( p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'block';
 
-	c_Info( p_filenames[p_frame], false);
+	var info = p_filenames[p_frame];
+	if( p_images[p_frame].m_loaderror && ( u_el.info.classList.contains('error') == false ))
+	{
+		u_el.info.classList.add('error');
+		info += ' loaded with an error.';
+	}
+	else if( u_el.info.classList.contains('error'))
+		u_el.info.classList.remove('error');
+	c_Info( info, false);
+
 	var width = '100%';
 	if( p_images.length > 1 )
 		width = 100.0*p_frame/(p_images.length-1) + '%';
@@ -714,7 +734,7 @@ function p_Save()
 function p_SetEditingState( i_update_whole_bar )
 {
 	p_PaintSetState();
-	p_CmSetState();
+	p_CmSetCurrent();
 
 	// Draw frame bar:
 	var start_frame = p_frame;
@@ -735,8 +755,8 @@ function p_SetEditingState( i_update_whole_bar )
 			if(( p_paintElCanvas[f] && p_paintElCanvas[f].m_edited ) || p_comments[f] )
 			{
 				color = p_bar_clr_edited;
-				if(( p_paintElCanvas[f] && p_paintElCanvas[f].m_saved && p_cm_saved[f] ) ||
-					(( p_paintElCanvas[f] == null ) && p_cm_saved[f] ) ||
+				if(( p_paintElCanvas[f] && p_paintElCanvas[f].m_saved && p_comments[f] && p_comments[f].saved ) ||
+					(( p_paintElCanvas[f] == null ) && p_comments[f].saved ) ||
 					(( p_comments[f] == null ) && p_paintElCanvas[f].m_saved ))
 					color = p_bar_clr_saved;
 			}
@@ -771,6 +791,8 @@ function p_ViewOnMouseDown( i_evt)
 i_evt.stopPropagation();
 	if( p_loaded == false ) return;
 	if( p_painting == false ) return;
+
+	p_CmProcess();
 
 	var canvas = null;
 	if( p_paintElCanvas[p_frame] )
@@ -1018,27 +1040,40 @@ function p_CmOnKeyDown( e) { e.stopPropagation(); }
 function p_CmProcess()
 {
 	var text = $('comments_body').innerHTML;
+//console.log('p_CmProcess: ' + text);
 	if( text.length )
 	{
-		if( p_comments[p_frame] == text )
-			return;
-		p_comments[p_frame] = text;
+		var cm = p_comments[p_frame];
+		if( cm && ( cm.text == text )) return;
+		if( cm == null ) cm = {};
+
+		cm.text = text;
+		cm.saved = false;
+		p_comments[p_frame] = cm;
 	}
 	else
 		p_comments[p_frame] = null;
 
-	p_cm_saved[p_frame] = false;
 	p_SetEditingState();
 }
 
-function p_CmSetState()
+function p_CmSetCurrent()
 {
 	var shadow = '0 0 4px #000';
-	if( p_comments[p_frame] )
+	$('comments_label').textContent = 'Comments';
+	var cm = p_comments[p_frame];
+	if( cm )
 	{
 		shadow = '0 0 4px #F00';
-		$('comments_body').innerHTML = p_comments[p_frame];
-		if( p_cm_saved[p_frame] )
+		$('comments_body').innerHTML = cm.text;
+		if( cm.cuser )
+		{
+			var label = c_GetUserTitle( cm.cuser);
+			if( cm.ctime ) label += ' at ' + c_DT_StrFromMSec( cm.ctime);
+			$('comments_label').textContent = label;
+			
+		}
+		if( cm.saved )
 			shadow = '0 0 4px #0F0';
 	}
 	else
@@ -1056,27 +1091,35 @@ function p_CommentsSave()
 	rcm.sequence = p_path;
 	rcm.text = 'Player comments:';
 
-	var has_comments = false;
+	var need_save = false;
 	for( var f = 0; f < p_images.length; f++ )
 	{
 		if( p_comments[f] == null ) continue;
-		has_comments = true;
+		if( p_comments[f].text == null ) continue;
+		if( p_comments[f].text.length == 0 ) continue;
 
+		// Collect comments for RULES for each frame always,
+		// whenever they are saved or not,
+		// or we will lost saved comments
 		rcm.text += '<br>';
 		rcm.text += '<br><a target="_blank" href="'+RULES.root+p_savepath+'/'+p_filenames[f]+'">'+p_filenames[f]+'</a>';
-		rcm.text += '<br>' + p_comments[f];
+		rcm.text += '<br>' + p_comments[f].text;
 
-		if( p_cm_saved[f] ) continue;
-		p_cm_saved[f] = true;
+		// Collect only unsaved comments for player:
+		var cm = p_comments[f];
+		if( cm.saved ) continue;
+		cm.saved = true;
+		cm.cuser = g_auth_user.id;
+		cm.ctime = rcm.ctime;
 
-		var pcm = {};
-		pcm.ctime = rcm.ctime;
-		pcm.cuser = rcm.cuser;
-		pcm.text = p_comments[f];
-		pcms[p_filenames[f]] = pcm;
+		pcms[p_filenames[f]] = cm;
+
+		// We need to save if at least one comment changed
+		need_save = true;
+		// RULES comments will saved all (see above)
 	}
 
-	if( false == has_comments )
+	if( false == need_save )
 		return;
 
 	var key = p_cm_keytime + '_' + g_auth_user.id;
@@ -1097,7 +1140,7 @@ function p_CommentsSave()
 
 	c_Info('Comments saved.');
 
-console.log(JSON.stringify( rcm));
+//console.log(JSON.stringify( rcm));
 }
 
 // ====================================================
@@ -1222,6 +1265,7 @@ function gl_InitTextures()
 }
 function gl_InitTexture( i_tex, i_img)
 {
+	if( p_images[i_img].m_loaderror ) return;
 	gl.bindTexture(gl.TEXTURE_2D, gl_textures[i_tex]);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, p_images[i_img]);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
