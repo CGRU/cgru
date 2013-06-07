@@ -377,7 +377,7 @@ margin-right: 10px;
 .files_view .item .thumbnail img {
 margin: 0;
 padding: 0;
-/*margin-bottom: -4px;*/
+margin-bottom: -4px;
 }
 .files_view .item .size { font: 12px monospace; width: 60px; text-align: right; }
 .files_view .item .mtime { font: 12px monospace; }
