@@ -1,13 +1,23 @@
 cm_file = 'comments.json';
 cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','14','16','20','24','32','40','48','66','99'];
-cm_all = {};
+cm_array = [];
 
 function View_comments_Open() { cm_Load(); }
 
 function cm_Load()
 {
 	$('comments').textContent = '';
-	cm_all = {};
+	if( ASSET && ASSET.comments_reversed )
+	{
+		$('comments_btn_0').style.display = 'none';
+		$('comments_btn_1').style.display = 'block';
+	}
+	else
+	{
+		$('comments_btn_0').style.display = 'block';
+		$('comments_btn_1').style.display = 'none';
+	}
+	cm_array = [];
 
 	if( false == c_RuFileExists( cm_file)) return;
 
@@ -15,16 +25,35 @@ function cm_Load()
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
-	cm_all = obj.comments;
-	for( key in cm_all )
-		cm_Add( cm_all[key], key);
+	for( key in obj.comments )
+	{
+		obj.comments[key].key = key;
+		cm_array.push( obj.comments[key]);
+	}
+
+	cm_array.sort( function(a,b){if(a.key<b.key)return -1;if(a.key>b.key)return 1;return 0;});
+
+	var i = 0;
+	for( var i = 0; i < cm_array.length; i++)
+		cm_Add( cm_array[i]);
+
+/*	if( ASSET && ASSET.comments_reversed ) i = cm_array.length - 1;
+	while(( i >= 0 ) && ( i < cm_array.length ))
+	{
+		cm_Add( cm_array[i]);
+		if( ASSET && ASSET.comments_reversed ) i--;
+		else i++;
+	}*/
 }
 
-function cm_Add( i_obj, i_key)
+function cm_Add( i_obj)
 {
 //window.console.log( JSON.stringify( i_obj));
 	var el = document.createElement('div');
-	$('comments').insertBefore( el, $('comments').firstChild);
+	if( ASSET && ASSET.comments_reversed )
+		$('comments').appendChild( el);
+	else
+		$('comments').insertBefore( el, $('comments').firstChild);
 	el.classList.add('comment');
 
 	var elPanel = document.createElement('div');
@@ -130,11 +159,11 @@ function cm_Add( i_obj, i_key)
 	el.m_elUploads = elUploads;
 
 	el.m_obj = i_obj;
-	cm_Init( el, i_key);
+	cm_Init( el);
 	return el;
 }
 
-function cm_Init( i_el, i_key)
+function cm_Init( i_el)
 {
 	i_el.m_elForEdit.innerHTML = '';
 	if( i_el.m_elEditPanel ) i_el.m_elPanel.removeChild( i_el.m_elEditPanel);
@@ -182,10 +211,10 @@ function cm_Init( i_el, i_key)
 		i_el.m_elAvatar.style.display = 'none';
 
 	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
-	if( i_key )
+	if( i_el.m_obj.key )
 	{
-		i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_key});
-		i_el.id = i_key;
+		i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_el.m_obj.key});
+		i_el.id = i_el.m_obj.key;
 	}
 	i_el.m_type = i_el.m_obj.type;
 
@@ -389,7 +418,8 @@ function cm_Save( i_el)
 
 	var key = i_el.m_obj.ctime+'_'+i_el.m_obj.user_name;
 
-	cm_Init( i_el, key);
+	i_el.m_obj.key = key;
+	cm_Init( i_el);
 
 	var comments = {};
 	comments[key] = i_el.m_obj;
@@ -403,28 +433,28 @@ function cm_Save( i_el)
 	if( c_NullOrErrorMsg( res)) return;
 	nw_MakeNews('<i>comments</i>', g_CurPath(), i_el.m_obj.user_name, i_el.m_obj.guest);
 
-	cm_all[key] = i_el.m_obj;
+	cm_array.push( i_el.m_obj);
 	var emails = [];
 	if( RULES.status && RULES.status.body && RULES.status.body.guest && RULES.status.body.guest.email )
 		emails.push( RULES.status.body.guest.email);
-	for( key in cm_all )
+	for( var i = 0; i < cm_array.length; i++)
 	{
-		var cm = cm_all[key];
+		var cm = cm_array[i];
 		if( cm.guest && cm.guest.email && cm.guest.email.length && ( emails.indexOf( cm.guest.email) == -1 ))
 			emails.push( cm.guest.email);
 	}
 	if( emails.length )
-		cm_EmailGuests( cm_all[key], key, emails);
+		cm_EmailGuests( i_el.m_obj, emails);
 }
 
-function cm_EmailGuests( i_cm, i_key, i_emails)
+function cm_EmailGuests( i_cm, i_emails)
 {
 	for( var i = 0; i < i_emails.length; i++)
 	{
 		var email = c_EmailDecode( i_emails[i]);
 		if( false == c_EmailValidate( email)) continue;
 		var subject = 'RULES Comment: '+g_CurPath();
-		var href = g_GetLocationArgs({"cm_Goto":i_key}, true);
+		var href = g_GetLocationArgs({"cm_Goto":i_cm.key}, true);
 		var body = '<a href="'+href+'" target="_blank">'+href+'</a>';
 		body += '<br><br>';
 		body += i_cm.text;

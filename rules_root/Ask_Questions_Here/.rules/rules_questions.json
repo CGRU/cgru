@@ -9,6 +9,7 @@
 	"topic":{
 		"seek":["[forum]/"],
 		"scripts":["forum.js"],
+		"comments_reversed":true,
 		"show_in_subdirectories":true
 	}
 },

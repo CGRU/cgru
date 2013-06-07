@@ -53,10 +53,10 @@
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"scripts":["shot.js"],
 		"source":{
-			"path":["SOURCE/SCAN"]
+			"path":["SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/DPX","RESULT/JPG"]
+			"path":["RESULT/JPG"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
