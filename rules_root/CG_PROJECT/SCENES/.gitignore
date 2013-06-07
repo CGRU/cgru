@@ -1,6 +1,3 @@
-# Ignore everything
-*
-
-# But not A_SCENE and this file
-!A_SCENE
-!.gitignore
+# Ignore other scenes:
+/PRO/
+/SHU/

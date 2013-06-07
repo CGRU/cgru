@@ -7,7 +7,7 @@ body, #header, #footer, #navig_div, #sidepanel_div, #content { background: #A0A0
 -webkit-transition: all .3s ease-in-out;
 }
 
-div { margin: 0; padding: 0; overflow: hidden; }
+div, span { margin: 0; padding: 0; overflow: hidden; }
 
 #header, #footer, #sidepanel_div, #content {
 box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,255,0.5) inset;
@@ -377,7 +377,7 @@ margin-right: 10px;
 .files_view .item .thumbnail img {
 margin: 0;
 padding: 0;
-margin-bottom: -4px;
+/*margin-bottom: -4px;*/
 }
 .files_view .item .size { font: 12px monospace; width: 60px; text-align: right; }
 .files_view .item .mtime { font: 12px monospace; }

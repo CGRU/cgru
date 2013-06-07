@@ -85,10 +85,13 @@ mput .rules/body.html
 ls .rules
 
 mkdir A_SHOT
-cd A_SHOT
-lcd A_SHOT
-mkdir .rules
-mput .rules/body.html
-ls .rules
+mkdir A_SHOT/.rules
+mput A_SHOT/.rules/body.html
+ls A_SHOT/.rules
+
+mkdir _readme_
+mkdir _readme_/.rules
+mput _readme_/.rules/body.html
+ls _readme_/.rules
 
 END_SCRIPT
