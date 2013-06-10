@@ -84,10 +84,10 @@ mkdir .rules
 mput .rules/body.html
 ls .rules
 
-mkdir A_SHOT
-mkdir A_SHOT/.rules
-mput A_SHOT/.rules/body.html
-ls A_SHOT/.rules
+mkdir A_SHOT_01
+mkdir A_SHOT_01/.rules
+mput A_SHOT_01/.rules/body.html
+ls A_SHOT_01/.rules
 
 mkdir _readme_
 mkdir _readme_/.rules

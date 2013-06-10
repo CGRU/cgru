@@ -37,6 +37,7 @@ temp*
 *.swp
 *.suo
 *.sdf
+*~
 
 # Archives
 *.tar

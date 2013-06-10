@@ -164,7 +164,7 @@ function p_Deactivate()
 	p_loaded = false;
 	p_StopTimer();
 	for( var btn in p_elb ) p_elb[btn].style.display = 'none';
-	c_Info('DEACTIVATED. Need to be restarted (F5).');
+	c_Info('DEACTIVATED. Need to be restarted (CTRL+R).');
 }
 
 function p_PathChanged()
@@ -774,6 +774,7 @@ function p_Paint()
 	{
 		$('info_panel').style.display = 'block';
 		$('paint_panel').style.display = 'none';
+		$('canvases').style.display = 'none';
 		$('paint_btn').classList.remove('pushed');
 		p_painting = false;
 	}
@@ -781,6 +782,7 @@ function p_Paint()
 	{
 		$('info_panel').style.display = 'none';
 		$('paint_panel').style.display = 'block';
+		$('canvases').style.display = 'block';
 		$('paint_btn').classList.add('pushed');
 		p_painting = true;
 	}
@@ -815,7 +817,7 @@ function p_PaintCreateCanvas( i_frame)
 	if( i_frame == null ) i_frame = p_frame;
 	var canvas = document.createElement('canvas');
 	p_paintElCanvas[i_frame] = canvas;
-	p_el.view.appendChild( canvas);
+	$('canvases').appendChild( canvas);
 	canvas.width = p_images[i_frame].width;
 	canvas.height = p_images[i_frame].height;
 	canvas.style.width = canvas.width + 'px';
@@ -915,7 +917,7 @@ function p_PaintClear()
 	if( canvas == null ) return;
 
 	p_paintElCanvas[p_frame] = null;
-	p_el.view.removeChild( canvas);
+	$('canvases').removeChild( canvas);
 
 	p_SetEditingState();
 }
@@ -1013,7 +1015,7 @@ function p_PaintSetState()
 		}
 	}
 
-	p_el.view.style.boxShadow = shadow;
+//	p_el.view.style.boxShadow = shadow;
 	$('paint_btn').style.boxShadow = shadow;
 }
 
