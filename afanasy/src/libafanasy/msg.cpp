@@ -656,7 +656,7 @@ const char * Msg::TNAMES[]=
 	/*- Users messages -*/
 	"TUsersListRequestIds",       ///< Request a list of Users with given ids.
 	"TUsersList",                 ///< Active users information.
-	"TUserAdd",                   ///< Add a permatent user.
+	"DEPRECATED_TUserAdd",                   ///< Add a permatent user.
 	"TUserIdRequest",             ///< Request an id of user with given name.
 	"TUserJobsOrder",             ///< Jobs ids in server list order.
 

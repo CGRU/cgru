@@ -59,16 +59,14 @@ CmdUserAdd::CmdUserAdd()
 	setArgsCount(1);
 	setInfo("Add permanent user.");
 	setHelp("uadd [name] Add a permanent user with spcecified name.");
-	setMsgType( af::Msg::TUserAdd);
+	setMsgType( af::Msg::TJSON);
+//	setMsgOutType( af::Msg::TJSON);
+	setRecieving();
 }
 CmdUserAdd::~CmdUserAdd(){}
 bool CmdUserAdd::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	std::string name = argv[0];
-
-	af::MCGeneral mcgeneral( name, 1);
-	msg.set( getMsgType(), &mcgeneral);
-
+	m_str << "{\"user\":{\"name\":\"" << argv[0] << "\"}}";
 	return true;
 }
 

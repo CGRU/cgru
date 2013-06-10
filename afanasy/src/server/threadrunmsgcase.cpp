@@ -66,12 +66,6 @@ switch ( i_msg->type())
 		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
 		break;
 	}
-	case af::Msg::TUserAdd:
-	{
-		af::MCGeneral mcgeneral( i_msg);
-		i_args->users->setPermanent( mcgeneral, true, i_args->monitors);
-		break;
-	}
 	case af::Msg::TTaskListenOutput:
 	{
 		af::MCListenAddress mclass( i_msg);

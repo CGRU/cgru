@@ -25,7 +25,7 @@ UserAf::UserAf( const std::string & username, const std::string & host):
 	AfNodeSrv( this)
 {
 	construct();
-	appendLog("Registered.");
+	appendLog("Registered from job.");
 }
 
 UserAf::UserAf( int uid):
@@ -34,6 +34,15 @@ UserAf::UserAf( int uid):
 {
 	construct();
 	appendLog("Registered from database.");
+}
+
+UserAf::UserAf( JSON & i_object):
+    afsql::DBUser(),
+	AfNodeSrv( this)
+{
+	jsonRead( i_object);
+	construct();
+	appendLog("Registered.");
 }
 
 void UserAf::construct()

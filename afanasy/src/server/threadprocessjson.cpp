@@ -298,7 +298,12 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		AfContainerLock ulock( i_args->users,    AfContainerLock::READLOCK);
 		MonitorAf * newMonitor = new MonitorAf( document["monitor"], i_args->users);
 		newMonitor->setAddressIP( i_msg->getAddress());
-		o_msg_response = i_args->monitors->addMonitor( newMonitor, true);
+		o_msg_response = i_args->monitors->addMonitor( newMonitor, /*JSON = */ true);
+	}
+	else if( document.HasMember("user"))
+	{
+		AfContainerLock ulock( i_args->users, AfContainerLock::WRITELOCK);
+		o_msg_response = i_args->users->addUser( new UserAf( document["user"]), i_args->monitors);
 	}
 
 

@@ -17,8 +17,11 @@ class UserContainer;
 class UserAf : public afsql::DBUser, public AfNodeSrv
 {
 public:
-	/// Create a new user.
+	/// Create a new user. User on job creation by unknown user.
 	UserAf( const std::string & username, const std::string & host);
+
+	/// Construct job from JSON.
+	UserAf( JSON & i_object);
 
 	/// Create user from database.
 	UserAf( int uid);

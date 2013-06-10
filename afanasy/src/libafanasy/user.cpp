@@ -14,25 +14,16 @@
 using namespace af;
 
 User::User( const std::string & username, const std::string & host):
-	m_host_name( host),
-	m_max_running_tasks(  af::Environment::getMaxRunningTasksNumber() ),
-	m_errors_retries(    af::Environment::getTaskErrorRetries() ),
-	m_errors_avoid_host( af::Environment::getErrorsAvoidHost()  ),
-	m_errors_task_same_host( af::Environment::getTaskErrorsSameHost() ),
-	m_errors_forgive_time( af::Environment::getErrorsForgiveTime()),
-	m_jobs_life_time( 0),
-	m_time_register( 0)
+	m_host_name( host)
 {
-	m_name = username;
-	m_priority = af::Environment::getPriority();
-
 	construct();
+	m_name = username;
 }
 
 User::User( int uid)
 {
-	m_id = uid;
 	construct();
+	m_id = uid;
 }
 
 User::User( Msg * msg)
@@ -42,13 +33,21 @@ User::User( Msg * msg)
 
 void User::construct()
 {
-	m_jobs_num = 0;
-	m_running_jobs_num = 0;
+	m_priority              = af::Environment::getPriority();
+	m_max_running_tasks     = af::Environment::getMaxRunningTasksNumber();
+	m_errors_retries        = af::Environment::getTaskErrorRetries();
+	m_errors_avoid_host     = af::Environment::getErrorsAvoidHost();
+	m_errors_task_same_host = af::Environment::getTaskErrorsSameHost();
+	m_errors_forgive_time   = af::Environment::getErrorsForgiveTime();
+
+	m_jobs_life_time    = 0;
+	m_time_register     = 0;
+	m_jobs_num          = 0;
+	m_running_jobs_num  = 0;
 	m_running_tasks_num = 0;
-	m_time_online = 0;
+	m_time_online       = 0;
 
 	m_hosts_mask.setCaseInsensitive();
-
 	m_hosts_mask_exclude.setCaseInsensitive();
 	m_hosts_mask_exclude.setExclude();
 }
@@ -126,6 +125,13 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_bool("permanent", permanent, i_object, io_changes);
 	if( permanent != isPermanent())
 		setPermanent( permanent);
+
+	// Paramers below are not editable and read only on creation
+	// When use edit parameters, log provided to store changes
+	if( io_changes )
+		return;
+
+	Node::jsonRead( i_object);
 }
 
 void User::v_readwrite( Msg * msg)

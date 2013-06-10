@@ -1,0 +1,8 @@
+{
+	"user":
+	{
+		"name"       : "jimmy",
+		"priority"   : 77,
+		"annotation" : "added via json"
+	}
+}
