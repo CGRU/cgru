@@ -280,7 +280,11 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	else if( document.HasMember("job"))
 	{
-		if( i_msg->isMagicInvalid() )
+		if( af::Environment::isDemoMode() )
+		{
+			AFCommon::QueueLogError("Job registration is not allowed: Server demo mode.");
+		}
+		else if( i_msg->isMagicInvalid() )
 		{
 			AFCommon::QueueLogError("Job registration is not allowed: Magic number mismatch.");
 		}

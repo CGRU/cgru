@@ -662,7 +662,7 @@ const char * Msg::TNAMES[]=
 
 
 	/*- Job messages -*/
-	"TJobRegister",               ///< Register job.
+	"DEPRECATED_TJobRegister",               ///< Register job.
 	"TJobsListRequestIds",        ///< Request a list of Jobs with given ids.
 	"TJobsListRequestUsersIds",   ///< Request brief of jobs od users with given ids.
 	"TJobsList",                  ///< Jobs list information.

@@ -131,14 +131,15 @@ std::string Environment::home_afanasy;
 Address Environment::serveraddress;
 
 bool Environment::god_mode       = false;
+bool Environment::visor_mode     = false;
 bool Environment::help_mode      = false;
+bool Environment::demo_mode      = false;
 bool Environment::m_valid        = false;
 bool Environment::m_verbose_init = false;
 bool Environment::m_quiet_init   = false;
 bool Environment::m_verbose_mode = false;
 bool Environment::m_solveservername = false;
 bool Environment::m_server          = false;
-bool Environment::visor_mode     = false;
 std::vector<std::string> Environment::m_config_files;
 std::string Environment::m_config_data;
 

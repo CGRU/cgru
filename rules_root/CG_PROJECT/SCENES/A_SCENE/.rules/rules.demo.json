@@ -1,6 +1,60 @@
 {
 
 "has_filesystem":true,
-"afanasy_enabled":true
+"afanasy_enabled":true,
+
+"OS_windows":{
+	"cmdexec":{
+		"open_folder":"start @PATH@",
+		"play_sequence":[
+			{"name":"PdP",
+				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
+			{"name":"Pd++",
+				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"},
+			{"name":"NkCp",
+				"cmd":"nukecopy @PATH@"},
+			{"name":"Nuke",
+				"cmd":"nukeview @PATH@"}
+		],
+		"play_movie":[
+			{"name":"QT",
+				"cmd":"QuickTimePlayer @PATH@"},
+			{"name":"VLC",
+				"cmd":"vlc @PATH@"}
+		]
+	}
+},
+
+"OS_linux":{
+	"cmdexec":{
+		"play_sequence":[
+			{"name":"DJV",
+				"cmd":"djv_view \"@PATH@\""},
+			{"name":"NkCp",
+				"cmd":"nukecopy \"@PATH@\""},
+			{"name":"Nuke",
+				"cmd":"nukeview \"@PATH@\""}
+		]
+	}
+},
+
+"OS_macosx":{
+	"cmdexec":{
+		"play_movie":[
+			{"name":"VLC",
+				"cmd":"vlc \"@PATH@\""},
+			{"name":"QT",
+				"cmd":"open \"@PATH@\""}
+		],
+		"play_sequence":[
+			{"name":"DJV",
+				"cmd":"djv_view \"@PATH@\""},
+			{"name":"NkCp",
+				"cmd":"nukecopy \"@PATH@\""},
+			{"name":"Nuke",
+				"cmd":"nukeview \"@PATH@\""}
+		]
+	}
+}
 
 }

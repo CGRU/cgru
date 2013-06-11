@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "jobprogress.h"
+#include "environment.h"
 #include "msg.h"
 #include "taskdata.h"
 #include "taskexec.h"
@@ -147,11 +148,14 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_uint32("tasks_max_run_time",    m_tasks_max_run_time,    i_object, io_changes);
 	jr_string("tasks_name",            m_tasks_name,            i_object, io_changes);
 	jr_string("parser",                m_parser,                i_object, io_changes);
-	jr_string("working_directory",     m_working_directory,     i_object, io_changes);
-	jr_string("command",               m_command,               i_object, io_changes);
-	jr_string("files",                 m_files,                 i_object, io_changes);
-	jr_string("command_pre",           m_command_pre,           i_object, io_changes);
-	jr_string("command_post",          m_command_post,          i_object, io_changes);
+	if( af::Environment::notDemoMode() )
+	{
+		jr_string("working_directory",     m_working_directory,     i_object, io_changes);
+		jr_string("command",               m_command,               i_object, io_changes);
+		jr_string("files",                 m_files,                 i_object, io_changes);
+		jr_string("command_pre",           m_command_pre,           i_object, io_changes);
+		jr_string("command_post",          m_command_post,          i_object, io_changes);
+	}
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
 	jr_string("custom_data",           m_custom_data,           i_object, io_changes);
@@ -290,7 +294,6 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
     switch( i_type)
 	{
 	case Msg::TJob:
-	case Msg::TJobRegister:
 	case Msg::TBlocks:
 
 		//rw_uint32_t( m_flags,                 msg);
@@ -488,7 +491,6 @@ void BlockData::v_readwrite( Msg * msg)
 	switch( msg->type())
 	{
 	case Msg::TJob:
-	case Msg::TJobRegister:
 	case Msg::TBlocks:
 		rw_uint32_t( m_flags,                 msg);
 		if( isNotNumeric()) rw_tasks(         msg);
@@ -1054,7 +1056,6 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
    switch( type)
    {
 /*   case Msg::TJob:
-   case Msg::TJobRegister:
    case Msg::TBlocks:
       break;*/
 

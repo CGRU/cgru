@@ -4,3 +4,6 @@
 
 # Ignore images:
 *.jpg
+
+# Ignore movies:
+*.mov

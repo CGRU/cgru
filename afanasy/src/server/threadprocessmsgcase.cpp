@@ -423,14 +423,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 
 // ------------------------------------- Job -------------------------------//
-	case af::Msg::TJobRegister:
-	{
-	  // No containers locks needed here.
-	  // Job registration is a complex procedure.
-	  // It locks and unlocks needed containers itself.
-	  i_args->jobs->job_register( new JobAf( i_msg), i_args->users, i_args->monitors);
-	  break;
-	}
 	case af::Msg::TJobRequestId:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);

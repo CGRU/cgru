@@ -92,7 +92,6 @@ printf("Request:  "); msg_request->stdOut();
 		{
 		case af::Msg::TConfigLoad:
 		case af::Msg::TFarmLoad:
-		case af::Msg::TJobRegister:
 //	    case af::Msg::TBlockCommand:
 //	    case af::Msg::TBlockWorkingDir:
 //	    case af::Msg::TBlockFiles:

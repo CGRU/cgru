@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
 	// Initialize environment:
 	af::Environment ENV( af::Environment::Server, argc, argv);
 	ENV.addUsage("-noIPv6", "Disable IPv6.");
+	ENV.addUsage("-demo", "Disable tasks changing and new jobs.");
+
 
 	// Initialize general library:
 	if( af::init( af::InitFarm) == false) return 1;
@@ -228,6 +230,13 @@ int main(int argc, char *argv[])
 		// Close database:
 		//
 		afDB_JobRegister.DBClose();
+	}
+
+	// Disable new commands and editing:
+	if( af::Environment::hasArgument("-demo"))
+	{
+		printf("Demo mode, no new commands.\n");
+		af::Environment::setDemoMode();
 	}
 
 //

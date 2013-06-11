@@ -41,6 +41,10 @@ public:
 	static inline void addUsage( const std::string & arg, const std::string & help)
 		{ cmdarguments_usagearg.push_back( arg); cmdarguments_usagehelp.push_back( help);}
 
+	static inline bool isDemoMode()  { return demo_mode; }
+	static inline bool notDemoMode() { return false == demo_mode; }
+	static inline void setDemoMode() { demo_mode = true; }
+
 	static bool reload();
 
 	static void setVerboseInit( bool value = true) { m_verbose_init = value;}
@@ -196,6 +200,7 @@ private:
 	static std::vector<std::string> cmdarguments_usagearg;
 	static std::vector<std::string> cmdarguments_usagehelp;
 	static bool help_mode;
+	static bool demo_mode;
 
 	static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
 	static void printUsage(); ///< Output command usage

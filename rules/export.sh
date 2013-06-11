@@ -81,13 +81,19 @@ mkdir A_SCENE
 cd A_SCENE
 lcd A_SCENE
 mkdir .rules
-mput .rules/body.html
+mput .rules/body.html .rules/*.json
+
 ls .rules
 
 mkdir A_SHOT_01
 mkdir A_SHOT_01/.rules
 mput A_SHOT_01/.rules/body.html
 ls A_SHOT_01/.rules
+
+mkdir A_SHOT_02
+mkdir A_SHOT_02/.rules
+mput A_SHOT_02/.rules/body.html
+ls A_SHOT_02/.rules
 
 mkdir _readme_
 mkdir _readme_/.rules

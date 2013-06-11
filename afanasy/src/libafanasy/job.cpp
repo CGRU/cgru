@@ -2,8 +2,9 @@
 
 #include "../include/afanasy.h"
 
-#include "msg.h"
 #include "blockdata.h"
+#include "environment.h"
+#include "msg.h"
 #include "jobprogress.h"
 
 using namespace af;
@@ -42,8 +43,12 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	}
 
 	jr_string("description",  m_description,  i_object, io_changes);
-	jr_string("command_pre",  m_command_pre,  i_object, io_changes);
-	jr_string("command_post", m_command_post, i_object, io_changes);
+
+	if( af::Environment::notDemoMode() )
+	{
+		jr_string("command_pre",  m_command_pre,  i_object, io_changes);
+		jr_string("command_post", m_command_post, i_object, io_changes);
+	}
 
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
