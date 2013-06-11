@@ -226,7 +226,11 @@ function c_ElDisplayToggle( i_el)
 
 function c_GetUserTitle( i_uid, i_guest, i_short)
 {
-	if( i_uid == null ) i_uid = g_auth_user.id;
+	if( i_uid == null )
+	{
+		if( g_auth_user == null ) return 'Guest';
+		i_uid = g_auth_user.id;
+	}
 	if( i_uid == null ) return null;
 
 	var title = i_uid;

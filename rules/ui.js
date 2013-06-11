@@ -12,10 +12,10 @@ u_body_filename = 'body.html';
 u_body_edit_markup = 0;
 u_body_text = '';
 
-cgru_params.push(['back_asset','Asset', '', 'Enter Background Style']);
-cgru_params.push(['back_body','Body', '', 'Enter Background Style']);
-cgru_params.push(['back_files','Files', '', 'Enter Background Style']);
-cgru_params.push(['back_comments','Comments', '', 'Enter Background Style']);
+cgru_params.push(['back_asset','Asset', '', 'Enter background style']);
+cgru_params.push(['back_body','Body', '', 'Enter background style']);
+cgru_params.push(['back_files','Files', '', 'Enter background style']);
+cgru_params.push(['back_comments','Comments', '', 'Enter background style']);
 
 function View_body_Open() { u_BodyLoad(); }
 function View_body_Close() { u_BodyEditCancel(''); }

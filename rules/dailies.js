@@ -186,6 +186,12 @@ function d_ProcessGUI( i_wnd)
 
 	i_wnd.destroy();
 
+	if( g_auth_user == null )
+	{
+		c_Error("Guests can't generate dailies.");
+		return;
+	}
+
 	var job = {};
 	//job.offline = true;
 	job.name = params.filename;
