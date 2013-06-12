@@ -103,7 +103,7 @@ box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 opacity: 0.9;
 }
 #navig .folder.current .fcolor { opacity: 0.7; }
-#navig .folder .fname { position: relative; float:left; }
+#navig .folder .fname { position: relative; float:left; text-decoration: none; text-shadow: none; }
 #navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
 #navig .folder .progress { clear: both; }
 #navig .folder .progressbar { height: 6px; }
@@ -212,6 +212,7 @@ min-height: 19px;
 #sidepanel .body { display: none; }
 #sidepanel.opened .opened .body { display: block; }
 #sidepanel .label:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
+
 /* ============= NEWS: =============== */
 #news_count {
 float:right;
@@ -228,22 +229,12 @@ text-shadow: 0 0 4px #00FF00, 0 0 8px #00FF00;
 font-weight: bold;
 display: none;
 }
-#news > div, #channels > div {
-box-shadow: 0 0 2px #000 inset;
-border-radius: 4px;
-margin: 1px 0px;
-}
-#news .button, #channels .button {
-float: left;
-height: 14px;
-margin: 0px 4px 0px 0px;
-padding: 0px 4px 0px 4px;
-}
-#news a, #channels a {
-font-size: 10px;
-}
-#news .avatar { float:right; border-radius: 4px; width: 24px; height: 24px; margin: 2px; }
+#news > div, #channels > div { box-shadow: 0 0 2px #000 inset; border-radius: 4px; margin: 1px 0px; }
+#news .button, #channels .button { float: left; height: 14px; margin: 0px 4px 0px 0px; padding: 0px 4px 0px 4px; }
+#news a, #channels a { font-size: 10px; }
+#news .avatar { float:right; border: 1px solid #777; border-radius: 4px; width: 24px; height: 24px; margin: 2px; }
 #news .news_label { font-size:12px; }
+
 /* ============= PLAYLIST: =============== */
 #playlist .item {
 font-weight: normal;
@@ -266,10 +257,16 @@ padding: 2px 0px 2px 8px;
 #playlist .current {font-weight: bold;}
 #playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
 /*#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); }*/
+
 /* ======= USERS: ======== */
 #permissions > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
 #permissions > div div { padding: 0px 4px;}
 #permissions > div .button { float: left; margin: 0px;}
+/* ============= RECENT: =============== */
+#recent { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:2px;padding:2px; }
+#recent > div { font-size: 12px; border-bottom: 1px solid #777; position: relative; }
+#recent img { width: 32px; height: 32px; border: 1px solid #777; border-radius: 4px; margin-top: 4px; float: right; }
+#recent .user { float: left; margin-right: 4px;}
 
 /* ============================================================================= */
 /* ================================ CONTENT: =================================== */
@@ -393,8 +390,9 @@ border: 1px solid #000;
 border-radius: 8px;
 }
 /*#body_avatar_c:hover, #body_avatar_m:hover { width: auto; height: auto; }*/
-#body_panel_edit > div { margin: 1px 8px;}
-#body_panel_edit .selected { background: rgba(200,255,255,.3);}
+#body_panel_edit > div { margin: 1px 4px;}
+#body_panel_edit .toggle { float:left; font-size:12px; border: 1px solid rgba(0,0,0,.5); cursor:pointer; padding:2px 3px; }
+#body_panel_edit .toggle.selected { background: rgba(200,255,255,.3);}
 #body_body { clear: both; }
 
 /* ============================================================================*/
@@ -494,6 +492,8 @@ float: left; margin: 1px 8px;
 .comment .panel .date { font-size: 14px; margin-top: 2px; }
 .comment .panel .modified { margin-top: 2px; float: right; font-size: 10px; font-style:italic; opacity: .8; padding: 2px 4px;}
 .comment .panel > .button { font-size: 12px; float: right;}
+.comment .panel .edit_btns_div { float: right;}
+.comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}
 .comment .edit_duration div { float: left; margin: 1px;}
 .comment .edit_duration .sample {
 text-align: center;

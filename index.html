@@ -164,7 +164,8 @@ RMB - open/close folder (faster)"
 			</div>
 			<div id="body_panel_edit" style="display:none">
 				<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
-				<div style="float:right;border:1px solid #000;cursor:pointer;padding:2px 6px;" id="body_edit_markup" onclick="u_BodyEditMarkup()" title="HTML Markup Mode">Markup</div>
+				<div class="toggle" id="body_edit_markup" onclick="u_BodyEditMarkup()" title="HTML Markup Mode">Markup mode</div>
+				<div class="toggle" ondblclick="u_BodyEditMarkupRemove()" title="Double click to remove all HTML markup from body">Remove all markup</div>
 			</div>
 			<div id="body_body" style="padding: 5px 10px;"></div>
 		</div>
@@ -240,6 +241,12 @@ RMB - open/close folder (faster)"
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="permissions"></div>
+		</div>
+	</div>
+	<div id="sidepanel_recent">
+		<div class="label button" onclick="nw_RecentOnClick()">Recent</div>
+		<div class="body">
+			<div id="recent"></div>
 		</div>
 	</div>
 </div>

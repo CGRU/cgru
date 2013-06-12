@@ -910,16 +910,110 @@ function jsf_save( $i_save, &$o_out)
 	fclose( $fHandle );
 }
 
-function jsf_makenews( $i_news, &$o_out)
+function jsf_makenews( $i_args, &$o_out)
 {
-	global $UserID, $FileMaxLength;
-/*
-	if( $UserID == null )
+	global $FileMaxLength;
+
+	$news = $i_args['news'];
+
+	// Ensure that news has a path:
+	if( false == array_key_exists('path', $news ))
 	{
-		$o_out['error'] = 'Guests are not allowed to make news.';
+		$o_out['error'] = 'News can`t be without a path.';
 		return;
 	}
-*/
+
+	$path = $news['path'];
+
+	// Path should not be an empty string:
+	if( strlen($path) == 0 )
+	{
+		$o_out['error'] = 'Path is an empty string.';
+		return;
+	}
+
+	// Ensure that the first path character is '/':
+	if( $path[0] != '/' )
+		$path = '/'.$path;
+
+	// Ensure that path last character is not '/' (if path is not just '/' root):
+	if(( $path != '/') && ( $path[strlen($path-1)] == '/'))
+		$path = substr( $path, 0, $strlen($path)-1);
+
+	// Process recent for current and each parent folders till root:
+	for( $i = 0; $i <= 100; $i++)
+	{
+		// Simple loop check:
+		if( $i >= 100 )
+		{
+			error_log('News: Recent path loop.');
+			break;
+		}
+
+//error_log('path='.$path);
+		$rarray = array();
+
+		// Get existing recent:
+		$rfile = $i_args['root'].$path.'/'.$i_args['rufolder'].'/'.$i_args['recent_file'];
+		if( is_file( $rfile))
+		if( $rhandle = fopen( $rfile, 'r'))
+		{
+			$rdata = fread( $rhandle, $FileMaxLength);
+			fclose( $rhandle);
+			$rarray = json_decode( $rdata, true);
+			if( is_null( $rarray))
+				$rarray = array();
+			$count = count( $rarray);
+			if( $count)
+			{
+				if( $i )
+				{
+					// Remove all news with the same path from all parent folders,
+					// so folder has only one recent from each child:
+					for( $j = 0; $j < $count; $j++ )
+						if( $rarray[$j]['path'] == $news['path'])
+						{
+							array_splice( $rarray, $j, 1);
+							$count = count( $rarray);
+							$j--;
+						}
+				}
+				else
+				{
+					// Remove latest recent news if it is the same:
+					if( ( $rarray[0]['path']  == $news['path']  ) &&
+						( $rarray[0]['title'] == $news['title'] ) &&
+						( $rarray[0]['user']  == $news['user']  ) )
+							array_splice( $rarray, 0, 1);
+				}
+				while( count( $rarray) >= $i_args['recent_max'])
+					array_pop( $rarray);
+			}
+		}
+
+		// Add new recent:
+		array_unshift( $rarray, $news);
+
+		// Save recent:
+		if( false == is_dir( dirname( $rfile)))
+			mkdir( dirname( $rfile));
+		if( $rhandle = fopen( $rfile, 'w'))
+		{
+			fwrite( $rhandle, json_encode( $rarray));
+			fclose($rhandle);
+		}
+
+		// Exit cycle if path is root:
+		if( strlen( $path) == 0 ) break;
+
+		// Set path to parent folder:
+		$path_prev = $path;
+		$path = substr( $path, 0, strrpos( $path, '/'));
+		// Stop cycle if can't go to parent folder:
+		if( $path == $path_prev ) break;
+	}
+
+	// Process users subsriptions:
 	$users = array();	
 	if( $fHandle = opendir('users'))
 	{
@@ -945,41 +1039,41 @@ function jsf_makenews( $i_news, &$o_out)
 	}
 
 	$ignore_own = false;
-	if( isset( $i_news['ignore_own']))
+	if( isset( $news['ignore_own']))
 	{
-		if( $i_news['ignore_own'])
+		if( $news['ignore_own'])
 			$ignore_own = true;
-		unset( $i_news['ignore_own']);
+		unset( $news['ignore_own']);
 	}
 
 	$o_out['users'] = array();
 
 	foreach( $users as &$user )
 	{
-		if( $ignore_own && ( $i_news['user'] == $user['id']))
+		if( $ignore_own && ( $news['user'] == $user['id']))
 			continue;
 
 		foreach( $user['channels'] as $channel )
 		{
-			if( strpos( $i_news['path'], $channel['id'] ) === 0 )
+			if( strpos( $news['path'], $channel['id'] ) === 0 )
 			{
 				array_push( $o_out['users'], $user['id']);
 
-				$i_news['user'] = $i_news['user'];
+				$news['user'] = $news['user'];
 
 				$has_event = false;
 				foreach( $user['news'] as &$event )
 				{
-					if( $event['path'] == $i_news['path'])
+					if( $event['path'] == $news['path'])
 					{
 						$has_event = true;
-						$event = $i_news;
+						$event = $news;
 						break;
 					}
 				}
 
 				if( false == $has_event )
-					array_push( $user['news'], $i_news);
+					array_push( $user['news'], $news);
 
 				$filename = 'users/'.$user['id'].'.json';
 				if( $fHandle = fopen( $filename, 'w'))

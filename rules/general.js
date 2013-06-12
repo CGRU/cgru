@@ -50,10 +50,11 @@ function g_Init()
 	{
 		g_auth_user = config.user;
 		ad_Init();
-		nw_Init();
 		u_InitAuth();
 		up_Init();
 	}
+
+	nw_Init();
 
 	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 
@@ -310,7 +311,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.m_elColor = elColor;
 	elColor.classList.add('fcolor');
 
-	var elName = document.createElement('div');
+	var elName = document.createElement('a');
 	elFolder.appendChild( elName);
 	elName.classList.add('fname');
 	elName.textContent = folder;
@@ -351,7 +352,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_path = '/'+folder;
 	else
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
-
+	elName.href = '#' + elFolder.m_path;
 	
 	elFolder.onclick = g_FolderOnClick;
 	elFolder.oncontextmenu = function(e){ e.stopPropagation(); g_OpenCloseFolder( e.currentTarget); return false;};
@@ -423,9 +424,8 @@ function g_FolderClicked()
 
 function g_FolderOnDblClick( i_evt)
 {
-window.console.log('Double Clicked');
+//console.log('Double Clicked');
 //g_FolderOnClick( i_evt, true);
-return;
 //return;
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;

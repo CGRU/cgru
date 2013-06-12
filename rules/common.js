@@ -168,12 +168,14 @@ function c_Log( i_msg)
 //	u_el.cycle.style.opacity = '.1';
 }
 
-function c_DT_StrFromSec( i_time) { return c_DT_StrFromMSec( i_time*1000);}
-function c_DT_StrFromMSec( i_time)
+function c_DT_StrFromSec( i_time, i_nosec) { return c_DT_StrFromMSec( i_time*1000, i_nosec);}
+function c_DT_StrFromMSec( i_time, i_nosec)
 {
 	var date = new Date(i_time);
 	date = date.toString();
 	date = date.substr( 0, date.indexOf(' GMT'));
+	if( i_nosec )
+		date = date.substr( 0, date.lastIndexOf(':'));
 	return date;
 }
 function c_DT_CurSeconds() { return Math.round((new Date).valueOf()/1000);}
@@ -457,5 +459,13 @@ function c_GetAvatar( i_user_id, i_guest )
 		return avatar;
 
 	return null;
+}
+
+function c_MakeLinksRelative( i_text)
+{
+	var address = document.location.protocol + '//' + document.location.host + document.location.pathname;
+	while( i_text.indexOf( address) != -1 )
+		i_text = i_text.replace( address, '');
+	return i_text;
 }
 

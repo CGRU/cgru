@@ -65,32 +65,44 @@ function cm_Add( i_obj)
 	elPanel.appendChild( elEdit);
 	elEdit.classList.add('button');
 	elEdit.textContent = 'Edit';
+	elEdit.title = 'Edit comment (admins only).';
 	elEdit.onclick = function(e){cm_Edit(e.currentTarget.m_el);}
 	elEdit.m_el = el;
 	el.m_elEdit = elEdit;
 
+	var elEditBtnsDiv = document.createElement('div');
+	elPanel.appendChild( elEditBtnsDiv);
+	elEditBtnsDiv.classList.add('edit_btns_div');
+	el.m_elEditBtnsDiv = elEditBtnsDiv;
+
 	var elCancel = document.createElement('div');
-	elPanel.appendChild( elCancel);
+	elEditBtnsDiv.appendChild( elCancel);
 	elCancel.classList.add('button');
 	elCancel.textContent = 'Cancel';
 	elCancel.onclick = function(e){cm_Cancel(e.currentTarget.m_el)};
 	elCancel.m_el = el;
-	el.m_elCancel = elCancel;
 
 	var elSave = document.createElement('div');
-	elPanel.appendChild( elSave);
+	elEditBtnsDiv.appendChild( elSave);
 	elSave.classList.add('button');
 	elSave.textContent = 'Save';
-	elSave.style.display = 'none';
 	elSave.onclick = function(e){cm_Save(e.currentTarget.m_el)};
 	elSave.m_el = el;
-	el.m_elSave = elSave;
+
+	var elRemMU = document.createElement('div');
+	elEditBtnsDiv.appendChild( elRemMU);
+	elRemMU.classList.add('button');
+	elRemMU.textContent = 'Remove all markup';
+	elRemMU.title = 'Double click to all remove markup from comment.';
+	elRemMU.m_el = el;
+	elRemMU.ondblclick = function(e){cm_RemMarkup(e.currentTarget.m_el)};
 
 	var elDel = document.createElement('div');
-	elPanel.appendChild( elDel);
+	elEditBtnsDiv.appendChild( elDel);
 	elDel.classList.add('button');
 	elDel.textContent = 'Delete';
-	elDel.onclick = function(e){cm_Delete(e.currentTarget.m_el)};
+	elDel.title = 'Double click to delete comment.';
+	elDel.ondblclick = function(e){cm_Delete(e.currentTarget.m_el)};
 	elDel.m_el = el;
 	el.m_elDel = elDel;
 
@@ -168,9 +180,7 @@ function cm_Init( i_el)
 	i_el.m_elForEdit.innerHTML = '';
 	if( i_el.m_elEditPanel ) i_el.m_elPanel.removeChild( i_el.m_elEditPanel);
 
-	i_el.m_elDel.style.display = 'none';
-	i_el.m_elCancel.style.display = 'none';
-	i_el.m_elSave.style.display = 'none';
+	i_el.m_elEditBtnsDiv.style.display = 'none';
 	i_el.m_elTypesDiv.style.display = 'none';
 	if( g_admin )
 		i_el.m_elEdit.style.display = 'block';
@@ -306,9 +316,11 @@ function cm_Edit( i_el)
 		}
 		i_el.m_elDel.style.display = 'block';
 	}
-	i_el.m_elCancel.style.display = 'block';
-	i_el.m_elSave.style.display = 'block';
+	else
+		i_el.m_elDel.style.display = 'none';
+
 	i_el.m_elEdit.style.display = 'none';
+	i_el.m_elEditBtnsDiv.style.display = 'block';
 	i_el.m_elTypesDiv.style.display = 'block';
 
 	i_el.m_elEditPanel = u_EditPanelCreate( i_el.m_elPanel);
@@ -390,6 +402,11 @@ function cm_Delete( i_el)
 	cm_Save( i_el);
 }
 
+function cm_RemMarkup( i_el)
+{
+	i_el.m_elText.innerHTML = i_el.m_elText.textContent;
+}
+
 function cm_Save( i_el)
 {
 	if( g_auth_user == null )
@@ -398,7 +415,7 @@ function cm_Save( i_el)
 		i_el.m_obj.user_name = i_el.m_obj.guest.id;
 	}
 
-	i_el.m_obj.text = i_el.m_elText.innerHTML;
+	i_el.m_obj.text = c_MakeLinksRelative( i_el.m_elText.innerHTML);
 	i_el.m_obj.color = i_el.m_color;
 	i_el.m_obj.type = i_el.m_type;
 	if( i_el.m_obj.deleted != true )

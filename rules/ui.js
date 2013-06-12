@@ -670,7 +670,8 @@ function u_BodyEditSave()
 	if( g_auth_user == null ) return;
 
 	if( u_body_edit_markup ) u_BodyEditMarkup();
-	var res = c_Parse( n_Request({"save":{"file":c_GetRuFilePath( u_body_filename),"data":$('body_body').innerHTML}}));
+	var text = c_MakeLinksRelative( $('body_body').innerHTML);
+	var res = c_Parse( n_Request({"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}}));
 
 	if( RULES.status == null ) RULES.status = {};
 	if( RULES.status.body == null )
@@ -706,6 +707,11 @@ function u_BodyEditMarkup()
 		$('body_edit_markup').classList.remove('selected');
 		$('body_panel_edit').m_panel_edit.style.display = 'block';
 	}
+}
+function u_BodyEditMarkupRemove()
+{
+	if( u_body_edit_markup ) return;
+	$('body_body').innerHTML = $('body_body').textContent;
 }
 
 function u_OpenCloseViewsAll()

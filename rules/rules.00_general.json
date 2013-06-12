@@ -4,6 +4,7 @@
 "company":"CGRU",
 "playlist":"rules/playlist.json",
 "newsrefresh":60,
+"newsrecent":99,
 
 "tags":{
 	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
