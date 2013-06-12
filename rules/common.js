@@ -471,6 +471,20 @@ function c_MakeLinksRelative( i_text)
 
 function c_elMarkupRemove( i_el)
 {
-	i_el.innerHTML = i_el.innerHTML.replace(/<br>/gi, '@BR@');
+	var html = i_el.innerHTML;
+
+	html = html.replace(/<br>/gi, '@BR@');
+	html = html.replace(/<div/gi, '@BR@<div');
+
+	html = html.replace(/<p/gi, '@BR@<p');
+	html = html.replace(/\/p>/gi, '/p>@BR@');
+
+	html = html.replace(/<blockquote/gi, '@BR@<blockquote');
+	html = html.replace(/\/blockquote>/gi, '/blockquote>@BR@');
+
+	while( html.indexOf('@BR@') == 0 )
+		html = html.replace(/@BR@/, '');
+
+	i_el.innerHTML = html;
 	i_el.innerHTML = i_el.textContent.replace(/@BR@/g, '<br>');
 }
