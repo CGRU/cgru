@@ -469,3 +469,8 @@ function c_MakeLinksRelative( i_text)
 	return i_text;
 }
 
+function c_elMarkupRemove( i_el)
+{
+	i_el.innerHTML = i_el.innerHTML.replace(/<br>/gi, '@BR@');
+	i_el.innerHTML = i_el.textContent.replace(/@BR@/g, '<br>');
+}

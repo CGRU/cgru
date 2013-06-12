@@ -95,7 +95,7 @@ function cm_Add( i_obj)
 	elRemMU.textContent = 'Remove all markup';
 	elRemMU.title = 'Double click to all remove markup from comment.';
 	elRemMU.m_el = el;
-	elRemMU.ondblclick = function(e){cm_RemMarkup(e.currentTarget.m_el)};
+	elRemMU.ondblclick = function(e){c_elMarkupRemove(e.currentTarget.m_el.m_elText)};
 
 	var elDel = document.createElement('div');
 	elEditBtnsDiv.appendChild( elDel);
@@ -400,11 +400,6 @@ function cm_Delete( i_el)
 {
 	i_el.m_obj.deleted = true;
 	cm_Save( i_el);
-}
-
-function cm_RemMarkup( i_el)
-{
-	i_el.m_elText.innerHTML = i_el.m_elText.textContent;
 }
 
 function cm_Save( i_el)

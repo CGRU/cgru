@@ -711,8 +711,7 @@ function u_BodyEditMarkup()
 function u_BodyEditMarkupRemove()
 {
 	if( u_body_edit_markup ) return;
-	$('body_body').innerHTML = $('body_body').innerHTML.replace(/<br>/gi, '@BR@');
-	$('body_body').innerHTML = $('body_body').textContent.replace(/@BR@/g, '<br>');
+	c_elMarkupRemove($('body_body'));
 }
 
 function u_OpenCloseViewsAll()
