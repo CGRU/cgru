@@ -448,7 +448,9 @@ function cm_Save( i_el)
 //window.console.log( JSON.stringify( edit));
 	res = c_Parse( n_Request({"editobj":edit}));
 	if( c_NullOrErrorMsg( res)) return;
-	nw_MakeNews('<i>comments</i>', g_CurPath(), i_el.m_obj.user_name, i_el.m_obj.guest);
+	var news_user = i_el.m_obj.user_name;
+	if( i_el.m_obj.muser_name ) news_user = i_el.m_obj.muser_name;
+	nw_MakeNews('<i>comments</i>', g_CurPath(), news_user, i_el.m_obj.guest);
 
 	cm_array.push( i_el.m_obj);
 	var emails = [];
