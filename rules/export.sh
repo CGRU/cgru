@@ -50,17 +50,17 @@ cd rules_root
 lcd rules_root
 
 mkdir .rules
-mput .rules/*.html .rules/*.json
+mput .rules/*.html .rules/rules.*.json
 ls .rules
 
 mkdir Ask_Questions_Here
 mkdir Ask_Questions_Here/.rules
-mput Ask_Questions_Here/.rules/body.html Ask_Questions_Here/.rules/*.json
+mput Ask_Questions_Here/.rules/body.html Ask_Questions_Here/.rules/rules.*.json
 ls Ask_Questions_Here/.rules
 
 mkdir Ask_Questions_Here/AFANASY
 mkdir Ask_Questions_Here/AFANASY/.rules
-mput Ask_Questions_Here/AFANASY/.rules/body.html Ask_Questions_Here/AFANASY/.rules/*.json
+mput Ask_Questions_Here/AFANASY/.rules/body.html Ask_Questions_Here/AFANASY/.rules/rules.*.json
 ls Ask_Questions_Here/AFANASY/.rules
 
 mkdir CG_PROJECT
@@ -81,7 +81,7 @@ mkdir A_SCENE
 cd A_SCENE
 lcd A_SCENE
 mkdir .rules
-mput .rules/body.html .rules/*.json
+mput .rules/body.html .rules/rules.*.json
 
 ls .rules
 
