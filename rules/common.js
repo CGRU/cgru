@@ -397,7 +397,7 @@ function c_MakeThumbnail( i_file)
 {
 	var cmd = RULES.thumbnail.create_file;
 	cmd = cmd.replace(/@INPUT@/g, i_file).replace(/@OUTPUT@/g, c_GetThumbFileName( i_file));
-	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
+	n_Request_old({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
 function c_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}

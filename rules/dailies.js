@@ -321,7 +321,7 @@ function d_ExpProcessGUI( i_wnd)
 		cmd += ' -x ' + params.resolution;
 	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
 
-	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
+	n_Request_old({"cmdexec":{"cmds":[cmd]}}, true);
 	i_wnd.destroy();
 //	window.location.reload();
 	fv_ReloadAll();

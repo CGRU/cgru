@@ -415,7 +415,7 @@ function st_Save( i_status, i_path, i_wait)
 	obj.object = {"status":i_status};
 	obj.add = true;
 	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
-	return c_Parse( n_Request({"editobj":obj}, i_wait));
+	return c_Parse( n_Request_old({"editobj":obj}, i_wait));
 }
 
 function st_UpdateProgresses( i_path)

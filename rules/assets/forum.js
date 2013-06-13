@@ -1,7 +1,7 @@
 function forum_InitTopic()
 {
 	a_SetLabel('Ask New Question');
-	var data = n_Request({"getfile":'rules/assets/forum.html'});
+	var data = n_Request_old({"getfile":'rules/assets/forum.html'});
 	$('asset').innerHTML = data;
 
 	u_GuestAttrsDraw( $('forum_guest_form'));
@@ -68,7 +68,7 @@ function forum_NewQuestionOnClick()
 
 	var folder = ASSETS.topic.path + '/' + question.id;
 	var path = RULES.root + '/' + folder  + '/' + RULES.rufolder + '/body.html';
-	var result = c_Parse( n_Request({"save":{"file":path,"data":btoa(question.body),"type":"base64"}}));
+	var result = c_Parse( n_Request_old({"save":{"file":path,"data":btoa(question.body),"type":"base64"}}));
 	if( result.error )
 	{
 		c_Error( result.error);

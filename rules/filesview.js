@@ -642,7 +642,7 @@ function fv_ImgConvert( i_wnd)
 	cmd += ' -o "' + out + '"';
 	i_wnd.destroy();
 
-	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
+	n_Request_old({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
 function fv_Converted( i_msg)

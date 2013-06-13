@@ -177,7 +177,7 @@ function nw_Subscribe( i_path)
 	obj.id = g_auth_user.id;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request({"editobj":obj});
+	n_Request_old({"editobj":obj});
 
 	g_auth_user.channels.push( channel);
 	nw_Process();
@@ -199,7 +199,7 @@ function nw_Unsubscribe( i_path)
 	obj.id = g_auth_user.id;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request({"editobj":obj});
+	n_Request_old({"editobj":obj});
 
 	for( i = 0; i < g_auth_user.channels.length; i++)
 		if( g_auth_user.channels[i].id == i_path )
@@ -282,7 +282,7 @@ function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
 	request.rufolder = RULES.rufolder;
 	request.recent_max = RULES.newsrecent;
 	request.recent_file = nw_recent_file;
-	var msg = c_Parse( n_Request({"makenews":request}));
+	var msg = c_Parse( n_Request_old({"makenews":request}));
 	if( msg.error )
 	{
 		c_Error( msg.error);
@@ -321,22 +321,35 @@ function nw_NewsLoad()
 {
 	if( g_auth_user == null ) return;
 
-	if( g_auth_user.news == null )
+	if( g_auth_user.news != null )
 	{
-		var filename = 'users/'+g_auth_user.id+'.json';
-		var user = c_Parse( n_Request({"readobj":filename}));
-		$('news').innerHTML = '';
-		if( user == null ) return;
-		if( user.error )
-		{
-			c_Error( user.error);
-			return;
-		}
-		g_auth_user.news = user.news;
+		nw_NewsShow( g_auth_user.news);
+		return;
 	}
+
+	var filename = 'users/'+g_auth_user.id+'.json';
+	c_Parse( n_Request({"obj":{"readobj":filename},"func":"nw_NewsReceived","info":"news","wait":false,"parse":true}));
+	$('news').innerHTML = 'Loading...';
+}
+
+function nw_NewsReceived( i_user)
+{
+	if( i_user == null ) return;
+	if( i_user.error )
+	{
+		c_Error( i_user.error);
+		return;
+	}
+	nw_NewsShow( i_user.news);
+}
+
+function nw_NewsShow( i_news)
+{
+	g_auth_user.news = i_news;
 
 	nw_ShowCount();
 
+	$('news').innerHTML = '';
 	g_auth_user.news.sort( function(a,b){var attr='time';if(a[attr]>b[attr])return -1;if(a[attr]<b[attr])return 1;return 0;});
 	for( var i = 0; i < g_auth_user.news.length; i++ )
 	{
@@ -391,7 +404,7 @@ function nw_RemoveNews( i_id)
 		obj.delobj = true;
 	}
 	obj.file = 'users/'+g_auth_user.id+'.json';
-	n_Request({"editobj":obj});
+	n_Request_old({"editobj":obj});
 	nw_NewsLoad();
 }
 
@@ -433,20 +446,24 @@ function nw_RecentLoad( i_nocheck)
 		return;
 
 	var file = c_GetRuFilePath( nw_recent_file);
-/*
-	var readobj = {};
-	readobj.file = file;
-	readobj.func = 'nw_RecentReceived';
-	readobj.args = file;
-*/
-	var recent = c_Parse( n_Request({"readobj":file}));
+	n_Request({"obj":{"readobj":file},"local":true,"func":"nw_RecentReceived","info":"recent","wait":false,"parse":true});
+	$('recent').textContent = 'Loading...';
+}
+
+function nw_RecentReceived( i_data, i_args)
+{
+//console.log( i_args);
+//console.log( i_data);
+//return;
+	if( i_args.path != g_CurPath()) return;
 
 	$('recent').innerHTML = '';
-	if( recent.error ) return;
+	if( i_data == null ) return;
+	if( i_data.error ) return;
 
-	for( var i = 0; i < recent.length; i++)
+	for( var i = 0; i < i_data.length; i++)
 	{
-		var news = recent[i];
+		var news = i_data[i];
 
 		var el = document.createElement('div');
 		$('recent').appendChild( el);

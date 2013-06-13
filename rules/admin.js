@@ -38,7 +38,7 @@ function ad_Login()
 }
 function ad_loginProcess( i_obj)
 {
-	var data = c_Parse( n_Request({"login":i_obj}));
+	var data = c_Parse( n_Request_old({"login":i_obj}));
 	if( data == null ) return;
 	if( data.error )
 	{
@@ -108,7 +108,7 @@ function ad_Logout()
 //*
  	var obj = {};
 	obj.logout = {"realm":'RULES'};
-	var data = n_Request( obj);
+	var data = n_Request_old( obj);
 //c_Log( data);
 //	*/
 ///*
@@ -172,7 +172,7 @@ function ad_PermissionsLoad()
 	if( path == null ) return;
 	ad_permissions = {};
 	ad_permissions.path = RULES.root + path;
-	ad_permissions = c_Parse( n_Request({"permissionsget": ad_permissions}));
+	ad_permissions = c_Parse( n_Request_old({"permissionsget": ad_permissions}));
 	if( ad_permissions == null ) return;
 	if( ad_permissions.error )
 	{
@@ -261,7 +261,7 @@ function ad_PermissionsAdd( i_type, i_id)
 		return;
 	}
 	ad_permissions[i_type].push( i_id);
-	var res = c_Parse( n_Request({"permissionsset":ad_permissions}));
+	var res = c_Parse( n_Request_old({"permissionsset":ad_permissions}));
 	if( res.error ) c_Error( res.error );
 	ad_PermissionsLoad();
 }
@@ -275,14 +275,14 @@ function ad_PermissionsRemove( i_type, i_id)
 		return;
 	}
 	ad_permissions[i_type].splice( index, 1);
-	var res = c_Parse( n_Request({"permissionsset":ad_permissions}));
+	var res = c_Parse( n_Request_old({"permissionsset":ad_permissions}));
 	if( res.error ) c_Error( res.error );
 	ad_PermissionsLoad();
 }
 
 function ad_PermissionsClearOnClick()
 {
-	var res = c_Parse( n_Request({"permissionsclear":{"path":RULES.root+g_CurPath()}}));
+	var res = c_Parse( n_Request_old({"permissionsclear":{"path":RULES.root+g_CurPath()}}));
 	if( res.error )
 	{
 		c_Error( res.error );
@@ -403,7 +403,7 @@ function ad_GetAll( i_type)
 {
 	var request = {};
 	request['getall'+i_type] = true;
-	var res = c_Parse( n_Request( request));
+	var res = c_Parse( n_Request_old( request));
 	if( res == null )
 	{
 		ad_wnd.elContent.innerHTML = 'Error getting '+i_type+'.';
@@ -639,7 +639,7 @@ function ad_WndUserGroupOnCkick( i_user)
 
 function ad_WriteGroups()
 {
-	var res = c_Parse( n_Request({"writegroups":g_groups}));
+	var res = c_Parse( n_Request_old({"writegroups":g_groups}));
 	if( res == null ) return;
 	if( res.error ) { c_Error( res.error ); return; }
 	ad_WndRefresh();
@@ -662,7 +662,7 @@ function ad_SaveUserProp( i_user_id, i_prop, i_value)
 	obj.object[i_prop] = i_value;
 	obj.file = 'users/' + i_user_id + '.json';
 
-	var res = c_Parse( n_Request({"editobj":obj}));
+	var res = c_Parse( n_Request_old({"editobj":obj}));
 	if( res && res.error )
 	{
 		c_Error( res.error );
@@ -688,7 +688,7 @@ function ad_CreateUser( not_used, i_user_id)
 	obj.object = user;
 	obj.file = 'users/' + i_user_id + '.json';
 
-	var res = c_Parse( n_Request({"editobj":obj}));
+	var res = c_Parse( n_Request_old({"editobj":obj}));
 	if( res && res.error )
 	{
 		c_Error( res.error );
@@ -705,7 +705,7 @@ function ad_DeleteUserOnClick()
 }
 function ad_DeleteUser( not_used, i_user_id)
 {
-	var res = c_Parse( n_Request({"deleteuser":i_user_id}));
+	var res = c_Parse( n_Request_old({"deleteuser":i_user_id}));
 	if( res && res.error )
 	{
 		c_Error( res.error );
@@ -747,7 +747,7 @@ function ad_SetPassword( i_user_id, i_passwd)
 
 	var digest = c_MD5( i_user_id + ':RULES:' + i_passwd);
 	digest = i_user_id + ':RULES:' + digest;
-	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"digest":digest}}, true, true));
+	var result = c_Parse( n_Request_old({"htdigest":{"user":i_user_id,"digest":digest}}, true, true));
 	if( result == null ) return;
 	if( result.error )
 	{

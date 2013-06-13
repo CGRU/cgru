@@ -559,7 +559,7 @@ function u_Search( i_args)
 	args.rufolder = RULES.rufolder;
 	args.depth = 4;
 
-	var res = c_Parse( n_Request({"search":args}));
+	var res = c_Parse( n_Request_old({"search":args}));
 
 	if( res.error )
 	{
@@ -671,7 +671,7 @@ function u_BodyEditSave()
 
 	if( u_body_edit_markup ) u_BodyEditMarkup();
 	var text = c_MakeLinksRelative( $('body_body').innerHTML);
-	var res = c_Parse( n_Request({"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}}));
+	var res = c_Parse( n_Request_old({"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}}));
 
 	if( RULES.status == null ) RULES.status = {};
 	if( RULES.status.body == null )

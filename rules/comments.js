@@ -21,7 +21,7 @@ function cm_Load()
 
 	if( false == c_RuFileExists( cm_file)) return;
 
-	var obj = c_Parse( n_Request({"readobj":c_GetRuFilePath( cm_file)}));
+	var obj = c_Parse( n_Request_old({"readobj":c_GetRuFilePath( cm_file)}));
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
@@ -441,7 +441,7 @@ function cm_Save( i_el)
 	edit.file = c_GetRuFilePath( cm_file);
 
 //window.console.log( JSON.stringify( edit));
-	res = c_Parse( n_Request({"editobj":edit}));
+	res = c_Parse( n_Request_old({"editobj":edit}));
 	if( c_NullOrErrorMsg( res)) return;
 	var news_user = i_el.m_obj.user_name;
 	if( i_el.m_obj.muser_name ) news_user = i_el.m_obj.muser_name;

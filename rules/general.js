@@ -17,7 +17,7 @@ function g_Init()
 	u_Init();
 	c_Init();
 
-	SERVER = c_Parse( n_Request({"start":{}}));
+	SERVER = c_Parse( n_Request_old({"start":{}}));
 	if( SERVER == null ) return;
 	if( SERVER.error )
 	{
@@ -27,7 +27,7 @@ function g_Init()
 	if( SERVER.version )
 		$('version').innerHTML = c_Strip( SERVER.version);
 
-	var config = c_Parse( n_Request({"initialize":{}}));
+	var config = c_Parse( n_Request_old({"initialize":{}}));
 	if( config == null ) return;
 	if( config.error )
 	{

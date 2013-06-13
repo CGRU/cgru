@@ -217,7 +217,7 @@ function p_Action( i_obj, i_action)
 		return;
 	}
 	obj.file = p_file;
-	var res = c_Parse( n_Request({"editobj":obj}));
+	var res = c_Parse( n_Request_old({"editobj":obj}));
 	if( res && res.error ) c_Error( res.error);
 	p_Load();
 }
@@ -225,7 +225,11 @@ function p_Action( i_obj, i_action)
 function p_RefreshOnClick( i_evt) { p_Load();}
 function p_Load()
 {
-	var obj = c_Parse( n_Request({"readobj":p_file}));
+	n_Request({"obj":{"readobj":p_file},"func":"p_Received","wait":false,"parse":true,"info":"playlist"});
+	p_el.playlist.innerHTML = 'Loading...';
+}
+function p_Received( obj)
+{
 	if( obj == null ) return;
 	if( obj.error == null )
 		p_fileExist = true;
