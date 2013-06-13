@@ -602,7 +602,15 @@ function u_Search( i_args)
 function u_BodyLoad( i_nockeck)
 {
 	if( u_body_edit_markup ) u_BodyEditMarkup();
-	u_body_text = n_GetRuFile( u_body_filename, i_nockeck);
+
+	if(( i_nockeck != true ) && ( false == c_RuFileExists( u_body_filename))) return;
+
+	n_Request({"obj":{"getfile":c_GetRuFilePath( u_body_filename)},"func":"u_BodyReceived","local":true,"info":"body","wait":false});
+}
+
+function u_BodyReceived( i_data, i_args)
+{
+	u_body_text = i_data;
 	$('body_body').innerHTML = u_body_text;
 	var info = '';
 	if( RULES.status && RULES.status.body )

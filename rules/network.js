@@ -61,7 +61,7 @@ function n_Request( i_args)
 	var log = '<b style="color:';
 	if( i_args.wait ) log += '#040';
 	else log += '#044';
-	log += '"><i>send:</i></b> '+ obj_str;
+	log += '"><i>send '+i_args.id+':</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.m_args = i_args;
@@ -76,7 +76,7 @@ function n_Request( i_args)
 
 	if( i_args.wait )
 	{
-		log += '<br/><b style="color:#040"><i>recv:</i></b> ';
+		log += '<br/><b style="color:#040"><i>recv '+xhr.m_args.id+':</i></b> ';
 		if( i_args.obj.getfile )
 			log += i_args.obj.getfile;
 		else
@@ -109,14 +109,19 @@ function n_XHRHandler()
 	{
 		if( this.status == 200 )
 		{
-			c_Log('<b><i style="color:#044">recv</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
-			if( window.n_MessageReceived )
+			c_Log('<b><i style="color:#044">recv '+this.m_args.id+'</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
+			if( window.n_MessageReceived && (this.m_args.info == ''))
 				window.n_MessageReceived( c_Parse( this.responseText));
+
 			if( this.m_args.func )
 			{
+				if( this.m_args.local && ( this.m_args.path != g_CurPath() ))
+					return;
+
 				var data = this.responseText;
 				if( this.m_args.parse )
 					data = c_Parse( data);
+
 				window[this.m_args.func]( data, this.m_args);
 			}
 		}

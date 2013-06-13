@@ -219,6 +219,7 @@ window.console.log('Current='+g_elCurFolder.m_folder);
 window.console.log('Path='+g_elCurFolder.m_path);
 window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 */
+	if( g_elCurFolder != u_el.navig )
 	g_OpenFolder( g_elCurFolder );
 	
 	var exists = false;
@@ -281,6 +282,7 @@ function g_OpenFolder( i_elFolder )
 
 	if( i_elFolder.m_dir == null )
 	{
+//console.log('n_WalkDir: ' + i_elFolder.m_path);
 		i_elFolder.m_dir = n_WalkDir( [i_elFolder.m_path], 0, RULES.rufolder, [], ['status'])[0];
 		i_elFolder.m_dir.folders.sort( c_CompareFiles );
 	}

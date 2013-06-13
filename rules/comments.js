@@ -21,7 +21,13 @@ function cm_Load()
 
 	if( false == c_RuFileExists( cm_file)) return;
 
-	var obj = c_Parse( n_Request_old({"readobj":c_GetRuFilePath( cm_file)}));
+	n_Request({"obj":{"readobj":c_GetRuFilePath( cm_file)},"func":"cm_Received","info":"comments","local":true,"wait":false,"parse":true});
+	$('comments').textContent = 'Loading...';
+}
+
+function cm_Received( obj, i_args)
+{
+	$('comments').textContent = '';
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
@@ -441,7 +447,7 @@ function cm_Save( i_el)
 	edit.file = c_GetRuFilePath( cm_file);
 
 //window.console.log( JSON.stringify( edit));
-	res = c_Parse( n_Request_old({"editobj":edit}));
+	res = c_Parse( n_Request({"obj":{"editobj":edit}}));
 	if( c_NullOrErrorMsg( res)) return;
 	var news_user = i_el.m_obj.user_name;
 	if( i_el.m_obj.muser_name ) news_user = i_el.m_obj.muser_name;
