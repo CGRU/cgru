@@ -290,7 +290,7 @@ function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
 	}
 
 	nw_NewsLoad();
-	nw_RecentLoad();
+	nw_RecentLoad(/*file exists check=*/ false);
 		
 	if( msg.users.length == 0 )
 	{
@@ -427,9 +427,20 @@ function nw_RecentOpen( i_noload )
 	if( i_noload !== false )
 		nw_RecentLoad();
 }
-function nw_RecentLoad()
+function nw_RecentLoad( i_nocheck)
 {
-	recent = c_Parse( n_GetRuFile( nw_recent_file, true));
+	if(( i_nocheck !== false ) && ( false == c_RuFileExists( nw_recent_file)))
+		return;
+
+	var file = c_GetRuFilePath( nw_recent_file);
+/*
+	var readobj = {};
+	readobj.file = file;
+	readobj.func = 'nw_RecentReceived';
+	readobj.args = file;
+*/
+	var recent = c_Parse( n_Request({"readobj":file}));
+
 	$('recent').innerHTML = '';
 	if( recent.error ) return;
 
