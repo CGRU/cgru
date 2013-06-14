@@ -79,7 +79,7 @@ function p_Init()
 	for( var i = 0; i < p_buttons.length; i++)
 		p_elb[p_buttons[i]] = document.getElementById('btn_'+p_buttons[i]);
 
-	SERVER = c_Parse( n_Request_old({"start":{}}));
+	SERVER = c_Parse( n_Request({"send":{"start":{}}}));
 	if( SERVER == null ) return;
 	if( SERVER.error )
 	{
@@ -87,7 +87,7 @@ function p_Init()
 		return;
 	}
 
-	var config = c_Parse( n_Request_old({"initialize":{}}));
+	var config = c_Parse( n_Request({"send":{"initialize":{}}}));
 	if( config == null ) return;
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
@@ -951,8 +951,10 @@ function p_PaintSave()
 			var png = canvas.toDataURL('image/png');
 			png = png.substr( png.indexOf(',')+1);
 			var png_path = RULES.root + p_path + '/.rules/' + p_filenames[f] + '.png';
+
 			p_filestosave++;
-			n_Request_old({"save":{"file":png_path,"data":png,"type":"base64"}}, false);
+
+			n_Request({"send":{"save":{"file":png_path,"data":png,"type":"base64"}},"func":"p_SavedFile","file":png_path,"info":"save png","wait":false,"parse":true});
 		}
 
 		var ctx = canvas.getContext('2d');
@@ -961,22 +963,22 @@ function p_PaintSave()
 		var data = canvas.toDataURL('image/jpeg',.8);
 		data = data.substr( data.indexOf(',')+1);
 
-		n_Request_old({"save":{"file":path,"data":data,"type":"base64"}}, false);
+		n_Request({"send":{"save":{"file":path,"data":data,"type":"base64"}},"func":"p_SavedFile","file":path,"info":"save jpg","wait":false,"parse":true});
 	}
 
 	if( p_filestosave == 0 )
 		p_SavingFinished();
 }
 
-function n_MessageReceived( i_msg)
+function p_SavedFile( i_data, i_args)
 {
 //window.console.log(JSON.stringify(i_msg));
-	if( i_msg.error )
+	if( i_data.error )
 	{
-		c_Error( i_msg.error);
+		c_Error( i_data.error);
 		return;
 	}
-	var file =  i_msg.save;
+	var file = i_args.file;
 	if( file )
 	{
 		p_filessaved++;
@@ -1130,14 +1132,14 @@ function p_CommentsSave()
 
 	edit.object = {"player":{"comments":pcms}};
 	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/player.json';
-	var res = c_Parse( n_Request_old({"editobj":edit}));
+	var res = c_Parse( n_Request({"send":{"editobj":edit}}));
 	if( c_NullOrErrorMsg( res)) return;
 
 	var comments = {};
 	comments[key] = rcm;
 	edit.object = {"comments":comments};
 	edit.file = RULES.root + p_rules_path + '/' + RULES.rufolder + '/comments.json';
-	var res = c_Parse( n_Request_old({"editobj":edit}));
+	var res = c_Parse( n_Request({"send":{"editobj":edit}}));
 	if( c_NullOrErrorMsg( res)) return;
 
 	c_Info('Comments saved.');

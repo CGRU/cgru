@@ -474,7 +474,7 @@ function c_elMarkupRemove( i_el)
 {
 	var html = i_el.innerHTML;
 
-	html = html.replace(/<br>/gi, '@BR@');
+	html = html.replace(/<br/gi, '@BR@<br');
 	html = html.replace(/<div/gi, '@BR@<div');
 
 	html = html.replace(/<p/gi, '@BR@<p');

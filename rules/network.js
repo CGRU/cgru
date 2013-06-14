@@ -49,7 +49,8 @@ function n_Request( i_args)
 	}
 
 	i_args.id = n_requests_count++;
-	i_args.path = g_CurPath();
+	if( p_PLAYER != true )
+		i_args.path = g_CurPath();
 	if( i_args.info == null ) i_args.info = '';
 
 	if( i_args.wait == null) i_args.wait = true;
@@ -119,6 +120,7 @@ function n_XHRHandler()
 
 			if( this.m_args.func )
 			{
+				if( p_PLAYER != true )
 				if( this.m_args.local && ( this.m_args.path != g_CurPath() ))
 					return;
 
@@ -128,8 +130,6 @@ function n_XHRHandler()
 
 				window[this.m_args.func]( data, this.m_args);
 			}
-			else if( window.n_MessageReceived )
-				window.n_MessageReceived( c_Parse( this.responseText));
 		}
 	}
 }
