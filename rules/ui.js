@@ -605,7 +605,7 @@ function u_BodyLoad( i_nockeck)
 
 	if(( i_nockeck != true ) && ( false == c_RuFileExists( u_body_filename))) return;
 
-	n_Request({"obj":{"getfile":c_GetRuFilePath( u_body_filename)},"func":"u_BodyReceived","local":true,"info":"body","wait":false});
+	n_Request({"send":{"getfile":c_GetRuFilePath( u_body_filename)},"func":"u_BodyReceived","local":true,"info":"body","wait":false});
 }
 
 function u_BodyReceived( i_data, i_args)
@@ -942,30 +942,17 @@ function u_GuestAttrsGet( i_el)
 	return guest;
 }
 
-function u_UpdateThumbnail( i_msg)
+function u_UpdateThumbnail( i_data)
 {
-	if( i_msg.thumbnail == null ) return;
-
-	fv_MakeThumbnail();
-
-	if( i_msg.error )
+	if( i_data.error )
 	{
-		c_Error('Make thumbnail: '+i_msg.error);
+		c_Error('Make thumbnail: '+i_data.error);
 		return;
 	}
 
-	if( i_msg.status == 'skipped' ) return;
+	if( i_data.status == 'skipped' ) return;
 
-	i_msg.thumbnail = cgru_PM( i_msg.thumbnail, false);
-	var path = i_msg.thumbnail.replace( RULES.root, '');
-	var path = path.replace( /\/\//g, '/');
-	if( path == (g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename))
-	{
-		u_el.thumbnail.src = i_msg.thumbnail;
-		u_el.thumbnail.style.display = 'inline';
-		return;
-	}
-
-	fv_UpdateThumbnail( i_msg);
+	u_el.thumbnail.src = RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+	u_el.thumbnail.style.display = 'inline';
 }
 

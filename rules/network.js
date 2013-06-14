@@ -38,10 +38,16 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 
 function n_Request_old( i_obj, i_wait, i_encode)
 {
-	return n_Request({"obj":i_obj,"wait":i_wait,"encode":i_encode})
+	return n_Request({"send":i_obj,"wait":i_wait,"encode":i_encode})
 }
 function n_Request( i_args)
 {
+	if( i_args.send == null )
+	{
+		c_Error('Network reqest: send object is null.');
+		return;
+	}
+
 	i_args.id = n_requests_count++;
 	i_args.path = g_CurPath();
 	if( i_args.info == null ) i_args.info = '';
@@ -51,17 +57,17 @@ function n_Request( i_args)
 	if( SERVER && SERVER.AUTH_RULES )
 	{
 		var digest = ad_ConstructDigest();
-		if( digest ) i_args.obj.digest = digest;
+		if( digest ) i_args.send.digest = digest;
 	}
 
-	var obj_str = JSON.stringify( i_args.obj);
+	var send_str = JSON.stringify( i_args.send);
 	if( i_args.encode == true )
-		obj_str = btoa( obj_str);
+		send_str = btoa( send_str);
 
-	var log = '<b style="color:';
+	var log = '<b><i style="color:';
 	if( i_args.wait ) log += '#040';
 	else log += '#044';
-	log += '"><i>send '+i_args.id+':</i></b> '+ obj_str;
+	log += '">send '+i_args.id+'</i> '+i_args.info+':</b> '+ send_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.m_args = i_args;
@@ -71,14 +77,14 @@ function n_Request( i_args)
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 //	xhr.open('POST', 'server.php', true); 
 	xhr.open('POST', n_server, i_args.wait ? false : true); 
-	xhr.send( obj_str);
-//window.console.log('n_Request_oldr='+obj_str);
+	xhr.send( send_str);
+//window.console.log('n_Request_oldr='+send_str);
 
 	if( i_args.wait )
 	{
-		log += '<br/><b style="color:#040"><i>recv '+xhr.m_args.id+':</i></b> ';
-		if( i_args.obj.getfile )
-			log += i_args.obj.getfile;
+		log += '<br/><b><i style="color:#040">recv '+xhr.m_args.id+'</i> '+xhr.m_args.info+':</b> ';
+		if( i_args.send.getfile )
+			log += i_args.send.getfile;
 		else
 			log += xhr.responseText.replace(/[<>]/g,'*');
 	}
@@ -110,8 +116,6 @@ function n_XHRHandler()
 		if( this.status == 200 )
 		{
 			c_Log('<b><i style="color:#044">recv '+this.m_args.id+'</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
-			if( window.n_MessageReceived && (this.m_args.info == ''))
-				window.n_MessageReceived( c_Parse( this.responseText));
 
 			if( this.m_args.func )
 			{
@@ -124,6 +128,8 @@ function n_XHRHandler()
 
 				window[this.m_args.func]( data, this.m_args);
 			}
+			else if( window.n_MessageReceived )
+				window.n_MessageReceived( c_Parse( this.responseText));
 		}
 	}
 }

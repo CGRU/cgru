@@ -100,7 +100,7 @@ function shot_MakeThumbnail( i_sources, i_path)
 	}
 	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
-	n_Request_old({"cmdexec":{"cmds":[cmd]}}, false);
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":"u_UpdateThumbnail","info":"shot thumbnail","local":true,"wait":false,"parse":true});
 }
 
 function shot_OpenCloseSourceOnClick( i_evt)

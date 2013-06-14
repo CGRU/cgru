@@ -328,7 +328,7 @@ function nw_NewsLoad()
 	}
 
 	var filename = 'users/'+g_auth_user.id+'.json';
-	c_Parse( n_Request({"obj":{"readobj":filename},"func":"nw_NewsReceived","info":"news","wait":false,"parse":true}));
+	c_Parse( n_Request({"send":{"readobj":filename},"func":"nw_NewsReceived","info":"news","wait":false,"parse":true}));
 	$('news').innerHTML = 'Loading...';
 }
 
@@ -446,7 +446,7 @@ function nw_RecentLoad( i_nocheck)
 		return;
 
 	var file = c_GetRuFilePath( nw_recent_file);
-	n_Request({"obj":{"readobj":file},"local":true,"func":"nw_RecentReceived","info":"recent","wait":false,"parse":true});
+	n_Request({"send":{"readobj":file},"local":true,"func":"nw_RecentReceived","info":"recent","wait":false,"parse":true});
 	$('recent').textContent = 'Loading...';
 }
 

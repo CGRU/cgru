@@ -393,11 +393,12 @@ function c_GetThumbFileName( i_file)
 	return path + '/' + RULES.rufolder + '/thumbnail.' + name + '.jpg';
 }
 
-function c_MakeThumbnail( i_file)
+function c_MakeThumbnail( i_file, i_func)
 {
 	var cmd = RULES.thumbnail.create_file;
-	cmd = cmd.replace(/@INPUT@/g, i_file).replace(/@OUTPUT@/g, c_GetThumbFileName( i_file));
-	n_Request_old({"cmdexec":{"cmds":[cmd]}}, false);
+	cmd = cmd.replace(/@INPUT@/g, RULES.root + i_file);
+	cmd = cmd.replace(/@OUTPUT@/g, RULES.root + c_GetThumbFileName( i_file));
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":i_func,"file":i_file,"info":"thumbnail","wait":false,"parse":true});
 }
 
 function c_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}

@@ -225,7 +225,7 @@ function p_Action( i_obj, i_action)
 function p_RefreshOnClick( i_evt) { p_Load();}
 function p_Load()
 {
-	n_Request({"obj":{"readobj":p_file},"func":"p_Received","wait":false,"parse":true,"info":"playlist"});
+	n_Request({"send":{"readobj":p_file},"func":"p_Received","wait":false,"parse":true,"info":"playlist"});
 	p_el.playlist.innerHTML = 'Loading...';
 }
 function p_Received( obj)

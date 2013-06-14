@@ -323,7 +323,6 @@ function d_ExpProcessGUI( i_wnd)
 
 	n_Request_old({"cmdexec":{"cmds":[cmd]}}, true);
 	i_wnd.destroy();
-//	window.location.reload();
 	fv_ReloadAll();
 }
 

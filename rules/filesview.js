@@ -533,18 +533,19 @@ function fv_FileThumbResize( i_img)
 	i_img.parentNode.style.height = h+'px';
 }
 
-function fv_UpdateThumbnail( i_msg)
+function fv_UpdateThumbnail( i_data, i_args)
 {
 	for( var v = 0; v < fv_views.length; v++)
 	for( var i = 0; i < fv_views[v].elThumbnails.length; i++)
 	{
-		if( fv_views[v].elThumbnails[i].m_thumbFile == i_msg.thumbnail )
+		if( fv_views[v].elThumbnails[i].m_path == i_args.file )
 		{
-			fv_views[v].elThumbnails[i].m_elImg.src = i_msg.thumbnail;
+			fv_views[v].elThumbnails[i].m_elImg.src = fv_views[v].elThumbnails[i].m_thumbFile;
 			fv_views[v].elThumbnails[i].style.display = 'block';
 			break;
 		}
 	}
+	fv_MakeThumbnail()
 }
 
 function fv_MakeThumbnail()
@@ -555,7 +556,7 @@ function fv_MakeThumbnail()
 		return;
 	}
 	fv_thumbnails_tomake--;
-	c_MakeThumbnail( RULES.root + fv_thumbnails_tomake_files.shift());
+	c_MakeThumbnail( fv_thumbnails_tomake_files.shift(), 'fv_UpdateThumbnail');
 }
 
 function fv_MakeThumbnailsFinish()
@@ -642,17 +643,18 @@ function fv_ImgConvert( i_wnd)
 	cmd += ' -o "' + out + '"';
 	i_wnd.destroy();
 
-	n_Request_old({"cmdexec":{"cmds":[cmd]}}, false);
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":"fv_Converted","file":i_wnd.m_file,"info":"convert","wait":false,"parse":true});
 }
 
-function fv_Converted( i_msg)
+function fv_Converted( i_data, i_args)
 {
-	var file = i_msg.convert;
-	if( i_msg.error )
+	if( i_data.error )
 	{
-		c_Error( i_msg.error);
+		c_Error( i_data.error);
 		return;
 	}
+
+	var file = i_args.file;
 	if( file == null )
 	{
 		c_Error('Converted null file.');
