@@ -102,7 +102,7 @@ class Tray( QtGui.QSystemTrayIcon):
 		self.menu['AFANASY'].addAction( action)
 		self.menu['AFANASY'].addSeparator()
 
-		action = QtGui.QAction('Set nibmy', self)
+		action = QtGui.QAction('Set nimby', self)
 		QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
 		self.menu['AFANASY'].addAction( action)
 		action = QtGui.QAction('Set NIMBY', self)
