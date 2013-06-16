@@ -18,7 +18,9 @@ function p_Init()
 	if( RULES_TOP.playlist ) p_file = RULES_TOP.playlist;
 	p_elCurFolder = p_el.playlist;
 	p_elCurFolder.m_id = '';
-	if( localStorage.playlist_opened == "true" ) p_Open();
+
+	if( localStorage.playlist_opened == null ) localStorage.playlist_opened = 'true';
+	if( localStorage.playlist_opened == 'true') p_Open();
 	else p_Close();
 	if( localStorage.playlist_opened_folders == null ) localStorage.playlist_opened_folders = '';
 }
