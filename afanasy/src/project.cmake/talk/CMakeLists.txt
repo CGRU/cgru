@@ -28,4 +28,4 @@ if(WIN32)
    target_link_libraries(aftalk Ws2_32.lib)
 endif(WIN32)
 
-target_link_libraries(aftalk afqt)
+target_link_libraries(aftalk afqt $ENV{AF_EXTRA_LIBS} )

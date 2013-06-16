@@ -45,4 +45,4 @@ if(WIN32)
    target_link_libraries(afwatch Ws2_32.lib)
 endif(WIN32)
 
-target_link_libraries(afwatch afqt)
+target_link_libraries(afwatch afqt $ENV{AF_EXTRA_LIBS} )

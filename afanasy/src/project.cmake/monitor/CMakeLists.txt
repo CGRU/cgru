@@ -24,4 +24,4 @@ if(WIN32)
    target_link_libraries(afmonitor Ws2_32.lib)
 endif(WIN32)
 
-target_link_libraries(afmonitor afqt)
+target_link_libraries(afmonitor afqt $ENV{AF_EXTRA_LIBS} )

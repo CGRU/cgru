@@ -22,4 +22,4 @@ if(WIN32)
    target_link_libraries(afserver Ws2_32.lib Iphlpapi.lib)
 endif(WIN32)
 
-target_link_libraries(afserver afsql)
+target_link_libraries(afserver afsql $ENV{AF_EXTRA_LIBS} )

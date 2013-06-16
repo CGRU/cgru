@@ -7,10 +7,6 @@ if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
    set_target_properties(afrender PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
 endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 
-if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
-   set_target_properties(afrender PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
-endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
-
 if(WIN32)
    target_link_libraries(afrender Ws2_32.lib Iphlpapi.lib)
 endif(WIN32)
@@ -21,4 +17,9 @@ if(APPLE)
    set(EXTRA_LIBS ${CORE_FOUNDATION} ${IOKIT} )
 endif (APPLE)
 
-target_link_libraries(afrender afanasy ${EXTRA_LIBS} )
+target_link_libraries(afrender afanasy ${EXTRA_LIBS} $ENV{AF_EXTRA_LIBS} )
+
+if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+   set_target_properties(afrender PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
+endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+
