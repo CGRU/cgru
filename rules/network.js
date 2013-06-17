@@ -3,7 +3,9 @@ n_server = 'rules.php';
 n_requests = [];
 n_requests_count = 0;
 
-function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
+n_walks = {};
+
+function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead, i_mtime)
 {
 	if( typeof( i_paths) != 'object')
 	{
@@ -14,26 +16,57 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 	if( i_depth == null ) i_depth = 0;
 
 	var paths = [];
+	var cur_seconds = c_DT_CurSeconds();
 	for( var i = 0; i < i_paths.length; i++)
+	{
+		if( i_mtime && n_walks[i_paths[i]] && ( cur_seconds - n_walks[i_paths[i]].walktime) < i_mtime )
+			continue;
+		else
+			n_walks[i_paths[i]] = null
+
 		if( RULES.root )
 			paths.push( RULES.root + i_paths[i]);
 		else
 			paths.push( i_paths[i]);
+	}
 
-	var request = {};
-	request.walkdir = paths;
-	request.depth = i_depth;
-	request.showhidden = ( localStorage.show_hidden == 'ON' );
-	if( i_rufolder ) request.rufolder = i_rufolder;
-	if( i_rufiles ) request.rufiles = i_rufiles;
-	if( i_lookahead ) request.lookahead = i_lookahead;
-	var data = n_Request_old( request);
-	var response = c_Parse( data);
+	if( paths.length )
+	{
+		var request = {};
+		request.walkdir = paths;
+		request.depth = i_depth;
+		request.showhidden = ( localStorage.show_hidden == 'ON' );
+		if( i_rufolder ) request.rufolder = i_rufolder;
+		if( i_rufiles ) request.rufiles = i_rufiles;
+		if( i_lookahead ) request.lookahead = i_lookahead;
+		var data = n_Request({"send":request});
+		var response = c_Parse( data);
 
-	if( response == null ) return null;
-	if( response.walkdir == null ) return null;
+		if( response == null ) return null;
+		if( response.walkdir == null ) return null;
+	}
 
-	return response.walkdir;
+	var o_walks = [];
+	var w = 0;
+	for( var i = 0; i < i_paths.length; i++ )
+	{
+		var walk = n_walks[i_paths[i]];
+		if( walk == null )
+		{
+			walk = response.walkdir[w];
+			walk.walktime = c_DT_CurSeconds();
+			w++;
+		}
+		else 
+			c_Log('Walk cached '+i_mtime+'s: '+i_paths[i]);
+		o_walks.push( walk);
+		if( walk == null ) continue;
+//		if( walk.error ) continue;
+		n_walks[i_paths[i]] = walk;
+	}
+
+	return o_walks;
+//	return response.walkdir;
 }
 
 function n_Request_old( i_obj, i_wait, i_encode)

@@ -5,6 +5,7 @@
 "playlist":"rules/playlist.json",
 "newsrefresh":60,
 "newsrecent":99,
+"cache_time":300,
 
 "tags":{
 	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
@@ -61,7 +62,8 @@
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
-		}
+		},
+		"cache_time":60
 	}
 },
 

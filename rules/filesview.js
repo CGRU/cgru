@@ -205,7 +205,7 @@ FilesView.prototype.show = function()
 	this.limitApply();
 }
 
-FilesView.prototype.createItem = function( i_path)
+FilesView.prototype.createItem = function( i_path, i_obj)
 {
 	var el = document.createElement('div');
 	el.classList.add('item');
@@ -225,12 +225,32 @@ FilesView.prototype.createItem = function( i_path)
 	return el;
 }
 
+FilesView.prototype.showAttrs = function( i_el, i_obj)
+{
+	if( i_obj.size != null )
+	{
+		var elSize = document.createElement('div');
+		i_el.appendChild( elSize);
+		elSize.classList.add('size');
+		elSize.textContent = c_Bytes2KMG( i_obj.size);
+	}
+
+	if( i_obj.mtime != null )
+	{
+		var elMTime = document.createElement('div');
+		i_el.appendChild( elMTime);
+		elMTime.classList.add('mtime');
+		elMTime.textContent = c_DT_FormStrFromSec( i_obj.mtime);
+	}
+
+}
+
 FilesView.prototype.showFolder = function( i_folder)
 {
 	var name = i_folder.name;
 	var path = ( this.path + '/' + name).replace( /\/\//g, '/');
 
-	var elFolder = this.createItem( path);
+	var elFolder = this.createItem( path, i_folder);
 	elFolder.classList.add('folder');
 
 	if( this.has_thumbs )
@@ -285,20 +305,14 @@ FilesView.prototype.showFolder = function( i_folder)
 			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
 	}
 
-	if( i_folder.mtime != null )
-	{
-		var elMTime = document.createElement('div');
-		elFolder.appendChild( elMTime);
-		elMTime.classList.add('mtime');
-		elMTime.textContent = c_DT_FormStrFromSec( i_folder.mtime);
-	}
+	this.showAttrs( elFolder, i_folder);
 }
 
 FilesView.prototype.showFile = function( i_file)
 {
 	var path = this.path + '/' + i_file.name;
 
-	var elFile = this.createItem( path);
+	var elFile = this.createItem( path, i_file);
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFile, path, 'file');
@@ -353,21 +367,7 @@ FilesView.prototype.showFile = function( i_file)
 		elCvt.onclick = function(e){ e.stopPropagation(); fv_ImgConvertDialog( e.currentTarget.m_file)};
 	}
 
-	if( i_file.size != null )
-	{
-		var elSize = document.createElement('div');
-		elFile.appendChild( elSize);
-		elSize.classList.add('size');
-		elSize.textContent = c_Bytes2KMG( i_file.size);
-	}
-
-	if( i_file.mtime != null )
-	{
-		var elMTime = document.createElement('div');
-		elFile.appendChild( elMTime);
-		elMTime.classList.add('mtime');
-		elMTime.textContent = c_DT_FormStrFromSec( i_file.mtime);
-	}
+	this.showAttrs( elFile, i_file);
 }
 
 FilesView.prototype.onClick = function( i_evt)

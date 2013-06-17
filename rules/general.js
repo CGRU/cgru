@@ -183,7 +183,7 @@ function g_Navigate( i_path)
 //	if( i_last )
 //		rufiles.push('status');
 
-	walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder, ['rules','status'], ['status']);
+	walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder, ['rules','status'], ['status'], RULES.cache_time);
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
@@ -256,7 +256,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-	g_elCurFolder.m_dir.folders.sort( c_CompareFiles );
+	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
@@ -284,7 +284,7 @@ function g_OpenFolder( i_elFolder )
 	{
 //console.log('n_WalkDir: ' + i_elFolder.m_path);
 		i_elFolder.m_dir = n_WalkDir( [i_elFolder.m_path], 0, RULES.rufolder, [], ['status'])[0];
-		i_elFolder.m_dir.folders.sort( c_CompareFiles );
+		i_elFolder.m_dir.folders.sort( g_CompareFolders );
 	}
 
 	i_elFolder.classList.add('opened');
@@ -392,6 +392,20 @@ function g_FolderSetStatus( i_status, i_elFolder)
 		i_elFolder.m_elPercent.textContent = i_status.progress + '%';
 }
 
+function g_CompareFolders(a,b)
+{
+	var attr = 'name';
+	var dir = -1;
+	if( localStorage.navig_show_size == 'true' )
+	{
+		attr = 'size';
+		dir = 1;
+	}
+	if( a[attr] < b[attr]) return dir;
+	if( a[attr] > b[attr]) return -dir;
+	return 0;
+}
+
 function g_CloseFolder( i_elFolder )
 {
 	if( false == i_elFolder.classList.contains('opened'))
@@ -454,7 +468,7 @@ function g_NavigShowInfo( i_toggle)
 		var name = 'navig_show_'+infos[i];
 		if( localStorage[name] == null )
 		{
-			if( i == 0 )
+			if( infos[i] == 'annotation' )
 				localStorage[name] = 'true';
 			else
 				localStorage[name] = 'false';

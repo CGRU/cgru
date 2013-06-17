@@ -35,8 +35,10 @@ function shot_Show()
 		}
 	}
 
+	var cache_time = RULES.cache_time;
+	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
 	if( walk.paths.length )
-		walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder);
+		walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder, null, null, cache_time);
 
 	if( ASSET.result )
 	{
@@ -96,9 +98,11 @@ function shot_MakeThumbnail( i_sources, i_path)
 	{
 		if( input ) input += ',';
 		else input = '';
-			input += cgru_PM('/' + RULES.root + i_sources[i], true);
+			input += RULES.root + i_sources[i];
+//			input += cgru_PM('/' + RULES.root + i_sources[i], true);
 	}
-	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
+	var output = RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename;
+//	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":"u_UpdateThumbnail","info":"shot thumbnail","local":true,"wait":false,"parse":true});
 }
