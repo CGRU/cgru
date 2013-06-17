@@ -324,6 +324,12 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elPercent.classList.add('percent');
 	elPercent.classList.add('info');
 
+	var elSize = document.createElement('div');
+	elFolder.appendChild( elSize);
+	elFolder.m_elSize = elSize;
+	elSize.classList.add('size');
+	elSize.classList.add('info');
+
 	var elAnn = document.createElement('div');
 	elFolder.appendChild( elAnn);
 	elFolder.m_elAnn = elAnn;
@@ -361,6 +367,8 @@ function g_AppendFolder( i_elParent, i_fobject)
 //	elFolder.ondblclick = g_FolderOnDblClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
+	if( i_fobject.size != null )
+		elFolder.m_elSize.textContent = c_Bytes2KMG( i_fobject.size);
 
 	i_elParent.appendChild( elFolder);
 	i_elParent.m_elFolders.push( elFolder);
@@ -440,7 +448,7 @@ function g_FolderOnDblClick( i_evt)
 
 function g_NavigShowInfo( i_toggle)
 {
-	var infos = ['annotation','artists','tags','percent'];
+	var infos = ['size','annotation','artists','tags','percent'];
 	for( var i = 0; i < infos.length; i++ )
 	{
 		var name = 'navig_show_'+infos[i];

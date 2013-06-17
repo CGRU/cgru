@@ -108,6 +108,7 @@ opacity: 0.9;
 #navig .folder .progress { clear: both; }
 #navig .folder .progressbar { height: 6px; }
 #navig .folder .info { display: none; margin:2px 4px 0px 0px; position: relative; float: right;font: 14px Arial; } 
+#navig .folder .size { }
 #navig .folder .annotation { }
 #navig .folder .tags { font-style: italic; }
 #navig .folder .percent {
@@ -120,6 +121,7 @@ border-radius: 4px;
 #navig.navig_show_tags       .folder .tags       { display: inline; }
 #navig.navig_show_artists    .folder .artists    { display: inline; }
 #navig.navig_show_annotation .folder .annotation { display: inline; }
+#navig.navig_show_size       .folder .size       { display: inline; }
 #navig.navig_show_percent    .folder .percent    { display: inline; }
 
 /* ========================================== */
