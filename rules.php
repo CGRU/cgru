@@ -492,13 +492,37 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 		$o_out['folders'] = array();
 		$o_out['files'] = array();
 
+		$walk = null;
+		$walk_file = $i_dir.'/'.$rufolder.'/walk.json';
+		if( is_file( $walk_file))
+		if( $wHandle = fopen( $walk_file, 'r'))
+		{
+//error_log($path);
+			$wdata = fread( $wHandle, $FileMaxLength);
+//error_log($wdata);
+			$walk = json_decode( $wdata, true);
+			fclose($wHandle);
+		}
+
 		while (false !== ( $entry = readdir( $handle)))
 		{
 			if( skipFile( $entry)) continue;
 //			if( $entry == '.') continue;
 //			if( $entry == '..') continue;
 			$path = $i_dir.'/'.$entry;
-			$walk = null;
+
+			if( $access && ( false == is_dir( $path)))
+			{
+				if( is_file( $path))
+				{
+					$fileObj = array();
+					$fileObj['name'] = $entry;
+					$fileObj['size'] = filesize( $path);
+					$fileObj['mtime'] = filemtime( $path);
+					array_push( $o_out['files'], $fileObj);
+				}
+				continue;
+			}
 
 			if(( $entry == $rufolder ) && is_dir( $path))
 			{
@@ -515,21 +539,9 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 						if( $access )
 							array_push( $o_out['rufiles'], $ruentry);
 
-						if( $ruentry == 'walk.json')
-						{
-							if( $wHandle = fopen( $path.'/'.$ruentry, 'r'))
-							{
-error_log($path);
-								$wdata = fread( $wHandle, $FileMaxLength);
-error_log($wdata);
-								$walk = json_decode( $wdata, true);
-								fclose($wHandle);
-								continue;
-							}
-						}
-
 						if( strrpos( $ruentry,'.json') === false ) continue;
 
+						if( is_null( $rufiles)) continue;
 						$founded = false;
 						foreach( $rufiles as $rufile )
 							if( strpos( $ruentry, $rufile ) === 0 )
@@ -553,33 +565,17 @@ error_log($wdata);
 				}
 			}
 
-			if( $access && ( false == is_dir( $path)))
-			{
-				if( is_file( $path))
-				{
-					$fileObj = array();
-					$fileObj['name'] = $entry;
-					$fileObj['size'] = filesize( $path);
-					$fileObj['mtime'] = filemtime( $path);
-					array_push( $o_out['files'], $fileObj);
-				}
-				continue;
-			}
-
 			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden")) continue;
 			if( $denied ) continue;
 			if( false === htaccessFolder( $path)) continue;
 
 			$folderObj = array();
 
-//			if( is_array( $walk))
-//				$folderObj = $walk;
-/*
 			if( is_array( $walk))
 				if( array_key_exists('folders', $walk))
 					if( array_key_exists( $entry, $walk['folders']))
 						$folderObj = $walk['folders'][$entry];
-*/
+
 			$folderObj['name'] = $entry;
 			$folderObj['mtime'] = filemtime( $path);
 
