@@ -563,6 +563,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					sort( $o_out['rufiles']);
 					ksort($o_out['rules']);
 				}
+				continue;
 			}
 
 			if(( $i_recv['showhidden'] == false ) && is_file("$path/.hidden")) continue;

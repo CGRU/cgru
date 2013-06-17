@@ -448,7 +448,7 @@ function g_FolderOnDblClick( i_evt)
 
 function g_NavigShowInfo( i_toggle)
 {
-	var infos = ['size','annotation','artists','tags','percent'];
+	var infos = ['annotation','size','artists','tags','percent'];
 	for( var i = 0; i < infos.length; i++ )
 	{
 		var name = 'navig_show_'+infos[i];
