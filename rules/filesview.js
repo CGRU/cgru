@@ -189,7 +189,7 @@ FilesView.prototype.limitApply = function()
 
 FilesView.prototype.refresh = function()
 {
-	this.walk = n_WalkDir( [this.path], 0, RULES.rufolder)[0];
+	this.walk = n_WalkDir({"paths":[this.path]})[0];
 	this.show();
 }
 

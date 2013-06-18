@@ -38,7 +38,7 @@ function shot_Show()
 	var cache_time = RULES.cache_time;
 	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
 	if( walk.paths.length )
-		walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder, null, null, cache_time);
+		walk.walks = n_WalkDir({"paths":walk.paths,"mtime":cache_time});
 
 	if( ASSET.result )
 	{
@@ -130,7 +130,7 @@ function shot_OpenCloseSourceOnClick( i_evt)
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
-	var walkdir = n_WalkDir( paths, 5);
+	var walkdir = n_WalkDir({"paths":paths,"depth":5});
 
 	var founded = false;
 	for( var i = 0; i < walkdir.length; i++)

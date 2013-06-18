@@ -432,7 +432,7 @@ function st_UpdateProgresses( i_path)
 		paths.push( path);
 	}
 //window.console.log( paths);
-	walks = n_WalkDir( paths, 0, RULES.rufolder, ['status'], ['status']);
+	walks = n_WalkDir({"paths":paths,"rufiles":['status'],"lookahead":['status']});
 	if( walks == null ) return;
 
 	for( var w = walks.length-1; w >= 0; w--)

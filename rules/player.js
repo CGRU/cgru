@@ -95,7 +95,7 @@ function p_Init()
 	if( config.user )
 		g_auth_user = config.user;
 
-	c_RulesMergeDir( RULES, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
+	c_RulesMergeDir( RULES, n_WalkDir({"paths":['.'],"rufiles":['rules']})[0]);
 
 	if( RULES.cgru_config )
 		cgru_ConfigJoin( RULES.cgru_config );
@@ -188,7 +188,7 @@ function p_PathChanged()
 	if( p_rules_path.indexOf('//') != -1 ) p_rules_path = p_rules_path.substr( 0, p_rules_path.indexOf('//'));
 	$('rules_link').href = window.location.protocol + '//' + window.location.host + c_PathDir(window.location.pathname ) + '/#' + p_rules_path;
 
-	var walk = n_WalkDir([p_path], 0, '.rules',['player'])[0];
+	var walk = n_WalkDir({"paths":[p_path],"rufiles":['player']})[0];
 	c_RulesMergeDir( RULES, walk);
 	RULES.rufiles = walk.rufiles;
 	if( walk.files == null )
@@ -328,7 +328,7 @@ function p_ImgLoaded(e)
 	p_Info( info);
 
 	// Process saved comments:
-	var walk = n_WalkDir([p_savepath], 0, '.rules',['player'])[0];
+	var walk = n_WalkDir({"paths":[p_savepath],"rufiles":['player']})[0];
 	c_RulesMergeDir( RULES, walk);
 	if( RULES.player && RULES.player.comments )
 	{

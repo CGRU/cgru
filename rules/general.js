@@ -56,7 +56,7 @@ function g_Init()
 
 	nw_Init();
 
-	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
+	c_RulesMergeDir( RULES_TOP, n_WalkDir({"paths":['.'],"rufiles":['rules']})[0]);
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
@@ -183,7 +183,7 @@ function g_Navigate( i_path)
 //	if( i_last )
 //		rufiles.push('status');
 
-	walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder, ['rules','status'], ['status'], RULES.cache_time);
+	walk.walks = n_WalkDir({"paths":walk.paths,"rufiles":['rules','status'],"lookahead":['status'],"mtime":RULES.cache_time});
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
@@ -282,21 +282,32 @@ function g_OpenFolder( i_elFolder )
 
 	if( i_elFolder.m_dir == null )
 	{
-//console.log('n_WalkDir: ' + i_elFolder.m_path);
-		i_elFolder.m_dir = n_WalkDir( [i_elFolder.m_path], 0, RULES.rufolder, [], ['status'])[0];
-		i_elFolder.m_dir.folders.sort( g_CompareFolders );
+		n_WalkDir({"paths":[i_elFolder.m_path],"lookahead":['status'],"wfunc":'g_OpenFolderDo',"element":i_elFolder});
+		return;
+//		i_elFolder.m_dir = n_WalkDir({"paths":[i_elFolder.m_path],"lookahead":['status']})[0];
+//		i_elFolder.m_dir.folders.sort( g_CompareFolders );
+	}
+	g_OpenFolderDo( null, {"element":i_elFolder});
+}
+function g_OpenFolderDo( i_data, i_args)
+{
+	var el = i_args.element;
+	el.classList.add('opened');
+
+	if( i_data )
+	{
+		el.m_dir = i_data[0];
+		el.m_dir.folders.sort( g_CompareFolders);
 	}
 
-	i_elFolder.classList.add('opened');
+	if( el.m_dir.folders == null ) return;
 
-	if( i_elFolder.m_dir.folders == null ) return;
-
-	for( var i = 0; i < i_elFolder.m_dir.folders.length; i++)
+	for( var i = 0; i < el.m_dir.folders.length; i++)
 	{
-		var fobject = i_elFolder.m_dir.folders[i];
+		var fobject = el.m_dir.folders[i];
 		var folder = fobject.name;
 		if( folder.charAt(0) == '.' ) continue;
-		g_AppendFolder( i_elFolder, fobject);
+		g_AppendFolder( el, fobject);
 	}
 }
 

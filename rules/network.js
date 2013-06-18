@@ -6,68 +6,82 @@ n_conn_count = 0;
 
 n_walks = {};
 
-function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead, i_mtime)
+function n_WalkDir( i_args)
 {
-	if( typeof( i_paths) != 'object')
-	{
-		c_Error('PATH "'+i_paths+'" not an object.');
-		return null;
-	}
-
-	if( i_depth == null ) i_depth = 0;
+	if( i_args.depth == null ) i_args.depth = 0;
+	if( i_args.rufolder == null ) i_args.rufolder = RULES.rufolder;
 
 	var paths = [];
 	var cur_seconds = c_DT_CurSeconds();
-	for( var i = 0; i < i_paths.length; i++)
+	for( var i = 0; i < i_args.paths.length; i++)
 	{
-		if( i_mtime && n_walks[i_paths[i]] && ( cur_seconds - n_walks[i_paths[i]].walktime) < i_mtime )
+		if( i_args.mtime && n_walks[i_args.paths[i]] && ( cur_seconds - n_walks[i_args.paths[i]].walktime) < i_args.mtime )
 			continue;
 		else
-			n_walks[i_paths[i]] = null
+			n_walks[i_args.paths[i]] = null
 
 		if( RULES.root )
-			paths.push( RULES.root + i_paths[i]);
+			paths.push( RULES.root + i_args.paths[i]);
 		else
-			paths.push( i_paths[i]);
+			paths.push( i_args.paths[i]);
 	}
 
-	if( paths.length )
+	if( paths.length == 0 )
+		return n_WalkDirProcess( null, i_args);
+
+	var request = {};
+	request.walkdir = paths;
+	request.depth = i_args.depth;
+	request.rufolder = i_args.rufolder;
+	request.showhidden = ( localStorage.show_hidden == 'ON' );
+	if( i_args.rufiles   ) request.rufiles   = i_args.rufiles;
+	if( i_args.lookahead ) request.lookahead = i_args.lookahead;
+
+	if( i_args.wfunc )
 	{
-		var request = {};
-		request.walkdir = paths;
-		request.depth = i_depth;
-		request.showhidden = ( localStorage.show_hidden == 'ON' );
-		if( i_rufolder ) request.rufolder = i_rufolder;
-		if( i_rufiles ) request.rufiles = i_rufiles;
-		if( i_lookahead ) request.lookahead = i_lookahead;
-		var data = n_Request({"send":request});
-		var response = c_Parse( data);
-
-		if( response == null ) return null;
-		if( response.walkdir == null ) return null;
+		i_args.send = request;
+		i_args.func = 'n_WalkDirProcess';
+		i_args.parse = true;
+		i_args.wait = false;
+		i_args.info = 'walk';
+		n_Request( i_args);
+		return;
 	}
+	
+	var data = n_Request({"send":request});
+	var response = c_Parse( data);
 
+	if( response == null ) return null;
+	if( response.walkdir == null ) return null;
+
+	return n_WalkDirProcess( response, i_args);
+}
+
+function n_WalkDirProcess( i_data, i_args)
+{
 	var o_walks = [];
 	var w = 0;
-	for( var i = 0; i < i_paths.length; i++ )
+	for( var i = 0; i < i_args.paths.length; i++ )
 	{
-		var walk = n_walks[i_paths[i]];
+		var walk = n_walks[i_args.paths[i]];
 		if( walk == null )
 		{
-			walk = response.walkdir[w];
+			walk = i_data.walkdir[w];
 			walk.walktime = c_DT_CurSeconds();
 			w++;
 		}
 		else 
-			c_Log('Walk cached '+i_mtime+'s: '+i_paths[i]);
+			c_Log('Walk cached '+i_args.mtime+'s: '+i_args.paths[i]);
 		o_walks.push( walk);
 		if( walk == null ) continue;
 //		if( walk.error ) continue;
-		n_walks[i_paths[i]] = walk;
+		n_walks[i_args.paths[i]] = walk;
 	}
 
+	if( i_args.wfunc )
+		return window[i_args.wfunc]( o_walks, i_args);
+
 	return o_walks;
-//	return response.walkdir;
 }
 
 function n_Request_old( i_obj, i_wait, i_encode)
@@ -106,7 +120,7 @@ function n_Request( i_args)
 	if( i_args.wait )
 		log += '#040">send '+i_args.id;
 	else
-		log += '#044">send '+i_args.id + '('+n_conn_count+')';
+		log += '#044">send '+i_args.id + ' ('+n_conn_count+')';
 	log += '</i> '+i_args.info+':</b> '+ send_str;
 
 	var xhr = new XMLHttpRequest;
@@ -145,7 +159,7 @@ function n_Request( i_args)
 	}
 
 	u_el.cycle.classList.remove('timeout');
-	u_el.cycle.style.opacity = '1';
+	u_el.cycle.classList.add('active');
 
 	xhr.onreadystatechange = n_XHRHandler;
 }
@@ -161,13 +175,13 @@ function n_XHRHandler()
 		if( n_conn_count < 0 ) n_conn_count = 0;
 		if( n_conn_count == 0 )
 		{
-			u_el.cycle.classList.add("timeout");
-			u_el.cycle.style.opacity = '.1';
+			u_el.cycle.classList.add('timeout');
+			u_el.cycle.classList.remove('active');
 		}
 
 		if( this.status == 200 )
 		{
-			c_Log('<b><i style="color:#044">recv '+this.m_args.id+'('+n_conn_count+')</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
+			c_Log('<b><i style="color:#044">recv '+this.m_args.id+' ('+n_conn_count+')</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
 
 			if( this.m_args.func )
 			{

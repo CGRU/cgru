@@ -53,8 +53,10 @@ position:absolute;
 top:16px;left:30px;height:10px;width:5px;
 border-radius: 3px;
 background: #FFA;
+opacity: 0.1;
 box-shadow: 0px 0px 5px #FA6;
 }
+#footer #cycle.active { opacity: 1.0; }
 #footer #cycle.timeout {
 -o-transition: all 1s ease-out;
 -moz-transition: all 1s ease-out;

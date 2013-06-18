@@ -19,7 +19,7 @@ function forum_QuestionIDOnGet()
 	var id = $('forum_question_id').textContent;
 	id = c_Strip( id.toLowerCase()).replace(/\W/g,'_').substr(0,16);
 	$('forum_question_id').textContent = id;
-	var walks = n_WalkDir([g_CurPath()]);
+	var walks = n_WalkDir({"paths":[g_CurPath()]});
 	if( walks && walks.length && walks[0].folders && walks[0].folders.length )
 		for( var i = 0; i < walks[0].folders.length; i++)
 			if( walks[0].folders[i].name == id )

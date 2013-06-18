@@ -28,7 +28,7 @@ function d_Make( i_path, i_outfolder)
 	if( match )
 		params.version = match[match.length-1];
 
-	var readir = n_WalkDir([i_path], 0)[0];
+	var readir = n_WalkDir({"paths":[i_path]})[0];
 	if( readir && readir.files && readir.files.length )
 	for( var f = 0; f < readir.files.length; f++ )
 	{

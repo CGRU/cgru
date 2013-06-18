@@ -151,7 +151,7 @@ function scene_Show()
 
 function scenes_Show()
 {
-	var walk = n_WalkDir([ASSET.path], 1, RULES.rufolder,['rules','status'],['status'])[0];
+	var walk = n_WalkDir({"paths":[ASSET.path],"depth":1,"rufiles":['rules','status'],"lookahead":['status']})[0];
 	if( walk.folders == null ) return;
 	walk.folders.sort( c_CompareFiles );
 
