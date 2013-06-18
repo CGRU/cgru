@@ -17,10 +17,11 @@ cgru_params.push(['back_body','Body', '', 'Enter background style']);
 cgru_params.push(['back_files','Files', '', 'Enter background style']);
 cgru_params.push(['back_comments','Comments', '', 'Enter background style']);
 
+u_thumbstime = {};
+
 function View_body_Open() { u_BodyLoad(); }
 function View_body_Close() { u_BodyEditCancel(''); }
-function View_files_Open() { if( g_elCurFolder ) new FilesView( $('files'), g_elCurFolder.m_path, g_elCurFolder.m_dir,
-	/*show limits=*/false); }
+function View_files_Open() { if( g_elCurFolder ) new FilesView({"el":$('files'),"path":g_elCurFolder.m_path,"walk":g_elCurFolder.m_dir,"limits":false}); }
 function View_files_Close() { $('files').textContent = ''; }
 
 function u_Init()
@@ -954,7 +955,20 @@ function u_UpdateThumbnail( i_data)
 
 	if( i_data.status == 'skipped' ) return;
 
-	u_el.thumbnail.src = RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+	var file = g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+	u_el.thumbnail.src = RULES.root + file;
 	u_el.thumbnail.style.display = 'inline';
+
+	// Update time
+	u_thumbstime[file] = c_DT_CurSeconds();
+
+	// Ensure that it exists in walk rules files:
+	if( g_elCurFolder && g_elCurFolder.m_dir )
+	{
+		if( g_elCurFolder.m_dir.rufiles == null )
+			g_elCurFolder.m_dir.rufiles = [];
+		if( g_elCurFolder.m_dir.rufiles.indexOf( RULES.thumbnail.filename) == -1 )
+			g_elCurFolder.m_dir.rufiles.push( RULES.thumbnail.filename);
+	}
 }
 

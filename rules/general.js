@@ -394,15 +394,13 @@ function g_FolderSetStatus( i_status, i_elFolder)
 
 function g_CompareFolders(a,b)
 {
-	var attr = 'name';
-	var dir = -1;
 	if( localStorage.navig_show_size == 'true' )
 	{
-		attr = 'size';
-		dir = 1;
+		if( a['size'] < b['size']) return 1;
+		if( a['size'] > b['size']) return -1;
 	}
-	if( a[attr] < b[attr]) return dir;
-	if( a[attr] > b[attr]) return -dir;
+	if( a['name'] < b['name']) return -1;
+	if( a['name'] > b['name']) return 1;
 	return 0;
 }
 

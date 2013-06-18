@@ -137,9 +137,6 @@ function c_Error( i_err)
 }
 function c_Log( i_msg)
 {
-	u_el.cycle.classList.remove('timeout');
-	u_el.cycle.style.opacity = '1';
-
 	var date = new Date();
 	var time = c_PadZero(date.getHours())+':'+c_PadZero(date.getMinutes())+':'+c_PadZero(date.getSeconds())+'.'+c_PadZero(date.getMilliseconds(),3);
 	var elLine = document.createElement('div');
@@ -162,10 +159,6 @@ function c_Log( i_msg)
 	}
 	elLine.innerHTML = innerHTML;
 	c_logCount++;
-
-	if( u_el && u_el.cycle )
-		setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
-//	u_el.cycle.style.opacity = '.1';
 }
 
 function c_DT_StrFromSec( i_time, i_nosec) { return c_DT_StrFromMSec( i_time*1000, i_nosec);}

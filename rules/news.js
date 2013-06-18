@@ -2,6 +2,8 @@ nw_recent_file = 'recent.json';
 
 nw_initialized = false;
 
+nw_recents = {};
+
 function nw_Init()
 {
 	// Recent:
@@ -146,12 +148,13 @@ function nw_Process()
 		$('subscribe_btn').style.display = 'none';
 	}
 	else
-		nw_Finish();
+		nw_Finish( false);
 }
 
-function nw_Finish()
+function nw_Finish( i_finish_recent)
 {
-	$('recent').innerHTML = '';
+	if( i_finish_recent !== false )
+		$('recent').innerHTML = '';
 
 	if( false == nw_initialized ) return;
 
@@ -446,6 +449,13 @@ function nw_RecentLoad( i_nocheck)
 		return;
 
 	var file = c_GetRuFilePath( nw_recent_file);
+	if( nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
+	{
+		c_Log('Recent cached '+RULES.cache_time+'s: '+g_CurPath());
+		nw_RecentReceived( nw_recents[g_CurPath()].array );
+		return;
+	}
+
 	n_Request({"send":{"readobj":file},"local":true,"func":"nw_RecentReceived","info":"recent","wait":false,"parse":true});
 	$('recent').textContent = 'Loading...';
 }
@@ -453,9 +463,13 @@ function nw_RecentLoad( i_nocheck)
 function nw_RecentReceived( i_data, i_args)
 {
 //console.log( i_args);
-//console.log( i_data);
+//console.log( i_data.length);
 //return;
-	if( i_args.path != g_CurPath()) return;
+	if( i_args )
+	{
+		nw_recents[i_args.path] = {"array":i_data,"time":c_DT_CurSeconds()};
+		if( i_args.path != g_CurPath()) return;
+	}
 
 	$('recent').innerHTML = '';
 	if( i_data == null ) return;

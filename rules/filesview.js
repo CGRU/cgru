@@ -13,16 +13,21 @@ function fv_Finish()
 	fv_cur_item = null;
 }
 
-function FilesView( i_elParent, i_path, i_walk, i_show_limits, i_show_thumbs)
+//function FilesView( i_elParent, i_path, i_walk, i_show_limits, i_show_thumbs)
+function FilesView( i_args)
 {
-	this.elParent = i_elParent;
-	this.path = i_path;
-	this.walk = i_walk;
+	this.elParent = i_args.el;
+	this.path = i_args.path;
+	this.walk = i_args.walk;
+
+	this.can_refresh = true;
+	if( i_args.refresh === false ) this.can_refresh = false;
 
 	this.has_limits = true;
-	if( i_show_limits === false ) this.has_limits = false;
+	if( i_args.limits === false ) this.has_limits = false;
+
 	this.has_thumbs = true;
-	if( i_show_thumbs === false ) this.has_thumbs = false;
+	if( i_args.thumbs === false ) this.has_thumbs = false;
 
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild( this.elRoot);
@@ -43,12 +48,12 @@ function FilesView( i_elParent, i_path, i_walk, i_show_limits, i_show_thumbs)
 		title = ASSET.name;
 	elTitle.textContent = title;
 
-	c_CreateOpenButton( this.elPanel, i_path);
+	c_CreateOpenButton( this.elPanel, this.path);
 
 	var elPath = document.createElement('a');
 	this.elPanel.appendChild( elPath);
-	elPath.href = '#' + i_path;
-	var path = i_path;
+	elPath.href = '#' + this.path;
+	var path = this.path;
 	if( ASSET && ASSET.path )
 	{
 		path = path.replace( ASSET.path, '');
@@ -56,6 +61,16 @@ function FilesView( i_elParent, i_path, i_walk, i_show_limits, i_show_thumbs)
 	}
 	elPath.classList.add('path');
 	elPath.textContent = path;
+
+	if( this.can_refresh )
+	{
+		var elRefteshBtn = document.createElement('div');
+		this.elPanel.appendChild( elRefteshBtn);
+		elRefteshBtn.classList.add('button');
+		elRefteshBtn.innerHTML = '&#10227;';
+		elRefteshBtn.m_view = this;
+		elRefteshBtn.onclick = function(e){ e.currentTarget.m_view.refresh()};
+	}
 
 	if( this.has_thumbs )
 	{
@@ -428,7 +443,6 @@ FilesView.prototype.makeThumbEl = function( i_el, i_path, i_type)
 	var elImg = document.createElement('img');
 	elThumbnal.appendChild( elImg);
 	elThumbnal.m_elImg = elImg;
-//if( c_FileCanThumbnail( i_path) && (( i_walk == null ) || ( i_walk.rufiles && ( i_walk.rufiles.indexOf( thumbName) != -1))))
 	if( this.walk.rufiles && ( this.walk.rufiles.indexOf( thumbName) != -1))
 		elImg.src = thumbFile;
 	else

@@ -54,7 +54,7 @@ function shot_Show()
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
 			thumb_paths.push( path);
-			new FilesView( elResult, path, walk.walks[walk.result[i]])
+			new FilesView({"el":elResult,"path":path,"walk":walk.walks[walk.result[i]]})
 			founded = true;
 		}
 
@@ -76,7 +76,7 @@ function shot_Show()
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				new FilesView( elDailies, path, walk.walks[walk.dailies[i]]);
+				new FilesView({"el":elDailies,"path":path,"walk":walk.walks[walk.dailies[i]]});
 				if( thumb_paths.length == 0 )
 					thumb_paths.push( path);
 				founded = true;
@@ -93,6 +93,16 @@ function shot_Show()
 
 function shot_MakeThumbnail( i_sources, i_path)
 {
+	var file = i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename;
+
+	var cache_time = RULES.cache_time;
+	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
+	if( u_thumbstime[file] && ( c_DT_CurSeconds() - u_thumbstime[file] < cache_time ))
+	{
+		c_Log('Thumbnail cached '+cache_time+'s: '+file);
+		return;
+	}
+
 	var input = null;
 	for( var i = 0; i < i_sources.length; i++ )
 	{
@@ -101,7 +111,7 @@ function shot_MakeThumbnail( i_sources, i_path)
 			input += RULES.root + i_sources[i];
 //			input += cgru_PM('/' + RULES.root + i_sources[i], true);
 	}
-	var output = RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename;
+	var output = RULES.root + file;
 //	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":"u_UpdateThumbnail","info":"shot thumbnail","local":true,"wait":false,"parse":true});
@@ -129,7 +139,7 @@ function shot_OpenCloseSourceOnClick( i_evt)
 		shot_SourceWalkFind( walkdir[i], flist);
 		if( flist.length )
 		{
-			new FilesView( elSource, paths[i], {"folders":flist}, false, false);
+			new FilesView({"el":elSource,"path":paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
 			founded = true;
 		}
 	}

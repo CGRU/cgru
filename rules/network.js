@@ -2,6 +2,7 @@ n_server = 'rules.php';
 
 n_requests = [];
 n_requests_count = 0;
+n_conn_count = 0;
 
 n_walks = {};
 
@@ -138,6 +139,13 @@ function n_Request( i_args)
 		return xhr.responseText;
 	}
 
+	if( n_conn_count <= 0 )
+	{
+		u_el.cycle.classList.remove('timeout');
+		u_el.cycle.style.opacity = '1';
+	}
+	n_conn_count++;
+
 	xhr.onreadystatechange = n_XHRHandler;
 }
 
@@ -164,6 +172,14 @@ function n_XHRHandler()
 				window[this.m_args.func]( data, this.m_args);
 			}
 		}
+
+		n_conn_count--;
+//		if( u_el && u_el.cycle ) setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
+		if( n_conn_count <= 0 )
+		{
+			u_el.cycle.classList.add("timeout");
+			u_el.cycle.style.opacity = '.1';
+		}
 	}
 }
 
@@ -188,7 +204,7 @@ function n_SendJob( job)
 	obj.sender_id = 0;
 	obj.magick_number = cgru_Config.af_magic_number;
 	
-	n_Request_old( obj);
+	n_Request({"send":obj});
 }
 
 function n_Get( i_path)
@@ -210,7 +226,7 @@ function n_GetRuFile( i_file, i_nockeck )
 {
 	if( i_nockeck != true )
 		if( false == c_RuFileExists( i_file)) return null;
-	return n_Request_old({"getfile":c_GetRuFilePath( i_file)});
+	return n_Request({"send":{"getfile":c_GetRuFilePath( i_file)}});
 //	return n_Get( c_GetRuFilePath( i_file));
 }
 
@@ -234,8 +250,7 @@ function n_SendMail( i_address, i_subject, i_body)
 	obj.body += '</div><a href="cgru.info" style="padding:10px;margin:10px;" target="_blank">CGRU</a>';
 	obj.body += '</div></body></html>';
 
-	var result = c_Parse( n_Request_old({"sendmail":obj}));
-//	var result = c_Parse( n_Request_old({"sendmail":obj}, true, true));
+	var result = c_Parse( n_Request({"send":{"sendmail":obj}}));
 	if( result == null ) return false;
 	if( result.error )
 	{
