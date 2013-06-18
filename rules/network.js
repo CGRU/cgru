@@ -87,7 +87,10 @@ function n_Request( i_args)
 		i_args.path = g_CurPath();
 	if( i_args.info == null ) i_args.info = '';
 
-	if( i_args.wait == null) i_args.wait = true;
+	if( i_args.wait == null)
+		i_args.wait = true;
+	else
+		n_conn_count++;
 
 	if( SERVER && SERVER.AUTH_RULES )
 	{
@@ -100,13 +103,15 @@ function n_Request( i_args)
 		send_str = btoa( send_str);
 
 	var log = '<b><i style="color:';
-	if( i_args.wait ) log += '#040';
-	else log += '#044';
-	log += '">send '+i_args.id+'</i> '+i_args.info+':</b> '+ send_str;
+	if( i_args.wait )
+		log += '#040">send '+i_args.id;
+	else
+		log += '#044">send '+i_args.id + '('+n_conn_count+')';
+	log += '</i> '+i_args.info+':</b> '+ send_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.m_args = i_args;
-	n_requests.push( xhr);
+//	n_requests.push( xhr);
 
 	xhr.overrideMimeType('application/json');
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
@@ -139,12 +144,8 @@ function n_Request( i_args)
 		return xhr.responseText;
 	}
 
-	if( n_conn_count <= 0 )
-	{
-		u_el.cycle.classList.remove('timeout');
-		u_el.cycle.style.opacity = '1';
-	}
-	n_conn_count++;
+	u_el.cycle.classList.remove('timeout');
+	u_el.cycle.style.opacity = '1';
 
 	xhr.onreadystatechange = n_XHRHandler;
 }
@@ -155,9 +156,18 @@ function n_XHRHandler()
 //console.log( this.readyState);
 	if( this.readyState == 4 )
 	{
+		n_conn_count--;
+//		if( u_el && u_el.cycle ) setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
+		if( n_conn_count < 0 ) n_conn_count = 0;
+		if( n_conn_count == 0 )
+		{
+			u_el.cycle.classList.add("timeout");
+			u_el.cycle.style.opacity = '.1';
+		}
+
 		if( this.status == 200 )
 		{
-			c_Log('<b><i style="color:#044">recv '+this.m_args.id+'</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
+			c_Log('<b><i style="color:#044">recv '+this.m_args.id+'('+n_conn_count+')</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
 
 			if( this.m_args.func )
 			{
@@ -171,14 +181,6 @@ function n_XHRHandler()
 
 				window[this.m_args.func]( data, this.m_args);
 			}
-		}
-
-		n_conn_count--;
-//		if( u_el && u_el.cycle ) setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
-		if( n_conn_count <= 0 )
-		{
-			u_el.cycle.classList.add("timeout");
-			u_el.cycle.style.opacity = '.1';
 		}
 	}
 }

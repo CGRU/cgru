@@ -396,8 +396,10 @@ function g_CompareFolders(a,b)
 {
 	if( localStorage.navig_show_size == 'true' )
 	{
-		if( a['size'] < b['size']) return 1;
-		if( a['size'] > b['size']) return -1;
+		if(      a['size'] ==  null   ) return  1;
+		else if( b['size'] ==  null   ) return -1;
+		else if( a['size'] < b['size']) return  1;
+		else if( a['size'] > b['size']) return -1;
 	}
 	if( a['name'] < b['name']) return -1;
 	if( a['name'] > b['name']) return 1;

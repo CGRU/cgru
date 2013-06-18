@@ -68,6 +68,7 @@ function FilesView( i_args)
 		this.elPanel.appendChild( elRefteshBtn);
 		elRefteshBtn.classList.add('button');
 		elRefteshBtn.innerHTML = '&#10227;';
+		elRefteshBtn.title = 'Refresh this files view';
 		elRefteshBtn.m_view = this;
 		elRefteshBtn.onclick = function(e){ e.currentTarget.m_view.refresh()};
 	}
@@ -242,14 +243,6 @@ FilesView.prototype.createItem = function( i_path, i_obj)
 
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
-	if( i_obj.size != null )
-	{
-		var elSize = document.createElement('div');
-		i_el.appendChild( elSize);
-		elSize.classList.add('size');
-		elSize.textContent = c_Bytes2KMG( i_obj.size);
-	}
-
 	if( i_obj.mtime != null )
 	{
 		var elMTime = document.createElement('div');
@@ -258,6 +251,13 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		elMTime.textContent = c_DT_FormStrFromSec( i_obj.mtime);
 	}
 
+	if( i_obj.size != null )
+	{
+		var elSize = document.createElement('div');
+		i_el.appendChild( elSize);
+		elSize.classList.add('size');
+		elSize.textContent = c_Bytes2KMG( i_obj.size);
+	}
 }
 
 FilesView.prototype.showFolder = function( i_folder)
