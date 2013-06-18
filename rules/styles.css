@@ -89,6 +89,7 @@ padding: 0px 0px 0px 16px;
 border-radius: 4px;
 font-weight: normal;
 }
+#navig.waiting .folder { cursor: wait; }
 #navig .folder.opened {
 padding-top: 4px;
 padding-bottom: 4px;
