@@ -190,7 +190,7 @@ FilesView.prototype.limitApply = function()
 FilesView.prototype.refresh = function()
 {
 	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this});
-	this.elView.innerHTML = 'Loading...';
+	c_LoadingElSet( this.elRoot);
 }
 FilesView.prototype.walkReceived = function( i_data, i_args)
 {
@@ -200,6 +200,7 @@ FilesView.prototype.walkReceived = function( i_data, i_args)
 
 FilesView.prototype.show = function()
 {
+	c_LoadingElReset( this.elRoot);
 	this.elView.innerHTML = '';
 	this.elItems = [];
 	this.elThumbnails = [];

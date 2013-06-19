@@ -2,18 +2,6 @@ function shot_Show()
 {
 	a_SetLabel('Shot');
 
-	var thumb_paths = [];
-
-	if( ASSET.source )
-	{
-		var elSource = document.createElement('div');
-		u_el.asset.appendChild( elSource);
-		elSource.classList.add('source');
-		elSource.classList.add('button');
-		elSource.textContent = 'Scan Sources';
-		elSource.onclick = shot_OpenCloseSourceOnClick;
-	}
-
 	var walk = {};
 	walk.paths = [];
 	if( ASSET.result )
@@ -35,10 +23,28 @@ function shot_Show()
 		}
 	}
 
-	var cache_time = RULES.cache_time;
-	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
-	if( walk.paths.length )
-		walk.walks = n_WalkDir({"paths":walk.paths,"mtime":cache_time});
+	walk.mtime = RULES.cache_time;
+	if( ASSET.cache_time ) walk.mtime = ASSET.cache_time;
+	walk.wfunc = shot_Loaded;
+	n_WalkDir( walk);
+}
+
+function shot_Loaded( i_data, i_args)
+{
+	var walk = i_args;
+	walk.walks = i_data;
+	var thumb_paths = [];
+	$('asset').textContent = '';
+
+	if( ASSET.source )
+	{
+		var elSource = document.createElement('div');
+		u_el.asset.appendChild( elSource);
+		elSource.classList.add('source');
+		elSource.classList.add('button');
+		elSource.textContent = 'Scan Sources';
+		elSource.onclick = shot_OpenCloseSourceOnClick;
+	}
 
 	if( ASSET.result )
 	{

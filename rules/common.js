@@ -482,3 +482,16 @@ function c_elMarkupRemove( i_el)
 	i_el.innerHTML = html;
 	i_el.innerHTML = i_el.textContent.replace(/@BR@/g, '<br>');
 }
+
+function c_LoadingElSet( i_el)
+{
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.classList.add('loading');
+	var elText = document.createElement('div');
+	el.appendChild( elText);
+	elText.textContent = 'Loading...';
+	i_el.m_elWaiting = el;
+}
+function c_LoadingElReset( i_el) { if( i_el.m_elWaiting ) i_el.removeChild( i_el.m_elWaiting); }
+

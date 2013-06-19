@@ -166,7 +166,7 @@ box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 .button.openclose.opened { font-size:14px; width: 14px; height: 14px; }
 .button.openclose.closed { }
 
-#content > .view { border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
+#content > .view { position: relative; border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 
 .editing {
 background: #DDD;
@@ -572,4 +572,26 @@ box-shadow: 0 0 4px #000 inset;
 .imgconvert > div > div { margin: 2px 8px; padding: 2px 8px;}
 .imgconvert > div .label { float: left; width: 100px; }
 .imgconvert > div .info { float: right; width: 150px; }
+
+/* ================ LOADING: ==================== */
+#navig_loading, .loading {
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: rgba( 128, 128, 128, .3);
+cursor: wait;
+}
+.loading { background: rgba( 128, 128, 128, .3); }
+#navig_loading { background: rgba( 128, 128, 128, .1); }
+.loading > div {
+text-align: center;
+font-weight: bold;
+background: #777;
+color: #000;
+margin: 20px;
+padding: 10px;
+border-radius: 8px;
+border: 2px solid #AAA;
+box-shadow: 0 0 8px #000;
+height: 20px;
+}
 

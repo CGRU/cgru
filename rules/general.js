@@ -283,10 +283,8 @@ function g_OpenFolder( i_elFolder )
 	if( i_elFolder.m_dir == null )
 	{
 		n_WalkDir({"paths":[i_elFolder.m_path],"lookahead":['status'],"wfunc":g_OpenFolderDo,"element":i_elFolder});
-		u_el.navig.classList.add('waiting');
+		$('navig_loading').style.display = 'block';
 		return;
-//		i_elFolder.m_dir = n_WalkDir({"paths":[i_elFolder.m_path],"lookahead":['status']})[0];
-//		i_elFolder.m_dir.folders.sort( g_CompareFolders );
 	}
 	g_OpenFolderDo( null, {"element":i_elFolder});
 }
@@ -295,7 +293,7 @@ function g_OpenFolderDo( i_data, i_args)
 	var el = i_args.element;
 	el.classList.add('opened');
 
-	u_el.navig.classList.remove('waiting');
+	$('navig_loading').style.display = 'none';
 
 	if( i_data )
 	{
