@@ -21,7 +21,7 @@ function cm_Load()
 
 	if( false == c_RuFileExists( cm_file)) return;
 
-	n_Request({"send":{"readobj":c_GetRuFilePath( cm_file)},"func":"cm_Received","info":"comments","local":true,"wait":false,"parse":true});
+	n_Request({"send":{"readobj":c_GetRuFilePath( cm_file)},"func":cm_Received,"info":'comments',"local":true,"wait":false,"parse":true});
 	$('comments').textContent = 'Loading...';
 }
 

@@ -954,7 +954,7 @@ function p_PaintSave()
 
 			p_filestosave++;
 
-			n_Request({"send":{"save":{"file":png_path,"data":png,"type":"base64"}},"func":"p_SavedFile","file":png_path,"info":"save png","wait":false,"parse":true});
+			n_Request({"send":{"save":{"file":png_path,"data":png,"type":"base64"}},"func":p_SavedFile,"file":png_path,"info":"save png","wait":false,"parse":true});
 		}
 
 		var ctx = canvas.getContext('2d');
@@ -963,7 +963,7 @@ function p_PaintSave()
 		var data = canvas.toDataURL('image/jpeg',.8);
 		data = data.substr( data.indexOf(',')+1);
 
-		n_Request({"send":{"save":{"file":path,"data":data,"type":"base64"}},"func":"p_SavedFile","file":path,"info":"save jpg","wait":false,"parse":true});
+		n_Request({"send":{"save":{"file":path,"data":data,"type":"base64"}},"func":p_SavedFile,"file":path,"info":"save jpg","wait":false,"parse":true});
 	}
 
 	if( p_filestosave == 0 )

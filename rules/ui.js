@@ -608,7 +608,7 @@ function u_BodyLoad( i_nockeck)
 
 	if(( i_nockeck != true ) && ( false == c_RuFileExists( u_body_filename))) return;
 
-	n_Request({"send":{"getfile":c_GetRuFilePath( u_body_filename)},"func":"u_BodyReceived","local":true,"info":"body","wait":false});
+	n_Request({"send":{"getfile":c_GetRuFilePath( u_body_filename)},"func":u_BodyReceived,"local":true,"info":'body',"wait":false});
 }
 
 function u_BodyReceived( i_data, i_args)

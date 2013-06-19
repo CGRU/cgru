@@ -189,8 +189,13 @@ FilesView.prototype.limitApply = function()
 
 FilesView.prototype.refresh = function()
 {
-	this.walk = n_WalkDir({"paths":[this.path]})[0];
-	this.show();
+	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this});
+	this.elView.innerHTML = 'Loading...';
+}
+FilesView.prototype.walkReceived = function( i_data, i_args)
+{
+	i_args.this.walk = i_data[0];
+	i_args.this.show();
 }
 
 FilesView.prototype.show = function()
@@ -379,7 +384,8 @@ FilesView.prototype.showFile = function( i_file)
 		elCvt.classList.add('button');
 		elCvt.textContent = 'JPG';
 		elCvt.m_file = this.path + '/' + i_file.name;
-		elCvt.onclick = function(e){ e.stopPropagation(); fv_ImgConvertDialog( e.currentTarget.m_file)};
+		elCvt.m_view = this;
+		elCvt.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.imgConvertDialog( e.currentTarget.m_file)};
 	}
 
 	this.showAttrs( elFile, i_file);
@@ -591,12 +597,13 @@ function fv_SkipFile( i_filename)
 	return false;
 }
 
-function fv_ImgConvertDialog( i_file)
+FilesView.prototype.imgConvertDialog = function ( i_file)
 {
 	var wnd = new cgru_Window('imgconvert','Image Convert');
 	wnd.resize( 40, 50);
 	wnd.elContent.classList.add('imgconvert');
 	wnd.m_file = RULES.root + i_file;
+	wnd.m_view = this;
 
 	var elQualityDiv = document.createElement('div');
 	wnd.elContent.appendChild( elQualityDiv);
@@ -637,9 +644,10 @@ function fv_ImgConvertDialog( i_file)
 	elButton.classList.add('button');
 	elButton.textContent = 'Convert';
 	elButton.m_wnd = wnd;
-	elButton.onclick = function(e){ fv_ImgConvert( e.currentTarget.m_wnd )};
+	elButton.m_view = this;
+	elButton.onclick = function(e){ e.currentTarget.m_view.imgConvert( e.currentTarget.m_wnd )};
 }
-function fv_ImgConvert( i_wnd)
+FilesView.prototype.imgConvert = function( i_wnd)
 {
 	var quality = i_wnd.elQuality.textContent;
 	var resolution = i_wnd.elResolution.textContent;
@@ -657,10 +665,9 @@ function fv_ImgConvert( i_wnd)
 	cmd += ' -o "' + out + '"';
 	i_wnd.destroy();
 
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":"fv_Converted","file":i_wnd.m_file,"info":"convert","wait":false,"parse":true});
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.imgConverted,"this":this,"file":i_wnd.m_file,"info":'convert',"wait":false,"parse":true});
 }
-
-function fv_Converted( i_data, i_args)
+FilesView.prototype.imgConverted = function( i_data, i_args)
 {
 	if( i_data.error )
 	{
@@ -668,18 +675,9 @@ function fv_Converted( i_data, i_args)
 		return;
 	}
 
-	var file = i_args.file;
-	if( file == null )
-	{
-		c_Error('Converted null file.');
-		return;
-	}
+	c_Info('Converted ' + c_PathBase( i_args.file));
 
-	c_Info('Converted ' + c_PathBase( file));
-
-	for( var i = 0; i < fv_views.length; i++)
-		if( file.indexOf( fv_views[i].path ) != -1 )
-			fv_views[i].refresh();
+	i_args.this.refresh();
 }
 
 function fv_ReloadAll()

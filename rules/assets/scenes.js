@@ -9,7 +9,6 @@ if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
 	sc_Init();
 	a_SetLabel('Scene');
 	scene_Show();
-	sc_Post();
 }
 
 if( ASSETS.scenes && ( ASSETS.scenes.path == g_CurPath()))
@@ -17,7 +16,6 @@ if( ASSETS.scenes && ( ASSETS.scenes.path == g_CurPath()))
 	sc_Init();
 	a_SetLabel('Scenes');
 	scenes_Show();
-	sc_Post();
 }
 
 function sc_Init()
@@ -147,11 +145,24 @@ function scene_Show()
 		sc_elCurEditShot = null;
 	}
 	sc_DisplayCounts();
+	sc_Post();
 }
 
 function scenes_Show()
 {
-	var walk = n_WalkDir({"paths":[ASSET.path],"depth":1,"rufiles":['rules','status'],"lookahead":['status']})[0];
+	n_WalkDir({"paths":[ASSET.path],"wfunc":scenes_Received,"depth":1,"rufiles":['rules','status'],"lookahead":['status'],"local":true});
+	$('asset').classList.add('waiting');
+	scenes_elWaiting = document.createElement('div');
+	scenes_elWaiting.innerHTML = '<h3 style="text-align:center">Loading all project shots...</h3>';
+	$('asset').appendChild( scenes_elWaiting);
+}
+
+function scenes_Received( i_data, i_args)
+{
+	$('asset').classList.remove('waiting');
+	$('asset').removeChild( scenes_elWaiting);
+	
+	var walk = i_data[0];
 	if( walk.folders == null ) return;
 	walk.folders.sort( c_CompareFiles );
 
@@ -254,6 +265,7 @@ function scenes_Show()
 		}
 	}
 	sc_DisplayCounts();
+	sc_Post();
 }
 
 function sc_ShotStatusApply( i_status)

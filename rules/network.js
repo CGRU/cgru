@@ -40,7 +40,7 @@ function n_WalkDir( i_args)
 	if( i_args.wfunc )
 	{
 		i_args.send = request;
-		i_args.func = 'n_WalkDirProcess';
+		i_args.func = n_WalkDirProcess;
 		i_args.parse = true;
 		i_args.wait = false;
 		i_args.info = 'walk';
@@ -79,7 +79,7 @@ function n_WalkDirProcess( i_data, i_args)
 	}
 
 	if( i_args.wfunc )
-		return window[i_args.wfunc]( o_walks, i_args);
+		return i_args.wfunc( o_walks, i_args);
 
 	return o_walks;
 }
@@ -193,7 +193,7 @@ function n_XHRHandler()
 				if( this.m_args.parse )
 					data = c_Parse( data);
 
-				window[this.m_args.func]( data, this.m_args);
+				this.m_args.func( data, this.m_args);
 			}
 		}
 	}
