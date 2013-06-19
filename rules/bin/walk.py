@@ -26,10 +26,19 @@ if not os.path.isdir( Options.path):
 	print( Options.path)
 	sys.exit(1)
 
-def listdir( i_path):
+Progress = 0
+TotalFiles = 0
+CurFiles = 0
+
+def listdir( i_path, i_curdepth = -1):
+	global Progress
+	global TotalFiles
+	global CurFiles
+
+	curdepth = i_curdepth + 1
 	if Options.verbose:
-		sys.stdout.write( i_path+'   ')
-		sys.stdout.write('\r')
+		if curdepth < 4:
+			print( i_path)
 
 	if Options.mtime >= 0 and i_path != Options.path:
 		filename = os.path.join( i_path, Options.output)
@@ -67,7 +76,7 @@ def listdir( i_path):
 
 		if os.path.isdir( path):
 			out['num_folders'] += 1
-			fout = listdir( path)
+			fout = listdir( path, curdepth)
 			if fout is not None:
 				cur['folders'][entry] = fout
 				out['num_folders'] += fout['num_folders']
@@ -76,9 +85,15 @@ def listdir( i_path):
 
 		if os.path.isfile( path):
 			out['num_files'] += 1
+			CurFiles += 1
 			out['size'] += os.path.getsize( path)
 
 	cur.update( out)
+	if TotalFiles:
+		cur_progress = int( 100.0 * CurFiles / TotalFiles )
+		if cur_progress != Progress:
+			Progress = cur_progress
+			print('PROGRESS: %d%%' % Progress)
 
 	filename = os.path.join( i_path, Options.output)
 	if not os.path.isdir( os.path.dirname( filename)):
@@ -99,6 +114,17 @@ def listdir( i_path):
 
 time_start = time.time()
 print('Started at: %s' % time.ctime( time_start))
+
+# Get old files count if any:
+filename = os.path.join( Options.path, Options.output)
+if os.path.isfile( filename):
+	file = open( filename, 'r')
+	total = json.load( file)
+	if 'num_files' in total: TotalFiles = total['num_files']
+	file.close()
+
+if TotalFiles:
+	print('Previous run files count: %d' % TotalFiles)
 
 print( listdir( Options.path))
 
