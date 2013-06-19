@@ -101,9 +101,16 @@ function n_Request( i_args)
 		i_args.path = g_CurPath();
 	if( i_args.info == null ) i_args.info = '';
 
-	if( i_args.wait == null)
+	if( i_args.func )
+	{
+		i_args.wait = false;
+		if( i_args.parse == null )
+			i_args.parse = true;
+	}
+	else if( i_args.wait == null )
 		i_args.wait = true;
-	else
+
+	if( i_args.wait !== true )
 		n_conn_count++;
 
 	if( SERVER && SERVER.AUTH_RULES )

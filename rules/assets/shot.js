@@ -1,6 +1,7 @@
 function shot_Show()
 {
 	a_SetLabel('Shot');
+	$('asset').innerHTML = '<div style="text-align:center">Scanning shot sequences...</div>';
 
 	var walk = {};
 	walk.paths = [];

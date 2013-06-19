@@ -16,8 +16,11 @@ function g_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
-
-	SERVER = c_Parse( n_Request_old({"start":{}}));
+	n_Request({"send":{"start":{}},"func":g_Init_Server});
+}
+function g_Init_Server( i_data)
+{
+	SERVER = i_data;
 	if( SERVER == null ) return;
 	if( SERVER.error )
 	{
@@ -27,7 +30,11 @@ function g_Init()
 	if( SERVER.version )
 		$('version').innerHTML = c_Strip( SERVER.version);
 
-	var config = c_Parse( n_Request_old({"initialize":{}}));
+	n_Request({"send":{"initialize":{}},"func":g_Init_Config});
+}
+function g_Init_Config( i_data)
+{
+	var config = i_data;
 	if( config == null ) return;
 	if( config.error )
 	{
@@ -56,7 +63,11 @@ function g_Init()
 
 	nw_Init();
 
-	c_RulesMergeDir( RULES_TOP, n_WalkDir({"paths":['.'],"rufiles":['rules']})[0]);
+	n_WalkDir({"paths":['.'],"wfunc":g_Init_Rules,"rufiles":['rules']});
+}
+function g_Init_Rules( i_data)
+{
+	c_RulesMergeDir( RULES_TOP, i_data[0]);
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
@@ -130,8 +141,16 @@ function g_PathChanged()
 	}
 
 	if( new_path != old_path )
+	{
 		g_Navigate( new_path);
+		return;
+	}
 
+	g_NavigatePost()
+}
+
+function g_NavigatePost()
+{
 	if( g_nav_clicked == false )
 	{
 		g_elCurFolder.scrollIntoView();
@@ -183,7 +202,17 @@ function g_Navigate( i_path)
 //	if( i_last )
 //		rufiles.push('status');
 
-	walk.walks = n_WalkDir({"paths":walk.paths,"rufiles":['rules','status'],"lookahead":['status'],"mtime":RULES.cache_time});
+	walk.rufiles = ['rules','status'];
+	walk.mtime = RULES.cache_time;
+	walk.lookahead = ['status'];
+	walk.wfunc = g_WalksReceived;
+	n_WalkDir( walk);
+}
+
+function g_WalksReceived( i_data, i_args)
+{
+	var walk = i_args;
+	walk.walks = i_data;
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
@@ -202,6 +231,7 @@ function g_Navigate( i_path)
 
 	u_Process();
 	ad_PermissionsProcess();
+	g_NavigatePost()
 }
 
 function g_Goto( i_folder, i_path, i_walk, i_last)
