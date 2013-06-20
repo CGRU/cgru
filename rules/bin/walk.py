@@ -13,7 +13,7 @@ Parser.add_option('-D', '--debug',   dest='debug',      action='store_true', def
 (Options, Args) = Parser.parse_args()
 
 Progress = 0
-TotalFiles = 0
+PrevFiles = None
 CurFiles = 0
 StartPath = '.'
 
@@ -25,25 +25,43 @@ if not os.path.isdir( StartPath):
 	print( StartPath)
 	sys.exit(1)
 
+def jsonLoad( i_filename):
+	if not os.path.isfile( i_filename):
+		return None
+
+	try:
+		file = open( i_filename, 'r')
+	except:
+		print( str(sys.exc_info()[1]))
+		return None
+
+	obj = None
+	try:
+		obj = json.load( file)
+	except:
+		print('ERROR: %s' % i_filename)
+		print( str(sys.exc_info()[1]))
+		obj = None
+
+	file.close()
+
+	return obj
+
 def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 	global Progress
-	global TotalFiles
+	global PrevFiles
 	global CurFiles
 
 	curdepth = i_curdepth + 1
-	if Options.verbose > i_curdepth:
+	if Options.verbose > curdepth:
 		print( i_path)
 
 	if i_maxdepth >= 0 and curdepth > i_maxdepth:
-		filename = os.path.join( i_path, Options.output)
-		if os.path.isfile( filename):
-			print('    reading: '+filename)
-			file = open( filename, 'r')
-			out = json.load( file)
-			if 'files' in out: del out['files']
-			if 'folders' in out: del out['folders']
-			file.close()
-			return out
+		out = jsonLoad( os.path.join( i_path, Options.output))
+		if out is None: return None
+		if 'files' in out: del out['files']
+		if 'folders' in out: del out['folders']
+		return out
 
 	out = dict()
 	out['num_files'] = 0
@@ -61,10 +79,11 @@ def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 		return None
 
 	for entry in entries:
-		if entry == os.path.dirname( Options.output):
-			continue
+		if entry == os.path.dirname( Options.output): continue
 
 		path = os.path.join( i_path, entry)
+
+		if os.path.islink( path): continue
 
 		if os.path.isdir( path):
 			out['num_folders'] += 1
@@ -81,8 +100,8 @@ def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 			out['size'] += os.path.getsize( path)
 
 	cur.update( out)
-	if TotalFiles:
-		cur_progress = int( 100.0 * CurFiles / TotalFiles )
+	if PrevFiles:
+		cur_progress = int( 100.0 * CurFiles / PrevFiles )
 		if cur_progress != Progress:
 			Progress = cur_progress
 			print('PROGRESS: %d%%' % Progress)
@@ -104,40 +123,61 @@ def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 
 	return out
 
+def sepThousands( i_int):
+	s = str( int(i_int))
+	o = ''
+	for i in range( 0, len( s)):
+		o += s[len(s) - i - 1]
+		if (i+1) % 3 == 0: o += ' '
+	s = ''
+	for i in range( 0, len( o)):
+		s += o[len(o) - i - 1]
+	return s
+
 time_start = time.time()
 print('Started at: %s' % time.ctime( time_start))
 
 # Get old files count if any:
-filename = os.path.join( StartPath, Options.output)
-if os.path.isfile( filename):
-	file = open( filename, 'r')
-	total = json.load( file)
-	if 'num_files' in total: TotalFiles = total['num_files']
-	file.close()
+prev = jsonLoad( os.path.join( StartPath, Options.output))
+if prev is not None:
+	if 'num_files' in prev:
+		PrevFiles = prev['num_files']
 
-if TotalFiles:
-	print('Previous run files count: %d' % TotalFiles)
+if PrevFiles:
+	print('Previous run: %d files, %d folders, %s bytes' % ( prev['num_files'], prev['num_folders'], sepThousands( prev['size'])))
 
 # Walk in subfolders:
-print( walkdir( StartPath))
+walk = walkdir( StartPath)
+
+# Calculate difference with previous
+d_files = None
+d_folders = None
+d_size = None
+if PrevFiles is not None:
+	d_files   = walk['num_files']   - prev['num_files']
+	d_folders = walk['num_folders'] - prev['num_folders']
+	d_size    = walk['size']        - prev['size']
 
 # Walk in parent folders:
 curpath = os.path.abspath( StartPath )
-TotalFiles = 0
+PrevFiles = None
 while curpath != '/':
 	uppath = os.path.dirname( curpath)
 	if uppath == curpath: break
 	curpath = uppath
-	filename = os.path.join( curpath, Options.output)
-	if not os.path.isfile( filename): break
+	if not os.path.isfile( os.path.join( curpath, Options.output)): break
 
 	print('Updating: %s' % curpath)
 	walkdir( curpath, 0)
 
 
-# Output finish and running time:
+# Output statistics:
 time_finish = time.time()
 print('Finished at: %s' % time.ctime( time_finish))
+print('Result: %d files, %d folders, %s bytes' % (walk['num_files'], walk['num_folders'], sepThousands( walk['size'])))
+if d_files is not None:
+	print('Delta: %d files, %d folders, %s bytes' % ( d_files, d_folders, sepThousands( d_size)))
+
 sec = time_finish - time_start
 hrs = int( sec / 3600 )
 sec -= hrs * 3600

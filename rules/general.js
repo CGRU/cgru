@@ -169,6 +169,7 @@ function g_NavigatePost()
 
 function g_Navigate( i_path)
 {
+	g_WaitingSet();
 	if( g_elCurFolder )
 		g_elCurFolder.classList.remove('current');
 	g_elCurFolder = u_el.navig;
@@ -213,6 +214,7 @@ function g_WalksReceived( i_data, i_args)
 {
 	var walk = i_args;
 	walk.walks = i_data;
+	g_WaitingReset();
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
@@ -313,7 +315,7 @@ function g_OpenFolder( i_elFolder )
 	if( i_elFolder.m_dir == null )
 	{
 		n_WalkDir({"paths":[i_elFolder.m_path],"lookahead":['status'],"wfunc":g_OpenFolderDo,"element":i_elFolder});
-		$('navig_loading').style.display = 'block';
+		g_WaitingSet();
 		return;
 	}
 	g_OpenFolderDo( null, {"element":i_elFolder});
@@ -323,7 +325,7 @@ function g_OpenFolderDo( i_data, i_args)
 	var el = i_args.element;
 	el.classList.add('opened');
 
-	$('navig_loading').style.display = 'none';
+	g_WaitingReset();
 
 	if( i_data )
 	{
@@ -340,6 +342,15 @@ function g_OpenFolderDo( i_data, i_args)
 		if( folder.charAt(0) == '.' ) continue;
 		g_AppendFolder( el, fobject);
 	}
+}
+
+function g_WaitingSet()
+{
+	$('navig_loading').style.display = 'block';
+}
+function g_WaitingReset()
+{
+	$('navig_loading').style.display = 'none';
 }
 
 function g_AppendFolder( i_elParent, i_fobject)
