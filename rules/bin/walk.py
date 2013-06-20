@@ -6,52 +6,44 @@ from optparse import OptionParser
 
 Parser = OptionParser( usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 
-Parser.add_option('-p', '--path',    dest='path',       type  ='string',     default='.',                help='Path to walk.')
-Parser.add_option('-o', '--output',  dest='output',     type  ='string',     default='.rules/walk.json', help='File to save results.')
-Parser.add_option('-m', '--mtime',   dest='mtime',      type  =int,          default=-1,                 help='Modification time difference.')
-Parser.add_option('-V', '--verbose', dest='verbose',    action='store_true', default=False,              help='Verbose mode.')
+Parser.add_option('-o', '--output',  dest='output',     type = 'string',     default='.rules/walk.json', help='File to save results.')
+Parser.add_option('-V', '--verbose', dest='verbose',    type = 'int',        default=0,                  help='Verbose mode.')
 Parser.add_option('-D', '--debug',   dest='debug',      action='store_true', default=False,              help='Debug mode.')
 
 (Options, Args) = Parser.parse_args()
 
-if Options.path == '':
-	print('ERROR: path is not specified.')
-	sys.exit(1)
-
-if Options.verbose:
-	print('Path = "%s"' % Options.path)
-
-if not os.path.isdir( Options.path):
-	print('ERROR: path does not exist:')
-	print( Options.path)
-	sys.exit(1)
-
 Progress = 0
 TotalFiles = 0
 CurFiles = 0
+StartPath = '.'
 
-def listdir( i_path, i_curdepth = -1):
+if len( Args):
+	StartPath = Args[0]
+
+if not os.path.isdir( StartPath):
+	print('ERROR: path does not exist:')
+	print( StartPath)
+	sys.exit(1)
+
+def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 	global Progress
 	global TotalFiles
 	global CurFiles
 
 	curdepth = i_curdepth + 1
-	if Options.verbose:
-		if curdepth < 4:
-			print( i_path)
+	if Options.verbose > i_curdepth:
+		print( i_path)
 
-	if Options.mtime >= 0 and i_path != Options.path:
+	if i_maxdepth >= 0 and curdepth > i_maxdepth:
 		filename = os.path.join( i_path, Options.output)
 		if os.path.isfile( filename):
-			if os.path.getmtime( i_path) - os.path.getmtime( filename ) < Options.mtime:
-				if Options.verbose:
-					print('Not modified %s' % i_path)
-				file = open( filename, 'r')
-				out = json.load( file)
-				if 'files' in out: del out['files']
-				if 'folders' in out: del out['folders']
-				file.close()
-				return out
+			print('    reading: '+filename)
+			file = open( filename, 'r')
+			out = json.load( file)
+			if 'files' in out: del out['files']
+			if 'folders' in out: del out['folders']
+			file.close()
+			return out
 
 	out = dict()
 	out['num_files'] = 0
@@ -76,7 +68,7 @@ def listdir( i_path, i_curdepth = -1):
 
 		if os.path.isdir( path):
 			out['num_folders'] += 1
-			fout = listdir( path, curdepth)
+			fout = walkdir( path, i_maxdepth, curdepth)
 			if fout is not None:
 				cur['folders'][entry] = fout
 				out['num_folders'] += fout['num_folders']
@@ -116,7 +108,7 @@ time_start = time.time()
 print('Started at: %s' % time.ctime( time_start))
 
 # Get old files count if any:
-filename = os.path.join( Options.path, Options.output)
+filename = os.path.join( StartPath, Options.output)
 if os.path.isfile( filename):
 	file = open( filename, 'r')
 	total = json.load( file)
@@ -126,10 +118,32 @@ if os.path.isfile( filename):
 if TotalFiles:
 	print('Previous run files count: %d' % TotalFiles)
 
-print( listdir( Options.path))
+# Walk in subfolders:
+print( walkdir( StartPath))
 
+# Walk in parent folders:
+curpath = os.path.abspath( StartPath )
+TotalFiles = 0
+while curpath != '/':
+	uppath = os.path.dirname( curpath)
+	if uppath == curpath: break
+	curpath = uppath
+	filename = os.path.join( curpath, Options.output)
+	if not os.path.isfile( filename): break
+
+	print('Updating: %s' % curpath)
+	walkdir( curpath, 0)
+
+
+# Output finish and running time:
 time_finish = time.time()
-
 print('Finished at: %s' % time.ctime( time_finish))
-print('Run time: %f seconds.' % (time_finish - time_start))
+sec = time_finish - time_start
+hrs = int( sec / 3600 )
+sec -= hrs * 3600
+mns = int( sec / 60 )
+sec -= mns * 60
+msc = int( 1000.0 * sec - int( sec))
+sec = int( sec)
+print('Run time: %02d:%02d:%02d.%03d' % (hrs, mns, sec, msc))
 

@@ -6,6 +6,7 @@ farm.json
 root
 users
 playlist.json
+walk.json
 
 # Access
 .htaccess
