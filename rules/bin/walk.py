@@ -123,7 +123,7 @@ def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 
 	return out
 
-def sepThousands( i_int):
+def sepTh( i_int):
 	s = str( int(i_int))
 	o = ''
 	for i in range( 0, len( s)):
@@ -144,7 +144,7 @@ if prev is not None:
 		PrevFiles = prev['num_files']
 
 if PrevFiles:
-	print('Previous run: %d files, %d folders, %s bytes' % ( prev['num_files'], prev['num_folders'], sepThousands( prev['size'])))
+	print('Previous run: %s files, %s folders, %s bytes' % ( sepTh( prev['num_files']), sepTh( prev['num_folders']), sepTh( prev['size'])))
 
 # Walk in subfolders:
 walk = walkdir( StartPath)
@@ -174,9 +174,9 @@ while curpath != '/':
 # Output statistics:
 time_finish = time.time()
 print('Finished at: %s' % time.ctime( time_finish))
-print('Result: %d files, %d folders, %s bytes' % (walk['num_files'], walk['num_folders'], sepThousands( walk['size'])))
+print('Result: %s files, %s folders, %s bytes' % ( sepTh( walk['num_files']), sepTh( walk['num_folders']), sepTh( walk['size'])))
 if d_files is not None:
-	print('Delta: %d files, %d folders, %s bytes' % ( d_files, d_folders, sepThousands( d_size)))
+	print('Delta: %s files, %s folders, %s bytes' % ( sepTh( d_files), sepTh( d_folders), sepTh( d_size)))
 
 sec = time_finish - time_start
 hrs = int( sec / 3600 )
