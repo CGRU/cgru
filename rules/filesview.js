@@ -577,7 +577,7 @@ function fv_MakeThumbnail()
 		return;
 	}
 	fv_thumbnails_tomake--;
-	c_MakeThumbnail( fv_thumbnails_tomake_files.shift(), 'fv_UpdateThumbnail');
+	c_MakeThumbnail( fv_thumbnails_tomake_files.shift(), fv_UpdateThumbnail);
 }
 
 function fv_MakeThumbnailsFinish()
