@@ -490,7 +490,7 @@ elif ext == 'scn':
 elif ext == 'max':
 	scenetype = 'max'
 	if cmd is None: cmd = '3dsmaxcmd' + cmdextension
-	cmd += ' "' + scene + '" -start:@#@ -end:@#@ -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
+	cmd += ' "' + scene + '" -start:@#@ -end:@#@ -nthFrame:' + str(by) + ' -v:5 -gammaCorrection:1 -continueOnError -showRFW:0'
 	if node != '': cmd += ' -cam:"%s"' % node
 	if take != '':
 		cmd += ' -batchrender'
