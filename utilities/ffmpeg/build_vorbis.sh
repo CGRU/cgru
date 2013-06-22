@@ -22,3 +22,16 @@ else
    ./configure --prefix=$libvorbis --enable-shared=
    make && make install
 fi
+
+cd ..
+
+libtheora=$PWD/libtheora
+cd libtheora-*
+export CFLAGS="-B/usr/lib/gold-ld/ -I$libogg/include"
+export LDFLAGS="-B/usr/lib/gold-ld/ -L$libogg/lib -L$libogg/lib64"
+if [ ! -z "$1" ]; then
+   ./configure --help
+else
+   ./configure --prefix=$libtheora --enable-shared=
+   make && make install
+fi
