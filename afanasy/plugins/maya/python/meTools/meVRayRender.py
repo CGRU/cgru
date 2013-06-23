@@ -1,12 +1,16 @@
 """
   meVRayRender.py
 
+  ver.0.3.9 (29 May 2013)
+    - fix duplicate Render Layer entry in vrscene file name for deferred generation 
+      with single selected layer case 
+    
   ver.0.3.8 (29 May 2013)
     - create missing folders for Render Layers 
     - add separator before frame number for multichannel exr (Vray4Maya bug?)
   
   ver.0.3.7 (28 May 2013)
-    - fixed small bugs with deffered generation
+    - fixed small bugs with deferred generation
     - check if vray is current renderer
     
   ver.0.3.6 (16 Feb 2013)
@@ -67,7 +71,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meVRayRender_'
-meVRayRenderVer = '0.3.8'
+meVRayRenderVer = '0.3.9'
 meVRayRenderMainWnd = self_prefix + 'MainWnd'
 
 vray_transfer_assets_list = [ 'none', 'transfer', 'use_cache' ]
@@ -244,7 +248,7 @@ class meVRayRender ( object ) :
     #gen_cmd += '-of ' + self.getImageFormat() + ' '
     if layer is not None : gen_cmd += '-rl ' + layer + ' '
     else                 : gen_cmd += '-rl 1 ' #'-perlayer 1 '
-    gen_cmd += '-exportFileName "' + self.get_vr_file_names ( False, layer ) + '" '
+    gen_cmd += '-exportFileName "' + self.get_vr_file_names ( False, None ) + '" '
     gen_cmd += '-noRender '
     gen_cmd += self.get_vrgen_options ( None )
     return gen_cmd
