@@ -116,10 +116,10 @@ function shot_MakeThumbnail( i_sources, i_path)
 		if( input ) input += ',';
 		else input = '';
 			input += RULES.root + i_sources[i];
-//			input += cgru_PM('/' + RULES.root + i_sources[i], true);
+//			input += cgru_PM('/' + RULES.root + i_sources[i]);
 	}
 	var output = RULES.root + file;
-//	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
+//	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename);
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }

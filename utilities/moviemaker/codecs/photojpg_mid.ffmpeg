@@ -1,2 +1,2 @@
 PhotoJPG (mid)
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec mjpeg -qmin 2 -qmax 4 "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -pix_fmt rgb24 -i "@INPUT@" -vcodec mjpeg -qmin 2 -qmax 4 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

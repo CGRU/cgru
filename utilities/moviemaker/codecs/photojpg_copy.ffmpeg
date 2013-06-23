@@ -1,2 +1,2 @@
 PhotoJPG (copy)
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec copy "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -pix_fmt rgb24 -i "@INPUT@" -vcodec copy @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

@@ -1,0 +1,2 @@
+Theora (mid)
+ffmpeg -y -i "@INPUT@" -pix_fmt yuv420p -vcodec theora -qscale 6 @AUXARGS@ -r @FPS@ "@OUTPUT@.ogg"

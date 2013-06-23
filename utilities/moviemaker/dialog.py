@@ -110,7 +110,7 @@ AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)', 'AAC (Advanced Audio Codec)',    
 AudioCodecValues = [             'libmp3lame',                    'libfaac',  'libvorbis',                             'flac']
 
 # Process Containers:
-Containers = ['mov','avi','mp4','m4v','mxf']
+Containers = ['mov','avi','mp4','m4v','mxf','ogg']
 if not str(Options.container) in Containers: Containers.append( str(Options.container))
 
 # Process Cacher:
@@ -1163,7 +1163,7 @@ Add this options to temporary image saving.')
       outputSequence = os.path.normpath( os.path.join( os.path.dirname( inputMovie), outputSequence))
       self.decodeOutputAbs.setText( outputSequence)
 
-      cmd = os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/mov2seq.py'
+      cmd = os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/movconvert.py'
       cmd = os.path.normpath( cmd)
       cmd = 'python "%s"' % cmd
       cmd = cmd + (' "%s" "%s"' % (inputMovie, outputSequence))

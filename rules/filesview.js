@@ -13,7 +13,6 @@ function fv_Finish()
 	fv_cur_item = null;
 }
 
-//function FilesView( i_elParent, i_path, i_walk, i_show_limits, i_show_thumbs)
 function FilesView( i_args)
 {
 	this.elParent = i_args.el;
@@ -372,10 +371,10 @@ FilesView.prototype.showFile = function( i_file)
 		var elExplode = document.createElement('div');
 		elFile.appendChild( elExplode);
 		elExplode.classList.add('button');
-		elExplode.textContent = 'Explode';
-		elExplode.title = 'Explode movie to images sequence';
+		elExplode.textContent = 'Convert';
+		elExplode.title = 'Convert movie or explode to images sequence';
 		elExplode.m_path = path;
-		elExplode.onclick = function(e){ e.stopPropagation(); d_Explode( e.currentTarget.m_path)};
+		elExplode.onclick = function(e){ e.stopPropagation(); d_Convert( e.currentTarget.m_path)};
 	}
 
 	if( c_FileIsImage( i_file.name))

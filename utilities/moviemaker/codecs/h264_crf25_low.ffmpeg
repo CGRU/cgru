@@ -1,2 +1,0 @@
-H.264 Low
-ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec libx264 -pix_fmt yuv420p -crf 25 "@OUTPUT@.@CONTAINER@"

@@ -140,14 +140,15 @@
 	"activity":"comp",
 
 	"codecs":{
-		"photojpg_high":"PhotoJPG High",
-		"photojpg_mid":"PhotoJPG Mid",
-		"photojpg_low":"PhotoJPG Low",
-		"h264_crf15_high":"H264 High",
-		"h264_crf21_mid":"H264 Mid",
-		"h264_crf25_low":"H264 Low",
-		"h264_crf30_bad":"H264 Bad",
-		"h264_crf40_ugly":"H264 Ugly"
+		"photojpg_high":"JPG High",
+		"photojpg_mid":"JPG Mid",
+		"photojpg_low":"JPG Low",
+		"h264_high":"H264 High",
+		"h264_mid":"H264 Mid",
+		"h264_low":"H264 Low",
+		"theora_high":"Theora High",
+		"theora_mid":"Theora Mid",
+		"theora_low":"Theora Low"
 	},
 
 	"af_capacity":500

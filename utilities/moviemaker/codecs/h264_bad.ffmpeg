@@ -1,0 +1,2 @@
+H.264 Bad
+ffmpeg -y -i "@INPUT@" -vcodec libx264 -pix_fmt yuv420p -crf 30 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
