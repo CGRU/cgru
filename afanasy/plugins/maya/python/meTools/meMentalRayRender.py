@@ -1,6 +1,11 @@
 """
   meMentalRayRender
   
+  ver.0.4.8 (21 Jun 2013)
+    - during .mi generation, "output image" set to "3"/"n" (nopath) for "relative" case, 
+      because it will be overriden by "-file_dir",
+      but mrs 3.11 still use directory name from "filename"
+    
   ver.0.4.7 (28 May 2013)
     - fixed small bugs with deffered generation
     - check if mentalRay is current renderer
@@ -77,7 +82,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meMentalRayRender_'
-meMentalRayRenderVer = '0.4.7b'
+meMentalRayRenderVer = '0.4.8'
 meMentalRayRenderMainWnd = self_prefix + 'MainWnd'
 
 # Nice Tip ( found at http://mayastation.typepad.com ) for enabling gzip compression option for Maya command line .mi export :
@@ -359,7 +364,7 @@ class meMentalRayRender ( object ) :
   def get_image_names ( self ) :
     #
     pad_str = getPadStr ( self.mi_param [ 'mi_padding' ], self.mi_param [ 'mi_perframe' ] )
-    images = cmds.renderSettings( fullPath = True, genericFrameImageName = ('@' + pad_str + '@')  )
+    images = cmds.renderSettings ( fullPath = True, genericFrameImageName = ('@' + pad_str + '@')  )
     #imageFileName = ';'.join ( images )
     imageFileName = str ( images[0] )
     return fromNativePath ( imageFileName )
@@ -425,18 +430,28 @@ class meMentalRayRender ( object ) :
 
     #migen_cmd += '-pcm ' # export pass contribition maps
     #migen_cmd += '-pud ' # export pass user data
+    # 1 - link library, 
+    # 2 - include mi file, 
+    # 3 - texture file, 
+    # 4 - lightmap, 
+    # 5 - light profile, 
+    # 6 - output image, !!! keep it "3"/"n" (nopath) for "relative" case because it will be overriden by "-file_dir"
+    # 7 - shadow map, 
+    # 8 - finalgather map, 
+    # 9 - photon map, 
+    # 10 - demand load object mi file. 
     if mi_deferred :
       migen_cmd += '-exportPathNames "' 
       if mi_filepaths == 'NoChange'   : migen_cmd += '3300000000'  
       elif mi_filepaths == 'Absolute' : migen_cmd += '3311111111'
-      elif mi_filepaths == 'Relative' : migen_cmd += '3322222222'
+      elif mi_filepaths == 'Relative' : migen_cmd += '3322232222' # "output image" = "3" (nopath) because it will be overriden by "-file_dir"
       else                            : migen_cmd += '3333333333'
       migen_cmd += '" '
     else :
       migen_cmd += '-exportPathNames '
       if mi_filepaths == 'NoChange'   : migen_cmd += '0000000000'  
       elif mi_filepaths == 'Absolute' : migen_cmd += 'nnaaaaaaaa'
-      elif mi_filepaths == 'Relative' : migen_cmd += 'nnrrrrrrrr'
+      elif mi_filepaths == 'Relative' : migen_cmd += 'nnrrrnrrrr' # "output image" = "n" (nopath) because it will be overriden by "-file_dir"
       else                            : migen_cmd += 'nnnnnnnnnn'
       migen_cmd += ' '
       if mi_selection : migen_cmd += '-active '
