@@ -54,6 +54,7 @@
 		"seek":["[scene]/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"scripts":["shot.js"],
+		"post":"shot_Post",
 		"source":{
 			"path":["SOURCE"]
 		},

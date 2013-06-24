@@ -157,6 +157,17 @@ function g_NavigatePost()
 	}
 	g_nav_clicked = false;
 
+	if( ASSET && ASSET.post )
+	{
+		if( window[ASSET.post])
+			window[ASSET.post]();
+	}
+	else
+		g_POST();
+}
+
+function g_POST()
+{
 	if( g_arguments == null ) return;
 
 	g_arguments = c_Parse( decodeURI( g_arguments));

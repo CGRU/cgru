@@ -27,16 +27,19 @@ if len(argv) < 1:
 Input = argv[0]
 
 if not os.path.isfile( Input):
-	print('ERROR: Input movie file does not exist:'+Input)
+	print('ERROR: Input movie file does not exist: ' + Input)
 	sys.exit(1)
 
 MOVIEMAKER = os.path.dirname( sys.argv[0])
 CODECSDIR  = os.path.join( MOVIEMAKER, 'codecs')
 
 Output = Options.output
+if Output == '': Output = Input
+
 Codec = Options.codec
 
 if Codec == '':
+	Output += '.'+Options.type
 	args = [ Options.avconv,'-y','-i', Input ]
 	args.extend(['-an','-f','image2'])
 	if Options.type == 'jpg':
@@ -52,8 +55,6 @@ if Codec == '':
 		if Options.xres != -1: Output += '.'+str(Options.xres)
 		if Options.yres != -1: Output += 'x'+str(Options.yres)
 
-	if Output == '':
-		Output = os.path.join( Input +'.'+Options.type)
 	Output = os.path.join( Output, Options.imgname+'.%07d.'+Options.type)
 
 	args.append( Output)
@@ -72,8 +73,7 @@ else:
 		print('Invalid encode file "%s"' % Codec)
 		sys.exit(1)
 
-	if Output != '': Output += '/'
-	Output += Input + '.' + os.path.basename( Codec.split('.')[0])
+	Output += '.' + os.path.basename( Codec.split('.')[0])
 
 	auxargs = []
 	if Options.xres != -1 or Options.yres != -1:

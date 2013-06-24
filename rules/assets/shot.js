@@ -44,7 +44,7 @@ function shot_Loaded( i_data, i_args)
 		elSource.classList.add('source');
 		elSource.classList.add('button');
 		elSource.textContent = 'Scan Sources';
-		elSource.onclick = shot_OpenCloseSourceOnClick;
+		elSource.onclick = shot_SourceOnClick;
 	}
 
 	if( ASSET.result )
@@ -96,6 +96,13 @@ function shot_Loaded( i_data, i_args)
 
 	if( thumb_paths.length )
 		shot_MakeThumbnail( thumb_paths, ASSET.path);
+
+	shot_Post();
+}
+
+function shot_Post()
+{
+	g_POST();
 }
 
 function shot_MakeThumbnail( i_sources, i_path)
@@ -124,29 +131,36 @@ function shot_MakeThumbnail( i_sources, i_path)
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
 
-function shot_OpenCloseSourceOnClick( i_evt)
+function shot_SourceOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
 	var elSource = el;
 
 	if( elSource.m_scanned ) return;
+
 	elSource.m_scanned = true;
-	elSource.textContent = '';
+	elSource.textContent = 'Scanning Shot Sources...';
 	elSource.classList.remove('button');
+	elSource.classList.add('waiting');
 
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
-	var walkdir = n_WalkDir({"paths":paths,"depth":5});
+	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"el":elSource,"local":true});
+}
 
+function shot_SourceReceived( i_data, i_args)
+{
+	i_args.el.textContent = '';
+	i_args.el.classList.remove('waiting');
 	var founded = false;
-	for( var i = 0; i < walkdir.length; i++)
+	for( var i = 0; i < i_data.length; i++)
 	{
 		var flist = [];
-		shot_SourceWalkFind( walkdir[i], flist);
+		shot_SourceWalkFind( i_data[i], flist);
 		if( flist.length )
 		{
-			new FilesView({"el":elSource,"path":paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
+			new FilesView({"el":i_args.el,"path":i_args.paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
 			founded = true;
 		}
 	}
