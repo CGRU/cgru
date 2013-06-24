@@ -115,6 +115,7 @@ if len(args) > 2:
 print( Inpattern1 + ' ' + Inpattern2)
 
 Codec       = Options.codec
+Container   = Options.container
 AspectIn    = Options.aspect_in
 Datesuffix  = Options.datesuffix
 Timesuffix  = Options.timesuffix
@@ -131,6 +132,9 @@ if Debug: Verbose = True
 if Verbose: print('VERBOSE MODE:')
 if Debug: print('DEBUG MODE:')
 
+if Container == '':
+	Container = 'mov'
+	if os.path.basename( Codec).find('theora') == 0: Container = 'ogg'
 
 # Definitions:
 tmpname   = 'img'
@@ -512,7 +516,7 @@ cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
 cmd_encode = cmd_encode.replace('@CODECS@',     CODECSDIR)
 cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
 cmd_encode = cmd_encode.replace('@FPS@',        Options.fps)
-cmd_encode = cmd_encode.replace('@CONTAINER@',  Options.container)
+cmd_encode = cmd_encode.replace('@CONTAINER@',  Container)
 cmd_encode = cmd_encode.replace('@OUTPUT@',     Output)
 cmd_encode = cmd_encode.replace('@AUXARGS@',    auxargs)
 
