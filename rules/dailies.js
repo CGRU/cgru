@@ -169,7 +169,7 @@ function d_ProcessGUI( i_wnd)
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/'+RULES.root+params.output);
+	block.working_directory = cgru_PM('/' + RULES.root+params.output, true);
 	job.blocks = [block];
 
 	var task = {}
@@ -188,12 +188,12 @@ function d_MakeCmd( i_params)
 	for( var parm in i_params )
 		params[parm] = i_params[parm];
 
-	var input = cgru_PM('/'+RULES.root+params.input);
-	var output = cgru_PM('/'+RULES.root+params.output+'/'+params.filename);
+	var input = cgru_PM('/' + RULES.root+params.input, true);
+	var output = cgru_PM('/' + RULES.root+params.output + '/' + params.filename, true);
 
 	var cmd = 'python';
 
-	cmd += ' "'+cgru_PM( d_makemovie)+'"';
+	cmd += ' "' + cgru_PM( d_makemovie, true) + '"';
 
 	cmd += ' -c "'+params.codec+'"';
 	cmd += ' -f '+params.fps;
@@ -281,7 +281,7 @@ function d_CvtProcessGUI( i_wnd)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' -f ' + params.fps;
 	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
-	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path) + '"';
+	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
 
 	var job = {};
 	//job.offline = true;
@@ -293,7 +293,7 @@ function d_CvtProcessGUI( i_wnd)
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path));
+	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path), true);
 	job.blocks = [block];
 
 	var task = {}
@@ -318,7 +318,7 @@ function d_ExpProcessGUI( i_wnd)
 	cmd += ' -q ' + params.quality;
 	if( params.cvtres.length )
 		cmd += ' -x ' + params.cvtres;
-	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path) + '"';
+	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"wait":true});
 	i_wnd.destroy();
