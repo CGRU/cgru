@@ -385,6 +385,9 @@ margin-bottom: -4px;
 .files_view .item .size { font: 12px monospace; width: 60px; text-align: right; }
 .files_view .item .mtime { font: 12px monospace; }
 .files_view .item.selected { background: rgba(150,250,250,.2); }
+.files_view .item .preview { clear: both; margin: 4px; float: none; text-align: center; border-radius: 8px; border: 2px solid #000; background: #222; }
+.files_view .item .preview .video { border-radius: 6px; border: 2px solid #000; }
+.files_view .item .preview .close { background: #555; color: #000; }
 
 #body, #body_panel { overflow: visible; }
 #body_info { font-style: italic; font-size: 14px; }
@@ -403,7 +406,8 @@ border-radius: 8px;
 
 /* ============================================================================*/
 /* ============================= ASSETS: ======================================*/
-#asset .source, #asset .result, #asset .resdailies {
+#asset .result, #asset .resdailies {
+clear: both;
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
 border-radius: 10px;
 margin: 6px;

@@ -389,6 +389,24 @@ FilesView.prototype.showFile = function( i_file)
 	}
 
 	this.showAttrs( elFile, i_file);
+
+	if( c_FileIsMovieHTML( i_file.name))
+		elFile.m_preview_file = elFile.m_path;
+
+	if( this.walk.rules && ( this.walk.rufiles.indexOf( i_file.name + '.ogg') != -1 ))
+		elFile.m_preview_file = c_PathDir( elFile.m_path) + '/' + RULES.rufolder + '/' + i_file.name + '.ogg';
+
+	if( elFile.m_preview_file )
+	{
+		var elPreviewBtn = document.createElement('div');
+		elFile.m_elPreviewBtn = elPreviewBtn;
+		elFile.appendChild( elPreviewBtn);
+		elPreviewBtn.classList.add('preview_btn');
+		elPreviewBtn.classList.add('button');
+		elPreviewBtn.innerHTML = '&#9655;';
+		elPreviewBtn.m_el_file = elFile;
+		elPreviewBtn.onclick = function(e){ e.stopPropagation(); fv_PreviewOpen(e.currentTarget.m_el_file);};
+	}
 }
 
 FilesView.prototype.onClick = function( i_evt)
@@ -501,6 +519,63 @@ FilesView.prototype.thumbsMake = function()
 		fv_thumbnails_tomake_files.push( this.elThumbnails[i].m_path);
 
 	fv_MakeThumbnail();
+}
+/*
+function fv_Preview( i_evt)
+{
+	i_evt.stopPropagation();
+	var btn = i_evt.currentTarget;
+	var el = btn.m_el_file;
+	if( el.m_preview )
+	{
+		btn.classList.remove('pushed');
+		btn.innerHTML = '&#9656;';
+		fv_PreviewClose( el);
+	}
+	else
+	{
+		btn.classList.add('pushed');
+		btn.innerHTML = 'X';
+		fv_PreviewOpen( el);
+	}
+	return false;
+}*/
+function fv_PreviewOpen( i_el)
+{
+	if( i_el.m_preview ) return;
+	i_el.m_preview = true;
+
+	i_el.m_elPreviewBtn.style.display = 'none';
+	
+	var elPreview = document.createElement('div');
+	i_el.m_elPreview = elPreview;
+	i_el.appendChild( elPreview);
+	elPreview.classList.add('preview');
+	elPreview.onclick = function(e){e.stopPropagation();};
+
+	var elPreviewClose = document.createElement('div')
+	elPreview.appendChild( elPreviewClose);
+	elPreviewClose.classList.add('close');
+	elPreviewClose.classList.add('button');
+	elPreviewClose.textContent = 'X';
+	elPreviewClose.m_el_file = i_el;
+	elPreviewClose.onclick = function(e){e.stopPropagation(); fv_PreviewClose( e.currentTarget.m_el_file);};
+
+	var elVideo = document.createElement('video');
+	elPreview.appendChild( elVideo);
+	elVideo.controls = true;
+	elVideo.classList.add('video');
+
+	var elSource = document.createElement('source');
+	elVideo.appendChild( elSource);
+	elSource.src = RULES.root + i_el.m_preview_file;
+	elSource.type = 'video/ogg';
+}
+function fv_PreviewClose( i_el)
+{
+	i_el.m_preview = false;
+	i_el.removeChild( i_el.m_elPreview);
+	i_el.m_elPreviewBtn.style.display = 'block';
 }
 
 function fv_FileThumbOnLoad() { fv_FileThumbResize( this);}

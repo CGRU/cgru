@@ -9,7 +9,7 @@ done
 # Location:
 cgruRoot="../.."
 
-function rcopy(){ rsync -rL --exclude '.svn' --exclude '__pycache__' --exclude '*.pyc' $1 $2; }
+function rcopy(){ rsync -rL --exclude '.svn' --exclude '.rules' --exclude '__pycache__' --exclude '*.pyc' $1 $2; }
 
 # Version and revision:
 export VERSION_NUMBER=`cat $cgruRoot/version.txt`

@@ -55,6 +55,9 @@
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"scripts":["shot.js"],
 		"post":"shot_Post",
+		"videos":{
+			"path":["VIDEOS","REF"]
+		},
 		"source":{
 			"path":["SOURCE"]
 		},
@@ -150,6 +153,11 @@
 		"theora_high":"Theora High",
 		"theora_mid":"Theora Mid",
 		"theora_low":"Theora Low"
+	},
+
+	"preview":{
+		"codec":"theora_mid",
+		"args":"-vf scale=640:-1"
 	},
 
 	"af_capacity":500

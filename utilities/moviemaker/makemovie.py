@@ -91,6 +91,9 @@ Parser.add_option('--draw169',          dest='draw169',        type  ='int',    
 Parser.add_option('--draw235',          dest='draw235',        type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
+Parser.add_option('--pcodec',           dest='pcodec',         type  = 'string',    default='',          help='Preview codec')
+Parser.add_option('--pargs',            dest='pargs',          type  = 'string',    default='',          help='Preview codec arguments')
+Parser.add_option('--pdir',             dest='pdir',           type  = 'string',    default='',          help='Preview output folder')
 Parser.add_option('--createoutdir',     dest='createoutdir',   action='store_true', default=False,       help='Create output folder if it not exists')
 Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
 
@@ -120,6 +123,10 @@ AspectIn    = Options.aspect_in
 Datesuffix  = Options.datesuffix
 Timesuffix  = Options.timesuffix
 Audio       = Options.audio
+
+PCodec      = Options.pcodec
+PFolder     = Options.pdir
+PFileName   = ''
 
 Verbose     = Options.verbose
 Debug       = Options.debug
@@ -178,6 +185,27 @@ if len(cmd_encode) < 2:
    print('Invalid encode file "%s"' % Codec)
    sys.exit(1)
 if Verbose: print('Encode command = "%s"' % cmd_encode)
+
+# Preview:
+cmd_preview = ''
+if PCodec != '':
+	if PCodec.find('.') == -1: PCodec += '.ffmpeg'
+	if os.path.dirname( PCodec) == '': PCodec = os.path.join( CODECSDIR, PCodec)
+	if os.path.isfile( PCodec):
+		file = open( PCodec)
+		lines = file.readlines()
+		cmd_preview = lines[len(lines)-1].strip()
+		if Verbose: print('Preview command = "%s"' % cmd_preview)
+	else:
+		print('Can`t find preview codec "%s"' % PCodec)
+		PCodec = ''
+if PFolder == '':
+	PFolder = os.path.dirname( Output)
+else:
+	PFolder = os.path.join( os.path.dirname( Output), PFolder)
+	if not os.path.isdir( PFolder): os.makedirs( PFolder)
+PFileName = os.path.join( PFolder, os.path.basename( Output)) + '.' + Container
+if Verbose: print('Preview filename = "%s"' % PFileName)
 
 # Date and time:
 localtime = time.localtime()
@@ -497,20 +525,22 @@ if need_convert:
 
 # Encode commands:
 auxargs = ''
-if encoder == 'ffmpeg' or encoder == 'nuke':
-   inputmask = os.path.join( inputdir, prefix+'%0'+str(padding)+'d'+suffix)
-   if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
+preview_input = os.path.join( inputdir, prefix+'%0'+str(padding)+'d'+suffix)
+if len(cmd_convert): preview_input = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
+
+if encoder == 'ffmpeg' or encoder == 'nuke': inputmask = preview_input
 elif encoder == 'mencoder':
-   inputmask = os.path.join( inputdir, prefix+'*'+suffix)
-   if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.*.'+TmpFormat)
+	inputmask = os.path.join( inputdir, prefix+'*'+suffix)
+	if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.*.'+TmpFormat)
 else:
-   print('Unknown encoder = "%s"' % encoder)
-   exit(1)
+	print('Unknown encoder = "%s"' % encoder)
+	exit(1)
+
 if len(Audio) and encoder == 'ffmpeg':
-   inputmask += '" -i "%s"' % Audio
-   inputmask += ' -ar %d' % Options.afreq
-   inputmask += ' -ab %dk' % Options.akbits
-   inputmask += ' -acodec "%s' % Options.acodec
+	inputmask += '" -i "%s"' % Audio
+	inputmask += ' -ar %d' % Options.afreq
+	inputmask += ' -ab %dk' % Options.akbits
+	inputmask += ' -acodec "%s' % Options.acodec
 
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
 cmd_encode = cmd_encode.replace('@CODECS@',     CODECSDIR)
@@ -519,6 +549,14 @@ cmd_encode = cmd_encode.replace('@FPS@',        Options.fps)
 cmd_encode = cmd_encode.replace('@CONTAINER@',  Container)
 cmd_encode = cmd_encode.replace('@OUTPUT@',     Output)
 cmd_encode = cmd_encode.replace('@AUXARGS@',    auxargs)
+
+if cmd_preview:
+	cmd_preview = cmd_preview.replace('@MOVIEMAKER@', MOVIEMAKER)
+	cmd_preview = cmd_preview.replace('@CODECS@',     CODECSDIR)
+	cmd_preview = cmd_preview.replace('@INPUT@',      preview_input)
+	cmd_preview = cmd_preview.replace('@FPS@',        Options.fps)
+	cmd_preview = cmd_preview.replace('@OUTPUT@',     PFileName)
+	cmd_preview = cmd_preview.replace('@AUXARGS@',    Options.pargs)
 
 # Print commands:
 if Debug:
@@ -542,6 +580,9 @@ if Debug:
    print('Encode command:\n')
    print( cmd_encode + '\n')
    os.system( cmd_encode)
+   print('Preview command:\n')
+   print( cmd_preview + '\n')
+   os.system( cmd_preview)
    print('\n')
    sys.exit(0)
 
@@ -586,6 +627,15 @@ if Options.afanasy:
       os.makedirs( TmpDir)
       j.setCmdPost('deletefiles "%s"' % os.path.abspath(TmpDir))
 
+   if cmd_preview != '':
+      bv = af.Block('preview','movgen')
+      j.blocks.append( bv)
+      t = af.Task( PFileName)
+      bv.tasks.append( t)
+      t.setCommand( cmd_preview)
+      if Options.afenccap > 0: bv.setCapacity( Options.afenccap)
+      if need_convert: bv.setDependMask('convert')
+
    if Verbose: j.output(1)
 
 # Commands execution:
@@ -620,9 +670,16 @@ else:
          print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
          sys.stdout.flush()
       print('')
+
    print('ACTIVITY: Encode')
    sys.stdout.flush()
    os.system( cmd_encode)
+
+   if cmd_preview != '':
+      print('ACTIVITY: Preview')
+      sys.stdout.flush()
+      os.system( cmd_preview)
+
    if not Debug:
       if os.path.isdir( TmpDir):
          shutil.rmtree( TmpDir)
@@ -632,5 +689,7 @@ else:
       else:
          print('Warning: Temporary directory does not exsist:')
          print( TmpDir)
+
    print('')
    print('Done')
+

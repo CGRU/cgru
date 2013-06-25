@@ -1,5 +1,8 @@
+shot_thumb_paths = [];
+
 function shot_Show()
 {
+	shot_thumb_paths = [];
 	a_SetLabel('Shot');
 	$('asset').innerHTML = '<div style="text-align:center">Scanning shot sequences...</div>';
 
@@ -34,8 +37,18 @@ function shot_Loaded( i_data, i_args)
 {
 	var walk = i_args;
 	walk.walks = i_data;
-	var thumb_paths = [];
 	$('asset').textContent = '';
+
+	if( ASSET.videos )
+	{
+		var elVideos = document.createElement('div');
+		u_el.asset.appendChild( elVideos);
+		elVideos.classList.add('source');
+		elVideos.classList.add('button');
+		elVideos.textContent = 'Show References';
+		elVideos.style.cssFloat = 'left';
+		elVideos.onclick = shot_VideosOnClick;
+	}
 
 	if( ASSET.source )
 	{
@@ -44,6 +57,7 @@ function shot_Loaded( i_data, i_args)
 		elSource.classList.add('source');
 		elSource.classList.add('button');
 		elSource.textContent = 'Scan Sources';
+		elSource.style.cssFloat = 'left';
 		elSource.onclick = shot_SourceOnClick;
 	}
 
@@ -60,7 +74,7 @@ function shot_Loaded( i_data, i_args)
 			var path = walk.paths[walk.result[i]];
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
-			thumb_paths.push( path);
+			shot_thumb_paths.push( path);
 			new FilesView({"el":elResult,"path":path,"walk":walk.walks[walk.result[i]]})
 			founded = true;
 		}
@@ -84,8 +98,8 @@ function shot_Loaded( i_data, i_args)
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
 				new FilesView({"el":elDailies,"path":path,"walk":walk.walks[walk.dailies[i]]});
-				if( thumb_paths.length == 0 )
-					thumb_paths.push( path);
+				if( shot_thumb_paths.length == 0 )
+					shot_thumb_paths.push( path);
 				founded = true;
 			}
 		}
@@ -94,8 +108,7 @@ function shot_Loaded( i_data, i_args)
 			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
-	if( thumb_paths.length )
-		shot_MakeThumbnail( thumb_paths, ASSET.path);
+	shot_MakeThumbnail( shot_thumb_paths);
 
 	shot_Post();
 }
@@ -105,9 +118,11 @@ function shot_Post()
 	g_POST();
 }
 
-function shot_MakeThumbnail( i_sources, i_path)
+function shot_MakeThumbnail()
 {
-	var file = i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename;
+	if( shot_thumb_paths.length == 0 ) return;
+
+	var file = ASSET.path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename;
 
 	var cache_time = RULES.cache_time;
 	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
@@ -118,17 +133,69 @@ function shot_MakeThumbnail( i_sources, i_path)
 	}
 
 	var input = null;
-	for( var i = 0; i < i_sources.length; i++ )
+	for( var i = 0; i < shot_thumb_paths.length; i++ )
 	{
 		if( input ) input += ',';
 		else input = '';
-			input += RULES.root + i_sources[i];
-//			input += cgru_PM('/' + RULES.root + i_sources[i], true);
+			input += RULES.root + shot_thumb_paths[i];
 	}
 	var output = RULES.root + file;
-//	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename, true);
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
+}
+
+function shot_VideosOnClick( i_evt)
+{
+	var el = i_evt.currentTarget;
+
+	if( el.m_opened ) return;
+
+	el.m_opende = true;
+	el.textContent = 'Loading Shot References...';
+	el.style.cssFloat = 'none';
+	el.classList.remove('button');
+	el.classList.add('waiting');
+	el.classList.add('result');
+
+	var walk = {};
+	walk.paths = [];
+	walk.el = el;
+	for( var i = 0; i < ASSET.videos.path.length; i++)
+		walk.paths.push( ASSET.path + '/' + ASSET.videos.path[i]);
+
+	walk.wfunc = shot_VideosReceived;
+	n_WalkDir( walk);
+}
+function shot_VideosReceived( i_data, i_args)
+{
+	var walk = i_args;
+	walk.walks = i_data;
+
+	i_args.el.textContent = '';
+	i_args.el.classList.remove('waiting');
+//console.log( i_data);
+	var founded = false;
+	var not_empty_paths = [];
+	for( var i = 0; i < walk.paths.length; i++)
+	{
+		var folders = walk.walks[i].folders;
+		var files = walk.walks[i].files;
+
+		if((( folders == null ) || ( folders.length == 0 )) &&
+			((  files == null ) || (   files.length == 0 )))
+			 continue;
+		not_empty_paths.push( walk.paths[i]);
+		new FilesView({"el":i_args.el,"path":walk.paths[i],"walk":walk.walks[i]})
+		founded = true;
+	}
+	if( false == founded )
+		i_args.el.textContent = JSON.stringify( walk.paths );
+
+	if( shot_thumb_paths.length == 0 )
+	{
+		shot_thumb_paths = not_empty_paths;
+		shot_MakeThumbnail();
+	}
 }
 
 function shot_SourceOnClick( i_evt)
@@ -139,21 +206,23 @@ function shot_SourceOnClick( i_evt)
 	if( elSource.m_scanned ) return;
 
 	elSource.m_scanned = true;
-	elSource.textContent = 'Scanning Shot Sources...';
+	elSource.textContent = 'Scanning Shot Source Sequences...';
+	elSource.style.cssFloat = 'none';
 	elSource.classList.remove('button');
 	elSource.classList.add('waiting');
+	elSource.classList.add('result');
 
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
 	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"el":elSource,"local":true});
 }
-
 function shot_SourceReceived( i_data, i_args)
 {
 	i_args.el.textContent = '';
 	i_args.el.classList.remove('waiting');
 	var founded = false;
+	var not_empty_paths = [];
 	for( var i = 0; i < i_data.length; i++)
 	{
 		var flist = [];
@@ -161,12 +230,19 @@ function shot_SourceReceived( i_data, i_args)
 		if( flist.length )
 		{
 			new FilesView({"el":i_args.el,"path":i_args.paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
+			not_empty_paths.push( i_args.paths[i]);
 			founded = true;
 		}
 	}
 
 	if( false == founded )
 		elSource.textContent = JSON.stringify( ASSET.source.path);
+
+	if( shot_thumb_paths.length == 0 )
+	{
+		shot_thumb_paths = not_empty_paths;
+		shot_MakeThumbnail();
+	}
 }
 
 function shot_SourceWalkFind( i_walk, o_list, i_path)

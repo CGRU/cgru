@@ -4,6 +4,7 @@ RULES.rufolder = 'rules';
 RULES_TOP = {};
 
 c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg'];
+c_movieTypesHTML = ['ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
 
@@ -349,6 +350,12 @@ function c_FileIsMovie( i_file)
 {
 	var type = i_file.substr( i_file.lastIndexOf('.')+1).toLowerCase();
 	if( c_movieTypes.indexOf( type) != -1) return true;
+	return false;
+}
+function c_FileIsMovieHTML( i_file)
+{
+	var type = i_file.substr( i_file.lastIndexOf('.')+1).toLowerCase();
+	if( c_movieTypesHTML.indexOf( type) != -1) return true;
 	return false;
 }
 function c_FileIsImage( i_file)
