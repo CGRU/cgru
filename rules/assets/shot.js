@@ -39,15 +39,15 @@ function shot_Loaded( i_data, i_args)
 	walk.walks = i_data;
 	$('asset').textContent = '';
 
-	if( ASSET.videos )
+	if( ASSET.references )
 	{
-		var elVideos = document.createElement('div');
-		u_el.asset.appendChild( elVideos);
-		elVideos.classList.add('source');
-		elVideos.classList.add('button');
-		elVideos.textContent = 'Show References';
-		elVideos.style.cssFloat = 'left';
-		elVideos.onclick = shot_VideosOnClick;
+		var elRefs = document.createElement('div');
+		u_el.asset.appendChild( elRefs);
+		elRefs.classList.add('source');
+		elRefs.classList.add('button');
+		elRefs.textContent = 'Show References';
+		elRefs.style.cssFloat = 'left';
+		elRefs.onclick = shot_RefsOnClick;
 	}
 
 	if( ASSET.source )
@@ -144,13 +144,13 @@ function shot_MakeThumbnail()
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
 
-function shot_VideosOnClick( i_evt)
+function shot_RefsOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
 
 	if( el.m_opened ) return;
 
-	el.m_opende = true;
+	el.m_opened = true;
 	el.textContent = 'Loading Shot References...';
 	el.style.cssFloat = 'none';
 	el.classList.remove('button');
@@ -160,13 +160,13 @@ function shot_VideosOnClick( i_evt)
 	var walk = {};
 	walk.paths = [];
 	walk.el = el;
-	for( var i = 0; i < ASSET.videos.path.length; i++)
-		walk.paths.push( ASSET.path + '/' + ASSET.videos.path[i]);
+	for( var i = 0; i < ASSET.references.path.length; i++)
+		walk.paths.push( ASSET.path + '/' + ASSET.references.path[i]);
 
-	walk.wfunc = shot_VideosReceived;
+	walk.wfunc = shot_RefsReceived;
 	n_WalkDir( walk);
 }
-function shot_VideosReceived( i_data, i_args)
+function shot_RefsReceived( i_data, i_args)
 {
 	var walk = i_args;
 	walk.walks = i_data;
