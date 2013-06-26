@@ -1,6 +1,9 @@
 ﻿"""
 meCheckTexturePaths
 
+ver.1.0.4 26 Jun 2013
+  - fix for VRay
+
 ver.1.0.3 20 Apr 2012
   - lookup for textures in mentalrayIblShape
   - texture types and attributes gathered from tuples list
@@ -41,101 +44,77 @@ from functools import partial
 import maya.cmds as cmds
 import maya.mel as mel
 
-meCheckTexturePathsVer = "1.0.3"
+from maya_ui_proc import *
+
+self_prefix = 'meCheckTexturePaths_'
+meCheckTexturePathsVer = "1.0.4"
 meCheckTexturePathsMainWnd = "meCheckTexturePathsMainWnd"
 meCheckTexturePathsReplaceWnd = "meCheckTexturePathReplaceWnd"
 #
+# meCheckTexturePaths
 #
-#
-class meCheckTexturePaths( object ):
+class meCheckTexturePaths ( object ) :
   #
+  # __init__
   #
-  #
-  def __init__( self, selection='' ):
+  def __init__ ( self, selection = '' ) :
     #print ">> meCheckTexturePaths: Class created"
     self.selection = selection
     self.winMain = ''
     self.winReplace = ''
     self.listTextures = ''
-    self.rootDir = cmds.workspace( q=True, rootDirectory=True )
+    self.rootDir = cmds.workspace ( q = True, rootDirectory = True )
     
-    self.strToFind = self.getDefaultStrValue( 'strToFind', '' )
-    self.strToReplace = self.getDefaultStrValue( 'strToReplace', '' )
+    self.strToFind = getDefaultStrValue ( self_prefix, 'strToFind', '' )
+    self.strToReplace = getDefaultStrValue ( self_prefix, 'strToReplace', '' )
     
     self.fileTextures = []
     self.mr_fileTextures = []
     self.imagePlanes = []
     
-    self.ui=self.setupUI()
-    self.jobOnDelete=cmds.scriptJob( uiDeleted=[ self.winMain , self.onDeleteMainWin ] )
+    self.ui = self.setupUI ()
+    self.jobOnDelete = cmds.scriptJob ( uiDeleted = [ self.winMain , self.onDeleteMainWin ] )
   #
-  #
+  # __del__
   #  
-  def __del__( self ):
+  def __del__ ( self ) :
     #print( ">> meCheckTexturePaths: Class deleted" )
-    if cmds.scriptJob( exists=self.jobOnDelete ):
-      cmds.scriptJob( kill=self.jobOnDelete, force=True )
+    if cmds.scriptJob ( exists = self.jobOnDelete ) :
+      cmds.scriptJob( kill = self.jobOnDelete, force = True )
   #
-  #
+  # onStrToFindChanged
   #  
-  def getDefaultStrValue( self, name, value ):
-    name = 'meCheckTexturePaths_' + name
-    if cmds.optionVar( exists=name ) == 1:
-      ret = cmds.optionVar( q=name )
-    else:
-      cmds.optionVar( sv=( name, value) )
-      ret = value
-    return ret
+  def onStrToFindChanged ( self, value ) : self.strToFind = self.setDefaultStrValue ( 'strToFind', value )
   #
-  #
-  #
-  def setDefaultStrValue( self, name, value ):
-    name = 'meCheckTexturePaths_' + name
-    cmds.optionVar( sv=( name, value) )    
-    return value
-  #
-  #
+  # onStrToReplaceChanged
   #  
-  def onStrToFindChanged( self, value ): self.strToFind = self.setDefaultStrValue( 'strToFind', value )
+  def onStrToReplaceChanged ( self, value ) : self.strToReplace = self.setDefaultStrValue ( 'strToReplace', value )
   #
-  #
+  # onFileNameChanged
   #  
-  def onStrToReplaceChanged( self, value ): self.strToReplace = self.setDefaultStrValue( 'strToReplace', value )
-  #
-  #
-  #  
-  def onFileNameChanged( self, fileNodeName, attr, value ):
+  def onFileNameChanged ( self, fileNodeName, attr, value ) :
     #print( ">> meCheckTexturePaths: onFileNameChanged %s = %s" % ( fileNodeName, value ) )
-    cmds.setAttr( fileNodeName + "." + attr, value, type="string") # ".fileTextureName"
+    cmds.setAttr ( fileNodeName + '.' + attr, value, type = 'string' ) # ".fileTextureName"
   #
-  #
+  # selectFileNode
   #  
-  def selectFileNode( self, fileNodeName ): cmds.select( fileNodeName, r=True );
+  def selectFileNode ( self, fileNodeName ) : cmds.select ( fileNodeName, r = True )
   #
-  #
-  #  
-  def isRelative( self, fileName ):
-    ret = True
-    if fileName != '':
-      if string.find( fileName, ':' ) == 1 or string.find( fileName, '/' ) == 0 or string.find( fileName, '\\' ) == 0:
-        ret = False
-    return ret
-  #
-  #
+  # drawFrameLayout
   # 
-  def drawFrameLayout( self, frameTitle, textureTypeAttrList ): # , attrNameList
+  def drawFrameLayout ( self, frameTitle, textureTypeAttrList ) : # , attrNameList
     cw1 = 100
     cw2 = 60
-    cmds.setParent( self.listTextures )
+    cmds.setParent ( self.listTextures )
     
-    cmds.frameLayout( label = frameTitle, borderVisible = True, borderStyle = 'etchedIn', marginHeight = 0, cll = True, cl = False )
-    cmds.columnLayout( columnAttach=( 'left', 0 ), rowSpacing = 0, adjustableColumn = True ) 
+    cmds.frameLayout ( label = frameTitle, borderVisible = True, borderStyle = 'etchedIn', marginHeight = 0, cll = True, cl = False )
+    cmds.columnLayout ( columnAttach=( 'left', 0 ), rowSpacing = 0, adjustableColumn = True ) 
     
-    for i in range( len( self.fileTextures ) ):
-      labelType = "Not Found"
+    for i in range ( len ( self.fileTextures ) ) :
+      labelType = 'Not Found'
       labelColor = ( 0.5, 0.0, 0.0 )
-      fileNodeName = self.fileTextures[ i ]
-      fileNodeType = cmds.objectType( fileNodeName )
+      fileNodeName = self.fileTextures [ i ]
+      fileNodeType = cmds.objectType ( fileNodeName )
       fileName = ''
       
       for ( textureType, attrName ) in textureTypeAttrList :
@@ -146,46 +125,50 @@ class meCheckTexturePaths( object ):
         fileTextureName = cmds.getAttr( fileNodeName + "." + attrName )
         print ( '>> fileTextureName = %s' ) % fileTextureName
         if fileTextureName is not None and fileTextureName != '' :
-          fileName = str( fileTextureName )
-          if cmds.file( fileTextureName, q=True, exists=True ) :
-            labelType = "Absolute"
-            labelColor = (1.0, 0.5, 0.0)
-            fileName = cmds.workspace( projectPath = fileTextureName )
-            if self.isRelative( fileName ):
-              labelType = "Relative"
+          fileName = str ( fileTextureName )
+          if cmds.file ( fileTextureName, q = True, exists = True ) :
+            labelType = 'Absolute'
+            labelColor = ( 1.0, 0.5, 0.0 )
+            fileName = cmds.workspace ( projectPath = fileTextureName )
+            if isRelative ( fileName ) :
+              labelType = 'Relative'
               labelColor = (0.0, 0.5, 0.0)  
       
-        cmds.rowLayout( numberOfColumns=2, columnWidth1=cw2, adjustableColumn2=2 )
-        cmds.iconTextButton( style='textOnly', label=labelType, width=cw2, h=16, bgc=labelColor )
-        cmds.textFieldButtonGrp( cw=( 1, cw1 ), adj=2, 
-                                 label=fileNodeName, 
-                                 buttonLabel="select", 
-                                 text=fileName, 
-                                 cc=partial( self.onFileNameChanged, fileNodeName, attrName ),
-                                 bc=partial( self.selectFileNode, fileNodeName ) )
-        cmds.setParent( '..' )      
+        cmds.rowLayout ( numberOfColumns = 2, columnWidth1 = cw2, adjustableColumn2 = 2 )
+        cmds.iconTextButton ( style = 'textOnly', label = labelType, width = cw2, h = 16, bgc = labelColor )
+        cmds.textFieldButtonGrp ( cw = ( 1, cw1 ), adj = 2, 
+                                 label = fileNodeName, 
+                                 buttonLabel = 'select', 
+                                 text = fileName, 
+                                 cc = partial ( self.onFileNameChanged, fileNodeName, attrName ),
+                                 bc = partial ( self.selectFileNode, fileNodeName ) )
+        cmds.setParent ( '..' )      
   #
-  #
+  # refreshUI
   #  
-  def refreshUI( self, param ):
-       
-    self.fileTextures = cmds.ls( textures = True, type = ['imagePlane', 'mentalrayIblShape'] ) 
+  def refreshUI ( self, param ) :
+    #
+    special_type_str_list = [ 'imagePlane' ]  
+    if cmds.getAttr ( 'defaultRenderGlobals.currentRenderer' ) == 'mentalRay' :
+      special_type_str_list.append ( 'mentalrayIblShape' )  
+    self.fileTextures = cmds.ls ( textures = True, type = special_type_str_list ) 
     
-    # print self.fileTextures
+    print self.fileTextures
      
     if cmds.columnLayout( self.listTextures, q=True, numberOfChildren=True ) > 0 :
       controls = cmds.columnLayout( self.listTextures, q=True, childArray=True )
       for i in range( len( controls ) ):
         cmds.deleteUI( controls[ i ] )
       
-    self.drawFrameLayout( ' Image Planes ', [ ('imagePlane', 'imageName') ] )
-    self.drawFrameLayout( ' Maya Texures ', [ ('file', 'fileTextureName') ] )
-    self.drawFrameLayout( ' MentalRay Texures ', [ ( 'mentalrayTexture', 'fileTextureName' ), 
-                                                   ( 'mentalrayIblShape', 'texture' ) ] )
+    self.drawFrameLayout ( ' Image Planes ', [ ( 'imagePlane', 'imageName' ) ] )
+    self.drawFrameLayout ( ' Maya Textures ', [ ( 'file', 'fileTextureName' ) ] )
+    if cmds.getAttr ( 'defaultRenderGlobals.currentRenderer' ) == 'mentalRay' :
+      self.drawFrameLayout ( ' MentalRay Textures ', [ ( 'mentalrayTexture', 'fileTextureName' ), ( 'mentalrayIblShape', 'texture' ) ] )
   #
-  #      
+  # setupUI      
   #        
-  def setupUI( self ):
+  def setupUI ( self ) :
+    #
     cw1 = 100
     cw2 = 60
     self.deleteUI( True )
@@ -209,9 +192,9 @@ class meCheckTexturePaths( object ):
 
     cmds.setParent( form )
                                  
-    btn_rep = cmds.button( label="Replace ...", command=self.onReplace )
-    btn_ref = cmds.button( label="Refresh", command=self.refreshUI )
-    btn_cls = cmds.button( label="Close", command=self.deleteUI )
+    btn_rep = cmds.button( label = 'Replace ...', command = self.onReplace )
+    btn_ref = cmds.button( label = 'Refresh', command = self.refreshUI )
+    btn_cls = cmds.button( label = 'Close', command = self.deleteUI )
     
     cmds.formLayout(  form, edit=True, 
                       attachForm=( ( proj, 'top',    0 ), 
@@ -240,94 +223,98 @@ class meCheckTexturePaths( object ):
     cmds.showWindow( self.winMain )
     return form
   #
-  #
+  # onDeleteMainWin
   #    
-  def onDeleteMainWin( self ):
+  def onDeleteMainWin( self ) :
     #print (">> meCheckTexturePaths: onDeleteMainWin() " )
     #cmds.delete( self.listTextures)
     self.deleteReplaceUI( True )
   #
-  #
+  # deleteReplaceUI
   #    
-  def deleteReplaceUI( self, param ):
+  def deleteReplaceUI ( self, param ) :
+    #
     winReplace = meCheckTexturePathsReplaceWnd 
     if cmds.window( winReplace, exists=True ): cmds.deleteUI( winReplace, window=True )
     if cmds.windowPref( winReplace, exists=True ): cmds.windowPref( winReplace, remove=True )
   #
-  #
+  # deleteUI
   #  
-  def deleteUI( self, param ):
+  def deleteUI ( self, param ) :
+    #
     winMain = meCheckTexturePathsMainWnd
-    if cmds.window( winMain, exists=True ): cmds.deleteUI( winMain, window=True )
-    if cmds.windowPref( winMain, exists=True ): cmds.windowPref( winMain, remove=True )
+    if cmds.window ( winMain, exists = True ) : cmds.deleteUI ( winMain, window = True )
+    if cmds.windowPref ( winMain, exists = True ) : cmds.windowPref ( winMain, remove = True )
   #
+  # doFindReplace
   #
-  #
-  def doFindReplace( self, param ):
+  def doFindReplace ( self, param ) :
+    #
     if self.strToFind != '' :
-      print ( ">> self.strToFind = %s self.strToReplace = %s" ) % (self.strToFind, self.strToReplace)
+      print ( ">> self.strToFind = %s self.strToReplace = %s" ) % ( self.strToFind, self.strToReplace )
       
-      for i in range( len( self.fileTextures ) ):  
-        fileNodeName = self.fileTextures[ i ]
-        fileNodeType = cmds.objectType( fileNodeName )
+      for i in range ( len( self.fileTextures ) ):  
+        fileNodeName = self.fileTextures [ i ]
+        fileNodeType = cmds.objectType ( fileNodeName )
         
         if fileNodeType == 'file' or fileNodeType == 'mentalrayTexture' : attrName = "fileTextureName" 
         elif fileNodeType == 'imagePlane' : attrName = "imageName" 
-        else: continue  
+        else : continue  
         
-        fileTextureName = cmds.getAttr( fileNodeName + "." + attrName )
+        fileTextureName = cmds.getAttr ( fileNodeName + "." + attrName )
         
         if fileTextureName is None : fileName = ''
-        else: fileName = str( fileTextureName )
-        newName = str( fileName ).replace( str( self.strToFind ), str( self.strToReplace ), 1 )
+        else : fileName = str ( fileTextureName )
+        newName = str ( fileName ).replace ( str ( self.strToFind ), str ( self.strToReplace ), 1 )
         if newName != fileName :
           # print fileNodeName + "." + attrName
           # ??? It is strange, but folder renaming doesn't work wor ImagePlane's "imageName" attribute... 
           cmds.setAttr( fileNodeName + "." + attrName, newName, type="string" )
           print ">> fileName = %s new = %s" % ( fileName, newName )
-      self.refreshUI( True )
+      self.refreshUI ( True )
   #
-  #
+  # onReplace
   #    
-  def onReplace( self, param ):
+  def onReplace ( self, param ) :
+    #
     cw1 = 100
     cw2 = 60
     
-    if cmds.window( meCheckTexturePathsReplaceWnd, exists=True ): 
-      cmds.deleteUI( meCheckTexturePathsReplaceWnd, window=True )
+    if cmds.window ( meCheckTexturePathsReplaceWnd, exists = True ) : 
+      cmds.deleteUI ( meCheckTexturePathsReplaceWnd, window = True )
       
-    self.winReplace = cmds.window( meCheckTexturePathsReplaceWnd, 
-                                title="Find and Replace", 
-                                menuBar=False,
-                                retain=False,
-                                widthHeight=(400, 100) )   
+    self.winReplace = cmds.window ( meCheckTexturePathsReplaceWnd, 
+                                title = 'Find and Replace', 
+                                menuBar = False,
+                                retain = False,
+                                widthHeight = ( 400, 100 ) )   
 
-    form = cmds.formLayout( 'f0', numberOfDivisions=100 )  
-    cmds.formLayout( form, e=True, width=500 )
-    col = cmds.columnLayout( 'c0', columnAttach=('left',0), rowSpacing=2, adjustableColumn=True, height=40 )
-    cmds.textFieldGrp( 'find_str', cw=( 1, cw1 ), adj=2, label="Find string : ", text=self.strToFind, cc=self.onStrToFindChanged )
-    cmds.textFieldGrp( 'replace_str', cw=( 1, cw1 ), adj=2, label="Replace with : ", text=self.strToReplace, cc=self.onStrToReplaceChanged )
-    cmds.setParent( '..' )
+    form = cmds.formLayout ( 'f0', numberOfDivisions = 100 )  
+    cmds.formLayout ( form, e = True, width = 500 )
+    col = cmds.columnLayout ( 'c0', columnAttach = ( 'left',0 ), rowSpacing = 2, adjustableColumn = True, height = 40 )
+    cmds.textFieldGrp ( 'find_str', cw = (  1, cw1 ), adj = 2, label = 'Find string : ', text = self.strToFind, cc = self.onStrToFindChanged )
+    cmds.textFieldGrp ( 'replace_str', cw=( 1, cw1 ), adj = 2, label = 'Replace with : ', text = self.strToReplace, cc = self.onStrToReplaceChanged )
+    cmds.setParent ( '..' )
     #cmds.text( label='' )
-    btn_rep = cmds.button( label="Replace ...", command=self.doFindReplace )
-    btn_cls = cmds.button( label="Close", command=self.deleteReplaceUI )
+    btn_rep = cmds.button ( label = 'Replace ...', command = self.doFindReplace )
+    btn_cls = cmds.button ( label = 'Close', command = self.deleteReplaceUI )
 
-    cmds.formLayout( form, edit=True,
-                     attachForm=[ (col, 'top', 10 ), 
-                                  (col, 'left', 0), 
-                                  (col, 'right', 0), 
-                                  (btn_rep, 'left', 0), 
-                                  (btn_cls , 'right', 0), 
-                                  (btn_cls, 'bottom', 0),
-                                  (btn_rep, 'bottom', 0)
+    cmds.formLayout ( form, edit = True,
+                     attachForm = [ ( col, 'top', 10 ), 
+                                    ( col, 'left', 0 ), 
+                                    ( col, 'right', 0 ), 
+                                    ( btn_rep, 'left', 0 ), 
+                                    ( btn_cls , 'right', 0 ), 
+                                    ( btn_cls, 'bottom', 0 ),
+                                    ( btn_rep, 'bottom', 0 )
                                  ],
                      
-                     attachControl=[ (col, 'bottom', 0, btn_rep), 
-                                     (btn_cls, 'left', 0, btn_rep)
+                     attachControl = [ ( col, 'bottom', 0, btn_rep ), 
+                                       ( btn_cls, 'left', 0, btn_rep )
                                    ],
-                     attachPosition=[ 
-                                      (btn_rep, 'right', 0, 50), 
-                                      (btn_cls, 'left',0, 50)
+                     attachPosition = [ 
+                                       ( btn_rep, 'right', 0, 50 ), 
+                                       ( btn_cls, 'left',0, 50 )
                                     ]
                    )
 
