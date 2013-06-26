@@ -56,7 +56,7 @@
 		"scripts":["shot.js"],
 		"post":"shot_Post",
 		"references":{
-			"path":["SOURCE/VIDEOS","SOURCE/REF"]
+			"path":["REFS"]
 		},
 		"source":{
 			"path":["SOURCE"]
