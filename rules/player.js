@@ -364,6 +364,7 @@ function p_ImgLoaded(e)
 
 	p_ShowFrame( p_frame);
 	p_SetEditingState( true);
+	p_Play();
 }
 
 function p_CreateImages()
