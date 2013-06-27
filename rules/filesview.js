@@ -356,7 +356,7 @@ FilesView.prototype.showFile = function( i_file)
 	if( c_FileIsMovie( i_file.name))
 	{
 		var cmds = RULES.cmdexec.play_movie;
-		if( cmds ) for( var c = 0; c < cmds.length; c++)
+		if( cmds && ( RULES.has_filesystem !== false )) for( var c = 0; c < cmds.length; c++)
 		{
 			var elCmd = document.createElement('div');
 			elFile.appendChild( elCmd);
