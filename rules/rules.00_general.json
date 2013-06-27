@@ -152,7 +152,8 @@
 		"h264_low":"H264 Low",
 		"theora_high":"Theora High",
 		"theora_mid":"Theora Mid",
-		"theora_low":"Theora Low"
+		"theora_low":"Theora Low",
+		"prores_normal":"ProRes"
 	},
 
 	"preview":{
