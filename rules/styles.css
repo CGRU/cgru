@@ -166,6 +166,8 @@ box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 .button.openclose.opened { font-size:14px; width: 14px; height: 14px; }
 .button.openclose.closed { }
 
+.buttons .button { float: left; }
+
 #content > .view { position: relative; border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 
 .editing {

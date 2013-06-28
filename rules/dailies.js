@@ -259,16 +259,28 @@ function d_Convert( i_path)
 	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd);}
 	elCvtBtn.m_wnd = wnd;
 
+	var div = document.createElement('div');
+	wnd.elContent.appendChild(div );
+	div.style.margin = '10px';
+
 	d_CreateGUI( wnd, d_expguiparams, [params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
+	elBtns.classList.add('buttons');
 
 	var elExpBtn = document.createElement('div');
 	elBtns.appendChild( elExpBtn);
 	elExpBtn.textContent = 'Explode Movie To Images Sequence';
 	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd);}
+	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd, false);}
+	elExpBtn.m_wnd = wnd;
+
+	var elExpBtn = document.createElement('div');
+	elBtns.appendChild( elExpBtn);
+	elExpBtn.textContent = 'Send Job to AFANASY';
+	elExpBtn.classList.add('button');
+	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd, true);}
 	elExpBtn.m_wnd = wnd;
 
 	wnd.m_path = i_path;
@@ -312,7 +324,7 @@ function d_CvtProcessGUI( i_wnd)
 	i_wnd.destroy();
 }
 
-function d_ExpProcessGUI( i_wnd)
+function d_ExpProcessGUI( i_wnd, i_afanasy)
 {
 	var params = {};
 	for( var p = 0; p < d_expguiparams.length; p++)
@@ -320,15 +332,45 @@ function d_ExpProcessGUI( i_wnd)
 	for( var p = 0; p < d_cvtguiparams.length; p++)
 		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
 
-	var cmd = 'utilities/moviemaker/movconvert.py -t jpg';
+	var cmd = 'utilities/moviemaker/movconvert.py';
+	if( i_afanasy ) cmd = cgru_PM('/cgru/' + cmd, true);
+	cmd += ' -t jpg';
 	cmd += ' -a ' + RULES.avconv;
 	cmd += ' -q ' + params.quality;
-	if( params.cvtres.length )
-		cmd += ' -x ' + params.cvtres;
+	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
 	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
 
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"wait":true});
+	if( i_afanasy !== true )
+	{
+		i_wnd.elContent.classList.add('waiting');
+		n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_ExpFinished,"wnd":i_wnd});
+		return;
+	}
+
+	var job = {};
+	//job.offline = true;
+	job.name = c_PathBase( i_wnd.m_path);
+
+	var block = {};
+	block.name = 'Explode';
+	block.service = 'movgen';
+	block.parser = 'generic';
+	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
+	block.working_directory = cgru_PM('/' + c_PathDir( i_wnd.m_path), true);
+	job.blocks = [block];
+
+	var task = {}
+	task.name = params.filename;
+	task.command = cmd;
+	block.tasks = [task];
+
+	n_SendJob( job);
+
 	i_wnd.destroy();
+}
+function d_ExpFinished( i_data, i_args)
+{
+	i_args.wnd.destroy();
 	fv_ReloadAll();
 }
 

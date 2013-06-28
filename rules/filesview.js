@@ -193,8 +193,23 @@ FilesView.prototype.refresh = function()
 }
 FilesView.prototype.walkReceived = function( i_data, i_args)
 {
+	fv_cur_item = null;
+	// Store selected items paths:
+	var sel_paths = [];
+	for( var i = 0; i < i_args.this.elItems.length; i++)
+		if( i_args.this.elItems[i].classList.contains('selected'))
+			sel_paths.push( i_args.this.elItems[i].m_path);
+
 	i_args.this.walk = i_data[0];
 	i_args.this.show();
+
+	// Select item back:
+	for( var i = 0; i < i_args.this.elItems.length; i++)
+		if( sel_paths.indexOf( i_args.this.elItems[i].m_path) != -1 )
+		{
+			i_args.this.elItems[i].classList.add('selected');
+			fv_cur_item = i_args.this.elItems[i];
+		}
 }
 
 FilesView.prototype.show = function()
