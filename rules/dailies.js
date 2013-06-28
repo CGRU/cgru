@@ -308,7 +308,7 @@ function d_CvtProcessGUI( i_wnd)
 	if( params.cvtres.length ) job.name += '-' + params.cvtres;
 
 	var block = {};
-	block.name = 'Dailies';
+	block.name = 'Convert';
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
@@ -356,11 +356,11 @@ function d_ExpProcessGUI( i_wnd, i_afanasy)
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + c_PathDir( i_wnd.m_path), true);
+	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path), true);
 	job.blocks = [block];
 
 	var task = {}
-	task.name = params.filename;
+	task.name = c_PathBase( i_wnd.m_path);
 	task.command = cmd;
 	block.tasks = [task];
 
