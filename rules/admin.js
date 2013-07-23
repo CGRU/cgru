@@ -502,7 +502,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var elTitle = document.createElement('div');
 	el.appendChild( elTitle);
-	elTitle.style.width = '200px';
+	elTitle.style.width = '190px';
 	elTitle.textContent = i_user.title;
 	elTitle.m_user_id = i_user.id;
 	elTitle.title = 'Double click edit title';
@@ -559,14 +559,14 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	el.appendChild( elCTime);
 	if( i_row ) elCTime.textContent = c_DT_StrFromSec( i_user.ctime).substr(4,11);
 	else elCTime.textContent = 'Created';
-	elCTime.style.width = '150px';
+	elCTime.style.width = '140px';
 	if( i_row == 0 ) elCTime.onclick = function(e) { ad_WndSortUsers('ctime'); };
 
 	var elRTime = document.createElement('div');
 	el.appendChild( elRTime);
 	if( i_row ) elRTime.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
 	else elRTime.textContent = 'Entered';
-	elRTime.style.width = '200px';
+	elRTime.style.width = '180px';
 	if( i_row == 0 ) elRTime.onclick = function(e) { ad_WndSortUsers('rtime'); };
 }
 
