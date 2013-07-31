@@ -51,7 +51,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_name,               &m_name                ));
    dbAddAttr( new DBAttrString( DBAttr::_hostname,           &m_host_name            ));
    dbAddAttr( new DBAttrString( DBAttr::_username,           &m_user_name            ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &m_blocksnum           ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &m_blocks_num           ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,            &m_command_pre             ));
    dbAddAttr( new DBAttrInt64 ( DBAttr::_time_creation,      &m_time_creation       ));
 }
@@ -91,9 +91,9 @@ bool DBJob::dbAdd( PGconn * i_conn) const
 
     bool o_result = true;
 
-    for( int b = 0; b < m_blocksnum; b++)
+    for( int b = 0; b < m_blocks_num; b++)
     {
-        if( false == ((DBBlockData*)(m_blocksdata[b]))->dbAdd( i_conn))
+        if( false == ((DBBlockData*)(m_blocks_data[b]))->dbAdd( i_conn))
         {
             o_result = false;
             break;
@@ -120,14 +120,14 @@ bool DBJob::v_dbSelect( PGconn * i_conn, const std::string * i_where)
     AFINFA("DBJob::dbSelect: id = %d", m_id);
 
    if( DBItem::v_dbSelect( i_conn) == false) return false;
-   if( m_blocksnum == 0)
+   if( m_blocks_num == 0)
    {
       AFERROR("DBJob::dbSelect: blocksnum == 0")
       return false;
    }
-   m_blocksdata = new af::BlockData*[m_blocksnum];
-   for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
-   for( int b = 0; b < m_blocksnum; b++)
+   m_blocks_data = new af::BlockData*[m_blocks_num];
+   for( int b = 0; b < m_blocks_num; b++) m_blocks_data[b] = NULL;
+   for( int b = 0; b < m_blocks_num; b++)
    {
       DBBlockData * dbBlock = new DBBlockData( b, m_id);
       if( dbBlock->v_dbSelect( i_conn) == false)
@@ -135,7 +135,7 @@ bool DBJob::v_dbSelect( PGconn * i_conn, const std::string * i_where)
          delete dbBlock;
          return false;
       }
-      m_blocksdata[b] = dbBlock;
+      m_blocks_data[b] = dbBlock;
    }
    progress = new DBJobProgress( this);
    if( progress == NULL)

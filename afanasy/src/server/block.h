@@ -21,6 +21,9 @@ public:
 
 	inline void setUser( UserAf * jobOwner) { m_user = jobOwner;}
 
+	bool storeTasks( const std::string & i_folder);
+	bool readStoredTasks( const std::string & i_folder);
+
 	inline int getErrorsAvoidHost() const
 	  { return ( m_data->getErrorsAvoidHost() > -1) ? m_data->getErrorsAvoidHost() : m_user->getErrorsAvoidHost();}
 	inline int getErrorsRetries() const
@@ -79,6 +82,8 @@ private:
 
 private:
 	void constructDependBlocks();
+
+	const std::string getStoreTasksFileName( const std::string & i_folder) const;
 
 	void skipRestartTasks( const Action & i_action, const JSON & i_operation, const std::string & i_type);
 

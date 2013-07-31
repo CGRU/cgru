@@ -105,7 +105,7 @@ void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorC
    render->setTask( taskexec, monitoring, false);
 
    m_task->v_monitor( monitoring );
-   m_task->v_updateDatabase();
+   m_task->v_store();
    time_lasthostadded = time( NULL);
 
    // Setting task not be ready to take any hosts if their quantity is enough
@@ -165,7 +165,7 @@ void TaskRunMulti::startMaster( RenderContainer * renders, MonitorContainer * mo
    render->startTask( m_exec);
    masterrunning = true;
    m_task->v_monitor( monitoring );
-   m_task->v_updateDatabase();
+   m_task->v_store();
    m_task->v_appendLog( std::string("Starting master on \"") + render->getName() + "\"");
 }
 

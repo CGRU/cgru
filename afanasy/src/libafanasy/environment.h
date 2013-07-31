@@ -169,13 +169,12 @@ public:
 	static inline const std::string & getThumbnailHttp()       { return thumbnail_http;   }
 	static inline const std::string & getThumbnailFile()       { return thumbnail_file;   }
 
-	static inline int getAfNodeLogsRotate()  { return afnode_logs_rotate;   }
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
-	static inline const std::string & getTempDirectory()       { return tempdirectory;  } ///< Get temp directory.
-	static inline const std::string & getTasksStdOutDir()      { return tasksstdoutdir; } ///< Get tasks standart output directory.
-	static inline const std::string & getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
-	static inline const std::string & getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
+	static inline const std::string & getTempDir()    { return temp_dir;    } ///< Get temp directory.
+	static inline const std::string & getJobsDir()    { return jobs_dir;    } ///< Get jobs store directory.
+	static inline const std::string & getRendersDir() { return renders_dir; } ///< Get renders store directory.
+	static inline const std::string & getUsersDir()   { return users_dir;   } ///< Get users store directory.
 
 	static inline const std::string & get_DB_ConnInfo()        { return db_conninfo;     } ///< Get database connection information.
 	static inline const std::string & get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
@@ -241,7 +240,6 @@ private:
 	static std::vector<std::string> platform;
 
 	static int filenamesizemax;
-	static int afnode_logs_rotate;
 	static int afnode_log_lines_max;
 
 	static int priority;          ///< Default priority
@@ -328,10 +326,10 @@ private:
 	static int talk_waitforbyteswritten;
 
 	/// Temp directory
-	static std::string tempdirectory;
-	static std::string tasksstdoutdir;
-	static std::string renderslogsdir;
-	static std::string userslogsdir;
+	static std::string temp_dir;
+	static std::string jobs_dir;
+	static std::string users_dir;
+	static std::string renders_dir;
 
 	static std::string db_conninfo;       ///< Database connection info
 	static std::string db_stringquotes;   ///< Database string quotes

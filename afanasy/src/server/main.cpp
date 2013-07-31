@@ -57,17 +57,17 @@ int main(int argc, char *argv[])
 	// Initialize general library:
 	if( af::init( af::InitFarm) == false) return 1;
 
-	// Initialize database:
+	// Initialize store:
 	afsql::init();
 
 	// Environment aready printed usage and we can exit.
 	if( ENV.isHelpMode()) return 0;
 
 	// create directories if it is not exists
-	if( af::pathMakePath( ENV.getTempDirectory(), af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir( ENV.getTasksStdOutDir(), af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir( ENV.getUsersLogsDir(),   af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir( ENV.getRendersLogsDir(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakePath( ENV.getTempDir(),    af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getJobsDir(),    af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getUsersDir(),   af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getRendersDir(), af::VerboseOn ) == false) return 1;
 
 // Server for windows can be me more simple and not use signals at all.
 // Windows is not a server platform, so it designed for individual tests or very small companies with easy load.
@@ -102,15 +102,15 @@ int main(int argc, char *argv[])
 	if( pthread_sigmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
 #endif
 
-	// Create a separate database connection to register jobs.
+	// Create a separate store connection to register jobs.
 	//  ( Job registration is can be long on heavy jobs.
 	//    Server should use another connection for it not to stop
-	//    database update on heavy job registration.
+	//    store update on heavy job registration.
 	//    WARINING!
-	//    Server new jobs accept speed = database jobs fill-in speed!
+	//    Server new jobs accept speed = store jobs fill-in speed!
 	//    It is near 1000 tasks per second on common systems where
 	//    PostgreSQL and Afanasy server are on the same host. )
-	// Also use it now to restore all containers state from database.
+	// Also use it now to restore all containers state from store.
 	afsql::DBConnection afDB_JobRegister("AFDB_JobRegister");
 
 	// containers initialization
@@ -142,95 +142,85 @@ int main(int argc, char *argv[])
 
 	bool hasSystemJob = false;
 //
-// Open database to get nodes:
+// Open store to get nodes:
 //
-	afDB_JobRegister.DBOpen();
-	if( afDB_JobRegister.isOpen())
+//	afDB_JobRegister.DBOpen();
+//	if( afDB_JobRegister.isOpen())
+//	{
+		// Update store tables:
+//		afsql::UpdateTables( &afDB_JobRegister);
+/*
+	//
+	// Get Renders from store:
+	//
+	printf("Getting renders from store...\n");
+	std::list<int> rids = afDB_JobRegister.getIntegers( afsql::DBRender::dbGetIDsCmd());
+	printf("%d renders founded.\n", (int)rids.size());
+	for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
 	{
-		// Update database tables:
-		afsql::UpdateTables( &afDB_JobRegister);
-
-		//
-		// Get Renders from database:
-		//
-		printf("Getting renders from database...\n");
-		std::list<int> rids = afDB_JobRegister.getIntegers( afsql::DBRender::dbGetIDsCmd());
-		printf("%d renders founded.\n", (int)rids.size());
-		for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
-		{
-			RenderAf * render = new RenderAf( *it);
-			if( afDB_JobRegister.getItem( render))
-				renders.addRender( render);
-			else delete render;
-		}
-		printf("%d renders registered.\n", renders.getCount());
-
-		//
-		// Get Users from database:
-		//
-		printf("Getting users from database...\n");
-		std::list<int> uids = afDB_JobRegister.getIntegers( afsql::DBUser::dbGetIDsCmd());
-		printf("%d users founded.\n", (int)uids.size());
-		for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
-		{
-			UserAf * user = new UserAf( *it);
-			if( afDB_JobRegister.getItem( user)) users.addUser( user);
-			else delete user;
-		}
-		printf("%d permanent users registered.\n", users.getCount());
-
-		//
-		// Get Jobs from database:
-		//
-		printf("Getting jobs from database...\n");
-		std::list<int> jids = afDB_JobRegister.getIntegers( afsql::DBJob::dbGetIDsCmd());
-		printf("%d jobs founded.\n", (int)jids.size());
-		for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
-		{
-			JobAf * job = NULL;
-			if( *it == AFJOB::SYSJOB_ID )
-				job = new SysJob( SysJob::FromDataBase);
-			else
-				job = new JobAf( *it);
-			if( afDB_JobRegister.getItem( job))
-			{
-				if( *it == AFJOB::SYSJOB_ID )
-				{
-					SysJob * sysjob = (SysJob*)job;
-					if( sysjob->initSystem() )
-					{
-						printf("System job retrieved from database.\n");
-						hasSystemJob = true;
-					}
-					else
-					{
-						printf("System job retrieved from database is obsolete. Deleting it...\n");
-						std::list<std::string> queries;
-						job->dbDeleteNoStatistics( &queries);
-						delete job;
-						afDB_JobRegister.execute( &queries);
-						continue;
-					}
-				}
-				jobs.job_register( job, &users, NULL);
-			}
-			else
-			{
-				printf("Deleting invalid job from database...\n");
-				std::list<std::string> queries;
-				job->dbDeleteNoStatistics( &queries);
-				std::cout << queries.back() << std::endl;
-				delete job;
-				afDB_JobRegister.execute( &queries);
-			}
-		}
-		printf("%d jobs registered.\n", jobs.getCount());
-
-		//
-		// Close database:
-		//
-		afDB_JobRegister.DBClose();
+		RenderAf * render = new RenderAf( *it);
+		if( afDB_JobRegister.getItem( render))
+			renders.addRender( render);
+		else delete render;
 	}
+	printf("%d renders registered.\n", renders.getCount());
+
+	//
+	// Get Users from store:
+	//
+	printf("Getting users from store...\n");
+	std::list<int> uids = afDB_JobRegister.getIntegers( afsql::DBUser::dbGetIDsCmd());
+	printf("%d users founded.\n", (int)uids.size());
+	for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
+	{
+		UserAf * user = new UserAf( *it);
+		if( afDB_JobRegister.getItem( user)) users.addUser( user);
+		else delete user;
+	}
+	printf("%d permanent users registered.\n", users.getCount());
+*/
+	//
+	// Get Jobs from store:
+	//
+	printf("Getting jobs from store...\n");
+
+	std::vector<int> jids = JobContainer::getStoredIds();
+
+	printf("%d jobs founded.\n", (int)jids.size());
+	for( int i = 0; i < jids.size(); i++)
+	{
+		JobAf * job = NULL;
+		if( jids[i] == AFJOB::SYSJOB_ID )
+			job = new SysJob( SysJob::FromDataBase);
+		else
+			job = new JobAf( jids[i]);
+		if( job->readStore())
+		{
+			if( jids[i] == AFJOB::SYSJOB_ID )
+			{
+				SysJob * sysjob = (SysJob*)job;
+				if( sysjob->initSystem() )
+				{
+					printf("System job retrieved from store.\n");
+					hasSystemJob = true;
+				}
+				else
+				{
+					printf("System job retrieved from store is obsolete. Deleting it...\n");
+					delete job;
+					continue;
+				}
+			}
+			jobs.job_register( job, &users, NULL);
+		}
+	}
+	printf("%d jobs registered.\n", jobs.getCount());
+
+		//
+		// Close store:
+		//
+//		afDB_JobRegister.DBClose();
+//	}
 
 	// Disable new commands and editing:
 	if( af::Environment::hasArgument("-demo"))
@@ -240,8 +230,7 @@ int main(int argc, char *argv[])
 	}
 
 //
-// Create system maintenance job if it was not in database:
-// (must be created after close of database connection to prevent mutex lock)
+// Create system maintenance job if it was not in store:
 	if( hasSystemJob == false )
 	{
 		SysJob* job = new SysJob( SysJob::New);

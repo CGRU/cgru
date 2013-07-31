@@ -18,7 +18,6 @@ Job::Job( int Id)
 	initDefaultValues();
 	m_id = Id;
 	m_time_creation = time(NULL);
-	m_valid = true;
 }
 
 Job::Job( Msg * msg)
@@ -76,14 +75,14 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
-	jr_string("host_name",     m_host_name,     i_object);
-	//jr_uint32("flags",       m_flags,         i_object);
-	//jr_uint32("state",       m_state,         i_object);
+	jr_string("host_name", m_host_name,     i_object);
+	//jr_uint32("flags",   m_flags,         i_object);
+	jr_uint32("st",        m_state,         i_object);
 	//jr_int32 ("user_list_order",          m_user_list_order,            i_object);
 
-	jr_int64 ("time_creation",      m_time_creation,       i_object);
-	//jr_int64 ("time_started",       m_time_started,        i_object);
-	//jr_int64 ("time_done",          m_time_done,           i_object);
+	jr_int64 ("time_creation", m_time_creation, i_object);
+	jr_int64 ("time_started",  m_time_started,  i_object);
+	jr_int64 ("time_done",     m_time_done,     i_object);
 
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
@@ -92,30 +91,24 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
-	m_blocksnum = blocks.Size();
-	if( m_blocksnum < 1 )
+	m_blocks_num = blocks.Size();
+	if( m_blocks_num < 1 )
 	{
 		AFERROR("Job::jsonRead: Blocks array has zero size.");
 		return;
 	}
 
-	m_blocksdata = new BlockData*[m_blocksnum];
-	for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
-	for( int b = 0; b < m_blocksnum; b++)
+	m_blocks_data = new BlockData*[m_blocks_num];
+	for( int b = 0; b < m_blocks_num; b++) m_blocks_data[b] = NULL;
+	for( int b = 0; b < m_blocks_num; b++)
 	{
-		m_blocksdata[b] = v_newBlockData( blocks[b], b);
-		if( m_blocksdata[b] == NULL)
+		m_blocks_data[b] = v_newBlockData( blocks[b], b);
+		if( m_blocks_data[b] == NULL)
 		{
 			AFERROR("Job::jsonRead: Can not allocate memory for new block.\n");
 			return;
 		}
-		if( false == m_blocksdata[b]->isValid())
-		{
-			return;
-		}
 	}
-
-	m_valid = true;
 }
 
 void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
@@ -124,74 +117,75 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
-	o_str << ",\"user_name\":\"" << m_user_name << "\"";
-	o_str << ",\"host_name\":\"" << m_host_name << "\"";
+	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
+	o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
 
 /*	if( m_flags != 0 )
-		o_str << ",\"flags\":"                      << m_flags;*/
+		o_str << ",\n\"flags\":"                      << m_flags;*/
+
+	o_str << ",\n\"st\":" << m_state;
 	if( m_state != 0 )
 	{
-		o_str << ",";
+		o_str << ",\n";
 		jw_state( m_state, o_str);
 	}
 
 	if( m_command_pre.size())
-		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
+		o_str << ",\n\"command_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
 	if( m_command_post.size())
-		o_str << ",\"cmd_post\":\""     << af::strEscape( m_command_post    ) << "\"";
+		o_str << ",\n\"command_post\":\""     << af::strEscape( m_command_post    ) << "\"";
 	if( m_description.size())
-		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
+		o_str << ",\n\"description\":\""  << af::strEscape( m_description ) << "\"";
 
 	if( m_user_list_order != -1 )
-		o_str << ",\"user_list_order\":"            << m_user_list_order;
-	o_str << ",\"time_creation\":"                  << m_time_creation;
+		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
+	o_str << ",\n\"time_creation\":"                  << m_time_creation;
 	if( m_max_running_tasks != -1 )
-		o_str << ",\"max_running_tasks\":"          << m_max_running_tasks;
+		o_str << ",\n\"max_running_tasks\":"          << m_max_running_tasks;
 	if( m_max_running_tasks_per_host != -1 )
-		o_str << ",\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
+		o_str << ",\n\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
 	if( m_time_wait != 0 )
-		o_str << ",\"time_wait\":"                  << m_time_wait;
+		o_str << ",\n\"time_wait\":"                  << m_time_wait;
 	if( m_time_started != 0 )
-		o_str << ",\"time_started\":"               << m_time_started;
+		o_str << ",\n\"time_started\":"               << m_time_started;
 	if( m_time_done != 0 )
-		o_str << ",\"time_done\":"                  << m_time_done;
+		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
-		o_str << ",\"time_life\":"                  << m_time_life;
+		o_str << ",\n\"time_life\":"                  << m_time_life;
 
 	if( hasHostsMask())
-		o_str << ",\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
+		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
 	if( hasHostsMaskExclude())
-		o_str << ",\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
+		o_str << ",\n\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 	if( hasDependMask())
-		o_str << ",\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
+		o_str << ",\n\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
 	if( hasDependMaskGlobal())
-		o_str << ",\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\"";
+		o_str << ",\n\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\"";
 	if( hasNeedOS())
-		o_str << ",\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
+		o_str << ",\n\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
 	if( hasNeedProperties())
-		o_str << ",\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
+		o_str << ",\n\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
 
-	if( m_blocksdata == NULL )
+	if( m_blocks_data == NULL )
 	{
 		o_str << "}";
 		return;
 	}	
 
-	o_str << ",\"blocks\":[";
-	for( int b = 0; b < m_blocksnum; b++ )
+	o_str << ",\n\"blocks\":[\n";
+	for( int b = 0; b < m_blocks_num; b++ )
 	{
 		if( b != 0 )
-			o_str << ',';
-		m_blocksdata[b]->jsonWrite( o_str, i_type);
+			o_str << ",\n";
+		m_blocks_data[b]->jsonWrite( o_str, i_type);
 	}
-	o_str << "]}";
+	o_str << "]\n}";
 }
 
 void Job::initDefaultValues()
 {
-	m_valid = false; 
 	m_id = 0;
-	m_blocksnum = 0;
+	m_blocks_num = 0;
 	m_max_running_tasks = -1;
 	m_max_running_tasks_per_host = -1;
 	m_time_wait = 0;
@@ -199,7 +193,7 @@ void Job::initDefaultValues()
 	m_time_done = 0;
 	m_user_list_order = -1;
 	m_time_life = -1;
-	m_blocksdata = NULL;
+	m_blocks_data = NULL;
 
 	m_hosts_mask.setCaseInsensitive();
 	m_hosts_mask_exclude.setCaseInsensitive();
@@ -212,13 +206,45 @@ void Job::initDefaultValues()
 	m_need_properties.setContain();
 }
 
+bool Job::isValid( std::string * o_err) const
+{
+	std::string * err = o_err;
+	if( err == NULL ) err = new std::string();
+
+	if( m_user_name.empty())
+		*err += "User name is empty";
+	else if( m_blocks_num < 1 )
+		*err += "Invalid number of blocks";
+	else if( m_blocks_data == NULL )
+		*err += "Blocks data is NULL";
+	else
+	{
+		for( int b = 0; b < m_blocks_num; b++)
+		{
+			m_blocks_data[b]->isValid( err);
+			if( err->size())
+				break;
+		}
+	}
+
+	bool valid = true;
+	if( err->size()) valid = false;
+	if( o_err == NULL )
+	{
+		AFERRAR("Invalid job '%s'[%d]:\n%s", m_name.c_str(), m_id, err->c_str())
+		delete err;
+	}
+
+	return valid;
+}
+
 Job::~Job()
 {
-   if( m_blocksdata != NULL)
+   if( m_blocks_data != NULL)
    {
-	  for( int b = 0; b < m_blocksnum; b++)
-		 if( m_blocksdata[b] != NULL) delete m_blocksdata[b];
-	  delete [] m_blocksdata;
+	  for( int b = 0; b < m_blocks_num; b++)
+		 if( m_blocks_data[b] != NULL) delete m_blocks_data[b];
+	  delete [] m_blocks_data;
    }
 }
 
@@ -226,7 +252,7 @@ void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
 
-	rw_int32_t ( m_blocksnum,                  msg);
+	rw_int32_t ( m_blocks_num,                  msg);
 	rw_uint32_t( m_flags,                      msg);
 	rw_uint32_t( m_state,                      msg);
 	rw_int32_t ( m_max_running_tasks,          msg);
@@ -258,35 +284,33 @@ void Job::v_readwrite( Msg * msg)
 
 void Job::rw_blocks( Msg * msg)
 {
-   if( m_blocksnum < 1)
+   if( m_blocks_num < 1)
    {
-	  AFERRAR("Job::rw_blocks: invalid blocks number = %d", m_blocksnum)
+	  AFERRAR("Job::rw_blocks: invalid blocks number = %d", m_blocks_num)
       return;
    }
 
    if( msg->isWriting() )
    {
-	  for( int b = 0; b < m_blocksnum; b++)
+	  for( int b = 0; b < m_blocks_num; b++)
       {
-		 m_blocksdata[b]->write( msg);
+		 m_blocks_data[b]->write( msg);
       }
    }
    else
    {
-	  m_blocksdata = new BlockData*[m_blocksnum];
-	  for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
-	  for( int b = 0; b < m_blocksnum; b++)
+	  m_blocks_data = new BlockData*[m_blocks_num];
+	  for( int b = 0; b < m_blocks_num; b++) m_blocks_data[b] = NULL;
+	  for( int b = 0; b < m_blocks_num; b++)
       {
-		 m_blocksdata[b] = v_newBlockData( msg);
-		 if( m_blocksdata[b] == NULL)
+		 m_blocks_data[b] = v_newBlockData( msg);
+		 if( m_blocks_data[b] == NULL)
          {
             AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
             return;
          }
       }
    }
-
-	m_valid = true;
 }
 
 BlockData * Job::v_newBlockData( Msg * msg)
@@ -303,7 +327,7 @@ int Job::v_calcWeight() const
 {
 	int weight = Node::v_calcWeight();
 	weight += sizeof(Job) - sizeof( Node);
-	for( int b = 0; b < m_blocksnum; b++) weight += m_blocksdata[b]->calcWeight();
+	for( int b = 0; b < m_blocks_num; b++) weight += m_blocks_data[b]->calcWeight();
 	weight += weigh( m_description);
 	weight += weigh( m_user_name);
 	weight += weigh( m_host_name);
@@ -327,17 +351,17 @@ void Job::stdOutJobBlocksTasks() const
 
 void Job::generateInfoStreamBlocks( std::ostringstream & o_str, bool full) const
 {
-	if( m_blocksdata == NULL )
+	if( m_blocks_data == NULL )
 		return;
 
-	for( int b = 0; b < m_blocksnum; b++)
+	for( int b = 0; b < m_blocks_num; b++)
 	{
 		o_str << std::endl << std::endl;
-		m_blocksdata[b]->v_generateInfoStream( o_str, full);
+		m_blocks_data[b]->v_generateInfoStream( o_str, full);
 		o_str << std::endl << std::endl;
-		m_blocksdata[b]->generateInfoStreamTasks( o_str, full);
+		m_blocks_data[b]->generateInfoStreamTasks( o_str, full);
 		o_str << std::endl << std::endl;
-		m_blocksdata[b]->generateProgressStream( o_str);
+		m_blocks_data[b]->generateProgressStream( o_str);
 	}
 }
 
@@ -353,21 +377,21 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
 	if( isHidden()) o_str << " (hidden)";
 
 	bool display_blocks = true;
-	if( m_blocksnum == 0)
+	if( m_blocks_num == 0)
 	{
 		o_str << "\n\t ERROR: HAS NO BLOCKS !";
 		display_blocks = false;
 	}
-	else if( m_blocksdata == NULL)
+	else if( m_blocks_data == NULL)
 	{
 		o_str << "\n\t ERROR: HAS NULL BLOCKS DATA !";
 		display_blocks = false;
 	}
-	else if( m_blocksdata != NULL)
+	else if( m_blocks_data != NULL)
 	{
-		for( int b = 0; b < m_blocksnum; b++)
+		for( int b = 0; b < m_blocks_num; b++)
 		{
-			if( m_blocksdata[b] != NULL) continue;
+			if( m_blocks_data[b] != NULL) continue;
 			o_str << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
 			display_blocks = false;
 		}
@@ -415,12 +439,12 @@ void Job::v_generateInfoStream( std::ostringstream & o_str, bool full) const
 
 	if( full == false ) return;
 
-	if(( m_blocksnum <=3 ) && ( m_blocksdata != NULL ))
+	if(( m_blocks_num <=3 ) && ( m_blocks_data != NULL ))
 	{
-		for( int b = 0; b < m_blocksnum; b++)
+		for( int b = 0; b < m_blocks_num; b++)
 		{
 			o_str << std::endl << std::endl;
-			m_blocksdata[b]->v_generateInfoStream( o_str, false);
+			m_blocks_data[b]->v_generateInfoStream( o_str, false);
 		}
 	}
 }

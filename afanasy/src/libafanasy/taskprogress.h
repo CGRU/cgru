@@ -38,6 +38,7 @@ public:
 
    void v_readwrite( Msg * msg); ///< Read or write progress in buffer.
 
+	void jsonRead( const JSON & i_obj);
 	void jsonWrite( std::ostringstream & o_str) const;
 };
 }

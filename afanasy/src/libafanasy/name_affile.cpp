@@ -84,15 +84,28 @@ const std::string af::pathUp( const std::string & path)
 	return pathUp;
 }
 
-void af::pathFilterFileName( std::string & filename)
+void af::pathFilterFileName( std::string & io_filename)
 {
-	for( int i = 0; i < AFGENERAL::FILENAME_INVALIDCHARACTERSLENGTH; i++)
+	for( int c = 0; c < io_filename.size(); c++)
+	{
+		if(( io_filename.at(c) <= ' ' ) ||
+			( io_filename.at(c) > 'z' ))
+			io_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
+
+		for( int i = 0; i < AFGENERAL::FILENAME_INVALID_CHARACTERS_LENGTH; i++)
+			if( io_filename.at(c) == AFGENERAL::FILENAME_INVALID_CHARACTERS[i] )
+			{
+				io_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
+				break;
+			}
+	}
+/*	for( int i = 0; i < AFGENERAL::FILENAME_INVALIDCHARACTERSLENGTH; i++)
 		for(;;)
 		{
 			size_t found = filename.find( AFGENERAL::FILENAME_INVALIDCHARACTERS[i]);
 			if( found == std::string::npos ) break;
 			filename.replace( found, 1, 1, AFGENERAL::FILENAME_INVALIDCHARACTERREPLACE);
-		}
+		}*/
 }
 
 bool af::pathFileExists( const std::string & path)
@@ -294,3 +307,80 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path)
 
 	return list;
 }
+
+bool af::removeDir( const std::string & i_folder )
+{
+#ifdef WINNT
+	HANDLE dir;
+	WIN32_FIND_DATA file_data;
+	if(( dir = FindFirstFile(( i_folder + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			std::string filename( file_data.cFileName);
+
+			if( filename.find(".") == 0 )
+				continue;
+
+			filename = i_folder + '\\' + filename;
+			if( false == af::pathFileExists( filename))
+				continue;
+
+			if( DeleteFile( filename.c_str()) == FALSE)
+			{
+				 AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename.c_str())
+				 return false;
+			}
+
+		} while ( FindNextFile( dir, &file_data));
+		FindClose( dir);
+	}
+	else
+	{
+		  AFERRAR("CleanUpData::doCleanUp: Can't open folder:\n%s", i_folder.c_str())
+		  return false;
+	}
+
+	if( RemoveDirectory( i_folder.c_str()) == FALSE)
+	{
+		AFERRAR("CleanUpData::doCleanUp: Can't remove folder:\n%s", i_folder.c_str())
+		return false;
+	}
+
+#else
+
+	// Opeining folder
+	struct dirent *de = NULL;
+	DIR * dir = opendir( i_folder.c_str());
+	if( dir == NULL)
+	{
+		AFERRAR("CleanUpData::doCleanUp: Can't open folder:\n%s", i_folder.c_str())
+		return false;
+	}
+
+	// Removing all files in folder
+	while( de = readdir(dir))
+	{
+		if( de->d_name[0] == '.' ) continue;
+		static char filename_buffer[4096];
+		sprintf( filename_buffer, "%s/%s", i_folder.c_str(), de->d_name);
+		if( unlink( filename_buffer) != 0)
+		{
+			AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename_buffer)
+			return false;
+		}
+	}
+
+	closedir(dir);
+
+	// Removing folder
+	if( rmdir( i_folder.c_str()) != 0)
+	{
+		AFERRAR("CleanUpData::doCleanUp: Can't delete folder:\n%s", i_folder.c_str())
+		return false;
+	}
+#endif
+
+	return true;
+}
+

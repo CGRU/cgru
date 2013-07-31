@@ -52,7 +52,8 @@ class Block:
 		self.data = dict()
 		self.data["name"] = blockname
 		self.data["capacity"] = int( cgruconfig.VARS['af_task_default_capacity'])
-		self.data['working_directory'] = Pathmap.toServer( os.getenv('PWD', os.getcwd()))
+		self.data["working_directory"] = Pathmap.toServer( os.getenv('PWD', os.getcwd()))
+		self.data["numeric"] = False
 		self.tasks = []
 		if self.setService( service):
 			__import__("services", globals(), locals(), [self.data["service"]])
@@ -90,6 +91,7 @@ class Block:
 		if pertask < 1:
 			print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
 			pertask = 1
+		self.data["numeric"] = True
 		self.data["frame_first"] = start
 		self.data["frame_last"] = end
 		self.data["frames_per_task"] = pertask

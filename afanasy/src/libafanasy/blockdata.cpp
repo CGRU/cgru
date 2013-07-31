@@ -182,24 +182,20 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if( io_changes )
 		return;
 
-	const JSON & tasks = i_object["tasks"];
-	if( tasks.IsArray())
-	{
-		m_tasks_num = tasks.Size();
-		if( m_tasks_num > 0 )
-		{
-			m_tasks_data = new TaskData*[m_tasks_num];
-			for( int t = 0; t < m_tasks_num; t++)
-			{
-				m_tasks_data[t] = createTask( tasks[t]);
-				if( m_tasks_data[t] == NULL)
-				{
-					AFERROR("BlockData::BlockData: Can not allocate memory for new task.")
-					return;
-				}
-			}
-		}
-	}
+	jr_uint32("st", m_state, i_object);
+
+	jsonReadTasks( i_object);
+	// If tasks are not preset in json data, condider that block is numeric at first
+	bool numeric = ( m_tasks_data == NULL );
+
+	// But on store reading, tasks are read later from separate file
+	if( numeric )
+		jr_bool("numeric", numeric, i_object);
+
+	// On store reading, block can be not numeric, but tasks will be read later from separate file
+	if( false == numeric )
+		// In this case we should know tasks number for job construction
+		jr_int32 ("tasks_num", m_tasks_num, i_object);
 
 	int64_t frame_first     = 0;
 	int64_t frame_last      = 0;
@@ -260,7 +256,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 //		AFERRAR("BlockData::readwrite: invalid type = %s.", Msg::TNAMES[msg->type()])
 //	}
 
-	if( m_tasks_data == NULL )
+	if( numeric )
 		setNumeric( frame_first, frame_last, frames_per_task, frames_inc);
 	else if( frames_per_task != 0 )
 		m_frames_per_task = frames_per_task;
@@ -273,6 +269,28 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if(( multihost_min != -1 ) || ( multihost_max != -1 ))
 		setMultiHost( multihost_min, multihost_max, multihost_max_wait,
 				multihost_master_on_slave, multihost_service, multihost_service_wait);
+}
+
+void BlockData::jsonReadTasks( const JSON & i_object)
+{
+	const JSON & tasks = i_object["tasks"];
+	if( tasks.IsArray())
+	{
+		m_tasks_num = tasks.Size();
+		if( m_tasks_num > 0 )
+		{
+			m_tasks_data = new TaskData*[m_tasks_num];
+			for( int t = 0; t < m_tasks_num; t++)
+			{
+				m_tasks_data[t] = createTask( tasks[t]);
+				if( m_tasks_data[t] == NULL)
+				{
+					AFERROR("BlockData::BlockData: Can not allocate memory for new task.")
+					return;
+				}
+			}
+		}
+	}
 }
 
 void BlockData::jsonWrite( std::ostringstream & o_str, const std::string & i_datamode) const
@@ -296,142 +314,144 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 	case Msg::TJob:
 	case Msg::TBlocks:
 
-		//rw_uint32_t( m_flags,                 msg);
-		//if( isNotNumeric()) rw_tasks(         msg);
 		if( isNotNumeric() && ( m_tasks_data != NULL ))
 		{
-            o_str << "\"tasks\":[";
-			for( int t = 0; t < m_tasks_num; t++ )
-			{
-				if( t != 0 )
-                    o_str << ',';
-                m_tasks_data[t]->jsonWrite( o_str);
-			}
-            o_str << "],";
+			o_str << "\n";
+			jsonWriteTasks( o_str);
+			o_str << ",";
 		}
 
+	case 0: // Zero value is on store.
+		// We do not need to write tasks here.
+		// Tasks data should be written in a separate file.
+
 	case Msg::TBlocksProperties:
-        o_str << "\"command\":\""     << af::strEscape(m_command) << "\"";
-        o_str << ",\"tasks_name\":\"" << m_tasks_name             << "\"";
+        o_str << "\n\"command\":\""     << af::strEscape(m_command) << "\"";
+        o_str << ",\n\"tasks_name\":\"" << m_tasks_name             << "\"";
 		if( m_parser.size())
-            o_str << ",\"parser\":\"" << m_parser << "\"";
+            o_str << ",\n\"parser\":\"" << m_parser << "\"";
 		if( m_working_directory.size())
-            o_str << ",\"working_directory\":\"" << af::strEscape(m_working_directory ) << "\"";
+            o_str << ",\n\"working_directory\":\"" << af::strEscape(m_working_directory ) << "\"";
 		if( m_files.size())
-            o_str << ",\"files\":\""             << af::strEscape( m_files )    << "\"";
+            o_str << ",\n\"files\":\""             << af::strEscape( m_files )    << "\"";
 		if( m_command_pre.size())
-            o_str << ",\"cmd_pre\":\""           << af::strEscape( m_command_pre )  << "\"";
+            o_str << ",\n\"cmd_pre\":\""           << af::strEscape( m_command_pre )  << "\"";
 		if( m_command_post.size())
-            o_str << ",\"cmd_post\":\""          << af::strEscape( m_command_post ) << "\"";
+            o_str << ",\n\"cmd_post\":\""          << af::strEscape( m_command_post ) << "\"";
 		if( m_multihost_service.size())
-            o_str << ",\"multihost_service\":\"" << m_multihost_service         << "\"";
+            o_str << ",\n\"multihost_service\":\"" << m_multihost_service         << "\"";
 		if( m_custom_data.size())
-	        o_str << ",\"custom_data\":\""       << m_custom_data               << "\"";
-        //o_str << ",\"environment\":\""         << m_environment               << "\"";
-        //o_str << ",\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
+	        o_str << ",\n\"custom_data\":\""       << m_custom_data               << "\"";
+        //o_str << ",\n\"environment\":\""         << m_environment               << "\"";
+        //o_str << ",\n\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
         o_str << ',';
 
 	case Msg::TJobsList:
 
-        o_str << "\"name\":\""           << m_name << "\"";
-        o_str << ",\"service\":\""       << m_service << "\"";
-        o_str << ",\"capacity\":"        << m_capacity;
-		o_str << ",\"flags\":"           << m_flags;
-		o_str << ",\"numeric\":"         << (isNumeric() ? "true":"false");
-		o_str << ",\"tasks_num\":"       << m_tasks_num;
-		o_str << ",\"frame_first\":"     << m_frame_first;
-        o_str << ",\"frame_last\":"      << m_frame_last;
-        o_str << ",\"frames_per_task\":" << m_frames_per_task;
-        o_str << ",\"frames_inc\":"      << m_frames_inc;
+        o_str << "\n\"name\":\""           << m_name << "\"";
+        o_str << ",\n\"service\":\""       << m_service << "\"";
+        o_str << ",\n\"capacity\":"        << m_capacity;
+		o_str << ",\n\"flags\":"           << m_flags;
+		o_str << ",\n\"numeric\":"         << (isNumeric() ? "true":"false");
+		o_str << ",\n\"tasks_num\":"       << m_tasks_num;
+		o_str << ",\n\"frame_first\":"     << m_frame_first;
+        o_str << ",\n\"frame_last\":"      << m_frame_last;
+        o_str << ",\n\"frames_per_task\":" << m_frames_per_task;
+        o_str << ",\n\"frames_inc\":"      << m_frames_inc;
 		if( isDependSubTask())
-            o_str << ",\"depend_sub_task\":true";
+            o_str << ",\n\"depend_sub_task\":true";
 		if( isNonSequential())
-            o_str << ",\"non_sequential\":true";
+            o_str << ",\n\"non_sequential\":true";
 		if( canVarCapacity())
 		{
-            o_str << ",\"capacity_coeff_min\":" << m_capacity_coeff_min;
-            o_str << ",\"capacity_coeff_max\":" << m_capacity_coeff_max;
+            o_str << ",\n\"capacity_coeff_min\":" << m_capacity_coeff_min;
+            o_str << ",\n\"capacity_coeff_max\":" << m_capacity_coeff_max;
 		}
 		if( isMultiHost())
 		{
-            o_str << ",\"multihost_min\":"          << int(m_multihost_min);
-            o_str << ",\"multihost_max\":"          << int(m_multihost_max);
-            o_str << ",\"multihost_max_wait\":"     << int(m_multihost_max_wait);
-            o_str << ",\"multihost_service_wait\":" << int(m_multihost_service_wait);
+            o_str << ",\n\"multihost_min\":"          << int(m_multihost_min);
+            o_str << ",\n\"multihost_max\":"          << int(m_multihost_max);
+            o_str << ",\n\"multihost_max_wait\":"     << int(m_multihost_max_wait);
+            o_str << ",\n\"multihost_service_wait\":" << int(m_multihost_service_wait);
 			if( canMasterRunOnSlaveHost())
-                o_str << ",\"multihost_master_on_slave\":true";
+                o_str << ",\n\"multihost_master_on_slave\":true";
 		}
-        //o_str << ",\"file_size_min\":"         << m_file_size_min;
-        //o_str << ",\"file_size_max\":"         << m_file_size_max;
+        //o_str << ",\n\"file_size_min\":"         << m_file_size_min;
+        //o_str << ",\n\"file_size_max\":"         << m_file_size_max;
 		if( m_max_running_tasks != -1 )
-            o_str << ",\"max_running_tasks\":"          << m_max_running_tasks;
+            o_str << ",\n\"max_running_tasks\":"          << m_max_running_tasks;
 		if( m_max_running_tasks_per_host != -1 )
-            o_str << ",\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
+            o_str << ",\n\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
 		if( m_need_memory > 0 )
-            o_str << ",\"need_memory\":"           << m_need_memory;
+            o_str << ",\n\"need_memory\":"           << m_need_memory;
 		if( m_need_power > 0 )
-            o_str << ",\"need_power\":"            << m_need_power;
+            o_str << ",\n\"need_power\":"            << m_need_power;
 		if( m_need_hdd > 0 )
-            o_str << ",\"need_hdd\":"              << m_need_hdd;
+            o_str << ",\n\"need_hdd\":"              << m_need_hdd;
 		if( m_errors_retries != -1 )
-            o_str << ",\"errors_retries\":"        << int(m_errors_retries);
+            o_str << ",\n\"errors_retries\":"        << int(m_errors_retries);
 		if( m_errors_avoid_host != -1 )
-            o_str << ",\"errors_avoid_host\":"     << int(m_errors_avoid_host);
+            o_str << ",\n\"errors_avoid_host\":"     << int(m_errors_avoid_host);
 		if( m_errors_task_same_host != -1 )
-            o_str << ",\"errors_task_same_host\":" << int(m_errors_task_same_host);
+            o_str << ",\n\"errors_task_same_host\":" << int(m_errors_task_same_host);
 		if( m_errors_forgive_time != -1 )
-            o_str << ",\"errors_forgive_time\":"   << int(m_errors_forgive_time);
+            o_str << ",\n\"errors_forgive_time\":"   << int(m_errors_forgive_time);
 		if( m_tasks_max_run_time > 0 )
-            o_str << ",\"tasks_max_run_time\":"    << int(m_tasks_max_run_time);
+            o_str << ",\n\"tasks_max_run_time\":"    << int(m_tasks_max_run_time);
 
 		if( hasDependMask())
-            o_str << ",\"depend_mask\":\""        << m_depend_mask.getPattern() << "\"";
+            o_str << ",\n\"depend_mask\":\""        << m_depend_mask.getPattern() << "\"";
 		if( hasTasksDependMask())
-            o_str << ",\"tasks_depend_mask\":\""  << m_tasks_depend_mask.getPattern() << "\"";
+            o_str << ",\n\"tasks_depend_mask\":\""  << m_tasks_depend_mask.getPattern() << "\"";
 		if( hasHostsMask())
-            o_str << ",\"hosts_mask\":\""         << m_hosts_mask.getPattern() << "\"";
+            o_str << ",\n\"hosts_mask\":\""         << m_hosts_mask.getPattern() << "\"";
 		if( hasHostsMaskExclude())
-            o_str << ",\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
+            o_str << ",\n\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
 		if( hasNeedProperties())
-            o_str << ",\"need_properties\":\""    << m_need_properties.getPattern() << "\"";
+            o_str << ",\n\"need_properties\":\""    << m_need_properties.getPattern() << "\"";
         o_str << ',';
 
 	case Msg::TBlocksProgress:
 
-        o_str << "\"block_num\":"  << m_block_num;
+		o_str << "\n\"block_num\":"  << m_block_num;
+
+		// Below parameters are calculated and not needed to store:
+		if( i_type == 0 ) break; 
+
+		o_str << ",\n\"st\":" << m_state;
 		if( m_state != 0 )
 		{
-			o_str << ",";
+			o_str << ",\n";
 			jw_state( m_state, o_str);
 		}
 		if( m_job_id != 0 )
-            o_str << ",\"job_id\":" << m_job_id;
+            o_str << ",\n\"job_id\":" << m_job_id;
 		if( m_running_tasks_counter > 0 )
-            o_str << ",\"running_tasks_counter\":" << m_running_tasks_counter;
+            o_str << ",\n\"running_tasks_counter\":" << m_running_tasks_counter;
 
 		if( p_percentage > 0 )
-            o_str << ",\"p_percentage\":"     << int(p_percentage);
+            o_str << ",\n\"p_percentage\":"     << int(p_percentage);
 		if( p_error_hosts > 0 )
-            o_str << ",\"p_error_hosts\":"    << p_error_hosts;
+            o_str << ",\n\"p_error_hosts\":"    << p_error_hosts;
 		if( p_avoid_hosts > 0 )
-            o_str << ",\"p_avoid_hosts\":"    << p_avoid_hosts;
+            o_str << ",\n\"p_avoid_hosts\":"    << p_avoid_hosts;
 		if( p_tasks_ready > 0 )
-            o_str << ",\"p_tasks_ready\":"    << p_tasks_ready;
+            o_str << ",\n\"p_tasks_ready\":"    << p_tasks_ready;
 		if( p_tasks_done > 0 )
-            o_str << ",\"p_tasks_done\":"     << p_tasks_done;
+            o_str << ",\n\"p_tasks_done\":"     << p_tasks_done;
 		if( p_tasks_error > 0 )
-            o_str << ",\"p_tasks_error\":"    << p_tasks_error;
+            o_str << ",\n\"p_tasks_error\":"    << p_tasks_error;
 		if( p_tasks_skipped > 0 )
-            o_str << ",\"p_tasks_skipped\":"  << p_tasks_skipped;
+            o_str << ",\n\"p_tasks_skipped\":"  << p_tasks_skipped;
 		if( p_tasks_warning > 0 )
-            o_str << ",\"p_tasks_warning\":"  << p_tasks_warning;
+            o_str << ",\n\"p_tasks_warning\":"  << p_tasks_warning;
 		if( p_tasks_run_time > 0 )
-            o_str << ",\"p_tasks_run_time\":" << p_tasks_run_time;
+            o_str << ",\n\"p_tasks_run_time\":" << p_tasks_run_time;
 
 //		if(( p_tasks_done < m_tasks_num ) ||
 //		     p_tasks_error || m_running_tasks_counter )
 		{
-			o_str << ",\"p_progressbar\":\"";
+			o_str << ",\n\"p_progressbar\":\"";
 			for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
 			{
 				o_str << p_progressbar[i];
@@ -445,33 +465,43 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
         AFERRAR("BlockData::readwrite: invalid type = %s.", Msg::TNAMES[i_type])
 	}
 
-    o_str << "}";
+    o_str << "\n}";
 }
 
-bool BlockData::isValid() const
+
+void BlockData::jsonWriteTasks( std::ostringstream & o_str) const
 {
-   if( m_tasks_num == 0)
-   {
-      AFERRAR("BlockData::isValid: #%d block[%s] zero tasks number.", m_block_num, m_name.c_str())
-      return false;
-   }
-   if( isNotNumeric())
-   {
-      if( m_tasks_data == NULL)
-      {
-         AFERRAR("BlockData::isValid: #%d block[%s] tasks data is null on not numeric block.", m_block_num, m_name.c_str())
-         return false;
-      }
-      for( int t = 0; t < m_tasks_num; t++)
-      {
-         if(m_tasks_data[t] == NULL)
-         {
-            AFERRAR("BlockData::isValid: #%d block[%s] task[%d] data is null on not numeric block.", m_block_num, m_name.c_str(), t)
-            return false;
-         }
-      }
-   }
-   return true;
+	o_str << "\"tasks\":[\n";
+	for( int t = 0; t < m_tasks_num; t++ )
+	{
+		if( t != 0 )
+			o_str << ",\n";
+		m_tasks_data[t]->jsonWrite( o_str);
+	}
+	o_str << "\n]";
+}
+
+void BlockData::isValid( std::string * o_err) const
+{
+	if( m_tasks_num == 0)
+	{
+		*o_err += "Block '" + m_name + "'[" + af::itos( m_block_num) + "]: Zero tasks number.";
+	}
+	else if( isNotNumeric())
+	{
+		if( m_tasks_data == NULL)
+		{
+			*o_err += "Block '" + m_name + "'[" + af::itos( m_block_num) + "]: Tasks data is null on not numeric block.";
+		}
+		else for( int t = 0; t < m_tasks_num; t++)
+		{
+			if( m_tasks_data[t] == NULL)
+			{
+				*o_err += "Block '" + m_name + "'[" + af::itos( m_block_num) + "]: Task[" + af::itos(t) + "] data is null on not numeric block.";
+				return;
+			}
+		}
+	}
 }
 
 BlockData::~BlockData()

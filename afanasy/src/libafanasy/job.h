@@ -27,15 +27,15 @@ public:
 
 	virtual ~Job();
 
-	inline bool isValid()   const { return          m_valid; }
-	inline bool isInvalid() const { return false == m_valid; }
+	bool isValid( std::string * o_err = NULL ) const;
+//	inline bool isInvalid() const { return false == isValid(); }
 
     void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
 	//inline unsigned getFlags() const { return flags;}
 	inline unsigned getState() const { return m_state;}
 
-	inline int getBlocksNum()           const { return m_blocksnum;                 }
+	inline int getBlocksNum()           const { return m_blocks_num;                 }
 	inline int getTimeLife()            const { return m_time_life;                 }
 	inline int getUserListOrder()       const { return m_user_list_order;           }
 	inline int getMaxRunningTasks()     const { return m_max_running_tasks;         }
@@ -95,12 +95,12 @@ public:
 	inline bool checkNeedProperties(    const std::string & str ) const { return m_need_properties.match( str);   }
 
 	inline int getRunningTasksNumber() const /// Get job running tasks.
-		{int n=0;for(int b=0;b<m_blocksnum;b++)n+=m_blocksdata[b]->getRunningTasksNumber();return n;}
+		{int n=0;for(int b=0;b<m_blocks_num;b++)n+=m_blocks_data[b]->getRunningTasksNumber();return n;}
 
-	const std::string & getTasksOutputDir() const { return m_tasks_output_dir; }
+//	const std::string & getTasksOutputDir() const { return m_tasks_output_dir; }
 
 	/// Get block constant pointer.
-	inline BlockData* getBlock( int n) const { if(n<(m_blocksnum))return m_blocksdata[n];else return NULL;}
+	inline BlockData* getBlock( int n) const { if(n<(m_blocks_num))return m_blocks_data[n];else return NULL;}
 
 	virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 
@@ -110,8 +110,8 @@ public:
 	void stdOutJobBlocksTasks() const;
 
 protected:
-	BlockData  ** m_blocksdata;    ///< Blocks pointer.
-	int32_t m_blocksnum;   ///< Number of blocks in job.
+	BlockData  ** m_blocks_data;    ///< Blocks pointer.
+	int32_t m_blocks_num;   ///< Number of blocks in job.
 
 	int32_t m_user_list_order;   ///< Job order in user jobs list.
 
@@ -158,8 +158,6 @@ protected:
 	RegExp m_need_os;
 	RegExp m_need_properties;
 
-	std::string m_tasks_output_dir;       ///< Tasks output directory.
-
 private:
 	void initDefaultValues();
 
@@ -172,7 +170,5 @@ private:
     void generateInfoStreamJob(    std::ostringstream & o_str, bool full = false) const; /// Generate information.
     void generateInfoStreamBlocks( std::ostringstream & o_str, bool full = false) const;
 
-private:
-	bool m_valid;
 };
 }

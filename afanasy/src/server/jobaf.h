@@ -25,17 +25,23 @@ class UserAf;
 class JobAf : public afsql::DBJob , public AfNodeSrv
 {
 public:
-
+/*
 /// Construct job from message data with provided message type.
 	JobAf( af::Msg * msg);
-
+*/
 /// Construct job from JSON.
 	JobAf( JSON & i_object);
 
-/// Construct empty Job for database.
+/// Construct empty Job for store.
 	JobAf( int Id);
 
 	virtual ~JobAf();
+
+	bool isFromStore() const { return m_from_store; }
+
+	bool readStore();
+
+	bool isValidConstructed() const;
 
     virtual void v_setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
 
@@ -98,14 +104,6 @@ public:
 /// Initialize new job, came to Afanasy container.
 	bool initialize();
 
-/// Whether job is constructed successfully.
-	inline bool isConstructed() const { return m_constructed;}
-
-/// Whether job is initialized successfully.
-	inline bool isInitialized() const { return m_initialized;}
-
-	inline bool  fromDataBase() const { return m_fromdatabase;}          ///< Whether job was created from database.
-
 	int getUid() const;
 
 	virtual int v_calcWeight()          const;  ///< Calculate and return memory size.
@@ -121,13 +119,18 @@ public:
 	int  getRenderCounts( RenderAf * render) const;
 	void remRenderCounts( RenderAf * render);
 
+//	const std::string & getStoreDir() const { return m_store_dir; }
+	const std::string & getTasksProgessDir() const { return m_store_dir_progress; }
+	const std::string & getTasksOuputDir() const { return m_store_dir_output; }
+	const std::vector<std::string> getStoreDirs() const;
+
 public:
 	/// Set Jobs Container.
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}
 
 protected:
 	/// Allocate JobInfo, tasksLog.
-	bool construct();
+	void construct();
 
     virtual Block * v_newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
 
@@ -135,11 +138,9 @@ protected:
 
 protected:
 	Block ** m_blocks;              ///< Blocks.
-	bool m_fromdatabase;            ///< Whether job constructed from database.
+	bool m_from_store;            ///< Whether job constructed from store.
 
 private:
-	bool m_constructed;             ///< Whether the job was constructed successfully.
-	bool m_initialized;             ///< Whether the job was initialized successfully.
 	bool m_deletion;                ///< Whether the job is deleting.
 
 	std::list<RenderAf*> renders_ptrs;
@@ -149,6 +150,11 @@ private:
 
 	UserAf * m_user;
 
+	std::string m_store_dir;   ///< Store directory.
+	std::string m_store_file;  ///< Store file.
+	std::string m_store_dir_progress;   ///< Store directory.
+	std::string m_store_dir_output;   ///< Store directory.
+
 private:
 	mutable int progressWeight;
 	mutable int m_logsWeight;
@@ -156,6 +162,8 @@ private:
 
 private:
 	void initializeValues();
+	void initStoreDirs();
+	void store( bool i_first_time) const;
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 

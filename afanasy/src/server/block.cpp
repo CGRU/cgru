@@ -1,5 +1,7 @@
 #include "block.h"
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/jobprogress.h"
 
 #include "../libafsql/dbattr.h"
@@ -52,6 +54,41 @@ Block::~Block()
 	  for( int t = 0; t < m_data->getTasksNum(); t++) if( m_tasks[t]) delete m_tasks[t];
 	  delete [] m_tasks;
    }
+}
+
+bool Block::storeTasks( const std::string & i_folder)
+{
+	if( m_data->isNumeric()) return true;
+	std::string filename = getStoreTasksFileName( i_folder);
+	std::ostringstream str;
+	str << "{\n";
+	m_data->jsonWriteTasks( str);
+	str << "\n}";
+	return AFCommon::writeFile( str, getStoreTasksFileName( i_folder));
+}
+
+bool Block::readStoredTasks( const std::string & i_folder)
+{
+	if( m_data->isNumeric()) return true;
+	std::string filename = getStoreTasksFileName( i_folder);
+
+	int size;
+	char * data = af::fileRead( filename, size);
+	if( data == NULL ) return false;
+
+	rapidjson::Document document;
+	char * res = af::jsonParseData( document, data, size);
+	if( res == NULL ) return false;
+
+	m_data->jsonReadTasks( document);
+	delete [] data;
+
+	return true;
+}
+
+const std::string Block::getStoreTasksFileName( const std::string & i_folder) const
+{
+	return i_folder + AFGENERAL::PATH_SEPARATOR + "block" + af::itos( m_data->getBlockNum()) + "_tasks.json";
 }
 
 void Block::appendJobLog( const std::string & message)

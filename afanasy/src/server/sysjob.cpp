@@ -74,7 +74,7 @@ std::string const SysTask::v_getInfo(bool full) const
 }
 
 void SysTask::v_monitor( MonitorContainer * monitoring) const {}
-void SysTask::v_updateDatabase() const {}
+void SysTask::v_store() {}
 void SysTask::v_writeTaskOutput( const af::MCTaskUp& taskup) const {}
 
 void SysTask::v_appendLog( const std::string & message)
@@ -465,16 +465,16 @@ SysJob::SysJob( int flags):
 	m_priority          = AFGENERAL::DEFAULT_PRIORITY;
 	m_max_running_tasks = AFGENERAL::MAXRUNNINGTASKS;
 
-	m_blocksnum = BlockLastIndex;
-	m_blocksdata = new af::BlockData*[m_blocksnum];
-	m_blocksdata[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, m_id);
-	m_blocksdata[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     m_id);
-	m_blocksdata[BlockEventsIndex ] = new SysBlockData_Events(  BlockEventsIndex,  m_id);
+	m_blocks_num = BlockLastIndex;
+	m_blocks_data = new af::BlockData*[m_blocks_num];
+	m_blocks_data[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, m_id);
+	m_blocks_data[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     m_id);
+	m_blocks_data[BlockEventsIndex ] = new SysBlockData_Events(  BlockEventsIndex,  m_id);
 
 	progress = new afsql::DBJobProgress( this);
 
 	construct();
-	m_fromdatabase = false;
+	m_from_store = false;
 
 	printf("System job constructed.\n");
 }
@@ -499,17 +499,17 @@ Block * SysJob::v_newBlock( int numBlock)
 	{
 	case BlockPostCmdIndex:
 	{
-		ms_block_cmdpost = new SysBlock_CmdPost( this, m_blocksdata[numBlock], progress);
+		ms_block_cmdpost = new SysBlock_CmdPost( this, m_blocks_data[numBlock], progress);
 		return ms_block_cmdpost;
 	}
 	case BlockWOLIndex:
 	{
-		ms_block_wol = new SysBlock_WOL( this, m_blocksdata[numBlock], progress);
+		ms_block_wol = new SysBlock_WOL( this, m_blocks_data[numBlock], progress);
 		return ms_block_wol;
 	}
 	case BlockEventsIndex:
 	{
-		ms_block_events = new SysBlock_Events( this, m_blocksdata[numBlock], progress);
+		ms_block_events = new SysBlock_Events( this, m_blocks_data[numBlock], progress);
 		return ms_block_events;
 	}
 	default:
@@ -535,7 +535,7 @@ void SysJob::AddEventCommand( const std::string & i_cmd, const std::string & i_w
 bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("SysJob::solve:\n");
-	for( int b = 0; b < m_blocksnum; b++ )
+	for( int b = 0; b < m_blocks_num; b++ )
 		if(((SysBlock*)(m_blocks[b]))->isReady())
 			return JobAf::v_solve( render, monitoring);
 
@@ -568,9 +568,9 @@ void SysJob::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * r
 	for( int p = 0; p < taskspos.getCount(); p++)
 	{
 		int b = taskspos.getNumBlock(p);
-		if( b >= m_blocksnum)
+		if( b >= m_blocks_num)
 		{
-			AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, m_blocksnum)
+			AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, m_blocks_num)
 			continue;
 		}
 		((SysBlock*)(m_blocks[b]))->clearCommands();
@@ -597,7 +597,7 @@ void SysJob::appendJobLog( const std::string & message)
 
 bool SysJob::initSystem()
 {
-	if( m_blocksnum != BlockLastIndex ) return false;
+	if( m_blocks_num != BlockLastIndex ) return false;
 	m_time_creation = time(NULL);
 	return true;
 }

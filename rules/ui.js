@@ -626,6 +626,8 @@ function u_BodyReceived( i_data, i_args)
 		}
 
 		info += 'Created by '+c_GetUserTitle( RULES.status.body.cuser, RULES.status.body.guest);
+		if( g_admin && RULES.status.body.guest && RULES.status.body.guest.email )
+			info += ' ' + c_EmailDecode( RULES.status.body.guest.email);
 		info += ' at '+c_DT_StrFromSec( RULES.status.body.ctime);
 		if( RULES.status.body.muser )
 		{

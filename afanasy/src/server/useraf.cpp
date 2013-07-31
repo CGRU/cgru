@@ -107,35 +107,35 @@ void UserAf::v_action( Action & i_action)
 
 void UserAf::v_setZombie( MonitorContainer * i_monitoring)
 {
-	 AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
-	 AfNodeSrv::v_setZombie();
-	 if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
-	 appendLog( "Became a zombie.");
-	AFCommon::saveLog( getLog(), af::Environment::getUsersLogsDir(), m_name, af::Environment::getAfNodeLogsRotate());
+	AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
+	AfNodeSrv::v_setZombie();
+	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
+	appendLog( "Became a zombie.");
+	AFCommon::saveLog( getLog(), af::Environment::getUsersDir(), m_name);
 }
 
 void UserAf::addJob( JobAf * i_job)
 {
-	 appendLog( std::string("Adding a job: ") + i_job->getName());
+	appendLog( std::string("Adding a job: ") + i_job->getName());
 
-	 m_zombietime = 0;
+	m_zombietime = 0;
 
-	 m_jobslist.add( i_job );
+	m_jobslist.add( i_job );
 
-	 m_jobs_num++;
+	m_jobs_num++;
 
-	 updateJobsOrder( i_job);
+	updateJobsOrder( i_job);
 
-	 i_job->setUser( this);
+	i_job->setUser( this);
 }
 
 void UserAf::removeJob( JobAf * i_job)
 {
-	 appendLog( std::string("Removing a job: ") + i_job->getName());
+	appendLog( std::string("Removing a job: ") + i_job->getName());
 
-	 m_jobslist.remove( i_job );
+	m_jobslist.remove( i_job );
 
-	 m_jobs_num--;
+	m_jobs_num--;
 }
 
 void UserAf::updateJobsOrder( af::Job * newJob)
@@ -190,9 +190,9 @@ af::Msg * UserAf::writeJobdsOrder() const
 void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 /*    if( isLocked() )
-	 {
+	{
 		  return;
-	 }*/
+	}*/
 //printf("UserAf::refresh: \"%s\"\n", getName().toUtf8().data());
 	int _numjobs = m_jobslist.getCount();
 	if(( _numjobs == 0) && ( false == isPermanent()))
@@ -244,46 +244,46 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 
 void UserAf::v_calcNeed()
 {
-	 // Need calculation based on running tasks number
-	 calcNeedResouces( m_running_tasks_num);
+	// Need calculation based on running tasks number
+	calcNeedResouces( m_running_tasks_num);
 }
 
 bool UserAf::v_canRun()
 {
 /*    if( isLocked() )
-	 {
+	{
 		  return false;
-	 }*/
+	}*/
 
-	 if( m_priority == 0)
-	 {
-		  // Zero priority - turns user jobs solving off
-		  return false;
-	 }
+	if( m_priority == 0)
+	{
+		// Zero priority - turns user jobs solving off
+		return false;
+	}
 
-	 if( m_jobs_num < 1 )
-	 {
-		  // Nothing to run
-		  return false;
-	 }
+	if( m_jobs_num < 1 )
+	{
+		// Nothing to run
+		return false;
+	}
 
-	 // Check maximum running tasks:
-	 if(( m_max_running_tasks >= 0 ) && ( m_running_tasks_num >= m_max_running_tasks ))
-	 {
-		  return false;
-	 }
+	// Check maximum running tasks:
+	if(( m_max_running_tasks >= 0 ) && ( m_running_tasks_num >= m_max_running_tasks ))
+	{
+		return false;
+	}
 
-	 // Returning that node is able run
-	 return true;
+	// Returning that node is able run
+	return true;
 }
 
 bool UserAf::v_canRunOn( RenderAf * i_render)
 {
-	 if( false == v_canRun())
-	 {
-		  // Unable to run at all
-		  return false;
-	 }
+	if( false == v_canRun())
+	{
+		// Unable to run at all
+		return false;
+	}
 
 // Check nimby:
 	if( i_render->isNimby() && (m_name != i_render->getUserName())) return false;
@@ -299,26 +299,26 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 
 bool UserAf::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-	 af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
+	af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
 
-	 if( solveJobsParallel())
-	 {
-		  solve_method = af::Node::SolveByPriority;
-	 }
+	if( solveJobsParallel())
+	{
+		solve_method = af::Node::SolveByPriority;
+	}
 
-	 if( m_jobslist.solve( solve_method, i_render, i_monitoring))
-	 {
-		  // Increase running tasks counter if render is online
+	if( m_jobslist.solve( solve_method, i_render, i_monitoring))
+	{
+		// Increase running tasks counter if render is online
 		// It can be online for WOL wake test
 		if( i_render->isOnline())
-	        m_running_tasks_num++;
+	    	m_running_tasks_num++;
 
-		  // Return true - that node was solved
-		  return true;
-	 }
+		// Return true - that node was solved
+		return true;
+	}
 
-	 // Return false - that node was not solved
-	 return false;
+	// Return false - that node was not solved
+	return false;
 }
 
 int UserAf::v_calcWeight() const

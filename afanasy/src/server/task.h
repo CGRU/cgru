@@ -48,7 +48,10 @@ public:
 
 	virtual void v_writeTaskOutput( const af::MCTaskUp & taskup) const;  ///< Write task output in tasksOutputDir.
 	virtual void v_monitor( MonitorContainer * monitoring) const;
-	virtual void v_updateDatabase() const;
+
+	// Store function should be empty in system job tasks
+	virtual void v_store();
+
 	virtual const std::string v_getInfo( bool full = false) const;
 
 	const std::string getOutputFileName( int startcount) const;
@@ -77,6 +80,7 @@ private:
 
 private:
 	int m_number;
+	std::string m_store_file;
 
 	TaskRun * m_run;
 

@@ -47,7 +47,7 @@ public:
 
 	inline uint32_t getFlags() const { return m_flags;}
 
-	bool isValid() const;
+	void isValid( std::string * o_err) const;
 	inline  void setJobId( int value) { m_job_id = value;}   ///< Set id of block job.
 	inline  int  getJobId() const { return m_job_id;}        ///< Get id of block job.
 
@@ -258,6 +258,8 @@ public:
 	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 	void jsonWrite( std::ostringstream & o_str, int i_type = Msg::TBlocks) const;
 	void jsonWrite( std::ostringstream & o_str, const std::string & i_datamode) const;
+	void jsonWriteTasks( std::ostringstream & o_str) const;
+	void jsonReadTasks( const JSON & i_object);
 
 /// Generate progress bits info string.
 	void generateProgressStream( std::ostringstream & o_str) const;

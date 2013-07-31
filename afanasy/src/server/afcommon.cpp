@@ -82,8 +82,7 @@ void AFCommon::executeCmd( const std::string & cmd)
    }
 }
 
-void AFCommon::saveLog(
-   const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate)
+void AFCommon::saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename)
 {
    int lines = log.size();
    if( lines < 1) return;
@@ -98,7 +97,7 @@ void AFCommon::saveLog(
    af::pathFilterFileName( path);
    path = dirname + '/' + path;
 
-   FileData * filedata = new FileData( bytes.data(), bytes.length(), path, rotate);
+   FileData * filedata = new FileData( bytes.data(), bytes.length(), path);
    FileWriteQueue->pushFile( filedata);
 }
 
@@ -109,7 +108,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
       QueueLogError("AFCommon::writeFile: File name is empty.");
       return false;
    }
-   int fd = open( filename.c_str(), O_WRONLY | O_CREAT, 0644);
+   int fd = open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
    if( fd == -1 )
    {
       QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);

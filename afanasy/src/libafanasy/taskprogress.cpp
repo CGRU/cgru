@@ -41,10 +41,21 @@ void TaskProgress::v_readwrite( Msg * msg)
 	rw_String  ( activity,     msg);
 }
 
+void TaskProgress::jsonRead( const JSON & i_obj)
+{
+	jr_uint32("st",  state,        i_obj);
+	jr_int32 ("str", starts_count, i_obj);
+	jr_int32 ("err", errors_count, i_obj);
+	jr_int64 ("tst", time_start,   i_obj);
+	jr_int64 ("tst", time_done,    i_obj);
+	jr_string("hst", hostname,     i_obj);
+}
+
 void TaskProgress::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "{";
 	jw_state( state, o_str);
+	o_str << ",\"st\":" << state;
 	if( percent      > 0 ) o_str << ",\"per\":" << int(percent);
 	if( frame        > 0 ) o_str << ",\"frm\":" << frame;
 	if( percentframe > 0 ) o_str << ",\"pfr\":" << int(percentframe);

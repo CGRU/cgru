@@ -20,11 +20,10 @@ namespace AFGENERAL
     #else
     const char PATH_SEPARATOR     = '/';
     #endif
-    const char   FILENAME_INVALIDCHARACTERS[] = "\"\\ /|!$&?()[]{}*^`',:;";
-    const size_t FILENAME_INVALIDCHARACTERSLENGTH = strlen( FILENAME_INVALIDCHARACTERS);
-    const char   FILENAME_INVALIDCHARACTERREPLACE = '_';
+    const char   FILENAME_INVALID_CHARACTERS[] = "\"\\ /|!$&?()[]{}*^<>%`',:;";
+    const size_t FILENAME_INVALID_CHARACTERS_LENGTH = strlen( FILENAME_INVALID_CHARACTERS);
+    const char   FILENAME_INVALID_CHARACTER_REPLACE = '_';
 	const int  LOG_LINES_MAX = 100;        ///< Maximum number of lines in each node log.
-	const int  LOGS_ROTATE   = 10;         ///< Number of logs to keep.
 
 	const char HTML_BROWSER[] = "/browser/index.html";
 }
@@ -44,7 +43,7 @@ namespace AFUSER
     const char PSWD_VISOR[]     = "1832116180fdc61b64fd978401e462e9";  ///< Default Visor password.
     const char PSWD_GOD[]       = "73bcaaa458bff0d27989ed331b68b64d";  ///< Default GOD password.
     const int  ZOMBIETIME       = 2;          ///< Time to user to have no jobs and become a zombie.
-    const char LOGS_DIRECTORY[] = "users";    ///< Users logs store directory, relative to AFSERVER::TEMP_DIRECTORY
+    const char DIRECTORY[]      = "users";    ///< Users store directory, relative to AFSERVER::TEMP_DIRECTORY
     const int  ERRORS_AVOID_HOST     = 3;     ///< Maximum number or errors on same host for job NOT to avoid host.
     const int  ERRORS_FORGIVETIME    = 18000; ///< Time from last error to remove host from error list (18000 seconds = 5 hours).
     const int  TASK_ERROR_RETRIES    = 3;     ///< Maximum number of errors in task to retry it automatically.
@@ -94,7 +93,7 @@ namespace AFRENDER
     const int  WAITFORBYTESWRITTEN      = 15000;      ///< Wait writing to socket timeout milliseconds.
     const int  MAXCOUNT                 = 100000;     ///< Maximum allowed online Renders.
     const int  TASKPROCESSNICE          = 10;         ///< Child process nice.
-    const char LOGS_DIRECTORY[]         = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
+    const char DIRECTORY[]              = "renders";  ///< Renders store directory, relative to AFSERVER::TEMP_DIRECTORY
     const char CMD_REBOOT[]             = "reboot";   ///< How to reboot a computer.
     const char CMD_SHUTDOWN[]           = "shutdown"; ///< How to shutdown a computer.
     const char CMD_WOLSLEEP[]           = "wolsleep"; ///< How to sleep computer.

@@ -67,18 +67,18 @@ void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorCon
 
 void Node::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
-    o_str << "\"name\":\""    << af::strEscape(m_name) << "\"";
+    o_str << "\n\"name\":\""    << af::strEscape(m_name) << "\"";
 	if( m_id > 0 )
-        o_str << ",\"id\":"   << m_id;
-    o_str << ",\"priority\":" << int(m_priority);
+        o_str << ",\n\"id\":"   << m_id;
+    o_str << ",\n\"priority\":" << int(m_priority);
 	if( m_locked )
-		o_str << ",\"locked\":true";
+		o_str << ",\n\"locked\":true";
 	if( isHidden())
-		o_str << ",\"hidden\":true";
+		o_str << ",\n\"hidden\":true";
 	if( m_annotation.size())
-		o_str << ",\"annotation\":\"" << af::strEscape( m_annotation) << "\"";
+		o_str << ",\n\"annotation\":\"" << af::strEscape( m_annotation) << "\"";
 	if( m_custom_data.size())
-		o_str << ",\"custom_data\":\""  << af::strEscape( m_custom_data ) << "\"";
+		o_str << ",\n\"custom_data\":\""  << af::strEscape( m_custom_data ) << "\"";
 }
 
 Msg * Node::jsonWrite( const std::string & i_type, const std::string & i_name ) const

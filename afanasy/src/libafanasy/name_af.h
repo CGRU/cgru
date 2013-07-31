@@ -166,21 +166,38 @@ namespace af
    bool  loadFarm( const std::string & filename, bool verbose = false);
    Farm * farm();
 
-   void pathFilterFileName( std::string & filename);
-   void pathFilter( std::string & path);
-   bool pathIsAbsolute( const std::string & path);
-   bool pathFileExists( const std::string & path);
-   bool pathIsFolder( const std::string & path);
-   const std::string pathAbsolute( const std::string & path);
-   const std::string pathUp( const std::string & path);
-   const std::string pathHome();
-   bool pathMakeDir( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
+
+//
+// Paths / Files related functions name_affile.cpp:
+//
+	void pathFilterFileName( std::string & io_filename);
+
+	void pathFilter( std::string & path);
+
+	bool pathIsAbsolute( const std::string & path);
+
+	bool pathFileExists( const std::string & path);
+
+	bool pathIsFolder( const std::string & path);
+
+	const std::string pathAbsolute( const std::string & path);
+
+	const std::string pathUp( const std::string & path);
+
+	const std::string pathHome();
+
+	bool pathMakeDir( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
+
 	bool pathMakePath( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
+
 	const std::vector<std::string> getFilesList( const std::string & i_path);
 
-   bool netIsIpAddr( const std::string & addr, bool verbose = false);
+	char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
-   char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
+	bool removeDir( const std::string & i_folder );
+//
+
+   bool netIsIpAddr( const std::string & addr, bool verbose = false);
 
 #ifdef WINNT
     void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());

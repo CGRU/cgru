@@ -6,8 +6,60 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+FileData::FileData( const std::ostringstream & i_str, const std::string & i_file_name):
+	m_file_name( i_file_name),
+	m_data( NULL)
+{
+	m_str = i_str.str();
+	m_length = m_str.size();
+}
+
+FileData::FileData( const char * i_data, int i_length, const std::string & i_file_name):
+	m_file_name( i_file_name),
+	m_length( i_length),
+	m_data( NULL)
+{
+	AFINFA("FileData::FileData: \"%s\" %d bytes R(%d).", m_file_name.c_str(), m_length)
+
+	if( i_data == NULL)
+	{
+		AFERROR("FileData::FileData: i_data is null.")
+		return;
+	}
+	if( m_length < 0 )
+	{
+		AFERROR("FileData::FileData: i_length is negative.")
+		return;
+	}
+	if( m_length == 0 )
+	{
+		AFERROR("FileData::FileData: Zero m_length.")
+		return;
+	}
+	if( m_file_name.size() == 0 )
+	{
+		AFERROR("FileData::FileData: File name is empty.")
+		return;
+	}
+
+	m_data = new char[m_length];
+	if( m_data == NULL )
+	{
+		AFERRAR("FileData::FileData: Can't allocate %d bytes for m_data.", m_length)
+		m_data = NULL;
+		m_length = 0;
+		return;
+	}
+
+	memcpy( m_data, i_data, m_length);
+}
+
+FileData::~FileData()
+{
+	if( m_data != NULL ) delete [] m_data;
+}
 FileQueue::FileQueue( const std::string & QueueName):
-   af::AfQueue( QueueName, af::AfQueue::e_start_thread)
+	af::AfQueue( QueueName, af::AfQueue::e_start_thread)
 {
 }
 
@@ -17,55 +69,10 @@ FileQueue::~FileQueue()
 
 void FileQueue::processItem( af::AfQueueItem* item)
 {
-   FileData * filedata = (FileData*)item;
-   //AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().toUtf8().data())
-   AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().c_str())
-   int rotate = filedata->getRotate();
-   std::string filename( filedata->getFileName());
-   if( rotate > 0)
-   {
-#ifdef AFOUTPUT
-printf("FileQueue::processItem: rotating \"%s\" %d times:\n", filename.c_str(), rotate);
-#endif
-      if( af::pathFileExists(filename))
-      {
-         renameNext( filename, 0, rotate);
-         std::string newname = filename + ".0";
-         rename( filename.c_str(), newname.c_str());
-      }
-   }
-   else if( rotate == -1)
-   {
-      filename = filename + "." + af::time2str( time(NULL), "%y%m%d_%H%M%S");
-   }
-   AFCommon::writeFile( filedata->getData(), filedata->getLength(), filename);
-   delete filedata;
+	FileData * filedata = (FileData*)item;
+	AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().c_str())
+
+	AFCommon::writeFile( filedata->getData(), filedata->getLength(), filedata->getFileName());
+	delete filedata;
 }
 
-void FileQueue::renameNext( const std::string & filename, int number, int maxnumber) const
-{
-   std::string curname = filename + "." + af::itos(number++);
-   if( number >= maxnumber )
-   {
-#ifdef AFOUTPUT
-//printf("FileQueue::renameNext: removing \"%s\"\n", curname.toUtf8().data());
-printf("FileQueue::renameNext: removing \"%s\"\n", curname.c_str());
-#endif
-      if( remove( curname.c_str()) != 0 )
-         AFERRPA("FileQueue::renameNext: unable to remove: \"%s\"\n", curname.c_str());
-      return;
-   }
-   if( af::pathFileExists( curname) == false) return;
-
-   std::string newname = filename + "." + af::itos(number);
-
-   renameNext( filename, number, maxnumber);
-
-#ifdef AFOUTPUT
-//printf("FileQueue::renameNext: renaming \"%s\" in \"%s\"\n", curname.toUtf8().data(), newname.toUtf8().data());
-printf("FileQueue::renameNext: renaming \"%s\" in \"%s\"\n", curname.c_str(), newname.c_str());
-#endif
-   if( rename( curname.c_str(), newname.c_str()) != 0)
-      AFERRPA("FileQueue::renameNext: unable to rename: \"%s\" in \"%s\"\n",
-         curname.c_str(), newname.c_str());
-}

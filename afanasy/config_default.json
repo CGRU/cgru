@@ -45,8 +45,7 @@
 		"":"If 'AF_CMD_PREFIX' environment variable exists, it will be used. All commands with be prefixed with it.",
 
 	"af_node_log_lines_max":100,
-	"af_node_logs_rotate":10,
-		"":"Changes log for any afnode (job, render, user)",
+		"":"Log history for any afnode (job, render, user)",
 
 	"af_priority":99,
 	"af_maxrunningtasks":-1,

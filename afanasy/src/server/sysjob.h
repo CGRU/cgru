@@ -43,7 +43,9 @@ public:
 	virtual const std::string v_getInfo( bool i_full = false) const;
 	virtual void v_appendLog( const std::string & i_message);
 	virtual void v_monitor( MonitorContainer * i_monitoring) const;
-	virtual void v_updateDatabase() const;
+
+	// This function does nothing in system job
+	virtual void v_store();
 
 private:
 	void appendSysJobLog( const std::string & i_message);

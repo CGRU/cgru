@@ -102,7 +102,6 @@ int     Environment::talk_waitforreadyread =           AFTALK::WAITFORREADYREAD;
 int     Environment::talk_waitforbyteswritten =        AFTALK::WAITFORBYTESWRITTEN;
 int     Environment::talk_zombietime =                 AFTALK::ZOMBIETIME;
 
-int Environment::afnode_logs_rotate   =              AFGENERAL::LOGS_ROTATE;
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
 int Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
@@ -113,10 +112,10 @@ std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUO
 int Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
 int Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
 
-std::string Environment::tempdirectory =               AFSERVER::TEMP_DIRECTORY;
-std::string Environment::renderslogsdir;
-std::string Environment::tasksstdoutdir;
-std::string Environment::userslogsdir;
+std::string Environment::temp_dir = AFSERVER::TEMP_DIRECTORY;
+std::string Environment::renders_dir;
+std::string Environment::jobs_dir;
+std::string Environment::users_dir;
 
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
@@ -184,7 +183,6 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, perm_user_mod_job_priority,        "af_perm_user_mod_job_priority"      );
 
 	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"              );
-	getVar( i_obj, afnode_logs_rotate,                "af_node_logs_rotate"                );
 	getVar( i_obj, priority,                          "af_priority"                          );
 	getVar( i_obj, maxrunningtasks,                   "af_maxrunningtasks"                   );
 
@@ -193,7 +191,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, serverport,                        "af_serverport"                        );
 	getVar( i_obj, clientport,                        "af_clientport"                        );
 
-	getVar( i_obj, tempdirectory,                     "af_tempdirectory"                     );
+	getVar( i_obj, temp_dir,                          "af_tempdirectory"                     );
 
 	getVar( i_obj, db_conninfo,                       "af_db_conninfo"                       );
 	getVar( i_obj, db_stringquotes,                   "af_db_stringquotes"                   );
@@ -651,9 +649,9 @@ bool Environment::init()
 	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
 	PRINT("Local computer name = '%s'\n", computername.c_str());
 
-	tasksstdoutdir = tempdirectory + AFGENERAL::PATH_SEPARATOR +    AFJOB::TASKS_OUTPUTDIR;
-	renderslogsdir = tempdirectory + AFGENERAL::PATH_SEPARATOR + AFRENDER::LOGS_DIRECTORY;
-	userslogsdir   = tempdirectory + AFGENERAL::PATH_SEPARATOR +   AFUSER::LOGS_DIRECTORY;
+	jobs_dir    = temp_dir + AFGENERAL::PATH_SEPARATOR +    AFJOB::DIRECTORY;
+	renders_dir = temp_dir + AFGENERAL::PATH_SEPARATOR + AFRENDER::DIRECTORY;
+	users_dir   = temp_dir + AFGENERAL::PATH_SEPARATOR +   AFUSER::DIRECTORY;
 
 	//############ Server Accept IP Addresses Mask:
 	if( false == Address::readIpMask( serveripmask, m_verbose_init))

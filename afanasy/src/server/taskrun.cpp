@@ -58,7 +58,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_blo
 	m_exec->setProgress( m_progress);
    render->setTask( m_exec, monitoring);
    m_task->v_monitor( monitoring );
-   m_task->v_updateDatabase();
+   m_task->v_store();
    m_task->v_appendLog( std::string("SESSION #") + af::itos( m_progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
 }
 
@@ -109,7 +109,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       if( false == (m_progress->state & AFJOB::STATE_WARNING_MASK))
       {
          m_progress->state = m_progress->state | AFJOB::STATE_WARNING_MASK;
-         m_task->v_updateDatabase();
+         m_task->v_store();
       }
    case af::TaskExec::UPPercent:
 //printf("TaskRun::update: case af::TaskExec::UPPercent:\n");
@@ -283,7 +283,7 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
    }
 
    m_task->v_monitor( monitoring );
-   m_task->v_updateDatabase();
+   m_task->v_store();
 
    m_task->v_appendLog( message);
    m_zombie = true;

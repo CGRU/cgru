@@ -1,5 +1,7 @@
 #include "task.h"
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/blockdata.h"
@@ -25,6 +27,27 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_progress( taskProgress),
    m_run( NULL)
 {
+	// If job is not from store, it is just came from network
+	// and so no we do not need to read tasks progess
+	if( false == m_block->m_job->isFromStore()) return;
+
+	m_store_file = m_block->m_job->getTasksProgessDir() + AFGENERAL::PATH_SEPARATOR
+		+ "b" + af::itos( m_block->m_data->getBlockNum())
+		+ ".t" + af::itos( m_number) + ".json";
+
+	// If job is from store we read tasks progress
+	if( false == af::pathFileExists( m_store_file)) return;
+
+	int size;
+	char * data = af::fileRead( m_store_file, size);
+	if( data == NULL ) return;
+
+	rapidjson::Document document;
+	char * res = af::jsonParseData( document, data, size);
+	if( res == NULL ) return;
+
+	m_progress->jsonRead( document);
+	delete [] data;
 }
 
 Task::~Task()
@@ -125,7 +148,7 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
    if( changed)
    {
       v_monitor( monitoring);
-      v_updateDatabase();
+      v_store();
    }
    deleteRunningZombie();
 }
@@ -140,7 +163,7 @@ void Task::restart( bool onlyRunning, const std::string & message, RenderContain
    if( onlyRunning ) return;
    m_progress->state = AFJOB::STATE_READY_MASK;
    m_progress->errors_count = 0;
-   v_updateDatabase();
+   v_store();
    v_monitor( monitoring);
    v_appendLog( message);
 }
@@ -155,7 +178,7 @@ void Task::restartError( const std::string & message, RenderContainer * renders,
    }
    m_progress->state = AFJOB::STATE_READY_MASK;
    m_progress->errors_count = 0;
-   v_updateDatabase();
+   v_store();
    v_monitor( monitoring);
    v_appendLog( message);
 }
@@ -168,7 +191,7 @@ void Task::skip( const std::string & message, RenderContainer * renders, Monitor
    {
       m_progress->state = AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK;
       m_progress->errors_count = 0;
-      v_updateDatabase();
+      v_store();
       v_monitor( monitoring);
       v_appendLog( message);
    }
@@ -245,9 +268,16 @@ void Task::v_monitor( MonitorContainer * monitoring) const
    if( monitoring ) monitoring->addTask( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number, m_progress);
 }
 
-void Task::v_updateDatabase() const
+void Task::v_store()
 {
-   AFCommon::QueueDBUpdateTask( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number, m_progress);
+	if( m_store_file.empty())
+		m_store_file = m_block->m_job->getTasksProgessDir() + AFGENERAL::PATH_SEPARATOR
+			+ "b" + af::itos( m_block->m_data->getBlockNum())
+			+ ".t" + af::itos( m_number) + ".json";
+
+	std::ostringstream str;
+	m_progress->jsonWrite( str);
+	AFCommon::QueueFileWrite( new FileData( str, m_store_file));
 }
 
 void Task::v_appendLog( const std::string & message)
@@ -272,11 +302,8 @@ const std::string Task::getOutputFileName( int startcount) const
    stream << "b"  << m_block->m_data->getBlockNum();
    stream << ".t" << m_number;
    stream << ".s" << startcount;
-   stream << "-" << m_block->m_data->getName();
-   stream << "." << m_block->m_data->genTaskName( m_number);
    std::string filename = stream.str();
-   af::pathFilterFileName( filename);
-   filename = m_block->m_job->getTasksOutputDir() + "/" + filename;
+	filename = m_block->m_job->getTasksOuputDir() + AFGENERAL::PATH_SEPARATOR + filename;
    return filename;
 }
 
