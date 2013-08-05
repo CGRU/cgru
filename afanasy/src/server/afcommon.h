@@ -7,7 +7,6 @@
 #include "../libafsql/name_afsql.h"
 
 #include "filequeue.h"
-#include "dbupdatetaskqueue.h"
 #include "dbactionqueue.h"
 #include "cleanupqueue.h"
 #include "logqueue.h"
@@ -56,20 +55,12 @@ public:
    inline static bool QueueLogErrno(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Errno ); else return false;}
 
    inline static void QueueDBAddItem(    const afsql::DBItem * item) { if( DBUpdateQueue ) DBUpdateQueue->addItem(    item );}
-//   inline static void QueueDBDelItem(    const afsql::DBItem * item) { if( DBUpdateQueue ) DBUpdateQueue->delItem(    item );}
-//   inline static void QueueDBUpdateItem( const afsql::DBItem * item, int attr = -1) { if( DBUpdateQueue ) DBUpdateQueue->updateItem( item, attr );}
-
-   inline static void QueueDBUpdateTask_begin() { DBUpTaskQueue->lock(); }
-   inline static bool QueueDBUpdateTask(  int JobId, int BlockNum, int TaskNum, const af::TaskProgress * Progress)
-                         { return DBUpTaskQueue->pushTaskUp( JobId, BlockNum, TaskNum, Progress);}
-   inline static void QueueDBUpdateTask_end() { DBUpTaskQueue->unlock(); }
 
 private:
    static af::MsgQueue      * MsgDispatchQueue;
    static FileQueue         * FileWriteQueue;
    static CleanUpQueue      * RemFoldersQueue;
    static LogQueue          * OutputLogQueue;
-   static DBUpdateTaskQueue * DBUpTaskQueue;
    static DBActionQueue     * DBUpdateQueue;
 
 //   static bool detach();

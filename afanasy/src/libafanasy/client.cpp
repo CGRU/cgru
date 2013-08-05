@@ -52,19 +52,19 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	Node::v_jsonWrite( o_str, i_type);
 
-	o_str << ",\"user_name\":\"" << m_user_name << "\"";
-	o_str << ",\"time_register\":" << m_time_register;
-	o_str << ",\"time_launch\":" << m_time_launch;
-	o_str << ",\"time_update\":" << m_time_update;
+	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
+	o_str << ",\n\"time_register\":" << m_time_register;
+	o_str << ",\n\"time_launch\":" << m_time_launch;
+	o_str << ",\n\"time_update\":" << m_time_update;
 
 	if( false == m_address.isEmpty())
 	{
-		o_str << ',';
+		o_str << ",\n";
 		m_address.jsonWrite( o_str);
 	}
 
 	if( m_version.size())
-		o_str << ",\"version\":\"" << m_version << "\"";
+		o_str << ",\n\"version\":\"" << m_version << "\"";
 }
 
 void Client::clearNetIFs()

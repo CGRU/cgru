@@ -45,7 +45,7 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 	jsonRead( document);
 	delete [] data;
 
-	// This render came from database on core init, it can't be online or busy
+	// This render came from store on server start, it can't be online or busy
 	setOffline();
 	setBusy( false);
 
@@ -81,7 +81,7 @@ bool RenderAf::initialize()
 	else
 	{
 		m_time_register = time( NULL);
-		setStoreDir( AFCommon::getStoreDirUser( *this));
+		setStoreDir( AFCommon::getStoreDirRender( *this));
 		store();
 		appendLog("Registered.");
 	}
@@ -387,7 +387,6 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
 
 void RenderAf::wolSleep( MonitorContainer * monitoring)
 {
-	//if( isWOLFalling()	) return;
 	if( isWOLSleeping())
 	{
 		appendLog("Render is already sleeping.");

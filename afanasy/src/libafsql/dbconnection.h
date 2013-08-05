@@ -21,8 +21,6 @@ public:
 
    bool getItem( DBItem * i_item);
 
-   bool addJob( DBJob * i_job);
-
    bool DBOpen();
    void DBClose();
 

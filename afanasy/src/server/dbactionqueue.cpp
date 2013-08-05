@@ -5,9 +5,7 @@
 #include "../libafanasy/environment.h"
 
 #include "../libafsql/dbconnection.h"
-#include "../libafsql/dbjob.h"
-#include "../libafsql/dbrender.h"
-#include "../libafsql/dbuser.h"
+#include "../libafsql/dbitem.h"
 
 #include "afcommon.h"
 #include "monitorcontainer.h"

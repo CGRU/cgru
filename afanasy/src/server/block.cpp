@@ -4,9 +4,6 @@
 
 #include "../libafanasy/jobprogress.h"
 
-#include "../libafsql/dbattr.h"
-#include "../libafsql/dbblockdata.h"
-
 #include "action.h"
 #include "afcommon.h"
 #include "jobaf.h"
@@ -453,7 +450,6 @@ void Block::skipRestartTasks( const Action & i_action, const JSON & i_operation,
 	if( tasks_vec.size())
 		length = tasks_vec.size();
 
-	AFCommon::QueueDBUpdateTask_begin();
 	for( int i = 0; i < length; i++)
 	{
 		int t = i;
@@ -472,7 +468,6 @@ void Block::skipRestartTasks( const Action & i_action, const JSON & i_operation,
 		else
 			m_tasks[t]->restart( only_running, message, i_action.renders, i_action.monitors);
 	}
-	AFCommon::QueueDBUpdateTask_end();
 }
 
 void Block::constructDependBlocks()

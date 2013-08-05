@@ -2,13 +2,7 @@
 
 #include "../libafanasy/environment.h"
 
-#include "dbjob.h"
-#include "dbblockdata.h"
-#include "dbrender.h"
-#include "dbuser.h"
-#include "dbstatistics.h"
-#include "dbtaskdata.h"
-#include "dbtaskprogress.h"
+#include "dbitem.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -154,12 +148,6 @@ bool DBConnection::getItem( DBItem * item)
 {
    if( m_working == false ) return false;
    return item->v_dbSelect( m_conn);
-}
-
-bool DBConnection::addJob( DBJob * job)
-{
-   if( m_working == false ) return false;
-   return job->dbAdd( m_conn);
 }
 
 bool DBConnection::execute( const std::list<std::string> * i_queries)

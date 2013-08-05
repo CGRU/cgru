@@ -34,7 +34,7 @@ JobAf::JobAf( JSON & i_object):
 {
 	initializeValues();
     jsonRead( i_object);
-    progress = new af::JobProgress( this);
+    m_progress = new af::JobProgress( this);
     construct();
 }
 
@@ -59,7 +59,7 @@ JobAf::JobAf( const std::string & i_store_dir):
 	jsonRead( document);
 	delete [] data;
 
-	progress = new af::JobProgress( this);
+	m_progress = new af::JobProgress( this);
 
 	construct();
 
@@ -150,11 +150,13 @@ JobAf::~JobAf()
         for( int b = 0; b < m_blocks_num; b++) if( m_blocks[b]) delete m_blocks[b];
         delete [] m_blocks;
     }
+
+	if( m_progress ) delete m_progress;
 }
 
 Block * JobAf::v_newBlock( int numBlock)
 {
-	return new Block( this, m_blocks_data[numBlock], progress);
+	return new Block( this, m_blocks_data[numBlock], m_progress);
 }
 
 void JobAf::setUser( UserAf * i_user)
@@ -173,7 +175,7 @@ bool JobAf::initialize()
 
 //
 //	Set job ID to blocks and progress classes:
-   progress->setJobId( m_id);
+   m_progress->setJobId( m_id);
    for( int b = 0; b < m_blocks_num; b++)
    {
       m_blocks_data[b]->setJobId( m_id);
@@ -238,13 +240,13 @@ bool JobAf::initialize()
       int numtasks = m_blocks_data[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
       {
-         uint32_t taskstate = progress->tp[b][t]->state;
+         uint32_t taskstate = m_progress->tp[b][t]->state;
          if((  taskstate == 0                           ) ||
             (  taskstate & AFJOB::STATE_RUNNING_MASK   ))
          {
             taskstate = taskstate |   AFJOB::STATE_READY_MASK;
             taskstate = taskstate & (~AFJOB::STATE_RUNNING_MASK);
-            progress->tp[b][t]->state = taskstate;
+            m_progress->tp[b][t]->state = taskstate;
          }
       }
    }
@@ -602,7 +604,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          block, m_blocks_data[block]->getName().c_str(), task, m_blocks_data[block]->getTasksNum())
       return NULL;
    }
-   if( false == ( progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
+   if( false == ( m_progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
 
    if( false == m_blocks[block]->canRunOn( render)) return NULL;
 
@@ -655,19 +657,19 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
 
          for( int t = firstdependtask; t <= lastdependtask; t++)
          {
-//printf("Dep['%s':%d-'%s']: checking '%s':%d - %s\n", blocksdata[block]->getName().toUtf8().data(), task, blocksdata[b]->getName().toUtf8().data(), blocksdata[b]->getName().toUtf8().data(), t, (progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK) ? "DONE" : "NOT Done");
+//printf("Dep['%s':%d-'%s']: checking '%s':%d - %s\n", blocksdata[block]->getName().toUtf8().data(), task, blocksdata[b]->getName().toUtf8().data(), blocksdata[b]->getName().toUtf8().data(), t, (m_progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK) ? "DONE" : "NOT Done");
             // Task is done, so depend is satisfied:
-            if( progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK )
+            if( m_progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK )
 					continue;
 
             // Check subframe depend, is depend task is running:
-            if( m_blocks_data[b]->isDependSubTask() && ( progress->tp[b][t]->state & AFJOB::STATE_RUNNING_MASK ))
+            if( m_blocks_data[b]->isDependSubTask() && ( m_progress->tp[b][t]->state & AFJOB::STATE_RUNNING_MASK ))
             {
 //               long long f_start, f_end, f_start_dep, f_end_dep;
 //               m_blocks_data[block]->genNumbers( f_start, f_end, task);
                long long f_start_dep, f_end_dep;
                m_blocks_data[b]->genNumbers( f_start_dep, f_end_dep, t);
-               long long frame_run = f_start_dep + progress->tp[b][t]->frame;
+               long long frame_run = f_start_dep + m_progress->tp[b][t]->frame;
 //printf("Dep['%s': #%d '%s']: f_s=%lld f_d=%lld\n", m_blocks_data[block]->getName().c_str(), task, m_blocks_data[b]->getName().c_str(), firstdependframe, frame_run);
                if( frame_run > lastdependframe )
 					continue;
@@ -812,7 +814,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 			if( m_blocks_data[b]->isNonSequential())
 			{
 				// Needed to store tasks that was tried
-				progress->tp[b][t]->setNotSolved();
+				m_progress->tp[b][t]->setNotSolved();
 			}
         }
     }
@@ -833,14 +835,14 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 					break;
 				}
 
-				if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK ))
+				if( false == ( m_progress->tp[b][t]->state & AFJOB::STATE_READY_MASK ))
 				{
 					continue;
 				}
 			}
 			else
 			{
-				t = af::getReadyTaskNumber( numtasks, progress->tp[b], m_blocks_data[b]->getFlags());
+				t = af::getReadyTaskNumber( numtasks, m_progress->tp[b], m_blocks_data[b]->getFlags());
 				if( t == -1 )
 					break;
 			}
@@ -1077,7 +1079,6 @@ void JobAf::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * re
 
 void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring)
 {
-   AFCommon::QueueDBUpdateTask_begin();
    for( int p = 0; p < taskspos.getCount(); p++)
    {
       int b = taskspos.getNumBlock(p);
@@ -1124,19 +1125,16 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
 		 else         m_blocks[b]->m_tasks[t]->skip( message, renders, monitoring);
       }
    }
-   AFCommon::QueueDBUpdateTask_end();
 }
 
 void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
-   AFCommon::QueueDBUpdateTask_begin();
    for( int b = 0; b < m_blocks_num; b++)
    {
       int numtasks = m_blocks_data[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
 		 m_blocks[b]->m_tasks[t]->restart( onlyRunning, message, renders, monitoring);
    }
-   AFCommon::QueueDBUpdateTask_end();
    v_refresh( time(NULL), renders, monitoring);
 }
 
@@ -1152,7 +1150,7 @@ void JobAf::restartErrors( const std::string & message, RenderContainer * render
 
 void JobAf::writeProgress( af::Msg &msg)
 {
-   msg.set( af::Msg::TJobProgress, progress);
+   msg.set( af::Msg::TJobProgress, m_progress);
 }
 
 af::Msg * JobAf::writeProgress( bool json)
@@ -1161,13 +1159,13 @@ af::Msg * JobAf::writeProgress( bool json)
 	if( json )
 	{
 		std::ostringstream stream;
-		progress->jsonWrite( stream);
+		m_progress->jsonWrite( stream);
 		std::string string = stream.str();
 		msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
 	}
 	else
 	{
-		msg->set( af::Msg::TJobProgress, progress);
+		msg->set( af::Msg::TJobProgress, m_progress);
 	}
 
 	return msg;
@@ -1347,7 +1345,7 @@ int JobAf::v_calcWeight() const
 //printf("JobAf::calcWeight: Job::calcWeight: %d bytes\n", weight);
    weight += sizeof(JobAf) - sizeof( Job);
 
-   if( progress != NULL) progressWeight = progress->calcWeight();
+   if( m_progress != NULL) progressWeight = m_progress->calcWeight();
    weight += progressWeight;
 
    m_logsWeight = calcLogWeight();

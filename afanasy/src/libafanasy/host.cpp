@@ -105,28 +105,28 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "\"host\":{";
 
-	o_str << "\"capacity\":"  << m_capacity;
-	o_str << ",\"max_tasks\":" << m_max_tasks;
-	o_str << ",\"power\":"     << m_power;
+	o_str << "\n\"capacity\":"  << m_capacity;
+	o_str << ",\n\"max_tasks\":" << m_max_tasks;
+	o_str << ",\n\"power\":"     << m_power;
 
 	if( m_os.size())
-		o_str << ",\"os\":\"" << m_os << "\"";
+		o_str << ",\n\"os\":\"" << m_os << "\"";
 	if( m_properties.size())
-		o_str << ",\"properties\":\"" << m_properties << "\"";
+		o_str << ",\n\"properties\":\"" << m_properties << "\"";
 	if( m_wol_idlesleep_time > 0 )
-		o_str << ",\"wol_idlesleep_time\":" << m_wol_idlesleep_time;
+		o_str << ",\n\"wol_idlesleep_time\":" << m_wol_idlesleep_time;
 	if( m_nimby_idlefree_time > 0 )
-		o_str << ",\"nimby_idlefree_time\":" << m_nimby_idlefree_time;
+		o_str << ",\n\"nimby_idlefree_time\":" << m_nimby_idlefree_time;
 	if( m_nimby_busyfree_time > 0 )
-		o_str << ",\"nimby_busyfree_time\":" << m_nimby_busyfree_time;
-	o_str << ",\"idle_cpu\":"  << m_idle_cpu;
-	o_str << ",\"busy_cpu\":"  << m_busy_cpu;
+		o_str << ",\n\"nimby_busyfree_time\":" << m_nimby_busyfree_time;
+	o_str << ",\n\"idle_cpu\":"  << m_idle_cpu;
+	o_str << ",\n\"busy_cpu\":"  << m_busy_cpu;
 /*	if( m_resources.size())
-		o_str << ",\"resources\":\"" << m_resources << "\"";
+		o_str << ",\n\"resources\":\"" << m_resources << "\"";
 	if( m_data.size())
-		o_str << ",\"data\":\"" << m_data << "\"";
+		o_str << ",\n\"data\":\"" << m_data << "\"";
 */
-	o_str << "}";
+	o_str << "\n}";
 }
 
 void Host::v_readwrite( Msg * msg)
@@ -320,32 +320,32 @@ void HostRes::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "\"host_resources\":{";
 
-	o_str << "\"cpu_num\":"  << cpu_num;
-	o_str << ",\"cpu_mhz\":" << cpu_mhz;
-	o_str << ",\"cpu_loadavg\":[" << int(cpu_loadavg[0])<<','<< int(cpu_loadavg[1])<<','<< int(cpu_loadavg[2])<<']';
-	o_str << ",\"cpu_user\":"    << int(cpu_user);
-	o_str << ",\"cpu_nice\":"    << int(cpu_nice);
-	o_str << ",\"cpu_system\":"  << int(cpu_system);
-	o_str << ",\"cpu_idle\":"    << int(cpu_idle);
-	o_str << ",\"cpu_iowait\":"  << int(cpu_iowait);
-	o_str << ",\"cpu_irq\":"     << int(cpu_irq);
-	o_str << ",\"cpu_softirq\":" << int(cpu_softirq);
+	o_str << "\n\"cpu_num\":"  << cpu_num;
+	o_str << ",\n\"cpu_mhz\":" << cpu_mhz;
+	o_str << ",\n\"cpu_loadavg\":[" << int(cpu_loadavg[0])<<','<< int(cpu_loadavg[1])<<','<< int(cpu_loadavg[2])<<']';
+	o_str << ",\n\"cpu_user\":"    << int(cpu_user);
+	o_str << ",\n\"cpu_nice\":"    << int(cpu_nice);
+	o_str << ",\n\"cpu_system\":"  << int(cpu_system);
+	o_str << ",\n\"cpu_idle\":"    << int(cpu_idle);
+	o_str << ",\n\"cpu_iowait\":"  << int(cpu_iowait);
+	o_str << ",\n\"cpu_irq\":"     << int(cpu_irq);
+	o_str << ",\n\"cpu_softirq\":" << int(cpu_softirq);
 
-	o_str << ",\"mem_total_mb\":"   << mem_total_mb;
-	o_str << ",\"mem_free_mb\":"    << mem_free_mb;
-	o_str << ",\"mem_cached_mb\":"  << mem_cached_mb;
-	o_str << ",\"mem_buffers_mb\":" << mem_buffers_mb;
-	o_str << ",\"swap_total_mb\":"  << swap_total_mb;
-	o_str << ",\"swap_used_mb\":"   << swap_used_mb;
-	o_str << ",\"hdd_total_gb\":"   << hdd_total_gb;
-	o_str << ",\"hdd_free_gb\":"    << hdd_free_gb;
-	o_str << ",\"hdd_rd_kbsec\":"   << hdd_rd_kbsec;
-	o_str << ",\"hdd_wr_kbsec\":"   << hdd_wr_kbsec;
-	o_str << ",\"hdd_busy\":"       << int(hdd_busy);
-	o_str << ",\"net_recv_kbsec\":" << net_recv_kbsec;
-	o_str << ",\"net_send_kbsec\":" << net_send_kbsec;
+	o_str << ",\n\"mem_total_mb\":"   << mem_total_mb;
+	o_str << ",\n\"mem_free_mb\":"    << mem_free_mb;
+	o_str << ",\n\"mem_cached_mb\":"  << mem_cached_mb;
+	o_str << ",\n\"mem_buffers_mb\":" << mem_buffers_mb;
+	o_str << ",\n\"swap_total_mb\":"  << swap_total_mb;
+	o_str << ",\n\"swap_used_mb\":"   << swap_used_mb;
+	o_str << ",\n\"hdd_total_gb\":"   << hdd_total_gb;
+	o_str << ",\n\"hdd_free_gb\":"    << hdd_free_gb;
+	o_str << ",\n\"hdd_rd_kbsec\":"   << hdd_rd_kbsec;
+	o_str << ",\n\"hdd_wr_kbsec\":"   << hdd_wr_kbsec;
+	o_str << ",\n\"hdd_busy\":"       << int(hdd_busy);
+	o_str << ",\n\"net_recv_kbsec\":" << net_recv_kbsec;
+	o_str << ",\n\"net_send_kbsec\":" << net_send_kbsec;
 
-	o_str << '}';
+	o_str << "\n}";
 }
 
 void HostRes::v_readwrite( Msg * msg)

@@ -53,70 +53,71 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	// Write running tasks percents in any case:
 	if( m_tasks.size())
 	{
-		o_str << "\"tasks_percents\":[";
+		o_str << "\n\"tasks_percents\":[";
 		bool first = true;
 		for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 		{
 			if( false == first )
-				o_str << ',';
+				o_str << ",\n";
 			else
 				first = false;
 
 			o_str << (*it)->getPercent();
 		}
-		o_str << "],";
+		o_str << "\n],";
 	}
 
 	if( i_type == af::Msg::TRendersResources )
 	{
-		o_str << "\"id\":"   << m_id;
+		o_str << "\n\"id\":"   << m_id;
 		if( isOnline())
 		{
-			o_str << ",\"idle_time\":" << m_idle_time;
-			o_str << ",\"busy_time\":" << m_busy_time;
-			o_str << ",";
+			o_str << ",\n\"idle_time\":" << m_idle_time;
+			o_str << ",\n\"busy_time\":" << m_busy_time;
+			o_str << ",\n";
 			m_hres.jsonWrite( o_str);
 		}
-		o_str << "}";
+		o_str << "\n}";
 		return;
 	}
 
 	Client::v_jsonWrite( o_str, i_type);
 
-	o_str << ",";
+	o_str << ",\n\"st\":" << m_state;
+	o_str << ",\n";
 	jw_state( m_state, o_str, true /*it is render node state type*/);
 
-	o_str << ",\"capacity_used\":" << m_capacity_used;
-	o_str << ",\"task_start_finish_time\":" << m_task_start_finish_time;
+	o_str << ",\n\"capacity_used\":" << m_capacity_used;
+	o_str << ",\n\"task_start_finish_time\":" << m_task_start_finish_time;
 	if( m_capacity  > 0 )
-		o_str << ",\"capacity\":" << m_capacity;
+		o_str << ",\n\"capacity\":" << m_capacity;
 	if( m_max_tasks  > 0 )
-		o_str << ",\"max_tasks\":" << m_max_tasks;
+		o_str << ",\n\"max_tasks\":" << m_max_tasks;
 	if( m_wol_operation_time > 0 )
-		o_str << ",\"wol_operation_time\":" << m_wol_operation_time;
-	o_str << ",\"idle_time\":" << m_idle_time;
-	o_str << ",\"busy_time\":" << m_busy_time;
+		o_str << ",\n\"wol_operation_time\":" << m_wol_operation_time;
+	o_str << ",\n\"idle_time\":" << m_idle_time;
+	o_str << ",\n\"busy_time\":" << m_busy_time;
 
 	if( m_tasks.size())
 	{
-		o_str << ",\"tasks\":[";
+		o_str << ",\n\"tasks\":[";
 		bool first = true;
 		for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 		{
 			if( false == first )
-				o_str << ',';
+				o_str << ",\n";
 			else
 				first = false;
 
 			(*it)->jsonWrite( o_str, i_type);
 		}
-		o_str << "]";
+		o_str << "\n]";
 	}
 
-	o_str << ',';
+	o_str << ",\n";
 	m_host.jsonWrite( o_str);
 
-	o_str << "}";
+	o_str << "\n}";
 }
 
 void Render::jsonRead( const JSON &i_object, std::string * io_changes)
@@ -143,6 +144,15 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 		if( NIMBY ) setNIMBY();
 		else setFree();
 	}
+
+	// Paramers below are not editable and read only on creation
+	// When use edit parameters, log provided to store changes
+	if( io_changes )
+		return;
+
+	Node::jsonRead( i_object);
+
+	jr_uint32("st",        m_state,         i_object);
 }
 
 void Render::v_readwrite( Msg * msg)

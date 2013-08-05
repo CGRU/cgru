@@ -172,11 +172,11 @@ void SysTask::v_updateState( const af::MCTaskUp & taskup, RenderContainer * rend
 
 //Task * SysBlock::task = NULL;
 
-SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
-	Block( blockJob, blockData, progress)
+SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * i_progress):
+	Block( blockJob, blockData, i_progress)
 {
 AFINFO("SysBlock::SysBlock:");
-	m_taskprogress = progress->tp[ m_data->getBlockNum()][0];
+	m_taskprogress = i_progress->tp[ m_data->getBlockNum()][0];
 	m_taskprogress->state &= ~AFJOB::STATE_READY_MASK;
 	m_taskprogress->starts_count = 0;
 	m_taskprogress->errors_count = 0;
@@ -470,7 +470,7 @@ SysJob::SysJob( const std::string & i_folder):
 	m_blocks_data[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     m_id);
 	m_blocks_data[BlockEventsIndex ] = new SysBlockData_Events(  BlockEventsIndex,  m_id);
 
-	progress = new af::JobProgress( this);
+	m_progress = new af::JobProgress( this);
 
 	construct();
 
@@ -492,17 +492,17 @@ Block * SysJob::v_newBlock( int numBlock)
 	{
 	case BlockPostCmdIndex:
 	{
-		ms_block_cmdpost = new SysBlock_CmdPost( this, m_blocks_data[numBlock], progress);
+		ms_block_cmdpost = new SysBlock_CmdPost( this, m_blocks_data[numBlock], m_progress);
 		return ms_block_cmdpost;
 	}
 	case BlockWOLIndex:
 	{
-		ms_block_wol = new SysBlock_WOL( this, m_blocks_data[numBlock], progress);
+		ms_block_wol = new SysBlock_WOL( this, m_blocks_data[numBlock], m_progress);
 		return ms_block_wol;
 	}
 	case BlockEventsIndex:
 	{
-		ms_block_events = new SysBlock_Events( this, m_blocks_data[numBlock], progress);
+		ms_block_events = new SysBlock_Events( this, m_blocks_data[numBlock], m_progress);
 		return ms_block_events;
 	}
 	default:

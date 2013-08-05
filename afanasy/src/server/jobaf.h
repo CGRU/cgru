@@ -124,7 +124,7 @@ protected:
     void v_calcNeed();
 
 protected:
-	af::JobProgress * progress;    ///< Tasks progress.
+	af::JobProgress * m_progress;    ///< Tasks progress.
 	Block ** m_blocks;              ///< Blocks.
 
 private:

@@ -107,14 +107,8 @@ void AfCmd::RegisterCommands()
 	addCmd( new CmdPasswd);
 
 	addCmd( new CmdDBCheck);
-	addCmd( new CmdDBResetUsers);
-	addCmd( new CmdDBResetRenders);
-	addCmd( new CmdDBResetJobs);
 	addCmd( new CmdDBResetStat);
 	addCmd( new CmdDBResetAll);
-	addCmd( new CmdDBJobsList);
-	addCmd( new CmdDBJobsClean);
-	addCmd( new CmdDBSysJobDel);
 	addCmd( new CmdDBUpdateTables);
 
 	addCmd( new CmdConfigLoad);
