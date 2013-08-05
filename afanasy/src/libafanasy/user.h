@@ -19,7 +19,7 @@ public:
 	User( const std::string & username, const std::string & host);
 
 	/// Construct user from id only.
-	User( int uid);
+	User( int i_id = 0);
 
 	/// Build user data from buffer.
 	User( Msg * msg);
@@ -53,18 +53,12 @@ public:
 	inline int     getNumRunningJobs()       const { return m_running_jobs_num;      } ///< Get active jobs quantity.
 	inline int     getRunningTasksNumber()   const { return m_running_tasks_num;  } ///< Get number of hosts used by user jobs.
 	inline int64_t getTimeRegister()         const { return m_time_register;       } ///< Get register time.
-	inline int64_t getTimeOnline()           const { return m_time_online;         } ///< Get online time.
 	inline int     getJobsLifeTime()         const { return m_jobs_life_time;       } ///< Get jobs default life time.
 
 	inline int getErrorsAvoidHost()      const { return m_errors_avoid_host;    }
 	inline int getErrorsRetries()        const { return m_errors_retries;      }
 	inline int getErrorsTaskSameHost()   const { return m_errors_task_same_host; }
 	inline int getErrorsForgiveTime()    const { return m_errors_forgive_time;  }
-
-	/// Set user whether user is permanent.
-	/** Permanent user will not be deleted if he has no jobs, Afanasy store them in database**/
-	inline bool  isPermanent() const      { return m_state & Permanent; } ///< Wheter the user is permanent.
-	void setPermanent( bool value);
 
 	inline bool solveJobsParallel() const { return m_state & SolveJobsParallel; }
 
@@ -99,17 +93,15 @@ protected:
 	int32_t m_running_tasks_num;      ///< User jobs hosts number.
 
 	int64_t m_time_register;        ///< User registration time (when he become permanent).
-	int64_t m_time_online;          ///< User online (server registration) time.
 
 private:
    enum State
    {
-	  Permanent         = 1,
-	  SolveJobsParallel = 2
+	  SolveJobsParallel = 1
    };
 
 private:
-   void construct();
+   void initDefaultValues();
    void v_readwrite( Msg * msg);   ///< Read or write user in buffer.
 };
 }

@@ -1,5 +1,6 @@
 #include "afcommon.h"
 
+#include <dirent.h>
 #include <fcntl.h>
 #ifdef WINNT
 #include <io.h>
@@ -12,7 +13,7 @@
 #include <sys/wait.h>
 #endif
 
-#include "../libafanasy/environment.h"
+#include "../include/afanasy.h"
 
 #include "threadargs.h"
 
@@ -24,7 +25,7 @@ af::MsgQueue      * AFCommon::MsgDispatchQueue  = NULL;
 FileQueue         * AFCommon::FileWriteQueue    = NULL;
 DBUpdateTaskQueue * AFCommon::DBUpTaskQueue     = NULL;
 DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
-CleanUpQueue      * AFCommon::CleanUpJobQueue   = NULL;
+CleanUpQueue      * AFCommon::RemFoldersQueue   = NULL;
 LogQueue          * AFCommon::OutputLogQueue    = NULL;
 
 /*
@@ -35,7 +36,7 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
    MsgDispatchQueue = new af::MsgQueue(      "Sending Messages", af::AfQueue::e_start_thread);
    FileWriteQueue   = new FileQueue(         "Writing Files");
-   CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
+   RemFoldersQueue  = new CleanUpQueue(      "Jobs Cleanup");
    OutputLogQueue   = new LogQueue(          "Log Output");
    DBUpTaskQueue    = new DBUpdateTaskQueue( "AFDB_update_task",   i_threadArgs->monitors);
    DBUpdateQueue    = new DBActionQueue(     "AFDB_update",        i_threadArgs->monitors);
@@ -45,7 +46,7 @@ AFCommon::~AFCommon()
 {
     delete FileWriteQueue;
     delete MsgDispatchQueue;
-    delete CleanUpJobQueue;
+    delete RemFoldersQueue;
     delete OutputLogQueue;
     delete DBUpTaskQueue;
     delete DBUpdateQueue;
@@ -73,6 +74,101 @@ void AFCommon::catchDetached()
 }
 */
 
+const std::string AFCommon::getStoreDir( const std::string & i_root, int i_id, const std::string & i_name)
+{
+	std::string store_dir = af::itos( i_id);
+	store_dir = af::itos( i_id / 1000 ) + AFGENERAL::PATH_SEPARATOR + store_dir;
+	store_dir = i_root + AFGENERAL::PATH_SEPARATOR + store_dir;
+	store_dir += '.' + af::pathFilterFileName( i_name);
+	return store_dir;
+}
+
+const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i_root)
+{
+	std::vector<std::string> o_folders;
+
+#ifdef WINNT
+	HANDLE thousand_dir_handle;
+	WIN32_FIND_DATA thousand_dir_data;
+	if(( thousand_dir_handle = FindFirstFile(( i_root + "\\*").c_str(), &thousand_dir_data)) != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			std::string thousand_dir( thousand_dir_data.cFileName);
+			if( thousand_dir.find(".") == 0 ) continue;
+			thousand_dir = i_root + '\\' + thousand_dir;
+			if( false == af::pathIsFolder( thousand_dir)) continue;
+
+			HANDLE job_dir_handle;
+			WIN32_FIND_DATA job_dir_data;
+			if(( job_dir_handle = FindFirstFile(( thousand_dir + "\\*").c_str(), &job_dir_data)) != INVALID_HANDLE_VALUE)
+			{
+				do
+				{
+					std::string job_dir( job_dir_data.cFileName);
+					if( thousand_dir.find('.') == 0 ) continue;
+					job_dir = thousand_dir + '\\' + job_dir;
+					if( false == af::pathIsFolder( job_dir)) continue;
+					o_folders.push_back( job_dir);
+				}
+				while ( FindNextFile( job_dir_handle, &job_dir_data));
+
+				FindClose( job_dir_handle);
+			}
+			else
+			{
+				AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", thousand_dir.c_str())
+				return o_folders;
+			}
+
+		} while ( FindNextFile( thousand_dir_handle, &thousand_dir_data));
+		FindClose( thousand_dir_handle);
+	}
+	else
+	{
+		AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", i_root.c_str())
+		return o_folders;
+	}
+
+#else
+
+	struct dirent * thousand_dir_data = NULL;
+	DIR * thousand_dir_handle = opendir( i_root.c_str());
+	if( thousand_dir_handle == NULL)
+	{
+		AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", i_root.c_str())
+		return o_folders;
+	}
+
+	while( thousand_dir_data = readdir( thousand_dir_handle))
+	{
+		if( thousand_dir_data->d_name[0] == '.' ) continue;
+		std::string thousand_dir = i_root + '/' + thousand_dir_data->d_name;
+		if( false == af::pathIsFolder( thousand_dir )) continue;
+
+		struct dirent * job_dir_data = NULL;
+		DIR * job_dir_handle = opendir( thousand_dir.c_str());
+		if( job_dir_handle == NULL)
+		{
+			AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", thousand_dir.c_str())
+			return o_folders;
+		}
+
+		while( job_dir_data = readdir( job_dir_handle))
+		{
+			if( job_dir_data->d_name[0] == '.' ) continue;
+			std::string job_dir( thousand_dir + '/' + job_dir_data->d_name);
+			if( false == af::pathIsFolder( job_dir)) continue;
+			o_folders.push_back( job_dir);
+		}
+	}
+
+	closedir(thousand_dir_handle);
+#endif
+
+	return o_folders;
+}
+
 void AFCommon::executeCmd( const std::string & cmd)
 {
    std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;
@@ -93,8 +189,7 @@ void AFCommon::saveLog( const std::list<std::string> & log, const std::string & 
       bytes += "\n";
    }
 
-   std::string path = filename;
-   af::pathFilterFileName( path);
+   std::string path = af::pathFilterFileName( filename);
    path = dirname + '/' + path;
 
    FileData * filedata = new FileData( bytes.data(), bytes.length(), path);

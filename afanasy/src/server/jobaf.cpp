@@ -5,12 +5,9 @@
 #include "../libafanasy/addresseslist.h"
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
+#include "../libafanasy/jobprogress.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgqueue.h"
-
-#include "../libafsql/dbattr.h"
-#include "../libafsql/dbconnection.h"
-#include "../libafsql/dbjobprogress.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -30,35 +27,45 @@
 #include "../include/macrooutput.h"
 
 JobContainer *JobAf::ms_jobs  = NULL;
-/*
-JobAf::JobAf( af::Msg * msg):
-    afsql::DBJob(),
-	AfNodeSrv( this),
-    m_from_store( false)
-{
-    initializeValues();
-    read( msg);
-    progress = new afsql::DBJobProgress( this);
-    construct();
-}
-*/
+
 JobAf::JobAf( JSON & i_object):
-    afsql::DBJob(),
-	AfNodeSrv( this),
-	m_from_store( false)
+    af::Job(),
+	AfNodeSrv( this)
 {
 	initializeValues();
     jsonRead( i_object);
-    progress = new afsql::DBJobProgress( this);
+    progress = new af::JobProgress( this);
     construct();
 }
 
-JobAf::JobAf( int Id):
-    afsql::DBJob( Id),
-	AfNodeSrv( this),
-    m_from_store( true)
+JobAf::JobAf( const std::string & i_store_dir):
+	af::Job(),
+	AfNodeSrv( this, i_store_dir)
 {
+	AFINFA("JobAf::JobAf: store dir = %s", i_store_dir.c_str())
+
     initializeValues();
+
+	if( getStoreDir().empty()) return;
+
+	initStoreDirs();
+
+	int size;
+	char * data = af::fileRead( getStoreFile(), size);
+	if( data == NULL ) return;
+	rapidjson::Document document;
+	char * res = af::jsonParseData( document, data, size);
+	if( res == NULL ) return;
+	jsonRead( document);
+	delete [] data;
+
+	progress = new af::JobProgress( this);
+
+	construct();
+
+	for( int b = 0; b < m_blocks_num; b++)
+		if( false == m_blocks[b]->readStoredTasks( getStoreDir()))
+			return;
 }
 
 void JobAf::initializeValues()
@@ -72,37 +79,13 @@ void JobAf::initializeValues()
 
 void JobAf::initStoreDirs()
 {
-	m_store_dir = af::itos( m_id);
-	m_store_dir = af::itos( m_id / 1000 ) + AFGENERAL::PATH_SEPARATOR + m_store_dir;
-	m_store_dir = af::Environment::getJobsDir() + AFGENERAL::PATH_SEPARATOR + m_store_dir;
-
-	m_store_file         = m_store_dir + AFGENERAL::PATH_SEPARATOR + "job_data.json";
-	m_store_dir_progress = m_store_dir + AFGENERAL::PATH_SEPARATOR + "progress";
-	m_store_dir_output   = m_store_dir + AFGENERAL::PATH_SEPARATOR + "output";
-}
-
-const std::vector<std::string> JobAf::getStoreDirs() const
-{
-	std::vector<std::string> dirs;
-	dirs.push_back( m_store_dir_output);
-	dirs.push_back( m_store_dir_progress);
-	dirs.push_back( m_store_dir);
-	return dirs;
-}
-
-bool JobAf::v_dbSelect( PGconn * i_conn, const std::string * i_where)
-{
-//printf("JobAf::dbSelect:\n");
-    if( afsql::DBJob::v_dbSelect( i_conn) == false) return false;
-    construct();
-	return isValid();
+	m_store_dir_progress = getStoreDir() + AFGENERAL::PATH_SEPARATOR + "progress";
+	m_store_dir_output   = getStoreDir() + AFGENERAL::PATH_SEPARATOR + "output";
 }
 
 void JobAf::construct()
 {
-AFINFA("JobAf::construct: \"%s\":", m_name.c_str())
-
-//	if( false == isValid()) return false;
+	AFINFA("JobAf::construct: \"%s\": from store: %d", m_name.c_str(), isFromStore())
 
 	if( m_blocks != NULL )
 	{
@@ -132,6 +115,8 @@ AFINFA("JobAf::construct: \"%s\":", m_name.c_str())
 			return;
 		}
 	}
+
+//printf("JobAf::construct: END; is from store: %d", isFromStore())
 }
 
 bool JobAf::isValidConstructed() const
@@ -146,12 +131,14 @@ bool JobAf::isValidConstructed() const
 
 	if( err.size())
 	{
-		if( m_from_store )
+		if( isFromStore())
 			AFERRAR("%s", err.c_str())
 		else
 			AFCommon::QueueLogError( err);
 		return false;
 	}
+
+	AFINFA("JobAf::isValidConstructed: \"%s\": TRUE; from store: %d", m_name.c_str(), isFromStore())
 
 	return true;
 }
@@ -182,13 +169,7 @@ void JobAf::setUser( UserAf * i_user)
 
 bool JobAf::initialize()
 {
-/*   if( isConstructed() == false)
-   {
-      AFERROR("JobAf::initialize: Job is not constructed.")
-      return 0;
-   }*/
-
-//printf("JobAf::initialize: BEGIN\n");
+	AFINFA("JobAf::initialize: '%s'[%d]:", m_name.c_str(), m_id)
 
 //
 //	Set job ID to blocks and progress classes:
@@ -200,20 +181,12 @@ bool JobAf::initialize()
 
 //
 // Store job ( if not stored )
-	if( m_from_store == false )
+	if( isFromStore() == false )
 	{
+		setStoreDir( AFCommon::getStoreDirJob( *this));
+
 		initStoreDirs();
 
-		if( af::pathIsFolder( m_store_dir))
-		{
-			if( false == af::removeDir( m_store_dir))
-				AFCommon::QueueLogError( std::string("Unable to remove old job store folder:\n") + m_store_dir);
-		}
-		if( af::pathMakePath( m_store_dir) == false)
-		{
-			AFCommon::QueueLogError( std::string("Unable to create job store folder:\n") + m_store_dir);
-			return false;
-		}
 		if( af::pathMakePath( m_store_dir_progress) == false)
 		{
 			AFCommon::QueueLogError( std::string("Unable to create job store folder:\n") + m_store_dir_progress);
@@ -225,12 +198,16 @@ bool JobAf::initialize()
 			return false;
 		}
 
-		store(/*first time =*/ true);
+		// Write blocks tasks data:
+		for( int b = 0; b < m_blocks_num; b++)
+			m_blocks[b]->storeTasks( getStoreDir());
+
+		store();
 	}
 
 //
 // Executing pre commands ( if not from database )
-   if( m_from_store == false )
+   if( isFromStore() == false )
    {
       if( false == m_command_pre.empty())
       {
@@ -276,53 +253,8 @@ bool JobAf::initialize()
 
    v_refresh( time(NULL), NULL, NULL);
 
-//printf("JobAf::initialize: END\n");
+//printf("JobAf::initialize: END")
    return true;
-}
-
-void JobAf::store( bool i_first_time) const
-{
-	std::ostringstream ostr;
-	v_jsonWrite( ostr, 0);
-
-	if( i_first_time)
-	{
-		// On first store we do not need to write data immediately (not queue)
-		AFCommon::writeFile( ostr, m_store_file);
-			
-		// And write tasks data
-		for( int b = 0; b < m_blocks_num; b++)
-			m_blocks[b]->storeTasks( m_store_dir);
-	}
-	else
-		AFCommon::QueueFileWrite( new FileData( ostr, m_store_file));
-}
-
-bool JobAf::readStore()
-{
-	initStoreDirs();
-//printf("DBJob::dbSelect: id = %d, file = %s\n", m_id, m_store_file.c_str());
-
-	int size;
-	char * data = af::fileRead( m_store_file, size);
-	if( data == NULL ) return false;
-	
-	rapidjson::Document document;
-	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL ) return false;
-
-	jsonRead( document);
-	delete [] data;
-
-	progress = new afsql::DBJobProgress( this);
-
-	construct();
-
-	for( int b = 0; b < m_blocks_num; b++)
-		if( false == m_blocks[b]->readStoredTasks( m_store_dir))
-			return false;
-
-	return isValidConstructed();
 }
 
 int JobAf::getUid() const { return m_user->getId(); }
@@ -364,7 +296,7 @@ void JobAf::v_setZombie( RenderContainer * renders, MonitorContainer * monitorin
    AfNodeSrv::v_setZombie();
 
    // Queue job cleanup:
-   AFCommon::QueueJobCleanUp( this);
+   AFCommon::QueueNodeCleanUp( this);
 
 //   if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
@@ -410,7 +342,7 @@ void JobAf::v_action( Action & i_action)
 					i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
 
 				if( i_action.log.size() )
-					store(/*first time =*/ false);
+					store();
 
 				return;
 			}
@@ -489,7 +421,7 @@ void JobAf::v_action( Action & i_action)
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
 		i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
-		store(/*first time =*/ false);
+		store();
 		return;
 	}
 
@@ -518,14 +450,14 @@ void JobAf::v_action( Action & i_action)
         i_action.monitors->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
         i_action.monitors->addJobEvent( af::Msg::TMonitorJobsAdd, getId(), m_user->getId());
 
-		store(/*first time =*/ false);
+		store();
 
 		return;
 	}
 
 	if( i_action.log.size() )
 	{
-		store(/*first time =*/ false);
+		store();
 		i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
 	}
 }
@@ -540,8 +472,10 @@ void JobAf::setUserListOrder( int index, bool updateDtabase)
 {
    int old_index = m_user_list_order;
    m_user_list_order = index;
-   if(( index != old_index ) && updateDtabase )
-		store(/*first time =*/ false);
+
+	// user list order == -1 at job creation, and we do not store here in any case:
+	if(( old_index != -1 ) && ( index != old_index ) && updateDtabase )
+		store();
 }
 
 void JobAf::checkDepends()
@@ -944,7 +878,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 			{
 				m_time_started = time(NULL);
 				appendLog("Started.");
-				store(/*first time =*/ false);
+				store();
 			}
 
 			return true;
@@ -1032,7 +966,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
          }
          appendLog("Done.");
          jobchanged = af::Msg::TMonitorJobsChanged;
-			store(/*first time =*/ false);
+			store();
       }
    }
    else
@@ -1065,7 +999,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		// If it is no job monitoring, job just came to server and it is first it refresh,
 		// so no change event and database storing needed
 		if( monitoring )
-			store(/*first time =*/ false);
+			store();
 
 		// Proccess events:
 		if( m_id != AFJOB::SYSJOB_ID ) // skip system job

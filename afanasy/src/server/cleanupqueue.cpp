@@ -1,15 +1,14 @@
 #include "cleanupqueue.h"
 
 #include "afcommon.h"
-#include "jobaf.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-CleanUpData::CleanUpData( const JobAf * job)
+CleanUpData::CleanUpData( const AfNodeSrv * i_node)
 {
-	m_dirs = job->getStoreDirs();
+	m_dirs.push_back( i_node->getStoreDir());
 }
 
 CleanUpQueue::CleanUpQueue( const std::string & QueueName):

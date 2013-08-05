@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/job.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
-
-#include "../libafsql/dbjob.h"
 
 #include "afnodesrv.h"
 #include "listeners.h"
@@ -22,24 +21,16 @@ class Task;
 class UserAf;
 
 /// Server side of Afanasy job.
-class JobAf : public afsql::DBJob , public AfNodeSrv
+class JobAf : public af::Job , public AfNodeSrv
 {
 public:
-/*
-/// Construct job from message data with provided message type.
-	JobAf( af::Msg * msg);
-*/
 /// Construct job from JSON.
 	JobAf( JSON & i_object);
 
 /// Construct empty Job for store.
-	JobAf( int Id);
+	JobAf( const std::string & i_store_dir = "");
 
 	virtual ~JobAf();
-
-	bool isFromStore() const { return m_from_store; }
-
-	bool readStore();
 
 	bool isValidConstructed() const;
 
@@ -97,8 +88,6 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-    virtual bool v_dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
-
 	void setUser( UserAf * i_user);
 
 /// Initialize new job, came to Afanasy container.
@@ -119,10 +108,8 @@ public:
 	int  getRenderCounts( RenderAf * render) const;
 	void remRenderCounts( RenderAf * render);
 
-//	const std::string & getStoreDir() const { return m_store_dir; }
 	const std::string & getTasksProgessDir() const { return m_store_dir_progress; }
 	const std::string & getTasksOuputDir() const { return m_store_dir_output; }
-	const std::vector<std::string> getStoreDirs() const;
 
 public:
 	/// Set Jobs Container.
@@ -132,13 +119,13 @@ protected:
 	/// Allocate JobInfo, tasksLog.
 	void construct();
 
-    virtual Block * v_newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
+    virtual Block * v_newBlock( int numBlock); ///< Virtual function to create system blocks in a system job
 
     void v_calcNeed();
 
 protected:
+	af::JobProgress * progress;    ///< Tasks progress.
 	Block ** m_blocks;              ///< Blocks.
-	bool m_from_store;            ///< Whether job constructed from store.
 
 private:
 	bool m_deletion;                ///< Whether the job is deleting.
@@ -150,8 +137,6 @@ private:
 
 	UserAf * m_user;
 
-	std::string m_store_dir;   ///< Store directory.
-	std::string m_store_file;  ///< Store file.
 	std::string m_store_dir_progress;   ///< Store directory.
 	std::string m_store_dir_output;   ///< Store directory.
 
@@ -163,7 +148,6 @@ private:
 private:
 	void initializeValues();
 	void initStoreDirs();
-	void store( bool i_first_time) const;
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 

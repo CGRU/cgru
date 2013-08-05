@@ -4,8 +4,6 @@
 
 #include "../libafanasy/environment.h"
 
-#include "../libafsql/dbattr.h"
-
 #include "action.h"
 #include "afcommon.h"
 #include "aflistit.h"
@@ -21,34 +19,48 @@
 UserContainer * UserAf::ms_users = NULL;
 
 UserAf::UserAf( const std::string & username, const std::string & host):
-	afsql::DBUser( username, host),
+	af::User( username, host),
 	AfNodeSrv( this)
 {
-	construct();
 	appendLog("Registered from job.");
 }
 
-UserAf::UserAf( int uid):
-	afsql::DBUser( uid),
-	AfNodeSrv( this)
-{
-	construct();
-	appendLog("Registered from database.");
-}
-
 UserAf::UserAf( JSON & i_object):
-    afsql::DBUser(),
+    af::User(),
 	AfNodeSrv( this)
 {
 	jsonRead( i_object);
-	construct();
-	appendLog("Registered.");
 }
 
-void UserAf::construct()
+UserAf::UserAf( const std::string & i_store_dir):
+	af::User(),
+	AfNodeSrv( this, i_store_dir)
 {
-	m_zombietime = 0;
-	m_time_online = time( NULL);
+	int size;
+	char * data = af::fileRead( getStoreFile(), size);
+	if( data == NULL ) return;
+	rapidjson::Document document;
+	char * res = af::jsonParseData( document, data, size);
+	if( res == NULL ) return;
+	jsonRead( document);
+	delete [] data;
+}
+
+bool UserAf::initialize()
+{
+	if( isFromStore())
+	{
+		appendLog("Initialized from store.");
+	}
+	else
+	{
+		m_time_register = time( NULL);
+		setStoreDir( AFCommon::getStoreDirUser( *this));
+		store();
+		appendLog("Registered.");
+	}
+
+	return true;
 }
 
 UserAf::~UserAf()
@@ -59,8 +71,6 @@ void UserAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_users->sor
 
 void UserAf::v_action( Action & i_action)
 {
-	bool was_permanent = isPermanent();
-
 	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
@@ -87,20 +97,9 @@ void UserAf::v_action( Action & i_action)
 	if( params.IsObject())
 		jsonRead( params, &i_action.log);
 
-	if( was_permanent != isPermanent())
-	{
-		if( isPermanent())
-			AFCommon::QueueDBAddItem( this);
-		else
-			AFCommon::QueueDBDelItem( this);
-	}
-
 	if( i_action.log.size() )
 	{
-		// Update database only is permanent parameter was not changed.
-		// If it was, user is just added to or deleted from database.
-		if( was_permanent == isPermanent())
-			AFCommon::QueueDBUpdateItem( this);
+		store();
 		i_action.monitors->addEvent( af::Msg::TMonitorUsersChanged, m_id);
 	}
 }
@@ -117,8 +116,6 @@ void UserAf::v_setZombie( MonitorContainer * i_monitoring)
 void UserAf::addJob( JobAf * i_job)
 {
 	appendLog( std::string("Adding a job: ") + i_job->getName());
-
-	m_zombietime = 0;
 
 	m_jobslist.add( i_job );
 
@@ -189,31 +186,9 @@ af::Msg * UserAf::writeJobdsOrder() const
 
 void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-/*    if( isLocked() )
-	{
-		  return;
-	}*/
-//printf("UserAf::refresh: \"%s\"\n", getName().toUtf8().data());
-	int _numjobs = m_jobslist.getCount();
-	if(( _numjobs == 0) && ( false == isPermanent()))
-	{
-		if( m_zombietime )
-		{
-			if( (currentTime-m_zombietime) > af::Environment::getUserZombieTime() )
-			{
-				appendLog( std::string("ZOMBIETIME: " + af::itos( af::Environment::getUserZombieTime()) + " seconds with no job."));
-				v_setZombie( monitoring);
-				return;
-			}
-		}
-		else
-		{
-			m_zombietime = currentTime;
-		}
-		return;
-	}
-	else m_zombietime = 0;
+	AFINFA("UserAf::refresh: \"%s\"", getName().toUtf8().data())
 
+	int _numjobs = m_jobslist.getCount();
 	int _numrunningjobs = 0;
 	int _runningtasksnumber = 0;
 	{
@@ -250,11 +225,6 @@ void UserAf::v_calcNeed()
 
 bool UserAf::v_canRun()
 {
-/*    if( isLocked() )
-	{
-		  return false;
-	}*/
-
 	if( m_priority == 0)
 	{
 		// Zero priority - turns user jobs solving off

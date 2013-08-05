@@ -4,12 +4,14 @@
 
 #include "../libafanasy/afqueue.h"
 
+#include "afnodesrv.h"
+
 class JobAf;
 
 class CleanUpData: public af::AfQueueItem
 {
 public:
-	CleanUpData( const JobAf * job);
+	CleanUpData( const AfNodeSrv * i_node);
 	void doCleanUp();
 private:
 	std::vector<std::string> m_dirs;
@@ -21,8 +23,8 @@ public:
 	CleanUpQueue( const std::string & QueueName);
 	virtual ~CleanUpQueue();
 
-/// Push queries to queue back.
-	inline bool pushJob( const JobAf * job) { return push( new CleanUpData(job));}
+	/// Push folders to queue back.
+	inline bool pushNode( const AfNodeSrv * i_node) { return push( new CleanUpData( i_node));}
 
 protected:
 	void processItem( af::AfQueueItem* item);

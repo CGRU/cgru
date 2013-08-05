@@ -3,9 +3,8 @@
 #include "../include/afjob.h"
 
 #include "../libafanasy/msgclasses/mctaskup.h"
+#include "../libafanasy/render.h"
 #include "../libafanasy/taskexec.h"
-
-#include "../libafsql/dbrender.h"
 
 #include "afnodesrv.h"
 
@@ -15,15 +14,18 @@ class JobContainer;
 class RenderContainer;
 
 /// Afanasy server side of Render host.
-class RenderAf: public afsql::DBRender, public AfNodeSrv
+class RenderAf: public af::Render, public AfNodeSrv
 {
 public:
 /// Construct Render from message and provided address.
 	RenderAf( af::Msg * msg);
 	~RenderAf();
 
-/// Construct offline render for database.
-	RenderAf( int Id);
+/// Construct an offline render for store.
+	RenderAf( const std::string & i_store_dir);
+
+	// Initialize render in container:
+	bool initialize();
 
 /// Set registration time ( and update time).
 	void setRegisterTime();
@@ -104,8 +106,11 @@ private:
 
 	std::list<std::string> tasksloglist;							///< Tasks Log.
 
+	std::string ipaddresses;
+	std::string macaddresses;
+
 private:
-	void init();
+	void initDefaultValues();
 
 	void addTask( af::TaskExec * taskexec);
 	void removeTask( const af::TaskExec * taskexec);

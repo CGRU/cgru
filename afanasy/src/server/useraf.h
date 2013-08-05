@@ -2,8 +2,7 @@
 
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
-
-#include "../libafsql/dbuser.h"
+#include "../libafanasy/user.h"
 
 #include "aflist.h"
 #include "afnodesrv.h"
@@ -14,7 +13,7 @@ class RenderAf;
 class UserContainer;
 
 /// Server side of Afanasy user.
-class UserAf : public afsql::DBUser, public AfNodeSrv
+class UserAf : public af::User, public AfNodeSrv
 {
 public:
 	/// Create a new user. User on job creation by unknown user.
@@ -23,10 +22,12 @@ public:
 	/// Construct job from JSON.
 	UserAf( JSON & i_object);
 
-	/// Create user from database.
-	UserAf( int uid);
+	/// Create user from store.
+	UserAf( const std::string & i_store_dir);
 
 	~UserAf();
+
+	bool initialize();
 
 	void addJob(    JobAf * i_job);     ///< Add job to user.
 	void removeJob( JobAf * i_job);     ///< Remove job from user.
@@ -64,14 +65,11 @@ protected:
 	void v_calcNeed();
 
 private:
-	void construct();
 	void updateJobsOrder( af::Job * newJob = NULL);
 	void v_setZombie( MonitorContainer * i_monitoring);    ///< Set user to zombie.
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
-	uint32_t m_zombietime; ///< User zombie time - time to have no jobs before deletion.
-
 	AfList m_jobslist; ///< Jobs list.
 
 private:

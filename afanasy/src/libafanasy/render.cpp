@@ -19,8 +19,8 @@ Render::Render( uint32_t State, uint8_t Priority):
 	m_priority = Priority;
 }
 
-Render::Render( int Id):
-   Client( Client::DoNotGetAnyValues, Id)
+Render::Render():
+	Client( Client::DoNotGetAnyValues, 0)
 {
 	construct();
 }
@@ -45,7 +45,6 @@ void Render::construct()
 Render::~Render()
 {
 }
-
 
 void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {

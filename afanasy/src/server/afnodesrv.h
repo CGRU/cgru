@@ -7,10 +7,17 @@ class Action;
 class AfNodeSrv
 {
 public:
-	AfNodeSrv( af::Node * i_node);
+	AfNodeSrv( af::Node * i_node, const std::string & i_store_dir = "");
 	virtual ~AfNodeSrv();
 
 	inline af::Node * node() { return m_node; }
+
+	void store() const;
+
+	inline bool isFromStore() const { return m_from_store; }
+	inline const std::string & getStoreDir() const { return m_store_dir; }
+	inline const std::string & getStoreFile() const { return m_store_file; }
+	bool createStoreDir() const;
 
 	/// Nodes comparison by priority ( wich is private property).
 	inline bool operator <  ( const AfNodeSrv & other) const { return m_node->m_priority <  other.m_node->m_priority;}
@@ -25,21 +32,17 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-/// Refresh node information
-   virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+	/// Refresh node information
+	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
-   friend class AfContainer;
-   friend class AfContainerIt;
-   friend class AfList;
-   friend class AfListIt;
-
-//   virtual int calcWeight() const;                   ///< Calculate and return memory size.
-//   int calcLogWeight() const;
+	// Friends for container:
+	friend class AfContainer;
+	friend class AfContainerIt;
+	friend class AfList;
+	friend class AfListIt;
 
 	inline void lock()     const { m_node->m_locked =  true; }
 	inline void unLock()   const { m_node->m_locked = false; }
-//	inline bool isLocked() const { return  m_node->m_locked; }
-//	inline bool unLocked() const { return !m_node->m_locked; }
 
 	virtual void v_setZombie() { m_node->m_flags = m_node->m_flags | af::Node::FZombie; } ///< Request to kill a node.
 
@@ -70,6 +73,8 @@ public:
 	bool greaterNeed( const AfNodeSrv * i_other) const;
 
 protected:
+	void setStoreDir( const std::string & i_store_dir);
+
 	/// General need calculation function,
 	/** Some resources should be passed to its algorithm.**/
 	void calcNeedResouces( int i_resourcesquantity);
@@ -88,6 +93,9 @@ private:
 //public:
 
 	af::Node * m_node;
+	bool m_from_store;            ///< Whether the node constructed from store.
+	std::string m_store_dir;   ///< Store directory.
+	std::string m_store_file;  ///< Store file.
 
 private:
 /// When node is ready to be deleted from container its becames a zombie and wait for a deletion by special thread.

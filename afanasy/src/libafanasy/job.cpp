@@ -13,10 +13,10 @@ using namespace af;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Job::Job( int Id)
+Job::Job( int i_id)
 {
 	initDefaultValues();
-	m_id = Id;
+	m_id = i_id;
 	m_time_creation = time(NULL);
 }
 
@@ -191,7 +191,7 @@ void Job::initDefaultValues()
 	m_time_wait = 0;
 	m_time_started = 0;
 	m_time_done = 0;
-	m_user_list_order = -1;
+	m_user_list_order = -1; // On update, if old index == -1 storing is skipped (new job registration)
 	m_time_life = -1;
 	m_blocks_data = NULL;
 

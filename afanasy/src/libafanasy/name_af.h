@@ -170,7 +170,7 @@ namespace af
 //
 // Paths / Files related functions name_affile.cpp:
 //
-	void pathFilterFileName( std::string & io_filename);
+	const std::string pathFilterFileName( const std::string & i_filename);
 
 	void pathFilter( std::string & path);
 

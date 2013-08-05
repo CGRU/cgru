@@ -371,7 +371,7 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 	  if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
 
       // No need to update state in database, state is calculated attribute
-      // AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
+// AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
    }
 
    return blockProgress_changed;
@@ -425,7 +425,7 @@ bool Block::action( Action & i_action)
 
 	if( blockchanged_type )
 	{
-		AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)m_data);
+//AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)m_data);
 		i_action.monitors->addBlock( af::Msg::TBlocksProperties, m_data);
 	}
 

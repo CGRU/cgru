@@ -6,8 +6,6 @@
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/farm.h"
 
-#include "../libafsql/dbattr.h"
-
 #include "action.h"
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -22,24 +20,40 @@
 RenderContainer * RenderAf::ms_renders = NULL;
 
 RenderAf::RenderAf( af::Msg * msg):
-	DBRender( msg),
+	af::Render( msg),
 	AfNodeSrv( this)
 {
-	init();
+	initDefaultValues();
 }
 
-RenderAf::RenderAf( int Id):
-	DBRender( Id),
-	AfNodeSrv( this)
+RenderAf::RenderAf( const std::string & i_store_dir):
+	af::Render(),
+	AfNodeSrv( this, i_store_dir)
 {
 //printf("RenderAf::RenderAf:\n");
 //printf("this = %p\n", this);
 //	setNode( this);
 	AFINFA("RenderAf::RenderAf(%d)", m_id);
-	init();
+	initDefaultValues();
+
+	int size;
+	char * data = af::fileRead( getStoreFile(), size);
+	if( data == NULL ) return;
+	rapidjson::Document document;
+	char * res = af::jsonParseData( document, data, size);
+	if( res == NULL ) return;
+	jsonRead( document);
+	delete [] data;
+
+	// This render came from database on core init, it can't be online or busy
+	setOffline();
+	setBusy( false);
+
+//	af::NetIF::getNetIFs( macaddresses, m_netIFs);
+//	m_address = af::Address( ipaddresses);
 }
 
-void RenderAf::init()
+void RenderAf::initDefaultValues()
 {
 	hostname = "no farm host";
 	hostdescription = "";
@@ -54,6 +68,25 @@ void RenderAf::init()
 
 RenderAf::~RenderAf()
 {
+}
+
+bool RenderAf::initialize()
+{
+	getFarmHost();
+
+	if( isFromStore())
+	{
+		appendLog("Initialized from store.");
+	}
+	else
+	{
+		m_time_register = time( NULL);
+		setStoreDir( AFCommon::getStoreDirUser( *this));
+		store();
+		appendLog("Registered.");
+	}
+
+	return true;
 }
 
 void RenderAf::setRegisterTime()
@@ -97,7 +130,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 		appendLog("Offline.");
 		m_time_launch = 0;
 		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+		store();
 	}
 }
 
@@ -140,7 +173,7 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 	std::string str = "Online v'" + m_version + "'.";
 	appendLog( str);
 	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-	AFCommon::QueueDBUpdateItem( this);
+	store();
 	return true;
 }
 
@@ -250,7 +283,7 @@ void RenderAf::v_action( Action & i_action)
 			if( isOnline() ) return;
 			appendLog( std::string("Deleted by ") + i_action.author);
 			offline( NULL, 0, i_action.monitors, true);
-			AFCommon::QueueDBDelItem( this);
+//AFCommon::QueueDBDelItem( this);
 			return;
 		}
 		else if( type == "reboot")
@@ -292,7 +325,7 @@ void RenderAf::v_action( Action & i_action)
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
 		i_action.monitors->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-		AFCommon::QueueDBUpdateItem( this);
+		store();
 		return;
 	}
 
@@ -302,7 +335,7 @@ void RenderAf::v_action( Action & i_action)
 
 	if( i_action.log.size() )
 	{
-		AFCommon::QueueDBUpdateItem( this);
+		store();
 		i_action.monitors->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 	}
 }
@@ -384,7 +417,7 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 	setWOLFalling( true);
 	appendLog("Sending WOL sleep request.");
 	m_wol_operation_time = time( NULL);
-	AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+	store();
 	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
 	af::Msg* msg = new af::Msg( af::Msg::TClientWOLSleepRequest);
@@ -397,7 +430,6 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 	if( i_msg.size())
 		appendLog( i_msg);
 
-	//if( isWOLWaking()	 ) return;
 	if( isOnline())
 	{
 		appendLog("Can't wake up online render.");
@@ -418,7 +450,7 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 	appendLog("Sending WOL wake request.");
 	setWOLWaking( true);
 	m_wol_operation_time = time( NULL);
-	AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+	store();
 	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
 	std::string cmd = af::Environment::getRenderCmdWolWake();
@@ -462,7 +494,7 @@ void RenderAf::addTask( af::TaskExec * taskexec)
 	{
 		setBusy( true);
 		m_task_start_finish_time = time( NULL);
-		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+		store();
 	}
 	m_tasks.push_back( taskexec);
 
@@ -528,7 +560,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			appendLog( log);
 			setNIMBY();
 			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-			AFCommon::QueueDBUpdateItem( this);
+			store();
 		}
 	}
 //printf("CPU busy with no task: %li-%li=%li, C%u%%(>%d%%) nbf=%dsecs\n", currentTime, m_busy_time, currentTime-m_busy_time, 100-m_hres.cpu_idle, m_host.m_busy_cpu, m_host.m_nimby_busyfree_time);
@@ -559,7 +591,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			appendLog( log);
 			setFree();
 			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-			AFCommon::QueueDBUpdateItem( this);
+			store();
 		}
 	}
 //printf("Idle: %li-%li=%li, C%u%%(<%d%%) (w%d,n%d)secs\n", currentTime, m_idle_time, currentTime-m_idle_time, 100-m_hres.cpu_idle, m_host.m_idle_cpu, m_host.m_wol_idlesleep_time, m_host.m_nimby_idlefree_time);
@@ -574,7 +606,7 @@ void RenderAf::notSolved()
 	{
 		setBusy( false);
 		m_task_start_finish_time = time( NULL);
-		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+		store();
 	}
 }
 

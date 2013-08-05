@@ -1,9 +1,8 @@
 #pragma once
 
+#include "../libafanasy/blockdata.h"
+#include "../libafanasy/taskdata.h"
 #include "../libafanasy/taskprogress.h"
-
-#include "../libafsql/dbblockdata.h"
-#include "../libafsql/dbtaskdata.h"
 
 #include "block.h"
 #include "jobaf.h"
@@ -103,12 +102,6 @@ public:
 	static void AddWOLCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name);
 	static void AddEventCommand( const std::string & i_cmd, const std::string & i_wdir, const std::string & i_user_name, const std::string & i_job_name, const std::string & i_task_name);
 
-	enum CreationFlags
-	{
-		New,
-		FromDataBase
-	};
-
 	enum BlocksEnum
 	{
 		BlockPostCmdIndex,
@@ -118,7 +111,7 @@ public:
 	};
 
 public:
-	SysJob( int m_flags);
+	SysJob( const std::string & i_folder = "");
 	virtual ~SysJob();
 
 	bool initSystem();
@@ -127,7 +120,6 @@ public:
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 	virtual void v_setZombie( RenderContainer * renders, MonitorContainer * monitoring);
-	virtual void v_dbDelete( std::list<std::string> * queries) const;
 	virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 	static void appendJobLog( const std::string & message);
@@ -148,7 +140,7 @@ private:
 };
 
 /// System job block data:
-class SysBlockData : public afsql::DBBlockData
+class SysBlockData : public af::BlockData
 {
 public:
 	SysBlockData ( int BlockNum, int JobId);
@@ -156,7 +148,7 @@ public:
 };
 
 /// System job task data:
-class SysTaskData : public afsql::DBTaskData
+class SysTaskData : public af::TaskData
 {
 public:
 	SysTaskData();

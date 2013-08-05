@@ -1,29 +1,36 @@
 #include "afnodesrv.h"
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/environment.h"
 
 #include "action.h"
 #include "afcommon.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 // Zero solve cycle variable in nodes is initial,
 // it means that node was not solved at all.
 unsigned long long AfNodeSrv::sm_solve_cycle = 1;
 
-AfNodeSrv::AfNodeSrv( af::Node * i_node):
+AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
+    m_from_store( false),
     m_solve_need(0.0),
-    /// 0 means that it was not solved at all
-    m_solve_cycle(0),
+	m_solve_cycle(0), // 0 means that it was not solved at all
     m_prev_ptr( NULL),
     m_next_ptr( NULL),
 	m_node( i_node)
 {
-//printf("AfNodeSrv::AfNodeSrv:\n");
+//	AFINFO("AfNodeSrv::AfNodeSrv:");
 //printf("this = %p\n", (void*)(this));
 //printf("m_node = %p\n", (void*)(m_node));
+	if( i_store_dir.size())
+	{
+		m_from_store = true;
+		setStoreDir( i_store_dir);
+	}
 }
 
 void AfNodeSrv::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -34,7 +41,66 @@ void AfNodeSrv::v_refresh( time_t currentTime, AfContainer * pointer, MonitorCon
 
 AfNodeSrv::~AfNodeSrv()
 {
-AFINFO("AfNodeSrv::~Node():")
+//AFINFO("AfNodeSrv::~Node():")
+}
+
+void AfNodeSrv::setStoreDir( const std::string & i_store_dir)
+{
+	m_store_dir = i_store_dir;
+	m_store_file = m_store_dir + AFGENERAL::PATH_SEPARATOR + "data.json";
+
+	if( false == isFromStore())
+		createStoreDir();
+}
+
+bool AfNodeSrv::createStoreDir() const
+{
+	AFINFA("AfNodeSrv::createStoreDir: %s", m_store_dir.c_str())
+
+	if( m_store_dir.empty())
+	{
+		AFERRAR("AfNodeSrv::createStoreDir: Store folder is not set for '%s'.", m_node->m_name.c_str())
+		return false;
+	}
+
+	// Try to remove previous (old node) folder:
+	if( af::pathIsFolder( m_store_dir))
+	{
+		if( false == af::removeDir( m_store_dir))
+		{
+			AFCommon::QueueLogError( std::string("Unable to remove old store folder:\n") + m_store_dir);
+			return false;
+		}
+	}
+
+	// Make path (all needed folders):
+	if( af::pathMakePath( m_store_dir) == false)
+	{
+		AFCommon::QueueLogError( std::string("Unable to create store folder:\n") + m_store_dir);
+		return false;
+	}
+
+	return true;
+}
+
+void AfNodeSrv::store() const
+{
+	AFINFA("AfNodeSrv::store: %s; from store: %d:", getStoreDir().c_str(), isFromStore())
+	if( m_node->getId() == 0 )
+	{
+		AFERRAR("AfNodeSrv::store(): '%s': zero ID.", m_node->getName().c_str())
+		return;
+	}
+	if( m_store_dir.empty())
+	{
+		AFERRAR("AfNodeSrv::store(): Store forder is not set for '%s'.", m_node->getName().c_str())
+		return;
+	}
+	std::ostringstream ostr;
+	m_node->v_jsonWrite( ostr, 0);
+	AFCommon::QueueFileWrite( new FileData( ostr, m_store_file));
+
+//printf("AfNodeSrv::store: END: %s; from store: %d:", getStoreDir().c_str(), isFromStore())
 }
 
 void AfNodeSrv::action( Action & i_action)

@@ -14,7 +14,7 @@ namespace af
 class Job : public Node
 {
 public:
-	Job( int Id);
+	Job( int i_id = 0);
 
 	/// Construct data from message buffer, corresponding to message type.
 	/** Used when user create a new job and send it to Afanasy.
@@ -28,7 +28,6 @@ public:
 	virtual ~Job();
 
 	bool isValid( std::string * o_err = NULL ) const;
-//	inline bool isInvalid() const { return false == isValid(); }
 
     void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 

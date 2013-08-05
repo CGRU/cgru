@@ -84,28 +84,23 @@ const std::string af::pathUp( const std::string & path)
 	return pathUp;
 }
 
-void af::pathFilterFileName( std::string & io_filename)
+const std::string af::pathFilterFileName( const std::string & i_filename)
 {
-	for( int c = 0; c < io_filename.size(); c++)
+	std::string o_filename( i_filename);
+	for( int c = 0; c < o_filename.size(); c++)
 	{
-		if(( io_filename.at(c) <= ' ' ) ||
-			( io_filename.at(c) > 'z' ))
-			io_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
+		if(( o_filename.at(c) <= ' ' ) ||
+			( o_filename.at(c) > 'z' ))
+			o_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
 
 		for( int i = 0; i < AFGENERAL::FILENAME_INVALID_CHARACTERS_LENGTH; i++)
-			if( io_filename.at(c) == AFGENERAL::FILENAME_INVALID_CHARACTERS[i] )
+			if( o_filename.at(c) == AFGENERAL::FILENAME_INVALID_CHARACTERS[i] )
 			{
-				io_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
+				o_filename.replace( c, 1, 1, AFGENERAL::FILENAME_INVALID_CHARACTER_REPLACE);
 				break;
 			}
 	}
-/*	for( int i = 0; i < AFGENERAL::FILENAME_INVALIDCHARACTERSLENGTH; i++)
-		for(;;)
-		{
-			size_t found = filename.find( AFGENERAL::FILENAME_INVALIDCHARACTERS[i]);
-			if( found == std::string::npos ) break;
-			filename.replace( found, 1, 1, AFGENERAL::FILENAME_INVALIDCHARACTERREPLACE);
-		}*/
+	return o_filename;
 }
 
 bool af::pathFileExists( const std::string & path)
@@ -319,14 +314,20 @@ bool af::removeDir( const std::string & i_folder )
 		{
 			std::string filename( file_data.cFileName);
 
-			if( filename.find(".") == 0 )
+			if(( filename == ".") || ( filename == ".."))
 				continue;
 
 			filename = i_folder + '\\' + filename;
 			if( false == af::pathFileExists( filename))
 				continue;
 
-			if( DeleteFile( filename.c_str()) == FALSE)
+			Attributes = GetFileAttributes( filename.c_str());
+			if( Attributes & FILE_ATTRIBUTE_DIRECTORY )
+			{
+				if( false == af::removeDir( filename))
+					return false;
+			}
+			else if( DeleteFile( filename.c_str()) == FALSE)
 			{
 				 AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename.c_str())
 				 return false;
@@ -361,12 +362,22 @@ bool af::removeDir( const std::string & i_folder )
 	// Removing all files in folder
 	while( de = readdir(dir))
 	{
-		if( de->d_name[0] == '.' ) continue;
-		static char filename_buffer[4096];
-		sprintf( filename_buffer, "%s/%s", i_folder.c_str(), de->d_name);
-		if( unlink( filename_buffer) != 0)
+		std::string filename( de->d_name);
+		if(( filename == ".") || ( filename == ".."))
+			continue;
+
+		filename = i_folder + '/' + filename;
+		if( false == af::pathFileExists( filename))
+			continue;
+
+		if( de->d_type == DT_DIR )
 		{
-			AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename_buffer)
+			if( false == af::removeDir( filename))
+				return false;
+		}
+		else if( unlink( filename.c_str()) != 0)
+		{
+			AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename.c_str())
 			return false;
 		}
 	}

@@ -18,13 +18,13 @@ public:
     ~UserContainer();
 
     /// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
-    UserAf* addUser( const std::string & username, const std::string & hostname, MonitorContainer * monitoring);
+	UserAf* addUser( const std::string & i_username, const std::string & i_hostname, MonitorContainer * i_monitoring);
 
     /// Add user, called on start with user created from batadase
-    int addUser( UserAf * user);
+	int addUser( UserAf * i_user);
 
     /// Add user, used to create from JSON data
-    af::Msg * addUser( UserAf * user, MonitorContainer * monitoring);
+	af::Msg * addUser( UserAf * i_user, MonitorContainer * i_monitoring);
 
     /// Generate MCJobs message for user with \c id , return NULL if no such \c id exists.
     af::Msg* generateJobsList( int id);

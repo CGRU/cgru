@@ -24,8 +24,7 @@ bool CmdPath::v_processArguments( int argc, char** argv, af::Msg &msg)
 	}
 	else if( operation == "fname")
 	{
-		af::pathFilterFileName( path);
-		std::cout << path << std::endl;
+		std::cout << af::pathFilterFileName( path) << std::endl;
 	}
 	else if( operation == "fpath")
 	{

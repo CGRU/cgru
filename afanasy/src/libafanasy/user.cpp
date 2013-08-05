@@ -16,14 +16,14 @@ using namespace af;
 User::User( const std::string & username, const std::string & host):
 	m_host_name( host)
 {
-	construct();
+	initDefaultValues();
 	m_name = username;
 }
 
-User::User( int uid)
+User::User( int i_id)
 {
-	construct();
-	m_id = uid;
+	initDefaultValues();
+	m_id = i_id;
 }
 
 User::User( Msg * msg)
@@ -31,7 +31,7 @@ User::User( Msg * msg)
 	read( msg);
 }
 
-void User::construct()
+void User::initDefaultValues()
 {
 	m_priority              = af::Environment::getPriority();
 	m_max_running_tasks     = af::Environment::getMaxRunningTasksNumber();
@@ -45,7 +45,6 @@ void User::construct()
 	m_jobs_num          = 0;
 	m_running_jobs_num  = 0;
 	m_running_tasks_num = 0;
-	m_time_online       = 0;
 
 	m_hosts_mask.setCaseInsensitive();
 	m_hosts_mask_exclude.setCaseInsensitive();
@@ -63,38 +62,35 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
-	o_str << ",\"time_register\":" << m_time_register;
-	o_str << ",\"time_online\":" << m_time_online;
-	o_str << ",\"errors_retries\":" << int(m_errors_retries);
-	o_str << ",\"errors_avoid_host\":" << int(m_errors_avoid_host);
-	o_str << ",\"errors_task_same_host\":" << int(m_errors_task_same_host);
-	o_str << ",\"errors_forgive_time\":" << m_errors_forgive_time;
+	o_str << ",\n\"time_register\":" << m_time_register;
+	o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
+	o_str << ",\n\"errors_avoid_host\":" << int(m_errors_avoid_host);
+	o_str << ",\n\"errors_task_same_host\":" << int(m_errors_task_same_host);
+	o_str << ",\n\"errors_forgive_time\":" << m_errors_forgive_time;
 
-	if( false == isPermanent() )
-		o_str << ",\"permanent\":false";
 	if( solveJobsParallel() )
-		o_str << ",\"solve_parallel\":true";
+		o_str << ",\n\"solve_parallel\":true";
 
 	if( m_max_running_tasks != -1 )
-		o_str << ",\"max_running_tasks\":" << m_max_running_tasks;
+		o_str << ",\n\"max_running_tasks\":" << m_max_running_tasks;
 	if( m_jobs_life_time > 0 )
-		o_str << ",\"jobs_life_time\":" << m_jobs_life_time;
+		o_str << ",\n\"jobs_life_time\":" << m_jobs_life_time;
 
 	if( m_host_name.size())
-		o_str << ",\"host_name\":\"" << m_host_name << "\"";
+		o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
 	if( hasHostsMask())
-		o_str << ",\"hosts_mask\":\""  << af::strEscape( m_hosts_mask.getPattern() ) << "\"";
+		o_str << ",\n\"hosts_mask\":\""  << af::strEscape( m_hosts_mask.getPattern() ) << "\"";
 	if( hasHostsMaskExclude())
-		o_str << ",\"hosts_mask_exclude\":\""  << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
+		o_str << ",\n\"hosts_mask_exclude\":\""  << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 
 	if( m_jobs_num > 0 )
-		o_str << ",\"jobs_num\":" << m_jobs_num;
+		o_str << ",\n\"jobs_num\":" << m_jobs_num;
 	if( m_running_jobs_num > 0 )
-		o_str << ",\"running_jobs_num\":" << m_running_jobs_num;
+		o_str << ",\n\"running_jobs_num\":" << m_running_jobs_num;
 	if( m_running_tasks_num > 0 )
-		o_str << ",\"running_tasks_num\":" << m_running_tasks_num;
+		o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
 
-	o_str << "}";
+	o_str << "\n}";
 }
 
 void User::jsonRead( const JSON &i_object, std::string * io_changes)
@@ -121,11 +117,6 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 	else
 		setJobsSolveMethod( af::Node::SolveByOrder);
 
-	bool permanent = true;
-	jr_bool("permanent", permanent, i_object, io_changes);
-	if( permanent != isPermanent())
-		setPermanent( permanent);
-
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
@@ -147,7 +138,7 @@ void User::v_readwrite( Msg * msg)
 	rw_uint8_t ( m_errors_avoid_host,     msg);
 	rw_uint8_t ( m_errors_task_same_host, msg);
 	rw_int32_t ( m_errors_forgive_time,   msg);
-	rw_int64_t ( m_time_online,           msg);
+rw_int64_t ( m_time_register,           msg); /// NEW VERSION
 	rw_int32_t ( m_jobs_life_time,        msg);
 	rw_int32_t ( m_jobs_num,              msg);
 	rw_int32_t ( m_running_jobs_num,      msg);
@@ -156,17 +147,6 @@ void User::v_readwrite( Msg * msg)
 	rw_RegExp  ( m_hosts_mask_exclude,    msg);
 	rw_String  ( m_annotation,            msg);
 	rw_String  ( m_custom_data,           msg);
-}
-
-void User::setPermanent( bool value)
-{
-   if( value )
-   {
-      m_state = m_state | Permanent;
-      m_time_register = time( NULL);
-   }
-   else
-      m_state = m_state & (~Permanent);
 }
 
 void User::setJobsSolveMethod( int i_method )
@@ -232,13 +212,7 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
       if( m_errors_forgive_time == 0 ) stream << " (infinite, no forgiving)";
 
       if( m_host_name.size() != 0) stream << "\n Last host = \"" << m_host_name << "\"";
-      if( isPermanent())
-      {
-         stream << "\n User is permanent (stored in database)";
-         stream << "\n Registration time = " << time2str( m_time_register);
-      }
-      else stream << "\n (user is temporal)";
-      stream << "\n Online time = " << time2str( m_time_online);
+		stream << "\n Registration time = " << time2str( m_time_register);
       if( m_annotation.size()) stream << "\n" << m_annotation;
       if( m_custom_data.size()) stream << "\nCustom Data:\n" << m_custom_data;
       //stream << "\n Memory = " << calcWeight() << " bytes.";
@@ -249,9 +223,7 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
             << " " << m_name
             << " j" << m_jobs_num << "/" << m_running_jobs_num
             << " r" << m_running_tasks_num << "/" << m_max_running_tasks
-            << " " << time2str( m_time_online)
             << " " <<  m_host_name
-            << " " << (isPermanent() == 1 ? "P" : "T")
             << " - " << v_calcWeight() << " bytes.";
    }
 }

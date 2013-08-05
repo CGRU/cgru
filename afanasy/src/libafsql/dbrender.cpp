@@ -13,7 +13,7 @@ const std::string DBRender::Keys("PRIMARY KEY( id)");
 const int         DBRender::KeysNum = 1;
 
 DBRender::DBRender( int Id):
-   af::Render( Id)
+   af::Render()
 {
    addDBAttributes();
 }

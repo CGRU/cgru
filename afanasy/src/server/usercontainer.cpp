@@ -31,25 +31,25 @@ UserContainer::~UserContainer()
 AFINFO("UserContainer::~UserContainer:\n");
 }
 
-UserAf* UserContainer::addUser( const std::string & username, const std::string & hostname, MonitorContainer * monitoring)
+UserAf* UserContainer::addUser( const std::string & i_usernmae, const std::string & i_hostname, MonitorContainer * i_monitoring)
 {
 	{
 		UserContainerIt usersIt( this);
 		for(UserAf *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
 		{
-			if( username == user->getName())
+			if( i_usernmae == user->getName())
 			{
-				if( user->getHostName() != hostname)
+				if( user->getHostName() != i_hostname)
 				{
-					user->setHostName( hostname);
-					if( monitoring) monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+					user->setHostName( i_hostname);
+					if( i_monitoring) i_monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
 				}
 				return user;
 			}
 		}
 	}
 
-	UserAf *user = new UserAf( username, hostname);
+	UserAf *user = new UserAf( i_usernmae, i_hostname);
 	if( addUser(user) == 0)
 	{
 		AFERROR("UserContainer::addUser: Can't add user to container.\n");
@@ -57,7 +57,7 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
 		return NULL;
 	}
 
-	if( monitoring) monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
+	if( i_monitoring) i_monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
 
 	AFCommon::QueueLog("New job user registered: " + user->v_generateInfoString( false));
 	return user;
@@ -74,16 +74,20 @@ UserAf * UserContainer::getUser( const std::string & i_name )
 	 return NULL;
 }
 
-int UserContainer::addUser( UserAf * user)
+int UserContainer::addUser( UserAf * i_user)
 {
 	// Add node to container:
-	int newId = add(user);
+	if( false == add( i_user))
+		return 0;
 
-	// On success add user to solving list:
-	if( newId > 0 )
-		m_userslist.add( user);
+	// Add user to solving list:
+	m_userslist.add( i_user);
 
-	return newId;
+	// Initialize user:
+	if( false == i_user->initialize())
+		return 0;
+
+	return i_user->getId();
 }
 
 af::Msg * UserContainer::addUser( UserAf * i_user, MonitorContainer * i_monitoring)
@@ -96,12 +100,6 @@ af::Msg * UserContainer::addUser( UserAf * i_user, MonitorContainer * i_monitori
 			AFERRAR("UserContainer::addUser: User \"%s\" already exists.", i_user->getName().c_str());
 			delete i_user;
 			std::ostringstream str;
-//			str << "{\"error\":{";
-//			str << "\n\"status\":\"exists\"";
-//			str << ",\n\"message\":\"User '" << user->getName() << "' already exists.\"";
-//			str << ",\n\"user\":\n";
-//			user->v_jsonWrite( str, /*type no matter*/ 0);
-//			str << "\n}}";
 			str << "{\"error\":\"exists\"";
 			str << ",\n\"user\":\n";
 			user->v_jsonWrite( str, /*type no matter*/ 0);
@@ -117,8 +115,8 @@ af::Msg * UserContainer::addUser( UserAf * i_user, MonitorContainer * i_monitori
 		return af::jsonMsgError("Unable to add node to container.");
 	}
 
-	i_user->setPermanent( true);
-	AFCommon::QueueDBAddItem( i_user);
+//AFCommon::QueueDBAddItem( i_user);
+	i_user->store();
 	if( i_monitoring) i_monitoring->addEvent( af::Msg::TMonitorUsersAdd, i_user->getId());
 
 	AFCommon::QueueLog("User registered: " + i_user->v_generateInfoString( false));

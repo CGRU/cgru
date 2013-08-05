@@ -3,10 +3,8 @@
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/jobprogress.h"
 
-#include "../libafsql/dbjobprogress.h"
-
-#include "afcommon.h"
 #include "afcommon.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
@@ -453,12 +451,13 @@ SysBlock * SysJob::ms_block_cmdpost = NULL;
 SysBlock * SysJob::ms_block_wol     = NULL;
 SysBlock * SysJob::ms_block_events  = NULL;
 
-SysJob::SysJob( int flags):
-	JobAf( AFJOB::SYSJOB_ID)
+SysJob::SysJob( const std::string & i_folder):
+	JobAf( i_folder)
 {
+	m_id == AFJOB::SYSJOB_ID;
 	ms_sysjob = this;
 
-	if( flags != New ) return;
+	if( isFromStore()) return;
 
 	m_name              = AFJOB::SYSJOB_NAME;
 	m_user_name         = AFJOB::SYSJOB_USERNAME;
@@ -471,21 +470,15 @@ SysJob::SysJob( int flags):
 	m_blocks_data[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     m_id);
 	m_blocks_data[BlockEventsIndex ] = new SysBlockData_Events(  BlockEventsIndex,  m_id);
 
-	progress = new afsql::DBJobProgress( this);
+	progress = new af::JobProgress( this);
 
 	construct();
-	m_from_store = false;
 
 	printf("System job constructed.\n");
 }
 
 SysJob::~SysJob()
 {
-}
-
-void SysJob::v_dbDelete( std::list<std::string> * queries) const
-{
-	AFCommon::QueueLogError("Trying to delete system job from database.");
 }
 
 void SysJob::v_setZombie( RenderContainer * renders, MonitorContainer * monitoring)
@@ -607,7 +600,7 @@ bool SysJob::initSystem()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SysBlockData::SysBlockData( int BlockNum, int JobId):
-	afsql::DBBlockData( BlockNum, JobId)
+	af::BlockData( BlockNum, JobId)
 {
 //   initDefaults();
 AFINFA("DBBlockData::DBBlockData: JobId=%d, BlockNum=%d", m_job_id, m_block_num)
@@ -634,7 +627,7 @@ SysBlockData::~SysBlockData()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SysTaskData::SysTaskData():
-	afsql::DBTaskData()
+	af::TaskData()
 {
 	m_name = "Dummy task. See all tasks logs here.";
 }

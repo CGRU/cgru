@@ -63,10 +63,10 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
       int id = addClient( newRender);
       if( id != 0 )
       {
-         newRender->getFarmHost();
+			newRender->initialize();
          if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersAdd, id);
          AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
-         if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
+//if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
       }
       // Return new render ID to render to tell that it was successfully registered:
       return new af::Msg( af::Msg::TRenderId, id);
@@ -76,7 +76,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
    if( addClient( newRender))
    {
       std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
-      newRender->getFarmHost();
+		newRender->initialize();
    }
 
    return NULL;

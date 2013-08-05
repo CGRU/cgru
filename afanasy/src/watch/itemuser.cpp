@@ -31,7 +31,6 @@ void ItemUser::updateValues( af::Node *node, int type)
 {
    af::User * user = (af::User*)node;
 
-   permanent = user->isPermanent();
    if( numrunningtasks ) setRunning();
    else        setNotRunning();
 
@@ -53,7 +52,6 @@ void ItemUser::updateValues( af::Node *node, int type)
    else                  setNotRunning();
 
    strLeftTop = QString("%1-%2").arg(name).arg( priority);
-   if( false == permanent ) strLeftTop = QString("(%1)").arg( strLeftTop);
    if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
 
    strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
@@ -99,8 +97,7 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
    int height_user = HeightUser-4;
 
    painter->setPen( clrTextMain( option) );
-   if( permanent) painter->setFont( afqt::QEnvironment::f_name);
-   else           painter->setFont( afqt::QEnvironment::f_info);
+   painter->setFont( afqt::QEnvironment::f_name);
    painter->drawText( x, y, w, h, Qt::AlignLeft | Qt::AlignTop,     strLeftTop);
 
    painter->setPen( clrTextInfo( option) );

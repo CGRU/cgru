@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/dlThread.h"
 #include "../libafanasy/msgqueue.h"
@@ -102,19 +104,8 @@ int main(int argc, char *argv[])
 	if( pthread_sigmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
 #endif
 
-	// Create a separate store connection to register jobs.
-	//  ( Job registration is can be long on heavy jobs.
-	//    Server should use another connection for it not to stop
-	//    store update on heavy job registration.
-	//    WARINING!
-	//    Server new jobs accept speed = store jobs fill-in speed!
-	//    It is near 1000 tasks per second on common systems where
-	//    PostgreSQL and Afanasy server are on the same host. )
-	// Also use it now to restore all containers state from store.
-	afsql::DBConnection afDB_JobRegister("AFDB_JobRegister");
-
 	// containers initialization
-	JobContainer jobs( &afDB_JobRegister);
+	JobContainer jobs;
 	if( false == jobs.isInitialized()) return 1;
 	JobAf::setJobContainer( &jobs);
 
@@ -140,63 +131,85 @@ int main(int argc, char *argv[])
 	if( false == msgQueue.isInitialized()) 
 	  return 1;
 
-	bool hasSystemJob = false;
-//
-// Open store to get nodes:
-//
-//	afDB_JobRegister.DBOpen();
-//	if( afDB_JobRegister.isOpen())
-//	{
-		// Update store tables:
-//		afsql::UpdateTables( &afDB_JobRegister);
-/*
+	// Thread aruguments.
+	ThreadArgs threadArgs;
+	threadArgs.jobs      = &jobs;
+	threadArgs.renders   = &renders;
+	threadArgs.users     = &users;
+	threadArgs.talks     = &talks;
+	threadArgs.monitors  = &monitors;
+	threadArgs.msgQueue  = &msgQueue;
+
+	/*
+	  Creating the afcommon object will actually create many message queues
+	  that will spawn threads. Have a look in the implementation of AfCommon.
+	*/
+	AFCommon afcommon( &threadArgs );
+
+	// Update SQL tables:
+	afsql::DBConnection afdb_upTables("AFDB_upTables");
+	afdb_upTables.DBOpen();
+	if( afdb_upTables.isOpen())
+	{
+		afsql::UpdateTables( &afdb_upTables);
+		afdb_upTables.DBClose();
+	}
+
 	//
 	// Get Renders from store:
 	//
-	printf("Getting renders from store...\n");
-	std::list<int> rids = afDB_JobRegister.getIntegers( afsql::DBRender::dbGetIDsCmd());
-	printf("%d renders founded.\n", (int)rids.size());
-	for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
 	{
-		RenderAf * render = new RenderAf( *it);
-		if( afDB_JobRegister.getItem( render))
-			renders.addRender( render);
-		else delete render;
+	printf("Getting renders from store...\n");
+
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getRendersDir());
+	printf("%d renders founded.\n", (int)folders.size());
+
+	for( int i = 0; i < folders.size(); i++)
+	{
+		RenderAf * render = new RenderAf( folders[i]);
+		renders.addRender( render);
 	}
 	printf("%d renders registered.\n", renders.getCount());
+	}
 
 	//
 	// Get Users from store:
 	//
-	printf("Getting users from store...\n");
-	std::list<int> uids = afDB_JobRegister.getIntegers( afsql::DBUser::dbGetIDsCmd());
-	printf("%d users founded.\n", (int)uids.size());
-	for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
 	{
-		UserAf * user = new UserAf( *it);
-		if( afDB_JobRegister.getItem( user)) users.addUser( user);
-		else delete user;
+	printf("Getting users from store...\n");
+
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getUsersDir());
+	printf("%d users founded.\n", (int)folders.size());
+
+	for( int i = 0; i < folders.size(); i++)
+	{
+		UserAf * user = new UserAf( folders[i]);
+		if( users.addUser( user) == 0 )
+			delete user;
 	}
-	printf("%d permanent users registered.\n", users.getCount());
-*/
+	printf("%d users registered from store.\n", users.getCount());
+	}
 	//
 	// Get Jobs from store:
 	//
+	bool hasSystemJob = false;
+	{
 	printf("Getting jobs from store...\n");
 
-	std::vector<int> jids = JobContainer::getStoredIds();
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getJobsDir());
+	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getJobsDir(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
 
-	printf("%d jobs founded.\n", (int)jids.size());
-	for( int i = 0; i < jids.size(); i++)
+	printf("%d jobs founded.\n", (int)folders.size());
+	for( int i = 0; i < folders.size(); i++)
 	{
 		JobAf * job = NULL;
-		if( jids[i] == AFJOB::SYSJOB_ID )
-			job = new SysJob( SysJob::FromDataBase);
+		if( folders[i] == sysjob_folder)
+			job = new SysJob( folders[i]);
 		else
-			job = new JobAf( jids[i]);
-		if( job->readStore())
+			job = new JobAf( folders[i]);
+		if( job->isValidConstructed())
 		{
-			if( jids[i] == AFJOB::SYSJOB_ID )
+			if( job->getId() == AFJOB::SYSJOB_ID )
 			{
 				SysJob * sysjob = (SysJob*)job;
 				if( sysjob->initSystem() )
@@ -214,13 +227,8 @@ int main(int argc, char *argv[])
 			jobs.job_register( job, &users, NULL);
 		}
 	}
-	printf("%d jobs registered.\n", jobs.getCount());
-
-		//
-		// Close store:
-		//
-//		afDB_JobRegister.DBClose();
-//	}
+	printf("%d jobs registered from store.\n", jobs.getCount());
+	}
 
 	// Disable new commands and editing:
 	if( af::Environment::hasArgument("-demo"))
@@ -233,24 +241,9 @@ int main(int argc, char *argv[])
 // Create system maintenance job if it was not in store:
 	if( hasSystemJob == false )
 	{
-		SysJob* job = new SysJob( SysJob::New);
+		SysJob* job = new SysJob();
 		jobs.job_register( job, &users, NULL);
 	}
-
-	// Thread aruguments.
-	ThreadArgs threadArgs;
-	threadArgs.jobs      = &jobs;
-	threadArgs.renders   = &renders;
-	threadArgs.users     = &users;
-	threadArgs.talks     = &talks;
-	threadArgs.monitors  = &monitors;
-	threadArgs.msgQueue  = &msgQueue;
-
-	/*
-	  Creating the afcommon object will actually create many message queues
-	  that will spawn threads. Have a look in the implementation of AfCommon.
-	*/
-	AFCommon afcommon( &threadArgs );
 
 	/*
 	  Start the thread that is responsible of listening to the port

@@ -14,8 +14,8 @@ public:
 /// Construct render, getting values from environment.
    Render( uint32_t State, uint8_t Priority);
 
-/// Construct offline render with provided values from database.
-   Render( int Id);
+	/// Construct offline from store.
+	Render();
 
 /// Read Render data from message.
    Render( Msg * msg);
@@ -96,7 +96,7 @@ public:
 
    virtual void v_jsonWrite( std::ostringstream & o_str, int type) const;
 
-   void jsonRead( const JSON & i_object, std::string * io_changes);
+	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 
 	// Needed for GUI only:
 	std::vector<int32_t> m_tasks_percents;

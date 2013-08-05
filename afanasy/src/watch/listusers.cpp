@@ -139,14 +139,8 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 		menu.addSeparator();
 
-		menu.addSeparator();
-		action = new QAction( "Set Permanent", this);
-		action->setEnabled( false == useritem->isPermanent());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actAdd() ));
-		menu.addAction( action);
-
-		action = new QAction( "Delete From Database", this);
-		action->setEnabled( useritem->isPermanent());
+		action = new QAction( "Delete", this);
+		action->setEnabled( useritem->numjobs);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
 		menu.addAction( action);
 	}
