@@ -59,12 +59,17 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	if( false == m_address.isEmpty())
 	{
-		o_str << ",\n";
+		o_str << ",\n\"address\":";
 		m_address.jsonWrite( o_str);
 	}
 
 	if( m_version.size())
 		o_str << ",\n\"version\":\"" << m_version << "\"";
+}
+
+void Client::jsonRead( const JSON & i_object)
+{
+	m_address.jsonRead( i_object["address"]);
 }
 
 void Client::clearNetIFs()

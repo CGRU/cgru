@@ -153,6 +153,8 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	Node::jsonRead( i_object);
 
 	jr_uint32("st",        m_state,         i_object);
+
+	Client::jsonRead( i_object);
 }
 
 void Render::v_readwrite( Msg * msg)
