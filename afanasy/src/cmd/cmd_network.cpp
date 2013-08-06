@@ -40,22 +40,6 @@ bool CmdNetwork::v_processArguments( int argc, char** argv, af::Msg &msg)
 		std::string addr( argv[1]);
 		af::netIsIpAddr( addr, true);
 	}
-	else if( operation == "pm")
-	{
-		if( argc < 2 )
-		{
-			printf("Specify a mac address string to parse.\n");
-			return false;
-		}
-		std::vector<af::NetIF*> netIFs;
-		af::NetIF::getNetIFs( argv[1], netIFs);
-		std::cout << "Network Interfaces:" << std::endl;
-		for( int i = 0; i < netIFs.size(); i++)
-		{
-			std::cout << "   ";
-			netIFs[i]->v_stdOut(true);
-		}
-	}
 	else if( operation == "pa")
 	{
 		if( argc < 2 )

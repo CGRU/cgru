@@ -66,7 +66,7 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-	inline const std::list<std::string> & getTasksLog() { return tasksloglist; }  ///< Get tasks log list.
+	inline const std::list<std::string> & getTasksLog() { return m_tasks_log; }  ///< Get tasks log list.
 	const std::string getServicesString() const;							 ///< Get services information.
 	void jsonWriteServices( std::ostringstream & o_str) const; ///< Get services information.
 
@@ -96,20 +96,6 @@ public:
 	static void closeLostTask( const af::MCTaskUp &taskup);
 
 private:
-	std::string hostname;
-	std::string hostdescription;
-
-	std::vector<int> servicescounts;
-	int servicesnum;
-
-	std::vector<int> disabledservices;
-
-	std::list<std::string> tasksloglist;							///< Tasks Log.
-
-	std::string ipaddresses;
-	std::string macaddresses;
-
-private:
 	void initDefaultValues();
 
 	void addTask( af::TaskExec * taskexec);
@@ -136,5 +122,17 @@ private:
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
+	std::string m_farm_host_name;
+	std::string m_farm_host_description;
+
+	std::vector<int> m_services_counts;
+	int m_services_num;
+
+	std::vector<int> disabledservices;
+
+	std::list<std::string> m_tasks_log;							///< Tasks Log.
+
+private:
 	static RenderContainer * ms_renders;
+
 };

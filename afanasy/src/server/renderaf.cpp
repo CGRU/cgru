@@ -48,16 +48,13 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 	// This render came from store on server start, it can't be online or busy
 	setOffline();
 	setBusy( false);
-
-//	af::NetIF::getNetIFs( macaddresses, m_netIFs);
-//	m_address = af::Address( ipaddresses);
 }
 
 void RenderAf::initDefaultValues()
 {
-	hostname = "no farm host";
-	hostdescription = "";
-	servicesnum = 0;
+	m_farm_host_name = "no farm host";
+	m_farm_host_description = "";
+	m_services_num = 0;
 	if( m_host.m_capacity == 0 ) m_host.m_capacity = af::Environment::getRenderDefaultCapacity();
 	if( m_host.m_max_tasks == 0 ) m_host.m_max_tasks = af::Environment::getRenderDefaultMaxTasks();
 	setBusy( false);
@@ -121,7 +118,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 		AFCommon::QueueLog("Render Deleting: " + v_generateInfoString( false));
 		appendLog("Waiting for deletion.");
 		v_setZombie();
-		AFCommon::saveLog( getLog(), af::Environment::getRendersDir(), m_name);
+//		AFCommon::saveLog( getLog(), af::Environment::getRendersDir(), m_name);
 		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, m_id);
 	}
 	else
@@ -618,8 +615,8 @@ void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block,
 
 void RenderAf::appendTasksLog( const std::string & message)
 {
-	while( tasksloglist.size() > af::Environment::getAfNodeLogLinesMax() ) tasksloglist.pop_front();
-	tasksloglist.push_back( af::time2str() + " : " + message);
+	while( m_tasks_log.size() > af::Environment::getAfNodeLogLinesMax() ) m_tasks_log.pop_front();
+	m_tasks_log.push_back( af::time2str() + " : " + message);
 }
 
 bool RenderAf::getFarmHost( af::Host * newHost)
@@ -627,41 +624,41 @@ bool RenderAf::getFarmHost( af::Host * newHost)
 	// Store old services usage:
 	std::list<int> servicescounts_old;
 	std::list<std::string> servicesnames_old;
-	for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
 	{
-		servicescounts_old.push_back( servicescounts[i]);
+		servicescounts_old.push_back( m_services_counts[i]);
 		servicesnames_old.push_back( m_host.getServiceName(i));
 	}
-	int servicesnum_old = servicesnum;
+	int servicesnum_old = m_services_num;
 
 	// Clear services and services usage:
 	m_host.clearServices();
-	servicescounts.clear();
-	servicesnum = 0;
+	m_services_counts.clear();
+	m_services_num = 0;
 
 	// When render becames online it refresh hardware information:
 	if( newHost ) m_host.copy( *newHost);
 
 	// Get farm services setttings:
-	if( af::farm()->getHost( m_name, m_host, hostname, hostdescription ) == false)
+	if( af::farm()->getHost( m_name, m_host, m_farm_host_name, m_farm_host_description ) == false)
 	{
-		hostname = "no farm host";
-		hostdescription = "";
+		m_farm_host_name = "no farm host";
+		m_farm_host_description = "";
 		return false;
 	}
 
 	// Check dirty - check if capacity was overriden and now is equal to the new value
 	checkDirty();
 
-	servicesnum = m_host.getServicesNum();
-	servicescounts.resize( servicesnum, 0);
+	m_services_num = m_host.getServicesNum();
+	m_services_counts.resize( m_services_num, 0);
 
 	std::list<std::string>::const_iterator osnIt = servicesnames_old.begin();
 	std::list<int>::const_iterator oscIt = servicescounts_old.begin();
 	for( int o = 0; o < servicesnum_old; o++, osnIt++, oscIt++)
-		for( int i = 0; i < servicesnum; i++)
+		for( int i = 0; i < m_services_num; i++)
 			if( *osnIt == m_host.getServiceName(i))
-				servicescounts[i] = *oscIt;
+				m_services_counts[i] = *oscIt;
 
 	disableServices();
 
@@ -672,12 +669,12 @@ void RenderAf::disableServices()
 {
 //printf("RenderAf::disabledservices: %s\n", m_services_disabled.c_str());
 	disabledservices.clear();
-	disabledservices.resize( servicesnum, 0);
+	disabledservices.resize( m_services_num, 0);
 	if( false == m_services_disabled.empty())
 	{
 		std::vector<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
 		for( int i = 0; i < dissrvlist.size(); i++)
-			for( int j = 0; j < servicesnum; j++)
+			for( int j = 0; j < m_services_num; j++)
 				if( dissrvlist[i] == m_host.getServiceName(j))
 					disabledservices[j] = 1;
 	}
@@ -709,18 +706,18 @@ void RenderAf::setService( const std::string & srvname, bool enable)
 
 const std::string RenderAf::getServicesString() const
 {
-	if( servicesnum == 0) return "No services.";
+	if( m_services_num == 0) return "No services.";
 
 	std::string str = "Services:";
-	for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
 	{
 		str += "\n	";
 		str += m_host.getServiceName(i);
 		if( disabledservices[i] ) str += " (DISABLED)";
-		if(( servicescounts[i] > 0) || ( m_host.getServiceCount(i) > 0))
+		if(( m_services_counts[i] > 0) || ( m_host.getServiceCount(i) > 0))
 		{
 			str += ": ";
-			if( servicescounts[i] > 0) str += af::itos( servicescounts[i]);
+			if( m_services_counts[i] > 0) str += af::itos( m_services_counts[i]);
 			if( m_host.getServiceCount(i) > 0) str += " / max=" + af::itos( m_host.getServiceCount(i));
 		}
 	}
@@ -736,10 +733,10 @@ void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
 {
 	o_str << "\"services\":{";
 
-	for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
 	{
 		if( i > 0 ) o_str << ",";
-		o_str << "\"" << m_host.getServiceName(i) << "\":[" << int( servicescounts[i]);
+		o_str << "\"" << m_host.getServiceName(i) << "\":[" << int( m_services_counts[i]);
 		if( m_host.getServiceCount(i) > 0)
 			o_str << ",\"max\"," << int( m_host.getServiceCount(i));
 		if( disabledservices[i] ) o_str << ",false";
@@ -757,14 +754,14 @@ bool RenderAf::canRunService( const std::string & type) const
 {
 	if( false == af::farm()->serviceLimitCheck( type, m_name)) return false;
 
-	for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
 	{
 		if( m_host.getServiceName(i) == type)
 		{
 			if( disabledservices[i]) return false;
 			if( m_host.getServiceCount(i) > 0)
 			{
-				return servicescounts[i] < m_host.getServiceCount(i);
+				return m_services_counts[i] < m_host.getServiceCount(i);
 			}
 			return true;
 		}
@@ -776,14 +773,14 @@ void RenderAf::addService( const std::string & type)
 {
 	af::farm()->serviceLimitAdd( type, m_name);
 
-	for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
 	{
 		if( m_host.getServiceName(i) == type)
 		{
-			servicescounts[i]++;
-			if((m_host.getServiceCount(i) > 0 ) && (servicescounts[i] > m_host.getServiceCount(i)))
-				AFERRAR("RenderAf::addService: servicescounts > host.getServiceCount for '%s' (%d>=%d)",
-						  type.c_str(), servicescounts[i], m_host.getServiceCount(i))
+			m_services_counts[i]++;
+			if((m_host.getServiceCount(i) > 0 ) && (m_services_counts[i] > m_host.getServiceCount(i)))
+				AFERRAR("RenderAf::addService: m_services_counts > host.getServiceCount for '%s' (%d>=%d)",
+						  type.c_str(), m_services_counts[i], m_host.getServiceCount(i))
 			return;
 		}
 	}
@@ -793,16 +790,16 @@ void RenderAf::remService( const std::string & type)
 {
 	af::farm()->serviceLimitRelease( type, m_name);
 
-	for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
 	{
 		if( m_host.getServiceName(i) == type)
 		{
-			if( servicescounts[i] < 1)
+			if( m_services_counts[i] < 1)
 			{
-				AFERRAR("RenderAf::remService: servicescounts < 1 for '%s' (=%d)", type.c_str(), servicescounts[i])
+				AFERRAR("RenderAf::remService: m_services_counts < 1 for '%s' (=%d)", type.c_str(), m_services_counts[i])
 			}
 			else
-				servicescounts[i]--;
+				m_services_counts[i]--;
 			return;
 		}
 	}

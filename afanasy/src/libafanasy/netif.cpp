@@ -52,35 +52,60 @@ using namespace af;
 
 NetIF::NetIF( const char * Name, const unsigned char * MacAddr, const std::vector<Address> ifAddresses)
 {
-   name = Name;
-   memcpy( macaddr, MacAddr, MacAddrLen);
-   addresses = ifAddresses;
+	m_name = Name;
+	memcpy( macaddr, MacAddr, MacAddrLen);
+	addresses = ifAddresses;
 }
 
 NetIF::NetIF( Msg * msg)
 {
-   read( msg);
+	read( msg);
 }
 
-NetIF::NetIF( const std::string & str)
+NetIF::NetIF( const JSON & i_object)
 {
-   memset( macaddr, 0, MacAddrLen);
-   if( str.empty()) return;
+	memset( macaddr, 0, MacAddrLen);
 
-   unsigned int num[MacAddrLen];
-   int fields = sscanf( str.c_str(), "%x:%x:%x:%x:%x:%x", &(num[0]),&(num[1]),&(num[2]),&(num[3]),&(num[4]),&(num[5]));
+	if( false == i_object.IsObject())
+	{
+		AFERROR("NetIF::NetIF: Not a JSON object.")
+		return;
+	}
 
-   bool valid = true;
-   for( int i = 0; i < MacAddrLen; i++)
-      if( num[i] > 0xff )
-         valid = false;
+	std::string mac;
+	jr_string("mac", mac, i_object);
+	if( mac.empty()) return;
 
-   if( valid && ( fields == MacAddrLen ))
-   {
-      for( int i = 0; i < MacAddrLen; i++) macaddr[i] = (unsigned char)(num[i]);
-      return;
-   }
-   AFERRAR("String \"%s\" is not a mac address.", str.c_str())
+	jr_string("name", m_name, i_object);
+
+	unsigned int num[MacAddrLen];
+	int fields = sscanf( mac.c_str(), "%x:%x:%x:%x:%x:%x", &(num[0]),&(num[1]),&(num[2]),&(num[3]),&(num[4]),&(num[5]));
+
+	bool valid = true;
+	for( int i = 0; i < MacAddrLen; i++)
+		if( num[i] > 0xff )
+			valid = false;
+
+	if(( valid == false ) || ( fields != MacAddrLen ))
+	{
+		AFERRAR("NetIF::NetIF: String \"%s\" is not a mac address.", mac.c_str())
+		return;
+	}
+
+	for( int i = 0; i < MacAddrLen; i++) macaddr[i] = (unsigned char)(num[i]);
+
+	const JSON & addr_array = i_object["addresses"];
+	if( false == addr_array.IsArray()) return;
+
+	addresses.clear();
+
+	for( int i = 0; i < addr_array.Size(); i++)
+	{
+		Address addr;
+		addr.jsonRead( addr_array[i]);
+		if( false == addr.isEmpty())
+			addresses.push_back( addr);
+	}
 }
 
 NetIF::~NetIF()
@@ -89,7 +114,7 @@ NetIF::~NetIF()
 
 void NetIF::v_readwrite( Msg * msg)
 {
-   rw_String(  name,    msg);
+   rw_String(  m_name,    msg);
    rw_data(    (char*)macaddr, msg, MacAddrLen);
 
    int8_t addrs = int8_t(addresses.size());
@@ -97,6 +122,23 @@ void NetIF::v_readwrite( Msg * msg)
    for( int i = 0; i < addrs; i++)
       if( msg->isWriting()) addresses[i].write( msg);
       else addresses.push_back( Address( msg));
+}
+
+void NetIF::jsonWrite( std::ostringstream & o_str) const
+{
+	o_str << "{\"name\":\"" << m_name << "\"";
+	o_str << ",\"mac\":\"" << getMACAddrString( true) << "\"";
+	if( addresses.size())
+	{
+		o_str << ",\"addresses\":[";
+		for( int i = 0; i < addresses.size(); i++)
+		{
+			if( i ) o_str << ",";
+			addresses[i].jsonWrite( o_str);
+		}
+		o_str << "]";
+	}
+	o_str << "}";
 }
 
 const std::string NetIF::getMACAddrString( bool withSeparators) const
@@ -114,7 +156,7 @@ const std::string NetIF::getMACAddrString( bool withSeparators) const
 
 void NetIF::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   if( false == name.empty()) stream << name << ": ";
+   if( false == m_name.empty()) stream << m_name << ": ";
    stream << getMACAddrString( true);
    if( addresses.size())
    {
@@ -130,20 +172,9 @@ void NetIF::v_generateInfoStream( std::ostringstream & stream, bool full) const
 int NetIF::calcWeight() const
 {
    int size = int(sizeof( NetIF));
-   size += af::weigh( name);
+   size += af::weigh( m_name);
    for( unsigned i = 0; i < addresses.size(); i++) size += addresses[i].calcWeight();
    return size;
-}
-
-void NetIF::getNetIFs( std::string str, std::vector<NetIF*> & netIFs)
-{
-   std::vector<std::string> strings = af::strSplit( str, " ");
-   for( int i = 0; i < strings.size(); i++)
-   {
-      NetIF * netif = new NetIF(strings[i]);
-      if( false == netif->isNull())
-         netIFs.push_back( netif);
-   }
 }
 
 void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)

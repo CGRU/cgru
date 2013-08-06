@@ -85,7 +85,7 @@ void Host::remServices( const std::vector<std::string> & remNames)
 
 void Host::mergeParameters( const Host & other)
 {
-	if( other.m_max_tasks      ) m_max_tasks = other.m_max_tasks;
+	if( other.m_max_tasks     ) m_max_tasks = other.m_max_tasks;
 	if( other.m_capacity      ) m_capacity = other.m_capacity;
 	if( other.m_power         ) m_power    = other.m_power;
 

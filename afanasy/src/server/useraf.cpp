@@ -110,7 +110,7 @@ void UserAf::v_setZombie( MonitorContainer * i_monitoring)
 	AfNodeSrv::v_setZombie();
 	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
 	appendLog( "Became a zombie.");
-	AFCommon::saveLog( getLog(), af::Environment::getUsersDir(), m_name);
+//	AFCommon::saveLog( getLog(), af::Environment::getUsersDir(), m_name);
 }
 
 void UserAf::addJob( JobAf * i_job)

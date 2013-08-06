@@ -63,6 +63,17 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		m_address.jsonWrite( o_str);
 	}
 
+	if( m_netIFs.size())
+	{
+		o_str << ",\n\"netifs\":[\n";
+		for( int i = 0; i < m_netIFs.size(); i++)
+		{
+			if( i ) o_str << ",\n";
+			m_netIFs[i]->jsonWrite( o_str);
+		}	
+		o_str << "\n]";
+	}
+
 	if( m_version.size())
 		o_str << ",\n\"version\":\"" << m_version << "\"";
 }
@@ -70,6 +81,20 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 void Client::jsonRead( const JSON & i_object)
 {
 	m_address.jsonRead( i_object["address"]);
+
+	const JSON & netifs_array = i_object["netifs"];
+	if( false == netifs_array.IsArray()) return;
+
+	clearNetIFs();
+
+	for( int i = 0; i < netifs_array.Size(); i++)
+	{
+		NetIF * netif = new NetIF( netifs_array[i]);
+		if( false == netif->isNull())
+			m_netIFs.push_back( netif);
+		else
+			delete netif;
+	}
 }
 
 void Client::clearNetIFs()

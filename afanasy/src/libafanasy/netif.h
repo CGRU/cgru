@@ -17,27 +17,27 @@ public:
 /// Construct from message:
 	NetIF( Msg * msg);
 
-/// Construct from string:
-	NetIF( const std::string & str);
+/// Construct from json object:
+	NetIF( const JSON & i_obj);
 
 	~NetIF();
 
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 	const std::string getMACAddrString( bool withSeparators = false) const;
-	const std::string & getName() const { return name;}
+	const std::string & getName() const { return m_name;}
 
 	inline bool isNull() const { for( int i = 0; i < MacAddrLen; i++) if( macaddr[i] != 0 ) return false; return true; }
 
 	int calcWeight() const;
 
+	void v_readwrite( Msg * msg);
+
+	void jsonWrite( std::ostringstream & o_str) const;
+
+public:
 	/// Search for interfaces and assinged addresses
 	static void getNetIFs( std::vector<NetIF*> & netIFs, bool verbose = false);
-
-	/// Parse string to get mac addresses
-	static void getNetIFs( std::string str, std::vector<NetIF*> & netIFs);
-
-	void v_readwrite( Msg * msg);
 
 public:
 	static const int MacAddrLen = 6;
@@ -48,7 +48,7 @@ public:
 
 private:
 
-	std::string name;
+	std::string m_name;
 
 	unsigned char macaddr[MacAddrLen];
 };
