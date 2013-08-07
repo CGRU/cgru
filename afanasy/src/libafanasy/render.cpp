@@ -117,6 +117,17 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << ",\n";
 	m_host.jsonWrite( o_str);
 
+	if( m_services_disabled.size())
+	{
+		o_str << ",\n\"services_disabled\":[";
+		for( int i = 0; i < m_services_disabled.size(); i++)
+		{
+			if( i ) o_str << ",";
+			o_str << '\"' << m_services_disabled[i] << '\"';
+		}
+		o_str << ']';
+	}
+
 	o_str << "\n}";
 }
 
@@ -146,15 +157,18 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	}
 
 	// Paramers below are not editable and read only on creation
+	// ( but they can be changes by other actions, like disable service)
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
 		return;
 
 	Node::jsonRead( i_object);
 
-	jr_uint32("st",        m_state,         i_object);
+	jr_uint32("st", m_state, i_object);
 
 	Client::jsonRead( i_object);
+
+	jr_stringvec("services_disabled", m_services_disabled, i_object);
 }
 
 void Render::v_readwrite( Msg * msg)

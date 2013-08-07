@@ -125,7 +125,7 @@ protected:
 	int32_t m_capacity_used;
 	int32_t m_max_tasks;
 
-	std::string m_services_disabled;
+	std::vector<std::string> m_services_disabled;
 
 	Host     m_host;
 	HostRes  m_hres;

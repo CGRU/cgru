@@ -121,20 +121,23 @@ namespace af
 	void sleep_sec(  int i_seconds  );
 	void sleep_msec( int i_mseconds );
 
-   const long long stoi( const std::string & str, bool * ok = NULL);
-   const std::string itos( long long integer);
-   const std::string getenv( const char * name);
-   const std::string state2str( int state);
-   const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
-   const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
-   const std::string strStripRight( const std::string & i_str, const std::string & i_characters = " \n");
-   const std::string strStrip( const std::string & i_str, Direction i_dir, const std::string & i_characters = " \n");
-   const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
-   const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
-   const std::string strReplace( const std::string & str, char before, char after);
+
+	// String functions:
+	const long long stoi( const std::string & str, bool * ok = NULL);
+	const std::string itos( long long integer);
+	const std::string getenv( const char * name);
+	const std::string state2str( int state);
+	const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
+	const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
+	const std::string strStripRight( const std::string & i_str, const std::string & i_characters = " \n");
+	const std::string strStrip( const std::string & i_str, Direction i_dir, const std::string & i_characters = " \n");
+	const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
+	const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
+	const std::string strReplace( const std::string & str, char before, char after);
 	const std::string strEscape( const std::string & i_str);
 	const std::vector<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
 	const std::string vectToStr( const std::vector<int32_t> & i_vec);
+
 
 	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags, int i_startFrom = 0);
    const std::string fillNumbers( const std::string & pattern, long long start, long long end);

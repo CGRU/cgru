@@ -128,7 +128,7 @@ private:
 	std::vector<int> m_services_counts;
 	int m_services_num;
 
-	std::vector<int> disabledservices;
+	std::vector<int> m_services_disabled_nums;
 
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
 

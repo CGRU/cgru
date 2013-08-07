@@ -183,6 +183,20 @@ void AfContainer::refresh( AfContainer * pointer, MonitorContainer * monitoring)
    }
 }
 
+af::Msg * AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
+{
+	std::string type_name;
+	return generateList( type, type_name, mcgeneral.getList(), mcgeneral.getName(), false);
+}
+
+af::Msg * AfContainer::generateList( int i_type)
+{
+	std::string type_name;
+	std::vector<int32_t> ids;
+	std::string mask;
+	return generateList( i_type, type_name, ids, mask, false);
+}
+
 af::Msg * AfContainer::generateList( int i_type, const std::string & i_type_name, const std::vector<int32_t> & i_ids, const std::string & i_mask, bool i_json)
 {
 	af::MCAfNodes mcnodes;
@@ -294,20 +308,6 @@ void AfContainer::generateListMask( int i_type, af::MCAfNodes & o_mcnodes, std::
 			}
 		}
 	}
-}
-
-af::Msg * AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
-{
-	std::string type_name;
-	return generateList( type, type_name, mcgeneral.getList(), mcgeneral.getName(), false);
-}
-
-af::Msg * AfContainer::generateList( int i_type)
-{
-	std::string type_name;
-	std::vector<int32_t> ids;
-	std::string mask;
-	return generateList( i_type, type_name, ids, mask, false);
 }
 
 bool AfContainer::setZombie( int id)

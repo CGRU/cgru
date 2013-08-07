@@ -667,16 +667,14 @@ bool RenderAf::getFarmHost( af::Host * newHost)
 
 void RenderAf::disableServices()
 {
-//printf("RenderAf::disabledservices: %s\n", m_services_disabled.c_str());
-	disabledservices.clear();
-	disabledservices.resize( m_services_num, 0);
-	if( false == m_services_disabled.empty())
+	m_services_disabled_nums.clear();
+	m_services_disabled_nums.resize( m_services_num, 0);
+	if( m_services_disabled.size())
 	{
-		std::vector<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
-		for( int i = 0; i < dissrvlist.size(); i++)
+		for( int i = 0; i < m_services_disabled.size(); i++)
 			for( int j = 0; j < m_services_num; j++)
-				if( dissrvlist[i] == m_host.getServiceName(j))
-					disabledservices[j] = 1;
+				if( m_services_disabled[i] == m_host.getServiceName(j))
+					m_services_disabled_nums[j] = 1;
 	}
 	checkDirty();
 }
@@ -684,22 +682,17 @@ void RenderAf::disableServices()
 void RenderAf::setService( const std::string & srvname, bool enable)
 {
 //printf("RenderAf::setService: %s %d\n", srvname.c_str(), enable);
-	std::vector<std::string> dissrvlist_old = af::strSplit( m_services_disabled, ";");
-	std::vector<std::string> dissrvlist_new;
+	std::vector<std::string> m_services_disabled_old = m_services_disabled;
+	m_services_disabled.clear();
 
 	// Collect new disabled services list w/o specified service:
-	for( int i = 0; i < dissrvlist_old.size(); i++)
-		if( dissrvlist_old[i] != srvname )
-			dissrvlist_new.push_back( dissrvlist_old[i]);
+	for( int i = 0; i < m_services_disabled_old.size(); i++)
+		if( m_services_disabled_old[i] != srvname )
+			m_services_disabled.push_back( m_services_disabled_old[i]);
 
 	// Add specified service in disabled list:
 	if( false == enable )
-		dissrvlist_new.push_back( srvname);
-
-	if( dissrvlist_new.size())
-		m_services_disabled = af::strJoin( dissrvlist_new, ";");
-	else
-		m_services_disabled.clear();
+		m_services_disabled.push_back( srvname);
 
 	disableServices();
 }
@@ -713,7 +706,7 @@ const std::string RenderAf::getServicesString() const
 	{
 		str += "\n	";
 		str += m_host.getServiceName(i);
-		if( disabledservices[i] ) str += " (DISABLED)";
+		if( m_services_disabled_nums[i] ) str += " (DISABLED)";
 		if(( m_services_counts[i] > 0) || ( m_host.getServiceCount(i) > 0))
 		{
 			str += ": ";
@@ -721,10 +714,10 @@ const std::string RenderAf::getServicesString() const
 			if( m_host.getServiceCount(i) > 0) str += " / max=" + af::itos( m_host.getServiceCount(i));
 		}
 	}
-	if( false == m_services_disabled.empty())
+	if( m_services_disabled.size())
 	{
 		str += "\nDisabled services:\n	";
-		str += m_services_disabled;
+		str += af::strJoin( m_services_disabled);
 	}
 
 	return str;
@@ -739,15 +732,14 @@ void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
 		o_str << "\"" << m_host.getServiceName(i) << "\":[" << int( m_services_counts[i]);
 		if( m_host.getServiceCount(i) > 0)
 			o_str << ",\"max\"," << int( m_host.getServiceCount(i));
-		if( disabledservices[i] ) o_str << ",false";
+		if( m_services_disabled_nums[i] ) o_str << ",false";
 		o_str << "]";
 	}
 
 	o_str << "}";
 
-	if( false == m_services_disabled.empty())
-		o_str << ",\"services_disabled\":\"" << m_services_disabled << "\"";
-
+	if( false == m_services_disabled.size())
+		o_str << ",\"services_disabled\":\"" << af::strJoin( m_services_disabled) << "\"";
 }
 
 bool RenderAf::canRunService( const std::string & type) const
@@ -758,7 +750,7 @@ bool RenderAf::canRunService( const std::string & type) const
 	{
 		if( m_host.getServiceName(i) == type)
 		{
-			if( disabledservices[i]) return false;
+			if( m_services_disabled_nums[i]) return false;
 			if( m_host.getServiceCount(i) > 0)
 			{
 				return m_services_counts[i] < m_host.getServiceCount(i);
