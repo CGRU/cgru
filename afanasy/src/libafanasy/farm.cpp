@@ -116,7 +116,7 @@ Farm::Farm( const std::string & File, bool Verbose ):
 	}
 
 	int filesize = -1;
-	char * buffer = fileRead( m_filename, filesize);
+	char * buffer = fileRead( m_filename, &filesize);
 	if( buffer == NULL )
 	{
 		printf("Farm: File \"%s\" reading error.\n", m_filename.c_str());

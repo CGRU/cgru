@@ -23,6 +23,8 @@
 
 using namespace af;
 
+std::string Environment::digest_file;
+
 int Environment::magic_mode_index = MMM_Reject;
 std::string Environment::magic_mode;
 
@@ -151,7 +153,7 @@ std::vector<std::string> Environment::cmdarguments_usagehelp;
 std::vector<std::string> Environment::previewcmds;
 std::vector<std::string> Environment::rendercmds;
 std::vector<std::string> Environment::rendercmds_admin;
-std::vector<std::string> Environment::serveripmask;
+std::vector<std::string> Environment::ip_trust;
 std::vector<std::string> Environment::render_resclasses;
 
 std::string Environment::version_revision;
@@ -168,28 +170,29 @@ void Environment::getVars( const JSON & i_obj)
 		return;
 	}
 
-	getVar( i_obj, filenamesizemax,                   "filenamesizemax"                   );
-	getVar( i_obj, timeformat,                        "timeformat"                        );
-	getVar( i_obj, previewcmds,                       "previewcmds"                       );
-	getVar( i_obj, cmd_shell,                         "cmd_shell"                         );
+	getVar( i_obj, servername,                        "af_servername"                        );
+	getVar( i_obj, ip_trust,                          "af_ip_trust"                          );
+	getVar( i_obj, digest_file,                       "af_digest_file"                       );
+	getVar( i_obj, serverport,                        "af_serverport"                        );
+	getVar( i_obj, clientport,                        "af_clientport"                        );
 
-	getVar( i_obj, pswd_visor,                        "pswd_visor"                        );
-	getVar( i_obj, pswd_god,                          "pswd_god"                          );
+	getVar( i_obj, pswd_visor,                        "pswd_visor"                           );
+	getVar( i_obj, pswd_god,                          "pswd_god"                             );
 
 	getVar( i_obj, af::Msg::Magic,                    "af_magic_number"                      );
 	getVar( i_obj, magic_mode,                        "af_magic_mode"                        );
 
-	getVar( i_obj, perm_user_mod_his_priority,        "af_perm_user_mod_his_priority"      );
-	getVar( i_obj, perm_user_mod_job_priority,        "af_perm_user_mod_job_priority"      );
+	getVar( i_obj, perm_user_mod_his_priority,        "af_perm_user_mod_his_priority"        );
+	getVar( i_obj, perm_user_mod_job_priority,        "af_perm_user_mod_job_priority"        );
 
-	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"              );
+	getVar( i_obj, filenamesizemax,                   "filenamesizemax"                      );
+	getVar( i_obj, timeformat,                        "timeformat"                           );
+	getVar( i_obj, previewcmds,                       "previewcmds"                          );
+	getVar( i_obj, cmd_shell,                         "cmd_shell"                            );
+
+	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"                );
 	getVar( i_obj, priority,                          "af_priority"                          );
 	getVar( i_obj, maxrunningtasks,                   "af_maxrunningtasks"                   );
-
-	getVar( i_obj, servername,                        "af_servername"                        );
-	getVar( i_obj, serveripmask,                      "af_serveripmask"                      );
-	getVar( i_obj, serverport,                        "af_serverport"                        );
-	getVar( i_obj, clientport,                        "af_clientport"                        );
 
 	getVar( i_obj, temp_dir,                          "af_tempdirectory"                     );
 
@@ -480,7 +483,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //###################################################
 
 	load();
-	m_valid = init();
+	m_valid = initAfterLoad();
 
 	PRINT("Render host name = '%s'\n", hostname.c_str());
 }
@@ -550,7 +553,7 @@ void Environment::loadFile( const std::string & i_filename)
 	PRINT("Parsing config file '%s':\n", i_filename.c_str());
 
 	int filesize = -1;
-	char * buffer = fileRead( i_filename, filesize);
+	char * buffer = fileRead( i_filename, &filesize);
 	if( buffer == NULL )
 		return;
 
@@ -607,13 +610,14 @@ bool Environment::reload()
 {
 	m_verbose_init = true;
 	load();
-	m_valid = init();
+	m_valid = initAfterLoad();
 	return m_valid;
 }
 
 bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
 
-bool Environment::init()
+// Initialize environment after all variables are loaded (set to default values)
+bool Environment::initAfterLoad()
 {
 //############ Local host name:
 #ifdef WINNT
@@ -622,7 +626,7 @@ bool Environment::init()
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
 	if ( WSAStartup( wVersionRequested, &wsaData) != 0) {
-		 AFERROR("Environment::init(): WSAStartup failed.");
+		 AFERROR("Environment::initAfterLoad(): WSAStartup failed.");
 		 return false;
 	}
 #else
@@ -654,10 +658,15 @@ bool Environment::init()
 	users_dir   = temp_dir + AFGENERAL::PATH_SEPARATOR +   AFUSER::DIRECTORY;
 
 	//############ Server Accept IP Addresses Mask:
-	if( false == Address::readIpMask( serveripmask, m_verbose_init))
+	if( false == Address::readIpMask( ip_trust, m_verbose_init))
 	{
 		return false;
 	}
+
+	// Digest authentication file read:
+	digest_file = getCGRULocation() + AFGENERAL::PATH_SEPARATOR + digest_file;
+	char * data = af::fileRead( digest_file);
+	delete [] data;
 
 	// Solve server name
 	if( m_solveservername )
@@ -667,7 +676,7 @@ bool Environment::init()
 	if( passwd != NULL) delete passwd;
 	passwd = new Passwd( pswd_visor, pswd_god);
 
-//   //############ Message Magic Number Mismatch Mode:
+	//############ Message Magic Number Mismatch Mode:
 	if      ( magic_mode == "getonly" ) magic_mode_index = MMM_GetOnly;
 	else if ( magic_mode == "notasks" ) magic_mode_index = MMM_NoTasks;
 

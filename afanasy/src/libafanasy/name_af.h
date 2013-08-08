@@ -195,7 +195,7 @@ namespace af
 
 	const std::vector<std::string> getFilesList( const std::string & i_path);
 
-	char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
+	char * fileRead( const std::string & i_filename, int * o_size = NULL, int i_maxfilesize = -1, std::string * o_err = NULL);
 
 	bool removeDir( const std::string & i_folder );
 //

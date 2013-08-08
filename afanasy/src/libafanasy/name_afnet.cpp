@@ -185,13 +185,13 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 			{
 				datafile = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + datafile;
 				std::string error;
-				data = af::fileRead( datafile, datalen, -1, &error);
+				data = af::fileRead( datafile, &datalen, -1, &error);
 			}
 		}
 		else
 		{
 			datafile = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
-			data = af::fileRead( datafile, datalen);
+			data = af::fileRead( datafile, &datalen);
 		}
 
 		if( data == NULL )

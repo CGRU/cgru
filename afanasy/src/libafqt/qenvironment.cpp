@@ -218,7 +218,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     loadAttrs( ms_filename);
 
 	int datalen = -1;
-	char * data = af::fileRead( qtos( ms_filename), datalen);
+	char * data = af::fileRead( qtos( ms_filename), &datalen);
 	if( data )
 	{
 		rapidjson::Document doc;
@@ -470,7 +470,7 @@ bool QEnvironment::loadTheme( const QString & i_theme)
 bool QEnvironment::loadAttrs( const QString & i_filename )
 {
 	int datalen = -1;
-	char * data = af::fileRead( qtos( i_filename), datalen);
+	char * data = af::fileRead( qtos( i_filename), &datalen);
 	if( data == NULL )
 	{
 		AFERRAR("AFQT: Unable to load config file:\n%s", i_filename.toUtf8().data())

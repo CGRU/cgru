@@ -39,7 +39,7 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 	if( false == af::pathFileExists( m_store_file)) return;
 
 	int size;
-	char * data = af::fileRead( m_store_file, size);
+	char * data = af::fileRead( m_store_file, &size);
 	if( data == NULL ) return;
 
 	rapidjson::Document document;

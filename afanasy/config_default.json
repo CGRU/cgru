@@ -3,8 +3,15 @@
 	"af_servername":"127.0.0.1",
 		"":"User server name or direct IP address literals",
 
-	"af_serveripmask":["*.*","127.0.0.1","192.168.*","*:*","0:0:0:0:0:0:0:1","FC00:*","FD00:*"],
-		"":"Acceptable ip addresses masks. Mask should have at least one '.' for IPv4 or one ':' for IPv6.",
+	"af_serverport":51000,
+	"af_clientport":51001,
+
+		"":"Trusted IP addresses masks. From these IPs no authentication needed.",
+	"af_ip_trust":["*.*","127.0.0.1","192.168.*","*:*","0:0:0:0:0:0:0:1","FC00:*","FD00:*"],
+		"":"Mask should have at least one '.' for IPv4 or one ':' for IPv6.",
+
+		"":"Digest authentication file path relative to CGRU_LOCATION folder",
+	"af_digest_file":".htdigest",
 
 	"af_magic_number":1,
 		"":"Magic number, default value is '1', value '0' is reserved and means magic number mismatch.",
@@ -12,9 +19,6 @@
 		"":"reject: All messages with invalid magick number will be rejected.",
 		"":"getonly: You can get information only. No changes allowed.",
 		"":"notasks: You can't add jobs and change existing tasks commands.",
-
-	"af_serverport":51000,
-	"af_clientport":51001,
 
 		"":"Commands arguments:",
 		"":"@ARG@ - will be replaced with render name:",

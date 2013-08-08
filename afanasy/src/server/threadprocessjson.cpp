@@ -93,7 +93,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 					if( filename.size()) // Reading output from file
 					{
 						int readsize = -1;
-						char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &error);
+						char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
 						if( data )
 						{
 							o_msg_response = af::jsonMsg( mode, name, data, readsize);

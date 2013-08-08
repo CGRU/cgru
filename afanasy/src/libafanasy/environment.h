@@ -206,8 +206,9 @@ private:
 	static void load();
 	static void loadFile( const std::string & i_filename);
 	static void getVars( const JSON & i_obj);
-	static bool init();
+	static bool initAfterLoad();
 
+	static std::string digest_file;
 	static int magic_mode_index;
 	static std::string magic_mode;
 
@@ -225,7 +226,7 @@ private:
 /// Afanasy server name
 	static std::string servername;
 	static Address serveraddress;
-	static std::vector<std::string> serveripmask;
+	static std::vector<std::string> ip_trust;
 
 /// User name
 /** Try to get \c USERNAME or \c USER environment variable at first.

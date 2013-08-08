@@ -636,7 +636,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		//	 Retrieving output from file
 		//
 			int readsize = -1;
-			char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &error);
+			char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
 			if( data )
 			{
 				o_msg_response = new af::Msg();

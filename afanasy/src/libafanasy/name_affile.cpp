@@ -182,60 +182,60 @@ bool af::pathMakePath( const std::string & i_path, VerboseMode i_verbose)
 	return true;
 }
 
-char * af::fileRead( const std::string & filename, int & readsize, int maxfilesize, std::string * errOutput)
+char * af::fileRead( const std::string & i_filename, int * o_size, int i_maxfilesize, std::string * o_err)
 {
 	struct stat st;
 	int fd = -1;
-	int retval = stat( filename.c_str(), &st);
+	int retval = stat( i_filename.c_str(), &st);
 	if( retval != 0 )
 	{
-		std::string err = std::string("Can't get file:\n") + filename + "\n" + strerror( errno);
-		if( errOutput ) *errOutput = err; else AFERROR( err)
+		std::string err = std::string("Can't get file:\n") + i_filename + "\n" + strerror( errno);
+		if( o_err ) *o_err = err; else AFERROR( err)
 		return NULL;
 	}
 	else if( false == (st.st_mode & S_IFREG))
 	{
-		std::string err = std::string("It is not a regular file:\n") + filename;
-		if( errOutput ) *errOutput = err; else AFERROR( err)
+		std::string err = std::string("It is not a regular file:\n") + i_filename;
+		if( o_err ) *o_err = err; else AFERROR( err)
 		return NULL;
 	}
 	else if( st.st_size < 1 )
 	{
-		std::string err = std::string("File is empty:\n") + filename;
-		if( errOutput ) *errOutput = err; else AFERROR( err)
+		std::string err = std::string("File is empty:\n") + i_filename;
+		if( o_err ) *o_err = err; else AFERROR( err)
 		return NULL;
 	}
 	else
 	{
-		fd = ::open( filename.c_str(), O_RDONLY);
+		fd = ::open( i_filename.c_str(), O_RDONLY);
 	}
 
 	if( fd == -1 )
 	{
-		std::string err = std::string("Can't open file:\n") + filename;
-		if( errOutput ) *errOutput = err; else AFERROR( err)
+		std::string err = std::string("Can't open file:\n") + i_filename;
+		if( o_err ) *o_err = err; else AFERROR( err)
 		return NULL;
 	}
 
 	int maxsize = st.st_size;
-	if( maxfilesize > 0 )
+	if( i_maxfilesize > 0 )
 	{
-		if( maxsize > maxfilesize )
+		if( maxsize > i_maxfilesize )
 		{
-			maxsize = maxfilesize;
-			std::string err = std::string("File size overflow:\n") + filename;
-			if( errOutput ) *errOutput = err; else AFERROR( err)
+			maxsize = i_maxfilesize;
+			std::string err = std::string("File size overflow:\n") + i_filename;
+			if( o_err ) *o_err = err; else AFERROR( err)
 		}
 	}
 	char * buffer = new char[maxsize+1];
-	readsize = 0;
+	int readsize = 0;
 	while( maxsize > 0 )
 	{
 		int bytes = ::read( fd, buffer+readsize, maxsize);
 		if( bytes == -1 )
 		{
-			std::string err = std::string("Reading file failed:\n") + filename + "\n" + strerror( errno);
-			if( errOutput ) *errOutput = err; else AFERROR( err)
+			std::string err = std::string("Reading file failed:\n") + i_filename + "\n" + strerror( errno);
+			if( o_err ) *o_err = err; else AFERROR( err)
 			buffer[readsize] = '\0';
 			break;
 		}
@@ -245,6 +245,7 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
 	}
 	::close( fd);
 	buffer[readsize] = '\0';
+	if( o_size ) *o_size = readsize;
 	return buffer;
 }
 

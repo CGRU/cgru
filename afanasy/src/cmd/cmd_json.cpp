@@ -91,7 +91,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 		if( Verbose )
 			printf("Trying to open:\n%s\n", filename.c_str());
 
-		data = af::fileRead( filename, datalen);
+		data = af::fileRead( filename, &datalen);
 
 		if( data == NULL )
 		{

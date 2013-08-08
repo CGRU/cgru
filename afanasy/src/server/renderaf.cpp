@@ -37,7 +37,7 @@ RenderAf::RenderAf( const std::string & i_store_dir):
 	initDefaultValues();
 
 	int size;
-	char * data = af::fileRead( getStoreFile(), size);
+	char * data = af::fileRead( getStoreFile(), &size);
 	if( data == NULL ) return;
 	rapidjson::Document document;
 	char * res = af::jsonParseData( document, data, size);

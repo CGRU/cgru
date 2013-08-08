@@ -70,7 +70,7 @@ bool Block::readStoredTasks( const std::string & i_folder)
 	std::string filename = getStoreTasksFileName( i_folder);
 
 	int size;
-	char * data = af::fileRead( filename, size);
+	char * data = af::fileRead( filename, &size);
 	if( data == NULL ) return false;
 
 	rapidjson::Document document;
