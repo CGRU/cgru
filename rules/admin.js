@@ -34,7 +34,7 @@ function ad_Login()
 		new cgru_Dialog( window, window, 'ad_LoginGetPassword', 'user_id', 'str', '', 'login', 'Login', 'Enter User ID');
 	}
 	else
-		ad_loginProcess({"realm":'RULES'});
+		ad_loginProcess({"realm":cgru_Config.realm});
 }
 function ad_loginProcess( i_obj)
 {
@@ -83,7 +83,7 @@ function ad_ConstructDigest( i_user_id, i_password)
 	else
 	{
 		localStorage.auth_user = i_user_id;
-		localStorage.auth_digest = c_MD5( i_user_id+':RULES:'+i_password);
+		localStorage.auth_digest = c_MD5( i_user_id+':'+cgru_Config.realm+':'+i_password);
 console.log('Digest: '+localStorage.auth_digest);
 	}
 
@@ -107,7 +107,7 @@ function ad_Logout()
 	}
 //*
  	var obj = {};
-	obj.logout = {"realm":'RULES'};
+	obj.logout = {"realm":cgru_Config.realm};
 	var data = n_Request_old( obj);
 //c_Log( data);
 //	*/
@@ -745,8 +745,8 @@ function ad_SetPassword( i_user_id, i_passwd)
 		n_SendMail( email, subject, body);
 	}
 
-	var digest = c_MD5( i_user_id + ':RULES:' + i_passwd);
-	digest = i_user_id + ':RULES:' + digest;
+	var digest = c_MD5( i_user_id + ':'+cgru_Config.realm+':' + i_passwd);
+	digest = i_user_id + ':'+cgru_Config.realm+':' + digest;
 	var result = c_Parse( n_Request_old({"htdigest":{"user":i_user_id,"digest":digest}}, true, true));
 	if( result == null ) return;
 	if( result.error )

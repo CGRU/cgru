@@ -1,5 +1,5 @@
 AuthType Digest
-AuthName "RULES"
+AuthName "CGRU"
 AuthDigestDomain /cgru/ http://cgru.info
 
 AuthDigestProvider file

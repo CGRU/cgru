@@ -6,9 +6,6 @@
 /// General:
 namespace AFGENERAL
 {
-    const int  MAGIC_NUMBER       = 1;
-	const int  MAGIC_NUMBER_BAD   = 0;	/// Server sends it back to client with some invalid magic number
-	const int  MAGIC_NUMBER_ANY   = 2;  /// Server sends it client, it never shows its real magick number
     const char TIME_FORMAT[]      = "%a %d %b %H:%M.%S";  ///< Default time output format.
 	const bool PERM_USER_MOD_HIS_PRIORITY = true;
 	const bool PERM_USER_MOD_JOB_PRIORITY = true;

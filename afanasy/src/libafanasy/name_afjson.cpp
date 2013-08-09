@@ -13,9 +13,7 @@
 
 const std::string af::jsonMakeHeader( int size)
 {
-	std::string header = "[ * AFANASY * ] ";
-	header += af::itos( af::Msg::Magic);
-	header += " 0 ";
+	std::string header = "AFANASY ";
 	header += af::itos( size);
 	header += " JSON";
 	return header;

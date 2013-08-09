@@ -8,13 +8,9 @@ import sys
 
 import cgruconfig
 
-AF_SENDERID=0
-
 def genHeader( data_size):
-	data = '[ * AFANASY * ]'
-	data += ' ' + str(int(cgruconfig.VARS['af_magic_number']))
-	data += ' ' + str(AF_SENDERID)
-	data += ' ' + str(data_size)
+	data = 'AFANASY '
+	data += str(data_size)
 	data += ' JSON'
 	return bytearray( data, 'utf-8')
 

@@ -271,7 +271,6 @@ void Dialog::newMessage( af::Msg *msg)
     {
     case af::Msg::TClientExitRequest:
     case af::Msg::TVersionMismatch:
-    case af::Msg::TMagicMismatch:
     {
         emit stop();
         break;

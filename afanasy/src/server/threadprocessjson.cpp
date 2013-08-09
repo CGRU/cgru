@@ -284,10 +284,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		{
 			AFCommon::QueueLogError("Job registration is not allowed: Server demo mode.");
 		}
-		else if( i_msg->isMagicInvalid() )
-		{
-			AFCommon::QueueLogError("Job registration is not allowed: Magic number mismatch.");
-		}
 		else
 		{
 			// No containers locks needed here.

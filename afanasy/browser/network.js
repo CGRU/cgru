@@ -14,7 +14,7 @@ function nw_Send( obj)
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 	xhr.open('POST', '/', true);
 
-	xhr.setRequestHeader('AFANASY', '1 0 '+obj_str.length);
+	xhr.setRequestHeader('AFANASY', obj_str.length);
 
 	xhr.send( obj_str);
 

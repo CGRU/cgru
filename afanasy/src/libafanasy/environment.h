@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "name_af.h"
 #include "netif.h"
 
@@ -66,9 +68,6 @@ public:
 
 	/// Set client port. Client can change its port.
 	static void setClientPort( uint16_t port) { clientport = port;}
-
-	static inline const int           getMagicMode()     { return magic_mode_index; }
-	static inline const std::string & getMagicModeName() { return magic_mode;       }
 
 	/// Get versions:
 	static inline const std::string & getVersionRevision(){ return version_revision; }
@@ -209,8 +208,8 @@ private:
 	static bool initAfterLoad();
 
 	static std::string digest_file;
-	static int magic_mode_index;
-	static std::string magic_mode;
+	static std::string digest_realm;
+	static std::map<std::string, std::string> user_passwd;
 
 	static std::string cgrulocation;    ///< CGRU root directory.
 	static std::string afroot;          ///< Afanasy root directory.

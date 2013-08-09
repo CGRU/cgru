@@ -31,7 +31,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg);
 af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
 	//i_msg->stdOut();
-	//printf("IM=%d LM=%d MM=%d\n", i_msg->getMagicNumber(), af::Msg::Magic, af::Environment::getMagicMode());
 	af::Msg * o_msg_response = NULL;
 
 	switch( i_msg->type())
@@ -40,24 +39,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AFCommon::QueueLogError( i_msg->v_generateInfoString( false));
 		o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
-		break;
-	}
-	case af::Msg::TMagicMismatch:
-	{
-		std::string err = "Magick number mismatch: recieved ";
-		err += af::itos( i_msg->getMagicNumber()) + " != " + af::itos( af::Msg::Magic) += " local.";
-		AFCommon::QueueLogError( err);
-		o_msg_response = new af::Msg( af::Msg::TMagicMismatch, 1);
-		break;
-	}
-	case af::Msg::TMagicNumber:
-	{
-		std::string msg = "Magick Number " + af::itos( af::Msg::Magic)
-				  + " changed to " + af::itos( i_msg->int32());
-		AFCommon::QueueLog( msg);
-		o_msg_response = new af::Msg();
-		o_msg_response->setString( msg);
-		af::Msg::Magic = i_msg->int32();
 		break;
 	}
 	case af::Msg::TInvalid:
@@ -698,23 +679,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TTaskListenOutput:
 	case af::Msg::TRenderDeregister:
 	case af::Msg::TTalkDeregister:
-/*	{
-		// Check magic number mismatch mode:
-		// All message types above are not allowed in "GetOnly" mode.
-		if( i_msg->isMagicInvalid() && ( af::Environment::getMagicMode() <= af::MMM_GetOnly ))
-		{
-			std::string err = "Magic Mismatch Mode: \"";
-			err += af::Environment::getMagicModeName();
-			err += "\"";
-			err += "\nMessage type not allowed: \"";
-			err += af::Msg::TNAMES[i_msg->type()];
-			err += "\"";
-			AFCommon::QueueLogError( err);
-			delete i_msg;
-			return o_msg_response;
-		}
-		// Only Monitor message types are allowed in "GetOnly" mode.
-	}*/
 	case af::Msg::TMonitorSubscribe:
 	case af::Msg::TMonitorUnsubscribe:
 	case af::Msg::TMonitorDeregister:

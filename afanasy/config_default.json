@@ -13,13 +13,6 @@
 		"":"Digest authentication file path relative to CGRU_LOCATION folder",
 	"af_digest_file":".htdigest",
 
-	"af_magic_number":1,
-		"":"Magic number, default value is '1', value '0' is reserved and means magic number mismatch.",
-	"af_magic_mode":"reject",
-		"":"reject: All messages with invalid magick number will be rejected.",
-		"":"getonly: You can get information only. No changes allowed.",
-		"":"notasks: You can't add jobs and change existing tasks commands.",
-
 		"":"Commands arguments:",
 		"":"@ARG@ - will be replaced with render name:",
 		"":"@ASK@ - raise dialog to ask a string:",

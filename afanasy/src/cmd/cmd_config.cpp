@@ -21,18 +21,3 @@ bool CmdConfigLoad::v_processArguments( int argc, char** argv, af::Msg &msg)
     return true;
 }
 
-CmdConfigMagic::CmdConfigMagic()
-{
-    setCmd("magic");
-    setArgsCount(1);
-    setInfo("Set new magic number.");
-    setHelp("magic Set new magic number.");
-    setMsgType( af::Msg::TConfigLoad);
-    setRecieving();
-}
-CmdConfigMagic::~CmdConfigMagic(){}
-bool CmdConfigMagic::v_processArguments( int argc, char** argv, af::Msg &msg)
-{
-    msg.set( af::Msg::TMagicNumber, atoi(argv[0]));
-    return true;
-}

@@ -9,6 +9,9 @@
 	"":"'OS_linux': Linix specific settings",
 	"":"'OS_macosx': MacOSX specific settings",
 
+		"":"Digest authentication realm",
+	"realm":"CGRU",
+
 	"OS_unix":{
 		"cmd_shell":"/bin/sh -c"
 	},

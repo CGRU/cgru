@@ -24,9 +24,8 @@
 using namespace af;
 
 std::string Environment::digest_file;
-
-int Environment::magic_mode_index = MMM_Reject;
-std::string Environment::magic_mode;
+std::string Environment::digest_realm;
+std::map<std::string, std::string> Environment::user_passwd;
 
 bool Environment::perm_user_mod_his_priority = AFGENERAL::PERM_USER_MOD_HIS_PRIORITY;
 bool Environment::perm_user_mod_job_priority = AFGENERAL::PERM_USER_MOD_JOB_PRIORITY;
@@ -173,14 +172,12 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, servername,                        "af_servername"                        );
 	getVar( i_obj, ip_trust,                          "af_ip_trust"                          );
 	getVar( i_obj, digest_file,                       "af_digest_file"                       );
+	getVar( i_obj, digest_realm,                      "realm"                                );
 	getVar( i_obj, serverport,                        "af_serverport"                        );
 	getVar( i_obj, clientport,                        "af_clientport"                        );
 
 	getVar( i_obj, pswd_visor,                        "pswd_visor"                           );
 	getVar( i_obj, pswd_god,                          "pswd_god"                             );
-
-	getVar( i_obj, af::Msg::Magic,                    "af_magic_number"                      );
-	getVar( i_obj, magic_mode,                        "af_magic_mode"                        );
 
 	getVar( i_obj, perm_user_mod_his_priority,        "af_perm_user_mod_his_priority"        );
 	getVar( i_obj, perm_user_mod_job_priority,        "af_perm_user_mod_job_priority"        );
@@ -504,25 +501,6 @@ void Environment::load()
 	loadFile( cgrulocation + "/config_default.json");
 	loadFile( home_afanasy + "/config.json");
 
-	// Remove magic number string:
-	int pos = 0;
-	for(;;)
-	{
-		pos = m_config_data.find("\"af_magic_number\"", pos);
-		if( pos == -1 ) break;
-
-		int pos_b = m_config_data.find(",", pos);
-		if( pos_b == -1 ) break;
-
-		int len = pos_b - pos + 1;
-		if( len <= 1 ) break;
-
-		std::string replace = "\"\":\"\",";
-		replace.resize( len, ' ');
-
-		m_config_data.replace( pos, len, replace);
-	}
-
 	m_config_data += "{}]}";
 /*
 	m_verbose_init = false;
@@ -664,9 +642,25 @@ bool Environment::initAfterLoad()
 	}
 
 	// Digest authentication file read:
+	{
 	digest_file = getCGRULocation() + AFGENERAL::PATH_SEPARATOR + digest_file;
 	char * data = af::fileRead( digest_file);
+printf("%s\n", data);
+	std::vector<std::string> lines = af::strSplit( data,"\n");
 	delete [] data;
+	for( int l = 0; l < lines.size(); l++)
+	{
+		if( lines[l].size() == 0 ) continue;
+		std::vector<std::string> words = af::strSplit(lines[l],":");
+		if( words.size() != 3 )
+		{
+			AFERRAR("Invalid digest file:\n%s\n%s", digest_file.c_str(), lines[l].c_str())
+			continue;
+		}
+printf("%s - %s\n", words[0].c_str(), words[2].c_str());
+		user_passwd[words[0]] = words[2];
+	}
+	}
 
 	// Solve server name
 	if( m_solveservername )
@@ -675,10 +669,6 @@ bool Environment::initAfterLoad()
 	//############ VISOR and GOD passwords:
 	if( passwd != NULL) delete passwd;
 	passwd = new Passwd( pswd_visor, pswd_god);
-
-	//############ Message Magic Number Mismatch Mode:
-	if      ( magic_mode == "getonly" ) magic_mode_index = MMM_GetOnly;
-	else if ( magic_mode == "notasks" ) magic_mode_index = MMM_NoTasks;
 
 	return true;
 }

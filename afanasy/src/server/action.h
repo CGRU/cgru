@@ -10,11 +10,6 @@ public:
 	Action( af::Msg * i_msg, ThreadArgs * i_args);
 	~Action();
 
-	enum Permissions {
-		PReadOnly = 1 << 0,
-		PNoTasks  = 1 << 1
-	};
-
 	inline bool isValid()   const { return m_valid;          }
 	inline bool isInvalid() const { return m_valid == false; }
 
@@ -27,8 +22,6 @@ public:
 	std::string user_name;
 	std::string host_name;
 	std::string author;
-
-	int permissions;
 
 	std::string log;
 
