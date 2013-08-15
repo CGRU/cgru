@@ -20,7 +20,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg);
+void threadRunJSON( ThreadArgs * i_args, const af::Msg * i_msg);
 
 void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
 {

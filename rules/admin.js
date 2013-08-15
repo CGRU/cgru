@@ -84,7 +84,7 @@ function ad_ConstructDigest( i_user_id, i_password)
 	{
 		localStorage.auth_user = i_user_id;
 		localStorage.auth_digest = c_MD5( i_user_id+':'+cgru_Config.realm+':'+i_password);
-console.log('Digest: '+localStorage.auth_digest);
+		//console.log('Digest: '+localStorage.auth_digest);
 	}
 
 	obj.response = c_MD5( localStorage.auth_digest+':'+SERVER.nonce+':'+obj.nc+':'+obj.cnonce+':'+obj.qop+':'+c_MD5('POST:'+obj.uri));

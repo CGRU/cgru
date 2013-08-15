@@ -241,7 +241,13 @@ Monitor.prototype.refresh = function()
 	}
 	else if(( this.type == 'renders') && ( this.cycle % 5 == 0 ))
 	{
-		nw_ReqestRendersResources();
+		// Get resources of online renders:
+		var ids = [];
+		for( var i = 0; i < this.items.length; i++)
+			if( this.items[i].state.ONL )
+				ids.push( this.items[i].params.id)
+		if( ids.length )
+			nw_GetNodes('renders', ids, 'resources');
 	}
 
 	for( var i = 0; i < this.items.length; i++)

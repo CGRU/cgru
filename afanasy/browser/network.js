@@ -3,11 +3,22 @@ nw_error_count = 0;
 nw_error_count_max = 5;
 nw_error_total = 0;
 
-function nw_Send( obj)
+function nw_send( obj)
 {
-	var obj_str = JSON.stringify(obj);
+	nw_request({"send":obj});
+}
 
-	var log = '<b><i>send:</i></b> '+ obj_str;
+function nw_request( i_args)
+{
+	var obj = i_args.send;
+	if( g_digest )
+	{
+		g_auth.nc++;
+		g_auth.response = hex_md5( g_digest + ':' + g_auth.nonce + ':' + g_auth.nc);
+		obj.auth = g_auth;
+	}
+
+	var obj_str = JSON.stringify( obj);
 
 	var xhr = new XMLHttpRequest();
 	xhr.overrideMimeType('application/json');
@@ -16,46 +27,52 @@ function nw_Send( obj)
 
 	xhr.setRequestHeader('AFANASY', obj_str.length);
 
+	xhr.m_log = '<b><i>send:</i></b> '+ obj_str;
+	xhr.m_args = i_args;
+
 	xhr.send( obj_str);
 
-	xhr.onreadystatechange = function()
+	xhr.onreadystatechange = n_XHRHandler;
+}
+
+function n_XHRHandler()
+{
+	if( this.readyState == 4 )
 	{
-		if( xhr.readyState == 4 )
+		if(( this.status == 200 ) && this.responseText.length )
 		{
-			if(( xhr.status == 200 ) && xhr.responseText.length )
+			this.m_log += '<br><b><i>recv:</i></b> '+ this.responseText;
+			g_Log( this.m_log, 'netlog');
+
+			nw_error_count = 0;
+			nw_connected = true;
+
+			var recv_obj = null;
+			try { recv_obj = JSON.parse( this.responseText);}
+			catch( err)
 			{
-				log += '<br/><b><i>recv:</i></b> '+ xhr.responseText;
-
-				nw_error_count = 0;
-				nw_connected = true;
-//				g_ProcessMsg( eval('('+xhr.responseText+')'));
-//				g_ProcessMsg( JSON.parse( xhr.responseText));
-
-				var newobj = null;
-				try { newobj = JSON.parse( xhr.responseText);}
-				catch( err)
-				{
-					g_Log(err.message+'\n\n'+xhr.responseText);
-					newobj = null;
-				}
-
-				if( newobj )
-					g_ProcessMsg( newobj);
+				g_Log(err.message+'\n\n'+this.responseText);
+				recv_obj = null;
 			}
-			else
+
+			if( recv_obj )
 			{
-				nw_error_count++;
-				nw_error_total++;
-//document.getElementById("status").textContent=nw_error_count+': Status number = ' + xhr.status;
-//document.getElementById("statustext").textContent='Status text: ' + xhr.statusText;
-				if(( nw_error_count > nw_error_count_max ) && nw_connected )
-				{
-					nw_connected = false;
-					g_Error('Connection lost.');
-					g_ConnectionLost();
-				}
+				if( this.m_args.func )
+					this.m_args.func( recv_obj, this.m_args);
+				else
+					g_ProcessMsg( recv_obj);
 			}
-			g_Log( log, 'netlog');
+		}
+		else
+		{
+			nw_error_count++;
+			nw_error_total++;
+			if(( nw_error_count > nw_error_count_max ) && nw_connected )
+			{
+				nw_connected = false;
+				g_Error('Connection lost.');
+				g_ConnectionLost();
+			}
 		}
 	}
 }
@@ -82,7 +99,7 @@ function nw_Subscribe( i_class, i_subscribe, i_ids)
 		obj.action.operation.uids = [uid];
 	}
 
-	nw_Send(obj);
+	nw_send(obj);
 }
 
 function nw_GetEvents()
@@ -95,7 +112,7 @@ function nw_GetEvents()
 	obj.get.ids = [g_id];
 	obj.get.mode = 'events';
 
-	nw_Send(obj);
+	nw_send(obj);
 }
 
 function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number)
@@ -118,7 +135,7 @@ function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number)
 	if( i_number )
 		obj.get.number = i_number;
 
-	nw_Send(obj);
+	nw_send(obj);
 }
 
 function nw_GetBlocks( i_job_id, i_blocks, i_modes)
@@ -133,21 +150,7 @@ function nw_GetSoftwareIcons()
 	obj.get.type = 'files';
 	obj.get.path = 'icons/software';
 
-	nw_Send(obj);
-}
-
-function nw_GetCGRUConfig()
-{
-	var obj = {};
-	obj.get = {};
-	obj.get.type = 'config';
-
-	nw_Send(obj);
-}
-
-function nw_ReqestRendersResources()
-{
-	nw_GetNodes('renders', null, 'resources');
+	nw_send(obj);
 }
 
 function nw_ConstructActionObject( i_type, i_ids)
@@ -176,6 +179,6 @@ function nw_Action( i_type, i_ids, i_operation, i_params, i_block_ids)
 	if( i_operation ) obj.action.operation = i_operation;
 	if( i_block_ids ) obj.action.block_ids = i_block_ids;
 
-	nw_Send( obj);
+	nw_send( obj);
 }
 

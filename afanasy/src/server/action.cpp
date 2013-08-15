@@ -4,7 +4,7 @@
 
 #include "afcommon.h"
 
-Action::Action( af::Msg * i_msg, ThreadArgs * i_args):
+Action::Action( const af::Msg * i_msg, ThreadArgs * i_args):
 	jobs( i_args->jobs),
 	monitors( i_args->monitors),
 	renders( i_args->renders),

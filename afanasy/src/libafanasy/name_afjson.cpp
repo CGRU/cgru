@@ -249,6 +249,7 @@ bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, c
 	if( false == array.IsArray())
 		return false;
 
+	o_attr.clear();
 	for( int i = 0; i < array.Size(); i++)
 		if( array[i].IsString())
 			o_attr.push_back( array[i].GetString());

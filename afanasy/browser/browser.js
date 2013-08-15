@@ -4,6 +4,9 @@ g_id = 0;
 g_uid = -1;
 g_keysdown = '';
 
+g_auth = {};
+g_digest = null;
+
 g_windows = [];
 g_recievers = [];
 g_refreshers = [];
@@ -18,9 +21,6 @@ g_FooterOpened = false;
 
 g_Images = [];
 
-cgru_params.push(['user_name','User Name', 'coord', 'Enter user name<br/>Need restart (F5)']);
-cgru_params.push(['host_name','Host Name', 'pc','Enter host name<br/>Needed for logs only']);
-cgru_params.push(['run_symbol','Run Symbol', '★','Enter any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">unicode</a><br/>You can copy&paste some:<br>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
 function cgru_params_OnChange( i_param, i_value) { cm_ApplyStyles();}
 
 function g_Init()
@@ -30,13 +30,6 @@ function g_Init()
 
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
-
-	nw_GetSoftwareIcons();
-	nw_GetCGRUConfig();
-
-	cgru_ConstructSettingsGUI();
-	cgru_InitParameters();
-	cm_ApplyStyles();
 
 	document.getElementById('platform').textContent = cgru_Platform;
 	document.getElementById('browser').textContent = cgru_Browser;
@@ -49,8 +42,89 @@ function g_Init()
 	for( var i = 0; i < g_monitor_buttons.length; i++)
 		g_monitor_buttons[i].onclick = function(e){return g_MButtonClicked(e.currentTarget.textContent,e);};
 
+	g_GetConfig();
+}
+
+function g_GetConfig()
+{
+	var obj = {"get":{"type":"config"}};
+	nw_request({"send":obj,"func":g_ConfigReceived});
+}
+function g_ConfigReceived( i_obj)
+{
+	if( i_obj.realm )
+	{
+		if( g_digest )
+		{
+			g_Error('Access denied.');
+			return;
+		}
+		g_DigestInit( i_obj);
+		return;
+	}
+
+	if( i_obj.cgru_config )
+	{
+		if( false == cgru_ConfigLoad( i_obj.cgru_config))
+		{
+			g_Error('Invalid config recieved.');
+			return;
+		}
+	}
+
+	if( g_digest == null )
+		cgru_params.push(['user_name','User Name', 'coord', 'Enter user name<br/>Need restart (F5)']);
+	cgru_params.push(['host_name','Host Name', 'pc','Enter host name<br/>Needed for logs only']);
+	cgru_params.push(['run_symbol','Run Symbol', '★','Enter any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">unicode</a><br/>You can copy&paste some:<br>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
+
+	cgru_ConstructSettingsGUI();
+	cgru_InitParameters();
+	cm_ApplyStyles();
+
+	nw_GetSoftwareIcons();
 	g_RegisterSend();
 	g_Refresh();
+}
+
+function g_DigestInit( i_obj)
+{
+	g_digest = null;
+	g_auth.nc = 0;
+
+	if( i_obj )
+	{
+		g_auth.nonce = i_obj.nonce;
+
+		if(( localStorage.digest == null )
+		|| ( localStorage.realm  == null )
+		|| ( localStorage.realm != i_obj.realm )
+		|| ( localStorage.user_name == null)
+		|| ( localStorage.user_name.length < 1 ))
+		{
+			localStorage.removeItem( localStorage.digest);
+			localStorage.realm = i_obj.realm;
+			g_DigestAsk();
+			return;
+		}
+	}
+
+	g_digest = localStorage.digest;
+	g_auth.user_name = localStorage.user_name;
+	g_GetConfig();
+}
+function g_DigestAsk()
+{
+	new cgru_Dialog( window, window, 'g_DigestAskPasswd', null, 'str', '', 'settings', 'Login', 'Enter User Name');
+}
+function g_DigestAskPasswd( i_param, i_value)
+{
+	localStorage.user_name = i_value;
+	new cgru_Dialog( window, window, 'g_DigestConstruct', null, 'str', '', 'settings', 'Login', 'Enter Password');
+}
+function g_DigestConstruct( i_param, i_value)
+{
+	localStorage.digest = hex_md5( localStorage.user_name + ':' + localStorage.realm + ':' + i_value);
+	g_DigestInit();
 }
 
 function g_RegisterSend()
@@ -66,63 +140,64 @@ function g_RegisterSend()
 	obj.monitor.user_name = localStorage['user_name'];
 	obj.monitor.host_name = localStorage['host_name'];
 	obj.monitor.engine = navigator.userAgent;
-	nw_Send(obj);
+	nw_send(obj);
 
 	setTimeout('g_RegisterSend()', 5000);
 }
 
-function g_ProcessMsg( obj)
+function g_ProcessMsg( i_obj)
 {
 //g_Info( g_cycle+' Progessing '+g_recievers.length+' recieves');
 	g_last_msg_cycle = g_cycle;
 
-	if( obj.files && obj.path )
+	// Realm is sended if message not authorized
+	if( i_obj.realm )
 	{
-		for( var i = 0; i < obj.files.length; i++)
+		g_Error('Authentication problems...');
+		return;
+	}
+
+	// Preload images (service icons):
+	if( i_obj.files && i_obj.path )
+	{
+		for( var i = 0; i < i_obj.files.length; i++)
 		{
 			var img = new Image();
-			img.src = obj.path + "/" + obj.files[i];
+			img.src = i_obj.path + "/" + i_obj.files[i];
 			g_Images.push( img);
 		}
 		return;
 	}
 
-	if( obj.cgru_config )
+	if( i_obj.monitor )
 	{
-		if( false == cgru_ConfigLoad( obj.cgru_config))
-			g_Error('Invalid config recieved.');
-		return;
-	}
-
-	if( obj.monitor )
-	{
-		if(( g_id == 0 ) && ( obj.monitor.id > 0 ))
+		if(( g_id == 0 ) && ( i_obj.monitor.id > 0 ))
 		{
 			// Monitor is not registered and recieved an ID:
-			g_RegisterRecieved( obj.monitor);
+			g_RegisterRecieved( i_obj.monitor);
 		}
-		else if( obj.monitor.id != g_id )
+		else if( i_obj.monitor.id != g_id )
 		{
 			// Recieved ID does not match:
-			g_Info('This ID = '+g_id+' != '+obj.monitor.id+' recieved.');
+			g_Info('This ID = '+g_id+' != '+i_obj.monitor.id+' recieved.');
 			g_Deregistered();
 		}
 		return;
 	}
 
-	if( obj.message )
+	if( i_obj.message )
 	{
-		g_ShowMessage( obj.message);
+		g_ShowMessage( i_obj.message);
 		return;
 	}
-	if( obj.object )
+	if( i_obj.i_object )
 	{
-		g_ShowObject( obj.object);
+		g_ShowObject( i_obj.i_object);
 		return;
 	}
-	if( obj.task_exec )
+	if( i_obj.task_exec )
 	{
-		g_ShowTask( obj.task_exec);
+		g_ShowTask( i_obj.task_exec);
 		return;
 	}
 
@@ -131,7 +206,7 @@ function g_ProcessMsg( obj)
 
 	for( var i = 0; i < g_recievers.length; i++)
 	{
-		g_recievers[i].processMsg( obj);
+		g_recievers[i].processMsg( i_obj);
 	}
 }
 

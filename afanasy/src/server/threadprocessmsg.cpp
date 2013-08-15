@@ -20,6 +20,7 @@
 #include "../libafanasy/msgqueue.h"
 
 #include "afcommon.h"
+#include "auth.h"
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
@@ -62,6 +63,7 @@ void processMessage( ThreadArgs * i_args)
 	// this client address will be used for a new client,
 	// if it is a new client registration request.
 	af::Msg * msg_request = new af::Msg( &(i_args->ss));
+	af::Msg * msg_response = NULL;
 
 	// Read message data from socket
 	if( false == readMessage( i_args, msg_request))
@@ -71,28 +73,24 @@ void processMessage( ThreadArgs * i_args)
 		return;
 	}
 
+#ifdef AFOUTPUT
+printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
+#endif
+
 	// Check message IP trust mask:
 	if( false == msg_request->getAddress().matchIpMask())
 	{
 		// Authenticate message that does not match trust mask:
-		if( 0 )
+		if( false == Auth::process( msg_request, &msg_response))
 		{
-		}
-		else
-		{
-			AFCommon::QueueLogError( std::string("Not allowed incoming message IP address: "
-				+ msg_request->getAddress().v_generateInfoString()));
 			delete msg_request;
 			return;
 		}
 	}
 
-#ifdef AFOUTPUT
-printf("Request:  "); msg_request->stdOut();
-#endif
-
 	// React on message, may be with response to the same opened socket.
-	af::Msg * msg_response = threadProcessMsgCase( i_args, msg_request);
+	if( msg_response == NULL )
+		msg_response = threadProcessMsgCase( i_args, msg_request);
 	// If request not needed any more it will be deleted there.
 
 	if( msg_response == NULL)
@@ -101,12 +99,13 @@ printf("Request:  "); msg_request->stdOut();
 		return;
 	}
 
-	// Create HTTP response header for web browsers:
-	if( msg_response && ( msg_request->type() == af::Msg::THTTP ))
+	// Set HTTP message type.
+	// On writing header will be send first for web browsers.
+	if( msg_request->type() == af::Msg::THTTP )
 		msg_response->setTypeHTTP();
 
 #ifdef AFOUTPUT
-printf("Response: "); msg_response->stdOut();
+printf("Response: "); msg_response->v_stdOut();
 #endif
 
 	// Write response message back to client socket
@@ -117,7 +116,7 @@ printf("Response: "); msg_response->stdOut();
 
 bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 {
-	AFINFO("Trying to recieve message...")
+	//AFINFO("Trying to recieve message...")
 
 	// set max allowed time to block recieveing data from client socket
 	timeval so_rcvtimeo;
@@ -145,7 +144,7 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 		return false;
 	}
 
-	AFINFO("readMessage: Message recieved.")
+	//AFINFO("readMessage: Message recieved.")
 
 	return true;
 }
@@ -180,5 +179,6 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 		return;
 	}
 
-	AFINFO("writeMessage: message sent.")
+	//AFINFO("writeMessage: message sent.")
 }
+

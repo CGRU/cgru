@@ -69,6 +69,9 @@ public:
 	/// Set client port. Client can change its port.
 	static void setClientPort( uint16_t port) { clientport = port;}
 
+	static inline const std::string & getDigestRealm() { return digest_realm; }
+	static const std::string getDigest( const std::string & i_user_name);
+
 	/// Get versions:
 	static inline const std::string & getVersionRevision(){ return version_revision; }
 	static inline const std::string & getVersionCGRU()    { return version_cgru;     }
@@ -209,7 +212,7 @@ private:
 
 	static std::string digest_file;
 	static std::string digest_realm;
-	static std::map<std::string, std::string> user_passwd;
+	static std::map<std::string, std::string> digest_map;
 
 	static std::string cgrulocation;    ///< CGRU root directory.
 	static std::string afroot;          ///< Afanasy root directory.

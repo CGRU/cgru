@@ -24,7 +24,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		return NULL;
 	}
 
-    af::Msg * o_msg_response = NULL;
+	af::Msg * o_msg_response = NULL;
 
 	JSON & getObj = document["get"];
 	if( getObj.IsObject())

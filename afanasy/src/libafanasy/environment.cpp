@@ -25,7 +25,7 @@ using namespace af;
 
 std::string Environment::digest_file;
 std::string Environment::digest_realm;
-std::map<std::string, std::string> Environment::user_passwd;
+std::map<std::string, std::string> Environment::digest_map;
 
 bool Environment::perm_user_mod_his_priority = AFGENERAL::PERM_USER_MOD_HIS_PRIORITY;
 bool Environment::perm_user_mod_job_priority = AFGENERAL::PERM_USER_MOD_JOB_PRIORITY;
@@ -658,7 +658,7 @@ printf("%s\n", data);
 			continue;
 		}
 printf("%s - %s\n", words[0].c_str(), words[2].c_str());
-		user_passwd[words[0]] = words[2];
+		digest_map[words[0]] = words[2];
 	}
 	}
 
@@ -733,6 +733,15 @@ bool Environment::getArgument( const std::string & argument, std::string & value
 		}
 	}
 	return false;
+}
+
+const std::string Environment::getDigest( const std::string & i_user_name)
+{
+	std::string digest;
+	std::map<std::string, std::string>::const_iterator it = digest_map.find( i_user_name);
+	if( it != digest_map.end())
+		digest = (*it).second;
+	return digest;
 }
 
 void Environment::printUsage()

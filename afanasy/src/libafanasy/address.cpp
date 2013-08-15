@@ -114,10 +114,16 @@ Address::~Address() {}
 
 bool Address::equal( const af::Address & other ) const
 {
+	if( false == equalIP( other)) return false;
+	if( m_port != other.m_port ) return false;
+	return false;
+}
+
+bool Address::equalIP( const af::Address & other ) const
+{
 	if( isEmpty()) return false;
 	if( other.isEmpty()) return false;
-
-	if(( m_family == other.m_family) && ( m_port == other.m_port ))
+	if( m_family == other.m_family)
 	{
 		if( memcmp( &m_addr, &(other.m_addr), ms_addrdatalength) == 0)
 		return true;
@@ -142,18 +148,18 @@ void Address::jsonWrite( std::ostringstream & o_str) const
 	o_str << "{\"family\":";
 	switch( m_family)
 	{
-		case IPv4:
-		{
-			o_str << "4";
-			break;
-		}
-		case IPv6:
-		{
-			o_str << "6";
-			break;
-		}
-		default:
-			o_str << "0";
+	case IPv4:
+	{
+		o_str << "4";
+		break;
+	}
+	case IPv6:
+	{
+		o_str << "6";
+		break;
+	}
+	default:
+		o_str << "0";
 	}
 	o_str << ",\"ip\":\"";
 	generateIPStream( o_str, false);
@@ -253,42 +259,42 @@ void Address::generateIPStream( std::ostringstream & stream, bool full) const
 {
 	switch( m_family)
 	{
-		case IPv4:
+	case IPv4:
+	{
+		char buffer[64];
+		sprintf( buffer, "%u.%u.%u.%u", uint8_t(m_addr[0]), uint8_t(m_addr[1]), uint8_t(m_addr[2]), uint8_t(m_addr[3]));
+		stream << buffer;
+		break;
+	}
+	case IPv6:
+	{
+		char buffer[64];
+		for( int i = 0; i < 8; i++)
 		{
-			char buffer[64];
-			sprintf( buffer, "%u.%u.%u.%u", uint8_t(m_addr[0]), uint8_t(m_addr[1]), uint8_t(m_addr[2]), uint8_t(m_addr[3]));
-			stream << buffer;
-			break;
-		}
-		case IPv6:
-		{
-			char buffer[64];
-			for( int i = 0; i < 8; i++)
+			if( i != 0 ) stream << ':';
+			uint8_t byte0 = uint8_t(m_addr[2*i]);
+			uint8_t byte1 = uint8_t(m_addr[2*i+1]);
+			if( full )
 			{
-				if( i != 0 ) stream << ':';
-				uint8_t byte0 = uint8_t(m_addr[2*i]);
-				uint8_t byte1 = uint8_t(m_addr[2*i+1]);
-				if( full )
-				{
-					if( byte0 ) sprintf( buffer, "%x%02x", byte0, byte1);
-					else if( byte1 ) sprintf( buffer, "%x", byte1);
-					if( byte0 || byte1 ) stream << buffer;
-				}
-				else
-				{
-					sprintf( buffer, "%02x%02x", byte0, byte1);
-					stream << buffer;
-				}
+				if( byte0 ) sprintf( buffer, "%x%02x", byte0, byte1);
+				else if( byte1 ) sprintf( buffer, "%x", byte1);
+				if( byte0 || byte1 ) stream << buffer;
 			}
-			break;
+			else
+			{
+				sprintf( buffer, "%02x%02x", byte0, byte1);
+				stream << buffer;
+			}
 		}
-		case Empty:
-			if( full ) stream << "Empty address";
-			break;
-		default:
-			if( full ) stream << "Unknown address family";
-			else stream << "AF=" << m_family;
-			break;
+		break;
+	}
+	case Empty:
+		if( full ) stream << "Empty address";
+		break;
+	default:
+		if( full ) stream << "Unknown address family";
+		else stream << "AF=" << m_family;
+		break;
 	}
 }
 
@@ -317,12 +323,12 @@ void Address::v_generateInfoStream( std::ostringstream & stream, bool full) cons
 	{
 		switch (m_family)
 		{
-			case IPv4:
-				stream << "IPv4 Address: ";
-				break;
-			case IPv6:
-				stream << "IPv6 Address: ";
-				break;
+		case IPv4:
+			stream << "IPv4 Address: ";
+			break;
+		case IPv6:
+			stream << "IPv6 Address: ";
+			break;
 		}
 	}
 	generateIPStream( stream, true);
@@ -341,164 +347,168 @@ int Address::calcWeight() const
 
 bool Address::readIpMask( const std::vector<std::string> & i_masks, bool i_verbose)
 {
-	 for( std::vector<std::string>::const_iterator it = i_masks.begin(); it != i_masks.end(); it++)
-	 {
-		  int mask_len = 0;
-		  char mask_bytes[ms_addrdatalength];
-		  Address::Family mask_family = Address::Empty;
+	ms_addr_masks.clear();
 
-		  if(((*it).find('.') != std::string::npos) && ((*it).find(':') != std::string::npos))
-		  {
-				AFERRAR("Invalid Server IP Mask: '%s' - and '.' and ':' characters preset.", (*it).c_str());
+	for( std::vector<std::string>::const_iterator it = i_masks.begin(); it != i_masks.end(); it++)
+	{
+		int mask_len = 0;
+		char mask_bytes[ms_addrdatalength];
+		Address::Family mask_family = Address::Empty;
+
+		if(((*it).find('.') != std::string::npos) && ((*it).find(':') != std::string::npos))
+		{
+			AFERRAR("Invalid Server IP Mask: '%s' - and '.' and ':' characters preset.", (*it).c_str());
+			return false;
+		}
+		if((*it).find('.') != std::string::npos )
+		{
+			// IPv4
+			mask_family = Address::IPv4;
+
+			std::vector<std::string> byte_strs = strSplit( *it, ".");
+			if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 4 ))
+			{
+				AFERRAR("Invalid Server IPv4 Mask: '%s' - should be 2 - 4 entries separated with '.'", (*it).c_str());
 				return false;
-		  }
-		  if((*it).find('.') != std::string::npos )
-		  {
-				// IPv4
-				mask_family = Address::IPv4;
+			}
 
-				std::vector<std::string> byte_strs = strSplit( *it, ".");
-				if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 4 ))
+			for( int i = 0; i < byte_strs.size(); i++)
+			{
+				if( byte_strs[i] == "*")
 				{
-					 AFERRAR("Invalid Server IPv4 Mask: '%s' - should be 2 - 4 entries separated with '.'", (*it).c_str());
-					 return false;
+					break;
 				}
-
-				for( int i = 0; i < byte_strs.size(); i++)
+				bool ok;
+				unsigned byte = (unsigned)af::stoi( byte_strs[i], &ok);
+				if( false == ok )
 				{
-					 if( byte_strs[i] == "*")
-					 {
-						  break;
-					 }
-					 bool ok;
-					 unsigned byte = (unsigned)af::stoi( byte_strs[i], &ok);
-					 if( false == ok )
-					 {
-						  AFERRAR("Invalid Server IP Mask: '%s': Invalid decimal number '%s'.", (*it).c_str(), byte_strs[i].c_str());
-						  return false;
-					 }
-					 if( byte > 0xff )
-					 {
-						  AFERRAR("Invalid Server IP Mask: '%s': Too big decimal number '%s'.", (*it).c_str(), byte_strs[i].c_str());
-						  return false;
-					 }
-					 mask_bytes[mask_len] = byte;
-					 mask_len++;
+					AFERRAR("Invalid Server IP Mask: '%s': Invalid decimal number '%s'.", (*it).c_str(), byte_strs[i].c_str());
+					return false;
 				}
-		  }
-		  else if((*it).find(':') != std::string::npos )
-		  {
-				// IPv6
-				mask_family = Address::IPv6;
-
-				std::vector<std::string> byte_strs = strSplit( *it, ":");
-				if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 8 ))
+				if( byte > 0xff )
 				{
-					 AFERRAR("Invalid Server IPv6 Mask: '%s' - should be 2 - 8 entries separated with ':'", (*it).c_str());
-					 return false;
+					AFERRAR("Invalid Server IP Mask: '%s': Too big decimal number '%s'.", (*it).c_str(), byte_strs[i].c_str());
+					return false;
 				}
+				mask_bytes[mask_len] = byte;
+				mask_len++;
+			}
+		}
+		else if((*it).find(':') != std::string::npos )
+		{
+			// IPv6
+			mask_family = Address::IPv6;
 
-				for( int i = 0; i < byte_strs.size(); i++)
-				{
-					 if( byte_strs[i] == "*")
-					 {
-						  break;
-					 }
-
-					 unsigned byte;
-					 sscanf( byte_strs[i].c_str(), "%x", &byte);
-					 uint8_t hi = byte >> 8;
-					 uint8_t lo = byte - (int(hi) << 8);
-					 mask_bytes[mask_len++] = hi;
-					 mask_bytes[mask_len++] = lo;
-				}
-		  }
-		  else
-		  {
-				AFERRAR("Invalid Server IP Mask: '%s' - no '.' or ':' characters preset.", (*it).c_str());
+			std::vector<std::string> byte_strs = strSplit( *it, ":");
+			if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 8 ))
+			{
+				AFERRAR("Invalid Server IPv6 Mask: '%s' - should be 2 - 8 entries separated with ':'", (*it).c_str());
 				return false;
-		  }
+			}
 
-		  ms_addr_masks.push_back( AddressMask( mask_len, mask_bytes, mask_family, i_verbose));
-	 }
-	 return true;
+			for( int i = 0; i < byte_strs.size(); i++)
+			{
+				if( byte_strs[i] == "*")
+				{
+					break;
+				}
+
+				unsigned byte;
+				sscanf( byte_strs[i].c_str(), "%x", &byte);
+				uint8_t hi = byte >> 8;
+				uint8_t lo = byte - (int(hi) << 8);
+				mask_bytes[mask_len++] = hi;
+				mask_bytes[mask_len++] = lo;
+			}
+		}
+		else
+		{
+			AFERRAR("Invalid Server IP Mask: '%s' - no '.' or ':' characters preset.", (*it).c_str());
+			return false;
+		}
+
+		ms_addr_masks.push_back( AddressMask( mask_len, mask_bytes, mask_family, i_verbose));
+	}
+	return true;
 }
 
 bool Address::matchIpMask() const
 {
-	 if( ms_addr_masks.size() == 0)
-	 {
-		  // No masks exists - any address allowed
-		  return true;
-	 }
+	AFINFA("Address::matchIpMask: %s", v_generateInfoString().c_str())
 
-	 for( std::list<AddressMask>::const_iterator it = ms_addr_masks.begin(); it != ms_addr_masks.end(); it++)
-	 {
-		  if( m_family != it->m_family)
-		  {
-				// Skip if family not equal
-				continue;
-		  }
+	if( ms_addr_masks.size() == 0)
+	{
+		// No masks exists - any address allowed
+		return true;
+	}
 
-		  if( it->m_len == 0 )
-		  {
-				// Mask has no length - any address match
-				return true;
-		  }
+	for( std::list<AddressMask>::const_iterator it = ms_addr_masks.begin(); it != ms_addr_masks.end(); it++)
+	{
+		if( m_family != it->m_family)
+		{
+			// Skip if family not equal
+			continue;
+		}
 
-		  if( memcmp( m_addr, it->m_bytes, it->m_len ) == 0 )
-		  {
-				// Return that mask is matched
-				return true;
-		  }
-	 }
+		if( it->m_len == 0 )
+		{
+			// Mask has no length - any address match
+			return true;
+		}
 
-	 // Return that mask is NOT matched
-	 return false;
+		if( memcmp( m_addr, it->m_bytes, it->m_len ) == 0 )
+		{
+			// Return that mask is matched
+			return true;
+		}
+	}
+
+	// Return that mask is NOT matched
+	return false;
 }
 
 AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_family, bool i_verbose):
-	 m_len( i_len),
-	 m_family( i_family)
+	m_len( i_len),
+	m_family( i_family)
 {
-	 if( m_len > 0 )
-	 {
-		  memcpy( m_bytes, i_bytes, i_len);
-	 }
+	if( m_len > 0 )
+	{
+		memcpy( m_bytes, i_bytes, i_len);
+	}
 
-	 if( false == i_verbose )
-		  return;
+	if( false == i_verbose )
+		return;
 
-	 // Print mask:
-	 printf("Server Mask");
+	// Print mask:
+	printf("Server Mask");
 
-	 switch( m_family )
-	 {
-	 case Address::IPv4:
-	 {
-		  printf(" IPv4: ");
-		  if( m_len == 0 ) printf("any");
-		  for( int i = 0; i < m_len; i++)
-		  {
-				if(i) printf(".");
-				uint8_t byte = m_bytes[i];
-				printf("%u", byte);
-		  }
-		  break;
-	 }
-	 case Address::IPv6:
-	 {
-		  printf(" IPv6: ");
-		  if( m_len == 0 ) printf("any");
-		  for( int i = 0; i < m_len; i++)
-		  {
-				if(( i > 0 ) && ( i%2 == 0 )) printf(":");
-				uint8_t byte = m_bytes[i];
-				printf("%02x", byte);
-		  }
-		  break;
-	 }
-	 }
+	switch( m_family )
+	{
+	case Address::IPv4:
+	{
+		printf(" IPv4: ");
+		if( m_len == 0 ) printf("any");
+		for( int i = 0; i < m_len; i++)
+		{
+			if(i) printf(".");
+			uint8_t byte = m_bytes[i];
+			printf("%u", byte);
+		}
+		break;
+	}
+	case Address::IPv6:
+	{
+		printf(" IPv6: ");
+		if( m_len == 0 ) printf("any");
+		for( int i = 0; i < m_len; i++)
+		{
+			if(( i > 0 ) && ( i%2 == 0 )) printf(":");
+			uint8_t byte = m_bytes[i];
+			printf("%02x", byte);
+		}
+		break;
+	}
+	}
 
-	 printf("\n");
+	printf("\n");
 }

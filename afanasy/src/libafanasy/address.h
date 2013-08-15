@@ -46,6 +46,7 @@ public:
 	inline void setPort( int value ) { m_port = value;       } ///< Set address port in host byte order.
 
 	bool equal( const Address & other ) const;   ///< Compare address with other.
+	bool equalIP( const Address & other ) const;   ///< Compare IP address with other.
 
 /// Set sockaddr_in structure address.
 	bool setSocketAddress( struct sockaddr_storage * ss) const;

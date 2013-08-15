@@ -7,7 +7,7 @@
 class Action
 {
 public:
-	Action( af::Msg * i_msg, ThreadArgs * i_args);
+	Action( const af::Msg * i_msg, ThreadArgs * i_args);
 	~Action();
 
 	inline bool isValid()   const { return m_valid;          }
