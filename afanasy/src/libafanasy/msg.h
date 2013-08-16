@@ -152,8 +152,9 @@ TRESERVED09,
 
 /**/TDATA/**/,                      ///< Some data.
 /**/TTESTDATA/**/,                  ///< Test some data transfer.
-/**/THTTP/**/,                      ///< HTTP - with JSON POST data
 /**/TJSON/**/,                      ///< JSON
+/**/THTTP/**/,                      ///< HTTP - with JSON POST data.
+/**/THTTPGET/**/,                   ///< HTTP Get request.
 /**/TString/**/,                    ///< String message.
 /**/TStringList/**/,                ///< Strings list message.
 

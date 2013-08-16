@@ -37,6 +37,8 @@ void processMessage( ThreadArgs * i_args);
 
 bool readMessage( ThreadArgs * i_args, af::Msg * i_msg);
 
+af::Msg * processHTTPGet( const af::Msg * i_msg);
+
 af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
 
 void writeMessage( ThreadArgs * i_args, af::Msg * i_msg);
@@ -77,8 +79,11 @@ void processMessage( ThreadArgs * i_args)
 printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
 #endif
 
+	if( msg_request->type() == af::Msg::THTTPGET )
+		msg_response = processHTTPGet( msg_request);
+
 	// Check message IP trust mask:
-	if( false == msg_request->getAddress().matchIpMask())
+	if(( msg_response == NULL ) && (false == msg_request->getAddress().matchIpMask()))
 	{
 		// Authenticate message that does not match trust mask:
 		if( false == Auth::process( msg_request, &msg_response))
@@ -182,3 +187,53 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 	//AFINFO("writeMessage: message sent.")
 }
 
+af::Msg * processHTTPGet( const af::Msg * i_msg)
+{
+	char * get = i_msg->data();
+	int get_len = i_msg->dataLen();
+	//::write( 1, get, get_len);
+
+	int get_start = 4; // skipping "GET "
+	int get_finish = get_start; 
+	char * data = NULL;
+	int datalen;
+	std::string datafile;
+	while( get[++get_finish] != ' ');
+	while( get[get_start] == '/' ) get_start++;
+	while( get[get_start] == '\\') get_start++;
+	if( get_finish - get_start > 1 )
+	{
+		datafile = std::string( get + get_start, get_finish - get_start);
+printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
+		if(( datafile.find("..") == -1 ) && ( datafile.find(':') == -1 ))
+		{
+			datafile = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + datafile;
+			std::string error;
+			data = af::fileRead( datafile, &datalen, -1, &error);
+		}
+	}
+	else
+	{
+		datafile = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
+		data = af::fileRead( datafile, &datalen);
+	}
+
+	if( data == NULL )
+	{
+		static char httpError[] = "HTTP/1.0 404 Not Found\r\n\r\n";
+		//writedata( i_desc, httpError, strlen(httpError));
+		data = httpError;
+		datalen = strlen(httpError);
+	}
+/*	else
+	{
+		static const char httpHeader[] = "HTTP/1.0 200 OK\r\n\r\n";
+		writedata( i_desc, httpHeader, strlen(httpHeader));
+		writedata( i_desc, data, datalen);
+	}*/
+
+	af::Msg * o_msg = new af::Msg();
+	o_msg->setData( datalen, data, af::Msg::THTTPGET);
+
+	return o_msg;
+}

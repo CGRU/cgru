@@ -1,12 +1,14 @@
 #include "auth.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/dlScopeLocker.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/passwd/md5.h"
 
 #include "afcommon.h"
 
 std::map<std::string, Auth> Auth::ms_map;
+DlMutex Auth::m_mutex;
 
 Auth::Auth(){};
 
@@ -70,6 +72,8 @@ bool Auth::process( const af::Msg * i_msg, af::Msg ** o_msg)
 		std::string nonce;
 		if( af::jr_string("nonce", nonce, obj))
 		{
+			DlScopeLocker lock( &m_mutex );
+
 			std::map<std::string, Auth>::iterator it = ms_map.find( nonce);
 //printf("Auth::process: searching for nonce = %s, auth.size = %zd\n", nonce.c_str(), ms_map.size());
 			if( it != ms_map.end())
@@ -90,6 +94,7 @@ bool Auth::process( const af::Msg * i_msg, af::Msg ** o_msg)
 			}
 		}
 	}
+	delete [] data;
 
 	if( access == false )
 	{
@@ -100,8 +105,6 @@ bool Auth::process( const af::Msg * i_msg, af::Msg ** o_msg)
 		*o_msg = af::jsonMsg( str);
 		access = true;
 	}
-
-	delete [] data;
 
 	return access;
 }
@@ -140,14 +143,30 @@ const std::string Auth::md5( const std::string & i_str)
 
 void Auth::free()
 {
-	long long free_time = time(NULL) - 6; // 10 minutes for unused nonce to become absolete
+	DlScopeLocker lock( &m_mutex );
+
+	 // 10 minutes for unused nonce to become absolete
+	long long free_time = time(NULL) - 600;
+
 	std::map<std::string, Auth>::iterator it = ms_map.begin();
+	// Another iterator for erase, as we should never erase loop iterator
+	std::map<std::string, Auth>::iterator erase_it = it;
+
 	while( it != ms_map.end())
 	{
-		printf("%s: %llu\n", (*it).second.m_nonce.c_str(), (*it).second.m_time);
-/*		if((*it).second.m_time < free_time )
-			ms_map.erase( it);
-		else*/
+		//printf("%s: %llu\n", (*it).second.m_nonce.c_str(), (*it).second.m_time);
+		if((*it).second.m_time < free_time )
+		{
+			// Copy loop iterator
+			erase_it = it;
+
+			// We should increment loop iterator before erase
+			it++;
+
+			// Erase function invalidates iterator
+			ms_map.erase( erase_it);
+		}
+		else
 			it++;
 	}
 }

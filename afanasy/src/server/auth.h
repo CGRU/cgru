@@ -3,6 +3,7 @@
 #include <map>
 
 #include "../libafanasy/address.h"
+#include "../libafanasy/dlMutex.h"
 #include "../libafanasy/name_af.h"
 
 class Auth
@@ -22,6 +23,7 @@ private:
 
 private:
 	static std::map<std::string, Auth> ms_map;
+	static DlMutex m_mutex;
 
 private:
 	bool isValid() const { return m_time != 0; }

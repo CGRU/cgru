@@ -196,7 +196,7 @@ bool Msg::setData( int i_size, const char * i_msgData, int i_type)
 
 	// Default header type for JSON - not binary
 	// So we should skip binary header at all
-	if( m_type == Msg::TJSON )
+	if(( m_type == Msg::TJSON ) || ( m_type == Msg::THTTPGET ))
 		m_header_offset = Msg::SizeHeader;
 
 	rw_header( true);
@@ -549,8 +549,9 @@ const char * Msg::TNAMES[]=
 
 	"TDATA",                      ///< Some data.
 	"TTESTDATA",                  ///< Test some data transfer.
-	"THTTP",                      ///< HTTP - with JSON POST data
 	"TJSON",                      ///< JSON
+	"THTTP",                      ///< HTTP - with JSON POST data
+	"THTTPGET",                   ///< HTTP Get request.
 	"TString",                    ///< QString text message.
 	"TStringList",                ///< QStringList text message.
 

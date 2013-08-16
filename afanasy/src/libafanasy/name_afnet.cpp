@@ -168,48 +168,14 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 
 	if( strncmp( buffer, "GET", 3) == 0 )
 	{
-		//writedata( 1, buffer, io_bytes);
-		int get_start = 4;
-		int get_finish = get_start; 
-		char * data = NULL;
-		int datalen;
-		std::string datafile;
-		while( buffer[++get_finish] != ' ');
-		while( buffer[get_start] == '/' ) get_start++;
-		while( buffer[get_start] == '\\') get_start++;
-		if( get_finish - get_start > 1 )
-		{
-			datafile = std::string( buffer + get_start, get_finish - get_start);
-//printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
-			if(( datafile.find("..") == -1 ) && ( datafile.find(':') == -1 ))
-			{
-				datafile = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + datafile;
-				std::string error;
-				data = af::fileRead( datafile, &datalen, -1, &error);
-			}
-		}
-		else
-		{
-			datafile = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
-			data = af::fileRead( datafile, &datalen);
-		}
+		//writedata( 1, buffer, i_bytes);
+		char * get = new char[i_bytes];
+		memcpy( get, buffer, i_bytes);
+		io_msg->setData( i_bytes, get, af::Msg::THTTPGET);
+		delete []  get;
 
-		if( data == NULL )
-		{
-			static const char httpError[] = "HTTP/1.0 404 Not Found\r\n\r\n";
-			writedata( i_desc, httpError, strlen(httpError));
-		}
-		else
-		{
-			static const char httpHeader[] = "HTTP/1.0 200 OK\r\n\r\n";
-			writedata( i_desc, httpHeader, strlen(httpHeader));
-			writedata( i_desc, data, datalen);
-		}
-
-		// Header not recongnized:
-		return -1;
-		// It is recognized and processed here (directly in the thread that was raised to read a socket)
-		// and there is no need to construct message for Afanasy
+		//printf("i_bytes = %d, msg data len = %d\n", i_bytes, io_msg->dataLen());
+		return 0; // no offset, reading finished
 	}
 
 	io_msg->readHeader( i_bytes);
@@ -457,21 +423,21 @@ bool af::msgread( int desc, af::Msg* msg)
 {
 AFINFO("af::msgread:\n");
 
-   char * buffer = msg->buffer();
-//
-// Read message header data
-   int bytes = ::readdata( desc, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer );
+	char * buffer = msg->buffer();
+	//
+	// Read message header data
+	int bytes = ::readdata( desc, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer );
 
-   if( bytes < af::Msg::SizeHeader)
-   {
-	  AFERRAR("af::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).", bytes);
-	  msg->setInvalid();
-	  return false;
-   }
+	if( bytes < af::Msg::SizeHeader)
+	{
+		AFERRAR("af::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).", bytes);
+		msg->setInvalid();
+		return false;
+	}
 
 	// Header offset is variable on not binary header (for example HTTP)
 	int header_offset = processHeader( msg, bytes, desc);
-	if( header_offset < 1)
+	if( header_offset < 0)
 		return false;
 
 	//
@@ -507,8 +473,13 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 		::writedata( i_desc, "Content-Type: application/json\r\n", 32);
 //                            1234567890123456789012345678901234567890
 //                            0         1         2         3
-		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n", 19);
-		::writedata( i_desc, "\r\n", 2);
+//		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n", 19);
+		::writedata( i_desc, "\r\n\r\n", 4);
+	}
+
+	if( i_msg->type() == af::Msg::THTTPGET )
+	{
+		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n\r\n", 21);
 	}
 
 	if( false == ::writedata( i_desc, i_msg->buffer() + i_msg->getHeaderOffset(), i_msg->writeSize() - i_msg->getHeaderOffset() ))

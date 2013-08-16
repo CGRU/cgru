@@ -13,6 +13,8 @@ cm_Attrs.push(['str',             'Starts',   'Starts Count']);
 cm_Attrs.push(['err',             'Errors',   'Errors Count']);
 cm_Attrs.push(['hst',             'Host',     'Host Name']);
 
+var $ = function( id ) { return document.getElementById( id ); };
+
 function cm_ApplyStyles()
 {
 	document.body.style.background = localStorage.background;

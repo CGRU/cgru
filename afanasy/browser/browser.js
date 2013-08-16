@@ -31,13 +31,13 @@ function g_Init()
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
 
-	document.getElementById('platform').textContent = cgru_Platform;
-	document.getElementById('browser').textContent = cgru_Browser;
+	$('platform').textContent = cgru_Platform;
+	$('browser').textContent = cgru_Browser;
 
 	if( localStorage.main_monitor )
 		g_main_monitor_type = localStorage.main_monitor;
 
-	var header = document.getElementById('header');
+	var header = $('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
 	for( var i = 0; i < g_monitor_buttons.length; i++)
 		g_monitor_buttons[i].onclick = function(e){return g_MButtonClicked(e.currentTarget.textContent,e);};
@@ -57,6 +57,7 @@ function g_ConfigReceived( i_obj)
 		if( g_digest )
 		{
 			g_Error('Access denied.');
+			g_DigestRemove();
 			return;
 		}
 		g_DigestInit( i_obj);
@@ -73,7 +74,10 @@ function g_ConfigReceived( i_obj)
 	}
 
 	if( g_digest == null )
+	{
 		cgru_params.push(['user_name','User Name', 'coord', 'Enter user name<br/>Need restart (F5)']);
+		$('auth_parameters').style.display = 'none';
+	}
 	cgru_params.push(['host_name','Host Name', 'pc','Enter host name<br/>Needed for logs only']);
 	cgru_params.push(['run_symbol','Run Symbol', '★','Enter any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">unicode</a><br/>You can copy&paste some:<br>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
 
@@ -101,7 +105,7 @@ function g_DigestInit( i_obj)
 		|| ( localStorage.user_name == null)
 		|| ( localStorage.user_name.length < 1 ))
 		{
-			localStorage.removeItem( localStorage.digest);
+			g_DigestRemove();
 			localStorage.realm = i_obj.realm;
 			g_DigestAsk();
 			return;
@@ -110,6 +114,7 @@ function g_DigestInit( i_obj)
 
 	g_digest = localStorage.digest;
 	g_auth.user_name = localStorage.user_name;
+	$('auth_user').textContent = localStorage.user_name;
 	g_GetConfig();
 }
 function g_DigestAsk()
@@ -125,6 +130,16 @@ function g_DigestConstruct( i_param, i_value)
 {
 	localStorage.digest = hex_md5( localStorage.user_name + ':' + localStorage.realm + ':' + i_value);
 	g_DigestInit();
+}
+function g_DigestRemove()
+{
+	localStorage.removeItem('digest');
+	localStorage.removeItem('realm');
+}
+function g_Logout()
+{
+	g_DigestRemove();
+	window.location.reload();
 }
 
 function g_RegisterSend()
@@ -237,10 +252,10 @@ function g_RegisterRecieved( i_obj)
 
 	this.document.title = 'AF';
 	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
-	document.getElementById('registered').textContent = 'Registered';
-	document.getElementById('id').textContent = g_id;
-	document.getElementById('uid').textContent = g_uid;
-	document.getElementById('version').textContent = i_obj.version;
+	$('registered').textContent = 'Registered';
+	$('id').textContent = g_id;
+	$('uid').textContent = g_uid;
+	$('version').textContent = i_obj.version;
 
 	g_MButtonClicked( g_main_monitor_type);
 
@@ -256,9 +271,9 @@ function g_Deregistered()
 	g_id = 0;
 	g_uid = -1;
 	g_Info('Deregistered.');
-	document.getElementById('registered').textContent = 'Deregistered';
-	document.getElementById('id').textContent = g_id;
-	document.getElementById('uid').textContent = g_uid;
+	$('registered').textContent = 'Deregistered';
+	$('id').textContent = g_id;
+	$('uid').textContent = g_uid;
 	g_CloseAllWindows();
 	g_CloseAllMonitors();
 	g_RegisterSend();
@@ -315,7 +330,7 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 			return;
 		}
 
-	var elParent = document.getElementById('content');
+	var elParent = $('content');
 	var wnd = window;
 	if( i_new_wnd )
 	{
@@ -452,8 +467,8 @@ function g_CloseAllWindows()
 
 function g_HeaderButtonClicked()
 {
-	var header = document.getElementById('header');
-	var button = document.getElementById('headeropenbutton');
+	var header = $('header');
+	var button = $('headeropenbutton');
 	if( g_HeaderOpened )
 	{
 		header.style.top = '-200px';
@@ -469,37 +484,37 @@ function g_HeaderButtonClicked()
 }
 function g_FooterButtonClicked()
 {
-	var footer = document.getElementById('footer');
-	var button = document.getElementById('footeropenbutton');
+	var footer = $('footer');
+	var button = $('footeropenbutton');
 	if( g_FooterOpened )
 	{
 		footer.style.height = '26px';
 		button.innerHTML = '&uarr;';
-		document.getElementById('log_btn').classList.remove('pushed');
-		document.getElementById('netlog_btn').classList.remove('pushed');
-		document.getElementById('log').style.display = 'none';
-		document.getElementById('netlog').style.display = 'none';
-		document.getElementById('log_btn').style.display = 'none';
-		document.getElementById('netlog_btn').style.display = 'none';
+		$('log_btn').classList.remove('pushed');
+		$('netlog_btn').classList.remove('pushed');
+		$('log').style.display = 'none';
+		$('netlog').style.display = 'none';
+		$('log_btn').style.display = 'none';
+		$('netlog_btn').style.display = 'none';
 		g_FooterOpened = false;
 	}
 	else
 	{
 		footer.style.height = '226px';
 		button.innerHTML = '&darr;';
-		document.getElementById('log_btn').classList.add('pushed');
-		document.getElementById('log').style.display = 'block';
-		document.getElementById('log_btn').style.display = 'block';
-		document.getElementById('netlog_btn').style.display = 'block';
+		$('log_btn').classList.add('pushed');
+		$('log').style.display = 'block';
+		$('log_btn').style.display = 'block';
+		$('netlog_btn').style.display = 'block';
 		g_FooterOpened = true;
 	}
 }
 function g_LogButtonClicked( i_type)
 {
-	var btn_log = document.getElementById('log_btn');
-	var btn_net = document.getElementById('netlog_btn');
-	var log = document.getElementById('log');
-	var netlog = document.getElementById('netlog');
+	var btn_log = $('log_btn');
+	var btn_net = $('netlog_btn');
+	var log = $('log');
+	var netlog = $('netlog');
 	if( i_type == 'log' )
 	{
 		btn_log.classList.add('pushed');
@@ -518,7 +533,7 @@ function g_LogButtonClicked( i_type)
 function g_Log( i_msg, i_log)
 {
 	if( i_log == null ) i_log = 'log';
-	var log = document.getElementById( i_log);
+	var log = $( i_log);
 	var lines = log.getElementsByTagName('div');
 	if( lines.length && ( i_msg == lines[0].msg ))
 	{
@@ -540,7 +555,7 @@ function g_Log( i_msg, i_log)
 }
 function g_Info( i_msg, i_log)
 {
-	document.getElementById('info').textContent=i_msg;
+	$('info').textContent=i_msg;
 	if( i_log == null || i_log == true )
 		g_Log( i_msg);
 }
@@ -585,7 +600,7 @@ function g_OnKeyDown(e)
 	else if((e.keyCode==38) && g_cur_monitor) g_cur_monitor.selectNext( e, true ); // UP
 	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( e, false); // DOWN
 //	else if(evt.keyCode==116) return false; // F5
-//document.getElementById('test').textContent='key down: ' + e.keyCode;
+//$('test').textContent='key down: ' + e.keyCode;
 //	return true;
 
 	g_keysdown += String.fromCharCode( e.keyCode);
@@ -643,20 +658,20 @@ function g_SuperUserProcessGUI()
 //g_Info('g_SuperUserProcessGUI()')
 	if( g_GOD())
 	{
-		document.getElementById('header').classList.add('su_god');
-		document.getElementById('footer').classList.add('su_god');
+		$('header').classList.add('su_god');
+		$('footer').classList.add('su_god');
 	}
 	else if( g_VISOR())
 	{
-		document.getElementById('header').classList.add('su_visor');
-		document.getElementById('footer').classList.add('su_visor');
+		$('header').classList.add('su_visor');
+		$('footer').classList.add('su_visor');
 	}
 	else
 	{
-		document.getElementById('header').classList.remove('su_visor');
-		document.getElementById('header').classList.remove('su_god');
-		document.getElementById('footer').classList.remove('su_visor');
-		document.getElementById('footer').classList.remove('su_god');
+		$('header').classList.remove('su_visor');
+		$('header').classList.remove('su_god');
+		$('footer').classList.remove('su_visor');
+		$('footer').classList.remove('su_god');
 	}
 }
 
