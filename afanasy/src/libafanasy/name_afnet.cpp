@@ -473,13 +473,7 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 		::writedata( i_desc, "Content-Type: application/json\r\n", 32);
 //                            1234567890123456789012345678901234567890
 //                            0         1         2         3
-//		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n", 19);
-		::writedata( i_desc, "\r\n\r\n", 4);
-	}
-
-	if( i_msg->type() == af::Msg::THTTPGET )
-	{
-		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n\r\n", 21);
+		::writedata( i_desc, "\r\n", 2);
 	}
 
 	if( false == ::writedata( i_desc, i_msg->buffer() + i_msg->getHeaderOffset(), i_msg->writeSize() - i_msg->getHeaderOffset() ))
@@ -495,9 +489,6 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 
 af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 {
-//	if( af::Environment::isServer())
-//		i_msg->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
-
 	if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
 	{
 		AFERROR("af::msgsend: Receiving message has several addresses.");

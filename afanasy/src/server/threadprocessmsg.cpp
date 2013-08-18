@@ -187,53 +187,88 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 	//AFINFO("writeMessage: message sent.")
 }
 
+bool validateGetFileName( const std::string & i_name);
+
 af::Msg * processHTTPGet( const af::Msg * i_msg)
 {
+	static const char header_OK[] = "HTTP/1.1 200 OK\r\n\r\n";
+	static const  int header_OK_len = strlen( header_OK);
+	static const char header_ERROR[] = "HTTP/1.1 404 Not Found\r\n\r\n";
+	static const  int header_ERROR_len = strlen( header_ERROR);
+
+	af::Msg * o_msg = new af::Msg();
+
 	char * get = i_msg->data();
 	int get_len = i_msg->dataLen();
 	//::write( 1, get, get_len);
-
 	int get_start = 4; // skipping "GET "
 	int get_finish = get_start; 
-	char * data = NULL;
-	int datalen;
-	std::string datafile;
 	while( get[++get_finish] != ' ');
 	while( get[get_start] == '/' ) get_start++;
 	while( get[get_start] == '\\') get_start++;
+
+	std::string file_name;
 	if( get_finish - get_start > 1 )
 	{
-		datafile = std::string( get + get_start, get_finish - get_start);
-printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
-		if(( datafile.find("..") == -1 ) && ( datafile.find(':') == -1 ))
+		file_name = std::string( get + get_start, get_finish - get_start);
+		if( false == validateGetFileName( file_name))
 		{
-			datafile = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + datafile;
-			std::string error;
-			data = af::fileRead( datafile, &datalen, -1, &error);
+			AFCommon::QueueLogError("GET invalid file name from " + i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
+			file_name.clear();
+		}
+		else
+		{
+			file_name = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + file_name;
 		}
 	}
 	else
 	{
-		datafile = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
-		data = af::fileRead( datafile, &datalen);
+		file_name = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
 	}
 
-	if( data == NULL )
-	{
-		static char httpError[] = "HTTP/1.0 404 Not Found\r\n\r\n";
-		//writedata( i_desc, httpError, strlen(httpError));
-		data = httpError;
-		datalen = strlen(httpError);
-	}
-/*	else
-	{
-		static const char httpHeader[] = "HTTP/1.0 200 OK\r\n\r\n";
-		writedata( i_desc, httpHeader, strlen(httpHeader));
-		writedata( i_desc, data, datalen);
-	}*/
+//printf("GET[%d,%d]=%s\n", get_start, get_finish, file_name.c_str());
 
-	af::Msg * o_msg = new af::Msg();
-	o_msg->setData( datalen, data, af::Msg::THTTPGET);
+	int file_size;
+	char * file_data = NULL;
+	if( file_name.size())
+	{
+		std::string error;
+		file_data = af::fileRead( file_name, &file_size, -1, &error);
+	}
+
+	if( file_data )
+	{
+		int msg_datalen = header_OK_len + file_size;
+		char * msg_data = new char[msg_datalen];
+
+		memcpy( msg_data, header_OK, header_OK_len);
+		memcpy( msg_data + header_OK_len, file_data, file_size);
+
+		o_msg->setData( msg_datalen, msg_data, af::Msg::THTTPGET);
+
+		delete file_data;
+		delete msg_data;
+	}
+	else
+	{
+		o_msg->setData( header_ERROR_len, header_ERROR, af::Msg::THTTPGET);
+	}
 
 	return o_msg;
 }
+
+static const char * files_skip[] = {
+/*1*/"..",
+/*2*/"htdigest",
+/*3*/"htaccess",
+/*4*/".json",
+/*5*/":"
+};
+bool validateGetFileName( const std::string & i_name)
+{
+	for( int i = 0; i < 5; i++)
+		if( i_name.find( files_skip[i]) != -1 ) return false;
+
+	return true;
+}
+
