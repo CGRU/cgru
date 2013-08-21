@@ -71,8 +71,10 @@ namespace AFJOB
 	const uint32_t STATE_PARSERSUCCESS_MASK         = 1<<13;
 	const   char   STATE_PARSERSUCCESS_NAME[]       = "Parser Finished Success";
 	const   char   STATE_PARSERSUCCESS_NAME_S[]     = "PBR";
-
-	const uint32_t STATE_SOLVED_MASK       = 1<<14;
+	const uint32_t STATE_FAILEDPOST_MASK            = 1<<14;
+	const   char   STATE_FAILEDPOST_NAME[]          = "Failed Post";
+	const   char   STATE_FAILEDPOST_NAME_S[]        = "FPO";
+	const uint32_t STATE_SOLVED_MASK                = 1<<30;
 
 	const int  SYSJOB_ID                   = 1;  // System job ID
 	const char SYSJOB_NAME[]               = "afanasy";

@@ -12,9 +12,10 @@ public:
 	Service( const std::string & i_type,
 	         const std::string & i_wdir,
 	         const std::string & i_command,
-	         const std::string & i_files = std::string()
+	         const std::string & i_files = std::string(),
+	         const std::string & i_store_dir = std::string()
 		);
-	Service( const TaskExec & taskexec);
+	Service( const TaskExec * taskexec, const std::string & i_store_dir = std::string());
 	~Service();
 
 	inline bool isInitialized() const { return initialized;}
@@ -24,10 +25,10 @@ public:
 	const std::string getFiles() const   { return files;   }
 
 	// Return an empty string on sucess or an error message on error
-	const std::string doPost();
+	const std::vector<std::string> doPost();
 
 private:
-	void initialize( const TaskExec & taskExec);
+	void initialize( const TaskExec * taskExec, const std::string & i_store_dir);
 
 private:
 	std::string name;

@@ -45,7 +45,7 @@ bool CmdPath::v_processArguments( int argc, char** argv, af::Msg &msg)
 	}
 	else if( operation == "listdir")
 	{
-		std::vector<std::string> list = af::getFilesList( path);
+		std::vector<std::string> list = af::getFilesList( path, /*safe mode=*/true);
 		for( int i = 0; i < list.size(); i++)
 			std::cout << list[i] << std::endl;
 	}

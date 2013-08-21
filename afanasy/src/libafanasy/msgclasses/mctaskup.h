@@ -10,7 +10,7 @@ namespace af
 class MCTaskUp : public MsgClass
 {
 public:
-	MCTaskUp();
+//	MCTaskUp();
 	MCTaskUp
 		(
 			int clientId,
@@ -46,6 +46,8 @@ public:
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
 
+	void addFile( const std::string & i_name, const char * i_data, int i_size);
+
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 private:
@@ -61,13 +63,23 @@ private:
 	int32_t m_frame;
 	int8_t  m_percent_frame;
 	std::string m_activity;
-	int32_t m_datalen;
 
-	char *m_data;
+	int32_t m_datalen;
+	char * m_data;
+
+	int32_t m_files_num;
+	std::vector<std::string> m_files_names;
+	std::vector<int32_t> m_files_sizes;
+	char * m_files_data;
+	int m_files_data_len;
+	int m_files_data_buflen;
 
 	bool m_deleteData;
 
 private:
 	void v_readwrite( Msg * msg);
+
+	void rwData( Msg * msg);
+	void rwFiles( Msg * msg);
 };
 }

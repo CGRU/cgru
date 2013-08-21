@@ -127,14 +127,20 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       return;
    }
 	case af::TaskExec::UPFinishedParserSuccess:
-		if( message.size() == 0)
+		if( message.empty())
 		{
 			message = "Parser finished success.";
 			m_progress->state = m_progress->state | AFJOB::STATE_PARSERSUCCESS_MASK;
 		}
+	case af::TaskExec::UPFinishedFailedPost:
+		if( message.empty())
+		{
+			message = "Finished, but post failed.";
+			m_progress->state = m_progress->state | AFJOB::STATE_FAILEDPOST_MASK;
+		}
 	case af::TaskExec::UPFinishedSuccess:
 	{
-		if( message.size() == 0)
+		if( message.empty())
 		{
 			message = "Finished success.";
 		}

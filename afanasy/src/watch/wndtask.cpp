@@ -109,7 +109,7 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 
 	// Create task and service:
 	af::TaskExec taskexec( msg);
-	af::Service service( taskexec);
+	af::Service service( &taskexec);
 	QString wdir      = afqt::stoq( service.getWDir());
 	QString command   = afqt::stoq( service.getCommand());
 	QString files     = afqt::stoq( service.getFiles());

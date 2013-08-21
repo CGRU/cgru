@@ -13,12 +13,14 @@ BlockItem.prototype.init = function()
 	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
 
 	this.state = {};
+/*
 	this.thumbnail_http_base = cgru_Config['af_thumbnail_http'];
 	this.thumbnail_http_naming = cgru_Config['af_thumbnail_naming'];
 	
 	this.thumbnail_http_path = this.thumbnail_http_base + this.thumbnail_http_naming;
 	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(job_id)d", this.params.job_id);
 	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(block_id)d", this.params.block_num);
+*/
 }
 
 BlockItem.prototype.update = function()
@@ -161,7 +163,7 @@ TaskItem.prototype.genName = function()
 	}
 
 	this.genFrames();
-	this.generateThumbnails();
+//	this.generateThumbnails();
 	if( tasks_name && ( tasks_name != '' ))
 	{
 		name = tasks_name;
@@ -177,7 +179,7 @@ TaskItem.prototype.genName = function()
 
 	return name;
 }
-
+/*
 TaskItem.prototype.generateThumbnails = function()
 {
 	if (this.block.params.files)
@@ -197,7 +199,7 @@ TaskItem.prototype.generateThumbnails = function()
 		}
 	}
 }
-
+*/
 TaskItem.prototype.genFrames = function()
 {
 	var p = this.block.params;

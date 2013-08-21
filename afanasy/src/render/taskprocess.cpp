@@ -63,88 +63,126 @@ int setNonblocking(int fd)
 
 TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_taskexec( i_taskExec),
-	m_service( *i_taskExec),
 	m_parser( NULL),
 	m_update_status( af::TaskExec::UPPercent),
 	m_stop_time( 0),
 	m_pid(0),
+	m_doing_post( false),
 	m_zombie( false),
 	m_dead_cycle(0)
 {
-	std::string command = m_service.getCommand();
-	std::string wdir    = m_service.getWDir();
+	m_store_dir = af::Environment::getTempDir() + AFGENERAL::PATH_SEPARATOR + "tasks" + AFGENERAL::PATH_SEPARATOR;
+	m_store_dir += af::itos( m_taskexec->getJobId());
+	m_store_dir += '.' + af::itos( m_taskexec->getBlockNum());
+	m_store_dir += '.' + af::itos( m_taskexec->getTaskNum());
+
+	if( af::pathIsFolder( m_store_dir))
+		af::removeDir( m_store_dir);
+	af::pathMakePath( m_store_dir);
+
+	m_service = new af::Service( m_taskexec, m_store_dir);
+	m_cmd  = m_service->getCommand();
+	m_wdir = m_service->getWDir();
 
 	m_parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());
 
 	// Process task working directory:
-	if( wdir.size())
+	if( m_wdir.size())
 	{
 #ifdef WINNT
-		if( wdir.find("\\\\") == 0)
+		if( m_wdir.find("\\\\") == 0)
 		{
-			AFERRAR("Working directory starts with '\\':\n%s\nUNC path can't be current.", wdir.c_str())
-			wdir.clear();
+			AFERRAR("Working directory starts with '\\':\n%s\nUNC path can't be current.", m_wdir.c_str())
+			m_wdir.clear();
 		}
 #endif
-		if( false == af::pathIsFolder( wdir))
+		if( false == af::pathIsFolder( m_wdir))
 		{
-			AFERRAR("Working directory does not exists:\n%s", wdir.c_str())
-			wdir.clear();
+			AFERRAR("Working directory does not exists:\n%s", m_wdir.c_str())
+			m_wdir.clear();
 		}
 	}
 
-	if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
+	if( m_wdir.empty())
+		m_wdir = af::Environment::getTempDir();
 
-#ifdef WINNT
-/*    if( af::launchProgram( &m_pinfo, command, wdir, 0, 0, 0,
-		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
-		m_pid = m_pinfo.dwProcessId;
-*/    if( af::launchProgram( &m_pinfo, command, wdir, &m_io_input, &m_io_output, &m_io_outerr,
-		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
-		m_pid = m_pinfo.dwProcessId;
+	if( af::Environment::isVerboseMode()) printf("%s\n", m_cmd.c_str());
 
-#else
-	// For UNIX we can ask child prcocess to call a function to setup after fork()
-	
-fp_setupChildProcess = setupChildProcess;
-	m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr);
-#endif
+	// Perform pre setup:
+	#ifdef WINNT
+	m_hjob = CreateJobObject( NULL, NULL);
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+	#endif
 
-	if( m_pid <= 0 )
+	launchCommand();
+
+	if( m_pid == 0 )
 	{
-		AFERROR("Failed to start a process")
-		m_taskexec->v_stdOut( true);
-		m_pid = 0;
 		m_update_status = af::TaskExec::UPFailedToStart;
 		sendTaskSate();
 		return;
 	}
+}
 
-	// Perform some setup:
-#ifdef WINNT
-	// Setup process for MS Windows OS:
-//    SetPriorityClass( m_pinfo.hProcess, BELOW_NORMAL_PRIORITY_CLASS);
-	hJob = CreateJobObject( NULL, NULL);
-	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
-	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-	if( SetInformationJobObject( hJob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) ) == 0)
+void TaskProcess::launchCommand()
+{
+//printf("TaskProcess::launchCommand: command:\n%s\n", m_cmd.c_str());
+
+	// Close handles remained from main process:
+	if( m_doing_post )
+		closeHandles();
+
+	#ifdef WINNT
+	/*	Test a command w/o output redirection:
+    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, 0, 0, 0,
+		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+		m_pid = m_pinfo.dwProcessId;*/
+	// For MSWIN we need to CREATE_SUSPENDED to attach process to a job before it can spawn any child:
+    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr,
+		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+		m_pid = m_pinfo.dwProcessId;
+	#else
+	// For UNIX we can ask child prcocess to call a function to setup after fork()
+	fp_setupChildProcess = setupChildProcess;
+	m_pid = af::launchProgram( m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr);
+	#endif
+
+	if( m_pid <= 0 )
+	{
+		AFERROR("Failed to start a process")
+		m_pid = 0;
+		return;
+	}
+
+	#ifdef WINNT
+	// On windows we attach process to a job to close all spawned childs:
+	if( SetInformationJobObject( m_hjob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) ) == 0)
 		AFERROR("SetInformationJobObject failed.\n");
-	if( AssignProcessToJobObject( hJob, m_pinfo.hProcess) == false)
+	if( AssignProcessToJobObject( m_hjob, m_pinfo.hProcess) == false)
 		AFERRAR("TaskProcess: AssignProcessToJobObject failed with code = %d.", GetLastError())
+	// Ppecess is CREATE_SUSPENDED so we need to resume it:
 	if( ResumeThread( m_pinfo.hThread) == -1)
 		AFERRAR("TaskProcess: ResumeThread failed with code = %d.", GetLastError())
+
 	printf("Started PID=%d: ", m_pid);
-#else
+
+	#else
+	// On UNIX we set buffers and non-blocking:
 	setbuf( m_io_output, m_filebuffer_out);
 	setbuf( m_io_outerr, m_filebuffer_err);
 	setNonblocking( fileno( m_io_input));
 	setNonblocking( fileno( m_io_output));
 	setNonblocking( fileno( m_io_outerr));
-	printf("Started PID=%d SID=%d(%d) GID=%d(%d): ", m_pid,
-		getsid(m_pid), setsid(), getpgid(m_pid), getpgrp());
-#endif
 
-	m_taskexec->v_stdOut( af::Environment::isVerboseMode());
+	printf("Started PID=%d SID=%d(%d) GID=%d(%d): ", m_pid, getsid(m_pid), setsid(), getpgid(m_pid), getpgrp());
+
+	#endif
+
+	if( false == m_doing_post )
+		m_taskexec->v_stdOut( af::Environment::isVerboseMode());
+	else
+		printf("POST: %s\n", m_cmd.c_str());
 }
 
 TaskProcess::~TaskProcess()
@@ -153,10 +191,7 @@ TaskProcess::~TaskProcess()
 	m_update_status = 0;
 
 	killProcess();
-
-	fclose( m_io_input);
-	fclose( m_io_output);
-	fclose( m_io_outerr);
+	closeHandles();
 
 #ifdef AFOUTPUT
 	printf(" ~ TaskProcess(): ");
@@ -164,7 +199,17 @@ TaskProcess::~TaskProcess()
 #endif
 
 	if( m_taskexec != NULL  ) delete m_taskexec;
+	if( m_service  != NULL  ) delete m_service;
 	if( m_parser   != NULL  ) delete m_parser;
+
+	af::removeDir( m_store_dir);
+}
+
+void TaskProcess::closeHandles()
+{
+	fclose( m_io_input);
+	fclose( m_io_output);
+	fclose( m_io_outerr);
 }
 
 void TaskProcess::refresh()
@@ -286,7 +331,11 @@ void TaskProcess::readProcess()
 
 	if( m_taskexec->getListenAddressesNum())
 	{
-		af::MCTaskOutput mctaskoutput( RenderHost::getName(), m_taskexec->getJobId(), m_taskexec->getBlockNum(), m_taskexec->getTaskNum(), output.size(), output.data());
+		af::MCTaskOutput mctaskoutput( RenderHost::getName(),
+			m_taskexec->getJobId(),
+			m_taskexec->getBlockNum(),
+			m_taskexec->getTaskNum(),
+			output.size(), output.data());
 		af::Msg * msg = new af::Msg( af::Msg::TTaskOutput, &mctaskoutput);
 		msg->setAddresses( *m_taskexec->getListenAddresses());
 		RenderHost::dispatchMessage( msg);
@@ -303,7 +352,7 @@ void TaskProcess::readProcess()
 	// if task is not in "stopping" state
 	if( m_stop_time == 0 )
 	{
-		// ckeck parser reasouns to force to stop a task
+		// ckeck parser reasons to force to stop a task
 	    if( m_parser->hasError())
 	    {
 	        printf("Error: Parser bad result. Stopping task.\n");
@@ -354,22 +403,24 @@ void TaskProcess::sendTaskSate()
 	}
 
 	af::MCTaskUp taskup(
-			         RenderHost::getId(),
+		RenderHost::getId(),
 
-			         m_taskexec->getJobId(),
-			         m_taskexec->getBlockNum(),
-			         m_taskexec->getTaskNum(),
-			         m_taskexec->getNumber(),
+		m_taskexec->getJobId(),
+		m_taskexec->getBlockNum(),
+		m_taskexec->getTaskNum(),
+		m_taskexec->getNumber(),
 
-			         m_update_status,
-			         percent,
-			         frame,
-			         percentframe,
-						activity,
+		m_update_status,
+		percent,
+		frame,
+		percentframe,
+		activity,
 
-			         stdout_size,
-			         stdout_data
-			      );
+		stdout_size,
+		stdout_data);
+
+	if( type == af::Msg::TTaskUpdateState )
+		collectFiles( taskup);
 
 	af::Msg * msg = new af::Msg( type, &taskup);
 	if( toRecieve) msg->setReceiving();
@@ -406,14 +457,16 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
 
 	if(( i_exitCode != 0 ) || ( m_stop_time != 0 ))
 	{
-		m_update_status = af::TaskExec::UPFinishedError;
+		if( m_doing_post )
+			m_update_status = af::TaskExec::UPFinishedFailedPost;
+		else
+			m_update_status = af::TaskExec::UPFinishedError;
 #ifdef WINNT
 		if( m_stop_time != 0 )
-		{
 #else
 		if(( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
-		{
 #endif
+		{
 			if(( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
 			   ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
 			     m_update_status  = af::TaskExec::UPFinishedKilled;
@@ -426,12 +479,21 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
 	}
 	else
 	{
-		std::string errMsg;
-//		errMsg = m_service.doPost();
-		if( errMsg.empty())
-			m_update_status = af::TaskExec::UPFinishedSuccess;
+		if( false == m_doing_post )
+		{
+			m_post_cmds = m_service->doPost();
+			m_doing_post = true;
+		}
+
+		if( m_doing_post && m_post_cmds.size())
+		{
+			m_cmd = m_post_cmds.front();
+//printf("POST:\n%s\n", af::strJoin( m_post_cmds, "\n").c_str());
+			m_post_cmds.erase( m_post_cmds.begin());
+			launchCommand();
+		}
 		else
-			m_update_status = af::TaskExec::UPFinishedFailedPost;
+			m_update_status = af::TaskExec::UPFinishedSuccess;
 	}
 }
 
@@ -454,7 +516,7 @@ void TaskProcess::stop()
 #ifdef UNIX
 	killpg( getpgid( m_pid), SIGTERM);
 #else
-	CloseHandle( hJob );
+	CloseHandle( m_hjob );
 #endif
 }
 
@@ -465,7 +527,7 @@ void TaskProcess::killProcess()
 #ifdef UNIX
 	killpg( getpgid( m_pid), SIGKILL);
 #else
-	CloseHandle( hJob );
+	CloseHandle( m_hjob );
 #endif
 }
 
@@ -534,3 +596,22 @@ int TaskProcess::readPipe( FILE * i_file )
 	return readsize;
 }
 #endif
+
+void TaskProcess::collectFiles( af::MCTaskUp & i_task_up)
+{
+	std::vector<std::string> list = af::getFilesList( m_store_dir, /*safe mode=*/false);
+	for( int i = 0; i < list.size(); i++)
+	{
+		std::string path = m_store_dir + AFGENERAL::PATH_SEPARATOR + list[i];
+		int size;
+		char * data = af::fileRead( path, &size, 100000);
+		if( data == NULL ) continue;
+		if( size >= 100000 )
+		{
+			delete data;
+			continue;
+		}
+		i_task_up.addFile( list[i], data, size);
+	}
+}
+

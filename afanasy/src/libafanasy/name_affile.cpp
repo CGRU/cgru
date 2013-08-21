@@ -249,20 +249,24 @@ char * af::fileRead( const std::string & i_filename, int * o_size, int i_maxfile
 	return buffer;
 }
 
-const std::vector<std::string> af::getFilesList( const std::string & i_path)
+const std::vector<std::string> af::getFilesList( const std::string & i_path, bool i_safe_mode)
 {
 	std::vector<std::string> list;
 
 	if( i_path.size() == 0 )
 		return list;
 
-	if(( i_path.find("..") != -1  ) ||
-	   ( i_path.find(':')  != -1  ) ||
-	   ( i_path[0]         == '/' ) ||
-	   ( i_path[0]         == '\\'))
-		return list;
+	std::string path( i_path);
 
-	std::string path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + i_path;
+	if( i_safe_mode )
+	{
+		if(( path.find("..") != -1  ) ||
+		   ( path.find(':')  != -1  ) ||
+		   ( path[0]         == '/' ) ||
+		   ( path[0]         == '\\'))
+			return list;
+		path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + path;
+	}
 
 #ifdef WINNT
 	HANDLE dir;
@@ -330,7 +334,7 @@ bool af::removeDir( const std::string & i_folder )
 			}
 			else if( DeleteFile( filename.c_str()) == FALSE)
 			{
-				 AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename.c_str())
+				 AFERRAR("af::removeDir: Can't delete file:\n%s", filename.c_str())
 				 return false;
 			}
 
@@ -339,13 +343,13 @@ bool af::removeDir( const std::string & i_folder )
 	}
 	else
 	{
-		  AFERRAR("CleanUpData::doCleanUp: Can't open folder:\n%s", i_folder.c_str())
+		  AFERRAR("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
 		  return false;
 	}
 
 	if( RemoveDirectory( i_folder.c_str()) == FALSE)
 	{
-		AFERRAR("CleanUpData::doCleanUp: Can't remove folder:\n%s", i_folder.c_str())
+		AFERRAR("af::removeDir: Can't remove folder:\n%s", i_folder.c_str())
 		return false;
 	}
 
@@ -356,7 +360,7 @@ bool af::removeDir( const std::string & i_folder )
 	DIR * dir = opendir( i_folder.c_str());
 	if( dir == NULL)
 	{
-		AFERRAR("CleanUpData::doCleanUp: Can't open folder:\n%s", i_folder.c_str())
+		AFERRAR("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
 		return false;
 	}
 
@@ -378,7 +382,7 @@ bool af::removeDir( const std::string & i_folder )
 		}
 		else if( unlink( filename.c_str()) != 0)
 		{
-			AFERRAR("CleanUpData::doCleanUp: Can't delete file:\n%s", filename.c_str())
+			AFERRAR("af::removeDir: Can't delete file:\n%s", filename.c_str())
 			return false;
 		}
 	}
@@ -388,7 +392,7 @@ bool af::removeDir( const std::string & i_folder )
 	// Removing folder
 	if( rmdir( i_folder.c_str()) != 0)
 	{
-		AFERRAR("CleanUpData::doCleanUp: Can't delete folder:\n%s", i_folder.c_str())
+		AFERRAR("af::removeDir: Can't delete folder:\n%s", i_folder.c_str())
 		return false;
 	}
 #endif

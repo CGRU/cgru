@@ -42,24 +42,35 @@ public:
 	const af::TaskExec * exec() { return m_taskexec;}
 
 private:
+	void launchCommand();
 	void sendTaskSate();
 	void readProcess();
 	void processFinished( int i_exitCode);
 	void killProcess();
+	void closeHandles();
+	void collectFiles( af::MCTaskUp & i_task_up);
 
 private:
 	af::TaskExec * m_taskexec;
-	af::Service m_service;
+	af::Service * m_service;
 	ParserHost * m_parser;
+
+	std::string m_store_dir;
 	uint8_t m_update_status;
 	time_t m_stop_time;
 	bool m_zombie;
 	int m_dead_cycle;
 
+	std::string m_cmd;
+	std::string m_wdir;
 	pid_t m_pid;
+
+	bool m_doing_post;
+	std::vector<std::string> m_post_cmds;
+
 #ifdef WINNT
 	PROCESS_INFORMATION m_pinfo;
-	HANDLE hJob;
+	HANDLE m_hjob;
 	HANDLE m_io_output;
 	HANDLE m_io_outerr;
 	HANDLE m_io_input;

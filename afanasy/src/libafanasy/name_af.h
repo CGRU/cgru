@@ -193,7 +193,7 @@ namespace af
 
 	bool pathMakePath( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
 
-	const std::vector<std::string> getFilesList( const std::string & i_path);
+	const std::vector<std::string> getFilesList( const std::string & i_path, bool i_safe_mode);
 
 	char * fileRead( const std::string & i_filename, int * o_size = NULL, int i_maxfilesize = -1, std::string * o_err = NULL);
 
@@ -238,7 +238,11 @@ namespace af
     /// Send a message to all its addresses and receive an answer if needed
     Msg * msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose);
 
-    bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
+
+	// Python:
+    bool PyGetString( PyObject * i_obj, std::string & o_str, const char * i_err_info = NULL);
+    bool PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, const char * i_err_info = NULL);
+
 
 	const std::string jsonMakeHeader( int size);
 	char * jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err = NULL);
