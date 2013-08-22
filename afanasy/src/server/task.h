@@ -54,7 +54,7 @@ public:
 
 	virtual const std::string v_getInfo( bool full = false) const;
 
-	const std::string getOutputFileName( int startcount) const;
+	const std::string getOutputFileName( int i_starts_count) const;
 
 /// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
 	af::Msg * getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const;
@@ -76,11 +76,18 @@ protected:
 	Block * m_block;
 
 private:
+	void writeFiles( const af::MCTaskUp & i_taskup);
 	void deleteRunningZombie();
 
 private:
 	int m_number;
-	std::string m_store_file;
+
+	std::string m_store_dir;
+	std::string m_store_dir_output;
+	std::string m_store_dir_files;
+	std::string m_store_file_progress;
+
+	std::vector<std::string> m_files;
 
 	TaskRun * m_run;
 

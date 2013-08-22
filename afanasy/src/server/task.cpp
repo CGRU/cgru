@@ -27,19 +27,24 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_progress( taskProgress),
    m_run( NULL)
 {
+	// Initialize store folders:
+	m_store_dir = m_block->m_job->getTasksDir() + AFGENERAL::PATH_SEPARATOR
+		+ af::itos( m_block->m_data->getBlockNum())
+		+ '.' + af::itos( m_number);
+
+	m_store_dir_output = m_store_dir + AFGENERAL::PATH_SEPARATOR + "output";
+	m_store_dir_files = m_store_dir + AFGENERAL::PATH_SEPARATOR + "files";
+	m_store_file_progress = m_store_dir + AFGENERAL::PATH_SEPARATOR + "progress.json";
+
 	// If job is not from store, it is just came from network
 	// and so no we do not need to read tasks progess
 	if( false == m_block->m_job->isFromStore()) return;
 
-	m_store_file = m_block->m_job->getTasksProgessDir() + AFGENERAL::PATH_SEPARATOR
-		+ "b" + af::itos( m_block->m_data->getBlockNum())
-		+ ".t" + af::itos( m_number) + ".json";
-
 	// If job is from store we read tasks progress
-	if( false == af::pathFileExists( m_store_file)) return;
+	if( false == af::pathFileExists( m_store_file_progress)) return;
 
 	int size;
-	char * data = af::fileRead( m_store_file, &size);
+	char * data = af::fileRead( m_store_file_progress, &size);
 	if( data == NULL ) return;
 
 	rapidjson::Document document;
@@ -90,6 +95,7 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 //printf("Task::updateState:\n");
    m_run->update( taskup, renders, monitoring, errorHost);
    if( taskup.getDataLen() != 0 ) v_writeTaskOutput( taskup);
+	writeFiles( taskup);
    deleteRunningZombie();
 }
 
@@ -270,14 +276,10 @@ void Task::v_monitor( MonitorContainer * monitoring) const
 
 void Task::v_store()
 {
-	if( m_store_file.empty())
-		m_store_file = m_block->m_job->getTasksProgessDir() + AFGENERAL::PATH_SEPARATOR
-			+ "b" + af::itos( m_block->m_data->getBlockNum())
-			+ ".t" + af::itos( m_number) + ".json";
-
 	std::ostringstream str;
 	m_progress->jsonWrite( str);
-	AFCommon::QueueFileWrite( new FileData( str, m_store_file));
+	AFCommon::QueueFileWrite( new FileData( str, m_store_file_progress,
+		m_store_dir));
 }
 
 void Task::v_appendLog( const std::string & message)
@@ -288,7 +290,30 @@ void Task::v_appendLog( const std::string & message)
 
 void Task::v_writeTaskOutput( const af::MCTaskUp& taskup) const
 {
-   AFCommon::QueueFileWrite( new FileData( taskup.getData(), taskup.getDataLen(), getOutputFileName( m_progress->starts_count)));
+	AFCommon::QueueFileWrite( new FileData( taskup.getData(), taskup.getDataLen(), getOutputFileName( m_progress->starts_count),
+		m_store_dir_output));
+}
+
+void Task::writeFiles( const af::MCTaskUp & i_taskup)
+{
+	for( int i = 0; i < i_taskup.getFilesNum(); i++)
+	{
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + i_taskup.getFileName(i);
+
+		// Store file name, if it does not stored yet:
+		bool exists = false;
+		for( int j = 0; j < m_files.size(); j++)
+			if( m_files[j] == filename )
+			{
+				exists = true;
+				break;
+			}
+		if( false == exists )
+			m_files.push_back( filename);
+
+		AFCommon::QueueFileWrite( new FileData( i_taskup.getFileData(i), i_taskup.getFileSize(i), filename,
+			m_store_dir_files));
+	}
 }
 
 void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
@@ -296,15 +321,9 @@ void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rende
    if( m_run) m_run->listen( mclisten, renders);
 }
 
-const std::string Task::getOutputFileName( int startcount) const
+const std::string Task::getOutputFileName( int i_starts_count) const
 {
-   std::ostringstream stream;
-   stream << "b"  << m_block->m_data->getBlockNum();
-   stream << ".t" << m_number;
-   stream << ".s" << startcount;
-   std::string filename = stream.str();
-	filename = m_block->m_job->getTasksOuputDir() + AFGENERAL::PATH_SEPARATOR + filename;
-   return filename;
+	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + 's' + af::itos( i_starts_count);
 }
 
 af::Msg * Task::getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const

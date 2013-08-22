@@ -79,8 +79,7 @@ void JobAf::initializeValues()
 
 void JobAf::initStoreDirs()
 {
-	m_store_dir_progress = getStoreDir() + AFGENERAL::PATH_SEPARATOR + "progress";
-	m_store_dir_output   = getStoreDir() + AFGENERAL::PATH_SEPARATOR + "output";
+	m_store_dir_tasks = getStoreDir() + AFGENERAL::PATH_SEPARATOR + "tasks";
 }
 
 void JobAf::construct()
@@ -189,22 +188,18 @@ bool JobAf::initialize()
 
 		initStoreDirs();
 
-		if( af::pathMakePath( m_store_dir_progress) == false)
-		{
-			AFCommon::QueueLogError( std::string("Unable to create job store folder:\n") + m_store_dir_progress);
-			return false;
-		}
-		if( af::pathMakePath( m_store_dir_output) == false)
-		{
-			AFCommon::QueueLogError( std::string("Unable to create job store folder:\n") + m_store_dir_output);
-			return false;
-		}
-
 		// Write blocks tasks data:
 		for( int b = 0; b < m_blocks_num; b++)
 			m_blocks[b]->storeTasks( getStoreDir());
 
 		store();
+	}
+
+	// Create tasks store folder (if does not exists any)
+	if(( af::pathIsFolder( m_store_dir_tasks) == false ) && ( af::pathMakePath( m_store_dir_tasks) == false ))
+	{
+		AFCommon::QueueLogError( std::string("Unable to create tasks store folder:\n") + m_store_dir_tasks);
+		return false;
 	}
 
 //

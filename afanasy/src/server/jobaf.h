@@ -108,8 +108,7 @@ public:
 	int  getRenderCounts( RenderAf * render) const;
 	void remRenderCounts( RenderAf * render);
 
-	const std::string & getTasksProgessDir() const { return m_store_dir_progress; }
-	const std::string & getTasksOuputDir() const { return m_store_dir_output; }
+	const std::string & getTasksDir() const { return m_store_dir_tasks; }
 
 public:
 	/// Set Jobs Container.
@@ -137,8 +136,7 @@ private:
 
 	UserAf * m_user;
 
-	std::string m_store_dir_progress;   ///< Store directory.
-	std::string m_store_dir_output;   ///< Store directory.
+	std::string m_store_dir_tasks;   ///< Tasks store directory.
 
 private:
 	mutable int progressWeight;

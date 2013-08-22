@@ -645,7 +645,6 @@ bool Environment::initAfterLoad()
 	{
 	digest_file = getCGRULocation() + AFGENERAL::PATH_SEPARATOR + digest_file;
 	char * data = af::fileRead( digest_file);
-printf("%s\n", data);
 	std::vector<std::string> lines = af::strSplit( data,"\n");
 	delete [] data;
 	for( int l = 0; l < lines.size(); l++)
@@ -657,7 +656,6 @@ printf("%s\n", data);
 			AFERRAR("Invalid digest file:\n%s\n%s", digest_file.c_str(), lines[l].c_str())
 			continue;
 		}
-printf("%s - %s\n", words[0].c_str(), words[2].c_str());
 		digest_map[words[0]] = words[2];
 	}
 	}

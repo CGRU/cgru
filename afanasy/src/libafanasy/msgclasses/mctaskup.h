@@ -46,6 +46,11 @@ public:
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
 
+	inline int getFilesNum() const { return m_files_num; }
+	inline int getFileSize( int i_num) const { return m_files_sizes[i_num]; }
+	inline const std::string & getFileName( int i_num) const { return m_files_names[i_num]; }
+	const char * getFileData( int i_num) const;
+
 	void addFile( const std::string & i_name, const char * i_data, int i_size);
 
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;

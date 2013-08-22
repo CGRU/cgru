@@ -147,6 +147,26 @@ void MCTaskUp::addFile( const std::string & i_name, const char * i_data, int i_s
 	m_files_data_len += i_size;
 }
 
+const char * MCTaskUp::getFileData( int i_num) const
+{
+	if( i_num >= m_files_num )
+	{
+		AFERROR("MCTaskUp::getFileData: i_num >= m_files_num")
+		return NULL;
+	}
+	if( m_files_data == NULL )
+	{
+		AFERROR("MCTaskUp::getFileData: m_files_data == NULL")
+		return NULL;
+	}
+
+	int offset = 0;
+	for( int i = 0; i < i_num; i++)
+		offset += m_files_sizes[i];
+	
+	return m_files_data + offset;
+}
+
 void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	if( full )
@@ -160,8 +180,7 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< ", datalen="  << m_datalen
 			<< ", files="    << m_files_num
 			<< ", status="   << int(m_status)
-			<< ", percent="  << int(m_percent)
-			<< "\n";
+			<< ", percent="  << int(m_percent);
 		if( m_datalen && m_data) stream << "data:\n" << std::string( m_data, m_datalen) << std::endl;
 	}
 	else
@@ -176,7 +195,7 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< " D" << m_datalen
 			<< " F" << m_files_num
 			<< " S" << int(m_status)
-			<< " "  << int(m_percent) << "%\n";
+			<< " "  << int(m_percent) << "%";
 	}
 }
 

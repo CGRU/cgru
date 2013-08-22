@@ -6,16 +6,18 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-FileData::FileData( const std::ostringstream & i_str, const std::string & i_file_name):
+FileData::FileData( const std::ostringstream & i_str, const std::string & i_file_name, const std::string & i_folder_name):
 	m_file_name( i_file_name),
+	m_folder_name( i_folder_name),
 	m_data( NULL)
 {
 	m_str = i_str.str();
 	m_length = m_str.size();
 }
 
-FileData::FileData( const char * i_data, int i_length, const std::string & i_file_name):
+FileData::FileData( const char * i_data, int i_length, const std::string & i_file_name, const std::string & i_folder_name):
 	m_file_name( i_file_name),
+	m_folder_name( i_folder_name),
 	m_length( i_length),
 	m_data( NULL)
 {
@@ -71,6 +73,15 @@ void FileQueue::processItem( af::AfQueueItem* item)
 {
 	FileData * filedata = (FileData*)item;
 	AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().c_str())
+
+	if( filedata->getFolderName().size())
+		if( false == af::pathIsFolder( filedata->getFolderName()))
+			if( false == af::pathMakeDir( filedata->getFolderName()))
+			{
+				AFCommon::QueueLogError("FileQueue: Unable to create folder:\n" + filedata->getFolderName());
+				delete filedata;
+				return;
+			}
 
 	AFCommon::writeFile( filedata->getData(), filedata->getLength(), filedata->getFileName());
 	delete filedata;
