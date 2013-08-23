@@ -46,7 +46,10 @@ public:
 	int logsWeight() const;
 	int blackListWeight() const;
 
-	virtual void v_writeTaskOutput( const af::MCTaskUp & taskup) const;  ///< Write task output in tasksOutputDir.
+	/// Store task output:
+	/// Need to be virtual, as system job task output storing is not needed
+	virtual void v_writeTaskOutput( const af::MCTaskUp & taskup) const;
+
 	virtual void v_monitor( MonitorContainer * monitoring) const;
 
 	// Store function should be empty in system job tasks

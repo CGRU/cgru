@@ -145,8 +145,11 @@ TaskItem.prototype.updateProgress = function( i_progress)
 TaskItem.prototype.genName = function()
 {
 	var t = this.task_num;
-	var name = 'task ' + t;
+	var name = 'task ' + t; //< This is the default task name
+
 	var tasks_name = this.block.params.tasks_name;
+
+	// If block is not numeric:
 	if( this.block.params.tasks )
 	{
 		var task_name = this.block.params.tasks[t].name;
@@ -162,8 +165,10 @@ TaskItem.prototype.genName = function()
 		return name
 	}
 
+	// The block is numeric:
 	this.genFrames();
 //	this.generateThumbnails();
+
 	if( tasks_name && ( tasks_name != '' ))
 	{
 		name = tasks_name;

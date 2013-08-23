@@ -61,6 +61,8 @@ int setNonblocking(int fd)
 }
 #endif
 
+long long TaskProcess::counter = 0;
+
 TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_taskexec( i_taskExec),
 	m_parser( NULL),
@@ -75,6 +77,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_store_dir += af::itos( m_taskexec->getJobId());
 	m_store_dir += '.' + af::itos( m_taskexec->getBlockNum());
 	m_store_dir += '.' + af::itos( m_taskexec->getTaskNum());
+	m_store_dir += '_' + af::itos( ++counter);
 
 	if( af::pathIsFolder( m_store_dir))
 		af::removeDir( m_store_dir);

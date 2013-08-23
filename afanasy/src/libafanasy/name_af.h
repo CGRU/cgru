@@ -244,6 +244,7 @@ namespace af
     bool PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, const char * i_err_info = NULL);
 
 
+	// JSON:
 	const std::string jsonMakeHeader( int size);
 	char * jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err = NULL);
 	char * jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err = NULL);

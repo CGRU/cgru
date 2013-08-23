@@ -60,6 +60,7 @@ private:
 	time_t m_stop_time;
 	bool m_zombie;
 	int m_dead_cycle;
+	static long long counter;
 
 	std::string m_cmd;
 	std::string m_wdir;

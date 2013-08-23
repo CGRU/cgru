@@ -37,10 +37,14 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 	m_store_file_progress = m_store_dir + AFGENERAL::PATH_SEPARATOR + "progress.json";
 
 	// If job is not from store, it is just came from network
-	// and so no we do not need to read tasks progess
+	// and so no we do not need to read anything
 	if( false == m_block->m_job->isFromStore()) return;
 
-	// If job is from store we read tasks progress
+	// Get existing files list
+	if( af::pathIsFolder( m_store_dir_files))
+		m_files = af::getFilesList( m_store_dir_files, /* safe mode = */ false);
+
+	// Read task progress
 	if( false == af::pathFileExists( m_store_file_progress)) return;
 
 	int size;
@@ -92,11 +96,16 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
             RenderAf::closeLostTask( taskup);
       return;
    }
-//printf("Task::updateState:\n");
-   m_run->update( taskup, renders, monitoring, errorHost);
-   if( taskup.getDataLen() != 0 ) v_writeTaskOutput( taskup);
+
+	//printf("Task::updateState:\n");
+	m_run->update( taskup, renders, monitoring, errorHost);
+
+	if( taskup.getDataLen() != 0 )
+		v_writeTaskOutput( taskup);
+
 	writeFiles( taskup);
-   deleteRunningZombie();
+
+	deleteRunningZombie();
 }
 
 void Task::deleteRunningZombie()
@@ -323,7 +332,7 @@ void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rende
 
 const std::string Task::getOutputFileName( int i_starts_count) const
 {
-	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + 's' + af::itos( i_starts_count);
+	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + af::itos( i_starts_count) + ".txt";
 }
 
 af::Msg * Task::getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const
