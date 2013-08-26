@@ -82,8 +82,9 @@ class service:
 				return 0
 		post_cmds = []
 #		if len( self.files) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
-#			post_cmds.extend( self.generateThumbnail())
-		post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
+		if len( self.files):
+			post_cmds.extend( self.generateThumbnail())
+#		post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
 		return post_cmds
 
 

@@ -27,18 +27,11 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_progress( taskProgress),
    m_run( NULL)
 {
-	// Initialize store folders:
-	m_store_dir = m_block->m_job->getTasksDir() + AFGENERAL::PATH_SEPARATOR
-		+ af::itos( m_block->m_data->getBlockNum())
-		+ '.' + af::itos( m_number);
-
-	m_store_dir_output = m_store_dir + AFGENERAL::PATH_SEPARATOR + "output";
-	m_store_dir_files = m_store_dir + AFGENERAL::PATH_SEPARATOR + "files";
-	m_store_file_progress = m_store_dir + AFGENERAL::PATH_SEPARATOR + "progress.json";
-
 	// If job is not from store, it is just came from network
 	// and so no we do not need to read anything
 	if( false == m_block->m_job->isFromStore()) return;
+
+	initStoreFolders();
 
 	// Get existing files list
 	if( af::pathIsFolder( m_store_dir_files))
@@ -64,8 +57,22 @@ Task::~Task()
    if( m_run) delete m_run;
 }
 
+void Task::initStoreFolders()
+{
+	m_store_dir = m_block->m_job->getTasksDir() + AFGENERAL::PATH_SEPARATOR
+		+ af::itos( m_block->m_data->getBlockNum())
+		+ '.' + af::itos( m_number);
+
+	m_store_dir_output = m_store_dir + AFGENERAL::PATH_SEPARATOR + "output";
+	m_store_dir_files = m_store_dir + AFGENERAL::PATH_SEPARATOR + "files";
+	m_store_file_progress = m_store_dir + AFGENERAL::PATH_SEPARATOR + "progress.json";
+}
+
 void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
+	if( m_store_dir.empty())
+		initStoreFolders();
+
    if( m_block->m_data->isMultiHost())
    {
       if( m_run )

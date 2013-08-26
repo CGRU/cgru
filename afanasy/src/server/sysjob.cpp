@@ -40,7 +40,6 @@ SysCmd::SysCmd(
 		if( space != std::string::npos )
 			task_name = task_name.substr( 0, space);
 	}
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,7 +322,6 @@ void SysBlock::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * r
 
 bool SysBlock::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
 {
-AFINFO("SysBlock::refresh:");
 	bool blockProgress_changed = false;
 	bool taskchanged = false;
 
@@ -452,12 +450,18 @@ SysBlock * SysJob::ms_block_wol     = NULL;
 SysBlock * SysJob::ms_block_events  = NULL;
 
 SysJob::SysJob( const std::string & i_folder):
-	JobAf( i_folder)
+	JobAf( i_folder, true)
 {
+AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
 	m_id == AFJOB::SYSJOB_ID;
 	ms_sysjob = this;
 
-	if( isFromStore()) return;
+	if( isFromStore())
+	{
+		readStore();
+		printf("System job retrieved from store.\n");
+		return;
+	}
 
 	m_name              = AFJOB::SYSJOB_NAME;
 	m_user_name         = AFJOB::SYSJOB_USERNAME;
@@ -488,6 +492,7 @@ void SysJob::v_setZombie( RenderContainer * renders, MonitorContainer * monitori
 
 Block * SysJob::v_newBlock( int numBlock)
 {
+AFINFO("SysJob::v_newBlock:");
 	switch( numBlock)
 	{
 	case BlockPostCmdIndex:
@@ -551,7 +556,7 @@ void SysJob::v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * r
 
 void SysJob::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-AFINFO("SysJob::refresh:");
+//AFINFO("SysJob::refresh:");
 	JobAf::v_refresh( currentTime, pointer, monitoring);
 }
 

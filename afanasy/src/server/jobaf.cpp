@@ -38,7 +38,7 @@ JobAf::JobAf( JSON & i_object):
     construct();
 }
 
-JobAf::JobAf( const std::string & i_store_dir):
+JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	af::Job(),
 	AfNodeSrv( this, i_store_dir)
 {
@@ -46,8 +46,16 @@ JobAf::JobAf( const std::string & i_store_dir):
 
     initializeValues();
 
-	if( getStoreDir().empty()) return;
+	// We do not read store for system job
+	// as some virtual functions from system job
+	// will not work in a base class constructor
+	if( i_system ) return;
 
+	readStore();
+}
+
+void JobAf::readStore()
+{
 	initStoreDirs();
 
 	int size;
@@ -64,7 +72,7 @@ JobAf::JobAf( const std::string & i_store_dir):
 	construct();
 
 	for( int b = 0; b < m_blocks_num; b++)
-		if( false == m_blocks[b]->readStoredTasks( getStoreDir()))
+		if( false == m_blocks[b]->readStoredTasks())
 			return;
 }
 
@@ -190,7 +198,7 @@ bool JobAf::initialize()
 
 		// Write blocks tasks data:
 		for( int b = 0; b < m_blocks_num; b++)
-			m_blocks[b]->storeTasks( getStoreDir());
+			m_blocks[b]->storeTasks();
 
 		store();
 	}

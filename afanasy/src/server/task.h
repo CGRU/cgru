@@ -79,6 +79,7 @@ protected:
 	Block * m_block;
 
 private:
+	void initStoreFolders();
 	void writeFiles( const af::MCTaskUp & i_taskup);
 	void deleteRunningZombie();
 

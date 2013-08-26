@@ -27,8 +27,8 @@ public:
 /// Construct job from JSON.
 	JobAf( JSON & i_object);
 
-/// Construct empty Job for store.
-	JobAf( const std::string & i_store_dir = "");
+/// Construct empty job for store
+	JobAf( const std::string & i_store_dir = "", bool i_system = false);
 
 	virtual ~JobAf();
 
@@ -117,6 +117,8 @@ public:
 protected:
 	/// Allocate JobInfo, tasksLog.
 	void construct();
+
+	void readStore();
 
     virtual Block * v_newBlock( int numBlock); ///< Virtual function to create system blocks in a system job
 

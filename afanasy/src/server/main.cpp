@@ -214,7 +214,6 @@ int main(int argc, char *argv[])
 				SysJob * sysjob = (SysJob*)job;
 				if( sysjob->initSystem() )
 				{
-					printf("System job retrieved from store.\n");
 					hasSystemJob = true;
 				}
 				else

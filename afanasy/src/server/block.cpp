@@ -53,24 +53,24 @@ Block::~Block()
    }
 }
 
-bool Block::storeTasks( const std::string & i_folder)
+bool Block::storeTasks()
 {
 	if( m_data->isNumeric()) return true;
-	std::string filename = getStoreTasksFileName( i_folder);
+
 	std::ostringstream str;
 	str << "{\n";
 	m_data->jsonWriteTasks( str);
 	str << "\n}";
-	return AFCommon::writeFile( str, getStoreTasksFileName( i_folder));
+
+	return AFCommon::writeFile( str, getStoreTasksFileName());
 }
 
-bool Block::readStoredTasks( const std::string & i_folder)
+bool Block::readStoredTasks()
 {
 	if( m_data->isNumeric()) return true;
-	std::string filename = getStoreTasksFileName( i_folder);
 
 	int size;
-	char * data = af::fileRead( filename, &size);
+	char * data = af::fileRead( getStoreTasksFileName(), &size);
 	if( data == NULL ) return false;
 
 	rapidjson::Document document;
@@ -83,9 +83,9 @@ bool Block::readStoredTasks( const std::string & i_folder)
 	return true;
 }
 
-const std::string Block::getStoreTasksFileName( const std::string & i_folder) const
+const std::string Block::getStoreTasksFileName() const
 {
-	return i_folder + AFGENERAL::PATH_SEPARATOR + "block" + af::itos( m_data->getBlockNum()) + "_tasks.json";
+	return m_job->getStoreDir() + AFGENERAL::PATH_SEPARATOR + "block" + af::itos( m_data->getBlockNum()) + "_tasks.json";
 }
 
 void Block::appendJobLog( const std::string & message)
