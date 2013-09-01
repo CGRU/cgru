@@ -602,7 +602,7 @@ int TaskProcess::readPipe( FILE * i_file )
 
 void TaskProcess::collectFiles( af::MCTaskUp & i_task_up)
 {
-	std::vector<std::string> list = af::getFilesList( m_store_dir, /*safe mode=*/false);
+	std::vector<std::string> list = af::getFilesList( m_store_dir);
 	for( int i = 0; i < list.size(); i++)
 	{
 		std::string path = m_store_dir + AFGENERAL::PATH_SEPARATOR + list[i];

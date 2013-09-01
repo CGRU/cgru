@@ -293,3 +293,10 @@ const std::vector<std::string> af::strSplit( const std::string & str, const std:
 	return strlist;
 }
 
+const std::string af::base64encode( const char * i_data, int i_size)
+{
+	std::string str;
+	str = "base64:" + af::itos( i_size);
+	return str;
+}
+

@@ -1209,6 +1209,11 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
 	std::ostringstream str;
 	str << "{";
 
+	if( false == checkBlockTaskNumbers( i_b, i_t, "writeTask"))
+	{
+		return af::jsonMsgError("Invalid block/task number.");
+	}
+
 	if( i_mode == "log" )
 		return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+","+af::itos(i_t)+"]", getTaskLog( i_b, i_t));
 	else if( i_mode == "info" )
@@ -1216,6 +1221,10 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
 		af::TaskExec * task = generateTask( i_b, i_t);
 		if( task )
 			task->jsonWrite( str, af::Msg::TTask);
+	}
+	else if( i_mode == "files" )
+	{
+		m_blocks[i_b]->m_tasks[i_t]->getFiles( str);
 	}
 	else if( i_mode == "output")
 	{

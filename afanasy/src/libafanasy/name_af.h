@@ -137,6 +137,7 @@ namespace af
 	const std::string strEscape( const std::string & i_str);
 	const std::vector<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
 	const std::string vectToStr( const std::vector<int32_t> & i_vec);
+	const std::string base64encode( const char * i_data, int i_size);
 
 
 	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags, int i_startFrom = 0);
@@ -193,7 +194,8 @@ namespace af
 
 	bool pathMakePath( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
 
-	const std::vector<std::string> getFilesList( const std::string & i_path, bool i_safe_mode);
+	const std::vector<std::string> getFilesList( const std::string & i_path);
+	const std::vector<std::string> getFilesListSafe( const std::string & i_path);
 
 	char * fileRead( const std::string & i_filename, int * o_size = NULL, int i_maxfilesize = -1, std::string * o_err = NULL);
 

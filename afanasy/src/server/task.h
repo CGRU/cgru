@@ -62,6 +62,8 @@ public:
 /// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
 	af::Msg * getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const;
 
+	void getFiles( std::ostringstream & i_str) const;
+
 	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 
 	void stdOut( bool full = false) const;

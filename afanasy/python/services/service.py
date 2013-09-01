@@ -99,15 +99,19 @@ class service:
 			if len( image) < 1: continue
 
 			basename, ext = os.path.splitext( os.path.basename( image))
-			if not ext.lower() in cgruconfig.VARS['af_thumbnail_extensions']: continue
+			if len( ext ) < 2: continue
+			ext = ext.lower()[1:]
+			if not ext in cgruconfig.VARS['af_thumbnail_extensions']: continue
 
-			thumbnail = image + '.jpg'
+			thumbnail = os.path.basename( image) + '.jpg'
 			thumbnail = os.path.join( self.taskInfo['store_dir'], thumbnail)
 
 			self.taskInfo['image'] = image
 			self.taskInfo['thumbnail'] = thumbnail
 
-			cmds.append( cgruconfig.VARS['af_thumbnail_cmd'] % (self.taskInfo))
+			cmd = cgruconfig.VARS['af_thumbnail_cmd'] % (self.taskInfo)
+			#print( cmd)
+			cmds.append( cmd)
 
 		return cmds
 

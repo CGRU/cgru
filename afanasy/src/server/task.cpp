@@ -35,7 +35,7 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 
 	// Get existing files list
 	if( af::pathIsFolder( m_store_dir_files))
-		m_files = af::getFilesList( m_store_dir_files, /* safe mode = */ false);
+		m_files = af::getFilesList( m_store_dir_files);
 
 	// Read task progress
 	if( false == af::pathFileExists( m_store_file_progress)) return;
@@ -314,7 +314,7 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 {
 	for( int i = 0; i < i_taskup.getFilesNum(); i++)
 	{
-		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + i_taskup.getFileName(i);
+		std::string filename = i_taskup.getFileName(i);
 
 		// Store file name, if it does not stored yet:
 		bool exists = false;
@@ -327,9 +327,46 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 		if( false == exists )
 			m_files.push_back( filename);
 
+		filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + filename;
+
 		AFCommon::QueueFileWrite( new FileData( i_taskup.getFileData(i), i_taskup.getFileSize(i), filename,
 			m_store_dir_files));
 	}
+}
+
+void Task::getFiles( std::ostringstream & i_str) const
+{
+	std::string error;
+
+	i_str << "\"files\":[";
+
+	for( int i = 0; i < m_files.size(); i++)
+	{
+		if( i ) i_str << ",";
+		
+		i_str << "\n{\"name\":\"" << m_files[i] << "\"";
+
+		int readsize = -1;
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[i];
+		char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
+		if( data )
+		{
+			i_str << ",\n\"data\":\"";
+			i_str << af::base64encode( data, readsize);
+			i_str << "\"";
+			delete [] data;
+		}
+		else
+		{
+			i_str << "\n,\"error\":\"" << af::strEscape( error) << "\"";
+		}
+
+		i_str << ",\n\"size\":" << readsize;
+
+		i_str << "}";
+	}
+
+	i_str << "\n]";
 }
 
 void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)

@@ -249,29 +249,17 @@ char * af::fileRead( const std::string & i_filename, int * o_size, int i_maxfile
 	return buffer;
 }
 
-const std::vector<std::string> af::getFilesList( const std::string & i_path, bool i_safe_mode)
+const std::vector<std::string> af::getFilesList( const std::string & i_path)
 {
 	std::vector<std::string> list;
 
 	if( i_path.size() == 0 )
 		return list;
 
-	std::string path( i_path);
-
-	if( i_safe_mode )
-	{
-		if(( path.find("..") != -1  ) ||
-		   ( path.find(':')  != -1  ) ||
-		   ( path[0]         == '/' ) ||
-		   ( path[0]         == '\\'))
-			return list;
-		path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + path;
-	}
-
 #ifdef WINNT
 	HANDLE dir;
 	WIN32_FIND_DATA file_data;
-	if(( dir = FindFirstFile((path + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	if(( dir = FindFirstFile((i_path + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
@@ -289,7 +277,7 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path, boo
 #else
 
 	struct dirent *de = NULL;
-	DIR * dir = opendir( path.c_str());
+	DIR * dir = opendir( i_path.c_str());
 	if( dir == NULL)
 	{
 		return list;
@@ -306,6 +294,26 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path, boo
 #endif
 
 	return list;
+}
+
+const std::vector<std::string> af::getFilesListSafe( const std::string & i_path)
+{
+	std::vector<std::string> empty;
+
+	if( i_path.size() == 0 )
+		return empty;
+
+	std::string path( i_path);
+
+	if(( path.find("..") != -1  ) ||
+	   ( path.find(':')  != -1  ) ||
+	   ( path[0]         == '/' ) ||
+	   ( path[0]         == '\\'))
+		return empty;
+
+	path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + path;
+
+	return af::getFilesList( path);
 }
 
 bool af::removeDir( const std::string & i_folder )

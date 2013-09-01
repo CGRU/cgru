@@ -55,6 +55,13 @@ TaskItem.prototype.init = function()
 	this.elBar.classList.add('bar');
 //this.elBar.textContent='bar';
 
+	this.elThumbBtn = this.monitor.document.createElement('div');
+	this.element.appendChild( this.elThumbBtn);
+	this.elThumbBtn.classList.add('tumb_btn');
+	this.elThumbBtn.textContent = 'T';
+	this.elThumbBtn.m_task = this;
+	this.elThumbBtn.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_task.showTumbs();};
+
 	this.elStar = this.monitor.document.createElement('div');
 	this.element.appendChild( this.elStar);
 	this.elStar.classList.add('star');
@@ -83,7 +90,6 @@ TaskItem.prototype.init = function()
 	this.params.order = this.task_num;
 	this.percent = 0;
 	this.state = {};
-	
 }
 
 TaskItem.prototype.update = function()
@@ -313,6 +319,20 @@ TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 TaskItem.prototype.onDoubleClick = function()
 {
 	this.menuHandleGet('info');
+}
+
+TaskItem.prototype.showTumbs = function()
+{
+	if( this.m_elThumbs )
+	{
+		this.element.removeChild( this.m_elThumbs);
+		this.m_elThumbs = null;
+		return;
+	}
+
+	var bids = []; var tids = [];
+	this.getBlockTasksIds( bids, tids);
+	nw_GetNodes('jobs', [this.job.id], 'files', [bids[0]], [tids[0]])
 }
 
 /*
