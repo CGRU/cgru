@@ -10,7 +10,7 @@
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 
-#include "passwd/passwd.h"
+#include "common/passwd.h"
 
 #include "msg.h"
 

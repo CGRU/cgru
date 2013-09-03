@@ -5,8 +5,9 @@
 
 #include "../include/afanasy.h"
 
+#include "../libafanasy/common/dlThread.h"
+
 #include "../libafanasy/environment.h"
-#include "../libafanasy/dlThread.h"
 #include "../libafanasy/msgqueue.h"
 
 #include "../libafsql/dbconnection.h"

@@ -293,10 +293,21 @@ const std::vector<std::string> af::strSplit( const std::string & str, const std:
 	return strlist;
 }
 
+char * base64_encode( const char * i_data, int i_length, int & o_length);
 const std::string af::base64encode( const char * i_data, int i_size)
 {
-	std::string str;
-	str = "base64:" + af::itos( i_size);
+	int size;
+	char * data = base64_encode( i_data, i_size, size);
+
+	if( data == NULL )
+	{
+		AFERROR("af::base64encode: Returned data is NULL")
+		return std::string();
+	}
+
+	std::string str( data, size);
+	delete [] data;
+
 	return str;
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "dlMutex.h"
-#include "dlThread.h"
+#include "common/dlMutex.h"
+#include "common/dlThread.h"
 
 #ifdef WINNT
 #include <winsock2.h>

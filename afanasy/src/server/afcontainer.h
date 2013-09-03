@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libafanasy/dlRWLock.h"
+#include "../libafanasy/common/dlRWLock.h"
 
 #include "../libafanasy/afnode.h"
 #include "../libafanasy/msg.h"

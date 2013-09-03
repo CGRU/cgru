@@ -2,8 +2,10 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/dlThread.h"
+#include "../libafanasy/common/dlThread.h"
+
 #include "../libafanasy/msgclasses/mctaskpos.h"
+
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"

@@ -1,6 +1,6 @@
 #include "cmd_passwd.h"
 
-#include "../libafanasy/passwd/md5.h"
+#include "../libafanasy/common/md5.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
