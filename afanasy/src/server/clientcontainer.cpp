@@ -53,7 +53,7 @@ int ClientContainer::addClient( AfNodeSrv * i_nodesrv, bool deleteSameAddress, M
 			{
 				if( deleteSameAddress)
 				{
-					node->v_setZombie();
+					node->setZombie();
 					if( monitoring ) monitoring->addEvent( msgEventType, client->getId());
 				}
 				else

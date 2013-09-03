@@ -485,11 +485,6 @@ SysJob::~SysJob()
 {
 }
 
-void SysJob::v_setZombie( RenderContainer * renders, MonitorContainer * monitoring)
-{
-	AFCommon::QueueLogError("Trying to make system job a zomibe.");
-}
-
 Block * SysJob::v_newBlock( int numBlock)
 {
 AFINFO("SysJob::v_newBlock:");

@@ -66,7 +66,7 @@ protected:
 
 private:
 	void updateJobsOrder( af::Job * newJob = NULL);
-	void v_setZombie( MonitorContainer * i_monitoring);    ///< Set user to zombie.
+	void deleteNode( MonitorContainer * i_monitoring);
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:

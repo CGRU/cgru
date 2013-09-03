@@ -44,6 +44,14 @@ AfNodeSrv::~AfNodeSrv()
 //AFINFO("AfNodeSrv::~Node():")
 }
 
+void AfNodeSrv::setZombie()
+{
+	m_node->m_flags = m_node->m_flags | af::Node::FZombie;
+
+	// Delete store folder (with recursion)
+	AFCommon::QueueNodeCleanUp( this);
+}
+
 void AfNodeSrv::setStoreDir( const std::string & i_store_dir)
 {
 	m_store_dir = i_store_dir;

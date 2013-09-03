@@ -333,7 +333,9 @@ bool AfContainer::setZombie( int id)
       AFERRAR("AfContainer::setZombie: Node with id=%d already a zombie.", id)
       return false;
    }
-   node->v_setZombie();
+
+	node->setZombie();
+
    return true;
 }
 

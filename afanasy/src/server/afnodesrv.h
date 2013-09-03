@@ -44,8 +44,9 @@ public:
 	inline void lock()     const { m_node->m_locked =  true; }
 	inline void unLock()   const { m_node->m_locked = false; }
 
-	virtual void v_setZombie() { m_node->m_flags = m_node->m_flags | af::Node::FZombie; } ///< Request to kill a node.
-
+	// Request to delete a node.
+	void setZombie();
+   
 	void appendLog( const std::string & message);  ///< Append task log with a \c message .
 	inline const std::list<std::string> & getLog() { return m_log; }    ///< Get log.
 	af::Msg * writeLog() const;

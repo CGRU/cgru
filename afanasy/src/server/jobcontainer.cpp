@@ -134,7 +134,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 			AfContainerLock jLock( this, AfContainerLock::WRITELOCK);
 			AfContainerLock uLock( users, AfContainerLock::WRITELOCK);
 			user->unLock();
-			job->v_setZombie( NULL, NULL);
+			job->deleteNode( NULL, NULL);
 		}
 
 		return 0;

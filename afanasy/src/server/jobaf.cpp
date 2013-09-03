@@ -264,8 +264,14 @@ bool JobAf::initialize()
 
 int JobAf::getUid() const { return m_user->getId(); }
 
-void JobAf::v_setZombie( RenderContainer * renders, MonitorContainer * monitoring)
+void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring)
 {
+	if( m_id == AFJOB::SYSJOB_ID )
+	{
+		AFCommon::QueueLogError("System job can't be zombie");
+		return;
+	}
+
    if( m_deletion == false )
    {
       m_state = AFJOB::STATE_OFFLINE_MASK;
@@ -273,7 +279,7 @@ void JobAf::v_setZombie( RenderContainer * renders, MonitorContainer * monitorin
       m_deletion = true;
       if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
       {
-//printf("JobAf::setZombie: runningtaskscounter = %d\n", runningtaskscounter);
+//printf("JobAf::deleteNode: runningtaskscounter = %d\n", runningtaskscounter);
          restartAllTasks( true, "Job deletion.", renders, monitoring);
          if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
          return;
@@ -281,7 +287,7 @@ void JobAf::v_setZombie( RenderContainer * renders, MonitorContainer * monitorin
    }
    if( getRunningTasksNumber() )
    {
-      AFERRAR("JobAf::setZombie: runningtaskscounter = %d", getRunningTasksNumber())
+      AFERRAR("JobAf::deleteNode: runningtaskscounter = %d", getRunningTasksNumber())
       return;
    }
 
@@ -298,12 +304,9 @@ void JobAf::v_setZombie( RenderContainer * renders, MonitorContainer * monitorin
          appendLog( std::string("Executing block[") + m_blocks_data[b]->getName() + "] post command:\n" + m_blocks_data[b]->getCmdPost());
       }
    }
-   AfNodeSrv::v_setZombie();
 
-   // Queue job cleanup:
-   AFCommon::QueueNodeCleanUp( this);
+	setZombie();
 
-//   if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
    AFCommon::QueueLog("Deleting a job: " + v_generateInfoString());
    unLock();
@@ -372,9 +375,14 @@ void JobAf::v_action( Action & i_action)
 		af::jr_string("type", type, operation);
 		if( type == "delete")
 		{
+			if( m_id == AFJOB::SYSJOB_ID )
+			{
+				appendLog("System job can't be deleted by " + i_action.author);
+				return;
+			}
 			appendLog("Deleted by " + i_action.author);
 			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_action.author);
-			v_setZombie( i_action.renders, i_action.monitors);
+			deleteNode( i_action.renders, i_action.monitors);
 			i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
 			return;
 		}
@@ -910,7 +918,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
       for( int b = 0; b < m_blocks_num; b++)
          m_blocks[b]->v_refresh( currentTime, renders, monitoring);
-      if( getRunningTasksNumber() == 0 ) v_setZombie( NULL, monitoring);
+      if( getRunningTasksNumber() == 0 ) deleteNode( NULL, monitoring);
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
    }
    if( isLocked() ) return;
@@ -1049,7 +1057,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
       {
          appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
          m_user->appendLog( std::string("Job \"") + m_name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
-         v_setZombie( renders, monitoring);
+         deleteNode( renders, monitoring);
          jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
       }
    }
