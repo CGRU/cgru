@@ -59,7 +59,7 @@
 			"path":["REFS"]
 		},
 		"source":{
-			"path":["SOURCE"]
+			"path":["SOURCE","SRC"]
 		},
 		"result":{
 			"path":["RESULT/JPG"]
