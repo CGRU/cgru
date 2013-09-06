@@ -511,6 +511,7 @@ elif ext == 'aep':
 	if node != '': cmd += ' -comp "%s"' % node
 	if take != '':
 		cmd += ' -RStemplate "%s"' % take
+	images = os.path.join( os.path.dirname( images), os.path.basename( images).replace('[','@').replace(']','@'))
 	if output != '':
 		output = os.path.join( os.getcwd(), output)
 		cmd += ' -output "%s"' % output

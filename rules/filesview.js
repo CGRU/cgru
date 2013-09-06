@@ -327,8 +327,12 @@ FilesView.prototype.showFolder = function( i_folder)
 		}
 	}
 
-	if( ASSET && ( ASSET.dailies ) && ( RULES.afanasy_enabled !== false ))
+	if( RULES.afanasy_enabled !== false )
 	{
+		var out_path = c_PathDir( path);
+		if( ASSET && ( ASSET.dailies ))
+			out_path = ASSET.path+'/'+ASSET.dailies.path[0];
+
 		var elMakeDailies = document.createElement('div');
 		elFolder.appendChild( elMakeDailies);
 		elMakeDailies.classList.add('button');
@@ -337,7 +341,7 @@ FilesView.prototype.showFolder = function( i_folder)
 		elMakeDailies.m_path = path;
 		elMakeDailies.onclick = function(e){
 			e.stopPropagation();
-			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
+			d_Make( e.currentTarget.m_path, out_path)};
 	}
 
 	this.showAttrs( elFolder, i_folder);
