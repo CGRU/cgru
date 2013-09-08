@@ -30,15 +30,16 @@ Parser::~Parser()
 {
 }
 
-bool Parser::parse(  std::string & data,
+bool Parser::parse( const std::string & i_mode, std::string & data,
 							int & percent, int & frame, int & percentframe, std::string & activity,
 							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
 {
 	bool result = false;
-	if( data.size() < 1) return result;
+//	if( data.size() < 1) return result;
 
-	PyObject * pArgs = PyTuple_New( 1);
+	PyObject * pArgs = PyTuple_New( 2);
 	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( data.data(), data.size()));
+	PyTuple_SetItem( pArgs, 1, PyBytes_FromStringAndSize( i_mode.data(), i_mode.size()));
 
 	PyObject * pTuple = PyObject_CallObject( PyObj_FuncParse, pArgs);
 	if( pTuple != NULL)

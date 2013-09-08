@@ -10,7 +10,7 @@ class mayatovray(parser.parser):
       parser.parser.__init__( self, frames)
       self.firstframe = True
 
-   def do( self, data):
+   def do( self, data, mode):
       #print 'parsing generic:'
       #print data
       needcalc = False

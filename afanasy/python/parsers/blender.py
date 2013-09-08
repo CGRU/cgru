@@ -9,7 +9,7 @@ class blender(parser.parser):
       self.firstframe = True
       self.framestring = keyframe
 
-   def do( self, data):
+   def do( self, data, mode):
       lines = data.split('\n')
       need_calc = False
       for line in lines:

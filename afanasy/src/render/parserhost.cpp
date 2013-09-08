@@ -60,9 +60,9 @@ ParserHost::~ParserHost()
 	if( m_data   != NULL) delete [] m_data;
 }
 
-void ParserHost::read( std::string & output)
+void ParserHost::read( const std::string & i_mode, std::string & output)
 {
-	parse( output);
+	parse( i_mode, output);
 	const char * out_data = output.data();
 	int          out_size = output.size();
 
@@ -137,7 +137,7 @@ void ParserHost::setOverload()
 	m_overload = true;
 }
 
-void ParserHost::parse( std::string & output)
+void ParserHost::parse( const std::string & i_mode, std::string & output)
 {
 	if( m_parser )
 	{
@@ -146,7 +146,7 @@ void ParserHost::parse( std::string & output)
 		bool _badresult       = false;
 		bool _finishedsuccess = false;
 
-		m_parser->parse( output, m_percent, m_frame, m_percentframe, m_activity, _warning, _error, _badresult, _finishedsuccess);
+		m_parser->parse( i_mode, output, m_percent, m_frame, m_percentframe, m_activity, _warning, _error, _badresult, _finishedsuccess);
 
 		if ( _error           ) m_error           = true;
 		if ( _warning         ) m_warning         = true;

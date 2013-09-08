@@ -5,7 +5,7 @@ class prman(parser.parser):
    def __init__( self, frames = 1):
       parser.parser.__init__( self, frames)
 
-   def do( self, data):
+   def do( self, data, mode):
 #      print 'Parsing "prman":'
 #      print data
       data_len = len(data)

@@ -12,7 +12,7 @@ class nuke(parser.parser):
 		parser.parser.__init__( self, frames)
 		self.filename = ''
 
-	def do( self, data):
+	def do( self, data, mode):
 		data_len = len(data)
 		if data_len < 1: return
 

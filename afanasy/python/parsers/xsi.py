@@ -12,7 +12,7 @@ class xsi(parser.parser):
       parser.parser.__init__( self, frames)
       self.firstframe = True
 
-   def do( self, data):
+   def do( self, data, mode):
       needcalc = False
       frame    = False
 

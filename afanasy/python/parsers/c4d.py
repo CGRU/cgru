@@ -14,7 +14,7 @@ class c4d(parser.parser):
       self.firstFrameNumber = 0
       self.frames = frames
 
-   def do( self, data):
+   def do( self, data, mode):
 
     # Check if there are any Errors
     for error in Errors:

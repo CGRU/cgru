@@ -7,7 +7,7 @@ class hbatch_prman( hbatch.hbatch, prman.prman):
       hbatch.hbatch.__init__( self, frames)
       prman.prman.__init__( self, frames)
 
-   def do( self, data):
+   def do( self, data, mode):
       #print data
       if prman.prman.do( self, data): self.calculate()
       hbatch.hbatch.do( self, data)

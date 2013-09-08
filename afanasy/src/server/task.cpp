@@ -344,10 +344,11 @@ void Task::getFiles( std::ostringstream & i_str) const
 	{
 		if( i ) i_str << ",";
 		
-		i_str << "\n{\"name\":\"" << m_files[i] << "\"";
-
-		int readsize = -1;
 		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[i];
+
+		i_str << "\n{\"name\":\"" << filename << "\"";
+/*
+		int readsize = -1;
 		char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
 		if( data )
 		{
@@ -362,7 +363,7 @@ void Task::getFiles( std::ostringstream & i_str) const
 		}
 
 		i_str << ",\n\"size\":" << readsize;
-
+*/
 		i_str << "}";
 	}
 

@@ -279,7 +279,7 @@ void TaskProcess::refresh()
 	if( pid == 0 )
 	{
 		// Task is not finished
-		readProcess();
+		readProcess("RUN");
 	}
 	else if( pid == m_pid )
 	{
@@ -316,7 +316,7 @@ void TaskProcess::close()
 	m_zombie = true;
 }
 
-void TaskProcess::readProcess()
+void TaskProcess::readProcess( const std::string & i_mode)
 {
 	std::string output;
 
@@ -330,7 +330,7 @@ void TaskProcess::readProcess()
 
 	if( output.size() == 0 ) return;
 
-	m_parser->read( output);
+	m_parser->read( i_mode, output);
 
 	if( m_taskexec->getListenAddressesNum())
 	{
@@ -456,7 +456,7 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
 	}
 
 	// Read process last output
-	readProcess();
+	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time));
 
 	if(( i_exitCode != 0 ) || ( m_stop_time != 0 ))
 	{
