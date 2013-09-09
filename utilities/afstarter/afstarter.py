@@ -15,6 +15,7 @@ Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', def
 (Options, Args) = Parser.parse_args()
 
 # Initializations:
+ScenesSequences = ['.ifd','.vrscene']
 Scene = ''
 if len(Args) > 0: Scene = Args[0]
 FilePrefix = 'afstarter.'
@@ -687,7 +688,8 @@ class Dialog( QtGui.QWidget):
       # Check scene:
       scene = str( self.fields['scenefile'].text())
       if len( scene) == 0: return
-      if scene[-4:] == '.ifd':
+      name, ext = os.path.splitext( scene)
+      if ext in ScenesSequences:
          scene = afcommon.patternFromFile( scene)
       elif not os.path.isfile( scene):
          self.teCmd.setText('Scene file does not exist.')
@@ -726,7 +728,7 @@ class Dialog( QtGui.QWidget):
       if not str( self.fields['outimages'].text()) == '': cmd += ' -output "%s"' % self.fields['outimages'].text()
       if not str( self.fields['preview'].text()) == '': cmd += ' -images "%s"' % self.fields['preview'].text()
       if not str( self.fields['extrargs'].text()) == '': cmd += ' -extrargs "%s"' % self.fields['extrargs'].text()
-      if servType != 'none': cmd += ' -type "%s"' % servType
+      if len( servType) and servType != 'none': cmd += ' -type "%s"' % servType
       if str( self.fields['os'].text()) == '': cmd += ' -os any'
       else: cmd += ' -os "%s"' % self.fields['os'].text()
       cmd += ' -pwd "%s"' % self.fields['wdir'].text()
@@ -773,10 +775,14 @@ class Dialog( QtGui.QWidget):
 
    def processoutput( self):
       output = self.process.readAll()
+      print( output.__class__.__name__)
       if sys.version_info[0] < 3:
          output = str( output)
       else:
-         output = str( output, 'utf-8')
+         if output.__class__.__name__ == 'QByteArray':
+            output = str( output.data(), 'utf-8')
+         else:
+            output = str( output, 'utf-8')
       print( output)
       self.teCmd.insertPlainText( output)
       self.teCmd.moveCursor( QtGui.QTextCursor.End)

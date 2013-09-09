@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
-import sys
+import os, re, sys
 
 import af
 import afcommon
@@ -511,6 +510,7 @@ elif ext == 'aep':
 	if node != '': cmd += ' -comp "%s"' % node
 	if take != '':
 		cmd += ' -RStemplate "%s"' % take
+	images = os.path.join( os.path.dirname( images), os.path.basename( images).replace('[','@').replace(']','@'))
 	if output != '':
 		output = os.path.join( os.getcwd(), output)
 		cmd += ' -output "%s"' % output
@@ -531,6 +531,17 @@ elif ext == 'c4d':
 		cmd += ' -oimage "%s"' % output
 		images = output
 
+# VRay:
+elif ext == 'vrscene':
+	scenetype = 'vray'
+	if cmd is None: cmd = 'vray' + cmdextension
+	cmd += ' -sceneFile="%s"' % scene
+	if re.search(r'@#{1,}@', scene) is None:
+		cmd += ' -frames=@#@-@#@,' + str(by)
+	if output != '':
+		cmd += ' -imgFile="%s"' % output
+		images = output
+	cmd += ' -display=0 -autoClose=1 -verboseLevel=4 -showProgress=2'
 
 # simple generic:
 else:
