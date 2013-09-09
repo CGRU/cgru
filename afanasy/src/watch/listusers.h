@@ -37,7 +37,6 @@ private slots:
    void actSolveJobsByOrder();
    void actSolveJobsParallel();
 
-   void actAdd();
    void actDelete();
 
 private:

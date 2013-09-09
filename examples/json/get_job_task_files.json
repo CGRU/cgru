@@ -1,0 +1,10 @@
+{
+	"get":
+	{
+		"type" : "jobs",
+		"mode" : "files",
+		"block_ids" : [1],
+		"task_ids" : [0],
+		"ids" : [3]
+	}
+}

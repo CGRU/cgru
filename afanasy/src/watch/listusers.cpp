@@ -140,7 +140,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 		menu.addSeparator();
 
 		action = new QAction( "Delete", this);
-		action->setEnabled( useritem->numjobs);
+		action->setEnabled( useritem->numjobs == 0 );
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
 		menu.addAction( action);
 	}
@@ -358,8 +358,7 @@ void ListUsers::actHostsMaskExclude()
 	setParameter("hosts_mask_exclude", afqt::qtos( mask));
 }
 
-void ListUsers::actAdd()               { setParameter("permanent",      "true",  false); }
-void ListUsers::actDelete()            { setParameter("permanent",      "false", false); }
+void ListUsers::actDelete() { operation("delete"); }
 void ListUsers::actSolveJobsByOrder()  { setParameter("solve_parallel", "false", false); }
 void ListUsers::actSolveJobsParallel() { setParameter("solve_parallel", "true",  false); }
 

@@ -1,9 +1,10 @@
 #include "auth.h"
 
+#include "../libafanasy/common/dlScopeLocker.h"
+#include "../libafanasy/common/md5.h"
+
 #include "../libafanasy/environment.h"
-#include "../libafanasy/dlScopeLocker.h"
 #include "../libafanasy/msg.h"
-#include "../libafanasy/passwd/md5.h"
 
 #include "afcommon.h"
 

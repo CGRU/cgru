@@ -14,7 +14,7 @@ class maya_mental(parser.parser):
 		self.buffer = ""
 		self.numinseq = 0
 		
-	def do( self, data):
+	def do( self, data, mode):
 		self.buffer += data
 		needcalc = False
 		# frame = False

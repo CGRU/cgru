@@ -7,7 +7,7 @@ class blender_yafray( blender.blender, yafray.yafray):
       blender.blender.__init__( self, frames)
       yafray.yafray.__init__( self, frames)
 
-   def do( self, data):
+   def do( self, data, mode):
       #print data
       if yafray.yafray.do( self, data): self.calculate()
       blender.blender.do( self, data)

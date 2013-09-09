@@ -2,8 +2,9 @@
 
 #include <map>
 
+#include "../libafanasy/common/dlMutex.h"
+
 #include "../libafanasy/address.h"
-#include "../libafanasy/dlMutex.h"
 #include "../libafanasy/name_af.h"
 
 class Auth

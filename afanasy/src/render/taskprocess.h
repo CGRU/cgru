@@ -2,8 +2,10 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/dlThread.h"
+#include "../libafanasy/common/dlThread.h"
+
 #include "../libafanasy/msgclasses/mctaskpos.h"
+
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"
@@ -44,7 +46,7 @@ public:
 private:
 	void launchCommand();
 	void sendTaskSate();
-	void readProcess();
+	void readProcess( const std::string & i_mode);
 	void processFinished( int i_exitCode);
 	void killProcess();
 	void closeHandles();

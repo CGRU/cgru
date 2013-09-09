@@ -13,7 +13,8 @@ public:
 
 	inline bool isInitialized() const { return initialized;}
 
-	bool parse( std::string & data,
+	bool parse( const std::string & i_mode,
+				std::string & data,
 				int & percent, int & frame, int & percentframe, std::string & activity,
 				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
 

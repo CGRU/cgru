@@ -91,6 +91,13 @@ void UserAf::v_action( Action & i_action)
 			updateJobsOrder();
 		  	i_action.monitors->addUser( this);
 		}
+		else if( type == "delete")
+		{
+			if( m_jobs_num != 0 ) return;
+			appendLog( std::string("Deleted by ") + i_action.author);
+			deleteNode( i_action.monitors);
+			return;
+		}
 	}
 
 	const JSON & params = (*i_action.data)["params"];
@@ -104,13 +111,14 @@ void UserAf::v_action( Action & i_action)
 	}
 }
 
-void UserAf::v_setZombie( MonitorContainer * i_monitoring)
+void UserAf::deleteNode( MonitorContainer * i_monitoring)
 {
 	AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
-	AfNodeSrv::v_setZombie();
+	appendLog("Became a zombie.");
+
+	setZombie();
+
 	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
-	appendLog( "Became a zombie.");
-//	AFCommon::saveLog( getLog(), af::Environment::getUsersDir(), m_name);
 }
 
 void UserAf::addJob( JobAf * i_job)

@@ -268,7 +268,7 @@ height: 24px;
 .item.task {
 margin: 1px 10px 0px 10px;
 padding: 0px 4px;
-height: 12px;
+/* NEW height: 12px;*/
 border-radius: 0px;
 }
 
@@ -284,6 +284,24 @@ opacity: 0.9;
 .task .body {
 top: 0; bottom: 0; left: 18px; right: 5px;
 /*box-shadow: 0px 0px 2px #000 inset;*/
+}
+.task .thumbs_btn {
+cursor: pointer;
+float: left;
+text-align: center;
+border: 1px solid #555;
+width: 10px; height: 10px;
+}
+.task .thumbs {
+clear: both; text-align: center;
+box-shadow: 0px 0px 3px #000 inset;
+border-radius: 4px;
+margin: 2px; padding: 2px;
+}
+.task .thumbs img {
+border-radius: 3px;
+border: 1px solid #555;
+margin: 2px;
 }
 
 .user .bar {

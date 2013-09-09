@@ -225,7 +225,7 @@ function n_SendJob( job)
 	obj.address = cgru_Config.af_servername;
 	obj.port = cgru_Config.af_serverport;
 	obj.sender_id = 0;
-	obj.magick_number = cgru_Config.af_magic_number;
+	obj.magick_number = 1;
 	
 	n_Request({"send":obj});
 }

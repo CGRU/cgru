@@ -2,9 +2,10 @@
 
 #include <stdint.h>
 
-#include "../libafanasy/af.h"
-#include "../libafanasy/dlMutex.h"
-#include "../libafanasy/msg.h"
+#include "common/dlMutex.h"
+
+#include "af.h"
+#include "msg.h"
 
 /// Messages store structure.
 struct MSGS

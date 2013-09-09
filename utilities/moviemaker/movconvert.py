@@ -45,15 +45,16 @@ if Codec == '':
 	if Options.type == 'jpg':
 		args.extend(['-qscale', str(Options.qscale)])
 		Output += '.q'+str(Options.qscale)
-	if not os.path.isdir( Output): os.makedirs( Output)
-	if not os.path.isdir( Output):
-		print('ERROR: Can`t create output folder: '+Output)
-		sys.exit(1)
 
 	if Options.xres != -1 or Options.yres != -1:
 		args.extend(['-vf','scale=%d:%d' % (Options.xres,Options.yres)])
 		if Options.xres != -1: Output += '.'+str(Options.xres)
 		if Options.yres != -1: Output += 'x'+str(Options.yres)
+
+	if not os.path.isdir( Output): os.makedirs( Output)
+	if not os.path.isdir( Output):
+		print('ERROR: Can`t create output folder: '+Output)
+		sys.exit(1)
 
 	Output = os.path.join( Output, Options.imgname+'.%07d.'+Options.type)
 

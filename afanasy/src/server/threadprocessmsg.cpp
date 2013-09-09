@@ -196,6 +196,9 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 	static const char header_ERROR[] = "HTTP/1.1 404 Not Found\r\n\r\n";
 	static const  int header_ERROR_len = strlen( header_ERROR);
 
+	static const char tasks_file[] = "@TMP@";
+	static const  int tasks_file_len = strlen( tasks_file);
+
 	af::Msg * o_msg = new af::Msg();
 
 	char * get = i_msg->data();
@@ -213,8 +216,19 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 		file_name = std::string( get + get_start, get_finish - get_start);
 		if( false == validateGetFileName( file_name))
 		{
-			AFCommon::QueueLogError("GET invalid file name from " + i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
+			AFCommon::QueueLogError("GET: Invalid file name from " + i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
 			file_name.clear();
+		}
+		else if( file_name.find( tasks_file) == 0 )
+		{
+			get_start += tasks_file_len;
+			file_name = std::string( get + get_start, get_finish - get_start);
+			if( file_name.find( af::Environment::getTempDir()) != 0 )
+			{
+				AFCommon::QueueLogError("GET: Invalid @TMP@ folder from " + i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
+				file_name.clear();
+			}
+//printf("GET TMP FILE: %s\n", file_name.c_str());
 		}
 		else
 		{

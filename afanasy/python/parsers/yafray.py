@@ -11,7 +11,7 @@ class yafray(parser.parser):
       self.passing = False
       self.passcount = 0
 
-   def do( self, data):
+   def do( self, data, mode):
 #      print data
 
       if self.passing:

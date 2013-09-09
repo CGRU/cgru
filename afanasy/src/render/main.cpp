@@ -1,5 +1,6 @@
+#include "../libafanasy/common/dlThread.h"
+
 #include "../libafanasy/environment.h"
-#include "../libafanasy/dlThread.h"
 #include "../libafanasy/host.h"
 #include "../libafanasy/render.h"
 

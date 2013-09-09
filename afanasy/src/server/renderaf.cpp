@@ -117,7 +117,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 	{
 		AFCommon::QueueLog("Render Deleting: " + v_generateInfoString( false));
 		appendLog("Waiting for deletion.");
-		v_setZombie();
+		setZombie();
 //		AFCommon::saveLog( getLog(), af::Environment::getRendersDir(), m_name);
 		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, m_id);
 	}

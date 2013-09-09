@@ -1,3 +1,32 @@
+/* GLOBAL.H - RSAREF types and constants */
+
+/* PROTOTYPES should be set to one if and only if the compiler supports
+  function argument prototyping.
+The following makes PROTOTYPES default to 0 if it has not already been defined with C compiler flags. */
+#ifndef PROTOTYPES
+#define PROTOTYPES 1
+#endif
+
+/* POINTER defines a generic pointer type */
+typedef char *POINTER;
+
+#include <stdint.h>
+
+/* UINT2 defines a two byte word */
+typedef uint16_t UINT2;
+
+/* UINT4 defines a four byte word */
+typedef uint32_t UINT4;
+
+/* PROTO_LIST is defined depending on how PROTOTYPES is defined above.
+If using PROTOTYPES, then PROTO_LIST returns the list, otherwise it
+  returns an empty list. */
+#if PROTOTYPES
+#define PROTO_LIST(list) list
+#else
+#define PROTO_LIST(list) ()
+#endif
+
 /* MD5.H - header file for MD5C.C
  */
 
@@ -24,8 +53,6 @@ documentation and/or software.
  */
 
 /* MD5 context. */
-
-#include "global.h"
 
 typedef struct {
   UINT4 state[4];                                   /* state (ABCD) */

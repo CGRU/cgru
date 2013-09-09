@@ -57,7 +57,7 @@ TaskItem.prototype.init = function()
 
 	this.elThumbBtn = this.monitor.document.createElement('div');
 	this.element.appendChild( this.elThumbBtn);
-	this.elThumbBtn.classList.add('tumb_btn');
+	this.elThumbBtn.classList.add('thumbs_btn');
 	this.elThumbBtn.textContent = 'T';
 	this.elThumbBtn.m_task = this;
 	this.elThumbBtn.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_task.showTumbs();};
@@ -323,16 +323,33 @@ TaskItem.prototype.onDoubleClick = function()
 
 TaskItem.prototype.showTumbs = function()
 {
-	if( this.m_elThumbs )
+	if( this.elThumbs )
 	{
-		this.element.removeChild( this.m_elThumbs);
-		this.m_elThumbs = null;
+		this.element.removeChild( this.elThumbs);
+		this.elThumbs = null;
 		return;
 	}
 
 	var bids = []; var tids = [];
 	this.getBlockTasksIds( bids, tids);
-	nw_GetNodes('jobs', [this.job.id], 'files', [bids[0]], [tids[0]])
+
+	var get = {"type":'jobs',"ids":[this.job.id],"mode":'files',"block_ids":[bids[0]],"task_ids":[tids[0]]};
+
+	nw_request({"send":{"get":get},"task":this,"func":function( i_obj, i_args){i_args.task.thumbsReceived( i_obj)}});
+}
+
+TaskItem.prototype.thumbsReceived = function( i_obj)
+{
+	this.elThumbs = document.createElement('div');
+	this.element.appendChild( this.elThumbs);
+	this.elThumbs.classList.add('thumbs');
+
+	for( var i = 0; i < i_obj.files.length; i++ )
+	{
+		elImg = this.monitor.document.createElement('img');
+		this.elThumbs.appendChild( elImg);
+		elImg.src = '@TMP@' + i_obj.files[i].name;
+	}
 }
 
 /*

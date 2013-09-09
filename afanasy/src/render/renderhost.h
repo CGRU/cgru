@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../libafanasy/dlRWLock.h"
+#include "../libafanasy/common/dlRWLock.h"
+
 #include "../libafanasy/msgclasses/mclistenaddress.h"
+
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
 

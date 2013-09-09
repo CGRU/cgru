@@ -2,7 +2,8 @@
 
 #include "name_afsql.h"
 
-#include "../libafanasy/dlMutex.h"
+#include "../libafanasy/common/dlMutex.h"
+
 #include "../libafanasy/name_af.h"
 
 

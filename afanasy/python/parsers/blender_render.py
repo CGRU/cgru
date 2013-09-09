@@ -7,7 +7,7 @@ class blender_render(blender.blender):
    def __init__( self, frames = 1):
       blender.blender.__init__( self, frames)
 
-   def do( self, data):
+   def do( self, data, mode):
       lines = data.split('\n')
       need_calc = False
       for line in lines:

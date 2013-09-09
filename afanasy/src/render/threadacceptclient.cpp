@@ -16,9 +16,10 @@
 #define closesocket close
 #endif
 
+#include "../libafanasy/common/dlThread.h"
+
 #include "../libafanasy/msg.h"
 #include "../libafanasy/environment.h"
-#include "../libafanasy/dlThread.h"
 
 #include "renderhost.h"
 

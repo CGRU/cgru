@@ -47,13 +47,7 @@ void TalkAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
    if( getTimeUpdate() < (currentTime - af::Environment::getTalkZombieTime()))
    {
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksDel, m_id);
-      v_setZombie();
+		setZombie();
    }
 }
 
-void TalkAf::v_setZombie()
-{
-   AFCommon::QueueLog("Deleting talk: " + v_generateInfoString( false));
-
-	AfNodeSrv::v_setZombie();
-}

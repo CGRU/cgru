@@ -4,7 +4,8 @@
 #include <fstream>
 #endif
 
-#include "../libafanasy/dlScopeLocker.h"
+#include "../libafanasy/common/dlScopeLocker.h"
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 

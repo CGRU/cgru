@@ -13,8 +13,9 @@
 #include <sys/types.h>
 #endif
 
+#include "../libafanasy/common/dlThread.h"
+
 #include "../libafanasy/environment.h"
-#include "../libafanasy/dlThread.h"
 
 #include "threadargs.h"
 

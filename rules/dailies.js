@@ -1,6 +1,8 @@
 d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
 d_guiparams = [];
+d_guiparams.push({"name":'project',"width":'50%'});
+d_guiparams.push({"name":'shot',"width":'50%',"lwidth":'70px'});
 d_guiparams.push({"name":'artist',"width":'50%'});
 d_guiparams.push({"name":'activity',"width":'25%',"lwidth":'70px'});
 d_guiparams.push({"name":'version',"width":'25%',"lwidth":'70px'});
@@ -24,6 +26,11 @@ function d_Make( i_path, i_outfolder)
 	c_Log('Make Dailies: '+i_path);
 
 	var params = {};
+
+	params.project = 'project';
+	if( ASSETS.project ) params.project = ASSETS.project.name;
+	params.shot = c_PathBase( i_path);
+	if( ASSETS.shot ) params.shot = ASSETS.shot.name;
 
 	params.version = i_path.split('/');
 	params.version = params.version[params.version.length-1];
@@ -64,10 +71,10 @@ function d_Make( i_path, i_outfolder)
 
 	var naming = RULES.dailies.naming;
 	var filename = RULES.dailies.naming;
-	filename = filename.replace('(p)', ASSETS.project.name);
-	filename = filename.replace('(P)', ASSETS.project.name.toUpperCase());
-	filename = filename.replace('(s)', ASSETS.shot.name);
-	filename = filename.replace('(S)', ASSETS.shot.name.toUpperCase());
+	filename = filename.replace('(p)', params.project);
+	filename = filename.replace('(P)', params.project.toUpperCase());
+	filename = filename.replace('(s)', params.shot);
+	filename = filename.replace('(S)', params.shot.toUpperCase());
 	filename = filename.replace('(v)', params.version);
 	filename = filename.replace('(V)', params.version.toUpperCase());
 	filename = filename.replace('(d)', date);
@@ -207,8 +214,8 @@ function d_MakeCmd( i_params)
 	cmd += ' --lgfsize '+params.logo_frame_size;
 	cmd += ' --lgfgrav '+params.logo_frame_grav;
 
-	cmd += ' --project "'+ASSETS.project.name+'"';
-	cmd += ' --shot "'+ASSETS.shot.name+'"';
+	cmd += ' --project "'+params.project+'"';
+	cmd += ' --shot "'+params.shot+'"';
 
 	cmd += ' --ver "'+params.version+'"';
 	cmd += ' --artist "'+params.artist+'"';

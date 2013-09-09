@@ -14,7 +14,7 @@ class mantra(parser.parser):
    def __init__( self, frames = 1):
       parser.parser.__init__( self, frames)
 
-   def do( self, data):
+   def do( self, data, mode):
 
       for warning in Warnings:
          if data.find(warning) != -1:

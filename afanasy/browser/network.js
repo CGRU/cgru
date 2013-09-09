@@ -115,7 +115,7 @@ function nw_GetEvents()
 	nw_send(obj);
 }
 
-function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number)
+function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number, i_func)
 {
 	var obj = {};
 	obj.get = {};
@@ -135,7 +135,7 @@ function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number)
 	if( i_number )
 		obj.get.number = i_number;
 
-	nw_send(obj);
+	nw_request({"send":obj,"func":i_func});
 }
 
 function nw_GetBlocks( i_job_id, i_blocks, i_modes)

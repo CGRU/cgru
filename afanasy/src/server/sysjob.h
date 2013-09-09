@@ -119,7 +119,6 @@ public:
 	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
-	virtual void v_setZombie( RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 	static void appendJobLog( const std::string & message);

@@ -1,8 +1,9 @@
 #include "afqueue.h"
-#include "dlScopeLocker.h"
 
 #include <stdio.h>
 #include <assert.h>
+
+#include "common/dlScopeLocker.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT

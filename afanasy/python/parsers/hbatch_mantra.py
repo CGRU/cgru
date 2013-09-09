@@ -7,7 +7,7 @@ class hbatch_mantra( hbatch.hbatch, mantra.mantra):
       hbatch.hbatch.__init__( self, frames)
       mantra.mantra.__init__( self, frames)
 
-   def do( self, data):
+   def do( self, data, mode):
       #print data
       mantra.mantra.do( self, data)
       hbatch.hbatch.do( self, data)

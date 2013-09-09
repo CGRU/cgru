@@ -2,8 +2,9 @@
 
 #include <stdio.h>
 
+#include "../libafanasy/common/dlScopeLocker.h"
+
 #include "../libafanasy/msgclasses/mcgeneral.h"
-#include "../libafanasy/dlScopeLocker.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
