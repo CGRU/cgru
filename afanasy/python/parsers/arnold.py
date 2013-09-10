@@ -16,6 +16,6 @@ class arnold(parser.parser):
 		if len( data ) < 1: return
 		
 		match = re_percent.findall( data )
-		if len( match ) > 1:
+		if len( match ):
 			percentframe = float( match[-1][1] )
 			self.percent = int( percentframe )

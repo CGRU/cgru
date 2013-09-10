@@ -96,6 +96,7 @@ Parser.add_option('--pargs',            dest='pargs',          type  = 'string',
 Parser.add_option('--pdir',             dest='pdir',           type  = 'string',    default='',          help='Preview output folder')
 Parser.add_option('--createoutdir',     dest='createoutdir',   action='store_true', default=False,       help='Create output folder if it not exists')
 Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
+Parser.add_option('--scale',            dest='scale',          type  = 'int',       default=0,          help='Movie encoding scale')
 
 (Options, args) = Parser.parse_args()
 
@@ -525,6 +526,8 @@ if need_convert:
 
 # Encode commands:
 auxargs = ''
+if Options.scale:
+	auxargs = '-vf scale=%d:-1' % Options.scale
 preview_input = os.path.join( inputdir, prefix+'%0'+str(padding)+'d'+suffix)
 if len(cmd_convert): preview_input = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
 

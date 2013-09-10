@@ -645,19 +645,24 @@ bool Environment::initAfterLoad()
 	{
 	digest_file = getCGRULocation() + AFGENERAL::PATH_SEPARATOR + digest_file;
 	char * data = af::fileRead( digest_file);
-	std::vector<std::string> lines = af::strSplit( data,"\n");
-	delete [] data;
-	for( int l = 0; l < lines.size(); l++)
+	if( data )
 	{
-		if( lines[l].size() == 0 ) continue;
-		std::vector<std::string> words = af::strSplit(lines[l],":");
-		if( words.size() != 3 )
+		std::vector<std::string> lines = af::strSplit( data,"\n");
+		delete [] data;
+		for( int l = 0; l < lines.size(); l++)
 		{
-			AFERRAR("Invalid digest file:\n%s\n%s", digest_file.c_str(), lines[l].c_str())
-			continue;
+			if( lines[l].size() == 0 ) continue;
+			std::vector<std::string> words = af::strSplit(lines[l],":");
+			if( words.size() != 3 )
+			{
+				AFERRAR("Invalid digest file:\n%s\n%s", digest_file.c_str(), lines[l].c_str())
+				continue;
+			}
+			digest_map[words[0]] = words[2];
 		}
-		digest_map[words[0]] = words[2];
 	}
+	else
+		printf("Digest not loaded, authentication is disabled.\n");
 	}
 
 	// Solve server name

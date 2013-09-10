@@ -23,41 +23,45 @@ afjob path/scene.hip 1 100 -fpt 3 -pwd projects/test -node /out/mantra1 -take ba
 \n\
 arguments:\n\
 \n\
-path/scene.shk		-	(R) Scene, which file extension determinate run command and task type\n\
-1						-	(R) First frame to render\n\
-100						-	(R) Last frame to render\n\
--by 1					-	Frames increment, default = 1\n\
--fpt 1					-	Frames per task, default = 1\n\
--pwd projects/test	-	Working directory, if not set current will be used.\n\
--name my_job			-	Job name, if not set scene name will be used.\n\
--node					-	Node to render ( houdini driver, nuke write, max camera )\n\
--type					-	Service type\n\
--take					-	Take to use ( houdini take, xsi pass, max batch )\n\
--ignoreinputs		-	not to render input nodes ( houdini ignore inputs ROP parameter )\n\
--tempscene			-	copy scene to temporary file to render\n\
--deletescene			-	delete scene when job deleted\n\
--pause					-	start job paused ( offline afanasy state )\n\
--os						-	OS needed mask, "any" to render on any platform\n\
--hostsmask			-	job render hosts mask\n\
--hostsexcl			-	job render hosts to exclude mask\n\
--maxruntasks			-	maximum number of hosts to use\n\
--maxruntime			-	maximum run time for task in seconds\n\
--priority				-	job priority\n\
--capacity				-	tasks capacity\n\
--capmin				-	tasks minimum capacity coefficient\n\
--capmax				-	tasks maximum capacity coefficient\n\
--depmask				-	wait untill other jobs of the same user, satisfying this mask\n\
--depglbl				-	wait untill other jobs of any user, satisfying this mask\n\
--output				-	override output filename\n\
--images				-	images to preview (img.%04d.jpg)\n\
--image					-	image to preview (img.0000.jpg)\n\
--exec					-	customize command executable.\n\
--extrargs				-	add to command extra arguments.\n\
+path/scene.shk          - (R) Scene, which file extension determinate run command and task type\n\
+1                       - (R) First frame to render\n\
+100                     - (R) Last frame to render\n\
+-by 1                   - Frames increment, default = 1\n\
+-fpt 1                  - Frames per task, default = 1\n\
+-pwd projects/test      - Working directory, if not set current will be used.\n\
+-name my_job            - Job name, if not set scene name will be used.\n\
+-node                   - Node to render ( houdini driver, nuke write, max camera )\n\
+-type                   - Service type\n\
+-take                   - Take to use ( houdini take, xsi pass, max batch )\n\
+-ignoreinputs           - not to render input nodes ( houdini ignore inputs ROP parameter )\n\
+-tempscene              - copy scene to temporary file to render\n\
+-deletescene            - delete scene when job deleted\n\
+-pause                  - start job paused ( offline afanasy state )\n\
+-os                     - OS needed mask, "any" to render on any platform\n\
+-hostsmask              - job render hosts mask\n\
+-hostsexcl              - job render hosts to exclude mask\n\
+-maxruntasks            - maximum number of hosts to use\n\
+-maxruntime             - maximum run time for task in seconds\n\
+-priority               - job priority\n\
+-capacity               - tasks capacity\n\
+-capmin                 - tasks minimum capacity coefficient\n\
+-capmax                 - tasks maximum capacity coefficient\n\
+-depmask                - wait untill other jobs of the same user, satisfying this mask\n\
+-depglbl                - wait untill other jobs of any user, satisfying this mask\n\
+-output                 - override output filename\n\
+-images                 - images to preview (img.%04d.jpg)\n\
+-image                  - image to preview (img.0000.jpg)\n\
+-exec                   - customize command executable.\n\
+-extrargs               - add to command extra arguments.\n\
+-simulate               - enable simulation\n\
+-noscript               - enable the use of the render-scripts (nuke & c4d)\n\
+-script                 - set a startup script\n\
+-mname                  - Movie name to encode from images\n\
+-mcodec                 - Movie codec\n\
+-mscale                 - Movie scale\n\
 -varirender attr start step count - variate parameter\n\
--simulate				-	enable simulation\n\
--noscript				-	enable the use of the render-scripts (nuke & c4d)\n\
--script				-	set a startup script\n\
-(R)						-	REQUIRED arguments\n\
+-V                      - verbose\n\
+(R)                     - REQUIRED arguments\n\
 \n\
 ')
 	error_exit()
@@ -89,34 +93,39 @@ e = integer( argsv[3])
 fpt = 1
 by  = 1
 pwd = os.getenv('PWD', os.getcwd())
-file			= ''
-node			= ''
-ignoreinputs	= False
-take			= ''
-deletescene	= False
-tempscene		= False
-startpaused	= False
-hostsmask		= ''
-hostsexcl		= ''
-maxruntime	= 0
-maxruntasks	= -1
-priority		= -1
-capacity		= -1
-capmin			= -1
-capmax			= -1
-dependmask	= ''
-dependglobal	= ''
-output			= ''
-images			= ''
-image			= ''
-extrargs		= ''
-blocktype		= ''
+file            = ''
+node            = ''
+ignoreinputs    = False
+take            = ''
+deletescene     = False
+tempscene       = False
+startpaused     = False
+hostsmask       = ''
+hostsexcl       = ''
+maxruntime      = 0
+maxruntasks     = -1
+priority        = -1
+capacity        = -1
+capmin          = -1
+capmax          = -1
+dependmask      = ''
+dependglobal    = ''
+output          = ''
+images          = ''
+image           = ''
+extrargs        = ''
+blocktype       = ''
 blockparser     = ''
-platform		= ''
-varirender	= False
-simulate		= False
-noscript		= False
-script			= ''
+platform        = ''
+varirender      = False
+simulate        = False
+noscript        = False
+script          = ''
+mname           = ''
+mcodec          = ''
+mscale          = ''
+
+Verbose = False
 cmd = None
 cmds = []
 blocknames = []
@@ -325,6 +334,28 @@ for i in range( argsl):
 		i += 1
 		if i == argsl: break
 		script = argsv[i]
+		continue
+  
+	if arg == '-mname':
+		i += 1
+		if i == argsl: break
+		mname = argsv[i]
+		continue
+  
+	if arg == '-mcodec':
+		i += 1
+		if i == argsl: break
+		mcodec = argsv[i]
+		continue
+  
+	if arg == '-mscale':
+		i += 1
+		if i == argsl: break
+		mscale = argsv[i]
+		continue
+  
+	if arg == '-V':
+		Verbose = True
 		continue
   
 #
@@ -556,7 +587,8 @@ elif ext == 'ass':
 # simple generic:
 else:
 	scenetype = 'generic'
-	images = output
+	if output != '' and images == '':
+		images = output
 	if cmd is None: cmd = scene
 	if extrargs != '': cmd += ' ' + extrargs
 	cmd += ' @#@ @#@'
@@ -589,6 +621,27 @@ for cmd in cmds:
 	blocks.append( block)
 	i += 1
 
+if mname != '' and images != '':
+	block = af.Block( mname + '-movie', 'movgen')
+	blocks.append( block)
+	block.setWorkingDirectory( pwd)
+	block.setDependMask( blocknames[-1])
+	task = af.Task( mname)
+	block.tasks.append( task)
+	cmd = os.getenv('CGRU_LOCATION')
+	cmd = os.path.join( cmd, 'utilities')
+	cmd = os.path.join( cmd, 'moviemaker')
+	cmd = os.path.join( cmd, 'makemovie.py')
+	cmd = 'python "%s"' % cmd
+	if mcodec != '': cmd += ' --codec "%s"' % mcodec
+	if mscale != '': cmd += ' --scale "%s"' % mscale
+	cmd += ' "%s"' % images.replace('@#','#').replace('#@','#')
+	if not os.path.isabs( mname ):
+		mname = os.path.join( os.path.dirname( os.path.dirname( images)), mname)
+	cmd += ' "%s"' % mname
+	task.setCommand( cmd)
+
+
 # Create a Job:
 job = af.Job( name)
 job.setPriority( priority)
@@ -608,7 +661,7 @@ job.blocks.extend( blocks)
 
 
 # Print job information:
-#job.output( True)
+if Verbose: job.output( True)
 
 # Send Job to server:
 if job.send() == False: sys.exit(1)
