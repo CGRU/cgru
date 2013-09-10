@@ -15,7 +15,7 @@ Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', def
 (Options, Args) = Parser.parse_args()
 
 # Initializations:
-ScenesSequences = ['.ifd','.vrscene']
+ScenesSequences = ['.ifd','.vrscene','.ass']
 Scene = ''
 if len(Args) > 0: Scene = Args[0]
 FilePrefix = 'afstarter.'

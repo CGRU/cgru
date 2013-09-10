@@ -543,6 +543,16 @@ elif ext == 'vrscene':
 		images = output
 	cmd += ' -display=0 -autoClose=1 -verboseLevel=4 -showProgress=2'
 
+# Arnold:
+elif ext == 'ass':
+	scenetype = 'arnold'
+	if cmd is None: cmd = 'kick' + cmdextension
+	cmd += ' -i "%s"' % scene
+	if output != '':
+		cmd += ' -o "%s"' % output
+		images = output
+	cmd += ' -v 2 -nstdin -dw -dp -nocrashpopup'
+
 # simple generic:
 else:
 	scenetype = 'generic'
