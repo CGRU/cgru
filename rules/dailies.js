@@ -11,9 +11,10 @@ d_guiparams.push({"name":'output'});
 d_guiparams.push({"name":'filename'});
 //d_guiparams.push({"name":'format',"width":'32%'});
 d_guiparams.push({"name":'fps',"label":'FPS',"width":'25%'});
-d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'25%',"lwidth":'70px'});
-d_guiparams.push({"name":'no_auto_colospace',"label":'No Auto Color Space',"width":'25%',"lwidth":'170px'});
-d_guiparams.push({"name":'gamma',"width":'25%',"lwidth":'70px'});
+d_guiparams.push({"name":'fffirst',"label":"F.F.First","width":'25%',"lwidth":'70px'});
+d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'50%',"lwidth":'170px'});
+d_guiparams.push({"name":'gamma',"width":'50%'});
+d_guiparams.push({"name":'no_auto_colospace',"label":'No Auto Color Space',"width":'50%',"lwidth":'170px'});
 //d_guiparams.push({"name":'codec'});
 
 d_cvtguiparams = [];
@@ -235,6 +236,8 @@ function d_MakeCmd( i_params)
 		cmd += ' -g ' + params.gamma;
 	if( params.no_auto_colospace != '' )
 		cmd += ' --noautocorr';
+	if( params.no_auto_colospace != '' )
+		cmd += ' --fffirst';
 
 	cmd += ' --lgspath "'+params.logo_slate_path+'"';
 	cmd += ' --lgssize '+params.logo_slate_size;
