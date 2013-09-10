@@ -111,13 +111,6 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 
 	if( af::Environment::isVerboseMode()) printf("%s\n", m_cmd.c_str());
 
-	// Perform pre setup:
-	#ifdef WINNT
-	m_hjob = CreateJobObject( NULL, NULL);
-	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
-	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-	#endif
-
 	launchCommand();
 
 	if( m_pid == 0 )
@@ -160,6 +153,9 @@ void TaskProcess::launchCommand()
 
 	#ifdef WINNT
 	// On windows we attach process to a job to close all spawned childs:
+	m_hjob = CreateJobObject( NULL, NULL);
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
 	if( SetInformationJobObject( m_hjob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) ) == 0)
 		AFERROR("SetInformationJobObject failed.\n");
 	if( AssignProcessToJobObject( m_hjob, m_pinfo.hProcess) == false)

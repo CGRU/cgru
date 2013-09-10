@@ -1,11 +1,11 @@
 #include "afcommon.h"
 
-#include <dirent.h>
 #include <fcntl.h>
 #ifdef WINNT
 #include <io.h>
 //#define open _open
 #else
+#include <dirent.h>
 #include <sys/errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>

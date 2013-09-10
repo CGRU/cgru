@@ -334,8 +334,7 @@ bool af::removeDir( const std::string & i_folder )
 			if( false == af::pathFileExists( filename))
 				continue;
 
-			Attributes = GetFileAttributes( filename.c_str());
-			if( Attributes & FILE_ATTRIBUTE_DIRECTORY )
+			if( GetFileAttributes( filename.c_str()) & FILE_ATTRIBUTE_DIRECTORY )
 			{
 				if( false == af::removeDir( filename))
 					return false;

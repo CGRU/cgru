@@ -1,6 +1,6 @@
-set ver=4.8.4
+set ver=4.8.5
 
-set location=http://releases.qt-project.org/qt4/source
+set location=http://download.qt-project.org/official_releases/qt/4.8/%ver%
 set foldername=qt-everywhere-opensource-src-%ver%
 set archive_ext=zip
 set archive=%foldername%.%archive_ext%
