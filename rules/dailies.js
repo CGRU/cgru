@@ -286,7 +286,7 @@ function d_Convert( i_path)
 	elSrc.textContent = i_path;
 
 	d_CreateGUI( wnd, d_cvtguiparams, [params, RULES.dailies]);
-	d_CreateGUI_Codecs( wnd);
+	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
