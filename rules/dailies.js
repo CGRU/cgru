@@ -9,9 +9,11 @@ d_guiparams.push({"name":'version',"width":'25%',"lwidth":'70px'});
 d_guiparams.push({"name":'input'});
 d_guiparams.push({"name":'output'});
 d_guiparams.push({"name":'filename'});
-d_guiparams.push({"name":'resolution',"width":'32%'});
-d_guiparams.push({"name":'fps',"label":'FPS',"width":'18%',"lwidth":'30px'});
-d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'50%',"lwidth":'70px'});
+//d_guiparams.push({"name":'format',"width":'32%'});
+d_guiparams.push({"name":'fps',"label":'FPS',"width":'25%'});
+d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'25%',"lwidth":'70px'});
+d_guiparams.push({"name":'no_auto_colospace',"label":'No Auto Color Space',"width":'25%',"lwidth":'170px'});
+d_guiparams.push({"name":'gamma',"width":'25%',"lwidth":'70px'});
 //d_guiparams.push({"name":'codec'});
 
 d_cvtguiparams = [];
@@ -91,7 +93,8 @@ function d_Make( i_path, i_outfolder)
 	wnd.elContent.classList.add('dailies');
 
 	d_CreateGUI( wnd, d_guiparams, [params, RULES.dailies]);
-	d_CreateGUI_Codecs( wnd);
+	d_CreateGUI_Choises({"wnd":wnd,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -115,41 +118,58 @@ function d_Make( i_path, i_outfolder)
 	elRules.textContent = 'RULES.dailies='+JSON.stringify(RULES.dailies).replace(/,/g,', ');
 }
 
-function d_CreateGUI_Codecs( i_wnd)
+function d_CreateGUI_Choises( i_args)
 {
-	i_wnd.m_codec = RULES.dailies.codec;
-	i_wnd.m_elCodecs = [];
-	var elCodecDiv = document.createElement('div');
-	i_wnd.elContent.appendChild( elCodecDiv);
-	elCodecDiv.style.clear = 'both';
-	var elCodecLabel = document.createElement('div');
-	elCodecDiv.appendChild( elCodecLabel);
-	elCodecLabel.textContent = 'Codec:';
-	elCodecLabel.classList.add('label');
-	for( var codec in RULES.dailies.codecs)
+	var wnd = i_args.wnd;
+	var name = i_args.name;
+	var def_val = i_args.value;
+	var label = i_args.label;
+	var keys = i_args.keys;
+
+	if( wnd.m_choises == null )
+		wnd.m_choises = {};
+
+	wnd.m_choises[name] = {};
+	wnd.m_choises[name].value = def_val;
+	wnd.m_choises[name].elements = [];
+	
+	var elDiv = document.createElement('div');
+	wnd.elContent.appendChild( elDiv);
+	elDiv.style.clear = 'both';
+	var elLabel = document.createElement('div');
+	elDiv.appendChild( elLabel);
+	elLabel.textContent = label;
+	elLabel.classList.add('label');
+	for( var key in keys)
 	{
 		var el = document.createElement('div');
-		elCodecDiv.appendChild( el);
+		elDiv.appendChild( el);
 		el.classList.add('choise');
 		el.classList.add('button');
-		el.textContent = RULES.dailies.codecs[codec];
-		el.onclick = d_CodecOnClick;
-		if( codec == i_wnd.m_codec )
-			el.classList.add('selected');
+		el.textContent = keys[key].name;
+		el.onclick = d_ChoiseOnClick;
+		var value = key;
+		if( keys[key].value ) value = keys[key].value;
+		if( value == def_val ) el.classList.add('selected');
 
-		el.m_codec = codec;
-		el.m_wnd = i_wnd;
+		el.m_value = value;
+		el.m_wnd = wnd;
+		el.m_name = name;
 
-		i_wnd.m_elCodecs.push( el);
+		wnd.m_choises[name].elements.push( el);
 	}
 }
-function d_CodecOnClick( i_evt)
+function d_ChoiseOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
-	for( var i = 0; i < el.m_wnd.m_elCodecs.length; i++)
-		el.m_wnd.m_elCodecs[i].classList.remove('selected');
+	var wnd = el.m_wnd;
+	var name = el.m_name;
+	var elements = wnd.m_choises[name].elements;
+
+	for( var i = 0; i < elements.length; i++)
+		elements[i].classList.remove('selected');
 	el.classList.add('selected');
-	el.m_wnd.m_codec = el.m_codec;
+	wnd.m_choises[name].value = el.m_value;
 }
 
 function d_ProcessGUI( i_wnd)
@@ -157,7 +177,9 @@ function d_ProcessGUI( i_wnd)
 	var params = {};
 	for( var p = 0; p < d_guiparams.length; p++)
 		params[d_guiparams[p].name] = i_wnd.m_elements[d_guiparams[p].name].textContent;
-	params['codec'] = i_wnd.m_codec;
+
+	for( key in i_wnd.m_choises )
+		params[key] = i_wnd.m_choises[key].value;
 
 	i_wnd.destroy();
 
@@ -184,6 +206,7 @@ function d_ProcessGUI( i_wnd)
 	task.command = d_MakeCmd( params);
 	block.tasks = [task];
 
+//console.log( task.command);
 	n_SendJob( job);
 
 	nw_MakeNews('<i>dailies</i>');
@@ -204,9 +227,15 @@ function d_MakeCmd( i_params)
 
 	cmd += ' -c "'+params.codec+'"';
 	cmd += ' -f '+params.fps;
-	cmd += ' -r '+params.resolution;
+	cmd += ' -r '+params.format;
 	cmd += ' -s '+params.slate;
 	cmd += ' -t '+params.template;
+
+	if( params.gamma != '' )
+		cmd += ' -g ' + params.gamma;
+	if( params.no_auto_colospace != '' )
+		cmd += ' --noautocorr';
+
 	cmd += ' --lgspath "'+params.logo_slate_path+'"';
 	cmd += ' --lgssize '+params.logo_slate_size;
 	cmd += ' --lgsgrav '+params.logo_slate_grav;

@@ -131,7 +131,7 @@
 "fps":"24",
 "dailies":
 {
-	"resolution":"1280x720",
+	"format":"hd720",
 	"fps":"25",
 	"codec":"photojpg_high",
 	"template":"dailies_withlogo",
@@ -145,17 +145,26 @@
 	"logo_frame_grav":"North",
 	"activity":"comp",
 
+	"formats":{
+		"pal":    {"name":"PAL",     "value":"720x576x1.09"},
+		"pal768": {"name":"PAL 768", "value":"768x576"},
+		"1k43":   {"name":"1k 4:3",  "value":"1024x768"},
+		"1k169":  {"name":"1k 16:9", "value":"1024x567"},
+		"hd720":  {"name":"HD720",   "value":"1280x720"},
+		"hd1080": {"name":"HD1080",  "value":"1920x1080"}
+	},
+
 	"codecs":{
-		"photojpg_high":"JPG High",
-		"photojpg_mid":"JPG Mid",
-		"photojpg_low":"JPG Low",
-		"h264_high":"H264 High",
-		"h264_mid":"H264 Mid",
-		"h264_low":"H264 Low",
-		"theora_high":"Theora High",
-		"theora_mid":"Theora Mid",
-		"theora_low":"Theora Low",
-		"prores_normal":"ProRes"
+		"photojpg_high": {"name":"JPG High"},
+		"photojpg_mid":  {"name":"JPG Mid"},
+		"photojpg_low":  {"name":"JPG Low"},
+		"h264_high":     {"name":"H264 High"},
+		"h264_mid":      {"name":"H264 Mid"},
+		"h264_low":      {"name":"H264 Low"},
+		"theora_high":   {"name":"Theora High"},
+		"theora_mid":    {"name":"Theora Mid"},
+		"theora_low":    {"name":"Theora Low"},
+		"prores_normal": {"name":"ProRes"}
 	},
 
 	"preview":{
