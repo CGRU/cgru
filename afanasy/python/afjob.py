@@ -58,7 +58,7 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 -script                 - set a startup script\n\
 -mname                  - Movie name to encode from images\n\
 -mcodec                 - Movie codec\n\
--mscale                 - Movie scale\n\
+-mres                   - Movie resolution\n\
 -varirender attr start step count - variate parameter\n\
 -V                      - verbose\n\
 (R)                     - REQUIRED arguments\n\
@@ -123,7 +123,7 @@ noscript        = False
 script          = ''
 mname           = ''
 mcodec          = ''
-mscale          = ''
+mres          = ''
 
 Verbose = False
 cmd = None
@@ -348,10 +348,10 @@ for i in range( argsl):
 		mcodec = argsv[i]
 		continue
   
-	if arg == '-mscale':
+	if arg == '-mres':
 		i += 1
 		if i == argsl: break
-		mscale = argsv[i]
+		mres = argsv[i]
 		continue
   
 	if arg == '-V':
@@ -634,7 +634,7 @@ if mname != '' and images != '':
 	cmd = os.path.join( cmd, 'makemovie.py')
 	cmd = 'python "%s"' % cmd
 	if mcodec != '': cmd += ' --codec "%s"' % mcodec
-	if mscale != '': cmd += ' --scale "%s"' % mscale
+	if mres != '': cmd += ' -r "%s"' % mres
 	cmd += ' "%s"' % images.replace('@#','#').replace('#@','#')
 	if not os.path.isabs( mname ):
 		mname = os.path.join( os.path.dirname( os.path.dirname( images)), mname)
