@@ -21,6 +21,10 @@ Parser.add_option('-o', '--output',  dest='output',     type  ='string',     def
 	help='Output image')
 Parser.add_option('-t', '--time',    dest='time',       type  ='int',        default=0,
 	help='Midification test time')
+Parser.add_option('-s', '--skip',    dest='skip',       type  ='string',     default='.rules',
+	help='Skip folders, comma separated list.')
+Parser.add_option(      '--nomovie', dest='nomovie',    action='store_true', default=False,
+	help='Skip movie files.')
 Parser.add_option('-f', '--force',   dest='force',      action='store_true', default=False,
 	help='Force creation, no modification time check.')
 Parser.add_option('-V', '--verbose', dest='verbose',    action='store_true', default=False,
@@ -32,6 +36,8 @@ Parser.add_option('-D', '--debug',   dest='debug',      action='store_true', def
 
 out = dict()
 out['thumbnail'] = Options.output
+
+SkipFolders = Options.skip.split(',')
 
 def errorExit( i_err):
 	out['error'] = i_err
@@ -81,12 +87,16 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 			continue
 		for root, dirs, files in os.walk( folder):
 			if len( files) == 0: continue
+			if os.path.basename(root) in SkipFolders:
+				if Options.verbose:
+					print('Skipping: "%s"' % root)
+				continue
 			images = []
 			for afile in files:
 				split = re.split( r'\d\.', afile)
 				if len(split) > 1 and split[-1].lower() in ImgExtensions:
 					images.append( afile)
-				elif isMovie( afile):
+				elif isMovie( afile) and not Options.nomovie:
 					new_movie = os.path.join( root, afile)
 					new_mtime = int( os.path.getmtime( new_movie))
 					if new_movie > cur_mtime:
@@ -120,12 +130,13 @@ if len( Images ) == 0 and Movie is None:
 	errorExit('Can`t find images in '+Options.input)
 
 if Options.verbose:
-	if Movie is not None:
-		print('Movie: '+Movie)
-	else:
+	if len( Images ):
 		print('Images:')
+		Movie = None
 		for img in Images:
 			print( img)
+	if Movie is not None:
+		print('Movie: '+Movie)
 
 if MTime >= cur_mtime:
 	if Options.force:

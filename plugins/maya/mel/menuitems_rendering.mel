@@ -4,11 +4,14 @@
 // menuItem -l "label" -ann "annotation" -c "command"
 //
 
-   if(`getenv AF_ROOT`!="")
-   {
-      menuItem -l "Afanasy..." -ecr 0 -c "afanasy" -ann "Afanasy render manager window.";
-      menuItem -divider true;
-   }
+	if(`getenv AF_ROOT`!="")
+	{
+		menuItem -l "Afanasy (Maya Batch)..." -ecr 0 -c "afanasy" -ann "Run maya batch.";
+		menuItem -l "MentalRay To Afanasy..." -ecr 0 -c "from afanasy import meMentalRayRender; meMentalRayRender.meMentalRayRender()" -stp "python";
+		menuItem -l "VRay To Afanasy..." -ecr 0 -c "from afanasy import meVRayRender; meVRayRender.meVRayRender()" -stp "python";
+		menuItem -l "Arnold To Afanasy..." -ecr 0 -c "from afanasy import meArnoldRender; meArnoldRender.meArnoldRender()" -stp "python";
+		menuItem -divider true;
+	}
 
    menuItem -l "Rendering Flags..." -ecr 0 -c "cgruSourceFile(\"rendering/tima_renderingflags.mel\");" -ann "Changes rendering flags on hierarchy";
    menuItem -l "Lights Manager..." -ecr 0 -c "cgruSourceFile(\"rendering/tima_lightsmanager.mel\");" -ann "Massive attribute editing of selected lighs.";

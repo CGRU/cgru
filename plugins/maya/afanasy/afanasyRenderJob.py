@@ -42,7 +42,8 @@ class AfanasyRenderBlock ( RenderBlock ) :
       self.stop = parentJob.stop
       self.step = parentJob.step
       self.task_size = parentJob.task_size
-      self.af_block.setWorkingDirectory ( parentJob.work_dir )
+      if len( parentJob.work_dir ):
+        self.af_block.setWorkingDirectory ( parentJob.work_dir )
       if local :
         self.af_block.setHostsMask ( parentJob.af_job.data [ 'host_name' ] ) 
   #
@@ -111,7 +112,7 @@ class AfanasyRenderJob ( RenderJob ) :
   def setup ( self ) :
     print '>> AfanasyRenderJob setup...'
     self.af_job.setDescription ( self.description )
-    self.af_job.setPriority ( self.priority )
+    if self.priority >= 0: self.af_job.setPriority ( self.priority )
     if self.hostsmask != '' : self.af_job.setHostsMask ( self.hostsmask )
     if self.hostsexcl != '' : self.af_job.setHostsMaskExclude ( self.hostsexcl )
     if self.depmask   != '' : self.af_job.setDependMask ( self.depmask )

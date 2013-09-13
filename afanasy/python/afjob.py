@@ -28,8 +28,9 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 100                     - (R) Last frame to render\n\
 -by 1                   - Frames increment, default = 1\n\
 -fpt 1                  - Frames per task, default = 1\n\
--pwd projects/test      - Working directory, if not set current will be used.\n\
--name my_job            - Job name, if not set scene name will be used.\n\
+-pwd                    - Working directory, if not set current will be used.\n\
+-name                   - Job name, if not set scene name will be used.\n\
+-proj                   - Project ( maya project ).\n\
 -node                   - Node to render ( houdini driver, nuke write, max camera )\n\
 -type                   - Service type\n\
 -take                   - Take to use ( houdini take, xsi pass, max batch )\n\
@@ -94,6 +95,7 @@ fpt = 1
 by  = 1
 pwd = os.getenv('PWD', os.getcwd())
 file            = ''
+proj            = ''
 node            = ''
 ignoreinputs    = False
 take            = ''
@@ -178,6 +180,12 @@ for i in range( argsl):
 		i += 1
 		if i == argsl: break
 		name = argsv[i]
+		continue
+
+	if arg == '-proj':
+		i += 1
+		if i == argsl: break
+		proj = argsv[i]
 		continue
 
 	if arg == '-node':
@@ -469,19 +477,14 @@ elif (ext == 'mb') or (ext == 'ma'):
 			cmd += ' -rp "%s"' % take
 		else:
 			cmd += ' -rl "%s"' % take
-	if (output != '') and (scenetype != 'maya_delight'):
-		if os.path.isdir( output):
-			cmd += ' -rd "%s"' % output
+	if images != '':
+		images = images.split(',')
+		if len( images) > 1:
+			images = afcommon.patternFromPaths( images[0], images[1])
 		else:
-			cmd += ' -rd "%s"' % os.path.dirname( output)
-			im = os.path.basename( output)
-			of = im[im.rfind('.')+1:]
-			im = im[:im.rfind('.')]
-			im = im[:im.rfind('.')]
-			cmd += ' -im "%s"' % os.path.basename( im)
-			cmd += ' -of "%s"' % os.path.basename( of)
-		images = output
-	cmd += ' -proj "%s"' % pwd
+			images = afcommon.patternFromFile( images[0])
+	if proj != '':
+		cmd += ' -proj "%s"' % proj
 	if scenetype == 'maya_mental':
 		cmd += ' -art -v 5'
 	if extrargs != '': cmd += ' ' + extrargs

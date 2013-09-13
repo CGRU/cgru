@@ -144,6 +144,7 @@ function scene_Show()
 		sc_ShotStatusApply( folders[f].status);
 		sc_elCurEditShot = null;
 	}
+	sc_CreatePostTools();
 	sc_DisplayCounts();
 	sc_Post();
 }
@@ -264,6 +265,7 @@ function scenes_Received( i_data, i_args)
 			sc_elCurEditShot = null;
 		}
 	}
+	sc_CreatePostTools();
 	sc_DisplayCounts();
 	sc_Post();
 }
@@ -465,5 +467,26 @@ function sc_DisplayCounts()
 		scenes++;
 	}
 	sc_elStatScenesCount.textContent = scenes;
+}
+
+function sc_CreatePostTools()
+{
+	var elTools = document.createElement('div');
+	$('asset').appendChild( elTools);
+
+	var elThumbs = document.createElement('div');
+	elTools.appendChild( elThumbs);
+
+	var elThumbsLabel = document.createElement('div');
+	elThumbs.appendChild( elThumbsLabel);
+	elThumbsLabel.textContent = 'Thumbnails:';
+
+	var elThumbsSkipMovie = document.createElement('div');
+	elThumbs.appendChild( elThumbsSkipMovie);
+	elThumbsSkipMovie.textContent = 'Skip Movies';
+
+	var elThumbsMake = document.createElement('div');
+	elThumbs.appendChild( elThumbsMake);
+	elThumbsMake.textContent = 'Make';
 }
 

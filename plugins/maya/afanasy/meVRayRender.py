@@ -139,7 +139,7 @@ class meVRayRender ( object ) :
     self.job_param [ 'job_step' ]        = getDefaultIntValue ( self_prefix, 'job_step', 1 )
     self.job_param [ 'job_size' ]        = getDefaultIntValue ( self_prefix, 'job_size', 1 )
     self.job_param [ 'job_paused' ]      = getDefaultIntValue ( self_prefix, 'job_paused', 1 ) is 1
-    self.job_param [ 'job_priority' ]    = getDefaultIntValue ( self_prefix, 'job_priority', 50 )
+    self.job_param [ 'job_priority' ]    = getDefaultIntValue ( self_prefix, 'job_priority', -1 )
     self.job_param [ 'job_cleanup_vr' ]  = getDefaultIntValue ( self_prefix, 'job_cleanup_vr', 0 ) is 1
     self.job_param [ 'job_cleanup_script' ] = getDefaultIntValue ( self_prefix, 'job_cleanup_script', 0 ) is 1
     self.job_param [ 'job_padding' ]     = cmds.getAttr ( 'vraySettings.fileNamePadding' )
@@ -173,7 +173,7 @@ class meVRayRender ( object ) :
     #
     self.vray_param [ 'vray_options' ]    = getDefaultStrValue ( self_prefix, 'vray_options', '' )
     self.vray_param [ 'vray_verbosity' ]  = getDefaultStrValue ( self_prefix, 'vray_verbosity', 'none' )
-    self.vray_param [ 'vray_threads' ]    = getDefaultIntValue ( self_prefix, 'vray_threads', 4 )
+    self.vray_param [ 'vray_threads' ]    = getDefaultIntValue ( self_prefix, 'vray_threads', 0 )
     self.vray_param [ 'vray_clearRVOn' ]  = getDefaultIntValue ( self_prefix, 'vr_clearRVOn', 0 ) is 1
     self.vray_param [ 'vray_progress_frequency' ]  = getDefaultIntValue ( self_prefix, 'vray_progress_frequency', 1 )
     self.vray_param [ 'vray_low_thread_priority' ] = getDefaultIntValue ( self_prefix, 'vray_low_thread_priority', 0 ) is 1
@@ -184,7 +184,7 @@ class meVRayRender ( object ) :
     self.vray_param [ 'vray_port' ]          = getDefaultIntValue ( self_prefix, 'vray_port', 20204 )
     self.vray_param [ 'vray_hosts_min' ]     = getDefaultIntValue ( self_prefix, 'vray_hosts_min', 1 )
     self.vray_param [ 'vray_hosts_max' ]     = getDefaultIntValue ( self_prefix, 'vray_hosts_max', 4 )
-    self.vray_param [ 'vray_threads_limit' ] = getDefaultIntValue ( self_prefix, 'vray_threads_limit', 4 )
+    self.vray_param [ 'vray_threads_limit' ] = getDefaultIntValue ( self_prefix, 'vray_threads_limit', 0 )
     self.vray_param [ 'vray_transfer_assets' ] = getDefaultStrValue ( self_prefix, 'vray_transfer_assets', 'none' )
     #
     # image parameters
@@ -204,7 +204,7 @@ class meVRayRender ( object ) :
     self.afanasy_param [ 'af_service' ]            = 'vray' #getDefaultStrValue ( self_prefix, 'af_service', 'vray' )
     self.afanasy_param [ 'af_deferred_service' ]   = 'mayatovray' #getDefaultStrValue ( self_prefix, 'af_deferred_service', 'mayatovray' )
     self.afanasy_param [ 'af_os' ]                 = getDefaultStrValue ( self_prefix, 'af_os', '' ) #linux mac windows
-    self.afanasy_param [ 'af_hostsmask' ]          = getDefaultStrValue ( self_prefix, 'af_hostsmask', '.*' )
+    self.afanasy_param [ 'af_hostsmask' ]          = getDefaultStrValue ( self_prefix, 'af_hostsmask', '' )
     self.afanasy_param [ 'af_hostsexcl' ]          = getDefaultStrValue ( self_prefix, 'af_hostsexcl', '' )
     self.afanasy_param [ 'af_depmask' ]            = getDefaultStrValue ( self_prefix, 'af_depmask', '' )
     self.afanasy_param [ 'af_depglbl' ]            = getDefaultStrValue ( self_prefix, 'af_depglbl', '' )
@@ -279,7 +279,7 @@ class meVRayRender ( object ) :
     cmd += '-imgFile=' + self.get_image_names ( False, layer ) + ' '
 
     cmd += options
-    
+
     return cmd
   #
   # get_vr_file_names
@@ -311,7 +311,8 @@ class meVRayRender ( object ) :
     # besides the masterLayer
     if len ( getRenderLayersList ( False ) ) > 1 and layer is not None :
       images_dir += '/' + layer
-    imageFileName = images_dir + '/' + fileNamePrefix
+      fileNamePrefix += '_' + layer
+    imageFileName = os.path.join( images_dir, fileNamePrefix)
     if frame_number and pad_str != '' :
       imageFileName += '.' + ('@' + pad_str + '@')
     imageFileName += '.' + ext
@@ -373,7 +374,7 @@ class meVRayRender ( object ) :
     # TODO!!! check if files are exist and have to be overriden
     if isSubmitingJob and vr_reuse:
       skipExport = True
-      print 'Skipping .vrscene files generation ...'
+      print('Skipping .vrscene files generation ...')
 
     if not skipExport:
       if not animation :
@@ -553,7 +554,7 @@ class meVRayRender ( object ) :
       vr_deferred = False
       self.job = RenderJob ( job_name, job_description )
 
-    self.job.work_dir  = self.rootDir
+    #self.job.work_dir  = self.rootDir
     self.job.padding   = self.vr_param [ 'vr_padding' ]
     self.job.priority  = self.job_param [ 'job_priority' ]
     self.job.paused    = self.job_param [ 'job_paused' ]
@@ -605,20 +606,24 @@ class meVRayRender ( object ) :
         layer_name = layer
         if layer == 'defaultRenderLayer' : layer_name = 'masterLayer'
         
-        if createLayersFolders :  
-          # create folders for Render Layers
-          images_rule = cmds.workspace ( fileRuleEntry = 'images' )
-          images_dir = cmds.workspace ( expandName = images_rule )
-          layer_dir = os.path.join ( images_dir, layer_name )
-          if not os.path.exists ( layer_dir ) : 
-            print '-> Create missing dir %s' % layer_dir    
-            os.makedirs ( layer_dir )
+        # create folders for Render Layers
+        # if createLayersFolders :  
+          # images_rule = cmds.workspace ( fileRuleEntry = 'images' )
+          # images_dir = cmds.workspace ( expandName = images_rule )
+          # layer_dir = os.path.join ( images_dir, layer_name )
+          # if not os.path.exists ( layer_dir ) : 
+            # print '-> Create missing dir %s' % layer_dir    
+            # os.makedirs ( layer_dir )
 
         frame_block = AfanasyRenderBlock ( ('render_' + layer_name ), service, self.job )
         frame_block.capacity = capacity
         frame_block.input_files = self.get_vr_file_names ( True, layer_name )
         frame_block.out_files = self.get_image_names ( True, layer_name )
-        
+        out_dir = os.path.dirname( frame_block.out_files)
+        if not os.path.isdir( out_dir):
+          print('Creating images output folder:\n' + out_dir)
+          os.makedirs( out_dir)
+
         render_cmd = self.getRenderCmd ( layer_name )
         
         if self.vray_param [ 'vray_distributed' ] :

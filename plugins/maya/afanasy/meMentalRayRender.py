@@ -158,7 +158,7 @@ class meMentalRayRender ( object ) :
     self.job_param [ 'job_step' ]        = getDefaultIntValue ( self_prefix, 'job_step', 1 )
     self.job_param [ 'job_size' ]        = getDefaultIntValue ( self_prefix, 'job_size', 1 )
     self.job_param [ 'job_paused' ]      = getDefaultIntValue ( self_prefix, 'job_paused', 1 ) is 1
-    self.job_param [ 'job_priority' ]    = getDefaultIntValue ( self_prefix, 'job_priority', 50 )
+    self.job_param [ 'job_priority' ]    = getDefaultIntValue ( self_prefix, 'job_priority', -1 )
     self.job_param [ 'job_cleanup_mi' ]  = getDefaultIntValue ( self_prefix, 'job_cleanup_mi', 0 ) is 1
     self.job_param [ 'job_cleanup_script' ] = getDefaultIntValue ( self_prefix, 'job_cleanup_script', 0 ) is 1
     #
@@ -190,7 +190,7 @@ class meMentalRayRender ( object ) :
     self.mr_param [ 'mr_options' ]            = getDefaultStrValue ( self_prefix, 'mr_options', '' )
     self.mr_param [ 'mr_verbosity' ]          = getDefaultStrValue ( self_prefix, 'mr_verbosity', 'none' )
     self.mr_param [ 'mr_progress_frequency' ] = getDefaultIntValue ( self_prefix, 'mr_progress_frequency', 1 )
-    self.mr_param [ 'mr_threads' ]            = getDefaultIntValue ( self_prefix, 'mr_threads', 4 )
+    self.mr_param [ 'mr_threads' ]            = getDefaultIntValue ( self_prefix, 'mr_threads', 0 )
     self.mr_param [ 'mr_texture_continue' ]   = getDefaultIntValue ( self_prefix, 'mr_texture_continue', 1 ) is 1
     
     self.mr_param [ 'mr_distributed' ]   = getDefaultIntValue ( self_prefix, 'mr_distributed', 0 ) is 1
@@ -218,7 +218,7 @@ class meMentalRayRender ( object ) :
     self.afanasy_param [ 'af_service' ]            = getDefaultStrValue ( self_prefix, 'af_service', 'mentalray' )
     self.afanasy_param [ 'af_deferred_service' ]   = getDefaultStrValue ( self_prefix, 'af_deferred_service', 'mayatomr' )
     self.afanasy_param [ 'af_os' ]                 = getDefaultStrValue ( self_prefix, 'af_os', '' ) #linux mac windows
-    self.afanasy_param [ 'af_hostsmask' ]          = getDefaultStrValue ( self_prefix, 'af_hostsmask', '.*' )
+    self.afanasy_param [ 'af_hostsmask' ]          = getDefaultStrValue ( self_prefix, 'af_hostsmask', '' )
     self.afanasy_param [ 'af_hostsexcl' ]          = getDefaultStrValue ( self_prefix, 'af_hostsexcl', '' )
     self.afanasy_param [ 'af_depmask' ]            = getDefaultStrValue ( self_prefix, 'af_depmask', '' )
     self.afanasy_param [ 'af_depglbl' ]            = getDefaultStrValue ( self_prefix, 'af_depglbl', '' )
