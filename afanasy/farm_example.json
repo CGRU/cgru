@@ -32,6 +32,7 @@
 			{"name":"postcmd"},
 
 			{"name":"afterfx"},
+			{"name":"arnold"},
 			{"name":"blender"},
 			{"name":"blender"},
 			{"name":"c4d"},
@@ -43,11 +44,15 @@
 			{"name":"maya"},
 			{"name":"maya_delight"},
 			{"name":"maya_mental"},
+			{"name":"mayatoarnold"},
+			{"name":"mayatomr"},
+			{"name":"mayatovray"},
 			{"name":"mentalray"},
 			{"name":"movgen"},
 			{"name":"nuke"},
 			{"name":"prman"},
 			{"name":"shake"},
+			{"name":"vray"},
 			{"name":"xsi"},
 			{"name":"yafray"}
 		],
