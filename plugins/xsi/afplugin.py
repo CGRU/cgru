@@ -7,7 +7,7 @@ from win32com.client import constants
 def XSILoadPlugin(in_reg):
 
 	in_reg.Name = "CGRU Afanasy Submit"
-	in_reg.URL = "http://cgru.sourceforge.net/"
+	in_reg.URL = "http://cgru.info/"
 	in_reg.Major = 1
 	in_reg.Minor = 0
 

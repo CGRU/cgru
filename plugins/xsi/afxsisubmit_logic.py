@@ -10,9 +10,7 @@ import af
 def CloseButton_OnClicked(): PPG.Close()
 
 def HelpButton_OnClicked():
-   path = os.getenv('XSI_AF_PATH')
-   path = os.path.join( path, 'doc')
-   path = os.path.join( path, 'afanasy.html')
+   path = 'http://cgru.info/#xsi'
    Application.LogMessage('Opening "%s"' % path)
    webbrowser.open(path)
    

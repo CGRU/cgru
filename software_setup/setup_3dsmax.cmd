@@ -2,7 +2,6 @@ rem Source general for all soft directives:
 call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
 For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Autodesk\3ds Max*"') Do set "MAX_LOCATION=C:\Program Files\Autodesk\%%I"
-rem set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2013
 
 set "PATH=%CGRU_LOCATION%\plugins\max;%PATH%"
 

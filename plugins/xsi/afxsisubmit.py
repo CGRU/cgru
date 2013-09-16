@@ -155,14 +155,11 @@ def Main():
    oPPGLayout.AddItem('afVariRenderCount',   'Count',             constants.siControlNumber)
 
    oPPGLayout.Language = 'Python'
-   afroot = os.getenv('AF_ROOT')
-   if afroot is None or afroot == '':
-      Application.LogMessage('AF_ROOT is not set, can`t find Afanasy.')
+   cgru_xsi = os.getenv('XSI_CGRU_PATH')
+   if cgru_xsi is None or cgru_xsi == '':
+      Application.LogMessage('XSI_CGRU_PATH is not set, can`t find Afanasy plug-in.')
    else:
-      logic_script = afroot
-      logic_script = os.path.join( logic_script, 'plugins')
-      logic_script = os.path.join( logic_script, 'xsi')
-      logic_script = os.path.join( logic_script, 'afxsisubmit_logic.py')
+      logic_script = os.path.join( cgru_xsi, 'afxsisubmit_logic.py')
       if( os.path.exists( logic_script)):
          textStream = open( logic_script,'r')
          logic = textStream.read()
