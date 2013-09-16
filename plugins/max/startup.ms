@@ -1,6 +1,6 @@
 (
 	-- Load macros:
-	macros.load (systemTools.getEnvVariable "AF_ROOT" + "/plugins/max")
+	macros.load (systemTools.getEnvVariable "CGRU_LOCATION" + "/plugins/max")
 
 	-- in interacive mode only
 	if (IsNetServer() == false) then (  
