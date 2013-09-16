@@ -11,16 +11,8 @@ if defined CGRU_LOCATION (
    )
 )
 
-rem Setup afanasy addons:
-SET NUKE_AF_PATH=%AF_ROOT%\plugins\nuke
-if defined NUKE_PATH (
-   set NUKE_PATH=%NUKE_AF_PATH%;%NUKE_PATH%
-) else (
-   set NUKE_PATH=%NUKE_AF_PATH%
-)
-
 rem Default number of threads for rendering:
-SET NUKE_AF_RENDERTHREADS=2
+rem SET NUKE_AF_RENDERTHREADS=2
 
 rem Nuke render launcher:
 SET NUKE_AF_RENDER=nuke -i

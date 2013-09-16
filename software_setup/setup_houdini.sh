@@ -33,20 +33,17 @@ popd $pwd >> /dev/null
 # Setup CGRU houdini scripts location:
 export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 
-# Set Afanasy houdini scripts and otls location:
-export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini
-
 # Set Python path to afanasy submission script:
-export PYTHONPATH=$HOUDINI_AF_PATH:$PYTHONPATH
+export PYTHONPATH=$HOUDINI_CGRU_PATH:$PYTHONPATH
 
 # Define OTL scan path:
-HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH:$HH/otls
+HOUDINI_CGRU_OTLSCAN_PATH=$HIH/otls:$HOUDINI_CGRU_PATH:$HH/otls
 
 # Create or add to exist OTL scan path:
 if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
-   export HOUDINI_OTLSCAN_PATH="${HOUDINI_AF_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
+   export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
 else
-   export HOUDINI_OTLSCAN_PATH=$HOUDINI_AF_OTLSCAN_PATH
+   export HOUDINI_OTLSCAN_PATH=$HOUDINI_CGRU_OTLSCAN_PATH
 fi
 
 export APP_DIR="$HOUDINI_LOCATION"

@@ -16,7 +16,7 @@ Gizmo {
    addUserKnob { 26 "" l "" }
    addUserKnob {  3 framespertask   l "Frames Per Task"  }
    addUserKnob { 26 "" l ""}
-   addUserKnob { 22 knob_1 l RENDER T "afanasy.render( nuke.toNode(\"this\"))"}
+   addUserKnob { 22 knob_1 l RENDER T "cgru.render( nuke.toNode(\"this\"))"}
    addUserKnob {  6 startpaused     l "Start Paused" -STARTLINE }
 
    addUserKnob { 20 "" Parameters }

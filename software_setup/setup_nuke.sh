@@ -13,17 +13,8 @@ if [ ! -z "${CGRU_LOCATION}" ]; then
    fi
 fi
 
-# Set Afanasy scripts location to use
-export NUKE_AF_PATH=$AF_ROOT/plugins/nuke
-# Add Afanasy scripts to Nuke path
-if [ -z "${NUKE_PATH}" ]; then
-   export NUKE_PATH="${NUKE_AF_PATH}"
-else
-   export NUKE_PATH="${NUKE_PATH}:${NUKE_AF_PATH}"
-fi
-
 # Default number of threads for rendering:
-export NUKE_AF_RENDERTHREADS=2
+#export NUKE_AF_RENDERTHREADS=2
 
 # Nuke render launcher:
 export NUKE_AF_RENDER="nuke -i"
