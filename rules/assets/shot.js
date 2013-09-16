@@ -272,4 +272,3 @@ if( ASSETS.shot && ( ASSETS.shot.path == g_CurPath()))
 	shot_Show();
 }
 
-

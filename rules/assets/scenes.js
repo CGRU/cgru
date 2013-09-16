@@ -1,8 +1,8 @@
 sc_elShots = null;
 sc_elScenes = null;
 sc_elCurEditShot = null;
-sc_elStatShotsCount = null;
-sc_elStatScenesCount = null;
+
+sc_elImgThumbs = [];
 
 if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
 {
@@ -20,43 +20,14 @@ if( ASSETS.scenes && ( ASSETS.scenes.path == g_CurPath()))
 
 function sc_Init()
 {
+	var data = n_Request({"send":{"getfile":'rules/assets/scenes.html'}});
+	$('asset').innerHTML = data;
+
 	sc_elShots = [];
 	sc_elScenes = [];
-//	ASSET.filter = sc_FilterShots;
 
-	var elStatDiv = document.createElement('div');
-	$('asset').appendChild( elStatDiv);
-	elStatDiv.classList.add('statistics');
-
-	var elStatShotsCountLabel = document.createElement('div');
-	elStatDiv.appendChild( elStatShotsCountLabel);
-	elStatShotsCountLabel.classList.add('label');
-	elStatShotsCountLabel.textContent = 'Shots Count:';
-
-	sc_elStatShotsCount = document.createElement('div');
-	elStatDiv.appendChild( sc_elStatShotsCount);
-	sc_elStatShotsCount.classList.add('value');
-
-	var elStatShotsProgressLabel = document.createElement('div');
-	elStatDiv.appendChild( elStatShotsProgressLabel);
-	elStatShotsProgressLabel.classList.add('label');
-	elStatShotsProgressLabel.textContent = 'Shots Progress:';
-
-	sc_elStatShotsProgress = document.createElement('div');
-	elStatDiv.appendChild( sc_elStatShotsProgress);
-	sc_elStatShotsProgress.classList.add('value');
-
-	if( ASSET.type == 'scenes' )
-	{
-		var elStatScenesCountLabel = document.createElement('div');
-		elStatDiv.appendChild( elStatScenesCountLabel);
-		elStatScenesCountLabel.classList.add('label');
-		elStatScenesCountLabel.textContent = 'Scenes Count:';
-
-		sc_elStatScenesCount = document.createElement('div');
-		elStatDiv.appendChild( sc_elStatScenesCount);
-		sc_elStatScenesCount.classList.add('value');
-	}
+	if( ASSET.type != 'scenes' )
+		$('scenes_scenes_count_div').style.display = 'none';
 }
 
 function sc_Post()
@@ -80,7 +51,7 @@ function scene_Show()
 		elFolder.m_hidden = false;
 		elFolder.m_status = folders[f].status;
 		elFolder.m_path = path;
-		u_el.asset.appendChild( elFolder);
+		$('scenes_div').appendChild( elFolder);
 		elFolder.style.padding = '4px';
 		elFolder.classList.add('shot');
 
@@ -89,7 +60,9 @@ function scene_Show()
 		elImg.classList.add('thumbnail');
 		elImg.m_path = path;
 		elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
-		elImg.src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+		elImg.m_src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+		sc_elImgThumbs.push( elImg);
+		elImg.src = elImg.m_src;
 
 		var elName = document.createElement('div');
 		elFolder.appendChild( elName);
@@ -144,7 +117,6 @@ function scene_Show()
 		sc_ShotStatusApply( folders[f].status);
 		sc_elCurEditShot = null;
 	}
-	sc_CreatePostTools();
 	sc_DisplayCounts();
 	sc_Post();
 }
@@ -176,7 +148,7 @@ function scenes_Received( i_data, i_args)
 		sc_elScenes.push( elScene);
 		elScene.m_hidden = false;
 		elScene.m_elThumbnails = [];
-		u_el.asset.appendChild( elScene);
+		$('scenes_div').appendChild( elScene);
 		elScene.classList.add('scene');
 		elScene.m_path = ASSET.path + '/' + fobj.name;
 //		elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
@@ -220,7 +192,10 @@ function scenes_Received( i_data, i_args)
 
 			var elImg = document.createElement('img');
 			elShot.appendChild( elImg);
-			elImg.src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
+			elImg.m_path = elShot.m_path;
+			elImg.m_src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
+			sc_elImgThumbs.push( elImg);
+			elImg.src = elImg.m_src;
 
 			elShot.m_elStatus = document.createElement('div');
 			elShot.appendChild( elShot.m_elStatus);
@@ -265,7 +240,6 @@ function scenes_Received( i_data, i_args)
 			sc_elCurEditShot = null;
 		}
 	}
-	sc_CreatePostTools();
 	sc_DisplayCounts();
 	sc_Post();
 }
@@ -454,39 +428,87 @@ function sc_DisplayCounts()
 		if( stat && stat.progress && ( stat.progress > 0 ))
 			progress += stat.progress;
 	}
-	sc_elStatShotsCount.textContent = shots;
+	$('scenes_shots_count').textContent = shots;
 	if( shots )
-		sc_elStatShotsProgress.textContent = Math.round(progress/shots) + '%';
+		$('scenes_shots_progress').textContent = Math.round(progress/shots) + '%';
 
-	if( ASSET.type != 'scenes') return;
-
-	var scenes = 0;
-	for( var i = 0; i < sc_elScenes.length; i++)
+	if( ASSET.type == 'scenes')
 	{
-		if( sc_elScenes[i].m_hidden ) continue;
-		scenes++;
+		var scenes = 0;
+		for( var i = 0; i < sc_elScenes.length; i++)
+		{
+			if( sc_elScenes[i].m_hidden ) continue;
+			scenes++;
+		}
+		$('scenes_scenes_count').textContent = scenes;
 	}
-	sc_elStatScenesCount.textContent = scenes;
 }
 
-function sc_CreatePostTools()
+function scenes_checkBox( el)
 {
-	var elTools = document.createElement('div');
-	$('asset').appendChild( elTools);
+	if( el.textContent == 'ON' )
+	{
+		el.textContent = 'OFF';
+		el.classList.remove('enabled');
+	}
+	else
+	{
+		el.textContent = 'ON';
+		el.classList.add('enabled');
+	}
+}
 
-	var elThumbs = document.createElement('div');
-	elTools.appendChild( elThumbs);
+function scenes_makeThumbnails()
+{
+	for( var i = 0; i < sc_elImgThumbs.length; i++)
+		sc_elImgThumbs[i].updated = false;
 
-	var elThumbsLabel = document.createElement('div');
-	elThumbs.appendChild( elThumbsLabel);
-	elThumbsLabel.textContent = 'Thumbnails:';
+	scenes_makeThumbnail();
+}
 
-	var elThumbsSkipMovie = document.createElement('div');
-	elThumbs.appendChild( elThumbsSkipMovie);
-	elThumbsSkipMovie.textContent = 'Skip Movies';
+limit = 10;
+limit_count = 0;
+function scenes_makeThumbnail( i_data, i_args)
+{
+//limit_count ++; if( limit_count > limit ) return;
+	if( i_data )
+	{
+		if( i_data.error )
+		{
+			c_Error( i_data.error);
+			return;
+		}
+		if( i_data.cmdexec && i_data.cmdexec.length )
+		{
+			var img = i_data.cmdexec[0].thumbnail;
+			if( img && i_args.elThumb )
+			{
+				i_args.elThumb.src = img + '#' + (new Date().getTime());
+				i_args.elThumb.updated = true;
+			}
+			else return;
+		}
+		else return;
+	}
 
-	var elThumbsMake = document.createElement('div');
-	elThumbs.appendChild( elThumbsMake);
-	elThumbsMake.textContent = 'Make';
+	var el = null;
+	for( var i = 0; i < sc_elImgThumbs.length; i++)
+	{
+		if( sc_elImgThumbs[i].updated )
+			continue;
+		el = sc_elImgThumbs[i];
+		break;
+	}
+
+	if( el == null )
+		return;
+
+	var thumb = RULES.root + el.m_path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, RULES.root + el.m_path).replace(/@OUTPUT@/g, thumb);
+	if( $('scenes_thumb_nomovie').textContent == 'ON' ) cmd += ' --nomovie';
+	if( $('scenes_thumb_force').textContent == 'ON' ) cmd += ' --force';
+	if( $('scenes_thumb_nocorr').textContent == 'ON' ) cmd += ' --nocorr';
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
 

@@ -168,6 +168,14 @@ box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 
 .buttons .button { float: left; }
 
+.checkbox {
+cursor: pointer;
+border-radius:4px;
+box-shadow: 0 0 2px #000 inset;
+text-align: center;
+}
+.checkbox.enabled {font-weight: bold;}
+
 #content > .view { position: relative; border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 
 .editing {

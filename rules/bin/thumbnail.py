@@ -25,6 +25,8 @@ Parser.add_option('-s', '--skip',    dest='skip',       type  ='string',     def
 	help='Skip folders, comma separated list.')
 Parser.add_option(      '--nomovie', dest='nomovie',    action='store_true', default=False,
 	help='Skip movie files.')
+Parser.add_option(      '--nocorr',  dest='nocorr',     action='store_true', default=False,
+	help='No auto correction.')
 Parser.add_option('-f', '--force',   dest='force',      action='store_true', default=False,
 	help='Force creation, no modification time check.')
 Parser.add_option('-V', '--verbose', dest='verbose',    action='store_true', default=False,
@@ -169,7 +171,7 @@ if Movie is not None:
 cmd = 'convert'
 cmd += ' "%s"'
 cmd += ' -layers flatten'
-if Movie is None:
+if Movie is None and not Options.nocorr:
 	imgtype = Images[0].rfind('.');
 	if imgtype > 0:
 		imgtype = Images[0][imgtype+1:].lower()

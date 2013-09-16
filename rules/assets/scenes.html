@@ -1,0 +1,42 @@
+<style type="text/css">
+#scenes_statistics div { float: left; padding: 4px; }
+#scenes_thumbnails div { float: left; padding: 4px 4px; }
+.checkbox { font-size: 12px; width: 32px; padding: 4px; margin: 3px; float:left; }
+</style>
+
+<div id="scenes_statistics">
+	<div id="scenes_scenes_count_div">
+		<div>Scenes Count:</div>
+		<div id="scenes_scenes_count"></div>
+	</div>
+	<div id="scenes_shots_count_div">
+		<div>Shots Count:</div>
+		<div id="scenes_shots_count"></div>
+	</div>
+	<div id="scenes_shots_progress_div">
+		<div>Shots Progress:</div>
+		<div id="scenes_shots_progress"></div>
+	</div>
+</div>
+
+<div style="clear:both" id="scenes_div"></div>
+
+<div id="scenes_thumbnails" style="border:1px solid #777; margin: 4px; border-radius: 4px">
+	<div>Thumbnails:</div>
+	<div class="button" onclick="scenes_makeThumbnails()">Make</div>
+	<div style="font-size:12px">
+		<div>
+			<div>Force Update:</div>
+			<p id="scenes_thumb_force" class="checkbox" onclick="scenes_checkBox( this)">OFF</p>
+		</div>
+		<div>
+			<div>Skip Movies:</div>
+			<p id="scenes_thumb_nomovie" class="checkbox enabled" onclick="scenes_checkBox( this)">ON</p>
+		</div>
+		<div>
+			<div>No Auto Colorspace:</div>
+			<p id="scenes_thumb_nocorr" class="checkbox" onclick="scenes_checkBox( this)">OFF</p>
+		</div>
+	</div>
+</div>
+
