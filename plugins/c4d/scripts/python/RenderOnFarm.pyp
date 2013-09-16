@@ -1,9 +1,5 @@
 import c4d
-import time
-import os
-import sys
-import shutil
-import subprocess
+import os, time
 
 import af
 

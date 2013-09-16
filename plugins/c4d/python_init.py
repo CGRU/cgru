@@ -19,19 +19,10 @@ except:
     print "ERROR: The variable C4D_CGRU_SCRIPTS_LOCATION is not set! So C4D will may not work properly!"
     exit()
 
-try:
-    # Get the location of the Plugin-Folders where to Plugins should get copied from
-    afanasy_c4d_plugin_folder = os.environ['C4D_AF_SCRIPTS_LOCATION']
-except:
-    print "ERROR: The variable C4D_AF_SCRIPTS_LOCATION is not set! So C4D will may not work properly!"
-    exit()
-
-
 
 # Now combine all the Folders where the Plugins should get copied from
 all_c4d_plugin_folders = []
 all_c4d_plugin_folders.append(cgru_c4d_plugin_folder)
-all_c4d_plugin_folders.append(afanasy_c4d_plugin_folder)
 
 try:
     # Look if additional plugin folders are set and add them if that is the case
