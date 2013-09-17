@@ -9,5 +9,5 @@ class hbatch_mantra( hbatch.hbatch, mantra.mantra):
 
    def do( self, data, mode):
       #print data
-      mantra.mantra.do( self, data)
-      hbatch.hbatch.do( self, data)
+      mantra.mantra.do( self, data, mode)
+      hbatch.hbatch.do( self, data, mode)

@@ -10,4 +10,4 @@ class blender_yafray( blender.blender, yafray.yafray):
    def do( self, data, mode):
       #print data
       if yafray.yafray.do( self, data): self.calculate()
-      blender.blender.do( self, data)
+      blender.blender.do( self, data, mode)

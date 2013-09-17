@@ -28,4 +28,4 @@ class blender_render(blender.blender):
                      need_calc = True
 
       if need_calc: self.calculate()
-      blender.blender.do( self, data)
+      blender.blender.do( self, data, mode)

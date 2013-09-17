@@ -9,5 +9,5 @@ class hbatch_prman( hbatch.hbatch, prman.prman):
 
    def do( self, data, mode):
       #print data
-      if prman.prman.do( self, data): self.calculate()
-      hbatch.hbatch.do( self, data)
+      if prman.prman.do( self, data, mode): self.calculate()
+      hbatch.hbatch.do( self, data, mode)
