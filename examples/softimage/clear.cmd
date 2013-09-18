@@ -2,6 +2,7 @@ echo Clearing XSI examples in %CD%
 
 cd project
 if exist Backup rd /s /q Backup
+if exist Cache rd /s /q Cache
 
 cd Scenes
 For /F "Tokens=*" %%I in ('dir /b') Do if not "%%I" == "scene.scn" del "%%I"
