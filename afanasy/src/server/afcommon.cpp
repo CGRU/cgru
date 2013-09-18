@@ -3,7 +3,6 @@
 #include <fcntl.h>
 #ifdef WINNT
 #include <io.h>
-//#define open _open
 #else
 #include <dirent.h>
 #include <sys/errno.h>
@@ -200,7 +199,11 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
       QueueLogError("AFCommon::writeFile: File name is empty.");
       return false;
    }
-   int fd = open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	#ifdef WINNT
+	int fd = _open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
+	#else
+	int fd = open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	#endif
    if( fd == -1 )
    {
       QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);

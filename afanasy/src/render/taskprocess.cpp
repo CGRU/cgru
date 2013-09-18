@@ -602,6 +602,9 @@ void TaskProcess::collectFiles( af::MCTaskUp & i_task_up)
 	for( int i = 0; i < list.size(); i++)
 	{
 		std::string path = m_store_dir + AFGENERAL::PATH_SEPARATOR + list[i];
+		#ifdef WINNT
+		path = af::strReplace( path, '/','\\');
+		#endif
 		int size;
 		char * data = af::fileRead( path, &size, 100000);
 		if( data == NULL ) continue;

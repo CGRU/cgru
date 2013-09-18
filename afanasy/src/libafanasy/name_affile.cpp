@@ -207,7 +207,11 @@ char * af::fileRead( const std::string & i_filename, int * o_size, int i_maxfile
 	}
 	else
 	{
+		#ifdef WINNT
+		fd = ::open( i_filename.c_str(), O_RDONLY | _O_BINARY);
+		#else
 		fd = ::open( i_filename.c_str(), O_RDONLY);
+		#endif
 	}
 
 	if( fd == -1 )

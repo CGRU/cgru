@@ -103,14 +103,17 @@ class service:
 			ext = ext.lower()[1:]
 			if not ext in cgruconfig.VARS['af_thumbnail_extensions']: continue
 
+			store_dir = self.taskInfo['store_dir']
+			if not isinstance( store_dir, str): store_dir = str( store_dir,'utf-8')
 			thumbnail = os.path.basename( image) + '.jpg'
-			thumbnail = os.path.join( self.taskInfo['store_dir'], thumbnail)
+			thumbnail = store_dir + '/' + thumbnail
 
-			self.taskInfo['image'] = image
-			self.taskInfo['thumbnail'] = thumbnail
+			self.taskInfo['image'] = os.path.normpath( image)
+			self.taskInfo['thumbnail'] = os.path.normpath( thumbnail)
 
-			cmd = cgruconfig.VARS['af_thumbnail_cmd'] % (self.taskInfo)
+			cmd = str(cgruconfig.VARS['af_thumbnail_cmd']) % (self.taskInfo)
 			#print( cmd)
+			#cmds.append('echo ' + cmd)
 			cmds.append( cmd)
 
 		return cmds
