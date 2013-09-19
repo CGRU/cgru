@@ -484,7 +484,7 @@ elif (ext == 'mb') or (ext == 'ma'):
 		else:
 			images = afcommon.patternFromFile( images[0])
 	if proj != '':
-		cmd += ' -proj "%s"' % proj
+		cmd += ' -proj "%s"' % os.path.normpath(proj)
 	if scenetype == 'maya_mental':
 		cmd += ' -art -v 5'
 	if extrargs != '': cmd += ' ' + extrargs

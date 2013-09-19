@@ -78,6 +78,9 @@ if( $DEBUG)
    $cmd += " -proj \""  + $project + "\"";
    $cmd += " -images \"" + $output + "\"";
    $cmd += " -deletescene";
+   if( `getAttr "defaultRenderGlobals.currentRenderer"` == "mentalRay" )
+      $cmd += " -type maya_mental";
+
    if( $pause) $cmd += " -pause";
 
    if(`about -windows`)

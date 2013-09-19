@@ -3,7 +3,7 @@
 //
 //#########################################################################
 
-if(`optionVar -exists "tima_AutoProjectSeek_Enable"` == 0) optionVar -iv "tima_AutoProjectSeek_Enable" 1;
+if(`optionVar -exists "tima_AutoProjectSeek_Enable"` == 0) optionVar -iv "tima_AutoProjectSeek_Enable" 0;
 
 global proc tima_AutoProjectSeek_checkBox_Command()
 {
