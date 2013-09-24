@@ -11,6 +11,7 @@
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
+#include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
 
 #include "actionid.h"
@@ -25,6 +26,7 @@
 #include <QtCore/QEvent>
 #include <QtCore/QProcess>
 #include <QtCore/QTimer>
+#include <QtGui/QApplication>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QInputDialog>
@@ -37,12 +39,12 @@
 
 ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	ListItems( parent),
-	jobid( JobId),
-	jobname( JobName),
-	blocksnum(0),
-	wblocks( NULL),
-	tasksnum( NULL),
-	wtasks( NULL),
+	m_job_id( JobId),
+	m_job_name( JobName),
+	m_blocks_num(0),
+	m_blocks( NULL),
+	m_tasks_num( NULL),
+	m_tasks( NULL),
 	constructed( false)
 {
 	init();
@@ -53,9 +55,9 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 
 	m_view->setListItems( this);
 
-	Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, jobid, true));
+	Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, m_job_id, true));
 
-	m_parentWindow->setWindowTitle( jobname);
+	m_parentWindow->setWindowTitle( m_job_name);
 }
 
 void ListTasks::construct( af::Job * job)
@@ -63,29 +65,29 @@ void ListTasks::construct( af::Job * job)
 	constructed = true;
 	m_view->viewport()->hide();
 
-	blocksnum = job->getBlocksNum();
-	if( blocksnum == 0 ) return;
+	m_blocks_num = job->getBlocksNum();
+	if( m_blocks_num == 0 ) return;
 
-	tasksnum = new int[blocksnum];
-	wblocks = new ItemJobBlock*[blocksnum];
-	wtasks = new ItemJobTask**[blocksnum];
+	m_tasks_num = new int[m_blocks_num];
+	m_blocks = new ItemJobBlock*[m_blocks_num];
+	m_tasks = new ItemJobTask**[m_blocks_num];
 	int row = 0;
-	for( int b = 0; b < blocksnum; b++)
+	for( int b = 0; b < m_blocks_num; b++)
 	{
 		const af::BlockData* block = job->getBlock( b);
-		wblocks[b] = new ItemJobBlock( block, this);
-		tasksnum[b] = block->getTasksNum();
-		wblocks[b]->tasksHidded = ((blocksnum > 1) && (tasksnum[b] > 1));
-		m_model->addItem( wblocks[b]);
+		m_blocks[b] = new ItemJobBlock( block, this);
+		m_tasks_num[b] = block->getTasksNum();
+		m_blocks[b]->tasksHidded = ((m_blocks_num > 1) && (m_tasks_num[b] > 1));
+		m_model->addItem( m_blocks[b]);
 		row++;
-		wtasks[b] = new ItemJobTask*[tasksnum[b]];
-		for( int t = 0; t < tasksnum[b]; t++)
+		m_tasks[b] = new ItemJobTask*[m_tasks_num[b]];
+		for( int t = 0; t < m_tasks_num[b]; t++)
 		{
 			ItemJobTask *wtask =  new ItemJobTask( block, t);
 			m_model->addItem( wtask);
-			if( wblocks[b]->tasksHidded) m_view->setRowHidden( row , true);
+			if( m_blocks[b]->tasksHidded) m_view->setRowHidden( row , true);
 			row++;
-			wtasks[b][t] = wtask;
+			m_tasks[b][t] = wtask;
 		}
 	}
 
@@ -94,14 +96,14 @@ void ListTasks::construct( af::Job * job)
 
 ListTasks::~ListTasks()
 {
-	Watch::delJobId( jobid);
+	Watch::delJobId( m_job_id);
 
-	for( int b = 0; b < blocksnum; b++) delete [] wtasks[b];
-	delete [] tasksnum;
-	delete [] wblocks;
-	delete [] wtasks;
+	for( int b = 0; b < m_blocks_num; b++) delete [] m_tasks[b];
+	delete [] m_tasks_num;
+	delete [] m_blocks;
+	delete [] m_tasks;
 
-	Watch::watchJodTasksWindowRem( jobid);
+	Watch::watchJodTasksWindowRem( m_job_id);
 }
 
 void ListTasks::v_connectionLost()
@@ -172,7 +174,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 			connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
 			menu.addAction( actionid);
 
-			if( jobid != AFJOB::SYSJOB_ID )
+			if( m_job_id != AFJOB::SYSJOB_ID )
 			{
 				int startCount = ((ItemJobTask*)(item))->taskprogress.starts_count;
 				if( startCount > 1 )
@@ -277,7 +279,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 	case af::Msg::TJob:
 	{
 		af::Job * job = new af::Job( msg);
-		if( job->getId() != jobid )
+		if( job->getId() != m_job_id )
 		{
 			AFERROR(     "ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.")
 			displayError("ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.");
@@ -288,8 +290,8 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 		if( constructed == false)
 		{
 			construct( job);
-			Watch::sendMsg( new af::Msg( af::Msg::TJobProgressRequestId, jobid, true));
-			Watch::addJobId( jobid);
+			Watch::sendMsg( new af::Msg( af::Msg::TJobProgressRequestId, m_job_id, true));
+			Watch::addJobId( m_job_id);
 		}
 		else
 		{
@@ -303,7 +305,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 		if( constructed == false ) break;
 
 		af::JobProgress * progress = new af::JobProgress( msg);
-		if( jobid == progress->getJobId())
+		if( m_job_id == progress->getJobId())
 		{
 			if( updateProgress( progress ) == false)
 			{
@@ -318,13 +320,13 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 	case af::Msg::TTasksRun:
 	{
 		af::MCTasksProgress mctsp( msg);
-		if( mctsp.getJobId() != jobid ) return false;
+		if( mctsp.getJobId() != m_job_id ) return false;
 		return updateTasks( &mctsp);
 	}
 	case af::Msg::TMonitorJobsDel:
 	{
 		af::MCGeneral ids( msg);
-		if( ids.hasId( jobid) == false) break;
+		if( ids.hasId( m_job_id) == false) break;
 	}
 	case af::Msg::TJobRequestId:
 	case af::Msg::TJobProgressRequestId:
@@ -337,8 +339,8 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 	case af::Msg::TMonitorJobsAdd:
 	{
 		af::MCGeneral ids( msg);
-		if( ids.hasId( jobid))
-			Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, jobid, true));
+		if( ids.hasId( m_job_id))
+			Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, m_job_id, true));
 		break;
 	}
 	case af::Msg::TBlocks:
@@ -350,11 +352,11 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 		for( int b = 0; b < count; b++)
 		{
 			af::BlockData * block = (af::BlockData*)mcblocks.getNode( b);
-			if( block->getJobId() != jobid) continue;
+			if( block->getJobId() != m_job_id) continue;
 			int blocknum = block->getBlockNum();
-			if( blocknum >= blocksnum ) continue;
+			if( blocknum >= m_blocks_num ) continue;
 
-			wblocks[blocknum]->update( block, msg->type());
+			m_blocks[blocknum]->update( block, msg->type());
 
 			if( msg->type() == af::Msg::TBlocks)
 				m_model->emit_dataChanged();
@@ -376,44 +378,44 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
 int ListTasks::getRow( int block, int task)
 {
 	int row = -1;
-	if( block < blocksnum )
+	if( block < m_blocks_num )
 	{
-		if((task != -1) && (task >= tasksnum[block]))
+		if((task != -1) && (task >= m_tasks_num[block]))
 		{
-			AFERRAR("ListTasks::getRow: task >= tasksnum[block] : (%d>=%d[%d])", task, tasksnum[block], block)
+			AFERRAR("ListTasks::getRow: task >= m_tasks_num[block] : (%d>=%d[%d])", task, m_tasks_num[block], block)
 		}
 		else
 		{
 			row = 1;
-			for( int b = 0; b < block; b++) row += 1 + tasksnum[b];
+			for( int b = 0; b < block; b++) row += 1 + m_tasks_num[b];
 			row += task;
 		}
 	}
 	else
-		AFERRAR("ListTasks::getRow: block >= blocksnum : (%d>=%d)", block, blocksnum)
+		AFERRAR("ListTasks::getRow: block >= m_blocks_num : (%d>=%d)", block, m_blocks_num)
 //printf("ListTasks::getRow: b[%d] t[%d] = %d\n", block, task, row);
 	return row;
 }
 
 bool ListTasks::updateProgress( const af::JobProgress * progress/*bool blocksOnly = false*/)
 {
-	if( blocksnum != progress->getBlocksNum())
+	if( m_blocks_num != progress->getBlocksNum())
 	{
-		AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", blocksnum, progress->getBlocksNum())
+		AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", m_blocks_num, progress->getBlocksNum())
 		return false;
 	}
 
-	for( int b = 0; b < blocksnum; b++)
+	for( int b = 0; b < m_blocks_num; b++)
 	{
-		if( tasksnum[b] != progress->getTasksNum(b))
+		if( m_tasks_num[b] != progress->getTasksNum(b))
 		{
-			AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, tasksnum[b], progress->getTasksNum(b))
+			AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, m_tasks_num[b], progress->getTasksNum(b))
 			return false;
 		}
 
-		for( int t = 0; t < tasksnum[b]; t++)
+		for( int t = 0; t < m_tasks_num[b]; t++)
 		{
-			wtasks[b][t]->upProgress( *(progress->tp[b][t]) );
+			m_tasks[b][t]->upProgress( *(progress->tp[b][t]) );
 		}
 	}
 
@@ -437,17 +439,17 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
 	int count = int( tasks->size());
 	for( int i = 0; i < count; i++)
 	{
-		if( *bIt > blocksnum)
+		if( *bIt > m_blocks_num)
 		{
-			AFERRAR("ListTasks::updateTasks: block > blocksnum (%d>%d)", *bIt, blocksnum)
+			AFERRAR("ListTasks::updateTasks: block > m_blocks_num (%d>%d)", *bIt, m_blocks_num)
 			return false;
 		}
-		if( *tIt > tasksnum[*bIt])
+		if( *tIt > m_tasks_num[*bIt])
 		{
-			AFERRAR("ListTasks::updateTasks: task > tasksnum[%d] (%d>%d)", *bIt, *tIt, tasksnum[*bIt])
+			AFERRAR("ListTasks::updateTasks: task > m_tasks_num[%d] (%d>%d)", *bIt, *tIt, m_tasks_num[*bIt])
 			return false;
 		}
-		wtasks[*bIt][*tIt]->upProgress( **trIt );
+		m_tasks[*bIt][*tIt]->upProgress( **trIt );
 
 		int row = getRow( *bIt, *tIt);
 		if( row != -1 )
@@ -470,18 +472,18 @@ void ListTasks::setWindowTitleProgress()
 {
 	int total_percent = 0;
 	int total_tasks = 0;
-	for( int b = 0; b < blocksnum; b++)
-		for( int t = 0; t < tasksnum[b]; t++)
+	for( int b = 0; b < m_blocks_num; b++)
+		for( int t = 0; t < m_tasks_num[b]; t++)
 		{
-			if(( wtasks[b][t]->taskprogress.state & AFJOB::STATE_DONE_MASK) ||
-				( wtasks[b][t]->taskprogress.state & AFJOB::STATE_SKIPPED_MASK))
+			if(( m_tasks[b][t]->taskprogress.state & AFJOB::STATE_DONE_MASK) ||
+				( m_tasks[b][t]->taskprogress.state & AFJOB::STATE_SKIPPED_MASK))
 				total_percent += 100;
-			else if ( wtasks[b][t]->taskprogress.state & AFJOB::STATE_RUNNING_MASK )
-				total_percent += wtasks[b][t]->taskprogress.percent;
+			else if ( m_tasks[b][t]->taskprogress.state & AFJOB::STATE_RUNNING_MASK )
+				total_percent += m_tasks[b][t]->taskprogress.percent;
 			total_tasks++;
 		}
 
-	m_parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(jobname));
+	m_parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(m_job_name));
 }
 
 void ListTasks::actTasksSkip()    { tasksOpeation("skip"); }
@@ -500,10 +502,10 @@ void ListTasks::doubleClicked( Item * item)
 	{
 		ItemJobBlock * block = (ItemJobBlock*)item;
 		int blockNum = block->getNumBlock();
-		bool hide = false == wblocks[blockNum]->tasksHidded;
-		wblocks[blockNum]->tasksHidded = hide;
+		bool hide = false == m_blocks[blockNum]->tasksHidded;
+		m_blocks[blockNum]->tasksHidded = hide;
 		int row_start = getRow( blockNum, 0);
-		int row_end   = getRow( blockNum, tasksnum[blockNum]-1);
+		int row_end   = getRow( blockNum, m_tasks_num[blockNum]-1);
 		for( int row = row_start; row <= row_end; row++) m_view->setRowHidden( row, hide);
 //   view->updateGeometries();
 		if( block->resetSortingParameters()) sortBlock( block->getNumBlock());
@@ -513,7 +515,7 @@ void ListTasks::doubleClicked( Item * item)
 void ListTasks::tasksOpeation( const std::string & i_type)
 {
 	std::ostringstream str;
-	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, jobid));
+	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, m_job_id));
 	str << ",\n\"operation\":{\n\"type\":\"" << i_type << '"';
 	str << ",\n\"task_ids\":[";
 
@@ -546,7 +548,7 @@ void ListTasks::do_Info_StdOut( int type, int number, Item * item)
 	if( item == NULL) item = getCurrentItem();
 	if( item->getId() != ItemJobTask::ItemId) return;
 	ItemJobTask *itemTask = (ItemJobTask*)item;
-	af::MCTaskPos mctaskpos( jobid, itemTask->getBlockNum(), itemTask->getTaskNum(), number);
+	af::MCTaskPos mctaskpos( m_job_id, itemTask->getBlockNum(), itemTask->getTaskNum(), number);
 	af::Msg * msg = new af::Msg( type, &mctaskpos, true);
 	Watch::sendMsg( msg);
 }
@@ -677,21 +679,21 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 void ListTasks::actTaskListen()
 {
 	ItemJobTask *itemTask = (ItemJobTask*)getCurrentItem();
-	Watch::listenTask( jobid, itemTask->getBlockNum(), itemTask->getTaskNum(),
-		jobname + '(' + itemTask->getName() + ')');
+	Watch::listenTask( m_job_id, itemTask->getBlockNum(), itemTask->getTaskNum(),
+		m_job_name + '(' + itemTask->getName() + ')');
 }
 
 void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }
 void ListTasks::blockAction( int id_block, const QString & i_action, bool i_query)
 {
-	if( id_block >= blocksnum)
+	if( id_block >= m_blocks_num)
 	{
-		AFERRAR("ListTasks::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
+		AFERRAR("ListTasks::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
 		return;
 	}
 
 	std::ostringstream str;
-	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, jobid));
+	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, m_job_id));
 
 	// Collect selected blocks ids:
 	str << ",\n\"block_ids\":[";
@@ -708,7 +710,7 @@ void ListTasks::blockAction( int id_block, const QString & i_action, bool i_quer
 
 	if( i_query )
 	{
-		if( false == wblocks[id_block]->blockAction( str, id_block, i_action, this))
+		if( false == m_blocks[id_block]->blockAction( str, id_block, i_action, this))
 			return;
 	}
 	else
@@ -723,32 +725,35 @@ void ListTasks::blockAction( int id_block, const QString & i_action, bool i_quer
 bool ListTasks::mousePressed( QMouseEvent * event)
 {
 	QModelIndex index = m_view->indexAt( event->pos());
-	if( qVariantCanConvert<Item*>( index.data()))
-	{
-		Item * item = qVariantValue<Item*>( index.data());
-		if( item->getId() == ItemJobBlock::ItemId)
-			return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
-	}
+	if( qVariantCanConvert<Item*>( index.data()) == false ) return false;
+
+	Item * item = qVariantValue<Item*>( index.data());
+	if( item->getId() == ItemJobBlock::ItemId)
+		return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
+
+	if(( QApplication::mouseButtons() == Qt::MidButton ) || ( QApplication::keyboardModifiers() == Qt::AltModifier ))
+		((ItemJobTask*)item)->showThumbnail();
+
 	return false;
 }
 
-void ListTasks::sortBlock( int numblock)
+void ListTasks::sortBlock( int i_block_num)
 {
-	if( numblock >= blocksnum )
+	if( i_block_num >= m_blocks_num )
 	{
-		AFERRAR("ListTasks::sortBlock: numblock >= blocksnum (%d>=%d)", numblock, blocksnum)
+		AFERRAR("ListTasks::sortBlock: i_block_num >= m_blocks_num (%d>=%d)", i_block_num, m_blocks_num)
 		return;
 	}
 
-	int sort_type = wblocks[numblock]->getSortType();
-	bool sort_ascending = wblocks[numblock]->isSortAsceding();
+	int sort_type = m_blocks[i_block_num]->getSortType();
+	bool sort_ascending = m_blocks[i_block_num]->isSortAsceding();
 
-	ItemJobTask ** array = new ItemJobTask*[tasksnum[numblock]];
-	for( int i = 0; i < tasksnum[numblock]; i++) array[i] = wtasks[numblock][i];
+	ItemJobTask ** array = new ItemJobTask*[m_tasks_num[i_block_num]];
+	for( int i = 0; i < m_tasks_num[i_block_num]; i++) array[i] = m_tasks[i_block_num][i];
 
-	if( sort_type)\
-		for( int i = 0; i < tasksnum[numblock]; i++)
-			for( int j = tasksnum[numblock]-1; j > i; j--)
+	if( sort_type)
+		for( int i = 0; i < m_tasks_num[i_block_num]; i++)
+			for( int j = m_tasks_num[i_block_num]-1; j > i; j--)
 			{
 				ItemJobTask * item_a = array[j-1];
 				ItemJobTask * item_b = array[j];
@@ -759,12 +764,30 @@ void ListTasks::sortBlock( int numblock)
 				}
 			}
 
-	int start = numblock+1;
-	for( int b = 0; b < numblock; b++) start += tasksnum[b];
+	int start = i_block_num+1;
+	for( int b = 0; b < i_block_num; b++) start += m_tasks_num[b];
 
 	const QList<Item*> selection = getSelectedItems();
-	m_model->setItems( start, (Item**)array, tasksnum[numblock]);
+	m_model->setItems( start, (Item**)array, m_tasks_num[i_block_num]);
 	setSelectedItems( selection);
 
 	delete [] array;
 }
+
+void ListTasks::taskFilesReceived( const af::MCTaskUp & i_taskup )
+{
+	if( i_taskup.getNumBlock() >= m_blocks_num )
+	{
+		AFERRAR("ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks_num ( %d >= %d )", i_taskup.getNumBlock(), m_blocks_num)
+		return;
+	}
+
+	if( i_taskup.getNumTask() >= m_tasks_num[i_taskup.getNumBlock()] )
+	{
+		AFERRAR("ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks_num ( %d >= %d )", i_taskup.getNumBlock(), m_blocks_num)
+		return;
+	}
+
+	m_tasks[i_taskup.getNumBlock()][i_taskup.getNumTask()]->taskFilesReceived( i_taskup);
+}
+

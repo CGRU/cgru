@@ -1212,7 +1212,7 @@ af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std:
 	return af::jsonMsg( str);
 }
 
-af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
+af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i_binary) const
 {
 	std::ostringstream str;
 	str << "{";
@@ -1223,7 +1223,9 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
 	}
 
 	if( i_mode == "log" )
+	{
 		return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+","+af::itos(i_t)+"]", getTaskLog( i_b, i_t));
+	}
 	else if( i_mode == "info" )
 	{
 		af::TaskExec * task = generateTask( i_b, i_t);
@@ -1232,7 +1234,10 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
 	}
 	else if( i_mode == "files" )
 	{
-		m_blocks[i_b]->m_tasks[i_t]->getFiles( str);
+		if( i_binary )
+			return m_blocks[i_b]->m_tasks[i_t]->getFiles();
+		else
+			m_blocks[i_b]->m_tasks[i_t]->getFiles( str);
 	}
 	else if( i_mode == "output")
 	{

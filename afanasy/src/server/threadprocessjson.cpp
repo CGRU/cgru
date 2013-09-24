@@ -145,7 +145,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						std::vector<int32_t> task_ids;
 						af::jr_int32vec("task_ids", task_ids, getObj);
 						if( task_ids.size())
-							o_msg_response = job->writeTask( block_ids[0], task_ids[0], mode);
+							o_msg_response = job->writeTask( block_ids[0], task_ids[0], mode, binary);
 						else
 						{
 							std::vector<std::string> modes;

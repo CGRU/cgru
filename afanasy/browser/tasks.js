@@ -340,15 +340,21 @@ TaskItem.prototype.showTumbs = function()
 
 TaskItem.prototype.thumbsReceived = function( i_obj)
 {
+	if( i_obj == null ) return;
+	if( i_obj.task_files == null ) return;
+	if( i_obj.task_files.files == null ) return;
+
+	var files = i_obj.task_files.files;
+
 	this.elThumbs = document.createElement('div');
 	this.element.appendChild( this.elThumbs);
 	this.elThumbs.classList.add('thumbs');
 
-	for( var i = 0; i < i_obj.files.length; i++ )
+	for( var i = 0; i < files.length; i++ )
 	{
 		elImg = this.monitor.document.createElement('img');
 		this.elThumbs.appendChild( elImg);
-		elImg.src = '@TMP@' + i_obj.files[i].name;
+		elImg.src = '@TMP@' + files[i].name;
 	}
 }
 

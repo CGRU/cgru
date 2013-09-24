@@ -334,11 +334,40 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 	}
 }
 
+af::Msg * Task::getFiles() const
+{
+	af::MCTaskUp taskup( -1, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number);
+
+	for( int i = 0; i < m_files.size(); i++)
+	{
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[i];
+
+		int size = -1;
+		std::string error;
+		char * data = af::fileRead( filename, &size, af::Msg::SizeDataMax, &error);
+		if( data )
+		{
+			taskup.addFile( filename, data, size);
+			delete [] data;
+		}
+		else if( error.size())
+		{
+			AFCommon::QueueLogError( error);
+		}
+	}
+
+	return new af::Msg( af::Msg::TTaskOutput, &taskup);
+}
+
 void Task::getFiles( std::ostringstream & i_str) const
 {
 	std::string error;
 
-	i_str << "\"files\":[";
+	i_str << "\"task_files\":{";
+	i_str << "\n\"job_id\":" << m_block->m_job->getId();
+	i_str << ",\n\"block_id\":" << m_block->m_data->getBlockNum();
+	i_str << ",\n\"task_id\":" << m_number;
+	i_str << ",\n\"files\":[";
 
 	for( int i = 0; i < m_files.size(); i++)
 	{
@@ -367,7 +396,7 @@ void Task::getFiles( std::ostringstream & i_str) const
 		i_str << "}";
 	}
 
-	i_str << "\n]";
+	i_str << "\n]}";
 }
 
 void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)

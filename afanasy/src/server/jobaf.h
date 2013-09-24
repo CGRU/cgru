@@ -42,7 +42,7 @@ public:
 
 	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const;
 
-	af::Msg * writeTask( int i_b, int i_t, const std::string & i_mode) const;
+	af::Msg * writeTask( int i_b, int i_t, const std::string & i_mode, bool i_binary) const;
 
 	af::Msg * writeErrorHosts() const;
 	af::Msg * writeErrorHosts( int b, int t) const;

@@ -6,39 +6,47 @@
 
 #include "item.h"
 
+#include <QtGui/QImage>
+
 class ItemJobTask : public Item
 {
 public:
-   ItemJobTask( const af::BlockData *pBlock, int numtask);
-   ~ItemJobTask();
+	ItemJobTask( const af::BlockData *pBlock, int numtask);
+	~ItemJobTask();
 
-   void upProgress( const af::TaskProgress & tp);
+	void upProgress( const af::TaskProgress & tp);
 
-	inline bool isBlockNumeric() const { return block->isNumeric();}
+	inline bool isBlockNumeric() const { return m_block->isNumeric();}
 
-   inline int getBlockNum() const { return blocknum; }
-   inline int getTaskNum()  const { return tasknum;  }
+	inline int getBlockNum() const { return m_blocknum; }
+	inline int getTaskNum()  const { return m_tasknum;  }
 
-   const std::string & getWDir() const;
-   const std::string genFiles() const;
-   int getFramesNum() const;
+	const std::string & getWDir() const;
+	const std::string genFiles() const;
+	int getFramesNum() const;
 
-   af::TaskProgress taskprogress;
+	af::TaskProgress taskprogress;
 
-   virtual const QVariant getToolTip() const;
-   virtual const QString getSelectString() const;
+	virtual const QVariant getToolTip() const;
+	virtual const QString getSelectString() const;
 
-   static const int ItemId = 2;
-   static const int WidthInfo;
+	void showThumbnail();
 
-   bool compare( int type, const ItemJobTask & other, bool ascending) const;
+	static const int ItemId = 2;
+	static const int WidthInfo;
+
+	bool compare( int type, const ItemJobTask & other, bool ascending) const;
+
+	void taskFilesReceived( const af::MCTaskUp & i_taskup );
 
 protected:
-   virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
 
-   int blocknum;
-   int tasknum;
-   const af::BlockData * block;
+	int m_blocknum;
+	int m_tasknum;
+	const af::BlockData * m_block;
+
+	QImage * m_thumbnail;
 };

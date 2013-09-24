@@ -178,7 +178,7 @@ def toStr( data):
 	return str( data, 'utf-8')
 
 def webbrowse( i_url):
-	if i_url[:7] != 'http://':
+	if i_url[:4] != 'http':
 		i_url = 'http://'+i_url
 
 	if 'webbrowser' in cgruconfig.VARS:

@@ -332,7 +332,8 @@ function d_CvtProcessGUI( i_wnd)
 		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
 	for( var p = 0; p < d_cvtguiparams.length; p++)
 		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
-	params['codec'] = i_wnd.m_codec;
+	for( key in i_wnd.m_choises )
+		params[key] = i_wnd.m_choises[key].value;
 
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avconv;

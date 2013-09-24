@@ -2,6 +2,7 @@
 
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/name_af.h"
 
 #include "../libafqt/name_afqt.h"
 
@@ -26,6 +27,8 @@ public:
 	bool mousePressed( QMouseEvent * event);
 
 	void sortBlock( int numblock);
+
+	void taskFilesReceived( const af::MCTaskUp & i_taskup );
 
 signals:
 	void changeMonitor( int type, int id);
@@ -58,13 +61,13 @@ private slots:
 	void actBrowseFolder();
 
 private:
-	int jobid;
-	QString jobname;
+	int m_job_id;
+	QString m_job_name;
 
-	int blocksnum;
-	ItemJobBlock **wblocks;
-	int *tasksnum;
-	ItemJobTask ***wtasks;
+	int m_blocks_num;
+	ItemJobBlock ** m_blocks;
+	int * m_tasks_num;
+	ItemJobTask *** m_tasks;
 
 	bool constructed;
 

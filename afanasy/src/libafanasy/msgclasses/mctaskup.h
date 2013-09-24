@@ -18,9 +18,9 @@ public:
 			int numJob,
 			int numBlock,
 			int numTask,
-			int number,
+			int number         = -1,
 
-			int UpStatus,
+			int UpStatus       = -1,
 			int UpPercent      = -1,
 			int UpFrame        = -1,
 			int UpPercentFrame = -1,

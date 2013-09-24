@@ -3,6 +3,7 @@
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -144,6 +145,26 @@ void Watch::caseMessage( af::Msg * msg)
       AFERROR("Watch::caseMessage: Unknown message recieved:")
       msg->v_stdOut();
    }
+}
+
+void Watch::taskFilesReceived( const af::MCTaskUp & i_taskup)
+{
+	QLinkedList<int>::const_iterator iIt = ms_watchtasksjobids.begin();
+	QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
+	while( iIt != ms_watchtasksjobids.end())
+	{
+		if( *iIt == i_taskup.getNumJob())
+		{
+			WndList * wlist = (WndList*)*wIt;
+			ListItems * ilist = wlist->getList();
+			ListTasks * tlist = (ListTasks*)ilist;
+			tlist->taskFilesReceived( i_taskup);
+			return;
+		}
+		iIt++;
+		wIt++;
+	}
+	AFERRAR("Watch::taskFilesReceived: Job with ID=%d not founded.", i_taskup.getNumJob())
 }
 
 void Watch::listenJob( int id, const QString & name)

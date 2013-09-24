@@ -4,6 +4,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "../libafqt/name_afqt.h"
 #include "../libafqt/qenvironment.h"
@@ -150,7 +151,7 @@ void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( new af::Msg( af::Ms
 void Dialog::sendMsg( af::Msg * msg)
 {
 #ifdef AFOUTPUT
-printf(" <<< Dialog::sendMsg: ");msg->stdOut();
+printf(" <<< Dialog::sendMsg: ");msg->v_stdOut();
 #endif
     m_qThreadSend.send( msg);
 }
@@ -265,7 +266,7 @@ void Dialog::newMessage( af::Msg *msg)
         return;
     }
     #ifdef AFOUTPUT
-    printf(" >>> Dialog::newMessage: ");msg->stdOut();
+    printf(" >>> Dialog::newMessage: ");msg->v_stdOut();
     #endif
     switch( msg->type())
     {
@@ -343,6 +344,12 @@ void Dialog::newMessage( af::Msg *msg)
             new WndText( "Message", msg);
         break;
     }
+	case af::Msg::TTaskOutput:
+	{
+		af::MCTaskUp taskup( msg);
+		Watch::taskFilesReceived( taskup);
+        break;
+	}
     default:
         Watch::caseMessage( msg);
     }
