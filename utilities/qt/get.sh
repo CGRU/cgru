@@ -1,8 +1,8 @@
 #!/bin/bash
 
-ver=4.8.4
+ver=4.8.5
 [ -z "$1" ] || ver=$1
-lcation="http://releases.qt-project.org/qt4/source"
+lcation="http://download.qt-project.org/official_releases/qt/4.8/$ver"
 foldername="qt-everywhere-opensource-src-$ver"
 archive_ext="tar.gz"
 archive="$foldername.$archive_ext"

@@ -2,8 +2,8 @@
 
 echo "Detecting UNIX distribution..."
 
-distskeys="Debian Ubuntu CentOS Fedora openSUSE Simply Gentoo Mint"
-knowndists="Debian Ubuntu CentOS Fedora openSUSE AltLinux MacOSX Gentoo Mint"
+distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint"
+knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint"
 
 if [ `uname` == "Darwin" ]; then
    export DISTRIBUTIVE="MacOSX"
@@ -85,6 +85,10 @@ case ${DISTRIBUTIVE} in
       redhatArch
       export PACKAGE_MANAGER="apt-get"
       export VERSION_NAME="alt${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
+      ;;
+   Red)
+      export DISTRIBUTIVE="RedHat"
+      redhatArch
       ;;
    *)
       redhatArch

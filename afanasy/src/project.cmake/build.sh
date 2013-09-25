@@ -16,12 +16,17 @@ popd > /dev/null
 # Process options:
 options=""
 sql="REQUIRED"
+gui="YES"
 for arg in "$@"; do
-	[ $arg == "--nosql" ] && sql="NO"
+	[ $arg == "--nosql" ] && sql="NO" && shift
+	[ $arg == "--nogui" ] && gui="NO" && shift
 done
 
 # Configure SQL:
 export AF_POSTGRESQL=$sql
+
+# Configure GUI:
+export AF_GUI=$gui
 
 # Configure building:
 export AF_ADD_CFLAGS=""
@@ -54,6 +59,9 @@ case ${DISTRIBUTIVE} in
         ;;
     CentOS)
         export ADD_CMAKE_MODULE_PATH="$PWD"
+        ;;
+    RedHat)
+        export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
         ;;
     MacOSX)
         ;;
