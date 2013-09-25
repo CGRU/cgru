@@ -136,6 +136,8 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"command_post\":\""     << af::strEscape( m_command_post    ) << "\"";
 	if( m_description.size())
 		o_str << ",\n\"description\":\""  << af::strEscape( m_description ) << "\"";
+	if( m_thumb_path.size())
+		o_str << ",\n\"thumb_path\":\"" << af::strEscape( m_thumb_path ) << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;

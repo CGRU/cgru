@@ -51,7 +51,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    if( numrunningtasks ) setRunning();
    else                  setNotRunning();
 
-   strLeftTop = QString("%1-%2").arg(name).arg( priority);
+   strLeftTop = QString("%1-%2").arg(m_name).arg( priority);
    if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
 
    strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
@@ -81,10 +81,10 @@ void ItemUser::updateValues( af::Node *node, int type)
 
 bool ItemUser::calcHeight()
 {
-   int old_height = height;
-   height = HeightUser;
-   if( false == annotation.isEmpty()) height += HeightAnnotation;
-   return old_height == height;
+   int old_height = m_height;
+   m_height = HeightUser;
+   if( false == annotation.isEmpty()) m_height += HeightAnnotation;
+   return old_height == m_height;
 }
 
 void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -158,7 +158,7 @@ bool ItemUser::setSortType(   int type )
          sort_int = priority;
          break;
       case CtrlSortFilter::TNAME:
-         sort_str = name;
+         sort_str = m_name;
          break;
       case CtrlSortFilter::THOSTNAME:
          sort_str = hostname;
@@ -184,7 +184,7 @@ bool ItemUser::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = name;
+         filter_str = m_name;
          break;
       case CtrlSortFilter::THOSTNAME:
          filter_str = hostname;

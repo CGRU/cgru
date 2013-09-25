@@ -13,21 +13,15 @@
 #include "../include/macrooutput.h"
 
 ItemNode::ItemNode( af::Node *node):
-   Item( afqt::stoq( node->getName()), node->getId()),
-   height( Height),
-   sort_int( 0),
+	Item( afqt::stoq( node->getName()), node->getId()),
+	sort_int( 0),
 	m_flagshidden( 0)
 {
-   locked = node->isLocked();
+	m_locked = node->isLocked();
 }
 
 ItemNode::~ItemNode()
 {
-}
-
-QSize ItemNode::sizeHint( const QStyleOptionViewItem &option) const
-{
-   return QSize( Width, height);
 }
 
 void ItemNode::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -46,9 +40,9 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
 
       switch( operation)
       {
-         case GREATER:        return ((sort_str) == (other.sort_str)) ? name > other.name : ((sort_str) >  (other.sort_str));
+         case GREATER:        return ((sort_str) == (other.sort_str)) ? m_name > other.m_name : ((sort_str) >  (other.sort_str));
          case GREATEREQUAL:   return ( sort_str) >= (other.sort_str);
-         case SMALLER:        return ((sort_str) == (other.sort_str)) ? name < other.name : ((sort_str) <  (other.sort_str));
+         case SMALLER:        return ((sort_str) == (other.sort_str)) ? m_name < other.m_name : ((sort_str) <  (other.sort_str));
          case SMALLEREQUAL:   return ( sort_str) <= (other.sort_str);
          case EQUAL:          return ( sort_str) == (other.sort_str);
          case NOTEQUAL:       return ( sort_str) != (other.sort_str);
@@ -63,9 +57,9 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
    {
       switch( operation)
       {
-         case GREATER:        return ((sort_int) == (other.sort_int)) ? name > other.name : ((sort_int) >  (other.sort_int));
+         case GREATER:        return ((sort_int) == (other.sort_int)) ? m_name > other.m_name : ((sort_int) >  (other.sort_int));
          case GREATEREQUAL:   return ( sort_int) >= (other.sort_int);
-         case SMALLER:        return ((sort_int) == (other.sort_int)) ? name < other.name : ((sort_int) <  (other.sort_int));
+         case SMALLER:        return ((sort_int) == (other.sort_int)) ? m_name < other.m_name : ((sort_int) <  (other.sort_int));
          case SMALLEREQUAL:   return ( sort_int) <= (other.sort_int);
          case EQUAL:          return ( sort_int) == (other.sort_int);
          case NOTEQUAL:       return ( sort_int) != (other.sort_int);

@@ -63,8 +63,8 @@ void ItemMonitor::updateValues( af::Node *node, int type)
       }
    }
    eventstitle = EventsName.arg( eventscount);
-   height = 25 + 12*eventscount;
-   if( height < 75) height = 75;
+   m_height = 25 + 12*eventscount;
+   if( m_height < 75) m_height = 75;
 
    superuser = false;
    usersids.clear();
@@ -103,7 +103,7 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 
    painter->setPen(   clrTextMain( option) );
    painter->setFont(  afqt::QEnvironment::f_name);
-   painter->drawText( option.rect, Qt::AlignTop | Qt::AlignHCenter, name );
+   painter->drawText( option.rect, Qt::AlignTop | Qt::AlignHCenter, m_name );
 
    painter->setPen(   clrTextInfo( option) );
    painter->setFont(  afqt::QEnvironment::f_info);
@@ -139,7 +139,7 @@ bool ItemMonitor::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         sort_str = name;
+         sort_str = m_name;
          break;
       case CtrlSortFilter::TTIMELAUNCHED:
          sort_int = time_launch;
@@ -171,7 +171,7 @@ bool ItemMonitor::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = name;
+         filter_str = m_name;
          break;
       case CtrlSortFilter::TVERSION:
          filter_str = version;

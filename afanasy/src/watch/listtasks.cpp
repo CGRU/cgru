@@ -83,7 +83,7 @@ void ListTasks::construct( af::Job * job)
 		m_tasks[b] = new ItemJobTask*[m_tasks_num[b]];
 		for( int t = 0; t < m_tasks_num[b]; t++)
 		{
-			ItemJobTask *wtask =  new ItemJobTask( block, t);
+			ItemJobTask *wtask =  new ItemJobTask( this, block, t);
 			m_model->addItem( wtask);
 			if( m_blocks[b]->tasksHidded) m_view->setRowHidden( row , true);
 			row++;

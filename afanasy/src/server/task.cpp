@@ -37,6 +37,9 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 	if( af::pathIsFolder( m_store_dir_files))
 		m_files = af::getFilesList( m_store_dir_files);
 
+	if( m_files.size() )
+		m_block->m_job->setThumbPathOnEmpty( m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[0]);
+
 	// Read task progress
 	if( false == af::pathFileExists( m_store_file_progress)) return;
 
@@ -328,6 +331,9 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 			m_files.push_back( filename);
 
 		filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + filename;
+
+		if( i == 0 )
+			m_block->m_job->setThumbPath( filename);
 
 		AFCommon::QueueFileWrite( new FileData( i_taskup.getFileData(i), i_taskup.getFileSize(i), filename,
 			m_store_dir_files));

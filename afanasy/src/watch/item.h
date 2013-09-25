@@ -10,81 +10,85 @@ class MainWidget;
 class Item
 {
 public:
-    Item( const QString &itemname, int itemid);
-    virtual ~Item();
+	Item( const QString &itemname, int itemid);
+	virtual ~Item();
 
-    virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
+	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
 
-    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
+	inline int getHeight() const { return m_height;}
 
-    inline const QString& getName()              const { return name;}   ///< Get item name.
+	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-    virtual inline const QVariant getToolTip()     const { return QVariant(); }
-    virtual inline const QString getSelectString() const { return name; }///< Get item select string.
+	inline const QString& getName()              const { return m_name;}   ///< Get item name.
 
-    inline void lock()                const { setLock( true);  }
-    inline void unLock()              const { setLock( false); }
-    inline bool isLocked()            const { return locked;   }
-    inline void setLock( bool value ) const { locked = value;  }
+	virtual inline const QVariant getToolTip()     const { return QVariant(); }
+	virtual inline const QString getSelectString() const { return m_name; }///< Get item select string.
 
-    inline int getId() const { return id; }
-    inline void resetId() { id = 0; }
+	inline void lock()                const { setLock( true);  }
+	inline void unLock()              const { setLock( false); }
+	inline bool isLocked()            const { return m_locked;   }
+	inline void setLock( bool value ) const { m_locked = value;  }
 
-    const QColor & clrTextMain(      const QStyleOptionViewItem &option)           const;
-    const QColor & clrTextInfo(      const QStyleOptionViewItem &option)           const;
-    const QColor & clrTextDone(      const QStyleOptionViewItem &option)           const;
-    const QColor & clrTextMuted(     const QStyleOptionViewItem &option)           const;
-    const QColor & clrTextState(     const QStyleOptionViewItem &option, bool on ) const;
+	inline int getId() const { return m_id; }
+	inline void resetId() { m_id = 0; }
 
-    static const QColor & clrTextInfo( bool running, bool selected, bool locked);
+	const QColor & clrTextMain(      const QStyleOptionViewItem &option)           const;
+	const QColor & clrTextInfo(      const QStyleOptionViewItem &option)           const;
+	const QColor & clrTextDone(      const QStyleOptionViewItem &option)           const;
+	const QColor & clrTextMuted(     const QStyleOptionViewItem &option)           const;
+	const QColor & clrTextState(     const QStyleOptionViewItem &option, bool on ) const;
 
-    inline void      setRunning() const { running = true;  } ///< Set item running ( to change text colors only).
-    inline void   setNotRunning() const { running = false; } ///< Set item not running ( to change text colors only).
-    inline const bool isRunning() const { return running;  } ///< Return whether node is "running".
+	static const QColor & clrTextInfo( bool running, bool selected, bool locked);
 
-    /// Draw a percent bar.
-    static void drawPercent
-    (
-        QPainter * painter,
-        int posx, int posy, int width, int height,
-        int whole,
-        int part_a, int part_b = 0, int part_c = 0,
-        bool drawBorder = true
-    );
+	inline void      setRunning() const { m_running = true;  } ///< Set item m_running ( to change text colors only).
+	inline void   setNotRunning() const { m_running = false; } ///< Set item not m_running ( to change text colors only).
+	inline const bool isRunning() const { return m_running;  } ///< Return whether node is "m_running".
 
-    static void calcutaleStarPoints();
+	/// Draw a percent bar.
+	static void drawPercent
+	(
+		QPainter * painter,
+		int posx, int posy, int width, int height,
+		int whole,
+		int part_a, int part_b = 0, int part_c = 0,
+		bool drawBorder = true
+	);
 
-    virtual bool calcHeight();
+	static void calcutaleStarPoints();
 
-protected:
-    virtual void drawBack( QPainter *painter, const QStyleOptionViewItem &option) const;
-    virtual void drawPost( QPainter *painter, const QStyleOptionViewItem &option, float alpha = 1.0) const;
-
-    /// Print AFJOB::STATE informaton
-    void printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const;
-
-    /// Draw a star at \c x,y coordinates with \c size size.
-    static void drawStar( int size, int posx, int posy, QPainter * painter);
+	virtual bool calcHeight();
 
 protected:
-    QString name;           ///< Item name.
+	virtual void drawBack( QPainter *painter, const QStyleOptionViewItem &option) const;
+	virtual void drawPost( QPainter *painter, const QStyleOptionViewItem &option, float alpha = 1.0) const;
 
-    static const int Height;
-    static const int Width;
+	/// Print AFJOB::STATE informaton
+	void printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const;
 
-    mutable bool locked;
+	/// Draw a star at \c x,y coordinates with \c size size.
+	static void drawStar( int size, int posx, int posy, QPainter * painter);
+
+protected:
+	QString m_name;           ///< Item name.
+
+	static const int Height;
+	static const int Width;
+
+	mutable bool m_locked;
+
+	int m_height;
 
 private:
-    /// Node "running" property.
-    mutable bool running;
+	/// Node "m_running" property.
+	mutable bool m_running;
 
-    /// Points contains star coordinates.
-    static QPolygonF ms_star_pointsInit;
+	/// Points contains star coordinates.
+	static QPolygonF ms_star_pointsInit;
 
-    /// Points used to offset and scale default star coordinates.
-    static QPolygonF ms_star_pointsDraw;
+	/// Points used to offset and scale default star coordinates.
+	static QPolygonF ms_star_pointsDraw;
 
-    int id;
+	int m_id;
 };
 
 Q_DECLARE_METATYPE( Item*)

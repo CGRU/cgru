@@ -39,7 +39,8 @@ public:
 	void inline displayError(   const QString &message) { m_infoline->displayError(   message); }
 
 	void revertModel();
-	void itemsHeightCahnged();
+	void itemsHeightChanged();
+	void itemsHeightCalc();
 
 	virtual bool mousePressed( QMouseEvent * event);
 

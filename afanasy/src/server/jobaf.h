@@ -110,6 +110,9 @@ public:
 
 	const std::string & getTasksDir() const { return m_store_dir_tasks; }
 
+	inline void setThumbPath( const std::string & i_path) { m_thumb_path = i_path; }
+	inline void setThumbPathOnEmpty( const std::string & i_path) { if( m_thumb_path.empty()) m_thumb_path = i_path; }
+
 public:
 	/// Set Jobs Container.
 	inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}

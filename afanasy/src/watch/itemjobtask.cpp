@@ -5,6 +5,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "itemjobblock.h"
+#include "listtasks.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -16,17 +17,31 @@
 
 const int ItemJobTask::WidthInfo = 98;
 
-ItemJobTask::ItemJobTask( const af::BlockData *pBlock, int numtask):
+ItemJobTask::ItemJobTask( ListTasks * i_list, const af::BlockData *pBlock, int numtask):
 	Item( afqt::stoq( pBlock->genTaskName( numtask)), ItemId),
+	m_list( i_list),
 	m_blocknum( pBlock->getBlockNum()),
 	m_tasknum( numtask),
 	m_block( pBlock),
-	m_thumbnail( NULL)
+	m_thumbs_num( 0),
+	m_thumbs_imgs( NULL)
 {
 }
 
 ItemJobTask::~ItemJobTask()
 {
+}
+
+
+bool ItemJobTask::calcHeight()
+{
+	int old_height = m_height;
+
+	m_height = ItemJobTask::TaskHeight;
+	if( m_thumbs_num )
+		m_height += ItemJobTask::TaskThumbHeight;
+
+	return old_height == m_height;
 }
 
 const QVariant ItemJobTask::getToolTip() const
@@ -68,7 +83,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	int percentframe  = taskprogress.percentframe;
 	int frames_num    = m_block->getFramePerTask();
 
-	QString leftString = name;
+	QString leftString = m_name;
 
 	QString rightString;
 	if( taskprogress.state & AFJOB::STATE_WARNING_MASK         ) rightString += "Warning! ";
@@ -188,8 +203,9 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 
 	if( taskprogress.state & AFJOB::STATE_RUNNING_MASK) drawStar( 7, x + w - 10, y + 7, painter);
 
-	if( m_thumbnail )
-		painter->drawImage( x, y, * m_thumbnail);
+	if( m_thumbs_num )
+		for( int i = 0; i < m_thumbs_num; i++ )	
+			painter->drawImage( x + 110*i, y + ItemJobTask::TaskHeight, * m_thumbs_imgs[i]);
 
 	drawPost( painter, option, .5);
 }
@@ -222,11 +238,19 @@ bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) 
 
 void ItemJobTask::showThumbnail()
 {
+	if( m_thumbs_num )
+	{
+		thumbsCLear();
+		calcHeight();
+		m_list->itemsHeightChanged();
+		return;
+	}
+
 	std::ostringstream str;
 	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"files\"";
+	str << ",\"ids\":[" << m_block->getJobId() << "]";
 	str << ",\"block_ids\":[" << m_blocknum << "]";
 	str << ",\"task_ids\":[" << m_tasknum << "]";
-	str << ",\"ids\":[" << m_block->getJobId() << "]";
 	str << ",\"binary\":true}}";
 
 	af::Msg * msg = af::jsonMsg( str);
@@ -236,19 +260,41 @@ void ItemJobTask::showThumbnail()
 
 void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 {
-printf("ItemJobTask::taskFilesReceived:\n");
-i_taskup.v_stdOut();
+//printf("ItemJobTask::taskFilesReceived:\n");
+//i_taskup.v_stdOut();
+	thumbsCLear();
 
-	for( int f = 0; f < i_taskup.getFilesNum(); f++)
+	m_thumbs_num = i_taskup.getFilesNum();
+
+	if( m_thumbs_num == 0 )
+		return;
+
+	m_thumbs_imgs = new QImage*[m_thumbs_num];
+
+	for( int i = 0; i < m_thumbs_num; i++)
 	{
-		m_thumbnail = new QImage();
-		if( false == m_thumbnail->loadFromData( (const unsigned char *) i_taskup.getFileData(f), i_taskup.getFileSize(f)))
+		m_thumbs_imgs[i] = new QImage();
+
+		if( false == m_thumbs_imgs[i]->loadFromData( (const unsigned char *) i_taskup.getFileData(i), i_taskup.getFileSize(i)))
 		{
-			AFERRAR("Can't constuct an image '%s'[%d]", i_taskup.getFileName(f).c_str(), i_taskup.getFileSize(f))
+			AFERRAR("Can't constuct an image '%s'[%d]", i_taskup.getFileName(i).c_str(), i_taskup.getFileSize(i))
 			continue;
 		}
-
-		return;	
 	}
+
+	calcHeight();
+	m_list->itemsHeightChanged();
 }
 
+void ItemJobTask::thumbsCLear()
+{
+	if( m_thumbs_num == 0 )
+		return;
+
+	for( int i = 0; i < m_thumbs_num; i++)
+		delete m_thumbs_imgs[i];
+
+	m_thumbs_num = 0;
+
+	delete [] m_thumbs_imgs;
+}

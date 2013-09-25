@@ -143,16 +143,16 @@ void ItemJob::updateValues( af::Node *node, int type)
 
 bool ItemJob::calcHeight()
 {
-   int old_height = height;
+   int old_height = m_height;
 
    if( compact_display ) block_height = BlockInfo::HeightCompact;
    else                  block_height = BlockInfo::Height;
 
-   height = Height + block_height*blocksnum;
+   m_height = Height + block_height*blocksnum;
 
-   if( false == annotation.isEmpty()) height += HeightAnnotation;
+   if( false == annotation.isEmpty()) m_height += HeightAnnotation;
 
-   return old_height == height;
+   return old_height == m_height;
 }
 
 void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -198,7 +198,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
    painter->setPen( clrTextMain( option) );
    painter->setFont( afqt::QEnvironment::f_name);
-   painter->drawText( x+30, y, w-40-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, name);
+   painter->drawText( x+30, y, w-40-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
 
    if( state & AFJOB::STATE_DONE_MASK)
    {
@@ -239,7 +239,7 @@ bool ItemJob::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         sort_str = name;
+         sort_str = m_name;
          break;
       case CtrlSortFilter::TPRIORITY:
          sort_int = priority;
@@ -280,7 +280,7 @@ bool ItemJob::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = name;
+         filter_str = m_name;
          break;
       case CtrlSortFilter::TUSERNAME:
          filter_str = username;

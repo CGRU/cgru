@@ -116,6 +116,8 @@ protected:
 
 	std::string m_description; ///< Job description for statistics purposes only.
 
+	std::string m_thumb_path;
+
 	std::string m_user_name;    ///< Job user ( creator ) name.
 	std::string m_host_name;    ///< Computer name, where job was created.
 

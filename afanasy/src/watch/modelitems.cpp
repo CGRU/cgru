@@ -15,10 +15,11 @@ ModelItems::~ModelItems()
 }
 
 int ModelItems::rowCount(  const QModelIndex & ) const { return items.size();}
-void ModelItems::itemsHeightCahnged()
+
+void ModelItems::itemsHeightCalc()
 {
-   for( int i = 0; i < items.size(); i++) items[i]->calcHeight();
-   layoutChanged();
+	for( int i = 0; i < items.size(); i++) items[i]->calcHeight();
+	layoutChanged();
 }
 
 QVariant ModelItems::data( const QModelIndex &index, int role) const

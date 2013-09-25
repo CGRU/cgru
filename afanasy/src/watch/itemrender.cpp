@@ -109,7 +109,7 @@ void ItemRender::deletePlots()
 
 bool ItemRender::calcHeight()
 {
-	int old_height = height;
+	int old_height = m_height;
 
 	m_plots_height = 0;
 	for( unsigned i = 0; i < m_plots.size(); i++) if( m_plots[i]->height+4 > m_plots_height ) m_plots_height = m_plots[i]->height+4;
@@ -123,20 +123,20 @@ bool ItemRender::calcHeight()
 	{
 	case  ListRenders::ESMallSize:
 	case  ListRenders::ENormalSize:
-	    height = m_plots_height;
+	    m_height = m_plots_height;
 		break;
 
 	case  ListRenders::EBigSize:
-	    height = m_plots_height + ms_HeightAnnotation;
+	    m_height = m_plots_height + ms_HeightAnnotation;
 		break;
 
 	default:
-	    if( m_online ) height = m_plots_height + ms_HeightTask * int( m_tasks.size());
-	    else height = ms_HeightOffline;
-	    if( false == m_annotation.isEmpty()) height += ms_HeightAnnotation;
+	    if( m_online ) m_height = m_plots_height + ms_HeightTask * int( m_tasks.size());
+	    else m_height = ms_HeightOffline;
+	    if( false == m_annotation.isEmpty()) m_height += ms_HeightAnnotation;
 	}
 
-	return old_height == height;
+	return old_height == m_height;
 }
 
 void ItemRender::updateValues( af::Node *node, int type)
@@ -514,7 +514,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 		QRect rect_center;
 	    painter->drawText( x+5, y, w-10, ms_HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
-	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + m_version );
+	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    m_name + ' ' + m_version );
 
 		// Print annonation at next line if display is not small
 	    if( false == m_annotation.isEmpty() && (ListRenders::getDisplaySize() != ListRenders::ESMallSize))
@@ -529,7 +529,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	case ListRenders::ESMallSize:
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, name + ' ' + m_capacity_usage + ' ' + m_version);
+	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + m_version);
 
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -539,7 +539,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	default:
 		painter->setPen(   clrTextMain( option) );
 		painter->setFont(  afqt::QEnvironment::f_name);
-	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, name + ' ' + m_version);
+	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_version);
 
 		painter->setPen(   afqt::QEnvironment::qclr_black );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -714,7 +714,7 @@ bool ItemRender::setSortType(   int type )
 	        sort_int = m_time_registered;
 			break;
 		case CtrlSortFilter::TNAME:
-			sort_str = name;
+			sort_str = m_name;
 			break;
 		case CtrlSortFilter::TUSERNAME:
 	        sort_str = m_username;
@@ -743,7 +743,7 @@ bool ItemRender::setFilterType( int type )
 		case CtrlSortFilter::TNONE:
 			return false;
 		case CtrlSortFilter::TNAME:
-			filter_str = name;
+			filter_str = m_name;
 			break;
 		case CtrlSortFilter::TUSERNAME:
 	        filter_str = m_username;

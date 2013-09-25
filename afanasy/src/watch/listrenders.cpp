@@ -120,7 +120,7 @@ void ListRenders::actChangeSize( int i_size)
 	 ms_displaysize = dsize;
 
 	 setSpacing();
-	 itemsHeightCahnged();
+	 itemsHeightCalc();
 	 revertModel();
 	 repaintItems();
 }

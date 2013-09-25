@@ -134,7 +134,8 @@ void ListItems::v_connectionEstablished() { if( isVisible()) v_shownFunc(); }
 void ListItems::deleteAllItems() { m_model->deleteAllItems();}
 void ListItems::doubleClicked( Item * item) {}
 void ListItems::revertModel()  { m_model->revert();}
-void ListItems::itemsHeightCahnged() { m_model->itemsHeightCahnged();}
+void ListItems::itemsHeightChanged() { m_model->itemsHeightChanged();}
+void ListItems::itemsHeightCalc() { m_model->itemsHeightCalc();}
 void ListItems::repaintItems() { m_view->repaintViewport();}
 
 void ListItems::deleteItems( af::MCGeneral & ids)

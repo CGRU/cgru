@@ -17,7 +17,7 @@ ItemTalk::ItemTalk( af::Talk *talk):
    username( afqt::stoq( talk->getUserName()))
 {
    updateValues( talk, 0);
-   height = 20;
+   m_height = 20;
 }
 
 ItemTalk::~ItemTalk()
@@ -38,7 +38,7 @@ void ItemTalk::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 
    painter->setPen(   clrTextMain( option) );
    painter->setFont(  afqt::QEnvironment::f_name);
-   painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, name );
+   painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, m_name );
 
    drawPost( painter, option);
 }
@@ -51,7 +51,7 @@ bool ItemTalk::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         sort_str = name;
+         sort_str = m_name;
          break;
       default:
          AFERRAR("ItemTalk::setSortType: Invalid type number = %d", type)
@@ -68,7 +68,7 @@ bool ItemTalk::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = name;
+         filter_str = m_name;
          break;
       default:
          AFERRAR("ItemTalk::setFilterType: Invalid type number = %d", type)

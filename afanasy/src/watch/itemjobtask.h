@@ -8,11 +8,15 @@
 
 #include <QtGui/QImage>
 
+class ListTasks;
+
 class ItemJobTask : public Item
 {
 public:
-	ItemJobTask( const af::BlockData *pBlock, int numtask);
+	ItemJobTask( ListTasks * i_list, const af::BlockData *pBlock, int numtask);
 	~ItemJobTask();
+
+	virtual bool calcHeight();
 
 	void upProgress( const af::TaskProgress & tp);
 
@@ -43,10 +47,19 @@ protected:
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
+	void thumbsCLear();
+
+private:
+	static const int TaskHeight = 13;
+	static const int TaskThumbHeight = 100;
+
+private:
+	ListTasks * m_list;
 
 	int m_blocknum;
 	int m_tasknum;
 	const af::BlockData * m_block;
 
-	QImage * m_thumbnail;
+	int m_thumbs_num;
+	QImage ** m_thumbs_imgs;
 };

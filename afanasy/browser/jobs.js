@@ -79,6 +79,9 @@ JobNode.prototype.update = function( i_obj)
 	this.elPriority.textContent = 'P' + this.params.priority;
 	this.elUserName.textContent = this.params.user_name;
 
+	if( this.params.thumb_path )
+		this.showThumb( this.params.thumb_path );
+
 	if( this.params.time_life )
 		this.elLifeTime.textContent = 'L' + cm_TimeStringFromSeconds( this.params.time_life);
 	else this.elLifeTime.textContent = '';
@@ -181,6 +184,18 @@ JobNode.prototype.menuHandleMove = function( i_name)
 	nw_Action('users', [g_uid], operation);
 	this.monitor.info('Moving Jobs');
 }
+
+JobNode.prototype.showThumb = function( i_path)
+{
+	if( this.thum_path == null )
+	{
+		this.elThumb = document.createElement('img');
+		this.element.appendChild( this.elThumb);
+		this.elThumb.src = '@TMP@' + i_path;
+	}
+}
+
+// ###################### BLOCK ###################################
 
 function JobBlock( i_elParent, i_block)
 {

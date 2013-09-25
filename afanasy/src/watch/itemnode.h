@@ -15,10 +15,6 @@ public:
 
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-   virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
-
-   inline int getHeight() const { return height;}
-
    virtual inline const QVariant getToolTip() const { return tooltip;}
 
    virtual void updateValues( af::Node *node, int type) = 0;   ///< Update ItemNode attributes ( copy them from given node).
@@ -62,7 +58,6 @@ public:
 	bool getHidden( int32_t i_flags) const;
 
 protected:
-   int height;
    QString tooltip;
 
    long long sort_int;    ///< For sorting by some number
