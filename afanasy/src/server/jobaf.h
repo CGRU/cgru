@@ -38,6 +38,8 @@ public:
 
 	void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
+	af::Msg * writeThumbnail( bool i_binary);
+
 	af::Msg * writeProgress( bool json);   ///< Write job progress in message.
 
 	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const;
@@ -110,8 +112,8 @@ public:
 
 	const std::string & getTasksDir() const { return m_store_dir_tasks; }
 
-	inline void setThumbPath( const std::string & i_path) { m_thumb_path = i_path; }
-	inline void setThumbPathOnEmpty( const std::string & i_path) { if( m_thumb_path.empty()) m_thumb_path = i_path; }
+	void setThumbnail( const std::string & i_path, int i_size, const char * i_data );
+	inline bool hasThumbnail() const { return m_thumb_size > 0; }
 
 public:
 	/// Set Jobs Container.

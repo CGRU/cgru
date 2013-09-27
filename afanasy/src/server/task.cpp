@@ -37,8 +37,18 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 	if( af::pathIsFolder( m_store_dir_files))
 		m_files = af::getFilesList( m_store_dir_files);
 
-	if( m_files.size() )
-		m_block->m_job->setThumbPathOnEmpty( m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[0]);
+	// Set thumbnail for a job if was not:
+	if( m_files.size() && ( false == m_block->m_job->hasThumbnail() ))
+	{
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[0];
+		int size;
+		char * data = af::fileRead( filename, &size);
+		if( data )
+		{
+			m_block->m_job->setThumbnail( filename, size, data);
+			delete [] data;
+		}
+	}
 
 	// Read task progress
 	if( false == af::pathFileExists( m_store_file_progress)) return;
@@ -332,8 +342,9 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 
 		filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + filename;
 
+		// Store first thumbnail for task job:
 		if( i == 0 )
-			m_block->m_job->setThumbPath( filename);
+			m_block->m_job->setThumbnail( filename, i_taskup.getFileSize(i), i_taskup.getFileData(i));
 
 		AFCommon::QueueFileWrite( new FileData( i_taskup.getFileData(i), i_taskup.getFileSize(i), filename,
 			m_store_dir_files));

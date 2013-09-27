@@ -140,11 +140,11 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				{
 					std::vector<int32_t> block_ids;
 					af::jr_int32vec("block_ids", block_ids, getObj);
-					if( block_ids.size())
+					if( block_ids.size() && ( block_ids[0] != -1 ))
 					{
 						std::vector<int32_t> task_ids;
 						af::jr_int32vec("task_ids", task_ids, getObj);
-						if( task_ids.size())
+						if( task_ids.size() && ( task_ids[0] != -1))
 							o_msg_response = job->writeTask( block_ids[0], task_ids[0], mode, binary);
 						else
 						{
@@ -155,11 +155,13 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 					}
 					else if( mode.size())
 					{
-						if(( mode == "progress" ) && ( job != NULL ))
+						if( mode == "thumbnail" )
+							o_msg_response = job->writeThumbnail( binary);
+						else if( mode == "progress" )
 							o_msg_response = job->writeProgress( json);
-						else if(( mode == "error_hosts" ) && ( job != NULL ))
+						else if( mode == "error_hosts" )
 							o_msg_response = job->writeErrorHosts();
-						else if(( mode == "log" ) && ( job != NULL ))
+						else if( mode == "log" )
 							o_msg_response = job->writeLog();
 					}
 				}

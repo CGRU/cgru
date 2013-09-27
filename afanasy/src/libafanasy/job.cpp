@@ -195,6 +195,9 @@ void Job::initDefaultValues()
 	m_time_done = 0;
 	m_user_list_order = -1; // On update, if old index == -1 storing is skipped (new job registration)
 	m_time_life = -1;
+
+	m_thumb_size = 0;
+	m_thumb_data = NULL;
 	m_blocks_data = NULL;
 
 	m_hosts_mask.setCaseInsensitive();
@@ -248,13 +251,15 @@ Job::~Job()
 		 if( m_blocks_data[b] != NULL) delete m_blocks_data[b];
 	  delete [] m_blocks_data;
    }
+
+	if( m_thumb_data ) delete [] m_thumb_data;
 }
 
 void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
 
-	rw_int32_t ( m_blocks_num,                  msg);
+	rw_int32_t ( m_blocks_num,                 msg);
 	rw_uint32_t( m_flags,                      msg);
 	rw_uint32_t( m_state,                      msg);
 	rw_int32_t ( m_max_running_tasks,          msg);

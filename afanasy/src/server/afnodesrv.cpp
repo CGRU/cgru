@@ -49,7 +49,8 @@ void AfNodeSrv::setZombie()
 	m_node->m_flags = m_node->m_flags | af::Node::FZombie;
 
 	// Delete store folder (with recursion)
-	AFCommon::QueueNodeCleanUp( this);
+	if( m_store_dir.size())
+		AFCommon::QueueNodeCleanUp( this);
 }
 
 void AfNodeSrv::setStoreDir( const std::string & i_store_dir)

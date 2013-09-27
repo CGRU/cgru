@@ -774,20 +774,28 @@ void ListTasks::sortBlock( int i_block_num)
 	delete [] array;
 }
 
-void ListTasks::taskFilesReceived( const af::MCTaskUp & i_taskup )
+bool ListTasks::v_filesReceived( const af::MCTaskUp & i_taskup )
 {
+	if( i_taskup.getNumJob() != m_job_id )
+		return false; // This is some for other job
+
+	if(( i_taskup.getNumBlock() < 0 ) || ( i_taskup.getNumTask() < 0 ))
+		return false; // This files are for an entire job
+
 	if( i_taskup.getNumBlock() >= m_blocks_num )
 	{
 		AFERRAR("ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks_num ( %d >= %d )", i_taskup.getNumBlock(), m_blocks_num)
-		return;
+		return true;
 	}
 
 	if( i_taskup.getNumTask() >= m_tasks_num[i_taskup.getNumBlock()] )
 	{
 		AFERRAR("ListTasks::taskFilesReceived: i_taskup.getNumBlock() >= m_blocks_num ( %d >= %d )", i_taskup.getNumBlock(), m_blocks_num)
-		return;
+		return true;
 	}
 
 	m_tasks[i_taskup.getNumBlock()][i_taskup.getNumTask()]->taskFilesReceived( i_taskup);
+
+	return true;
 }
 

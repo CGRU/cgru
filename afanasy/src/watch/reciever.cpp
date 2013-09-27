@@ -8,13 +8,14 @@
 
 Reciever::Reciever()
 {
-   Watch::addReciever( this);
+	Watch::addReciever( this);
 }
 
 Reciever::~Reciever()
 {
-   Watch::removeReciever( this);
+	Watch::removeReciever( this);
 }
 
+bool Reciever::v_filesReceived( const af::MCTaskUp & i_taskup){ return false;}
 void Reciever::v_connectionLost(){}
 void Reciever::v_connectionEstablished(){}

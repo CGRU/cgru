@@ -56,6 +56,8 @@ public:
 
 	static void calcutaleStarPoints();
 
+	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
+
 	virtual bool calcHeight();
 
 protected:

@@ -347,7 +347,7 @@ void Dialog::newMessage( af::Msg *msg)
 	case af::Msg::TTaskOutput:
 	{
 		af::MCTaskUp taskup( msg);
-		Watch::taskFilesReceived( taskup);
+		Watch::filesReceived( taskup);
         break;
 	}
     default:

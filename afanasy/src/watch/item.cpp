@@ -132,6 +132,8 @@ void Item::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 	painter->drawText( option.rect, Qt::AlignBottom | Qt::AlignRight, QString(" ( virtual Item painting ) "));
 }
 
+void Item::v_filesReceived( const af::MCTaskUp & i_taskup) {}
+
 void Item::printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const
 {
 	static const int posx_d = 18;

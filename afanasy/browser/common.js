@@ -226,3 +226,6 @@ function cm_FillNumbers( i_string, i_number)
 	}
 	return i_string;
 }
+
+function cm_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}
+function cm_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));}

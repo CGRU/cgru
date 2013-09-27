@@ -2,6 +2,7 @@
 
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -19,9 +20,12 @@ const int ItemJob::Height = 30;
 const int ItemJob::HeightAnnotation = 12;
 
 ItemJob::ItemJob( af::Job *job):
-    ItemNode( (af::Node*)job),
-    blocksnum(  job->getBlocksNum()),
-    state(0)
+	ItemNode( (af::Node*)job),
+	blocksnum(  job->getBlocksNum()),
+	m_tasks_done( -1),
+	m_thumb_height( 0),
+	m_thumb_img( NULL),
+	state(0)
 {
    if( blocksnum == 0)
    {
@@ -44,7 +48,8 @@ ItemJob::ItemJob( af::Job *job):
 
 ItemJob::~ItemJob()
 {
-   if( blockinfo != NULL ) delete [] blockinfo;
+	if( blockinfo  ) delete [] blockinfo;
+	if( m_thumb_img ) delete m_thumb_img;
 }
 
 void ItemJob::updateValues( af::Node *node, int type)
@@ -100,13 +105,24 @@ void ItemJob::updateValues( af::Node *node, int type)
    num_runningtasks     = job->getRunningTasksNumber();
    lifetime             = job->getTimeLife();
 
-   compact_display   = true;
-   for( int b = 0; b < blocksnum; b++)
-   {
-      const af::BlockData * block = job->getBlock(b);
-      blockinfo[b].update( block, type);
-      if( block->getProgressAvoidHostsNum() > 0 ) compact_display = false;
-   }
+	compact_display = true;
+	bool get_thumbnail = false;
+
+	int tasks_done_old = m_tasks_done;
+	m_tasks_done = 0;
+	for( int b = 0; b < blocksnum; b++)
+	{
+		const af::BlockData * block = job->getBlock(b);
+		blockinfo[b].update( block, type);
+
+		if( block->getProgressAvoidHostsNum() > 0 )
+			compact_display = false;
+
+		m_tasks_done += blockinfo[b].tasksdone;
+	}
+	if( tasks_done_old != m_tasks_done )
+		get_thumbnail = true;
+
    if( time_started ) compact_display = false;
    if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
 
@@ -139,20 +155,37 @@ void ItemJob::updateValues( af::Node *node, int type)
    tooltip = job->v_generateInfoString( true).c_str();
 
    calcHeight();
+
+	if( get_thumbnail )
+		getThumbnail();
 }
 
 bool ItemJob::calcHeight()
 {
-   int old_height = m_height;
+	int old_height = m_height;
 
-   if( compact_display ) block_height = BlockInfo::HeightCompact;
-   else                  block_height = BlockInfo::Height;
+	if( compact_display )
+	{
+		block_height = BlockInfo::HeightCompact;
+	}
+	else
+	{
+		block_height = BlockInfo::Height;
+	}
 
-   m_height = Height + block_height*blocksnum;
+	m_height = Height + block_height*blocksnum;
 
-   if( false == annotation.isEmpty()) m_height += HeightAnnotation;
+	if( false == annotation.isEmpty())
+	{
+		m_height += HeightAnnotation;
+	}
 
-   return old_height == m_height;
+	if( m_thumb_img )
+	{
+		m_height += m_thumb_height;
+	}
+
+	return old_height == m_height;
 }
 
 void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -313,4 +346,34 @@ bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QStri
       return false;
    }
    return blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
+}
+
+void ItemJob::getThumbnail() const
+{
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"thumbnail\"";
+	str << ",\"ids\":[" << getId() << "]";
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	msg->setReceiving( true);
+	Watch::sendMsg( msg);
+}
+
+void ItemJob::v_filesReceived( const af::MCTaskUp & i_taskup)
+{
+//printf("ItemJob::v_filesReceived:\n"); i_taskup.v_stdOut();
+
+	if( i_taskup.getFilesNum() == 0 )
+		return;
+
+	QImage * img = new QImage();
+	if( false == img->loadFromData( (const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
+		return;
+
+	if( m_thumb_img )
+		delete m_thumb_img;
+
+	m_thumb_img = img;
+	m_thumb_height = img->size().height();
 }

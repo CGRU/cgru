@@ -48,6 +48,11 @@ JobNode.prototype.init = function()
 	for( var b = 0; b < this.params.blocks.length; b++)
 		this.blocks.push( new JobBlock( this.element, this.params.blocks[b]));
 
+	this.elThumbs = document.createElement('div');
+	this.element.appendChild( this.elThumbs);
+	this.elThumbs.classList.add('thumbnails');
+	this.elThumbs.style.display = 'none';
+
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild( this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
@@ -187,11 +192,36 @@ JobNode.prototype.menuHandleMove = function( i_name)
 
 JobNode.prototype.showThumb = function( i_path)
 {
-	if( this.thum_path == null )
+//console.log('JobNode.prototype.showThumb = '+i_path);
+	if( this.elThumbs.m_divs == null )
 	{
-		this.elThumb = document.createElement('img');
-		this.element.appendChild( this.elThumb);
-		this.elThumb.src = '@TMP@' + i_path;
+		this.elThumbs.style.display = 'block';
+		this.elThumbs.m_divs = [];
+	}
+
+	// Do nothing if the last image is the same
+	if( this.elThumbs.m_divs.length )
+		if( this.elThumbs.m_divs[this.elThumbs.m_divs.length-1].m_path == i_path )
+			return;
+
+	var thumb = document.createElement('div')
+	this.elThumbs.appendChild( thumb);
+	this.elThumbs.m_divs.push( thumb);
+	thumb.m_path = i_path;
+
+	var name = document.createElement('div');
+	name.textContent = cm_PathBase( i_path).replace(/\.jpg$/,'');
+	thumb.appendChild( name);
+
+	var img = document.createElement('img');
+	thumb.appendChild( img);
+	img.src = '@TMP@' + i_path;
+
+	var max = 10
+	if( this.elThumbs.m_divs.length > max )
+	{
+		this.elThumbs.m_divs.splice( 0, 1);
+		this.elThumbs.removeChild( this.elThumbs.m_divs[0]);
 	}
 }
 

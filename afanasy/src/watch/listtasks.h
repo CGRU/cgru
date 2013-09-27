@@ -28,7 +28,7 @@ public:
 
 	void sortBlock( int numblock);
 
-	void taskFilesReceived( const af::MCTaskUp & i_taskup );
+	bool v_filesReceived( const af::MCTaskUp & i_taskup );
 
 signals:
 	void changeMonitor( int type, int id);

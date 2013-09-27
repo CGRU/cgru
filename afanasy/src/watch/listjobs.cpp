@@ -1,7 +1,8 @@
 #include "listjobs.h"
 
-#include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
+#include "../libafanasy/environment.h"
+#include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "itemjob.h"
 #include "ctrljobs.h"
@@ -749,3 +750,22 @@ void ListJobs::blockAction( int id_block, QString i_action)
 		Watch::sendMsg( af::jsonMsg( str));
 	}
 }
+
+bool ListJobs::v_filesReceived( const af::MCTaskUp & i_taskup )
+{
+	if(( i_taskup.getNumBlock() != -1 ) || ( i_taskup.getNumTask() != -1 ))
+		return false; // This is for a task (not for an entire job)
+
+	for( int i = 0; i < count(); i++)
+	{
+		ItemJob * itemjob = (ItemJob*)(m_model->item(i));
+		if( itemjob->getId() == i_taskup.getNumJob() )
+		{
+			itemjob->v_filesReceived( i_taskup);
+			return true;
+		}
+	}
+
+	return false;
+}
+

@@ -1315,21 +1315,27 @@ const std::string JobAf::v_getErrorHostsListString( int b, int t) const
    return str;
 }
 
-bool JobAf::checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str) const
+bool JobAf::checkBlockTaskNumbers( int i_b, int i_t, const char * o_str) const
 {
-   if( BlockNum >= m_blocks_num)
-   {
-      if( str ) AFERRAR("JobAf::checkBlockTaskNumbers: %s: numblock >= blocksnum ( %d >= %d )", str, BlockNum, m_blocks_num)
-      else      AFERRAR("JobAf::checkBlockTaskNumbers: numblock >= blocksnum ( %d >= %d )", BlockNum, m_blocks_num)
-      return false;
-   }
-   if( TaskNum >= m_blocks_data[BlockNum]->getTasksNum())
-   {
-      if( str ) AFERRAR("JobAf::checkBlockTaskNumbers: %s: numtask >= numTasks ( %d >= %d )", str, TaskNum, m_blocks_data[BlockNum]->getTasksNum())
-      else      AFERRAR("JobAf::checkBlockTaskNumbers: numtask >= numTasks ( %d >= %d )", TaskNum, m_blocks_data[BlockNum]->getTasksNum())
-      return false;
-   }
-   return true;
+	if(( i_b >= m_blocks_num) || ( i_b < 0 ))
+	{
+		if( o_str )
+			AFERRAR("JobAf::checkBlockTaskNumbers: %s: numblock >= blocksnum ( %d >= %d )", o_str, i_b, m_blocks_num)
+		else
+			AFERRAR("JobAf::checkBlockTaskNumbers: numblock >= blocksnum ( %d >= %d )", i_b, m_blocks_num)
+		return false;
+	}
+
+	if(( i_t >= m_blocks_data[i_b]->getTasksNum()) || ( i_t < 0 ))
+	{
+		if( o_str )
+			AFERRAR("JobAf::checkBlockTaskNumbers: %s: numtask >= numTasks ( %d >= %d )", o_str, i_t, m_blocks_data[i_b]->getTasksNum())
+		else
+			AFERRAR("JobAf::checkBlockTaskNumbers: numtask >= numTasks ( %d >= %d )", i_t, m_blocks_data[i_b]->getTasksNum())
+		return false;
+	}
+
+	return true;
 }
 
 af::Msg * JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
@@ -1360,6 +1366,33 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
          for( int t = 0; t < m_blocks_data[b]->getTasksNum(); t++)
 			m_blocks[b]->m_tasks[t]->listenOutput( mclisten, renders);
    }
+}
+
+void JobAf::setThumbnail( const std::string & i_path, int i_size, const char * i_data)
+{
+	if( m_thumb_path == i_path ) return;
+	if( i_size == 0 ) return;
+	if( i_data == NULL ) return;
+
+	m_thumb_size = i_size;
+	m_thumb_path = i_path;
+	if( m_thumb_data ) delete [] m_thumb_data;
+	m_thumb_data = new char[m_thumb_size];
+	memcpy( m_thumb_data, i_data, m_thumb_size);
+//printf("JobAf::setThumbnail: '%s'[%d]\n", i_path.c_str(), i_size);
+}
+
+af::Msg * JobAf::writeThumbnail( bool i_binary)
+{
+//printf("JobAf::writeThumbnail: %s\n", i_binary?"BINARY":"JSON");
+	if( i_binary )
+	{
+		af::MCTaskUp taskup( -1, getId(), -1, -1);
+		taskup.addFile( m_thumb_path, m_thumb_data, m_thumb_size);
+		return new af::Msg( af::Msg::TTaskOutput, &taskup);
+	}
+
+	return NULL;
 }
 
 int JobAf::v_calcWeight() const

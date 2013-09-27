@@ -57,7 +57,7 @@ public:
 
 	static void caseMessage( af::Msg * msg);
 
-	static void taskFilesReceived( const af::MCTaskUp & i_taskup);
+	static void filesReceived( const af::MCTaskUp & i_taskup);
 
 	static void setWindowTitle( const QString & title);
 

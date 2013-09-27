@@ -16,6 +16,8 @@ public:
 	bool caseMessage( af::Msg * msg);
 	ItemNode* createNewItem( af::Node *node);
 
+	bool v_filesReceived( const af::MCTaskUp & i_taskup );
+
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 

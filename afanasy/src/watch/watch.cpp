@@ -147,24 +147,17 @@ void Watch::caseMessage( af::Msg * msg)
    }
 }
 
-void Watch::taskFilesReceived( const af::MCTaskUp & i_taskup)
+void Watch::filesReceived( const af::MCTaskUp & i_taskup)
 {
-	QLinkedList<int>::const_iterator iIt = ms_watchtasksjobids.begin();
-	QLinkedList<QWidget*>::iterator wIt = ms_watchtaskswindows.begin();
-	while( iIt != ms_watchtasksjobids.end())
+	for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
 	{
-		if( *iIt == i_taskup.getNumJob())
-		{
-			WndList * wlist = (WndList*)*wIt;
-			ListItems * ilist = wlist->getList();
-			ListTasks * tlist = (ListTasks*)ilist;
-			tlist->taskFilesReceived( i_taskup);
+		if((*rIt)->v_filesReceived( i_taskup))
 			return;
-		}
-		iIt++;
-		wIt++;
 	}
-	AFERRAR("Watch::taskFilesReceived: Job with ID=%d not founded.", i_taskup.getNumJob())
+
+	printf("Watch::filesReceived: Recepient not founded:\n");
+	i_taskup.v_stdOut();
+	return;
 }
 
 void Watch::listenJob( int id, const QString & name)
