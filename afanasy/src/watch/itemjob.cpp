@@ -7,6 +7,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"
+#include "listjobs.h"
 #include "watch.h"
 
 #include <QtCore/QEvent>
@@ -17,24 +18,24 @@
 #include "../include/macrooutput.h"
 
 const int ItemJob::Height = 30;
+const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
-ItemJob::ItemJob( af::Job *job):
+ItemJob::ItemJob( ListJobs * i_list, af::Job *job):
 	ItemNode( (af::Node*)job),
-	blocksnum(  job->getBlocksNum()),
+	m_list( i_list),
+	m_blocks_num(  job->getBlocksNum()),
 	m_tasks_done( -1),
-	m_thumb_height( 0),
-	m_thumb_img( NULL),
 	state(0)
 {
-   if( blocksnum == 0)
+   if( m_blocks_num == 0)
    {
-      AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): blocksnum == 0")
+      AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): m_blocks_num == 0")
       return;
    }
 
-   blockinfo = new BlockInfo[blocksnum];
-   for( int b = 0; b < blocksnum; b++)
+   blockinfo = new BlockInfo[m_blocks_num];
+   for( int b = 0; b < m_blocks_num; b++)
    {
       const af::BlockData * block = job->getBlock(b);
       blockinfo[b].setName( afqt::stoq( block->getName()));
@@ -49,14 +50,16 @@ ItemJob::ItemJob( af::Job *job):
 ItemJob::~ItemJob()
 {
 	if( blockinfo  ) delete [] blockinfo;
-	if( m_thumb_img ) delete m_thumb_img;
+
+	for( int i = 0; i < m_thumbs.size(); i++)
+		delete m_thumbs[i];
 }
 
 void ItemJob::updateValues( af::Node *node, int type)
 {
    af::Job *job = (af::Job*)node;
 
-   if( blocksnum != job->getBlocksNum())
+   if( m_blocks_num != job->getBlocksNum())
    {
       AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.")
       resetId();
@@ -110,7 +113,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 
 	int tasks_done_old = m_tasks_done;
 	m_tasks_done = 0;
-	for( int b = 0; b < blocksnum; b++)
+	for( int b = 0; b < m_blocks_num; b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
 		blockinfo[b].update( block, type);
@@ -173,16 +176,18 @@ bool ItemJob::calcHeight()
 		block_height = BlockInfo::Height;
 	}
 
-	m_height = Height + block_height*blocksnum;
+	m_height = Height + block_height*m_blocks_num;
 
 	if( false == annotation.isEmpty())
 	{
 		m_height += HeightAnnotation;
 	}
 
-	if( m_thumb_img )
+	if( m_thumbs.size())
 	{
-		m_height += m_thumb_height;
+		m_height += afqt::QEnvironment::thumb_jobs_height.n;
+		m_height += ItemJob::HeightThumbName;
+		m_height += 4;
 	}
 
 	return old_height == m_height;
@@ -240,7 +245,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
       painter->drawText(  x+3, y+26, runningTime );
    }
 
-   for( int b = 0; b < blocksnum; b++)
+   for( int b = 0; b < m_blocks_num; b++)
       blockinfo[b].paint( painter, option,
          x+5, y + Height + block_height*b, w-9,
          compact_display, itemColor);
@@ -253,12 +258,37 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
       painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_runningtasks_str );
    }
 
-   if( false == annotation.isEmpty())
-   {
-      painter->setPen( clrTextMain( option) );
-      painter->setFont( afqt::QEnvironment::f_info);
-      painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, annotation );
-   }
+
+	// Thumbnails:
+	int tx = x;
+	painter->setPen( afqt::QEnvironment::qclr_black );
+	painter->setFont( afqt::QEnvironment::f_info );
+	for( int i = 0; i < m_thumbs.size(); i++ )
+	{
+		tx += 5;
+		if( tx > w ) break;
+		int tw = m_thumbs[i]->size().width();
+		if( tx + tw > w ) tw = w - tx;
+		int th = y + Height + block_height * m_blocks_num;
+
+		painter->drawText( tx, th, tw, ItemJob::HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
+
+		th += ItemJob::HeightThumbName;
+
+		painter->drawImage( tx, th, * m_thumbs[i], 0, 0, tw, m_thumbs[i]->size().height());
+
+		tx += m_thumbs[i]->size().width();
+	}
+
+
+	// Annotation:
+	if( false == annotation.isEmpty())
+	{
+		painter->setPen( clrTextMain( option) );
+		painter->setFont( afqt::QEnvironment::f_info);
+		painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, annotation );
+	}
+
 
    // Draw standart post effects:
    drawPost( painter, option);
@@ -330,9 +360,9 @@ bool ItemJob::setFilterType( int type )
 
 void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 {
-   if((id_block >= 0) && (id_block >= blocksnum))
+   if((id_block >= 0) && (id_block >= m_blocks_num))
    {
-      AFERRAR("ListJobs::generateMenu: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
+      AFERRAR("ListJobs::generateMenu: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
       return;
    }
    blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
@@ -340,9 +370,9 @@ void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 
 bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
 {
-   if((id_block >= 0) && (id_block >= blocksnum))
+   if((id_block >= 0) && (id_block >= m_blocks_num))
    {
-      AFERRAR("ListJobs::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
+      AFERRAR("ListJobs::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
       return false;
    }
    return blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
@@ -367,13 +397,36 @@ void ItemJob::v_filesReceived( const af::MCTaskUp & i_taskup)
 	if( i_taskup.getFilesNum() == 0 )
 		return;
 
+	QString filename = afqt::stoq( i_taskup.getFileName(0));
+	static const QRegExp rx(".*/");
+	filename = filename.replace( rx, "");
+	filename = filename.replace(".jpg","");
+
+	if( m_thumbs_paths.size() )
+		if( m_thumbs_paths[0] == filename )
+			return;
+
 	QImage * img = new QImage();
 	if( false == img->loadFromData( (const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
 		return;
 
-	if( m_thumb_img )
-		delete m_thumb_img;
+	if( m_thumbs.size() >= afqt::QEnvironment::thumb_jobs_num.n )
+	{
+		delete m_thumbs.takeLast();
+		m_thumbs_paths.removeLast();
+	}
 
-	m_thumb_img = img;
-	m_thumb_height = img->size().height();
+	if( img->size().height() != afqt::QEnvironment::thumb_jobs_height.n )
+	{
+		QImage img_scaled = img->scaledToHeight( afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation );
+		delete img;
+		img = new QImage( img_scaled);
+	}
+
+	m_thumbs.prepend( img);
+	m_thumbs_paths.prepend( filename);
+
+	if( false == calcHeight())
+		m_list->itemsHeightChanged();
 }
+

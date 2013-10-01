@@ -119,14 +119,16 @@ function g_DigestInit( i_obj)
 }
 function g_DigestAsk()
 {
-	new cgru_Dialog( window, window, 'g_DigestAskPasswd', null, 'str', '', 'settings', 'Login', 'Enter User Name');
+	new cgru_Dialog({"handle":'g_DigestAskPasswd',"type":'str',"name":'settings',"title":'Login',"info":'Enter User Name'});
+//	new cgru_Dialog( window, window, 'g_DigestAskPasswd', null, 'str', '', 'settings', 'Login', 'Enter User Name');
 }
-function g_DigestAskPasswd( i_param, i_value)
+function g_DigestAskPasswd( i_value)
 {
 	localStorage.user_name = i_value;
-	new cgru_Dialog( window, window, 'g_DigestConstruct', null, 'str', '', 'settings', 'Login', 'Enter Password');
+	new cgru_Dialog({"handle":'g_DigestConstruct',"type":'str',"name":'settings',"title":'Login',"info":'Enter Password'});
+//	new cgru_Dialog( window, window, 'g_DigestConstruct', null, 'str', '', 'settings', 'Login', 'Enter Password');
 }
-function g_DigestConstruct( i_param, i_value)
+function g_DigestConstruct( i_value)
 {
 	localStorage.digest = hex_md5( localStorage.user_name + ':' + localStorage.realm + ':' + i_value);
 	g_DigestInit();

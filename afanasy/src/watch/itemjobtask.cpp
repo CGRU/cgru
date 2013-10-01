@@ -282,8 +282,8 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 		}
 	}
 
-	calcHeight();
-	m_list->itemsHeightChanged();
+	if( false == calcHeight())
+		m_list->itemsHeightChanged();
 }
 
 void ItemJobTask::thumbsCLear()

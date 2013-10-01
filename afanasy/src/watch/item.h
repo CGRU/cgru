@@ -71,14 +71,15 @@ protected:
 	static void drawStar( int size, int posx, int posy, QPainter * painter);
 
 protected:
-	QString m_name;           ///< Item name.
-
 	static const int Height;
 	static const int Width;
 
-	mutable bool m_locked;
+protected:
+	QString m_name;           ///< Item name.
 
 	int m_height;
+
+	mutable bool m_locked;
 
 private:
 	/// Node "m_running" property.

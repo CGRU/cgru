@@ -148,7 +148,9 @@ margin: 4px 8px;
 padding: 4px;
 float: left;
 }
+.ctrl_options { float: right; }
 
+.ctrl_sort_filter { right: 30px; top: 0; bottom: 0; }
 .ctrl_sort, .ctrl_filter {
 position: absolute;
 box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
@@ -159,7 +161,7 @@ border-radius: 4px;
 -webkit-transition: all .3s ease-in-out;*/
 }
 .ctrl_sort   { left: 5px; width: 124px; }
-.ctrl_filter { left: 138px; right: 3%; }
+.ctrl_filter { left: 138px; right: 0px; }
 .ctrl_filter.filtering { background: #FC6; color:#000; }
 .ctrl_sort.sorting { background: #FC6; color:#000; }
 .ctrl_sort .label, .ctrl_filter .label { float: left; margin: 5px 10px; width: 30px;}

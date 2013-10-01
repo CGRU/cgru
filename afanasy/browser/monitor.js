@@ -83,10 +83,7 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	this.elCtrl.appendChild( this.elCtrlSortFilter);
 	this.elCtrlSortFilter.style.position = 'absolute';
 	this.elCtrlSortFilter.style.left = buttons_width+'px';
-	this.elCtrlSortFilter.style.right = '0';
-	this.elCtrlSortFilter.style.top = '0';
-	this.elCtrlSortFilter.style.bottom = '0';
-//this.elCtrlSortFilter.style.border = '1px solid #333';
+	this.elCtrlSortFilter.classList.add('ctrl_sort_filter');
 
 	this.elCtrlSort = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlSort);
@@ -131,6 +128,17 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	this.elCtrlFilterInput.monitor = this;
 	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
 	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
+
+	if( this.nodeConstructor.has_options )
+	{
+		this.elOptions = this.document.createElement('div');
+		this.elCtrl.appendChild( this.elOptions);
+		this.elOptions.textContent = 'O';
+		this.elOptions.classList.add('ctrl_button');
+		this.elOptions.classList.add('ctrl_options');
+		this.elOptions.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'option',false);}
+		this.elOptions.monitor = this;
+	}
 
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
@@ -647,7 +655,10 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 		i_menu.addItem();
 		return;
 	}
-	var receiver = this.cur_item;
+
+	var receiver = this;
+	if( this.cur_item ) receiver = this.cur_item;
+
 	var handle = i_action[3];
 	var title = i_action[4];
 	var permission = i_action[5];
@@ -681,24 +692,29 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
 				cmds.push( cmd);
 			}
-		i_menu.addItem( name, 'cmdexec', cmds, title);
+		i_menu.addItem({"name":name,"receiver":'cmdexec',"handle":cmds,"label":title});
 		return;
 	}
 	if( receiver[handle] == null ) receiver = this;
 	if( receiver[handle] )
-		i_menu.addItem( name, receiver, handle, title);
+		i_menu.addItem({"name":name,"receiver":receiver,"handle":handle,"label":title});
 	else
-		i_menu.addItem('invalid', 'invalid', 'invalid', 'invalid '+name, false);
+		i_menu.addItem({"label":'invalid '+name,"enabled":false});
 }
 
-Monitor.prototype.onMouseOverSet = function( i_evt, i_name)
+Monitor.prototype.onMouseOverSet = function( i_evt, i_name, i_need_selection)
 {
-	if( this.cur_item == null ) return;
-	if( this.hasSelection() == false ) return;
+	if( i_need_selection !== false )
+	{
+		if( this.cur_item == null ) return;
+		if( this.hasSelection() == false ) return;
+	}
+
 	if( i_name == null ) i_name = 'set';
 
 	var menu = this.createMenu( i_evt, 'set');
-	var actions = this.cur_item.constructor.actions;
+//	var actions = this.cur_item.constructor.actions;
+	var actions = this.nodeConstructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == i_name )
 			this.addMenuItem( menu, actions[i]);
@@ -706,7 +722,7 @@ Monitor.prototype.onMouseOverSet = function( i_evt, i_name)
 }
 Monitor.prototype.menuHandleParam = function( i_name)
 {
-	var ptype = null;
+//var ptype = null;
 	var actions = this.cur_item.constructor.actions;
 	
 	for( var i = 0; i < actions.length; i++)
@@ -714,33 +730,39 @@ Monitor.prototype.menuHandleParam = function( i_name)
 		{
 			var parameter = i_name;
 			if( actions[i][6] ) parameter = actions[i][6];
-			this.setParameter( parameter, actions[i][2]);
+			this.setParameter( actions[i][2], parameter);
 			return;
 		}
 }
 Monitor.prototype.menuHandleDialog = function( i_name)
 {
-	var ptype = null;
-	var parameter = i_name;
-	var actions = this.cur_item.constructor.actions;
-	var reciever = this;
-	var handle = 'setParameter';
-	var value = this.cur_item.params[parameter];
+//console.log( this);
+//console.log( JSON.stringify(this));
+	var args = {};
+	args.type     = null;
+	args.param    = i_name;
+	args.receiver = this;
+	args.wnd      = this.window;
+	args.handle   = 'setParameter';
+	args.value    = this.cur_item.params[i_name];
+	args.name     = this.name + '_parameter';
 
 	// Search actions by name to get other values
+//	var actions = this.cur_item.constructor.actions;
+	var actions = this.nodeConstructor.actions;
 	for( var i = 0; i < actions.length; i++)
 	{
 		if( i_name == actions[i][1])
 		{
-			ptype = actions[i][2];
+			args.type = actions[i][2];
 			// Parameter can be overriden:
 			if( actions[i][6] ) parameter = actions[i][6];
 		}
 	}
 
-	new cgru_Dialog( this.window, reciever, handle, parameter, ptype, value, this.name+'_parameter');
+	new cgru_Dialog( args);
 }
-Monitor.prototype.setParameter = function( i_parameter, i_value)
+Monitor.prototype.setParameter = function( i_value, i_parameter)
 {
 	var params = {};
 	params[i_parameter] = i_value;
@@ -763,6 +785,11 @@ Monitor.prototype.menuHandleGet = function( i_name)
 Monitor.prototype.action = function( i_operation, i_params)
 {
 	nw_Action( this.type, this.getSelectedIds(), i_operation, i_params);
+}
+
+Monitor.prototype.setOption = function( i_param)
+{
+console.log( i_param);
 }
 
 Monitor.prototype.getSelectedIds = function()
@@ -883,7 +910,7 @@ Monitor.prototype.sortByIds = function( i_ids)
 Monitor.prototype.createMenu = function( i_evt, i_name)
 {
 	if( this.menu ) this.menu.destroy();
-	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_'+i_name, 'onMenuDestroy');
+	var menu = new cgru_Menu({"doc":this.document,"parent":this.document.body,"evt":i_evt,"name":this.type+'_'+i_name,"receiver":this,"destroy":'onMenuDestroy'});
 	this.menu = menu;
 	return menu;
 }
@@ -905,7 +932,7 @@ Monitor.prototype.sortFilterParmMenu = function( i_evt, i_type)
 	for( var i = 0; i < this.nodeConstructor[i_type].length; i++)
 		for( var j = 0; j < cm_Attrs.length; j++)
 			if( this.nodeConstructor[i_type][i] == cm_Attrs[j][0] )
-				menu.addItem( cm_Attrs[j][0], this, i_type+'ParmChanged', cm_Attrs[j][2]);
+				menu.addItem({"name":cm_Attrs[j][0],"receiver":this,"handle":i_type+'ParmChanged',"title":cm_Attrs[j][2]});
 	menu.show();
 	i_evt.stopPropagation();
 	return false;

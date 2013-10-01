@@ -5,22 +5,24 @@
 #include "itemnode.h"
 #include "blockinfo.h"
 
+class ListJobs;
+
 class ItemJob : public ItemNode
 {
 public:
-	ItemJob( af::Job *job);
+	ItemJob( ListJobs * i_list, af::Job *job);
 	~ItemJob();
 
 	void updateValues( af::Node *node, int type);
 
 	inline int getErrorRetries(         int block = 0 ) const
-		{if(block<blocksnum )return blockinfo[ block].getErrorsRetries();       else return 0; }
+		{if(block<m_blocks_num )return blockinfo[ block].getErrorsRetries();       else return 0; }
 	inline int getErrorsAvoidHost(      int block = 0 ) const
-		{if(block<blocksnum )return blockinfo[ block].getErrorsAvoidHost();     else return 0; }
+		{if(block<m_blocks_num )return blockinfo[ block].getErrorsAvoidHost();     else return 0; }
 	inline int getErrorsTaskSameHost(   int block = 0 ) const
-		{if(block<blocksnum )return blockinfo[ block].getErrorsTaskSameHost();  else return 0; }
+		{if(block<m_blocks_num )return blockinfo[ block].getErrorsTaskSameHost();  else return 0; }
 	inline uint32_t getTasksMaxRunTime( int block = 0 ) const
-		{if(block<blocksnum )return blockinfo[ block].getTasksMaxRunTime();     else return 0; }
+		{if(block<m_blocks_num )return blockinfo[ block].getTasksMaxRunTime();     else return 0; }
 
 	int priority;
 	int maxrunningtasks;
@@ -45,9 +47,9 @@ public:
 	QString cmd_post;
 	QString description;
 
-	inline int getBlocksNum() const { return blocksnum;}
+	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const
-		{ if( block < blocksnum ) return blockinfo[block].getPercentage(); else return 0;}
+		{ if( block < m_blocks_num ) return blockinfo[block].getPercentage(); else return 0;}
 
 	bool setSortType(   int type );
 	bool setFilterType( int type );
@@ -68,7 +70,14 @@ protected:
 	void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
-	int blocksnum;
+	static const int Height;
+	static const int HeightThumbName;
+	static const int HeightAnnotation;
+
+private:
+	ListJobs * m_list;
+
+	int m_blocks_num;
 	bool compact_display;
 
 	QString properties;
@@ -83,13 +92,9 @@ private:
 
 	int m_tasks_done;
 
-	int m_thumb_height;
-	QImage * m_thumb_img;
+	QList<QImage*> m_thumbs;
+	QList<QString> m_thumbs_paths;
 
-private:
-
-	static const int Height;
-	static const int HeightAnnotation;
 	int block_height;
 	BlockInfo * blockinfo;
 };

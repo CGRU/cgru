@@ -98,6 +98,8 @@ AttrColor QEnvironment::clr_textdone(        "clr_textdone",         "Done Text"
 AttrColor QEnvironment::clr_textmuted(       "clr_textmuted",        "Muted Text",              AFGUI::CLR_TEXTMUTED           );
 AttrColor QEnvironment::clr_textstars(       "clr_textstars",        "Stars Text",              AFGUI::CLR_TEXTSTARS           );
 
+AttrNumber QEnvironment::thumb_jobs_num(    "thumb_jobs_num",    "Job Item Quantity", AFGUI::THUMB_JOBS_NUM    );
+AttrNumber QEnvironment::thumb_jobs_height( "thumb_jobs_height", "Job Item Height",   AFGUI::THUMB_JOBS_HEIGHT );
 
 QColor QEnvironment::qclr_black(   0,   0,   0);
 QColor QEnvironment::qclr_white( 255, 255, 255);
@@ -147,6 +149,9 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &image_snap_lefton     );
     ms_attrs_gui.append( &image_snap_rightoff   );
     ms_attrs_gui.append( &image_snap_righton    );
+
+	ms_attrs_gui.append( &thumb_jobs_num    );
+	ms_attrs_gui.append( &thumb_jobs_height );
 
     ms_attrs_gui.append( &star_numpoints );
     ms_attrs_gui.append( &star_radiusout );

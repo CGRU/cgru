@@ -362,9 +362,9 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	return true;
 }
 
-ItemNode* ListJobs::createNewItem( af::Node *node)
+ItemNode * ListJobs::createNewItem( af::Node *node)
 {
-	return new ItemJob( (af::Job*)node);
+	return new ItemJob( this, (af::Job*)node);
 }
 
 void ListJobs::resetSorting()
@@ -762,6 +762,7 @@ bool ListJobs::v_filesReceived( const af::MCTaskUp & i_taskup )
 		if( itemjob->getId() == i_taskup.getNumJob() )
 		{
 			itemjob->v_filesReceived( i_taskup);
+			
 			return true;
 		}
 	}

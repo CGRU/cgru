@@ -292,13 +292,15 @@ TaskItem.prototype.menuHandleOutput = function( i_number)
 {
 	if( i_number == -1 )
 	{
-		new cgru_Dialog( this.monitor.window, this, 'menuHandleGet', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
+		new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleGetOutput',"type":'num',"name":this.job.name,"title":'Get Task Process Output',"info":'Enter Start Number'});
+//		new cgru_Dialog( this.monitor.window, this, 'menuHandleGet', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
 		return;
 	}
 //	this.menuHandleGet('output', i_number);
 	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
 }
 
+TaskItem.prototype.menuHandleGetOutput = function( i_number ){ this.menuHandleGet('output', i_number)}
 TaskItem.prototype.menuHandleGet = function( i_name, i_number)
 {
 	var bids = []; var tids = [];

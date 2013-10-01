@@ -316,18 +316,18 @@ JobBlock.prototype.onContextMenu = function( evt)
 		onlyBlockIsSelected = true;
 	}
 
-	var menu = new cgru_Menu( document, document.body, evt, this, 'jobblock_context', 'onContextMenuDestroy');
+	var menu = new cgru_Menu({"parent":document.body,"evt":evt,"name":'jobblock_context',"receiver":this,"destroy":'onContextMenuDestroy'});
 	this.job.monitor.menu = menu;
 
 	if( onlyBlockIsSelected )
-		menu.addItem( null, null, null, '<b>'+this.params.name+'</b>', false);
+		menu.addItem({"label":'<b>'+this.params.name+'</b>',"enabled":false});
 	else
-		menu.addItem( null, null, null, '<b>All Blocks</b>', false);
+		menu.addItem({"label":'<b>All Blocks</b>',"enabled":false});
 	menu.addItem();
 
 	var actions = JobBlock.actions;
 	for( var i = 0; i < actions.length; i++)
-		menu.addItem( actions[i][1], this, actions[i][3], actions[i][4]);
+		menu.addItem({"name":actions[i][1],"receiver":this,"handle":actions[i][3],"label":actions[i][4]});
 	menu.show();
 
 	return false;
@@ -344,9 +344,10 @@ JobBlock.prototype.menuHandleDialog = function( i_parameter)
 	for( var i = 0; i < actions.length; i++)
 		if( i_parameter == actions[i][1])
 			ptype = actions[i][2];
-	new cgru_Dialog( this.job.monitor.window, this, 'setParameter', i_parameter, ptype, this.params[i_parameter], 'jobblock_parameter');
+//	new cgru_Dialog( this.job.monitor.window, this, 'setParameter', i_parameter, ptype, this.params[i_parameter], 'jobblock_parameter');
+	new cgru_Dialog({"wnd":this.job.monitor.window,"receiver":this,"handle":'setParameter',"param":i_parameter,"type":ptype,"value":this.params[i_parameter],"name":'jobblock_parameter'});
 }
-JobBlock.prototype.setParameter = function( i_parameter, i_value)
+JobBlock.prototype.setParameter = function( i_value, i_parameter)
 {
 	var params = {};
 	params[i_parameter] = i_value;
@@ -686,7 +687,13 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 }
 
+
+
 JobNode.actions = [];
+
+JobNode.has_options = true;
+JobNode.actions.push(['option','jobs_thumbs_num',    'num', 'setOption', 'Thumbnails Quantity', null, 10  ]);
+JobNode.actions.push(['option','jobs_thumbs_height', 'num', 'setOption', 'Thumbnails Height',   null, 100 ]);
 
 JobNode.actions.push(['context', 'log',               null, 'menuHandleGet',       'Show Log']);
 JobNode.actions.push(['context', 'error_hosts',       null, 'menuHandleGet',       'Show Error Hosts']);

@@ -373,9 +373,10 @@ RenderNode.prototype.onDoubleClick = function()
 
 RenderNode.prototype.menuHandleServiceDialog = function( i_name)
 {
-	new cgru_Dialog( this.monitor.window, this, 'menuHandleServiceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
+//	new cgru_Dialog( this.monitor.window, this, 'menuHandleServiceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
+	new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleServiceApply',"param":i_name,"type":'str',"name":this.type+'_parameter',"title":(i_name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
 }
-RenderNode.prototype.menuHandleServiceApply = function( i_name, i_value)
+RenderNode.prototype.menuHandleServiceApply = function( i_value, i_name)
 {
 g_Info('menuHandleService = ' + i_name + ',' + i_value);
 	var operation = {};
