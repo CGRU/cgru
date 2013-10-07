@@ -28,8 +28,8 @@ Gizmo {
    addUserKnob {  1 dependmask      l "Depend Mask"            }
    addUserKnob {  1 dependmaskglbl  l "Global Depend Mask"     }
    addUserKnob {  3 capacity        l "Capacity"               }
-   addUserKnob {  3 capacitymin     l "Minimum Capacity Coeff" }
-   addUserKnob {  3 capacitymax     l "Maximum Capacity Coeff" }
+   addUserKnob {  3 maxperhost      l "Max Tasks Per Host"     }
+   addUserKnob {  3 maxruntime      l "Max Task Run Time"      }
 
    addUserKnob { 20 "" MultiWrite }
    addUserKnob {  1 addnodes    l "Add Nodes"    }
@@ -62,8 +62,8 @@ Gizmo {
 	maxhosts       -1
 	priority       -1
 	capacity       -1
-	capacitymin    -1
-	capacitymax    -1
+	maxperhost     -1
+	maxruntime     -1
 	hostsmask      ""
 	hostsmaskexcl  ""
 	dependmask     ""

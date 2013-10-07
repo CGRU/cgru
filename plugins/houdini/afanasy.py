@@ -46,6 +46,8 @@ class BlockParameters:
       self.subtaskdepend      = int( afnode.parm('subtaskdepend').eval())
       self.priority           = -1
       self.max_runtasks       = -1
+      self.maxperhost         = -1
+      self.maxruntime         = -1
       self.capacity           = -1
       self.capacity_min       = -1
       self.capacity_max       = -1
@@ -56,6 +58,8 @@ class BlockParameters:
       if afnode.parm('enable_extended_parameters').eval():
          self.priority           = int( afnode.parm('priority').eval())
          self.max_runtasks       = int( afnode.parm('max_runtasks').eval())
+         self.maxperhost         = int( afnode.parm('maxperhost').eval())
+         self.maxruntime         = int( afnode.parm('maxruntime').eval())
          self.capacity           = int( afnode.parm('capacity').eval())
          self.capacity_min       = int( afnode.parm('capacity_coefficient1').eval())
          self.capacity_max       = int( afnode.parm('capacity_coefficient2').eval())
@@ -171,8 +175,11 @@ class BlockParameters:
       if self.capacity_min != -1 or self.capacity_max != -1 :
          block.setVariableCapacity( self.capacity_min, self.capacity_max)
 
+      block.setTasksMaxRunTime( self.maxruntime)
+
       if self.subblock:
          if self.max_runtasks > -1: block.setMaxRunningTasks( self.max_runtasks)
+         if self.maxperhost > -1: block.setMaxRunTasksPerHost( self.maxperhost)
          if self.hosts_mask != '': block.setHostsMask( self.hosts_mask)
          if self.hosts_mask_exclude != '': block.setHostsMaskExclude( self.hosts_mask_exclude)
       if self.dependmask != '':
@@ -209,6 +216,7 @@ class BlockParameters:
       if self.depend_mask != '': job.setDependMask( self.depend_mask)
       if self.depend_mask_global != '': job.setDependMaskGlobal( self.depend_mask_global)
       if self.max_runtasks > -1: job.setMaxRunningTasks( self.max_runtasks)
+      if self.maxperhost > -1: job.setMaxRunTasksPerHost( self.maxperhost)
       if self.hosts_mask != '': job.setHostsMask( self.hosts_mask)
       if self.hosts_mask_exclude != '': job.setHostsMaskExclude( self.hosts_mask_exclude)
 

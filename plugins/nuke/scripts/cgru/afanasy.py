@@ -114,8 +114,8 @@ class BlockParameters:
 		self.framespertask     =  1
 		self.maxhosts          = -1
 		self.capacity          = -1
-		self.capacitymin       = -1
-		self.capacitymax       = -1
+		self.maxperhost        = -1
+		self.maxruntime        = -1
 		self.hostsmask         = None
 		self.hostsmaskexclude  = None
 		self.fullrangedepend   = 0
@@ -128,8 +128,8 @@ class BlockParameters:
 			self.framespertask     = int( afnode.knob('framespertask').value())
 			self.maxhosts          = int( afnode.knob('maxhosts').value())
 			self.capacity          = int( afnode.knob('capacity').value())
-			self.capacitymin       = int( afnode.knob('capacitymin').value())
-			self.capacitymax       = int( afnode.knob('capacitymax').value())
+			self.maxperhost        = int( afnode.knob('maxperhost').value())
+			self.maxruntime        = int( afnode.knob('maxruntime').value())
 			self.tmpimage          = int( afnode.knob('tmpimage').value())
 			self.pathsmap          = int( afnode.knob('pathsmap').value())
 			self.hostsmask         = afnode.knob('hostsmask').value()
@@ -247,6 +247,7 @@ class BlockParameters:
 			block.setNumeric( self.framefirst, self.framelast, self.framespertask, self.frameinc)
 			block.setFiles( self.imgfile)
 			if self.capacity != -1: block.setCapacity( self.capacity)
+			if self.maxruntime != -1: block.setTasksMaxRunTime( self.maxruntime)
 
 			cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i')
 			if self.tmpimage or self.pathsmap:
@@ -263,11 +264,6 @@ class BlockParameters:
 					cmd += ' -t %s' % nukerenderscript
 					if not self.tmpimage: cmd += ' --notmpimage'
 					if not self.pathsmap: cmd += ' --nopathsmap'
-
-			if self.capacitymin != -1 or self.capacitymax != -1:
-				block.setVariableCapacity( self.capacitymin, self.capacitymax)
-				services = __import__('services.service', globals(), locals(), [])
-				cmd += ' -m ' + services.service.str_capacity
 
 			cmd += ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
 
@@ -293,6 +289,7 @@ class BlockParameters:
 
 		if self.subblock:
 			if self.maxhosts != -1: block.setMaxHosts( self.maxhosts)
+			if self.maxperhost != -1: block.setMaxRunTasksPerHost( self.maxperhost)
 			if self.hostsmask != None:
 				self.hostsmask = str( self.hostsmask)
 				if self.hostsmask != '': block.setHostsMask( self.hostsmask)
@@ -397,6 +394,7 @@ class JobParameters:
 
 		self.startpaused        = 0
 		self.maxhosts           = -1
+		self.maxperhost         = -1
 		self.priority           = -1
 		self.platform           = None
 		self.hostsmask          = None
@@ -409,6 +407,7 @@ class JobParameters:
 		if afnode != None:
 			self.startpaused        = int(afnode.knob('startpaused').value())
 			self.maxhosts           = int(afnode.knob('maxhosts').value())
+			self.maxperhost         = int(afnode.knob('maxperhost').value())
 			self.priority           = int(afnode.knob('priority').value())
 			self.platform           = afnode.knob('platform').value()
 			self.hostsmask          = afnode.knob('hostsmask').value()
@@ -476,6 +475,7 @@ class JobParameters:
 		job = af.Job( str( self.jobname))
 		if self.priority != -1: job.setPriority( self.priority)
 		if self.maxhosts != -1: job.setMaxHosts( self.maxhosts)
+		if self.maxperhost != -1: job.setMaxRunTasksPerHost( self.maxperhost)
 		if self.hostsmask != None:
 			self.hostsmask = str( self.hostsmask)
 			if self.hostsmask != '': job.setHostsMask( self.hostsmask)
