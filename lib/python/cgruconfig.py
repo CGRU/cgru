@@ -89,6 +89,7 @@ class Config:
 			self.Vars['USERNAME'] = username
 
 			home = os.getenv('HOME', os.getenv('HOMEPATH'))
+			if home is None: home = username
 			self.Vars['HOME'] = home
 			self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
 			self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.json')
