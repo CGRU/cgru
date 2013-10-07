@@ -133,14 +133,7 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	var actions = this.nodeConstructor.actions;
 	if( actions && actions.length )
 	{
-		this.elOptions = this.document.createElement('div');
-		this.elCtrl.appendChild( this.elOptions);
-		this.elOptions.textContent = 'O';
-		this.elOptions.classList.add('ctrl_button');
-		this.elOptions.classList.add('ctrl_options');
-		this.elOptions.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'option',false);}
-		this.elOptions.monitor = this;
-
+		var has_options = false;
 		for( var i = 0; i < actions.length; i++)
 		{
 			if( actions[i].mode != 'option') continue;
@@ -154,6 +147,19 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 			}
 			else
 				this.options[actions[i].name] = actions[i].default;
+
+			has_options = true;
+		}
+
+		if( has_options )
+		{
+			this.elOptions = this.document.createElement('div');
+			this.elCtrl.appendChild( this.elOptions);
+			this.elOptions.textContent = 'O';
+			this.elOptions.classList.add('ctrl_button');
+			this.elOptions.classList.add('ctrl_options');
+			this.elOptions.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'option',false);}
+			this.elOptions.monitor = this;
 		}
 	}
 
