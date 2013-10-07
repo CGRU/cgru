@@ -312,6 +312,7 @@ function JobBlock( i_elParent, i_block)
 	this.elNeedHDD = cm_ElCreateFloatText( this.element, 'right', 'Required HDD Space');
 	this.elNeedPower = cm_ElCreateFloatText( this.element, 'right', 'Needed Power');
 	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Needed Properties');
+	this.elRunTime = cm_ElCreateFloatText( this.element, 'right');
 }
 
 JobBlock.prototype.onContextMenu = function( evt)
@@ -451,8 +452,6 @@ JobBlock.prototype.constructFull = function()
 	this.elTasksErr.classList.add('ERR');
 	this.elTasksErr.style.display = 'none';
 
-	this.elRunTime = cm_ElCreateFloatText( this.elFull, 'right');
-
 	this.elErrHosts = cm_ElCreateFloatText( this.elFull, 'right');
 }
 
@@ -586,6 +585,19 @@ JobBlock.prototype.update = function( i_displayFull)
 		if( this.params.need_properties)
 			this.elNeedProperties.textContent = this.params.need_properties;
 		else this.elNeedProperties.textContent = '';
+
+		if( this.params.p_tasks_run_time && this.params.p_tasks_done )
+		{
+			var sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
+			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / this.params.p_tasks_done));
+			this.elRunTime.textContent = sum +'/'+avg;
+			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
+		}
+		else
+		{
+			this.elRunTime.textContent = '';
+			this.elRunTime.title = '';
+		}
 	}
 
 	if( this.displayFull )
@@ -638,19 +650,6 @@ JobBlock.prototype.update = function( i_displayFull)
 			this.elTasksWrn.textContent = 'wrn:'+tasks_wrn;
 		}
 		else this.elTasksWrn.textContent = '';
-
-		if( this.params.p_tasks_run_time && tasks_done )
-		{
-			var sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
-			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / tasks_done));
-			this.elRunTime.textContent = sum +'/'+avg;
-			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
-		}
-		else
-		{
-			this.elRunTime.textContent = '';
-			this.elRunTime.title = '';
-		}
 
 		var he_txt = '', he_tit = '';
 		this.elErrHosts.classList.remove('ERR');
