@@ -56,24 +56,24 @@ function p_OnClick()
 
 function p_NewOnClick()
 {
-	new cgru_Dialog( window, window, 'p_NewFolder', null, 'str', localStorage.user_name, 'playlist',
-		'New Playlist Folder', 'Enter Folder Name');
+	new cgru_Dialog({"handle":'p_NewFolder',"value":g_auth_user.id,
+		"name":'playlist',"title":'New Playlist Folder',"info":'Enter Folder Name'});
 }
 function p_AddOnClick()
 {
 	var name = g_elCurFolder.m_path.split('/');
 	name = name[name.length-1];
-	new cgru_Dialog( window, window, 'p_AddLink', null, 'str', name, 'playlist',
-		'New Playlist Link', 'Enter Link Name');
+	new cgru_Dialog({"handle":'p_AddLink',"value":name,
+		"name":'playlist',"title":'New Playlist Link',"info":'Enter Link Name'});
 }
 function p_RenameOnClick()
 {
 	if( p_elCurItem == null ) return;
-	new cgru_Dialog( window, window, 'p_Rename', null, 'str', p_elCurItem.m_label, 'playlist',
-		'Rename Playlist Item', 'Enter New Name');
+	new cgru_Dialog({"handle":'p_Rename',"value":p_elCurItem.m_label,
+		"name":'playlist',"title":'Rename Playlist Item',"info":'Enter New Name'});
 }
 
-function p_NewFolder( i_param, i_value)
+function p_NewFolder( i_value)
 {
 	var obj = {};
 	obj.label = i_value;
@@ -83,7 +83,7 @@ function p_NewFolder( i_param, i_value)
 	obj.playlist = [];
 	p_Action( obj, 'add');
 }
-function p_AddLink( i_param, i_value)
+function p_AddLink( i_value)
 {
 	var obj = {};
 	obj.label = i_value;
@@ -108,7 +108,7 @@ function p_AddLink( i_param, i_value)
 	
 	p_Action( obj, 'add');
 }
-function p_Rename( i_param, i_value)
+function p_Rename( i_value)
 {
 	var obj = {};
 	obj.label = i_value;

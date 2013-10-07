@@ -371,12 +371,13 @@ RenderNode.prototype.onDoubleClick = function()
 	nw_GetNodes('renders', [this.params.id], 'full');
 }
 
-RenderNode.prototype.menuHandleServiceDialog = function( i_name)
+RenderNode.prototype.mh_Service = function( i_param)
 {
-//	new cgru_Dialog( this.monitor.window, this, 'menuHandleServiceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
-	new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleServiceApply',"param":i_name,"type":'str',"name":this.type+'_parameter',"title":(i_name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
+//	new cgru_Dialog( this.monitor.window, this, 'serviceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
+	new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'serviceApply',"param":i_param.name,
+		"name":this.type+'_parameter',"title":(i_param.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
 }
-RenderNode.prototype.menuHandleServiceApply = function( i_value, i_name)
+RenderNode.prototype.serviceApply = function( i_value, i_name)
 {
 g_Info('menuHandleService = ' + i_name + ',' + i_value);
 	var operation = {};
@@ -462,37 +463,37 @@ RenderTask.prototype.destroy = function()
 
 RenderNode.actions = [];
 
-RenderNode.actions.push(['context', 'log',       null, 'menuHandleGet',   'Show Log']);
-RenderNode.actions.push(['context', 'tasks_log', null, 'menuHandleGet',   'Tasks Log']);
-RenderNode.actions.push(['context', 'full',      null, 'menuHandleGet',   'Full Info']);
-RenderNode.actions.push(['context',  null]);
-RenderNode.actions.push(['context', 'nimby',     true, 'menuHandleParam', 'Set nimby']);
-RenderNode.actions.push(['context', 'NIMBY',     true, 'menuHandleParam', 'Set NIMBY']);
-RenderNode.actions.push(['context', 'nimbyOff', false, 'menuHandleParam', 'Set Free', null, 'nimby']);
-RenderNode.actions.push(['context',  null]);
-RenderNode.actions.push(['context', 'eject_tasks',         null, 'menuHandleOperation', 'Eject Tasks']);
-RenderNode.actions.push(['context', 'eject_tasks_keep_my', null, 'menuHandleOperation', 'Eject Not My']);
+RenderNode.actions.push({"mode":'context', "name":'log',       "handle":'mh_Get', "label":'Show Log'});
+RenderNode.actions.push({"mode":'context', "name":'tasks_log', "handle":'mh_Get', "label":'Tasks Log'});
+RenderNode.actions.push({"mode":'context', "name":'full',      "handle":'mh_Get', "label":'Full Info'});
+RenderNode.actions.push({"mode":'context'});
+RenderNode.actions.push({"mode":'context', "name":'nimby', "value":true,  "handle":'mh_Param', "label":'Set nimby'});
+RenderNode.actions.push({"mode":'context', "name":'NIMBY', "value":true,  "handle":'mh_Param', "label":'Set NIMBY'});
+RenderNode.actions.push({"mode":'context', "name":'nimby', "value":false, "handle":'mh_Param', "label":'Set Free'});
+RenderNode.actions.push({"mode":'context'});
+RenderNode.actions.push({"mode":'context', "name":'eject_tasks',         "handle":'mh_Oper', "label":'Eject Tasks'});
+RenderNode.actions.push({"mode":'context', "name":'eject_tasks_keep_my', "handle":'mh_Oper', "label":'Eject Not My'});
 
-RenderNode.actions.push(['set', 'priority',     'num', 'menuHandleDialog', 'Priority']);
-RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleDialog', 'Capacity']);
-RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleDialog', 'Maximum Tasks']);
-RenderNode.actions.push(['set', 'restore_defaults','num', 'menuHandleOperation', 'Restore Defaults']);
-RenderNode.actions.push(['set',  null]);
-RenderNode.actions.push(['set', 'enable',  null, 'menuHandleServiceDialog', 'Enable Service']);
-RenderNode.actions.push(['set', 'disable', null, 'menuHandleServiceDialog', 'Disable Service']);
-RenderNode.actions.push(['set',  null]);
-RenderNode.actions.push(['set', 'hidden',       'bl1', 'menuHandleDialog', 'Hide/Unhide']);
-RenderNode.actions.push(['set',  null]);
-RenderNode.actions.push(['set', 'user_name',    'str', 'menuHandleDialog', 'User Name']);
-RenderNode.actions.push(['set',  null]);
-RenderNode.actions.push(['set', 'annotation',   'str', 'menuHandleDialog', 'Annotation']);
+RenderNode.actions.push({"mode":'set', "name":'priority',  "type":'num', "handle":'mh_Dialog', "label":'Priority'});
+RenderNode.actions.push({"mode":'set', "name":'capacity',  "type":'num', "handle":'mh_Dialog', "label":'Capacity'});
+RenderNode.actions.push({"mode":'set', "name":'max_tasks', "type":'num', "handle":'mh_Dialog', "label":'Maximum Tasks'});
+RenderNode.actions.push({"mode":'set', "name":'restore_defaults', "handle":'mh_Oper', "label":'Restore Defaults'});
+RenderNode.actions.push({"mode":'set'});
+RenderNode.actions.push({"mode":'set', "name":'enable',  "handle":'mh_Service', "label":'Enable Service'});
+RenderNode.actions.push({"mode":'set', "name":'disable', "handle":'mh_Service', "label":'Disable Service'});
+RenderNode.actions.push({"mode":'set'});
+RenderNode.actions.push({"mode":'set', "name":'hidden',     "type":'bl1', "handle":'mh_Dialog', "label":'Hide/Unhide'});
+RenderNode.actions.push({"mode":'set'});
+RenderNode.actions.push({"mode":'set', "name":'user_name',  "type":'str', "handle":'mh_Dialog', "label":'User Name'});
+RenderNode.actions.push({"mode":'set'});
+RenderNode.actions.push({"mode":'set', "name":'annotation', "type":'str', "handle":'mh_Dialog', "label":'Annotation'});
 
-RenderNode.actions.push(['pow', 'wol_sleep', null, 'menuHandleOperation', 'WOL Sleep']);
-RenderNode.actions.push(['pow', 'wol_wake' , null, 'menuHandleOperation', 'WOL Wake']);
-RenderNode.actions.push(['pow', 'exit',      null, 'menuHandleOperation', 'Exit Client']);
-RenderNode.actions.push(['pow', 'reboot',    null, 'menuHandleOperation', 'Reboot Machine']);
-RenderNode.actions.push(['pow', 'shutdown',  null, 'menuHandleOperation', 'Shutdown Machine']);
-RenderNode.actions.push(['pow', 'delete',    null, 'menuHandleOperation', 'Delete From DB']);
+RenderNode.actions.push({"mode":'pow', "name":'wol_sleep', "handle":'mh_Oper', "label":'WOL Sleep'});
+RenderNode.actions.push({"mode":'pow', "name":'wol_wake' , "handle":'mh_Oper', "label":'WOL Wake'});
+RenderNode.actions.push({"mode":'pow', "name":'exit',      "handle":'mh_Oper', "label":'Exit Client'});
+RenderNode.actions.push({"mode":'pow', "name":'reboot',    "handle":'mh_Oper', "label":'Reboot Machine'});
+RenderNode.actions.push({"mode":'pow', "name":'shutdown',  "handle":'mh_Oper', "label":'Shutdown Machine'});
+RenderNode.actions.push({"mode":'pow', "name":'delete',    "handle":'mh_Oper', "label":'Delete From DB'});
 
 RenderNode.sort = ['priority','user_name','name'];
 RenderNode.filter = ['user_name','name','host_name'];

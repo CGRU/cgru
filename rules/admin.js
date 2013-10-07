@@ -31,7 +31,9 @@ function ad_Login()
 	if( SERVER.AUTH_RULES )
 	{
 		localStorage.auth_digest = '';
-		new cgru_Dialog( window, window, 'ad_LoginGetPassword', 'user_id', 'str', '', 'login', 'Login', 'Enter User ID');
+		new cgru_Dialog({"handle":'ad_LoginGetPassword',"param":'user_id',
+			"name":'login',"title":'Login',"info":'Enter User ID'});
+//		new cgru_Dialog( window, window, 'ad_LoginGetPassword', 'user_id', 'str', '', 'login', 'Login', 'Enter User ID');
 	}
 	else
 		ad_loginProcess({"realm":cgru_Config.realm});
@@ -53,16 +55,18 @@ function ad_loginProcess( i_obj)
 	g_GO('/');
 	window.location.reload();
 }
-function ad_LoginGetPassword( i_notused, i_user_id)
+function ad_LoginGetPassword( i_user_id)
 {
-	new cgru_Dialog( window, window, 'ad_LoginConstruct', i_user_id, 'str', '', 'login', 'Login', 'Enter Password');
+	new cgru_Dialog({"handle":'ad_LoginConstruct',"param":i_user_id,
+		"name":'login',"title":'Login',"info":'Enter Password'});
+//	new cgru_Dialog( window, window, 'ad_LoginConstruct', i_user_id, 'str', '', 'login', 'Login', 'Enter Password');
 }
-function ad_LoginConstruct( i_user_id, i_password)
+function ad_LoginConstruct( i_password, i_user_id)
 {
-	var digest = ad_ConstructDigest( i_user_id, i_password);
+	var digest = ad_ConstructDigest( i_password, i_user_id);
 	ad_loginProcess({"digest":digest});
 }
-function ad_ConstructDigest( i_user_id, i_password)
+function ad_ConstructDigest( i_password, i_user_id)
 {
 	var obj = {};
 	obj.nc = 1;
@@ -241,13 +245,17 @@ function ad_PermissionsLoad()
 
 function ad_PermissionsGrpAddOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'groups', 'str', 'admins', 'permissions', 'Add Group', 'Enter Group ID');
+//	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'groups', 'str', 'admins', 'permissions', 'Add Group', 'Enter Group ID');
+	new cgru_Dialog({"handle":'ad_PermissionsAdd',"param":'groups',"value":'admins',
+		"name":'permissions',"title":'Add Group',"info":'Enter Group ID'});
 }
 function ad_PermissionsUsrAddOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'users', 'str', '', 'permssions', 'Add User', 'Enter User ID');
+//	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'users', 'str', '', 'permssions', 'Add User', 'Enter User ID');
+	new cgru_Dialog({"handle":'ad_PermissionsAdd',"param":'users',
+		"name":'permssions',"title":'Add User',"info":'Enter User ID'});
 }
-function ad_PermissionsAdd( i_type, i_id)
+function ad_PermissionsAdd( i_id, i_type)
 {
 	i_id = c_Strip( i_id);
 	if( i_id.length < 1 )
@@ -534,7 +542,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	else elPasswd.textContent = 'Pass';
 	elPasswd.m_user_id = i_user.id;
 	elPasswd.title = 'Double click to edit password';
-	if( i_row ) elPasswd.ondblclick = function(e){ad_SetPasswordDialog( null, e.currentTarget.m_user_id);};
+	if( i_row ) elPasswd.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
 
 	var elChannels = document.createElement('div');
 	el.appendChild( elChannels);
@@ -579,8 +587,13 @@ function ad_WndSortUsers( i_prop)
 	ad_WndDrawUsers();
 }
 
-function ad_CreateGrpOnClick() { new cgru_Dialog( window, window, 'ad_CreateGroup', null, 'str', '', 'users', 'Create Group', 'Enter Group Name');}
-function ad_CreateGroup( i_not_used, i_group)
+function ad_CreateGrpOnClick()
+{
+//	new cgru_Dialog( window, window, 'ad_CreateGroup', null, 'str', '', 'users', 'Create Group', 'Enter Group Name');
+	new cgru_Dialog({"handle":'ad_CreateGroup',
+		"name":'users',"title":'Create Group',"info":'Enter Group Name'});
+}
+function ad_CreateGroup( i_group)
 {
 	if( g_groups[i_group] != null )
 	{
@@ -591,8 +604,13 @@ function ad_CreateGroup( i_not_used, i_group)
 	ad_WriteGroups();
 }
 
-function ad_DeleteGrpOnClick() { new cgru_Dialog( window, window, 'ad_DeleteGroup', null, 'str', '', 'users', 'Delete Group', 'Enter Group Name');}
-function ad_DeleteGroup( i_not_used, i_group)
+function ad_DeleteGrpOnClick()
+{
+//	new cgru_Dialog( window, window, 'ad_DeleteGroup', null, 'str', '', 'users', 'Delete Group', 'Enter Group Name');
+	new cgru_Dialog({"handle":'ad_DeleteGroup',
+		"name":'users',"title":'Delete Group',"info":'Enter Group Name'});
+}
+function ad_DeleteGroup( i_group)
 {
 	if( g_groups[i_group] == null )
 	{
@@ -644,15 +662,39 @@ function ad_WriteGroups()
 	if( res.error ) { c_Error( res.error ); return; }
 	ad_WndRefresh();
 }
-function ad_ChangeTitleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');}
-function ad_ChangeTitle( i_user_id, i_title) { ad_SaveUserProp( i_user_id, 'title', i_title); ad_WndRefresh();}
-
-function ad_ChangeRoleOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role'); }
-function ad_ChangeRole( i_user_id, i_role) { ad_SaveUserProp( i_user_id, 'role', i_role); ad_WndRefresh();}
-
-function ad_ChangeEmailOnCkick( i_user_id) { new cgru_Dialog( window, window, 'ad_ChangeEmail', i_user_id, 'str', g_users[i_user_id].email, 'users', 'Change Email', 'Enter New Address');}
-function ad_ChangeEmail( i_user_id, i_email) { ad_SaveUserProp( i_user_id, 'email', i_email); ad_WndRefresh();}
-
+function ad_ChangeTitleOnCkick( i_user_id)
+{
+//	new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');
+	new cgru_Dialog({"handle":'ad_ChangeTitle',"param":i_user_id,"value":g_users[i_user_id].title,
+		"name":'users',"title":'Change Title',"info":'Enter New Title'});
+}
+function ad_ChangeTitle( i_title, i_user_id)
+{
+	ad_SaveUserProp( i_user_id, 'title', i_title);
+	ad_WndRefresh();
+}
+function ad_ChangeRoleOnCkick( i_user_id)
+{
+//	new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role');
+	new cgru_Dialog({"handle":'ad_ChangeRole',"param":i_user_id,"value":g_users[i_user_id].role,
+		"name":'users',"title":'Change Role',"info":'Enter New Role'});
+}
+function ad_ChangeRole( i_role, i_user_id)
+{
+	ad_SaveUserProp( i_user_id, 'role', i_role);
+	ad_WndRefresh();
+}
+function ad_ChangeEmailOnCkick( i_user_id)
+{
+//	new cgru_Dialog( window, window, 'ad_ChangeEmail', i_user_id, 'str', g_users[i_user_id].email, 'users', 'Change Email', 'Enter New Address');
+	new cgru_Dialog({"handle":'ad_ChangeEmail',"param":i_user_id,"value":g_users[i_user_id].email,
+		"name":'users',"title":'Change Email',"info":'Enter New Address'});
+}
+function ad_ChangeEmail( i_email, i_user_id)
+{
+	ad_SaveUserProp( i_user_id, 'email', i_email);
+	ad_WndRefresh();
+}
 function ad_SaveUserProp( i_user_id, i_prop, i_value)
 {
 	var obj = {};
@@ -672,10 +714,11 @@ function ad_SaveUserProp( i_user_id, i_prop, i_value)
 
 function ad_CreateUserOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_CreateUser', null, 'str', '', 'users',
-		'Create New User', 'Enter User Login Name');
+//	new cgru_Dialog( window, window, 'ad_CreateUser', null, 'str', '', 'users', 'Create New User', 'Enter User Login Name');
+	new cgru_Dialog({"handle":'ad_CreateUser',
+		"name":'users',"title":'Create New User',"info":'Enter User Login Name'});
 }
-function ad_CreateUser( not_used, i_user_id)
+function ad_CreateUser( i_user_id)
 {
 	var user = {};
 	user.id = i_user_id;
@@ -700,10 +743,11 @@ function ad_CreateUser( not_used, i_user_id)
 
 function ad_DeleteUserOnClick()
 {
-	new cgru_Dialog( window, window, 'ad_DeleteUser', null, 'str', '', 'users',
-		'Delete User', 'Enter User Login Name');
+//	new cgru_Dialog( window, window, 'ad_DeleteUser', null, 'str', '', 'users', 'Delete User', 'Enter User Login Name');
+	new cgru_Dialog({"handle":'ad_DeleteUser',
+		"name":'users',"title":'Delete User',"info":'Enter User Login Name'});
 }
-function ad_DeleteUser( not_used, i_user_id)
+function ad_DeleteUser( i_user_id)
 {
 	var res = c_Parse( n_Request_old({"deleteuser":i_user_id}));
 	if( res && res.error )
@@ -715,15 +759,16 @@ function ad_DeleteUser( not_used, i_user_id)
 	ad_WndRefresh();
 }
 
-function ad_SetPasswordDialog( not_used, i_user_id)
+function ad_SetPasswordDialog( i_user_id)
 {
 	var pw = '';
 	for( var i = 0; i < 10; i ++) pw += Math.random().toString(36).substring(2);
 	pw = btoa( pw).substr( 0, 60);
-	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', pw, 'password',
-		'Set Password', 'Enter New Password');
+//	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', pw, 'password', 'Set Password', 'Enter New Password');
+	new cgru_Dialog({"handle":'ad_SetPassword',"param":i_user_id,"value":pw,
+		"name":'password',"title":'Set Password',"info":'Enter New Password'});
 }
-function ad_SetPassword( i_user_id, i_passwd)
+function ad_SetPassword( i_passwd, i_user_id)
 {
 	var email = g_users[i_user_id].email;
 	if( email && email.length )
@@ -833,10 +878,11 @@ el.textContent = JSON.stringify( g_auth_user);
 function ad_ProfileEditPropOnClick( i_evt)
 {
 	var prop = i_evt.currentTarget.m_prop;
-	new cgru_Dialog( window, window, 'ad_ProfileEditProp', prop.name, 'str', g_auth_user[prop.name],
-		'users', 'Change '+prop.label, 'Enter New Value');
+//	new cgru_Dialog( window, window, 'ad_ProfileEditProp', prop.name, 'str', g_auth_user[prop.name], 'users', 'Change '+prop.label, 'Enter New Value');
+	new cgru_Dialog({"handle":'ad_ProfileEditProp',"param":prop.name,"value":g_auth_user[prop.name],
+		"name":'users',"title":'Change '+prop.label,"info":'Enter New Value'});
 }
-function ad_ProfileEditProp( i_prop, i_value)
+function ad_ProfileEditProp( i_value, i_prop)
 {
 	g_auth_user[i_prop] = i_value;
 	ad_SaveUserProp( g_auth_user.id, i_prop, i_value)

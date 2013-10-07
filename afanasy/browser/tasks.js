@@ -273,42 +273,42 @@ TaskItem.prototype.onContextMenu = function( i_menu)
 			if( i <= this.params.str - maxShownOutputs) break;
 			var num = i;
 			if( i == this.params.str ) num = 0;
-			i_menu.addItem('output', this, 'menuHandleOutput', 'Output '+i, true, num);
+			i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output '+i, "param":num});
 		}
 		if( this.params.str > maxShownOutputs )
-			i_menu.addItem('output', this, 'menuHandleOutput', 'Output...', true, -1);
+			i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output...', "param":-1});
 	}
 	else
-		i_menu.addItem('output', this, 'menuHandleOutput', 'Output');
+		i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output'});
 	i_menu.addItem();
-	i_menu.addItem('log',    this, 'menuHandleGet', 'Log');
-	i_menu.addItem('info',   this, 'menuHandleGet', 'Info');
+	i_menu.addItem({"name":'log',     "receiver":this, "handle":'mh_Get', "label":'Log'});
+	i_menu.addItem({"name":'info',    "receiver":this, "handle":'mh_Get', "label":'Info'});
 	i_menu.addItem();
-	i_menu.addItem('restart', this, 'menuHandleOperation', 'Restart');
-	i_menu.addItem('skip',    this, 'menuHandleOperation', 'Skip');
+	i_menu.addItem({"name":'restart', "receiver":this, "handle":'mh_Oper', "label":'Restart'});
+	i_menu.addItem({"name":'skip',    "receiver":this, "handle":'mh_Oper', "label":'Skip'});
 }
 
-TaskItem.prototype.menuHandleOutput = function( i_number)
+TaskItem.prototype.mh_Output = function( i_number)
 {
 	if( i_number == -1 )
 	{
 		new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleGetOutput',"type":'num',"name":this.job.name,"title":'Get Task Process Output',"info":'Enter Start Number'});
-//		new cgru_Dialog( this.monitor.window, this, 'menuHandleGet', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
+//		new cgru_Dialog( this.monitor.window, this, 'mh_Get', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
 		return;
 	}
-//	this.menuHandleGet('output', i_number);
+//	this.mh_Get('output', i_number);
 	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
 }
 
-TaskItem.prototype.menuHandleGetOutput = function( i_number ){ this.menuHandleGet('output', i_number)}
-TaskItem.prototype.menuHandleGet = function( i_name, i_number)
+TaskItem.prototype.menuHandleGetOutput = function( i_number ){ this.mh_Get('output', i_number)}
+TaskItem.prototype.mh_Get = function( i_name, i_number)
 {
 	var bids = []; var tids = [];
 	this.getBlockTasksIds( bids, tids);
 	nw_GetNodes('jobs', [this.job.id], i_name, bids, tids, i_number)
 }
 
-TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
+TaskItem.prototype.mh_Oper = function( i_name, i_value)
 {
 	var operation = {};
 	operation.type = i_name;
@@ -320,7 +320,7 @@ TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 
 TaskItem.prototype.onDoubleClick = function()
 {
-	this.menuHandleGet('info');
+	this.mh_Get('info');
 }
 
 TaskItem.prototype.showTumbs = function()
@@ -363,12 +363,12 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 /*
 TaskItem.actions = [];
 
-TaskItem.actions.push(['context', 'output',  null, 'menuHandleGet', 'Output']);
-TaskItem.actions.push(['context', 'log',     null, 'menuHandleGet', 'Log']);
-TaskItem.actions.push(['context', 'info',    null, 'menuHandleGet', 'Info']);
+TaskItem.actions.push(['context', 'output',  null, 'mh_Get', 'Output']);
+TaskItem.actions.push(['context', 'log',     null, 'mh_Get', 'Log']);
+TaskItem.actions.push(['context', 'info',    null, 'mh_Get', 'Info']);
 
-TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Restart']);
-TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
+TaskItem.actions.push(['context', 'restart', null, 'mh_Oper', 'Restart']);
+TaskItem.actions.push(['context', 'skip',    null, 'mh_Oper', 'Skip']);
 */
 
 TaskItem.sort = ['order','name','hst','str','err'];

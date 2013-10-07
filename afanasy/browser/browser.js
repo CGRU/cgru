@@ -207,9 +207,9 @@ function g_ProcessMsg( i_obj)
 		g_ShowMessage( i_obj.message);
 		return;
 	}
-	if( i_obj.i_object )
+	if( i_obj.object )
 	{
-		g_ShowObject( i_obj.i_object);
+		g_ShowObject( i_obj.object);
 		return;
 	}
 	if( i_obj.task_exec )

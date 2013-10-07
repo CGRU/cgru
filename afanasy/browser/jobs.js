@@ -175,8 +175,8 @@ JobNode.prototype.refresh = function()
 }
 
 JobNode.prototype.onDoubleClick = function() { g_OpenTasks( this.params.name, this.params.id );}
-JobNode.prototype.menuHandleShowObj = function() { g_ShowObject( this.params );}
-JobNode.prototype.menuHandleMove = function( i_name)
+JobNode.prototype.mh_Show = function() { g_ShowObject( this.params );}
+JobNode.prototype.mh_Move = function( i_name)
 {
 	if( g_uid < 1 )
 	{
@@ -204,21 +204,35 @@ JobNode.prototype.showThumb = function( i_path)
 		if( this.elThumbs.m_divs[this.elThumbs.m_divs.length-1].m_path == i_path )
 			return;
 
+	var label = cm_PathBase( i_path).replace(/\.jpg$/,'');
+
 	var thumb = document.createElement('div')
 	this.elThumbs.appendChild( thumb);
 	this.elThumbs.m_divs.push( thumb);
 	thumb.m_path = i_path;
+	thumb.title = label;
 
 	var name = document.createElement('div');
-	name.textContent = cm_PathBase( i_path).replace(/\.jpg$/,'');
+	name.textContent = label;
 	thumb.appendChild( name);
 
-	var img = document.createElement('img');
-	thumb.appendChild( img);
-	img.src = '@TMP@' + i_path;
+	if( i_path.lastIndexOf('.jpg') == (i_path.length - 4))
+	{
+		var img = document.createElement('img');
+		thumb.appendChild( img);
+		img.src = '@TMP@' + i_path;
+		img.m_height = this.monitor.options.jobs_thumbs_height;
+		img.onload = function( e) {
+			var img = e.currentTarget;
+			if( img.height == img.m_height ) return;
+			img.width = img.m_height * img.width / img.height;
+			img.height = img.m_height;
+		}
+	}
+	else
+		name.style.position = 'relative';
 
-	var max = 10
-	if( this.elThumbs.m_divs.length > max )
+	if( this.elThumbs.m_divs.length > this.monitor.options.jobs_thumbs_num )
 	{
 		this.elThumbs.m_divs.splice( 0, 1);
 		this.elThumbs.removeChild( this.elThumbs.m_divs[0]);
@@ -327,7 +341,13 @@ JobBlock.prototype.onContextMenu = function( evt)
 
 	var actions = JobBlock.actions;
 	for( var i = 0; i < actions.length; i++)
-		menu.addItem({"name":actions[i][1],"receiver":this,"handle":actions[i][3],"label":actions[i][4]});
+	{
+		var item = {};
+		for( var key in actions[i] ) item[key] = actions[i][key];
+		item.receiver = this;
+		item.param = actions[i];
+		menu.addItem( item);
+	}
 	menu.show();
 
 	return false;
@@ -337,15 +357,11 @@ JobBlock.prototype.onContextMenuDestroy = function()
 	this.element.classList.remove('selected');
 	this.job.monitor.menu = null;
 }
-JobBlock.prototype.menuHandleDialog = function( i_parameter)
+JobBlock.prototype.mh_Dialog = function( i_parameter)
 {
-	var ptype = null;
-	var actions = JobBlock.actions;
-	for( var i = 0; i < actions.length; i++)
-		if( i_parameter == actions[i][1])
-			ptype = actions[i][2];
-//	new cgru_Dialog( this.job.monitor.window, this, 'setParameter', i_parameter, ptype, this.params[i_parameter], 'jobblock_parameter');
-	new cgru_Dialog({"wnd":this.job.monitor.window,"receiver":this,"handle":'setParameter',"param":i_parameter,"type":ptype,"value":this.params[i_parameter],"name":'jobblock_parameter'});
+	new cgru_Dialog({"wnd":this.job.monitor.window,"receiver":this,"handle":'setParameter',
+		"param":i_parameter.name,"type":i_parameter.type,"value":this.params[i_parameter.name],
+		"name":'jobblock_parameter'});
 }
 JobBlock.prototype.setParameter = function( i_value, i_parameter)
 {
@@ -691,64 +707,63 @@ JobBlock.prototype.update = function( i_displayFull)
 
 JobNode.actions = [];
 
-JobNode.has_options = true;
-JobNode.actions.push(['option','jobs_thumbs_num',    'num', 'setOption', 'Thumbnails Quantity', null, 10  ]);
-JobNode.actions.push(['option','jobs_thumbs_height', 'num', 'setOption', 'Thumbnails Height',   null, 100 ]);
+JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_num',    "type":'num', "handle":'mh_Opt', "label":'Thumbnails Quantity', "default":10  });
+JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_height', "type":'num', "handle":'mh_Opt', "label":'Thumbnails Height',   "default":100 });
 
-JobNode.actions.push(['context', 'log',               null, 'menuHandleGet',       'Show Log']);
-JobNode.actions.push(['context', 'error_hosts',       null, 'menuHandleGet',       'Show Error Hosts']);
-JobNode.actions.push(['context', 'show_obj',          null, 'menuHandleShowObj',   'Show Object']);
-JobNode.actions.push(['context',  null,               null,  null,                  null]);
-JobNode.actions.push(['context', 'reset_error_hosts', null, 'menuHandleOperation', 'Reset Error Hosts']);
-JobNode.actions.push(['context', 'restart_errors',    null, 'menuHandleOperation', 'Restart Errors']);
-JobNode.actions.push(['context', 'restart_running',   null, 'menuHandleOperation', 'Restart Running']);
-JobNode.actions.push(['context',  null,               null,  null,                  null]);
-JobNode.actions.push(['context', 'move_jobs_up',      null, 'menuHandleMove',      'Move Up',     'user']);
-JobNode.actions.push(['context', 'move_jobs_down',    null, 'menuHandleMove',      'Move Down',   'user']);
-JobNode.actions.push(['context', 'move_jobs_top',     null, 'menuHandleMove',      'Move Top',    'user']);
-JobNode.actions.push(['context', 'move_jobs_bottom',  null, 'menuHandleMove',      'Move Bottom', 'user']);
-JobNode.actions.push(['context',  null,               null,  null,                  null]);
-JobNode.actions.push(['context', 'start',             null, 'menuHandleOperation', 'Start']);
-JobNode.actions.push(['context', 'pause',             null, 'menuHandleOperation', 'Pause']);
-JobNode.actions.push(['context', 'stop',              null, 'menuHandleOperation', 'Stop']);
-JobNode.actions.push(['context', 'restart',           null, 'menuHandleOperation', 'Restart']);
-JobNode.actions.push(['context', 'restart_pause',     null, 'menuHandleOperation', 'Restart&Pause']);
-JobNode.actions.push(['context', 'delete',            null, 'menuHandleOperation', 'Delete']);
+JobNode.actions.push({"mode":'context', "name":'log',               "handle":'mh_Get',  "label":'Show Log'});
+JobNode.actions.push({"mode":'context', "name":'error_hosts',       "handle":'mh_Get',  "label":'Show Error Hosts'});
+JobNode.actions.push({"mode":'context', "name":'show_obj',          "handle":'mh_Show', "label":'Show Object'});
+JobNode.actions.push({"mode":'context'});
+JobNode.actions.push({"mode":'context', "name":'reset_error_hosts', "handle":'mh_Oper', "label":'Reset Error Hosts'});
+JobNode.actions.push({"mode":'context', "name":'restart_errors',    "handle":'mh_Oper', "label":'Restart Errors'});
+JobNode.actions.push({"mode":'context', "name":'restart_running',   "handle":'mh_Oper', "label":'Restart Running'});
+JobNode.actions.push({"mode":'context'});
+JobNode.actions.push({"mode":'context', "name":'move_jobs_up',      "handle":'mh_Move', "label":'Move Up',     "permissions":'user'});
+JobNode.actions.push({"mode":'context', "name":'move_jobs_down',    "handle":'mh_Move', "label":'Move Down',   "permissions":'user'});
+JobNode.actions.push({"mode":'context', "name":'move_jobs_top',     "handle":'mh_Move', "label":'Move Top',    "permissions":'user'});
+JobNode.actions.push({"mode":'context', "name":'move_jobs_bottom',  "handle":'mh_Move', "label":'Move Bottom', "permissions":'user'});
+JobNode.actions.push({"mode":'context'});
+JobNode.actions.push({"mode":'context', "name":'start',             "handle":'mh_Oper', "label":'Start'});
+JobNode.actions.push({"mode":'context', "name":'pause',             "handle":'mh_Oper', "label":'Pause'});
+JobNode.actions.push({"mode":'context', "name":'stop',              "handle":'mh_Oper', "label":'Stop'});
+JobNode.actions.push({"mode":'context', "name":'restart',           "handle":'mh_Oper', "label":'Restart'});
+JobNode.actions.push({"mode":'context', "name":'restart_pause',     "handle":'mh_Oper', "label":'Restart&Pause'});
+JobNode.actions.push({"mode":'context', "name":'delete',            "handle":'mh_Oper', "label":'Delete'});
 
-JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleDialog', 'Annotation']);
-JobNode.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDialog', 'Depend Mask']);
-JobNode.actions.push(['set', 'depend_mask_global',         'reg', 'menuHandleDialog', 'Global Depend Mask']);
-JobNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleDialog', 'Max Runnig Tasks']);
-JobNode.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleDialog', 'Max Run Tasks Per Host']);
-JobNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleDialog', 'Hosts Mask']);
-JobNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
-JobNode.actions.push(['set', 'time_wait',                  'tim', 'menuHandleDialog', 'Time Wait']);
-JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleDialog', 'Priority']);
-JobNode.actions.push(['set', 'need_os',                    'reg', 'menuHandleDialog', 'OS Needed']);
-JobNode.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Need Properties']);
-JobNode.actions.push(['set', 'time_life',                  'hrs', 'menuHandleDialog', 'Life Time']);
-JobNode.actions.push(['set', 'user_name',                  'str', 'menuHandleDialog', 'Owner', 'visor']);
-JobNode.actions.push(['set',  null,                         null,  null,               null]);
-JobNode.actions.push(['set', 'hidden',                     'bl1', 'menuHandleDialog', 'Hidden']);
+JobNode.actions.push({"mode":'set', "name":'annotation',                 "type":'str', "handle":'mh_Dialog', "label":'Annotation'});
+JobNode.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
+JobNode.actions.push({"mode":'set', "name":'depend_mask_global',         "type":'reg', "handle":'mh_Dialog', "label":'Global Depend Mask'});
+JobNode.actions.push({"mode":'set', "name":'max_running_tasks',          "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
+JobNode.actions.push({"mode":'set', "name":'max_running_tasks_per_host', "type":'num', "handle":'mh_Dialog', "label":'Max Run Tasks Per Host'});
+JobNode.actions.push({"mode":'set', "name":'hosts_mask',                 "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
+JobNode.actions.push({"mode":'set', "name":'hosts_mask_exclude',         "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
+JobNode.actions.push({"mode":'set', "name":'time_wait',                  "type":'tim', "handle":'mh_Dialog', "label":'Time Wait'});
+JobNode.actions.push({"mode":'set', "name":'priority',                   "type":'num', "handle":'mh_Dialog', "label":'Priority'});
+JobNode.actions.push({"mode":'set', "name":'need_os',                    "type":'reg', "handle":'mh_Dialog', "label":'OS Needed'});
+JobNode.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Need Properties'});
+JobNode.actions.push({"mode":'set', "name":'time_life',                  "type":'hrs', "handle":'mh_Dialog', "label":'Life Time'});
+JobNode.actions.push({"mode":'set', "name":'user_name',                  "type":'str', "handle":'mh_Dialog', "label":'Owner',"permissions":'visor'});
+JobNode.actions.push({"mode":'set'});
+JobNode.actions.push({"mode":'set', "name":'hidden',                     "type":'bl1', "handle":'mh_Dialog', "label":'Hidden'});
 
 JobBlock.actions = [];
-JobBlock.actions.push(['set', 'capacity',                   'num', 'menuHandleDialog', 'Capacity']);
-JobBlock.actions.push(['set',  null,                         null,  null,               null]);
-JobBlock.actions.push(['set', 'errors_retries',             'num', 'menuHandleDialog', 'Errors Retries']);
-JobBlock.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleDialog', 'Errors Avoid Host']);
-JobBlock.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleDialog', 'Errors Task Same Host']);
-JobBlock.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleDialog', 'Errors Forgive Time']);
-JobBlock.actions.push(['set', 'tasks_max_run_time',         'hrs', 'menuHandleDialog', 'Tasks Max Run Time']);
-JobBlock.actions.push(['set',  null,                         null,  null,               null]);
-JobBlock.actions.push(['set', 'non_sequential',             'bl1', 'menuHandleDialog', 'Non-Sequential']);
-JobBlock.actions.push(['set',  null,                         null,  null,               null]);
-JobBlock.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleDialog', 'Max Runnig Tasks']);
-JobBlock.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleDialog', 'Max Run Tasks Per Host']);
-JobBlock.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleDialog', 'Hosts Mask']);
-JobBlock.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
-JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDialog', 'Depend Mask']);
-JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleDialog', 'Tasks Depend Mask']);
-JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Properties Needed']);
+JobBlock.actions.push({"mode":'set', "name":'capacity',                   "type":'num', "handle":'mh_Dialog', "label":'Capacity'});
+JobBlock.actions.push({"mode":'set'});
+JobBlock.actions.push({"mode":'set', "name":'errors_retries',             "type":'num', "handle":'mh_Dialog', "label":'Errors Retries'});
+JobBlock.actions.push({"mode":'set', "name":'errors_avoid_host',          "type":'num', "handle":'mh_Dialog', "label":'Errors Avoid Host'});
+JobBlock.actions.push({"mode":'set', "name":'errors_task_same_host',      "type":'num', "handle":'mh_Dialog', "label":'Errors Task Same Host'});
+JobBlock.actions.push({"mode":'set', "name":'errors_forgive_time',        "type":'hrs', "handle":'mh_Dialog', "label":'Errors Forgive Time'});
+JobBlock.actions.push({"mode":'set', "name":'tasks_max_run_time',         "type":'hrs', "handle":'mh_Dialog', "label":'Tasks Max Run Time'});
+JobBlock.actions.push({"mode":'set'});
+JobBlock.actions.push({"mode":'set', "name":'non_sequential',             "type":'bl1', "handle":'mh_Dialog', "label":'Non-Sequential'});
+JobBlock.actions.push({"mode":'set'});
+JobBlock.actions.push({"mode":'set', "name":'max_running_tasks',          "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
+JobBlock.actions.push({"mode":'set', "name":'max_running_tasks_per_host', "type":'num', "handle":'mh_Dialog', "label":'Max Run Tasks Per Host'});
+JobBlock.actions.push({"mode":'set', "name":'hosts_mask',                 "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
+JobBlock.actions.push({"mode":'set', "name":'hosts_mask_exclude',         "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
+JobBlock.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
+JobBlock.actions.push({"mode":'set', "name":'tasks_depend_mask',          "type":'reg', "handle":'mh_Dialog', "label":'Tasks Depend Mask'});
+JobBlock.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Properties Needed'});
 
 JobNode.sortVisor = 'time_creation';
 JobNode.sort = ['order','time_creation','priority','user_name','name','host_name'];

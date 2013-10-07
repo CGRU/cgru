@@ -250,10 +250,10 @@ function nw_NewsOpen()
 function nw_MakeNewsDialog()
 {
 	if( g_auth_user == null ) return;
-	new cgru_Dialog( window, window, 'nw_MakeNewsDialogApply', null, 'str', '', 'news',
-		'Create News', 'Enter News Title');
+	new cgru_Dialog({"handle":'nw_MakeNewsDialogApply',
+		"name":'news',"title":'Create News',"info":'Enter News Title'});
 }
-function nw_MakeNewsDialogApply( i_not_used, i_title) { nw_MakeNews( i_title); }
+function nw_MakeNewsDialogApply( i_title) { nw_MakeNews( i_title); }
 function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
 {
 	if( localStorage.news_disabled == 'true') return;

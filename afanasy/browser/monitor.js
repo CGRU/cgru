@@ -129,7 +129,9 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
 	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
-	if( this.nodeConstructor.has_options )
+	this.options = {};
+	var actions = this.nodeConstructor.actions;
+	if( actions && actions.length )
 	{
 		this.elOptions = this.document.createElement('div');
 		this.elCtrl.appendChild( this.elOptions);
@@ -138,6 +140,21 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 		this.elOptions.classList.add('ctrl_options');
 		this.elOptions.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'option',false);}
 		this.elOptions.monitor = this;
+
+		for( var i = 0; i < actions.length; i++)
+		{
+			if( actions[i].mode != 'option') continue;
+
+			if( localStorage[actions[i].name] != null )
+			{
+				if( actions[i].type == 'num' )
+					this.options[actions[i].name] = parseInt( localStorage[actions[i].name]);
+				else
+					this.options[actions[i].name] = localStorage[actions[i].name];
+			}
+			else
+				this.options[actions[i].name] = actions[i].default;
+		}
 	}
 
 	this.elInfoText = this.document.createElement('div');
@@ -638,7 +655,7 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 	{
 		var actions = i_el.item.constructor.actions;
 		for( var i = 0; i < actions.length; i++)
-			if( actions[i][0] == 'context' )
+			if( actions[i].mode == 'context' )
 				this.addMenuItem( menu, actions[i]);
 	}
 	menu.show();
@@ -649,38 +666,37 @@ Monitor.prototype.onMenuDestroy = function() { this.menu = null;}
 
 Monitor.prototype.addMenuItem = function( i_menu, i_action)
 {
-	var name = i_action[1];
-	if( name == null )
+	if( i_action.name == null )
 	{
 		i_menu.addItem();
 		return;
 	}
 
-	var receiver = this;
-	if( this.cur_item ) receiver = this.cur_item;
+	var item = {};
+	for( var key in i_action ) item[key] = i_action[key];
+	item.receiver = this;
+	if( this.cur_item && this.cur_item[item.handle])
+		item.receiver = this.cur_item;
+	item.param = i_action;
 
-	var handle = i_action[3];
-	var title = i_action[4];
-	var permission = i_action[5];
-
-	if( permission )
+	if( item.permissions )
 	{
 		if( g_VISOR())
 		{
-			if( permission == 'user') return;
+			if( item.permissions == 'user') return;
 			if( g_GOD())
 			{
-				if( false == (( permission == 'visor') || ( permission == 'god')))
+				if( false == (( item.permissions == 'visor') || ( item.permissions == 'god')))
 					return;
 			}
-			else if( permission != 'visor')
+			else if( item.permissions != 'visor')
 				return;
 		}
-		else if( permission != 'user')
+		else if( item.permissions != 'user')
 			return;
 	}
 
-	if( i_action[0] == 'cmd')
+	if( i_action.mode == 'cmd')
 	{
 		var cmds = [];
 		for( var i = 0; i < this.items.length; i++)
@@ -692,12 +708,12 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
 				cmds.push( cmd);
 			}
-		i_menu.addItem({"name":name,"receiver":'cmdexec',"handle":cmds,"label":title});
+		i_menu.addItem({"name":name,"receiver":'cmdexec',"handle":cmds,"label":label});
 		return;
 	}
-	if( receiver[handle] == null ) receiver = this;
-	if( receiver[handle] )
-		i_menu.addItem({"name":name,"receiver":receiver,"handle":handle,"label":title});
+
+	if( item.receiver[item.handle] )
+		i_menu.addItem( item);
 	else
 		i_menu.addItem({"label":'invalid '+name,"enabled":false});
 }
@@ -716,49 +732,25 @@ Monitor.prototype.onMouseOverSet = function( i_evt, i_name, i_need_selection)
 //	var actions = this.cur_item.constructor.actions;
 	var actions = this.nodeConstructor.actions;
 	for( var i = 0; i < actions.length; i++)
-		if( actions[i][0] == i_name )
+		if( actions[i].mode == i_name )
 			this.addMenuItem( menu, actions[i]);
 	menu.show();
 }
-Monitor.prototype.menuHandleParam = function( i_name)
+Monitor.prototype.mh_Param = function( i_param)
 {
-//var ptype = null;
-	var actions = this.cur_item.constructor.actions;
-	
-	for( var i = 0; i < actions.length; i++)
-		if( i_name == actions[i][1])
-		{
-			var parameter = i_name;
-			if( actions[i][6] ) parameter = actions[i][6];
-			this.setParameter( actions[i][2], parameter);
-			return;
-		}
+	this.setParameter( i_param.value, i_param.name);
 }
-Monitor.prototype.menuHandleDialog = function( i_name)
+Monitor.prototype.mh_Dialog = function( i_param)
 {
-//console.log( this);
-//console.log( JSON.stringify(this));
 	var args = {};
-	args.type     = null;
-	args.param    = i_name;
+
+	args.param    = i_param.name;
+	args.type     = i_param.type;
 	args.receiver = this;
 	args.wnd      = this.window;
 	args.handle   = 'setParameter';
-	args.value    = this.cur_item.params[i_name];
+	args.value    = this.cur_item.params[i_param.name];
 	args.name     = this.name + '_parameter';
-
-	// Search actions by name to get other values
-//	var actions = this.cur_item.constructor.actions;
-	var actions = this.nodeConstructor.actions;
-	for( var i = 0; i < actions.length; i++)
-	{
-		if( i_name == actions[i][1])
-		{
-			args.type = actions[i][2];
-			// Parameter can be overriden:
-			if( actions[i][6] ) parameter = actions[i][6];
-		}
-	}
 
 	new cgru_Dialog( args);
 }
@@ -769,17 +761,17 @@ Monitor.prototype.setParameter = function( i_value, i_parameter)
 //this.info('params.'+i_parameter+'="'+i_value+'";');
 	this.action( null, params);
 }
-Monitor.prototype.menuHandleOperation = function( i_name)
+Monitor.prototype.mh_Oper = function( i_param)
 {
-//this.info('Operation = ' + i_name);
+//this.info('Operation = ' + i_param.name);
 	var operation = {};
-	operation.type = i_name;
+	operation.type = i_param.name;
 	this.action( operation, null);
 }
-Monitor.prototype.menuHandleGet = function( i_name)
+Monitor.prototype.mh_Get = function( i_param)
 {
-//this.info('Get = ' + i_name);
-	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
+//this.info('Get = ' + i_param.name);
+	nw_GetNodes( this.type, [this.cur_item.params.id], i_param.name);
 }
 
 Monitor.prototype.action = function( i_operation, i_params)
@@ -787,9 +779,24 @@ Monitor.prototype.action = function( i_operation, i_params)
 	nw_Action( this.type, this.getSelectedIds(), i_operation, i_params);
 }
 
-Monitor.prototype.setOption = function( i_param)
+Monitor.prototype.mh_Opt = function( i_param)
 {
-console.log( i_param);
+	var args = {};
+
+	args.param    = i_param.name;
+	args.type     = i_param.type;
+	args.receiver = this;
+	args.wnd      = this.window;
+	args.handle   = 'setOption';
+	args.value    = this.options[i_param.name];
+	args.name     = this.name + '_parameter';
+
+	new cgru_Dialog( args);
+}
+Monitor.prototype.setOption = function( i_value, i_param)
+{
+	this.options[i_param] = i_value;
+	localStorage[i_param] = i_value;
 }
 
 Monitor.prototype.getSelectedIds = function()

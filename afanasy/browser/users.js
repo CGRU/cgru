@@ -164,28 +164,28 @@ UserNode.prototype.onDoubleClick = function() { g_ShowObject( this.params);}
 
 UserNode.actions = [];
 
-UserNode.actions.push(['context', 'log',                    null, 'menuHandleGet',    'Show Log']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'priority',              'num', 'menuHandleDialog', 'Priority']);
-UserNode.actions.push(['context', 'max_running_tasks',     'num', 'menuHandleDialog', 'Max Runnig Tasks']);
-UserNode.actions.push(['context', 'hosts_mask',            'reg', 'menuHandleDialog', 'Hosts Mask']);
-UserNode.actions.push(['context', 'hosts_mask_exclude',    'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
-UserNode.actions.push(['context']);
-UserNode.actions.push(['context', 'errors_retries',        'num', 'menuHandleDialog', 'Errors Retries']);
-UserNode.actions.push(['context', 'errors_avoid_host',     'num', 'menuHandleDialog', 'Errors Avoid Host']);
-UserNode.actions.push(['context', 'errors_task_same_host', 'num', 'menuHandleDialog', 'Errors Task Same Host']);
-UserNode.actions.push(['context', 'errors_forgive_time',   'hrs', 'menuHandleDialog', 'Errors Forgive Time']);
+UserNode.actions.push({"mode":'context', "name":'log', "handle":'mh_Get', "label":'Show Log'});
+UserNode.actions.push({"mode":'context'});
+UserNode.actions.push({"mode":'context', "name":'priority',              "type":'num', "handle":'mh_Dialog', "label":'Priority'});
+UserNode.actions.push({"mode":'context', "name":'max_running_tasks',     "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
+UserNode.actions.push({"mode":'context', "name":'hosts_mask',            "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
+UserNode.actions.push({"mode":'context', "name":'hosts_mask_exclude',    "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
+UserNode.actions.push({"mode":'context'});
+UserNode.actions.push({"mode":'context', "name":'errors_retries',        "type":'num', "handle":'mh_Dialog', "label":'Errors Retries'});
+UserNode.actions.push({"mode":'context', "name":'errors_avoid_host',     "type":'num', "handle":'mh_Dialog', "label":'Errors Avoid Host'});
+UserNode.actions.push({"mode":'context', "name":'errors_task_same_host', "type":'num', "handle":'mh_Dialog', "label":'Errors Task Same Host'});
+UserNode.actions.push({"mode":'context', "name":'errors_forgive_time',   "type":'hrs', "handle":'mh_Dialog', "label":'Errors Forgive Time'});
 
-UserNode.actions.push(['set', 'solve_parallel',        'bl1', 'menuHandleDialog', 'Solve Jobs Parallel']);
-UserNode.actions.push(['set']);
-UserNode.actions.push(['set', 'jobs_life_time',        'hrs', 'menuHandleDialog', 'Jobs Life Time']);
-UserNode.actions.push(['set']);
-UserNode.actions.push(['set', 'permanent'     ,        'bl1', 'menuHandleDialog', 'Set Permanent']);
-UserNode.actions.push(['set']);
-UserNode.actions.push(['set', 'annotation',            'str', 'menuHandleDialog', 'Annotate']);
-UserNode.actions.push(['set']);
-UserNode.actions.push(['set', 'custom_data',          'json', 'menuHandleDialog', 'Custom Data']);
+UserNode.actions.push({"mode":'set', "name":'solve_parallel', "type":'bl1',  "handle":'mh_Dialog', "label":'Solve Jobs Parallel'});
+UserNode.actions.push({"mode":'set'});
+UserNode.actions.push({"mode":'set', "name":'jobs_life_time', "type":'hrs',  "handle":'mh_Dialog', "label":'Jobs Life Time'});
+UserNode.actions.push({"mode":'set'});
+UserNode.actions.push({"mode":'set', "name":'permanent',      "type":'bl1',  "handle":'mh_Dialog', "label":'Set Permanent'});
+UserNode.actions.push({"mode":'set'});
+UserNode.actions.push({"mode":'set', "name":'annotation',     "type":'str',  "handle":'mh_Dialog', "label":'Annotate'});
+UserNode.actions.push({"mode":'set'});
+UserNode.actions.push({"mode":'set', "name":'custom_data',    "type":'json', "handle":'mh_Dialog', "label":'Custom Data'});
 
 UserNode.sort = ['priority','name','host_name'];
-UserNode.filter = ['user_name','name','host_name'];
+UserNode.filter = ['name','host_name'];
 
