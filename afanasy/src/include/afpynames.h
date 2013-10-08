@@ -13,10 +13,8 @@ namespace AFPYNAMES
 	const char SERVICE_FUNC_GETWDIR[]      = "getWDir";
 	const char SERVICE_FUNC_GETCOMMAND[]   = "getCommand";
 	const char SERVICE_FUNC_GETFILES[]     = "getFiles";
+	const char SERVICE_FUNC_PARSE[]        = "parse";
 	const char SERVICE_FUNC_DOPOST[]       = "doPost"; ///< Name of the function to call at task finish
-
-	const char PARSER_CLASSESDIR[] = "parsers";      ///< Parsers directory relative to PYTHONPATH
-	const char PARSER_FUNC_PARSE[] = "parse";
 
 	const char RES_CLASSESDIR[]  = "resources";      ///< Resources directory relative to PYTHONPATH
 	const char RES_FUNC_UPDATE[] = "do";

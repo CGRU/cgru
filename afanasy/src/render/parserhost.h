@@ -2,14 +2,14 @@
 
 #include "../include/afjob.h"
 
-#include "../libafanasy/parser.h"
+#include "../libafanasy/name_af.h"
 
 class ParserHost
 {
 
 public:
 
-	ParserHost( const std::string & task_type, int num_frames);
+	ParserHost( af::Service * i_service);
 	~ParserHost();
 
 	void read( const std::string & i_mode, std::string & output);
@@ -25,10 +25,7 @@ public:
 	inline char* getData( int *size ) const { *size = m_datasize; return m_data;}
 
 private:
-	af::Parser * m_parser;
-
-	std::string m_type;
-	int m_numframes;
+	af::Service * m_service;
 
 	int  m_percent;
 	int  m_frame;

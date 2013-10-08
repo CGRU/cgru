@@ -87,7 +87,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_cmd  = m_service->getCommand();
 	m_wdir = m_service->getWDir();
 
-	m_parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());
+	m_parser = new ParserHost( m_service);
 
 	// Process task working directory:
 	if( m_wdir.size())

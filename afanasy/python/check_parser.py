@@ -20,7 +20,9 @@ except:
 
 parserType = sys.argv[1]
 parserModule = __import__('parsers', globals(), locals(), [parserType])
-parser = eval('parserModule.%s.%s(%d)' % ( parserType, parserType, framesNum))
+cmd = 'parserModule.%s.%s(%d)' % ( parserType, parserType, framesNum)
+print( cmd )
+parser = eval( cmd)
 
 arguments = []
 for i in range( 3, len(sys.argv)): arguments.append( sys.argv[i])
@@ -28,8 +30,8 @@ for i in range( 3, len(sys.argv)): arguments.append( sys.argv[i])
 output = subprocess.Popen( arguments, stdout=subprocess.PIPE).stdout
 
 for line in output:
-   print(line,)
-   parser.parse(line)
+   print( line,)
+   parser.parse('test', line)
    print('Parse: %d%%: %d frame %d%%' % (parser.percent, parser.frame, parser.percentframe))
    
 output.close()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import cgrupathmap, cgruconfig
-import os, sys, re
+import os, sys, re, traceback
 
 str_capacity = '@AF_CAPACITY@'
 str_hosts = '@AF_HOSTS@'
@@ -27,7 +27,16 @@ class service:
 		self.str_hostsprefix = str_hostsprefix
 		self.str_hostseparator = str_hostseparator
 
-		
+		try:
+			mod = __import__('parsers', globals(), locals(), [taskInfo['parser']])
+			cmd = 'mod.%s.%s(%d)' % ( taskInfo['parser'], taskInfo['parser'], taskInfo['frames_num'])
+			self.parser = eval( cmd)
+		except:
+			self.parser = None
+			print('ERROR: Failed to import parser "%s"' % cmd)
+			traceback.print_exc( file = sys.stdout)
+
+
 	def getWDir( self):
 		return self.pm.toClient( self.wdir)
 
@@ -66,6 +75,14 @@ class service:
 		print('Hosts list "%s" applied:' % str( hosts))
 		print(command)
 		return command
+
+
+	def parse( self, data, mode):
+		if self.parse is None: return None
+		result = self.parser.parse( data, mode)
+		#print('Service parse result:')
+		#print( result)
+		return result
 
 
 	def doPost( self):
@@ -118,7 +135,7 @@ class service:
 
 		return cmds
 
-
+	# Not used:
 	def checkfiles( self, sizemin, sizemax):
 		print('Checking for "'+self.files+'" '+str(sizemin)+'-'+str(sizemax))
 		if self.files == '':

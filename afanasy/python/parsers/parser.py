@@ -10,6 +10,7 @@ class parser:
 	def __init__( self, frames = 1):
 		self.numframes = frames
 		if self.numframes < 1: self.numframes = 1
+
 		self.percent = 0
 		self.frame = 0
 		self.percentframe = 0
@@ -18,6 +19,11 @@ class parser:
 		self.warning = False
 		self.badresult = False
 		self.finishedsuccess = False
+
+		self.files = []
+
+	def getFiles( self):
+		return self.files
 
 	def do( self, data, mode):
 		print('Error: parser.do: Invalid call, this method must be implemented.')

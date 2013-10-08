@@ -18,11 +18,16 @@ public:
 	Service( const TaskExec * taskexec, const std::string & i_store_dir = std::string());
 	~Service();
 
-	inline bool isInitialized() const { return initialized;}
+	inline bool isInitialized() const { return m_initialized;}
 
-	const std::string getWDir()    const { return wdir;    }
-	const std::string getCommand() const { return command; }
-	const std::string getFiles() const   { return files;   }
+	const std::string getWDir()    const { return m_wdir;    }
+	const std::string getCommand() const { return m_command; }
+	const std::string getFiles() const   { return m_files;   }
+
+	bool parse( const std::string & i_mode,
+				std::string & data,
+				int & percent, int & frame, int & percentframe, std::string & activity,
+				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
 
 	// Return an empty string on sucess or an error message on error
 	const std::vector<std::string> doPost();
@@ -31,17 +36,18 @@ private:
 	void initialize( const TaskExec * taskExec, const std::string & i_store_dir);
 
 private:
-	std::string name;
+	std::string m_name;
 
-	PyObject* PyObj_FuncGetWDir;
-	PyObject* PyObj_FuncGetCommand;
-	PyObject* PyObj_FuncGetFiles;
-	PyObject* PyObj_FuncDoPost;
+	PyObject * m_PyObj_FuncGetWDir;
+	PyObject * m_PyObj_FuncGetCommand;
+	PyObject * m_PyObj_FuncGetFiles;
+	PyObject * m_PyObj_FuncParse;
+	PyObject * m_PyObj_FuncDoPost;
 
-	bool initialized;
+	bool m_initialized;
 
-	std::string wdir;
-	std::string command;
-	std::string files;
+	std::string m_wdir;
+	std::string m_command;
+	std::string m_files;
 };
 }

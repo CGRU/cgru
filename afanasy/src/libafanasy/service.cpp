@@ -22,10 +22,10 @@ Service::Service(
 	const std::string & i_files,
 	const std::string & i_store_dir
 ):
-	name( i_type),
-	wdir( i_wdir),
-	command( i_command),
-	files( i_files)
+	m_name( i_type),
+	m_wdir( i_wdir),
+	m_command( i_command),
+	m_files( i_files)
 {
 	TaskExec * i_task_exec = new TaskExec(
 			"i_name", i_type, "", i_command,
@@ -40,21 +40,22 @@ Service::Service(
 }
 
 Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir):
-	name( i_task_exec->getServiceType()),
-	wdir( i_task_exec->getWDir()),
-	command( i_task_exec->getCommand()),
-	files( i_task_exec->getFiles())
+	m_name( i_task_exec->getServiceType()),
+	m_wdir( i_task_exec->getWDir()),
+	m_command( i_task_exec->getCommand()),
+	m_files( i_task_exec->getFiles())
 {
 	initialize( i_task_exec, i_store_dir);
 }
 
 void Service::initialize( const TaskExec * i_task_exec, const std::string & i_store_dir)
 {
-	PyObj_FuncGetWDir = NULL;
-	PyObj_FuncGetCommand = NULL;
-	PyObj_FuncGetFiles = NULL;
-	PyObj_FuncDoPost = NULL;
-	initialized = false;
+	m_PyObj_FuncGetWDir = NULL;
+	m_PyObj_FuncGetCommand = NULL;
+	m_PyObj_FuncGetFiles = NULL;
+	m_PyObj_FuncParse = NULL;
+	m_PyObj_FuncDoPost = NULL;
+	m_initialized = false;
 
 	PyObject * pHostsList = PyList_New(0);
 	for( std::list<std::string>::const_iterator it = i_task_exec->getMultiHostsNames().begin(); it != i_task_exec->getMultiHostsNames().end(); it++)
@@ -75,6 +76,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "capacity", PyLong_FromLong( i_task_exec->getCapCoeff()));
 	PyDict_SetItemString( task_info, "files",    PyBytes_FromString( i_task_exec->getFiles().c_str()));
 	PyDict_SetItemString( task_info, "hosts",    pHostsList);
+
+	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( i_task_exec->getParserType().c_str()));
+	PyDict_SetItemString( task_info, "frames_num", PyLong_FromLong(    i_task_exec->getFramesNum()));
 
 	PyDict_SetItemString( task_info, "task_id",          PyLong_FromLong( i_task_exec->getTaskNum()));
 	PyDict_SetItemString( task_info, "task_name",        PyBytes_FromString( i_task_exec->getName().c_str()));
@@ -102,90 +106,167 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyTuple_SetItem( pArgs, 0, task_info);
 
 	// Try to import service class
-	if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name, pArgs))
+	if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, m_name, pArgs))
 		// If failed and imported class was not the base class
-		if( name != AFPYNAMES::SERVICE_CLASSESBASE)
+		if( m_name != AFPYNAMES::SERVICE_CLASSESBASE )
 			// Try to import base service
 			if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, AFPYNAMES::SERVICE_CLASSESBASE, pArgs))
 				return;
 
 	//Get functions:
-	PyObj_FuncGetWDir= getFunction( AFPYNAMES::SERVICE_FUNC_GETWDIR);
-	if( PyObj_FuncGetWDir == NULL ) return;
-	PyObj_FuncGetCommand = getFunction( AFPYNAMES::SERVICE_FUNC_GETCOMMAND);
-	if( PyObj_FuncGetCommand == NULL ) return;
-	PyObj_FuncGetFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETFILES);
-	if( PyObj_FuncGetFiles == NULL ) return;
-	PyObj_FuncDoPost = getFunction( AFPYNAMES::SERVICE_FUNC_DOPOST);
-	if( PyObj_FuncDoPost == NULL ) return;
+	m_PyObj_FuncGetWDir= getFunction( AFPYNAMES::SERVICE_FUNC_GETWDIR);
+	if( m_PyObj_FuncGetWDir == NULL ) return;
+
+	m_PyObj_FuncGetCommand = getFunction( AFPYNAMES::SERVICE_FUNC_GETCOMMAND);
+	if( m_PyObj_FuncGetCommand == NULL ) return;
+
+	m_PyObj_FuncGetFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETFILES);
+	if( m_PyObj_FuncGetFiles == NULL ) return;
+
+	m_PyObj_FuncParse = getFunction( AFPYNAMES::SERVICE_FUNC_PARSE);
+	if( m_PyObj_FuncParse == NULL ) return;
+
+	m_PyObj_FuncDoPost = getFunction( AFPYNAMES::SERVICE_FUNC_DOPOST);
+	if( m_PyObj_FuncDoPost == NULL ) return;
 
 	PyObject * pResult;
 
 	// Process working directory:
-	AFINFA("Service::initialize: Processing working dirctory:\n%s", wdir.c_str())
-	pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
+	AFINFA("Service::initialize: Processing working dirctory:\n%s", m_wdir.c_str())
+	pResult = PyObject_CallObject( m_PyObj_FuncGetWDir, NULL);
 	if( pResult == NULL)
 	{
 		if( PyErr_Occurred()) PyErr_Print();
 		return;
 	}
-	if( false == af::PyGetString( pResult, wdir))
+	if( false == af::PyGetString( pResult, m_wdir))
 	{
 		AFERROR("Service:FuncGetWDir: Returned object is not a string.")
 		Py_DECREF( pResult);
 		return;
 	}
 	Py_DECREF( pResult);
-	AFINFA("Service::initialize: Working dirctory:\n%s", wdir.c_str())
+	AFINFA("Service::initialize: Working dirctory:\n%s", m_wdir.c_str())
 
 	// Process command:
-	AFINFA("Service::initialize: Processing command:\n%s", command.c_str())
-	pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
+	AFINFA("Service::initialize: Processing command:\n%s", m_command.c_str())
+	pResult = PyObject_CallObject( m_PyObj_FuncGetCommand, NULL);
 	if( pResult == NULL)
 	{
 		if( PyErr_Occurred()) PyErr_Print();
 		return;
 	}
-	if( false == af::PyGetString( pResult, command))
+	if( false == af::PyGetString( pResult, m_command))
 	{
 		AFERROR("Service:FuncGetCommand: Returned object is not a string.")
 		Py_DECREF( pResult);
 		return;
 	}
 	Py_DECREF( pResult);
-	AFINFA("Service::initialize: Command:\n%s", command.c_str())
+	AFINFA("Service::initialize: Command:\n%s", m_command.c_str())
 
 	// Process files:
-	AFINFA("Service::initialize: Processing files:\n%s", files.c_str())
-	pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
+	AFINFA("Service::initialize: Processing files:\n%s", m_files.c_str())
+	pResult = PyObject_CallObject( m_PyObj_FuncGetFiles, NULL);
 	if( pResult == NULL)
 	{
 		if( PyErr_Occurred()) PyErr_Print();
 		return;
 	}
-	if( false == af::PyGetString( pResult, files))
+	if( false == af::PyGetString( pResult, m_files))
 	{
 		AFERROR("Service:FuncGetCommand: Returned object is not a string.")
 		Py_DECREF( pResult);
 		return;
 	}
 	Py_DECREF( pResult);
-	AFINFA("Service::initialize: Files:\n%s", files.c_str())
+	AFINFA("Service::initialize: Files:\n%s", m_files.c_str())
 
-	initialized = true;
+	m_initialized = true;
 }
 
 Service::~Service()
 {
 }
 
+bool Service::parse( const std::string & i_mode, std::string & i_data,
+							int & percent, int & frame, int & percentframe, std::string & activity,
+							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
+{
+	bool result = false;
+//	if( data.size() < 1) return result;
+
+	PyObject * pArgs = PyTuple_New( 2);
+	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( i_data.data(), i_data.size()));
+	PyTuple_SetItem( pArgs, 1, PyBytes_FromStringAndSize( i_mode.data(), i_mode.size()));
+
+	PyObject * pTuple = PyObject_CallObject( m_PyObj_FuncParse, pArgs);
+	if( pTuple != NULL)
+	{
+		if( PyTuple_Check( pTuple))
+		{
+			if( PyTuple_Size( pTuple) == 9)
+			{
+				percent           = PyLong_AsLong(   PyTuple_GetItem( pTuple, 1));
+				frame             = PyLong_AsLong(   PyTuple_GetItem( pTuple, 2));
+				percentframe      = PyLong_AsLong(   PyTuple_GetItem( pTuple, 3));
+				warning           = PyObject_IsTrue( PyTuple_GetItem( pTuple, 4));
+				error             = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
+				badresult         = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
+				finishedsuccess   = PyObject_IsTrue( PyTuple_GetItem( pTuple, 7));
+
+				PyObject * pActivity = PyTuple_GetItem( pTuple, 8);
+				if( pActivity == NULL)
+				{
+					if( PyErr_Occurred()) PyErr_Print();
+				}
+				else
+				{
+					af::PyGetString( pActivity, activity, "Parser::parse: activity");
+//printf("Activity: %s\n", activity.c_str());
+				}
+
+				PyObject * pOutput = PyTuple_GetItem( pTuple, 0);
+				if( pOutput == NULL)
+				{
+					if( PyErr_Occurred()) PyErr_Print();
+				}
+				else if( pOutput == Py_None)
+				{
+					result = true;
+				}
+				else
+				{
+					if( af::PyGetString( pOutput, i_data, "Parser::parse: output"))
+						result = true;
+				}
+			}
+			else
+			{
+				AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 9\n", m_name.c_str());
+			}
+		}
+		else
+		{
+			AFERRAR("Parser::parse: type=\"%s\" value is not a tuple\n", m_name.c_str());
+		}
+		Py_DECREF( pTuple);
+	}
+	else
+	{
+		if( PyErr_Occurred()) PyErr_Print();
+	}
+	Py_DECREF( pArgs);
+
+	return result;
+}
 const std::vector<std::string> Service::doPost()
 {
 	AFINFA("Service::doPost()")
 
 	std::vector<std::string> cmds;
 
-	PyObject * pResult = PyObject_CallObject( PyObj_FuncDoPost, NULL);
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncDoPost, NULL);
 	if( pResult )
 	{
 		if( false == af::PyGetStringList( pResult, cmds))

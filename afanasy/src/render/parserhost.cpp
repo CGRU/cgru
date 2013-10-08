@@ -1,5 +1,7 @@
 #include "parserhost.h"
 
+#include "../libafanasy/service.h"
+
 #ifdef WINNT
 //#define strcpy strcpy_s
 #endif
@@ -19,10 +21,8 @@ const char* ParserHost::ms_overload_string =
 	###########################################################   \n\
 \n\n\n";
 
-ParserHost::ParserHost( const std::string & task_type, int num_frames):
-	m_parser( NULL),
-	m_type( task_type),
-	m_numframes( num_frames),
+ParserHost::ParserHost( af::Service * i_service):
+	m_service( i_service),
 	m_percent( 0),
 	m_frame( 0),
 	m_percentframe( 0),
@@ -42,21 +42,10 @@ ParserHost::ParserHost( const std::string & task_type, int num_frames):
 		printf( "ParserHost::ParserHost(): Can`t allocate memory for data.");
 		return;
 	}
-
-	if( false == m_type.empty())
-	{
-		m_parser = new af::Parser( m_type, m_numframes);
-		if( m_parser->isInitialized() == false)
-		{
-			delete m_parser;
-			m_parser = NULL;
-		}
-	}
 }
 
 ParserHost::~ParserHost()
 {
-	if( m_parser != NULL) delete m_parser;
 	if( m_data   != NULL) delete [] m_data;
 }
 
@@ -139,28 +128,25 @@ void ParserHost::setOverload()
 
 void ParserHost::parse( const std::string & i_mode, std::string & output)
 {
-	if( m_parser )
-	{
-		bool _warning         = false;
-		bool _error           = false;
-		bool _badresult       = false;
-		bool _finishedsuccess = false;
+	bool _warning         = false;
+	bool _error           = false;
+	bool _badresult       = false;
+	bool _finishedsuccess = false;
 
-		m_parser->parse( i_mode, output, m_percent, m_frame, m_percentframe, m_activity, _warning, _error, _badresult, _finishedsuccess);
+	m_service->parse( i_mode, output, m_percent, m_frame, m_percentframe, m_activity, _warning, _error, _badresult, _finishedsuccess);
 
-		if ( _error           ) m_error           = true;
-		if ( _warning         ) m_warning         = true;
-		if ( _badresult       ) m_badresult       = true;
-		if ( _finishedsuccess ) m_finishedsuccess = true;
-#ifdef AFOUTPUds
-		printf("PERCENT: %d%%", m_percent);
-		printf("; FRAME: %d", m_frame);
-		printf("; PERCENTFRAME: %d%%", m_percentframe);
-		if( _error           ) printf("; ERROR");
-		if( _warning         ) printf("; WARNING");
-		if( _badresult       ) printf("; BAD RESULT");
-		if( _finishedsuccess ) printf("; FINISHED SUCCESS");
-		printf("\n");
+	if ( _error           ) m_error           = true;
+	if ( _warning         ) m_warning         = true;
+	if ( _badresult       ) m_badresult       = true;
+	if ( _finishedsuccess ) m_finishedsuccess = true;
+#ifdef AFOUTPUT
+	printf("PERCENT: %d%%", m_percent);
+	printf("; FRAME: %d", m_frame);
+	printf("; PERCENTFRAME: %d%%", m_percentframe);
+	if( _error           ) printf("; ERROR");
+	if( _warning         ) printf("; WARNING");
+	if( _badresult       ) printf("; BAD RESULT");
+	if( _finishedsuccess ) printf("; FINISHED SUCCESS");
+	printf("\n");
 #endif
-	}
 }

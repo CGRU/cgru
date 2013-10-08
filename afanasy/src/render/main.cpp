@@ -219,7 +219,7 @@ printf("msgCase: "); msg->stdOut();
     case af::Msg::TVersionMismatch:
     case af::Msg::TClientExitRequest:
     {
-        printf("Render exit request recieved.\n");
+        printf("Render exit request received.\n");
         AFRunning = false;
         break;
     }
