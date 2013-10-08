@@ -66,7 +66,7 @@ public:
 private:
     static RenderHost * ms_obj;
 
-    static std::vector<std::string> windowsmustdie;
+    static std::vector<std::string> ms_windowsmustdie;
 
     static std::vector<PyRes*> ms_pyres;
 

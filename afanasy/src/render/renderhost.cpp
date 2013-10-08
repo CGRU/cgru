@@ -26,7 +26,7 @@ bool RenderHost::ms_connected = false;
 std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
 bool RenderHost::m_listening = false;
-std::vector<std::string> RenderHost::windowsmustdie;
+std::vector<std::string> RenderHost::ms_windowsmustdie;
 
 RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
    Render( i_state, i_priority)
@@ -54,46 +54,12 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
 #ifdef WINNT
     // Windows Must Die:
-	HANDLE dir;
-	WIN32_FIND_DATA file_data;
-	if(( dir = FindFirstFile((af::Environment::getAfRoot() + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
-	{
-		do
-		{
-			std::string filename( file_data.cFileName);
-			if( filename.find("windowsmustdie") != 0 )
-				continue;
-
-			filename = af::Environment::getAfRoot() + '\\' + filename;
-			if( false == af::pathFileExists( filename))
-				continue;
-
-			std::ifstream file( filename);
-			if( file.is_open())
-			{
-				while( file.good())
-				{
-					std::string line;
-					std::getline( file, line);
-					line = af::strStrip( line);
-					if( line.size() > 0 )
-						windowsmustdie.push_back( line);
-				}
-				file.close();
-			}
-			else printf("Unable to read '%s'.\n", filename.c_str());
-		} while( FindNextFile( dir, &file_data));
-		FindClose( dir);
-	}
-	else
-	{
-		AFERRAR("Can't open folder '%s'", af::Environment::getAfRoot().c_str())
-	}
-    if( windowsmustdie.size())
+	ms_windowsmustdie = af::Environment::getRenderWindowsMustDie();
+    if( ms_windowsmustdie.size())
     {
         printf("Windows Must Die:\n");
-        for( int i = 0; i < windowsmustdie.size(); i++)
-            printf("   %s\n", windowsmustdie[i].c_str());
+        for( int i = 0; i < ms_windowsmustdie.size(); i++)
+            printf("   %s\n", ms_windowsmustdie[i].c_str());
     }
 #endif
 
@@ -255,12 +221,12 @@ void RenderHost::windowsMustDie()
 {
 // Windows Must Die:
     AFINFO("RenderHost::windowsMustDie():");
-    for( int i = 0; i < windowsmustdie.size(); i++)
+    for( int i = 0; i < ms_windowsmustdie.size(); i++)
     {
-        HWND WINAPI hw = FindWindow( NULL, TEXT( windowsmustdie[i].c_str()));
+        HWND WINAPI hw = FindWindow( NULL, TEXT( ms_windowsmustdie[i].c_str()));
         if( hw != NULL )
         {
-            printf("Window must die founded:\n%s\n", windowsmustdie[i].c_str());
+            printf("Window must die founded:\n%s\n", ms_windowsmustdie[i].c_str());
             SendMessage( hw, WM_CLOSE, 0, 0);
         }
     }

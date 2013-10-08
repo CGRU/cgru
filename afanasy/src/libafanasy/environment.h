@@ -155,6 +155,7 @@ public:
 	static inline int getRenderWaitForConnected()      { return render_waitforconnected;     }
 	static inline int getRenderWaitForReadyRead()      { return render_waitforreadyread;     }
 	static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
+	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
 
 	static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
 	static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
@@ -283,6 +284,7 @@ private:
 	static int render_waitforconnected;
 	static int render_waitforreadyread;
 	static int render_waitforbyteswritten;
+	static std::vector<std::string> render_windowsmustdie;
 
 	static std::string render_exec;       ///< How Render can execute anther Render.
 	static std::string cmd_shell;

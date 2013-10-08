@@ -57,6 +57,7 @@ int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
 int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTED;
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
+std::vector<std::string> Environment::render_windowsmustdie;
 std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
  
 std::string Environment::render_exec =                 AFRENDER::EXEC;
@@ -224,6 +225,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, render_waitforconnected,           "af_render_waitforconnected"           );
 	getVar( i_obj, render_waitforreadyread,           "af_render_waitforreadyread"           );
 	getVar( i_obj, render_waitforbyteswritten,        "af_render_waitforbyteswritten"        );
+	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
 	getVar( i_obj, thumbnail_cmd,                     "af_thumbnail_cmd"                     );
 	getVar( i_obj, thumbnail_naming,                  "af_thumbnail_naming"                  );

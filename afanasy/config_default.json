@@ -32,7 +32,14 @@
 		"af_tempdirectory":"/temp/afanasy",
 		"af_render_cmd_reboot":"shutdown /r",
 		"af_render_cmd_shutdown":"shutdown /s",
-		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep"
+		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep",
+		"af_render_windowsmustdie":[
+			"mantra.exe",
+			"mantra.exe - Application Error",
+			"3ds Max application",
+			"Microsoft Visual C++ Runtime Library",
+			"Visual Studio Just-In-Time Debugger"
+		]
 	},
 
 	"af_perm_user_mod_his_priority":true,
