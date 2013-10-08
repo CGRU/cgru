@@ -360,16 +360,5 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 	}
 }
 
-/*
-TaskItem.actions = [];
-
-TaskItem.actions.push(['context', 'output',  null, 'mh_Get', 'Output']);
-TaskItem.actions.push(['context', 'log',     null, 'mh_Get', 'Log']);
-TaskItem.actions.push(['context', 'info',    null, 'mh_Get', 'Info']);
-
-TaskItem.actions.push(['context', 'restart', null, 'mh_Oper', 'Restart']);
-TaskItem.actions.push(['context', 'skip',    null, 'mh_Oper', 'Skip']);
-*/
-
 TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];

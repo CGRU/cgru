@@ -390,9 +390,25 @@ bool Block::action( Action & i_action)
 			if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;
 		}
-		else if(( type == "restart") || ( type == "skip") || ("restart_running"))
+		else if( type == "skip")
 		{
-			skipRestartTasks( i_action, operation, type);
+			skipRestartTasks( true, "Block skip by " + i_action.author, i_action, operation);
+		}
+		else if( type == "restart")
+		{
+			skipRestartTasks( false, "Block restart by " + i_action.author, i_action, operation);
+		}
+		else if( type == "restart_running")
+		{
+			skipRestartTasks( false, "Block restart running by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
+		}
+		else if( type == "restart_skipped")
+		{
+			skipRestartTasks( false, "Block restart skipped by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
+		}
+		else if( type == "restart_done")
+		{
+			skipRestartTasks( false, "Block restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
 		else
 		{
@@ -429,20 +445,8 @@ bool Block::action( Action & i_action)
 	return job_progress_changed;
 }
 
-void Block::skipRestartTasks( const Action & i_action, const JSON & i_operation, const std::string & i_type)
+void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
 {
-	bool skip = false;
-	bool only_running = false;
-	if( i_type == "skip")
-		skip = true;
-	else if( i_type == "restart_running")
-		only_running = true;
-
-	std::string message;
-	if( skip ) message = "Skip request by ";
-	else       message = "Restart request by ";
-	message += i_action.author;
-
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
 
@@ -458,15 +462,16 @@ void Block::skipRestartTasks( const Action & i_action, const JSON & i_operation,
 			t = tasks_vec[i];
 			if(( t >= m_data->getTasksNum()) || ( t < 0 ))
 			{
-				appendJobLog("Operation '"+i_type+"' invalid task numer="+af::itos(t)+" by "+i_action.author);
+				appendJobLog( i_message);
+				appendJobLog("Invalid operation task numer = " + af::itos(t));
 				break;
 			}
 		}
 
-		if( skip )
-			m_tasks[t]->skip( message, i_action.renders, i_action.monitors);
+		if( i_skip )
+			m_tasks[t]->skip( i_message, i_action.renders, i_action.monitors);
 		else
-			m_tasks[t]->restart( only_running, message, i_action.renders, i_action.monitors);
+			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
 	}
 }
 

@@ -280,7 +280,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
       if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
       {
 //printf("JobAf::deleteNode: runningtaskscounter = %d\n", runningtaskscounter);
-         restartAllTasks( true, "Job deletion.", renders, monitoring);
+         restartAllTasks("Job deletion.", renders, monitoring, AFJOB::STATE_RUNNING_MASK);
          if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
          return;
       }
@@ -396,12 +396,20 @@ void JobAf::v_action( Action & i_action)
 		}
 		else if( type == "stop")
 		{
-		   restartAllTasks( true, "Job stopped by " + i_action.author, i_action.renders, i_action.monitors);
+		   restartAllTasks("Job stopped by " + i_action.author, i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
 		else if( type == "restart_running")
 		{
-			restartAllTasks( true, "Job restarted running by " + i_action.author,  i_action.renders, i_action.monitors);
+			restartAllTasks("Job restarted running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+		}
+		else if( type == "restart_skipped")
+		{
+			restartAllTasks("Job restarted skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
+		}
+		else if( type == "restart_done")
+		{
+			restartAllTasks("Job restarted done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
 		}
 		else if( type == "reset_error_hosts")
 		{
@@ -411,18 +419,18 @@ void JobAf::v_action( Action & i_action)
 		else if( type == "restart")
 		{
 			//printf("Msg::TJobRestart:\n");
-			restartAllTasks( false, "Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
+			restartAllTasks("Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
 			//printf("Msg::TJobRestart: tasks restarted.\n");
 			checkDepends();
 			m_time_started = 0;
 		}
 		else if( type == "restart_errors")
 		{
-			restartErrors( "Job errors restarted by " + i_action.author,  i_action.renders, i_action.monitors);
+			restartAllTasks("Job errors restarted by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_ERROR_MASK);
 		}
 		else if( type == "restart_pause")
 		{
-			restartAllTasks( false, "Job restarted ( and paused ) by " + i_action.author,  i_action.renders, i_action.monitors);
+			restartAllTasks("Job restarted ( and paused ) by " + i_action.author,  i_action.renders, i_action.monitors);
 			checkDepends();
 			m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 			m_time_started = 0;
@@ -1132,31 +1140,24 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
 
       for( int t = start; t < end; t++)
       {
-		 if( restart) m_blocks[b]->m_tasks[t]->restart( false, message, renders, monitoring);
+		 if( restart) m_blocks[b]->m_tasks[t]->restart( message, renders, monitoring);
 		 else         m_blocks[b]->m_tasks[t]->skip( message, renders, monitoring);
       }
    }
 }
 
-void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
-   for( int b = 0; b < m_blocks_num; b++)
-   {
-      int numtasks = m_blocks_data[b]->getTasksNum();
-      for( int t = 0; t < numtasks; t++)
-		 m_blocks[b]->m_tasks[t]->restart( onlyRunning, message, renders, monitoring);
-   }
-   v_refresh( time(NULL), renders, monitoring);
-}
+	for( int b = 0; b < m_blocks_num; b++)
+	{
+		int numtasks = m_blocks_data[b]->getTasksNum();
+		for( int t = 0; t < numtasks; t++)
+		{
+			m_blocks[b]->m_tasks[t]->restart( i_message, i_renders, i_monitoring, i_state);
+		}
+	}
 
-void JobAf::restartErrors( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
-{
-   for( int b = 0; b < m_blocks_num; b++)
-   {
-      int numtasks = m_blocks_data[b]->getTasksNum();
-      for( int t = 0; t < numtasks; t++)
-		 m_blocks[b]->m_tasks[t]->restartError( message, renders, monitoring);
-   }
+	v_refresh( time(NULL), i_renders, i_monitoring);
 }
 
 void JobAf::writeProgress( af::Msg &msg)

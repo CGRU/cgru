@@ -85,7 +85,7 @@ private:
 
 	const std::string getStoreTasksFileName() const;
 
-	void skipRestartTasks( const Action & i_action, const JSON & i_operation, const std::string & i_type);
+	void skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state = 0);
 
 	void addRenderCounts( RenderAf * render);
 	int  getRenderCounts( RenderAf * render) const;

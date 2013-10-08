@@ -188,34 +188,30 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
    deleteRunningZombie();
 }
 
-void Task::restart( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void Task::restart( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
-   if( m_run )
-   {
-      m_run->restart( message, renders, monitoring);
-      return;
-   }
-   if( onlyRunning ) return;
-   m_progress->state = AFJOB::STATE_READY_MASK;
-   m_progress->errors_count = 0;
-   v_store();
-   v_monitor( monitoring);
-   v_appendLog( message);
-}
+	if( i_state != 0 )
+	{
+		// If request is to restart done tasks, we shoud skip skipped tasks
+		// which are always done too
+		if(( i_state == AFJOB::STATE_DONE_MASK ) && ( m_progress->state & AFJOB::STATE_SKIPPED_MASK ))
+			return;
 
-void Task::restartError( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
-{
-   if( false == ( m_progress->state & AFJOB::STATE_ERROR_MASK )) return;
-   if( m_run )
-   {
-      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_number)
-      return;
-   }
-   m_progress->state = AFJOB::STATE_READY_MASK;
-   m_progress->errors_count = 0;
-   v_store();
-   v_monitor( monitoring);
-   v_appendLog( message);
+		if(( m_progress->state & i_state ) == 0 )
+			return;
+	}
+
+	if( m_run )
+	{
+		m_run->restart( i_message, i_renders, i_monitoring);
+		return;
+	}
+
+	m_progress->state = AFJOB::STATE_READY_MASK;
+	m_progress->errors_count = 0;
+	v_store();
+	v_monitor( i_monitoring);
+	v_appendLog( i_message);
 }
 
 void Task::skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)

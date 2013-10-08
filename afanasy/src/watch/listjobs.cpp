@@ -143,6 +143,15 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
 	menu.addAction( action);
 
+	action = new QAction( "Restart Skipped", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartSkipped() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_SKIPPED_MASK);
+	menu.addAction( action);
+
+	action = new QAction( "Restart Done", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartDone() ));
+	menu.addAction( action);
+
 	menu.addSeparator();
 	if( af::Environment::VISOR() == false)
 	{
@@ -457,6 +466,8 @@ void ListJobs::actStop()            { operation("stop"             );}
 void ListJobs::actRestart()         { operation("restart"          );}
 void ListJobs::actRestartErrors()   { operation("restart_errors"   );}
 void ListJobs::actRestartRunning()  { operation("restart_running"  );}
+void ListJobs::actRestartSkipped()  { operation("restart_skipped"  );}
+void ListJobs::actRestartDone()     { operation("restart_done"     );}
 void ListJobs::actResetErrorHosts() { operation("reset_error_hosts");}
 void ListJobs::actPause()           { operation("pause"            );}
 void ListJobs::actRestartPause()    { operation("restart_pause"    );}

@@ -29,8 +29,8 @@ public:
 
 	virtual void v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
-	void restart( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
-	void restartError( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+	void restart( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
+
 	void skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 	virtual void v_appendLog( const std::string  & message);

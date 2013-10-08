@@ -423,6 +423,18 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
 		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
 		menu->addAction( action);
 
+		action = new ActionIdString( id_block, "restart_running", "Restart Running", qwidget);
+		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
+		menu->addAction( action);
+
+		action = new ActionIdString( id_block, "restart_skipped", "Restart Skipped", qwidget);
+		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
+		menu->addAction( action);
+
+		action = new ActionIdString( id_block, "restart_done", "Restart Done", qwidget);
+		QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
+		menu->addAction( action);
+
 		menu->addSeparator();
 	}
 
@@ -548,6 +560,9 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 
 	if( i_action == "skip" ||
 		i_action == "restart" ||
+		i_action == "restart_running" ||
+		i_action == "restart_skipped" ||
+		i_action == "restart_done" ||
 		i_action == "reset_error_hosts")
 	{
 		i_str << ",\n\"operation\":{\"type\":\"" << i_action.toUtf8().data() << "\"}";

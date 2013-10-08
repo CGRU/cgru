@@ -163,11 +163,8 @@ private:
 /** If \c onlyIfDepeds == \c true , check process only if job is already waiting for others. **/
 	void checkDepends();
 
-/// Restart tasks, can restart only running tasks.
-	void restartAllTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
-
-/// Restart tasks with errors
-	void restartErrors( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+/// Restart tasks, can restart only matching state mask.
+	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
 
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 

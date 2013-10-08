@@ -716,6 +716,8 @@ JobNode.actions.push({"mode":'context'});
 JobNode.actions.push({"mode":'context', "name":'reset_error_hosts', "handle":'mh_Oper', "label":'Reset Error Hosts'});
 JobNode.actions.push({"mode":'context', "name":'restart_errors',    "handle":'mh_Oper', "label":'Restart Errors'});
 JobNode.actions.push({"mode":'context', "name":'restart_running',   "handle":'mh_Oper', "label":'Restart Running'});
+JobNode.actions.push({"mode":'context', "name":'restart_skipped',   "handle":'mh_Oper', "label":'Restart Skipped'});
+JobNode.actions.push({"mode":'context', "name":'restart_done',      "handle":'mh_Oper', "label":'Restart Done'});
 JobNode.actions.push({"mode":'context'});
 JobNode.actions.push({"mode":'context', "name":'move_jobs_up',      "handle":'mh_Move', "label":'Move Up',     "permissions":'user'});
 JobNode.actions.push({"mode":'context', "name":'move_jobs_down',    "handle":'mh_Move', "label":'Move Down',   "permissions":'user'});
