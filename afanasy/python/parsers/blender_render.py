@@ -4,8 +4,8 @@ keypart = 'Part '
 
 class blender_render(blender.blender):
    'Blender Render'
-   def __init__( self, frames = 1):
-      blender.blender.__init__( self, frames)
+   def __init__( self):
+      blender.blender.__init__( self)
 
    def do( self, data, mode):
       lines = data.split('\n')

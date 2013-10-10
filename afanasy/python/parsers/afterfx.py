@@ -6,8 +6,8 @@ re_frame = re.compile(r'PROGRESS: .* (.*): .* Seconds')
 
 class afterfx(parser.parser):
 	'Adobe After Effects'
-	def __init__( self, frames = 1):
-		parser.parser.__init__( self, frames)
+	def __init__( self):
+		parser.parser.__init__( self)
 		self.firstframe = True
 
 	def do( self, data, mode):

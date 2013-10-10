@@ -6,8 +6,8 @@ pass_quantity = 13
 
 class yafray(parser.parser):
    'Yafray'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
+   def __init__( self):
+      parser.parser.__init__( self)
       self.passing = False
       self.passcount = 0
 

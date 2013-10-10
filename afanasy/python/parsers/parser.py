@@ -7,9 +7,7 @@ str_finishedsuccess = '[ PARSER FINISHED SUCCESS ]'
 
 class parser:
 	"This is base class, not to be instanced"
-	def __init__( self, frames = 1):
-		self.numframes = frames
-		if self.numframes < 1: self.numframes = 1
+	def __init__( self):
 
 		self.percent = 0
 		self.frame = 0
@@ -21,6 +19,11 @@ class parser:
 		self.finishedsuccess = False
 
 		self.files = []
+
+	def setTaskInfo( self, taskInfo):
+		self.taskInfo = taskInfo
+		self.numframes = taskInfo['frames_num']
+		if self.numframes < 1: self.numframes = 1
 
 	def getFiles( self):
 		return self.files

@@ -37,6 +37,7 @@ private:
 
 private:
 	std::string m_name;
+	std::string m_parser_type;
 
 	PyObject * m_PyObj_FuncGetWDir;
 	PyObject * m_PyObj_FuncGetCommand;

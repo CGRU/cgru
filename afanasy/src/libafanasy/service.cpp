@@ -41,6 +41,7 @@ Service::Service(
 
 Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir):
 	m_name( i_task_exec->getServiceType()),
+	m_parser_type( i_task_exec->getParserType()),
 	m_wdir( i_task_exec->getWDir()),
 	m_command( i_task_exec->getCommand()),
 	m_files( i_task_exec->getFiles())
@@ -77,7 +78,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "files",    PyBytes_FromString( i_task_exec->getFiles().c_str()));
 	PyDict_SetItemString( task_info, "hosts",    pHostsList);
 
-	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( i_task_exec->getParserType().c_str()));
+	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( m_parser_type.c_str()));
 	PyDict_SetItemString( task_info, "frames_num", PyLong_FromLong(    i_task_exec->getFramesNum()));
 
 	PyDict_SetItemString( task_info, "task_id",          PyLong_FromLong( i_task_exec->getTaskNum()));
@@ -222,7 +223,7 @@ bool Service::parse( const std::string & i_mode, std::string & i_data,
 				}
 				else
 				{
-					af::PyGetString( pActivity, activity, "Parser::parse: activity");
+					af::PyGetString( pActivity, activity, "Service::parse: activity");
 //printf("Activity: %s\n", activity.c_str());
 				}
 
@@ -237,25 +238,27 @@ bool Service::parse( const std::string & i_mode, std::string & i_data,
 				}
 				else
 				{
-					if( af::PyGetString( pOutput, i_data, "Parser::parse: output"))
+					if( af::PyGetString( pOutput, i_data, "Service::parse: output"))
 						result = true;
 				}
 			}
 			else
 			{
-				AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 9\n", m_name.c_str());
+				AFERRAR("Service::parse: parser=\"%s\" returned tuple size != 9\n", m_parser_type.c_str());
 			}
 		}
-		else
+		else if( pTuple != Py_None)
 		{
-			AFERRAR("Parser::parse: type=\"%s\" value is not a tuple\n", m_name.c_str());
+			AFERRAR("Service::parse: parser=\"%s\" returned value is not a tuple\n", m_parser_type.c_str());
 		}
+
 		Py_DECREF( pTuple);
 	}
 	else
 	{
 		if( PyErr_Occurred()) PyErr_Print();
 	}
+
 	Py_DECREF( pArgs);
 
 	return result;

@@ -7,8 +7,8 @@ re_percent = re.compile(r'(\|\s*)(\d*)(%\s*done)')
 
 class arnold(parser.parser):
 	'Arnold'
-	def __init__( self, frames = 1):
-		parser.parser.__init__( self, frames)
+	def __init__( self):
+		parser.parser.__init__( self)
 		self.firstframe = True
 		self.data_all = ''
 

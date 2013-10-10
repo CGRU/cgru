@@ -8,8 +8,8 @@ ErrorsRE = [re.compile(r'Invalid .* license key.')]
 
 class nuke(parser.parser):
 	'The Foundry Nuke'
-	def __init__( self, frames = 1):
-		parser.parser.__init__( self, frames)
+	def __init__( self):
+		parser.parser.__init__( self)
 		self.filename = ''
 
 	def do( self, data, mode):

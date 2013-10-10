@@ -4,9 +4,9 @@ FRAME = 'writing scene to'
 
 class mayatoarnold(parser.parser):
 	'Maya to Arnold'
-	def __init__( self, frames = 1):
+	def __init__( self):
 		print('mayatoarnold(parser.parser)')
-		parser.parser.__init__( self, frames)
+		parser.parser.__init__( self)
 
 	def do( self, data, mode):
 		print(data)

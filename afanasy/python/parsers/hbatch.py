@@ -4,8 +4,8 @@ keyframe = 'RopNode.render: frame '
 
 class hbatch(parser.parser):
    'Houdini9.x batch'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
+   def __init__( self):
+      parser.parser.__init__( self)
       self.firstframe = True
 
    def do( self, data, mode):

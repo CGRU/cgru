@@ -1,29 +1,47 @@
 from parsers import parser
 
+import os
+
+# Fra:1 Mem:8.55M (11.55M, peak 29.22M) | Scene, Part 1-16
+# Saved: render/mypic.0001.jpg Time: 00:00.51
+
 keyframe = 'Fra:'
 
 class blender(parser.parser):
-   'Blender Batch'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
-      self.firstframe = True
-      self.framestring = keyframe
+	'Blender Batch'
+	def __init__( self):
+		parser.parser.__init__( self)
+		self.firstframe = True
+		self.framestring = keyframe
 
-   def do( self, data, mode):
-      lines = data.split('\n')
-      need_calc = False
-      for line in lines:
-         if line.find( keyframe) < 0: continue
-         frmpos = line.find(' ')
-         if frmpos < 0: continue
-         # Increment frame if new:
-         if line[0:frmpos] != self.framestring:
-            self.framestring = line[0:frmpos]
-            need_calc = True
-            if self.firstframe:
-               self.firstframe = False
-            else:
-               self.frame += 1
-               self.percentframe = 0
+	def do( self, data, mode):
+		lines = data.split('\n')
+		need_calc = False
 
-      if need_calc: self.calculate()
+		for line in lines:
+
+			if line.find('Saved:') != -1:
+				line = line[6:]
+				line = line[:line.find('Time:')]
+				self.appendFile( line.strip())
+				continue
+
+			if line.find( keyframe) < 0: continue
+			frmpos = line.find(' ')
+			if frmpos < 0: continue
+			# Increment frame if new:
+			if line[0:frmpos] != self.framestring:
+				self.framestring = line[0:frmpos]
+				need_calc = True
+				if self.firstframe:
+					self.firstframe = False
+				else:
+					self.frame += 1
+					self.percentframe = 0
+
+		if need_calc: self.calculate()
+
+	def appendFile( self, i_file):
+		i_file = os.path.join( self.taskInfo['wdir'], i_file)
+		if os.path.isfile( i_file):
+			self.files.append( i_file)

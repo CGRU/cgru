@@ -10,8 +10,8 @@ Errors = ['Error occured while rendering job.']
 
 class max(parser.parser):
    '3ds Max'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
+   def __init__( self):
+      parser.parser.__init__( self)
       self.firstframe = True
 
    def do( self, data, mode):

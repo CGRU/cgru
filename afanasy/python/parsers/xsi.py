@@ -8,8 +8,8 @@ re_number  = re.compile(r'[0-9]{1,}')
 
 class xsi(parser.parser):
    'Softimage'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
+   def __init__( self):
+      parser.parser.__init__( self)
       self.firstframe = True
 
    def do( self, data, mode):

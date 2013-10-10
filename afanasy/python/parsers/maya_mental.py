@@ -9,8 +9,8 @@ re_number = re.compile(r'[0-9]{1,}')
 
 class maya_mental(parser.parser):
 	'Maya To Mental Ray plugin'
-	def __init__( self, frames = 1):
-		parser.parser.__init__( self, frames)
+	def __init__( self):
+		parser.parser.__init__( self)
 		self.buffer = ""
 		self.numinseq = 0
 		

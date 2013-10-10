@@ -11,8 +11,8 @@ ErrorsRE = [re.compile(r'Error loading geometry .* from stdin')]
 
 class mantra(parser.parser):
    'Houdini mantra with "Alfred Style Progress"'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
+   def __init__( self):
+      parser.parser.__init__( self)
 
    def do( self, data, mode):
 

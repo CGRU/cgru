@@ -9,8 +9,8 @@ re_percent = re.compile(r'Rendering image...:([ ]{,})([0-9]{1,2}.*)(%[ ]{,}).*')
 
 class vray (parser.parser):
 	'VRay Standalone'
-	def __init__( self, frames = 1):
-		parser.parser.__init__( self, frames )
+	def __init__( self):
+		parser.parser.__init__( self)
 		self.buffer = ""
 		self.numinseq = 0
 		

@@ -8,11 +8,10 @@ Errors = ['Files cannot be written - please check output paths!','Error renderin
 
 class c4d(parser.parser):
    'Cinema 4D'
-   def __init__( self, frames = 1):
-      parser.parser.__init__( self, frames)
+   def __init__( self):
+      parser.parser.__init__( self)
       self.firstFrame = True
       self.firstFrameNumber = 0
-      self.frames = frames
 
    def do( self, data, mode):
 
@@ -40,7 +39,7 @@ class c4d(parser.parser):
     currentFrame = thisFrame - self.firstFrameNumber
     
     # Calculate
-    taskPercent = int(float(currentFrame)/self.frames*100)
+    taskPercent = int(float(currentFrame)/self.numframes*100)
     
     # It does not output anything about the frame progress it only displays when it is totally finished
     self.percentframe = 100

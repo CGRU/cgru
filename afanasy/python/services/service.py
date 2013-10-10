@@ -11,53 +11,53 @@ str_hostseparator = ','
 class service:
 	"This is base service class."
 	def __init__( self, taskInfo):
-		self.wdir = taskInfo['wdir']
-		self.command = taskInfo['command']
-		self.capacity = taskInfo['capacity']
-		self.hosts = taskInfo['hosts']
-
-		self.files = taskInfo.get('files', '')
-		
 		self.taskInfo = taskInfo
 		
 		self.pm = cgrupathmap.PathMap()
+
+		self.files = [];
 
 		self.str_capacity = str_capacity
 		self.str_hosts = str_hosts
 		self.str_hostsprefix = str_hostsprefix
 		self.str_hostseparator = str_hostseparator
 
-		try:
-			mod = __import__('parsers', globals(), locals(), [taskInfo['parser']])
-			cmd = 'mod.%s.%s(%d)' % ( taskInfo['parser'], taskInfo['parser'], taskInfo['frames_num'])
-			self.parser = eval( cmd)
-		except:
-			self.parser = None
-			print('ERROR: Failed to import parser "%s"' % cmd)
-			traceback.print_exc( file = sys.stdout)
-
-
-	def getWDir( self):
-		return self.pm.toClient( self.wdir)
-
-
-	def getCommand( self):
-		command = self.pm.toClient( self.command)
+		# Transfer command and working folder:		
+		command = taskInfo['command']
+		command = self.pm.toClient( command)
 		# Apply capacity:
-		if self.capacity > 0: command = self.applyCmdCapacity( command)
+		if self.taskInfo['capacity'] > 0: command = self.applyCmdCapacity( command)
 		# Apply hosts (multihosts tasks):
-		if len( self.hosts): command = self.applyCmdHosts( command)
-		return command
+		if len( self.taskInfo['hosts']): command = self.applyCmdHosts( command)
+		taskInfo['command'] = command
+		taskInfo['wdir'] = self.pm.toClient( taskInfo['wdir'])
+		if len(self.taskInfo['files']): self.taskInfo['files'] = self.pm.toClient( self.taskInfo['files'])
 
 
-	def getFiles( self):
-		if len(self.files) < 1: return self.files
-		return self.pm.toClient( self.files)
+		# Initialize parser:
+		self.parser = None
+		cmd = taskInfo['parser']
+		if len( taskInfo['parser']):
+			try:
+				mod = __import__('parsers', globals(), locals(), [taskInfo['parser']])
+				reload( mod)
+				cmd = 'mod.%s.%s()' % ( taskInfo['parser'], taskInfo['parser'])
+				self.parser = eval( cmd)
+				self.parser.setTaskInfo( taskInfo)
+			except:
+				self.parser = None
+				print('ERROR: Failed to import parser "%s"' % cmd)
+				traceback.print_exc( file = sys.stdout)
+
+
+	def getWDir(    self): return self.taskInfo['wdir']
+	def getCommand( self): return self.taskInfo['command']
+	def getFiles(   self): return self.taskInfo['files']
 
 
 	def applyCmdCapacity( self, command):
-		command = command.replace( self.str_capacity, str( self.capacity))
-		print('Capacity coefficient %s applied:' % str( self.capacity))
+		command = command.replace( self.str_capacity, str( self.taskInfo['capacity']))
+		print('Capacity coefficient %s applied:' % str( self.taskInfo['capacity']))
 		print(command)
 		return command
 
@@ -65,7 +65,7 @@ class service:
 	def applyCmdHosts( self, command):
 		hosts = str_hostsprefix
 		firsthost = True
-		for host in self.hosts:
+		for host in self.taskInfo['hosts']:
 			if firsthost:
 				firsthost = False
 			else:
@@ -78,11 +78,8 @@ class service:
 
 
 	def parse( self, data, mode):
-		if self.parse is None: return None
-		result = self.parser.parse( data, mode)
-		#print('Service parse result:')
-		#print( result)
-		return result
+		if self.parser is None: return None
+		return self.parser.parse( data, mode)
 
 
 	def doPost( self):
@@ -98,15 +95,16 @@ class service:
 			else:
 				return 0
 		post_cmds = []
-#		if len( self.files) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
-		if len( self.files):
+		print( self.parser.getFiles())
+#		if len( self.taskInfo['files']) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
+		if len( self.taskInfo['files']):
 			post_cmds.extend( self.generateThumbnail())
 #		post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
 		return post_cmds
 
 
 	def generateThumbnail( self):
-		files_list = self.files.decode('utf-8').split(';')
+		files_list = self.taskInfo['files'].decode('utf-8').split(';')
 		cmds = []
 
 		if not os.path.isdir( self.taskInfo['store_dir']):
@@ -137,8 +135,8 @@ class service:
 
 	# Not used:
 	def checkfiles( self, sizemin, sizemax):
-		print('Checking for "'+self.files+'" '+str(sizemin)+'-'+str(sizemax))
-		if self.files == '':
+		print('Checking for "'+self.taskInfo['files']+'" '+str(sizemin)+'-'+str(sizemax))
+		if self.taskInfo['files'] == '':
 			print('Error: service::checkfiles: Files not set!')
 			return False
 		return True

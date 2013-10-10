@@ -3,9 +3,9 @@ from parsers import mantra
 
 class hbatch_mantra( hbatch.hbatch, mantra.mantra):
    'Houdini batch + catch mantra node output'
-   def __init__( self, frames = 1):
-      hbatch.hbatch.__init__( self, frames)
-      mantra.mantra.__init__( self, frames)
+   def __init__( self):
+      hbatch.hbatch.__init__( self)
+      mantra.mantra.__init__( self)
 
    def do( self, data, mode):
       #print data
