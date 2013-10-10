@@ -3,7 +3,7 @@ RULES = {};
 RULES.rufolder = 'rules';
 RULES_TOP = {};
 
-c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg'];
+c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg','flv'];
 c_movieTypesHTML = ['ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
