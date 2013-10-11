@@ -464,7 +464,7 @@ for i in range(2):
          logoh = int( Height * logosize[i] / 100 )
          cmd = 'convert'
          cmd += ' "%s"' % logopath[i]
-         cmd += ' -gravity %s -background black' % logograv[i]
+         cmd += ' -gravity %s -background "rgba(0,0,0,0)"' % logograv[i]
          cmd += ' -resize %dx%d' % ( logow, logoh)
          cmd += ' -extent %dx%d' % ( Width, Height)
          tmplogo[i] = os.path.join( TmpDir, tmplogo[i])

@@ -283,7 +283,7 @@ def reformatAnnotate( infile, outfile):
          rect_x2 += rect_w
          rect_c += 255 / (rect_num - 1)
    # Add logo in path specified:
-   if Options.logopath != '': cmd += ' "%s" -compose plus -gravity center -composite' % Options.logopath
+   if Options.logopath != '': cmd += ' "%s" -compose over -gravity center -composite' % Options.logopath
    # Stereo:
    if Stereo: cmd += ' -resize "%dx%d!"' % ( Width/2, Height)
    # Set quality if specified:
