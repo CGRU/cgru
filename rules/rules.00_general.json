@@ -173,5 +173,12 @@
 	},
 
 	"af_capacity":500
+},
+
+"put":{
+	"dest":"/",
+	"af_capacity":100,
+	"af_perhost":1
 }
+
 }

@@ -344,6 +344,12 @@ FilesView.prototype.showFolder = function( i_folder)
 			d_Make( e.currentTarget.m_path, out_path)};
 	}
 
+	var elPut = document.createElement('div');
+	elFolder.appendChild( elPut);
+	elPut.classList.add('button');
+	elPut.textContent = 'PUT';
+	elPut.onclick = function(e){ e.stopPropagation(); pu_Put( path);}
+
 	this.showAttrs( elFolder, i_folder);
 }
 

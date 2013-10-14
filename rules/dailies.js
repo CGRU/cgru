@@ -91,9 +91,9 @@ function d_Make( i_path, i_outfolder)
 	params.filename = filename;
 
 	var wnd = new cgru_Window('dailes','Make Dailies');
-	wnd.elContent.classList.add('dailies');
+	wnd.elContent.classList.add('dialog');
 
-	d_CreateGUI( wnd, d_guiparams, [params, RULES.dailies]);
+	c_CreateGUI( wnd, d_guiparams, [params, RULES.dailies]);
 	d_CreateGUI_Choises({"wnd":wnd,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
@@ -278,14 +278,14 @@ function d_Convert( i_path)
 	params.cvtres = '';
 
 	var wnd = new cgru_Window('dailes','Convert Movie');
-	wnd.elContent.classList.add('dailies');
+	wnd.elContent.classList.add('dialog');
 
 	var elSrc = document.createElement('div');
 	wnd.elContent.appendChild( elSrc);
 	elSrc.classList.add('source');
 	elSrc.textContent = i_path;
 
-	d_CreateGUI( wnd, d_cvtguiparams, [params, RULES.dailies]);
+	c_CreateGUI( wnd, d_cvtguiparams, [params, RULES.dailies]);
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
@@ -302,7 +302,7 @@ function d_Convert( i_path)
 	wnd.elContent.appendChild(div );
 	div.style.margin = '10px';
 
-	d_CreateGUI( wnd, d_expguiparams, [params]);
+	c_CreateGUI( wnd, d_expguiparams, [params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -412,61 +412,5 @@ function d_ExpFinished( i_data, i_args)
 {
 	i_args.wnd.destroy();
 	fv_ReloadAll();
-}
-
-function d_CreateGUI( i_wnd, i_params, i_defaults)
-{
-	if( i_wnd.m_elements == null ) i_wnd.m_elements = {};
-	for( var p = 0; p < i_params.length; p++)
-	{
-		var elDiv = document.createElement('div');
-		i_wnd.elContent.appendChild( elDiv);
-
-		if( i_params[p].width != null )
-		{
-			elDiv.style.cssFloat = 'left';
-			elDiv.style.width = i_params[p].width;
-		}
-		else
-			elDiv.style.clear = 'both';
-
-		var elLabel = document.createElement('div');
-		elDiv.appendChild( elLabel);
-		elLabel.classList.add('label');
-		if( i_params[p].label )
-			elLabel.textContent = i_params[p].label+':';
-		else
-		{
-			elLabel.textContent = i_params[p].name+':';
-			elLabel.style.textTransform = 'capitalize';
-		}
-		if( i_params[p].lwidth )
-			elLabel.style.width = i_params[p].lwidth;
-
-		if( i_params[p].info )
-		{	
-			var elInfo = document.createElement('div');
-			elDiv.appendChild( elInfo);
-			elInfo.classList.add('info');
-			elInfo.textContent = i_params[p].info;
-			if( i_params[p].iwidth )
-				elInfo.style.width = i_params[p].iwidth;
-		}
-
-		var elParam = document.createElement('div');
-		elDiv.appendChild( elParam);
-		elParam.classList.add('param');
-		elParam.classList.add('editing');
-		if( i_defaults )
-			for( var d = 0; d < i_defaults.length; d++)
-				if( i_defaults[d][i_params[p].name] )
-				{
-					elParam.textContent = i_defaults[d][i_params[p].name];
-					break;
-				}
-		elParam.contentEditable = 'true';
-
-		i_wnd.m_elements[i_params[p].name] = elParam;
-	}
 }
 

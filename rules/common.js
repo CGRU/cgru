@@ -502,3 +502,62 @@ function c_LoadingElSet( i_el)
 }
 function c_LoadingElReset( i_el) { if( i_el.m_elWaiting ) i_el.removeChild( i_el.m_elWaiting); }
 
+function c_CreateGUI( i_wnd, i_params, i_defaults)
+{
+	if( i_wnd.m_elements == null ) i_wnd.m_elements = {};
+	for( var p = 0; p < i_params.length; p++)
+	{
+		var elDiv = document.createElement('div');
+		i_wnd.elContent.appendChild( elDiv);
+
+		if( i_params[p].width != null )
+		{
+			elDiv.style.cssFloat = 'left';
+			elDiv.style.width = i_params[p].width;
+		}
+		else
+			elDiv.style.clear = 'both';
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		if( i_params[p].label )
+			elLabel.textContent = i_params[p].label+':';
+		else
+		{
+			elLabel.textContent = i_params[p].name+':';
+			elLabel.style.textTransform = 'capitalize';
+		}
+		if( i_params[p].lwidth )
+			elLabel.style.width = i_params[p].lwidth;
+
+		if( i_params[p].info )
+		{	
+			var elInfo = document.createElement('div');
+			elDiv.appendChild( elInfo);
+			elInfo.classList.add('info');
+			elInfo.textContent = i_params[p].info;
+			if( i_params[p].iwidth )
+				elInfo.style.width = i_params[p].iwidth;
+		}
+
+		var elParam = document.createElement('div');
+		elDiv.appendChild( elParam);
+		elParam.classList.add('param');
+		elParam.classList.add('editing');
+		if( i_defaults )
+			for( var d = 0; d < i_defaults.length; d++)
+				if( i_defaults[d][i_params[p].name] )
+				{
+					elParam.textContent = i_defaults[d][i_params[p].name];
+					break;
+				}
+		if( i_params[p].disabled )
+			elParam.classList.add('disabled');
+		else
+			elParam.contentEditable = 'true';
+
+		i_wnd.m_elements[i_params[p].name] = elParam;
+	}
+}
+
