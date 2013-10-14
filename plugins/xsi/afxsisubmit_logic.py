@@ -190,7 +190,7 @@ def SubmitButton_OnClicked():
       for blockname in blocknames:
          block = af.Block( blockname, 'xsi')
          block.setCommand( str( blockcmds[i]))
-         block.setFiles( str( blockimages[i]))
+         block.setFiles([str( blockimages[i])])
          block.setNumeric( cp_frame_start, cp_frame_end, frame_fpt, cp_frame_by)
          if capacity   != -1: block.setCapacity( capacity)
          if maxruntime !=  0: block.setTasksMaxRunTime( int( maxruntime * 3600))

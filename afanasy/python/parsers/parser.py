@@ -1,4 +1,4 @@
-import sys
+import os, sys
 
 str_warning = '[ PARSER WARNING ]'
 str_error = '[ PARSER ERROR ]'
@@ -25,8 +25,17 @@ class parser:
 		self.numframes = taskInfo['frames_num']
 		if self.numframes < 1: self.numframes = 1
 
+	def appendFile( self, i_file):
+		i_file = os.path.join( self.taskInfo['wdir'], i_file)
+		if not i_file in self.files:
+			if os.path.isfile( i_file):
+				self.files.append( i_file)
+
 	def getFiles( self):
-		return self.files
+		files_list = self.files
+		if len( files_list) > 3:
+			files_list = [ files_list[0], files_list[ len(files_list)/2 ], files_list[-1]]
+		return files_list
 
 	def do( self, data, mode):
 		print('Error: parser.do: Invalid call, this method must be implemented.')
@@ -45,6 +54,13 @@ class parser:
 		if data.find( str_error           ) != -1: self.error           = True
 		if data.find( str_badresult       ) != -1: self.badresult       = True
 		if data.find( str_finishedsuccess ) != -1: self.finishedsuccess = True
+
+		lines = data.split('\n')
+		for line in lines:
+			if line.find('@IMAGE@') != -1:
+				line = line[7:]
+				self.appendFile( line.strip())
+
 		try:
 			result = self.do( data, mode)
 		except:

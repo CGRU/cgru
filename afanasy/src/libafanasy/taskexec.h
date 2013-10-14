@@ -26,7 +26,7 @@ public:
 			int i_capacity,
 			int i_file_size_min,
 			int i_file_size_max,
-			const std::string & i_files,
+			const std::vector<std::string> & i_files,
 
 			long long i_start_frame,
 			long long i_end_frame,
@@ -90,7 +90,7 @@ public:
 	inline const std::string & getCommand()  const { return m_command; } ///< Get command.
 	inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
 	inline const std::string & getEnv()      const { return m_environment;     } ///< Get extra environment.
-	inline const std::string & getFiles()    const { return m_files;   } ///< Get preview command.
+	inline const std::vector<std::string> & getFiles() const { return m_files;   } ///< Get files.
 
 	inline bool hasFileSizeCheck() const { return ((m_file_size_min != -1) || (m_file_size_max != -1));}
 
@@ -184,7 +184,7 @@ private:
 	std::string m_working_directory;  ///< Working directory.
 	std::string m_environment;        ///< Extra environment.
 	std::string m_command;            ///< Command.
-	std::string m_files;              ///< Preview command.
+	std::vector<std::string> m_files; ///< File(s).
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.

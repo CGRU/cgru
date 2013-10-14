@@ -416,7 +416,7 @@ class RenderOnFarm(plugins.CommandData):
 		cmd += ' -nogui -render "' + scenePath + '" -frame @#@ @#@ ' + str( self.byFrame)
 		if self.output != '':
 			cmd += ' -oimage "%s"' % self.output
-			block.setFiles( self.output)
+			block.setFiles([self.output])
 		block.setCommand( cmd)
 
 		# When Constraints got backed a temp-scene got created and has to be deleted in the end

@@ -159,8 +159,9 @@ namespace af
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
 
-   int weigh( const std::string & str);
-   int weigh( const std::list<std::string> & strlist);
+	int weigh( const std::string & str);
+	int weigh( const std::list<std::string> & strlist);
+	int weigh( const std::vector<std::string> & i_list);
 
 
    bool  init( uint32_t flags );

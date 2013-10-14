@@ -40,8 +40,3 @@ class blender(parser.parser):
 					self.percentframe = 0
 
 		if need_calc: self.calculate()
-
-	def appendFile( self, i_file):
-		i_file = os.path.join( self.taskInfo['wdir'], i_file)
-		if os.path.isfile( i_file):
-			self.files.append( i_file)

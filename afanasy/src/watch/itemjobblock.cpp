@@ -58,7 +58,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
 //printf("Changing block properties.\n");
       command           = afqt::stoq( block->getCmd());
       workingdir        = afqt::stoq( block->getWDir());
-      files             = afqt::stoq( block->getFiles());
+      files             = block->getFiles();
       cmdpre            = afqt::stoq( block->getCmdPre());
       cmdpost           = afqt::stoq( block->getCmdPost());
       environment       = afqt::stoq( block->getEnvironment());

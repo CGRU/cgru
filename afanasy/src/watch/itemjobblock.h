@@ -25,7 +25,7 @@ public:
    uint32_t state;
    QString  command;
    QString  workingdir;
-   QString  files;
+   std::vector<std::string> files;
    QString  cmdpre;
    QString  environment;
    QString  cmdpost;

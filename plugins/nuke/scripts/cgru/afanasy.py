@@ -140,7 +140,7 @@ class BlockParameters:
 		if wnode.Class() == RenderNodeClassName:
 			afcommon = __import__('afcommon', globals(), locals(), [])
 			# Get images files:
-			self.imgfile = ''
+			self.imgfiles = []
 			if nuke.toNode('root').knob('proxy').value():
 				fileknob = wnode.knob('proxy')
 			else:
@@ -161,7 +161,7 @@ class BlockParameters:
 					print('Error: Skipping invalid view: "%s"' % view)
 					continue
 
-				if len( self.imgfile): self.imgfile += ';'
+#				if len( self.imgfiles): self.imgfiles += ';'
 				# Get thow files for current view and fitst and last frames:
 				octx = nuke.OutputContext()
 				octx.setView( 1 + nuke.views().index(view))
@@ -172,7 +172,7 @@ class BlockParameters:
 				# If frame first and frame last are equal no sequence needed
 				if octx_framefirst == octx_framelast:
 					octx.setFrame( octx_framefirst)
-					self.imgfile += fileknob.getEvaluatedValue( octx)
+					self.imgfiles.append( fileknob.getEvaluatedValue( octx))
 				else:
 					# Get files from first and last frames to calculate frames pattern:
 					octx.setFrame( octx_framefirst)
@@ -192,10 +192,10 @@ class BlockParameters:
 						nuke.message('Error:\n%s\nInvalid files pattern.\nView "%s".' % ( self.writename, view))
 						self.valid = False
 						return
-					self.imgfile += part1 + '@' + '#'*padding + '@' + part2
+					self.imgfiles.append( part1 + '@' + '#'*padding + '@' + part2)
 
 			# Check images folders:
-			for imgfile in self.imgfile.split(';'):
+			for imgfile in self.imgfiles:
 				folder = os.path.dirname( imgfile)
 				if folder != '':
 					if not os.path.isdir(folder):
@@ -245,7 +245,7 @@ class BlockParameters:
 		if self.wnode.Class() == RenderNodeClassName:
 			block = af.Block( self.name, AfanasyServiceType)
 			block.setNumeric( self.framefirst, self.framelast, self.framespertask, self.frameinc)
-			block.setFiles( self.imgfile)
+			block.setFiles( self.imgfiles)
 			if self.capacity != -1: block.setCapacity( self.capacity)
 			if self.maxruntime != -1: block.setTasksMaxRunTime( self.maxruntime)
 

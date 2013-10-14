@@ -152,7 +152,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	{
 		jr_string("working_directory",     m_working_directory,     i_object, io_changes);
 		jr_string("command",               m_command,               i_object, io_changes);
-		jr_string("files",                 m_files,                 i_object, io_changes);
+		jr_stringvec("files",              m_files,                 i_object);
 		jr_string("command_pre",           m_command_pre,           i_object, io_changes);
 		jr_string("command_post",          m_command_post,          i_object, io_changes);
 	}
@@ -333,7 +333,15 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 		if( m_working_directory.size())
             o_str << ",\n\"working_directory\":\"" << af::strEscape(m_working_directory ) << "\"";
 		if( m_files.size())
-            o_str << ",\n\"files\":\""             << af::strEscape( m_files )    << "\"";
+		{
+			o_str << ",\n\"files\":[";
+			for( int i = 0; i < m_files.size(); i++ )
+			{
+				if( i ) o_str << ",";
+				o_str << "\"" << af::strEscape( m_files[i]) << "\"";
+			}
+			o_str << "]";
+		}
 		if( m_command_pre.size())
             o_str << ",\n\"cmd_pre\":\""           << af::strEscape( m_command_pre )  << "\"";
 		if( m_command_post.size())
@@ -532,11 +540,11 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_String  ( m_working_directory,     msg);
 		rw_String  ( m_environment,           msg);
 		rw_String  ( m_command,               msg);
-		rw_String  ( m_files,                 msg);
 		rw_String  ( m_command_pre,           msg);
 		rw_String  ( m_command_post,          msg);
 		rw_String  ( m_multihost_service,     msg);
 		rw_String  ( m_custom_data,           msg);
+		rw_StringVect ( m_files,              msg);
 
 	case Msg::TJobsList:
 		rw_uint32_t( m_flags,                 msg);
@@ -921,37 +929,48 @@ const std::string BlockData::genCommand( int num, long long * fstart, long long 
    return str;
 }
 
-const std::string BlockData::genFiles( int num, long long * fstart, long long * fend) const
+const std::vector<std::string> BlockData::genFiles( int num, long long * fstart, long long * fend) const
 {
-   std::string str;
-   if( num >= m_tasks_num)
-   {
-      AFERROR("BlockData::genCmdView: n >= tasksnum.")
-      return str;
-   }
-   if( isNumeric())
-   {
-      if( m_files.size())
-      {
-         long long start, end;
-         bool ok = true;
-         if( fstart && fend )
-         {
-            start = *fstart;
-            end   = *fend;
-         }
-         else
-            ok = genNumbers( start, end, num);
+	std::vector<std::string> files;
+	if( num >= m_tasks_num)
+	{
+		AFERROR("BlockData::genCmdView: n >= tasksnum.")
+		return files;
+	}
+	if( isNumeric())
+	{
+		if( m_files.size())
+		{
+			long long start, end;
+			bool ok = true;
+			if( fstart && fend )
+			{
+				start = *fstart;
+				end   = *fend;
+			}
+			else
+				ok = genNumbers( start, end, num);
 
-         if( ok)
-            str = af::fillNumbers( m_files, start, end);
-      }
-   }
-   else
-   {       
-      str = af::replaceArgs( m_files, m_tasks_data[num]->getFiles() );
-   }
-   return str;
+			if( ok)
+			{
+				for( int i = 0; i < m_files.size(); i++)
+					files.push_back( af::fillNumbers( m_files[i], start, end));
+			}
+		}
+	}
+	else
+	{
+		if( m_tasks_data[num]->getFiles().empty())
+			return files;
+
+		if( m_files.empty())
+			return m_tasks_data[num]->getFiles();
+
+		for( int bf = 0; bf < m_files.size(); bf++ )
+		for( int tf = 0; tf < m_tasks_data[num]->getFiles().size(); tf++ )
+			files.push_back( af::replaceArgs( m_files[bf], m_tasks_data[num]->getFiles()[tf]));
+	}
+	return files;
 }
 
 TaskExec * BlockData::genTask( int num) const

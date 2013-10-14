@@ -67,9 +67,9 @@ public:
 
 	bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL ) const; ///< Generate fisrt and last frame numbers for \c num task.
 	int calcTaskNumber( long long i_frame, bool & o_inValidRange) const;
-	const std::string genTaskName(   int num, long long * fstart = NULL, long long * fend = NULL ) const;
-	const std::string genCommand(    int num, long long * fstart = NULL, long long * fend = NULL ) const;
-	const std::string genFiles(      int num, long long * fstart = NULL, long long * fend = NULL ) const;
+	const std::string genTaskName( int num, long long * fstart = NULL, long long * fend = NULL ) const;
+	const std::string genCommand(  int num, long long * fstart = NULL, long long * fend = NULL ) const;
+	const std::vector<std::string> genFiles(int num, long long * fstart = NULL, long long * fend = NULL ) const;
 
 	inline bool isNumeric() const { return m_flags & FNumeric;} ///< Whether the block is numeric.
 	inline bool isNotNumeric() const { return false == (m_flags & FNumeric);} ///< Whether the block is not numeric.
@@ -102,7 +102,7 @@ public:
 /// Set block tasks command.
 	inline void setCommand(          const std::string & str    ) { m_command          = str;   }
 /// Set block tasks veiw result command.
-	inline void setFiles(            const std::string & str    ) { m_files            = str;   }
+//	inline void setFiles(            const std::string & str    ) { m_files            = str;   }
 /// Set block pre commnand.
 	inline void setCmdPre(           const std::string & str    ) { m_command_pre          = str;   }
 /// Set block post commnand.
@@ -164,20 +164,20 @@ public:
 	void setFramesPerTask( long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string & getName()         const { return m_name;                }  ///< Get name.
-	inline const std::string & getWDir()         const { return m_working_directory;                }  ///< Get working directory.
+	inline const std::string & getWDir()         const { return m_working_directory;   }  ///< Get working directory.
 	inline const std::string & getCmd()          const { return m_command;             }  ///< Get command.
-	inline bool                hasTasksName()    const { return m_tasks_name.size();    }  ///< Whether block has tasks name.
-	inline const std::string & getTasksName()    const { return m_tasks_name;           }  ///< Get tasks name.
-	inline bool                hasFiles()        const { return m_files.size();        }  ///< Whether block has files.
-	inline const std::string & getFiles()        const { return m_files;               }  ///< Get tasks files.
+	inline bool                hasTasksName()    const { return m_tasks_name.size();   }  ///< Whether block has tasks name.
+	inline const std::string & getTasksName()    const { return m_tasks_name;          }  ///< Get tasks name.
 	inline bool                hasEnvironment()  const { return m_environment.size();  }  ///< Whether extra environment is set.
 	inline const std::string & getEnvironment()  const { return m_environment;         }  ///< Get extra environment.
+	inline bool                hasFiles()        const { return m_files.size();        }  ///< Whether block has files.
+	inline const std::vector<std::string> & getFiles() const { return m_files;         }  ///< Get tasks files.
 
 	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();        }  ///< Whether depend mask is set.
-	inline bool hasTasksDependMask()    const { return m_tasks_depend_mask.notEmpty();   }  ///< Whether block has tasks depend mask.
+	inline bool hasTasksDependMask()    const { return m_tasks_depend_mask.notEmpty();  }  ///< Whether block has tasks depend mask.
 	inline bool hasHostsMask()          const { return m_hosts_mask.notEmpty();         }  ///< Whether block has hostsmask.
 	inline bool hasHostsMaskExclude()   const { return m_hosts_mask_exclude.notEmpty(); }  ///< Whether block has host exclude smask.
-	inline bool hasNeedProperties()     const { return m_need_properties.notEmpty();   }  ///< Whether block has need_properties.
+	inline bool hasNeedProperties()     const { return m_need_properties.notEmpty();    }  ///< Whether block has need_properties.
 
 	inline const std::string & getDependMask()        const { return m_depend_mask.getPattern();       }  ///< Get depend mask.
 	inline const std::string & getTasksDependMask()   const { return m_tasks_depend_mask.getPattern();  }  ///< Get tasks depend mask.
@@ -313,7 +313,7 @@ protected:
 	std::string m_command_post;  ///< Post command.
 
 	std::string m_command;               ///< Command.
-	std::string m_files;          ///< Command to view tasks result.
+	std::vector<std::string> m_files;          ///< Command to view tasks result.
 
 	std::string m_custom_data;     ///< Custom data.
 

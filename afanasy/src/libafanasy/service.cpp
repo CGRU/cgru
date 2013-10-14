@@ -19,13 +19,12 @@ Service::Service(
 	const std::string & i_type,
 	const std::string & i_wdir,
 	const std::string & i_command,
-	const std::string & i_files,
+	const std::vector<std::string> & i_files,
 	const std::string & i_store_dir
 ):
 	m_name( i_type),
 	m_wdir( i_wdir),
-	m_command( i_command),
-	m_files( i_files)
+	m_command( i_command)
 {
 	TaskExec * i_task_exec = new TaskExec(
 			"i_name", i_type, "", i_command,
@@ -43,8 +42,7 @@ Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir)
 	m_name( i_task_exec->getServiceType()),
 	m_parser_type( i_task_exec->getParserType()),
 	m_wdir( i_task_exec->getWDir()),
-	m_command( i_task_exec->getCommand()),
-	m_files( i_task_exec->getFiles())
+	m_command( i_task_exec->getCommand())
 {
 	initialize( i_task_exec, i_store_dir);
 }
@@ -54,17 +52,20 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncGetWDir = NULL;
 	m_PyObj_FuncGetCommand = NULL;
 	m_PyObj_FuncGetFiles = NULL;
+	m_PyObj_FuncGetParsedFiles = NULL;
 	m_PyObj_FuncParse = NULL;
 	m_PyObj_FuncDoPost = NULL;
 	m_initialized = false;
 
+	PyObject * pFilesList = PyList_New(0);
+	for( int i = 0; i < i_task_exec->getFiles().size(); i++)
+		PyList_Append( pFilesList, PyBytes_FromString( i_task_exec->getFiles()[i].c_str() ));
+
 	PyObject * pHostsList = PyList_New(0);
-	for( std::list<std::string>::const_iterator it = i_task_exec->getMultiHostsNames().begin(); it != i_task_exec->getMultiHostsNames().end(); it++)
-		if( PyList_Append( pHostsList, PyBytes_FromString((*it).c_str())) != 0)
-		{
-			AFERROR("Service::Service: PyList_Append:")
-			PyErr_Print();
-		}
+	for( std::list<std::string>::const_iterator it = i_task_exec->getMultiHostsNames().begin();
+			it != i_task_exec->getMultiHostsNames().end(); it++)
+		PyList_Append( pHostsList, PyBytes_FromString((*it).c_str()));
+
 
 	PyObject *pArgs;
 	pArgs = PyTuple_New( 1);
@@ -75,7 +76,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "wdir",     PyBytes_FromString( i_task_exec->getWDir().c_str()));
 	PyDict_SetItemString( task_info, "command",  PyBytes_FromString( i_task_exec->getCommand().c_str()));
 	PyDict_SetItemString( task_info, "capacity", PyLong_FromLong( i_task_exec->getCapCoeff()));
-	PyDict_SetItemString( task_info, "files",    PyBytes_FromString( i_task_exec->getFiles().c_str()));
+	PyDict_SetItemString( task_info, "files",    pFilesList);
 	PyDict_SetItemString( task_info, "hosts",    pHostsList);
 
 	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( m_parser_type.c_str()));
@@ -124,6 +125,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncGetFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETFILES);
 	if( m_PyObj_FuncGetFiles == NULL ) return;
 
+	m_PyObj_FuncGetParsedFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETPARSEDFILES);
+	if( m_PyObj_FuncGetParsedFiles == NULL ) return;
+
 	m_PyObj_FuncParse = getFunction( AFPYNAMES::SERVICE_FUNC_PARSE);
 	if( m_PyObj_FuncParse == NULL ) return;
 
@@ -165,23 +169,6 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	}
 	Py_DECREF( pResult);
 	AFINFA("Service::initialize: Command:\n%s", m_command.c_str())
-
-	// Process files:
-	AFINFA("Service::initialize: Processing files:\n%s", m_files.c_str())
-	pResult = PyObject_CallObject( m_PyObj_FuncGetFiles, NULL);
-	if( pResult == NULL)
-	{
-		if( PyErr_Occurred()) PyErr_Print();
-		return;
-	}
-	if( false == af::PyGetString( pResult, m_files))
-	{
-		AFERROR("Service:FuncGetCommand: Returned object is not a string.")
-		Py_DECREF( pResult);
-		return;
-	}
-	Py_DECREF( pResult);
-	AFINFA("Service::initialize: Files:\n%s", m_files.c_str())
 
 	m_initialized = true;
 }
@@ -273,7 +260,7 @@ const std::vector<std::string> Service::doPost()
 	if( pResult )
 	{
 		if( false == af::PyGetStringList( pResult, cmds))
-			AFERROR("Service:FuncDoPost: Returned object is not a string.")
+			AFERRAR("Service:goPost: '%s': returned object is not a string.", m_name.c_str())
 
 		Py_DECREF( pResult);
 	}
@@ -281,5 +268,41 @@ const std::vector<std::string> Service::doPost()
 		PyErr_Print();
 
 	return cmds;
+}
+
+const std::vector<std::string> Service::getFiles() const
+{
+	std::vector<std::string> files;
+
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncGetFiles, NULL);
+	if( pResult )
+	{
+		if( false == af::PyGetStringList( pResult, files))
+			AFERRAR("Service:getFiles: '%s': returned object is not a string.", m_name.c_str())
+
+		Py_DECREF( pResult);
+	}
+	else if( PyErr_Occurred())
+		PyErr_Print();
+
+	return files;
+}
+
+const std::vector<std::string> Service::getParsedFiles() const
+{
+	std::vector<std::string> files;
+
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncGetParsedFiles, NULL);
+	if( pResult )
+	{
+		if( false == af::PyGetStringList( pResult, files))
+			AFERRAR("Service:getParsedFiles: '%s': returned object is not a string.", m_name.c_str())
+
+		Py_DECREF( pResult);
+	}
+	else if( PyErr_Occurred())
+		PyErr_Print();
+
+	return files;
 }
 

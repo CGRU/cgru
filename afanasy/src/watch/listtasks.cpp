@@ -125,7 +125,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 		  case ItemJobBlock::ItemId:
 		  {
 				ItemJobBlock *itemBlock = (ItemJobBlock*)item;
-				if( false == itemBlock->files.isEmpty() )
+				if( itemBlock->files.size() )
 				{
 					 action = new QAction( "Browse Files...", this);
 					 connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
@@ -206,9 +206,9 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
 			menu.addAction( action);
 
-			if( ((ItemJobTask*)(item))->genFiles().empty() == false )
+			std::vector<std::string> files = ((ItemJobTask*)(item))->genFiles();
+			if( files.size())
 			{
-				QStringList files = QString::fromUtf8(((ItemJobTask*)(item))->genFiles().c_str()).split(';');
 				if( af::Environment::getPreviewCmds().size() > 0 )
 				{
 					menu.addSeparator();
@@ -225,10 +225,11 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 					{
 						if( files.size() > 1)
 						{
-							QMenu * submenu_img = new QMenu( QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
+							QString file = afqt::stoq((*it).c_str());
+							QMenu * submenu_img = new QMenu( QString("%1").arg( file), this);
 							for( int i = 0; i < files.size(); i++)
 							{
-								QString imgname = files[i].right(99);
+								QString imgname = file.right(99);
 								ActionIdId * actionid = new ActionIdId( p, i, imgname, this);
 								connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
 								submenu_img->addAction( actionid);
@@ -572,10 +573,19 @@ void ListTasks::actBlockWorkingDir()
 void ListTasks::actBlockFiles()
 {
 	bool ok;
-	QString cur = ((ItemJobBlock*)( getCurrentItem()))->files;
+	QString cur = afqt::stoq( af::strJoin(((ItemJobBlock*)( getCurrentItem()))->files, ";"));
 	QString str = QInputDialog::getText(this, "Change Files", "Enter Files", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
-	blockAction( 0, QString("\"params\":{\"files\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+	QString params = QString("\"params\":{\"files\":[");
+	QStringList files = str.split(";");
+	for( int i = 0; i < files.size(); i++ )
+	{
+		if( i ) params += ",";
+		params += "\"" + files[i] + "\"";
+	}
+	params += "]}";
+
+	blockAction( 0, params, false);
 }
 void ListTasks::actBlockCmdPost()
 {
@@ -617,8 +627,8 @@ void ListTasks::actBrowseFolder()
 	 case ItemJobBlock::ItemId:
 	 {
 		  ItemJobBlock *itemBlock = (ItemJobBlock*)item;
-		  af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", afqt::qtos( itemBlock->files));
-		  image = afqt::stoq( service.getFiles()).split(';')[0];
+		  af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", itemBlock->files);
+		  image = afqt::stoq( service.getFiles()[0]);
 		  wdir = afqt::stoq( service.getWDir());
 		  break;
 	 }
@@ -626,7 +636,7 @@ void ListTasks::actBrowseFolder()
 	 {
 		  ItemJobTask* taskitem = (ItemJobTask*)item;
 		  af::Service service("service", taskitem->getWDir(), "", taskitem->genFiles());
-		  image = afqt::stoq( service.getFiles()).split(';')[0];
+		  image = afqt::stoq( service.getFiles()[0]);
 		  wdir = afqt::stoq( service.getWDir());
 		  break;
 	 }
@@ -654,13 +664,13 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 	ItemJobTask* taskitem = (ItemJobTask*)item;
 	af::Service service( "service", taskitem->getWDir(), "", taskitem->genFiles());
 
-	QStringList images = afqt::stoq( service.getFiles()).split(';');
+	std::vector<std::string> images = service.getFiles();
 	if( num_img >= images.size())
 	{
 		displayError( "No such image nubmer.");
 		return;
 	}
-	QString arg  = images[num_img];
+	QString arg = afqt::stoq( images[num_img]);
 	QString wdir( afqt::stoq( service.getWDir()));
 
 	if( arg.isEmpty()) return;

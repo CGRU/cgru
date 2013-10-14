@@ -164,7 +164,7 @@ void TaskProcess::launchCommand()
 	if( ResumeThread( m_pinfo.hThread) == -1)
 		AFERRAR("TaskProcess: ResumeThread failed with code = %d.", GetLastError())
 
-	printf("Started PID=%d: ", m_pid);
+	printf("\nStarted PID=%d: ", m_pid);
 
 	#else
 	// On UNIX we set buffers and non-blocking:
@@ -174,7 +174,7 @@ void TaskProcess::launchCommand()
 	setNonblocking( fileno( m_io_output));
 	setNonblocking( fileno( m_io_outerr));
 
-	printf("Started PID=%d SID=%d(%d) GID=%d(%d): ", m_pid, getsid(m_pid), setsid(), getpgid(m_pid), getpgrp());
+	printf("\nStarted PID=%d SID=%d(%d) GID=%d(%d): ", m_pid, getsid(m_pid), setsid(), getpgid(m_pid), getpgrp());
 
 	#endif
 

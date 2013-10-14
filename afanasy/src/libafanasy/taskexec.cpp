@@ -17,7 +17,7 @@ TaskExec::TaskExec(
 		int i_capacity,
 		int i_file_size_min,
 		int i_file_size_max,
-		const std::string & i_files,
+		const std::vector<std::string> & i_files,
 
 		long long i_start_frame,
 		long long i_end_frame,
@@ -137,7 +137,15 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 		if( m_parser.size())
 			o_str << ",\"parser\":\"" << m_parser << "\"";
 		if( m_files.size())
-			o_str << ",\"files\":\"" << af::strEscape( m_files  ) << "\"";
+		{
+			o_str << ",\"files\":[";
+			for( int i = 0; i < m_files.size(); i++)
+			{
+				if( i ) o_str << ",";
+				o_str << "\"" << af::strEscape( m_files[i]) << "\"";
+			}
+			o_str << "]";
+		}
 		if( m_working_directory.size())
 			o_str << ",\"working_directory\":\"" << af::strEscape( m_working_directory ) << "\"";
 		if( m_custom_data_task.size())
@@ -178,7 +186,7 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_String  ( m_command,           msg);
 		rw_String  ( m_working_directory, msg);
 		rw_String  ( m_environment,       msg);
-		rw_String  ( m_files,             msg);
+		rw_StringVect ( m_files,          msg);
 		rw_String  ( m_parser,            msg);
 		rw_String  ( m_custom_data_task,  msg);
 		rw_String  ( m_custom_data_block, msg);

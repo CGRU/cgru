@@ -58,7 +58,7 @@ class AfanasyRenderBlock ( RenderBlock ) :
     if self.distributed :
       self.af_block.setMultiHost ( self.hosts_min, self.hosts_max, 0, self.sameHostMaster, '', 0 )  
     self.af_block.setCommand ( self.cmd + ' ' + self.input_files )
-    self.af_block.setFiles ( self.out_files )
+    self.af_block.setFiles([self.out_files])
     if self.isNumeric :
       self.af_block.setNumeric ( self.start, self.stop, self.task_size, self.step )  
 #

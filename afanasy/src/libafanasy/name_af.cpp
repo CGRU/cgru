@@ -498,6 +498,13 @@ int af::weigh( const std::list<std::string> & strlist)
    return w;
 }
 
+int af::weigh( const std::vector<std::string> & i_list)
+{
+   int w = 0;
+   for( int i = 0; i < i_list.size(); i++) w += weigh( i_list[i]);
+   return w;
+}
+
 const std::string af::getenv( const char * name)
 {
    std::string envvar;

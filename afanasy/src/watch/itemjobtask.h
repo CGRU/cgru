@@ -26,7 +26,7 @@ public:
 	inline int getTaskNum()  const { return m_tasknum;  }
 
 	const std::string & getWDir() const;
-	const std::string genFiles() const;
+	const std::vector<std::string> genFiles() const;
 	int getFramesNum() const;
 
 	af::TaskProgress taskprogress;

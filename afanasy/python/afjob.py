@@ -620,7 +620,7 @@ for cmd in cmds:
 	block.setCapacity( capacity)
 	block.setVariableCapacity( capmin, capmax)
 	if maxruntime != 0: block.setTasksMaxRunTime( maxruntime)
-	if images != '': block.setFiles( afcommon.patternFromDigits( afcommon.patternFromStdC( images)))
+	if images != '': block.setFiles( afcommon.patternFromDigits( afcommon.patternFromStdC( images)).split(';'))
 	blocks.append( block)
 	i += 1
 

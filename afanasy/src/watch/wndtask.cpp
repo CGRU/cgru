@@ -110,9 +110,9 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 	// Create task and service:
 	af::TaskExec taskexec( msg);
 	af::Service service( &taskexec);
-	QString wdir      = afqt::stoq( service.getWDir());
-	QString command   = afqt::stoq( service.getCommand());
-	QString files     = afqt::stoq( service.getFiles());
+	QString wdir    = afqt::stoq( service.getWDir());
+	QString command = afqt::stoq( service.getCommand());
+	std::vector<std::string> files = service.getFiles();
 
 	// Output task data:
 	QTextCharFormat fParameter;
@@ -144,14 +144,12 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 	c.insertText( "Working Directory:", fInfo);
 	c.insertText( "\n");
 	c.insertText( wdir, fParameter);
-	QStringList filesList;
-	if( files.isEmpty() == false)
+	if( files.size())
 	{
 		c.insertText( "\n");
 		c.insertText( "Files:", fInfo);
-		filesList = files.split(';');
-		for( int i = 0; i < filesList.size(); i++)
-			c.insertText( "\n" + filesList[i], fParameter);
+		for( int i = 0; i < files.size(); i++)
+			c.insertText( "\n" + afqt::stoq( files[i]), fParameter);
 	}
 	if( taskexec.hasFileSizeCheck())
 	{
@@ -162,7 +160,7 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 		c.insertText( QString::number( taskexec.getFileSizeMax()), fParameter);
 	}
 
-	if( files.isEmpty())
+	if( files.size() == 0 )
 		return;
 
 	// Create preview files controls:
@@ -174,14 +172,14 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 	layoutH->addLayout( layoutL);
 	layoutH->addLayout( layoutR);
 
-	for( int i = 0; i < filesList.size(); i++)
+	for( int i = 0; i < files.size(); i++)
 	{
 		QLineEdit * fileField = new QLineEdit( this);
 		layoutL->addWidget( fileField);
 		fileField->setReadOnly(true);
-		fileField->setText( filesList[i]);
+		fileField->setText( afqt::stoq( files[i]));
 
-		ButtonMenu * btnBrowse = new ButtonMenu( filesList[i], wdir, this);
+		ButtonMenu * btnBrowse = new ButtonMenu( afqt::stoq( files[i]), wdir, this);
 		layoutR->addWidget( btnBrowse);
 	}
 }

@@ -44,8 +44,10 @@ class Task:
 		self.data["command"] = command
 
 	def setFiles( self, files, TransferToServer = True):
-		if TransferToServer: files = Pathmap.toServer( files)
-		self.data["files"] = files
+		if not "files" in self.data: self.data["files"] = []
+		for afile in files:
+			if TransferToServer: afile = Pathmap.toServer( afile)
+			self.data["files"].append( afile)
 
 class Block:
 	def __init__( self, blockname = 'block', service = 'generic'):
@@ -127,8 +129,10 @@ class Block:
 		self.data["command_post"] = command_post
 
 	def setFiles(  self, files, TransferToServer = True):
-		if TransferToServer: files = Pathmap.toServer( files)
-		self.data["files"] = files
+		if not "files" in self.data: self.data["files"] = []
+		for afile in files:
+			if TransferToServer: afile = Pathmap.toServer( afile)
+			self.data["files"].append( afile)
 
 	def setName(               self, value): self.data["name"] = value
 	def setTasksName(          self, value): self.data["tasks_name"] = value

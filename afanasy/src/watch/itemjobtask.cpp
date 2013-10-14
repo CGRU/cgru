@@ -63,10 +63,13 @@ const QString ItemJobTask::getSelectString() const
 	return afqt::stoq( m_block->genTaskName( m_tasknum));
 }
 
-const std::string & ItemJobTask::getWDir()      const { return m_block->getWDir();            }
-const std::string ItemJobTask::genFiles()     const { return m_block->genFiles( m_tasknum);   }
-int           ItemJobTask::getFramesNum() const { return m_block->getFramePerTask();    }
-void          ItemJobTask::upProgress(    const af::TaskProgress &tp){ taskprogress = tp;}
+const std::string & ItemJobTask::getWDir() const { return m_block->getWDir(); }
+
+const std::vector<std::string> ItemJobTask::genFiles() const { return m_block->genFiles( m_tasknum); }
+
+int ItemJobTask::getFramesNum() const { return m_block->getFramePerTask();}
+
+void ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
 void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {

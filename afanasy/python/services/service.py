@@ -31,7 +31,8 @@ class service:
 		if len( self.taskInfo['hosts']): command = self.applyCmdHosts( command)
 		taskInfo['command'] = command
 		taskInfo['wdir'] = self.pm.toClient( taskInfo['wdir'])
-		if len(self.taskInfo['files']): self.taskInfo['files'] = self.pm.toClient( self.taskInfo['files'])
+		for i in range( 0, len( self.taskInfo['files'])):
+			self.taskInfo['files'][i] = self.pm.toClient( self.taskInfo['files'][i])
 
 
 		# Initialize parser:
@@ -50,9 +51,10 @@ class service:
 				traceback.print_exc( file = sys.stdout)
 
 
-	def getWDir(    self): return self.taskInfo['wdir']
-	def getCommand( self): return self.taskInfo['command']
-	def getFiles(   self): return self.taskInfo['files']
+	def getWDir(        self ): return self.taskInfo['wdir']
+	def getCommand(     self ): return self.taskInfo['command']
+	def getFiles(       self ): return self.taskInfo['files']
+	def getParsedFiles( self ): return self.files
 
 
 	def applyCmdCapacity( self, command):
@@ -94,24 +96,35 @@ class service:
 				return byte & mask
 			else:
 				return 0
+
+		if self.parser is not None:
+			self.files = self.parser.getFiles()
+
 		post_cmds = []
-		print( self.parser.getFiles())
+		#print( self.parser.getFiles())
 #		if len( self.taskInfo['files']) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
-		if len( self.taskInfo['files']):
-			post_cmds.extend( self.generateThumbnail())
+		post_cmds.extend( self.generateThumbnail())
 #		post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
 		return post_cmds
 
 
 	def generateThumbnail( self):
-		files_list = self.taskInfo['files'].decode('utf-8').split(';')
 		cmds = []
 
 		if not os.path.isdir( self.taskInfo['store_dir']):
 			return cmds
 
+		files_list = self.files
+		if len( files_list) == 0 and len(self.taskInfo['files']):
+			for afile in self.taskInfo['files']:
+				files_list.append( afile.decode('utf-8'))
+		if len( files_list ) == 0:
+			return cmds
+
 		for image in files_list:
 			if len( image) < 1: continue
+			image = os.path.join( self.taskInfo['wdir'], image)
+			if not os.path.isfile( image): continue
 
 			basename, ext = os.path.splitext( os.path.basename( image))
 			if len( ext ) < 2: continue

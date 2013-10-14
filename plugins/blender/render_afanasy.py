@@ -235,7 +235,7 @@ class ORE_Submit(bpy.types.Operator):
 			if pos > 0: images = images[:pos] + '@' + images[pos:]
 			pos = images.rfind('#')
 			if pos > 0: images = images[:pos+1] + '@' + images[pos+1:]
-			block.setFiles( images)
+			block.setFiles([images])
 		# Set job running parameters:
 		if ore.maxruntasks		 > -1: job.setMaxRunningTasks( ore.maxruntasks )
 		if ore.priority			 > -1: job.setPriority( ore.priority )

@@ -158,7 +158,7 @@ class BlockParameters:
 
       block = af.Block( self.name, self.type)
       block.setCommand( self.cmd % vars(), self.cmd_useprefix)
-      if self.preview != '': block.setFiles( self.preview)
+      if self.preview != '': block.setFiles([self.preview])
 
       if self.numeric: block.setNumeric( self.frame_first, self.frame_last, self.frame_pertask, self.frame_inc)
       else:
@@ -166,7 +166,7 @@ class BlockParameters:
          for cmd in self.tasks_cmds:
             task = af.Task( self.tasks_names[t])
             task.setCommand( cmd)
-            if len( self.tasks_previews): task.setFiles(self.tasks_previews[t])
+            if len( self.tasks_previews): task.setFiles([self.tasks_previews[t]])
             block.tasks.append( task)
             t += 1
          block.setFramesPerTask( self.frame_pertask)

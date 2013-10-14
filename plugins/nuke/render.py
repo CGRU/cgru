@@ -245,6 +245,7 @@ while frame <= flast:
 				exitcode = 1
 			else:
 				moveditems += 1
+				print('@IMAGE@' + dest)
 
 		if moveditems < 1:
 			print('Error: No images generated.')

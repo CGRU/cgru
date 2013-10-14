@@ -92,6 +92,17 @@ if drivertypename == 'ifd':
                   print command
                except:
                   print 'Failed, number of mantra theads not changed.'
+      # Trying to set ROP verbose level:
+      verbose = ropnode.parm('vm_verbose')
+      if verbose != None:
+         value =verbose.eval()
+         if value != None:
+            if value < 1:
+               print 'Trying to set "Verbose Level" to 1 on mantra'
+               try:
+                  verbose.set( 1)
+               except:
+                  print 'Failed, frame verbose not available.'
       # Trying to set ROP to output progress
       progress = ropnode.parm('vm_alfprogress')
       if progress != None:
