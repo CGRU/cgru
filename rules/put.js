@@ -9,8 +9,18 @@ function pu_Put( i_path)
 	wnd.elContent.classList.add('dialog');
 
 	var params = {};
+
 	params.src = i_path;
-	params.dest = '/ololo/';
+
+	params.dest = RULES.put.dest;
+	if( params.dest.indexOf('/')  != 0 )
+	{
+		if( ASSETS.project )
+			params.dest = ASSETS.project.path + '/' + params.dest;
+		else
+			params.dest = '/' + params.dest;
+	}
+
 	params.name = c_PathBase( i_path);
 	if( ASSET )
 	{
@@ -40,6 +50,11 @@ function pu_Put( i_path)
 	elSend.classList.add('button');
 	elSend.onclick = function(e){ pu_ProcessGUI( e.currentTarget.m_wnd);}
 	elSend.m_wnd = wnd;
+
+	var elRules = document.createElement('div');
+	wnd.elContent.appendChild( elRules);
+	elRules.classList.add('rules');
+	elRules.textContent = 'RULES.put='+JSON.stringify(RULES.put).replace(/,/g,', ');
 }
 
 function pu_ProcessGUI( i_wnd)
@@ -56,10 +71,10 @@ function pu_ProcessGUI( i_wnd)
 
 	var block = {};
 	block.name = 'put';
-	block.service = 'put';
-	block.parser = 'generic';
+	block.service = RULES.put.af_service;
+	block.parser  = RULES.put.af_parser;
 	if( RULES.put.af_capacity ) block.capacity = RULES.put.af_capacity;
-	if( RULES.put.af_perhost ) block.max_running_tasks_per_host = RULES.put.af_perhost;
+	if( RULES.put.af_perhost  ) block.max_running_tasks_per_host = RULES.put.af_perhost;
 	job.blocks = [block];
 
 	var task = {}

@@ -176,9 +176,11 @@
 },
 
 "put":{
-	"dest":"/",
-	"af_capacity":100,
-	"af_perhost":1
+	"dest":"FINAL",
+	"af_service":"generic",
+	"af_parser":"generic",
+	"-af_capacity":100,
+	"-af_perhost":1
 }
 
 }

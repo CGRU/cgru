@@ -227,7 +227,12 @@ function n_SendJob( job)
 	obj.sender_id = 0;
 	obj.magick_number = 1;
 	
-	n_Request({"send":obj});
+	n_Request({"send":obj,"func":n_JobSended});
+}
+function n_JobSended( i_data)
+{
+	if( i_data.error )
+		c_Error( i_data.error);
 }
 
 function n_Get( i_path)
