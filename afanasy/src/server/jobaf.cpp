@@ -1236,9 +1236,9 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 	else if( i_mode == "files" )
 	{
 		if( i_binary )
-			return m_blocks[i_b]->m_tasks[i_t]->getFiles();
+			return m_blocks[i_b]->m_tasks[i_t]->getStoredFiles();
 		else
-			m_blocks[i_b]->m_tasks[i_t]->getFiles( str);
+			m_blocks[i_b]->m_tasks[i_t]->getStoredFiles( str);
 	}
 	else if( i_mode == "output")
 	{
@@ -1257,8 +1257,8 @@ const std::list<std::string> & JobAf::getTaskLog( int block, int task) const
 
 af::TaskExec * JobAf::generateTask( int block, int task) const
 {
-   if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
-   return m_blocks[block]->m_data->genTask( task);
+	if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
+	return m_blocks[block]->m_tasks[task]->genExec();
 }
 
 const std::string JobAf::generateTaskName( int i_b, int i_t) const

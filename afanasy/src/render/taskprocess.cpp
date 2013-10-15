@@ -197,9 +197,9 @@ TaskProcess::~TaskProcess()
 	m_taskexec->stdOut();
 #endif
 
-	if( m_taskexec != NULL  ) delete m_taskexec;
-	if( m_service  != NULL  ) delete m_service;
-	if( m_parser   != NULL  ) delete m_parser;
+	delete m_taskexec;
+	delete m_service;
+	delete m_parser;
 
 	af::removeDir( m_store_dir);
 }
@@ -385,7 +385,7 @@ void TaskProcess::sendTaskSate()
 	{
 		type = af::Msg::TTaskUpdateState;
 		toRecieve = true;
-		if( m_parser) stdout_data = m_parser->getData( &stdout_size);
+		stdout_data = m_parser->getData( &stdout_size);
 	}
 
 	int percent        = 0;
@@ -393,13 +393,10 @@ void TaskProcess::sendTaskSate()
 	int percentframe   = 0;
 	std::string activity = "";
 
-	if( m_parser)
-	{
-		percent        = m_parser->getPercent();
-		frame          = m_parser->getFrame();
-		percentframe   = m_parser->getPercentFrame();
-		activity       = m_parser->getActivity();
-	}
+	percent        = m_parser->getPercent();
+	frame          = m_parser->getFrame();
+	percentframe   = m_parser->getPercentFrame();
+	activity       = m_parser->getActivity();
 
 	af::MCTaskUp taskup(
 		RenderHost::getId(),
@@ -419,7 +416,10 @@ void TaskProcess::sendTaskSate()
 		stdout_data);
 
 	if( type == af::Msg::TTaskUpdateState )
+	{
 		collectFiles( taskup);
+		taskup.setParsedFiles( m_service->getParsedFiles());
+	}
 
 	af::Msg * msg = new af::Msg( type, &taskup);
 	if( toRecieve) msg->setReceiving();
@@ -532,22 +532,15 @@ void TaskProcess::killProcess()
 
 void TaskProcess::getOutput( af::Msg * o_msg) const
 {
-	if( m_parser != NULL)
+	int size;
+	char *data = m_parser->getData( &size);
+	if( size > 0)
 	{
-		int size;
-		char *data = m_parser->getData( &size);
-		if( size > 0)
-		{
-			o_msg->setData( size, data);
-		}
-		else
-		{
-			o_msg->setString("Render: Silence...");
-		}
+		o_msg->setData( size, data);
 	}
 	else
 	{
-		o_msg->setString("Render: Parser is NULL.");
+		o_msg->setString("Render: Silence...");
 	}
 }
 

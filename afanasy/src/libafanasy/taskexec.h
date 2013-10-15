@@ -184,10 +184,12 @@ private:
 	std::string m_working_directory;  ///< Working directory.
 	std::string m_environment;        ///< Extra environment.
 	std::string m_command;            ///< Command.
-	std::vector<std::string> m_files; ///< File(s).
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.
+
+	std::vector<std::string> m_files; ///< File(s).
+	std::vector<std::string> m_parsed_files; ///< File(s).
 
 	int32_t m_capacity;
 	int32_t m_capacity_coeff;

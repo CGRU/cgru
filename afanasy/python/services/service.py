@@ -15,8 +15,6 @@ class service:
 		
 		self.pm = cgrupathmap.PathMap()
 
-		self.files = [];
-
 		self.str_capacity = str_capacity
 		self.str_hosts = str_hosts
 		self.str_hostsprefix = str_hostsprefix
@@ -54,7 +52,12 @@ class service:
 	def getWDir(        self ): return self.taskInfo['wdir']
 	def getCommand(     self ): return self.taskInfo['command']
 	def getFiles(       self ): return self.taskInfo['files']
-	def getParsedFiles( self ): return self.files
+
+	def getParsedFiles( self ):
+		if self.parser is not None:
+			return self.parser.getFiles()
+		else:
+			return []
 
 
 	def applyCmdCapacity( self, command):
@@ -97,9 +100,6 @@ class service:
 			else:
 				return 0
 
-		if self.parser is not None:
-			self.files = self.parser.getFiles()
-
 		post_cmds = []
 		#print( self.parser.getFiles())
 #		if len( self.taskInfo['files']) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
@@ -114,11 +114,15 @@ class service:
 		if not os.path.isdir( self.taskInfo['store_dir']):
 			return cmds
 
-		files_list = self.files
-		if len( files_list) == 0 and len(self.taskInfo['files']):
+		files_list = self.getParsedFiles()
+
+		if len( files_list ):
+			if len( files_list) > 3:
+				files_list = [ files_list[0], files_list[ len(files_list)/2 ], files_list[-1]]
+		elif len(self.taskInfo['files']):
 			for afile in self.taskInfo['files']:
 				files_list.append( afile.decode('utf-8'))
-		if len( files_list ) == 0:
+		else:
 			return cmds
 
 		for image in files_list:

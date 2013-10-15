@@ -22,6 +22,8 @@ public:
 
 	inline int getNumber() const { return m_number;}
 
+	af::TaskExec * genExec() const;
+
 	virtual void v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
 
 /// Update task state.
@@ -62,8 +64,8 @@ public:
 /// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
 	af::Msg * getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const;
 
-	af::Msg * getFiles() const;
-	void getFiles( std::ostringstream & i_str) const;
+	af::Msg * getStoredFiles() const;
+	void getStoredFiles( std::ostringstream & i_str) const;
 
 	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 
@@ -83,7 +85,7 @@ protected:
 
 private:
 	void initStoreFolders();
-	void writeFiles( const af::MCTaskUp & i_taskup);
+	void storeFiles( const af::MCTaskUp & i_taskup);
 	void deleteRunningZombie();
 
 private:
@@ -94,7 +96,8 @@ private:
 	std::string m_store_dir_files;
 	std::string m_store_file_progress;
 
-	std::vector<std::string> m_files;
+	std::vector<std::string> m_stored_files;
+	std::vector<std::string> m_parsed_files;
 
 	TaskRun * m_run;
 

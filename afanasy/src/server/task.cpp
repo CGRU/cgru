@@ -35,12 +35,12 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 
 	// Get existing files list
 	if( af::pathIsFolder( m_store_dir_files))
-		m_files = af::getFilesList( m_store_dir_files);
+		m_stored_files = af::getFilesList( m_store_dir_files);
 
 	// Set thumbnail for a job if was not:
-	if( m_files.size() && ( false == m_block->m_job->hasThumbnail() ))
+	if( m_stored_files.size() && ( false == m_block->m_job->hasThumbnail() ))
 	{
-		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[0];
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_stored_files[0];
 		int size;
 		char * data = af::fileRead( filename, &size);
 		if( data )
@@ -79,6 +79,13 @@ void Task::initStoreFolders()
 	m_store_dir_output = m_store_dir + AFGENERAL::PATH_SEPARATOR + "output";
 	m_store_dir_files = m_store_dir + AFGENERAL::PATH_SEPARATOR + "files";
 	m_store_file_progress = m_store_dir + AFGENERAL::PATH_SEPARATOR + "progress.json";
+}
+
+af::TaskExec * Task::genExec() const
+{
+	af::TaskExec * exec = m_block->m_data->genTask( m_number);
+
+	return exec;
 }
 
 void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
@@ -123,7 +130,10 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 	if( taskup.getDataLen() != 0 )
 		v_writeTaskOutput( taskup);
 
-	writeFiles( taskup);
+	if( taskup.getParsedFiles().size())
+		m_parsed_files = taskup.getParsedFiles();
+
+	storeFiles( taskup);
 
 	deleteRunningZombie();
 }
@@ -319,7 +329,7 @@ void Task::v_writeTaskOutput( const af::MCTaskUp& taskup) const
 		m_store_dir_output));
 }
 
-void Task::writeFiles( const af::MCTaskUp & i_taskup)
+void Task::storeFiles( const af::MCTaskUp & i_taskup)
 {
 	for( int i = 0; i < i_taskup.getFilesNum(); i++)
 	{
@@ -327,14 +337,14 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 
 		// Store file name, if it does not stored yet:
 		bool exists = false;
-		for( int j = 0; j < m_files.size(); j++)
-			if( m_files[j] == filename )
+		for( int j = 0; j < m_stored_files.size(); j++)
+			if( m_stored_files[j] == filename )
 			{
 				exists = true;
 				break;
 			}
 		if( false == exists )
-			m_files.push_back( filename);
+			m_stored_files.push_back( filename);
 
 		filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + filename;
 
@@ -347,13 +357,13 @@ void Task::writeFiles( const af::MCTaskUp & i_taskup)
 	}
 }
 
-af::Msg * Task::getFiles() const
+af::Msg * Task::getStoredFiles() const
 {
 	af::MCTaskUp taskup( -1, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number);
 
-	for( int i = 0; i < m_files.size(); i++)
+	for( int i = 0; i < m_stored_files.size(); i++)
 	{
-		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[i];
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_stored_files[i];
 
 		int size = -1;
 		std::string error;
@@ -372,7 +382,7 @@ af::Msg * Task::getFiles() const
 	return new af::Msg( af::Msg::TTaskOutput, &taskup);
 }
 
-void Task::getFiles( std::ostringstream & i_str) const
+void Task::getStoredFiles( std::ostringstream & i_str) const
 {
 	std::string error;
 
@@ -382,11 +392,11 @@ void Task::getFiles( std::ostringstream & i_str) const
 	i_str << ",\n\"task_id\":" << m_number;
 	i_str << ",\n\"files\":[";
 
-	for( int i = 0; i < m_files.size(); i++)
+	for( int i = 0; i < m_stored_files.size(); i++)
 	{
 		if( i ) i_str << ",";
 		
-		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_files[i];
+		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_stored_files[i];
 
 		i_str << "\n{\"name\":\"" << filename << "\"";
 /*

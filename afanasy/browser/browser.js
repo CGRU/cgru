@@ -721,15 +721,14 @@ function g_ShowTask( i_obj)
 	if( i_obj.files && i_obj.files.length )
 	{
 		doc.write('<div><i>Files:</i></div>');
-		var files = i_obj.files.split(';');
-		for( var f = 0; f < files.length; f++)
+		for( var f = 0; f < i_obj.files.length; f++)
 		{
 			doc.write('<div>');
-			doc.write('<div class="param">'+files[f]+'</div>');
+			doc.write('<div class="param">' + i_obj.files[f] + '</div>');
 			var cmds = cgru_Config.previewcmds;
 			for( var c = 0; c < cmds.length; c++ )
 			{
-				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, files[f]));
+				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, i_obj.files[f]));
 				doc.write('<div class="cmdexec">'+cmd+'</div>');
 			}
 			doc.write('</div>');

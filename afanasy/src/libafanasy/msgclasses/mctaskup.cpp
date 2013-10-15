@@ -13,36 +13,36 @@ using namespace af;
 
 MCTaskUp::MCTaskUp
 (
-	int clientId,
+	int i_clientid,
 
-	int numJob,
-	int numBlock,
-	int numTask,
-	int number,
+	int i_numjob,
+	int i_numblock,
+	int i_numtask,
+	int i_number,
 
-	int UpStatus,
-	int UpPercent,
-	int UpFrame,
-	int UpPercentFrame,
-	std::string activity,
-	int dataLen,
-	char * data
+	int i_status,
+	int i_percent,
+	int i_frame,
+	int i_percent_frame,
+	std::string i_activity,
+	int i_datalen,
+	char * i_data
 ):
-	m_clientid      ( clientId),
+	m_clientid      ( i_clientid),
 
-	m_numjob        ( numJob),
-	m_numblock      ( numBlock),
-	m_numtask       ( numTask),
-	m_number        ( number),
+	m_numjob        ( i_numjob),
+	m_numblock      ( i_numblock),
+	m_numtask       ( i_numtask),
+	m_number        ( i_number),
 
-	m_status        ( UpStatus),
-	m_percent       ( UpPercent),
-	m_frame         ( UpFrame),
-	m_percent_frame ( UpPercentFrame),
-	m_activity      ( activity),
+	m_status        ( i_status),
+	m_percent       ( i_percent),
+	m_frame         ( i_frame),
+	m_percent_frame ( i_percent_frame),
+	m_activity      ( i_activity),
 
-	m_datalen       ( dataLen ),
-	m_data          ( data ),
+	m_datalen       ( i_datalen ),
+	m_data          ( i_data ),
 	m_deleteData    ( false), // Don not delete data on client side, as it is not copied
 
 	m_files_num(0),
@@ -78,8 +78,10 @@ void MCTaskUp::v_readwrite( Msg * msg)
 	rw_int32_t( m_frame,          msg);
 	rw_int8_t ( m_percent_frame,  msg);
 	rw_String ( m_activity,       msg);
-	rw_int32_t( m_datalen,        msg);
-	rw_int32_t( m_files_num,      msg);
+
+	rw_StringVect( m_parsed_files, msg);
+	rw_int32_t(    m_datalen,      msg);
+	rw_int32_t(    m_files_num,    msg);
 
 	if( m_datalen )
 		rwData( msg);

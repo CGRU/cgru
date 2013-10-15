@@ -13,20 +13,20 @@ public:
 //	MCTaskUp();
 	MCTaskUp
 		(
-			int clientId,
+			int i_clientid,
 
-			int numJob,
-			int numBlock,
-			int numTask,
-			int number         = -1,
+			int i_numjob,
+			int i_numblock,
+			int i_numtask,
+			int i_number           = -1,
 
-			int UpStatus       = -1,
-			int UpPercent      = -1,
-			int UpFrame        = -1,
-			int UpPercentFrame = -1,
-			std::string activity = "",
-			int dataLen        = 0,
-			char * data        = NULL
+			int i_status           = -1,
+			int i_percent          = -1,
+			int i_frame            = -1,
+			int i_percent_frame    = -1,
+			std::string i_activity = "",
+			int i_datalen          = 0,
+			char * i_data          = NULL
 		);
 	MCTaskUp( Msg * msg);
 	~MCTaskUp();
@@ -45,6 +45,9 @@ public:
   	inline const std::string & getActivity() const { return m_activity;      }
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
+
+	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
+	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
 
 	inline int getFilesNum() const { return m_files_num; }
 	inline int getFileSize( int i_num) const { return m_files_sizes[i_num]; }
@@ -71,6 +74,8 @@ private:
 
 	int32_t m_datalen;
 	char * m_data;
+
+	std::vector<std::string> m_parsed_files;
 
 	int32_t m_files_num;
 	std::vector<std::string> m_files_names;

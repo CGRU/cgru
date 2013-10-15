@@ -32,10 +32,7 @@ class parser:
 				self.files.append( i_file)
 
 	def getFiles( self):
-		files_list = self.files
-		if len( files_list) > 3:
-			files_list = [ files_list[0], files_list[ len(files_list)/2 ], files_list[-1]]
-		return files_list
+		return self.files
 
 	def do( self, data, mode):
 		print('Error: parser.do: Invalid call, this method must be implemented.')
