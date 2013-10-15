@@ -65,6 +65,9 @@ function pu_ProcessGUI( i_wnd)
 
 	i_wnd.destroy();
 
+	var source = cgru_PM('/' + RULES.root+params.src,  true);
+	var dest   = cgru_PM('/' + RULES.root+params.dest, true);
+
 	var job = {};
 	//job.offline = true;
 	job.name = 'PUT ' + params.name;
@@ -83,8 +86,8 @@ function pu_ProcessGUI( i_wnd)
 
 	var cmd = '/cg/etc/put.py';
 	cmd = 'python "' + cmd + '"';
-	cmd += ' -s "' + params.src + '"';
-	cmd += ' -d "' + params.dest + '"';
+	cmd += ' -s "' + source + '"';
+	cmd += ' -d "' + dest + '"';
 	cmd += ' -n "' + params.name + '"';
 	task.command = cmd;
 
