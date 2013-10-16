@@ -77,7 +77,6 @@ function pu_ProcessGUI( i_wnd)
 	block.service = RULES.put.af_service;
 	block.parser  = RULES.put.af_parser;
 	if( RULES.put.af_capacity ) block.capacity = RULES.put.af_capacity;
-	if( RULES.put.af_perhost  ) block.max_running_tasks_per_host = RULES.put.af_perhost;
 	job.blocks = [block];
 
 	var task = {}

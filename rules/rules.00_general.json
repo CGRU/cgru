@@ -179,8 +179,7 @@
 	"dest":"FINAL",
 	"af_service":"generic",
 	"af_parser":"generic",
-	"af_capacity":100,
-	"af_perhost":1
+	"af_capacity":500
 }
 
 }
