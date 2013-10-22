@@ -177,6 +177,7 @@
 
 "put":{
 	"dest":"FINAL",
+	"cmd":"python /cg/etc/put.py",
 	"af_service":"generic",
 	"af_parser":"generic",
 	"af_capacity":500

@@ -22,7 +22,7 @@ function pu_Put( i_path)
 	}
 
 	params.name = c_PathBase( i_path);
-	if( ASSET )
+	if( ASSETS.shot )
 	{
 		params.name = ASSET.name;
 
@@ -83,8 +83,7 @@ function pu_ProcessGUI( i_wnd)
 	task.name = params.name;
 	block.tasks = [task];
 
-	var cmd = '/cg/etc/put.py';
-	cmd = 'python "' + cmd + '"';
+	var cmd = RULES.put.cmd;
 	cmd += ' -s "' + source + '"';
 	cmd += ' -d "' + dest + '"';
 	cmd += ' -n "' + params.name + '"';
