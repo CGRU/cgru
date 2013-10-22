@@ -20,9 +20,14 @@ except:
 
 parserType = sys.argv[1]
 parserModule = __import__('parsers', globals(), locals(), [parserType])
-cmd = 'parserModule.%s.%s(%d)' % ( parserType, parserType, framesNum)
+cmd = 'parserModule.%s.%s()' % ( parserType, parserType)
 print( cmd )
 parser = eval( cmd)
+
+taskInfo = dict()
+taskInfo['frames_num'] = framesNum
+taskInfo['wdir'] = os.getcwd()
+parser.setTaskInfo( taskInfo)
 
 arguments = []
 for i in range( 3, len(sys.argv)): arguments.append( sys.argv[i])
