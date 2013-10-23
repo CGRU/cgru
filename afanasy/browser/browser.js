@@ -16,6 +16,8 @@ g_main_monitor = null;
 g_main_monitor_type = 'jobs';
 g_monitor_buttons = [];
 
+g_TopWindow = null;
+
 g_HeaderOpened = false;
 g_FooterOpened = false;
 
@@ -204,17 +206,20 @@ function g_ProcessMsg( i_obj)
 
 	if( i_obj.message )
 	{
-		g_ShowMessage( i_obj.message);
+		g_ShowObject( i_obj);
+//		g_ShowMessage( i_obj.message);
 		return;
 	}
 	if( i_obj.object )
 	{
-		g_ShowObject( i_obj.object);
+		g_ShowObject( i_obj);
+//		g_ShowObject({"object":i_obj.object});
 		return;
 	}
 	if( i_obj.task_exec )
 	{
-		g_ShowTask( i_obj.task_exec);
+		taskexecShow( i_obj.task_exec);
+//		g_ShowTask( i_obj.task_exec);
 		return;
 	}
 
@@ -299,15 +304,8 @@ function g_MButtonClicked( i_type, i_evt)
 			else
 				g_monitor_buttons[i].classList.add('pushed');
 
-	var new_wnd = false;
-	if( i_evt )
-	{
-		if( i_evt.shiftKey ) new_wnd = true;
-		if( i_evt.ctrlKey ) new_wnd = true;
-		if( i_evt.altKey ) new_wnd = true;
-	}
 
-	g_OpenMonitor( i_type, new_wnd);
+	g_OpenMonitor({"type":i_type,"evt":i_evt});
 }
 
 function g_MonitorClosed( i_monitor)
@@ -319,47 +317,75 @@ function g_MonitorClosed( i_monitor)
 		g_main_monitor = null;
 }
 
-function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
+//function g_OpenMonitor( i_type, i_evt, i_id, i_name)
+function g_OpenMonitor( i_args)
 {
-	if( i_name == null )
-		i_name = i_type;
+	if( i_args.name == null )
+		i_args.name = i_args.type;
+
+	if( i_args.wnd == null )
+		i_args.wnd = window;
+
+	var new_wnd = false;
+	if( i_args.evt )
+	{
+		if( i_args.evt.shiftKey ) new_wnd = true;
+		if( i_args.evt.ctrlKey ) new_wnd = true;
+		if( i_args.evt.altKey ) new_wnd = true;
+	}
 
 	for( var i = 0; i < g_monitors.length; i++)
-		if( g_monitors[i].name == i_name )
+		if( g_monitors[i].name == i_args.name )
 		{
-			g_Info('Monitor "'+i_name+'" already opened.', false);
+			g_Info('Monitor "'+i_args.name+'" already opened.', false);
 			g_monitors[i].window.focus();
 			return;
 		}
 
-	var elParent = $('content');
-	var wnd = window;
-	if( i_new_wnd )
+	i_args.elParent = $('content');
+	if(( i_args.type == 'tasks' ) && ( new_wnd == false ))
 	{
-		wnd = g_OpenWindowWrite( i_name);
-		if( wnd == null ) return;
-		elParent = wnd.document.body;
+		if( g_TopWindow )
+		{
+			g_TopWindow.destroy();
+		}
+
+		g_TopWindow = new cgru_Window({"name":'tasks',"title":i_args.name,"wnd":i_args.wnd,"closeOnEsc":false});
+		g_TopWindow.closeOnEsc = false;
+		g_TopWindow.onDestroy = function(){ g_TopWindow.monitor.destroy(); g_TopWindow = null;};
+		g_TopWindow.elWindow.classList.add('tasks');
+
+		i_args.elParent = g_TopWindow.elContent;
+	}
+	else if( new_wnd )
+	{
+		i_args.wnd = g_OpenWindowWrite( i_args.name);
+		if( i_args.wnd == null ) return;
+		i_args.elParent = i_args.wnd.document.body;
 	}
 	else if( g_main_monitor )
 		g_main_monitor.destroy();
 
-	var monitor = new Monitor( wnd, elParent, i_type, i_id, i_name);
+	var monitor = new Monitor( i_args);
 
-	if( i_new_wnd )
+	if( new_wnd )
 	{
-		wnd.monitor = monitor;
-		wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
+		i_args.wnd.monitor = monitor;
+		i_args.wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
+	}
+	else if( i_args.type == 'tasks')
+	{
+		g_TopWindow.monitor = monitor;
 	}
 	else
 	{
 		g_main_monitor = monitor;
-		g_main_monitor_type = i_type;
-		localStorage.main_monitor = i_type;
+		g_main_monitor_type = i_args.type;
+		localStorage.main_monitor = i_args.type;
 	}
 
 	return monitor;
 }
-function g_OpenTasks( i_job_name, i_job_id) { g_OpenMonitor('tasks', true, i_job_id, i_job_name);}
 
 function g_CloseAllMonitors()
 {
@@ -371,7 +397,7 @@ function g_CloseAllMonitors()
 	while( g_monitors.length > 0 )
 		g_monitors[0].destroy();
 }
-
+/*
 function g_ShowMessage( msg)
 {
 	if( msg.list == null ) return;
@@ -389,18 +415,79 @@ function g_ShowMessage( msg)
 		wnd.document.title = title;
 	}
 }
-
-function g_ShowObject( obj)
+*/
+function g_ShowObject( i_data, i_args)
 {
+	var object = i_data;
+	var message = false;
+	if( object.object )
+		object = object.object;
+	else if( object.message )
+	{
+		object = object.message;
+		message = true;
+	}
+
+	if( i_args == null )
+	{
+		if( message )
+			g_Log('Global message received.');
+		else
+			g_Log('Global object received.');
+		i_args = {};
+	}
+
+	var new_wnd = false;
+	var wnd = window;
+	if( i_args.wnd )
+		wnd = i_args.wnd;
+	if( i_args.evt )
+	{
+		if( i_args.evt.shiftKey ) new_wnd = true;
+		if( i_args.evt.ctrlKey ) new_wnd = true;
+		if( i_args.evt.altKey ) new_wnd = true;
+	}
 	var title = 'Object';
-	if( obj.name ) title = obj.name;
+	if( object.name ) title = object.name;
+	if( i_args.name ) title = i_args.name;
+	if( object.type ) title += ' ' + object.type;
+
+
+	if( new_wnd == false )
+	{
+		if( message )
+		{
+			var wnd = new cgru_Window({"name":title,"wnd":wnd});
+			for( var i = 0; i < object.list.length; i++)
+			{
+				var el = wnd.document.createElement('p');
+				el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
+				wnd.elContent.appendChild(el);
+			}
+		}
+		else
+			cgru_ShowObject( object, title, wnd);
+		return;
+	}
+
 	var wnd = g_OpenWindowLoad('window.html', title);
 	if( wnd == null ) return;
-	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
 	wnd.onload = function(){
-		var el = wnd.document.createElement('p');
-		el.innerHTML = obj_str.replace(/\n/g,'<br/>');
-		wnd.document.body.appendChild(el);
+		if( message )
+		{
+			for( var i = 0; i < object.list.length; i++)
+			{
+				var el = wnd.document.createElement('p');
+				el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
+				wnd.document.body.appendChild(el);
+			}
+		}
+		else
+		{
+			var el = wnd.document.createElement('p');
+			el.innerHTML = JSON.stringify( object, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
+			wnd.document.body.appendChild(el);
+		}
 		wnd.document.title = title;
 	};
 }
@@ -581,14 +668,14 @@ function g_OnClose()
 
 function g_OnKeyDown(e)
 {
-	if(!e) return;
-	if(e.keyCode==27) // ESC
+	if( ! e ) return;
+	if( e.keyCode == 27 ) // ESC
 	{
 		for( var i = 0; i < g_monitors.length; i++)
 		{
 			g_monitors[i].selectAll( false);
 		}
-		cgru_ClosePopus();
+		cgru_EscapePopus();
 		return;
 	}
 
@@ -676,7 +763,7 @@ function g_SuperUserProcessGUI()
 		$('footer').classList.remove('su_god');
 	}
 }
-
+/*
 function g_ShowTask( i_obj)
 {
 	var title = 'Task '+i_obj.name;
@@ -735,6 +822,18 @@ function g_ShowTask( i_obj)
 		}
 	}
 
+	if( i_obj.parsed_files && i_obj.parsed_files.length )
+	{
+		doc.write('<div style="overflow:auto">');
+		for( var f = 0; f < i_obj.parsed_files.length; f++)
+		{
+//			doc.write('<div>');
+			doc.write('<span class="param" id="task_parsed_file">' + cm_PathBase( i_obj.parsed_files[f]) + '</span>');
+//			doc.write('</div>');
+		}
+		doc.write('</div>');
+	}
+
 	doc.write('<div>Raw Object:</div><div class="task_data">');
 	doc.write( obj_str.replace(/\n/g,'<br/>'));
 	doc.write('</div>');
@@ -743,4 +842,7 @@ function g_ShowTask( i_obj)
 	doc.close();
 	if( cgru_Browser == 'firefox')
 		wnd.location.reload();
+
+	$('task_parsed_file').oncontextmenu = function(e) { alert( e.id);};
 }
+*/

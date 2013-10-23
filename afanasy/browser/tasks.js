@@ -296,16 +296,20 @@ TaskItem.prototype.mh_Output = function( i_number)
 //		new cgru_Dialog( this.monitor.window, this, 'mh_Get', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
 		return;
 	}
-//	this.mh_Get('output', i_number);
-	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
+	this.mh_Get('output', i_number);
+//	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
 }
 
 TaskItem.prototype.menuHandleGetOutput = function( i_number ){ this.mh_Get('output', i_number)}
-TaskItem.prototype.mh_Get = function( i_name, i_number)
+TaskItem.prototype.mh_Get = function( i_mode, i_number)
 {
-	var bids = []; var tids = [];
-	this.getBlockTasksIds( bids, tids);
-	nw_GetNodes('jobs', [this.job.id], i_name, bids, tids, i_number)
+//	var bids = []; var tids = [];
+//	this.getBlockTasksIds( bids, tids);
+//	nw_GetNodes('jobs', [this.job.id], i_mode, bids, tids, i_number)
+	var get = {"type":'jobs',"ids":[this.job.id],"mode":i_mode,"number":i_number};
+	get.block_ids = [this.block.block_num];
+	get.task_ids = [this.task_num];
+	nw_request({"send":{"get":get},"func":g_ShowObject,"wnd":this.monitor.window});
 }
 
 TaskItem.prototype.mh_Oper = function( i_name, i_value)
@@ -318,7 +322,7 @@ TaskItem.prototype.mh_Oper = function( i_name, i_value)
 	nw_Action('jobs', [this.job.id], operation, null, bids);
 }
 
-TaskItem.prototype.onDoubleClick = function()
+TaskItem.prototype.onDoubleClick = function( i_evt)
 {
 	this.mh_Get('info');
 }
@@ -362,3 +366,76 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 
 TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];
+
+taskexec_attrs = {};
+taskexec_attrs.name = {};
+taskexec_attrs.capacity = {"float":"left"};
+taskexec_attrs.service = {"float":"left"};
+taskexec_attrs.parser = {"float":"left"};
+
+function taskexecShow( i_obj)
+{
+	var wnd = g_OpenWindowWrite( i_obj.name, 'Task ' + i_obj.name);
+
+	if( wnd == null ) return;
+
+	var doc = wnd.document;
+	doc.body.classList.add('window_object');
+
+	var attrs = doc.createElement('div');
+	doc.body.appendChild( attrs);
+	attrs.classList.add('attrs');
+
+	for( attr in taskexec_attrs )
+	{
+		var div = doc.createElement('div');
+		attrs.appendChild( div);
+		div.classList.add('attr');
+
+		var label = doc.createElement('div');
+		div.appendChild( label);
+		label.classList.add('label');
+		if( taskexec_attrs[attr].label )
+			label.textContent = taskexec_attrs[attr].label + ':';
+		else
+		{
+			label.textContent = attr + ':';
+			label.style.textTransform = 'capitalize';
+		}
+
+		var value = doc.createElement('div');
+		div.appendChild( value);
+		value.classList.add('value');
+		value.textContent = i_obj[attr];
+	}
+
+	if( i_obj.files && i_obj.files.length )
+	{
+		var div = doc.createElement('div');
+		doc.body.appendChild( div);
+
+		var label = doc.createElement('div');
+		div.appendChild( label);
+		label.textContent = 'Files:';
+
+		for( var f = 0; f < i_obj.files.length; f++)
+		{
+			var file = doc.createElement('div');
+			div.appendChild( file);
+
+			var cmds = cgru_Config.previewcmds;
+			for( var c = 0; c < cmds.length; c++ )
+			{
+//				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, i_obj.files[f]));
+				cmd = cmds[c].replace('@ARG@', i_obj.files[f]);
+
+				var exec = doc.createElement('div');
+				file.appendChild( exec);
+				exec.classList.add('cmdexec');
+				exec.textContent = cmd;
+//				doc.write('<div class="cmdexec">'+cmd+'</div>');
+			}
+		}
+	}
+}
+

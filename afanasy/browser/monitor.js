@@ -1,11 +1,12 @@
-function Monitor( i_window, i_element, i_type, i_id, i_name)
+function Monitor( i_args)
 {
-	this.window = i_window;
-	this.document = this.window.document;
-	this.type = i_type;
-	this.elParent = i_element;
-	this.name = i_name ? i_name : i_type;
+	this.window = i_args.wnd;
+	this.type = i_args.type;
+	this.elParent = i_args.elParent;
+	this.name = i_args.name ? i_args.name : i_args.type;
+
 	this.elementsSU = [];
+	this.document = this.window.document;
 
 	this.nodeConstructor = null;
 	if     ( this.type == 'jobs'   ) this.nodeConstructor = JobNode;
@@ -218,7 +219,7 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 
 	if( this.type == 'tasks')
 	{
-		this.job_id = i_id;
+		this.job_id = i_args.id;
 		nw_GetNodes( 'jobs', [this.job_id], 'full');
 	}
 	else
@@ -525,7 +526,7 @@ Monitor.prototype.createItem = function( i_item, i_obj, i_appendChild)
 	i_item.element.item = i_item;
 	i_item.element.onmousedown = function(e){ if(e.button==0) return e.currentTarget.monitor.onMouseDown(e,e.currentTarget);}
 	i_item.element.onmouseover = function(e){ if(e.button==0) return e.currentTarget.monitor.onMouseOver(e,e.currentTarget);}
-	i_item.element.ondblclick = function(e){ return e.currentTarget.item.onDoubleClick();}
+	i_item.element.ondblclick = function(e){ return e.currentTarget.item.onDoubleClick(e);}
 	i_item.element.oncontextmenu = function(e){ return e.currentTarget.monitor.onContextMenu(e,e.currentTarget);}
 
 	i_item.init();
@@ -708,13 +709,13 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].element.selected == true )
 			{
-				cmd = handle;
+				cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
 				if( this.items[i].params.address.ip )
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
 				cmds.push( cmd);
 			}
-		i_menu.addItem({"name":name,"receiver":'cmdexec',"handle":cmds,"label":label});
+		i_menu.addItem({"name":i_action.name,"receiver":'cmdexec',"handle":cmds,"label":i_action.label});
 		return;
 	}
 
@@ -774,10 +775,12 @@ Monitor.prototype.mh_Oper = function( i_param)
 	operation.type = i_param.name;
 	this.action( operation, null);
 }
-Monitor.prototype.mh_Get = function( i_param)
+Monitor.prototype.mh_Get = function( i_param, i_evt)
 {
 //this.info('Get = ' + i_param.name);
-	nw_GetNodes( this.type, [this.cur_item.params.id], i_param.name);
+	get = {"type":this.type,"ids":[this.cur_item.params.id],"mode":i_param.name};
+	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.window});
+//	nw_GetNodes( this.type, [this.cur_item.params.id], i_param.name);
 }
 
 Monitor.prototype.action = function( i_operation, i_params)

@@ -5,7 +5,7 @@ pu_params.push({"name":'name'});
 
 function pu_Put( i_path)
 {
-	var wnd = new cgru_Window('put','Put Folder');
+	var wnd = new cgru_Window({"name":'put',"title":'Put Folder'});
 	wnd.elContent.classList.add('dialog');
 
 	var params = {};

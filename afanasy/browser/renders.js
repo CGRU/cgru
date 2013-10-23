@@ -366,9 +366,10 @@ RenderNode.prototype.updateTasksPercents = function()
 			this.tasks[t].setPercent( this.params.tasks_percents[t]);
 }
 
-RenderNode.prototype.onDoubleClick = function()
+RenderNode.prototype.onDoubleClick = function( e)
 {
-	nw_GetNodes('renders', [this.params.id], 'full');
+//	nw_GetNodes('renders', [this.params.id], 'full');
+	nw_request({"send":{"get":{"type":'renders',"ids":[this.params.id],"mode":'full'}},"func":g_ShowObject,"evt":e,"wnd":this.monitor.window});
 }
 
 RenderNode.prototype.mh_Service = function( i_param)
@@ -504,10 +505,10 @@ RenderNode.createActions = function()
 	if( RenderNode.actionsCreated ) return;
 
 	if( cgru_Config.af_rendercmds ) for( var i = 0; i < cgru_Config.af_rendercmds.length; i++)
-		RenderNode.actions.push(['cmd', 'cmd', null, cgru_Config.af_rendercmds[i], cgru_Config.af_rendercmds[i]]);
+		RenderNode.actions.push({"mode":'cmd',"name":'cmd',"handle":cgru_Config.af_rendercmds[i],"label":cgru_Config.af_rendercmds[i]});
 
 	if( cgru_Config.af_rendercmds_admin ) for( var i = 0; i < cgru_Config.af_rendercmds_admin.length; i++)
-		RenderNode.actions.push(['cmd', 'cmd', null, cgru_Config.af_rendercmds_admin[i], cgru_Config.af_rendercmds_admin[i], 'god']);
+		RenderNode.actions.push({"mode":'cmd',"name":'cmd',"handle":cgru_Config.af_rendercmds_admin[i],"label":cgru_Config.af_rendercmds_admin[i],"permissions":'god'});
 
 	RenderNode.actionsCreated = true;
 }

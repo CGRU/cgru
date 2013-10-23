@@ -84,7 +84,7 @@ void Task::initStoreFolders()
 af::TaskExec * Task::genExec() const
 {
 	af::TaskExec * exec = m_block->m_data->genTask( m_number);
-
+	exec->setParsedFiles( m_parsed_files);
 	return exec;
 }
 

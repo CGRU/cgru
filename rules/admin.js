@@ -301,7 +301,7 @@ function ad_PermissionsClearOnClick()
 
 function ad_OpenWindow()
 {
-	ad_wnd = new cgru_Window('Administrate');
+	ad_wnd = new cgru_Window({"name":'administrate',"title":'Administrate'});
 	ad_wnd.elContent.classList.add('administrate');
 	ad_wnd.closeOnEsc = false;
 
@@ -819,7 +819,7 @@ function ad_ProfileOpen()
 		return;
 	}
 
-	var wnd = new cgru_Window('My Profile');
+	var wnd = new cgru_Window({"name":'profile',"title":'My Profile'});
 	wnd.elContent.classList.add('profile');
 	wnd.closeOnEsc = false;
 	ad_wnd_prof = wnd;

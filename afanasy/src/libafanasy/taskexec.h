@@ -92,6 +92,9 @@ public:
 	inline const std::string & getEnv()      const { return m_environment;     } ///< Get extra environment.
 	inline const std::vector<std::string> & getFiles() const { return m_files;   } ///< Get files.
 
+	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
+	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
+
 	inline bool hasFileSizeCheck() const { return ((m_file_size_min != -1) || (m_file_size_max != -1));}
 
 	inline long long getFileSizeMin()   const { return m_file_size_min;}

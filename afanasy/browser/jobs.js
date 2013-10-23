@@ -174,8 +174,15 @@ JobNode.prototype.refresh = function()
 	this.elTime.textContent = '';
 }
 
-JobNode.prototype.onDoubleClick = function() { g_OpenTasks( this.params.name, this.params.id );}
-JobNode.prototype.mh_Show = function() { g_ShowObject( this.params );}
+JobNode.prototype.onDoubleClick = function( i_evt)
+{
+	g_OpenMonitor({"type":'tasks',"evt":i_evt,"id":this.params.id,"name":this.params.name,"wnd":this.monitor.window});
+}
+
+JobNode.prototype.mh_Show = function( i_param, i_evt )
+{
+	g_ShowObject({"object":this.params},{"evt":i_evt,"wnd":this.monitor.window});
+}
 JobNode.prototype.mh_Move = function( i_name)
 {
 	if( g_uid < 1 )

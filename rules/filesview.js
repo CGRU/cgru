@@ -699,7 +699,7 @@ function fv_SkipFile( i_filename)
 
 FilesView.prototype.imgConvertDialog = function ( i_file)
 {
-	var wnd = new cgru_Window('imgconvert','Image Convert');
+	var wnd = new cgru_Window({"name":'imgconvert',"title":'Image Convert'});
 	wnd.resize( 40, 50);
 	wnd.elContent.classList.add('imgconvert');
 	wnd.m_file = RULES.root + i_file;

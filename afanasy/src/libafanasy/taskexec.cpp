@@ -136,16 +136,6 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 
 		if( m_parser.size())
 			o_str << ",\"parser\":\"" << m_parser << "\"";
-		if( m_files.size())
-		{
-			o_str << ",\"files\":[";
-			for( int i = 0; i < m_files.size(); i++)
-			{
-				if( i ) o_str << ",";
-				o_str << "\"" << af::strEscape( m_files[i]) << "\"";
-			}
-			o_str << "]";
-		}
 		if( m_working_directory.size())
 			o_str << ",\"working_directory\":\"" << af::strEscape( m_working_directory ) << "\"";
 		if( m_custom_data_task.size())
@@ -160,6 +150,28 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 			o_str << ",\"custom_data_render\":\"" << af::strEscape( m_custom_data_render ) << "\"";
 		if( m_environment.size())
 			o_str << ",\"environment\":\"" << af::strEscape( m_environment ) << "\"";
+
+		if( m_files.size())
+		{
+			o_str << ",\"files\":[";
+			for( int i = 0; i < m_files.size(); i++)
+			{
+				if( i ) o_str << ",";
+				o_str << "\"" << af::strEscape( m_files[i]) << "\"";
+			}
+			o_str << "]";
+		}
+
+		if( m_parsed_files.size())
+		{
+			o_str << ",\"parsed_files\":[";
+			for( int i = 0; i < m_parsed_files.size(); i++)
+			{
+				if( i ) o_str << ",";
+				o_str << "\"" << af::strEscape( m_parsed_files[i]) << "\"";
+			}
+			o_str << "]";
+		}
 	}
 
 	o_str << "}";
@@ -185,14 +197,17 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_int64_t ( m_file_size_max,     msg);
 		rw_String  ( m_command,           msg);
 		rw_String  ( m_working_directory, msg);
-		rw_String  ( m_environment,       msg);
-		rw_StringVect ( m_files,          msg);
 		rw_String  ( m_parser,            msg);
-		rw_String  ( m_custom_data_task,  msg);
-		rw_String  ( m_custom_data_block, msg);
-		rw_String  ( m_custom_data_job,   msg);
-		rw_String  ( m_custom_data_user,  msg);
-		rw_String  ( m_custom_data_render,msg);
+		rw_String  ( m_environment,       msg);
+
+		rw_StringVect( m_files,           msg);
+		rw_StringVect( m_parsed_files,    msg);
+
+		rw_String( m_custom_data_task,    msg);
+		rw_String( m_custom_data_block,   msg);
+		rw_String( m_custom_data_job,     msg);
+		rw_String( m_custom_data_user,    msg);
+		rw_String( m_custom_data_render,  msg);
 
 		rw_StringList( m_multihost_names, msg);
 
@@ -233,8 +248,20 @@ void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) con
 	{
 		stream << std::endl;
 		if( m_working_directory.size()) stream << "   Working directory = \"" << m_working_directory << "\".\n";
-		if(  m_environment.size()) stream << "   Environment = \""       <<  m_environment << "\".\n";
 		stream << m_command;
+		if( m_environment.size()) stream << "   Environment = \""       <<  m_environment << "\".\n";
+		if( m_files.size())
+		{
+			stream << "Files:\n";
+			for( int i = 0; i < m_files.size(); i++ )
+				stream << m_files[i] << "\n";
+		}
+		if( m_parsed_files.size())
+		{
+			stream << "Parsed Files:\n";
+			for( int i = 0; i < m_parsed_files.size(); i++ )
+				stream << m_parsed_files[i] << "\n";
+		}
 	}
 }
 

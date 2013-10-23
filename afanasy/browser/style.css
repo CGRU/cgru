@@ -420,6 +420,10 @@ text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 .su_visor { background: #FF8; color:#000; }
 .su_god   { background: #EFF; color:#000; }
 
+.cgru_window_window.tasks {
+top: 150px; bottom: 50px; left: 10%; right: 10%;
+}
+
 .task_exec div {
 /*border: 1px solid #000;*/
 margin: 12px 4px;

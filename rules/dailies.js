@@ -90,7 +90,7 @@ function d_Make( i_path, i_outfolder)
 	filename = filename.replace('(U)', params.artist.toUpperCase());
 	params.filename = filename;
 
-	var wnd = new cgru_Window('dailes','Make Dailies');
+	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
 	wnd.elContent.classList.add('dialog');
 
 	c_CreateGUI( wnd, d_guiparams, [params, RULES.dailies]);
@@ -277,7 +277,7 @@ function d_Convert( i_path)
 	params.quality = 5;
 	params.cvtres = '';
 
-	var wnd = new cgru_Window('dailes','Convert Movie');
+	var wnd = new cgru_Window({"name":'dailes',"title":'Convert Movie'});
 	wnd.elContent.classList.add('dialog');
 
 	var elSrc = document.createElement('div');

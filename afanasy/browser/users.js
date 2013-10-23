@@ -160,7 +160,7 @@ UserNode.prototype.refresh = function()
 //window.console.log(this.params.name+'-'+percent+'% ('+this.monitor.type+'_max='+this.monitor.max_tasks+')')
 }
 
-UserNode.prototype.onDoubleClick = function() { g_ShowObject( this.params);}
+UserNode.prototype.onDoubleClick = function( e) { g_ShowObject({"object":this.params},{"evt":e,"wnd":this.monitor.window});}
 
 UserNode.actions = [];
 
