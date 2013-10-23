@@ -89,6 +89,10 @@ function pu_ProcessGUI( i_wnd)
 	cmd += ' -n "' + params.name + '"';
 	task.command = cmd;
 
+	if( RULES.put.post_delete )
+		job.command_post = 'rm -rf "' + source + '"';
+
+//job.offline = true;
 	n_SendJob( job);
 
 //console.log( task.command);

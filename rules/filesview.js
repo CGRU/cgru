@@ -263,6 +263,15 @@ FilesView.prototype.createItem = function( i_path, i_obj)
 
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
+	if( RULES.files_detele )
+	{
+		var elDel = document.createElement('div');
+		i_el.appendChild( elDel);
+		elDel.classList.add('button');
+		elDel.textContent = 'DEL';
+		elDel.m_view = this;
+		elDel.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( i_el.m_path)};
+	}
 	if( i_obj.mtime != null )
 	{
 		var elMTime = document.createElement('div');
@@ -544,6 +553,34 @@ FilesView.prototype.thumbsMake = function()
 		fv_thumbnails_tomake_files.push( this.elThumbnails[i].m_path);
 
 	fv_MakeThumbnail();
+}
+
+FilesView.prototype.deleteFilesDialog = function( i_path)
+{
+	new cgru_Dialog({"receiver":this,"handle":'deleteFiles',"param":i_path,
+		"name":'settings',"title":'Delete',"info":'<span style="font-size:20px;font-weight:bold;">'+i_path+'</span><br>Are You Sure?<br>Type "yes".'});
+}
+FilesView.prototype.deleteFiles = function( i_value, i_path)
+{
+	if( i_value != 'yes' ) return;
+
+	cmd = 'rules/bin/rm -rf "' + RULES.root + i_path + '"';
+//console.log(cmd);
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.filesDeleted,"this":this,"delpath":i_path,"info":'delete',"wait":false,"parse":true});
+}
+FilesView.prototype.filesDeleted = function( i_data, i_args)
+{
+//console.log( JSON.stringify( i_args.delpath));
+	if( i_data.error )
+	{
+		c_Error( i_data.error);
+		return;
+	}
+
+	c_Info('Deleted ' + i_args.delpath);
+
+	i_args.this.refresh();
 }
 /*
 function fv_Preview( i_evt)
