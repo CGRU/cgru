@@ -288,20 +288,21 @@ TaskItem.prototype.onContextMenu = function( i_menu)
 	i_menu.addItem({"name":'skip',    "receiver":this, "handle":'mh_Oper', "label":'Skip'});
 }
 
-TaskItem.prototype.mh_Output = function( i_number)
+TaskItem.prototype.mh_Output = function( i_number, i_evt)
 {
 	if( i_number == -1 )
 	{
-		new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleGetOutput',"type":'num',"name":this.job.name,"title":'Get Task Process Output',"info":'Enter Start Number'});
+		new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleGetOutput',"param":i_evt,
+			"type":'num',"name":this.job.name,"title":'Get Task Process Output',"info":'Enter Start Number'});
 //		new cgru_Dialog( this.monitor.window, this, 'mh_Get', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
 		return;
 	}
-	this.mh_Get('output', i_number);
+	this.mh_Get('output', i_evt, i_number);
 //	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
 }
 
-TaskItem.prototype.menuHandleGetOutput = function( i_number ){ this.mh_Get('output', i_number)}
-TaskItem.prototype.mh_Get = function( i_mode, i_number)
+TaskItem.prototype.menuHandleGetOutput = function( i_number, i_evt){ this.mh_Get('output', i_evt, i_number)}
+TaskItem.prototype.mh_Get = function( i_mode, i_evt, i_number)
 {
 //	var bids = []; var tids = [];
 //	this.getBlockTasksIds( bids, tids);
@@ -309,7 +310,8 @@ TaskItem.prototype.mh_Get = function( i_mode, i_number)
 	var get = {"type":'jobs',"ids":[this.job.id],"mode":i_mode,"number":i_number};
 	get.block_ids = [this.block.block_num];
 	get.task_ids = [this.task_num];
-	nw_request({"send":{"get":get},"func":g_ShowObject,"wnd":this.monitor.window});
+
+	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.monitor.window});
 }
 
 TaskItem.prototype.mh_Oper = function( i_name, i_value)
@@ -324,7 +326,7 @@ TaskItem.prototype.mh_Oper = function( i_name, i_value)
 
 TaskItem.prototype.onDoubleClick = function( i_evt)
 {
-	this.mh_Get('info');
+	this.mh_Get('info', i_evt);
 }
 
 TaskItem.prototype.showTumbs = function()
@@ -367,75 +369,137 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];
 
-taskexec_attrs = {};
-taskexec_attrs.name = {};
-taskexec_attrs.capacity = {"float":"left"};
-taskexec_attrs.service = {"float":"left"};
-taskexec_attrs.parser = {"float":"left"};
+t_attrs = {};
+t_attrs.name = {};
+t_attrs.capacity = {"float":'left',"width":'24%'};
+t_attrs.service = {"float":'left',"width":'38%'};
+t_attrs.parser = {"float":'left',"width":'38%'};
+t_attrs.command = {"pathmap":true};
+t_attrs.working_directory = {"label":'Directory',"pathmap":true};
 
-function taskexecShow( i_obj)
+function t_ShowExec( i_obj, i_elParent)
 {
-	var wnd = g_OpenWindowWrite( i_obj.name, 'Task ' + i_obj.name);
+	i_elParent.classList.add('task_exec');
 
-	if( wnd == null ) return;
-
-	var doc = wnd.document;
-	doc.body.classList.add('window_object');
-
-	var attrs = doc.createElement('div');
-	doc.body.appendChild( attrs);
+	var attrs = document.createElement('div');
+	i_elParent.appendChild( attrs);
 	attrs.classList.add('attrs');
 
-	for( attr in taskexec_attrs )
+	for( attr in t_attrs )
 	{
-		var div = doc.createElement('div');
+		var div = document.createElement('div');
 		attrs.appendChild( div);
 		div.classList.add('attr');
+		if( t_attrs[attr].float )
+			div.style.cssFloat = t_attrs[attr].float;
+		else
+			div.style.clear = 'both';
+		if( t_attrs[attr].width )
+			div.style.width = t_attrs[attr].width;
 
-		var label = doc.createElement('div');
+		var label = document.createElement('div');
 		div.appendChild( label);
 		label.classList.add('label');
-		if( taskexec_attrs[attr].label )
-			label.textContent = taskexec_attrs[attr].label + ':';
+		if( t_attrs[attr].label )
+			label.textContent = t_attrs[attr].label + ':';
 		else
 		{
 			label.textContent = attr + ':';
 			label.style.textTransform = 'capitalize';
 		}
 
-		var value = doc.createElement('div');
+		var value = document.createElement('div');
 		div.appendChild( value);
 		value.classList.add('value');
-		value.textContent = i_obj[attr];
+		if( t_attrs[attr].pathmap )
+			value.textContent = cgru_PM( i_obj[attr]);
+		else
+			value.textContent = i_obj[attr];
 	}
 
-	if( i_obj.files && i_obj.files.length )
+	var files = [];
+	var label = 'Files:';
+	if( i_obj.files ) files = i_obj.files;
+	if( i_obj.parsed_files && i_obj.parsed_files.length )
 	{
-		var div = doc.createElement('div');
-		doc.body.appendChild( div);
+		files = i_obj.parsed_files;
+		label = 'Files (parsed):';
+	}
+	
+	var dir_pm = cgru_PM( i_obj.working_directory);
+	if( files.length )
+	{
+		var elFilesDiv = document.createElement('div');
+		i_elParent.appendChild( elFilesDiv);
+		elFilesDiv.classList.add('files_div');
 
-		var label = doc.createElement('div');
-		div.appendChild( label);
-		label.textContent = 'Files:';
+		var elFilesLabel = document.createElement('div');
+		elFilesDiv.appendChild( elFilesLabel);
+		elFilesLabel.textContent = label;
 
-		for( var f = 0; f < i_obj.files.length; f++)
+		var elFiles = document.createElement('div');
+		elFilesDiv.appendChild( elFiles);
+		elFiles.classList.add('files');
+
+		for( var f = 0; f < files.length; f++)
 		{
-			var file = doc.createElement('div');
-			div.appendChild( file);
-
-			var cmds = cgru_Config.previewcmds;
-			for( var c = 0; c < cmds.length; c++ )
-			{
-//				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, i_obj.files[f]));
-				cmd = cmds[c].replace('@ARG@', i_obj.files[f]);
-
-				var exec = doc.createElement('div');
-				file.appendChild( exec);
-				exec.classList.add('cmdexec');
-				exec.textContent = cmd;
-//				doc.write('<div class="cmdexec">'+cmd+'</div>');
-			}
+			var elFile = document.createElement('div');
+			elFiles.appendChild( elFile);
+			elFile.textContent = cm_PathBase( files[f]);
+			elFile.title = files[f];
+			elFile.m_file = files[f];
+			elFile.m_dir = dir_pm;
+			elFile.onclick = t_FileOpen;
 		}
 	}
+
+	var elRawDiv = document.createElement('div');
+	i_elParent.appendChild( elRawDiv);
+	elRawDiv.classList.add('raw');
+
+	var elRawLabel = document.createElement('div');
+	elRawDiv.appendChild( elRawLabel);
+	elRawLabel.classList.add('label');
+	elRawLabel.textContent = 'Raw Object:';
+
+	var elRawObj = document.createElement('div');
+	elRawDiv.appendChild( elRawObj);
+	elRawObj.classList.add('object');
+	elRawObj.innerHTML = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
+}
+
+function t_FileOpen( i_evt)
+{
+	elFile = i_evt.currentTarget;
+
+	if( elFile.m_opened )
+	{
+		elFile.m_opened = false;
+		elFile.removeChild( elFile.m_elCmds);
+		elFile.classList.remove('opened');
+		return;
+	}
+
+	var dir = elFile.m_dir;
+	var file = elFile.m_file;
+	file = cgru_PM( file);
+	file = cgru_PathJoin( dir, file);
+
+	elFile.m_opened = true;
+	elFile.classList.add('opened');
+
+	var elCmds = document.createElement('div');
+	elFile.appendChild( elCmds);
+	elFile.m_elCmds = elCmds;
+
+	for( var c = 0; c < cgru_Config.previewcmds.length; c++ )
+	{
+		var elCmd = document.createElement('div');
+		elCmds.appendChild( elCmd);
+		elCmd.classList.add('cmdexec');
+		elCmd.textContent = cgru_Config.previewcmds[c].replace('@ARG@', file);
+	}
+
+	return false;
 }
 

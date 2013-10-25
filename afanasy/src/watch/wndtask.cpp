@@ -18,6 +18,8 @@
 #include <QtGui/QLineEdit>
 #include <QtGui/QMenu>
 #include <QtGui/QPushButton>
+#include <QtGui/QScrollArea>
+#include <QtGui/QSplitter>
 #include <QtGui/QTextEdit>
 
 #define AFOUTPUT
@@ -87,13 +89,13 @@ void ButtonMenu::launchCmd( int i_index)
 WndTask::WndTask( const QString & Name, af::Msg * msg):
 	Wnd( Name)
 {
-	QVBoxLayout * layout = new QVBoxLayout( this);
-	#if QT_VERSION >= 0x040300
-	layout->setContentsMargins( 1, 1, 1, 1);
-	#endif
+	QVBoxLayout * box = new QVBoxLayout( this);
+
+	QSplitter * splitter = new QSplitter( Qt::Vertical, this);
+	box->addWidget( splitter);
 
 	QTextEdit * qTextEdit = new QTextEdit( this);
-	layout->addWidget( qTextEdit);
+	splitter->addWidget( qTextEdit);
 	qTextEdit->setAcceptRichText( false);
 	qTextEdit->setLineWrapMode( QTextEdit::NoWrap);
 	qTextEdit->setReadOnly( true);
@@ -113,6 +115,7 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 	QString wdir    = afqt::stoq( service.getWDir());
 	QString command = afqt::stoq( service.getCommand());
 	std::vector<std::string> files = service.getFiles();
+	std::vector<std::string> parsed_files = service.getParsedFiles();
 
 	// Output task data:
 	QTextCharFormat fParameter;
@@ -151,6 +154,13 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 		for( int i = 0; i < files.size(); i++)
 			c.insertText( "\n" + afqt::stoq( files[i]), fParameter);
 	}
+/*	if( parsed_files.size())
+	{
+		c.insertText( "\n");
+		c.insertText( "Parsed Files:", fInfo);
+		for( int i = 0; i < parsed_files.size(); i++)
+			c.insertText( "\n" + afqt::stoq( parsed_files[i]), fParameter);
+	}*/
 	if( taskexec.hasFileSizeCheck())
 	{
 		c.insertText( "\n");
@@ -160,11 +170,34 @@ WndTask::WndTask( const QString & Name, af::Msg * msg):
 		c.insertText( QString::number( taskexec.getFileSizeMax()), fParameter);
 	}
 
-	if( files.size() == 0 )
+	if( parsed_files.size())
+		files = parsed_files;
+
+	if( files.empty())
 		return;
 
+
 	// Create preview files controls:
-	layout->addWidget( new QLabel("Preview Files:", this));
+	QScrollArea * scroll = new QScrollArea();
+//	scroll->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOn);
+//	scroll->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOn);
+	QWidget * widget = new QWidget();
+	QVBoxLayout * layout = new QVBoxLayout();
+	widget->setLayout( layout);
+	scroll->setWidget( widget);
+	splitter->addWidget( scroll);
+
+	splitter->setSizes( QList<int>() << 300 << ( files.size() > 10 ? 300 : files.size() * 30 ));
+	scroll->setWidgetResizable( true);
+	layout->setSpacing(0);
+	#if QT_VERSION >= 0x040300
+	layout->setContentsMargins( 1, 1, 1, 1);
+	#endif
+
+	if( parsed_files.size())
+		layout->addWidget( new QLabel("Preview Files (parsed):", this));
+	else
+		layout->addWidget( new QLabel("Preview Files:", this));
 	QHBoxLayout * layoutH = new QHBoxLayout();
 	QVBoxLayout * layoutL = new QVBoxLayout();
 	QVBoxLayout * layoutR = new QVBoxLayout();

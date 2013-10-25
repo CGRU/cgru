@@ -61,6 +61,10 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	for( int i = 0; i < i_task_exec->getFiles().size(); i++)
 		PyList_Append( pFilesList, PyBytes_FromString( i_task_exec->getFiles()[i].c_str() ));
 
+	PyObject * pParsedFilesList = PyList_New(0);
+	for( int i = 0; i < i_task_exec->getParsedFiles().size(); i++)
+		PyList_Append( pParsedFilesList, PyBytes_FromString( i_task_exec->getParsedFiles()[i].c_str() ));
+
 	PyObject * pHostsList = PyList_New(0);
 	for( std::list<std::string>::const_iterator it = i_task_exec->getMultiHostsNames().begin();
 			it != i_task_exec->getMultiHostsNames().end(); it++)
@@ -73,11 +77,12 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyObject *task_info;
 	task_info = PyDict_New();
 
-	PyDict_SetItemString( task_info, "wdir",     PyBytes_FromString( i_task_exec->getWDir().c_str()));
-	PyDict_SetItemString( task_info, "command",  PyBytes_FromString( i_task_exec->getCommand().c_str()));
-	PyDict_SetItemString( task_info, "capacity", PyLong_FromLong( i_task_exec->getCapCoeff()));
-	PyDict_SetItemString( task_info, "files",    pFilesList);
-	PyDict_SetItemString( task_info, "hosts",    pHostsList);
+	PyDict_SetItemString( task_info, "wdir",         PyBytes_FromString( i_task_exec->getWDir().c_str()));
+	PyDict_SetItemString( task_info, "command",      PyBytes_FromString( i_task_exec->getCommand().c_str()));
+	PyDict_SetItemString( task_info, "capacity",     PyLong_FromLong( i_task_exec->getCapCoeff()));
+	PyDict_SetItemString( task_info, "files",        pFilesList);
+	PyDict_SetItemString( task_info, "hosts",        pHostsList);
+	PyDict_SetItemString( task_info, "parsed_files", pParsedFilesList);
 
 	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( m_parser_type.c_str()));
 	PyDict_SetItemString( task_info, "frames_num", PyLong_FromLong(    i_task_exec->getFramesNum()));

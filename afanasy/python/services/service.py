@@ -31,6 +31,8 @@ class service:
 		taskInfo['wdir'] = self.pm.toClient( taskInfo['wdir'])
 		for i in range( 0, len( self.taskInfo['files'])):
 			self.taskInfo['files'][i] = self.pm.toClient( self.taskInfo['files'][i])
+		for i in range( 0, len( self.taskInfo['parsed_files'])):
+			self.taskInfo['parsed_files'][i] = self.pm.toClient( self.taskInfo['parsed_files'][i])
 
 
 		# Initialize parser:
@@ -54,7 +56,9 @@ class service:
 	def getFiles(       self ): return self.taskInfo['files']
 
 	def getParsedFiles( self ):
-		if self.parser is not None:
+		if len( self.taskInfo['parsed_files']):
+			return self.taskInfo['parsed_files']
+		elif self.parser is not None:
 			return self.parser.getFiles()
 		else:
 			return []

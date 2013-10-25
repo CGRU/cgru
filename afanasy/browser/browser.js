@@ -204,22 +204,9 @@ function g_ProcessMsg( i_obj)
 		return;
 	}
 
-	if( i_obj.message )
+	if( i_obj.message || i_obj.object || i_obj.task_exec )
 	{
 		g_ShowObject( i_obj);
-//		g_ShowMessage( i_obj.message);
-		return;
-	}
-	if( i_obj.object )
-	{
-		g_ShowObject( i_obj);
-//		g_ShowObject({"object":i_obj.object});
-		return;
-	}
-	if( i_obj.task_exec )
-	{
-		taskexecShow( i_obj.task_exec);
-//		g_ShowTask( i_obj.task_exec);
 		return;
 	}
 
@@ -397,50 +384,37 @@ function g_CloseAllMonitors()
 	while( g_monitors.length > 0 )
 		g_monitors[0].destroy();
 }
-/*
-function g_ShowMessage( msg)
-{
-	if( msg.list == null ) return;
-	var name = msg.name+'_'+msg.type;
-	var title = msg.name+':'+msg.type;
-	var wnd = g_OpenWindowLoad('window.html', name);
-	if( wnd == null ) return;
-	wnd.onload = function(){
-		for( var i = 0; i < msg.list.length; i++)
-		{
-			var el = wnd.document.createElement('p');
-			el.innerHTML = msg.list[i].replace(/\n/g,'<br/>');
-			wnd.document.body.appendChild(el);
-		}
-		wnd.document.title = title;
-	}
-}
-*/
+
 function g_ShowObject( i_data, i_args)
 {
 	var object = i_data;
-	var message = false;
-	if( object.object )
-		object = object.object;
-	else if( object.message )
+	var type = 'object';
+	if( i_data.object )
+		object = i_data.object;
+	else if( i_data.message )
 	{
-		object = object.message;
-		message = true;
+		object = i_data.message;
+		type = 'message';
+	}
+	else if( i_data.task_exec )
+	{
+		object = i_data.task_exec;
+		type = 'task_exec';
 	}
 
 	if( i_args == null )
 	{
-		if( message )
-			g_Log('Global message received.');
-		else
-			g_Log('Global object received.');
+		g_Log('Global object received.');
 		i_args = {};
 	}
 
 	var new_wnd = false;
 	var wnd = window;
 	if( i_args.wnd )
+	{
 		wnd = i_args.wnd;
+	}
+	var doc = wnd.document;
 	if( i_args.evt )
 	{
 		if( i_args.evt.shiftKey ) new_wnd = true;
@@ -452,44 +426,40 @@ function g_ShowObject( i_data, i_args)
 	if( i_args.name ) title = i_args.name;
 	if( object.type ) title += ' ' + object.type;
 
-
-	if( new_wnd == false )
+	var elContent = null;
+	if( new_wnd )
 	{
-		if( message )
-		{
-			var wnd = new cgru_Window({"name":title,"wnd":wnd});
-			for( var i = 0; i < object.list.length; i++)
-			{
-				var el = wnd.document.createElement('p');
-				el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
-				wnd.elContent.appendChild(el);
-			}
-		}
-		else
-			cgru_ShowObject( object, title, wnd);
-		return;
+		wnd = g_OpenWindowWrite('window.html', title);
+		if( wnd == null ) return;
+		elContent = wnd.document.body;
+		doc = wnd.document;
+		wnd.document.title = title;
+	}
+	else
+	{
+		wnd = new cgru_Window({"name":title,"wnd":wnd});
+		elContent = wnd.elContent;
 	}
 
-	var wnd = g_OpenWindowLoad('window.html', title);
-	if( wnd == null ) return;
-	wnd.onload = function(){
-		if( message )
+	if( type == 'message')
+	{
+		for( var i = 0; i < object.list.length; i++)
 		{
-			for( var i = 0; i < object.list.length; i++)
-			{
-				var el = wnd.document.createElement('p');
-				el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
-				wnd.document.body.appendChild(el);
-			}
+			var el = document.createElement('p');
+			el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
+			elContent.appendChild(el);
 		}
-		else
-		{
-			var el = wnd.document.createElement('p');
-			el.innerHTML = JSON.stringify( object, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
-			wnd.document.body.appendChild(el);
-		}
-		wnd.document.title = title;
-	};
+	}
+	else if( type == 'task_exec')
+	{
+		t_ShowExec( object, elContent, doc);
+	}
+	else
+	{
+		var el = document.createElement('p');
+		el.innerHTML = JSON.stringify( object, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
+		elContent.appendChild(el);
+	}
 }
 
 function g_OpenWindowLoad( i_file, i_name)
@@ -530,12 +500,12 @@ function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 	wnd.name = i_name;
 
 	wnd.document.writeln('<!DOCTYPE html>');
-	wnd.document.write('<html><head><title>'+i_title+'</title>');
-	wnd.document.write('<link type="text/css" rel="stylesheet" href="lib/styles.css">');
-	wnd.document.write('<link type="text/css" rel="stylesheet" href="afanasy/browser/style.css">');
+	wnd.document.writeln('<html><head><title>'+i_title+'</title>');
+	wnd.document.writeln('<link type="text/css" rel="stylesheet" href="lib/styles.css">');
+	wnd.document.writeln('<link type="text/css" rel="stylesheet" href="afanasy/browser/style.css">');
 	if(( i_notFinishWrite == null ) || ( i_notFinishWrite == false ))
 	{
-		wnd.document.write('</head><body></body></html>');
+		wnd.document.writeln('</head><body></body></html>');
 		wnd.document.body.onkeydown = g_OnKeyDown;
 	}
 	if( wnd.document.body )
