@@ -6,7 +6,7 @@
 
 #include "dbattr.h"
 #include "dbconnection.h"
-#include "dbstatistics.h"
+#include "dbjob.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -58,7 +58,7 @@ void afsql::ResetStat( DBConnection * dbconnenction)
 		AFERROR("DBConnection::ResetArchive: Database connection is not open")
 		return;
 	}
-	DBStatistics statistics;
+	DBJob statistics;
 	dbconnenction->dropTable( statistics.v_dbGetTableName());
 	std::list<std::string> queries;
 	statistics.dbCreateTable( &queries);
@@ -89,7 +89,7 @@ void afsql::UpdateTables( DBConnection * dbconnenction, bool showOnly )
 	std::list<std::string> columns;
 	std::list<std::string> queries;
 
-	DBStatistics statistics;
+	DBJob statistics;
 	columns = dbconnenction->getTableColumns( statistics.v_dbGetTableName());
 	statistics.dbUpdateTable( &queries, columns);
 

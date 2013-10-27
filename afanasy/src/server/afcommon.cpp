@@ -20,11 +20,11 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-af::MsgQueue      * AFCommon::MsgDispatchQueue  = NULL;
-FileQueue         * AFCommon::FileWriteQueue    = NULL;
-DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
-CleanUpQueue      * AFCommon::RemFoldersQueue   = NULL;
-LogQueue          * AFCommon::OutputLogQueue    = NULL;
+af::MsgQueue * AFCommon::MsgDispatchQueue = NULL;
+FileQueue    * AFCommon::FileWriteQueue   = NULL;
+DBQueue      * AFCommon::ms_DBQueue       = NULL;
+CleanUpQueue * AFCommon::RemFoldersQueue  = NULL;
+LogQueue     * AFCommon::OutputLogQueue   = NULL;
 
 /*
    This ctor will start the various job queues. Note that threads
@@ -32,20 +32,20 @@ LogQueue          * AFCommon::OutputLogQueue    = NULL;
 */
 AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
-   MsgDispatchQueue = new af::MsgQueue(      "Sending Messages", af::AfQueue::e_start_thread);
-   FileWriteQueue   = new FileQueue(         "Writing Files");
-   RemFoldersQueue  = new CleanUpQueue(      "Jobs Cleanup");
-   OutputLogQueue   = new LogQueue(          "Log Output");
-   DBUpdateQueue    = new DBActionQueue(     "AFDB_update",        i_threadArgs->monitors);
+	MsgDispatchQueue = new af::MsgQueue( "Sending Messages", af::AfQueue::e_start_thread);
+	FileWriteQueue	= new FileQueue(	 "Writing Files");
+	RemFoldersQueue  = new CleanUpQueue( "Jobs Cleanup");
+	OutputLogQueue	= new LogQueue(	  "Log Output");
+	ms_DBQueue		 = new DBQueue(		"AFDB_update", i_threadArgs->monitors);
 }
 
 AFCommon::~AFCommon()
 {
-    delete FileWriteQueue;
-    delete MsgDispatchQueue;
-    delete RemFoldersQueue;
-    delete OutputLogQueue;
-    delete DBUpdateQueue;
+	delete FileWriteQueue;
+	delete MsgDispatchQueue;
+	delete RemFoldersQueue;
+	delete OutputLogQueue;
+	delete ms_DBQueue;
 }
 
 /*
@@ -167,67 +167,67 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 
 void AFCommon::executeCmd( const std::string & cmd)
 {
-   std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;
-   if( system( cmd.c_str()))
-   {
-      AFERRPE("AFCommon::executeCmd: system: ")
-   }
+	std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;
+	if( system( cmd.c_str()))
+	{
+		AFERRPE("AFCommon::executeCmd: system: ")
+	}
 }
 
 void AFCommon::saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename)
 {
-   int lines = log.size();
-   if( lines < 1) return;
-   std::string bytes;
-   for( std::list<std::string>::const_iterator it = log.begin(); it != log.end(); it++)
-   {
-      bytes += *it;
-      bytes += "\n";
-   }
+	int lines = log.size();
+	if( lines < 1) return;
+	std::string bytes;
+	for( std::list<std::string>::const_iterator it = log.begin(); it != log.end(); it++)
+	{
+		bytes += *it;
+		bytes += "\n";
+	}
 
-   std::string path = af::pathFilterFileName( filename);
-   path = dirname + '/' + path;
+	std::string path = af::pathFilterFileName( filename);
+	path = dirname + '/' + path;
 
-   FileData * filedata = new FileData( bytes.data(), bytes.length(), path);
-   FileWriteQueue->pushFile( filedata);
+	FileData * filedata = new FileData( bytes.data(), bytes.length(), path);
+	FileWriteQueue->pushFile( filedata);
 }
 
 bool AFCommon::writeFile( const char * data, const int length, const std::string & filename)
 {
-   if( filename.size() == 0)
-   {
-      QueueLogError("AFCommon::writeFile: File name is empty.");
-      return false;
-   }
+	if( filename.size() == 0)
+	{
+		QueueLogError("AFCommon::writeFile: File name is empty.");
+		return false;
+	}
 	#ifdef WINNT
 	int fd = _open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
 	#else
 	int fd = open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	#endif
-   if( fd == -1 )
-   {
-      QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
-      return false;
-   }
-   int bytes = 0;
-   while( bytes < length )
-   {
-      int written = write( fd, data+bytes, length-bytes);
-      if( written == -1 )
-      {
-         QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
-         close( fd);
-         return false;
-      }
-      bytes += written;
-   }
+	if( fd == -1 )
+	{
+		QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
+		return false;
+	}
+	int bytes = 0;
+	while( bytes < length )
+	{
+		int written = write( fd, data+bytes, length-bytes);
+		if( written == -1 )
+		{
+			QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
+			close( fd);
+			return false;
+		}
+		bytes += written;
+	}
 
-   close( fd);
+	close( fd);
 
-   /* FIXME: do we need this chmod() ? If so, in what case ? */
-   chmod( filename.c_str(), 0644);
+	/* FIXME: do we need this chmod() ? If so, in what case ? */
+	chmod( filename.c_str(), 0644);
 
-   // AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
-   AFINFA("AFCommon::writeFile - \"%s\"", filename.c_str())
-   return true;
+	// AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
+	AFINFA("AFCommon::writeFile - \"%s\"", filename.c_str())
+	return true;
 }

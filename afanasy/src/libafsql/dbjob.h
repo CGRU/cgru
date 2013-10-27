@@ -6,13 +6,13 @@
 
 namespace afsql
 {
-class DBStatistics: public DBItem
+class DBJob: public DBItem
 {
 public:
-	DBStatistics();
-	virtual ~DBStatistics();
+	DBJob();
+	virtual ~DBJob();
 
-	void addJob( const af::Job * job, std::list<std::string> * queries);
+	void add( const af::Job * job, std::list<std::string> * queries);
 
 	inline const std::string & v_dbGetTableName()  const { return TableName;}
 

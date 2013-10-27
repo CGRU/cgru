@@ -21,6 +21,7 @@ namespace afsql
 	class DBStatJob;
 	class DBStatBlock;
 
+	void addJob( af::Job * i_job );
 
 	bool connect( PGconn * i_conn);
 	bool execute( PGconn * i_conn, const std::list<std::string> * i_queries);

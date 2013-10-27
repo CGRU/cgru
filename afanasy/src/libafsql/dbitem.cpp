@@ -206,12 +206,3 @@ void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<st
 	}
 }
 
-int DBItem::v_calcWeight() const
-{
-	int weight = sizeof(DBItem);
-	for( int i = 0; i < dbAttributes.size(); i++)
-	{
-		weight += sizeof(dbAttributes[i]) + sizeof(*(dbAttributes[i]));
-	}
-	return weight;
-}

@@ -1,4 +1,4 @@
-#include "dbstatistics.h"
+#include "dbjob.h"
 
 #include "../libafanasy/job.h"
 
@@ -6,9 +6,9 @@
 
 using namespace afsql;
 
-const std::string DBStatistics::TableName("statistics");
+const std::string DBJob::TableName("statistics");
 
-DBStatistics::DBStatistics()
+DBJob::DBJob()
 {
 	dbAddAttr( new DBAttrString(  DBAttr::_annotation,        &annotation       ));
 	dbAddAttr( new DBAttrString(  DBAttr::_blockname,         &blockname        ));
@@ -24,11 +24,11 @@ DBStatistics::DBStatistics()
 	dbAddAttr( new DBAttrString(  DBAttr::_username,          &username         ));
 }
 
-DBStatistics::~DBStatistics()
+DBJob::~DBJob()
 {
 }
 
-void DBStatistics::addJob( const af::Job * job, std::list<std::string> * queries)
+void DBJob::add( const af::Job * job, std::list<std::string> * queries)
 {
 	// Get job parameters:
 	jobname        = job->getName();

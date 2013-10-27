@@ -22,8 +22,6 @@ public:
 
 	void dbUpdateTable( std::list<std::string> * queries, const std::list<std::string> & columns) const;
 
-	virtual int v_calcWeight() const;
-
 protected:
 	virtual inline const std::string & v_dbGetIDsString()  const { return empty;}
 	virtual inline const std::string & v_dbGetKeysString() const { return empty;}
