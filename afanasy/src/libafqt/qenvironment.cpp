@@ -398,7 +398,7 @@ void QEnvironment::solveServerAddress()
       adresses = qhostinfo.addresses();
       if( adresses.size() < 1 )
       {
-         AFERRAR("Can't solve server name.", serveraddrnum_arg.c_str())
+         AFERRAR("Can't solve server name '%s'", serveraddrnum_arg.c_str())
          ms_valid = false;
          return;
       }

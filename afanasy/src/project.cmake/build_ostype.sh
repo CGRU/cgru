@@ -7,4 +7,4 @@ export AF_OSTYPE=$OSTYPE
 
 echo "OSTYPE='$AF_OSTYPE'"
 
-./build.sh
+./build.sh "$@"
