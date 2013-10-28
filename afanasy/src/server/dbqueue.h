@@ -2,6 +2,7 @@
 
 #include "../libafanasy/afqueue.h"
 
+#include "../libafsql/dbjob.h"
 #include "../libafsql/name_afsql.h"
 
 class MonitorContainer;
@@ -20,6 +21,8 @@ public:
 	void addItem(    const afsql::DBItem * item);
 	void delItem(    const afsql::DBItem * item);
 	void updateItem( const afsql::DBItem * item, int attr = -1);
+
+	void addJob( const af::Job * i_job);
 
 protected:
 
@@ -41,4 +44,7 @@ private:
 private:
 	MonitorContainer * m_monitors;
 	bool m_working;
+
+	afsql::DBJob m_dbjob;
 };
+

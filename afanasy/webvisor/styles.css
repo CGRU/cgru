@@ -1,59 +1,37 @@
 body {
-   background-color: #DFEDA2;
-   background-image:url('images/back.jpg');
-   color: #002000;
-   font-family: Verdana, Arial, Helvetica, sans-serif;
-   font-size: 14px;
-   text-align: justify;
+background-color: #DFEDA2;
+background-image:url('images/back.jpg');
+color: #002000;
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 14px;
+text-align: justify;
 }
-a:link {
-   color: #000060;
-}
-a:visited {
-   color: #000060;
-}
-a:hover {
-   color: #500000;
-}
-a:active {
-   color: #D00000;
-}
+body, div, span { margin: 0; padding: 0; }
 
-.state_empty
-{
-}
+a:link { color: #000060; }
+a:visited { color: #000060; }
+a:hover { color: #500000; }
+a:active { color: #D00000; }
+.state_empty {}
+.state_error { background-color: #FF7777; }
+.state_waitdep { background-color: #BBAABB; }
+.state_waittime { background-color: #AAAAFF; }
+.state_running { background-color: #A5FF7F; }
+.state_done { background-color: #779966; }
+.state_offline { background-color: #808080;}
+.state_nimby { background-color: #A0A0D0;}
 
-.state_error
-{
- background-color: #FF7777;
+#info {
+margin: 4px 20px;
+padding: 4px 12px;
+background: rgba(0,20,0,.8);
+color: rgba(200,255,100,.9);
+text-shadow: 0 0 4px rgba(0,255,0,.8);
+border-radius: 4px;
+box-shadow: 0 0 4px #000 inset, 0 0 4px rgba(255,255,255,.8);
 }
-
-.state_waitdep
-{
- background-color: #BBAABB;
-}
-
-.state_waittime
-{
- background-color: #AAAAFF;
-}
-
-.state_running
-{
- background-color: #A5FF7F;
-}
-
-.state_done
-{
- background-color: #779966;
-}
-
-.state_offline
-{
- background-color: #808080;
-}
-
-.state_nimby
-{
- background-color: #A0A0D0;
+#info.error{
+background: rgba(20,0,0,.8);
+color: rgba(255,100,100,1);
+text-shadow: 0 0 4px rgba(2550,0,0,.9);
 }

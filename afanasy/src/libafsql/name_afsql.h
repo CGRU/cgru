@@ -17,11 +17,9 @@ namespace afsql
 	class DBAttrUInt8;
 	class DBAttrInt32;
 	class DBAttrUInt32;
-	class DBItem;
-	class DBStatJob;
-	class DBStatBlock;
 
-	void addJob( af::Job * i_job );
+	class DBItem;
+	class DBJob;
 
 	bool connect( PGconn * i_conn);
 	bool execute( PGconn * i_conn, const std::list<std::string> * i_queries);

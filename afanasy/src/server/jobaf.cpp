@@ -307,6 +307,8 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
 	setZombie();
 
+	AFCommon::DBAddJob( this);
+
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
    AFCommon::QueueLog("Deleting a job: " + v_generateInfoString());
    unLock();

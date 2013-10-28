@@ -148,6 +148,16 @@ void DBQueue::delItem( const afsql::DBItem * item)
 	push( queries);
 }
 
+void DBQueue::addJob( const af::Job * i_job)
+{
+//printf("DBQueue::addJob: (working=%d)\n", m_working);
+	if( false == m_working ) return;
+
+	Queries * queries = new Queries();
+	m_dbjob.add( i_job, queries);
+	push( queries);
+}
+
 void DBQueue::sendAlarm()
 {
 	std::string str("ALARM! Server database connection error. Contact your system administrator.");

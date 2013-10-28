@@ -33,10 +33,10 @@ LogQueue     * AFCommon::OutputLogQueue   = NULL;
 AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
 	MsgDispatchQueue = new af::MsgQueue( "Sending Messages", af::AfQueue::e_start_thread);
-	FileWriteQueue	= new FileQueue(	 "Writing Files");
+	FileWriteQueue	 = new FileQueue(	 "Writing Files");
 	RemFoldersQueue  = new CleanUpQueue( "Jobs Cleanup");
-	OutputLogQueue	= new LogQueue(	  "Log Output");
-	ms_DBQueue		 = new DBQueue(		"AFDB_update", i_threadArgs->monitors);
+	OutputLogQueue	 = new LogQueue(	 "Log Output");
+	ms_DBQueue		 = new DBQueue(		 "AFDB_update", i_threadArgs->monitors);
 }
 
 AFCommon::~AFCommon()

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RULES</title>
+<link rel="shortcut icon" href="../../favicon.ico" type="image/png">
+<link type="text/css" rel="stylesheet" href="../../lib/styles.css">
+<link type="text/css" rel="stylesheet" href="styles.css">
+<script type="text/javascript" src="../../lib/js/cgru.js"></script>
+<script type="text/javascript" src="general.js"></script>
+</head>
+
+<body onload="g_Init()">
+
+<div style="text-align: center; margin: 10px;">
+	<div style="float:left; width:25%; text-align: right; padding: 8px;"><img src="images/star01.png" alt="★"></div>
+	<div style="float:right; width:25%; text-align: left; padding: 8px;"><img src="images/star02.png" alt="★"></div>
+	<div><img src="images/afanasy.png" border="0" alt="AFANASY"></div>
+</div>
+
+<div>
+	<div style="float:left; width:200px; height:40px; background:url('images/header_left.png')"></div>
+	<div style="float:right; width:200px; height:40px; background:url('images/header_right.png')"></div>
+	<div style="overflow:hidden; height:40px; background:url('images/header.png') repeat-x"></div>
+</div>
+
+<div id="content"></div>
+<div id="info"></div>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0"><tr>
+	<td width="200px"><div style="width:100%;height:40px;background:url('images/footer_left.png')"></div></td>
+	<td><div style="width:100%;height:40px;background:url('images/footer.png') repeat-x"></div></td>
+	<td width="200px"><div style="width:100%;height:40px;background:url('images/footer_center.png')"></div></td>
+	<td><div style="width:100%;height:40px;background:url('images/footer.png') repeat-x"></div></td>
+	<td width="200px"><div style="width:100%;height:40px;background:url('images/footer_right.png')"></div></td>
+</tr></table>
+
+</body>
+
+</html>
+
+<!--?php
+require('afanasy.php');
+$afanasy = new Afanasy();
+$afanasy->Display();
+?-->
+
