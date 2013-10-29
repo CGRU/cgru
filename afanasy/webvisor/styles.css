@@ -5,6 +5,7 @@ color: #002000;
 font-family: Verdana, Arial, Helvetica, sans-serif;
 font-size: 14px;
 text-align: justify;
+overflow: hidden;
 }
 body, div, span { margin: 0; padding: 0; }
 
@@ -21,7 +22,10 @@ a:active { color: #D00000; }
 .state_offline { background-color: #808080;}
 .state_nimby { background-color: #A0A0D0;}
 
+#content { margin: 10px 20px;}
+
 #info {
+overflow: hidden;
 margin: 4px 20px;
 padding: 4px 12px;
 background: rgba(0,20,0,.8);
@@ -34,4 +38,28 @@ box-shadow: 0 0 4px #000 inset, 0 0 4px rgba(255,255,255,.8);
 background: rgba(20,0,0,.8);
 color: rgba(255,100,100,1);
 text-shadow: 0 0 4px rgba(2550,0,0,.9);
+}
+
+.table_div {
+text-align: center;
+background: rgba(255,255,255,.1);
+box-shadow: 0 0 3px rgba(0,0,0,.8) inset;
+border-radius: 4px;
+margin: 12px 0px;
+padding: 4px;
+}
+.table_div .caption {
+text-transform: capitalize;
+text-align: center;
+font-size: 16px;
+font-weight: bold;
+}
+table.table {
+width: 100%;
+}
+table.table td {
+text-align: center;
+background: rgba(255,255,255,.1);
+box-shadow: 0 0 3px rgba(0,0,0,.8) inset;
+padding: 2px;
 }
