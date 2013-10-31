@@ -1,2 +1,2 @@
 PhotoJPG (best)
-ffmpeg -y -pix_fmt rgb24 -i "@INPUT@" -vcodec mjpeg -qscale 1 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -i "@INPUT@" -vcodec mjpeg -pix_fmt yuv420p -qscale 1 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
