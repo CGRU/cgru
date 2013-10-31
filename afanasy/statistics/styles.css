@@ -5,22 +5,32 @@ color: #002000;
 font-family: Verdana, Arial, Helvetica, sans-serif;
 font-size: 14px;
 text-align: justify;
-overflow: hidden;
+overflow-x: hidden;
+overflow-y: scroll;
 }
 body, div, span { margin: 0; padding: 0; }
+div { overflow: hidden;}
 
-a:link { color: #000060; }
-a:visited { color: #000060; }
-a:hover { color: #500000; }
-a:active { color: #D00000; }
-.state_empty {}
-.state_error { background-color: #FF7777; }
-.state_waitdep { background-color: #BBAABB; }
-.state_waittime { background-color: #AAAAFF; }
-.state_running { background-color: #A5FF7F; }
-.state_done { background-color: #779966; }
-.state_offline { background-color: #808080;}
-.state_nimby { background-color: #A0A0D0;}
+a { color: #040;}
+
+#top_panel {
+margin: 4px 20px;
+text-align: center;
+border-radius: 6px;
+box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF;
+padding: 8px 8px;
+}
+#top_panel a {
+font-weight: bold;
+border-radius: 4px;
+box-shadow: 0 0 3px #000, 0 0 3px #FFF inset;
+margin: 2px 12px;
+padding: 2px 12px;
+}
+#top_panel a.enabled {
+box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
+background: rgba(255,255,255,.3);
+}
 
 #content { margin: 10px 20px;}
 
@@ -44,11 +54,11 @@ text-shadow: 0 0 4px rgba(2550,0,0,.9);
 text-align: center;
 background: rgba(255,255,255,.1);
 box-shadow: 0 0 3px rgba(0,0,0,.8) inset;
-border-radius: 4px;
+border-radius: 12px 12px 4px 4px;
 margin: 12px 0px;
 padding: 4px;
 }
-.table_div .caption {
+.table_div > .title {
 text-transform: capitalize;
 text-align: center;
 font-size: 16px;
@@ -57,9 +67,14 @@ font-weight: bold;
 table.table {
 width: 100%;
 }
-table.table td {
+table.table th, table.table td {
 text-align: center;
 background: rgba(255,255,255,.1);
 box-shadow: 0 0 3px rgba(0,0,0,.8) inset;
 padding: 2px;
+}
+table.table th {
+border-radius: 8px 8px 0px 0px;
+background: rgba(255,255,255,.2);
+font-weight: normal;
 }

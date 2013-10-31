@@ -38,9 +38,9 @@ public:
 	inline long long getWOLTime()  const { return m_wol_operation_time;   }
 	inline long long getIdleTime() const { return m_idle_time;            }
 	inline long long getBusyTime() const { return m_busy_time;            }
-	inline void setWOLFalling(     bool value) { if( value ) m_state = m_state | SWOLFalling;  else m_state = m_state & (~SWOLFalling); }
-	inline void setWOLSleeping(  bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
-	inline void setWOLWaking(    bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
+	inline void setWOLFalling(  bool value) { if( value ) m_state = m_state | SWOLFalling;  else m_state = m_state & (~SWOLFalling); }
+	inline void setWOLSleeping( bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
+	inline void setWOLWaking(   bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
 
 	inline int getMaxTasks()     const { return (m_max_tasks == -1 ? m_host.m_max_tasks : m_max_tasks);}
 	inline int getCapacity()     const { return (m_capacity == -1 ? m_host.m_capacity : m_capacity);}

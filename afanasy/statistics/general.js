@@ -1,27 +1,72 @@
 var $ = function( id ) { return document.getElementById( id ); };
 
+g_actions = {};
+g_actions.jobs_table = {"label":'Jobs Table'};
+g_actions.tasks_table = {"label":'Tasks Table'};
+
 function g_Init()
 {
-	g_Log('init');
+	g_Info('init');
 	g_Request({"send":{"init":null},"func":g_Start});
 }
 
 function g_Start( i_data, i_args)
 {
 //console.log( JSON.stringify( i_data));
-	g_Log('Started');
-	g_RequestJobs();
+	g_Info('Started');
+
+	for( var action in g_actions )
+	{
+		var elAct = document.createElement('a');
+		$('top_panel').appendChild( elAct);
+		elAct.textContent = g_actions[action].label;
+		elAct.href = '#' + action;
+		g_actions[action].element = elAct;
+	}
+
+	window.onhashchange = g_PathChanged;
+	g_PathChanged();
 }
 
-function g_RequestJobs()
+function g_PathChanged()
 {
-	g_Log('Requesting jobs statistics...');
-	g_Request({"send":{"getjobs":null},"func":g_ShowTables});
+	var action = document.location.hash;
+	if( action.indexOf('#') == 0 ) action = action.substr(1);
+
+	for( var a in g_actions )
+		g_actions[a].element.classList.remove('enabled');
+
+	if( action == '' )
+	{
+		document.location.hash = 'jobs_table';
+		return;
+	}
+
+	g_Info( action);
+
+	if( g_actions[action].element )
+		g_actions[action].element.classList.add('enabled');
+
+	if( action == 'jobs_table')
+	{
+		g_Info('Requesting jobs tasks table statistics...');
+		g_Request({"send":{"get_jobs_table":null},"func":g_ShowTables});
+		return;
+	}
+	if( action == 'tasks_table')
+	{
+		g_Info('Requesting tasks table statistics...');
+		g_Request({"send":{"get_tasks_table":null},"func":g_ShowTables});
+		return;
+	}
+
+	$('content').textContent = '';
+	g_Error('Unknown action: "' + action + '"');
 }
 
 function g_ShowTables( i_data, i_args)
 {
-//g_Log( JSON.stringify( i_data));
+//g_Info( JSON.stringify( i_data));
 	$('content').textContent = '';
 	if( i_data.tables == null )
 	{
@@ -37,7 +82,7 @@ function g_ShowTables( i_data, i_args)
 
 		var elTableName = document.createElement('div');
 		elTableDiv.appendChild( elTableName);
-		elTableName.classList.add('caption');
+		elTableName.classList.add('title');
 		elTableName.textContent = table;
 
 		var elTable = document.createElement('table');
@@ -47,13 +92,13 @@ function g_ShowTables( i_data, i_args)
 		var elRow = document.createElement('tr');
 		elTable.appendChild( elRow);
 
-		var elCol = document.createElement('td');
+		var elCol = document.createElement('th');
 		elRow.appendChild( elCol);
 		elCol.textContent = '#';
 
 		for( var col in i_data.tables[table][0])
 		{
-			var elCol = document.createElement('td');
+			var elCol = document.createElement('th');
 			elRow.appendChild( elCol);
 			if( g_parm[col] && g_parm[col].label )
 				elCol.textContent = g_parm[col].label;
@@ -79,8 +124,10 @@ function g_ShowTables( i_data, i_args)
 
 				if( g_parm[col])
 				{
-					if( g_parm[col].round ) value = Math.round( value);
-					if( g_parm[col].time ) value = g_SecToHMS( value);
+					if( g_parm[col].percent ) value = Math.round( 100 * value) + '%';
+					else if( g_parm[col].round ) value = Math.round( value);
+					else if( g_parm[col].time ) value = g_SecToHMS( value);
+
 					if( g_parm[col].suffix ) value += g_parm[col].suffix;
 				}
 
@@ -89,7 +136,7 @@ function g_ShowTables( i_data, i_args)
 		}
 	}
 
-	g_Log('Jobs statictics received.');
+	g_Info('Statistics received.');
 }
 
 function g_SecToHMS( i_sec)
@@ -112,7 +159,7 @@ function g_SecToHMS( i_sec)
 		hms = days + 'd ' + hms;
 	return hms;
 }
-function g_Log( i_msg)
+function g_Info( i_msg)
 {
 	$('info').innerHTML = i_msg;
 	$('info').classList.remove('error');
@@ -120,7 +167,7 @@ function g_Log( i_msg)
 
 function g_Error( i_msg)
 {
-	g_Log( i_msg);
+	g_Info( i_msg);
 	$('info').classList.add('error');
 }
 
@@ -209,22 +256,17 @@ function n_XHRHandler()
 }
 
 g_parm = {};
-g_parm.username = {'label':"User Name"};
-g_parm.numjobs = {'label':"Jobs Quantity"};
-g_parm.sumruntime = {'label':"Sum Run Time","time":true};
-g_parm.avgruntime = {'label':"Average Run Time","time":true};
-g_parm.usertasksnum = {'label':"Tasks Quantity"};
-g_parm.usertasksavg = {'label':"Average Quantity","round":true};
-g_parm.service_name = {'label':"Favourite Service"};
-g_parm.service_percent = {'label':"Service Percent",'suffix':"%","round":true};
 
-g_parm.service = {'label':"Service"};
-g_parm.servicequantity = {'label':"Service Quantity"};
-g_parm.tasksquantity = {'label':"Tasks Quantity"};
-g_parm.tasksquantityavg = {'label':"Average Quantity","round":true};
-g_parm.taskssumruntime = {'label':"Sum Run Time","time":true};
-g_parm.tasksavgruntime = {'label':"Average Run Time","time":true};
-g_parm.tasksdone = {'label':"Done",'suffix':"%","round":true};
-g_parm.user_name = {'label':"Favourite User"};
-g_parm.user_percent = {'label':"User Percent",'suffix':"%","round":true};
+g_parm.capacity_avg       = {"label":'Average Capacity', "round":true};
+g_parm.error_avg          = {"label":'Average Error',    "percent":true};
+g_parm.fav_name           = {"label":'Favourite Name'};
+g_parm.fav_percent        = {"label":'Favourive Percent', "percent":true};
+g_parm.jobs_quantity      = {"label":'Jobs Quantity'};
+g_parm.run_time_avg       = {"label":'Average Run Time', "time":true};
+g_parm.run_time_sum       = {"label":'Sum Run Time',     "time":true};
+g_parm.service            = {"label":'Service'};
+g_parm.tasks_done_percent = {"label":'Done',             "percent":true};
+g_parm.tasks_quantity     = {"label":'Tasks Quantity'};
+g_parm.tasks_quantity_avg = {"label":'Average Quantity', "round":true};
+g_parm.username           = {"label":'User'};
 

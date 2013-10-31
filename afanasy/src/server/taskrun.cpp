@@ -7,6 +7,7 @@
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 
+#include "afcommon.h"
 #include "block.h"
 #include "jobaf.h"
 #include "renderaf.h"
@@ -286,6 +287,7 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
          render->taskFinished( m_exec, monitoring);
          m_block->taskFinished( m_exec, render, monitoring);
       }
+		AFCommon::DBAddTask( m_exec, m_progress, m_block->m_job, render);
    }
 
    m_task->v_monitor( monitoring );

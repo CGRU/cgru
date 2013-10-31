@@ -14,31 +14,46 @@ CmdDBCheck::CmdDBCheck()
 CmdDBCheck::~CmdDBCheck(){}
 bool CmdDBCheck::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-      afsql::DBConnection DB( "afanasy.cmd.Check");
-      if( DB.isWorking()) printf("\nDatabase connection is working.\n");
-      else                printf("\nDatabase connection is NOT WORKING !\n");
-      return true;
+	afsql::DBConnection DB( "afanasy.cmd.Check");
+	if( DB.isWorking()) printf("\nDatabase connection is working.\n");
+	else                printf("\nDatabase connection is NOT WORKING !\n");
+	return true;
 }
 
-CmdDBResetStat::CmdDBResetStat()
+CmdDBResetJobs::CmdDBResetJobs()
 {
-   setCmd("db_resetstat");
-   setInfo("Reset (create) statistics table.");
+	setCmd("db_reset_jobs");
+	setInfo("Reset (create) jobs statistics table.");
 }
-CmdDBResetStat::~CmdDBResetStat(){}
-bool CmdDBResetStat::v_processArguments( int argc, char** argv, af::Msg &msg)
+CmdDBResetJobs::~CmdDBResetJobs(){}
+bool CmdDBResetJobs::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-   afsql::DBConnection DB( "afanasy.cmd.ResetArchive");
-   DB.DBOpen();
-   afsql::ResetStat( &DB);
-   DB.DBClose();
-   return true;
+	afsql::DBConnection DB("afanasy.cmd.ResetJobs");
+	DB.DBOpen();
+	afsql::ResetJobs( &DB);
+	DB.DBClose();
+	return true;
+}
+
+CmdDBResetTasks::CmdDBResetTasks()
+{
+	setCmd("db_reset_tasks");
+	setInfo("Reset (create) tasks statistics table.");
+}
+CmdDBResetTasks::~CmdDBResetTasks(){}
+bool CmdDBResetTasks::v_processArguments( int argc, char** argv, af::Msg &msg)
+{
+	afsql::DBConnection DB("afanasy.cmd.ResetTasks");
+	DB.DBOpen();
+	afsql::ResetTasks( &DB);
+	DB.DBClose();
+	return true;
 }
 
 CmdDBResetAll::CmdDBResetAll()
 {
-   setCmd("db_resetall");
-   setInfo("Reset (create) all tables.");
+	setCmd("db_reset_all");
+	setInfo("Reset (create) all statistics tables.");
 }
 CmdDBResetAll::~CmdDBResetAll(){}
 bool CmdDBResetAll::v_processArguments( int argc, char** argv, af::Msg &msg)

@@ -54,7 +54,13 @@ public:
 	inline static bool QueueLogError(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Error ); else return false;}
 	inline static bool QueueLogErrno(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Errno ); else return false;}
 
-	inline static void DBAddJob( const af::Job * job) { if( ms_DBQueue ) ms_DBQueue->addJob( job );}
+	inline static void DBAddJob( const af::Job * i_job) { if( ms_DBQueue ) ms_DBQueue->addJob( i_job );}
+	inline static void DBAddTask(
+		const af::TaskExec * i_exec,
+		const af::TaskProgress * i_progress,
+		const af::Job * i_job,
+		const af::Render * i_render)
+		{ if( ms_DBQueue ) ms_DBQueue->addTask( i_exec, i_progress, i_job, i_render );}
 
 private:
 	static af::MsgQueue * MsgDispatchQueue;

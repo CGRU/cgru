@@ -7,6 +7,7 @@
 #include "dbattr.h"
 #include "dbconnection.h"
 #include "dbjob.h"
+#include "dbtask.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -50,7 +51,7 @@ bool afsql::execute( PGconn * i_conn, const std::list<std::string> * i_queries)
 	return o_result;
 }
 
-void afsql::ResetStat( DBConnection * dbconnenction)
+void afsql::ResetJobs( DBConnection * dbconnenction)
 {
 	if( dbconnenction->isWorking() == false ) return;
 	if( dbconnenction->isOpen()	 == false )
@@ -59,6 +60,21 @@ void afsql::ResetStat( DBConnection * dbconnenction)
 		return;
 	}
 	DBJob statistics;
+	dbconnenction->dropTable( statistics.v_dbGetTableName());
+	std::list<std::string> queries;
+	statistics.dbCreateTable( &queries);
+	dbconnenction->execute( &queries);
+}
+
+void afsql::ResetTasks( DBConnection * dbconnenction)
+{
+	if( dbconnenction->isWorking() == false ) return;
+	if( dbconnenction->isOpen()	 == false )
+	{
+		AFERROR("DBConnection::ResetArchive: Database connection is not open")
+		return;
+	}
+	DBTask statistics;
 	dbconnenction->dropTable( statistics.v_dbGetTableName());
 	std::list<std::string> queries;
 	statistics.dbCreateTable( &queries);
@@ -74,7 +90,8 @@ void afsql::ResetAll( DBConnection * dbconnenction)
 		return;
 	}
 	dbconnenction->dropAllTables();
-	ResetStat( dbconnenction);
+	ResetJobs( dbconnenction);
+	ResetTasks( dbconnenction);
 }
 
 void afsql::UpdateTables( DBConnection * dbconnenction, bool showOnly )

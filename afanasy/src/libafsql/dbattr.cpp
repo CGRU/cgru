@@ -56,7 +56,6 @@ void DBAttr::init()
 	DBName[_id                    ] = "id";
 	DBName[_id_block              ] = "id_block";
 	DBName[_id_job                ] = "id_job";
-//   DBName[_id_task               ] = "id_task";
 	DBName[_ipaddresses           ] = "ipaddresses";
 	DBName[_jobname               ] = "jobname";
 	DBName[_lifetime              ] = "lifetime";
@@ -78,16 +77,16 @@ void DBAttr::init()
 	DBName[_parsercoeff           ] = "parsercoeff";
 	DBName[_password              ] = "password";
 	DBName[_priority              ] = "priority";
+	DBName[_run_time_sum          ] = "run_time_sum";
 	DBName[_service               ] = "service";
 	DBName[_services_disabled     ] = "services_disabled";
 	DBName[_starts_count          ] = "starts_count";
 	DBName[_state                 ] = "state";
 	DBName[_tasksdependmask       ] = "tasksdependmask";
-	DBName[_tasksdone             ] = "tasksdone";
+	DBName[_tasks_done            ] = "tasks_done";
 	DBName[_tasksmaxruntime       ] = "tasksmaxruntime";
 	DBName[_tasksname             ] = "tasksname";
-	DBName[_tasksnum              ] = "tasksnum";
-	DBName[_taskssumruntime       ] = "taskssumruntime";
+	DBName[_tasks_quantity        ] = "tasks_quantity";
 	DBName[_time_creation         ] = "time_creation";
 	DBName[_time_done             ] = "time_done";
 	DBName[_time_register         ] = "time_register";

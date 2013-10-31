@@ -158,6 +158,20 @@ void DBQueue::addJob( const af::Job * i_job)
 	push( queries);
 }
 
+void DBQueue::addTask(
+	const af::TaskExec * i_exec,
+	const af::TaskProgress * i_progress,
+	const af::Job * i_job,
+	const af::Render * i_render)
+{
+//printf("DBQueue::addTask: (working=%d)\n", m_working);
+	if( false == m_working ) return;
+
+	Queries * queries = new Queries();
+	m_dbtask.add( i_exec, i_progress, i_job, i_render, queries);
+	push( queries);
+}
+
 void DBQueue::sendAlarm()
 {
 	std::string str("ALARM! Server database connection error. Contact your system administrator.");

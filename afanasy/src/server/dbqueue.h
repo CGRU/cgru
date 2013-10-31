@@ -3,6 +3,7 @@
 #include "../libafanasy/afqueue.h"
 
 #include "../libafsql/dbjob.h"
+#include "../libafsql/dbtask.h"
 #include "../libafsql/name_afsql.h"
 
 class MonitorContainer;
@@ -23,6 +24,11 @@ public:
 	void updateItem( const afsql::DBItem * item, int attr = -1);
 
 	void addJob( const af::Job * i_job);
+	void addTask(
+		const af::TaskExec * i_exec,
+		const af::TaskProgress * i_progress,
+		const af::Job * i_job,
+		const af::Render * i_render);
 
 protected:
 
@@ -46,5 +52,6 @@ private:
 	bool m_working;
 
 	afsql::DBJob m_dbjob;
+	afsql::DBTask m_dbtask;
 };
 

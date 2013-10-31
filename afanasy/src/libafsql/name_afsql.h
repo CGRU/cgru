@@ -27,8 +27,9 @@ namespace afsql
 /// Database comlex procedures interface.
 	class DBConnection;
 
-	void ResetStat(    DBConnection * dbconnenction);
-	void ResetAll(     DBConnection * dbconnenction);
+	void ResetJobs(  DBConnection * dbconnenction);
+	void ResetTasks( DBConnection * dbconnenction);
+	void ResetAll(   DBConnection * dbconnenction);
 
 	void UpdateTables( DBConnection * dbconnenction, bool showOnly = false);
 }
