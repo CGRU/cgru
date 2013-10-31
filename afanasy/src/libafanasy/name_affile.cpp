@@ -123,7 +123,7 @@ const std::string af::pathHome()
 {
 	std::string home;
 #ifdef WINNT
-	home = af::getenv("HOMEPATH");
+	home = af::getenv("APPDATA");
 	if( false == af::pathIsFolder( home ))
 		home = "c:\\temp";
 #else
