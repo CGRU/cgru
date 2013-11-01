@@ -391,7 +391,11 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //############ home directory:
 	home = af::pathHome();
 	PRINT("User home directory = '%s'\n", home.c_str());
+#ifdef WINNT
+	home_afanasy = home + AFGENERAL::PATH_SEPARATOR + "cgru";
+#else
 	home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".cgru";
+#endif
 	PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
 	if( af::pathMakeDir( home_afanasy, af::VerboseOn ) == false)
 	{
