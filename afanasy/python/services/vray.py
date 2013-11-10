@@ -18,7 +18,7 @@ class vray(service.service):
 	def applycmdhosts ( self, command ):
 		hosts_ip = []
 		for host_name in self.hosts :
-		hosts_ip.append ( socket.gethostbyname ( host_name ) )
+			hosts_ip.append ( socket.gethostbyname ( host_name ) )
 		hosts = str_hostseparator.join ( hosts_ip )
 		command = command.replace( self.str_hosts, str_hostsprefix + '"' + hosts + '"')
 		print ( 'VRay hosts list "%s" applied:' % str ( hosts) )

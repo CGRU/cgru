@@ -15,7 +15,7 @@
 <div style="text-align: center; margin: 10px;">
 	<div style="float:left; width:25%; text-align: right; padding: 8px;"><img src="images/star01.png" alt="★"></div>
 	<div style="float:right; width:25%; text-align: left; padding: 8px;"><img src="images/star02.png" alt="★"></div>
-	<div><img src="images/afanasy.png" border="0" alt="AFANASY"></div>
+	<div><img src="images/afanasy.png" border="0" alt="AFANASY" onclick="g_PathChanged()"></div>
 </div>
 
 <div>
@@ -24,7 +24,17 @@
 	<div style="overflow:hidden; height:40px; background:url('images/header.png') repeat-x"></div>
 </div>
 
-<div id="top_panel"></div>
+<div id="top_panel">
+	<div style="float:left;" class="time_div">
+		<div>Time From:</div>
+		<div id="time_min" contenteditable=true class="editing"></div>
+	</div>
+	<div style="float:right;" class="time_div">
+		<div>Time To:</div>
+		<div id="time_max" contenteditable=true class="editing"></div>
+	</div>
+	<div id="actions"></div>
+</div>
 
 <div id="info"></div>
 

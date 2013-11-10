@@ -8,7 +8,7 @@ text-align: justify;
 overflow-x: hidden;
 overflow-y: scroll;
 }
-body, div, span { margin: 0; padding: 0; }
+body, div, a, span { margin: 0; padding: 0; }
 div { overflow: hidden;}
 
 a { color: #040;}
@@ -20,19 +20,46 @@ border-radius: 6px;
 box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF;
 padding: 8px 8px;
 }
-#top_panel a {
+#actions {
+/*border: 1px solid #000;*/
+text-align: center;
+position: relative;
+height: 26px;
+}
+#actions a {
+position: relative;
+top: 4px;
+text-align: center;
 font-weight: bold;
 border-radius: 4px;
 box-shadow: 0 0 3px #000, 0 0 3px #FFF inset;
 margin: 2px 12px;
 padding: 2px 12px;
 }
-#top_panel a.enabled {
+#actions a.enabled {
 box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
 background: rgba(255,255,255,.3);
 }
 
-#content { margin: 10px 20px;}
+.editing{
+background: #DDD;
+border-radius: 4px;
+box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
+}
+
+.time_div  {
+/*border: 1px solid #000;*/
+}
+.time_div > div {
+float: left;
+width: 100px;
+padding: 2px;
+}
+
+#content {
+margin: 10px 20px;
+text-align: center;
+}
 
 #info {
 overflow: hidden;
@@ -78,3 +105,11 @@ border-radius: 8px 8px 0px 0px;
 background: rgba(255,255,255,.2);
 font-weight: normal;
 }
+
+svg {
+margin: 20px;
+border-radius: 8px;
+box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF;
+background: rgba(0,20,0,.6);
+}
+

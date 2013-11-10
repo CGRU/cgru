@@ -8,7 +8,17 @@
 
 class MonitorContainer;
 
-class Queries: public std::list<std::string>, public af::AfQueueItem {};
+class Queries: public std::list<std::string>, public af::AfQueueItem
+{
+public:
+	inline void stdOut() const
+	{
+		if( size())
+			for( const_iterator it = begin(); it != end(); it++) printf("%s\n", (*it).c_str());
+		else
+			printf("Queries::stdOut: Zero size.\n");
+	}
+};
 
 /// Simple FIFO database action queue
 class DBQueue : public af::AfQueue
