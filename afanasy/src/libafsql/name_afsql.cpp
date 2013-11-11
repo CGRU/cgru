@@ -106,9 +106,13 @@ void afsql::UpdateTables( DBConnection * dbconnenction, bool showOnly )
 	std::list<std::string> columns;
 	std::list<std::string> queries;
 
-	DBJob statistics;
-	columns = dbconnenction->getTableColumns( statistics.v_dbGetTableName());
-	statistics.dbUpdateTable( &queries, columns);
+	DBJob dbjob;
+	columns = dbconnenction->getTableColumns( dbjob.v_dbGetTableName());
+	dbjob.dbUpdateTable( &queries, columns);
+
+	DBTask dbtask;
+	columns = dbconnenction->getTableColumns( dbtask.v_dbGetTableName());
+	dbtask.dbUpdateTable( &queries, columns);
 
 	if(( queries.size()) && ( false == showOnly )) dbconnenction->execute( &queries);
 }

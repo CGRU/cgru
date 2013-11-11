@@ -118,7 +118,8 @@ class service:
 		if not os.path.isdir( self.taskInfo['store_dir']):
 			return cmds
 
-		files_list = self.getParsedFiles()
+		files_list = []
+		files_list.extend( self.getParsedFiles())
 
 		if len( files_list ):
 			if len( files_list) > 3:

@@ -167,7 +167,7 @@ SELECT $select,
  avg(capacity) AS capacity_avg,
  sum(time_done-time_started) AS run_time_sum,
  avg(time_done-time_started) AS run_time_avg,
- avg(CASE WHEN errors_count>0 THEN 1 ELSE 0 END) AS error_avg
+ avg(error) AS error_avg
  FROM $table
  WHERE time_done BETWEEN $time_min and $time_max
  GROUP BY $select ORDER BY $order_s DESC;

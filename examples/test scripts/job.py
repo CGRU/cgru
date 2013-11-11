@@ -131,13 +131,13 @@ for b in range( numblocks):
       else:
          block.setNumeric( 1, numtasks, options.pertask, increment)
       if options.pertask > 1:
-         block.setFiles('file_a.@#@.@###@-file_a.@#@.@###@;file_b.@#@.@###@-file_b.@#@.@###@')
+         block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@','file_b.@#@.@###@-file_b.@#@.@###@'])
       else:
-         block.setFiles('file_a.@#@.@####@;file_b.@#@.@####@')
+         block.setFiles(['file_a.@#@.@####@','file_b.@#@.@####@'])
    else:
       block.setCommand('python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(), False)
       block.setTasksName('task @#@')
-      block.setFiles('file_a.@#@;file_b.@#@')
+      block.setFiles(['file_a.@#@','file_b.@#@'])
       if options.frames != '':
          fr = frames[b].split('/')
          block.setFramesPerTask( int(fr[2]))
@@ -146,7 +146,7 @@ for b in range( numblocks):
          timesec_task = timesec + randtime * random.random()
          task = af.Task('#' + str(t))
          task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars());
-         task.setFiles('%04d' % t)
+         task.setFiles(['%04d' % t])
          block.tasks.append( task)
 
 if options.cmdpre  != '':

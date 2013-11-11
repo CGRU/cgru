@@ -190,9 +190,16 @@ console.log( JSON.stringify( i_data));
 
 	g_ShowTimeInterval( i_data);
 
+	var elDiv = document.createElement('div');
+	$('content').appendChild( elDiv);
+	elDiv.classList.add('title');
+	elDiv.textContent = select;
+
+
 	// Create SVG element:
 	var svg = document.createElementNS( NS,'svg');
-	$('content').appendChild( svg);
+	elDiv.appendChild( svg);
+//	$('content').appendChild( svg);
 	svg.style.width = width + 'px';
 	svg.style.height = height + 'px';
 	svg.setAttribute('version','1.1');

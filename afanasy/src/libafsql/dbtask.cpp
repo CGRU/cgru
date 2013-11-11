@@ -17,6 +17,7 @@ DBTask::DBTask()
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_capacity,     &m_capacity     ));
 	dbAddAttr( new DBAttrString( DBAttr::_command,      &m_command      ));
 	dbAddAttr( new DBAttrString( DBAttr::_description,  &m_description  ));
+	dbAddAttr( new DBAttrInt32 ( DBAttr::_error,        &m_error        ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_errors_count, &m_errors_count ));
 	dbAddAttr( new DBAttrString( DBAttr::_hostname,     &m_hostname     ));
 	dbAddAttr( new DBAttrString( DBAttr::_jobname,      &m_jobname      ));
@@ -50,6 +51,7 @@ void DBTask::add(
 	m_errors_count = i_progress->errors_count;
 	m_time_start   = i_progress->time_start;
 	m_time_done    = i_progress->time_done;
+	m_error      = ( i_progress->state & AFJOB::STATE_ERROR_MASK ) ? 1 : 0;
 
 	m_hostname = i_render->getName();
 

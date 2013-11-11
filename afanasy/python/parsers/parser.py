@@ -30,6 +30,7 @@ class parser:
 		if not i_file in self.files:
 			if os.path.isfile( i_file):
 				self.files.append( i_file)
+				#print('PARSED FILE APPENDED:\n' + i_file)
 
 	def getFiles( self):
 		return self.files

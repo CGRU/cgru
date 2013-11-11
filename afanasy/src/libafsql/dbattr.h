@@ -24,6 +24,7 @@ public:
 			_capacity,
 			_capcoeff_max,
 			_capcoeff_min,
+			_error,
 			_errors_avoidhost,
 			_errors_count,
 			_errors_forgivetime,

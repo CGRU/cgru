@@ -295,6 +295,7 @@ const std::vector<std::string> Service::getFiles() const
 
 const std::vector<std::string> Service::getParsedFiles() const
 {
+//printf("Service::getParsedFiles():\n");
 	std::vector<std::string> files;
 
 	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncGetParsedFiles, NULL);

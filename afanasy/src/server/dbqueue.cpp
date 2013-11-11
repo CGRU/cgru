@@ -150,13 +150,13 @@ void DBQueue::delItem( const afsql::DBItem * item)
 
 void DBQueue::addJob( const af::Job * i_job)
 {
-printf("DBQueue::addJob: (working=%d)\n", m_working);
+//printf("DBQueue::addJob: (working=%d)\n", m_working);
 	if( false == m_working ) return;
 
 	Queries * queries = new Queries();
 	m_dbjob.add( i_job, queries);
 	push( queries);
-queries->stdOut();
+//queries->stdOut();
 }
 
 void DBQueue::addTask(

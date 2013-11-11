@@ -37,6 +37,7 @@ void DBAttr::init()
 	DBName[_dependmask_global     ] = "dependmask_global";
 	DBName[_description           ] = "description";
 	DBName[_environment           ] = "environment";
+	DBName[_error                 ] = "error";
 	DBName[_errors_avoidhost      ] = "errors_avoidhost";
 	DBName[_errors_forgivetime    ] = "errors_forgivetime";
 	DBName[_errors_count          ] = "errors_count";

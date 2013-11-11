@@ -344,7 +344,7 @@ void TaskProcess::readProcess( const std::string & i_mode)
 	                              ( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
 	                              ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
 	{
-		printf("Warning: Parser notification.\n");
+		printf("WARNING: Parser notification.\n");
 		m_update_status = af::TaskExec::UPWarning;
 	}
 
