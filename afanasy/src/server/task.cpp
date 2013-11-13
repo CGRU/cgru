@@ -90,9 +90,6 @@ af::TaskExec * Task::genExec() const
 
 void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-	if( m_store_dir.empty())
-		initStoreFolders();
-
    if( m_block->m_data->isMultiHost())
    {
       if( m_run )
@@ -311,6 +308,9 @@ void Task::v_monitor( MonitorContainer * monitoring) const
 
 void Task::v_store()
 {
+	if( m_store_dir.empty())
+		initStoreFolders();
+
 	std::ostringstream str;
 	m_progress->jsonWrite( str);
 	AFCommon::QueueFileWrite( new FileData( str, m_store_file_progress,

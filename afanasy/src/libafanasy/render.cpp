@@ -330,14 +330,14 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		else                stream << "  ";
 
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
-
+/*
 		if( m_wol_operation_time ) stream << " W:" << time2str( m_wol_operation_time);
 		stream << " I:" << time2str( m_idle_time);
 		stream << " B:" << time2str( m_busy_time);
 
 		stream << " v'" << m_version << "'";
+*/
 		stream << " ";
 		m_address.v_generateInfoStream( stream ,full);
-//      stream << " - " << calcWeight() << " bytes.";
    }
 }

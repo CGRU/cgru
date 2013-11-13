@@ -7,8 +7,8 @@ import af, afnetwork
 JobNamePrefix = '_emulate_'
 JobUserPrefix = '_emuser_'
 TmpDir = '/tmp/afanasy_emulate'
-OutputDir = '/var/tmp/afanasy'
-TasksOutDir = JobNamePrefix+'/tasksoutput/'+JobNamePrefix
+#OutputDir = '/var/tmp/afanasy'
+#TasksOutDir = JobNamePrefix+'/tasksoutput/'+JobNamePrefix
 
 ActionUser = 'jimmy'
 ActionHost = 'pc01'
@@ -64,8 +64,8 @@ if os.path.isdir( TmpDir):
 	shutil.rmtree( TmpDir)
 
 # Cleanup previous tasks outputs:
-if os.path.isdir( OutputDir):
-	os.system('rm -rf %s.*' % TasksOutDir )
+#if os.path.isdir( OutputDir):
+#	os.system('rm -rf %s.*' % TasksOutDir )
 
 # Cleanup mode:
 if Options.cleanup:
@@ -92,7 +92,7 @@ for b in range( 0, Options.blocksnum):
 		cmd = 'python "%s"' % cmd
 		cmd += ' -s @#@ -e @#@ -t 1 @####@ @#####@ @#####@ @#####@'
 		block.setCommand( cmd, False)
-		block.setFiles('file_a.@#@.@####@;file_b.@#@.@####@')
+		block.setFiles(['file_a.@#@.@####@','file_b.@#@.@####@'])
 
 
 job.setNeedOS('')

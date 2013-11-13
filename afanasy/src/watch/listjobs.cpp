@@ -278,12 +278,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	action = new QAction( "Restart", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->time_started != 0);
+	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
 	menu.addAction( action);
 
 	action = new QAction( "Restart&&Pause", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->time_started != 0);
+	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
 	menu.addAction( action);
 
 	menu.addSeparator();

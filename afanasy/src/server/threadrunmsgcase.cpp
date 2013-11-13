@@ -34,12 +34,16 @@ switch ( i_msg->type())
 	}
 	case af::Msg::TTalkDeregister:
 	{
-		if( i_args->talks->setZombie( i_msg->int32())) i_args->monitors->addEvent( af::Msg::TMonitorTalksDel, i_msg->int32());
+		TalkContainerIt it( i_args->talks);
+		TalkAf* node = it.getTalk( i_msg->int32());
+		if( node ) node->deregister( i_args->monitors);
 		break;
 	}
 	case af::Msg::TMonitorDeregister:
 	{
-		if( i_args->monitors->setZombie( i_msg->int32())) i_args->monitors->addEvent( af::Msg::TMonitorMonitorsDel, i_msg->int32());
+		MonitorContainerIt it( i_args->monitors);
+		MonitorAf* node = it.getMonitor( i_msg->int32());
+		if( node ) node->deregister();
 		break;
 	}
 	case af::Msg::TMonitorMessage:

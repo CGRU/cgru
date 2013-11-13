@@ -43,11 +43,21 @@ MonitorAf::~MonitorAf()
 
 void MonitorAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   if( getTimeUpdate() < (currentTime - af::Environment::getMonitorZombieTime()))
-   {
-      if( monitoring) monitoring->addEvent( af::Msg::TMonitorMonitorsDel, m_id);
-		setZombie();
-   }
+	if( getTimeUpdate() < (currentTime - af::Environment::getMonitorZombieTime()))
+	{
+		if( monitoring) monitoring->addEvent( af::Msg::TMonitorMonitorsDel, m_id);
+		{
+			AFCommon::QueueLog("Monitor zombie: " + v_generateInfoString( false));
+			setZombie();
+		}
+	}
+}
+
+void MonitorAf::deregister()
+{
+	AFCommon::QueueLog("Monitor deregister: " + v_generateInfoString( false));
+	setZombie();
+	m_monitors->addEvent( af::Msg::TMonitorMonitorsDel, getId());
 }
 
 void MonitorAf::v_action( Action & i_action)
@@ -66,8 +76,7 @@ void MonitorAf::v_action( Action & i_action)
 		}
 		if( optype == "deregister")
 		{
-			setZombie();
-			i_action.monitors->addEvent( af::Msg::TMonitorMonitorsDel, getId());
+			deregister();
 		}
 		if( optype == "watch")
 		{

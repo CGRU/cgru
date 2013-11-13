@@ -19,5 +19,7 @@ public:
 
 	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
+	void deregister( MonitorContainer * i_monitors);
+
 private:
 };

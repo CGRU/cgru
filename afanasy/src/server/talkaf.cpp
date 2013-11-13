@@ -18,6 +18,13 @@ TalkAf::~TalkAf()
 {
 }
 
+void TalkAf::deregister( MonitorContainer * i_monitors)
+{
+	AFCommon::QueueLog("Talk deregister: " + v_generateInfoString( false));
+	setZombie();
+	i_monitors->addEvent( af::Msg::TMonitorTalksDel, getId());
+}
+
 void TalkAf::v_action( Action & i_action)
 {
 	const JSON & operation = (*i_action.data)["operation"];

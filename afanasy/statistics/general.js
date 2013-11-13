@@ -192,9 +192,11 @@ console.log( JSON.stringify( i_data));
 
 	var elDiv = document.createElement('div');
 	$('content').appendChild( elDiv);
-	elDiv.classList.add('title');
-	elDiv.textContent = select;
 
+	var elTitle = document.createElement('div');
+	elDiv.appendChild( elTitle);
+	elTitle.classList.add('title');
+	elTitle.textContent = select;
 
 	// Create SVG element:
 	var svg = document.createElementNS( NS,'svg');

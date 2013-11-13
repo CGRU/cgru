@@ -44,6 +44,8 @@ public:
 
 	void addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids);
 
+	void deregister();
+
 private:
 	void setEvents( const std::vector<int32_t> & i_ids, bool value);
 	void setJobsUsersIds( const std::vector<int32_t> & i_ids);

@@ -5,6 +5,8 @@
 
 #include "common/dlScopeLocker.h"
 
+#include "name_af.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -215,6 +217,11 @@ void AfQueue::run()
 
    while( AFRunning )
    {
+/*		if( count > 1000 )
+		{
+			printf("Queue '%s' is full, waitinig...\n", name.c_str());
+			af::sleep_sec( 1);
+		}*/
 
       AfQueueItem * item = pop( e_wait );
 

@@ -8,7 +8,7 @@
 #include "afcommon.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 // Zero solve cycle variable in nodes is initial,

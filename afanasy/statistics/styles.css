@@ -41,6 +41,13 @@ box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
 background: rgba(255,255,255,.3);
 }
 
+.title {
+text-transform: capitalize;
+text-align: center;
+font-size: 16px;
+font-weight: bold;
+}
+
 .editing{
 background: #DDD;
 border-radius: 4px;
@@ -85,12 +92,6 @@ border-radius: 12px 12px 4px 4px;
 margin: 12px 0px;
 padding: 4px;
 }
-.table_div > .title {
-text-transform: capitalize;
-text-align: center;
-font-size: 16px;
-font-weight: bold;
-}
 table.table {
 width: 100%;
 }
@@ -107,7 +108,7 @@ font-weight: normal;
 }
 
 svg {
-margin: 20px;
+margin: 8px;
 border-radius: 8px;
 box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF;
 background: rgba(0,20,0,.6);
