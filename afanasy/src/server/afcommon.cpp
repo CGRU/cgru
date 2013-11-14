@@ -99,7 +99,7 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 				do
 				{
 					std::string job_dir( job_dir_data.cFileName);
-					if( thousand_dir.find('.') == 0 ) continue;
+					if( job_dir.find('.') == 0 ) continue;
 					job_dir = thousand_dir + '\\' + job_dir;
 					if( false == af::pathIsFolder( job_dir)) continue;
 					o_folders.push_back( job_dir);
