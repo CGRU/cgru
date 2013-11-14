@@ -8,7 +8,6 @@
 
 #include "filequeue.h"
 #include "dbqueue.h"
-#include "cleanupqueue.h"
 #include "logqueue.h"
 
 struct ThreadArgs;
@@ -48,7 +47,8 @@ public:
 
 	inline static void QueueMsgDispatch( af::Msg * i_msg)          { MsgDispatchQueue->pushMsg( i_msg);     }
 	inline static void QueueFileWrite( FileData * i_filedata)      { FileWriteQueue->pushFile( i_filedata); }
-	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { RemFoldersQueue->pushNode( i_node);    }
+	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { FileWriteQueue->pushNode( i_node);    }
+//	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { RemFoldersQueue->pushNode( i_node);    }
 
 	inline static bool QueueLog(        const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Info  ); else return false;}
 	inline static bool QueueLogError(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Error ); else return false;}
@@ -65,7 +65,6 @@ public:
 private:
 	static af::MsgQueue * MsgDispatchQueue;
 	static FileQueue    * FileWriteQueue;
-	static CleanUpQueue * RemFoldersQueue;
 	static LogQueue     * OutputLogQueue;
 	static DBQueue      * ms_DBQueue;
 

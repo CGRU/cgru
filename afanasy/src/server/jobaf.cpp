@@ -200,7 +200,11 @@ bool JobAf::initialize()
 		for( int b = 0; b < m_blocks_num; b++)
 			m_blocks[b]->storeTasks();
 
-		store();
+//		store();
+		std::ostringstream ostr;
+		v_jsonWrite( ostr, 0);
+		std::string str = ostr.str();
+		AFCommon::writeFile( str.c_str(), str.size(), getStoreFile());
 	}
 
 	// Create tasks store folder (if does not exists any)

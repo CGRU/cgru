@@ -23,7 +23,6 @@
 af::MsgQueue * AFCommon::MsgDispatchQueue = NULL;
 FileQueue    * AFCommon::FileWriteQueue   = NULL;
 DBQueue      * AFCommon::ms_DBQueue       = NULL;
-CleanUpQueue * AFCommon::RemFoldersQueue  = NULL;
 LogQueue     * AFCommon::OutputLogQueue   = NULL;
 
 /*
@@ -34,7 +33,6 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
 	MsgDispatchQueue = new af::MsgQueue( "Sending Messages", af::AfQueue::e_start_thread);
 	FileWriteQueue	 = new FileQueue(	 "Writing Files");
-	RemFoldersQueue  = new CleanUpQueue( "Jobs Cleanup");
 	OutputLogQueue	 = new LogQueue(	 "Log Output");
 	ms_DBQueue		 = new DBQueue(		 "AFDB_update", i_threadArgs->monitors);
 }
@@ -43,7 +41,6 @@ AFCommon::~AFCommon()
 {
 	delete FileWriteQueue;
 	delete MsgDispatchQueue;
-	delete RemFoldersQueue;
 	delete OutputLogQueue;
 	delete ms_DBQueue;
 }

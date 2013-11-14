@@ -345,7 +345,7 @@ bool af::removeDir( const std::string & i_folder )
 			}
 			else if( DeleteFile( filename.c_str()) == FALSE)
 			{
-				 AFERRAR("af::removeDir: Can't delete file:\n%s", filename.c_str())
+				 AFERRPA("af::removeDir: Can't delete file:\n%s\n", filename.c_str())
 				 return false;
 			}
 
@@ -354,13 +354,13 @@ bool af::removeDir( const std::string & i_folder )
 	}
 	else
 	{
-		  AFERRAR("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
+		  AFERRPA("af::removeDir: Can't open folder:\n%s\n", i_folder.c_str())
 		  return false;
 	}
 
 	if( RemoveDirectory( i_folder.c_str()) == FALSE)
 	{
-		AFERRAR("af::removeDir: Can't remove folder:\n%s", i_folder.c_str())
+		AFERRPA("af::removeDir: Can't remove folder:\n%s\n", i_folder.c_str())
 		return false;
 	}
 
@@ -371,7 +371,7 @@ bool af::removeDir( const std::string & i_folder )
 	DIR * dir = opendir( i_folder.c_str());
 	if( dir == NULL)
 	{
-		AFERRAR("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
+		AFERRPA("af::removeDir: Can't open folder:\n%s\n", i_folder.c_str())
 		return false;
 	}
 
@@ -393,7 +393,7 @@ bool af::removeDir( const std::string & i_folder )
 		}
 		else if( unlink( filename.c_str()) != 0)
 		{
-			AFERRAR("af::removeDir: Can't delete file:\n%s", filename.c_str())
+			AFERRPA("af::removeDir: Can't delete file:\n%s\n", filename.c_str())
 			return false;
 		}
 	}
@@ -403,7 +403,7 @@ bool af::removeDir( const std::string & i_folder )
 	// Removing folder
 	if( rmdir( i_folder.c_str()) != 0)
 	{
-		AFERRAR("af::removeDir: Can't delete folder:\n%s", i_folder.c_str())
+		AFERRPA("af::removeDir: Can't delete folder:\n%s\n", i_folder.c_str())
 		return false;
 	}
 #endif

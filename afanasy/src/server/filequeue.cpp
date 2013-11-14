@@ -1,6 +1,7 @@
 #include "filequeue.h"
 
 #include "afcommon.h"
+#include "afnodesrv.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -56,6 +57,13 @@ FileData::FileData( const char * i_data, int i_length, const std::string & i_fil
 	memcpy( m_data, i_data, m_length);
 }
 
+FileData::FileData( const AfNodeSrv * i_node):
+	m_length( 0),
+	m_data( NULL)
+{
+	m_folder_name = i_node->getStoreDir();
+}
+
 FileData::~FileData()
 {
 	if( m_data != NULL ) delete [] m_data;
@@ -74,6 +82,13 @@ void FileQueue::processItem( af::AfQueueItem* item)
 	FileData * filedata = (FileData*)item;
 	AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().c_str())
 
+	if( filedata->forDelete())
+	{
+		af::removeDir( filedata->getFolderName());
+		delete filedata;
+		return;
+	}
+
 	if( filedata->getFolderName().size())
 		if( false == af::pathIsFolder( filedata->getFolderName()))
 			if( false == af::pathMakeDir( filedata->getFolderName()))
@@ -84,6 +99,7 @@ void FileQueue::processItem( af::AfQueueItem* item)
 			}
 
 	AFCommon::writeFile( filedata->getData(), filedata->getLength(), filedata->getFileName());
+
 	delete filedata;
 }
 
