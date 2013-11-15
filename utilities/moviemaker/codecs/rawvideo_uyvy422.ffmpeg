@@ -1,2 +1,2 @@
 RAW uyvy422
-ffmpeg -y -i "@INPUT@" -vcodec rawvideo -pix_fmt uyvy422 -vtag 2vuy @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec rawvideo -pix_fmt uyvy422 -vtag 2vuy @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

@@ -1,2 +1,2 @@
 ProRes Proxy
-ffmpeg -y -i "@INPUT@" -vcodec prores -profile:v 0 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec prores -profile:v 0 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

@@ -1,2 +1,2 @@
 PhotoJPG (mid)
-ffmpeg -y -i "@INPUT@" -vcodec mjpeg -pix_fmt yuv420p -qmin 2 -qmax 4 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec mjpeg -pix_fmt yuv420p -qmin 2 -qmax 4 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
