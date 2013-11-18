@@ -111,11 +111,13 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int32 ("jobs_life_time",        m_jobs_life_time,        i_object, io_changes);
 
 	bool solve_parallel = false;
-	jr_bool("solve_parallel", solve_parallel, i_object, io_changes);
-	if( solve_parallel )
-		setJobsSolveMethod( af::Node::SolveByPriority);
-	else
-		setJobsSolveMethod( af::Node::SolveByOrder);
+	if( jr_bool("solve_parallel", solve_parallel, i_object, io_changes))
+	{
+		if( solve_parallel )
+			setJobsSolveMethod( af::Node::SolveByPriority);
+		else
+			setJobsSolveMethod( af::Node::SolveByOrder);
+	}
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
