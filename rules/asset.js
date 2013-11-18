@@ -152,17 +152,21 @@ function a_AutoSeek()
 						else apath = apath + '/' + nextfolder;
 					}
 
-					var exists = false; // Verify whether an asset with the same path exists
+					// Verify whether an asset with the same path exists
+					// Delete previous asset with the same path
+					// - before: do not add new asset with the same path
+//					var exists = false;
 					for( var asset in ASSETS)
 					{
 //console.log( ASSETS[asset].path + ' == ' + apath);
 						if( ASSETS[asset].path == apath)
 						{
-							exists = true;
+//							exists = true;
+							delete ASSETS[asset];
 							break;
 						}
 					}
-					if( exists ) break;
+//					if( exists ) break;
 
 					a_Create( asset_type, aname, apath, false);
 					break;
