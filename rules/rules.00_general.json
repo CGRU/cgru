@@ -73,6 +73,13 @@
 	}
 },
 
+"cgru_config":{
+	"pathsmap":[
+			["/cgru/rules_root/","/rules_root/"],
+			["/rules_root/","/cgru/rules_root/"]
+		]
+},
+
 "cmdexec":{"open_folder":"open \"@PATH@\""},
 
 "OS_linux":{

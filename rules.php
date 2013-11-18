@@ -507,8 +507,6 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 		while (false !== ( $entry = readdir( $handle)))
 		{
 			if( skipFile( $entry)) continue;
-//			if( $entry == '.') continue;
-//			if( $entry == '..') continue;
 			$path = $i_dir.'/'.$entry;
 
 			if( $access && ( false == is_dir( $path)))
@@ -516,6 +514,8 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 				if( is_file( $path))
 				{
 					$fileObj = array();
+					if( false == is_null( $walk) && isset( $walk['files']) && isset( $walk['files'][$entry]))
+						$fileObj = $walk['files'][$entry];
 					$fileObj['name'] = $entry;
 					$fileObj['size'] = filesize( $path);
 					$fileObj['mtime'] = filemtime( $path);
@@ -878,6 +878,8 @@ function afanasy( $i_obj, &$o_out)
 	$header = $header.' '.$i_obj['sender_id'];
 	$header = $header.' '.strlen($data);
 	$header = $header.' JSON';
+
+	$header = 'AFANASY '.strlen($data).' JSON';
 
 	fwrite( $socket, $header.$data);
 	fclose( $socket);

@@ -45,7 +45,7 @@ def sendAction( i_type, i_mask, i_operation, i_params = None):
 		action['params'] = i_params
 
 	afnetwork.sendServer( json.dumps( {'action': action}), False, False)
-	print( json.dumps( {'action': action}))
+	#print( json.dumps( {'action': action}))
 
 def jobsDelete():
 	sendAction('jobs', JobNamePrefix+'.*', 'delete')

@@ -25,6 +25,7 @@
 		"nimby_busyfree_time": 60,
 
 		"services":[
+			{"name":"checksum"},
 			{"name":"generic"},
 			{"name":"system"},
 			{"name":"events"},
@@ -33,7 +34,6 @@
 
 			{"name":"afterfx"},
 			{"name":"arnold"},
-			{"name":"blender"},
 			{"name":"blender"},
 			{"name":"c4d"},
 			{"name":"hbatch"},

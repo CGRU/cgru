@@ -387,6 +387,9 @@ function t_ShowExec( i_obj, i_elParent)
 
 	for( attr in t_attrs )
 	{
+		if( i_obj[attr] == null )
+			continue;
+
 		var div = document.createElement('div');
 		attrs.appendChild( div);
 		div.classList.add('attr');

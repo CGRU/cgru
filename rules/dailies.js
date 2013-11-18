@@ -1,5 +1,27 @@
 d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
+d_guiparams = {};
+d_guiparams.project = {"width":'50%'};
+d_guiparams.shot = {"width":'50%',"lwidth":'70px'};
+d_guiparams.artist = {"width":'50%'};
+d_guiparams.activity = {"width":'25%',"lwidth":'70px'};
+d_guiparams.version = {"width":'25%',"lwidth":'70px'};
+d_guiparams.input = {};
+d_guiparams.output = {};
+d_guiparams.filename = {}
+d_guiparams.fps = {"label":'FPS',"width":'25%'};
+d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px'};
+d_guiparams.aspect_in = {"label":'Aspect In',"width":'50%',"lwidth":'170px'};
+d_guiparams.gamma = {"width":'50%'};
+d_guiparams.no_auto_colospace = {"label":'No Auto Color Space',"width":'50%',"lwidth":'170px'};
+
+d_cvtguiparams = {};
+d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
+d_cvtguiparams.fps = {"label":'FPS'};
+
+d_expguiparams = {};
+d_expguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
+/*
 d_guiparams = [];
 d_guiparams.push({"name":'project',"width":'50%'});
 d_guiparams.push({"name":'shot',"width":'50%',"lwidth":'70px'});
@@ -9,13 +31,11 @@ d_guiparams.push({"name":'version',"width":'25%',"lwidth":'70px'});
 d_guiparams.push({"name":'input'});
 d_guiparams.push({"name":'output'});
 d_guiparams.push({"name":'filename'});
-//d_guiparams.push({"name":'format',"width":'32%'});
 d_guiparams.push({"name":'fps',"label":'FPS',"width":'25%'});
 d_guiparams.push({"name":'fffirst',"label":"F.F.First","width":'25%',"lwidth":'70px'});
 d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'50%',"lwidth":'170px'});
 d_guiparams.push({"name":'gamma',"width":'50%'});
 d_guiparams.push({"name":'no_auto_colospace',"label":'No Auto Color Space',"width":'50%',"lwidth":'170px'});
-//d_guiparams.push({"name":'codec'});
 
 d_cvtguiparams = [];
 d_cvtguiparams.push({"name":'cvtres',"label":'Resolution',"info":'on empty no changes'});
@@ -23,7 +43,7 @@ d_cvtguiparams.push({"name":'fps',"label":'FPS'});
 
 d_expguiparams = [];
 d_expguiparams.push({"name":'quality',"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'});
-
+*/
 function d_Make( i_path, i_outfolder)
 {
 	c_Log('Make Dailies: '+i_path);
@@ -91,9 +111,8 @@ function d_Make( i_path, i_outfolder)
 	params.filename = filename;
 
 	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
-	wnd.elContent.classList.add('dialog');
 
-	c_CreateGUI( wnd, d_guiparams, [params, RULES.dailies]);
+	c_CreateGUI( wnd.elContent, d_guiparams, [params, RULES.dailies]);
 	d_CreateGUI_Choises({"wnd":wnd,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
@@ -175,9 +194,7 @@ function d_ChoiseOnClick( i_evt)
 
 function d_ProcessGUI( i_wnd)
 {
-	var params = {};
-	for( var p = 0; p < d_guiparams.length; p++)
-		params[d_guiparams[p].name] = i_wnd.m_elements[d_guiparams[p].name].textContent;
+	var params = c_GetGUIParams( i_wnd.elContent, d_guiparams);
 
 	for( key in i_wnd.m_choises )
 		params[key] = i_wnd.m_choises[key].value;
@@ -278,14 +295,13 @@ function d_Convert( i_path)
 	params.cvtres = '';
 
 	var wnd = new cgru_Window({"name":'dailes',"title":'Convert Movie'});
-	wnd.elContent.classList.add('dialog');
 
 	var elSrc = document.createElement('div');
 	wnd.elContent.appendChild( elSrc);
 	elSrc.classList.add('source');
 	elSrc.textContent = i_path;
 
-	c_CreateGUI( wnd, d_cvtguiparams, [params, RULES.dailies]);
+	c_CreateGUI( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
@@ -302,7 +318,7 @@ function d_Convert( i_path)
 	wnd.elContent.appendChild(div );
 	div.style.margin = '10px';
 
-	c_CreateGUI( wnd, d_expguiparams, [params]);
+	c_CreateGUI( wnd.elContent, d_expguiparams, [params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -328,10 +344,12 @@ function d_Convert( i_path)
 function d_CvtProcessGUI( i_wnd)
 {
 	var params = {};
-	for( var p = 0; p < d_expguiparams.length; p++)
-		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
-	for( var p = 0; p < d_cvtguiparams.length; p++)
-		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
+	c_GetGUIParams( i_wnd.elContent, d_expguiparams, params);
+	c_GetGUIParams( i_wnd.elContent, d_cvtguiparams, params);
+//	for( var p = 0; p < d_expguiparams.length; p++)
+//		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
+//	for( var p = 0; p < d_cvtguiparams.length; p++)
+//		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
 	for( key in i_wnd.m_choises )
 		params[key] = i_wnd.m_choises[key].value;
 
@@ -367,10 +385,12 @@ function d_CvtProcessGUI( i_wnd)
 function d_ExpProcessGUI( i_wnd, i_afanasy)
 {
 	var params = {};
-	for( var p = 0; p < d_expguiparams.length; p++)
-		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
-	for( var p = 0; p < d_cvtguiparams.length; p++)
-		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
+	c_GetGUIParams( i_wnd.elContent, d_expguiparams, params);
+	c_GetGUIParams( i_wnd.elContent, d_cvtguiparams, params);
+//	for( var p = 0; p < d_expguiparams.length; p++)
+//		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
+//	for( var p = 0; p < d_cvtguiparams.length; p++)
+//		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
 
 	var cmd = 'utilities/moviemaker/movconvert.py';
 	if( i_afanasy ) cmd = cgru_PM('/cgru/' + cmd, true);

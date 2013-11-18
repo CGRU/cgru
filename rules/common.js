@@ -88,7 +88,7 @@ function c_RulesMergeDir( o_rules, i_dir)
 	{
 		var obj = i_dir.rules[attr];
 		if( obj == null )
-			c_Error('RULES file "'+attr+'" in "'+i_dir.dir+'" is invalid.');
+			c_Error('RULES file "'+attr+'" in "'+g_CurPath()+'/'+RULES.rufolder+'" is invalid.');
 		else
 			c_RulesMergeObjs( o_rules, obj);
 	}
@@ -504,11 +504,12 @@ function c_LoadingElReset( i_el) { if( i_el.m_elWaiting ) i_el.removeChild( i_el
 
 function c_CreateGUI( i_wnd, i_params, i_defaults)
 {
+	i_wnd.classList.add('dialog');
 	if( i_wnd.m_elements == null ) i_wnd.m_elements = {};
-	for( var p = 0; p < i_params.length; p++)
+	for( var p in i_params)
 	{
 		var elDiv = document.createElement('div');
-		i_wnd.elContent.appendChild( elDiv);
+		i_wnd.appendChild( elDiv);
 
 		if( i_params[p].width != null )
 		{
@@ -525,7 +526,7 @@ function c_CreateGUI( i_wnd, i_params, i_defaults)
 			elLabel.textContent = i_params[p].label+':';
 		else
 		{
-			elLabel.textContent = i_params[p].name+':';
+			elLabel.textContent = p+':';
 			elLabel.style.textTransform = 'capitalize';
 		}
 		if( i_params[p].lwidth )
@@ -541,23 +542,74 @@ function c_CreateGUI( i_wnd, i_params, i_defaults)
 				elInfo.style.width = i_params[p].iwidth;
 		}
 
+
 		var elParam = document.createElement('div');
 		elDiv.appendChild( elParam);
 		elParam.classList.add('param');
 		elParam.classList.add('editing');
+		if( i_params[p].bool != null )
+		{
+			if( i_params[p].bool)
+				elParam.textContent = 'ON';
+			else
+				elParam.textContent = 'OFF';
+			elParam.classList.add('checkbox');
+			elParam.onclick = function( e)
+			{
+				if( e.currentTarget.textContent == 'ON')
+					e.currentTarget.textContent = 'OFF';
+				else
+					e.currentTarget.textContent = 'ON';
+			};
+		}
+		else
+		{
+			if( i_params[p].disabled )
+				elParam.classList.add('disabled');
+			else
+				elParam.contentEditable = 'true';
+		}
+
 		if( i_defaults )
 			for( var d = 0; d < i_defaults.length; d++)
-				if( i_defaults[d][i_params[p].name] )
+				if( i_defaults[d][p] != null )
 				{
-					elParam.textContent = i_defaults[d][i_params[p].name];
+					if( i_params[p].bool != null )
+					{
+						if( i_defaults[d][p])
+							elParam.textContent = 'ON';
+						else
+							elParam.textContent = 'OFF';
+					}
+					else
+						elParam.textContent = i_defaults[d][p];
 					break;
 				}
-		if( i_params[p].disabled )
-			elParam.classList.add('disabled');
-		else
-			elParam.contentEditable = 'true';
 
-		i_wnd.m_elements[i_params[p].name] = elParam;
+		i_wnd.m_elements[p] = elParam;
 	}
+}
+
+function c_GetGUIParams( i_wnd, i_params, o_params)
+{
+	var params = {};
+
+	for( var p in i_params)
+	{
+		if( i_params[p].bool != null )
+		{
+			if( i_wnd.m_elements[p].textContent == 'ON' )
+				params[p] = true;
+			else
+				params[p] = false;
+		}
+		else
+			params[p] = i_wnd.m_elements[p].textContent;
+
+		if( o_params )
+			o_params[p] = params[p];
+	}
+
+	return params;
 }
 

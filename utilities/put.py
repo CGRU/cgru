@@ -21,6 +21,7 @@ def errorExit( i_msg = None):
 	sys.exit(1)
 
 def makeDir( i_folder):
+	if( len( i_folder) == 0 ): return
 	if os.path.isdir( i_folder ): return
 	print('Creating folder:\n' + i_folder )
 	if Options.debug: return
@@ -31,10 +32,10 @@ def makeDir( i_folder):
 
 
 if Options.source == '': errorExit('Source is not specified')
-if not os.path.isdir( Options.source ): errorExit('Source folder does not exst:\n' + Options.source )
+if not os.path.isdir( Options.source ): errorExit('Source folder does not exist:\n' + Options.source )
 
 if Options.dest == '': errorExit('Destination is not specified')
-if not os.path.isdir( Options.dest ): errorExit('Destination folder does not exst:\n' + Options.dest )
+if not os.path.isdir( Options.dest ): errorExit('Destination folder does not exist:\n' + Options.dest )
 
 if Options.name == '': errorExit('Name is not specified')
 Result = os.path.join( Options.dest, Options.name)

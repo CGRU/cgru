@@ -56,21 +56,25 @@ def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 	if Options.verbose > curdepth:
 		print( i_path)
 
+	out = jsonLoad( os.path.join( i_path, Options.output))
 	if i_maxdepth >= 0 and curdepth > i_maxdepth:
-		out = jsonLoad( os.path.join( i_path, Options.output))
 		if out is None: return None
 		if 'files' in out: del out['files']
 		if 'folders' in out: del out['folders']
 		return out
 
-	out = dict()
-	out['num_files'] = 0
-	out['num_folders'] = 0
-	out['size'] = 0
-
 	cur = dict()
 	cur['folders'] = dict()
 	cur['files'] = dict()
+
+	if out is None:
+		out = dict()
+	else:
+		if 'files' in out: cur['files'] = out['files']
+
+	out['num_files'] = 0
+	out['num_folders'] = 0
+	out['size'] = 0
 
 	try:
 		entries = os.listdir( i_path)

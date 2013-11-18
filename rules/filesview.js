@@ -111,6 +111,21 @@ function FilesView( i_args)
 		this.elThumbsBtn.title = 'Generate thumbnails';
 	}
 
+
+	if( RULES.checksum )
+	for( var sum in RULES.checksum )
+	{
+		this.elGenBtn = document.createElement('div');
+		this.elPanel.appendChild( this.elGenBtn);
+		this.elGenBtn.classList.add('button');
+		this.elGenBtn.textContent = RULES.checksum[sum].name;
+		this.elGenBtn.m_view = this;
+		this.elGenBtn.onclick = function(e){
+			fu_Checksum({"path":e.currentTarget.m_view.path,"walk":e.currentTarget.m_view.walk,"type":sum})
+		};
+		this.elGenBtn.title = 'Generate ' + RULES.checksum[sum].name;
+	}
+
 	this.elView = document.createElement('div');
 	this.elRoot.appendChild( this.elView);
 	this.elView.classList.add('view');
@@ -287,6 +302,30 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		elSize.classList.add('size');
 		elSize.textContent = c_Bytes2KMG( i_obj.size);
 	}
+
+	if( i_obj.checksum )
+	{
+		var elSums = [];
+		var time = null;
+		for( var sum in i_obj.checksum )
+		{
+			if( sum == 'time' )
+			{
+				time = i_obj.checksum[sum];
+				continue;
+			}
+
+			var elSum = document.createElement('div');
+			i_el.appendChild( elSum);
+			elSum.classList.add('checksum');
+			elSum.textContent = sum+':'+i_obj.checksum[sum];
+			elSums.push( elSum);
+		}
+
+		if( time && elSums.length)
+		for( var i = 0; i < elSums.length; i++)
+			elSums[i].title = c_DT_FormStrFromSec( time);
+	}
 }
 
 FilesView.prototype.showFolder = function( i_folder)
@@ -357,7 +396,7 @@ FilesView.prototype.showFolder = function( i_folder)
 	elFolder.appendChild( elPut);
 	elPut.classList.add('button');
 	elPut.textContent = 'PUT';
-	elPut.onclick = function(e){ e.stopPropagation(); pu_Put( path);}
+	elPut.onclick = function(e){ e.stopPropagation(); fu_Put( path);}
 
 	this.showAttrs( elFolder, i_folder);
 }
@@ -816,6 +855,7 @@ FilesView.prototype.imgConverted = function( i_data, i_args)
 
 	i_args.this.refresh();
 }
+
 
 function fv_ReloadAll()
 {
