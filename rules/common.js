@@ -523,10 +523,10 @@ function c_CreateGUI( i_wnd, i_params, i_defaults)
 		elDiv.appendChild( elLabel);
 		elLabel.classList.add('label');
 		if( i_params[p].label )
-			elLabel.textContent = i_params[p].label+':';
+			elLabel.textContent = i_params[p].label + ':';
 		else
 		{
-			elLabel.textContent = p+':';
+			elLabel.textContent = p.replace(/_/g,' ') + ':';
 			elLabel.style.textTransform = 'capitalize';
 		}
 		if( i_params[p].lwidth )
