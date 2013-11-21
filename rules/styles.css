@@ -564,17 +564,21 @@ box-shadow: 0 0 4px #000 inset;
 #upload > div.error .progress { color: #FF0000; }
 
 /* ====================================================================== */
-/* ==================== WINDOWS: ======================================== */
+/* ==================== GUI: ======================================== */
+.dialog .param > div { margin: 4px 8px; padding: 3px 6px; border-radius: 4px;}
 .dialog .label { float: left; width: 100px;  text-align: right; }
-.dialog div div { margin: 4px 8px; padding: 3px 6px; border-radius: 4px;}
-.dialog .param, .dialog .rules { box-shadow: 0 0 4px #000 inset;}
-.dialog .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
-/*.dialog div .param { background: #DDD;}*/
+.dialog .value, .dialog .rules { box-shadow: 0 0 4px #000 inset;}
 .dialog .info { float: right; width: 200px; }
+.dialog .list { border: 1px solid #F00; }
+.dialog .list .item { border: 1px solid #0F0; }
+.dialog .list .ctrl { border: 1px solid #FF0; }
+.dialog .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
+.dialog .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
 .dialog .rules { padding: 12px;  border-radius: 6px;}
 .dialog .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; font-size: 14px; margin: 4px 4px 2px 0px; }
 .dialog .choise.selected { background: rgba(255,255,0,.2); box-shadow: 0 0 2px #000 inset; }
 
+/* ==================== WINDOWS: ======================================== */
 .administrate { color: #000000; font-size: 14px; }
 .administrate .button { float: left; }
 .admin_groups div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }

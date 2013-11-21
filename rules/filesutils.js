@@ -33,7 +33,7 @@ function fu_Put( i_path)
 			params.name += '_' + match[match.length-1];
 	}
 
-	c_CreateGUI( wnd.elContent, fu_put_params, [params, RULES.put]);
+	gui_Create( wnd.elContent, fu_put_params, [params, RULES.put]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -59,7 +59,7 @@ function fu_Put( i_path)
 
 function fu_PutDo( i_wnd)
 {
-	var params = c_GetGUIParams( i_wnd.elContent, fu_put_params);
+	var params = gui_GetParams( i_wnd.elContent, fu_put_params);
 //	for( var p = 0; p < fu_put_params.length; p++)
 //		params[fu_put_params[p].name] = i_wnd.m_elements[fu_put_params[p].name].textContent;
 
@@ -121,7 +121,7 @@ function fu_Checksum( i_args)
 
 	var params = i_args;
 
-	c_CreateGUI( wnd.elContent, fu_sum_params, [params, RULES.checksum[i_args.type]]);
+	gui_Create( wnd.elContent, fu_sum_params, [params, RULES.checksum[i_args.type]]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -147,7 +147,7 @@ function fu_Checksum( i_args)
 
 function fu_ChecksumDo( i_wnd)
 {
-	var params = c_GetGUIParams( i_wnd.elContent, fu_sum_params);
+	var params = gui_GetParams( i_wnd.elContent, fu_sum_params);
 	var walk = i_wnd.i_walk;
 	i_wnd.destroy();
 

@@ -112,7 +112,7 @@ function d_Make( i_path, i_outfolder)
 
 	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
 
-	c_CreateGUI( wnd.elContent, d_guiparams, [params, RULES.dailies]);
+	gui_Create( wnd.elContent, d_guiparams, [params, RULES.dailies]);
 	d_CreateGUI_Choises({"wnd":wnd,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
@@ -194,7 +194,7 @@ function d_ChoiseOnClick( i_evt)
 
 function d_ProcessGUI( i_wnd)
 {
-	var params = c_GetGUIParams( i_wnd.elContent, d_guiparams);
+	var params = gui_GetParams( i_wnd.elContent, d_guiparams);
 
 	for( key in i_wnd.m_choises )
 		params[key] = i_wnd.m_choises[key].value;
@@ -301,7 +301,7 @@ function d_Convert( i_path)
 	elSrc.classList.add('source');
 	elSrc.textContent = i_path;
 
-	c_CreateGUI( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
@@ -318,7 +318,7 @@ function d_Convert( i_path)
 	wnd.elContent.appendChild(div );
 	div.style.margin = '10px';
 
-	c_CreateGUI( wnd.elContent, d_expguiparams, [params]);
+	gui_Create( wnd.elContent, d_expguiparams, [params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -344,8 +344,8 @@ function d_Convert( i_path)
 function d_CvtProcessGUI( i_wnd)
 {
 	var params = {};
-	c_GetGUIParams( i_wnd.elContent, d_expguiparams, params);
-	c_GetGUIParams( i_wnd.elContent, d_cvtguiparams, params);
+	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
+	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
 //	for( var p = 0; p < d_expguiparams.length; p++)
 //		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
 //	for( var p = 0; p < d_cvtguiparams.length; p++)
@@ -385,8 +385,8 @@ function d_CvtProcessGUI( i_wnd)
 function d_ExpProcessGUI( i_wnd, i_afanasy)
 {
 	var params = {};
-	c_GetGUIParams( i_wnd.elContent, d_expguiparams, params);
-	c_GetGUIParams( i_wnd.elContent, d_cvtguiparams, params);
+	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
+	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
 //	for( var p = 0; p < d_expguiparams.length; p++)
 //		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
 //	for( var p = 0; p < d_cvtguiparams.length; p++)
