@@ -502,3 +502,9 @@ function c_LoadingElSet( i_el)
 }
 function c_LoadingElReset( i_el) { if( i_el.m_elWaiting ) i_el.removeChild( i_el.m_elWaiting); }
 
+function c_GuestCheck( i_msg)
+{
+	if( g_auth_user ) return false;
+	if( i_msg == null ) i_msg = 'Guests are not allowed here.';
+	c_Error( i_msg);
+}

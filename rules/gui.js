@@ -45,11 +45,18 @@ function gui_Create( i_wnd, i_params, i_defaults)
 			var elList = document.createElement('div');
 			elDiv.appendChild( elList);
 			elList.classList.add('list');
+
 			elList.m_params = i_params[p][i_params[p].list];
+			elList.m_elParams = [];
 
 			var elCtrl = document.createElement('div');
 			elList.appendChild( elCtrl);
 			elCtrl.classList.add('ctrl');
+
+			var elName = document.createElement('div');
+			elCtrl.appendChild( elName);
+			elName.classList.add('name');
+			elName.textContent = i_params[p].list.replace(/_/g,' ');
 
 			var btns = ['insert','append','move_up','move_down','delete'];
 			for( var b = 0; b < btns.length; b++ )
@@ -60,15 +67,19 @@ function gui_Create( i_wnd, i_params, i_defaults)
 				elBtn.textContent = btns[b].replace(/_/g,' ');
 				elBtn.m_elList = elList;
 				elBtn.m_action = btns[b];
+				elBtn.m_item = i_params[p].list;
 				elBtn.ondblclick = gui_ListAction;
 			}
 
-			var elParams = document.createElement('div');
-			elList.appendChild( elParams);
-			elParams.classList.add('item');
+			i_wnd.m_elements[p] = elList;
 
-			gui_Create( elParams, i_params[p][i_params[p].list]);
-//			i_wnd.m_elements[p] = elValue;
+			if( i_defaults )
+			for( var d = 0; d < i_defaults.length; d++)
+			if( i_defaults[d][p])
+			for( var l = 0; l < i_defaults[d][p].length; l++)
+			for( var item in i_defaults[d][p][l])
+				gui_ListAdd( elList, item, i_defaults[d][p][l][item]);
+
 			continue;
 		}
 
@@ -124,15 +135,90 @@ function gui_ListAction( i_evt)
 	var elBtn = i_evt.currentTarget;
 	var elList = elBtn.m_elList;
 	var action = elBtn.m_action;
-console.log( action);
+	var item = elBtn.m_item;
 
-	if( action == 'append')
+	var elParams = null;
+	for( var i = 0; i < elList.m_elParams.length; i++)
+		if( elList.m_elParams[i].classList.contains('selected'))
+		{
+			elParams = elList.m_elParams[i];
+			break;
+		}
+
+	if(( action == 'append') || ( action == 'insert'))
 	{
-		var elParams = document.createElement('div');
-		elList.appendChild( elParams);
-		elParams.classList.add('item');
-		gui_Create( elParams, elList.m_params);
+		gui_ListAdd( elList, item, null, action, elParams);
+		return;
 	}
+
+	if( elList.m_elParams.length == 0 )
+	{
+		c_Error('List has no items.');
+		return;
+	}
+
+	if( elParams == null )
+	{
+		c_Error('Nothing selected.');
+		return;
+	}
+
+	var index = elList.m_elParams.indexOf( elParams);
+
+	if( action == 'delete')
+	{
+		if( index >= 0 ) elList.m_elParams.splice( index, 1);			
+		elList.removeChild( elParams);
+	}
+	else if( action == 'move_up')
+	{
+		if( index <= 0 )
+		{
+			c_Error('Item already has top position.');
+			return;
+		}
+	}
+	else if( action == 'move_down')
+	{
+		if( index >= ( elList.m_elParams.length - 1 ))
+		{
+			c_Error('Item already has bottom position.');
+			return;
+		}
+	}
+}
+function gui_ListGetCurrent( i_elList)
+{
+	return null
+}
+function gui_ListAdd( i_elList, i_item, i_values, i_action, i_elParams)
+{
+	var elParams = document.createElement('div');
+	if( i_action == 'insert' )
+		i_elList.insertBefore( elParams, i_elParams);
+	else
+		i_elList.appendChild( elParams);
+	elParams.classList.add('item');
+
+	var defaults = null;
+	if( i_values ) defaults = [i_values];
+	gui_Create( elParams, i_elList.m_params, defaults);
+
+	elParams.m_item = i_item;
+	elParams.m_params = i_elList.m_params;
+	elParams.m_elList = i_elList;
+	i_elList.m_elParams.push( elParams);
+
+	elParams.onclick = gui_ListSelect;
+}
+function gui_ListSelect( i_evt)
+{
+	i_evt.stopPropagation();
+	var el = i_evt.currentTarget;
+	var elParams = el.m_elList.m_elParams;
+	for( var i = 0; i < elParams.length; i++)
+		elParams[i].classList.remove('selected');
+	el.classList.add('selected');
 }
 
 function gui_GetParams( i_wnd, i_params, o_params)
@@ -147,6 +233,18 @@ function gui_GetParams( i_wnd, i_params, o_params)
 				params[p] = true;
 			else
 				params[p] = false;
+		}
+		else if( i_params[p].list )
+		{
+			var elParams = i_wnd.m_elements[p].m_elParams;
+			var l_items = [];
+			for( var i = 0; i < elParams.length; i++)
+			{
+				var l_params = {};
+				l_params[elParams[i].m_item] = gui_GetParams( elParams[i], elParams[i].m_params);
+				l_items.push( l_params);
+			}
+			params[p] = l_items;
 		}
 		else
 			params[p] = i_wnd.m_elements[p].textContent;

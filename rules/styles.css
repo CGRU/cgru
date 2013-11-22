@@ -569,9 +569,11 @@ box-shadow: 0 0 4px #000 inset;
 .dialog .label { float: left; width: 100px;  text-align: right; }
 .dialog .value, .dialog .rules { box-shadow: 0 0 4px #000 inset;}
 .dialog .info { float: right; width: 200px; }
-.dialog .list { border: 1px solid #F00; }
-.dialog .list .item { border: 1px solid #0F0; }
-.dialog .list .ctrl { border: 1px solid #FF0; }
+.dialog .list { border-radius: 5px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; }
+.dialog .list .item { border-radius: 3px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; margin: 4px; }
+.dialog .list .item.selected { background: rgba(100,200,200,.3); }
+.dialog .list .ctrl { border-radius: 3px; }
+.dialog .list .ctrl .name { float: left; text-transform: capitalize; padding: 3px 8px; }
 .dialog .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
 .dialog .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
 .dialog .rules { padding: 12px;  border-radius: 6px;}
