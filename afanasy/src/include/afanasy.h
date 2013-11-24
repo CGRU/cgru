@@ -22,7 +22,7 @@ namespace AFGENERAL
     const char   FILENAME_INVALID_CHARACTER_REPLACE = '_';
 	const int  LOG_LINES_MAX = 100;        ///< Maximum number of lines in each node log.
 
-	const char HTML_BROWSER[] = "/browser/index.html";
+	const char HTML_BROWSER[] = "/afanasy/browser/index.html";
 }
 
 /// Addresses:

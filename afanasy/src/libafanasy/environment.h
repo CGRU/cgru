@@ -83,6 +83,7 @@ public:
 	static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
 	static inline const std::string & getCGRULocation(){ return cgrulocation;  } ///< Get CGRU root directory.
 	static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
+	static inline const std::string & getHTTPServeDir(){ return http_serve_dir;}
 	static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
 	static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
 	static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
@@ -167,10 +168,10 @@ public:
 	static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
 	static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;}
 
-	static inline const std::string & getThumbnailCmd()        { return thumbnail_cmd;   }
-	static inline const std::string & getThumbnailNaming()     { return thumbnail_naming;   }
-	static inline const std::string & getThumbnailHttp()       { return thumbnail_http;   }
-	static inline const std::string & getThumbnailFile()       { return thumbnail_file;   }
+//	static inline const std::string & getThumbnailCmd()        { return thumbnail_cmd;   }
+//	static inline const std::string & getThumbnailNaming()     { return thumbnail_naming;   }
+//	static inline const std::string & getThumbnailHttp()       { return thumbnail_http;   }
+//	static inline const std::string & getThumbnailFile()       { return thumbnail_file;   }
 
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
@@ -219,6 +220,7 @@ private:
 	static std::string afroot;          ///< Afanasy root directory.
 	static std::string home;            ///< User home directory.
 	static std::string home_afanasy;    ///< Afanasy home settings.
+	static std::string http_serve_dir;  ///< Afanasy HTTP server serve directory.
 
 	static std::string version_revision;///< Sources version, will be compiled in binaries
 	static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup

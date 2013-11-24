@@ -194,7 +194,6 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 	static const char header_OK[] = "HTTP/1.1 200 OK\r\n\r\n";
 	static const  int header_OK_len = strlen( header_OK);
 	static const char header_ERROR[] = "HTTP/1.1 404 Not Found\r\n\r\n";
-	static const  int header_ERROR_len = strlen( header_ERROR);
 
 	static const char tasks_file[] = "@TMP@";
 	static const  int tasks_file_len = strlen( tasks_file);
@@ -232,12 +231,12 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 		}
 		else
 		{
-			file_name = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + file_name;
+			file_name = af::Environment::getHTTPServeDir() + AFGENERAL::PATH_SEPARATOR + file_name;
 		}
 	}
 	else
 	{
-		file_name = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
+		file_name = af::Environment::getHTTPServeDir() + AFGENERAL::HTML_BROWSER;
 	}
 
 //printf("GET[%d,%d]=%s\n", get_start, get_finish, file_name.c_str());
@@ -265,7 +264,10 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 	}
 	else
 	{
-		o_msg->setData( header_ERROR_len, header_ERROR, af::Msg::THTTPGET);
+		std::string error( header_ERROR);
+		error += "File not founded: ";
+		error += file_name;
+		o_msg->setData( error.size(), error.c_str(), af::Msg::THTTPGET);
 	}
 
 	return o_msg;

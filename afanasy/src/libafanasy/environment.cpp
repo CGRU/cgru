@@ -128,6 +128,7 @@ std::string Environment::cgrulocation;
 std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
+std::string Environment::http_serve_dir;
 
 Address Environment::serveraddress;
 
@@ -176,6 +177,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, digest_realm,                      "realm"                                );
 	getVar( i_obj, serverport,                        "af_serverport"                        );
 	getVar( i_obj, clientport,                        "af_clientport"                        );
+	getVar( i_obj, http_serve_dir,                    "af_http_serve_dir"                     );
 
 	getVar( i_obj, pswd_visor,                        "pswd_visor"                           );
 	getVar( i_obj, pswd_god,                          "pswd_god"                             );
@@ -640,6 +642,9 @@ bool Environment::initAfterLoad()
 	jobs_dir    = temp_dir + AFGENERAL::PATH_SEPARATOR +    AFJOB::DIRECTORY;
 	renders_dir = temp_dir + AFGENERAL::PATH_SEPARATOR + AFRENDER::DIRECTORY;
 	users_dir   = temp_dir + AFGENERAL::PATH_SEPARATOR +   AFUSER::DIRECTORY;
+
+	if( http_serve_dir.empty()) 
+		http_serve_dir = cgrulocation;
 
 	//############ Server Accept IP Addresses Mask:
 	if( false == Address::readIpMask( ip_trust, m_verbose_init))

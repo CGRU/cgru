@@ -6,6 +6,9 @@
 	"af_serverport":51000,
 	"af_clientport":51001,
 
+		"":"Afanasy server HTTP serve folder, if empty CGRU root folder will be used",
+	"-af_http_serve_dir":"/cgru",
+
 		"":"Trusted IP addresses masks. From these IPs no authentication needed.",
 	"af_ip_trust":["*.*","127.0.0.1","192.168.*","*:*","0:0:0:0:0:0:0:1","FC00:*","FD00:*"],
 		"":"Mask should have at least one '.' for IPv4 or one ':' for IPv6.",
