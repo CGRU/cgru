@@ -236,7 +236,7 @@ const std::list<std::string> DBConnection::getTableColumns( const std::string & 
 		AFERRAR("DBConnection::getTableColumnsNames: Database '%s' connection is not open.", m_name.c_str())
 		return o_columns;
 	}
-	std::string query = std::string("SELECT * FROM ") + i_tablename;
+	std::string query = std::string("SELECT * FROM ") + i_tablename + " LIMIT 1;";
 
 	PGresult * res = PQexec( m_conn, query.c_str());
 	if( PQresultStatus(res) != PGRES_TUPLES_OK)
