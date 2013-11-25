@@ -169,14 +169,17 @@ function gui_ListAction( i_evt)
 	{
 		if( index >= 0 ) elList.m_elParams.splice( index, 1);			
 		elList.removeChild( elParams);
+		return;
 	}
-	else if( action == 'move_up')
+
+	if( action == 'move_up')
 	{
 		if( index <= 0 )
 		{
 			c_Error('Item already has top position.');
 			return;
 		}
+		index_new = index - 1;
 	}
 	else if( action == 'move_down')
 	{
@@ -185,7 +188,18 @@ function gui_ListAction( i_evt)
 			c_Error('Item already has bottom position.');
 			return;
 		}
+		index_new = index + 1;
 	}
+
+	var prevParams = null;
+	if( index_new != elList.m_elParams.length - 1 )
+		prevParams = elList.m_elParams[index_new];
+
+	elList.m_elParams.splice( index, 1);
+	elList.removeChild( elParams);
+
+	elList.m_elParams.splice( index_new, 0, elParams);
+	elList.insertBefore( elParams, prevParams);
 }
 function gui_ListGetCurrent( i_elList)
 {
