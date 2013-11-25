@@ -12,6 +12,7 @@ Parser.add_option('-D', '--debug',   dest='debug',   action='store_true', defaul
 (Options, args) = Parser.parse_args()
 if Options.debug: Options.verbose = True
 
+os.umask(0000)
 
 def errorExit( i_msg = None):
 	if i_msg:	
@@ -53,34 +54,41 @@ files = []
 for afile in allfiles:
 	if afile[0] == '.': continue
 	afile = os.path.join( Options.source, afile)
-	if not os.path.isfile( afile): continue
-	files.append( afile)
+	if os.path.isfile( afile): files.append( afile)
+	elif os.path.isdir( afile): files.append( afile)
 
 files.sort()
 Result += '/'
 
-Copy = 'cp'
+Copy_File = 'cp -p "%s" "%s"'
+Copy_Dir  = 'cp -rp "%s" "%s"'
 if sys.platform.find('win') == 0:
-	Copy = 'COPY'
+	Copy_File = 'COPY "%s" "%s"'
+	Copy_Dir  = 'XCOPY "%s" "%s" /ys'
 if Options.rsync:
-	Copy = 'rsync -avP'
+	Copy_File = 'rsync -avP "%s" "%s"'
+	Copy_Dir  = 'rsync -avP "%s" "%s"'
 
 i = 0
 for afile in files:
 	if Options.verbose:
 		print( os.path.basename( afile))
 
-	cmd = Copy
-	cmd += ' "%s"' % afile
-	cmd += ' "%s"' % Result
+	dest = Result
 
+	Copy = Copy_File
+	if os.path.isdir( afile):
+		Copy = Copy_Dir
+		if sys.platform.find('win') == 0:
+			dest = os.path.join( dest, os.path.basename( afile))
+
+	cmd = Copy % ( afile, dest)
+
+	print( cmd)
 	if not Options.debug:
 		status = os.system( cmd)
 		if status != 0:
-			print( cmd)
 			sys.exit( status)
-	else:
-		print( cmd)
 
 	if not Options.rsync:
 		print('PROGRESS: %d%%' % int( 100.0 * (i + 1.0) / len( files)))

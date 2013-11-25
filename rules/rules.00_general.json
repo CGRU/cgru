@@ -184,7 +184,7 @@
 
 "put":{
 	"dest":"FINAL",
-	"cmd":"python /cg/etc/put.py",
+	"cmd":"python /cgru/utilities/put.py",
 	"post_delete":false,
 	"af_service":"generic",
 	"af_parser":"generic",
