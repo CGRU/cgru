@@ -83,7 +83,7 @@ function fu_PutDo( i_wnd)
 	task.name = params.name;
 	block.tasks = [task];
 
-	var cmd = RULES.put.cmd;
+	var cmd = cgru_PM( RULES.put.cmd, true);
 	cmd += ' -s "' + source + '"';
 	cmd += ' -d "' + dest + '"';
 	cmd += ' -n "' + params.name + '"';
