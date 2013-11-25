@@ -126,11 +126,13 @@ class service:
 				files_list = [ files_list[0], files_list[ len(files_list)/2 ], files_list[-1]]
 		elif len(self.taskInfo['files']):
 			for afile in self.taskInfo['files']:
-				files_list.append( afile.decode('utf-8'))
+				files_list.append( afile)
+				#files_list.append( afile.decode('utf-8'))
 		else:
 			return cmds
 
 		for image in files_list:
+			if not isinstance( image, str): image = str( image, 'utf-8')
 			if len( image) < 1: continue
 			image = os.path.join( self.taskInfo['wdir'], image)
 			if not os.path.isfile( image): continue
