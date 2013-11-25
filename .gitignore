@@ -30,18 +30,26 @@ override.cmd
 # Python
 *.pyc
 
-# Temporary files and folders
-tmp*
-temp*
+# Temporary and old files and folders
+Deploy
+*.old
 *.swn
 *.swo
 *.swp
-*.suo
-*.sdf
+tmp*
+temp*
 *~
 
 # Archives
-*.tar
-*.gz
-*.bz2
 *.7z
+*.bz2
+*.gz
+*.tar
+*.zip
+
+# MSVS temporary files
+ipch
+*.pdb
+*.suo
+*.sdf
+*.vcxproj.user

@@ -4,5 +4,7 @@ bin
 include
 lib
 share
+
 ilmbase*
 openexr*
+zlib*

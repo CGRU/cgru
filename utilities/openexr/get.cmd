@@ -1,4 +1,4 @@
-set packages=ilmbase-1.0.2 openexr-1.7.0
+set packages=ilmbase-1.0.3 openexr-1.7.1
 set location=http://download.savannah.nongnu.org/releases/openexr
 echo off
 
