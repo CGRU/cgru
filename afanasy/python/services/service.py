@@ -37,17 +37,17 @@ class service:
 
 		# Initialize parser:
 		self.parser = None
-		cmd = taskInfo['parser']
+		parser = taskInfo['parser']
+		if not isinstance( parser, str): parser = str( parser, 'utf-8')
 		if len( taskInfo['parser']):
 			try:
-				mod = __import__('parsers', globals(), locals(), [taskInfo['parser']])
-				reload( mod)
-				cmd = 'mod.%s.%s()' % ( taskInfo['parser'], taskInfo['parser'])
+				mod = __import__('parsers', globals(), locals(), [parser])
+				cmd = 'mod.%s.%s()' % ( parser, parser)
 				self.parser = eval( cmd)
 				self.parser.setTaskInfo( taskInfo)
 			except:
 				self.parser = None
-				print('ERROR: Failed to import parser "%s"' % cmd)
+				print('ERROR: Failed to import parser "%s"' % parser)
 				traceback.print_exc( file = sys.stdout)
 
 

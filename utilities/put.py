@@ -58,13 +58,12 @@ for afile in allfiles:
 	elif os.path.isdir( afile): files.append( afile)
 
 files.sort()
-Result += '/'
 
 Copy_File = 'cp -p "%s" "%s"'
 Copy_Dir  = 'cp -rp "%s" "%s"'
 if sys.platform.find('win') == 0:
 	Copy_File = 'COPY "%s" "%s"'
-	Copy_Dir  = 'XCOPY "%s" "%s" /ys'
+	Copy_Dir  = 'XCOPY "%s" "%s" /YSIR'
 if Options.rsync:
 	Copy_File = 'rsync -avP "%s" "%s"'
 	Copy_Dir  = 'rsync -avP "%s" "%s"'
@@ -75,16 +74,18 @@ for afile in files:
 		print( os.path.basename( afile))
 
 	dest = Result
+	if not Options.rsync:
+		dest = os.path.join( Result, os.path.basename( afile))
 
 	Copy = Copy_File
 	if os.path.isdir( afile):
 		Copy = Copy_Dir
-		if sys.platform.find('win') == 0:
-			dest = os.path.join( dest, os.path.basename( afile))
 
 	cmd = Copy % ( afile, dest)
 
 	print( cmd)
+	sys.stdout.flush()
+
 	if not Options.debug:
 		status = os.system( cmd)
 		if status != 0:
