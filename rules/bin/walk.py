@@ -16,6 +16,7 @@ Progress = 0
 PrevFiles = None
 CurFiles = 0
 StartPath = '.'
+os.umask(0000)
 
 if len( Args):
 	StartPath = Args[0]
@@ -138,6 +139,7 @@ def sepTh( i_int):
 		s += o[len(o) - i - 1]
 	return s
 
+##############################################################################
 time_start = time.time()
 print('Started at: %s' % time.ctime( time_start))
 
