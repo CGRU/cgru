@@ -32,7 +32,7 @@
 	},
 	"OS_windows":{
 		"af_rendercmds":["vncviewer @ARG@","start ping /t @ARG@","start ping /t @IP@"],
-		"af_tempdirectory":"/temp/afanasy",
+		"af_tempdirectory":"c:/temp/afanasy",
 		"af_render_cmd_reboot":"shutdown /r",
 		"af_render_cmd_shutdown":"shutdown /s",
 		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep",
