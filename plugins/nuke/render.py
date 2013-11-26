@@ -161,7 +161,6 @@ if not options.notmpimage:
 		# Nuke paths has only UNIX slashes, even on MS Windows platform
 		if sys.platform.find('win') == 0:
 			filepath = filepath.replace('/','\\')
-		imagesdir  = os.path.dirname(  filepath)
 		imagesname = os.path.basename( filepath)
 		tmppath    = os.path.join( tmpdir, imagesname)
 		# Nuke paths has only UNIX slashes, even on MS Windows platform
@@ -216,7 +215,7 @@ while frame <= flast:
 			if item.rfind('.tmp') == len(item)-4: continue
 			if item.rfind('.nk') == len(item)-3: continue
 			src  = os.path.join( tmpdir, item)
-			dest = os.path.join( imagesdirs[view_num], item)
+			dest = os.path.normpath( imagesdirs[view_num] + '/' + item)
 
 			# Delete old image if any:
 			if os.path.isfile( dest):
