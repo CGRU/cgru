@@ -93,6 +93,9 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+	// Create temp directory, if it does not exist:
+	if( af::pathMakePath( ENV.getTempDir(), af::VerboseOn ) == false) return 1;
+
     // Some initial render properties:
     uint32_t state = af::Render::SOnline;
     if( ENV.hasArgument( NIMBY))
