@@ -123,7 +123,7 @@ class service:
 
 		if len( files_list ):
 			if len( files_list) > 3:
-				files_list = [ files_list[0], files_list[ len(files_list)/2 ], files_list[-1]]
+				files_list = [ files_list[0], files_list[ int(len(files_list)/2) ], files_list[-1]]
 		elif len(self.taskInfo['files']):
 			for afile in self.taskInfo['files']:
 				files_list.append( afile)
