@@ -63,10 +63,11 @@ if Options.type == 'md5':
 else:
 	errorExit('Unsupported checksum type: "%s"' % Options.type)
 
-
 file_in = open( Options.input, 'rb')
 read_len = 0
 progress = -1
+
+sys.stdout.flush()
 while True:
 	data = file_in.read( 1000000)
 	if len( data) <= 0: break
@@ -78,6 +79,7 @@ while True:
 	if new_progress != progress:
 		progress = new_progress
 		print('PROGRESS: %d%%' % progress)
+		sys.stdout.flush()
 
 file_in.close()
 result = chsum.hexdigest()
