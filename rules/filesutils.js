@@ -175,7 +175,7 @@ function fu_ChecksumDo( i_wnd)
 		filepath = '/' + RULES.root + filepath;
 		filepath = cgru_PM( filepath,  true);
 
-		var cmd = 'python /cgru/utilities/checksum.py';
+		var cmd = cgru_PM( RULES.checksum[params.type].cmd, true);
 
 		cmd += ' -i "' + filepath + '"';
 		cmd += ' -t "' + params.type + '"';
