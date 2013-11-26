@@ -4,11 +4,11 @@ import re
 
 class rsync(parser.parser):
 	'Rsync command parser'
-	def __init__( self, frames = 1):
-		parser.parser.__init__( self, frames)
+	def __init__( self):
+		parser.parser.__init__( self)
 		#print('rsync parser instanced')
 
-	def do( self, data):
+	def do( self, data, mode):
 		#print(data)
 
 		data = re.findall(r'\d*%', data)
