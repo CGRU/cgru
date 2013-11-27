@@ -260,24 +260,32 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
 
 	// Thumbnails:
-	int tx = x;
+	int tx = x + w;
+	static const int xb = 4;
 	painter->setPen( afqt::QEnvironment::qclr_black );
 	painter->setFont( afqt::QEnvironment::f_info );
 	for( int i = 0; i < m_thumbs.size(); i++ )
 	{
-		tx += 5;
-		if( tx > w ) break;
+		tx -= xb;
+		if( tx < x + xb ) break;
 		int tw = m_thumbs[i]->size().width();
-		if( tx + tw > w ) tw = w - tx;
+		tx -= tw;
+		int sx = 0;
+		if( tx < x + xb )
+		{
+			sx =  ( x + xb ) - tx;
+			tw -= ( x + xb ) - tx;
+			tx = x + xb;
+		}
 		int th = y + Height + block_height * m_blocks_num;
 
 		painter->drawText( tx, th, tw, ItemJob::HeightThumbName, Qt::AlignRight | Qt::AlignVCenter, m_thumbs_paths[i]);
 
 		th += ItemJob::HeightThumbName;
 
-		painter->drawImage( tx, th, * m_thumbs[i], 0, 0, tw, m_thumbs[i]->size().height());
+		painter->drawImage( tx, th, * m_thumbs[i], sx, 0, tw, m_thumbs[i]->size().height());
 
-		tx += m_thumbs[i]->size().width();
+//		tx -= m_thumbs[i]->size().width();
 	}
 
 

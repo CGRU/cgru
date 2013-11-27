@@ -1,5 +1,5 @@
 
-function gui_Create( i_wnd, i_params, i_defaults)
+function gui_Create( i_wnd, i_params, i_values)
 {
 	i_wnd.classList.add('dialog');
 	if( i_wnd.m_elements == null ) i_wnd.m_elements = {};
@@ -73,12 +73,12 @@ function gui_Create( i_wnd, i_params, i_defaults)
 
 			i_wnd.m_elements[p] = elList;
 
-			if( i_defaults )
-			for( var d = 0; d < i_defaults.length; d++)
-			if( i_defaults[d][p])
-			for( var l = 0; l < i_defaults[d][p].length; l++)
-			for( var item in i_defaults[d][p][l])
-				gui_ListAdd( elList, item, i_defaults[d][p][l][item]);
+			if( i_values )
+			for( var v = 0; v < i_values.length; v++)
+			if( i_values[v][p])
+			for( var l = 0; l < i_values[v][p].length; l++)
+			for( var item in i_values[v][p][l])
+				gui_ListAdd( elList, item, i_values[v][p][l][item]);
 
 			continue;
 		}
@@ -110,21 +110,26 @@ function gui_Create( i_wnd, i_params, i_defaults)
 				elValue.contentEditable = 'true';
 		}
 
-		if( i_defaults )
-			for( var d = 0; d < i_defaults.length; d++)
-				if( i_defaults[d][p] != null )
-				{
-					if( i_params[p].bool != null )
-					{
-						if( i_defaults[d][p])
-							elValue.textContent = 'ON';
-						else
-							elValue.textContent = 'OFF';
-					}
-					else
-						elValue.textContent = i_defaults[d][p];
-					break;
-				}
+		var values = [];
+		if( i_params[p].default )
+			values.push( i_params[p].default )
+		if( i_values )
+			for( var v = 0; v < i_values.length; v++)
+				if( i_values[v][p] != null )
+					values.push( i_values[v][p]);
+
+		for( var v = 0; v < values.length; v++)
+		{
+			if( i_params[p].bool != null )
+			{
+				if( values[v])
+					elValue.textContent = 'ON';
+				else
+					elValue.textContent = 'OFF';
+			}
+			else
+				elValue.textContent = values[v];
+		}
 
 		i_wnd.m_elements[p] = elValue;
 	}
@@ -214,9 +219,9 @@ function gui_ListAdd( i_elList, i_item, i_values, i_action, i_elParams)
 		i_elList.appendChild( elParams);
 	elParams.classList.add('item');
 
-	var defaults = null;
-	if( i_values ) defaults = [i_values];
-	gui_Create( elParams, i_elList.m_params, defaults);
+	var values = null;
+	if( i_values ) values = [i_values];
+	gui_Create( elParams, i_elList.m_params, values);
 
 	elParams.m_item = i_item;
 	elParams.m_params = i_elList.m_params;

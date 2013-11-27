@@ -228,12 +228,14 @@ JobNode.prototype.showThumb = function( i_path)
 		var img = document.createElement('img');
 		thumb.appendChild( img);
 		img.src = '@TMP@' + i_path;
+		img.style.display = 'none';
 		img.m_height = this.monitor.options.jobs_thumbs_height;
 		img.onload = function( e) {
 			var img = e.currentTarget;
 			if( img.height == img.m_height ) return;
 			img.width = img.m_height * img.width / img.height;
 			img.height = img.m_height;
+			img.style.display = 'block';
 		}
 	}
 	else
@@ -241,8 +243,8 @@ JobNode.prototype.showThumb = function( i_path)
 
 	if( this.elThumbs.m_divs.length > this.monitor.options.jobs_thumbs_num )
 	{
-		this.elThumbs.m_divs.splice( 0, 1);
 		this.elThumbs.removeChild( this.elThumbs.m_divs[0]);
+		this.elThumbs.m_divs.splice( 0, 1);
 	}
 }
 
@@ -714,7 +716,7 @@ JobBlock.prototype.update = function( i_displayFull)
 JobNode.actions = [];
 
 JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_num',    "type":'num', "handle":'mh_Opt', "label":'Thumbnails Quantity', "default":10  });
-JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_height', "type":'num', "handle":'mh_Opt', "label":'Thumbnails Height',   "default":100 });
+JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_height', "type":'num', "handle":'mh_Opt', "label":'Thumbnails Height',   "default":50 });
 
 JobNode.actions.push({"mode":'context', "name":'log',               "handle":'mh_Get',  "label":'Show Log'});
 JobNode.actions.push({"mode":'context', "name":'error_hosts',       "handle":'mh_Get',  "label":'Show Error Hosts'});
