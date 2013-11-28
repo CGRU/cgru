@@ -48,6 +48,7 @@ xcopy plugins\max %dest%\plugins\max\ /ys
 xcopy plugins\c4d %dest%\plugins\c4d\ /ys
 
 xcopy plugins\maya %dest%\plugins\maya\ /y
+xcopy plugins\maya\afanasy %dest%\plugins\maya\afanasy\ /ys
 xcopy plugins\maya\icons %dest%\plugins\maya\icons\ /ys
 xcopy plugins\maya\mel %dest%\plugins\maya\mel\ /ys
 xcopy plugins\maya\mll %dest%\plugins\maya\mll\ /ys
