@@ -190,7 +190,7 @@ JobNode.prototype.mh_Show = function( i_param, i_evt )
 {
 	g_ShowObject({"object":this.params},{"evt":i_evt,"wnd":this.monitor.window});
 }
-JobNode.prototype.mh_Move = function( i_name)
+JobNode.prototype.mh_Move = function( i_param)
 {
 	if( g_uid < 1 )
 	{
@@ -198,7 +198,7 @@ JobNode.prototype.mh_Move = function( i_name)
 		return;
 	}
 	var operation = {};
-	operation.type = i_name;
+	operation.type = i_param.name;
 	operation.jids = this.monitor.getSelectedIds();
 	nw_Action('users', [g_uid], operation);
 	this.monitor.info('Moving Jobs');
