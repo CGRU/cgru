@@ -239,9 +239,11 @@ JobNode.prototype.showThumb = function( i_path)
 		img.m_height = this.monitor.options.jobs_thumbs_height;
 		img.onload = function( e) {
 			var img = e.currentTarget;
-			if( img.height == img.m_height ) return;
-			img.width = img.m_height * img.width / img.height;
-			img.height = img.m_height;
+			if( img.height != img.m_height )
+			{
+				img.width = img.m_height * img.width / img.height;
+				img.height = img.m_height;
+			}
 			img.style.display = 'block';
 		}
 	}
