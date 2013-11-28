@@ -152,26 +152,33 @@ JobNode.prototype.update = function( i_obj)
 
 JobNode.prototype.refresh = function()
 {
-	var time = this.params.time_wait;
-	if( time && this.state.WTM )
-	{
-		time = cm_TimeStringInterval( new Date().getTime()/1000, time);
-		this.elTime.textContent = time;
-		return;
-	}
+	var time_txt = '';
+	var time_tip = '';
 
-	time = this.params.time_started;
-	if( time )
+	if( this.params.time_wait && this.state.WTM )
+	{
+		time_txt = cm_TimeStringInterval( new Date().getTime()/1000, this.params.time_wait);
+		time_tip = 'Waiting for: ' + cm_DateTimeStrFromSec( this.params.time_wait);
+	}
+	else if( this.params.time_started )
 	{
 		if( this.state.DON == true )
-			time = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
+		{
+			time_txt = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
+			time_tip = 'Done at: ' + cm_DateTimeStrFromSec( this.params.time_done);
+			time_tip += '\nRunning time: ' + time_txt;
+		}
 		else
-			time = cm_TimeStringInterval( time);
-		this.elTime.textContent = time;
-		return;
+		{
+			time_txt = cm_TimeStringInterval( this.params.time_started);
+		}
+		time_tip = 'Started at: ' + cm_DateTimeStrFromSec( this.params.time_started) + '\n' + time_tip;
 	}
 
-	this.elTime.textContent = '';
+	time_tip = 'Created at: ' + cm_DateTimeStrFromSec( this.params.time_creation) + '\n' + time_tip;
+
+	this.elTime.textContent = time_txt;
+	this.elTime.title = time_tip;
 }
 
 JobNode.prototype.onDoubleClick = function( i_evt)

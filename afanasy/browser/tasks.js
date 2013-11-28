@@ -125,9 +125,16 @@ TaskItem.prototype.updateProgress = function( i_progress)
 
 	if( this.params.tst )
 		if( this.params.tdn && ( this.state.RUN != true ))
+		{
 			this.elTime.textContent = cm_TimeStringInterval( this.params.tst, this.params.tdn);
+			this.elTime.title = 'Time Started = ' + cm_DateTimeStrFromSec( this.params.tst)
+				+ '\nTime Done = ' + cm_DateTimeStrFromSec( this.params.tdn);
+		}
 		else
+		{
 			this.elTime.textContent = cm_TimeStringInterval( this.params.tst);
+			this.elTime.title = 'Time Started = ' + cm_DateTimeStrFromSec( this.params.tst);
+		}
 
 	this.percent = 0;
 

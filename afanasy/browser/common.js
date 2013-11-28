@@ -158,6 +158,17 @@ function cm_TimeStringFromSeconds( i_seconds)
 	return str;
 }
 
+function cm_DateTimeStrFromSec( i_sec, i_nosec) { return cm_DateTimeStrFromMSec( i_sec * 1000, i_nosec);}
+function cm_DateTimeStrFromMSec( i_sec, i_nosec)
+{
+	var date = new Date(i_sec);
+	date = date.toString();
+	date = date.substr( 0, date.indexOf(' GMT'));
+	if( i_nosec )
+		date = date.substr( 0, date.lastIndexOf(':'));
+	return date;
+}
+
 cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PER','PBR','PSC','WFL','WSL','WWK'];
 function cm_GetState( i_state, o_state, o_element)
 {
