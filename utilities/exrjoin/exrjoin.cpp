@@ -7,13 +7,14 @@
 
 #include <stdlib.h>
 #include <sys/stat.h>
-//#include <unistd.h>
 
 #define FILENAME_MAXLEN 4096
 
 #ifdef WINNT
 #define unlink _unlink
 #define strncpy strncpy_s
+#else
+#include <unistd.h>
 #endif
 
 // Forward declarations:
