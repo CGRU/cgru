@@ -88,7 +88,7 @@ class Config:
 			username = username.lower()
 			self.Vars['USERNAME'] = username
 
-			home = os.getenv('HOME', os.getenv('HOMEPATH'))
+			home = os.getenv('APPDATA', os.getenv('HOME'))
 			if home is None: home = username
 			self.Vars['HOME'] = home
 			self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
