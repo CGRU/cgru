@@ -91,7 +91,7 @@ class Config:
 			home = os.getenv('APPDATA', os.getenv('HOME'))
 			if home is None: home = username
 			self.Vars['HOME'] = home
-			if sys.platform.find('win'):
+			if sys.platform.find('win') == 0:
 				self.Vars['HOME_CGRU'] = os.path.join( home, 'cgru')
 			else:
 				self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
