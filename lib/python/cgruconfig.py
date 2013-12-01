@@ -91,7 +91,10 @@ class Config:
 			home = os.getenv('APPDATA', os.getenv('HOME'))
 			if home is None: home = username
 			self.Vars['HOME'] = home
-			self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
+			if sys.platform.find('win'):
+				self.Vars['HOME_CGRU'] = os.path.join( home, 'cgru')
+			else
+				self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
 			self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.json')
 			if sys.platform.find('win') == 0 or os.geteuid() != 0:
 				cgruutils.createFolder( self.Vars['HOME_CGRU']	 )
