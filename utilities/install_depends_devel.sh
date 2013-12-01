@@ -6,8 +6,8 @@ source ./distribution.sh
 
 # List packages:
 
-packages="yasm p7zip ruby wget inkscape cmake subversion"
-packages_noarch="rubygems"
+packages="yasm p7zip wget inkscape cmake subversion"
+packages_noarch=""
 
 # Packages for Debian distributives:
 function debianArch(){
