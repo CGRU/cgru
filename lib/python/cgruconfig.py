@@ -93,7 +93,7 @@ class Config:
 			self.Vars['HOME'] = home
 			if sys.platform.find('win'):
 				self.Vars['HOME_CGRU'] = os.path.join( home, 'cgru')
-			else
+			else:
 				self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
 			self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.json')
 			if sys.platform.find('win') == 0 or os.geteuid() != 0:
