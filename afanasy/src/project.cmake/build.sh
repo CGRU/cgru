@@ -56,7 +56,6 @@ case ${DISTRIBUTIVE} in
         ;;
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
-#        export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
         export AF_EXTRA_LIBS="pthread"
         ;;
     Mint)
@@ -67,6 +66,7 @@ case ${DISTRIBUTIVE} in
         ;;
     AltLinux)
         export ADD_CMAKE_MODULE_PATH="$PWD"
+        export AF_EXTRA_LIBS="pthread"
         ;;
     CentOS)
         export ADD_CMAKE_MODULE_PATH="$PWD"
