@@ -560,7 +560,8 @@ void ListTasks::actBlockCommand()
 	QString cur = ((ItemJobBlock*)( getCurrentItem()))->command;
 	QString str = QInputDialog::getText(this, "Change Command", "Enter Command", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
-	blockAction( 0, QString("\"params\":{\"command\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
+	blockAction( 0, QString("\"params\":{\"command\":\"%1\"}").arg( str), false);
 }
 void ListTasks::actBlockWorkingDir()
 {
@@ -568,7 +569,8 @@ void ListTasks::actBlockWorkingDir()
 	QString cur = ((ItemJobBlock*)( getCurrentItem()))->workingdir;
 	QString str = QInputDialog::getText(this, "Change Working Directory", "Enter Directory", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
-	blockAction( 0, QString("\"params\":{\"working_directory\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
+	blockAction( 0, QString("\"params\":{\"working_directory\":\"%1\"}").arg( str), false);
 }
 void ListTasks::actBlockFiles()
 {
@@ -581,7 +583,7 @@ void ListTasks::actBlockFiles()
 	for( int i = 0; i < files.size(); i++ )
 	{
 		if( i ) params += ",";
-		params += "\"" + files[i] + "\"";
+		params += "\"" + afqt::stoq( af::strEscape( afqt::qtos( files[i]))) + "\"";
 	}
 	params += "]}";
 
@@ -593,7 +595,8 @@ void ListTasks::actBlockCmdPost()
 	QString cur = ((ItemJobBlock*)( getCurrentItem()))->cmdpost;
 	QString str = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
-	blockAction( 0, QString("\"params\":{\"command_post\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
+	blockAction( 0, QString("\"params\":{\"command_post\":\"%1\"}").arg(str), false);
 }
 void ListTasks::actBlockService()
 {
