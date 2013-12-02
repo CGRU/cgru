@@ -61,6 +61,8 @@ public:
 	/// Set container.
 	inline static void setUserContainer( UserContainer * i_users ) { ms_users = i_users;}
 
+	void logAction( const Action & i_action, const std::string & i_node_name);
+
 protected:
 	void v_calcNeed();
 

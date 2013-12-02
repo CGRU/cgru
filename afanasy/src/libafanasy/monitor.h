@@ -41,7 +41,6 @@ public:
 //	static const char EventsClasses[18][32];
 
 protected:
-	int32_t m_uid;
 	std::string m_host_name;
 	std::string m_gui_name;
 	std::string m_engine;

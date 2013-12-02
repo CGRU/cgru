@@ -462,8 +462,8 @@ void JobAf::v_action( Action & i_action)
 	if( m_user_name != user_name )
 	{
 		// User name was changed
-        UserAf * user = UserContainer::getUser( m_user_name);
-        if( user == NULL )
+		UserAf * user = i_action.users->getUser( m_user_name);
+		if( user == NULL )
 		{
 			return;
 		}

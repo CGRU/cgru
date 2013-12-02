@@ -90,7 +90,6 @@ Monitor::Monitor( const JSON & obj):
 
 bool Monitor::construct()
 {
-	m_uid = -1;
    events = new bool[EventsCount];
    if( events == NULL)
    {
@@ -127,9 +126,6 @@ void Monitor::v_readwrite( Msg * msg)
 void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	Client::v_jsonWrite( o_str, i_type);
-
-	o_str << ",\"uid\":" << m_uid;
-	o_str << ",\"version\":\"" << m_version << "\"";
 }
 
 bool Monitor::hasEvent( int type) const

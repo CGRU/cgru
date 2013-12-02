@@ -26,15 +26,6 @@ MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 	af::Monitor( i_obj)
 {
 	m_event_nodeids.resize( af::Monitor::EventsCount);
-
-	UserContainerIt usersIt( i_users);
-	for( af::User *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
-	{
-		if( user->getName() == m_user_name)
-		{
-			m_uid = user->getId();
-		}
-	}
 }
 
 MonitorAf::~MonitorAf()
@@ -150,7 +141,8 @@ void MonitorAf::v_action( Action & i_action)
 
 bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 {
-   m_time_activity = time( NULL);
+	m_time_activity = time( NULL);
+
 //printf("MonitorAf::setInterest: [%s]:\n", af::Msg::TNAMES[type]);
    switch(type)
    {

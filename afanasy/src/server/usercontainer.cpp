@@ -8,6 +8,7 @@
 
 #include "../libafsql/dbconnection.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "renderaf.h"
 #include "monitorcontainer.h"
@@ -18,12 +19,9 @@
 
 using namespace af;
 
-UserContainer * UserContainer::ms_users = NULL;
-
 UserContainer::UserContainer():
 	AfContainer( "Users", AFUSER::MAXCOUNT)
 {
-	 ms_users = this;
 }
 
 UserContainer::~UserContainer()
@@ -65,13 +63,27 @@ UserAf* UserContainer::addUser( const std::string & i_usernmae, const std::strin
 
 UserAf * UserContainer::getUser( const std::string & i_name )
 {
-	 UserContainerIt usersIt( ms_users);
-	 for(UserAf * user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
-	 {
-		  if( user->getName() == i_name )
-				return user;
-	 }
-	 return NULL;
+	UserContainerIt usersIt( this);
+	for( UserAf * user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
+	{
+		if( user->getName() == i_name )
+		return user;
+	}
+	return NULL;
+}
+
+void UserContainer::updateTimeActivity( const std::string & i_name)
+{
+	UserAf * user = getUser( i_name);
+	if( user )
+		user->updateTimeActivity();
+}
+
+void UserContainer::logAction( const Action & i_action, const std::string & i_node_name)
+{
+	UserAf * user = getUser( i_action.user_name);
+	if( user )
+		user->logAction( i_action, i_node_name);
 }
 
 int UserContainer::addUser( UserAf * i_user)

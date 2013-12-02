@@ -41,10 +41,12 @@ void User::initDefaultValues()
 	m_errors_forgive_time   = af::Environment::getErrorsForgiveTime();
 
 	m_jobs_life_time    = 0;
-	m_time_register     = 0;
 	m_jobs_num          = 0;
 	m_running_jobs_num  = 0;
 	m_running_tasks_num = 0;
+
+	m_time_register = 0;
+	m_time_activity = 0;
 
 	m_hosts_mask.setCaseInsensitive();
 	m_hosts_mask_exclude.setCaseInsensitive();
@@ -63,6 +65,7 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	Node::v_jsonWrite( o_str, i_type);
 
 	o_str << ",\n\"time_register\":" << m_time_register;
+	o_str << ",\n\"time_activity\":" << m_time_activity;
 	o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
 	o_str << ",\n\"errors_avoid_host\":" << int(m_errors_avoid_host);
 	o_str << ",\n\"errors_task_same_host\":" << int(m_errors_task_same_host);
@@ -133,14 +136,14 @@ void User::v_readwrite( Msg * msg)
 
 	rw_uint32_t( m_state,                 msg);
 	rw_uint32_t( m_flags,                 msg);
-	rw_int64_t ( m_time_register,         msg);
+	rw_int64_t ( m_time_activity,         msg);
 	rw_String  ( m_host_name,             msg);
 	rw_int32_t ( m_max_running_tasks,     msg);
 	rw_uint8_t ( m_errors_retries,        msg);
 	rw_uint8_t ( m_errors_avoid_host,     msg);
 	rw_uint8_t ( m_errors_task_same_host, msg);
 	rw_int32_t ( m_errors_forgive_time,   msg);
-rw_int64_t ( m_time_register,           msg); /// NEW VERSION
+	rw_int64_t ( m_time_register,         msg);
 	rw_int32_t ( m_jobs_life_time,        msg);
 	rw_int32_t ( m_jobs_num,              msg);
 	rw_int32_t ( m_running_jobs_num,      msg);
@@ -215,6 +218,7 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
 
       if( m_host_name.size() != 0) stream << "\n Last host = \"" << m_host_name << "\"";
 		stream << "\n Registration time = " << time2str( m_time_register);
+		stream << "\n Last activity time = " << time2str( m_time_activity);
       if( m_annotation.size()) stream << "\n" << m_annotation;
       if( m_custom_data.size()) stream << "\nCustom Data:\n" << m_custom_data;
       //stream << "\n Memory = " << calcWeight() << " bytes.";

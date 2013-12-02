@@ -6,6 +6,7 @@
 
 #include "action.h"
 #include "afcommon.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -167,9 +168,12 @@ void AfNodeSrv::action( Action & i_action)
 	{
 		if( i_action.log[0] == '\n' )
 			i_action.log[0] = ' ';
+		i_action.users->logAction( i_action, m_node->m_name);
 		i_action.log += std::string(" by ") + i_action.author;
 		appendLog( i_action.log);
 	}
+	else
+		i_action.users->updateTimeActivity( i_action.user_name);
 }
 
 void AfNodeSrv::v_action( Action & i_action)

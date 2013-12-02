@@ -54,7 +54,7 @@ bool UserAf::initialize()
 	}
 	else
 	{
-		m_time_register = time( NULL);
+		setTimeRegister();
 		setStoreDir( AFCommon::getStoreDirUser( *this));
 		store();
 		appendLog("Registered.");
@@ -111,6 +111,15 @@ void UserAf::v_action( Action & i_action)
 	}
 }
 
+void UserAf::logAction( const Action & i_action, const std::string & i_node_name)
+{
+	if( i_action.log.empty())
+		return;
+
+	appendLog( std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
+	updateTimeActivity();
+}
+
 void UserAf::deleteNode( MonitorContainer * i_monitoring)
 {
 	AFCommon::QueueLog("Deleting user: " + v_generateInfoString( false));
@@ -124,6 +133,8 @@ void UserAf::deleteNode( MonitorContainer * i_monitoring)
 void UserAf::addJob( JobAf * i_job)
 {
 	appendLog( std::string("Adding a job: ") + i_job->getName());
+
+	updateTimeActivity();
 
 	m_jobslist.add( i_job );
 
