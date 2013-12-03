@@ -27,6 +27,9 @@ public:
    int numjobs;
    int numrunningtasks;
 
+	int64_t time_register;
+	int64_t time_activity;
+
    bool setSortType(   int type );
    bool setFilterType( int type );
 

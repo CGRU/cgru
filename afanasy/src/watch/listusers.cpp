@@ -36,6 +36,8 @@ ListUsers::ListUsers( QWidget* parent):
 	ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
 	ctrl->addSortType(   CtrlSortFilter::TNUMJOBS);
 	ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+	ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
+	ctrl->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
 	ctrl->addFilterType( CtrlSortFilter::TNONE);
 	ctrl->addFilterType( CtrlSortFilter::TNAME);
 	ctrl->addFilterType( CtrlSortFilter::THOSTNAME);

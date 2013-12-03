@@ -68,10 +68,7 @@ UserNode.prototype.update = function( i_obj)
 {
 	if( i_obj ) this.params = i_obj;
 
-	if( this.params.permanent == false )
-		this.elName.innerHTML = '<i>'+this.params.name+'</i>';
-	else
-		this.elName.textContent = this.params.name;
+	this.elName.textContent = this.params.name;
 
 	this.elPriority.textContent = '-' + this.params.priority;
 
@@ -127,12 +124,12 @@ UserNode.prototype.update = function( i_obj)
 	if( this.params.solve_parallel )
 	{
 		this.elSolving.textContent = 'Par';
-		solving += '\nParallel: All together accoring to jobs priority.\n';
+		solving += '\nParallel: All together according to jobs priority.\n';
 	}
 	else
 	{
 		this.elSolving.textContent = 'Ord';
-		solving += '\nOrdered: One by one accoring to jobs priority and order.\n';
+		solving += '\nOrdered: Queued by jobs priority and order.\n';
 	}
 	this.elSolving.title = solving;
 
@@ -140,6 +137,13 @@ UserNode.prototype.update = function( i_obj)
 		this.elAnnotation.textContent = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
+
+	var title = '';
+	title += 'Time Registered: ' + cm_DateTimeStrFromSec( this.params.time_register) + '\n';
+	title += 'Last Acitvity: ' + cm_DateTimeStrFromSec( this.params.time_activity) + '\n';
+	title += 'ID = ' + this.params.id + '\n';
+//	this.elName.title = title;
+	this.element.title = title;
 
 	this.refresh();
 }

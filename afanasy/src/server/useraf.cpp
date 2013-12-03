@@ -50,11 +50,18 @@ bool UserAf::initialize()
 {
 	if( isFromStore())
 	{
+		if(( getTimeRegister() == 0 ) || ( getTimeActivity() == 0 ))
+		{
+			if( getTimeRegister() == 0 ) setTimeRegister();
+			if( getTimeActivity() == 0 ) updateTimeActivity();
+			store();
+		}
 		appendLog("Initialized from store.");
 	}
 	else
 	{
 		setTimeRegister();
+		updateTimeActivity();
 		setStoreDir( AFCommon::getStoreDirUser( *this));
 		store();
 		appendLog("Registered.");

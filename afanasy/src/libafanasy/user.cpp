@@ -127,6 +127,9 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 	if( io_changes )
 		return;
 
+	jr_int64("time_activity", m_time_activity, i_object);
+	jr_int64("time_register", m_time_register, i_object);
+
 	Node::jsonRead( i_object);
 }
 
@@ -216,9 +219,9 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n    Errors Forgive Time = " << af::time2strHMS( m_errors_forgive_time, true);
       if( m_errors_forgive_time == 0 ) stream << " (infinite, no forgiving)";
 
-      if( m_host_name.size() != 0) stream << "\n Last host = \"" << m_host_name << "\"";
-		stream << "\n Registration time = " << time2str( m_time_register);
-		stream << "\n Last activity time = " << time2str( m_time_activity);
+      if( m_host_name.size() != 0) stream << "\n Last host: \"" << m_host_name << "\"";
+		stream << "\n Registration time: " << time2str( m_time_register);
+		stream << "\n Last activity time: " << time2str( m_time_activity);
       if( m_annotation.size()) stream << "\n" << m_annotation;
       if( m_custom_data.size()) stream << "\nCustom Data:\n" << m_custom_data;
       //stream << "\n Memory = " << calcWeight() << " bytes.";
