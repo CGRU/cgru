@@ -60,7 +60,16 @@ def sendServer( data, receive = True, verbose = False):
 		return False, None
 
 	if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)
-	s.sendall( data)
+
+#	s.sendall( data) #<<< !!! May not work !!!!
+
+	total_send = 0
+	while total_send < len( data):
+		sent = s.send( data[total_send:])
+		if sent == 0:
+			print('Error: Unable send data to socket')
+			return False, None
+		total_send += sent
    
 	if not receive:
 		return True, None

@@ -13,7 +13,8 @@ using namespace af;
 JobProgress::JobProgress( Job * job, bool doConstruct):
    m_job_id( job->getId())
 {
-   if( doConstruct ) construct( job);
+	initProperties();
+	if( doConstruct ) construct( job);
 }
 
 bool JobProgress::construct( Job * job)
@@ -21,7 +22,7 @@ bool JobProgress::construct( Job * job)
    m_blocks_num = job->getBlocksNum();
    if( m_blocks_num < 1)
    {
-      AFERRAR("JobProgress::JobProgress: invalid number if blocks = %d (m_job_id=%d)", m_blocks_num, job->getId())
+      AFERRAR("JobProgress::JobProgress: invalid number if blocks = %d (job name: '%s')", m_blocks_num, job->getName().c_str())
       return false;
    }
 
@@ -53,14 +54,20 @@ bool JobProgress::construct( Job * job)
 
 JobProgress::JobProgress( Msg * msg)
 {
-   read( msg);
+	initProperties();
+	read( msg);
+}
+
+void JobProgress::initProperties()
+{
+	m_job_id = 0;
+	tasksnum = NULL;
+	tp = NULL;
+	m_blocks_num = 0;
 }
 
 bool JobProgress::initBlocks()
 {
-   tasksnum    = NULL;
-   tp          = NULL;
-
    if( m_blocks_num == 0)
    {
       AFERROR("JobProgress::initialize: m_blocks_num == 0\n");

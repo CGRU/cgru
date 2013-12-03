@@ -50,7 +50,8 @@ protected:
    int32_t *tasksnum;           ///< Block tasks number per block.
 
 private:
-   virtual TaskProgress * newTaskProgress() const;
+	void initProperties();
+	virtual TaskProgress * newTaskProgress() const;
 
 private:
    int32_t m_job_id;               ///< Job id.

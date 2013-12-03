@@ -33,7 +33,10 @@ JobAf::JobAf( JSON & i_object):
 	AfNodeSrv( this)
 {
 	initializeValues();
-    jsonRead( i_object);
+
+    if( false == jsonRead( i_object))
+		return;
+
     m_progress = new af::JobProgress( this);
     construct();
 }
@@ -80,6 +83,7 @@ void JobAf::initializeValues()
 {
     m_user             = NULL;
     m_blocks           = NULL;
+	m_progress         = NULL;
     m_deletion         = false;
     m_logsWeight       = 0;
     m_blackListsWeight = 0;
@@ -138,6 +142,7 @@ bool JobAf::isValidConstructed() const
 
 	if( err.size())
 	{
+		err = std::string("Invalid job '") + m_name + "': " + err;
 		if( isFromStore())
 			AFERRAR("%s", err.c_str())
 		else

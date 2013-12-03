@@ -244,7 +244,7 @@ class Job:
 	def send( self, verbose = False):
 		if len( self.blocks) == 0:
 			print('Error: Job has no blocks')
-			return False
+#			return False
 		self.fillBlocks()
 
 		obj = {"job": self.data }

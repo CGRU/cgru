@@ -33,12 +33,12 @@ Job::Job( JSON & i_object)
 	jsonRead( i_object);
 }
 
-void Job::jsonRead( const JSON &i_object, std::string * io_changes)
+bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 {
 	if( false == i_object.IsObject())
 	{
 		AFERROR("Job::jsonRead: Not a JSON object.")
-		return;
+		return false;
 	}
 
 	jr_string("description",  m_description,  i_object, io_changes);
@@ -71,7 +71,7 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
-		return;
+		return true;
 
 	Node::jsonRead( i_object);
 
@@ -88,14 +88,14 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	if( false == blocks.IsArray())
 	{
 		AFERROR("Job::jsonRead: Can't find blocks array.");
-		return;
+		return false;
 	}
 
 	m_blocks_num = blocks.Size();
 	if( m_blocks_num < 1 )
 	{
 		AFERROR("Job::jsonRead: Blocks array has zero size.");
-		return;
+		return false;
 	}
 
 	m_blocks_data = new BlockData*[m_blocks_num];
@@ -106,9 +106,11 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		if( m_blocks_data[b] == NULL)
 		{
 			AFERROR("Job::jsonRead: Can not allocate memory for new block.\n");
-			return;
+			return false;
 		}
 	}
+
+	return true;
 }
 
 void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
