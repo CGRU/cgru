@@ -26,6 +26,13 @@ MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 	af::Monitor( i_obj)
 {
 	m_event_nodeids.resize( af::Monitor::EventsCount);
+
+	UserAf * user = i_users->getUser( m_user_name);
+	if( user )
+	{
+		m_uid = user->getId();
+		user->updateTimeActivity();
+	}
 }
 
 MonitorAf::~MonitorAf()

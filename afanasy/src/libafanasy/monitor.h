@@ -41,6 +41,7 @@ public:
 //	static const char EventsClasses[18][32];
 
 protected:
+	int32_t m_uid; // Needed to detect user id ( web gui )
 	std::string m_host_name;
 	std::string m_gui_name;
 	std::string m_engine;
