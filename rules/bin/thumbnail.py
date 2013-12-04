@@ -27,6 +27,8 @@ Parser.add_option(      '--nomovie', dest='nomovie',    action='store_true', def
 	help='Skip movie files.')
 Parser.add_option(      '--nocorr',  dest='nocorr',     action='store_true', default=False,
 	help='No auto correction.')
+Parser.add_option('-c', '--colorspace',  dest='colorspace', type  ='string', default='',
+	help='Set colorpace.')
 Parser.add_option('-f', '--force',   dest='force',      action='store_true', default=False,
 	help='Force creation, no modification time check.')
 Parser.add_option('-V', '--verbose', dest='verbose',    action='store_true', default=False,
@@ -171,13 +173,16 @@ if Movie is not None:
 cmd = 'convert'
 cmd += ' "%s"'
 cmd += ' -layers flatten'
-if Movie is None and not Options.nocorr:
-	imgtype = Images[0].rfind('.');
-	if imgtype > 0:
-		imgtype = Images[0][imgtype+1:].lower()
-		if   imgtype == 'exr': cmd += ' -set colorspace sRGB'
-		elif imgtype == 'dpx': cmd += ' -set colorspace Log'
-		elif imgtype == 'cin': cmd += ' -set colorspace Log'
+if Movie is None:
+	if Options.colorspace != '':
+		cmd += ' -set colorspace ' + Options.colorspace
+	elif not Options.nocorr:
+		imgtype = Images[0].rfind('.');
+		if imgtype > 0:
+			imgtype = Images[0][imgtype+1:].lower()
+			if   imgtype == 'exr': cmd += ' -set colorspace sRGB'
+			elif imgtype == 'dpx': cmd += ' -set colorspace Log'
+			elif imgtype == 'cin': cmd += ' -set colorspace Log'
 cmd += ' -resize %dx%d' % (Options.xres, Options.yres)
 cmd += ' "%s"'
 if len( Images) == 1:

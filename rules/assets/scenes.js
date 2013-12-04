@@ -481,33 +481,49 @@ function scenes_makeThumbnail( i_data, i_args)
 		if( i_data.cmdexec && i_data.cmdexec.length )
 		{
 			var img = i_data.cmdexec[0].thumbnail;
-			if( img && i_args.elThumb )
+			if( img == null )
 			{
-				i_args.elThumb.src = img + '#' + (new Date().getTime());
-				i_args.elThumb.updated = true;
+				c_Error('No thumbnail output received');
+				return;
 			}
-			else return;
+
+			i_args.elThumb.src = img + '#' + (new Date().getTime());
+			i_args.elThumb.updated = true;
 		}
-		else return;
+		else
+		{
+			c_Error('Data has no command execution results.');
+			return;
+		}
 	}
 
 	var el = null;
+	var num_updated = 0;
 	for( var i = 0; i < sc_elImgThumbs.length; i++)
 	{
 		if( sc_elImgThumbs[i].updated )
+		{
+			num_updated++;
 			continue;
+		}
 		el = sc_elImgThumbs[i];
 		break;
 	}
 
 	if( el == null )
+	{
+		c_Info('Thumbnails generation finished.');
 		return;
+	}
 
 	var thumb = RULES.root + el.m_path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, RULES.root + el.m_path).replace(/@OUTPUT@/g, thumb);
 	if( $('scenes_thumb_nomovie').textContent == 'ON' ) cmd += ' --nomovie';
 	if( $('scenes_thumb_force').textContent == 'ON' ) cmd += ' --force';
+	cmd += ' -c sRGB';
 	if( $('scenes_thumb_nocorr').textContent == 'ON' ) cmd += ' --nocorr';
+
+	c_Info('Generating thumbnail for ' + el.m_path + ' (' + num_updated + '/' + sc_elImgThumbs.length + ')');
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
