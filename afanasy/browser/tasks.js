@@ -453,11 +453,13 @@ function t_ShowExec( i_obj, i_elParent)
 
 		for( var f = 0; f < files.length; f++)
 		{
+			var file = cgru_PM( files[f]);
+
 			var elFile = document.createElement('div');
 			elFiles.appendChild( elFile);
-			elFile.textContent = cm_PathBase( files[f]);
-			elFile.title = files[f];
-			elFile.m_file = files[f];
+			elFile.textContent = cm_PathBase( file);
+			elFile.title = file;
+			elFile.m_file = file;
 			elFile.m_dir = dir_pm;
 			elFile.onclick = t_FileOpen;
 		}
@@ -490,10 +492,7 @@ function t_FileOpen( i_evt)
 		return;
 	}
 
-	var dir = elFile.m_dir;
-	var file = elFile.m_file;
-	file = cgru_PM( file);
-	file = cgru_PathJoin( dir, file);
+	var file = cgru_PathJoin( elFile.m_dir, elFile.m_file);
 
 	elFile.m_opened = true;
 	elFile.classList.add('opened');

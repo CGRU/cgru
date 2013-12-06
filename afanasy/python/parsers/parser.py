@@ -1,5 +1,7 @@
 import os, sys
 
+import cgruutils
+
 str_warning = '[ PARSER WARNING ]'
 str_error = '[ PARSER ERROR ]'
 str_badresult = '[ PARSER BAD RESULT ]'
@@ -40,8 +42,8 @@ class parser:
 
 	def parse( self, data, mode):
 		
-		if not isinstance( data, str): data = str( data,'utf-8')
-		if not isinstance( mode, str): mode = str( mode,'utf-8')
+		data = cgruutils.toStr( data)
+		mode = cgruutils.toStr( mode)
 
 		self.activity = ''
 		self.warning = False

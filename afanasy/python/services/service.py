@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import cgrupathmap, cgruconfig
+import cgruconfig, cgrupathmap, cgruutils
 import os, sys, re, traceback
 
 str_capacity = '@AF_CAPACITY@'
@@ -31,14 +31,16 @@ class service:
 		taskInfo['wdir'] = self.pm.toClient( taskInfo['wdir'])
 		for i in range( 0, len( self.taskInfo['files'])):
 			self.taskInfo['files'][i] = self.pm.toClient( self.taskInfo['files'][i])
+
+		# When GUI receives task exec to show files,
+		# server sends exec with parsed files.
 		for i in range( 0, len( self.taskInfo['parsed_files'])):
 			self.taskInfo['parsed_files'][i] = self.pm.toClient( self.taskInfo['parsed_files'][i])
 
 
 		# Initialize parser:
 		self.parser = None
-		parser = taskInfo['parser']
-		if not isinstance( parser, str): parser = str( parser, 'utf-8')
+		parser = cgruutils.toStr( taskInfo['parser'])
 		if len( taskInfo['parser']):
 			try:
 				mod = __import__('parsers', globals(), locals(), [parser])
@@ -56,10 +58,16 @@ class service:
 	def getFiles(       self ): return self.taskInfo['files']
 
 	def getParsedFiles( self ):
+		# taskInfo does not have parsed files on render,
+		# afserver set parsed files parameter on TaskExec for GUIs only,
+		# it needed for GUIs only to transfer files paths to view
 		if len( self.taskInfo['parsed_files']):
 			return self.taskInfo['parsed_files']
 		elif self.parser is not None:
-			return self.parser.getFiles()
+			files = self.parser.getFiles()
+			for i in range( 0, len( files)):
+				files[i] = self.pm.toServer( files[i])
+			return files
 		else:
 			return []
 
@@ -92,17 +100,17 @@ class service:
 
 
 	def doPost( self):
-		def check_flag(byte, flag_name):
-			return True
-			flags = {
-					'numeric': 0x01,
-					'thumbnails': 0x64
-					}
-			if flags[flag_name]:
-				mask = flags.get(flag_name)
-				return byte & mask
-			else:
-				return 0
+#		def check_flag(byte, flag_name):
+#			return True
+#			flags = {
+#					'numeric': 0x01,
+#					'thumbnails': 0x64
+#					}
+#			if flags[flag_name]:
+#				mask = flags.get(flag_name)
+#				return byte & mask
+#			else:
+#				return 0
 
 		post_cmds = []
 		#print( self.parser.getFiles())
@@ -119,7 +127,8 @@ class service:
 			return cmds
 
 		files_list = []
-		files_list.extend( self.getParsedFiles())
+		if self.parser is not None:
+			files_list = self.parser.getFiles()
 
 		if len( files_list ):
 			if len( files_list) > 3:
@@ -132,7 +141,7 @@ class service:
 			return cmds
 
 		for image in files_list:
-			if not isinstance( image, str): image = str( image, 'utf-8')
+			image = cgruutils.toStr( image)
 			if len( image) < 1: continue
 			image = os.path.join( self.taskInfo['wdir'], image)
 			if not os.path.isfile( image): continue
@@ -142,8 +151,7 @@ class service:
 			ext = ext.lower()[1:]
 			if not ext in cgruconfig.VARS['af_thumbnail_extensions']: continue
 
-			store_dir = self.taskInfo['store_dir']
-			if not isinstance( store_dir, str): store_dir = str( store_dir,'utf-8')
+			store_dir = cgruutils.toStr( self.taskInfo['store_dir'])
 			thumbnail = os.path.basename( image) + '.jpg'
 			thumbnail = store_dir + '/' + thumbnail
 

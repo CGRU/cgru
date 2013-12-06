@@ -99,8 +99,8 @@ class Block:
 		self.data["frames_per_task"] = pertask
 		self.data["frames_inc"] = increment
 
-	def setFlags(self, flags):
-		self.data['flags'] = flags
+#	def setFlags(self, flags):
+#		self.data['flags'] = flags
 
 	def setCapacity( self, capacity):
 		if capacity > 0:
@@ -165,7 +165,7 @@ class Block:
 	def setNeedProperties(   self, value):
 		if checkRegExp(value): self.data["need_properties"] = value
 
-	def setGenThumbnails(self, value = True): self.data["gen_thumbnails"] = value;
+#	def setGenThumbnails(self, value = True): self.data["gen_thumbnails"] = value;
 	
 	def setDoPost( self, value = True ): self.data["do_post"] = value
 	
