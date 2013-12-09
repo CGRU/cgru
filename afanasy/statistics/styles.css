@@ -52,6 +52,7 @@ font-weight: bold;
 background: #DDD;
 border-radius: 4px;
 box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
+min-height: 18px;
 }
 
 .time_div  {

@@ -7,6 +7,8 @@ g_actions.tasks_graph = {"label":'Tasks Graph'};
 
 NS = 'http://www.w3.org/2000/svg';
 
+g_time_ids = ['time_min','time_max'];
+
 function g_Init()
 {
 	g_Info('init');
@@ -27,14 +29,26 @@ function g_Start( i_data, i_args)
 		g_actions[action].element = elAct;
 	}
 
+	for( var i = 0; i < g_time_ids.length; i++)
+		$(g_time_ids[i]).onkeydown = g_TimeKeyDown;
+
 	window.onhashchange = g_PathChanged;
 	g_PathChanged();
 }
 
 function g_PathChanged()
 {
-	var action = document.location.hash;
-	if( action.indexOf('#') == 0 ) action = action.substr(1);
+	var hash = document.location.hash;
+	if( hash.indexOf('#') == 0 ) hash = hash.substr(1);
+
+	hash = hash.split(',');
+	var action = hash[0];
+	var args = {};
+	if( hash.length > 2 )
+	{
+		args.time_min = hash[1];
+		args.time_max = hash[2];
+	}
 
 	for( var a in g_actions )
 		g_actions[a].element.classList.remove('enabled');
@@ -45,17 +59,25 @@ function g_PathChanged()
 		return;
 	}
 
-	g_Info( action);
-
 	$('content').textContent = '';
 
-	if( g_actions[action].element )
-		g_actions[action].element.classList.add('enabled');
+	if( g_actions[action] )
+	{
+		if( g_actions[action].element )
+			g_actions[action].element.classList.add('enabled');
+	}
+	else
+	{
+		g_Error('Unknown action: "' + action + '"');
+		return;
+	}
+
+	g_Info( action);
 
 	if( action == 'jobs_table')
 	{
 		g_Info('Requesting jobs tasks statistics table...');
-		var args = g_GetTimeInterval();
+		g_GetTimeInterval( args);
 		args.select = 'service';
 		args.favorite = 'username';
 		g_Request({"send":{"get_jobs_table":args},"func":g_ShowTable,"args":args,"service":'get_jobs_table'});
@@ -64,7 +86,7 @@ function g_PathChanged()
 	if( action == 'tasks_table')
 	{
 		g_Info('Requesting tasks services statistics table...');
-		var args = g_GetTimeInterval();
+		g_GetTimeInterval( args);
 		args.select = 'service';
 		args.favorite = 'username';
 		g_Request({"send":{"get_tasks_table":args},"func":g_ShowTable,"args":args,"service":'get_tasks_table'});
@@ -73,15 +95,14 @@ function g_PathChanged()
 	if( action == 'tasks_graph')
 	{
 		g_Info('Requesting tasks services statistics graph...');
-		var time_max = Math.round((new Date).valueOf()/1000);
-		var time_min = time_max - 1000000;
-		var args = g_GetTimeInterval({"time_min":time_min,"time_max":time_max});
+		args.notime = {};
+		args.notime.time_max = Math.round((new Date).valueOf()/1000);
+		args.notime.time_min = time_max - 1000000;
+		g_GetTimeInterval( args);
 		args.select = 'service';
 		g_Request({"send":{"get_tasks_graph":args},"func":g_ShowGraph,"args":args});
 		return;
 	}
-
-	g_Error('Unknown action: "' + action + '"');
 }
 
 function g_ShowTable( i_data, i_args)
@@ -176,8 +197,8 @@ function g_ShowTable( i_data, i_args)
 function g_ShowGraph( i_data, i_args)
 {
 //$('content').textContent = JSON.stringify( i_data).replace(/,/g,', ');
-console.log( JSON.stringify( i_args));
-console.log( JSON.stringify( i_data));
+//console.log( JSON.stringify( i_args));
+//console.log( JSON.stringify( i_data));
 
 	var width = 1200;
 	var height = 300;
@@ -236,21 +257,49 @@ console.log( JSON.stringify( i_data));
 	var scale_x = ( width - border.left - border.right ) / ( time_max - time_min )
 
 	// Draw X:
+	var text_intervals = [1,2,5,10,50,100];
+	var text_interval = 1;
+	var i = 0;
+	var count = ( time_max - time_min ) / interval + 1;
+	while( count / text_interval > 20 )
+	{
+		text_interval = text_intervals[i];
+		i++;
+	}
+
+	i = -1;
 	for( var time in i_data.graph )
 	{
+		i++;
+		var dy = 5;
+		if( i % text_interval == 0 ) dy = 10;
+
+		var color = 'rgb(0,0,0)';
+		var date = new Date( 1000 * parseInt( time));
+		if(( date.getDay() == 0 ) || ( date.getDay() == 6 ))
+			color = 'rgb(0,0,100)';
+
 		var path = document.createElementNS( NS,'path');
 		svg.appendChild( path);
-		path.setAttribute('stroke','rgb(0,0,0)');
+		path.setAttribute('stroke', color);
 		path.setAttribute('stroke-width','1');
 		path.setAttribute('fill','none');
 		var x = border.left + scale_x * ( time - time_min );
 		var y = height - border.bottom;
 		var line = 'M ' + x + ' ' + y;
-		line += ' L ' + x + ' ' + (y+5);
+		line += ' L ' + x + ' ' + ( y + dy );
 		path.setAttribute('d', line);
 //console.log( line)
 
-		date = new Date( 1000 * parseInt( time));
+		if( i % text_interval != 0 ) continue;
+
+		var text = document.createElementNS( NS, 'text');
+		svg.appendChild( text);
+		text.setAttribute('x', x - .2 * ( scale_x * interval ));
+		text.setAttribute('y', y + 20);
+		text.setAttribute('font-size', 12);
+		text.setAttribute('fill', color);
+
 		date = date.toISOString();
 		date = date.substr( 0, date.indexOf('T'));
 		date = date.substr( date.indexOf('-') + 1);
@@ -258,12 +307,6 @@ console.log( JSON.stringify( i_data));
 //		date = date.substr( 0, date.lastIndexOf(' '));
 //		date = date.substr( date.indexOf(' '));
 
-		var text = document.createElementNS( NS, 'text');
-		svg.appendChild( text);
-		text.setAttribute('x', x - .2 * ( scale_x * interval ));
-		text.setAttribute('y', y + 20);
-		text.setAttribute('font-size', 12);
-		text.setAttribute('fill','rgb(0,0,0)');
 		text.textContent = date;
 	}
 
@@ -334,27 +377,87 @@ console.log( JSON.stringify( i_data));
 //		path.setAttribute('stroke-line-join','miter');
 		path.setAttribute('fill','none');
 
-		// Time interval loop:
-		var line = '';
-		var i = 0;
+		// Time interval loop to store values:
+		var px = [];
+		var py = [];
 		for( var time in i_data.graph )
 		{
-//console.log( time);
-			var quantity = 0;
+			var value = 0;
 			var record = i_data.graph[time][select_name];
-			if( record ) quantity = record.quantity;
-			if( i ) line += ' L '; else line += 'M ';
+			if( record ) value = record.quantity;
 
-			var x = border.left + scale_x * ( time - time_min );
-			var y = height - border.bottom - scale_y * quantity;
-
-			line += x + ' ' + y;
-			i++;
+			px.push( scale_x * ( time - time_min ));
+			py.push( scale_y * value);
+		}
+		// Calculate tangents:
+		var tx = [];
+		var ty = [];
+		for( var i = 0; i < px.length; i++ )
+		{
+			var tl = .2;
+			if( i == 0 )
+			{
+				tx.push( px[i] + 2*tl * ( px[i+1] - px[i] ));
+				ty.push( py[i] + 2*tl * ( py[i+1] - py[i] ));
+			}
+			else if( i == ( px.length - 1 ))
+			{
+				tx.push( px[i] - 2*tl * ( px[i] - px[i-1] ));
+				ty.push( py[i] - 2*tl * ( py[i] - py[i-1] ));
+			}
+			else
+			{
+				tx.push( px[i] - tl * ( px[i+1] - px[i-1] ));
+				if(( py[i] >= py[i-1] ) && ( py[i] >= py[i+1] ))
+					ty.push( py[i]);
+				else if(( py[i] <= py[i-1] ) && ( py[i] <= py[i+1] ))
+					ty.push( py[i]);
+				else
+					ty.push( py[i] - tl * ( py[i+1] - py[i-1] ));
+			}
 		}
 
+		if( 0 ) { /* Try without smooth*/ if( 0 ) /* Use tangents */
+		{	var _px = []; var _py = [];
+			for( var i = 0; i < px.length; i++ ) { _px.push( px[i]); _px.push( tx[i]); _py.push( py[i]); _py.push( ty[i]); }
+		px = _px; py = _py; }
+		var line = ''; for( var i = 0; i < px.length; i++ )
+		{	if( i == 0 ) line += 'M'; else line += ' L ';
+			line += (px[i] + border.left) + ' ' + (height - border.bottom - py[i]); }
+		path.setAttribute('d', line); continue; }
+
+		// Draw curve:
+//d="M10 80 C 40 10, 65 10, 95 80 S 150 150, 180 90, 250 60, 350 100" // <- example
+//   p1     t1right  t2left p2      t3left   p3      t4left  p4
+		var line = '';
+		for( var i = 0; i < px.length; i++ )
+		{
+			if( i == 0 )
+			{
+				line += 'M';
+				var x = px[i] + border.left;
+				var y = height - border.bottom - py[i];
+				line += x + ' ' + y;
+				line += ' C ';
+				var x = tx[i] + border.left;
+				var y = height - border.bottom - ty[i];
+				line += x + ' ' + y;
+			}
+			else
+			{
+				if( i == 2) line += ' S ';
+				else line += ', ';
+				var x = tx[i] + border.left;
+				var y = height - border.bottom - ty[i];
+				line += x + ' ' + y;
+				line += ', ';
+				var x = px[i] + border.left;
+				var y = height - border.bottom - py[i];
+				line += x + ' ' + y;
+			}
+		}
 		path.setAttribute('d', line);
 //console.log( line)
-//		path.setAttribute('d','M 0 0 L 10 10 L 10 20');
 	}
 
 	if( select == 'service' )
@@ -368,16 +471,32 @@ console.log( JSON.stringify( i_data));
 		g_Info('Statistics received.');
 }
 
+function g_TimeKeyDown( i_evt)
+{
+	if( i_evt.keyCode != 13 ) // Enter
+		return;
+
+	i_evt.stopPropagation();
+
+	var args = {};
+	g_GetTimeInterval( args);
+
+	var hash = document.location.hash.split(',')[0];
+	hash += ',' + args.time_min + ',' + args.time_max;
+
+	document.location.hash = hash;
+}
+
 function g_ShowTimeInterval( i_args)
 {
-	if( $('time_min').textContent == '' )
+//	if( $('time_min').textContent == '' )
 	{
 		var date = new Date( 1000 * i_args.time_min);
 		date = date.toISOString();
 		date = date.substr( 0, date.indexOf('T'));
 		$('time_min').textContent = date;
 	}	
-	if( $('time_max').textContent == '' )
+//	if( $('time_max').textContent == '' )
 	{
 		var date = new Date( 1000 * i_args.time_max);
 		date = date.toISOString();
@@ -386,48 +505,50 @@ function g_ShowTimeInterval( i_args)
 	}	
 }
 
-function g_GetTimeInterval( i_args)
+function g_GetTimeInterval( io_args)
 {
-	var args = {};
-	if( i_args ) args = i_args;
+	if( io_args == null ) io_args = {};
 
-	if( $('time_min').textContent != '' )
+	for( i = 0; i < g_time_ids.length; i++)
 	{
-		var date = new Date( Date.parse( $('time_min').textContent));
-		args.time_min = Math.round( date.valueOf() / 1000 );
-		date = date.toISOString();
-		date = date.substr( 0, date.indexOf('T'));
-		$('time_min').textContent = date;
-	}	
-	if( $('time_max').textContent != '' )
-	{
-		var date = new Date( Date.parse( $('time_max').textContent));
-		args.time_max = Math.round( date.valueOf() / 1000 );
-		date = date.toISOString();
-		date = date.substr( 0, date.indexOf('T'));
-		$('time_max').textContent = date;
+		var time = null;
+		if(( io_args[g_time_ids[i]] == null ) && ( $(g_time_ids[i]).textContent != '' ))
+		{
+			var date = new Date( Date.parse( $(g_time_ids[i]).textContent));
+			time = Math.round( date.valueOf() / 1000 );
+		}
+	
+		if(( time == null ) && ( io_args.notime ) && ( io_args.notime[g_time_ids[i]] ))
+			time = io_args.notime[g_time_ids[i]];
+
+		if( time )
+		{
+			var date = new Date( time * 1000 );
+			date = date.toISOString();
+			date = date.substr( 0, date.indexOf('T'));
+			$(g_time_ids[i]).textContent = date;
+
+			io_args[g_time_ids[i]] = time;
+		}
 	}
 
-	if( args.time_min && args.time_max )
+	if( io_args.time_min && io_args.time_max )
 	{
 		var intervals = [ 60, 3600, 3600*24, 3600*24*7 ];
-		args.interval = 1;
+		io_args.interval = 1;
 		var i = 0;
-		while(( args.time_max - args.time_min ) / args.interval > 100 )
+		while(( io_args.time_max - io_args.time_min ) / io_args.interval > 100 )
 		{
 			if( i < intervals.length )
-				args.interval = intervals[i];
+				io_args.interval = intervals[i];
 			else
-				args.interval *= 10;
+				io_args.interval *= 10;
 			i++;
 		}
-		args.time_min = Math.floor( args.time_min / args.interval ) * args.interval;
-		args.time_max = Math.ceil( args.time_max / args.interval ) * args.interval;
+		io_args.time_min = Math.floor( io_args.time_min / io_args.interval ) * io_args.interval;
+		io_args.time_max = Math.ceil(  io_args.time_max / io_args.interval ) * io_args.interval;
 	}
-
-//console.log('P:'+args.time_min+'-'+args.time_max);
-
-	return args;
+//console.log('T:' + io_args.time_min + '-' + io_args.time_max);
 }
 
 function g_SecToHMS( i_sec)
