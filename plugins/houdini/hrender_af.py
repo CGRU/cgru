@@ -35,13 +35,19 @@ ignoreInputs = options.ignore_inputs
 #print ignore_inputs
 
 # Loading HIP file, and force HIP variable:
-envhip = os.path.abspath( hip)
-envhip = os.path.dirname( envhip)
-envhip = envhip.replace('\\\\','/')
-envhip = envhip.replace('\\','/')
-os.environ['HIP'] = envhip
-hou.allowEnvironmentToOverwriteVariable('HIP', True)
-hou.hscript('set HIP=' + envhip)
+force_hip = True   # not sure, we need to force HIP variable. May be this code is obsolete
+if force_hip:
+    envhip = os.path.abspath(hip)
+    envhip = os.path.dirname(envhip)
+
+    if os.name != 'nt':
+        envhip = envhip.replace('\\\\','/')     # for nt //server/share/path is the only one way
+
+    envhip = envhip.replace('\\','/')   # houidi always use unix-like path
+    os.environ['HIP'] = envhip
+    hou.allowEnvironmentToOverwriteVariable('HIP', True)
+    hou.hscript('set HIP=' + envhip)
+
 # Note that we ignore all load warnings.
 try:
    hou.hipFile.load(hip)
