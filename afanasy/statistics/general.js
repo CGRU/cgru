@@ -303,7 +303,7 @@ function g_ShowGraph( i_data, i_args)
 
 	var text_interval_offset = 0;
 	if( int_name == 'hour' )
-		text_interval_offset = time_min % ( 60 * 60 *24 );
+		text_interval_offset = - Math.round((new Date()).getTimezoneOffset()/60);
 	if( int_name == 'day' )
 		text_interval_offset = ( new Date( time_min * 1000 ).getDay());
 
@@ -321,7 +321,7 @@ function g_ShowGraph( i_data, i_args)
 		var color = 'rgb(0,0,0)';
 		var date = new Date( 1000 * parseInt( time));
 		if(( date.getDay() == 0 ) || ( date.getDay() == 6 ))
-			color = 'rgb(250,200,250)';
+			color = 'rgb(60,20,0)';
 
 		var path = document.createElementNS( NS,'path');
 		svg.appendChild( path);
@@ -338,38 +338,45 @@ function g_ShowGraph( i_data, i_args)
 		if( false == draw_text )
 			continue;
 
-		var text = document.createElementNS( NS, 'text');
-		svg.appendChild( text);
-		text.setAttribute('x', x - .2 * ( scale_x * interval ));
-		text.setAttribute('y', y + 20);
-		text.setAttribute('font-size', 12);
-		text.setAttribute('fill', color);
-
-		var date_txt = date.toISOString();
-		date_txt = date_txt.substr( date_txt.indexOf('-') + 1); // Cut year
-		date_txt = date_txt.substr( 0, date_txt.lastIndexOf(':')); // Cut seconds
+		var draw_week_day = true;
+		var date_txt = '';
 		if( date_prev.getMonth() == date.getMonth())
 		{
-			date_txt = date_txt.substr( date_txt.indexOf('-') + 1); // Cut month
+			date_txt = '' + date.getDate();
 			if( date_prev.getDate() == date.getDate())
 			{
-				date_txt = date_txt.substr( date_txt.indexOf('T') + 1); // Cut date
+				date_txt = date.getHours() + ':00';
+				draw_week_day = false;
 			}
-			else
-			{
-				date_txt = date_txt.substr( 0, date_txt.indexOf('T')); // Cut time
-			}
-		
 		}
 		else
 		{
-			date_txt = date_txt.substr( 0, date_txt.indexOf('T')); // Cut time
+			date_txt = (date.getMonth()+1) + '/' + date.getDate();
 		}
 
-		if( date_prev != date_txt )
-			text.textContent = date_txt;
+		var text = document.createElementNS( NS, 'text');
+		svg.appendChild( text);
+		text.setAttribute('x', x - 4 * ( date_txt.length ));
+		text.setAttribute('y', y + 20);
+		text.setAttribute('font-size', 12);
+		text.setAttribute('fill', color);
+		text.textContent = date_txt;
 
 		date_prev = date;
+
+		if( false == draw_week_day )
+			continue;
+
+		var week_days = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+		
+		date_txt = week_days[ date.getDay()];
+		var text = document.createElementNS( NS, 'text');
+		svg.appendChild( text);
+		text.setAttribute('x', x - 4 * ( date_txt.length ));
+		text.setAttribute('y', y + 34);
+		text.setAttribute('font-size', 12);
+		text.setAttribute('fill', color);
+		text.textContent = date_txt;
 	}
 
 	// Draw Y:
@@ -475,7 +482,13 @@ function g_ShowGraph( i_data, i_args)
 				else if(( py[i] <= py[i-1] ) && ( py[i] <= py[i+1] ))
 					ty.push( py[i]);
 				else
-					ty.push( py[i] - tl * ( py[i+1] - py[i-1] ));
+				{
+					var _ty = py[i] - tl * ( py[i+1] - py[i-1] );
+					if( py[i] + _ty < 0 )
+						ty.push( py[i]);
+					else
+						ty.push( py[i] - tl * ( py[i+1] - py[i-1] ));
+				}
 			}
 		}
 
