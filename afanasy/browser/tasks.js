@@ -128,7 +128,7 @@ TaskItem.prototype.updateProgress = function( i_progress)
 		{
 			this.elTime.textContent = cm_TimeStringInterval( this.params.tst, this.params.tdn);
 			this.elTime.title = 'Started at: ' + cm_DateTimeStrFromSec( this.params.tst)
-				+ '\nDone at: ' + cm_DateTimeStrFromSec( this.params.tdn);
+				+ '\nFinished at: ' + cm_DateTimeStrFromSec( this.params.tdn);
 		}
 		else
 		{
