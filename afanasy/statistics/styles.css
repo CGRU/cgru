@@ -26,7 +26,8 @@ text-align: center;
 position: relative;
 height: 26px;
 }
-#actions a {
+#actions .action {
+cursor: pointer;
 position: relative;
 top: 4px;
 text-align: center;
@@ -36,7 +37,7 @@ box-shadow: 0 0 3px #000, 0 0 3px #FFF inset;
 margin: 2px 12px;
 padding: 2px 12px;
 }
-#actions a.enabled {
+#actions .action.enabled {
 box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
 background: rgba(255,255,255,.3);
 }

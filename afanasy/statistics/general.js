@@ -8,6 +8,11 @@ g_actions.tasks_graph = {"label":'Tasks Graph'};
 NS = 'http://www.w3.org/2000/svg';
 
 g_time_ids = ['time_min','time_max'];
+g_graph_intervals = {"names":['minute','hour','day','week']};
+g_graph_intervals.minute = {"seconds":60,"intervals":[ 1, 5, 10, 15, 20, 30, 60, 60*3, 60*6, 60*12, 60*24 ],"offsets":[[0]]};
+g_graph_intervals.hour   = {"seconds":60 * 60,"intervals":[ 1, 3, 6, 12, 24 ],"offsets":[[0]]};
+g_graph_intervals.day    = {"seconds":60 * 60 * 24,"intervals":[ 1, 7, 7, 7 ],"offsets":[[0],[1,3,5],[1,5],[1]]};
+g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offsets":[[0]]};
 
 function g_Init()
 {
@@ -22,21 +27,32 @@ function g_Start( i_data, i_args)
 
 	for( var action in g_actions )
 	{
-		var elAct = document.createElement('a');
+		var elAct = document.createElement('span');
 		$('actions').appendChild( elAct);
+		elAct.classList.add('action');
 		elAct.textContent = g_actions[action].label;
-		elAct.href = '#' + action;
+		elAct.m_action = action;
+		elAct.onclick = g_ActionClicked;
 		g_actions[action].element = elAct;
 	}
 
 	for( var i = 0; i < g_time_ids.length; i++)
 		$(g_time_ids[i]).onkeydown = g_TimeKeyDown;
 
-	window.onhashchange = g_PathChanged;
-	g_PathChanged();
+	window.onhashchange = g_HashChanged;
+	g_HashChanged();
 }
 
-function g_PathChanged()
+function g_ActionClicked( i_evt)
+{
+	var action = i_evt.currentTarget.m_action;
+	var hash = document.location.hash.split(',');
+	if( hash.length > 2 )
+		action += ',' + hash[1] + ',' + hash[2];
+	document.location.hash = action;
+}
+
+function g_HashChanged()
 {
 	var hash = document.location.hash;
 	if( hash.indexOf('#') == 0 ) hash = hash.substr(1);
@@ -97,7 +113,7 @@ function g_PathChanged()
 		g_Info('Requesting tasks services statistics graph...');
 		args.notime = {};
 		args.notime.time_max = Math.round((new Date).valueOf()/1000);
-		args.notime.time_min = time_max - 1000000;
+		args.notime.time_min = args.notime.time_max - 1000000;
 		g_GetTimeInterval( args);
 		args.select = 'service';
 		g_Request({"send":{"get_tasks_graph":args},"func":g_ShowGraph,"args":args});
@@ -258,26 +274,54 @@ function g_ShowGraph( i_data, i_args)
 
 	// Draw X:
 	var text_intervals = [1,2,5,10,50,100];
+	var int_name = null;
+	for( var name in g_graph_intervals )
+	{
+		if( g_graph_intervals[name].seconds == interval )
+		{
+			int_name = name;
+			text_intervals = g_graph_intervals[name].intervals;
+		}
+	}
+
 	var text_interval = 1;
+	var text_interval_offsets = [0];
 	var i = 0;
 	var count = ( time_max - time_min ) / interval + 1;
-	while( count / text_interval > 20 )
+	while( count / text_interval * text_interval_offsets.length > 20 )
 	{
-		text_interval = text_intervals[i];
+		if( i < text_intervals.length )
+			text_interval = text_intervals[i];
+		else
+			text_interval *= 2;
+
+		if( i < g_graph_intervals[int_name].offsets.length )
+			text_interval_offsets = g_graph_intervals[int_name].offsets[i];
+
 		i++;
 	}
 
-	i = -1;
+	var text_interval_offset = 0;
+	if( int_name == 'hour' )
+		text_interval_offset = time_min % ( 60 * 60 *24 );
+	if( int_name == 'day' )
+		text_interval_offset = ( new Date( time_min * 1000 ).getDay());
+
+//console.log("Count: " + count + ", interval: " + interval + ', type: "' + int_name + '", text interval: ' + text_interval + ', offset: ' + text_interval_offset + ', offsets: ' + text_interval_offsets.join(','));
+
+	var date_prev = new Date( 0);
+	i = text_interval_offset - 1;
 	for( var time in i_data.graph )
 	{
 		i++;
-		var dy = 5;
-		if( i % text_interval == 0 ) dy = 10;
+		var draw_text = false;
+		if( text_interval_offsets.indexOf( i % text_interval ) != -1 )
+			draw_text = true;
 
 		var color = 'rgb(0,0,0)';
 		var date = new Date( 1000 * parseInt( time));
 		if(( date.getDay() == 0 ) || ( date.getDay() == 6 ))
-			color = 'rgb(0,0,100)';
+			color = 'rgb(250,200,250)';
 
 		var path = document.createElementNS( NS,'path');
 		svg.appendChild( path);
@@ -287,11 +331,12 @@ function g_ShowGraph( i_data, i_args)
 		var x = border.left + scale_x * ( time - time_min );
 		var y = height - border.bottom;
 		var line = 'M ' + x + ' ' + y;
-		line += ' L ' + x + ' ' + ( y + dy );
+		line += ' L ' + x + ' ' + ( y + ( draw_text ? 10 : 5 ) );
 		path.setAttribute('d', line);
 //console.log( line)
 
-		if( i % text_interval != 0 ) continue;
+		if( false == draw_text )
+			continue;
 
 		var text = document.createElementNS( NS, 'text');
 		svg.appendChild( text);
@@ -300,14 +345,31 @@ function g_ShowGraph( i_data, i_args)
 		text.setAttribute('font-size', 12);
 		text.setAttribute('fill', color);
 
-		date = date.toISOString();
-		date = date.substr( 0, date.indexOf('T'));
-		date = date.substr( date.indexOf('-') + 1);
-//		date = date.substr( date.indexOf(' ') + 1);
-//		date = date.substr( 0, date.lastIndexOf(' '));
-//		date = date.substr( date.indexOf(' '));
+		var date_txt = date.toISOString();
+		date_txt = date_txt.substr( date_txt.indexOf('-') + 1); // Cut year
+		date_txt = date_txt.substr( 0, date_txt.lastIndexOf(':')); // Cut seconds
+		if( date_prev.getMonth() == date.getMonth())
+		{
+			date_txt = date_txt.substr( date_txt.indexOf('-') + 1); // Cut month
+			if( date_prev.getDate() == date.getDate())
+			{
+				date_txt = date_txt.substr( date_txt.indexOf('T') + 1); // Cut date
+			}
+			else
+			{
+				date_txt = date_txt.substr( 0, date_txt.indexOf('T')); // Cut time
+			}
+		
+		}
+		else
+		{
+			date_txt = date_txt.substr( 0, date_txt.indexOf('T')); // Cut time
+		}
 
-		text.textContent = date;
+		if( date_prev != date_txt )
+			text.textContent = date_txt;
+
+		date_prev = date;
 	}
 
 	// Draw Y:
@@ -489,19 +551,12 @@ function g_TimeKeyDown( i_evt)
 
 function g_ShowTimeInterval( i_args)
 {
-//	if( $('time_min').textContent == '' )
+	for( var i = 0; i < g_time_ids.length; i++ )
 	{
-		var date = new Date( 1000 * i_args.time_min);
+		var date = new Date( 1000 * i_args[g_time_ids[i]]);
 		date = date.toISOString();
 		date = date.substr( 0, date.indexOf('T'));
-		$('time_min').textContent = date;
-	}	
-//	if( $('time_max').textContent == '' )
-	{
-		var date = new Date( 1000 * i_args.time_max);
-		date = date.toISOString();
-		date = date.substr( 0, date.indexOf('T'));
-		$('time_max').textContent = date;
+		$(g_time_ids[i]).textContent = date;
 	}	
 }
 
@@ -509,15 +564,16 @@ function g_GetTimeInterval( io_args)
 {
 	if( io_args == null ) io_args = {};
 
-	for( i = 0; i < g_time_ids.length; i++)
+//console.log('g_GetTimeInterval:' + io_args.time_min + '-' + io_args.time_max);
+	for( var i = 0; i < g_time_ids.length; i++)
 	{
-		var time = null;
-		if(( io_args[g_time_ids[i]] == null ) && ( $(g_time_ids[i]).textContent != '' ))
+		var time = io_args[g_time_ids[i]];
+		if(( time == null ) && ( $(g_time_ids[i]).textContent != '' ))
 		{
 			var date = new Date( Date.parse( $(g_time_ids[i]).textContent));
 			time = Math.round( date.valueOf() / 1000 );
 		}
-	
+
 		if(( time == null ) && ( io_args.notime ) && ( io_args.notime[g_time_ids[i]] ))
 			time = io_args.notime[g_time_ids[i]];
 
@@ -534,13 +590,12 @@ function g_GetTimeInterval( io_args)
 
 	if( io_args.time_min && io_args.time_max )
 	{
-		var intervals = [ 60, 3600, 3600*24, 3600*24*7 ];
 		io_args.interval = 1;
 		var i = 0;
 		while(( io_args.time_max - io_args.time_min ) / io_args.interval > 100 )
 		{
-			if( i < intervals.length )
-				io_args.interval = intervals[i];
+			if( i < g_graph_intervals.names.length )
+				io_args.interval = g_graph_intervals[g_graph_intervals.names[i]].seconds;
 			else
 				io_args.interval *= 10;
 			i++;
@@ -548,7 +603,7 @@ function g_GetTimeInterval( io_args)
 		io_args.time_min = Math.floor( io_args.time_min / io_args.interval ) * io_args.interval;
 		io_args.time_max = Math.ceil(  io_args.time_max / io_args.interval ) * io_args.interval;
 	}
-//console.log('T:' + io_args.time_min + '-' + io_args.time_max);
+//console.log('g_GetTimeInterval:' + io_args.time_min + '-' + io_args.time_max);
 }
 
 function g_SecToHMS( i_sec)
