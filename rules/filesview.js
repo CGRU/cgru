@@ -111,10 +111,11 @@ function FilesView( i_args)
 		this.elThumbsBtn.title = 'Generate thumbnails';
 	}
 
-
 	if( RULES.checksum )
 	for( var sum in RULES.checksum )
 	{
+		if( RULES.checksum[sum].enabled != true ) continue;
+
 		this.elGenBtn = document.createElement('div');
 		this.elPanel.appendChild( this.elGenBtn);
 		this.elGenBtn.classList.add('button');

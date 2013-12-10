@@ -3,6 +3,8 @@
 import json, hashlib, os, subprocess, sys, time
 import traceback
 
+from filelock import FileLock
+
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] output\nType \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-i', '--input',   dest='input' ,  type  ='string',     default='',    help='Input file')
@@ -87,9 +89,11 @@ print( result)
 
 obj = dict()
 if os.path.isfile( Options.output):
+	lock = FileLock( Options.output, 100, 1)
 	file_out = open( Options.output, 'r')
 	obj = json.load( file_out)
 	file_out.close()
+	lock.release()
 	#print( json.dumps( obj))
 
 file_in_name = os.path.basename( Options.input)
@@ -100,9 +104,11 @@ obj['files'][file_in_name]['checksum'][Options.type] = result
 obj['files'][file_in_name]['checksum']['time'] = time.time()
 result = json.dumps( obj, indent=1)
 
+lock = FileLock( Options.output, 100, 1)
 file_out = open( Options.output, 'w')
 file_out.write( result)
 file_out.close()
+lock.release()
 
 # Output running time:
 time_finish = time.time()

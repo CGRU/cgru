@@ -189,6 +189,18 @@
 	"af_service":"generic",
 	"af_parser":"generic",
 	"af_capacity":500
-}
+},
+
+"checksum":{
+	"md5":{
+		"cmd":"python /cgru/utilities/checksum.py",
+		"name":"MD5",
+		"af_service":"checksum",
+		"af_parser":"generic",
+		"af_capacity":500
+	}
+},
+
+"":""
 
 }
