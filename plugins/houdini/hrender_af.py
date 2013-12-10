@@ -54,8 +54,10 @@ try:
 except hou.LoadWarning:
    pass
 #hou.hipFile.load( hip, True)
-hou.hscript('set HIP=' + envhip)
-print 'HIP set to "%s"' % envhip
+
+if force_hip:
+	hou.hscript('set HIP=' + envhip)
+	print 'HIP set to "%s"' % envhip
 
 # Establish ROP to be used
 if rop[0] != '/':
