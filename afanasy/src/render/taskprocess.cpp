@@ -101,7 +101,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 #endif
 		if( false == af::pathIsFolder( m_wdir))
 		{
-			AFERRAR("Working directory does not exists:\n%s", m_wdir.c_str())
+			printf("WARNING: Working directory does not exist:\n%s\n", m_wdir.c_str());
 			m_wdir.clear();
 		}
 	}
