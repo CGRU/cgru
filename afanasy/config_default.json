@@ -141,6 +141,7 @@
 	"af_sysjob_tasksmax":1000,
 	"af_sysjob_wol_service":"wakeonlan",
 	"af_sysjob_postcmd_service":"postcmd",
+	"af_sysjob_events_service":"events",
 
 "":"Network:",
 	"af_srv_so_rcvtimeo_sec":2,
