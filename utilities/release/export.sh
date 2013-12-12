@@ -65,9 +65,8 @@ rm $dest/afanasy/bin/afmonitor
 rcopy afanasy/browser $dest/afanasy
 rcopy afanasy/icons $dest/afanasy
 rcopy afanasy/init $dest/afanasy
-rcopy afanasy/plugins $dest/afanasy
 rcopy afanasy/python $dest/afanasy
-rcopy afanasy/webvisor $dest/afanasy
+rcopy afanasy/statistics $dest/afanasy
 
 copy utilities $dest/utilities
 rcopy utilities/afstarter $dest/utilities
@@ -76,12 +75,13 @@ rcopy utilities/moviemaker $dest/utilities
 rcopy utilities/regexp $dest/utilities
 
 createDir $dest/plugins
-rcopy plugins/nuke $dest/plugins
-rcopy plugins/houdini $dest/plugins
-rcopy plugins/xsi $dest/plugins
-rcopy plugins/blender $dest/plugins
-rcopy plugins/max $dest/plugins
+rcopy plugins/afterfx $dest/plugins
 rcopy plugins/c4d $dest/plugins
+rcopy plugins/blender $dest/plugins
+rcopy plugins/houdini $dest/plugins
+rcopy plugins/nuke $dest/plugins
+rcopy plugins/max $dest/plugins
+rcopy plugins/xsi $dest/plugins
 
 copy plugins/maya $dest/plugins/maya
 rcopy plugins/maya/icons $dest/plugins/maya
