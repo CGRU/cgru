@@ -28,7 +28,6 @@ xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
 del %dest%\afanasy\bin\afmonitor.exe
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
-xcopy afanasy\plugins %dest%\afanasy\plugins\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys
 
 xcopy utilities\ %dest%\utilities\ /y
@@ -40,12 +39,13 @@ xcopy utilities\*.py %dest%\utilities\ /y
 xcopy utilities\*.cmd %dest%\utilities\ /y
 
 xcopy plugins %dest%\plugins\ /y
-xcopy plugins\nuke %dest%\plugins\nuke\ /ys
-xcopy plugins\houdini %dest%\plugins\houdini\ /ys
-xcopy plugins\xsi %dest%\plugins\xsi\ /ys
-xcopy plugins\blender %dest%\plugins\blender\ /ys
-xcopy plugins\max %dest%\plugins\max\ /ys
+xcopy plugins\afterfx %dest%\plugins\afterfx\ /ys
 xcopy plugins\c4d %dest%\plugins\c4d\ /ys
+xcopy plugins\blender %dest%\plugins\blender\ /ys
+xcopy plugins\houdini %dest%\plugins\houdini\ /ys
+xcopy plugins\max %dest%\plugins\max\ /ys
+xcopy plugins\nuke %dest%\plugins\nuke\ /ys
+xcopy plugins\xsi %dest%\plugins\xsi\ /ys
 
 xcopy plugins\maya %dest%\plugins\maya\ /y
 xcopy plugins\maya\afanasy %dest%\plugins\maya\afanasy\ /ys
