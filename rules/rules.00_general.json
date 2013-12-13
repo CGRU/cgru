@@ -141,6 +141,7 @@
 	"format":"hd720",
 	"fps":"25",
 	"codec":"photojpg_high",
+	"colorspace":"auto",
 	"template":"dailies_withlogo",
 	"slate":"dailies_slate",
 	"naming":"(s)_(v)_(d)",
@@ -151,6 +152,14 @@
 	"logo_frame_size":10,
 	"logo_frame_grav":"North",
 	"activity":"comp",
+
+	"colorspaces":{
+		"auto":   {"name":"Auto",      "value":"auto"},
+		"ext":    {"name":"Extension", "value":"extension"},
+		"linear": {"name":"Linear",    "value":"RGB"},
+		"srgb":   {"name":"sRGB",      "value":"sRGB"},
+		"log":    {"name":"Cineon",    "value":"Log"}
+	},
 
 	"formats":{
 		"pal":    {"name":"PAL",     "value":"720x576x1.09"},

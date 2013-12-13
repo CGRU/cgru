@@ -11,9 +11,8 @@ d_guiparams.output = {};
 d_guiparams.filename = {}
 d_guiparams.fps = {"label":'FPS',"width":'25%'};
 d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px'};
-d_guiparams.aspect_in = {"label":'Aspect In',"width":'50%',"lwidth":'170px'};
-d_guiparams.gamma = {"width":'50%'};
-d_guiparams.no_auto_colospace = {"label":'No Auto Color Space',"width":'50%',"lwidth":'170px'};
+d_guiparams.aspect_in = {"label":'Aspect In',"width":'25%',"lwidth":'70px'};
+d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 
 d_cvtguiparams = {};
 d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
@@ -113,6 +112,7 @@ function d_Make( i_path, i_outfolder)
 	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
 
 	gui_Create( wnd.elContent, d_guiparams, [params, RULES.dailies]);
+	d_CreateGUI_Choises({"wnd":wnd,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 	d_CreateGUI_Choises({"wnd":wnd,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
@@ -154,16 +154,22 @@ function d_CreateGUI_Choises( i_args)
 	wnd.m_choises[name].elements = [];
 	
 	var elDiv = document.createElement('div');
+	elDiv.classList.add('param');
 	wnd.elContent.appendChild( elDiv);
 	elDiv.style.clear = 'both';
+
 	var elLabel = document.createElement('div');
 	elDiv.appendChild( elLabel);
 	elLabel.textContent = label;
 	elLabel.classList.add('label');
+
+	var elChoises = document.createElement('div');
+	elDiv.appendChild( elChoises);
+
 	for( var key in keys)
 	{
 		var el = document.createElement('div');
-		elDiv.appendChild( el);
+		elChoises.appendChild( el);
 		el.classList.add('choise');
 		el.classList.add('button');
 		el.textContent = keys[key].name;
@@ -249,11 +255,11 @@ function d_MakeCmd( i_params)
 	cmd += ' -s '+params.slate;
 	cmd += ' -t '+params.template;
 
+	cmd += ' --colorspace "'+params.colorspace+'"';
+
 	if( params.gamma != '' )
 		cmd += ' -g ' + params.gamma;
-	if( params.no_auto_colospace != '' )
-		cmd += ' --noautocorr';
-	if( params.no_auto_colospace != '' )
+	if( params.fffirst != '' )
 		cmd += ' --fffirst';
 
 	cmd += ' --lgspath "'+params.logo_slate_path+'"';
