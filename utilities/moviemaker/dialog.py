@@ -1609,7 +1609,7 @@ Add this options to temporary image saving.')
 			if self.fields['aspect_auto'].value() > 0: cmd += ' --aspect_auto %f' % self.fields['aspect_auto'].value()
 			if self.fields['aspect_out'].value()  > 0: cmd += ' --aspect_out %f' % self.fields['aspect_out'].value()
 			if self.fields['corrext'].isChecked(): cmd += ' --corrext'
-			if len( self.fields['colorspace'].text()): cmd += ' --colorspace "%s"' % self.fields['colorspace'].text()
+			if len( self.fields['colorspace'].currentText()): cmd += ' --colorspace "%s"' % self.fields['colorspace'].currentText()
 			if len( self.fields['correction'].text()): cmd += ' --correction "%s"' % self.fields['correction'].text()
 			if self.fields['addtime'].isChecked(): cmd += ' --addtime'
 			cacher = getComboBoxString( self.fields['cacher_opacity'])
