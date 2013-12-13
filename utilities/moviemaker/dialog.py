@@ -34,8 +34,7 @@ Parser.add_option('--aspect_out',            dest='aspect_out',      type  ='flo
 Parser.add_option('--tmpformat',             dest='tmpformat',       type  ='string',     default='tga',          help='Temporary images format')
 Parser.add_option('--tmpquality',            dest='tmpquality',      type  ='string',     default='',             help='Temporary images format quality options')
 Parser.add_option('--noidentify',            dest='noidentify',      action='store_true', default=False,          help='Disable image identification')
-Parser.add_option('--corrext',               dest='corrext',         action='store_true', default=False,          help='Correct by extension (dpx,exr)')
-Parser.add_option('--colorspace',            dest='colorspace',      type  ='string',     default='',             help='Input images colorspace')
+Parser.add_option('--colorspace',            dest='colorspace',      type  ='string',     default='auto',         help='Input images colorspace')
 Parser.add_option('--correction',            dest='correction',      type  ='string',     default='',             help='Add custom color correction parameters')
 Parser.add_option('--stereodub',             dest='stereodub',       action='store_true', default=False,          help='Stereo mode by default')
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
@@ -154,7 +153,7 @@ if not Options.format in FormatValues:
 	FormatNames.append( Options.format)
 
 # Process colorspace:
-Colorspaces = ['','RGB','sRGB','Log']
+Colorspaces = ['auto','extension','RGB','sRGB','Log']
 if Options.colorspace not in Colorspaces: Colorspaces.append( Options.colorspace)
 
 # Process temporary images format:
@@ -743,7 +742,9 @@ Images with width/height ratio > this value will be treated as 2:1.')
 		parameterslayout.addWidget( group)
 
 		label = QtGui.QLabel('Colorspace:', self)
-		label.setToolTip('Specify exact input images colorspace')
+		label.setToolTip('Specify input images colorspace:\n\
+auto: Automatically from metadata.\n\
+extension: Automatically from extension (exr,dpx,cin).')
 		grouplayout.addWidget( label)
 		self.fields['colorspace'] = QtGui.QComboBox( self)
 		i = 0
@@ -753,13 +754,6 @@ Images with width/height ratio > this value will be treated as 2:1.')
 			i += 1
 		QtCore.QObject.connect( self.fields['colorspace'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
 		grouplayout.addWidget( self.fields['colorspace'])
-
-		self.fields['corrext'] = QtGui.QCheckBox('Extension Colorspace', self)
-		self.fields['corrext'].setToolTip('\
-Correct colors to convert colors of Linear(EXR) and Log(dpx,cin) images to sRGB.')
-		self.fields['corrext'].setChecked( Options.corrext)
-		QtCore.QObject.connect( self.fields['corrext'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-		grouplayout.addWidget( self.fields['corrext'])
 
 		layout = QtGui.QHBoxLayout()
 		layout.addWidget( QtGui.QLabel('Gamma:', self))
@@ -1608,7 +1602,6 @@ Add this options to temporary image saving.')
 			if self.fields['aspect_in'].value()   > 0: cmd += ' --aspect_in %f' % self.fields['aspect_in'].value()
 			if self.fields['aspect_auto'].value() > 0: cmd += ' --aspect_auto %f' % self.fields['aspect_auto'].value()
 			if self.fields['aspect_out'].value()  > 0: cmd += ' --aspect_out %f' % self.fields['aspect_out'].value()
-			if self.fields['corrext'].isChecked(): cmd += ' --corrext'
 			if len( self.fields['colorspace'].currentText()): cmd += ' --colorspace "%s"' % self.fields['colorspace'].currentText()
 			if len( self.fields['correction'].text()): cmd += ' --correction "%s"' % self.fields['correction'].text()
 			if self.fields['addtime'].isChecked(): cmd += ' --addtime'

@@ -67,8 +67,7 @@ Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',  
 Parser.add_option('--aspect_in',        dest='aspect_in',      type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
 Parser.add_option('--aspect_auto',      dest='aspect_auto',    type  ='float',      default=-1.0,        help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('--aspect_out',       dest='aspect_out',     type  ='float',      default=-1.0,        help='Output movie aspect, "-1" = no changes')
-Parser.add_option('--corrext',          dest='corrext',        action='store_true', default=False,       help='Correct by extension (dpx,exr)')
-Parser.add_option('--colorspace',       dest='colorspace',     type  ='string',     default='',          help='Input images colorspace')
+Parser.add_option('--colorspace',       dest='colorspace',     type  ='string',     default='auto',      help='Input images colorspace')
 Parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--company',          dest='company',        type  ='string',     default='',          help='Draw company')
 Parser.add_option('--project',          dest='project',        type  ='string',     default='',          help='Draw project')
@@ -418,7 +417,7 @@ if Options.shotversion  != '': cmd_args += ' --ver "%s"'       % Options.shotver
 if Options.font         != '': cmd_args += ' --font "%s"'      % Options.font
 if Options.activity     != '': cmd_args += ' --activity "%s"'  % Options.activity
 if Options.comments     != '': cmd_args += ' --comments "%s"'  % Options.comments
-if Options.colorspace   != '': cmd_args += ' --colorspace "%s"' % Options.correction
+if Options.colorspace   != '': cmd_args += ' --colorspace "%s"' % Options.colorspace
 if Options.correction   != '': cmd_args += ' --correction "%s"' % Options.correction
 if FrameRange           != '': cmd_args += ' --framerange "%s"'  % FrameRange
 if Options.cacher_opacity > 0:
@@ -506,7 +505,6 @@ if need_convert:
 		if Options.line169  != '': cmd += ' --line169 "%s"'  % Options.line169
 		if Options.line235  != '': cmd += ' --line235 "%s"'  % Options.line235
 		if Options.lgfpath  != '': cmd += ' --logopath "%s"' % tmplogo[1]
-		if Options.corrext       : cmd += ' --corrext'
 		if Options.fffirst:
 			if FramePadding > 1:
 				framestring = '%0' + str(FramePadding) + 'd'

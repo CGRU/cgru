@@ -30,7 +30,7 @@ Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string', 
 Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
 Parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='',          help='Output image quality')
 Parser.add_option('--corrext',          dest='corrext',        action='store_true', default=False,       help='Correct by extension (dpx,exr)')
-Parser.add_option('--colorspace',       dest='colorspace',     type  ='string',     default='',          help='Input images colorspace')
+Parser.add_option('--colorspace',       dest='colorspace',     type  ='string',     default='auto',      help='Input images colorspace')
 Parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Stereo dublicate mode')
 Parser.add_option('--drawcolorbars',    dest='drawcolorbars',  action='store_true', default=False,       help='Draw file name')
@@ -162,14 +162,13 @@ def reformatAnnotate( infile, outfile):
 
 		# Input file correction:
 		correction = ''
-		if Options.colorspace != '':
-			corr_sRGB = '-set colorspace ' + Options.colorspace
-		elif Options.corrext:
-			corr_sRGB = '-set colorspace sRGB'
-			corr_Log = '-set colorspace Log'
-			if   imgtype == 'exr': correction = corr_sRGB
-			elif imgtype == 'dpx': correction = corr_Log
-			elif imgtype == 'cin': correction = corr_Log
+		if Options.colorspace != 'auto':
+			colorspace = Options.colorspace
+			if colorspace == 'extension':
+				if   imgtype == 'exr': colorspace = 'sRGB'
+				elif imgtype == 'dpx': colorspace = 'Log'
+				elif imgtype == 'cin': colorspace = 'Log'
+			correction = '-set colorspace ' + colorspace
 		if Options.correction != '':
 			if correction != '': correction += ' '
 			correction += Options.correction
