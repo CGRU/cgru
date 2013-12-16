@@ -121,8 +121,8 @@ function d_ProcessGUI( i_wnd)
 {
 	var params = gui_GetParams( i_wnd.elContent, d_guiparams);
 
-	for( key in i_wnd.m_choises )
-		params[key] = i_wnd.m_choises[key].value;
+	for( key in i_wnd.elContent.m_choises )
+		params[key] = i_wnd.elContent.m_choises[key].value;
 
 	i_wnd.destroy();
 
@@ -271,8 +271,8 @@ function d_CvtProcessGUI( i_wnd)
 	var params = {};
 	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
 	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
-	for( key in i_wnd.m_choises )
-		params[key] = i_wnd.m_choises[key].value;
+	for( key in i_wnd.elContent.m_choises )
+		params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avconv;
