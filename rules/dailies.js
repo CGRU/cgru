@@ -20,29 +20,8 @@ d_cvtguiparams.fps = {"label":'FPS'};
 
 d_expguiparams = {};
 d_expguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
-/*
-d_guiparams = [];
-d_guiparams.push({"name":'project',"width":'50%'});
-d_guiparams.push({"name":'shot',"width":'50%',"lwidth":'70px'});
-d_guiparams.push({"name":'artist',"width":'50%'});
-d_guiparams.push({"name":'activity',"width":'25%',"lwidth":'70px'});
-d_guiparams.push({"name":'version',"width":'25%',"lwidth":'70px'});
-d_guiparams.push({"name":'input'});
-d_guiparams.push({"name":'output'});
-d_guiparams.push({"name":'filename'});
-d_guiparams.push({"name":'fps',"label":'FPS',"width":'25%'});
-d_guiparams.push({"name":'fffirst',"label":"F.F.First","width":'25%',"lwidth":'70px'});
-d_guiparams.push({"name":'aspect_in',"label":'Aspect In',"width":'50%',"lwidth":'170px'});
-d_guiparams.push({"name":'gamma',"width":'50%'});
-d_guiparams.push({"name":'no_auto_colospace',"label":'No Auto Color Space',"width":'50%',"lwidth":'170px'});
 
-d_cvtguiparams = [];
-d_cvtguiparams.push({"name":'cvtres',"label":'Resolution',"info":'on empty no changes'});
-d_cvtguiparams.push({"name":'fps',"label":'FPS'});
 
-d_expguiparams = [];
-d_expguiparams.push({"name":'quality',"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'});
-*/
 function d_Make( i_path, i_outfolder)
 {
 	c_Log('Make Dailies: '+i_path);
@@ -112,9 +91,9 @@ function d_Make( i_path, i_outfolder)
 	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
 
 	gui_Create( wnd.elContent, d_guiparams, [params, RULES.dailies]);
-	d_CreateGUI_Choises({"wnd":wnd,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
-	d_CreateGUI_Choises({"wnd":wnd,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
-	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -136,66 +115,6 @@ function d_Make( i_path, i_outfolder)
 	wnd.elContent.appendChild( elRules);
 	elRules.classList.add('rules');
 	elRules.textContent = 'RULES.dailies='+JSON.stringify(RULES.dailies).replace(/,/g,', ');
-}
-
-function d_CreateGUI_Choises( i_args)
-{
-	var wnd = i_args.wnd;
-	var name = i_args.name;
-	var def_val = i_args.value;
-	var label = i_args.label;
-	var keys = i_args.keys;
-
-	if( wnd.m_choises == null )
-		wnd.m_choises = {};
-
-	wnd.m_choises[name] = {};
-	wnd.m_choises[name].value = def_val;
-	wnd.m_choises[name].elements = [];
-	
-	var elDiv = document.createElement('div');
-	elDiv.classList.add('param');
-	wnd.elContent.appendChild( elDiv);
-	elDiv.style.clear = 'both';
-
-	var elLabel = document.createElement('div');
-	elDiv.appendChild( elLabel);
-	elLabel.textContent = label;
-	elLabel.classList.add('label');
-
-	var elChoises = document.createElement('div');
-	elDiv.appendChild( elChoises);
-
-	for( var key in keys)
-	{
-		var el = document.createElement('div');
-		elChoises.appendChild( el);
-		el.classList.add('choise');
-		el.classList.add('button');
-		el.textContent = keys[key].name;
-		el.onclick = d_ChoiseOnClick;
-		var value = key;
-		if( keys[key].value ) value = keys[key].value;
-		if( value == def_val ) el.classList.add('selected');
-
-		el.m_value = value;
-		el.m_wnd = wnd;
-		el.m_name = name;
-
-		wnd.m_choises[name].elements.push( el);
-	}
-}
-function d_ChoiseOnClick( i_evt)
-{
-	var el = i_evt.currentTarget;
-	var wnd = el.m_wnd;
-	var name = el.m_name;
-	var elements = wnd.m_choises[name].elements;
-
-	for( var i = 0; i < elements.length; i++)
-		elements[i].classList.remove('selected');
-	el.classList.add('selected');
-	wnd.m_choises[name].value = el.m_value;
 }
 
 function d_ProcessGUI( i_wnd)
@@ -308,7 +227,7 @@ function d_Convert( i_path)
 	elSrc.textContent = i_path;
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
-	d_CreateGUI_Choises({"wnd":wnd,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -352,10 +271,6 @@ function d_CvtProcessGUI( i_wnd)
 	var params = {};
 	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
 	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
-//	for( var p = 0; p < d_expguiparams.length; p++)
-//		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
-//	for( var p = 0; p < d_cvtguiparams.length; p++)
-//		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
 	for( key in i_wnd.m_choises )
 		params[key] = i_wnd.m_choises[key].value;
 
@@ -393,10 +308,6 @@ function d_ExpProcessGUI( i_wnd, i_afanasy)
 	var params = {};
 	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
 	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
-//	for( var p = 0; p < d_expguiparams.length; p++)
-//		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
-//	for( var p = 0; p < d_cvtguiparams.length; p++)
-//		params[d_cvtguiparams[p].name] = i_wnd.m_elements[d_cvtguiparams[p].name].textContent;
 
 	var cmd = 'utilities/moviemaker/movconvert.py';
 	if( i_afanasy ) cmd = cgru_PM('/cgru/' + cmd, true);

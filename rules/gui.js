@@ -275,3 +275,64 @@ function gui_GetParams( i_wnd, i_params, o_params)
 	return params;
 }
 
+
+function gui_CreateChoises( i_args)
+{
+	var wnd = i_args.wnd;
+	var name = i_args.name;
+	var def_val = i_args.value;
+	var label = i_args.label;
+	var keys = i_args.keys;
+
+	if( wnd.m_choises == null )
+		wnd.m_choises = {};
+
+	wnd.m_choises[name] = {};
+	wnd.m_choises[name].value = def_val;
+	wnd.m_choises[name].elements = [];
+	
+	var elDiv = document.createElement('div');
+	elDiv.classList.add('param');
+	wnd.appendChild( elDiv);
+	elDiv.style.clear = 'both';
+
+	var elLabel = document.createElement('div');
+	elDiv.appendChild( elLabel);
+	elLabel.textContent = label;
+	elLabel.classList.add('label');
+
+	var elChoises = document.createElement('div');
+	elDiv.appendChild( elChoises);
+
+	for( var key in keys)
+	{
+		var el = document.createElement('div');
+		elChoises.appendChild( el);
+		el.classList.add('choise');
+		el.classList.add('button');
+		el.textContent = keys[key].name;
+		el.onclick = gui_ChoiseOnClick;
+		var value = key;
+		if( keys[key].value ) value = keys[key].value;
+		if( value == def_val ) el.classList.add('selected');
+
+		el.m_value = value;
+		el.m_wnd = wnd;
+		el.m_name = name;
+
+		wnd.m_choises[name].elements.push( el);
+	}
+}
+function gui_ChoiseOnClick( i_evt)
+{
+	var el = i_evt.currentTarget;
+	var wnd = el.m_wnd;
+	var name = el.m_name;
+	var elements = wnd.m_choises[name].elements;
+
+	for( var i = 0; i < elements.length; i++)
+		elements[i].classList.remove('selected');
+	el.classList.add('selected');
+	wnd.m_choises[name].value = el.m_value;
+}
+

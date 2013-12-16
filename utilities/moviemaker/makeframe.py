@@ -168,6 +168,7 @@ def reformatAnnotate( infile, outfile):
 				if   imgtype == 'exr': colorspace = 'sRGB'
 				elif imgtype == 'dpx': colorspace = 'Log'
 				elif imgtype == 'cin': colorspace = 'Log'
+				else: colorspace = 'sRGB'
 			correction = '-set colorspace ' + colorspace
 		if Options.correction != '':
 			if correction != '': correction += ' '

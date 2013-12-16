@@ -4,6 +4,13 @@ sc_elCurEditShot = null;
 
 sc_elImgThumbs = [];
 
+sc_thumb_params = {};
+sc_thumb_params.force_update = {"width":'30%',"lwidth":'150px',"bool":false};
+sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px',"bool":true};
+
+sc_thumb_params_values = {};
+
+
 if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
 {
 	sc_Init();
@@ -22,6 +29,9 @@ function sc_Init()
 {
 	var data = n_Request({"send":{"getfile":'rules/assets/scenes.html'}});
 	$('asset').innerHTML = data;
+
+	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
+	gui_CreateChoises({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	sc_elShots = [];
 	sc_elScenes = [];
@@ -444,24 +454,15 @@ function sc_DisplayCounts()
 	}
 }
 
-function scenes_checkBox( el)
-{
-	if( el.textContent == 'ON' )
-	{
-		el.textContent = 'OFF';
-		el.classList.remove('enabled');
-	}
-	else
-	{
-		el.textContent = 'ON';
-		el.classList.add('enabled');
-	}
-}
-
 function scenes_makeThumbnails()
 {
 	for( var i = 0; i < sc_elImgThumbs.length; i++)
 		sc_elImgThumbs[i].updated = false;
+
+
+	sc_thumb_params_values = gui_GetParams( $('scenes_make_thumbnails'), sc_thumb_params);
+	for( key in $('scenes_make_thumbnails').m_choises )
+		sc_thumb_params_values[key] = $('scenes_make_thumbnails').m_choises[key].value;
 
 	scenes_makeThumbnail();
 }
@@ -518,12 +519,13 @@ function scenes_makeThumbnail( i_data, i_args)
 
 	var thumb = RULES.root + el.m_path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, RULES.root + el.m_path).replace(/@OUTPUT@/g, thumb);
-	if( $('scenes_thumb_nomovie').textContent == 'ON' ) cmd += ' --nomovie';
-	if( $('scenes_thumb_force').textContent == 'ON' ) cmd += ' --force';
-	cmd += ' -c sRGB';
-	if( $('scenes_thumb_nocorr').textContent == 'ON' ) cmd += ' --nocorr';
+
+	if( sc_thumb_params_values.force_update ) cmd += ' --force';
+	if( sc_thumb_params_values.skip_movies ) cmd += ' --nomovie';
+	cmd += ' -c ' + sc_thumb_params_values.colorspace;
 
 	c_Info('Generating thumbnail for ' + el.m_path + ' (' + num_updated + '/' + sc_elImgThumbs.length + ')');
+//console.log(cmd);
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
