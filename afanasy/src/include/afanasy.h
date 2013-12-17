@@ -50,13 +50,14 @@ namespace AFUSER
 /// Server options:
 namespace AFSERVER
 {
-    const int  SO_RCVTIMEO_SEC   = 2;  ///< Receive timeout seconds.
-    const int  SO_SNDTIMEO_SEC   = 2;  ///< Send timeout seconds.
-    #ifdef WINNT
-    const char TEMP_DIRECTORY[]  = "\\afanasy"; ///< Server store logs, tasks output.
-    #else
-    const char TEMP_DIRECTORY[]  = "/var/tmp/afanasy"; ///< Server store logs, tasks output.
-    #endif
+	const int  SO_RCVTIMEO_SEC   = 2;  ///< Receive timeout seconds.
+	const int  SO_SNDTIMEO_SEC   = 2;  ///< Send timeout seconds.
+	const int  SO_MSGTIMEO_SEC   = 1;  ///< Dispatch messages to clients timeout seconds.
+	#ifdef WINNT
+	const char TEMP_DIRECTORY[]  = "\\afanasy"; ///< Server store logs, tasks output.
+	#else
+	const char TEMP_DIRECTORY[]  = "/var/tmp/afanasy"; ///< Server store logs, tasks output.
+	#endif
 }
 
 /// Database options:

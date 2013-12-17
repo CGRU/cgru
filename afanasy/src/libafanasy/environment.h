@@ -185,8 +185,9 @@ public:
 	static inline int                 get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
 	static inline int                 get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
-	static inline int getServer_SO_RCVTIMEO_SEC()  { return server_so_rcvtimeo_sec; }
-	static inline int getServer_SO_SNDTIMEO_SEC()  { return server_so_sndtimeo_sec; }
+	static inline int getServer_SO_RCVTIMEO_SEC() { return server_so_rcvtimeo_sec;  }
+	static inline int getServer_SO_SNDTIMEO_SEC() { return server_so_sndtimeo_sec;  }
+	static inline int getServerMsg_SO_TIMEO_SEC() { return server_msg_so_timeo_sec; }
 
 private:
 
@@ -343,8 +344,9 @@ private:
 	static int         db_stringnamelen;  ///< Database string name length
 	static int         db_stringexprlen;  ///< Database string expression length
 
-	static int  server_so_rcvtimeo_sec;
-	static int  server_so_sndtimeo_sec;
+	static int server_so_rcvtimeo_sec;
+	static int server_so_sndtimeo_sec;
+	static int server_msg_so_timeo_sec;
 
 	static Passwd * passwd;
 	static bool visor_mode;     ///< user is VISOR

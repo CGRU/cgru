@@ -108,6 +108,7 @@ int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
 int Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
 int Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
+int Environment::server_msg_so_timeo_sec =         AFSERVER::SO_MSGTIMEO_SEC;
 
 std::string Environment::db_conninfo =                     AFDATABASE::CONNINFO;
 std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
@@ -203,6 +204,7 @@ void Environment::getVars( const JSON & i_obj)
 
 	getVar( i_obj, server_so_rcvtimeo_sec,            "af_server_so_rcvtimeo_sec"            );
 	getVar( i_obj, server_so_sndtimeo_sec,            "af_server_so_sndtimeo_sec"            );
+	getVar( i_obj, server_msg_so_timeo_sec,           "af_server_msg_so_timeo_sec"           );
 
 	getVar( i_obj, task_default_capacity,             "af_task_default_capacity"             );
 	getVar( i_obj, task_update_timeout,               "af_task_update_timeout"               );
