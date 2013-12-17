@@ -128,13 +128,7 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 	so_rcvtimeo.tv_sec = af::Environment::getServer_SO_RCVTIMEO_SEC();
 	so_rcvtimeo.tv_usec = 0;
 
-	#ifdef WINNT
-	#define TOCHAR (char *)
-	#else
-	#define TOCHAR
-	#endif
-
-	if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
+	if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
 	{
 		AFERRPE("readMessage: setsockopt failed.");
 		af::printAddress( &(i_args->ss));
@@ -161,13 +155,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 	so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
 	so_sndtimeo.tv_usec = 0;
 
-	#ifdef WINNT
-	#define TOCHAR (char *)
-	#else
-	#define TOCHAR
-	#endif
-
-	if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
+	if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
 	{
 		AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
 		af::printAddress( &(i_args->ss));

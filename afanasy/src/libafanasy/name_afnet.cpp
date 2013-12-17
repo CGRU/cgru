@@ -222,19 +222,19 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	timeval so_sndtimeo;
 	so_sndtimeo.tv_usec = 0;
 	so_sndtimeo.tv_sec = af::Environment::getServer_SO_RCVTIMEO_SEC();
-	if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
+	if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
 	{
 		AFERRPE("msgsendtoaddress: set socket SO_RCVTIMEO option failed")
 		i_address.v_stdOut(); printf("\n");
 	}
 	so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
-	if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
+	if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
 	{
 		AFERRPE("msgsendtoaddress: set socket SO_SNDTIMEO option failed")
 		i_address.v_stdOut(); printf("\n");
 	}
 	int nodelay = 1;
-	if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) != 0)
+	if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
 	{
 	   AFERRPE("msgsendtoaddress: set socket TCP_NODELAY option failed")
 	   i_address.v_stdOut(); printf("\n");

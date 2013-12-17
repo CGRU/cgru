@@ -149,3 +149,9 @@ namespace AFMONITOR
     const int WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
     const int ZOMBIETIME          = 40;       ///< Seconds to wait for update to consider to kill Monitor.
 }
+
+#ifdef WINNT
+#define WINNT_TOCHAR (char *)
+#else
+#define WINNT_TOCHAR
+#endif
