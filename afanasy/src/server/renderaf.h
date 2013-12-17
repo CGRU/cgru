@@ -89,8 +89,8 @@ public:
 
 
 public:
-	/// Set container.
-	inline static void setRenderContainer( RenderContainer *Rendercontainer){ ms_renders = Rendercontainer;}
+	/// Set container:
+	inline static void setRenderContainer( RenderContainer * i_container){ ms_renders = i_container;}
 
 	/// Stop task on render if it is not running (for server)
 	static void closeLostTask( const af::MCTaskUp &taskup);

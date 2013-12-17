@@ -45,10 +45,11 @@ public:
 
 //   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 
-	inline static void QueueMsgDispatch( af::Msg * i_msg)          { MsgDispatchQueue->pushMsg( i_msg);     }
+//	inline static void QueueMsgMonitor( af::Msg * i_msg) { MsgDispatchQueue_M->pushMsg( i_msg);   }
+//	inline static void QueueMsgTalk(    af::Msg * i_msg) { MsgDispatchQueue_T->pushMsg( i_msg);   }
+
 	inline static void QueueFileWrite( FileData * i_filedata)      { FileWriteQueue->pushFile( i_filedata); }
-	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { FileWriteQueue->pushNode( i_node);    }
-//	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { RemFoldersQueue->pushNode( i_node);    }
+	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { FileWriteQueue->pushNode( i_node);     }
 
 	inline static bool QueueLog(        const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Info  ); else return false;}
 	inline static bool QueueLogError(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Error ); else return false;}
@@ -63,7 +64,8 @@ public:
 		{ if( ms_DBQueue ) ms_DBQueue->addTask( i_exec, i_progress, i_job, i_render );}
 
 private:
-	static af::MsgQueue * MsgDispatchQueue;
+	static af::MsgQueue * MsgDispatchQueue_M;
+	static af::MsgQueue * MsgDispatchQueue_T;
 	static FileQueue    * FileWriteQueue;
 	static LogQueue     * OutputLogQueue;
 	static DBQueue      * ms_DBQueue;

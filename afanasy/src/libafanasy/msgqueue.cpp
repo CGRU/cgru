@@ -36,7 +36,7 @@ void ThreadCommon_dispatchMessages(void* arg)
    sigemptyset( &sigmask);
    sigaddset( &sigmask, SIGALRM);
    if( pthread_sigmask( SIG_UNBLOCK, &sigmask, NULL) != 0)
-      perror("pthread_sigmask:");
+	  perror("pthread_sigmask:");
 #endif
 
    AFINFA("Thread (id = %lu) to dispatch messages created.", (long unsigned)pthread_self())
@@ -49,10 +49,10 @@ void ThreadCommon_dispatchMessages(void* arg)
   where thread can do some setup.
 */
 MsgQueue::MsgQueue( const std::string & QueueName, StartTread i_start_thread ):
-    AfQueue( QueueName, i_start_thread),
-    m_returnQueue( NULL),
-    m_returnNotSended( false),
-    m_verbose( VerboseOn)
+	AfQueue( QueueName, i_start_thread),
+	m_returnQueue( NULL),
+	m_returnNotSended( false),
+	m_verbose( VerboseOn)
 {
 }
 
@@ -62,57 +62,57 @@ MsgQueue::~MsgQueue()
 
 void MsgQueue::processItem( AfQueueItem* item)
 {
-    Msg * msg = (Msg*)item;
+	Msg * msg = (Msg*)item;
 
-    if( msg == NULL )
-    {
-        AFERRAR("MsgQueue::processItem: '%s': NULL Meassage.\n", name.c_str())
-        return;
-    }
+	if( msg == NULL )
+	{
+		AFERRAR("MsgQueue::processItem: '%s': NULL Meassage.\n", name.c_str())
+		return;
+	}
 
-    if( msg->addressIsEmpty() && ( msg->addressesCount() == 0 ))
-    {
-        AFERRAR("MsgQueue::processItem: '%s':\n   Message has no addresses to send to.", name.c_str());
-        msg->v_stdOut();
-        delete msg;
-        return;
-    }
+	if( msg->addressIsEmpty() && ( msg->addressesCount() == 0 ))
+	{
+		AFERRAR("MsgQueue::processItem: '%s':\n\tMessage has no addresses to send to.", name.c_str());
+		msg->v_stdOut();
+		delete msg;
+		return;
+	}
 
-    bool ok;
-    af::Msg * answer = af::msgsend( msg, ok, m_verbose);
+	bool ok;
+	af::Msg * answer = af::msgsend( msg, ok, m_verbose);
 
-    if( answer != NULL )
-    {
-        // We got an answer:
-        if( m_returnQueue != NULL )
-        {
-            m_returnQueue->pushMsg( answer );
-        }
-        else
-        {
-            AFERRAR("MsgQueue::processItem: '%s':\n   Got an answer, but has no return queue set.", name.c_str())
-            printf("Reuest: ");
-            msg->v_stdOut();
-            printf("Answer: ");
-            answer->v_stdOut();
-            delete answer;
-        }
-    }
+	if( answer != NULL )
+	{
+		// We got an answer:
+		if( m_returnQueue != NULL )
+		{
+			m_returnQueue->pushMsg( answer );
+		}
+		else
+		{
+			AFERRAR("MsgQueue::processItem: '%s':\n\tGot an answer, but has no return queue set.", name.c_str())
+			printf("Reuest: ");
+			msg->v_stdOut();
+			printf("Answer: ");
+			answer->v_stdOut();
+			delete answer;
+		}
+	}
 
-    if(( false == ok) && m_returnNotSended )
-    {
-        if( m_returnQueue != NULL )
-        {
-            msg->setSendFailed();
-            m_returnQueue->pushMsg( msg );
-            return;
-        }
-        else
-        {
-            AFERRAR("MsgQueue::processItem: '%s':\n   Can't return message as no return queue set.", name.c_str())
-            msg->v_stdOut();
-        }
-    }
+	if(( false == ok) && m_returnNotSended )
+	{
+		if( m_returnQueue != NULL )
+		{
+			msg->setSendFailed();
+			m_returnQueue->pushMsg( msg );
+			return;
+		}
+		else
+		{
+			AFERRAR("MsgQueue::processItem: '%s':\n\tCan't return message as no return queue set.", name.c_str())
+			msg->v_stdOut();
+		}
+	}
 
-    delete msg;
+	delete msg;
 }

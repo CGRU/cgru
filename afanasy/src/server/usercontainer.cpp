@@ -22,6 +22,7 @@ using namespace af;
 UserContainer::UserContainer():
 	AfContainer( "Users", AFUSER::MAXCOUNT)
 {
+	UserAf::setUserContainer( this);
 }
 
 UserContainer::~UserContainer()

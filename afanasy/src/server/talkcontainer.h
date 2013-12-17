@@ -16,9 +16,6 @@ public:
 
 /// Dispatch Talk message to clients.
    void distributeData( af::Msg *i_msg );
-
-private:
-
 };
 
 /// Talks interator.

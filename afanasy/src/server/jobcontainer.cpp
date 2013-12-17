@@ -20,6 +20,7 @@
 JobContainer::JobContainer():
     AfContainer( "Jobs", AFJOB::MAXQUANTITY)
 {
+	JobAf::setJobContainer( this);
 }
 
 JobContainer::~JobContainer()

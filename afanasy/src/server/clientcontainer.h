@@ -19,6 +19,9 @@ protected:
 //	int addClient( af::Client *newClient, bool deleteSameAddress = false, MonitorContainer * monitoring = NULL, int msgEventType = 0);
 	int addClient( AfNodeSrv * i_nodesrv, bool deleteSameAddress = false, MonitorContainer * monitoring = NULL, int msgEventType = 0);
 
+protected:
+	static af::MsgQueue * ms_msg_queue;
+
 private:
 
 };

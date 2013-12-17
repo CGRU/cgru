@@ -11,6 +11,8 @@
 
 using namespace af;
 
+MsgQueue * Client::ms_msg_queue = NULL;
+
 Client::Client( int i_flags, int Id):
 	m_time_launch( 0),
 	m_time_register( 0),

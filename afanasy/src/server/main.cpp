@@ -108,15 +108,12 @@ int main(int argc, char *argv[])
 	// containers initialization
 	JobContainer jobs;
 	if( false == jobs.isInitialized()) return 1;
-	JobAf::setJobContainer( &jobs);
 
 	UserContainer users;
 	if( false == users.isInitialized()) return 1;
-	UserAf::setUserContainer( &users);
 
 	RenderContainer renders;
 	if( false == renders.isInitialized()) return 1;
-	RenderAf::setRenderContainer( &renders);
 
 	TalkContainer talks;
 	if( false == talks.isInitialized()) return 1;
@@ -124,8 +121,6 @@ int main(int argc, char *argv[])
 	MonitorContainer monitors;
 	if( false == monitors.isInitialized()) return 1;
 	
-	MonitorAf::setMonitorContainer( &monitors);
-
 	// Message Queue initialization, but without thread start.
 	// Run cycle queue will read this messages itself.
 	af::MsgQueue msgQueue("RunMsgQueue", af::AfQueue::e_no_thread);  

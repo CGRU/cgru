@@ -48,9 +48,16 @@ public:
 
 	void jsonRead( const JSON & i_object);
 
+public:
+	/// Set messages delivery queue:
+	inline static void setMsgQueue( MsgQueue * i_msg_queue) { ms_msg_queue = i_msg_queue;}
+
 protected:
 	void clearNetIFs();
 	void grabNetIFs( std::vector<NetIF*> & otherNetIFs);
+
+protected:
+	static MsgQueue * ms_msg_queue;
 
 protected:
 	int64_t     m_time_launch;   ///< Client launch time.

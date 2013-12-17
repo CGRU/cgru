@@ -17,8 +17,6 @@ public:
    af::Msg * addRender( RenderAf *newRender, MonitorContainer * monitoring = NULL);
 
 /// Set Render with \c id zombie, by calling RenderAf::setZombie( \c updateTaskState ) function.
-
-private:
 };
 
 /// Renders iterator.

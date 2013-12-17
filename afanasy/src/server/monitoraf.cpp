@@ -69,7 +69,7 @@ void MonitorAf::v_action( Action & i_action)
 		{
 			af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
 			msg->setAddress( this);
-			AFCommon::QueueMsgDispatch( msg);
+			ms_msg_queue->pushMsg( msg);
 			return;
 		}
 		if( optype == "deregister")

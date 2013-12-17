@@ -11,15 +11,16 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-using namespace af;
-
 RenderContainer::RenderContainer():
-   ClientContainer( "Renders", AFRENDER::MAXCOUNT)
+	ClientContainer( "Renders", AFRENDER::MAXCOUNT)
 {
+	RenderAf::setRenderContainer( this);
+	RenderAf::setMsgQueue( ms_msg_queue);
 }
 
 RenderContainer::~RenderContainer()
 {
+	delete ms_msg_queue;
 AFINFO("RenderContainer::~RenderContainer:")
 }
 

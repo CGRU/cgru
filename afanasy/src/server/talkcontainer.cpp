@@ -16,6 +16,7 @@
 TalkContainer::TalkContainer():
    ClientContainer( "Talks", AFTALK::MAXCOUNT)
 {
+	TalkAf::setMsgQueue( ms_msg_queue);
 }
 
 TalkContainer::~TalkContainer()
@@ -32,7 +33,7 @@ af::Msg * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksAdd, id);
       af::Msg* msg = generateList( af::Msg::TTalksList);
       msg->setAddress( newTalk);
-      AFCommon::QueueMsgDispatch( msg);
+		ms_msg_queue->pushMsg( msg);
    }
    return new af::Msg( af::Msg::TTalkId, id);
 }
@@ -72,7 +73,7 @@ else printf("\n");
 #endif
       }
    }
-   AFCommon::QueueMsgDispatch( message);
+	ms_msg_queue->pushMsg( message);
 }
 
 //##############################################################################
