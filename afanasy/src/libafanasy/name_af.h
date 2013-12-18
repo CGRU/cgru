@@ -33,68 +33,68 @@ struct sockaddr_storage;
 
 namespace af
 {
-   class Attr;
-   class Af;
-   class AfQueue;
-   class AfQueueItem;
+	class Attr;
+	class Af;
+	class AfQueue;
+	class AfQueueItem;
 
-   class Msg;
-   class MsgQueue;
-   class MsgStat;
+	class Msg;
+	class MsgQueue;
+	class MsgStat;
 
-   class Environment;
+	class Environment;
 
-   class RegExp;
-   class NetIF;
-   class Address;
-   class AddressesList;
-   class Passwd;
-   class Farm;
-   class Host;
-   class HostRes;
-   class Parser;
-   class PyClass;
-   class Service;
+	class RegExp;
+	class NetIF;
+	class Address;
+	class AddressesList;
+	class Passwd;
+	class Farm;
+	class Host;
+	class HostRes;
+	class Parser;
+	class PyClass;
+	class Service;
 
-   class MsgClass;
-   class MsgClassUserHost;
-   class MCTest;
-   class MCGeneral;
-   class MCAfNodes;
-   class MCAfNodesIt;
-   class MCTalkmessage;
-   class MCTalkdistmessage;
-   class MCTaskPos;
-   class MCTasksPos;
-   class MCTasksProgress;
-   class MCListenAddress;
-   class MCTaskUp;
-   class MCJobsWeight;
+	class MsgClass;
+	class MsgClassUserHost;
+	class MCTest;
+	class MCGeneral;
+	class MCAfNodes;
+	class MCAfNodesIt;
+	class MCTalkmessage;
+	class MCTalkdistmessage;
+	class MCTaskPos;
+	class MCTasksPos;
+	class MCTasksProgress;
+	class MCListenAddress;
+	class MCTaskUp;
+	class MCJobsWeight;
 
-   class Node;
+	class Node;
 
-   class Client;
-   class Talk;
-   class Render;
-   class Monitor;
+	class Client;
+	class Talk;
+	class Render;
+	class Monitor;
 
-   class UserHeader;
-   class User;
+	class UserHeader;
+	class User;
 
-   class JobHeader;
-   class JobInfo;
-   class Job;
-   class BlockData;
-   class TaskData;
-   class TaskExec;
-   class TaskProgress;
-   class JobProgress;
+	class JobHeader;
+	class JobInfo;
+	class Job;
+	class BlockData;
+	class TaskData;
+	class TaskExec;
+	class TaskProgress;
+	class JobProgress;
 
-   enum VerboseMode
-   {
-      VerboseOff,
-      VerboseOn
-   };
+	enum VerboseMode
+	{
+		VerboseOff,
+		VerboseOn
+	};
 
 	enum InitFlags
 	{
@@ -103,11 +103,11 @@ namespace af
 		InitFarm     = 1 << 1,
 	};
 
-   enum Direction
-   {
-      Left,
-      Right
-   };
+	enum Direction
+	{
+		Left,
+		Right
+	};
 
 	enum MagickMismatchMode
 	{
@@ -141,11 +141,11 @@ namespace af
 
 
 	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags, int i_startFrom = 0);
-   const std::string fillNumbers( const std::string & pattern, long long start, long long end);
-   const std::string replaceArgs( const std::string & pattern, const std::string & arg);
+	const std::string fillNumbers( const std::string & pattern, long long start, long long end);
+	const std::string replaceArgs( const std::string & pattern, const std::string & arg);
 
-   const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
-   const std::string time2strHMS( int time32, bool clamp = false);
+	const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
+	const std::string time2strHMS( int time32, bool clamp = false);
 
 	bool addUniqueToList( std::list<int32_t> & o_list, int i_value);
 	bool addUniqueToVect( std::vector<int> & o_vect, int i_value);
@@ -156,20 +156,20 @@ namespace af
 
 	bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
-   void rw_int32 (  int32_t &integer, char * data, bool write);
-   void rw_uint32( uint32_t &integer, char * data, bool write);
+	void rw_int32 (  int32_t &integer, char * data, bool write);
+	void rw_uint32( uint32_t &integer, char * data, bool write);
 
 	int weigh( const std::string & str);
 	int weigh( const std::list<std::string> & strlist);
 	int weigh( const std::vector<std::string> & i_list);
 
 
-   bool  init( uint32_t flags );
-   void  destroy();
+	bool  init( uint32_t flags );
+	void  destroy();
 
-   bool  loadFarm( bool verbose = false);
-   bool  loadFarm( const std::string & filename, bool verbose = false);
-   Farm * farm();
+	bool  loadFarm( bool verbose = false);
+	bool  loadFarm( const std::string & filename, bool verbose = false);
+	Farm * farm();
 
 
 //
@@ -203,48 +203,52 @@ namespace af
 	bool removeDir( const std::string & i_folder );
 //
 
-   bool netIsIpAddr( const std::string & addr, bool verbose = false);
+	bool netIsIpAddr( const std::string & addr, bool verbose = false);
 
 #ifdef WINNT
-    void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
-    bool launchProgram( PROCESS_INFORMATION * o_pinfo,
-	                    const std::string & i_commandline, const std::string & i_wdir = std::string(),
-                        HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
-                        DWORD i_flags = 0, bool alwaysCreateWindow = false);
+	void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
+	bool launchProgram(
+			PROCESS_INFORMATION * o_pinfo,
+			const std::string & i_commandline, const std::string & i_wdir = std::string(),
+			HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
+			DWORD i_flags = 0, bool alwaysCreateWindow = false
+		);
 #else
-    int launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string(),
-                       FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);
+	int launchProgram(
+			const std::string & i_commandline, const std::string & i_wdir = std::string(),
+			FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL
+		);
 #endif
 
-    /// Calculate messages statistics and write it in buffer, return written size.
-    void statwrite( af::Msg * msg = NULL );
+	/// Calculate messages statistics and write it in buffer, return written size.
+	void statwrite( af::Msg * msg = NULL );
 
-    /// Read messages statistics from buffer.
-    void statread( af::Msg * msg );
+	/// Read messages statistics from buffer.
+	void statread( af::Msg * msg );
 
-    /// Write messages statistics ( in \c stdout ).
-    void statout( int  columns = -1, int sorting = -1);
+	/// Write messages statistics ( in \c stdout ).
+	void statout( int  columns = -1, int sorting = -1);
 
-    /// Solve host address.
-    const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
+	/// Solve host address.
+	const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
 
 	Msg * msgString( const std::string & i_str);
 
-    /// Recieve message from given file discriptor \c desc to \c buffer
-    /** Return true if success. This function will block process.**/
-    bool msgread( int desc, af::Msg* msg);
+	/// Recieve message from given file discriptor \c desc to \c buffer
+	/** Return true if success. This function will block process.**/
+	bool msgread( int desc, af::Msg* msg);
 
-    /// Send message \c msg to given file discriptor
-    /** Return true if success.**/
-    bool msgwrite( int i_desc, const af::Msg * i_msg);
+	/// Send message \c msg to given file discriptor
+	/** Return true if success.**/
+	bool msgwrite( int i_desc, const af::Msg * i_msg);
 
-    /// Send a message to all its addresses and receive an answer if needed
-    Msg * msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose);
+	/// Send a message to all its addresses and receive an answer if needed
+	Msg * msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
 
 
 	// Python:
-    bool PyGetString( PyObject * i_obj, std::string & o_str, const char * i_err_info = NULL);
-    bool PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, const char * i_err_info = NULL);
+	bool PyGetString( PyObject * i_obj, std::string & o_str, const char * i_err_info = NULL);
+	bool PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, const char * i_err_info = NULL);
 
 
 	// JSON:

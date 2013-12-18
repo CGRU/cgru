@@ -184,14 +184,14 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 }
 
 af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
-						    bool & io_ok, af::VerboseMode i_verbose)
+						    bool & o_ok, af::VerboseMode i_verbose)
 {
-	io_ok = true;
+	o_ok = true;
 
 	if( i_address.isEmpty() )
 	{
 		AFERROR("msgsendtoaddress: Address is empty.")
-		io_ok = false;
+		o_ok = false;
 		return NULL;
 	}
 
@@ -203,7 +203,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
 	{
 		AFERRPE("msgsendtoaddress: socket() call failed")
-		io_ok = false;
+		o_ok = false;
 		return NULL;
 	}
 
@@ -253,7 +253,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		alarm(0);
 #endif //WINNT
 */
-		io_ok = false;
+		o_ok = false;
 		return NULL;
 	}
 /*
@@ -268,7 +268,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		AFERRAR("af::msgsend: can't send message to client: %s",
 				i_address.v_generateInfoString().c_str())
 		closesocket(socketfd);
-		io_ok = false;
+		o_ok = false;
 		return NULL;
 	}
 
@@ -302,12 +302,12 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		{
 			o_msg = new af::Msg();
 			o_msg->setData( buffer.size(), buffer.c_str(), af::Msg::TJSON);
-			io_ok = true;
+			o_ok = true;
 		}
 		else
 		{
 			AFERROR("msgsendtoaddress: Reading JSON answer failed.")
-			io_ok = false;
+			o_ok = false;
 		}
 
 		closesocket(socketfd);
@@ -322,7 +322,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	   AFERROR("msgsendtoaddress: Reading binary answer failed.")
 	   closesocket( socketfd);
 	   delete o_msg;
-	   io_ok = false;
+	   o_ok = false;
 	   return NULL;
 	}
 
@@ -493,7 +493,7 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 	return true;
 }
 
-af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
+af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 {
 	if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
 	{
@@ -503,14 +503,14 @@ af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 	if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
 	{
 		AFERROR("af::msgsend: Message has no addresses to send to.")
-		io_ok = false;
+		o_ok = false;
 		i_msg->v_stdOut();
 		return NULL;
 	}
 
 	if( false == i_msg->addressIsEmpty())
 	{
-		af::Msg * o_msg = ::msgsendtoaddress( i_msg, i_msg->getAddress(), io_ok, i_verbose);
+		af::Msg * o_msg = ::msgsendtoaddress( i_msg, i_msg->getAddress(), o_ok, i_verbose);
 		if( o_msg != NULL )
 			return o_msg;
 	}
@@ -527,7 +527,7 @@ af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 		::msgsendtoaddress( i_msg, *it, ok, i_verbose);
 		if( false == ok )
 		{
-			io_ok = false;
+			o_ok = false;
 			// Store an address that message was failed to send to
 			i_msg->setAddress( *it);
 		}
