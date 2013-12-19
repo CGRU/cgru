@@ -16,7 +16,7 @@
 #include "../include/macrooutput.h"
 
 const int ButtonMonitor::ButtonsHeight = 25;
-ButtonMonitor * ButtonMonitor::Buttons[Watch::WLAST] = {0,0,0,0,0,0};
+ButtonMonitor * ButtonMonitor::Buttons[Watch::WLAST] = {0,0,0,0,0};
 ButtonMonitor * ButtonMonitor::Current = NULL;
 int ButtonMonitor::CurrentType = Watch::WNONE;
 
@@ -62,9 +62,6 @@ void ButtonMonitor::createImage()
          break;
       case Watch::WUsers:
          img_filename += "users";
-         break;
-      case Watch::WTalks:
-         img_filename += "talks";
          break;
       case Watch::WMonitors:
          img_filename += "monitors";
@@ -149,7 +146,6 @@ void ButtonMonitor::createImage()
             width = 110;
             height = 30;
             break;
-         case Watch::WTalks:
          case Watch::WMonitors:
             width = 40;
             height = 24;

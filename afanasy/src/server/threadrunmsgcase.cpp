@@ -12,7 +12,6 @@
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
-#include "talkcontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -30,13 +29,6 @@ switch ( i_msg->type())
 	case af::Msg::TJSON:
 	{
 		threadRunJSON( i_args, i_msg);
-		break;
-	}
-	case af::Msg::TTalkDeregister:
-	{
-		TalkContainerIt it( i_args->talks);
-		TalkAf* node = it.getTalk( i_msg->int32());
-		if( node ) node->deregister( i_args->monitors);
 		break;
 	}
 	case af::Msg::TMonitorDeregister:

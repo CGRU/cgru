@@ -17,7 +17,6 @@
 #include "monitorcontainer.h"
 #include "sysjob.h"
 #include "rendercontainer.h"
-#include "talkcontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -115,9 +114,6 @@ int main(int argc, char *argv[])
 	RenderContainer renders;
 	if( false == renders.isInitialized()) return 1;
 
-	TalkContainer talks;
-	if( false == talks.isInitialized()) return 1;
-
 	MonitorContainer monitors;
 	if( false == monitors.isInitialized()) return 1;
 	
@@ -132,7 +128,6 @@ int main(int argc, char *argv[])
 	threadArgs.jobs      = &jobs;
 	threadArgs.renders   = &renders;
 	threadArgs.users     = &users;
-	threadArgs.talks     = &talks;
 	threadArgs.monitors  = &monitors;
 	threadArgs.msgQueue  = &msgQueue;
 

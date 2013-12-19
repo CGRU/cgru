@@ -8,7 +8,7 @@ echo "Depends for $DISTRIBUTIVE:"
 case ${DISTRIBUTIVE} in
 	Debian | Ubuntu | Mint )
 		export DEPENDS_AFANASY="libpq5"
-		export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network libqt4-xml"
+		export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
 		export DEPENDS_CGRU="python-qt4 imagemagick"
 		;;
 	Fedora )

@@ -18,7 +18,6 @@
 #include "monitoraf.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
-#include "talkcontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -86,7 +85,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AfContainerLock jlock( i_args->jobs,	 AfContainerLock::WRITELOCK);
 		AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
-		AfContainerLock tlock( i_args->talks,	AfContainerLock::WRITELOCK);
 		AfContainerLock ulock( i_args->users,	AfContainerLock::WRITELOCK);
 		printf("\n	========= RELOADING CONFIG =========\n\n");
 		std::string message;
@@ -184,54 +182,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		o_msg_response = new af::Msg();
 		o_msg_response->setStringList( node->getLog());
 		break;
-	}
-
-// ---------------------------------- Talk ---------------------------------//
-	case af::Msg::TTalkRegister:
-	{
-		AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
-		AfContainerLock tlock( i_args->talks,	 AfContainerLock::WRITELOCK);
-
-		TalkAf * newTalk = new TalkAf( i_msg);
-		newTalk->setAddressIP( i_msg->getAddress());
-		o_msg_response = i_args->talks->addTalk( newTalk, i_args->monitors);
-		break;
-	}
-	case af::Msg::TTalksListRequest:
-	{
-	  AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
-
-	  o_msg_response = i_args->talks->generateList( af::Msg::TTalksList);
-	  break;
-	}
-	case af::Msg::TTalksListRequestIds:
-	{
-	  AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
-
-	  af::MCGeneral ids( i_msg);
-	  o_msg_response = i_args->talks->generateList( af::Msg::TTalksList, ids);
-	  break;
-	}
-	case af::Msg::TTalkUpdateId:
-	{
-	  AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
-
-	  if( i_args->talks->updateId( i_msg->int32()))
-	  {
-		 o_msg_response = i_args->talks->generateList( af::Msg::TTalksList);
-	  }
-	  else
-	  {
-		 o_msg_response = new af::Msg( af::Msg::TTalkId, 0);
-	  }
-	  break;
-	}
-	case af::Msg::TTalkDistributeData:
-	{
-	  AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
-
-	  i_args->talks->distributeData( i_msg);
-	  break;
 	}
 
 // ---------------------------------- Render -------------------------------//
@@ -678,7 +628,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TTaskUpdatePercent:
 	case af::Msg::TTaskListenOutput:
 	case af::Msg::TRenderDeregister:
-	case af::Msg::TTalkDeregister:
 	case af::Msg::TMonitorSubscribe:
 	case af::Msg::TMonitorUnsubscribe:
 	case af::Msg::TMonitorDeregister:

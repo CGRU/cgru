@@ -4,7 +4,7 @@ import os
 import shutil
 
 store = ['FindPostgreSQL.cmake','.gitignore','.svn','build.sh','build_ostype.sh','override.sh','override.cmd','clear.py','clear.cmd','CMakeLists.txt','win_build_msvc_pyaf.cmd','win_build_msvc.cmd']
-projects = ['libafanasy','libafqt','libafsql','cmd','server','render','talk','watch','monitor']
+projects = ['libafanasy','libafqt','libafsql','cmd','server','render','watch']
 
 DEBUG = True
 DEBUG = False

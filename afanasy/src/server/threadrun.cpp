@@ -7,7 +7,6 @@
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
-#include "talkcontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -49,7 +48,6 @@ void threadRunCycle( void * i_args)
 	AfContainerLock jLock( a->jobs,     AfContainerLock::WRITELOCK);
 	AfContainerLock lLock( a->renders,  AfContainerLock::WRITELOCK);
 	AfContainerLock mlock( a->monitors, AfContainerLock::WRITELOCK);
-	AfContainerLock tlock( a->talks,    AfContainerLock::WRITELOCK);
 	AfContainerLock ulock( a->users,    AfContainerLock::WRITELOCK);
 
 	//
@@ -76,7 +74,6 @@ void threadRunCycle( void * i_args)
 	// Refresh data:
 	//
 	AFINFO("ThreadRun::run: Refreshing data:")
-	a->talks    ->refresh( NULL,        a->monitors);
 	a->monitors ->refresh( NULL,        a->monitors);
 	a->jobs     ->refresh( a->renders,  a->monitors);
 	a->renders  ->refresh( a->jobs,     a->monitors);
@@ -168,7 +165,6 @@ void threadRunCycle( void * i_args)
 	// Free Containers:
 	//
 	AFINFO("ThreadRun::run: deleting zombies:")
-	a->talks    ->freeZombies();
 	a->monitors ->freeZombies();
 	a->renders  ->freeZombies();
 	a->jobs     ->freeZombies();

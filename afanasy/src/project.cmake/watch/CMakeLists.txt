@@ -20,7 +20,6 @@ set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listmonitors.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listnodes.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listrenders.h"
- "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listtalks.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listtasks.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listusers.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/modelnodes.h"

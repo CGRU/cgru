@@ -28,9 +28,9 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const QString Watch::BtnName[WLAST] = { "NULL","JOBS","USERS","RENDERS","T","M"};
-const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Talks","Monitors"};
-WndList* Watch::opened[WLAST] = {0,0,0,0,0,0};
+const QString Watch::BtnName[WLAST] = { "NULL","JOBS","USERS","RENDERS","M"};
+const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
+WndList* Watch::opened[WLAST] = {0,0,0,0,0};
 
 QLinkedList<Wnd*>      Watch::ms_windows;
 QLinkedList<Reciever*> Watch::ms_recievers;

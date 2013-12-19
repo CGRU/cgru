@@ -41,8 +41,6 @@ puts "OS="+toolset.tag("target_os")
     end
     required_prj "server.mxx.rb"
     required_prj "cmd.mxx.rb"
-    required_prj "talk.mxx.rb"
     required_prj "render.mxx.rb"
     required_prj "watch.mxx.rb"
-    required_prj "monitor.mxx.rb"
 }

@@ -9,7 +9,6 @@
 #include "../user.h"
 #include "../render.h"
 #include "../monitor.h"
-#include "../talk.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -68,9 +67,6 @@ Af* MCAfNodes::newNode( Msg * msg )
    {
       case Msg::TMonitorsList:
          return new Monitor( msg);
-
-      case Msg::TTalksList:
-         return new Talk( msg);
 
       case Msg::TJobsList:
          return new Job( msg);

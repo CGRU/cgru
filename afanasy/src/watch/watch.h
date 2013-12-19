@@ -31,7 +31,6 @@ public:
 		WJobs,
 		WUsers,
 		WRenders,
-		WTalks,
 		WMonitors,
 
 		WLAST

@@ -25,7 +25,6 @@
 #include "monitoraf.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
-#include "talkcontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 

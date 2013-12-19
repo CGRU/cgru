@@ -74,7 +74,6 @@ namespace af
 	class Node;
 
 	class Client;
-	class Talk;
 	class Render;
 	class Monitor;
 

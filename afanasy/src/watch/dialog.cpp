@@ -17,7 +17,6 @@
 #include "listjobs.h"
 #include "listusers.h"
 #include "listrenders.h"
-#include "listtalks.h"
 #include "listmonitors.h"
 #include "monitorhost.h"
 #include "offlinescreen.h"
@@ -417,12 +416,6 @@ bool Dialog::openMonitor( int type, bool open)
       displayInfo("Render hosts list.");
       break;
    }
-   case Watch::WTalks:
-   {
-      newlist = new ListTalks( parent);
-      displayInfo("Talks chat dialogs.");
-      break;
-   }
    case Watch::WMonitors:
    {
       newlist = new ListMonitors( parent);
@@ -458,9 +451,6 @@ void Dialog::keyPressEvent( QKeyEvent * event)
    {
       if( af::Environment::GOD())
       {
-         m_btnMonitor[Watch::WTalks] = new ButtonMonitor( Watch::WTalks, this);
-         m_hlayout_b->addWidget( m_btnMonitor[Watch::WTalks]);
-
          m_btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
          m_hlayout_b->addWidget( m_btnMonitor[Watch::WMonitors]);
 
@@ -474,11 +464,6 @@ void Dialog::keyPressEvent( QKeyEvent * event)
       }
       else
       {
-         if( m_btnMonitor[Watch::WTalks])
-         {
-            delete m_btnMonitor[Watch::WTalks];
-            m_btnMonitor[Watch::WTalks] = NULL;
-         }
          if( m_btnMonitor[Watch::WMonitors])
          {
             delete m_btnMonitor[Watch::WMonitors];
