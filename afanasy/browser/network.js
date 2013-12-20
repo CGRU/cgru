@@ -51,7 +51,8 @@ function n_XHRHandler()
 			try { recv_obj = JSON.parse( this.responseText);}
 			catch( err)
 			{
-				g_Log(err.message+'\n\n'+this.responseText);
+				g_Error('JSON.parse:');
+				g_Log( err.message+'<br>'+this.responseText);
 				recv_obj = null;
 			}
 

@@ -9,10 +9,11 @@ function Monitor( i_args)
 	this.document = this.window.document;
 
 	this.nodeConstructor = null;
-	if     ( this.type == 'jobs'   ) this.nodeConstructor = JobNode;
-	else if( this.type == 'renders') this.nodeConstructor = RenderNode;
-	else if( this.type == 'users'  ) this.nodeConstructor = UserNode;
-	else if( this.type == 'tasks'  ) this.nodeConstructor = TaskItem;
+	if     ( this.type == 'jobs'    ) this.nodeConstructor = JobNode;
+	else if( this.type == 'renders' ) this.nodeConstructor = RenderNode;
+	else if( this.type == 'users'   ) this.nodeConstructor = UserNode;
+	else if( this.type == 'tasks'   ) this.nodeConstructor = TaskItem;
+	else if( this.type == 'monitors') this.nodeConstructor = MonitorNode;
 
 	if( this.nodeConstructor.createActions)
 		this.nodeConstructor.createActions();

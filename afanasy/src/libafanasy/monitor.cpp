@@ -33,28 +33,7 @@ const char Monitor::EventsNames[Monitor::EventsCount][32] = {
 	"talks_del",
 	"COMMON_END"
 };
-/*
-const char Monitor::EventsClasses[Monitor::EventsCount][32] = {
-	"jobs",
-	"jobs",
-	"jobs",
-	"jobs",
-	"jobs",
-	"common",
-	"users",
-	"users",
-	"users",
-	"renders",
-	"renders",
-	"renders",
-	"monitors",
-	"monitors",
-	"monitors",
-	"talks",
-	"talks",
-	"common"
-};
-*/
+
 Monitor::Monitor():
    Client( Client::GetEnvironment, 0)
 //	m_listening_port(true)
@@ -127,9 +106,14 @@ void Monitor::v_readwrite( Msg * msg)
 
 void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
+	o_str << "{";
+
 	Client::v_jsonWrite( o_str, i_type);
 
 	o_str << "\n,\"uid\":" << m_uid;
+	o_str << "\n,\"time_activity\":" << m_time_activity;
+
+	o_str << "\n}";
 }
 
 bool Monitor::hasEvent( int type) const

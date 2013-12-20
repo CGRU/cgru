@@ -122,6 +122,12 @@ void MonitorAf::v_action( Action & i_action)
 				eids.push_back( af::Msg::TMonitorUsersChanged);
 				eids.push_back( af::Msg::TMonitorUsersDel);
 			}
+			else if( opclass == "monitors")
+			{
+				eids.push_back( af::Msg::TMonitorMonitorsAdd);
+				eids.push_back( af::Msg::TMonitorMonitorsChanged);
+				eids.push_back( af::Msg::TMonitorMonitorsDel);
+			}
 			else
 			{
 				appendLog("Unknown operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_action.author);

@@ -58,6 +58,8 @@ border: 1px inset #555;
 color: #353;
 box-shadow: 0px 0px 5px #250 inset, 0px 0px 10px rgba(255,255,255,.7);
 }
+#header .mbutton.god_only { display: none;}
+#header.su_god .mbutton.god_only { display: inline; }
 
 #content {
 position: absolute;

@@ -76,9 +76,9 @@ af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
 		return new af::Msg( af::Msg::TMonitorId, id);
 
 	std::ostringstream str;
-	str << "{\"monitor\":{";
+	str << "{\"monitor\":";
 	i_monitor->v_jsonWrite( str, 0);
-	str << "}}";
+	str << "}";
 	return af::jsonMsg( str);
 }
 
