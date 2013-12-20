@@ -36,13 +36,16 @@ char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int 
 	{
 		int pos = o_doc.GetErrorOffset();
 		err = err + "JSON: " + o_doc.GetParseError();
-		err = err + "(at character " + af::itos( pos) + "):\n";
+		err = err + " (at character " + af::itos( pos) + " of " + af::itos( i_data_len)  + "):\n";
 		if(( pos >= 0 ) && ( pos < i_data_len ))
 		{
-			int begin = pos - 100;
+			static const int offset = 50;
+			int begin = pos - offset;
 			if( begin < 0 ) begin = 0;
-			int len = pos - begin + 1;
-			err += std::string( i_data + begin, len);
+			int end = pos + offset;
+			if( end >= i_data_len ) end = i_data_len - 1;
+			err += std::string( ' ', offset) + "!\n";
+			err += std::string( i_data + begin, end - begin);
 		}
 		delete [] data;
 		data = NULL;

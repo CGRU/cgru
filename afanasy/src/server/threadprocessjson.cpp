@@ -246,7 +246,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				}
 				else
 				{
-					o_msg_response = af::jsonMsg("{\"error\":\"id not specified\"}");
+					o_msg_response = af::jsonMsgError("id is not specified");
 				}
 			}
 			else
@@ -278,7 +278,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		i_args->msgQueue->pushMsg( i_msg);
 		// To not to detele it, set to NULL, as it pushed to another queue
-		i_msg = NULL; //< To not to detele it, as it pushed to another queue
+		i_msg = NULL;
 	}
 	else if( document.HasMember("job"))
 	{
