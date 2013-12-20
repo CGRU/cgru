@@ -483,11 +483,16 @@ function g_ShowGraph( i_data, i_args)
 					ty.push( py[i]);
 				else
 				{
-					var _ty = py[i] - tl * ( py[i+1] - py[i-1] );
+//					var _ty = py[i] - tl * ( py[i+1] - py[i-1] );
+					var _ty = tl * ( py[i+1] - py[i-1] );
+//					if(( py[i] + _ty < 0 ) || ( py[i] - _ty < 0 ))
 					if( py[i] + _ty < 0 )
-						ty.push( py[i]);
+						ty.push( py[i] * 2 );
+					else if( py[i] - _ty < 0 )
+						ty.push( 0 );
 					else
-						ty.push( py[i] - tl * ( py[i+1] - py[i-1] ));
+						ty.push( py[i] - _ty );
+//						ty.push( py[i] - tl * ( py[i+1] - py[i-1] ));
 				}
 			}
 		}
