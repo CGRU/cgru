@@ -1,6 +1,8 @@
 #include "../libafanasy/common/dlThread.h"
 
+#ifndef WINNT
 #include <sys/wait.h>
+#endif
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
@@ -105,8 +107,7 @@ int main(int argc, char *argv[])
 		pid_t pid = 0;
 		#ifdef WINNT
 		PROCESS_INFORMATION m_pinfo;
-    	if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr,
-			CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+    	if( af::launchProgram( &m_pinfo, command, "", 0, 0, 0))
 			m_pid = m_pinfo.dwProcessId;
 		DWORD result = WaitForSingleObject( m_pinfo.hProcess, 0);
 		if ( result == WAIT_OBJECT_0)
