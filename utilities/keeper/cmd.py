@@ -30,11 +30,9 @@ def setWebBrowser(): getVar('webbrowser','Set Web Browser','Enter command with "
 def afwebgui(): cgruutils.webbrowse( cgruconfig.VARS['af_servername']+':'+str(cgruconfig.VARS['af_serverport']))
 
 def exitRender(  text = '(keeper)'): af.Cmd().renderExit( text)
-def exitTalk(    text = '(keeper)'): af.Cmd().talkExit( text)
 def exitMonitor( text = '(keeper)'): af.Cmd().monitorExit( text)
 def exitClients( text = '(keeper)'):
    exitRender( text)
-   exitTalk( text)
    exitMonitor( text)
 
 def quitExitClients():

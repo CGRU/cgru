@@ -368,13 +368,6 @@ class Cmd:
 		self.data['operation'] = {'type':'exit'}
 		self._sendRequest()
 
-	def talkExit( self, text):
-		self.action = 'action'
-		self.data['type'] = 'talks'
-		self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + cgruconfig.VARS['HOSTNAME'] + ':.*'
-		self.data['operation'] = {'type':'exit'}
-		self._sendRequest()
-
 	def monitorExit( self, text):
 		self.action = 'action'
 		self.data['type'] = 'monitors'
