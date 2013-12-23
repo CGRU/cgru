@@ -27,8 +27,12 @@ mput *.html *.php *.txt
 ls
 
 mkdir lib
-mput lib/*.css lib/*.js
+mput lib/*.css
 ls lib
+
+mkdir lib/js
+mput lib/js/*.js
+ls lib/js
 
 mkdir rules
 mput rules/*.css rules/*.js
