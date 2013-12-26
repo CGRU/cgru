@@ -311,6 +311,8 @@ function gui_CreateChoises( i_args)
 		el.classList.add('choise');
 		el.classList.add('button');
 		el.textContent = keys[key].name;
+		if( keys[key].tooltip ) el.title = keys[key].tooltip;
+		else if( keys[key].value ) el.title = keys[key].value;
 		el.onclick = gui_ChoiseOnClick;
 		var value = key;
 		if( keys[key].value ) value = keys[key].value;

@@ -41,11 +41,15 @@ function fu_Put( i_path)
 
 	var elAfDiv = document.createElement('div');
 	elBtns.appendChild( elAfDiv);
-	elAfDiv.classList.add('label');
-	elAfDiv.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+	elAfDiv.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elAfDiv.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
 	var elSend = document.createElement('div');
-	elBtns.appendChild( elSend);
+	elAfDiv.appendChild( elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.onclick = function(e){ fu_PutDo( e.currentTarget.m_wnd);}
@@ -129,11 +133,15 @@ function fu_Checksum( i_args)
 
 	var elAfDiv = document.createElement('div');
 	elBtns.appendChild( elAfDiv);
-	elAfDiv.classList.add('label');
-	elAfDiv.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+	elAfDiv.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elAfDiv.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
 	var elSend = document.createElement('div');
-	elBtns.appendChild( elSend);
+	elAfDiv.appendChild( elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.onclick = function(e){ fu_ChecksumDo( e.currentTarget.m_wnd);}

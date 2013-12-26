@@ -154,8 +154,8 @@
 	"activity":"comp",
 
 	"colorspaces":{
-		"auto":   {"name":"Auto",      "value":"auto"},
-		"ext":    {"name":"Extension", "value":"extension"},
+		"auto":   {"name":"Auto",      "value":"auto",      "tooltip":"Try to read metadata"},
+		"ext":    {"name":"Extension", "value":"extension", "tooltip":"By image extension:\nDPX,CIN: cineon\nEXR: linear\nAny Other: sRGB"},
 		"linear": {"name":"Linear",    "value":"RGB"},
 		"srgb":   {"name":"sRGB",      "value":"sRGB"},
 		"log":    {"name":"Cineon",    "value":"Log"}
