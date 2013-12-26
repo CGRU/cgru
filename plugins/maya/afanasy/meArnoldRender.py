@@ -255,7 +255,9 @@ class meArnoldRender ( object ) :
     cmd = 'kick'
     if ar_verbosity_level != 0 : cmd += ' -v ' + str ( ar_verbosity_level )
     if ar_threads         != 0 : cmd += ' -t ' + str ( ar_threads )
-    cmd += ' -nstdin -dw -dp -nocrashpopup -i '
+    # cmd += ' -nstdin -dw -dp -nocrashpopup -i '
+    # !!! -nocrashpopup flag doesn't support in kick linux version
+    cmd += ' -nstdin -dw -dp -i '
 
     if len( options):
       cmd += ' ' + options

@@ -255,6 +255,6 @@ def mrShaderManager ( arg ): mel.eval ( "mrShaderManager" )
 #
 def checkTextures ( arg ) :
   #
-  import meTools.meCheckTexturePaths as tx
+  import afanasy.meCheckTexturePaths as tx
   #reload( tx )
   tx.meCheckTexturePaths () 
