@@ -144,8 +144,9 @@
 	"af_sysjob_events_service":"events",
 
 "":"Network:",
-	"af_srv_so_rcvtimeo_sec":2,
-	"af_srv_so_sndtimeo_sec":2,
+	"af_server_so_rcvtimeo_sec":2,
+	"af_server_so_sndtimeo_sec":2,
+	"af_server_so_msgtimeo_sec":2,
  
 	"":""
 }}

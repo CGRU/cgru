@@ -75,7 +75,7 @@
 	},{
 
 		"name":"Server",
-		"mask":"server.*|srv.*|cap.*",
+		"mask":"server.*|srv.*",
 		"description":"Captain.",
 		"capacity":1100,
 		"maxtasks":2,

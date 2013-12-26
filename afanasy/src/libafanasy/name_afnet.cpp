@@ -220,7 +220,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	// set socket maximum time to wait for an output operation to complete
 	timeval so_timeo;
 	so_timeo.tv_usec = 0;
-	so_timeo.tv_sec = af::Environment::getServerMsg_SO_TIMEO_SEC();
+	so_timeo.tv_sec = af::Environment::getServer_SO_MSGTIMEO_SEC();
 	if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
 	{
 		AFERRPE("msgsendtoaddress: set socket SO_RCVTIMEO option failed")

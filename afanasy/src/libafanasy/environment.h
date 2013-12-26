@@ -187,7 +187,7 @@ public:
 
 	static inline int getServer_SO_RCVTIMEO_SEC() { return server_so_rcvtimeo_sec;  }
 	static inline int getServer_SO_SNDTIMEO_SEC() { return server_so_sndtimeo_sec;  }
-	static inline int getServerMsg_SO_TIMEO_SEC() { return server_msg_so_timeo_sec; }
+	static inline int getServer_SO_MSGTIMEO_SEC() { return server_so_msgtimeo_sec; }
 
 private:
 
@@ -346,7 +346,7 @@ private:
 
 	static int server_so_rcvtimeo_sec;
 	static int server_so_sndtimeo_sec;
-	static int server_msg_so_timeo_sec;
+	static int server_so_msgtimeo_sec;
 
 	static Passwd * passwd;
 	static bool visor_mode;     ///< user is VISOR
