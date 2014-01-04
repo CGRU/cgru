@@ -83,10 +83,7 @@ if( $DEBUG)
 
    if( $pause) $cmd += " -pause";
 
-   if(`about -windows`)
-      $cmd = "python \"" + `getenv AF_ROOT` + "/python/afjob.py\" " + $cmd;
-   else
-      $cmd = `getenv AF_ROOT` + "/python/afjob.sh " + $cmd +  " &";
+	$cmd = "python \"" + `getenv AF_ROOT` + "/python/afjob.py\" " + $cmd;
 
    //
    // if debug mode print command and return
