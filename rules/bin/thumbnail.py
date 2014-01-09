@@ -89,6 +89,7 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 			continue
 		for root, dirs, files in os.walk( folder):
 			if len( files) == 0: continue
+			if os.path.basename(root)[0] == '_': continue
 			if os.path.basename(root) in SkipFolders:
 				if Options.verbose:
 					print('Skipping: "%s"' % root)
