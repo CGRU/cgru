@@ -347,7 +347,7 @@ Images with width/height ratio > this value will be treated as 2:1.')
          self.evaluate()
 
    def browseOutput( self):
-      folder = QtGui.QFileDialog.getExistingDirectoryy( self,'Choose a folder', self.editOutput.text())
+      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a folder', self.editOutput.text())
       if len( folder):
          self.editOutput.setText( folder)
          self.evaluate()
