@@ -1,7 +1,7 @@
 
 function gui_Create( i_wnd, i_params, i_values)
 {
-	i_wnd.classList.add('dialog');
+	i_wnd.classList.add('gui');
 	if( i_wnd.m_elements == null ) i_wnd.m_elements = {};
 	for( var p in i_params)
 	{
@@ -336,5 +336,67 @@ function gui_ChoiseOnClick( i_evt)
 		elements[i].classList.remove('selected');
 	el.classList.add('selected');
 	wnd.m_choises[name].value = el.m_value;
+}
+
+function gui_CreateTabs( i_tabs, i_elParent)
+{
+	var o_elTabs = [];
+
+	i_elParent.classList.add('gui');
+	i_elParent.classList.add('tab');
+
+	var elLabels = [];
+	for( var tab in i_tabs)
+	{
+		var elLabel = document.createElement('div');
+		i_elParent.appendChild( elLabel);
+		elLabel.classList.add('tablabel');
+		if( i_tabs[tab].label )
+			elLabel.textContent = i_tabs[tab].label;
+		else
+		{
+			elLabel.textContent = tab.replace(/_/g,' ');
+			elLabel.style.textTransform = 'capitalize';
+		}
+		if( i_tabs[tab].tooltip )
+			elLabel.title = i_tabs[tab].tooltip;
+
+		elLabel.m_tab = tab;
+		elLabel.onclick = function(e){
+			var el = e.currentTarget;
+			for( var i = 0; i < el.m_elLabels.length; i++ )
+			{
+				el.m_elLabels[i].classList.remove('active');
+				el.m_elLabels[i].m_elTab.style.display = 'none';
+			}
+			el.m_elTab.style.display = 'block';
+			el.classList.add('active');
+		}
+
+		elLabels.push( elLabel);
+	}
+
+	for( var i = 0; i < elLabels.length; i++)
+	{
+		var tab = elLabels[i].m_tab;
+
+		var elTab = document.createElement('div');
+		i_elParent.appendChild( elTab);
+		elTab.classList.add('tabpanel');
+		elTab.style.display = 'none';
+
+		elLabels[i].m_elTab = elTab;
+		elLabels[i].m_elLabels = elLabels;
+		o_elTabs[tab] = elTab;
+elTab.textContent = 'Panel for ' + tab;
+	}
+
+//	for( var i = 0; i < elLabels.length; i++)
+//		elLabels[i].m_elTabs = o_elTabs;
+
+	elLabels[0].classList.add('active');
+	o_elTabs[elLabels[0].m_tab].style.display = 'block';
+
+	return o_elTabs;
 }
 
