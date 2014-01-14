@@ -60,7 +60,6 @@
 
 "":"Job:",
 	"af_task_default_capacity":1000,
-	"af_task_update_timeout":300,
 	"af_task_log_linesmax":100,
 
 "":"Render:",
@@ -83,6 +82,7 @@
 	"af_render_nice":10,
 	"af_render_update_sec":5,
 	"af_render_updatetaskperiod":1,
+	"af_task_update_timeout":15,
 	"af_render_zombietime":60,
 	"af_render_connectretries":3,
 	"af_render_waitforconnected":15000,
