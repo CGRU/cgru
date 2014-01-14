@@ -333,6 +333,7 @@ function g_ShowGraph( i_data, i_args)
 		var line = 'M ' + x + ' ' + y;
 		line += ' L ' + x + ' ' + ( y + ( draw_text ? 10 : 5 ) );
 		path.setAttribute('d', line);
+		path.setAttribute('title', date.toLocaleString());
 //console.log( line)
 
 		if( false == draw_text )
@@ -361,6 +362,7 @@ function g_ShowGraph( i_data, i_args)
 		text.setAttribute('font-size', 12);
 		text.setAttribute('fill', color);
 		text.textContent = date_txt;
+		text.setAttribute('title', date.toLocaleString());
 
 		date_prev = date;
 
@@ -377,6 +379,7 @@ function g_ShowGraph( i_data, i_args)
 		text.setAttribute('font-size', 12);
 		text.setAttribute('fill', color);
 		text.textContent = date_txt;
+		text.setAttribute('title', date.toLocaleString());
 	}
 
 	// Draw Y:
@@ -445,6 +448,7 @@ function g_ShowGraph( i_data, i_args)
 		path.setAttribute('stroke-width','1.5');
 //		path.setAttribute('stroke-line-join','miter');
 		path.setAttribute('fill','none');
+		path.setAttribute('title', select_name);
 
 		// Time interval loop to store values:
 		var px = [];
