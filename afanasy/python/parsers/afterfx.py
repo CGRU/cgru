@@ -9,8 +9,16 @@ class afterfx(parser.parser):
 	def __init__( self):
 		parser.parser.__init__( self)
 		self.firstframe = True
+		self.data_all = ''
 
 	def do( self, data, mode):
+		self.data_all += data
+
+		# Check whether was any progress:
+		if mode == 'finished':
+			if self.data_all.find('PROGRESS') == -1:
+				self.badresult = True
+
 		match = re_frame.search( data)
 		if match is None: return      
 		if not self.firstframe: self.frame += 1
