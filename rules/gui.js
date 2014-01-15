@@ -110,6 +110,9 @@ function gui_Create( i_wnd, i_params, i_values)
 				elValue.contentEditable = 'true';
 		}
 
+		if( i_params[p].pulldown )
+			gui_PullDownCreate({"elParent":elDiv,"elValue":elValue,"menu":i_params[p].pulldown});
+
 		var values = [];
 		if( i_params[p].default )
 			values.push( i_params[p].default )
@@ -133,6 +136,50 @@ function gui_Create( i_wnd, i_params, i_values)
 
 		i_wnd.m_elements[p] = elValue;
 	}
+}
+
+function gui_PullDownCreate( i_args)
+{
+	i_args.elParent.classList.add('pulldown');
+
+	var elBtn = document.createElement('div');
+	i_args.elParent.insertBefore( elBtn, i_args.elValue);
+	elBtn.classList.add('pulldown_btn');
+	elBtn.textContent = '[<>]';
+	elBtn.m_args = i_args;
+
+	elBtn.onclick = function( i_evt)
+	{
+		var args = i_evt.currentTarget.m_args;
+		if( args.elDiv )
+		{
+			args.elParent.removeChild( args.elDiv);
+			args.elDiv = null;
+			return;
+		}
+
+		args.elDiv = document.createElement('div');
+		args.elParent.appendChild( args.elDiv);
+		args.elDiv.classList.add('pulldown_menu');
+
+		for( var i = 0; i < args.menu.length; i++ )
+		{
+			var el = document.createElement('div');
+			args.elDiv.appendChild( el);
+			el.classList.add('pulldown_item');
+			el.textContent = args.menu[i];
+			el.m_args = args;
+			el.onclick = gui_PullDownClicked;
+		}
+	}
+}
+function gui_PullDownClicked( i_evt)
+{
+	var args = i_evt.currentTarget.m_args;
+	args.elValue.textContent = i_evt.currentTarget.textContent;
+	if( args.elDiv )
+		args.elParent.removeChild( args.elDiv);
+	args.elDiv = null;
 }
 
 function gui_ListAction( i_evt)

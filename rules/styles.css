@@ -582,6 +582,11 @@ box-shadow: 0 0 4px #000 inset;
 .gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 6px 6px 0 0; box-shadow: 0 0 2px #000; cursor: pointer; float: left; }
 .gui .tablabel.active { box-shadow: 0 0 2px #000 inset; background: rgba(100,255,255,.2); }
 .gui .tabpanel { padding: 2px 8px; box-shadow: 0 0 2px inset; clear: both; }
+.gui .pulldown_btn { font-size: 12px; }
+.gui .pulldown_btn, .gui .pulldown_item { float: right; cursor: pointer; border-radius: 3px; box-shadow: 0 0 1px; }
+.gui .pulldown_item:hover, .gui .pulldown_btn:hover { background: rgba(100,255,255,.2); }
+.gui .pulldown_item { margin: 1px 4px; padding: 1px 4px; }
+.gui .pulldown_menu { border-radius: 6px; box-shadow: 0 0 2px inset; }
 
 /* ==================== WINDOWS: ======================================== */
 .administrate { color: #000000; font-size: 14px; }
