@@ -435,11 +435,8 @@ function gui_CreateTabs( i_tabs, i_elParent)
 		elLabels[i].m_elTab = elTab;
 		elLabels[i].m_elLabels = elLabels;
 		o_elTabs[tab] = elTab;
-elTab.textContent = 'Panel for ' + tab;
+//elTab.textContent = 'Panel for ' + tab;
 	}
-
-//	for( var i = 0; i < elLabels.length; i++)
-//		elLabels[i].m_elTabs = o_elTabs;
 
 	elLabels[0].classList.add('active');
 	o_elTabs[elLabels[0].m_tab].style.display = 'block';
