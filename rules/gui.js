@@ -385,28 +385,28 @@ function gui_ChoiseOnClick( i_evt)
 	wnd.m_choises[name].value = el.m_value;
 }
 
-function gui_CreateTabs( i_tabs, i_elParent)
+function gui_CreateTabs( i_args)
 {
 	var o_elTabs = [];
 
-	i_elParent.classList.add('gui');
-	i_elParent.classList.add('tab');
+	i_args.elParent.classList.add('gui');
+	i_args.elParent.classList.add('tab');
 
 	var elLabels = [];
-	for( var tab in i_tabs)
+	for( var tab in i_args.tabs)
 	{
 		var elLabel = document.createElement('div');
-		i_elParent.appendChild( elLabel);
+		i_args.elParent.appendChild( elLabel);
 		elLabel.classList.add('tablabel');
-		if( i_tabs[tab].label )
-			elLabel.textContent = i_tabs[tab].label;
+		if( i_args.tabs[tab].label )
+			elLabel.textContent = i_args.tabs[tab].label;
 		else
 		{
 			elLabel.textContent = tab.replace(/_/g,' ');
 			elLabel.style.textTransform = 'capitalize';
 		}
-		if( i_tabs[tab].tooltip )
-			elLabel.title = i_tabs[tab].tooltip;
+		if( i_args.tabs[tab].tooltip )
+			elLabel.title = i_args.tabs[tab].tooltip;
 
 		elLabel.m_tab = tab;
 		elLabel.onclick = function(e){
@@ -418,17 +418,23 @@ function gui_CreateTabs( i_tabs, i_elParent)
 			}
 			el.m_elTab.style.display = 'block';
 			el.classList.add('active');
+			if( i_args.name )
+				localStorage[i_args.name] = el.m_tab;
 		}
 
 		elLabels.push( elLabel);
 	}
 
+	var active_index = 0;
 	for( var i = 0; i < elLabels.length; i++)
 	{
 		var tab = elLabels[i].m_tab;
+		if( i_args.name && localStorage[i_args.name] )
+			if( localStorage[i_args.name] == tab )
+				active_index = i;
 
 		var elTab = document.createElement('div');
-		i_elParent.appendChild( elTab);
+		i_args.elParent.appendChild( elTab);
 		elTab.classList.add('tabpanel');
 		elTab.style.display = 'none';
 
@@ -438,8 +444,8 @@ function gui_CreateTabs( i_tabs, i_elParent)
 //elTab.textContent = 'Panel for ' + tab;
 	}
 
-	elLabels[0].classList.add('active');
-	o_elTabs[elLabels[0].m_tab].style.display = 'block';
+	elLabels[active_index].classList.add('active');
+	o_elTabs[elLabels[active_index].m_tab].style.display = 'block';
 
 	return o_elTabs;
 }
