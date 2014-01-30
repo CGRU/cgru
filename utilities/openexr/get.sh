@@ -1,7 +1,7 @@
 #!/bin/bash
 
-packages="ilmbase-1.0.3 openexr-1.7.1"
-location="http://github.com/downloads/openexr/openexr"
+packages="ilmbase-2.1.0 openexr-2.1.0"
+location="http://download.savannah.nongnu.org/releases/openexr"
 
 for package in $packages; do
    if [ -d $package ] ; then
