@@ -27,6 +27,8 @@ $GuestCanEdit = array('comments.json');
 $Out = array();
 $Recv = array();
 
+if( false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
+
 # Decode input:
 if( isset($_POST['upload_path']))
 	upload( $_POST['upload_path'], $Out);
@@ -713,8 +715,28 @@ function pushArray( &$o_obj, $i_edit)
 	if( array_key_exists('id', $o_obj) && ( $o_obj['id'] == $i_edit['id']))
 		if( array_key_exists( $i_edit['pusharray'], $o_obj) && is_array( $o_obj[$i_edit['pusharray']]))
 		{
-			foreach( $i_edit['objects'] as $obj )
-				array_push( $o_obj[$i_edit['pusharray']], $obj);
+			$pusharray = &$o_obj[$i_edit['pusharray']];
+			$offset = count( $pusharray); // Default index for new item - push at the end
+
+			// Delete any other items with the same ids as input objects:
+			for( $e = 0; $e < count( $i_edit['objects']); $e++)
+				if( array_key_exists('id', $i_edit['objects'][$e] ))
+					for( $i = 0; $i < count( $pusharray); $i++)
+						if( array_key_exists( 'id', $pusharray[$i]))
+							if( $pusharray[$i]['id'] == $i_edit['objects'][$e]['id'])
+								array_splice( $pusharray, $i, 1);
+
+			// Search for an index to insert before:
+			if( array_key_exists( 'id_before', $i_edit))
+				for( $i = 0; $i < count( $pusharray); $i++)
+					if( array_key_exists( 'id', $pusharray[$i]))
+						if( $pusharray[$i]['id'] == $i_edit['id_before'])
+							$offset = $i;
+
+//error_log('id_before = '.$i_edit['id_before']);
+//error_log('offset = '.$offset);
+			array_splice( $pusharray, $offset, 0, $i_edit['objects']);
+
 			return;
 		}
 	foreach( $o_obj as &$obj ) pushArray( $obj, $i_edit);
@@ -820,7 +842,7 @@ function jsf_editobj( $i_edit, &$o_out)
 //error_log('obj:'.json_encode($obj));
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);
-		fwrite( $fHandle, json_encode( $obj));
+		fwrite( $fHandle, json_encode( $obj, JSON_PRETTY_PRINT));
 		fclose($fHandle);
 		$o_out['status'] = 'success';
 	}
