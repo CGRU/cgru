@@ -79,6 +79,10 @@ function p_NewFolder( i_value)
 	p_Action( obj, 'add');
 }
 
+function p_AddLinkAbc()
+{
+	p_AddLink( null, true);
+}
 function p_AddLinkAfter()
 {
 	var id_before = null;
@@ -91,7 +95,7 @@ function p_AddLinkBefore()
 	if( p_elCurItem ) id_before = p_elCurItem.m_id;
 	p_AddLink( id_before);
 }
-function p_AddLink( i_id_before)
+function p_AddLink( i_id_before, i_abc)
 {
 	var name = g_elCurFolder.m_path.split('/');
 	name = name[name.length-1];
@@ -99,6 +103,15 @@ function p_AddLink( i_id_before)
 	var obj = {};
 	obj.label = name;
 	obj.id = p_elCurFolder.m_id + '/' + name;
+
+	if( i_abc ) // Search for an index by alphabet
+	if( p_elCurFolder && p_elCurFolder.m_elArray && ( p_elCurFolder.m_elArray.length > 1 ))
+		for( var i = 1; i < p_elCurFolder.m_elArray.length; i++)
+			if( obj.id < p_elCurFolder.m_elArray[i].m_id )
+			{
+				i_id_before = p_elCurFolder.m_elArray[i].m_id;
+				break;
+			}
 
 	if( fv_cur_item )
 	{
@@ -186,23 +199,23 @@ function p_DelOnClick()
 }
 function p_MoveUp()
 {
-	if( p_elCurItem && p_elCurItem.previousSibling && ( p_elCurItem.previousSibling != p_elCurItem.parentNode.firstChild))
+	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elFirst))
 		p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.previousSibling.m_id);
 }
 function p_MoveTop()
 {
-	if( p_elCurItem && p_elCurItem.previousSibling && ( p_elCurItem.previousSibling != p_elCurItem.parentNode.firstChild))
-		p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.parentNode.firstChild.m_id);
+	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elFirst))
+		p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.m_elParent.m_elFirst.m_id);
 }
 function p_MoveBottom()
 {
-	if( p_elCurItem && p_elCurItem.nextSibling && ( p_elCurItem.nextSibling != p_elCurItem.parentNode.firstChild))
+	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elLast))
 		p_Action( p_elCurItem.m_obj, 'add');
 }
 function p_MoveDown()
 {
-	if( p_elCurItem && p_elCurItem.nextSibling )
-		if( p_elCurItem.nextSibling.nextSibling && ( p_elCurItem.nextSibling.nextSibling != p_elCurItem.parentNode.firstChild))
+	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elLast))
+		if( p_elCurItem.nextSibling.nextSibling && ( p_elCurItem.nextSibling.nextSibling != p_elCurItem.m_elParent.m_elFirst))
 			p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.nextSibling.nextSibling.m_id);
 		else
 			p_Action( p_elCurItem.m_obj, 'add');
@@ -345,6 +358,12 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 	el.m_id = i_obj.id;
 	el.m_obj = i_obj;
 
+	el.m_elParent = i_elParent;
+	if( i_elParent.m_elFirst == null ) i_elParent.m_elFirst = el;
+	if( i_elParent.m_elArray == null ) i_elParent.m_elArray = [];
+	i_elParent.m_elArray.push( el);
+	i_elParent.m_elLast = el;
+
 	var title = '';
 	if( i_obj.user ) el.title = c_GetUserTitle( i_obj.user);
 	if( i_obj.time ) el.title += '\n' + c_DT_StrFromSec( i_obj.time);
@@ -376,3 +395,33 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 	return el;
 }
 
+function p_MakeCut()
+{
+	var args = {};
+
+	if( p_elCurFolder == null )
+	{
+		c_Error('Current folder not founded.');
+		return;
+	}
+	if( p_elCurFolder.m_elArray == null )
+	{
+		c_Error('Current folder not has no childs.');
+		return;
+	}
+
+	args.shots = [];
+	for( var i = 0; i < p_elCurFolder.m_elArray.length; i++)
+		if( p_elCurFolder.m_elArray[i].m_path )
+			args.shots.push( p_elCurFolder.m_elArray[i].m_path);
+
+	if( args.shots.length < 2 )
+	{
+		c_Error('Current folder has less then 2 shots.');
+		return;
+	}
+
+	args.cutname = p_elCurFolder.m_label;
+
+	d_MakeCut( args);
+}

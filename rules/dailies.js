@@ -355,3 +355,66 @@ function d_ExpFinished( i_data, i_args)
 	fv_ReloadAll();
 }
 
+function d_MakeCut( i_args)
+{
+//console.log( JSON.stringify( i_args));
+	var wnd = new cgru_Window({"name":'cut',"title":'Make Cut'});
+	wnd.m_args = i_args;
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+
+	var elAfDiv = document.createElement('div');
+	elBtns.appendChild( elAfDiv);
+	elAfDiv.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elAfDiv.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+
+	var elSend = document.createElement('div');
+	elAfDiv.appendChild( elSend);
+	elSend.textContent = 'Send Job';
+	elSend.classList.add('button');
+	elSend.m_wnd = wnd;
+	elSend.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd);}
+
+	var elShots = document.createElement('div');
+	wnd.elContent.appendChild( elShots);
+	for( var i = 0; i < i_args.shots.length; i++)
+	{
+		el = document.createElement('div');
+		elShots.appendChild( el);
+		el.textContent = i_args.shots[i];
+	}
+}
+
+function d_CutProcessGUI( i_wnd)
+{
+//	var params = {};
+	var shots = i_wnd.m_args.shots;
+
+	var cmd = 'rules/bin/makecut.sh';
+
+	cmd += ' -n "' + i_wnd.m_args.cutname + '"';
+	cmd += ' -u "' + g_auth_user.id + '"';
+	cmd += ' -o "' + cgru_PM('/' + RULES.root + '/Zona/SHOTS/SERIA_16/COMMON/cut', true) + '"';
+//	cmd += ' -a ' + RULES.avconv;
+//	cmd += ' -q ' + params.quality;
+//	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
+
+	for( var i = 0; i < shots.length; i++)
+		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CutFinished,"wnd":i_wnd});
+
+	i_wnd.destroy();
+}
+function d_CutFinished( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+//console.log( JSON.stringify( i_args));
+}
+

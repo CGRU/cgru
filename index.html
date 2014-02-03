@@ -204,11 +204,11 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div class="playlist_ctrl">
-				<div class="button" onclick="p_NewOnClick()" title="Create New Folder">+Folder</div>
-				<div class="button" onclick="p_AddLink()" title="Add Current Location To Selected Folder">+</div>
-				<div class="button" onclick="p_DelOnClick()" title="Remove Current Item">-</div>
-				<div class="button" onclick="p_RenameOnClick()" title="Rename Current Item">Rename</div>
-				<div class="button" onclick="p_RefreshOnClick()" title="Refresh Playlist">&#10227;</div>
+				<div class="button" onclick="p_NewOnClick()" title="Create new folder">+Folder</div>
+				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+</div>
+				<div class="button" onclick="p_DelOnClick()" title="Remove current item">-</div>
+				<div class="button" onclick="p_RenameOnClick()" title="Rename current item">Rename</div>
+				<div class="button" onclick="p_RefreshOnClick()" title="Refresh playlist">&#10227;</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>
@@ -219,7 +219,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 				<div class="button" onclick="p_MoveUp()" title="Move item up">&uarr;</div>
 				<div class="button" onclick="p_MoveBottom()" title="Move item bottom">&darr;&darr;</div>
 				<div class="button" onclick="p_MoveTop()" title="Move item top">&uarr;&uarr;</div>
-				<div class="button" _onclick="p_MakeCut()" title="Make cut">Cut</div>
+				<div class="button" onclick="p_MakeCut()" title="Make cut">Cut</div>
 			</div>
 		</div>
 	</div>
