@@ -421,7 +421,12 @@ function p_MakeCut()
 		return;
 	}
 
-	args.cutname = p_elCurFolder.m_label;
+	args.cut_name = p_elCurFolder.m_label;
+	if( p_elCurItem && p_elCurItem.m_path )
+		args.output = c_PathDir( p_elCurItem.m_path);
+	else
+		args.output = c_PathDir( args.shots[0]);
+	args.output += '/' + RULES.cut.output;
 
 	d_MakeCut( args);
 }

@@ -6,7 +6,7 @@ import af
 
 from optparse import OptionParser
 
-Extensions = ['jpg','png']
+Extensions = ['jpg','png','dpx']
 Folder = 'RESULT/JPG'
 TmpFiles = 'img.%07d.jpg'
 
@@ -18,17 +18,25 @@ Parser.add_option('-n', '--cutname',    dest='cutname',    type  ='string', defa
 Parser.add_option('-r', '--resolution', dest='resolution', type  ='string', default='1280x720', help='Resolution: 1280x720')
 Parser.add_option('-o', '--outdir',     dest='outdir',     type  ='string', default='cut',      help='Output folder')
 Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='',         help='Afanasy user name')
+Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,  help='Test input only')
+
+def errExit( i_msg):
+	print('{"error":"%s"},' % i_msg)
+	print('{"status":"error"}]}')
+	sys.exit(1)
 
 def interrupt( signum, frame):
-   print('\nInterrupt received...')
-   exit(0)
+	errExit('Interrupt received')
 signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT,  interrupt)
 
+print('{"cut"[')
+
 (Options, args) = Parser.parse_args()
 
-if len(args) < 1: Parser.error('Not enough arguments provided.')
+if len(args) < 1:
+	errExit('Not enough arguments provided.')
 
 Scenes = args
 CutName = Options.cutname
@@ -37,14 +45,12 @@ if os.path.isfile( args[-1]):
 	Scenes = args[-1]
 	if CutName == '':
 		CutName = os.path.basename( Scenes)
-	print('Reading scenes file "%s"...' % Scenes)
 	file = open( Scenes)
 	Scenes = file.readlines()
 	file.close
 
 if len( Scenes) < 2:
-	print('Error: Less than 2 scenes provided.')
-	exit(1)
+	errExit('Less than 2 scenes provided.')
 
 if CutName == '':
 	CutName = os.path.basename( os.path.dirname( Scenes[0]))
@@ -52,10 +58,12 @@ if CutName == '':
 ftime = time.time()
 OutDir = Options.outdir + '/' + CutName
 OutDir = os.path.normpath( OutDir)
-if os.path.isdir( OutDir):
-	print('Deleting folder "%s"...' % OutDir)
-	shutil.rmtree( OutDir)
-os.makedirs( OutDir)
+if not Options.testonly:
+	if os.path.isdir( OutDir):
+		print('{"progress":"Deleting folder: %s"},' % OutDir )
+		shutil.rmtree( OutDir)
+	os.makedirs( OutDir)
+	print('{"progress":"Creating folder: %s"},' % OutDir )
 
 movie_name = os.path.basename(CutName) + time.strftime('_%y-%m-%d_%H-%M-%S.mov')
 movie_name = os.path.join( Options.outdir, movie_name)
@@ -80,8 +88,7 @@ for scene in Scenes:
 	if os.path.isdir( folderDeeper):
 		folder = folderDeeper
 	if not os.path.isdir( folder):
-		print('Error: Folder not founded:\n%s' % folder)
-		exit(1)
+		errExit('Folder not founded: %s' % folder)
 
 	items = []
 	for item in os.listdir( folder):
@@ -103,8 +110,7 @@ for scene in Scenes:
 		if valid:
 			files.append( os.path.join( folder, item))
 	if len(files) == 0:
-		print('Error: No files founded in folder:\n"%s"' % folder)
-		exit(1)
+		errExit('No files founded in folder: %s' % folder)
 	files.sort()
 
 	for image in files:
@@ -139,7 +145,7 @@ job.blocks.append( block)
 
 block = af.Block('encode')
 block.setDependMask('convert')
-task = af.Task('ffmpeg')
+task = af.Task('encode')
 task.setCommand( cmd_encode)
 block.tasks.append( task)
 job.blocks.append( block)
@@ -147,6 +153,7 @@ job.blocks.append( block)
 if Options.afuser != '': job.setUserName( Options.afuser)
 
 job.setNeedOS('win')
-job.send()
+if not Options.testonly:
+	job.send()
 
-#if os.path.isdir( OutDir): shutil.rmtree( OutDir)
+print('{"status":"success"}]}')

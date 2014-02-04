@@ -21,6 +21,10 @@ d_cvtguiparams.fps = {"label":'FPS'};
 d_expguiparams = {};
 d_expguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
 
+d_cutparams = {};
+d_cutparams.cut_name = {};
+d_cutparams.input = {};
+d_cutparams.output = {};
 
 function d_Make( i_path, i_outfolder)
 {
@@ -361,6 +365,12 @@ function d_MakeCut( i_args)
 	var wnd = new cgru_Window({"name":'cut',"title":'Make Cut'});
 	wnd.m_args = i_args;
 
+	var params = {};
+	params.cut_name = i_args.cut_name;
+	params.output = i_args.output;
+
+	gui_Create( wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
+
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
 	elBtns.style.clear = 'both';
@@ -379,7 +389,14 @@ function d_MakeCut( i_args)
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.m_wnd = wnd;
-	elSend.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd);}
+	elSend.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, false);}
+
+	var elTest = document.createElement('div');
+	elAfDiv.appendChild( elTest);
+	elTest.textContent = 'Test Inputs';
+	elTest.classList.add('button');
+	elTest.m_wnd = wnd;
+	elTest.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, true);}
 
 	var elShots = document.createElement('div');
 	wnd.elContent.appendChild( elShots);
@@ -393,14 +410,14 @@ function d_MakeCut( i_args)
 
 function d_CutProcessGUI( i_wnd)
 {
-//	var params = {};
 	var shots = i_wnd.m_args.shots;
+	var params = gui_GetParams( i_wnd.elContent, d_guiparams);
 
 	var cmd = 'rules/bin/makecut.sh';
 
-	cmd += ' -n "' + i_wnd.m_args.cutname + '"';
+	cmd += ' -n "' + params.cut_name + '"';
 	cmd += ' -u "' + g_auth_user.id + '"';
-	cmd += ' -o "' + cgru_PM('/' + RULES.root + '/Zona/SHOTS/SERIA_16/COMMON/cut', true) + '"';
+	cmd += ' -o "' + cgru_PM('/' + RULES.root + params.output, true) + '"';
 //	cmd += ' -a ' + RULES.avconv;
 //	cmd += ' -q ' + params.quality;
 //	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';

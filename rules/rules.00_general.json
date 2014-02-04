@@ -191,6 +191,11 @@
 	"af_capacity":500
 },
 
+"cut":{
+	"input":"RESULT/JPG,RESULT/DPX",
+	"output":"COMMON/_cut"
+},
+
 "put":{
 	"dest":"FINAL",
 	"cmd":"python /cgru/utilities/put.py",

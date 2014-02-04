@@ -569,7 +569,7 @@ box-shadow: 0 0 4px #000 inset;
 /* ==================== GUI: ======================================== */
 .gui .param > div { margin: 4px 8px; padding: 3px 6px; border-radius: 4px;}
 .gui .label { float: left; width: 100px;  text-align: right; }
-.gui .value, .dialog .rules { box-shadow: 0 0 4px #000 inset;}
+.gui .value { box-shadow: 0 0 4px #000 inset;}
 .gui .info { float: right; width: 200px; }
 .gui .list { border-radius: 5px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; }
 .gui .list .item { border-radius: 3px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; margin: 4px; }
@@ -578,8 +578,8 @@ box-shadow: 0 0 4px #000 inset;
 .gui .list .ctrl .name { float: left; text-transform: capitalize; padding: 3px 8px; }
 .gui .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
 .gui .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
-.gui .rules { padding: 12px;  border-radius: 6px;}
-.gui .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; font-size: 14px; margin: 4px 4px 2px 0px; }
+.gui .rules { box-shadow: 0 0 4px #000 inset; padding: 12px; margin: 4px 0px;  border-radius: 6px;}
+.gui .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; font-size: 14px; margin: 0px 2px; }
 .gui .choise.selected { background: rgba(255,255,0,.2); box-shadow: 0 0 2px #000 inset; }
 .gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 6px 6px 0 0; box-shadow: 0 0 2px #000; cursor: pointer; float: left; }
 .gui .tablabel.active { box-shadow: 0 0 2px #000 inset; background: rgba(100,255,255,.2); }
