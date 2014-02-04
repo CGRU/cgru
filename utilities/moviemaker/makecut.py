@@ -14,11 +14,13 @@ Parser = OptionParser(usage="%prog [options] input\n\
    Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
    Type \"%prog -h\" for help", version="%prog 1.0")
 
-Parser.add_option('-n', '--cutname',    dest='cutname',    type  ='string', default='',         help='Cut name')
-Parser.add_option('-r', '--resolution', dest='resolution', type  ='string', default='1280x720', help='Resolution: 1280x720')
-Parser.add_option('-o', '--outdir',     dest='outdir',     type  ='string', default='cut',      help='Output folder')
-Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='',         help='Afanasy user name')
-Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,  help='Test input only')
+Parser.add_option('-n', '--cutname',    dest='cutname',    type  ='string', default='',          help='Cut name')
+Parser.add_option('-f', '--fps',        dest='fps',        type  ='string', default='24',        help='FPS')
+Parser.add_option('-r', '--resolution', dest='resolution', type  ='string', default='1280x720',  help='Resolution: 1280x720')
+Parser.add_option('-c', '--codec',      dest='codec',      type  ='string', default='h264_good', help='Codec')
+Parser.add_option('-o', '--outdir',     dest='outdir',     type  ='string', default='cut',       help='Output folder')
+Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='',          help='Afanasy user name')
+Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,   help='Test input only')
 
 def errExit( i_msg):
 	print('{"error":"%s"},' % i_msg)
@@ -31,7 +33,7 @@ signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT,  interrupt)
 
-print('{"cut"[')
+print('{"cut":[')
 
 (Options, args) = Parser.parse_args()
 
@@ -65,7 +67,7 @@ if not Options.testonly:
 	os.makedirs( OutDir)
 	print('{"progress":"Creating folder: %s"},' % OutDir )
 
-movie_name = os.path.basename(CutName) + time.strftime('_%y-%m-%d_%H-%M-%S.mov')
+movie_name = os.path.basename(CutName) + time.strftime('_%y-%m-%d_%H-%M-%S')
 movie_name = os.path.join( Options.outdir, movie_name)
 
 commands = []
@@ -98,7 +100,7 @@ for scene in Scenes:
 	if len(items):
 		items.sort()
 		folder = os.path.join( folder, items[-1])
-	print( folder)
+	print('{"sequence":"%s"},' % folder)
 
 	files = []
 	for item in os.listdir( folder):
@@ -128,7 +130,12 @@ for scene in Scenes:
 		commands.append( cmd)
 		task_names.append( os.path.basename(image))
 
-cmd_encode = 'ffmpeg -y -r 24 -i "' + os.path.join( OutDir, TmpFiles) + '" -vcodec mjpeg -pix_fmt yuv420p -qscale 1 -r 24 "' + movie_name + '"'
+cmd_encode = os.path.join( os.path.dirname( sys.argv[0]), 'makemovie.py')
+cmd_encode = 'python "%s"' % os.path.normpath( cmd_encode)
+cmd_encode += ' -f %s' % Options.fps
+cmd_encode += ' -c %s' % Options.codec
+cmd_encode += ' "%s"' % os.path.join( OutDir, TmpFiles)
+cmd_encode += ' "%s"' % movie_name
 
 job = af.Job('CUT ' + CutName)
 block = af.Block('convert')

@@ -24,6 +24,7 @@ d_expguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px
 d_cutparams = {};
 d_cutparams.cut_name = {};
 d_cutparams.input = {};
+d_cutparams.fps = {"label":'FPS'};
 d_cutparams.output = {};
 
 function d_Make( i_path, i_outfolder)
@@ -370,10 +371,13 @@ function d_MakeCut( i_args)
 	params.output = i_args.output;
 
 	gui_Create( wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
 	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
 
 	var elAfDiv = document.createElement('div');
 	elBtns.appendChild( elAfDiv);
@@ -398,40 +402,63 @@ function d_MakeCut( i_args)
 	elTest.m_wnd = wnd;
 	elTest.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, true);}
 
-	var elShots = document.createElement('div');
-	wnd.elContent.appendChild( elShots);
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
 	for( var i = 0; i < i_args.shots.length; i++)
 	{
 		el = document.createElement('div');
-		elShots.appendChild( el);
+		elResults.appendChild( el);
 		el.textContent = i_args.shots[i];
 	}
+	wnd.m_elResults = elResults;
 }
 
-function d_CutProcessGUI( i_wnd)
+function d_CutProcessGUI( i_wnd, i_test)
 {
 	var shots = i_wnd.m_args.shots;
-	var params = gui_GetParams( i_wnd.elContent, d_guiparams);
+	var params = gui_GetParams( i_wnd.elContent, d_cutparams);
+	for( key in i_wnd.elContent.m_choises )
+		params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var cmd = 'rules/bin/makecut.sh';
 
 	cmd += ' -n "' + params.cut_name + '"';
 	cmd += ' -u "' + g_auth_user.id + '"';
+	cmd += ' -f "' + params.fps + '"';
+	cmd += ' -r "' + params.format + '"';
+	cmd += ' -c "' + params.codec + '"';
 	cmd += ' -o "' + cgru_PM('/' + RULES.root + params.output, true) + '"';
-//	cmd += ' -a ' + RULES.avconv;
-//	cmd += ' -q ' + params.quality;
-//	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
+	if( i_test ) cmd += ' -t';
 
 	for( var i = 0; i < shots.length; i++)
 		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CutFinished,"wnd":i_wnd});
 
-	i_wnd.destroy();
 }
 function d_CutFinished( i_data, i_args)
 {
 //console.log( JSON.stringify( i_data));
 //console.log( JSON.stringify( i_args));
+	var elResults = i_args.wnd.m_elResults;
+	elResults.textContent = '';
+
+	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ) || ( i_data.cmdexec[0].cut == null ))
+	{
+		elResults.textContent = ( JSON.stringify( i_data));
+		return;
+	}
+
+	var cut = i_data.cmdexec[0].cut;
+
+	for( var i = 0; i < cut.length; i++)
+	{
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+		for( var msg in cut[i])
+			el.textContent = msg + ': ' + cut[i][msg]
+	}
+
+//	i_wnd.destroy();
 }
 
