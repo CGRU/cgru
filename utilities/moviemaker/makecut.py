@@ -87,23 +87,23 @@ for shot in Shots:
 	if len(shot) == 0: continue
 	if shot[0] == '#': continue
 
+	folders = []
 	for folder in Inputs:
 		folder = os.path.join( shot, folder)
-		if os.path.isdir( folder): break
-		else: folder = None
-	
-	if folder is None:
-		errExit('Input not founded for: %s' % shot)
+		if not os.path.isdir( folder): continue
 
-	items = []
-	for item in os.listdir( folder):
-		if os.path.isdir( os.path.join( folder, item)):
-			if item[0] == 'v':
-				items.append( item)
-	if len(items):
-		items.sort()
-		folder = os.path.join( folder, items[-1])
-	print('{"sequence":"%s"},' % folder)
+		for item in os.listdir( folder):
+			if item[0] in '._': continue
+			item = os.path.join( folder, item)
+			if os.path.isdir( item):
+					folders.append( item)
+
+	if len(folders):
+		folders.sort()
+		folder = folders[-1]
+	else:
+		errExit('Input not founded for: %s' % shot)
+		
 
 	files = []
 	for item in os.listdir( folder):
@@ -117,6 +117,8 @@ for shot in Shots:
 	if len(files) == 0:
 		errExit('No files founded in folder: %s' % folder)
 	files.sort()
+
+	print('{"sequence":"%s"},' % folder)
 
 	for image in files:
 		cmd = cmd_prefix
@@ -132,6 +134,9 @@ for shot in Shots:
 		file_counter += 1
 		commands.append( cmd)
 		task_names.append( os.path.basename(image))
+
+print('{"progress":"%d sequences founded"},' % len(Shots))
+print('{"progress":"%d files founded"},' % file_counter)
 
 cmd_encode = os.path.join( os.path.dirname( sys.argv[0]), 'makemovie.py')
 cmd_encode = 'python "%s"' % os.path.normpath( cmd_encode)
