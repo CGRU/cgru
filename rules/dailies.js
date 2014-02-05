@@ -404,17 +404,24 @@ function d_MakeCut( i_args)
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+
 	for( var i = 0; i < i_args.shots.length; i++)
 	{
 		el = document.createElement('div');
 		elResults.appendChild( el);
 		el.textContent = i_args.shots[i];
 	}
-	wnd.m_elResults = elResults;
 }
 
 function d_CutProcessGUI( i_wnd, i_test)
 {
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
+
 	var shots = i_wnd.m_args.shots;
 	var params = gui_GetParams( i_wnd.elContent, d_cutparams);
 	for( key in i_wnd.elContent.m_choises )
@@ -422,6 +429,7 @@ function d_CutProcessGUI( i_wnd, i_test)
 
 	var cmd = 'rules/bin/makecut.sh';
 
+	cmd += ' -i "' + params.input + '"';
 	cmd += ' -n "' + params.cut_name + '"';
 	cmd += ' -u "' + g_auth_user.id + '"';
 	cmd += ' -f "' + params.fps + '"';
@@ -440,6 +448,7 @@ function d_CutFinished( i_data, i_args)
 {
 //console.log( JSON.stringify( i_data));
 //console.log( JSON.stringify( i_args));
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
 	var elResults = i_args.wnd.m_elResults;
 	elResults.textContent = '';
 
@@ -451,12 +460,16 @@ function d_CutFinished( i_data, i_args)
 
 	var cut = i_data.cmdexec[0].cut;
 
-	for( var i = 0; i < cut.length; i++)
+	for( var i = cut.length - 1; i >= 0; i--)
 	{
 		var el = document.createElement('div');
 		elResults.appendChild( el);
 		for( var msg in cut[i])
-			el.textContent = msg + ': ' + cut[i][msg]
+		{
+			el.textContent = msg + ': ' + cut[i][msg];
+			if(( msg == 'error' ) || ( cut[i][msg].indexOf('error') != -1 ))
+				el.style.color = '#F42';
+		}
 	}
 
 //	i_wnd.destroy();

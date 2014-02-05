@@ -589,7 +589,22 @@ box-shadow: 0 0 4px #000 inset;
 .gui .pulldown_item:hover, .gui .pulldown_btn:hover { background: rgba(100,255,255,.2); }
 .gui .pulldown_item { margin: 1px 4px; padding: 1px 4px; }
 .gui .pulldown_menu { border-radius: 6px; box-shadow: 0 0 2px inset; }
-
+.gui .wait { position: absolute; top: 0; bottom: 0; right: 0; left: 0; background: rgba(0,0,0,.5); cursor: wait; }
+.gui .output {
+overflow: auto;
+font-family: courier;
+background-color: rgba(0,10,0,.8);
+color: #9F6;
+font-weight: bold;
+font-size: 14px;
+padding: 8px 16px;
+margin: 8px;
+opacity: 0.9;
+box-shadow: 0px 0px 50px #000000 inset, 0px 0px 10px rgba(255,255,255,.8);
+border-radius: 12px;
+border: 3px solid #000;
+text-shadow: 0px 0px 16px #372;
+}
 /* ==================== WINDOWS: ======================================== */
 .administrate { color: #000000; font-size: 14px; }
 .administrate .button { float: left; }

@@ -7,13 +7,13 @@ import af
 from optparse import OptionParser
 
 Extensions = ['jpg','png','dpx']
-Folder = 'RESULT/JPG'
 TmpFiles = 'img.%07d.jpg'
 
 Parser = OptionParser(usage="%prog [options] input\n\
    Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
    Type \"%prog -h\" for help", version="%prog 1.0")
 
+Parser.add_option('-i', '--inputs',     dest='inputs',     type  ='string', default='RESULT/JPG',help='Inputs')
 Parser.add_option('-n', '--cutname',    dest='cutname',    type  ='string', default='',          help='Cut name')
 Parser.add_option('-f', '--fps',        dest='fps',        type  ='string', default='24',        help='FPS')
 Parser.add_option('-r', '--resolution', dest='resolution', type  ='string', default='1280x720',  help='Resolution: 1280x720')
@@ -40,22 +40,23 @@ print('{"cut":[')
 if len(args) < 1:
 	errExit('Not enough arguments provided.')
 
-Scenes = args
+Inputs = Options.inputs.split(',')
+Shots = args
 CutName = Options.cutname
 
 if os.path.isfile( args[-1]):
-	Scenes = args[-1]
+	Shots = args[-1]
 	if CutName == '':
-		CutName = os.path.basename( Scenes)
-	file = open( Scenes)
-	Scenes = file.readlines()
+		CutName = os.path.basename( Shots)
+	file = open( Shots)
+	Shots = file.readlines()
 	file.close
 
-if len( Scenes) < 2:
-	errExit('Less than 2 scenes provided.')
+if len( Shots) < 2:
+	errExit('Less than 2 shots provided.')
 
 if CutName == '':
-	CutName = os.path.basename( os.path.dirname( Scenes[0]))
+	CutName = os.path.basename( os.path.dirname( Shots[0]))
 
 ftime = time.time()
 OutDir = Options.outdir + '/' + CutName
@@ -81,16 +82,18 @@ cmd_prefix += ' -d "%s"' % time.strftime('%y-%m-%d')
 
 file_counter = 0
 
-for scene in Scenes:
-	scene = scene.strip()
-	if len(scene) == 0: continue
-	if scene[0] == '#': continue
-	folder = scene
-	folderDeeper = os.path.join( folder, Folder)
-	if os.path.isdir( folderDeeper):
-		folder = folderDeeper
-	if not os.path.isdir( folder):
-		errExit('Folder not founded: %s' % folder)
+for shot in Shots:
+	shot = shot.strip()
+	if len(shot) == 0: continue
+	if shot[0] == '#': continue
+
+	for folder in Inputs:
+		folder = os.path.join( shot, folder)
+		if os.path.isdir( folder): break
+		else: folder = None
+	
+	if folder is None:
+		errExit('Input not founded for: %s' % shot)
 
 	items = []
 	for item in os.listdir( folder):
@@ -118,7 +121,7 @@ for scene in Scenes:
 	for image in files:
 		cmd = cmd_prefix
 		cmd += ' --project "%s"' % CutName
-		cmd += ' --shot "%s"' % os.path.basename( scene)
+		cmd += ' --shot "%s"' % os.path.basename( shot)
 		cmd += ' --ver "%s"' % os.path.basename( folder)
 		cmd += ' --moviename "%s"' % os.path.basename( movie_name)
 		cmd += ' -f "%s"' % os.path.basename( image)
@@ -161,6 +164,7 @@ if Options.afuser != '': job.setUserName( Options.afuser)
 
 job.setNeedOS('win')
 if not Options.testonly:
-	job.send()
+	if not job.send():
+		errExit('Can`t send job to server.')
 
 print('{"status":"success"}]}')
