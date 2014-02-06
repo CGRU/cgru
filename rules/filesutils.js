@@ -272,6 +272,8 @@ function fu_PutMultiProcessGUI( i_wnd, i_test)
 
 	cmd += ' -i "' + params.input + '"';
 	cmd += ' -u "' + g_auth_user.id + '"';
+	cmd += ' -c ' + RULES.put.af_capacity;
+	cmd += ' -m ' + RULES.put.af_maxtasks;
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
 	if( i_test ) cmd += ' -t';
 
@@ -303,6 +305,16 @@ function fu_PutMultiFinished( i_data, i_args)
 		elResults.appendChild( el);
 		for( var msg in put[i])
 		{
+			if( msg == 'src' )
+			{
+				msg = 'put:';
+				msg += ' ' + put[i].src;
+				msg += ' -> ' + put[i].name;
+				//msg += ' ' + put[i].version;
+				//msg += ' ' + put[i].dst;
+				el.textContent = msg;
+				break;
+			}
 			el.textContent = msg + ': ' + put[i][msg];
 			if(( msg == 'error' ) || ( put[i][msg].indexOf('error') != -1 ))
 				el.style.color = '#F42';

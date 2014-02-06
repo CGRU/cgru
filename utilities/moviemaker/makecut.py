@@ -86,23 +86,25 @@ for shot in Shots:
 	if len(shot) == 0: continue
 	if shot[0] == '#': continue
 
-	folders = []
-	for folder in Inputs:
-		folder = os.path.join( shot, folder)
-		if not os.path.isdir( folder): continue
+	folder = None
+	version = None
+	name = os.path.basename( shot)
 
-		for item in os.listdir( folder):
+	for inp in Inputs:
+		inp = os.path.join( shot, inp)
+		if not os.path.isdir( inp): continue
+
+		for item in os.listdir( inp):
 			if item[0] in '._': continue
-			item = os.path.join( folder, item)
-			if os.path.isdir( item):
-					folders.append( item)
+			if not os.path.isdir( os.path.join( inp, item)): continue
+			ver = item.replace( name, '').strip('_. ')
+			if version is not None:
+				if version >= ver: continue
+			version = ver
+			folder = os.path.join( inp, item)
 
-	if len(folders):
-		folders.sort()
-		folder = folders[-1]
-	else:
+	if folder is None:
 		errExit('Input not founded for: %s' % shot)
-		
 
 	files = []
 	for item in os.listdir( folder):
@@ -122,8 +124,8 @@ for shot in Shots:
 	for image in files:
 		cmd = cmd_prefix
 		cmd += ' --project "%s"' % CutName
-		cmd += ' --shot "%s"' % os.path.basename( shot)
-		cmd += ' --ver "%s"' % os.path.basename( folder)
+		cmd += ' --shot "%s"' % name
+		cmd += ' --ver "%s"' % version
 		cmd += ' --moviename "%s"' % os.path.basename( movie_name)
 		cmd += ' -f "%s"' % os.path.basename( image)
 		cmd += ' "%s"' % image

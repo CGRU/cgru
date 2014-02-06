@@ -197,13 +197,14 @@
 },
 
 "put":{
-	"input":"RESULT/JPG,RESULT/DPX",
+	"input":"RESULT/DPX,RESULT/JPG",
 	"dest":"FINAL",
 	"cmd":"python /cgru/utilities/put.py",
 	"post_delete":false,
 	"af_service":"generic",
 	"af_parser":"generic",
-	"af_capacity":500
+	"af_capacity":500,
+	"af_maxtasks":5
 },
 
 "checksum":{
