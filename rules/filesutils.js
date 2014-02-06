@@ -198,3 +198,117 @@ function fu_ChecksumDo( i_wnd)
 	n_SendJob( job);
 }
 
+// ########################### Multi Put: #################################
+fu_putmulti_params = {};
+fu_putmulti_params.input = {};
+fu_putmulti_params.dest = {"label":'Destination'};
+function fu_PutMultiDialog( i_args)
+{
+//console.log( JSON.stringify( i_args));
+	var wnd = new cgru_Window({"name":'put',"title":'Multi Put'});
+	wnd.m_args = i_args;
+
+	var params = {};
+	if( RULES.put.dest.indexOf('/') !== 0 )
+		if( ASSETS.project )
+			params.dest = ASSETS.project.path + '/' + RULES.put.dest;
+
+	gui_Create( wnd.elContent, fu_putmulti_params, [RULES.put, params]);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	var elAfDiv = document.createElement('div');
+	elBtns.appendChild( elAfDiv);
+	elAfDiv.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elAfDiv.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+
+	var elSend = document.createElement('div');
+	elAfDiv.appendChild( elSend);
+	elSend.textContent = 'Send Job';
+	elSend.classList.add('button');
+	elSend.m_wnd = wnd;
+	elSend.onclick = function(e){ fu_PutMultiProcessGUI( e.currentTarget.m_wnd, false);}
+
+	var elTest = document.createElement('div');
+	elAfDiv.appendChild( elTest);
+	elTest.textContent = 'Test Inputs';
+	elTest.classList.add('button');
+	elTest.m_wnd = wnd;
+	elTest.onclick = function(e){ fu_PutMultiProcessGUI( e.currentTarget.m_wnd, true);}
+
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+
+	for( var i = 0; i < i_args.shots.length; i++)
+	{
+		el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = i_args.shots[i];
+	}
+}
+
+function fu_PutMultiProcessGUI( i_wnd, i_test)
+{
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
+
+	var shots = i_wnd.m_args.shots;
+	var params = gui_GetParams( i_wnd.elContent, fu_putmulti_params);
+	for( key in i_wnd.elContent.m_choises )
+		params[key] = i_wnd.elContent.m_choises[key].value;
+
+	var cmd = 'rules/bin/putmulti.sh';
+
+	cmd += ' -i "' + params.input + '"';
+	cmd += ' -u "' + g_auth_user.id + '"';
+	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+	if( i_test ) cmd += ' -t';
+
+	for( var i = 0; i < shots.length; i++)
+		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":fu_PutMultiFinished,"wnd":i_wnd});
+
+}
+function fu_PutMultiFinished( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+//console.log( JSON.stringify( i_args));
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+	var elResults = i_args.wnd.m_elResults;
+	elResults.textContent = '';
+
+	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ) || ( i_data.cmdexec[0].put == null ))
+	{
+		elResults.textContent = ( JSON.stringify( i_data));
+		return;
+	}
+
+	var put = i_data.cmdexec[0].put;
+
+	for( var i = put.length - 1; i >= 0; i--)
+	{
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+		for( var msg in put[i])
+		{
+			el.textContent = msg + ': ' + put[i][msg];
+			if(( msg == 'error' ) || ( put[i][msg].indexOf('error') != -1 ))
+				el.style.color = '#F42';
+		}
+	}
+
+//	i_wnd.destroy();
+}
+

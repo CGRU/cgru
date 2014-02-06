@@ -58,7 +58,6 @@ if len( Shots) < 2:
 if CutName == '':
 	CutName = os.path.basename( os.path.dirname( Shots[0]))
 
-ftime = time.time()
 OutDir = Options.outdir + '/' + CutName
 OutDir = os.path.normpath( OutDir)
 if not Options.testonly:

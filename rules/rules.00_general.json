@@ -197,6 +197,7 @@
 },
 
 "put":{
+	"input":"RESULT/JPG,RESULT/DPX",
 	"dest":"FINAL",
 	"cmd":"python /cgru/utilities/put.py",
 	"post_delete":false,

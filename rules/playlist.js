@@ -430,3 +430,33 @@ function p_MakeCut()
 
 	d_MakeCut( args);
 }
+
+function p_Put()
+{
+	var args = {};
+
+	if( p_elCurFolder == null )
+	{
+		c_Error('Current folder not founded.');
+		return;
+	}
+	if( p_elCurFolder.m_elArray == null )
+	{
+		c_Error('Current folder not has no childs.');
+		return;
+	}
+
+	args.shots = [];
+	for( var i = 0; i < p_elCurFolder.m_elArray.length; i++)
+		if( p_elCurFolder.m_elArray[i].m_path )
+			args.shots.push( p_elCurFolder.m_elArray[i].m_path);
+
+	if( args.shots.length < 1 )
+	{
+		c_Error('Current folder has less then one shot.');
+		return;
+	}
+
+	fu_PutMultiDialog( args);
+}
+

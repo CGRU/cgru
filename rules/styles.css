@@ -255,7 +255,7 @@ display: none;
 
 /* ============= PLAYLIST: =============== */
 .playlist_ctrl { padding-left: 6px; }
-.playlist_ctrl .button { float: left; font-size:11px; padding: 2px 4px; border-radius: 3px; min-width: 10px; }
+.playlist_ctrl .button { float: left; font-size:11px; padding: 2px 4px; border-radius: 3px; min-width: 5px; }
 #playlist .item {
 font-weight: normal;
 }
