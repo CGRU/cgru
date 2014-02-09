@@ -65,20 +65,20 @@ function scene_Show()
 		elFolder.style.padding = '4px';
 		elFolder.classList.add('shot');
 
+		var elLink = document.createElement('a');
+		elFolder.appendChild( elLink);
+		elLink.href = '#' + path;
 		var elImg = document.createElement('img');
-		elFolder.appendChild( elImg);
+		elLink.appendChild( elImg);
 		elImg.classList.add('thumbnail');
 		elImg.m_path = path;
-		elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
 		elImg.m_src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
 		sc_elImgThumbs.push( elImg);
 		elImg.src = elImg.m_src;
 
-		var elName = document.createElement('div');
+		var elName = document.createElement('a');
 		elFolder.appendChild( elName);
-		elName.classList.add('button');
-		elName.m_path = path;
-		elName.onclick = function(e){g_GO(e.currentTarget.m_path)};
+		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
 
 		elFolder.m_elFinish = document.createElement('div');
@@ -219,7 +219,6 @@ function scenes_Received( i_data, i_args)
 			elShot.m_elStatus.appendChild( elShot.m_elPercent);
 			elShot.m_elPercent.classList.add('percent');
 
-//			var elName = document.createElement('div');
 			var elName = document.createElement('a');
 			elShot.m_elStatus.appendChild( elName);
 			elName.classList.add('name');
@@ -528,5 +527,29 @@ function scenes_makeThumbnail( i_data, i_args)
 //console.log(cmd);
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
+}
+
+var scenes_skip = ['common','_'];
+function scenes_Put()
+{
+	var args = {};
+	args.shots = [];
+	for( var i = 0; i < sc_elShots.length; i++)
+	{
+		var path = sc_elShots[i].m_path;
+		var name = c_PathBase( path);
+		var skip = false;
+		for( var j = 0; j < scenes_skip.length; j++)
+			if( name.toLowerCase().indexOf( scenes_skip[j]) == 0 )
+			{
+				skip = true;
+				break;
+			}
+		if( skip ) continue;
+
+		args.shots.push( path);
+	}
+
+	fu_PutMultiDialog( args);
 }
 

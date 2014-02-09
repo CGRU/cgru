@@ -1,9 +1,10 @@
 <style type="text/css">
 #scenes_statistics div { float: left; padding: 4px; }
+#scenes_results_div div { float: left; margin: 2px 8px; }
 #_scenes_make_thumbnails div { float: left; padding: 4px 4px; }
 </style>
 
-<div id="scenes_statistics">
+<div id="scenes_statistics" style="float: left">
 	<div id="scenes_scenes_count_div">
 		<div>Scenes Count:</div>
 		<div id="scenes_scenes_count"></div>
@@ -16,6 +17,10 @@
 		<div>Shots Progress:</div>
 		<div id="scenes_shots_progress"></div>
 	</div>
+</div>
+
+<div id="scenes_results_div" style="float: right">
+	<div class="button" onclick="scenes_Put()">Put</div>
 </div>
 
 <div style="clear:both" id="scenes_div"></div>
