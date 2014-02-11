@@ -54,6 +54,7 @@
 	},
 	"shot":{
 		"seek":["[scene]/"],
+		"skip":[".","_","-","tmp","temp","tmp","common","rnd"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"scripts":["shot.js"],
 		"post":"shot_Post",

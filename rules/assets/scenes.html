@@ -1,7 +1,73 @@
 <style type="text/css">
+
+#asset .statistics > div { float: left; margin: 1px 4px; padding: 1px 4px; }
 #scenes_statistics div { float: left; padding: 4px; }
-#scenes_results_div div { float: left; margin: 2px 8px; }
+
+#scenes_ctrl_panel { float: right; margin: 2px 8px; font-size: 14px; }
+#scenes_ctrl_panel div { float: left; margin: 2px 4px; }
+
 #_scenes_make_thumbnails div { float: left; padding: 4px 4px; }
+
+.shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
+.shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
+.shot .status { clear:both; /*border: 1px solid #000;*/ }
+.shot .status .btn_edit { float: right; font-size: 10px; }
+.shot .status .percent { float: left; margin-right: 5px; }
+.shot .status .annotation { float: left; margin-right: 5px; }
+.shot .status .artists { float: left; margin-right: 5px; }
+.shot .status .tags { float: left; margin-right: 5px; }
+.shot .status .progressbar { clear: both; height: 8px; }
+
+.scene { padding: 4px; }
+.scene a { color: inherit; /*display:block;*/ }
+.scene a:hover { color: #AFF;}
+.scene .shot {
+position: relative;
+float: left;
+border-radius: 6px;
+margin: 4px;
+box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;
+border: 2px solid #000;
+width: 200px;
+height: 44px;
+}
+.scene .shot .status_edit { position: relative; top: 44px;}
+.scene .shot.status_editing {
+clear: both;
+width: 100%;
+left: 0; right: 0;
+height: 170px;
+border: 2px solid #FF0;
+}
+.scene .shot .status {
+position:absolute;
+top:0;left:0;bottom:0;right:0;
+padding: 0px 4px;
+font-size: 12px;
+font-weight: bold;
+text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 4px #000;
+color: #FFF;
+width: 190px;
+height: 44px;
+}
+.scene .shot .status .name { float:left;}
+.scene .shot .status .percent { float:right;}
+.scene .shot .status .annotation { float:right;}
+.scene .shot .status .progress { clear:both;}
+.scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
+.scene .shot .status .artists, .scene .shot .status .tags { clear:both; font-size: 10px;}
+.scene .shot .status .finish { position: absolute; top: 10px; }
+.scene .shot img {
+position: absolute;
+width: 182px;
+height: 34px;
+border-radius: 4px;
+margin: 4px 8px;
+border: 1px solid #000;
+box-shadow: 0 0 4px rgba(255,255,255,.7);
+opacity:.9;
+}
+
 </style>
 
 <div id="scenes_statistics" style="float: left">
@@ -19,8 +85,10 @@
 	</div>
 </div>
 
-<div id="scenes_results_div" style="float: right">
-	<div class="button" onclick="scenes_Put()">Put</div>
+<div id="scenes_ctrl_panel">
+	<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">S.None</div>
+	<div class="button" onclick="scenes_SelectAll(true)" title="Select All Shots">S.All</div>
+	<div class="button" onclick="scenes_Put()" title="Put Shots Results">Put</div>
 </div>
 
 <div style="clear:both" id="scenes_div"></div>

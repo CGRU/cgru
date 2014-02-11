@@ -214,6 +214,8 @@ function d_MakeCmd( i_params)
 	if(( params.aspect_in != null ) && ( params.aspect_in != '' ))
 		cmd += ' --aspect_in '+params.aspect_in;
 
+	cmd += ' --createoutdir';
+
 	cmd += ' "'+input+'"';
 	cmd += ' "'+output+'"';
 

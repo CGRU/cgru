@@ -1,5 +1,6 @@
 sc_elShots = null;
 sc_elScenes = null;
+sc_elCurShot = null;
 sc_elCurEditShot = null;
 
 sc_elImgThumbs = [];
@@ -52,21 +53,21 @@ function scene_Show()
 	var folders = g_elCurFolder.m_dir.folders;
 	for( var f = 0; f < folders.length; f++ )
 	{
-		if( sc_ShotSkip( folders[f].name)) continue;
+		if( sc_SkipFolder( folders[f].name)) continue;
 
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
-		var elFolder = document.createElement('div');
-		sc_elShots.push( elFolder);
-		elFolder.m_hidden = false;
-		elFolder.m_status = folders[f].status;
-		elFolder.m_path = path;
-		$('scenes_div').appendChild( elFolder);
-		elFolder.style.padding = '4px';
-		elFolder.classList.add('shot');
+		var elShot = document.createElement('div');
+		sc_elShots.push( elShot);
+		elShot.m_hidden = false;
+		elShot.m_status = folders[f].status;
+		elShot.m_path = path;
+		$('scenes_div').appendChild( elShot);
+		elShot.style.padding = '4px';
+		elShot.classList.add('shot');
 
 		var elLink = document.createElement('a');
-		elFolder.appendChild( elLink);
+		elShot.appendChild( elLink);
 		elLink.href = '#' + path;
 		var elImg = document.createElement('img');
 		elLink.appendChild( elImg);
@@ -77,55 +78,57 @@ function scene_Show()
 		elImg.src = elImg.m_src;
 
 		var elName = document.createElement('a');
-		elFolder.appendChild( elName);
+		elShot.appendChild( elName);
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
 
-		elFolder.m_elFinish = document.createElement('div');
-		elFolder.appendChild( elFolder.m_elFinish);
+		elShot.m_elFinish = document.createElement('div');
+		elShot.appendChild( elShot.m_elFinish);
 
-		elFolder.m_elStatus = document.createElement('div');
-		elFolder.appendChild( elFolder.m_elStatus);
-		elFolder.m_elStatus.classList.add('status');
+		elShot.m_elStatus = document.createElement('div');
+		elShot.appendChild( elShot.m_elStatus);
+		elShot.m_elStatus.classList.add('status');
 
-		elFolder.m_elEdit = document.createElement('div');
-		elFolder.m_elStatus.appendChild( elFolder.m_elEdit);
-		elFolder.m_elEdit.classList.add('button');
-		elFolder.m_elEdit.classList.add('btn_edit');
-		elFolder.m_elEdit.textContent = 'Edit';
-		elFolder.m_elEdit.m_elFolder = elFolder;
-		elFolder.m_elEdit.onclick = function(e){
-			var el = e.currentTarget.m_elFolder;
+		elShot.m_elEdit = document.createElement('div');
+		elShot.m_elStatus.appendChild( elShot.m_elEdit);
+		elShot.m_elEdit.classList.add('button');
+		elShot.m_elEdit.classList.add('btn_edit');
+		elShot.m_elEdit.textContent = 'Edit';
+		elShot.m_elEdit.m_elShot = elShot;
+		elShot.m_elEdit.onclick = function(e){
+			var el = e.currentTarget.m_elShot;
 			sc_elCurEditShot = el;
 			st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply, el.m_elStatus);
 		};
 
-		elFolder.m_elProgress = document.createElement('div');
-		elFolder.m_elStatus.appendChild( elFolder.m_elProgress);
-		elFolder.m_elProgress.classList.add('progress');
-		elFolder.m_elProgressBar = document.createElement('div');
-		elFolder.m_elProgress.appendChild( elFolder.m_elProgressBar);
-		elFolder.m_elProgressBar.classList.add('progressbar');
+		elShot.m_elProgress = document.createElement('div');
+		elShot.m_elStatus.appendChild( elShot.m_elProgress);
+		elShot.m_elProgress.classList.add('progress');
+		elShot.m_elProgressBar = document.createElement('div');
+		elShot.m_elProgress.appendChild( elShot.m_elProgressBar);
+		elShot.m_elProgressBar.classList.add('progressbar');
 
-		elFolder.m_elPercent = document.createElement('div');
-		elFolder.m_elStatus.appendChild( elFolder.m_elPercent);
-		elFolder.m_elPercent.classList.add('percent');
+		elShot.m_elPercent = document.createElement('div');
+		elShot.m_elStatus.appendChild( elShot.m_elPercent);
+		elShot.m_elPercent.classList.add('percent');
 
-		elFolder.m_elAnn = document.createElement('div');
-		elFolder.m_elStatus.appendChild( elFolder.m_elAnn);
-		elFolder.m_elAnn.classList.add('annotation');
+		elShot.m_elAnn = document.createElement('div');
+		elShot.m_elStatus.appendChild( elShot.m_elAnn);
+		elShot.m_elAnn.classList.add('annotation');
 
-		elFolder.m_elArtists = document.createElement('div');
-		elFolder.m_elStatus.appendChild( elFolder.m_elArtists);
-		elFolder.m_elArtists.classList.add('artists');
+		elShot.m_elArtists = document.createElement('div');
+		elShot.m_elStatus.appendChild( elShot.m_elArtists);
+		elShot.m_elArtists.classList.add('artists');
 
-		elFolder.m_elTags = document.createElement('div');
-		elFolder.m_elStatus.appendChild( elFolder.m_elTags);
-		elFolder.m_elTags.classList.add('tags');
+		elShot.m_elTags = document.createElement('div');
+		elShot.m_elStatus.appendChild( elShot.m_elTags);
+		elShot.m_elTags.classList.add('tags');
 
-		sc_elCurEditShot = elFolder;
+		sc_elCurEditShot = elShot;
 		sc_ShotStatusApply( folders[f].status);
 		sc_elCurEditShot = null;
+
+		elShot.onclick = sc_ShotClicked;
 	}
 	sc_DisplayCounts();
 	sc_Post();
@@ -152,7 +155,7 @@ function scenes_Received( i_data, i_args)
 	for( var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
-		if( sc_ShotSkip( fobj.name)) continue;
+		if( sc_SkipFolder( fobj.name)) continue;
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
@@ -182,7 +185,7 @@ function scenes_Received( i_data, i_args)
 		for( var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
-			if( sc_ShotSkip( fobj.name)) continue;
+			if( sc_SkipFolder( fobj.name)) continue;
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);
@@ -247,10 +250,54 @@ function scenes_Received( i_data, i_args)
 			sc_elCurEditShot = elShot;
 			sc_ShotStatusApply( fobj.status);
 			sc_elCurEditShot = null;
+
+			elShot.onclick = sc_ShotClicked;
 		}
 	}
 	sc_DisplayCounts();
 	sc_Post();
+}
+
+function sc_ShotClicked( i_evt)
+{
+	var el = i_evt.currentTarget;
+	sc_SelectShot( el, el.m_selected !== true );
+	if( i_evt.shiftKey && sc_elCurShot )
+	{
+		var i_p = sc_elShots.indexOf( sc_elCurShot );
+		var i_c = sc_elShots.indexOf( el);
+		if( i_p != i_c )
+		{
+			var select = false;
+			if( el.m_selected ) select = true;
+			var step = 1;
+			if( i_c < i_p ) step = -1;
+			while( i_p != i_c )
+			{
+				sc_SelectShot( sc_elShots[i_p], select);
+				i_p += step;
+			}
+		}
+	}
+	sc_elCurShot = el;
+}
+function sc_SelectShot( i_elShot, i_select)
+{
+	if( i_select )
+	{
+		i_elShot.m_selected = true;
+		i_elShot.classList.add('selected');
+	}
+	else
+	{
+		i_elShot.m_selected = false;
+		i_elShot.classList.remove('selected');
+	}
+}
+function scenes_SelectAll( i_select)
+{
+	for( var i = 0; i < sc_elShots.length; i++)
+		sc_SelectShot( sc_elShots[i], i_select);
 }
 
 function sc_ShotStatusApply( i_status)
@@ -264,10 +311,12 @@ function sc_ShotStatusApply( i_status)
 	st_SetElColor( i_status, sc_elCurEditShot);
 }
 
-function sc_ShotSkip( i_name)
+function sc_SkipFolder( i_name)
 {
-	if( i_name.indexOf('.') == 0 ) return true;
-	if( i_name.indexOf('_') == 0 ) return true;
+	var name = c_PathBase( i_name);
+	for( var i = 0; i < RULES.assets.shot.skip.length; i++)
+		if( name.toLowerCase().indexOf( RULES.assets.shot.skip[i]) === 0 )
+			return true;
 	return false;
 }
 
@@ -529,25 +578,20 @@ function scenes_makeThumbnail( i_data, i_args)
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":scenes_makeThumbnail,"elThumb":el,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
 
-var scenes_skip = ['common','_'];
 function scenes_Put()
 {
 	var args = {};
 	args.shots = [];
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
-		var path = sc_elShots[i].m_path;
-		var name = c_PathBase( path);
-		var skip = false;
-		for( var j = 0; j < scenes_skip.length; j++)
-			if( name.toLowerCase().indexOf( scenes_skip[j]) == 0 )
-			{
-				skip = true;
-				break;
-			}
-		if( skip ) continue;
+		if(( sc_elCurShot ) && ( sc_elShots[i].m_selected !== true )) continue;
+		args.shots.push( sc_elShots[i].m_path);
+	}
 
-		args.shots.push( path);
+	if( args.shots.length < 1 )
+	{
+		c_Error('Select at least one shot.');
+		return;
 	}
 
 	fu_PutMultiDialog( args);

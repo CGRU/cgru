@@ -43,7 +43,6 @@ function shot_Loaded( i_data, i_args)
 	{
 		var elRefs = document.createElement('div');
 		u_el.asset.appendChild( elRefs);
-		elRefs.classList.add('source');
 		elRefs.classList.add('button');
 		elRefs.textContent = 'Show References';
 		elRefs.style.cssFloat = 'left';
@@ -54,7 +53,6 @@ function shot_Loaded( i_data, i_args)
 	{
 		var elSource = document.createElement('div');
 		u_el.asset.appendChild( elSource);
-		elSource.classList.add('source');
 		elSource.classList.add('button');
 		elSource.textContent = 'Scan Sources';
 		elSource.style.cssFloat = 'left';
@@ -65,7 +63,7 @@ function shot_Loaded( i_data, i_args)
 	{
 		var elResult = document.createElement('div');
 		u_el.asset.appendChild( elResult);
-		elResult.classList.add('result');
+		elResult.style.clear = 'both';
 
 		var founded = false;
 		for( var i = 0; i < walk.result.length; i++)
@@ -87,7 +85,7 @@ function shot_Loaded( i_data, i_args)
 	{
 		var elDailies = document.createElement('div');
 		u_el.asset.appendChild( elDailies);
-		elDailies.classList.add('resdailies');
+		elDailies.style.clear = 'both';
 
 		var founded = false;
 		for( var i = 0; i < walk.dailies.length; i++)
@@ -155,7 +153,7 @@ function shot_RefsOnClick( i_evt)
 	el.style.cssFloat = 'none';
 	el.classList.remove('button');
 	el.classList.add('waiting');
-	el.classList.add('result');
+	el.style.clear = 'both';
 
 	var walk = {};
 	walk.paths = [];
@@ -210,7 +208,7 @@ function shot_SourceOnClick( i_evt)
 	elSource.style.cssFloat = 'none';
 	elSource.classList.remove('button');
 	elSource.classList.add('waiting');
-	elSource.classList.add('result');
+	elSource.style.clear = 'both';
 
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)

@@ -78,7 +78,6 @@ width: 6px;
 }
 #navig_panel { position: absolute; height: 20px; left:0;right:0;top:0; box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;}
 #navig_panel .button { font-size: 12px; padding: 0px; margin: 3px; float: left; width: 40px; text-align: center; border-radius: 4px; box-shadow: 0 0 2px #000; }
-#navig_panel .button.selected { background: rgba(100,200,200,.3); }
 #navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/ }
 #navig .folder {
 clear: both;
@@ -176,6 +175,8 @@ text-align: center;
 }
 .checkbox.enabled {font-weight: bold;}
 
+.selected { background: rgba( 100, 255, 1255, .2); }
+
 #content > .view { position: relative; border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 
 .editing {
@@ -196,7 +197,6 @@ min-height: 19px;
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
 .tag { float:left; cursor: pointer; border-radius: 3px; box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
-.tag.selected { background: rgba(100,255,255,.2);}
 .artists, .tags { box-shadow: 0 0 2px #000 inset; border-radius: 3px; padding: 0 4px; }
 .tags { font-style:italic;}
 
@@ -355,10 +355,15 @@ padding: 5px 4px;
 #assets .asset .type { padding: 0px 4px; float: left; text-decoration: none; }
 #assets .asset .name { padding: 0px 4px; float: left; font: bold 16px monospace;}
 
+#asset .files_view {
+box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
+border-radius: 10px;
+margin: 6px;
+padding: 5px 20px 20px 20px;
+}
 .files_view .panel { /*border: 1px solid #000;*/ }
 .files_view .panel div, .files_view .panel a { float: left; margin: 0px 8px; }
 .files_view .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }
-.files_view .panel .limit.selected { background: rgba(100,255,255,.2); }
 .files_view .panel .title { clear: both; font-weight: bold;}
 .files_view .panel .path { margin: 0px 8px; }
 .files_view .panel .cmdexec { padding: 0px 8px;}
@@ -399,7 +404,6 @@ margin-bottom: -4px;
 .files_view .item .size { font: 12px monospace; width: 60px; text-align: right; }
 .files_view .item .mtime { font: 12px monospace; }
 .files_view .item .checksum { font: 12px monospace; }
-.files_view .item.selected { background: rgba(150,250,250,.2); }
 .files_view .item .preview { clear: both; margin: 4px; float: none; text-align: center; border-radius: 8px; border: 2px solid #000; background: #222; }
 .files_view .item .preview .video { border-radius: 6px; border: 2px solid #000; }
 .files_view .item .preview .close { background: #555; color: #000; }
@@ -416,81 +420,7 @@ border-radius: 8px;
 /*#body_avatar_c:hover, #body_avatar_m:hover { width: auto; height: auto; }*/
 #body_panel_edit > div { margin: 1px 4px;}
 #body_panel_edit .toggle { float:left; font-size:12px; border: 1px solid rgba(0,0,0,.5); cursor:pointer; padding:2px 3px; }
-#body_panel_edit .toggle.selected { background: rgba(200,255,255,.3);}
 #body_body { clear: both; }
-
-/* ============================================================================*/
-/* ============================= ASSETS: ======================================*/
-#asset .result, #asset .resdailies {
-clear: both;
-box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
-border-radius: 10px;
-margin: 6px;
-padding: 5px 20px 20px 20px;
-}
-#asset .source.button { padding: 4px;}
-
-#asset .statistics > div { float: left; margin: 1px 4px; padding: 1px 4px; }
-.shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
-.shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
-.shot .status { clear:both; /*border: 1px solid #000;*/ }
-.shot .status .btn_edit { float: right; font-size: 10px; }
-.shot .status .percent { float: left; margin-right: 5px; }
-.shot .status .annotation { float: left; margin-right: 5px; }
-.shot .status .artists { float: left; margin-right: 5px; }
-.shot .status .tags { float: left; margin-right: 5px; }
-.shot .status .progressbar { clear: both; height: 8px; }
-
-.scene { padding: 4px; }
-.scene a { color: inherit; /*display:block;*/ }
-.scene a:hover { color: #AFF;}
-.scene .shot {
-position: relative;
-float: left;
-border-radius: 6px;
-margin: 4px;
-box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;
-border: 2px solid #000;
-width: 200px;
-height: 44px;
-}
-.scene .shot .status_edit { position: relative; top: 44px;}
-.scene .shot.status_editing {
-clear: both;
-width: 100%;
-left: 0; right: 0;
-height: 170px;
-border: 2px solid #FF0;
-}
-/*.scene .shot .name,*/
-.scene .shot .status {
-position:absolute;
-top:0;left:0;bottom:0;right:0;
-padding: 0px 4px;
-font-size: 12px;
-font-weight: bold;
-text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 4px #000;
-color: #FFF;
-width: 190px;
-height: 44px;
-}
-.scene .shot .status .name { float:left;}
-.scene .shot .status .percent { float:right;}
-.scene .shot .status .annotation { float:right;}
-.scene .shot .status .progress { clear:both;}
-.scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
-.scene .shot .status .artists, .scene .shot .status .tags { clear:both; font-size: 10px;}
-.scene .shot .status .finish { position: absolute; top: 10px; }
-.scene .shot img {
-position: absolute;
-width: 182px;
-height: 34px;
-border-radius: 4px;
-margin: 4px 8px;
-border: 1px solid #000;
-box-shadow: 0 0 4px rgba(255,255,255,.7);
-opacity:.9;
-}
 
 /* ========================================================= */
 /* =================== COMMENTS ============================ */
@@ -573,14 +503,13 @@ box-shadow: 0 0 4px #000 inset;
 .gui .info { float: right; width: 200px; }
 .gui .list { border-radius: 5px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; }
 .gui .list .item { border-radius: 3px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; margin: 4px; }
-.gui .list .item.selected { background: rgba(100,200,200,.3); }
 .gui .list .ctrl { border-radius: 3px; }
 .gui .list .ctrl .name { float: left; text-transform: capitalize; padding: 3px 8px; }
 .gui .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
 .gui .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
 .gui .rules { box-shadow: 0 0 4px #000 inset; padding: 12px; margin: 4px 0px;  border-radius: 6px;}
 .gui .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; font-size: 14px; margin: 0px 2px; }
-.gui .choise.selected { background: rgba(255,255,0,.2); box-shadow: 0 0 2px #000 inset; }
+.gui .choise.selected { box-shadow: 0 0 2px #000 inset; }
 .gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 6px 6px 0 0; box-shadow: 0 0 2px #000; cursor: pointer; float: left; }
 .gui .tablabel.active { box-shadow: 0 0 2px #000 inset; background: rgba(100,255,255,.2); }
 .gui .tabpanel { padding: 2px 8px; box-shadow: 0 0 2px inset; clear: both; }
@@ -595,7 +524,7 @@ box-shadow: 0 0 4px #000 inset;
 .administrate { color: #000000; font-size: 14px; }
 .administrate .button { float: left; }
 .admin_groups div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
-.admin_groups .selected, .admin_users .selected div { background: rgba(100,255,255,.2); }
+.admin_users .selected div { background: rgba(100,255,255,.2); }
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
 
 .profile > div { border-radius: 4px; border: 1px solid #888; margin: 4px 0px; padding: 4px; }
