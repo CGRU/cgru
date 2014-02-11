@@ -1,0 +1,25 @@
+<style type="text/css">
+
+.shot_files {
+box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
+border-radius: 10px;
+margin: 6px;
+padding: 5px 20px 20px 20px;
+}
+
+</style>
+
+<div id="shot_refs_div" style="float: left; display: none;">
+	<div id="shot_refs_btn" class="button" onclick="shot_ShowRefs()">Show References</div>
+	<div id="shot_refs" class="shot_files" style="display: none;">Loading Shot References...</div>
+</div>
+
+<div id="shot_src_div" style="float: left; display: none;">
+	<div id="shot_src_btn" class="button" onclick="shot_ScanSources()">Scan Sources</div>
+	<div id="shot_src" class="shot_files" style="display: none;">Scanning Shot Source Sequences...</div>
+</div>
+
+<div id="shot_results" class="shot_files" style="clear: both; display: none;">Reading Shot Results...</div>
+
+<div id="shot_dailies" class="shot_files" style="clear: both; display: none;">Reading Shot Dailies...</div>
+
