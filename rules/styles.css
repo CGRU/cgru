@@ -355,12 +355,6 @@ padding: 5px 4px;
 #assets .asset .type { padding: 0px 4px; float: left; text-decoration: none; }
 #assets .asset .name { padding: 0px 4px; float: left; font: bold 16px monospace;}
 
-#asset .files_view {
-box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
-border-radius: 10px;
-margin: 6px;
-padding: 5px 20px 20px 20px;
-}
 .files_view .panel { /*border: 1px solid #000;*/ }
 .files_view .panel div, .files_view .panel a { float: left; margin: 0px 8px; }
 .files_view .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; width: 50px; border-radius: 4px; box-shadow: 0 0 2px #000; text-align: center; }

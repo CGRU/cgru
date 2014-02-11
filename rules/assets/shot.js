@@ -3,11 +3,19 @@ shot_thumb_paths = [];
 function shot_Show()
 {
 	shot_thumb_paths = [];
+
 	a_SetLabel('Shot');
-	$('asset').innerHTML = '<div style="text-align:center">Scanning shot sequences...</div>';
+	$('asset').innerHTML = n_Request({"send":{"getfile":'rules/assets/shot.html'}});
 
 	var walk = {};
 	walk.paths = [];
+	
+	if( ASSET.references )
+		$('shot_refs_div').style.display = 'block';
+
+	if( ASSET.source )
+		$('shot_src_div').style.display = 'block';
+
 	if( ASSET.result )
 	{
 		walk.result = [];
@@ -16,6 +24,7 @@ function shot_Show()
 			walk.result.push( walk.paths.length);
 			walk.paths.push( ASSET.path + '/' + ASSET.result.path[r]);
 		}
+		$('shot_results').style.display = 'block';
 	}
 	if( ASSET.dailies )
 	{
@@ -25,6 +34,7 @@ function shot_Show()
 			walk.dailies.push( walk.paths.length);
 			walk.paths.push( ASSET.path + '/' + ASSET.dailies.path[r]);
 		}
+		$('shot_dailies').style.display = 'block';
 	}
 
 	walk.mtime = RULES.cache_time;
@@ -37,34 +47,11 @@ function shot_Loaded( i_data, i_args)
 {
 	var walk = i_args;
 	walk.walks = i_data;
-	$('asset').textContent = '';
-
-	if( ASSET.references )
-	{
-		var elRefs = document.createElement('div');
-		u_el.asset.appendChild( elRefs);
-		elRefs.classList.add('button');
-		elRefs.textContent = 'Show References';
-		elRefs.style.cssFloat = 'left';
-		elRefs.onclick = shot_RefsOnClick;
-	}
-
-	if( ASSET.source )
-	{
-		var elSource = document.createElement('div');
-		u_el.asset.appendChild( elSource);
-		elSource.classList.add('button');
-		elSource.textContent = 'Scan Sources';
-		elSource.style.cssFloat = 'left';
-		elSource.onclick = shot_SourceOnClick;
-	}
 
 	if( ASSET.result )
 	{
-		var elResult = document.createElement('div');
-		u_el.asset.appendChild( elResult);
-		elResult.style.clear = 'both';
-
+		var el = $('shot_results');
+		el.textContent = '';
 		var founded = false;
 		for( var i = 0; i < walk.result.length; i++)
 		{
@@ -73,20 +60,18 @@ function shot_Loaded( i_data, i_args)
 			if(( folders == null ) || ( folders.length == 0 )) continue;
 
 			shot_thumb_paths.push( path);
-			new FilesView({"el":elResult,"path":path,"walk":walk.walks[walk.result[i]]})
+			new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]]})
 			founded = true;
 		}
 
 		if( false == founded )
-			elResult.textContent = JSON.stringify( ASSET.result.path );
+			el.textContent = JSON.stringify( ASSET.result.path );
 	}
 
 	if( ASSET.dailies )
 	{
-		var elDailies = document.createElement('div');
-		u_el.asset.appendChild( elDailies);
-		elDailies.style.clear = 'both';
-
+		var el = $('shot_dailies');
+		el.textContent = '';
 		var founded = false;
 		for( var i = 0; i < walk.dailies.length; i++)
 		{
@@ -95,7 +80,7 @@ function shot_Loaded( i_data, i_args)
 			var folders = walk.walks[walk.dailies[i]].folders;
 			if(( files && files.length ) || ( folders && folders.length ))
 			{
-				new FilesView({"el":elDailies,"path":path,"walk":walk.walks[walk.dailies[i]]});
+				new FilesView({"el":el,"path":path,"walk":walk.walks[walk.dailies[i]]});
 				if( shot_thumb_paths.length == 0 )
 					shot_thumb_paths.push( path);
 				founded = true;
@@ -103,7 +88,7 @@ function shot_Loaded( i_data, i_args)
 		}
 
 		if( false == founded )
-			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
+			el.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
 	shot_MakeThumbnail( shot_thumb_paths);
@@ -142,22 +127,16 @@ function shot_MakeThumbnail()
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
 
-function shot_RefsOnClick( i_evt)
+function shot_ShowRefs()
 {
-	var el = i_evt.currentTarget;
-
-	if( el.m_opened ) return;
-
-	el.m_opened = true;
-	el.textContent = 'Loading Shot References...';
-	el.style.cssFloat = 'none';
-	el.classList.remove('button');
-	el.classList.add('waiting');
-	el.style.clear = 'both';
+	$('shot_refs_div').style.clear = 'both';
+	$('shot_refs_div').style.cssFloat = 'none';
+	$('shot_refs_btn').style.display = 'none';
+	$('shot_refs').style.display = 'block';
+	$('shot_refs').classList.add('waiting');
 
 	var walk = {};
 	walk.paths = [];
-	walk.el = el;
 	for( var i = 0; i < ASSET.references.path.length; i++)
 		walk.paths.push( ASSET.path + '/' + ASSET.references.path[i]);
 
@@ -169,8 +148,9 @@ function shot_RefsReceived( i_data, i_args)
 	var walk = i_args;
 	walk.walks = i_data;
 
-	i_args.el.textContent = '';
-	i_args.el.classList.remove('waiting');
+	var el = $('shot_refs');
+	el.textContent = '';
+	el.classList.remove('waiting');
 //console.log( i_data);
 	var founded = false;
 	var not_empty_paths = [];
@@ -183,11 +163,11 @@ function shot_RefsReceived( i_data, i_args)
 			((  files == null ) || (   files.length == 0 )))
 			 continue;
 		not_empty_paths.push( walk.paths[i]);
-		new FilesView({"el":i_args.el,"path":walk.paths[i],"walk":walk.walks[i]})
+		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false})
 		founded = true;
 	}
 	if( false == founded )
-		i_args.el.textContent = JSON.stringify( walk.paths );
+		el.textContent = JSON.stringify( walk.paths );
 
 	if( shot_thumb_paths.length == 0 )
 	{
@@ -196,29 +176,24 @@ function shot_RefsReceived( i_data, i_args)
 	}
 }
 
-function shot_SourceOnClick( i_evt)
+function shot_ScanSources()
 {
-	var el = i_evt.currentTarget;
-	var elSource = el;
-
-	if( elSource.m_scanned ) return;
-
-	elSource.m_scanned = true;
-	elSource.textContent = 'Scanning Shot Source Sequences...';
-	elSource.style.cssFloat = 'none';
-	elSource.classList.remove('button');
-	elSource.classList.add('waiting');
-	elSource.style.clear = 'both';
+	$('shot_src_div').style.clear = 'both';
+	$('shot_src_div').style.cssFloat = 'none';
+	$('shot_src_btn').style.display = 'none';
+	$('shot_src').style.display = 'block';
+	$('shot_src').classList.add('waiting');
 
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
-	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"el":elSource,"local":true});
+	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"local":true});
 }
 function shot_SourceReceived( i_data, i_args)
 {
-	i_args.el.textContent = '';
-	i_args.el.classList.remove('waiting');
+	var el = $('shot_src');
+	el.textContent = '';
+	el.classList.remove('waiting');
 	var founded = false;
 	var not_empty_paths = [];
 	for( var i = 0; i < i_data.length; i++)
@@ -227,14 +202,14 @@ function shot_SourceReceived( i_data, i_args)
 		shot_SourceWalkFind( i_data[i], flist);
 		if( flist.length )
 		{
-			new FilesView({"el":i_args.el,"path":i_args.paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
+			new FilesView({"el":el,"path":i_args.paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
 			founded = true;
 		}
 	}
 
 	if( false == founded )
-		elSource.textContent = JSON.stringify( ASSET.source.path);
+		el.textContent = JSON.stringify( ASSET.source.path);
 
 	if( shot_thumb_paths.length == 0 )
 	{
