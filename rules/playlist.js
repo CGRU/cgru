@@ -364,13 +364,15 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 	i_elParent.m_elArray.push( el);
 	i_elParent.m_elLast = el;
 
+	i_elParent.title = i_elParent.m_title + '\nItems Count: ' + i_elParent.m_elArray.length;
+
 	var title = '';
-	if( i_obj.user ) el.title = c_GetUserTitle( i_obj.user);
-	if( i_obj.time ) el.title += '\n' + c_DT_StrFromSec( i_obj.time);
+	if( i_obj.user ) title = c_GetUserTitle( i_obj.user);
+	if( i_obj.time ) title += '\n' + c_DT_StrFromSec( i_obj.time);
 	if( i_obj.path )
 	{
 		var path = i_obj.path.split('?')[0];
-		el.title += '\n' + path;
+		title += '\n' + path;
 
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
@@ -380,7 +382,7 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 
 		if( i_obj.item )
 		{
-			el.title += '\n @ ' + i_obj.item.replace( path, '');
+			title += '\n @ ' + i_obj.item.replace( path, '');
 			var elAnchor = document.createElement('a');
 			el.appendChild( elAnchor);
 			elAnchor.textContent = c_PathBase( i_obj.item);
@@ -390,6 +392,7 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 		}
 	}
 
+	el.m_title = title;
 	if( title != '' ) el.title = title;
 
 	return el;
