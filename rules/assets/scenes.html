@@ -8,7 +8,8 @@
 
 #_scenes_make_thumbnails div { float: left; padding: 4px 4px; }
 
-.shot, .scene { border-radius:6px; box-shadow: 0 0 4px #000 inset; margin: 4px ;}
+.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 6px; box-shadow: 0 0 4px #000 inset; margin: 4px;}
+
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
 .shot .status .btn_edit { float: right; font-size: 10px; }
@@ -27,7 +28,6 @@ float: left;
 border-radius: 6px;
 margin: 4px;
 box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;
-border: 2px solid #000;
 width: 200px;
 height: 44px;
 }
@@ -67,6 +67,8 @@ border: 1px solid #000;
 box-shadow: 0 0 4px rgba(255,255,255,.7);
 opacity:.9;
 }
+
+.shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #000 inset, 0 0 4px #7FF;}
 
 </style>
 

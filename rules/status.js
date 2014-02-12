@@ -180,6 +180,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elRoot = document.createElement('div');
 	st_elParent.appendChild( st_elRoot);
 	st_elRoot.classList.add('status_edit');
+	st_elRoot.onclick = function(e){e.stopPropagation();};
 
 	var elBtns = document.createElement('div');
 	st_elRoot.appendChild( elBtns);

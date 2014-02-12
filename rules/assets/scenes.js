@@ -96,6 +96,7 @@ function scene_Show()
 		elShot.m_elEdit.textContent = 'Edit';
 		elShot.m_elEdit.m_elShot = elShot;
 		elShot.m_elEdit.onclick = function(e){
+			e.stopPropagation();
 			var el = e.currentTarget.m_elShot;
 			sc_elCurEditShot = el;
 			st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply, el.m_elStatus);
