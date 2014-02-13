@@ -842,7 +842,10 @@ function jsf_editobj( $i_edit, &$o_out)
 //error_log('obj:'.json_encode($obj));
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);
-		fwrite( $fHandle, json_encode( $obj, JSON_PRETTY_PRINT));
+		if( phpversion() >= "5.3" )
+			fwrite( $fHandle, json_encode( $obj, JSON_PRETTY_PRINT));
+		else
+			fwrite( $fHandle, json_encode( $obj));
 		fclose($fHandle);
 		$o_out['status'] = 'success';
 	}

@@ -792,7 +792,7 @@ function ad_SetPassword( i_passwd, i_user_id)
 
 	var digest = c_MD5( i_user_id + ':'+cgru_Config.realm+':' + i_passwd);
 	digest = i_user_id + ':'+cgru_Config.realm+':' + digest;
-	var result = c_Parse( n_Request_old({"htdigest":{"user":i_user_id,"digest":digest}}, true, true));
+	var result = c_Parse( n_Request_old({"htdigest":{"user":i_user_id,"digest":digest}}, true, SERVER.php_version >= "5.3"));
 	if( result == null ) return;
 	if( result.error )
 	{
