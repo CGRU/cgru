@@ -72,6 +72,29 @@ function FilesView( i_args)
 		elRefteshBtn.onclick = function(e){ e.currentTarget.m_view.refresh()};
 	}
 
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'SA';
+	el.title = 'Select all';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.selectAll( true)};
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'SN';
+	el.title = 'Select none';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.selectAll( false)};
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'PUT';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.put();}
+
 	if( this.has_thumbs )
 	{
 		var elThumbDiv = document.createElement('div');
@@ -219,13 +242,10 @@ FilesView.prototype.walkReceived = function( i_data, i_args)
 	i_args.this.walk = i_data[0];
 	i_args.this.show();
 
-	// Select item back:
+	// Select items back:
 	for( var i = 0; i < i_args.this.elItems.length; i++)
 		if( sel_paths.indexOf( i_args.this.elItems[i].m_path) != -1 )
-		{
-			i_args.this.elItems[i].classList.add('selected');
-			fv_cur_item = i_args.this.elItems[i];
-		}
+			i_args.this.selectItem( i_args.this.elItems[i]);
 }
 
 FilesView.prototype.show = function()
@@ -393,12 +413,6 @@ FilesView.prototype.showFolder = function( i_folder)
 			d_Make( e.currentTarget.m_path, out_path)};
 	}
 
-	var elPut = document.createElement('div');
-	elFolder.appendChild( elPut);
-	elPut.classList.add('button');
-	elPut.textContent = 'PUT';
-	elPut.onclick = function(e){ e.stopPropagation(); fu_Put( path);}
-
 	this.showAttrs( elFolder, i_folder);
 }
 
@@ -486,35 +500,58 @@ FilesView.prototype.showFile = function( i_file)
 FilesView.prototype.onClick = function( i_evt)
 {
 	i_evt.stopPropagation();
-	this.selectItemToggle( i_evt.currentTarget);
+	var el = i_evt.currentTarget;
+	this.selectItem( el, el.m_selected !== true );
+	if( i_evt.shiftKey && fv_cur_item )
+	{
+		var i_s = this.elItems.indexOf( el);
+		var i_c = this.elItems.indexOf( fv_cur_item );
+		if( i_s != i_c )
+		{
+			var select = false;
+			if( el.classList.contains('selected')) select = true;
+			var step = 1;
+			if( i_s < i_c ) step = -1;
+			while( i_c != i_s )
+			{
+				this.selectItem( this.elItems[i_c], select);
+				i_c += step;
+			}
+		}
+	}
+	fv_cur_item = el;
 }
-
-FilesView.prototype.selectItem = function( i_el)
+FilesView.prototype.selectItem = function( i_el, i_select)
 {
-	this.selectNone();
-	i_el.classList.add('selected');
-	fv_cur_item = i_el;
-}
-
-FilesView.prototype.selectItemToggle = function( i_el)
-{
-	if( i_el.classList.contains('selected'))
-		this.deselectItem( i_el);
+	if( i_select )
+	{
+		i_el.m_selected = true;
+		i_el.classList.add('selected');
+	}
 	else
-		this.selectItem( i_el);
+	{
+		i_el.m_selected = false;
+		i_el.classList.remove('selected');
+	}
 }
-
-FilesView.prototype.deselectItem = function( i_el)
-{
-	i_el.classList.remove('selected');
-	if( fv_cur_item == i_el )
-		fv_cur_item = null;
-}
-
-FilesView.prototype.selectNone = function()
+FilesView.prototype.selectAll = function( i_select)
 {
 	for( var i = 0; i < this.elItems.length; i++)
-		this.elItems[i].classList.remove('selected');
+		this.selectItem( this.elItems[i], i_select);
+	if( i_select == false )
+		fv_cur_item = null;
+}
+FilesView.prototype.put = function()
+{
+	var args = {};
+	args.paths = [];
+	for( var i = 0; i < this.elItems.length; i++)
+		if( this.elItems[i].m_selected )
+			args.paths.push( this.elItems[i].m_path);
+	if( args.paths.length < 1 )
+		c_Error('No items selected.');
+	else
+		fu_Put( args);
 }
 
 FilesView.prototype.getItemPath = function( i_path)

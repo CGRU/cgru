@@ -1,17 +1,17 @@
 //========================== Put: ============================
 fu_put_params = [];
-fu_put_params.src = {"label":'Source', "disabled":true};
+//fu_put_params.src = {"label":'Source', "disabled":true};
 fu_put_params.dest = {"label":'Destination'};
-fu_put_params.name = {};
+//fu_put_params.name = {};
 
-function fu_Put( i_path)
+function fu_Put( i_args)
 {
 	var wnd = new cgru_Window({"name":'put',"title":'Put Folder'});
-
+	wnd.m_args = i_args;
+	i_args.names = [];
 	var params = {};
 
-	params.src = i_path;
-
+//	params.src = i_path;
 	params.dest = RULES.put.dest;
 	if( params.dest.indexOf('/')  != 0 )
 	{
@@ -21,19 +21,7 @@ function fu_Put( i_path)
 			params.dest = '/' + params.dest;
 	}
 
-	params.name = c_PathBase( i_path);
-	if( ASSETS.shot )
-	{
-		params.name = ASSET.name;
-
-		var version = i_path.split('/');
-		version = version[version.length-1];
-		var match = version.match(/v\d{2,}.*/gi);
-		if( match )
-			params.name += '_' + match[match.length-1];
-	}
-
-	gui_Create( wnd.elContent, fu_put_params, [params, RULES.put]);
+	gui_Create( wnd.elContent, fu_put_params, [RULES.put, params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -55,6 +43,29 @@ function fu_Put( i_path)
 	elSend.onclick = function(e){ fu_PutDo( e.currentTarget.m_wnd);}
 	elSend.m_wnd = wnd;
 
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+	for( var i = 0; i < i_args.paths.length; i++)
+	{
+		var name = c_PathBase( i_args.paths[i]);
+		if( ASSETS.shot )
+		{
+			name = ASSET.name;
+			var version = i_args.paths[i].split('/');
+			version = version[version.length-1];
+			var match = version.match(/v\d{2,}.*/gi);
+			if( match )
+				name += '_' + match[match.length-1];
+		}
+		i_args.names.push( name);
+
+		el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = i_args.paths[i] + ' -> ' + name;
+	}
+
 	var elRules = document.createElement('div');
 	wnd.elContent.appendChild( elRules);
 	elRules.classList.add('rules');
@@ -64,17 +75,15 @@ function fu_Put( i_path)
 function fu_PutDo( i_wnd)
 {
 	var params = gui_GetParams( i_wnd.elContent, fu_put_params);
-//	for( var p = 0; p < fu_put_params.length; p++)
-//		params[fu_put_params[p].name] = i_wnd.m_elements[fu_put_params[p].name].textContent;
 
-	i_wnd.destroy();
-
-	var source = cgru_PM('/' + RULES.root+params.src,  true);
-	var dest   = cgru_PM('/' + RULES.root+params.dest, true);
+	for( var i = 0; i < i_wnd.m_args.paths.length; i++)
+	{
+	var source = cgru_PM('/' + RULES.root + i_wnd.m_args.paths[i],  true);
+	var dest   = cgru_PM('/' + RULES.root + params.dest, true);
+	var name   = i_wnd.m_args.names[i];
 
 	var job = {};
-	//job.offline = true;
-	job.name = 'PUT ' + params.name;
+	job.name = 'PUT ' + name;
 
 	var block = {};
 	block.name = 'put';
@@ -84,13 +93,13 @@ function fu_PutDo( i_wnd)
 	job.blocks = [block];
 
 	var task = {}
-	task.name = params.name;
+	task.name = name;
 	block.tasks = [task];
 
 	var cmd = cgru_PM( RULES.put.cmd, true);
 	cmd += ' -s "' + source + '"';
 	cmd += ' -d "' + dest + '"';
-	cmd += ' -n "' + params.name + '"';
+	cmd += ' -n "' + name + '"';
 	task.command = cmd;
 
 	if( RULES.put.post_delete )
@@ -98,10 +107,11 @@ function fu_PutDo( i_wnd)
 
 //job.offline = true;
 	n_SendJob( job);
-
+	}
 //console.log( task.command);
 //console.log( JSON.stringify( params));
 //console.log( JSON.stringify( job));
+//	i_wnd.destroy();
 }
 
 
