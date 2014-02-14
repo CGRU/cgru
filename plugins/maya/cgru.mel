@@ -1,5 +1,5 @@
 /***************************************************************************
-*    Copyright (C) 2009 by Timur Hairulin                                  *
+*    Copyright (C) 2014 by Timur Hairulin                                  *
 *                                                                          *
 *    This program is free software; you can redistribute it and/or modify  *
 *    it under the terms of the GNU Library General Public License as       *
@@ -16,6 +16,9 @@
 *    Free Software Foundation, Inc.,                                       *
 *    59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************/
+
+//CGRU launch:
+//{string $cmd = ("source \"" + `getenv MAYA_CGRU_LOCATION` + "/cgru.mel\"");catch(`eval $cmd`);}
 
 print("\n// ***** cgru initialization begin\n");
 //############################################ setting up locations: ######################################
@@ -55,7 +58,6 @@ global proc cgruSourceFile_global( string $file)
 //########################################## sourcing scripts: ###############################
 {
 cgruSourceFile("cgruplugins.mel");               // load plugins stored cgru/mll folder
-cgruSourceDir("_autosource", 0);                 // startup scripts sourcing
 cgruSourceDir("hotkeys", 0);                     // init hotkeys commands
 cgruSourceDir("markingmenus", 0);                // init marking menus global procedures
 cgruSourceFile("cgrumenu.mel");                  // create [__CGRU__] menu in main maya window menu bar
