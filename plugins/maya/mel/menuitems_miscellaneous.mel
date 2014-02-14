@@ -4,10 +4,8 @@
 // menuItem -l "label" -ann "annotation" -c "command"
 //
 
-   menuItem -l "Autosave Manager..." -ecr 0 -c "tima_ShowAutoSaveManagerWnd_globalProc();" -ann "Config auto save.";
-   menuItem -divider true;
    menuItem -l "Camera Zoom&Pan" -ecr 1 -c "cgruSourceFile(\"miscellaneous/tima_camzoompanmouse.mel\");" -ann "Rapid editing rendering flags on the selected hierarchy.";
-   menuItem -l "Randomize..." ecr 1 -c "cgruSourceFile(\"miscellaneous/tima_randchannels.mel\");" -ann "Randomize selected channels.";
+   menuItem -l "Randomize..." -ecr 1 -c "cgruSourceFile(\"miscellaneous/tima_randchannels.mel\");" -ann "Randomize selected channels.";
    menuItem -l "Mass Rename..." -ecr 0 -c "cgruSourceFile(\"miscellaneous/tima_massrename.mel\");" -ann "Multiply objects rename.";
    menuItem -l "Sets Editor..." -ecr 0 -c "cgruSourceFile(\"miscellaneous/tima_setseditor.mel\");" -ann "Boolean operations with sets window.";
    menuItem -l "Rivet (Button)" -ecr 0 -i "bazh_rivet_icon.xpm" -c "cgruSourceFile(\"miscellaneous/bazh_rivet.mel\");" -ann "Constrains locator to polygon or NURBS surface.";

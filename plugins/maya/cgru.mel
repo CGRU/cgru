@@ -61,7 +61,6 @@ cgruSourceFile("cgruplugins.mel");               // load plugins stored cgru/mll
 cgruSourceDir("hotkeys", 0);                     // init hotkeys commands
 cgruSourceDir("markingmenus", 0);                // init marking menus global procedures
 cgruSourceFile("cgrumenu.mel");                  // create [__CGRU__] menu in main maya window menu bar
-cgruSourceFile("cgruquicklaunch.mel");           // build "quick launch" icons in maya status bar
 
 if(!(`getenv MAYA_CGRU_AUTOLOAD` == ""))         // Optional auto source some external scripts:
 cgruSourceDir(`getenv MAYA_CGRU_AUTOLOAD`, 1);   // cgruSourceDir( string $folder, int $global):

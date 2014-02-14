@@ -18,7 +18,7 @@ export MAYA_EXEC=${MAYA_LOCATION}/bin/maya${MAYA_VERSION}
 # The name of Maya main window menu
 export MAYA_CGRU_MENUS_NAME="CGRU"
 
-# path to modeling, animation, rendering ... menu items
+# path to modelling, animation, rendering ... menu items
 # if not set default MAYA_CGRU_LOCATION/mel will be used
 #export MAYA_CGRU_MENUS_LOCATION="/cg/tools/maya/settings"
 
@@ -38,7 +38,7 @@ export PATH=${MAYA_LOCATION}/bin:${PATH}
 export XBMLANGPATH=${MAYA_CGRU_LOCATION}/icons/%B
 
 # Add CGRU scripts to Maya scripts path:
-export MAYA_SCRIPT_PATH=${MAYA_CGRU_LOCATION}/mel/AETemplates:${MAYA_CGRU_LOCATION}/mel/_native/${MAYA_VERSION}:${MAYA_SCRIPT_PATH}
+export MAYA_SCRIPT_PATH=${MAYA_CGRU_LOCATION}/mel/AETemplates:${MAYA_SCRIPT_PATH}
 # Add CGRU plugins to Maya plugins path:
 export MAYA_PLUG_IN_PATH=${MAYA_CGRU_LOCATION}/mll/${MAYA_VERSION}${MAYA_ARCH}:${MAYA_PLUG_IN_PATH}
 
