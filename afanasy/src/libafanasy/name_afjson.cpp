@@ -44,8 +44,8 @@ char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int 
 			if( begin < 0 ) begin = 0;
 			int end = pos + offset;
 			if( end >= i_data_len ) end = i_data_len - 1;
-			err += std::string( ' ', offset) + "!\n";
-			err += std::string( i_data + begin, end - begin);
+			err += std::string( offset, ' ') + "!\n";
+			err += af::strReplace( af::strReplace( std::string( i_data + begin, end - begin), '\n', ' '), '\t', ' ');
 		}
 		delete [] data;
 		data = NULL;
