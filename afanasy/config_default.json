@@ -103,7 +103,6 @@
 	"af_task_error_retries":3,
 	"af_task_errors_same_host":3,
 	"af_errors_forgivetime":18000,
-	"af_user_zombietime":2,
 
 "":"Monitor: (any gui)",
 	"af_monitor_render_idle_bar_max":3600,

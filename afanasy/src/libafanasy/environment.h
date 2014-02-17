@@ -127,8 +127,6 @@ public:
 	static inline const std::string & getSysPostCmdService() { return sysjob_postcmd_service;    }
 	static inline const std::string & getSysEventsService()  { return sysjob_events_service;     }
 
-	static inline int getUserZombieTime()                { return user_zombietime;              }
-
 	static inline int getMonitorRenderIdleBarMax()       { return monitor_render_idle_bar_max;  }
 	static inline int getMonitorUpdatePeriod()           { return monitor_updateperiod;         }
 	static inline int getMonitorConnectRetries()         { return monitor_connectretries;       }
@@ -315,8 +313,6 @@ private:
 	static std::string sysjob_wol_service;
 	static std::string sysjob_postcmd_service;
 	static std::string sysjob_events_service;
-
-	static int user_zombietime;
 
 	static int monitor_render_idle_bar_max;
 	static int monitor_updateperiod;
