@@ -44,33 +44,8 @@
 
 MStatus initializePlugin( MObject obj )
 {
-
    MStatus   status;
-   MFnPlugin plugin( obj, "Timur Hairulin", "8.5 16.05.2007", "Any");
-// unloading hybrid mentalray nodes if any
-
-MStringArray miCustomNodesFiles;
-MStringArray cgru_miCustomNodesFiles;
-bool execmd = false;
-if(plugin.findPlugin("Mayatomr") != MObject::kNullObj)
-{
-   MGlobal::executeCommand ( "miCustomNodesFiles()", miCustomNodesFiles, false, false);
-   for(unsigned i = 0; i < miCustomNodesFiles.length(); i++)
-   {
-      int rindex = miCustomNodesFiles[i].rindex('/') + 1;
-      int index =  miCustomNodesFiles[i].rindex('_') - 1;
-      if(miCustomNodesFiles[i].substring(rindex, index) == "cgru")
-      {
-         cgru_miCustomNodesFiles.append(miCustomNodesFiles[i]);
-         execmd = true;
-      }
-   }
-   for(unsigned i = 0; i < cgru_miCustomNodesFiles.length(); i++)
-   {
-      MString command = "mrFactory -unload \""+cgru_miCustomNodesFiles[i]+"\"";
-      MGlobal::executeCommand ( command, true, false);
-   }
-}
+   MFnPlugin plugin( obj, "Timur Hairulin", "17.02.2014", "Any");
 
    status = plugin.registerCommand( "tm_command", tm_command::creator, tm_command::newSyntax);
    if (!status) { status.perror( "registerCommand tm_command"); return status;}
@@ -150,16 +125,9 @@ if(plugin.findPlugin("Mayatomr") != MObject::kNullObj)
    status = plugin.registerNode( "grade_tm", grade_tm::id, grade_tm::creator, grade_tm::initialize, MPxNode::kDependNode, &classification);
    if (!status) { status.perror( "registerNode grade_tm"); return status;}
 
-// loading hybrid mentalray nodes if any
-if(execmd)
-{
-   for(unsigned i = 0; i < cgru_miCustomNodesFiles.length(); i++)
-   {
-      MString command = "mrFactory -load \""+cgru_miCustomNodesFiles[i]+"\"";
-      MGlobal::executeCommand ( command, true, false);
-   }
-}
-/**/
+	MString command = "eval(\"source \\\"\" + `getenv MAYA_CGRU_LOCATION` + \"/cgru.mel\\\"\")";
+	MGlobal::executeCommandOnIdle( command, true);
+
    return status;
 }
 

@@ -22,9 +22,6 @@ set MAYA_SCRIPT_PATH=%MAYA_CGRU_LOCATION%\mel\AETemplates;%MAYA_SCRIPT_PATH%
 set MAYA_PLUG_IN_PATH=%MAYA_CGRU_LOCATION%\mll\%MAYA_VERSION%%MAYA_ARCH%;%MAYA_PLUG_IN_PATH%
 set XBMLANGPATH=%MAYA_CGRU_LOCATION%\icons
 
-rem automatically load plugins located in MAYA_CGRU_LOCATION/mll/MAYA_VERSION directory
-set MAYA_CGRU_PLUG_INS_AUTOLOAD=1
-
 set "PATH=%MAYA_LOCATION%\bin;%PATH%"
 
 rem Enable Afanasy if it is set:

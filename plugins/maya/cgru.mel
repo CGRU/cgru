@@ -57,7 +57,6 @@ global proc cgruSourceFile_global( string $file)
 {string $cmd = ("source \"" + $file + "\""); cgruInfo("Sourcing absolute \"" + $file + "\""); catch(`eval $cmd`);}
 //########################################## sourcing scripts: ###############################
 {
-cgruSourceFile("cgruplugins.mel");               // load plugins stored cgru/mll folder
 cgruSourceDir("hotkeys", 0);                     // init hotkeys commands
 cgruSourceDir("markingmenus", 0);                // init marking menus global procedures
 cgruSourceFile("cgrumenu.mel");                  // create [__CGRU__] menu in main maya window menu bar
