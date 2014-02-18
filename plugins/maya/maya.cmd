@@ -1,9 +1,5 @@
 rem Set Maya version:
 set MAYA_VERSION=2014
-rem Set Maya architecture:
-set MAYA_ARCH=-x64
-rem For 32bit Maya uncomment next line (or put it in "override.cmd" file)
-rem set MAYA_ARCH=
 
 rem Set Maya location:
 set MAYA_LOCATION=C:\Program Files\Autodesk\Maya%MAYA_VERSION%
@@ -19,12 +15,12 @@ rem path to modelling, animation, rendering ... menu items
 rem if not set default MAYA_CGRU_LOCATION/mel will be used
 rem set MAYA_CGRU_MENUS_LOCATION=%MAYA_CGRU_LOCATION%\settings
 set MAYA_SCRIPT_PATH=%MAYA_CGRU_LOCATION%\mel\AETemplates;%MAYA_SCRIPT_PATH%
-set MAYA_PLUG_IN_PATH=%MAYA_CGRU_LOCATION%\mll\%MAYA_VERSION%%MAYA_ARCH%;%MAYA_PLUG_IN_PATH%
+set MAYA_PLUG_IN_PATH=%MAYA_CGRU_LOCATION%\mll\%MAYA_VERSION%;%MAYA_PLUG_IN_PATH%
 set XBMLANGPATH=%MAYA_CGRU_LOCATION%\icons
 
 set "PATH=%MAYA_LOCATION%\bin;%PATH%"
 
 rem Enable Afanasy if it is set:
-IF DEFINED AF_ROOT set MAYA_SCRIPT_PATH=%AF_ROOT%\plugins\maya;%MAYA_SCRIPT_PATH%
+IF DEFINED AF_ROOT set "MAYA_SCRIPT_PATH=%MAYA_CGRU_LOCATION%\afanasy;%MAYA_SCRIPT_PATH%"
 
 start maya.exe %*

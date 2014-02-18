@@ -26,7 +26,7 @@ Mxx_ru::Cpp::composite_target {
 
    # How to store data
    raise "MAYA_VERSION environment variable is not defined." if ENV['MAYA_VERSION'] == nil
-   global_obj_placement( Mxx_ru::Cpp::CustomSubdirObjPlacement.new( "../../maya/mll/#{ENV['MAYA_VERSION']}#{ENV['MAYA_ARCH']}", "tmp/#{ENV['MAYA_VERSION']}#{ENV['MAYA_ARCH']}/#{mxx_runtime_mode}" ))
+   global_obj_placement( Mxx_ru::Cpp::CustomSubdirObjPlacement.new( "../../maya/mll/#{ENV['MAYA_VERSION']}#{ENV['MAYA_ARCH']}", "tmp/#{ENV['MAYA_VERSION']}/#{mxx_runtime_mode}" ))
 
    # Projects
    required_prj "cgru_plugin.mxx.rb"

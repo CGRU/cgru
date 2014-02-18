@@ -11,6 +11,7 @@ if exist %cgru_qt% SET "PATH=%cgru_qt%\bin;%PATH%"
 set "AF_GUI=YES"
 
 rem Specify Python:
+if exist %CGRU_LOCATION%\python-devel set CGRU_PYTHONDIR=%CGRU_LOCATION%\python-devel
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: %CGRU_PYTHONDIR%
    SET AF_PYTHON_INCLUDE_PATH=%CGRU_PYTHONDIR%\include

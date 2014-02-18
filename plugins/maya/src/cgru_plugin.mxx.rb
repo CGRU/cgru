@@ -9,7 +9,6 @@ Mxx_ru::Cpp::macos_bundle_target {
 
    maya_location = ENV['MAYA_LOCATION']
    raise "MAYA_LOCATION environment variable is not defined." if maya_location == nil
-   maya_arch=ENV['MAYA_ARCH']
 
    include_path "mr_shaders/src"
 
@@ -38,13 +37,7 @@ Mxx_ru::Cpp::macos_bundle_target {
          linker_option "/export:uninitializePlugin"
 #         linker_option "/NODEFAULTLIB"
          lib "user32.lib"
-         if maya_arch == nil || (maya_arch.empty? || maya_arch.include?("32"))
-               define "Bits32_" # suppose it's 32bit if no architecture specified
-         else
-            if maya_arch.include?("64")
-               define "Bits64_"
-            end
-         end
+         define "Bits64_"
 
       when "unix"
          define "UNIX"
@@ -103,17 +96,10 @@ Mxx_ru::Cpp::macos_bundle_target {
                linker_option "-pthread"
                linker_option "-Wl,-Bsymbolic"
                include_path "/usr/include/X11"
-               if  maya_arch == nil || (maya_arch.empty? || maya_arch.include?("32"))
-                  compiler_option "-m32" # suppose it's 32bit if no architecture specified
-                  linker_option "-m32"
-               else
-                  if maya_arch.include?("64")
-                     define "Bits64_"
-                     define "LINUX_64"
-                     compiler_option "-m64"
-                     linker_option "-m64"
-                  end
-               end
+               define "Bits64_"
+               define "LINUX_64"
+               compiler_option "-m64"
+               linker_option "-m64"
          end
          define "FUNCPROTO"
          define "_GNU_SOURCE"

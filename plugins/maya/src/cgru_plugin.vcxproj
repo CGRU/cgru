@@ -1228,7 +1228,7 @@
     <Link>
       <AdditionalOptions>/export:initializePlugin /export:uninitializePlugin  %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;OpenMaya.lib;Foundation.lib;OpenMayaFX.lib;OpenMayaUI.lib;OpenMayaAnim.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>..\..\maya\mll\2014-x64\cgru.mll</OutputFile>
+      <OutputFile>..\..\maya\mll\2014\cgru.mll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>c:\Program Files\Autodesk\Maya2014\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(IntDir)cgru.pdb</ProgramDatabaseFile>
