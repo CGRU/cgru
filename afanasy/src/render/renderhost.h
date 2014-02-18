@@ -15,7 +15,6 @@ class PyRes;
 class RenderHost: public af::Render
 {
 public:
-    RenderHost( int32_t i_state, uint8_t i_priority);
     RenderHost();
     ~RenderHost();
 
