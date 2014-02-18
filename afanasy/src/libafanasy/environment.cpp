@@ -87,8 +87,6 @@ std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_SERVICE;
 std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_SERVICE;
 std::string Environment::sysjob_events_service =      AFJOB::SYSJOB_EVENTS_SERVICE;
 
-int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
-
 int     Environment::monitor_render_idle_bar_max =     AFMONITOR::RENDER_IDLE_BAR_MAX;
 int     Environment::monitor_updateperiod =            AFMONITOR::UPDATEPERIOD;
 int     Environment::monitor_connectretries =          AFMONITOR::CONNECTRETRIES;
@@ -254,8 +252,6 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, sysjob_wol_service,                "af_sysjob_wol_service"                );
 	getVar( i_obj, sysjob_events_service,             "af_sysjob_events_service"             );
 
-	getVar( i_obj, user_zombietime,                   "af_user_zombietime"                   );
-
 	getVar( i_obj, talk_updateperiod,                 "af_talk_updateperiod"                 );
 	getVar( i_obj, talk_zombietime,                   "af_talk_zombietime"                   );
 	getVar( i_obj, talk_connectretries,               "af_talk_connectretries"               );
@@ -407,10 +403,11 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	}
 //
 //############ user name:
-	username = getenv("AF_USERNAME");
-	if( username.size() == 0) username = getenv("USER");
-	if( username.size() == 0) username = getenv("USERNAME");
-	if( username.size() == 0)
+	getArgument("-username", username);
+	if( username.empty()) username = getenv("AF_USERNAME");
+	if( username.empty()) username = getenv("USER");
+	if( username.empty()) username = getenv("USERNAME");
+	if( username.empty())
 	{
 #ifdef WINNT
 		 char acUserName[256];
@@ -422,7 +419,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 		 if( pw ) username = pw->pw_name;
 #endif
 	}
-	if( username.size() == 0) username = "unknown";
+	if( username.empty()) username = "unknown";
 
 	// Convert to lowercase:
 	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
@@ -431,10 +428,46 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	if( dpos == std::string::npos) dpos = username.rfind('\\');
 	if( dpos != std::string::npos) username = username.substr( dpos + 1);
 	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-	PRINT("Afanasy user name = '%s'\n", username.c_str());
+	printf("Afanasy user name = '%s'\n", username.c_str());
+
 //
-//############ local host name:
-	hostname = getenv("AF_HOSTNAME");
+//############ Local host name:
+	getArgument("-hostname", hostname);
+	if( hostname.empty()) hostname = getenv("AF_HOSTNAME");
+#ifdef WINNT
+	computername = getenv("COMPUTERNAME");
+	WSADATA wsaData;
+	WORD wVersionRequested = MAKEWORD(2, 2);
+	if( WSAStartup( wVersionRequested, &wsaData) != 0 )
+	{
+		 AFERROR("Environment::initAfterLoad(): WSAStartup failed.");
+		 return;
+	}
+#else
+	computername = getenv("HOSTNAME");
+#endif
+	if( computername.empty())
+	{
+		static const int buflen = 256;
+		static char buffer[buflen];
+#ifndef WINNT
+		if( gethostname( buffer, buflen) != 0 )
+#else
+		DWORD win_buflen = buflen;
+		if( GetComputerName( buffer, &win_buflen) != 0 )
+#endif
+		{
+			AFERRPE("Can't get local host name")
+			return;
+		}
+		computername = buffer;
+	}
+	if( hostname.empty()) hostname = computername;
+	std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
+
+	printf("Local computer name = '%s'\n", computername.c_str());
+	printf("Afanasy host name = '%s'\n", hostname.c_str());
 
 //
 //############ Platform: #############################
@@ -491,8 +524,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 	load();
 	m_valid = initAfterLoad();
-
-	PRINT("Render host name = '%s'\n", hostname.c_str());
 }
 
 Environment::~Environment()
@@ -607,40 +638,6 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 // Initialize environment after all variables are loaded (set to default values)
 bool Environment::initAfterLoad()
 {
-//############ Local host name:
-#ifdef WINNT
-	computername = getenv("COMPUTERNAME");
-
-	WSADATA wsaData;
-	WORD wVersionRequested = MAKEWORD(2, 2);
-	if ( WSAStartup( wVersionRequested, &wsaData) != 0) {
-		 AFERROR("Environment::initAfterLoad(): WSAStartup failed.");
-		 return false;
-	}
-#else
-	computername = getenv("HOSTNAME");
-#endif
-	if( computername.empty())
-	{
-		static const int buflen = 256;
-		static char buffer[buflen];
-#ifndef WINNT
-		if( gethostname( buffer, buflen) != 0 )
-#else
-		DWORD win_buflen = buflen;
-		if( GetComputerName( buffer, &win_buflen) != 0 )
-#endif
-		{
-			AFERRPE("Can't get local host name")
-			return false;
-		}
-		computername = buffer;
-	}
-	if( hostname.size() == 0 ) hostname = computername;
-	std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
-	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
-	PRINT("Local computer name = '%s'\n", computername.c_str());
-
 	jobs_dir    = temp_dir + AFGENERAL::PATH_SEPARATOR +    AFJOB::DIRECTORY;
 	renders_dir = temp_dir + AFGENERAL::PATH_SEPARATOR + AFRENDER::DIRECTORY;
 	users_dir   = temp_dir + AFGENERAL::PATH_SEPARATOR +   AFUSER::DIRECTORY;
@@ -724,6 +721,8 @@ void Environment::initCommandArguments( int argc, char** argv)
 			help_mode = true;
 		}
 	}
+	addUsage("-username", "Override user name.");
+	addUsage("-hostname", "Override host name.");
 	addUsage("-h --help", "Display this help.");
 	addUsage("-V --Verbose", "Verbose mode.");
 }

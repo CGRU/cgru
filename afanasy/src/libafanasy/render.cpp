@@ -11,18 +11,27 @@
 
 using namespace af;
 
-Render::Render( uint32_t State, uint8_t Priority):
-   Client( Client::GetEnvironment, 0)
+Render::Render(  Client::Flags i_flags):
+   Client( i_flags, 0)
 {
-	m_state = State;
 	construct();
-	m_priority = Priority;
-}
 
-Render::Render():
-	Client( Client::DoNotGetAnyValues, 0)
-{
-	construct();
+	if( i_flags != Client::DoNotGetAnyValues )
+	{
+		m_state = af::Render::SOnline;
+		if( af::Environment::hasArgument("-NIMBY"))
+		{
+			printf("Initial state set to 'NIMBY'\n");
+			m_state = m_state | af::Render::SNIMBY;
+		}
+		else if( af::Environment::hasArgument("-nimby"))
+		{
+			printf("Initial state set to 'nimby'\n");
+			m_state = m_state | af::Render::Snimby;
+		}
+		m_priority = af::Environment::getPriority();
+		m_capacity = af::Environment::getRenderDefaultCapacity();
+	}
 }
 
 Render::Render( Msg * msg):

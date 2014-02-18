@@ -28,8 +28,8 @@ std::vector<TaskProcess*> RenderHost::ms_tasks;
 bool RenderHost::m_listening = false;
 std::vector<std::string> RenderHost::ms_windowsmustdie;
 
-RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
-   Render( i_state, i_priority)
+RenderHost::RenderHost():
+	af::Render( Client::GetEnvironment)
 {
     ms_obj = this;
 

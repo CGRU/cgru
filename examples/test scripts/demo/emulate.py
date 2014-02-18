@@ -23,10 +23,11 @@ Parser.add_option('-u', '--usersnum',  dest='usersnum',  type='int',   default=1
 Parser.add_option('-t', '--cycletime', dest='cycletime', type='float', default=5.0,  help='cycle pause time in seconds')
 Parser.add_option('-p', '--periods',   dest='periods',   type='int',   default=10,   help='number of cycles in period')
 Parser.add_option('-d', '--delperiod', dest='delperiod', type='int',   default=3,    help='deletion period')
+Parser.add_option('-c', '--capacity',  dest='capacity',  type='int',   default=111,  help='tasks capacity')
 Parser.add_option(      '--pausetime', dest='pausetime', type='float', default=15.0, help='pause time in seconds')
 Parser.add_option(      '--notasks',   dest='notasks',   action='store_true', default=False, help='empty tasks')
 Parser.add_option(      '--nopost',    dest='nopost',    action='store_true', default=False, help='no post command')
-Parser.add_option('-c', '--cleanup',   dest='cleanup',   action='store_true', default=False, help='cleanup mode')
+Parser.add_option(      '--cleanup',   dest='cleanup',   action='store_true', default=False, help='cleanup mode')
 Options, Args = Parser.parse_args()
 
 def sendAction( i_type, i_mask, i_operation, i_params = None):
@@ -85,6 +86,7 @@ job = af.Job()
 for b in range( 0, Options.blocksnum):
 	block = af.Block()
 	job.blocks.append( block)
+	block.setCapacity( Options.capacity)
 	if not Options.notasks:
 		block.setNumeric(1, Options.tasksnum)
 		block.setNonSequential()

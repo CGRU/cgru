@@ -11,11 +11,7 @@ class Render : public Client
 {
 public:
 
-/// Construct render, getting values from environment.
-   Render( uint32_t State, uint8_t Priority);
-
-	/// Construct offline from store.
-	Render();
+	Render( Client::Flags i_flags = Client::DoNotGetAnyValues);
 
 /// Read Render data from message.
    Render( Msg * msg);

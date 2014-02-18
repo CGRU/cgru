@@ -67,10 +67,8 @@ int main(int argc, char *argv[])
 	}
 
 	// Fill command arguments:
-	std::string nimby = "-nimby";
-	ENV.addUsage( nimby, "Set initial state to 'nimby'.");
-	std::string NIMBY = "-NIMBY";
-	ENV.addUsage( NIMBY, "Set initial state to 'NIMBY'.");
+	ENV.addUsage("-nimby", "Set initial state to 'nimby'.");
+	ENV.addUsage("-NIMBY", "Set initial state to 'NIMBY'.");
 	std::string cmdArgName = "-cmd";
 	ENV.addUsage( cmdArgName + " [command]", "Run command only, do not connect to server.");
 	std::string checkResourcesModeCmdArg = "-res";
@@ -133,21 +131,7 @@ int main(int argc, char *argv[])
 	// Create temp directory, if it does not exist:
 	if( af::pathMakePath( ENV.getTempDir(), af::VerboseOn ) == false) return 1;
 
-	// Some initial render properties:
-	uint32_t state = af::Render::SOnline;
-	if( ENV.hasArgument( NIMBY))
-	{
-		printf("Initial state set to 'NIMBY'\n");
-		state = state | af::Render::SNIMBY;
-	}
-	else if( ENV.hasArgument( nimby))
-	{
-		printf("Initial state set to 'nimby'\n");
-		state = state | af::Render::Snimby;
-	}
-	uint8_t priority = ENV.getPriority();
-
-	RenderHost * render = new RenderHost( state, priority);
+	RenderHost * render = new RenderHost();
 
 	DlThread ServerAccept;
 	ServerAccept.Start( &threadAcceptClient, NULL);
