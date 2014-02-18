@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ver0="3.99"
-ver1="3"
+ver1="5"
 ver="$ver0.$ver1"
 arch="lame-$ver.tar.gz"
 
