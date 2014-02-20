@@ -26,7 +26,6 @@ xcopy start %dest%\start\ /ys
 
 xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
-del %dest%\afanasy\bin\afmonitor.exe
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys
 

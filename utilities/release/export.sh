@@ -61,7 +61,6 @@ rcopy start $dest
 
 copy afanasy $dest/afanasy
 rcopy afanasy/bin $dest/afanasy
-rm $dest/afanasy/bin/afmonitor
 rcopy afanasy/browser $dest/afanasy
 rcopy afanasy/icons $dest/afanasy
 rcopy afanasy/init $dest/afanasy
@@ -93,4 +92,3 @@ cd utilities
 source ./getrevision.sh $cgru
 #echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
 echo "${CGRU_REVISION}" > $dest/revision.txt
-
