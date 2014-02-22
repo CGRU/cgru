@@ -16,17 +16,6 @@ popd > /dev/null
 dirs_nonempty="plugins/maya/mll"
 cgru_bins="exrjoin"
 afanasy_bins="afserver afcmd afrender afwatch"
-[ -z "$DISTRIBUTIVE" ] && source "$cgru/utilities/distribution.sh"
-if [ ! -z "$DISTRIBUTIVE" ]; then
-	case ${DISTRIBUTIVE} in
-		Fedora | openSUSE | Mint | Ubuntu | Debian | AltLinux )
-			cgru_bins="$cgru_bins ffmpeg"
-			;;
-		*)
-			cgru_bins="$cgru_bins ffmpeg convert"
-			;;
-	esac
-fi
 
 cgru_bin="$cgru/bin"
 afanasy_bin="$cgru/afanasy/bin"
