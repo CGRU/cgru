@@ -9,7 +9,7 @@ case ${DISTRIBUTIVE} in
 	Debian | Ubuntu | Mint )
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
-		export DEPENDS_CGRU="python-qt4 imagemagick"
+		export DEPENDS_CGRU="python-qt4 imagemagick ffmpeg"
 		;;
 	Fedora )
 		export DEPENDS_AFANASY="libpqxx"
@@ -19,13 +19,13 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_CGRU="python-qt4 ImageMagick"
 		;;
-	AltLinux )
-		export DEPENDS_AFANASY="libpq5.4"
-		export DEPENDS_CGRU="python-module-PyQt4 ImageMagick"
-		;;
 	CentOS )
 		export DEPENDS_AFANASY="postgresql-libs"
-		export DEPENDS_CGRU="PyQt4 ffmpeg ImageMagick"
+		export DEPENDS_CGRU="PyQt4 ImageMagick"
+		;;
+	AltLinux )
+		export DEPENDS_AFANASY="libpq5.4"
+		export DEPENDS_CGRU="python-module-PyQt4 ImageMagick ffmpeg"
 		;;
 	*)
 		export DEPENDS_AFANASY="libpq5"
