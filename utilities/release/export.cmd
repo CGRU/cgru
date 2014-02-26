@@ -18,24 +18,25 @@ set afanasy=trunk
 xcopy . %dest%\ /y
 
 xcopy bin %dest%\bin\ /ys
-xcopy lib %dest%\lib\ /ys
-xcopy icons %dest%\icons\ /ys
 xcopy examples %dest%\examples\ /ys
+xcopy icons %dest%\icons\ /ys
+xcopy lib %dest%\lib\ /ys
+xcopy rules %dest%\rules\ /ys
 xcopy software_setup %dest%\software_setup\ /ys
 xcopy start %dest%\start\ /ys
 
 xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
+xcopy afanasy\browser %dest%\afanasy\browser\ /y
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys
+xcopy afanasy\statistics %dest%\afanasy\statistics\ /ys
 
-xcopy utilities\ %dest%\utilities\ /y
+xcopy utilities %dest%\utilities\ /y
 xcopy utilities\keeper %dest%\utilities\keeper\ /ys
 xcopy utilities\moviemaker %dest%\utilities\moviemaker\ /ys
 xcopy utilities\afstarter %dest%\utilities\afstarter\ /ys
 xcopy utilities\regexp %dest%\utilities\regexp\ /ys
-xcopy utilities\*.py %dest%\utilities\ /y
-xcopy utilities\*.cmd %dest%\utilities\ /y
 
 xcopy plugins %dest%\plugins\ /y
 xcopy plugins\afterfx %dest%\plugins\afterfx\ /ys

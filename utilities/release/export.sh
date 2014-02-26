@@ -83,6 +83,7 @@ rcopy plugins/max $dest/plugins
 rcopy plugins/xsi $dest/plugins
 
 copy plugins/maya $dest/plugins/maya
+rcopy plugins/maya/afanasy $dest/plugins/afanasy
 rcopy plugins/maya/icons $dest/plugins/maya
 rcopy plugins/maya/mel $dest/plugins/maya
 [ -d plugins/maya/mll ] && rcopy plugins/maya/mll $dest/plugins/maya
