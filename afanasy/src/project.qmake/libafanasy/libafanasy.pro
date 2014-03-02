@@ -22,7 +22,7 @@ unix {
    }
 }
 
-DIR = ../../libafanasy/passwd
+DIR = ../../libafanasy/common
 SOURCES += $$system(ls $$DIR/*.cpp)
 HEADERS += $$system(ls $$DIR/*.h)
 

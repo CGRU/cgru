@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dest="/data/cgru-data/exports/cgru-linux"
+dest="/media/sf_data/cgru-data/exports/cgru-linux"
 
 [ -d "${dest}" ] && rm -rf "${dest}"
 

@@ -1,16 +1,16 @@
 #!/bin/bash
 
 ver="1.3.1"
-arch="libogg-$ver.tar.xz"
+arch="libogg-$ver.tar.gz"
 [ -f "$arch" ] || wget "http://downloads.xiph.org/releases/ogg/$arch"
-tar xfvJ "$arch"
+tar xfvz "$arch"
 
 ver="1.3.3"
-arch="libvorbis-$ver.tar.xz"
+arch="libvorbis-$ver.tar.gz"
 [ -f "$arch" ] || wget "http://downloads.xiph.org/releases/vorbis/$arch"
-tar xfvJ "$arch"
+tar xfvz "$arch"
 
 ver="1.1.1"
-arch="libtheora-$ver.tar.xz"
+arch="libtheora-$ver.tar.gz"
 [ -f "$arch" ] || wget "http://downloads.xiph.org/releases/theora/$arch"
-tar xfvJ "$arch"
+tar xfvz "$arch"
