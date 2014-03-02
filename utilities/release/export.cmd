@@ -2,7 +2,7 @@ set dest=%1
 
 if exist override.cmd call override.cmd
 
-cd ..\..
+pushd ..\..
 
 set cgru=%CD%
 
@@ -12,8 +12,6 @@ call clear.cmd
 cd "%cgru%"
 
 if not exist %dest% mkdir %dest%
-
-set afanasy=trunk
 
 xcopy . %dest%\ /y
 
@@ -59,3 +57,5 @@ cd utilities
 call getrevision.cmd "%cgru%"
 rem echo %CGRU_VERSION% rev%CGRU_REVISION% > %dest%\version.txt
 echo %CGRU_REVISION% > %dest%\revision.txt
+
+popd

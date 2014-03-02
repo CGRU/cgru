@@ -19,8 +19,14 @@ call :df qt.conf
 cd Lib
 call :dd test
 
-cd site-packages/PyQt4
-call :dd translations
+cd site-packages
+call :dd PySide-1.2.1-py3.3.egg-info
+call :dd pysideuic
+
+cd PySide
+call :dd examples
+call :df *.exe
+call :dd docs
 call :df libmysql*
 call :df phonon*
 call :df QAxContainer*
@@ -34,6 +40,7 @@ call :df QtScript*
 call :df QtTest*
 call :df QtWebKit*
 call :df QtXmlPatterns*
+call :dd translations
 
 popd
 
