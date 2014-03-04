@@ -74,7 +74,7 @@
 
 		"":"Custom resources meters:",
 			"":"example - simple resource meter for an example only",
-			"":"iostat - parce output of linux 'iostat' command, specify device in 'render_customiostat_devices' varibale",
+			"":"iostat - parse output of linux 'iostat' command, specify device in 'render_customiostat_devices' variable",
 	"-af_render_resclasses":["example","iostat"],
 	"-af_render_customiostat_devices":"sda",
 		"":"To specify several devices use regular expressions, for example 'sda[2-4]'",
