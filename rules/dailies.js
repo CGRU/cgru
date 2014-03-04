@@ -161,7 +161,7 @@ function d_ProcessGUI( i_wnd)
 //console.log( task.command);
 	n_SendJob( job);
 
-	nw_MakeNews('<i>dailies</i>');
+	nw_MakeNews({"title":'dailies'});
 }
 
 function d_MakeCmd( i_params)

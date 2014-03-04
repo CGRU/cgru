@@ -248,6 +248,7 @@ font-weight: bold;
 display: none;
 }
 #news > div, #channels > div { box-shadow: 0 0 2px #000 inset; border-radius: 4px; margin: 1px 0px; }
+#news > div.assigned { background: rgba(0,255,0,.2);}
 #news .button, #channels .button { float: left; height: 14px; margin: 0px 4px 0px 0px; padding: 0px 4px 0px 4px; }
 #news a, #channels a { font-size: 10px; }
 #news .avatar { float:right; border: 1px solid #777; border-radius: 4px; width: 24px; height: 24px; margin: 2px; }

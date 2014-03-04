@@ -700,7 +700,7 @@ function u_BodyEditSave()
 	}
 
 	st_Save();
-	nw_MakeNews('<i>body</i>');
+	nw_MakeNews({"title":'body'});
 	u_BodyEditCancel();
 	u_BodyLoad( true);
 }

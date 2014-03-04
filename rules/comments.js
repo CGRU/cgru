@@ -451,7 +451,7 @@ function cm_Save( i_el)
 	if( c_NullOrErrorMsg( res)) return;
 	var news_user = i_el.m_obj.user_name;
 	if( i_el.m_obj.muser_name ) news_user = i_el.m_obj.muser_name;
-	nw_MakeNews('<i>comments</i>', g_CurPath(), news_user, i_el.m_obj.guest);
+	nw_MakeNews({"title":'comment',"path":g_CurPath(),"user":news_user,"guest":i_el.m_obj.guest});
 
 	cm_array.push( i_el.m_obj);
 	var emails = [];

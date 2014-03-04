@@ -253,31 +253,33 @@ function nw_MakeNewsDialog()
 	new cgru_Dialog({"handle":'nw_MakeNewsDialogApply',
 		"name":'news',"title":'Create News',"info":'Enter News Title'});
 }
-function nw_MakeNewsDialogApply( i_title) { nw_MakeNews( i_title); }
-function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
+function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
+//function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
+function nw_MakeNews( i_args )
 {
 	if( localStorage.news_disabled == 'true') return;
-//window.console.log(i_title);
-//	if( g_auth_user == null ) return;
-	if( i_user_id == null )
+
+	var news = i_args;
+
+	if( news.user_id == null )
 	{
 		if( g_auth_user )
-			i_user_id = g_auth_user.id;
+			news.user = g_auth_user.id;
 		else
 			c_Error('Can`t make news with no user.');
 	}
 
-	if( i_path == null ) i_path = g_CurPath();
+	if( news.path == null ) news.path = g_CurPath();
 
-	var news = {};
 	news.time = c_DT_CurSeconds();
-	news.user = i_user_id;
-	news.path = i_path;
-	news.title = i_title;
-	if( i_guest ) news.guest = i_guest;
-	news.id = i_user_id+'_'+news.time+'_'+news.path;
+	news.id = news.user + '_' + news.time + '_' + news.path;
+
 	if( localStorage.news_ignore_own == 'true' )
 		news.ignore_own = true;
+
+	// If news path is current we get artists from status, if them not set in input arguments:
+	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status.artists )
+		news.artists = RULES.status.artists;
 
 	var request = {};
 	request.news = news;
@@ -361,6 +363,8 @@ function nw_NewsShow( i_news)
 		var el = document.createElement('div');
 		$('news').appendChild( el);
 		el.title = c_DT_StrFromSec( news.time);
+		if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
+			el.classList.add('assigned');
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);

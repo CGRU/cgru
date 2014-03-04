@@ -399,7 +399,7 @@ function st_SaveOnClick()
 		g_FolderSetStatus( st_status);
 
 	st_Save( st_status, st_path);
-	nw_MakeNews('<i>status</i>', st_path);
+	nw_MakeNews({"title":'status',"path":st_path,"artists":st_status.artists});
 
 	if( st_elProgress.textContent.length )
 		if( st_progress != st_status.progress )

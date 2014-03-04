@@ -1094,46 +1094,54 @@ function jsf_makenews( $i_args, &$o_out)
 		unset( $news['ignore_own']);
 	}
 
+    // Get subscribed users:
+    $sub_users = array();
 	$o_out['users'] = array();
-
 	foreach( $users as &$user )
 	{
 		if( $ignore_own && ( $news['user'] == $user['id']))
 			continue;
 
+		if( array_key_exists( 'artists', $news))
+			if( in_array( $user['id'], $news['artists']))
+			{
+				array_push( $sub_users, $user);
+				array_push( $o_out['users'], $user['id']);
+				continue;
+			}
+
+
 		foreach( $user['channels'] as $channel )
-		{
 			if( strpos( $news['path'], $channel['id'] ) === 0 )
 			{
+				array_push( $sub_users, $user);
 				array_push( $o_out['users'], $user['id']);
-
-				$news['user'] = $news['user'];
-
-				$has_event = false;
-				foreach( $user['news'] as &$event )
-				{
-					if( $event['path'] == $news['path'])
-					{
-						$has_event = true;
-						$event = $news;
-						break;
-					}
-				}
-
-				if( false == $has_event )
-					array_push( $user['news'], $news);
-
-				$filename = 'users/'.$user['id'].'.json';
-				if( $fHandle = fopen( $filename, 'w'))
-				{
-					fwrite( $fHandle, json_encode( $user));
-					fclose($fHandle);
-				}
-//error_log('New wrote in '.$filename);
-
 				break;
 			}
+	}
+
+    // Add news and write files:
+    foreach( $sub_users as &$user)
+    {
+		$has_event = false;
+		foreach( $user['news'] as &$event )
+			if( $event['path'] == $news['path'])
+			{
+				$has_event = true;
+				$event = $news;
+				break;
+			}
+
+		if( false == $has_event )
+			array_push( $user['news'], $news);
+
+		$filename = 'users/'.$user['id'].'.json';
+		if( $fHandle = fopen( $filename, 'w'))
+		{
+			fwrite( $fHandle, json_encode( $user));
+			fclose($fHandle);
 		}
+//error_log('New wrote in '.$filename);
 	}
 }
 
