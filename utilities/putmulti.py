@@ -13,13 +13,14 @@ Parser = OptionParser(usage="%prog [options] input\n\
    Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
    Type \"%prog -h\" for help", version="%prog 1.0")
 
-Parser.add_option('-i', '--inputs',     dest='inputs',     type  ='string', default='RESULT/JPG',help='Inputs')
-Parser.add_option('-d', '--dest',       dest='dest',       type  ='string', default='',          help='Destination')
-Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='put',       help='Afanasy user name')
-Parser.add_option('-m', '--afmaxtasks', dest='afmaxtasks', type  ='int',    default=5,           help='Afanasy max tasks')
-Parser.add_option('-c', '--afcapacity', dest='afcapacity', type  ='int',    default=0,           help='Afanasy capacity')
-Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,   help='Test input only')
-Parser.add_option('-V', '--verbose',    dest='verbose',    action='store_true', default=False,   help='Verbose mode')
+Parser.add_option('-i', '--inputs',       dest='inputs',       type  ='string', default='RESULT/JPG',help='Inputs')
+Parser.add_option('-d', '--dest',         dest='dest',         type  ='string', default='',          help='Destination')
+Parser.add_option('-u', '--afuser',       dest='afuser',       type  ='string', default='put',       help='Afanasy user name')
+Parser.add_option('-m', '--afmaxtasks',   dest='afmaxtasks',   type  ='int',    default=5,           help='Afanasy max tasks')
+Parser.add_option('-c', '--afcapacity',   dest='afcapacity',   type  ='int',    default=0,           help='Afanasy capacity')
+Parser.add_option('-s', '--skipexisting', dest='skipexisting', action='store_true', default=False,   help='Skip existing folders')
+Parser.add_option('-t', '--testonly',     dest='testonly',     action='store_true', default=False,   help='Test input only')
+Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,   help='Verbose mode')
 
 print('{"put":[')
 
@@ -78,8 +79,15 @@ for src in Sources:
 
 	name += '_' + version
 	dest = os.path.join( Options.dest, name)
+	skipexisting = False
+	skipexisting_str = 'false'
+	if os.path.isdir( dest ) and Options.skipexisting:
+		skipexisting = True
+		skipexisting_str = 'true'
 
-	print('{"src":"%s","name":"%s","version":"%s","dst":"%s"},' % (folder, name, version, dest))
+	print('{"src":"%s","name":"%s","version":"%s","dst":"%s","skipexisting":%s},' % (folder, name, version, dest, skipexisting_str))
+
+	if skipexisting: continue
 
 	cmd = CmdPut
 	cmd += ' -s "%s"' % folder
@@ -91,7 +99,7 @@ for src in Sources:
 
 	if Options.verbose: print( cmd)
 
-print('{"progress":"%d sequences founded"},' % len(Sources))
+print('{"progress":"%d sequences founded"},' % len(commands))
 
 job = af.Job('PUT ' + Options.dest)
 job.setUserName( Options.afuser)
