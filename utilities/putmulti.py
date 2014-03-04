@@ -19,6 +19,7 @@ Parser.add_option('-u', '--afuser',       dest='afuser',       type  ='string', 
 Parser.add_option('-m', '--afmaxtasks',   dest='afmaxtasks',   type  ='int',    default=5,           help='Afanasy max tasks')
 Parser.add_option('-c', '--afcapacity',   dest='afcapacity',   type  ='int',    default=0,           help='Afanasy capacity')
 Parser.add_option('-s', '--skipexisting', dest='skipexisting', action='store_true', default=False,   help='Skip existing folders')
+Parser.add_option('-e', '--skiperrors',   dest='skiperrors',   action='store_true', default=False,   help='Skip error folders')
 Parser.add_option('-t', '--testonly',     dest='testonly',     action='store_true', default=False,   help='Test input only')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,   help='Verbose mode')
 
@@ -75,7 +76,11 @@ for src in Sources:
 			folder = os.path.join( inp, item)
 
 	if folder is None:
-		errExit('Input not founded for: %s' % src)
+		if Options.skiperrors:
+			print('{"error":"%s"},' % src)
+			continue
+		else:
+			errExit('Input not founded for: %s' % src)
 
 	name += '_' + version
 	dest = os.path.join( Options.dest, name)
