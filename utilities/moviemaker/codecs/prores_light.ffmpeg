@@ -1,2 +1,2 @@
 ProRes Light
-ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec prores -profile:v 1 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores -profile:v 1 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

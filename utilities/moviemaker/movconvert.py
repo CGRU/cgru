@@ -7,7 +7,7 @@ import subprocess
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] input [second_input] output\ntype \"%prog -h\" for help", version="%prog 1.  0")
 
-Parser.add_option('-a', '--avconv',    dest='avconv',    type  ='string', default='ffmpeg', help='AV convert command (ffmpeg)')
+Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
 Parser.add_option('-x', '--xres',      dest='xres',      type  ='int',    default=-1,       help='X resolution (no change)')
 Parser.add_option('-y', '--yres',      dest='yres',      type  ='int',    default=-1,       help='Y resolution (no change)')
 Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie cpdec (png)')
@@ -40,7 +40,7 @@ Codec = Options.codec
 
 if Codec == '':
 	Output += '.'+Options.type
-	args = [ Options.avconv,'-y','-i', Input ]
+	args = [ Options.avcmd,'-y','-i', Input ]
 	args.extend(['-an','-f','image2'])
 	if Options.type == 'jpg':
 		args.extend(['-qscale', str(Options.qscale)])
@@ -87,8 +87,9 @@ else:
 		if arg_enc[0]  == '"': arg_enc = arg_enc[1:]
 		if arg_enc[-1] == '"': arg_enc = arg_enc[:-1]
 
+		arg_enc = arg_enc.replace('@AVCMD@',      Options.avcmd     )
 		arg_enc = arg_enc.replace('@MOVIEMAKER@', MOVIEMAKER        )
-		arg_enc = arg_enc.replace('@CODECS@',     CODECSDIR         )
+		arg_enc = arg_enc.replace('@CODECSDIR@',  CODECSDIR         )
 		arg_enc = arg_enc.replace('@INPUT@',      Input             )
 		arg_enc = arg_enc.replace('@FPS@',        Options.fps       )
 		arg_enc = arg_enc.replace('@CONTAINER@',  Options.container )

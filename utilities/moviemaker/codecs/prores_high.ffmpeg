@@ -1,2 +1,2 @@
 ProRes High
-ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec prores -profile:v 3 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores -profile:v 3 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

@@ -133,7 +133,7 @@
 	"create_file":"rules/bin/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
 
-"avconv":"ffmpeg",
+"avcmd":"ffmpeg",
 "skipfiles":[".","Thumbs.db"],
 
 "fps":"24",

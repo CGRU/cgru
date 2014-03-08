@@ -177,6 +177,7 @@ function d_MakeCmd( i_params)
 
 	cmd += ' "' + cgru_PM( d_makemovie, true) + '"';
 
+	cmd += ' -a "' + RULES.avcmd + '"';
 	cmd += ' -c "'+params.codec+'"';
 	cmd += ' -f '+params.fps;
 	cmd += ' -r '+params.format;
@@ -286,7 +287,7 @@ function d_CvtProcessGUI( i_wnd)
 		params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var cmd = 'movconvert';
-	cmd += ' -a ' + RULES.avconv;
+	cmd += ' -a ' + RULES.avcmd;
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' -f ' + params.fps;
 	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
@@ -323,7 +324,7 @@ function d_ExpProcessGUI( i_wnd, i_afanasy)
 	var cmd = 'utilities/moviemaker/movconvert.py';
 	if( i_afanasy ) cmd = cgru_PM('/cgru/' + cmd, true);
 	cmd += ' -t jpg';
-	cmd += ' -a ' + RULES.avconv;
+	cmd += ' -a ' + RULES.avcmd;
 	cmd += ' -q ' + params.quality;
 	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
 	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
