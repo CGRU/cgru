@@ -179,11 +179,12 @@ if Movie is None:
 			imgtype = Images[0].rfind('.');
 			if imgtype > 0:
 				imgtype = Images[0][imgtype+1:].lower()
-			if   imgtype == 'exr': colorspace = 'sRGB'
+			if   imgtype == 'exr': colorspace = 'Linear'
 			elif imgtype == 'dpx': colorspace = 'Log'
 			elif imgtype == 'cin': colorspace = 'Log'
 			else: colorspace = 'sRGB'
 		cmd += ' -set colorspace ' + colorspace
+	cmd += ' -colorspace sRGB'
 
 cmd += ' -resize %dx%d' % (Options.xres, Options.yres)
 cmd += ' "%s"'
