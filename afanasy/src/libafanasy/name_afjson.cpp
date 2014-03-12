@@ -84,17 +84,24 @@ af::Msg * af::jsonMsgError( const std::string & i_str)
 	std::string str = "{\"error\":\"";
 	str += i_str;
 	str += "\"}";
-	af::Msg * o_msg = new af::Msg();
-	o_msg->setData( str.size(), str.c_str(), af::Msg::TJSON);
-	return o_msg;
+	return af::jsonMsg( str);
+}
+
+af::Msg * af::jsonMsgStatus( bool i_success, const std::string & i_type, const std::string & i_msg)
+{
+	std::string str = "{\"status\":";
+	str += i_success ? "\"success\"" : "\"error\"";
+	str += ",\n\"" + i_type + "\":\"" + i_msg + "\"";
+	str += ",\n\"";
+	str += i_success ? "success" : "error";
+	str += "\":\"" + i_msg + "\"";
+	str += "}";
+	return af::jsonMsg( str);
 }
 
 af::Msg * af::jsonMsg( const std::ostringstream & i_stream)
 {
-	af::Msg * o_msg = new af::Msg();
-	std::string string = i_stream.str();
-	o_msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
-	return o_msg;
+	return af::jsonMsg( i_stream.str());
 }
 
 af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, char * i_data, int i_size)

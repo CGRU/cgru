@@ -307,7 +307,51 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		AfContainerLock ulock( i_args->users, AfContainerLock::WRITELOCK);
 		o_msg_response = i_args->users->addUser( new UserAf( document["user"]), i_args->monitors);
 	}
+	else if( document.HasMember("reload_farm"))
+	{
+		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
 
+		printf("\n	========= RELOADING FARM =========\n\n");
+		if( af::loadFarm( true))
+		{
+			RenderContainerIt rendersIt( i_args->renders);
+			for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+			{
+				render->getFarmHost();
+				i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
+			}
+			printf("\n	========= FARM RELOADED SUCCESSFULLY =========\n\n");
+			o_msg_response = af::jsonMsgStatus( true, "reload_farm",
+				"Reloaded successfully.");
+		}
+		else
+		{
+			printf("\n	========= FARM RELOADING FAILED =========\n\n");
+			o_msg_response = af::jsonMsgStatus( false, "reload_farm",
+				"Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.");
+		}
+	}
+	else if( document.HasMember("reload_config"))
+	{
+		AfContainerLock jlock( i_args->jobs,	AfContainerLock::WRITELOCK);
+		AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
+		AfContainerLock ulock( i_args->users,	AfContainerLock::WRITELOCK);
+		printf("\n	========= RELOADING CONFIG =========\n\n");
+		std::string message;
+		if( af::Environment::reload())
+		{
+			printf("\n	========= CONFIG RELOADED SUCCESSFULLY =========\n\n");
+			o_msg_response = af::jsonMsgStatus( true, "reload_config",
+				"Reloaded successfully.");
+		}
+		else
+		{
+			printf("\n	========= CONFIG RELOADING FAILED =========\n\n");
+			o_msg_response = af::jsonMsgStatus( false, "reload_config",
+				"Failed, see server logs fo details.");
+		}
+	}
 
 	delete [] data;
 	if( i_msg ) delete i_msg;

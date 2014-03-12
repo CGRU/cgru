@@ -80,8 +80,8 @@ public:
 /// Request messages, sizes, quantities statistics. Can be requested displayed by anatoly.
 /**/TStatRequest/**/,
 
-/**/TConfigLoad/**/,                ///< Reload config file
-/**/TFarmLoad/**/,                  ///< Reload farm file
+/**/DEPRECATED_TConfigLoad/**/,                ///< Reload config file
+/**/DEPRECATED_TFarmLoad/**/,                  ///< Reload farm file
 
 
 /**/TClientExitRequest/**/,         ///< Request to client to exit,

@@ -28,7 +28,6 @@ public:
 	JobContainer     * jobs;
 	MonitorContainer * monitors;
 	RenderContainer  * renders;
-	TalkContainer    * talks;
 	UserContainer    * users;
 
 private:

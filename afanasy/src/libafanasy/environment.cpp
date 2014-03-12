@@ -428,7 +428,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	if( dpos == std::string::npos) dpos = username.rfind('\\');
 	if( dpos != std::string::npos) username = username.substr( dpos + 1);
 	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-	printf("Afanasy user name = '%s'\n", username.c_str());
+	PRINT("Afanasy user name = '%s'\n", username.c_str());
 
 //
 //############ Local host name:
@@ -466,8 +466,8 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
 	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
 
-	printf("Local computer name = '%s'\n", computername.c_str());
-	printf("Afanasy host name = '%s'\n", hostname.c_str());
+	PRINT("Local computer name = '%s'\n", computername.c_str());
+	PRINT("Afanasy host name = '%s'\n", hostname.c_str());
 
 //
 //############ Platform: #############################
