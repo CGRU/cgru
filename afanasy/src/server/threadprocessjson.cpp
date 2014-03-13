@@ -50,13 +50,27 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 
 		if( type == "jobs" )
 		{
-			std::vector<int32_t> uids;
-			af::jr_int32vec("uids", uids, getObj);
-			if( uids.size())
+			if( getObj.HasMember("uids"))
 			{
-				AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
-				AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
-				o_msg_response = i_args->users->generateJobsList( uids, type, json);
+				std::vector<int32_t> uids;
+				af::jr_int32vec("uids", uids, getObj);
+				if( uids.size())
+				{
+					AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
+					AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
+					o_msg_response = i_args->users->generateJobsList( uids, type, json);
+				}
+			}
+			if( getObj.HasMember("users"))
+			{
+				std::vector<std::string> users;
+				af::jr_stringvec("users", users, getObj);
+				if( users.size())
+				{
+					AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
+					AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
+					o_msg_response = i_args->users->generateJobsList( users, type, json);
+				}
 			}
 			else if( mode == "output")
 			{

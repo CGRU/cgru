@@ -159,34 +159,49 @@ af::Msg* UserContainer::generateJobsList( int id)
 	return new af::Msg( af::Msg::TJobsList, &mcjobs);
 }
 
-af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids,
-	const std::string & i_type_name, bool json)
+af::Msg * UserContainer::generateJobsList( const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json)
+{
+	return generateJobsList( ids, std::vector<std::string>(), i_type_name, i_json);
+}
+
+af::Msg * UserContainer::generateJobsList( const std::vector<std::string> & i_names, const std::string & i_type_name, bool i_json)
+{
+	return generateJobsList( std::vector<int32_t>(), i_names, i_type_name, i_json);
+}
+
+af::Msg * UserContainer::generateJobsList( const std::vector<int32_t> & ids, const std::vector<std::string> & i_names,
+	const std::string & i_type_name, bool i_json)
 {
 	UserContainerIt usersIt( this);
 	MCAfNodes mcjobs;
 	std::ostringstream stream;
 	bool has_jobs = false;
 
-	if( json )
+	if( i_json )
 	{
 		stream << "{\"" << i_type_name << "\":[\n";
 	}
 
+	std::vector<UserAf*> users;
 	for( int i = 0; i < ids.size(); i++)
+		users.push_back( usersIt.getUser( ids[i]));
+	for( int i = 0; i < i_names.size(); i++)
+		users.push_back( getUser( i_names[i]));
+
+	for( int i = 0; i < users.size(); i++)
 	{
-		UserAf* user = usersIt.getUser( ids[i]);
-		if( user == NULL) continue;
-		if( json )
+		if( users[i] == NULL) continue;
+		if( i_json )
 		{
 			if(( i != 0 ) && ( has_jobs ))
 				stream << ",\n";
-			has_jobs = user->getJobs( stream);
+			has_jobs = users[i]->getJobs( stream);
 		}
 		else
-			user->jobsinfo( mcjobs);
+			users[i]->jobsinfo( mcjobs);
 	}
 
-	if( json )
+	if( i_json )
 	{
 		stream << "\n]}";
 		return af::jsonMsg( stream);

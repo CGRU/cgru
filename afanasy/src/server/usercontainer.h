@@ -19,7 +19,7 @@ public:
 	~UserContainer();
 
 	/// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
-	UserAf* addUser( const std::string & i_username, const std::string & i_hostname, MonitorContainer * i_monitoring);
+	UserAf * addUser( const std::string & i_username, const std::string & i_hostname, MonitorContainer * i_monitoring);
 
 	/// Add user, called on start with user created from batadase
 	int addUser( UserAf * i_user);
@@ -28,11 +28,14 @@ public:
 	af::Msg * addUser( UserAf * i_user, MonitorContainer * i_monitoring);
 
 	/// Generate MCJobs message for user with \c id , return NULL if no such \c id exists.
-	af::Msg* generateJobsList( int id);
-
-	/// Generate MCJobs message for users with provided ids.
-	af::Msg* generateJobsList( const std::vector<int32_t> & ids,
-			const std::string & i_type_name, bool json = false);
+	af::Msg * generateJobsList( int id);
+	/// Generate MCJobs message for users with provided ids:
+	af::Msg * generateJobsList( const std::vector<int32_t> & ids, const std::vector<std::string> & i_names,
+		const std::string & i_type_name, bool i_json = false);
+	/// Generate MCJobs message for users with provided ids:
+	af::Msg * generateJobsList( const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json = false);
+	/// Generate MCJobs message for users with provided names:
+	af::Msg * generateJobsList( const std::vector<std::string> & i_names, const std::string & i_type_name, bool i_json = false);
 
 	/// Generate task for \c render , return \c true on success.
 	bool solve( RenderAf *render, MonitorContainer * monitoring);
