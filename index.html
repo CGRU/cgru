@@ -190,11 +190,15 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 	<div id="sidepanel_news" style="display:none">
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
-			<div id="news" style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"></div>
-			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;">
+			<div id="news"></div>
+			<div id="news_ctrl">
 				<div style="font-size:14px;">
-					<div class="button" title="Double click to clear all received news" style="float:left;padding:2px 4px;" ondblclick="nw_RemoveNews()">Clear News</div>
-					<div class="button" title="Click to open/close subsribed locations" onclick="c_ElDisplayToggle(document.getElementById('channels'))">Channels</div>
+					<div class="button" title="Double click to clear all received news"
+						ondblclick="nw_RemoveNews()">Clear</div>
+					<div class="button">DNM</div>
+					<div class="button">SOM</div>
+					<div class="button" title="Click to open/close subsribed locations"
+						onclick="c_ElDisplayToggle(document.getElementById('channels'))">Chan</div>
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>

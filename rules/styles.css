@@ -247,6 +247,9 @@ text-shadow: 0 0 4px #00FF00, 0 0 8px #00FF00;
 font-weight: bold;
 display: none;
 }
+#news { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
+#news_ctrl { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
+#news_ctrl .button { float: left; }
 #news > div, #channels > div { box-shadow: 0 0 2px #000 inset; border-radius: 4px; margin: 1px 0px; }
 #news > div.assigned { background: rgba(0,255,0,.2);}
 #news .button, #channels .button { float: left; height: 14px; margin: 0px 4px 0px 0px; padding: 0px 4px 0px 4px; }
