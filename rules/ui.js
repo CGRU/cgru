@@ -683,7 +683,7 @@ function u_BodyEditSave()
 	if( g_auth_user == null ) return;
 
 	if( u_body_edit_markup ) u_BodyEditMarkup();
-	var text = c_MakeLinksRelative( $('body_body').innerHTML);
+	var text = c_MakeLinksHttp( c_MakeLinksRelative( $('body_body').innerHTML));
 	var res = c_Parse( n_Request_old({"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}}));
 
 	if( RULES.status == null ) RULES.status = {};

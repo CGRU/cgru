@@ -27,8 +27,6 @@ $GuestCanEdit = array('comments.json');
 $Out = array();
 $Recv = array();
 
-if( false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
-
 # Decode input:
 if( isset($_POST['upload_path']))
 	upload( $_POST['upload_path'], $Out);
@@ -104,6 +102,16 @@ else if( count( $Recv))
 # Write response:
 if( false == is_null( $Out))
 	echo json_encode( $Out);
+
+# Encode "Pretty" JSON data:
+if( false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
+function jsonEncode( &$i_obj)
+{
+	if( phpversion() >= "5.3" )
+		return json_encode( $i_obj, JSON_PRETTY_PRINT);
+	else
+		return json_encode( $i_obj);
+}
 
 # Functions:
 function jsf_start( $i_arg, &$o_out)
@@ -842,10 +850,7 @@ function jsf_editobj( $i_edit, &$o_out)
 //error_log('obj:'.json_encode($obj));
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);
-		if( phpversion() >= "5.3" )
-			fwrite( $fHandle, json_encode( $obj, JSON_PRETTY_PRINT));
-		else
-			fwrite( $fHandle, json_encode( $obj));
+		fwrite( $fHandle, jsonEncode( $obj));
 		fclose($fHandle);
 		$o_out['status'] = 'success';
 	}
@@ -897,20 +902,12 @@ function afanasy( $i_obj, &$o_out)
 	$obj = array();
 	$obj['job'] = $i_obj['job'];
 	$data = json_encode( $obj);
-
-	$header = '[ * AFANASY * ]';
-	$header = $header.' '.$i_obj['magick_number'];
-	$header = $header.' '.$i_obj['sender_id'];
-	$header = $header.' '.strlen($data);
-	$header = $header.' JSON';
-
 	$header = 'AFANASY '.strlen($data).' JSON';
 
 	fwrite( $socket, $header.$data);
 	fclose( $socket);
 
 	$o_out['satus'] = 'success';
-//	$o_out['header'] = $header;
 }
 
 function jsf_save( $i_save, &$o_out)
@@ -1047,7 +1044,7 @@ function jsf_makenews( $i_args, &$o_out)
 			mkdir( dirname( $rfile));
 		if( $rhandle = fopen( $rfile, 'w'))
 		{
-			fwrite( $rhandle, json_encode( $rarray));
+			fwrite( $rhandle, jsonEncode( $rarray));
 			fclose($rhandle);
 		}
 
@@ -1138,7 +1135,7 @@ function jsf_makenews( $i_args, &$o_out)
 		$filename = 'users/'.$user['id'].'.json';
 		if( $fHandle = fopen( $filename, 'w'))
 		{
-			fwrite( $fHandle, json_encode( $user));
+			fwrite( $fHandle, jsonEncode( $user));
 			fclose($fHandle);
 		}
 //error_log('New wrote in '.$filename);

@@ -416,7 +416,7 @@ function cm_Save( i_el)
 		i_el.m_obj.user_name = i_el.m_obj.guest.id;
 	}
 
-	i_el.m_obj.text = c_MakeLinksRelative( i_el.m_elText.innerHTML);
+	i_el.m_obj.text = c_MakeLinksHttp( c_MakeLinksRelative( i_el.m_elText.innerHTML));
 	i_el.m_obj.color = i_el.m_color;
 	i_el.m_obj.type = i_el.m_type;
 	if( i_el.m_obj.deleted != true )

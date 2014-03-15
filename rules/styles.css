@@ -143,6 +143,7 @@ border-radius: 4px;
 
 a { color: inherit; text-shadow: 0 0 1px rgba(0,0,255,.4);}
 a:hover { text-shadow: 0 0 2px rgba(100,200,255,.5); }
+a.link_auto { text-decoration: none; }
 
 .button {
 -moz-user-select: none;

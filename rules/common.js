@@ -462,6 +462,31 @@ function c_GetAvatar( i_user_id, i_guest )
 	return null;
 }
 
+function c_MakeLinksHttp( i_text)
+{
+	var a_re = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	var a_parts = i_text.split(/<a /gi);
+	var out = '';
+	for( var i = 0; i < a_parts.length; i++)
+	{
+		text = a_parts[i];
+		link = '';
+		var pos = text.indexOf('</a>');
+		if( pos > 0 )
+		{
+			link = text.substr( 0, pos);
+			text = text.substr( pos);
+		}
+//console.log('l='+link); console.log('t='+text);
+		text = text.replace( a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
+		text = link + text;
+
+		if( out != '') out += '<a ';
+		out += text;
+	}
+	return out;
+}
+
 function c_MakeLinksRelative( i_text)
 {
 	var address = document.location.protocol + '//' + document.location.host + document.location.pathname;
