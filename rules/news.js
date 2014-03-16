@@ -238,7 +238,7 @@ function nw_NewsClose()
 	$('sidepanel_news').classList.remove('opened');
 	$('news').innerHTML = '';
 	localStorage.news_opened = false;
-	g_auth_user.news = null;
+	delete g_auth_user.news;
 }
 function nw_NewsOpen()
 {
@@ -333,7 +333,7 @@ function nw_NewsLoad()
 	}
 
 	var filename = 'users/'+g_auth_user.id+'.json';
-	c_Parse( n_Request({"send":{"readobj":filename},"func":nw_NewsReceived,"info":"news","wait":false,"parse":true}));
+	n_Request({"send":{"readobj":filename},"func":nw_NewsReceived,"info":"news","wait":false,"parse":true});
 	$('news').innerHTML = 'Loading...';
 }
 
@@ -355,6 +355,7 @@ function nw_NewsShow( i_news)
 	nw_ShowCount();
 
 	$('news').innerHTML = '';
+	$('news').m_elArray = [];
 	g_auth_user.news.sort( function(a,b){var attr='time';if(a[attr]>b[attr])return -1;if(a[attr]<b[attr])return 1;return 0;});
 	for( var i = 0; i < g_auth_user.news.length; i++ )
 	{
@@ -362,6 +363,9 @@ function nw_NewsShow( i_news)
 
 		var el = document.createElement('div');
 		$('news').appendChild( el);
+		$('news').m_elArray.push( el);
+		el.m_news = news;
+
 		el.title = c_DT_StrFromSec( news.time);
 		if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
 			el.classList.add('assigned');
@@ -371,7 +375,7 @@ function nw_NewsShow( i_news)
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
 		elBtn.m_id = news.id;
-		elBtn.ondblclick = function(e){ nw_RemoveNews( e.currentTarget.m_id);};
+		elBtn.ondblclick = function(e){ nw_RemoveNews([e.currentTarget.m_id]);};
 		elBtn.title = 'Double click to remove link';
 
 		var avatar = c_GetAvatar( news.user, news.guest);
@@ -394,20 +398,47 @@ function nw_NewsShow( i_news)
 		elLink.textContent = news.path;
 	}
 
-	g_auth_user.news = null;
+	delete g_auth_user.news;
 }
 
-function nw_RemoveNews( i_id)
+function nw_ShowOnlyAssigned( i_btn)
+{
+	if( $('news').classList.contains('show_only_assigned'))
+	{
+		$('news').classList.remove('show_only_assigned');
+		i_btn.classList.remove('pushed');
+	}
+	else
+	{
+		$('news').classList.add('show_only_assigned');
+		i_btn.classList.add('pushed');
+	}
+}
+
+function nw_RemoveNotAssigned()
+{
+	var elNews = $('news').m_elArray;
+	var ids = [];
+	for( var i = 0; i < elNews.length; i++)
+		if( false == elNews[i].classList.contains('assigned'))
+			ids.push( elNews[i].m_news.id);
+	if( ids.length )
+		nw_RemoveNews( ids);
+}
+
+function nw_RemoveNews( i_ids)
 {
 	var obj = {};
-	if( i_id == null )
+	if( i_ids == null )
 	{
 		obj.object = {"news":[]};
 		obj.add = true;
 	}
 	else
 	{
-		obj.objects = [{"id":i_id}];
+		obj.objects = [];
+		for( var i = 0; i < i_ids.length; i++ )
+			obj.objects.push({"id":i_ids[i]});
 		obj.delobj = true;
 	}
 	obj.file = 'users/'+g_auth_user.id+'.json';

@@ -180,7 +180,7 @@ function jsf_initialize( $i_arg, &$o_out)
 
 		if( isset( $obj['avatar']) && strlen($obj['avatar']))
 			$user['avatar'] = $obj['avatar'];
-		else if( isset( $obj['email']))
+		else if( isset( $obj['email']) && strlen($obj['email']))
 			$user['avatar'] = 'http://www.gravatar.com/avatar/'.md5( strtolower( trim($obj['email'])));
 
 		$o_out['users'][$obj['id']] = $user;
@@ -206,25 +206,15 @@ function processUser( &$o_out)
 	$editobj['add'] = true;
 	$editobj['file'] = $filename;
 
-	if( false == is_file( $filename))
-	{
-		$user['id'] = $UserID;
-		$user['channels'] = array();
-		$user['news'] = array();
-		$user['ctime'] = time();
-
-		$editobj['object'] = $user;
-		$out = array();
-		jsf_editobj( $editobj, $out);
-	}
-
-	readObj( $filename, $user);
-
+	if( is_file( $filename))
+		readObj( $filename, $user);
 	if( array_key_exists('error', $user))
-	{
 		$o_out['error'] = $user['error'];
-		return;
-	}
+
+	if( false == isset( $user['id']      )) $user['id']       = $UserID;
+	if( false == isset( $user['channels'])) $user['channels'] = array();
+	if( false == isset( $user['news']    )) $user['news']     = array();
+	if( false == isset( $user['ctime']   )) $user['ctime']    = time();
 
 	$user['rtime'] = time();
 	$editobj['object'] = $user;

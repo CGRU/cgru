@@ -195,10 +195,13 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 				<div style="font-size:14px;">
 					<div class="button" title="Double click to clear all received news"
 						ondblclick="nw_RemoveNews()">Clear</div>
-					<div class="button">DNM</div>
-					<div class="button">SOM</div>
+					<div class="button" title="Double clock to remove all not assigned news"
+						ondblclick="nw_RemoveNotAssigned()">DNMy</div>
+					<div class="button" title="Show only assigned news"
+						onclick="nw_ShowOnlyAssigned(this)">My</div>
 					<div class="button" title="Click to open/close subsribed locations"
-						onclick="c_ElDisplayToggle(document.getElementById('channels'))">Chan</div>
+						onclick="c_ElDisplayToggle(document.getElementById('channels'));
+						this.classList.toggle('pushed')">Chan</div>
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>

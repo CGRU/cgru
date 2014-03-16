@@ -4,7 +4,7 @@ ad_wnd = null;
 ad_wnd_curgroup = null;
 ad_wnd_sort_prop = 'id';
 ad_wnd_sort_dir = 0;
-ad_wnd_prof = null;
+//ad_wnd_prof = null;
 
 function ad_Init()
 {
@@ -388,8 +388,8 @@ function ad_WndDrawUsers()
 			var arrays = ['news','channels'];
 			if( arrays.indexOf( ad_wnd_sort_prop) != -1 )
 			{
-				val_a = val_a.length;
-				val_b = val_b.length;
+				if( val_a ) val_a = val_a.length;
+				if( val_b ) val_b = val_b.length;
 			}
 
 			if( val_a == null ) val_a = '';
@@ -546,8 +546,9 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var elChannels = document.createElement('div');
 	el.appendChild( elChannels);
-	elChannels.textContent = i_user.channels.length;
 	elChannels.style.width = '50px';
+	if( i_user.channels )
+		elChannels.textContent = i_user.channels.length;
 	if( i_user.channels && i_user.channels.length )
 	{
 		var channels = '';
@@ -559,7 +560,8 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var elNews = document.createElement('div');
 	el.appendChild( elNews);
-	elNews.textContent = i_user.news.length;
+	if( i_user.news )
+		elNews.textContent = i_user.news.length;
 	elNews.style.width = '50px';
 	if( i_row == 0 ) elNews.onclick = function(e) { ad_WndSortUsers('news'); };
 
@@ -670,7 +672,7 @@ function ad_ChangeTitleOnCkick( i_user_id)
 }
 function ad_ChangeTitle( i_title, i_user_id)
 {
-	ad_SaveUserProp( i_user_id, 'title', i_title);
+	ad_SaveUser({"id":i_user_id,"title":i_title});
 	ad_WndRefresh();
 }
 function ad_ChangeRoleOnCkick( i_user_id)
@@ -681,7 +683,7 @@ function ad_ChangeRoleOnCkick( i_user_id)
 }
 function ad_ChangeRole( i_role, i_user_id)
 {
-	ad_SaveUserProp( i_user_id, 'role', i_role);
+	ad_SaveUser({"id":i_user_id,"role":i_role});
 	ad_WndRefresh();
 }
 function ad_ChangeEmailOnCkick( i_user_id)
@@ -692,17 +694,17 @@ function ad_ChangeEmailOnCkick( i_user_id)
 }
 function ad_ChangeEmail( i_email, i_user_id)
 {
-	ad_SaveUserProp( i_user_id, 'email', i_email);
+	ad_SaveUser({"id":i_user_id,"email":i_email});
 	ad_WndRefresh();
 }
-function ad_SaveUserProp( i_user_id, i_prop, i_value)
+function ad_SaveUser( i_user)
 {
+	if( i_user == null ) i_user = g_auth_user;
+	
 	var obj = {};
-
 	obj.add = true;
-	obj.object = {};
-	obj.object[i_prop] = i_value;
-	obj.file = 'users/' + i_user_id + '.json';
+	obj.object = i_user;
+	obj.file = 'users/' + i_user.id + '.json';
 
 	var res = c_Parse( n_Request_old({"editobj":obj}));
 	if( res && res.error )
@@ -805,11 +807,12 @@ function ad_SetPassword( i_passwd, i_user_id)
 
 
 ad_prof_props = [];
-ad_prof_props.push({"name":'id',     "label":'ID',     "edit":false});
-ad_prof_props.push({"name":'title',  "label":'Title',  "edit":false});
-ad_prof_props.push({"name":'role',   "label":'Role',   "edit":false});
-ad_prof_props.push({"name":'avatar', "label":'Avatar', "edit":true});
-ad_prof_props.push({"name":'email',  "label":'Email',  "edit":true});
+ad_prof_props.id     = {"disabled":true,"lwidth":'170px',"label":'ID'};
+ad_prof_props.title  = {"disabled":true,"lwidth":'170px'};
+ad_prof_props.role   = {"disabled":true,"lwidth":'170px'};
+ad_prof_props.avatar = {};
+ad_prof_props.email  = {"width":'70%'};
+ad_prof_props.email_news = {"width":'30%',"bool":false};
 
 function ad_ProfileOpen()
 {
@@ -821,14 +824,15 @@ function ad_ProfileOpen()
 
 	var wnd = new cgru_Window({"name":'profile',"title":'My Profile'});
 	wnd.elContent.classList.add('profile');
-	wnd.closeOnEsc = false;
-	ad_wnd_prof = wnd;
-	ad_ProfileDraw();
-}
-function ad_ProfileDraw()
-{
-	var wnd = ad_wnd_prof;
-	wnd.elContent.innerHTML = '';
+
+//	wnd.closeOnEsc = false;
+//	ad_wnd_prof = wnd;
+//	ad_ProfileDrawa();
+//}
+//function ad_ProfileDraw()
+//{
+//	var wnd = ad_wnd_prof;
+//	wnd.elContent.innerHTML = '';
 
 	var avatar = c_GetAvatar();
 	if( avatar )
@@ -837,10 +841,37 @@ function ad_ProfileDraw()
 		wnd.elContent.appendChild( el);
 		el.classList.add('avatar');
 		el.src = avatar;
-		el.width = 100;
-		el.height = 100;
 	}
 
+	gui_Create( wnd.elContent, ad_prof_props, [g_auth_user]);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+
+	var elSend = document.createElement('div');
+	elBtns.appendChild( elSend);
+	elSend.textContent = 'Save';
+	elSend.classList.add('button');
+	elSend.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);}
+	elSend.m_wnd = wnd;
+
+	var elSend = document.createElement('div');
+	elBtns.appendChild( elSend);
+	elSend.textContent = 'Cancel';
+	elSend.classList.add('button');
+	elSend.onclick = function(e){ e.currentTarget.m_wnd.destroy();}
+	elSend.m_wnd = wnd;
+}
+
+function ad_ProfileSave( i_wnd)
+{
+	var params = gui_GetParams( i_wnd.elContent, ad_prof_props);
+	for( p in params ) g_auth_user[p] = params[p];
+	ad_SaveUser();
+	i_wnd.destroy();
+}
+/*
 	for( var i = 0; i < ad_prof_props.length; i++ )
 	{
 		var prop = ad_prof_props[i];
@@ -868,13 +899,7 @@ function ad_ProfileDraw()
 		elProp.textContent = g_auth_user[prop.name];
 		elProp.classList.add('prop');
 	}
-
-	return;
-var el = document.createElement('div');
-wnd.elContent.appendChild( el);
-el.textContent = JSON.stringify( g_auth_user);
 }
-
 function ad_ProfileEditPropOnClick( i_evt)
 {
 	var prop = i_evt.currentTarget.m_prop;
@@ -888,4 +913,5 @@ function ad_ProfileEditProp( i_value, i_prop)
 	ad_SaveUserProp( g_auth_user.id, i_prop, i_value)
 	ad_ProfileDraw();
 }
+*/
 

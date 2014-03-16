@@ -156,11 +156,11 @@ box-shadow: 0 0 3px #000, 0 0 3px rgba(255,255,255,.3) inset;
 margin: 2px;
 padding: 2px;
 }
+.button:hover { background: rgba(200,255,255,.1);}
 .button.pushed {
-background: transparent;
+background: rgba(100,255,255,.2);
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 }
-.button:hover { background: rgba(200,255,255,.1);}
 
 .button.openclose { float:left; }
 .button.openclose.opened { font-size:14px; width: 14px; height: 14px; }
@@ -253,6 +253,8 @@ display: none;
 #news_ctrl .button { float: left; }
 #news > div, #channels > div { box-shadow: 0 0 2px #000 inset; border-radius: 4px; margin: 1px 0px; }
 #news > div.assigned { background: rgba(0,255,0,.2);}
+#news.show_only_assigned > div { display: none;}
+#news.show_only_assigned > div.assigned { display: block;}
 #news .button, #channels .button { float: left; height: 14px; margin: 0px 4px 0px 0px; padding: 0px 4px 0px 4px; }
 #news a, #channels a { font-size: 10px; }
 #news .avatar { float:right; border: 1px solid #777; border-radius: 4px; width: 24px; height: 24px; margin: 2px; }
@@ -526,12 +528,14 @@ box-shadow: 0 0 4px #000 inset;
 .admin_users .selected div { background: rgba(100,255,255,.2); }
 .admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
 
+/*
 .profile > div { border-radius: 4px; border: 1px solid #888; margin: 4px 0px; padding: 4px; }
 .profile > div > div { padding: 4px 8px; }
 .profile > div .label { float: left; width: 150px; }
 .profile > div .prop { min-height: 20px; box-shadow: 0 0 2px #000 inset, 0 0 0 2px rgba(255,255,255,.2); border-radius: 4px; }
-.profile > div .button { float: right; margin: 1px 8px; font-size: 14px; }
-.profile .avatar { float: right; width: 100px; height: 100px; border: 1px solid #000; border-radius: 8px; margin: 8px; padding: 0px; box-shadow: 0 0 4px rgba(255,255,255,.8); }
+*/
+.profile .button { width: 100px; float: right; margin: 12px 12px; padding: 2px 12px; }
+.profile .avatar { position: absolute; width: 88px; height: 88px; border: 1px solid #000; border-radius: 8px; box-shadow: 0 0 4px rgba(255,255,255,.8); }
 
 .imgconvert > div > div { margin: 2px 8px; padding: 2px 8px;}
 .imgconvert > div .label { float: left; width: 100px; }
