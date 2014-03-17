@@ -464,9 +464,10 @@ function c_GetAvatar( i_user_id, i_guest )
 
 function c_MakeLinksHttp( i_text)
 {
+//console.log('c_MakeLinksHttp in:'+i_text);
 	var a_re = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 	var a_parts = i_text.split(/<a /gi);
-	var out = '';
+	var out = null;
 	for( var i = 0; i < a_parts.length; i++)
 	{
 		text = a_parts[i];
@@ -481,9 +482,10 @@ function c_MakeLinksHttp( i_text)
 		text = text.replace( a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
 		text = link + text;
 
-		if( out != '') out += '<a ';
-		out += text;
+		if( out == null) out = text;
+		else out += '<a ' + text;
 	}
+//console.log('c_MakeLinksHttp out:'+out);
 	return out;
 }
 
