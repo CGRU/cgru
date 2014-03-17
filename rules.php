@@ -27,6 +27,16 @@ $GuestCanEdit = array('comments.json');
 $Out = array();
 $Recv = array();
 
+# Encode "Pretty" JSON data:
+if( false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
+function jsonEncode( &$i_obj)
+{
+	if( phpversion() >= "5.3" )
+		return json_encode( $i_obj, JSON_PRETTY_PRINT);
+	else
+		return json_encode( $i_obj);
+}
+
 # Decode input:
 if( isset($_POST['upload_path']))
 	upload( $_POST['upload_path'], $Out);
@@ -102,16 +112,6 @@ else if( count( $Recv))
 # Write response:
 if( false == is_null( $Out))
 	echo json_encode( $Out);
-
-# Encode "Pretty" JSON data:
-if( false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
-function jsonEncode( &$i_obj)
-{
-	if( phpversion() >= "5.3" )
-		return json_encode( $i_obj, JSON_PRETTY_PRINT);
-	else
-		return json_encode( $i_obj);
-}
 
 # Functions:
 function jsf_start( $i_arg, &$o_out)
