@@ -6,5 +6,5 @@ pushd "${cgru}" > /dev/null
 source "./setup.sh" > /dev/null
 popd > /dev/null
 
-python "$CGRU_LOCATION/utilities/putmulti.py" "$@"
+python "$CGRU_LOCATION/rules/bin/putmulti.py" "$@"
 
