@@ -129,8 +129,9 @@ for i in range(0,len(FIN_SRC)):
 	src = FIN_SRC[i]
 	dst = FIN_DST[i]
 
-	if Options.move and not Options.test:
-		shutil.move( src, dst)
+	if Options.move:
+		if not Options.test:
+			shutil.move( src, dst)
 		continue
 
 	cmd = Put
