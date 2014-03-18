@@ -37,6 +37,7 @@
 		"seek":["/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"play_folders":false,
+		"scripts":["project.js"],
 		"show_files":true
 	},
 	"scenes":{
