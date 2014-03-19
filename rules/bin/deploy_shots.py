@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, re, shutil, signal, sys
+import json, os, re, shutil, signal, sys
 import af
 
 from optparse import OptionParser
@@ -12,6 +12,7 @@ Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     defa
 Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default='',    help='References')
 Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
 Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default='',    help='Shot renaming padding')
+Parser.add_option('-u', '--uppercase',dest='uppercase',action='store_true', default='',    help='Rename shot uppercase')
 Parser.add_option('-m', '--move',     dest='move',     action='store_true', default=False, help='Move source files, not copy')
 Parser.add_option('-A', '--afanasy',  dest='afanasy',  action='store_true', default=False, help='Use Afanasy to copy sources')
 Parser.add_option(      '--afuser',   dest='afuser',   type  ='string',     default='',    help='Afanasy user')
@@ -21,9 +22,12 @@ Parser.add_option('--shot_src',       dest='shot_src', type  ='string',     defa
 Parser.add_option('--shot_ref',       dest='shot_ref', type  ='string',     default='REF', help='Shot references folder')
 Parser.add_option('--test',           dest='test',     action='store_true', default=False, help='Test inputs only')
 
+Out = []
+
 def errExit( i_msg):
-	print('{"error":"%s"},' % i_msg)
-	print('{"status":"error"}]}')
+	Out.append({'error':i_msg})
+	Out.append({'status':'error'})
+	print( json.dumps({'deploy':Out}, indent=4))
 	sys.exit(1)
 
 def interrupt( signum, frame):
@@ -31,8 +35,6 @@ def interrupt( signum, frame):
 signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT,  interrupt)
-
-print('{"deploy":[')
 
 (Options, args) = Parser.parse_args()
 
@@ -57,23 +59,25 @@ for shot in Sources:
 	if shot in Sources_skip: continue
 	src = os.path.join( Options.sources, shot)
 	if not os.path.isdir( src):
-		print('{"warning":"\"%s\" is not a folder"},' % shot)
+		Out.append({'warning':"\"%s\" is not a folder" % shot})
 		continue
 
 	src_sources = [src]
 
 	for folder in Sources:
 		if folder == shot: continue
-		if folder.find( shot + '_') != 0: continue
+		if folder.lower().find( shot.lower() + '_') != 0: continue
 		Sources_skip.append( folder)
 		src_sources.append( os.path.join( Options.sources, folder))
 
 	src_refs = []
 	for ref in References:
-		if ref.find( shot + '.') == 0 or ref.find( shot + '_') == 0:
+		if ref.lower().find( shot.lower() + '.') == 0 or ref.lower().find( shot.lower() + '_') == 0:
 			src_refs.append( os.path.join( Options.refs, ref))
 
 	shot_name = shot
+
+	# Rename shot padding:
 	if Options.padding != '':
 		words = re.findall(r'\D+', shot)
 		digits = re.findall(r'\d+', shot)
@@ -88,16 +92,22 @@ for shot in Sources:
 				num += 1
 			#print('"%s"->"%s"' % (shot, shot_name))
 
+	# Rename shot uppercase:
+	if Options.uppercase:
+		shot_name = shot_name.upper()
+
 	shot_dest = os.path.join( Options.dest, shot_name)
 
-	print('{"shot":"%s","sources":[' % shot_name)
-	for src in src_sources: print('\t"%s",' % src)
-	print('\t,""]')
+	Out_Shot = dict()
+	Out_Shot['name'] = shot_name
+	Out_Shot['src'] = []
+	for src in src_sources: Out_Shot['src'].append( src)
+
 	if len( src_refs):
-		print('\t"refs":[')
-		for ref in src_refs: print('\t"%s",' % ref)
-		print('\t,""]')
-	print('\t},')
+		Out_Shot['ref'] = []
+		for ref in src_refs: Out_Shot['ref'].append( ref)
+
+	Out.append({'shot':Out_Shot})
 
 	if not Options.test:
 		if not os.path.isdir( shot_dest):
@@ -148,8 +158,8 @@ for i in range(0,len(FIN_SRC)):
 	else:
 		os.system( cmd)
 
-if Options.afanasy:
+if Options.afanasy and not Options.test:
 	job.send()
 
-print('{"status":"success"}]}')
+print( json.dumps({'deploy':Out}, indent=4))
 
