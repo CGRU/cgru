@@ -6,9 +6,9 @@ source "$CGRU_LOCATION/software_setup/setup__all.sh"
 # Search directory where Houdini installed:
 HOUDINI_INSTALL_DIR="/opt"
 for folder in `ls "$HOUDINI_INSTALL_DIR"`; do
-   if [ "`echo $folder | awk '{print match( \$1, "hfs")}'`" == "1" ]; then
-      export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
-   fi
+	if [ "`echo $folder | awk '{print match( \$1, "hfs")}'`" == "1" ]; then
+		export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
+	fi
 done
 
 #Override houdini location based on locate_houdini.sh
@@ -20,8 +20,8 @@ fi
 
 # Check Houdini location:
 if [ -z "$HOUDINI_LOCATION" ]; then
-   echo "Can't find houdini in '$HOUDINI_DIR'"
-   exit 1
+	echo "Can't find houdini in '$HOUDINI_INSTALL_DIR'"
+	exit 1
 fi
 echo "Houdni location = '$HOUDINI_LOCATION'"
 
@@ -41,9 +41,9 @@ HOUDINI_CGRU_OTLSCAN_PATH=$HIH/otls:$HOUDINI_CGRU_PATH:$HH/otls
 
 # Create or add to exist OTL scan path:
 if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
-   export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
+	export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
 else
-   export HOUDINI_OTLSCAN_PATH=$HOUDINI_CGRU_OTLSCAN_PATH
+	export HOUDINI_OTLSCAN_PATH=$HOUDINI_CGRU_OTLSCAN_PATH
 fi
 
 export APP_DIR="$HOUDINI_LOCATION"
