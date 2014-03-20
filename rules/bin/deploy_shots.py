@@ -49,10 +49,12 @@ def isSameShot( i_shot, i_name):
 
 if Options.sources == '': errExit('Sources are not specified')
 if not os.path.isdir( Options.sources): errExit('Sources folder does not exist')
-if Options.dest == '': errExit('Destination is not specified')
-if not os.path.isdir( Options.dest): errExit('Destination folder does not exist')
 if Options.template == '': errExit('Shot template is not specified')
 if not os.path.isdir( Options.template): errExit('Shot template folder does not exist')
+
+if not Options.test:
+	if Options.dest == '': errExit('Destination is not specified')
+	if not os.path.isdir( Options.dest): errExit('Destination folder does not exist')
 
 References = []
 if Options.refs != '' and os.path.isdir( Options.refs):
