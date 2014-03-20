@@ -36,6 +36,15 @@ signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT,  interrupt)
 
+SameShotSeparators = '._-'
+def isSameShot( i_shot, i_name):
+	i_shot = i_shot.lower()
+	i_name = i_name.lower()
+	for s in SameShotSeparators:
+		if i_name.find( i_shot + s ) == 0:
+			return True
+	return False
+
 (Options, args) = Parser.parse_args()
 
 if Options.sources == '': errExit('Sources are not specified')
@@ -66,13 +75,13 @@ for shot in Sources:
 
 	for folder in Sources:
 		if folder == shot: continue
-		if folder.lower().find( shot.lower() + '_') != 0: continue
-		Sources_skip.append( folder)
-		src_sources.append( os.path.join( Options.sources, folder))
+		if isSameShot( shot, folder):
+			Sources_skip.append( folder)
+			src_sources.append( os.path.join( Options.sources, folder))
 
 	src_refs = []
 	for ref in References:
-		if ref.lower().find( shot.lower() + '.') == 0 or ref.lower().find( shot.lower() + '_') == 0:
+		if isSameShot( shot, ref):
 			src_refs.append( os.path.join( Options.refs, ref))
 
 	shot_name = shot

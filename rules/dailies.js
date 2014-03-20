@@ -372,6 +372,8 @@ function d_MakeCut( i_args)
 	var params = {};
 	params.cut_name = i_args.cut_name;
 	params.output = i_args.output;
+	params.input = RULES.assets.shot.result.path.join(',');
+	if( RULES.cut.input ) params.input = RULES.cut.input;
 
 	gui_Create( wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});

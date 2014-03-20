@@ -14,6 +14,8 @@ prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
 prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
+prj_deploy_shots_params.uppercase = {"bool":true,"width":'50%'};
+prj_deploy_shots_params.padding = {"width":'50%'};
 
 function prj_ShotsDeploy()
 {
@@ -23,8 +25,15 @@ function prj_ShotsDeploy()
 	var params = {};
 	params.sources = g_CurPath() + '/deploy/src';
 	params.references = g_CurPath() + '/deploy/ref';
-	params.template = g_CurPath() + '/deploy/_template';
-	params.destination = g_CurPath() + '/deploy/out';
+	params.template = RULES.assets.shot.template;
+
+//console.log( JSON.stringify( g_elCurFolder.m_dir));
+	params.destination = RULES.assets.scenes.seek[0];
+	for( var s = 0; s < RULES.assets.scenes.seek.length; s++)
+		for( var f = 0; f < g_elCurFolder.m_dir.folders.length; f++)
+			if( RULES.assets.scenes.seek[s].indexOf( g_elCurFolder.m_dir.folders[f]) != -1 )
+				params.destination = RULES.assets.scenes.seek[s];
+	params.destination = params.destination.replace('[project]', ASSETS.project.path) + '/deploy';
 
 	gui_Create( wnd.elContent, prj_deploy_shots_params, [params]);
 
@@ -86,7 +95,10 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	cmd += ' -r "' + cgru_PM('/' + RULES.root + params.references, true) + '"';
 	cmd += ' -t "' + cgru_PM('/' + RULES.root + params.template, true) + '"';
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
-	cmd += ' -u';
+	cmd += ' --shot_src "' + RULES.assets.shot.source.path[0] + '"'
+	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'
+	if( params.uppercase ) cmd += ' -u';
+	if( params.padding.length ) cmd += ' -p ' + params.padding;
 	cmd += ' --afuser "' + g_auth_user.id + '"';
 	cmd += ' --afcap ' + RULES.put.af_capacity;
 	cmd += ' --afmax ' + RULES.put.af_maxtasks;
@@ -120,10 +132,10 @@ function prj_ShotsDeployFinished( i_data, i_args)
 		elResults.appendChild( el);
 		for( var key in deploy[d])
 		{
+			el.classList.add( key);
 			if( key == 'shot' )
 			{
 				var shot = deploy[d][key];
-				el.classList.add('shot');
 
 				var elName = document.createElement('div');
 				el.appendChild( elName);
@@ -152,9 +164,8 @@ function prj_ShotsDeployFinished( i_data, i_args)
 //console.log( JSON.stringify( shot));
 				break;
 			}
+
 			el.textContent = key + ': ' + deploy[d][key];
-			if(( key == 'error' ) || ( deploy[d][key].indexOf('error') != -1 ))
-				el.style.color = '#F42';
 		}
 	}
 }

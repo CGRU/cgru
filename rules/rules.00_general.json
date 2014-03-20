@@ -60,17 +60,18 @@
 		"scripts":["shot.js"],
 		"post":"shot_Post",
 		"references":{
-			"path":["REFS"]
+			"path":["REF"]
 		},
 		"source":{
-			"path":["SOURCE","SRC"]
+			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG"]
+			"path":["RESULT/JPG","RESULT/DPX"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
 		},
+		"template":"/CG_PROJECT/SCENES/COMMON/_template",
 		"cache_time":60
 	}
 },
@@ -194,12 +195,12 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/DPX",
+	"input":"RESULT/JPG",
 	"output":"COMMON/_cut"
 },
 
 "put":{
-	"input":"RESULT/DPX,RESULT/JPG",
+	"input":"RESULT/DPX",
 	"dest":"FINAL",
 	"cmd":"python /cgru/utilities/put.py",
 	"post_delete":false,

@@ -221,6 +221,10 @@ function fu_PutMultiDialog( i_args)
 	wnd.m_args = i_args;
 
 	var params = {};
+
+	params.input = RULES.assets.shot.result.path.join(',');
+	if( RULES.put.input ) params.input = RULES.put.input;
+
 	if( RULES.put.dest.indexOf('/') !== 0 )
 		if( ASSETS.project )
 			params.dest = ASSETS.project.path + '/' + RULES.put.dest;
