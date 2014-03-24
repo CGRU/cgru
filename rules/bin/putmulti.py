@@ -52,7 +52,7 @@ if not Options.testonly:
 
 commands = []
 task_names = []
-CmdPut = os.path.join( os.path.dirname( sys.argv[0]), 'put.py')
+CmdPut = os.environ['CGRU_LOCATION'] + '/utilities/put.py'
 CmdPut = 'python "%s"' % os.path.normpath( CmdPut)
 CmdPut += ' -d "%s"' % Options.dest
 
