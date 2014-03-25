@@ -784,8 +784,10 @@ JobBlock.actions.push({"mode":'set', "name":'depend_mask',                "type"
 JobBlock.actions.push({"mode":'set', "name":'tasks_depend_mask',          "type":'reg', "handle":'mh_Dialog', "label":'Tasks Depend Mask'});
 JobBlock.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Properties Needed'});
 
-JobNode.sortVisor = 'time_creation';
+// First array item will be used by default (on load)
 JobNode.sort = ['order','time_creation','priority','user_name','name','host_name'];
+JobNode.sortVisor = 'time_creation';
+// If user is visor, special parameter will be used as the default
 JobNode.filter = ['name','host_name','user_name'];
 JobNode.filterVisor = 'user_name';
 
