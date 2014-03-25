@@ -17,9 +17,7 @@ d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 d_cvtguiparams = {};
 d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
 d_cvtguiparams.fps = {"label":'FPS'};
-
-d_expguiparams = {};
-d_expguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
+d_cvtguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
 
 d_cutparams = {};
 d_cutparams.cut_name = {};
@@ -225,100 +223,115 @@ function d_MakeCmd( i_params)
 	return cmd;
 }
 
-function d_Convert( i_path)
+function d_Convert( i_args)
 {
 	var params = {};
 	params.quality = 5;
 	params.cvtres = '';
 
 	var wnd = new cgru_Window({"name":'dailes',"title":'Convert Movie'});
-
-	var elSrc = document.createElement('div');
-	wnd.elContent.appendChild( elSrc);
-	elSrc.classList.add('source');
-	elSrc.textContent = i_path;
+	wnd.m_args = i_args;
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+	elBtns.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elBtns.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
 	var elCvtBtn = document.createElement('div');
 	elBtns.appendChild( elCvtBtn);
-	elCvtBtn.textContent = 'Convert Movie To Another Movie';
+	elCvtBtn.textContent = 'Convert Movies To Another Movies';
 	elCvtBtn.classList.add('button');
-	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd);}
+	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);}
 	elCvtBtn.m_wnd = wnd;
 
-	var div = document.createElement('div');
-	wnd.elContent.appendChild(div );
-	div.style.margin = '10px';
-
-	gui_Create( wnd.elContent, d_expguiparams, [params]);
-
-	var elBtns = document.createElement('div');
-	wnd.elContent.appendChild( elBtns);
-	elBtns.classList.add('buttons');
+//	var elBtns = document.createElement('div');
+//	wnd.elContent.appendChild( elBtns);
+//	elBtns.classList.add('buttons');
 
 	var elExpBtn = document.createElement('div');
 	elBtns.appendChild( elExpBtn);
-	elExpBtn.textContent = 'Explode Movie To Images Sequence';
+	elExpBtn.textContent = 'Explode Movies To Images Sequences';
 	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd, false);}
+	elExpBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, true);}
 	elExpBtn.m_wnd = wnd;
 
-	var elExpBtn = document.createElement('div');
-	elBtns.appendChild( elExpBtn);
-	elExpBtn.textContent = 'Send Job to AFANASY';
-	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd, true);}
-	elExpBtn.m_wnd = wnd;
-
-	wnd.m_path = i_path;
+	var elSrc = document.createElement('div');
+	wnd.elContent.appendChild( elSrc);
+	elSrc.classList.add('source');
+	for( var i = 0; i < i_args.paths.length; i++)
+	{
+		var el = document.createElement('div');
+		elSrc.appendChild( el);
+		el.textContent = i_args.paths[i];
+	}
 }
 
-function d_CvtProcessGUI( i_wnd)
+function d_CvtProcessGUI( i_wnd, i_explode)
 {
-	var params = {};
-	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
-	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
+	var params = gui_GetParams( i_wnd.elContent, d_cvtguiparams);
 	for( key in i_wnd.elContent.m_choises )
 		params[key] = i_wnd.elContent.m_choises[key].value;
 
-	var cmd = 'movconvert';
-	cmd += ' -a ' + RULES.avcmd;
-	cmd += ' -c "' + params.codec + '"';
-	cmd += ' -f ' + params.fps;
-	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
-	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
-
 	var job = {};
-	//job.offline = true;
-	job.name = c_PathBase( i_wnd.m_path) + '-' + params.codec;
+	job.name = c_PathBase( i_wnd.m_args.paths[0]);
+	if( i_wnd.m_args.paths.length > 1 )
+		job.name = c_PathDir( i_wnd.m_args.paths[0]) + ' x' + i_wnd.m_args.paths.length;
 	if( params.cvtres.length ) job.name += '-' + params.cvtres;
+	//job.offline = true;
 
 	var block = {};
-	block.name = 'Convert';
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path), true);
+	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir( i_wnd.m_args.paths[0]), true);
+	block.tasks = [];
 	job.blocks = [block];
 
-	var task = {}
-	task.name = c_PathBase( i_wnd.m_path);
-	task.command = cmd;
-	block.tasks = [task];
+	var cmd = 'movconvert';
+	cmd += ' -a ' + RULES.avcmd;
+	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
+
+	if( i_explode )
+	{
+		job.name = 'Explode ' + job.name;
+		block.name = 'Explode';
+		cmd += ' -t jpg';
+		cmd += ' -q ' + params.quality;
+	}
+	else
+	{
+		job.name = 'Convert ' + job.name;
+		block.name = 'Convert';
+		cmd += ' -c "' + params.codec + '"';
+		cmd += ' -f ' + params.fps;
+	}
+
+	for( var i = 0; i < i_wnd.m_args.paths.length; i++)
+	{
+		var path = i_wnd.m_args.paths[i];
+		var task = {};
+		task.name = c_PathBase( path);
+		task.command = cmd + ' "' + cgru_PM('/' + RULES.root + path, true) + '"';
+		block.tasks.push( task);
+	}
 
 	n_SendJob( job);
 	i_wnd.destroy();
 }
-
+/*
 function d_ExpProcessGUI( i_wnd, i_afanasy)
 {
 	var params = {};
-	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
+//	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
 	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
 
 	var cmd = 'utilities/moviemaker/movconvert.py';
@@ -362,7 +375,7 @@ function d_ExpFinished( i_data, i_args)
 	i_args.wnd.destroy();
 	fv_ReloadAll();
 }
-
+*/
 function d_MakeCut( i_args)
 {
 //console.log( JSON.stringify( i_args));

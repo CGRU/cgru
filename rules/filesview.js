@@ -95,6 +95,13 @@ function FilesView( i_args)
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.put();}
 
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'CVT';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.convert();}
+
 	if( this.has_thumbs )
 	{
 		var elThumbDiv = document.createElement('div');
@@ -455,14 +462,6 @@ FilesView.prototype.showFile = function( i_file)
 			cmd = cmd.replace('@FPS@', RULES.fps);
 			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 		}
-
-		var elExplode = document.createElement('div');
-		elFile.appendChild( elExplode);
-		elExplode.classList.add('button');
-		elExplode.textContent = 'Convert';
-		elExplode.title = 'Convert movie or explode to images sequence';
-		elExplode.m_path = path;
-		elExplode.onclick = function(e){ e.stopPropagation(); d_Convert( e.currentTarget.m_path)};
 	}
 
 	if( c_FileIsImage( i_file.name))
@@ -552,6 +551,19 @@ FilesView.prototype.put = function()
 		c_Error('No items selected.');
 	else
 		fu_Put( args);
+}
+FilesView.prototype.convert = function()
+{
+	var args = {};
+	args.paths = [];
+	for( var i = 0; i < this.elItems.length; i++)
+		if( this.elItems[i].m_selected )
+			if( c_FileIsMovie( this.elItems[i].m_path))
+				args.paths.push( this.elItems[i].m_path);
+	if( args.paths.length < 1 )
+		c_Error('No items selected.');
+	else
+		d_Convert( args);
 }
 
 FilesView.prototype.getItemPath = function( i_path)
@@ -659,26 +671,7 @@ FilesView.prototype.filesDeleted = function( i_data, i_args)
 
 	i_args.this.refresh();
 }
-/*
-function fv_Preview( i_evt)
-{
-	i_evt.stopPropagation();
-	var btn = i_evt.currentTarget;
-	var el = btn.m_el_file;
-	if( el.m_preview )
-	{
-		btn.classList.remove('pushed');
-		btn.innerHTML = '&#9656;';
-		fv_PreviewClose( el);
-	}
-	else
-	{
-		btn.classList.add('pushed');
-		btn.innerHTML = 'X';
-		fv_PreviewOpen( el);
-	}
-	return false;
-}*/
+
 function fv_PreviewOpen( i_el)
 {
 	if( i_el.m_preview ) return;
