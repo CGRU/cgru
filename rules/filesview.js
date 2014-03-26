@@ -561,7 +561,7 @@ FilesView.prototype.convert = function()
 			if( c_FileIsMovie( this.elItems[i].m_path))
 				args.paths.push( this.elItems[i].m_path);
 	if( args.paths.length < 1 )
-		c_Error('No items selected.');
+		c_Error('No movies selected.');
 	else
 		d_Convert( args);
 }

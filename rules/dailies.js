@@ -17,6 +17,8 @@ d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 d_cvtguiparams = {};
 d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
 d_cvtguiparams.fps = {"label":'FPS'};
+d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
 d_cvtguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
 
 d_cutparams = {};
@@ -299,6 +301,10 @@ function d_CvtProcessGUI( i_wnd, i_explode)
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avcmd;
 	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
+	if( params.time_start != d_cvtguiparams.time_start.default )
+		cmd += ' -s ' + params.time_start;
+	if( params.duration != d_cvtguiparams.duration.default )
+		cmd += ' -d ' + params.duration;
 
 	if( i_explode )
 	{
@@ -327,55 +333,7 @@ function d_CvtProcessGUI( i_wnd, i_explode)
 	n_SendJob( job);
 	i_wnd.destroy();
 }
-/*
-function d_ExpProcessGUI( i_wnd, i_afanasy)
-{
-	var params = {};
-//	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
-	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
 
-	var cmd = 'utilities/moviemaker/movconvert.py';
-	if( i_afanasy ) cmd = cgru_PM('/cgru/' + cmd, true);
-	cmd += ' -t jpg';
-	cmd += ' -a ' + RULES.avcmd;
-	cmd += ' -q ' + params.quality;
-	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
-	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
-
-	if( i_afanasy !== true )
-	{
-		i_wnd.elContent.classList.add('waiting');
-		n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_ExpFinished,"wnd":i_wnd});
-		return;
-	}
-
-	var job = {};
-	//job.offline = true;
-	job.name = c_PathBase( i_wnd.m_path);
-
-	var block = {};
-	block.name = 'Explode';
-	block.service = 'movgen';
-	block.parser = 'generic';
-	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path), true);
-	job.blocks = [block];
-
-	var task = {}
-	task.name = c_PathBase( i_wnd.m_path);
-	task.command = cmd;
-	block.tasks = [task];
-
-	n_SendJob( job);
-
-	i_wnd.destroy();
-}
-function d_ExpFinished( i_data, i_args)
-{
-	i_args.wnd.destroy();
-	fv_ReloadAll();
-}
-*/
 function d_MakeCut( i_args)
 {
 //console.log( JSON.stringify( i_args));

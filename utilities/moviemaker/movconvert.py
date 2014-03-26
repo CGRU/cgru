@@ -16,6 +16,8 @@ Parser.add_option('-n', '--container', dest='container', type  ='string', defaul
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string', default='',       help='Output movie or images folder (auto)')
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
+Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
+Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default='frame',  help='Images files name (frame)')
 
 (Options, argv) = Parser.parse_args()
@@ -40,7 +42,12 @@ Codec = Options.codec
 
 if Codec == '':
 	Output += '.'+Options.type
-	args = [ Options.avcmd,'-y','-i', Input ]
+	args = [Options.avcmd,'-y']
+	if Options.timestart != '':
+		args.extend(['-ss', Options.timestart])
+	args.extend(['-i', Input ])
+	if Options.duration != '':
+		args.extend(['-t', Options.duration])
 	args.extend(['-an','-f','image2'])
 	if Options.type == 'jpg':
 		args.extend(['-qscale', str(Options.qscale)])
@@ -72,13 +79,17 @@ else:
 	cmd_enc = lines[len(lines)-1].strip()
 	if len( cmd_enc) < 2:
 		print('Invalid encode file "%s"' % Codec)
-		sys.exit(1)
+		sys.exit(1)	
 
 	Output += '.' + os.path.basename( Codec.split('.')[0])
 
 	auxargs = []
+	if Options.timestart != '':
+		auxargs.extend(['-ss', Options.timestart])
+	if Options.duration != '':
+		auxargs.extend(['-t', Options.duration])
 	if Options.xres != -1 or Options.yres != -1:
-		auxargs = ['-vf','scale=%d:%d' % (Options.xres,Options.yres)]
+		auxargs.extend(['-vf','scale=%d:%d' % (Options.xres,Options.yres)])
 		if Options.xres != -1: Output += '.'+str(Options.xres)
 		if Options.yres != -1: Output += 'x'+str(Options.yres)
 
