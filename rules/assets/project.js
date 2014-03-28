@@ -99,9 +99,17 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'
 	if( params.uppercase ) cmd += ' -u';
 	if( params.padding.length ) cmd += ' -p ' + params.padding;
-	cmd += ' --afuser "' + g_auth_user.id + '"';
-	cmd += ' --afcap ' + RULES.put.af_capacity;
-	cmd += ' --afmax ' + RULES.put.af_maxtasks;
+
+	if( i_args.move )
+		cmd += ' -m';
+	else
+	{
+		cmd += ' -A';
+		cmd += ' --afuser "' + g_auth_user.id + '"';
+		cmd += ' --afcap ' + RULES.put.af_capacity;
+		cmd += ' --afmax ' + RULES.put.af_maxtasks;
+	}
+
 	if( i_args.test ) cmd += ' --test';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":prj_ShotsDeployFinished,"wnd":i_wnd});
