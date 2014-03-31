@@ -399,6 +399,24 @@ function nw_NewsShow( i_news)
 	}
 
 	delete g_auth_user.news;
+
+	nw_HighlightCurrent();
+}
+
+function nw_NavigatePost()
+{
+	nw_HighlightCurrent();
+}
+
+function nw_HighlightCurrent()
+{
+	var path = g_CurPath();
+	var elNews = $('news').m_elArray;
+	for( var i = 0; i < elNews.length; i++)
+		if( path == elNews[i].m_news.path )
+			elNews[i].classList.add('current');
+		else
+			elNews[i].classList.remove('current');
 }
 
 function nw_ShowOnlyAssigned( i_btn)
