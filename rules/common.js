@@ -463,9 +463,13 @@ function c_GetAvatar( i_user_id, i_guest )
 	return null;
 }
 
-function c_MakeLinksHttp( i_text)
+function c_LinksProcess( i_text)
 {
-//console.log('c_MakeLinksHttp in:'+i_text);
+	return c_LinksToRelative( c_HttpToLinks( i_text));
+}
+function c_HttpToLinks( i_text)
+{
+//console.log('c_HttpToLinks in:'+i_text);
 	var a_re = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 	var a_parts = i_text.split(/<a /gi);
 	var out = null;
@@ -486,11 +490,10 @@ function c_MakeLinksHttp( i_text)
 		if( out == null) out = text;
 		else out += '<a ' + text;
 	}
-//console.log('c_MakeLinksHttp out:'+out);
+//console.log('c_HttpToLinks out:'+out);
 	return out;
 }
-
-function c_MakeLinksRelative( i_text)
+function c_LinksToRelative( i_text)
 {
 	var address = document.location.protocol + '//' + document.location.host + document.location.pathname;
 	while( i_text.indexOf( address) != -1 )
