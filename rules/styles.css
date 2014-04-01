@@ -249,6 +249,8 @@ font-weight: bold;
 display: none;
 }
 #news { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
+#sidepanel_news #news_refresh { display: none; float:right; }
+#sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
 #news_ctrl { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
 #news_ctrl .button { float: left; }
 #news > div, #channels > div { box-shadow: 0 0 2px #000 inset; border-radius: 4px; margin: 1px 0px; }
@@ -263,6 +265,8 @@ display: none;
 #news .news_label { font-size:12px; }
 
 /* ============= PLAYLIST: =============== */
+#sidepanel_playlist #playlist_refresh { display: none; float:right; }
+#sidepanel.opened #sidepanel_playlist.opened #playlist_refresh { display: block; }
 .playlist_ctrl { padding-left: 6px; }
 .playlist_ctrl .button { float: left; font-size:11px; padding: 2px 4px; border-radius: 3px; min-width: 5px; }
 #playlist .item {

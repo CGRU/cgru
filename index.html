@@ -188,6 +188,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
+		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()">&#10227;</div>
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
 			<div id="news"></div>
@@ -208,14 +209,14 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 		</div>
 	</div>
 	<div id="sidepanel_playlist">
+		<div class="label button" id="playlist_refresh" onclick="p_RefreshOnClick()">&#10227;</div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div class="playlist_ctrl">
 				<div class="button" onclick="p_NewOnClick()" title="Create new folder">+Folder</div>
-				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+</div>
+				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+Link</div>
 				<div class="button" onclick="p_DelOnClick()" title="Remove current item">-</div>
 				<div class="button" onclick="p_RenameOnClick()" title="Rename current item">Rename</div>
-				<div class="button" onclick="p_RefreshOnClick()" title="Refresh playlist">&#10227;</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>
