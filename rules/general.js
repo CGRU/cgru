@@ -158,6 +158,7 @@ function g_NavigatePost()
 	g_nav_clicked = false;
 
 	nw_NavigatePost();
+	p_NavigatePost();
 
 	if( ASSET && ASSET.post )
 	{

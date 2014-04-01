@@ -414,9 +414,9 @@ function nw_HighlightCurrent()
 	var elNews = $('news').m_elArray;
 	for( var i = 0; i < elNews.length; i++)
 		if( path == elNews[i].m_news.path )
-			elNews[i].classList.add('current');
+			elNews[i].classList.add('cur_path');
 		else
-			elNews[i].classList.remove('current');
+			elNews[i].classList.remove('cur_path');
 }
 
 function nw_ShowOnlyAssigned( i_btn)

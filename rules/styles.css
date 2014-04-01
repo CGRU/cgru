@@ -252,9 +252,9 @@ display: none;
 #news_ctrl { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
 #news_ctrl .button { float: left; }
 #news > div, #channels > div { box-shadow: 0 0 2px #000 inset; border-radius: 4px; margin: 1px 0px; }
-#news > div.assigned         { background: rgba(   0, 255,   0, .2); }
-#news > div.current          { background: rgba( 100, 255, 255, .2); }
-#news > div.assigned.current { background: rgba(   0, 255, 150, .2); }
+#news > div.assigned          { background: rgba(   0, 255,   0, .2); }
+#news > div.cur_path          { background: rgba( 100, 255, 255, .2); }
+#news > div.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
 #news.show_only_assigned > div { display: none;}
 #news.show_only_assigned > div.assigned { display: block;}
 #news .button, #channels .button { float: left; height: 14px; margin: 0px 4px 0px 0px; padding: 0px 4px 0px 4px; }
@@ -277,6 +277,7 @@ font-size: 16px;
 padding: 2px 0px 2px 8px;
 }
 #playlist .location { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
+#playlist .location.cur_path { background: rgba( 100, 255, 255, .2 ); }
 #playlist .location a { display: block; }
 #playlist .location .anchor { float: right; }
 #playlist .location .link { float: left; }
