@@ -496,12 +496,12 @@ function nw_RecentOpen( i_noload )
 	if( i_noload !== false )
 		nw_RecentLoad();
 }
-function nw_RecentLoad( i_nocheck, i_nocache)
+function nw_RecentLoad( i_check, i_cache)
 {
-	if(( i_nocheck !== false ) && ( false == c_RuFileExists( nw_recent_file)))
+	if(( i_check !== false ) && ( false == c_RuFileExists( nw_recent_file)))
 		return;
 
-	if(( i_nocache !== true ) && nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
+	if(( i_cache !== false ) && nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
 	{
 		c_Log('Recent cached '+RULES.cache_time+'s: '+g_CurPath());
 		nw_RecentReceived( nw_recents[g_CurPath()].array );
@@ -515,7 +515,7 @@ function nw_RecentLoad( i_nocheck, i_nocache)
 
 function nw_RecentRefresh()
 {
-	nw_RecentLoad( false, true);
+	nw_RecentLoad( true, false);
 }
 
 function nw_RecentReceived( i_data, i_args)
