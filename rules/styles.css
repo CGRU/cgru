@@ -228,7 +228,7 @@ min-height: 19px;
 #sidepanel .label { word-wrap: break-word; letter-spacing: 99px;}
 #sidepanel.opened .label { letter-spacing: 1px;}
 #sidepanel .opened .label { background: rgba(200,255,255,.2); box-shadow: 0 0 2px #000;}
-#sidepanel .body { display: none; }
+#sidepanel .body { clear: both; display: none; }
 #sidepanel.opened .opened .body { display: block; }
 #sidepanel .label:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
 
