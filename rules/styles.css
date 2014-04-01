@@ -293,6 +293,8 @@ padding: 2px 0px 2px 8px;
 #permissions > div div { padding: 0px 4px;}
 #permissions > div .button { float: left; margin: 0px;}
 /* ============= RECENT: =============== */
+#sidepanel_recent #recent_refresh { display: none; float:right; }
+#sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
 #recent { border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:2px;padding:2px; }
 #recent > div { font-size: 12px; border-bottom: 1px solid #777; position: relative; }
 #recent img { width: 32px; height: 32px; border: 1px solid #777; border-radius: 4px; margin-top: 4px; float: right; }

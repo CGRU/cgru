@@ -496,21 +496,26 @@ function nw_RecentOpen( i_noload )
 	if( i_noload !== false )
 		nw_RecentLoad();
 }
-function nw_RecentLoad( i_nocheck)
+function nw_RecentLoad( i_nocheck, i_nocache)
 {
 	if(( i_nocheck !== false ) && ( false == c_RuFileExists( nw_recent_file)))
 		return;
 
-	var file = c_GetRuFilePath( nw_recent_file);
-	if( nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
+	if(( i_nocache !== true ) && nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
 	{
 		c_Log('Recent cached '+RULES.cache_time+'s: '+g_CurPath());
 		nw_RecentReceived( nw_recents[g_CurPath()].array );
 		return;
 	}
 
+	var file = c_GetRuFilePath( nw_recent_file);
 	n_Request({"send":{"readobj":file},"local":true,"func":nw_RecentReceived,"info":"recent","wait":false,"parse":true});
 	$('recent').textContent = 'Loading...';
+}
+
+function nw_RecentRefresh()
+{
+	nw_RecentLoad( false, true);
 }
 
 function nw_RecentReceived( i_data, i_args)
