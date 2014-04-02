@@ -55,7 +55,7 @@ Render::~Render()
 {
 }
 
-void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
+void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Thread-safe
 {
 	o_str << "{";
 
@@ -180,7 +180,7 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_stringvec("services_disabled", m_services_disabled, i_object);
 }
 
-void Render::v_readwrite( Msg * msg)
+void Render::v_readwrite( Msg * msg) // Thread-safe
 {
    switch( msg->type())
    {
@@ -228,15 +228,19 @@ void Render::v_readwrite( Msg * msg)
 		// Tasks percents, needed for GUI only:
 		if( msg->isWriting())
 		{
-			m_tasks_percents.clear();
+			// Using temporary array because this function should be thread-safe
+			std::vector<int32_t> _tasks_percents;
 			for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
-				m_tasks_percents.push_back((*it)->getPercent());
+				_tasks_percents.push_back((*it)->getPercent());
+			rw_Int32_Vect( _tasks_percents, msg);
 		}
-		rw_Int32_Vect( m_tasks_percents, msg);
+		else
+			rw_Int32_Vect( m_tasks_percents, msg);
 
 		rw_int64_t( m_idle_time, msg);
 		rw_int64_t( m_busy_time, msg);
-	  m_hres.v_readwrite( msg);
+
+		m_hres.v_readwrite( msg);
 
       break;
    default:
