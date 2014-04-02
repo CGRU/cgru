@@ -76,4 +76,6 @@ private:
 
 private:
 	static MonitorContainer * m_monitors;
+
+	DlMutex m_mutex;
 };
