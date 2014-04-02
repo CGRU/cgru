@@ -5,7 +5,7 @@ import re
 import subprocess
 
 from optparse import OptionParser
-Parser = OptionParser(usage="%prog [options] input [second_input] output\ntype \"%prog -h\" for help", version="%prog 1.  0")
+Parser = OptionParser(usage="%prog [options] input\ntype \"%prog -h\" for help", version="%prog 1.  0")
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
 Parser.add_option('-x', '--xres',      dest='xres',      type  ='int',    default=-1,       help='X resolution (no change)')
@@ -27,16 +27,32 @@ if len(argv) < 1:
 	sys.exit(0)
 
 Input = argv[0]
+Output = Options.output
+if Output == '': Output = Input
 
-if not os.path.isfile( Input):
-	print('ERROR: Input movie file does not exist: ' + Input)
-	sys.exit(1)
+SequenceInput = False
+MovieInput = True
+if os.path.isdir( Input):
+	SequenceInput = True
+	MovieInput = False
+	for afile in os.listdir( Input):
+		if afile[0] == '.': continue
+		if not os.path.isfile( os.path.join( Input, afile)): continue
+		digits = re.findall(r'\d+', afile)
+		if len(digits) == 0: continue
+		digits = digits[-1]
+		Input = afile[:afile.find( digits)]
+		Input += '%0' + str(len(digits)) + 'd'
+		Input += afile[afile.find(digits)+len(digits):]
+		Input = os.path.join( argv[0], Input)
+		break
+else:
+	if not os.path.isfile( Input):
+		print('ERROR: Input does not exist: ' + Input)
+		sys.exit(1)
 
 MOVIEMAKER = os.path.dirname( sys.argv[0])
 CODECSDIR  = os.path.join( MOVIEMAKER, 'codecs')
-
-Output = Options.output
-if Output == '': Output = Input
 
 Codec = Options.codec
 
