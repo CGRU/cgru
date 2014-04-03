@@ -32,15 +32,19 @@ if Output == '': Output = Input
 
 SequenceInput = False
 MovieInput = True
+StartNumber = None
 if os.path.isdir( Input):
 	SequenceInput = True
 	MovieInput = False
-	for afile in os.listdir( Input):
+	allfiles = os.listdir( Input)
+	allfiles.sort()
+	for afile in allfiles:
 		if afile[0] == '.': continue
 		if not os.path.isfile( os.path.join( Input, afile)): continue
 		digits = re.findall(r'\d+', afile)
 		if len(digits) == 0: continue
 		digits = digits[-1]
+		StartNumber = int( digits)
 		Input = afile[:afile.find( digits)]
 		Input += '%0' + str(len(digits)) + 'd'
 		Input += afile[afile.find(digits)+len(digits):]
@@ -114,7 +118,6 @@ else:
 		if arg_enc[0]  == '"': arg_enc = arg_enc[1:]
 		if arg_enc[-1] == '"': arg_enc = arg_enc[:-1]
 
-		arg_enc = arg_enc.replace('@AVCMD@',      Options.avcmd     )
 		arg_enc = arg_enc.replace('@MOVIEMAKER@', MOVIEMAKER        )
 		arg_enc = arg_enc.replace('@CODECSDIR@',  CODECSDIR         )
 		arg_enc = arg_enc.replace('@INPUT@',      Input             )
@@ -122,11 +125,13 @@ else:
 		arg_enc = arg_enc.replace('@CONTAINER@',  Options.container )
 		arg_enc = arg_enc.replace('@OUTPUT@',     Output            )
 
-		if arg_enc == '@AUXARGS@':
+		if arg_enc == '@AVCMD@':
+			args.append( Options.avcmd)
+			if StartNumber:
+				args.extend(['-start_number',str(StartNumber)])
+		elif arg_enc == '@AUXARGS@':
 			args.extend( auxargs)
-			continue
-
-		if len( arg_enc):
+		elif len( arg_enc):
 			args.append( arg_enc)
 
 print( args)
