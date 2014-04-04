@@ -11,6 +11,7 @@ for archive in `ls`; do
 	archive_dir="cgru-${archive}"
 	if [ -L "${archive_dir}" ]; then
 		archive_dir=`readlink "${archive_dir}"`
+		[ -e "$archive_dir" ] || continue
 	else
 		[ -d "${archive_dir}" ] && rm -rf "${archive_dir}"
 		pushd .. > /dev/null
