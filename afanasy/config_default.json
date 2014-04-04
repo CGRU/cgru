@@ -70,7 +70,7 @@
 		"":"Network interface to measure traffic, it not specified all used except loopback",
 
 	"af_render_hddspace_path":"/",
-	"af_render_iostat_device":"sda",
+	"af_render_iostat_device":"*",
 
 		"":"Custom resources meters:",
 			"":"example - simple resource meter for an example only",
