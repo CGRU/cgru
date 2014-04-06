@@ -522,15 +522,15 @@ FilesView.prototype.onClick = function( i_evt)
 }
 FilesView.prototype.selectItem = function( i_el, i_select)
 {
-	if( i_select )
-	{
-		i_el.m_selected = true;
-		i_el.classList.add('selected');
-	}
-	else
+	if( i_select === false )
 	{
 		i_el.m_selected = false;
 		i_el.classList.remove('selected');
+	}
+	else
+	{
+		i_el.m_selected = true;
+		i_el.classList.add('selected');
 	}
 }
 FilesView.prototype.selectAll = function( i_select)
@@ -540,6 +540,7 @@ FilesView.prototype.selectAll = function( i_select)
 	if( i_select == false )
 		fv_cur_item = null;
 }
+FilesView.prototype.selectNone = function() { this.selectAll( false); }
 FilesView.prototype.put = function()
 {
 	var args = {};

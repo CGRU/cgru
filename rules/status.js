@@ -96,27 +96,29 @@ function st_SetElTags( i_status, i_elTags, i_short)
 			el.title = c_GetTagTip( i_status.tags[i]);
 		}
 }
-function st_SetElColor( i_status, i_elB, i_elC, i_setNone)
+function st_SetElColor( i_status, i_elBack, i_elColor, i_setNone)
 {
-	if( i_elB == null ) i_elB = st_elParent;
-	if( i_elC == null ) i_elC = i_elB;
+	if( i_elBack == null ) i_elBack = st_elParent;
+	if( i_elColor == null ) i_elColor = i_elBack;
 	if( i_setNone == null ) i_setNone = true;
 
-	if( i_status &&  i_status.color)
+	if( i_status && i_status.color)
 	{
 		var c = i_status.color;
-		i_elB.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+		i_elBack.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
 		if( c[0]+c[1]+.3*c[2] > 300 )
-			i_elC.style.color = '#000';
+			i_elColor.style.color = '#000';
 		else
-			i_elC.style.color = '#FFF';
+			i_elColor.style.color = '#FFF';
 //window.console.log(c[0]+c[1]+c[2])
 		return true;
 	}
 	else if( i_setNone )
 	{
-		i_elB.style.background = '';
-		i_elC.style.color = 'inherit';
+//		i_elBack.style.background = '';
+//		i_elColor.style.color = 'inherit';
+		i_elBack.style.background = localStorage.background;
+		i_elColor.style.color = localStorage.text_color;
 	}
 	return false;
 }

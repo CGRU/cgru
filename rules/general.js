@@ -160,6 +160,8 @@ function g_NavigatePost()
 	nw_NavigatePost();
 	p_NavigatePost();
 
+	$('navigate_up').href = '#' + c_PathDir( g_CurPath());
+
 	if( ASSET && ASSET.post )
 	{
 		if( window[ASSET.post])
