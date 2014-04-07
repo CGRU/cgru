@@ -412,6 +412,8 @@ function nw_HighlightCurrent()
 {
 	var path = g_CurPath();
 	var elNews = $('news').m_elArray;
+	if( elNews == null ) return;
+
 	for( var i = 0; i < elNews.length; i++)
 		if( path == elNews[i].m_news.path )
 			elNews[i].classList.add('cur_path');
