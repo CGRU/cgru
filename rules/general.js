@@ -89,6 +89,8 @@ function g_Init_Rules( i_data)
 	g_NavigShowInfo();
 
 	g_PathChanged();
+
+	$('navigate_root').href = document.location.href.replace(/#.*/,'');
 }
 
 function g_CurPath() { if( g_elCurFolder ) return g_elCurFolder.m_path; else return null;}
