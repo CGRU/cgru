@@ -120,6 +120,7 @@ std::string Environment::users_dir;
 
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
+int Environment::ipv6_disable = 0;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
@@ -171,12 +172,13 @@ void Environment::getVars( const JSON & i_obj)
 	}
 
 	getVar( i_obj, servername,                        "af_servername"                        );
+	getVar( i_obj, ipv6_disable,                      "af_ipv6_disable"                      );
 	getVar( i_obj, ip_trust,                          "af_ip_trust"                          );
 	getVar( i_obj, digest_file,                       "af_digest_file"                       );
 	getVar( i_obj, digest_realm,                      "realm"                                );
 	getVar( i_obj, serverport,                        "af_serverport"                        );
 	getVar( i_obj, clientport,                        "af_clientport"                        );
-	getVar( i_obj, http_serve_dir,                    "af_http_serve_dir"                     );
+	getVar( i_obj, http_serve_dir,                    "af_http_serve_dir"                    );
 
 	getVar( i_obj, pswd_visor,                        "pswd_visor"                           );
 	getVar( i_obj, pswd_god,                          "pswd_god"                             );

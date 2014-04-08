@@ -6,6 +6,10 @@
 	"af_serverport":51000,
 	"af_clientport":51001,
 
+		"":"Afanasy server will use IPv6 if it is configured on server interface",
+	"af_ipv6_disable":1,
+		"":"IPv6 is disabled by default, to enable it, set this parameter value to 0",
+
 		"":"Afanasy server HTTP serve folder, if empty CGRU root folder will be used",
 	"-af_http_serve_dir":"/cgru",
 
