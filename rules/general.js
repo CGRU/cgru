@@ -381,7 +381,6 @@ function g_AppendFolder( i_elParent, i_fobject)
 
 	var elColor = document.createElement('div');
 	elFolder.appendChild( elColor);
-	elFolder.m_elColor = elColor;
 	elColor.classList.add('fcolor');
 
 	var elName = document.createElement('a');
@@ -454,7 +453,7 @@ function g_FolderSetStatus( i_status, i_elFolder)
 	i_elFolder.m_fobject.status = i_status;
 
 	st_SetElLabel( i_status, i_elFolder.m_elAnn);
-	st_SetElColor( i_status, i_elFolder.m_elColor, i_elFolder);
+	st_SetElColor( i_status, i_elFolder);
 	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
 	st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
 	st_SetElTags( i_status, i_elFolder.m_elTags, true);
