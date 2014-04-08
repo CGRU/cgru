@@ -19,7 +19,7 @@ d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
 d_cvtguiparams.fps = {"label":'FPS'};
 d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
 d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
+d_cvtguiparams.quality = {"label":'JPEG Quality',"default":'100'};
 
 d_cutparams = {};
 d_cutparams.cut_name = {};
@@ -228,8 +228,8 @@ function d_MakeCmd( i_params)
 function d_Convert( i_args)
 {
 	var params = {};
-	params.quality = 5;
-	params.cvtres = '';
+//	params.quality = 80;
+//	params.cvtres = '';
 
 	var title = 'Convert ';
 	if( i_args.images ) title += ' Images';
@@ -307,6 +307,7 @@ function d_CvtImages( i_wnd, i_args, i_params)
 	var cmd = 'rules/bin/convert.sh -J';
 
 	cmd += ' -c ' + i_params.colorspace;
+	cmd += ' -q ' + i_params.quality;
 	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
 
 	if( i_args.folders )
@@ -357,7 +358,10 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 		job.name = 'Explode ' + job.name;
 		block.name = 'Explode';
 		cmd += ' -t jpg';
-		cmd += ' -q ' + i_params.quality;
+		var q = parseInt( i_params.quality);
+		q = Math.round( 10 - ( q / 10 ));
+		if( q < 1 ) q = 1;
+		cmd += ' -q ' + q;
 	}
 	else
 	{
