@@ -557,12 +557,37 @@ FilesView.prototype.convert = function()
 {
 	var args = {};
 	args.paths = [];
+
+	args.images = true;
+	args.folders = true;
+	args.movies = true;
+
 	for( var i = 0; i < this.elItems.length; i++)
-		if( this.elItems[i].m_selected )
-			if( c_FileIsMovie( this.elItems[i].m_path))
-				args.paths.push( this.elItems[i].m_path);
+	{
+		if( this.elItems[i].m_selected != true ) continue;
+
+		if( c_FileIsImage( this.elItems[i].m_path) && args.images )
+		{
+			args.folders = false;
+			args.movies = false;
+		}
+		else if( this.elItems[i].classList.contains('folder') && args.folders )
+		{
+			args.images = false;
+			args.movies = false;
+		}
+		else if( c_FileIsMovie( this.elItems[i].m_path) && args.movies )
+		{
+			args.images = false;
+			args.folders = false;
+		}
+		else
+			continue;
+
+		args.paths.push( this.elItems[i].m_path);
+	}
 	if( args.paths.length < 1 )
-		c_Error('No movies selected.');
+		c_Error('No items selected.');
 	else
 		d_Convert( args);
 }

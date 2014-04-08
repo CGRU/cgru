@@ -231,11 +231,16 @@ function d_Convert( i_args)
 	params.quality = 5;
 	params.cvtres = '';
 
-	var wnd = new cgru_Window({"name":'dailes',"title":'Convert Movie'});
+	var title = 'Convert ';
+	if( i_args.images ) title += ' Images';
+	else if( i_args.folders ) title += ' Sequences';
+	else if( i_args.movies) title += ' Movies';
+	var wnd = new cgru_Window({"name":'dailes',"title":title});
 	wnd.m_args = i_args;
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -250,18 +255,14 @@ function d_Convert( i_args)
 
 	var elCvtBtn = document.createElement('div');
 	elBtns.appendChild( elCvtBtn);
-	elCvtBtn.textContent = 'Convert Movies To Another Movies';
+	elCvtBtn.textContent = title + ' To Movies';
 	elCvtBtn.classList.add('button');
 	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);}
 	elCvtBtn.m_wnd = wnd;
 
-//	var elBtns = document.createElement('div');
-//	wnd.elContent.appendChild( elBtns);
-//	elBtns.classList.add('buttons');
-
 	var elExpBtn = document.createElement('div');
 	elBtns.appendChild( elExpBtn);
-	elExpBtn.textContent = 'Explode Movies To Images Sequences';
+	elExpBtn.textContent = title + ' To Sequences';
 	elExpBtn.classList.add('button');
 	elExpBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, true);}
 	elExpBtn.m_wnd = wnd;
@@ -277,53 +278,98 @@ function d_Convert( i_args)
 	}
 }
 
-function d_CvtProcessGUI( i_wnd, i_explode)
+function d_CvtProcessGUI( i_wnd, i_to_sequence)
 {
 	var params = gui_GetParams( i_wnd.elContent, d_cvtguiparams);
 	for( key in i_wnd.elContent.m_choises )
 		params[key] = i_wnd.elContent.m_choises[key].value;
 
+	if( i_wnd.m_args.movies || ( i_to_sequence == false ))
+	{
+		d_CvtMovies( i_wnd.m_args, params, i_to_sequence );
+		i_wnd.destroy();
+	}
+	else
+	{
+		d_CvtImages( i_wnd, i_wnd.m_args, params );
+	}
+}
+
+function d_CvtImages( i_wnd, i_args, i_params)
+{
+//console.log( JSON.stringify( i_args));
+//console.log( JSON.stringify( i_params));
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
+
+	var cmd = 'rules/bin/convert.sh -J';
+
+	cmd += ' -c ' + i_params.colorspace;
+	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
+
+	if( i_args.folders )
+	{
+		cmd += ' -A';
+		cmd += ' --afuser "' + g_auth_user.id + '"';
+	}
+
+	for( var i = 0; i < i_args.paths.length; i++)
+		cmd += ' "' + cgru_PM('/' + RULES.root + i_args.paths[i], true) + '"'
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CvtImagesFinished,"wnd":i_wnd});
+}
+function d_CvtImagesFinished( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+//console.log( JSON.stringify( i_args));
+	i_args.wnd.destroy();
+}
+
+function d_CvtMovies( i_args, i_params, i_to_sequence )
+{
 	var job = {};
-	job.name = c_PathBase( i_wnd.m_args.paths[0]);
-	if( i_wnd.m_args.paths.length > 1 )
-		job.name = c_PathDir( i_wnd.m_args.paths[0]) + ' x' + i_wnd.m_args.paths.length;
-	if( params.cvtres.length ) job.name += '-' + params.cvtres;
+	job.name = c_PathBase( i_args.paths[0]);
+	if( i_args.paths.length > 1 )
+		job.name = c_PathDir( i_args.paths[0]) + ' x' + i_args.paths.length;
+	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
 	//job.offline = true;
 
 	var block = {};
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir( i_wnd.m_args.paths[0]), true);
+	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir( i_args.paths[0]), true);
 	block.tasks = [];
 	job.blocks = [block];
 
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avcmd;
-	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
-	if( params.time_start != d_cvtguiparams.time_start.default )
-		cmd += ' -s ' + params.time_start;
-	if( params.duration != d_cvtguiparams.duration.default )
-		cmd += ' -d ' + params.duration;
+	if( i_params.cvtres.length ) cmd += ' -x ' + i_params.cvtres;
+	if( i_params.time_start != d_cvtguiparams.time_start.default )
+		cmd += ' -s ' + i_params.time_start;
+	if( i_params.duration != d_cvtguiparams.duration.default )
+		cmd += ' -d ' + i_params.duration;
 
-	if( i_explode )
+	if( i_to_sequence )
 	{
 		job.name = 'Explode ' + job.name;
 		block.name = 'Explode';
 		cmd += ' -t jpg';
-		cmd += ' -q ' + params.quality;
+		cmd += ' -q ' + i_params.quality;
 	}
 	else
 	{
 		job.name = 'Convert ' + job.name;
 		block.name = 'Convert';
-		cmd += ' -c "' + params.codec + '"';
-		cmd += ' -f ' + params.fps;
+		cmd += ' -c "' + i_params.codec + '"';
+		cmd += ' -f ' + i_params.fps;
 	}
 
-	for( var i = 0; i < i_wnd.m_args.paths.length; i++)
+	for( var i = 0; i < i_args.paths.length; i++)
 	{
-		var path = i_wnd.m_args.paths[i];
+		var path = i_args.paths[i];
 		var task = {};
 		task.name = c_PathBase( path);
 		task.command = cmd + ' "' + cgru_PM('/' + RULES.root + path, true) + '"';
@@ -331,7 +377,6 @@ function d_CvtProcessGUI( i_wnd, i_explode)
 	}
 
 	n_SendJob( job);
-	i_wnd.destroy();
 }
 
 function d_MakeCut( i_args)
@@ -418,7 +463,6 @@ function d_CutProcessGUI( i_wnd, i_test)
 		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CutFinished,"wnd":i_wnd});
-
 }
 function d_CutFinished( i_data, i_args)
 {

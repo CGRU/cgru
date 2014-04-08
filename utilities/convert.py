@@ -150,7 +150,7 @@ for i in range( 0, len(Jobs)):
 		if Options.verbose or Options.debug: print( Jobs[i][j])
 
 		if Options.afanasy:
-			task = af.Task( FilesIn[i][j])
+			task = af.Task( os.path.basename( FilesIn[i][j]))
 			block.tasks.append( task)
 			task.setCommand( Jobs[i][j])
 
