@@ -110,22 +110,24 @@ for input in Inputs:
 		cmds.append( cmd)
 		files_in.append( afile)
 
-	if len(cmds) == 0: continue
-
-	Jobs.append( cmds)
-	MkDirs.append( mkdir)
-	FilesIn.append( files_in)
-	JobNames.append( os.path.basename( input))
-
 	convert = dict()
 	convert['input'] = input
+	convert['files_num'] = len( files_in)
 	if mkdir:
 		convert['output'] = mkdir
 		convert['type'] = 'folder'
-		convert['files_num'] = len( files_in)
 	else:
 		convert['output'] = output
 		convert['type'] = 'file'
+
+	if len(cmds):
+		Jobs.append( cmds)
+		MkDirs.append( mkdir)
+		FilesIn.append( files_in)
+		JobNames.append( os.path.basename( convert['output']))
+	else:
+		convert['warning'] = 'No images founded'
+
 	OUT['convert'].append( convert)
 
 

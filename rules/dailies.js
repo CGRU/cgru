@@ -240,7 +240,8 @@ function d_Convert( i_args)
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	if( i_args.movies == false )
+		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -270,6 +271,7 @@ function d_Convert( i_args)
 	var elSrc = document.createElement('div');
 	wnd.elContent.appendChild( elSrc);
 	elSrc.classList.add('source');
+	wnd.m_elSrc = elSrc;
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
 		var el = document.createElement('div');
@@ -310,8 +312,10 @@ function d_CvtImages( i_wnd, i_args, i_params)
 	cmd += ' -q ' + i_params.quality;
 	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
 
-	if( i_args.folders )
+	var afanasy = false;
+	if( i_args.folders || ( i_args.paths.length > 1 ))
 	{
+		afanasy = true;
 		cmd += ' -A';
 		cmd += ' --afuser "' + g_auth_user.id + '"';
 	}
@@ -319,13 +323,62 @@ function d_CvtImages( i_wnd, i_args, i_params)
 	for( var i = 0; i < i_args.paths.length; i++)
 		cmd += ' "' + cgru_PM('/' + RULES.root + i_args.paths[i], true) + '"'
 
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CvtImagesFinished,"wnd":i_wnd});
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CvtImagesFinished,"wnd":i_wnd,"afanasy":afanasy});
 }
 function d_CvtImagesFinished( i_data, i_args)
 {
 //console.log( JSON.stringify( i_data));
 //console.log( JSON.stringify( i_args));
-	i_args.wnd.destroy();
+	if( i_args.afanasy == false )
+	{
+		i_args.wnd.destroy();
+		i_args.wnd.m_args.filesview.refresh();
+//		fv_ReloadAll();
+		return;
+	}
+
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+
+	var elOut = i_args.wnd.m_elSrc;
+	elOut.textContent = '';
+	elOut.classList.remove('source');
+	elOut.classList.add('output');
+
+	if(( i_data.cmdexec == null ) || ( i_data.cmdexec.length == 0 ) || ( i_data.cmdexec[0].convert == null ))
+	{
+		elOut.textContent = JSON.stringify( i_data);
+		return;
+	}
+
+	var convert = i_data.cmdexec[0].convert;	
+
+	if( convert.error ) c_Error( convert.error );
+
+	for( var i = 0; i < convert.length; i++ )
+	{
+		var c = convert[i];
+		var el = document.createElement('div');
+		elOut.appendChild( el);
+		var text =  JSON.stringify( c);
+		if( c.input )
+		{
+			text = 'File: ';
+			if( c.type == 'folder') text = 'Folder: ';
+			text += c_PathBase( c.input );
+			if( c.files_num ) text += '[' + c.files_num + ']';
+			if( c.warning )
+			{
+				text += ' ' + c.warning;
+				el.style.color = '#F82';
+			}
+			else
+			{
+				text += ' -> ';
+				text += c_PathBase( c.output );
+			}
+		}
+		el.textContent = text;
+	}
 }
 
 function d_CvtMovies( i_args, i_params, i_to_sequence )
