@@ -1050,7 +1050,6 @@ function jsf_makenews( $i_args, &$o_out)
 
 
 	// Process users subsriptions:
-	$news_user_title = $news['user']; // needed for emails
 
 	// Read users:
 	$users = array();	
@@ -1066,9 +1065,6 @@ function jsf_makenews( $i_args, &$o_out)
 				$uobj = json_decode( $udata, true);
 				if( is_null( $uobj)) continue;
 				array_push( $users, $uobj);
-
-				if( array_key_exists('title', $uobj) && ( $uobj['id'] == $news['user']))
-					$news_user_title = $uobj['title'];
 			}
 		}
 		closedir($fHandle);
@@ -1143,8 +1139,8 @@ function jsf_makenews( $i_args, &$o_out)
 
 		$mail = array();
 		$mail['address'] = $user['email'];
-		$mail['subject'] = $news_user_title.' - '.$news['title'];
-		$mail['body'] = $news['path'];
+		$mail['subject'] = $i_args['email_subject'];
+		$mail['body'] = $i_args['email_body'];
 
 		$out = array();
 		jsf_sendmail( $mail, $out);

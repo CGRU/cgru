@@ -277,12 +277,19 @@ function nw_MakeNews( i_args )
 	if( localStorage.news_ignore_own == 'true' )
 		news.ignore_own = true;
 
-	// If news path is current we get artists from status, if them not set in input arguments:
+	// If news path is the current we get artists from status, if them not set in input arguments:
 	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status.artists )
 		news.artists = RULES.status.artists;
 
+	var email_subject = c_GetUserTitle( news.user) + ' - ' + news.title;
+	var email_body = '<a href="';
+	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname + '#' + news.path;
+	email_body += '">' + news.path + '</a>';
+
 	var request = {};
 	request.news = news;
+	request.email_subject = email_subject;
+	request.email_body = email_body;
 	request.root = RULES.root;
 	request.rufolder = RULES.rufolder;
 	request.recent_max = RULES.newsrecent;
