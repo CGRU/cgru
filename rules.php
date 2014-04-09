@@ -1048,7 +1048,11 @@ function jsf_makenews( $i_args, &$o_out)
 		if( $path == $path_prev ) break;
 	}
 
+
 	// Process users subsriptions:
+	$news_user_title = $news['user']; // needed for emails
+
+	// Read users:
 	$users = array();	
 	if( $fHandle = opendir('users'))
 	{
@@ -1062,6 +1066,9 @@ function jsf_makenews( $i_args, &$o_out)
 				$uobj = json_decode( $udata, true);
 				if( is_null( $uobj)) continue;
 				array_push( $users, $uobj);
+
+				if( array_key_exists('title', $uobj) && ( $uobj['id'] == $news['user']))
+					$news_user_title = $uobj['title'];
 			}
 		}
 		closedir($fHandle);
@@ -1128,7 +1135,19 @@ function jsf_makenews( $i_args, &$o_out)
 			fwrite( $fHandle, jsonEncode( $user));
 			fclose($fHandle);
 		}
-//error_log('New wrote in '.$filename);
+
+		// Send emails
+		if( array_key_exists('email', $user) == false ) continue;
+		if( array_key_exists('email_news', $user) == false ) continue;
+		if( $user['email_news'] != true ) continue;
+
+		$mail = array();
+		$mail['address'] = $user['email'];
+		$mail['subject'] = $news_user_title.' - '.$news['title'];
+		$mail['body'] = $news['path'];
+
+		$out = array();
+		jsf_sendmail( $mail, $out);
 	}
 }
 
@@ -1724,7 +1743,25 @@ function jsf_sendmail( $i_args, &$o_out)
 	$addr = $i_args['address'];
 	if( strpos( $addr, '@' ) === false )
 		$addr = implode('@', json_decode( base64_decode( $addr)));
-	if( mail( $addr, $i_args['subject'], $i_args['body'], $i_args['headers']))
+
+	$headers = '';
+	$headers = $headers."MIME-Version: 1.0\r\n";
+	$headers = $headers."Content-type: text/html; charset=utf-8\r\n";
+//	$headers = $headers."To: <'+i_address+'>\r\n";
+	$headers = $headers."From: CGRU <noreply@cgru.info>\r\n";
+
+	$subject = $i_args['subject'];
+
+	$body = '';
+	$body = $body.'<html><body>';
+	$body = $body.'<div style="background:#DFA; color:#020; margin:8px; padding:8px; border:2px solid #070; border-radius:9px;">';
+	$body = $body.$subject;
+	$body = $body.'<div style="background:#FFF; color:#000; margin:8px; padding:8px; border:2px solid #070; border-radius:9px;">';
+	$body = $body.$i_args['body'];
+	$body = $body.'</div><a href="cgru.info" style="padding:10px;margin:10px;" target="_blank">CGRU</a>';
+	$body = $body.'</div></body></html>';
+
+	if( mail( $addr, $subject, $body, $headers))
 		$o_out['status'] = 'email sent.';
 	else
 		$o_out['error'] = 'email was not sent.';
