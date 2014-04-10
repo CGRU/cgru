@@ -1,2 +1,2 @@
 Theora (low)
-ffmpeg -y -r @FPS@ -i "@INPUT@" -pix_fmt yuv420p -vcodec theora -qscale 4 @AUXARGS@ -r @FPS@ "@OUTPUT@.ogg"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -pix_fmt yuv420p -vcodec theora -qscale 4 @AUXARGS@ -r @FPS@ "@OUTPUT@.ogg"

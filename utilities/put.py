@@ -33,7 +33,7 @@ def makeDir( i_folder):
 
 
 if Options.source == '': errorExit('Source is not specified')
-if not os.path.isdir( Options.source ): errorExit('Source folder does not exist:\n' + Options.source )
+if not os.path.exists( Options.source ): errorExit('Source does not exist:\n' + Options.source )
 
 if Options.dest == '': errorExit('Destination is not specified')
 if not os.path.isdir( Options.dest ): errorExit('Destination folder does not exist:\n' + Options.dest )
@@ -47,15 +47,18 @@ if Options.verbose:
 	print('Name:        ' + Options.name)
 	print('Result:      ' + Result)
 
-makeDir( Result)
 
-allfiles = os.listdir( Options.source)
 files = []
-for afile in allfiles:
-	if afile[0] == '.': continue
-	afile = os.path.join( Options.source, afile)
-	if os.path.isfile( afile): files.append( afile)
-	elif os.path.isdir( afile): files.append( afile)
+if os.path.isdir( Options.source):
+	makeDir( Result)
+	allfiles = os.listdir( Options.source)
+	for afile in allfiles:
+		if afile[0] == '.': continue
+		afile = os.path.join( Options.source, afile)
+		if os.path.isfile( afile): files.append( afile)
+		elif os.path.isdir( afile): files.append( afile)
+else:
+	files = [Options.source]
 
 files.sort()
 
@@ -74,7 +77,7 @@ for afile in files:
 		print( os.path.basename( afile))
 
 	dest = Result
-	if not Options.rsync:
+	if not Options.rsync and os.path.isdir( Options.source):
 		dest = os.path.join( Result, os.path.basename( afile))
 
 	Copy = Copy_File

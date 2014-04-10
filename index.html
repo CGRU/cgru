@@ -188,27 +188,35 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
+		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()">&#10227;</div>
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
-			<div id="news" style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"></div>
-			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;">
+			<div id="news"></div>
+			<div id="news_ctrl">
 				<div style="font-size:14px;">
-					<div class="button" title="Double click to clear all received news" style="float:left;padding:2px 4px;" ondblclick="nw_RemoveNews()">Clear News</div>
-					<div class="button" title="Click to open/close subsribed locations" onclick="c_ElDisplayToggle(document.getElementById('channels'))">Channels</div>
+					<div class="button" title="Double click to clear all received news"
+						ondblclick="nw_RemoveNews()">Clear</div>
+					<div class="button" title="Double click to remove news that not assigned to me"
+						ondblclick="nw_RemoveNotAssigned()">DNMy</div>
+					<div class="button" title="Show news that assigned to me"
+						onclick="nw_ShowOnlyAssigned(this)">My</div>
+					<div class="button" title="Click to open/close subsribed locations"
+						onclick="c_ElDisplayToggle(document.getElementById('channels'));
+						this.classList.toggle('pushed')">Chan</div>
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>
 		</div>
 	</div>
 	<div id="sidepanel_playlist">
+		<div class="label button" id="playlist_refresh" onclick="p_RefreshOnClick()">&#10227;</div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div class="playlist_ctrl">
 				<div class="button" onclick="p_NewOnClick()" title="Create new folder">+Folder</div>
-				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+</div>
+				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+Link</div>
 				<div class="button" onclick="p_DelOnClick()" title="Remove current item">-</div>
 				<div class="button" onclick="p_RenameOnClick()" title="Rename current item">Rename</div>
-				<div class="button" onclick="p_RefreshOnClick()" title="Refresh playlist">&#10227;</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>
@@ -254,6 +262,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 		</div>
 	</div>
 	<div id="sidepanel_recent">
+		<div class="label button" id="recent_refresh" onclick="nw_RecentRefresh()">&#10227;</div>
 		<div class="label button" onclick="nw_RecentOnClick()">Recent</div>
 		<div class="body">
 			<div id="recent"></div>
@@ -322,8 +331,8 @@ Hidden folders increase system speed.">
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
-		<div class="button" onclick="window.onhashchange=null;g_GO('/');window.location.reload();">Root</div>
-		<div class="button" onclick="g_GO('..')">Up</div>
+		<a class="button" id="navigate_root">Root</a>
+		<a class="button" id="navigate_up">Up</a>
 		<div id="news_count" title="News Counter" onclick="u_SidePanelOpen();nw_NewsOpen()"></div>
 		<div id="assets"></div>
 	</div>

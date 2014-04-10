@@ -134,9 +134,17 @@ void TaskProcess::launchCommand()
     if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, 0, 0, 0,
 		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
 		m_pid = m_pinfo.dwProcessId;*/
+
+	DWORD priority = NORMAL_PRIORITY_CLASS;
+	int nice = af::Environment::getRenderNice();
+	if( nice >   0 ) priority = BELOW_NORMAL_PRIORITY_CLASS;
+	if( nice >  10 ) priority = IDLE_PRIORITY_CLASS;
+	if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;
+	if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;
+
 	// For MSWIN we need to CREATE_SUSPENDED to attach process to a job before it can spawn any child:
     if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr,
-		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+		CREATE_SUSPENDED | priority ))
 		m_pid = m_pinfo.dwProcessId;
 	#else
 	// For UNIX we can ask child prcocess to call a function to setup after fork()

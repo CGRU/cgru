@@ -157,6 +157,9 @@ class service:
 
 			self.taskInfo['image'] = os.path.normpath( image)
 			self.taskInfo['thumbnail'] = os.path.normpath( thumbnail)
+			self.taskInfo['pre_args'] = ''
+			if ext == 'dpx' or ext == 'cin': self.taskInfo['pre_args'] = '-set colorspace Log'
+			if ext == 'exr': self.taskInfo['pre_args'] = '-set colorspace RGB'
 
 			cmd = str(cgruconfig.VARS['af_thumbnail_cmd']) % (self.taskInfo)
 			#print( cmd)

@@ -192,20 +192,51 @@ function Monitor( i_args)
 
 	
 	if( this.nodeConstructor.sortVisor && g_VISOR() )
-		this.sortParm = this.nodeConstructor.sortVisor;
+	{
+		if( localStorage[this.type + '_sort_param_visor'])
+			this.sortParm = localStorage[this.type + '_sort_param_visor'];
+		else
+			this.sortParm = this.nodeConstructor.sortVisor;
+	}
 	else
-		this.sortParm = this.nodeConstructor.sort[0];
+	{
+		if( localStorage[this.type + '_sort_param'])
+			this.sortParm = localStorage[this.type + '_sort_param'];
+		else
+			this.sortParm = this.nodeConstructor.sort[0];
+	}
+
 	for( var i = 0; i < cm_Attrs.length; i++)
 		if( cm_Attrs[i][0] == this.sortParm )
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
-	this.sortDirection = false;
+
+	if( localStorage[this.type + '_sort_dir'] == 'ON')
+		this.sortDirection = true;
+	else
+		this.sortDirection = false;
 	if( this.sortParm == 'order')
 		this.sortDirection = true;
 
 	if( this.nodeConstructor.filterVisor && g_VISOR())
-		this.filterParm = this.nodeConstructor.filterVisor;
+	{
+		if( localStorage[this.type + '_filter_param_visor'] )
+			this.filterParm = localStorage[this.type + '_filter_param_visor'];
+		else
+			this.filterParm = this.nodeConstructor.filterVisor;
+	}
 	else
-		this.filterParm = this.nodeConstructor.filter[0];
+	{
+		if( localStorage[this.type + '_filter_param'])
+			this.filterParm = localStorage[this.type + '_filter_param'];
+		else
+			this.filterParm = this.nodeConstructor.filter[0];
+	}
+
+	if( localStorage[this.type + '_filter_exclude'] == 'ON')
+		this.filterExclude = true;
+	else
+		this.filterExclude = false;
+
 	for( var i = 0; i < cm_Attrs.length; i++)
 		if( cm_Attrs[i][0] == this.filterParm )
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
@@ -940,6 +971,7 @@ Monitor.prototype.sortDirChanged = function( i_evt)
 	if( this.sortParm == 'order') return;
 	if( this.sortDirection ) this.sortDirection = false;
 	else this.sortDirection = true;
+	localStorage[this.type + '_sort_dir'] = this.sortDirection ? 'ON' : 'OFF';
 	this.sortItems();
 	return false;
 }
@@ -949,7 +981,7 @@ Monitor.prototype.sortFilterParmMenu = function( i_evt, i_type)
 	for( var i = 0; i < this.nodeConstructor[i_type].length; i++)
 		for( var j = 0; j < cm_Attrs.length; j++)
 			if( this.nodeConstructor[i_type][i] == cm_Attrs[j][0] )
-				menu.addItem({"name":cm_Attrs[j][0],"receiver":this,"handle":i_type+'ParmChanged',"title":cm_Attrs[j][2]});
+				menu.addItem({"name":cm_Attrs[j][0],"receiver":this,"handle":i_type+'ParmChanged',"label":cm_Attrs[j][2]});
 	menu.show();
 	i_evt.stopPropagation();
 	return false;
@@ -962,13 +994,22 @@ Monitor.prototype.sortParmChanged = function( i_name)
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 	this.sortParm = i_name;
 	if( this.sortParm == 'order') this.sortDirection = true;
+
+	// Store:
+	if( this.nodeConstructor.sortVisor && g_VISOR() )
+		localStorage[this.type + '_sort_param_visor'] = this.sortParm;
+	else
+		localStorage[this.type + '_sort_param'] = this.sortParm;
+
 	this.sortItems();
 }
+
 // --------------- Filtering: -------------------//
 Monitor.prototype.filterExcludeChanged = function( i_evt)
 {
 	if( this.filterExclude ) this.filterExclude = false;
 	else this.filterExclude = true;
+	localStorage[this.type + '_filter_exclude'] = this.filterExclude ? 'ON' : 'OFF';
 	this.filterItems();
 }
 Monitor.prototype.filterParmChanged = function( i_name)
@@ -978,6 +1019,13 @@ Monitor.prototype.filterParmChanged = function( i_name)
 		if( cm_Attrs[i][0] == i_name )
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
 	this.filterParm = i_name;
+
+	// Store:
+	if( this.nodeConstructor.filterVisor && g_VISOR() )
+		localStorage[this.type + '_filter_param_visor'] = this.filterParm;
+	else
+		localStorage[this.type + '_filter_param'] = this.filterParm;
+
 	this.info('Filter'+(this.filterExclude?' E':'')+': '+i_name);
 	this.filterItems();
 }

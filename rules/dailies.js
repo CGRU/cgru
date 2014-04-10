@@ -17,9 +17,9 @@ d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 d_cvtguiparams = {};
 d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
 d_cvtguiparams.fps = {"label":'FPS'};
-
-d_expguiparams = {};
-d_expguiparams.quality = {"label":'JPEG Images Compression Rate',"lwidth":'250px',"info":'1 is the best quality'};
+d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.quality = {"label":'JPEG Quality',"default":'100'};
 
 d_cutparams = {};
 d_cutparams.cut_name = {};
@@ -161,7 +161,7 @@ function d_ProcessGUI( i_wnd)
 //console.log( task.command);
 	n_SendJob( job);
 
-	nw_MakeNews('<i>dailies</i>');
+	nw_MakeNews({"title":'dailies'});
 }
 
 function d_MakeCmd( i_params)
@@ -177,6 +177,7 @@ function d_MakeCmd( i_params)
 
 	cmd += ' "' + cgru_PM( d_makemovie, true) + '"';
 
+	cmd += ' -a "' + RULES.avcmd + '"';
 	cmd += ' -c "'+params.codec+'"';
 	cmd += ' -f '+params.fps;
 	cmd += ' -r '+params.format;
@@ -224,142 +225,215 @@ function d_MakeCmd( i_params)
 	return cmd;
 }
 
-function d_Convert( i_path)
+function d_Convert( i_args)
 {
 	var params = {};
-	params.quality = 5;
-	params.cvtres = '';
+//	params.quality = 80;
+//	params.cvtres = '';
 
-	var wnd = new cgru_Window({"name":'dailes',"title":'Convert Movie'});
+	var title = 'Convert ';
+	if( i_args.images ) title += ' Images';
+	else if( i_args.folders ) title += ' Sequences';
+	else if( i_args.movies) title += ' Movies';
+	var wnd = new cgru_Window({"name":'dailes',"title":title});
+	wnd.m_args = i_args;
+
+	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	if( i_args.movies == false )
+		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+	elBtns.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elBtns.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+
+	var elCvtBtn = document.createElement('div');
+	elBtns.appendChild( elCvtBtn);
+	elCvtBtn.textContent = title + ' To Movies';
+	elCvtBtn.classList.add('button');
+	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);}
+	elCvtBtn.m_wnd = wnd;
+
+	var elExpBtn = document.createElement('div');
+	elBtns.appendChild( elExpBtn);
+	elExpBtn.textContent = title + ' To Sequences';
+	elExpBtn.classList.add('button');
+	elExpBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, true);}
+	elExpBtn.m_wnd = wnd;
 
 	var elSrc = document.createElement('div');
 	wnd.elContent.appendChild( elSrc);
 	elSrc.classList.add('source');
-	elSrc.textContent = i_path;
-
-	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
-
-	var elBtns = document.createElement('div');
-	wnd.elContent.appendChild( elBtns);
-
-	var elCvtBtn = document.createElement('div');
-	elBtns.appendChild( elCvtBtn);
-	elCvtBtn.textContent = 'Convert Movie To Another Movie';
-	elCvtBtn.classList.add('button');
-	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd);}
-	elCvtBtn.m_wnd = wnd;
-
-	var div = document.createElement('div');
-	wnd.elContent.appendChild(div );
-	div.style.margin = '10px';
-
-	gui_Create( wnd.elContent, d_expguiparams, [params]);
-
-	var elBtns = document.createElement('div');
-	wnd.elContent.appendChild( elBtns);
-	elBtns.classList.add('buttons');
-
-	var elExpBtn = document.createElement('div');
-	elBtns.appendChild( elExpBtn);
-	elExpBtn.textContent = 'Explode Movie To Images Sequence';
-	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd, false);}
-	elExpBtn.m_wnd = wnd;
-
-	var elExpBtn = document.createElement('div');
-	elBtns.appendChild( elExpBtn);
-	elExpBtn.textContent = 'Send Job to AFANASY';
-	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd, true);}
-	elExpBtn.m_wnd = wnd;
-
-	wnd.m_path = i_path;
+	wnd.m_elSrc = elSrc;
+	for( var i = 0; i < i_args.paths.length; i++)
+	{
+		var el = document.createElement('div');
+		elSrc.appendChild( el);
+		el.textContent = i_args.paths[i];
+	}
 }
 
-function d_CvtProcessGUI( i_wnd)
+function d_CvtProcessGUI( i_wnd, i_to_sequence)
 {
-	var params = {};
-	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
-	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
+	var params = gui_GetParams( i_wnd.elContent, d_cvtguiparams);
 	for( key in i_wnd.elContent.m_choises )
 		params[key] = i_wnd.elContent.m_choises[key].value;
 
-	var cmd = 'movconvert';
-	cmd += ' -a ' + RULES.avconv;
-	cmd += ' -c "' + params.codec + '"';
-	cmd += ' -f ' + params.fps;
-	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
-	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
-
-	var job = {};
-	//job.offline = true;
-	job.name = c_PathBase( i_wnd.m_path) + '-' + params.codec;
-	if( params.cvtres.length ) job.name += '-' + params.cvtres;
-
-	var block = {};
-	block.name = 'Convert';
-	block.service = 'movgen';
-	block.parser = 'generic';
-	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path), true);
-	job.blocks = [block];
-
-	var task = {}
-	task.name = c_PathBase( i_wnd.m_path);
-	task.command = cmd;
-	block.tasks = [task];
-
-	n_SendJob( job);
-	i_wnd.destroy();
+	if( i_wnd.m_args.movies || ( i_to_sequence == false ))
+	{
+		d_CvtMovies( i_wnd.m_args, params, i_to_sequence );
+		i_wnd.destroy();
+	}
+	else
+	{
+		d_CvtImages( i_wnd, i_wnd.m_args, params );
+	}
 }
 
-function d_ExpProcessGUI( i_wnd, i_afanasy)
+function d_CvtImages( i_wnd, i_args, i_params)
 {
-	var params = {};
-	gui_GetParams( i_wnd.elContent, d_expguiparams, params);
-	gui_GetParams( i_wnd.elContent, d_cvtguiparams, params);
+//console.log( JSON.stringify( i_args));
+//console.log( JSON.stringify( i_params));
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
 
-	var cmd = 'utilities/moviemaker/movconvert.py';
-	if( i_afanasy ) cmd = cgru_PM('/cgru/' + cmd, true);
-	cmd += ' -t jpg';
-	cmd += ' -a ' + RULES.avconv;
-	cmd += ' -q ' + params.quality;
-	if( params.cvtres.length ) cmd += ' -x ' + params.cvtres;
-	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
+	var cmd = 'rules/bin/convert.sh -J';
 
-	if( i_afanasy !== true )
+	cmd += ' -c ' + i_params.colorspace;
+	cmd += ' -q ' + i_params.quality;
+	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
+
+	var afanasy = false;
+	if( i_args.folders || ( i_args.paths.length > 1 ))
 	{
-		i_wnd.elContent.classList.add('waiting');
-		n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_ExpFinished,"wnd":i_wnd});
+		afanasy = true;
+		cmd += ' -A';
+		cmd += ' --afuser "' + g_auth_user.id + '"';
+	}
+
+	for( var i = 0; i < i_args.paths.length; i++)
+		cmd += ' "' + cgru_PM('/' + RULES.root + i_args.paths[i], true) + '"'
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CvtImagesFinished,"wnd":i_wnd,"afanasy":afanasy});
+}
+function d_CvtImagesFinished( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+//console.log( JSON.stringify( i_args));
+	if( i_args.afanasy == false )
+	{
+		i_args.wnd.destroy();
+		i_args.wnd.m_args.filesview.refresh();
+//		fv_ReloadAll();
 		return;
 	}
 
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+
+	var elOut = i_args.wnd.m_elSrc;
+	elOut.textContent = '';
+	elOut.classList.remove('source');
+	elOut.classList.add('output');
+
+	if(( i_data.cmdexec == null ) || ( i_data.cmdexec.length == 0 ) || ( i_data.cmdexec[0].convert == null ))
+	{
+		elOut.textContent = JSON.stringify( i_data);
+		return;
+	}
+
+	var convert = i_data.cmdexec[0].convert;	
+
+	if( convert.error ) c_Error( convert.error );
+
+	for( var i = 0; i < convert.length; i++ )
+	{
+		var c = convert[i];
+		var el = document.createElement('div');
+		elOut.appendChild( el);
+		var text =  JSON.stringify( c);
+		if( c.input )
+		{
+			text = 'File: ';
+			if( c.type == 'folder') text = 'Folder: ';
+			text += c_PathBase( c.input );
+			if( c.files_num ) text += '[' + c.files_num + ']';
+			if( c.warning )
+			{
+				text += ' ' + c.warning;
+				el.style.color = '#F82';
+			}
+			else
+			{
+				text += ' -> ';
+				text += c_PathBase( c.output );
+			}
+		}
+		el.textContent = text;
+	}
+}
+
+function d_CvtMovies( i_args, i_params, i_to_sequence )
+{
 	var job = {};
+	job.name = c_PathBase( i_args.paths[0]);
+	if( i_args.paths.length > 1 )
+		job.name = c_PathDir( i_args.paths[0]) + ' x' + i_args.paths.length;
+	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
 	//job.offline = true;
-	job.name = c_PathBase( i_wnd.m_path);
 
 	var block = {};
-	block.name = 'Explode';
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(i_wnd.m_path), true);
+	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir( i_args.paths[0]), true);
+	block.tasks = [];
 	job.blocks = [block];
 
-	var task = {}
-	task.name = c_PathBase( i_wnd.m_path);
-	task.command = cmd;
-	block.tasks = [task];
+	var cmd = 'movconvert';
+	cmd += ' -a ' + RULES.avcmd;
+	if( i_params.cvtres.length ) cmd += ' -x ' + i_params.cvtres;
+	if( i_params.time_start != d_cvtguiparams.time_start.default )
+		cmd += ' -s ' + i_params.time_start;
+	if( i_params.duration != d_cvtguiparams.duration.default )
+		cmd += ' -d ' + i_params.duration;
+
+	if( i_to_sequence )
+	{
+		job.name = 'Explode ' + job.name;
+		block.name = 'Explode';
+		cmd += ' -t jpg';
+		var q = parseInt( i_params.quality);
+		q = Math.round( 10 - ( q / 10 ));
+		if( q < 1 ) q = 1;
+		cmd += ' -q ' + q;
+	}
+	else
+	{
+		job.name = 'Convert ' + job.name;
+		block.name = 'Convert';
+		cmd += ' -c "' + i_params.codec + '"';
+		cmd += ' -f ' + i_params.fps;
+	}
+
+	for( var i = 0; i < i_args.paths.length; i++)
+	{
+		var path = i_args.paths[i];
+		var task = {};
+		task.name = c_PathBase( path);
+		task.command = cmd + ' "' + cgru_PM('/' + RULES.root + path, true) + '"';
+		block.tasks.push( task);
+	}
 
 	n_SendJob( job);
-
-	i_wnd.destroy();
-}
-function d_ExpFinished( i_data, i_args)
-{
-	i_args.wnd.destroy();
-	fv_ReloadAll();
 }
 
 function d_MakeCut( i_args)
@@ -371,6 +445,8 @@ function d_MakeCut( i_args)
 	var params = {};
 	params.cut_name = i_args.cut_name;
 	params.output = i_args.output;
+	params.input = RULES.assets.shot.result.path.join(',');
+	if( RULES.cut.input ) params.input = RULES.cut.input;
 
 	gui_Create( wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
@@ -444,7 +520,6 @@ function d_CutProcessGUI( i_wnd, i_test)
 		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CutFinished,"wnd":i_wnd});
-
 }
 function d_CutFinished( i_data, i_args)
 {

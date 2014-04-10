@@ -238,7 +238,7 @@ function nw_NewsClose()
 	$('sidepanel_news').classList.remove('opened');
 	$('news').innerHTML = '';
 	localStorage.news_opened = false;
-	g_auth_user.news = null;
+	delete g_auth_user.news;
 }
 function nw_NewsOpen()
 {
@@ -253,34 +253,43 @@ function nw_MakeNewsDialog()
 	new cgru_Dialog({"handle":'nw_MakeNewsDialogApply',
 		"name":'news',"title":'Create News',"info":'Enter News Title'});
 }
-function nw_MakeNewsDialogApply( i_title) { nw_MakeNews( i_title); }
-function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
+function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
+//function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
+function nw_MakeNews( i_args )
 {
 	if( localStorage.news_disabled == 'true') return;
-//window.console.log(i_title);
-//	if( g_auth_user == null ) return;
-	if( i_user_id == null )
+
+	var news = i_args;
+
+	if( news.user_id == null )
 	{
 		if( g_auth_user )
-			i_user_id = g_auth_user.id;
+			news.user = g_auth_user.id;
 		else
 			c_Error('Can`t make news with no user.');
 	}
 
-	if( i_path == null ) i_path = g_CurPath();
+	if( news.path == null ) news.path = g_CurPath();
 
-	var news = {};
 	news.time = c_DT_CurSeconds();
-	news.user = i_user_id;
-	news.path = i_path;
-	news.title = i_title;
-	if( i_guest ) news.guest = i_guest;
-	news.id = i_user_id+'_'+news.time+'_'+news.path;
+	news.id = news.user + '_' + news.time + '_' + news.path;
+
 	if( localStorage.news_ignore_own == 'true' )
 		news.ignore_own = true;
 
+	// If news path is the current we get artists from status, if them not set in input arguments:
+	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status.artists )
+		news.artists = RULES.status.artists;
+
+	var email_subject = c_GetUserTitle( news.user) + ' - ' + news.title;
+	var email_body = '<a href="';
+	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname + '#' + news.path;
+	email_body += '">' + news.path + '</a>';
+
 	var request = {};
 	request.news = news;
+	request.email_subject = email_subject;
+	request.email_body = email_body;
 	request.root = RULES.root;
 	request.rufolder = RULES.rufolder;
 	request.recent_max = RULES.newsrecent;
@@ -331,7 +340,7 @@ function nw_NewsLoad()
 	}
 
 	var filename = 'users/'+g_auth_user.id+'.json';
-	c_Parse( n_Request({"send":{"readobj":filename},"func":nw_NewsReceived,"info":"news","wait":false,"parse":true}));
+	n_Request({"send":{"readobj":filename},"func":nw_NewsReceived,"info":"news","wait":false,"parse":true});
 	$('news').innerHTML = 'Loading...';
 }
 
@@ -353,6 +362,7 @@ function nw_NewsShow( i_news)
 	nw_ShowCount();
 
 	$('news').innerHTML = '';
+	$('news').m_elArray = [];
 	g_auth_user.news.sort( function(a,b){var attr='time';if(a[attr]>b[attr])return -1;if(a[attr]<b[attr])return 1;return 0;});
 	for( var i = 0; i < g_auth_user.news.length; i++ )
 	{
@@ -360,14 +370,19 @@ function nw_NewsShow( i_news)
 
 		var el = document.createElement('div');
 		$('news').appendChild( el);
+		$('news').m_elArray.push( el);
+		el.m_news = news;
+
 		el.title = c_DT_StrFromSec( news.time);
+		if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
+			el.classList.add('assigned');
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
 		elBtn.m_id = news.id;
-		elBtn.ondblclick = function(e){ nw_RemoveNews( e.currentTarget.m_id);};
+		elBtn.ondblclick = function(e){ nw_RemoveNews([e.currentTarget.m_id]);};
 		elBtn.title = 'Double click to remove link';
 
 		var avatar = c_GetAvatar( news.user, news.guest);
@@ -390,20 +405,67 @@ function nw_NewsShow( i_news)
 		elLink.textContent = news.path;
 	}
 
-	g_auth_user.news = null;
+	delete g_auth_user.news;
+
+	nw_HighlightCurrent();
 }
 
-function nw_RemoveNews( i_id)
+function nw_NavigatePost()
+{
+	nw_HighlightCurrent();
+}
+
+function nw_HighlightCurrent()
+{
+	var path = g_CurPath();
+	var elNews = $('news').m_elArray;
+	if( elNews == null ) return;
+
+	for( var i = 0; i < elNews.length; i++)
+		if( path == elNews[i].m_news.path )
+			elNews[i].classList.add('cur_path');
+		else
+			elNews[i].classList.remove('cur_path');
+}
+
+function nw_ShowOnlyAssigned( i_btn)
+{
+	if( $('news').classList.contains('show_only_assigned'))
+	{
+		$('news').classList.remove('show_only_assigned');
+		i_btn.classList.remove('pushed');
+	}
+	else
+	{
+		$('news').classList.add('show_only_assigned');
+		i_btn.classList.add('pushed');
+	}
+}
+
+function nw_RemoveNotAssigned()
+{
+	var elNews = $('news').m_elArray;
+	var ids = [];
+	for( var i = 0; i < elNews.length; i++)
+		if( false == elNews[i].classList.contains('assigned'))
+			ids.push( elNews[i].m_news.id);
+	if( ids.length )
+		nw_RemoveNews( ids);
+}
+
+function nw_RemoveNews( i_ids)
 {
 	var obj = {};
-	if( i_id == null )
+	if( i_ids == null )
 	{
 		obj.object = {"news":[]};
 		obj.add = true;
 	}
 	else
 	{
-		obj.objects = [{"id":i_id}];
+		obj.objects = [];
+		for( var i = 0; i < i_ids.length; i++ )
+			obj.objects.push({"id":i_ids[i]});
 		obj.delobj = true;
 	}
 	obj.file = 'users/'+g_auth_user.id+'.json';
@@ -443,21 +505,26 @@ function nw_RecentOpen( i_noload )
 	if( i_noload !== false )
 		nw_RecentLoad();
 }
-function nw_RecentLoad( i_nocheck)
+function nw_RecentLoad( i_check, i_cache)
 {
-	if(( i_nocheck !== false ) && ( false == c_RuFileExists( nw_recent_file)))
+	if(( i_check !== false ) && ( false == c_RuFileExists( nw_recent_file)))
 		return;
 
-	var file = c_GetRuFilePath( nw_recent_file);
-	if( nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
+	if(( i_cache !== false ) && nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
 	{
 		c_Log('Recent cached '+RULES.cache_time+'s: '+g_CurPath());
 		nw_RecentReceived( nw_recents[g_CurPath()].array );
 		return;
 	}
 
+	var file = c_GetRuFilePath( nw_recent_file);
 	n_Request({"send":{"readobj":file},"local":true,"func":nw_RecentReceived,"info":"recent","wait":false,"parse":true});
 	$('recent').textContent = 'Loading...';
+}
+
+function nw_RecentRefresh()
+{
+	nw_RecentLoad( true, false);
 }
 
 function nw_RecentReceived( i_data, i_args)

@@ -8,7 +8,6 @@ Action::Action( const af::Msg * i_msg, ThreadArgs * i_args):
 	jobs( i_args->jobs),
 	monitors( i_args->monitors),
 	renders( i_args->renders),
-	talks( i_args->talks),
 	users( i_args->users),
 	m_buffer( NULL),
 	m_valid( false)
@@ -28,6 +27,13 @@ Action::Action( const af::Msg * i_msg, ThreadArgs * i_args):
 		return;
 	}
 
+	af::jr_string("type", type, *data);
+	if( type.empty())
+	{
+		AFCommon::QueueLogError("JSON action type is not set.");
+		return;
+	}
+
 	af::jr_int32vec("ids", ids, *data);
 	if( ids.size() == 0 )
 	{
@@ -37,13 +43,6 @@ Action::Action( const af::Msg * i_msg, ThreadArgs * i_args):
 			AFCommon::QueueLogError("JSON action should have nodes ids or mask to operate with.");
 			return;
 		}
-	}
-
-	af::jr_string("type", type, *data);
-	if( type.empty())
-	{
-		AFCommon::QueueLogError("JSON action type is not set.");
-		return;
 	}
 
 	af::jr_string("user_name", user_name, *data);

@@ -23,6 +23,7 @@ FileRecent = 'recent'
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] [file or folder]\ntype \"%prog -h\" for help", version="%prog 1.0")
+Parser.add_option('-a', '--avcmd',           dest='avcmd',           type  ='string',     default='ffmpeg'       ,help='AV tool command')
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies_withlogo', help='Sequence frame template')
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Codec preset')
@@ -678,6 +679,15 @@ Example "255,255,0" - yellow.')
 
 
 		# Parameters
+
+		layout = QtGui.QHBoxLayout()
+		parameterslayout.addLayout( layout)
+		label = QtGui.QLabel('AV tool command:', self)
+		layout.addWidget( label)
+		label.setToolTip('AV tools command.')
+		self.fields['avcmd'] = QtGui.QLineEdit( Options.avcmd, self)
+		QtCore.QObject.connect( self.fields['avcmd'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+		layout.addWidget( self.fields['avcmd'])
 
 		# Fake time:
 		layout = QtGui.QHBoxLayout()
@@ -1575,11 +1585,13 @@ Add this options to temporary image saving.')
 		cmd = 'makemovie.py'
 		cmd = os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
 		cmd = '%s "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
+		if len( self.fields['avcmd'].text()): cmd += ' -a "%s"' % self.fields['avcmd'].text()
 		cmd += ' -c "%s"' % getComboBoxString( self.fields['codec'])
 		cmd += ' -f %s' % self.fields['fps'].currentText()
 		cmd += ' -n %s' % self.fields['container'].currentText()
 		cmd += ' --fs %d' % self.fields['framestart'].value()
 		cmd += ' --fe %d' % self.sbFrameLast.value()
+
 		format = getComboBoxString( self.fields['format'])
 		if format != '':
 			if self.fields['fffirst'].isChecked(): cmd += ' --fffirst'
@@ -1626,6 +1638,7 @@ Add this options to temporary image saving.')
 				cmd += ' --lgfpath "%s"' % lgfpath
 				cmd += ' --lgfsize %d' % self.fields['lgfsize'].value()
 				cmd += ' --lgfgrav %s' % self.fields['lgfgrav'].currentText()
+
 		if self.fields['datesuffix'].isChecked(): cmd += ' --datesuffix'
 		if self.fields['timesuffix'].isChecked(): cmd += ' --timesuffix'
 		if self.cbFakeTime.isChecked() : cmd += ' --faketime %d' % self.fakeTime.dateTime().toTime_t()

@@ -124,6 +124,7 @@ function shot_MakeThumbnail()
 	}
 	var output = RULES.root + file;
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
+	cmd += ' -c  extension';
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
 }
 

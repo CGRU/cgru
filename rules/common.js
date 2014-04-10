@@ -398,6 +398,7 @@ function c_MakeThumbnail( i_file, i_func)
 	var cmd = RULES.thumbnail.create_file;
 	cmd = cmd.replace(/@INPUT@/g, RULES.root + i_file);
 	cmd = cmd.replace(/@OUTPUT@/g, RULES.root + c_GetThumbFileName( i_file));
+	cmd += ' -c  extension'
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":i_func,"file":i_file,"info":'thumbnail'});
 }
 
@@ -462,7 +463,37 @@ function c_GetAvatar( i_user_id, i_guest )
 	return null;
 }
 
-function c_MakeLinksRelative( i_text)
+function c_LinksProcess( i_text)
+{
+	return c_LinksToRelative( c_HttpToLinks( i_text));
+}
+function c_HttpToLinks( i_text)
+{
+//console.log('c_HttpToLinks in:'+i_text);
+	var a_re = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	var a_parts = i_text.split(/<a /gi);
+	var out = null;
+	for( var i = 0; i < a_parts.length; i++)
+	{
+		text = a_parts[i];
+		link = '';
+		var pos = text.indexOf('</a>');
+		if( pos > 0 )
+		{
+			link = text.substr( 0, pos);
+			text = text.substr( pos);
+		}
+//console.log('l='+link); console.log('t='+text);
+		text = text.replace( a_re, '<a target="_blank" class="link_auto" href="$1">$1</a>');
+		text = link + text;
+
+		if( out == null) out = text;
+		else out += '<a ' + text;
+	}
+//console.log('c_HttpToLinks out:'+out);
+	return out;
+}
+function c_LinksToRelative( i_text)
 {
 	var address = document.location.protocol + '//' + document.location.host + document.location.pathname;
 	while( i_text.indexOf( address) != -1 )

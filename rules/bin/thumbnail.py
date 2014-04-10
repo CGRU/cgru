@@ -21,8 +21,8 @@ Parser.add_option('-o', '--output',  dest='output',     type  ='string',     def
 	help='Output image')
 Parser.add_option('-t', '--time',    dest='time',       type  ='int',        default=0,
 	help='Midification test time')
-Parser.add_option('-s', '--skip',    dest='skip',       type  ='string',     default='.rules',
-	help='Skip folders, comma separated list.')
+Parser.add_option('-s', '--skip',    dest='skip',       type  ='string',     default='matte,mask',
+	help='Skip folders and folders, comma separated list.')
 Parser.add_option(      '--nomovie', dest='nomovie',    action='store_true', default=False,
 	help='Skip movie files.')
 Parser.add_option('-c', '--colorspace',  dest='colorspace', type  ='string', default='auto',
@@ -88,14 +88,25 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 #			print('ERROR: folder "%s" does not exist.' % folder)
 			continue
 		for root, dirs, files in os.walk( folder):
+			# Skip folder:
 			if len( files) == 0: continue
-			if os.path.basename(root)[0] == '_': continue
-			if os.path.basename(root) in SkipFolders:
-				if Options.verbose:
-					print('Skipping: "%s"' % root)
+			to_skip = False
+			root_basename = os.path.basename(root)
+			if len(root_basename):
+				if root_basename[0] in '._':
+					to_skip = True
+			if not to_skip:
+				for skip in SkipFolders:
+					if root_basename.lower().find( skip) != -1:
+						to_skip = True
+						break
+			if to_skip:
+				if Options.verbose: print('Skipping: "%s"' % root)
 				continue
+
 			images = []
 			for afile in files:
+				if afile[0] in '._': continue
 				split = re.split( r'\d\.', afile)
 				if len(split) > 1 and split[-1].lower() in ImgExtensions:
 					images.append( afile)
@@ -105,6 +116,7 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 					if new_movie > cur_mtime:
 						Movie = new_movie
 						cur_mtime = new_mtime
+
 			if len( images) == 0: continue
 			new_mtime = int( os.path.getmtime(os.path.join( root, images[0])))
 			if new_mtime > cur_mtime:
@@ -179,11 +191,12 @@ if Movie is None:
 			imgtype = Images[0].rfind('.');
 			if imgtype > 0:
 				imgtype = Images[0][imgtype+1:].lower()
-			if   imgtype == 'exr': colorspace = 'sRGB'
+			if   imgtype == 'exr': colorspace = 'RGB'
 			elif imgtype == 'dpx': colorspace = 'Log'
 			elif imgtype == 'cin': colorspace = 'Log'
 			else: colorspace = 'sRGB'
 		cmd += ' -set colorspace ' + colorspace
+	cmd += ' -colorspace sRGB'
 
 cmd += ' -resize %dx%d' % (Options.xres, Options.yres)
 cmd += ' "%s"'

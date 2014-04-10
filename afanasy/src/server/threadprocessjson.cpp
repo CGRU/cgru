@@ -50,13 +50,27 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 
 		if( type == "jobs" )
 		{
-			std::vector<int32_t> uids;
-			af::jr_int32vec("uids", uids, getObj);
-			if( uids.size())
+			if( getObj.HasMember("uids"))
 			{
-				AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
-				AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
-				o_msg_response = i_args->users->generateJobsList( uids, type, json);
+				std::vector<int32_t> uids;
+				af::jr_int32vec("uids", uids, getObj);
+				if( uids.size())
+				{
+					AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
+					AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
+					o_msg_response = i_args->users->generateJobsList( uids, type, json);
+				}
+			}
+			if( getObj.HasMember("users"))
+			{
+				std::vector<std::string> users;
+				af::jr_stringvec("users", users, getObj);
+				if( users.size())
+				{
+					AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
+					AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
+					o_msg_response = i_args->users->generateJobsList( users, type, json);
+				}
 			}
 			else if( mode == "output")
 			{
@@ -117,9 +131,12 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	
 					if( error.size())
 					{
+						error += "\nCheck task log.";
+						error += "\nIf there is 'update timeout' check firewall.";
+						error += "\nClient should listen a port and server should be able to connect to it.";
 						if( o_msg_response == NULL )
 							o_msg_response = af::jsonMsgError( error);
-						AFCommon::QueueLogError("TTaskOutputRequest: " + error);
+						//AFCommon::QueueLogError("TTaskOutputRequest: " + error);
 					}
 				}
 			}
@@ -307,7 +324,51 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		AfContainerLock ulock( i_args->users, AfContainerLock::WRITELOCK);
 		o_msg_response = i_args->users->addUser( new UserAf( document["user"]), i_args->monitors);
 	}
+	else if( document.HasMember("reload_farm"))
+	{
+		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
 
+		printf("\n	========= RELOADING FARM =========\n\n");
+		if( af::loadFarm( true))
+		{
+			RenderContainerIt rendersIt( i_args->renders);
+			for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+			{
+				render->getFarmHost();
+				i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
+			}
+			printf("\n	========= FARM RELOADED SUCCESSFULLY =========\n\n");
+			o_msg_response = af::jsonMsgStatus( true, "reload_farm",
+				"Reloaded successfully.");
+		}
+		else
+		{
+			printf("\n	========= FARM RELOADING FAILED =========\n\n");
+			o_msg_response = af::jsonMsgStatus( false, "reload_farm",
+				"Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.");
+		}
+	}
+	else if( document.HasMember("reload_config"))
+	{
+		AfContainerLock jlock( i_args->jobs,	AfContainerLock::WRITELOCK);
+		AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
+		AfContainerLock ulock( i_args->users,	AfContainerLock::WRITELOCK);
+		printf("\n	========= RELOADING CONFIG =========\n\n");
+		std::string message;
+		if( af::Environment::reload())
+		{
+			printf("\n	========= CONFIG RELOADED SUCCESSFULLY =========\n\n");
+			o_msg_response = af::jsonMsgStatus( true, "reload_config",
+				"Reloaded successfully.");
+		}
+		else
+		{
+			printf("\n	========= CONFIG RELOADING FAILED =========\n\n");
+			o_msg_response = af::jsonMsgStatus( false, "reload_config",
+				"Failed, see server logs fo details.");
+		}
+	}
 
 	delete [] data;
 	if( i_msg ) delete i_msg;

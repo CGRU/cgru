@@ -9,7 +9,7 @@ class mayatoarnold(parser.parser):
 		parser.parser.__init__( self)
 
 	def do( self, data, mode):
-		print(data)
+		#print(data)
 		needcalc = False
 
 		if data.find(FRAME) > -1:

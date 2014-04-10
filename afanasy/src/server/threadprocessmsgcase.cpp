@@ -81,54 +81,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		o_msg_response = new af::Msg( af::Msg::TConfirm, 1 - i_msg->int32());
 		break;
 	}
-	case af::Msg::TConfigLoad:
-	{
-		AfContainerLock jlock( i_args->jobs,	 AfContainerLock::WRITELOCK);
-		AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
-		AfContainerLock ulock( i_args->users,	AfContainerLock::WRITELOCK);
-		printf("\n	========= RELOADING CONFIG =========\n\n");
-		std::string message;
-		if( af::Environment::reload())
-		{
-			 message = "Reloaded successfully.";
-			 printf("\n	========= CONFIG RELOADED SUCCESSFULLY =========\n\n");
-		}
-		else
-		{
-			 message = "Failed, see server logs fo details.";
-			 printf("\n	========= CONFIG RELOADING FAILED =========\n\n");
-		}
-		o_msg_response = new af::Msg();
-		o_msg_response->setString( message);
-		break;
-	}
-	case af::Msg::TFarmLoad:
-	{
-		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-		AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
-
-		printf("\n	========= RELOADING FARM =========\n\n");
-		std::string message;
-		if( af::loadFarm( true))
-		{
-			 RenderContainerIt rendersIt( i_args->renders);
-			 for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-			 {
-				  render->getFarmHost();
-				  i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
-			 }
-			 message = "Reloaded successfully.";
-			 printf("\n	========= FARM RELOADED SUCCESSFULLY =========\n\n");
-		}
-		else
-		{
-			 message = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
-			 printf("\n	========= FARM RELOADING FAILED =========\n\n");
-		}
-		o_msg_response = new af::Msg();
-		o_msg_response->setString( message);
-		break;
-	}
 
 // ---------------------------------- Monitor ---------------------------------//
 	case af::Msg::TMonitorRegister:
@@ -577,7 +529,10 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			else if( error.size())
 			{
 				error = std::string("Getting task output: ") + error;
-				AFCommon::QueueLogError( error);
+				error += "\nCheck task log.";
+				error += "\nIf there is 'update timeout' check firewall.";
+				error += "\nClient should listen a port and server should be able to connect to it.";
+				//AFCommon::QueueLogError( error);
 				o_msg_response = af::msgString( error);
 			}
 		}
@@ -593,7 +548,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			{
 				error = "Retrieving output from render failed. See server logs for details.";
 				o_msg_response = af::msgString( error);
-				AFCommon::QueueLogError( error);
+				//AFCommon::QueueLogError( error);
 			}
 			delete msg_request_render;
 		}

@@ -89,6 +89,8 @@ function g_Init_Rules( i_data)
 	g_NavigShowInfo();
 
 	g_PathChanged();
+
+	$('navigate_root').href = document.location.href.replace(/#.*/,'');
 }
 
 function g_CurPath() { if( g_elCurFolder ) return g_elCurFolder.m_path; else return null;}
@@ -156,6 +158,11 @@ function g_NavigatePost()
 		g_elCurFolder.scrollIntoView();
 	}
 	g_nav_clicked = false;
+
+	nw_NavigatePost();
+	p_NavigatePost();
+
+	$('navigate_up').href = '#' + c_PathDir( g_CurPath());
 
 	if( ASSET && ASSET.post )
 	{
@@ -374,7 +381,6 @@ function g_AppendFolder( i_elParent, i_fobject)
 
 	var elColor = document.createElement('div');
 	elFolder.appendChild( elColor);
-	elFolder.m_elColor = elColor;
 	elColor.classList.add('fcolor');
 
 	var elName = document.createElement('a');
@@ -447,7 +453,7 @@ function g_FolderSetStatus( i_status, i_elFolder)
 	i_elFolder.m_fobject.status = i_status;
 
 	st_SetElLabel( i_status, i_elFolder.m_elAnn);
-	st_SetElColor( i_status, i_elFolder.m_elColor, i_elFolder);
+	st_SetElColor( i_status, i_elFolder);
 	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
 	st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
 	st_SetElTags( i_status, i_elFolder.m_elTags, true);

@@ -27,9 +27,9 @@ extern bool AFRunning;
 
 void threadProcessMsg( void * i_args);
 
-void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
+void threadAcceptPort( void * i_arg, int i_port)
 {
-	AFINFA("Accept (id = %lu): %d - %d\n", (long unsigned)DlThread::Self(), i_port, i_exitOnFail)
+	AFINFA("Accept (id = %lu): %d - %d\n", (long unsigned)DlThread::Self(), i_port)
 
 	ThreadArgs * threadArgs = (ThreadArgs*)i_arg;
 	int protocol = AF_UNSPEC;
@@ -43,7 +43,7 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 	sprintf( port, "%u", i_port);
 	getaddrinfo( NULL, port, &hints, &res);
 
-	if( i_exitOnFail ) printf("Available addresses:\n");
+	printf("Available addresses:\n");
 
 	for( struct addrinfo * ai = res; ai != NULL; ai = ai->ai_next)
 	{
@@ -53,7 +53,7 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 			{
 				if( protocol == AF_UNSPEC ) protocol = AF_INET;
 				const char * addr_str = inet_ntoa( ((sockaddr_in*)(ai->ai_addr))->sin_addr );
-				if( i_exitOnFail ) printf("IP = '%s'\n", addr_str);
+				printf("IP = '%s'\n", addr_str);
 				break;
 			}
 			case AF_INET6:
@@ -62,42 +62,34 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 				static const int buffer_len = 256;
 				char buffer[buffer_len];
 				const char * addr_str = inet_ntop( AF_INET6, &(((sockaddr_in6*)(ai->ai_addr))->sin6_addr), buffer, buffer_len);
-				if( i_exitOnFail ) printf("IPv6 = '%s'\n", addr_str);
+				printf("IPv6 = '%s'\n", addr_str);
 				break;
 			}
 			default:
-				if( i_exitOnFail ) printf("Unsupported address family, skipping.\n");
+				printf("Unsupported address family, skipping.\n");
 				continue;
 		}
 	}
 	freeaddrinfo( res);
 
-	#if defined (WINNT)
-	if( i_exitOnFail ) printf("Disable listening IPv6 for MS Windows.\n");
-	protocol = AF_INET;
-	#elif defined (MACOSX)
-	if( i_exitOnFail ) printf("Disable listening IPv6 for Mac OS X.\n");
-	protocol = AF_INET;
-	#endif
-	if( af::Environment::hasArgument("-noIPv6"))
+	if( af::Environment::isIPv6Disabled())
 	{
-		if( i_exitOnFail ) printf("IPv6 is disabled.\n");
+		printf("IPv6 is disabled by config.\n");
 		protocol = AF_INET;
 	}
-
 
 	switch(protocol)
 	{
 		case AF_INET:
-			if( i_exitOnFail ) printf("Using IPv4 addresses family.\n");
+			printf("Using IPv4 addresses family.\n");
 			break;
 		case AF_INET6:
-			if( i_exitOnFail ) printf("Using IPv6 addresses family.\n");
-			if( i_exitOnFail ) printf("IPv4 connections addresses will be mapped to IPv6.\n");
+			printf("Using IPv6 addresses family.\n");
+			printf("IPv4 connections addresses will be mapped to IPv6.\n");
 			break;
 		default:
 			AFERROR("No addresses founed.")
-			if( i_exitOnFail ) AFRunning = false;
+			AFRunning = false;
 			return;
 	}
 
@@ -119,7 +111,7 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 	if( server_sd == -1)
 	{
 		AFERRPE("socket")
-		if( i_exitOnFail ) AFRunning = false;
+		AFRunning = false;
 		return;
 	}
 	//
@@ -151,7 +143,7 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 	{
 		AFERRAR("Port %d:", i_port)
 		AFERRPE("bind()")
-		if( i_exitOnFail ) AFRunning = false;
+		AFRunning = false;
 		return;
 	}
 
@@ -159,7 +151,7 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 	{
 		AFERRAR("Port %d:", i_port)
 		AFERRPE("listen()")
-		if( i_exitOnFail ) AFRunning = false;
+		AFRunning = false;
 		return;
 	}
 
@@ -228,10 +220,6 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 
 void threadAcceptClient( void * i_arg)
 {
-	threadAcceptPort( i_arg, af::Environment::getServerPort(), true);
+	threadAcceptPort( i_arg, af::Environment::getServerPort());
 }
 
-void threadAcceptClientHttp( void * i_arg )
-{
-	threadAcceptPort( i_arg, 80, false);
-}

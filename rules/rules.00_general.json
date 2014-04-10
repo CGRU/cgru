@@ -37,6 +37,7 @@
 		"seek":["/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"play_folders":false,
+		"scripts":["project.js"],
 		"show_files":true
 	},
 	"scenes":{
@@ -59,17 +60,18 @@
 		"scripts":["shot.js"],
 		"post":"shot_Post",
 		"references":{
-			"path":["REFS"]
+			"path":["REF"]
 		},
 		"source":{
-			"path":["SOURCE","SRC"]
+			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG"]
+			"path":["RESULT/JPG","RESULT/DPX"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
 		},
+		"template":"/CG_PROJECT/SCENES/COMMON/_template",
 		"cache_time":60
 	}
 },
@@ -133,7 +135,7 @@
 	"create_file":"rules/bin/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
 
-"avconv":"ffmpeg",
+"avcmd":"ffmpeg",
 "skipfiles":[".","Thumbs.db"],
 
 "fps":"24",
@@ -193,12 +195,12 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/DPX",
+	"input":"RESULT/JPG",
 	"output":"COMMON/_cut"
 },
 
 "put":{
-	"input":"RESULT/DPX,RESULT/JPG",
+	"input":"RESULT/DPX",
 	"dest":"FINAL",
 	"cmd":"python /cgru/utilities/put.py",
 	"post_delete":false,

@@ -1,10 +1,11 @@
 {
 	"get":
 	{
-		"type" : "jobs",
-		"-ids"  : [1],
-		"-uids" : [1,2],
-		"-mode" : "full",
-		"mask" : "afanasy|_empty_.*"
+		"type"  : "jobs",
+		"-ids"   : [1],
+		"-uids"  : [1,2],
+		"-mode"  : "full",
+		"users" : ["alex","peter"],
+		"-mask"  : "afanasy|_empty_.*"
 	}
 }

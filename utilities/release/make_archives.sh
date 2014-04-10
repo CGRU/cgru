@@ -11,6 +11,7 @@ for archive in `ls`; do
 	archive_dir="cgru-${archive}"
 	if [ -L "${archive_dir}" ]; then
 		archive_dir=`readlink "${archive_dir}"`
+		[ -e "$archive_dir" ] || continue
 	else
 		[ -d "${archive_dir}" ] && rm -rf "${archive_dir}"
 		pushd .. > /dev/null
@@ -41,8 +42,8 @@ for archive in `ls`; do
 	# Archivate:
 	case ${archive} in
 	linux )
-		archive_file="cgru.${version}.${archive}.tar.gz"
-		archive_cmd="tar -cvzf \"${archive_file}\" \"${archive_dir}\""
+		archive_file="${PWD}/cgru.${version}.${archive}.tar.gz"
+		archive_cmd="tar -cvzf \"${archive_file}\" -C \"`dirname ${archive_dir}`\" \"`basename ${archive_dir}`\""
 		;;
 	windows )
 		archive_file="cgru.${version}.${archive}.zip"
@@ -54,6 +55,7 @@ for archive in `ls`; do
 		[ -f "${archive_file}" ] && rm -fv "${archive_file}"
 		echo $archive_cmd
 		eval $archive_cmd
+		chmod a+rw "${archive_file}"
 	fi
 
 	archive_file="cgru.${version}.${archive}.7z"

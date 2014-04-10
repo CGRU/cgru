@@ -85,6 +85,7 @@ public:
 	static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
 	static inline const std::string & getHTTPServeDir(){ return http_serve_dir;}
 	static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
+	static inline const int isIPv6Disabled()           { return ipv6_disable;  }
 	static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
 	static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
 	static inline const std::string & getComputerName(){ return computername;  } ///< Get local computer name.
@@ -230,6 +231,7 @@ private:
 /// Afanasy server name
 	static std::string servername;
 	static Address serveraddress;
+	static int ipv6_disable;
 	static std::vector<std::string> ip_trust;
 
 /// User name

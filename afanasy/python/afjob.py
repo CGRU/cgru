@@ -556,10 +556,12 @@ elif ext == 'c4d':
 	scenetype = 'c4d'
 	if cmd is None: cmd = 'c4d' + cmdextension
 	if not noscript:
-		cmd = 'c4drender' + cmdextension
+		cmd = 'c4d' + cmdextension
 	# Here i get the information in there that the normal c4d and not the special
-	# c4drender command should get used (which copies all the stuff locally)
-	if extrargs == 'no_copy': cmd = 'c4d' + cmdextension
+	# c4drender command should get used (which copies all the stuff locally).
+	# As "c4drender" should be the special case this defaults to "c4d" now and
+	# takes the argument "copy_scene_files" to invoke "c4drender"
+	if extrargs == 'copy_scene_files': cmd = 'c4drender' + cmdextension
 	cmd += ' -nogui -render "' + scene + '" -frame @#@ @#@ ' + str(by)
 	if output != '':
 		cmd += ' -oimage "%s"' % output

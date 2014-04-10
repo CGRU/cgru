@@ -29,7 +29,6 @@ Parser.add_option('-t', '--template',   dest='template',       type  ='string', 
 Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='720x576',   help='Format: 720x576')
 Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
 Parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='',          help='Output image quality')
-Parser.add_option('--corrext',          dest='corrext',        action='store_true', default=False,       help='Correct by extension (dpx,exr)')
 Parser.add_option('--colorspace',       dest='colorspace',     type  ='string',     default='auto',      help='Input images colorspace')
 Parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Stereo dublicate mode')
@@ -165,11 +164,12 @@ def reformatAnnotate( infile, outfile):
 		if Options.colorspace != 'auto':
 			colorspace = Options.colorspace
 			if colorspace == 'extension':
-				if   imgtype == 'exr': colorspace = 'sRGB'
+				if   imgtype == 'exr': colorspace = 'Linear'
 				elif imgtype == 'dpx': colorspace = 'Log'
 				elif imgtype == 'cin': colorspace = 'Log'
 				else: colorspace = 'sRGB'
 			correction = '-set colorspace ' + colorspace
+		if correction != '': correction += ' -colorspace sRGB'
 		if Options.correction != '':
 			if correction != '': correction += ' '
 			correction += Options.correction
@@ -182,7 +182,10 @@ def reformatAnnotate( infile, outfile):
 					FRAME = digits[-1]
 					if Verbose: print('Frame = "%s"' % FRAME)
 
-		cmd = 'convert "%s" +matte' % infile
+		cmd = 'convert'
+		cmd += ' "%s"' % infile
+		if correction != '': cmd += ' %s' % correction
+		cmd += ' +matte'
 		cmd += ' -resize %d' % Width
 		if Options.aspect_in > 0 or Options.aspect_out > 0:
 			scale = 100.0
@@ -190,7 +193,6 @@ def reformatAnnotate( infile, outfile):
 			if Options.aspect_out > 0: scale *= Options.aspect_out
 			cmd += ' -resize 100x%f%%' % scale
 		cmd += ' -gravity center -background black -extent %(Width)dx%(Height)d +repage' % globals()
-		if correction != '': cmd += ' %s' % correction
 		if Options.gamma > 0: cmd += ' -gamma %.2f' % Options.gamma
 		# Draw cacher:
 		if Options.cacher_opacity > 0:

@@ -95,6 +95,13 @@ function FilesView( i_args)
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.put();}
 
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'CVT';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.convert();}
+
 	if( this.has_thumbs )
 	{
 		var elThumbDiv = document.createElement('div');
@@ -455,25 +462,6 @@ FilesView.prototype.showFile = function( i_file)
 			cmd = cmd.replace('@FPS@', RULES.fps);
 			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 		}
-
-		var elExplode = document.createElement('div');
-		elFile.appendChild( elExplode);
-		elExplode.classList.add('button');
-		elExplode.textContent = 'Convert';
-		elExplode.title = 'Convert movie or explode to images sequence';
-		elExplode.m_path = path;
-		elExplode.onclick = function(e){ e.stopPropagation(); d_Convert( e.currentTarget.m_path)};
-	}
-
-	if( c_FileIsImage( i_file.name))
-	{
-		var elCvt = document.createElement('div');
-		elFile.appendChild( elCvt);
-		elCvt.classList.add('button');
-		elCvt.textContent = 'JPG';
-		elCvt.m_file = this.path + '/' + i_file.name;
-		elCvt.m_view = this;
-		elCvt.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.imgConvertDialog( e.currentTarget.m_file)};
 	}
 
 	this.showAttrs( elFile, i_file);
@@ -523,15 +511,15 @@ FilesView.prototype.onClick = function( i_evt)
 }
 FilesView.prototype.selectItem = function( i_el, i_select)
 {
-	if( i_select )
-	{
-		i_el.m_selected = true;
-		i_el.classList.add('selected');
-	}
-	else
+	if( i_select === false )
 	{
 		i_el.m_selected = false;
 		i_el.classList.remove('selected');
+	}
+	else
+	{
+		i_el.m_selected = true;
+		i_el.classList.add('selected');
 	}
 }
 FilesView.prototype.selectAll = function( i_select)
@@ -541,6 +529,7 @@ FilesView.prototype.selectAll = function( i_select)
 	if( i_select == false )
 		fv_cur_item = null;
 }
+FilesView.prototype.selectNone = function() { this.selectAll( false); }
 FilesView.prototype.put = function()
 {
 	var args = {};
@@ -552,6 +541,45 @@ FilesView.prototype.put = function()
 		c_Error('No items selected.');
 	else
 		fu_Put( args);
+}
+FilesView.prototype.convert = function()
+{
+	var args = {};
+	args.paths = [];
+	args.filesview = this;
+
+	args.folders = true;
+	args.images = true;
+	args.movies = true;
+
+	for( var i = 0; i < this.elItems.length; i++)
+	{
+		if( this.elItems[i].m_selected != true ) continue;
+
+		if( this.elItems[i].classList.contains('folder') && args.folders )
+		{
+			args.images = false;
+			args.movies = false;
+		}
+		else if( c_FileIsImage( this.elItems[i].m_path) && args.images )
+		{
+			args.folders = false;
+			args.movies = false;
+		}
+		else if( c_FileIsMovie( this.elItems[i].m_path) && args.movies )
+		{
+			args.folders = false;
+			args.images = false;
+		}
+		else
+			continue;
+
+		args.paths.push( this.elItems[i].m_path);
+	}
+	if( args.paths.length < 1 )
+		c_Error('No items selected.');
+	else
+		d_Convert( args);
 }
 
 FilesView.prototype.getItemPath = function( i_path)
@@ -659,26 +687,7 @@ FilesView.prototype.filesDeleted = function( i_data, i_args)
 
 	i_args.this.refresh();
 }
-/*
-function fv_Preview( i_evt)
-{
-	i_evt.stopPropagation();
-	var btn = i_evt.currentTarget;
-	var el = btn.m_el_file;
-	if( el.m_preview )
-	{
-		btn.classList.remove('pushed');
-		btn.innerHTML = '&#9656;';
-		fv_PreviewClose( el);
-	}
-	else
-	{
-		btn.classList.add('pushed');
-		btn.innerHTML = 'X';
-		fv_PreviewOpen( el);
-	}
-	return false;
-}*/
+
 function fv_PreviewOpen( i_el)
 {
 	if( i_el.m_preview ) return;
@@ -810,90 +819,6 @@ function fv_SkipFile( i_filename)
 			return true;
 	return false;
 }
-
-FilesView.prototype.imgConvertDialog = function ( i_file)
-{
-	var wnd = new cgru_Window({"name":'imgconvert',"title":'Image Convert'});
-	wnd.resize( 40, 50);
-	wnd.elContent.classList.add('imgconvert');
-	wnd.m_file = RULES.root + i_file;
-	wnd.m_view = this;
-
-	var elQualityDiv = document.createElement('div');
-	wnd.elContent.appendChild( elQualityDiv);
-	var elQualityLabel = document.createElement('div');
-	elQualityLabel.textContent = 'Quality';
-	elQualityDiv.appendChild( elQualityLabel);
-	elQualityLabel.classList.add('label');
-	var elQualityInfo = document.createElement('div');
-	elQualityInfo.textContent = '100 is the best';
-	elQualityDiv.appendChild( elQualityInfo);
-	elQualityInfo.classList.add('info');
-
-	wnd.elQuality = document.createElement('div');
-	wnd.elQuality.textContent = '75';
-	elQualityDiv.appendChild( wnd.elQuality);
-	wnd.elQuality.classList.add('editing');
-	wnd.elQuality.contentEditable = true;
-
-	var elResolutionDiv = document.createElement('div');
-	wnd.elContent.appendChild( elResolutionDiv);
-	var elResolutionLabel = document.createElement('div');
-	elResolutionLabel.textContent = 'Resolution';
-	elResolutionDiv.appendChild( elResolutionLabel);
-	elResolutionLabel.classList.add('label');
-	var elResolutionInfo = document.createElement('div');
-	elResolutionInfo.textContent = '-1 means original';
-	elResolutionDiv.appendChild( elResolutionInfo);
-	elResolutionInfo.classList.add('info');
-
-	wnd.elResolution = document.createElement('div');
-	wnd.elResolution.textContent = '1280';
-	elResolutionDiv.appendChild( wnd.elResolution);
-	wnd.elResolution.classList.add('editing');
-	wnd.elResolution.contentEditable = true;
-
-	var elButton = document.createElement('div');
-	wnd.elContent.appendChild( elButton);
-	elButton.classList.add('button');
-	elButton.textContent = 'Convert';
-	elButton.m_wnd = wnd;
-	elButton.m_view = this;
-	elButton.onclick = function(e){ e.currentTarget.m_view.imgConvert( e.currentTarget.m_wnd )};
-}
-FilesView.prototype.imgConvert = function( i_wnd)
-{
-	var quality = i_wnd.elQuality.textContent;
-	var resolution = i_wnd.elResolution.textContent;
-
-	var out = i_wnd.m_file;
-	out += '.q' + quality;
-	if( resolution != '-1' )
-		out += '.' + resolution;
-	out += '.jpg';
-
-	var cmd = 'rules/bin/convert.py';
-	cmd += ' -i "' + i_wnd.m_file + '"';
-	cmd += ' -q ' + quality;
-	if( resolution != '-1' ) cmd += ' -r ' + resolution;
-	cmd += ' -o "' + out + '"';
-	i_wnd.destroy();
-
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.imgConverted,"this":this,"file":i_wnd.m_file,"info":'convert',"wait":false,"parse":true});
-}
-FilesView.prototype.imgConverted = function( i_data, i_args)
-{
-	if( i_data.error )
-	{
-		c_Error( i_data.error);
-		return;
-	}
-
-	c_Info('Converted ' + c_PathBase( i_args.file));
-
-	i_args.this.refresh();
-}
-
 
 function fv_ReloadAll()
 {

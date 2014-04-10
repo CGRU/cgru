@@ -416,7 +416,7 @@ function cm_Save( i_el)
 		i_el.m_obj.user_name = i_el.m_obj.guest.id;
 	}
 
-	i_el.m_obj.text = c_MakeLinksRelative( i_el.m_elText.innerHTML);
+	i_el.m_obj.text = c_LinksProcess( i_el.m_elText.innerHTML);
 	i_el.m_obj.color = i_el.m_color;
 	i_el.m_obj.type = i_el.m_type;
 	if( i_el.m_obj.deleted != true )
@@ -451,7 +451,7 @@ function cm_Save( i_el)
 	if( c_NullOrErrorMsg( res)) return;
 	var news_user = i_el.m_obj.user_name;
 	if( i_el.m_obj.muser_name ) news_user = i_el.m_obj.muser_name;
-	nw_MakeNews('<i>comments</i>', g_CurPath(), news_user, i_el.m_obj.guest);
+	nw_MakeNews({"title":'comment',"path":g_CurPath(),"user":news_user,"guest":i_el.m_obj.guest});
 
 	cm_array.push( i_el.m_obj);
 	var emails = [];

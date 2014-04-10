@@ -5,9 +5,9 @@ import re
 import subprocess
 
 from optparse import OptionParser
-Parser = OptionParser(usage="%prog [options] input [second_input] output\ntype \"%prog -h\" for help", version="%prog 1.  0")
+Parser = OptionParser(usage="%prog [options] input\ntype \"%prog -h\" for help", version="%prog 1.  0")
 
-Parser.add_option('-a', '--avconv',    dest='avconv',    type  ='string', default='ffmpeg', help='AV convert command (ffmpeg)')
+Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
 Parser.add_option('-x', '--xres',      dest='xres',      type  ='int',    default=-1,       help='X resolution (no change)')
 Parser.add_option('-y', '--yres',      dest='yres',      type  ='int',    default=-1,       help='Y resolution (no change)')
 Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie cpdec (png)')
@@ -16,6 +16,8 @@ Parser.add_option('-n', '--container', dest='container', type  ='string', defaul
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string', default='',       help='Output movie or images folder (auto)')
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
+Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
+Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default='frame',  help='Images files name (frame)')
 
 (Options, argv) = Parser.parse_args()
@@ -25,22 +27,47 @@ if len(argv) < 1:
 	sys.exit(0)
 
 Input = argv[0]
+Output = Options.output
+if Output == '': Output = Input
 
-if not os.path.isfile( Input):
-	print('ERROR: Input movie file does not exist: ' + Input)
-	sys.exit(1)
+SequenceInput = False
+MovieInput = True
+StartNumber = None
+if os.path.isdir( Input):
+	SequenceInput = True
+	MovieInput = False
+	allfiles = os.listdir( Input)
+	allfiles.sort()
+	for afile in allfiles:
+		if afile[0] == '.': continue
+		if not os.path.isfile( os.path.join( Input, afile)): continue
+		digits = re.findall(r'\d+', afile)
+		if len(digits) == 0: continue
+		digits = digits[-1]
+		StartNumber = int( digits)
+		Input = afile[:afile.find( digits)]
+		Input += '%0' + str(len(digits)) + 'd'
+		Input += afile[afile.find(digits)+len(digits):]
+		Input = os.path.join( argv[0], Input)
+		break
+else:
+	if not os.path.isfile( Input):
+		print('ERROR: Input does not exist: ' + Input)
+		sys.exit(1)
 
 MOVIEMAKER = os.path.dirname( sys.argv[0])
 CODECSDIR  = os.path.join( MOVIEMAKER, 'codecs')
-
-Output = Options.output
-if Output == '': Output = Input
 
 Codec = Options.codec
 
 if Codec == '':
 	Output += '.'+Options.type
-	args = [ Options.avconv,'-y','-i', Input ]
+	args = [Options.avcmd,'-y']
+	if Options.timestart != '':
+		args.extend(['-ss', Options.timestart])
+	args.extend(['-i', Input ])
+	if Options.duration != '':
+		args.extend(['-t', Options.duration])
 	args.extend(['-an','-f','image2'])
 	if Options.type == 'jpg':
 		args.extend(['-qscale', str(Options.qscale)])
@@ -72,13 +99,17 @@ else:
 	cmd_enc = lines[len(lines)-1].strip()
 	if len( cmd_enc) < 2:
 		print('Invalid encode file "%s"' % Codec)
-		sys.exit(1)
+		sys.exit(1)	
 
 	Output += '.' + os.path.basename( Codec.split('.')[0])
 
 	auxargs = []
+	if Options.timestart != '':
+		auxargs.extend(['-ss', Options.timestart])
+	if Options.duration != '':
+		auxargs.extend(['-t', Options.duration])
 	if Options.xres != -1 or Options.yres != -1:
-		auxargs = ['-vf','scale=%d:%d' % (Options.xres,Options.yres)]
+		auxargs.extend(['-vf','scale=%d:%d' % (Options.xres,Options.yres)])
 		if Options.xres != -1: Output += '.'+str(Options.xres)
 		if Options.yres != -1: Output += 'x'+str(Options.yres)
 
@@ -88,17 +119,19 @@ else:
 		if arg_enc[-1] == '"': arg_enc = arg_enc[:-1]
 
 		arg_enc = arg_enc.replace('@MOVIEMAKER@', MOVIEMAKER        )
-		arg_enc = arg_enc.replace('@CODECS@',     CODECSDIR         )
+		arg_enc = arg_enc.replace('@CODECSDIR@',  CODECSDIR         )
 		arg_enc = arg_enc.replace('@INPUT@',      Input             )
 		arg_enc = arg_enc.replace('@FPS@',        Options.fps       )
 		arg_enc = arg_enc.replace('@CONTAINER@',  Options.container )
 		arg_enc = arg_enc.replace('@OUTPUT@',     Output            )
 
-		if arg_enc == '@AUXARGS@':
+		if arg_enc == '@AVCMD@':
+			args.append( Options.avcmd)
+			if StartNumber:
+				args.extend(['-start_number',str(StartNumber)])
+		elif arg_enc == '@AUXARGS@':
 			args.extend( auxargs)
-			continue
-
-		if len( arg_enc):
+		elif len( arg_enc):
 			args.append( arg_enc)
 
 print( args)

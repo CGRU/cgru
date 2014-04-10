@@ -20,7 +20,6 @@
 
 #include "cmd_database.h"
 
-#include "cmd_talk.h"
 #include "cmd_render.h"
 #include "cmd_user.h"
 #include "cmd_monitor.h"
@@ -48,8 +47,6 @@ void AfCmd::RegisterCommands()
 	addCmd( new CmdConfirm);
 	addCmd( new CmdRegExp);
 	addCmd( new CmdInvalid);
-
-	addCmd( new CmdTalkList);
 
 	addCmd( new CmdMonitorList);
 	addCmd( new CmdMonitorLog);

@@ -25,7 +25,7 @@ case ${DISTRIBUTIVE} in
 		;;
 	AltLinux )
 		export DEPENDS_AFANASY="libpq5.4"
-		export DEPENDS_CGRU="python-module-PyQt4 ImageMagick ffmpeg"
+		export DEPENDS_CGRU="python-module-PyQt4 openexr ImageMagick ffmpeg"
 		;;
 	*)
 		export DEPENDS_AFANASY="libpq5"

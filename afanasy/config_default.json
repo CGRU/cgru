@@ -6,6 +6,10 @@
 	"af_serverport":51000,
 	"af_clientport":51001,
 
+		"":"Afanasy server will use IPv6 if it is configured on server interface",
+	"af_ipv6_disable":1,
+		"":"IPv6 is disabled by default, to enable it, set this parameter value to 0",
+
 		"":"Afanasy server HTTP serve folder, if empty CGRU root folder will be used",
 	"-af_http_serve_dir":"/cgru",
 
@@ -70,11 +74,11 @@
 		"":"Network interface to measure traffic, it not specified all used except loopback",
 
 	"af_render_hddspace_path":"/",
-	"af_render_iostat_device":"sda",
+	"af_render_iostat_device":"*",
 
 		"":"Custom resources meters:",
 			"":"example - simple resource meter for an example only",
-			"":"iostat - parce output of linux 'iostat' command, specify device in 'render_customiostat_devices' varibale",
+			"":"iostat - parse output of linux 'iostat' command, specify device in 'render_customiostat_devices' variable",
 	"-af_render_resclasses":["example","iostat"],
 	"-af_render_customiostat_devices":"sda",
 		"":"To specify several devices use regular expressions, for example 'sda[2-4]'",
@@ -93,7 +97,7 @@
 
 "":"Thumbnail:",
 	"af_thumbnail_extensions":["exr","dpx","jpg","jpeg","png","tif","tiff","tga"],
-	"af_thumbnail_cmd":"convert -identify \"%(image)s\" -thumbnail \"100x100^\" -gravity center -extent 100x100 \"%(thumbnail)s\"",
+	"af_thumbnail_cmd":"convert -identify \"%(image)s\" %(pre_args)s -thumbnail \"100x100^\" -gravity center -extent 100x100 -colorspace sRGB \"%(thumbnail)s\"",
 	"-af_thumbnail_naming":"%(job_id)d.%(block_id)d.%(task_id)d.%(thumbnail_filename)s",
 	"-af_thumbnail_http":"http://localhost:80/thumbnails/",
 	"-af_thumbnail_file":"//servername/sharename/thumbnails/",

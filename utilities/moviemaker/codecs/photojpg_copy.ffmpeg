@@ -1,2 +1,2 @@
 PhotoJPG (copy)
-ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec copy @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec copy @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

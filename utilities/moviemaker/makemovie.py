@@ -34,7 +34,8 @@ Parser = OptionParser(usage="%prog [options] input_files_pattern(s)] output\n\
 	Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
 	Type \"%prog -h\" for help", version="%prog 1.0")
 
-Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg_best.ffmpeg', help='File with encode command line in last line')
+Parser.add_option('-a', '--avcmd',      dest='avcmd',       type  ='string',     default='ffmpeg',    help='AV tool command')
+Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg_best', help='Encode command file')
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default='25',        help='Frames per second')
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
@@ -169,12 +170,12 @@ if os.path.dirname( Output) != '' and not os.path.isdir( os.path.dirname( Output
 
 # Encode command:
 # Codec = Codec.lower()
-encoder = Codec.split('.')
-if len(encoder) < 2:
-	encoder = 'ffmpeg'
-	Codec += '.' + encoder
-else: encoder = encoder[-1]
-if Verbose: print('Encoder engine = "%s"' % encoder)
+EncType = Codec.split('.')
+if len(EncType) < 2:
+	EncType = 'ffmpeg'
+	Codec += '.' + EncType
+else: EncType = EncType[-1]
+if Verbose: print('Encoder engine = "%s"' % EncType)
 if os.path.dirname( Codec) == '': Codec = os.path.join( CODECSDIR, Codec)
 if not os.path.isfile( Codec):
 	print('Can`t find codec "%s"' % Codec)
@@ -531,22 +532,23 @@ if Options.scale:
 preview_input = os.path.join( inputdir, prefix+'%0'+str(padding)+'d'+suffix)
 if len(cmd_convert): preview_input = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
 
-if encoder == 'ffmpeg' or encoder == 'nuke': inputmask = preview_input
-elif encoder == 'mencoder':
+if EncType == 'ffmpeg' or EncType == 'nuke': inputmask = preview_input
+elif EncType == 'mencoder':
 	inputmask = os.path.join( inputdir, prefix+'*'+suffix)
 	if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.*.'+TmpFormat)
 else:
-	print('Unknown encoder = "%s"' % encoder)
+	print('Unknown encoder type = "%s"' % EncType)
 	exit(1)
 
-if len(Audio) and encoder == 'ffmpeg':
+if len(Audio) and EncType == 'ffmpeg':
 	inputmask += '" -i "%s"' % Audio
 	inputmask += ' -ar %d' % Options.afreq
 	inputmask += ' -ab %dk' % Options.akbits
 	inputmask += ' -acodec "%s' % Options.acodec
 
+cmd_encode = cmd_encode.replace('@AVCMD@',      Options.avcmd)
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
-cmd_encode = cmd_encode.replace('@CODECS@',     CODECSDIR)
+cmd_encode = cmd_encode.replace('@CODECSDIR@',  CODECSDIR)
 cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
 cmd_encode = cmd_encode.replace('@FPS@',        Options.fps)
 cmd_encode = cmd_encode.replace('@CONTAINER@',  Container)
@@ -554,8 +556,9 @@ cmd_encode = cmd_encode.replace('@OUTPUT@',     Output)
 cmd_encode = cmd_encode.replace('@AUXARGS@',    auxargs)
 
 if cmd_preview:
+	cmd_preview = cmd_preview.replace('@AVCMD@',      Options.avcmd)
 	cmd_preview = cmd_preview.replace('@MOVIEMAKER@', MOVIEMAKER)
-	cmd_preview = cmd_preview.replace('@CODECS@',     CODECSDIR)
+	cmd_preview = cmd_preview.replace('@CODECSDIR@',  CODECSDIR)
 	cmd_preview = cmd_preview.replace('@INPUT@',      preview_input)
 	cmd_preview = cmd_preview.replace('@FPS@',        Options.fps)
 	cmd_preview = cmd_preview.replace('@OUTPUT@',     PFileName)

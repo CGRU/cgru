@@ -31,12 +31,7 @@ id "${nonrootuser}" || nonrootuser=""
 
 # Temp directory:
 tmpdir=/var/tmp/afanasy
-if [ -d "$tmpdir" ]; then
-   # Delete old temporary folders
-   find $tmpdir -type d -mtime +99 -exec rm -rvf {} \;
-   # Delete old temporary files
-   find $tmpdir -mtime +99 -exec rm -vf {} \;
-else
+if [ ! -d "$tmpdir" ]; then
    mkdir $tmpdir
    if [ ! -d "$tmpdir" ]; then
       echo "temp directory was not created"

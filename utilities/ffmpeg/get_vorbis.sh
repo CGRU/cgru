@@ -5,7 +5,7 @@ arch="libogg-$ver.tar.gz"
 [ -f "$arch" ] || wget "http://downloads.xiph.org/releases/ogg/$arch"
 tar xfvz "$arch"
 
-ver="1.3.3"
+ver="1.3.4"
 arch="libvorbis-$ver.tar.gz"
 [ -f "$arch" ] || wget "http://downloads.xiph.org/releases/vorbis/$arch"
 tar xfvz "$arch"

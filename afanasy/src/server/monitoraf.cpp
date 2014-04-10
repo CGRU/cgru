@@ -1,5 +1,7 @@
 #include "monitoraf.h"
 
+#include "../libafanasy/common/dlScopeLocker.h"
+
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -380,6 +382,8 @@ af::Msg * MonitorAf::getEvents()
 	std::ostringstream stream;
 	stream << "{\"events\":";
 	bool hasevents = false;
+
+	DlScopeLocker mutex( &m_mutex);
 
 	// Nodes events:
 	for( int e = 0; e < af::Monitor::EventsCount; e++)

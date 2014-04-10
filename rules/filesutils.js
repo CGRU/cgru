@@ -211,6 +211,8 @@ function fu_ChecksumDo( i_wnd)
 // ########################### Multi Put: #################################
 fu_putmulti_params = {};
 fu_putmulti_params.input = {};
+fu_putmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
+fu_putmulti_params.skiperrors = {"label":'Skip Errors', "bool":false,"width":'50%'};
 fu_putmulti_params.dest = {"label":'Destination'};
 function fu_PutMultiDialog( i_args)
 {
@@ -219,6 +221,10 @@ function fu_PutMultiDialog( i_args)
 	wnd.m_args = i_args;
 
 	var params = {};
+
+	params.input = RULES.assets.shot.result.path.join(',');
+	if( RULES.put.input ) params.input = RULES.put.input;
+
 	if( RULES.put.dest.indexOf('/') !== 0 )
 		if( ASSETS.project )
 			params.dest = ASSETS.project.path + '/' + RULES.put.dest;
@@ -282,6 +288,8 @@ function fu_PutMultiProcessGUI( i_wnd, i_test)
 
 	cmd += ' -i "' + params.input + '"';
 	cmd += ' -u "' + g_auth_user.id + '"';
+	if( params.skipexisting ) cmd += ' -s';
+	if( params.skiperrors ) cmd += ' -e';
 	cmd += ' -c ' + RULES.put.af_capacity;
 	cmd += ' -m ' + RULES.put.af_maxtasks;
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
@@ -322,6 +330,12 @@ function fu_PutMultiFinished( i_data, i_args)
 				msg += ' -> ' + put[i].name;
 				//msg += ' ' + put[i].version;
 				//msg += ' ' + put[i].dst;
+				//console.log( JSON.stringify( put[i]));
+				if( put[i].skipexisting )
+				{
+					msg += ' SKIPPING';
+					el.style.color = '#888';
+				}
 				el.textContent = msg;
 				break;
 			}

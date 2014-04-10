@@ -27,7 +27,15 @@ $GuestCanEdit = array('comments.json');
 $Out = array();
 $Recv = array();
 
+# Encode "Pretty" JSON data:
 if( false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
+function jsonEncode( &$i_obj)
+{
+	if( phpversion() >= "5.3" )
+		return json_encode( $i_obj, JSON_PRETTY_PRINT);
+	else
+		return json_encode( $i_obj);
+}
 
 # Decode input:
 if( isset($_POST['upload_path']))
@@ -172,7 +180,7 @@ function jsf_initialize( $i_arg, &$o_out)
 
 		if( isset( $obj['avatar']) && strlen($obj['avatar']))
 			$user['avatar'] = $obj['avatar'];
-		else if( isset( $obj['email']))
+		else if( isset( $obj['email']) && strlen($obj['email']))
 			$user['avatar'] = 'http://www.gravatar.com/avatar/'.md5( strtolower( trim($obj['email'])));
 
 		$o_out['users'][$obj['id']] = $user;
@@ -198,25 +206,15 @@ function processUser( &$o_out)
 	$editobj['add'] = true;
 	$editobj['file'] = $filename;
 
-	if( false == is_file( $filename))
-	{
-		$user['id'] = $UserID;
-		$user['channels'] = array();
-		$user['news'] = array();
-		$user['ctime'] = time();
-
-		$editobj['object'] = $user;
-		$out = array();
-		jsf_editobj( $editobj, $out);
-	}
-
-	readObj( $filename, $user);
-
+	if( is_file( $filename))
+		readObj( $filename, $user);
 	if( array_key_exists('error', $user))
-	{
 		$o_out['error'] = $user['error'];
-		return;
-	}
+
+	if( false == isset( $user['id']      )) $user['id']       = $UserID;
+	if( false == isset( $user['channels'])) $user['channels'] = array();
+	if( false == isset( $user['news']    )) $user['news']     = array();
+	if( false == isset( $user['ctime']   )) $user['ctime']    = time();
 
 	$user['rtime'] = time();
 	$editobj['object'] = $user;
@@ -842,10 +840,7 @@ function jsf_editobj( $i_edit, &$o_out)
 //error_log('obj:'.json_encode($obj));
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);
-		if( phpversion() >= "5.3" )
-			fwrite( $fHandle, json_encode( $obj, JSON_PRETTY_PRINT));
-		else
-			fwrite( $fHandle, json_encode( $obj));
+		fwrite( $fHandle, jsonEncode( $obj));
 		fclose($fHandle);
 		$o_out['status'] = 'success';
 	}
@@ -897,20 +892,12 @@ function afanasy( $i_obj, &$o_out)
 	$obj = array();
 	$obj['job'] = $i_obj['job'];
 	$data = json_encode( $obj);
-
-	$header = '[ * AFANASY * ]';
-	$header = $header.' '.$i_obj['magick_number'];
-	$header = $header.' '.$i_obj['sender_id'];
-	$header = $header.' '.strlen($data);
-	$header = $header.' JSON';
-
 	$header = 'AFANASY '.strlen($data).' JSON';
 
 	fwrite( $socket, $header.$data);
 	fclose( $socket);
 
 	$o_out['satus'] = 'success';
-//	$o_out['header'] = $header;
 }
 
 function jsf_save( $i_save, &$o_out)
@@ -1047,7 +1034,7 @@ function jsf_makenews( $i_args, &$o_out)
 			mkdir( dirname( $rfile));
 		if( $rhandle = fopen( $rfile, 'w'))
 		{
-			fwrite( $rhandle, json_encode( $rarray));
+			fwrite( $rhandle, jsonEncode( $rarray));
 			fclose($rhandle);
 		}
 
@@ -1061,7 +1048,10 @@ function jsf_makenews( $i_args, &$o_out)
 		if( $path == $path_prev ) break;
 	}
 
+
 	// Process users subsriptions:
+
+	// Read users:
 	$users = array();	
 	if( $fHandle = opendir('users'))
 	{
@@ -1094,46 +1084,66 @@ function jsf_makenews( $i_args, &$o_out)
 		unset( $news['ignore_own']);
 	}
 
+    // Get subscribed users:
+    $sub_users = array();
 	$o_out['users'] = array();
-
 	foreach( $users as &$user )
 	{
 		if( $ignore_own && ( $news['user'] == $user['id']))
 			continue;
 
+		if( array_key_exists( 'artists', $news))
+			if( in_array( $user['id'], $news['artists']))
+			{
+				array_push( $sub_users, $user);
+				array_push( $o_out['users'], $user['id']);
+				continue;
+			}
+
+
 		foreach( $user['channels'] as $channel )
-		{
 			if( strpos( $news['path'], $channel['id'] ) === 0 )
 			{
+				array_push( $sub_users, $user);
 				array_push( $o_out['users'], $user['id']);
-
-				$news['user'] = $news['user'];
-
-				$has_event = false;
-				foreach( $user['news'] as &$event )
-				{
-					if( $event['path'] == $news['path'])
-					{
-						$has_event = true;
-						$event = $news;
-						break;
-					}
-				}
-
-				if( false == $has_event )
-					array_push( $user['news'], $news);
-
-				$filename = 'users/'.$user['id'].'.json';
-				if( $fHandle = fopen( $filename, 'w'))
-				{
-					fwrite( $fHandle, json_encode( $user));
-					fclose($fHandle);
-				}
-//error_log('New wrote in '.$filename);
-
 				break;
 			}
+	}
+
+    // Add news and write files:
+    foreach( $sub_users as &$user)
+    {
+		$has_event = false;
+		foreach( $user['news'] as &$event )
+			if( $event['path'] == $news['path'])
+			{
+				$has_event = true;
+				$event = $news;
+				break;
+			}
+
+		if( false == $has_event )
+			array_push( $user['news'], $news);
+
+		$filename = 'users/'.$user['id'].'.json';
+		if( $fHandle = fopen( $filename, 'w'))
+		{
+			fwrite( $fHandle, jsonEncode( $user));
+			fclose($fHandle);
 		}
+
+		// Send emails
+		if( array_key_exists('email', $user) == false ) continue;
+		if( array_key_exists('email_news', $user) == false ) continue;
+		if( $user['email_news'] != true ) continue;
+
+		$mail = array();
+		$mail['address'] = $user['email'];
+		$mail['subject'] = $i_args['email_subject'];
+		$mail['body'] = $i_args['email_body'];
+
+		$out = array();
+		jsf_sendmail( $mail, $out);
 	}
 }
 
@@ -1729,7 +1739,25 @@ function jsf_sendmail( $i_args, &$o_out)
 	$addr = $i_args['address'];
 	if( strpos( $addr, '@' ) === false )
 		$addr = implode('@', json_decode( base64_decode( $addr)));
-	if( mail( $addr, $i_args['subject'], $i_args['body'], $i_args['headers']))
+
+	$headers = '';
+	$headers = $headers."MIME-Version: 1.0\r\n";
+	$headers = $headers."Content-type: text/html; charset=utf-8\r\n";
+//	$headers = $headers."To: <'+i_address+'>\r\n";
+	$headers = $headers."From: CGRU <noreply@cgru.info>\r\n";
+
+	$subject = $i_args['subject'];
+
+	$body = '';
+	$body = $body.'<html><body>';
+	$body = $body.'<div style="background:#DFA; color:#020; margin:8px; padding:8px; border:2px solid #070; border-radius:9px;">';
+	$body = $body.$subject;
+	$body = $body.'<div style="background:#FFF; color:#000; margin:8px; padding:8px; border:2px solid #070; border-radius:9px;">';
+	$body = $body.$i_args['body'];
+	$body = $body.'</div><a href="cgru.info" style="padding:10px;margin:10px;" target="_blank">CGRU</a>';
+	$body = $body.'</div></body></html>';
+
+	if( mail( $addr, $subject, $body, $headers))
 		$o_out['status'] = 'email sent.';
 	else
 		$o_out['error'] = 'email was not sent.';
