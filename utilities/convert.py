@@ -83,7 +83,10 @@ for input in Inputs:
 		if mkdir: output = os.path.join( mkdir, os.path.basename( afile)) + '.jpg'
 
 		cmd = 'convert'
-		if Options.identify: cmd += ' -identify'
+
+		if Options.afanasy: cmd += ' -identify -verbose'
+		elif Options.identify: cmd += ' -identify'
+
 		cmd += ' "%s"' % afile
 		cmd += ' -flatten'
 
