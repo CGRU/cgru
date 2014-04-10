@@ -487,10 +487,10 @@ const char * Msg::TNAMES[]=
 	"TClientShutdownRequest",     ///< Shutdown client host computer,
 
 	/*- Talk messages -*/
-	"TTalkId",                    ///< Id for new Talk. Server sends it back when new Talk registered.
-	"TTalkUpdateId",              ///< Update Talk with given id ( No information for updating Talk needed).
-	"TTalksListRequest",          ///< Request online Talks list.
-	"TTalkDeregister",            ///< Deregister talk with given id.
+	"DEPRECATED_TTalkId",                    ///< Id for new Talk. Server sends it back when new Talk registered.
+	"DEPRECATED_TTalkUpdateId",              ///< Update Talk with given id ( No information for updating Talk needed).
+	"DEPRECATED_TTalksListRequest",          ///< Request online Talks list.
+	"DEPRECATED_TTalkDeregister",            ///< Deregister talk with given id.
 
 
 	/*- Monitor messages -*/
@@ -561,11 +561,11 @@ const char * Msg::TNAMES[]=
 
 	/*- Talk messages -*/
 	/// Register Talk. Send by Talk client to register. Server sends back its id \c TTalkId.
-	"TTalkRegister",
-	"TTalksListRequestIds",       ///< Request a list of Talks with given ids.
-	"TTalksList",                 ///< Message with a list of online Talks.
-	"TTalkDistributeData",        ///< Message with a list Talk's users and a text to send to them.
-	"TTalkData",                  ///< Message to Talk with text.
+	"DEPRECATED_TTalkRegister",
+	"DEPRECATED_TTalksListRequestIds",       ///< Request a list of Talks with given ids.
+	"DEPRECATED_TTalksList",                 ///< Message with a list of online Talks.
+	"DEPRECATED_TTalkDistributeData",        ///< Message with a list Talk's users and a text to send to them.
+	"DEPRECATED_TTalkData",                  ///< Message to Talk with text.
 
 
 	/*- Monitor messages -*/
