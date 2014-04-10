@@ -82,7 +82,7 @@ af::Msg * af::jsonMsg( const std::string & i_str)
 af::Msg * af::jsonMsgError( const std::string & i_str)
 {
 	std::string str = "{\"error\":\"";
-	str += i_str;
+	str += af::strEscape( i_str);
 	str += "\"}";
 	return af::jsonMsg( str);
 }
