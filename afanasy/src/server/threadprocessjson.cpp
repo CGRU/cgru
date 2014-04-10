@@ -131,9 +131,12 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	
 					if( error.size())
 					{
+						error += "\nCheck task log.";
+						error += "\nIf there is 'update timeout' check firewall.";
+						error += "\nClient should listen a port and server should be able to connect to it.";
 						if( o_msg_response == NULL )
 							o_msg_response = af::jsonMsgError( error);
-						AFCommon::QueueLogError("TTaskOutputRequest: " + error);
+						//AFCommon::QueueLogError("TTaskOutputRequest: " + error);
 					}
 				}
 			}
