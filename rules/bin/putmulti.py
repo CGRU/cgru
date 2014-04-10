@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, shutil, signal, sys, time
+import os, re, shutil, signal, sys, time
 
 import af
 
@@ -13,6 +13,7 @@ Parser = OptionParser(usage="%prog [options] input\n\
    Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
    Type \"%prog -h\" for help", version="%prog 1.0")
 
+Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',    default=3,           help='Version padding')
 Parser.add_option('-i', '--inputs',       dest='inputs',       type  ='string', default='RESULT/JPG',help='Inputs')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string', default='',          help='Destination')
 Parser.add_option('-u', '--afuser',       dest='afuser',       type  ='string', default='put',       help='Afanasy user name')
@@ -35,6 +36,13 @@ def interrupt( signum, frame):
 signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT,  interrupt)
+
+SimilarCharactrers = ' .-()[]{}!'
+def simiralName( i_name):
+	name = i_name.lower()
+	for c in SimilarCharactrers:
+		name = name.replace( c,'_')
+	return name
 
 (Options, args) = Parser.parse_args()
 
@@ -69,10 +77,20 @@ for src in Sources:
 		for item in os.listdir( inp):
 			if item[0] in '._': continue
 			if not os.path.isdir( os.path.join( inp, item)): continue
-			ver = item.replace( name, '').strip('_. ')
+			ver = simiralName( item).replace( simiralName( name), '').strip('!_-. ')
+			ver_digits = re.findall(r'\d+', ver)
+			if len( ver_digits ):
+				ver_digits = ver_digits[0]
+				ver_number = int( ver_digits)
+				ver_number = ('%0'+str(Options.padding)+'d') % ver_number
+				ver = ver.replace( ver_digits, ver_number, 1)
+
+			if len( ver) and ver[0].isdigit(): ver = 'v' + ver
+
 			if version is not None:
 				if version >= ver: continue
 			version = ver
+
 			folder = os.path.join( inp, item)
 
 	if folder is None:
@@ -82,7 +100,9 @@ for src in Sources:
 		else:
 			errExit('Input not founded for: %s' % src)
 
+	if version == '': version = ('v%0'+str(Options.padding)+'d') % 0
 	name += '_' + version
+
 	dest = os.path.join( Options.dest, name)
 	skipexisting = False
 	skipexisting_str = 'false'
