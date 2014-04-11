@@ -14,12 +14,27 @@ const int ParserHost::ms_DataSizeMax   = 1 << 20;
 const int ParserHost::ms_DataSizeHalf  = ParserHost::ms_DataSizeMax  >> 1;
 const int ParserHost::ms_DataSizeShift = ParserHost::ms_DataSizeHalf >> 1;
 
-const char* ParserHost::ms_overload_string =
-"\n\n\n\
-	###########################################################   \n\
-	###   Maximum size reached. Output middle trunctated.   ###   \n\
-	###########################################################   \n\
-\n\n\n";
+const char* ParserHost::ms_overload_string = "\n\
+\n\
+\n\
+\n\
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\
+\n\
+\n\
+\n\
+Maximum size reached. Output middle trunctated.\n\
+\n\
+\n\
+\n\
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n\
+\n\
+\n\
+\n\
+";
 
 ParserHost::ParserHost( af::Service * i_service):
 	m_service( i_service),
@@ -35,7 +50,7 @@ ParserHost::ParserHost( af::Service * i_service):
 	m_overload( false)
 {
 	m_data = new char[ms_DataSizeMax];
-	m_overload_string_length = int(strlen(ms_overload_string)+1);
+	m_overload_string_length = int(strlen(ms_overload_string));
 
 	if( m_data == NULL )
 	{
@@ -122,7 +137,7 @@ bool ParserHost::shiftData( int shift)
 
 void ParserHost::setOverload()
 {
-	strcpy( m_data+ms_DataSizeHalf-m_overload_string_length, ms_overload_string);
+	strncpy( m_data+ms_DataSizeHalf-m_overload_string_length, ms_overload_string, m_overload_string_length);
 	m_overload = true;
 }
 
