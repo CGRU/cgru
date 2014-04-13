@@ -198,6 +198,6 @@ def SubmitButton_OnClicked():
          i += 1
 
       # Send job:
-      if not job.send():
+      if not job.send()[0]:
          Application.LogMessage('Error: Can\'t send job to server.')
          os.remove( tmpscene)

@@ -424,7 +424,7 @@ class RenderOnFarm(plugins.CommandData):
 			job.setCmdPost('deletefiles "%s"' % scenePath)
 
 		# Sending the job to server:
-		if not job.send():
+		if not job.send()[0]:
 			# If there was a problem tell him what happend
 			c4d.gui.MessageDialog('There was a problem with submitting the job.')
 

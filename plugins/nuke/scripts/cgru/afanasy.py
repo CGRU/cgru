@@ -641,7 +641,7 @@ def renderNodes( nodes, fparams, storeframes):
 			os.remove( pm_scenename)
 		else:
 			nuke.scriptSave( scenename)
-		if jobs[i].send() == False:
+		if jobs[i].send()[0] == False:
 			nuke.message('Unable to send job to server.')
 			os.remove( scenename)
 			break

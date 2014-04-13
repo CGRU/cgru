@@ -669,4 +669,6 @@ job.blocks.extend( blocks)
 if Verbose: job.output( True)
 
 # Send Job to server:
-if job.send() == False: sys.exit(1)
+status, data = job.send()
+print( json.dumps( data))
+if not status: sys.exit(1)

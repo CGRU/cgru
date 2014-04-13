@@ -250,7 +250,7 @@ class Job:
 		obj = {"job": self.data }
 		#print(json.dumps( obj))
 
-		return afnetwork.sendServer( json.dumps( obj), False, verbose)[0]
+		return afnetwork.sendServer( json.dumps( obj), True, verbose)
 
 	def setAnnotation(         self, value): self.data["annotation"] = value
 	def setDescription(        self, value): self.data["description"] = value
