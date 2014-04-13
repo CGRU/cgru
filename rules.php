@@ -1138,6 +1138,7 @@ function jsf_makenews( $i_args, &$o_out)
 		if( $user['email_news'] != true ) continue;
 
 		$mail = array();
+		$mail['from_title'] = $i_args['email_from_title'];
 		$mail['address'] = $user['email'];
 		$mail['subject'] = $i_args['email_subject'];
 		$mail['body'] = $i_args['email_body'];
@@ -1740,11 +1741,16 @@ function jsf_sendmail( $i_args, &$o_out)
 	if( strpos( $addr, '@' ) === false )
 		$addr = implode('@', json_decode( base64_decode( $addr)));
 
+	$from_title = 'CGRU';
+	$from_address = 'noreply@cgru.info';
+	if( array_key_exists('from_title', $i_args)) $from_title = $i_args['from_title'];
+	if( array_key_exists('from_address', $i_args)) $from_address = $i_args['from_address'];
+
 	$headers = '';
 	$headers = $headers."MIME-Version: 1.0\r\n";
 	$headers = $headers."Content-type: text/html; charset=utf-8\r\n";
 //	$headers = $headers."To: <'+i_address+'>\r\n";
-	$headers = $headers."From: CGRU <noreply@cgru.info>\r\n";
+	$headers = $headers."From: $from_title <$from_address>\r\n";
 
 	$subject = $i_args['subject'];
 

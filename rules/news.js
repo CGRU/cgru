@@ -278,7 +278,7 @@ function nw_MakeNews( i_args )
 		news.ignore_own = true;
 
 	// If news path is the current we get artists from status, if them not set in input arguments:
-	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status.artists )
+	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status && RULES.status.artists )
 		news.artists = RULES.status.artists;
 
 	var email_subject = c_GetUserTitle( news.user) + ' - ' + news.title;
@@ -288,6 +288,7 @@ function nw_MakeNews( i_args )
 
 	var request = {};
 	request.news = news;
+	request.email_from_title = RULES.company;
 	request.email_subject = email_subject;
 	request.email_body = email_body;
 	request.root = RULES.root;
