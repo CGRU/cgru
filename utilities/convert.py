@@ -12,7 +12,7 @@ Parser = OptionParser( usage="%prog [options] input\ntype \"%prog -h\" for help"
 
 Parser.add_option('-t', '--thumbnail',  dest='thumbnail',  action='store_true', default=False,  help='Thumbnail mode')
 Parser.add_option('-c', '--colorspace', dest='colorspace', type  ='string',     default='auto', help='Input images colorspace')
-Parser.add_option('-r', '--resize',     dest='resize',     type  ='string',     default='',     help='Resize')
+Parser.add_option('-r', '--resize',     dest='resize',     type  ='string',     default='',     help='Resize (1280x720)')
 Parser.add_option('-q', '--quality',    dest='quality',    type  ='int',        default=75,     help='Quality')
 Parser.add_option('-o', '--output',     dest='output',     type  ='string',     default='',     help='Output image')
 Parser.add_option('-A', '--afanasy',    dest='afanasy',    action='store_true', default=False,  help='Use Afanasy')

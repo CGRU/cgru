@@ -400,7 +400,7 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avcmd;
-	if( i_params.cvtres.length ) cmd += ' -x ' + i_params.cvtres;
+	if( i_params.cvtres.length ) cmd += ' -r ' + i_params.cvtres;
 	if( i_params.time_start != d_cvtguiparams.time_start.default )
 		cmd += ' -s ' + i_params.time_start;
 	if( i_params.duration != d_cvtguiparams.duration.default )

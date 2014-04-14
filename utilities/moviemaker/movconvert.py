@@ -8,8 +8,7 @@ from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] input\ntype \"%prog -h\" for help", version="%prog 1.  0")
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
-Parser.add_option('-x', '--xres',      dest='xres',      type  ='int',    default=-1,       help='X resolution (no change)')
-Parser.add_option('-y', '--yres',      dest='yres',      type  ='int',    default=-1,       help='Y resolution (no change)')
+Parser.add_option('-r', '--resize',    dest='resize',    type  ='string', default='',       help='Resize (1280x720)')
 Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie cpdec (png)')
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
 Parser.add_option('-n', '--container', dest='container', type  ='string', default='mov',    help='Movie Container (mov or ogg for theora)')
@@ -73,10 +72,11 @@ if Codec == '':
 		args.extend(['-qscale', str(Options.qscale)])
 		Output += '.q'+str(Options.qscale)
 
-	if Options.xres != -1 or Options.yres != -1:
-		args.extend(['-vf','scale=%d:%d' % (Options.xres,Options.yres)])
-		if Options.xres != -1: Output += '.'+str(Options.xres)
-		if Options.yres != -1: Output += 'x'+str(Options.yres)
+	if Options.resize != '':
+		resize = Options.resize.split('x')
+		if len( resize) < 2: resize.append('-1')
+		args.extend(['-vf','scale=%s:%s' % ( resize[0], resize[1])])
+		Output += '.r%s' % Options.resize
 
 	if not os.path.isdir( Output): os.makedirs( Output)
 	if not os.path.isdir( Output):
@@ -108,10 +108,11 @@ else:
 		auxargs.extend(['-ss', Options.timestart])
 	if Options.duration != '':
 		auxargs.extend(['-t', Options.duration])
-	if Options.xres != -1 or Options.yres != -1:
-		auxargs.extend(['-vf','scale=%d:%d' % (Options.xres,Options.yres)])
-		if Options.xres != -1: Output += '.'+str(Options.xres)
-		if Options.yres != -1: Output += 'x'+str(Options.yres)
+	if Options.resize != '':
+		resize = Options.resize.split('x')
+		if len( resize) < 2: resize.append('-1')
+		auxargs.extend(['-vf','scale=%s:%s' % ( resize[0], resize[1])])
+		Output += '.r%s' % Options.resize
 
 	cmd_enc = cmd_enc.split(' ')
 	for arg_enc in cmd_enc:
