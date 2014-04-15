@@ -15,7 +15,7 @@ d_guiparams.aspect_in = {"label":'Aspect In',"width":'25%',"lwidth":'70px'};
 d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 
 d_cvtguiparams = {};
-d_cvtguiparams.cvtres = {"label":'Resolution',"info":'on empty no changes'};
+d_cvtguiparams.cvtres = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
 d_cvtguiparams.fps = {"label":'FPS'};
 d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
 d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
