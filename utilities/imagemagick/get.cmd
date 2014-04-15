@@ -3,17 +3,17 @@ set filename=ImageMagick-windows.zip
 set location=ftp://ftp.imagemagick.org/pub/ImageMagick/windows
 
 if exist %filename% (
-   echo File %filename% already exists. Skipping download.
+	echo File %filename% already exists. Skipping download.
 ) else (
-   wget %location%/%filename%
+	wget %location%/%filename%
 )
 
 7z x %filename%
 
-set config=ImageMagick-6.7.1\VisualMagick\magick\magick-config.h.in
+set config=ImageMagick-6.8.8\VisualMagick\magick\magick-baseconfig.h.in
 if not exist %config% (
-   echo Config file "%config%" not founded.
-   exit
+	echo Config file "%config%" not founded.
+	exit
 )
 
 echo off
