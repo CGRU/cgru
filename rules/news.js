@@ -289,7 +289,7 @@ function nw_MakeNews( i_args )
 	var request = {};
 	request.news = news;
 	request.email_from_title = c_EmailFromTitle();
-	request.email_subject = email_subject + ': ' + c_PathBase( news.path);
+	request.email_subject = email_subject;
 	request.email_body = email_body;
 	request.root = RULES.root;
 	request.rufolder = RULES.rufolder;
