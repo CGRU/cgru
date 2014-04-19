@@ -261,7 +261,7 @@ function n_GetRuFile( i_file, i_nockeck )
 function n_SendMail( i_address, i_subject, i_body)
 {
 	var obj = {};
-	obj.from_title = RULES.company;
+	obj.from_title = c_EmailFromTitle();
 	obj.address = c_EmailEncode( i_address);
 	obj.subject = i_subject;
 
