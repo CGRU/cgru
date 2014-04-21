@@ -1401,7 +1401,7 @@ af::Msg * JobAf::writeThumbnail( bool i_binary)
 	{
 		af::MCTaskUp taskup( -1, getId(), -1, -1);
 		taskup.addFile( m_thumb_path, m_thumb_data, m_thumb_size);
-		return new af::Msg( af::Msg::TTaskOutput, &taskup);
+		return new af::Msg( af::Msg::TTaskFiles, &taskup);
 	}
 
 	return NULL;

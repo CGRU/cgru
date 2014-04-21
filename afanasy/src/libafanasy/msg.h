@@ -251,10 +251,10 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTaskUpdatePercent/**/,         ///< New progress percentage for task.
 /**/TTaskUpdateState/**/,           ///< New state for task.
 /**/TTaskListenOutput/**/,          ///< Request to send task output to provided address.
-/**/TTaskOutput/**/,                ///< Job task output data.
+/**/TTaskFiles/**/,                 ///< Task (or entire job) files
 /**/TTasksRun/**/,                  ///< Job tasks run data.
 
-/**/TRESERVED10/**/,
+/**/TTaskOutput/**/,                ///< Job task output data (for task listening: from afrender directly to afwatch).
 /**/TRESERVED11/**/,
 /**/TRESERVED12/**/,
 /**/TRESERVED13/**/,

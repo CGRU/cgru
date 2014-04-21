@@ -343,7 +343,7 @@ void Dialog::newMessage( af::Msg *msg)
             new WndText( "Message", msg);
         break;
     }
-	case af::Msg::TTaskOutput:
+	case af::Msg::TTaskFiles:
 	{
 		af::MCTaskUp taskup( msg);
 		Watch::filesReceived( taskup);

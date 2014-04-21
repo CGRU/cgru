@@ -379,7 +379,7 @@ af::Msg * Task::getStoredFiles() const
 		}
 	}
 
-	return new af::Msg( af::Msg::TTaskOutput, &taskup);
+	return new af::Msg( af::Msg::TTaskFiles, &taskup);
 }
 
 void Task::getStoredFiles( std::ostringstream & i_str) const
