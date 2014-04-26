@@ -21,6 +21,9 @@ ftp -in $dest <<END_SCRIPT
 quote USER $FTP_USER
 quote PASS $FTP_PASS
 
+cd www
+cd cgru.info
+
 mkdir rules
 cd rules
 mput *.html *.php *.txt
