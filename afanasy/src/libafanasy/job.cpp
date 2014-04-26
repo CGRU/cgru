@@ -235,12 +235,14 @@ bool Job::isValid( std::string * o_err) const
 	}
 
 	bool valid = true;
-	if( err->size()) valid = false;
-	if( o_err == NULL )
+	if( err->size())
 	{
-		AFERRAR("Invalid job '%s'[%d]:\n%s", m_name.c_str(), m_id, err->c_str())
-		delete err;
+		valid = false;
+		AFERRAR("Invalid job '%s'[%d]:\n%s\n", m_name.c_str(), m_id, err->c_str())
 	}
+
+	if( o_err == NULL )
+		delete err;
 
 	return valid;
 }
