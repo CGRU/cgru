@@ -161,7 +161,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 		}
 		else
 		{
-			send_stream = false;
+			send = false;
 		}
 	}
 
