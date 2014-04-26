@@ -16,7 +16,7 @@
 			"frames_inc"        : 2,
 			"command"           : "nuke -F@#@,@#@ -x scene.nk -X Write1",
 			"working_directory" : "/home/jimmy/work",
-			"files"             : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
+			"files"             : ["folder/img_L.@####@.jpg","folder/img_R.@####@.jpg"]
 		}
 		]
 	}

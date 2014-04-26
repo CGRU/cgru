@@ -43,7 +43,7 @@
 			"need_properties"            : "nvidia",
 			"command"                    : "nuke -F@#@,@#@ -x scene.nk -X Write1",
 			"working_directory"          : "/home/jimmy/work",
-			"files"                      : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg",
+			"files"                      : ["folder/img_L.@####@.jpg","folder/img_R.@####@.jpg"],
 			"command_post"               : "deletefiles scene.nk"
 		},
 		{
@@ -64,22 +64,22 @@
 			"multihost_master_on_slave"  : false,
 			"command"                    : "generate @#@",
 			"working_directory"          : "/home/jimmy/work",
-			"files"                      : "folder/@#@.jpg",
+			"files"                      : ["folder/@#@.jpg"],
 			"tasks":[
 			{
 				"name"                   : "Process A",
 				"command"                : "-a file_a",
-				"files"                  : "file_a"
+				"files"                  : ["file_a"]
 			},
 			{
 				"name"                   : "Process B",
 				"command"                : "-b file_b",
-				"files"                  : "file_b"
+				"files"                  : ["file_b"]
 			},
 			{
 				"name"                   : "Process C",
 				"command"                : "-c file_c",
-				"files"                  : "file_c"
+				"files"                  : ["file_c"]
 			}
 			]
 		}
