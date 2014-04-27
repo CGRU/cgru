@@ -71,19 +71,11 @@ void threadAcceptClient( void * i_arg )
     }
     freeaddrinfo( res);
 
-#if defined (WINNT)
-    printf("Disable listening IPv6 for MS Windows.\n");
-    protocol = AF_INET;
-#elif defined (MACOSX)
-    printf("Disable listening IPv6 for Mac OS X.\n");
-    protocol = AF_INET;
-#endif
-
-    if( af::Environment::hasArgument("-noIPv6"))
-    {
-        printf("IPv6 is disabled.\n");
-        protocol = AF_INET;
-    }
+	if( af::Environment::isIPv6Disabled())
+	{
+		printf("IPv6 is disabled by config.\n");
+		protocol = AF_INET;
+	}
 
     switch(protocol)
     {

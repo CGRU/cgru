@@ -23,7 +23,9 @@ public:
 
     static void setListeningPort( uint16_t i_port);
 
-    inline static bool isListening() { return m_listening; }
+    inline static bool isListening() { return ms_listening; }
+
+	inline static bool noOutputRedirection() { return ms_no_output_redirection; }
 
     inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
     static void dispatchMessage( af::Msg * i_msg);
@@ -78,7 +80,9 @@ private:
 
     static std::vector<TaskProcess*> ms_tasks;
 
-    static bool m_listening;
+    static bool ms_listening;
+
+	static bool ms_no_output_redirection;
 
     DlMutex m_mutex;
 //    DlRWLock m_mutex;

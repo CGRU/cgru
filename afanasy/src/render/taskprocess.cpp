@@ -130,11 +130,6 @@ void TaskProcess::launchCommand()
 		closeHandles();
 
 	#ifdef WINNT
-	/*	Test a command w/o output redirection:
-    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, 0, 0, 0,
-		CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
-		m_pid = m_pinfo.dwProcessId;*/
-
 	DWORD priority = NORMAL_PRIORITY_CLASS;
 	int nice = af::Environment::getRenderNice();
 	if( nice >   0 ) priority = BELOW_NORMAL_PRIORITY_CLASS;
@@ -143,13 +138,26 @@ void TaskProcess::launchCommand()
 	if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;
 
 	// For MSWIN we need to CREATE_SUSPENDED to attach process to a job before it can spawn any child:
-    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr,
-		CREATE_SUSPENDED | priority ))
-		m_pid = m_pinfo.dwProcessId;
+	if( RenderHost::noOutputRedirection())
+	{
+		// Test a command w/o output redirection:
+	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, 0, 0, 0,
+			CREATE_SUSPENDED | priority ))
+			m_pid = m_pinfo.dwProcessId;
+	}
+	else
+	{
+	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr,
+			CREATE_SUSPENDED | priority ))
+			m_pid = m_pinfo.dwProcessId;
+	}
 	#else
 	// For UNIX we can ask child prcocess to call a function to setup after fork()
 	fp_setupChildProcess = setupChildProcess;
-	m_pid = af::launchProgram( m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr);
+	if( RenderHost::noOutputRedirection())
+		m_pid = af::launchProgram( m_cmd, m_wdir, 0, 0, 0);
+	else
+		m_pid = af::launchProgram( m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr);
 	#endif
 
 	if( m_pid <= 0 )
@@ -176,11 +184,14 @@ void TaskProcess::launchCommand()
 
 	#else
 	// On UNIX we set buffers and non-blocking:
-	setbuf( m_io_output, m_filebuffer_out);
-	setbuf( m_io_outerr, m_filebuffer_err);
-	setNonblocking( fileno( m_io_input));
-	setNonblocking( fileno( m_io_output));
-	setNonblocking( fileno( m_io_outerr));
+	if( false == RenderHost::noOutputRedirection())
+	{
+		setbuf( m_io_output, m_filebuffer_out);
+		setbuf( m_io_outerr, m_filebuffer_err);
+		setNonblocking( fileno( m_io_input));
+		setNonblocking( fileno( m_io_output));
+		setNonblocking( fileno( m_io_outerr));
+	}
 
 	printf("\nStarted PID=%d SID=%d(%d) GID=%d(%d): ", m_pid, getsid(m_pid), setsid(), getpgid(m_pid), getpgrp());
 
@@ -214,9 +225,12 @@ TaskProcess::~TaskProcess()
 
 void TaskProcess::closeHandles()
 {
-	fclose( m_io_input);
-	fclose( m_io_output);
-	fclose( m_io_outerr);
+	if( false == RenderHost::noOutputRedirection())
+	{
+		fclose( m_io_input);
+		fclose( m_io_output);
+		fclose( m_io_outerr);
+	}
 }
 
 void TaskProcess::refresh()
@@ -322,6 +336,8 @@ void TaskProcess::close()
 
 void TaskProcess::readProcess( const std::string & i_mode)
 {
+	if( RenderHost::noOutputRedirection()) return;
+
 	std::string output;
 
 	int readsize = readPipe( m_io_output);

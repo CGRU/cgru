@@ -25,13 +25,16 @@ int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
 bool RenderHost::ms_connected = false;
 std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
-bool RenderHost::m_listening = false;
+bool RenderHost::ms_listening = false;
+bool RenderHost::ms_no_output_redirection = false;
 std::vector<std::string> RenderHost::ms_windowsmustdie;
 
 RenderHost::RenderHost():
 	af::Render( Client::GetEnvironment)
 {
     ms_obj = this;
+
+	if( af::Environment::hasArgument("-nor")) ms_no_output_redirection = true;
 
     ms_msgAcceptQueue   = new af::MsgQueue("Messages Accept Queue",   af::AfQueue::e_no_thread    );
     ms_msgDispatchQueue = new af::MsgQueue("Messages Dispatch Queue", af::AfQueue::e_start_thread );
@@ -105,7 +108,7 @@ RenderHost::~RenderHost()
 void RenderHost::setListeningPort( uint16_t i_port)
 {
     ms_obj->m_address.setPort( i_port);
-    m_listening = true;
+    ms_listening = true;
     if( af::Environment::isVerboseMode())
         printf("RenderHost::setListeningPort = %d\n", i_port);
 }

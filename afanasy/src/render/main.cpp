@@ -69,17 +69,15 @@ int main(int argc, char *argv[])
 	// Fill command arguments:
 	ENV.addUsage("-nimby", "Set initial state to 'nimby'.");
 	ENV.addUsage("-NIMBY", "Set initial state to 'NIMBY'.");
-	std::string cmdArgName = "-cmd";
-	ENV.addUsage( cmdArgName + " [command]", "Run command only, do not connect to server.");
-	std::string checkResourcesModeCmdArg = "-res";
-	ENV.addUsage( checkResourcesModeCmdArg, "Check host resources only and quit.");
-	ENV.addUsage("-noIPv6", "Disable IPv6.");
+	ENV.addUsage( std::string("-cmd") + " [command]", "Run command only, do not connect to server.");
+	ENV.addUsage("-res", "Check host resources only and quit.");
+	ENV.addUsage("-nor", "No output redirection.");
 	// Help mode, usage is alredy printed, exiting:
 	if( ENV.isHelpMode() )
 		return 0;
 
 	// Check resources and exit:
-	if( ENV.hasArgument( checkResourcesModeCmdArg) )
+	if( ENV.hasArgument("-res"))
 	{
 		af::Host host;
 		af::HostRes hostres;
@@ -94,10 +92,10 @@ int main(int argc, char *argv[])
 	}
 
 	// Run command and exit
-	if( ENV.hasArgument( cmdArgName))
+	if( ENV.hasArgument("-cmd"))
 	{
 		std::string command;
-		ENV.getArgument( cmdArgName, command);
+		ENV.getArgument("-cmd", command);
 		printf("Test command mode:\n%s\n", command.c_str());
 
 		pid_t m_pid;
@@ -119,7 +117,6 @@ int main(int argc, char *argv[])
 			pid = -1;
 		}
 		#else
-		// For UNIX we can ask child prcocess to call a function to setup after fork()
 		m_pid = af::launchProgram( command, "", 0, 0, 0);
 		pid = waitpid( m_pid, &status, 0);
 		#endif
