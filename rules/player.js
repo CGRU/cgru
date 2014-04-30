@@ -114,7 +114,7 @@ function p_Init()
 	}
 	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
 
-	u_DrawColorBars( $('paint_palette'), p_ColorOnClick, 25);
+	u_DrawColorBars({"el":$('paint_palette'),"onclick":p_PaintColorSet,"height":25});
 	p_el.view.onmousedown = p_ViewOnMouseDown;
 	p_el.view.onmousemove = p_ViewOnMouseMove;
 	p_el.view.onmouseup = p_ViewOnMouseUp;
@@ -873,12 +873,6 @@ function p_ViewOnMouseOver()
 	p_paintCtx = null;
 }
 
-function p_ColorOnClick( e)
-{
-	var clrEl = e.currentTarget;
-	el = clrEl.parentNode.parentNode.parentNode;
-	p_PaintColorSet(clrEl.m_color);
-}
 function p_PaintColorSet( i_clr)
 {
 	if( i_clr == null )

@@ -294,7 +294,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elColor = document.createElement('div');
 	st_elRoot.appendChild( st_elColor);
 	st_elColor.classList.add('color');
-	u_DrawColorBars( st_elColor, st_EditColorOnClick);
+	u_DrawColorBars({"el":st_elColor,"onclick":st_EditColorOnClick});
 
 	st_SetElAnnotation( st_status, st_elAnn);
 	st_SetElColor( st_status);
@@ -358,11 +358,9 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 	}
 }
 
-function st_EditColorOnClick( i_evt)
+function st_EditColorOnClick( i_clr)
 {
-	var el = i_evt.currentTarget;
-	st_status.color = el.m_color
-//console.log( st_status);
+	st_status.color = i_clr;
 	st_SetElColor( st_status);
 }
 

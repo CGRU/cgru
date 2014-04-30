@@ -1,8 +1,15 @@
 cm_file = 'comments.json';
 cm_durations = ['.1','.2','.3','.5','1','2','3','4','5','6','7','8','9','10','11','12','14','16','20','24','32','40','48','66','99'];
 cm_array = [];
+cm_goto_key = null;
 
 function View_comments_Open() { cm_Load(); }
+
+function cm_Finish()
+{
+	cm_array = [];
+	cm_goto_key = null;
+}
 
 function cm_Load()
 {
@@ -17,6 +24,7 @@ function cm_Load()
 		$('comments_btn_0').style.display = 'block';
 		$('comments_btn_1').style.display = 'none';
 	}
+
 	cm_array = [];
 
 	if( false == c_RuFileExists( cm_file)) return;
@@ -31,233 +39,230 @@ function cm_Received( obj, i_args)
 	if( obj == null ) return;
 	if( obj.comments == null ) return;
 
+	var obj_array = [];
 	for( key in obj.comments )
 	{
 		obj.comments[key].key = key;
-		cm_array.push( obj.comments[key]);
+		obj_array.push( obj.comments[key]);
 	}
 
-	cm_array.sort( function(a,b){if(a.key<b.key)return -1;if(a.key>b.key)return 1;return 0;});
+	obj_array.sort( function(a,b){if(a.key<b.key)return -1;if(a.key>b.key)return 1;return 0;});
 
 	var i = 0;
-	for( var i = 0; i < cm_array.length; i++)
-		cm_Add( cm_array[i]);
+	for( var i = 0; i < obj_array.length; i++)
+		cm_array.push( new Comment( obj_array[i]));
 
-/*	if( ASSET && ASSET.comments_reversed ) i = cm_array.length - 1;
-	while(( i >= 0 ) && ( i < cm_array.length ))
-	{
-		cm_Add( cm_array[i]);
-		if( ASSET && ASSET.comments_reversed ) i--;
-		else i++;
-	}*/
+	cm_GotoKey();
 }
 
-function cm_Add( i_obj)
+function cm_NewOnClick()
+{
+	var comment = new Comment();
+	comment.edit();
+}
+
+function Comment( i_obj) 
 {
 //window.console.log( JSON.stringify( i_obj));
-	var el = document.createElement('div');
+	this.el = document.createElement('div');
 	if( ASSET && ASSET.comments_reversed )
-		$('comments').appendChild( el);
+		$('comments').appendChild( this.el);
 	else
-		$('comments').insertBefore( el, $('comments').firstChild);
-	el.classList.add('comment');
+		$('comments').insertBefore( this.el, $('comments').firstChild);
+	this.el.classList.add('comment');
+	this.el.m_comment = this;
 
-	var elPanel = document.createElement('div');
-	el.appendChild( elPanel);
-	elPanel.classList.add('panel');
-	el.m_elPanel = elPanel;
+	this.elPanel = document.createElement('div');
+	this.el.appendChild( this.elPanel);
+	this.elPanel.classList.add('panel');
 
-	var elEdit = document.createElement('div');
-	elPanel.appendChild( elEdit);
-	elEdit.classList.add('button');
-	elEdit.textContent = 'Edit';
-	elEdit.title = 'Edit comment (admins only).';
-	elEdit.onclick = function(e){cm_Edit(e.currentTarget.m_el);}
-	elEdit.m_el = el;
-	el.m_elEdit = elEdit;
+	this.elEdit = document.createElement('div');
+	this.elPanel.appendChild( this.elEdit);
+	this.elEdit.classList.add('button');
+	this.elEdit.textContent = 'Edit';
+	this.elEdit.title = 'Edit comment (admins only).';
+	this.elEdit.onclick = function(e){ e.currentTarget.m_comment.edit();};
+	this.elEdit.m_comment = this;
 
-	var elEditBtnsDiv = document.createElement('div');
-	elPanel.appendChild( elEditBtnsDiv);
-	elEditBtnsDiv.classList.add('edit_btns_div');
-	el.m_elEditBtnsDiv = elEditBtnsDiv;
+	this.elEditBtnsDiv = document.createElement('div');
+	this.elPanel.appendChild( this.elEditBtnsDiv);
+	this.elEditBtnsDiv.classList.add('edit_btns_div');
 
-	var elCancel = document.createElement('div');
-	elEditBtnsDiv.appendChild( elCancel);
-	elCancel.classList.add('button');
-	elCancel.textContent = 'Cancel';
-	elCancel.onclick = function(e){cm_Cancel(e.currentTarget.m_el)};
-	elCancel.m_el = el;
+	this.elCancel = document.createElement('div');
+	this.elEditBtnsDiv.appendChild( this.elCancel);
+	this.elCancel.classList.add('button');
+	this.elCancel.textContent = 'Cancel';
+	this.elCancel.m_comment = this;
+	this.elCancel.onclick = function(e){ e.currentTarget.m_comment.editCancel();};
 
-	var elSave = document.createElement('div');
-	elEditBtnsDiv.appendChild( elSave);
-	elSave.classList.add('button');
-	elSave.textContent = 'Save';
-	elSave.onclick = function(e){cm_Save(e.currentTarget.m_el)};
-	elSave.m_el = el;
+	this.elSave = document.createElement('div');
+	this.elEditBtnsDiv.appendChild( this.elSave);
+	this.elSave.classList.add('button');
+	this.elSave.textContent = 'Save';
+	this.elSave.m_comment = this;
+	this.elSave.onclick = function(e){ e.currentTarget.m_comment.save();};
 
-	var elRemMU = document.createElement('div');
-	elEditBtnsDiv.appendChild( elRemMU);
-	elRemMU.classList.add('button');
-	elRemMU.textContent = 'Remove all markup';
-	elRemMU.title = 'Double click to all remove markup from comment.';
-	elRemMU.m_el = el;
-	elRemMU.ondblclick = function(e){c_elMarkupRemove(e.currentTarget.m_el.m_elText)};
+	this.elRemMU = document.createElement('div');
+	this.elEditBtnsDiv.appendChild( this.elRemMU);
+	this.elRemMU.classList.add('button');
+	this.elRemMU.textContent = 'Remove all markup';
+	this.elRemMU.title = 'Double click to remove all markup from comment.';
+	this.elRemMU.m_comment = this;
+	this.elRemMU.ondblclick = function(e){ c_elMarkupRemove( e.currentTarget.m_comment.elText)};
 
-	var elDel = document.createElement('div');
-	elEditBtnsDiv.appendChild( elDel);
-	elDel.classList.add('button');
-	elDel.textContent = 'Delete';
-	elDel.title = 'Double click to delete comment.';
-	elDel.ondblclick = function(e){cm_Delete(e.currentTarget.m_el)};
-	elDel.m_el = el;
-	el.m_elDel = elDel;
+	this.elDel = document.createElement('div');
+	this.elEditBtnsDiv.appendChild( this.elDel);
+	this.elDel.classList.add('button');
+	this.elDel.textContent = 'Delete';
+	this.elDel.title = 'Double click to delete comment.';
+	this.elDel.ondblclick = function(e){ e.currentTarget.m_comment.destroy();};
+	this.elDel.m_comment = this;
 
-	var elType = document.createElement('a');
-	elPanel.appendChild( elType);
-	elType.classList.add('tag');
-	elType.classList.add('type');
-	elType.style.cssFloat = 'left';
-	el.m_elType = elType;
+	this.elType = document.createElement('a');
+	this.elPanel.appendChild( this.elType);
+	this.elType.classList.add('tag');
+	this.elType.classList.add('type');
+	this.elType.style.cssFloat = 'left';
 
-	var elAvatar = document.createElement('img');
-	elAvatar.classList.add('avatar');
-	elPanel.appendChild( elAvatar);
-	el.m_elAvatar = elAvatar;
+	this.elAvatar = document.createElement('img');
+	this.elAvatar.classList.add('avatar');
+	this.elPanel.appendChild( this.elAvatar);
 
-	var elUser = document.createElement('div');
-	elUser.classList.add('user');
-	elPanel.appendChild( elUser);
-	el.m_elUser = elUser;
+	this.elUser = document.createElement('div');
+	this.elUser.classList.add('user');
+	this.elPanel.appendChild( this.elUser);
 
-	var elDuration = document.createElement('div');
-	elDuration.classList.add('duration');
-	elPanel.appendChild( elDuration);
-	el.m_elDuration = elDuration;
 
-	var elDate = document.createElement('div');
-	elDate.classList.add('date');
-	elPanel.appendChild( elDate);
-	el.m_elDate = elDate;
+	this.elReport = document.createElement('div');
+	this.elPanel.appendChild( this.elReport);
+	this.elReport.style.display = 'none';
+	this.elReport.classList.add('report');
 
-	var elModified = document.createElement('div');
-	elModified.classList.add('modified');
-	elPanel.appendChild( elModified);
-	el.m_elModified = elModified;
+	this.elDuration = document.createElement('div');
+	this.elDuration.classList.add('duration');
+	this.elReport.appendChild( this.elDuration);
 
-	var elText = document.createElement('div');
-	el.appendChild( elText);
-	elText.classList.add('text');
-	el.m_elText = elText;
+	this.elTags = document.createElement('div');
+	this.elTags.classList.add('tags');
+	this.elReport.appendChild( this.elTags);
 
-	var elTypesDiv = document.createElement('div');
-	el.appendChild( elTypesDiv);
-	elTypesDiv.classList.add('types');
-	el.m_elTypesDiv = elTypesDiv;
-	el.m_elTypes = [];
-	for( var type in RULES.comments )
-	{
-		eltp = document.createElement('div');
-		elTypesDiv.appendChild( eltp);
-		eltp.classList.add('tag');
-		eltp.textContent = RULES.comments[type].title;
-		eltp.m_type = type;
-		eltp.m_el = el;
-		eltp.onclick = function(e){ cm_TypeOnClick( e.currentTarget.m_el, e.currentTarget.m_type);};
-		st_SetElColor({"color":RULES.comments[type].color}, eltp);
-	}
 
-	var elForEdit = document.createElement('div');
-	el.appendChild( elForEdit);
-	el.m_elForEdit = elForEdit;
+	this.elDate = document.createElement('div');
+	this.elDate.classList.add('date');
+	this.elPanel.appendChild( this.elDate);
 
-	var elUploads = document.createElement('div');
-	el.appendChild( elUploads);
-	elUploads.classList.add('uploads');
-	elUploads.style.display = 'none';
-	el.m_elUploads = elUploads;
+	this.elModified = document.createElement('div');
+	this.elModified.classList.add('modified');
+	this.elPanel.appendChild( this.elModified);
 
-	el.m_obj = i_obj;
-	cm_Init( el);
-	return el;
+	this.elText = document.createElement('div');
+	this.el.appendChild( this.elText);
+	this.elText.classList.add('text');
+
+	this.elForEdit = document.createElement('div');
+	this.el.appendChild( this.elForEdit);
+
+	this.elUploads = document.createElement('div');
+	this.el.appendChild( this.elUploads);
+	this.elUploads.classList.add('uploads');
+	this.elUploads.style.display = 'none';
+
+	this.obj = i_obj;
+	this.init();
 }
 
-function cm_Init( i_el)
+Comment.prototype.init = function() 
 {
-	i_el.m_elForEdit.innerHTML = '';
-	if( i_el.m_elEditPanel ) i_el.m_elPanel.removeChild( i_el.m_elEditPanel);
+	this.elTags.textContent = '';
+	this.elForEdit.innerHTML = '';
 
-	i_el.m_elEditBtnsDiv.style.display = 'none';
-	i_el.m_elTypesDiv.style.display = 'none';
+	this.elEditBtnsDiv.style.display = 'none';
+
 	if( g_admin )
-		i_el.m_elEdit.style.display = 'block';
+		this.elEdit.style.display = 'block';
 	else
-		i_el.m_elEdit.style.display = 'none';
+		this.elEdit.style.display = 'none';
 
-	i_el.m_elText.contentEditable = 'false';
-	i_el.m_elText.classList.remove('editing');
-	i_el.m_elText.style.color = localStorage.text_color;
+	this.elText.contentEditable = 'false';
+	this.elText.classList.remove('editing');
+	this.elText.style.color = localStorage.text_color;
 
 	if( localStorage.back_comments && ( localStorage.back_comments != ''))
-		i_el.m_elText.style.background = localStorage.back_comments;
+		this.elText.style.background = localStorage.back_comments;
 	else if( localStorage.background && ( localStorage.background != '' ))
-		i_el.m_elText.style.background = localStorage.background;
+		this.elText.style.background = localStorage.background;
 
 	var avatar = null;
-	if( i_el.m_obj == null )
+	if( this.obj == null )
 	{
-		i_el.m_obj = {};
-		i_el.m_obj.ctime = (new Date()).getTime();
-		i_el.m_new = true;
+		this.obj = {};
+		this.obj.ctime = (new Date()).getTime();
+		this._new = true;
 		if( g_auth_user )
-			i_el.m_obj.user_name = g_auth_user.id;
+			this.obj.user_name = g_auth_user.id;
 	}
 
-	if( i_el.m_obj.user_name )
+	if( this.obj.user_name )
 	{
-		i_el.m_elUser.textContent = c_GetUserTitle( i_el.m_obj.user_name, i_el.m_obj.guest);
-		avatar = c_GetAvatar( i_el.m_obj.user_name, i_el.m_obj.guest);
+		this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
+		avatar = c_GetAvatar( this.obj.user_name, this.obj.guest);
 	}
 
 	if( avatar != null )
 	{
-		i_el.m_elAvatar.src = avatar;
-		i_el.m_elAvatar.style.display = 'block';
+		this.elAvatar.src = avatar;
+		this.elAvatar.style.display = 'block';
 	}
 	else
-		i_el.m_elAvatar.style.display = 'none';
+		this.elAvatar.style.display = 'none';
 
-	cm_SetElType( i_el.m_obj.type, i_el.m_elType, i_el);
-	if( i_el.m_obj.key )
+	this.setElType( this.obj.type);
+	if( this.obj.key )
+		this.elType.href = g_GetLocationArgs({"cm_Goto":this.obj.key});
+
+	this.type = this.obj.type;
+
+	if( this.obj.tags && this.obj.tags.length )
 	{
-		i_el.m_elType.href = g_GetLocationArgs({"cm_Goto":i_el.m_obj.key});
-		i_el.id = i_el.m_obj.key;
-	}
-	i_el.m_type = i_el.m_obj.type;
-
-	i_el.m_elDate.textContent = c_DT_StrFromMSec( i_el.m_obj.ctime);
-	if( i_el.m_obj.duration ) i_el.m_elDuration.textContent = i_el.m_obj.duration;
-	else i_el.m_elDuration.textContent = ' ';
-
-	if( i_el.m_obj.mtime )
-	{
-		var date = c_DT_StrFromMSec( i_el.m_obj.mtime);
-		i_el.m_elModified.textContent = 'Modified: ' + c_GetUserTitle(i_el.m_obj.muser_name)+' '+date;
-	}
-
-	if( i_el.m_obj.text )
-		i_el.m_elText.innerHTML = i_el.m_obj.text;
-
-	if( i_el.m_obj.uploads && ( i_el.m_uploads_created != true ))
-	{
-//console.log( JSON.stringify(i_el.m_obj.uploads));
-		i_el.m_uploads_created = true;
-		i_el.m_elUploads.style.display = 'block';
-		for( var i = 0; i < i_el.m_obj.uploads.length; i++)
+		for( var i = 0; i < this.obj.tags.length; i++ )
 		{
-			var up = i_el.m_obj.uploads[i];
+			var tag = this.obj.tags[i];
 
 			var el = document.createElement('div');
-			i_el.m_elUploads.appendChild( el);
+			this.elTags.appendChild( el);
+			el.classList.add('tag');
+
+			if( RULES.tags[tag].title )
+				el.textContent = RULES.tags[tag].title;
+			else
+				el.textContent = tag;
+		}
+	}
+
+	this.elDate.textContent = c_DT_StrFromMSec( this.obj.ctime);
+	if( this.obj.duration && this.obj.duration > 0 )
+		this.elDuration.textContent = this.obj.duration;
+
+	if( this.obj.mtime )
+	{
+		var date = c_DT_StrFromMSec( this.obj.mtime);
+		this.elModified.textContent = 'Modified: ' + c_GetUserTitle( this.obj.muser_name)+' '+date;
+	}
+
+	if( this.obj.text )
+		this.elText.innerHTML = this.obj.text;
+
+	if( this.obj.uploads && ( this.uploads_created != true ))
+	{
+//console.log( JSON.stringify( this.obj.uploads));
+		this.uploads_created = true;
+		this.elUploads.style.display = 'block';
+		for( var i = 0; i < this.obj.uploads.length; i++)
+		{
+			var up = this.obj.uploads[i];
+
+			var el = document.createElement('div');
+			this.elUploads.appendChild( el);
 			el.classList.add('path');
 
 			c_CreateOpenButton( el, up.path);
@@ -270,45 +275,49 @@ function cm_Init( i_el)
 			elLink.textContent = dir;
 
 			for( var f = 0; f < up.files.length; f++)
-				cm_ShowFile( el, up.path, up.files[f]);
+				this.showFile( up.path, up.files[f]);
 		}
 	}
 
-	i_el.m_color = i_el.m_obj.color;
+	this.color = this.obj.color;
 
-	st_SetElColor({"color":i_el.m_color}, i_el, null, false);
+	st_SetElColor({"color":this.color}, this.el, null, false);
 
-	if( i_el.m_obj.deleted )
-		i_el.style.display = 'none';
+	if( this.obj.deleted )
+		this.el.style.display = 'none';
 }
 
-function cm_SetElType( i_type, i_elType, i_elColor)
+Comment.prototype.setElType = function( i_type)
 {
-	if( i_elColor == null ) i_elColor = i_elType;
+	this.elReport.style.display = 'none';
+
 	if( i_type )
 	{
 		if( RULES.comments[i_type] )
 		{
-			i_elType.textContent = RULES.comments[i_type].title;
-			st_SetElColor({"color":RULES.comments[i_type].color}, i_elColor);
+			this.elType.textContent = RULES.comments[i_type].title;
+			st_SetElColor({"color":RULES.comments[i_type].color}, this.el);
 		}
 		else
 		{
-			i_elType.textContent = i_type;
-			i_elColor.style.color = 'inherit';
-			st_SetElColor( null, i_elColor);
+			this.elType.textContent = i_type;
+			this.el.style.color = 'inherit';
+			st_SetElColor( null, this.el);
 		}
+
+		if( i_type == 'report' )
+			this.elReport.style.display = 'block';
 	}
 	else
 	{
-		i_elType.textContent = 'Comment';
-		st_SetElColor( null, i_elColor);
+		this.elType.textContent = 'Comment';
+		st_SetElColor( null, this.el);
 	}
 }
 
-function cm_Edit( i_el)
+Comment.prototype.edit = function()
 {
-	if( i_el.m_new != true )
+	if( this._new != true )
 	{
 		if( g_auth_user == null )
 		{
@@ -320,127 +329,164 @@ function cm_Edit( i_el)
 			c_Error('You can`t edit comments.');
 			return;
 		}
-		i_el.m_elDel.style.display = 'block';
+		this.elDel.style.display = 'block';
 	}
 	else
-		i_el.m_elDel.style.display = 'none';
+		this.elDel.style.display = 'none';
 
-	i_el.m_elEdit.style.display = 'none';
-	i_el.m_elEditBtnsDiv.style.display = 'block';
-	i_el.m_elTypesDiv.style.display = 'block';
+	this.elEdit.style.display = 'none';
+	this.elEditBtnsDiv.style.display = 'block';
 
-	i_el.m_elEditPanel = u_EditPanelCreate( i_el.m_elPanel);
+	this.elEditPanel = u_EditPanelCreate( this.elForEdit);
 
-	var elDCtrl = document.createElement('div');
-	i_el.m_elForEdit.appendChild( elDCtrl);
-	elDCtrl.classList.add('edit_duration');
-	i_el.m_elDCtrl = elDCtrl;
+	this.elEditTypesDiv = document.createElement('div');
+	this.elForEdit.appendChild( this.elEditTypesDiv);
+	this.elEditTypesDiv.style.clear = 'both';
+	for( var type in RULES.comments )
+	{
+		var el = document.createElement('div');
+		this.elEditTypesDiv.appendChild( el);
+		el.classList.add('tag');
+		el.textContent = RULES.comments[type].title;
+		el.m_type = type;
+		el.m_comment = this;
+		el.onclick = function(e){ e.currentTarget.m_comment.setType( e.currentTarget.m_type);};
+		st_SetElColor({"color":RULES.comments[type].color}, el);
+	}
 
-	var elDLabel = document.createElement('div');
-	elDCtrl.appendChild( elDLabel);
-	elDLabel.textContent = 'Duration:';
+	this.elEditTags = document.createElement('div');
+	this.elForEdit.appendChild( this.elEditTags);
+	this.elEditTags.classList.add('list');
+	this.elEditTags.classList.add('tags');
+	this.elEditTags.textContent = 'Tags:';
+	this.elEditTags.m_elTags = [];
+	for( var tag in RULES.tags)
+	{
+		var el = document.createElement('div');
+		this.elEditTags.appendChild( el);
+		el.classList.add('tag');
+		el.m_tag = tag;
+		el.onclick = c_ElToggleSelected;
 
-	var elDrtn = document.createElement('div');
-	elDCtrl.appendChild( elDrtn);
-	elDrtn.classList.add('editing');
-	elDrtn.contentEditable = 'true';
-	i_el.m_elDrtn = elDrtn;
-	if( i_el.m_obj.duration ) i_el.m_elDrtn.textContent = i_el.m_obj.duration;
+		if( RULES.tags[tag].title ) el.textContent = RULES.tags[tag].title;
+		else el.textContent = tag;
+
+		if( this.obj.tags )
+			if( this.obj.tags.indexOf( tag) != -1 )
+				el.classList.add('selected');
+
+		this.elEditTags.m_elTags.push( el);
+	}
+
+	var elDurationDiv = document.createElement('div');
+	this.elForEdit.appendChild( elDurationDiv);
+	elDurationDiv.classList.add('edit_duration');
+
+	var elDurationLabel = document.createElement('div');
+	elDurationDiv.appendChild( elDurationLabel);
+	elDurationLabel.textContent = 'Duration:';
+
+	this.elEditDuration = document.createElement('div');
+	elDurationDiv.appendChild( this.elEditDuration);
+	this.elEditDuration.classList.add('editing');
+	this.elEditDuration.contentEditable = 'true';
+	if( this.obj.duration ) this.elEditDuration.textContent = this.obj.duration;
 
 	for( var i = 0; i < cm_durations.length; i++)
 	{
-		var elDr = document.createElement('div');
-		elDCtrl.appendChild( elDr);
-		elDr.classList.add('sample')
-		elDr.textContent = cm_durations[i];
-		elDr.m_elDrtn = elDrtn;
-		elDr.onclick = function(e){e.currentTarget.m_elDrtn.textContent = e.currentTarget.textContent;}
+		var el = document.createElement('div');
+		elDurationDiv.appendChild( el);
+		el.classList.add('sample')
+		el.textContent = cm_durations[i];
+		el.m_elDrtn = this.elEditDuration;
+		el.onclick = function(e){ e.currentTarget.m_elDrtn.textContent = e.currentTarget.textContent;}
 	}
 
-	var elColor = document.createElement('div');
-	i_el.m_elForEdit.appendChild( elColor);
-	i_el.m_elColor = elColor;
-	u_DrawColorBars( elColor, cm_ColorOnclick);
+	this.elColor = document.createElement('div');
+	this.elForEdit.appendChild( this.elColor);
+	u_DrawColorBars({"el":this.elColor,"onclick":cm_ColorOnclick,"data":this});
 
 	if( g_auth_user == null )
-		u_GuestAttrsDraw( i_el.m_elForEdit);
+		u_GuestAttrsDraw( this.elForEdit);
 
-	i_el.m_elText.classList.add('editing');
-	i_el.m_elText.contentEditable = 'true';
-	i_el.m_elText.style.color = '#000000';
-	i_el.m_elText.style.background = '#DDDDDD';
-	i_el.m_elText.focus();
+	this.elText.classList.add('editing');
+	this.elText.contentEditable = 'true';
+	this.elText.style.color = '#000000';
+	this.elText.style.background = '#DDDDDD';
+	this.elText.focus();
 }
 
-function cm_TypeOnClick( i_el, i_type)
+function cm_ColorOnclick( i_clr, i_data) { i_data.setColor( i_clr); }
+Comment.prototype.setColor = function( i_clr)
 {
-	i_el.m_type = i_type;
-//	i_el.m_elType.textContent = RULES.comments[i_type].title;
-	cm_SetElType( i_type, i_el.m_elType, i_el);
-	st_SetElColor({"color":i_el.m_color}, i_el, null, false);
+	this.color = i_clr;
+	this.setElType( this.type);
+	st_SetElColor({"color":this.color}, this.el, null, false);
 }
 
-function cm_ColorOnclick( e)
+Comment.prototype.setType = function( i_type)
 {
-	var clrEl = e.currentTarget;
-	el = clrEl.parentNode.parentNode.parentNode;
-	el.m_color = clrEl.m_color;
-	cm_SetElType( el.m_type, el.m_elType, el);
-	st_SetElColor({"color":el.m_color}, el, null, false);
+	this.type = i_type;
+	this.setElType( i_type);
+	st_SetElColor({"color":this.color}, this.el, null, false);
 }
 
-function cm_Cancel( i_el)
+Comment.prototype.editCancel = function()
 {
-	if( i_el.m_new )
-		$('comments').removeChild( i_el);
+	if( this._new )
+		$('comments').removeChild( this.el);
 	else
-		cm_Init( i_el);
+		this.init();
 }
 
-function cm_NewOnClick()
+Comment.prototype.destroy = function()
 {
-	cm_Edit( cm_Add());
+	this.obj.deleted = true;
+	this.save();
 }
 
-function cm_Delete( i_el)
-{
-	i_el.m_obj.deleted = true;
-	cm_Save( i_el);
-}
-
-function cm_Save( i_el)
+Comment.prototype.save = function()
 {
 	if( g_auth_user == null )
 	{
-		i_el.m_obj.guest = u_GuestAttrsGet( i_el.m_elForEdit);
-		i_el.m_obj.user_name = i_el.m_obj.guest.id;
+		this.obj.guest = u_GuestAttrsGet( this.elForEdit);
+		this.obj.user_name = this.obj.guest.id;
 	}
 
-	i_el.m_obj.text = c_LinksProcess( i_el.m_elText.innerHTML);
-	i_el.m_obj.color = i_el.m_color;
-	i_el.m_obj.type = i_el.m_type;
-	if( i_el.m_obj.deleted != true )
-		cm_ProcessUploads( i_el.m_obj);
+	this.obj.text = c_LinksProcess( this.elText.innerHTML);
+	this.obj.color = this.color;
+	this.obj.type = this.type;
+	if( this.obj.deleted != true )
+		this.processUploads();
 
-	var duration = parseFloat( i_el.m_elDrtn.textContent);
+	this.obj.tags = [];
+	for( var i = 0; i < this.elEditTags.m_elTags.length; i++)
+	{
+		var el = this.elEditTags.m_elTags[i];
+		if( el.classList.contains('selected'))
+		this.obj.tags.push( el.m_tag);
+	}
+
+	this.obj.duration = -1;
+	var duration = parseFloat( this.elEditDuration.textContent);
 	if( false == isNaN( duration ))
-		i_el.m_obj.duration = duration;
+		this.obj.duration = duration;
 
-	if( i_el.m_new )
-		i_el.m_new = false;
+	if( this._new )
+		this._new = false;
 	else
 	{
-		i_el.m_obj.mtime = (new Date()).getTime();
-		i_el.m_obj.muser_name = g_auth_user.id;
+		this.obj.mtime = (new Date()).getTime();
+		this.obj.muser_name = g_auth_user.id;
 	}
 
-	var key = i_el.m_obj.ctime+'_'+i_el.m_obj.user_name;
+	var key = this.obj.ctime + '_' + this.obj.user_name;
 
-	i_el.m_obj.key = key;
-	cm_Init( i_el);
+	this.obj.key = key;
+	this.init();
 
 	var comments = {};
-	comments[key] = i_el.m_obj;
+	comments[key] = this.obj;
 	var edit = {};
 	edit.object = {"comments":comments};
 	edit.add = true;
@@ -449,58 +495,42 @@ function cm_Save( i_el)
 //window.console.log( JSON.stringify( edit));
 	res = c_Parse( n_Request({"send":{"editobj":edit}}));
 	if( c_NullOrErrorMsg( res)) return;
-	var news_user = i_el.m_obj.user_name;
-	if( i_el.m_obj.muser_name ) news_user = i_el.m_obj.muser_name;
-	nw_MakeNews({"title":'comment',"path":g_CurPath(),"user":news_user,"guest":i_el.m_obj.guest});
 
-	cm_array.push( i_el.m_obj);
+	var news_user = this.obj.user_name;
+	if( this.obj.muser_name ) news_user = this.obj.muser_name;
+	nw_MakeNews({"title":'comment',"path":g_CurPath(),"user":news_user,"guest":this.obj.guest});
+
+	cm_array.push( this);
+
 	var emails = [];
 	if( RULES.status && RULES.status.body && RULES.status.body.guest && RULES.status.body.guest.email )
 		emails.push( RULES.status.body.guest.email);
 	for( var i = 0; i < cm_array.length; i++)
 	{
-		var cm = cm_array[i];
+		var cm = cm_array[i].obj;
 		if( cm.guest && cm.guest.email && cm.guest.email.length && ( emails.indexOf( cm.guest.email) == -1 ))
 			emails.push( cm.guest.email);
 	}
-	if( emails.length )
-		cm_EmailGuests( i_el.m_obj, emails);
-}
 
-function cm_EmailGuests( i_cm, i_emails)
-{
-	for( var i = 0; i < i_emails.length; i++)
+	for( var i = 0; i < emails.length; i++)
 	{
-		var email = c_EmailDecode( i_emails[i]);
+		var email = c_EmailDecode( emails[i]);
 		if( false == c_EmailValidate( email)) continue;
 		var subject = 'RULES Comment: '+g_CurPath();
-		var href = g_GetLocationArgs({"cm_Goto":i_cm.key}, true);
+		var href = g_GetLocationArgs({"cm_Goto":this.obj.key}, true);
 		var body = '<a href="'+href+'" target="_blank">'+href+'</a>';
 		body += '<br><br>';
-		body += i_cm.text;
+		body += this.obj.text;
 		body += '<br><br>';
-		var user = c_GetUserTitle( i_cm.user_name, i_cm.guest);
+		var user = c_GetUserTitle( this.obj.user_name, this.obj.guest);
 		body += user;
-		if( user != i_cm.user_name ) body += ' ['+i_cm.user_name+']';
+		if( user != this.obj.user_name ) body += ' ['+this.obj.user_name+']';
 
 		n_SendMail( email, subject, body);
 	}
 }
 
-function cm_Goto( i_name )
-{
-	if( localStorage['view_comments'] !== 'true' )
-		u_OpenCloseView( 'comments', true, true);
-	var el = $(i_name);
-	if( el == null )
-	{
-		c_Error('Comment with key='+i_name+' not founded.');
-		return;
-	}
-	el.scrollIntoView();
-}
-
-function cm_ProcessUploads( i_obj)
+Comment.prototype.processUploads = function()
 {
 	var upfiles = [];
 	for( var i = 0; i < up_elFiles.length; i++)
@@ -537,13 +567,13 @@ function cm_ProcessUploads( i_obj)
 	}
 
 //console.log( JSON.stringify( uploads));
-	i_obj.uploads = uploads;
+	this.obj.uploads = uploads;
 }
 
-function cm_ShowFile( i_el, i_path, i_file)
+Comment.prototype.showFile = function( i_path, i_file)
 {
 	var el = document.createElement('div');
-	i_el.appendChild( el);
+	this.el.appendChild( el);
 	el.classList.add('file');
 
 	var elThumb = document.createElement('img');
@@ -568,5 +598,24 @@ function cm_ShowFile( i_el, i_path, i_file)
 	elGoto.classList.add('goto');
 	elGoto.textContent = i_file.name;
 	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto":i_path+'/'+i_file.name});
+}
+
+function cm_Goto( i_name ) { cm_goto_key = i_name; }
+function cm_GotoKey()
+{
+	if( cm_goto_key == null ) return;
+
+	if( localStorage['view_comments'] !== 'true' )
+		u_OpenCloseView( 'comments', true, true);
+
+	for( var i = 0; i < cm_array.length; i++)
+		if( cm_array[i].obj.key == cm_goto_key )
+		{
+			cm_array[i].el.scrollIntoView();
+			return;
+		}
+
+	c_Error('Comment with key=' + cm_goto_key + ' not founded.');
+	cm_goto_key = null;
 }
 

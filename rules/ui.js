@@ -137,6 +137,7 @@ function u_Finish()
 	nw_Finish();
 	a_Finish();
 	fv_Finish();
+	cm_Finish();
 
 	u_ViewsFuncsClose();
 
@@ -347,13 +348,19 @@ function u_SidePanelOpen()
 
 function u_RulesShow() { cgru_ShowObject( RULES, 'RULES '+g_CurPath()); }
 
-function u_DrawColorBars( i_el, i_onclick, i_height)
+//function u_DrawColorBars( i_el, i_onclick, height)
+function u_DrawColorBars( i_args)
 {
-	if( i_height == null )
-		i_height = '20px';
+	var height = i_args.height;
+	var elParent = i_args.el;
+	var onclick = i_args.onclick;
+	var data = i_args.data;
+
+	if( height == null )
+		height = '20px';
 	else
-		i_height = Math.round( i_height/3 )+'px';
-	i_el.classList.add('colorbars');
+		height = Math.round( height/3 )+'px';
+	elParent.classList.add('colorbars');
 	var ccol = 35;
 	var crow = 3;
 	var cstep = 5;
@@ -361,14 +368,13 @@ function u_DrawColorBars( i_el, i_onclick, i_height)
 	for( var cr = 0; cr < crow; cr++)
 	{
 		elRaw = document.createElement('div');
-		i_el.appendChild( elRaw);
+		elParent.appendChild( elRaw);
 		for( var cc = 0; cc < ccol; cc++)
 		{
 			el = document.createElement('div');
 			elRaw.appendChild( el);
 			el.style.width = 100/ccol + '%';
-			el.style.height = i_height;
-			el.onclick = i_onclick;
+			el.style.height = height;
 
 			var r = 0, g = 0, b = 0;
 			r = ( ( cc % cstep ) + 1 ) / ( cstep + 1 );
@@ -406,6 +412,9 @@ function u_DrawColorBars( i_el, i_onclick, i_height)
 				el.m_color = [r,g,b];
 			}
 //window.console.log('rgb('+r+','+g+','+b+')');
+
+			el.m_data = data;
+			el.onclick = function(e){ onclick( e.currentTarget.m_color, e.currentTarget.m_data);};
 		}
 	}
 }

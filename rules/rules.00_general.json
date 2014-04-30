@@ -25,11 +25,9 @@
 },
 
 "comments":{
-	"message":{"title":"Message","color":[150,200,100]},
-	"report" :{"title":"Report" ,"color":[200,200,100]},
-	"review" :{"title":"Review" ,"color":[150,10,10]},
-	"client" :{"title":"Client" ,"color":[20,100,20]},
-	"generic":{"title":"generic"}
+	"report" :{"title":"Report" ,"color":[100,200,100]},
+	"client" :{"title":"Client" ,"color":[200,200,100]},
+	"message":{"title":"Message","color":[150,150,200]}
 },
 
 "assets":{
