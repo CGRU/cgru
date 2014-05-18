@@ -10,9 +10,11 @@ class events(service.service):
 	'Events Trigger'
 	def __init__( self, task_info):
 		service.service.__init__( self, task_info)
-		data = self.command
-		self.command = ''
+		data = self.taskInfo['command']
+		self.taskInfo['command'] = ''
+
 		#print('Event data:\n%s' % data)
+
 		try:
 			if not isinstance( data, str):
 				data = str( data, 'utf-8')
@@ -40,11 +42,28 @@ class events(service.service):
 			return
 
 		# Combine objects:
-		obj = {}
-		# Get object from user in any:
-		if 'user' in objects: obj = objects['user']
-		# Update with job object in any:
-		if 'job' in objects: obj.update( objects['job'])
+		obj = dict()
+		# Update with user custom object in any:
+		if 'custom_data' in objects['user']:
+			try:
+				obj.update( json.loads( objects['user']['custom_data']))
+			except:
+				print('JSON error in user custom data:')
+				print( objects['user']['custom_data'])
+				print( sys.exc_info()[1])
+				return
+		# Update with job custom object in any:
+		if 'custom_data' in objects['job']:
+			try:
+				obj.update( json.loads( objects['job']['custom_data']))
+			except:
+				print('JSON error in job custom data:')
+				print( objects['job']['custom_data'])
+				print( sys.exc_info()[1])
+				return
+
+		#print('Custom data:')
+		#print( json.dumps( obj))
 
 		if len( obj ) == 0:
 			#print('No configured data founded.')
@@ -96,5 +115,5 @@ class events(service.service):
 			cmd += ' "User Name: %s<br>"' % task_info['user_name']
 			cmd += ' "Job Name: %s"' % task_info['job_name']
 			print(cmd)
-			self.command = cmd
+			self.taskInfo['command'] = cmd
 

@@ -1049,18 +1049,25 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 			// Processing command for system job is some events happened:
 			if( events.size())
 			{
-				std::string cmd = "{\n";
-				if( m_user->getCustomData().size()) cmd += "\"user\":" + m_user->getCustomData();
-				if( m_custom_data.size()) cmd += ",\n\"job\":" + m_custom_data;
-				cmd += ",\n\"events\":[";
+				std::ostringstream str;
+				str << "{";
+
+				str << "\n\"user\":";
+				m_user->v_jsonWrite( str, af::Msg::TUsersList);
+
+				str << ",\n\"job\":";
+				v_jsonWrite( str, af::Msg::TJobsList);
+
+				str << ",\n\"events\":[";
+
 				for( int i = 0; i < events.size(); i++ )
 				{
-					if( i ) cmd += ',';
-					cmd = cmd + '"' + events[i] + '"';
+					if( i ) str << ',';
+					str << '"' << events[i] << '"';
 				}
-				cmd += "]\n}";
+				str << "]\n}";
 
-				SysJob::AddEventCommand( cmd,
+				SysJob::AddEventCommand( str.str(),
 					"", // working directory - no matter
 					m_user_name, m_name, events[0]);
 			}
