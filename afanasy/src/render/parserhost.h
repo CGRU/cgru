@@ -40,13 +40,11 @@ private:
 	int                m_datasize;
 	static const int   ms_DataSizeMax;
 	static const int   ms_DataSizeHalf;
-	static const int   ms_DataSizeShift;
+	static const int   ms_DataShiftMin;
 	bool               m_overload;
 	static const char* ms_overload_string;
 	int                m_overload_string_length;
 
 private:
-	void setOverload();
-	bool shiftData( int offset);
 	void parse( const std::string & i_mode, std::string & output);
 };

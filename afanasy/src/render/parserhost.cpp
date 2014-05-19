@@ -10,9 +10,9 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const int ParserHost::ms_DataSizeMax   = 1 << 20;
-const int ParserHost::ms_DataSizeHalf  = ParserHost::ms_DataSizeMax  >> 1;
-const int ParserHost::ms_DataSizeShift = ParserHost::ms_DataSizeHalf >> 1;
+const int ParserHost::ms_DataSizeMax   = 1 << 20; // 1 Mega Byte
+const int ParserHost::ms_DataSizeHalf  = ParserHost::ms_DataSizeMax  >> 1; // A half of the maximum
+const int ParserHost::ms_DataShiftMin = ParserHost::ms_DataSizeHalf >> 1; // A quater of the maximum
 
 const char* ParserHost::ms_overload_string = "\n\
 \n\
@@ -54,57 +54,97 @@ ParserHost::ParserHost( af::Service * i_service):
 
 	if( m_data == NULL )
 	{
-		printf( "ParserHost::ParserHost(): Can`t allocate memory for data.");
+		AFERROR("ParserHost::ParserHost(): Can`t allocate memory for data.")
 		return;
 	}
 }
 
 ParserHost::~ParserHost()
 {
-	if( m_data   != NULL) delete [] m_data;
+	if( m_data != NULL) delete [] m_data;
 }
 
 void ParserHost::read( const std::string & i_mode, std::string & output)
 {
 	parse( i_mode, output);
-	const char * out_data = output.data();
-	int          out_size = output.size();
 
+	// writing output in buffer:
+	//
+	const char * copy_data = output.data();
+	int          copy_size = output.size();
+//printf("\nParserHost::read: size = %d ( datasize = %d )\n", copy_size, m_datasize);
 #ifdef AFOUTPUT
-printf("\"");for(int c=0;c<out_size;c++)if(out_data[c]>=32)printf("%c", out_data[c]);printf("\":\n");
+printf("\"");for(int c=0;c<out_size;c++)if(copy_size[c]>=32)printf("%c", copy_size[c]);printf("\":\n");
 #endif
 
-	// writing output in buffer
-	//
-//printf("\nParser::read: size = %d ( datasize = %d )\n", size, datasize);
-	const char * copy_data = out_data;
-	int          copy_size = out_size;
-	if( (m_datasize+output.size()) > ms_DataSizeMax )
+	// Output can reach its limit.
+	// In this case we shift it to cut the middle,
+	// considering that all usueful information is in the begging and the end.
+	if( m_datasize + copy_size > ms_DataSizeMax )
 	{
-//printf("(datasize+size) > DataSizeMax : (%d+%d)>%d\n", datasize, size, DataSizeMax);
+//printf("m_datasize + copy_size > ms_DataSizeMax : %d + %d > %d\n", m_datasize, copy_size, ms_DataSizeMax);
+
 		if( m_datasize < ms_DataSizeHalf )
 		{
-			memcpy( m_data+m_datasize, out_data, ms_DataSizeHalf-m_datasize);
-			copy_data = out_data + ms_DataSizeHalf - m_datasize ;
-			copy_size = out_size - ( ms_DataSizeHalf - m_datasize);
+			// Current data size is less than a half,
+			// We need to copy portion to reach the half:
+			memcpy( m_data+m_datasize, copy_data, ms_DataSizeHalf - m_datasize);
+			copy_data = copy_data + ms_DataSizeHalf - m_datasize;
+			copy_size = copy_size - ( ms_DataSizeHalf - m_datasize );
 			m_datasize = ms_DataSizeHalf;
 		}
 
-		int sizeShift = ms_DataSizeShift;
-		if( m_datasize+copy_size-sizeShift > ms_DataSizeMax ) sizeShift = m_datasize + copy_size - ms_DataSizeMax;
-//printf("sizeShift=%d\n", sizeShift);
-		if( sizeShift < m_datasize-ms_DataSizeHalf ) shiftData( sizeShift);
-		else
+		// If new portion size is a half or more,
+		// no existing data shifting is needed
+		if( copy_size >= ms_DataSizeHalf )
 		{
-			copy_data = out_data + copy_size - ms_DataSizeHalf;
+			// We copy new data just a half from the end:
+			copy_data = copy_data + copy_size - ms_DataSizeHalf;
 			copy_size = ms_DataSizeHalf;
 			m_datasize  = ms_DataSizeHalf;
-//printf("sizeShift >= datasize-DataSizeHalf ( %d >= %d-%d )\n", sizeShift, datasize, DataSizeHalf);
+//printf("copy_size >= ms_DataSizeHalf ( %d >= %d )\n", copy_size, ms_DataSizeHalf );
 		}
-		if( m_overload == false ) setOverload();
+		else
+		{
+			int shift = m_datasize + copy_size - ms_DataSizeMax;
+
+			// If we can shift by a quater, we do it:
+			if(( shift < ms_DataShiftMin ) && ( m_datasize > ms_DataSizeHalf + ms_DataShiftMin ))
+			{
+				shift = ms_DataShiftMin;
+				// - this needed to prevent data shifting for each new incoming byte
+			}
+
+			// Shifting existing data:
+			int move_size = m_datasize - ms_DataSizeHalf - shift;
+			// This should be always > 0, as copy_size < ms_DataSizeHalf
+			// explanation:
+			//int move_size = m_datasize - ms_DataSizeHalf - m_datasize - copy_size + ms_DataSizeMax;
+			//int move_size = - ms_DataSizeHalf - copy_size + ms_DataSizeMax;
+			//int move_size = ms_DataSizeHalf - copy_size;
+
+//printf("shift = %d, size = %d\n", shift, move_size);
+			if( move_size > 0 )
+			{
+				// - just check if this algorithm has a bag
+				memmove( m_data+ms_DataSizeHalf, m_data+ms_DataSizeHalf+shift, move_size);
+				m_datasize -= shift;
+			}
+			else
+				AFERRAR("ParserHost::read: move_size = %d < 0", move_size)
+		}
+
+		// Copy overload sting just before the middle of the data, if it was not yet:
+		if( m_overload == false )
+		{
+//printf("Copying overload string.\n");
+			strncpy( m_data+ms_DataSizeHalf-m_overload_string_length, ms_overload_string, m_overload_string_length);
+			m_overload = true;
+		}
+
 	}
 
-//printf("memcpy: datasize=%d, copysize=%d, size=%d\n", datasize, copy_size, size);
+//printf("memcpy: datasize=%d, copysize=%d\n", m_datasize, copy_size);
 
 	memcpy( m_data+m_datasize, copy_data, copy_size);
 	m_datasize += copy_size;
@@ -120,25 +160,6 @@ fflush( stdout);
 #endif*/
 
 //printf("end: datasize = %d\n", datasize);
-}
-
-bool ParserHost::shiftData( int shift)
-{
-	if( shift < 0 )
-	{
-		AFERRAR("ParserHost::shiftData: shift < 0 (%d<0)\n", shift);
-		return false;
-	}
-	if( shift == 0 ) return true;
-	memcpy( m_data+ms_DataSizeHalf, m_data+ms_DataSizeHalf+shift, m_datasize-ms_DataSizeHalf-shift);
-	m_datasize -= shift;
-	return true;
-}
-
-void ParserHost::setOverload()
-{
-	strncpy( m_data+ms_DataSizeHalf-m_overload_string_length, ms_overload_string, m_overload_string_length);
-	m_overload = true;
 }
 
 void ParserHost::parse( const std::string & i_mode, std::string & output)

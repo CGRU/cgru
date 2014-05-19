@@ -21,7 +21,7 @@ print('Started at ' + strftime('%A %d %B %H:%M:%S'))
 from optparse import OptionParser
 parser = OptionParser(usage='usage: %prog [options]', version='%prog 1.0')
 parser.add_option('-s', '--start',     dest='start',     type='int',    default=1,  help='start frame number')
-parser.add_option('-e', '--end',       dest='end',       type='int',    default=2,  help='end frame number')
+parser.add_option('-e', '--end',       dest='end',       type='int',    default=1,  help='end frame number')
 parser.add_option('-i', '--increment', dest='increment', type='int',    default=1,  help='frame increment')
 parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=2,  help='time per frame in seconds')
 parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,  help='random time per frame in seconds')
@@ -57,7 +57,7 @@ if frame_inc < 1:
 	frame_inc = 1
 	print('[ PARSER WARNING ]')
 
-# Open some filename if specified:
+# Open some file if specified:
 if( filename != ''):
 	print('FILE:')
 	print( filename)
@@ -68,13 +68,18 @@ if( filename != ''):
 	finally:
 		f.close()
 
-sleepsec = (timesec + randtime*random.random()) / 100 / (verbose+1)
+#sleepsec = .01 * (timesec + randtime*random.random()) / ( verbose + 1 )
+sleepsec = .01 * (timesec + randtime*random.random())
 
 frame = frame_start
 parserKey_CurIndex = int(random.random()*100) % len(ParserKeys)
+
+time_start = time.time()
+print('Started at: %s' % time.ctime( time_start))
+
 while frame <= frame_end:
 	print( 'FRAME: ' + str(frame))
-	time.sleep(sleepsec)
+#	time.sleep(sleepsec)
 	for p in range(100):
 		print( 'PROGRESS: ' + str(p+1)+'%')
 		if( p ) == 10: print('ACTIVITY: Generating')
@@ -90,10 +95,14 @@ while frame <= frame_end:
 		for v in range( verbose):
 			print( str(frame) + ': ' + str(p) + ': ' + str(v) + ': QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm')
 #			sys.stdout.flush()
-			time.sleep(sleepsec)
+#			time.sleep(sleepsec)
 		sys.stdout.flush()
 		time.sleep(sleepsec)
 	frame += frame_inc
 
+time_finish = time.time()
+print('Finished at: %s' % time.ctime( time_finish))
+print('Sleeping = %f seconds.' % ( sleepsec))
+print('Running time = %d seconds.' % ( time_finish - time_start))
+
 sys.stdout.flush()
-print( 'Finished at ' + strftime('%A %d %B %H:%M:%S'))
