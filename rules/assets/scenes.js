@@ -300,6 +300,14 @@ function scenes_SelectAll( i_select)
 	for( var i = 0; i < sc_elShots.length; i++)
 		sc_SelectShot( sc_elShots[i], i_select);
 }
+function scenes_SelectPlaylist()
+{
+	scenes_SelectAll( false);
+	var shots = p_GetCurrentShots();
+	for( var i = 0; i < sc_elShots.length; i++)
+		if( shots.indexOf( sc_elShots[i].m_path) != -1 )
+			sc_SelectShot( sc_elShots[i], true);
+}
 
 function sc_ShotStatusApply( i_status)
 {
@@ -585,7 +593,7 @@ function scenes_Put()
 	args.shots = [];
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
-		if(( sc_elCurShot ) && ( sc_elShots[i].m_selected !== true )) continue;
+		if( sc_elShots[i].m_selected !== true ) continue;
 		args.shots.push( sc_elShots[i].m_path);
 	}
 

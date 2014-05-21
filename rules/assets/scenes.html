@@ -88,8 +88,12 @@ opacity:.9;
 </div>
 
 <div id="scenes_ctrl_panel">
-	<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">S.None</div>
-	<div class="button" onclick="scenes_SelectAll(true)" title="Select All Shots">S.All</div>
+	<div style="box-shadow: 0 0 2px #000 inset;">
+		<div>Select:</div>
+		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
+		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">Playlist</div>
+		<div class="button" onclick="scenes_SelectAll(true)" title="Select All Shots">All</div>
+	</div>
 	<div class="button" onclick="scenes_Put()" title="Put Shots Results">Put</div>
 </div>
 
