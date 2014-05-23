@@ -135,7 +135,7 @@ function Comment( i_obj)
 
 	this.elReport = document.createElement('div');
 	this.elPanel.appendChild( this.elReport);
-	this.elReport.style.display = 'none';
+//	this.elReport.style.display = 'none';
 	this.elReport.classList.add('report');
 
 	this.elDuration = document.createElement('div');
@@ -161,6 +161,7 @@ function Comment( i_obj)
 
 	this.elForEdit = document.createElement('div');
 	this.el.appendChild( this.elForEdit);
+	this.elForEdit.classList.add('edit');
 
 	this.elUploads = document.createElement('div');
 	this.el.appendChild( this.elUploads);
@@ -175,6 +176,7 @@ Comment.prototype.init = function()
 {
 	this.elTags.textContent = '';
 	this.elForEdit.innerHTML = '';
+	this.editing = false;
 
 	this.elEditBtnsDiv.style.display = 'none';
 
@@ -289,10 +291,13 @@ Comment.prototype.init = function()
 
 Comment.prototype.setElType = function( i_type)
 {
-	this.elReport.style.display = 'none';
+	for( var type in RULES.comments )
+		this.el.classList.remove( type);
 
 	if( i_type )
 	{
+		this.el.classList.add( i_type);
+
 		if( RULES.comments[i_type] )
 		{
 			this.elType.textContent = RULES.comments[i_type].title;
@@ -304,9 +309,6 @@ Comment.prototype.setElType = function( i_type)
 			this.el.style.color = 'inherit';
 			st_SetElColor( null, this.el);
 		}
-
-		if( i_type == 'report' )
-			this.elReport.style.display = 'block';
 	}
 	else
 	{
@@ -317,6 +319,7 @@ Comment.prototype.setElType = function( i_type)
 
 Comment.prototype.edit = function()
 {
+	this.editing = true;
 	if( this._new != true )
 	{
 		if( g_auth_user == null )
@@ -354,8 +357,12 @@ Comment.prototype.edit = function()
 		st_SetElColor({"color":RULES.comments[type].color}, el);
 	}
 
+	this.elReportEdit = document.createElement('div');
+	this.elForEdit.appendChild( this.elReportEdit);
+	this.elReportEdit.classList.add('report');
+
 	this.elEditTags = document.createElement('div');
-	this.elForEdit.appendChild( this.elEditTags);
+	this.elReportEdit.appendChild( this.elEditTags);
 	this.elEditTags.classList.add('list');
 	this.elEditTags.classList.add('tags');
 	this.elEditTags.textContent = 'Tags:';
@@ -379,7 +386,7 @@ Comment.prototype.edit = function()
 	}
 
 	var elDurationDiv = document.createElement('div');
-	this.elForEdit.appendChild( elDurationDiv);
+	this.elReportEdit.appendChild( elDurationDiv);
 	elDurationDiv.classList.add('edit_duration');
 
 	var elDurationLabel = document.createElement('div');

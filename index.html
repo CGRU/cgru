@@ -117,7 +117,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 			<div style="float:left;">Comments:</div>
 			<div id="search_comment" class="editing" contenteditable="true"></div>
 		</div>
-		<div id="search_result_div" style="display:none;border-radius:6px; box-shadow:0 0 3px #000 inset;">
+		<div id="search_result_div" style="display:none; box-shadow:0 0 3px #000 inset;">
 			<div id="search_info">
 				<div style="float:left;">Search Path = </div>
 				<a id="search_path"></a>
@@ -126,8 +126,8 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 					<div style="float:left;" id="search_results_count"></div>
 				</div>
 			</div>
-			<div id="search_result" style="border-radius:6px; box-shadow:0 0 3px #000 inset; margin: 8px; padding: 8px;"></div>
-			<div id="search_result_none" style="display:none; border-radius:6px; box-shadow:0 0 3px #000 inset; margin: 8px; padding: 8px; text-align: center;">
+			<div id="search_result" style="box-shadow:0 0 3px #000 inset; margin: 8px; padding: 8px;"></div>
+			<div id="search_result_none" style="display:none; box-shadow:0 0 3px #000 inset; margin: 8px; padding: 8px; text-align: center;">
 				No results founded.</div>
 		</div>
 	</div>
@@ -218,7 +218,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 				<div class="button" onclick="p_DelOnClick()" title="Remove current item">-</div>
 				<div class="button" onclick="p_RenameOnClick()" title="Rename current item">Rename</div>
 			</div>
-			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
+			<div style="box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>
 			<div class="playlist_ctrl">
 				<div class="button" onclick="p_AddLinkAfter()" title="Add item after current">+&darr;</div>
@@ -241,7 +241,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					title="Remove not started and uploaded items" onclick="up_ClearAll()">Clear</div>
 			</div>
-			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;" id="upload">
+			<div style="box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;" id="upload">
 				<!--div><input type="file" id="upload_file" onchange="up_FileSelected()" style="float:left;width:100px"></input></div-->
 			</div>
 		</div>
@@ -257,7 +257,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					onclick="ad_PermissionsUsrAddOnClick()">Add User</div>
 			</div>
-			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
+			<div style="box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="permissions"></div>
 		</div>
 	</div>
@@ -273,7 +273,7 @@ Refresh browser to sort by size"       onclick="g_NavigShowInfo(this)">SIZE</div
 </div>
 
 <div id="header">
-	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; border-radius: 5px; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px">
+	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px">
 		<div style="top: 0px; bottom: 0px; width: 250px; position: absolute; /*border: 1px solid #000;*/">
 			<div class="cgru_parameter">
 				<div class="label">Browser Storage</div>

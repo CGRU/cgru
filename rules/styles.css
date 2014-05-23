@@ -179,7 +179,7 @@ text-align: center;
 
 .selected { background: rgba( 100, 255, 1255, .2); }
 
-#content > .view { position: relative; border-radius: 8px; box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
+#content > .view { position: relative; /*border-radius: 8px;*/ box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 
 .editing {
 background: #DDD;
@@ -198,15 +198,15 @@ min-height: 19px;
 
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
-.tag { float:left; cursor: pointer; border-radius: 3px; box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
-.artists, .tags { box-shadow: 0 0 2px #000 inset; border-radius: 3px; padding: 0 4px; }
+.tag { float:left; cursor: pointer; /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
+.artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 4px; }
 .tags { font-style:italic;}
 
-.progress, .progressbar { border-radius: 3px; box-shadow: 0 0 2px #000 inset; }
+.progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; }
 .progress { position: relative; background:rgba(0,0,0,.5); }
 .progressbar { background:rgba(0,255,0,.5); }
 
-.colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
+.colorbars { /*border-radius: 6px;*/ margin: 2px; border: 1px solid #000;}
 .colorbars div div { float:left;}
 
 .cmdexec { opacity: 0.8; }
@@ -242,7 +242,7 @@ padding: 4px 4px;
 width: 60px;
 text-align: center;
 box-shadow: 0 0 4px #030 inset, 0 0 4px #AFA;
-border-radius: 4px;
+/*border-radius: 4px;*/
 background: rgba(0,20,0,.5);
 color: #00FF00;
 text-shadow: 0 0 4px #00FF00, 0 0 8px #00FF00;
@@ -329,7 +329,7 @@ padding: 1px 8px;
 
 #content #content_info {
 box-shadow: 0 0 2px #000 inset;
-border-radius: 10px;
+/*border-radius: 10px;*/
 padding: 4px;
 }
 
@@ -348,7 +348,7 @@ padding: 4px;
 #search {
 margin: 4px 0 0 0;
 box-shadow: 0 0 4px #000000 inset;
-border-radius: 8px;
+/*border-radius: 8px;*/
 padding: 4px;
 }
 #search div { margin: 1px 4px; }
@@ -357,7 +357,7 @@ padding: 4px;
 #assets {
 background: rgba(255,255,100,.1);
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
-border-radius: 12px;
+/*border-radius: 12px;*/
 height: 30px;
 margin: 0px 100px;
 padding: 0px 10px;
@@ -365,7 +365,7 @@ padding: 0px 10px;
 #assets .asset {
 cursor: pointer;
 float: left;
-border-radius: 8px;
+/*border-radius: 8px;*/
 margin: 1px 4px;
 padding: 5px 4px;
 }
@@ -437,7 +437,7 @@ border-radius: 8px;
 /* =================== COMMENTS ============================ */
 .comment {
 box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
-border-radius: 4px;
+/*border-radius: 4px;*/
 margin: 4px;
 }
 .comment .text {
@@ -447,6 +447,8 @@ padding: 4px;
 margin: 0px 4px 8px 4px;
 /*margin-top: 0px;*/
 }
+.comment .report { display: none; }
+.comment.report .report { display: block; }
 .comment .panel { margin: 0px;}
 .comment .panel .type { width: 100px; text-align: center; display: block; }
 .comment .panel .avatar,.comment .panel .user,.comment .panel .duration,.comment .panel .date {
@@ -454,7 +456,7 @@ float: left; margin: 1px 8px;
 }
 .comment .panel .avatar { height: 32px; width: 32px; border-radius: 4px; box-shadow: 0 0 2px #FFF; }
 .comment .panel .user { width: 140px; }
-.comment .panel .duration { width: 50px; text-align:center; box-shadow: 0 0 2px #000 inset; border-radius: 4px; }
+.comment .panel .duration { width: 50px; text-align:center; box-shadow: 0 0 2px #000 inset; }
 .comment .panel .date { font-size: 14px; margin-top: 2px; }
 .comment .panel .modified { margin-top: 2px; float: right; font-size: 10px; font-style:italic; opacity: .8; padding: 2px 4px;}
 .comment .panel > .button { font-size: 12px; float: right;}
@@ -465,7 +467,7 @@ float: left; margin: 1px 8px;
 text-align: center;
 border: 1px solid rgba(0,0,0,.3);
 width: 20px;
-border-radius: 4px;
+/*border-radius: 4px;*/
 cursor: pointer;
 }
 .comment .edit_duration .sample:hover { border: 1px solid rgba(200,255,255,.3);}
