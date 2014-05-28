@@ -315,20 +315,33 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		elDel.m_view = this;
 		elDel.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( i_el.m_path)};
 	}
+
 	if( i_obj.mtime != null )
 	{
-		var elMTime = document.createElement('div');
-		i_el.appendChild( elMTime);
-		elMTime.classList.add('mtime');
-		elMTime.textContent = c_DT_FormStrFromSec( i_obj.mtime);
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('mtime');
+		el.textContent = c_DT_FormStrFromSec( i_obj.mtime);
 	}
 
 	if( i_obj.size != null )
 	{
-		var elSize = document.createElement('div');
-		i_el.appendChild( elSize);
-		elSize.classList.add('size');
-		elSize.textContent = c_Bytes2KMG( i_obj.size);
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('size');
+		el.textContent = c_Bytes2KMG( i_obj.size);
+	}
+
+	if( i_obj.files && i_obj.files.length )
+	{
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('filesnum');
+		el.textContent = 'F-' + i_obj.files.length;
+		el.title = 'Files quantity: ' + i_obj.files.length + '\nDouble click to update status frames number.';
+
+		el.m_filesnum = i_obj.files.length;
+		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_filesnum);};
 	}
 
 	if( i_obj.checksum )

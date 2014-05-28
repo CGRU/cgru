@@ -7,6 +7,75 @@ st_status = null;
 st_FuncApply = null;
 st_progress = null;
 
+function st_Show( i_status)
+{
+	if( i_status != null )
+		RULES.status = c_CloneObj( i_status);
+	else
+		i_status = RULES.status;
+
+	st_SetElAnnotation( i_status, u_el.status_annotation);
+	st_SetElColor( i_status, u_el.content_info);
+	st_SetElProgress( i_status, u_el.status_progressbar, u_el.status_progress, u_el.status_percentage);
+	st_SetElArtists( i_status, u_el.status_artists);
+	st_SetElTags( i_status, u_el.status_tags);
+	st_SetElFramesNum( i_status, u_el.status_framesnum);
+	st_SetElFinish( i_status, u_el.status_finish);
+
+	var modified = '';
+	if( RULES.status )
+	{
+		if( RULES.status.muser ) modified += ' by ' + c_GetUserTitle( RULES.status.muser);
+		if( RULES.status.mtime ) modified += ' at ' + c_DT_StrFromSec( RULES.status.mtime);
+		if( modified != '' ) modified = 'Modified' + modified;
+	}
+	$('status_modified').textContent = modified;
+
+	$('status_reports').textContent = '';
+	if( RULES.status == null ) return;
+	if( RULES.status.reports == null ) return;
+	if( RULES.status.reports.length == 0 ) return;
+
+	var rep_types = {};
+	for( var i = 0; i < RULES.status.reports.length; i++)
+	{
+		var report = RULES.status.reports[i];
+		if(( report.tags == null ) || ( report.tags.length == 0 ))
+			report.tags = ['other'];
+		for( var t = 0; t < report.tags.length; t++)
+		{
+			var rtype;
+			if( rep_types[report.tags[t]])
+			{
+				rtype = rep_types[report.tags[t]];
+			}
+			else
+			{
+				rtype = {};
+				rtype.duration = 0;
+				rtype.artists = [];
+				rep_types[report.tags[t]] = rtype;
+			}
+			rtype.duration += report.duration;
+			if( rtype.artists.indexOf( report.artist) == -1 )
+				rtype.artists.push( report.artist);
+		}
+	}
+	for( var rtype in rep_types )
+	{
+		var el = document.createElement('div');
+		$('status_reports').appendChild( el);
+		var info = c_GetTagTitle( rtype) + ' ' + rep_types[rtype].duration;
+		for( var a = 0; a < rep_types[rtype].artists.length; a++)
+		{
+			if( a ) info += ',';
+			info += ' ' + c_GetUserTitle( rep_types[rtype].artists[a]);
+		}
+		el.textContent = info;
+	}
+//console.log( JSON.stringify( RULES.status.reports));
+}
+
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
@@ -35,6 +104,17 @@ function st_SetElLabel( i_status, i_el, i_full)
 {
 	if( i_full == null ) i_full = false;
 	st_SetElAnnotation( i_status, i_el, i_full);
+}
+function st_SetElFramesNum( i_status, i_el, i_full)
+{
+	if( i_full == null ) i_full = true;
+	var num = '';
+	if( i_status && i_status.frames_num )
+	{
+		num = i_status.frames_num;
+		if( i_full ) num = 'Frames number = ' + num;
+	}
+	i_el.textContent = num;
 }
 function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
 function st_SetElText( i_status, i_el, i_field, i_full)
@@ -417,6 +497,14 @@ function st_Save( i_status, i_path, i_wait)
 	obj.add = true;
 	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
 	return c_Parse( n_Request_old({"editobj":obj}, i_wait));
+}
+
+function st_SetFramesNumber( i_num)
+{
+	if( RULES.status == null ) RULES.status = {};
+	RULES.status.frames_num = i_num;
+	st_Save();
+	st_Show();
 }
 
 function st_UpdateProgresses( i_path)

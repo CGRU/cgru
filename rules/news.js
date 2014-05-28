@@ -413,6 +413,7 @@ function nw_NewsShow( i_news)
 
 function nw_NavigatePost()
 {
+	nw_Process();
 	nw_HighlightCurrent();
 }
 

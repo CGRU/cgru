@@ -1,12 +1,7 @@
 <style type="text/css">
 
-#asset .statistics > div { float: left; margin: 1px 4px; padding: 1px 4px; }
-#scenes_statistics div { float: left; padding: 4px; }
-
 #scenes_ctrl_panel { float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
-
-#_scenes_make_thumbnails div { float: left; padding: 4px 4px; }
 
 .shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 6px; box-shadow: 0 0 4px #000 inset; margin: 4px;}
 
@@ -72,23 +67,10 @@ opacity:.9;
 
 </style>
 
-<div id="scenes_statistics" style="float: left">
-	<div id="scenes_scenes_count_div">
-		<div>Scenes Count:</div>
-		<div id="scenes_scenes_count"></div>
-	</div>
-	<div id="scenes_shots_count_div">
-		<div>Shots Count:</div>
-		<div id="scenes_shots_count"></div>
-	</div>
-	<div id="scenes_shots_progress_div">
-		<div>Shots Progress:</div>
-		<div id="scenes_shots_progress"></div>
-	</div>
-</div>
+<div id="scenes_info" style="float: left; margin: 4px 12px;"></div>
 
 <div id="scenes_ctrl_panel">
-	<div style="box-shadow: 0 0 2px #000 inset;">
+	<div style="box-shadow: 0 0 2px #000 inset; font-size: 12px;">
 		<div>Select:</div>
 		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
 		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">Playlist</div>
@@ -96,6 +78,8 @@ opacity:.9;
 	</div>
 	<div class="button" onclick="scenes_Put()" title="Put Shots Results">Put</div>
 </div>
+
+<div id="scenes_reports"></div>
 
 <div style="clear:both" id="scenes_div"></div>
 

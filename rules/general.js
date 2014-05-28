@@ -153,6 +153,11 @@ function g_PathChanged()
 
 function g_NavigatePost()
 {
+	a_Process();
+	u_Process();
+	nw_Process();
+	ad_PermissionsProcess();
+
 	if( g_nav_clicked == false )
 	{
 		g_elCurFolder.scrollIntoView();
@@ -249,8 +254,6 @@ function g_WalksReceived( i_data, i_args)
 	else
 		window.document.title = g_elCurFolder.m_path;
 
-	u_Process();
-	ad_PermissionsProcess();
 	g_NavigatePost()
 }
 

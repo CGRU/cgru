@@ -509,6 +509,13 @@ Comment.prototype.save = function()
 
 	cm_array.push( this);
 
+	this.updateStatus();
+
+	this.sendEmails();
+}
+
+Comment.prototype.sendEmails = function()
+{
 	var emails = [];
 	if( RULES.status && RULES.status.body && RULES.status.body.guest && RULES.status.body.guest.email )
 		emails.push( RULES.status.body.guest.email);
@@ -535,6 +542,32 @@ Comment.prototype.save = function()
 
 		n_SendMail( email, subject, body);
 	}
+}
+
+Comment.prototype.updateStatus = function()
+{
+	var reports = [];
+
+	for( var i = 0; i < cm_array.length; i++ )
+	{
+		var obj = cm_array[i].obj;
+
+		if( obj.deleted ) continue;
+		if( obj.type !== 'report') continue;
+		if( obj.duration == null ) continue;
+		if( obj.duration < 0 ) continue;
+
+		var rep = {};
+		rep.duration = obj.duration;
+		rep.tags = obj.tags;
+		rep.artist = obj.user_name;
+		rep.time = obj.time;
+
+		reports.push( rep);
+	}
+
+	RULES.status.reports = reports;
+	st_Save();
 }
 
 Comment.prototype.processUploads = function()

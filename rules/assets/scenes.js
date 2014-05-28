@@ -36,9 +36,6 @@ function sc_Init()
 
 	sc_elShots = [];
 	sc_elScenes = [];
-
-	if( ASSET.type != 'scenes' )
-		$('scenes_scenes_count_div').style.display = 'none';
 }
 
 function sc_Post()
@@ -495,9 +492,12 @@ function sc_DisplayCounts()
 		if( stat && stat.progress && ( stat.progress > 0 ))
 			progress += stat.progress;
 	}
-	$('scenes_shots_count').textContent = shots;
+
+//	$('scenes_shots_count').textContent = shots;
+	var info = 'Shots Count: ' + shots;
 	if( shots )
-		$('scenes_shots_progress').textContent = Math.round(progress/shots) + '%';
+		info += ' Shots Progress: ' + Math.round(progress/shots) + '%';
+//		$('scenes_shots_progress').textContent = Math.round(progress/shots) + '%';
 
 	if( ASSET.type == 'scenes')
 	{
@@ -507,8 +507,11 @@ function sc_DisplayCounts()
 			if( sc_elScenes[i].m_hidden ) continue;
 			scenes++;
 		}
-		$('scenes_scenes_count').textContent = scenes;
+//		$('scenes_scenes_count').textContent = scenes;
+		info = ' Scenes Count: ' + scenes + ' ' + info;
 	}
+
+	$('scenes_info').textContent = info;
 }
 
 function scenes_makeThumbnails()

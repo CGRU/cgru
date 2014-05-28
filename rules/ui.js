@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','info','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','content_info','content_status','thumbnail','status_finish'];
+u_elements = ['asset','assets','info','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','content_info','content_status','thumbnail','status_finish','status_framesnum'];
 u_el = {};
 u_views = ['asset','files','body','comments'];
 
@@ -109,9 +109,7 @@ function u_Process()
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
 
-	a_Process();
-	u_StatusApply();
-	nw_Process();
+	st_Show();
 	u_ViewsFuncsOpen();
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
@@ -130,7 +128,7 @@ function u_Finish()
 {
 	st_DestroyEditUI();
 
-	u_StatusApply( null);
+	st_Show( null);
 
 	u_el.thumbnail.style.display = 'none';
 
@@ -266,32 +264,9 @@ function u_ApplyStyles()
 		$(backs[i]+'_div').style.background = localStorage['back_' + backs[i]];
 }
 
-function u_StatusApply( i_status)
-{
-	if( i_status != null )
-		RULES.status = c_CloneObj( i_status);
-	else
-		i_status = RULES.status;
-
-	st_SetElAnnotation( i_status, u_el.status_annotation);
-	st_SetElColor( i_status, u_el.content_info);
-	st_SetElProgress( i_status, u_el.status_progressbar, u_el.status_progress, u_el.status_percentage);
-	st_SetElArtists( i_status, u_el.status_artists);
-	st_SetElTags( i_status, u_el.status_tags);
-	st_SetElFinish( i_status, u_el.status_finish);
-	var modified = '';
-	if( RULES.status )
-	{
-		if( RULES.status.muser ) modified += ' by ' + c_GetUserTitle( RULES.status.muser);
-		if( RULES.status.mtime ) modified += ' at ' + c_DT_StrFromSec( RULES.status.mtime);
-		if( modified != '' ) modified = 'Modified' + modified;
-	}
-	$('status_modified').innerHTML = modified;
-}
-
 function u_StatusEditOnClick()
 {
-	st_CreateEditUI( u_el.content_info, g_CurPath(), RULES.status, u_StatusApply, u_el.content_status);
+	st_CreateEditUI( u_el.content_info, g_CurPath(), RULES.status, st_Show, u_el.content_status);
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
