@@ -128,6 +128,7 @@ function st_SetElFramesNum( i_status, i_el, i_full)
 	{
 		num = i_status.frames_num;
 		if( i_full ) num = 'Frames number = ' + num;
+		else num = 'f' + num;
 	}
 	i_el.textContent = num;
 }

@@ -397,6 +397,12 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elPercent.classList.add('percent');
 	elPercent.classList.add('info');
 
+	var elFrames = document.createElement('div');
+	elFolder.appendChild( elFrames);
+	elFolder.m_elFrames = elFrames;
+	elFrames.classList.add('frames');
+	elFrames.classList.add('info');
+
 	var elSize = document.createElement('div');
 	elFolder.appendChild( elSize);
 	elFolder.m_elSize = elSize;
@@ -459,6 +465,7 @@ function g_FolderSetStatus( i_status, i_elFolder)
 	st_SetElColor( i_status, i_elFolder);
 	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
 	st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
+	st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
 	st_SetElTags( i_status, i_elFolder.m_elTags, true);
 
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
@@ -535,7 +542,7 @@ function g_FolderOnDblClick( i_evt)
 
 function g_NavigShowInfo( i_toggle)
 {
-	var infos = ['annotation','size','artists','tags','percent'];
+	var infos = ['annotation','size','artists','tags','frames','percent'];
 	for( var i = 0; i < infos.length; i++ )
 	{
 		var name = 'navig_show_'+infos[i];
