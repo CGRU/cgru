@@ -180,8 +180,15 @@ Comment.prototype.init = function()
 
 	this.elEditBtnsDiv.style.display = 'none';
 
-	if( g_admin )
-		this.elEdit.style.display = 'block';
+//console.log( g_auth_user.id + ' ' + this.obj.user_name );
+	if( g_auth_user )
+	{
+		if( g_admin || ( this.obj.user_name == g_auth_user.id ))
+			this.elEdit.style.display = 'block';
+
+		if( this.obj.user_name == g_auth_user.id )
+			this.el.classList.add('own');
+	}
 	else
 		this.elEdit.style.display = 'none';
 
@@ -327,11 +334,11 @@ Comment.prototype.edit = function()
 			c_Error('Guests can`t edit comments.');
 			return;
 		}
-		if( g_admin == false )
+/*		if( g_admin == false )
 		{
 			c_Error('You can`t edit comments.');
 			return;
-		}
+		}*/
 		this.elDel.style.display = 'block';
 	}
 	else
@@ -480,7 +487,10 @@ Comment.prototype.save = function()
 		this.obj.duration = duration;
 
 	if( this._new )
+	{
 		this._new = false;
+		cm_array.push( this);
+	}
 	else
 	{
 		this.obj.mtime = (new Date()).getTime();
@@ -506,8 +516,6 @@ Comment.prototype.save = function()
 	var news_user = this.obj.user_name;
 	if( this.obj.muser_name ) news_user = this.obj.muser_name;
 	nw_MakeNews({"title":'comment',"path":g_CurPath(),"user":news_user,"guest":this.obj.guest});
-
-	cm_array.push( this);
 
 	this.updateStatus();
 
@@ -548,6 +556,18 @@ Comment.prototype.updateStatus = function()
 {
 	var reports = [];
 
+	if( RULES.status == null )
+		RULES.status = {};
+
+	if( RULES.status.tags == null )
+		RULES.status.tags = [];
+
+	if( RULES.status.artist == null )
+		RULES.status.artist = [];
+
+	var reps_tags = [];
+	var reps_arts = [];
+
 	for( var i = 0; i < cm_array.length; i++ )
 	{
 		var obj = cm_array[i].obj;
@@ -557,17 +577,33 @@ Comment.prototype.updateStatus = function()
 		if( obj.duration == null ) continue;
 		if( obj.duration < 0 ) continue;
 
+//console.log( JSON.stringify( obj));
 		var rep = {};
 		rep.duration = obj.duration;
 		rep.tags = obj.tags;
 		rep.artist = obj.user_name;
 		rep.time = obj.time;
 
+		for( var t = 0; t < obj.tags.length; t++ )
+			if( reps_tags.indexOf( obj.tags[t] ) == -1 )
+				reps_tags.push( obj.tags[t] )
+
+		reps_arts.push( obj.user_name);
+
 		reports.push( rep);
 	}
 
+	for( var t = 0; t < reps_tags.length; t++ )
+		if( RULES.status.tags.indexOf( reps_tags[t] ) == -1 )
+			RULES.status.tags.push( reps_tags[t] )
+
+	for( var t = 0; t < reps_arts.length; t++ )
+		if( RULES.status.artists.indexOf( reps_arts[t] ) == -1 )
+			RULES.status.artists.push( reps_arts[t] )
+
 	RULES.status.reports = reports;
 	st_Save();
+	st_Show();
 }
 
 Comment.prototype.processUploads = function()

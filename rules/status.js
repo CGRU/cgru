@@ -31,45 +31,60 @@ function st_Show( i_status)
 	}
 	$('status_modified').textContent = modified;
 
+
+	// Reports:
+
 	$('status_reports').textContent = '';
 	if( RULES.status == null ) return;
 	if( RULES.status.reports == null ) return;
 	if( RULES.status.reports.length == 0 ) return;
 
-	var rep_types = {};
+	var reps_types = {};
+	var reps_duration = 0;
+
 	for( var i = 0; i < RULES.status.reports.length; i++)
 	{
 		var report = RULES.status.reports[i];
+
 		if(( report.tags == null ) || ( report.tags.length == 0 ))
 			report.tags = ['other'];
+
 		for( var t = 0; t < report.tags.length; t++)
 		{
 			var rtype;
-			if( rep_types[report.tags[t]])
+			if( reps_types[report.tags[t]])
 			{
-				rtype = rep_types[report.tags[t]];
+				rtype = reps_types[report.tags[t]];
 			}
 			else
 			{
 				rtype = {};
 				rtype.duration = 0;
 				rtype.artists = [];
-				rep_types[report.tags[t]] = rtype;
+				reps_types[report.tags[t]] = rtype;
 			}
+
 			rtype.duration += report.duration;
+
 			if( rtype.artists.indexOf( report.artist) == -1 )
 				rtype.artists.push( report.artist);
 		}
+
+		reps_duration += report.duration;
+//console.log( JSON.stringify( report));
 	}
-	for( var rtype in rep_types )
+
+	reps_types.total = {"duration":reps_duration,"artists":[]};
+
+	for( var rtype in reps_types )
 	{
 		var el = document.createElement('div');
 		$('status_reports').appendChild( el);
-		var info = c_GetTagTitle( rtype) + ' ' + rep_types[rtype].duration;
-		for( var a = 0; a < rep_types[rtype].artists.length; a++)
+		var info = c_GetTagTitle( rtype) + ' ' + reps_types[rtype].duration;
+		for( var a = 0; a < reps_types[rtype].artists.length; a++)
 		{
 			if( a ) info += ',';
-			info += ' ' + c_GetUserTitle( rep_types[rtype].artists[a]);
+			info += ' ' + c_GetUserTitle( reps_types[rtype].artists[a]);
 		}
 		el.textContent = info;
 	}

@@ -439,8 +439,10 @@ border-radius: 8px;
 .comment {
 box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
 /*border-radius: 4px;*/
-margin: 4px;
+border: 2px solid rgba(0,0,0,.1);
+/*margin: 4px;*/
 }
+.comment.own { border: 2px solid rgba(0,0,100,.9); }
 .comment .text {
 box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF;
 border-radius: 4px;
