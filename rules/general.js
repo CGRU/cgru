@@ -446,8 +446,11 @@ function g_AppendFolder( i_elParent, i_fobject)
 //	elFolder.ondblclick = g_FolderOnDblClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
-	if( i_fobject.size != null )
-		elFolder.m_elSize.textContent = c_Bytes2KMG( i_fobject.size);
+	if( i_fobject.size_total != null )
+	{
+		elFolder.m_elSize.textContent = c_Bytes2KMG( i_fobject.size_total);
+		elFolder.m_elSize.title = 'Calculated with subfolders';
+	}
 
 	i_elParent.appendChild( elFolder);
 	i_elParent.m_elFolders.push( elFolder);
@@ -476,10 +479,10 @@ function g_CompareFolders(a,b)
 {
 	if( localStorage.navig_show_size == 'true' )
 	{
-		if(      a['size'] ==  null   ) return  1;
-		else if( b['size'] ==  null   ) return -1;
-		else if( a['size'] < b['size']) return  1;
-		else if( a['size'] > b['size']) return -1;
+		if(      a['size_total'] ==  null   ) return  1;
+		else if( b['size_total'] ==  null   ) return -1;
+		else if( a['size_total'] < b['size_total']) return  1;
+		else if( a['size_total'] > b['size_total']) return -1;
 	}
 	if( a['name'] < b['name']) return -1;
 	if( a['name'] > b['name']) return 1;

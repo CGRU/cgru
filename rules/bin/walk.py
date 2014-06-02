@@ -6,9 +6,10 @@ from optparse import OptionParser
 
 Parser = OptionParser( usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 
-Parser.add_option('-o', '--output',  dest='output',     type = 'string',     default='.rules/walk.json', help='File to save results.')
-Parser.add_option('-V', '--verbose', dest='verbose',    type = 'int',        default=0,                  help='Verbose mode.')
-Parser.add_option('-D', '--debug',   dest='debug',      action='store_true', default=False,              help='Debug mode.')
+Parser.add_option('-o', '--output',   dest='output',   type = 'string',     default='.rules/walk.json', help='File to save results.')
+Parser.add_option('-n', '--noupdate', dest='noupdate', action='store_true', default=False,              help='Skip update upfolders.')
+Parser.add_option('-V', '--verbose',  dest='verbose',  type = 'int',        default=0,                  help='Verbose mode.')
+Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,              help='Debug mode.')
 
 (Options, Args) = Parser.parse_args()
 
@@ -22,9 +23,10 @@ if len( Args):
 	StartPath = Args[0]
 
 if not os.path.isdir( StartPath):
-	print('ERROR: path does not exist:')
+	print('ERROR: Starting path does not exist:')
 	print( StartPath)
 	sys.exit(1)
+
 
 def jsonLoad( i_filename):
 	if not os.path.isfile( i_filename):
@@ -48,34 +50,24 @@ def jsonLoad( i_filename):
 
 	return obj
 
-def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
+
+def walkdir( i_path, i_subwalk, i_curdepth = 0):
 	global Progress
 	global PrevFiles
 	global CurFiles
 
-	curdepth = i_curdepth + 1
-	if Options.verbose > curdepth:
+	if Options.verbose > i_curdepth and i_subwalk:
 		print( i_path)
 
-	out = jsonLoad( os.path.join( i_path, Options.output))
-	if i_maxdepth >= 0 and curdepth > i_maxdepth:
-		if out is None: return None
-		if 'files' in out: del out['files']
-		if 'folders' in out: del out['folders']
-		return out
-
-	cur = dict()
-	cur['folders'] = dict()
-	cur['files'] = dict()
-
-	if out is None:
-		out = dict()
-	else:
-		if 'files' in out: cur['files'] = out['files']
-
+	out = dict()
+	out['folders'] = dict()
+	out['files'] = dict()
 	out['num_files'] = 0
 	out['num_folders'] = 0
 	out['size'] = 0
+	out['num_files_total'] = 0
+	out['num_folders_total'] = 0
+	out['size_total'] = 0
 
 	try:
 		entries = os.listdir( i_path)
@@ -84,44 +76,60 @@ def walkdir( i_path, i_maxdepth = -1, i_curdepth = -1):
 		return None
 
 	for entry in entries:
+		# Skip result folder (.rules):
 		if entry == os.path.dirname( Options.output): continue
 
 		path = os.path.join( i_path, entry)
 
+		# We are not walking in links:
 		if os.path.islink( path): continue
 
 		if os.path.isdir( path):
 			out['num_folders'] += 1
-			fout = walkdir( path, i_maxdepth, curdepth)
+			out['num_folders_total'] += 1
+
+			fout = None
+			if i_subwalk:
+				# Recursively walk in a subfolder:
+				fout = walkdir( path, True, i_curdepth + 1)
+			else:
+				# Load previous walk data:
+				fout = jsonLoad( os.path.join( path, Options.output))
+
 			if fout is not None:
-				cur['folders'][entry] = fout
-				out['num_folders'] += fout['num_folders']
-				out['num_files'] += fout['num_files']
-				out['size'] += fout['size']
+				# We do not need info for each subfolder in a child folder:
+				if 'files' in fout: del fout['files']
+				if 'folders' in fout: del fout['folders']
+				out['folders'][entry] = fout
+
+				out['num_folders_total'] += fout['num_folders_total']
+				out['num_files_total'] += fout['num_files_total']
+				out['size_total'] += fout['size_total']
 
 		if os.path.isfile( path):
-			out['num_files'] += 1
 			CurFiles += 1
+			out['num_files'] += 1
+			out['num_files_total'] += 1
+			out['size_total'] += os.path.getsize( path)
 			out['size'] += os.path.getsize( path)
 
-	cur.update( out)
+	# Just output progress:
 	if PrevFiles:
 		cur_progress = int( 100.0 * CurFiles / PrevFiles )
 		if cur_progress != Progress:
 			Progress = cur_progress
 			print('PROGRESS: %d%%' % Progress)
 
+	# Store current walk data:
 	filename = os.path.join( i_path, Options.output)
 	if not os.path.isdir( os.path.dirname( filename)):
 		try:
 			os.makedirs( os.path.dirname( filename))
 		except:
 			print( str(sys.exc_info()[1]))
-			return out
-
 	try:
 		file = open( filename, 'w')
-		json.dump( cur, file, indent=1)
+		json.dump( out, file, indent=1)
 		file.close()
 	except:
 		print( str(sys.exc_info()[1]))
@@ -146,41 +154,47 @@ print('Started at: %s' % time.ctime( time_start))
 # Get old files count if any:
 prev = jsonLoad( os.path.join( StartPath, Options.output))
 if prev is not None:
-	if 'num_files' in prev:
-		PrevFiles = prev['num_files']
+	if 'num_files_total' in prev:
+		PrevFiles = prev['num_files_total']
 
 if PrevFiles:
-	print('Previous run: %s files, %s folders, %s bytes' % ( sepTh( prev['num_files']), sepTh( prev['num_folders']), sepTh( prev['size'])))
+	print('Previous run: %s files, %s folders, %s bytes' % ( sepTh( prev['num_files_total']), sepTh( prev['num_folders_total']), sepTh( prev['size_total'])))
 
 # Walk in subfolders:
-walk = walkdir( StartPath)
+walk = walkdir( StartPath, True)
 
 # Calculate difference with previous
 d_files = None
 d_folders = None
 d_size = None
 if PrevFiles is not None:
-	d_files   = walk['num_files']   - prev['num_files']
-	d_folders = walk['num_folders'] - prev['num_folders']
-	d_size    = walk['size']        - prev['size']
+	d_files   = walk['num_files_total'] - prev['num_files_total']
+	d_folders = walk['num_folders_total'] - prev['num_folders_total']
+	d_size    = walk['size_total'] - prev['size_total']
 
-# Walk in parent folders:
-curpath = os.path.abspath( StartPath )
-PrevFiles = None
-while curpath != '/':
-	uppath = os.path.dirname( curpath)
-	if uppath == curpath: break
-	curpath = uppath
-	if not os.path.isfile( os.path.join( curpath, Options.output)): break
 
-	print('Updating: %s' % curpath)
-	walkdir( curpath, 0)
+# Update parent folders:
+if not Options.noupdate:
+	curpath = os.path.abspath( StartPath )
+	PrevFiles = None
+	while curpath != '/':
+		# Go one folder upper:
+		uppath = os.path.dirname( curpath)
+		if uppath == curpath: break
+		curpath = uppath
+
+		# Stop updating if there is not any walk data:
+		if not os.path.isfile( os.path.join( curpath, Options.output)):
+			break
+
+		print('Updating: %s' % curpath)
+		walkdir( curpath, False)
 
 
 # Output statistics:
 time_finish = time.time()
 print('Finished at: %s' % time.ctime( time_finish))
-print('Result: %s files, %s folders, %s bytes' % ( sepTh( walk['num_files']), sepTh( walk['num_folders']), sepTh( walk['size'])))
+print('Result: %s files, %s folders, %s bytes' % ( sepTh( walk['num_files_total']), sepTh( walk['num_folders_total']), sepTh( walk['size_total'])))
 if d_files is not None:
 	print('Delta: %s files, %s folders, %s bytes' % ( sepTh( d_files), sepTh( d_folders), sepTh( d_size)))
 

@@ -330,6 +330,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		i_el.appendChild( el);
 		el.classList.add('size');
 		el.textContent = c_Bytes2KMG( i_obj.size);
+		el.title = 'Files size without subfolders';
 	}
 
 	var num_files = 0;
@@ -343,7 +344,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		i_el.appendChild( el);
 		el.classList.add('filesnum');
 		el.textContent = 'F:' + num_files;
-		el.title = 'Files quantity: ' + num_files + '\nDouble click to update status frames number.';
+		el.title = 'Files quantity: ' + num_files + ' (without subfolders)\nDouble click to update status frames number.';
 
 		el.m_num_files = num_files;
 		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
