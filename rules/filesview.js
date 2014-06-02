@@ -332,16 +332,21 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		el.textContent = c_Bytes2KMG( i_obj.size);
 	}
 
+	var num_files = 0;
+	if( i_obj.num_files )
+		num_files = i_obj.num_files;
 	if( i_obj.files && i_obj.files.length )
+		num_files = i_obj.files.length;
+	if( num_files )
 	{
 		var el = document.createElement('div');
 		i_el.appendChild( el);
 		el.classList.add('filesnum');
-		el.textContent = 'F-' + i_obj.files.length;
-		el.title = 'Files quantity: ' + i_obj.files.length + '\nDouble click to update status frames number.';
+		el.textContent = 'F:' + num_files;
+		el.title = 'Files quantity: ' + num_files + '\nDouble click to update status frames number.';
 
-		el.m_filesnum = i_obj.files.length;
-		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_filesnum);};
+		el.m_num_files = num_files;
+		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
 	}
 
 	if( i_obj.checksum )

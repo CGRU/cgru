@@ -80,7 +80,7 @@ function st_Show( i_status)
 	{
 		var el = document.createElement('div');
 		$('status_reports').appendChild( el);
-		var info = c_GetTagTitle( rtype) + ' ' + reps_types[rtype].duration;
+		var info = c_GetTagTitle( rtype) + ': ' + reps_types[rtype].duration;
 		for( var a = 0; a < reps_types[rtype].artists.length; a++)
 		{
 			if( a ) info += ',';
@@ -127,8 +127,9 @@ function st_SetElFramesNum( i_status, i_el, i_full)
 	if( i_status && i_status.frames_num )
 	{
 		num = i_status.frames_num;
+		i_el.title = ' ~ ' + Math.round(num/RULES.fps) + 'sec';
 		if( i_full ) num = 'Frames number = ' + num;
-		else num = 'f' + num;
+		else num = 'F:' + num;
 	}
 	i_el.textContent = num;
 }

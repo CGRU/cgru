@@ -417,7 +417,7 @@ margin-bottom: -4px;
 }
 .files_view .item .size { font: 12px monospace; width: 60px; text-align: right; }
 .files_view .item .mtime { font: 12px monospace; }
-.files_view .item .filesnum { font: 12px monospace; border: 1px solid #777; cursor: pointer; }
+.files_view .item .filesnum { font: 10px monospace; border: 1px solid #777; cursor: pointer; margin: 1px; padding: 1px; }
 .files_view .item .checksum { font: 12px monospace; }
 .files_view .item .preview { clear: both; margin: 4px; float: none; text-align: center; border-radius: 8px; border: 2px solid #000; background: #222; }
 .files_view .item .preview .video { border-radius: 6px; border: 2px solid #000; }
