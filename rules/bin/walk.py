@@ -27,6 +27,9 @@ if not os.path.isdir( StartPath):
 	print( StartPath)
 	sys.exit(1)
 
+def printFlush( i_msg):
+	print( i_msg)
+	sys.stdout.flush()
 
 def jsonLoad( i_filename):
 	if not os.path.isfile( i_filename):
@@ -35,7 +38,7 @@ def jsonLoad( i_filename):
 	try:
 		file = open( i_filename, 'r')
 	except:
-		print( str(sys.exc_info()[1]))
+		printFlush( str(sys.exc_info()[1]))
 		return None
 
 	obj = None
@@ -43,7 +46,7 @@ def jsonLoad( i_filename):
 		obj = json.load( file)
 	except:
 		print('ERROR: %s' % i_filename)
-		print( str(sys.exc_info()[1]))
+		printFlush( str(sys.exc_info()[1]))
 		obj = None
 
 	file.close()
@@ -64,7 +67,7 @@ def walkdir( i_path, i_subwalk, i_curdepth = 0):
 	global CurFiles
 
 	if Options.verbose > i_curdepth and i_subwalk:
-		print( i_path)
+		printFlush( i_path)
 
 	out = dict()	
 	checkDict( out)
@@ -120,7 +123,7 @@ def walkdir( i_path, i_subwalk, i_curdepth = 0):
 		cur_progress = int( 100.0 * CurFiles / PrevFiles )
 		if cur_progress != Progress:
 			Progress = cur_progress
-			print('PROGRESS: %d%%' % Progress)
+			printFlush('PROGRESS: %d%%' % Progress)
 
 	# Store current walk data:
 	filename = os.path.join( i_path, Options.output)
@@ -128,13 +131,13 @@ def walkdir( i_path, i_subwalk, i_curdepth = 0):
 		try:
 			os.makedirs( os.path.dirname( filename))
 		except:
-			print( str(sys.exc_info()[1]))
+			printFlush( str(sys.exc_info()[1]))
 	try:
 		file = open( filename, 'w')
 		json.dump( out, file, indent=1)
 		file.close()
 	except:
-		print( str(sys.exc_info()[1]))
+		printFlush( str(sys.exc_info()[1]))
 
 	return out
 
@@ -151,7 +154,7 @@ def sepTh( i_int):
 
 ##############################################################################
 time_start = time.time()
-print('Started at: %s' % time.ctime( time_start))
+printFlush('Started at: %s' % time.ctime( time_start))
 
 # Get old files count if any:
 prev = jsonLoad( os.path.join( StartPath, Options.output))
@@ -161,7 +164,7 @@ if prev is not None:
 		PrevFiles = prev['num_files_total']
 
 if PrevFiles:
-	print('Previous run: %s files, %s folders, %s bytes' % ( sepTh( prev['num_files_total']), sepTh( prev['num_folders_total']), sepTh( prev['size_total'])))
+	printFlush('Previous run: %s files, %s folders, %s bytes' % ( sepTh( prev['num_files_total']), sepTh( prev['num_folders_total']), sepTh( prev['size_total'])))
 
 # Walk in subfolders:
 walk = walkdir( StartPath, True)
@@ -190,7 +193,7 @@ if not Options.noupdate:
 		if not os.path.isfile( os.path.join( curpath, Options.output)):
 			break
 
-		print('Updating: %s' % curpath)
+		printFlush('Updating: %s' % curpath)
 		walkdir( curpath, False)
 
 
