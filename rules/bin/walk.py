@@ -50,6 +50,13 @@ def jsonLoad( i_filename):
 
 	return obj
 
+def checkDict( io_dict):
+	if not 'folders' in io_dict: io_dict['folders'] = dict()
+	if not 'files'   in io_dict: io_dict['files']   = dict()
+	num_keys = ['num_files','num_folders','size','num_files_total','num_folders_total','size_total']
+	for key in num_keys:
+		if not key in io_dict:
+			io_dict[key] = 0
 
 def walkdir( i_path, i_subwalk, i_curdepth = 0):
 	global Progress
@@ -59,15 +66,8 @@ def walkdir( i_path, i_subwalk, i_curdepth = 0):
 	if Options.verbose > i_curdepth and i_subwalk:
 		print( i_path)
 
-	out = dict()
-	out['folders'] = dict()
-	out['files'] = dict()
-	out['num_files'] = 0
-	out['num_folders'] = 0
-	out['size'] = 0
-	out['num_files_total'] = 0
-	out['num_folders_total'] = 0
-	out['size_total'] = 0
+	out = dict()	
+	checkDict( out)
 
 	try:
 		entries = os.listdir( i_path)
@@ -97,9 +97,11 @@ def walkdir( i_path, i_subwalk, i_curdepth = 0):
 				fout = jsonLoad( os.path.join( path, Options.output))
 
 			if fout is not None:
+				checkDict( fout)
+
 				# We do not need info for each subfolder in a child folder:
-				if 'files' in fout: del fout['files']
-				if 'folders' in fout: del fout['folders']
+				del fout['files']
+				del fout['folders']
 				out['folders'][entry] = fout
 
 				out['num_folders_total'] += fout['num_folders_total']
@@ -155,6 +157,7 @@ print('Started at: %s' % time.ctime( time_start))
 prev = jsonLoad( os.path.join( StartPath, Options.output))
 if prev is not None:
 	if 'num_files_total' in prev:
+		checkDict( prev)
 		PrevFiles = prev['num_files_total']
 
 if PrevFiles:
@@ -167,7 +170,7 @@ walk = walkdir( StartPath, True)
 d_files = None
 d_folders = None
 d_size = None
-if PrevFiles is not None:
+if PrevFiles:
 	d_files   = walk['num_files_total'] - prev['num_files_total']
 	d_folders = walk['num_folders_total'] - prev['num_folders_total']
 	d_size    = walk['size_total'] - prev['size_total']

@@ -449,7 +449,10 @@ function g_AppendFolder( i_elParent, i_fobject)
 	if( i_fobject.size_total != null )
 	{
 		elFolder.m_elSize.textContent = c_Bytes2KMG( i_fobject.size_total);
-		elFolder.m_elSize.title = 'Calculated with subfolders';
+		var title = 'Calculated with subfolders';
+		if( i_fobject.num_folders_total ) title += '\nTotal folders count: ' + i_fobject.num_folders_total;
+		if( i_fobject.num_files_total   ) title += '\nTotal files count: ' + i_fobject.num_files_total;
+		elFolder.m_elSize.title = title;
 	}
 
 	i_elParent.appendChild( elFolder);

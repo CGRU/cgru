@@ -348,3 +348,72 @@ function fu_PutMultiFinished( i_data, i_args)
 //	i_wnd.destroy();
 }
 
+fu_walk_params = {};
+fu_walk_params.path = {};
+fu_walk_params.verbose   = {"label":'Verbose Level',"default":2,"lwidth":'170px',"width":'50%'};
+fu_walk_params.upparents = {"label":'Update Parent Folders',"bool":true,"lwidth":'200px',"width":'50%'};
+function fu_Walk( i_args)
+{
+	var wnd = new cgru_Window({"name":'walk',"title":'Send Walk Job'});
+	wnd.m_args = i_args;
+	var params = {};
+	params.path = i_args.path;
+
+	gui_Create( wnd.elContent, fu_walk_params, [RULES.walk, params]);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+//	elBtns.classList.add('buttons');
+
+	var elAfDiv = document.createElement('div');
+	elBtns.appendChild( elAfDiv);
+	elAfDiv.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elAfDiv.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+
+	var elSend = document.createElement('div');
+	elAfDiv.appendChild( elSend);
+	elSend.textContent = 'Send Job';
+	elSend.classList.add('button');
+	elSend.m_wnd = wnd;
+	elSend.onclick = function(e){ fu_WalkProcessGUI( e.currentTarget.m_wnd);}
+
+	var elRules = document.createElement('div');
+	wnd.elContent.appendChild( elRules);
+	elRules.classList.add('rules');
+	elRules.textContent = 'RULES.walk='+JSON.stringify(RULES.walk).replace(/,/g,', ');
+}
+
+function fu_WalkProcessGUI( i_wnd)
+{
+	var params = gui_GetParams( i_wnd.elContent, fu_walk_params);
+
+	var job = {};
+	job.name = 'Walk ' + params.path;
+
+	var block = {};
+	block.name = 'walk';
+	block.service  = RULES.walk.af_service;
+	block.parser   = RULES.walk.af_parser;
+	block.capacity = RULES.walk.af_capacity;
+	job.blocks = [block];
+
+	var task = {}
+	task.name = params.path;
+	block.tasks = [task];
+
+	var cmd = cgru_PM( RULES.walk.cmd, true);
+	if( params.upparents == false ) cmd += ' -n';
+	cmd += ' -V ' + params.verbose;
+	cmd += ' "' + cgru_PM('/' + RULES.root + params.path, true) + '"';
+	task.command = cmd;
+//console.log( cmd);
+
+	n_SendJob( job);
+
+	i_wnd.destroy();
+}

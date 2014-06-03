@@ -94,6 +94,7 @@ function FilesView( i_args)
 	el.textContent = 'PUT';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.put();}
+	el.title = 'Put selected folders';
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
@@ -101,6 +102,15 @@ function FilesView( i_args)
 	el.textContent = 'CVT';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.convert();}
+	el.title = 'Convert selected sequences (folders) or movies (files)';
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Walk';
+	el.m_path = this.path;
+	el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
+	el.title = 'Send Walk job to AFANASY';
 
 	if( this.has_thumbs )
 	{
@@ -333,18 +343,24 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		el.title = 'Files size without subfolders';
 	}
 
-	var num_files = 0;
-	if( i_obj.num_files )
+	var num_files = null;
+	if( i_obj.num_files != null )
 		num_files = i_obj.num_files;
 	if( i_obj.files && i_obj.files.length )
 		num_files = i_obj.files.length;
-	if( num_files )
+	if( num_files != null )
 	{
 		var el = document.createElement('div');
 		i_el.appendChild( el);
 		el.classList.add('filesnum');
 		el.textContent = 'F:' + num_files;
-		el.title = 'Files quantity: ' + num_files + ' (without subfolders)\nDouble click to update status frames number.';
+
+		var title = 'Files quantity: ' + num_files + ' (without subfolders)';
+		title += '\nDouble click to update status frames number.';
+		title += '\nTotal count with subfolders:';
+		title += '\nFolders: ' + i_obj.num_folders_total;
+		title += '\nFiles: ' + i_obj.num_files_total;
+		el.title = title;
 
 		el.m_num_files = num_files;
 		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};

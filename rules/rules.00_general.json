@@ -208,6 +208,13 @@
 	"af_maxtasks":5
 },
 
+"walk":{
+	"cmd":"python /cgru/rules/bin/walk.py",
+	"af_service":"walk",
+	"af_parser":"generic",
+	"af_capacity":100
+},
+
 "checksum":{
 	"md5":{
 		"cmd":"python /cgru/utilities/checksum.py",
