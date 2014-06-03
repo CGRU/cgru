@@ -186,7 +186,8 @@ Comment.prototype.init = function()
 		if( g_admin || ( this.obj.user_name == g_auth_user.id ))
 			this.elEdit.style.display = 'block';
 
-		if( this.obj.user_name == g_auth_user.id )
+		// If this is a new comment or and own old:
+		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))
 			this.el.classList.add('own');
 	}
 	else
@@ -562,8 +563,8 @@ Comment.prototype.updateStatus = function()
 	if( RULES.status.tags == null )
 		RULES.status.tags = [];
 
-	if( RULES.status.artist == null )
-		RULES.status.artist = [];
+	if( RULES.status.artists == null )
+		RULES.status.artists = [];
 
 	var reps_tags = [];
 	var reps_arts = [];
