@@ -488,12 +488,13 @@ function sc_ShowAllShots()
 
 function sc_StatusProcess( i_status)
 {
+	if( i_status == null ) return;
+
 	if( i_status.frames_num )
 		sc_frames_total += i_status.frames_num;
 
 	// Reports:
 
-	if( i_status == null ) return;
 	if( i_status.reports == null ) return;
 
 	for( var i = 0; i < i_status.reports.length; i++)
