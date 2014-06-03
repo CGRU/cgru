@@ -12,6 +12,10 @@ sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px',"bool":true};
 sc_thumb_params_values = {};
 
 
+sc_reps_types = {};
+sc_reps_duration = 0;
+sc_frames_total = 0;
+
 if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
 {
 	sc_Init();
@@ -124,11 +128,12 @@ function scene_Show()
 
 		sc_elCurEditShot = elShot;
 		sc_ShotStatusApply( folders[f].status);
+		sc_StatusProcess( folders[f].status);
 		sc_elCurEditShot = null;
 
 		elShot.onclick = sc_ShotClicked;
 	}
-	sc_DisplayCounts();
+	sc_DisplayStatistics();
 	sc_Post();
 }
 
@@ -247,12 +252,13 @@ function scenes_Received( i_data, i_args)
 
 			sc_elCurEditShot = elShot;
 			sc_ShotStatusApply( fobj.status);
+			sc_StatusProcess( fobj.status);
 			sc_elCurEditShot = null;
 
 			elShot.onclick = sc_ShotClicked;
 		}
 	}
-	sc_DisplayCounts();
+	sc_DisplayStatistics();
 	sc_Post();
 }
 
@@ -457,7 +463,7 @@ function sc_FilterShots( i_args)
 			}
 		}
 
-	sc_DisplayCounts();
+	sc_DisplayStatistics();
 }
 
 function sc_ShowAllShots()
@@ -477,11 +483,58 @@ function sc_ShowAllShots()
 			sc_elScenes[i].m_hidden = false;
 		}
 
-	sc_DisplayCounts();
+	sc_DisplayStatistics();
 }
 
-function sc_DisplayCounts()
+function sc_StatusProcess( i_status)
 {
+	if( i_status.frames_num )
+		sc_frames_total += i_status.frames_num;
+
+	// Reports:
+
+	if( i_status == null ) return;
+	if( i_status.reports == null ) return;
+
+	for( var i = 0; i < i_status.reports.length; i++)
+	{
+		var report = i_status.reports[i];
+
+		if(( report.tags == null ) || ( report.tags.length == 0 ))
+			report.tags = ['other'];
+
+		for( var t = 0; t < report.tags.length; t++)
+		{
+			var rtype;
+			if( sc_reps_types[report.tags[t]])
+			{
+				rtype = sc_reps_types[report.tags[t]];
+			}
+			else
+			{
+				rtype = {};
+				rtype.duration = 0;
+				rtype.artists = [];
+				sc_reps_types[report.tags[t]] = rtype;
+			}
+
+			rtype.duration += report.duration;
+
+			if( rtype.artists.indexOf( report.artist) == -1 )
+				rtype.artists.push( report.artist);
+		}
+
+		sc_reps_duration += report.duration;
+		//console.log( JSON.stringify( report));
+	}
+
+	sc_reps_types.total = {"duration":sc_reps_duration,"artists":[]};
+}
+
+function sc_DisplayStatistics()
+{
+	// Shots count and progress:
+	//
 	var shots = 0;
 	var progress = 0;
 	for( var i = 0; i < sc_elShots.length; i++)
@@ -493,11 +546,9 @@ function sc_DisplayCounts()
 			progress += stat.progress;
 	}
 
-//	$('scenes_shots_count').textContent = shots;
 	var info = 'Shots Count: ' + shots;
 	if( shots )
 		info += ' Shots Progress: ' + Math.round(progress/shots) + '%';
-//		$('scenes_shots_progress').textContent = Math.round(progress/shots) + '%';
 
 	if( ASSET.type == 'scenes')
 	{
@@ -507,11 +558,28 @@ function sc_DisplayCounts()
 			if( sc_elScenes[i].m_hidden ) continue;
 			scenes++;
 		}
-//		$('scenes_scenes_count').textContent = scenes;
 		info = ' Scenes Count: ' + scenes + ' ' + info;
 	}
 
+	if( sc_frames_total ) info += ' Frames count: ' + sc_frames_total;
+
 	$('scenes_info').textContent = info;
+
+	// Reports:
+	//
+	for( var rtype in sc_reps_types )
+	{
+		var el = document.createElement('div');
+		$('scenes_reports').appendChild( el);
+
+		var info = c_GetTagTitle( rtype) + ': ' + sc_reps_types[rtype].duration;
+		for( var a = 0; a < sc_reps_types[rtype].artists.length; a++)
+		{
+			if( a ) info += ',';
+			info += ' ' + c_GetUserTitle( sc_reps_types[rtype].artists[a]);
+		}
+		el.textContent = info;
+	}
 }
 
 function scenes_makeThumbnails()
