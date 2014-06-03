@@ -21,7 +21,7 @@ Parser.add_option('-o', '--output',  dest='output',     type  ='string',     def
 	help='Output image')
 Parser.add_option('-t', '--time',    dest='time',       type  ='int',        default=0,
 	help='Midification test time')
-Parser.add_option('-s', '--skip',    dest='skip',       type  ='string',     default='matte,mask',
+Parser.add_option('-s', '--skip',    dest='skip',       type  ='string',     default='matte,mask,layer',
 	help='Skip folders and folders, comma separated list.')
 Parser.add_option(      '--nomovie', dest='nomovie',    action='store_true', default=False,
 	help='Skip movie files.')
