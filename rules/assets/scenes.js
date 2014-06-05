@@ -562,7 +562,7 @@ function sc_DisplayStatistics()
 		info = ' Scenes Count: ' + scenes + ' ' + info;
 	}
 
-	if( sc_frames_total ) info += ' Frames count: ' + sc_frames_total;
+	if( sc_frames_total ) info += ' Frames count: ' + sc_frames_total + ' = ' + c_DT_DurFromSec( sc_frames_total / RULES.fps);
 
 	$('scenes_info').textContent = info;
 
