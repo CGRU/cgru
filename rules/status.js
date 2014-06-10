@@ -1,40 +1,132 @@
+st_Status = null;
+/*
 st_wnd = null;
-st_elRoot = null;
+this.elEdit = null;
 st_elParent = null;
 st_elToHide = null
 st_path = null;
 st_status = null;
 st_FuncApply = null;
 st_progress = null;
+*/
+function st_InitAuth()
+{
+	$('status_edit_btn').style.display = 'block';
+}
+
+function st_Finish()
+{
+//	st_DestroyEditUI();
+//	st_Show( null);
+	st_Status = null;
+}
+
+function st_BodyModified()
+{
+	if( RULES.status == null ) RULES.status = {};
+	if( RULES.status.body == null )
+	{
+		RULES.status.body = {};
+		RULES.status.body.cuser = g_auth_user.id;
+		RULES.status.body.ctime = c_DT_CurSeconds();
+	}
+	else
+	{
+		RULES.status.body.muser = g_auth_user.id;
+		RULES.status.body.mtime = c_DT_CurSeconds();
+	}
+
+	st_Save();
+}
 
 function st_Show( i_status)
 {
-	if( i_status != null )
+/*	if( i_status != null )
 		RULES.status = c_CloneObj( i_status);
 	else
-		i_status = RULES.status;
+		i_status = RULES.status;*/
+	if( st_Status )
+		st_Status.show();
+	else
+		new Status( i_status);
+}
 
-	st_SetElAnnotation( i_status, u_el.status_annotation);
-	st_SetElColor( i_status, u_el.content_info);
-	st_SetElProgress( i_status, u_el.status_progressbar, u_el.status_progress, u_el.status_percentage);
-	st_SetElArtists( i_status, u_el.status_artists);
-	st_SetElTags( i_status, u_el.status_tags);
-	st_SetElFramesNum( i_status, u_el.status_framesnum);
-	st_SetElFinish( i_status, u_el.status_finish);
+function Status( i_obj, i_args)
+{
+	if( i_args == null ) i_args = {};
 
-	var modified = '';
-	if( RULES.status )
+	if( i_args.createGUI )
+		i_args.createGUI( this);
+	else
 	{
-		if( RULES.status.muser ) modified += ' by ' + c_GetUserTitle( RULES.status.muser);
-		if( RULES.status.mtime ) modified += ' at ' + c_DT_StrFromSec( RULES.status.mtime);
-		if( modified != '' ) modified = 'Modified' + modified;
+		this.elParent      = $('status');
+		this.elShow        = $('status_show');
+		this.elEditBtn     = $('status_edit_btn');
+		this.elColor       = $('status');
+		this.elAnnotation  = $('status_annotation');
+		this.elProgress    = $('status_progress');
+		this.elProgressBar = $('status_progressbar');
+		this.elPercentage  = $('status_percentage');
+		this.elArtists     = $('status_artists');
+		this.elTags        = $('status_tags');
+		this.elFramesNum   = $('status_framesnum');
+		this.elFinish      = $('status_finish');
+		this.elModified    = $('status_modified');
+		this.elReports     = $('status_reports');
 	}
-	$('status_modified').textContent = modified;
 
+	if( this.elEditBtn )
+	{
+		this.elEditBtn.m_status = this;
+		this.elEditBtn.onclick = function(e){e.currentTarget.m_status.edit();};
+	}
+
+	this.path = i_args.path;
+	if( this.path == null ) this.path = g_CurPath();
+
+	this.obj = i_obj;
+	this.args = i_args;
+
+	this.show();
+}
+
+Status.prototype.show = function( i_status)
+{
+	if( i_status ) this.obj = i_status;
+
+	if( this.elShow       ) this.elShow.style.display = 'block';
+	if( this.elColor      ) st_SetElColor(      this.obj, this.elColor);
+	if( this.elAnnotation ) st_SetElAnnotation( this.obj, this.elAnnotation);
+	if( this.elProgress   ) st_SetElProgress(   this.obj, this.elProgressBar, this.elProgress, this.elPercentage);
+	if( this.elArtists    ) st_SetElArtists(    this.obj, this.elArtists);
+	if( this.elTags       ) st_SetElTags(       this.obj, this.elTags);
+	if( this.elFramesNum  ) st_SetElFramesNum(  this.obj, this.elFramesNum);
+	if( this.elFinish     ) st_SetElFinish(     this.obj, this.elFinish);
+	if( this.elModified   )
+	{
+		var modified = '';
+		if( RULES.status )
+		{
+			if( RULES.status.muser ) modified += ' by ' + c_GetUserTitle( RULES.status.muser);
+			if( RULES.status.mtime ) modified += ' at ' + c_DT_StrFromSec( RULES.status.mtime);
+			if( modified != '' ) modified = 'Modified' + modified;
+		}
+		this.elModified.textContent = modified;
+	}
+	if( this.elEdit )
+	{
+		if( this.elParent )
+		{
+			this.elParent.removeChild( this.elEdit);
+			this.elParent.classList.remove('status_editing');
+		}
+		this.elEdit = null;
+	}
 
 	// Reports:
+	if( this.elReports == null ) return;
 
-	$('status_reports').textContent = '';
+	this.elReports.textContent = '';
 	if( RULES.status == null ) return;
 	if( RULES.status.reports == null ) return;
 	if( RULES.status.reports.length == 0 ) return;
@@ -79,7 +171,7 @@ function st_Show( i_status)
 	for( var rtype in reps_types )
 	{
 		var el = document.createElement('div');
-		$('status_reports').appendChild( el);
+		this.elReports.appendChild( el);
 		var info = c_GetTagTitle( rtype) + ': ' + reps_types[rtype].duration;
 		for( var a = 0; a < reps_types[rtype].artists.length; a++)
 		{
@@ -195,7 +287,6 @@ function st_SetElTags( i_status, i_elTags, i_short)
 }
 function st_SetElColor( i_status, i_elBack, i_elColor, i_setNone)
 {
-	if( i_elBack == null ) i_elBack = st_elParent;
 	if( i_elColor == null ) i_elColor = i_elBack;
 	if( i_setNone == null ) i_setNone = true;
 
@@ -248,23 +339,34 @@ function st_SetElFinish( i_status, i_elFinish, i_full)
 	i_elFinish.style.color = 'rgb('+Math.round(150*alpha)+',0,0)';
 	i_elFinish.textContent = text;
 }
-
-function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
+/*
+function st_StatusEditOnClick()
+{
+	st_CreateEditUI( $('status'), g_CurPath(), RULES.status, st_Show, $('status_show'));
+}
+*/
+//function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
+Status.prototype.edit = function()
 {
 //console.log(JSON.stringify(i_status));
-	if( i_elToHide )
-		i_elToHide.style.display = 'none';
+	if( this.elEdit ) return;
 
-	st_DestroyEditUI();
+	if( this.elShow ) this.elShow.style.display = 'none';
 
-	st_elParent = i_elParent;
-	st_elParent.classList.add('status_editing');
-	st_elToHide = i_elToHide;
-	st_path = i_path;
-	st_progress = null;
-	st_FuncApply = i_FuncApply;
-	st_status = {};
+	this.elParent.classList.add('status_editing');
 
+//	st_DestroyEditUI();
+	this.elEdit = document.createElement('div');
+	this.elParent.appendChild( this.elEdit);
+	this.elEdit.classList.add('status_edit');
+
+//	st_elParent = i_elParent;
+//	st_elToHide = i_elToHide;
+//	st_path = i_path;
+//	st_progress = null;
+//	st_FuncApply = i_FuncApply;
+//	st_status = {};
+/*
 	if( i_status )
 	{
 		st_status = c_CloneObj( i_status);
@@ -272,33 +374,34 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 		if( i_status.progress != null )
 			st_progress = i_status.progress;
 	}
-//console.log(JSON.stringify(st_status));
-//	st_status.annotation = i_status.annotation;
-//	st_status.color = i_status.color;
+*/
 
-	st_elRoot = document.createElement('div');
-	st_elParent.appendChild( st_elRoot);
-	st_elRoot.classList.add('status_edit');
-	st_elRoot.onclick = function(e){e.stopPropagation();};
+//	this.elEdit = document.createElement('div');
+//	st_elParent.appendChild( this.elEdit);
+//	this.elEdit.classList.add('status_edit');
+	this.elEdit.onclick = function(e){e.stopPropagation();};
 
 	var elBtns = document.createElement('div');
-	st_elRoot.appendChild( elBtns);
+	this.elEdit.appendChild( elBtns);
 	elBtns.style.cssFloat = 'right';
 
 	var elBtnCancel = document.createElement('div');
 	elBtns.appendChild( elBtnCancel);
 	elBtnCancel.classList.add('button');
 	elBtnCancel.textContent = 'Cancel';
-	elBtnCancel.onclick = st_DestroyEditUI;
+	elBtnCancel.m_status = this;
+//	elBtnCancel.onclick = function(e){e.currentTarget.m_status.editCancel();};
+	elBtnCancel.onclick = function(e){e.currentTarget.m_status.show();};
 
 	var elBtnSave = document.createElement('div');
 	elBtns.appendChild( elBtnSave);
 	elBtnSave.classList.add('button');
 	elBtnSave.textContent = 'Save';
-	elBtnSave.onclick = st_SaveOnClick;
+	elBtnSave.m_status = this;
+	elBtnSave.onclick = function(e){e.currentTarget.m_status.editSave();};
 
 	var elFinishDiv = document.createElement('div');
-	st_elRoot.appendChild( elFinishDiv);
+	this.elEdit.appendChild( elFinishDiv);
 	elFinishDiv.style.cssFloat = 'right';
 	elFinishDiv.style.width = '200px';
 	elFinishDiv.style.textAlign = 'center';
@@ -307,26 +410,26 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	elFinishDiv.appendChild( elFinishLabel);
 	elFinishLabel.style.cssFloat = 'left';
 	elFinishLabel.textContent = 'Finish:';
-	elFinishLabel.onclick  = function(){ st_elFinish.textContent = c_DT_FormStrNow();};
+	elFinishLabel.onclick  = function(){ this.elEdit_finish.textContent = c_DT_FormStrNow();};
 	elFinishLabel.style.cursor = 'pointer';
-	st_elFinish = document.createElement('div');
-	elFinishDiv.appendChild( st_elFinish);
-	st_elFinish.classList.add('editing');
-	st_elFinish.contentEditable = 'true';
+	this.elEdit_finish = document.createElement('div');
+	elFinishDiv.appendChild( this.elEdit_finish);
+	this.elEdit_finish.classList.add('editing');
+	this.elEdit_finish.contentEditable = 'true';
 
 	var elAnnDiv = document.createElement('div');
-	st_elRoot.appendChild( elAnnDiv);
+	this.elEdit.appendChild( elAnnDiv);
 	var elAnnLabel = document.createElement('div');
 	elAnnDiv.appendChild( elAnnLabel);
 	elAnnLabel.textContent = 'Annotation:';
 	elAnnLabel.style.cssFloat = 'left';
-	st_elAnn = document.createElement('div');
-	elAnnDiv.appendChild( st_elAnn);
-	st_elAnn.classList.add('editing');
-	st_elAnn.contentEditable = 'true';
+	this.elEdit_annotation = document.createElement('div');
+	elAnnDiv.appendChild( this.elEdit_annotation);
+	this.elEdit_annotation.classList.add('editing');
+	this.elEdit_annotation.contentEditable = 'true';
 
 	var elProgressDiv = document.createElement('div');
-	st_elRoot.appendChild( elProgressDiv);
+	this.elEdit.appendChild( elProgressDiv);
 //	elProgressDiv.style.cssFloat = 'left';
 	elProgressDiv.classList.add('percent');
 	var elProgressLabel = document.createElement('div');
@@ -334,100 +437,108 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	elProgressLabel.textContent = 'Progress:';
 //	elProgressLabel.style.cssFloat = 'left';
 	elProgressLabel.style.fontSize = '12px';
-	st_elProgress = document.createElement('div');
-	elProgressDiv.appendChild( st_elProgress);
-	st_elProgress.style.width = '40px';
-	st_elProgress.style.height = '18px';
-	st_elProgress.contentEditable = 'true';
-	st_elProgress.classList.add('editing');
-	st_elProgress.style.textAlign = 'center';
+	this.elEdit_progress = document.createElement('div');
+	elProgressDiv.appendChild( this.elEdit_progress);
+	this.elEdit_progress.style.width = '40px';
+	this.elEdit_progress.style.height = '18px';
+	this.elEdit_progress.contentEditable = 'true';
+	this.elEdit_progress.classList.add('editing');
+	this.elEdit_progress.style.textAlign = 'center';
 
-	st_elArtists = document.createElement('div');
-	st_elRoot.appendChild( st_elArtists);
-	st_elArtists.classList.add('list');
-	st_elArtists.classList.add('artists');
-	st_elArtists.m_elBtn = document.createElement('div');
-	st_elArtists.appendChild( st_elArtists.m_elBtn);
-	st_elArtists.m_elBtn.classList.add('button');
-	st_elArtists.m_elBtn.style.cssFloat = 'left';;
-	st_elArtists.m_elBtn.textContent = 'Artists:';
-	st_elArtists.m_elBtn.onclick = st_EditArtistsShow;
-	st_elArtists.m_elList = document.createElement('div');
-	st_elArtists.appendChild( st_elArtists.m_elList);
+	this.elEdit_artists = document.createElement('div');
+	this.elEdit.appendChild( this.elEdit_artists);
+	this.elEdit_artists.classList.add('list');
+	this.elEdit_artists.classList.add('artists');
+	this.elEdit_artists.m_elBtn = document.createElement('div');
+	this.elEdit_artists.appendChild( this.elEdit_artists.m_elBtn);
+	this.elEdit_artists.m_elBtn.classList.add('button');
+	this.elEdit_artists.m_elBtn.style.cssFloat = 'left';;
+	this.elEdit_artists.m_elBtn.textContent = 'Artists:';
+	this.elEdit_artists.m_elBtn.m_status = this;
+	this.elEdit_artists.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editArtistsShow();};
+	this.elEdit_artists.m_elList = document.createElement('div');
+	this.elEdit_artists.appendChild( this.elEdit_artists.m_elList);
 
-	if( st_status.artists )
-		for( var i = 0; i < st_status.artists.length; i++)
+	if( this.obj.artists )
+		for( var i = 0; i < this.obj.artists.length; i++)
 		{
 			var el = document.createElement('div');
-			st_elArtists.m_elList.appendChild( el);
-			el.textContent = c_GetUserTitle( st_status.artists[i]);
+			this.elEdit_artists.m_elList.appendChild( el);
+			el.textContent = c_GetUserTitle( this.obj.artists[i]);
 			el.classList.add('tag');
 			el.classList.add('selected');
 		}
 
-	st_elTags = document.createElement('div');
-	st_elRoot.appendChild( st_elTags);
-	st_elTags.classList.add('list');
-	st_elTags.classList.add('tags');
-	st_elTags.m_elBtn = document.createElement('div');
-	st_elTags.appendChild( st_elTags.m_elBtn);
-	st_elTags.m_elBtn.classList.add('button');
-	st_elTags.m_elBtn.style.cssFloat = 'left';
-	st_elTags.m_elBtn.textContent = 'Tags:';
-	st_elTags.m_elBtn.onclick = st_EditTagsShow;
-	st_elTags.m_elList = document.createElement('div');
-	st_elTags.appendChild( st_elTags.m_elList);
-	if( st_status.tags )
-		for( var i = 0; i < st_status.tags.length; i++)
+	this.elEdit_tags = document.createElement('div');
+	this.elEdit.appendChild( this.elEdit_tags);
+	this.elEdit_tags.classList.add('list');
+	this.elEdit_tags.classList.add('tags');
+	this.elEdit_tags.m_elBtn = document.createElement('div');
+	this.elEdit_tags.appendChild( this.elEdit_tags.m_elBtn);
+	this.elEdit_tags.m_elBtn.classList.add('button');
+	this.elEdit_tags.m_elBtn.style.cssFloat = 'left';
+	this.elEdit_tags.m_elBtn.textContent = 'Tags:';
+	this.elEdit_tags.m_elBtn.m_status = this;
+	this.elEdit_tags.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editTagsShow();};
+	this.elEdit_tags.m_elList = document.createElement('div');
+	this.elEdit_tags.appendChild( this.elEdit_tags.m_elList);
+	if( this.obj.tags )
+		for( var i = 0; i < this.obj.tags.length; i++)
 		{
 			var el = document.createElement('div');
-			st_elTags.m_elList.appendChild( el);
-			el.textContent = c_GetTagTitle( i_status.tags[i]);
-			el.title = c_GetTagTip( i_status.tags[i]);
+			this.elEdit_tags.m_elList.appendChild( el);
+			el.textContent = c_GetTagTitle( this.obj.tags[i]);
+			el.title = c_GetTagTip( this.obj.tags[i]);
 			el.classList.add('tag');
 			el.classList.add('selected');
 		}
 
-	st_elColor = document.createElement('div');
-	st_elRoot.appendChild( st_elColor);
-	st_elColor.classList.add('color');
-	u_DrawColorBars({"el":st_elColor,"onclick":st_EditColorOnClick});
+	var elColor = document.createElement('div');
+	this.elEdit.appendChild( elColor);
+	elColor.classList.add('color');
+	u_DrawColorBars({"el":elColor,"onclick":st_EditColorOnClick,"data":this});
 
-	st_SetElAnnotation( st_status, st_elAnn);
-	st_SetElColor( st_status);
-	if( st_status.finish )
-		st_elFinish.textContent = c_DT_FormStrFromSec( st_status.finish);
-	if( st_status.progress != null ) st_elProgress.textContent = st_status.progress;
+	st_SetElAnnotation( this.obj, this.elEdit_annotation);
+//	st_SetElColor( this.obj);
+	if( this.obj.finish )
+		this.elEdit_finish.textContent = c_DT_FormStrFromSec( this.obj.finish);
+	if( this.obj.progress != null ) this.elEdit_progress.textContent = this.obj.progress;
 
-	st_elAnn.focus();
+	this.elEdit_annotation.focus();
+}
+function st_EditColorOnClick( i_clr, i_data)
+{
+	i_data.edit_color = i_clr;
+	st_SetElColor({"color": i_clr}, i_data.elColor);
 }
 
+/*
 function st_DestroyEditUI()
 {
 	if( st_elParent )
 	{
 		st_elParent.classList.remove('status_editing');
-		if( st_elRoot ) st_elParent.removeChild( st_elRoot);
+		if( this.elEdit ) st_elParent.removeChild( this.elEdit);
 	}
 
 	if( st_elToHide )
 		st_elToHide.style.display = 'block';
 
-	st_elRoot = null;
+	this.elEdit = null;
 	st_elParent = null;
 	st_elToHide = null;
 	st_status = null;
 }
-
-function st_EditTagsShow( i_evt)
+*/
+Status.prototype.editTagsShow = function()
 {
-	st_EditShowList( st_elTags, 'tags', RULES.tags);
+	this.editShowList( this.elEdit_tags, 'tags', RULES.tags);
 }
-function st_EditArtistsShow( i_evt)
+Status.prototype.editArtistsShow = function()
 {
-	st_EditShowList( st_elArtists, 'artists', g_users);
+	this.editShowList( this.elEdit_artists, 'artists', g_users);
 }
-function st_EditShowList( i_elParent, i_stParam, i_list)
+Status.prototype.editShowList = function( i_elParent, i_stParam, i_list)
 {
 	if( i_elParent.m_edit ) return;
 	i_elParent.m_edit = true;
@@ -445,7 +556,7 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 			el.textContent = item;
 		if( i_list[item].tip ) el.title = i_list[item].tip;
 		el.m_item = item;
-		if( st_status[i_stParam] && ( st_status[i_stParam].indexOf( item) != -1 ))
+		if( this.obj[i_stParam] && ( this.obj[i_stParam].indexOf( item) != -1 ))
 		{
 			el.m_selected = true;
 			el.classList.add('selected');
@@ -455,54 +566,54 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 	}
 }
 
-function st_EditColorOnClick( i_clr)
+Status.prototype.editSave = function()
 {
-	st_status.color = i_clr;
-	st_SetElColor( st_status);
-}
+	if( this.obj == null ) this.obj = {};
+	var old_progress = this.obj.progress;
 
-function st_SaveOnClick()
-{
-	var finish = st_elFinish.textContent;
+	this.obj.color = this.edit_color;
+
+	var finish = this.elEdit_finish.textContent;
 	if( finish.length )
 	{
-		finish = c_DT_SecFromStr( st_elFinish.textContent);
+		finish = c_DT_SecFromStr( this.elEdit_finish.textContent);
 		if( finish == 0 ) return;
-		st_status.finish = finish;
+		this.obj.finish = finish;
 	}
 
-	st_status.annotation = c_Strip( st_elAnn.innerHTML);
-	st_status.progress = parseInt( c_Strip( st_elProgress.textContent));
-	if( st_elArtists.m_elListAll )
+	this.obj.annotation = c_Strip( this.elEdit_annotation.innerHTML);
+	this.obj.progress = parseInt( c_Strip( this.elEdit_progress.textContent));
+	if( this.elEdit_artists.m_elListAll )
 	{
-		st_status.artists = [];
-		for( var i = 0; i < st_elArtists.m_elListAll.length; i++)
-			if( st_elArtists.m_elListAll[i].m_selected )
-				st_status.artists.push( st_elArtists.m_elListAll[i].m_item);
+		this.obj.artists = [];
+		for( var i = 0; i < this.elEdit_artists.m_elListAll.length; i++)
+			if( this.elEdit_artists.m_elListAll[i].m_selected )
+				this.obj.artists.push( this.elEdit_artists.m_elListAll[i].m_item);
 	}
-	if( st_elTags.m_elListAll )
+	if( this.elEdit_tags.m_elListAll )
 	{
-		st_status.tags = [];
-		for( var i = 0; i < st_elTags.m_elListAll.length; i++)
-			if( st_elTags.m_elListAll[i].m_selected )
-				st_status.tags.push( st_elTags.m_elListAll[i].m_item);
+		this.obj.tags = [];
+		for( var i = 0; i < this.elEdit_tags.m_elListAll.length; i++)
+			if( this.elEdit_tags.m_elListAll[i].m_selected )
+				this.obj.tags.push( this.elEdit_tags.m_elListAll[i].m_item);
 	}
 
-	st_status.muser = g_auth_user.id;
-	st_status.mtime = c_DT_CurSeconds();
+	this.obj.muser = g_auth_user.id;
+	this.obj.mtime = c_DT_CurSeconds();
 
-	st_FuncApply( st_status);
-	if( g_CurPath() == st_path )
-		g_FolderSetStatus( st_status);
+//	st_FuncApply( st_status);
+	if( g_CurPath() == this.path )
+		g_FolderSetStatus( this.obj);
 
-	st_Save( st_status, st_path);
-	nw_MakeNews({"title":'status',"path":st_path,"artists":st_status.artists});
+	st_Save( this.obj, this.path);
+	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 
-	if( st_elProgress.textContent.length )
-		if( st_progress != st_status.progress )
-			st_UpdateProgresses( st_path);
+	if( this.elEdit_progress.textContent.length )
+		if( old_progress != this.obj.progress )
+			st_UpdateProgresses( this.path);
 
-	st_DestroyEditUI();
+//	st_DestroyEditUI();
+	this.show();
 }
 
 function st_Save( i_status, i_path, i_wait)
@@ -521,7 +632,7 @@ function st_SetFramesNumber( i_num)
 	if( RULES.status == null ) RULES.status = {};
 	RULES.status.frames_num = i_num;
 	st_Save();
-	st_Show();
+	st_Show( RULES.status);
 }
 
 function st_UpdateProgresses( i_path)

@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','info','log','navig','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','content_info','content_status','thumbnail','status_finish','status_framesnum'];
+u_elements = ['asset','assets','info','log','navig','cycle','thumbnail'];
 u_el = {};
 u_views = ['asset','files','body','comments'];
 
@@ -57,9 +57,9 @@ function u_Init()
 }
 function u_InitAuth()
 {
+	st_InitAuth();
 	$('body_edit').style.display = 'block';
 	$('search_artists_div').style.display = 'block';
-	$('status_edit').style.display = 'block';
 	$('auth_user').textContent = c_GetUserTitle()+' ['+g_auth_user.id+']';
 
 	var elArtists = $('search_artists');
@@ -109,7 +109,7 @@ function u_Process()
 	$('body_avatar_c').style.display = 'none';
 	$('body_avatar_m').style.display = 'none';
 
-	st_Show();
+	st_Show( RULES.status);
 	u_ViewsFuncsOpen();
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
@@ -126,12 +126,9 @@ function u_Process()
 
 function u_Finish()
 {
-	st_DestroyEditUI();
-
-	st_Show( null);
-
 	u_el.thumbnail.style.display = 'none';
 
+	st_Finish();
 	nw_Finish();
 	a_Finish();
 	fv_Finish();
@@ -262,11 +259,6 @@ function u_ApplyStyles()
 	var backs = ['asset','body','files','comments'];
 	for( var i = 0; i < backs.length; i++ )
 		$(backs[i]+'_div').style.background = localStorage['back_' + backs[i]];
-}
-
-function u_StatusEditOnClick()
-{
-	st_CreateEditUI( u_el.content_info, g_CurPath(), RULES.status, st_Show, u_el.content_status);
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
@@ -670,20 +662,8 @@ function u_BodyEditSave()
 	var text = c_LinksProcess( $('body_body').innerHTML);
 	var res = c_Parse( n_Request_old({"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}}));
 
-	if( RULES.status == null ) RULES.status = {};
-	if( RULES.status.body == null )
-	{
-		RULES.status.body = {};
-		RULES.status.body.cuser = g_auth_user.id;
-		RULES.status.body.ctime = c_DT_CurSeconds();
-	}
-	else
-	{
-		RULES.status.body.muser = g_auth_user.id;
-		RULES.status.body.mtime = c_DT_CurSeconds();
-	}
+	st_BodyModified();
 
-	st_Save();
 	nw_MakeNews({"title":'body'});
 	u_BodyEditCancel();
 	u_BodyLoad( true);

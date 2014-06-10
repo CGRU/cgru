@@ -330,7 +330,7 @@ padding: 1px 8px;
 #content #panel #subscribe .button.disabled { font-weight: bold; background: #FF0000; padding: 1px 20px; }
 #content #panel #subscribe .button.ignore { background: rgba(255,255,0,.1); }
 
-#content #content_info {
+#content #status {
 box-shadow: 0 0 2px #000 inset;
 /*border-radius: 10px;*/
 padding: 4px;

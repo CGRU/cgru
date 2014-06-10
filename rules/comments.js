@@ -604,7 +604,7 @@ Comment.prototype.updateStatus = function()
 
 	RULES.status.reports = reports;
 	st_Save();
-	st_Show();
+	st_Show( RULES.status);
 }
 
 Comment.prototype.processUploads = function()
