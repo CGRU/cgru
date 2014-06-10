@@ -214,8 +214,8 @@ function c_DT_DurFromSec( i_sec)
 	var hours = Math.floor( i_sec / 3600 );
 	var secs  = i_sec - ( hours * 3600 );
 	var mins  = Math.floor( secs / 60 );
-	secs      = secs - ( mins * 60 );
-	return hours + ':' + mins + ':' + secs;
+	secs      = Math.round( secs - ( mins * 60 ));
+	return hours + ':' + c_PadZero( mins) + ':' + c_PadZero( secs);
 }
 function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
