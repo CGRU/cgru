@@ -222,7 +222,13 @@ function shot_SourceReceived( i_data, i_args)
 function shot_SourceWalkFind( i_walk, o_list, i_path)
 {
 //window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
-	if( i_walk.folders == null ) return;
+	if( i_walk.files && i_walk.files.length )
+	{
+		if( i_walk.name == null ) i_walk.name = '/';
+		o_list.push( i_walk);
+	}
+
+	if(( i_walk.folders == null ) || ( i_walk.folders.length == 0 )) return;
 
 	i_walk.folders.sort( c_CompareFiles );
 	for( var f = 0; f < i_walk.folders.length; f++)
@@ -232,11 +238,7 @@ function shot_SourceWalkFind( i_walk, o_list, i_path)
 		var path = i_path;
 		if( path ) path += '/' + fobj.name;
 		else path = fobj.name;
-		if( fobj.files && fobj.files.length)
-		{
-			fobj.name = path;
-			o_list.push( fobj);
-		}
+
 		shot_SourceWalkFind( fobj, o_list, path);
 	}
 }
