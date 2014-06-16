@@ -1,7 +1,6 @@
 sc_elShots = null;
 sc_elScenes = null;
 sc_elCurShot = null;
-sc_elCurEditShot = null;
 
 sc_elImgThumbs = [];
 
@@ -92,18 +91,11 @@ function scene_Show()
 		elShot.appendChild( elShot.m_elStatus);
 		elShot.m_elStatus.classList.add('status');
 
-		elSt.elEditBtn = document.createElement('div');
-		elShot.m_elStatus.appendChild( elSt.elEditBtn);
-		elSt.elEditBtn.classList.add('button');
-		elSt.elEditBtn.classList.add('btn_edit');
-		elSt.elEditBtn.textContent = 'Edit';
-/*		elSt.elEditBtn.m_elShot = elShot;
-		elSt.elEditBtn.onclick = function(e){
-			e.stopPropagation();
-			var el = e.currentTarget.m_elShot;
-			sc_elCurEditShot = el;
-			st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply, el.m_elStatus);
-		};*/
+		var elEditBtn = document.createElement('div');
+		elShot.m_elStatus.appendChild( elEditBtn);
+		elEditBtn.classList.add('button');
+		elEditBtn.classList.add('btn_edit');
+		elEditBtn.textContent = 'Edit';
 
 		elSt.elProgress = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elProgress);
@@ -136,12 +128,12 @@ function scene_Show()
 			i_status.elShow = elShot.m_elStatus;
 		}
 
-		new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot});
+		var st_obj = new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot});
+		elShot.m_status = st_obj;
+		elEditBtn.m_status = st_obj;
+		elEditBtn.onclick = sc_EditStatus;
 
-//		sc_elCurEditShot = elShot;
-//		sc_ShotStatusApply( folders[f].status);
 		sc_StatusProcess( folders[f].status);
-//		sc_elCurEditShot = null;
 
 		elShot.onclick = sc_ShotClicked;
 	}
@@ -210,7 +202,6 @@ function scenes_Received( i_data, i_args)
 			elScene.m_elThumbnails.push( elShot);
 			elShot.classList.add('shot');
 			elShot.m_path = elScene.m_path + '/' + fobj.name;
-//			elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
 
 			var elImg = document.createElement('img');
 			elShot.appendChild( elImg);
@@ -267,26 +258,30 @@ function scenes_Received( i_data, i_args)
 			}
 
 			var st_obj = new Status( fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot});
-			elShot.m_st_obj = st_obj;
+			elShot.m_status = st_obj;
+			elShot.ondblclick = sc_EditStatus;
 
-			elShot.ondblclick = function(e){
-//				var el = e.currentTarget;
-//				sc_elCurEditShot = el;
-//				st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply);
-				e.currentTarget.m_st_obj.edit();
-				return false;
-			};
-
-//			sc_elCurEditShot = elShot;
-//			sc_ShotStatusApply( fobj.status);
 			sc_StatusProcess( fobj.status);
-//			sc_elCurEditShot = null;
 
 			elShot.onclick = sc_ShotClicked;
 		}
 	}
 	sc_DisplayStatistics();
 	sc_Post();
+}
+
+function sc_EditStatus( e)
+{
+	e.stopPropagation();
+
+	var shots = scenes_GetSelectedShots();
+	var statuses = [];
+	for( var i = 0; i < shots.length; i++)
+		statuses.push( shots[i].m_status);
+
+	e.currentTarget.m_status.edit({"statuses":statuses});
+
+	return false;
 }
 
 function sc_ShotClicked( i_evt)
@@ -338,18 +333,14 @@ function scenes_SelectPlaylist()
 		if( shots.indexOf( sc_elShots[i].m_path) != -1 )
 			sc_SelectShot( sc_elShots[i], true);
 }
-/*
-function sc_ShotStatusApply( i_status)
+function scenes_GetSelectedShots()
 {
-	if( i_status != null ) sc_elCurEditShot.m_status = c_CloneObj( i_status);
-	st_SetElLabel( i_status, sc_elCurEditShot.m_elAnn, false);
-	st_SetElArtists( i_status, sc_elCurEditShot.m_elArtists);
-	st_SetElTags( i_status, sc_elCurEditShot.m_elTags);
-	st_SetElProgress( i_status, sc_elCurEditShot.m_elProgressBar, sc_elCurEditShot.m_elProgress, sc_elCurEditShot.m_elPercent);
-	st_SetElFinish( i_status, sc_elCurEditShot.m_elFinish, ASSET.type == 'scene' );
-	st_SetElColor( i_status, sc_elCurEditShot);
+	var shots = [];
+	for( var i = 0; i < sc_elShots.length; i++)
+		if( sc_elShots[i].m_selected === true )
+			shots.push( sc_elShots[i]);
+	return shots;
 }
-*/
 function sc_SkipFolder( i_name)
 {
 	var name = c_PathBase( i_name);
@@ -623,8 +614,7 @@ function scenes_makeThumbnails()
 	scenes_makeThumbnail();
 }
 
-limit = 10;
-limit_count = 0;
+//limit = 10; limit_count = 0;
 function scenes_makeThumbnail( i_data, i_args)
 {
 //limit_count ++; if( limit_count > limit ) return;
@@ -690,11 +680,9 @@ function scenes_Put()
 {
 	var args = {};
 	args.shots = [];
-	for( var i = 0; i < sc_elShots.length; i++)
-	{
-		if( sc_elShots[i].m_selected !== true ) continue;
-		args.shots.push( sc_elShots[i].m_path);
-	}
+	var shots = scenes_GetSelectedShots();
+	for( var i = 0; i < shots.length; i++)
+		args.shots.push( shots[i].m_path);
 
 	if( args.shots.length < 1 )
 	{

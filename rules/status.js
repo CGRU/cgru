@@ -346,8 +346,9 @@ function st_StatusEditOnClick()
 }
 */
 //function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
-Status.prototype.edit = function()
+Status.prototype.edit = function( i_args)
 {
+//console.log( JSON.stringify( i_args));
 //console.log(JSON.stringify(i_status));
 	if( this.elEdit ) return;
 
@@ -410,12 +411,14 @@ Status.prototype.edit = function()
 	elFinishDiv.appendChild( elFinishLabel);
 	elFinishLabel.style.cssFloat = 'left';
 	elFinishLabel.textContent = 'Finish:';
-	elFinishLabel.onclick  = function(){ this.elEdit_finish.textContent = c_DT_FormStrNow();};
+	elFinishLabel.onclick  = function(e){ e.currentTarget.m_elEdit_finish.textContent = c_DT_FormStrNow();};
+	elFinishLabel.title = 'Double click to set current date.';
 	elFinishLabel.style.cursor = 'pointer';
 	this.elEdit_finish = document.createElement('div');
 	elFinishDiv.appendChild( this.elEdit_finish);
 	this.elEdit_finish.classList.add('editing');
 	this.elEdit_finish.contentEditable = 'true';
+	elFinishLabel.m_elEdit_finish = this.elEdit_finish;
 
 	var elAnnDiv = document.createElement('div');
 	this.elEdit.appendChild( elAnnDiv);
@@ -598,22 +601,26 @@ Status.prototype.editSave = function()
 				this.obj.tags.push( this.elEdit_tags.m_elListAll[i].m_item);
 	}
 
-	this.obj.muser = g_auth_user.id;
-	this.obj.mtime = c_DT_CurSeconds();
-
 //	st_FuncApply( st_status);
-	if( g_CurPath() == this.path )
-		g_FolderSetStatus( this.obj);
-
-	st_Save( this.obj, this.path);
-	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists});
+//	st_DestroyEditUI();
+	this.save();
+	this.show();
 
 	if( this.elEdit_progress.textContent.length )
 		if( old_progress != this.obj.progress )
 			st_UpdateProgresses( this.path);
+}
 
-//	st_DestroyEditUI();
-	this.show();
+Status.prototype.save = function()
+{
+	if( g_CurPath() == this.path )
+		g_FolderSetStatus( this.obj);
+
+	this.obj.muser = g_auth_user.id;
+	this.obj.mtime = c_DT_CurSeconds();
+
+	st_Save( this.obj, this.path);
+	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 }
 
 function st_Save( i_status, i_path, i_wait)
