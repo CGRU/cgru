@@ -83,53 +83,65 @@ function scene_Show()
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
 
-		elShot.m_elFinish = document.createElement('div');
-		elShot.appendChild( elShot.m_elFinish);
+		var elSt = {};
+
+		elSt.elFinish = document.createElement('div');
+		elShot.appendChild( elSt.elFinish);
 
 		elShot.m_elStatus = document.createElement('div');
 		elShot.appendChild( elShot.m_elStatus);
 		elShot.m_elStatus.classList.add('status');
 
-		elShot.m_elEdit = document.createElement('div');
-		elShot.m_elStatus.appendChild( elShot.m_elEdit);
-		elShot.m_elEdit.classList.add('button');
-		elShot.m_elEdit.classList.add('btn_edit');
-		elShot.m_elEdit.textContent = 'Edit';
-		elShot.m_elEdit.m_elShot = elShot;
-		elShot.m_elEdit.onclick = function(e){
+		elSt.elEditBtn = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elEditBtn);
+		elSt.elEditBtn.classList.add('button');
+		elSt.elEditBtn.classList.add('btn_edit');
+		elSt.elEditBtn.textContent = 'Edit';
+/*		elSt.elEditBtn.m_elShot = elShot;
+		elSt.elEditBtn.onclick = function(e){
 			e.stopPropagation();
 			var el = e.currentTarget.m_elShot;
 			sc_elCurEditShot = el;
 			st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply, el.m_elStatus);
-		};
+		};*/
 
-		elShot.m_elProgress = document.createElement('div');
-		elShot.m_elStatus.appendChild( elShot.m_elProgress);
-		elShot.m_elProgress.classList.add('progress');
-		elShot.m_elProgressBar = document.createElement('div');
-		elShot.m_elProgress.appendChild( elShot.m_elProgressBar);
-		elShot.m_elProgressBar.classList.add('progressbar');
+		elSt.elProgress = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elProgress);
+		elSt.elProgress.classList.add('progress');
+		elSt.elProgressBar = document.createElement('div');
+		elSt.elProgress.appendChild( elSt.elProgressBar);
+		elSt.elProgressBar.classList.add('progressbar');
 
-		elShot.m_elPercent = document.createElement('div');
-		elShot.m_elStatus.appendChild( elShot.m_elPercent);
-		elShot.m_elPercent.classList.add('percent');
+		elSt.elPercentage = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elPercentage);
+		elSt.elPercentage.classList.add('percent');
 
-		elShot.m_elAnn = document.createElement('div');
-		elShot.m_elStatus.appendChild( elShot.m_elAnn);
-		elShot.m_elAnn.classList.add('annotation');
+		elSt.elAnnotation = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elAnnotation);
+		elSt.elAnnotation.classList.add('annotation');
 
-		elShot.m_elArtists = document.createElement('div');
-		elShot.m_elStatus.appendChild( elShot.m_elArtists);
-		elShot.m_elArtists.classList.add('artists');
+		elSt.elArtists = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elArtists);
+		elSt.elArtists.classList.add('artists');
 
-		elShot.m_elTags = document.createElement('div');
-		elShot.m_elStatus.appendChild( elShot.m_elTags);
-		elShot.m_elTags.classList.add('tags');
+		elSt.elTags = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elTags);
+		elSt.elTags.classList.add('tags');
 
-		sc_elCurEditShot = elShot;
-		sc_ShotStatusApply( folders[f].status);
+		function st_CreateSceneShot( i_status)
+		{
+			for( var el in elSt ) i_status[el] = elSt[el];
+			i_status.elColor = elShot;
+			i_status.elParent = elShot;
+			i_status.elShow = elShot.m_elStatus;
+		}
+
+		new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot});
+
+//		sc_elCurEditShot = elShot;
+//		sc_ShotStatusApply( folders[f].status);
 		sc_StatusProcess( folders[f].status);
-		sc_elCurEditShot = null;
+//		sc_elCurEditShot = null;
 
 		elShot.onclick = sc_ShotClicked;
 	}
@@ -199,12 +211,6 @@ function scenes_Received( i_data, i_args)
 			elShot.classList.add('shot');
 			elShot.m_path = elScene.m_path + '/' + fobj.name;
 //			elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
-			elShot.ondblclick = function(e){
-				var el = e.currentTarget;
-				sc_elCurEditShot = el;
-				st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply);
-				return false;
-			};
 
 			var elImg = document.createElement('img');
 			elShot.appendChild( elImg);
@@ -213,17 +219,19 @@ function scenes_Received( i_data, i_args)
 			sc_elImgThumbs.push( elImg);
 			elImg.src = elImg.m_src;
 
+			var elSt = {};
+
 			elShot.m_elStatus = document.createElement('div');
 			elShot.appendChild( elShot.m_elStatus);
 			elShot.m_elStatus.classList.add('status');
 
-			elShot.m_elAnn = document.createElement('div');
-			elShot.m_elStatus.appendChild( elShot.m_elAnn);
-			elShot.m_elAnn.classList.add('annotation');
+			elSt.elAnnotation = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elAnnotation);
+			elSt.elAnnotation.classList.add('annotation');
 
-			elShot.m_elPercent = document.createElement('div');
-			elShot.m_elStatus.appendChild( elShot.m_elPercent);
-			elShot.m_elPercent.classList.add('percent');
+			elSt.elPercentage = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elPercentage);
+			elSt.elPercentage.classList.add('percent');
 
 			var elName = document.createElement('a');
 			elShot.m_elStatus.appendChild( elName);
@@ -231,29 +239,48 @@ function scenes_Received( i_data, i_args)
 			elName.textContent = fobj.name;
 			elName.href = '#'+elShot.m_path;
 
-			elShot.m_elProgress = document.createElement('div');
-			elShot.m_elStatus.appendChild( elShot.m_elProgress);
-			elShot.m_elProgress.classList.add('progress');
-			elShot.m_elProgressBar = document.createElement('div');
-			elShot.m_elProgress.appendChild( elShot.m_elProgressBar);
-			elShot.m_elProgressBar.classList.add('progressbar');
+			elSt.elProgress = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elProgress);
+			elSt.elProgress.classList.add('progress');
+			elSt.elProgressBar = document.createElement('div');
+			elSt.elProgress.appendChild( elSt.elProgressBar);
+			elSt.elProgressBar.classList.add('progressbar');
 
-			elShot.m_elTags = document.createElement('div');
-			elShot.m_elStatus.appendChild( elShot.m_elTags);
-			elShot.m_elTags.classList.add('tags');
+			elSt.elTags = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elTags);
+			elSt.elTags.classList.add('tags');
 
-			elShot.m_elArtists = document.createElement('div');
-			elShot.m_elStatus.appendChild( elShot.m_elArtists);
-			elShot.m_elArtists.classList.add('artists');
+			elSt.elArtists = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elArtists);
+			elSt.elArtists.classList.add('artists');
 
-			elShot.m_elFinish = document.createElement('div');
-			elShot.m_elStatus.appendChild( elShot.m_elFinish);
-			elShot.m_elFinish.classList.add('finish');
+/*			elSt.elFinish = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elFinish);
+			elSt.elFinish.classList.add('finish');*/
 
-			sc_elCurEditShot = elShot;
-			sc_ShotStatusApply( fobj.status);
+			function st_CreateSceneShot( i_status)
+			{
+				for( var el in elSt ) i_status[el] = elSt[el];
+				i_status.elParent = elShot;
+				i_status.elColor = elShot;
+				i_status.elShow = elShot.m_elStatus;
+			}
+
+			var st_obj = new Status( fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot});
+			elShot.m_st_obj = st_obj;
+
+			elShot.ondblclick = function(e){
+//				var el = e.currentTarget;
+//				sc_elCurEditShot = el;
+//				st_CreateEditUI( el, el.m_path, el.m_status, sc_ShotStatusApply);
+				e.currentTarget.m_st_obj.edit();
+				return false;
+			};
+
+//			sc_elCurEditShot = elShot;
+//			sc_ShotStatusApply( fobj.status);
 			sc_StatusProcess( fobj.status);
-			sc_elCurEditShot = null;
+//			sc_elCurEditShot = null;
 
 			elShot.onclick = sc_ShotClicked;
 		}
@@ -311,7 +338,7 @@ function scenes_SelectPlaylist()
 		if( shots.indexOf( sc_elShots[i].m_path) != -1 )
 			sc_SelectShot( sc_elShots[i], true);
 }
-
+/*
 function sc_ShotStatusApply( i_status)
 {
 	if( i_status != null ) sc_elCurEditShot.m_status = c_CloneObj( i_status);
@@ -322,7 +349,7 @@ function sc_ShotStatusApply( i_status)
 	st_SetElFinish( i_status, sc_elCurEditShot.m_elFinish, ASSET.type == 'scene' );
 	st_SetElColor( i_status, sc_elCurEditShot);
 }
-
+*/
 function sc_SkipFolder( i_name)
 {
 	var name = c_PathBase( i_name);

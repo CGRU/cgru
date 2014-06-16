@@ -174,11 +174,11 @@ function c_DT_StrFromMSec( i_time, i_nosec)
 }
 function c_DT_CurSeconds() { return Math.round((new Date).valueOf()/1000);}
 function c_DT_FormStrNow() { return c_DT_FormStrFromSec( c_DT_CurSeconds());}
-function c_DT_SecFromStr( i_str) { return  Math.round( c_DT_DateFromStr( i_str).valueOf()/1000);}
+function c_DT_SecFromStr( i_str) { return Math.round( c_DT_DateFromStr( i_str).valueOf()/1000);}
 function c_DT_DateFromStr( i_str)
 {
 	var nums = c_Strip( i_str).split(/\D{1,}/);
-	c_Error('Invalid date: "'+i_str+'"');
+//	c_Error('Invalid date: "'+i_str+'"');
 	var date = new Date(0);
 	if( nums.length < 3 ) return date;
 	var day = nums[0];

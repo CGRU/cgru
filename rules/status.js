@@ -78,7 +78,7 @@ function Status( i_obj, i_args)
 	if( this.elEditBtn )
 	{
 		this.elEditBtn.m_status = this;
-		this.elEditBtn.onclick = function(e){e.currentTarget.m_status.edit();};
+		this.elEditBtn.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_status.edit();};
 	}
 
 	this.path = i_args.path;
@@ -105,10 +105,10 @@ Status.prototype.show = function( i_status)
 	if( this.elModified   )
 	{
 		var modified = '';
-		if( RULES.status )
+		if( this.obj )
 		{
-			if( RULES.status.muser ) modified += ' by ' + c_GetUserTitle( RULES.status.muser);
-			if( RULES.status.mtime ) modified += ' at ' + c_DT_StrFromSec( RULES.status.mtime);
+			if( this.obj.muser ) modified += ' by ' + c_GetUserTitle(  this.obj.muser);
+			if( this.obj.mtime ) modified += ' at ' + c_DT_StrFromSec( this.obj.mtime);
 			if( modified != '' ) modified = 'Modified' + modified;
 		}
 		this.elModified.textContent = modified;
