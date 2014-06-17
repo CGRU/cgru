@@ -180,7 +180,8 @@ text-align: center;
 }
 .checkbox.enabled {font-weight: bold;}
 
-.selected { background: rgba( 100, 255, 1255, .2); }
+.selected { background: rgba( 100, 255, 255, .2); }
+.half_selected { background: rgba( 255, 255, 100, .2); }
 
 #content > .view { position: relative; /*border-radius: 8px;*/ box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7); margin: 3px 0px; }
 

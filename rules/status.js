@@ -333,6 +333,7 @@ Status.prototype.edit = function( i_args)
 {
 //console.log( JSON.stringify( i_args));
 //console.log(JSON.stringify(i_status));
+	if( this.obj == null ) this.obj = {};
 
 	// If editing element is exists, status is already in edit mode:
 	if( this.elEdit ) return;
@@ -413,6 +414,45 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_progress.classList.add('editing');
 	this.elEdit_progress.style.textAlign = 'center';
 
+	var artists = {};
+	var tags = {};
+
+	if( this.obj.artists )
+		for( var a = 0; a < this.obj.artists.length; a++)
+			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a]),"full":true};
+
+	if( this.obj.tags )
+		for( var a = 0; a < this.obj.tags.length; a++)
+			tags[this.obj.tags[a]] = {"title":c_GetTagTitle( this.obj.tags[a]),"full":true};
+
+
+	if( i_args && i_args.statuses )
+		for( var s = 0; s < i_args.statuses.length; s++)
+		{
+			for( var id in artists ) artists[id].full = false;
+			for( var id in tags    ) tags[id].full    = false;
+
+			if( i_args.statuses[s].obj && i_args.statuses[s].obj.artists )
+			for( var a = 0; a < i_args.statuses[s].obj.artists.length; a++)
+			{
+				var id = i_args.statuses[s].obj.artists[a];
+				if( artists[id] )
+					artists[id].full = true;
+				else
+					artists[id] = {"title":c_GetUserTitle(id),"full":false};
+			}
+
+			if( i_args.statuses[s].obj && i_args.statuses[s].obj.tags )
+			for( var a = 0; a < i_args.statuses[s].obj.tags.length; a++)
+			{
+				var id = i_args.statuses[s].obj.tags[a];
+				if( tags[id] )
+					tags[id].full = true;
+				else
+					tags[id] = {"title":c_GetTagTitle(id),"full":false};
+			}
+		}
+
 	this.elEdit_artists = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_artists);
 	this.elEdit_artists.classList.add('list');
@@ -423,42 +463,20 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_artists.m_elBtn.style.cssFloat = 'left';;
 	this.elEdit_artists.m_elBtn.textContent = 'Artists:';
 	this.elEdit_artists.m_elBtn.m_status = this;
-	this.elEdit_artists.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editArtistsShow();};
+	this.elEdit_artists.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editArtistsShow( artists);};
 	this.elEdit_artists.m_elList = document.createElement('div');
 	this.elEdit_artists.appendChild( this.elEdit_artists.m_elList);
-
-	var artists = {};
-	if( this.obj.artists )
-		for( var a = 0; a < this.obj.artists.length; a++)
-			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a]),"full":true};
-
-	if( i_args.statuses )
-		for( var s = 0; s < i_args.statuses.length; s++)
-		{
-			for( var a = 0; a < artist.length; a++)
-				artists[a].full = false;
-
-			if( i_args.statuses[s].artists )
-			for( var a = 0; a < i_args.statuses[s].artists[a].length; a++)
-			{
-				var id = i_args.statuses[s].artists[a];
-				if( artists[id] )
-					artists[id].full = true;
-				else
-					artists[id] = {"title":c_GetUserTitle(id),"full":false};
-			}
-		}
-
-
-	if( this.obj.artists )
-		for( var i = 0; i < this.obj.artists.length; i++)
-		{
-			var el = document.createElement('div');
-			this.elEdit_artists.m_elList.appendChild( el);
-			el.textContent = c_GetUserTitle( this.obj.artists[i]);
-			el.classList.add('tag');
+	for( var id in artists )
+	{
+		var el = document.createElement('div');
+		this.elEdit_artists.m_elList.appendChild( el);
+		el.textContent = artists[id].title;
+		el.classList.add('tag');
+		if( artists[id].full )
 			el.classList.add('selected');
-		}
+		else
+			el.classList.add('half_selected');
+	}
 
 	this.elEdit_tags = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_tags);
@@ -470,19 +488,21 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_tags.m_elBtn.style.cssFloat = 'left';
 	this.elEdit_tags.m_elBtn.textContent = 'Tags:';
 	this.elEdit_tags.m_elBtn.m_status = this;
-	this.elEdit_tags.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editTagsShow();};
+	this.elEdit_tags.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editTagsShow( tags);};
 	this.elEdit_tags.m_elList = document.createElement('div');
 	this.elEdit_tags.appendChild( this.elEdit_tags.m_elList);
-	if( this.obj.tags )
-		for( var i = 0; i < this.obj.tags.length; i++)
-		{
-			var el = document.createElement('div');
-			this.elEdit_tags.m_elList.appendChild( el);
-			el.textContent = c_GetTagTitle( this.obj.tags[i]);
-			el.title = c_GetTagTip( this.obj.tags[i]);
-			el.classList.add('tag');
+	for( var id in tags )
+	{
+		var el = document.createElement('div');
+		this.elEdit_tags.m_elList.appendChild( el);
+		el.textContent = tags[id].title;
+		el.title = c_GetTagTip( id);
+		el.classList.add('tag');
+		if( tags[id].full )
 			el.classList.add('selected');
-		}
+		else
+			el.classList.add('half_selected');
+	}
 
 	var elColor = document.createElement('div');
 	this.elEdit.appendChild( elColor);
@@ -494,7 +514,7 @@ Status.prototype.edit = function( i_args)
 	var progress = this.obj.progress;
 	var finish = this.obj.finish;
 
-	if( i_args.statuses && i_args.statuses.length )
+	if( i_args && i_args.statuses && i_args.statuses.length )
 	{
 		// Several statuses (shots) selected:
 		annotation = this.getMultiVale('annotation', i_args.statuses);
@@ -544,15 +564,15 @@ Status.prototype.getMultiVale = function( i_key, i_statuses)
 	}
 	return value;
 }
-Status.prototype.editTagsShow = function()
+Status.prototype.editTagsShow = function( i_args)
 {
-	this.editShowList( this.elEdit_tags, 'tags', RULES.tags);
+	this.editShowList( this.elEdit_tags, 'tags', RULES.tags, i_args);
 }
-Status.prototype.editArtistsShow = function()
+Status.prototype.editArtistsShow = function( i_args)
 {
-	this.editShowList( this.elEdit_artists, 'artists', g_users);
+	this.editShowList( this.elEdit_artists, 'artists', g_users, i_args);
 }
-Status.prototype.editShowList = function( i_elParent, i_stParam, i_list)
+Status.prototype.editShowList = function( i_elParent, i_stParam, i_list, i_args)
 {
 	if( i_elParent.m_edit ) return;
 	i_elParent.m_edit = true;
@@ -570,13 +590,53 @@ Status.prototype.editShowList = function( i_elParent, i_stParam, i_list)
 			el.textContent = item;
 		if( i_list[item].tip ) el.title = i_list[item].tip;
 		el.m_item = item;
-		if( this.obj[i_stParam] && ( this.obj[i_stParam].indexOf( item) != -1 ))
+
+/*		if( this.obj[i_stParam] && ( this.obj[i_stParam].indexOf( item) != -1 ))
 		{
 			el.m_selected = true;
 			el.classList.add('selected');
+		}*/
+
+		if( i_args[item] )
+		{
+			if( i_args[item].full )
+			{
+				el.m_selected = true;
+				el.classList.add('selected');
+			}
+			else
+			{
+				el.m_half_selected = true;
+				el.classList.add('half_selected');
+			}
 		}
-		el.onclick = c_ElToggleSelected;
+
+		el.onclick = status_elToggleSelection;
 		i_elParent.m_elListAll.push( el);
+	}
+}
+function status_elToggleSelection( e)
+{
+	var el = e.currentTarget;
+	if( el.m_selected )
+	{
+		el.m_selected = false;
+		el.classList.remove('selected');
+	}
+	else if( el.classList.contains('half_selected'))
+	{
+		el.m_selected = true;
+		el.classList.add('selected');
+		el.classList.remove('half_selected');
+	}
+	else if( el.m_half_selected )
+	{
+		el.classList.add('half_selected');
+	}
+	else
+	{
+		el.m_selected = true;
+		el.classList.add('selected');
 	}
 }
 
@@ -632,7 +692,7 @@ Status.prototype.editSave = function( i_args)
 	// Collect statuses to change
 	// ( this and may be others selected )
 	var statuses = [this];
-	if( i_args.statuses && i_args.statuses.length )
+	if( i_args && i_args.statuses && i_args.statuses.length )
 	{
 		statuses = i_args.statuses;
 		if( statuses.indexOf( this) == -1 )
