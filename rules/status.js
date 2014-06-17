@@ -591,12 +591,6 @@ Status.prototype.editShowList = function( i_elParent, i_stParam, i_list, i_args)
 		if( i_list[item].tip ) el.title = i_list[item].tip;
 		el.m_item = item;
 
-/*		if( this.obj[i_stParam] && ( this.obj[i_stParam].indexOf( item) != -1 ))
-		{
-			el.m_selected = true;
-			el.classList.add('selected');
-		}*/
-
 		if( i_args[item] )
 		{
 			if( i_args[item].full )
@@ -726,8 +720,8 @@ Status.prototype.editSave = function( i_args)
 //	this.save();
 //	this.show();
 
-//	if( some_progress_changed )
-//		st_UpdateProgresses( this.path, progresses);
+	if( some_progress_changed )
+		st_UpdateProgresses( this.path, progresses);
 }
 
 Status.prototype.save = function( i_args)
@@ -761,13 +755,14 @@ function st_SetFramesNumber( i_num)
 	st_Show( RULES.status);
 }
 
-function st_UpdateProgresses( i_path)
+function st_UpdateProgresses( i_path, i_progresses)
 {
 	var folders = i_path.split('/');
 	var path = '';
 
 	paths = [];
 	progresses = {};
+	if( i_progresses ) progresses = i_progresses;
 
 	for( var i = 1; i < folders.length-1; i++)
 	{
