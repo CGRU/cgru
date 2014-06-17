@@ -255,11 +255,11 @@ function nw_MakeNewsDialog()
 }
 function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
 //function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
-function nw_MakeNews( i_args )
+function nw_MakeNews( i_news, i_args )
 {
 	if( localStorage.news_disabled == 'true') return;
 
-	var news = i_args;
+	var news = i_news;
 
 	if( news.user_id == null )
 	{
@@ -301,6 +301,8 @@ function nw_MakeNews( i_args )
 		c_Error( msg.error);
 		return;
 	}
+
+	if( i_args && ( i_args.load === false )) return;
 
 	nw_NewsLoad();
 	nw_RecentLoad(/*file exists check=*/ false);

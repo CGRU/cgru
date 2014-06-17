@@ -1,14 +1,6 @@
 st_Status = null;
-/*
-st_wnd = null;
-this.elEdit = null;
-st_elParent = null;
-st_elToHide = null
-st_path = null;
-st_status = null;
-st_FuncApply = null;
-st_progress = null;
-*/
+st_MultiValue = '[...]';
+
 function st_InitAuth()
 {
 	$('status_edit_btn').style.display = 'block';
@@ -16,8 +8,6 @@ function st_InitAuth()
 
 function st_Finish()
 {
-//	st_DestroyEditUI();
-//	st_Show( null);
 	st_Status = null;
 }
 
@@ -48,7 +38,7 @@ function st_Show( i_status)
 	if( st_Status )
 		st_Status.show();
 	else
-		new Status( i_status);
+		st_Status = new Status( i_status);
 }
 
 function Status( i_obj, i_args)
@@ -339,47 +329,23 @@ function st_SetElFinish( i_status, i_elFinish, i_full)
 	i_elFinish.style.color = 'rgb('+Math.round(150*alpha)+',0,0)';
 	i_elFinish.textContent = text;
 }
-/*
-function st_StatusEditOnClick()
-{
-	st_CreateEditUI( $('status'), g_CurPath(), RULES.status, st_Show, $('status_show'));
-}
-*/
-//function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 Status.prototype.edit = function( i_args)
 {
 //console.log( JSON.stringify( i_args));
 //console.log(JSON.stringify(i_status));
+
+	// If editing element is exists, status is already in edit mode:
 	if( this.elEdit ) return;
 
+	// Hide status show element, if any:
 	if( this.elShow ) this.elShow.style.display = 'none';
 
+	// Create editing GUI:
 	this.elParent.classList.add('status_editing');
 
-//	st_DestroyEditUI();
 	this.elEdit = document.createElement('div');
 	this.elParent.appendChild( this.elEdit);
 	this.elEdit.classList.add('status_edit');
-
-//	st_elParent = i_elParent;
-//	st_elToHide = i_elToHide;
-//	st_path = i_path;
-//	st_progress = null;
-//	st_FuncApply = i_FuncApply;
-//	st_status = {};
-/*
-	if( i_status )
-	{
-		st_status = c_CloneObj( i_status);
-		// Store progress to see whether progress update needed
-		if( i_status.progress != null )
-			st_progress = i_status.progress;
-	}
-*/
-
-//	this.elEdit = document.createElement('div');
-//	st_elParent.appendChild( this.elEdit);
-//	this.elEdit.classList.add('status_edit');
 	this.elEdit.onclick = function(e){e.stopPropagation();};
 
 	var elBtns = document.createElement('div');
@@ -391,7 +357,6 @@ Status.prototype.edit = function( i_args)
 	elBtnCancel.classList.add('button');
 	elBtnCancel.textContent = 'Cancel';
 	elBtnCancel.m_status = this;
-//	elBtnCancel.onclick = function(e){e.currentTarget.m_status.editCancel();};
 	elBtnCancel.onclick = function(e){e.currentTarget.m_status.show();};
 
 	var elBtnSave = document.createElement('div');
@@ -399,7 +364,7 @@ Status.prototype.edit = function( i_args)
 	elBtnSave.classList.add('button');
 	elBtnSave.textContent = 'Save';
 	elBtnSave.m_status = this;
-	elBtnSave.onclick = function(e){e.currentTarget.m_status.editSave();};
+	elBtnSave.onclick = function(e){e.currentTarget.m_status.editSave( i_args);};
 
 	var elFinishDiv = document.createElement('div');
 	this.elEdit.appendChild( elFinishDiv);
@@ -462,6 +427,29 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_artists.m_elList = document.createElement('div');
 	this.elEdit_artists.appendChild( this.elEdit_artists.m_elList);
 
+	var artists = {};
+	if( this.obj.artists )
+		for( var a = 0; a < this.obj.artists.length; a++)
+			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a]),"full":true};
+
+	if( i_args.statuses )
+		for( var s = 0; s < i_args.statuses.length; s++)
+		{
+			for( var a = 0; a < artist.length; a++)
+				artists[a].full = false;
+
+			if( i_args.statuses[s].artists )
+			for( var a = 0; a < i_args.statuses[s].artists[a].length; a++)
+			{
+				var id = i_args.statuses[s].artists[a];
+				if( artists[id] )
+					artists[id].full = true;
+				else
+					artists[id] = {"title":c_GetUserTitle(id),"full":false};
+			}
+		}
+
+
 	if( this.obj.artists )
 		for( var i = 0; i < this.obj.artists.length; i++)
 		{
@@ -501,11 +489,33 @@ Status.prototype.edit = function( i_args)
 	elColor.classList.add('color');
 	u_DrawColorBars({"el":elColor,"onclick":st_EditColorOnClick,"data":this});
 
-	st_SetElAnnotation( this.obj, this.elEdit_annotation);
-//	st_SetElColor( this.obj);
-	if( this.obj.finish )
-		this.elEdit_finish.textContent = c_DT_FormStrFromSec( this.obj.finish);
-	if( this.obj.progress != null ) this.elEdit_progress.textContent = this.obj.progress;
+	// Get values:
+	var annotation = this.obj.annotation;
+	var progress = this.obj.progress;
+	var finish = this.obj.finish;
+
+	if( i_args.statuses && i_args.statuses.length )
+	{
+		// Several statuses (shots) selected:
+		annotation = this.getMultiVale('annotation', i_args.statuses);
+		progress = this.getMultiVale('progress', i_args.statuses);
+		finish = this.getMultiVale('finish', i_args.statuses);
+	}
+
+	// Set values:
+	if( annotation != null )
+	{
+		this.elEdit_annotation.textContent = annotation;
+	}
+	if( finish != null )
+	{
+		if( finish != st_MultiValue ) finish = c_DT_FormStrFromSec( finish);
+		this.elEdit_finish.textContent = finish;
+	}
+	if( progress != null )
+	{
+		this.elEdit_progress.textContent = progress;
+	}
 
 	this.elEdit_annotation.focus();
 }
@@ -514,25 +524,26 @@ function st_EditColorOnClick( i_clr, i_data)
 	i_data.edit_color = i_clr;
 	st_SetElColor({"color": i_clr}, i_data.elColor);
 }
-
-/*
-function st_DestroyEditUI()
+Status.prototype.getMultiVale = function( i_key, i_statuses)
 {
-	if( st_elParent )
+	if( i_statuses.indexOf( this) == -1 ) i_statuses.push( this);
+
+	var value = this.obj[i_key];
+
+	if(( i_statuses.length == 1 ) && ( i_statuses[0] == this ))
+		return value;
+
+	for( var i = 0; i < i_statuses.length; i++)
 	{
-		st_elParent.classList.remove('status_editing');
-		if( this.elEdit ) st_elParent.removeChild( this.elEdit);
+		var other = i_statuses[i].obj[i_key];
+		if( value != other )
+		{
+			value = st_MultiValue;
+			return value;
+		}
 	}
-
-	if( st_elToHide )
-		st_elToHide.style.display = 'block';
-
-	this.elEdit = null;
-	st_elParent = null;
-	st_elToHide = null;
-	st_status = null;
+	return value;
 }
-*/
 Status.prototype.editTagsShow = function()
 {
 	this.editShowList( this.elEdit_tags, 'tags', RULES.tags);
@@ -569,23 +580,36 @@ Status.prototype.editShowList = function( i_elParent, i_stParam, i_list)
 	}
 }
 
-Status.prototype.editSave = function()
+Status.prototype.editSave = function( i_args)
 {
 	if( this.obj == null ) this.obj = {};
-	var old_progress = this.obj.progress;
 
-	this.obj.color = this.edit_color;
+	var finish = null;
+	var annotation = null;
+	var progress = null;
 
-	var finish = this.elEdit_finish.textContent;
-	if( finish.length )
+	// Get values from GUI:
+
+	var finish_edit = this.elEdit_finish.textContent;
+	if( finish_edit.length && ( finish_edit != st_MultiValue ))
 	{
-		finish = c_DT_SecFromStr( this.elEdit_finish.textContent);
-		if( finish == 0 ) return;
-		this.obj.finish = finish;
+		finish_edit = c_DT_SecFromStr( this.elEdit_finish.textContent);
+		if( finish_edit != 0 )
+			finish = finish_edit;
+		else
+			c_Error('Invelid date format: ' + finish_edit);
 	}
 
-	this.obj.annotation = c_Strip( this.elEdit_annotation.innerHTML);
-	this.obj.progress = parseInt( c_Strip( this.elEdit_progress.textContent));
+	if( this.elEdit_annotation.textContent != st_MultiValue )
+	{
+		annotation = c_Strip( this.elEdit_annotation.innerHTML);
+	}
+
+	if( this.elEdit_progress.textContent != st_MultiValue )
+	{
+		progress = parseInt( c_Strip( this.elEdit_progress.textContent));
+	}
+
 	if( this.elEdit_artists.m_elListAll )
 	{
 		this.obj.artists = [];
@@ -593,6 +617,7 @@ Status.prototype.editSave = function()
 			if( this.elEdit_artists.m_elListAll[i].m_selected )
 				this.obj.artists.push( this.elEdit_artists.m_elListAll[i].m_item);
 	}
+
 	if( this.elEdit_tags.m_elListAll )
 	{
 		this.obj.tags = [];
@@ -601,17 +626,51 @@ Status.prototype.editSave = function()
 				this.obj.tags.push( this.elEdit_tags.m_elListAll[i].m_item);
 	}
 
-//	st_FuncApply( st_status);
-//	st_DestroyEditUI();
-	this.save();
-	this.show();
+	this.obj.color = this.edit_color;
 
-	if( this.elEdit_progress.textContent.length )
-		if( old_progress != this.obj.progress )
-			st_UpdateProgresses( this.path);
+
+	// Collect statuses to change
+	// ( this and may be others selected )
+	var statuses = [this];
+	if( i_args.statuses && i_args.statuses.length )
+	{
+		statuses = i_args.statuses;
+		if( statuses.indexOf( this) == -1 )
+			statuses.push( this);
+	}
+
+	// Set values to statuses
+	var some_progress_changed = false;
+	var progresses = {};
+	var load_news = false;
+	for( var i = 0; i < statuses.length; i++)
+	{
+		progresses[statuses[i].path] = statuses[i].obj.progress;
+		if( progress != statuses[i].obj.progress ) some_progress_changed = true;
+
+		if( annotation !== null ) statuses[i].obj.annotation = annotation;
+		if( finish     !== null ) statuses[i].obj.finish     = finish;
+		if( progress   !== null ) statuses[i].obj.progress   = progress;
+
+		// Status saving produce news.
+		// Making news produce loading them by default.
+		// We should reload news only at last:
+		if( i == (statuses.length - 1)) load_news = true;
+		statuses[i].save({"load_news":load_news});
+
+		// Status showing causes values redraw,
+		// and destoys edit GUI if any.
+		statuses[i].show();
+	}
+
+//	this.save();
+//	this.show();
+
+//	if( some_progress_changed )
+//		st_UpdateProgresses( this.path, progresses);
 }
 
-Status.prototype.save = function()
+Status.prototype.save = function( i_args)
 {
 	if( g_CurPath() == this.path )
 		g_FolderSetStatus( this.obj);
@@ -620,7 +679,7 @@ Status.prototype.save = function()
 	this.obj.mtime = c_DT_CurSeconds();
 
 	st_Save( this.obj, this.path);
-	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists});
+	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists},{"load":i_args.load_news});
 }
 
 function st_Save( i_status, i_path, i_wait)

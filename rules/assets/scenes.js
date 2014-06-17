@@ -274,12 +274,14 @@ function sc_EditStatus( e)
 {
 	e.stopPropagation();
 
+	var status = e.currentTarget.m_status;
 	var shots = scenes_GetSelectedShots();
 	var statuses = [];
 	for( var i = 0; i < shots.length; i++)
-		statuses.push( shots[i].m_status);
+		if( shots[i].m_status != status )
+			statuses.push( shots[i].m_status);
 
-	e.currentTarget.m_status.edit({"statuses":statuses});
+	status.edit({"statuses":statuses});
 
 	return false;
 }
