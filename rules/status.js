@@ -504,10 +504,10 @@ Status.prototype.edit = function( i_args)
 			el.classList.add('half_selected');
 	}
 
-	var elColor = document.createElement('div');
-	this.elEdit.appendChild( elColor);
-	elColor.classList.add('color');
-	u_DrawColorBars({"el":elColor,"onclick":st_EditColorOnClick,"data":this});
+	this.elEdit_Color = document.createElement('div');
+	this.elEdit.appendChild( this.elEdit_Color);
+	this.elEdit_Color.classList.add('color');
+	u_DrawColorBars({"el":this.elEdit_Color,"onclick":st_EditColorOnClick,"data":this});
 
 	// Get values:
 	var annotation = this.obj.annotation;
@@ -541,7 +541,8 @@ Status.prototype.edit = function( i_args)
 }
 function st_EditColorOnClick( i_clr, i_data)
 {
-	i_data.edit_color = i_clr;
+	i_data.elEdit_Color.m_color = i_clr;
+	i_data.elEdit_Color.m_color_changed = true
 	st_SetElColor({"color": i_clr}, i_data.elColor);
 }
 Status.prototype.getMultiVale = function( i_key, i_statuses)
@@ -641,6 +642,8 @@ Status.prototype.editSave = function( i_args)
 	var finish = null;
 	var annotation = null;
 	var progress = null;
+	var artists = null;
+	var tags = null;
 
 	// Get values from GUI:
 
@@ -651,7 +654,7 @@ Status.prototype.editSave = function( i_args)
 		if( finish_edit != 0 )
 			finish = finish_edit;
 		else
-			c_Error('Invelid date format: ' + finish_edit);
+			c_Error('Invalid date format: ' + finish_edit);
 	}
 
 	if( this.elEdit_progress.textContent != st_MultiValue )
@@ -671,21 +674,27 @@ Status.prototype.editSave = function( i_args)
 
 	if( this.elEdit_artists.m_elListAll )
 	{
-		this.obj.artists = [];
+		artists = {};
 		for( var i = 0; i < this.elEdit_artists.m_elListAll.length; i++)
+		{
 			if( this.elEdit_artists.m_elListAll[i].m_selected )
-				this.obj.artists.push( this.elEdit_artists.m_elListAll[i].m_item);
+				artists[this.elEdit_artists.m_elListAll[i].m_item] = 'selected';
+			else if( this.elEdit_artists.m_elListAll[i].classList.contains('half_selected'))
+				artists[this.elEdit_artists.m_elListAll[i].m_item] = 'half';
+		}
 	}
 
 	if( this.elEdit_tags.m_elListAll )
 	{
-		this.obj.tags = [];
+		tags = {};
 		for( var i = 0; i < this.elEdit_tags.m_elListAll.length; i++)
+		{
 			if( this.elEdit_tags.m_elListAll[i].m_selected )
-				this.obj.tags.push( this.elEdit_tags.m_elListAll[i].m_item);
+				tags[this.elEdit_tags.m_elListAll[i].m_item] = 'selected';
+			else if( this.elEdit_tags.m_elListAll[i].classList.contains('half_selected'))
+				tags[this.elEdit_tags.m_elListAll[i].m_item] = 'half';
+		}
 	}
-
-	this.obj.color = this.edit_color;
 
 
 	// Collect statuses to change
@@ -704,6 +713,8 @@ Status.prototype.editSave = function( i_args)
 	var load_news = false;
 	for( var i = 0; i < statuses.length; i++)
 	{
+		if( statuses[i].obj == null ) statuses[i].obj = {};
+
 		if( annotation !== null ) statuses[i].obj.annotation = annotation;
 		if( finish     !== null ) statuses[i].obj.finish     = finish;
 		if( progress   !== null )
@@ -712,6 +723,37 @@ Status.prototype.editSave = function( i_args)
 			if( progress != statuses[i].obj.progress ) some_progress_changed = true;
 			statuses[i].obj.progress = progress;
 		}
+
+		if( artists )
+		{
+			if( statuses[i].obj.artists == null )
+				statuses[i].obj.artists = [];
+
+			for( var a = 0; a < statuses[i].obj.artists.length; a++ )
+				if( artists[statuses[i].obj.artists[a]] == null )
+					statuses[i].obj.artists.splice(a,1);
+
+			for( var id in artists )
+				if(( artists[id] == 'selected' ) && ( statuses[i].obj.artists.indexOf(id) == -1 ))
+					statuses[i].obj.artists.push( id);
+		}
+
+		if( tags )
+		{
+			if( statuses[i].obj.tags == null )
+				statuses[i].obj.tags = [];
+
+			for( var a = 0; a < statuses[i].obj.tags.length; a++ )
+				if( tags[statuses[i].obj.tags[a]] == null )
+					statuses[i].obj.tags.splice(a,1);
+
+			for( var id in tags )
+				if(( tags[id] == 'selected' ) && ( statuses[i].obj.tags.indexOf(id) == -1 ))
+					statuses[i].obj.tags.push( id);
+		}
+
+		if( this.elEdit_Color.m_color_changed )
+			statuses[i].obj.color = this.elEdit_Color.m_color;
 
 		// Status saving produce news.
 		// Making news produce loading them by default.
