@@ -509,6 +509,23 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_Color.classList.add('color');
 	u_DrawColorBars({"el":this.elEdit_Color,"onclick":st_EditColorOnClick,"data":this});
 
+
+	this.elEdit_tasks = document.createElement('div');
+	this.elEdit.appendChild( this.elEdit_tasks);
+
+	var el = document.createElement('div');
+	this.elEdit_tasks.appendChild( el);
+	el.textContent = 'Tasks';
+
+	var el = document.createElement('div');
+	this.elEdit_tasks.appendChild( el);
+	el.textContent = 'Add';
+	el.classList.add('button');
+	el.m_status = this;
+	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
+	this.editTasksShow();
+
+
 	// Get values:
 	var annotation = this.obj.annotation;
 	var progress = this.obj.progress;
@@ -632,6 +649,59 @@ function status_elToggleSelection( e)
 	{
 		el.m_selected = true;
 		el.classList.add('selected');
+	}
+}
+
+Status.prototype.addTaskOnClick = function()
+{
+	if( this.obj.tasks == null )
+		this.obj.tasks = [];
+
+	var task = {};
+	task.duration = 1;
+	task.tags = [];
+	task.artists = [];
+
+//	this.obj.tasks.push( task);
+
+	this.editTasksShow({"new":task});
+}
+
+Status.prototype.editTasksShow = function( i_args)
+{
+//	if( this.elEdit_tasks_list )
+//		this.elEdit_tasks.removeChild( this.elEdit_tasks_list);
+
+	var tasks = this.obj.tasks;
+	if( i_args && i_args.new )
+		tasks = [i_args.new]
+
+	if( tasks == null ) return;
+
+//	this.elEdit_tasks_list = document.createElement('div');
+//	this.elEdit_tasks.appendChild( this.elEdit_tasks_list);
+
+	for( var t = 0; t < tasks.length; t++)
+	{
+		var el = document.createElement('div');
+		this.elEdit_tasks.appendChild( el);
+
+		var elDurDiv = document.createElement('div');
+		el.appendChild( elDurDiv);
+
+		var elDurLabel = document.createElement('div');
+		elDurDiv.appendChild( elDurLabel);
+		elDurLabel.textContent = 'Duration: ';
+		elDurLabel.style.cssFloat = 'left';
+
+		var elDur = document.createElement('div');
+		elDurDiv.appendChild( elDur);
+		elDur.textContent = tasks[t].duration;
+		elDur.contentEditable = true;
+		elDur.classList.add('editing');
+		elDur.style.width = '40px';
+
+		var elTags = document.createElement('div');
 	}
 }
 
