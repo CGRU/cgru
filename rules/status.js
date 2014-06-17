@@ -654,14 +654,19 @@ Status.prototype.editSave = function( i_args)
 			c_Error('Invelid date format: ' + finish_edit);
 	}
 
-	if( this.elEdit_annotation.textContent != st_MultiValue )
-	{
-		annotation = c_Strip( this.elEdit_annotation.innerHTML);
-	}
-
 	if( this.elEdit_progress.textContent != st_MultiValue )
 	{
 		progress = parseInt( c_Strip( this.elEdit_progress.textContent));
+		if( isNaN( progress) )
+		{
+			progress = null;
+			c_Error('Invalid progress: ' + c_Strip( this.elEdit_progress.textContent));
+		}
+	}
+
+	if( this.elEdit_annotation.textContent != st_MultiValue )
+	{
+		annotation = c_Strip( this.elEdit_annotation.innerHTML);
 	}
 
 	if( this.elEdit_artists.m_elListAll )
@@ -699,12 +704,14 @@ Status.prototype.editSave = function( i_args)
 	var load_news = false;
 	for( var i = 0; i < statuses.length; i++)
 	{
-		progresses[statuses[i].path] = statuses[i].obj.progress;
-		if( progress != statuses[i].obj.progress ) some_progress_changed = true;
-
 		if( annotation !== null ) statuses[i].obj.annotation = annotation;
 		if( finish     !== null ) statuses[i].obj.finish     = finish;
-		if( progress   !== null ) statuses[i].obj.progress   = progress;
+		if( progress   !== null )
+		{
+			progresses[statuses[i].path] = progress;
+			if( progress != statuses[i].obj.progress ) some_progress_changed = true;
+			statuses[i].obj.progress = progress;
+		}
 
 		// Status saving produce news.
 		// Making news produce loading them by default.
