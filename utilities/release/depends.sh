@@ -9,7 +9,7 @@ case ${DISTRIBUTIVE} in
 	Debian | Ubuntu | Mint )
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
-		export DEPENDS_CGRU="python-qt4 imagemagick ffmpeg"
+		export DEPENDS_CGRU="python-qt4 python3-pyside imagemagick"
 		;;
 	Fedora )
 		export DEPENDS_AFANASY="libpqxx"
