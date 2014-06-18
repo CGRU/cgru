@@ -34,14 +34,14 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job *job):
       return;
    }
 
-   blockinfo = new BlockInfo[m_blocks_num];
+   m_blockinfo = new BlockInfo[m_blocks_num];
    for( int b = 0; b < m_blocks_num; b++)
    {
       const af::BlockData * block = job->getBlock(b);
-      blockinfo[b].setName( afqt::stoq( block->getName()));
-      blockinfo[b].setItem( this);
-      blockinfo[b].setBlockNumber( b);
-      blockinfo[b].setJobId( getId());
+      m_blockinfo[b].setName( afqt::stoq( block->getName()));
+      m_blockinfo[b].setItem( this);
+      m_blockinfo[b].setBlockNumber( b);
+      m_blockinfo[b].setJobId( getId());
    }
 
    updateValues( (af::Node*)job, af::Msg::TJobsList);
@@ -49,7 +49,7 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job *job):
 
 ItemJob::~ItemJob()
 {
-	if( blockinfo  ) delete [] blockinfo;
+	if( m_blockinfo  ) delete [] m_blockinfo;
 
 	for( int i = 0; i < m_thumbs.size(); i++)
 		delete m_thumbs[i];
@@ -85,28 +85,28 @@ void ItemJob::updateValues( af::Node *node, int type)
 	setDone(    job->isDone()    );
 	setError(   job->isError()   );
 
-   annotation           = afqt::stoq( job->getAnnotation().c_str());
-   priority             = job->getPriority();
-   username             = afqt::stoq( job->getUserName().c_str());
-   hostname             = afqt::stoq( job->getHostName().c_str());
-   maxrunningtasks      = job->getMaxRunningTasks();
-   maxruntasksperhost   = job->getMaxRunTasksPerHost();
-   state                = job->getState();
-   time_creation        = job->getTimeCreation();
-   time_started         = job->getTimeStarted();
-   time_wait            = job->getTimeWait();
-   time_done            = job->getTimeDone();
-   hostsmask            = afqt::stoq( job->getHostsMask());
-   hostsmask_exclude    = afqt::stoq( job->getHostsMaskExclude());
-   dependmask           = afqt::stoq( job->getDependMask());
-   dependmask_global    = afqt::stoq( job->getDependMaskGlobal());
-   need_os              = afqt::stoq( job->getNeedOS());
-   need_properties      = afqt::stoq( job->getNeedProperties());
-   cmd_pre              = afqt::stoq( job->getCmdPre());
-   cmd_post             = afqt::stoq( job->getCmdPost());
-   description          = afqt::stoq( job->getDescription());
-   num_runningtasks     = job->getRunningTasksNumber();
-   lifetime             = job->getTimeLife();
+	annotation           = afqt::stoq( job->getAnnotation().c_str());
+	priority             = job->getPriority();
+	username             = afqt::stoq( job->getUserName().c_str());
+	hostname             = afqt::stoq( job->getHostName().c_str());
+	maxrunningtasks      = job->getMaxRunningTasks();
+	maxruntasksperhost   = job->getMaxRunTasksPerHost();
+	state                = job->getState();
+	time_creation        = job->getTimeCreation();
+	time_started         = job->getTimeStarted();
+	time_wait            = job->getTimeWait();
+	time_done            = job->getTimeDone();
+	hostsmask            = afqt::stoq( job->getHostsMask());
+	hostsmask_exclude    = afqt::stoq( job->getHostsMaskExclude());
+	dependmask           = afqt::stoq( job->getDependMask());
+	dependmask_global    = afqt::stoq( job->getDependMaskGlobal());
+	need_os              = afqt::stoq( job->getNeedOS());
+	need_properties      = afqt::stoq( job->getNeedProperties());
+	cmd_pre              = afqt::stoq( job->getCmdPre());
+	cmd_post             = afqt::stoq( job->getCmdPost());
+	description          = afqt::stoq( job->getDescription());
+	num_runningtasks     = job->getRunningTasksNumber();
+	lifetime             = job->getTimeLife();
 
 	compact_display = true;
 	bool get_thumbnail = false;
@@ -116,12 +116,12 @@ void ItemJob::updateValues( af::Node *node, int type)
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
-		blockinfo[b].update( block, type);
+		m_blockinfo[b].update( block, type);
 
 		if( block->getProgressAvoidHostsNum() > 0 )
 			compact_display = false;
 
-		m_tasks_done += blockinfo[b].tasksdone;
+		m_tasks_done += m_blockinfo[b].tasksdone;
 	}
 	if( tasks_done_old != m_tasks_done )
 		get_thumbnail = true;
@@ -144,7 +144,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
    properties += QString(" p%2").arg( priority);
 
-   user_time = username;
+   user_eta = username;
    if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
       setRunning();
    else
@@ -152,7 +152,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 
    if( isLocked())
    {
-      user_time += " (LOCK)";
+      user_eta += " (LOCK)";
    }
 
    tooltip = job->v_generateInfoString( true).c_str();
@@ -212,13 +212,34 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
    uint32_t currenttime = time( NULL);
 
-   QString user_time_current = user_time;
-   if( time_started && (( state & AFJOB::STATE_DONE_MASK) == false))
-   {
-      user_time_current = QString(af::time2strHMS( currenttime - time_started).c_str()) + " - " + user_time;
-   }
-   if( time_wait > currenttime )
-      user_time_current = user_time + " - " + af::time2strHMS( time_wait - currenttime ).c_str();
+	QString user_time = user_eta;
+	QString properties_time = properties;
+	if( time_started && (( state & AFJOB::STATE_DONE_MASK) == false))
+	{
+		properties_time += " " + QString(af::time2strHMS( currenttime - time_started).c_str());
+		// ETA (but not for the system job):
+		if( getId() != AFJOB::SYSJOB_ID )
+		{
+			int percentage = 0;
+			for( int b = 0; b < m_blocks_num; b++)
+				percentage += m_blockinfo[b].percentage;
+
+			percentage /= m_blocks_num;
+			if(( percentage > 0 ) && ( percentage < 100 ))
+			{
+				int sec_run = currenttime - time_started;
+				int sec_all = sec_run * 100.0 / percentage;
+				int eta = sec_all - sec_run;
+				if( eta > 0 )
+					user_time = QString::fromUtf8("ETA≈") + afqt::stoq( af::time2strHMS( eta)) + " " + user_eta;
+			}
+		}
+	}
+
+	if( time_wait > currenttime )
+	{
+		user_time = user_eta + " " + af::time2strHMS( time_wait - currenttime ).c_str();
+	}
 
    printfState( state, x+35+(w>>3), y+25, painter, option);
 
@@ -227,12 +248,11 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
    int cy = y-10; int dy = 13;
 	QRect rect_user;
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time_current, &rect_user);
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time, &rect_user);
 
-   QString properties_lifetime = properties;
-   if( lifetime > 0 ) properties_lifetime += QString(" L%1-%2")
+   if( lifetime > 0 ) properties_time += QString(" L%1-%2")
       .arg( af::time2strHMS( lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_lifetime);
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
 
    painter->setPen( clrTextMain( option) );
    painter->setFont( afqt::QEnvironment::f_name);
@@ -246,7 +266,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    }
 
    for( int b = 0; b < m_blocks_num; b++)
-      blockinfo[b].paint( painter, option,
+      m_blockinfo[b].paint( painter, option,
          x+5, y + Height + block_height*b, w-9,
          compact_display, itemColor);
 
@@ -373,7 +393,7 @@ void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
       AFERRAR("ListJobs::generateMenu: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
       return;
    }
-   blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
+   m_blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
 }
 
 bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
@@ -383,7 +403,7 @@ bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QStri
       AFERRAR("ListJobs::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
       return false;
    }
-   return blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
+   return m_blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
 }
 
 void ItemJob::getThumbnail() const

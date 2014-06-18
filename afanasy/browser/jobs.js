@@ -22,7 +22,8 @@ JobNode.prototype.init = function()
 	this.element.appendChild( this.elName);
 	this.elName.classList.add('prestar');
 
-	this.elUserName = cm_ElCreateFloatText( this.element,	'right', 'User Name');
+	this.elUserName = cm_ElCreateFloatText( this.element,'right','User Name');
+	this.elETA = cm_ElCreateFloatText( this.element,'right','ETA:');
 
 	this.element.appendChild( document.createElement('br'));
 
@@ -154,6 +155,7 @@ JobNode.prototype.refresh = function()
 {
 	var time_txt = '';
 	var time_tip = '';
+	var eta = '';
 
 	if( this.params.time_wait && this.state.WTM )
 	{
@@ -171,6 +173,30 @@ JobNode.prototype.refresh = function()
 		else
 		{
 			time_txt = cm_TimeStringInterval( this.params.time_started);
+
+			// ETA (but not for the system job which id == 1):
+			if( this.params.id > 1 )
+			{
+				var percentage = 0;
+				for( var b = 0; b < this.blocks.length; b++)
+				{
+					if( this.blocks[b].params.p_percentage )
+						percentage += this.blocks[b].params.p_percentage;
+				}
+				percentage /= this.blocks.length;
+				if(( percentage > 0 ) && ( percentage < 100 ))
+				{
+					var sec_now = (new Date()).valueOf() / 1000;
+					var sec_run = sec_now - this.params.time_started;
+					var sec_all = sec_run * 100.0 / percentage;
+					eta = sec_all - sec_run;
+					if( eta > 0 )
+					{
+						eta = cm_TimeStringInterval( 0, eta);
+						eta = 'ETA≈' + eta;
+					}
+				}
+			}
 		}
 		time_tip = 'Started at: ' + cm_DateTimeStrFromSec( this.params.time_started) + '\n' + time_tip;
 	}
@@ -179,6 +205,7 @@ JobNode.prototype.refresh = function()
 
 	this.elTime.textContent = time_txt;
 	this.elTime.title = time_tip;
+	this.elETA.textContent = eta;
 }
 
 JobNode.prototype.onDoubleClick = function( i_evt)

@@ -46,6 +46,7 @@ public:
 	bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const;
 
 	int tasksdone;
+	int percentage;
 
 private:
 	uint32_t state;
@@ -64,7 +65,6 @@ private:
 	int tasksnum;
 	int tasksready;
 	int taskserror;
-	int percentage;
 	long long taskssumruntime;
 
 	bool numeric;              ///< Whether the block is numeric.

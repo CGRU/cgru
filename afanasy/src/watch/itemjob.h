@@ -16,13 +16,13 @@ public:
 	void updateValues( af::Node *node, int type);
 
 	inline int getErrorRetries(         int block = 0 ) const
-		{if(block<m_blocks_num )return blockinfo[ block].getErrorsRetries();       else return 0; }
+		{if(block<m_blocks_num )return m_blockinfo[ block].getErrorsRetries();       else return 0; }
 	inline int getErrorsAvoidHost(      int block = 0 ) const
-		{if(block<m_blocks_num )return blockinfo[ block].getErrorsAvoidHost();     else return 0; }
+		{if(block<m_blocks_num )return m_blockinfo[ block].getErrorsAvoidHost();     else return 0; }
 	inline int getErrorsTaskSameHost(   int block = 0 ) const
-		{if(block<m_blocks_num )return blockinfo[ block].getErrorsTaskSameHost();  else return 0; }
+		{if(block<m_blocks_num )return m_blockinfo[ block].getErrorsTaskSameHost();  else return 0; }
 	inline uint32_t getTasksMaxRunTime( int block = 0 ) const
-		{if(block<m_blocks_num )return blockinfo[ block].getTasksMaxRunTime();     else return 0; }
+		{if(block<m_blocks_num )return m_blockinfo[ block].getTasksMaxRunTime();     else return 0; }
 
 	int priority;
 	int maxrunningtasks;
@@ -49,7 +49,7 @@ public:
 
 	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const
-		{ if( block < m_blocks_num ) return blockinfo[block].getPercentage(); else return 0;}
+		{ if( block < m_blocks_num ) return m_blockinfo[block].getPercentage(); else return 0;}
 
 	bool setSortType(   int type );
 	bool setFilterType( int type );
@@ -58,7 +58,7 @@ public:
 
 	bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const;
 
-	inline const QString & getBlockName( int num) const { return blockinfo[num].getName();}
+	inline const QString & getBlockName( int num) const { return m_blockinfo[num].getName();}
 
 	bool calcHeight();
 
@@ -83,7 +83,7 @@ private:
 	QString properties;
 
 	QStringList blocksinfo;
-	QString user_time;
+	QString user_eta;
 
 	QString runningTime;
 
@@ -96,5 +96,5 @@ private:
 	QList<QString> m_thumbs_paths;
 
 	int block_height;
-	BlockInfo * blockinfo;
+	BlockInfo * m_blockinfo;
 };
