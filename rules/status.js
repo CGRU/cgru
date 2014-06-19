@@ -62,6 +62,7 @@ function Status( i_obj, i_args)
 		this.elFramesNum   = $('status_framesnum');
 		this.elFinish      = $('status_finish');
 		this.elModified    = $('status_modified');
+		this.elTasks       = $('status_tasks');
 		this.elReports     = $('status_reports');
 	}
 
@@ -113,20 +114,25 @@ Status.prototype.show = function( i_status)
 		this.elEdit = null;
 	}
 
-	// Reports:
-	if( this.elReports == null ) return;
+	if( this.elReports )
+		this.showReports();
 
+	if( this.elTasks )
+		this.showTasks();
+}
+Status.prototype.showReports = function()
+{
 	this.elReports.textContent = '';
-	if( RULES.status == null ) return;
-	if( RULES.status.reports == null ) return;
-	if( RULES.status.reports.length == 0 ) return;
+	if( this.obj == null ) return;
+	if( this.obj.reports == null ) return;
+	if( this.obj.reports.length == 0 ) return;
 
 	var reps_types = {};
 	var reps_duration = 0;
 
-	for( var i = 0; i < RULES.status.reports.length; i++)
+	for( var i = 0; i < this.obj.reports.length; i++)
 	{
-		var report = RULES.status.reports[i];
+		var report = this.obj.reports[i];
 
 		if(( report.tags == null ) || ( report.tags.length == 0 ))
 			report.tags = ['other'];
@@ -171,6 +177,56 @@ Status.prototype.show = function( i_status)
 		el.textContent = info;
 	}
 //console.log( JSON.stringify( RULES.status.reports));
+}
+Status.prototype.showTasks = function()
+{
+	this.elTasks.textContent = '';
+	if( this.obj == null ) return;
+	if( this.obj.tasks == null ) return;
+	if( this.obj.tasks.length == 0 ) return;
+
+	for( var t = 0; t < this.obj.tasks.length; t++)
+	{
+		var task = this.obj.tasks[t];
+
+		var el = document.createElement('div');
+		this.elTasks.appendChild( el);
+		el.classList.add('task');
+
+		var elDur = document.createElement('div');
+		el.appendChild( elDur);
+		elDur.textContent = task.duration;
+
+		if( task.tags && task.tags.length )
+		{
+			var elTags = document.createElement('div');
+			el.appendChild( elTags);
+			elTags.classList.add('tags');
+
+			for( var g = 0; g < task.tags.length; g++)
+			{
+				var elTag = document.createElement('div');
+				elTags.appendChild( elTag);
+				elTag.classList.add('tag');
+				elTag.textContent = c_GetTagTitle( task.tags[g]);
+			}
+		}
+
+		if( task.artists && task.artists.length )
+		{
+			var elTags = document.createElement('div');
+			el.appendChild( elTags);
+			elTags.classList.add('artists');
+
+			for( var g = 0; g < task.artists.length; g++)
+			{
+				var elTag = document.createElement('div');
+				elTags.appendChild( elTag);
+				elTag.classList.add('tag');
+				elTag.textContent = c_GetUserTitle( task.artists[g]);
+			}
+		}
+	}
 }
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
@@ -419,27 +475,27 @@ Status.prototype.edit = function( i_args)
 
 	if( this.obj.artists )
 		for( var a = 0; a < this.obj.artists.length; a++)
-			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a]),"full":true};
+			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a])};
 
 	if( this.obj.tags )
 		for( var a = 0; a < this.obj.tags.length; a++)
-			tags[this.obj.tags[a]] = {"title":c_GetTagTitle( this.obj.tags[a]),"full":true};
+			tags[this.obj.tags[a]] = {"title":c_GetTagTitle( this.obj.tags[a]),"tooltip":c_GetTagTip( this.obj.tags[a])};
 
 
 	if( i_args && i_args.statuses )
 		for( var s = 0; s < i_args.statuses.length; s++)
 		{
-			for( var id in artists ) artists[id].full = false;
-			for( var id in tags    ) tags[id].full    = false;
+			for( var id in artists ) artists[id].half = true;
+			for( var id in tags    ) tags[id].half    = true;
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.artists )
 			for( var a = 0; a < i_args.statuses[s].obj.artists.length; a++)
 			{
 				var id = i_args.statuses[s].obj.artists[a];
 				if( artists[id] )
-					artists[id].full = true;
+					artists[id].half = false;
 				else
-					artists[id] = {"title":c_GetUserTitle(id),"full":false};
+					artists[id] = {"title":c_GetUserTitle(id),"half":true};
 			}
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.tags )
@@ -447,62 +503,14 @@ Status.prototype.edit = function( i_args)
 			{
 				var id = i_args.statuses[s].obj.tags[a];
 				if( tags[id] )
-					tags[id].full = true;
+					tags[id].half = false;
 				else
-					tags[id] = {"title":c_GetTagTitle(id),"full":false};
+					tags[id] = {"title":c_GetTagTitle(id),"half":true,"tooltip":c_GetTagTip(id)};
 			}
 		}
 
-	this.elEdit_artists = document.createElement('div');
-	this.elEdit.appendChild( this.elEdit_artists);
-	this.elEdit_artists.classList.add('list');
-	this.elEdit_artists.classList.add('artists');
-	this.elEdit_artists.m_elBtn = document.createElement('div');
-	this.elEdit_artists.appendChild( this.elEdit_artists.m_elBtn);
-	this.elEdit_artists.m_elBtn.classList.add('button');
-	this.elEdit_artists.m_elBtn.style.cssFloat = 'left';;
-	this.elEdit_artists.m_elBtn.textContent = 'Artists:';
-	this.elEdit_artists.m_elBtn.m_status = this;
-	this.elEdit_artists.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editArtistsShow( artists);};
-	this.elEdit_artists.m_elList = document.createElement('div');
-	this.elEdit_artists.appendChild( this.elEdit_artists.m_elList);
-	for( var id in artists )
-	{
-		var el = document.createElement('div');
-		this.elEdit_artists.m_elList.appendChild( el);
-		el.textContent = artists[id].title;
-		el.classList.add('tag');
-		if( artists[id].full )
-			el.classList.add('selected');
-		else
-			el.classList.add('half_selected');
-	}
-
-	this.elEdit_tags = document.createElement('div');
-	this.elEdit.appendChild( this.elEdit_tags);
-	this.elEdit_tags.classList.add('list');
-	this.elEdit_tags.classList.add('tags');
-	this.elEdit_tags.m_elBtn = document.createElement('div');
-	this.elEdit_tags.appendChild( this.elEdit_tags.m_elBtn);
-	this.elEdit_tags.m_elBtn.classList.add('button');
-	this.elEdit_tags.m_elBtn.style.cssFloat = 'left';
-	this.elEdit_tags.m_elBtn.textContent = 'Tags:';
-	this.elEdit_tags.m_elBtn.m_status = this;
-	this.elEdit_tags.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editTagsShow( tags);};
-	this.elEdit_tags.m_elList = document.createElement('div');
-	this.elEdit_tags.appendChild( this.elEdit_tags.m_elList);
-	for( var id in tags )
-	{
-		var el = document.createElement('div');
-		this.elEdit_tags.m_elList.appendChild( el);
-		el.textContent = tags[id].title;
-		el.title = c_GetTagTip( id);
-		el.classList.add('tag');
-		if( tags[id].full )
-			el.classList.add('selected');
-		else
-			el.classList.add('half_selected');
-	}
+	this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,   "elEdit":this.elEdit});
+	this.editListShow({"name":'tags',   "label":'Tags:',   "list":tags,   "list_all":RULES.tags,"elEdit":this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_Color);
@@ -512,17 +520,23 @@ Status.prototype.edit = function( i_args)
 
 	this.elEdit_tasks = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_tasks);
+	this.elEdit_tasks.classList.add('edit_tasks');
+
+	var elTasksPanel = document.createElement('div');
+	this.elEdit_tasks.appendChild( elTasksPanel);
 
 	var el = document.createElement('div');
-	this.elEdit_tasks.appendChild( el);
-	el.textContent = 'Tasks';
-
-	var el = document.createElement('div');
-	this.elEdit_tasks.appendChild( el);
+	elTasksPanel.appendChild( el);
 	el.textContent = 'Add';
 	el.classList.add('button');
+	el.style.cssFloat = 'right';
 	el.m_status = this;
 	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
+
+	var el = document.createElement('div');
+	elTasksPanel.appendChild( el);
+	el.textContent = 'Tasks:';
+
 	this.editTasksShow();
 
 
@@ -582,49 +596,76 @@ Status.prototype.getMultiVale = function( i_key, i_statuses)
 	}
 	return value;
 }
-Status.prototype.editTagsShow = function( i_args)
+Status.prototype.editListShow = function( i_args)
 {
-	this.editShowList( this.elEdit_tags, 'tags', RULES.tags, i_args);
-}
-Status.prototype.editArtistsShow = function( i_args)
-{
-	this.editShowList( this.elEdit_artists, 'artists', g_users, i_args);
-}
-Status.prototype.editShowList = function( i_elParent, i_stParam, i_list, i_args)
-{
-	if( i_elParent.m_edit ) return;
-	i_elParent.m_edit = true;
-	i_elParent.m_elBtn.classList.remove('button');
-	i_elParent.m_elList.style.display = 'none';
-	i_elParent.m_elListAll = [];
-	for( var item in i_list)
+	var elRoot = document.createElement('div');
+	i_args.elEdit.appendChild( elRoot);
+	i_args.elRoot = elRoot;
+	elRoot.classList.add('list');
+	elRoot.classList.add( i_args.name);
+	elRoot.m_elBtn = document.createElement('div');
+	elRoot.appendChild( elRoot.m_elBtn);
+	elRoot.m_elBtn.classList.add('button');
+	elRoot.m_elBtn.style.cssFloat = 'left';;
+	elRoot.m_elBtn.textContent = i_args.label;
+	elRoot.m_elBtn.m_status = this;
+	elRoot.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editListEdit( i_args);};
+	elRoot.m_elList = document.createElement('div');
+	elRoot.appendChild( elRoot.m_elList);
+	for( var id in i_args.list )
 	{
 		var el = document.createElement('div');
-		i_elParent.appendChild( el);
+		elRoot.m_elList.appendChild( el);
+		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
-		if( i_list[item].title )
-			el.textContent = i_list[item].title;
+		if( i_args.list[id].tooltip ) el.title = i_args.list[id].tooltip;
+
+		if( i_args.list[id].half )
+			el.classList.add('half_selected');
 		else
-			el.textContent = item;
-		if( i_list[item].tip ) el.title = i_list[item].tip;
+			el.classList.add('selected');
+	}
+}
+Status.prototype.editListEdit = function( i_args)
+{
+	if( i_args.elRoot.m_edit ) return;
+	i_args.elRoot.m_edit = true;
+	i_args.elRoot.m_elBtn.classList.remove('button');
+	i_args.elRoot.m_elList.style.display = 'none';
+
+	i_args.elEdit[i_args.name] = [];
+
+	for( var item in i_args.list_all)
+	{
+		var el = document.createElement('div');
+		i_args.elRoot.appendChild( el);
+		el.classList.add('tag');
 		el.m_item = item;
 
-		if( i_args[item] )
+		if( i_args.list_all[item].title )
+			el.textContent = i_args.list_all[item].title;
+		else
+			el.textContent = item;
+
+		if( i_args.list_all[item].tip )
+			el.title = i_args.list_all[item].tip;
+
+		if( i_args.list[item] )
 		{
-			if( i_args[item].full )
-			{
-				el.m_selected = true;
-				el.classList.add('selected');
-			}
-			else
+			if( i_args.list[item].half )
 			{
 				el.m_half_selected = true;
 				el.classList.add('half_selected');
 			}
+			else
+			{
+				el.m_selected = true;
+				el.classList.add('selected');
+			}
 		}
 
 		el.onclick = status_elToggleSelection;
-		i_elParent.m_elListAll.push( el);
+		i_args.elEdit[i_args.name].push( el);
 	}
 }
 function status_elToggleSelection( e)
@@ -662,32 +703,29 @@ Status.prototype.addTaskOnClick = function()
 	task.tags = [];
 	task.artists = [];
 
-//	this.obj.tasks.push( task);
-
 	this.editTasksShow({"new":task});
 }
 
 Status.prototype.editTasksShow = function( i_args)
 {
-//	if( this.elEdit_tasks_list )
-//		this.elEdit_tasks.removeChild( this.elEdit_tasks_list);
-
 	var tasks = this.obj.tasks;
 	if( i_args && i_args.new )
 		tasks = [i_args.new]
 
 	if( tasks == null ) return;
 
-//	this.elEdit_tasks_list = document.createElement('div');
-//	this.elEdit_tasks.appendChild( this.elEdit_tasks_list);
+	if( this.elEdit_tasks.elTasks == null )
+		this.elEdit_tasks.elTasks = [];
 
 	for( var t = 0; t < tasks.length; t++)
 	{
 		var el = document.createElement('div');
 		this.elEdit_tasks.appendChild( el);
+		el.classList.add('task');
 
 		var elDurDiv = document.createElement('div');
 		el.appendChild( elDurDiv);
+		elDurDiv.style.cssFloat = 'left';
 
 		var elDurLabel = document.createElement('div');
 		elDurDiv.appendChild( elDurLabel);
@@ -700,8 +738,35 @@ Status.prototype.editTasksShow = function( i_args)
 		elDur.contentEditable = true;
 		elDur.classList.add('editing');
 		elDur.style.width = '40px';
+		elDur.style.cssFloat = 'left';
 
+		var tags = {};
+		if( tasks[t].tags )
+		for( var g = 0; g < tasks[t].tags.length; g++)
+		{
+			var id = tasks[t].tags[g];
+			tags[id] = {"title":c_GetTagTitle(id),"tooltip":c_GetTagTip(id)};
+		}
 		var elTags = document.createElement('div');
+		el.appendChild( elTags);
+		this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":elTags});
+
+		var artists = {};
+		if( tasks[t].artists )
+		for( var g = 0; g < tasks[t].artists.length; g++)
+		{
+			var id = tasks[t].artists[g];
+			artists[id] = {"title":c_GetUserTitle(id)};
+		}
+		var elArtists = document.createElement('div');
+		el.appendChild( elArtists);
+		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
+
+		el.m_task = tasks[t];
+		el.m_elDur = elDur;
+		el.m_elTags = elTags;
+		el.m_elArtists = elArtists;
+		this.elEdit_tasks.elTasks.push( el);
 	}
 }
 
@@ -742,30 +807,73 @@ Status.prototype.editSave = function( i_args)
 		annotation = c_Strip( this.elEdit_annotation.innerHTML);
 	}
 
-	if( this.elEdit_artists.m_elListAll )
+	if( this.elEdit.artists )
 	{
 		artists = {};
-		for( var i = 0; i < this.elEdit_artists.m_elListAll.length; i++)
+		var elList = this.elEdit.artists;
+		for( var i = 0; i < elList.length; i++)
 		{
-			if( this.elEdit_artists.m_elListAll[i].m_selected )
-				artists[this.elEdit_artists.m_elListAll[i].m_item] = 'selected';
-			else if( this.elEdit_artists.m_elListAll[i].classList.contains('half_selected'))
-				artists[this.elEdit_artists.m_elListAll[i].m_item] = 'half';
+			if( elList[i].m_selected )
+				artists[elList[i].m_item] = 'selected';
+			else if( elList[i].classList.contains('half_selected'))
+				artists[elList[i].m_item] = 'half';
 		}
 	}
 
-	if( this.elEdit_tags.m_elListAll )
+	if( this.elEdit.tags )
 	{
 		tags = {};
-		for( var i = 0; i < this.elEdit_tags.m_elListAll.length; i++)
+		var elList = this.elEdit.tags;
+		for( var i = 0; i < elList.length; i++)
 		{
-			if( this.elEdit_tags.m_elListAll[i].m_selected )
-				tags[this.elEdit_tags.m_elListAll[i].m_item] = 'selected';
-			else if( this.elEdit_tags.m_elListAll[i].classList.contains('half_selected'))
-				tags[this.elEdit_tags.m_elListAll[i].m_item] = 'half';
+			if( elList[i].m_selected )
+				tags[elList[i].m_item] = 'selected';
+			else if( elList[i].classList.contains('half_selected'))
+				tags[elList[i].m_item] = 'half';
 		}
 	}
 
+	if( this.elEdit_tasks.elTasks )
+	{
+		// Task are set to the current status only.
+		// Mutli selection edit is not supported.
+
+		this.obj.tasks = [];
+
+		for( var t = 0; t < this.elEdit_tasks.elTasks.length; t++)
+		{
+			var elTask = this.elEdit_tasks.elTasks[t];
+			var task = {};
+
+			var duration = parseInt( c_Strip( elTask.m_elDur.textContent ));
+			if( ! isNaN( duration ))
+				task.duration = duration;
+
+			if( elTask.m_elTags.tags)
+			{
+				task.tags = [];
+				elList = elTask.m_elTags.tags;
+				for( var i = 0; i < elList.length; i++)
+					if( elList[i].m_selected )
+						task.tags.push( elList[i].m_item);
+			}
+			else if( elTask.m_task.tags )
+				task.tags = elTask.m_task.tags;
+
+			if( elTask.m_elArtists.artists)
+			{
+				task.artists = [];
+				elList = elTask.m_elArtists.artists;
+				for( var i = 0; i < elList.length; i++)
+					if( elList[i].m_selected )
+						task.artists.push( elList[i].m_item);
+			}
+			else if( elTask.m_task.artists )
+				task.artists = elTask.m_task.artists;
+
+			this.obj.tasks.push( task);
+		}
+	}
 
 	// Collect statuses to change
 	// ( this and may be others selected )

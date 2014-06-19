@@ -221,6 +221,8 @@ min-height: 19px;
 .gui_size_handle { cursor: col-resize; box-shadow: 0 0 1px #000 inset;}
 .gui_size_handle:hover { box-shadow: 0 0 2px #000 inset;}
 
+.status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
+
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
 #sidepanel_div { position: absolute; right: 0; }
