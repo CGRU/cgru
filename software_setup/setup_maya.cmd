@@ -2,7 +2,7 @@ rem Source general for all soft directives:
 call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
 rem Set Maya version:
-set "MAYA_VERSION=2014"
+set "MAYA_VERSION=2015"
 
 rem Set Maya location:
 set "MAYA_LOCATION=C:\Program Files\Autodesk\Maya%MAYA_VERSION%"
