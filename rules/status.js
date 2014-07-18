@@ -62,8 +62,10 @@ function Status( i_obj, i_args)
 		this.elFramesNum   = $('status_framesnum');
 		this.elFinish      = $('status_finish');
 		this.elModified    = $('status_modified');
-		this.elTasks       = $('status_tasks');
+		this.elReportsDiv  = $('status_reports_div');
 		this.elReports     = $('status_reports');
+		this.elTasksDiv    = $('status_tasks_div');
+		this.elTasks       = $('status_tasks');
 	}
 
 	if( this.elEditBtn )
@@ -114,18 +116,23 @@ Status.prototype.show = function( i_status)
 		this.elEdit = null;
 	}
 
-	if( this.elReports )
-		this.showReports();
-
 	if( this.elTasks )
 		this.showTasks();
+
+	if( this.elReports )
+		this.showReports();
 }
 Status.prototype.showReports = function()
 {
 	this.elReports.textContent = '';
-	if( this.obj == null ) return;
-	if( this.obj.reports == null ) return;
-	if( this.obj.reports.length == 0 ) return;
+	if(( this.obj == null )
+	|| ( this.obj.reports == null )
+	|| ( this.obj.reports.length == 0 ))
+	{
+		this.elReportsDiv.style.display = 'none';
+		return;
+	}
+	this.elReportsDiv.style.display = 'block';
 
 	var reps_types = {};
 	var reps_duration = 0;
@@ -162,8 +169,6 @@ Status.prototype.showReports = function()
 //console.log( JSON.stringify( report));
 	}
 
-	reps_types.total = {"duration":reps_duration,"artists":[]};
-
 	for( var rtype in reps_types )
 	{
 		var el = document.createElement('div');
@@ -176,14 +181,23 @@ Status.prototype.showReports = function()
 		}
 		el.textContent = info;
 	}
+
+	var el = document.createElement('div');
+	this.elReports.appendChild( el);
+	el.textContent = 'Total Duration: ' + reps_duration;
 //console.log( JSON.stringify( RULES.status.reports));
 }
 Status.prototype.showTasks = function()
 {
 	this.elTasks.textContent = '';
-	if( this.obj == null ) return;
-	if( this.obj.tasks == null ) return;
-	if( this.obj.tasks.length == 0 ) return;
+	if(( this.obj == null )
+	|| ( this.obj.tasks == null )
+	|| ( this.obj.tasks.length == 0 ))
+	{
+		this.elTasksDiv.style.display = 'none';
+		return;
+	}
+	this.elTasksDiv.style.display = 'block';
 
 	for( var t = 0; t < this.obj.tasks.length; t++)
 	{
@@ -195,6 +209,7 @@ Status.prototype.showTasks = function()
 
 		var elDur = document.createElement('div');
 		el.appendChild( elDur);
+		elDur.classList.add('duration');
 		elDur.textContent = task.duration;
 
 		if( task.tags && task.tags.length )

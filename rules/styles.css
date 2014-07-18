@@ -221,8 +221,6 @@ min-height: 19px;
 .gui_size_handle { cursor: col-resize; box-shadow: 0 0 1px #000 inset;}
 .gui_size_handle:hover { box-shadow: 0 0 2px #000 inset;}
 
-.status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
-
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
 #sidepanel_div { position: absolute; right: 0; }
@@ -333,7 +331,7 @@ padding: 1px 8px;
 #content #panel #subscribe .button.disabled { font-weight: bold; background: #FF0000; padding: 1px 20px; }
 #content #panel #subscribe .button.ignore { background: rgba(255,255,0,.1); }
 
-#content #status {
+#status {
 box-shadow: 0 0 2px #000 inset;
 /*border-radius: 10px;*/
 padding: 4px;
@@ -345,11 +343,15 @@ padding: 4px;
 #status_progressbar { height: 10px; /*border-radius: 4px;*/ }
 #status_modified { clear: both; float:right; font-style:italic; font-size: 14px; }
 
+#status_tasks .task { margin: 2px; border: 1px solid #777; }
+#status_tasks .task > div { float: left; margin: 2px 4px; }
+
 .status_edit { clear: both; }
 .status_edit .percent { float:left; margin: 0px 6px; }
 .status_edit .color { clear:both;}
 .status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
+.status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
 
 #search {
 margin: 4px 0 0 0;
