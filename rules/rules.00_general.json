@@ -139,7 +139,7 @@
 "fps":"24",
 "dailies":
 {
-	"format":"hd720",
+	"format":"1280x720",
 	"fps":"25",
 	"codec":"photojpg_high",
 	"colorspace":"auto",
