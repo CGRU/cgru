@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='prman'
+parser = 'prman'
+
 
 class prman(service.service):
-   'PIXAR\'s RenderMan'
+    """PIXAR's RenderMan
+    """
+    pass

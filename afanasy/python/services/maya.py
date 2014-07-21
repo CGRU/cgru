@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser=''
+parser = ''
+
 
 class maya(service.service):
-   'Autodesk Maya'
+    """Autodesk Maya
+    """
+    pass

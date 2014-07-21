@@ -1,25 +1,39 @@
+# -*- coding: utf-8 -*-
+
 from parsers import parser
 
 import re
 
+
 class rsync(parser.parser):
-	'Rsync command parser'
-	def __init__( self):
-		parser.parser.__init__( self)
-		#print('rsync parser instanced')
+    """Rsync command parser
+    """
 
-	def do( self, data, mode):
-		#print(data)
+    def __init__(self):
+        parser.parser.__init__(self)
 
-		data = re.findall(r'\d*%', data)
-		if len( data) == 0: return
+        # print('rsync parser instanced')
 
-		data = data[0]
-		if data.find('%') <= 0: return
+    def do(self, data, mode):
+        """Missing DocString
 
-		data = data.replace('%','')
-		self.percentframe = int(data)
+        :param data: 
+        :param mode: 
+        :return:
+        """
+        #print(data)
 
-		#print('percent = ' + data)
+        data = re.findall(r'\d*%', data)
+        if len(data) == 0:
+            return
 
-		self.calculate()
+        data = data[0]
+        if data.find('%') <= 0:
+            return
+
+        data = data.replace('%', '')
+        self.percentframe = int(data)
+
+        #print('percent = ' + data)
+
+        self.calculate()

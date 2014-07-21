@@ -7,36 +7,51 @@ import os
 
 keyframe = 'Fra:'
 
+
 class blender(parser.parser):
-	'Blender Batch'
-	def __init__( self):
-		parser.parser.__init__( self)
-		self.firstframe = True
-		self.framestring = keyframe
+    """Blender Batch
+    """
 
-	def do( self, data, mode):
-		lines = data.split('\n')
-		need_calc = False
+    def __init__(self):
+        parser.parser.__init__(self)
+        self.firstframe = True
+        self.framestring = keyframe
 
-		for line in lines:
+    def do(self, data, mode):
+        """Missing DocString
 
-			if line.find('Saved:') != -1:
-				line = line[6:]
-				line = line[:line.find('Time:')]
-				self.appendFile( line.strip())
-				continue
+        :param data:
+        :param mode:
+        :return:
+        """
+        lines = data.split('\n')
+        need_calc = False
 
-			if line.find( keyframe) < 0: continue
-			frmpos = line.find(' ')
-			if frmpos < 0: continue
-			# Increment frame if new:
-			if line[0:frmpos] != self.framestring:
-				self.framestring = line[0:frmpos]
-				need_calc = True
-				if self.firstframe:
-					self.firstframe = False
-				else:
-					self.frame += 1
-					self.percentframe = 0
+        for line in lines:
 
-		if need_calc: self.calculate()
+            if line.find('Saved:') != -1:
+                line = line[6:]
+                line = line[:line.find('Time:')]
+                self.appendFile(line.strip())
+                continue
+
+            if line.find(keyframe) < 0:
+                continue
+
+            frmpos = line.find(' ')
+
+            if frmpos < 0:
+                continue
+
+            # Increment frame if new:
+            if line[0:frmpos] != self.framestring:
+                self.framestring = line[0:frmpos]
+                need_calc = True
+                if self.firstframe:
+                    self.firstframe = False
+                else:
+                    self.frame += 1
+                    self.percentframe = 0
+
+        if need_calc:
+            self.calculate()

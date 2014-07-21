@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='max'
+parser = 'max'
+
 
 class max(service.service):
-   '3ds Max'
+    """3ds Max
+    """
+    pass

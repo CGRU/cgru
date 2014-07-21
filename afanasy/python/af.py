@@ -10,380 +10,897 @@ import time
 import cgruconfig
 import cgrupathmap
 import afnetwork
-import services
+import services  # this seems unneccessary not used
 
 Pathmap = cgrupathmap.PathMap()
 
-def checkRegExp( pattern):
-	result = True
-	try:
-		re.compile(pattern)
-	except:
-		print('Error: Invalid regular expression pattern "%s"' % pattern)
-		print( str(sys.exc_info()[1]))
-		result = False
-	return result
 
-def checkClass( name, folder):
-	filename = name + '.py'
-	path = os.path.join( cgruconfig.VARS['AF_ROOT'], 'python')
-	path = os.path.join( path, folder)
-	if filename in os.listdir( path): return True
-	return False
+def checkRegExp(pattern):
+    """Missing DocString
+
+    :param pattern:
+    :return:
+    """
+    result = True
+    try:
+        re.compile(pattern)
+    except:  # TODO: Too broad exception clause
+        print('Error: Invalid regular expression pattern "%s"' % pattern)
+        print(str(sys.exc_info()[1]))
+        result = False
+    return result
+
+
+def checkClass(name, folder):
+    """Missing DocString
+
+    :param name:
+    :param folder:
+    :return:
+    """
+    filename = name + '.py'
+    path = os.path.join(cgruconfig.VARS['AF_ROOT'], 'python')
+    path = os.path.join(path, folder)
+    if filename in os.listdir(path): return True
+    return False
+
 
 class Task:
-	def __init__( self, taskname = ''):
-		self.data = dict()
-		self.setName( taskname)
+    """Missing DocString
+    """
 
-	def setName( self, name):
-		if name != '': self.data["name"] = name
+    def __init__(self, taskname=''):
+        self.data = dict()
+        self.setName(taskname)
 
-	def setCommand( self, command, TransferToServer = True):
-		if TransferToServer: command = Pathmap.toServer( command)
-		self.data["command"] = command
+    def setName(self, name):
+        """Missing DocString
 
-	def setFiles( self, files, TransferToServer = True):
-		if not "files" in self.data: self.data["files"] = []
-		for afile in files:
-			if TransferToServer: afile = Pathmap.toServer( afile)
-			self.data["files"].append( afile)
+        :param name:
+        :return:
+        """
+        if name != '':
+            self.data["name"] = name
+
+    def setCommand(self, command, TransferToServer=True):
+        """Missing DocString
+
+        :param command:
+        :param TransferToServer:
+        :return:
+        """
+        if TransferToServer:
+            command = Pathmap.toServer(command)
+        self.data["command"] = command
+
+    def setFiles(self, files, TransferToServer=True):
+        """Missing DocString
+
+        :param files:
+        :param TransferToServer:
+        :return:
+        """
+        if not "files" in self.data:
+            self.data["files"] = []
+
+        for afile in files:
+            if TransferToServer:
+                afile = Pathmap.toServer(afile)
+            self.data["files"].append(afile)
+
 
 class Block:
-	def __init__( self, blockname = 'block', service = 'generic'):
-		self.data = dict()
-		self.data["name"] = blockname
-		self.data["capacity"] = int( cgruconfig.VARS['af_task_default_capacity'])
-		self.data["working_directory"] = Pathmap.toServer( os.getenv('PWD', os.getcwd()))
-		self.data["numeric"] = False
-		self.tasks = []
-		if self.setService( service):
-			__import__("services", globals(), locals(), [self.data["service"]])
-			parser = eval(('services.%s.parser') % self.data["service"])
-			self.setParser( parser)
+    """Missing DocString
+    """
 
-	def setService( self, service, nocheck = False):
-		if service != '':
-			result = True
-			if not nocheck:
-				if not checkClass( service, 'services'):
-					print('Error: Unknown service "%s", setting to "generic"' % service)
-					service = 'generic'
-					result = False
-			self.data["service"] = service
-			return result
-		return False
+    def __init__(self, blockname='block', service='generic'):
+        self.data = dict()
+        self.data["name"] = blockname
+        self.data["capacity"] = int(
+            cgruconfig.VARS['af_task_default_capacity'])
+        self.data["working_directory"] = Pathmap.toServer(
+            os.getenv('PWD', os.getcwd()))
+        self.data["numeric"] = False
+        self.tasks = []
+        if self.setService(service):
+            __import__("services", globals(), locals(), [self.data["service"]])
+            parser = eval(('services.%s.parser') % self.data["service"])
+            self.setParser(parser)
 
-	def setParser( self, parser, nocheck = False):
-		if parser != '':
-			if not nocheck:
-				if not checkClass( parser, 'parsers'):
-					if parser != 'none':
-						print('Error: Unknown parser "%s", setting to "none"' % parser)
-						parser = 'none'
-		self.data["parser"] = parser
+    def setService(self, service, nocheck=False):
+        """Missing DocString
 
-	def setNumeric( self, start = 1, end = 10, pertask = 1, increment = 1):
-		if len( self.tasks):
-			print('Error: Block.setNumeric: Block already has tasks.')
-			return
-		if end < start:
-			print('Error: Block.setNumeric: end < start (%d < %d)' % (end,start))
-			end = start
-		if pertask < 1:
-			print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
-			pertask = 1
-		self.data["numeric"] = True
-		self.data["frame_first"] = start
-		self.data["frame_last"] = end
-		self.data["frames_per_task"] = pertask
-		self.data["frames_inc"] = increment
+        :param service:
+        :param nocheck:
+        :return:
+        """
+        if service != '':
+            result = True
+            if not nocheck:
+                if not checkClass(service, 'services'):
+                    print('Error: Unknown service "%s", setting to "generic"' %
+                          service)
+                    service = 'generic'
+                    result = False
+            self.data["service"] = service
+            return result
+        return False
 
-#	def setFlags(self, flags):
-#		self.data['flags'] = flags
+    def setParser(self, parser, nocheck=False):
+        """Missing DocString
 
-	def setCapacity( self, capacity):
-		if capacity > 0:
-			self.data["capacity"] = capacity
+        :param parser:
+        :param nocheck:
+        :return:
+        """
+        if parser != '':
+            if not nocheck:
+                if not checkClass(parser, 'parsers'):
+                    if parser != 'none':
+                        print('Error: Unknown parser "%s", setting to "none"' %
+                              parser)
+                        parser = 'none'
+        self.data["parser"] = parser
 
-	def setVariableCapacity( self, capacity_coeff_min, capacity_coeff_max):
-		if capacity_coeff_min >= 0 or capacity_coeff_max >= 0:
-			self.data["capacity_coeff_min"] = capacity_coeff_min
-			self.data["capacity_coeff_max"] = capacity_coeff_max
+    def setNumeric(self, start=1, end=10, pertask=1, increment=1):
+        """Missing DocString
 
-	def setWorkingDirectory( self, working_directory, TransferToServer = True):
-		if TransferToServer: working_directory = Pathmap.toServer( working_directory)
-		self.data["working_directory"] = working_directory
+        :param int start:
+        :param int end:
+        :param int pertask:
+        :param int increment:
+        :return:
+        """
+        if len(self.tasks):
+            print('Error: Block.setNumeric: Block already has tasks.')
+            return
+        if end < start:
+            print(
+            'Error: Block.setNumeric: end < start (%d < %d)' % (end, start))
+            end = start
+        if pertask < 1:
+            print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
+            pertask = 1
+        self.data["numeric"] = True
+        self.data["frame_first"] = start
+        self.data["frame_last"] = end
+        self.data["frames_per_task"] = pertask
+        self.data["frames_inc"] = increment
 
-	def setCommand( self, command, prefix = True, TransferToServer = True):
-		if prefix: command = os.getenv('AF_CMD_PREFIX', cgruconfig.VARS['af_cmdprefix']) + command
-		if TransferToServer: command = Pathmap.toServer( command)
-		self.data["command"] = command
+    # def setFlags(self, flags):
+    #     self.data['flags'] = flags
 
-	def setCmdPre(  self, command_pre, TransferToServer = True):
-		if TransferToServer: command_pre = Pathmap.toServer( command_pre)
-		self.data["command_pre"] = command_pre
+    def setCapacity(self, capacity):
+        """Missing DocString
 
-	def setCmdPost( self, command_post, TransferToServer = True):
-		if TransferToServer: command_post = Pathmap.toServer( command_post)
-		self.data["command_post"] = command_post
+        :param capacity:
+        :return:
+        """
+        if capacity > 0:
+            self.data["capacity"] = capacity
 
-	def setFiles(  self, files, TransferToServer = True):
-		if not "files" in self.data: self.data["files"] = []
-		for afile in files:
-			if TransferToServer: afile = Pathmap.toServer( afile)
-			self.data["files"].append( afile)
+    def setVariableCapacity(self, capacity_coeff_min, capacity_coeff_max):
+        """Missing DocString
 
-	def setName(               self, value): self.data["name"] = value
-	def setTasksName(          self, value): self.data["tasks_name"] = value
-	def setFramesPerTask(      self, value): self.data["frames_per_task"] = value
-	def setParserCoeff(        self, value): self.data["parser_coeff"] = value
-	def setErrorsAvoidHost(    self, value): self.data["errors_avoid_host"] = value
-	def setErrorsForgiveTime(  self, value): self.data["errors_forgive_time"] = value
-	def setErrorsRetries(      self, value): self.data["errors_retries"] = value
-	def setErrorsTaskSameHost( self, value): self.data["errors_task_same_host"] = value
-	def setNeedHDD(            self, value): self.data["need_hdd"] = value
-	def setNeedMemory(         self, value): self.data["need_memory"] = value
-	def setNeedPower(          self, value): self.data["need_power"] = value
-	def setNonSequential( self, value = True ): self.data["non_sequential"] = value
-	def setDependSubTask( self, value = True ): self.data["depend_sub_task"] = value
-	def setTasksMaxRunTime(    self, value):
-		if( value > 0 ): self.data["tasks_max_run_time"] = value
-	def setMaxRunningTasks(    self, value):
-		if( value >= 0 ): self.data["max_running_tasks"] = value
-	def setMaxRunTasksPerHost( self, value):
-		if( value >= 0 ): self.data["max_running_tasks_per_host"] = value
+        :param capacity_coeff_min:
+        :param capacity_coeff_max:
+        :return:
+        """
+        if capacity_coeff_min >= 0 or capacity_coeff_max >= 0:
+            self.data["capacity_coeff_min"] = capacity_coeff_min
+            self.data["capacity_coeff_max"] = capacity_coeff_max
 
-	def setHostsMask(        self, value):
-		if checkRegExp(value): self.data["hosts_mask"] = value
-	def setHostsMaskExclude( self, value):
-		if checkRegExp(value): self.data["hosts_mask_exclude"] = value
-	def setDependMask(       self, value):
-		if checkRegExp(value): self.data["depend_mask"] = value
-	def setTasksDependMask( self, value):
-		if checkRegExp(value): self.data["tasks_depend_mask"] = value
-	def setNeedProperties(   self, value):
-		if checkRegExp(value): self.data["need_properties"] = value
+    def setWorkingDirectory(self, working_directory, TransferToServer=True):
+        """Missing DocString
 
-#	def setGenThumbnails(self, value = True): self.data["gen_thumbnails"] = value;
-	
-	def setDoPost( self, value = True ): self.data["do_post"] = value
-	
-	def setMultiHost( self, h_min, h_max, h_max_wait, master_on_slave = False, service = None, service_wait = -1):
-		if h_min < 1:
-			print('Error: Block::setMultiHost: Minimum must be greater then zero.')
-			return False
-		if h_max < h_min:
-			print('Block::setMultiHost: Maximum must be greater or equal then minimum.')
-			return False
-		if master_on_slave and service is None:
-			print('Error: Block::setMultiHost: Master in slave is enabled but service was not specified.')
-			return False
+        :param working_directory:
+        :param TransferToServer:
+        :return:
+        """
+        if TransferToServer:
+            working_directory = Pathmap.toServer(working_directory)
+        self.data["working_directory"] = working_directory
 
-		self.data['multihost_min'] = h_min
-		self.data['multihost_max'] = h_max
-		self.data['multihost_max_wait'] = h_max_wait
-		if master_on_slave:
-			self.data['multihost_master_on_slave'] = master_on_slave
-		if service:
-			self.data['multihost_service'] = service
-		if service_wait > 0:
-			self.data['multihost_service_wait'] = service_wait
+    def setCommand(self, command, prefix=True, TransferToServer=True):
+        """Missing DocString
 
+        :param command:
+        :param prefix:
+        :param TransferToServer:
+        :return:
+        """
+        if prefix:
+            command = \
+                os.getenv('AF_CMD_PREFIX',
+                          cgruconfig.VARS['af_cmdprefix']) + command
+        if TransferToServer:
+            command = Pathmap.toServer(command)
+        self.data["command"] = command
 
-	def fillTasks( self):
-		if len( self.tasks):
-			self.data["tasks"] = []
-			for task in self.tasks:
-				self.data["tasks"].append( task.data)
+    def setCmdPre(self, command_pre, TransferToServer=True):
+        """Missing DocString
+
+        :param command_pre:
+        :param TransferToServer:
+        :return:
+        """
+        if TransferToServer:
+            command_pre = Pathmap.toServer(command_pre)
+        self.data["command_pre"] = command_pre
+
+    def setCmdPost(self, command_post, TransferToServer=True):
+        """Missing DocString
+
+        :param command_post:
+        :param TransferToServer:
+        :return:
+        """
+        if TransferToServer:
+            command_post = Pathmap.toServer(command_post)
+        self.data["command_post"] = command_post
+
+    def setFiles(self, files, TransferToServer=True):
+        """Missing DocString
+
+        :param files:
+        :param TransferToServer:
+        :return:
+        """
+        if not "files" in self.data:
+            self.data["files"] = []
+
+        for afile in files:
+            if TransferToServer:
+                afile = Pathmap.toServer(afile)
+            self.data["files"].append(afile)
+
+    def setName(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["name"] = value
+
+    def setTasksName(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["tasks_name"] = value
+
+    def setFramesPerTask(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["frames_per_task"] = value
+
+    def setParserCoeff(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["parser_coeff"] = value
+
+    def setErrorsAvoidHost(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["errors_avoid_host"] = value
+
+    def setErrorsForgiveTime(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["errors_forgive_time"] = value
+
+    def setErrorsRetries(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["errors_retries"] = value
+
+    def setErrorsTaskSameHost(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["errors_task_same_host"] = value
+
+    def setNeedHDD(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["need_hdd"] = value
+
+    def setNeedMemory(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["need_memory"] = value
+
+    def setNeedPower(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["need_power"] = value
+
+    def setNonSequential(self, value=True):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["non_sequential"] = value
+
+    def setDependSubTask(self, value=True):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["depend_sub_task"] = value
+
+    def setTasksMaxRunTime(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value > 0:
+            self.data["tasks_max_run_time"] = value
+
+    def setMaxRunningTasks(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value >= 0:
+            self.data["max_running_tasks"] = value
+
+    def setMaxRunTasksPerHost(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value >= 0:
+            self.data["max_running_tasks_per_host"] = value
+
+    def setHostsMask(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["hosts_mask"] = value
+
+    def setHostsMaskExclude(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["hosts_mask_exclude"] = value
+
+    def setDependMask(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["depend_mask"] = value
+
+    def setTasksDependMask(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["tasks_depend_mask"] = value
+
+    def setNeedProperties(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["need_properties"] = value
+
+    # def setGenThumbnails(self, value = True):
+    #     self.data["gen_thumbnails"] = value;
+
+    def setDoPost(self, value=True):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["do_post"] = value
+
+    def setMultiHost(self, h_min, h_max, h_max_wait, master_on_slave=False, service=None, service_wait=-1):
+        """Missing DocString
+
+        :param h_min:
+        :param h_max:
+        :param h_max_wait:
+        :param master_on_slave:
+        :param service:
+        :param service_wait:
+        :return:
+        """
+        if h_min < 1:
+            print('Error: Block::setMultiHost: Minimum must be greater then '
+                  'zero.')
+            return False
+
+        if h_max < h_min:
+            print('Block::setMultiHost: Maximum must be greater or equal then '
+                  'minimum.')
+            return False
+
+        if master_on_slave and service is None:
+            print('Error: Block::setMultiHost: Master in slave is enabled but '
+                  'service was not specified.')
+            return False
+
+        self.data['multihost_min'] = h_min
+        self.data['multihost_max'] = h_max
+        self.data['multihost_max_wait'] = h_max_wait
+
+        if master_on_slave:
+            self.data['multihost_master_on_slave'] = master_on_slave
+
+        if service:
+            self.data['multihost_service'] = service
+
+        if service_wait > 0:
+            self.data['multihost_service_wait'] = service_wait
+
+    def fillTasks(self):
+        """Missing DocString
+        """
+        if len(self.tasks):
+            self.data["tasks"] = []
+            for task in self.tasks:
+                self.data["tasks"].append(task.data)
+
 
 class Job:
-	def __init__( self, jobname = None, verbose = False):
-		self.data = dict()
-		self.data["name"] = "noname"
-		self.data["user_name"] = cgruconfig.VARS['USERNAME']
-		self.data["host_name"] = cgruconfig.VARS['HOSTNAME']
-		self.data["priority"]  = cgruconfig.VARS['af_priority']
-		self.data["time_creation"] = int(time.time())
-		self.setName( jobname)
-		self.blocks = []
+    """Missing DocString
 
-	def setName( self, name):
-		if name is not None and len(name):
-			self.data["name"] = name
+    :param jobname:
+    :param verbose:
+    """
 
-	def setUserName( self, username):
-		if username is not None and len(username):
-			self.data["user_name"] = username.lower()
+    def __init__(self, jobname=None, verbose=False):
+        self.data = dict()
+        self.data["name"] = "noname"
+        self.data["user_name"] = cgruconfig.VARS['USERNAME']
+        self.data["host_name"] = cgruconfig.VARS['HOSTNAME']
+        self.data["priority"] = cgruconfig.VARS['af_priority']
+        self.data["time_creation"] = int(time.time())
+        self.setName(jobname)
+        self.blocks = []
 
-	def setPriority( self, priority):
-		if priority < 0: return
-		if priority > 250:
-			priority = 250
-			print('Warning: priority clamped to maximum = %d' % priority)
-		self.data["priority"] = priority
+    def setName(self, name):
+        """Missing DocString
 
-	def setCmdPre(  self, command, TransferToServer = True):
-		if TransferToServer: command = Pathmap.toServer( command)
-		self.data["command_pre"] = command
+        :param name:
+        :return:
+        """
+        if name is not None and len(name):
+            self.data["name"] = name
 
-	def setCmdPost( self, command, TransferToServer = True):
-		if TransferToServer: command = Pathmap.toServer( command)
-		self.data["command_post"] = command
+    def setUserName(self, username):
+        """Missing DocString
 
-	def fillBlocks( self):
-		self.data["blocks"] = []
-		for block in self.blocks:
-			block.fillTasks()
-			self.data["blocks"].append( block.data)
+        :param username:
+        :return:
+        """
+        if username is not None and len(username):
+            self.data["user_name"] = username.lower()
 
-	def output( self, full = False):
-		self.fillBlocks()
-		print( json.dumps( self.data, sort_keys=True, indent=4))
+    def setPriority(self, priority):
+        """Missing DocString
 
-	def send( self, verbose = False):
-		if len( self.blocks) == 0:
-			print('Error: Job has no blocks')
-#			return False
-		self.fillBlocks()
+        :param priority:
+        :return:
+        """
+        if priority < 0:
+            return
 
-		obj = {"job": self.data }
-		#print(json.dumps( obj))
+        if priority > 250:
+            priority = 250
+            print('Warning: priority clamped to maximum = %d' % priority)
 
-		return afnetwork.sendServer( json.dumps( obj), True, verbose)
+        self.data["priority"] = priority
 
-	def setAnnotation(         self, value): self.data["annotation"] = value
-	def setDescription(        self, value): self.data["description"] = value
-	def setWaitTime(           self, value):
-		if( value > 0 ): self.data["time_wait"] = value
-	def setMaxRunningTasks(    self, value):
-		if( value >= 0 ): self.data["max_running_tasks"] = value
-	def setMaxRunTasksPerHost( self, value):
-		if( value >= 0 ): self.data["max_running_tasks_per_host"] = value
+    def setCmdPre(self, command, TransferToServer=True):
+        """Missing DocString
 
-	def setHostsMask(        self, value):
-		if checkRegExp(value): self.data["hosts_mask"] = value
-	def setHostsMaskExclude( self, value):
-		if checkRegExp(value): self.data["hosts_mask_exclude"] = value
-	def setDependMask(       self, value):
-		if checkRegExp(value): self.data["depend_mask"] = value
-	def setDependMaskGlobal( self, value):
-		if checkRegExp(value): self.data["depend_mask_global"] = value
-	def setNeedOS(           self, value):
-		if checkRegExp(value): self.data["need_os"] = value
-	def setNeedProperties(   self, value):
-		if checkRegExp(value): self.data["need_properties"] = value
+        :param command:
+        :param TransferToServer:
+        :return:
+        """
+        if TransferToServer:
+            command = Pathmap.toServer(command)
+        self.data["command_pre"] = command
 
-	def setNativeOS( self): self.data["need_os"] = cgruconfig.VARS['platform'][-1]
-	def setAnyOS(    self): self.data["need_os"] = ''
+    def setCmdPost(self, command, TransferToServer=True):
+        """Missing DocString
 
-	def pause(      self): self.data["offline"] = True
-	def setPaused(  self): self.data["offline"] = True
-	def setOffline( self): self.data["offline"] = True
-	def offline(    self): self.data["offline"] = True
-	def offLine(    self): self.data["offline"] = True
+        :param command:
+        :param TransferToServer:
+        :return:
+        """
+        if TransferToServer:
+            command = Pathmap.toServer(command)
+        self.data["command_post"] = command
+
+    def fillBlocks(self):
+        """Missing DocString
+
+        :return:
+        """
+        self.data["blocks"] = []
+        for block in self.blocks:
+            block.fillTasks()
+            self.data["blocks"].append(block.data)
+
+    def output(self, full=False):
+        """Missing DocString
+
+        :param full:
+        :return:
+        """
+        self.fillBlocks()
+        print(json.dumps(self.data, sort_keys=True, indent=4))
+
+    def send(self, verbose=False):
+        """Missing DocString
+
+        :param verbose:
+        :return:
+        """
+        if len(self.blocks) == 0:
+            print('Error: Job has no blocks')
+            # return False
+        self.fillBlocks()
+
+        obj = {"job": self.data}
+        # print(json.dumps( obj))
+
+        return afnetwork.sendServer(json.dumps(obj), True, verbose)
+
+    def setAnnotation(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["annotation"] = value
+
+    def setDescription(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        self.data["description"] = value
+
+    def setWaitTime(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value > 0:
+            self.data["time_wait"] = value
+
+    def setMaxRunningTasks(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value >= 0:
+            self.data["max_running_tasks"] = value
+
+    def setMaxRunTasksPerHost(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value >= 0:
+            self.data["max_running_tasks_per_host"] = value
+
+    def setHostsMask(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["hosts_mask"] = value
+
+    def setHostsMaskExclude(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["hosts_mask_exclude"] = value
+
+    def setDependMask(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["depend_mask"] = value
+
+    def setDependMaskGlobal(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["depend_mask_global"] = value
+
+    def setNeedOS(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["need_os"] = value
+
+    def setNeedProperties(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if checkRegExp(value):
+            self.data["need_properties"] = value
+
+    def setNativeOS(self):
+        """Missing DocString
+        """
+        self.data["need_os"] = cgruconfig.VARS['platform'][-1]
+
+    def setAnyOS(self):
+        """Missing DocString
+        """
+        self.data["need_os"] = ''
+
+    def pause(self):
+        """Missing DocString
+        """
+        self.data["offline"] = True
+
+    def setPaused(self):
+        """Missing DocString
+        """
+        self.data["offline"] = True
+
+    def setOffline(self):
+        """Missing DocString
+        """
+        self.data["offline"] = True
+
+    def offline(self):
+        """Missing DocString
+        """
+        self.data["offline"] = True
+
+    def offLine(self):
+        """Missing DocString
+        """
+        self.data["offline"] = True
+
 
 class Cmd:
-	def __init__( self ):
-		self.data = dict()
-		self.data['user_name'] = cgruconfig.VARS['USERNAME']
-		self.data['host_name'] = cgruconfig.VARS['HOSTNAME']
-		self.action = None
-   
-	def _sendRequest(self, verbose = False):
-		if self.action is None:
-			print('ERROR: Action is not set.')
-			return None
+    """Missing DocString
+    """
 
-		receive = ( self.action == 'get')
-		obj = { self.action: self.data }
-		#print(json.dumps( obj))
-		output = afnetwork.sendServer( json.dumps( obj), receive, verbose)
+    def __init__(self):
+        self.data = dict()
+        self.data['user_name'] = cgruconfig.VARS['USERNAME']
+        self.data['host_name'] = cgruconfig.VARS['HOSTNAME']
+        self.action = None
 
-		if output[0] == True:
-			return output[1]
-		else:
-			return None
+    def _sendRequest(self, verbose=False):
+        """Missing DocString
 
-	def getJobList( self, verbose = False):
-		self.action = 'get'
-		self.data['type'] = 'jobs'
-		data = self._sendRequest()
-		if data is not None:
-			if 'jobs' in data:
-				return data['jobs']
-		return None
+        :param bool verbose:
+        :return:
+        """
+        if self.action is None:
+            print('ERROR: Action is not set.')
+            return None
 
-	def deleteJob(self, jobName, verbose = False):
-		self.action = 'action'
-		self.data['type'] = 'jobs'
-		self.data['mask'] = jobName
-		self.data['operation'] = {'type':'delete'}
-		return self._sendRequest(verbose)
+        receive = (self.action == 'get')
+        obj = {self.action: self.data}
+        # print(json.dumps( obj))
+        output = afnetwork.sendServer(json.dumps(obj), receive, verbose)
 
-	def getJobInfo(self, jobId, verbose = False):
-		self.data['ids'] = [ jobId ]
-		self.data['mode'] = 'full'
-		return self.getJobList(verbose)
+        if output[0] is True:
+            return output[1]
+        else:
+            return None
 
-	def renderSetNimby( self, text):
-		self.action = 'action'
-		self.data['type'] = 'renders'
-		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-		self.data['params'] = {'nimby':True}
-		self._sendRequest()
+    def getJobList(self, verbose=False):
+        """Missing DocString
 
-	def renderSetNIMBY( self, text):
-		self.action = 'action'
-		self.data['type'] = 'renders'
-		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-		self.data['params'] = {'NIMBY':True}
-		self._sendRequest()
+        :param bool verbose:
+        :return:
+        """
+        self.action = 'get'
+        self.data['type'] = 'jobs'
+        data = self._sendRequest()
+        if data is not None:
+            if 'jobs' in data:
+                return data['jobs']
+        return None
 
-	def renderSetFree( self, text):
-		self.action = 'action'
-		self.data['type'] = 'renders'
-		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-		self.data['params'] = {'nimby':False}
-		self._sendRequest()
+    def deleteJob(self, jobName, verbose=False):
+        """Missing DocString
 
-	def renderEjectTasks( self, text):
-		self.action = 'action'
-		self.data['type'] = 'renders'
-		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-		self.data['operation'] = {'type':'eject_tasks'}
-		self._sendRequest()
+        :param str jobName:
+        :param bool verbose:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['mask'] = jobName
+        self.data['operation'] = {'type': 'delete'}
+        return self._sendRequest(verbose)
 
-	def renderEjectNotMyTasks( self, text):
-		self.action = 'action'
-		self.data['type'] = 'renders'
-		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-		self.data['operation'] = {'type':'eject_tasks_keep_my'}
-		self._sendRequest()
+    def getJobInfo(self, jobId, verbose=False):
+        """Missing DocString
 
-	def renderExit( self, text):
-		self.action = 'action'
-		self.data['type'] = 'renders'
-		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-		self.data['operation'] = {'type':'exit'}
-		self._sendRequest()
+        :param jobId:
+        :param bool verbose:
+        :return:
+        """
+        self.data['ids'] = [jobId]
+        self.data['mode'] = 'full'
+        return self.getJobList(verbose)
 
-	def monitorExit( self, text):
-		self.action = 'action'
-		self.data['type'] = 'monitors'
-		self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + cgruconfig.VARS['HOSTNAME'] + ':.*'
-		self.data['operation'] = {'type':'exit'}
-		self._sendRequest()
+    def renderSetNimby(self, text):
+        """Missing DocString
 
-	def renderGetList( self, mask = None):
-		self.action = 'get'
-		self.data['type'] = 'renders'
-		if mask is not None:
-			self.data['mask'] = mask
-		data = self._sendRequest()
-		if data is not None:
-			if 'renders' in data:
-				return data['renders']
-		return None
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['params'] = {'nimby': True}
+        self._sendRequest()
 
-	def renderGetLocal( self): return self.renderGetList( cgruconfig.VARS['HOSTNAME'])
+    def renderSetNIMBY(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['params'] = {'NIMBY': True}
+        self._sendRequest()
+
+    def renderSetFree(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['params'] = {'nimby': False}
+        self._sendRequest()
+
+    def renderEjectTasks(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['operation'] = {'type': 'eject_tasks'}
+        self._sendRequest()
+
+    def renderEjectNotMyTasks(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['operation'] = {'type': 'eject_tasks_keep_my'}
+        self._sendRequest()
+
+    def renderExit(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['operation'] = {'type': 'exit'}
+        self._sendRequest()
+
+    def monitorExit(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'monitors'
+        self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + \
+                            cgruconfig.VARS['HOSTNAME'] + ':.*'
+        self.data['operation'] = {'type': 'exit'}
+        self._sendRequest()
+
+    def renderGetList(self, mask=None):
+        """Missing DocString
+
+        :param mask:
+        :return:
+        """
+        self.action = 'get'
+        self.data['type'] = 'renders'
+        if mask is not None:
+            self.data['mask'] = mask
+        data = self._sendRequest()
+        if data is not None:
+            if 'renders' in data:
+                return data['renders']
+        return None
+
+    def renderGetLocal(self):
+        """Missing DocString
+
+        :return:
+        """
+        return self.renderGetList(cgruconfig.VARS['HOSTNAME'])

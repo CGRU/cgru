@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='xsi'
+parser = 'xsi'
+
 
 class xsi(service.service):
-   'Softimage'
+    """Softimage
+    """
+    pass

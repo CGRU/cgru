@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='mayatoarnold'
+parser = 'mayatoarnold'
+
 
 class mayatoarnold(service.service):
-   'Autodesk Maya to Arnold Standalone'
+    """Autodesk Maya to Arnold Standalone
+    """
+    pass

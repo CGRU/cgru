@@ -8,91 +8,103 @@ import sys
 
 import cgruconfig
 
-def genHeader( data_size):
-	data = 'AFANASY '
-	data += str(data_size)
-	data += ' JSON'
-	return bytearray( data, 'utf-8')
 
-def sendServer( data, receive = True, verbose = False):
+def genHeader(data_size):
+    """Missing DocString
 
-	size = len(data)
-	header = genHeader(size)
-	data = header + bytearray( data, 'utf-8')
-	datalen = len(data)
-	#return True, None
+    :param data_size:
+    :return:
+    """
+    data = 'AFANASY %s JSON' % data_size
+    return bytearray(data, 'utf-8')
 
-	host = cgruconfig.VARS['af_servername']
-	port = cgruconfig.VARS['af_serverport']
 
-	s = None
-	err_msg = ''
-	reslist = []
+def sendServer(data, receive=True, verbose=False):
+    """Missing DocString
 
-	try:
-		reslist = socket.getaddrinfo( host, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
-	except:
-		print('Can`t solve "%s":' % host + str(sys.exc_info()[1]))
+    :param receive:
+    :param verbose:
+    :return:
+    """
+    size = len(data)
+    header = genHeader(size)
+    data = header + bytearray(data, 'utf-8')
+    datalen = len(data)
+    # return True, None
 
-	for res in reslist:
-		af, socktype, proto, canonname, sa = res
-		if verbose: print('Trying to connect to "%s"' % str(sa[0]))
-		try:
-			s = socket.socket(af, socktype, proto)
-		except:
-			if err_msg != '': err_msg += '\n'
-			err_msg += str(sa[0]) + ' : ' + str(sys.exc_info()[1])
-			s = None
-			continue
-		try:
-			s.connect(sa)
-		except:
-			if err_msg != '': err_msg += '\n'
-			err_msg += str(sa[0]) + ' : ' + str(sys.exc_info()[1])
-			s.close()
-			s = None
-			continue
-		break
+    host = cgruconfig.VARS['af_servername']
+    port = cgruconfig.VARS['af_serverport']
 
-	if s is None:
-		print('Could not open socket.')
-		print( err_msg)
-		return False, None
+    s = None
+    err_msg = ''
+    reslist = []
 
-	if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)
+    try:
+        reslist = socket.getaddrinfo(host, port, socket.AF_UNSPEC,
+                                     socket.SOCK_STREAM)
+    except:  # TODO: Too broad exception clause
+        print('Can`t solve "%s":' % host + str(sys.exc_info()[1]))
 
-#	s.sendall( data) #<<< !!! May not work !!!!
+    for res in reslist:
+        af, socktype, proto, canonname, sa = res
+        if verbose: print('Trying to connect to "%s"' % str(sa[0]))
+        try:
+            s = socket.socket(af, socktype, proto)
+        except:  # TODO: Too broad exception clause
+            if err_msg != '': err_msg += '\n'
+            err_msg += str(sa[0]) + ' : ' + str(sys.exc_info()[1])
+            s = None
+            continue
+        try:
+            s.connect(sa)
+        except:  # TODO: Too broad exception clause
+            if err_msg != '': err_msg += '\n'
+            err_msg += str(sa[0]) + ' : ' + str(sys.exc_info()[1])
+            s.close()
+            s = None
+            continue
+        break
 
-	total_send = 0
-	while total_send < len( data):
-		sent = s.send( data[total_send:])
-		if sent == 0:
-			print('Error: Unable send data to socket')
-			return False, None
-		total_send += sent
-   
-	if not receive:
-		return True, None
+    if s is None:
+        print('Could not open socket.')
+        print(err_msg)
+        return False, None
 
-	data = b''
-	while True:
-		buffer = s.recv(4096)
-		if not buffer:
-			break
-		data += buffer
-	s.close()
+    if verbose:
+        print('afnetwork.sendServer: send %d bytes' % datalen)
 
-	struct = None
+    # s.sendall( data) #<<< !!! May not work !!!!
 
-	try:
-		if not isinstance( data, str):
-			data = str( data, 'utf-8')
-		struct = json.loads( data)
-	except:
-		print('afnetwork.py: Received data:')
-		print( data)
-		print('JSON loads error:')
-		print( str(sys.exc_info()[1]))
-		struct = None
+    total_send = 0
+    while total_send < len(data):
+        sent = s.send(data[total_send:])
+        if sent == 0:
+            print('Error: Unable send data to socket')
+            return False, None
+        total_send += sent
 
-	return True, struct
+    if not receive:
+        return True, None
+
+    data = b''
+    while True:
+        buffer = s.recv(4096)
+        if not buffer:
+            break
+        data += buffer
+    s.close()
+
+    struct = None
+
+    try:
+        if not isinstance(data, str):
+            data = str(data, 'utf-8')
+        struct = json.loads(data)
+    except:  # TODO: Too broad exception clause
+        print('afnetwork.py: Received data:')
+        print(data)
+        print('JSON loads error:')
+        print(str(sys.exc_info()[1]))
+        struct = None
+
+    return True, struct

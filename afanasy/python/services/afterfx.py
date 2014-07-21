@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='afterfx'
+parser = 'afterfx'
+
 
 class afterfx(service.service):
-   'Adobe After Effects'
+    """Adobe After Effects
+    """
+    pass

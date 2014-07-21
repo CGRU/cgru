@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='blender'
+parser = 'blender'
+
 
 class blender(service.service):
-   'Blender batch'
+    """Blender batch
+    """
+    pass

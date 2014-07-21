@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='generic'
+parser = 'generic'
+
 
 class checksum(service.service):
-   'Calculata checksum'
+    """Calculata checksum
+    """
+    pass

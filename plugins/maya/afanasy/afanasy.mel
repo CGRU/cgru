@@ -11,6 +11,7 @@ if(`optionVar -exists "cgru_afanasy__start_frame_ov"`   == false ) optionVar -iv
 if(`optionVar -exists "cgru_afanasy__end_frame_ov"`     == false ) optionVar -iv "cgru_afanasy__end_frame_ov"     2;
 if(`optionVar -exists "cgru_afanasy__frames_render_ov"` == false ) optionVar -iv "cgru_afanasy__frames_render_ov" 1;
 if(`optionVar -exists "cgru_afanasy__by_frame_ov"`      == false ) optionVar -iv "cgru_afanasy__by_frame_ov"      1;
+if(`optionVar -exists "cgru_afanasy__separate_layers"`  == false ) optionVar -iv "cgru_afanasy__separate_layers"  1;
 
 global proc afanasy_launch()
 {
@@ -23,6 +24,7 @@ global proc afanasy_launch()
     int $end_frame       = `intField -q -v cgru_afanasy__end_frame`;
     int $frames_render   = `intField -q -v cgru_afanasy__frames_render`;
     int $by_frame        = `intField -q -v cgru_afanasy__by_frame`;
+    int $separate_layers = `checkBox -q -v cgru_afanasy__separate_layers`;
     int $pause           = `checkBox -q -v cgru_afanasy__paused`;
  
     // check values
@@ -35,6 +37,7 @@ global proc afanasy_launch()
     optionVar -iv "cgru_afanasy__end_frame_ov"     $end_frame;
     optionVar -iv "cgru_afanasy__frames_render_ov" $frames_render;
     optionVar -iv "cgru_afanasy__by_frame_ov"      $by_frame;
+    optionVar -iv "cgru_afanasy__separate_layers"  $by_frame;
  
     //
     // get paths

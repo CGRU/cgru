@@ -1,119 +1,130 @@
 # -*- coding: utf-8 -*-
 
-import cgruconfig
+import json
+import os
+import sys
 
-import json, os, sys
+import cgruconfig
 
 from services import service
 
+
+# TODO: Class names should follow CamelCase naming convention
 class events(service.service):
-	'Events Trigger'
-	def __init__( self, task_info):
-		service.service.__init__( self, task_info)
-		data = self.taskInfo['command']
-		self.taskInfo['command'] = ''
+    """Events Trigger
+    """
 
-		#print('Event data:\n%s' % data)
+    def __init__(self, task_info):
+        service.service.__init__(self, task_info)
+        data = self.taskInfo['command']
+        self.taskInfo['command'] = ''
 
-		try:
-			if not isinstance( data, str):
-				data = str( data, 'utf-8')
-			objects = json.loads( data)
-		except:
-			error = str(sys.exc_info()[1])
-			print( error)
-			print('Event data:\n%s' % data)
-			objects = None
+        # print('Event data:\n%s' % data)
 
-		if objects is None: return
+        try:
+            if not isinstance(data, str):
+                data = str(data, 'utf-8')
+            objects = json.loads(data)
+        except:  # TODO: Too broad exception clause
+            error = str(sys.exc_info()[1])
+            print(error)
+            print('Event data:\n%s' % data)
+            objects = None
 
-		# Check recieved events:
-		if not 'events' in objects:
-			print('ERROR: Recieved data does not contain events.')
-			print('Event data:\n%s' % data)
-			return
-		if not isinstance(objects['events'], list):
-			print('ERROR: Recieved events is not a list.')
-			print('Event data:\n%s' % data)
-			return
-		if len(objects['events']) == 0:
-			print('ERROR: Recieved events list is empty.')
-			print('Event data:\n%s' % data)
-			return
+        if objects is None:
+            return
 
-		# Combine objects:
-		obj = dict()
-		# Update with user custom object in any:
-		if 'custom_data' in objects['user']:
-			try:
-				obj.update( json.loads( objects['user']['custom_data']))
-			except:
-				print('JSON error in user custom data:')
-				print( objects['user']['custom_data'])
-				print( sys.exc_info()[1])
-				return
-		# Update with job custom object in any:
-		if 'custom_data' in objects['job']:
-			try:
-				obj.update( json.loads( objects['job']['custom_data']))
-			except:
-				print('JSON error in job custom data:')
-				print( objects['job']['custom_data'])
-				print( sys.exc_info()[1])
-				return
+        # Check received events:
+        if not 'events' in objects:
+            print('ERROR: Received data does not contain events.')
+            print('Event data:\n%s' % data)
+            return
+        if not isinstance(objects['events'], list):
+            print('ERROR: Received events is not a list.')
+            print('Event data:\n%s' % data)
+            return
+        if len(objects['events']) == 0:
+            print('ERROR: Received events list is empty.')
+            print('Event data:\n%s' % data)
+            return
 
-		#print('Custom data:')
-		#print( json.dumps( obj))
+        # Combine objects:
+        obj = dict()
+        # Update with user custom object in any:
+        if 'custom_data' in objects['user']:
+            try:
+                obj.update(json.loads(objects['user']['custom_data']))
+            except:  # TODO: too broad exception clause
+                print('JSON error in user custom data:')
+                print(objects['user']['custom_data'])
+                print(sys.exc_info()[1])
+                return
+        # Update with job custom object in any:
+        if 'custom_data' in objects['job']:
+            try:
+                obj.update(json.loads(objects['job']['custom_data']))
+            except:  # TODO: too broad exception clause
+                print('JSON error in job custom data:')
+                print(objects['job']['custom_data'])
+                print(sys.exc_info()[1])
+                return
 
-		if len( obj ) == 0:
-			#print('No configured data founded.')
-			return
+        #print('Custom data:')
+        #print(json.dumps(obj))
 
-		if not 'events' in obj:
-			#print('No configured events founded.')
-			return
+        if len(obj) == 0:
+            #print('No configured data founded.')
+            return
 
-		email_events = []
+        if not 'events' in obj:
+            #print('No configured events founded.')
+            return
 
-		# Iterate all interested events:
-		for event in obj['events']:
+        email_events = []
 
-			if not event in objects['events']:
-				#print('Skipping not recieved event "%s"' % event)
-				continue
+        # Iterate all interested events:
+        for event in obj['events']:
 
-			event_obj = obj['events'][event]
+            if not event in objects['events']:
+                #print('Skipping not received event "%s"' % event)
+                continue
 
-			# Event should be a dictionary:
-			if not isinstance( event_obj, dict):
-				print('ERROR: Configured event["%s"] is not an object.' % event )
-				print('Event data:\n%s' % data)
-				return
+            event_obj = obj['events'][event]
 
-			if not 'methods' in event_obj:
-				print('ERROR: Configured event["%s"] does not have methods.' % event )
-				print('Event data:\n%s' % data)
-				continue
+            # Event should be a dictionary:
+            if not isinstance(event_obj, dict):
+                print('ERROR: Configured event["%s"] is not an object.' % event)
+                print('Event data:\n%s' % data)
+                return
 
-			methods = event_obj['methods']
-			if not isinstance( methods, list):
-				print('ERROR: Configured event["%s"] methods is not an array.' % event )
-				print('Event data:\n%s' % data)
-				continue
+            if not 'methods' in event_obj:
+                print('ERROR: Configured event["%s"] does not have methods.' % event)
+                print('Event data:\n%s' % data)
+                continue
 
-			if 'email' in methods and 'email' in obj:
-				print('EVENT: %s:%s %s:%s' % ( event, task_info['job_name'], task_info['user_name'], obj['email'] ))
-				email_events.append( event)
+            methods = event_obj['methods']
+            if not isinstance(methods, list):
+                print('ERROR: Configured event["%s"] methods is not an array.' % event)
+                print('Event data:\n%s' % data)
+                continue
 
-		if len(email_events):
-			cmd = cgruconfig.VARS['email_send_cmd']
-			cmd += ' -V' # Verbose mode
-			cmd += ' -f "noreply@%s"' % cgruconfig.VARS['email_sender_address_host']
-			cmd += ' -t "%s"' % obj['email']
-			cmd += ' -s "%s"' % (','.join( email_events))
-			cmd += ' "Events: %s<br>"' % (','.join( email_events))
-			cmd += ' "User Name: %s<br>"' % task_info['user_name']
-			cmd += ' "Job Name: %s"' % task_info['job_name']
-			print(cmd)
-			self.taskInfo['command'] = cmd
+            if 'email' in methods and 'email' in obj:
+                print(
+                    'EVENT: %s:%s %s:%s' %
+                    (event, task_info['job_name'], task_info['user_name'],
+                     obj['email'])
+                )
+                email_events.append(event)
 
+        if len(email_events):
+            cmd = cgruconfig.VARS['email_send_cmd']
+            cmd += ' -V'  # Verbose mode
+            cmd += ' -f "noreply@%s"' % cgruconfig.VARS[
+                'email_sender_address_host']
+            cmd += ' -t "%s"' % obj['email']
+            cmd += ' -s "%s"' % (','.join(email_events))
+            cmd += ' "Events: %s<br>"' % (','.join(email_events))
+            cmd += ' "User Name: %s<br>"' % task_info['user_name']
+            cmd += ' "Job Name: %s"' % task_info['job_name']
+            print(cmd)
+            self.taskInfo['command'] = cmd
