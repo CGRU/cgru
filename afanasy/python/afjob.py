@@ -315,37 +315,43 @@ if __name__ == '__main__':
 
         if arg == '-depglbl':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             dependglobal = argsv[i]
             continue
 
         if arg == '-images':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             images = argsv[i]
             continue
 
         if arg == '-output':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             output = argsv[i]
             continue
 
         if arg == '-image':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             image = argsv[i]
             continue
 
         if arg == '-type':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             blocktype = argsv[i]
             continue
 
         if arg == '-os':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             platform = argsv[i]
             continue
 
@@ -379,25 +385,29 @@ if __name__ == '__main__':
 
         if arg == '-script':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             script = argsv[i]
             continue
 
         if arg == '-mname':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             mname = argsv[i]
             continue
 
         if arg == '-mcodec':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             mcodec = argsv[i]
             continue
 
         if arg == '-mres':
             i += 1
-            if i == argsl: break
+            if i == argsl:
+                break
             mres = argsv[i]
             continue
 
@@ -429,14 +439,16 @@ if __name__ == '__main__':
     # Shake:
     if ext == 'shk':
         scenetype = 'shake'
-        if cmd is None: cmd = 'shake' + cmdextension
+        if cmd is None:
+            cmd = 'shake' + cmdextension
         cmd += ' -exec ' + scene + ' ' + extrargs + ' -vv -t @#@-@#@'
 
     # Blender:
     if ext == 'blend':
         scenetype = 'blender'
         blockparser = 'blender_render'
-        if cmd is None: cmd = 'blender' + cmdextension
+        if cmd is None:
+            cmd = 'blender' + cmdextension
         cmd += ' -b "%s"' % scene
         if extrargs != '':
             cmd += ' ' + extrargs
@@ -447,17 +459,20 @@ if __name__ == '__main__':
             if images == '':
                 images = output
                 pos = images.find('#')
-                if pos > 0: images = images[:pos] + '@' + images[pos:]
+                if pos > 0:
+                    images = images[:pos] + '@' + images[pos:]
                 pos = images.rfind('#')
-                if pos > 0: images = images[:pos+1] + '@' + images[pos+1:]
+                if pos > 0:
+                    images = images[:pos+1] + '@' + images[pos+1:]
         cmd += ' -s @#@ -e @#@ -j %d -a' % by
         blockname = blockparser
 
     # Nuke:
     elif ext == 'nk':
         scenetype = 'nuke'
-        if cmd is None: cmd = 'nuke' + cmdextension
-        #	cmd += ' -i'
+        if cmd is None:
+            cmd = 'nuke' + cmdextension
+        # cmd += ' -i'
         if script:
             cmd += ' -t %s' % script
         elif not noscript:
