@@ -57,23 +57,32 @@ class AfanasyRenderBlock(RenderBlock):
             if self.parentJob.use_var_capacity:
                 self.af_block.setVariableCapacity(
                     self.parentJob.capacity_coeff_min,
-                    self.parentJob.capacity_coeff_max)
+                    self.parentJob.capacity_coeff_max
+                )
         if self.distributed:
-            self.af_block.setMultiHost(self.hosts_min, self.hosts_max, 0,
-                                       self.sameHostMaster, '', 0)
+            self.af_block.setMultiHost(
+                self.hosts_min,
+                self.hosts_max,
+                0,
+                self.sameHostMaster,
+                '',
+                0
+            )
         self.af_block.setCommand(self.cmd + ' ' + self.input_files)
         self.af_block.setFiles([self.out_files])
         if self.isNumeric:
-            self.af_block.setNumeric(self.start, self.stop, self.task_size,
-                                     self.step)
+            self.af_block.setNumeric(
+                self.start,
+                self.stop,
+                self.task_size,
+                self.step
+            )
 
 
-# AfanasyRenderJob class
-# used with Afanasy render manager
-#
 class AfanasyRenderJob(RenderJob):
-    #
-    #
+    """ AfanasyRenderJob class used with Afanasy render manager
+    """
+
     def __init__(self, name='', description=''):
         #
         RenderJob.__init__(self, name, description)
@@ -93,16 +102,28 @@ class AfanasyRenderJob(RenderJob):
         self.depglbl = ''
         self.need_os = ''
         # Pre Command - Command to execute on job registration.
-        # Note, that this command is executed by server, and not from tasks working directory.
-        # Use absolute paths here or even transfer paths if you server has another file system than renders.
+        #
+        # Note, that this command is executed by server, and not from tasks
+        # working directory.
+        #
+        # Use absolute paths here or even transfer paths if you server has
+        # another file system than renders.
+        #
         # Commands are executed in a special thread with commands queue.
-        # This means if somebody executes 'sleep 1000', other commands execution (and jobs registration)
-        # will be delayed on 1000 seconds (only delayed, not lost).
-        # Try not use Pre Command at all. You always can create one more task(block) and make other tasks(blocks) depend on it.
+        #
+        # This means if somebody executes 'sleep 1000', other commands
+        # execution (and jobs registration) will be delayed on 1000 seconds
+        # (only delayed, not lost).
+        #
+        # Try not use Pre Command at all. You always can create one more
+        # task(block) and make other tasks(blocks) depend on it.
         self.command_pre = ''
+
         # Post Command - Command executed on job deletion.
-        # This commands are executed on render farm hosts by special system job.
-        # Working directory of such system task will be the first block working folder.
+        # This commands are executed on render farm hosts by special system
+        # job.
+        # Working directory of such system task will be the first block working
+        # folder.
         self.command_post = ''
 
         self.distributed = False
@@ -113,25 +134,30 @@ class AfanasyRenderJob(RenderJob):
         self.port = 39010  # mentalray standalone slave port
         self.hosts = ''
 
-    # 
-    # setup
-    #
     def setup(self):
-        print '>> AfanasyRenderJob setup...'
-        self.af_job.setDescription(self.description)
-        if self.priority >= 0: self.af_job.setPriority(self.priority)
-        if self.hostsmask != '': self.af_job.setHostsMask(self.hostsmask)
-        if self.hostsexcl != '': self.af_job.setHostsMaskExclude(
-            self.hostsexcl)
-        if self.depmask != '': self.af_job.setDependMask(self.depmask)
-        if self.depglbl != '': self.af_job.setDependMaskGlobal(self.depglbl)
-        if self.need_os != '': self.af_job.setNeedOS(self.need_os)
+        """Missing DocString
 
-    #
-    # process
-    #
+        :return:
+        """
+        print('>> AfanasyRenderJob setup...')
+        self.af_job.setDescription(self.description)
+        if self.priority >= 0:
+            self.af_job.setPriority(self.priority)
+        if self.hostsmask != '':
+            self.af_job.setHostsMask(self.hostsmask)
+        if self.hostsexcl != '':
+            self.af_job.setHostsMaskExclude(self.hostsexcl)
+        if self.depmask != '':
+            self.af_job.setDependMask(self.depmask)
+        if self.depglbl != '':
+            self.af_job.setDependMaskGlobal(self.depglbl)
+        if self.need_os != '':
+            self.af_job.setNeedOS(self.need_os)
+
     def process(self):
-        print '>> AfanasyJob process...'
+        """Missing DocString
+        """
+        print('>> AfanasyJob process...')
         gen_block_exists = False
         if self.gen_block is not None:
             gen_block_exists = True
@@ -142,7 +168,8 @@ class AfanasyRenderJob(RenderJob):
                 frame_block.af_block.setTasksDependMask(self.gen_block.name)
             self.af_job.blocks.append(frame_block.af_block)
 
-        if self.paused: self.af_job.offline()
+        if self.paused:
+            self.af_job.offline()
 
         self.af_job.output(1)
         self.af_job.send()

@@ -42,7 +42,7 @@ def getDefaultStrValue(self_prefix, name, value):
     if cmds.optionVar(exists=var_name) == 1:
         ret = cmds.optionVar(q=var_name)
     else:
-        cmds.optionVar(sv=( var_name, value))
+        cmds.optionVar(sv=(var_name, value))
         ret = value
     return ret
 
@@ -91,7 +91,7 @@ def setDefaultIntValue(self_prefix, name, section=None, value=None):
     :return:
     """
     var_name = self_prefix + name
-    cmds.optionVar(iv=(var_name, value ))
+    cmds.optionVar(iv=(var_name, value))
     if section is not None:
         section[name] = value
     return value
@@ -108,13 +108,13 @@ def setDefaultIntValue2(self_prefix, names, section=None, value1=None, value2=No
     :return:
     """
     var_name = self_prefix + names[0]
-    cmds.optionVar(iv=( var_name, value1 ))
+    cmds.optionVar(iv=(var_name, value1))
     var_name = self_prefix + names[1]
-    cmds.optionVar(iv=( var_name, value2 ))
+    cmds.optionVar(iv=(var_name, value2))
     if section is not None:
         section[names[0]] = value1
         section[names[1]] = value2
-    return ( value1, value2 )
+    return value1, value2
 
 
 def setDefaultIntValue3(self_prefix, names, section=None, value1=None, value2=None, value3=None):
