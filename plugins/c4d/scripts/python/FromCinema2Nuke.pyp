@@ -14,17 +14,16 @@ from c4d import plugins, bitmaps
 
 doc = c4d.documents.GetActiveDocument()
 
-
-GROUP_ID1=1000
-GROUP_ID2=1001
-TEXTBOX_PATH=1005
+GROUP_ID1 = 1000
+GROUP_ID2 = 1001
+TEXTBOX_PATH = 1005
 TEXTBOX_SCRIPTNAME = 1021
 
-BUTTON_CLOSE=1006
-BUTTON_EXPORT=1007
+BUTTON_CLOSE = 1006
+BUTTON_EXPORT = 1007
 
-CHECKBOX_CREATE_NUKE=1010  
-CHECKBOX_OPEN_NUKE=1011
+CHECKBOX_CREATE_NUKE = 1010
+CHECKBOX_OPEN_NUKE = 1011
 CHECKBOX_CREATE_DIFFUSE = 1012
 CHECKBOX_DELETE_EXP_FILES = 1013
 CHECKBOX_EXP_GEO_SEQ = 1014
@@ -39,44 +38,55 @@ EDITSLIDER_ENDFRAME = 1202
 
 WINDOW_WIDTH = 320
 
-
 PLUGIN_ID = 1027904
 
 
 class FromCinema2Nuke(plugins.CommandData):
+    """Missing DocString
+    """
+
     def __init__(self):
-
-        #System Specific - Please change that it matches your System. Please use Slash instead of Backslash!!!
+        # System Specific - Please change that it matches your System. Please
+        # use Slash instead of Backslash!!!
         self.nukePath = ''
-#        self.nukePath = 'C:/Program Files/Nuke6.1v1/'
+        #        self.nukePath = 'C:/Program Files/Nuke6.1v1/'
         self.nukeExec = 'nuke'
-#        self.nukeExec = 'Nuke6.1.exe'
+        #        self.nukeExec = 'Nuke6.1.exe'
 
-        self.showUI = True #Show UI-Window or just take default-Values
+        self.showUI = True  #Show UI-Window or just take default-Values
 
         #Sets Default-Values
         #self.defaultExportPath = '/Users/jober/Desktop/'
         #self.defaultExportPath = 'C:/Users/jober/Desktop/maya2nuke/2/'
-        self.defaultExportPath = os.getenv('HOME', os.getenv('HOMEPATH', '')) + '/Desktop/ExportNuke/' 
+        self.defaultExportPath = os.getenv('HOME', os.getenv('HOMEPATH',
+                                                             '')) + '/Desktop/ExportNuke/'
         self.defaultNukeExportScriptName = 'NukeScene.nk'
-        self.defaultExportTypeValue = 2 #Preset Export-Type - Values(1-> FBX, 2->OBJ)
-        self.defaultExportGeometrySequence = False #Preset Export Geometry Sequence - Values(True,False) - Case-Sensetive
-        self.defaultCreateDiffuseShader = False #Preset Create Diffuse-Shader for each exported Geometry - Values(True,False) - Case-Sensetive
-        self.defaultCreateNukeScript = True #Preset Create Nuke-Script - Values(True,False) - Case-Sensetive
-        self.defaultOpenNukeScript = True #Preset Open Nuke-Script - Values(True,False) - Case-Sensetive
-        self.defaultDeleteExportFiles = False #Preset Delete Export-Files - Values(True,False) - Case-Sensetive
-        self.defaultStartFrameValue = int(doc.GetMinTime().GetFrame(doc.GetFps()))
-        self.defaultEndFrameValue = int(doc.GetMaxTime().GetFrame(doc.GetFps()))    
-        
+        self.defaultExportTypeValue = 2  #Preset Export-Type - Values(1-> FBX, 2->OBJ)
+        self.defaultExportGeometrySequence = False  #Preset Export Geometry Sequence - Values(True,False) - Case-Sensetive
+        self.defaultCreateDiffuseShader = False  #Preset Create Diffuse-Shader for each exported Geometry - Values(True,False) - Case-Sensetive
+        self.defaultCreateNukeScript = True  #Preset Create Nuke-Script - Values(True,False) - Case-Sensetive
+        self.defaultOpenNukeScript = True  #Preset Open Nuke-Script - Values(True,False) - Case-Sensetive
+        self.defaultDeleteExportFiles = False  #Preset Delete Export-Files - Values(True,False) - Case-Sensetive
+        self.defaultStartFrameValue = int(
+            doc.GetMinTime().GetFrame(doc.GetFps()))
+        self.defaultEndFrameValue = int(
+            doc.GetMaxTime().GetFrame(doc.GetFps()))
+
         self.doc = None
 
 
-
     def Execute(self, doc):
-        # That it really takes the currenct scene
-        self.defaultStartFrameValue = int(doc.GetMinTime().GetFrame(doc.GetFps()))
-        self.defaultEndFrameValue = int(doc.GetMaxTime().GetFrame(doc.GetFps())) 
-        
+        """Missing DocString
+
+        :param doc:
+        :return:
+        """
+        # That it really takes the current scene
+        self.defaultStartFrameValue = int(
+            doc.GetMinTime().GetFrame(doc.GetFps()))
+        self.defaultEndFrameValue = int(
+            doc.GetMaxTime().GetFrame(doc.GetFps()))
+
         #Init values with defaults
         self.startFrame = self.defaultStartFrameValue
         self.endFrame = self.defaultEndFrameValue
@@ -87,14 +97,18 @@ class FromCinema2Nuke(plugins.CommandData):
         self.deleteExport = self.defaultDeleteExportFiles
         self.nukeExportScriptName = self.defaultNukeExportScriptName
         self.exportPath = self.defaultExportPath
-        self.exportType = self.defaultExportTypeValue 
+        self.exportType = self.defaultExportTypeValue
         self.startExport = False
-        
+
         self.doc = doc
-        
+
         self.selected = self.doc.GetActiveObjects(False)
         if len(self.selected) == 0:
-            c4d.gui.MessageDialog("Nothing is selected.\nPlease select the Objects, Cameras, Lights and Locators you want to export.\n")
+            c4d.gui.MessageDialog(
+                "Nothing is selected.\n"
+                "Please select the Objects, Cameras, "
+                "Lights and Locators you want to export.\n"
+            )
         else:
             self.objects = []
             self.cameras = []
@@ -102,21 +116,25 @@ class FromCinema2Nuke(plugins.CommandData):
             self.locators = []
             self.newCameras = []
             if self.showUI == True:
-                self.showParameterWindow() #Show Parameter Window
-            
+                self.showParameterWindow()  #Show Parameter Window
+
             if self.startExport:
                 self.startExportProcedure()
         return True
 
-
     #STARTS THE EXPORT PROCEDURE
     def startExportProcedure(self, arg=None):
+        """Missing DocString
+
+        :param arg:
+        :return:
+        """
         #Saves Frame on which the Script starts
         timeScriptStart = self.doc.GetTime().Get()
 
         #Replaces Backslash with Slash
         self.exportPath = self.exportPath.replace('\\', '/')
-        
+
         #Check if Slash is on the end
         if self.exportPath[-1] != '/':
             self.exportPath += '/'
@@ -124,42 +142,48 @@ class FromCinema2Nuke(plugins.CommandData):
         #Create export Folder if it does not exist
         if (os.path.isdir(self.exportPath) == 0):
             os.mkdir(self.exportPath)
-        
-        self.readObjects() #Reads in Objects in Lists
-        
-        self.exportObjects() #Exports the Objects
-        self.exportCameras() #Exports the Cameras
-        self.exportLights() #Exports the Lights
-        self.exportLocators() #Exports the Locators
-        
-        if self.createNukeScript == True:
-            self.createNukePythonFile() #Creates the Nuke-File
-         
-        if self.deleteExport == True:
-            self.delteCameraFiles()    #Deletes the Camera-Files
-            self.delteLightFiles()    #Deletes the Light-Files
-            self.delteLocatorFile()    #Deletes the Locator-File
-        
-        if self.createNukeScript == True:
-            self.delteNukePythonFile() #Deletes the Nuke-Python-File
-                    
-        if self.openNukeScript == True and self.createNukeScript == True:
-            self.openNukeScriptAfterwards() #Open Nukescript
-        
+
+        self.readObjects()  #Reads in Objects in Lists
+
+        self.exportObjects()  #Exports the Objects
+        self.exportCameras()  #Exports the Cameras
+        self.exportLights()  #Exports the Lights
+        self.exportLocators()  #Exports the Locators
+
+        if self.createNukeScript is True:
+            self.createNukePythonFile()  #Creates the Nuke-File
+
+        if self.deleteExport is True:
+            self.delteCameraFiles()  #Deletes the Camera-Files
+            self.delteLightFiles()  #Deletes the Light-Files
+            self.delteLocatorFile()  #Deletes the Locator-File
+
+        if self.createNukeScript is True:
+            self.delteNukePythonFile()  #Deletes the Nuke-Python-File
+
+        if self.openNukeScript is True and self.createNukeScript is True:
+            self.openNukeScriptAfterwards()  #Open Nukescript
+
         #Goes back to the Frame it started, i think is not needed here because it runs the export in a seperate document
         self.doc.SetTime(c4d.BaseTime(timeScriptStart))
 
+        #SHOW PARAMETER WINDOW
 
-
-  #SHOW PARAMETER WINDOW
     def showParameterWindow(self):
+        """Missing DocString
+        """
         self.parWindow = self.fc2nExportWindow(self)
-        self.parWindow.Open(c4d.DLG_TYPE_MODAL, defaultw=WINDOW_WIDTH, defaulth=120)
-        
+        self.parWindow.Open(
+            c4d.DLG_TYPE_MODAL,
+            defaultw=WINDOW_WIDTH,
+            defaulth=120
+        )
 
-    
-  #READ AND SORT OBJECTS
+        #READ AND SORT OBJECTS
+
     def readObjects(self):
+        """Missing DocString
+        """
         #Go through all selected Objects
         for object in self.selected:
             #Get the Object-Type to sort
@@ -173,107 +197,182 @@ class FromCinema2Nuke(plugins.CommandData):
             else:
                 self.objects[:0] = [object]
 
-
     #EXPORT OBJECTS
     def exportObjects(self):
+        """Missing DocString
+        """
         #Go through all selected Objects
 
         for object in self.objects:
             exportName = object.GetName().replace(':', '_').replace('.', '_')
             nameExtension = ''
-            
+
             if bool(self.exportGeometrySequence) == bool(True):
                 startF = self.startFrame
-                endF = self.endFrame 
+                endF = self.endFrame
             else:
                 startF = endF = self.doc.GetTime().GetFrame(self.doc.GetFps())
 
             tempDoc = c4d.documents.IsolateObjects(self.doc, [object])
 
-            for timevalue in range(startF, (endF+1), 1):
+            for timevalue in range(startF, (endF + 1), 1):
                 if bool(self.exportGeometrySequence) == bool(True):
-                    nameExtension = '.%04d' % timevalue 
+                    nameExtension = '.%04d' % timevalue
 
-                if self.exportType == 1: #Export FBX
-                    nameExtension += ".fbx" 
-                else: #Export OBJ
-                    nameExtension += ".obj" 
+                if self.exportType == 1:  #Export FBX
+                    nameExtension += ".fbx"
+                else:  #Export OBJ
+                    nameExtension += ".obj"
 
                 self.setCurrentFrame(timevalue, tempDoc)
-                c4d.documents.SaveDocument(tempDoc, self.exportPath+exportName+nameExtension, c4d.SAVEDOCUMENTFLAGS_0, c4d.FORMAT_OBJEXPORT )
-                
+                c4d.documents.SaveDocument(
+                    tempDoc,
+                    self.exportPath + exportName + nameExtension,
+                    c4d.SAVEDOCUMENTFLAGS_0,
+                    c4d.FORMAT_OBJEXPORT
+                )
+
             c4d.documents.KillDocument(tempDoc)
 
-            print 'Exported: ' + exportName
+            print('Exported: %s' % exportName)
 
 
-
-
-    #EXPORT LOCACTOR-DATA IN FILE
+    #EXPORT LOCATOR-DATA IN FILE
     def exportLocators(self):
-        channelMatch = {'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X':'transform.tx', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y':'transform.ty', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z':'transform.tz', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X':'transform.sx', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y':'transform.sy', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z':'transform.sz', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X':'transform.rx', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y':'transform.ry', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z':'transform.rz', 'c4d.ID_BASEOBJECT_ROTATION_ORDER':'transform.rotateOrder'}
+        """Missing DocString
+        """
+        channelMatch = {
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X': 'transform.tx',
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y': 'transform.ty',
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z': 'transform.tz',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X': 'transform.sx',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y': 'transform.sy',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z': 'transform.sz',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X': 'transform.rx',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y': 'transform.ry',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z': 'transform.rz',
+            'c4d.ID_BASEOBJECT_ROTATION_ORDER': 'transform.rotateOrder'
+        }
 
         #Go through all selected Locators
         for locator in self.locators:
             #Export the Camera
-            objectFileName = locator.GetName().replace(':', '_').replace('.', '_')
-            self.exportData(locator, channelMatch, self.startFrame, self.endFrame, self.exportPath + objectFileName + '.fm2n')
-            print "Exported: " + objectFileName
-
-
+            objectFileName = \
+                locator.GetName().replace(':', '_').replace('.', '_')
+            self.exportData(
+                locator,
+                channelMatch,
+                self.startFrame,
+                self.endFrame,
+                self.exportPath + objectFileName + '.fm2n'
+            )
+            print("Exported: %s" % objectFileName)
 
     #EXPORT CAMERA-DATA IN FILE
     def exportCameras(self):
-#        channelMatch = {'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X':'transform.tx', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y':'transform.ty', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z':'transform.tz', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X':'transform.sx', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y':'transform.sy', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z':'transform.sz', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X':'transform.rx', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y':'transform.ry', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z':'transform.rz', 'c4d.ID_BASEOBJECT_ROTATION_ORDER':'transform.rotateOrder', 'c4d.CAMERA_FOCUS':'camera.fl', 'c4d.CAMERAOBJECT_FOV':'camera.horizontalFilmAperture', 'c4d.CAMERAOBJECT_FOV_VERTICAL':'camera.verticalFilmAperture'}
-#        channelMatch = {'transform.tx':'tx', 'transform.ty':'ty', 'transform.tz':'tz', 'transform.rx':'rx', 'transform.ry':'ry', 'transform.rz':'rz', 'transform.rotateOrder':'rOrd', 'camera.fl':'focal', 'camera.horizontalFilmAperture':'aperture'}
-        channelMatch = {'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X':'transform.tx', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y':'transform.ty', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z':'transform.tz', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X':'transform.sx', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y':'transform.sy', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z':'transform.sz', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X':'transform.rx', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y':'transform.ry', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z':'transform.rz', 'c4d.ID_BASEOBJECT_ROTATION_ORDER':'transform.rotateOrder', 'c4d.CAMERA_FOCUS':'camera.fl', 'c4d.CAMERAOBJECT_APERTURE':'camera.horizontalFilmAperture', 'c4d.CAMERAOBJECT_TARGETDISTANCE':'camera.focal_point', 'c4d.CAMERAOBJECT_TARGETDISTANCE':'camera.focal_point', 'c4d.CAMERAOBJECT_FNUMBER_VALUE':'camera.fstop'}
-        
+        """Missing DocString
+        """
+        #        channelMatch = {'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X':'transform.tx', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y':'transform.ty', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z':'transform.tz', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X':'transform.sx', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y':'transform.sy', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z':'transform.sz', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X':'transform.rx', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y':'transform.ry', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z':'transform.rz', 'c4d.ID_BASEOBJECT_ROTATION_ORDER':'transform.rotateOrder', 'c4d.CAMERA_FOCUS':'camera.fl', 'c4d.CAMERAOBJECT_FOV':'camera.horizontalFilmAperture', 'c4d.CAMERAOBJECT_FOV_VERTICAL':'camera.verticalFilmAperture'}
+        #        channelMatch = {'transform.tx':'tx', 'transform.ty':'ty', 'transform.tz':'tz', 'transform.rx':'rx', 'transform.ry':'ry', 'transform.rz':'rz', 'transform.rotateOrder':'rOrd', 'camera.fl':'focal', 'camera.horizontalFilmAperture':'aperture'}
+        channelMatch = {
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X': 'transform.tx',
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y': 'transform.ty',
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z': 'transform.tz',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X': 'transform.sx',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y': 'transform.sy',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z': 'transform.sz',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X': 'transform.rx',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y': 'transform.ry',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z': 'transform.rz',
+            'c4d.ID_BASEOBJECT_ROTATION_ORDER': 'transform.rotateOrder',
+            'c4d.CAMERA_FOCUS': 'camera.fl',
+            'c4d.CAMERAOBJECT_APERTURE': 'camera.horizontalFilmAperture',
+            'c4d.CAMERAOBJECT_TARGETDISTANCE': 'camera.focal_point',
+            'c4d.CAMERAOBJECT_TARGETDISTANCE': 'camera.focal_point',
+            'c4d.CAMERAOBJECT_FNUMBER_VALUE': 'camera.fstop'
+        }
+
         #Go through all selected Cameras
         for camera in self.cameras:
-            #Export the Camera 
-            objectFileName = camera.GetName().replace(':', '_').replace('.', '_')
-            self.exportData(camera, channelMatch, self.startFrame, self.endFrame, self.exportPath + objectFileName + '.fm2n')
-            print "Exported: " + objectFileName
-
+            #Export the Camera
+            objectFileName = \
+                camera.GetName().replace(':', '_').replace('.', '_')
+            self.exportData(camera, channelMatch, self.startFrame,
+                            self.endFrame,
+                            self.exportPath + objectFileName + '.fm2n')
+            print("Exported: %s" % objectFileName)
 
     #EXPORT LIGHT-DATA IN FILE
     def exportLights(self):
+        """Missing DocString
+        """
         #Go through all Lights
-        channelMatch = {'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X':'transform.tx', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y':'transform.ty', 'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z':'transform.tz', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X':'transform.sx', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y':'transform.sy', 'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z':'transform.sz', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X':'transform.rx', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y':'transform.ry', 'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z':'transform.rz', 'c4d.ID_BASEOBJECT_ROTATION_ORDER':'transform.rotateOrder', 'c4d.LIGHT_BRIGHTNESS':'transform.intensity', 'c4d.LIGHT_COLOR,c4d.VECTOR_X':'transform.cr', 'c4d.LIGHT_COLOR,c4d.VECTOR_Y':'transform.cg', 'c4d.LIGHT_COLOR,c4d.VECTOR_Z':'transform.cb', 'c4d.LIGHT_DETAILS_OUTERANGLE':'transform.coneAngle', 'c4d.LIGHT_DETAILS_INNERANGLE':'transform.penumbraAngle', 'c4d.LIGHT_DETAILS_FALLOFF':'transform.dropoff'}
-        
-        for light in self.lights:            
+        channelMatch = {
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_X': 'transform.tx',
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Y': 'transform.ty',
+            'c4d.ID_BASEOBJECT_REL_POSITION,c4d.VECTOR_Z': 'transform.tz',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_X': 'transform.sx',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Y': 'transform.sy',
+            'c4d.ID_BASEOBJECT_REL_SCALE,c4d.VECTOR_Z': 'transform.sz',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_X': 'transform.rx',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Y': 'transform.ry',
+            'c4d.ID_BASEOBJECT_REL_ROTATION,c4d.VECTOR_Z': 'transform.rz',
+            'c4d.ID_BASEOBJECT_ROTATION_ORDER': 'transform.rotateOrder',
+            'c4d.LIGHT_BRIGHTNESS': 'transform.intensity',
+            'c4d.LIGHT_COLOR,c4d.VECTOR_X': 'transform.cr',
+            'c4d.LIGHT_COLOR,c4d.VECTOR_Y': 'transform.cg',
+            'c4d.LIGHT_COLOR,c4d.VECTOR_Z': 'transform.cb',
+            'c4d.LIGHT_DETAILS_OUTERANGLE': 'transform.coneAngle',
+            'c4d.LIGHT_DETAILS_INNERANGLE': 'transform.penumbraAngle',
+            'c4d.LIGHT_DETAILS_FALLOFF': 'transform.dropoff'
+        }
+
+        for light in self.lights:
             #Export Lights
-            
-            if light[c4d.LIGHT_TYPE] in [0,1,3]:
-                objectFileName = light.GetName().replace(':', '_').replace('.', '_')
-                self.exportData(light, channelMatch, self.startFrame, self.endFrame, self.exportPath + objectFileName + '.fm2n')
-                print "Exported: " + objectFileName
+
+            if light[c4d.LIGHT_TYPE] in [0, 1, 3]:
+                objectFileName = \
+                    light.GetName().replace(':', '_').replace('.', '_')
+                self.exportData(light, channelMatch, self.startFrame,
+                                self.endFrame,
+                                self.exportPath + objectFileName + '.fm2n')
+                print("Exported: %s" % objectFileName)
             else:
-                c4d.gui.MessageDialog(light.GetName() + " is not supported in Nuke. You can just use Point-(Omni), Distance-(Infinite) and Spot-Lights!")
-    
-    
-    
+                c4d.gui.MessageDialog(
+                    light.GetName() + " is not supported in Nuke. You can "
+                                      "just use Point-(Omni), "
+                                      "Distance-(Infinite) and Spot-Lights!"
+                )
+
     #DELETE CAMERA FILES
     def delteCameraFiles(self):
+        """Missing DocString
+        """
         for camera in self.cameras:
-            objectFileName = camera.GetName().replace(':', '_').replace('.', '_')
+            objectFileName = \
+                camera.GetName().replace(':', '_').replace('.', '_')
             os.remove(self.exportPath + objectFileName + '.fm2n')
 
     #DELETE LIGHT FILES
     def delteLightFiles(self):
+        """Missing DocString
+        """
         for light in self.lights:
-            objectFileName = light.GetName().replace(':', '_').replace('.', '_')
+            objectFileName = \
+                light.GetName().replace(':', '_').replace('.', '_')
             os.remove(self.exportPath + objectFileName + '.fm2n')
 
     #DELETE LOCATOR FILE
     def delteLocatorFile(self):
         for locator in self.locators:
-            objectFileName = locator.GetName().replace(':', '_').replace('.', '_')
+            objectFileName = \
+                locator.GetName().replace(':', '_').replace('.', '_')
             os.remove(self.exportPath + objectFileName + '.fm2n')
-
 
     #CREATE NUKE PYTHON FILE
     def createNukePythonFile(self):
+        """Missing DocString
+        """
 
         #Writes out the Import-Function
         nukePyFile = "def importData(importFile, channelMatch):\n\
@@ -375,11 +474,11 @@ background1 = nuke.nodes.Constant()\n\
 background1[\'format\'].setValue(\'HD\')\n\
 \n'
 
-        #Create Objects         
-        if self.exportType == 1: #Export FBX
+        #Create Objects
+        if self.exportType == 1:  # Export FBX
             fileExtension = 'fbx'
-        else: #Export OBJ
-          fileExtension = 'obj'
+        else:  # Export OBJ
+            fileExtension = 'obj'
         for object in self.objects:
             importName = object.GetName().replace(':', '_').replace('.', '_')
             sceneInput += 1
@@ -387,7 +486,7 @@ background1[\'format\'].setValue(\'HD\')\n\
                 nameExtension = '.%04d'
             else:
                 nameExtension = ''
-                
+
             nukePyFile += '#Creates Geometry-Objects and connects them to Scene\n\
 ' + importName + ' = nuke.nodes.ReadGeo(file=\'' + self.exportPath + importName + nameExtension + '.' + fileExtension + '\')\n\
 \n'
@@ -403,8 +502,7 @@ scene.setInput(' + str(sceneInput) + ',' + importName + 'ApplyMat)\n\n'
 ' + importName + 'background[\'color\'].setValue(1)\n\
 ' + importName + 'background[\'format\'].setValue(\'HD\')\n\
 ' + importName + '.setInput(0, ' + importName + 'background)\n\
-scene.setInput(' + str(sceneInput) + ',' + importName + ')\n\n'         
-
+scene.setInput(' + str(sceneInput) + ',' + importName + ')\n\n'
 
         #Create Lights
         nukePyFile += 'channelMatch = {\'transform.tx\':\'translate:0\', \'transform.ty\':\'translate:1\', \'transform.tz\':\'translate:2\', \'transform.rx\':\'rotate:0\', \'transform.ry\':\'rotate:1\', \'transform.rz\':\'rotate:2\', \'transform.sx\':\'scaling:0\', \'transform.sy\':\'scaling:1\', \'transform.sz\':\'scaling:2\', \'transform.rotateOrder\':\'rot_order\', \'transform.intensity\':\'intensity\', \'transform.cr\':\'color:0\', \'transform.cg\':\'color:1\', \'transform.cb\':\'color:2\', \'transform.coneAngle\':\'cone_angle\', \'transform.penumbraAngle\':\'cone_penumbra_angle\', \'transform.dropoff\':\'cone_falloff\'}\n'
@@ -417,8 +515,7 @@ scene.setInput(' + str(sceneInput) + ',' + importName + ')\n\n'
 scene.setInput(' + str(sceneInput) + ',' + importName + ')\n\n\
 \n\
 #IMPORT LIGHT-VALUES\n\
-importData(\'' + self.exportPath + importName + '.fm2n\', channelMatch)\n\n'        
-
+importData(\'' + self.exportPath + importName + '.fm2n\', channelMatch)\n\n'
 
         #Create Cameras
         for camera in self.cameras:
@@ -441,7 +538,6 @@ channelMatch = {\'transform.tx\':\'translate:0\', \'transform.ty\':\'translate:1
 filename = \'' + self.exportPath + importName + '.fm2n\'\n\
 importData(filename, channelMatch)\n\n'
 
-
         #Create Locators
         if len(self.locators) > 0:
             sceneInput += 1
@@ -451,8 +547,9 @@ sceneLocator = nuke.nodes.Scene()\n\
 channelMatch = {\'transform.tx\':\'translate:0\', \'transform.ty\':\'translate:1\', \'transform.tz\':\'translate:2\', \'transform.rx\':\'rotate:0\', \'transform.ry\':\'rotate:1\', \'transform.rz\':\'rotate:2\', \'transform.sx\':\'scaling:0\', \'transform.sy\':\'scaling:1\', \'transform.sz\':\'scaling:2\', \'transform.rotateOrder\':\'rot_order\'}\n\n'
 
             for locator in self.locators:
-#                importName = locator.replace(':', '_')
-                importName = locator.GetName().replace(':', '_').replace('.', '_')
+                #                importName = locator.replace(':', '_')
+                importName = locator.GetName().replace(':', '_').replace('.',
+                                                                         '_')
                 nukePyFile += '#Creates Locators and connects them with Scene-Node\n\
 \n\
 ' + importName + ' = nuke.nodes.Axis()\n\
@@ -475,61 +572,71 @@ scene.setInput(' + str(sceneInput) + ',sceneLocator)\n\
 viewer = nuke.nodes.Viewer()\n\
 viewer.setInput(0, ' + importName + 'Render)\n'
 
-  
         #Saves the Nuke-Script
         nukePyFile += '#Save Nuke-Script\n\
 nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
 
         nukePyFile += 'sys.exit(0)\n'
 
-
         #Save NukePythonFile to Disc
-        f = open(self.exportPath + 'nukePyFile.py', 'w')
-        f.write(nukePyFile.encode('ascii', 'xmlcharrefreplace') )
-        f.close()
-        
-        #Execute Python-File with Nuke
-        os.system('"' + self.nukePath + self.nukeExec + '" -t < ' + self.exportPath + 'nukePyFile.py' )
+        with open(self.exportPath + 'nukePyFile.py', 'w') as f:
+            f.write(nukePyFile.encode('ascii', 'xmlcharrefreplace'))
 
-        
-    
+        #Execute Python-File with Nuke
+        os.system(
+            '"' + self.nukePath + self.nukeExec + '" -t < ' + self.exportPath +
+            'nukePyFile.py'
+        )
+
     def convertValuesCinema2Maya(self, parameterName, parameterValue):
-        radianParameters = ['transform.rx', 'transform.ry', 'transform.rz', 'transform.coneAngle', 'transform.penumbraAngle']
-        
+        """Missing DocString
+
+        :param parameterName:
+        :param parameterValue:
+        :return:
+        """
+        radianParameters = ['transform.rx', 'transform.ry', 'transform.rz',
+                            'transform.coneAngle', 'transform.penumbraAngle']
+
         #Convert from Radians in Degree
         if parameterName in radianParameters:
-            return (180*parameterValue)/pi
+            return (180 * parameterValue) / pi
 
         #No idear why i have to flip Z but i do it
         if parameterName == 'transform.tz':
             return parameterValue * -1
 
-
         if parameterName == 'transform.rotateOrder':
-            if parameterValue == 6: #If it is HPB
-                return 'ZXY' #HPB is the same like ZXY only with the order changed | H = Y, P = X, B = Z
+            if parameterValue == 6:  #If it is HPB
+                return 'ZXY'  #HPB is the same like ZXY only with the order changed | H = Y, P = X, B = Z
             else:
                 rotateOrders = ['YXZ', 'YZX', 'ZYX', 'ZXY', 'XZY', 'XYZ']
                 return rotateOrders[parameterValue]
-        
+
         return parameterValue
 
-
-
     def getObjectParameterValue(self, object, channel, channels):
+        """Missing DocString
+
+        :param object:
+        :param channel:
+        :param channels:
+        :return:
+        """
+        # TODO: "object" is shadowing the built-in Python "object", please fix it
         parameterName = channels[channel]
-           
-            #Transformation-Values
+
+        #Transformation-Values
         if parameterName == 'transform.tx':
             thisValue = object.GetMg().off.x
 
         elif parameterName == 'transform.ty':
             thisValue = object.GetMg().off.y
-            
-        elif parameterName == 'transform.tz':
-            thisValue = object.GetMg().off.z        
 
-        #Scale - Values
+        elif parameterName == 'transform.tz':
+            thisValue = object.GetMg().off.z
+
+            #Scale - Values
         elif parameterName == 'transform.sx':
             thisValue = object.GetMg().v1.GetLength()
 
@@ -541,42 +648,51 @@ nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
 
         #Rotation - Values
         elif parameterName == 'transform.rx':
-            if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6: #When HPB
+            if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6:  # When HPB
                 thisValue = c4d.utils.MatrixToHPB(object.GetMg()).y
             else:
                 thisValue = object[eval(channel)]
-                
+
         elif parameterName == 'transform.ry':
-            if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6: #When HPB
+            if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6:  # When HPB
                 thisValue = c4d.utils.MatrixToHPB(object.GetMg()).x
             else:
                 thisValue = object[eval(channel)]
-            
+
         elif parameterName == 'transform.rz':
-            if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 0 or object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 1 or object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 2:
+            if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 0 or object[
+                c4d.ID_BASEOBJECT_ROTATION_ORDER] == 1 or object[
+                c4d.ID_BASEOBJECT_ROTATION_ORDER] == 2:
                 thisValue = object[eval(channel)] * -1
-            elif object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6: #When HPB
+            elif object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6:  # When HPB
                 thisValue = c4d.utils.MatrixToHPB(object.GetMg()).z
             else:
                 thisValue = object[eval(channel)]
         else:
             #Any other stuff apart from Translaten, Rotation and Scale
             thisValue = object[eval(channel)]
-            
+
         return self.convertValuesCinema2Maya(parameterName, thisValue)
-
-
-
 
     #Export the Data
     def exportData(self, object, channels, startF, endF, exportFile):
-#        objectPath = object.path()
+        """Missing DocString
+
+        :param object:
+        :param channels:
+        :param startF:
+        :param endF:
+        :param exportFile:
+        :return:
+        """
+        # TODO: "object" is shadowing the built-in Python "object", please fix it
+        #        objectPath = object.path()
         objectName = object.GetName().replace(':', '_').replace('.', '_')
         objectType = c4d.GetObjectName(object.GetType())
-    
+
         channalsAnimated = []
         channalsNotAnimated = []
-        
+
         objectNameWrite = objectName
         #Get the right Object-Type to write out
         if objectType == 'Camera':
@@ -586,7 +702,7 @@ nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
         elif objectType == 'Light':
             if object[c4d.LIGHT_TYPE] == 0:
                 #Omni-Light
-                objectNodeTypeWrite = 'point' 
+                objectNodeTypeWrite = 'point'
             elif object[c4d.LIGHT_TYPE] == 1:
                 #Spot-Light
                 objectNodeTypeWrite = 'spot'
@@ -594,56 +710,74 @@ nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
                 #Infinite-Light
                 objectNodeTypeWrite = 'directional'
 
-        
         #Get all the animated channels of that object
         allAnimatedChannels = object.GetCTracks()
-        
+
         #Create an array with all the names of the animated channels
         allAnimatedChannelNames = []
         for aniChannel in allAnimatedChannels:
             allAnimatedChannelNames.append(aniChannel.GetName())
 
+        self.aniChannelMatch = {
+            'transform.tx': 'Position . X',
+            'transform.ty': 'Position . Y',
+            'transform.tz': 'Position . Z',
+            'transform.sx': 'Scale . X',
+            'transform.sy': 'Scale . Y',
+            'transform.sz': 'Scale . Z',
+            'transform.cr': 'Color . R',
+            'transform.cg': 'Color . G',
+            'transform.cb': 'Color . B',
+            'transform.intensity': 'Intensity'
+        }
 
-        self.aniChannelMatch = {'transform.tx':'Position . X', 'transform.ty':'Position . Y', 'transform.tz':'Position . Z', 'transform.sx':'Scale . X', 'transform.sy':'Scale . Y', 'transform.sz':'Scale . Z', 'transform.cr':'Color . R', 'transform.cg':'Color . G', 'transform.cb':'Color . B', 'transform.intensity':'Intensity'}
-
-        if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6: #When HPB
-            self.aniChannelMatch.update({'transform.rx':'Rotation . P', 'transform.ry':'Rotation . H', 'transform.rz':'Rotation . B'})
+        if object[c4d.ID_BASEOBJECT_ROTATION_ORDER] == 6:  #When HPB
+            self.aniChannelMatch.update({'transform.rx': 'Rotation . P',
+                                         'transform.ry': 'Rotation . H',
+                                         'transform.rz': 'Rotation . B'})
         else:
-            self.aniChannelMatch.update({'transform.rx':'Rotation . X', 'transform.ry':'Rotation . Y', 'transform.rz':'Rotation . Z'})
+            self.aniChannelMatch.update({'transform.rx': 'Rotation . X',
+                                         'transform.ry': 'Rotation . Y',
+                                         'transform.rz': 'Rotation . Z'})
 
-  
-        #Invert the aniChannelMatch to have acces to the channelNames
-        channelMatch_inverted = dict( ((self.aniChannelMatch[k], k) for k in (self.aniChannelMatch) ) )
-       
-        #Now split all the channels which should get exported in an animated and not animated group
+
+        #Invert the aniChannelMatch to have access to the channelNames
+        channelMatch_inverted = dict(
+            ((self.aniChannelMatch[k], k) for k in self.aniChannelMatch))
+
+        #Now split all the channels which should get exported in an animated
+        # and not animated group
         for channel in channels:
             channelAnimated = False
 
-            #Check if Channel is in MatchingDictionary (only animatable are in there), so if not there it will not be animated
+            # Check if Channel is in MatchingDictionary (only animatable are in
+            # there), so if not there it will not be animated
             if channels[channel] in self.aniChannelMatch:
-                #If it is in dictionary and also in the dictionary with the animated channels then it is animated
-                if self.aniChannelMatch[channels[channel]] in allAnimatedChannelNames:
+                # If it is in dictionary and also in the dictionary with the
+                # animated channels then it is animated
+                if self.aniChannelMatch[
+                    channels[channel]] in allAnimatedChannelNames:
                     channelAnimated = True
-                
+
             #Now depending on the set value it adds it to the matching group
             if channelAnimated:
                 channalsAnimated.append(channel)
-            else:    
+            else:
                 channalsNotAnimated.append(channel)
 
-        
+
         #Output Values
-        writeOut = objectNameWrite + '\t'  + objectNodeTypeWrite + '\t\n'
-            
-        #Write out not animated Channels  
+        writeOut = '%s\t%s\t\n' % (objectNameWrite, objectNodeTypeWrite)
+
+        #Write out not animated Channels
         for channel in channalsNotAnimated:
             thisValue = self.getObjectParameterValue(object, channel, channels)
 
             writeOut += "%s\t%s\n" % (channels[channel], thisValue)
-                
+
         writeOut += '+++++Animated+++++\n'
         #Write out animated Channels
-    
+
         if len(channalsAnimated) > 0:
             #List all animated Channels
             writeOut += 'Frame'
@@ -651,71 +785,99 @@ nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
                 #channelValues = channel.split(':')
                 writeOut += "\t%s" % channels[channel]
             writeOut += '\n'
-                
-            #Go through all Frames    
-            for frame in range(startF, (endF+1)):
+
+            #Go through all Frames
+            for frame in range(startF, (endF + 1)):
                 #Write out Frame-Number
                 writeOut += str(frame)
-                
+
                 #Set Frame - Maybe later differently
                 self.setCurrentFrame(frame, self.doc)
 
                 for channel in channalsAnimated:
-                    writeOut += "\t%s" % self.getObjectParameterValue(object, channel, channels)
+                    writeOut += \
+                        "\t%s" % self.getObjectParameterValue(object,
+                                                              channel,
+                                                              channels)
                 writeOut += '\n'
-        
+
         f = open(exportFile, 'w')
         f.write(writeOut)
-        f.close()  
-    
+        f.close()
 
     def setCurrentFrame(self, frame, currentDocument):
-        currentDocument.SetTime(c4d.BaseTime(float(frame)/currentDocument.GetFps()))
+        """Missing DocString
+
+        :param frame:
+        :param currentDocument:
+        :return:
+        """
+        currentDocument.SetTime(
+            c4d.BaseTime(float(frame) / currentDocument.GetFps()))
         currentDocument.ExecutePasses(None, True, True, True, 0);
         c4d.GeSyncMessage(c4d.EVMSG_TIMECHANGED)
 
-
-    #DELETE NUKE PYTHON FILE
     def delteNukePythonFile(self):
+        """DELETE NUKE PYTHON FILE
+        """
         os.remove(self.exportPath + 'nukePyFile.py')
-            
-            
-    #Open Nuke Script after export
+
     def openNukeScriptAfterwards(self):
-        print '"' + self.nukePath + self.nukeExec + '" ' + self.exportPath + self.nukeExportScriptName
-        subprocess.Popen([self.nukePath + self.nukeExec, self.exportPath + self.nukeExportScriptName])
+        """Open Nuke Script after export
+        """
+        print(
+            '"%s%s" %s%s' % (self.nukePath, self.nukeExec, self.exportPath,
+                             self.nukeExportScriptName)
+        )
+        subprocess.Popen([self.nukePath + self.nukeExec,
+                          self.exportPath + self.nukeExportScriptName])
 
 
-
-    #Here starts the Class for the ParameterWindow
     class fc2nExportWindow(c4d.gui.GeDialog):
-           
+        """Here starts the Class for the ParameterWindow
+        """
+
         def __init__(self, thisParent):
             #Get the parentClass and save it as an internal variable
             self.parentClass = thisParent
-        
+
         def CreateLayout(self):
-            #creat the layout of the dialog        
+            """Missing DocString
+            """
+            #creat the layout of the dialog
             self.SetTitle("FromCinema2Nuke - Export")
-            
+
             self.GroupBegin(GROUP_ID1, c4d.BFH_SCALEFIT, cols=1, rows=17)
-            
-            self.AddStaticText(STATIC_TEXT_STARTFRAME, c4d.BFH_LEFT, name="Framerange:")
-            self.AddEditSlider(EDITSLIDER_STARTFRAME, c4d.BFH_SCALEFIT)      
+
+            self.AddStaticText(STATIC_TEXT_STARTFRAME, c4d.BFH_LEFT,
+                               name="Framerange:")
+            self.AddEditSlider(EDITSLIDER_STARTFRAME, c4d.BFH_SCALEFIT)
             self.AddEditSlider(EDITSLIDER_ENDFRAME, c4d.BFH_SCALEFIT)
-    
-            self.AddStaticText(STATIC_TEXT_PATH, c4d.BFH_LEFT, name="Export Path:")
+
+            self.AddStaticText(STATIC_TEXT_PATH, c4d.BFH_LEFT,
+                               name="Export Path:")
             self.AddEditText(TEXTBOX_PATH, c4d.BFH_SCALEFIT)
-    
-            self.AddStaticText(STATIC_TEXT_SCRIPTNAME, c4d.BFH_LEFT, name="Export Script-Name:")
-            self.AddEditText(TEXTBOX_SCRIPTNAME, c4d.BFH_SCALEFIT)         
-            
-            self.AddCheckbox(CHECKBOX_EXP_GEO_SEQ, c4d.BFH_FIT, name="Export Geometry animated (as Geometry-Sequence)", initw=WINDOW_WIDTH, inith=15)
-            self.AddCheckbox(CHECKBOX_CREATE_NUKE, c4d.BFH_FIT, name="Create Nuke-Script", initw=WINDOW_WIDTH, inith=15)
-            self.AddCheckbox(CHECKBOX_OPEN_NUKE, c4d.BFH_FIT, name="Open Nuke-Script after Export", initw=WINDOW_WIDTH, inith=15)
-            self.AddCheckbox(CHECKBOX_CREATE_DIFFUSE, c4d.BFH_FIT, name="Create Diffuse-Shader for Geometry in Nuke-Script", initw=WINDOW_WIDTH, inith=15)
-            self.AddCheckbox(CHECKBOX_DELETE_EXP_FILES, c4d.BFH_FIT, name="Delete Export-Files (.fm2n-Files) after Export", initw=WINDOW_WIDTH, inith=15) 
-            
+
+            self.AddStaticText(STATIC_TEXT_SCRIPTNAME, c4d.BFH_LEFT,
+                               name="Export Script-Name:")
+            self.AddEditText(TEXTBOX_SCRIPTNAME, c4d.BFH_SCALEFIT)
+
+            self.AddCheckbox(CHECKBOX_EXP_GEO_SEQ, c4d.BFH_FIT,
+                             name="Export Geometry animated (as Geometry-Sequence)",
+                             initw=WINDOW_WIDTH, inith=15)
+            self.AddCheckbox(CHECKBOX_CREATE_NUKE, c4d.BFH_FIT,
+                             name="Create Nuke-Script", initw=WINDOW_WIDTH,
+                             inith=15)
+            self.AddCheckbox(CHECKBOX_OPEN_NUKE, c4d.BFH_FIT,
+                             name="Open Nuke-Script after Export",
+                             initw=WINDOW_WIDTH, inith=15)
+            self.AddCheckbox(CHECKBOX_CREATE_DIFFUSE, c4d.BFH_FIT,
+                             name="Create Diffuse-Shader for Geometry in Nuke-Script",
+                             initw=WINDOW_WIDTH, inith=15)
+            self.AddCheckbox(CHECKBOX_DELETE_EXP_FILES, c4d.BFH_FIT,
+                             name="Delete Export-Files (.fm2n-Files) after Export",
+                             initw=WINDOW_WIDTH, inith=15)
+
             self.GroupEnd()
 
             self.GroupBegin(GROUP_ID2, c4d.BFH_SCALEFIT, cols=2, rows=1)
@@ -725,51 +887,79 @@ nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
 
             return True
 
-
-
         def InitValues(self):
+            """Missing DocString
+            """
             #Get all the values from the parentClass and init everything with it
-            self.SetReal(EDITSLIDER_STARTFRAME, self.parentClass.defaultStartFrameValue, min= self.parentClass.defaultStartFrameValue, max=self.parentClass.defaultEndFrameValue)
-            self.SetReal(EDITSLIDER_ENDFRAME, self.parentClass.defaultEndFrameValue, min= self.parentClass.defaultStartFrameValue, max=self.parentClass.defaultEndFrameValue)
-            
+            self.SetReal(EDITSLIDER_STARTFRAME,
+                         self.parentClass.defaultStartFrameValue,
+                         min=self.parentClass.defaultStartFrameValue,
+                         max=self.parentClass.defaultEndFrameValue)
+            self.SetReal(EDITSLIDER_ENDFRAME,
+                         self.parentClass.defaultEndFrameValue,
+                         min=self.parentClass.defaultStartFrameValue,
+                         max=self.parentClass.defaultEndFrameValue)
+
             self.SetString(TEXTBOX_PATH, self.parentClass.defaultExportPath)
-            self.SetString(TEXTBOX_SCRIPTNAME, self.parentClass.defaultNukeExportScriptName)
-            
-            self.SetBool(CHECKBOX_EXP_GEO_SEQ, self.parentClass.defaultExportGeometrySequence)
-            self.SetBool(CHECKBOX_CREATE_NUKE, self.parentClass.defaultCreateNukeScript)
-            self.SetBool(CHECKBOX_OPEN_NUKE, self.parentClass.defaultOpenNukeScript)
-            self.SetBool(CHECKBOX_CREATE_DIFFUSE, self.parentClass.defaultCreateDiffuseShader)
-            self.SetBool(CHECKBOX_DELETE_EXP_FILES, self.parentClass.defaultDeleteExportFiles)
+            self.SetString(TEXTBOX_SCRIPTNAME,
+                           self.parentClass.defaultNukeExportScriptName)
+
+            self.SetBool(CHECKBOX_EXP_GEO_SEQ,
+                         self.parentClass.defaultExportGeometrySequence)
+            self.SetBool(CHECKBOX_CREATE_NUKE,
+                         self.parentClass.defaultCreateNukeScript)
+            self.SetBool(CHECKBOX_OPEN_NUKE,
+                         self.parentClass.defaultOpenNukeScript)
+            self.SetBool(CHECKBOX_CREATE_DIFFUSE,
+                         self.parentClass.defaultCreateDiffuseShader)
+            self.SetBool(CHECKBOX_DELETE_EXP_FILES,
+                         self.parentClass.defaultDeleteExportFiles)
 
             return True
-        
+
         def Command(self, id, msg):
+            """Missing DocString
+
+            :param id:
+            :param msg:
+            """
             #handle user input
-            if id==BUTTON_CLOSE:
+            if id == BUTTON_CLOSE:
                 self.Close()
-            elif id==BUTTON_EXPORT:
-                
-                self.parentClass.startFrame = self.GetReal(EDITSLIDER_STARTFRAME)
+            elif id == BUTTON_EXPORT:
+
+                self.parentClass.startFrame = self.GetReal(
+                    EDITSLIDER_STARTFRAME)
                 self.parentClass.endFrame = self.GetReal(EDITSLIDER_ENDFRAME)
-                
+
                 self.parentClass.exportPath = self.GetString(TEXTBOX_PATH)
-                self.parentClass.nukeExportScriptName = self.GetString(TEXTBOX_SCRIPTNAME)
-                
+                self.parentClass.nukeExportScriptName = self.GetString(
+                    TEXTBOX_SCRIPTNAME)
+
                 self.parentClass.exportType = self.parentClass.defaultExportTypeValue
-                
-                self.parentClass.exportGeometrySequence = self.GetBool(CHECKBOX_EXP_GEO_SEQ)
-                self.parentClass.createNukeScript = self.GetBool(CHECKBOX_CREATE_NUKE)
-                self.parentClass.openNukeScript = self.GetBool(CHECKBOX_OPEN_NUKE)
-                self.parentClass.createDiffuseShader = self.GetBool(CHECKBOX_CREATE_DIFFUSE)
-                self.parentClass.deleteExport = self.GetBool(CHECKBOX_DELETE_EXP_FILES)
-                
+
+                self.parentClass.exportGeometrySequence = self.GetBool(
+                    CHECKBOX_EXP_GEO_SEQ)
+                self.parentClass.createNukeScript = self.GetBool(
+                    CHECKBOX_CREATE_NUKE)
+                self.parentClass.openNukeScript = self.GetBool(
+                    CHECKBOX_OPEN_NUKE)
+                self.parentClass.createDiffuseShader = self.GetBool(
+                    CHECKBOX_CREATE_DIFFUSE)
+                self.parentClass.deleteExport = self.GetBool(
+                    CHECKBOX_DELETE_EXP_FILES)
+
                 self.parentClass.startExport = True
-                
+
                 self.Close()
             return True
 
 
-
-plugins.RegisterCommandPlugin(id=PLUGIN_ID, str="Export to Nuke",
-                            info=c4d.OBJECT_GENERATOR, icon=None, help="Exports Objects from Cinema to Nuke",
-                            dat=FromCinema2Nuke())
+plugins.RegisterCommandPlugin(
+    id=PLUGIN_ID,
+    str="Export to Nuke",
+    info=c4d.OBJECT_GENERATOR,
+    icon=None,
+    help="Exports Objects from Cinema to Nuke",
+    dat=FromCinema2Nuke()
+)

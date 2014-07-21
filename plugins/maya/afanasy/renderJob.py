@@ -37,7 +37,7 @@ class RenderBlock(object):
     # virtual methods
     #
     def setup(self):
-        print '>> RenderBlock setup...'
+        print('>> RenderBlock setup...')
 
 
 class RenderJob(object):
@@ -67,14 +67,11 @@ class RenderJob(object):
     # virtual methods
     #
     def setup(self):
-        print '>> RenderJob setup...'
+        print('>> RenderJob setup...')
 
     def process(self):
-        print '>> RenderJob process...'
+        print('>> RenderJob process...')
 
-    #
-    # setup_range
-    #
     def setup_range(self, currentTime=0):
         if not self.animation:
             self.start = currentTime

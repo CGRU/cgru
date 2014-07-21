@@ -13,7 +13,7 @@ block.setNumeric( 1, 5, 2)
 job.blocks.append(block)
 
 print
-job.output( True)
+job.output(True)
 print
 
 job.send()
