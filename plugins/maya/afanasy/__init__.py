@@ -213,8 +213,5 @@ class UI(object):
         for cmd in cmds:
             print(cmds)
 
-            subprocess.Popen(
-                [cmd],
-                shell=True
-            )
+            os.system(cmd)
 
