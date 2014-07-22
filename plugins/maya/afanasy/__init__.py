@@ -30,14 +30,14 @@ class UI(object):
                 pm.text(l='Start Frame')
                 pm.intField(
                     'cgru_afanasy__start_frame',
-                    v=pm.optionVar.get('cgru_afanasy__start_frame_ov')
+                    v=pm.optionVar.get('cgru_afanasy__start_frame_ov', 1)
                 )
 
             with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
                 pm.text(l='End Frame')
                 pm.intField(
                     'cgru_afanasy__end_frame',
-                    v=pm.optionVar.get('cgru_afanasy__end_frame_ov')
+                    v=pm.optionVar.get('cgru_afanasy__end_frame_ov', 1)
                 )
 
             with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
