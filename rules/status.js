@@ -132,59 +132,10 @@ Status.prototype.showReports = function()
 		this.elReportsDiv.style.display = 'none';
 		return;
 	}
-	this.elReportsDiv.style.display = 'block';
+	else
+		this.elReportsDiv.style.display = 'block';
 
-	var reps_types = {};
-	var reps_duration = 0;
-
-	for( var i = 0; i < this.obj.reports.length; i++)
-	{
-		var report = this.obj.reports[i];
-
-		if(( report.tags == null ) || ( report.tags.length == 0 ))
-			report.tags = ['other'];
-
-		for( var t = 0; t < report.tags.length; t++)
-		{
-			var rtype;
-			if( reps_types[report.tags[t]])
-			{
-				rtype = reps_types[report.tags[t]];
-			}
-			else
-			{
-				rtype = {};
-				rtype.duration = 0;
-				rtype.artists = [];
-				reps_types[report.tags[t]] = rtype;
-			}
-
-			rtype.duration += report.duration;
-
-			if( rtype.artists.indexOf( report.artist) == -1 )
-				rtype.artists.push( report.artist);
-		}
-
-		reps_duration += report.duration;
-//console.log( JSON.stringify( report));
-	}
-
-	for( var rtype in reps_types )
-	{
-		var el = document.createElement('div');
-		this.elReports.appendChild( el);
-		var info = c_GetTagTitle( rtype) + ': ' + reps_types[rtype].duration;
-		for( var a = 0; a < reps_types[rtype].artists.length; a++)
-		{
-			if( a ) info += ',';
-			info += ' ' + c_GetUserTitle( reps_types[rtype].artists[a]);
-		}
-		el.textContent = info;
-	}
-
-	var el = document.createElement('div');
-	this.elReports.appendChild( el);
-	el.textContent = 'Total Duration: ' + reps_duration;
+	stsc_Show({"reports":this.obj.reports,"elReports":this.elReports});
 //console.log( JSON.stringify( RULES.status.reports));
 }
 Status.prototype.showTasks = function()
@@ -197,8 +148,10 @@ Status.prototype.showTasks = function()
 		this.elTasksDiv.style.display = 'none';
 		return;
 	}
-	this.elTasksDiv.style.display = 'block';
+	else
+		this.elTasksDiv.style.display = 'block';
 
+	var total_duration = 0;
 	for( var t = 0; t < this.obj.tasks.length; t++)
 	{
 		var task = this.obj.tasks[t];
@@ -241,7 +194,13 @@ Status.prototype.showTasks = function()
 				elTag.textContent = c_GetUserTitle( task.artists[g]);
 			}
 		}
+
+		total_duration += task.duration;
 	}
+
+	var el = document.createElement('div');
+	this.elTasks.appendChild( el);
+	el.textContent = 'Total Duration: ' + total_duration;
 }
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
