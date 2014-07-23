@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 	printf("Getting renders from store...\n");
 
 	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getRendersDir());
-	printf("%d renders founded.\n", (int)folders.size());
+	printf("%d renders found.\n", (int)folders.size());
 
 	for( int i = 0; i < folders.size(); i++)
 	{
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 	printf("Getting users from store...\n");
 
 	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getUsersDir());
-	printf("%d users founded.\n", (int)folders.size());
+	printf("%d users found.\n", (int)folders.size());
 
 	for( int i = 0; i < folders.size(); i++)
 	{
@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
 	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getJobsDir());
 	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getJobsDir(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
 
-	printf("%d jobs founded.\n", (int)folders.size());
+	printf("%d jobs found.\n", (int)folders.size());
 	for( int i = 0; i < folders.size(); i++)
 	{
 		JobAf * job = NULL;

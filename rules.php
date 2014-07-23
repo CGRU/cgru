@@ -276,16 +276,16 @@ function http_digest_validate( &$o_out)
 	}
 	
 	$data = explode("\n", $data);
-	$founded = false;
+	$found = false;
 	foreach( $data as $line )
 		if( strpos( $line, $Digest['username']) === 0)
 		{
 			$data = $line;
-			$founded = true;
+			$found = true;
 			break;
 		}
 
-	if( false == $founded )
+	if( false == $found )
 	{
 		$o_out['error'] = 'Wrong!';
 		return false;
@@ -542,14 +542,14 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 						if( strrpos( $ruentry,'.json') === false ) continue;
 
 						if( is_null( $rufiles)) continue;
-						$founded = false;
+						$found = false;
 						foreach( $rufiles as $rufile )
 							if( strpos( $ruentry, $rufile ) === 0 )
 							{
-								$founded = true;
+								$found = true;
 								break;
 							}
-						if( false == $founded ) continue;
+						if( false == $found ) continue;
 
 						if( $fHandle = fopen( $path.'/'.$ruentry, 'r'))
 						{
@@ -1465,7 +1465,7 @@ function permissionsGet( $i_args, &$o_out)
 	$data = fread( $fHandle, $FileMaxLength);
 	fclose( $fHandle);
 
-	$founded = false;
+	$found = false;
 	$lines = explode("\n", $data);
 	foreach( $lines as $line )
 	{
@@ -1479,21 +1479,21 @@ function permissionsGet( $i_args, &$o_out)
 		{
 			unset($words[1]);
 			foreach( $words as $group) array_push( $o_out['groups'], $group);
-			$founded = true;
+			$found = true;
 		}
 		else if( $words[1] == 'user' )
 		{
 			unset($words[1]);
 			foreach( $words as $user) array_push( $o_out['users'], $user);
-			$founded = true;
+			$found = true;
 		}
 		else if( $words[1] == 'valid-user' )
 		{
 			$o_out['valid_user'] = true;
-			$founded = true;
+			$found = true;
 		}
 	}
-/*	if( false == $founded )
+/*	if( false == $found )
 	{
 		$o_out['error'] = 'Unable to find users or groups in the file.';
 		error_log( $htaccess);
@@ -1547,14 +1547,14 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 		$path = "$i_path/$entry";
 		if( false == is_dir( $path)) continue;
 
-		$founded = false;
+		$found = false;
 		$rufolder = "$path/".$i_args['rufolder'];
-		if( is_dir( $rufolder)) $founded = true;
-		if( $founded && htaccessPath( $i_path)) $founded = true;
+		if( is_dir( $rufolder)) $found = true;
+		if( $found && htaccessPath( $i_path)) $found = true;
 
-		if( $founded && array_key_exists('status', $i_args ))
+		if( $found && array_key_exists('status', $i_args ))
 		{
-			$founded = false;
+			$found = false;
 			$rufile = "$rufolder/status.json";
 			if( is_file( $rufile))
 			{
@@ -1562,15 +1562,15 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 				{
 					$obj = json_decode( fread( $fHandle, $FileMaxLength), true);
 						if( searchStatus( $i_args['status'], $obj))
-							$founded = true;
+							$found = true;
 					fclose($fHandle);
 				}
 			}
 		}
 
-		if( $founded && array_key_exists('body', $i_args ))
+		if( $found && array_key_exists('body', $i_args ))
 		{
-			$founded = false;
+			$found = false;
 			$rufile = "$rufolder/body.html";
 			if( is_file( $rufile))
 			{
@@ -1579,14 +1579,14 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 					$data = fread( $fHandle, $FileMaxLength);
 					fclose($fHandle);
 					if( mb_stripos( $data, $i_args['body'], 0, 'utf-8') !== false )
-						$founded = true;
+						$found = true;
 				}
 			}
 		}
 
-		if( $founded && array_key_exists('comment', $i_args ))
+		if( $found && array_key_exists('comment', $i_args ))
 		{
-			$founded = false;
+			$found = false;
 			$rufile = "$rufolder/comments.json";
 			if( is_file( $rufile))
 			{
@@ -1594,13 +1594,13 @@ function searchFolder( &$i_args, &$o_out, $i_path, $i_depth)
 				{
 					$obj = json_decode( fread( $fHandle, $FileMaxLength), true);
 					if( searchComment( $i_args['comment'], $obj))
-						$founded = true;
+						$found = true;
 					fclose($fHandle);
 				}
 			}
 		}
 
-		if( $founded )
+		if( $found )
 			array_push( $o_out['result'], $path);
 
 		if( $i_depth < $i_args['depth'] )
@@ -1615,48 +1615,48 @@ function searchStatus( &$i_args, &$i_obj)
 	if( false == is_array( $i_obj)) return false;
 	if( false == array_key_exists('status', $i_obj)) return false;
 
-	$founded = true;
+	$found = true;
 
-	if( $founded && array_key_exists('ann', $i_args))
+	if( $found && array_key_exists('ann', $i_args))
 	{
-		$founded = false;
+		$found = false;
 		if( array_key_exists('annotation', $i_obj['status']))
 			if( mb_stripos( $i_obj['status']['annotation'], $i_args['ann'], 0, 'utf-8') !== false )
-				$founded = true;
+				$found = true;
 	}
 
-	if( $founded && array_key_exists('artists', $i_args))
+	if( $found && array_key_exists('artists', $i_args))
 	{
-		$founded = false;
+		$found = false;
 		if( array_key_exists('artists', $i_obj['status']))
 			foreach( $i_args['artists'] as $artist )
 				if( in_array( $artist, $i_obj['status']['artists']))
-					$founded = true;
+					$found = true;
 	}
 
-	if( $founded && array_key_exists('tags', $i_args))
+	if( $found && array_key_exists('tags', $i_args))
 	{
-		$founded = false;
+		$found = false;
 		if( array_key_exists('tags', $i_obj['status']))
 			foreach( $i_args['tags'] as $tag )
 				if( in_array( $tag, $i_obj['status']['tags']))
-					$founded = true;
+					$found = true;
 	}
 
-	if( $founded && array_key_exists('percent', $i_args))
+	if( $found && array_key_exists('percent', $i_args))
 	{
-		$founded = false;
+		$found = false;
 		if( array_key_exists('progress', $i_obj['status']))
 			if( ($i_obj['status']['progress'] >= $i_args['percent'][0]) &&
 				($i_obj['status']['progress'] <= $i_args['percent'][1]) )
-					$founded = true;
+					$found = true;
 	}
 
 	$parms = array('finish','statmod','bodymod');
 	foreach( $parms as $parm )
-		if( $founded && array_key_exists( $parm, $i_args))
+		if( $found && array_key_exists( $parm, $i_args))
 		{
-			$founded = false;
+			$found = false;
 			$val = $parm;
 			if( $parm == 'statmod' ) $val = 'mtime';
 			else if( $parm == 'bodymod' ) $val = 'body';
@@ -1668,11 +1668,11 @@ function searchStatus( &$i_args, &$i_obj)
 				$val = ($val - time()) / ( 60 * 60 * 24 );
 				if( ($val >= $i_args[$parm][0]) &&
 					($val <= $i_args[$parm][1]) )
-						$founded = true;
+						$found = true;
 			}
 		}
 
-	return $founded;
+	return $found;
 }
 
 function searchComment( &$i_args, &$i_obj)

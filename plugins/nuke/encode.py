@@ -43,7 +43,7 @@ output = args[1]
 # Get images pattern:
 inputdir = os.path.dirname(sequence)
 if not os.path.isdir(inputdir):
-    errorExit('Images folder "%s" not founded.' % inputdir)
+    errorExit('Images folder "%s" not found.' % inputdir)
 imagesname = os.path.basename(sequence)
 
 pos = imagesname.find('.%')
@@ -105,7 +105,7 @@ print(output)
 
 # Try to open scene:
 if not os.path.isfile(options.xscene): errorExit(
-    'File "%s" not founded.' % options.xscene)
+    'File "%s" not found.' % options.xscene)
 try:
     nuke.scriptOpen(options.xscene)
 except:
@@ -116,7 +116,7 @@ readnodes = options.rnode.split(',')
 for nodename in readnodes:
     readnode = nuke.toNode(nodename)
     if readnode is None:
-        errorExit('Read "%s" not founded.' % nodename)
+        errorExit('Read "%s" not found.' % nodename)
 
     if readnode.Class() != 'Read':
         errorExit('Node "%s" class is not "Read".' % nodename)
@@ -131,7 +131,7 @@ for nodename in readnodes:
 # Try to process write nodes:
 writenode = nuke.toNode(options.xnode)
 if writenode is None:
-    errorExit('Node "%s" not founded.' % options.xnode)
+    errorExit('Node "%s" not found.' % options.xnode)
 if writenode.Class() != 'Write':
     errorExit('Node "%s" class is not "Write".' % options.xnode)
 writenode['file'].setValue(output)

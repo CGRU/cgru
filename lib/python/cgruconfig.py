@@ -207,16 +207,16 @@ def writeVars(variables, configfile=VARS['config_file_home']):
         for var in variables:
             tofind = '"%s":' % var
             toinsert = '\t"%s":%s,\n' % (var, json.dumps(VARS[var]))
-            founded = False
+            found = False
             num = -1
             for line in lines:
                 num += 1
                 if line.find(tofind) == -1:
                     continue
-                founded = True
+                found = True
                 lines[num] = toinsert
                 break
-            if not founded:
+            if not found:
                 num = 1
                 for line in lines:
                     num += 1

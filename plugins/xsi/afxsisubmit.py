@@ -176,7 +176,7 @@ def Main():
             textStream.close()
         else:
             Application.LogMessage(
-                'Script logic file not founded:\n%s' % logic_script
+                'Script logic file not found:\n%s' % logic_script
             )
 
     oView = Application.Desktop.ActiveLayout.CreateView('Property Panel', 'AfanasyProperties')

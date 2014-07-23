@@ -67,7 +67,7 @@ for input in Inputs:
             files.append(afile)
         files.sort()
     else:
-        errorExit('%s not founded.' % input)
+        errorExit('%s not found.' % input)
 
     cmds = []
     mkdir = None
@@ -148,7 +148,7 @@ for input in Inputs:
         FilesIn.append(files_in)
         JobNames.append(os.path.basename(convert['output']))
     else:
-        convert['warning'] = 'No images founded'
+        convert['warning'] = 'No images found'
 
     OUT['convert'].append(convert)
 

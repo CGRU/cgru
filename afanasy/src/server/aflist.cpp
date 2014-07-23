@@ -43,7 +43,7 @@ int AfList::add( AfNodeSrv *node)
       {
          std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
          std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
-         bool lessPriorityFounded = false;
+         bool lessPriorityFound = false;
          while( it != end_it)
          {
             index++;
@@ -51,10 +51,10 @@ int AfList::add( AfNodeSrv *node)
 
             nodes_list.insert( it, node);
 
-            lessPriorityFounded = true;
+            lessPriorityFound = true;
             break;
          }
-         if( lessPriorityFounded == false )
+         if( lessPriorityFound == false )
             nodes_list.push_back( node);
       }
       else
@@ -85,18 +85,18 @@ int AfList::sortPriority( AfNodeSrv * i_node)
    nodes_list.remove( i_node);
    std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
    std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
-   bool lessPriorityFounded = false;
+   bool lessPriorityFound = false;
 
    while( it != end_it)
    {
       index++;
       if( **it >= *i_node ) { it++; continue;}
       nodes_list.insert( it, i_node);
-      lessPriorityFounded = true;
+      lessPriorityFound = true;
       break;
    }
 
-   if( lessPriorityFounded == false )
+   if( lessPriorityFound == false )
    {
       index++;
       nodes_list.push_back( i_node);
@@ -143,8 +143,8 @@ printf("AfList::moveNodes:\n");
          if( (*it)->m_node->m_id == i_list[n] )
          {
 #ifdef AFOUTPUT
-//printf("Founded a node \"%s\"-%d\n", (*it)->getName().c_str(), (*it)->m_node->m_id);
-printf("Founded a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node->m_id );
+//printf("Found a node \"%s\"-%d\n", (*it)->getName().c_str(), (*it)->m_node->m_id);
+printf("Found a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node->m_id );
 #endif
             move_list.push_back( *it);
             break;

@@ -148,20 +148,20 @@ cout<<endl<<"facesSmooth_b:";for(i=0;i<facesSmooth_b.length();i++)cout<<facesSmo
 			}
 			continue;
 		}
-		bool founded = false;
+		bool found = false;
 		meshFn.getEdgeVertices( fSelEdges[se], twoVertices_a);
 		meshFn.getEdgeVertices( fSelEdges[se-1], twoVertices_b);
 		if( (twoVertices_a[0] == twoVertices_b[0]) ||
 			(twoVertices_a[0] == twoVertices_b[1]))
 		{
 				slotVerticesIds.append( twoVertices_a[0]);
-				founded = true;
+				found = true;
 		} else
 		if( (twoVertices_a[1] == twoVertices_b[0]) ||
 			(twoVertices_a[1] == twoVertices_b[1]))
 		{
 				slotVerticesIds.append( twoVertices_a[1]);
-				founded = true;
+				found = true;
 		}
 		if( se == (selEdgesCount-1))
 		{
@@ -189,7 +189,7 @@ cout<<endl<<"facesSmooth_b:";for(i=0;i<facesSmooth_b.length();i++)cout<<facesSmo
          if( lastVertex == firstVertex)
             slotVerticesIds.append( lastVertex);
 		}
-		if( founded) continue;
+		if( found) continue;
 		MGlobal::displayError(" can`t find vertices to split");
 		return MStatus::kFailure;
 	}
@@ -272,7 +272,7 @@ cout<<endl<<"rightFaces: ";for(i=0;i<rightFaces.length();i++)cout<<rightFaces[i]
 
 		vtxIt.getConnectedEdges( conEdges);
 		unsigned numConEdges = conEdges.length();
-		bool founded = false;
+		bool found = false;
 		for( unsigned ce = 0; ce < numConEdges; ce++)
 		{
 //cout<<",   ce= " << conEdges[ce];
@@ -282,7 +282,7 @@ cout<<endl<<"rightFaces: ";for(i=0;i<rightFaces.length();i++)cout<<rightFaces[i]
 			edgeIt.getConnectedFaces( conFaces);
 			if ( !inMIntArray( conFaces[0], rightFaces, index)) continue;
 //cout<<",onRF ";
-			founded = true;
+			found = true;
 //cout<<" look for edges ";
 			vtxIt.getOppositeVertex( opVtx, conEdges[ce]);
 			meshFn.getPoint( opVtx, pointA);
@@ -290,7 +290,7 @@ cout<<endl<<"rightFaces: ";for(i=0;i<rightFaces.length();i++)cout<<rightFaces[i]
 			v.normalize();
 			vector += v;
 		}
-		if(!founded)
+		if(!found)
 		{
 //cout<<" look for faces: "<< endl;
 			vtxIt.getConnectedFaces( conFaces);
@@ -470,7 +470,7 @@ bool tm_polySlotFty::validateEdges()
 #ifdef _DEBUG
 cout << endl << "edge = " << edgeIndex << ", vtx = " << vtx << " : ";
 #endif
-			bool founded = false;
+			bool found = false;
 			for( unsigned e = 0; e < numInputEdges; e++)
 			{
 #ifdef _DEBUG
@@ -484,15 +484,15 @@ cout << " v" << nextVtxs[0] << " v" << nextVtxs[1] << ";";
 #endif
 				if( nextVtxs[0] == vtx)
 				{
-					founded = true;
+					found = true;
 					vtx = nextVtxs[1];
 				} else
 				if( nextVtxs[1] == vtx)
 				{
-					founded = true;
+					found = true;
 					vtx = nextVtxs[0];
 				}
-				if( !founded) continue;
+				if( !found) continue;
 				edgeIndex = fSelEdges[e];
 #ifdef _DEBUG
 cout << " *" << edgeIndex << "v" << vtx;
@@ -502,9 +502,9 @@ cout << " *" << edgeIndex << "v" << vtx;
 					loopEdgesList.push_front( edgeIndex);
 				else
 					loopEdgesList.push_back( edgeIndex);
-				if( founded) break;
+				if( found) break;
 			}
-			if(!founded) break;
+			if(!found) break;
 		}
 #ifdef _DEBUG
 cout << endl << "COUNTER = " << COUNTER;

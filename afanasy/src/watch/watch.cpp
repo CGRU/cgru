@@ -155,7 +155,7 @@ void Watch::filesReceived( const af::MCTaskUp & i_taskup)
 			return;
 	}
 
-	printf("Watch::filesReceived: Recepient not founded:\n");
+	printf("Watch::filesReceived: Recipient not found:\n");
 	i_taskup.v_stdOut();
 	return;
 }

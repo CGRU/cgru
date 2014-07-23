@@ -137,7 +137,7 @@ class iostat(resbase.resbase):
                 self.graphb = 10
                 self.bgcolorb = self.value
             else:
-                self.label = 'No such devices founded: "%s"' % self.device
+                self.label = 'No such devices found: "%s"' % self.device
 
         self.process = subprocess.Popen(
             ['iostat', '-x', '-d', '-m', '4', '2'],

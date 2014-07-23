@@ -818,7 +818,7 @@ function ad_ProfileOpen()
 {
 	if( g_auth_user == null )
 	{
-		c_Error('No authenticated user founded.');
+		c_Error('No authenticated user found.');
 		return;
 	}
 

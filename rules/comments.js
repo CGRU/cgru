@@ -692,7 +692,7 @@ function cm_GotoKey()
 			return;
 		}
 
-	c_Error('Comment with key=' + cm_goto_key + ' not founded.');
+	c_Error('Comment with key=' + cm_goto_key + ' not found.');
 	cm_goto_key = null;
 }
 

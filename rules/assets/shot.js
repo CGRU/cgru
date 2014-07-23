@@ -52,7 +52,7 @@ function shot_Loaded( i_data, i_args)
 	{
 		var el = $('shot_results');
 		el.textContent = '';
-		var founded = false;
+		var found = false;
 		for( var i = 0; i < walk.result.length; i++)
 		{
 			var folders = walk.walks[walk.result[i]].folders;
@@ -61,10 +61,10 @@ function shot_Loaded( i_data, i_args)
 
 			shot_thumb_paths.push( path);
 			new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]]})
-			founded = true;
+			found = true;
 		}
 
-		if( false == founded )
+		if( false == found )
 			el.textContent = JSON.stringify( ASSET.result.path );
 	}
 
@@ -72,7 +72,7 @@ function shot_Loaded( i_data, i_args)
 	{
 		var el = $('shot_dailies');
 		el.textContent = '';
-		var founded = false;
+		var found = false;
 		for( var i = 0; i < walk.dailies.length; i++)
 		{
 			var path = walk.paths[walk.dailies[i]];
@@ -83,11 +83,11 @@ function shot_Loaded( i_data, i_args)
 				new FilesView({"el":el,"path":path,"walk":walk.walks[walk.dailies[i]]});
 				if( shot_thumb_paths.length == 0 )
 					shot_thumb_paths.push( path);
-				founded = true;
+				found = true;
 			}
 		}
 
-		if( false == founded )
+		if( false == found )
 			el.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
@@ -153,7 +153,7 @@ function shot_RefsReceived( i_data, i_args)
 	el.textContent = '';
 	el.classList.remove('waiting');
 //console.log( i_data);
-	var founded = false;
+	var found = false;
 	var not_empty_paths = [];
 	for( var i = 0; i < walk.paths.length; i++)
 	{
@@ -165,9 +165,9 @@ function shot_RefsReceived( i_data, i_args)
 			 continue;
 		not_empty_paths.push( walk.paths[i]);
 		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false})
-		founded = true;
+		found = true;
 	}
-	if( false == founded )
+	if( false == found )
 		el.textContent = JSON.stringify( walk.paths );
 
 	if( shot_thumb_paths.length == 0 )
@@ -195,7 +195,7 @@ function shot_SourceReceived( i_data, i_args)
 	var el = $('shot_src');
 	el.textContent = '';
 	el.classList.remove('waiting');
-	var founded = false;
+	var found = false;
 	var not_empty_paths = [];
 	for( var i = 0; i < i_data.length; i++)
 	{
@@ -205,11 +205,11 @@ function shot_SourceReceived( i_data, i_args)
 		{
 			new FilesView({"el":el,"path":i_args.paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
-			founded = true;
+			found = true;
 		}
 	}
 
-	if( false == founded )
+	if( false == found )
 		el.textContent = JSON.stringify( ASSET.source.path);
 
 	if( shot_thumb_paths.length == 0 )

@@ -12,7 +12,7 @@ folder=$1
 [ -d "$folder" ] || folder="$cgru/$folder"
 
 if [ ! -d "$folder" ]; then
-   echo "Folder '$folder' not founded."
+   echo "Folder '$folder' not found."
    exit 1
 fi
 
@@ -31,5 +31,5 @@ for browser in $browsers; do
     exit 0
 done
 
-echo "No browser founded."
+echo "No browser found."
 exit 1

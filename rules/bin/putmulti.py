@@ -122,7 +122,7 @@ for src in Sources:
             print('{"error":"%s"},' % src)
             continue
         else:
-            errExit('Input not founded for: %s' % src)
+            errExit('Input not found for: %s' % src)
 
     if version == '':
         version = ('v%0' + str(Options.padding) + 'd') % 0
@@ -152,7 +152,7 @@ for src in Sources:
 
     if Options.verbose: print( cmd)
 
-print('{"progress":"%d sequences founded"},' % len(commands))
+print('{"progress":"%d sequences found"},' % len(commands))
 
 job = af.Job('PUT ' + Options.dest)
 job.setUserName(Options.afuser)

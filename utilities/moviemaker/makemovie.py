@@ -45,8 +45,8 @@ Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',    
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
 Parser.add_option('-n', '--container',  dest='container',   type  ='string',     default='',          help='Container')
-Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first founded')
-Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last founded')
+Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first found')
+Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last found')
 Parser.add_option('--fffirst',          dest='fffirst',     action='store_true', default=False,       help='Draw first frame as first and not actual frame number.')
 Parser.add_option('--thumbnail',        dest='thumbnail',   action='store_true', default=False,       help='Add a thumbnail image on slate frame')
 Parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
@@ -354,7 +354,7 @@ def getImages(inpattern):
         allFiles.append(os.path.join(inputdir, item))
 
     if len(allFiles) <= 1:
-        print('None or only one file founded matching pattern.')
+        print('None or only one file found matching pattern.')
         print('Input directory:')
         print(inputdir)
         print('Expression:')

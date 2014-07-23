@@ -293,7 +293,7 @@ def dailiesGenCmd(node):
         images += '%s%s%s' % (part1, '#' * padding, part2)
 
     if images == '':
-        nuke.message('Error:\n%s\No valid views founded.' % inputnode.name())
+        nuke.message('Error:\n%s\No valid views found.' % inputnode.name())
         return
 
     # Get Movie Name:

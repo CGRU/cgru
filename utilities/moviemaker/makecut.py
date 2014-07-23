@@ -120,7 +120,7 @@ for shot in Shots:
             folder = os.path.join(inp, item)
 
     if folder is None:
-        errExit('Input not founded for: %s' % shot)
+        errExit('Input not found for: %s' % shot)
 
     files = []
     for item in os.listdir(folder):
@@ -132,7 +132,7 @@ for shot in Shots:
         if valid:
             files.append(os.path.join(folder, item))
     if len(files) == 0:
-        errExit('No files founded in folder: %s' % folder)
+        errExit('No files found in folder: %s' % folder)
     files.sort()
 
     print('{"sequence":"%s"},' % folder)
@@ -152,8 +152,8 @@ for shot in Shots:
         commands.append(cmd)
         task_names.append(os.path.basename(image))
 
-print('{"progress":"%d sequences founded"},' % len(Shots))
-print('{"progress":"%d files founded"},' % file_counter)
+print('{"progress":"%d sequences found"},' % len(Shots))
+print('{"progress":"%d files found"},' % file_counter)
 
 cmd_encode =  os.path.join(os.path.dirname(sys.argv[0]), 'makemovie.py')
 cmd_encode =  'python "%s"' % os.path.normpath(cmd_encode)

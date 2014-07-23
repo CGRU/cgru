@@ -12,7 +12,7 @@ else
    issuefile="/etc/system-release"
    [ -f "${issuefile}" ] || issuefile="/etc/gentoo-release" ; [ -f "${issuefile}" ] || issuefile="/etc/issue"
    if [ ! -f "${issuefile}" ]; then
-      echo "File '${issuefile}' not founded. Can't detect distribution."
+      echo "File '${issuefile}' not found. Can't detect distribution."
       exit 1
    fi
    # Search issue file:
@@ -26,7 +26,7 @@ else
    done
 fi
 
-# No distribution founded:
+# No distribution found:
 if [ -z "${DISTRIBUTIVE}" ]; then
    echo "Unsupported distribution:"
    cat "${issuefile}"

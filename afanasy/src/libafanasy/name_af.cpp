@@ -352,8 +352,8 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 		}
 	}
 
-	// No ready tasks founded:
-//printf("No ready tasks founded.\n");
+	// No ready tasks found:
+//printf("No ready tasks found.\n");
 	return -1;
 }
 
@@ -376,7 +376,7 @@ const std::string af::fillNumbers( const std::string & i_pattern, long long i_st
 		{
 			if(( nstart != -1) && (( pos - nstart ) > 1))
 			{
-				// we founded the second "@" character in some pattern pair
+				// we found the second "@" character in some pattern pair
 				// store input string from the last pattern
 				str += std::string( i_pattern.data()+part, nstart-part);
 
@@ -456,7 +456,7 @@ const std::string af::fillNumbers( const std::string & i_pattern, long long i_st
 
 	if( str.empty() )
 	{
-		// no patterns were founded
+		// no patterns were found
 		// returning and input string unchanged
 		return i_pattern;
 	}

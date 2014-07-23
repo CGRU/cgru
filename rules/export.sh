@@ -9,7 +9,7 @@ cgru=$PWD
 
 credentials=rules/export_credentials.sh
 if [ ! -f $credentials ]; then
-	echo $credentials file not founded
+	echo $credentials file not found
 	exit 1
 fi
 source $credentials

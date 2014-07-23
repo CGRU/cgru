@@ -34,7 +34,7 @@ Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_tru
 Parser.add_option('--aspect_in',          dest='aspect_in',    type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
 Parser.add_option('--aspect_auto',        dest='aspect_auto',  type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('-D', '--debug',        dest='debug',        action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
-Parser.add_option(      '--test',         dest='test',         action='store_true', default=False,       help='Test mode, only show founded sequences.')
+Parser.add_option(      '--test',         dest='test',         action='store_true', default=False,       help='Test mode, only show found sequences.')
 
 (Options, args) = Parser.parse_args()
 
@@ -95,15 +95,15 @@ def getPatterns(filenames):
             digits = digits[-1]
             digitslen = len(digits)
             pos = afile.rfind(digits)
-            another_file_founded = False
+            another_file_found = False
             for other in filenames:
                 if other == afile:
                     continue
                 if other[:pos] == afile[:pos] \
                    and other[pos + digitslen:] == afile[pos + digitslen:]:
                     processedfiles.append(other)
-                    another_file_founded = True
-            if not another_file_founded:
+                    another_file_found = True
+            if not another_file_found:
                 continue
             pattern = afile[:pos] + '#' * digitslen + afile[pos + digitslen:]
             patterns.append(pattern)

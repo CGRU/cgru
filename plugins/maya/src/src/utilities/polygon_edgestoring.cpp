@@ -88,7 +88,7 @@ bool tm_polygon_edgestoring::calculate( MIntArray &edgesArray)
 
 			lastFace = newFace;
 
-			bool founded = false;
+			bool found = false;
 			for( unsigned e = 0; e < numInputEdges; e++)
 			{
 				if( edgesArray[e] == edgeIndex) continue;
@@ -99,7 +99,7 @@ bool tm_polygon_edgestoring::calculate( MIntArray &edgesArray)
 				{
 					if( faceEdges[fe] == edgesArray[e])
 					{
-						founded = true;
+						found = true;
 						edgeIndex = edgesArray[e];
 						visitedEdges[e] = 1;
 						if( face == 0)
@@ -107,11 +107,11 @@ bool tm_polygon_edgestoring::calculate( MIntArray &edgesArray)
 						else
 							ringEdgesList.push_back( edgeIndex);
 					}
-					if( founded) break;
+					if( found) break;
 				}
-				if( founded) break;
+				if( found) break;
 			}
-			if(!founded) break;
+			if(!found) break;
 		}
 	}
 	if (visitedEdges != NULL) delete [] visitedEdges;

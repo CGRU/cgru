@@ -89,15 +89,15 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 			// Look for line end:
 			if( buffer[offset] == '\n' )
 			{
-				// Goto line begin:
+				// Go to line begin:
 				offset++;
 				if( offset == i_bytes )
 					break;
 
-				// If header founded, body can start in the same data packet:
+				// If header found, body can start in the same data packet:
 				if( header_processed && ( buffer[offset] == '{' ))
 				{
-					//write(1,"\nBODY FOUNDED:\n", 15);
+					//write(1,"\nBODY FOUND:\n", 15);
 					//write(1, buffer+offset, i_bytes - offset);
 					//write(1,"\n",1);
 					break;
@@ -106,11 +106,11 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 				// Look for a special header:
 				if( strncmp("AFANASY: ", buffer+offset, 9) == 0)
 				{
-					//printf("\nAFANASY FOUNDED:\n");
+					//printf("\nAFANASY FOUND:\n");
 					offset += 9;
 					if( 1 == sscanf( buffer + offset, "%d", &size))
 					{
-						//printf("\nHEADER FOUNDED: size=%d\n", size);
+						//printf("\nHEADER FOUND: size=%d\n", size);
 						header_processed = true;
 					}
 					else return -1;
@@ -118,7 +118,7 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 			}
 		}
 
-		// If header founded, construct message:
+		// If header found, construct message:
 		if( header_processed )
 		{
 			io_msg->setHeader( af::Msg::THTTP, size, offset, i_bytes);
@@ -148,7 +148,7 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 					{
 						if( buffer[offset] == '{' )
 						{
-							//printf("FOUNDED: size=%d Offset=%d:\n", size, offset);
+							//printf("FOUND: size=%d Offset=%d:\n", size, offset);
 							//write(1, buffer, offset);
 							//write(1, buffer+offset, i_bytes - offset);
 							//write(1,"\n",1);

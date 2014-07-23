@@ -17,7 +17,7 @@ def showInfo(tray=None):
         if tray is not None:
             tray.showMessage(
                 'Render information:',
-                'No local render client founded.'
+                'No local render client found.'
             )
         return
 

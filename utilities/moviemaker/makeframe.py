@@ -109,7 +109,7 @@ if template != '':
         with open(template) as f:
             cmdlines = f.readlines()
     else:
-        print('Error: template file "%s" not founded' % template)
+        print('Error: template file "%s" not found' % template)
 
 # Resolution:
 Width = 0

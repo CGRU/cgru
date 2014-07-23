@@ -251,21 +251,21 @@ AFINFO("SysBlock::addTask:");
 
 	// Get the smallest task number:
 	int number = 0;
-	bool founded;
+	bool found;
 	for( ; number < af::Environment::getSysJobTasksMax(); number++)
 	{
-		founded = true;
+		found = true;
 		for( std::list<SysTask*>::iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
 		{
 			if((*it)->getNumber() == number)
 			{
-				founded = false;
+				found = false;
 				break;
 			}
 		}
-		if( founded ) break;
+		if( found ) break;
 	}
-	if( false == founded )
+	if( false == found )
 	{
 		std::string message = std::string("Can't find task number (max=") + af::itos(af::Environment::getSysJobTasksMax()) + ")";
 		AFCommon::QueueLogError( std::string("SysBlock::addTask: %s") + message.c_str());

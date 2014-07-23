@@ -449,7 +449,7 @@ class Dialog(QtGui.QWidget):
 
         layout = QtGui.QHBoxLayout()
         label = QtGui.QLabel('Files count:', self)
-        label.setToolTip('Files founded matching pattern.')
+        label.setToolTip('Files found matching pattern.')
         layout.addWidget(label)
         self.editInputFilesCount = QtGui.QLineEdit(self)
         self.editInputFilesCount.setEnabled(False)
@@ -1894,14 +1894,14 @@ class Dialog(QtGui.QWidget):
         if lgspath != '':
             if not os.path.isfile(lgspath):
                 if not os.path.isfile(os.path.join(LogosPath, lgspath)):
-                    self.cmdField.setText('No slate logo file founded')
+                    self.cmdField.setText('No slate logo file found')
                     return
 
         lgfpath = '%s' % self.fields['lgfpath'].text()
         if lgfpath != '':
             if not os.path.isfile(lgfpath):
                 if not os.path.isfile(os.path.join(LogosPath, lgfpath)):
-                    self.cmdField.setText('No frame logo file founded')
+                    self.cmdField.setText('No frame logo file found')
                     return
 
         cmd = 'makemovie.py'

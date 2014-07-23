@@ -309,7 +309,7 @@ function nw_MakeNews( i_news, i_args )
 		
 	if( msg.users.length == 0 )
 	{
-		c_Log('No subscribed users founded.');
+		c_Log('No subscribed users found.');
 		return;
 	}
 	var info = 'Subscibed users:';

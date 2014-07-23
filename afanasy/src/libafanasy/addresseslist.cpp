@@ -49,19 +49,19 @@ bool AddressesList::addAddress( const Address & address )
 
 bool AddressesList::removeAddress( const Address & address)
 {
-   bool founded = false;
+   bool found = false;
    for( std::list<Address>::iterator it = addresses.begin(); it != addresses.end(); )
    {
       if( address.equal(*it))
       {
          it = addresses.erase(it);
-         founded = true;
+         found = true;
       }
       else
          it++;
    }
 
-   return founded;
+   return found;
 }
 
 int AddressesList::calcWeight() const

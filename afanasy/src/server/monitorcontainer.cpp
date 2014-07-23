@@ -187,7 +187,7 @@ void MonitorContainer::dispatch()
       for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
       {
 			std::list<int32_t> ids;
-         bool founded = false;
+         bool found = false;
 
          std::list<int32_t>::const_iterator jIt = jobEvents[e].begin();
          std::list<int32_t>::const_iterator jIt_end = jobEvents[e].end();
@@ -197,13 +197,13 @@ void MonitorContainer::dispatch()
          {
             if( monitor->hasJobEvent( eventType, *uIt))
             {
-               if( !founded) founded = true;
+               if( !found) found = true;
 						ids.push_back( *jIt);
             }
             jIt++;
             uIt++;
          }
-         if( ! founded ) continue;
+         if( ! found ) continue;
 
 			if( monitor->collectingEvents())
 			{
@@ -386,16 +386,16 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
 	if( idscount < 1 ) return;
 
 	af::Msg * msg = new af::Msg;
-	bool founded = false;
+	bool found = false;
 	MonitorContainerIt mIt( this);
 	for( int i = 0; i < idscount; i++)
 	{
 		MonitorAf * monitor = mIt.getMonitor( mcgeneral.getId(i));
 		if( monitor == NULL) continue;
 		msg->addAddress( monitor);
-		if( !founded) founded = true;
+		if( !found) found = true;
 	}
-	if( founded)
+	if( found)
 	{
 		msg->setString( mcgeneral.getUserName() + ": " + mcgeneral.getString() );
 		ms_msg_queue->pushMsg( msg);

@@ -54,7 +54,7 @@ if len(Args) < 1:
 File = Args[0]
 
 if not os.path.isfile(File):
-    print('File not founded:')
+    print('File not found:')
     print(File)
     sys.exit(1)
 

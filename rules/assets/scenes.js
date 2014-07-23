@@ -379,7 +379,7 @@ function sc_FilterShots( i_args)
 	for( var th = 0; th < sc_elShots.length; th++)
 	{
 		var el = sc_elShots[th];
-		var founded = ( i_args == null );
+		var found = ( i_args == null );
 
 		if( el.m_status == null ) el.m_status = {};
 
@@ -388,64 +388,64 @@ function sc_FilterShots( i_args)
 			if( el.m_status.annotation )
 				for( var o = 0; o < anns.length; o++)
 				{
-					var founded_and = true;
+					var found_and = true;
 					for( var a = 0; a < anns[o].length; a++)
 					{
 						if( el.m_status.annotation.indexOf( anns[o][a]) == -1 )
 						{
-							founded_and = false;
+							found_and = false;
 							break;
 						}
 					}
-					if( founded_and )
+					if( found_and )
 					{
-						founded = true;
+						found = true;
 						break;
 					}
 				}
 		}
-		else founded = true;
+		else found = true;
 
-		if( i_args.tags && founded )
+		if( i_args.tags && found )
 		{
-			founded = false;
+			found = false;
 			if( el.m_status.tags )
 				for( i = 0; i < i_args.tags.length; i++ )
 					if( el.m_status.tags.indexOf( i_args.tags[i]) != -1 )
-						{ founded = true; break; }
+						{ found = true; break; }
 		}
 
-		if( i_args.artists && founded )
+		if( i_args.artists && found )
 		{
-			founded = false;
+			found = false;
 			if( el.m_status.artists )
 				for( i = 0; i < i_args.artists.length; i++ )
 					if( el.m_status.artists.indexOf( i_args.artists[i]) != -1 )
-						{ founded = true; break; }
+						{ found = true; break; }
 		}
 
-		if( i_args.percent && founded )
+		if( i_args.percent && found )
 		{
-			founded = false;
+			found = false;
 			if( el.m_status.progress &&
 				(( i_args.percent[0] == null ) || ( el.m_status.progress >= i_args.percent[0] )) &&
 				(( i_args.percent[1] == null ) || ( el.m_status.progress <= i_args.percent[1] )))
-				founded = true;
+				found = true;
 		}
 
-		if( i_args.finish && founded )
+		if( i_args.finish && found )
 		{
-			founded = false;
+			found = false;
 			if( el.m_status.finish )
 			{
 				var days = c_DT_DaysLeft( el.m_status.finish);
 				if( (( i_args.finish[0] == null ) ||  days >= i_args.finish[0] ) &&
 					(( i_args.finish[1] == null ) ||  days <= i_args.finish[1] ))
-					founded = true;
+					found = true;
 			}
 		}
 
-		if( founded )
+		if( found )
 		{
 			el.style.display = 'block';
 			el.m_hidden = false;

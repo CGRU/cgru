@@ -21,7 +21,7 @@ pythonver=$1
 if [ ! -z "$pythonver" ]; then
    pythondir=$PWD/$pythonver
    if [ ! -d "$pythondir" ]; then
-      echo "Error: No python '$pythondir' founded."
+      echo "Error: No python '$pythondir' found."
       exit 1
    fi
    export PATH=$pythondir/bin:$PATH

@@ -73,11 +73,11 @@ class events(service.service):
         #print(json.dumps(obj))
 
         if len(obj) == 0:
-            #print('No configured data founded.')
+            #print('No configured data found.')
             return
 
         if not 'events' in obj:
-            #print('No configured events founded.')
+            #print('No configured events found.')
             return
 
         email_events = []

@@ -133,16 +133,16 @@ function af_CheckScene()
 	}
 
 	// Check 3 - Ensure that at least 1 comp is queued
-	var founded = false;
+	var found = false;
 	for( i = 1; i <= app.project.renderQueue.numItems; i++ )
 	{
 		if( app.project.renderQueue.item( i ).status == RQItemStatus.QUEUED )
 		{
-			founded = true;
+			found = true;
 			break;
 		}
 	}
-	if( ! founded )
+	if( ! found )
 	{
 		alert('You do not have any items set to render.');
 		return false;

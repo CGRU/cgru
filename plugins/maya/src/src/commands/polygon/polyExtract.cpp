@@ -51,7 +51,7 @@ bool tm_polyExtract::extractFaces_Func( MSelectionList &selectionList, MStringAr
 	status = selectionList.getDependNode( 0, meshObj);
 	if(!status){MGlobal::displayError("tm_polyExtract::extractFaces_Func:   Can't find object !");return false;}
 	MFnMesh meshFn( meshObj, &status);
-	if(!status){MGlobal::displayError("tm_polyExtract::extractFaces_Func:   Non mesh object founded !");return false;}
+	if(!status){MGlobal::displayError("tm_polyExtract::extractFaces_Func:   Non mesh object found !");return false;}
 
 	MDagPath meshDagPath_first, meshDagPath;
 	selectionList.getDagPath( 0, meshDagPath_first);
@@ -66,7 +66,7 @@ bool tm_polyExtract::extractFaces_Func( MSelectionList &selectionList, MStringAr
 		faceComponentIter.getDagPath(meshDagPath, multiFaceComponent);
 		if(!(meshDagPath_first == meshDagPath))
 		{
-			MGlobal::displayError("tm_polyExtract::extractFaces_Func:   Different meshes faces founded !");
+			MGlobal::displayError("tm_polyExtract::extractFaces_Func:   Different meshes faces found !");
 			return false;
 		}
 		if (!multiFaceComponent.isNull())
@@ -85,7 +85,7 @@ bool tm_polyExtract::extractFaces_Func( MSelectionList &selectionList, MStringAr
 	}
 	if( inputFacesArray.length() == 0)
 	{
-		MGlobal::displayError("tm_polyExtract::extractFaces_Func:   No faces founded !");
+		MGlobal::displayError("tm_polyExtract::extractFaces_Func:   No faces found !");
 		return false;
 	}
 #ifdef _DEBUG

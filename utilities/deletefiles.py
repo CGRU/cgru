@@ -68,7 +68,7 @@ for file in args:
                 status = 1
     else:
         # No such file or directory:
-        print('Error: file(s) to delete not founded:')
+        print('Error: file(s) to delete not found:')
         print(file)
         status = 1
 
