@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
-import sys
-
 import cgruconfig
 import cgruutils
 
@@ -85,9 +82,9 @@ def findSeparator(path):
 def replaceSeparators(path, path_from, path_to):
     """Missing DocString
 
-    :param path: 
-    :param path_from: 
-    :param path_to: 
+    :param path:
+    :param path_from:
+    :param path_to:
     :return:
     """
     new_path = path

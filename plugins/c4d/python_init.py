@@ -1,22 +1,24 @@
+# -*- coding: utf-8 -*-
 import os
 import cgruutils
 
-
+c4d_plugin_folder = ''
 try:
     # Get the location of the C4D-Plugin-Folder
     c4d_plugin_folder = os.environ['C4D_PLUGIN_LOCATION']
-except:  # TODO: Too broad exception clause
-    print "ERROR: The variable C4D_PLUGIN_LOCATION is not set! So C4D will " \
-          "may not work properly!"
+except KeyError:
+    print("ERROR: The variable C4D_PLUGIN_LOCATION is not set! So C4D will "
+          "may not work properly!")
     exit()
 
+cgru_c4d_plugin_folder = ''
 try:
     # Get the location of the Plugin-Folders where to Plugins should get copied
     # from
     cgru_c4d_plugin_folder = os.environ['C4D_CGRU_SCRIPTS_LOCATION']
-except:  # TODO: Too broad exception clause
-    print "ERROR: The variable C4D_CGRU_SCRIPTS_LOCATION is not set! So C4D " \
-          "will may not work properly!"
+except KeyError:
+    print("ERROR: The variable C4D_CGRU_SCRIPTS_LOCATION is not set! So C4D "
+          "will may not work properly!")
     exit()
 
 
@@ -24,12 +26,13 @@ except:  # TODO: Too broad exception clause
 all_c4d_plugin_folders = [cgru_c4d_plugin_folder]
 
 try:
-    # Look if additional plugin folders are set and add them if that is the case
+    # Look if additional plugin folders are set
+    # and add them if that is the case
     cgru_additional_plugin_folders = \
         os.environ['C4D_ADDITIONAL_PLUGIN_FOLDERS']
     print(cgru_additional_plugin_folders)
     all_c4d_plugin_folders.extend(cgru_additional_plugin_folders.split(";"))
-except:  # TODO: Too broad exception clause
+except KeyError:
     pass
 
 # Give the user a some information about what is happening

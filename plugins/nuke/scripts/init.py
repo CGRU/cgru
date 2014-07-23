@@ -1,4 +1,7 @@
+# -*- coding: utf-8 -*-
+import os
+
 print('Starting CGRU Nuke add-ons from:')
-print( os.getenv('NUKE_CGRU_PATH'))
+print(os.getenv('NUKE_CGRU_PATH'))
 
 import cgru

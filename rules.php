@@ -1072,7 +1072,7 @@ function jsf_makenews( $i_args, &$o_out)
 
 	if( count( $users) == 0 )
 	{
-		$o_out['error'] = 'No users founded.';
+		$o_out['error'] = 'No users found.';
 		return;
 	}
 
@@ -1175,7 +1175,7 @@ function isAdmin( &$o_out)
 
 	if( false == array_key_exists('admins', $Groups))
 	{
-		$o_out['error'] = 'No admins group founded.';
+		$o_out['error'] = 'No admins group found.';
 		return false;
 	}
 

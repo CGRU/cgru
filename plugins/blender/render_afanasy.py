@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 bl_info = {
     "name": "Afanasy Farm Manager",
     "author": "Timur Hairulin <timurhai@gmail.com>",
@@ -290,9 +291,9 @@ class ORE_Submit(bpy.types.Operator):
                 set(['ERROR']),
                 'An error occurred while sending submission to Afanasy'
             )
-            return {'CANCELLED'}
+            return set(['CANCELLED'])
 
-        imp.reload(af)
+        imp.reload(af)  # TODO: imp.reload() does not exist in Python 3.x
 
         # Create a job:
         job = af.Job(jobname)
@@ -349,7 +350,7 @@ class ORE_Submit(bpy.types.Operator):
         #  Send job to server:
         job.send()
 
-        return {'FINISHED'}
+        return set(['FINISHED'])
 
 
 class Afanasy(bpy.types.RenderEngine):

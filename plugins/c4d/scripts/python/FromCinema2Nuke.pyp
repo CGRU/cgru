@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #######################################################################################################
 #  FromCinema2Nuke V1.0 - Date: 26.01.2017 - Created by Jan Oberhauser - jan.oberhauser@gmail.com     #
 #  Exports Polygon-Objects, Cameras, Lights and Locators to Nuke                                      #
@@ -74,7 +75,6 @@ class FromCinema2Nuke(plugins.CommandData):
 
         self.doc = None
 
-
     def Execute(self, doc):
         """Missing DocString
 
@@ -122,9 +122,8 @@ class FromCinema2Nuke(plugins.CommandData):
                 self.startExportProcedure()
         return True
 
-    #STARTS THE EXPORT PROCEDURE
     def startExportProcedure(self, arg=None):
-        """Missing DocString
+        """Starts the export procedure
 
         :param arg:
         :return:
@@ -140,31 +139,32 @@ class FromCinema2Nuke(plugins.CommandData):
             self.exportPath += '/'
 
         #Create export Folder if it does not exist
-        if (os.path.isdir(self.exportPath) == 0):
+        if os.path.isdir(self.exportPath) == 0:
             os.mkdir(self.exportPath)
 
-        self.readObjects()  #Reads in Objects in Lists
+        self.readObjects()  # Reads in Objects in Lists
 
-        self.exportObjects()  #Exports the Objects
-        self.exportCameras()  #Exports the Cameras
-        self.exportLights()  #Exports the Lights
-        self.exportLocators()  #Exports the Locators
+        self.exportObjects()  # Exports the Objects
+        self.exportCameras()  # Exports the Cameras
+        self.exportLights()  # Exports the Lights
+        self.exportLocators()  # Exports the Locators
 
         if self.createNukeScript is True:
-            self.createNukePythonFile()  #Creates the Nuke-File
+            self.createNukePythonFile()  # Creates the Nuke-File
 
         if self.deleteExport is True:
-            self.delteCameraFiles()  #Deletes the Camera-Files
-            self.delteLightFiles()  #Deletes the Light-Files
-            self.delteLocatorFile()  #Deletes the Locator-File
+            self.delteCameraFiles()  # Deletes the Camera-Files
+            self.delteLightFiles()  # Deletes the Light-Files
+            self.delteLocatorFile()  # Deletes the Locator-File
 
         if self.createNukeScript is True:
-            self.delteNukePythonFile()  #Deletes the Nuke-Python-File
+            self.delteNukePythonFile()  # Deletes the Nuke-Python-File
 
         if self.openNukeScript is True and self.createNukeScript is True:
-            self.openNukeScriptAfterwards()  #Open Nukescript
+            self.openNukeScriptAfterwards()  # Open Nukescript
 
-        #Goes back to the Frame it started, i think is not needed here because it runs the export in a seperate document
+        # Goes back to the Frame it started, i think is not needed here because
+        # it runs the export in a separate document
         self.doc.SetTime(c4d.BaseTime(timeScriptStart))
 
         #SHOW PARAMETER WINDOW
@@ -235,7 +235,6 @@ class FromCinema2Nuke(plugins.CommandData):
             c4d.documents.KillDocument(tempDoc)
 
             print('Exported: %s' % exportName)
-
 
     #EXPORT LOCATOR-DATA IN FILE
     def exportLocators(self):
@@ -373,8 +372,9 @@ class FromCinema2Nuke(plugins.CommandData):
     def createNukePythonFile(self):
         """Missing DocString
         """
-
         #Writes out the Import-Function
+        # TODO: Please use multi line string and get rid of all the newline characters
+        # TODO: Please use proper Python formatting to form the nukePyFile
         nukePyFile = "def importData(importFile, channelMatch):\n\
     #Open File\n\
     file = open(importFile, 'r')\n\
@@ -832,7 +832,7 @@ nuke.scriptSave( \'' + self.exportPath + self.nukeExportScriptName + '\')\n'
         subprocess.Popen([self.nukePath + self.nukeExec,
                           self.exportPath + self.nukeExportScriptName])
 
-
+    # TODO: This is very very weird to do, a class which is a method of another ???
     class fc2nExportWindow(c4d.gui.GeDialog):
         """Here starts the Class for the ParameterWindow
         """

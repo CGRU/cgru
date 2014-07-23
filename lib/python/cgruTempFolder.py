@@ -3,8 +3,8 @@ import tempfile
 
 import os
 import shutil
-import stat
-import sys
+# import stat
+# import sys
 import time
 import datetime
 import cgruutils
@@ -108,7 +108,8 @@ class cgruTempFolder(object):
                 print("The following Folder got deleted: %s" %
                       folder_to_delete)
         except:  # TODO: Too broad exception clause
-            # Then it seams that another task already deleted it in the meantime
+            # Then it seams that another task already deleted it in the
+            # meantime
             pass
 
         if self.debug:
@@ -140,7 +141,7 @@ class cgruTempFolder(object):
     def deleteOldLockFiles(self, folder_name):
         """Missing DocString
 
-        :param folder_name: 
+        :param folder_name:
         :return:
         """
         if os.path.isdir(folder_name):

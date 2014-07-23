@@ -1,20 +1,28 @@
 #!/bin/env python
+# -*- coding: utf-8 -*-
 
-import json, os, random, sys, shutil, time
+import os
+import sys
+import json
+import random
+import shutil
+import time
 
-import af, afnetwork
+import af
+import afnetwork
 
 JobNamePrefix = '_emulate_'
 JobUserPrefix = '_emuser_'
 TmpDir = '/tmp/afanasy_emulate'
-#OutputDir = '/var/tmp/afanasy'
+# OutputDir = '/var/tmp/afanasy'
 #TasksOutDir = JobNamePrefix+'/tasksoutput/'+JobNamePrefix
 
 ActionUser = 'jimmy'
 ActionHost = 'pc01'
-JobActions = ['stop','restart','delete']
+JobActions = ['stop', 'restart', 'delete']
 
 from optparse import OptionParser
+
 Parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
 Parser.add_option('-j', '--jobspack',  dest='jobspack',  type='int',   default=10,   help='jobs numbder in pack')
 Parser.add_option('-b', '--blocksnum', dest='blocksnum', type='int',   default=2,    help='blocks numbder in each job')
@@ -30,73 +38,77 @@ Parser.add_option(      '--nopost',    dest='nopost',    action='store_true', de
 Parser.add_option(      '--cleanup',   dest='cleanup',   action='store_true', default=False, help='cleanup mode')
 Options, Args = Parser.parse_args()
 
-def sendAction( i_type, i_mask, i_operation, i_params = None):
-	action = dict()
-	action['type'] = i_type
-	action['user_name'] = ActionUser
-	action['host_name'] = ActionHost
-	action['mask'] = i_mask
 
-	if i_operation is not None:
-		operation = dict()
-		operation['type'] = i_operation
-		action['operation'] = operation
+def sendAction(i_type, i_mask, i_operation, i_params=None):
+    action = dict()
+    action['type'] = i_type
+    action['user_name'] = ActionUser
+    action['host_name'] = ActionHost
+    action['mask'] = i_mask
 
-	if i_params is not None:
-		action['params'] = i_params
+    if i_operation is not None:
+        operation = dict()
+        operation['type'] = i_operation
+        action['operation'] = operation
 
-	afnetwork.sendServer( json.dumps( {'action': action}), False, False)
-	#print( json.dumps( {'action': action}))
+    if i_params is not None:
+        action['params'] = i_params
+
+    afnetwork.sendServer(json.dumps({'action': action}), False, False)
+
+
+#print( json.dumps( {'action': action}))
 
 def jobsDelete():
-	sendAction('jobs', JobNamePrefix+'.*', 'delete')
+    sendAction('jobs', JobNamePrefix + '.*', 'delete')
 
-def jobRandomAction( jobs):	
-	job = jobs[ int( len(jobs) * random.random())]
-	action = None
-	operation = None
-	if len(jobs) % 2 == 0:
-		action = JobActions[ int( len(JobActions) * random.random())]
-	else:
-		operation = {"priority": int(200*random.random())}
-	sendAction('jobs', job, action, operation)
+
+def jobRandomAction(jobs):
+    job = jobs[int(len(jobs) * random.random())]
+    action = None
+    operation = None
+    if len(jobs) % 2 == 0:
+        action = JobActions[int(len(JobActions) * random.random())]
+    else:
+        operation = {"priority": int(200 * random.random())}
+    sendAction('jobs', job, action, operation)
 
 # Temporary folder:
-if os.path.isdir( TmpDir):
-	shutil.rmtree( TmpDir)
+if os.path.isdir(TmpDir):
+    shutil.rmtree(TmpDir)
 
 # Cleanup previous tasks outputs:
 #if os.path.isdir( OutputDir):
-#	os.system('rm -rf %s.*' % TasksOutDir )
+#    os.system('rm -rf %s.*' % TasksOutDir )
 
 # Cleanup mode:
 if Options.cleanup:
-	print('Clean up completed.')
-	sys.exit(0)
+    print('Clean up completed.')
+    sys.exit(0)
 
-print('Jobs Pack	= %d' % Options.jobspack )
-print('Tasks Number = %d' % Options.tasksnum )
-if Options.nopost: print('No post command')
+print('Jobs Pack    = %d' % Options.jobspack)
+print('Tasks Number = %d' % Options.tasksnum)
+if Options.nopost:
+    print('No post command')
 
 # Create temporary folder:
-os.mkdir( TmpDir)
+os.mkdir(TmpDir)
 
 # Create a job template:
 job = af.Job()
-for b in range( 0, Options.blocksnum):
-	block = af.Block()
-	job.blocks.append( block)
-	block.setCapacity( Options.capacity)
-	if not Options.notasks:
-		block.setNumeric(1, Options.tasksnum)
-		block.setNonSequential()
-		cmd = 'task.py'
-		cmd = os.path.join( os.getcwd(), cmd)
-		cmd = 'python "%s"' % cmd
-		cmd += ' -s @#@ -e @#@ -t 1 @####@ @#####@ @#####@ @#####@'
-		block.setCommand( cmd, False)
-		block.setFiles(['file_a.@#@.@####@','file_b.@#@.@####@'])
-
+for b in range(0, Options.blocksnum):
+    block = af.Block()
+    job.blocks.append(block)
+    block.setCapacity(Options.capacity)
+    if not Options.notasks:
+        block.setNumeric(1, Options.tasksnum)
+        block.setNonSequential()
+        cmd = 'task.py'
+        cmd = os.path.join(os.getcwd(), cmd)
+        cmd = 'python "%s"' % cmd
+        cmd += ' -s @#@ -e @#@ -t 1 @####@ @#####@ @#####@ @#####@'
+        block.setCommand(cmd, False)
+        block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
 
 job.setNeedOS('')
 
@@ -105,55 +117,54 @@ user_num = 0
 period = 0
 deletion = 0
 jobs = []
-while( 1):
-	for j in range( 0, Options.jobspack):
-		jobname = '%(JobNamePrefix)s.%(period)d.%(counter)d' % vars()
-		username = '%(JobUserPrefix)s%(user_num)d' % vars()
-		output = 'Job = %(counter)d, user = %(username)s, period = %(period)d' % vars()
-		print( output)
-		tmpfile = TmpDir+'/'+jobname
+while True:
+    for j in range(0, Options.jobspack):
+        jobname = '%(JobNamePrefix)s.%(period)d.%(counter)d' % vars()
+        username = '%(JobUserPrefix)s%(user_num)d' % vars()
+        output = 'Job = %(counter)d, user = %(username)s, period = %(period)d' % vars()
+        print(output)
+        tmpfile = TmpDir + '/' + jobname
 
-		if Options.nopost:
-			job.data['command_post'] = '';
-		else:
-			file = open( tmpfile, 'w')
-			file.write( output)
-			file.close()
-			job.data['command_post'] = 'rm "%s"' % tmpfile;
+        if Options.nopost:
+            job.data['command_post'] = ''
+        else:
+            with open(tmpfile, 'w') as f:
+                f.write(output)
+            job.data['command_post'] = 'rm "%s"' % tmpfile
 
-		job.data['name'] = jobname
-		job.data['user_name'] = username
-		job.data['time_creation'] = int(time.time())
+        job.data['name'] = jobname
+        job.data['user_name'] = username
+        job.data['time_creation'] = int(time.time())
 
-		if not job.send():
-			print('Error creating a job, exiting.')
-			sys.exit(1)
+        if not job.send():
+            print('Error creating a job, exiting.')
+            sys.exit(1)
 
-		jobs.append( jobname)
+        jobs.append(jobname)
 
-#		if counter % 11 == 0: jobRandomAction( jobs);
-		jobRandomAction( jobs);
+        # if counter % 11 == 0:
+        #     jobRandomAction( jobs);
+        jobRandomAction(jobs)
 
-		user_num += 1
-		if user_num >= Options.usersnum:
-			user_num = 0
+        user_num += 1
+        if user_num >= Options.usersnum:
+            user_num = 0
 
-		counter += 1
+        counter += 1
 
-	time.sleep( Options.cycletime )
+    time.sleep(Options.cycletime)
 
-	period += 1
-	if period >= Options.periods:
-		period = 0
-		deletion += 1
-		if deletion >= Options.delperiod:
-			deletion = 0
-			print('Deleting Jobs.')
-			for d in range(0,10):
-				jobsDelete()
-				time.sleep(1.0)
-			jobs = []
-		else:
-			print('Pause...')
-			time.sleep( Options.pausetime)
-
+    period += 1
+    if period >= Options.periods:
+        period = 0
+        deletion += 1
+        if deletion >= Options.delperiod:
+            deletion = 0
+            print('Deleting Jobs.')
+            for d in range(0, 10):
+                jobsDelete()
+                time.sleep(1.0)
+            jobs = []
+        else:
+            print('Pause...')
+            time.sleep(Options.pausetime)

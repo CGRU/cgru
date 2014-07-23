@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
   maya_ui_proc.py
 

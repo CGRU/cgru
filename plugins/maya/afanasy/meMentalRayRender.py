@@ -1,18 +1,19 @@
+# -*- coding: utf-8 -*-
 """
   meMentalRayRender
-  
+
   ver.0.4.8 (21 Jun 2013)
     - during .mi generation, "output image" set to "3"/"n" (nopath) for "relative" case, 
       because it will be overriden by "-file_dir",
       but mrs 3.11 still use directory name from "filename"
-    
+
   ver.0.4.7 (28 May 2013)
     - fixed small bugs with deffered generation
     - check if mentalRay is current renderer
-    
+
   ver.0.4.6 (7 Feb 2013) 
     - minor bug with single masterLayer case for deferred migen
-    
+
   ver.0.4.5 (29 Jan 2013) 
     - distributed render support
   ver.0.4.4 (28 Jan 2013) 
@@ -60,17 +61,17 @@
 
   Usage:
   You can add this code as shelf button :
-   
+
   import meTools.meMentalRayRender as meMentalRayRender
   reload( meMentalRayRender )
   meMentalRayRender = meMentalRayRender.meMentalRayRender()
-  
-  Important!!! 
-  Do not use another object name. 
+
+  Important!!!
+  Do not use another object name.
   Only meMentalRayRender.renderLayerSelected() will work with script job.
 
   For using with Afanasy, add %AF_ROOT%\plugins\maya\python to %PYTHONPATH%
-  
+
 """
 import sys, os, string
 import maya.OpenMaya as OpenMaya

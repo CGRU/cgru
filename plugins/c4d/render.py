@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import subprocess
 import sys
@@ -12,7 +13,7 @@ import cgruTempFolder
 def error_exit(msg):
     """Missing DocString
 
-    :param msg: 
+    :param msg:
     :return:
     """
     print("ERROR: %s" % msg)
@@ -28,12 +29,12 @@ def error_exit(msg):
 parameters = sys.argv
 
 
-# Get hust the parameters needed, all the other ones get passed directly to c4d
+# Get just the parameters needed, all the other ones get passed directly to c4d
 # and let it take care about it
 try:
     parameters.index("-debug")
     debug = True
-except:  # TODO: Too broad exception clause
+except ValueError:
     debug = False
 
 scene_file_path = parameters[parameters.index("-render") + 1]
@@ -102,27 +103,32 @@ parameters = sys.argv
 parameters[0] = "c4d"
 parameters[parameters.index("-render") + 1] = temp_scene_file_path
 
-output_overwrite = False
+
 # If image-output-overwrite is set then redirect it to local Output-Folder
+output_overwrite = False
 try:
     output_overwrite = parameters[parameters.index("-oimage") + 1]
-    (oimage_overwrite_folder, oimage_overwrite_filename) = os.path.split(
-        output_overwrite)
-    parameters[parameters.index("-oimage") + 1] = os.path.join(
-        temp_output_folder, oimage_overwrite_filename)
-except:  # TODO: Too broad exception clause
+
+    oimage_overwrite_folder, oimage_overwrite_filename = \
+        os.path.split(output_overwrite)
+
+    parameters[parameters.index("-oimage") + 1] = \
+        os.path.join(temp_output_folder, oimage_overwrite_filename)
+
+except ValueError:
     oimage_overwrite_folder = False
 
 
 # If image-omultipass-overwrite is set then redirect it to local Output-Folder
 try:
     output_overwrite = parameters[parameters.index("-omultipass") + 1]
+
     omultipass_overwrite_folder, omultipass_overwrite_filename = \
         os.path.split(output_overwrite)
 
     parameters[parameters.index("-omultipass") + 1] = \
         os.path.join(temp_output_folder, omultipass_overwrite_filename)
-except:  # TODO: Too broad exception clause
+except ValueError:
     omultipass_overwrite_folder = False
 
 
@@ -165,9 +171,8 @@ while True:
 #process.wait()
 
 
-copied_files = 0
 # Now copy the rendered files to the server
-
+output_folder = ''
 if output_overwrite:
     # When the output got overwritten copy it where it was defined by the used
     # by the overwrite

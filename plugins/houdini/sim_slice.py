@@ -1,4 +1,5 @@
 #!/usr/bin/env hython
+# -*- coding: utf-8 -*-
 
 import os
 from optparse import OptionParser
@@ -13,43 +14,45 @@ parser.add_option("-c", "--slice",     dest="slice",     type="int",    help="sl
 (options, args) = parser.parse_args()
 
 if len(args) < 2:
-   parser.error( "At least one of mandatory rop_name or hip_name argument is missed.")
+    parser.error(
+        "At least one of mandatory rop_name or hip_name argument is missed.")
 elif len(args) > 2:
-   parser.error( "Too many arguments provided.")
+    parser.error("Too many arguments provided.")
 else:
-   hip = args[0]
-   rop = args[1]
+    hip = args[0]
+    rop = args[1]
 
-start    = options.start
-end      = options.end
-take     = options.take
-slice    = options.slice
+start = options.start
+end   = options.end
+take  = options.take
+slice = options.slice
 
-hou.hipFile.load(hip,True)
+hou.hipFile.load(hip, True)
 
 # Establish ROP to be used
 if rop[0] != "/":
-   rop = "/out/" + rop
-ropnode = hou.node( rop)
-if ropnode == None:
-   raise hou.InvalidNodeName( rop + " rop node wasn't found")
+    rop = "/out/%s" % rop
+ropnode = hou.node(rop)
+
+if ropnode is None:
+    raise hou.InvalidNodeName(rop + " rop node wasn't found")
 
 # Trying to set ROP to output progress
 drivertypename = ropnode.type().name()
 
-if take != None and len(take) > 0:
-   hou.hscript("takeset " + take)
+if take is not None and len(take) > 0:
+    hou.hscript("takeset " + take)
 
 # If end wasn't specified, render single frame
-if end == None:
-   end = start
+if end is None:
+    end = start
 
 os.putenv("AF_SLICE", str(slice))
 os.putenv("AF_TRPORT", str(18000))
 os.putenv("AF_TRADDRESS", 'localhost')
 
-ropnode.render((start,end))
-#while frame <= end:
+ropnode.render((start, end))
+# while frame <= end:
 #   print parsers.hbatch.keyframe + str(frame)
 #   sys.stdout.flush()
 #   frame += by

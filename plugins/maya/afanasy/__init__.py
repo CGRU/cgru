@@ -5,7 +5,6 @@ import time
 import logging
 
 import pymel.core as pm
-import subprocess
 
 
 logger = logging.getLogger(__name__)

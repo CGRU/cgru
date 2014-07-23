@@ -1,4 +1,5 @@
-﻿"""
+﻿# -*- coding: utf-8 -*-
+"""
 meCheckTexturePaths
 
 ver.1.0.5 5 May 2014
