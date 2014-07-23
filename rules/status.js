@@ -116,27 +116,17 @@ Status.prototype.show = function( i_status)
 		this.elEdit = null;
 	}
 
-	if( this.elTasks )
-		this.showTasks();
+//	if( this.elTasks )
+//		this.showTasks();
 
-	if( this.elReports )
-		this.showReports();
-}
-Status.prototype.showReports = function()
-{
-	this.elReports.textContent = '';
-	if(( this.obj == null )
-	|| ( this.obj.reports == null )
-	|| ( this.obj.reports.length == 0 ))
-	{
-		this.elReportsDiv.style.display = 'none';
-		return;
-	}
-	else
-		this.elReportsDiv.style.display = 'block';
+	var args = {};
+	args.statuses = [this.obj];
+	args.elReports = this.elReports;
+	args.elReportsDiv = this.elReportsDiv;
+	args.elTasks = this.elTasks;
+	args.elTasksDiv = this.elTasksDiv;
 
-	stsc_Show({"reports":this.obj.reports,"elReports":this.elReports});
-//console.log( JSON.stringify( RULES.status.reports));
+	stsc_Show( args);
 }
 Status.prototype.showTasks = function()
 {
