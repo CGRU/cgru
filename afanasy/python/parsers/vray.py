@@ -3,9 +3,9 @@ from parsers import parser
 import re
 
 re_frame = re.compile(
-    r'SCEN.*(progr: begin scene preprocessing for frame )([0-9]{1,})'
+    r'SCEN.*(progr: begin scene preprocessing for frame )([0-9]+)'
 )
-re_number = re.compile(r'[0-9]{1,}')
+re_number = re.compile(r'[0-9]+')
 re_percent = re.compile(
     r'Rendering image...:([ ]{,})([0-9]{1,2}.*)(%[ ]{,}).*'
 )

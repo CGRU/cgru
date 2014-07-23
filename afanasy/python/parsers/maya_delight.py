@@ -4,7 +4,7 @@ from parsers import parser
 
 import re
 
-re_frame = re.compile(r'Frame ([0-9]{1,})(: caching geometry:)')
+re_frame = re.compile(r'Frame ([0-9]+)(: caching geometry:)')
 
 # NOTE: This is heavily based on the 'xsi' parser.
 # NOTE: This does not support 'percentframe',

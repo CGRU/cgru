@@ -5,14 +5,14 @@ from parsers import parser
 import re
 
 re_frame = re.compile(
-    r'SCEN.*(progr: begin scene preprocessing for frame )([0-9]{1,})'
+    r'SCEN.*(progr: begin scene preprocessing for frame )([0-9]+)'
 )
 
 re_percent = re.compile(
     r'JOB.*progr:([ ]{,})([0-9]{1,2}.*)(%[ ]{,})(rendered on).*'
 )
 
-re_number = re.compile(r'[0-9]{1,}')
+re_number = re.compile(r'[0-9]+')
 
 
 class mentalray(parser.parser):

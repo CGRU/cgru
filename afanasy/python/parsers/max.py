@@ -4,9 +4,9 @@ from parsers import parser
 
 import re
 
-re_frame = re.compile(r'Frame [0-9]{1,} completed')
-re_percent = re.compile(r'progr:[ ]{,}[0-9]{1,2}.*%[ ]{,}rendered')
-re_number = re.compile(r'[0-9]{1,}')
+re_frame = re.compile(r'Frame [0-9]+ completed')
+re_percent = re.compile(r'progr:[ ]+[0-9]{1,2}.*%[ ]{,}rendered')
+re_number = re.compile(r'[0-9]+')
 
 Errors = ['Error occured while rendering job.']
 

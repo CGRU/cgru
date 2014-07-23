@@ -22,7 +22,7 @@ class Dialog(QtGui.QWidget):
                                QtCore.SIGNAL('textEdited(QString)'),
                                self.evaluate)
 
-        self.lePattern = QtGui.QLineEdit('((render|workstation)0[1-4]{1,})',
+        self.lePattern = QtGui.QLineEdit('((render|workstation)0[1-4]+)',
                                          self)
         layout.addWidget(self.lePattern)
         QtCore.QObject.connect(self.lePattern,

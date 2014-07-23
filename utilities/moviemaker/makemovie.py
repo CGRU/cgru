@@ -332,7 +332,7 @@ def getImages(inpattern):
     if padding > 1:
         expr = r'%(eprefix)s([0-9]{%(padding)s,%(padding)s})%(esuffix)s$' % vars()
     else:
-        expr = r'%(eprefix)s([0-9]{1,})%(esuffix)s$' % vars()
+        expr = r'%(eprefix)s([0-9]+)%(esuffix)s$' % vars()
 
     if Verbose:
         print('Expression = ' + expr)

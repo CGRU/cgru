@@ -717,7 +717,7 @@ if __name__ == '__main__':
 
         cmd += ' -sceneFile="%s"' % scene
 
-        if re.search(r'@#{1,}@', scene) is None:
+        if re.search(r'@#+@', scene) is None:
             cmd += ' -frames=@#@-@#@,' + str(by)
 
         if output != '':
