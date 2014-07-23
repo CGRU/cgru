@@ -1,3 +1,5 @@
+import os
+
 # Add CGRU to main window menu:
 cgru_menu = nuke.menu('Nuke').addMenu('CGRU')
 
@@ -17,4 +19,6 @@ cgru_menu.addCommand("-", "", "")
 cgru_menu.addCommand('Documentation', 'cgru.docsNuke()')
 
 # Add afanasy gizmo to nodes:
-nuke.menu('Nodes').addCommand('CGRU/afanasy', 'nuke.createNode("afanasy")', '')
+icons = os.path.join( os.environ['CGRU_LOCATION'],'icons')
+nuke.menu('Nodes').addMenu('CGRU', icon=os.path.join(icons,'keeper.png'))
+nuke.menu('Nodes').addCommand('CGRU/afanasy', 'nuke.createNode("afanasy")', icon=os.path.join(icons,'afanasy.png'))

@@ -1,6 +1,6 @@
 <style type="text/css">
 
-#scenes_ctrl_panel { float: right; margin: 2px 8px; font-size: 14px; }
+#scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
 
 .shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 6px; box-shadow: 0 0 4px #000 inset; margin: 4px;}
@@ -67,9 +67,20 @@ opacity:.9;
 
 </style>
 
-<div id="scenes_info" style="float: left; margin: 4px 12px;"></div>
+<div id="scenes_info" style="-float:left; margin: 4px 12px;"></div>
 
-<div id="scenes_ctrl_panel">
+<div>
+	<div id="scenes_reports_div" style="float:right; margin:4px; padding:2px; border:1px solid #777">
+		Reports:
+		<div id="scenes_reports" style="margin: 4px;"></div>
+	</div>
+	<div id="scenes_tasks_div" style="-float:right; margin:4px; padding:2px; border:1px solid #777">
+		Tasks:
+		<div id="scenes_tasks" style="margin: 4px;"></div>
+	</div>
+</div>
+
+<div id="scenes_ctrl_panel" style="clear:both;">
 	<div style="box-shadow: 0 0 2px #000 inset; font-size: 12px;">
 		<div>Select:</div>
 		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
@@ -78,8 +89,6 @@ opacity:.9;
 	</div>
 	<div class="button" onclick="scenes_Put()" title="Put Shots Results">Put</div>
 </div>
-
-<div id="scenes_reports" style="margin: 4px; padding: 4px; clear:both"></div>
 
 <div style="clear:both" id="scenes_div"></div>
 

@@ -183,7 +183,7 @@ Comment.prototype.init = function()
 //console.log( g_auth_user.id + ' ' + this.obj.user_name );
 	if( g_auth_user )
 	{
-		if( g_admin || ( this.obj.user_name == g_auth_user.id ))
+		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
 			this.elEdit.style.display = 'block';
 
 		// If this is a new comment or and own old:
