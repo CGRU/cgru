@@ -64,7 +64,7 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/DPX"]
+			"path":["RESULT/JPG","RESULT/DPX","RESULT/TIF"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
