@@ -8,20 +8,35 @@
 "cache_time":300,
 
 "tags":{
-	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
+	"started" :{"title":"START",    "short":"St",  "tip":"Started"},
 	"error"   :{"title":"ERROR",    "short":"Err", "tip":"Error"},
 	"hold"    :{"title":"HOLD",     "short":"Hl",  "tip":"On hold"},
 	"omit"    :{"title":"OMIT",     "short":"Om",  "tip":"Omit"},
-	"started" :{"title":"Started",  "short":"St",  "tip":"Started"},
+	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
+
 	"wirem"   :{"title":"WiRem",    "short":"WR",  "tip":"Wire remove"},
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
 	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
 	"back"    :{"title":"Back",     "short":"Bk",  "tip":"Back placement"},
 	"cleanup" :{"title":"CleanUp",  "short":"Cl",  "tip":"Cleanup"},
-	"animatic":{"title":"Animatic", "short":"An",  "tip":"Animiatic"},
+	"comp"    :{"title":"Comp",     "short":"Cp",  "tip":"Compositing"},
+
+	"concept" :{"title":"Concept",  "short":"Cc",  "tip":"Concept"},
+	"paint"   :{"title":"Paint",    "short":"Pt",  "tip":"Painting"},
+	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte Painting"},
+	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
+
+	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
+	"anim"    :{"title":"Anim",     "short":"Am",  "tip":"Animation"},
+	"track"   :{"title":"Track",    "short":"Tr",  "tip":"Tracking"},
+	"sim"     :{"title":"Sim",      "short":"Sm",  "tip":"Simulating"},
+	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
+
+	"animatic":{"title":"Animatic", "short":"Ac",  "tip":"Animiatic"},
 	"fullcg"  :{"title":"FullCG",   "short":"FCG", "tip":"Full CG Shot"},
-	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"},
-	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"}
+	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"},
+
+	"other"   :{"title":"Other",    "short":"Ot",  "tip":"Something else"}
 },
 
 "comments":{
