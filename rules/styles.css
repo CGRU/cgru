@@ -352,11 +352,15 @@ padding: 4px;
 .status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
 .status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
+.status_edit .edit_tasks .task .button { clear: both; float: left; padding: 0px 4px; }
+.status_edit .edit_tasks .task .dur_div { float: left; }
+.status_edit .edit_tasks .task .dur_label { float: left; }
+.status_edit .edit_tasks .task .duration { width: 40px; float: left; }
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }
-table.statistics td { border: 1px solid #777; border-right-width: 0; padding: 1px 4px; }
-table.statistics .duration { text-align: center; }
+table.statistics td { border: 1px solid #777; border-right-width: 0; padding: 1px 8px; }
+table.statistics .duration { text-align: center; border-left-width: 0; }
 
 #search {
 margin: 4px 0 0 0;

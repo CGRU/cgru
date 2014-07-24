@@ -5,8 +5,8 @@ sc_elCurShot = null;
 sc_elImgThumbs = [];
 
 sc_thumb_params = {};
-sc_thumb_params.force_update = {"width":'30%',"lwidth":'150px',"bool":false};
-sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px',"bool":true};
+sc_thumb_params.force_update = {"width":'30%',"lwidth":'150px',"bool":false,"tooltip":'Update or skip existing thumbnails'};
+sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px',"bool":true,"tooltip":'Do not create thumbnails from movie files'};
 
 sc_thumb_params_values = {};
 
