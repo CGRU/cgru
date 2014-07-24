@@ -353,6 +353,11 @@ padding: 4px;
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
 .status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
 
+table.statistics { border-collapse: collapse; }
+table.statistics th { font-weight: normal; font-style: italic; }
+table.statistics td { border: 1px solid #777; border-right-width: 0; padding: 1px 4px; }
+table.statistics .duration { text-align: center; }
+
 #search {
 margin: 4px 0 0 0;
 box-shadow: 0 0 4px #000000 inset;

@@ -14,6 +14,9 @@
 .shot .status .tags { float: left; margin-right: 5px; }
 .shot .status .progressbar { clear: both; height: 8px; }
 
+#scenes_tasks .task { margin: 2px; border: 1px solid #777; }
+#scenes_tasks .task > div { float: left; margin: 2px 4px; }
+
 .scene { padding: 4px; }
 .scene a { color: inherit; /*display:block;*/ }
 .scene a:hover { color: #AFF;}
@@ -67,20 +70,7 @@ opacity:.9;
 
 </style>
 
-<div id="scenes_info" style="-float:left; margin: 4px 12px;"></div>
-
-<div>
-	<div id="scenes_reports_div" style="float:right; margin:4px; padding:2px; border:1px solid #777">
-		Reports:
-		<div id="scenes_reports" style="margin: 4px;"></div>
-	</div>
-	<div id="scenes_tasks_div" style="-float:right; margin:4px; padding:2px; border:1px solid #777">
-		Tasks:
-		<div id="scenes_tasks" style="margin: 4px;"></div>
-	</div>
-</div>
-
-<div id="scenes_ctrl_panel" style="clear:both;">
+<div id="scenes_ctrl_panel" style="float:right;">
 	<div style="box-shadow: 0 0 2px #000 inset; font-size: 12px;">
 		<div>Select:</div>
 		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
@@ -90,10 +80,21 @@ opacity:.9;
 	<div class="button" onclick="scenes_Put()" title="Put Shots Results">Put</div>
 </div>
 
+<div id="scenes_info" style="-float:left; margin: 4px 12px;"></div>
+
 <div style="clear:both" id="scenes_div"></div>
 
 <div id="scenes_make_thumbnails" style="border:1px solid #777; margin: 4px; border-radius: 4px">
 	<div class="button" style="float: right;" onclick="scenes_makeThumbnails()">Make</div>
 	<div style="float: left; padding: 4px">Thumbnails:</div>
+</div>
+
+<div id="scenes_tasks_div" style="-float:right; margin:4px; padding:2px; border:1px solid #777">
+	Tasks:
+	<div id="scenes_tasks" style="margin: 4px;"></div>
+</div>
+<div id="scenes_reports_div" style="-float:right; margin:4px; padding:2px; border:1px solid #777">
+	Reports:
+	<div id="scenes_reports" style="margin: 4px;"></div>
 </div>
 
