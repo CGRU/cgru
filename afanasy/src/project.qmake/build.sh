@@ -63,14 +63,14 @@ if [ -z "$QMAKE" ]; then
    if ! qts=`which $QMAKE`; then
       QMAKE=qmake
       if ! qts=`which $QMAKE`; then
-         echo "ERROR: qmake not founded."
+         echo "ERROR: qmake not found."
          exit 1
       fi
    fi
    for qt in $qts; do QMAKE=$qt; break; done
 fi
 if [ ! -f "$QMAKE" ]; then
-   echo "ERROR: qmake not founded."
+   echo "ERROR: qmake not found."
    exit 1
 fi
 echo "qmake = '$QMAKE'"

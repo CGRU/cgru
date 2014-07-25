@@ -378,7 +378,7 @@ Monitor.prototype.processMsg = function( obj)
 
 	for( var j = 0; j < nodes.length; j++)
 	{
-		founded = false;
+		found = false;
 		for( var i = 0; i < this.items.length; i++)
 		{
 			if( this.items[i].params.id == nodes[j].id )
@@ -386,11 +386,11 @@ Monitor.prototype.processMsg = function( obj)
 				this.items[i].update( nodes[j]);
 				updated.push( this.items[i]);
 				this.filterItem( this.items[i]);
-				founded = true;
+				found = true;
 				break;
 			}
 		}
-		if( founded == false )
+		if( found == false )
 			new_ids.push(j);
 	}
 

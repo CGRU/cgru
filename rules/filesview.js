@@ -880,6 +880,6 @@ function fv_Goto( i_path )
 			return;
 		}
 	}
-	c_Error('Item not founded: ' + i_path);
+	c_Error('Item not found: ' + i_path);
 }
 

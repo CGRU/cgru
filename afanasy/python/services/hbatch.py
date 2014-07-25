@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='hbatch'
+parser = 'hbatch'
+
 
 class hbatch(service.service):
-   'Houdini batch'
+	"""Houdini batch
+	"""
+	pass

@@ -371,7 +371,7 @@ function sc_FilterShots( i_args)
 
 	for( var th = 0; th < sc_elShots.length; th++)
 	{
-		var founded = ( i_args == null );
+		var found = ( i_args == null );
 
 		var el = sc_elShots[th];
 		var st_obj = {};
@@ -383,64 +383,64 @@ function sc_FilterShots( i_args)
 			if( st_obj.annotation )
 				for( var o = 0; o < anns.length; o++)
 				{
-					var founded_and = true;
+					var found_and = true;
 					for( var a = 0; a < anns[o].length; a++)
 					{
 						if( st_obj.annotation.indexOf( anns[o][a]) == -1 )
 						{
-							founded_and = false;
+							found_and = false;
 							break;
 						}
 					}
-					if( founded_and )
+					if( found_and )
 					{
-						founded = true;
+						found = true;
 						break;
 					}
 				}
 		}
-		else founded = true;
+		else found = true;
 
-		if( i_args.tags && founded )
+		if( i_args.tags && found )
 		{
-			founded = false;
+			found = false;
 			if( st_obj.tags )
 				for( i = 0; i < i_args.tags.length; i++ )
 					if( st_obj.tags.indexOf( i_args.tags[i]) != -1 )
-						{ founded = true; break; }
+						{ found = true; break; }
 		}
 
-		if( i_args.artists && founded )
+		if( i_args.artists && found )
 		{
-			founded = false;
+			found = false;
 			if( st_obj.artists )
 				for( i = 0; i < i_args.artists.length; i++ )
 					if( st_obj.artists.indexOf( i_args.artists[i]) != -1 )
-						{ founded = true; break; }
+						{ found = true; break; }
 		}
 
-		if( i_args.percent && founded )
+		if( i_args.percent && found )
 		{
-			founded = false;
+			found = false;
 			if( st_obj.progress &&
 				(( i_args.percent[0] == null ) || ( st_obj.progress >= i_args.percent[0] )) &&
 				(( i_args.percent[1] == null ) || ( st_obj.progress <= i_args.percent[1] )))
-				founded = true;
+				found = true;
 		}
 
-		if( i_args.finish && founded )
+		if( i_args.finish && found )
 		{
-			founded = false;
+			found = false;
 			if( st_obj.finish )
 			{
 				var days = c_DT_DaysLeft( st_obj.finish);
 				if( (( i_args.finish[0] == null ) ||  days >= i_args.finish[0] ) &&
 					(( i_args.finish[1] == null ) ||  days <= i_args.finish[1] ))
-					founded = true;
+					found = true;
 			}
 		}
 
-		if( founded )
+		if( found )
 		{
 			el.style.display = 'block';
 			el.m_hidden = false;

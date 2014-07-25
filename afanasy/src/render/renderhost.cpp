@@ -229,7 +229,7 @@ void RenderHost::windowsMustDie()
         HWND WINAPI hw = FindWindow( NULL, TEXT( ms_windowsmustdie[i].c_str()));
         if( hw != NULL )
         {
-            printf("Window must die founded:\n%s\n", ms_windowsmustdie[i].c_str());
+            printf("Window must die found:\n%s\n", ms_windowsmustdie[i].c_str());
             SendMessage( hw, WM_CLOSE, 0, 0);
         }
     }

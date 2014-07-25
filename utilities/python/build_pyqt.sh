@@ -26,7 +26,7 @@ if [ ! -d "$qt" ]; then
    qt=`dirname $PWD`/qt/$qtver
 fi
 if [ ! -d "$qt" ]; then
-   echo "Error: No Qt '$qt' founded."
+   echo "Error: No Qt '$qt' found."
    exit 1
 fi
 export PATH=$qt/bin:$PATH
@@ -41,7 +41,7 @@ pythonver=$2
 if [ ! -z "$pythonver" ]; then
    pythondir=$PWD/$pythonver
    if [ ! -d "$pythondir" ]; then
-      echo "Error: No python '$pythondir' founded."
+      echo "Error: No python '$pythondir' found."
       exit 1
    fi
    export PATH=$pythondir/bin:$PATH

@@ -8,7 +8,7 @@ bool tm_polygon::edgesToRing_Func( MIntArray &edgesArray, MSelectionList &select
 	status = selectionList.getDependNode( 0, meshObj);
 	if(!status){MGlobal::displayError("###***   Can't find object !");return false;}
 	MFnMesh meshFn( meshObj, &status);
-	if(!status){MGlobal::displayError("###***   Non mesh object founded !");return false;}
+	if(!status){MGlobal::displayError("###***   Non mesh object found !");return false;}
 
 	MDagPath meshDagPath_first, meshDagPath;
 	selectionList.getDagPath( 0, meshDagPath_first);
@@ -19,7 +19,7 @@ bool tm_polygon::edgesToRing_Func( MIntArray &edgesArray, MSelectionList &select
 		edgeComponentIter.getDagPath(meshDagPath, multiEdgeComponent);
 		if(!(meshDagPath_first == meshDagPath))
 		{
-			MGlobal::displayError("###***   Different meshes edges founded !");
+			MGlobal::displayError("###***   Different meshes edges found !");
 			return false;
 		}
 		if (!multiEdgeComponent.isNull())

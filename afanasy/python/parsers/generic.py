@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from parsers import parser
 
 FRAME = 'FRAME: '
@@ -7,13 +9,22 @@ ACTIVITY = 'ACTIVITY: '
 PERCENT_len = len(PERCENT)
 ACTIVITY_len = len(ACTIVITY)
 
+
 class generic(parser.parser):
-	'Simple generic parser'
-	def __init__( self):
-		parser.parser.__init__( self)
+	"""Simple generic parser
+	"""
+
+	def __init__(self):
+		parser.parser.__init__(self)
 		self.firstframe = True
 
-	def do( self, data, mode):
+	def do(self, data, mode):
+		"""Missing DocString
+
+		:param data:
+		:param mode:
+		:return:
+		"""
 		needcalc = False
 
 		if data.rfind(FRAME) > -1:
@@ -34,6 +45,7 @@ class generic(parser.parser):
 		activity_pos = data.rfind(ACTIVITY)
 		if activity_pos > -1:
 			activity_pos += ACTIVITY_len
-			self.activity = data[ activity_pos : data.find('\n', activity_pos) ]
+			self.activity = data[activity_pos: data.find('\n', activity_pos)]
 
-		if( needcalc ): self.calculate()
+		if needcalc:
+			self.calculate()

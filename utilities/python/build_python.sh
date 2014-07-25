@@ -7,7 +7,7 @@ pythonver=$1
 
 pythonsrc=Python-$pythonver$options
 if [ ! -d "$pythonsrc" ]; then
-   echo "Error: No python sources '$pythonsrc' founded."
+   echo "Error: No python sources '$pythonsrc' found."
    exit 1
 fi
 

@@ -408,7 +408,7 @@ function p_GetCurrentShots()
 {
 	if( p_elCurFolder == null )
 	{
-		c_Error('Current folder not founded.');
+		c_Error('Current folder not found.');
 		return;
 	}
 	if( p_elCurFolder.m_elArray == null )
@@ -446,7 +446,7 @@ function p_MakeCut()
 
 	if( p_elCurFolder == null )
 	{
-		c_Error('Current folder not founded.');
+		c_Error('Current folder not found.');
 		return;
 	}
 	if( p_elCurFolder.m_elArray == null )
@@ -482,7 +482,7 @@ function p_Put()
 
 	if( p_elCurFolder == null )
 	{
-		c_Error('Current folder not founded.');
+		c_Error('Current folder not found.');
 		return;
 	}
 	if( p_elCurFolder.m_elArray == null )

@@ -122,14 +122,14 @@ int joinEXRs( int tilesX, int tilesY, const char* baseName, bool deleteTiles, bo
       }
       else
       {
-         fprintf( stderr, "Error: File '%s' not founded.\n", tileNames[i]); fflush( stderr);
+         fprintf( stderr, "Error: File '%s' not found.\n", tileNames[i]); fflush( stderr);
          exitCode = 1;
       }
    }
 
    if( nonEmptyTile < 0) // All tiles were empty
    {
-      fprintf( stderr, "Error: No tile files founded.\n"); fflush( stderr);
+      fprintf( stderr, "Error: No tile files found.\n"); fflush( stderr);
    }
    else
    {

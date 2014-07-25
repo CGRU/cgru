@@ -79,7 +79,7 @@ bool Auth::process( const af::Msg * i_msg, af::Msg ** o_msg)
 //printf("Auth::process: searching for nonce = %s, auth.size = %zd\n", nonce.c_str(), ms_map.size());
 			if( it != ms_map.end())
 			{
-//printf("Auth::process: nonce = %s FOUNDED!\n", nonce.c_str());
+//printf("Auth::process: nonce = %s FOUND!\n", nonce.c_str());
 				if((*it).second.check( obj, i_msg->getAddress()))
 					access = true;
 			}

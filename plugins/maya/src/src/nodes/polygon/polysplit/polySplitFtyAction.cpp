@@ -158,7 +158,7 @@ cout << "nextFaceId == -1 (edgeId[" << fSelEdges[0] << "]);" << endl;
 	meshFn.getEdgeVertices( fSelEdges[0], edgeVertices);
 	int vtxIndex = edgeVertices[zero_vtx_index];
 	unsigned e = 1;
-	bool founded = true;
+	bool found = true;
 	int nextEdgeVertices[2];
 	int COUNTER = 0;
 	while( e < edgesCount)
@@ -182,7 +182,7 @@ cout << "(COUNTER > 32000) on finding inverted edges!" << endl;
 cout << COUNTER << ") edgeId = " << fSelEdges[e-1] << ", numConEdges = " << numConEdges;
 cout << ", vtxIndex = " << vtxIndex << ", nextFaceId = " << nextFaceId << ":" << endl;
 #endif
-		bool nextEdgeId_founded = false;
+		bool nextEdgeId_found = false;
 		for( unsigned ce = 0; ce < numConEdges; ce++)
 		{
 			if((conEdges[ce] == fSelEdges[e-1]) || (conEdges[ce] == nextEdgeId)) continue;
@@ -191,16 +191,16 @@ cout << ", vtxIndex = " << vtxIndex << ", nextFaceId = " << nextFaceId << ":" <<
 				if( conEdges[ce] == faceEdges[fe])
 				{
 					nextEdgeId = conEdges[ce];
-					nextEdgeId_founded = true;
+					nextEdgeId_found = true;
 					break;
 				}
 			}
-			if( nextEdgeId_founded) break;
+			if( nextEdgeId_found) break;
 		}
-if(!nextEdgeId_founded)
+if(!nextEdgeId_found)
 {
 #ifdef _DEBUG
-cout << "nextEdgeId was not founded, edge " <<  fSelEdges[e-1] << endl;
+cout << "nextEdgeId was not found, edge " <<  fSelEdges[e-1] << endl;
 cout << "connected edges: ";
 for( unsigned ce = 0; ce < numConEdges; ce++) cout << conEdges[ce] << ", "; cout << endl;
 cout << "connected face edges: ";
@@ -218,19 +218,19 @@ break;
 #ifdef _DEBUG
 cout << "nextEdgeId = " << nextEdgeId << ", cEdge_oppVtx = " << cEdge_oppVtx << endl;
 #endif
-		founded = false;
+		found = false;
 		if(cEdge_oppVtx == nextEdgeVertices[searchVtxIndex])
 		{
 			invEdge[e] = 1;
 			zero_vtx_index = 1;
-			founded = true;
+			found = true;
 		}
 		if(cEdge_oppVtx == nextEdgeVertices[1-searchVtxIndex])
 		{
 			zero_vtx_index = 0;
-			founded = true;
+			found = true;
 		}
-		if(!founded)
+		if(!found)
 		{
 			vtxIndex = cEdge_oppVtx;
 			continue;
@@ -251,7 +251,7 @@ cout << "numConFaces < 2 (edgeId[" << fSelEdges[e] << "]);" << endl;
 		vtxIndex = nextEdgeVertices[zero_vtx_index];
 		e++;
 #ifdef _DEBUG
-cout << "founded, conFaces = " << conFaces[0] << ", " << conFaces[1] << " => " << nextFaceId << endl;
+cout << "found, conFaces = " << conFaces[0] << ", " << conFaces[1] << " => " << nextFaceId << endl;
 #endif
 	}
 	}

@@ -177,7 +177,7 @@ function c_DT_FormStrNow() { return c_DT_FormStrFromSec( c_DT_CurSeconds());}
 function c_DT_SecFromStr( i_str) { return Math.round( c_DT_DateFromStr( i_str).valueOf()/1000);}
 function c_DT_DateFromStr( i_str)
 {
-	var nums = c_Strip( i_str).split(/\D{1,}/);
+	var nums = c_Strip( i_str).split(/\D+/);
 //	c_Error('Invalid date: "'+i_str+'"');
 	var date = new Date(0);
 	if( nums.length < 3 ) return date;

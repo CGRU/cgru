@@ -64,7 +64,7 @@ void DBItem::v_dbDelete( std::list<std::string> * queries) const
 void DBItem::v_dbUpdate( std::list<std::string> * queries, int attr) const
 {
 	std::string str = std::string("UPDATE ") + v_dbGetTableName() + " SET";
-	bool attrfounded = false;
+	bool attrfound = false;
 	int i = 0;
 	for( int i = v_dbGetKeysNum(); i < dbAttributes.size(); i++)
 	{
@@ -76,13 +76,13 @@ void DBItem::v_dbUpdate( std::list<std::string> * queries, int attr) const
 		str += " " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
 		if( attr > 0 )
 		{
-			attrfounded = true;
+			attrfound = true;
 			break;
 		}
 	}
-	if(( attr > 0 ) && ( false == attrfounded ))
+	if(( attr > 0 ) && ( false == attrfound ))
 	{
-		AFERRAR("DBItem::dbUpdate: attr=%d not founded.", attr)
+		AFERRAR("DBItem::dbUpdate: attr=%d not found.", attr)
 		return;
 	}
 	str += " WHERE " + dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();

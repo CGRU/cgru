@@ -25,7 +25,7 @@ source ./depends.sh
 # Check:
 ./check.sh $check
 if [ "$?" != "0" ]; then
-	echo "Some required binaries not founded. Use \"--skipcheck\" argument to skip it."
+	echo "Some required binaries not found. Use \"--skipcheck\" argument to skip it."
 	exit 1
 fi
 

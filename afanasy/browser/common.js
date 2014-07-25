@@ -62,16 +62,16 @@ function cm_IdsMerge( i_ids1, i_ids2)
 		{
 			for( var i = 0; i < i_ids2.length; i++)
 			{
-				founded = false;
+				found = false;
 				for( var o = 0; o < o_ids.length; o++)
 				{
 					if( o_ids[o] == i_ids2[i] )
 					{
-						founded = true;
+						found = true;
 						break;
 					}
 				}
-				if( founded == false )
+				if( found == false )
 					o_ids.push( i_ids2[i])
 			}
 		}

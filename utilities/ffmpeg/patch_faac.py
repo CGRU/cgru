@@ -1,21 +1,21 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 filename = 'common/mp4v2/mpeg4ip.h'
 
-import os, shutil, sys
+import shutil
 
-file = open( filename,'r')
-lines = file.readlines()
-file.close()
+with open(filename, 'r') as f:
+	lines = f.readlines()
 
-shutil.move( filename, filename + '.old')
+shutil.move(filename, filename + '.old')
 
-file = open( filename,'w')
-line_num = 1
-for line in lines:
-   if line_num == 126:
-      line = '// ' + line
-      print('%d: %s' % (line_num, line))
-   file.write( line)
-   line_num += 1
-file.close()
+with open(filename, 'w') as f:
+	line_num = 1
+	for line in lines:
+		if line_num == 126:
+			line = '// ' + line
+			print('%d: %s' % (line_num, line))
+		f.write(line)
+		line_num += 1
+	f.close()

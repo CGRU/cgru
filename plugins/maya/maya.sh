@@ -37,7 +37,7 @@ export MAYA_PLUG_IN_PATH=${MAYA_CGRU_LOCATION}/mll/${MAYA_VERSION}:${MAYA_PLUG_I
 
 # Enable Afanasy if it is set:
 if [ ! -z "${AF_ROOT}" ]; then
-	echo "Afanasy founded: '${AF_ROOT}'"
+	echo "Afanasy found: '${AF_ROOT}'"
 	export MAYA_SCRIPT_PATH="${MAYA_CGRU_LOCATION}/afanasy:${MAYA_SCRIPT_PATH}"
 fi
 

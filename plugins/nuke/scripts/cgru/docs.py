@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import nuke
 
 import os
@@ -5,22 +7,25 @@ import webbrowser
 
 import cgrudocs
 
-def browse( path):
-   webbrowser.open( path)
 
-def getenv( name):
-   value = os.getenv( name)
-   if value is None:
-      nuke.message('Variable "%s" is not set.' % name)
-      return None
-   if value == '':
-      nuke.message('Variable "%s" is empty.' % name)
-      return None
-   return value
+def browse(path):
+	webbrowser.open(path)
+
+
+def getenv(name):
+	value = os.getenv(name)
+	if value is None:
+		nuke.message('Variable "%s" is not set.' % name)
+		return None
+	if value == '':
+		nuke.message('Variable "%s" is empty.' % name)
+		return None
+	return value
+
 
 def docsCGRU():
-   cgrudocs.show()
+	cgrudocs.show()
+
 
 def docsNuke():
-   cgrudocs.show('nuke')
-
+	cgrudocs.show('nuke')

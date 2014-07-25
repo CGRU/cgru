@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='nuke'
+parser = 'nuke'
+
 
 class nuke(service.service):
-   'The Foundry Nuke'
+	"""The Foundry Nuke
+	"""
+	pass

@@ -22,7 +22,7 @@ if [ -z "${output}" ]; then
 fi
 
 if [ ! -f "${template}" ]; then
-	echo "Error: Template file '${template}' not founded."
+	echo "Error: Template file '${template}' not found."
 	exit 1
 fi
 

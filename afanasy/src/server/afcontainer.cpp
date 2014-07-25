@@ -65,7 +65,7 @@ int AfContainer::add( AfNodeSrv * i_node)
 //printf("AfContainer::add: name = %s\n", i_node->m_node->m_name.c_str());
 
 	int newId = i_node->m_node->m_id;
-	bool founded = false;
+	bool found = false;
 
    if( newId != 0)
    {
@@ -75,7 +75,7 @@ int AfContainer::add( AfNodeSrv * i_node)
       }
       else
       {
-         founded = true;
+         found = true;
       }
    }
    else
@@ -84,13 +84,13 @@ int AfContainer::add( AfNodeSrv * i_node)
       {
          if( nodesTable[newId] == NULL )
          {
-            founded = true;
+            found = true;
             break;
          }
       }
    }
 
-   if( !founded )
+   if( !found )
    {
       newId = 0;
    }
@@ -166,7 +166,7 @@ int AfContainer::add( AfNodeSrv * i_node)
       count++;
    }
 
-   if( !founded )
+   if( !found )
       AFERROR("AfContainer::add: nodes table full.")
    //AFINFA("AfContainer::add: new id = %u, count = %u", i_node->m_id, count)
    AFINFA("AfContainer::add: new id = %u, count = %u", i_node->m_node->m_id, count)
@@ -404,17 +404,17 @@ void AfContainer::action( Action & i_action)
 			AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + i_action.mask + ("\" is invalid: ") + errMsg);
 			return;
 		}
-		bool namefounded = false;
+		bool namefound = false;
 		for( AfNodeSrv * node = first_ptr; node != NULL; node = node->m_next_ptr )
 		{
 			if( rx.match( node->m_node->m_name))
 			{
 				node->action( i_action);
-				if( false == namefounded) namefounded = true;
+				if( false == namefound) namefound = true;
 			}
 		}
-		if( false == namefounded )
-			AFCommon::QueueLog( name + ": No node matches \"" + i_action.mask + "\" founded.");
+		if( false == namefound )
+			AFCommon::QueueLog( name + ": No node matches \"" + i_action.mask + "\" found.");
 	}
 }
 
@@ -430,7 +430,7 @@ void AfContainer::sortPriority( AfNodeSrv * i_node)
    if(    after  != NULL )  after->m_prev_ptr = i_node->m_prev_ptr;
    else last_ptr  = i_node->m_prev_ptr;
 
-   bool lessPriorityFounded = false;
+   bool lessPriorityFound = false;
 // insetring node after last node with a greater or same priority
    for( before = first_ptr; before != NULL; before = before->m_next_ptr )
    {
@@ -444,11 +444,11 @@ void AfContainer::sortPriority( AfNodeSrv * i_node)
       if( before != NULL ) before->m_next_ptr = i_node;
       else first_ptr = i_node;
 
-      lessPriorityFounded = true;
+      lessPriorityFound = true;
       break;
    }
 
-   if( lessPriorityFounded == false )
+   if( lessPriorityFound == false )
    {
    // push node into the end of list
       last_ptr->m_next_ptr = i_node;

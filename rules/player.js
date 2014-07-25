@@ -237,7 +237,7 @@ function p_PathChanged()
 		if( walk.error )
 			c_Error( walk.error);
 		else
-			c_Error('No JPEG or PNG Files Founded.');
+			c_Error('No JPEG or PNG Files Found.');
 		return;
 	}
 

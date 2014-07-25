@@ -7,14 +7,23 @@ import os
 
 keyframe = 'Fra:'
 
+
 class blender(parser.parser):
-	'Blender Batch'
-	def __init__( self):
-		parser.parser.__init__( self)
+	"""Blender Batch
+	"""
+
+	def __init__(self):
+		parser.parser.__init__(self)
 		self.firstframe = True
 		self.framestring = keyframe
 
-	def do( self, data, mode):
+	def do(self, data, mode):
+		"""Missing DocString
+
+		:param data:
+		:param mode:
+		:return:
+		"""
 		lines = data.split('\n')
 		need_calc = False
 
@@ -23,12 +32,17 @@ class blender(parser.parser):
 			if line.find('Saved:') != -1:
 				line = line[6:]
 				line = line[:line.find('Time:')]
-				self.appendFile( line.strip())
+				self.appendFile(line.strip())
 				continue
 
-			if line.find( keyframe) < 0: continue
+			if line.find(keyframe) < 0:
+				continue
+
 			frmpos = line.find(' ')
-			if frmpos < 0: continue
+
+			if frmpos < 0:
+				continue
+
 			# Increment frame if new:
 			if line[0:frmpos] != self.framestring:
 				self.framestring = line[0:frmpos]
@@ -39,4 +53,5 @@ class blender(parser.parser):
 					self.frame += 1
 					self.percentframe = 0
 
-		if need_calc: self.calculate()
+		if need_calc:
+			self.calculate()

@@ -35,7 +35,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
       {
          if( newRender->getName() == render->getName())
          {
-            // Online render with the same hostname founded:
+            // Online render with the same hostname found:
             if( render->isOnline())
             {
                std::string errLog = "Online render with the same name exists:";
@@ -48,7 +48,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
                // Return -1 ID to render to tell that there is already registered render with the same name:
                return new af::Msg( af::Msg::TRenderId, -1);
             }
-            // Offline render with the same hostname founded:
+            // Offline render with the same hostname found:
             else if( render->online( newRender, monitoring))
             {
                int id = render->getId();

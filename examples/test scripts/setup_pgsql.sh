@@ -16,7 +16,7 @@ apt-get -y install $pg_name
 
 # Check PostgreSQL init file:
 if [ ! -f $pg_init ]; then
-   echo "ERROR: File '$pg_init' not founded."
+   echo "ERROR: File '$pg_init' not found."
    exit 1
 fi
 
@@ -24,7 +24,7 @@ fi
 if [ -f $af_init ]; then
    $af_init stop
 else
-   echo "Warning: File '$af_init' not founded, install afanasy server if needed."
+   echo "Warning: File '$af_init' not found, install afanasy server if needed."
 fi
 
 # Stop PostgreSQL service:
@@ -32,7 +32,7 @@ $pg_init stop
 
 # Check PostgreSQL config file:
 if [ ! -f $pg_conf ]; then
-   echo "ERROR: File '$pg_conf' not founded."
+   echo "ERROR: File '$pg_conf' not found."
    exit 1
 fi
 

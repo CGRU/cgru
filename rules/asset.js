@@ -77,7 +77,7 @@ function a_Create( i_type, i_name, i_path, i_absolute)
 	if( i_absolute )
 		c_Log('Asset specified: ' + i_type + '=' + i_name);
 	else
-		c_Log('Asset founded: ' + i_type + '=' + i_name);
+		c_Log('Asset found: ' + i_type + '=' + i_name);
 }
 
 function a_Append( i_path, i_rules)

@@ -30,7 +30,7 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 	std::string arg = argv[1];
 	if( arg.empty()) return true;
 
-	bool command_founded = false;
+	bool command_found = false;
 	for( int i = 1; i < argc; i++)
 	{
 		arg = argv[i];
@@ -50,7 +50,7 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 				{
 					if( command->v_processArguments( argc - i, argv + i, msg))
 					{
-						command_founded = true;
+						command_found = true;
 						if( msg.isNull())
 						{
 							std::string str = command->getStreamString();
@@ -74,7 +74,7 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 		}
 	}
 
-	if( command_founded && (Help == false)) return true;
+	if( command_found && (Help == false)) return true;
 
 	printf("Usage: afcmd type options\n");
 	for( CmdList::iterator it = commands.begin(); it != commands.end(); it++)

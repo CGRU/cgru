@@ -273,7 +273,7 @@ function up_Remove( i_el)
 	var index = up_elFiles.indexOf( i_el);
 	if( index == -1 )
 	{
-		c_Error('Upload: Removing index not founded.');
+		c_Error('Upload: Removing index not found.');
 		return;
 	}
 	$('upload').removeChild( up_elFiles[index]);

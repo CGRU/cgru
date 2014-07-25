@@ -82,7 +82,7 @@ void ModelNodes::sortnodes( const QList<ItemNode*> & itemstosort, bool ascending
       for( int i = 0; i < items.count(); i++) if( items[i] == item) { row = i; break;}
       if( row == -1)
       {
-         AFERROR("ModelNodes::sortnodes: item not founded.\n");
+         AFERROR("ModelNodes::sortnodes: item not found.\n");
          return;
       }
 

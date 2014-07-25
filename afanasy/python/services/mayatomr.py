@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='mayatomr'
+parser = 'mayatomr'
+
 
 class mayatomr(service.service):
-   'Autodesk Maya to MentalRay Standalone'
+	"""Autodesk Maya to MentalRay Standalone
+	"""
+	pass

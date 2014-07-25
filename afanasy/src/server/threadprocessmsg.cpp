@@ -252,7 +252,7 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 	else
 	{
 		std::string error( header_ERROR);
-		error += "File not founded: ";
+		error += "File not found: ";
 		error += file_name;
 		o_msg->setData( error.size(), error.c_str(), af::Msg::THTTPGET);
 	}

@@ -128,7 +128,7 @@ function g_ShowTable( i_data, i_args)
 //console.log('O:'+i_data.time_min+'-'+i_data.time_max);
 	if( i_data.table == null )
 	{
-		g_Error('No table founded.');
+		g_Error('No table found.');
 		return;
 	}
 

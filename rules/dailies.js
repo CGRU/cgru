@@ -49,7 +49,7 @@ function d_Make( i_path, i_outfolder)
 	for( var f = 0; f < readir.files.length; f++ )
 	{
 		var file = readir.files[f].name;
-		var match = file.match(/\d{1,}\./g);
+		var match = file.match(/\d+\./g);
 		if( match )
 		{
 			match = match[match.length-1];

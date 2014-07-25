@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from services import service
 
-parser='arnold'
+parser = 'arnold'
+
 
 class arnold(service.service):
-	'Arnold Standalone'
+	"""Arnold Standalone
+	"""
+	pass
