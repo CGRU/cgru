@@ -8,57 +8,57 @@ re_percent = re.compile(r'Progress: \d+%')
 re_frame = re.compile(r'Rendering frame \d+')
 re_number = re.compile(r'\d+')
 Errors = ['Files cannot be written - please check output paths!',
-          'Error rendering project']
+		  'Error rendering project']
 
 
 class c4d(parser.parser):
-    """Cinema 4D
-    """
+	"""Cinema 4D
+	"""
 
-    def __init__(self):
-        parser.parser.__init__(self)
-        self.firstFrame = True
-        self.firstFrameNumber = 0
+	def __init__(self):
+		parser.parser.__init__(self)
+		self.firstFrame = True
+		self.firstFrameNumber = 0
 
-    def do(self, data, mode):
-        """Missing DocString
+	def do(self, data, mode):
+		"""Missing DocString
 
-        :param data:
-        :param mode:
-        :return:
-        """
-        need_calc = False
+		:param data:
+		:param mode:
+		:return:
+		"""
+		need_calc = False
 
-        # Check if there are any Errors
-        for error in Errors:
-            if data.find(error) != -1:
-                self.error = True
-                break
+		# Check if there are any Errors
+		for error in Errors:
+			if data.find(error) != -1:
+				self.error = True
+				break
 
-        # Search for frame percent:
-        match = re_percent.search(data)
-        if match is not None:
-            frame = re_number.search(match.group(0))
-            self.percentframe = int(frame.group(0))
-            need_calc = True
+		# Search for frame percent:
+		match = re_percent.search(data)
+		if match is not None:
+			frame = re_number.search(match.group(0))
+			self.percentframe = int(frame.group(0))
+			need_calc = True
 
-        # Search for frame number:
-        match = re_frame.search(data)
+		# Search for frame number:
+		match = re_frame.search(data)
 
-        if match is not None:
-            # Get the current frame-number
-            frame = re_number.search(match.group(0))
-            thisFrame = int(frame.group(0))
+		if match is not None:
+			# Get the current frame-number
+			frame = re_number.search(match.group(0))
+			thisFrame = int(frame.group(0))
 
-            # To know with what frame the task starts
-            if self.firstFrame:
-                self.firstFrameNumber = thisFrame
-                self.firstFrame = False
+			# To know with what frame the task starts
+			if self.firstFrame:
+				self.firstFrameNumber = thisFrame
+				self.firstFrame = False
 
-            # Calculate the current frame (not the frame-number!)
-            self.frame = thisFrame - self.firstFrameNumber
+			# Calculate the current frame (not the frame-number!)
+			self.frame = thisFrame - self.firstFrameNumber
 
-            need_calc = True
+			need_calc = True
 
-        if need_calc:
-            self.calculate()
+		if need_calc:
+			self.calculate()

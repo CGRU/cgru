@@ -5,6 +5,6 @@ parser = 'mayatoarnold'
 
 
 class mayatoarnold(service.service):
-    """Autodesk Maya to Arnold Standalone
-    """
-    pass
+	"""Autodesk Maya to Arnold Standalone
+	"""
+	pass

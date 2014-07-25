@@ -5,6 +5,6 @@ parser = 'afterfx'
 
 
 class afterfx(service.service):
-    """Adobe After Effects
-    """
-    pass
+	"""Adobe After Effects
+	"""
+	pass

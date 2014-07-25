@@ -12,6 +12,7 @@ import af
 import services.service
 
 from optparse import OptionParser
+
 parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
 parser.add_option(      '--name',         dest='jobname',      type='string', default='', help='job name')
 parser.add_option('-u', '--user',         dest='user',         type='string', default='', help='job user name')
@@ -48,7 +49,9 @@ parser.add_option(      '--nonseq',       dest='nonseq',       action='store_tru
 parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False, help='generate not numeric blocks')
 parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
 parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
-(options, args) = parser.parse_args()
+
+options, args = parser.parse_args()
+
 jobname     = options.jobname
 timesec     = options.timesec
 randtime    = options.randtime
@@ -60,156 +63,156 @@ xcopy       = options.xcopy
 frames      = options.frames.split(',')
 
 if options.frames != '':
-    numblocks = len(frames)
+	numblocks = len(frames)
 
 if xcopy < 1:
-    xcopy = 1
+	xcopy = 1
 
 if jobname == '':
-    jobname = '_empty_'
+	jobname = '_empty_'
 
 job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
 
 blocknames = []
 if options.labels != '':
-    blocknames = options.labels.split(':')
+	blocknames = options.labels.split(':')
 else:
-    blocknames.append('block')
+	blocknames.append('block')
 
 blocktypes = []
 if options.services != '':
-    blocktypes = options.services.split(':')
+	blocktypes = options.services.split(':')
 else:
-    blocktypes.append('generic')
+	blocktypes.append('generic')
 
 if numblocks < len(blocknames):
-    numblocks = len(blocknames)
+	numblocks = len(blocknames)
 
 if numblocks < len(blocktypes):
-    numblocks = len(blocktypes)
+	numblocks = len(blocktypes)
 
 for b in range(numblocks):
-    blockname = 'block'
-    blocktype = 'generic'
+	blockname = 'block'
+	blocktype = 'generic'
 
-    if len(blocknames) > b:
-        blockname = blocknames[b]
-    else:
-        blockname = blocknames[len(blocknames) - 1] + str(b)
+	if len(blocknames) > b:
+		blockname = blocknames[b]
+	else:
+		blockname = blocknames[len(blocknames) - 1] + str(b)
 
-    if len(blocktypes) > b:
-        blocktype = blocktypes[b]
-    else:
-        blocktype = blocktypes[len(blocktypes) - 1]
+	if len(blocktypes) > b:
+		blocktype = blocktypes[b]
+	else:
+		blocktype = blocktypes[len(blocktypes) - 1]
 
-    block = af.Block(blockname, blocktype)
-    job.blocks.append(block)
+	block = af.Block(blockname, blocktype)
+	job.blocks.append(block)
 
-    if options.parser != '':
-        block.setParser(options.parser)
+	if options.parser != '':
+		block.setParser(options.parser)
 
-    if b > 0:
-        job.blocks[b - 1].setTasksDependMask(blockname)
-        if options.subdep:
-            job.blocks[b].setDependSubTask()
+	if b > 0:
+		job.blocks[b - 1].setTasksDependMask(blockname)
+		if options.subdep:
+			job.blocks[b].setDependSubTask()
 
-    if options.maxtime:
-        block.setTasksMaxRunTime(options.maxtime)
+	if options.maxtime:
+		block.setTasksMaxRunTime(options.maxtime)
 
-    if options.capacity != 0:
-        block.setCapacity(options.capacity)
+	if options.capacity != 0:
+		block.setCapacity(options.capacity)
 
-    if options.nonseq:
-        block.setNonSequential()
+	if options.nonseq:
+		block.setNonSequential()
 
-    str_capacity = ''
-    if options.capmin != -1 or options.capmax != -1:
-        block.setVariableCapacity(options.capmin, options.capmax)
-        str_capacity = ' -c ' + services.service.str_capacity
+	str_capacity = ''
+	if options.capmin != -1 or options.capmax != -1:
+		block.setVariableCapacity(options.capmin, options.capmax)
+		str_capacity = ' -c ' + services.service.str_capacity
 
-    if options.filemin != -1 or options.filemax != -1:
-        block.setFileSizeCheck(options.filemin, options.filemax)
+	if options.filemin != -1 or options.filemax != -1:
+		block.setFileSizeCheck(options.filemin, options.filemax)
 
-    str_hosts = ''
-    if options.mhmin != -1 or options.mhmax != -1:
-        block.setMultiHost(
-            options.mhmin, options.mhmax, options.mhwaitmax,
-            options.mhsame, options.mhservice, options.mhwaitsrv
-        )
-        str_hosts = ' ' + services.service.str_hosts
+	str_hosts = ''
+	if options.mhmin != -1 or options.mhmax != -1:
+		block.setMultiHost(
+			options.mhmin, options.mhmax, options.mhwaitmax,
+			options.mhsame, options.mhservice, options.mhwaitsrv
+		)
+		str_hosts = ' ' + services.service.str_hosts
 
-    negative_pertask = False
-    if options.frames != '':
-        fr = frames[b].split('/')
-        if int(fr[2]) < 0:
-            negative_pertask = True
+	negative_pertask = False
+	if options.frames != '':
+		fr = frames[b].split('/')
+		if int(fr[2]) < 0:
+			negative_pertask = True
 
-    if not options.stringtype and not negative_pertask:
-        cmd = 'task.py'
-        cmd = os.path.join(os.getcwd(), cmd)
-        cmd = 'python "%s"' % cmd
-        cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
-               '-i %(increment)d -t %(timesec)g -r %(randtime)g ' \
-               '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
+	if not options.stringtype and not negative_pertask:
+		cmd = 'task.py'
+		cmd = os.path.join(os.getcwd(), cmd)
+		cmd = 'python "%s"' % cmd
+		cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
+			   '-i %(increment)d -t %(timesec)g -r %(randtime)g ' \
+			   '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
-        block.setCommand(cmd, False)
-        if options.frames != '':
-            fr = frames[b].split('/')
-            block.setNumeric(int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
-        else:
-            block.setNumeric(1, numtasks, options.pertask, increment)
-        if options.pertask > 1:
-            block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@',
-                            'file_b.@#@.@###@-file_b.@#@.@###@'])
-        else:
-            block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
-    else:
-        block.setCommand(
-            'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
-            False
-        )
-        block.setTasksName('task @#@')
-        block.setFiles(['file_a.@#@', 'file_b.@#@'])
-        if options.frames != '':
-            fr = frames[b].split('/')
-            block.setFramesPerTask(int(fr[2]))
-            numtasks = int(fr[1]) - int(fr[0]) + 1
-        for t in range(numtasks):
-            timesec_task = timesec + randtime * random.random()
-            task = af.Task('#' + str(t))
-            task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
-            task.setFiles(['%04d' % t])
-            block.tasks.append(task)
+		block.setCommand(cmd, False)
+		if options.frames != '':
+			fr = frames[b].split('/')
+			block.setNumeric(int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
+		else:
+			block.setNumeric(1, numtasks, options.pertask, increment)
+		if options.pertask > 1:
+			block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@',
+							'file_b.@#@.@###@-file_b.@#@.@###@'])
+		else:
+			block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
+	else:
+		block.setCommand(
+			'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
+			False
+		)
+		block.setTasksName('task @#@')
+		block.setFiles(['file_a.@#@', 'file_b.@#@'])
+		if options.frames != '':
+			fr = frames[b].split('/')
+			block.setFramesPerTask(int(fr[2]))
+			numtasks = int(fr[1]) - int(fr[0]) + 1
+		for t in range(numtasks):
+			timesec_task = timesec + randtime * random.random()
+			task = af.Task('#' + str(t))
+			task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
+			task.setFiles(['%04d' % t])
+			block.tasks.append(task)
 
 if options.cmdpre != '':
-    job.setCmdPre(options.cmdpre)
+	job.setCmdPre(options.cmdpre)
 if options.cmdpost != '':
-    job.setCmdPost(options.cmdpost)
+	job.setCmdPost(options.cmdpost)
 
 if options.waittime:
-    job.setWaitTime(int(time.time()) + options.waittime)
+	job.setWaitTime(int(time.time()) + options.waittime)
 
 if options.user != '':
-    job.setUserName(options.user)
+	job.setUserName(options.user)
 
 if options.pause:
-    job.offLine()
+	job.offLine()
 
 if options.output:
-    job.output(1)
+	job.output(1)
 
 job.setNeedOS('')
 
 exit_status = 0
 if options.sendjob:
-    for x in range(xcopy):
-        status, data = job.send(verbose)
-        if not status:
-            print('Error: Job was not sent.')
-            exit_status = 1
-            break
-        if verbose:
-            print(json.dumps(data))
+	for x in range(xcopy):
+		status, data = job.send(verbose)
+		if not status:
+			print('Error: Job was not sent.')
+			exit_status = 1
+			break
+		if verbose:
+			print(json.dumps(data))
 
 sys.exit(exit_status)

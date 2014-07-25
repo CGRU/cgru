@@ -5,6 +5,6 @@ parser = 'mayatovray'
 
 
 class mayatovray(service.service):
-    """Autodesk Maya to VRay Standalone
-    """
-    pass
+	"""Autodesk Maya to VRay Standalone
+	"""
+	pass

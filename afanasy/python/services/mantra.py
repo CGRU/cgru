@@ -5,6 +5,6 @@ parser = 'mantra'
 
 
 class mantra(service.service):
-    """Houdini mantra
-    """
-    pass
+	"""Houdini mantra
+	"""
+	pass

@@ -5,6 +5,6 @@ parser = 'nuke'
 
 
 class nuke(service.service):
-    """The Foundry Nuke
-    """
-    pass
+	"""The Foundry Nuke
+	"""
+	pass

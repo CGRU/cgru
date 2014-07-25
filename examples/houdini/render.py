@@ -3,17 +3,17 @@
 
 import af
 
-scene = 'scene.hip'
-rop = '/out/ifd'
-ifd = 'render/scene.@####@.ifd'
-ifdd = 'render/scene.%04d.ifd'
-img = 'render/img.@####@.exr'
-imgd = 'render/img.%04d.exr'
-f_start = 1
+scene    = 'scene.hip'
+rop      = '/out/ifd'
+ifd      = 'render/scene.@####@.ifd'
+ifdd     = 'render/scene.%04d.ifd'
+img      = 'render/img.@####@.exr'
+imgd     = 'render/img.%04d.exr'
+f_start  = 1
 f_finish = 10
-divx = 3
-divy = 2
-tiles = divx * divy
+divx     = 3
+divy     = 2
+tiles    = divx * divy
 
 job = af.Job('Houdini Test: Tile Render')
 
@@ -26,12 +26,12 @@ b_render.setCommand('mantrarender tc %(divx)d %(divy)d @#@' % vars())
 b_render.setTasksDependMask('generate ifd')
 b_render.setFramesPerTask(-tiles)
 for f in range(f_start, f_finish + 1):
-    cmd = ' -R -f ' + ifdd % f
-    for t in range(0, tiles):
-        task = af.Task('%d tile %d' % (f, t))
-        task.setCommand(str(t) + cmd)
-        task.setFiles((imgd % f) + ('.tile_%d.exr' % t))
-        b_render.tasks.append(task)
+	cmd = ' -R -f ' + ifdd % f
+	for t in range(0, tiles):
+		task = af.Task('%d tile %d' % (f, t))
+		task.setCommand(str(t) + cmd)
+		task.setFiles((imgd % f) + ('.tile_%d.exr' % t))
+		b_render.tasks.append(task)
 
 cmd = 'exrjoin %(divx)d %(divy)d %(img)s d && deletefiles %(ifd)s' % vars()
 b_exrjoin = af.Block('join tiles')

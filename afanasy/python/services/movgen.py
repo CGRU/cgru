@@ -5,6 +5,6 @@ parser = 'generic'
 
 
 class movgen(service.service):
-    """Service for movies generation. Annotate and encode to make dailies.
-    """
-    pass
+	"""Service for movies generation. Annotate and encode to make dailies.
+	"""
+	pass

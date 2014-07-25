@@ -10,28 +10,29 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 from optparse import OptionParser
+
 Parser = OptionParser(
-    usage="%prog [options] message\ntype \"%prog -h\" for help",
-    version="%prog 1.0"
+	usage="%prog [options] message\ntype \"%prog -h\" for help",
+	version="%prog 1.0"
 )
 
-Parser.add_option('-f', '--from',       dest='sender',     type = 'string', default='', help='Sender email address.')
-Parser.add_option('-s', '--subject',    dest='subject',    type = 'string', default='CGRU', help='Message subject.')
-Parser.add_option('-t', '--to',         dest='to',         type = 'string', action='append', default=[], help='recipients addresses.')
-Parser.add_option('-m', '--smtpserver', dest='smtpserver', type = 'string', default='', help='SMTP host name.')
-Parser.add_option('-e', '--encoding',   dest='encoding',   type = 'string', default='UTF-8', help='Encoding.')
-Parser.add_option('-V', '--VERBOSE',    dest='verbose',    action='store_true', default=False, help='Verbose Mode.')
-Parser.add_option('-D', '--DEBUG',      dest='debug',      action='store_true', default=False, help='Debug Mode.')
+Parser.add_option('-f', '--from',       dest='sender',       type='string',                  default='',      help='Sender email address.')
+Parser.add_option('-s', '--subject',    dest='subject',      type='string',                  default='CGRU',  help='Message subject.')
+Parser.add_option('-t', '--to',         dest='to',           type='string', action='append', default=[],      help='recipients addresses.')
+Parser.add_option('-m', '--smtpserver', dest='smtpserver',   type='string',                  default='',      help='SMTP host name.')
+Parser.add_option('-e', '--encoding',   dest='encoding',     type='string',                  default='UTF-8', help='Encoding.')
+Parser.add_option('-V', '--VERBOSE',    dest='verbose',    action='store_true',              default=False,   help='Verbose Mode.')
+Parser.add_option('-D', '--DEBUG',      dest='debug',      action='store_true',              default=False,   help='Debug Mode.')
 Options, Args = Parser.parse_args()
 
 if Options.debug:
-    Options.verbose = True
+	Options.verbose = True
 
 if Options.sender == '':
-    Options.sender = cgruconfig.VARS['USERNAME'] + '@' + socket.gethostname()
+	Options.sender = cgruconfig.VARS['USERNAME'] + '@' + socket.gethostname()
 
 if Options.smtpserver == '':
-    Options.smtpserver = cgruconfig.VARS['email_smtp_server']
+	Options.smtpserver = cgruconfig.VARS['email_smtp_server']
 
 html = """
 <html>
@@ -46,7 +47,7 @@ html = """
 </html>
 """
 body = ' '.join(Args)
-#body = '<html><body>'+body+'</body></html>'
+# body = '<html><body>'+body+'</body></html>'
 body = html % body
 
 msg = MIMEMultipart()
@@ -56,13 +57,13 @@ msg['From'] = Options.sender
 msg['To'] = ', '.join(Options.to)
 
 if Options.verbose:
-    print('SMTP Host: %s' % Options.smtpserver)
-    print(msg)
+	print('SMTP Host: %s' % Options.smtpserver)
+	print(msg)
 
 if not Options.debug:
-    smtp = smtplib.SMTP(Options.smtpserver)
-    smtp.sendmail(Options.sender, Options.to, msg.as_string())
-    smtp.quit()
+	smtp = smtplib.SMTP(Options.smtpserver)
+	smtp.sendmail(Options.sender, Options.to, msg.as_string())
+	smtp.quit()
 else:
-    print('DEBUG MODE. Skipping execution.')
+	print('DEBUG MODE. Skipping execution.')
 

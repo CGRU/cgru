@@ -5,5 +5,6 @@ parser = 'hbatch'
 
 
 class hbatch(service.service):
-    """Houdini batch
-    """
+	"""Houdini batch
+	"""
+	pass

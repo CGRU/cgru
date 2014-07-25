@@ -5,6 +5,6 @@ parser = 'maya_delight'
 
 
 class maya_delight(service.service):
-    """3Delight For Maya
-    """
-    pass
+	"""3Delight For Maya
+	"""
+	pass

@@ -7,58 +7,58 @@ import cgruconfig
 
 
 def usageExit(exitstatus=1, msg=None):
-    print('Usage: %s [port] [host] command' % sys.argv[0])
-    sys.exit(exitstatus)
+	print('Usage: %s [port] [host] command' % sys.argv[0])
+	sys.exit(exitstatus)
 
 
 def send(data, host='localhost', port=-1, verbose=False):
-    if port == -1:
-        port = int(cgruconfig.VARS['keeper_port'])
+	if port == -1:
+		port = int(cgruconfig.VARS['keeper_port'])
 
-    s = None
+	s = None
 
-    for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
-        af, socktype, proto, canonname, sa = res
-        if verbose:
-            print('Trying to connect to "%s"' % str(sa[0]))
+	for res in socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
+		af, socktype, proto, canonname, sa = res
+		if verbose:
+			print('Trying to connect to "%s"' % str(sa[0]))
 
-        try:
-            s = socket.socket(af, socktype, proto)
-        except Exception as e:
-            print(str(e))
-            s = None
-            continue
+		try:
+			s = socket.socket(af, socktype, proto)
+		except Exception as e:
+			print(str(e))
+			s = None
+			continue
 
-        try:
-            s.connect(sa)
-        except Exception as e:
-            print(str(e))
-            s.close()
-            s = None
-            continue
-        break
+		try:
+			s.connect(sa)
+		except Exception as e:
+			print(str(e))
+			s.close()
+			s = None
+			continue
+		break
 
-    if s is None:
-        print('Could not open socket.')
-    else:
-        s.sendall(data)
+	if s is None:
+		print('Could not open socket.')
+	else:
+		s.sendall(data)
 
 
 if len(sys.argv) < 2:
-    usageExit()
+	usageExit()
 
 try:
-    cmd = bytes(sys.argv[-1], 'utf-8')
+	cmd = bytes(sys.argv[-1], 'utf-8')
 except:
-    cmd = bytes(sys.argv[-1])
+	cmd = bytes(sys.argv[-1])
 
 port = -1
 host = 'localhost'
 
 if len(sys.argv) > 2:
-    host = sys.argv[-2]
+	host = sys.argv[-2]
 
 if len(sys.argv) > 3:
-    port = int(sys.argv[-3])
+	port = int(sys.argv[-3])
 
 send(cmd, host, port)

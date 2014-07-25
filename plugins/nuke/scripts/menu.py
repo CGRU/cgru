@@ -19,6 +19,7 @@ cgru_menu.addCommand("-", "", "")
 cgru_menu.addCommand('Documentation', 'cgru.docsNuke()')
 
 # Add afanasy gizmo to nodes:
-icons = os.path.join( os.environ['CGRU_LOCATION'],'icons')
-nuke.menu('Nodes').addMenu('CGRU', icon=os.path.join(icons,'keeper.png'))
-nuke.menu('Nodes').addCommand('CGRU/afanasy', 'nuke.createNode("afanasy")', icon=os.path.join(icons,'afanasy.png'))
+icons = os.path.join(os.environ['CGRU_LOCATION'], 'icons')
+nuke.menu('Nodes').addMenu('CGRU', icon=os.path.join(icons, 'keeper.png'))
+nuke.menu('Nodes').addCommand('CGRU/afanasy', 'nuke.createNode("afanasy")',
+							  icon=os.path.join(icons, 'afanasy.png'))

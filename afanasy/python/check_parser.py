@@ -8,26 +8,26 @@ sys.path.append(os.path.abspath(sys.argv[0]))
 
 
 def UsageExit(message=''):
-    """Missing DocString
+	"""Missing DocString
 
-    :param message:
-    :return:
-    """
-    if message != '':
-        print('Error: %s' % message)
+	:param message:
+	:return:
+	"""
+	if message != '':
+		print('Error: %s' % message)
 
-    print('Usage: %s [parser type] [frames number] [command line]' %
-          os.path.basename(sys.argv[0]))
-    exit(1)
+	print('Usage: %s [parser type] [frames number] [command line]' %
+		  os.path.basename(sys.argv[0]))
+	exit(1)
 
 
 if len(sys.argv) < 4:
-    UsageExit()
+	UsageExit()
 
 try:
-    framesNum = int(sys.argv[2])
+	framesNum = int(sys.argv[2])
 except:  # TODO: Too broad exception clause
-    UsageExit('%s\nInvalid frames number.' % str(sys.exc_info()[1]))
+	UsageExit('%s\nInvalid frames number.' % str(sys.exc_info()[1]))
 
 parserType = sys.argv[1]
 parserModule = __import__('parsers', globals(), locals(), [parserType])
@@ -42,16 +42,14 @@ parser.setTaskInfo(taskInfo)
 
 arguments = []
 for i in range(3, len(sys.argv)):
-    arguments.append(sys.argv[i])
+	arguments.append(sys.argv[i])
 
 output = subprocess.Popen(arguments, stdout=subprocess.PIPE).stdout
 
 for line in output:
-    print(line,)
-    parser.parse('test', line)
-    print(
-        'Parse: %d%%: %d frame %d%%' %
-        (parser.percent, parser.frame, parser.percentframe)
-    )
+	print(line,)
+	parser.parse('test', line)
+	print('Parse: %d%%: %d frame %d%%' %
+		  (parser.percent, parser.frame, parser.percentframe))
 
 output.close()

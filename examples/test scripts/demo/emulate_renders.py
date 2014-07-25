@@ -24,28 +24,27 @@ Options, Args = Parser.parse_args()
 
 
 def sendAction(i_type, i_mask, i_operation, i_params=None):
-    action = dict()
-    action['type'] = i_type
-    action['user_name'] = Options.user
-    action['host_name'] = Options.name
-    action['mask'] = i_mask
+	action = dict()
+	action['type'] = i_type
+	action['user_name'] = Options.user
+	action['host_name'] = Options.name
+	action['mask'] = i_mask
 
-    if i_operation is not None:
-        operation = dict()
-        operation['type'] = i_operation
-        action['operation'] = operation
+	if i_operation is not None:
+		operation = dict()
+		operation['type'] = i_operation
+		action['operation'] = operation
 
-    if i_params is not None:
-        action['params'] = i_params
+	if i_params is not None:
+		action['params'] = i_params
 
-    #print( json.dumps( {'action': action}))
-    status, answer = afnetwork.sendServer(json.dumps({'action': action}),
-                                          False, False)
-    return status
+	# print( json.dumps( {'action': action}))
+	status, answer = afnetwork.sendServer(json.dumps({'action': action}), False, False)
+	return status
 
 
 def rendersExit():
-    return sendAction('renders', Options.name + '.*', 'exit')
+	return sendAction('renders', Options.name + '.*', 'exit')
 
 
 print('Renders name = "%s"' % Options.name)
@@ -56,20 +55,20 @@ Cmd += ' -username "%s"' % Options.user
 
 cycle = 0
 while True:
-    cycle += 1
+	cycle += 1
 
-    print('Launching renders: (%d)' % cycle)
-    for i in range(0, Options.count):
-        hostname = Options.name + ("%03d" % i)
-        cmd = Cmd % hostname
-        print(cmd)
-        os.system(cmd + ' > /dev/null &')
+	print('Launching renders: (%d)' % cycle)
+	for i in range(0, Options.count):
+		hostname = Options.name + ("%03d" % i)
+		cmd = Cmd % hostname
+		print(cmd)
+		os.system(cmd + ' > /dev/null &')
 
-    time.sleep(Options.worktime)
+	time.sleep(Options.worktime)
 
-    print('Exiting renders...(%d)' % cycle)
-    if not rendersExit():
-        break
+	print('Exiting renders...(%d)' % cycle)
+	if not rendersExit():
+		break
 
-    time.sleep(Options.offlinetime)
+	time.sleep(Options.offlinetime)
 

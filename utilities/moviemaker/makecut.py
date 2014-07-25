@@ -15,9 +15,9 @@ Extensions = ['jpg', 'png', 'dpx']
 TmpFiles = 'img.%07d.jpg'
 
 Parser = OptionParser(
-    usage="%prog [options] input\n"
-          "Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n"
-          "Type \"%prog -h\" for help", version="%prog 1.0"
+	usage="%prog [options] input\n"
+		  "Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n"
+		  "Type \"%prog -h\" for help", version="%prog 1.0"
 )
 
 Parser.add_option('-i', '--inputs',     dest='inputs',     type  ='string', default='RESULT/JPG',help='Inputs')
@@ -31,13 +31,13 @@ Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', 
 
 
 def errExit(i_msg):
-    print('{"error":"%s"},' % i_msg)
-    print('{"status":"error"}]}')
-    sys.exit(1)
+	print('{"error":"%s"},' % i_msg)
+	print('{"status":"error"}]}')
+	sys.exit(1)
 
 
 def interrupt(signum, frame):
-    errExit('Interrupt received')
+	errExit('Interrupt received')
 
 
 signal.signal(signal.SIGTERM, interrupt)
@@ -49,33 +49,33 @@ print('{"cut":[')
 (Options, args) = Parser.parse_args()
 
 if len(args) < 1:
-    errExit('Not enough arguments provided.')
+	errExit('Not enough arguments provided.')
 
 Inputs = Options.inputs.split(',')
 Shots = args
 CutName = Options.cutname
 
 if os.path.isfile(args[-1]):
-    Shots = args[-1]
-    if CutName == '':
-        CutName = os.path.basename(Shots)
-    with open(Shots) as f:
-        Shots = f.readlines()
+	Shots = args[-1]
+	if CutName == '':
+		CutName = os.path.basename(Shots)
+	with open(Shots) as f:
+		Shots = f.readlines()
 
 if len(Shots) < 2:
-    errExit('Less than 2 shots provided.')
+	errExit('Less than 2 shots provided.')
 
 if CutName == '':
-    CutName = os.path.basename(os.path.dirname(Shots[0]))
+	CutName = os.path.basename(os.path.dirname(Shots[0]))
 
 OutDir = Options.outdir + '/' + CutName
 OutDir = os.path.normpath(OutDir)
 if not Options.testonly:
-    if os.path.isdir(OutDir):
-        print('{"progress":"Deleting folder: %s"},' % OutDir)
-        shutil.rmtree(OutDir)
-    os.makedirs(OutDir)
-    print('{"progress":"Creating folder: %s"},' % OutDir)
+	if os.path.isdir(OutDir):
+		print('{"progress":"Deleting folder: %s"},' % OutDir)
+		shutil.rmtree(OutDir)
+	os.makedirs(OutDir)
+	print('{"progress":"Creating folder: %s"},' % OutDir)
 
 movie_name = os.path.basename(CutName) + time.strftime('_%y-%m-%d_%H-%M-%S')
 movie_name = os.path.join(Options.outdir, movie_name)
@@ -92,71 +92,71 @@ cmd_prefix += ' -d "%s"' % time.strftime('%y-%m-%d')
 file_counter = 0
 
 for shot in Shots:
-    shot = shot.strip()
-    if len(shot) == 0:
-        continue
-    if shot[0] == '#':
-        continue
+	shot = shot.strip()
+	if len(shot) == 0:
+		continue
+	if shot[0] == '#':
+		continue
 
-    folder = None
-    version = None
-    name = os.path.basename(shot)
+	folder = None
+	version = None
+	name = os.path.basename(shot)
 
-    for inp in Inputs:
-        inp = os.path.join(shot, inp)
-        if not os.path.isdir(inp):
-            continue
+	for inp in Inputs:
+		inp = os.path.join(shot, inp)
+		if not os.path.isdir(inp):
+			continue
 
-        for item in os.listdir(inp):
-            if item[0] in '._':
-                continue
-            if not os.path.isdir(os.path.join(inp, item)):
-                continue
-            ver = item.replace(name, '').strip('_. ')
-            if version is not None:
-                if version >= ver:
-                    continue
-            version = ver
-            folder = os.path.join(inp, item)
+		for item in os.listdir(inp):
+			if item[0] in '._':
+				continue
+			if not os.path.isdir(os.path.join(inp, item)):
+				continue
+			ver = item.replace(name, '').strip('_. ')
+			if version is not None:
+				if version >= ver:
+					continue
+			version = ver
+			folder = os.path.join(inp, item)
 
-    if folder is None:
-        errExit('Input not found for: %s' % shot)
+	if folder is None:
+		errExit('Input not found for: %s' % shot)
 
-    files = []
-    for item in os.listdir(folder):
-        valid = False
-        for ext in Extensions:
-            if item[-len(ext):].lower() == ext:
-                valid = True
-                break
-        if valid:
-            files.append(os.path.join(folder, item))
-    if len(files) == 0:
-        errExit('No files found in folder: %s' % folder)
-    files.sort()
+	files = []
+	for item in os.listdir(folder):
+		valid = False
+		for ext in Extensions:
+			if item[-len(ext):].lower() == ext:
+				valid = True
+				break
+		if valid:
+			files.append(os.path.join(folder, item))
+	if len(files) == 0:
+		errExit('No files found in folder: %s' % folder)
+	files.sort()
 
-    print('{"sequence":"%s"},' % folder)
+	print('{"sequence":"%s"},' % folder)
 
-    for image in files:
-        cmd = cmd_prefix
-        cmd += ' --project "%s"' % CutName
-        cmd += ' --shot "%s"' % name
-        cmd += ' --ver "%s"' % version
-        cmd += ' --moviename "%s"' % os.path.basename(movie_name)
-        cmd += ' -f "%s"' % os.path.basename(image)
-        cmd += ' "%s"' % image
-        output = os.path.join(OutDir, TmpFiles % file_counter)
-        cmd += ' "%s"' % output
+	for image in files:
+		cmd = cmd_prefix
+		cmd += ' --project "%s"' % CutName
+		cmd += ' --shot "%s"' % name
+		cmd += ' --ver "%s"' % version
+		cmd += ' --moviename "%s"' % os.path.basename(movie_name)
+		cmd += ' -f "%s"' % os.path.basename(image)
+		cmd += ' "%s"' % image
+		output = os.path.join(OutDir, TmpFiles % file_counter)
+		cmd += ' "%s"' % output
 
-        file_counter += 1
-        commands.append(cmd)
-        task_names.append(os.path.basename(image))
+		file_counter += 1
+		commands.append(cmd)
+		task_names.append(os.path.basename(image))
 
 print('{"progress":"%d sequences found"},' % len(Shots))
 print('{"progress":"%d files found"},' % file_counter)
 
-cmd_encode =  os.path.join(os.path.dirname(sys.argv[0]), 'makemovie.py')
-cmd_encode =  'python "%s"' % os.path.normpath(cmd_encode)
+cmd_encode = os.path.join(os.path.dirname(sys.argv[0]), 'makemovie.py')
+cmd_encode = 'python "%s"' % os.path.normpath(cmd_encode)
 cmd_encode += ' -f %s' % Options.fps
 cmd_encode += ' -c %s' % Options.codec
 cmd_encode += ' "%s"' % os.path.join(OutDir, TmpFiles)
@@ -166,10 +166,10 @@ job = af.Job('CUT ' + CutName)
 block = af.Block('convert')
 counter = 0
 for cmd in commands:
-    task = af.Task(task_names[counter])
-    task.setCommand(cmd)
-    block.tasks.append(task)
-    counter += 1
+	task = af.Task(task_names[counter])
+	task.setCommand(cmd)
+	block.tasks.append(task)
+	counter += 1
 block.setCapacity(100)
 block.setMaxRunTasksPerHost(2)
 block.setTasksMaxRunTime(20)
@@ -183,11 +183,11 @@ block.tasks.append(task)
 job.blocks.append(block)
 
 if Options.afuser != '':
-    job.setUserName(Options.afuser)
+	job.setUserName(Options.afuser)
 
 job.setNeedOS('win')
 if not Options.testonly:
-    if not job.send():
-        errExit('Can`t send job to server.')
+	if not job.send():
+		errExit('Can`t send job to server.')
 
 print('{"status":"success"}]}')

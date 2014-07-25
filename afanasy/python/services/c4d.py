@@ -5,6 +5,6 @@ parser = 'c4d'
 
 
 class c4d(service.service):
-    """MAXON Cinema 4D
-    """
-    pass
+	"""MAXON Cinema 4D
+	"""
+	pass
