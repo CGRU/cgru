@@ -1,4 +1,4 @@
-function stsc_Show( i_args)
+function stcs_Show( i_args)
 {
 //console.log( JSON.stringify( i_args));
 	var i_statuses = i_args.statuses;
@@ -6,17 +6,16 @@ function stsc_Show( i_args)
 	var i_elReportsDiv = i_args.elReportsDiv;
 	var i_elTasks = i_args.elTasks;
 	var i_elTasksDiv = i_args.elTasksDiv;
+	var i_draw_bars = i_args.draw_bars;
 
 	if( i_elTasks == null ) return;
 	if( i_elReports == null ) return;
 
 	i_elTasks.textContent = '';
-	var tasks = [];
 	var tasks_types = {};
 	var tasks_duration = 0;
 
 	i_elReports.textContent = '';
-	var reports = [];
 	var reps_types = {};
 	var reps_duration = 0;
 
@@ -96,33 +95,36 @@ function stsc_Show( i_args)
 
 
 	// Tasks show:
+	var tasks = [];
 	for( var ttype in tasks_types ) tasks.push( tasks_types[ttype]);
 	if( tasks.length )
 	{
 		i_elTasksDiv.style.display = 'block';
-		stsc_ShowTable({"el":i_elTasks,"data":tasks,"total_duration":tasks_duration});
+		stcs_ShowTable({"el":i_elTasks,"data":tasks,"total_duration":tasks_duration,"draw_bars":i_draw_bars});
 	}
 	else
 		i_elTasksDiv.style.display = 'none';
 
 
 	// Reports show:
+	var reports = [];
 	for( var rtype in reps_types ) reports.push( reps_types[rtype]);
 	if( reports.length )
 	{
 		i_elReportsDiv.style.display = 'block';
-		stsc_ShowTable({"el":i_elReports,"data":reports,"total_duration":reps_duration});
+		stcs_ShowTable({"el":i_elReports,"data":reports,"total_duration":reps_duration,"draw_bars":i_draw_bars});
 	}
 	else
 		i_elReportsDiv.style.display = 'none';
 
 }
 
-function stsc_ShowTable( i_args)
+function stcs_ShowTable( i_args)
 {
 	var i_el = i_args.el;
 	var i_data = i_args.data;
 	var i_total_duration = i_args.total_duration;
+	var i_draw_bars = i_args.draw_bars;
 
 	i_data.sort( function(a,b){if(a.duration<b.duration)return 1});
 
@@ -189,5 +191,54 @@ function stsc_ShowTable( i_args)
 	var elTd = document.createElement('th');
 	elTr.appendChild( elTd);
 	elTd.textContent = 'total';
+
+	if( i_draw_bars !== true ) return;
+
+	var elBarsDiv = document.createElement('div');
+	i_el.appendChild( elBarsDiv);
+	elBarsDiv.classList.add('bars');
+
+	var width = 80;
+	var height = 100;
+	var height_coeff = height / i_data[0].duration;
+	var height_text = 20;
+	height += height_text * 2;
+
+	for( var i = 0; i < i_data.length; i++)
+	{
+		var rect_h = i_data[i].duration * height_coeff;
+
+		var elBar = document.createElement('div');
+		elBarsDiv.appendChild( elBar);
+		elBar.classList.add('bar');
+		elBar.style.cssFloat = 'left';
+		elBar.style.position = 'relative';
+		elBar.style.width = width + 'px';
+		elBar.style.height = height + 'px';
+
+		var elBarRect = document.createElement('div');
+		elBar.appendChild( elBarRect);
+		elBarRect.classList.add('rect');
+		elBarRect.style.position = 'absolute';
+		elBarRect.style.bottom = height_text + 'px';
+		elBarRect.style.width = width + 'px';
+		elBarRect.style.height = rect_h + 'px';
+
+		var elBarName = document.createElement('div');
+		elBar.appendChild( elBarName);
+		elBarName.classList.add('name');
+		elBarName.textContent = c_GetTagTitle( i_data[i].tags[0]);
+		elBarName.style.position = 'absolute';
+		elBarName.style.bottom = '0';
+		elBarName.style.width = width + 'px';
+
+		var elBarValue = document.createElement('div');
+		elBar.appendChild( elBarValue);
+		elBarValue.classList.add('value');
+		elBarValue.textContent = i_data[i].duration;
+		elBarValue.style.position = 'absolute';
+		elBarValue.style.width = width + 'px';
+		elBarValue.style.bottom = height_text + rect_h + 'px';
+	}
 }
 

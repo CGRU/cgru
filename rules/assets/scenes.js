@@ -548,8 +548,9 @@ function sc_DisplayStatistics()
 	args.elReportsDiv = $('scenes_reports_div');
 	args.elTasks = $('scenes_tasks');
 	args.elTasksDiv = $('scenes_tasks_div');
+	args.draw_bars = true;
 
-	stsc_Show( args);
+	stcs_Show( args);
 }
 
 function scenes_makeThumbnails()

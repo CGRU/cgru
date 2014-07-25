@@ -126,7 +126,7 @@ Status.prototype.show = function( i_status)
 	args.elTasks = this.elTasks;
 	args.elTasksDiv = this.elTasksDiv;
 
-	stsc_Show( args);
+	stcs_Show( args);
 }
 Status.prototype.showTasks = function()
 {
