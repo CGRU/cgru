@@ -503,7 +503,7 @@ function sc_ShowAllShots()
 
 function sc_DisplayStatistics()
 {
-	// Shots count and progress:
+	// Shots count, progress, frames count:
 	//
 	var shots = 0;
 	var progress = 0;
@@ -512,8 +512,11 @@ function sc_DisplayStatistics()
 		if( sc_elShots[i].m_hidden ) continue;
 		shots++;
 		var stat = sc_elShots[i].m_status.obj;
-		if( stat && stat.progress && ( stat.progress > 0 ))
+		if( stat == null) continue;
+		if( stat.progress && ( stat.progress > 0 ))
 			progress += stat.progress;
+		if( stat.frames_num )
+			sc_frames_total += stat.frames_num;
 	}
 
 	var info = 'Shots Count: ' + shots;
