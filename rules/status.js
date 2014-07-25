@@ -126,7 +126,7 @@ Status.prototype.show = function( i_status)
 	args.elTasks = this.elTasks;
 	args.elTasksDiv = this.elTasksDiv;
 
-	stsc_Show( args);
+	stcs_Show( args);
 }
 Status.prototype.showTasks = function()
 {
@@ -689,20 +689,33 @@ Status.prototype.editTasksShow = function( i_args)
 
 		var elDurDiv = document.createElement('div');
 		el.appendChild( elDurDiv);
-		elDurDiv.style.cssFloat = 'left';
+		elDurDiv.classList.add('dur_div');
 
 		var elDurLabel = document.createElement('div');
 		elDurDiv.appendChild( elDurLabel);
 		elDurLabel.textContent = 'Duration: ';
-		elDurLabel.style.cssFloat = 'left';
+		elDurLabel.classList.add('dur_label');
 
 		var elDur = document.createElement('div');
 		elDurDiv.appendChild( elDur);
 		elDur.textContent = tasks[t].duration;
 		elDur.contentEditable = true;
 		elDur.classList.add('editing');
-		elDur.style.width = '40px';
-		elDur.style.cssFloat = 'left';
+		elDur.classList.add('duration');
+
+		var elDel = document.createElement('div');
+		el.appendChild( elDel);
+		elDel.classList.add('button');
+		elDel.textContent = '-';
+		elDel.title = 'Delete Task\n(by double click)';
+		elDel.m_status = this;
+		elDel.m_elTask = el;
+		elDel.ondblclick = function(e){
+			var st = e.currentTarget.m_status;
+			var el = e.currentTarget.m_elTask;
+			st.elEdit_tasks.elTasks.splice( st.elEdit_tasks.elTasks.indexOf(el),1);
+			st.elEdit_tasks.removeChild( el);
+		}
 
 		var tags = {};
 		if( tasks[t].tags )
@@ -819,7 +832,15 @@ Status.prototype.editSave = function( i_args)
 				elList = elTask.m_elTags.tags;
 				for( var i = 0; i < elList.length; i++)
 					if( elList[i].m_selected )
-						task.tags.push( elList[i].m_item);
+					{
+						var tag = elList[i].m_item;
+						task.tags.push( tag);
+
+						// Add tag to status:
+						if( this.obj.tags == null ) this.obj.tags = [];
+						if( this.obj.tags.indexOf( tag) == -1 )
+							this.obj.tags.push( tag);
+					}
 			}
 			else if( elTask.m_task.tags )
 				task.tags = elTask.m_task.tags;
@@ -830,7 +851,15 @@ Status.prototype.editSave = function( i_args)
 				elList = elTask.m_elArtists.artists;
 				for( var i = 0; i < elList.length; i++)
 					if( elList[i].m_selected )
-						task.artists.push( elList[i].m_item);
+					{
+						var artist = elList[i].m_item;
+						task.artists.push( artist);
+
+						// Add artist to status:
+						if( this.obj.artists == null ) this.obj.artists = [];
+						if( this.obj.artists.indexOf( artist) == -1 )
+							this.obj.artists.push( artist);
+					}
 			}
 			else if( elTask.m_task.artists )
 				task.artists = elTask.m_task.artists;

@@ -10,7 +10,7 @@ d_guiparams.input = {};
 d_guiparams.output = {};
 d_guiparams.filename = {}
 d_guiparams.fps = {"label":'FPS',"width":'25%'};
-d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px'};
+d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px',"tooltip":'First frame is "1"\nNo matter image file name number.'};
 d_guiparams.aspect_in = {"label":'Aspect In',"width":'25%',"lwidth":'70px'};
 d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 

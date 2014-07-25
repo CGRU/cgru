@@ -27,6 +27,8 @@ function gui_Create( i_wnd, i_params, i_values)
 			elLabel.textContent = p.replace(/_/g,' ') + ':';
 			elLabel.style.textTransform = 'capitalize';
 		}
+		if( i_params[p].tooltip )
+			elLabel.title = i_params[p].tooltip;
 		if( i_params[p].lwidth )
 			elLabel.style.width = i_params[p].lwidth;
 
