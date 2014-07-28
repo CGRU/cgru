@@ -6,6 +6,8 @@ function stcs_Show( i_args)
 	var i_elReportsDiv = i_args.elReportsDiv;
 	var i_elTasks = i_args.elTasks;
 	var i_elTasksDiv = i_args.elTasksDiv;
+	var i_elDiffer = i_args.elDiffer;
+	var i_elDifferDiv = i_args.elDifferDiv;
 	var i_draw_bars = i_args.draw_bars;
 
 	if( i_elTasks == null ) return;
@@ -117,6 +119,17 @@ function stcs_Show( i_args)
 	else
 		i_elReportsDiv.style.display = 'none';
 
+
+	if( i_elDiffer == null ) return;
+
+	i_elDiffer.textContent = '';
+	if( tasks.length && reports.length )
+	{
+		i_elDifferDiv.style.display = 'block';
+		stcs_ShowDifference({"el":i_elDiffer,"tasks":tasks,"reports":reports});
+	}
+	else
+		i_elDifferDiv.style.display = 'none';
 }
 
 function stcs_ShowTable( i_args)
@@ -159,6 +172,7 @@ function stcs_ShowTable( i_args)
 		elTr.appendChild( elTd);
 		elTd.classList.add('duration');
 		elTd.textContent = i_data[r].duration;
+		elTd.title = '/8 = ' + ( Math.round( 10.0 * i_data[r].duration / 8) / 10 );
 
 		var elTd = document.createElement('td');
 		elTr.appendChild( elTd);
@@ -187,6 +201,7 @@ function stcs_ShowTable( i_args)
 	var elTd = document.createElement('th');
 	elTr.appendChild( elTd);
 	elTd.textContent = i_total_duration;
+	elTd.title = '/8 = ' + ( Math.round( 10.0 * i_total_duration / 8) / 10 );
 
 	var elTd = document.createElement('th');
 	elTr.appendChild( elTd);
@@ -198,47 +213,99 @@ function stcs_ShowTable( i_args)
 	i_el.appendChild( elBarsDiv);
 	elBarsDiv.classList.add('bars');
 
-	var width = 80;
-	var height = 100;
-	var height_coeff = height / i_data[0].duration;
-	var height_text = 20;
-	height += height_text * 2;
+	var width_coeff = 100 / i_data[0].duration;
 
 	for( var i = 0; i < i_data.length; i++)
 	{
-		var rect_h = i_data[i].duration * height_coeff;
+		var rect_w = i_data[i].duration * width_coeff;
+		var info = Math.round( 100.0 * i_data[i].duration / i_total_duration ) + '% ';
+		info += c_GetTagTitle( i_data[i].tags[0]);
+		var dur_info = 'Duration: ' + i_data[i].duration + ' ( /8=' + ( Math.round( 10.0 * i_data[i].duration / 8) / 10 ) + ' )';
 
 		var elBar = document.createElement('div');
 		elBarsDiv.appendChild( elBar);
 		elBar.classList.add('bar');
-		elBar.style.cssFloat = 'left';
 		elBar.style.position = 'relative';
-		elBar.style.width = width + 'px';
-		elBar.style.height = height + 'px';
 
 		var elBarRect = document.createElement('div');
 		elBar.appendChild( elBarRect);
 		elBarRect.classList.add('rect');
-		elBarRect.style.position = 'absolute';
-		elBarRect.style.bottom = height_text + 'px';
-		elBarRect.style.width = width + 'px';
-		elBarRect.style.height = rect_h + 'px';
+		elBarRect.style.width =  rect_w + '%';
+		elBarRect.title = dur_info;
 
-		var elBarName = document.createElement('div');
-		elBar.appendChild( elBarName);
-		elBarName.classList.add('name');
-		elBarName.textContent = c_GetTagTitle( i_data[i].tags[0]);
-		elBarName.style.position = 'absolute';
-		elBarName.style.bottom = '0';
-		elBarName.style.width = width + 'px';
+		var elBarInfo = document.createElement('div');
+		elBar.appendChild( elBarInfo);
+		elBarInfo.classList.add('info');
+		elBarInfo.textContent = info;
+		elBarInfo.style.position = 'absolute';
+		elBarInfo.style.top = '-2px';
+		elBarInfo.title = dur_info;
+		if( rect_w < 50 )
+			elBarInfo.style.left = rect_w + '%';
+		else
+			elBarInfo.style.right = ( 100 - rect_w ) + '%';
+	}
+}
 
-		var elBarValue = document.createElement('div');
-		elBar.appendChild( elBarValue);
-		elBarValue.classList.add('value');
-		elBarValue.textContent = i_data[i].duration;
-		elBarValue.style.position = 'absolute';
-		elBarValue.style.width = width + 'px';
-		elBarValue.style.bottom = height_text + rect_h + 'px';
+function stcs_ShowDifference( i_args)
+{
+	var i_tasks = i_args.tasks;
+	var i_reports = i_args.reports;
+
+	var alltags = {};
+
+	for( var i = 0; i < i_tasks.length; i++)
+	{
+		var tag = i_tasks[i].tags[0];
+		alltags[tag] = {};
+		alltags[tag].tsk_dur = i_tasks[i].duration;
+	}
+
+	for( var i = 0; i < i_reports.length; i++)
+	{
+		var tag = i_reports[i].tags[0];
+		if( alltags[tag] == null ) alltags[tag] = {};
+		alltags[tag].rep_dur = i_reports[i].duration;
+	}
+
+	var data = [];
+	var differ_max = 1;
+	var differ_min = 1;
+	for( var tag in alltags )
+	{
+		var obj = alltags[tag];
+		obj.tag = tag;
+		obj.differ = 0;
+
+		if( obj.tsk_dur && obj.rep_dur )
+		{
+			obj.differ = obj.rep_dur / obj.tsk_dur;
+
+			if( obj.differ > 1 )
+			if( obj.differ > differ_max )
+				differ_max = obj.differ;
+			if( obj.differ < differ_min )
+				differ_min = obj.differ;
+		}
+		else if( obj.rep_dur )
+			obj.differ = -1;
+
+
+		data.push( obj);
+	}
+
+//	if( differ_max <= 0 ) return;
+
+	data.sort( function(a,b)
+	{
+		if( a.differ < b.differ ) return 1;
+	});
+
+	var width_r = 50 / ( differ_max - 1 );
+	var width_l = 50 / ( differ_max - 1 );
+
+	for( var i = 0; i < data.length; i++ )
+	{
 	}
 }
 

@@ -68,10 +68,14 @@ opacity:.9;
 
 .shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #000 inset, 0 0 4px #7FF;}
 
-#scenes_statistics .bars .bar { padding: 4px; }
-#scenes_statistics .bars .bar .value { text-align: center; }
-#scenes_statistics .bars .bar .rect  { background: #371; box-shadow: 0 0 3px #000; }
-#scenes_statistics .bars .bar .name  { text-align: center; }
+#scenes_statistics .bars .bar { margin: 2px 0px; }
+#scenes_statistics .bars .bar .rect {
+background: rgba(0,250,0,.3);
+height: 11px;
+box-shadow: 0 0 2px #000 inset;
+border-radius: 2px;
+}
+#scenes_statistics .bars .bar .info  { font-size: 12px; padding: 0px 4px; }
 
 </style>
 
@@ -95,13 +99,17 @@ opacity:.9;
 </div>
 
 <div id="scenes_statistics">
-	<div id="scenes_tasks_div" style="-float:right; margin:4px; padding:2px; border:1px solid #777">
+	<div id="scenes_tasks_div" style="margin:4px; padding:2px; border:1px solid #777">
 		Tasks:
 		<div id="scenes_tasks" style="margin: 4px;"></div>
 	</div>
-	<div id="scenes_reports_div" style="-float:right; margin:4px; padding:2px; border:1px solid #777">
+	<div id="scenes_reports_div" style="margin:4px; padding:2px; border:1px solid #777">
 		Reports:
 		<div id="scenes_reports" style="margin: 4px;"></div>
+	</div>
+	<div id="scenes_differ_div" style="margin:4px; padding:2px; border:1px solid #777">
+		Difference:
+		<div id="scenes_differ" style="margin: 4px;"></div>
 	</div>
 </div>
 

@@ -547,10 +547,12 @@ function sc_DisplayStatistics()
 
 	var args = {};
 	args.statuses = statuses;
-	args.elReports = $('scenes_reports');
-	args.elReportsDiv = $('scenes_reports_div');
 	args.elTasks = $('scenes_tasks');
 	args.elTasksDiv = $('scenes_tasks_div');
+	args.elReports = $('scenes_reports');
+	args.elReportsDiv = $('scenes_reports_div');
+	args.elDiffer = $('scenes_differ');
+	args.elDifferDiv = $('scenes_differ_div');
 	args.draw_bars = true;
 
 	stcs_Show( args);
