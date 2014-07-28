@@ -172,7 +172,7 @@ function stcs_ShowTable( i_args)
 		elTr.appendChild( elTd);
 		elTd.classList.add('duration');
 		elTd.textContent = i_data[r].duration;
-		elTd.title = '/8 = ' + ( Math.round( 10.0 * i_data[r].duration / 8) / 10 );
+		elTd.title = '/8 = ' + (i_data[r].duration/8.0).toPrecision(2);
 
 		var elTd = document.createElement('td');
 		elTr.appendChild( elTd);
@@ -183,6 +183,8 @@ function stcs_ShowTable( i_args)
 			txt += ' ' + c_GetTagTitle( i_data[r].tags[t]);
 		}
 		elTd.textContent = txt;
+		if( i_data[r].tags.length == 1 )
+			elTd.title = c_GetTagTip( i_data[r].tags[0]);
 
 		var elTd = document.createElement('td');
 		elTr.appendChild( elTd);
@@ -201,7 +203,7 @@ function stcs_ShowTable( i_args)
 	var elTd = document.createElement('th');
 	elTr.appendChild( elTd);
 	elTd.textContent = i_total_duration;
-	elTd.title = '/8 = ' + ( Math.round( 10.0 * i_total_duration / 8) / 10 );
+	elTd.title = '/8 = ' + (i_total_duration/8.0).toPrecision(2);
 
 	var elTd = document.createElement('th');
 	elTr.appendChild( elTd);
@@ -220,7 +222,7 @@ function stcs_ShowTable( i_args)
 		var rect_w = i_data[i].duration * width_coeff;
 		var info = Math.round( 100.0 * i_data[i].duration / i_total_duration ) + '% ';
 		info += c_GetTagTitle( i_data[i].tags[0]);
-		var dur_info = 'Duration: ' + i_data[i].duration + ' ( /8=' + ( Math.round( 10.0 * i_data[i].duration / 8) / 10 ) + ' )';
+		var tooltip = 'Duration: ' + i_data[i].duration + ' ( /8=' + (i_data[i].duration/8.0).toPrecision(2) + ' )';
 
 		var elBar = document.createElement('div');
 		elBarsDiv.appendChild( elBar);
@@ -231,7 +233,7 @@ function stcs_ShowTable( i_args)
 		elBar.appendChild( elBarRect);
 		elBarRect.classList.add('rect');
 		elBarRect.style.width =  rect_w + '%';
-		elBarRect.title = dur_info;
+		elBarRect.title = tooltip;
 
 		var elBarInfo = document.createElement('div');
 		elBar.appendChild( elBarInfo);
@@ -239,7 +241,7 @@ function stcs_ShowTable( i_args)
 		elBarInfo.textContent = info;
 		elBarInfo.style.position = 'absolute';
 		elBarInfo.style.top = '-2px';
-		elBarInfo.title = dur_info;
+		elBarInfo.title = tooltip;
 		if( rect_w < 50 )
 			elBarInfo.style.left = rect_w + '%';
 		else
@@ -249,6 +251,7 @@ function stcs_ShowTable( i_args)
 
 function stcs_ShowDifference( i_args)
 {
+	var i_el = i_args.el;
 	var i_tasks = i_args.tasks;
 	var i_reports = i_args.reports;
 
@@ -294,18 +297,112 @@ function stcs_ShowDifference( i_args)
 		data.push( obj);
 	}
 
-//	if( differ_max <= 0 ) return;
+	var elBarsDiv = document.createElement('div');
+	i_el.appendChild( elBarsDiv);
+	elBarsDiv.classList.add('bars');
 
 	data.sort( function(a,b)
 	{
+		if( b.differ == -1 ) return 1;
+		if( a.differ == -1 ) return -1;
 		if( a.differ < b.differ ) return 1;
 	});
 
 	var width_r = 50 / ( differ_max - 1 );
-	var width_l = 50 / ( differ_max - 1 );
+	var width_l = 50 / ( 1 - differ_min );
+
+//console.log('dn=' + differ_min + ' dx=' + differ_max);
+//console.log('wr=' + width_r + ' wl=' + width_l);
 
 	for( var i = 0; i < data.length; i++ )
 	{
+		var info = data[i].differ.toPrecision(2);
+
+		var tooltip = 'Duration: ';
+
+		var r = 0; var g = 250; var b = 0; var a = .3;
+
+		var elBar = document.createElement('div');
+		elBarsDiv.appendChild( elBar);
+		elBar.classList.add('bar');
+		elBar.style.position = 'relative';
+
+		var elBarRect = document.createElement('div');
+		elBar.appendChild( elBarRect);
+		elBarRect.classList.add('rect');
+		elBarRect.style.position = 'absolute';
+
+		var elBarInfo = document.createElement('div');
+		elBar.appendChild( elBarInfo);
+		elBarInfo.classList.add('info');
+		elBarInfo.style.position = 'absolute';
+		elBarInfo.style.top = '-2px';
+
+		if( data[i].differ == -1 )
+		{
+//			elBarRect.style.display = 'none';
+			elBarRect.style.left = '50%';
+			elBarRect.style.right = '0';
+			elBarInfo.style.right = '50%';
+			elBarInfo.style.color = 'rgb(150,0,0)';
+			r = 250; g = 0; a = .1;
+			info = c_GetTagTitle( data[i].tag) + ' (no tasks)';
+			tooltip += 'Reports ' + data[i].rep_dur;
+		}
+		else if( data[i].differ == 0 )
+		{
+//			elBarRect.style.display = 'none';
+			elBarRect.style.left = '0';
+			elBarRect.style.right = '50%';
+			elBarInfo.style.left = '50%';
+			elBarInfo.style.color = 'rgb(0,0,250)';
+			b = 250; g = 0; a = .1;
+			info = c_GetTagTitle( data[i].tag) + ' (no reports)';
+			tooltip += 'Tasks ' + data[i].tsk_dur;
+		}
+		else if( data[i].differ < 1 )
+		{
+			elBarRect.style.right = '50%';
+			elBarRect.style.left = (50 - width_l * ( 1 - data[i].differ )) + '%';
+			elBarInfo.style.left = '50%';
+
+			b = (1-data[i].differ) / (1-differ_min);
+			if( b < .5 )
+				b = 2 * b;
+			else
+			{
+				b = 1;
+				g = Math.round( 250.0 * ( .5 - .5*b ));
+			}
+			b = Math.round(250.0 * b);
+
+			info += ' ' + c_GetTagTitle( data[i].tag);
+			tooltip += 'Tasks ' + data[i].tsk_dur + ' / ' + data[i].rep_dur + ' Reports';
+		}
+		else
+		{
+			elBarRect.style.left = '50%';
+			elBarRect.style.right = (50 + width_r * ( 1 - data[i].differ )) + '%';
+			elBarInfo.style.right = '50%';
+
+			r = (data[i].differ-1) / (differ_max-1);
+			if( r < .5 )
+				r = 2 * r;
+			else
+			{
+				r = 1;
+				g = Math.round( 250.0 * ( .5 - .5*r ));
+			}
+			r = Math.round(250.0 * r);
+
+			info += ' ' + c_GetTagTitle( data[i].tag);
+			tooltip += 'Tasks ' + data[i].tsk_dur + ' / ' + data[i].rep_dur + ' Reports';
+		}
+//console.log('rgba('+r+','+g+','+b+',.3)');
+		elBarRect.style.background = 'rgba('+r+','+g+','+b+','+a+')';
+		elBarInfo.textContent = info;
+		elBarInfo.title = tooltip;
+		elBarRect.title = tooltip;
 	}
 }
 

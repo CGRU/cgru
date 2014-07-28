@@ -762,20 +762,22 @@ Status.prototype.editSave = function( i_args)
 	var finish_edit = this.elEdit_finish.textContent;
 	if( finish_edit.length && ( finish_edit != st_MultiValue ))
 	{
-		finish_edit = c_DT_SecFromStr( this.elEdit_finish.textContent);
+		finish_edit = c_DT_SecFromStr( finish_edit);
 		if( finish_edit != 0 )
 			finish = finish_edit;
 		else
-			c_Error('Invalid date format: ' + finish_edit);
+			c_Error('Invalid date format: ' + this.elEdit_finish.textContent);
 	}
 
-	if( this.elEdit_progress.textContent != st_MultiValue )
+	var progress_edit = this.elEdit_progress.textContent;
+	if( progress_edit.length && ( progress_edit != st_MultiValue ))
 	{
-		progress = parseInt( c_Strip( this.elEdit_progress.textContent));
+		progress_edit = c_Strip( progress_edit);
+		progress = parseInt( progress_edit);
 		if( isNaN( progress) )
 		{
 			progress = null;
-			c_Error('Invalid progress: ' + c_Strip( this.elEdit_progress.textContent));
+			c_Error('Invalid progress: ' + c_Strip( progress_edit));
 		}
 	}
 
