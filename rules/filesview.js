@@ -334,13 +334,16 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		el.textContent = c_DT_FormStrFromSec( i_obj.mtime);
 	}
 
-	if( i_obj.size_total != null )
+	var size = i_obj.size_total;
+	if( size == null ) size = i_obj.size;
+	if( size != null )
 	{
 		var el = document.createElement('div');
 		i_el.appendChild( el);
 		el.classList.add('size');
-		el.textContent = c_Bytes2KMG( i_obj.size_total);
-		el.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_obj.size);
+		el.textContent = c_Bytes2KMG( size);
+		if(( i_obj.size_total != null ) && ( i_obj.size != null ))
+			el.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_obj.size);
 	}
 
 	var num_files = null;
