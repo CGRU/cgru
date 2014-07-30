@@ -202,6 +202,8 @@ for path in Args:
 	path = os.path.normpath( path)
 	Out.append( processShot( path))
 
+print(json.dumps({'shot_process': Out}, indent=4))
+
 files = []
 if Options.soft != '':
 	for shot in Out:
@@ -226,11 +228,11 @@ for afile in files:
 		continue
 
 	file.write(afile['data'])
+	file.close()
 
 	if Options.run == '': continue
 
-	print('%s "%s"' % (Options.run, afile['file']))
-	os.system('%s "%s" &' % (Options.run, afile['file']))
-
-#print(json.dumps({'shot_process': Out}, indent=4))
+	cmd = '%s "%s" &' % (Options.run, afile['file'])
+	print(cmd)
+	os.system(cmd)
 
