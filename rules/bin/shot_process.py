@@ -90,6 +90,8 @@ def scanSequences( i_files):
 		seq['first'] = num
 		seq['count'] = 1
 
+		if Options.verbose: print(seq)
+
 	if seq is not None and seq['count'] > 1:
 		out.append(seq)
 
@@ -129,6 +131,16 @@ def processShot( i_path):
 
 	return out
 
+def createNukeBackdrop( o_data, i_name, i_y, i_w):
+	bd = 'BackdropNode {'
+	bd += '\nname %s' % i_name
+	bd += '\nxpos -20'
+	bd += '\nypos %d' % (i_y - 20)
+	bd += '\nbdwidth %d' % (i_w + 20)
+	bd += '\nbdheight 120'
+	bd += '\n}'
+	return bd
+
 def createNuke( shot):
 	if shot['sequences_count'] == 0: return
 
@@ -151,11 +163,7 @@ def createNuke( shot):
 	src = None
 	x = 0
 	y = 0
-	i = 0
-	last = False
 	for seq in shot['sequences']:
-		i += 1
-		if i == shot['sequences_count']: last = True
 
 		filename = seq['base'] + '#'*seq['padd'] + seq['ext']
 		filename = os.path.relpath( filename, shot['path'])
@@ -164,20 +172,11 @@ def createNuke( shot):
 		root = filename.split('/')
 		if len(root): root = root[0]
 		if src is None: src = root
-		if src != root or last:
-			bd = 'BackdropNode {'
-			bd += '\nname %s' % src
-			bd += '\nxpos -20'
-			bd += '\nypos %d' % (y - 20)
-			bd += '\nbdwidth %d' % ((x+100 if last else x) + 20)
-			bd += '\nbdheight 120'
-			bd += '\n}'
-
-			out['data'] += '\n' + bd
-			if not last:
-				y += 140
-				x = 0
-			src = root
+		if src != root:
+			out['data'] += '\n' + createNukeBackdrop( out['data'], src, y, x)
+			y += 140
+			x = 0
+		src = root
 
 		read = 'Read {'
 		read += '\ninputs 0'
@@ -193,6 +192,8 @@ def createNuke( shot):
 
 		out['data'] += '\n' + read
 		x += 100
+
+	out['data'] += '\n' + createNukeBackdrop( out['data'], src, y, x)
 
 	shot['nuke'] = out['file']
 
