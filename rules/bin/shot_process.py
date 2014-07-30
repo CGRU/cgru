@@ -20,6 +20,7 @@ Parser = OptionParser(
 Parser.add_option('-f', '--fps',      dest='fps',      type='int',          default=24,     help='Frames per second')
 Parser.add_option('-o', '--output',   dest='output',   type='string',       default='WORK', help='Software output')
 Parser.add_option('-s', '--soft',     dest='soft',     type='string',       default='',     help='Software type')
+Parser.add_option('-r', '--run',      dest='run',      type='string',       default='',     help='Run soft')
 Parser.add_option('-V', '--verbose',  dest='verbose',  action='store_true', default=False,  help='Verbose mode')
 Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,  help='Debug mode')
 
@@ -132,12 +133,51 @@ def createNuke( shot):
 	if shot['sequences_count'] == 0: return
 
 	out = dict()
-	out['data'] = ''
 
+	out['file'] = shot['path']
+	out['file'] = os.path.join( out['file'], Options.output)
+	out['file'] = os.path.join( out['file'], 'nuke')
+	out['file'] = os.path.join( out['file'], shot['name'])
+	out['file'] += '.v000.nk'
+
+	out['data'] = 'Root {'
+	out['data'] += '\nname %s' % out['file'].replace('\\','/')
+	out['data'] += '\nproject_directory %s' % shot['path'].replace('\\','/')
+	out['data'] += '\nfirst_frame %d' % shot['frame_first']
+	out['data'] += '\nlast_frame %d' % shot['frame_last']
+	out['data'] += '\nfps %d' % Options.fps
+	out['data'] += '\n}'
+
+	src = None
 	x = 0
 	y = 0
+	i = 0
+	last = False
 	for seq in shot['sequences']:
+		i += 1
+		if i == shot['sequences_count']: last = True
+
 		filename = seq['base'] + '#'*seq['padd'] + seq['ext']
+		filename = os.path.relpath( filename, shot['path'])
+		filename = filename.replace('\\','/')
+
+		root = filename.split('/')
+		if len(root): root = root[0]
+		if src is None: src = root
+		if src != root or last:
+			bd = 'BackdropNode {'
+			bd += '\nname %s' % src
+			bd += '\nxpos -20'
+			bd += '\nypos %d' % (y - 20)
+			bd += '\nbdwidth %d' % ((x+100 if last else x) + 20)
+			bd += '\nbdheight 120'
+			bd += '\n}'
+
+			out['data'] += '\n' + bd
+			if not last:
+				y += 140
+				x = 0
+			src = root
 
 		read = 'Read {'
 		read += '\ninputs 0'
@@ -146,7 +186,7 @@ def createNuke( shot):
 		read += '\nlast %d' % seq['last']
 		read += '\norigset true'
 		read += '\nversion 4'
-		read += '\nname %s' % os.path.basename(seq['base'])
+		read += '\nname %s' % ('R_' + os.path.basename(seq['base']).strip(' _.!'))
 		read += '\nxpos %d' % x
 		read += '\nypos %d' % y
 		read += '\n}'
@@ -154,11 +194,6 @@ def createNuke( shot):
 		out['data'] += '\n' + read
 		x += 100
 
-	out['file'] = shot['path']
-	out['file'] = os.path.join( out['file'], Options.output)
-	out['file'] = os.path.join( out['file'], 'nuke')
-	out['file'] = os.path.join( out['file'], shot['name'])
-	out['file'] += '.v000.nk'
 	shot['nuke'] = out['file']
 
 	return out
@@ -175,8 +210,27 @@ if Options.soft != '':
 			if out: files.append(out)
 
 for afile in files:
-	print(afile['file'])
-	print(afile['data'])
+	#print(afile['file'])
+	#print(afile['data'])
+	folder = os.path.dirname(afile['file'])
+	if not os.path.isdir(folder):
+		try:
+			os.makedirs(folder)
+		except:
+			Out['error'] = 'Can\'t create folder: ' + folder
+			continue
+	try:
+		file = open( afile['file'],'w')
+	except:
+		Out['error'] = 'Can\'t create file: ' + afile['file']
+		continue
 
-print(json.dumps({'shot_process': Out}, indent=4))
+	file.write(afile['data'])
+
+	if Options.run == '': continue
+
+	print('%s "%s"' % (Options.run, afile['file']))
+	os.system('%s "%s" &' % (Options.run, afile['file']))
+
+#print(json.dumps({'shot_process': Out}, indent=4))
 

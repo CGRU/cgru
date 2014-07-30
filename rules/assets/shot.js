@@ -5,8 +5,20 @@ function shot_Show()
 	shot_thumb_paths = [];
 
 	a_SetLabel('Shot');
+
+	// Get page:
 	$('asset').innerHTML = n_Request({"send":{"getfile":'rules/assets/shot.html'}});
 
+	// Set process buttons commands:
+	var path = cgru_PM('/' + RULES.root + g_CurPath());
+	cmd = cgru_PM('/cgru/rules/bin/shot_process');
+	cmd = cmd + ' -s nuke -r nuke "' + path + '"';
+console.log( cmd);
+	$('shot_nukenew_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
+
+	$('shot_nukelatest_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
+
+	// Collect walks to show result folders:
 	var walk = {};
 	walk.paths = [];
 	

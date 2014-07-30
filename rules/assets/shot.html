@@ -7,6 +7,12 @@ margin: 6px;
 padding: 5px 20px 20px 20px;
 }
 
+#shot_process_div > div {
+float:left;
+font-size: 12px;
+margin:2px 4px;
+}
+
 </style>
 
 <div id="shot_refs_div" style="float: left; display: none;">
@@ -17,6 +23,11 @@ padding: 5px 20px 20px 20px;
 <div id="shot_src_div" style="float: left; display: none;">
 	<div id="shot_src_btn" class="button" onclick="shot_ScanSources()">Scan Sources</div>
 	<div id="shot_src" class="shot_files" style="display: none;">Scanning Shot Source Sequences...</div>
+</div>
+
+<div id="shot_process_div" style="float:right">
+	<div class="cmdexec" id="shot_nukenew_btn" onclick="shot_NukeNew()">Nk New</div>
+	<div class="cmdexec" id="shot_nukelatest_btn" onclick="shot_NukeNew()">Nk Latest</div>
 </div>
 
 <div id="shot_results" class="shot_files" style="clear: both; display: none;">Reading Shot Results...</div>
