@@ -64,11 +64,15 @@ allfiles = os.listdir( SceneFolder)
 scenes = []
 for afile in allfiles:
 	if afile[0] == '.': continue
-	name, ext = os.path.splitext( afile)
-	if ext.lower() == Options.ext.lower():
+	# We should skip files with more than one extension
+	# Assuming that second extension is a temp render scene
+	if afile.lower().find( Options.ext.lower()) == len (afile) - len(Options.ext):
 		scenes.append( afile)
 
 scenes.sort()
+if Options.verbose:
+	for afile in scenes:
+		print( afile)
 
 SceneFile = os.path.join( SceneFolder, scenes[-1])
 cmd = '%s "%s" &' % (Options.run, SceneFile)
@@ -79,5 +83,6 @@ Out.append({'cmd':cmd})
 
 print(json.dumps({OutName: Out}, indent=4))
 
-os.system(cmd)
+if not Options.debug:
+	os.system(cmd)
 
