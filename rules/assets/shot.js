@@ -18,7 +18,7 @@ function shot_Show()
 
 	cmd = cmd + ' -s nuke -r nuke';
 	if( ASSET.nuke_template )
-		cmd += ' -t ' + ASSET.nuke_template;
+		cmd += ' -t ' + cgru_PM('/' + RULES.root + ASSET.nuke_template);
 
 	cmd += ' ' + path;
 

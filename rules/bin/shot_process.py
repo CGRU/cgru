@@ -159,7 +159,7 @@ def createNuke( shot):
 	out['file'] = os.path.join( out['file'], Options.output)
 	out['file'] = os.path.join( out['file'], 'nuke')
 	out['file'] = os.path.join( out['file'], shot['name'])
-	out['file'] += '.v000.nk'
+	out['file'] += '_v000.nk'
 
 	out['data'] = 'Root {'
 	out['data'] += '\nname %s' % out['file'].replace('\\','/')
