@@ -11,9 +11,17 @@ function shot_Show()
 
 	// Set process buttons commands:
 	var path = cgru_PM('/' + RULES.root + g_CurPath());
+
 	cmd = cgru_PM('/cgru/rules/bin/shot_process', true);
-	if( ASSET.process ) cmd = ASSET.process;
-	cmd = cmd + ' -s nuke -r nuke ' + path;
+	if( ASSET.process )
+		cmd = cgru_PM( ASSET.process);
+
+	cmd = cmd + ' -s nuke -r nuke';
+	if( ASSET.nuke_template )
+		cmd += ' -t ' + ASSET.nuke_template;
+
+	cmd += ' ' + path;
+
 console.log( cmd);
 	$('shot_nukenew_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
 

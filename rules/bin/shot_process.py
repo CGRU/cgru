@@ -20,6 +20,7 @@ Parser = OptionParser(
 Parser.add_option('-f', '--fps',      dest='fps',      type='int',          default=24,     help='Frames per second')
 Parser.add_option('-o', '--output',   dest='output',   type='string',       default='WORK', help='Software output')
 Parser.add_option('-s', '--soft',     dest='soft',     type='string',       default='',     help='Software type')
+Parser.add_option('-t', '--template', dest='template', type='string',       default='',     help='Software file template')
 Parser.add_option('-r', '--run',      dest='run',      type='string',       default='',     help='Run soft')
 Parser.add_option('-V', '--verbose',  dest='verbose',  action='store_true', default=False,  help='Verbose mode')
 Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,  help='Debug mode')
@@ -45,6 +46,14 @@ if Options.debug: Options.verbose = True
 
 if len( Args) == 0:
 	errExit('Paths are not specified.')
+
+TemplateFileData = ''
+if Options.template != '':
+	if not os.path.isfile( Options.template):
+		errExit('Template file does not exist')
+	file = open( Options.template,'r')
+	TemplateFileData = file.read()
+	file.close()
 
 def isImage( i_file):
 	name,ext = os.path.splitext( i_file)
@@ -228,7 +237,7 @@ for afile in files:
 		Out['error'] = 'Can\'t create file: ' + afile['file']
 		continue
 
-	file.write(afile['data'])
+	file.write(TemplateFileData + afile['data'])
 	file.close()
 
 	if Options.run == '': continue
