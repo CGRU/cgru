@@ -124,7 +124,7 @@ def processShot( i_path):
 			sequences.append( seq)
 
 	out['name'] = os.path.basename( i_path)
-	out['sequences'] = sequences
+	out['sequences'] = sorted( sequences, key=lambda seq: seq['base'])
 	out['sequences_count'] = len(sequences)
 	out['frame_first'] = frame_first
 	out['frame_last'] = frame_last
