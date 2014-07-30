@@ -203,6 +203,7 @@ def createNuke( shot):
 		x += 100
 
 	out['data'] += '\n' + createNukeBackdrop( out['data'], src, y, x)
+	out['shot'] = os.path.basename( shot['path'])
 
 	shot['nuke'] = out['file']
 
@@ -236,6 +237,8 @@ for afile in files:
 	except:
 		Out['error'] = 'Can\'t create file: ' + afile['file']
 		continue
+
+	TemplateFileData = TemplateFileData.replace('@SHOT@', afile['shot'])
 
 	file.write(TemplateFileData + afile['data'])
 	file.close()

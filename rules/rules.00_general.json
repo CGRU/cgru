@@ -85,6 +85,7 @@
 			"path":["RESULT/DAILIES"]
 		},
 		"template":"/CG_PROJECT/SCENES/COMMON/_template",
+		"-nuke_template":"/CG_PROJECT/SCENES/COMMON/_template.nk",
 		"cache_time":60
 	}
 },

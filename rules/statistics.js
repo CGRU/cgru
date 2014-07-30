@@ -371,8 +371,8 @@ function stcs_ShowDifference( i_args)
 				b = 2 * b;
 			else
 			{
+				g = Math.round( 250.0 * ( 1 - 2*(b-.5) ));
 				b = 1;
-				g = Math.round( 250.0 * ( .5 - .5*b ));
 			}
 			b = Math.round(250.0 * b);
 
@@ -390,8 +390,8 @@ function stcs_ShowDifference( i_args)
 				r = 2 * r;
 			else
 			{
+				g = Math.round( 250.0 * ( 1 - 2*(r-.5) ));
 				r = 1;
-				g = Math.round( 250.0 * ( .5 - .5*r ));
 			}
 			r = Math.round(250.0 * r);
 
