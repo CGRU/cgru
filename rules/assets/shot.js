@@ -23,9 +23,17 @@ function shot_Show()
 	cmd += ' ' + path;
 
 console.log( cmd);
-	$('shot_nukenew_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
+	$('shot_nuke_new_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
 
-	$('shot_nukelatest_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
+	cmd = cgru_PM('/cgru/rules/bin/shot_open_latest', true);
+	if( ASSET.open_latest )
+		cmd = cgru_PM( ASSET.open_latest);
+
+	cmd = cmd + ' -s nuke -e .nk -r nuke';
+
+	cmd += ' ' + path;
+console.log( cmd);
+	$('shot_nuke_latest_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
 
 	// Collect walks to show result folders:
 	var walk = {};
