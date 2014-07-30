@@ -59,6 +59,10 @@ if Options.soft != '':
 folder_user = os.path.join( SceneFolder, getpass.getuser())
 if os.path.isdir( folder_user):
 	SceneFolder = folder_user
+Out.append({'folder':SceneFolder})
+
+if not os.path.isdir( SceneFolder):
+	errExit('No scenes folder.')
 
 allfiles = os.listdir( SceneFolder)
 scenes = []
@@ -69,6 +73,9 @@ for afile in allfiles:
 	if afile.lower().find( Options.ext.lower()) == len (afile) - len(Options.ext):
 		scenes.append( afile)
 
+if len(scenes) == 0:
+	errExit('No scenes founded.')
+
 scenes.sort()
 if Options.verbose:
 	for afile in scenes:
@@ -77,7 +84,6 @@ if Options.verbose:
 SceneFile = os.path.join( SceneFolder, scenes[-1])
 cmd = '%s "%s" &' % (Options.run, SceneFile)
 
-Out.append({'folder':SceneFolder})
 Out.append({'file':SceneFile})
 Out.append({'cmd':cmd})
 
