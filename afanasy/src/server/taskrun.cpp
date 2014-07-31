@@ -222,12 +222,16 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    if( m_zombie ) return false;
    bool changed = false;
 
-   // Tasks with running time > maximum set to errors: // If it TasksMaxRunTime > 0 ( 0 is "infinite" )
-   if((m_block->m_data->getTasksMaxRunTime() != 0) && (currentTime - m_progress->time_start > m_block->m_data->getTasksMaxRunTime()))
-   {
-      stop("Task maximum run time reached.", renders, monitoring);
-      errorHostId = m_hostId;
-   }
+	// Max running time check:
+	if(( m_block->m_data->getTasksMaxRunTime() != 0) && // ( If TasksMaxRunTime == 0 it is "infinite" )
+		( m_stopTime == 0 ) && // It can be already reachedd before and task is already stopping
+		( currentTime - m_progress->time_start > m_block->m_data->getTasksMaxRunTime()))
+	{
+		m_progress->state = m_progress->state | AFJOB::STATE_ERROR_MASK;
+		m_progress->errors_count++;
+		stop("Task maximum run time reached.", renders, monitoring);
+		errorHostId = m_hostId;
+	}
 
    // Tasks update timeout check:
    if(( m_stopTime == 0) && ( currentTime > m_progress->time_done + af::Environment::getTaskUpdateTimeout()))
