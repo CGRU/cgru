@@ -99,28 +99,26 @@
 
 "cmdexec":{"open_folder":"open \"@PATH@\""},
 
-"OS_linux":{
+"OS_unix":{
 	"cmdexec":{
-		"open_folder":"nautilus \"@PATH@\"",
 		"play_sequence":[
 			{"name":"DJV",
-				"cmd":"djv_view \"@PATH@\""}
+				"cmd":"djv_view \"@PATH@\"",
+				"tooltip":"Open sequence within 'djv_view'."},
+			{"name":"NkCp",
+				"cmd":"nukecopy \"@PATH@\"",
+				"tooltip":"Copy Nuke Read.\nPaste it in a scene."},
+			{"name":"Nuke",
+				"cmd":"nukeview \"@PATH@\"",
+				"tooltip":"Open Nuke with this sequence Reader."}
 		],
 		"play_movie":[
 			{"name":"VLC",
-				"cmd":"vlc \"@PATH@\""},
+				"cmd":"vlc \"@PATH@\"",
+				"tooltip":"Open with VLC media player."},
 			{"name":"Totem",
-				"cmd":"totem \"@PATH@\""}
-		]
-	}
-},
-
-"OS_macosx":{
-	"cmdexec":{
-		"open_folder":"open \"@PATH@\"",
-		"play_movie":[
-			{"name":"QT",
-				"cmd":"open \"@PATH@\""}
+				"cmd":"totem \"@PATH@\"",
+				"tooltip":"Open with Totem video player."}
 		]
 	}
 },
@@ -129,17 +127,39 @@
 	"cmdexec":{
 		"open_folder":"start @PATH@",
 		"play_sequence":[
-			{"name":"PdP",
-				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
 			{"name":"Pd++",
-				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"}
+				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@",
+				"tooltip":"Append sequence in opened PdPlayer."},
+			{"name":"PdP",
+				"cmd":"pdplayer --fps=@FPS@ @PATH@",
+				"tooltip":"Open sequence with PdPlayer."},
+			{"name":"NkCp",
+				"cmd":"nukecopy @PATH@",
+				"tooltip":"Copy Nuke Read.\nPaste it in a scene."},
+			{"name":"Nuke",
+				"cmd":"nukeview @PATH@",
+				"tooltip":"Open Nuke with this sequence Reader."}
 		],
 		"play_movie":[
 			{"name":"QT",
-				"cmd":"QuickTimePlayer @PATH@"},
+				"cmd":"QuickTimePlayer @PATH@",
+				"tooltip":"Open with QuickTime."},
 			{"name":"VLC",
-				"cmd":"vlc @PATH@"}
+				"cmd":"vlc @PATH@",
+				"tooltip":"Open with VLC media player."}
 		]
+	}
+},
+
+"OS_linux":{
+	"cmdexec":{
+		"open_folder":"nautilus \"@PATH@\""
+	}
+},
+
+"OS_macosx":{
+	"cmdexec":{
+		"open_folder":"open \"@PATH@\""
 	}
 },
 

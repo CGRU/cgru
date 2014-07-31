@@ -422,6 +422,7 @@ FilesView.prototype.showFolder = function( i_folder)
 		elLinkA.setAttribute('href', 'player.html#'+play_path);
 		elLinkA.setAttribute('target', '_blank');
 		elLinkA.textContent = 'play';
+		elLinkA.title = "Open RULES player in a new window.";
 		elLinkA.style.cssFloat = 'right';
 	}
 
@@ -438,6 +439,7 @@ FilesView.prototype.showFolder = function( i_folder)
 			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
+			if( cmds[c].tooltip ) elCmd.title = cmds[c].tooltip;
 		}
 	}
 
@@ -499,6 +501,7 @@ FilesView.prototype.showFile = function( i_file)
 			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
+			if( cmds[c].tooltip ) elCmd.title = cmds[c].tooltip;
 		}
 	}
 
@@ -518,6 +521,7 @@ FilesView.prototype.showFile = function( i_file)
 		elPreviewBtn.classList.add('preview_btn');
 		elPreviewBtn.classList.add('button');
 		elPreviewBtn.innerHTML = '&#9655;';
+		elPreviewBtn.title = "Preview";
 		elPreviewBtn.m_el_file = elFile;
 		elPreviewBtn.onclick = function(e){ e.stopPropagation(); fv_PreviewOpen(e.currentTarget.m_el_file);};
 	}
