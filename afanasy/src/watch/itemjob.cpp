@@ -408,6 +408,9 @@ bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QStri
 
 void ItemJob::getThumbnail() const
 {
+	if( afqt::QEnvironment::thumb_jobs_num.n < 1 )
+		return;
+
 	std::ostringstream str;
 	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"thumbnail\"";
 	str << ",\"ids\":[" << getId() << "]";
@@ -434,25 +437,28 @@ void ItemJob::v_filesReceived( const af::MCTaskUp & i_taskup)
 		if( m_thumbs_paths[0] == filename )
 			return;
 
-	QImage * img = new QImage();
-	if( false == img->loadFromData( (const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
-		return;
-
-	if( m_thumbs.size() >= afqt::QEnvironment::thumb_jobs_num.n )
+	if( m_thumbs.size() && ( m_thumbs.size() >= afqt::QEnvironment::thumb_jobs_num.n ))
 	{
 		delete m_thumbs.takeLast();
 		m_thumbs_paths.removeLast();
 	}
 
-	if( img->size().height() != afqt::QEnvironment::thumb_jobs_height.n )
+	if( afqt::QEnvironment::thumb_jobs_num.n > 0 )
 	{
-		QImage img_scaled = img->scaledToHeight( afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation );
-		delete img;
-		img = new QImage( img_scaled);
-	}
+		QImage * img = new QImage();
+		if( false == img->loadFromData( (const unsigned char *) i_taskup.getFileData(0), i_taskup.getFileSize(0)))
+			return;
 
-	m_thumbs.prepend( img);
-	m_thumbs_paths.prepend( filename);
+		if( img->size().height() != afqt::QEnvironment::thumb_jobs_height.n )
+		{
+			QImage img_scaled = img->scaledToHeight( afqt::QEnvironment::thumb_jobs_height.n, Qt::SmoothTransformation );
+			delete img;
+			img = new QImage( img_scaled);
+		}
+
+		m_thumbs.prepend( img);
+		m_thumbs_paths.prepend( filename);
+	}
 
 	if( false == calcHeight())
 		m_list->itemsHeightChanged();
