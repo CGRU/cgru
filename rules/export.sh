@@ -17,7 +17,7 @@ source $credentials
 echo USER=$FTP_USER
 echo DEST=$dest
 
-ftp -in $dest <<END_SCRIPT
+ftp -pin $dest <<END_SCRIPT
 quote USER $FTP_USER
 quote PASS $FTP_PASS
 
