@@ -10,7 +10,7 @@ import sys
 from optparse import OptionParser
 
 ImgTypes = ['jpg','png','exr','dpx','tif','tiff','cin','tga']
-MovTypes = ['mov','avi','mpg','mpeg','mp4']
+#MovTypes = ['mov','avi','mpg','mpeg','mp4']
 
 Parser = OptionParser(
 	usage="%prog [options]\n\tType \"%prog -h\" for help",
@@ -107,6 +107,11 @@ def scanSequences( i_files):
 	return out
 
 def processShot( i_path):
+	"""Initial finction to process given path.
+	Assuming that the path is some shot root.
+	:param i_path:
+	:return:
+	"""
 	out = dict()
 	out['path'] = i_path
 	if not os.path.isdir( i_path):
@@ -137,10 +142,17 @@ def processShot( i_path):
 	out['sequences_count'] = len(sequences)
 	out['frame_first'] = frame_first
 	out['frame_last'] = frame_last
+	out['fps'] = Options.fps
 
 	return out
 
-def createNukeBackdrop( o_data, i_name, i_y, i_w):
+def createNukeBackdrop( i_name, i_y, i_w):
+	""" Create Nuke 'Backdrop' node
+	:param i_name:
+	:param i_x:
+	:param i_y:
+	:return:
+	"""
 	bd = 'BackdropNode {'
 	bd += '\nname %s' % i_name
 	bd += '\nxpos -20'
@@ -150,39 +162,35 @@ def createNukeBackdrop( o_data, i_name, i_y, i_w):
 	bd += '\n}'
 	return bd
 
-def createNuke( shot):
-	if shot['sequences_count'] == 0: return
+def processNuke( io_shot):
+	""" Process io_shot to create Nuke script:
+	:param io_shot:
+	:return:
+	"""
+	io_shot['file'] = io_shot['path']
+	io_shot['file'] = os.path.join( io_shot['file'], Options.output)
+	io_shot['file'] = os.path.join( io_shot['file'], 'nuke')
+	io_shot['file'] = os.path.join( io_shot['file'], io_shot['name'])
+	io_shot['file'] += '_v000.nk'
 
-	out = dict()
+	io_shot['nuke_name'] = io_shot['file'].replace('\\','/')
+	io_shot['nuke_path'] = io_shot['path'].replace('\\','/')
 
-	out['file'] = shot['path']
-	out['file'] = os.path.join( out['file'], Options.output)
-	out['file'] = os.path.join( out['file'], 'nuke')
-	out['file'] = os.path.join( out['file'], shot['name'])
-	out['file'] += '_v000.nk'
-
-	out['data'] = 'Root {'
-	out['data'] += '\nname %s' % out['file'].replace('\\','/')
-	out['data'] += '\nproject_directory %s' % shot['path'].replace('\\','/')
-	out['data'] += '\nfirst_frame %d' % shot['frame_first']
-	out['data'] += '\nlast_frame %d' % shot['frame_last']
-	out['data'] += '\nfps %d' % Options.fps
-	out['data'] += '\n}'
-
+	io_shot['data'] = ''
 	src = None
 	x = 0
 	y = 0
-	for seq in shot['sequences']:
+	for seq in io_shot['sequences']:
 
 		filename = seq['base'] + '#'*seq['padd'] + seq['ext']
-		filename = os.path.relpath( filename, shot['path'])
+		filename = os.path.relpath( filename, io_shot['path'])
 		filename = filename.replace('\\','/')
 
 		root = filename.split('/')
 		if len(root): root = root[0]
 		if src is None: src = root
 		if src != root:
-			out['data'] += '\n' + createNukeBackdrop( out['data'], src, y, x)
+			io_shot['data'] += '\n' + createNukeBackdrop( src, y, x)
 			y += 140
 			x = 0
 		src = root
@@ -199,53 +207,63 @@ def createNuke( shot):
 		read += '\nypos %d' % y
 		read += '\n}'
 
-		out['data'] += '\n' + read
+		io_shot['data'] += '\n' + read
 		x += 100
 
-	out['data'] += '\n' + createNukeBackdrop( out['data'], src, y, x)
-	out['shot'] = os.path.basename( shot['path'])
-
-	shot['nuke'] = out['file']
-
-	return out
+	if io_shot['sequences_count']:
+		io_shot['data'] += '\n' + createNukeBackdrop( src, y, x)
 
 for path in Args:
 	path = os.path.normpath( path)
 	Out.append( processShot( path))
 
-print(json.dumps({'shot_process': Out}, indent=4))
+if Options.soft == '':
+	print(json.dumps({'shot_process': Out}, indent=4))
+	sys.exit(0)
 
-files = []
-if Options.soft != '':
-	for shot in Out:
-		if Options.soft == 'nuke':
-			out = createNuke( shot)
-			if out: files.append(out)
+for shot in Out:
 
-for afile in files:
-	#print(afile['file'])
-	#print(afile['data'])
-	folder = os.path.dirname(afile['file'])
-	if not os.path.isdir(folder):
+	if Options.soft == 'nuke': processNuke( shot)
+
+	if not 'file' in shot: continue
+
+	if not Options.debug:
+		folder = os.path.dirname(shot['file'])
+		if not os.path.isdir(folder):
+			try:
+				os.makedirs(folder)
+			except:
+				Out['error'] = 'Can\'t create folder: ' + folder
+				continue
 		try:
-			os.makedirs(folder)
+			file = open( shot['file'],'w')
 		except:
-			Out['error'] = 'Can\'t create folder: ' + folder
+			Out['error'] = 'Can\'t create file: ' + shot['file']
 			continue
-	try:
-		file = open( afile['file'],'w')
-	except:
-		Out['error'] = 'Can\'t create file: ' + afile['file']
-		continue
 
-	TemplateFileData = TemplateFileData.replace('@SHOT@', afile['shot'])
+	data = TemplateFileData.replace('%','%%')
+	data = data.replace('@(','%(')
+	data = data % shot
+	data = data + shot['data']
 
-	file.write(TemplateFileData + afile['data'])
-	file.close()
+	if Options.verbose:
+		print(data)
+
+	if not Options.debug:
+		file.write(data)
+		file.close()
 
 	if Options.run == '': continue
 
-	cmd = '%s "%s" &' % (Options.run, afile['file'])
-	print(cmd)
-	os.system(cmd)
+	cmd = '%s "%s" &' % (Options.run, shot['file'])
+
+	if Options.verbose:
+		print(cmd)
+
+	os.chdir(shot['path'])
+
+	if not Options.debug:
+		os.system(cmd)
+
+print(json.dumps({'shot_process': Out}, indent=4))
 

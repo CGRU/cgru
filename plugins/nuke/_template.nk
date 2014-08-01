@@ -1,0 +1,153 @@
+Root {
+ inputs 0
+ name @(nuke_name)s
+ project_directory @(nuke_path)s
+ frame @(frame_first)d
+ first_frame @(frame_first)d
+ last_frame @(frame_last)d
+ lock_range true
+ fps @(fps)d
+ format "1920 1080 0 0 1920 1080 1 HD"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+}
+
+BackdropNode {
+ inputs 0
+ name OUTPUT
+ xpos -804
+ ypos 93
+ bdwidth 527
+ bdheight 254
+}
+Read {
+ inputs 0
+ file "\[ value w_jpg.file ]"
+ first {{af_JPG.framefirst}}
+ last {{af_JPG.framelast}}
+ origset true
+ version 3
+ name r_jpg
+ xpos -644
+ ypos 239
+ disable true
+}
+Dot {
+ inputs 0
+ name Dot28
+ xpos -610
+ ypos 156
+}
+set N41bf330 [stack 0]
+Dot {
+ name Dot2
+ xpos -500
+ ypos 156
+}
+set N41a6c90 [stack 0]
+Write {
+ file "RESULT/DPX/\[value ctrl.shot]_\[value ctrl.v3p]/\[value ctrl.shot]_\[value ctrl.v3p].####.dpx"
+ file_type dpx
+ checkHashOnRead false
+ name w_dpx
+ xpos -534
+ ypos 174
+}
+afanasy {
+ name af_DPX
+ xpos -534
+ ypos 212
+ hide_input true
+ jobname ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+}
+push $N41bf330
+Write {
+ file "RESULT/JPG/\[value ctrl.shot]_\[value ctrl.v3p]/\[value ctrl.shot]_\[value ctrl.v3p].####.jpg"
+ file_type jpeg
+ _jpeg_quality 1
+ checkHashOnRead false
+ name w_jpg
+ xpos -644
+ ypos 175
+}
+afanasy {
+ name af_JPG
+ xpos -644
+ ypos 213
+ hide_input true
+ jobname ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+}
+Read {
+ inputs 0
+ file "\[ value w_dpx.file ]"
+ first {{af_DPX.framefirst}}
+ last {{af_DPX.framelast}}
+ origset true
+ version 4
+ name r_dpx
+ xpos -534
+ ypos 238
+ disable true
+}
+Read {
+ inputs 0
+ file "\[ value w_tif.file ]"
+ first {{af_TIF.framefirst}}
+ last {{af_TIF.framelast}}
+ origset true
+ version 4
+ name r_tif
+ xpos -424
+ ypos 238
+ disable true
+}
+NoOp {
+ inputs 0
+ name ctrl
+ xpos -772
+ ypos 181
+ hide_input true
+ addUserKnob {20 User}
+ addUserKnob {1 shot l Shot}
+ shot @(name)s
+ addUserKnob {3 ver l Version}
+ addUserKnob {1 v3p}
+ v3p "v\[format %03d \[ value ver ]]"
+}
+push $N41a6c90
+Dot {
+ name Dot1
+ xpos -390
+ ypos 156
+}
+Write {
+ file "RESULT/TIF/\[value ctrl.shot]_\[value ctrl.v3p]/\[value ctrl.shot]_\[value ctrl.v3p].####.tif"
+ file_type tiff
+ compression none
+ checkHashOnRead false
+ name w_tif
+ xpos -424
+ ypos 174
+}
+afanasy {
+ name af_TIF
+ xpos -424
+ ypos 212
+ hide_input true
+ jobname ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+}
