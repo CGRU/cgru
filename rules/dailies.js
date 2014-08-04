@@ -238,7 +238,14 @@ function d_Convert( i_args)
 	var wnd = new cgru_Window({"name":'dailes',"title":title});
 	wnd.m_args = i_args;
 
+	var img_types = {};
+	img_types.jpg = {"name":'JPG'};
+	img_types.png = {"name":'PNG'};
+	img_types.dpx = {"name":'DPX'};
+	img_types.tif = {"name":'TIF'};
+
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 	if( i_args.movies == false )
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
@@ -410,7 +417,7 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 	{
 		job.name = 'Explode ' + job.name;
 		block.name = 'Explode';
-		cmd += ' -t jpg';
+		cmd += ' -t ' + i_params.imgtype;
 		var q = parseInt( i_params.quality);
 		q = Math.round( 10 - ( q / 10 ));
 		if( q < 1 ) q = 1;
