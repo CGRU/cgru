@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../libafanasy/environment.h"
 #include "../libafanasy/msgqueue.h"
 
 #include "auth.h"
@@ -84,18 +85,25 @@ void threadRunCycle( void * i_args)
 	// Jobs sloving:
 	//
 	AFINFO("ThreadRun::run: Solving jobs:")
+
+	int tasks_solved = 0;
 	RenderContainerIt rendersIt( a->renders);
 	std::list<int> rIds;
 	{
 		// ask every ready render to produce a task
 		for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
 		{
+			if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
+				( tasks_solved >= af::Environment::getServeTasksSpeed()))
+				break;
+
 			if( render->isReady())
 			{
 				// store render Id if it produced a task
 				if( a->users->solve( render, a->monitors))
 				{
 					rIds.push_back( render->getId());
+					tasks_solved++;
 					continue;
 				}
 			}
@@ -115,19 +123,30 @@ void threadRunCycle( void * i_args)
 			AFERROR("Renders solve cycles limit reached.");
 			break;
 		}
+
+		if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
+			( tasks_solved >= af::Environment::getServeTasksSpeed()))
+			break;
+
 		AFINFA("ThreadRun::run: Renders on cycle: %d", int(rIds.size()))
 		std::list<int>::iterator rIt = rIds.begin();
 		while( rIt != rIds.end())
 		{
+			if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
+				( tasks_solved >= af::Environment::getServeTasksSpeed()))
+				break;
+
 			RenderAf * render = rendersIt.getRender( *rIt);
 			if( render->isReady())
 			{
 				if( a->users->solve( render, a->monitors))
 				{
 					rIt++;
+					tasks_solved++;
 					continue;
 				}
 			}
+
 			// delete render id from list if it can't produce a task
 			rIt = rIds.erase( rIt);
 		}

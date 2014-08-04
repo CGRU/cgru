@@ -17,6 +17,7 @@ namespace AFJOB
 	const char BLOCK_DEFAULT_PARSER[]   = "none";
 	const char TASK_DEFAULT_NAME[]      = "task";
 
+	const int SERVE_TASKS_SPEED     = -1;   ///< Unlimited
 	const int TASK_DEFAULT_CAPACITY = 1000;
 	const int TASK_UPDATE_TIMEOUT   = 15;   ///< Seconds for task to have no update to produce error.
 	const int TASK_STOP_TIMEOUT     = 5;    ///< Time after running task was asked to stop, it become not running itself.
