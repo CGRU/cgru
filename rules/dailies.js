@@ -395,11 +395,16 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 {
 	var job = {};
 	job.name = c_PathBase( i_args.paths[0]);
+
 	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
-	job.name += '.' + i_params.codec;
+
+	if( i_to_sequence )
+		job.name = 'Explode ' + job.name;
+	else
+		job.name = 'Convert ' + job.name + '.' + i_params.codec;
+
 	if( i_args.paths.length > 1 )
 		job.name = c_PathDir( i_args.paths[0]) + ' x' + i_args.paths.length;
-	//job.offline = true;
 
 	var block = {};
 	block.service = 'movgen';
@@ -419,7 +424,6 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 
 	if( i_to_sequence )
 	{
-		job.name = 'Explode ' + job.name;
 		block.name = 'Explode';
 		cmd += ' -t ' + i_params.imgtype;
 		var q = parseInt( i_params.quality);
@@ -429,7 +433,6 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 	}
 	else
 	{
-		job.name = 'Convert ' + job.name;
 		block.name = 'Convert';
 		cmd += ' -c "' + i_params.codec + '"';
 		cmd += ' -f ' + i_params.fps;
