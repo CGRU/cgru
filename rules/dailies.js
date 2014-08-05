@@ -243,6 +243,8 @@ function d_Convert( i_args)
 	img_types.png = {"name":'PNG'};
 	img_types.dpx = {"name":'DPX'};
 	img_types.tif = {"name":'TIF'};
+	if( i_args.movies !== true )
+		img_types.exr = {"name":'EXR'};
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
@@ -315,6 +317,7 @@ function d_CvtImages( i_wnd, i_args, i_params)
 
 	var cmd = 'rules/bin/convert.sh -J';
 
+	cmd += ' -t ' + i_params.imgtype;
 	cmd += ' -c ' + i_params.colorspace;
 	cmd += ' -q ' + i_params.quality;
 	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
@@ -392,9 +395,10 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 {
 	var job = {};
 	job.name = c_PathBase( i_args.paths[0]);
+	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
+	job.name += '.' + i_params.codec;
 	if( i_args.paths.length > 1 )
 		job.name = c_PathDir( i_args.paths[0]) + ' x' + i_args.paths.length;
-	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
 	//job.offline = true;
 
 	var block = {};

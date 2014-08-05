@@ -80,6 +80,8 @@ if Codec == '':
 	if Options.type == 'jpg':
 		args.extend(['-qscale', str(Options.qscale)])
 		Output += '.q' + str(Options.qscale)
+	elif Options.type == 'dpx':
+		args.extend(['-pix_fmt','gbrp10le'])
 
 	if Options.resize != '':
 		resize = Options.resize.split('x')

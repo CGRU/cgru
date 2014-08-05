@@ -208,16 +208,18 @@
 	},
 
 	"codecs":{
-		"photojpg_high": {"name":"JPG High"},
-		"photojpg_mid":  {"name":"JPG Mid"},
-		"photojpg_low":  {"name":"JPG Low"},
-		"h264_high":     {"name":"H264 High"},
-		"h264_mid":      {"name":"H264 Mid"},
-		"h264_low":      {"name":"H264 Low"},
-		"theora_high":   {"name":"Theora High"},
-		"theora_mid":    {"name":"Theora Mid"},
-		"theora_low":    {"name":"Theora Low"},
-		"prores_normal": {"name":"ProRes"}
+		"photojpg_high": {"name":"JPG Hi",   "tooltip":"PhotoJPG High [mov]"},
+		"photojpg_mid":  {"name":"JPG Mid",  "tooltip":"PhotoJPG Mid [mov]"},
+		"photojpg_low":  {"name":"JPG Lo",   "tooltip":"PhotoJPG Low [mov]"},
+		"h264_high":     {"name":"H264 Hi",  "tooltip":"H.264 High [mov]"},
+		"h264_mid":      {"name":"H264 Mid", "tooltip":"H.264 Mid [mov]"},
+		"h264_low":      {"name":"H264 Lo",  "tooltip":"H.264 Low [mov]"},
+		"theora_high":   {"name":"Th Hi",    "tooltip":"Theora High [ogg]"},
+		"theora_mid":    {"name":"Th Mid",   "tooltip":"Theora Mid [ogg]"},
+		"theora_low":    {"name":"Th Lo" ,   "tooltip":"Theora Low [ogg]"},
+		"prores_high":   {"name":"Pro HQ",   "tooltip":"Apple ProRes HQ 444 10-Bit [mov]"},
+		"prores_normal": {"name":"Pro Norm", "tooltip":"Apple ProRes Normal 422 [mov]"},
+		"prores_light":  {"name":"Pro Li",   "tooltip":"Apple ProRes Light 420 [mov]"}
 	},
 
 	"preview":{
