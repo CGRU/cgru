@@ -1,2 +1,0 @@
-ProRes Light
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 1 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
