@@ -1,2 +1,2 @@
 ProRes Proxy
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 0 -pix_fmt yuv420p @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 0 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

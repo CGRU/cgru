@@ -217,9 +217,9 @@
 		"theora_high":   {"name":"Th Hi",    "tooltip":"Theora High [ogg]"},
 		"theora_mid":    {"name":"Th Mid",   "tooltip":"Theora Mid [ogg]"},
 		"theora_low":    {"name":"Th Lo" ,   "tooltip":"Theora Low [ogg]"},
-		"prores_high":   {"name":"Pro HQ",   "tooltip":"Apple ProRes HQ 444 10-Bit [mov]"},
-		"prores_normal": {"name":"Pro Norm", "tooltip":"Apple ProRes Normal 422 [mov]"},
-		"prores_light":  {"name":"Pro Li",   "tooltip":"Apple ProRes Light 420 [mov]"}
+		"prores_high":   {"name":"Pro HQ",   "tooltip":"Apple ProRes444 HQ 10Bit [mov]"},
+		"prores_normal": {"name":"Pro Norm", "tooltip":"Apple ProRes422 Normal [mov]"},
+		"prores_light":  {"name":"Pro Li",   "tooltip":"Apple ProRes422 Light [mov]"}
 	},
 
 	"preview":{
