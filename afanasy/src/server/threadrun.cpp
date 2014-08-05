@@ -115,8 +115,7 @@ void threadRunCycle( void * i_args)
 
 	RenderContainerIt rendersIt( a->renders);
 	for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-		if( render->isReady())
-			renders.push_back( render);
+		renders.push_back( render);
 
 	renders.sort( MostReadyRender());
 
