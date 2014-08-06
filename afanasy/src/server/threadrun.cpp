@@ -128,12 +128,15 @@ void threadRunCycle( void * i_args)
 
 		RenderAf * render = *rIt;
 
-		// store render Id if it produced a task
-		if( a->users->solve( render, a->monitors))
+		if( render->isReady())
 		{
-			solved_renders.push_back( render);
-			tasks_solved++;
-			continue;
+			// store render Id if it produced a task
+			if( a->users->solve( render, a->monitors))
+			{
+				solved_renders.push_back( render);
+				tasks_solved++;
+				continue;
+			}
 		}
 
 		// Render not solved, needed to update render status
