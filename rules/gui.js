@@ -120,7 +120,7 @@ function gui_Create( i_wnd, i_params, i_values)
 			values.push( i_params[p].default )
 		if( i_values )
 			for( var v = 0; v < i_values.length; v++)
-				if( i_values[v][p] != null )
+				if( i_values[v] && ( i_values[v][p] != null ))
 					values.push( i_values[v][p]);
 
 		for( var v = 0; v < values.length; v++)

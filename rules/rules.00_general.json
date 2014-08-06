@@ -237,9 +237,16 @@
 "put":{
 	"input":"RESULT/DPX",
 	"dest":"FINAL",
+	"-dest":"/incoming",
 	"cmd":"python /cgru/utilities/put.py",
+	"-ftp":{
+		"host":"localhost",
+		"user":"",
+		"pass":""
+	},
 	"post_delete":false,
 	"af_service":"generic",
+	"-af_service":"ftp",
 	"af_parser":"generic",
 	"af_capacity":500,
 	"af_maxtasks":5

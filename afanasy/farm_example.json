@@ -26,12 +26,13 @@
 
 		"services":[
 			{"name":"checksum"},
-			{"name":"generic"},
-			{"name":"system"},
-			{"name":"walk","count":1},
 			{"name":"events"},
-			{"name":"wakeonlan"},
+			{"name":"ftp"},
+			{"name":"generic"},
 			{"name":"postcmd"},
+			{"name":"system"},
+			{"name":"wakeonlan"},
+			{"name":"walk","count":1},
 
 			{"name":"afterfx"},
 			{"name":"arnold"},

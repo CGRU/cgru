@@ -1,8 +1,13 @@
 //========================== Put: ============================
-fu_put_params = [];
+fu_put_params = {};
 //fu_put_params.src = {"label":'Source', "disabled":true};
 fu_put_params.dest = {"label":'Destination'};
 //fu_put_params.name = {};
+
+fu_putftp_params = {};
+fu_putftp_params.host = {"label":'FTP Server'};
+fu_putftp_params.user = {"label":'FTP User',"width":'50%'};
+fu_putftp_params.pass = {"lwidth":'150px',"label":'FTP Password',"width":'50%'};
 
 function fu_Put( i_args)
 {
@@ -22,6 +27,8 @@ function fu_Put( i_args)
 	}
 
 	gui_Create( wnd.elContent, fu_put_params, [RULES.put, params]);
+	if( RULES.put.ftp )
+		gui_Create( wnd.elContent, fu_putftp_params, [RULES.put.ftp, params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -75,15 +82,15 @@ function fu_Put( i_args)
 function fu_PutDo( i_wnd)
 {
 	var params = gui_GetParams( i_wnd.elContent, fu_put_params);
+	if( RULES.put.ftp )
+		gui_GetParams( i_wnd.elContent, fu_putftp_params, params);
 
 	for( var i = 0; i < i_wnd.m_args.paths.length; i++)
 	{
 	var source = cgru_PM('/' + RULES.root + i_wnd.m_args.paths[i],  true);
-	var dest   = cgru_PM('/' + RULES.root + params.dest, true);
 	var name   = i_wnd.m_args.names[i];
 
 	var job = {};
-	job.name = 'PUT ' + name;
 
 	var block = {};
 	block.name = 'put';
@@ -98,12 +105,25 @@ function fu_PutDo( i_wnd)
 
 	var cmd = cgru_PM( RULES.put.cmd, true);
 	cmd += ' -s "' + source + '"';
-	cmd += ' -d "' + dest + '"';
-	cmd += ' -n "' + name + '"';
+	if( RULES.put.ftp )
+	{
+		job.name = 'FTP ' + name;
+		cmd += ' --ftp ' + params.host;
+		if( params.user.length ) cmd += ' --ftpuser ' + params.user;
+		if( params.pass.length ) cmd += ' --ftppass ' + params.pass;
+		cmd += ' -d "' + params.dest + '"';
+	}
+	else
+	{
+		job.name = 'PUT ' + name;
+		cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+		cmd += ' -n "' + name + '"';
+		if( RULES.put.post_delete )
+			job.command_post = 'rm -rf "' + source + '"';
+	}
+
 	task.command = cmd;
 
-	if( RULES.put.post_delete )
-		job.command_post = 'rm -rf "' + source + '"';
 
 //job.offline = true;
 	n_SendJob( job);
@@ -230,6 +250,8 @@ function fu_PutMultiDialog( i_args)
 			params.dest = ASSETS.project.path + '/' + RULES.put.dest;
 
 	gui_Create( wnd.elContent, fu_putmulti_params, [RULES.put, params]);
+	if( RULES.put.ftp )
+		gui_Create( wnd.elContent, fu_putftp_params, [RULES.put.ftp, params]);
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -281,18 +303,30 @@ function fu_PutMultiProcessGUI( i_wnd, i_test)
 
 	var shots = i_wnd.m_args.shots;
 	var params = gui_GetParams( i_wnd.elContent, fu_putmulti_params);
+	if( RULES.put.ftp )
+		gui_GetParams( i_wnd.elContent, fu_putftp_params, params);
 	for( key in i_wnd.elContent.m_choises )
 		params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var cmd = 'rules/bin/putmulti.sh';
 
 	cmd += ' -i "' + params.input + '"';
-	cmd += ' -u "' + g_auth_user.id + '"';
 	if( params.skipexisting ) cmd += ' -s';
 	if( params.skiperrors ) cmd += ' -e';
-	cmd += ' -c ' + RULES.put.af_capacity;
-	cmd += ' -m ' + RULES.put.af_maxtasks;
-	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+	cmd += ' --afuser "' + g_auth_user.id + '"';
+	cmd += ' --afservice "' + RULES.put.af_service + '"';
+	cmd += ' --afcapacity ' + RULES.put.af_capacity;
+	cmd += ' --afmaxtasks ' + RULES.put.af_maxtasks;
+	if( RULES.put.ftp	)
+	{
+		cmd += ' -d "' + params.dest + '"';
+		cmd += ' --ftp ' + params.host;
+		if( params.user.length ) cmd += ' --ftpuser ' + params.user;
+		if( params.pass.length ) cmd += ' --ftppass ' + params.pass;
+	}
+	else
+		cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+
 	if( i_test ) cmd += ' -t';
 
 	for( var i = 0; i < shots.length; i++)
