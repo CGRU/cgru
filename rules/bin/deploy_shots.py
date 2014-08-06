@@ -31,6 +31,7 @@ Parser.add_option(      '--afmax',    dest='afmax',    type  ='int',        defa
 Parser.add_option('--shot_src',       dest='shot_src', type  ='string',     default='SRC', help='Shot sources folder')
 Parser.add_option('--shot_ref',       dest='shot_ref', type  ='string',     default='REF', help='Shot references folder')
 Parser.add_option('--test',           dest='test',     action='store_true', default=False, help='Test inputs only')
+Parser.add_option('-V', '--verbose',  dest='verbose',  action='store_true', default=False, help='Verbose actions')
 
 Out = []
 
@@ -50,15 +51,18 @@ signal.signal(signal.SIGTERM, interrupt)
 signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT, interrupt)
 
-SameShotSeparators = '._-'
-
-
 def isSameShot(i_shot, i_name):
+	SameShotSeparators = '._-'
 	i_shot = i_shot.lower()
 	i_name = i_name.lower()
 	for s in SameShotSeparators:
 		if i_name.find(i_shot + s) == 0:
 			return True
+	for ex in ['.dpx','.tif','.png','.jpg']:
+		p = i_shot.rfind(ex)
+		if p > 0:
+			if i_shot[:p] == i_name:
+				return True
 	return False
 
 
@@ -94,11 +98,13 @@ Sources_skip = []
 FIN_SRC = []
 FIN_DST = []
 for shot in Sources:
+	if shot[0] == '.':
+		continue
 	if shot in Sources_skip:
 		continue
 	src = os.path.join(Options.sources, shot)
 	if not os.path.isdir(src):
-		Out.append({'warning': "\"%s\" is not a folder" % shot})
+		#Out.append({'warning': "\"%s\" is not a folder" % shot})
 		continue
 
 	src_sources = [src]
@@ -112,8 +118,11 @@ for shot in Sources:
 
 	src_refs = []
 	for ref in References:
+		ref_path = os.path.join(Options.refs, ref)
+		if not os.path.isfile(ref_path): continue
+		if ref_path in src_sources: continue
 		if isSameShot(shot, ref):
-			src_refs.append(os.path.join(Options.refs, ref))
+			src_refs.append(os.path.join(ref_path))
 
 	shot_name = shot
 
@@ -143,12 +152,18 @@ for shot in Sources:
 	Out_Shot['name'] = shot_name
 	Out_Shot['src'] = []
 	for src in src_sources:
+		#print(src)
 		Out_Shot['src'].append(src)
+		FIN_SRC.append(src)
+		FIN_DST.append(os.path.join(shot_dest, Options.shot_src))
 
 	if len(src_refs):
 		Out_Shot['ref'] = []
 		for ref in src_refs:
+			#print(ref)
 			Out_Shot['ref'].append(ref)
+			FIN_SRC.append(ref)
+			FIN_DST.append(os.path.join(shot_dest, Options.shot_ref))
 
 	Out.append({'shot': Out_Shot})
 
@@ -156,12 +171,6 @@ for shot in Sources:
 		if not os.path.isdir(shot_dest):
 			shutil.copytree(Options.template, shot_dest)
 
-	for scr in src_sources:
-		FIN_SRC.append(src)
-		FIN_DST.append(os.path.join(shot_dest, Options.shot_src))
-	for ref in src_refs:
-		FIN_SRC.append(ref)
-		FIN_DST.append(os.path.join(shot_dest, Options.shot_ref))
 
 if Options.afanasy:
 	job = af.Job('PUT ' + Options.dest)
@@ -182,6 +191,8 @@ for i in range(0, len(FIN_SRC)):
 	dst = FIN_DST[i]
 
 	if Options.move:
+		if Options.verbose:
+			print('%s -> %s' % (src,dst))
 		if not Options.test:
 			shutil.move(src, dst)
 		continue
@@ -201,7 +212,7 @@ for i in range(0, len(FIN_SRC)):
 	else:
 		os.system(cmd)
 
-if Options.afanasy and not Options.test:
+if Options.afanasy and not Options.move and not Options.test:
 	job.send()
 
 print(json.dumps({'deploy': Out}, indent=4))

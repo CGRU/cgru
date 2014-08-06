@@ -228,11 +228,12 @@ function shot_SourceReceived( i_data, i_args)
 	var not_empty_paths = [];
 	for( var i = 0; i < i_data.length; i++)
 	{
-		var flist = [];
-		shot_SourceWalkFind( i_data[i], flist);
-		if( flist.length )
+		var fo_list = [];
+		var fi_list = [];
+		shot_SourceWalkFind( i_data[i], fo_list, fi_list);
+		if( fo_list.length || fi_list.length )
 		{
-			new FilesView({"el":el,"path":i_args.paths[i],"walk":{"folders":flist},"limits":false,"thumbs":false,"refresh":false});
+			new FilesView({"el":el,"path":i_args.paths[i],"walk":{"folders":fo_list,"files":fi_list},"limits":false,"thumbs":false,"refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
 			found = true;
 		}
@@ -248,13 +249,31 @@ function shot_SourceReceived( i_data, i_args)
 	}
 }
 
-function shot_SourceWalkFind( i_walk, o_list, i_path)
+function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 {
 //window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
 	if( i_walk.files && i_walk.files.length )
 	{
-		if( i_walk.name == null ) i_walk.name = '/';
-		o_list.push( i_walk);
+		var img_num = 0;
+		for( f = 0; f < i_walk.files.length; f++ )
+		{
+			var name = i_walk.files[f].name;
+
+			if( name.indexOf('.') == 0 ) continue;
+
+			if( c_FileIsMovie( name ))
+			{
+				o_fi_list.push( i_walk.files[f]);
+			}
+
+			if( false == c_FileIsImage( name )) continue;
+			img_num++;
+			if( img_num < 2 ) continue;
+
+			if( i_walk.name == null ) i_walk.name = '/';
+			o_fo_list.push( i_walk);
+			break;
+		}
 	}
 
 	if(( i_walk.folders == null ) || ( i_walk.folders.length == 0 )) return;
@@ -268,7 +287,7 @@ function shot_SourceWalkFind( i_walk, o_list, i_path)
 		if( path ) path += '/' + fobj.name;
 		else path = fobj.name;
 
-		shot_SourceWalkFind( fobj, o_list, path);
+		shot_SourceWalkFind( fobj, o_fo_list, o_fi_list, path);
 	}
 }
 
