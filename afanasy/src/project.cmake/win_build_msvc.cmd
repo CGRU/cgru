@@ -6,7 +6,7 @@ call setup.cmd
 popd
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-set cgru_qt=%CGRU_LOCATION%\utilities\qt\qt-everywhere-opensource-src-4.8.5
+set cgru_qt=%CGRU_LOCATION%\utilities\qt\qt-everywhere-opensource-src-4.8.6
 if exist %cgru_qt% SET "PATH=%cgru_qt%\bin;%PATH%"
 set "AF_GUI=YES"
 
@@ -15,7 +15,7 @@ if exist %CGRU_LOCATION%\python-devel set CGRU_PYTHONDIR=%CGRU_LOCATION%\python-
 if defined CGRU_PYTHONDIR (
    echo Building with CGRU Python: %CGRU_PYTHONDIR%
    SET AF_PYTHON_INCLUDE_PATH=%CGRU_PYTHONDIR%\include
-   SET AF_PYTHON_LIBRARIES=%CGRU_PYTHONDIR%\libs\python33.lib
+   SET AF_PYTHON_LIBRARIES=%CGRU_PYTHONDIR%\libs\python34.lib
 )
 
 if exist override.cmd call override.cmd
