@@ -16,7 +16,7 @@ Parser = OptionParser(
 	version="%prog 1.0"
 )
 
-Parser.add_option('-t', '--thumbnail',  dest='thumbnail',  action='store_true', default=False,  help='Thumbnail mode')
+Parser.add_option('-t', '--type',       dest='type',       type  ='string',     default='jpg',  help='Image type')
 Parser.add_option('-c', '--colorspace', dest='colorspace', type  ='string',     default='auto', help='Input images colorspace')
 Parser.add_option('-r', '--resize',     dest='resize',     type  ='string',     default='',     help='Resize (1280x720)')
 Parser.add_option('-q', '--quality',    dest='quality',    type  ='int',        default=75,     help='Quality')
@@ -76,10 +76,11 @@ for input in Inputs:
 	output = Options.output
 	if output == '' or len(Inputs) > 1:
 		output = input
-		output += '.q%d' % Options.quality
+		if Options.type == 'jpg':
+			output += '.q%d' % Options.quality
 		if Options.resize != '':
 			output += '.r%s' % Options.resize
-		output += '.jpg'
+		output += '.' + Options.type
 
 	if os.path.isdir(input):
 		mkdir = output
@@ -93,7 +94,7 @@ for input in Inputs:
 			continue
 
 		if mkdir:
-			output = os.path.join(mkdir, os.path.basename(afile)) + '.jpg'
+			output = os.path.join(mkdir, os.path.basename(afile)) + '.' + Options.type
 
 		cmd = 'convert'
 
@@ -118,16 +119,19 @@ for input in Inputs:
 			else:
 				cmd += ' -set colorspace ' + Options.colorspace
 
-		if Options.thumbnail:
-			if Options.resize == '':
-				Options.resize = '100x100'
-			cmd += ' -thumbnail "%s^"' % Options.resize
-			cmd += ' -gravity center -extent %s' % Options.resize
-		elif Options.resize != '':
+		if Options.resize != '':
 			cmd += ' -resize %s' % Options.resize
 
 		cmd += ' -quality %d' % Options.quality
-		cmd += ' -colorspace sRGB'
+
+		if Options.type == 'dpx':
+			cmd += ' -depth 10'
+			cmd += ' -colorspace Log'
+		elif Options.type == 'exr':
+			cmd += ' -colorspace RGB'
+		else:
+			cmd += ' -colorspace sRGB'
+
 		cmd += ' "%s"' % output
 
 		cmds.append(cmd)

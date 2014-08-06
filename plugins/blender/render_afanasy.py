@@ -61,6 +61,13 @@ class ORESettings(bpy.types.PropertyGroup):
 	pause = BoolProperty(name='Start Job Paused',
 						 description='Send job in offline state.', default=0)
 
+	packLinkedObjects = BoolProperty(name='Pack Linked Objects',
+						 description='Make Loacal All linked Groups and Objects', default=0)
+	relativePaths = BoolProperty(name='Relative Paths',
+						 description='Set Relative Paths for all Textures and Objects', default=0)
+	packTextures = BoolProperty(name='Pack Textures',
+						 description='Pack all Textures into the Blend File.', default=0)
+
 	# Render Settings:
 	filepath = StringProperty(name='File Path', description='Set File Path.',
 							  maxlen=512, default='')
@@ -177,6 +184,11 @@ class RENDER_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
 		layout.separator()
 		layout.prop(ore, 'pause')
 
+		layout.separator()
+		layout.prop(ore, 'packLinkedObjects')
+		layout.prop(ore, 'relativePaths')
+		layout.prop(ore, 'packTextures')
+
 		# layout.separator()
 		# layout.operator('ore.docs', icon='INFO')
 
@@ -236,18 +248,29 @@ class ORE_Submit(bpy.types.Operator):
 		ore = sce.ore_render
 		rd = context.scene.render
 		images = None
-		bpy.ops.wm.save_mainfile()
 
 		# Calculate temporary scene path:
 		scenefile = bpy.data.filepath
 		renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(
 			time.time() - int(time.time()))[2:5] + '.blend'
 
+		# Make all Local and pack all textures and objects
+		if ore.packLinkedObjects:
+			bpy.ops.object.make_local(type='ALL')
+		if ore.relativePaths:
+			bpy.ops.file.make_paths_relative()
+		if ore.packTextures:
+			bpy.ops.file.pack_all()
+
+
+		# Save Temporary file
+		bpy.ops.wm.save_mainfile(filepath=renderscenefile)
+
 		# Get job name:
 		jobname = ore.jobname
 		# If job name is empty use scene file name:
 		if jobname is None or jobname == '':
-			jobname = os.path.basename(scenefile)
+			jobname = os.path.basename(renderscenefile)
 			# Try to cut standart '.blend' extension:
 			if len(jobname) > 6:
 				if jobname[-6:] == '.blend':
@@ -345,11 +368,14 @@ class ORE_Submit(bpy.types.Operator):
 		# Print job information:
 		job.output(True)
 
-		# Copy scene to render
-		shutil.copy(scenefile, renderscenefile)
+		## Copy scene to render
+		#shutil.copy(scenefile, renderscenefile)
 
 		#  Send job to server:
 		job.send()
+
+		# open the file again
+		bpy.ops.wm.open_mainfile(filepath=scenefile)
 
 		return set(['FINISHED'])
 

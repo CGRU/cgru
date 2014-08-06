@@ -62,6 +62,11 @@
 	"af_priority":99,
 	"af_maxrunningtasks":-1,
 
+	"af_serve_tasks_speed":-1,
+		"":"Server tasks solving speed limit (~tasks/second)",
+		"":"You can set this parameter to zero to pause job solving (see docs to reload config 'on-the-fly')",
+		"":"'-1' means unlimited.",
+
 "":"Job:",
 	"af_task_default_capacity":1000,
 	"af_task_log_linesmax":100,

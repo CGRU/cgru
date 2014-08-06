@@ -6,4 +6,4 @@ pushd "${cgru}" > /dev/null
 source "./setup.sh" > /dev/null
 popd > /dev/null
 
-python "$CGRU_LOCATION/utilities/convert.py" "$@"
+python "$CGRU_LOCATION/rules/bin/convert.py" "$@"

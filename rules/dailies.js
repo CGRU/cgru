@@ -238,7 +238,16 @@ function d_Convert( i_args)
 	var wnd = new cgru_Window({"name":'dailes',"title":title});
 	wnd.m_args = i_args;
 
+	var img_types = {};
+	img_types.jpg = {"name":'JPG'};
+	img_types.png = {"name":'PNG'};
+	img_types.dpx = {"name":'DPX'};
+	img_types.tif = {"name":'TIF'};
+	if( i_args.movies !== true )
+		img_types.exr = {"name":'EXR'};
+
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 	if( i_args.movies == false )
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
@@ -308,6 +317,7 @@ function d_CvtImages( i_wnd, i_args, i_params)
 
 	var cmd = 'rules/bin/convert.sh -J';
 
+	cmd += ' -t ' + i_params.imgtype;
 	cmd += ' -c ' + i_params.colorspace;
 	cmd += ' -q ' + i_params.quality;
 	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
@@ -385,10 +395,16 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 {
 	var job = {};
 	job.name = c_PathBase( i_args.paths[0]);
+
+	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
+
+	if( i_to_sequence )
+		job.name = 'Explode ' + job.name;
+	else
+		job.name = 'Convert ' + job.name + '.' + i_params.codec;
+
 	if( i_args.paths.length > 1 )
 		job.name = c_PathDir( i_args.paths[0]) + ' x' + i_args.paths.length;
-	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
-	//job.offline = true;
 
 	var block = {};
 	block.service = 'movgen';
@@ -408,9 +424,8 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 
 	if( i_to_sequence )
 	{
-		job.name = 'Explode ' + job.name;
 		block.name = 'Explode';
-		cmd += ' -t jpg';
+		cmd += ' -t ' + i_params.imgtype;
 		var q = parseInt( i_params.quality);
 		q = Math.round( 10 - ( q / 10 ));
 		if( q < 1 ) q = 1;
@@ -418,7 +433,6 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 	}
 	else
 	{
-		job.name = 'Convert ' + job.name;
 		block.name = 'Convert';
 		cmd += ' -c "' + i_params.codec + '"';
 		cmd += ' -f ' + i_params.fps;

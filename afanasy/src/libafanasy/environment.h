@@ -113,6 +113,7 @@ public:
 	static inline int    getPriority()               { return priority;         } ///< Get default host priority.
 	static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
 
+	static inline int getServeTasksSpeed()               { return serve_tasks_speed;            }
 	static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
 	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
@@ -273,6 +274,7 @@ private:
 
 	static std::string timeformat;    ///< Default time format.
 
+	static int serve_tasks_speed;
 	static int task_update_timeout;
 	static int task_default_capacity;
 	static int task_log_linesmax;

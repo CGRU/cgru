@@ -34,6 +34,7 @@ int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORI
 int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
 
+int     Environment::serve_tasks_speed =               AFJOB::SERVE_TASKS_SPEED;
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
 int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
@@ -206,6 +207,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, server_so_sndtimeo_sec,            "af_server_so_sndtimeo_sec"            );
 	getVar( i_obj, server_so_msgtimeo_sec,            "af_server_so_msgtimeo_sec"            );
 
+	getVar( i_obj, serve_tasks_speed,                 "af_serve_tasks_speed"                 );
 	getVar( i_obj, task_default_capacity,             "af_task_default_capacity"             );
 	getVar( i_obj, task_update_timeout,               "af_task_update_timeout"               );
 	getVar( i_obj, task_log_linesmax,                 "af_task_log_linesmax"                 );
