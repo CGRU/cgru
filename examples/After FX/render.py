@@ -6,7 +6,7 @@ job = af.Job('After FX Test')
 
 block = af.Block('Frames', 'afterfx')
 block.setCommand(
-	'aerender -project "%(cwd)s\\AE Project.aep" -comp "Comp 1" -s @#@ '
+	'aerender -project "%(cwd)s\\comp.aep" -comp "Comp 1" -s @#@ '
 	'-e @#@ -i 1 -mp -output "%(cwd)s/render/Comp 1_[####].jpg"' % {
 		'cwd': os.getcwd()
 	}
