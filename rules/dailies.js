@@ -424,7 +424,7 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 
 	if( i_to_sequence )
 	{
-		block.name = 'Explode';
+		block.name = 'Explode to ' + i_params.imgtype;
 		cmd += ' -t ' + i_params.imgtype;
 		var q = parseInt( i_params.quality);
 		q = Math.round( 10 - ( q / 10 ));
@@ -433,7 +433,7 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 	}
 	else
 	{
-		block.name = 'Convert';
+		block.name = 'Convert to ' + i_params.codec;
 		cmd += ' -c "' + i_params.codec + '"';
 		cmd += ' -f ' + i_params.fps;
 	}
