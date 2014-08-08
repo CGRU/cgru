@@ -49,9 +49,9 @@ class ORESettings(bpy.types.PropertyGroup):
 	jobname = StringProperty(name='Job Name',
 							 description='Job Name. Scene name if empty.',
 							 maxlen=512, default='')
-	engine = StringProperty(name='Use Engine',
+	engine = EnumProperty(name='Use Engine',
 							description='Engine to render scene with.',
-							maxlen=512, default='BLENDER_RENDER')
+							items=(("BLENDER_RENDER","BLENDER_RENDER",""), ("CYCLES","CYCLES","")), default='BLENDER_RENDER')
 	fstart = IntProperty(name='Start', description='Start Frame', default=1)
 	fend = IntProperty(name='End', description='End Frame', default=11)
 	finc = IntProperty(name='By', description='Frames Increment', min=1,
