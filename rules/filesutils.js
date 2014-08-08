@@ -116,7 +116,8 @@ function fu_PutDo( i_wnd)
 	else
 	{
 		job.name = 'PUT ' + name;
-		cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+		//cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+		cmd += ' -d "' + params.dest + '"';
 		cmd += ' -n "' + name + '"';
 		if( RULES.put.post_delete )
 			job.command_post = 'rm -rf "' + source + '"';
@@ -131,7 +132,7 @@ function fu_PutDo( i_wnd)
 //console.log( task.command);
 //console.log( JSON.stringify( params));
 //console.log( JSON.stringify( job));
-//	i_wnd.destroy();
+	i_wnd.destroy();
 }
 
 
@@ -325,7 +326,8 @@ function fu_PutMultiProcessGUI( i_wnd, i_test)
 		if( params.pass.length ) cmd += ' --ftppass ' + params.pass;
 	}
 	else
-		cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
+		cmd += ' -d "' + params.dest + '"';
+		//cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
 
 	if( i_test ) cmd += ' -t';
 
