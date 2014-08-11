@@ -142,6 +142,11 @@ for shot in Sources:
 				num += 1
 				# print('"%s"->"%s"' % (shot, shot_name))
 
+	# Shot name:
+	for ex in ['.mov','.dpx','.tif','.png','.jpg']:
+		shot_name = shot_name.replace(ex,'')
+		shot_name = shot_name.replace(ex.upper(),'')
+
 	# Rename shot uppercase:
 	if Options.uppercase:
 		shot_name = shot_name.upper()

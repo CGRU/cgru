@@ -27,6 +27,7 @@ Parser.add_option('-s', '--skip',       dest='skip',       type='string',       
 Parser.add_option(      '--nomovie',    dest='nomovie',    action='store_true', default=False,              help='Skip movie files.')
 Parser.add_option('-c', '--colorspace', dest='colorspace', type='string',       default='auto',             help='Specity input colorpace.')
 Parser.add_option('-f', '--force',      dest='force',      action='store_true', default=False,              help='Force creation, no modification time check.')
+Parser.add_option('-a', '--avcmd',      dest='avcmd',      type='string',       default='ffmpeg',           help='AV command (ffmpeg).')
 Parser.add_option('-V', '--verbose',    dest='verbose',    action='store_true', default=False,              help='Verbose mode.')
 Parser.add_option('-D', '--debug',      dest='debug',      action='store_true', default=False,              help='Debug mode.')
 
@@ -186,7 +187,7 @@ Thumbnails = []
 
 if Movie is not None:
 	frame = os.path.join(OutDir, 'frame.%07d.jpg')
-	cmd = 'avconv -y'
+	cmd = '%s -y' % Options.avcmd
 	cmd += ' -i "%s"' % Movie
 	cmd += ' -f image2 -vframes %d' % Options.number
 	cmd += ' "%s"' % frame
