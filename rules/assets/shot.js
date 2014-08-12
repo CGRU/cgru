@@ -251,7 +251,8 @@ function shot_SourceReceived( i_data, i_args)
 
 function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 {
-//window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
+//console.log( JSON.stringify( i_walk).replace(/,/g,', '));
+//console.log( i_path);
 	if( i_walk.files && i_walk.files.length )
 	{
 		var img_num = 0;
@@ -263,6 +264,8 @@ function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 
 			if( c_FileIsMovie( name ))
 			{
+				if( i_path )
+					i_walk.files[f].name = i_path + '/' + i_walk.files[f].name;
 				o_fi_list.push( i_walk.files[f]);
 			}
 
@@ -270,8 +273,13 @@ function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 			img_num++;
 			if( img_num < 2 ) continue;
 
-			if( i_walk.name == null ) i_walk.name = '/';
+			if( i_path )
+				i_walk.name = i_path;
+			else if( i_walk.name == null )
+				i_walk.name = '/';
+
 			o_fo_list.push( i_walk);
+
 			break;
 		}
 	}
