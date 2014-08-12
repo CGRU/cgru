@@ -165,6 +165,7 @@
 
 "thumbnail":{
 	"filename":"thumbnail.jpg",
+	"colorspace":"auto",
 	"cmd_asset":"rules/bin/thumbnail.py -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
 	"create_file":"rules/bin/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
