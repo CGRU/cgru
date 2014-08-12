@@ -36,9 +36,13 @@ function st_Show( i_status)
 	else
 		i_status = RULES.status;*/
 	if( st_Status )
-		st_Status.show();
+	{
+		st_Status.show( i_status);
+	}
 	else
+	{
 		st_Status = new Status( i_status);
+	}
 }
 
 function Status( i_obj, i_args)

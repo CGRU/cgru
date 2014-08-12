@@ -360,9 +360,12 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 
 		var title = 'Files quantity: ' + num_files + ' (without subfolders)';
 		title += '\nDouble click to update status frames number.';
-		title += '\nTotal count with subfolders:';
-		title += '\nFolders: ' + i_obj.num_folders_total;
-		title += '\nFiles: ' + i_obj.num_files_total;
+		if(( i_obj.num_folders_total != null ) && ( i_obj.num_files_total != null ))
+		{
+			title += '\nTotal count with subfolders:';
+			title += '\nFolders: ' + i_obj.num_folders_total;
+			title += '\nFiles: ' + i_obj.num_files_total;
+		}
 		el.title = title;
 
 		el.m_num_files = num_files;
