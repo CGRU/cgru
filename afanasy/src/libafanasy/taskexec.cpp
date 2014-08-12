@@ -115,20 +115,26 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( m_job_name.size())
 		o_str << ",\"job_name\":\""   << m_job_name   << "\"";
 
-	if( m_capacity_coeff > 0 )
-		o_str << ",\"capacity_coeff\":\"" << m_capacity_coeff;
+	o_str << ",\"job_id\":"    << m_job_id;
+	o_str << ",\"block_num\":" << m_block_num;
+	o_str << ",\"task_num\":"  << m_task_num;
+
 	if( m_number > 0 )
-		o_str << ",\"number\":\"" << m_number;
+		o_str << ",\"number\":" << m_number;
+
+	if( m_capacity_coeff > 0 )
+		o_str << ",\"capacity_coeff\":" << m_capacity_coeff;
 
 	if( i_type != Msg::TRendersList )
 	{
 		o_str << ",\"command\":\"" << af::strEscape( m_command  ) << "\"";
-		o_str << ",\"frames_num\":" << m_frames_num;
-		o_str << ",\"frame_start\":" << m_frame_start;
+
+		o_str << ",\"frames_num\":"   << m_frames_num;
+		o_str << ",\"frame_start\":"  << m_frame_start;
 		o_str << ",\"frame_finish\":" << m_frame_finish;
 
 		if( m_parser_coeff > 1 )
-			o_str << ",\"parser_coeff\":" << m_parser_coeff;
+			o_str << ",\"parser_coeff\":"  << m_parser_coeff;
 		if( m_file_size_min > 0 )
 			o_str << ",\"file_size_min\":" << m_file_size_min;
 		if( m_file_size_max > 0 )
