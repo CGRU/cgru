@@ -32,7 +32,7 @@ function sc_Init()
 	$('asset').innerHTML = data;
 
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
-	gui_CreateChoises({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoises({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	sc_elShots = [];
 	sc_elScenes = [];
