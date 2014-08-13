@@ -44,12 +44,26 @@ arguments = []
 for i in range(3, len(sys.argv)):
 	arguments.append(sys.argv[i])
 
-output = subprocess.Popen(arguments, stdout=subprocess.PIPE).stdout
+process = subprocess.Popen(arguments, shell=False, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#process = subprocess.Popen(' '.join(arguments), shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+process.stdin.close()
 
-for line in output:
-	print(line,)
-	parser.parse('test', line)
-	print('Parse: %d%%: %d frame %d%%' %
+stdout = process.stdout
+stderr = process.stderr
+#stdout = process.stderr
+#stderr = process.stdout
+
+while True:
+	stdout.flush()
+	data = stdout.readline()
+	if data is None: break
+	if len(data) < 1: break
+
+	sys.stdout.write(data)
+	parser.parse( data,'mode')
+	sys.stdout.write('Parse: %d%%: %d frame %d%%\n' %
 		  (parser.percent, parser.frame, parser.percentframe))
+	sys.stdout.flush()
 
-output.close()
+print( stderr.read().replace('\r',''))
+

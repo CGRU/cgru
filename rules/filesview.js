@@ -107,7 +107,15 @@ function FilesView( i_args)
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.textContent = 'Walk';
+	el.textContent = 'A';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.archivate();}
+	el.title = 'Archivate foles and folders';
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'W';
 	el.m_path = this.path;
 	el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
 	el.title = 'Send Walk job to AFANASY';
@@ -625,6 +633,19 @@ FilesView.prototype.convert = function()
 		c_Error('No items selected.');
 	else
 		d_Convert( args);
+}
+
+FilesView.prototype.archivate = function()
+{
+	var args = {};
+	args.paths = [];
+	for( var i = 0; i < this.elItems.length; i++)
+		if( this.elItems[i].m_selected )
+			args.paths.push( this.elItems[i].m_path);
+	if( args.paths.length < 1 )
+		c_Error('No items selected.');
+	else
+		fu_Archivate( args);
 }
 
 FilesView.prototype.getItemPath = function( i_path)

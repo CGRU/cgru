@@ -229,7 +229,9 @@ function fu_ChecksumDo( i_wnd)
 	n_SendJob( job);
 }
 
-// ########################### Multi Put: #################################
+//
+// ########################### Multi Put: ################################# //
+//
 fu_putmulti_params = {};
 fu_putmulti_params.input = {};
 fu_putmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
@@ -332,7 +334,7 @@ function fu_PutMultiProcessGUI( i_wnd, i_test)
 	if( i_test ) cmd += ' -t';
 
 	for( var i = 0; i < shots.length; i++)
-		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
+		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":fu_PutMultiFinished,"wnd":i_wnd});
 
@@ -384,6 +386,103 @@ function fu_PutMultiFinished( i_data, i_args)
 //	i_wnd.destroy();
 }
 
+//
+// ########################### Archivate: ################################# //
+//
+fu_arch_params = {};
+fu_arch_params.dest = {"label":'Destination'};
+function fu_Archivate( i_args)
+{
+//console.log( JSON.stringify( i_args));
+	var wnd = new cgru_Window({"name":'archivate',"title":'Archivate'});
+	wnd.m_args = i_args;
+
+	var params = {};
+
+	gui_Create( wnd.elContent, fu_arch_params);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	var elAfDiv = document.createElement('div');
+	elBtns.appendChild( elAfDiv);
+	elAfDiv.classList.add('param');
+
+	var elLabel = document.createElement('div');
+	elAfDiv.appendChild( elLabel);
+	elLabel.classList.add('label');
+	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+
+	var elSend = document.createElement('div');
+	elAfDiv.appendChild( elSend);
+	elSend.textContent = 'Send Job';
+	elSend.classList.add('button');
+	elSend.m_wnd = wnd;
+	elSend.onclick = function(e){ fu_ArchivateProcessGUI( e.currentTarget.m_wnd);}
+
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+
+	for( var i = 0; i < i_args.paths.length; i++)
+	{
+		el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = i_args.paths[i];
+	}
+}
+function fu_ArchivateProcessGUI( i_wnd)
+{
+	var paths = i_wnd.m_args.paths;
+	var params = gui_GetParams( i_wnd.elContent, fu_arch_params);
+
+	var arch_cmd = "/cgru/utilities/arch.py";
+
+	var job = {};
+	job.name = 'Arch ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
+
+	var block = {};
+	block.name = c_PathDir( paths[0]);
+	block.service = 'arch';
+	block.parser = 'generic';
+	block.tasks = [];
+	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(paths[0]), true);
+	job.blocks = [block];
+
+	for( var i = 0; i < paths.length; i++)
+	{
+		var input = c_PathBase( paths[i]);
+
+		var output = '';
+		if( params.dest.length )
+			output = cgru_PM('/' + RULES.root + params.dest, true) + '/';
+		output += c_PathBase( input);
+		output += '.7z';
+
+		if( paths.length == 1 )
+			job.name = c_PathBase( output);
+
+		var cmd = arch_cmd;
+		cmd += ' -i "' + input + '"';
+		cmd += ' -o "' + output + '"';
+
+		var task = {};
+		task.name = c_PathBase( output);
+		task.command = cmd;
+		block.tasks.push(task);
+	}
+
+	n_SendJob( job);
+
+	i_wnd.destroy();
+}
+
+//
+// ########################### Walk: ################################# //
+//
 fu_walk_params = {};
 fu_walk_params.path = {};
 fu_walk_params.verbose   = {"label":'Verbose Level',"default":2,"lwidth":'170px',"width":'50%'};

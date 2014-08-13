@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import traceback
 
 import cgruutils
 
@@ -102,7 +103,8 @@ class parser(
 			result = self.do(data, mode)
 		except:  # TODO: too broad exception clause
 			print('Error parsing output:')
-			print(str(sys.exc_info()[1]))
+			#print(str(sys.exc_info()[1]))
+			traceback.print_exc(file=sys.stdout)
 		return result, self.percent, self.frame, self.percentframe, \
 			   self.warning, self.error, self.badresult, self.finishedsuccess, \
 			   self.activity

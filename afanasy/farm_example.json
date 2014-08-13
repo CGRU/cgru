@@ -25,6 +25,7 @@
 		"nimby_busyfree_time": 60,
 
 		"services":[
+			{"name":"arch"},
 			{"name":"checksum"},
 			{"name":"events"},
 			{"name":"ftp"},
