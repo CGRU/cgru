@@ -439,7 +439,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 	var paths = i_wnd.m_args.paths;
 	var params = gui_GetParams( i_wnd.elContent, fu_arch_params);
 
-	var arch_cmd = "/cgru/utilities/arch.py";
+	var arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
 
 	var job = {};
 	job.name = 'Arch ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
