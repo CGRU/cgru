@@ -460,7 +460,6 @@ function fu_ArchivateProcessGUI( i_wnd)
 		if( params.dest.length )
 			output = cgru_PM('/' + RULES.root + params.dest, true) + '/';
 		output += c_PathBase( input);
-		output += '.7z';
 
 		if( paths.length == 1 )
 			job.name = c_PathBase( output);
