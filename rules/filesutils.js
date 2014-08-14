@@ -394,7 +394,8 @@ fu_arch_params.dest = {"label":'Destination'};
 function fu_Archivate( i_args)
 {
 //console.log( JSON.stringify( i_args));
-	var wnd = new cgru_Window({"name":'archivate',"title":'Archivate'});
+	var title = i_args.archive ? 'Archivate' : 'Extract Archive';
+	var wnd = new cgru_Window({"name":'archivate',"title":title});
 	wnd.m_args = i_args;
 
 	var params = {};
@@ -439,37 +440,61 @@ function fu_ArchivateProcessGUI( i_wnd)
 	var paths = i_wnd.m_args.paths;
 	var params = gui_GetParams( i_wnd.elContent, fu_arch_params);
 
-	var arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
-
 	var job = {};
-	job.name = 'Arch ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
+	job.name = 'Archive';
+
+	var arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
+	if( i_wnd.m_args.extract )
+	{
+		arch_cmd = cgru_PM('/cgru/utilities/arch_x.py', true);
+		job.name = 'Extract';
+	}
+
+	job.name += ' ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
+	job.max_running_tasks = RULES.archive.af_maxtasks;
 
 	var block = {};
 	block.name = c_PathDir( paths[0]);
-	block.service = 'arch';
-	block.parser = 'generic';
+	block.service = RULES.archive.af_service;
+	block.parser = RULES.archive.af_parser;
+	block.capacity = RULES.archive.af_capacity;
 	block.tasks = [];
 	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(paths[0]), true);
 	job.blocks = [block];
 
 	for( var i = 0; i < paths.length; i++)
 	{
+		var cmd = arch_cmd;
+		var task = {};
+
 		var input = c_PathBase( paths[i]);
+		cmd += ' -i "' + input + '"';
 
 		var output = '';
 		if( params.dest.length )
+		{
 			output = cgru_PM('/' + RULES.root + params.dest, true) + '/';
-		output += c_PathBase( input);
+			if( i_wnd.m_args.extract )
+			{
+				cmd += ' -o "' + output + '"';
+			}
+		}
 
-		if( paths.length == 1 )
-			job.name = c_PathBase( output);
+		if( i_wnd.m_args.archive )
+		{
+			output += c_PathBase( input);
+			cmd += ' -o "' + output + '"';
+			task.name = c_PathBase( output);
+			if( paths.length == 1 )
+				job.name = c_PathBase( output);
+		}
+		else
+		{
+			task.name = c_PathBase( input);
+			if( paths.length == 1 )
+				job.name = c_PathBase( input);
+		}
 
-		var cmd = arch_cmd;
-		cmd += ' -i "' + input + '"';
-		cmd += ' -o "' + output + '"';
-
-		var task = {};
-		task.name = c_PathBase( output);
 		task.command = cmd;
 		block.tasks.push(task);
 	}

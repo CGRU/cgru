@@ -645,13 +645,27 @@ FilesView.prototype.convert = function()
 
 FilesView.prototype.archivate = function()
 {
-	var args = {};
-	args.paths = [];
+	var args = {"archive":true,"paths":[]};
 	for( var i = 0; i < this.elItems.length; i++)
 		if( this.elItems[i].m_selected )
 			args.paths.push( this.elItems[i].m_path);
 	if( args.paths.length < 1 )
 		c_Error('No items selected.');
+	else
+		fu_Archivate( args);
+}
+
+FilesView.prototype.extract = function()
+{
+	var args = {"extract":true,"paths":[]};
+	for( var i = 0; i < this.elItems.length; i++)
+	{
+		if( this.elItems[i].m_selected != true ) continue;
+		if( this.elItems[i].classList.contains('folder')) continue;
+		args.paths.push( this.elItems[i].m_path);
+	}
+	if( args.paths.length < 1 )
+		c_Error('No archives selected.');
 	else
 		fu_Archivate( args);
 }

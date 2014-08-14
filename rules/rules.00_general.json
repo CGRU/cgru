@@ -253,6 +253,16 @@
 	"af_maxtasks":5
 },
 
+"archive":{
+	"cmd":"python /cgru/utilities/arch.py",
+	"cmd_x":"python /cgru/utilities/arch_x.py",
+	"dest":"",
+	"af_service":"arch",
+	"af_parser":"generic",
+	"af_capacity":500,
+	"af_maxtasks":5
+},
+
 "walk":{
 	"cmd":"python /cgru/rules/bin/walk.py",
 	"af_service":"walk",

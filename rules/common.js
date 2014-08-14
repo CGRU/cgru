@@ -7,6 +7,7 @@ c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg','flv'];
 c_movieTypesHTML = ['ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
+c_archives = ['zip','7z'];
 
 c_logCount = 0;
 c_elLogs = [];
@@ -383,6 +384,12 @@ function c_FileCanThumbnail( i_file)
 {
 	if( c_FileIsImage( i_file) ) return true;
 	if( c_FileIsMovie( i_file) ) return true;
+	return false;
+}
+function c_FileIsArchive( i_file)
+{
+	var type = i_file.substr( i_file.lastIndexOf('.')+1).toLowerCase();
+	if( c_archives.indexOf( type) != -1) return true;
 	return false;
 }
 
