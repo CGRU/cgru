@@ -61,7 +61,7 @@ if os.path.isfile(Options.output):
 	print('Deleting exising archive:\n' + Options.output)
 	os.remove(Options.output)
 
-Process = subprocess.Popen( Cmd, shell=False, bufsize=1, stdout=subprocess.PIPE)
+Process = subprocess.Popen( Cmd, shell=False, stdout=subprocess.PIPE)
 
 while True:
 	data = Process.stdout.readline()

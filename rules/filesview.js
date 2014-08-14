@@ -115,6 +115,14 @@ function FilesView( i_args)
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
+	el.textContent = 'X';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.extract();}
+	el.title = 'Extract files from archives';
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
 	el.textContent = 'W';
 	el.m_path = this.path;
 	el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
