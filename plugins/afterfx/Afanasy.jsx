@@ -183,82 +183,89 @@ function af_CheckScene()
 
 function af_DrawWindow()
 {
-	var win_x =  5;
-	var win_y = 425;
-	var win_w = 260;
-	var win_h = 300;
-	var edge = 3;
-	var el_h = 18;
-	var label_x = 5;
-	var label_w = 120;
-	var param_w = win_w - 20;
+	var af_Window = new Window('palette','Submit Job To Afanasy', undefined, {resizeable:true});
+    //af_Window.margins = [0,0,0,0];
+    af_Window.alignChildren = ['center','top'];
+    
+	var tabPanel = af_Window.add( 'tabbedpanel', undefined,'', {resizeable:true});
+    //tabPanel.margins = [0,0,0,0];
+    tabPanel.alignment = ['fill','fill'];
+    tabPanel.alignChildren = ['left','top'];
 
-	var af_Window = new Window('palette','Submit Job To Afanasy', [win_x, win_y, win_x + win_w, win_y + win_h]);
-	var tabPanel = af_Window.add( 'tabbedpanel', undefined );
-	var generalTab = tabPanel.add( 'tab', undefined, 'General' );
-	var y = edge * 2;
+    var generalTab = tabPanel.add( 'tab', undefined, 'General', {resizeable:true});
+    //generalTab.spacing= 20;
+    //generalTab.margins = [0,0,0,0];
+    generalTab.alignment = ['fill','fill'];
+    generalTab.alignChildren = ['left','top'];
 
-	generalTab.add('statictext', [label_x, y, label_w, y + el_h], 'Frame Start');
-	var elStart = generalTab.add('edittext', [label_w, y, param_w, y + el_h], af.frame_start);
-	y += el_h + edge;
-	generalTab.add('statictext', [label_x, y, label_w, y + el_h], 'Frame Finish');
-	var elEnd   = generalTab.add('edittext', [label_w, y, param_w, y + el_h], af.frame_end);
-	y += el_h+ edge;
-	generalTab.add('statictext', [label_x, y, label_w, y + el_h], 'Frame Increment');
-	var elBy    = generalTab.add('edittext', [label_w, y, param_w, y + el_h], af.frame_by);
-	y += el_h+ edge;
-	generalTab.add('statictext', [label_x, y, label_w, y + el_h], 'Frames Per Task');
-	var elFpt   = generalTab.add('edittext', [label_w, y, param_w, y + el_h], af.frame_per_task);
-	y += el_h+ edge;
+	generalTab.add('statictext', undefined, 'Frame Start');
+	var elStart = generalTab.add('edittext', undefined, af.frame_start);
+    elStart.alignment = ['fill','center'];
+
+    generalTab.add('statictext', undefined, 'Frame Finish');
+	var elEnd = generalTab.add('edittext', undefined, af.frame_end);
+    elEnd.alignment = ['fill','center'];
+
+	generalTab.add('statictext', undefined, 'Frame Increment');
+	var elBy = generalTab.add('edittext', undefined, af.frame_by);
+    elBy.alignment = ['fill','center'];
+
+	generalTab.add('statictext', undefined, 'Frames Per Task');
+	var elFpt = generalTab.add('edittext', undefined, af.frame_per_task);
+    elFpt.alignment = ['fill','center'];
 
 	elStart.onChange = function(){ if( isNaN(this.text)) this.text = af.frame_start;    af.frame_start    = parseInt(this.text);};
 	elEnd.onChange   = function(){ if( isNaN(this.text)) this.text = af.frame_end;      af.frame_end      = parseInt(this.text);};
 	elFpt.onChange   = function(){ if( isNaN(this.text)) this.text = af.frame_per_task; af.frame_per_task = parseInt(this.text);};
 	elBy.onChange    = function(){ if( isNaN(this.text)) this.text = af.frame_by;       af.frame_by       = parseInt(this.text);};
 
-	generalTab.add('statictext', [label_x, y, label_w, y + el_h], 'Comp Name:');
-	generalTab.add('statictext', [label_w, y, param_w, y + el_h], af.comp_name);
-	y += el_h + edge;
+	generalTab.add('statictext', undefined, 'Comp Name:');
+	generalTab.add('statictext', undefined, af.comp_name);
 
-	var elPaused = generalTab.add('checkbox', [label_w, y, param_w, y + el_h], 'Start Paused');
+	var elPaused = generalTab.add('checkbox', undefined, 'Start Paused');
 	elPaused.helpTip = 'If enabled, the job will submit in the offline state.';
 	elPaused.value = af.paused;
 	elPaused.onClick = function(){ af.paused = this.value;};
-	y += el_h + edge;
 
 
 	// Movie:
-	var movieTab = tabPanel.add( 'tab', undefined, 'Movie');
-	var y = edge * 2;
+	var movieTab = tabPanel.add( 'tab', undefined, 'Movie', {resizeable:true});
+    movieTab.alignment = ['fill','fill'];
+    movieTab.alignChildren = ['left','top'];
 
-	var elMovEnable = movieTab.add('checkbox', [label_w, y, param_w, y + el_h], 'Encode Movie');
+	var elMovEnable = movieTab.add('checkbox', undefined, 'Encode Movie');
 	elMovEnable.helpTip = 'If enabled, a movie will be encoded from sequence.';
 	elMovEnable.value = af.mov_enable;
 	elMovEnable.onClick = function(){ af.mov_enable = this.value;};
-	y += el_h + edge;
 
-	movieTab.add('statictext', [label_x, y, label_w, y + el_h], 'Name:');
-	movieTab.add('edittext', [label_w, y, param_w, y + el_h], af.mov_name).onChange = function()
-		{ af.mov_name = this.text;};
-	y += el_h + edge;
+	movieTab.add('statictext', undefined, 'Name:');
+	elMovName = movieTab.add('edittext', undefined, af.mov_name);
+    elMovName.onChange = function(){ af.mov_name = this.text;};
+    elMovName.alignment = ['fill','center'];
 
-	movieTab.add('statictext', [label_x, y, label_w, y + el_h], 'Codec:');
-	movieTab.add('edittext', [label_w, y, param_w, y + el_h], af.mov_codec).onChange = function()
-		{ af.mov_codec = this.text;};
-	y += el_h + edge;
+	movieTab.add('statictext', undefined, 'Codec:');
+	elMovCodec = movieTab.add('edittext', undefined, af.mov_codec);
+    elMovCodec.onChange = function(){ af.mov_codec = this.text;};
+    elMovCodec.alignment = ['fill','center'];
 
-	movieTab.add('statictext', [label_x, y, label_w, y + el_h], 'Resolution:');
-	movieTab.add('edittext', [label_w, y, param_w, y + el_h], af.mov_res).onChange = function()
-		{ af.mov_res = this.text;};
-	y += el_h + edge;
+	movieTab.add('statictext', undefined, 'Resolution:');
+	elMovRes = movieTab.add('edittext', undefined, af.mov_res)
+    elMovRes.onChange = function(){ af.mov_res = this.text;};
+    elMovRes.alignment = ['fill','center'];
 
 	// Submit and close buttons:
-	var startRenderBtn = af_Window.add ('button', [edge + 30, win_h - edge - 20 ,edge+125,win_h-edge], 'Render');
+	var startRenderBtn = af_Window.add ('button', undefined, 'Render');
 	startRenderBtn.onClick = function() { af_StartRender(1); };
+    startRenderBtn.preferredSize = [100,20];
 
-	var closeBtn = af_Window.add('button', [edge + 130,win_h - edge - 20 ,edge+225,win_h-edge], 'Render & Close');
+	var closeBtn = af_Window.add('button', undefined, 'Render & Close');
 	closeBtn.onClick = function() { af_StartRender(1); af_Window.hide(); };
+    closeBtn.preferredSize = [100,20];
 
+	af_Window.onResizing = af_Window.onResize = function () {this.layout.resize();}
+		
+    af_Window.layout.resize();
+    af_Window.center();
 	af_Window.show()
 }
 
