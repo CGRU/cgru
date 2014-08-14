@@ -53,14 +53,9 @@ void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
 	o_str << "}";
 }
 
-bool ServiceLimit::increment( const std::string & hostname)
+void ServiceLimit::increment( const std::string & hostname)
 {
-	bool retval = true;
-
-	if( counter >= maxcount ) retval = false; // Check counter
 	counter++;										  // Increase counter
-
-	if( hostslist.size() >= maxhosts ) retval = false; // Check hosts list
 
 	bool hostexists = false;
 	for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
@@ -70,29 +65,20 @@ bool ServiceLimit::increment( const std::string & hostname)
 			break;
 		}
 	if( false == hostexists ) hostslist.push_back( hostname); // Appent hostslist with hostname if it does not exist
-
-	return retval;
 }
 
-bool ServiceLimit::releaseHost( const std::string & hostname)
+void ServiceLimit::releaseHost( const std::string & hostname)
 {
-	bool retval = true;
+	if( counter > 0 )
+		counter--;
 
-	if( counter <= 0 ) retval = false;
-	else counter--;
-
-	bool hostexists = false;
 	std::list< std::string>::iterator it = hostslist.begin();
 	for( ; it != hostslist.end(); it++)
 		if( *it == hostname )
 		{
-			hostexists = true;
 			hostslist.erase( it);
 			break;
 		}
-	if( false == hostexists ) retval = false;
-
-	return retval;
 }
 
 void ServiceLimit::getLimits( const ServiceLimit & other)
@@ -262,7 +248,7 @@ bool Farm::getFarm( const JSON & i_obj)
 			return false;
 		}
 		
-		int maxcount, maxhosts = -1;
+		int maxcount = -1, maxhosts = -1;
 		jr_int("maxcount", maxcount, limits[i]);
 		jr_int("maxhosts", maxhosts, limits[i]);
 
@@ -392,26 +378,28 @@ bool Farm::serviceLimitCheck( const std::string & service, const std::string & h
 	return (*it).second->canRun( hostname);
 }
 
-bool Farm::serviceLimitAdd( const std::string & service, const std::string & hostname)
+void Farm::serviceLimitAdd( const std::string & service, const std::string & hostname)
 {
-	// Find a service:
+	// Find a service limit:
 	std::map< std::string, ServiceLimit * >::const_iterator it = m_servicelimits.find( service);
 
-	// If there is no limits description, we do not add it:
-	if( it == m_servicelimits.end()) return true;
-
-	return (*it).second->increment( hostname);
+	// Add if founded:
+	if( it != m_servicelimits.end())
+	{
+		(*it).second->increment( hostname);
+	}
 }
 
-bool Farm::serviceLimitRelease( const std::string & service, const std::string & hostname)
+void Farm::serviceLimitRelease( const std::string & service, const std::string & hostname)
 {
-	// Find a service:
+	// Find a service limit:
 	std::map< std::string, ServiceLimit * >::const_iterator it = m_servicelimits.find( service);
 
-	// If there is no limits description, we do not add it:
-	if( it == m_servicelimits.end()) return true;
-
-	return (*it).second->releaseHost( hostname);
+	// Release if founded:
+	if( it != m_servicelimits.end())
+	{
+		(*it).second->releaseHost( hostname);
+	}
 }
 
 void Farm::servicesLimitsGetUsage( const Farm & other)

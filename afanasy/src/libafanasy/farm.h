@@ -15,8 +15,8 @@ public:
 	void jsonWrite( std::ostringstream & o_str) const; /// Generate information.
 
    bool canRun( const std::string & hostname) const;
-   bool increment( const std::string & hostname);
-   bool releaseHost( const std::string & hostname);
+   void increment( const std::string & hostname);
+   void releaseHost( const std::string & hostname);
    void getLimits( const ServiceLimit & other);
 
 protected:
@@ -46,10 +46,10 @@ public:
    bool serviceLimitCheck( const std::string & service, const std::string & hostname) const;
 
    /// Add service limit, return false if limits were already reached and this adding is over limit.
-   bool serviceLimitAdd( const std::string & service, const std::string & hostname);
+   void serviceLimitAdd( const std::string & service, const std::string & hostname);
 
    /// Release service limit.
-   bool serviceLimitRelease( const std::string & service, const std::string & hostname);
+   void serviceLimitRelease( const std::string & service, const std::string & hostname);
 
    void servicesLimitsGetUsage( const Farm & other);
 
