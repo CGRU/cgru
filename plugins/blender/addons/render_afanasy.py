@@ -23,6 +23,7 @@ import bpy
 
 from bpy.props import (PointerProperty, StringProperty, BoolProperty,
 					   EnumProperty, IntProperty, CollectionProperty)
+from bpy.types import Operator, AddonPreferences
 
 # bpy.CURRENT_VERSION = bl_info["version"][0]
 # bpy.found_newer_version = False
@@ -41,6 +42,42 @@ def renderEngine(render_engine):
 	bpy.utils.register_class(render_engine)
 	return render_engine
 
+def getListRenderers(scene, context):
+
+	lst = [("BLENDER_RENDER","BLENDER_RENDER",""), ("CYCLES","CYCLES","")]
+
+	prefs = context.user_preferences.addons[__name__].preferences
+	if prefs.customEngine != '':
+		renderersSplit = prefs.customEngine.split(",")
+		for customRen in renderersSplit:
+			lst.append((customRen, customRen,""))
+
+	return lst
+
+class OREAddonPreferences(AddonPreferences):
+	# this must match the addon name, use '__package__'
+	# when defining this in a submodule of a python package.
+	# bl_idname = __name__
+	bl_idname = __name__
+
+	customEngine = StringProperty(name='Custom Engines',
+							description='''Custom Engines. Use "," to split renderers''',
+							maxlen=512, default='')
+
+	engineList = EnumProperty(name='Use Engine',
+							description='Engine to render scene with.',
+							items=getListRenderers)
+
+	def draw(self, context):
+		layout = self.layout
+		row = layout.row()
+		row.label(text="Please, set Exchanges Folder and save Preferences")
+		row = layout.row()
+		row.prop(self, "engineList")
+		layout.prop(self, "customEngine")
+		#col.operator("scene.ms_add_lightmap_group", icon='ZOOMIN', text="")
+		#col.operator("scene.ms_del_lightmap_group", icon='ZOOMOUT', text="")
+
 
 class ORESettings(bpy.types.PropertyGroup):
 	"""Missing DocString
@@ -49,9 +86,9 @@ class ORESettings(bpy.types.PropertyGroup):
 	jobname = StringProperty(name='Job Name',
 							 description='Job Name. Scene name if empty.',
 							 maxlen=512, default='')
-	engine = EnumProperty(name='Use Engine',
-							description='Engine to render scene with.',
-							items=(("BLENDER_RENDER","BLENDER_RENDER",""), ("CYCLES","CYCLES","")), default='BLENDER_RENDER')
+	engine = StringProperty(name='Use Engine',
+							 description='Engine to render scene with.',
+							 maxlen=512, default='BLENDER_RENDER')
 	fstart = IntProperty(name='Start', description='Start Frame', default=1)
 	fend = IntProperty(name='End', description='End Frame', default=11)
 	finc = IntProperty(name='By', description='Frames Increment', min=1,
@@ -169,7 +206,12 @@ class RENDER_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
 		ore = sce.ore_render
 
 		layout.prop(ore, 'jobname')
-		layout.prop(ore, 'engine', text='Render Engine')
+
+		#user_preferences = context.user_preferences
+		#addon_prefs = user_preferences.addons[__name__].preferences
+		layout.label(text="Renderer: " + ore.engine)
+		layout.operator('ore.setrenderer')
+		layout.prop(context.user_preferences.addons[__name__].preferences, 'engineList', text='Render Engine')
 
 		layout.separator()
 		row = layout.row()
@@ -234,6 +276,23 @@ class PARAMETERS_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
 		layout.prop(ore, 'dependmaskglobal')
 		layout.prop(ore, 'hostsmask')
 		layout.prop(ore, 'hostsmaskexclude')
+
+
+class ORE_SetRenderer(bpy.types.Operator):
+	"""Missing DocString
+	"""
+
+	bl_idname = "ore.setrenderer"
+	bl_label = "Set Renderer"
+
+	def execute(self, context):
+		sce = context.scene
+		ore = sce.ore_render
+		prefs = context.user_preferences.addons[__name__].preferences
+
+		ore.engine = prefs.engineList
+
+		return set(['FINISHED'])
 
 
 class ORE_Submit(bpy.types.Operator):
