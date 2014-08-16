@@ -33,6 +33,9 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 		if( a->getPriority() > b->getPriority()) return true;
 		if( a->getPriority() < b->getPriority()) return false;
 
+		if( a->getTasksStartFinishTime() < b->getTasksStartFinishTime()) return true;
+		if( a->getTasksStartFinishTime() > b->getTasksStartFinishTime()) return false;
+
 		if( a->getCapacity() > b->getCapacity()) return true;
 		if( a->getCapacity() < b->getCapacity()) return false;
 
