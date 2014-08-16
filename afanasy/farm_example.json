@@ -2,12 +2,14 @@
 	"":"Copy this file into 'farm.json' and describe you own",
 
 	"":"You can limit service on your farm:",
-	"":"'maxhosts' - maximum number if various hosts (renders) service can run on",
-	"":"'maxcount' - total maximum number of service starts, no matter on the same host or not",
+		"":"'maxhosts' - maximum number if various hosts (renders) service can run on",
+		"":"'maxcount' - total maximum number of service starts, no matter on the same host or not",
 	"limits":[
-		{"service":"service_a", "maxhosts":10, "maxcount":20},
-		{"service":"service_b", "maxhosts":10, "maxcount":20}
+		{"service":"service_a", "maxhosts":10, "maxcount":-1},
+		{"service":"service_b", "maxcount":20}
 	],
+		"":"if you drop maxhosts or maxcount paramter it will be '-1'",
+		"":"-1 means no limit",
 
 	"patterns":[
 	{
