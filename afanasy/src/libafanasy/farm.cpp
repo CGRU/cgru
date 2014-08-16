@@ -8,83 +8,83 @@
 
 using namespace af;
 
-ServiceLimit::ServiceLimit( int MaxCount, int MaxHosts):
-	maxcount( MaxCount),
-	maxhosts( MaxHosts),
-	counter( 0)
+ServiceLimit::ServiceLimit( int i_max_count, int i_max_hosts):
+	m_max_count( i_max_count),
+	m_max_hosts( i_max_hosts),
+	m_counter( 0)
 {
 }
 
 
-bool ServiceLimit::canRun( const std::string & hostname) const
+bool ServiceLimit::canRun( const std::string & i_hostname) const
 {
-	if( maxcount != -1 ) if( counter >= maxcount ) return false; // Check maximum m_count
-	if( maxhosts != -1 ) // Check maximum hosts
+	if( m_max_count != -1 ) if( m_counter >= m_max_count ) return false; // Check maximum m_count
+	if( m_max_hosts != -1 ) // Check maximum hosts
 	{
 		// If host already exists service can run on it:
-		for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
-			if( *it == hostname ) return true;
+		for( std::list< std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++)
+			if( *it == i_hostname ) return true;
 
 		// Check whether we can add one more host:
-		if( hostslist.size() >= maxhosts ) return false;
+		if( m_hosts_list.size() >= m_max_hosts ) return false;
 	}
 	return true;
 }
 
-void ServiceLimit::generateInfoStream( std::ostringstream & stream, bool full) const
+void ServiceLimit::generateInfoStream( std::ostringstream & o_stream, bool i_full) const
 {
-	if( full)
-		stream << "Count = " << counter << "/" <<  maxcount << "; Hosts = " << hostslist.size() << "/" << maxhosts;
+	if( i_full )
+		o_stream << "Count = " << m_counter << "/" <<  m_max_count << "; Hosts = " << m_hosts_list.size() << "/" << m_max_hosts;
 	else
-		stream << "c" << counter << "/" <<  maxcount << " h" << hostslist.size() << "/" << maxhosts;
+		o_stream << "c" << m_counter << "/" <<  m_max_count << " h" << m_hosts_list.size() << "/" << m_max_hosts;
 }
 void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "{";
-	o_str << "\"m_count\":" << counter;
-	o_str << ",\"max_count\":" << maxcount;
+	o_str << "\"m_count\":" << m_counter;
+	o_str << ",\"max_count\":" << m_max_count;
 	o_str << ",\"hosts\":[";
-	for( std::list<std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
+	for( std::list<std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++)
 	{
-		if( it != hostslist.begin()) o_str << ",";
+		if( it != m_hosts_list.begin()) o_str << ",";
 		o_str << "\"" << *it << "\"";
 	}
-	o_str << "],\"max_hosts\":" << maxhosts;
+	o_str << "],\"max_hosts\":" << m_max_hosts;
 	o_str << "}";
 }
 
-void ServiceLimit::increment( const std::string & hostname)
+void ServiceLimit::increment( const std::string & i_hostname)
 {
-	counter++;										  // Increase counter
+	// Increase m_counter
+	m_counter++;										  
 
-	bool hostexists = false;
-	for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
-		if( *it == hostname )
-		{
-			hostexists = true;
-			break;
-		}
-	if( false == hostexists ) hostslist.push_back( hostname); // Appent hostslist with hostname if it does not exist
+	// Ensure that hostname exists in the list:
+	for( std::list< std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++)
+		if( *it == i_hostname )
+			return;
+
+	// Appent m_hosts_list with hostname if it does not exist
+	m_hosts_list.push_back( i_hostname);
 }
 
-void ServiceLimit::releaseHost( const std::string & hostname)
+void ServiceLimit::releaseHost( const std::string & i_hostname)
 {
-	if( counter > 0 )
-		counter--;
+	if( m_counter > 0 )
+		m_counter--;
 
-	std::list< std::string>::iterator it = hostslist.begin();
-	for( ; it != hostslist.end(); it++)
-		if( *it == hostname )
+	std::list< std::string>::iterator it = m_hosts_list.begin();
+	for( ; it != m_hosts_list.end(); it++)
+		if( *it == i_hostname )
 		{
-			hostslist.erase( it);
+			m_hosts_list.erase( it);
 			break;
 		}
 }
 
-void ServiceLimit::getLimits( const ServiceLimit & other)
+void ServiceLimit::getLimits( const ServiceLimit & i_other)
 {
-	if( other.counter >= 0 ) counter = other.counter;
-	hostslist = other.hostslist;
+	if( i_other.m_counter >= 0 ) m_counter = i_other.m_counter;
+	m_hosts_list = i_other.m_hosts_list;
 }
 
 //############################################## Farm ########################################

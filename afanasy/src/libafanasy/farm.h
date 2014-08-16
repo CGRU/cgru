@@ -9,21 +9,23 @@ namespace af
 class ServiceLimit
 {
 public:
-   ServiceLimit( int MaxCount, int MaxHosts);
+	ServiceLimit( int i_max_count, int i_max_hosts);
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void generateInfoStream( std::ostringstream & o_stream, bool i_full = false) const; /// Generate information.
 	void jsonWrite( std::ostringstream & o_str) const; /// Generate information.
 
-   bool canRun( const std::string & hostname) const;
-   void increment( const std::string & hostname);
-   void releaseHost( const std::string & hostname);
-   void getLimits( const ServiceLimit & other);
+	bool canRun(      const std::string & i_hostname) const;
+	void increment(   const std::string & i_hostname);
+	void releaseHost( const std::string & i_hostname);
 
-protected:
-   int maxcount;
-   int maxhosts;
-   int counter;
-   std::list< std::string> hostslist;
+	void getLimits( const ServiceLimit & i_other);
+
+private:
+	int m_max_count;
+	int m_max_hosts;
+
+	int m_counter;
+	std::list<std::string> m_hosts_list;
 };
 
 class Farm
