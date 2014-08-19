@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd `dirname "$0"`
+
+cd ..
+cd ..
+
+source "./setup.sh"
+
+"${CGRU_LOCATION}/rules/bin/shot_open_latest.py" "$@"
