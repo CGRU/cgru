@@ -10,6 +10,7 @@ Root {
  format "1920 1080 0 0 1920 1080 1 HD"
  proxy_type scale
  proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ label "@(comment)s"
 }
 
 BackdropNode {

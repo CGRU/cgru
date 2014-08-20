@@ -48,6 +48,19 @@ if len( Args) == 0:
 	errExit('Paths are not specified.')
 
 TemplateFileData = ''
+# Search for the same name template file in shot upper folders:
+if Options.template != '':
+	folder = Args[0]
+	while True:
+		up = os.path.dirname(folder)
+		if folder == up: break
+		folder = up
+		template = os.path.join( folder, os.path.basename(Options.template))
+		if os.path.isfile( template):
+			Options.template = template
+			break
+
+# Load template file data:
 if Options.template != '':
 	if not os.path.isfile( Options.template):
 		errExit('Template file does not exist')
@@ -212,6 +225,10 @@ def processNuke( io_shot):
 
 	if io_shot['sequences_count']:
 		io_shot['data'] += '\n' + createNukeBackdrop( src, y, x)
+
+	io_shot['comment'] = ''
+	if Options.template != '':
+		io_shot['comment'] += 'Template: %s\n' % Options.template
 
 for path in Args:
 	path = os.path.normpath( path)
