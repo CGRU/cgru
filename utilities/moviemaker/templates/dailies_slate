@@ -22,7 +22,7 @@
 -fill white   -pointsize @SIZE_1/18Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_2/30Y@ "%(VERSION)s"
 
 -fill DimGrey -pointsize @SIZE_1/24Y@ -gravity      east -annotate +@SIZE_4/5X@+@SIZE_5/30Y@ "Frames: "
--fill white   -pointsize @SIZE_1/24Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_5/30Y@ "%(FRAMERANGE)s"
+-fill "#AAFFFF" -pointsize @SIZE_1/24Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_5/30Y@ "%(FRAMERANGE)s"
 
 -fill DimGrey -pointsize @SIZE_1/24Y@ -gravity      east -annotate +@SIZE_4/5X@+@SIZE_7/30Y@  "Comments: "
 -fill white   -pointsize @SIZE_1/24Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_7/30Y@  "%(COMMENTS)s"

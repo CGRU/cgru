@@ -456,8 +456,8 @@ print(TmpDir)
 
 # Commands construction:
 cmd_makeframe = os.path.join(os.path.dirname(sys.argv[0]), 'makeframe.py')
-cmd_makeframe = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'),
-							   cmd_makeframe)
+cmd_makeframe = '"%s" "%s"' % (os.getenv('CGRU_PYTHONEXE', 'python'), cmd_makeframe)
+if Verbose: cmd_makeframe += ' -V'
 
 # Calculate frame range:
 FrameRange = ''
@@ -775,6 +775,7 @@ else:
 		sys.stdout.flush()
 		for cmd in cmd_precomp:
 			print(name_precomp[n])
+			if Verbose: print(cmd)
 			os.system(cmd)
 			n += 1
 		print('')
@@ -784,7 +785,7 @@ else:
 		sys.stdout.flush()
 		for cmd in cmd_convert:
 			print(name_convert[n])
-			# print(cmd)
+			if Verbose: print(cmd)
 			# output = subprocess.Popen( cmd, stdout=subprocess.PIPE).communicate()[0]
 			cmd_array = []
 			#         if os.platform.find('win')
@@ -798,11 +799,13 @@ else:
 		print('')
 
 	print('ACTIVITY: Encode')
+	if Verbose: print(cmd_encode)
 	sys.stdout.flush()
 	os.system(cmd_encode)
 
 	if cmd_preview != '':
 		print('ACTIVITY: Preview')
+		if Verbose: print(cmd_preview)
 		sys.stdout.flush()
 		os.system(cmd_preview)
 
