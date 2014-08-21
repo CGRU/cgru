@@ -516,7 +516,11 @@ Comment.prototype.save = function()
 
 	var news_user = this.obj.user_name;
 	if( this.obj.muser_name ) news_user = this.obj.muser_name;
-	nw_MakeNews({"title":'comment',"path":g_CurPath(),"user":news_user,"guest":this.obj.guest});
+
+	var news_title = 'comment';
+	if( this.obj.type == 'report' ) news_title = 'report';
+
+	nw_MakeNews({"title":news_title,"path":g_CurPath(),"user":news_user,"guest":this.obj.guest});
 
 	this.updateStatus();
 

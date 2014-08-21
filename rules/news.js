@@ -385,7 +385,7 @@ function nw_NewsShow( i_news)
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
 		elBtn.m_id = news.id;
-		elBtn.ondblclick = function(e){ nw_RemoveNews([e.currentTarget.m_id]);};
+		elBtn.ondblclick = function(e){ nw_DeleteNews([e.currentTarget.m_id]);};
 		elBtn.title = 'Double click to remove link';
 
 		var avatar = c_GetAvatar( news.user, news.guest);
@@ -411,6 +411,7 @@ function nw_NewsShow( i_news)
 	delete g_auth_user.news;
 
 	nw_HighlightCurrent();
+	nw_Filter();
 }
 
 function nw_NavigatePost()
@@ -432,32 +433,60 @@ function nw_HighlightCurrent()
 			elNews[i].classList.remove('cur_path');
 }
 
-function nw_ShowOnlyAssigned( i_btn)
+function nw_FilterBtn(i_btn, i_filter)
 {
-	if( $('news').classList.contains('show_only_assigned'))
-	{
-		$('news').classList.remove('show_only_assigned');
-		i_btn.classList.remove('pushed');
-	}
-	else
-	{
-		$('news').classList.add('show_only_assigned');
-		i_btn.classList.add('pushed');
-	}
+	i_btn.m_filter = i_filter;
+	var all = ( i_filter == '_all_');
+
+	// Get all news filter buttons and remove push:
+	var btns = document.getElementsByClassName('nw_fb');
+	for( var i = 0; i < btns.length; i++)
+		btns[i].classList.remove('pushed');
+
+	// Add push on clicked button except 'All':
+	if( ! all ) i_btn.classList.add('pushed');
+
+	nw_Filter();
 }
 
-function nw_RemoveNotAssigned()
+function nw_Filter()
+{
+	var filter = null;
+
+	// Get all news filter buttons and remove push:
+	var btns = document.getElementsByClassName('nw_fb');
+	for( var i = 0; i < btns.length; i++)
+		if( btns[i].classList.contains('pushed'))
+			filter = btns[i].m_filter;
+
+	var my  = ( filter == '_my_' );
+
+	var elNews = $('news').m_elArray;
+	for( var i = 0; i < elNews.length; i++)
+		if(( filter === null ) ||
+			( elNews[i].m_news.title == filter ) ||
+			( my && ( elNews[i].classList.contains('assigned'))))
+			elNews[i].style.display = 'block';
+		else
+			elNews[i].style.display = 'none';
+}
+
+function nw_DeleteFiltered( i_visible)
 {
 	var elNews = $('news').m_elArray;
+	var display = 'none';
+	if( i_visible ) display = 'block';
+
 	var ids = [];
 	for( var i = 0; i < elNews.length; i++)
-		if( false == elNews[i].classList.contains('assigned'))
+		if( elNews[i].style.display == display )
 			ids.push( elNews[i].m_news.id);
+
 	if( ids.length )
-		nw_RemoveNews( ids);
+		nw_DeleteNews( ids);
 }
 
-function nw_RemoveNews( i_ids)
+function nw_DeleteNews( i_ids)
 {
 	var obj = {};
 	if( i_ids == null )

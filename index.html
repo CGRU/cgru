@@ -206,16 +206,25 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()">&#10227;</div>
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
+			<div class="news_ctrl" style="font-size: 12px">
+				<div class="button nw_fb" title="ALL"      onclick="nw_FilterBtn(this,'_all_')"  >All</div>
+				<div class="button nw_fb" title="Assigned" onclick="nw_FilterBtn(this,'_my_')"   >My</div>
+				<div class="button nw_fb" title="Body"     onclick="nw_FilterBtn(this,'body')"   >B</div>
+				<div class="button nw_fb" title="Status"   onclick="nw_FilterBtn(this,'status')" >S</div>
+				<div class="button nw_fb" title="Report"   onclick="nw_FilterBtn(this,'report')" >R</div>
+				<div class="button nw_fb" title="Dailies"  onclick="nw_FilterBtn(this,'dailies')">D</div>
+				<div class="button nw_fb" title="Comment"  onclick="nw_FilterBtn(this,'comment')">C</div>
+			</div>
 			<div id="news"></div>
-			<div id="news_ctrl">
+			<div class="news_ctrl">
 				<div style="font-size:14px;">
-					<div class="button" title="Double click to clear all received news"
-						ondblclick="nw_RemoveNews()">Clear</div>
-					<div class="button" title="Double click to remove news that not assigned to me"
-						ondblclick="nw_RemoveNotAssigned()">DNMy</div>
-					<div class="button" title="Show news that assigned to me"
-						onclick="nw_ShowOnlyAssigned(this)">My</div>
-					<div class="button" title="Click to open/close subsribed locations"
+					<div class="button" title="Double click to delete all news"
+						ondblclick="nw_DeleteNews()">DA</div>
+					<div class="button" title="Double click to delete visble news"
+						ondblclick="nw_DeleteFiltered(true)">DV</div>
+					<div class="button" title="Double click to delete hidden news"
+						ondblclick="nw_DeleteFiltered(false)">DH</div>
+					<div class="button" title="Click to open/close subscribed locations"
 						onclick="c_ElDisplayToggle(document.getElementById('channels'));
 						this.classList.toggle('pushed')">Chan</div>
 				</div>
