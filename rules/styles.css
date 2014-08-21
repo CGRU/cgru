@@ -484,7 +484,7 @@ float: left; margin: 1px 8px;
 .comment .edit_duration .sample {
 text-align: center;
 border: 1px solid rgba(0,0,0,.3);
-width: 20px;
+width: 30px;
 /*border-radius: 4px;*/
 cursor: pointer;
 }
