@@ -952,9 +952,6 @@ Status.prototype.editSave = function( i_args)
 
 Status.prototype.save = function( i_args)
 {
-	if( g_CurPath() == this.path )
-		g_FolderSetStatus( this.obj);
-
 	this.obj.muser = g_auth_user.id;
 	this.obj.mtime = c_DT_CurSeconds();
 
@@ -966,6 +963,13 @@ function st_Save( i_status, i_path, i_wait)
 {
 	if( i_status == null ) i_status = RULES.status;
 	if( i_path == null ) i_path = g_CurPath();
+
+//console.log(g_CurPath()+'='+i_path);
+//	if( g_CurPath() == i_path )
+//		g_FolderSetStatus( i_status);
+	g_FolderSetStatusPath( i_status, i_path);
+	n_walks[i_path] = null;
+
 	var obj = {};
 	obj.object = {"status":i_status};
 	obj.add = true;
@@ -983,19 +987,24 @@ function st_SetFramesNumber( i_num)
 
 function st_UpdateProgresses( i_path, i_progresses)
 {
-	var folders = i_path.split('/');
-	var path = '';
-
 	paths = [];
 	progresses = {};
 	if( i_progresses ) progresses = i_progresses;
 
+	var paths_skip_save = [];
+	// Skip saving of provided progresses:
+	// ( as they provided after edit and already saved )
+	for( var path in progresses ) paths_skip_save.push(path);
+
+	var folders = i_path.split('/');
+	var path = '';
 	for( var i = 1; i < folders.length-1; i++)
 	{
 		path += '/'+folders[i];
 		paths.push( path);
 	}
-//window.console.log( paths);
+//console.log( paths);
+//console.log(JSON.stringify(i_progresses));
 	walks = n_WalkDir({"paths":paths,"rufiles":['status'],"lookahead":['status']});
 	if( walks == null ) return;
 
@@ -1051,6 +1060,12 @@ function st_UpdateProgresses( i_path, i_progresses)
 	}
 
 	for( var path in progresses)
+	{
+		if( paths_skip_save.indexOf(path) != -1 )
+			continue;
+
 		st_Save({"progress":progresses[path]}, path, false);
+//console.log(path);
+	}
 }
 

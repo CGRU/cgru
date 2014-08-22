@@ -355,6 +355,13 @@ function c_RuFileExists( i_file)
 	if( g_elCurFolder.m_dir.rufiles.indexOf( i_file) == -1 ) return false;
 	return true;
 }
+function c_RuFileAdd( i_file)
+{
+	if( g_elCurFolder.m_dir == null ) g_elCurFolder.m_dir = {};
+	if( g_elCurFolder.m_dir.rufiles == null ) g_elCurFolder.m_dir.rufiles = [];
+	if( g_elCurFolder.m_dir.rufiles.indexOf( i_file) == -1 )
+		g_elCurFolder.m_dir.rufiles.push( i_file);
+}
 
 function c_FileIsMovie( i_file)
 {

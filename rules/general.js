@@ -6,6 +6,8 @@ g_users = null;
 g_groups = null;
 
 g_elCurFolder = null;
+g_elFolders = {};
+
 g_nav_clicked = false;
 g_arguments = null;
 
@@ -458,11 +460,15 @@ function g_AppendFolder( i_elParent, i_fobject)
 	i_elParent.appendChild( elFolder);
 	i_elParent.m_elFolders.push( elFolder);
 
+	g_elFolders[elFolder.m_path] = elFolder;
+
 	return elFolder;
 }
 
+function g_FolderSetStatusPath( i_status, i_path) { g_FolderSetStatus( i_status, g_elFolders[i_path]);}
 function g_FolderSetStatus( i_status, i_elFolder)
 {
+//console.log('GFS:'+JSON.stringify(i_status));
 	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
 
 	i_elFolder.m_fobject.status = i_status;

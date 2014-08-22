@@ -578,11 +578,15 @@ function u_Search( i_args)
 	}
 }
 
-function u_BodyLoad( i_nockeck)
+function u_BodyLoad()
 {
 	if( u_body_edit_markup ) u_BodyEditMarkup();
 
-	if(( i_nockeck != true ) && ( false == c_RuFileExists( u_body_filename))) return;
+	if( false == c_RuFileExists( u_body_filename))
+	{
+		u_BodyShowInfo();
+		return;
+	}
 
 	n_Request({"send":{"getfile":c_GetRuFilePath( u_body_filename)},"func":u_BodyReceived,"local":true,"info":'body',"parse":false});
 }
@@ -591,6 +595,11 @@ function u_BodyReceived( i_data, i_args)
 {
 	u_body_text = i_data;
 	$('body_body').innerHTML = u_body_text;
+	u_BodyShowInfo();
+}
+
+function u_BodyShowInfo()
+{
 	var info = '';
 	if( RULES.status && RULES.status.body )
 	{
@@ -622,6 +631,7 @@ function u_BodyReceived( i_data, i_args)
 		}
 	}
 	$('body_info').innerHTML = info;
+//console.log(info);
 }
 
 function u_BodyEditStart()
@@ -660,13 +670,30 @@ function u_BodyEditSave()
 
 	if( u_body_edit_markup ) u_BodyEditMarkup();
 	var text = c_LinksProcess( $('body_body').innerHTML);
-	var res = c_Parse( n_Request_old({"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}}));
+	var res = n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}},"func":u_BodyEditSaveFinished,"info":'body save'});
+//console.log('RES:'+JSON.stringify( res));
+}
 
+function u_BodyEditSaveFinished( i_data, i_args)
+{
+	if(( i_data == null ) || ( i_data.error ))
+	{
+		c_Error( i_data.error)
+		return;
+	}
+//console.log('DAT'+JSON.stringify( i_data));
+//console.log('ARG'+JSON.stringify( i_args));
 	st_BodyModified();
 
 	nw_MakeNews({"title":'body'});
+
 	u_BodyEditCancel();
-	u_BodyLoad( true);
+
+	// Add body file to .rules folder files list.
+	c_RuFileAdd( u_body_filename);
+	// Body file be new and does exist before saving.
+
+	u_BodyLoad();
 }
 
 function u_BodyEditMarkup()
