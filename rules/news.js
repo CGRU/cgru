@@ -210,10 +210,20 @@ function nw_Unsubscribe( i_path)
 	obj.id = g_auth_user.id;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request_old({"editobj":obj});
+	n_Request({"send":{"editobj":obj},"func":nw_UnsubscribeFinished,"news_path":i_path});
+}
+function nw_UnsubscribeFinished( i_data, i_args)
+{
+	if(( i_data == null ) || ( i_data.error ))
+	{
+		c_Error( i_data.error );
+		return;
+	}
+
+	var path = i_args.news_path;
 
 	for( i = 0; i < g_auth_user.channels.length; i++)
-		if( g_auth_user.channels[i].id == i_path )
+		if( g_auth_user.channels[i].id == path )
 		{
 			g_auth_user.channels.splice( i, 1);
 			break;
@@ -222,7 +232,7 @@ function nw_Unsubscribe( i_path)
 	nw_Process();
 	nw_UpdateChannels();
 
-	c_Info('Unsubscribed from ' + i_path);
+	c_Info('Unsubscribed from ' + path);
 }
 
 function nw_NewsOnClick()
@@ -303,26 +313,30 @@ function nw_MakeNews( i_news, i_args )
 	request.rufolder = RULES.rufolder;
 	request.recent_max = RULES.newsrecent;
 	request.recent_file = nw_recent_file;
-	var msg = c_Parse( n_Request_old({"makenews":request}));
-	if( msg.error )
+	n_Request({"send":{"makenews":request},"func":nw_MakeNewsFinished,"args":i_args});
+}
+function nw_MakeNewsFinished( i_data, i_args)
+{
+	if( i_data.error )
 	{
-		c_Error( msg.error);
+		c_Error( i_data.error);
 		return;
 	}
 
-	if( i_args && ( i_args.load === false )) return;
+	if( i_args.args && ( i_args.args.load === false )) return;
 
 	nw_NewsLoad();
 	nw_RecentLoad(/*file exists check=*/ false);
 		
-	if( msg.users.length == 0 )
+	if( i_data.users.length == 0 )
 	{
 		c_Log('No subscribed users found.');
 		return;
 	}
+
 	var info = 'Subscibed users:';
-	for( var i = 0; i < msg.users.length; i++)
-		info += ' '+msg.users[i];
+	for( var i = 0; i < i_data.users.length; i++)
+		info += ' '+i_data.users[i];
 	c_Log( info);
 }
 
@@ -510,7 +524,17 @@ function nw_DeleteNews( i_ids)
 		obj.delobj = true;
 	}
 	obj.file = 'users/'+g_auth_user.id+'.json';
-	n_Request_old({"editobj":obj});
+	n_Request({"send":{"editobj":obj},"func":nw_DeleteNewsFinished});
+}
+function nw_DeleteNewsFinished( i_data)
+{
+	if(( i_data == null ) || ( i_data.error ))
+	{
+		c_Error( i_data.error );
+		return;
+	}
+
+	c_Info('News deleted');
 	nw_NewsLoad();
 }
 

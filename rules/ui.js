@@ -538,7 +538,14 @@ function u_Search( i_args)
 	args.rufolder = RULES.rufolder;
 	args.depth = 4;
 
-	var res = c_Parse( n_Request_old({"search":args}));
+	n_Request({"send":{"search":args},"func":u_SearchReceived});
+	$('search').classList.add('waiting');
+}
+function u_SearchReceived( i_data)
+{
+	$('search').classList.remove('waiting');
+
+	var res = i_data;
 
 	if( res.error )
 	{

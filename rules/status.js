@@ -948,6 +948,8 @@ Status.prototype.editSave = function( i_args)
 
 	if( some_progress_changed )
 		st_UpdateProgresses( this.path, progresses);
+
+	c_Info('Status(es) saved.');
 }
 
 Status.prototype.save = function( i_args)
