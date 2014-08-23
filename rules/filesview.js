@@ -70,15 +70,15 @@ function FilesView( i_args)
 		elRefteshBtn.title = 'Refresh this files view';
 		elRefteshBtn.m_view = this;
 		elRefteshBtn.onclick = function(e){ e.currentTarget.m_view.refresh()};
-	}
 
-	var el = document.createElement('div');
-	this.elPanel.appendChild( el);
-	el.classList.add('button');
-	el.textContent = '+F';
-	el.title = 'Add a new folder';
-	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.makeFolder()};
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.textContent = '+F';
+		el.title = 'Add a new folder';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.makeFolder()};
+	}
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
