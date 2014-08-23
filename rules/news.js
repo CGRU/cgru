@@ -180,13 +180,21 @@ function nw_Subscribe( i_path)
 	obj.id = g_auth_user.id;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request_old({"editobj":obj});
+	n_Request({"send":{"editobj":obj},"func":nw_SubscribeFinished,"channel":channel});
+}
+function nw_SubscribeFinished( i_data, i_args)
+{
+	if(( i_data == null ) || ( i_data.error ))
+	{
+		c_Error( i_data.error );
+		return;
+	}
 
-	g_auth_user.channels.push( channel);
+	g_auth_user.channels.push( i_args.channel);
 	nw_Process();
 	nw_UpdateChannels();
 
-	c_Info('Subscribed on ' + i_path);
+	c_Info('Subscribed at ' + i_args.channel.id);
 }
 
 function nw_Unsubscribe( i_path)

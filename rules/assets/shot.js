@@ -1,13 +1,17 @@
 shot_thumb_paths = [];
 
-function shot_Show()
+function shot_Init()
 {
 	shot_thumb_paths = [];
 
 	a_SetLabel('Shot');
 
 	// Get page:
-	$('asset').innerHTML = n_Request({"send":{"getfile":'rules/assets/shot.html'}});
+	n_Request({"send":{"getfile":'rules/assets/shot.html'},"func":shot_InitHTML,"info":'get shot.html',"parse":false});
+}
+function shot_InitHTML( i_data)
+{
+	$('asset').innerHTML = i_data;
 
 	// Set process buttons commands:
 	var path = cgru_PM('/' + RULES.root + g_CurPath());
@@ -301,6 +305,6 @@ function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 
 if( ASSETS.shot && ( ASSETS.shot.path == g_CurPath()))
 {
-	shot_Show();
+	shot_Init();
 }
 

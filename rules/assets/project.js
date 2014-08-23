@@ -1,12 +1,16 @@
 if( ASSETS.project && ( ASSETS.project.path == g_CurPath()))
 {
-	prj_Show();
+	prj_Init();
 }
 
-function prj_Show()
+function prj_Init()
 {
 	a_SetLabel('Project');
-	$('asset').innerHTML = n_Request({"send":{"getfile":'rules/assets/project.html'}});
+	n_Request({"send":{"getfile":'rules/assets/project.html'},"func":prj_InitHTML,"info":'get project.html',"parse":false});
+}
+function prj_InitHTML( i_data)
+{
+	$('asset').innerHTML = i_data;
 }
 
 prj_deploy_shots_params = {};

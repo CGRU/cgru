@@ -12,30 +12,46 @@ sc_thumb_params_values = {};
 
 sc_frames_total = 0;
 
+sc_scenes = false;
+
 if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
 {
-	sc_Init();
 	a_SetLabel('Scene');
-	scene_Show();
+	sc_scenes = false;
+
+	sc_Init();
 }
 
 if( ASSETS.scenes && ( ASSETS.scenes.path == g_CurPath()))
 {
-	sc_Init();
 	a_SetLabel('Scenes');
-	scenes_Show();
+	sc_scenes = true;
+
+	sc_Init();
 }
 
 function sc_Init()
 {
-	var data = n_Request({"send":{"getfile":'rules/assets/scenes.html'}});
-	$('asset').innerHTML = data;
+	sc_elShots = [];
+	sc_elScenes = [];
+
+	n_Request({"send":{"getfile":'rules/assets/scenes.html'},"func":sc_InitHTML,"info":'get scenes.html',"parse":false});
+}
+function sc_InitHTML( i_data)
+{
+	$('asset').innerHTML = i_data;
 
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
 	gui_CreateChoises({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
-	sc_elShots = [];
-	sc_elScenes = [];
+	if( sc_scenes )
+	{
+		scenes_Show();
+	}
+	else
+	{
+		scene_Show();
+	}
 }
 
 function sc_Post()

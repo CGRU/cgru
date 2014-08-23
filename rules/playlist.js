@@ -271,8 +271,14 @@ function p_Action( i_obj, i_action, i_id_before)
 		return;
 	}
 	obj.file = p_file;
-	var res = c_Parse( n_Request_old({"editobj":obj}));
-	if( res && res.error ) c_Error( res.error);
+	n_Request({"send":{"editobj":obj},"func":p_EditFinished});
+}
+function p_EditFinished( i_data)
+{
+	if(( i_data == null ) || ( i_data.error ))
+		c_Error( data.error);
+	else
+		c_Info('Playlist changes saved.');
 	p_Load();
 }
 

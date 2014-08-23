@@ -959,14 +959,11 @@ Status.prototype.save = function( i_args)
 	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists},{"load":i_args.load_news});
 }
 
-function st_Save( i_status, i_path, i_wait)
+function st_Save( i_status, i_path, i_func, i_args)
 {
 	if( i_status == null ) i_status = RULES.status;
 	if( i_path == null ) i_path = g_CurPath();
 
-//console.log(g_CurPath()+'='+i_path);
-//	if( g_CurPath() == i_path )
-//		g_FolderSetStatus( i_status);
 	g_FolderSetStatusPath( i_status, i_path);
 	n_walks[i_path] = null;
 
@@ -974,7 +971,8 @@ function st_Save( i_status, i_path, i_wait)
 	obj.object = {"status":i_status};
 	obj.add = true;
 	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
-	return c_Parse( n_Request_old({"editobj":obj}, i_wait));
+
+	n_Request({"send":{"editobj":obj},"func":i_func,"args":i_args,"wait":false});
 }
 
 function st_SetFramesNumber( i_num)
@@ -1040,7 +1038,7 @@ function st_UpdateProgresses( i_path, i_progresses)
 				{
 //console.log(folder.name+': null');
 					if( w != (walks.length-1)) continue;
-					st_Save({"progress":0}, path, false);		
+					st_Save({"progress":0}, path);
 				}
 				else if( folder.status.progress < 0 ) continue;
 				else progress += folder.status.progress;
@@ -1064,7 +1062,7 @@ function st_UpdateProgresses( i_path, i_progresses)
 		if( paths_skip_save.indexOf(path) != -1 )
 			continue;
 
-		st_Save({"progress":progresses[path]}, path, false);
+		st_Save({"progress":progresses[path]}, path);
 //console.log(path);
 	}
 }
