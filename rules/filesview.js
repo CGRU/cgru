@@ -75,6 +75,14 @@ function FilesView( i_args)
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
+	el.textContent = '+F';
+	el.title = 'Add a new folder';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.makeFolder()};
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
 	el.textContent = 'SA';
 	el.title = 'Select all';
 	el.m_view = this;
@@ -747,11 +755,30 @@ FilesView.prototype.thumbsMake = function()
 
 	fv_MakeThumbnail();
 }
-
+FilesView.prototype.makeFolder = function()
+{
+	new cgru_Dialog({"receiver":this,"handle":'makeFolderDo',
+		"name":'make_folder',"title":'Make Folder',"info":'Ender new folder name:'});
+}
+FilesView.prototype.makeFolderDo = function( i_name)
+{
+	var path = cgru_PM( RULES.root + this.path + '/' + i_name, true);
+	n_Request({"send":{"makefolder":{"path":path}},"func":fv_makeFolderFinished,"fview":this});
+}
+function fv_makeFolderFinished( i_data, i_args)
+{
+	if(( i_data == null ) || ( i_data.error))
+	{
+		c_Error( i_data.error);
+		return;
+	}
+	i_args.fview.refresh();
+	c_Info('Folder created: ' + i_args.fview.path + '/' + i_data.makefolder);
+}
 FilesView.prototype.deleteFilesDialog = function( i_path)
 {
 	new cgru_Dialog({"receiver":this,"handle":'deleteFiles',"param":i_path,
-		"name":'settings',"title":'Delete',"info":'<span style="font-size:20px;font-weight:bold;">'+i_path+'</span><br>Are You Sure?<br>Type "yes".'});
+		"name":'delete',"title":'Delete',"info":'<span style="font-size:20px;font-weight:bold;">'+i_path+'</span><br>Are You Sure?<br>Type "yes".'});
 }
 FilesView.prototype.deleteFiles = function( i_value, i_path)
 {

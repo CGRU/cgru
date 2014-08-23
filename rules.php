@@ -120,6 +120,7 @@ function jsf_start( $i_arg, &$o_out)
 	$o_out['upload_max_filesize'] = ini_get('upload_max_filesize');
 	$o_out['post_max_size'] = ini_get('post_max_size');
 	$o_out['memory_limit'] = ini_get('memory_limit');
+	$o_out['max_execution_time'] = ini_get('max_execution_time');
 	if( $fHandle = fopen('version.txt','r'))
 	{
 		$o_out['version'] = fread( $fHandle, $FileMaxLength);
@@ -646,6 +647,18 @@ function jsf_getfile( $i_file, &$o_out)
 	}
 	else
 		$o_out['error'] = 'Unable to load file '.$i_file;
+}
+
+function jsf_makefolder( $i_args, &$o_out)
+{
+	$dirname = $i_args['path'];
+	mkdir( $dirname, 0777, true);
+	if( false == is_dir( $dirname))
+	{
+		$o_out['error'] = 'Unable to create directory '.$dirname;
+		return;
+	}
+	$o_out['makefolder'] = $dirname;
 }
 
 function jsf_readobj( $i_file, &$o_out)
