@@ -155,7 +155,7 @@ else:
 		elif len(arg_enc):
 			args.append(arg_enc)
 
-print(args)
+print(' '.join(args))
 
 try:
 	process = subprocess.Popen(args, shell=False, stderr=subprocess.PIPE)
