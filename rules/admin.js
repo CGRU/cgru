@@ -407,27 +407,38 @@ function ad_WndDrawUsers()
 		ad_WndAddUser( ad_wnd.elUsers, users[i], row++);
 }
 
-function ad_GetAll( i_type)
+function ad_GetType( i_type, i_func)
 {
 	var request = {};
 	request['getall'+i_type] = true;
-	var res = c_Parse( n_Request_old( request));
-	if( res == null )
+	n_Request({"send":request,"func":ad_GetTypeReceived,"ad_get_type":i_type,"ad_func":i_func,"info":i_type});
+}
+function ad_GetTypeReceived( i_data, i_args)
+{
+	var type = i_args.ad_get_type;
+
+	if( i_data == null )
 	{
-		ad_wnd.elContent.innerHTML = 'Error getting '+i_type+'.';
-		return null;
+		ad_wnd.elContent.innerHTML = 'Error getting '+type+'.';
+		return;
 	}
-	if( res.error )
+	if( i_data.error )
 	{
-		ad_wnd.elContent.innerHTML = 'Error getting '+i_type+':<br>'+res.error;
-		return null;
+		ad_wnd.elContent.innerHTML = 'Error getting '+type+':<br>'+i_data.error;
+		return;
 	}
-	if( res[i_type] == null )
+	if( i_data[type] == null )
 	{
-		ad_wnd.elContent.innerHTML = '"'+i_type+'" are NULL.';
-		return null;
+		ad_wnd.elContent.innerHTML = '"'+type+'" are NULL.';
+		return;
 	}
-	return res[i_type];
+
+	if( type == 'users' )
+		g_users = i_data[type];
+	else if( type == 'groups' )
+		g_groups = i_data[type];
+
+	i_args.ad_func();
 }
 
 function ad_WndGrpOnClick( i_evt)
@@ -452,13 +463,14 @@ function ad_WndGrpOnClick( i_evt)
 
 function ad_WndRefresh()
 {
-	if( ad_wnd == null ) return;
-	g_groups = ad_GetAll('groups');
-	if( g_groups == null ) return;
-
-	g_users = ad_GetAll('users');
-	if( g_users == null ) return;
-
+	ad_GetType('groups', ad_WndReceivedGroups);
+}
+function ad_WndReceivedGroups()
+{
+	ad_GetType('users', ad_WndReceivedUsers);
+}
+function ad_WndReceivedUsers()
+{
 	for( var u in g_users )
 	{
 //window.console.log(user);
@@ -467,6 +479,8 @@ function ad_WndRefresh()
 			if( g_groups[grp].indexOf( g_users[u].id ) != -1 )
 				g_users[u].groups.push( grp);
 	}
+
+	if( ad_wnd == null ) return;
 
 	ad_WndDrawGroups();
 	ad_WndDrawUsers();
