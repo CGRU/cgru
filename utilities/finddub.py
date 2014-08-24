@@ -24,7 +24,6 @@ def errorExit(i_err):
 if len( Args) < 1:
 	errorExit('Path is not specified.')
 
-Root = Args[0]
 RegExp = None
 if Options.regexp is not None:
 	RegExp = re.compile( Options.regexp)
@@ -40,55 +39,64 @@ FoldersPaths = []
 DubFilesCount = 0
 DubFoldersCount = 0
 
-for dirpath, dirnames, filenames in os.walk(Root):
+Root = Args[0]
+RootDir = os.path.dirname(Root)
+Roots = []
+for adir in os.listdir(RootDir):
+	if os.path.join( RootDir, adir).find( Root) == 0:
+		Roots.append( os.path.join( RootDir, adir))
+Roots.sort()
 
-	dirbase = os.path.basename( dirpath)
-	if len( dirbase) and dirbase[0] == '.': continue
+for rdir in Roots:
+	for dirpath, dirnames, filenames in os.walk(rdir):
 
-	if SkipRE is not None:
-		if SkipRE.match( dirpath) is not None: continue
-
-	for afile in filenames:
-		if RegExp is not None:
-			if RegExp.match( afile) is None: continue
-
-		if SkipRE is not None:
-			if SkipRE.match( afile) is not None: continue
-
-		if Options.verbose: print( afile)
-
-		if afile in Files:
-			DubFilesCount += 1
-			print('Dublicate File[%d]:' % DubFilesCount)
-			i = Files.index( afile)
-			pre_file = os.path.join( FilesPaths[i], Files[i])
-			new_file = os.path.join( dirpath, afile)
-			print('%s (%d bytes)' % (pre_file, os.path.getsize(pre_file)))
-			print('%s (%d bytes)' % (new_file, os.path.getsize(new_file)))
-		else:
-			Files.append( afile)
-			FilesPaths.append( dirpath)
-
-	if not Options.dirs: continue
-
-	for adir in dirnames:
-		if RegExp is not None:
-			if RegExp.match( adir) is None: continue
+		dirbase = os.path.basename( dirpath)
+		if len( dirbase) and dirbase[0] == '.': continue
 
 		if SkipRE is not None:
-			if SkipRE.match( adir) is not None: continue
+			if SkipRE.match( dirpath) is not None: continue
 
-		if Options.verbose: print( adir)
+		for afile in filenames:
+			if RegExp is not None:
+				if RegExp.match( afile) is None: continue
 
-		if adir in Folders:
-			DubFoldersCount += 1
-			print('Dublicate Folder[%d]:' % DubFoldersCount)
-			i = Folders.index( adir)
-			print( os.path.join( FoldersPaths[i], Folders[i]))
-			print( os.path.join( dirpath, adir))
-		else:
-			Folders.append( adir)
-			FoldersPaths.append( dirpath)
+			if SkipRE is not None:
+				if SkipRE.match( afile) is not None: continue
+
+			if Options.verbose: print( afile)
+
+			if afile in Files:
+				DubFilesCount += 1
+				print('Dublicate File[%d]:' % DubFilesCount)
+				i = Files.index( afile)
+				pre_file = os.path.join( FilesPaths[i], Files[i])
+				new_file = os.path.join( dirpath, afile)
+				print('%s (%d bytes)' % (pre_file, os.path.getsize(pre_file)))
+				print('%s (%d bytes)' % (new_file, os.path.getsize(new_file)))
+			else:
+				Files.append( afile)
+				FilesPaths.append( dirpath)
+
+		if not Options.dirs: continue
+
+		for adir in dirnames:
+			if RegExp is not None:
+				if RegExp.match( adir) is None: continue
+
+			if SkipRE is not None:
+				if SkipRE.match( adir) is not None: continue
+
+			if Options.verbose: print( adir)
+
+			if adir in Folders:
+				DubFoldersCount += 1
+				print('Dublicate Folder[%d]:' % DubFoldersCount)
+				i = Folders.index( adir)
+				print( os.path.join( FoldersPaths[i], Folders[i]))
+				print( os.path.join( dirpath, adir))
+			else:
+				Folders.append( adir)
+				FoldersPaths.append( dirpath)
 
 print('Dublicate files count: %d' % DubFilesCount)
 if DubFoldersCount:
