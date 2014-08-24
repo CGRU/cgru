@@ -576,7 +576,14 @@ FilesView.prototype.onClick = function( i_evt)
 			}
 		}
 	}
+
 	fv_cur_item = el;
+
+	var sel_count = 0;
+	for( var i = 0; i < this.elItems.length; i++)
+		if( this.elItems[i].m_selected )
+			sel_count++;
+	c_Info(sel_count + ' items selected.');
 }
 FilesView.prototype.selectItem = function( i_el, i_select)
 {

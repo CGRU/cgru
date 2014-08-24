@@ -317,6 +317,8 @@ function sc_ShotClicked( i_evt)
 		}
 	}
 	sc_elCurShot = el;
+
+	c_Info( scenes_GetSelectedShots().length + ' shots selected.');
 }
 function sc_SelectShot( i_elShot, i_select)
 {
