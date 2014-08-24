@@ -14,7 +14,7 @@ Parser = OptionParser(
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
 Parser.add_option('-r', '--resize',    dest='resize',    type  ='string', default='',       help='Resize (1280x720)')
-Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie cpdec (png)')
+Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie codec')
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
 Parser.add_option('-n', '--container', dest='container', type  ='string', default='mov',    help='Movie Container (mov or ogg for theora)')
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
@@ -176,17 +176,20 @@ frame_old    = -1
 framereached = False
 output       = ''
 while True:
-	stdout = ''
 	data = process.stderr.read(1)
 	if data is None:
 		break
+	#print( str( type( data)))
 	if len(data) < 1:
 		break
 	if not isinstance(data, str):
-		data = str(data, 'ascii')
+		try:
+			data = str(data, 'ascii')
+		except:
+			data = '@'
 	data = data.replace('\r', '\n')
 	sys.stdout.write(data)
-	if data == '\n':
+	if data[-1] == '\n':
 		output = ''
 		if frame_old != frame:
 			frame_info = 'Frame = %d' % frame
@@ -198,7 +201,7 @@ while True:
 			frame_old = frame
 		sys.stdout.flush()
 		continue
-	output += str(data)
+	output += data
 
 	if seconds == -1 and frame == -1:
 		reobj = re_duration.search(output)
