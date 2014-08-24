@@ -83,6 +83,8 @@ print(' '.join(Cmd))
 if Options.debug:
 	sys.exit(0)
 
+os.umask(0000)
+
 Process = subprocess.Popen( Cmd, shell=False, stdout=subprocess.PIPE)
 
 while True:
