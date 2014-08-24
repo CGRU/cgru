@@ -23,7 +23,7 @@ if Options.input is None: errorExit('Input is not specified.')
 if not os.path.isfile(Options.input): errorExit('Input is not a file.')
 
 Name,Ext = os.path.splitext(Options.input)
-Ext = Ext.strip('.')
+Ext = Ext.strip('.').lower()
 
 FilesTotal = 0
 Files = []
@@ -48,7 +48,7 @@ elif Ext == '7z':
 	Key = 'Extracting '
 
 if Cmd is None:
-	errorExit('Unsupported arvhive type "%s"' % Options.type)
+	errorExit('Unsupported arvhive type "%s"' % Ext)
 
 print(' '.join(CmdList))
 
