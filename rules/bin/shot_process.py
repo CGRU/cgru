@@ -19,9 +19,9 @@ Parser = OptionParser(
 
 Parser.add_option('-f', '--fps',      dest='fps',      type='int',          default=24,     help='Frames per second')
 Parser.add_option('-o', '--output',   dest='output',   type='string',       default='WORK', help='Software output')
-Parser.add_option('-s', '--soft',     dest='soft',     type='string',       default='',     help='Software type')
-Parser.add_option('-t', '--template', dest='template', type='string',       default='',     help='Software file template')
-Parser.add_option('-r', '--run',      dest='run',      type='string',       default='',     help='Run soft')
+Parser.add_option('-s', '--soft',     dest='soft',     type='string',       default=None,   help='Software type')
+Parser.add_option('-t', '--template', dest='template', type='string',       default=None,   help='Software file template')
+Parser.add_option('-r', '--run',      dest='run',      type='string',       default=None,   help='Run soft')
 Parser.add_option('-V', '--verbose',  dest='verbose',  action='store_true', default=False,  help='Verbose mode')
 Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,  help='Debug mode')
 
@@ -49,7 +49,7 @@ if len( Args) == 0:
 
 TemplateFileData = ''
 # Search for the same name template file in shot upper folders:
-if Options.template != '':
+if Options.template is not None:
 	folder = Args[0]
 	while True:
 		up = os.path.dirname(folder)
@@ -61,7 +61,7 @@ if Options.template != '':
 			break
 
 # Load template file data:
-if Options.template != '':
+if Options.template is not None:
 	if not os.path.isfile( Options.template):
 		errExit('Template file does not exist')
 	file = open( Options.template,'r')
@@ -193,7 +193,11 @@ def processNuke( io_shot):
 	src = None
 	x = 0
 	y = 0
+	max_count = 0
 	for seq in io_shot['sequences']:
+
+		if seq['count'] > max_count:
+			max_count = seq['count']
 
 		filename = seq['base'] + '#'*seq['padd'] + seq['ext']
 		filename = os.path.relpath( filename, io_shot['path'])
@@ -215,6 +219,8 @@ def processNuke( io_shot):
 		read += '\nlast %d' % seq['last']
 		read += '\norigset true'
 		read += '\nversion 4'
+		read += '\nframe_mode "start at"'
+		read += '\nframe 1'
 		read += '\nname %s' % ('R_' + os.path.basename(seq['base']).strip(' _.!'))
 		read += '\nxpos %d' % x
 		read += '\nypos %d' % y
@@ -223,18 +229,21 @@ def processNuke( io_shot):
 		io_shot['data'] += '\n' + read
 		x += 100
 
+	io_shot['frame_first'] = 1
+	io_shot['frame_last'] = max_count
+
 	if io_shot['sequences_count']:
 		io_shot['data'] += '\n' + createNukeBackdrop( src, y, x)
 
 	io_shot['comment'] = ''
-	if Options.template != '':
+	if Options.template is not None:
 		io_shot['comment'] += 'Template: %s\n' % Options.template
 
 for path in Args:
 	path = os.path.normpath( path)
 	Out.append( processShot( path))
 
-if Options.soft == '':
+if Options.soft is None:
 	print(json.dumps({'shot_process': Out}, indent=4))
 	sys.exit(0)
 
@@ -270,7 +279,7 @@ for shot in Out:
 		file.write(data)
 		file.close()
 
-	if Options.run == '': continue
+	if Options.run is None: continue
 
 	cmd = '%s "%s" &' % (Options.run, shot['file'])
 
