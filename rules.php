@@ -1438,7 +1438,7 @@ function jsf_permissionsclear( $i_args, &$o_out)
 	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( false === is_file( $htaccess))
 	{
-		$o_out['error'] = 'Can`t find the file.';
+		$o_out['error'] = 'No permissions settings founded.';
 		return;
 	}
 

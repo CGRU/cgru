@@ -176,7 +176,12 @@ function ad_PermissionsLoad()
 	if( path == null ) return;
 	ad_permissions = {};
 	ad_permissions.path = RULES.root + path;
-	ad_permissions = c_Parse( n_Request_old({"permissionsget": ad_permissions}));
+	n_Request({"send":{"permissionsget": ad_permissions},"func":ad_PermissionsReceived});
+}
+function ad_PermissionsReceived( i_data)
+{
+	ad_permissions = i_data;
+
 	if( ad_permissions == null ) return;
 	if( ad_permissions.error )
 	{
@@ -189,7 +194,7 @@ function ad_PermissionsLoad()
 		return;
 	}
 
-	ad_permissions.path = RULES.root + path;
+	ad_permissions.path = RULES.root + g_CurPath();
 
 	if( ad_permissions.groups.length )
 	{
@@ -245,13 +250,11 @@ function ad_PermissionsLoad()
 
 function ad_PermissionsGrpAddOnClick()
 {
-//	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'groups', 'str', 'admins', 'permissions', 'Add Group', 'Enter Group ID');
 	new cgru_Dialog({"handle":'ad_PermissionsAdd',"param":'groups',"value":'admins',
 		"name":'permissions',"title":'Add Group',"info":'Enter Group ID'});
 }
 function ad_PermissionsUsrAddOnClick()
 {
-//	new cgru_Dialog( window, window, 'ad_PermissionsAdd', 'users', 'str', '', 'permssions', 'Add User', 'Enter User ID');
 	new cgru_Dialog({"handle":'ad_PermissionsAdd',"param":'users',
 		"name":'permssions',"title":'Add User',"info":'Enter User ID'});
 }
@@ -269,11 +272,8 @@ function ad_PermissionsAdd( i_id, i_type)
 		return;
 	}
 	ad_permissions[i_type].push( i_id);
-	var res = c_Parse( n_Request_old({"permissionsset":ad_permissions}));
-	if( res.error ) c_Error( res.error );
-	ad_PermissionsLoad();
+	n_Request({"send":{"permissionsset":ad_permissions},"func":ad_ChangesFinished,"ad_func":ad_PermissionsLoad,"info":'perm add',"ad_msg":'Permissions '+i_type+' added'});
 }
-
 function ad_PermissionsRemove( i_type, i_id)
 {
 	var index = ad_permissions[i_type].indexOf( i_id);
@@ -283,22 +283,23 @@ function ad_PermissionsRemove( i_type, i_id)
 		return;
 	}
 	ad_permissions[i_type].splice( index, 1);
-	var res = c_Parse( n_Request_old({"permissionsset":ad_permissions}));
-	if( res.error ) c_Error( res.error );
-	ad_PermissionsLoad();
+	n_Request({"send":{"permissionsset":ad_permissions},"func":ad_ChangesFinished,"ad_func":ad_PermissionsLoad,"info":'perm rem',"ad_msg":'Permissions '+i_type+' removed'});
 }
 
 function ad_PermissionsClearOnClick()
 {
-	var res = c_Parse( n_Request_old({"permissionsclear":{"path":RULES.root+g_CurPath()}}));
-	if( res.error )
-	{
-		c_Error( res.error );
-		return;
-	}
-	ad_PermissionsLoad();
+	n_Request({"send":{"permissionsclear":{"path":RULES.root+g_CurPath()}},"func":ad_ChangesFinished,"ad_func":ad_PermissionsLoad,"info":'perm clear',"ad_msg":'Permissions cleared'});
 }
+function ad_ChangesFinished( i_data, i_args)
+{
+	if(( i_data == null ) || ( i_data.error ))
+		c_Error( i_data.error);
+	else if( i_args.ad_msg )
+		c_Info( i_args.ad_msg );
 
+	if( i_args.ad_func )
+		i_args.ad_func();
+}
 function ad_OpenWindow()
 {
 	ad_wnd = new cgru_Window({"name":'administrate',"title":'Administrate'});
@@ -670,48 +671,38 @@ function ad_WndUserGroupOnCkick( i_user)
 
 	ad_WriteGroups();
 }
-
 function ad_WriteGroups()
 {
-	var res = c_Parse( n_Request_old({"writegroups":g_groups}));
-	if( res == null ) return;
-	if( res.error ) { c_Error( res.error ); return; }
-	ad_WndRefresh();
+	n_Request({"send":{"writegroups":g_groups},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'Grounps written.',"info":'writegroups'});
 }
 function ad_ChangeTitleOnCkick( i_user_id)
 {
-//	new cgru_Dialog( window, window, 'ad_ChangeTitle', i_user_id, 'str', g_users[i_user_id].title, 'users', 'Change Title', 'Enter New Title');
 	new cgru_Dialog({"handle":'ad_ChangeTitle',"param":i_user_id,"value":g_users[i_user_id].title,
 		"name":'users',"title":'Change Title',"info":'Enter New Title'});
 }
 function ad_ChangeTitle( i_title, i_user_id)
 {
-	ad_SaveUser({"id":i_user_id,"title":i_title});
-	ad_WndRefresh();
+	ad_SaveUser({"id":i_user_id,"title":i_title}, ad_WndRefresh);
 }
 function ad_ChangeRoleOnCkick( i_user_id)
 {
-//	new cgru_Dialog( window, window, 'ad_ChangeRole', i_user_id, 'str', g_users[i_user_id].role, 'users', 'Change Role', 'Enter New Role');
 	new cgru_Dialog({"handle":'ad_ChangeRole',"param":i_user_id,"value":g_users[i_user_id].role,
 		"name":'users',"title":'Change Role',"info":'Enter New Role'});
 }
 function ad_ChangeRole( i_role, i_user_id)
 {
-	ad_SaveUser({"id":i_user_id,"role":i_role});
-	ad_WndRefresh();
+	ad_SaveUser({"id":i_user_id,"role":i_role}, ad_WndRefresh);
 }
 function ad_ChangeEmailOnCkick( i_user_id)
 {
-//	new cgru_Dialog( window, window, 'ad_ChangeEmail', i_user_id, 'str', g_users[i_user_id].email, 'users', 'Change Email', 'Enter New Address');
 	new cgru_Dialog({"handle":'ad_ChangeEmail',"param":i_user_id,"value":g_users[i_user_id].email,
 		"name":'users',"title":'Change Email',"info":'Enter New Address'});
 }
 function ad_ChangeEmail( i_email, i_user_id)
 {
-	ad_SaveUser({"id":i_user_id,"email":i_email});
-	ad_WndRefresh();
+	ad_SaveUser({"id":i_user_id,"email":i_email}, ad_WndRefresh);
 }
-function ad_SaveUser( i_user)
+function ad_SaveUser( i_user, i_func)
 {
 	if( i_user == null ) i_user = g_auth_user;
 	
@@ -720,12 +711,7 @@ function ad_SaveUser( i_user)
 	obj.object = i_user;
 	obj.file = 'users/' + i_user.id + '.json';
 
-	var res = c_Parse( n_Request_old({"editobj":obj}));
-	if( res && res.error )
-	{
-		c_Error( res.error );
-		return;
-	}
+	n_Request({"send":{"editobj":obj},"func":ad_ChangesFinished,"ad_func":i_func,"ad_msg":'User '+i_user.id+' saved'});
 }
 
 function ad_CreateUserOnClick()
@@ -747,32 +733,17 @@ function ad_CreateUser( i_user_id)
 	obj.object = user;
 	obj.file = 'users/' + i_user_id + '.json';
 
-	var res = c_Parse( n_Request_old({"editobj":obj}));
-	if( res && res.error )
-	{
-		c_Error( res.error );
-		return;
-	}
-	c_Info('User "'+i_user_id+'" created.');
-	ad_WndRefresh();
+	n_Request({"send":{"editobj":obj},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" created.'});
 }
 
 function ad_DeleteUserOnClick()
 {
-//	new cgru_Dialog( window, window, 'ad_DeleteUser', null, 'str', '', 'users', 'Delete User', 'Enter User Login Name');
 	new cgru_Dialog({"handle":'ad_DeleteUser',
 		"name":'users',"title":'Delete User',"info":'Enter User Login Name'});
 }
 function ad_DeleteUser( i_user_id)
 {
-	var res = c_Parse( n_Request_old({"deleteuser":i_user_id}));
-	if( res && res.error )
-	{
-		c_Error( res.error );
-		return;
-	}
-	c_Info('User "'+i_user_id+'" deleted.');
-	ad_WndRefresh();
+	n_Request({"send":{"deleteuser":i_user_id},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" deleted.'});
 }
 
 function ad_SetPasswordDialog( i_user_id)
