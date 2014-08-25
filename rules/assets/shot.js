@@ -73,6 +73,8 @@ function shot_InitHTML( i_data)
 	walk.mtime = RULES.cache_time;
 	if( ASSET.cache_time ) walk.mtime = ASSET.cache_time;
 	walk.wfunc = shot_Loaded;
+	walk.info = 'walk results';
+
 	n_WalkDir( walk);
 }
 
@@ -175,6 +177,8 @@ function shot_ShowRefs()
 		walk.paths.push( ASSET.path + '/' + ASSET.references.path[i]);
 
 	walk.wfunc = shot_RefsReceived;
+	walk.info = 'walk refs';
+
 	n_WalkDir( walk);
 }
 function shot_RefsReceived( i_data, i_args)
@@ -221,7 +225,7 @@ function shot_ScanSources()
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
-	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"local":true});
+	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"info":'walk src',"local":true});
 }
 function shot_SourceReceived( i_data, i_args)
 {

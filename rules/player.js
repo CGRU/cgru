@@ -79,7 +79,11 @@ function p_Init()
 	for( var i = 0; i < p_buttons.length; i++)
 		p_elb[p_buttons[i]] = document.getElementById('btn_'+p_buttons[i]);
 
-	SERVER = c_Parse( n_Request({"send":{"start":{}}}));
+	n_Request({"send":{"start":{}},"func":p_StartReceived,"info":'start'});
+}
+function p_StartReceived( i_data)
+{
+	SERVER = i_data;
 	if( SERVER == null ) return;
 	if( SERVER.error )
 	{
@@ -87,15 +91,22 @@ function p_Init()
 		return;
 	}
 
-	var config = c_Parse( n_Request({"send":{"initialize":{}}}));
-	if( config == null ) return;
-	for( var file in config.config )
-		cgru_ConfigJoin( config.config[file].cgru_config );
-	g_users = config.users;
-	if( config.user )
-		g_auth_user = config.user;
+	n_Request({"send":{"initialize":{}},"func":p_InitializeReveived,"info":'init'});
+}
+function p_InitializeReveived( i_data)
+{
+	if( i_data == null ) return;
+	for( var file in i_data.i_data )
+		cgru_ConfigJoin( i_data.i_data[file].cgru_i_data );
+	g_users = i_data.users;
+	if( i_data.user )
+		g_auth_user = i_data.user;
 
-	c_RulesMergeDir( RULES, n_WalkDir({"paths":['.'],"rufiles":['rules']})[0]);
+	n_WalkDir({"paths":['.'],"wfunc":p_ConfigReceived,"info":'walk init',"rufiles":['rules']});
+}
+function p_ConfigReceived( i_data)
+{
+	c_RulesMergeDir( RULES, i_data[0]);
 
 	if( RULES.cgru_config )
 		cgru_ConfigJoin( RULES.cgru_config );
@@ -188,7 +199,11 @@ function p_PathChanged()
 	if( p_rules_path.indexOf('//') != -1 ) p_rules_path = p_rules_path.substr( 0, p_rules_path.indexOf('//'));
 	$('rules_link').href = window.location.protocol + '//' + window.location.host + c_PathDir(window.location.pathname ) + '/#' + p_rules_path;
 
-	var walk = n_WalkDir({"paths":[p_path],"rufiles":['player']})[0];
+	n_WalkDir({"paths":[p_path],"wfunc":p_WalkReceived,"info":'walk images',"rufiles":['player']});
+}
+function p_WalkReceived( i_data)
+{
+	var walk = i_data[0];
 	c_RulesMergeDir( RULES, walk);
 	RULES.rufiles = walk.rufiles;
 	if( walk.files == null )
@@ -328,7 +343,11 @@ function p_ImgLoaded(e)
 	p_Info( info);
 
 	// Process saved comments:
-	var walk = n_WalkDir({"paths":[p_savepath],"rufiles":['player']})[0];
+	n_WalkDir({"paths":[p_savepath],"wfunc":p_WalkReceivedComments,"info":'walk comments',"rufiles":['player']});
+}
+function p_WalkReceivedComments( i_data)
+{
+	var walk = i_data[0];
 	c_RulesMergeDir( RULES, walk);
 	if( RULES.player && RULES.player.comments )
 	{

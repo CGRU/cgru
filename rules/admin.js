@@ -33,23 +33,25 @@ function ad_Login()
 		localStorage.auth_digest = '';
 		new cgru_Dialog({"handle":'ad_LoginGetPassword',"param":'user_id',
 			"name":'login',"title":'Login',"info":'Enter User ID'});
-//		new cgru_Dialog( window, window, 'ad_LoginGetPassword', 'user_id', 'str', '', 'login', 'Login', 'Enter User ID');
 	}
 	else
-		ad_loginProcess({"realm":cgru_Config.realm});
+		ad_LoginProcess({"realm":cgru_Config.realm});
 }
-function ad_loginProcess( i_obj)
+function ad_LoginProcess( i_obj)
 {
-	var data = c_Parse( n_Request_old({"login":i_obj}));
-	if( data == null ) return;
-	if( data.error )
+	n_Request({"send":{"login":i_obj},"func":ad_LoginReceived,"info":'login'});
+}
+function ad_LoginReceived( i_data)
+{
+	if( i_data == null ) return;
+	if( i_data.error )
 	{
 		if( SERVER.AUTH_RULES )
 		{
 			localStorage.auth_user = '';
 			localStorage.auth_digest = '';
 		}
-		c_Error( data.error);
+		c_Error( i_data.error);
 		return;
 	}
 	g_GO('/');
@@ -59,12 +61,11 @@ function ad_LoginGetPassword( i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_LoginConstruct',"param":i_user_id,
 		"name":'login',"title":'Login',"info":'Enter Password'});
-//	new cgru_Dialog( window, window, 'ad_LoginConstruct', i_user_id, 'str', '', 'login', 'Login', 'Enter Password');
 }
 function ad_LoginConstruct( i_password, i_user_id)
 {
 	var digest = ad_ConstructDigest( i_password, i_user_id);
-	ad_loginProcess({"digest":digest});
+	ad_LoginProcess({"digest":digest});
 }
 function ad_ConstructDigest( i_password, i_user_id)
 {
@@ -112,18 +113,22 @@ function ad_Logout()
 //*
  	var obj = {};
 	obj.logout = {"realm":cgru_Config.realm};
-	var data = n_Request_old( obj);
-//c_Log( data);
+	n_Request({"send":obj,"func":ad_LogoutReceived,"info":'logout'});
+}
+function ad_LogoutReceived( i_data)
+{
+//c_Log( i_data);
 //	*/
 ///*
 	var xhr = new XMLHttpRequest;
 	xhr.open('GET', '/', true, 'null', 'null');
 	xhr.send('');
-	xhr.onreadystatechange = function() {
+	xhr.onreadystatechange = function()
+	{
 		if (xhr.readyState == 4) { g_GO('/'); window.location.reload(); }
 	}
 //*/
-//c_Log( data);
+//c_Log( i_data);
 }
 
 function ad_PermissionsProcess()
@@ -779,15 +784,22 @@ function ad_SetPassword( i_passwd, i_user_id)
 
 	var digest = c_MD5( i_user_id + ':'+cgru_Config.realm+':' + i_passwd);
 	digest = i_user_id + ':'+cgru_Config.realm+':' + digest;
-	var result = c_Parse( n_Request_old({"htdigest":{"user":i_user_id,"digest":digest}}, true, SERVER.php_version >= "5.3"));
-	if( result == null ) return;
-	if( result.error )
+
+	var obj = {};
+	obj.send = {"htdigest":{"user":i_user_id,"digest":digest}};
+	obj.encode = SERVER.php_version >= "5.3";
+	obj.func = ad_SetPasswordFinished;
+	n_Request(obj);
+}
+function ad_SetPasswordFinished( i_data)
+{
+	if(( i_data == null ) || ( i_data.error ))
 	{
-		c_Error( result.error);
+		c_Error( i_data.error);
 		return;
 	}
 
-	if( result.status ) c_Info( result.status);
+	if( i_data.status ) c_Info( i_data.status);
 }
 
 

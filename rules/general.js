@@ -18,7 +18,7 @@ function g_Init()
 	cgru_Init();
 	u_Init();
 	c_Init();
-	n_Request({"send":{"start":{}},"func":g_Init_Server});
+	n_Request({"send":{"start":{}},"func":g_Init_Server,"info":'start'});
 }
 function g_Init_Server( i_data)
 {
@@ -32,7 +32,7 @@ function g_Init_Server( i_data)
 	if( SERVER.version )
 		$('version').innerHTML = c_Strip( SERVER.version);
 
-	n_Request({"send":{"initialize":{}},"func":g_Init_Config});
+	n_Request({"send":{"initialize":{}},"func":g_Init_Config,"info":'init'});
 }
 function g_Init_Config( i_data)
 {
@@ -65,7 +65,7 @@ function g_Init_Config( i_data)
 
 	nw_Init();
 
-	n_WalkDir({"paths":['.'],"wfunc":g_Init_Rules,"rufiles":['rules']});
+	n_WalkDir({"paths":['.'],"wfunc":g_Init_Rules,"info":'walk config',"rufiles":['rules']});
 }
 function g_Init_Rules( i_data)
 {
@@ -232,6 +232,7 @@ function g_Navigate( i_path)
 	walk.mtime = RULES.cache_time;
 	walk.lookahead = ['status'];
 	walk.wfunc = g_WalksReceived;
+	walk.info = 'walk GO';
 	n_WalkDir( walk);
 }
 

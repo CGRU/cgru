@@ -8,6 +8,14 @@ n_walks = {};
 
 function n_WalkDir( i_args)
 {
+	if( i_args.wfunc == null )
+	{
+		alert('Walk function is null');
+		console.log('Walk function is null');
+		return;
+	}
+
+	if( i_args.info == null ) i_args.info = 'walk';
 	if( i_args.depth == null ) i_args.depth = 0;
 	if( i_args.rufolder == null ) i_args.rufolder = RULES.rufolder;
 
@@ -37,24 +45,11 @@ function n_WalkDir( i_args)
 	if( i_args.rufiles   ) request.rufiles   = i_args.rufiles;
 	if( i_args.lookahead ) request.lookahead = i_args.lookahead;
 
-	if( i_args.wfunc )
-	{
-		i_args.send = request;
-		i_args.func = n_WalkDirProcess;
-		i_args.parse = true;
-		i_args.wait = false;
-		i_args.info = 'walk';
-		n_Request( i_args);
-		return;
-	}
-	
-	var data = n_Request({"send":request});
-	var response = c_Parse( data);
+	i_args.send = request;
+	i_args.func = n_WalkDirProcess;
+	i_args.parse = true;
 
-	if( response == null ) return null;
-	if( response.walkdir == null ) return null;
-
-	return n_WalkDirProcess( response, i_args);
+	n_Request( i_args);
 }
 
 function n_WalkDirProcess( i_data, i_args)
@@ -84,10 +79,6 @@ function n_WalkDirProcess( i_data, i_args)
 	return o_walks;
 }
 
-function n_Request_old( i_obj, i_wait, i_encode)
-{
-	return n_Request({"send":i_obj,"wait":i_wait,"encode":i_encode})
-}
 function n_Request( i_args)
 {
 	if( i_args.send == null )
@@ -112,6 +103,11 @@ function n_Request( i_args)
 
 	if( i_args.wait !== true )
 		n_conn_count++;
+	else
+	{
+		console.log('WAIT REQUEST!');
+		alert('WAIT REQUEST!');
+	}
 
 	if( SERVER && SERVER.AUTH_RULES )
 	{
