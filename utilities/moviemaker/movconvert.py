@@ -53,9 +53,9 @@ if os.path.isdir(Input):
 			continue
 		digits = digits[-1]
 		StartNumber = int(digits)
-		Input = afile[:afile.find(digits)]
+		Input = afile[:afile.rfind(digits)]
 		Input += '%0' + str(len(digits)) + 'd'
-		Input += afile[afile.find(digits) + len(digits):]
+		Input += afile[afile.rfind(digits) + len(digits):]
 		Input = os.path.join(argv[0], Input)
 		break
 else:
