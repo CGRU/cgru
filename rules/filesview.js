@@ -989,6 +989,7 @@ function fv_Goto( i_path )
 		{
 			fv_views[v].selectItem( el);
 			el.scrollIntoView();
+			c_Info(c_PathBase(i_path) + ' selected.');
 			return;
 		}
 	}

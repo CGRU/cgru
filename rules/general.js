@@ -140,7 +140,7 @@ function g_PathChanged()
 	{
 		new_path = new_path.split('?');
 		if( new_path.length > 0 )
-			g_arguments = new_path[1];
+			g_arguments = c_Parse( decodeURI( new_path[1]));
 		new_path = new_path[0];
 	}
 
@@ -156,7 +156,7 @@ function g_PathChanged()
 
 function g_NavigatePost()
 {
-console.log('g_NavigatePost');
+//console.log('g_NavigatePost');
 	a_Process();
 	u_Process();
 	nw_Process();
@@ -173,31 +173,30 @@ console.log('g_NavigatePost');
 
 	$('navigate_up').href = '#' + c_PathDir( g_CurPath());
 
-	g_POST()
+	g_POST('navig');
 }
 
-function g_POST()
+function g_POST(i_msg)
 {
-console.log('g_POST');
 	if( ASSET && ASSET.post )
 	{
-		if( window[ASSET.post])
-			window[ASSET.post]();
 		return;
 	}
-	g_PostLaunchFunc();
+	g_PostLaunchFunc(i_msg);
 }
-function g_PostLaunchFunc()
+function g_PostLaunchFunc( i_msg)
 {
-console.log('g_PostLaunchFunc');
+	c_Log('Post: ' + i_msg);
+	//console.log('Post: ' + i_msg);
 	if( g_arguments == null ) return;
 
-	g_arguments = c_Parse( decodeURI( g_arguments));
 	for( var func in g_arguments)
+	{
 		if( window[func])
 			window[func](g_arguments[func]);
 		else
 			c_Error('Function "'+func+'" does not exist.');
+	}
 }
 
 function g_Navigate( i_path)

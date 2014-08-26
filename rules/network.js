@@ -106,7 +106,7 @@ function n_Request( i_args)
 	else
 	{
 		console.log('WAIT REQUEST!');
-		alert('WAIT REQUEST!');
+		//alert('WAIT REQUEST!');
 	}
 
 	if( SERVER && SERVER.AUTH_RULES )

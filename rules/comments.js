@@ -1,14 +1,12 @@
 cm_file = 'comments.json';
 cm_durations = ['.25','.5','1','1.5','2','3','4','5','6','7','8','9','10','12','14','16','18','20','24','32','40','80'];
 cm_array = [];
-cm_goto_key = null;
 
 function View_comments_Open() { cm_Load(); }
 
 function cm_Finish()
 {
 	cm_array = [];
-	cm_goto_key = null;
 }
 
 function cm_Load()
@@ -52,7 +50,7 @@ function cm_Received( obj, i_args)
 	for( var i = 0; i < obj_array.length; i++)
 		cm_array.push( new Comment( obj_array[i]));
 
-	cm_GotoKey();
+	g_POST('comments');
 }
 
 function cm_NewOnClick()
@@ -681,23 +679,24 @@ Comment.prototype.showFile = function( i_path, i_file)
 	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto":i_path+'/'+i_file.name});
 }
 
-function cm_Goto( i_name ) { cm_goto_key = i_name; }
-function cm_GotoKey()
+function cm_Goto( i_key)
 {
-console.log('cm_GotoKey: ' + cm_goto_key);
-	if( cm_goto_key == null ) return;
+	c_Log('cm_Goto: ' + i_key);
+//	console.log('cm_Goto: ' + i_key);
 
+	if( i_key == null ) return;
+
+//TODO: this will not work, as this function is async
 	if( localStorage['view_comments'] !== 'true' )
 		u_OpenCloseView( 'comments', true, true);
 
 	for( var i = 0; i < cm_array.length; i++)
-		if( cm_array[i].obj.key == cm_goto_key )
+		if( cm_array[i].obj.key == i_key )
 		{
 			cm_array[i].el.scrollIntoView();
 			return;
 		}
 
-	c_Error('Comment with key=' + cm_goto_key + ' not found.');
-	cm_goto_key = null;
+	c_Error('Comment with key=' + i_key + ' not found.');
 }
 

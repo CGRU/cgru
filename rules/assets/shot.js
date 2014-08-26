@@ -133,7 +133,7 @@ function shot_Loaded( i_data, i_args)
 
 function shot_Post()
 {
-	g_PostLaunchFunc();
+	g_PostLaunchFunc('shot');
 }
 
 function shot_MakeThumbnail()
