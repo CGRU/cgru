@@ -91,8 +91,10 @@ function shot_Loaded( i_data, i_args)
 		for( var i = 0; i < walk.result.length; i++)
 		{
 			var folders = walk.walks[walk.result[i]].folders;
+			var files   = walk.walks[walk.result[i]].files;
 			var path = walk.paths[walk.result[i]];
-			if(( folders == null ) || ( folders.length == 0 )) continue;
+			if((( folders == null ) || ( folders.length == 0 )) &&
+				(( files  == null ) || (   files.length == 0 ))) continue;
 
 			shot_thumb_paths.push( path);
 			new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]]})
