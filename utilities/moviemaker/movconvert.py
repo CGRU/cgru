@@ -22,7 +22,7 @@ Parser.add_option('-o', '--output',    dest='output',    type  ='string', defaul
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
 Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
 Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
-Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default='frame',  help='Images files name (frame)')
+Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
 
 Options, argv = Parser.parse_args()
 
@@ -96,7 +96,11 @@ if Codec == '':
 		print('ERROR: Can`t create output folder: ' + Output)
 		sys.exit(1)
 
-	Output = os.path.join(Output, Options.imgname + '.%07d.' + Options.type)
+	imgname = Options.imgname
+	if imgname is None:
+		imgname = os.path.basename( Input)
+		imgname,ext = os.path.splitext( imgname)
+	Output = os.path.join(Output, imgname + '.%07d.' + Options.type)
 
 	args.append(Output)
 
