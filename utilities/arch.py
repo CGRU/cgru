@@ -45,6 +45,9 @@ Key = None
 if Options.type == 'zip':
 	Cmd = ['zip','-y','-r','-1', Options.output, Options.input,'-x','*/.*']
 	Key = 'adding: '
+elif Options.type == 'rar':
+	Cmd = ['rar','a','-y','-r','-o+','-x*/.*/', Options.output, Options.input]
+	Key = 'Adding '
 elif Options.type == '7z':
 	Cmd = ['7za','a','-y','-r','-t7z','-x!.*', Options.output, Options.input]
 	Key = 'Compressing '

@@ -40,6 +40,11 @@ if Ext == 'zip':
 	if Options.output is not None: Cmd.extend(['-d', Options.output])
 	Cmd.append( Options.input)
 	Key = 'inflating: '
+elif Ext == 'rar':
+	CmdList = ['unrar','l', Options.input]
+	Cmd = ['unrar','x','-r','-o+','-y', Options.input]
+	if Options.output is not None: Cmd.append( Options.output)
+	Key = 'Extracting '
 elif Ext == '7z':
 	CmdList = ['7za','l', Options.input]
 	Cmd = ['7za','x','-y']
@@ -66,14 +71,22 @@ while True:
 		data = re.findall('\S+', data)
 		if len( data) != 3: continue
 		if data[-1] != 'files': continue
-		SizeTotal = int(data[0])
-		FilesTotal =  int(data[1])
+		SizeTotal  = int(data[0])
+		FilesTotal = int(data[1])
+	elif Ext == 'rar':
+		data = re.findall('\S+', data)
+		if len( data) != 5: continue
+		try:
+			SizeTotal  += int(data[1])
+			FilesTotal += 1
+		except:
+			continue
 	elif Ext == '7z':
 		data = re.findall('\S+', data)
 		if len( data) != 6: continue
 		if data[3] != 'files,': continue
-		SizeTotal = int(data[0])
-		FilesTotal =  int(data[2])
+		SizeTotal  = int(data[0])
+		FilesTotal = int(data[2])
 
 print('Files Total: %d' % FilesTotal)
 print('Size Total: %d' % SizeTotal)
