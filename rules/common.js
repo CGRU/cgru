@@ -57,6 +57,7 @@ function c_Parse( i_data)
 	catch( err)
 	{
 		c_Error( err.message+'<br/><br/>'+i_data);
+		console.log( err.message+'\n'+i_data);
 		obj = null;
 	}
 

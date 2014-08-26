@@ -156,6 +156,7 @@ function g_PathChanged()
 
 function g_NavigatePost()
 {
+console.log('g_NavigatePost');
 	a_Process();
 	u_Process();
 	nw_Process();
@@ -177,6 +178,7 @@ function g_NavigatePost()
 
 function g_POST()
 {
+console.log('g_POST');
 	if( ASSET && ASSET.post )
 	{
 		if( window[ASSET.post])
@@ -187,6 +189,7 @@ function g_POST()
 }
 function g_PostLaunchFunc()
 {
+console.log('g_PostLaunchFunc');
 	if( g_arguments == null ) return;
 
 	g_arguments = c_Parse( decodeURI( g_arguments));

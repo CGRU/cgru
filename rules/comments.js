@@ -684,6 +684,7 @@ Comment.prototype.showFile = function( i_path, i_file)
 function cm_Goto( i_name ) { cm_goto_key = i_name; }
 function cm_GotoKey()
 {
+console.log('cm_GotoKey: ' + cm_goto_key);
 	if( cm_goto_key == null ) return;
 
 	if( localStorage['view_comments'] !== 'true' )
