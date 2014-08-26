@@ -504,25 +504,34 @@ function nw_DeleteFiltered( i_visible)
 		if( elNews[i].style.display == display )
 			ids.push( elNews[i].m_news.id);
 
-	if( ids.length )
-		nw_DeleteNews( ids);
+	nw_DeleteNews( ids);
 }
 
 function nw_DeleteNews( i_ids)
 {
-	var obj = {};
+	// Delete all new if ids is not specified:
 	if( i_ids == null )
 	{
-		obj.object = {"news":[]};
-		obj.add = true;
+		i_ids = [];
+		var elNews = $('news').m_elArray;
+		// Make an array with all ids:
+		for( var i = 0; i < elNews.length; i++)
+			i_ids.push( elNews[i].m_news.id);
 	}
-	else
+
+	if( i_ids.length == 0 )
 	{
-		obj.objects = [];
-		for( var i = 0; i < i_ids.length; i++ )
-			obj.objects.push({"id":i_ids[i]});
-		obj.delobj = true;
+		c_Error('No news to delete.');
+		nw_NewsLoad();
+		return;
 	}
+
+	var obj = {};
+	obj.objects = [];
+	for( var i = 0; i < i_ids.length; i++ )
+		obj.objects.push({"id":i_ids[i]});
+	obj.delobj = true;
+
 	obj.file = 'users/'+g_auth_user.id+'.json';
 	n_Request({"send":{"editobj":obj},"func":nw_DeleteNewsFinished});
 }
