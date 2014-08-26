@@ -401,6 +401,8 @@ function fu_Archivate( i_args)
 	var params = {};
 
 	gui_Create( wnd.elContent, fu_arch_params);
+	if( i_args.archive )
+		gui_CreateChoises({"wnd":wnd.elContent,"name":'type',"value":RULES.archive.default,"label":'Type:',"keys":RULES.archive.types});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -438,16 +440,26 @@ function fu_Archivate( i_args)
 function fu_ArchivateProcessGUI( i_wnd)
 {
 	var paths = i_wnd.m_args.paths;
+
 	var params = gui_GetParams( i_wnd.elContent, fu_arch_params);
+	if( i_wnd.elContent.m_choises )
+		for( key in i_wnd.elContent.m_choises )
+			params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var job = {};
-	job.name = 'Archive';
 
-	var arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
-	if( i_wnd.m_args.extract )
+	var arch_cmd = null;
+
+	if( i_wnd.m_args.archive )
 	{
-		arch_cmd = cgru_PM('/cgru/utilities/arch_x.py', true);
+		job.name = 'Archive ' + params.type;
+		arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
+		arch_cmd += ' -t ' + params.type;
+	}
+	else
+	{
 		job.name = 'Extract';
+		arch_cmd = cgru_PM('/cgru/utilities/arch_x.py', true);
 	}
 
 	job.name += ' ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;

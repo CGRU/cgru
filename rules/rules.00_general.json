@@ -255,6 +255,12 @@
 },
 
 "archive":{
+	"types":{
+		"zip": {"name":"ZIP", "tooltip":"Fastest, simplest, no special programs needed, recommended"},
+		"rar": {"name":"RAR", "tooltip":"For WinRAR lowers"},
+		"7z" : {"name":"7Z",  "tooltip":"Slowest, but small archive size"}
+	},
+	"default":"zip",
 	"cmd":"python /cgru/utilities/arch.py",
 	"cmd_x":"python /cgru/utilities/arch_x.py",
 	"dest":"",
