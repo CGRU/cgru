@@ -8,13 +8,6 @@ n_walks = {};
 
 function n_WalkDir( i_args)
 {
-	if( i_args.wfunc == null )
-	{
-		alert('Walk function is null');
-		console.log('Walk function is null');
-		return;
-	}
-
 	if( i_args.info == null ) i_args.info = 'walk';
 	if( i_args.depth == null ) i_args.depth = 0;
 	if( i_args.rufolder == null ) i_args.rufolder = RULES.rufolder;
@@ -45,11 +38,23 @@ function n_WalkDir( i_args)
 	if( i_args.rufiles   ) request.rufiles   = i_args.rufiles;
 	if( i_args.lookahead ) request.lookahead = i_args.lookahead;
 
-	i_args.send = request;
-	i_args.func = n_WalkDirProcess;
-	i_args.parse = true;
+	if( i_args.wfunc )
+	{
+		i_args.send = request;
+		i_args.func = n_WalkDirProcess;
+		i_args.parse = true;
+		i_args.wait = false;
+		n_Request( i_args);
+		return;
+	}
+	
+	var data = n_Request({"send":request});
+	var response = c_Parse( data);
 
-	n_Request( i_args);
+	if( response == null ) return null;
+	if( response.walkdir == null ) return null;
+
+	return n_WalkDirProcess( response, i_args);
 }
 
 function n_WalkDirProcess( i_data, i_args)
