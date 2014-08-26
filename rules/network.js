@@ -126,7 +126,7 @@ function n_Request( i_args)
 
 	var log = '<b><i style="color:';
 	if( i_args.wait )
-		log += '#040">send '+i_args.id;
+		log += '#800">send '+i_args.id;
 	else
 		log += '#044">send '+i_args.id + ' ('+n_conn_count+')';
 	log += '</i> '+i_args.info+':</b> '+ send_str;
@@ -144,7 +144,7 @@ function n_Request( i_args)
 
 	if( i_args.wait )
 	{
-		log += '<br/><b><i style="color:#040">recv '+xhr.m_args.id+'</i> '+xhr.m_args.info+':</b> ';
+		log += '<br/><b><i style="color:#800">recv '+xhr.m_args.id+'</i> '+xhr.m_args.info+':</b> ';
 		if( i_args.send.getfile )
 			log += i_args.send.getfile;
 		else

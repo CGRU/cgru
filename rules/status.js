@@ -1005,18 +1005,22 @@ function st_UpdateProgresses( i_path, i_progresses)
 	}
 //console.log( paths);
 //console.log(JSON.stringify(i_progresses));
-	walks = n_WalkDir({"paths":paths,"rufiles":['status'],"lookahead":['status']});
-	if( walks == null ) return;
+	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,"paths_skip_save":paths_skip_save,
+		"info":'walk upstatuses',"rufiles":['status'],"lookahead":['status']});
+}
+function st_UpdateProgressesWalkReceived( i_walks, i_args)
+{
+	if( i_walks == null ) return;
 
-	for( var w = walks.length-1; w >= 0; w--)
+	for( var w = i_walks.length-1; w >= 0; w--)
 	{
-//window.console.log( walks[w]);
-		if( walks[w].error )
+//window.console.log( i_walks[w]);
+		if( i_walks[w].error )
 		{
-			c_Error( walks[w].error);
+			c_Error( i_walks[w].error);
 			return;
 		}
-		if(( walks[w].folders == null ) || ( walks[w].folders.length == 0 ))
+		if(( i_walks[w].folders == null ) || ( i_walks[w].folders.length == 0 ))
 		{
 			c_Error('Can`t find folders in ' + paths[w]);
 			return;
@@ -1024,9 +1028,9 @@ function st_UpdateProgresses( i_path, i_progresses)
 
 		var progress = 0;
 		var progress_count = 0;
-		for( var f = 0; f < walks[w].folders.length; f++ )
+		for( var f = 0; f < i_walks[w].folders.length; f++ )
 		{
-			var folder = walks[w].folders[f];
+			var folder = i_walks[w].folders[f];
 			if( folder.name == RULES.rufolder ) continue;
 			var path = paths[w] + '/' + folder.name;
 			if( progresses[path] != null )
@@ -1039,7 +1043,7 @@ function st_UpdateProgresses( i_path, i_progresses)
 				if(( folder.status == null ) || ( folder.status.progress == null ))
 				{
 //console.log(folder.name+': null');
-					if( w != (walks.length-1)) continue;
+					if( w != (i_walks.length-1)) continue;
 					st_Save({"progress":0}, path);
 				}
 				else if( folder.status.progress < 0 ) continue;
@@ -1061,7 +1065,7 @@ function st_UpdateProgresses( i_path, i_progresses)
 
 	for( var path in progresses)
 	{
-		if( paths_skip_save.indexOf(path) != -1 )
+		if( i_args.paths_skip_save.indexOf(path) != -1 )
 			continue;
 
 		st_Save({"progress":progresses[path]}, path);

@@ -44,28 +44,8 @@ function d_Make( i_path, i_outfolder)
 	if( match )
 		params.version = match[match.length-1];
 
-	var readir = n_WalkDir({"paths":[i_path]})[0];
-	if( readir && readir.files && readir.files.length )
-	for( var f = 0; f < readir.files.length; f++ )
-	{
-		var file = readir.files[f].name;
-		var match = file.match(/\d+\./g);
-		if( match )
-		{
-			match = match[match.length-1];
-			var pos = file.lastIndexOf( match);
-			var pattern = file.substr( 0, pos);
-			for( var d = 0; d < match.length-1; d++ ) pattern += '#';
-			pattern += file.substr( pos-1 + match.length);
-			i_path += '/' + pattern;
-			break;
-		}
-//window.console.log( match);
-	}
-
 	params.input = i_path;
 	params.output = i_outfolder;
-
 	params.artist = c_GetUserTitle();
 	params.activity = RULES.dailies.activity;
 
@@ -94,6 +74,32 @@ function d_Make( i_path, i_outfolder)
 	params.filename = filename;
 
 	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
+
+	n_WalkDir({"paths":[i_path],"wfunc":d_DailiesWalkReceived,"info":'walk dailies',"d_params":params,"d_wnd":wnd});
+}
+function d_DailiesWalkReceived( i_data, i_args)
+{
+	var wnd = i_args.d_wnd;
+	var params = i_args.d_params;
+	var walk = i_data[0];
+
+	if( walk && walk.files && walk.files.length )
+	for( var f = 0; f < walk.files.length; f++ )
+	{
+		var file = walk.files[f].name;
+		var match = file.match(/\d+\./g);
+		if( match )
+		{
+			match = match[match.length-1];
+			var pos = file.lastIndexOf( match);
+			var pattern = file.substr( 0, pos);
+			for( var d = 0; d < match.length-1; d++ ) pattern += '#';
+			pattern += file.substr( pos-1 + match.length);
+			params.input += '/' + pattern;
+			break;
+		}
+//window.console.log( match);
+	}
 
 	gui_Create( wnd.elContent, d_guiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
