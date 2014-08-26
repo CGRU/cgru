@@ -154,7 +154,7 @@ function scene_Show()
 
 function scenes_Show()
 {
-	n_WalkDir({"paths":[ASSET.path],"wfunc":scenes_Received,"depth":1,"rufiles":['rules','status'],"lookahead":['status'],"local":true});
+	n_WalkDir({"paths":[ASSET.path],"wfunc":scenes_Received,"info":'walk scenes',"depth":1,"rufiles":['rules','status'],"lookahead":['status'],"local":true});
 	$('asset').classList.add('waiting');
 	scenes_elWaiting = document.createElement('div');
 	scenes_elWaiting.innerHTML = '<h3 style="text-align:center">Loading all project shots...</h3>';

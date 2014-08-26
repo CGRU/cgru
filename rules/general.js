@@ -150,7 +150,8 @@ function g_PathChanged()
 		return;
 	}
 
-	g_NavigatePost()
+//	g_NavigatePost()
+	g_POST()
 }
 
 function g_NavigatePost()
@@ -171,16 +172,20 @@ function g_NavigatePost()
 
 	$('navigate_up').href = '#' + c_PathDir( g_CurPath());
 
+	g_POST()
+}
+
+function g_POST()
+{
 	if( ASSET && ASSET.post )
 	{
 		if( window[ASSET.post])
 			window[ASSET.post]();
+		return;
 	}
-	else
-		g_POST();
+	g_PostLaunchFunc();
 }
-
-function g_POST()
+function g_PostLaunchFunc()
 {
 	if( g_arguments == null ) return;
 
