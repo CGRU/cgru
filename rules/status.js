@@ -31,6 +31,14 @@ function st_BodyModified()
 
 function st_Show( i_status)
 {
+	if( ASSET && ASSET.subfolders_status_hide && ( ASSET.path != g_CurPath() ))
+	{
+		$('status').style.display = 'none';
+		return;
+	}
+
+	$('status').style.display = 'block';
+		
 /*	if( i_status != null )
 		RULES.status = c_CloneObj( i_status);
 	else
@@ -372,6 +380,8 @@ Status.prototype.edit = function( i_args)
 	this.elParent.appendChild( this.elEdit);
 	this.elEdit.classList.add('status_edit');
 	this.elEdit.onclick = function(e){e.stopPropagation();};
+	this.elEdit.m_status = this;
+	this.elEdit.onkeydown = function(e){ e.currentTarget.m_status.editOnKeyDown(e, i_args);};
 
 	var elBtns = document.createElement('div');
 	this.elEdit.appendChild( elBtns);
@@ -389,6 +399,7 @@ Status.prototype.edit = function( i_args)
 	elBtnSave.classList.add('button');
 	elBtnSave.textContent = 'Save';
 	elBtnSave.m_status = this;
+	elBtnSave.m_args = i_args;
 	elBtnSave.onclick = function(e){e.currentTarget.m_status.editSave( i_args);};
 
 	var elFinishDiv = document.createElement('div');
@@ -437,6 +448,7 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_progress.contentEditable = 'true';
 	this.elEdit_progress.classList.add('editing');
 	this.elEdit_progress.style.textAlign = 'center';
+	this.elEdit_progress.onkeydown = function(e){ if( e.keyCode == 13 ) return false; };
 
 	var artists = {};
 	var tags = {};
@@ -537,6 +549,11 @@ Status.prototype.edit = function( i_args)
 	}
 
 	this.elEdit_annotation.focus();
+}
+Status.prototype.editOnKeyDown = function(e, i_args)
+{
+	if( e.keyCode == 27 ) this.show();                 // ESC
+	if( e.keyCode == 13 ) this.editSave( i_args);      // ENTER
 }
 function st_EditColorOnClick( i_clr, i_data)
 {
@@ -961,12 +978,12 @@ Status.prototype.save = function( i_args)
 	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists},{"load":i_args.load_news});
 }
 
-function st_Save( i_status, i_path, i_func, i_args)
+function st_Save( i_status, i_path, i_func, i_args, i_navig_up)
 {
 	if( i_status == null ) i_status = RULES.status;
 	if( i_path == null ) i_path = g_CurPath();
 
-	g_FolderSetStatusPath( i_status, i_path);
+	g_FolderSetStatusPath( i_status, i_path, i_navig_up);
 	n_walks[i_path] = null;
 
 	var obj = {};
@@ -1063,12 +1080,16 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 //console.log(paths[w]+': '+progress_count+': '+progress);
 	}
 
+	// Update only progess in navig:
+	var navig_up = {};
+	navig_up.progress = true;
+
 	for( var path in progresses)
 	{
 		if( i_args.paths_skip_save.indexOf(path) != -1 )
 			continue;
 
-		st_Save({"progress":progresses[path]}, path);
+		st_Save({"progress":progresses[path]}, path,/*func=*/null,/*args=*/null, navig_up);
 //console.log(path);
 	}
 }

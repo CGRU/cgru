@@ -491,6 +491,7 @@ FilesView.prototype.showFolder = function( i_folder)
 	}
 
 	if( RULES.afanasy_enabled !== false )
+	if( ASSET && ASSET.subfolders_dailies_hide && ( ASSET.path == g_CurPath() ))
 	{
 		var out_path = c_PathDir( path);
 		if( ASSET && ( ASSET.dailies ))

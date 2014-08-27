@@ -473,23 +473,29 @@ function g_AppendFolder( i_elParent, i_fobject)
 	return elFolder;
 }
 
-function g_FolderSetStatusPath( i_status, i_path) { g_FolderSetStatus( i_status, g_elFolders[i_path]);}
-function g_FolderSetStatus( i_status, i_elFolder)
+function g_FolderSetStatusPath( i_status, i_path, i_params) { g_FolderSetStatus( i_status, g_elFolders[i_path], i_params);}
+function g_FolderSetStatus( i_status, i_elFolder, i_params)
 {
 //console.log('GFS:'+JSON.stringify(i_status));
 	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
 
-	i_elFolder.m_fobject.status = i_status;
+	if( i_params )
+		for( parm in i_params )
+			i_elFolder.m_fobject.status[parm] = i_status[parm];
+	else
+		i_elFolder.m_fobject.status = i_status;
 
-	st_SetElLabel( i_status, i_elFolder.m_elAnn);
-	st_SetElColor( i_status, i_elFolder);
-	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
-	st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
-	st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
-	st_SetElTags( i_status, i_elFolder.m_elTags, true);
-
-	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
-		i_elFolder.m_elPercent.textContent = i_status.progress + '%';
+	if(( i_params == null ) || i_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
+	if(( i_params == null ) || i_params.color      ) st_SetElColor( i_status, i_elFolder);
+	if(( i_params == null ) || i_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
+	if(( i_params == null ) || i_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
+	if(( i_params == null ) || i_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
+	if(( i_params == null ) || i_params.progress   )
+	{
+		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
+		if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
+			i_elFolder.m_elPercent.textContent = i_status.progress + '%';
+	}
 }
 
 function g_CompareFolders(a,b)
