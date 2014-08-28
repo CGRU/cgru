@@ -248,9 +248,16 @@ function d_Convert( i_args)
 	img_types.jpg = {"name":'JPG'};
 	img_types.png = {"name":'PNG'};
 	img_types.dpx = {"name":'DPX'};
-	img_types.tif = {"name":'TIF'};
 	if( i_args.movies !== true )
+	{
 		img_types.exr = {"name":'EXR'};
+		img_types.tif = {"name":'TIF'};
+	}
+	else
+	{
+		img_types.tif8  = {"name":'TIF8' ,"tooltip":'8  bits TIF'};
+		img_types.tif16 = {"name":'TIF16',"tooltip":'16 bits TIF'};
+	}
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
