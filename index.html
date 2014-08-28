@@ -48,7 +48,7 @@ if( document.location.host.indexOf('cgru.info') != -1 )
 	<div id="navig_panel">
 		<div class="infotooltip" style="float: left; margin: 1px 4px;" title="Navigation Controls:
 LMB - goto folder (set current)
-LMB on current folder - open/close
+LMB on the current folder - open/close
 RMB - open/close folder (faster)"
 			>i</div>
 		<div class="button" id="navig_show_artists"    title="Show artists"    onclick="g_NavigShowInfo(this)">ART</div>
@@ -206,16 +206,16 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()">&#10227;</div>
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
-			<div class="news_ctrl" style="font-size: 12px">
-				<div class="button nw_fb" title="Show All" onclick="nw_FilterBtn(this,'_all_')"  >All</div>
-				<div class="button nw_fb" title="Assigned" onclick="nw_FilterBtn(this,'_my_')"   >My</div>
-				<div class="button nw_fb" title="Body"     onclick="nw_FilterBtn(this,'body')"   >B</div>
-				<div class="button nw_fb" title="Status"   onclick="nw_FilterBtn(this,'status')" >S</div>
-				<div class="button nw_fb" title="Report"   onclick="nw_FilterBtn(this,'report')" >R</div>
-				<div class="button nw_fb" title="Dailies"  onclick="nw_FilterBtn(this,'dailies')">D</div>
-				<div class="button nw_fb" title="Comment"  onclick="nw_FilterBtn(this,'comment')">C</div>
-			</div>
-			<div id="news"></div>
+			<div class="infotooltip" style="float: right; margin: 6px 5px;" title="News:
+If you assigned on any shot (location) you will receive all its changes.
+To receive all news from some location and all its subfolders (project,scene)
+you should subscribe on this location (add its path to channels).
+[Chan] - Open subscribed channels to show/remove them.
+To filter (show/hide) only specific news use buttons below.
+You can remove all [DA] news, only visible [DV] or hidden [DH] news during filtering.
+To remove only one news link double click [-] button at the top-left corner.
+Remember any delete operation buttons in RULES requires double-click.
+"				>i</div>
 			<div class="news_ctrl">
 				<div style="font-size:14px;">
 					<div class="button" title="Double click to delete all news"
@@ -230,16 +230,32 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>
+			<div class="news_ctrl" style="font-size: 12px">
+				<div class="button nw_fb" title="Show All" onclick="nw_FilterBtn(this,'_all_')"  >All</div>
+				<div class="button nw_fb" title="Assigned" onclick="nw_FilterBtn(this,'_my_')"   >My</div>
+				<div class="button nw_fb" title="Body"     onclick="nw_FilterBtn(this,'body')"   >B</div>
+				<div class="button nw_fb" title="Status"   onclick="nw_FilterBtn(this,'status')" >S</div>
+				<div class="button nw_fb" title="Report"   onclick="nw_FilterBtn(this,'report')" >R</div>
+				<div class="button nw_fb" title="Dailies"  onclick="nw_FilterBtn(this,'dailies')">D</div>
+				<div class="button nw_fb" title="Comment"  onclick="nw_FilterBtn(this,'comment')">C</div>
+			</div>
+			<div id="news"></div>
 		</div>
 	</div>
 	<div id="sidepanel_playlist">
 		<div class="label button" id="playlist_refresh" onclick="p_RefreshOnClick()">&#10227;</div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
+			<div class="infotooltip" style="float: right; margin: 2px 4px;" title="Playlist:
+It is designed to share links.
+If you bookmark some location in your browser
+this bookmark will be visible only for you.
+Use playlist for bookmarks for all users of the RULES site.
+"			>i</div>
 			<div class="playlist_ctrl">
-				<div class="button" onclick="p_NewOnClick()" title="Create new folder">+Folder</div>
+				<div class="button" onclick="p_NewOnClick()" title="Create new folder">+Dir</div>
 				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+Link</div>
-				<div class="button" onclick="p_DelOnClick()" title="Remove current item">-</div>
+				<div class="button" ondblclick="p_DelOnClick()" title="Remove current item">-</div>
 				<div class="button" onclick="p_RenameOnClick()" title="Rename current item">Rename</div>
 			</div>
 			<div style="box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
@@ -259,6 +275,14 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 	<div id="sidepanel_upload" style="display:none;">
 		<div class="label button" onclick="up_OnClick()">Upload</div>
 		<div class="body">
+			<div class="infotooltip" style="float: right; margin: 2px 4px;" title="Upload:
+Upload files on file-server here.
+Drag&Drop or browse files to select.
+You can upload several files at once.
+To upload images sequence use its archive.
+Better to archive images sequence folder.
+So folder will appear on unpack.
+"			>i</div>
 			<div style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					title="Start unload all selected files" onclick="up_StartAll()">Start</div>
@@ -358,7 +382,8 @@ Hidden folders increase system speed.">
 	<div class="panel">
 		<a class="button" id="navigate_root">Root</a>
 		<a class="button" id="navigate_up">Up</a>
-		<div id="news_count" title="News Counter" onclick="u_SidePanelOpen();nw_NewsOpen()"></div>
+		<div id="news_count" onclick="u_SidePanelOpen();nw_NewsOpen()" title="News Counter
+Click to refresh and open news"></div>
 		<div id="assets"></div>
 	</div>
 </div>
