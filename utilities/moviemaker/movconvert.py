@@ -82,6 +82,12 @@ if Codec == '':
 		Output += '.q' + str(Options.qscale)
 	elif Options.type == 'dpx':
 		args.extend(['-pix_fmt','gbrp10be'])
+	elif Options.type == 'tif' or Options.type == 'tif8':
+		args.extend(['-pix_fmt','rgb24'])
+		Options.type = 'tif'
+	elif Options.type == 'tif16':
+		args.extend(['-pix_fmt','rgb48le'])
+		Options.type = 'tif'
 
 	if Options.resize != '':
 		resize = Options.resize.split('x')
