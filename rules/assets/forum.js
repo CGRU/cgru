@@ -1,9 +1,9 @@
 function forum_Init()
 {
 	a_SetLabel('Ask New Question');
-	n_Request({"send":{"getfile":'rules/assets/forum.html'},"func":u_BodyReceived,"info":'get forum.html',"parse":false});
+	n_Request({"send":{"getfile":'rules/assets/forum.html'},"func":forum_InitHTML,"info":'get forum.html',"parse":false});
 }
-function forum_Received( i_data)
+function forum_InitHTML( i_data)
 {
 	$('asset').innerHTML = i_data;
 
