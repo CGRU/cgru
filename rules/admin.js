@@ -683,7 +683,7 @@ function ad_WriteGroups()
 function ad_ChangeTitleOnCkick( i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeTitle',"param":i_user_id,"value":g_users[i_user_id].title,
-		"name":'users',"title":'Change Title',"info":'Enter New Title'});
+		"name":'users',"title":'Change Title',"info":'Enter new title for ' + c_GetUserTitle(i_user_id)});
 }
 function ad_ChangeTitle( i_title, i_user_id)
 {
@@ -692,7 +692,7 @@ function ad_ChangeTitle( i_title, i_user_id)
 function ad_ChangeRoleOnCkick( i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeRole',"param":i_user_id,"value":g_users[i_user_id].role,
-		"name":'users',"title":'Change Role',"info":'Enter New Role'});
+		"name":'users',"title":'Change Role',"info":'Enter new role for ' + c_GetUserTitle(i_user_id)});
 }
 function ad_ChangeRole( i_role, i_user_id)
 {
@@ -701,7 +701,7 @@ function ad_ChangeRole( i_role, i_user_id)
 function ad_ChangeEmailOnCkick( i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeEmail',"param":i_user_id,"value":g_users[i_user_id].email,
-		"name":'users',"title":'Change Email',"info":'Enter New Address'});
+		"name":'users',"title":'Change Email',"info":'Enter new email for ' + c_GetUserTitle(i_user_id)});
 }
 function ad_ChangeEmail( i_email, i_user_id)
 {
@@ -758,7 +758,7 @@ function ad_SetPasswordDialog( i_user_id)
 	pw = btoa( pw).substr( 0, 60);
 //	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', pw, 'password', 'Set Password', 'Enter New Password');
 	new cgru_Dialog({"handle":'ad_SetPassword',"param":i_user_id,"value":pw,
-		"name":'password',"title":'Set Password',"info":'Enter New Password'});
+		"name":'password',"title":'Set Password',"info":'Enter new password for ' + c_GetUserTitle(i_user_id)});
 }
 function ad_SetPassword( i_passwd, i_user_id)
 {
