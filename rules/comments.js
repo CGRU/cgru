@@ -509,20 +509,24 @@ Comment.prototype.save = function()
 	edit.file = c_GetRuFilePath( cm_file);
 
 //window.console.log( JSON.stringify( edit));
-	res = c_Parse( n_Request({"send":{"editobj":edit}}));
-	if( c_NullOrErrorMsg( res)) return;
+//	res = c_Parse( n_Request({"send":{"editobj":edit}}));
+	n_Request({"send":{"editobj":edit},"func":this.saveFinished,"this":this});
+}
+Comment.prototype.saveFinished = function( i_data, i_args)
+{
+	if( c_NullOrErrorMsg( i_data)) return;
 
-	var news_user = this.obj.user_name;
-	if( this.obj.muser_name ) news_user = this.obj.muser_name;
+	var news_user = i_args.this.obj.user_name;
+	if( i_args.this.obj.muser_name ) news_user = i_args.this.obj.muser_name;
 
 	var news_title = 'comment';
-	if( this.obj.type == 'report' ) news_title = 'report';
+	if( i_args.this.obj.type == 'report' ) news_title = 'report';
 
-	nw_MakeNews({"title":news_title,"path":g_CurPath(),"user":news_user,"guest":this.obj.guest});
+	nw_MakeNews({"title":news_title,"path":g_CurPath(),"user":news_user,"guest":i_args.this.obj.guest});
 
-	this.updateStatus();
+	i_args.this.updateStatus();
 
-	this.sendEmails();
+	i_args.this.sendEmails();
 }
 
 Comment.prototype.sendEmails = function()
