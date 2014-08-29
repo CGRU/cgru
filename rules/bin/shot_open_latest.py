@@ -17,7 +17,7 @@ Parser = OptionParser(
 	version="%prog 1.0"
 )
 
-Parser.add_option('-f', '--folder',   dest='folder',   type='string',       default='WORK', help='Frames per second')
+Parser.add_option('-f', '--folder',   dest='folder',   type='string',       default='WORK', help='"WORK" folder')
 Parser.add_option('-s', '--soft',     dest='soft',     type='string',       default='nuke', help='Software type')
 Parser.add_option('-e', '--ext',      dest='ext',      type='string',       default='.nk',  help='Software file extension')
 Parser.add_option('-r', '--run',      dest='run',      type='string',       default='nuke', help='Software run command')
@@ -50,6 +50,8 @@ if len( Args) == 0:
 SceneFolder = Args[0]
 if not os.path.isdir( SceneFolder):
 	errExit('Path does not exist.')
+os.chdir( SceneFolder)
+
 SceneFile = ''
 SceneFolder = os.path.join( SceneFolder, Options.folder)
 
