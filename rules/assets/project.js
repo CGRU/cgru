@@ -139,6 +139,10 @@ function prj_ShotsDeployFinished( i_data, i_args)
 	var deploy = i_data.cmdexec[0].deploy;
 //elResults.textContent = 'd:'+JSON.stringify( deploy);return;
 
+	var el = document.createElement('div');
+	elResults.appendChild( el);
+	el.textContent = deploy.length + ' shots founded:';
+
 	for( var d = deploy.length - 1; d >= 0; d--)
 	{
 		var el = document.createElement('div');
