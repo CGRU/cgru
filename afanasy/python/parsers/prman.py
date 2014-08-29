@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from parsers import parser
+import re
 
+IMAGE = r'mode = rgba'
 
 class prman(parser.parser):
 	"""PIXAR's RenderMan
@@ -17,6 +19,16 @@ class prman(parser.parser):
 		:param mode:
 		:return:
 		"""
+
+		lines = data.split('\n')
+		for line in lines:
+			pattern = re.compile(IMAGE)
+			res = pattern.search(line)
+			if res != None:
+				quotes = re.split("\"", line)
+				if quotes[1] != "":
+					self.appendFile(quotes[1].strip())
+
 		# print 'Parsing "prman":'
 		# print data
 		data_len = len(data)
