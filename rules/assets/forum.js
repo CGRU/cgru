@@ -111,7 +111,7 @@ function forum_StatusSaved( i_data, i_args)
 
 	var question = i_args.args;
 
-	nw_MakeNews({"title":'question',"path":question.older,"user":question.user_id,"guest":question.guest});
+	nw_MakeNews({"title":'question',"path":question.folder,"user":question.user_id,"guest":question.guest});
 	g_GO( question.folder);
 }
 
