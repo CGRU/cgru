@@ -173,6 +173,16 @@ function g_NavigatePost()
 
 	$('navigate_up').href = '#' + c_PathDir( g_CurPath());
 
+	if( g_elCurFolder.m_elNext )
+		$('navigate_next').href = '#' + g_elCurFolder.m_elNext.m_path;
+	else
+		$('navigate_next').href = '#' + g_elCurFolder.m_path;
+
+	if( g_elCurFolder.m_elPrev )
+		$('navigate_prev').href = '#' + g_elCurFolder.m_elPrev.m_path;
+	else
+		$('navigate_prev').href = '#' + g_elCurFolder.m_path;
+
 	g_POST('navig');
 }
 
@@ -463,6 +473,14 @@ function g_AppendFolder( i_elParent, i_fobject)
 		if( i_fobject.num_folders_total ) title += '\nTotal folders count: ' + i_fobject.num_folders_total;
 		if( i_fobject.num_files_total   ) title += '\nTotal files count: ' + i_fobject.num_files_total;
 		elFolder.m_elSize.title = title;
+	}
+
+	// set next element to previous folder:
+	if( i_elParent.m_elFolders && i_elParent.m_elFolders.length )
+	{
+		var elPrev = i_elParent.m_elFolders[i_elParent.m_elFolders.length-1];
+		elPrev.m_elNext = elFolder;
+		elFolder.m_elPrev = elPrev;
 	}
 
 	i_elParent.appendChild( elFolder);
