@@ -6,6 +6,10 @@ function shot_Init()
 
 	a_SetLabel('Shot');
 
+	a_SetTooltip('Info:\n\
+This is Shot asset.\n\
+It is designed to view shot sources and results on one page.\n');
+
 	// Get page:
 	n_Request({"send":{"getfile":'rules/assets/shot.html'},"func":shot_InitHTML,"info":'get shot.html',"parse":false});
 }

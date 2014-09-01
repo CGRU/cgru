@@ -14,13 +14,9 @@ function cm_Load()
 	$('comments').textContent = '';
 	if( ASSET && ASSET.comments_reversed )
 	{
-		$('comments_btn_0').style.display = 'none';
-		$('comments_btn_1').style.display = 'block';
-	}
-	else
-	{
-		$('comments_btn_0').style.display = 'block';
-		$('comments_btn_1').style.display = 'none';
+		var el = $('comments_btn_add');
+		$('comments_show').removeChild( el);
+		$('comments_show').appendChild( el);
 	}
 
 	cm_array = [];
@@ -77,8 +73,8 @@ function Comment( i_obj)
 	this.elEdit = document.createElement('div');
 	this.elPanel.appendChild( this.elEdit);
 	this.elEdit.classList.add('button');
-	this.elEdit.textContent = 'Edit';
-	this.elEdit.title = 'Edit comment (admins only).';
+	this.elEdit.classList.add('edit');
+	this.elEdit.title = 'Edit comment';
 	this.elEdit.onclick = function(e){ e.currentTarget.m_comment.edit();};
 	this.elEdit.m_comment = this;
 

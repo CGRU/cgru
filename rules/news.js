@@ -94,12 +94,13 @@ function nw_UpdateChannels()
 		nw_path = g_auth_user.channels[i].id;
 		var el = document.createElement('div');
 		$('channels').appendChild( el);
+		el.classList.add('channel');
 		el.title = 'Subscribed by '+g_auth_user.channels[i].user+' at\n'+c_DT_StrFromSec( g_auth_user.channels[i].time);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
-		elBtn.textContent = '-';
+		elBtn.classList.add('delete');
 		elBtn.m_path = nw_path;
 		elBtn.ondblclick = function(e){ nw_Unsubscribe( e.currentTarget.m_path);};
 		elBtn.title = 'Double click to remove channel';
@@ -136,7 +137,7 @@ function nw_Process()
 			{
 				$('subscribe_path').style.display = 'block';
 				$('unsubscribe_btn').style.display = 'none';
-				$('subscribe_path').innerHTML = 'at <a href="#'+nw_path+'">'+nw_path+'</a>';
+				$('subscribe_path').innerHTML = '<a href="#'+nw_path+'">'+nw_path+'</a>';
 			}
 			break;
 		}
@@ -396,6 +397,7 @@ function nw_NewsShow( i_news)
 		var el = document.createElement('div');
 		$('news').appendChild( el);
 		$('news').m_elArray.push( el);
+		el.classList.add('news');
 		el.m_news = news;
 
 		el.title = c_DT_StrFromSec( news.time);
@@ -405,7 +407,7 @@ function nw_NewsShow( i_news)
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
-		elBtn.textContent = '-';
+		elBtn.classList.add('delete');
 		elBtn.m_id = news.id;
 		elBtn.ondblclick = function(e){ nw_DeleteNews([e.currentTarget.m_id]);};
 		elBtn.title = 'Double click to remove link';

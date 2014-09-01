@@ -10,8 +10,6 @@ sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px',"bool":true,"toolt
 
 sc_thumb_params_values = {};
 
-sc_frames_total = 0;
-
 sc_scenes = false;
 
 if( ASSETS.scene && ( ASSETS.scene.path == g_CurPath()))
@@ -179,10 +177,11 @@ function scenes_Received( i_data, i_args)
 		sc_elScenes.push( elScene);
 		elScene.m_hidden = false;
 		elScene.m_elThumbnails = [];
+		elScene.m_elShots = [];
 		$('scenes_div').appendChild( elScene);
 		elScene.classList.add('scene');
 		elScene.m_path = ASSET.path + '/' + fobj.name;
-//		elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
+		elScene.onclick = function(e){scenes_SelectScene(e.currentTarget)};
 
 		var elName = document.createElement('a');
 		elScene.appendChild( elName);
@@ -207,6 +206,7 @@ function scenes_Received( i_data, i_args)
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);
+			elScene.m_elShots.push( elShot);
 			elShot.m_status = fobj.status;
 			elShot.m_hidden = false;
 			elScene.appendChild( elShot);
@@ -297,6 +297,7 @@ function sc_EditStatus( e)
 
 function sc_ShotClicked( i_evt)
 {
+	i_evt.stopPropagation();
 	var el = i_evt.currentTarget;
 	sc_SelectShot( el, el.m_selected !== true );
 	if( i_evt.shiftKey && sc_elCurShot )
@@ -318,7 +319,8 @@ function sc_ShotClicked( i_evt)
 	}
 	sc_elCurShot = el;
 
-	c_Info( scenes_GetSelectedShots().length + ' shots selected.');
+//	c_Info( scenes_GetSelectedShots().length + ' shots selected.');
+	sc_DisplayStatistics();
 }
 function sc_SelectShot( i_elShot, i_select)
 {
@@ -337,6 +339,8 @@ function scenes_SelectAll( i_select)
 {
 	for( var i = 0; i < sc_elShots.length; i++)
 		sc_SelectShot( sc_elShots[i], i_select);
+
+	sc_DisplayStatistics();
 }
 function scenes_SelectPlaylist()
 {
@@ -345,13 +349,38 @@ function scenes_SelectPlaylist()
 	for( var i = 0; i < sc_elShots.length; i++)
 		if( shots.indexOf( sc_elShots[i].m_path) != -1 )
 			sc_SelectShot( sc_elShots[i], true);
+
+	sc_DisplayStatistics();
 }
+function scenes_SelectScene( i_elScene)
+{
+	var shots = i_elScene.m_elShots;
+	if( shots.length == 0 )
+		return;
+
+	var select = shots[0].m_selected != true;
+
+	for( var i = 0; i < shots.length; i++)
+	{
+		sc_SelectShot( shots[i], select);
+	}
+
+	sc_DisplayStatistics();
+}
+
 function scenes_GetSelectedShots()
 {
 	var shots = [];
 	for( var i = 0; i < sc_elShots.length; i++)
-		if( sc_elShots[i].m_selected === true )
-			shots.push( sc_elShots[i]);
+	{
+		if( sc_elShots[i].m_selected != true )
+			continue;
+
+		if( sc_elShots[i].m_hidden )
+			continue;
+
+		shots.push( sc_elShots[i]);
+	}
 	return shots;
 }
 function sc_SkipFolder( i_name)
@@ -521,47 +550,65 @@ function sc_ShowAllShots()
 
 function sc_DisplayStatistics()
 {
-	// Shots count, progress, frames count:
-	//
-	var shots = 0;
-	var progress = 0;
+	var selShots = scenes_GetSelectedShots();
+//	c_Info( selShots.length + ' shots selected.');
+
+	var shots = [];
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
-		if( sc_elShots[i].m_hidden ) continue;
-		shots++;
-		var stat = sc_elShots[i].m_status.obj;
+		if( sc_elShots[i].m_hidden == true )
+			continue;
+
+		if( selShots.length && ( sc_elShots[i].m_selected != true ))
+			continue;
+
+		shots.push( sc_elShots[i]);
+	}
+
+	// Shots count, progress, frames count:
+	//
+	var progress = 0;
+	var frames_count = 0;
+	for( var i = 0; i < shots.length; i++)
+	{
+		var stat = shots[i].m_status.obj;
 		if( stat == null) continue;
 		if( stat.progress && ( stat.progress > 0 ))
 			progress += stat.progress;
 		if( stat.frames_num )
-			sc_frames_total += stat.frames_num;
+			frames_count += stat.frames_num;
 	}
 
-	var info = 'Shots Count: ' + shots;
-	if( shots )
-		info += ' Shots Progress: ' + Math.round(progress/shots) + '%';
+	var info = 'Shots Count: ' + shots.length;
+	if( shots.length )
+		info += ' Shots Progress: ' + Math.round(progress/shots.length) + '%';
 
 	if( ASSET.type == 'scenes')
 	{
-		var scenes = 0;
+		var scenes_count = 0;
 		for( var i = 0; i < sc_elScenes.length; i++)
 		{
-			if( sc_elScenes[i].m_hidden ) continue;
-			scenes++;
+			for( var s = 0; s < sc_elScenes[i].m_elShots.length; s++ )
+			{
+				if( shots.indexOf( sc_elScenes[i].m_elShots[s]) != -1 )
+				{
+					scenes_count++;
+					break;
+				}
+			}
 		}
-		info = ' Scenes Count: ' + scenes + ' ' + info;
+		info = ' Scenes Count: ' + scenes_count + ' ' + info;
 	}
 
-	if( sc_frames_total ) info += ' Frames count: ' + sc_frames_total + ' = ' + c_DT_DurFromSec( sc_frames_total / RULES.fps);
+	if( frames_count ) info += ' Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps);
 
 	$('scenes_info').textContent = info;
 
 	// Statistics:
 	//
 	var statuses = [];
-	for( var i = 0; i < sc_elShots.length; i++)
-		if( sc_elShots[i].m_hidden !== true )
-			statuses.push( sc_elShots[i].m_status.obj);
+	for( var i = 0; i < shots.length; i++)
+		statuses.push( shots[i].m_status.obj);
 
 	var args = {};
 	args.statuses = statuses;

@@ -47,6 +47,18 @@ function FilesView( i_args)
 		title = ASSET.name;
 	elTitle.textContent = title;
 
+	el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('infotooltip');
+	el.style.cssFloat = 'right';
+//	el.style.cssFloat = 'left';
+	el.title = "This is files view.\n\
+You can create folder,\n\
+arhive and unpack,\n\
+convert images/movies,\n\
+put in other location (may be FTP),\n\
+genetate thumbnails.";
+
 	c_CreateOpenButton( this.elPanel, this.path);
 
 	var elPath = document.createElement('a');
@@ -63,18 +75,18 @@ function FilesView( i_args)
 
 	if( this.can_refresh )
 	{
-		var elRefteshBtn = document.createElement('div');
-		this.elPanel.appendChild( elRefteshBtn);
-		elRefteshBtn.classList.add('button');
-		elRefteshBtn.innerHTML = '&#10227;';
-		elRefteshBtn.title = 'Refresh this files view';
-		elRefteshBtn.m_view = this;
-		elRefteshBtn.onclick = function(e){ e.currentTarget.m_view.refresh()};
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/refresh.png)';
+		el.title = 'Refresh this files view';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.refresh()};
 
 		var el = document.createElement('div');
 		this.elPanel.appendChild( el);
 		el.classList.add('button');
-		el.textContent = '+F';
+		el.style.backgroundImage = 'url(rules/icons/folder_new.png)';
 		el.title = 'Add a new folder';
 		el.m_view = this;
 		el.onclick = function(e){ e.currentTarget.m_view.makeFolder()};
@@ -86,31 +98,15 @@ function FilesView( i_args)
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.textContent = 'SA';
+	el.style.backgroundImage = 'url(rules/icons/select.png)';
 	el.title = 'Select all';
 	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.selectAll( true)};
+	el.onclick = function(e){ e.currentTarget.m_view.selectAll()};
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.textContent = 'SN';
-	el.title = 'Select none';
-	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.selectAll( false)};
-
-	var el = document.createElement('div');
-	this.elPanel.appendChild( el);
-	el.classList.add('button');
-	el.textContent = 'PUT';
-	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.put();}
-	el.title = 'Put selected folders';
-
-	var el = document.createElement('div');
-	this.elPanel.appendChild( el);
-	el.classList.add('button');
-	el.textContent = 'CVT';
+	el.style.backgroundImage = 'url(rules/icons/convert.png)';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.convert();}
 	el.title = 'Convert selected sequences (folders) or movies (files)';
@@ -118,7 +114,7 @@ function FilesView( i_args)
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.textContent = 'A';
+	el.style.backgroundImage = 'url(rules/icons/archive.png)';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.archivate();}
 	el.title = 'Archivate foles and folders';
@@ -126,18 +122,18 @@ function FilesView( i_args)
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.textContent = 'X';
+	el.style.backgroundImage = 'url(rules/icons/put.png)';
 	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.extract();}
-	el.title = 'Extract files from archives';
+	el.onclick = function(e){ e.currentTarget.m_view.put();}
+	el.title = 'Put selected folders';
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.textContent = 'W';
+	el.style.backgroundImage = 'url(rules/icons/walk.png)';
 	el.m_path = this.path;
 	el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
-	el.title = 'Send Walk job to AFANASY';
+	el.title = 'Top secret feature.';
 
 	if( this.has_thumbs )
 	{
@@ -145,34 +141,34 @@ function FilesView( i_args)
 		this.elPanel.appendChild( elThumbDiv);
 		elThumbDiv.classList.add('thumbsdiv');
 
-		var elThumbBigger = document.createElement('div');
-		elThumbDiv.appendChild( elThumbBigger);
-		elThumbBigger.classList.add('button');
-		elThumbBigger.textContent = '+';
-		elThumbBigger.m_view = this;
-		elThumbBigger.onclick = function(e){ e.currentTarget.m_view.thumbsBigger()};
-		elThumbBigger.title = 'Show thumbnails bigger';
+		var el = document.createElement('div');
+		elThumbDiv.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/increase.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.thumbsBigger()};
+		el.title = 'Show thumbnails bigger';
 
-		var elThumbSmaller = document.createElement('div');
-		elThumbDiv.appendChild( elThumbSmaller);
-		elThumbSmaller.classList.add('button');
-		elThumbSmaller.textContent = '-';
-		elThumbSmaller.m_view = this;
-		elThumbSmaller.onclick = function(e){ e.currentTarget.m_view.thumbsSmaller()};
-		elThumbSmaller.title = 'Show thumbnails smaller';
+		var el = document.createElement('div');
+		elThumbDiv.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/decrease.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.thumbsSmaller()};
+		el.title = 'Show thumbnails smaller';
 
-		var elThumbCrop = document.createElement('div');
-		elThumbDiv.appendChild( elThumbCrop);
-		elThumbCrop.classList.add('button');
-		elThumbCrop.textContent = '[c]';
-		elThumbCrop.m_view = this;
-		elThumbCrop.onclick = function(e){ e.currentTarget.m_view.thumbsCrop()};
-		elThumbCrop.title = 'Show thumbnails cropped';
+		var el = document.createElement('div');
+		elThumbDiv.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/crop.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.thumbsCrop()};
+		el.title = 'Show thumbnails cropped';
 
 		this.elThumbsBtn = document.createElement('div');
 		elThumbDiv.appendChild( this.elThumbsBtn);
 		this.elThumbsBtn.classList.add('button');
-		this.elThumbsBtn.textContent = 'Thumbs:';
+		this.elThumbsBtn.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
 		this.elThumbsBtn.m_view = this;
 		this.elThumbsBtn.onclick = function(e){ e.currentTarget.m_view.thumbsMake()};
 		this.elThumbsBtn.title = 'Generate thumbnails';
@@ -455,22 +451,23 @@ FilesView.prototype.showFolder = function( i_folder)
 	var elOpen = c_CreateOpenButton( elFolder, path);
 	if( elOpen ) elOpen.style.cssFloat = 'left';
 
-	var elLinkA = document.createElement('a');
-	elFolder.appendChild( elLinkA);
-	elLinkA.setAttribute('href', '#'+path);
-	elLinkA.textContent = name;
+	var el = document.createElement('a');
+	elFolder.appendChild( el);
+	el.setAttribute('href', '#'+path);
+	el.textContent = name;
 
 	if( ASSET && (( ASSET.path != g_CurPath()) || ( ASSET.play_folders !== false )))
 	{
 		var play_path = path;
 		if( ASSET.path ) play_path = play_path.replace(ASSET.path, ASSET.path + '/');
-		var elLinkA = document.createElement('a');
-		elFolder.appendChild( elLinkA);
-		elLinkA.setAttribute('href', 'player.html#'+play_path);
-		elLinkA.setAttribute('target', '_blank');
-		elLinkA.textContent = 'play';
-		elLinkA.title = "Open RULES player in a new window.";
-		elLinkA.style.cssFloat = 'right';
+		var el = document.createElement('a');
+		elFolder.appendChild( el);
+		el.classList.add('button');
+		el.setAttribute('href', 'player.html#'+play_path);
+		el.setAttribute('target', '_blank');
+		el.style.backgroundImage = 'url(rules/icons/player.png)';
+		el.title = "Open RULES player in a new window.";
+		el.style.cssFloat = 'right';
 	}
 
 	if( RULES.has_filesystem !== false )
@@ -497,13 +494,13 @@ FilesView.prototype.showFolder = function( i_folder)
 		if( ASSET && ( ASSET.dailies ))
 			out_path = ASSET.path+'/'+ASSET.dailies.path[0];
 
-		var elMakeDailies = document.createElement('div');
-		elFolder.appendChild( elMakeDailies);
-		elMakeDailies.classList.add('button');
-		elMakeDailies.textContent = 'Dailies';
-		elMakeDailies.title = 'Make dailies';
-		elMakeDailies.m_path = path;
-		elMakeDailies.onclick = function(e){
+		var el = document.createElement('div');
+		elFolder.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/dailies.png)';
+		el.title = 'Make dailies';
+		el.m_path = path;
+		el.onclick = function(e){
 			e.stopPropagation();
 			d_Make( e.currentTarget.m_path, out_path)};
 	}
@@ -516,24 +513,26 @@ FilesView.prototype.showFile = function( i_file)
 	var path = this.path + '/' + i_file.name;
 
 	var elFile = this.createItem( path, i_file);
+	elFile.classList.add('file');
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFile, path, 'file');
 
-	var elLinkA = document.createElement('a');
-	elFile.appendChild( elLinkA);
-	elLinkA.href = RULES.root + path;
-	elLinkA.target = '_blank';
-	elLinkA.textContent = i_file.name;
+	var el = document.createElement('a');
+	elFile.appendChild( el);
+	el.href = RULES.root + path;
+	el.target = '_blank';
+	el.textContent = i_file.name;
 
 	if( c_FileCanEdit( i_file.name))
 	{
-		var elLinkA = document.createElement('a');
-		elFile.appendChild( elLinkA);
-		elLinkA.setAttribute('href', 'player.html#'+path);
-		elLinkA.setAttribute('target', '_blank');
-		elLinkA.textContent = 'edit';
-		elLinkA.style.cssFloat = 'right';
+		var el = document.createElement('a');
+		elFile.appendChild( el);
+		el.setAttribute('href', 'player.html#'+path);
+		el.setAttribute('target', '_blank');
+		el.classList.add('button');
+		el.classList.add('edit');
+		el.style.cssFloat = 'right';
 	}
 
 	if( c_FileIsMovie( i_file.name))
@@ -563,15 +562,15 @@ FilesView.prototype.showFile = function( i_file)
 
 	if( elFile.m_preview_file )
 	{
-		var elPreviewBtn = document.createElement('div');
-		elFile.m_elPreviewBtn = elPreviewBtn;
-		elFile.appendChild( elPreviewBtn);
-		elPreviewBtn.classList.add('preview_btn');
-		elPreviewBtn.classList.add('button');
-		elPreviewBtn.innerHTML = '&#9655;';
-		elPreviewBtn.title = "Preview";
-		elPreviewBtn.m_el_file = elFile;
-		elPreviewBtn.onclick = function(e){ e.stopPropagation(); fv_PreviewOpen(e.currentTarget.m_el_file);};
+		var el = document.createElement('div');
+		elFile.m_elPreviewBtn = el;
+		elFile.appendChild( el);
+		el.classList.add('preview_btn');
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/play.png)';
+		el.title = "Preview";
+		el.m_el_file = elFile;
+		el.onclick = function(e){ e.stopPropagation(); fv_PreviewOpen(e.currentTarget.m_el_file);};
 	}
 }
 
@@ -621,8 +620,17 @@ FilesView.prototype.selectItem = function( i_el, i_select)
 }
 FilesView.prototype.selectAll = function( i_select)
 {
+	if( i_select == null )
+	{
+		if( this.getSelected().length == this.elItems.length )
+			i_select = false;
+		else
+			i_select = true;
+	}
+
 	for( var i = 0; i < this.elItems.length; i++)
 		this.selectItem( this.elItems[i], i_select);
+
 	if( i_select == false )
 	{
 		fv_cur_item = null;
@@ -632,6 +640,16 @@ FilesView.prototype.selectAll = function( i_select)
 		c_Info('All items selected.');
 }
 FilesView.prototype.selectNone = function() { this.selectAll( false); }
+
+FilesView.prototype.getSelected = function()
+{
+	var o_items = []
+	for( var i = 0; i < this.elItems.length; i++)
+		if( this.elItems[i].m_selected )
+			o_items.push( this.elItems[i]);
+	return o_items;
+}
+
 FilesView.prototype.put = function()
 {
 	var args = {};
@@ -686,27 +704,42 @@ FilesView.prototype.convert = function()
 
 FilesView.prototype.archivate = function()
 {
-	var args = {"archive":true,"paths":[]};
-	for( var i = 0; i < this.elItems.length; i++)
-		if( this.elItems[i].m_selected )
-			args.paths.push( this.elItems[i].m_path);
+	var args = {};
+	args.paths = [];
+	args.archive = true;
+
+	var items = this.getSelected();
+	for( var i = 0; i < items.length; i++)
+	{
+		if( args.paths.length == 0 )
+		{
+			if( items[i].classList.contains('file') && c_FileIsArchive( items[i].m_path))
+			{
+				args.archive = false;
+				args.extract = true;
+			}
+			else
+				args.extract = false;
+		}
+		else
+		{
+			if( items[i].classList.contains('file') && c_FileIsArchive( items[i].m_path))
+			{
+				if( args.archive )
+					continue;
+			}
+			else
+			{
+				if( args.extract )
+					continue;
+			}
+		}
+
+		args.paths.push( items[i].m_path);
+	}
+
 	if( args.paths.length < 1 )
 		c_Error('No items selected.');
-	else
-		fu_Archivate( args);
-}
-
-FilesView.prototype.extract = function()
-{
-	var args = {"extract":true,"paths":[]};
-	for( var i = 0; i < this.elItems.length; i++)
-	{
-		if( this.elItems[i].m_selected != true ) continue;
-		if( this.elItems[i].classList.contains('folder')) continue;
-		args.paths.push( this.elItems[i].m_path);
-	}
-	if( args.paths.length < 1 )
-		c_Error('No archives selected.');
 	else
 		fu_Archivate( args);
 }
@@ -849,13 +882,16 @@ function fv_PreviewOpen( i_el)
 	elPreview.classList.add('preview');
 	elPreview.onclick = function(e){e.stopPropagation();};
 
-	var elPreviewClose = document.createElement('div')
-	elPreview.appendChild( elPreviewClose);
-	elPreviewClose.classList.add('close');
-	elPreviewClose.classList.add('button');
-	elPreviewClose.textContent = 'X';
-	elPreviewClose.m_el_file = i_el;
-	elPreviewClose.onclick = function(e){e.stopPropagation(); fv_PreviewClose( e.currentTarget.m_el_file);};
+	var el = document.createElement('div')
+	elPreview.appendChild( el);
+	el.classList.add('close');
+	el.classList.add('button');
+//	el.textContent = 'X';
+	el.style.backgroundImage = 'url(rules/icons/delete.png)';
+//	el.style.width = '16px';
+//	el.style.height = '16px';
+	el.m_el_file = i_el;
+	el.onclick = function(e){e.stopPropagation(); fv_PreviewClose( e.currentTarget.m_el_file);};
 
 	var elVideo = document.createElement('video');
 	elPreview.appendChild( elVideo);

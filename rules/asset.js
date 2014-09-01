@@ -17,6 +17,7 @@ function a_Finish()
 	ASSET = null;
 
 	a_SetLabel('Asset');
+	$('asset_tooltip').style.display = 'none';
 	$('asset_div').style.display = 'none';
 	u_el.assets.innerHTML = '';
 	u_el.asset.innerHTML = '';
@@ -25,6 +26,12 @@ function a_Finish()
 function a_SetLabel( i_label)
 {
 	$('asset_label').innerHTML = i_label;
+}
+
+function a_SetTooltip( i_info)
+{
+	$('asset_tooltip').style.display = 'block';
+	$('asset_tooltip').title = i_info;
 }
 
 function a_Show()

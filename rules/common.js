@@ -7,7 +7,7 @@ c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg','flv'];
 c_movieTypesHTML = ['ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
-c_archives = ['zip','7z'];
+c_archives = ['zip','rar','7z'];
 
 c_logCount = 0;
 c_elLogs = [];
@@ -338,8 +338,8 @@ function c_CreateOpenButton( i_el, i_path)
 	if( RULES.has_filesystem === false ) return null;
 	var el = document.createElement('div');
 	i_el.appendChild( el);
-	el.textContent = 'Open';
 	el.classList.add('cmdexec');
+	el.classList.add('open');
 	var cmd = RULES.cmdexec.open_folder;
 	cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
 	el.setAttribute('cmdexec', JSON.stringify([cmd]));

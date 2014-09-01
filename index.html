@@ -49,8 +49,11 @@ if( document.location.host.indexOf('cgru.info') != -1 )
 		<div class="infotooltip" style="float: left; margin: 1px 4px;" title="Navigation Controls:
 LMB - goto folder (set current)
 LMB on the current folder - open/close
-RMB - open/close folder (faster)"
-			>i</div>
+RMB - open/close folder (faster)
+
+Use [ART],[TAG],[ANN] buttons
+to show/hige folder status info."
+			></div>
 		<div class="button" id="navig_show_artists"    title="Show artists"    onclick="g_NavigShowInfo(this)">ART</div>
 		<div class="button" id="navig_show_tags"       title="Show tags"       onclick="g_NavigShowInfo(this)">TAG</div>
 		<div class="button" id="navig_show_annotation" title="Show annotation" onclick="g_NavigShowInfo(this)">ANN</div>
@@ -68,9 +71,11 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 	<div id="panel">
 		<div id="subscribe" style="display:none">
 			<div id="subscribe_btn" class="button" title="Receive this location changes" onclick="nw_Subscribe()">Subscribe</div>
-			<div id="subscribe_label">Subscribed</div>
+			<div id="subscribe_label">Subscribed at</div>
 			<div id="unsubscribe_btn" class="button" title="Do not receive changes from this location" onclick="nw_Unsubscribe()">Unsubscribe</div>
-			<div id="subscribe_path" title="Subscribed parent location"></div>
+			<div id="subscribe_path"
+				style="font: 12px monospace; box-shadow: 0 0 2px #000000 inset; padding: 2px 8px; margin: 2px 8px;"
+				title="Subscribed parent location"></div>
 			<div id="news_make" class="button" title="Create some custom news" onclick="nw_MakeNewsDialog()">Make News</div>
 			<div id="news_disable" class="button" title="If news disabled, your changes does not produce any news" onclick="nw_DisableNewsToggle( true)"></div>
 			<div id="news_ignore_own" class="button" title="If you ignoring own news, you do not receive changes performed by yourself" onclick="nw_IgnoreOwnToggle( true)"></div>
@@ -138,7 +143,12 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 	<div style="text-align:center;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
 	<div id="status">
 		<div id="status_show">
-			<div id="status_edit_btn" class="button" style="display:none; float:right; font-size:10px;">Edit</div>
+			<div class="infotooltip" style="float: left;" title="Info:
+This is current location (folder,shot,project) status.
+Artist, working whith the shot, should be assigned here.
+Supervisor can assign artist by creating a task."
+				></div>
+			<div id="status_edit_btn" class="button edit" title="Edit status" style="display:none; float:right; font-size:10px;"></div>
 			<div id="status_percentage"></div>
 			<div id="status_annotation"></div>
 			<div id="status_artists" class="artists"></div>
@@ -160,42 +170,82 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 		</div>
 	</div>
 	<div id="asset_div" class="view">
-		<div id="asset_btn" class="button openclose" onclick="u_OpenCloseView('asset')">-</div>
-		<div id="asset_label" style="text-align:center; margin-top: 4px;">Asset</div>
-		<div id="asset"></div>
+		<div class="button show" onclick="u_OpenCloseView('asset')"
+			title="Show asset view">Asset</div>
+		<div class="view_show">
+			<div id="asset_tooltip" class="infotooltip" style="float: right; margin: 2px; display: none;"></div>
+			<div class="button openclose" onclick="u_OpenCloseView('asset')"
+				title="Hide asset view"></div>
+			<div id="asset_label" style="text-align:center; margin-top: 4px;">Asset</div>
+			<div id="asset" class="view_view"></div>
+		</div>
 	</div>
 	<div id="files_div" class="view">
-		<div id="files_btn" class="button openclose" onclick="u_OpenCloseView('files')">-</div>
-		<div id="files_label" style="text-align:center; margin-top: 4px;">Files</div>
-		<div id="files"></div>
+		<div class="button show" onclick="u_OpenCloseView('files')"
+			title="Show files">Files</div>
+		<div class="view_show">
+			<div class="button openclose" onclick="u_OpenCloseView('files')"
+				title="Hide files"></div>
+			<div class="infotooltip" style="float: left; margin: 2px 4px;" title="Info:
+Here are shown curret location files.
+"			></div>
+			<div id="files_label" style="text-align:center; margin-top: 4px;">Files</div>
+			<div id="files" class="view_view"></div>
+		</div>
 	</div>
 	<div id="body_div" class="view">
-		<div id="body_btn" class="button openclose" onclick="u_OpenCloseView('body')">-</div>
-		<div id="body_edit" style="float:right; display:none;">
-			<div id="body_btn_0" class="button" style="padding:0px 4px; float:right; display:none;"
-				onclick="u_BodyEditStart()">Edit</div>
-		</div>
-		<div id="body_label" style="text-align:center; margin-top: 4px;">Body</div>
-		<div id="body">
-			<div id="body_panel" style="padding: 1px 10px;">
-				<img id="body_avatar_c">
-				<img id="body_avatar_m">
-				<div id="body_info"></div>
+		<div class="button show" onclick="u_OpenCloseView('body')"
+			title="Show body">Body</div>
+		<div class="view_show">
+			<div class="button openclose" onclick="u_OpenCloseView('body')"
+				title="Hide body"></div>
+			<div class="infotooltip" style="float: left; margin: 2px 4px;" title="Info:
+Body is designed to show some information.
+Usually shot specification is written here.
+Project input and output format.
+"			></div>
+			<div id="body_edit" style="float:right; display:none;">
+				<div id="body_btn_edit" class="button edit" style="float:right; display:none;"
+					onclick="u_BodyEditStart()" title="Edit body"></div>
+				<div id="body_btn_edit_cancel" class="button" style="padding:0px 4px; float:right; display:none;"
+					onclick="u_BodyEditCancel()">Cancel</div>
 			</div>
-			<div id="body_panel_edit" style="display:none">
-				<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
-				<div class="toggle" id="body_edit_markup" onclick="u_BodyEditMarkup()" title="HTML Markup Mode">Markup mode</div>
-				<div class="toggle" ondblclick="u_BodyEditMarkupRemove()" title="Double click to remove all HTML markup from body">Remove all markup</div>
+			<div id="body_label" style="text-align:center; margin-top: 4px;">Body</div>
+			<div id="body" class="view_view">
+				<div id="body_panel" style="padding: 1px 10px;">
+					<img id="body_avatar_c">
+					<img id="body_avatar_m">
+					<div id="body_info"></div>
+				</div>
+				<div id="body_panel_edit" style="display:none">
+					<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
+					<div class="toggle" id="body_edit_markup" onclick="u_BodyEditMarkup()"
+						title="HTML Markup Mode">Markup mode</div>
+					<div class="toggle" ondblclick="u_BodyEditMarkupRemove()"
+						title="Double click to remove all HTML markup from body">
+						Remove all markup</div>
+				</div>
+				<div id="body_body" style="padding: 5px 10px;"></div>
 			</div>
-			<div id="body_body" style="padding: 5px 10px;"></div>
 		</div>
 	</div>
 	<div id="comments_div" class="view">
-		<div id="comments_btn" class="button openclose" onclick="u_OpenCloseView('comments')">-</div>
-		<div id="comments_btn_0" class="button" style="float:right;padding:0px 6px;" onclick="cm_NewOnClick()">New Comment</div>
-		<div id="comments_label" style="text-align:center; margin-top: 4px;">Comments</div>
-		<div id="comments"></div>
-		<div id="comments_btn_1" class="button" style="float:right;padding:0px 6px;" onclick="cm_NewOnClick()">New Comment</div>
+		<div class="button show" onclick="u_OpenCloseView('comments')"
+			title="Show comments">Comments</div>
+		<div class="view_show" id="comments_show">
+			<div class="button openclose" onclick="u_OpenCloseView('comments')"
+				title="Hide comments"></div>
+			<div class="infotooltip" style="float: left; margin: 2px 4px;" title="Info:
+Comments are stored here.
+Comment can be an artist report with a tag and duration.
+"			></div>
+			<div id="comments_btn_add" class="button"
+				style="float:right; width: 20px; height: 20px; background-image: url(rules/icons/comment_add.png)"
+				title="Add a new comment"
+				onclick="cm_NewOnClick()"></div>
+			<div id="comments_label" style="text-align:center; margin-top: 4px;">Comments</div>
+			<div id="comments" class="view_view"></div>
+		</div>
 	</div>
 </div>
 
@@ -203,10 +253,11 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
-		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()">&#10227;</div>
+		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()" title="Refresh news" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);"></div>
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
-			<div class="infotooltip" style="float: right; margin: 6px 5px;" title="News:
+			<div class="news_ctrl">
+				<div class="infotooltip" style="float: right;" title="News:
 If you assigned on any shot (location) you will receive all its changes.
 To receive all news from some location and all its subfolders (project,scene)
 you should subscribe on this location (add its path to channels).
@@ -215,9 +266,8 @@ To filter (show/hide) only specific news use buttons below.
 You can remove all [DA] news, only visible [DV] or hidden [DH] news during filtering.
 To remove only one news link double click [-] button at the top-left corner.
 Remember any delete operation buttons in RULES requires double-click.
-"				>i</div>
-			<div class="news_ctrl">
-				<div style="font-size:14px;">
+"				></div>
+				<div class="news_ctrl_btns">
 					<div class="button" title="Double click to delete all news"
 						ondblclick="nw_DeleteNews()">DA</div>
 					<div class="button" title="Double click to delete visble news"
@@ -230,7 +280,7 @@ Remember any delete operation buttons in RULES requires double-click.
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>
-			<div class="news_ctrl" style="font-size: 12px">
+			<div class="news_filter" style="font-size: 12px">
 				<div class="button nw_fb" title="Show All" onclick="nw_FilterBtn(this,'_all_')"  >All</div>
 				<div class="button nw_fb" title="Assigned" onclick="nw_FilterBtn(this,'_my_')"   >My</div>
 				<div class="button nw_fb" title="Body"     onclick="nw_FilterBtn(this,'body')"   >B</div>
@@ -243,7 +293,7 @@ Remember any delete operation buttons in RULES requires double-click.
 		</div>
 	</div>
 	<div id="sidepanel_playlist">
-		<div class="label button" id="playlist_refresh" onclick="p_RefreshOnClick()">&#10227;</div>
+		<div class="label button" id="playlist_refresh" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);" onclick="p_RefreshOnClick()"></div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div class="infotooltip" style="float: right; margin: 2px 4px;" title="Playlist:
@@ -252,24 +302,36 @@ If you bookmark some location in your browser
 this bookmark will be visible only for you.
 Use playlist for bookmarks for all users of the RULES site.
 Guests can't edit playlist.
-"			>i</div>
-			<div class="playlist_ctrl">
-				<div class="button" onclick="p_NewOnClick()" title="Create new folder">+Dir</div>
-				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically">+Link</div>
-				<div class="button" ondblclick="p_DelOnClick()" title="Remove current item">-</div>
-				<div class="button" onclick="p_RenameOnClick()" title="Rename current item">Rename</div>
+"			></div>
+			<div class="playlist_ctrl playlist_ctrl_top">
+				<div class="button" onclick="p_NewOnClick()" title="Create new folder"
+					style="background-image:url(rules/icons/folder_new.png);"></div>
+				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically"
+					style="background-image:url(rules/icons/bookmark.png);"></div>
+				<div class="button" ondblclick="p_DelOnClick()" title="Double click to remove current item"
+					style="background-image:url(rules/icons/delete.png);"></div>
+				<div class="button" onclick="p_RenameOnClick()" title="Rename current item"
+					style="background-image:url(rules/icons/rename.png);;"></div>
 			</div>
 			<div style="clear:both; box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>
-			<div class="playlist_ctrl">
-				<div class="button" onclick="p_AddLinkAfter()" title="Add item after current">+&darr;</div>
-				<div class="button" onclick="p_AddLinkBefore()" title="Add item before current">+&uarr;</div>
-				<div class="button" onclick="p_MoveDown()" title="Move item down">&darr;</div>
-				<div class="button" onclick="p_MoveUp()" title="Move item up">&uarr;</div>
-				<div class="button" onclick="p_MoveBottom()" title="Move item bottom">&darr;&darr;</div>
-				<div class="button" onclick="p_MoveTop()" title="Move item top">&uarr;&uarr;</div>
-				<div class="button" onclick="p_MakeCut()" title="Make cut">C</div>
-				<div class="button" onclick="p_Put()" title="Put shots results">P</div>
+			<div class="playlist_ctrl playlist_ctrl_bot">
+				<div class="button" onclick="p_AddLinkAfter()" title="Add item after current"
+					style="background-image:url(rules/icons/plus_down.png)"></div>
+				<div class="button" onclick="p_AddLinkBefore()" title="Add item before current"
+					style="background-image:url(rules/icons/plus_up.png)"></div>
+				<div class="button" onclick="p_MoveDown()" title="Move item down"
+					style="background-image:url(rules/icons/move_down.png)"></div>
+				<div class="button" onclick="p_MoveUp()" title="Move item up"
+					style="background-image:url(rules/icons/move_up.png)"></div>
+				<div class="button" onclick="p_MoveBottom()" title="Move item bottom"
+					style="background-image:url(rules/icons/move_bottom.png)"></div>
+				<div class="button" onclick="p_MoveTop()" title="Move item top"
+					style="background-image:url(rules/icons/move_top.png)"></div>
+				<div class="button" onclick="p_MakeCut()" title="Make cut"
+					style="background-image:url(rules/icons/cut.png)"></div>
+				<div class="button" onclick="p_Put()" title="Put shots results"
+					style="background-image:url(rules/icons/put.png)"></div>
 			</div>
 		</div>
 	</div>
@@ -283,7 +345,7 @@ You can upload several files at once.
 To upload images sequence use its archive.
 Better to archive images sequence folder.
 So folder will appear on unpack.
-"			>i</div>
+"			></div>
 			<div style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					title="Start unload all selected files" onclick="up_StartAll()">Start</div>
@@ -295,7 +357,7 @@ So folder will appear on unpack.
 			</div>
 		</div>
 	</div>
-	<div id="sidepanel_permissions" style="display:none; font-size: 12px; background: rgba(200,0,0,.2);">
+	<div id="sidepanel_permissions" style="display:none; font-size: 12px; background-color: rgba(200,0,0,.2);">
 		<div class="label button" onclick="ad_PermissionsOnClick()">PERMISSIONS</div>
 		<div class="body">
 			<div style="padding-left:8px;">
@@ -312,7 +374,8 @@ So folder will appear on unpack.
 		</div>
 	</div>
 	<div id="sidepanel_recent">
-		<div class="label button" id="recent_refresh" onclick="nw_RecentRefresh()">&#10227;</div>
+		<div class="label button" id="recent_refresh" onclick="nw_RecentRefresh()"
+			style="width:18px; height:18px; background-image:url(rules/icons/refresh.png)";></div>
 		<div class="label button" onclick="nw_RecentOnClick()">Recent</div>
 		<div class="body">
 			<div id="recent"></div>
@@ -368,8 +431,13 @@ Hidden folders increase system speed.">
 			</div>
 		</div>
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">
-			<div class="button" id="admin_button" style="display:none; background: rgba(200,0,0,.2)" onclick="ad_OpenWindow()">Administrate</div>
-			<div class="button" id="profile_button" style="display:none" onclick="ad_ProfileOpen()">My Profile</div>
+			<div class="button" id="admin_button"
+				style="display:none; background: rgba(200,0,0,.2)"
+				title="Admnistrate all users"
+				onclick="ad_OpenWindow()">Administrate</div>
+			<div class="button" id="profile_button" style="display:none"
+				title="Edit my profile settings"
+				onclick="ad_ProfileOpen()">My Profile</div>
 			<div style="text-align:center; padding: 10px 0 0 0;">
 				<a href="http://cgru.info/rules/general" target="_blank">Documentation</a></div>
 			<div style="text-align:center; padding: 10px 0 0 0;" id="afanasy_webgui"></div>
@@ -379,24 +447,34 @@ Hidden folders increase system speed.">
 				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank">Firefox Add-on</a></div>
 		</div>
 	</div>
-	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()">&darr;</div>
+	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()"
+		title="Open/close settings"
+		style="background-image:url(rules/icons/arrow_down)"></div>
 	<div class="panel">
-		<a class="button" id="navigate_root">Root</a>
-		<a class="button" id="navigate_up">Up</a>
-		<a class="button" id="navigate_prev">Prev</a>
-		<a class="button" id="navigate_next">Next</a>
-		<div id="news_count" onclick="u_SidePanelOpen();nw_NewsOpen()" title="News Counter
+		<a class="button" id="navigate_root" title="Navigate RULES root and refresh"
+			style="background-image:url(rules/icons/top.png);"></a>
+		<a class="button" id="navigate_up" title="Navigate up"
+			style="background-image:url(rules/icons/up.png);"></a>
+		<a class="button" id="navigate_prev" title="Navigate to the previous folder (shot)"
+			style="background-image:url(rules/icons/previous.png);"></a>
+		<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
+			style="background-image:url(rules/icons/next.png);"></a>
+		<div id="news_count" onclick="u_SidePanelOpen();nw_NewsOpen()"
+			style="float: right; cursor: pointer; margin: 2px 8px; padding: 4px 4px; width: 60px; text-align: center; box-shadow: 0 0 4px #030 inset, 0 0 4px #AFA; background: rgba(0,20,0,.5); color: #00FF00; text-shadow: 0 0 4px #00FF00, 0 0 8px #00FF00; font-weight: bold; display: none;"
+			title="News Counter
 Click to refresh and open news"></div>
 		<div id="assets"></div>
 	</div>
 </div>
 
 <div id="footer">
-	<div id="footeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseFooter()">&uarr;</div>
+	<div id="footeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseFooter()"
+		title="Open/close system log"
+		style="background-image:url(rules/icons/arrow_up)"></div>
 	<div id="cycle"></div>
-	<div id="version" style="float:right;margin:10px;">v?</div>
-	<div id="open" class="cmdexec" style="float:right;margin:8px;" title="Open location a file browser.
-RMB 'Run' menu item.">Open</div>
+	<div id="version" style="float:right;margin:10px;" title="CGRU version">v?</div>
+	<div id="open" class="cmdexec open" style="height: 26px; float:right; margin:8px;" title="Open location a file browser.
+RMB 'Run' menu item."></div>
 	<div id="info"></div>
 	<div id="log"></div>
 </div>
