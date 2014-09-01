@@ -21,8 +21,9 @@ Parser.add_option('-s', '--sources',  dest='sources',  type  ='string',     defa
 Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     default='',    help='Destination')
 Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default='',    help='References')
 Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
-Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default='',    help='Shot renaming padding')
-Parser.add_option('-u', '--uppercase',dest='uppercase',action='store_true', default='',    help='Rename shot uppercase')
+Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default='',    help='Shot renaming padding (Ex:"432")')
+Parser.add_option(      '--sameshot', dest='sameshot', action='store_true', default=False, help='"NAME" and "NAME-1" will be one shot')
+Parser.add_option('-u', '--uppercase',dest='uppercase',action='store_true', default=False, help='Rename shot uppercase')
 Parser.add_option('-m', '--move',     dest='move',     action='store_true', default=False, help='Move source files, not copy')
 Parser.add_option('-A', '--afanasy',  dest='afanasy',  action='store_true', default=False, help='Use Afanasy to copy sources')
 Parser.add_option(      '--afuser',   dest='afuser',   type  ='string',     default='',    help='Afanasy user')
@@ -52,6 +53,9 @@ signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT, interrupt)
 
 def isSameShot(i_shot, i_name):
+	if Options.sameshot is not True:
+		return False
+
 	SameShotSeparators = '._-'
 	i_shot = i_shot.lower()
 	i_name = i_name.lower()

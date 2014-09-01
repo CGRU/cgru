@@ -18,8 +18,9 @@ prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
 prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
-prj_deploy_shots_params.uppercase = {"bool":true,"width":'50%'};
-prj_deploy_shots_params.padding = {"width":'50%'};
+prj_deploy_shots_params.sameshot = {"bool":false,"width":'33%',"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
+prj_deploy_shots_params.uppercase = {"bool":true,"width":'33%',"tooltip":'Convert shot names to upper case'};
+prj_deploy_shots_params.padding = {"width":'33%',"tooltip":'Example: "432" - first number will have 4 padding, next 3 and so on.'};
 
 function prj_ShotsDeploy()
 {
@@ -102,6 +103,7 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
 	cmd += ' --shot_src "' + RULES.assets.shot.source.path[0] + '"'
 	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'
+	if( params.sameshot ) cmd += ' --sameshot';
 	if( params.uppercase ) cmd += ' -u';
 	if( params.padding.length ) cmd += ' -p ' + params.padding;
 
