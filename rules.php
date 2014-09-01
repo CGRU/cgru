@@ -14,7 +14,7 @@ $HT_AccessFileName = '.htaccess';
 $HT_GroupsFileName = '.htgroups';
 $HT_DigestFileName = '.htdigest';
 
-$FileMaxLength = 100000;
+$FileMaxLength = 1000000;
 
 $Digest = false;
 $UserID = null;
