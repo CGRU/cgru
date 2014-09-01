@@ -80,10 +80,10 @@ for input in Inputs:
 			output += '.q%d' % Options.quality
 		if Options.resize != '':
 			output += '.r%s' % Options.resize
-		output += '.' + Options.type
+#		output += '.' + Options.type
 
 	if os.path.isdir(input):
-		mkdir = output
+		mkdir = '%s.%s' % (output, Options.type )
 
 	for afile in files:
 		imgtype = afile.rfind('.')
@@ -92,9 +92,6 @@ for input in Inputs:
 		imgtype = afile[imgtype + 1:].lower()
 		if not imgtype in ImgTypes:
 			continue
-
-		if mkdir:
-			output = os.path.join(mkdir, os.path.basename(afile)) + '.' + Options.type
 
 		cmd = 'convert'
 
@@ -122,15 +119,29 @@ for input in Inputs:
 		if Options.resize != '':
 			cmd += ' -resize %s' % Options.resize
 
-		cmd += ' -quality %d' % Options.quality
-
-		if Options.type == 'dpx':
+		ext = Options.type
+		colorspace = ' -colorspace sRGB'
+		if Options.type == 'jpg':
+			cmd += ' -quality %d' % Options.quality
+			cmd += ' -colorspace sRGB'
+		elif Options.type == 'dpx':
 			cmd += ' -depth 10'
 			cmd += ' -colorspace Log'
+		elif Options.type == 'tif8':
+			ext = 'tif'
+			cmd += ' -depth 8'
+			cmd += ' -colorspace sRGB'
+		elif Options.type == 'tif16':
+			ext = 'tif'
+			cmd += ' -depth 16'
+			cmd += ' -colorspace sRGB'
 		elif Options.type == 'exr':
 			cmd += ' -colorspace RGB'
-		else:
-			cmd += ' -colorspace sRGB'
+
+		cmd += colorspace
+
+		if mkdir:
+			output = os.path.join(mkdir, os.path.basename(afile)) + '.' + ext
 
 		cmd += ' "%s"' % output
 
