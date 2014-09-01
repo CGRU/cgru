@@ -53,3 +53,7 @@ ipch
 *.suo
 *.sdf
 *.vcxproj.user
+
+# Project settings
+.idea
+*.iml
