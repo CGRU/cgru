@@ -6,7 +6,7 @@
 	You can add this code as shelf button :
 
 from afanasy import meArnoldRender
-reload( meArnoldRender )
+reload( meArnoldRender ) # keep this just for debug purposes
 meArnoldRender = meArnoldRender.meArnoldRender()
 
 	Important!!!
@@ -30,9 +30,10 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meArnoldRender_'
-meArnoldRenderVer = '0.0.1'
+meArnoldRenderVer = '0.3.0'
 meArnoldRenderMainWnd = self_prefix + 'MainWnd'
 
+job_separator_list = ['none', '.', '_' ]
 ass_compression_list = ['Off', 'On']
 ar_verbosity_list = [
 	'none',
@@ -45,8 +46,7 @@ ar_verbosity_list = [
 	'details'
 ]
 
-
-class meArnoldRender(object):
+class meArnoldRender ( object ) :
 	"""meArnoldRender
 	"""
 
@@ -100,7 +100,7 @@ class meArnoldRender(object):
 	# print( ">> meArnoldRender: Class deleted" )
 
 	def initParameters(self):
-		"""Missing DocString
+		"""Init all parameters
 		"""
 
 		#
@@ -139,6 +139,12 @@ class meArnoldRender(object):
 
 		self.job_param['job_cleanup_script'] = \
 			getDefaultIntValue(self_prefix, 'job_cleanup_script', 0) is 1
+			
+		self.job_param['job_padding'] = \
+			getDefaultIntValue(self_prefix, 'job_padding', 4)
+		
+		self.job_param['job_separator'] = \
+			getDefaultStrValue(self_prefix, 'job_separator', '.') # { 'none', '.', '_'}
 
 		#
 		# .ass generation parameters
@@ -146,10 +152,8 @@ class meArnoldRender(object):
 		self.ass_param['ass_reuse'] = \
 			getDefaultIntValue(self_prefix, 'ass_reuse', 0) is 1
 
-		self.ass_param['ass_filename'] = 'data'
-
-		self.ass_param['ass_padding'] = \
-			getDefaultIntValue(self_prefix, 'ass_padding', 4)
+		self.ass_param['ass_dirname'] = \
+			getDefaultStrValue(self_prefix, 'ass_dirname', 'data')
 
 		self.ass_param['ass_perframe'] = \
 			getDefaultIntValue(self_prefix, 'ass_perframe', 1) is 1
@@ -266,96 +270,37 @@ class meArnoldRender(object):
 		self.afanasy_param['af_depglbl'] = \
 			getDefaultStrValue(self_prefix, 'af_depglbl', '')
 
-	def getImageFileNamePrefix(self):
-		"""Missing DocString
+	def getImageFileNamePrefix ( self ) :
+		""" Get image file prefix name from RenderGlobals or use just maya scene name
+				if name is empty string 
 		"""
 		fileNamePrefix = cmds.getAttr('defaultRenderGlobals.imageFilePrefix')
 		if fileNamePrefix == None or fileNamePrefix == '':
 			fileNamePrefix = getMayaSceneName()
 		return fileNamePrefix
 
-	def getImageFormat(self):
-		"""Missing DocString
+	def getImageFormat ( self ) :
+		"""Get image format extensions
+		
+		return: string of image format extension
 		"""
-		imageFormatStr = ''
-		format_idx = cmds.getAttr('defaultRenderGlobals.imageFormat')
-		# TODO: instead of using a very big "if" use a dictionary to look up values
-		if format_idx == 0:  # Gif
-			imageFormatStr = 'iff'
-		elif format_idx == 1:  # Softimage (pic)
-			imageFormatStr = 'pic'
-		elif format_idx == 2:  # Wavefront (rla)
-			imageFormatStr = 'rla'
-		elif format_idx == 3:  # Tiff
-			imageFormatStr = 'tif'
-		elif format_idx == 4:  # Tiff16
-			imageFormatStr = 'iff'
-		elif format_idx == 5:  # SGI (rgb)
-			imageFormatStr = 'rgb'
-		elif format_idx == 6:  # Alias (pix)
-			imageFormatStr = 'pix'
-		elif format_idx == 7:  # Maya IFF (iff)
-			imageFormatStr = 'iff'
-		elif format_idx == 8:  # JPEG (jpg)
-			imageFormatStr = 'jpg'
-		elif format_idx == 9:  # EPS (eps)
-			imageFormatStr = 'eps'
-		elif format_idx == 10:  # Maya 16 IFF (iff)
-			imageFormatStr = 'iff'
-		elif format_idx == 11:  # Cineon
-			imageFormatStr = 'iff'
-		elif format_idx == 12:  # Quantel PAL (yuv)
-			imageFormatStr = 'yuv'
-		elif format_idx == 13:  # SGI 16
-			imageFormatStr = 'iff'
-		elif format_idx == 19:  # Targa (tga)
-			imageFormatStr = 'tga'
-		elif format_idx == 20:  # Windows Bitmap (bmp)
-			imageFormatStr = 'bmp'
-		elif format_idx == 21:  # SGI Movie
-			imageFormatStr = 'iff'
-		elif format_idx == 22:  # Quicktime
-			imageFormatStr = 'iff'
-		elif format_idx == 23:  # AVI
-			imageFormatStr = 'iff'
-		elif format_idx == 30:  # MacPaint
-			imageFormatStr = 'iff'
-		elif format_idx == 31:  # PSD
-			imageFormatStr = 'psd'
-		elif format_idx == 32:  # PNG
-			imageFormatStr = 'png'
-		elif format_idx == 33:  # QuickDraw
-			imageFormatStr = 'iff'
-		elif format_idx == 34:  # QuickTime Image
-			imageFormatStr = 'iff'
-		elif format_idx == 35:  # DDS
-			imageFormatStr = 'iff'
-		elif format_idx == 36:  # PSD Layered
-			imageFormatStr = 'psd'
-		elif format_idx == 50:  # IMF plugin
-			imageFormatStr = 'iff'
-		elif format_idx == 51:  # Custom Image Format
-			imageFormatStr = 'tif'
-		elif format_idx == 60:  # Macromedia SWF (swf)
-			imageFormatStr = 'iff'
-		elif format_idx == 61:  # Adobe Illustrator (ai)
-			imageFormatStr = 'iff'
-		elif format_idx == 62:  # SVG (svg)
-			imageFormatStr = 'iff'
-		elif format_idx == 63:  # Swift3DImporter (swft)
-			imageFormatStr = 'iff'
+		imageFormatStr = mel.eval ( 'getImfImageType' )
+		if imageFormatStr == 'deepexr' : 
+			imageFormatStr = 'exr'
 		return imageFormatStr
 
-	def getDeferredCmd(self, layer=None):
-		"""Missing DocString
+	def getDeferredCmd ( self, layer=None ) :
+		"""Get command for deferred .ass generation
+		
+		:param layer: current render layer
+		:return: string for deferred render command
 		"""
 		gen_cmd = self.def_assgenCommand
 		gen_cmd += ' -proj "' + self.rootDir + '"'
-		gen_cmd += ' -rt 1'  # Render type (
-		#     0 = render,
-		#     1 = export ass,
-		#     2 = export and kick
-		# )
+		gen_cmd += ' -rt 1' # Render type : 
+		# 0 = render,
+		# 1 = export ass,
+		# 2 = export and kick
 		if layer is not None:
 			gen_cmd += ' -rl ' + layer
 		else:
@@ -363,11 +308,11 @@ class meArnoldRender(object):
 		gen_cmd += self.get_assgen_options(layer)
 		return gen_cmd
 
-	def getRenderCmd(self, layer=None):
-		"""Missing DocString
+	def getRenderCmd ( self, layer=None ) :
+		"""Get command for render
 
-		:param layer: Missing documentation for layer argument
-		:return:
+		:param layer: current render layer
+		:return: string for render command
 		"""
 		ar_verbosity_level = \
 			ar_verbosity_list.index(self.ar_param['ar_verbosity'])
@@ -394,15 +339,20 @@ class meArnoldRender(object):
 
 		return ' '.join(cmd_buffer)
 
-	def get_ass_file_names(self, suffix=True, layer=None):
-		"""Missing DocString
+	def get_ass_name ( self, suffix=True, layer=None, decorator = '@' ) :
+		"""get_ass_name
 
-		:param suffix:
-		:param layer:
-		:return:
+		:param suffix: if it is True -- return pattern string name name.@###@.ass
+									 otherwise -- return just .ass filename
+		:param layer: current render layer
+		:param decorator: symbol for padding string decoration
+		:return: .ass filename 
 		"""
 		ass_deferred = self.ass_param['ass_deferred']
-		filename = self.ass_param['ass_filename']
+		separator = self.job_param['job_separator']
+		if separator == 'none' :
+			separator = ''
+		filename = self.ass_param['ass_dirname']
 		if layer is not None:
 			if layer == 'defaultRenderLayer':
 				layer = 'masterLayer'
@@ -422,20 +372,23 @@ class meArnoldRender(object):
 
 		if suffix:
 			pad_str = getPadStr(
-				self.ass_param['ass_padding'],
+				self.job_param['job_padding'],
 				self.ass_param['ass_perframe']
 			)
-			filename += '.@%s@.ass' % pad_str
+			if self.ass_param['ass_perframe'] :
+				filename += '%s%s%s%s.ass' % ( separator, decorator, pad_str, decorator )
+			else :	
+				filename += '.ass'	
 			if self.ass_param['ass_compression'] != 'Off':
 				filename += '.gz'
 
 		return filename
 
-	def get_image_names(self):
-		"""Missing DocString
+	def get_image_name ( self ) :
+		"""get_image_name
 		"""
 		pad_str = getPadStr(
-			self.ass_param['ass_padding'],
+			self.job_param['job_padding'],
 			self.ass_param['ass_perframe']
 		)
 
@@ -446,10 +399,12 @@ class meArnoldRender(object):
 
 		#imageFileName = ';'.join (images)
 		imageFileName = str(images[0])
+		( fileName, ext ) = os.path.splitext ( imageFileName )
+		imageFileName = fileName + '.' + self.getImageFormat ()
 		return fromNativePath(imageFileName)
 
-	def get_assgen_options(self, layer=None):
-		"""Missing DocString
+	def get_assgen_options ( self, layer=None ) :
+		"""get_assgen_options
 
 		:param layer:
 		:return:
@@ -460,14 +415,14 @@ class meArnoldRender(object):
 		step = self.job_param['job_step']
 		ass_reuse = self.ass_param['ass_reuse']
 		ass_selection = self.ass_param['ass_selection']
-		ass_filename = self.ass_param['ass_filename']
-		ass_padding = self.ass_param['ass_padding']
+		ass_dirname = self.ass_param['ass_dirname']
+		ass_padding = self.job_param['job_padding']
 		ass_perframe = self.ass_param['ass_perframe']
 		ass_binary = self.ass_param['ass_binary']
 		ass_deferred = self.ass_param['ass_deferred']
 
 		assgen_cmd = ''
-		filename = cmds.workspace(expandName=ass_filename)
+		filename = cmds.workspace(expandName=ass_dirname)
 		filename, ext = os.path.splitext(filename)
 
 		if ext == '' or ext == '.':
@@ -490,7 +445,7 @@ class meArnoldRender(object):
 				# for deferred generation we do not add layer name to filename
 				# this will be done by Maya
 
-			filename = self.get_ass_file_names(False, layer)
+			filename = self.get_ass_name(False, layer)
 
 			ass_compression_level = \
 				ass_compression_list.index(self.ass_param['ass_compression'])
@@ -509,11 +464,10 @@ class meArnoldRender(object):
 
 		return assgen_cmd
 
-	def generate_ass(self, isSubmitingJob=False):
-		"""Missing DocString
+	def generate_ass ( self, isSubmitingJob=False ) :
+		"""generate_ass
 
-		:param isSubmitingJob:
-		:return:
+		:param isSubmitingJob: if job will be submited after .ass generation
 		"""
 		skipExport = False
 		exportAllRenderLayers = self.ass_param['ass_export_all_layers']
@@ -522,15 +476,16 @@ class meArnoldRender(object):
 		start = self.job_param['job_start']
 		stop = self.job_param['job_end']
 		step = self.job_param['job_step']
+		separator = self.job_param['job_separator']
 		ass_reuse = self.ass_param['ass_reuse']
 		ass_selection = self.ass_param['ass_selection']
-		ass_filename = self.ass_param['ass_filename']
-		ass_padding = self.ass_param['ass_padding']
+		ass_dirname = self.ass_param['ass_dirname']
+		ass_padding = self.job_param['job_padding']
 		ass_perframe = self.ass_param['ass_perframe']
 		ass_binary = self.ass_param['ass_binary']
 		ass_deferred = self.ass_param['ass_deferred']
 
-		filename = cmds.workspace(expandName=ass_filename)
+		filename = cmds.workspace(expandName=ass_dirname)
 		filename, ext = os.path.splitext(filename)
 
 		if ext == '' or ext == '.':
@@ -556,7 +511,20 @@ class meArnoldRender(object):
 			#
 			defGlobals = 'defaultRenderGlobals'
 			saveGlobals = {}
-
+			#
+			# override RenderGlobals
+			#
+			cmds.setAttr(defGlobals + '.extensionPadding', ass_padding)
+			cmds.setAttr(defGlobals + '.animation', 1) # always use 'name.#.ext' format
+			cmds.setAttr(defGlobals + '.outFormatControl', 0)
+			cmds.setAttr(defGlobals + '.putFrameBeforeExt', 1 )
+			if separator == 'none' :
+				cmds.setAttr(defGlobals + '.periodInExt', 0 )		
+			elif separator == '.' :
+				cmds.setAttr(defGlobals + '.periodInExt', 1 )	
+			else :
+				cmds.setAttr(defGlobals + '.periodInExt', 2 )	
+			
 			image_name = self.getImageFileNamePrefix()
 
 			if ass_deferred:
@@ -621,7 +589,7 @@ class meArnoldRender(object):
 
 					#cmds.setAttr( defGlobals + '.imageFilePrefix', image_name, type='string' ) # will use MayaSceneName if empty 
 
-					print( assgen_cmd)
+					print(assgen_cmd)
 					mel.eval(assgen_cmd)
 
 					cmds.setAttr(
@@ -635,11 +603,10 @@ class meArnoldRender(object):
 						currentRenderLayer=current_layer
 					)
 
-	def submitJob(self, param=None):
-		"""Missing DocString
+	def submitJob ( self, param=None ) :
+		"""submitJob
 
-		:param param: Missing documentation of unused param argument
-		:return:
+		:param param: dummy parameter
 		"""
 
 		job_dispatcher = self.job_param['job_dispatcher']
@@ -690,7 +657,7 @@ class meArnoldRender(object):
 			self.job = RenderJob(job_name, job_description)
 
 		#self.job.work_dir  = self.rootDir
-		self.job.padding = self.ass_param['ass_padding']
+		self.job.padding = self.job_param['job_padding']
 		self.job.priority = self.job_param['job_priority']
 		self.job.paused = self.job_param['job_paused']
 		self.job.task_size = self.job_param['job_size']
@@ -733,7 +700,7 @@ class meArnoldRender(object):
 				self.job.gen_block.cmd = gen_cmd
 				self.job.gen_block.input_files = '"%s"' % self.def_scene_name
 				self.job.gen_block.task_size = min(ass_def_task_size,
-												   self.job.num_tasks)
+													 self.job.num_tasks)
 				self.job.gen_block.setup()
 
 			renderLayers = []
@@ -756,9 +723,9 @@ class meArnoldRender(object):
 						self.job
 					)
 				frame_block.capacity = capacity
-				frame_block.input_files = '"%s"' % self.get_ass_file_names(
+				frame_block.input_files = '"%s"' % self.get_ass_name(
 					True, layer_name)
-				frame_block.out_files = self.get_image_names()
+				frame_block.out_files = self.get_image_name()
 				render_cmd = self.getRenderCmd(layer)
 
 				if self.ar_param['ar_distributed']:
@@ -801,52 +768,51 @@ class meArnoldRender(object):
 			# restore current layer
 			cmds.editRenderLayerGlobals(currentRenderLayer=current_layer)
 
-	def assFileNameChanged(self, name, value):
-		"""Missing DocString
+	def jobFileNameOptionsChanged ( self, name, value ) :
+		"""jobFileNameOptionsChanged
 
 		:param name:
 		:param value:
 		"""
-		if name in ('ass_filename', 'ass_compression'):
+		if name == 'job_padding' :
+			setDefaultIntValue(self_prefix, name, self.job_param, value)
+			cmds.setAttr('defaultRenderGlobals.extensionPadding', value)
+		elif name == 'job_separator' :
+			setDefaultStrValue(self_prefix, name,	self.job_param, value)
+			cmds.setAttr('defaultRenderGlobals.outFormatControl', 0)
+			if value == 'none' :
+				cmds.setAttr('defaultRenderGlobals.periodInExt', 0 )		
+			elif value == '.' :
+				cmds.setAttr('defaultRenderGlobals.periodInExt', 1 )	
+			else :
+				cmds.setAttr('defaultRenderGlobals.periodInExt', 2 )	
+		self.setResolvedPath()
+		
+	def assDirNameChanged ( self, name, value ) :
+		"""assDirNameChanged
+
+		:param name:
+		:param value:
+		"""
+		if name in ('ass_dirname', 'ass_compression'):
 			setDefaultStrValue(self_prefix, name, self.ass_param, value)
 		else:  # ass_padding, ass_perframe
 			setDefaultIntValue(self_prefix, name, self.ass_param, value)
 		self.setResolvedPath()
 
-	def setResolvedPath(self):
-		"""Missing DocString
+	def setResolvedPath(self) :
+		"""Displays preview of current .ass full filename in textFieldGrp
 		"""
-		filename = cmds.workspace(expandName=self.ass_param['ass_filename'])
-		filename, ext = os.path.splitext(filename)
-
-		if not (self.ass_param['ass_deferred'] and len(
-				getRenderLayersList(False)) == 1):
-			# do not add layer name for single render layer in scene
-			# during deferred assgen
-			filename += '_%s' % self.layer
-
-		if self.ass_param['ass_padding'] > 0 and self.ass_param[
-			'ass_perframe']:
-			filename += '.'
-			pad_str = getPadStr(
-				self.ass_param['ass_padding'],
-				self.ass_param['ass_perframe']
-			)
-			filename += pad_str
-
-		ext = '.ass'
-		if self.ass_param['ass_compression'] != 'Off':
-			ext += '.gz'
-
-		filename += ext
+		filename = self.get_ass_name ( True, self.layer, '' )
+		
 		cmds.textFieldGrp(
 			'%s|f0|t0|tc1|fr2|fc2|ass_resolved_path' % self.winMain,
 			edit=True,
 			text=filename
 		)
 
-	def enable_range(self, arg):
-		"""Missing DocString
+	def enable_range ( self, arg ) :
+		"""enable_range
 
 		:param arg: Missing documentation of arg argument
 		:return:
@@ -858,8 +824,8 @@ class meArnoldRender(object):
 			enable=arg
 		)
 
-	def enable_var_capacity(self, arg):
-		"""Missing DocString
+	def enable_var_capacity(self, arg) :
+		"""enable_var_capacity
 
 		:param arg: Missing documentation about arg argument
 		:return:
@@ -877,8 +843,8 @@ class meArnoldRender(object):
 			enable=arg
 		)
 
-	def enable_deferred(self, arg):
-		"""Missing DocString
+	def enable_deferred(self, arg) :
+		"""enable_deferred
 
 		:param arg: Missing documentation about arg argument
 		:return:
@@ -919,8 +885,8 @@ class meArnoldRender(object):
 			bgc=bg_color
 		)  # , enableBackground=False
 
-	def enable_distributed(self, arg):
-		"""Missing DocString
+	def enable_distributed(self, arg) :
+		"""enable_distributed
 
 		:param arg: Missing documentation about arg argument
 		:return:
@@ -979,8 +945,8 @@ class meArnoldRender(object):
 			bgc=bg_color
 		)  # , enableBackground=False
 
-	def onRenderLayerSelected(self, arg):
-		"""Missing DocString
+	def onRenderLayerSelected(self, arg) :
+		"""onRenderLayerSelected
 
 		:param arg: Missing documentation about arg argument
 		:return:
@@ -1000,8 +966,8 @@ class meArnoldRender(object):
 			lowestPriority=True
 		)
 
-	def renderLayerSelected(self):
-		"""Missing DocString
+	def renderLayerSelected(self) :
+		"""renderLayerSelected
 		"""
 		self.layer = cmds.editRenderLayerGlobals(
 			query=True,
@@ -1021,8 +987,8 @@ class meArnoldRender(object):
 
 		self.setResolvedPath()
 
-	def renderLayerRenamed(self):
-		"""Missing DocString
+	def renderLayerRenamed(self) :
+		"""renderLayerRenamed
 		"""
 		self.layer = cmds.editRenderLayerGlobals(
 			query=True,
@@ -1038,8 +1004,8 @@ class meArnoldRender(object):
 			lowestPriority=True
 		)
 
-	def renderLayerChanged(self):
-		"""Missing DocString
+	def renderLayerChanged(self) :
+		"""renderLayerChanged
 		"""
 		self.layer = cmds.editRenderLayerGlobals(
 			query=True,
@@ -1053,8 +1019,8 @@ class meArnoldRender(object):
 		)
 		return True
 
-	def updateRenderLayerMenu(self):
-		"""Missing DocString
+	def updateRenderLayerMenu(self) :
+		"""updateRenderLayerMenu
 		"""
 		list_items = cmds.optionMenuGrp(
 			self.winMain + '|f0|c0|r0|' + 'layer_selector',
@@ -1096,8 +1062,8 @@ class meArnoldRender(object):
 			lowestPriority=True
 		)
 
-	def renderLayersSetup(self, layers):
-		"""Missing DocString
+	def renderLayersSetup(self, layers) :
+		"""renderLayersSetup
 
 		:param layers:
 		:return:
@@ -1128,8 +1094,8 @@ class meArnoldRender(object):
 				)
 				firstRun = False
 
-	def setupUI(self):
-		"""Missing DocString
+	def setupUI ( self ) :
+		"""setupUI
 		"""
 		#
 		# Main window setup
@@ -1139,7 +1105,7 @@ class meArnoldRender(object):
 			cmds.window(
 				meArnoldRenderMainWnd,
 				title='meArnoldRender ver.%s (%s)' % (meArnoldRenderVer,
-													  self.os),
+														self.os),
 				menuBar=True,
 				retain=False,
 				widthHeight=(420, 460)
@@ -1381,10 +1347,10 @@ class meArnoldRender(object):
 
 		cmds.setParent('..')
 		cmds.setParent('..')
-
+		
 		cmds.frameLayout(
 			'fr2',
-			label=' Cleanup ',
+			label=' File Names Options ',
 			borderVisible=True,
 			borderStyle='etchedIn',
 			marginHeight=ar_hi,
@@ -1394,6 +1360,51 @@ class meArnoldRender(object):
 
 		cmds.columnLayout(
 			'fc2',
+			columnAttach=('left', 0),
+			rowSpacing=0,
+			adjustableColumn=True
+		)
+		
+		cmds.intFieldGrp(
+			'job_padding',
+			cw=((1, cw1), (2, cw2)),
+			label='Frame Padding ',
+			value1=self.job_param['job_padding'],
+			cc=partial(self.jobFileNameOptionsChanged, 'job_padding')
+		)
+		
+		job_separator = cmds.optionMenuGrp(
+			'job_separator',
+			cw=((1, cw1),),
+			cal=(1, 'right'),
+			label='Separator ',
+			cc=partial( self.jobFileNameOptionsChanged, 'job_separator' ) 
+		)
+
+		for name in job_separator_list:
+			cmds.menuItem(label=name)  
+
+		cmds.optionMenuGrp(
+			job_separator,
+			e=True,
+			value=self.job_param['job_separator']
+		)
+		
+		cmds.setParent('..')
+		cmds.setParent('..')
+
+		cmds.frameLayout(
+			'fr3',
+			label=' Cleanup ',
+			borderVisible=True,
+			borderStyle='etchedIn',
+			marginHeight=ar_hi,
+			cll=True,
+			cl=True
+		)
+
+		cmds.columnLayout(
+			'fc3',
 			columnAttach=('left', 0),
 			rowSpacing=0,
 			adjustableColumn=True
@@ -1546,50 +1557,26 @@ class meArnoldRender(object):
 
 		cmds.text(label='')
 
-		# ass_dir = cmds.textFieldButtonGrp(
-		#     cw=(1, cw1),
-		#     adj=2,
-		#     label="Directory ",
-		#     buttonLabel="...",
-		#     text=self.ass_param['ass_dir']
-		# )
-
-		# cmds.textFieldButtonGrp(
-		#     ass_dir,
-		#     edit=True,
-		#     bc=partial(browseDirectory, self.rootDir, ass_dir),
-		#     cc=partial(self.setDefaultStrValue, 'ass_dir')
-		# )
-
-
-		ass_filename = cmds.textFieldButtonGrp(
-			'ass_filename',
+		ass_dirname = cmds.textFieldButtonGrp(
+			'ass_dirname',
 			cw=(1, cw1),
-			enable=False,
+			enable=True,
 			adj=2,
-			label='File Name ',
+			label='Directory Name ',
 			buttonLabel='...',
-			text=self.ass_param['ass_filename'],
-			cc=partial(self.assFileNameChanged, 'ass_filename')
+			text=self.ass_param['ass_dirname'],
+			cc=partial(self.assDirNameChanged, 'ass_dirname')
 		)
 
 		cmds.textFieldButtonGrp(
-			ass_filename,
+			ass_dirname,
 			edit=True,
 			bc=partial(
-				browseFile,
+				browseDirectory,
 				self.rootDir,
-				ass_filename,
-				'Arnold files (*.ass)'
-			)
-		)
-
-		cmds.intFieldGrp(
-			'ass_padding',
-			cw=((1, cw1), (2, cw2)),
-			label='Frame Padding ',
-			value1=self.ass_param['ass_padding'],
-			cc=partial(self.assFileNameChanged, 'ass_padding')
+				ass_dirname
+			),
+			cc=partial(self.assDirNameChanged, 'ass_dirname')
 		)
 
 		cmds.checkBoxGrp(
@@ -1598,7 +1585,7 @@ class meArnoldRender(object):
 			label='',
 			label1=' File Per Frame ',
 			value1=self.ass_param['ass_perframe'],
-			cc=partial(self.assFileNameChanged, 'ass_perframe')
+			cc=partial(self.assDirNameChanged, 'ass_perframe')
 		)
 
 		cmds.checkBoxGrp(
@@ -1634,7 +1621,7 @@ class meArnoldRender(object):
 			cw=((1, cw1),),
 			cal=(1, 'right'),
 			label='Compression ',
-			cc=partial(self.assFileNameChanged, 'ass_compression')
+			cc=partial(self.assDirNameChanged, 'ass_compression')
 		)
 
 		for name in ass_compression_list:
@@ -1746,20 +1733,6 @@ class meArnoldRender(object):
 				self.ar_param
 			)
 		)
-
-		# cmds.intFieldGrp (
-		#     'ar_port',
-		#     cw=((1, cw1), (2, cw2)),
-		#     label='Port ',
-		#     value1=self.ar_param['ar_port'],
-		#     enable=self.ar_param['ar_distributed'],
-		#     cc=partial(
-		#         setDefaultIntValue,
-		#         self_prefix,
-		#         'ar_port',
-		#         self.ar_param
-		#     )
-		# )
 
 		cmds.intFieldGrp(
 			'ar_hosts_min',
@@ -2180,11 +2153,10 @@ class meArnoldRender(object):
 
 		return form
 
-	def deleteUI(self, param):
-		"""Missing DocString
+	def deleteUI ( self, param ) :
+		"""deleteUI
 
-		:param param:
-		:return:
+		:param param: dummy parameter
 		"""
 		winMain = meArnoldRenderMainWnd
 

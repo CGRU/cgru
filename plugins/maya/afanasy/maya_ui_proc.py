@@ -32,7 +32,7 @@ import maya.mel as mel
 
 
 def getDefaultStrValue(self_prefix, name, value):
-	"""Missing DocString
+	"""getDefaultStrValue
 
 	:param self_prefix:
 	:param name:
@@ -49,7 +49,7 @@ def getDefaultStrValue(self_prefix, name, value):
 
 
 def getDefaultIntValue(self_prefix, name, value):
-	"""Missing DocString
+	"""getDefaultIntValue
 
 	:param self_prefix:
 	:param name:
@@ -66,7 +66,7 @@ def getDefaultIntValue(self_prefix, name, value):
 
 
 def getDefaultFloatValue(self_prefix, name, value):
-	"""Missing DocString
+	"""getDefaultFloatValue
 
 	:param self_prefix:
 	:param name:
@@ -83,7 +83,7 @@ def getDefaultFloatValue(self_prefix, name, value):
 
 
 def setDefaultIntValue(self_prefix, name, section=None, value=None):
-	"""Missing DocString
+	"""setDefaultIntValue
 
 	:param self_prefix:
 	:param name:
@@ -99,7 +99,7 @@ def setDefaultIntValue(self_prefix, name, section=None, value=None):
 
 
 def setDefaultIntValue2(self_prefix, names, section=None, value1=None, value2=None):
-	"""Missing DocString
+	"""setDefaultIntValue2
 
 	:param self_prefix:
 	:param names:
@@ -119,7 +119,7 @@ def setDefaultIntValue2(self_prefix, names, section=None, value1=None, value2=No
 
 
 def setDefaultIntValue3(self_prefix, names, section=None, value1=None, value2=None, value3=None):
-	"""Missing DocString
+	"""setDefaultIntValue3
 
 	:param self_prefix:
 	:param names:
@@ -143,7 +143,7 @@ def setDefaultIntValue3(self_prefix, names, section=None, value1=None, value2=No
 
 
 def setDefaultFloatValue(self_prefix, name, section=None, value=None):
-	"""Missing DocString
+	"""setDefaultFloatValue
 
 	:param self_prefix:
 	:param name:
@@ -159,7 +159,7 @@ def setDefaultFloatValue(self_prefix, name, section=None, value=None):
 
 
 def setDefaultFloatValue2(self_prefix, names, section=None, value1=None, value2=None):
-	"""Missing DocString
+	"""setDefaultFloatValue2
 
 	:param self_prefix:
 	:param names:
@@ -179,7 +179,7 @@ def setDefaultFloatValue2(self_prefix, names, section=None, value1=None, value2=
 
 
 def setDefaultStrValue(self_prefix, name, section=None, value=None):
-	"""Missing DocString
+	"""setDefaultStrValue
 
 	:param self_prefix:
 	:param name:
@@ -195,7 +195,7 @@ def setDefaultStrValue(self_prefix, name, section=None, value=None):
 
 
 def getMayaSceneName(withoutSubdir=True):
-	"""Missing DocString
+	"""getMayaSceneName
 
 	:param withoutSubdir: If ``withoutSubdir`` is **False**, then return scene
 	  relative path to current project (include subdirectory in scene dir).
@@ -217,7 +217,7 @@ def getMayaSceneName(withoutSubdir=True):
 
 
 def isRelative(fileName):
-	"""Missing DocString
+	"""isRelative
 
 	:param fileName:
 	:return:
@@ -230,7 +230,7 @@ def isRelative(fileName):
 
 
 def fromNativePath(nativePath):
-	"""Missing DocString
+	"""fromNativePath
 
 	:param nativePath:
 	:return:
@@ -239,7 +239,7 @@ def fromNativePath(nativePath):
 
 
 def getDirName(image_name):
-	"""Missing DocString
+	"""getDirName
 
 	:param image_name:
 	:return:
@@ -250,20 +250,20 @@ def getDirName(image_name):
 
 
 def getPadStr(padding, perframe):
-	"""Missing DocString
+	"""Get padding string
 	"""
-	pad_str = ''
-	# print 'padding = %d perframe = %s' % ( padding, str ( perframe ) )
-
-	if padding > 0 and perframe:
+	if perframe :
 		pad_str = '#'
-		for i in range(1, padding):
-			pad_str += '#'
+		if padding > 1 and perframe:
+			for i in range(1, padding):
+				pad_str += '#'
+	else :
+		pad_str = ''
 	return pad_str
 
 
 def browseDirectory(rootDir, control):
-	"""Missing DocString
+	"""browseDirectory
 
 	:param rootDir:
 	:param control:
@@ -292,7 +292,7 @@ def browseDirectory(rootDir, control):
 
 
 def browseFile(rootDir, control, extFilter):
-	"""Missing DocString
+	"""browseFile
 
 	:param rootDir:
 	:param control:
@@ -319,7 +319,7 @@ def browseFile(rootDir, control, extFilter):
 
 
 def getRenderCamerasList():
-	"""Missing DocString
+	"""getRenderCamerasList
 	"""
 	renderCamerasList = []
 	cameras = cmds.listCameras()
@@ -369,7 +369,7 @@ def maya_render_globals(arg):
 
 
 def mrShaderManager(arg):
-	"""Missing DocString
+	"""Open MentalRay Shaders window
 
 	:param arg:
 	:return:
@@ -378,7 +378,7 @@ def mrShaderManager(arg):
 
 
 def checkTextures(arg):
-	"""Missing DocString
+	"""Run check project's texture script
 
 	:param arg:
 	:return:
