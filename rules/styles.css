@@ -200,11 +200,12 @@ margin: 3px 0px;
 float: left;
 }
 #content > .view .view_show { display: none; }
-#content > .view .buttom.show { display: block; }
+#content > .view .button.show { display: block; padding: 2px 12px; }
+#content > .view .button.show img { height: 18px; padding: 0px 6px; }
 #content > .view.opened { clear: both; float: none; }
 #content > .view.opened .view_show { display: block; }
 #content > .view.opened .button.show { display: none; }
-#content .view_view { clear: both; }
+#content > .view .view_view { clear: both; }
 
 .editing {
 background: #DDD;
