@@ -150,7 +150,6 @@ function g_PathChanged()
 		return;
 	}
 
-//	g_NavigatePost()
 	g_POST()
 }
 
@@ -241,10 +240,6 @@ function g_Navigate( i_path)
 		walk.paths.push( path);
 	}
 
-//	var rufiles = ['rules'];
-//	if( i_last )
-//		rufiles.push('status');
-
 	walk.rufiles = ['rules','status'];
 	walk.mtime = RULES.cache_time;
 	walk.lookahead = ['status'];
@@ -261,8 +256,12 @@ function g_WalksReceived( i_data, i_args)
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
+		// Unlike other rules, status should not be merged,
+		// it is unique for each location,
+		// no matter what parent folders status is
 		RULES.status = null;
-		if( false == g_Goto( walk.folders[i], walk.paths[i], walk.walks[i], i == (walk.paths.length-1)))
+
+		if( false == g_Goto( walk.folders[i], walk.paths[i], walk.walks[i]))
 			return;
 	}
 
@@ -274,12 +273,17 @@ function g_WalksReceived( i_data, i_args)
 	else
 		window.document.title = g_elCurFolder.m_path;
 
+	// Update status of the current folder,
+	// as it can be created before (user navigating shots of the same scene),
+	// and now it can be changed
+	g_FolderSetStatus( RULES.status);
+
 	g_NavigatePost()
 }
 
-function g_Goto( i_folder, i_path, i_walk, i_last)
+function g_Goto( i_folder, i_path, i_walk)
 {
-	c_Log('Goto "'+i_folder+'"'+(i_last?'*':''));
+	c_Log('Goto "'+i_folder+'"');
 
 	if( i_walk.error )
 	{
