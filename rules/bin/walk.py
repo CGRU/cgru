@@ -200,18 +200,14 @@ if PrevFiles:
 
 # Update parent folders:
 if not Options.noupdate:
-	curpath = os.path.abspath(StartPath)
+	curpath = StartPath
 	PrevFiles = None
-	while curpath != '/':
+	while curpath != '/' and curpath != '':
 		# Go one folder upper:
 		uppath = os.path.dirname(curpath)
-		if uppath == curpath:
+		if uppath == curpath or uppath == '' or uppath == '/':
 			break
 		curpath = uppath
-
-		# Stop updating if there is not any walk data:
-		if not os.path.isfile(os.path.join(curpath, Options.output)):
-			break
 
 		printFlush('Updating: %s' % curpath)
 		walkdir(curpath, False)

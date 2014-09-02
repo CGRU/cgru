@@ -18,6 +18,7 @@ function FilesView( i_args)
 	this.elParent = i_args.el;
 	this.path = i_args.path;
 	this.walk = i_args.walk;
+	this.can_count = i_args.can_count;
 
 	this.can_refresh = true;
 	if( i_args.refresh === false ) this.can_refresh = false;
@@ -456,6 +457,22 @@ FilesView.prototype.showFolder = function( i_folder)
 	el.setAttribute('href', '#'+path);
 	el.textContent = name;
 
+	if( this.can_count )
+	{
+		var el = document.createElement('a');
+		elFolder.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/count.png)';
+		el.title = "Count files.";
+		el.style.cssFloat = 'right';
+		el.m_view = this;
+		el.m_path = path;
+		el.onclick = function(e){
+			e.stopPropagation();
+			e.currentTarget.m_view.countFiles( e.currentTarget.m_path);
+		};
+	}
+
 	if( ASSET && (( ASSET.path != g_CurPath()) || ( ASSET.play_folders !== false )))
 	{
 		var play_path = path;
@@ -650,6 +667,16 @@ FilesView.prototype.getSelected = function()
 	return o_items;
 }
 
+FilesView.prototype.countFiles = function( i_path)
+{
+	c_LoadingElSet( this.elRoot);
+	var cmd = 'rules/bin/walk.py "' + RULES.root + i_path + '"';
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"parse":false,"this":this});
+}
+FilesView.prototype.countFilesFinished = function( i_data, i_args)
+{
+	i_args.this.refresh();
+}
 FilesView.prototype.put = function()
 {
 	var args = {};

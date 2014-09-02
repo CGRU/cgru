@@ -551,6 +551,9 @@ function c_elMarkupRemove( i_el)
 
 function c_LoadingElSet( i_el)
 {
+	if( i_el.m_elWaiting )
+		return;
+
 	var el = document.createElement('div');
 	i_el.appendChild( el);
 	el.classList.add('loading');
@@ -559,7 +562,14 @@ function c_LoadingElSet( i_el)
 	elText.textContent = 'Loading...';
 	i_el.m_elWaiting = el;
 }
-function c_LoadingElReset( i_el) { if( i_el.m_elWaiting ) i_el.removeChild( i_el.m_elWaiting); }
+function c_LoadingElReset( i_el)
+{
+	if( i_el.m_elWaiting )
+	{
+		i_el.removeChild( i_el.m_elWaiting);
+		i_el.m_elWaiting = null;
+	}
+}
 
 function c_GuestCheck( i_msg)
 {

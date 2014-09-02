@@ -101,7 +101,7 @@ function shot_Loaded( i_data, i_args)
 				(( files  == null ) || (   files.length == 0 ))) continue;
 
 			shot_thumb_paths.push( path);
-			new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]]})
+			new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]],"can_count":true})
 			found = true;
 		}
 

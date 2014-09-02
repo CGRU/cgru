@@ -189,7 +189,7 @@ function n_XHRHandler()
 
 		if( this.status == 200 )
 		{
-			c_Log('<b><i style="color:#044">recv '+this.m_args.id+' ('+n_conn_count+')</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
+			c_Log('<b><i style="color:#048">recv '+this.m_args.id+' ('+n_conn_count+')</i> '+this.m_args.info+':</b> '+ this.responseText.replace(/[<>]/g,'*'));
 
 			if( this.m_args.func )
 			{
