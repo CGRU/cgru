@@ -99,7 +99,7 @@ genetate thumbnails.";
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
-	el.style.backgroundImage = 'url(rules/icons/select.png)';
+	el.style.backgroundImage = 'url(rules/icons/select_all.png)';
 	el.title = 'Select all';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.selectAll()};
