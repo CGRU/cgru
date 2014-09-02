@@ -59,6 +59,8 @@ afanasy {
  xpos -534
  ypos 212
  hide_input true
+ framefirst @(frame_first)d
+ framelast @(frame_last)d
  jobname ""
  hostsmask ""
  hostsmaskexcl ""
@@ -81,6 +83,8 @@ afanasy {
  xpos -644
  ypos 213
  hide_input true
+ framefirst @(frame_first)d
+ framelast @(frame_last)d
  jobname ""
  hostsmask ""
  hostsmaskexcl ""
@@ -144,6 +148,8 @@ afanasy {
  name af_TIF
  xpos -424
  ypos 212
+ framefirst @(frame_first)d
+ framelast @(frame_last)d
  hide_input true
  jobname ""
  hostsmask ""
