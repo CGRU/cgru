@@ -237,14 +237,26 @@ function st_SetElLabel( i_status, i_el, i_full)
 function st_SetElFramesNum( i_status, i_el, i_full)
 {
 	if( i_full == null ) i_full = true;
+
 	var num = '';
 	if( i_status && i_status.frames_num )
 	{
 		num = i_status.frames_num;
 		i_el.title = ' ~ ' + Math.round(num/RULES.fps) + 'sec';
-		if( i_full ) num = 'Frames number = ' + num;
-		else num = 'F:' + num;
+		if( i_full )
+			i_el.parentNode.style.display = 'block';
+		else
+			num = 'F:' + num;
 	}
+	else if ( i_full )
+		i_el.parentNode.style.display = 'none';
+
+	if( i_full )
+	{
+		i_el.parentNode.classList.remove('updated');
+		i_el.parentNode.title = null;
+	}
+
 	i_el.textContent = num;
 }
 function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
@@ -997,9 +1009,16 @@ function st_Save( i_status, i_path, i_func, i_args, i_navig_up)
 function st_SetFramesNumber( i_num)
 {
 	if( RULES.status == null ) RULES.status = {};
+
+	if( RULES.status.frames_num == i_num )
+		return;
+
 	RULES.status.frames_num = i_num;
 	st_Save();
 	st_Show( RULES.status);
+
+	$('status_framesnum_div').classList.add('updated');
+	$('status_framesnum_div').title = 'Frames number updated\nPrevous value: ' + RULES.status.frames_num;
 }
 
 function st_UpdateProgresses( i_path, i_progresses)

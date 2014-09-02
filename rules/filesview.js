@@ -266,9 +266,9 @@ FilesView.prototype.limitApply = function()
 			this.elItems[f].style.display = 'block';
 }
 
-FilesView.prototype.refresh = function()
+FilesView.prototype.refresh = function( i_args)
 {
-	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this});
+	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this,"post_args":i_args});
 	c_LoadingElSet( this.elRoot);
 }
 FilesView.prototype.walkReceived = function( i_data, i_args)
@@ -282,6 +282,9 @@ FilesView.prototype.walkReceived = function( i_data, i_args)
 
 	i_args.this.walk = i_data[0];
 	i_args.this.show();
+
+	if( i_args.post_args && i_args.post_args.func )
+		i_args.post_args.func( i_args.post_args, i_args.this);
 
 	// Select items back:
 	for( var i = 0; i < i_args.this.elItems.length; i++)
@@ -410,6 +413,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		el.title = title;
 
 		el.m_num_files = num_files;
+		el.onclick = function(e){e.stopPropagation();};
 		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
 	}
 
@@ -667,15 +671,15 @@ FilesView.prototype.getSelected = function()
 	return o_items;
 }
 
-FilesView.prototype.countFiles = function( i_path)
+FilesView.prototype.countFiles = function( i_path, i_args)
 {
 	c_LoadingElSet( this.elRoot);
 	var cmd = 'rules/bin/walk.py "' + RULES.root + i_path + '"';
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"parse":false,"this":this});
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"parse":false,"this":this,"post_args":i_args});
 }
 FilesView.prototype.countFilesFinished = function( i_data, i_args)
 {
-	i_args.this.refresh();
+	i_args.this.refresh( i_args.post_args);
 }
 FilesView.prototype.put = function()
 {

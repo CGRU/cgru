@@ -86,6 +86,7 @@ function shot_Loaded( i_data, i_args)
 {
 	var walk = i_args;
 	walk.walks = i_data;
+	res_filesviews = [];
 
 	if( ASSET.result )
 	{
@@ -101,7 +102,7 @@ function shot_Loaded( i_data, i_args)
 				(( files  == null ) || (   files.length == 0 ))) continue;
 
 			shot_thumb_paths.push( path);
-			new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]],"can_count":true})
+			res_filesviews.push( new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]],"can_count":true}))
 			found = true;
 		}
 
@@ -134,12 +135,76 @@ function shot_Loaded( i_data, i_args)
 
 	shot_MakeThumbnail( shot_thumb_paths);
 
+	// Count frames numbers:
+	for( var r = 0; r < res_filesviews.length; r++ )
+	{
+		var fv = res_filesviews[r];
+
+		if( fv.walk.folders == null ) continue;
+		if( fv.walk.folders.length == 0 ) continue;
+
+		// Count frames numner only in the last folder:
+		// Find the last folder, but not '.commented':
+		var folder = null;
+		for( var f = fv.walk.folders.length-1; f >= 0; f--)
+		{
+			if( fv.walk.folders[f].name.indexOf('.commented') == -1 )
+			{
+				folder = fv.walk.folders[f];
+				break;
+			}
+		}
+		if( folder == null ) continue;
+
+		if( folder.num_files != null )
+		{
+			// if status frames numbers is undefined, but no update needed, we set status frames number:
+			if( r == ( res_filesviews.length - 1 ))
+			{
+				if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
+				{
+					st_SetFramesNumber( folder.num_files);
+					c_Log('Shot length updated from "' + (fv.path+'/'+folder.name) + '": ' + folder.num_files);
+				}
+			}
+
+			continue;
+		}
+
+		var path = fv.path + '/' + folder.name;
+
+		var args = null;
+		// On last files view, we will update status frames number:
+		if( r == ( res_filesviews.length - 1 ))
+		{
+			args = {};
+			args.func = shot_FilesCounted;
+			args.path = path;
+		}
+
+		fv.countFiles( path, args);
+	}
+
 	shot_Post();
 }
 
 function shot_Post()
 {
 	g_PostLaunchFunc('shot');
+}
+
+function shot_FilesCounted( i_args, i_fv)
+{
+	var name = c_PathBase( i_args.path);
+	for( var f = 0; f < i_fv.walk.folders.length; f++)
+	{
+		var folder = i_fv.walk.folders[f];
+		if( folder.name != name ) continue;
+		if( folder.num_files == null ) return;
+		st_SetFramesNumber( folder.num_files);
+		c_Log('Shot length updated from "' + i_args.path + '": ' + folder.num_files);
+		return;
+	}
 }
 
 function shot_MakeThumbnail()
