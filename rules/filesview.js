@@ -360,14 +360,25 @@ FilesView.prototype.createItem = function( i_path, i_obj)
 
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
+	if( this.can_refresh )
+	{
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/rename.png)';
+		el.m_view = this;
+		el.m_path = i_el.m_path;
+		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( i_el.m_path)};
+	}
+
 	if( RULES.files_detele )
 	{
-		var elDel = document.createElement('div');
-		i_el.appendChild( elDel);
-		elDel.classList.add('button');
-		elDel.textContent = 'DEL';
-		elDel.m_view = this;
-		elDel.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( i_el.m_path)};
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('button');
+		el.textContent = 'DEL';
+		el.m_view = this;
+		el.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( i_el.m_path)};
 	}
 
 	if( i_obj.mtime != null )
@@ -872,6 +883,28 @@ function fv_makeFolderFinished( i_data, i_args)
 	i_args.fview.refresh();
 	c_Info('Folder created: ' + i_args.fview.path + '/' + i_data.makefolder);
 }
+
+FilesView.prototype.rename = function( i_path)
+{
+	new cgru_Dialog({"receiver":this,"handle":'renameDo',"param":i_path,"value":c_PathBase(i_path),
+		"name":'rename',"title":'Rename',"info":'Ender a new name.'});
+}
+FilesView.prototype.renameDo = function( i_value, i_path)
+{
+	new_path = RULES.root + c_PathDir( i_path) + '/' + i_value;
+	cmd = 'rules/bin/rename.py "' + RULES.root + i_path + '" "' + new_path + '"';
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.renameFinished,"this":this,"old_path":i_path,"new_path":new_path,"info":'rename'});
+}
+FilesView.prototype.renameFinished = function( i_data, i_args)
+{
+	if( c_NullOrErrorMsg( i_data)) return;
+
+	c_Info('Renamed: ' + c_PathBase(i_args.old_path) + ' -> ' + c_PathBase(i_args.new_path));
+
+	i_args.this.refresh();
+}
+
 FilesView.prototype.deleteFilesDialog = function( i_path)
 {
 	new cgru_Dialog({"receiver":this,"handle":'deleteFiles',"param":i_path,

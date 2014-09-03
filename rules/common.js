@@ -68,8 +68,9 @@ function c_Parse( i_data)
 
 function c_NullOrErrorMsg( i_obj)
 {
-	if( i_obj == null ) return true;
-	if( i_obj.error )
+//	if( i_obj == null ) return true;
+//	if( i_obj.error )
+	if(( i_obj == null ) || ( i_obj.error ))
 	{
 		c_Error( i_obj.error);
 		return true;
