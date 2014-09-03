@@ -2,7 +2,7 @@
 
 from parsers import blender
 
-keypart = 'Tracing Sample '
+keypart = 'Path Tracing Tile '
 
 
 class blender_cycles(blender.blender):
@@ -20,6 +20,7 @@ class blender_cycles(blender.blender):
 			ptpos = line.find(keypart)
 			if ptpos > 0:
 				parts = line[ptpos + len(keypart):].split('/')
+				parts[1] = parts[1].split(',')[0]
 				if len(parts) == 2:
 					ok = True
 					try:
