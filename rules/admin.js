@@ -407,10 +407,13 @@ function ad_WndDrawUsers()
 			return 0;
 		});
 	
+	var elTable = document.createElement('table');
+	ad_wnd.elUsers.appendChild( elTable);
+
 	var row = 0;
-	ad_WndAddUser( ad_wnd.elUsers, labels, row++);
+	ad_WndAddUser( elTable, labels, row++);
 	for( var i = 0; i < users.length; i++ )
-		ad_WndAddUser( ad_wnd.elUsers, users[i], row++);
+		ad_WndAddUser( elTable, users[i], row++);
 }
 
 function ad_GetType( i_type, i_func)
@@ -494,8 +497,8 @@ function ad_WndReceivedUsers()
 
 function ad_WndAddUser( i_el, i_user, i_row)
 {
-	var el = document.createElement('div');
-	i_el.appendChild(el);
+	var el = document.createElement('tr');
+	var td = 'td';
 
 	if( i_row )
 	{
@@ -511,9 +514,12 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	{
 		el.style.backgroundColor = 'rgba(0,0,0,.2)';
 		el.style.cursor = 'pointer';
+		td = 'th';
 	}
 
-	var elGroup = document.createElement('div');
+	i_el.appendChild(el);
+
+	var elGroup = document.createElement(td);
 	el.appendChild( elGroup);
 	elGroup.style.width = '20px';
 	elGroup.textContent = 'G';
@@ -522,13 +528,13 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elGroup.m_user = i_user;
 	if( i_row ) elGroup.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
 
-	var elName = document.createElement('div');
+	var elName = document.createElement(td);
 	el.appendChild( elName);
 	elName.style.width = '100px';
 	elName.textContent = i_user.id;
 	if( i_row == 0 ) elName.onclick = function(e) { ad_WndSortUsers('id'); };
 
-	var elTitle = document.createElement('div');
+	var elTitle = document.createElement(td);
 	el.appendChild( elTitle);
 	elTitle.style.width = '190px';
 	elTitle.textContent = i_user.title;
@@ -537,7 +543,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( i_row ) elTitle.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
 	else elTitle.onclick = function(e) { ad_WndSortUsers('title'); }
 
-	var elRole = document.createElement('div');
+	var elRole = document.createElement(td);
 	el.appendChild( elRole);
 	elRole.style.width = '100px';
 	elRole.textContent = i_user.role;
@@ -546,7 +552,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
 	else elRole.onclick = function(e) { ad_WndSortUsers('role'); }
 
-	var elEmail = document.createElement('div');
+	var elEmail = document.createElement(td);
 	el.appendChild( elEmail);
 	elEmail.style.width = '200px';
 	elEmail.textContent = i_user.email;
@@ -555,7 +561,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( i_row ) elEmail.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
 	else elEmail.onclick = function(e) { ad_WndSortUsers('email'); };
 
-	var elPasswd = document.createElement('div');
+	var elPasswd = document.createElement(td);
 	el.appendChild( elPasswd);
 	elPasswd.style.width = '50px';
 	if( i_row ) elPasswd.textContent = '***';
@@ -564,7 +570,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elPasswd.title = 'Double click to edit password';
 	if( i_row ) elPasswd.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
 
-	var elChannels = document.createElement('div');
+	var elChannels = document.createElement(td);
 	el.appendChild( elChannels);
 	elChannels.style.width = '50px';
 	if( i_user.channels )
@@ -578,21 +584,21 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	}
 	if( i_row == 0 ) elChannels.onclick = function(e) { ad_WndSortUsers('channels'); };
 
-	var elNews = document.createElement('div');
+	var elNews = document.createElement(td);
 	el.appendChild( elNews);
 	if( i_user.news )
 		elNews.textContent = i_user.news.length;
 	elNews.style.width = '50px';
 	if( i_row == 0 ) elNews.onclick = function(e) { ad_WndSortUsers('news'); };
 
-	var elCTime = document.createElement('div');
+	var elCTime = document.createElement(td);
 	el.appendChild( elCTime);
 	if( i_row ) elCTime.textContent = c_DT_StrFromSec( i_user.ctime).substr(4,11);
 	else elCTime.textContent = 'Created';
 	elCTime.style.width = '140px';
 	if( i_row == 0 ) elCTime.onclick = function(e) { ad_WndSortUsers('ctime'); };
 
-	var elRTime = document.createElement('div');
+	var elRTime = document.createElement(td);
 	el.appendChild( elRTime);
 	if( i_row ) elRTime.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
 	else elRTime.textContent = 'Entered';

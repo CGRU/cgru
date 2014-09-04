@@ -589,8 +589,10 @@ box-shadow: 0 0 4px #000 inset;
 .administrate { color: #000000; font-size: 14px; }
 .administrate .button { float: left; }
 .admin_groups div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
-.admin_users .selected div { background: rgba(100,255,255,.2); }
-.admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
+.admin_users table { border-collapse: collapse; }
+.admin_users th { font-weight: normal; }
+.admin_users td { text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
+.admin_users .selected td { background: rgba(100,255,255,.2); }
 
 /*
 .profile > div { border-radius: 4px; border: 1px solid #888; margin: 4px 0px; padding: 4px; }
