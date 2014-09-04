@@ -2,7 +2,7 @@
     "name": "cgru-addon", 
     "license": "MPL 2.0", 
     "author": "", 
-    "version": "0.2.1", 
+    "version": "2.0.2", 
     "fullName": "cgru-addon", 
     "id": "jid1-vZfSNCnvRp0Raw", 
     "description": "CGRU add-on to run commands. Add CSS class 'cmdexec' to element, text content will be executed, or 'cmdexec' attribute for array (json)."

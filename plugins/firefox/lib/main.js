@@ -1,7 +1,7 @@
 const { Cc, Ci } = require('chrome');
-const ContextMenu = require('context-menu');
+const ContextMenu = require('sdk/context-menu');
 const { get, set, exists } = Cc['@mozilla.org/process/environment;1'].getService( Ci.nsIEnvironment);
-const RunTime = require('runtime');
+const RunTime = require('sdk/system/runtime');
 
 Info = function( i_msg) { console.log('CGRU: '+i_msg);};
 
