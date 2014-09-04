@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 bl_info = {
 	"name": "CGRU Tools",
-	"author": """Timur Hairulin <timurhai@gmail.com>, Paul Geraskin <paulgeraskin@gmail.com> """,
+	"author": "CGRU Team",
 	"version": (1,),
 	"blender": (2, 7, 1),
 	"location": "3D Viewport",
@@ -33,10 +33,10 @@ class ORESettings(bpy.types.PropertyGroup):
 	#engine = StringProperty(name='Use Engine',
 							 #description='Engine to render scene with.',
 							 #maxlen=512, default='')
-	fstart = IntProperty(name='Start', description='Start Frame', default=1)
-	fend = IntProperty(name='End', description='End Frame', default=11)
-	finc = IntProperty(name='By', description='Frames Increment', min=1,
-					   default=1)
+	#fstart = IntProperty(name='Start', description='Start Frame', default=1)
+	#fend = IntProperty(name='End', description='End Frame', default=11)
+	#finc = IntProperty(name='By', description='Frames Increment', min=1,
+					   #default=1)
 	fpertask = IntProperty(name='Per Task', description='Frames Per One Task',
 						   min=1, default=1)
 	pause = BoolProperty(name='Start Job Paused',
