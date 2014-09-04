@@ -6,7 +6,7 @@
 "cache_time":300,
 
 "news":{
-	"limit":3,
+	"limit":99,
 	"refresh":60,
 	"recent":99
 },

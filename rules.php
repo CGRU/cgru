@@ -1126,25 +1126,27 @@ function jsf_makenews( $i_args, &$o_out)
     // Add news and write files:
     foreach( $sub_users as &$user)
     {
-		$has_event = false;
-		foreach( $user['news'] as &$event )
-			if( $event['path'] == $news['path'])
+		// Delete older news with the same path:
+		for( $i = 0; $i < count($user['news']); $i++)
+		{
+			if( $user['news'][$i]['path'] == $news['path'])
 			{
-				$has_event = true;
-				$event = $news;
+				array_splice( $user['news'], $i, 1);
 				break;
 			}
+		}
 
-		if( false == $has_event )
-			array_push( $user['news'], $news);
+		// Add news to the beginning of array:
+		array_unshift( $user['news'], $news);
 
+		// Delete news above the limit:
 		$limit = $i_args['limit'];
 		if( array_key_exists('news_limit', $user))
 			$limit = $user['news_limit'];
+		while( count( $user['news']) > $limit)
+			array_pop( $user['news']);
 
-//		while( count( $user['news']) > $limit)
-//			array_pop( $user['news']);
-
+		// Write user file:
 		$filename = 'users/'.$user['id'].'.json';
 		if( $fHandle = fopen( $filename, 'w'))
 		{

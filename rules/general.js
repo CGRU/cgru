@@ -271,12 +271,14 @@ function g_WalksReceived( i_data, i_args)
 	if( g_elCurFolder.m_path == '/')
 		window.document.title = RULES_TOP.company+'-RULES';
 	else
+	{
 		window.document.title = g_elCurFolder.m_path;
 
-	// Update status of the current folder,
-	// as it can be created before (user navigating shots of the same scene),
-	// and now it can be changed
-	g_FolderSetStatus( RULES.status);
+		// Update status of the current folder,
+		// as it can be created before (user navigating shots of the same scene),
+		// and now it can be changed
+		g_FolderSetStatus( RULES.status);
+	}
 
 	g_NavigatePost()
 }

@@ -4,7 +4,6 @@ ad_wnd = null;
 ad_wnd_curgroup = null;
 ad_wnd_sort_prop = 'id';
 ad_wnd_sort_dir = 0;
-//ad_wnd_prof = null;
 
 function ad_Init()
 {
@@ -410,55 +409,66 @@ function ad_WndDrawUsers()
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'G';
+	el.title = 'Group button.\nDouble click to add/remove user from selected group.';
 	el.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'ID';
+	el.title = 'User login and unique ID';
 	el.onclick = function(e) { ad_WndSortUsers('id'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Title';
+	el.title = 'User full name.\nDouble click to edit.';
 	el.onclick = function(e) { ad_WndSortUsers('title'); }
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Role';
+	el.title = 'Does not play any role :)\nJust for sorting.\nDouble click to edit.';
 	el.onclick = function(e) { ad_WndSortUsers('role'); }
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Email';
+	el.title = 'User email address.\nDouble click to edit.';
 	el.onclick = function(e) { ad_WndSortUsers('email'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
+	el.title = 'User password.\nDouble click to set new.';
 	el.textContent = 'Pass';
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Cnls';
+	el.title = 'New subscribed channels';
 	el.onclick = function(e) { ad_WndSortUsers('channels'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'News';
+	el.title = 'News count';
 	el.onclick = function(e) { ad_WndSortUsers('news'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Lim';
+	el.title = 'News count limit';
 	el.onclick = function(e) { ad_WndSortUsers('news_limit'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Created';
+	el.title = 'Time when the user wan created';
 	el.onclick = function(e) { ad_WndSortUsers('ctime'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Entered';
+	el.title = 'Last login(F5) time';
 	el.onclick = function(e) { ad_WndSortUsers('rtime'); };
 
 	for( var i = 0; i < users.length; i++ )
@@ -561,7 +571,6 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = 'G';
-	el.title = 'Double click edit group';
 	el.style.cursor = 'pointer';
 	el.m_user = i_user;
 	el.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
@@ -574,28 +583,24 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elTr.appendChild( el);
 	el.textContent = i_user.title;
 	el.m_user_id = i_user.id;
-	el.title = 'Double click edit title';
 	el.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = i_user.role;
 	el.m_user_id = i_user.id;
-	el.title = 'Double click edit role';
 	el.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = i_user.email;
 	el.m_user_id = i_user.id;
-	el.title = 'Double click edit email';
 	el.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = '***';
 	el.m_user_id = i_user.id;
-	el.title = 'Double click to edit password';
 	el.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
@@ -617,8 +622,10 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
-	if( i_user.news_limit != null )
+	if( i_user.news_limit != null && ( i_user.news_limit > 0 ))
 		el.textContent = i_user.news_limit;
+	else
+		el.innerHTML = '<i>' + RULES.news.limit + '</i>';
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -640,7 +647,6 @@ function ad_WndSortUsers( i_prop)
 
 function ad_CreateGrpOnClick()
 {
-//	new cgru_Dialog( window, window, 'ad_CreateGroup', null, 'str', '', 'users', 'Create Group', 'Enter Group Name');
 	new cgru_Dialog({"handle":'ad_CreateGroup',
 		"name":'users',"title":'Create Group',"info":'Enter Group Name'});
 }
@@ -657,7 +663,6 @@ function ad_CreateGroup( i_group)
 
 function ad_DeleteGrpOnClick()
 {
-//	new cgru_Dialog( window, window, 'ad_DeleteGroup', null, 'str', '', 'users', 'Delete Group', 'Enter Group Name');
 	new cgru_Dialog({"handle":'ad_DeleteGroup',
 		"name":'users',"title":'Delete Group',"info":'Enter Group Name'});
 }
@@ -785,7 +790,6 @@ function ad_SetPasswordDialog( i_user_id)
 	var pw = '';
 	for( var i = 0; i < 10; i ++) pw += Math.random().toString(36).substring(2);
 	pw = btoa( pw).substr( 0, 60);
-//	new cgru_Dialog( window, window, 'ad_SetPassword', i_user_id, 'str', pw, 'password', 'Set Password', 'Enter New Password');
 	new cgru_Dialog({"handle":'ad_SetPassword',"param":i_user_id,"value":pw,
 		"name":'password',"title":'Set Password',"info":'Enter new password for ' + c_GetUserTitle(i_user_id)});
 }

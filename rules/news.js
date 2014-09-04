@@ -419,6 +419,8 @@ function nw_NewsShow( i_news)
 			el.appendChild( elAvatar);
 			elAvatar.classList.add('avatar');
 			elAvatar.src = avatar;
+			elAvatar.title = c_GetUserTitle( news.user, news.guest) + '\nDouble click to delete all news from this user.';
+			elAvatar.ondblclick = function(e){ nw_DeleteNewsUser( news.user, news.guest);};
 		}
 
 		var elLabel = document.createElement('div');
@@ -504,6 +506,17 @@ function nw_DeleteFiltered( i_visible)
 	var ids = [];
 	for( var i = 0; i < elNews.length; i++)
 		if( elNews[i].style.display == display )
+			ids.push( elNews[i].m_news.id);
+
+	nw_DeleteNews( ids);
+}
+
+function nw_DeleteNewsUser( i_user, i_guest)
+{
+	var elNews = $('news').m_elArray;
+	var ids = []
+	for( var i = 0; i < elNews.length; i++)
+		if( elNews[i].m_news.user == i_user )
 			ids.push( elNews[i].m_news.id);
 
 	nw_DeleteNews( ids);
