@@ -34,10 +34,9 @@ function nw_Init()
 
 function nw_InitConfigured()
 {
-//console.log( RULES.newsrefresh);
-	if( RULES.newsrefresh == null ) return;
-	if( RULES.newsrefresh < 1 ) return;
-	setInterval( nw_NewsLoad, RULES.newsrefresh * 1000);
+	if( RULES.news.refresh == null ) return;
+	if( RULES.news.refresh < 1 ) return;
+	setInterval( nw_NewsLoad, RULES.news.refresh * 1000);
 }
 
 function nw_DisableNewsToggle( i_toggle)
@@ -312,7 +311,8 @@ function nw_MakeNews( i_news, i_args )
 	request.email_body = email_body;
 	request.root = RULES.root;
 	request.rufolder = RULES.rufolder;
-	request.recent_max = RULES.newsrecent;
+	request.limit = RULES.news.limit;
+	request.recent_max = RULES.news.recent;
 	request.recent_file = nw_recent_file;
 	n_Request({"send":{"makenews":request},"func":nw_MakeNewsFinished,"args":i_args});
 }

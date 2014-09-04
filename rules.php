@@ -1138,6 +1138,13 @@ function jsf_makenews( $i_args, &$o_out)
 		if( false == $has_event )
 			array_push( $user['news'], $news);
 
+		$limit = $i_args['limit'];
+		if( array_key_exists('news_limit', $user))
+			$limit = $user['news_limit'];
+
+//		while( count( $user['news']) > $limit)
+//			array_pop( $user['news']);
+
 		$filename = 'users/'.$user['id'].'.json';
 		if( $fHandle = fopen( $filename, 'w'))
 		{

@@ -3,9 +3,13 @@
 "rufolder":".rules",
 "company":"CGRU",
 "playlist":"rules/playlist.json",
-"newsrefresh":60,
-"newsrecent":99,
 "cache_time":300,
+
+"news":{
+	"limit":3,
+	"refresh":60,
+	"recent":99
+},
 
 "tags":{
 	"started" :{"title":"START",    "short":"St",  "tip":"Started"},

@@ -812,6 +812,8 @@ Status.prototype.editSave = function( i_args)
 			progress = null;
 			c_Error('Invalid progress: ' + c_Strip( progress_edit));
 		}
+		if( progress <  -1 ) progress = -1;
+		if( progress > 100 ) progress = 100;
 	}
 
 	if( this.elEdit_annotation.textContent != st_MultiValue )

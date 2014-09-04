@@ -377,14 +377,6 @@ function ad_WndDrawUsers()
 	ad_wnd.elUsers.innerHTML = '';
 	ad_wnd.elUsrRows = [];
 
-	var labels = {};
-	labels.id = 'ID';
-	labels.title = 'Title';
-	labels.role = 'Role';
-	labels.email = 'Email';
-	labels.channels = {}; labels.channels.length = 'Cnls';
-	labels.news = {}; labels.news.length = 'News';
-
 	var users = [];
 	for( var user in g_users ) users.push( g_users[user]);
 		users.sort( function( a, b ) {
@@ -410,10 +402,67 @@ function ad_WndDrawUsers()
 	var elTable = document.createElement('table');
 	ad_wnd.elUsers.appendChild( elTable);
 
-	var row = 0;
-	ad_WndAddUser( elTable, labels, row++);
+	var elTr = document.createElement('tr');
+	elTable.appendChild( elTr);
+	elTr.style.backgroundColor = 'rgba(0,0,0,.2)';
+	elTr.cursor = 'pointer';
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'G';
+	el.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'ID';
+	el.onclick = function(e) { ad_WndSortUsers('id'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Title';
+	el.onclick = function(e) { ad_WndSortUsers('title'); }
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Role';
+	el.onclick = function(e) { ad_WndSortUsers('role'); }
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Email';
+	el.onclick = function(e) { ad_WndSortUsers('email'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Pass';
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Cnls';
+	el.onclick = function(e) { ad_WndSortUsers('channels'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'News';
+	el.onclick = function(e) { ad_WndSortUsers('news'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Lim';
+	el.onclick = function(e) { ad_WndSortUsers('news_limit'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Created';
+	el.onclick = function(e) { ad_WndSortUsers('ctime'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'Entered';
+	el.onclick = function(e) { ad_WndSortUsers('rtime'); };
+
 	for( var i = 0; i < users.length; i++ )
-		ad_WndAddUser( elTable, users[i], row++);
+		ad_WndAddUser( elTable, users[i], i);
 }
 
 function ad_GetType( i_type, i_func)
@@ -497,113 +546,87 @@ function ad_WndReceivedUsers()
 
 function ad_WndAddUser( i_el, i_user, i_row)
 {
-	var el = document.createElement('tr');
-	var td = 'td';
+	var elTr = document.createElement('tr');
+	i_el.appendChild(elTr);
+	ad_wnd.elUsrRows.push( elTr);
+	elTr.m_user = i_user;
+	elTr.classList.add('user');
 
-	if( i_row )
-	{
-		ad_wnd.elUsrRows.push( el);
-		el.m_user = i_user;
-		el.classList.add('user');
-		if( i_row % 2) el.style.backgroundColor = 'rgba(255,255,255,.1)';
-		else el.style.backgroundColor = 'rgba(0,0,0,.1)';
-		if( i_user.groups.indexOf( ad_wnd_curgroup ) != -1 )
-			el.classList.add('selected');
-	}
-	else
-	{
-		el.style.backgroundColor = 'rgba(0,0,0,.2)';
-		el.style.cursor = 'pointer';
-		td = 'th';
-	}
+	if( i_row % 2) elTr.style.backgroundColor = 'rgba(255,255,255,.1)';
+	else elTr.style.backgroundColor = 'rgba(0,0,0,.1)';
 
-	i_el.appendChild(el);
+	if( i_user.groups.indexOf( ad_wnd_curgroup ) != -1 )
+		elTr.classList.add('selected');
 
-	var elGroup = document.createElement(td);
-	el.appendChild( elGroup);
-	elGroup.style.width = '20px';
-	elGroup.textContent = 'G';
-	elGroup.title = 'Double click edit group';
-	elGroup.style.cursor = 'pointer';
-	elGroup.m_user = i_user;
-	if( i_row ) elGroup.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = 'G';
+	el.title = 'Double click edit group';
+	el.style.cursor = 'pointer';
+	el.m_user = i_user;
+	el.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
 
-	var elName = document.createElement(td);
-	el.appendChild( elName);
-	elName.style.width = '100px';
-	elName.textContent = i_user.id;
-	if( i_row == 0 ) elName.onclick = function(e) { ad_WndSortUsers('id'); };
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = i_user.id;
 
-	var elTitle = document.createElement(td);
-	el.appendChild( elTitle);
-	elTitle.style.width = '190px';
-	elTitle.textContent = i_user.title;
-	elTitle.m_user_id = i_user.id;
-	elTitle.title = 'Double click edit title';
-	if( i_row ) elTitle.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
-	else elTitle.onclick = function(e) { ad_WndSortUsers('title'); }
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = i_user.title;
+	el.m_user_id = i_user.id;
+	el.title = 'Double click edit title';
+	el.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
 
-	var elRole = document.createElement(td);
-	el.appendChild( elRole);
-	elRole.style.width = '100px';
-	elRole.textContent = i_user.role;
-	elRole.m_user_id = i_user.id;
-	elRole.title = 'Double click edit role';
-	if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
-	else elRole.onclick = function(e) { ad_WndSortUsers('role'); }
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = i_user.role;
+	el.m_user_id = i_user.id;
+	el.title = 'Double click edit role';
+	el.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
 
-	var elEmail = document.createElement(td);
-	el.appendChild( elEmail);
-	elEmail.style.width = '200px';
-	elEmail.textContent = i_user.email;
-	elEmail.m_user_id = i_user.id;
-	elEmail.title = 'Double click edit email';
-	if( i_row ) elEmail.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
-	else elEmail.onclick = function(e) { ad_WndSortUsers('email'); };
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = i_user.email;
+	el.m_user_id = i_user.id;
+	el.title = 'Double click edit email';
+	el.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
 
-	var elPasswd = document.createElement(td);
-	el.appendChild( elPasswd);
-	elPasswd.style.width = '50px';
-	if( i_row ) elPasswd.textContent = '***';
-	else elPasswd.textContent = 'Pass';
-	elPasswd.m_user_id = i_user.id;
-	elPasswd.title = 'Double click to edit password';
-	if( i_row ) elPasswd.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = '***';
+	el.m_user_id = i_user.id;
+	el.title = 'Double click to edit password';
+	el.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
 
-	var elChannels = document.createElement(td);
-	el.appendChild( elChannels);
-	elChannels.style.width = '50px';
+	var el = document.createElement('td');
+	elTr.appendChild( el);
 	if( i_user.channels )
-		elChannels.textContent = i_user.channels.length;
+		el.textContent = i_user.channels.length;
 	if( i_user.channels && i_user.channels.length )
 	{
 		var channels = '';
 		for( var i = 0; i < i_user.channels.length; i++)
 		 channels += i_user.channels[i].id+'\n';
-		elChannels.title = channels;
+		el.title = channels;
 	}
-	if( i_row == 0 ) elChannels.onclick = function(e) { ad_WndSortUsers('channels'); };
 
-	var elNews = document.createElement(td);
-	el.appendChild( elNews);
+	var el = document.createElement('td');
+	elTr.appendChild( el);
 	if( i_user.news )
-		elNews.textContent = i_user.news.length;
-	elNews.style.width = '50px';
-	if( i_row == 0 ) elNews.onclick = function(e) { ad_WndSortUsers('news'); };
+		el.textContent = i_user.news.length;
 
-	var elCTime = document.createElement(td);
-	el.appendChild( elCTime);
-	if( i_row ) elCTime.textContent = c_DT_StrFromSec( i_user.ctime).substr(4,11);
-	else elCTime.textContent = 'Created';
-	elCTime.style.width = '140px';
-	if( i_row == 0 ) elCTime.onclick = function(e) { ad_WndSortUsers('ctime'); };
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	if( i_user.news_limit != null )
+		el.textContent = i_user.news_limit;
 
-	var elRTime = document.createElement(td);
-	el.appendChild( elRTime);
-	if( i_row ) elRTime.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
-	else elRTime.textContent = 'Entered';
-	elRTime.style.width = '180px';
-	if( i_row == 0 ) elRTime.onclick = function(e) { ad_WndSortUsers('rtime'); };
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = c_DT_StrFromSec( i_user.ctime).substr(4,11);
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
 }
 
 function ad_WndSortUsers( i_prop)
@@ -810,11 +833,12 @@ function ad_SetPasswordFinished( i_data)
 
 
 ad_prof_props = [];
-ad_prof_props.id     = {"disabled":true,"lwidth":'170px',"label":'ID'};
-ad_prof_props.title  = {"disabled":true,"lwidth":'170px'};
-ad_prof_props.role   = {"disabled":true,"lwidth":'170px'};
-ad_prof_props.avatar = {};
-ad_prof_props.email  = {"width":'70%'};
+ad_prof_props.id         = {"disabled":true,"lwidth":'170px',"label":'ID'};
+ad_prof_props.title      = {"disabled":true,"lwidth":'170px'};
+ad_prof_props.role       = {"disabled":true,"lwidth":'170px'};
+ad_prof_props.avatar     = {};
+ad_prof_props.news_limit = {};
+ad_prof_props.email      = {"width":'70%'};
 ad_prof_props.email_news = {"width":'30%',"bool":false};
 
 function ad_ProfileOpen()
@@ -827,15 +851,6 @@ function ad_ProfileOpen()
 
 	var wnd = new cgru_Window({"name":'profile',"title":'My Profile'});
 	wnd.elContent.classList.add('profile');
-
-//	wnd.closeOnEsc = false;
-//	ad_wnd_prof = wnd;
-//	ad_ProfileDrawa();
-//}
-//function ad_ProfileDraw()
-//{
-//	var wnd = ad_wnd_prof;
-//	wnd.elContent.innerHTML = '';
 
 	var avatar = c_GetAvatar();
 	if( avatar )
@@ -870,51 +885,19 @@ function ad_ProfileOpen()
 function ad_ProfileSave( i_wnd)
 {
 	var params = gui_GetParams( i_wnd.elContent, ad_prof_props);
+
+	if( params.news_limit.length == 0 )
+		params.news_limit = '-1';
+
+	params.news_limit = parseInt( params.news_limit);
+	if( isNaN(params.news_limit))
+	{
+		c_Error('Invalud news limit number.');
+		return;
+	}
+
 	for( p in params ) g_auth_user[p] = params[p];
 	ad_SaveUser();
 	i_wnd.destroy();
 }
-/*
-	for( var i = 0; i < ad_prof_props.length; i++ )
-	{
-		var prop = ad_prof_props[i];
-
-		var el = document.createElement('div');
-		wnd.elContent.appendChild( el);
-
-		var elLabel = document.createElement('div');
-		el.appendChild( elLabel);
-		elLabel.textContent = prop.label;
-		elLabel.classList.add('label');
-
-		if( prop.edit )
-		{
-			var elEdit = document.createElement('div');
-			el.appendChild( elEdit);
-			elEdit.textContent = 'Edit';
-			elEdit.classList.add('button');
-			elEdit.m_prop = prop;
-			elEdit.onclick = ad_ProfileEditPropOnClick;
-		}
-
-		var elProp = document.createElement('div');
-		el.appendChild( elProp);
-		elProp.textContent = g_auth_user[prop.name];
-		elProp.classList.add('prop');
-	}
-}
-function ad_ProfileEditPropOnClick( i_evt)
-{
-	var prop = i_evt.currentTarget.m_prop;
-//	new cgru_Dialog( window, window, 'ad_ProfileEditProp', prop.name, 'str', g_auth_user[prop.name], 'users', 'Change '+prop.label, 'Enter New Value');
-	new cgru_Dialog({"handle":'ad_ProfileEditProp',"param":prop.name,"value":g_auth_user[prop.name],
-		"name":'users',"title":'Change '+prop.label,"info":'Enter New Value'});
-}
-function ad_ProfileEditProp( i_value, i_prop)
-{
-	g_auth_user[i_prop] = i_value;
-	ad_SaveUserProp( g_auth_user.id, i_prop, i_value)
-	ad_ProfileDraw();
-}
-*/
 
