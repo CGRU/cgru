@@ -175,7 +175,7 @@ function shot_Loaded( i_data, i_args)
 
 		var args = null;
 		// On last files view, we will update status frames number:
-		if( r == ( res_filesviews.length - 1 ))
+		if(( r == ( res_filesviews.length - 1 )) && ( RULES.status.frames_num == null ))
 		{
 			args = {};
 			args.func = shot_FilesCounted;
@@ -310,6 +310,29 @@ function shot_SourceReceived( i_data, i_args)
 		var fo_list = [];
 		var fi_list = [];
 		shot_SourceWalkFind( i_data[i], fo_list, fi_list);
+
+		// Update shot frames number if not set:
+		if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
+		{
+			var frames_num = null;
+			// Update only if all ssource sequences have the same length:
+			for( var f = 0; f < fo_list.length; f++)
+			{
+				if(( frames_num == null ) && fo_list[f].files && fo_list[f].files.length )
+				{
+					frames_num = fo_list[f].files.length;
+				}
+				else if( fo_list[f].files && fo_list[f].files.length && ( frames_num != fo_list[f].files.length ))
+				{
+					frames_num = null;
+					break;
+				}
+			}
+
+			if( frames_num != null )
+				st_SetFramesNumber( frames_num);
+		}
+
 		if( fo_list.length || fi_list.length )
 		{
 			new FilesView({"el":el,"path":i_args.paths[i],"walk":{"folders":fo_list,"files":fi_list},"limits":false,"thumbs":false,"refresh":false});
