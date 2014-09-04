@@ -126,6 +126,7 @@ NoOp {
  addUserKnob {1 shot l Shot}
  shot @(name)s
  addUserKnob {3 ver l Version}
+ ver 1
  addUserKnob {1 v3p}
  v3p "v\[format %03d \[ value ver ]]"
 }
