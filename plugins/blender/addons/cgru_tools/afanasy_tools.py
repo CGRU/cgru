@@ -53,6 +53,8 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		sce = context.scene
 		ore = sce.ore_render
 
+		#row = layout.row()
+
 		layout.operator('ore.submit')
 		layout.separator()
 
@@ -69,7 +71,7 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		layout.prop(ore, 'packTextures')
 
 		layout.separator()
-		row.prop(ore, 'fpertask')
+		layout.prop(ore, 'fpertask')
 		layout.prop(ore, 'priority')
 		layout.prop(ore, 'maxruntasks')
 		layout.prop(ore, 'dependmask')
