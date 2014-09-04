@@ -25,19 +25,20 @@ class OREAddonPreferences(AddonPreferences):
 		row = layout.row()
 
 
-# This method creates a string with a list of engines in all scenes
-def getSceneEngines():
-	str = ''
-	strEngines = []
-	for scene in bpy.data.scenes:
-		if scene.render.engine not in strEngines:
-			if str != '':
-				str += ','
-			str += scene.render.engine
-			strEngines.append(scene.render.engine)
+## This method creates a string with a list of engines in all scenes
+def getSceneEngine():
+	#str = ''
+	#strEngines = []
+	#for scene in bpy.data.scenes:
+		#if scene.render.engine not in strEngines:
+			#if str != '':
+				#str += ','
+			#str += scene.render.engine
+			#strEngines.append(scene.render.engine)
 
-	strEngines = None
-	return str
+	#strEngines = None
+
+	return bpy.context.scene.render.engine
 
 
 class RENDER_PT_Afanasy(bpy.types.Panel):
@@ -55,10 +56,10 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 
 		#row = layout.row()
 
+		layout.label(text="Engine: " + getSceneEngine())
 		layout.operator('ore.submit')
 		layout.separator()
 
-		layout.label(text="Engines: " + getSceneEngines())
 		layout.prop(ore, 'jobname')
 		layout.prop(ore, 'filepath')
 
@@ -92,7 +93,7 @@ class ORE_Submit(bpy.types.Operator):
 		ore = sce.ore_render
 		#rd = context.scene.render
 		images = None
-		enginesString = getSceneEngines()
+		engineString = getSceneEngine()
 
 		# Calculate temporary scene path:
 		scenefile = bpy.data.filepath
@@ -167,20 +168,18 @@ class ORE_Submit(bpy.types.Operator):
 		# Create a job:
 		job = af.Job(jobname)
 		servicename = 'blender'
-		block = af.Block(enginesString, servicename)
+		block = af.Block(engineString, servicename)
 
-		#if enginesString == 'BLENDER_RENDER':
-			#block.setParser('blender_render')
-		#if enginesString == 'CYCLES':
-			#block.setParser('blender_cycles')
+		if engineString == 'BLENDER_RENDER':
+			block.setParser('blender_render')
+		elif engineString == 'CYCLES':
+			block.setParser('blender_cycles')
 
-		# set blender_cycles parser for all engines
-		block.setParser('blender_cycles')
 
 		job.blocks.append(block)
 		# Set block command and frame range:
 		cmd = 'blender -b "%s"' % renderscenefile
-		cmd += ' -E "%s"' % enginesString
+		cmd += ' -E "%s"' % engineString
 		if images is not None:
 			cmd += ' -o "%s"' % images
 		cmd += ' -s @#@ -e @#@ -j %d -a' % finc
