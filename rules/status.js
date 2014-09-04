@@ -1095,7 +1095,7 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 			return;
 		}
 
-		progress = Math.round( progress / progress_count);
+		progress = Math.floor( progress / progress_count);
 		progresses[paths[w]] = progress;
 
 //console.log(paths[w]+': '+progress_count+': '+progress);
