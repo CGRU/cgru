@@ -46,26 +46,19 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
 	bl_context = "render"
-	#bl_options = {'DEFAULT_CLOSED'}
+	bl_options = {'DEFAULT_CLOSED'}
 
 	def draw(self, context):
 		layout = self.layout
 		sce = context.scene
 		ore = sce.ore_render
 
-		layout.prop(ore, 'jobname')
-		layout.label(text="Engines: " + getSceneEngines())
-
-
-		layout.separator()
-		row = layout.row()
-		#row.prop(ore, 'fstart')
-		#row.prop(ore, 'fend')
-		#row.prop(ore, 'finc')
-		row.prop(ore, 'fpertask')
-
-		layout.separator()
 		layout.operator('ore.submit')
+		layout.separator()
+
+		layout.label(text="Engines: " + getSceneEngines())
+		layout.prop(ore, 'jobname')
+		layout.prop(ore, 'filepath')
 
 		layout.separator()
 		layout.prop(ore, 'pause')
@@ -75,8 +68,8 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		layout.prop(ore, 'relativePaths')
 		layout.prop(ore, 'packTextures')
 
-		layout.prop(ore, 'filepath')
-
+		layout.separator()
+		row.prop(ore, 'fpertask')
 		layout.prop(ore, 'priority')
 		layout.prop(ore, 'maxruntasks')
 		layout.prop(ore, 'dependmask')

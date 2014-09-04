@@ -30,13 +30,7 @@ class ORESettings(bpy.types.PropertyGroup):
 	jobname = StringProperty(name='Job Name',
 							 description='Job Name. Scene name if empty.',
 							 maxlen=512, default='')
-	#engine = StringProperty(name='Use Engine',
-							 #description='Engine to render scene with.',
-							 #maxlen=512, default='')
-	#fstart = IntProperty(name='Start', description='Start Frame', default=1)
-	#fend = IntProperty(name='End', description='End Frame', default=11)
-	#finc = IntProperty(name='By', description='Frames Increment', min=1,
-					   #default=1)
+
 	fpertask = IntProperty(name='Per Task', description='Frames Per One Task',
 						   min=1, default=1)
 	pause = BoolProperty(name='Start Job Paused',
