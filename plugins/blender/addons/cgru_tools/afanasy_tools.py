@@ -42,30 +42,25 @@ def getSceneEngines():
 
 class RENDER_PT_Afanasy(bpy.types.Panel):
 	bl_label = "Afanasy"
-	bl_space_type = 'VIEW_3D'
-	bl_region_type = 'TOOLS'
-	bl_context = "objectmode"
 	bl_category = 'CGRU'
-	#bl_options = {'DEFAULT_CLOSED'}
+	bl_space_type = 'PROPERTIES'
+	bl_region_type = 'WINDOW'
+	bl_context = "render"
+	bl_options = {'DEFAULT_CLOSED'}
 
 	def draw(self, context):
 		layout = self.layout
 		sce = context.scene
 		ore = sce.ore_render
 
-		layout.prop(ore, 'jobname')
-		layout.label(text="Engines: " + getSceneEngines())
+		#row = layout.row()
 
-
-		layout.separator()
-		row = layout.row()
-		row.prop(ore, 'fstart')
-		row.prop(ore, 'fend')
-		row.prop(ore, 'finc')
-		row.prop(ore, 'fpertask')
-
-		layout.separator()
 		layout.operator('ore.submit')
+		layout.separator()
+
+		layout.label(text="Engines: " + getSceneEngines())
+		layout.prop(ore, 'jobname')
+		layout.prop(ore, 'filepath')
 
 		layout.separator()
 		layout.prop(ore, 'pause')
@@ -75,36 +70,8 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		layout.prop(ore, 'relativePaths')
 		layout.prop(ore, 'packTextures')
 
-
-class PARAMETERS_PT_RenderSettings(bpy.types.Panel):
-	"""Missing DocString
-	"""
-
-	bl_label = 'Render Settings'
-	bl_space_type = 'VIEW_3D'
-	bl_region_type = 'TOOLS'
-	bl_context = "objectmode"
-	bl_category = 'CGRU'
-
-	def draw(self, context):
-		layout = self.layout
-		ore = context.scene.ore_render
-		layout.prop(ore, 'filepath')
-
-
-class PARAMETERS_PT_Afanasy(bpy.types.Panel):
-	"""Missing DocString
-	"""
-
-	bl_label = 'Parameters'
-	bl_space_type = 'VIEW_3D'
-	bl_region_type = 'TOOLS'
-	bl_context = "objectmode"
-	bl_category = 'CGRU'
-
-	def draw(self, context):
-		layout = self.layout
-		ore = context.scene.ore_render
+		layout.separator()
+		layout.prop(ore, 'fpertask')
 		layout.prop(ore, 'priority')
 		layout.prop(ore, 'maxruntasks')
 		layout.prop(ore, 'dependmask')
@@ -155,9 +122,9 @@ class ORE_Submit(bpy.types.Operator):
 					jobname = jobname[:-6]
 
 		# Get frames settings:
-		fstart = ore.fstart
-		fend = ore.fend
-		finc = ore.finc
+		fstart = bpy.context.scene.frame_start
+		fend = bpy.context.scene.frame_end
+		finc = bpy.context.scene.frame_step
 		fpertask = ore.fpertask
 		# Check frames settings:
 		if fpertask < 1:
@@ -218,6 +185,7 @@ class ORE_Submit(bpy.types.Operator):
 			cmd += ' -o "%s"' % images
 		cmd += ' -s @#@ -e @#@ -j %d -a' % finc
 		block.setCommand(cmd)
+		#print(cmd)
 		block.setNumeric(fstart, fend, fpertask, finc)
 		if images is not None:
 			pos = images.find('#')
