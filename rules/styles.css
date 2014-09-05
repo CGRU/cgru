@@ -225,7 +225,9 @@ min-height: 19px;
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
 .tag { float:left; cursor: pointer; /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
-.artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 4px; }
+.tag.short { margin:0 1px; padding:0 2px; }
+.tag.me { background: rgba(100,255,100,.5); }
+.artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 2px; }
 .tags { font-style:italic;}
 
 .progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; }

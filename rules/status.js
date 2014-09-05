@@ -273,20 +273,39 @@ function st_SetElText( i_status, i_el, i_field, i_full)
 	else
 		i_el.innerHTML = '';
 }
-function st_SetElArtists( i_status, i_elArtists, i_short)
+function st_SetElArtists( i_status, i_el, i_short)
 {
-	var text = '';
-	if( i_status && i_status.artists )
-		for( var i = 0; i < i_status.artists.length; i++)
+	i_el.textContent = '';
+
+	if(( i_status == null ) || ( i_status.artists == null ))
+		return;
+
+	for( var i = 0; i < i_status.artists.length; i++)
+	{
+		var el = document.createElement('div');
+		i_el.appendChild( el);
+		el.classList.add('tag');
+		el.textContent = c_GetUserTitle( i_status.artists[i], null, i_short);
+
+		if( i_short )
 		{
-			if( i )
-			{
-				if( i_short ) text += ',';
-				else text += ', ';
-			}
-			text += c_GetUserTitle( i_status.artists[i], null, i_short);
+			el.classList.add('short');
+			if( g_auth_user && ( g_auth_user.id == i_status.artists[i] ))
+				el.title = 'It`s me!';
+			else
+				el.title = c_GetUserTitle( i_status.artists[i]);
 		}
-	i_elArtists.textContent = text;
+
+		if( g_auth_user && ( g_auth_user.id == i_status.artists[i] ))
+		{	
+			el.classList.add('me');
+
+			if( i_short !== true )
+			{
+				el.title = 'It`s me!\n - may be i should do something here?';
+			}
+		}
+	}
 }
 function st_SetElTags( i_status, i_elTags, i_short)
 {
