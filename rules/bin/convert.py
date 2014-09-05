@@ -80,7 +80,6 @@ for input in Inputs:
 			output += '.q%d' % Options.quality
 		if Options.resize != '':
 			output += '.r%s' % Options.resize
-#		output += '.' + Options.type
 
 	if os.path.isdir(input):
 		mkdir = '%s.%s' % (output, Options.type )
@@ -141,7 +140,10 @@ for input in Inputs:
 		cmd += colorspace
 
 		if mkdir:
-			output = os.path.join(mkdir, os.path.basename(afile)) + '.' + ext
+			output = os.path.join(mkdir, os.path.basename(afile))
+
+		output,old_ext = os.path.splitext(output)
+		output += '.' + ext
 
 		cmd += ' "%s"' % output
 
