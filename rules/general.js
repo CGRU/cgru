@@ -11,6 +11,8 @@ g_elFolders = {};
 g_nav_clicked = false;
 g_arguments = null;
 
+g_default_infos = ['annotation','artists','percent'];
+
 function cgru_params_OnChange( i_param, i_value) { u_ApplyStyles();}
 
 function g_Init()
@@ -598,7 +600,7 @@ function g_NavigShowInfo( i_toggle)
 		var name = 'navig_show_'+infos[i];
 		if( localStorage[name] == null )
 		{
-			if( infos[i] == 'annotation' )
+			if( g_default_infos.indexOf(infos[i]) != -1 )
 				localStorage[name] = 'true';
 			else
 				localStorage[name] = 'false';
