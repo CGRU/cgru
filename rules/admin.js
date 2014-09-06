@@ -343,6 +343,9 @@ function ad_OpenWindow()
 	elBtnDeleteUsr.textContent = 'Delete User';
 	elBtnDeleteUsr.onclick = ad_DeleteUserOnClick;
 
+	ad_wnd.elInfo = document.createElement('div');
+	ad_wnd.elContent.appendChild( ad_wnd.elInfo);
+
 	ad_wnd.elGroups = document.createElement('div');
 	ad_wnd.elContent.appendChild( ad_wnd.elGroups);
 	ad_wnd.elGroups.classList.add('admin_groups');
@@ -363,7 +366,7 @@ function ad_WndDrawGroups()
 		var el = document.createElement('div');
 		ad_wnd.elGroups.appendChild( el);
 		ad_wnd.elGrpBnts.push( el);
-		el.textContent = grp;
+		el.textContent = grp + ' [' + g_groups[grp].length + ']';
 		el.m_group = grp;
 		el.onclick = ad_WndGrpOnClick;
 		if( grp == ad_wnd_curgroup )
@@ -444,19 +447,19 @@ function ad_WndDrawUsers()
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Cnls';
-	el.title = 'New subscribed channels';
+	el.title = 'News subscribed channels.\nDouble click clear channels.';
 	el.onclick = function(e) { ad_WndSortUsers('channels'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'News';
-	el.title = 'News count';
+	el.title = 'News count.\nDouble click clear news.';
 	el.onclick = function(e) { ad_WndSortUsers('news'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Lim';
-	el.title = 'News count limit';
+	el.title = 'News count limit.\nDouble click to set limit.';
 	el.onclick = function(e) { ad_WndSortUsers('news_limit'); };
 
 	var el = document.createElement('th');
@@ -550,6 +553,9 @@ function ad_WndReceivedUsers()
 
 	if( ad_wnd == null ) return;
 
+	var info = Object.keys(g_users).length + ' users, ' + Object.keys(g_groups).length + ' groups.';
+	ad_wnd.elInfo.textContent = info;
+
 	ad_WndDrawGroups();
 	ad_WndDrawUsers();
 }
@@ -614,11 +620,15 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		 channels += i_user.channels[i].id+'\n';
 		el.title = channels;
 	}
+	el.m_user_id = i_user.id;
+	el.ondblclick = function(e){ad_UserChannelsClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	if( i_user.news )
 		el.textContent = i_user.news.length;
+	el.m_user_id = i_user.id;
+	el.ondblclick = function(e){ad_UserNewsClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -626,6 +636,8 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.textContent = i_user.news_limit;
 	else
 		el.innerHTML = '<i>' + RULES.news.limit + '</i>';
+	el.m_user_id = i_user.id;
+	el.ondblclick = function(e){ad_UserNewsLimitDialog( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -741,6 +753,29 @@ function ad_ChangeEmail( i_email, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"email":i_email}, ad_WndRefresh);
 }
+function ad_UserChannelsClean( i_user_id)
+{
+	ad_SaveUser({"id":i_user_id,"channels":[]}, ad_WndRefresh);
+}
+function ad_UserNewsClean( i_user_id)
+{
+	ad_SaveUser({"id":i_user_id,"news":[]}, ad_WndRefresh);
+}
+function ad_UserNewsLimitDialog( i_user_id)
+{
+	new cgru_Dialog({"handle":'ad_UserNewsLimitSet',"param":i_user_id,"value":g_users[i_user_id].news_limit,
+		"name":'users',"title":'Change News Limit',"info":'Enter news limit for ' + c_GetUserTitle(i_user_id)});
+}
+function ad_UserNewsLimitSet( i_limit, i_user_id)
+{
+	var limit = parseInt( i_limit);
+	if( isNaN( limit))
+	{
+		c_Error('Invalid news limit: ' + i_limit);
+		return;
+	}
+	ad_SaveUser({"id":i_user_id,"news_limit":limit}, ad_WndRefresh);
+}
 function ad_SaveUser( i_user, i_func)
 {
 	if( i_user == null ) i_user = g_auth_user;
@@ -755,7 +790,6 @@ function ad_SaveUser( i_user, i_func)
 
 function ad_CreateUserOnClick()
 {
-//	new cgru_Dialog( window, window, 'ad_CreateUser', null, 'str', '', 'users', 'Create New User', 'Enter User Login Name');
 	new cgru_Dialog({"handle":'ad_CreateUser',
 		"name":'users',"title":'Create New User',"info":'Enter User Login Name'});
 }
