@@ -504,6 +504,7 @@ function g_FolderSetStatus( i_status, i_elFolder, i_params)
 {
 //console.log('GFS:'+JSON.stringify(i_status));
 	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
+	if( i_elFolder.m_fobject.status == null ) i_elFolder.m_fobject.status = {};
 
 	if( i_params )
 		for( parm in i_params )
