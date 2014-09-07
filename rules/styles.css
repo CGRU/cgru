@@ -418,7 +418,9 @@ padding: 5px 4px;
 
 .files_view { border: 1px solid #777; }
 .files_view .panel { border: 1px solid #777; }
-.files_view .panel .button{ width: 18px; height: 18px; }
+.files_view .panel .button { width: 18px; height: 18px; }
+.files_view .panel .counts { clear:both; font: 14px monospace; }
+.files_view .panel .counts .frames_count { float: right; border: 1px solid #777; font-size: 12px; padding: 0px 4px; cursor: pointer; }
 .files_view .panel div, .files_view .panel a { float: left; margin: 0px 8px; }
 .files_view .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; height: 14px; width: 50px; /*border-radius: 4px;*/ box-shadow: 0 0 2px #000; text-align: center; }
 .files_view .panel .title { clear: both; font-weight: bold;}

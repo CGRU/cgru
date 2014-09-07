@@ -93,9 +93,6 @@ genetate thumbnails.";
 		el.onclick = function(e){ e.currentTarget.m_view.makeFolder()};
 	}
 
-	this.elCounts = document.createElement('div');
-	this.elPanel.appendChild( this.elCounts);
-
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
@@ -190,6 +187,10 @@ genetate thumbnails.";
 		};
 		this.elGenBtn.title = 'Generate ' + RULES.checksum[sum].name;
 	}
+
+	this.elCounts = document.createElement('div');
+	this.elPanel.appendChild( this.elCounts);
+	this.elCounts.classList.add('counts');
 
 	this.elView = document.createElement('div');
 	this.elRoot.appendChild( this.elView);
@@ -305,6 +306,8 @@ FilesView.prototype.show = function()
 
 	var folders_count = 0;
 	var files_count = 0;
+	var frames_count = 0;
+	var size_count = 0;
 
 	if( this.walk.folders)
 	{
@@ -313,6 +316,13 @@ FilesView.prototype.show = function()
 			if( false == fv_SkipFile( this.walk.folders[i].name))
 			{
 				this.showFolder( this.walk.folders[i]);
+
+				if( this.walk.folders[i].size_total )
+					size_count += this.walk.folders[i].size_total;
+
+				if( this.walk.folders[i].num_files )
+					frames_count += this.walk.folders[i].num_files;
+
 				folders_count++;
 			}
 	}
@@ -324,16 +334,32 @@ FilesView.prototype.show = function()
 			if( false == fv_SkipFile( this.walk.files[i].name))
 			{
 				this.showFile( this.walk.files[i]);
+
+				if( this.walk.files[i].size )
+					size_count += this.walk.files[i].size;
+
 				files_count++;
 			}
 	}
 
 	var counts = '';
-	if( folders_count )
-		counts += folders_count + ' Dirs';
-	if( files_count )
-		counts += ' ' + files_count + ' Files';
+	if( folders_count ) counts += ' Dirs:' + folders_count;
+	if( files_count ) counts += ' Files:' + files_count;
+	if( size_count ) counts += ' Size:' + c_Bytes2KMG( size_count);
+
 	this.elCounts.textContent = counts;
+
+	if( frames_count )
+	{
+		var el = document.createElement('div');
+		this.elCounts.appendChild( el);
+		el.classList.add('frames_count');
+		el.textContent = 'F:' + frames_count;
+		el.title = 'All folders files sum.\nDouble click to update status frames number.';
+		el.m_frames_count = frames_count;
+		el.onclick = function(e){e.stopPropagation();};
+		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_frames_count);};
+	}
 
 	this.limitApply();
 }
