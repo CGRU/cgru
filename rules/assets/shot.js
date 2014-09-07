@@ -3,6 +3,7 @@ shot_thumb_paths = [];
 function shot_Init()
 {
 	shot_thumb_paths = [];
+	shot_res_paths = [];
 
 	a_SetLabel('Shot');
 
@@ -43,6 +44,11 @@ function shot_InitHTML( i_data)
 //console.log( cmd);
 	$('shot_nuke_latest_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
 
+	shot_ResultsRead( true);
+}
+
+function shot_ResultsRead( i_first_time)
+{
 	// Collect walks to show result folders:
 	var walk = {};
 	walk.paths = [];
@@ -54,84 +60,57 @@ function shot_InitHTML( i_data)
 		$('shot_src_div').style.display = 'block';
 
 	if( ASSET.result )
-	{
-		walk.result = [];
 		for( var r = 0; r < ASSET.result.path.length; r++)
-		{
-			walk.result.push( walk.paths.length);
 			walk.paths.push( ASSET.path + '/' + ASSET.result.path[r]);
-		}
-		$('shot_results').style.display = 'block';
-	}
+
 	if( ASSET.dailies )
-	{
-		walk.dailies = [];
 		for( var r = 0; r < ASSET.dailies.path.length; r++)
-		{
-			walk.dailies.push( walk.paths.length);
 			walk.paths.push( ASSET.path + '/' + ASSET.dailies.path[r]);
-		}
-		$('shot_dailies').style.display = 'block';
+
+	if( walk.paths.length == 0 )
+	{
+		$('shot_results').textContent('No results paths defined in the shot asset.');
+		return;
 	}
 
-	walk.mtime = RULES.cache_time;
-	if( ASSET.cache_time ) walk.mtime = ASSET.cache_time;
-	walk.wfunc = shot_Loaded;
+
+	if( i_first_time )
+	{
+		walk.mtime = RULES.cache_time;
+		if( ASSET.cache_time )
+			walk.mtime = ASSET.cache_time;
+	}
+
+	walk.wfunc = shot_ResultsReceived;
 	walk.info = 'walk results';
+	walk.first_time = i_first_time;
 
 	n_WalkDir( walk);
 }
 
-function shot_Loaded( i_data, i_args)
+function shot_ResultsReceived( i_data, i_args)
 {
-	var walk = i_args;
-	walk.walks = i_data;
 	res_filesviews = [];
 
-	if( ASSET.result )
+	var el = $('shot_results');
+	el.textContent = '';
+	var found = false;
+	for( var i = 0; i < i_data.length; i++)
 	{
-		var el = $('shot_results');
-		el.textContent = '';
-		var found = false;
-		for( var i = 0; i < walk.result.length; i++)
-		{
-			var folders = walk.walks[walk.result[i]].folders;
-			var files   = walk.walks[walk.result[i]].files;
-			var path = walk.paths[walk.result[i]];
-			if((( folders == null ) || ( folders.length == 0 )) &&
-				(( files  == null ) || (   files.length == 0 ))) continue;
+		var folders = i_data[i].folders;
+		var files   = i_data[i].files;
+		var path    = i_args.paths[i];
 
-			shot_thumb_paths.push( path);
-			res_filesviews.push( new FilesView({"el":el,"path":path,"walk":walk.walks[walk.result[i]],"can_count":true}))
-			found = true;
-		}
+		if((( folders == null ) || ( folders.length == 0 )) &&
+			(( files  == null ) || (   files.length == 0 ))) continue;
 
-		if( false == found )
-			el.textContent = JSON.stringify( ASSET.result.path );
+		shot_thumb_paths.push( path);
+		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],"can_count":true}))
+		found = true;
 	}
 
-	if( ASSET.dailies )
-	{
-		var el = $('shot_dailies');
-		el.textContent = '';
-		var found = false;
-		for( var i = 0; i < walk.dailies.length; i++)
-		{
-			var path = walk.paths[walk.dailies[i]];
-			var files = walk.walks[walk.dailies[i]].files;
-			var folders = walk.walks[walk.dailies[i]].folders;
-			if(( files && files.length ) || ( folders && folders.length ))
-			{
-				new FilesView({"el":el,"path":path,"walk":walk.walks[walk.dailies[i]]});
-				if( shot_thumb_paths.length == 0 )
-					shot_thumb_paths.push( path);
-				found = true;
-			}
-		}
-
-		if( false == found )
-			el.textContent = JSON.stringify( ASSET.dailies.path );
-	}
+	if( false == found )
+		el.textContent = JSON.stringify( i_args.paths);
 
 	shot_MakeThumbnail( shot_thumb_paths);
 
@@ -185,7 +164,8 @@ function shot_Loaded( i_data, i_args)
 		fv.countFiles( path, args);
 	}
 
-	shot_Post();
+	if( i_args.first_time )
+		shot_Post();
 }
 
 function shot_Post()
@@ -289,7 +269,6 @@ function shot_ScanSources()
 {
 	$('shot_src_div').style.clear = 'both';
 	$('shot_src_div').style.cssFloat = 'none';
-	$('shot_src_btn').style.display = 'none';
 	$('shot_src').style.display = 'block';
 	$('shot_src').classList.add('waiting');
 
@@ -300,6 +279,8 @@ function shot_ScanSources()
 }
 function shot_SourceReceived( i_data, i_args)
 {
+	$('shot_src_btn').textContent = 'Rescan Sources';
+
 	var el = $('shot_src');
 	el.textContent = '';
 	el.classList.remove('waiting');

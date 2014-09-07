@@ -2,6 +2,7 @@
 
 .shot_files {
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
+clear: both;
 margin: 6px;
 }
 .shot_files  .files_view {
@@ -24,7 +25,7 @@ margin:2px 4px;
 </div>
 
 <div id="shot_src_div" style="float: left; display: none;">
-	<div id="shot_src_btn" class="button"
+	<div id="shot_src_btn" class="button" style="float: left;"
 		title="Scan shot sources folder and its subfolders for sequences and movies."
 		onclick="shot_ScanSources()">Scan Sources</div>
 	<div id="shot_src" class="shot_files" style="display: none;">Scanning Shot Source Sequences...</div>
@@ -37,7 +38,7 @@ margin:2px 4px;
 ( alphabetically last )">Nk Latest</div>
 </div>
 
-<div id="shot_results" class="shot_files" style="clear: both; display: none;">Reading Shot Results...</div>
+<div class="button" style="float: left;" onclick="shot_ResultsRead(false)">Reread Shot Results</div>
 
-<div id="shot_dailies" class="shot_files" style="clear: both; display: none;">Reading Shot Dailies...</div>
+<div id="shot_results" class="shot_files">Reading Shot Results...</div>
 
