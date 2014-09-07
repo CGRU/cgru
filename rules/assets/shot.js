@@ -307,22 +307,25 @@ function shot_SourceReceived( i_data, i_args)
 	var not_empty_paths = [];
 	for( var i = 0; i < i_data.length; i++)
 	{
-		var fo_list = [];
-		var fi_list = [];
-		shot_SourceWalkFind( i_data[i], fo_list, fi_list);
+		var walk = {}
+		walk.folders = [];
+		walk.files = [];
+		walk.rufiles = [];
+
+		shot_SourceWalkFind( i_data[i], walk);
 
 		// Update shot frames number if not set:
 		if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 		{
 			var frames_num = null;
 			// Update only if all ssource sequences have the same length:
-			for( var f = 0; f < fo_list.length; f++)
+			for( var f = 0; f < walk.folders.length; f++)
 			{
-				if(( frames_num == null ) && fo_list[f].files && fo_list[f].files.length )
+				if(( frames_num == null ) && walk.folders[f].files && walk.folders[f].files.length )
 				{
-					frames_num = fo_list[f].files.length;
+					frames_num = walk.folders[f].files.length;
 				}
-				else if( fo_list[f].files && fo_list[f].files.length && ( frames_num != fo_list[f].files.length ))
+				else if( walk.folders[f].files && walk.folders[f].files.length && ( frames_num != walk.folders[f].files.length ))
 				{
 					frames_num = null;
 					break;
@@ -333,9 +336,9 @@ function shot_SourceReceived( i_data, i_args)
 				st_SetFramesNumber( frames_num);
 		}
 
-		if( fo_list.length || fi_list.length )
+		if( walk.folders.length || walk.files.length )
 		{
-			new FilesView({"el":el,"path":i_args.paths[i],"walk":{"folders":fo_list,"files":fi_list},"limits":false,"thumbs":false,"refresh":false});
+			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"-thumbs":false,"refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
 			found = true;
 		}
@@ -351,10 +354,8 @@ function shot_SourceReceived( i_data, i_args)
 	}
 }
 
-function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
+function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 {
-//console.log( JSON.stringify( i_walk).replace(/,/g,', '));
-//console.log( i_path);
 	if( i_walk.files && i_walk.files.length )
 	{
 		var img_num = 0;
@@ -368,7 +369,7 @@ function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 			{
 				if( i_path )
 					i_walk.files[f].name = i_path + '/' + i_walk.files[f].name;
-				o_fi_list.push( i_walk.files[f]);
+				o_walk.files.push( i_walk.files[f]);
 			}
 
 			if( false == c_FileIsImage( name )) continue;
@@ -380,7 +381,13 @@ function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 			else if( i_walk.name == null )
 				i_walk.name = '/';
 
-			o_fo_list.push( i_walk);
+			o_walk.folders.push( i_walk);
+
+			// Add parent folder rufiles, needed to show thumbnails:
+			if( i_parent_walk.rufiles )
+				for( var r = 0; r < i_parent_walk.rufiles.length; r++)
+					if( o_walk.rufiles.indexOf( i_parent_walk.rufiles[r]) == -1 )
+						o_walk.rufiles.push( i_parent_walk.rufiles[r]);
 
 			break;
 		}
@@ -392,12 +399,11 @@ function shot_SourceWalkFind( i_walk, o_fo_list, o_fi_list, i_path)
 	for( var f = 0; f < i_walk.folders.length; f++)
 	{
 		var fobj = i_walk.folders[f];
-//console.log(JSON.stringify(fobj));
 		var path = i_path;
 		if( path ) path += '/' + fobj.name;
 		else path = fobj.name;
 
-		shot_SourceWalkFind( fobj, o_fo_list, o_fi_list, path);
+		shot_SourceWalkFind( fobj, o_walk, path, i_walk);
 	}
 }
 
