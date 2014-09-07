@@ -7,7 +7,7 @@ c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg','flv'];
 c_movieTypesHTML = ['ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
-c_archives = ['zip','rar','7z'];
+c_archives = ['zip','rar','7z','001'];
 
 c_logCount = 0;
 c_elLogs = [];

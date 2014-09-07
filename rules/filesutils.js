@@ -391,6 +391,7 @@ function fu_PutMultiFinished( i_data, i_args)
 //
 fu_arch_params = {};
 fu_arch_params.dest = {"label":'Destination'};
+fu_arch_params.split = {"tooltip":'Split archive size.'};
 function fu_Archivate( i_args)
 {
 //console.log( JSON.stringify( i_args));
@@ -455,6 +456,8 @@ function fu_ArchivateProcessGUI( i_wnd)
 		job.name = 'Archive ' + params.type;
 		arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
 		arch_cmd += ' -t ' + params.type;
+		if( params.split != '' )
+			arch_cmd += ' -s ' + params.split;
 	}
 	else
 	{

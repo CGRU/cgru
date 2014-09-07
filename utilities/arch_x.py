@@ -32,9 +32,16 @@ Size = 0
 
 Cmd = None
 Key = None
+CmdPre = None
 CmdList = None
 
 if Ext == 'zip':
+	parts, tmp = os.path.splitext( Options.input)
+	parts = parts + '.z01'
+	print(parts)
+	if os.path.isfile( parts):
+		CmdPre = 'zip -F "%s" --output "%s"' % (Options.input,(Options.input+'.zip'))
+		Options.input += '.zip'
 	CmdList = ['unzip','-l', Options.input]
 	Cmd = ['unzip','-o']
 	if Options.output is not None: Cmd.extend(['-d', Options.output])
@@ -45,7 +52,7 @@ elif Ext == 'rar':
 	Cmd = ['unrar','x','-r','-o+','-y', Options.input]
 	if Options.output is not None: Cmd.append( Options.output)
 	Key = 'Extracting '
-elif Ext == '7z':
+elif Ext == '7z' or Ext == '001':
 	CmdList = ['7za','l', Options.input]
 	Cmd = ['7za','x','-y']
 	if Options.output is not None: Cmd.extend(['-o', Options.output])
@@ -54,6 +61,10 @@ elif Ext == '7z':
 
 if Cmd is None:
 	errorExit('Unsupported arvhive type "%s"' % Ext)
+
+if CmdPre:
+	print( CmdPre)
+	os.system( CmdPre)
 
 print(' '.join(CmdList))
 
