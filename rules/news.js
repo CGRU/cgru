@@ -389,7 +389,11 @@ function nw_NewsShow( i_news)
 
 	$('news').innerHTML = '';
 	$('news').m_elArray = [];
+
+	var projects = [];
+
 	g_auth_user.news.sort( function(a,b){var attr='time';if(a[attr]>b[attr])return -1;if(a[attr]<b[attr])return 1;return 0;});
+
 	for( var i = 0; i < g_auth_user.news.length; i++ )
 	{
 		var news = g_auth_user.news[i];
@@ -433,9 +437,27 @@ function nw_NewsShow( i_news)
 		el.appendChild( elLink);
 		elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
+
+		var prj = news.path.substr(1);
+		prj = prj.substr( 0, prj.indexOf('/'));
+		if( projects.indexOf(prj) == -1 )
+			projects.push( prj);
 	}
 
 	delete g_auth_user.news;
+
+	// News projects:
+	$('news_projects').innerHTML = '';
+
+	for( var i = 0; i < projects.length; i++ )
+	{
+		var el = document.createElement('div');
+		$('news_projects').appendChild( el);
+		el.classList.add('button');
+		el.classList.add('nw_fb');
+		el.textContent = projects[i];
+		el.onclick=function(e){ nw_FilterBtn( e.currentTarget, e.currentTarget.textContent, true);};
+	}
 
 	nw_HighlightCurrent();
 	nw_Filter();
@@ -460,10 +482,10 @@ function nw_HighlightCurrent()
 			elNews[i].classList.remove('cur_path');
 }
 
-function nw_FilterBtn(i_btn, i_filter)
+function nw_FilterBtn(i_btn, i_filter, i_project)
 {
 	i_btn.m_filter = i_filter;
-	var all = ( i_filter == '_all_');
+	i_btn.m_project = i_project;
 
 	// Get all news filter buttons and remove push:
 	var btns = document.getElementsByClassName('nw_fb');
@@ -471,7 +493,7 @@ function nw_FilterBtn(i_btn, i_filter)
 		btns[i].classList.remove('pushed');
 
 	// Add push on clicked button except 'All':
-	if( ! all ) i_btn.classList.add('pushed');
+	if( i_filter != '_all_') i_btn.classList.add('pushed');
 
 	nw_Filter();
 }
@@ -479,35 +501,50 @@ function nw_FilterBtn(i_btn, i_filter)
 function nw_Filter()
 {
 	var filter = null;
+	var project = null;
 
 	// Get all news filter buttons and remove push:
 	var btns = document.getElementsByClassName('nw_fb');
 	for( var i = 0; i < btns.length; i++)
 		if( btns[i].classList.contains('pushed'))
+		{
 			filter = btns[i].m_filter;
+			project = btns[i].m_project;
+		}
 
 	var my  = ( filter == '_my_' );
 
 	var elNews = $('news').m_elArray;
 	for( var i = 0; i < elNews.length; i++)
-		if(( filter === null ) ||
+	{
+		if( ( filter === null ) ||
+			( project && ( elNews[i].m_news.path.indexOf( filter ) == 1 )) ||
 			( elNews[i].m_news.title == filter ) ||
 			( my && ( elNews[i].classList.contains('assigned'))))
+		{
 			elNews[i].style.display = 'block';
+		}
 		else
+		{
 			elNews[i].style.display = 'none';
+		}
+	}
 }
 
 function nw_DeleteFiltered( i_visible)
 {
 	var elNews = $('news').m_elArray;
 	var display = 'none';
-	if( i_visible ) display = 'block';
+	if( i_visible )
+		display = 'block';
 
 	var ids = [];
 	for( var i = 0; i < elNews.length; i++)
 		if( elNews[i].style.display == display )
 			ids.push( elNews[i].m_news.id);
+
+	if( i_visible )
+		nw_FilterBtn($('news_filter_show_all'),'_all_');
 
 	nw_DeleteNews( ids);
 }

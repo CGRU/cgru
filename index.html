@@ -293,7 +293,7 @@ Remember any delete operation buttons in RULES requires double-click.
 				<div id="channels" style="display:none"></div>
 			</div>
 			<div class="news_filter" style="font-size: 12px">
-				<div class="button nw_fb" title="Show All" onclick="nw_FilterBtn(this,'_all_')"  >All</div>
+				<div class="button nw_fb" title="Show All" id="news_filter_show_all" onclick="nw_FilterBtn(this,'_all_')">All</div>
 				<div class="button nw_fb" title="Assigned" onclick="nw_FilterBtn(this,'_my_')"   >My</div>
 				<div class="button nw_fb" title="Body"     onclick="nw_FilterBtn(this,'body')"   >B</div>
 				<div class="button nw_fb" title="Status"   onclick="nw_FilterBtn(this,'status')" >S</div>
@@ -301,6 +301,7 @@ Remember any delete operation buttons in RULES requires double-click.
 				<div class="button nw_fb" title="Dailies"  onclick="nw_FilterBtn(this,'dailies')">D</div>
 				<div class="button nw_fb" title="Comment"  onclick="nw_FilterBtn(this,'comment')">C</div>
 			</div>
+			<div class="news_filter" id="news_projects" style="font: 10px monospace;"></div>
 			<div id="news"></div>
 		</div>
 	</div>
