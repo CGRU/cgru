@@ -287,7 +287,7 @@ function shot_RefsReceived( i_data, i_args)
 	}
 }
 
-function shot_ScanSources()
+function shot_SourcesScan()
 {
 	$('shot_src_div').style.clear = 'both';
 	$('shot_src_div').style.cssFloat = 'none';
@@ -297,11 +297,19 @@ function shot_ScanSources()
 	var paths = [];
 	for( var i = 0; i < ASSET.source.path.length; i++)
 		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
-	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourceReceived,"info":'walk src',"local":true});
+	n_WalkDir({"paths":paths,"depth":5,"wfunc":shot_SourcesReceived,"info":'walk src',"local":true});
 }
-function shot_SourceReceived( i_data, i_args)
+function shot_SourcesClose()
+{
+	$('shot_src_div').style.clear = 'none';
+	$('shot_src_div').style.cssFloat = 'left';
+	$('shot_src').style.display = 'none';
+	$('shot_src_close_btn').style.display = 'none';
+}
+function shot_SourcesReceived( i_data, i_args)
 {
 	$('shot_src_btn').textContent = 'Rescan Sources';
+	$('shot_src_close_btn').style.display = 'block';
 
 	var el = $('shot_src');
 	el.textContent = '';
