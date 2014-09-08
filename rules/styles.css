@@ -224,7 +224,7 @@ min-height: 19px;
 
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
-.tag { float:left; cursor: pointer; /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
+.tag { float:left; cursor: pointer; /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; margin:1px 4px; padding:0 4px; }
 .tag.short { margin:0 1px; padding:0 2px; }
 .tag.me { background: rgba(100,255,100,.5); }
 .artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 2px; }
@@ -376,7 +376,9 @@ padding: 4px;
 .status_edit { clear: both; }
 .status_edit .percent { float:left; margin: 0px 6px; }
 .status_edit .color { clear:both;}
-.status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
+.status_edit .list { padding: 4px; margin: 2px; /*border-radius: 3px;*/ /*border: 1px solid rgba(0,0,0,.2);*/ }
+.status_edit .list .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); }
+.status_edit .list .role .label { float: left; padding: 0px 6px; font-style: italic; }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
 .status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
 .status_edit .edit_tasks .task .button { clear: both; float: left; padding: 0px 4px; }
@@ -596,7 +598,7 @@ box-shadow: 0 0 4px #000 inset;
 .admin_users { overflow: auto; }
 .admin_users table { border-collapse: collapse; width: 100%; }
 .admin_users th { font-weight: normal; }
-.admin_users td { text-align: center; border:1px solid rgba(0,0,0,.1); min-height: 20px; }
+.admin_users td { text-align: center; border: 1px solid rgba(0,0,0,.5); padding: 4px; min-height: 20px; }
 .admin_users .selected td { background: rgba(100,255,255,.2); }
 
 /*

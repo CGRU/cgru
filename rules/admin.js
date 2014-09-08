@@ -568,8 +568,8 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elTr.m_user = i_user;
 	elTr.classList.add('user');
 
-	if( i_row % 2) elTr.style.backgroundColor = 'rgba(255,255,255,.1)';
-	else elTr.style.backgroundColor = 'rgba(0,0,0,.1)';
+	if( i_row % 2 ) elTr.style.backgroundColor = 'rgba(0,0,0,.1)';
+	else elTr.style.backgroundColor = 'rgba(255,255,255,.1)';
 
 	if( i_user.groups.indexOf( ad_wnd_curgroup ) != -1 )
 		elTr.classList.add('selected');

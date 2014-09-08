@@ -651,6 +651,12 @@ Status.prototype.editListEdit = function( i_args)
 
 	i_args.elEdit[i_args.name] = [];
 
+	if( i_args.name == 'artists')
+	{
+		this.editArtistsEdit( i_args);
+		return;
+	}
+
 	for( var item in i_args.list_all)
 	{
 		var el = document.createElement('div');
@@ -682,6 +688,76 @@ Status.prototype.editListEdit = function( i_args)
 
 		el.onclick = status_elToggleSelection;
 		i_args.elEdit[i_args.name].push( el);
+	}
+}
+Status.prototype.editArtistsEdit = function( i_args)
+{
+	i_args.elRoot.m_elBtn.style.display = 'none';
+
+	var roles_obj = {};
+	for( var item in i_args.list_all)
+	{
+		var role = i_args.list_all[item].role;
+
+		if( roles_obj[role] == null )
+			roles_obj[role] = [];
+
+		roles_obj[role].push( i_args.list_all[item]);
+	}
+
+	var roles = [];
+	for( var role in roles_obj )
+	{
+		roles_obj[role].sort(function(a,b){return a.title > b.title});
+		roles.push({"role":role,"artists":roles_obj[role]});
+	}
+	roles.sort(function(a,b){return a.role < b.role});
+
+	for( var r = 0; r < roles.length; r++)
+	{
+
+		var elRole = document.createElement('div');
+		i_args.elRoot.appendChild( elRole);
+		elRole.classList.add('role');
+
+		var elLabel = document.createElement('div');
+		elRole.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = roles[r].role + ':';
+
+		for( var a = 0; a < roles[r].artists.length; a++)
+		{
+			var artist = roles[r].artists[a];
+
+			var el = document.createElement('div');
+			elRole.appendChild( el);
+			el.classList.add('tag');
+			el.m_item = artist.id;
+//			if( artist.title )
+				el.textContent = artist.title;
+//			else
+//				el.textContent = artist.id;
+
+			if( artist.tip )
+				el.title = artist.tip;
+
+			if( i_args.list[artist.id] )
+			{
+				if( i_args.list[artist.id].half )
+				{
+					el.m_half_selected = true;
+					el.classList.add('half_selected');
+				}
+				else
+				{
+					el.m_selected = true;
+					el.classList.add('selected');
+				}
+			}
+
+			el.onclick = status_elToggleSelection;
+			i_args.elEdit[i_args.name].push( el);
+		}
 	}
 }
 function status_elToggleSelection( e)
