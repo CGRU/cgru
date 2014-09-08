@@ -104,13 +104,35 @@ function shot_ResultsReceived( i_data, i_args)
 		if((( folders == null ) || ( folders.length == 0 )) &&
 			(( files  == null ) || (   files.length == 0 ))) continue;
 
-		shot_thumb_paths.push( path);
+		// Last path is DAILIES,
+		// We skip it, if something already added
+		if(( i < (i_data.length - 1)) || ( shot_thumb_paths.length == 0 ))
+			shot_thumb_paths.push( path);
+
 		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],"can_count":true}))
 		found = true;
 	}
 
 	if( false == found )
-		el.textContent = JSON.stringify( i_args.paths);
+	{
+		var e = document.createElement('div');
+		el.appendChild( e);
+		e.textContent = 'No results founded in: ';
+		e.classList.add('shot_empty_result');
+
+		for( var i = 0; i < i_args.paths.length; i++)
+		{
+			var path = i_args.paths[i];
+			path = path.replace( ASSET.path,'');
+			if( path.indexOf('/') == 0 )
+				path = path.substring(1);
+
+			var e = document.createElement('div');
+			el.appendChild( e);
+			e.textContent = path;
+			e.classList.add('shot_empty_result');
+		}
+	}
 
 	shot_MakeThumbnail( shot_thumb_paths);
 
