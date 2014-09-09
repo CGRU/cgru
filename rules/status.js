@@ -733,10 +733,10 @@ Status.prototype.editArtistsEdit = function( i_args)
 			elRole.appendChild( el);
 			el.classList.add('tag');
 			el.m_item = artist.id;
-//			if( artist.title )
+			if( artist.title )
 				el.textContent = artist.title;
-//			else
-//				el.textContent = artist.id;
+			else
+				el.textContent = artist.id;
 
 			if( artist.tip )
 				el.title = artist.tip;
