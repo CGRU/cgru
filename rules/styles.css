@@ -228,6 +228,9 @@ min-height: 19px;
 .tag.short { margin:0 1px; padding:0 2px; }
 .tag.me { background: rgba(100,255,100,.5); }
 .artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 2px; }
+.artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); }
+.artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
+#search_artists .role .label { cursor: pointer; }
 .tags { font-style:italic;}
 
 .progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; }
@@ -377,8 +380,6 @@ padding: 4px;
 .status_edit .percent { float:left; margin: 0px 6px; }
 .status_edit .color { clear:both;}
 .status_edit .list { padding: 4px; margin: 2px; /*border-radius: 3px;*/ /*border: 1px solid rgba(0,0,0,.2);*/ }
-.status_edit .list .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); }
-.status_edit .list .role .label { float: left; padding: 0px 6px; font-style: italic; }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
 .status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
 .status_edit .edit_tasks .task .button { clear: both; float: left; padding: 0px 4px; }

@@ -231,6 +231,31 @@ function c_ElDisplayToggle( i_el)
 		i_el.style.display = 'none';
 }
 
+// Construct from g_users sorted roles with sorted artists:
+function c_GetRolesArtists()
+{
+	var roles_obj = {};
+	for( var uid in g_users )
+	{
+		var role = g_users[uid].role;
+
+		if( roles_obj[role] == null )
+			roles_obj[role] = [];
+
+		roles_obj[role].push( g_users[uid]);
+	}
+
+	var roles = [];
+	for( var role in roles_obj )
+	{
+		roles_obj[role].sort(function(a,b){return a.title > b.title});
+		roles.push({"role":role,"artists":roles_obj[role]});
+	}
+	roles.sort(function(a,b){return a.role < b.role});
+
+	return roles;
+}
+
 function c_GetUserTitle( i_uid, i_guest, i_short)
 {
 	if( i_uid == null )

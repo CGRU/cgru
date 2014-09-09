@@ -46,7 +46,6 @@ function u_Init()
 
 	if( localStorage.show_hidden == null ) localStorage.show_hidden = 'OFF';
 	$('show_hidden').textContent = localStorage.show_hidden;
-	$('search_artists').m_elArtists = [];
 
 	u_CalcGUI();
 
@@ -61,19 +60,6 @@ function u_InitAuth()
 	$('body_edit').style.display = 'block';
 	$('search_artists_div').style.display = 'block';
 	$('auth_user').textContent = c_GetUserTitle()+' ['+g_auth_user.id+']';
-
-	var elArtists = $('search_artists');
-	for( var user in g_users )
-	{
-		el = document.createElement('div');
-		elArtists.appendChild( el);
-		el.style.cssFloat = 'left';
-		el.textContent = c_GetUserTitle( user);
-		el.m_user = user;
-		el.classList.add('tag');
-		el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
-		elArtists.m_elArtists.push( el);
-	}
 }
 
 function u_Process()
@@ -383,6 +369,52 @@ function u_DrawColorBars( i_args)
 
 function u_SearchOnClick()
 {
+	// First time search operations:
+	if( $('search').m_constcted != true )
+	{
+		$('search').m_constcted = true;
+		$('search_artists').m_elArtists = [];
+
+		// Constuct atrists just once, as they are not depending on location:
+		var roles = c_GetRolesArtists();
+
+		for( var r = 0; r < roles.length; r++)
+		{
+			var elRole = document.createElement('div');
+			$('search_artists').appendChild( elRole);
+			elRole.classList.add('role');
+
+			var elLabel = document.createElement('div');
+			elRole.appendChild( elLabel);
+			elLabel.classList.add('label');
+			elLabel.textContent = roles[r].role + ':';
+			elLabel.title = 'Click to (un)select all role artists.';
+			elLabel.m_elArtists = [];
+			elLabel.onclick = function(e)
+			{
+				var el = e.currentTarget;
+				for( var a = 0; a < el.m_elArtists.length; a++) c_ElToggleSelected(el.m_elArtists[a]);
+				if( ASSET && ASSET.filter ) u_SearchSearch();
+			}
+
+			for( var a = 0; a < roles[r].artists.length; a++)
+			{
+				var artist = roles[r].artists[a];
+
+				el = document.createElement('div');
+				elRole.appendChild( el);
+				$('search_artists').m_elArtists.push( el);
+				el.style.cssFloat = 'left';
+				el.textContent = c_GetUserTitle( artist.id);
+				el.m_user = artist.id;
+				el.classList.add('tag');
+				el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
+
+				elLabel.m_elArtists.push(el);
+			}
+		}
+	}
+
 	$('search_result').textContent = '';
 	$('search_result_div').style.display = 'none';
 	$('search_result_none').style.display = 'none';

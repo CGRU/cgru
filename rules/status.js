@@ -694,24 +694,7 @@ Status.prototype.editArtistsEdit = function( i_args)
 {
 	i_args.elRoot.m_elBtn.style.display = 'none';
 
-	var roles_obj = {};
-	for( var item in i_args.list_all)
-	{
-		var role = i_args.list_all[item].role;
-
-		if( roles_obj[role] == null )
-			roles_obj[role] = [];
-
-		roles_obj[role].push( i_args.list_all[item]);
-	}
-
-	var roles = [];
-	for( var role in roles_obj )
-	{
-		roles_obj[role].sort(function(a,b){return a.title > b.title});
-		roles.push({"role":role,"artists":roles_obj[role]});
-	}
-	roles.sort(function(a,b){return a.role < b.role});
+	var roles = c_GetRolesArtists();
 
 	for( var r = 0; r < roles.length; r++)
 	{
