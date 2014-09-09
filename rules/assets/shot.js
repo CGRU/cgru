@@ -356,7 +356,22 @@ function shot_SourcesReceived( i_data, i_args)
 	}
 
 	if( false == found )
-		el.textContent = JSON.stringify( ASSET.source.path);
+	{
+		var e = document.createElement('div');
+		el.appendChild( e);
+		e.textContent = 'No sequences founded in: ';
+		e.classList.add('shot_empty_result');
+
+		for( var i = 0; i < ASSET.source.path.length; i++)
+		{
+			var path = ASSET.source.path[i];
+			var e = document.createElement('div');
+			el.appendChild( e);
+			e.textContent = path;
+			e.classList.add('shot_empty_result');
+		}
+	}
+
 
 	if( shot_thumb_paths.length == 0 )
 	{
