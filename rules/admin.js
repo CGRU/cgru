@@ -2,7 +2,7 @@ ad_initialized = false;
 ad_permissions = null;
 ad_wnd = null;
 ad_wnd_curgroup = null;
-ad_wnd_sort_prop = 'id';
+ad_wnd_sort_prop = 'role';
 ad_wnd_sort_dir = 0;
 
 function ad_Init()
