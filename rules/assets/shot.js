@@ -174,9 +174,9 @@ function shot_ResultsReceived( i_data, i_args)
 
 		var path = fv.path + '/' + folder.name;
 
+		// Update status frames number if it is still not defined:
 		var args = null;
-		// On last files view, we will update status frames number:
-		if(( r == ( res_filesviews.length - 1 )) && ( RULES.status.frames_num == null ))
+		if( RULES.status.frames_num == null )
 		{
 			args = {};
 			args.func = shot_FilesCounted;
@@ -195,16 +195,12 @@ function shot_Post()
 	g_PostLaunchFunc('shot');
 }
 
-function shot_FilesCounted( i_args, i_fv)
+function shot_FilesCounted( i_args, i_walk)
 {
-	var name = c_PathBase( i_args.path);
-	for( var f = 0; f < i_fv.walk.folders.length; f++)
+	if( i_walk.num_files )
 	{
-		var folder = i_fv.walk.folders[f];
-		if( folder.name != name ) continue;
-		if( folder.num_files == null ) return;
-		st_SetFramesNumber( folder.num_files);
-		c_Log('Shot length updated from "' + i_args.path + '": ' + folder.num_files);
+		st_SetFramesNumber( i_walk.num_files);
+		c_Log('Shot length updated from "' + i_args.path + '": ' + i_walk.num_files);
 		return;
 	}
 }

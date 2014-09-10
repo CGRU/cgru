@@ -267,12 +267,12 @@ FilesView.prototype.limitApply = function()
 			this.elItems[f].style.display = 'block';
 }
 
-FilesView.prototype.refresh = function( i_args)
+FilesView.prototype.refresh = function()
 {
-	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this,"post_args":i_args});
+	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this});
 	c_LoadingElSet( this.elRoot);
 }
-FilesView.prototype.walkReceived = function( i_data, i_args)
+FilesView.prototype.walkReceived = function( i_data)
 {
 	fv_cur_item = null;
 	// Store selected items paths:
@@ -283,9 +283,6 @@ FilesView.prototype.walkReceived = function( i_data, i_args)
 
 	i_args.this.walk = i_data[0];
 	i_args.this.show();
-
-	if( i_args.post_args && i_args.post_args.func )
-		i_args.post_args.func( i_args.post_args, i_args.this);
 
 	// Select items back:
 	for( var i = 0; i < i_args.this.elItems.length; i++)
@@ -304,27 +301,12 @@ FilesView.prototype.show = function()
 	if( this.walk == null )
 		return;
 
-	var folders_count = 0;
-	var files_count = 0;
-	var frames_count = 0;
-	var size_count = 0;
-
 	if( this.walk.folders)
 	{
 		this.walk.folders.sort( c_CompareFiles );
 		for( var i = 0; i < this.walk.folders.length; i++)
 			if( false == fv_SkipFile( this.walk.folders[i].name))
-			{
 				this.showFolder( this.walk.folders[i]);
-
-				if( this.walk.folders[i].size_total )
-					size_count += this.walk.folders[i].size_total;
-
-				if( this.walk.folders[i].num_files )
-					frames_count += this.walk.folders[i].num_files;
-
-				folders_count++;
-			}
 	}
 
 	if( this.walk.files)
@@ -332,15 +314,42 @@ FilesView.prototype.show = function()
 		this.walk.files.sort( c_CompareFiles );
 		for( var i = 0; i < this.walk.files.length; i++)
 			if( false == fv_SkipFile( this.walk.files[i].name))
-			{
 				this.showFile( this.walk.files[i]);
+	}
 
+	this.limitApply();
+	this.showCounts();
+}
+
+FilesView.prototype.showCounts = function()
+{
+	var folders_count = 0;
+	var files_count = 0;
+	var frames_count = 0;
+	var size_count = 0;
+
+	if( this.walk.folders)
+		for( var i = 0; i < this.walk.folders.length; i++)
+			if( false == fv_SkipFile( this.walk.folders[i].name))
+			{
+				folders_count++;
+
+				if( this.walk.folders[i].size_total )
+					size_count += this.walk.folders[i].size_total;
+
+				if( this.walk.folders[i].num_files )
+					frames_count += this.walk.folders[i].num_files;
+			}
+
+	if( this.walk.files)
+		for( var i = 0; i < this.walk.files.length; i++)
+			if( false == fv_SkipFile( this.walk.files[i].name))
+			{
 				if( this.walk.files[i].size )
 					size_count += this.walk.files[i].size;
 
 				files_count++;
 			}
-	}
 
 	var counts = '';
 	if( folders_count ) counts += ' Dirs:' + folders_count;
@@ -360,10 +369,7 @@ FilesView.prototype.show = function()
 		el.onclick = function(e){e.stopPropagation();};
 		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_frames_count);};
 	}
-
-	this.limitApply();
 }
-
 FilesView.prototype.createItem = function( i_path, i_obj)
 {
 	var el = document.createElement('div');
@@ -384,7 +390,7 @@ FilesView.prototype.createItem = function( i_path, i_obj)
 	return el;
 }
 
-FilesView.prototype.showAttrs = function( i_el, i_obj)
+FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 {
 	if( this.can_refresh )
 	{
@@ -406,25 +412,35 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		el.m_view = this;
 		el.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( i_el.m_path)};
 	}
-
+}
+FilesView.prototype.showAttrs = function( i_el, i_obj)
+{
 	if( i_obj.mtime != null )
 	{
-		var el = document.createElement('div');
-		i_el.appendChild( el);
-		el.classList.add('mtime');
-		el.textContent = c_DT_FormStrFromSec( i_obj.mtime);
+		if( i_el.m_el_mtime == null )
+		{
+			i_el.m_el_mtime = document.createElement('div');
+			i_el.appendChild( i_el.m_el_mtime);
+			i_el.m_el_mtime.classList.add('mtime');
+		}
+
+		i_el.m_el_mtime.textContent = c_DT_FormStrFromSec( i_obj.mtime);
 	}
 
 	var size = i_obj.size_total;
 	if( size == null ) size = i_obj.size;
 	if( size != null )
 	{
-		var el = document.createElement('div');
-		i_el.appendChild( el);
-		el.classList.add('size');
-		el.textContent = c_Bytes2KMG( size);
+		if( i_el.m_el_size == null )
+		{
+			i_el.m_el_size = document.createElement('div');
+			i_el.appendChild( i_el.m_el_size);
+			i_el.m_el_size.classList.add('size');
+		}
+
+		i_el.m_el_size.textContent = c_Bytes2KMG( size);
 		if(( i_obj.size_total != null ) && ( i_obj.size != null ))
-			el.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_obj.size);
+			i_el.m_el_size.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_obj.size);
 	}
 
 	var num_files = null;
@@ -434,10 +450,14 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		num_files = i_obj.files.length;
 	if( num_files != null )
 	{
-		var el = document.createElement('div');
-		i_el.appendChild( el);
-		el.classList.add('filesnum');
-		el.textContent = 'F:' + num_files;
+		if( i_el.m_el_num_files == null )
+		{
+			i_el.m_el_num_files = document.createElement('div');
+			i_el.appendChild( i_el.m_el_num_files);
+			i_el.m_el_num_files.classList.add('filesnum');
+		}
+
+		i_el.m_el_num_files.textContent = 'F:' + num_files;
 
 		var title = 'Files quantity: ' + num_files + ' (without subfolders)';
 		title += '\nDouble click to update status frames number.';
@@ -447,13 +467,13 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			title += '\nFolders: ' + i_obj.num_folders_total;
 			title += '\nFiles: ' + i_obj.num_files_total;
 		}
-		el.title = title;
+		i_el.m_el_num_files.title = title;
 
-		el.m_num_files = num_files;
-		el.onclick = function(e){e.stopPropagation();};
-		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
+		i_el.m_el_num_files.m_num_files = num_files;
+		i_el.m_el_num_files.onclick = function(e){e.stopPropagation();};
+		i_el.m_el_num_files.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
 	}
-
+/*
 	if( i_obj.checksum )
 	{
 		var elSums = [];
@@ -477,6 +497,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		for( var i = 0; i < elSums.length; i++)
 			elSums[i].title = c_DT_FormStrFromSec( time);
 	}
+*/
 }
 
 FilesView.prototype.showFolder = function( i_folder)
@@ -563,6 +584,7 @@ FilesView.prototype.showFolder = function( i_folder)
 			d_Make( e.currentTarget.m_path, out_path)};
 	}
 
+	this.showGenericButtons( elFolder, i_folder);
 	this.showAttrs( elFolder, i_folder);
 }
 
@@ -610,6 +632,7 @@ FilesView.prototype.showFile = function( i_file)
 		}
 	}
 
+	this.showGenericButtons( elFile, i_file);
 	this.showAttrs( elFile, i_file);
 
 	if( c_FileIsMovieHTML( i_file.name))
@@ -712,11 +735,69 @@ FilesView.prototype.countFiles = function( i_path, i_args)
 {
 	c_LoadingElSet( this.elRoot);
 	var cmd = 'rules/bin/walk.py "' + RULES.root + i_path + '"';
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"parse":false,"this":this,"post_args":i_args});
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"this":this,"wpath":i_path,"post_args":i_args});
 }
-FilesView.prototype.countFilesFinished = function( i_data, i_args)
+FilesView.prototype.countFilesFinished = function( i_data, i_args) { i_args.this.countFilesUpdate(i_data, i_args);}
+FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 {
-	i_args.this.refresh( i_args.post_args);
+	if( i_data.error)
+		c_Error( i_data.error);
+
+	if(( i_data.cmdexec == null ) || ( i_data.cmdexec[0].walk == null ))
+	{
+		c_Error('Invalid walk output received.');
+		return;
+	}
+
+	var data = i_data.cmdexec[0].walk;
+
+	for( key in data )
+		if( key != 'walk')
+			if( key.indexOf('error') != -1 )
+				c_Error('Walk[' + key + ']: ' + data[key])
+
+	if( data.error )
+	{
+		c_Error( error);
+		return;
+	}
+
+	if( data.walk == null )
+	{
+		c_Error('Walk result does not contain walk object.');
+		return;
+	}
+
+	// Update folder item attrs:
+	for( var i = 0; i < this.elItems.length; i++)
+	{
+		if( this.elItems[i].m_path != i_args.wpath )
+			continue;
+
+		this.showAttrs( this.elItems[i], data.walk);
+
+		break;
+	}
+
+	// Update this class instance walk object:
+	var name = c_PathBase( i_args.wpath);
+	for( var i = 0; i < this.walk.folders.length; i++)
+	{
+		if( this.walk.folders[i].name != name )
+			continue
+
+		for( var key in data.walk )
+			this.walk.folders[i][key] = data.walk[key]
+
+		break;
+	}
+
+	this.showCounts();
+
+	c_LoadingElReset( this.elRoot);
+
+	if( i_args.post_args && i_args.post_args.func )
+		i_args.post_args.func( i_args.post_args, data.walk);	
 }
 FilesView.prototype.put = function()
 {

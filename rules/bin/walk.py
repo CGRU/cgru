@@ -26,19 +26,25 @@ CurFiles = 0
 StartPath = '.'
 os.umask(0000)
 
+print('{"walk":{')
+
+def outInfo( i_key, i_msg):
+	print(' "%s"\t:"%s",' % (i_key, i_msg))
+	sys.stdout.flush()
+
+def outStatus( i_status):
+	print(' "status"\t:"%s"' % i_status)
+	print('}}')
+
 if len(Args):
 	StartPath = Args[0]
 
+outInfo('path',StartPath)
+
 if not os.path.isdir(StartPath):
-	print('ERROR: Starting path does not exist:')
-	print(StartPath)
+	outInfo('error','Start path does not exists.')
+	outStatus('error')
 	sys.exit(1)
-
-
-def printFlush(i_msg):
-	print(i_msg)
-	sys.stdout.flush()
-
 
 def jsonLoad(i_filename):
 	if not os.path.isfile(i_filename):
@@ -47,15 +53,14 @@ def jsonLoad(i_filename):
 	try:
 		file = open(i_filename, 'r')
 	except:
-		printFlush(str(sys.exc_info()[1]))
+		outInfo('error_file_open',str(sys.exc_info()[1]))
 		return None
 
 	obj = None
 	try:
 		obj = json.load(file)
 	except:
-		print('ERROR: %s' % i_filename)
-		printFlush(str(sys.exc_info()[1]))
+		outInfo('error_file_json',str(sys.exc_info()[1]))
 		obj = None
 
 	file.close()
@@ -81,7 +86,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 	global CurFiles
 
 	if Options.verbose > i_curdepth and i_subwalk:
-		printFlush(i_path)
+		outInfo('cur_path',i_path)
 
 	out = dict()
 	checkDict(out)
@@ -89,7 +94,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 	try:
 		entries = os.listdir(i_path)
 	except:
-		print(str(sys.exc_info()[1]))
+		outInfo('error_listdir',str(sys.exc_info()[1]))
 		return None
 
 	for entry in entries:
@@ -139,20 +144,23 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 		cur_progress = int(100.0 * CurFiles / PrevFiles)
 		if cur_progress != Progress:
 			Progress = cur_progress
-			printFlush('PROGRESS: %d%%' % Progress)
+			outInfo('progress','PROGRESS: %d%%' % Progress)
 
 	# Store current walk data:
 	filename = os.path.join(i_path, Options.output)
+
 	if not os.path.isdir(os.path.dirname(filename)):
 		try:
 			os.makedirs(os.path.dirname(filename))
 		except:
-			printFlush(str(sys.exc_info()[1]))
-	try:
-		with open(filename, 'w') as f:
-			json.dump(out, f, indent=1)
-	except:
-		printFlush(str(sys.exc_info()[1]))
+			outInfo('error_make_dir',str(sys.exc_info()[1]))
+
+	if os.path.isdir(os.path.dirname(filename)):
+		try:
+			with open(filename, 'w') as f:
+				json.dump(out, f, indent=1)
+		except:
+			outInfo('error_file_write',str(sys.exc_info()[1]))
 
 	return out
 
@@ -171,7 +179,7 @@ def sepTh(i_int):
 
 # #############################################################################
 time_start = time.time()
-printFlush('Started at: %s' % time.ctime(time_start))
+outInfo('time_start', time.ctime(time_start))
 
 # Get old files count if any:
 prev = jsonLoad(os.path.join(StartPath, Options.output))
@@ -181,7 +189,7 @@ if prev is not None:
 		PrevFiles = prev['num_files_total']
 
 if PrevFiles:
-	printFlush('Previous run: %s files, %s folders, %s bytes' % (
+	outInfo('previous','%s files, %s folders, %s bytes' % (
 		sepTh(prev['num_files_total']), sepTh(prev['num_folders_total']),
 		sepTh(prev['size_total'])))
 
@@ -209,24 +217,23 @@ if not Options.noupdate:
 			break
 		curpath = uppath
 
-		printFlush('Updating: %s' % curpath)
+		outInfo('updating', curpath)
 		walkdir(curpath, False)
 
 
 # Output statistics:
 time_finish = time.time()
-print('Finished at: %s' % time.ctime(time_finish))
-print('Result: %s files, %s folders, %s bytes' % (
+outInfo('time_finish', time.ctime(time_finish))
+outInfo('processed','%s files, %s folders, %s bytes' % (
 	sepTh(walk['num_files_total']),
 	sepTh(walk['num_folders_total']),
 	sepTh(walk['size_total']))
 )
+print('"walk":%s,' % json.dumps(walk,indent=1))
 
 if d_files is not None:
-	print(
-		'Delta: %s files, %s folders, %s bytes' %
-		(sepTh(d_files), sepTh(d_folders), sepTh(d_size))
-	)
+	outInfo('delta','%s files, %s folders, %s bytes' %
+		(sepTh(d_files), sepTh(d_folders), sepTh(d_size)))
 
 sec = time_finish - time_start
 hrs = int(sec / 3600)
@@ -235,4 +242,6 @@ mns = int(sec / 60)
 sec -= mns * 60
 msc = int(1000.0 * sec - int(sec))
 sec = int(sec)
-print('Run time: %02d:%02d:%02d.%03d' % (hrs, mns, sec, msc))
+outInfo('time_run','%02d:%02d:%02d.%03d' % (hrs, mns, sec, msc))
+
+outStatus('success')
