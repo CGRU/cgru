@@ -272,7 +272,7 @@ FilesView.prototype.refresh = function()
 	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this});
 	c_LoadingElSet( this.elRoot);
 }
-FilesView.prototype.walkReceived = function( i_data)
+FilesView.prototype.walkReceived = function( i_data, i_args)
 {
 	fv_cur_item = null;
 	// Store selected items paths:
