@@ -1,6 +1,6 @@
 <?php
 
-$GuestSites = array('cgru.info','127.0.0.1');
+$GuestSites = array('rules.cgru.info','127.0.0.1');
 $CONF = array();
 $CONF['AUTH_RULES'] = false;
 if( false !== array_search( $_SERVER['SERVER_NAME'], $GuestSites))
