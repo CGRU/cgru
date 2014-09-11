@@ -743,6 +743,8 @@ FilesView.prototype.countFiles = function( i_path, i_args)
 FilesView.prototype.countFilesFinished = function( i_data, i_args) { i_args.this.countFilesUpdate(i_data, i_args);}
 FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 {
+	c_LoadingElReset( this.elRoot);
+
 	if( i_data.error)
 		c_Error( i_data.error);
 
@@ -796,8 +798,6 @@ FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 	}
 
 	this.showCounts();
-
-	c_LoadingElReset( this.elRoot);
 
 	if( i_args.post_args && i_args.post_args.func )
 		i_args.post_args.func( i_args.post_args, data.walk);	
