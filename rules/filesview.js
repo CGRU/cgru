@@ -18,10 +18,10 @@ function FilesView( i_args)
 	this.elParent = i_args.el;
 	this.path = i_args.path;
 	this.walk = i_args.walk;
-	this.can_count = i_args.can_count;
 
-	this.can_refresh = true;
-	if( i_args.refresh === false ) this.can_refresh = false;
+	this.can_refresh = ! ( i_args.can_refresh === false );
+	this.can_count   =     i_args.can_count;
+	this.show_walk   = ! ( i_args.show_walk === false );
 
 	this.has_limits = true;
 	if( i_args.limits === false ) this.has_limits = false;
@@ -125,13 +125,16 @@ genetate thumbnails.";
 	el.onclick = function(e){ e.currentTarget.m_view.put();}
 	el.title = 'Put selected folders';
 
-	var el = document.createElement('div');
-	this.elPanel.appendChild( el);
-	el.classList.add('button');
-	el.style.backgroundImage = 'url(rules/icons/walk.png)';
-	el.m_path = this.path;
-	el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
-	el.title = 'Top secret feature.';
+	if( this.show_walk )
+	{
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/walk.png)';
+		el.m_path = this.path;
+		el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
+		el.title = 'Top secret feature.';
+	}
 
 	if( this.has_thumbs )
 	{

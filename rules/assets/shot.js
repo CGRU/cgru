@@ -109,7 +109,7 @@ function shot_ResultsReceived( i_data, i_args)
 		if(( i < (i_data.length - 1)) || ( shot_thumb_paths.length == 0 ))
 			shot_thumb_paths.push( path);
 
-		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],"can_count":true}))
+		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],"show_walk":false,"can_count":true}))
 		found = true;
 	}
 
@@ -345,7 +345,7 @@ function shot_SourcesReceived( i_data, i_args)
 
 		if( walk.folders.length || walk.files.length )
 		{
-			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"-thumbs":false,"refresh":false});
+			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"-thumbs":false,"can_refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
 			found = true;
 		}
