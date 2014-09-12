@@ -186,11 +186,11 @@ for i in range(0, len(Jobs)):
 		if Options.afuser != '':
 			job.setUserName(Options.afuser)
 
+		if Options.afmax != -1:
+			job.setMaxRunningTasks(Options.afmax)
+
 		if Options.afcap != -1:
 			block.setCapacity(Options.afcap)
-
-		if Options.afmax != -1:
-			block.setMaxRunningTasks(Options.afmax)
 
 		if Options.afmph != -1:
 			block.setMaxRunTasksPerHost(Options.afmph)

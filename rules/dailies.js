@@ -14,19 +14,6 @@ d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px',"toolti
 d_guiparams.aspect_in = {"label":'Aspect In',"width":'25%',"lwidth":'70px'};
 d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
 
-d_cvtguiparams = {};
-d_cvtguiparams.cvtres = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
-d_cvtguiparams.fps = {"label":'FPS'};
-d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.quality = {"label":'JPEG Quality',"default":'100'};
-
-d_cutparams = {};
-d_cutparams.cut_name = {};
-d_cutparams.input = {};
-d_cutparams.fps = {"label":'FPS'};
-d_cutparams.output = {};
-
 function d_Make( i_path, i_outfolder)
 {
 	c_Log('Make Dailies: '+i_path);
@@ -231,6 +218,15 @@ function d_MakeCmd( i_params)
 	return cmd;
 }
 
+
+d_cvtguiparams = {};
+d_cvtguiparams.cvtres = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
+d_cvtguiparams.fps = {"label":'FPS'};
+d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.quality = {"label":'JPEG Quality',"default":'100'};
+d_cvtguiparams.afmaxtasks = {"label":'Max Tasks',"default":'-1',"tooltip":'Maximum running tasks for Afanasy job.'};
+
 function d_Convert( i_args)
 {
 	var params = {};
@@ -335,6 +331,7 @@ function d_CvtImages( i_wnd, i_args, i_params)
 		afanasy = true;
 		cmd += ' -A';
 		cmd += ' --afuser "' + g_auth_user.id + '"';
+		cmd += ' --afmax ' + i_params.afmaxtasks;
 	}
 
 	for( var i = 0; i < i_args.paths.length; i++)
@@ -413,6 +410,13 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 	if( i_args.paths.length > 1 )
 		job.name = c_PathDir( i_args.paths[0]) + ' x' + i_args.paths.length;
 
+	job.max_running_tasks = parseInt( i_params.afmaxtasks);
+	if( isNaN( job.max_running_tasks ))
+	{
+		c_Error('Invalid "Max Tasks" value: "' + i_params.afmaxtasks + '"');
+		job.max_running_tasks = -1;
+	}
+
 	var block = {};
 	block.service = 'movgen';
 	block.parser = 'generic';
@@ -455,7 +459,15 @@ function d_CvtMovies( i_args, i_params, i_to_sequence )
 	}
 
 	n_SendJob( job);
+//console.log(JSON.stringify(job));
 }
+
+
+d_cutparams = {};
+d_cutparams.cut_name = {};
+d_cutparams.input = {};
+d_cutparams.fps = {"label":'FPS'};
+d_cutparams.output = {};
 
 function d_MakeCut( i_args)
 {
