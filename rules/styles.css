@@ -170,7 +170,7 @@ background-position: center;
 }
 .button:hover { background-color: rgba(200,255,255,.1);}
 .button.pushed {
-background: rgba(100,255,255,.2);
+background-color: rgba(100,255,255,.2);
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 }
 .button.edit { background-image: url(icons/edit.png); width: 16px; height: 16px; }
