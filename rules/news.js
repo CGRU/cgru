@@ -85,6 +85,16 @@ function nw_IgnoreOwnToggle( i_toggle)
 	}
 }
 
+function nw_SortOrderToggle()
+{
+	if( localStorage.news_sort_order == 'ASC' )
+		localStorage.news_sort_order = 'DESC';
+	else
+		localStorage.news_sort_order = 'ASC';
+
+	nw_NewsLoad();
+}
+
 function nw_UpdateChannels()
 {
 	$('channels').innerHTML = '';
@@ -392,7 +402,15 @@ function nw_NewsShow( i_news)
 
 	var projects = [];
 
-	g_auth_user.news.sort( function(a,b){var attr='time';if(a[attr]>b[attr])return -1;if(a[attr]<b[attr])return 1;return 0;});
+	g_auth_user.news.sort( function(a,b){
+		var attr = 'time';
+		if(a[attr] > b[attr]) return -1;
+		if(a[attr] < b[attr]) return 1;
+		return 0;
+	});
+
+	if( localStorage.news_sort_order == 'ASC' )
+		g_auth_user.news.reverse();
 
 	for( var i = 0; i < g_auth_user.news.length; i++ )
 	{

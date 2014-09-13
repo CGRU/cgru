@@ -269,7 +269,7 @@ Comment can be an artist report with a tag and duration.
 		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
 			<div class="news_ctrl">
-				<div class="infotooltip" style="float: right;" title="News:
+				<div class="infotooltip" style="float: right; margin: 0; padding: 0;" title="News:
 If you assigned on any shot (location) you will receive all its changes.
 To receive all news from some location and all its subfolders (project,scene)
 you should subscribe on this location (add its path to channels).
@@ -281,18 +281,25 @@ Remember any delete operation buttons in RULES requires double-click.
 "				></div>
 				<div class="news_ctrl_btns">
 					<div class="button" title="Double click to delete all news"
-						ondblclick="nw_DeleteNews()">DA</div>
+						style="background-image:url(rules/icons/delete_all.png);"
+						ondblclick="nw_DeleteNews()"></div>
 					<div class="button" title="Double click to delete visble news"
-						ondblclick="nw_DeleteFiltered(true)">DV</div>
+						style="background-image:url(rules/icons/delete_visible.png);"
+						ondblclick="nw_DeleteFiltered(true)"></div>
 					<div class="button" title="Double click to delete hidden news"
-						ondblclick="nw_DeleteFiltered(false)">DH</div>
+						style="background-image:url(rules/icons/delete_hidden.png);"
+						ondblclick="nw_DeleteFiltered(false)"></div>
 					<div class="button" title="Click to open/close subscribed locations"
+						style="background-image:url(rules/icons/news_channels.png);"
 						onclick="c_ElDisplayToggle(document.getElementById('channels'));
-						this.classList.toggle('pushed')">Chan</div>
+						this.classList.toggle('pushed')"></div>
+					<div class="button" title="Change news sorting order"
+						style="background-image:url(rules/icons/sort_order_toggle.png);"
+						onclick="nw_SortOrderToggle()"></div>
 				</div>
 				<div id="channels" style="display:none"></div>
 			</div>
-			<div class="news_filter" style="font-size: 12px">
+			<div class="news_filter" style="font-size: 12px" title="News filter">
 				<div class="button nw_fb" title="Show All" id="news_filter_show_all" onclick="nw_FilterBtn(this,'_all_')">All</div>
 				<div class="button nw_fb" title="Assigned" onclick="nw_FilterBtn(this,'_my_')"   >My</div>
 				<div class="button nw_fb" title="Body"     onclick="nw_FilterBtn(this,'body')"   >B</div>
@@ -301,7 +308,7 @@ Remember any delete operation buttons in RULES requires double-click.
 				<div class="button nw_fb" title="Dailies"  onclick="nw_FilterBtn(this,'dailies')">D</div>
 				<div class="button nw_fb" title="Comment"  onclick="nw_FilterBtn(this,'comment')">C</div>
 			</div>
-			<div class="news_filter" id="news_projects" style="font: 10px monospace;"></div>
+			<div class="news_filter" id="news_projects" style="font: 10px monospace;" title="New projects"></div>
 			<div id="news"></div>
 		</div>
 	</div>
