@@ -152,7 +152,7 @@ function g_PathChanged()
 		return;
 	}
 
-	g_POST()
+	g_POST('hash')
 }
 
 function g_NavigatePost()
@@ -191,6 +191,12 @@ function g_POST(i_msg)
 {
 	if( ASSET && ASSET.post )
 	{
+		// Asset script should launch post function itself,
+		// as all its data load (GUI construction) can be delayed (async).
+		// But if post function runs because only hash arguments changes (not the entire location)
+		// it should be run here, because asset was loaded before.
+		if( i_msg == 'hash')
+			window[ASSET.post]();
 		return;
 	}
 	g_PostLaunchFunc(i_msg);

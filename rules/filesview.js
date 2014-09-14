@@ -395,12 +395,27 @@ FilesView.prototype.createItem = function( i_path, i_obj)
 
 FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 {
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.classList.add('button');
+	el.style.backgroundImage = 'url(rules/icons/comment_add.png)';
+	el.title = 'Comment item';
+	el.m_view = this;
+	el.m_path = i_el.m_path;
+	el.onclick = function(e){
+		e.stopPropagation();
+		el = e.currentTarget;
+		var text = '<a href="' + g_GetLocationArgs({"fv_Goto":el.m_path}) + '">' + c_PathBase(el.m_path) + '</a><br><br>';
+		cm_NewOnClick( text);
+	};
+
 	if( this.can_refresh )
 	{
 		var el = document.createElement('div');
 		i_el.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/rename.png)';
+		el.title = 'Rename item';
 		el.m_view = this;
 		el.m_path = i_el.m_path;
 		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( i_el.m_path)};
@@ -522,6 +537,8 @@ FilesView.prototype.showFolder = function( i_folder)
 	el.setAttribute('href', '#'+path);
 	el.textContent = name;
 
+	this.showGenericButtons( elFolder, i_folder);
+
 	if( this.can_count )
 	{
 		var el = document.createElement('a');
@@ -587,7 +604,6 @@ FilesView.prototype.showFolder = function( i_folder)
 			d_Make( e.currentTarget.m_path, out_path)};
 	}
 
-	this.showGenericButtons( elFolder, i_folder);
 	this.showAttrs( elFolder, i_folder);
 }
 
@@ -606,6 +622,8 @@ FilesView.prototype.showFile = function( i_file)
 	el.href = RULES.root + path;
 	el.target = '_blank';
 	el.textContent = i_file.name;
+
+	this.showGenericButtons( elFile, i_file);
 
 	if( c_FileCanEdit( i_file.name))
 	{
@@ -635,7 +653,6 @@ FilesView.prototype.showFile = function( i_file)
 		}
 	}
 
-	this.showGenericButtons( elFile, i_file);
 	this.showAttrs( elFile, i_file);
 
 	if( c_FileIsMovieHTML( i_file.name))

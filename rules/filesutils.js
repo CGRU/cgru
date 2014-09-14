@@ -232,15 +232,23 @@ function fu_ChecksumDo( i_wnd)
 //
 // ########################### Multi Put: ################################# //
 //
+
 fu_putmulti_params = {};
-fu_putmulti_params.input = {};
+fu_putmulti_params.input = {"label":'Result Paths'};
 fu_putmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
 fu_putmulti_params.skiperrors = {"label":'Skip Errors', "bool":false,"width":'50%'};
 fu_putmulti_params.dest = {"label":'Destination'};
+fu_putmulti_params.af_maxtasks = {"label":'Max Tasks'};
+
+fu_findres_params = {};
+fu_findres_params.input = {};
+fu_findres_params.dest = {};
+fu_findres_params.skiperrors = {"bool":false};
+
 function fu_PutMultiDialog( i_args)
 {
 //console.log( JSON.stringify( i_args));
-	var wnd = new cgru_Window({"name":'put',"title":'Multi Put'});
+	var wnd = new cgru_Window({"name":'put',"title":'Put Results'});
 	wnd.m_args = i_args;
 
 	var params = {};
@@ -250,7 +258,7 @@ function fu_PutMultiDialog( i_args)
 
 	if( RULES.put.dest.indexOf('/') !== 0 )
 		if( ASSETS.project )
-			params.dest = ASSETS.project.path + '/' + RULES.put.dest;
+			params.dest = '/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest;
 
 	gui_Create( wnd.elContent, fu_putmulti_params, [RULES.put, params]);
 	if( RULES.put.ftp )
@@ -270,122 +278,204 @@ function fu_PutMultiDialog( i_args)
 	elLabel.classList.add('label');
 	elLabel.innerHTML = '<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
-	var elSend = document.createElement('div');
-	elAfDiv.appendChild( elSend);
-	elSend.textContent = 'Send Job';
-	elSend.classList.add('button');
-	elSend.m_wnd = wnd;
-	elSend.onclick = function(e){ fu_PutMultiProcessGUI( e.currentTarget.m_wnd, false);}
+	var elSendJob = document.createElement('div');
+	elAfDiv.appendChild( elSendJob);
+	elSendJob.textContent = 'Send Job';
+	elSendJob.classList.add('button');
+	elSendJob.style.display = 'none';
+	elSendJob.m_wnd = wnd;
+	elSendJob.onclick = function(e){ fu_PutMultiDo( e.currentTarget.m_wnd);}
+	wnd.m_res_btns_show = [elSendJob];
 
-	var elTest = document.createElement('div');
-	elAfDiv.appendChild( elTest);
-	elTest.textContent = 'Test Inputs';
-	elTest.classList.add('button');
-	elTest.m_wnd = wnd;
-	elTest.onclick = function(e){ fu_PutMultiProcessGUI( e.currentTarget.m_wnd, true);}
+	var elFind = document.createElement('div');
+	elAfDiv.appendChild( elFind);
+	elFind.textContent = 'Find Results';
+	elFind.classList.add('button');
+	elFind.style.cssFloat = 'right';
+	elFind.m_wnd = wnd;
+	elFind.onclick = function(e){ fu_ResultsFind( e.currentTarget.m_wnd);}
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild( elResults);
 	wnd.m_elResults = elResults;
 	elResults.classList.add('output');
 
-	for( var i = 0; i < i_args.shots.length; i++)
+	for( var i = 0; i < i_args.paths.length; i++)
 	{
 		el = document.createElement('div');
 		elResults.appendChild( el);
-		el.textContent = i_args.shots[i];
+		el.textContent = i_args.paths[i];
 	}
 }
-
-function fu_PutMultiProcessGUI( i_wnd, i_test)
+function fu_ResultsFind( i_wnd)
 {
 	var elWait = document.createElement('div');
 	i_wnd.elContent.appendChild( elWait);
 	i_wnd.m_elWait = elWait;
 	elWait.classList.add('wait');
 
-	var shots = i_wnd.m_args.shots;
-	var params = gui_GetParams( i_wnd.elContent, fu_putmulti_params);
-	if( RULES.put.ftp )
-		gui_GetParams( i_wnd.elContent, fu_putftp_params, params);
-	for( key in i_wnd.elContent.m_choises )
-		params[key] = i_wnd.elContent.m_choises[key].value;
+	var paths = i_wnd.m_args.paths;
+	var params = gui_GetParams( i_wnd.elContent, fu_findres_params);
 
-	var cmd = 'rules/bin/putmulti.sh';
-
-	cmd += ' -i "' + params.input + '"';
-	if( params.skipexisting ) cmd += ' -s';
+	var cmd = 'rules/bin/find_results.py';
+	cmd += ' -r "' + params.input + '"';
+	cmd += ' -d "' + cgru_PM( params.dest, true) + '"';
 	if( params.skiperrors ) cmd += ' -e';
-	cmd += ' --afuser "' + g_auth_user.id + '"';
-	cmd += ' --afservice "' + RULES.put.af_service + '"';
-	cmd += ' --afcapacity ' + RULES.put.af_capacity;
-	cmd += ' --afmaxtasks ' + RULES.put.af_maxtasks;
-	if( RULES.put.ftp	)
-	{
-		cmd += ' -d "' + params.dest + '"';
-		cmd += ' --ftp ' + params.host;
-		if( params.user.length ) cmd += ' --ftpuser ' + params.user;
-		if( params.pass.length ) cmd += ' --ftppass ' + params.pass;
-	}
-	else
-		cmd += ' -d "' + params.dest + '"';
-		//cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
 
-	if( i_test ) cmd += ' -t';
+	for( var i = 0; i < paths.length; i++)
+		cmd += ' "' + cgru_PM('/' + RULES.root + paths[i], true) + '"';
 
-	for( var i = 0; i < shots.length; i++)
-		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"';
-
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":fu_PutMultiFinished,"wnd":i_wnd});
-
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":fu_ResultsReceived,"wnd":i_wnd});
 }
-function fu_PutMultiFinished( i_data, i_args)
+function fu_ResultsReceived( i_data, i_args)
 {
 //console.log( JSON.stringify( i_data));
 //console.log( JSON.stringify( i_args));
 	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+
 	var elResults = i_args.wnd.m_elResults;
 	elResults.textContent = '';
+	for( var i = 0; i < i_args.wnd.m_res_btns_show.length; i++)
+		i_args.wnd.m_res_btns_show[i].style.display = 'none';
 
-	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ) || ( i_data.cmdexec[0].put == null ))
+	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ) || ( i_data.cmdexec[0].find_results == null ))
 	{
+		c_Error('Invalid results data received.');
 		elResults.textContent = ( JSON.stringify( i_data));
 		return;
 	}
 
-	var put = i_data.cmdexec[0].put;
+	var result = i_data.cmdexec[0].find_results;
 
-	for( var i = put.length - 1; i >= 0; i--)
+	if( result.error )
 	{
 		var el = document.createElement('div');
 		elResults.appendChild( el);
-		for( var msg in put[i])
-		{
-			if( msg == 'src' )
-			{
-				msg = 'put:';
-				msg += ' ' + put[i].src;
-				msg += ' -> ' + put[i].name;
-				//msg += ' ' + put[i].version;
-				//msg += ' ' + put[i].dst;
-				//console.log( JSON.stringify( put[i]));
-				if( put[i].skipexisting )
-				{
-					msg += ' SKIPPING';
-					el.style.color = '#888';
-				}
-				el.textContent = msg;
-				break;
-			}
-			el.textContent = msg + ': ' + put[i][msg];
-			if(( msg == 'error' ) || ( put[i][msg].indexOf('error') != -1 ))
-				el.style.color = '#F42';
-		}
+		el.textContent = result.error;
+		el.style.color = '#F42';
 	}
 
-//	i_wnd.destroy();
-}
+	if( result.info )
+	{
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = result.info;
+	}
 
+	if( result.results == null )
+		return;
+
+	if( result.results.length == 0 )
+	{
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = 'No results founded.';
+		el.style.color = '#F42';
+		return;
+	}
+
+	var founded = false;
+	for( var i = 0; i < result.results.length; i++)
+	{
+		var res = result.results[i];
+
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+
+		msg = res.src;
+		msg += ' -> ' + res.name;
+		//msg += ' ' + res.version;
+		//msg += ' ' + res.dst;
+		//console.log( JSON.stringify( res));
+		if( res.exist )
+		{
+			msg += ' EXIST';
+			el.style.color = '#888';
+		}
+
+		el.textContent = msg;
+
+		if( res.error )
+		{
+			el.style.color = '#F42';
+
+			var el = document.createElement('div');
+			elResults.appendChild( el);
+			el.textContent = res.error;
+			el.style.color = '#F42';
+		}
+		else
+			founded = true;
+	}
+
+	if( founded )
+	{
+		i_args.wnd.m_result = result;
+		for( var i = 0; i < i_args.wnd.m_res_btns_show.length; i++)
+			i_args.wnd.m_res_btns_show[i].style.display = 'block';
+	}
+//console.log(JSON.stringify(result));
+}
+function fu_PutMultiDo( i_wnd)
+{
+	var params = gui_GetParams( i_wnd.elContent, fu_putmulti_params);
+	if( RULES.put.ftp )
+		gui_GetParams( i_wnd.elContent, fu_putftp_params, params);
+
+	var result = i_wnd.m_result;
+
+	var job = {};
+	job.name = 'PUT ' + result.dest;
+	job.max_running_tasks = parseInt( params.af_maxtasks);
+	if( isNaN( job.max_running_tasks ))
+	{
+		c_Error('Invalid "Max Tasks" value: "' + params.af_maxtasks + '"');
+		job.max_running_tasks = -1;
+	}
+
+	var block = {};
+	job.blocks = [block];
+	block.name = 'put';
+	block.service = RULES.put.af_service;
+	block.capacity = RULES.put.af_capacity;
+	block.parser = 'generic';
+	block.tasks = [];
+
+	var put = cgru_PM( RULES.put.cmd, true);
+	if( RULES.put.ftp	)
+	{
+		put += ' --ftp ' + params.host;
+		if( params.user.length ) put += ' --ftpuser ' + params.user;
+		if( params.pass.length ) put += ' --ftppass ' + params.pass;
+	}
+	put += ' -d "' + result.dest + '"';
+
+	for( var i = 0; i < result.results.length; i++)
+	{
+		var res = result.results[i];
+		if( params.skipexisting && res.exist )
+			continue;
+
+		var cmd = put;
+		cmd += ' -s "' + res.src + '"';
+		cmd += ' -n "' + res.name + '"';
+
+		var task = {};
+		task.name = res.name;
+		task.command = cmd;
+		block.tasks.push( task);
+	}
+
+	if( block.tasks.length == 0 )
+		c_Error('No results to put.');
+	else
+	{
+		n_SendJob( job);
+		for( var i = 0; i < i_wnd.m_res_btns_show.length; i++)
+			i_wnd.m_res_btns_show[i].style.display = 'none';
+	}
+//console.log(JSON.stringify(job));
+}
 //
 // ########################### Archivate: ################################# //
 //

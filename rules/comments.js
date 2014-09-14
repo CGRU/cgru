@@ -49,9 +49,11 @@ function cm_Received( obj, i_args)
 	g_POST('comments');
 }
 
-function cm_NewOnClick()
+function cm_NewOnClick( i_text)
 {
 	var comment = new Comment();
+	if( i_text)
+		comment.elText.innerHTML = i_text;
 	comment.edit();
 }
 

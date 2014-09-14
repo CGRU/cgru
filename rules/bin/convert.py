@@ -20,7 +20,7 @@ Parser.add_option('-t', '--type',       dest='type',       type  ='string',     
 Parser.add_option('-c', '--colorspace', dest='colorspace', type  ='string',     default='auto', help='Input images colorspace')
 Parser.add_option('-r', '--resize',     dest='resize',     type  ='string',     default='',     help='Resize (1280x720)')
 Parser.add_option('-q', '--quality',    dest='quality',    type  ='int',        default=75,     help='Quality')
-Parser.add_option('-o', '--output',     dest='output',     type  ='string',     default='',     help='Output image')
+Parser.add_option('-o', '--output',     dest='output',     type  ='string',     default=None,   help='Output folder')
 Parser.add_option('-A', '--afanasy',    dest='afanasy',    action='store_true', default=False,  help='Use Afanasy')
 Parser.add_option(      '--afuser',     dest='afuser',     type  ='string',     default='',     help='Afanasy user')
 Parser.add_option(      '--afmax',      dest='afmax',      type  ='int',        default='-1',   help='Afanasy maximum running tasks')
@@ -74,12 +74,15 @@ for input in Inputs:
 	files_in = []
 
 	output = Options.output
-	if output == '' or len(Inputs) > 1:
-		output = input
-		if Options.type == 'jpg':
-			output += '.q%d' % Options.quality
-		if Options.resize != '':
-			output += '.r%s' % Options.resize
+	if output is None:
+		output = os.path.dirname(input)
+
+	output = os.path.join( output, os.path.basename(input))
+
+	if Options.type == 'jpg':
+		output += '.q%d' % Options.quality
+	if Options.resize != '':
+		output += '.r%s' % Options.resize
 
 	if os.path.isdir(input):
 		mkdir = '%s.%s' % (output, Options.type )
