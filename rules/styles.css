@@ -281,7 +281,7 @@ background-position: center;
 #sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
 .news_ctrl { /*border-radius:4px;*/ -box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; margin: 2px; padding: 2px 4px; }
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
-#channels .channel .button.delete { float: left; height: 14px; width: 14px; margin: 0 4px 0 0; }
+#channels .channel .button.delete { float: right; height: 14px; width: 14px; }
 #channels .channel { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
 .news_filter { margin: 2px; padding: 0px 4px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
 .news_filter .button { float: left; margin: 1px 2px; padding: 1px 3px; }
