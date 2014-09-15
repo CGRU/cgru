@@ -114,10 +114,12 @@
 				"tooltip":"Open sequence within 'djv_view'."},
 			{"name":"NkCp",
 				"cmd":"nukecopy \"@PATH@\"",
-				"tooltip":"Copy Nuke Read.\nPaste it in a scene."},
+				"tooltip":"Copy Nuke Read.\nPaste it in a scene.",
+				"submenu":true},
 			{"name":"Nuke",
 				"cmd":"nukeview \"@PATH@\"",
-				"tooltip":"Open Nuke with this sequence Reader."}
+				"tooltip":"Open Nuke with this sequence Reader.",
+				"submenu":true}
 		],
 		"play_movie":[
 			{"name":"VLC",
@@ -142,10 +144,12 @@
 				"tooltip":"Open sequence with PdPlayer."},
 			{"name":"NkCp",
 				"cmd":"nukecopy @PATH@",
-				"tooltip":"Copy Nuke Read.\nPaste it in a scene."},
+				"tooltip":"Copy Nuke Read.\nPaste it in a scene.",
+				"submenu":true},
 			{"name":"Nuke",
 				"cmd":"nukeview @PATH@",
-				"tooltip":"Open Nuke with this sequence Reader."}
+				"tooltip":"Open Nuke with this sequence Reader.",
+				"submenu":true}
 		],
 		"play_movie":[
 			{"name":"QT",

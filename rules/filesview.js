@@ -398,6 +398,24 @@ FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 	var el = document.createElement('div');
 	i_el.appendChild( el);
 	el.classList.add('button');
+	el.style.backgroundImage = 'url(rules/icons/menu.png)';
+	el.title = 'Open menu';
+	el.onclick = function(e){
+		e.stopPropagation();
+		var el = e.currentTarget;
+		el.classList.toggle('pushed');
+		c_ElDisplayToggle( el.m_elMenu);
+	}
+
+	i_el.m_elMenu = document.createElement('div');
+	i_el.appendChild( i_el.m_elMenu);
+	el.m_elMenu = i_el.m_elMenu;
+	i_el.m_elMenu.style.display = 'none';
+	i_el.m_elMenu.classList.add('menu');
+
+	var el = document.createElement('div');
+	i_el.m_elMenu.appendChild( el);
+	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/comment_add.png)';
 	el.title = 'Comment item';
 	el.m_view = this;
@@ -412,7 +430,7 @@ FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 	if( this.can_refresh )
 	{
 		var el = document.createElement('div');
-		i_el.appendChild( el);
+		i_el.m_elMenu.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/rename.png)';
 		el.title = 'Rename item';
@@ -424,7 +442,7 @@ FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 	if( RULES.files_detele )
 	{
 		var el = document.createElement('div');
-		i_el.appendChild( el);
+		i_el.m_elMenu.appendChild( el);
 		el.classList.add('button');
 		el.textContent = 'DEL';
 		el.m_view = this;
@@ -542,7 +560,7 @@ FilesView.prototype.showFolder = function( i_folder)
 	if( this.can_count )
 	{
 		var el = document.createElement('a');
-		elFolder.appendChild( el);
+		elFolder.m_elMenu.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/count.png)';
 		el.title = "Count files.";
@@ -560,7 +578,7 @@ FilesView.prototype.showFolder = function( i_folder)
 		var play_path = path;
 		if( ASSET.path ) play_path = play_path.replace(ASSET.path, ASSET.path + '/');
 		var el = document.createElement('a');
-		elFolder.appendChild( el);
+		elFolder.m_elMenu.appendChild( el);
 		el.classList.add('button');
 		el.setAttribute('href', 'player.html#'+play_path);
 		el.setAttribute('target', '_blank');
@@ -575,7 +593,10 @@ FilesView.prototype.showFolder = function( i_folder)
 		if( cmds ) for( var c = 0; c < cmds.length; c++)
 		{
 			var elCmd = document.createElement('div');
-			elFolder.appendChild( elCmd);
+			if( cmds[c].submenu )
+				elFolder.m_elMenu.appendChild( elCmd);
+			else
+				elFolder.appendChild( elCmd);
 			elCmd.classList.add('cmdexec');
 			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
