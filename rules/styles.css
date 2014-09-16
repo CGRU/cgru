@@ -118,7 +118,7 @@ left:0;right:0;top:0;bottom:0;
 #navig .folder .progressbar { height: 6px; }
 #navig .folder .info { display: none; margin: 2px 4px 0px 0px; position: relative; float: right; font: 14px Arial; } 
 #navig .folder .size { }
-#navig .folder .frames { }
+#navig .folder .frames { width:50px; }
 #navig .folder .annotation { }
 #navig .folder .tags { font-style: italic; }
 #navig .folder .percent {
