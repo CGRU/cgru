@@ -133,7 +133,7 @@ function shot_ResultsReceived( i_data, i_args)
 		}
 	}
 
-	shot_MakeThumbnail( shot_thumb_paths);
+	shot_MakeThumbnail();
 
 	// Count frames numbers:
 	for( var r = 0; r < res_filesviews.length; r++ )
@@ -208,26 +208,7 @@ function shot_MakeThumbnail()
 {
 	if( shot_thumb_paths.length == 0 ) return;
 
-	var file = c_GetRuFilePath( RULES.thumbnail.filename);
-
-	var cache_time = RULES.cache_time;
-	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
-	if( u_thumbstime[file] && ( c_DT_CurSeconds() - u_thumbstime[file] < cache_time ))
-	{
-		c_Log('Thumbnail cached '+cache_time+'s: '+file);
-		return;
-	}
-
-	var input = null;
-	for( var i = 0; i < shot_thumb_paths.length; i++ )
-	{
-		if( input ) input += ',';
-		else input = '';
-			input += RULES.root + shot_thumb_paths[i];
-	}
-	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, file);
-	cmd += ' -c ' + RULES.thumbnail.colorspace;
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true});
+	u_ThumbnailMake({"paths":[shot_thumb_paths],"info":'shot'});
 }
 
 function shot_ShowRefs()

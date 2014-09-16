@@ -439,6 +439,20 @@ FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( i_el.m_path)};
 	}
 
+	if( i_el.m_isFolder || ( c_FileIsMovie( i_el.m_path)))
+	{
+		el = document.createElement('div');
+		i_el.m_elMenu.appendChild(el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
+		el.m_path = i_el.m_path;
+		el.onclick = function(e){
+			e.stopPropagation();
+			u_ThumbnailMake({"paths":[e.currentTarget.m_path],"info":'filesview',"no_cache":true});
+		}
+		el.title = 'Generate location thumbnail from this folder.';
+	}
+
 	if( RULES.files_detele )
 	{
 		var el = document.createElement('div');
@@ -543,6 +557,7 @@ FilesView.prototype.showFolder = function( i_folder)
 
 	var elFolder = this.createItem( path, i_folder);
 	elFolder.classList.add('folder');
+	elFolder.m_isFolder = true;
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFolder, path, 'folder');
@@ -634,6 +649,7 @@ FilesView.prototype.showFile = function( i_file)
 
 	var elFile = this.createItem( path, i_file);
 	elFile.classList.add('file');
+	elFile.m_isFile = true;
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFile, path, 'file');

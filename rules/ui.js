@@ -953,7 +953,36 @@ function u_GuestAttrsGet( i_el)
 	return guest;
 }
 
-function u_UpdateThumbnail( i_data)
+function u_ThumbnailMake( i_args)
+{
+	var file = c_GetRuFilePath( RULES.thumbnail.filename);
+
+	if( i_args.no_cache !== true )
+	{
+		var cache_time = RULES.cache_time;
+		if( ASSET.cache_time ) cache_time = ASSET.cache_time;
+		if( u_thumbstime[file] && ( c_DT_CurSeconds() - u_thumbstime[file] < cache_time ))
+		{
+			c_Log('Thumbnail cached '+cache_time+'s: '+file);
+			return;
+		}
+	}
+
+	var input = null;
+	for( var i = 0; i < i_args.paths.length; i++ )
+	{
+		if( input ) input += ',';
+		else input = '';
+			input += RULES.root + i_args.paths[i];
+	}
+
+	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, file);
+	cmd += ' -c ' + RULES.thumbnail.colorspace;
+	if( i_args.no_cache ) cmd += ' -f';
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_ThumbnailShow,"info":i_args.info+' thumbnail',"local":true});
+}
+function u_ThumbnailShow( i_data)
 {
 	if( i_data.error )
 	{
