@@ -628,7 +628,6 @@ function scenes_makeThumbnails()
 	for( var i = 0; i < sc_elImgThumbs.length; i++)
 		sc_elImgThumbs[i].updated = false;
 
-
 	sc_thumb_params_values = gui_GetParams( $('scenes_make_thumbnails'), sc_thumb_params);
 	for( key in $('scenes_make_thumbnails').m_choises )
 		sc_thumb_params_values[key] = $('scenes_make_thumbnails').m_choises[key].value;

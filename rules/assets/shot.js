@@ -3,7 +3,6 @@ shot_thumb_paths = [];
 function shot_Init()
 {
 	shot_thumb_paths = [];
-	shot_res_paths = [];
 
 	a_SetLabel('Shot');
 
@@ -209,7 +208,7 @@ function shot_MakeThumbnail()
 {
 	if( shot_thumb_paths.length == 0 ) return;
 
-	var file = ASSET.path + '/'+RULES.rufolder+'/' + RULES.thumbnail.filename;
+	var file = c_GetRuFilePath( RULES.thumbnail.filename);
 
 	var cache_time = RULES.cache_time;
 	if( ASSET.cache_time ) cache_time = ASSET.cache_time;
@@ -226,10 +225,9 @@ function shot_MakeThumbnail()
 		else input = '';
 			input += RULES.root + shot_thumb_paths[i];
 	}
-	var output = RULES.root + file;
-	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
+	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, file);
 	cmd += ' -c ' + RULES.thumbnail.colorspace;
-	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true,"wait":false,"parse":true});
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_UpdateThumbnail,"info":'shot thumbnail',"local":true});
 }
 
 function shot_ShowRefs()

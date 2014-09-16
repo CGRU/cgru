@@ -64,9 +64,9 @@ function u_InitAuth()
 
 function u_Process()
 {
-	if( g_elCurFolder.m_dir.rufiles && ( g_elCurFolder.m_dir.rufiles.indexOf( RULES.thumbnail.filename ) != -1 ))
+	if( c_RuFileExists(RULES.thumbnail.filename))
 	{
-		u_el.thumbnail.src = RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/'+RULES.thumbnail.filename;
+		u_el.thumbnail.src = c_GetRuFilePath(RULES.thumbnail.filename);
 		u_el.thumbnail.style.display = 'inline';
 	}
 	else
@@ -963,8 +963,8 @@ function u_UpdateThumbnail( i_data)
 
 	if( i_data.status == 'skipped' ) return;
 
-	var file = g_CurPath() + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
-	u_el.thumbnail.src = RULES.root + file;
+	var file = c_GetRuFilePath(RULES.thumbnail.filename);
+	u_el.thumbnail.src = file + '#' + (new Date().getTime());
 	u_el.thumbnail.style.display = 'inline';
 
 	// Update time
