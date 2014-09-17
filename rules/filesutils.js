@@ -319,7 +319,7 @@ function fu_ResultsFind( i_wnd)
 
 	var cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
-	cmd += ' -d "' + cgru_PM( params.dest, true) + '"';
+	cmd += ' -d "' + params.dest + '"';
 	if( params.skiperrors ) cmd += ' -e';
 
 	for( var i = 0; i < paths.length; i++)
