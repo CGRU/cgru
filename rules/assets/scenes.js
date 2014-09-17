@@ -33,7 +33,7 @@ function sc_Init()
 	sc_elShots = [];
 	sc_elScenes = [];
 
-	n_Request({"send":{"getfile":'rules/assets/scenes.html'},"func":sc_InitHTML,"info":'get scenes.html',"parse":false});
+	n_GetFile({"path":'rules/assets/scenes.html',"func":sc_InitHTML,"info":'scenes.html',"parse":false});
 }
 function sc_InitHTML( i_data)
 {

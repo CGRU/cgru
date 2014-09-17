@@ -622,7 +622,8 @@ function u_BodyLoad()
 		return;
 	}
 
-	n_Request({"send":{"getfile":c_GetRuFilePath( u_body_filename)},"func":u_BodyReceived,"local":true,"info":'body',"parse":false});
+	n_GetFile({"path":c_GetRuFilePath( u_body_filename),"func":u_BodyReceived,
+		cache_time:60,"info":'body.html',"parse":false,"local":true});
 }
 
 function u_BodyReceived( i_data, i_args)

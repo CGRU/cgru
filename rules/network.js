@@ -5,6 +5,7 @@ n_requests_count = 0;
 n_conn_count = 0;
 
 n_walks = {};
+n_gets = {};
 
 function n_WalkDir( i_args)
 {
@@ -236,6 +237,7 @@ function n_JobSended( i_data)
 		c_Error( i_data.error);
 }
 
+// not used
 function n_Get( i_path)
 {
 	var log = '<b><i>get:</i></b> '+ i_path;
@@ -250,13 +252,37 @@ function n_Get( i_path)
 	return xhr.responseText;
 }
 
-
+// not used
 function n_GetRuFile( i_file, i_nockeck )
 {
 	if( i_nockeck != true )
 		if( false == c_RuFileExists( i_file)) return null;
 	return n_Request({"send":{"getfile":c_GetRuFilePath( i_file)}});
 //	return n_Get( c_GetRuFilePath( i_file));
+}
+
+function n_GetFile( i_args)
+{
+	if( n_gets[i_args.path]
+		&& (( i_args.cache_time == null )
+			|| ( c_DT_CurSeconds() - n_gets[i_args.path].time < i_args.cache_time )
+			)
+		)
+	{
+		var info = 'GetFile cached['+i_args.info+']';
+		if( i_args.cache_time ) info += '['+i_args.cache_time+'s]';
+		info += ': ' + i_args.path;
+		c_Log(info);
+		i_args.func( n_gets[i_args.path].data, i_args);
+		return;
+	}
+	n_Request({"send":{"getfile":i_args.path},"func":n_GetFileReceived,
+		"info":'get ' + i_args.info,"parse":i_args.parse,"get_args":i_args,"local":i_args.local});
+}
+function n_GetFileReceived( i_data, i_args)
+{
+	n_gets[i_args.get_args.path] = {"data":i_data,"time":c_DT_CurSeconds()};
+	i_args.get_args.func( i_data, i_args.get_args);
 }
 
 function n_SendMail( i_address, i_subject, i_body)

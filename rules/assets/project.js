@@ -6,7 +6,7 @@ if( ASSETS.project && ( ASSETS.project.path == g_CurPath()))
 function prj_Init()
 {
 	a_SetLabel('Project');
-	n_Request({"send":{"getfile":'rules/assets/project.html'},"func":prj_InitHTML,"info":'get project.html',"parse":false});
+	n_GetFile({"path":'rules/assets/project.html',"func":prj_InitHTML,"info":'project.html',"parse":false});
 }
 function prj_InitHTML( i_data)
 {
