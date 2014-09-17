@@ -23,21 +23,28 @@ function cm_Load()
 
 	if( false == c_RuFileExists( cm_file)) return;
 
-	n_Request({"send":{"readobj":c_GetRuFilePath( cm_file)},"func":cm_Received,"info":'comments',"local":true,"wait":false,"parse":true});
 	$('comments').textContent = 'Loading...';
+
+	n_GetFile({"path":c_GetRuFilePath( cm_file),"func":cm_Received,"cache_time":RULES.cache_time,"info":'comments',"parse":true,"local":true});
+
 }
 
-function cm_Received( obj, i_args)
+function cm_Received( i_data)
 {
 	$('comments').textContent = '';
-	if( obj == null ) return;
-	if( obj.comments == null ) return;
+	if( i_data == null ) return;
+	if( i_data.comments == null )
+	{
+		c_Error('Invalid comments data received.');
+		c_Log(JSON.stringify(i_data));
+		return;
+	}
 
 	var obj_array = [];
-	for( key in obj.comments )
+	for( key in i_data.comments )
 	{
-		obj.comments[key].key = key;
-		obj_array.push( obj.comments[key]);
+		i_data.comments[key].key = key;
+		obj_array.push( i_data.comments[key]);
 	}
 
 	obj_array.sort( function(a,b){if(a.key<b.key)return -1;if(a.key>b.key)return 1;return 0;});

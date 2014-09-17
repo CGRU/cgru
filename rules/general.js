@@ -249,7 +249,7 @@ function g_Navigate( i_path)
 	}
 
 	walk.rufiles = ['rules','status'];
-	walk.mtime = RULES.cache_time;
+	walk.cache_time = RULES.cache_time;
 	walk.lookahead = ['status'];
 	walk.wfunc = g_WalksReceived;
 	walk.info = 'walk GO';
