@@ -679,7 +679,10 @@ FilesView.prototype.showFile = function( i_file)
 		if( cmds && ( RULES.has_filesystem !== false )) for( var c = 0; c < cmds.length; c++)
 		{
 			var elCmd = document.createElement('div');
-			elFile.appendChild( elCmd);
+			if( cmds[c].submenu )
+				elFile.m_elMenu.appendChild( elCmd);
+			else
+				elFile.appendChild( elCmd);
 			elCmd.classList.add('cmdexec');
 			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
