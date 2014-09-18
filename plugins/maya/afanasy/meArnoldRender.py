@@ -30,11 +30,10 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meArnoldRender_'
-meArnoldRenderVer = '0.3.0'
+meArnoldRenderVer = '0.3.2'
 meArnoldRenderMainWnd = self_prefix + 'MainWnd'
 
 job_separator_list = ['none', '.', '_' ]
-ass_compression_list = ['Off', 'On']
 ar_verbosity_list = [
 	'none',
 	'fatal',
@@ -143,8 +142,9 @@ class meArnoldRender ( object ) :
 		self.job_param['job_padding'] = \
 			getDefaultIntValue(self_prefix, 'job_padding', 4)
 		
+		# job_separator = { 'none', '.', '_' }
 		self.job_param['job_separator'] = \
-			getDefaultStrValue(self_prefix, 'job_separator', '.') # { 'none', '.', '_'}
+			getDefaultStrValue(self_prefix, 'job_separator', '.') 
 
 		#
 		# .ass generation parameters
@@ -153,7 +153,8 @@ class meArnoldRender ( object ) :
 			getDefaultIntValue(self_prefix, 'ass_reuse', 0) is 1
 
 		self.ass_param['ass_dirname'] = \
-			getDefaultStrValue(self_prefix, 'ass_dirname', 'data')
+			getDefaultStrValue(self_prefix, 'ass_dirname', 
+			cmds.workspace( fileRuleEntry='ASS' ) )
 
 		self.ass_param['ass_perframe'] = \
 			getDefaultIntValue(self_prefix, 'ass_perframe', 1) is 1
@@ -162,7 +163,8 @@ class meArnoldRender ( object ) :
 			getDefaultIntValue(self_prefix, 'ass_selection', 0) is 1
 
 		self.ass_param['ass_binary'] = \
-			getDefaultIntValue(self_prefix, 'ass_binary', 0) is 1
+			getDefaultIntValue(self_prefix, 'ass_binary', 
+				cmds.getAttr( 'defaultArnoldRenderOptions.binaryAss' ) ) is 1
 
 		self.ass_param['ass_verbosity'] = \
 			getDefaultStrValue(self_prefix, 'ass_verbosity', 'none')
@@ -179,9 +181,49 @@ class meArnoldRender ( object ) :
 		self.ass_param['ass_export_all_layers'] = \
 			getDefaultIntValue(self_prefix, 'ass_export_all_layers', 0) is 1
 
-		self.ass_param['ass_compression'] = \
-			getDefaultStrValue(self_prefix, 'ass_compression', 'Off')
-
+		self.ass_param['ass_compressed'] = \
+			getDefaultStrValue(self_prefix, 'ass_compressed',
+			cmds.getAttr('defaultArnoldRenderOptions.output_ass_compressed' )) is 1
+			
+		# defaultArnoldRenderOptions.expandProcedurals
+		self.ass_param['ass_expand_procedurals'] = \
+			getDefaultIntValue(self_prefix, 'ass_expand_procedurals', 
+			cmds.getAttr('defaultArnoldRenderOptions.expandProcedurals' )) is 1
+		
+		# defaultArnoldRenderOptions.outputAssBoundingBox
+		self.ass_param['ass_export_bounds'] = \
+			getDefaultIntValue(self_prefix, 'ass_export_bounds', 
+			cmds.getAttr('defaultArnoldRenderOptions.outputAssBoundingBox')) is 1  
+			
+		# defaultArnoldRenderOptions.absoluteTexturePaths
+		self.ass_param['ass_abs_tex_path'] = \
+			getDefaultIntValue(self_prefix, 'ass_abs_tex_path', 
+			cmds.getAttr('defaultArnoldRenderOptions.absoluteTexturePaths')) is 1
+			
+		# defaultArnoldRenderOptions.absoluteProceduralPaths
+		self.ass_param['ass_abs_proc_path'] = \
+			getDefaultIntValue(self_prefix, 'ass_abs_proc_path', 
+			cmds.getAttr('defaultArnoldRenderOptions.absoluteProceduralPaths')) is 1
+			
+		# defaultArnoldRenderOptions.plugins_path
+		self.ass_param['ass_plugin_path'] = \
+			getDefaultStrValue(self_prefix, 'ass_plugin_path',
+			cmds.getAttr('defaultArnoldRenderOptions.plugins_path') )
+		
+		# defaultArnoldRenderOptions.procedural_searchpath	
+		self.ass_param['ass_proc_search_path'] = \
+			getDefaultStrValue(self_prefix, 'ass_proc_search_path',
+			cmds.getAttr('defaultArnoldRenderOptions.procedural_searchpath'))
+		
+		# defaultArnoldRenderOptions.shader_searchpath	
+		self.ass_param['ass_shader_search_path'] = \
+			getDefaultStrValue(self_prefix, 'ass_shader_search_path',
+			cmds.getAttr('defaultArnoldRenderOptions.shader_searchpath'))
+		
+		# defaultArnoldRenderOptions.texture_searchpath
+		self.ass_param['ass_tex_search_path'] = \
+			getDefaultStrValue(self_prefix, 'ass_tex_search_path',
+			cmds.getAttr('defaultArnoldRenderOptions.texture_searchpath'))
 		#
 		# Arnold parameters
 		#
@@ -363,9 +405,10 @@ class meArnoldRender ( object ) :
 		scenename = getMayaSceneName()
 
 		if ass_deferred:
-			scenename, ext = os.path.splitext(
-				os.path.basename(self.def_scene_name)
-			)
+			scenename += '_deferred'
+			#scenename, ext = os.path.splitext(
+			#	os.path.basename(self.def_scene_name)
+			#)
 
 		filename += '/%s' % scenename
 		filename = cmds.workspace(expandName=filename)
@@ -379,8 +422,11 @@ class meArnoldRender ( object ) :
 				filename += '%s%s%s%s.ass' % ( separator, decorator, pad_str, decorator )
 			else :	
 				filename += '.ass'	
-			if self.ass_param['ass_compression'] != 'Off':
-				filename += '.gz'
+			if self.ass_param['ass_compressed'] :
+				# !!! There is error in maya translator 
+				# for "defaultArnoldRenderOptions.output_ass_compressed" flag
+				if not ass_deferred : 
+					filename += '.gz'
 
 		return filename
 
@@ -418,9 +464,21 @@ class meArnoldRender ( object ) :
 		ass_dirname = self.ass_param['ass_dirname']
 		ass_padding = self.job_param['job_padding']
 		ass_perframe = self.ass_param['ass_perframe']
+		ass_deferred = self.ass_param['ass_deferred']  
+		
 		ass_binary = self.ass_param['ass_binary']
-		ass_deferred = self.ass_param['ass_deferred']
-
+		ass_compressed = self.ass_param['ass_compressed']
+		ass_expand_procedurals = self.ass_param['ass_expand_procedurals']
+		ass_export_bounds = self.ass_param['ass_export_bounds']
+		
+		ass_abs_tex_path = self.ass_param['ass_abs_tex_path']
+		ass_abs_proc_path = self.ass_param['ass_abs_proc_path']
+		
+		ass_plugin_path = self.ass_param['ass_plugin_path']
+		ass_proc_search_path = self.ass_param['ass_proc_search_path']
+		ass_shader_search_path = self.ass_param['ass_shader_search_path']
+		ass_tex_search_path = self.ass_param['ass_tex_search_path']
+		
 		assgen_cmd = ''
 		filename = cmds.workspace(expandName=ass_dirname)
 		filename, ext = os.path.splitext(filename)
@@ -431,8 +489,15 @@ class meArnoldRender ( object ) :
 		if ass_deferred:
 			if ass_binary:
 				assgen_cmd += ' -ai:bass 1'
-
-			assgen_cmd += ' -ai:lfv 2'
+			if ass_export_bounds:
+				assgen_cmd += ' -ai:exbb 1'
+			
+			assgen_cmd += ' -ai:lve 1' # ' -ai:lfv 2'
+			assgen_cmd += ' -ai:sppg "' + ass_plugin_path + '"'
+			assgen_cmd += ' -ai:sppr "' + ass_proc_search_path + '"'
+			assgen_cmd += ' -ai:spsh "' + ass_shader_search_path + '"'
+			assgen_cmd += ' -ai:sptx "' + ass_tex_search_path + '"'
+			
 			#assgen_cmd += ' -filename \"' + filename + '\"'
 		else:
 			if layer is not None:
@@ -447,19 +512,21 @@ class meArnoldRender ( object ) :
 
 			filename = self.get_ass_name(False, layer)
 
-			ass_compression_level = \
-				ass_compression_list.index(self.ass_param['ass_compression'])
-
-			if ass_compression_level > 0:
+			if ass_compressed :
 				assgen_cmd += ' -compressed'
 
-			if not ass_binary:
+			if not ass_binary :
 				assgen_cmd += ' -asciiAss'
 
-			if ass_selection:
+			if ass_selection :
 				assgen_cmd += ' -selected'
 
-			assgen_cmd += ' -expandProcedurals'
+			if ass_expand_procedurals :
+				assgen_cmd += ' -expandProcedurals'
+				
+			if ass_export_bounds:
+				assgen_cmd += ' -boundingBox'
+				
 			assgen_cmd += ' -filename \"' + filename + '\"'
 
 		return assgen_cmd
@@ -467,7 +534,7 @@ class meArnoldRender ( object ) :
 	def generate_ass ( self, isSubmitingJob=False ) :
 		"""generate_ass
 
-		:param isSubmitingJob: if job will be submited after .ass generation
+		:param isSubmitingJob: if job assumed to be submited after .ass generation
 		"""
 		skipExport = False
 		exportAllRenderLayers = self.ass_param['ass_export_all_layers']
@@ -482,8 +549,19 @@ class meArnoldRender ( object ) :
 		ass_dirname = self.ass_param['ass_dirname']
 		ass_padding = self.job_param['job_padding']
 		ass_perframe = self.ass_param['ass_perframe']
-		ass_binary = self.ass_param['ass_binary']
 		ass_deferred = self.ass_param['ass_deferred']
+		
+		ass_binary = self.ass_param['ass_binary']
+		ass_expand_procedurals = self.ass_param['ass_expand_procedurals']
+		ass_export_bounds = self.ass_param['ass_export_bounds']
+		
+		ass_abs_tex_path = self.ass_param['ass_abs_tex_path']
+		ass_abs_proc_path = self.ass_param['ass_abs_proc_path']
+		
+		ass_plugin_path = self.ass_param['ass_plugin_path']
+		ass_proc_search_path = self.ass_param['ass_proc_search_path']
+		ass_shader_search_path = self.ass_param['ass_shader_search_path']
+		ass_tex_search_path = self.ass_param['ass_tex_search_path']
 
 		filename = cmds.workspace(expandName=ass_dirname)
 		filename, ext = os.path.splitext(filename)
@@ -510,6 +588,7 @@ class meArnoldRender ( object ) :
 			# save RenderGlobals
 			#
 			defGlobals = 'defaultRenderGlobals'
+			aiGlobals = 'defaultArnoldRenderOptions'
 			saveGlobals = {}
 			#
 			# override RenderGlobals
@@ -526,6 +605,20 @@ class meArnoldRender ( object ) :
 				cmds.setAttr(defGlobals + '.periodInExt', 2 )	
 			
 			image_name = self.getImageFileNamePrefix()
+			
+			cmds.setAttr(aiGlobals + '.binaryAss', ass_binary )
+			cmds.setAttr(aiGlobals + '.expandProcedurals', ass_expand_procedurals )
+			cmds.setAttr(aiGlobals + '.outputAssBoundingBox', ass_export_bounds )
+			cmds.setAttr(aiGlobals + '.absoluteTexturePaths', ass_abs_tex_path )
+			cmds.setAttr(aiGlobals + '.absoluteProceduralPaths', ass_abs_proc_path )
+			cmds.setAttr(aiGlobals + '.plugins_path', ass_plugin_path, type='string' )
+			cmds.setAttr(aiGlobals + '.procedural_searchpath', ass_proc_search_path, type='string' )
+			cmds.setAttr(aiGlobals + '.shader_searchpath', ass_shader_search_path, type='string' )
+			cmds.setAttr(aiGlobals + '.texture_searchpath', ass_tex_search_path, type='string' )
+			#
+			# Clear .output_ass_filename to force using default filename from RenderGlobals
+			#
+			cmds.setAttr(aiGlobals + '.output_ass_filename', '', type='string' )
 
 			if ass_deferred:
 				# generate unique maya scene name and save it
@@ -539,16 +632,15 @@ class meArnoldRender ( object ) :
 					image_name,
 					type='string'
 				)
-
-				scene_name = getMayaSceneName(
-					withoutSubdir=False)  # get scene name without extension
-
+				
+				# get scene name without extension
+				scene_name = getMayaSceneName( withoutSubdir=False)  
 				def_scene_name = scene_name + '_deferred'
-
 				cmds.file(rename=def_scene_name)
-				self.def_scene_name = cmds.file(save=True,
-												de=True)  # save it with default extension
-				cmds.file(rename=scene_name)  # rename scene back
+				# save it with default extension
+				self.def_scene_name = cmds.file(save=True, de=True)  
+				# rename scene back
+				cmds.file(rename=scene_name)  
 
 				cmds.setAttr(
 					defGlobals + '.imageFilePrefix',
@@ -793,10 +885,16 @@ class meArnoldRender ( object ) :
 
 		:param name:
 		:param value:
+		
 		"""
-		if name in ('ass_dirname', 'ass_compression'):
+		if name == 'ass_dirname' :
 			setDefaultStrValue(self_prefix, name, self.ass_param, value)
-		else:  # ass_padding, ass_perframe
+			cmds.workspace( fileRule=('ASS',value) )
+			cmds.workspace( saveWorkspace=True )
+		elif name == 'ass_compressed' :
+			setDefaultIntValue(self_prefix, name, self.ass_param, value)
+			cmds.setAttr( 'defaultArnoldRenderOptions.output_ass_compressed', value )
+		else:  # ass_padding, ass_perframe, 
 			setDefaultIntValue(self_prefix, name, self.ass_param, value)
 		self.setResolvedPath()
 
@@ -851,7 +949,7 @@ class meArnoldRender ( object ) :
 		"""
 		ass_def_frame = self.winMain + '|f0|t0|tc1|fr3'
 		ass_def = ass_def_frame + '|fc3|'
-		ass_compression = self.winMain + '|f0|t0|tc1|fr1|fc1|ass_compression'
+		ass_compressed = self.winMain + '|f0|t0|tc1|fr1|fc1|ass_compressed'
 
 		setDefaultIntValue(
 			self_prefix,
@@ -869,8 +967,8 @@ class meArnoldRender ( object ) :
 			edit=True,
 			enable=arg
 		)
-		cmds.optionMenuGrp(
-			ass_compression,
+		cmds.checkBoxGrp(
+			ass_compressed,
 			e=True,
 			enable=not arg
 		)
@@ -884,6 +982,8 @@ class meArnoldRender ( object ) :
 			edit=True,
 			bgc=bg_color
 		)  # , enableBackground=False
+		
+		self.setResolvedPath()
 
 	def enable_distributed(self, arg) :
 		"""enable_distributed
@@ -1616,42 +1716,151 @@ class meArnoldRender ( object ) :
 			)
 		)
 
-		ass_compression = cmds.optionMenuGrp(
-			'ass_compression',
-			cw=((1, cw1),),
-			cal=(1, 'right'),
-			label='Compression ',
-			cc=partial(self.assDirNameChanged, 'ass_compression')
+		cmds.checkBoxGrp(
+			'ass_compressed',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Compression',
+			value1=self.ass_param['ass_compressed'],
+			enable=not self.ass_param['ass_deferred'],
+			cc=partial(self.assDirNameChanged, 'ass_compressed')
 		)
-
-		for name in ass_compression_list:
-			cmds.menuItem(label=name)
-
-		cmds.optionMenuGrp(
-			ass_compression,
-			e=True,
-			value=self.ass_param['ass_compression']
+	
+		cmds.checkBoxGrp(
+			'ass_expand_procedurals',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Expand Procedurals',
+			value1=self.ass_param['ass_expand_procedurals'],
+			cc=partial(
+				setDefaultIntValue,
+				self_prefix,
+				'ass_expand_procedurals',
+				self.ass_param
+			)
 		)
-
-		# ass_verbosity = none, fatal, error, warning, info, progress, and details
-		# ass_verbosity = cmds.optionMenuGrp(
-		#     'ass_verbosity',
-		#     cw=((1, cw1),),
-		#     cal=(1, 'right'),
-		#     label="Verbosity ",
-		#     cc=partial(self.setDefaultStrValue, 'ass_verbosity'))
-
-		# for name in ('none', 'fatal', 'error', 'warning', 'info', 'progress', 'details'):
-		#     cmds.menuItem(label=name)
-
-		# cmds.optionMenuGrp(
-		#     ass_verbosity,
-		#     e=True,
-		#     value=self.ass_param['ass_verbosity']
-		# )
+		
+		cmds.checkBoxGrp(
+			'ass_export_bounds',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Export Bounding Box (.asstoc)',
+			value1=self.ass_param['ass_export_bounds'],
+			cc=partial(
+				setDefaultIntValue,
+				self_prefix,
+				'ass_export_bounds',
+				self.ass_param
+			)
+		)
 
 		cmds.setParent('..')
 		cmds.setParent('..')
+		
+		cmds.frameLayout(
+			'fr4',
+			label=' Search Paths ',
+			borderVisible=True,
+			borderStyle='etchedIn',
+			marginHeight=ar_hi,
+			cll=True,
+			cl=True
+		)
+
+		cmds.columnLayout(
+			'cl4',
+			columnAttach=('left', 0),
+			rowSpacing=0,
+			adjustableColumn=True
+		)
+
+		cmds.checkBoxGrp(
+			'ass_abs_tex_path',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Absolute Texture Paths',
+			value1=self.ass_param['ass_abs_tex_path'],
+			cc=partial(
+				setDefaultIntValue,
+				self_prefix,
+				'ass_abs_tex_path',
+				self.ass_param
+			)
+		)
+		
+		cmds.checkBoxGrp(
+			'ass_abs_proc_path',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Absolute Procedural Paths',
+			value1=self.ass_param['ass_abs_proc_path'],
+			cc=partial(
+				setDefaultIntValue,
+				self_prefix,
+				'ass_abs_proc_path',
+				self.ass_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ass_plugin_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Plug-ins Path ',
+			text=self.ass_param['ass_plugin_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ass_plugin_path',
+				self.ass_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ass_proc_search_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Procedural Search Path ',
+			text=self.ass_param['ass_proc_search_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ass_proc_search_path',
+				self.ass_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ass_shader_search_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Shaders Search Path ',
+			text=self.ass_param['ass_shader_search_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ass_shader_search_path',
+				self.ass_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ass_tex_search_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Textures Search Path ',
+			text=self.ass_param['ass_tex_search_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ass_tex_search_path',
+				self.ass_param
+			)
+		)
+		
+		cmds.setParent('..')
+		cmds.setParent('..')
+
 		cmds.frameLayout(
 			'fr2',
 			label=' Resolved Path ',
@@ -1680,6 +1889,7 @@ class meArnoldRender ( object ) :
 
 		cmds.setParent('..')
 		cmds.setParent('..')
+
 		cmds.setParent('..')
 
 		#
@@ -1761,21 +1971,6 @@ class meArnoldRender ( object ) :
 				self.ar_param
 			)
 		)
-
-		# cmds.intFieldGrp(
-		#     'ar_threads_limit',
-		#     cw=((1, cw1), (2, cw2)),
-		#     label='Threads Limit ',
-		#     ann='Max threads per host. All available threads will be used if 0',
-		#     value1=self.ar_param['ar_threads_limit'],
-		#     enable=self.ar_param['ar_distributed'],
-		#     cc=partial(
-		#         setDefaultIntValue,
-		#         self_prefix,
-		#         'ar_threads_limit',
-		#         self.ar_param
-		#     )
-		# )
 
 		cmds.textFieldGrp(
 			'ar_hosts',
