@@ -273,11 +273,6 @@ function n_GetFile( i_args)
 		if( i_args.cache_time ) info += '['+i_args.cache_time+'s]';
 		info += ': ' + i_args.path;
 		c_Log(info);
-//		var data = n_gets[i_args.path].data;
-//		if( i_args.parse )
-//			data = c_Parse( data);
-//		i_args.func( data, i_args);
-//console.log(JSON.stringify(n_gets[i_args.path].data));
 		i_args.func( n_gets[i_args.path].data, i_args);
 		return;
 	}

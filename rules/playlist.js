@@ -285,8 +285,8 @@ function p_EditFinished( i_data)
 function p_RefreshOnClick( i_evt) { p_Load();}
 function p_Load()
 {
-	n_Request({"send":{"readobj":p_file},"func":p_Received,"wait":false,"parse":true,"info":"playlist"});
 	$('playlist').innerHTML = 'Loading...';
+	n_Request({"send":{"getfile":p_file},"func":p_Received,"info":'playlist'});
 	p_elLinks = [];
 }
 function p_Received( obj)
