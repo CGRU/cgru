@@ -3,7 +3,7 @@
 "rufolder":".rules",
 "company":"CGRU",
 "playlist":"rules/playlist.json",
-"cache_time":300,
+"cache_time":60,
 
 "news":{
 	"limit":99,
@@ -92,8 +92,7 @@
 			"path":["RESULT/DAILIES"]
 		},
 		"template":"/CG_PROJECT/SCENES/COMMON/_template",
-		"nuke_template":"/cgru/plugins/nuke/_template.nk",
-		"cache_time":60
+		"nuke_template":"/cgru/plugins/nuke/_template.nk"
 	}
 },
 

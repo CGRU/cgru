@@ -17,7 +17,7 @@ function n_WalkDir( i_args)
 	var cur_seconds = c_DT_CurSeconds();
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
-		if( i_args.mtime && n_walks[i_args.paths[i]] && ( cur_seconds - n_walks[i_args.paths[i]].walktime) < i_args.mtime )
+		if( i_args.cache_time && n_walks[i_args.paths[i]] && ( cur_seconds - n_walks[i_args.paths[i]].walktime) < i_args.cache_time )
 			continue;
 		else
 			n_walks[i_args.paths[i]] = null
@@ -72,7 +72,7 @@ function n_WalkDirProcess( i_data, i_args)
 			w++;
 		}
 		else 
-			c_Log('Walk cached '+i_args.mtime+'s: '+i_args.paths[i]);
+			c_Log('Walk cached '+i_args.cache_time+'s: '+i_args.paths[i]);
 		o_walks.push( walk);
 		if( walk == null ) continue;
 //		if( walk.error ) continue;

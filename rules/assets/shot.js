@@ -74,11 +74,7 @@ function shot_ResultsRead( i_first_time)
 
 
 	if( i_first_time )
-	{
-		walk.mtime = RULES.cache_time;
-		if( ASSET.cache_time )
-			walk.mtime = ASSET.cache_time;
-	}
+		walk.cache_time = RULES.cache_time;
 
 	walk.wfunc = shot_ResultsReceived;
 	walk.info = 'walk results';

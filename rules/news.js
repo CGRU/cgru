@@ -337,7 +337,7 @@ function nw_MakeNewsFinished( i_data, i_args)
 	if( i_args.args && ( i_args.args.load === false )) return;
 
 	nw_NewsLoad();
-	nw_RecentLoad(/*file exists check=*/ false);
+	nw_RecentLoad({"file_check":false});
 		
 	if( i_data.users.length == 0 )
 	{
@@ -375,9 +375,9 @@ function nw_NewsLoad()
 		return;
 	}
 
-	var filename = 'users/'+g_auth_user.id+'.json';
-	n_Request({"send":{"readobj":filename},"func":nw_NewsReceived,"info":"news","wait":false,"parse":true});
 	$('news').innerHTML = 'Loading...';
+	var filename = 'users/'+g_auth_user.id+'.json';
+	n_Request({"send":{"getfile":filename},"func":nw_NewsReceived,"info":"news"});
 }
 
 function nw_NewsReceived( i_user)
@@ -650,39 +650,29 @@ function nw_RecentOpen( i_noload )
 	if( i_noload !== false )
 		nw_RecentLoad();
 }
-function nw_RecentLoad( i_check, i_cache)
+function nw_RecentLoad( i_args)
 {
-	if(( i_check !== false ) && ( false == c_RuFileExists( nw_recent_file)))
+	if( i_args == null ) i_args = {};
+
+	if(( i_args.file_check !== false ) && ( false == c_RuFileExists( nw_recent_file)))
 		return;
 
-	if(( i_cache !== false ) && nw_recents[g_CurPath()] && ( c_DT_CurSeconds() - nw_recents[g_CurPath()].time < RULES.cache_time ))
-	{
-		c_Log('Recent cached '+RULES.cache_time+'s: '+g_CurPath());
-		nw_RecentReceived( nw_recents[g_CurPath()].array );
-		return;
-	}
-
-	var file = c_GetRuFilePath( nw_recent_file);
-	n_Request({"send":{"readobj":file},"local":true,"func":nw_RecentReceived,"info":"recent","wait":false,"parse":true});
 	$('recent').textContent = 'Loading...';
+
+	var cache = RULES.cache_time;
+	if( i_args.cache === false ) cache = 0;
+
+	n_GetFile({"path":c_GetRuFilePath( nw_recent_file),"func":nw_RecentReceived,
+		"cache_time":cache,"info":'recent',"parse":true,"local":true});
 }
 
 function nw_RecentRefresh()
 {
-	nw_RecentLoad( true, false);
+	nw_RecentLoad({"cache":false});
 }
 
 function nw_RecentReceived( i_data, i_args)
 {
-//console.log( i_args);
-//console.log( i_data.length);
-//return;
-	if( i_args )
-	{
-		nw_recents[i_args.path] = {"array":i_data,"time":c_DT_CurSeconds()};
-		if( i_args.path != g_CurPath()) return;
-	}
-
 	$('recent').innerHTML = '';
 	if( i_data == null ) return;
 	if( i_data.error ) return;
