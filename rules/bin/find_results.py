@@ -72,8 +72,8 @@ for src in args:
 	version = None
 	name = os.path.basename(src)
 
-	for respath in ResPaths:
-		respath = os.path.join(src, respath)
+	for res in ResPaths:
+		respath = os.path.join(src, res)
 		if not os.path.isdir(respath):
 			continue
 
@@ -104,18 +104,18 @@ for src in args:
 			result['src'] = os.path.join(respath, item)
 
 	if result['src'] is None:
-		result['error'] = src
-		if Options.skiperrors:
-			continue
-		else:
+		result['error'] = 'Not founded'
+		if not Options.skiperrors:
 			errExit('Input not found for: %s' % src)
 
-	if version == '':
+	if version == '' or version is None:
 		version = ('v%0' + str(Options.padding) + 'd') % 0
 	name += '_' + version
 
 	result['name'] = name
 	result['version'] = version
+	result['asset'] = src
+	result['respath'] = res
 
 	if Options.dest is not None:
 		result['dest'] = os.path.join(Options.dest, name)

@@ -258,7 +258,7 @@ function fu_PutMultiDialog( i_args)
 
 	if( RULES.put.dest.indexOf('/') !== 0 )
 		if( ASSETS.project )
-			params.dest = '/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest;
+			params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest, true);
 
 	gui_Create( wnd.elContent, fu_putmulti_params, [RULES.put, params]);
 	if( RULES.put.ftp )
@@ -374,35 +374,46 @@ function fu_ResultsReceived( i_data, i_args)
 		return;
 	}
 
+	var elTable = document.createElement('table');
+	elResults.appendChild( elTable);
+
 	var founded = false;
 	for( var i = 0; i < result.results.length; i++)
 	{
 		var res = result.results[i];
-
-		var el = document.createElement('div');
-		elResults.appendChild( el);
-
-		msg = res.src;
-		msg += ' -> ' + res.name;
-		//msg += ' ' + res.version;
-		//msg += ' ' + res.dst;
 		//console.log( JSON.stringify( res));
+
+		var elTr = document.createElement('tr');
+		elTable.appendChild(elTr);
+
+		var el = document.createElement('td');
+		elTr.appendChild( el);
+		el.textContent = res.asset;
+
+		var el = document.createElement('td');
+		elTr.appendChild( el);
+		el.textContent = res.respath;
+
+		var el = document.createElement('td');
+		elTr.appendChild( el);
+		el.textContent = res.name;
+
+		var el = document.createElement('td');
+		elTr.appendChild( el);
+
+		var msg = '';
 		if( res.exist )
 		{
 			msg += ' EXIST';
-			el.style.color = '#888';
+			elTr.style.color = '#888';
 		}
 
 		el.textContent = msg;
 
 		if( res.error )
 		{
-			el.style.color = '#F42';
-
-			var el = document.createElement('div');
-			elResults.appendChild( el);
 			el.textContent = res.error;
-			el.style.color = '#F42';
+			elTr.style.color = '#F42';
 		}
 		else
 			founded = true;

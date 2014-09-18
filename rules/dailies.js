@@ -275,7 +275,7 @@ function d_Convert( i_args)
 	{
 		if( RULES.put.dest.indexOf('/') !== 0 )
 			if( ASSETS.project )
-				params.dest = '/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest;
+				params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest, true);
 		gui_Create( wnd.elContent, d_cvtmulti_params, [RULES.put,params]);
 	}
 
