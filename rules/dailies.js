@@ -9,6 +9,7 @@ d_guiparams.version = {"width":'25%',"lwidth":'70px'};
 d_guiparams.input = {};
 d_guiparams.output = {};
 d_guiparams.filename = {}
+d_guiparams.af_depend_mask = {"label":'Depends',"tooltip":'Afanasy job depend mask'}
 d_guiparams.fps = {"label":'FPS',"width":'25%'};
 d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px',"tooltip":'First frame is "1"\nNo matter image file name number.'};
 d_guiparams.aspect_in = {"label":'Aspect In',"width":'25%',"lwidth":'70px'};
@@ -137,6 +138,8 @@ function d_ProcessGUI( i_wnd)
 	var job = {};
 	//job.offline = true;
 	job.name = params.filename;
+	if( params.af_depend_mask.length )
+		job.depend_mask = params.af_depend_mask;
 
 	var block = {};
 	block.name = 'Dailies';
@@ -152,6 +155,7 @@ function d_ProcessGUI( i_wnd)
 	block.tasks = [task];
 
 //console.log( task.command);
+//console.log( JSON.stringify(job));
 	n_SendJob( job);
 
 	nw_MakeNews({"title":'dailies'});
