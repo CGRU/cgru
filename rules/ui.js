@@ -612,8 +612,10 @@ function u_SearchReceived( i_data)
 	}
 }
 
-function u_BodyLoad()
+function u_BodyLoad( i_args)
 {
+	if( i_args == null ) i_args = {};
+
 	if( u_body_edit_markup ) u_BodyEditMarkup();
 
 	if( false == c_RuFileExists( u_body_filename))
@@ -622,8 +624,12 @@ function u_BodyLoad()
 		return;
 	}
 
+	var cache = RULES.cache_time;
+	if( i_args.cache === false )
+		cache = 0;
+
 	n_GetFile({"path":c_GetRuFilePath( u_body_filename),"func":u_BodyReceived,
-		"cache_time":RULES.cache_time,"info":'body.html',"parse":false,"local":true});
+		"cache_time":cache,"info":'body.html',"parse":false,"local":true});
 }
 
 function u_BodyReceived( i_data, i_args)
@@ -725,7 +731,7 @@ function u_BodyEditSaveFinished( i_data, i_args)
 	c_RuFileAdd( u_body_filename);
 	// Body file be new and does exist before saving.
 
-	u_BodyLoad();
+	u_BodyLoad({"cache":false});
 }
 
 function u_BodyEditMarkup()
