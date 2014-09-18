@@ -703,9 +703,12 @@ function cm_Goto( i_key)
 		if( cm_array[i].obj.key == i_key )
 		{
 			cm_array[i].el.scrollIntoView();
+			cm_array[i].el.classList.add('goto');
+			c_Info('Comment highlighted.');
 			return;
 		}
 
-	c_Error('Comment with key=' + i_key + ' not found.');
+	if( cm_array.length )
+		c_Error('Comment with key=' + i_key + ' not found.');
 }
 
