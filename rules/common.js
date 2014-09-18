@@ -524,7 +524,7 @@ function c_LinksProcess( i_text)
 function c_HttpToLinks( i_text)
 {
 //console.log('c_HttpToLinks in:'+i_text);
-	var a_re = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+	var a_re = /(((\b(https?|ftp|file):\/\/)|(#\/))[-A-Z0-9+&@#\/%?=~_|!:,.;"\{\}]*[-A-Z0-9+&@#\/%=~_|"\{\}])/ig;
 	var a_parts = i_text.split(/<a /gi);
 	var out = null;
 	for( var i = 0; i < a_parts.length; i++)

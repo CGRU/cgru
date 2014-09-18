@@ -665,7 +665,7 @@ FilesView.prototype.showFile = function( i_file)
 	if( c_FileCanEdit( i_file.name))
 	{
 		var el = document.createElement('a');
-		elFile.appendChild( el);
+		elFile.m_elMenu.appendChild( el);
 		el.setAttribute('href', 'player.html#'+path);
 		el.setAttribute('target', '_blank');
 		el.classList.add('button');
