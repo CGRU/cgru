@@ -69,6 +69,7 @@ if not os.path.isdir( SceneFolder):
 allfiles = os.listdir( SceneFolder)
 scenes = []
 for afile in allfiles:
+	if not os.path.isfile(os.path.join(SceneFolder, afile)): continue
 	if afile[0] == '.': continue
 	# We should skip files with more than one extension
 	# Assuming that second extension is a temp render scene
