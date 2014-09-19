@@ -400,6 +400,10 @@ function fu_ResultsReceived( i_data, i_args)
 
 		var el = document.createElement('td');
 		elTr.appendChild( el);
+		el.textContent = res.version;
+
+		var el = document.createElement('td');
+		elTr.appendChild( el);
 
 		var msg = '';
 		if( res.exist )
