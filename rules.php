@@ -1221,6 +1221,9 @@ function jsf_htdigest( $i_recv, &$o_out)
 		$data = fread( $fHandle, $FileMaxLength);
 		fclose($fHandle);
 	}
+
+	// Construct new lines w/o our user (if it exists):
+	$o_out['status'] = 'User "'.$user.'" set.';
 	$old_lines = explode("\n", $data);
 	$new_lines = array();
 	foreach( $old_lines as $line )
@@ -1229,15 +1232,18 @@ function jsf_htdigest( $i_recv, &$o_out)
 		if( count( $values ) == 3 )
 		{
 			if( $values[0] == $user )
+			{
+				// Just skip old line with our user:
 				$o_out['status'] = 'User "'.$user.'" updated.';
+			}
 			else
 			{
-				$o_out['status'] = 'User "'.$user.'" set.';
+				// Store line with other user:
 				array_push( $new_lines, $line);
 			}
 		}
 	}
-
+	// Add our user to the end:
 	array_push( $new_lines, $i_recv['digest']);
 
 	$data = implode("\n", $new_lines)."\n";
