@@ -695,20 +695,27 @@ function cm_Goto( i_key)
 
 	if( i_key == null ) return;
 
-//TODO: this will not work, as this function is async
+	// This function is async, but this works.
+	// As post function will be called once more
+	//  after comments will be received.
 	if( localStorage['view_comments'] !== 'true' )
 		u_OpenCloseView( 'comments', true, true);
 
+	var cm = null;
+
 	for( var i = 0; i < cm_array.length; i++)
 		if( cm_array[i].obj.key == i_key )
-		{
-			cm_array[i].el.scrollIntoView();
-			cm_array[i].el.classList.add('goto');
-			c_Info('Comment highlighted.');
-			return;
-		}
+			cm = cm_array[i];
+		else
+			cm_array[i].el.classList.remove('goto');
 
-	if( cm_array.length )
+	if( cm )
+	{
+		cm.el.scrollIntoView();
+		cm.el.classList.add('goto');
+		c_Info('Comment highlighted.');
+	}
+	else if( cm_array.length )
 		c_Error('Comment with key=' + i_key + ' not found.');
 }
 
