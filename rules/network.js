@@ -294,14 +294,21 @@ function n_SendMail( i_address, i_subject, i_body)
 
 	obj.body = i_body;
 
-	var result = c_Parse( n_Request({"send":{"sendmail":obj}}));
-	if( result == null ) return false;
-	if( result.error )
+//	var result = c_Parse( n_Request({"send":{"sendmail":obj}}));
+	n_Request({"send":{"sendmail":obj},"func":n_SendMailReceived});
+}
+function n_SendMailReceived( i_data, i_args)
+{
+	if( i_data == null )
 	{
-		c_Error( result.error);
-		return false;
+		c_Error('Unknown result sending email.');
+		return;
 	}
 
-	return true;
+	if( i_data.error )
+	{
+		c_Error( i_data.error);
+		return;
+	}
 }
 

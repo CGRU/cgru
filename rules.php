@@ -165,7 +165,7 @@ function jsf_initialize( $i_arg, &$o_out)
 	if( array_key_exists('error', $o_out)) return;
 
 	$out = array();
-	jsf_getallusers( null, $out);
+	getallusers( $out);
 	if( array_key_exists('error', $out))
 	{
 		$o_out['error'] = $out['error'];
@@ -176,8 +176,11 @@ function jsf_initialize( $i_arg, &$o_out)
 	{
 		$user = array();
 		$user['id'] = $obj['id'];
-		if( isset( $obj['title'])) $user['title'] = $obj['title'];
-		if( isset( $obj['role'])) $user['role'] = $obj['role'];
+
+		// We do not send all users props to each user.
+		$props = array('title','role','states','disabled');
+		foreach( $props as $prop )
+			if( isset( $obj[$prop])) $user[$prop] = $obj[$prop];
 
 		if( isset( $obj['avatar']) && strlen($obj['avatar']))
 			$user['avatar'] = $obj['avatar'];
@@ -1211,9 +1214,47 @@ function isAdmin( &$o_out)
 function jsf_htdigest( $i_recv, &$o_out)
 {
 	global $FileMaxLength, $UserID, $HT_DigestFileName;
-	if( false == isAdmin( $o_out)) return;
 
 	$user = $i_recv['user'];
+
+	// Not admin can change only own password,
+	//    if he has special state "passwd".
+	// Admin can change any user password.
+	if( false == isAdmin( $o_out))
+	{
+		if( is_null( $UserID))
+		{
+			$o_out['error'] = 'Guests can`t change any password';
+			return;
+		}
+
+		if( $user != $UserID )
+		{
+			$o_out['error'] = 'User can`t change other user password';
+			return;
+		}
+
+		// Check "passwd" state:
+		$out = array();
+		getallusers( $out);
+		if( array_key_exists('error', $out))
+		{
+			$o_out['error'] = $out['error'];
+			return;
+		}
+		if( false == array_key_exists( $user, $out['users']))
+		{
+			$o_out['error'] = 'User "'.$user.'" not founded.';
+			return;
+		}
+		$uobj = $out['users'][$user];
+		if(( false == array_key_exists('states', $uobj))
+			|| ( false === array_search('passwd', $uobj['states'])))
+		{
+			$o_out['error'] = 'You are not allowed to change password.';
+			return;
+		}
+	}
 
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
@@ -1224,6 +1265,7 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 	// Construct new lines w/o our user (if it exists):
 	$o_out['status'] = 'User "'.$user.'" set.';
+	$o_out['user'] = $user;
 	$old_lines = explode("\n", $data);
 	$new_lines = array();
 	foreach( $old_lines as $line )
@@ -1260,10 +1302,12 @@ function jsf_htdigest( $i_recv, &$o_out)
 //error_log($data);
 }
 
-function jsf_deleteuser( $i_user_id, &$o_out)
+function jsf_disableuser( $i_args, &$o_out)
 {
 	global $FileMaxLength, $HT_DigestFileName;
 	if( false == isAdmin( $o_out)) return;
+
+	$uid = $i_args['uid'];
 
 	$dHandle = opendir('users');
 	if( $dHandle === false )
@@ -1271,12 +1315,29 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 		$o_out['error'] = 'Can`t open users folder.';
 		return;
 	}
-
 	while (false !== ( $entry = readdir( $dHandle)))
 	{
 		if( false === is_file("users/$entry")) continue;
-		if( $entry != "$i_user_id.json" ) continue;
-		unlink("users/$entry");
+		if( $entry != "$uid.json" ) continue;
+
+		// If user new object provided, we write it.
+		// This needed to just disable user and not to loose its settings.
+		if( array_key_exists('uobj', $i_args))
+		{
+			if( $fHandle = fopen("users/$uid.json",'w'))
+			{
+				fwrite( $fHandle, jsonEncode( $i_args['uobj']));
+				fclose($fHandle);
+				$o_out['status'] = 'success';
+			}
+			else
+				$out['error'] = 'Unable to write "'.$uid.'" user file';
+		}
+		else
+		{
+			// Delete user file and loose all its data:
+			unlink("users/$entry");
+		}
 		break;
 	}
 	closedir($dHandle);
@@ -1299,7 +1360,7 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 		$values = explode(':', $line);
 		if( count( $values ) == 3 )
 		{
-			if( $values[0] != $i_user_id )
+			if( $values[0] != $uid )
 				array_push( $new_lines, $line);
 		}
 	}
@@ -1314,6 +1375,11 @@ function jsf_deleteuser( $i_user_id, &$o_out)
 }
 
 function jsf_getallusers( $i_args, &$o_out)
+{
+	if( false == isAdmin( $o_out)) return;
+	getallusers( $o_out);
+}
+function getallusers( &$o_out)
 {
 	global $FileMaxLength;
 

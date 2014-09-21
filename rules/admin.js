@@ -2,8 +2,13 @@ ad_initialized = false;
 ad_permissions = null;
 ad_wnd = null;
 ad_wnd_curgroup = null;
+ad_wnd_curstate = null;
 ad_wnd_sort_prop = 'role';
 ad_wnd_sort_dir = 0;
+
+ad_states = {};
+ad_states.notart = {"short":'NA',"label":'NotArt',"tooltip":'Not an artist.'};
+ad_states.passwd = {"short":'PS',"label":'Passwd',"tooltip":'Can change password.'};
 
 function ad_Init()
 {
@@ -313,42 +318,72 @@ function ad_OpenWindow()
 	var elBtnsDiv = document.createElement('div');
 	ad_wnd.elContent.appendChild( elBtnsDiv );
 
-	var elBtnRefresh = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnRefresh);
-	elBtnRefresh.classList.add('button');
-	elBtnRefresh.textContent = 'Refresh';
-	elBtnRefresh.onclick = ad_WndRefresh;
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Refresh';
+	el.onclick = ad_WndRefresh;
 
-	var elBtnCreateGrp = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnCreateGrp);
-	elBtnCreateGrp.classList.add('button');
-	elBtnCreateGrp.textContent = 'Create Group';
-	elBtnCreateGrp.onclick = ad_CreateGrpOnClick;
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Create Group';
+	el.onclick = ad_CreateGrpOnClick;
 
-	var elBtnDeleteGrp = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnDeleteGrp);
-	elBtnDeleteGrp.classList.add('button');
-	elBtnDeleteGrp.textContent = 'Delete Group';
-	elBtnDeleteGrp.onclick = ad_DeleteGrpOnClick;
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Delete Group';
+	el.onclick = ad_DeleteGrpOnClick;
 
-	var elBtnCreateUsr = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnCreateUsr);
-	elBtnCreateUsr.classList.add('button');
-	elBtnCreateUsr.textContent = 'Create User';
-	elBtnCreateUsr.onclick = ad_CreateUserOnClick;
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Create User';
+	el.onclick = ad_CreateUserOnClick;
 
-	var elBtnDeleteUsr = document.createElement('div');
-	elBtnsDiv.appendChild( elBtnDeleteUsr);
-	elBtnDeleteUsr.classList.add('button');
-	elBtnDeleteUsr.textContent = 'Delete User';
-	elBtnDeleteUsr.onclick = ad_DeleteUserOnClick;
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Enable User';
+	el.onclick = ad_EnableUserOnClick;
+
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Disable User';
+	el.onclick = ad_DisableUserOnClick;
+
+	var el = document.createElement('div');
+	elBtnsDiv.appendChild( el);
+	el.classList.add('button');
+	el.textContent = 'Delete User';
+	el.onclick = ad_DeleteUserOnClick;
 
 	ad_wnd.elInfo = document.createElement('div');
 	ad_wnd.elContent.appendChild( ad_wnd.elInfo);
 
+	ad_wnd.elGrpBtns = [];
+
 	ad_wnd.elGroups = document.createElement('div');
 	ad_wnd.elContent.appendChild( ad_wnd.elGroups);
 	ad_wnd.elGroups.classList.add('admin_groups');
+
+	ad_wnd.elStates = document.createElement('div');
+	ad_wnd.elContent.appendChild( ad_wnd.elStates);
+	ad_wnd.elStates.classList.add('admin_states');
+	for( var st in ad_states )
+	{
+		var el = document.createElement('div');
+		ad_wnd.elStates.appendChild( el);
+		ad_wnd.elGrpBtns.push( el);
+		el.textContent = ad_states[st].label;
+		el.title = ad_states[st].tooltip;
+		el.m_state = st;
+		el.onclick = function(e){ad_WndStateSelect(e.currentTarget);}
+		if( st == ad_wnd_curstate )
+			el.classList.add('selected');
+	}
 
 	ad_wnd.elUsers = document.createElement('div');
 	ad_wnd.elContent.appendChild( ad_wnd.elUsers);
@@ -357,15 +392,42 @@ function ad_OpenWindow()
 	ad_WndRefresh();
 }
 
+function ad_WndStateSelect( i_el)
+{
+	var select = true;
+	if( i_el.classList.contains('selected'))
+		select = false;
+
+	for( var i = 0; i < ad_wnd.elGrpBtns.length; i++)
+		ad_wnd.elGrpBtns[i].classList.remove('selected');
+
+	if( select )
+	{
+		i_el.classList.add('selected');
+		ad_wnd_curstate = i_el.m_state;
+	}
+	else
+		ad_wnd_curstate = null;
+
+	for( var i = 0; i < ad_wnd.elUsrRows.length; i++)
+	{
+		var elU = ad_wnd.elUsrRows[i];
+		if( elU.m_user.states && ( elU.m_user.states.indexOf( ad_wnd_curstate) != -1 ))
+			elU.classList.add('selected');
+		else
+			elU.classList.remove('selected');
+//console.log( elU.m_user.id+' '+elU.m_user.groups+' '+ el.m_group);
+	}
+}
+
 function ad_WndDrawGroups()
 {
 	ad_wnd.elGroups.innerHTML = '';
-	ad_wnd.elGrpBnts = [];
 	for( var grp in g_groups )
 	{
 		var el = document.createElement('div');
 		ad_wnd.elGroups.appendChild( el);
-		ad_wnd.elGrpBnts.push( el);
+		ad_wnd.elGrpBtns.push( el);
 		el.textContent = grp + ' [' + g_groups[grp].length + ']';
 		el.m_group = grp;
 		el.onclick = ad_WndGrpOnClick;
@@ -384,19 +446,25 @@ function ad_WndDrawUsers()
 		users.sort( function( a, b ) {
 			var val_a = a[ad_wnd_sort_prop];
 			var val_b = b[ad_wnd_sort_prop];
-
+/*
 			var arrays = ['news','channels'];
 			if( arrays.indexOf( ad_wnd_sort_prop) != -1 )
 			{
 				if( val_a ) val_a = val_a.length;
 				if( val_b ) val_b = val_b.length;
 			}
-
+*/
 			if( val_a == null ) val_a = '';
 			if( val_b == null ) val_b = '';
 
 			if(( val_a > val_b ) == ad_wnd_sort_dir ) return -1;
 			if(( val_a < val_b ) == ad_wnd_sort_dir ) return  1;
+
+			if(( a.disabled && ( ! b.disabled )) == ad_wnd_sort_dir ) return -1;
+			if(( b.disabled && ( ! a.disabled )) == ad_wnd_sort_dir ) return  1;
+
+			if(( a.title > b.title ) == ad_wnd_sort_dir ) return -1;
+			if(( a.title < b.title ) == ad_wnd_sort_dir ) return  1;
 
 			return 0;
 		});
@@ -407,13 +475,13 @@ function ad_WndDrawUsers()
 	var elTr = document.createElement('tr');
 	elTable.appendChild( elTr);
 	elTr.style.backgroundColor = 'rgba(0,0,0,.2)';
-	elTr.cursor = 'pointer';
+	elTr.classList.add('notselectable');
+	elTr.style.cursor = 'pointer';
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'G';
 	el.title = 'Group button.\nDouble click to add/remove user from selected group.';
-	el.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
@@ -430,7 +498,7 @@ function ad_WndDrawUsers()
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Role';
-	el.title = 'Does not play any role :)\nJust for sorting.\nDouble click to edit.';
+	el.title = 'Needed for sorting.\nDouble click to edit.';
 	el.onclick = function(e) { ad_WndSortUsers('role'); }
 
 	var el = document.createElement('th');
@@ -474,6 +542,17 @@ function ad_WndDrawUsers()
 	el.title = 'Last login(F5) time';
 	el.onclick = function(e) { ad_WndSortUsers('rtime'); };
 
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'State';
+	el.title = 'User states';
+	el.onclick = function(e) { ad_WndSortUsers('states'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'S';
+	el.title = 'State button.\nDouble click to add/remove user states.';
+
 	for( var i = 0; i < users.length; i++ )
 		ad_WndAddUser( elTable, users[i], i);
 }
@@ -514,17 +593,26 @@ function ad_GetTypeReceived( i_data, i_args)
 
 function ad_WndGrpOnClick( i_evt)
 {
-	for( var i = 0; i < ad_wnd.elGrpBnts.length; i++)
-		ad_wnd.elGrpBnts[i].classList.remove('selected');
-
 	var el = i_evt.currentTarget;
-	el.classList.add('selected');
+	var select = true;
+	if( el.classList.contains('selected'))
+		select = false;
 
-	ad_wnd_curgroup = el.m_group;
+	for( var i = 0; i < ad_wnd.elGrpBtns.length; i++)
+		ad_wnd.elGrpBtns[i].classList.remove('selected');
+
+	if( select )
+	{
+		el.classList.add('selected');
+		ad_wnd_curgroup = el.m_group;
+	}
+	else
+		ad_wnd_curgroup = null;
+
 	for( var i = 0; i < ad_wnd.elUsrRows.length; i++)
 	{
 		var elU = ad_wnd.elUsrRows[i];
-		if( elU.m_user.groups.indexOf( el.m_group) != -1 )
+		if( elU.m_user.groups.indexOf( ad_wnd_curgroup) != -1 )
 			elU.classList.add('selected');
 		else
 			elU.classList.remove('selected');
@@ -544,7 +632,7 @@ function ad_WndReceivedUsers()
 {
 	for( var u in g_users )
 	{
-//window.console.log(user);
+//window.console.log(g_users[u]);
 		g_users[u].groups = [];
 		for( var grp in g_groups )
 			if( g_groups[grp].indexOf( g_users[u].id ) != -1 )
@@ -567,11 +655,16 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	ad_wnd.elUsrRows.push( elTr);
 	elTr.m_user = i_user;
 	elTr.classList.add('user');
+	if( i_user.disabled )
+		elTr.classList.add('disabled');
 
 	if( i_row % 2 ) elTr.style.backgroundColor = 'rgba(0,0,0,.1)';
 	else elTr.style.backgroundColor = 'rgba(255,255,255,.1)';
 
 	if( i_user.groups.indexOf( ad_wnd_curgroup ) != -1 )
+		elTr.classList.add('selected');
+
+	if( i_user.states && ( i_user.states.indexOf( ad_wnd_curstate ) != -1 ))
 		elTr.classList.add('selected');
 
 	var el = document.createElement('td');
@@ -605,9 +698,12 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
-	el.textContent = '***';
-	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
+	if( i_user.disabled !== true )
+	{
+		el.textContent = '***';
+		el.m_user_id = i_user.id;
+		el.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
+	}
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -621,14 +717,16 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.title = channels;
 	}
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_UserChannelsClean( e.currentTarget.m_user_id);};
+	if( i_user.disabled !== true )
+		el.ondblclick = function(e){ad_UserChannelsClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	if( i_user.news )
 		el.textContent = i_user.news.length;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_UserNewsClean( e.currentTarget.m_user_id);};
+	if( i_user.disabled !== true )
+		el.ondblclick = function(e){ad_UserNewsClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -646,10 +744,43 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	var states = '';
+	if( i_user.states ) for( var i = 0; i < i_user.states.length; i++)
+		states += ' ' + ad_states[i_user.states[i]].short;
+	el.textContent = states;
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = 'S';
+	el.style.cursor = 'pointer';
+	el.m_user = i_user;
+	el.ondblclick = function(e){ad_WndUserStateToggle( e.currentTarget.m_user);};
+}
+function ad_WndUserStateToggle( i_user)
+{
+	if( ad_wnd_curstate == null )
+	{
+		c_Error('No state selected');
+		return;
+	}
+
+	if( i_user.states == null )
+		i_user.states = [];
+
+	if( i_user.states.indexOf( ad_wnd_curstate ) == -1  )
+		i_user.states.push( ad_wnd_curstate);
+	else
+		i_user.states.splice( i_user.states.indexOf( ad_wnd_curstate ), 1);
+
+	ad_SaveUser({"id":i_user.id,"states":i_user.states}, ad_WndRefresh);
 }
 
 function ad_WndSortUsers( i_prop)
 {
+//console.log('ad_WndSortUsers: ' + i_prop);
 	if( ad_wnd_sort_prop == i_prop )
 		ad_wnd_sort_dir = 1 - ad_wnd_sort_dir;
 	else
@@ -697,9 +828,6 @@ function ad_WndUserGroupOnCkick( i_user)
 		c_Error('No group selected');
 		return;
 	}
-	for( var i = 0; i < ad_wnd.elGrpBnts.length; i++)
-		if( ad_wnd.elGrpBnts[i].classList.contains('selected'))
-			grp = ad_wnd.elGrpBnts[i].m_group;
 
 	if( i_user.groups.indexOf( grp ) == -1  )
 	{
@@ -809,14 +937,58 @@ function ad_CreateUser( i_user_id)
 	n_Request({"send":{"editobj":obj},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" created.'});
 }
 
+function ad_EnableUserOnClick()
+{
+	new cgru_Dialog({"handle":'ad_EnableUser',
+		"name":'users',"title":'Enable User',"info":'Enter user login name to enable:'});
+}
+function ad_EnableUser( i_user_id)
+{
+	if( g_users[i_user_id] == null )
+	{
+		c_Error('User "' + i_user_id + '" does not exist.');
+		return;
+	}
+
+	ad_SaveUser({"id":i_user_id,"disabled":false}, ad_WndRefresh);
+}
+
+function ad_DisableUserOnClick()
+{
+	new cgru_Dialog({"handle":'ad_DisableUser',
+		"name":'users',"title":'Disable User',"info":'Enter user login name to disable:'});
+}
+function ad_DisableUser( i_user_id)
+{
+	if( g_users[i_user_id] == null )
+	{
+		c_Error('User "' + i_user_id + '" does not exist.');
+		return;
+	}
+
+	var uobj = g_users[i_user_id];
+	uobj.disabled = true;
+	delete uobj.news;
+	delete uobj.channels;
+
+	n_Request({"send":{"disableuser":{"uid":i_user_id,"uobj":uobj}},"func":ad_ChangesFinished,
+			"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" disabled.'});
+}
+
 function ad_DeleteUserOnClick()
 {
+	if( g_users[i_user_id] == null )
+	{
+		c_Error('User "' + i_user_id + '" does not exist.');
+		return;
+	}
 	new cgru_Dialog({"handle":'ad_DeleteUser',
-		"name":'users',"title":'Delete User',"info":'Enter User Login Name'});
+		"name":'users',"title":'Delete User',"info":'Enter user login name to <b>delete</b>:'});
 }
 function ad_DeleteUser( i_user_id)
 {
-	n_Request({"send":{"deleteuser":i_user_id},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" deleted.'});
+	n_Request({"send":{"disableuser":{"uid":i_user_id}},"func":ad_ChangesFinished,
+		"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" deleted.'});
 }
 
 function ad_SetPasswordDialog( i_user_id)
@@ -860,13 +1032,24 @@ function ad_SetPassword( i_passwd, i_user_id)
 }
 function ad_SetPasswordFinished( i_data)
 {
-	if(( i_data == null ) || ( i_data.error ))
+	if( i_data.user && g_auth_user && ( i_data.user == g_auth_user.id ))
 	{
-		c_Error( i_data.error);
+		// We have just chnged own password and should reload page:
+		document.body.textContent = '';
+		window.location.reload();
+	}
+
+	if( i_data == null )
+	{
+		c_Error('Unknown error.');
 		return;
 	}
 
-	if( i_data.status ) c_Info( i_data.status);
+	if( i_data.status )
+		c_Info( i_data.status);
+
+	if( i_data.error )
+		c_Error( i_data.error);
 }
 
 
@@ -905,19 +1088,29 @@ function ad_ProfileOpen()
 	wnd.elContent.appendChild( elBtns);
 	elBtns.style.clear = 'both';
 
-	var elSend = document.createElement('div');
-	elBtns.appendChild( elSend);
-	elSend.textContent = 'Save';
-	elSend.classList.add('button');
-	elSend.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);}
-	elSend.m_wnd = wnd;
+	var el = document.createElement('div');
+	elBtns.appendChild( el);
+	el.textContent = 'Save';
+	el.classList.add('button');
+	el.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);}
+	el.m_wnd = wnd;
 
-	var elSend = document.createElement('div');
-	elBtns.appendChild( elSend);
-	elSend.textContent = 'Cancel';
-	elSend.classList.add('button');
-	elSend.onclick = function(e){ e.currentTarget.m_wnd.destroy();}
-	elSend.m_wnd = wnd;
+	var el = document.createElement('div');
+	elBtns.appendChild( el);
+	el.textContent = 'Cancel';
+	el.classList.add('button');
+	el.onclick = function(e){ e.currentTarget.m_wnd.destroy();}
+	el.m_wnd = wnd;
+
+//	if( g_auth_user.states.indexOf('passwd') != -1 )
+	{
+		var el = document.createElement('div');
+		elBtns.appendChild( el);
+		el.textContent = 'Set Password';
+		el.classList.add('button');
+		el.onclick = function(e){ ad_SetPasswordDialog( g_auth_user.id);}
+		el.m_wnd = wnd;
+	}
 }
 
 function ad_ProfileSave( i_wnd)

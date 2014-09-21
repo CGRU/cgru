@@ -154,6 +154,11 @@ a { color: inherit; text-shadow: 0 0 1px rgba(0,0,255,.4);}
 a:hover { text-shadow: 0 0 2px rgba(100,200,255,.5); }
 a.link_auto { text-decoration: none; }
 
+.notselectable {
+-moz-user-select: none;
+-webkit-user-select: none;
+}
+
 .button {
 -moz-user-select: none;
 -webkit-user-select: none;
@@ -225,6 +230,7 @@ min-height: 19px;
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
 .tag { float:left; cursor: pointer; /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; margin:1px 4px; padding:0 4px; }
+.tag.disabled { text-decoration: line-through; }
 .tag.short { margin:0 1px; padding:0 2px; }
 .tag.me { background: rgba(100,255,100,.5); }
 .artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 2px; }
@@ -603,10 +609,14 @@ box-shadow: 0 0 4px #000 inset;
 /* ==================== WINDOWS: ======================================== */
 .administrate { color: #000000; font-size: 14px; }
 .administrate .button { float: left; }
+.admin_groups { float: left; }
 .admin_groups div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
-.admin_users { overflow: auto; }
+.admin_states { float: right; box-shadow: 0 0 3px #000 inset; }
+.admin_states div { cursor: pointer; margin: 2px 4px; padding: 2px 4px; float: left; text-align: center; border-radius: 4px; box-shadow: 0 0 3px #000 inset; }
+.admin_users { clear: both; overflow: auto; }
 .admin_users table { border-collapse: collapse; width: 100%; }
 .admin_users th { font-weight: normal; }
+.admin_users tr.disabled { text-decoration: line-through; font-style: italic; }
 .admin_users td { text-align: center; border: 1px solid rgba(0,0,0,.5); padding: 4px; min-height: 20px; }
 .admin_users .selected td { background: rgba(100,255,255,.2); }
 

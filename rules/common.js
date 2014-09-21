@@ -232,11 +232,21 @@ function c_ElDisplayToggle( i_el)
 }
 
 // Construct from g_users sorted roles with sorted artists:
-function c_GetRolesArtists()
+// Provide i_show_list to show artist even if he is disabled or not an artist
+function c_GetRolesArtists( i_show_list)
 {
 	var roles_obj = {};
 	for( var uid in g_users )
 	{
+//console.log(g_users[uid].states);
+		if( i_show_list[uid] == null )
+		{
+			if( g_users[uid].disabled )
+				continue;
+			if( g_users[uid].states && ( g_users[uid].states.indexOf('notart') != -1 ))
+				continue;
+		}
+
 		var role = g_users[uid].role;
 
 		if( roles_obj[role] == null )

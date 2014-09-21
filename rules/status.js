@@ -287,6 +287,9 @@ function st_SetElArtists( i_status, i_el, i_short)
 		el.classList.add('tag');
 		el.textContent = c_GetUserTitle( i_status.artists[i], null, i_short);
 
+		if( g_users[i_status.artists[i]] && g_users[i_status.artists[i]].disabled )
+			el.classList.add('disabled');
+
 		if( i_short )
 		{
 			el.classList.add('short');
@@ -634,6 +637,10 @@ Status.prototype.editListShow = function( i_args)
 		elRoot.m_elList.appendChild( el);
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
+
+		if( i_args.list_all[id] && i_args.list_all[id].disabled )
+			el.classList.add('disabled');
+
 		if( i_args.list[id].tooltip ) el.title = i_args.list[id].tooltip;
 
 		if( i_args.list[id].half )
@@ -694,11 +701,10 @@ Status.prototype.editArtistsEdit = function( i_args)
 {
 	i_args.elRoot.m_elBtn.style.display = 'none';
 
-	var roles = c_GetRolesArtists();
+	var roles = c_GetRolesArtists( i_args.list);
 
 	for( var r = 0; r < roles.length; r++)
 	{
-
 		var elRole = document.createElement('div');
 		i_args.elRoot.appendChild( elRole);
 		elRole.classList.add('role');
@@ -716,6 +722,10 @@ Status.prototype.editArtistsEdit = function( i_args)
 			elRole.appendChild( el);
 			el.classList.add('tag');
 			el.m_item = artist.id;
+
+			if( g_users[artist.id] && g_users[artist.id].disabled )
+				el.classList.add('disabled');
+
 			if( artist.title )
 				el.textContent = artist.title;
 			else
