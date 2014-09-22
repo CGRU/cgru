@@ -239,7 +239,7 @@ function c_GetRolesArtists( i_show_list)
 	for( var uid in g_users )
 	{
 //console.log(g_users[uid].states);
-		if( i_show_list[uid] == null )
+		if(( i_show_list == null ) || ( i_show_list[uid] == null ))
 		{
 			if( g_users[uid].disabled )
 				continue;
