@@ -30,7 +30,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meArnoldRender_'
-meArnoldRenderVer = '0.3.2'
+meArnoldRenderVer = '0.3.3'
 meArnoldRenderMainWnd = self_prefix + 'MainWnd'
 
 job_separator_list = ['none', '.', '_' ]
@@ -85,9 +85,12 @@ class meArnoldRender ( object ) :
 
 		self.assgenCommand = 'arnoldExportAss'
 		self.def_assgenCommand = 'Render -r arnold'
-		self.def_scene_name = ''  # maya scene name used for deferred .ass
-		# generation
-
+		# maya scene name used for deferred .ass generation
+		self.def_scene_name = ''  
+		
+		# 'deletefiles' script is located in $CGRU_LOCATION\bin
+		self.cleanup_cmd = 'deletefiles' 
+		
 		self.save_frame_bgc = [0, 0, 0]
 		self.def_frame_bgc = [0.75, 0.5, 0]
 
@@ -136,8 +139,8 @@ class meArnoldRender ( object ) :
 		self.job_param['job_cleanup_ass'] = \
 			getDefaultIntValue(self_prefix, 'job_cleanup_ass', 0) is 1
 
-		self.job_param['job_cleanup_script'] = \
-			getDefaultIntValue(self_prefix, 'job_cleanup_script', 0) is 1
+		self.job_param['job_cleanup_maya'] = \
+			getDefaultIntValue(self_prefix, 'job_cleanup_maya', 0) is 1
 			
 		self.job_param['job_padding'] = \
 			getDefaultIntValue(self_prefix, 'job_padding', 4)
@@ -152,9 +155,14 @@ class meArnoldRender ( object ) :
 		self.ass_param['ass_reuse'] = \
 			getDefaultIntValue(self_prefix, 'ass_reuse', 0) is 1
 
+		ass_dirname = cmds.workspace( fileRuleEntry='ASS' )
+		if ass_dirname == '' :
+			ass_dirname = 'ass'
+			cmds.workspace( fileRule=('ASS',ass_dirname) )
+			cmds.workspace( saveWorkspace=True )
+				
 		self.ass_param['ass_dirname'] = \
-			getDefaultStrValue(self_prefix, 'ass_dirname', 
-			cmds.workspace( fileRuleEntry='ASS' ) )
+			getDefaultStrValue(self_prefix, 'ass_dirname', ass_dirname ) 
 
 		self.ass_param['ass_perframe'] = \
 			getDefaultIntValue(self_prefix, 'ass_perframe', 1) is 1
@@ -195,35 +203,7 @@ class meArnoldRender ( object ) :
 			getDefaultIntValue(self_prefix, 'ass_export_bounds', 
 			cmds.getAttr('defaultArnoldRenderOptions.outputAssBoundingBox')) is 1  
 			
-		# defaultArnoldRenderOptions.absoluteTexturePaths
-		self.ass_param['ass_abs_tex_path'] = \
-			getDefaultIntValue(self_prefix, 'ass_abs_tex_path', 
-			cmds.getAttr('defaultArnoldRenderOptions.absoluteTexturePaths')) is 1
-			
-		# defaultArnoldRenderOptions.absoluteProceduralPaths
-		self.ass_param['ass_abs_proc_path'] = \
-			getDefaultIntValue(self_prefix, 'ass_abs_proc_path', 
-			cmds.getAttr('defaultArnoldRenderOptions.absoluteProceduralPaths')) is 1
-			
-		# defaultArnoldRenderOptions.plugins_path
-		self.ass_param['ass_plugin_path'] = \
-			getDefaultStrValue(self_prefix, 'ass_plugin_path',
-			cmds.getAttr('defaultArnoldRenderOptions.plugins_path') )
 		
-		# defaultArnoldRenderOptions.procedural_searchpath	
-		self.ass_param['ass_proc_search_path'] = \
-			getDefaultStrValue(self_prefix, 'ass_proc_search_path',
-			cmds.getAttr('defaultArnoldRenderOptions.procedural_searchpath'))
-		
-		# defaultArnoldRenderOptions.shader_searchpath	
-		self.ass_param['ass_shader_search_path'] = \
-			getDefaultStrValue(self_prefix, 'ass_shader_search_path',
-			cmds.getAttr('defaultArnoldRenderOptions.shader_searchpath'))
-		
-		# defaultArnoldRenderOptions.texture_searchpath
-		self.ass_param['ass_tex_search_path'] = \
-			getDefaultStrValue(self_prefix, 'ass_tex_search_path',
-			cmds.getAttr('defaultArnoldRenderOptions.texture_searchpath'))
 		#
 		# Arnold parameters
 		#
@@ -235,34 +215,41 @@ class meArnoldRender ( object ) :
 
 		self.ar_param['ar_threads'] = \
 			getDefaultIntValue(self_prefix, 'ar_threads', 0)
-
-		self.ar_param['ar_distributed'] = \
-			getDefaultIntValue(self_prefix, 'ar_distributed', 0) is 1
-
-		self.ar_param['ar_nomaster'] = \
-			getDefaultIntValue(self_prefix, 'ar_nomaster', 0) is 1
-
-		self.ar_param['ar_hosts'] = \
-			getDefaultStrValue(self_prefix, 'ar_hosts', '')  # @AF_HOSTS@
-
-		self.ar_param['ar_port'] = \
-			getDefaultIntValue(self_prefix, 'ar_port', 39010)
-
-		self.ar_param['ar_hosts_min'] = \
-			getDefaultIntValue(self_prefix, 'ar_hosts_min', 1)
-
-		self.ar_param['ar_hosts_max'] = \
-			getDefaultIntValue(self_prefix, 'ar_hosts_max', 4)
-
-		self.ar_param['ar_threads_limit'] = \
-			getDefaultIntValue(self_prefix, 'ar_threads_limit', 4)
-
+			
+		# defaultArnoldRenderOptions.absoluteTexturePaths
+		self.ar_param['ar_abs_tex_path'] = \
+			getDefaultIntValue(self_prefix, 'ar_abs_tex_path', 
+			cmds.getAttr('defaultArnoldRenderOptions.absoluteTexturePaths')) is 1
+			
+		# defaultArnoldRenderOptions.absoluteProceduralPaths
+		self.ar_param['ar_abs_proc_path'] = \
+			getDefaultIntValue(self_prefix, 'ar_abs_proc_path', 
+			cmds.getAttr('defaultArnoldRenderOptions.absoluteProceduralPaths')) is 1
+			
+		# defaultArnoldRenderOptions.plugins_path
+		self.ar_param['ar_plugin_path'] = \
+			getDefaultStrValue(self_prefix, 'ar_plugin_path',
+			cmds.getAttr('defaultArnoldRenderOptions.plugins_path') )
+		
+		# defaultArnoldRenderOptions.procedural_searchpath	
+		self.ar_param['ar_proc_search_path'] = \
+			getDefaultStrValue(self_prefix, 'ar_proc_search_path',
+			cmds.getAttr('defaultArnoldRenderOptions.procedural_searchpath'))
+		
+		# defaultArnoldRenderOptions.shader_searchpath	
+		self.ar_param['ar_shader_search_path'] = \
+			getDefaultStrValue(self_prefix, 'ar_shader_search_path',
+			cmds.getAttr('defaultArnoldRenderOptions.shader_searchpath'))
+		
+		# defaultArnoldRenderOptions.texture_searchpath
+		self.ar_param['ar_tex_search_path'] = \
+			getDefaultStrValue(self_prefix, 'ar_tex_search_path',
+			cmds.getAttr('defaultArnoldRenderOptions.texture_searchpath'))
 		#
-		# image parameters
+		# Image parameters
 		#
 		self.img_param['img_filename'] = self.getImageFileNamePrefix()
 		self.img_param['img_format'] = self.getImageFormat()
-
 		#
 		# Afanasy parameters
 		#
@@ -299,7 +286,7 @@ class meArnoldRender ( object ) :
 
 		self.afanasy_param['af_os'] = \
 			getDefaultStrValue(self_prefix, 'af_os', '')  #linux mac windows
-
+	
 		self.afanasy_param['af_hostsmask'] = \
 			getDefaultStrValue(self_prefix, 'af_hostsmask', '')
 
@@ -471,13 +458,13 @@ class meArnoldRender ( object ) :
 		ass_expand_procedurals = self.ass_param['ass_expand_procedurals']
 		ass_export_bounds = self.ass_param['ass_export_bounds']
 		
-		ass_abs_tex_path = self.ass_param['ass_abs_tex_path']
-		ass_abs_proc_path = self.ass_param['ass_abs_proc_path']
+		ar_abs_tex_path = self.ar_param['ar_abs_tex_path']
+		ar_abs_proc_path = self.ar_param['ar_abs_proc_path']
 		
-		ass_plugin_path = self.ass_param['ass_plugin_path']
-		ass_proc_search_path = self.ass_param['ass_proc_search_path']
-		ass_shader_search_path = self.ass_param['ass_shader_search_path']
-		ass_tex_search_path = self.ass_param['ass_tex_search_path']
+		ar_plugin_path = self.ar_param['ar_plugin_path']
+		ar_proc_search_path = self.ar_param['ar_proc_search_path']
+		ar_shader_search_path = self.ar_param['ar_shader_search_path']
+		ar_tex_search_path = self.ar_param['ar_tex_search_path']
 		
 		assgen_cmd = ''
 		filename = cmds.workspace(expandName=ass_dirname)
@@ -493,10 +480,10 @@ class meArnoldRender ( object ) :
 				assgen_cmd += ' -ai:exbb 1'
 			
 			assgen_cmd += ' -ai:lve 1' # ' -ai:lfv 2'
-			assgen_cmd += ' -ai:sppg "' + ass_plugin_path + '"'
-			assgen_cmd += ' -ai:sppr "' + ass_proc_search_path + '"'
-			assgen_cmd += ' -ai:spsh "' + ass_shader_search_path + '"'
-			assgen_cmd += ' -ai:sptx "' + ass_tex_search_path + '"'
+			assgen_cmd += ' -ai:sppg "' + ar_plugin_path + '"'
+			assgen_cmd += ' -ai:sppr "' + ar_proc_search_path + '"'
+			assgen_cmd += ' -ai:spsh "' + ar_shader_search_path + '"'
+			assgen_cmd += ' -ai:sptx "' + ar_tex_search_path + '"'
 			
 			#assgen_cmd += ' -filename \"' + filename + '\"'
 		else:
@@ -555,13 +542,13 @@ class meArnoldRender ( object ) :
 		ass_expand_procedurals = self.ass_param['ass_expand_procedurals']
 		ass_export_bounds = self.ass_param['ass_export_bounds']
 		
-		ass_abs_tex_path = self.ass_param['ass_abs_tex_path']
-		ass_abs_proc_path = self.ass_param['ass_abs_proc_path']
+		ar_abs_tex_path = self.ar_param['ar_abs_tex_path']
+		ar_abs_proc_path = self.ar_param['ar_abs_proc_path']
 		
-		ass_plugin_path = self.ass_param['ass_plugin_path']
-		ass_proc_search_path = self.ass_param['ass_proc_search_path']
-		ass_shader_search_path = self.ass_param['ass_shader_search_path']
-		ass_tex_search_path = self.ass_param['ass_tex_search_path']
+		ar_plugin_path = self.ar_param['ar_plugin_path']
+		ar_proc_search_path = self.ar_param['ar_proc_search_path']
+		ar_shader_search_path = self.ar_param['ar_shader_search_path']
+		ar_tex_search_path = self.ar_param['ar_tex_search_path']
 
 		filename = cmds.workspace(expandName=ass_dirname)
 		filename, ext = os.path.splitext(filename)
@@ -609,12 +596,12 @@ class meArnoldRender ( object ) :
 			cmds.setAttr(aiGlobals + '.binaryAss', ass_binary )
 			cmds.setAttr(aiGlobals + '.expandProcedurals', ass_expand_procedurals )
 			cmds.setAttr(aiGlobals + '.outputAssBoundingBox', ass_export_bounds )
-			cmds.setAttr(aiGlobals + '.absoluteTexturePaths', ass_abs_tex_path )
-			cmds.setAttr(aiGlobals + '.absoluteProceduralPaths', ass_abs_proc_path )
-			cmds.setAttr(aiGlobals + '.plugins_path', ass_plugin_path, type='string' )
-			cmds.setAttr(aiGlobals + '.procedural_searchpath', ass_proc_search_path, type='string' )
-			cmds.setAttr(aiGlobals + '.shader_searchpath', ass_shader_search_path, type='string' )
-			cmds.setAttr(aiGlobals + '.texture_searchpath', ass_tex_search_path, type='string' )
+			cmds.setAttr(aiGlobals + '.absoluteTexturePaths', ar_abs_tex_path )
+			cmds.setAttr(aiGlobals + '.absoluteProceduralPaths', ar_abs_proc_path )
+			cmds.setAttr(aiGlobals + '.plugins_path', ar_plugin_path, type='string' )
+			cmds.setAttr(aiGlobals + '.procedural_searchpath', ar_proc_search_path, type='string' )
+			cmds.setAttr(aiGlobals + '.shader_searchpath', ar_shader_search_path, type='string' )
+			cmds.setAttr(aiGlobals + '.texture_searchpath', ar_tex_search_path, type='string' )
 			#
 			# Clear .output_ass_filename to force using default filename from RenderGlobals
 			#
@@ -706,7 +693,9 @@ class meArnoldRender ( object ) :
 		job_name = str(self.job_param['job_name']).strip()
 		if job_name == '':
 			job_name = getMayaSceneName()
-
+		job_cleanup_ass = self.job_param['job_cleanup_ass']
+		job_cleanup_maya = self.job_param['job_cleanup_maya']
+		
 		ass_deferred = self.ass_param['ass_deferred']
 		ass_local_assgen = self.ass_param['ass_local_assgen']
 		ass_def_task_size = self.ass_param['ass_def_task_size']
@@ -715,7 +704,6 @@ class meArnoldRender ( object ) :
 
 		if job_dispatcher == 'afanasy':
 			self.job = AfanasyRenderJob(job_name, job_description)
-
 			self.job.use_var_capacity = self.afanasy_param[
 				'af_use_var_capacity']
 			self.job.capacity_coeff_min = self.afanasy_param['af_cap_min']
@@ -724,7 +712,6 @@ class meArnoldRender ( object ) :
 				'af_max_running_tasks']
 			self.job.max_tasks_per_host = self.afanasy_param[
 				'af_max_tasks_per_host']
-
 			self.job.hostsmask = str(
 				self.afanasy_param['af_hostsmask']).strip()
 			self.job.hostsexcl = str(
@@ -748,7 +735,7 @@ class meArnoldRender ( object ) :
 			ass_deferred = False
 			self.job = RenderJob(job_name, job_description)
 
-		#self.job.work_dir  = self.rootDir
+		self.job.work_dir  = self.rootDir
 		self.job.padding = self.job_param['job_padding']
 		self.job.priority = self.job_param['job_priority']
 		self.job.paused = self.job_param['job_paused']
@@ -793,6 +780,11 @@ class meArnoldRender ( object ) :
 				self.job.gen_block.input_files = '"%s"' % self.def_scene_name
 				self.job.gen_block.task_size = min(ass_def_task_size,
 													 self.job.num_tasks)
+				# Set block Post command for cleanup 
+				if job_cleanup_maya :
+					self.job.gen_block.af_block.setCmdPost( 
+					self.cleanup_cmd + ' ' + self.job.gen_block.input_files )										 
+				
 				self.job.gen_block.setup()
 
 			renderLayers = []
@@ -801,7 +793,7 @@ class meArnoldRender ( object ) :
 			else:
 				# use only current layer
 				renderLayers.append(current_layer)
-
+			
 			for layer in renderLayers:
 				cmds.editRenderLayerGlobals(currentRenderLayer=layer)
 				layer_name = layer
@@ -818,40 +810,18 @@ class meArnoldRender ( object ) :
 				frame_block.input_files = '"%s"' % self.get_ass_name(
 					True, layer_name)
 				frame_block.out_files = self.get_image_name()
-				render_cmd = self.getRenderCmd(layer)
-
-				if self.ar_param['ar_distributed']:
-					frame_block.distributed = True
-					frame_block.hosts_min = self.ar_param['ar_hosts_min']
-					frame_block.hosts_max = self.ar_param['ar_hosts_max']
-
-					if frame_block.hosts_max <= 0:
-						frame_block.hosts_max = 1
-
-					if frame_block.hosts_min > frame_block.hosts_max:
-						frame_block.hosts_min = 1
-
-					if self.ar_param['ar_nomaster']:
-						render_cmd += ' -nomaster '
-
-					hosts_str = str(self.ar_param['ar_hosts']).strip()
-
-					if hosts_str != '':
-						hosts = ' -hosts '
-						#hosts_list = hosts_str.split ( ' ' )
-						#for host in hosts_list :
-						#  hosts += ( '"%s:%d' % ( host, self.ar_param [ 'ar_port' ]) )
-						#  if self.ar_param [ 'ar_threads_limit' ] > 0 :
-						#    hosts += ( ' -threads %d' % self.ar_param [ 'ar_threads_limit' ] ) 
-						#  hosts += ( '" ' )
-						hosts = '%s%s' % (hosts, hosts_str)
-						render_cmd += '%s -- ' % hosts
-					else:
-						render_cmd += ' @AF_HOSTS@ '
-
-				frame_block.cmd = render_cmd
-
+				frame_block.cmd = self.getRenderCmd(layer)
+				
+				# Set block Post command for cleanup
+				if job_cleanup_ass :
+					import re
+					# replace frame number '@####@' with '*' wildcard
+					input_files = re.sub ( '@[#]+@', '*', frame_block.input_files )
+					frame_block.af_block.setCmdPost(
+						self.cleanup_cmd + ' ' + input_files )	
+					
 				frame_block.setup()
+				
 				self.job.frames_blocks.append(frame_block)
 
 			self.job.process()
@@ -925,7 +895,7 @@ class meArnoldRender ( object ) :
 	def enable_var_capacity(self, arg) :
 		"""enable_var_capacity
 
-		:param arg: Missing documentation about arg argument
+		:param arg: True if enable_var_capacity
 		:return:
 		"""
 		setDefaultIntValue(
@@ -944,8 +914,7 @@ class meArnoldRender ( object ) :
 	def enable_deferred(self, arg) :
 		"""enable_deferred
 
-		:param arg: Missing documentation about arg argument
-		:return:
+		:param arg: True if enabled
 		"""
 		ass_def_frame = self.winMain + '|f0|t0|tc1|fr3'
 		ass_def = ass_def_frame + '|fc3|'
@@ -984,72 +953,32 @@ class meArnoldRender ( object ) :
 		)  # , enableBackground=False
 		
 		self.setResolvedPath()
+	
+	def set_needed_os ( self, arg ) :
+		"""set_needed_os
 
-	def enable_distributed(self, arg) :
-		"""enable_distributed
-
-		:param arg: Missing documentation about arg argument
-		:return:
+		:param arg: dummy boolean value
 		"""
-		ar_distr_frame = self.winMain + '|f0|t0|tc2|fr2'
-		ar_distr = ar_distr_frame + '|fc2|'
-		setDefaultIntValue(
-			self_prefix,
-			'ar_distributed',
-			self.ar_param,
-			arg
-		)
-		cmds.checkBoxGrp(
-			ar_distr + 'ar_nomaster',
-			edit=True,
-			enable=arg
-		)
+		af_os_chk = self.winMain + '|f0|t0|tc3|fr1|fc1|af_os'
 
-		# cmds.intFieldGrp(
-		#     ar_distr + 'ar_port',
-		#     edit=True,
-		#     enable=arg
-		# )
+		val1 = cmds.checkBoxGrp( af_os_chk, q=True, value1=True )
+		val2 = cmds.checkBoxGrp( af_os_chk, q=True, value2=True )
+		val3 = cmds.checkBoxGrp( af_os_chk, q=True, value3=True )
+		af_os_lst = []
+		if val1 :
+			af_os_lst.append( 'windows' )
+		if val2 :
+			af_os_lst.append( 'linux' )	
+		if val3 :
+			af_os_lst.append( 'mac' )	
+		af_os_str = ' '.join ( af_os_lst )
 
-		cmds.intFieldGrp(
-			ar_distr + 'ar_hosts_min',
-			edit=True,
-			enable=arg
-		)
-
-		cmds.intFieldGrp(
-			ar_distr + 'ar_hosts_max',
-			edit=True,
-			enable=arg
-		)
-
-		# cmds.intFieldGrp(
-		#     ar_distr + 'ar_threads_limit',
-		#     edit=True,
-		#     enable=arg
-		# )
-
-		cmds.textFieldGrp(
-			ar_distr + 'ar_hosts',
-			edit=True,
-			enable=arg
-		)
-
-		bg_color = self.save_frame_bgc
-		if arg:
-			bg_color = self.def_frame_bgc
-
-		cmds.frameLayout(
-			ar_distr_frame,
-			edit=True,
-			bgc=bg_color
-		)  # , enableBackground=False
-
+		setDefaultStrValue( self_prefix, 'af_os', self.afanasy_param, af_os_str )
+		
 	def onRenderLayerSelected(self, arg) :
 		"""onRenderLayerSelected
 
-		:param arg: Missing documentation about arg argument
-		:return:
+		:param arg: selected render layer
 		"""
 		#
 		self.layer = arg
@@ -1077,8 +1006,6 @@ class meArnoldRender ( object ) :
 		if self.layer == 'defaultRenderLayer':
 			self.layer = 'masterLayer'
 
-		print('* renderLayerSelected %s' % self.layer)
-
 		cmds.optionMenuGrp(
 			self.winMain + '|f0|c0|r0|' + 'layer_selector',
 			e=True,
@@ -1094,11 +1021,6 @@ class meArnoldRender ( object ) :
 			query=True,
 			currentRenderLayer=True
 		)
-
-		#print('* renderLayerRenamed %s' % self.layer)
-
-		# self.updateRenderLayerMenu()
-
 		cmds.evalDeferred(
 			partial(self.updateRenderLayerMenu),
 			lowestPriority=True
@@ -1111,8 +1033,6 @@ class meArnoldRender ( object ) :
 			query=True,
 			currentRenderLayer=True
 		)
-		#print('* renderLayerChanged %s' % self.layer)
-		#self.updateRenderLayerMenu()
 		cmds.evalDeferred(
 			partial(self.updateRenderLayerMenu),
 			lowestPriority=True
@@ -1169,8 +1089,6 @@ class meArnoldRender ( object ) :
 		:return:
 		"""
 		# add script job for renaming render layer
-
-		#print '* renderLayersSetup'
 		selector = self.winMain + '|f0|c0|r0|layer_selector'
 		firstRun = True
 		for layer in layers:
@@ -1196,10 +1114,10 @@ class meArnoldRender ( object ) :
 
 	def setupUI ( self ) :
 		"""setupUI
+		
+		Main window setup
+		
 		"""
-		#
-		# Main window setup
-		#
 		self.deleteUI(True)
 		self.winMain = \
 			cmds.window(
@@ -1509,14 +1427,14 @@ class meArnoldRender ( object ) :
 			rowSpacing=0,
 			adjustableColumn=True
 		)
-
+		
 		cmds.checkBoxGrp(
 			'job_cleanup_ass',
 			cw=((1, cw1), (2, cw1 * 2)),
 			label='',
 			label1=' .ass files',
 			value1=self.job_param['job_cleanup_ass'],
-			enable=False,
+			enable=True,
 			cc=partial(
 				setDefaultIntValue,
 				self_prefix,
@@ -1526,22 +1444,25 @@ class meArnoldRender ( object ) :
 		)
 
 		cmds.checkBoxGrp(
-			'job_cleanup_script',
+			'job_cleanup_maya',
 			cw=((1, cw1), (2, cw1 * 2)),
 			label='',
-			label1=' script file',
-			value1=self.job_param['job_cleanup_script'],
-			enable=False,
+			label1=' maya _deferred file',
+			value1=self.job_param['job_cleanup_maya'],
+			enable=True,
 			cc=partial(
 				setDefaultIntValue,
 				self_prefix,
-				'job_cleanup_script',
+				'job_cleanup_maya',
 				self.job_param
 			)
 		)
-
+		
+		cmds.text( label ='\n   Note: Files will be cleaned after the job delete', al='left' )
+		
 		cmds.setParent('..')
 		cmds.setParent('..')
+		
 		cmds.setParent('..')
 
 		#
@@ -1757,109 +1678,6 @@ class meArnoldRender ( object ) :
 		cmds.setParent('..')
 		cmds.setParent('..')
 		
-		cmds.frameLayout(
-			'fr4',
-			label=' Search Paths ',
-			borderVisible=True,
-			borderStyle='etchedIn',
-			marginHeight=ar_hi,
-			cll=True,
-			cl=True
-		)
-
-		cmds.columnLayout(
-			'cl4',
-			columnAttach=('left', 0),
-			rowSpacing=0,
-			adjustableColumn=True
-		)
-
-		cmds.checkBoxGrp(
-			'ass_abs_tex_path',
-			cw=((1, cw1), (2, cw1 * 2)),
-			label='',
-			label1=' Absolute Texture Paths',
-			value1=self.ass_param['ass_abs_tex_path'],
-			cc=partial(
-				setDefaultIntValue,
-				self_prefix,
-				'ass_abs_tex_path',
-				self.ass_param
-			)
-		)
-		
-		cmds.checkBoxGrp(
-			'ass_abs_proc_path',
-			cw=((1, cw1), (2, cw1 * 2)),
-			label='',
-			label1=' Absolute Procedural Paths',
-			value1=self.ass_param['ass_abs_proc_path'],
-			cc=partial(
-				setDefaultIntValue,
-				self_prefix,
-				'ass_abs_proc_path',
-				self.ass_param
-			)
-		)
-		
-		cmds.textFieldGrp(
-			'ass_plugin_path',
-			cw=(1, cw1),
-			adj=2,
-			label='Plug-ins Path ',
-			text=self.ass_param['ass_plugin_path'],
-			cc=partial(
-				setDefaultStrValue,
-				self_prefix,
-				'ass_plugin_path',
-				self.ass_param
-			)
-		)
-		
-		cmds.textFieldGrp(
-			'ass_proc_search_path',
-			cw=(1, cw1),
-			adj=2,
-			label='Procedural Search Path ',
-			text=self.ass_param['ass_proc_search_path'],
-			cc=partial(
-				setDefaultStrValue,
-				self_prefix,
-				'ass_proc_search_path',
-				self.ass_param
-			)
-		)
-		
-		cmds.textFieldGrp(
-			'ass_shader_search_path',
-			cw=(1, cw1),
-			adj=2,
-			label='Shaders Search Path ',
-			text=self.ass_param['ass_shader_search_path'],
-			cc=partial(
-				setDefaultStrValue,
-				self_prefix,
-				'ass_shader_search_path',
-				self.ass_param
-			)
-		)
-		
-		cmds.textFieldGrp(
-			'ass_tex_search_path',
-			cw=(1, cw1),
-			adj=2,
-			label='Textures Search Path ',
-			text=self.ass_param['ass_tex_search_path'],
-			cc=partial(
-				setDefaultStrValue,
-				self_prefix,
-				'ass_tex_search_path',
-				self.ass_param
-			)
-		)
-		
-		cmds.setParent('..')
-		cmds.setParent('..')
 
 		cmds.frameLayout(
 			'fr2',
@@ -1902,106 +1720,6 @@ class meArnoldRender ( object ) :
 			adjustableColumn=True
 		)
 
-		fr2 = cmds.frameLayout(
-			'fr2',
-			label=' Distributed render ',
-			borderVisible=True,
-			borderStyle='etchedIn',
-			marginHeight=ar_hi,
-			cll=True,
-			cl=True
-		)
-
-		cmds.columnLayout(
-			'fc2',
-			columnAttach=('left', 0), rowSpacing=0, adjustableColumn=True
-		)
-
-		cmds.checkBoxGrp(
-			'ar_distributed',
-			cw=((1, cw1), (2, cw1 * 2)),
-			label='Use distributed ',
-			enable=False,
-			ann='Use slave hosts for rendering - is not available in Arnold.',
-			value1=self.ar_param['ar_distributed'],
-			cc=partial(self.enable_distributed)
-		)
-
-		cmds.checkBoxGrp(
-			'ar_nomaster',
-			cw=((1, cw1), (2, cw1 * 2)),
-			label='',
-			label1=" No Master ",
-			ann="When rendering with multiple hosts, schedule all jobs on "
-				"slaves only, if possible",
-			value1=self.ar_param['ar_nomaster'],
-			enable=self.ar_param['ar_distributed'],
-			cc=partial(
-				setDefaultIntValue,
-				self_prefix,
-				'ar_nomaster',
-				self.ar_param
-			)
-		)
-
-		cmds.intFieldGrp(
-			'ar_hosts_min',
-			cw=((1, cw1), (2, cw2)),
-			label='Min Hosts ',
-			value1=self.ar_param['ar_hosts_min'],
-			enable=self.ar_param['ar_distributed'],
-			cc=partial(
-				setDefaultIntValue,
-				self_prefix,
-				'ar_hosts_min',
-				self.ar_param
-			)
-		)
-
-		cmds.intFieldGrp(
-			'ar_hosts_max',
-			cw=((1, cw1), (2, cw2)),
-			label='Max Hosts ',
-			value1=self.ar_param['ar_hosts_max'],
-			enable=self.ar_param['ar_distributed'],
-			cc=partial(
-				setDefaultIntValue,
-				self_prefix,
-				'ar_hosts_max',
-				self.ar_param
-			)
-		)
-
-		cmds.textFieldGrp(
-			'ar_hosts',
-			cw=(1, cw1),
-			adj=2,
-			label='Remote Hosts ',
-			ann='Remote hosts names (if empty, will be filled by Render '
-				'Manager)',
-			text=self.ar_param['ar_hosts'],
-			enable=self.ar_param['ar_distributed'],
-			cc=partial(
-				setDefaultStrValue,
-				self_prefix,
-				'ar_hosts',
-				self.ar_param
-			)
-		)
-
-		bg_color = self.save_frame_bgc
-
-		if self.ar_param['ar_distributed']:
-			bg_color = self.def_frame_bgc
-
-		cmds.frameLayout(
-			fr2,
-			edit=True,
-			bgc=bg_color
-		)  # , enableBackground=False
-
-		cmds.setParent('..')
-		cmds.setParent('..')
 
 		cmds.frameLayout(
 			'fr1',
@@ -2072,6 +1790,111 @@ class meArnoldRender ( object ) :
 
 		cmds.setParent('..')
 		cmds.setParent('..')
+		
+		cmds.frameLayout(
+			'fr2',
+			label=' Search Paths ',
+			borderVisible=True,
+			borderStyle='etchedIn',
+			marginHeight=ar_hi,
+			cll=True,
+			cl=True
+		)
+
+		cmds.columnLayout(
+			'fc2',
+			columnAttach=('left', 0),
+			rowSpacing=0,
+			adjustableColumn=True
+		)
+
+		cmds.checkBoxGrp(
+			'ar_abs_tex_path',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Absolute Texture Paths',
+			value1=self.ar_param['ar_abs_tex_path'],
+			cc=partial(
+				setDefaultIntValue,
+				self_prefix,
+				'ar_abs_tex_path',
+				self.ar_param
+			)
+		)
+		
+		cmds.checkBoxGrp(
+			'ar_abs_proc_path',
+			cw=((1, cw1), (2, cw1 * 2)),
+			label='',
+			label1=' Absolute Procedural Paths',
+			value1=self.ar_param['ar_abs_proc_path'],
+			cc=partial(
+				setDefaultIntValue,
+				self_prefix,
+				'ar_abs_proc_path',
+				self.ar_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ar_plugin_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Plug-ins Path ',
+			text=self.ar_param['ar_plugin_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ar_plugin_path',
+				self.ar_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ar_proc_search_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Procedural Search Path ',
+			text=self.ar_param['ar_proc_search_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ar_proc_search_path',
+				self.ar_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ar_shader_search_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Shaders Search Path ',
+			text=self.ar_param['ar_shader_search_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ar_shader_search_path',
+				self.ar_param
+			)
+		)
+		
+		cmds.textFieldGrp(
+			'ar_tex_search_path',
+			cw=(1, cw1),
+			adj=2,
+			label='Textures Search Path ',
+			text=self.ar_param['ar_tex_search_path'],
+			cc=partial(
+				setDefaultStrValue,
+				self_prefix,
+				'ar_tex_search_path',
+				self.ar_param
+			)
+		)
+		
+		cmds.setParent('..')
+		cmds.setParent('..')
+
 		cmds.setParent('..')
 
 		#
@@ -2271,6 +2094,7 @@ class meArnoldRender ( object ) :
 			)
 		)
 
+		"""
 		cmds.textFieldGrp(
 			'af_os',
 			cw=(1, cw1),
@@ -2284,6 +2108,20 @@ class meArnoldRender ( object ) :
 				'af_os',
 				self.afanasy_param
 			)
+		)
+		"""
+		cmds.checkBoxGrp(
+			'af_os',
+			cw=((1, cw1), (2, cw1/2), (3, cw1/2), (4, cw1/2)),
+			numberOfCheckBoxes = 3,
+			label='Needed OS  ',
+			label1='windows',
+			value1=( self.afanasy_param['af_os'].find('windows') != -1 ),
+			label2='linux',
+			value2=( self.afanasy_param['af_os'].find('linux') != -1 ),
+			label3='mac',
+			value3=( self.afanasy_param['af_os'].find('mac') != -1 ),
+			cc=partial( self.set_needed_os )
 		)
 
 		cmds.setParent('..')

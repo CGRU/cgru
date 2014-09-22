@@ -2,6 +2,7 @@
 """
 	renderJob.py
 
+	ver.0.2.0 (19 Sep 2014)
 	ver.0.1.0 (17 Jan 2013)
 
 	Author:
@@ -9,10 +10,7 @@
 	Yuri Meshalkin (aka mesh)
 	mesh@kpp.kiev.ua
 
-	(c) Kiev Post Production 2013
-
 """
-
 
 class RenderBlock(object):
 	"""Abstract RenderBlock class
@@ -31,9 +29,6 @@ class RenderBlock(object):
 		self.cmd = ''
 		self.input_files = ''
 		self.out_files = ''
-
-		cleanup = False
-
 	#
 	# virtual methods
 	#
@@ -59,11 +54,9 @@ class RenderJob(object):
 		self.step = 1
 		self.task_size = 1
 		self.num_tasks = 1
-		self.cleanup_cmd = None
-
+		
 		self.gen_block = None
 		self.frames_blocks = []
-
 	#
 	# virtual methods
 	#

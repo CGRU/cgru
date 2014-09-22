@@ -2,6 +2,7 @@
 """
   afanasyRenderJob.py
 
+  ver.0.2.0 (19 Sep 2014)
   ver.0.1.0 (28 Jan 2013)
   ver.0.0.1 (16 Jan 2013)
 
@@ -10,14 +11,10 @@
   Yuri Meshalkin (aka mesh)
   mesh@kpp.kiev.ua
 
-  (c) Kiev Post Production 2012
-
 """
-
 import af
 
 from renderJob import RenderJob, RenderBlock
-
 
 class AfanasyRenderBlock(RenderBlock):
 	"""AfanasyRenderBlock class
@@ -48,10 +45,9 @@ class AfanasyRenderBlock(RenderBlock):
 				self.af_block.setWorkingDirectory(parentJob.work_dir)
 			if local:
 				self.af_block.setHostsMask(parentJob.af_job.data['host_name'])
-				#
 
 	def setup(self):
-		"""Missing DocString
+		"""AfanasyRenderBlock setup
 		"""
 		self.af_block.setCapacity(self.capacity)
 		if self.parentJob is not None:
@@ -78,7 +74,6 @@ class AfanasyRenderBlock(RenderBlock):
 				self.task_size,
 				self.step
 			)
-
 
 class AfanasyRenderJob(RenderJob):
 	""" AfanasyRenderJob class used with Afanasy render manager
@@ -136,9 +131,7 @@ class AfanasyRenderJob(RenderJob):
 		self.hosts = ''
 
 	def setup(self):
-		"""Missing DocString
-
-		:return:
+		"""AfanasyRenderJob setup
 		"""
 		print('>> AfanasyRenderJob setup...')
 		self.af_job.setDescription(self.description)
@@ -156,7 +149,7 @@ class AfanasyRenderJob(RenderJob):
 			self.af_job.setNeedOS(self.need_os)
 
 	def process(self):
-		"""Missing DocString
+		"""AfanasyRenderJob process
 		"""
 		print('>> AfanasyJob process...')
 		gen_block_exists = False
