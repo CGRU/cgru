@@ -9,8 +9,9 @@ u_guest_attrs.push({"name":'email',  "label":'Email',  "info":'gravarar, hidden'
 u_guest_attrs.push({"name":'avatar', "label":'Avatar', "info":'link'});
 
 u_body_filename = 'body.html';
-u_body_edit_markup = 0;
 u_body_text = '';
+u_body_editing = false;
+u_body_edit_markup = 0;
 
 cgru_params.push(['back_asset','Asset', '', 'Enter background style']);
 cgru_params.push(['back_body','Body', '', 'Enter background style']);
@@ -50,6 +51,17 @@ function u_Init()
 	u_CalcGUI();
 
 	$('body_panel_edit').m_panel_edit = u_EditPanelCreate( $('body_panel_edit'));
+	$('body_body').onkeydown = function(e)
+	{
+		if( u_body_editing )
+		{
+			if(( e.keyCode == 13 ) && e.ctrlKey ) // CTRL + ENTER
+			{
+				u_BodyEditSave();
+				$('body_body').blur();
+			}
+		}
+	}
 
 	for( var i = 0; i < u_views.length; i++)
 		u_OpenCloseView( u_views[i], false, false);
@@ -686,10 +698,14 @@ function u_BodyEditStart()
 	$('body_body').contentEditable = 'true';
 	$('body_body').classList.add('editing');
 	$('body_body').focus();
+
+	u_body_editing = true;
 }
 
 function u_BodyEditCancel( i_text)
 {
+	u_body_editing = false;
+
 	if( u_body_edit_markup ) u_BodyEditMarkup();
 	if( i_text == null ) i_text = u_body_text;
 	$('body_body').innerHTML = i_text;
@@ -705,6 +721,8 @@ function u_BodyEditCancel( i_text)
 function u_BodyEditSave()
 {
 	if( g_auth_user == null ) return;
+
+	u_body_editing = false;
 
 	if( u_body_edit_markup ) u_BodyEditMarkup();
 	var text = c_LinksProcess( $('body_body').innerHTML);

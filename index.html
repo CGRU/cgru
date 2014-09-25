@@ -217,7 +217,7 @@ Project input and output format.
 			<div id="body_edit" style="float:right; display:none;">
 				<div id="body_btn_edit" class="button edit" style="float:right; display:none;"
 					onclick="u_BodyEditStart()" title="Edit body"></div>
-				<div id="body_btn_edit_cancel" class="button" style="padding:0px 4px; float:right; display:none;"
+				<div id="body_btn_edit_cancel" class="button" title="Cancel body editing." style="padding:0px 4px; float:right; display:none;"
 					onclick="u_BodyEditCancel()">Cancel</div>
 			</div>
 			<div id="body_label" style="text-align:center; margin-top: 4px;">Body</div>
@@ -228,7 +228,8 @@ Project input and output format.
 					<div id="body_info"></div>
 				</div>
 				<div id="body_panel_edit" style="display:none">
-					<div class="button" style="float:right" onclick="u_BodyEditSave()">Save</div>
+					<div class="button" style="float:right" onclick="u_BodyEditSave()" title="Save body editing (CTRL+ENTER)">
+						<b>Save</b> <small>(CTRL+ENTER)</small></div>
 					<div class="toggle" id="body_edit_markup" onclick="u_BodyEditMarkup()"
 						title="HTML Markup Mode">Markup mode</div>
 					<div class="toggle" ondblclick="u_BodyEditMarkupRemove()"
