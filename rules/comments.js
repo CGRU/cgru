@@ -95,13 +95,15 @@ function Comment( i_obj)
 	this.elEditBtnsDiv.appendChild( this.elCancel);
 	this.elCancel.classList.add('button');
 	this.elCancel.textContent = 'Cancel';
+	this.elCancel.title = 'Cancel comment editing.';
 	this.elCancel.m_comment = this;
 	this.elCancel.onclick = function(e){ e.currentTarget.m_comment.editCancel();};
 
 	this.elSave = document.createElement('div');
 	this.elEditBtnsDiv.appendChild( this.elSave);
 	this.elSave.classList.add('button');
-	this.elSave.textContent = 'Save';
+	this.elSave.innerHTML = '<b>Save</b> <small>(CRTL+ENTER)</small>';
+	this.elSave.title = 'Save comment.\n(CRTL+ENTER)';
 	this.elSave.m_comment = this;
 	this.elSave.onclick = function(e){ e.currentTarget.m_comment.save();};
 
@@ -161,6 +163,8 @@ function Comment( i_obj)
 	this.elText = document.createElement('div');
 	this.el.appendChild( this.elText);
 	this.elText.classList.add('text');
+	this.elText.m_obj = this;
+	this.elText.onkeydown = function(e){ e.currentTarget.m_obj.textOnKeyDown(e);};
 
 	this.elForEdit = document.createElement('div');
 	this.el.appendChild( this.elForEdit);
@@ -455,6 +459,18 @@ Comment.prototype.editCancel = function()
 		$('comments').removeChild( this.el);
 	else
 		this.init();
+}
+
+Comment.prototype.textOnKeyDown = function( i_e)
+{
+	if( this.editing )
+	{
+		if(( i_e.keyCode == 13 ) && i_e.ctrlKey ) // CTRL + ENTER
+		{
+			this.save();
+			this.elText.blur();
+		}
+	}
 }
 
 Comment.prototype.destroy = function()
