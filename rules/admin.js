@@ -503,6 +503,12 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
+	el.textContent = 'Tag';
+	el.title = 'Default tag.\nDouble click to edit.';
+	el.onclick = function(e) { ad_WndSortUsers('tag'); }
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
 	el.textContent = 'Email';
 	el.title = 'User email address.\nDouble click to edit.';
 	el.onclick = function(e) { ad_WndSortUsers('email'); };
@@ -692,6 +698,12 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
+	el.textContent = i_user.tag;
+	el.m_user_id = i_user.id;
+	el.ondblclick = function(e){ad_ChangeTagOnCkick(e.currentTarget.m_user_id);};
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
 	el.textContent = i_user.email;
 	el.m_user_id = i_user.id;
 	el.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
@@ -871,6 +883,20 @@ function ad_ChangeRoleOnCkick( i_user_id)
 function ad_ChangeRole( i_role, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"role":i_role}, ad_WndRefresh);
+}
+function ad_ChangeTagOnCkick( i_user_id)
+{
+	new cgru_Dialog({"handle":'ad_ChangeTag',"param":i_user_id,"value":g_users[i_user_id].tag,
+		"name":'users',"title":'Change Role',"info":'Enter new tag for ' + c_GetUserTitle(i_user_id)});
+}
+function ad_ChangeTag( i_tag, i_user_id)
+{
+	if( i_tag.length && ( RULES.tags[i_tag] == null ))
+	{
+		c_Error('No such tag: "' + i_tag + '"');
+		return;
+	}
+	ad_SaveUser({"id":i_user_id,"tag":i_tag}, ad_WndRefresh);
 }
 function ad_ChangeEmailOnCkick( i_user_id)
 {

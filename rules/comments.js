@@ -137,7 +137,6 @@ function Comment( i_obj)
 	this.elUser.classList.add('user');
 	this.elPanel.appendChild( this.elUser);
 
-
 	this.elReport = document.createElement('div');
 	this.elPanel.appendChild( this.elReport);
 //	this.elReport.style.display = 'none';
@@ -150,7 +149,6 @@ function Comment( i_obj)
 	this.elTags = document.createElement('div');
 	this.elTags.classList.add('tags');
 	this.elReport.appendChild( this.elTags);
-
 
 	this.elDate = document.createElement('div');
 	this.elDate.classList.add('date');
@@ -216,7 +214,13 @@ Comment.prototype.init = function()
 		this.obj.ctime = (new Date()).getTime();
 		this._new = true;
 		if( g_auth_user )
+		{
 			this.obj.user_name = g_auth_user.id;
+			if( g_auth_user.tag && g_auth_user.tag.length )
+			{
+				this.obj.tags = [g_auth_user.tag];
+			}
+		}
 	}
 
 	if( this.obj.user_name )
@@ -249,7 +253,7 @@ Comment.prototype.init = function()
 			this.elTags.appendChild( el);
 			el.classList.add('tag');
 
-			if( RULES.tags[tag].title )
+			if( RULES.tags[tag] && RULES.tags[tag].title )
 				el.textContent = RULES.tags[tag].title;
 			else
 				el.textContent = tag;
@@ -493,13 +497,18 @@ Comment.prototype.save = function()
 	if( this.obj.deleted != true )
 		this.processUploads();
 
-	this.obj.tags = [];
-	for( var i = 0; i < this.elEditTags.m_elTags.length; i++)
+	if( this.obj.type == 'report' )
 	{
-		var el = this.elEditTags.m_elTags[i];
-		if( el.classList.contains('selected'))
-		this.obj.tags.push( el.m_tag);
+		this.obj.tags = [];
+		for( var i = 0; i < this.elEditTags.m_elTags.length; i++)
+		{
+			var el = this.elEditTags.m_elTags[i];
+			if( el.classList.contains('selected'))
+			this.obj.tags.push( el.m_tag);
+		}
 	}
+	else
+		delete this.obj.tags;
 
 	this.obj.duration = -1;
 	var duration = parseFloat( this.elEditDuration.textContent);
