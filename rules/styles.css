@@ -271,10 +271,25 @@ background-position: center;
 #sidepanel_hide { display: none; font-size: 10px; font-style: italic; }
 #sidepanel.opened { overflow-y: scroll;}
 #sidepanel.opened #sidepanel_hide { display: block;}
-#sidepanel .label { word-wrap: break-word; letter-spacing: 99px;}
-#sidepanel .label { word-wrap: break-word; letter-spacing: 99px;}
-#sidepanel.opened .label { letter-spacing: 1px;}
-#sidepanel.opened .label { height:18px; background-color: rgba(201,255,255,.2); box-shadow: 0 0 2px #000;}
+#sidepanel .label {
+font-size: 14px;
+font-family: Verdana;
+width: 13px;
+word-wrap: break-word;
+letter-spacing: 4px;
+text-transform: uppercase;
+}
+#sidepanel.opened .label {
+font-size: 16px;
+font-family: inherit;
+width: auto;
+letter-spacing: 1px;
+text-transform: none;
+height:18px;
+background-color:
+rgba(201,255,255,.2);
+box-shadow: 0 0 2px #000;
+}
 #sidepanel.opened #sidepanel_permissions .label { height:12px;}
 #sidepanel .body { clear: both; display: none; }
 #sidepanel.opened .opened .body { display: block; }

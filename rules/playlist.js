@@ -21,7 +21,7 @@ function p_Init()
 	obj.id = '';
 	p_elCurFolder.m_obj = obj;
 
-	if( localStorage.playlist_opened == null ) localStorage.playlist_opened = 'true';
+	if( localStorage.playlist_opened == null ) localStorage.playlist_opened = 'false';
 	if( localStorage.playlist_opened == 'true') p_Open();
 	else p_Close();
 	if( localStorage.playlist_opened_folders == null ) localStorage.playlist_opened_folders = '';

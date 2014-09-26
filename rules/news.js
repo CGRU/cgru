@@ -7,7 +7,7 @@ nw_recents = {};
 function nw_Init()
 {
 	// Recent:
-	if( localStorage.recent_opened == null ) localStorage.recent_opened = 'true';
+	if( localStorage.recent_opened == null ) localStorage.recent_opened = 'false';
 	if( localStorage.recent_opened == 'true') nw_RecentOpen( false);
 
 	// News are not available for guests:

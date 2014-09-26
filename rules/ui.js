@@ -38,7 +38,7 @@ function u_Init()
 	if( localStorage.sidepanel_width == null ) localStorage.sidepanel_width = 200;
 	if( localStorage.sidepanel_closed_width == null ) localStorage.sidepanel_closed_width = 20;
 
-	if( localStorage.sidepanel_opened == null ) localStorage.sidepanel_opened = 'true';
+	if( localStorage.sidepanel_opened == null ) localStorage.sidepanel_opened = 'false';
 	if( localStorage.sidepanel_opened == 'true' ) u_SidePanelOpen();
 	else u_SidePanelClose();
 
