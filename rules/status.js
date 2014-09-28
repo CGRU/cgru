@@ -8,6 +8,9 @@ function st_InitAuth()
 
 function st_Finish()
 {
+	if( st_Status )
+		st_Status.editCancel();
+
 	st_Status = null;
 }
 
@@ -99,6 +102,8 @@ Status.prototype.show = function( i_status)
 {
 	if( i_status ) this.obj = i_status;
 
+	this.editCancel();
+
 	if( this.elShow       ) this.elShow.style.display = 'block';
 	if( this.elColor      ) st_SetElColor(      this.obj, this.elColor);
 	if( this.elAnnotation ) st_SetElAnnotation( this.obj, this.elAnnotation);
@@ -117,15 +122,6 @@ Status.prototype.show = function( i_status)
 			if( modified != '' ) modified = 'Modified' + modified;
 		}
 		this.elModified.textContent = modified;
-	}
-	if( this.elEdit )
-	{
-		if( this.elParent )
-		{
-			this.elParent.removeChild( this.elEdit);
-			this.elParent.classList.remove('status_editing');
-		}
-		this.elEdit = null;
 	}
 
 //	if( this.elTasks )
@@ -866,6 +862,18 @@ Status.prototype.editTasksShow = function( i_args)
 		el.m_elArtists = elArtists;
 		this.elEdit_tasks.elTasks.push( el);
 	}
+}
+
+Status.prototype.editCancel = function()
+{
+	if( this.elEdit == null ) return;
+
+	if( this.elParent )
+	{
+		this.elParent.removeChild( this.elEdit);
+		this.elParent.classList.remove('status_editing');
+	}
+	this.elEdit = null;
 }
 
 Status.prototype.editSave = function( i_args)
