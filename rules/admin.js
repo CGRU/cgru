@@ -487,6 +487,12 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
+	el.textContent = 'A';
+	el.title = 'User avatar.\nDouble click to edit.';
+	el.onclick = function(e) { ad_WndSortUsers('avatar'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
 	el.textContent = 'ID';
 	el.title = 'User login and unique ID';
 	el.onclick = function(e) { ad_WndSortUsers('id'); };
@@ -694,6 +700,15 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
+	el.classList.add('avatar');
+	var avatar = c_GetAvatar(i_user.id);
+	if( avatar )
+		el.style.backgroundImage = 'url(' + avatar + ')';
+	el.m_user_id = i_user.id;
+	el.ondblclick = function(e){ad_ChangeAvatarOnCkick(e.currentTarget.m_user_id);};
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
 	el.textContent = i_user.id;
 
 	var el = document.createElement('td');
@@ -877,6 +892,15 @@ function ad_WndUserGroupOnCkick( i_user)
 function ad_WriteGroups()
 {
 	n_Request({"send":{"writegroups":g_groups},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'Grounps written.',"info":'writegroups'});
+}
+function ad_ChangeAvatarOnCkick( i_user_id)
+{
+	new cgru_Dialog({"handle":'ad_ChangeAvatar',"param":i_user_id,"value":g_users[i_user_id].avatar,
+		"name":'users',"title":'Change Avatar',"info":'Enter new avatar link for ' + c_GetUserTitle(i_user_id)});
+}
+function ad_ChangeAvatar( i_avatar, i_user_id)
+{
+	ad_SaveUser({"id":i_user_id,"avatar":i_avatar}, ad_WndRefresh);
 }
 function ad_ChangeTitleOnCkick( i_user_id)
 {
