@@ -4,6 +4,8 @@ nw_initialized = false;
 
 nw_recents = {};
 
+nw_filter_project = null;
+
 function nw_Init()
 {
 	// Recent:
@@ -23,7 +25,7 @@ function nw_Init()
 	if( localStorage.news_disabled == null ) localStorage.news_disabled = 'false';
 	if( localStorage.news_ignore_own == null ) localStorage.news_ignore_own = 'false';
 
-	if( localStorage.news_opened == "true" ) nw_NewsOpen();
+	if( localStorage.news_opened == "true" ) nw_NewsOpen(false);
 	else nw_NewsClose();
 
 	nw_Finish();
@@ -266,13 +268,12 @@ function nw_NewsClose()
 	$('sidepanel_news').classList.remove('opened');
 	$('news').innerHTML = '';
 	localStorage.news_opened = false;
-	delete g_auth_user.news;
 }
-function nw_NewsOpen()
+function nw_NewsOpen( i_refresh)
 {
 	$('sidepanel_news').classList.add('opened');
 	localStorage.news_opened = true;
-	nw_NewsLoad();
+	nw_NewsLoad( i_refresh);
 }
 
 function nw_MakeNewsDialog()
@@ -351,11 +352,14 @@ function nw_MakeNewsFinished( i_data, i_args)
 	c_Log( info);
 }
 
-function nw_ShowCount()
+function nw_ShowCount( i_hidden_count)
 {
 	if( g_auth_user && g_auth_user.news && g_auth_user.news.length )
 	{
-		$('news_count').textContent = g_auth_user.news.length;
+		var count = g_auth_user.news.length;
+		if( i_hidden_count )
+			count += '/' + (g_auth_user.news.length - i_hidden_count);
+		$('news_count').textContent = count;
 		$('news_count').style.display = 'block';
 	}
 	else
@@ -365,13 +369,14 @@ function nw_ShowCount()
 	}
 }
 
-function nw_NewsLoad()
+function nw_NewsLoad( i_refresh)
 {
+//console.log('nw_NewsLoad()');
 	if( g_auth_user == null ) return;
 
-	if( g_auth_user.news != null )
+	if( i_refresh === false )
 	{
-		nw_NewsShow( g_auth_user.news);
+		nw_NewsShow();
 		return;
 	}
 
@@ -382,21 +387,21 @@ function nw_NewsLoad()
 
 function nw_NewsReceived( i_user)
 {
+//console.log('nw_NewsReceived()');
 	if( i_user == null ) return;
 	if( i_user.error )
 	{
 		c_Error( i_user.error);
 		return;
 	}
-	nw_NewsShow( i_user.news);
+
+	g_auth_user.news = i_user.news;
+
+	nw_NewsShow();
 }
 
-function nw_NewsShow( i_news)
+function nw_NewsShow()
 {
-	g_auth_user.news = i_news;
-
-	nw_ShowCount();
-
 	$('news').innerHTML = '';
 	$('news').m_elArray = [];
 
@@ -462,11 +467,8 @@ function nw_NewsShow( i_news)
 			projects.push( prj);
 	}
 
-	delete g_auth_user.news;
-
 	// News projects:
 	$('news_projects').innerHTML = '';
-
 	for( var i = 0; i < projects.length; i++ )
 	{
 		var el = document.createElement('div');
@@ -475,6 +477,12 @@ function nw_NewsShow( i_news)
 		el.classList.add('nw_fb');
 		el.textContent = projects[i];
 		el.onclick=function(e){ nw_FilterBtn( e.currentTarget, e.currentTarget.textContent, true);};
+
+		el.m_filter = projects[i];
+		el.m_project = true;
+
+		if( nw_filter_project == projects[i])
+			el.classList.add('pushed');
 	}
 
 	nw_HighlightCurrent();
@@ -533,6 +541,7 @@ function nw_Filter()
 	var my  = ( filter == '_my_' );
 
 	var elNews = $('news').m_elArray;
+	var hidden_count = 0;
 	for( var i = 0; i < elNews.length; i++)
 	{
 		if( ( filter === null ) ||
@@ -545,8 +554,14 @@ function nw_Filter()
 		else
 		{
 			elNews[i].style.display = 'none';
+			hidden_count++;
 		}
 	}
+
+	if( project )
+		nw_filter_project = filter;
+
+	nw_ShowCount( hidden_count);
 }
 
 function nw_DeleteFiltered( i_visible)
