@@ -318,7 +318,7 @@ display: none;
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
 #channels .channel { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
-.news_filter { margin: 2px; padding: 0px 4px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
+.news_filter { margin: 2px; padding: 0px 3px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
 .news_filter .button { float: left; margin: 1px 2px; padding: 1px 3px; }
 #news .news { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }

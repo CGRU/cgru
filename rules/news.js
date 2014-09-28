@@ -538,7 +538,8 @@ function nw_Filter()
 			project = btns[i].m_project;
 		}
 
-	var my  = ( filter == '_my_' );
+	var assigned  = ( filter == '_ia_' );
+	var by_me     = ( filter == '_me_' );
 
 	var elNews = $('news').m_elArray;
 	var hidden_count = 0;
@@ -547,7 +548,8 @@ function nw_Filter()
 		if( ( filter === null ) ||
 			( project && ( elNews[i].m_news.path.indexOf( filter ) == 1 )) ||
 			( elNews[i].m_news.title == filter ) ||
-			( my && ( elNews[i].classList.contains('assigned'))))
+			( by_me && ( g_auth_user.id == elNews[i].m_news.user )) ||
+			( assigned && ( elNews[i].classList.contains('assigned'))))
 		{
 			elNews[i].style.display = 'block';
 		}
