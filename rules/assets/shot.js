@@ -29,6 +29,10 @@ Example: "UNI5_v001"'});
 		"bg":'rgba( 255, 255, 0, .2)',
 		"tip":'Folder does not contain shot name.'});
 	shot_results_masks.push({
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}','i'),
+		"bg":'rgba( 255, 0, 255, .2)',
+		"tip":'Folder name letters case mismatch.'});
+	shot_results_masks.push({
 		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}'),
 		"bg":'rgba( 150, 255, 0, .2)',
 		"tip":'Folder name has characters after version 3 digits.'});
