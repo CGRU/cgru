@@ -361,11 +361,13 @@ function nw_ShowCount( i_hidden_count)
 			count += '/' + (g_auth_user.news.length - i_hidden_count);
 		$('news_count').textContent = count;
 		$('news_count').style.display = 'block';
+		$('panel_logo').style.display = 'none';
 	}
 	else
 	{
 		$('news_count').style.display = 'none';
 		$('news_count').textContent = '';
+		$('panel_logo').style.display = 'block';
 	}
 }
 

@@ -2,6 +2,7 @@
 "root":"rules_root",
 "rufolder":".rules",
 "company":"CGRU",
+"panel_logo_img":"rules/icons/rules.png",
 "playlist":"rules/playlist.json",
 "cache_time":60,
 

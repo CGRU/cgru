@@ -68,6 +68,10 @@ box-shadow: 0px 0px 5px #FA6;
 -webkit-transition: all 1s ease-out;
 }
 
+#panel_logo {
+float: right;
+}
+
 #navig_div, #sidepanel_div {
 top: 38px; bottom: 38px;
 /*user-select: none;*/
