@@ -12,10 +12,34 @@ function shot_Init()
 This is Shot asset.\n\
 It is designed to view shot sources and results on one page.\n');
 
-	shot_results_masks.push({"re":new RegExp('^v\\d{3,3}'),                     "bg":'rgba( 255, 150, 0, .2)'});
-	shot_results_masks.push({"re":new RegExp('^v\\d{3,3}$'),                    "bg":'rgba( 255, 255, 0, .2)'});
-	shot_results_masks.push({"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}'),  "bg":'rgba( 150, 255, 0, .2)'});
-	shot_results_masks.push({"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}$'), "bg":'rgba(   0, 255, 0, .2)'});
+	shot_results_masks.push({
+		"re":new RegExp('.*'),
+		"bg":'rgba( 255, 0, 0, .1)',
+		"tip":'Wrong result name.\n\
+It must be:\n\
+shot name + "_v" + version number with padding 3.\n\
+ ( "SHOTNAME_v###" ) \n\
+Example: "UNI5_v001"'});
+	shot_results_masks.push({
+		"re":new RegExp('^v\\d{3,3}'),
+		"bg":'rgba( 255, 150, 0, .2)',
+		"tip":'Folder does not contain shot name.'});
+	shot_results_masks.push({
+		"re":new RegExp('^v\\d{3,3}$'),
+		"bg":'rgba( 255, 255, 0, .2)',
+		"tip":'Folder does not contain shot name.'});
+	shot_results_masks.push({
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}'),
+		"bg":'rgba( 150, 255, 0, .2)',
+		"tip":'Folder name has characters after version 3 digits.'});
+	shot_results_masks.push({
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}$'),
+		"bg":'rgba(   0, 255, 0, .2)',
+		"tip":'Correct results folder name.'});
+	shot_results_masks.push({
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}_.*\\.mov$'),
+		"bg":'rgba(   0, 255, 0, .2)',
+		"tip":'Correct results movie name.'});
 
 	// Get page:
 	n_GetFile({"path":'rules/assets/shot.html',"func":shot_InitHTML,"info":'shot.html',"parse":false});

@@ -469,7 +469,10 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 	if( this.masks && this.masks.length )
 	for( var i = 0; i < this.masks.length; i++ )
 		if( this.masks[i].re.test( c_PathBase( i_el.m_path)))
+		{
 			i_el.m_elName.style.backgroundColor = this.masks[i].bg;
+			i_el.m_elName.title = this.masks[i].tip;
+		}
 
 	if( i_obj.mtime != null )
 	{
@@ -573,6 +576,7 @@ FilesView.prototype.showFolder = function( i_folder)
 
 	elFolder.m_elName = document.createElement('a');
 	elFolder.appendChild( elFolder.m_elName);
+	elFolder.m_elName.classList.add('name');
 	elFolder.m_elName.setAttribute('href', '#'+path);
 	elFolder.m_elName.textContent = name;
 
@@ -662,6 +666,7 @@ FilesView.prototype.showFile = function( i_file)
 
 	elFile.m_elName = document.createElement('a');
 	elFile.appendChild( elFile.m_elName);
+	elFile.m_elName.classList.add('name');
 	elFile.m_elName.href = RULES.root + path;
 	elFile.m_elName.target = '_blank';
 	elFile.m_elName.textContent = i_file.name;
