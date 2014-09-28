@@ -22,6 +22,7 @@ Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     defa
 Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default='',    help='References')
 Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
 Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default='',    help='Shot renaming padding (Ex:"432")')
+Parser.add_option(      '--extract',  dest='extract',  action='store_true', default=False, help='Extract source folder(s)')
 Parser.add_option(      '--sameshot', dest='sameshot', action='store_true', default=False, help='"NAME" and "NAME-1" will be one shot')
 Parser.add_option('-u', '--uppercase',dest='uppercase',action='store_true', default=False, help='Rename shot uppercase')
 Parser.add_option('-m', '--move',     dest='move',     action='store_true', default=False, help='Move source files, not copy')
@@ -53,9 +54,6 @@ signal.signal(signal.SIGABRT, interrupt)
 signal.signal(signal.SIGINT, interrupt)
 
 def isSameShot(i_shot, i_name):
-	if Options.sameshot is not True:
-		return False
-
 	SameShotSeparators = '._-'
 	i_shot = i_shot.lower()
 	i_name = i_name.lower()
@@ -116,7 +114,7 @@ for shot in Sources:
 	for folder in Sources:
 		if folder == shot:
 			continue
-		if isSameShot(shot, folder):
+		if Options.sameshot and isSameShot(shot, folder):
 			Sources_skip.append(folder)
 			src_sources.append(os.path.join(Options.sources, folder))
 
@@ -178,7 +176,10 @@ for shot in Sources:
 
 	if not Options.test:
 		if not os.path.isdir(shot_dest):
-			shutil.copytree(Options.template, shot_dest)
+			try:
+				shutil.copytree(Options.template, shot_dest)
+			except:
+				errExit('Can`t create "%s"' % shot_dest)
 
 
 if Options.afanasy:
@@ -196,30 +197,39 @@ Put = os.environ['CGRU_LOCATION'] + '/utilities/put.py'
 Put = 'python "%s"' % os.path.normpath(Put)
 
 for i in range(0, len(FIN_SRC)):
-	src = FIN_SRC[i]
 	dst = FIN_DST[i]
 
-	if Options.move:
-		if Options.verbose:
-			print('%s -> %s' % (src,dst))
-		if not Options.test:
-			shutil.move(src, dst)
-		continue
+	sources = [FIN_SRC[i]]
+	if Options.extract and os.path.isdir(FIN_SRC[i]):
+		sources = os.listdir( FIN_SRC[i])
+		for s in range(0,len(sources)):
+			sources[s] = os.path.join(FIN_SRC[i],sources[s])
 
-	cmd = Put
-	cmd += ' -s "%s"' % src
-	cmd += ' -d "%s"' % dst
-	cmd += ' -n "%s"' % os.path.basename(src)
+	for src in sources:
+		if Options.move:
+			if Options.verbose:
+				print('%s -> %s' % (src,dst))
+			if not Options.test:
+				try:
+					shutil.move(src, dst)
+				except:
+					errExit('Can`t move to "%s"' % dst)
+			continue
 
-	if Options.test:
-		continue
+		cmd = Put
+		cmd += ' -s "%s"' % src
+		cmd += ' -d "%s"' % dst
+		cmd += ' -n "%s"' % os.path.basename(src)
 
-	if Options.afanasy:
-		task = af.Task(os.path.basename(src))
-		task.setCommand(cmd)
-		block.tasks.append(task)
-	else:
-		os.system(cmd)
+		if Options.test:
+			continue
+
+		if Options.afanasy:
+			task = af.Task(os.path.basename(src))
+			task.setCommand(cmd)
+			block.tasks.append(task)
+		else:
+			os.system(cmd)
 
 if Options.afanasy and not Options.move and not Options.test:
 	job.send()

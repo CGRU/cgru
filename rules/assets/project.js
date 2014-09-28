@@ -18,9 +18,10 @@ prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
 prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
-prj_deploy_shots_params.sameshot = {"bool":false,"width":'33%',"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
-prj_deploy_shots_params.uppercase = {"bool":true,"width":'33%',"tooltip":'Convert shot names to upper case'};
-prj_deploy_shots_params.padding = {"width":'33%',"tooltip":'Example: "432" - first number will have 4 padding, next 3 and so on.'};
+prj_deploy_shots_params.sameshot  = {"width":'25%',"bool":false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
+prj_deploy_shots_params.extract   = {"width":'25%',"bool":false,"tooltip":'Extract sources folder.'};
+prj_deploy_shots_params.uppercase = {"width":'25%',"bool":false,"tooltip":'Convert shot names to upper case.'};
+prj_deploy_shots_params.padding   = {"width":'25%',"tooltip":'Example: "432" - first number will have 4 padding, next 3 and so on.'};
 
 function prj_ShotsDeploy()
 {
@@ -104,6 +105,7 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	cmd += ' --shot_src "' + RULES.assets.shot.source.path[0] + '"'
 	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'
 	if( params.sameshot ) cmd += ' --sameshot';
+	if( params.extract ) cmd += ' --extract';
 	if( params.uppercase ) cmd += ' -u';
 	if( params.padding.length ) cmd += ' -p ' + params.padding;
 
@@ -139,7 +141,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 	}
 
 	var deploy = i_data.cmdexec[0].deploy;
-//elResults.textContent = 'd:'+JSON.stringify( deploy);return;
+//console.log(JSON.stringify(deploy));
 
 	var el = document.createElement('div');
 	elResults.appendChild( el);
@@ -147,6 +149,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 
 	for( var d = deploy.length - 1; d >= 0; d--)
 	{
+//console.log(JSON.stringify(deploy[d]));
 		var el = document.createElement('div');
 		elResults.appendChild( el);
 		for( var key in deploy[d])
