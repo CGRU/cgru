@@ -1,14 +1,21 @@
 shot_thumb_paths = [];
+shot_results_masks = [];
 
 function shot_Init()
 {
 	shot_thumb_paths = [];
+	shot_results_masks = [];
 
 	a_SetLabel('Shot');
 
 	a_SetTooltip('Info:\n\
 This is Shot asset.\n\
 It is designed to view shot sources and results on one page.\n');
+
+	shot_results_masks.push({"re":new RegExp('^v\\d{3,3}'),                     "bg":'rgba( 255, 150, 0, .2)'});
+	shot_results_masks.push({"re":new RegExp('^v\\d{3,3}$'),                    "bg":'rgba( 255, 255, 0, .2)'});
+	shot_results_masks.push({"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}'),  "bg":'rgba( 150, 255, 0, .2)'});
+	shot_results_masks.push({"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}$'), "bg":'rgba(   0, 255, 0, .2)'});
 
 	// Get page:
 	n_GetFile({"path":'rules/assets/shot.html',"func":shot_InitHTML,"info":'shot.html',"parse":false});
@@ -104,7 +111,9 @@ function shot_ResultsReceived( i_data, i_args)
 		if(( i < (i_data.length - 1)) || ( shot_thumb_paths.length == 0 ))
 			shot_thumb_paths.push( path);
 
-		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],"show_walk":false,"can_count":true}))
+		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],
+			"show_walk":false,"can_count":true,"masks":shot_results_masks}));
+
 		found = true;
 	}
 

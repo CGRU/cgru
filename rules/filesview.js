@@ -18,6 +18,7 @@ function FilesView( i_args)
 	this.elParent = i_args.el;
 	this.path = i_args.path;
 	this.walk = i_args.walk;
+	this.masks = i_args.masks;
 
 	this.can_refresh = ! ( i_args.can_refresh === false );
 	this.can_count   =     i_args.can_count;
@@ -465,6 +466,11 @@ FilesView.prototype.showGenericButtons = function( i_el, i_obj)
 }
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
+	if( this.masks && this.masks.length )
+	for( var i = 0; i < this.masks.length; i++ )
+		if( this.masks[i].re.test( c_PathBase( i_el.m_path)))
+			i_el.m_elName.style.backgroundColor = this.masks[i].bg;
+
 	if( i_obj.mtime != null )
 	{
 		if( i_el.m_el_mtime == null )
@@ -565,10 +571,10 @@ FilesView.prototype.showFolder = function( i_folder)
 	var elOpen = c_CreateOpenButton( elFolder, path);
 	if( elOpen ) elOpen.style.cssFloat = 'left';
 
-	var el = document.createElement('a');
-	elFolder.appendChild( el);
-	el.setAttribute('href', '#'+path);
-	el.textContent = name;
+	elFolder.m_elName = document.createElement('a');
+	elFolder.appendChild( elFolder.m_elName);
+	elFolder.m_elName.setAttribute('href', '#'+path);
+	elFolder.m_elName.textContent = name;
 
 	this.showGenericButtons( elFolder, i_folder);
 
@@ -654,11 +660,11 @@ FilesView.prototype.showFile = function( i_file)
 	if( this.has_thumbs )
 		this.makeThumbEl( elFile, path, 'file');
 
-	var el = document.createElement('a');
-	elFile.appendChild( el);
-	el.href = RULES.root + path;
-	el.target = '_blank';
-	el.textContent = i_file.name;
+	elFile.m_elName = document.createElement('a');
+	elFile.appendChild( elFile.m_elName);
+	elFile.m_elName.href = RULES.root + path;
+	elFile.m_elName.target = '_blank';
+	elFile.m_elName.textContent = i_file.name;
 
 	this.showGenericButtons( elFile, i_file);
 
