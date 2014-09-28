@@ -348,15 +348,20 @@ function d_CvtProcessGUI( i_wnd, i_to_sequence)
 
 	// Process paths:
 	var paths = i_wnd.m_args.paths;
-	var res_skipped = [];
 	if( i_wnd.m_args.results )
 	{
+		// Paths are founded with find_results.py:
 		var results = i_wnd.m_result.results;
+		var res_skipped = [];
 		paths = [];
 		for( var i = 0; i < results.length; i++ )
 		{
-			if( params.skipexisting && results[i].exist )
+			if( results[i].error )
 				continue;
+
+			if( results[i].exist && params.skipexisting )
+				continue;
+
 			paths.push( results[i].src);
 			res_skipped.push( results[i]);
 		}
@@ -364,8 +369,11 @@ function d_CvtProcessGUI( i_wnd, i_to_sequence)
 		i_wnd.m_result.results = res_skipped;
 	}
 	else
+	{
+		// Paths are just selected in filesview:
 		for( var i = 0; i < paths.length; i++ )
 			paths[i] = cgru_PM('/' + RULES.root + paths[i], true);
+	}
 
 	if( paths.length == 0 )
 	{

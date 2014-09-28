@@ -468,7 +468,11 @@ function fu_PutMultiDo( i_wnd)
 	for( var i = 0; i < result.results.length; i++)
 	{
 		var res = result.results[i];
-		if( params.skipexisting && res.exist )
+
+		if( res.error )
+			continue;
+
+		if( res.exist && params.skipexisting )
 			continue;
 
 		var cmd = put;
