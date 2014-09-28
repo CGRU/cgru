@@ -409,6 +409,8 @@ function ad_WndStateSelect( i_el)
 	else
 		ad_wnd_curstate = null;
 
+	ad_wnd_curgroup = null;
+
 	for( var i = 0; i < ad_wnd.elUsrRows.length; i++)
 	{
 		var elU = ad_wnd.elUsrRows[i];
@@ -615,6 +617,8 @@ function ad_WndGrpOnClick( i_evt)
 	else
 		ad_wnd_curgroup = null;
 
+	ad_wnd_curstate = null;
+
 	for( var i = 0; i < ad_wnd.elUsrRows.length; i++)
 	{
 		var elU = ad_wnd.elUsrRows[i];
@@ -647,7 +651,15 @@ function ad_WndReceivedUsers()
 
 	if( ad_wnd == null ) return;
 
-	var info = Object.keys(g_users).length + ' users, ' + Object.keys(g_groups).length + ' groups.';
+	var info = Object.keys(g_users).length + ' Users, ' + Object.keys(g_groups).length + ' Groups';
+	var roles = c_GetRolesArtists( g_users);
+	info += ', ' + roles.length + ' Roles: ';
+	for( var r = 0; r < roles.length; r++)
+	{
+		if( r ) info += ', ';
+		info += roles[r].artists.length + ' ' + roles[r].role;
+	}
+	info += '.';
 	ad_wnd.elInfo.textContent = info;
 
 	ad_WndDrawGroups();
