@@ -521,7 +521,10 @@ function nw_FilterBtn(i_btn, i_filter, i_project)
 		btns[i].classList.remove('pushed');
 
 	// Add push on clicked button except 'All':
-	if( i_filter != '_all_') i_btn.classList.add('pushed');
+	if( i_filter == '_all_')
+		nw_filter_project = null;
+	else
+		i_btn.classList.add('pushed');
 
 	nw_Filter();
 }
