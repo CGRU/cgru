@@ -17,6 +17,7 @@ p_fileObjs = null;
 p_fileSizeTotal = null;
 p_fileSizeLoaded = null;
 p_loadStartMS = null;
+p_loadLastMS = null;
 p_loaded = false;
 p_numloaded = 0;
 p_top = '38px';
@@ -56,7 +57,7 @@ p_fps = 24.0;
 p_interval = 40;
 p_drawTime = new Date();
 
-p_elements = ['player_content','play_slider','frame_bar','view','framerate'];
+p_elements = ['player_content','play_slider','frame_bar','view','preview','framerate'];
 p_el = {};
 p_buttons = ['play','prev','next','reverse','rewind','forward'];
 p_elb = {};
@@ -289,7 +290,8 @@ function p_ImgLoaded(e)
 	var info = 'Loaded '+p_numloaded+' of '+p_filenames.length+' images';
 	info += ': '+c_Bytes2KMG( p_fileSizeLoaded)+' of '+c_Bytes2KMG( p_fileSizeTotal);
 
-	var sec = ((new Date()).valueOf() - p_loadStartMS) / 1000;
+	var now_ms = (new Date()).valueOf();
+	var sec = ( now_ms - p_loadStartMS) / 1000;
 	if( sec > 0 )
 	{
 		var speed = p_fileSizeLoaded / sec;
@@ -301,7 +303,17 @@ function p_ImgLoaded(e)
 
 //	if( img.complete != true ) c_Error('Image load imcopleted: ' + img.m_file.name);
 
+	// Show loaded image, but not more often than half a second (500ms)
+	if(( p_loadLastMS == null ) || ( now_ms - p_loadLastMS > 500 ))
+	{
+		p_el.preview.src = img.src;
+		p_loadLastMS = now_ms;
+	}
+
 	if( p_numloaded < p_filenames.length ) return;
+
+	// Hide preview element:
+	p_el.preview.style.display = 'none';
 
 	p_loaded = true;
 	p_PushButton();
