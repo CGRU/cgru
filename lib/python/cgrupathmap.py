@@ -142,8 +142,8 @@ class PathMap:
 			if len(pair) != 2:
 				print('ERROR: Pathmap is not a pair.')
 				return
-			path_client = pair[0].replace('\\', '/')
-			path_server = pair[1].replace('\\', '/')
+			path_client = (cgruutils.toStr(pair[0])).replace('\\', '/')
+			path_server = (cgruutils.toStr(pair[1])).replace('\\', '/')
 			self.PathClient.append(path_client)
 			self.PathServer.append(path_server)
 			self.initialized = True
