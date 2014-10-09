@@ -284,6 +284,10 @@ function n_GetFileReceived( i_data, i_args)
 	n_gets[i_args.get_args.path] = {"data":i_data,"time":c_DT_CurSeconds()};
 	i_args.get_args.func( i_data, i_args.get_args);
 }
+function n_GetFileFlushCache( i_file)
+{
+	delete n_gets[i_file];
+}
 
 function n_SendMail( i_address, i_subject, i_body)
 {

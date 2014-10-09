@@ -531,12 +531,15 @@ Comment.prototype.save = function()
 	this.obj.key = key;
 	this.init();
 
+	var file = c_GetRuFilePath( cm_file);
+	n_GetFileFlushCache( file);
+
 	var comments = {};
 	comments[key] = this.obj;
 	var edit = {};
 	edit.object = {"comments":comments};
 	edit.add = true;
-	edit.file = c_GetRuFilePath( cm_file);
+	edit.file = file;
 
 //window.console.log( JSON.stringify( edit));
 //	res = c_Parse( n_Request({"send":{"editobj":edit}}));
