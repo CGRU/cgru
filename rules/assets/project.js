@@ -30,7 +30,7 @@ function prj_ShotsDeploy()
 
 	var params = {};
 	params.sources = g_CurPath() + '/deploy/src';
-	params.references = g_CurPath() + '/deploy/ref';
+//	params.references = g_CurPath() + '/deploy/ref';
 	params.template = RULES.assets.shot.template;
 
 //console.log( JSON.stringify( g_elCurFolder.m_dir));
