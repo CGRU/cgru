@@ -4,7 +4,7 @@ bl_info = {
 	"author": "CGRU Team",
 	"version": (1,),
 	"blender": (2, 7, 1),
-	"location": "3D Viewport",
+	"location": "Properties > Render > Afanasy",
 	"description": "CGRU Tools",
 	"warning": "",
 	"wiki_url": "",
