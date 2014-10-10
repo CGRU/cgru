@@ -57,33 +57,47 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		#row = layout.row()
 
 		layout.label(text="Engine: " + getSceneEngine())
-		layout.operator('ore.submit')
-		layout.separator()
-
-		layout.prop(ore, 'jobname')
-		layout.prop(ore, 'filepath')
-
-		layout.separator()
-		layout.prop(ore, 'pause')
-
-		layout.separator()
-		layout.prop(ore, 'packLinkedObjects')
-		layout.prop(ore, 'relativePaths')
-		layout.prop(ore, 'packTextures')
+		row = layout.row()
+		row.scale_y = 1.5
+		row.operator('ore.submit', icon='RENDER_STILL')
+		
+		layout.separator()		
+		col = layout.column()
+		col.prop(ore, 'jobname')
+		col.prop(ore, 'filepath')
 
 		layout.separator()
-		layout.prop(ore, 'fpertask')
-		layout.prop(ore, 'priority')
-		layout.prop(ore, 'maxruntasks')
-		layout.prop(ore, 'dependmask')
-		layout.prop(ore, 'dependmaskglobal')
-		layout.prop(ore, 'hostsmask')
-		layout.prop(ore, 'hostsmaskexclude')
+		split = layout.split()
+		col = split.column()
+		col.prop(ore, 'pause')
+		col = split.column()
+		col.prop(ore, 'packLinkedObjects')
+		col.prop(ore, 'relativePaths')
+		col.prop(ore, 'packTextures')
+
+		layout.separator()
+		col = layout.column(align=True)
+		row = col.row(align=True)
+		row.scale_y = 1.4
+		row.prop(sce, "frame_start")
+		row.prop(sce, "frame_end")
+		row.prop(ore, 'fpertask')
+		row = col.row(align=True)
+		row.scale_y = 1.2
+		row.prop(ore, 'priority')
+		row.prop(ore, 'maxruntasks')
+		
+		layout.separator()
+		col = layout.column()
+		col.prop(ore, 'dependmask')
+		col.prop(ore, 'dependmaskglobal')
+		col.prop(ore, 'hostsmask')
+		col.prop(ore, 'hostsmaskexclude')
+		
 
 
 class ORE_Submit(bpy.types.Operator):
-	"""Missing DocString
-	"""
+	"""Submit job to Afanasy Renderfarm."""
 
 	bl_idname = "ore.submit"
 	bl_label = "Submit Job"
