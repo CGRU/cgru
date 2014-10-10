@@ -12,10 +12,10 @@ from cgrupyqt import QtCore, QtGui
 Names = ['Blender', 'Houdini', 'Maya', 'Nuke', 'NukeX']
 
 if 'windows' in cgruconfig.VARS['platform']:
-	Names.extend(['3DSMax', 'Softimage', 'AfterFX'])
+	Names.extend(['3DSMax', 'Softimage'])
 if 'windows' in cgruconfig.VARS['platform'] \
 	or 'macosx' in cgruconfig.VARS['platform']:
-	Names.extend(['C4D'])
+	Names.extend(['C4D','AfterFX'])
 
 
 def startDetached(command):
