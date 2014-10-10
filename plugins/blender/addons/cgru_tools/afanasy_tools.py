@@ -9,21 +9,8 @@ import bpy
 
 from bpy.props import (PointerProperty, StringProperty, BoolProperty,
 					   EnumProperty, IntProperty, CollectionProperty)
-from bpy.types import Operator, AddonPreferences
 
 bpy.errors = []
-
-class OREAddonPreferences(AddonPreferences):
-	# this must match the addon name, use '__name__'
-	# when defining this in a submodule of a python package.
-	bl_idname = __name__
-
-	def draw(self, context):
-		layout = self.layout
-		row = layout.row()
-		row.label(text="Please, set Exchanges Folder and save Preferences")
-		row = layout.row()
-
 
 ## This method creates a string with a list of engines in all scenes
 def getSceneEngine():
@@ -105,6 +92,7 @@ class ORE_Submit(bpy.types.Operator):
 	def execute(self, context):
 		sce = context.scene
 		ore = sce.ore_render
+		addon_prefs = context.user_preferences.addons['cgru_tools'].preferences
 		#rd = context.scene.render
 		images = None
 		engineString = getSceneEngine()
@@ -237,7 +225,7 @@ class ORE_Submit(bpy.types.Operator):
 		job.send()
 
 		# open the file again
-		bpy.ops.wm.open_mainfile(filepath=scenefile)
+		#bpy.ops.wm.open_mainfile(filepath=scenefile)
 
 		return set(['FINISHED'])
 

@@ -23,6 +23,23 @@ import bpy
 from bpy.props import *
 
 
+class OREAddonPreferences(bpy.types.AddonPreferences):
+	# this must match the addon name, use '__name__'
+	# when defining this in a submodule of a python package.
+	bl_idname = __name__
+
+	cgru_location = bpy.props.StringProperty(
+		name="CGRU Root location",
+		subtype="DIR_PATH")
+    
+	def draw(self, context):
+		layout = self.layout
+		row = layout.row()
+		row.label(text="Please, set Exchanges Folder and save Preferences")
+		row = layout.row()
+		row.prop(self, "cgru_location")
+
+
 class ORESettings(bpy.types.PropertyGroup):
 	"""Missing DocString
 	"""
