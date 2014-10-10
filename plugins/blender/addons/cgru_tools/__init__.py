@@ -35,7 +35,7 @@ class OREAddonPreferences(bpy.types.AddonPreferences):
 	def draw(self, context):
 		layout = self.layout
 		row = layout.row()
-		row.label(text="Please, set Exchanges Folder and save Preferences")
+		row.label(text="Please, set CGRU install root location")
 		row = layout.row()
 		row.prop(self, "cgru_location")
 

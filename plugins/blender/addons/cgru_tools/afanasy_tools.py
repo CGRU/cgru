@@ -140,16 +140,31 @@ class ORE_Submit(bpy.types.Operator):
 			images = ore.filepath
 
 		# Check and add CGRU module in system path:
+		if not 'CGRU_LOCATION' in os.environ:
+			os.environ['CGRU_LOCATION'] = addon_prefs.cgru_location
+		
 		cgrupython = os.getenv('CGRU_PYTHON')
 		if cgrupython is None or cgrupython == '':
-			cgrupython = '/opt/cgru/lib/python'
+			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+				if sys.platform.find('win'):
+					cgrupython = 'C:\cgru\lib\python'
+				else:
+					cgrupython = '/opt/cgru/lib/python'
+			else:
+				cgrupython = os.path.join(addon_prefs.cgru_location, 'lib', 'python')
 		if cgrupython not in sys.path:
 			sys.path.append(cgrupython)
 
 		# Check and add Afanasy module in system path:
 		afpython = os.getenv('AF_PYTHON')
 		if afpython is None or afpython == '':
-			afpython = '/opt/cgru/afanasy/python'
+			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+				if sys.platform.find('win'):
+					afpython = 'C:\cgru\afanasy\python'
+				else:
+					afpython = '/opt/cgru/afanasy/python'
+			else:
+				afpython = os.path.join(addon_prefs.cgru_location, 'afanasy', 'python')
 		if afpython not in sys.path:
 			sys.path.append(afpython)
 
