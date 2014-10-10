@@ -111,6 +111,8 @@ class ORE_Submit(bpy.types.Operator):
 
 		# Calculate temporary scene path:
 		scenefile = bpy.data.filepath
+		if ".blend" in scenefile:
+			scenefile = scenefile[:-6]
 		renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(
 			time.time() - int(time.time()))[2:5] + '.blend'
 
@@ -121,7 +123,6 @@ class ORE_Submit(bpy.types.Operator):
 			bpy.ops.file.make_paths_relative()
 		if ore.packTextures:
 			bpy.ops.file.pack_all()
-
 
 		# Save Temporary file
 		bpy.ops.wm.save_mainfile(filepath=renderscenefile)
