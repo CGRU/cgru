@@ -126,9 +126,9 @@ class ORE_Submit(bpy.types.Operator):
 					jobname = jobname[:-6]
 
 		# Get frames settings:
-		fstart = bpy.context.scene.frame_start
-		fend = bpy.context.scene.frame_end
-		finc = bpy.context.scene.frame_step
+		fstart = sce.frame_start
+		fend = sce.frame_end
+		finc = sce.frame_step
 		fpertask = ore.fpertask
 		# Check frames settings:
 		if fpertask < 1:
