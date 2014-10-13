@@ -9,6 +9,8 @@ if( app.project.af == null )
 	af.frame_per_task = 5;
 	af.paused = false;
 	af.comp_name = '';
+	af.hosts_mask = '';
+	af.exclude_hosts = '';
 	af.mov_enable = false;
 	af.mov_name = '';
 	af.mov_codec = 'h264_good';
@@ -84,9 +86,18 @@ function af_StartRender( i_execute)
 			af.mov_name = af.comp_name;
 			return;
 		}
+		
+		if ( system.osName == "MacOS") // Macosx
+		{
+			var cmd = 'python';
+			cmd += ' ' + $.getenv('AF_ROOT') + "/python/afjob.py"
+		}
+		else // Windows
+		{
+			var cmd = 'pythonw.exe';
+			cmd += ' "%AF_ROOT%\\python\\afjob.py"';
+		}
 
-		var cmd = 'pythonw.exe';
-		cmd += ' "%AF_ROOT%\\python\\afjob.py"';
 		cmd += ' "' + project_path + '"';
 		cmd += ' ' + af.frame_start;
 		cmd += ' ' + af.frame_end;
@@ -95,6 +106,8 @@ function af_StartRender( i_execute)
 		cmd += ' -node "' + af.comp_name + '"';
 		cmd += ' -name "' + project_name + '"';
 		cmd += ' -images "' + output_path + '"';
+		cmd += ' -hostsmask "' + af.hosts_mask + '"';
+		cmd += ' -hostsexcl "' + af.exclude_hosts + '"';
 		cmd += ' -tempscene';
 		cmd += ' -deletescene';
 		if( af.paused )
@@ -108,8 +121,13 @@ function af_StartRender( i_execute)
 			if( af.mov_res != '' )
 				cmd += ' -mres "' + af.mov_res + '"';
 		}
-
-		var cmd_output = system.callSystem('cmd /c "' + cmd + '"');
+		
+		if ( system.osName == "MacOS")
+		{
+			var cmd_output = system.callSystem(cmd);
+		}
+		else
+			var cmd_output = system.callSystem('cmd /c "' + cmd + '"');
 
 //alert( cmd_output);
 //alert( system.callSystem('cmd /c \"pythonw.exe "c:\\cg\\tools\\cgru\\afanasy\\python\\afjob.py" "Z:\\PROJECTS\\Zona\\test\\station\\station_test_afo.aep" 0 2310 -by 1 -fpt 77 -node "station_anim" -os any -pwd "Z:\\PROJECTS\\Zona\\test\\station" -pause -name "station_test_afo.aep\""'));
@@ -184,9 +202,9 @@ function af_CheckScene()
 function af_DrawWindow()
 {
 	var af_Window = new Window('palette','Submit Job To Afanasy', undefined, {resizeable:true});
-    //af_Window.margins = [0,0,0,0];
-    af_Window.alignChildren = ['center','top'];
-    
+	//af_Window.margins = [0,0,0,0];
+	af_Window.alignChildren = ['center','top'];
+
 	var tabPanel = af_Window.add( 'tabbedpanel', undefined,'', {resizeable:true});
     //tabPanel.margins = [0,0,0,0];
     tabPanel.alignment = ['fill','fill'];
@@ -227,6 +245,16 @@ function af_DrawWindow()
 	elPaused.value = af.paused;
 	elPaused.onClick = function(){ af.paused = this.value;};
 
+
+	generalTab.add('statictext', undefined, 'Hosts Mask');
+	var elHostsMask = generalTab.add('edittext', undefined, af.hosts_mask);
+	elHostsMask.onChange = function(){ af.hosts_mask = this.text;};
+	elHostsMask.alignment = ['fill','center'];
+
+	generalTab.add('statictext', undefined, 'Exclude Hosts Mask');
+	var elExcludeHosts = generalTab.add('edittext', undefined, af.exclude_hosts);
+	elExcludeHosts.onChange = function(){ af.exclude_hosts = this.text;};
+	elExcludeHosts.alignment = ['fill', 'center'];
 
 	// Movie:
 	var movieTab = tabPanel.add( 'tab', undefined, 'Movie', {resizeable:true});
