@@ -113,7 +113,7 @@ class ORE_Submit(bpy.types.Operator):
 			bpy.ops.file.pack_all()
 
 		# Save Temporary file
-		bpy.ops.wm.save_mainfile(filepath=renderscenefile)
+		bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)
 
 		# Get job name:
 		jobname = ore.jobname
