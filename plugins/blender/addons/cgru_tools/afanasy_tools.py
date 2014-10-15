@@ -12,6 +12,19 @@ from bpy.props import (PointerProperty, StringProperty, BoolProperty,
 
 bpy.errors = []
 
+layer_text_block = '''# 
+# layer '{0}'
+#
+import bpy
+bpy.context.scene.render.use_sequencer = False
+bpy.context.scene.render.use_compositing = False
+layers = bpy.context.scene.render.layers
+for layer in layers:
+    layer.use = False
+layers['{0}'].use = True
+bpy.context.scene.render.filepath = bpy.context.scene.render.filepath + '_' + "{0}" + '_'
+'''
+
 ## This method creates a string with a list of engines in all scenes
 def getSceneEngine():
 	#str = ''
@@ -57,6 +70,7 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		split = layout.split()
 		col = split.column()
 		col.prop(ore, 'pause')
+		col.prop(ore, 'splitRenderLayers')
 		col = split.column()
 		col.prop(ore, 'packLinkedObjects')
 		col.prop(ore, 'relativePaths')
@@ -111,9 +125,6 @@ class ORE_Submit(bpy.types.Operator):
 			bpy.ops.file.make_paths_relative()
 		if ore.packTextures:
 			bpy.ops.file.pack_all()
-
-		# Save Temporary file
-		bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)
 
 		# Get job name:
 		jobname = ore.jobname
@@ -186,32 +197,71 @@ class ORE_Submit(bpy.types.Operator):
 		# Create a job:
 		job = af.Job(jobname)
 		servicename = 'blender'
-		block = af.Block(engineString, servicename)
 
-		if engineString == 'BLENDER_RENDER':
-			block.setParser('blender_render')
-		elif engineString == 'CYCLES':
-			block.setParser('blender_cycles')
+		# check if split Layers in blocks is enable 
+		if ore.splitRenderLayers:
+			layers = bpy.context.scene.render.layers
+			if len(layers) > 1:
+				for layer in layers:
+					# Create a text block for each layer
+					txt_block = bpy.data.texts.new("layer_" + layer.name)
+					txt_block.write(layer_text_block.format(layer.name))
 
+					# Create a block
+					block = af.Block("layer_" + layer.name, servicename)
 
-		job.blocks.append(block)
-		# Set block command and frame range:
-		cmd = 'blender -b "%s"' % renderscenefile
-		cmd += ' -E "%s"' % engineString
-		if images is not None:
-			cmd += ' -o "%s"' % images
-		cmd += ' -s @#@ -e @#@ -j %d -a' % finc
-		block.setCommand(cmd)
-		#print(cmd)
-		block.setNumeric(fstart, fend, fpertask, finc)
-		if images is not None:
-			pos = images.find('#')
-			if pos > 0:
-				images = images[:pos] + '@' + images[pos:]
-			pos = images.rfind('#')
-			if pos > 0:
-				images = images[:pos + 1] + '@' + images[pos + 1:]
-			block.setFiles([images])
+					# Check current render engine
+					if engineString == 'BLENDER_RENDER':
+						block.setParser('blender_render')
+					elif engineString == 'CYCLES':
+						block.setParser('blender_cycles')
+
+					job.blocks.append(block)
+
+					# Set block command and frame range:
+					cmd = 'blender -b "%s"' % renderscenefile
+					cmd += ' --python-text "%s"' % ("layer_" + layer.name)
+					cmd += ' -E "%s"' % engineString
+					if images is not None:
+						cmd += ' -o "%s"' % images
+					cmd += ' -s @#@ -e @#@ -j %d -a' % finc
+					block.setCommand(cmd)
+					block.setNumeric(fstart, fend, fpertask, finc)
+					if images is not None:
+						pos = images.find('#')
+						if pos > 0:
+							images = images[:pos] + '@' + images[pos:]
+						pos = images.rfind('#')
+						if pos > 0:
+							images = images[:pos + 1] + '@' + images[pos + 1:]
+						block.setFiles([images])
+		else:
+			block = af.Block(engineString, servicename)
+
+			if engineString == 'BLENDER_RENDER':
+				block.setParser('blender_render')
+			elif engineString == 'CYCLES':
+				block.setParser('blender_cycles')
+
+			job.blocks.append(block)
+
+			# Set block command and frame range:
+			cmd = 'blender -b "%s"' % renderscenefile
+			cmd += ' -E "%s"' % engineString
+			if images is not None:
+				cmd += ' -o "%s"' % images
+			cmd += ' -s @#@ -e @#@ -j %d -a' % finc
+			block.setCommand(cmd)
+			block.setNumeric(fstart, fend, fpertask, finc)
+			if images is not None:
+				pos = images.find('#')
+				if pos > 0:
+					images = images[:pos] + '@' + images[pos:]
+				pos = images.rfind('#')
+				if pos > 0:
+					images = images[:pos + 1] + '@' + images[pos + 1:]
+				block.setFiles([images])
+
 		# Set job running parameters:
 		if ore.maxruntasks > -1:
 			job.setMaxRunningTasks(ore.maxruntasks)
@@ -235,6 +285,15 @@ class ORE_Submit(bpy.types.Operator):
 
 		## Copy scene to render
 		#shutil.copy(scenefile, renderscenefile)
+
+		# Save Temporary file
+		bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)
+
+		# Clean up temp text blocks
+		if ore.splitRenderLayers:
+			for text in bpy.data.texts:
+				if "layer_" in text:
+					bpy.data.texts.remove(text)
 
 		#  Send job to server:
 		job.send()

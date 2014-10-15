@@ -56,6 +56,8 @@ class ORESettings(bpy.types.PropertyGroup):
 		description='Set Relative Paths for all Textures and Objects', default=0)
 	packTextures = BoolProperty(name='Pack Textures',
 		description='Pack all Textures into the Blend File.', default=0)
+	splitRenderLayers = BoolProperty(name='Split Render Layers',
+		description='Split Render layer in blocks. Warning: this option disable post-processing passes (compositing nor seqeuncer are execute).', default=0) 
 
 	# Render Settings:
 	filepath = StringProperty(name='File Path', description='Set File Path.',
