@@ -297,7 +297,7 @@ void TaskProcess::refresh()
 	if( pid == 0 )
 	{
 		// Task is not finished
-		readProcess("RUN");
+		readProcess("RUN",/* i_read_empty = */ false);
 	}
 	else if( pid == m_pid )
 	{
@@ -334,7 +334,7 @@ void TaskProcess::close()
 	m_zombie = true;
 }
 
-void TaskProcess::readProcess( const std::string & i_mode)
+void TaskProcess::readProcess( const std::string & i_mode, bool i_read_empty)
 {
 	if( RenderHost::noOutputRedirection()) return;
 
@@ -348,11 +348,14 @@ void TaskProcess::readProcess( const std::string & i_mode)
 	if( readsize > 0 )
 		output += std::string( m_readbuffer, readsize);
 
-	if( output.size() == 0 ) return;
+	// Skip parsing empty string ( it not forced )
+	if(( i_read_empty == false ) && ( output.size() == 0 ))
+		return;
 
 	m_parser->read( i_mode, output);
 
-	if( m_taskexec->getListenAddressesNum())
+	// Send data to listening sockets, it not empty
+	if( output.size() && m_taskexec->getListenAddressesNum())
 	{
 		af::MCTaskOutput mctaskoutput( RenderHost::getName(),
 			m_taskexec->getJobId(),
@@ -476,7 +479,8 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
 	}
 
 	// Read process last output
-	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time));
+	// Force to read even empty output to let user to perform finalizing actions.
+	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time),/* i_read_empty = */ true);
 
 	if(( i_exitCode != 0 ) || ( m_stop_time != 0 ))
 	{
