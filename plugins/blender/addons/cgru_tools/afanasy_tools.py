@@ -221,7 +221,7 @@ class ORE_Submit(bpy.types.Operator):
 					# Set block command and frame range:
 					cmd = 'blender -b "%s"' % renderscenefile
 					cmd += ' --python-text "%s"' % ("layer_" + layer.name)
-					cmd += ' -E "%s"' % engineString
+					cmd += ' -y -E "%s"' % engineString
 					if images is not None:
 						cmd += ' -o "%s"' % images
 					cmd += ' -s @#@ -e @#@ -j %d -a' % finc
