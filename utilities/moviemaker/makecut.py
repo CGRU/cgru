@@ -25,8 +25,13 @@ Parser.add_option('-n', '--cutname',    dest='cutname',    type  ='string', defa
 Parser.add_option('-f', '--fps',        dest='fps',        type  ='string', default='24',        help='FPS')
 Parser.add_option('-r', '--resolution', dest='resolution', type  ='string', default='1280x720',  help='Resolution: 1280x720')
 Parser.add_option('-c', '--codec',      dest='codec',      type  ='string', default='h264_good', help='Codec')
+Parser.add_option('--colorspace',       dest='colorspace', type  ='string', default='auto',      help='Input images colorspace')
 Parser.add_option('-o', '--outdir',     dest='outdir',     type  ='string', default='cut',       help='Output folder')
 Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='',          help='Afanasy user name')
+Parser.add_option('--afservice',        dest='afservice',  type  ='string', default='movgen',    help='Afanasy service type')
+Parser.add_option('--afcapacity',       dest='afcapacity', type  ='int',    default=100,         help='Afanasy tasks capacity')
+Parser.add_option('--afperhost',        dest='afperhost',  type  ='int',    default=-1,          help='Afanasy max tasks per host')
+Parser.add_option('--afruntime',        dest='afruntime',  type  ='int',    default=20,          help='Afanasy max tasks run time')
 Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,   help='Test input only')
 
 
@@ -88,6 +93,7 @@ cmd_prefix = 'python "%s"' % os.path.normpath(cmd_prefix)
 cmd_prefix += ' -t "dailies"'
 cmd_prefix += ' -r %s' % Options.resolution
 cmd_prefix += ' -d "%s"' % time.strftime('%y-%m-%d')
+cmd_prefix += ' --colorspace "%s"' % Options.colorspace
 
 file_counter = 0
 
@@ -163,19 +169,19 @@ cmd_encode += ' "%s"' % os.path.join(OutDir, TmpFiles)
 cmd_encode += ' "%s"' % movie_name
 
 job = af.Job('CUT ' + CutName)
-block = af.Block('convert')
+block = af.Block('convert', Options.afservice)
 counter = 0
 for cmd in commands:
 	task = af.Task(task_names[counter])
 	task.setCommand(cmd)
 	block.tasks.append(task)
 	counter += 1
-block.setCapacity(100)
-block.setMaxRunTasksPerHost(2)
-block.setTasksMaxRunTime(20)
+block.setCapacity( Options.afcapacity)
+block.setMaxRunTasksPerHost( Options.afperhost)
+block.setTasksMaxRunTime( Options.afruntime)
 job.blocks.append(block)
 
-block = af.Block('encode')
+block = af.Block('encode', Options.afservice)
 block.setDependMask('convert')
 task = af.Task('encode')
 task.setCommand(cmd_encode)
@@ -185,7 +191,6 @@ job.blocks.append(block)
 if Options.afuser != '':
 	job.setUserName(Options.afuser)
 
-job.setNeedOS('win')
 if not Options.testonly:
 	if not job.send():
 		errExit('Can`t send job to server.')

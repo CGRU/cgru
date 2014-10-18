@@ -584,8 +584,9 @@ function d_MakeCut( i_args)
 	if( RULES.cut.input ) params.input = RULES.cut.input;
 
 	gui_Create( wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -648,6 +649,8 @@ function d_CutProcessGUI( i_wnd, i_test)
 	cmd += ' -f "' + params.fps + '"';
 	cmd += ' -r "' + params.format + '"';
 	cmd += ' -c "' + params.codec + '"';
+	cmd += ' --colorspace "' + params.colorspace + '"';
+	cmd += ' --afcapacity ' + RULES.cut.af_capacity;
 	cmd += ' -o "' + cgru_PM('/' + RULES.root + params.output, true) + '"';
 	if( i_test ) cmd += ' -t';
 

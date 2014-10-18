@@ -242,8 +242,9 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG",
-	"output":"COMMON/_cut"
+	"input":"RESULT/JPG,RESULT/TIF,RESULT/DPX",
+	"output":"COMMON/_cut",
+	"af_capacity":100
 },
 
 "put":{
