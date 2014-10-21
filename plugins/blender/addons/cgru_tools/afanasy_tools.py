@@ -277,7 +277,7 @@ class ORE_Submit(bpy.types.Operator):
 		bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)
 
 		# Clean up temp text blocks
-		if ore.splitRenderLayers:
+		if ore.splitRenderLayers and len(layers) > 1:
 			for text in bpy.data.texts:
 				if "layer_" in text:
 					bpy.data.texts.remove(text)
