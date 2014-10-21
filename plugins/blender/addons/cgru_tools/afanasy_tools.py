@@ -198,46 +198,28 @@ class ORE_Submit(bpy.types.Operator):
 		job = af.Job(jobname)
 		servicename = 'blender'
 
-		# check if split Layers in blocks is enable 
-		if ore.splitRenderLayers:
-			layers = bpy.context.scene.render.layers
-			if len(layers) > 1:
-				for layer in layers:
-					# Create a text block for each layer
-					txt_block = bpy.data.texts.new("layer_" + layer.name)
-					txt_block.write(layer_text_block.format(layer.name))
+		renderNames = []
 
-					# Create a block
-					block = af.Block("layer_" + layer.name, servicename)
+		layers = bpy.context.scene.render.layers
 
-					# Check current render engine
-					if engineString == 'BLENDER_RENDER':
-						block.setParser('blender_render')
-					elif engineString == 'CYCLES':
-						block.setParser('blender_cycles')
-
-					job.blocks.append(block)
-
-					# Set block command and frame range:
-					cmd = 'blender -b "%s"' % renderscenefile
-					cmd += ' --python-text "%s"' % ("layer_" + layer.name)
-					cmd += ' -y -E "%s"' % engineString
-					if images is not None:
-						cmd += ' -o "%s"' % images
-					cmd += ' -s @#@ -e @#@ -j %d -a' % finc
-					block.setCommand(cmd)
-					block.setNumeric(fstart, fend, fpertask, finc)
-					if images is not None:
-						pos = images.find('#')
-						if pos > 0:
-							images = images[:pos] + '@' + images[pos:]
-						pos = images.rfind('#')
-						if pos > 0:
-							images = images[:pos + 1] + '@' + images[pos + 1:]
-						block.setFiles([images])
+		if ore.splitRenderLayers and len(layers) > 1:
+			for layer in layers:
+				renderNames.append(layer.name)
 		else:
-			block = af.Block(engineString, servicename)
+			renderNames.append(engineString)
 
+		for renderName in renderNames:
+			block = None
+
+			# Create block
+			if ore.splitRenderLayers and len(layers) > 1:
+				txt_block = bpy.data.texts.new("layer_" + renderName)
+				txt_block.write(layer_text_block.format(renderName))
+				block = af.Block("layer_" + renderName, servicename)
+			else:
+				block = af.Block(engineString, servicename)
+
+			# Check current render engine
 			if engineString == 'BLENDER_RENDER':
 				block.setParser('blender_render')
 			elif engineString == 'CYCLES':
@@ -247,6 +229,11 @@ class ORE_Submit(bpy.types.Operator):
 
 			# Set block command and frame range:
 			cmd = 'blender -b "%s"' % renderscenefile
+
+			# Only for renderLayers
+			if ore.splitRenderLayers and len(layers) > 1:
+				cmd += ' --python-text "%s"' % ("layer_" + renderName)
+
 			cmd += ' -y -E "%s"' % engineString
 			if images is not None:
 				cmd += ' -o "%s"' % images
