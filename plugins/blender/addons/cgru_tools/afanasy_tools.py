@@ -4,6 +4,7 @@ import shutil
 import time
 import os
 import sys
+import re
 
 import bpy
 
@@ -240,17 +241,12 @@ class ORE_Submit(bpy.types.Operator):
 					cmd += ' -o "%s"' % (images + '_' + renderName +'_')
 				else:
 					cmd += ' -o "%s"' % images
+				images = re.sub(r'(#+)', r'@\1@', images)
+				block.setFiles([images])
+
 			cmd += ' -s @#@ -e @#@ -j %d -a' % finc
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
-			if images is not None:
-				pos = images.find('#')
-				if pos > 0:
-					images = images[:pos] + '@' + images[pos:]
-				pos = images.rfind('#')
-				if pos > 0:
-					images = images[:pos + 1] + '@' + images[pos + 1:]
-				block.setFiles([images])
 
 		# Set job running parameters:
 		if ore.maxruntasks > -1:
