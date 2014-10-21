@@ -236,7 +236,10 @@ class ORE_Submit(bpy.types.Operator):
 
 			cmd += ' -y -E "%s"' % engineString
 			if images is not None:
-				cmd += ' -o "%s"' % (images + renderName + '_')
+				if ore.splitRenderLayers and len(layers) > 1:
+					cmd += ' -o "%s"' % (images + '_' + renderName +'_')
+				else:
+					cmd += ' -o "%s"' % images
 			cmd += ' -s @#@ -e @#@ -j %d -a' % finc
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
