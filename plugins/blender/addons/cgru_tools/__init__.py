@@ -60,7 +60,7 @@ class ORESettings(bpy.types.PropertyGroup):
 		description='Split Render layer in blocks. Warning: this option disable post-processing passes (compositing nor seqeuncer are execute).', default=0) 
 
 	# Render Settings:
-	filepath = StringProperty(name='File Path', description='Set File Path.',
+	filepath = StringProperty(name='File Path', description='Set File Path. You can use ### to set number of frames',
 		maxlen=512, default='')
 
 	# Paramerets:
