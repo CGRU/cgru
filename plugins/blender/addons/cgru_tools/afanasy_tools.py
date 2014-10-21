@@ -236,7 +236,7 @@ class ORE_Submit(bpy.types.Operator):
 
 			cmd += ' -y -E "%s"' % engineString
 			if images is not None:
-				cmd += ' -o "%s"' % images
+				cmd += ' -o "%s"' % (images + renderName + '_')
 			cmd += ' -s @#@ -e @#@ -j %d -a' % finc
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
