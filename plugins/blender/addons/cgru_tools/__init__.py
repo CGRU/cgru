@@ -20,7 +20,7 @@ else:
 	from . import afanasy_tools
 
 import bpy
-from bpy.props import *
+from bpy.props import (IntProperty, BoolProperty, StringProperty, PointerProperty)
 
 
 class OREAddonPreferences(bpy.types.AddonPreferences):
@@ -31,7 +31,7 @@ class OREAddonPreferences(bpy.types.AddonPreferences):
 	cgru_location = bpy.props.StringProperty(
 		name="CGRU Root location",
 		subtype="DIR_PATH")
-    
+ 
 	def draw(self, context):
 		layout = self.layout
 		row = layout.row()
