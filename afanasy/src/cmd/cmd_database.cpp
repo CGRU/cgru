@@ -14,6 +14,9 @@ CmdDBCheck::CmdDBCheck()
 CmdDBCheck::~CmdDBCheck(){}
 bool CmdDBCheck::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
+	#ifdef SQL_OFF
+		printf("\nProject was build without SQL library.\n");
+	#endif
 	afsql::DBConnection DB( "afanasy.cmd.Check");
 	if( DB.isWorking()) printf("\nDatabase connection is working.\n");
 	else                printf("\nDatabase connection is NOT WORKING !\n");
