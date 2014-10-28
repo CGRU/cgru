@@ -658,7 +658,8 @@ bool Environment::initAfterLoad()
 	// Digest authentication file read:
 	{
 	digest_file = getCGRULocation() + AFGENERAL::PATH_SEPARATOR + digest_file;
-	char * data = af::fileRead( digest_file);
+	std::string info;
+	char * data = af::fileRead( digest_file, NULL, 0, &info);
 	if( data )
 	{
 		std::vector<std::string> lines = af::strSplit( data,"\n");
@@ -674,9 +675,14 @@ bool Environment::initAfterLoad()
 			}
 			digest_map[words[0]] = words[2];
 		}
+		printf("Digest file loaded, authentication is enabled.\n");
 	}
-	else
+	else if( isVerboseMode())
+	{
+		if( info.size())
+			printf("%s\n", info.c_str());
 		printf("Digest not loaded, authentication is disabled.\n");
+	}
 	}
 
 	// Solve server name
