@@ -95,6 +95,42 @@ void DBConnection::DBClose()
 	AFINFO("DB Unlocked.")
 }
 
+const std::vector<std::string> DBConnection::getTables() const
+{
+	std::vector<std::string> tables;
+
+	if( m_working == false )
+	{
+		return tables;
+	}
+
+	if( false == m_opened )
+	{
+		AFERRAR("DBConnection::getTables: Database connection '%s' is not open.", m_name.c_str())
+		return tables;
+	}
+
+	char query[] = "select relname from pg_stat_user_tables WHERE schemaname='public';";
+	PGresult * res = PQexec( m_conn, query);
+	if( PQresultStatus(res) != PGRES_TUPLES_OK)
+	{
+		AFERRAR("%s: Getting all tables names failed:\n%s\n%s",
+			m_name.c_str(), query, PQerrorMessage( m_conn))
+		return tables;
+	}
+
+	for( int i = 0; i < PQntuples( res); i++)
+	{
+		for( int j = 0; j < PQnfields( res); j++)
+		{
+			tables.push_back( PQgetvalue(res, i, j));
+		}
+	}
+	PQclear( res);
+
+	return tables;
+}
+
 bool DBConnection::dropAllTables()
 {
 	if( m_working == false )
@@ -107,29 +143,12 @@ bool DBConnection::dropAllTables()
 		return false;
 	}
 
-	char query[] = "select relname from pg_stat_user_tables WHERE schemaname='public';";
-	PGresult * res = PQexec( m_conn, query);
-	if( PQresultStatus(res) != PGRES_TUPLES_OK)
-	{
-		AFERRAR("%s: Getting all tables names failed:\n%s\n%s",
-			m_name.c_str(), query, PQerrorMessage( m_conn))
-		return false;
-	}
-
-	std::list<std::string> tables;
-	for( int i = 0; i < PQntuples( res); i++)
-	{
-		for( int j = 0; j < PQnfields( res); j++)
-		{
-			tables.push_back( PQgetvalue(res, i, j));
-		}
-	}
-	PQclear( res);
+	std::vector<std::string> tables = getTables();
 
 	bool o_result = true;
-	for( std::list<std::string>::const_iterator it = tables.begin(); it != tables.end(); it++)
+	for( int i = 0; i < tables.size(); i++)
 	{
-		std::string query = std::string("DROP TABLE ") + *it + " CASCADE;";
+		std::string query = std::string("DROP TABLE ") + tables[i] + " CASCADE;";
 		std::cout << query << std::endl;
 		PGresult * res = PQexec( m_conn, query.c_str());
 		if( PQresultStatus(res) != PGRES_COMMAND_OK)
@@ -213,6 +232,15 @@ bool DBConnection::dropTable( const std::string & i_tablename)
 		AFERRAR("DBConnection::dropTable: Database connection '%s is not open.", m_name.c_str())
 		return false;
 	}
+
+	std::vector<std::string> tables = getTables();
+	bool founded = false;
+	for( int i = 0; i < tables.size(); i++)
+		if( tables[i] == i_tablename )
+			founded = true;
+
+	if( founded == false )
+		return true;
 
 	std::string query = std::string("DROP TABLE ") + i_tablename + ";";
 	AFINFA("%s: executing query:\n%s", m_name.c_str(), query.c_str())

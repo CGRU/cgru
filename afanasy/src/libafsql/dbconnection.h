@@ -25,6 +25,7 @@ public:
 	bool DBOpen();
 	void DBClose();
 
+	const std::vector<std::string> getTables() const;
 	const std::list<std::string> getTableColumns( const std::string & i_tablename);
 	bool dropTable( const std::string & i_tablename);
 	bool dropAllTables();
