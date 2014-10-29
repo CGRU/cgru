@@ -7,6 +7,7 @@
 #include <windows.h>
 #include <Winsock2.h>
 #define fclose CloseHandle
+#define WEXITSTATUS
 #else
 #include <signal.h>
 #include <sys/ioctl.h>
