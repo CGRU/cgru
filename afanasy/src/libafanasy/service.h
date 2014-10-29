@@ -30,6 +30,8 @@ public:
 				int & percent, int & frame, int & percentframe, std::string & activity,
 				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
 
+	bool checkExitStatus( int i_status) const;
+
 	// Return an empty string on sucess or an error message on error
 	const std::vector<std::string> doPost();
 
@@ -45,6 +47,7 @@ private:
 	PyObject * m_PyObj_FuncGetFiles;
 	PyObject * m_PyObj_FuncGetParsedFiles;
 	PyObject * m_PyObj_FuncParse;
+	PyObject * m_PyObj_FuncCheckExitStatus;
 	PyObject * m_PyObj_FuncDoPost;
 
 	bool m_initialized;

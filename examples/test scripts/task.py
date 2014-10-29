@@ -33,6 +33,7 @@ parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=
 parser.add_option('-c', '--cpunum',    dest='cpunum',    type='int',    default=0,  help='number of processors to use')
 parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=10, help='parser key percentage')
 parser.add_option('-H', '--HOSTS',     dest='hosts',     type='string', default='', help='hosts list')
+parser.add_option('--exitstatus',      dest='exitstatus',type='int',    default=0,  help='good exit status')
 
 options, args = parser.parse_args()
 
@@ -118,3 +119,7 @@ print('Sleeping = %f seconds.' % sleepsec)
 print('Running time = %d seconds.' % (time_finish - time_start))
 
 sys.stdout.flush()
+
+if options.exitstatus != 0:
+	print('Good exit status is "%d"' % options.exitstatus)
+sys.exit( options.exitstatus)

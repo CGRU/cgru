@@ -458,7 +458,7 @@ void TaskProcess::sendTaskSate()
 
 void TaskProcess::processFinished( int i_exitCode)
 {
-printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(stopped)":"");
+printf("Finished PID=%d: Exit Code=%d Status=%d %s\n", m_pid, i_exitCode, WEXITSTATUS( i_exitCode), m_stop_time ? "(stopped)":"");
 
 	// Zero m_pid means that task is not running any more
 	m_pid = 0;
@@ -482,7 +482,9 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
 	// Force to read even empty output to let user to perform finalizing actions.
 	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time),/* i_read_empty = */ true);
 
-	if(( i_exitCode != 0 ) || ( m_stop_time != 0 ))
+	bool success = m_service->checkExitStatus( WEXITSTATUS( i_exitCode));
+
+	if(( success != true ) || ( m_stop_time != 0 ))
 	{
 		if( m_doing_post )
 			m_update_status = af::TaskExec::UPFinishedFailedPost;

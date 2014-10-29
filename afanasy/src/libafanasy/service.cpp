@@ -54,6 +54,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncGetFiles = NULL;
 	m_PyObj_FuncGetParsedFiles = NULL;
 	m_PyObj_FuncParse = NULL;
+	m_PyObj_FuncCheckExitStatus = NULL;
 	m_PyObj_FuncDoPost = NULL;
 	m_initialized = false;
 
@@ -72,7 +73,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 
 
 	PyObject *pArgs;
-	pArgs = PyTuple_New( 1);
+	pArgs = PyTuple_New( 2);
 
 	PyObject *task_info;
 	task_info = PyDict_New();
@@ -111,6 +112,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyDict_SetItemString( task_info, "store_dir", PyBytes_FromString( i_store_dir.c_str()));
 
 	PyTuple_SetItem( pArgs, 0, task_info);
+	PyTuple_SetItem( pArgs, 1, PyBool_FromLong( af::Environment::isVerboseMode()));
 
 	// Try to import service class
 	if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, m_name, pArgs))
@@ -134,6 +136,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	if( m_PyObj_FuncGetParsedFiles == NULL ) return;
 
 	m_PyObj_FuncParse = getFunction( AFPYNAMES::SERVICE_FUNC_PARSE);
+	if( m_PyObj_FuncParse == NULL ) return;
+
+	m_PyObj_FuncCheckExitStatus = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKEXITSTATUS);
 	if( m_PyObj_FuncParse == NULL ) return;
 
 	m_PyObj_FuncDoPost = getFunction( AFPYNAMES::SERVICE_FUNC_DOPOST);
@@ -255,6 +260,34 @@ bool Service::parse( const std::string & i_mode, std::string & i_data,
 
 	return result;
 }
+
+bool Service::checkExitStatus( int i_status) const
+{
+	PyObject * pArgs = PyTuple_New( 1);
+	PyTuple_SetItem( pArgs, 0, PyLong_FromLong( i_status));
+
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncCheckExitStatus, pArgs);
+
+	if( pResult == NULL)
+	{
+		if( PyErr_Occurred()) PyErr_Print();
+		return true;
+	}
+
+	if( true != PyBool_Check( pResult))
+	{
+		AFERROR("Service::checkExitStatus: Return object type is not a boolean.")
+		return true;
+	}
+
+	bool result = PyObject_IsTrue( pResult);
+
+	Py_DECREF( pResult);
+
+	//printf("Service::checkExitStatus: %d %d\n", i_status, result);
+	return result;
+}
+
 const std::vector<std::string> Service::doPost()
 {
 	AFINFA("Service::doPost()")

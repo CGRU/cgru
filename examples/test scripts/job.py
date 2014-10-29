@@ -42,6 +42,7 @@ parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    de
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
+parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
 parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
 parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
 parser.add_option(      '--sub',          dest='subdep',       action='store_true', default=False, help='sub task dependence')
@@ -152,6 +153,7 @@ for b in range(numblocks):
 		cmd = 'task.py'
 		cmd = os.path.join(os.getcwd(), cmd)
 		cmd = 'python "%s"' % cmd
+		cmd += ' --exitstatus %d ' % options.exitstatus
 		cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
 			   '-i %(increment)d -t %(timesec)g -r %(randtime)g ' \
 			   '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()

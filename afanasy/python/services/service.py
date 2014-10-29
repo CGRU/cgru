@@ -22,8 +22,9 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 	:param taskInfo:
 	"""
 
-	def __init__(self, taskInfo):
+	def __init__(self, taskInfo, i_verbose):
 		self.taskInfo = taskInfo
+		self.verbose = i_verbose
 
 		self.pm = cgrupathmap.PathMap()
 
@@ -69,6 +70,10 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 				self.parser = None
 				print('ERROR: Failed to import parser "%s"' % parser)
 				traceback.print_exc(file=sys.stdout)
+
+		if self.verbose:
+			print(taskInfo)
+
 
 	def getWDir(self):
 		"""Missing DocString
@@ -151,6 +156,23 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 		if self.parser is None:
 			return None
 		return self.parser.parse(data, mode)
+
+	def checkExitStatus(self, i_status):
+		""" This function needed to check task process exit status.
+			By default zero is success, any other means some error.
+			But some services can have some other good exit status value(s).
+		"""
+		status = False
+		if i_status == 0:
+			status = True
+
+		if self.verbose:
+			msg = 'ERROR'
+			if status:
+				msg = 'SUCCESS'
+			print('service::checkExitStatus: %d %s' % (i_status, msg))
+
+		return status
 
 	def doPost(self):
 		"""Missing DocString
