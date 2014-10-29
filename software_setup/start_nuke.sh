@@ -2,4 +2,4 @@
 
 source `dirname $0`/start__all.sh
 
-nuke "$@"
+nuke --nukex "$@"
