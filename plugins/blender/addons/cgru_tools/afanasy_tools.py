@@ -8,7 +8,7 @@ import re
 import bpy
 
 
-#bpy.errors = []
+# bpy.errors = []
 
 LAYER_TEXT_BLOCK = '''#
 # layer '{0}'
@@ -20,7 +20,8 @@ layers = bpy.context.scene.render.layers
 for layer in layers:
 	layer.use = False
 layers['{0}'].use = True
-bpy.context.scene.render.filepath = bpy.context.scene.render.filepath + '_' + "{0}" + '_'
+bpy.context.scene.render.filepath = bpy.context.scene.render.filepath \
+	+ '_' + "{0}" + '_'
 '''
 
 CMD_TEMPLATE = "blender -b {blend_scene} -y -E {render_engine} " \
@@ -81,7 +82,6 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		col.prop(ore, 'hostsmaskexclude')
 
 
-
 class ORE_Submit(bpy.types.Operator):
 	"""Submit job to Afanasy Renderfarm."""
 
@@ -97,7 +97,7 @@ class ORE_Submit(bpy.types.Operator):
 		engine_string = sce.render.engine
 
 		# Check and add CGRU module in system path:
-		if not 'CGRU_LOCATION' in os.environ:
+		if 'CGRU_LOCATION' not in os.environ:
 			os.environ['CGRU_LOCATION'] = addon_prefs.cgru_location
 
 		cgrupython = os.getenv('CGRU_PYTHON')
@@ -130,12 +130,13 @@ class ORE_Submit(bpy.types.Operator):
 			af = __import__('af', globals(), locals(), [])
 		except ImportError as err:
 			print('Unable to import Afanasy Python module: ' % err)
-
-			self.report({'ERROR'}, 'An error occurred while sending submission to Afanasy')
+			self.report(
+				{'ERROR'},
+				'An error occurred while sending submission to Afanasy'
+			)
 			return {'CANCELLED'}
 
 		imp.reload(af)
-
 
 		# Calculate temporary scene path:
 		scenefile = bpy.data.filepath
@@ -203,35 +204,42 @@ class ORE_Submit(bpy.types.Operator):
 			elif engine_string == 'CYCLES':
 				block.setParser('blender_cycles')
 
+			working_directory = os.path.dirname(renderscenefile)
+
 			if ore.filepath != '':
 				pos = ore.filepath.find('#')
 				if pos != -1:
-					images = "{0}{1}{2}".format(ore.filepath[:pos],\
+					images = "{0}{1}_{2}".format(ore.filepath[:pos],
 							renderlayer_name, ore.filepath[pos:])
 				else:
 					images = "{0}{1}".format(ore.filepath, renderlayer_name)
 
 				output_images = re.sub(r'(#+)', r'@\1@', images)
 				if output_images.startswith('//'):
-					working_directory = bpy.path.abspath('//')
-					output_images = os.path.join(working_directory,\
+					output_images = os.path.join(working_directory,
 							output_images.replace('//', ''))
+					working_directory = os.path.dirname(output_images)
+
 				if rd.file_extension not in output_images:
 					block.setFiles([output_images + rd.file_extension])
 				else:
 					block.setFiles([output_images])
+			else:
+				if rd.filepath != '':
+					if not rd.filepath.startswith('//'):
+						working_directory = os.path.dirname(rd.filepath)
 
-			cmd = CMD_TEMPLATE.format(\
-					blend_scene=renderscenefile,\
+			cmd = CMD_TEMPLATE.format(
+					blend_scene=renderscenefile,
 					render_engine=engine_string,
-					python_options=' --python-text "layer_%s"' % renderlayer_name \
+					python_options=' --python-text "layer_%s"' % renderlayer_name
 							if ore.splitRenderLayers and len(layers) > 1 else '',
 					output_options=' -o "%s" ' % images if images else '',
 					frame_inc=finc)
 
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
-			block.setWorkingDirectory(os.path.dirname(renderscenefile))
+			block.setWorkingDirectory(working_directory)
 			job.blocks.append(block)
 
 		# Set job running parameters:
