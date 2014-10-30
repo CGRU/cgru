@@ -60,7 +60,7 @@ def isSameShot(i_shot, i_name):
 	for s in SameShotSeparators:
 		if i_name.find(i_shot + s) == 0:
 			return True
-	for ex in ['.dpx','.tif','.tif8','.tif16','.png','.jpg']:
+	for ex in ['.dpx','.tif16','.tif8','.tif','.png','.jpg']:
 		p = i_shot.rfind(ex)
 		if p > 0:
 			if i_shot[:p] == i_name:
@@ -145,7 +145,7 @@ for shot in Sources:
 				# print('"%s"->"%s"' % (shot, shot_name))
 
 	# Shot name:
-	for ex in ['.mov','.dpx','.tif','.tif8','.tif16','.png','.jpg']:
+	for ex in ['.mov','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
 		shot_name = shot_name.replace(ex,'')
 		shot_name = shot_name.replace(ex.upper(),'')
 
