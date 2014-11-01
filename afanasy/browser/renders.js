@@ -200,7 +200,7 @@ RenderNode.prototype.update = function( i_obj)
 				this.plottersCs[i].setScale( r.custom[i].value_max);
 				this.plottersCs[i].setColor( r.custom[i].graph_clr);
 				this.plottersCs[i].addValues([r.custom[i].value]);
-				this.plottersCs[i].setLabel( r.custom[i].label, r.custom[i].label_clr);
+				this.plottersCs[i].setLabel( r.custom[i].label, r.custom[i].label_clr, r.custom[i].label_size);
 				this.plottersCs[i].setBGColor( r.custom[i].back_clr);
 				this.plottersCs[i].setTitle( r.custom[i].tooltip);
 			}
