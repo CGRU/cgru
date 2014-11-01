@@ -111,21 +111,38 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
     FILE * memfd = ::fopen( "/proc/meminfo", "r" );
     if( memfd )
     {
-        char buffer[200];
+        char buffer[1024];
         buffer[sizeof(buffer)-1] = '\0';
         unsigned long long llu;
-        char records[6][12] = {"MemTotal:","MemFree:","Buffers:","Cached:","SwapTotal:","SwapFree:"};
-        int32_t * pointers[6] = {&hres.mem_total_mb, &hres.mem_free_mb, &hres.mem_buffers_mb, &hres.mem_cached_mb, &hres.swap_total_mb, &hres.swap_used_mb};
-        int i = 0;
+		static const int params_len = 6;
+        char records[params_len][12] = {"MemTotal:","MemFree:","Buffers:","Cached:","SwapTotal:","SwapFree:"};
+        int params_founded[params_len] = {0,0,0,0,0,0};
+        int32_t * pointers[params_len] = {&hres.mem_total_mb, &hres.mem_free_mb, &hres.mem_buffers_mb, &hres.mem_cached_mb, &hres.swap_total_mb, &hres.swap_used_mb};
+        int params_founded_count = 0;
         while( fgets( buffer, sizeof(buffer)-1, memfd) )
         {
-            int record_len = strlen(records[i]);
-            if( strncmp( buffer, records[i], record_len) != 0 ) continue;
-            static const char scan_fmt[] = "%llu";
-            if( sscanf( buffer + record_len, scan_fmt, &llu) == 1 )
-                *(pointers[i]) = llu >> 10;
-            //printf("records[%d][%d] = '%s' %d\n", i, record_len, records[i], *(pointers[i]));
-            if( ++i == 6 ) break;
+			for( int p = 0; p < params_len; p++)
+			{
+				if( params_founded[p] ) continue;
+				//printf("Searching for %s:\n", records[p]);
+
+				int record_len = strlen(records[p]);
+				if( strncmp( buffer, records[p], record_len) != 0 ) continue;
+
+				static const char scan_fmt[] = "%llu";
+				if( sscanf( buffer + record_len, scan_fmt, &llu) == 1 )
+					*(pointers[p]) = llu >> 10;
+
+				//printf("Founded %s = %d\n", records[p], *(pointers[p]));
+				params_founded[p] = 1;
+				params_founded_count++;
+				
+				break;
+			}
+
+			// We founeded all needed parameters:
+			if( params_founded_count >= params_len )
+				break;
         }
         ::fclose( memfd );
         hres.mem_free_mb = hres.mem_free_mb + hres.mem_buffers_mb + hres.mem_cached_mb;
