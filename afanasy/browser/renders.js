@@ -116,7 +116,7 @@ RenderNode.prototype.update = function( i_obj)
 
 			this.plotterC.setTitle('CPU: '+r.cpu_mhz+' MHz x'+r.cpu_num);
 
-			this.plotterM.setTitle('Memory: '+r.mem_total_mb+' Mb');
+			this.plotterM.setTitle('Memory:\nTotal: '+r.mem_total_mb+' Mb');
 			this.plotterM.setScale( r.mem_total_mb, 85 * r.mem_total_mb / 100, r.mem_total_mb);
 
 			if( r.swap_total_mb > 0 )
@@ -154,7 +154,7 @@ RenderNode.prototype.update = function( i_obj)
 
 		var mem = r.mem_total_mb - r.mem_free_mb;
 		var buf = r.mem_cached_mb + r.mem_buffers_mb;
-		this.plotterM.appendTitle('\n-buffered: '+buf+'\nUsed: '+mem+' Mb');
+		this.plotterM.appendTitle('\nUsed: '+mem+'Mb\nCached: '+buf+' Mb\nFree: '+r.mem_free_mb+'Mb');
 		this.plotterM.addValues([ mem, buf]);
 
 		this.plotterS.addValues([ r.swap_used_mb]);
