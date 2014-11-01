@@ -1,59 +1,29 @@
-Plotter_W = 54;
 Plotter_H = 25;
-Plotter_MW = 8;
-Plotter_MH = 2;
 
-Plotter_Lines = 100;
 Plotter_MainW = 10;
 Plotter_TailClrFade = 1;//.9;
 Plotter_TailLineWidth = .8;
 Plotter_AutoScaleLines = 30;
 Plotter_AutoScaleMax = 1000000000;
 
-function Plotter( i_plottersArray, i_pElement, i_label, i_title)
+function Plotter( i_pElement, i_label, i_title)
 {
 	this.label = i_label;
 	this.title = i_title;
 
 	this.elParent = i_pElement;
-//	this.element = document.createElement('span');
 	this.element = document.createElement('div');
 	this.element.title = this.title;
 	this.elParent.appendChild( this.element);
 	this.element.classList.add('plotter');
-	this.element.style.top = Plotter_MH + 'px';
-	this.element.style.width = Plotter_W + 'px';
-	this.element.style.height = Plotter_H + 'px';
-
-	var dx = Plotter_W + Plotter_MW;
-	this.element.style.left = (-3*dx + i_plottersArray.length * dx) + 'px';
 
 	this.canvas = document.createElement('canvas');
-	this.canvas.width = Plotter_W;
-	this.canvas.height = Plotter_H;
-	this.canvas.style.width = Plotter_W + 'px';
-	this.canvas.style.height = Plotter_H + 'px';
 	this.element.appendChild( this.canvas);
 
-/*	if( this.canvas.getContext)
-	{
-		var ctx = this.canvas.getContext('2d');
-		ctx.fillStyle = 'rgb(200,80,0)';
-		ctx.fillRect( 0, 0, Plotter_W/2, Plotter_H/2);
-		ctx.fillStyle = 'rgb(0,0,200)';
-		ctx.fillRect( Plotter_W/2, Plotter_H/2, Plotter_W/2, Plotter_H/2);
-	}
-*/
 	this.elLabel = document.createElement('div');
 	this.element.appendChild( this.elLabel);
 	this.elLabel.classList.add('label');
 	this.elLabel.textContent = this.label;
-
-//	this.element.style.width = '50px';
-//	this.element.style.height = '50px';
-//	this.element.style.left = '50px';
-
-	i_plottersArray.push( this);
 
 	this.pos = -1;
 	this.values = [];
@@ -64,25 +34,43 @@ function Plotter( i_plottersArray, i_pElement, i_label, i_title)
 	this.cycle = 0;
 	this.storeCycles = 1;
 	this.clrBG = [0,0,0];
+
+	this.setHeight( Plotter_H);
 }
 
+Plotter.prototype.setWidth = function( i_width)
+{
+	this.width = i_width;
+	this.element.style.width = this.width + 'px';
+	this.canvas.width = this.width;
+	this.canvas.style.width = this.width + 'px';
+}
+Plotter.prototype.setHeight = function( i_height)
+{
+	this.height = i_height;
+	this.element.style.height = this.height + 'px';
+	this.canvas.height = this.height;
+	this.canvas.style.height = this.height + 'px';
+}
+Plotter.prototype.setLabel = function( i_label, i_clr)
+{
+	if( i_label )
+		this.elLabel.innerHTML = i_label.replace(/\n/g,'<br>');
+	if( i_clr )
+		this.elLabel.color = 'rgb(' + i_clr[0] + ',' + i_clr[1] + ',' + i_clr[2] + ')';
+}
+Plotter.prototype.setBGColor = function( i_clr)
+{
+	this.clrBG = i_clr;
+}
 Plotter.prototype.setTitle = function( i_title)
 {
 	this.title = i_title;
 	this.element.title = this.title;
 }
-
 Plotter.prototype.appendTitle = function( i_append)
 {
 	this.element.title = this.title + i_append;
-}
-
-Plotter.prototype.setHidden = function( i_hide)
-{
-	if( i_hide )
-		this.element.style.display = 'none';
-	else
-		this.element.style.display = 'block';
 }
 
 Plotter.prototype.addGraph = function( i_storeCycles)
@@ -106,6 +94,7 @@ Plotter.prototype.setScale = function( i_scale, i_hot_min, i_hot_max)
 	this.scale = i_scale;
 	this.hot_min = i_hot_min;
 	this.hot_max = i_hot_max;
+//if( this.element.classList.contains('custom')) console.log('Plotter.prototype.setScale:' + this.scale);
 }
 
 Plotter.prototype.setAutoScale = function( i_label_value, i_maxBGC)
@@ -119,7 +108,12 @@ Plotter.prototype.setAutoScale = function( i_label_value, i_maxBGC)
 Plotter.prototype.addValues = function( i_vals, i_hot)
 {
 	if( i_vals.length != this.values.length )
+	{
+		console.log('Graph count != values count');
 		return;
+	}
+
+//if( this.element.classList.contains('custom')) console.log( i_vals);
 
 	if( this.storeCycles > 1 )
 	{
@@ -131,7 +125,7 @@ Plotter.prototype.addValues = function( i_vals, i_hot)
 	else
 		this.pos++;
 
-	if( this.pos == Plotter_Lines )
+	if( this.pos == this.width )
 		this.pos = 0;
 
 	var clrs = [];
@@ -177,6 +171,7 @@ Plotter.prototype.addValues = function( i_vals, i_hot)
 		return;
 
 	var scale = this.scale;
+//if( this.element.classList.contains('custom')) console.log( scale);
 	if( scale <= 0 )
 	{
 		var max_value = 0;
@@ -226,18 +221,18 @@ Plotter.prototype.addValues = function( i_vals, i_hot)
 
 	var ctx = this.canvas.getContext('2d');
 	ctx.fillStyle = 'rgb('+this.clrBG[0]+','+this.clrBG[1]+','+this.clrBG[2]+')';
-	ctx.fillRect( 0, 0, Plotter_W, Plotter_H);
+	ctx.fillRect( 0, 0, this.width, this.height);
 
 //g_Info( i_vals[0] + ' l'+this.values[1].length + ' s'+this.scale + ' c'+(cycle++));
 
-	var x = Plotter_W - Plotter_MainW;
-	var h0 = Plotter_H;
+	var x = this.width - Plotter_MainW;
+	var h0 = this.height;
 	for( var v = 0; v < this.values.length; v++)
 	{
 		ctx.fillStyle = 'rgb('+clrs[v][0]+','+clrs[v][1]+','+clrs[v][2]+')';
-		var h = Plotter_H * this.values[v][this.pos] / scale;
+		var h = this.height * this.values[v][this.pos] / scale;
 		h0 -= h;
-		ctx.fillRect( x, h0, Plotter_W, h);
+		ctx.fillRect( x, h0, this.width, h);
 	}
 
 	if( this.values[0].length == 1 )
@@ -250,16 +245,18 @@ Plotter.prototype.addValues = function( i_vals, i_hot)
 	{
 		if( p == -1 )
 			p = this.values[0].length - 1;
-		h0 = Plotter_H;
+		h0 = this.height;
 		for( var v = 0; v < this.values.length; v++)
 		{
 
 			ctx.strokeStyle = 'rgb('+this.colors[v][p][0]+','+this.colors[v][p][1]+','+this.colors[v][p][2]+')';
-			var h = h0 - (Plotter_H * this.values[v][p] / scale);
+//if( this.element.classList.contains('custom')) console.log( this.height + ' ' + this.values[v][p] + ' ' + scale);
+			var h = h0 - (this.height * this.values[v][p] / scale);
 			ctx.beginPath();
 			ctx.moveTo( x, h0);
 			ctx.lineTo( x, h);
 			ctx.stroke();
+//if( this.element.classList.contains('custom')) console.log(ctx.strokeStyle + ' ' + x + ' ' + h0 + ' ' + h);
 			h0 = h;
 		}
 		p--;
@@ -268,6 +265,7 @@ Plotter.prototype.addValues = function( i_vals, i_hot)
 			break;
 	}
 
+//if( this.element.classList.contains('custom')) console.log( this.values[0].length);
 //	ctx.save();
 }
 

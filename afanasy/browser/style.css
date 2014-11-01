@@ -243,6 +243,13 @@ font-weight: normal;
 position: absolute;
 top: 2px; left: 2px;
 }
+.item.render .plotter.custom {
+position: relative;
+float: left;
+}
+.item.render .plotters_custom_div {
+width: 100%;
+}
 .item.render .power {
 position: absolute;
 text-align: center;

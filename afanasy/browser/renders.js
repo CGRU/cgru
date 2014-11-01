@@ -29,6 +29,7 @@ RenderNode.prototype.init = function()
 	this.elResources = document.createElement('div');
 	this.element.appendChild( this.elResources);
 	this.elResources.className = 'resources';
+	this.elResources.style.display = 'none';
 
 	this.elNewLine = document.createElement('br');
 	this.element.appendChild( this.elNewLine);
@@ -44,12 +45,12 @@ RenderNode.prototype.init = function()
 	this.elAnnotation.style.textAlign = 'center';
 
 	this.plotters = [];
-	this.plotterC = new Plotter( this.plotters, this.elResources, 'C', 'CPU');
-	this.plotterM = new Plotter( this.plotters, this.elResources, 'M', 'Memory');
-	this.plotterS = new Plotter( this.plotters, this.elResources, 'S', 'Swap');
-	this.plotterH = new Plotter( this.plotters, this.elResources, 'H', 'HDD Space');
-	this.plotterN = new Plotter( this.plotters, this.elResources, 'N', 'Network I/O');
-	this.plotterD = new Plotter( this.plotters, this.elResources, 'D', 'Disk I/O');
+	this.plotterC = new Plotter( this.elResources, 'C', 'CPU');         this.plotters.push( this.plotterC);
+	this.plotterM = new Plotter( this.elResources, 'M', 'Memory');      this.plotters.push( this.plotterM);
+	this.plotterS = new Plotter( this.elResources, 'S', 'Swap');        this.plotters.push( this.plotterS);
+	this.plotterH = new Plotter( this.elResources, 'H', 'HDD Space');   this.plotters.push( this.plotterH);
+	this.plotterN = new Plotter( this.elResources, 'N', 'Network I/O'); this.plotters.push( this.plotterN);
+	this.plotterD = new Plotter( this.elResources, 'D', 'Disk I/O');    this.plotters.push( this.plotterD);
 
 	this.plotterC.addGraph();
 	this.plotterC.setColor([200,   0,  0]);
@@ -81,6 +82,8 @@ RenderNode.prototype.init = function()
 	this.plotterD.setScale(-1, 10000, 100000);
 	this.plotterD.setAutoScale( 1000, 100000);
 
+	this.plottersCs = [];
+
 	this.elPower = document.createElement('div');
 	this.elPower.classList.add('power');
 	this.element.appendChild( this.elPower);
@@ -109,6 +112,8 @@ RenderNode.prototype.update = function( i_obj)
 			// or resources reciedved fisrt time,
 			// we need to set plotter scales:
 
+			this.elResources.style.display = 'block';
+
 			this.plotterC.setTitle('CPU: '+r.cpu_mhz+' MHz x'+r.cpu_num);
 
 			this.plotterM.setTitle('Memory: '+r.mem_total_mb+' Mb');
@@ -129,6 +134,16 @@ RenderNode.prototype.update = function( i_obj)
 			this.plotterH.setTitle('HDD Space: '+r.hdd_total_gb+' Gb');
 			this.plotterH.setScale( r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
 		}
+
+		var pl_w = Math.round( this.element.clientWidth / 11 - 4);
+		for( var i = 0; i < this.plotters.length; i++)
+		{
+			this.plotters[i].setWidth( pl_w);
+			var dx = this.plotters[i].width + 8;
+			this.plotters[i].element.style.left = (-3*dx + i * dx) + 'px';
+			this.plotters[i].element.style.top = '2px';
+		}
+
 
 		this.host_resources = r;
 
@@ -160,6 +175,41 @@ RenderNode.prototype.update = function( i_obj)
 		this.params.tasks_percents = i_obj.tasks_percents;
 		this.updateTasksPercents();
 
+		if( r.custom )
+		{
+			if( this.plottersCs.length != r.custom.length )
+			{
+				this.plottersCsDelete();
+				this.elPlottersCs = document.createElement('div');
+				this.elPlottersCs.classList.add('plotters_custom_div');
+				this.element.appendChild( this.elPlottersCs);
+				for( var i = 0; i < r.custom.length; i++)
+				{	
+					var plotter = new Plotter( this.elPlottersCs, 'Cs', 'custom');
+					this.plottersCs.push( plotter);
+					plotter.element.classList.add('custom');
+					plotter.addGraph();
+					plotter.setColor([50, 200, 20], [ 255, 0, 0]);
+				}
+			}
+
+			for( var i = 0; i < r.custom.length; i++)
+			{
+				this.plottersCs[i].setWidth( Math.round( this.elPlottersCs.clientWidth / r.custom.length ) - 6);
+				this.plottersCs[i].setHeight( r.custom[i].height);
+				this.plottersCs[i].setScale( r.custom[i].value_max);
+				this.plottersCs[i].setColor( r.custom[i].graph_clr);
+				this.plottersCs[i].addValues([r.custom[i].value]);
+				this.plottersCs[i].setLabel( r.custom[i].label, r.custom[i].label_clr);
+				this.plottersCs[i].setBGColor( r.custom[i].back_clr);
+				this.plottersCs[i].setTitle( r.custom[i].tooltip);
+			}
+		}
+		else if(( r.custom == null ) && ( this.plottersCs.length ))
+		{
+			this.plottersCsDelete();
+		}
+
 		return;
 	}
 
@@ -187,9 +237,6 @@ RenderNode.prototype.update = function( i_obj)
 	else
 		this.elAnnotation.textContent = '';
 
-	for( var i = 0; i < this.plotters.length; i++)
-		this.plotters[i].setHidden( this.state.OFF)
-
 	if( this.state.WWK ) this.offlineState = 'Waking Up';
 	else if( this.state.WSL || this.state.WFL) this.offlineState = 'Sleeping';
 	else this.offlineState = 'Offline';
@@ -199,6 +246,9 @@ RenderNode.prototype.update = function( i_obj)
 	{
 		this.elStar.style.display = 'none';
 		this.clearTasks();
+this.plottersCsDelete();
+this.elResources.style.display = 'none';
+this.host_resources = null;
 		this.elCapacity.textContent = '';
 		this.elMaxTasks.textContent = '';
 		this.state.textContent = '';
@@ -237,6 +287,21 @@ RenderNode.prototype.update = function( i_obj)
 
 	this.updateTasksPercents();
 	this.refresh();
+}
+
+RenderNode.prototype.plottersCsDelete = function()
+{
+	if( this.plottersCs.length == 0 )
+		return;
+
+	for( var i = 0; i < this.plottersCs.length; i++ )
+	{
+		this.elPlottersCs.removeChild( this.plottersCs[i].element );
+		delete this.plottersCs[i];
+	}
+
+	this.element.removeChild( this.elPlottersCs);
+	this.plottersCs = [];
 }
 
 RenderNode.prototype.clearTasks = function()

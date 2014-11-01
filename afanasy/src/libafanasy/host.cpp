@@ -218,6 +218,24 @@ void HostResMeter::v_readwrite( Msg * msg)
     rw_String(  tooltip,    msg);
 }
 
+void HostResMeter::jsonWrite( std::ostringstream & o_str) const
+{
+	o_str << "{";
+
+	o_str << "\n\"value\":"       << value;
+	o_str << ",\n\"value_max\":"  << valuemax;
+	o_str << ",\n\"width\":"      << int(width);
+	o_str << ",\n\"height\":"     << int(height);
+	o_str << ",\n\"label_size\":" << int(labelsize);
+	o_str << ",\n\"label\":\""    << af::strEscape(label) << "\"";
+	o_str << ",\n\"tooltip\":\""  << af::strEscape(tooltip) << "\"";
+	o_str << ",\n\"graph_clr\":[" << int(graphr)   << "," << int(graphg)   << "," << int(graphb)   << "]";
+	o_str << ",\n\"label_clr\":[" << int(labelr)   << "," << int(labelg)   << "," << int(labelb)   << "]";
+	o_str << ",\n\"back_clr\":["  << int(bgcolorr) << "," << int(bgcolorb) << "," << int(bgcolorb) << "]";
+
+	o_str << "\n}";
+}
+
 void HostResMeter::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
     stream << label   << ": ";
@@ -344,6 +362,20 @@ void HostRes::jsonWrite( std::ostringstream & o_str) const
 	o_str << ",\n\"hdd_busy\":"       << int(hdd_busy);
 	o_str << ",\n\"net_recv_kbsec\":" << net_recv_kbsec;
 	o_str << ",\n\"net_send_kbsec\":" << net_send_kbsec;
+
+	if( custom.size())
+	{
+		o_str << ",\n\"custom\":[";
+
+		for( int i = 0; i < custom.size(); i++)
+		{
+			if( i ) o_str << ",";
+			o_str << "\n";
+			custom[i]->jsonWrite( o_str);
+		}
+
+		o_str << "\n]";
+	}
 
 	o_str << "\n}";
 }

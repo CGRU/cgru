@@ -83,6 +83,8 @@ public:
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 	void v_readwrite( Msg * msg); ///< Read or write Host Resources in message.
+
+	void jsonWrite( std::ostringstream & o_str) const;
 };
 
 class HostRes : public Af
