@@ -50,4 +50,4 @@ class example(resbase.resbase):
 		self.bgcolorr = 10
 		self.bgcolorg = 20
 		self.bgcolorb = 2 * self.value
-		self.tooltip = 'Custom resources meter example.'
+		self.tooltip = 'Custom resources meter example.\nPython class calculates some value(s).\nAnd returns value, maximum (scale), height (prferred for GUI), label (text, color, size), back color and a tooltip (are reading right now).'
