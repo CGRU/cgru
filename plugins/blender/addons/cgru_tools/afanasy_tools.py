@@ -182,7 +182,8 @@ class ORE_Submit(bpy.types.Operator):
 
 		if ore.splitRenderLayers and len(layers) > 1:
 			for layer in layers:
-				renderlayer_names.append(layer.name)
+				if layer.use:
+					renderlayer_names.append(layer.name)
 		else:
 			renderlayer_names.append('')
 
