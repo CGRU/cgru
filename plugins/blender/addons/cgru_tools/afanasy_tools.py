@@ -1,44 +1,32 @@
 # -*- coding: utf-8 -*-
 import imp
-import shutil
 import time
 import os
 import sys
+import re
 
 import bpy
 
-from bpy.props import (PointerProperty, StringProperty, BoolProperty,
-					   EnumProperty, IntProperty, CollectionProperty)
-from bpy.types import Operator, AddonPreferences
 
-bpy.errors = []
+# bpy.errors = []
 
-class OREAddonPreferences(AddonPreferences):
-	# this must match the addon name, use '__name__'
-	# when defining this in a submodule of a python package.
-	bl_idname = __name__
+LAYER_TEXT_BLOCK = '''#
+# layer '{0}'
+#
+import bpy
+bpy.context.scene.render.use_sequencer = False
+bpy.context.scene.render.use_compositing = False
+layers = bpy.context.scene.render.layers
+for layer in layers:
+	layer.use = False
+layers['{0}'].use = True
+bpy.context.scene.render.filepath = bpy.context.scene.render.filepath \
+	+ '_' + "{0}" + '_'
+'''
 
-	def draw(self, context):
-		layout = self.layout
-		row = layout.row()
-		row.label(text="Please, set Exchanges Folder and save Preferences")
-		row = layout.row()
-
-
-## This method creates a string with a list of engines in all scenes
-def getSceneEngine():
-	#str = ''
-	#strEngines = []
-	#for scene in bpy.data.scenes:
-		#if scene.render.engine not in strEngines:
-			#if str != '':
-				#str += ','
-			#str += scene.render.engine
-			#strEngines.append(scene.render.engine)
-
-	#strEngines = None
-
-	return bpy.context.scene.render.engine
+CMD_TEMPLATE = "blender -b {blend_scene} -y -E {render_engine} " \
+		"{python_options}" "{output_options} -s @#@ " \
+		"-e @#@ -j {frame_inc} -a"
 
 
 class RENDER_PT_Afanasy(bpy.types.Panel):
@@ -54,36 +42,48 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		sce = context.scene
 		ore = sce.ore_render
 
-		#row = layout.row()
-
-		layout.label(text="Engine: " + getSceneEngine())
-		layout.operator('ore.submit')
-		layout.separator()
-
-		layout.prop(ore, 'jobname')
-		layout.prop(ore, 'filepath')
+		layout.label(text="Engine: %s" % sce.render.engine)
+		row = layout.row()
+		row.scale_y = 1.5
+		row.operator('ore.submit', icon='RENDER_STILL')
 
 		layout.separator()
-		layout.prop(ore, 'pause')
+		col = layout.column()
+		col.prop(ore, 'jobname')
+		col.prop(ore, 'filepath')
 
 		layout.separator()
-		layout.prop(ore, 'packLinkedObjects')
-		layout.prop(ore, 'relativePaths')
-		layout.prop(ore, 'packTextures')
+		split = layout.split()
+		col = split.column()
+		col.prop(ore, 'pause')
+		col.prop(ore, 'splitRenderLayers')
+		col = split.column()
+		col.prop(ore, 'packLinkedObjects')
+		col.prop(ore, 'relativePaths')
+		col.prop(ore, 'packTextures')
 
 		layout.separator()
-		layout.prop(ore, 'fpertask')
-		layout.prop(ore, 'priority')
-		layout.prop(ore, 'maxruntasks')
-		layout.prop(ore, 'dependmask')
-		layout.prop(ore, 'dependmaskglobal')
-		layout.prop(ore, 'hostsmask')
-		layout.prop(ore, 'hostsmaskexclude')
+		col = layout.column(align=True)
+		row = col.row(align=True)
+		row.scale_y = 1.4
+		row.prop(sce, "frame_start")
+		row.prop(sce, "frame_end")
+		row.prop(ore, 'fpertask')
+		row = col.row(align=True)
+		row.scale_y = 1.2
+		row.prop(ore, 'priority')
+		row.prop(ore, 'maxruntasks')
+
+		layout.separator()
+		col = layout.column()
+		col.prop(ore, 'dependmask')
+		col.prop(ore, 'dependmaskglobal')
+		col.prop(ore, 'hostsmask')
+		col.prop(ore, 'hostsmaskexclude')
 
 
 class ORE_Submit(bpy.types.Operator):
-	"""Missing DocString
-	"""
+	"""Submit job to Afanasy Renderfarm."""
 
 	bl_idname = "ore.submit"
 	bl_label = "Submit Job"
@@ -91,14 +91,58 @@ class ORE_Submit(bpy.types.Operator):
 	def execute(self, context):
 		sce = context.scene
 		ore = sce.ore_render
-		#rd = context.scene.render
+		addon_prefs = context.user_preferences.addons['cgru_tools'].preferences
+		rd = context.scene.render
 		images = None
-		engineString = getSceneEngine()
+		engine_string = sce.render.engine
+
+		# Check and add CGRU module in system path:
+		if 'CGRU_LOCATION' not in os.environ:
+			os.environ['CGRU_LOCATION'] = addon_prefs.cgru_location
+
+		cgrupython = os.getenv('CGRU_PYTHON')
+		if cgrupython is None or cgrupython == '':
+			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+				if sys.platform.find('win'):
+					cgrupython = r'C:\cgru\lib\python'
+				else:
+					cgrupython = r'/opt/cgru/lib/python'
+			else:
+				cgrupython = os.path.join(addon_prefs.cgru_location, 'lib', 'python')
+		if cgrupython not in sys.path:
+			sys.path.append(cgrupython)
+
+		# Check and add Afanasy module in system path:
+		afpython = os.getenv('AF_PYTHON')
+		if afpython is None or afpython == '':
+			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+				if sys.platform.find('win'):
+					afpython = r'C:\cgru\afanasy\python'
+				else:
+					afpython = r'/opt/cgru/afanasy/python'
+			else:
+				afpython = os.path.join(addon_prefs.cgru_location, 'afanasy', 'python')
+		if afpython not in sys.path:
+			sys.path.append(afpython)
+
+		# Import Afanasy module:
+		try:
+			af = __import__('af', globals(), locals(), [])
+		except ImportError as err:
+			print('Unable to import Afanasy Python module: ' % err)
+			self.report(
+				{'ERROR'},
+				'An error occurred while sending submission to Afanasy'
+			)
+			return {'CANCELLED'}
+
+		imp.reload(af)
 
 		# Calculate temporary scene path:
 		scenefile = bpy.data.filepath
-		renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(
-			time.time() - int(time.time()))[2:5] + '.blend'
+		if scenefile.endswith('.blend'):
+			scenefile = scenefile[:-6]
+		renderscenefile = "%s.%s.blend" % (scenefile, time.strftime('%Y%m%d%H%M%S'))
 
 		# Make all Local and pack all textures and objects
 		if ore.packLinkedObjects:
@@ -108,92 +152,97 @@ class ORE_Submit(bpy.types.Operator):
 		if ore.packTextures:
 			bpy.ops.file.pack_all()
 
-
-		# Save Temporary file
-		bpy.ops.wm.save_mainfile(filepath=renderscenefile)
-
 		# Get job name:
 		jobname = ore.jobname
 		# If job name is empty use scene file name:
 		if jobname is None or jobname == '':
 			jobname = os.path.basename(renderscenefile)
 			# Try to cut standart '.blend' extension:
-			if len(jobname) > 6:
-				if jobname[-6:] == '.blend':
-					jobname = jobname[:-6]
+			if jobname.endswith('.blend'):
+				jobname = jobname[:-6]
 
 		# Get frames settings:
-		fstart = bpy.context.scene.frame_start
-		fend = bpy.context.scene.frame_end
-		finc = bpy.context.scene.frame_step
+		fstart = sce.frame_start
+		fend = sce.frame_end
+		finc = sce.frame_step
 		fpertask = ore.fpertask
+
 		# Check frames settings:
 		if fpertask < 1:
 			fpertask = 1
 		if fend < fstart:
 			fend = fstart
-		# Process images:
-		if ore.filepath != '':
-			images = ore.filepath
-
-		# Check and add CGRU module in system path:
-		cgrupython = os.getenv('CGRU_PYTHON')
-		if cgrupython is None or cgrupython == '':
-			cgrupython = '/opt/cgru/lib/python'
-		if cgrupython not in sys.path:
-			sys.path.append(cgrupython)
-
-		# Check and add Afanasy module in system path:
-		afpython = os.getenv('AF_PYTHON')
-		if afpython is None or afpython == '':
-			afpython = '/opt/cgru/afanasy/python'
-		if afpython not in sys.path:
-			sys.path.append(afpython)
-
-		# Import Afanasy module:
-		try:
-			af = __import__('af', globals(), locals(), [])
-		except:  # TODO: Too broad exception clause
-			error = str(sys.exc_info()[1])
-			print('Unable to import Afanasy Python module:\n' + error)
-
-			self.report(
-				set(['ERROR']),
-				'An error occurred while sending submission to Afanasy'
-			)
-			return set(['CANCELLED'])
-
-		imp.reload(af)  # TODO: imp.reload() does not exist in Python 3.x
 
 		# Create a job:
 		job = af.Job(jobname)
+
 		servicename = 'blender'
-		block = af.Block(engineString, servicename)
+		renderlayer_names = []
+		layers = bpy.context.scene.render.layers
 
-		if engineString == 'BLENDER_RENDER':
-			block.setParser('blender_render')
-		elif engineString == 'CYCLES':
-			block.setParser('blender_cycles')
+		if ore.splitRenderLayers and len(layers) > 1:
+			for layer in layers:
+				if layer.use:
+					renderlayer_names.append(layer.name)
+		else:
+			renderlayer_names.append('')
 
+		for renderlayer_name in renderlayer_names:
+			block = None
+			images = None
 
-		job.blocks.append(block)
-		# Set block command and frame range:
-		cmd = 'blender -b "%s"' % renderscenefile
-		cmd += ' -E "%s"' % engineString
-		if images is not None:
-			cmd += ' -o "%s"' % images
-		cmd += ' -s @#@ -e @#@ -j %d -a' % finc
-		block.setCommand(cmd)
-		#print(cmd)
-		block.setNumeric(fstart, fend, fpertask, finc)
-		if images is not None:
-			pos = images.find('#')
-			if pos > 0:
-				images = images[:pos] + '@' + images[pos:]
-			pos = images.rfind('#')
-			if pos > 0:
-				images = images[:pos + 1] + '@' + images[pos + 1:]
-			block.setFiles([images])
+			# Create block
+			if ore.splitRenderLayers and len(layers) > 1:
+				txt_block = bpy.data.texts.new("layer_%s" % renderlayer_name)
+				txt_block.write(LAYER_TEXT_BLOCK.format(renderlayer_name))
+				block = af.Block("layer_%s" % renderlayer_name, servicename)
+			else:
+				block = af.Block(engine_string, servicename)
+
+			# Check current render engine
+			if engine_string == 'BLENDER_RENDER':
+				block.setParser('blender_render')
+			elif engine_string == 'CYCLES':
+				block.setParser('blender_cycles')
+
+			working_directory = os.path.dirname(renderscenefile)
+
+			if ore.filepath != '':
+				pos = ore.filepath.find('#')
+				if pos != -1:
+					images = "{0}{1}_{2}".format(ore.filepath[:pos],
+							renderlayer_name, ore.filepath[pos:])
+				else:
+					images = "{0}{1}".format(ore.filepath, renderlayer_name)
+
+				output_images = re.sub(r'(#+)', r'@\1@', images)
+				if output_images.startswith('//'):
+					output_images = os.path.join(working_directory,
+							output_images.replace('//', ''))
+					working_directory = os.path.dirname(output_images)
+
+				if rd.file_extension not in output_images:
+					block.setFiles([output_images + rd.file_extension])
+				else:
+					block.setFiles([output_images])
+			else:
+				if rd.filepath != '':
+					if not rd.filepath.startswith('//'):
+						working_directory = os.path.dirname(rd.filepath)
+
+			cmd = CMD_TEMPLATE.format(
+					blend_scene=renderscenefile,
+					render_engine=engine_string,
+					python_options=' --python-text "layer_%s"' % renderlayer_name
+							if ore.splitRenderLayers and len(layers) > 1 else '',
+					output_options=' -o "%s" ' % images if images else '',
+					frame_inc=finc)
+
+			block.setCommand(cmd)
+			block.setNumeric(fstart, fend, fpertask, finc)
+			block.setWorkingDirectory(working_directory)
+			job.blocks.append(block)
+
 		# Set job running parameters:
 		if ore.maxruntasks > -1:
 			job.setMaxRunningTasks(ore.maxruntasks)
@@ -215,16 +264,19 @@ class ORE_Submit(bpy.types.Operator):
 		# Print job information:
 		job.output(True)
 
-		## Copy scene to render
-		#shutil.copy(scenefile, renderscenefile)
+		# Save Temporary file
+		bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)
+
+		# Clean up temp text blocks
+		if ore.splitRenderLayers and len(layers) > 1:
+			for text in bpy.data.texts:
+				if "layer_" in text:
+					bpy.data.texts.remove(text)
 
 		#  Send job to server:
 		job.send()
 
-		# open the file again
-		bpy.ops.wm.open_mainfile(filepath=scenefile)
-
-		return set(['FINISHED'])
+		return {'FINISHED'}
 
 
 def register():
