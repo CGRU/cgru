@@ -57,7 +57,7 @@ class UI(object):
 				pm.text(l='Host Mask')
 				pm.textField(
 					'cgru_afanasy__hosts_mask',
-					text='rn.*'
+					text='""'
 				)
 
 			with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
