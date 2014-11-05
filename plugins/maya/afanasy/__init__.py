@@ -53,6 +53,20 @@ class UI(object):
 					v=pm.optionVar.get('cgru_afanasy__by_frame_ov', 1)
 				)
 
+			with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+				pm.text(l='Host Mask')
+				pm.textField(
+					'cgru_afanasy__hosts_mask',
+					text='rn.*'
+				)
+
+			with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+				pm.text(l='Host Exclude')
+				pm.textField(
+					'cgru_afanasy__hosts_exclude',
+					text='""'
+				)
+
 			pm.checkBox('cgru_afanasy__paused', l='Start Paused', v=0)
 			pm.checkBox(
 				'cgru_afanasy__separate_layers',
@@ -86,6 +100,8 @@ class UI(object):
 		frames_per_task = \
 			pm.intField('cgru_afanasy__frames_per_task', q=1, v=1)
 		by_frame = pm.intField('cgru_afanasy__by_frame', q=1, v=1)
+		hosts_mask = pm.textField('cgru_afanasy__hosts_mask', q=1, text=True)
+		hosts_exclude = pm.textField('cgru_afanasy__hosts_exclude', q=1, text=True)
 		separate_layers = \
 			pm.checkBox('cgru_afanasy__separate_layers', q=1, v=1)
 		pause = pm.checkBox('cgru_afanasy__paused', q=1, v=1)
@@ -104,6 +120,8 @@ class UI(object):
 		pm.optionVar['cgru_afanasy__end_frame_ov'] = end_frame
 		pm.optionVar['cgru_afanasy__frames_per_task_ov'] = frames_per_task
 		pm.optionVar['cgru_afanasy__by_frame_ov'] = by_frame
+		pm.optionVar['cgru_afanasy__hosts_mask_ov'] = hosts_mask
+		pm.optionVar['cgru_afanasy__hosts_exclude_ov'] = hosts_exclude
 		pm.optionVar['cgru_afanasy__separate_layers'] = separate_layers
 
 		# get paths
@@ -138,6 +156,8 @@ class UI(object):
 			'%(start)s',
 			'%(end)s',
 			'-by %(by_frame)s',
+			'-hostsmask %(msk)s',
+			'-hostsexcl %(exc)s',
 			'-fpt %(fpt)s',
 			'-name "%(name)s"',
 			'-proj "%(proj)s"',
@@ -150,6 +170,8 @@ class UI(object):
 			'start': start_frame,
 			'end': end_frame,
 			'by_frame': by_frame,
+			'msk': hosts_mask,
+			'exc': hosts_exclude,
 			'fpt': frames_per_task,
 			'name': job_name,
 			'proj': project_path,
