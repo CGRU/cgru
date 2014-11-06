@@ -156,7 +156,7 @@ class ORE_Submit(bpy.types.Operator):
 		jobname = ore.jobname
 		# If job name is empty use scene file name:
 		if jobname is None or jobname == '':
-			jobname = os.path.basename(renderscenefile)
+			jobname = os.path.basename(scenefile)
 			# Try to cut standart '.blend' extension:
 			if jobname.endswith('.blend'):
 				jobname = jobname[:-6]
