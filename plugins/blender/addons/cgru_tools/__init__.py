@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 bl_info = {
 	"name": "CGRU Tools",
-	"author": "CGRU Team",
-	"version": (1,),
+	"author": "Timur Hairulin, Paul Geraskin, Sylvain Maziere",
+	"version": (1,0,0),
 	"blender": (2, 7, 1),
 	"location": "Properties > Render > Afanasy",
 	"description": "CGRU Tools",
