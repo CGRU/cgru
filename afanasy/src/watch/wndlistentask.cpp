@@ -28,8 +28,8 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    qTextEdit->moveCursor( QTextCursor::End, QTextCursor::KeepAnchor);
    QTextCursor cursor = qTextEdit->textCursor();
    QTextBlockFormat blockFormat;
-   blockFormat.setTopMargin(-5);
-   blockFormat.setBottomMargin(-5);
+//   blockFormat.setTopMargin(-5);
+//   blockFormat.setBottomMargin(-5);
    cursor.setBlockFormat( blockFormat);
    qTextEdit->setTextCursor( cursor);
    qTextEdit->setWordWrapMode( QTextOption::NoWrap);
