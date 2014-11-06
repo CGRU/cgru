@@ -210,8 +210,6 @@ class ORE_Submit(bpy.types.Operator):
 			elif engine_string == 'CYCLES':
 				block.setParser('blender_cycles')
 
-			working_directory = os.path.dirname(renderscenefile)
-
 			if ore.filepath != '':
 				pos = ore.filepath.find('#')
 				if pos != -1:
@@ -226,18 +224,13 @@ class ORE_Submit(bpy.types.Operator):
 
 				output_images = re.sub(r'(#+)', r'@\1@', images)
 				if output_images.startswith('//'):
-					output_images = os.path.join(working_directory,
+					output_images = os.path.join(os.path.dirname(renderscenefile),
 							output_images.replace('//', ''))
-					working_directory = os.path.dirname(output_images)
 
 				if rd.file_extension not in output_images:
 					block.setFiles([output_images + rd.file_extension])
 				else:
 					block.setFiles([output_images])
-			else:
-				if rd.filepath != '':
-					if not rd.filepath.startswith('//'):
-						working_directory = os.path.dirname(rd.filepath)
 
 			cmd = CMD_TEMPLATE.format(
 					blend_scene=renderscenefile,
@@ -249,7 +242,6 @@ class ORE_Submit(bpy.types.Operator):
 
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
-			block.setWorkingDirectory(working_directory)
 			job.blocks.append(block)
 
 		# Set job running parameters:
