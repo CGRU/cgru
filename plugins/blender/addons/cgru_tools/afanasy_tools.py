@@ -210,7 +210,11 @@ class ORE_Submit(bpy.types.Operator):
 			if ore.filepath != '':
 				pos = ore.filepath.find('#')
 				if pos != -1:
-					images = "{0}{1}_{2}".format(ore.filepath[:pos],
+					if ore.filepath[pos-1] in '._- ':
+						images = "{0}{1}{2}".format(ore.filepath[:pos-1],
+							renderlayer_name, ore.filepath[pos-1:])
+					else:
+						images = "{0}{1}{2}".format(ore.filepath[:pos],
 							renderlayer_name, ore.filepath[pos:])
 				else:
 					images = "{0}{1}".format(ore.filepath, renderlayer_name)
