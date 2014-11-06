@@ -96,6 +96,7 @@ class ORE_Submit(bpy.types.Operator):
 		rd = context.scene.render
 		images = None
 		engine_string = sce.render.engine
+		sceneModified = False  # if the opriginal scene modified checker
 
 		# Check and add CGRU module in system path:
 		if 'CGRU_LOCATION' not in os.environ:
@@ -148,10 +149,13 @@ class ORE_Submit(bpy.types.Operator):
 		# Make all Local and pack all textures and objects
 		if ore.packLinkedObjects:
 			bpy.ops.object.make_local(type='ALL')
+			sceneModified = True
 		if ore.relativePaths:
 			bpy.ops.file.make_paths_relative()
+			sceneModified = True
 		if ore.packTextures:
 			bpy.ops.file.pack_all()
+			sceneModified = True
 
 		# Get job name:
 		jobname = ore.jobname
@@ -280,6 +284,10 @@ class ORE_Submit(bpy.types.Operator):
 
 		#  Send job to server:
 		job.send()
+
+		# if opriginal scene is modified - we need to reload the scene file
+		if sceneModified:
+			bpy.ops.wm.open_mainfile(filepath=scenefile + ".blend")
 
 		return {'FINISHED'}
 
