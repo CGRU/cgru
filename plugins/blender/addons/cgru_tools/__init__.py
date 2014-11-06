@@ -33,13 +33,15 @@ class OREAddonPreferences(bpy.types.AddonPreferences):
 		subtype="DIR_PATH")
  
 	def draw(self, context):
+		layout = self.layout
+		row = layout.row()
 		import os
 		if 'CGRU_LOCATION' not in os.environ:
-			layout = self.layout
-			row = layout.row()
 			row.label(text="Please, set CGRU install root location")
 			row = layout.row()
 			row.prop(self, "cgru_location")
+		else:
+			row.label(text="CGRU root location: %s" % os.getenv('CGRU_LOCATION'))
 
 
 class ORESettings(bpy.types.PropertyGroup):
