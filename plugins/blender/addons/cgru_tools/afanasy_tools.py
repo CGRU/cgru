@@ -66,8 +66,9 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		col = layout.column(align=True)
 		row = col.row(align=True)
 		row.scale_y = 1.4
-		row.prop(sce, "frame_start")
-		row.prop(sce, "frame_end")
+		row.prop(sce, 'frame_start')
+		row.prop(sce, 'frame_end')
+		row.prop(sce, 'frame_step')
 		row.prop(ore, 'fpertask')
 		row = col.row(align=True)
 		row.scale_y = 1.2
