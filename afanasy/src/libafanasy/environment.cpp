@@ -642,14 +642,16 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 // Initialize environment after all variables are loaded (set to default values)
 bool Environment::initAfterLoad()
 {
+	// Store folders:
 	jobs_dir    = temp_dir + AFGENERAL::PATH_SEPARATOR +    AFJOB::DIRECTORY;
 	renders_dir = temp_dir + AFGENERAL::PATH_SEPARATOR + AFRENDER::DIRECTORY;
 	users_dir   = temp_dir + AFGENERAL::PATH_SEPARATOR +   AFUSER::DIRECTORY;
 
+	// HTTP serve folder:
 	if( http_serve_dir.empty()) 
 		http_serve_dir = cgrulocation;
 
-	//############ Server Accept IP Addresses Mask:
+	// Server Accept IP Addresses Mask:
 	if( false == Address::readIpMask( ip_trust, m_verbose_init))
 	{
 		return false;
@@ -685,11 +687,17 @@ bool Environment::initAfterLoad()
 	}
 	}
 
+	// Check whether server address is configured:
+	if(( servername == std::string(AFADDR::SERVER_NAME)) && ( isServer() != true ))
+	{
+		printf("WARNING: SERVER ADDRESS ID NOT CONFIGURED, USING %s\n", AFADDR::SERVER_NAME);
+	}
+
 	// Solve server name
 	if( m_solveservername )
 		 serveraddress = af::solveNetName( servername, serverport, AF_UNSPEC, m_verbose_init ? VerboseOn : VerboseOff);
 
-	//############ VISOR and GOD passwords:
+	// VISOR and GOD passwords:
 	if( passwd != NULL) delete passwd;
 	passwd = new Passwd( pswd_visor, pswd_god);
 
