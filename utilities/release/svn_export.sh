@@ -26,7 +26,8 @@ echo ${revision} > $snapshot_dir/revision.txt
 
 # Make an archive:
 cd $tmpdir
-acrhivename=$curdir/$snapshot.7z
-[ -f $acrhivename ] && rm -fv $acrhivename
-echo "Compressing $acrhivename"
-7za a -r -y -t7z $acrhivename $snapshot > /dev/null || echo "Failed!"
+archivename=$curdir/$snapshot.zip
+[ -f $archivename ] && rm -fv $archivename
+echo Compressing "${snapshot}" to "${archivename}"
+zip -y -r "${archivename}" "${snapshot}" -x "*/.*"
+
