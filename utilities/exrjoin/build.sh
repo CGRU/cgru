@@ -7,30 +7,30 @@ openexr_inc="${openexr}/include/OpenEXR"
 openexr_lib="${openexr}/lib"
 
 if [ -d $openexr_inc ] ; then
-   # Custom include:
-   CPPFLAGS="-I$openexr_inc"
+	# Custom include:
+	CPPFLAGS="-I$openexr_inc"
 else
-   # System include:
-   CPPFLAGS="-I/usr/include/OpenEXR"
+	# System include:
+	CPPFLAGS="-I/usr/include/OpenEXR"
 fi
 
 if [ -d $openexr_inc ] ; then
-   # Custom libs:
-   LDFLAGS="-L/lib64 -L/usr/lib64"
-   LDFLAGS="$LDFLAGS -L${openexr_lib}"
-   LDFLAGS="$LDFLAGS -L${openexr_lib}64"
-   LDFLAGS="$LDFLAGS -Wl,--start-group"
-   LDFLAGS="$LDFLAGS -lz"
-   LDFLAGS="$LDFLAGS -lpthread"
-   LDFLAGS="$LDFLAGS -lIex"
-   LDFLAGS="$LDFLAGS -lHalf"
-   LDFLAGS="$LDFLAGS -lImath"
-   LDFLAGS="$LDFLAGS -lIlmThread"
-   LDFLAGS="$LDFLAGS -lIlmImf"
-   LDFLAGS="$LDFLAGS -Wl,--end-group"
+	# Custom libs:
+	LDFLAGS="-L/lib64 -L/usr/lib64"
+	LDFLAGS="$LDFLAGS -L${openexr_lib}"
+	LDFLAGS="$LDFLAGS -L${openexr_lib}64"
+	LDFLAGS="$LDFLAGS -Wl,--start-group"
+	LDFLAGS="$LDFLAGS -lIex"
+	LDFLAGS="$LDFLAGS -lHalf"
+	LDFLAGS="$LDFLAGS -lImath"
+	LDFLAGS="$LDFLAGS -lIlmThread"
+	LDFLAGS="$LDFLAGS -lIlmImf"
+	LDFLAGS="$LDFLAGS -lpthread"
+	LDFLAGS="$LDFLAGS -lz"
+	LDFLAGS="$LDFLAGS -Wl,--end-group"
 else
-   # System libs:
-   LDFLAGS="-lIlmImf"
+	# System libs:
+	LDFLAGS="-lIlmImf"
 fi
 
 [ -f override.sh ] && source override.sh
