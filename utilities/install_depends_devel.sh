@@ -98,6 +98,28 @@ function altArch(){
    pkg_extension=""
 }
 
+# Packages for Mageia distributives:
+function mageiaArch(){
+   packages="$packages vim"
+   packages="$packages gcc-c++"
+   packages="$packages python-devel"
+   packages="$packages postgresql-devel"
+   packages="$packages qt4-devel-private"
+   packages="$packages rpm-build"
+   packages="$packages git"
+   packages="$packages PyQt4"
+   packages="$packages libzip libzip-devel"
+   # ImageMagick:
+   packages="$packages libjpeg libjpeg-devel"
+   packages="$packages libtiff libtiff-devel"
+   packages="$packages libpng libpng-devel"
+   packages="$packages freetype freetype-devel"
+   packages="$packages fontconfig fontconfig-devel"
+
+   pkg_manager_cmd="urpmi"
+   pkg_extension=""
+}
+
 # Case distribution:
 case ${DISTRIBUTIVE} in
    AltLinux)
@@ -108,6 +130,9 @@ case ${DISTRIBUTIVE} in
       ;;
    openSUSE)
       suseArch
+      ;;
+   Mageia)
+      mageiaArch
       ;;
    *)
       redhatArch

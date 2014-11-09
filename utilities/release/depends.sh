@@ -27,6 +27,10 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_AFANASY="libpq5.4"
 		export DEPENDS_CGRU="python-module-PyQt4 openexr ImageMagick ffmpeg"
 		;;
+	Mageia )
+		export DEPENDS_AFANASY="libpqxx"
+		export DEPENDS_CGRU="pyside imagemagick ffmpeg"
+		;;
 	*)
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_CGRU="PyQt4"

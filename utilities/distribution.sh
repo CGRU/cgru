@@ -2,7 +2,7 @@
 
 echo "Detecting UNIX distribution..."
 
-distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE"
+distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia"
 knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE"
 
 if [ `uname` == "Darwin" ]; then
@@ -50,6 +50,7 @@ function debianArch(){
    fi
    export PACKAGE_FORMAT="DPKG"
    export PACKAGE_MANAGER="apt-get"
+   export PACKAGE_INSTALL="$PACKAGE_MANAGER install"
 }
 
 # Common for RedHat distributives:
@@ -57,6 +58,7 @@ function redhatArch(){
    export VERSION_NAME="${DISTRIBUTIVE}-${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
    export PACKAGE_FORMAT="RPM"
    export PACKAGE_MANAGER="yum"
+   export PACKAGE_INSTALL="$PACKAGE_MANAGER install"
    export RELEASE_NUMBER="0"
 }
 
@@ -79,6 +81,11 @@ case ${DISTRIBUTIVE} in
    openSUSE)
       redhatArch
       export PACKAGE_MANAGER="zypper"
+      ;;
+   Mageia)
+      redhatArch
+      export PACKAGE_MANAGER="urpm"
+	  export PACKAGE_INSTALL="${PACKAGE_MANAGER}i"
       ;;
    Simply)
       export DISTRIBUTIVE="AltLinux"
