@@ -34,19 +34,19 @@ void threadRunCycle( void * i_args);
 //####################### signal handlers ####################################
 void sig_int(int signum)
 {
-	//         1234567890
-	write( 2, "SIG INT\n", 8);
+	char msg[] = "SIG INT\n";
+	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
 	AFRunning = false;
 }
 void sig_alrm(int signum)
 {
-	//         1234567890
-	write( 2, "ALARM\n", 6);
+	char msg [] = "SIG ALARM\n";
+	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
 }
 void sig_pipe(int signum)
 {
-	//         1234567890
-	write( 2, "PIPE\n", 5);
+	char msg [] = "SIG PIPE\n";
+	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
 }
 
 //######################################## main #########################################
