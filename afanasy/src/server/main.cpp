@@ -34,16 +34,19 @@ void threadRunCycle( void * i_args);
 //####################### signal handlers ####################################
 void sig_int(int signum)
 {
-	fprintf( stderr, "SIG INT\n" );
+	//         1234567890
+	write( 2, "SIG INT\n", 8);
 	AFRunning = false;
 }
 void sig_alrm(int signum)
 {
-	printf("ALARM: Thread ID = %lu.\n", (long unsigned)DlThread::Self());
+	//         1234567890
+	write( 2, "ALARM\n", 6);
 }
 void sig_pipe(int signum)
 {
-	printf("PIPE ERROR: Thread ID = %lu.\n", (long unsigned)DlThread::Self());
+	//         1234567890
+	write( 2, "PIPE\n", 5);
 }
 
 //######################################## main #########################################
