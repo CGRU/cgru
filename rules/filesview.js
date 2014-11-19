@@ -222,6 +222,7 @@ FilesView.prototype.limitsAdd = function()
 		this.elPanel.appendChild( elLimit);
 		this.elLimits.push( elLimit);
 		elLimit.classList.add('limit');
+		elLimit.classList.add('button');
 
 		var text = limits[i];
 		if( text == 0 )
@@ -254,13 +255,11 @@ FilesView.prototype.limitApply = function()
 		if( parseInt( localStorage.filesview ) == el.m_limit )
 		{
 			limit = el.m_limit;
-			el.classList.remove('button');
-			if( limit ) el.classList.add('selected');
+			if( limit ) el.classList.add('pushed');
 		}
 		else
 		{
-			el.classList.add('button');
-			el.classList.remove('selected');
+			el.classList.remove('pushed');
 		}
 	}
 

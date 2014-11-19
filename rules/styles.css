@@ -30,7 +30,7 @@ left: 40px; right: 10px; bottom: 5px; height: 30px;
 #header .panel .button {
 background-size: 50%;
 width: 40px; height: 20px;
-margin: 1px 8px;
+margin: 1px 4px;
 float: left;
 }
 
@@ -86,7 +86,14 @@ right: 0; top: 0; bottom: 0;
 width: 6px;
 }
 #navig_panel { position: absolute; height: 20px; left:0;right:0;top:0; box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;}
-#navig_panel .button { font-size: 12px; padding: 0px; margin: 3px; float: left; width: 40px; text-align: center; /*border-radius: 4px;*/ box-shadow: 0 0 2px #000; }
+#navig_panel .button {
+font-size: 12px;
+padding: 0px;
+margin: 3px;
+float: left;
+width: 40px;
+text-align: center;
+}
 #navig_panel #navig_show_frames, #navig_panel #navig_show_percent { width: 20px; }
 #navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/ }
 #navig .folder {
@@ -168,8 +175,12 @@ a.link_auto { text-decoration: none; }
 -webkit-user-select: none;
 cursor: pointer;
 text-align: center;
-/*border-radius: 4px;*/
+border-radius: 2px;
+text-align: center;
+/*
 box-shadow: 0 0 2px #000, 0 0 2px rgba(255,255,255,.3) inset;
+*/
+border: 1px solid #777;
 margin: 2px;
 padding: 2px;
 background-color: rgba(255,255,255,.1);
@@ -177,10 +188,10 @@ background-size: 100%;
 background-repeat: no-repeat;
 background-position: center;
 }
-.button:hover { background-color: rgba(200,255,255,.1);}
+.button:hover { background-color: rgba(200,255,255,.5);}
 .button.pushed {
-background-color: rgba(100,255,255,.2);
-box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
+background-color: rgba(100,255,255,.3);
+/*box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;*/
 }
 .button.edit { background-image: url(icons/edit.png); width: 16px; height: 16px; }
 .button.delete { background-image: url(icons/delete.png); width: 16px; height: 16px; margin: 0; padding: 0; }
@@ -199,8 +210,8 @@ text-align: center;
 }
 .checkbox.enabled {font-weight: bold;}
 
-.selected { background: rgba( 100, 255, 255, .2); }
-.half_selected { background: rgba( 255, 255, 100, .2); }
+.selected { background-color: rgba( 100, 255, 255, .2); }
+.half_selected { background-color: rgba( 255, 255, 100, .2); }
 
 #content > .view {
 position: relative;
@@ -233,11 +244,21 @@ min-height: 19px;
 
 .thumbnail { box-shadow:0 0 4px rgba(255,255,255,.5); border-radius:8px; }
 
-.tag { float:left; cursor: pointer; /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; margin:1px 4px; padding:0 4px; }
+.tag {
+float:left;
+cursor: pointer;
+border-radius: 3px;
+border: 1px solid #777;
+margin:1px 4px;
+padding:0 4px;
+}
 .tag.disabled { text-decoration: line-through; }
 .tag.short { margin:0 1px; padding:0 2px; }
 .tag.me { background: rgba(100,255,100,.5); }
-.artists, .tags { box-shadow: 0 0 2px #000 inset; /*border-radius: 3px;*/ padding: 0 2px; }
+.artists, .tags {
+box-shadow: 0 0 2px #000 inset;
+border-radius: 2px;
+padding: 0 2px; }
 .artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); }
 .artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
 #search_artists .role .label { cursor: pointer; }
@@ -323,7 +344,7 @@ display: none;
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
 #channels .channel { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
 .news_filter { margin: 2px; padding: 0px 3px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
-.news_filter .button { float: left; margin: 1px 2px; padding: 1px 3px; }
+.news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
 #news .news { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
@@ -339,7 +360,7 @@ display: none;
 .playlist_ctrl { padding-left: 6px; }
 .playlist_ctrl .button { float: left; padding: 0; }
 .playlist_ctrl_top .button { width: 20px; height: 20px; }
-.playlist_ctrl_bot .button { width: 16px; height: 16px; }
+.playlist_ctrl_bot .button { width: 16px; height: 16px; margin: 1px; }
 #playlist .item {
 font-weight: normal;
 }
@@ -443,9 +464,12 @@ padding: 4px;
 #assets {
 background: rgba(255,255,100,.1);
 box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
-/*border-radius: 12px;*/
+border-radius: 12px;
 height: 30px;
-margin: 0px 100px;
+left: 240px;
+right: 120px;
+position: absolute;
+/*margin: 0px 10px;*/
 padding: 0px 10px;
 }
 #assets .asset {
@@ -464,7 +488,7 @@ padding: 5px 4px;
 .files_view .panel .counts { clear:both; font: 14px monospace; }
 .files_view .panel .counts .frames_count { float: right; border: 1px solid #777; font-size: 12px; padding: 0px 4px; cursor: pointer; }
 .files_view .panel div, .files_view .panel a { float: left; margin: 0px 8px; }
-.files_view .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; height: 14px; width: 50px; /*border-radius: 4px;*/ box-shadow: 0 0 2px #000; text-align: center; }
+.files_view .panel .limit { font-size: 12px; float: left; margin: 4px 8px; padding: 0; height: 14px; width: 50px; }
 .files_view .panel .title { clear: both; font-weight: bold;}
 .files_view .panel .path { margin: 0px 8px; }
 .files_view .panel .thumbsdiv { float: right; /*border: 1px solid #000;*/ }
