@@ -189,6 +189,7 @@ Status.prototype.showTasks = function()
 				var elTag = document.createElement('div');
 				elTags.appendChild( elTag);
 				elTag.classList.add('tag');
+				elTag.classList.add('artist');
 				elTag.textContent = c_GetUserTitle( task.artists[g]);
 			}
 		}
@@ -281,6 +282,7 @@ function st_SetElArtists( i_status, i_el, i_short)
 		var el = document.createElement('div');
 		i_el.appendChild( el);
 		el.classList.add('tag');
+		el.classList.add('artist');
 		el.textContent = c_GetUserTitle( i_status.artists[i], null, i_short);
 
 		if( g_users[i_status.artists[i]] && g_users[i_status.artists[i]].disabled )
@@ -633,6 +635,8 @@ Status.prototype.editListShow = function( i_args)
 		elRoot.m_elList.appendChild( el);
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
+		if( i_args.name == 'artists' )
+			el.classList.add('artist');
 
 		if( i_args.list_all[id] && i_args.list_all[id].disabled )
 			el.classList.add('disabled');
@@ -717,6 +721,7 @@ Status.prototype.editArtistsEdit = function( i_args)
 			var el = document.createElement('div');
 			elRole.appendChild( el);
 			el.classList.add('tag');
+			el.classList.add('artist');
 			el.m_item = artist.id;
 
 			if( g_users[artist.id] && g_users[artist.id].disabled )

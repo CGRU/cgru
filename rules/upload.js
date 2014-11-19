@@ -56,7 +56,7 @@ function up_CreateInput()
 	el.appendChild( elInput);
 	el.m_elInput = elInput;
 	elInput.type = 'file';
-	elInput.size = '99';
+//	elInput.size = '99';
 	elInput.onchange = up_FileSelected;
 	elInput.m_elFile = el;
 	elInput.title = 'Drag and drop files or click to browse';

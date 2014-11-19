@@ -251,14 +251,16 @@ border-radius: 3px;
 border: 1px solid #777;
 margin:1px 4px;
 padding:0 4px;
+/*background-color: rgba(0,0,255,.1);*/
 }
+.artist { /*background-color: rgba(255,255,255,.2);*/border: 1px solid rgba(255,255,255,.5);}
 .tag.disabled { text-decoration: line-through; }
 .tag.short { margin:0 1px; padding:0 2px; }
 .tag.me { background: rgba(100,255,100,.5); }
 .artists, .tags {
-box-shadow: 0 0 2px #000 inset;
-border-radius: 2px;
-padding: 0 2px; }
+/*box-shadow: 0 0 2px #000 inset;*/
+/*border-radius: 2px;*/
+/*padding: 0 2px;*/ }
 .artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); }
 .artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
 #search_artists .role .label { cursor: pointer; }
@@ -271,7 +273,11 @@ padding: 0 2px; }
 .colorbars { /*border-radius: 6px;*/ margin: 2px; border: 1px solid #000;}
 .colorbars div div { float:left;}
 
-.cmdexec { opacity: 0.8; padding: 3px 8px;}
+.cmdexec {
+opacity: 0.8;
+padding: 3px 8px;
+border-radius: 2px;
+}
 .cmdexec.open {
 padding: 0px 0px;
 width: 30px; height: 20px;
@@ -292,7 +298,12 @@ background-position: center;
 #sidepanel_div { position: absolute; right: 0; }
 #sidepanel_handle { position: absolute; width: 6px; left: 0; top: 0; bottom: 0;/* background: #FFFF00;*/ }
 #sidepanel { position: absolute; right: 0; left: 6px; top: 0; bottom: 0; }
-#sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; /*border-radius: 4px;*//* margin-left: 6px;*/ }
+#sidepanel > div {
+box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF;
+margin: 4px 1px;
+border-radius: 4px;
+/* margin-left: 6px;*/
+}
 #sidepanel_hide { display: none; font-size: 10px; font-style: italic; }
 #sidepanel.opened { overflow-y: scroll;}
 #sidepanel.opened #sidepanel_hide { display: block;}
@@ -313,7 +324,7 @@ text-transform: none;
 height:18px;
 background-color:
 rgba(201,255,255,.2);
-box-shadow: 0 0 2px #000;
+/*box-shadow: 0 0 2px #000;*/
 }
 #sidepanel.opened #sidepanel_permissions .label { height:12px;}
 #sidepanel .body { clear: both; display: none; }
@@ -336,16 +347,16 @@ font-weight: bold;
 font-family: monospace;
 display: none;
 }
-#news { /*border-radius:4px;*/ box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; margin: 4px; padding: 4px; }
+#news { border-radius: 2px; box-shadow: 0 0 2px #000 inset, 0 0 4px #FFF; margin: 4px; padding: 4px; }
 #sidepanel_news #news_refresh { display: none; float: right; }
 #sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
-.news_ctrl { /*border-radius:4px;*/ -box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; margin: 2px; padding: 2px 4px; }
+.news_ctrl { margin: 2px; padding: 2px 4px; }
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
-#channels .channel { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
+#channels .channel { box-shadow: 0 0 2px #000 inset; border-radius: 2px; margin: 1px 0px; }
 .news_filter { margin: 2px; padding: 0px 3px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
-#news .news { box-shadow: 0 0 2px #000 inset; /*border-radius: 4px;*/ margin: 1px 0px; }
+#news .news { box-shadow: 0 0 2px #000 inset; border-radius: 2px; margin: 1px 0px; }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
@@ -361,6 +372,7 @@ display: none;
 .playlist_ctrl .button { float: left; padding: 0; }
 .playlist_ctrl_top .button { width: 20px; height: 20px; }
 .playlist_ctrl_bot .button { width: 16px; height: 16px; margin: 1px; }
+#playlist { border-radius: 2px; clear:both; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF; margin:4px; padding:4px; }
 #playlist .item {
 font-weight: normal;
 }
@@ -384,14 +396,16 @@ padding: 2px 0px 2px 8px;
 #playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
 /*#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); }*/
 
-/* ======= USERS: ======== */
+/* ======= PERMISSIONS: ======== */
+#sidepanel_permissions { display:none; background-color: rgba(200,0,0,.2); }
+#permissions { border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF; margin:4px; padding:4px; }
 #permissions > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
 #permissions > div div { padding: 0px 4px;}
 #permissions > div .button { float: left; margin: 0px;}
 /* ============= RECENT: =============== */
 #sidepanel_recent #recent_refresh { display: none; float:right; }
 #sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
-#recent { /*border-radius:4px;*/box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:2px;padding:2px; }
+#recent { border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF;margin:2px;padding:2px; }
 #recent > div { font-size: 12px; border-bottom: 1px solid #777; position: relative; }
 #recent img { width: 32px; height: 32px; border: 1px solid #777; border-radius: 4px; margin-top: 4px; float: right; }
 #recent .user { float: left; margin-right: 4px;}
@@ -629,11 +643,12 @@ box-shadow: 0 0 4px #000 inset;
 
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */
+#upload { border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
 #upload > div { border-radius: 4px; box-shadow: 0 0 3px #000 inset; margin: 1px 0px; font-size: 14px; }
 #upload > div.started { background: rgba(200,200,0,.3); }
 #upload > div.done { background: rgba(0,150,0,.3); }
 #upload > div.error { background: rgba(150,0,0,.3); }
-#upload input { font-size: 40px; }
+#upload input { font-size: 40px; padding-left: 999px; background-color: rgba(255,0,255,.2); }
 #upload .info { padding: 1px 2px; }
 #upload .progress { background: rgba(0,0,0,.5); border-radius:4px; box-shadow: 0 0 4px inset; clear: both; position:relative; }
 #upload .bar { background: rgba( 0,200,0,.5); height: 16px; width: 0; left: 0px; }
@@ -642,9 +657,9 @@ box-shadow: 0 0 4px #000 inset;
 
 /* ====================================================================== */
 /* ==================== GUI: ======================================== */
-.gui .param > div { margin: 4px 8px; padding: 3px 6px; border-radius: 4px;}
+.gui .param > div { margin: 4px 8px; padding: 3px 6px; border-radius: 2px;}
 .gui .label { float: left; width: 100px;  text-align: right; }
-.gui .value { box-shadow: 0 0 4px #000 inset;}
+.gui .value { box-shadow: 0 0 2px #000 inset;}
 .gui .info { float: right; width: 200px; }
 .gui .list { border-radius: 5px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; }
 .gui .list .item { border-radius: 3px; box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF; margin: 4px; }
@@ -653,8 +668,8 @@ box-shadow: 0 0 4px #000 inset;
 .gui .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
 .gui .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
 .gui .rules { box-shadow: 0 0 4px #000 inset; padding: 12px; margin: 4px 0px;  border-radius: 6px;}
-.gui .choise { float: left; box-shadow: 0 0 2px #000; border-radius: 4px; font-size: 14px; margin: 0px 2px; }
-.gui .choise.selected { box-shadow: 0 0 2px #000 inset; }
+.gui .choise { float: left; /*box-shadow: 0 0 2px #000;*/ border-radius: 2px; font-size: 14px; margin: 0px 2px; }
+.gui .choise.selected { /*box-shadow: 0 0 2px #000 inset;*/ }
 .gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 6px 6px 0 0; box-shadow: 0 0 2px #000; cursor: pointer; float: left; }
 .gui .tablabel.active { box-shadow: 0 0 2px #000 inset; background: rgba(100,255,255,.2); }
 .gui .tabpanel { padding: 2px 8px; box-shadow: 0 0 2px inset; clear: both; }

@@ -137,8 +137,11 @@ top: 0; left: 0;
 
 .cmdexec {
 background: #DD8;
-box-shadow: 0px 0px 3px #000 inset;
+/*box-shadow: 0px 0px 3px #000 inset;*/
+border: 1px solid rgba(0,0,0,.5);
 padding: 4px 8px;
 font-weight: bold;
 color: #000000;
+cursor: pointer;
 }
+.cmdexec:hover { border: 1px solid rgba(255,255,0,1); }
