@@ -20,6 +20,18 @@ box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,2
 #header { top: -200px; height: 238px; }
 #footer { bottom: 0px; height: 38px; }
 
+#header_params {
+border: 1px solid #777;
+border-radius: 2px;
+box-shadow: 0px 0px 10px #FFF;
+position:absolute;
+top: 5px;
+bottom: 40px;
+left: 5px;
+right: 5px;
+font-size: 12px;
+}
+
 .headeropenbtn { position: absolute; left: 10px; width: 9px; height: 20px; margin:0; padding:0; opacity:.8; }
 #header .headeropenbtn { bottom: 8px;}
 #footer .headeropenbtn { top: 8px;}
