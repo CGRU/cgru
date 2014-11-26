@@ -726,7 +726,7 @@ box-shadow: 0 0 4px #000 inset;
 .admin_users th { font-weight: normal; }
 .admin_users tr.disabled { text-decoration: line-through; font-style: italic; }
 .admin_users td { text-align: center; border: 1px solid rgba(0,0,0,.5); padding: 4px; min-height: 20px; }
-.admin_users .selected td { background: rgba(100,255,255,.2); }
+.admin_users .selected td { background-color: rgba(100,255,255,.2); }
 .admin_users .avatar {
 width: 18px;
 background-size: 100%;
