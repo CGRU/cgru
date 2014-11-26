@@ -1,5 +1,11 @@
-body { font: 16px Arial; }
-body, #header, #footer, #navig_div, #sidepanel_div, #content { background: #A0A0A0; }
+body {
+font: 16px Arial;
+}
+
+body, #header, #footer, #navig_div, #sidepanel_div, #content {
+background: #A0A0A0;
+color: #000000;
+}
 
 #header, #footer {
 -o-transition: all .3s ease-in-out;
@@ -216,7 +222,7 @@ background-color: rgba(100,255,255,.3);
 
 .checkbox {
 cursor: pointer;
-border-radius:4px;
+border-radius: 2px;
 box-shadow: 0 0 2px #000 inset;
 text-align: center;
 }
@@ -225,9 +231,21 @@ text-align: center;
 .selected { background-color: rgba( 100, 255, 255, .2); }
 .half_selected { background-color: rgba( 255, 255, 100, .2); }
 
+#status, #content > .view {
+border: 2px solid #777;
+border-radius: 3px;
+}
+
+#asset_div    { background: rgba(255,255,255,.2); }
+#body_div     { background: rgba(255,255,100,.2); }
+#comments_div { background: rgba(255,100,255,.2); }
+
+#status {
+padding: 4px;
+}
+
 #content > .view {
 position: relative;
-box-shadow: 0 0 4px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
 margin: 3px 0px;
 float: left;
 }
@@ -278,7 +296,7 @@ padding:0 4px;
 #search_artists .role .label { cursor: pointer; }
 .tags { font-style:italic;}
 
-.progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 2px #000 inset; }
+.progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 1px #000 inset; }
 .progress { position: relative; background:rgba(0,0,0,.5); }
 .progressbar { background:rgba(0,255,0,.5); }
 
@@ -441,18 +459,20 @@ margin: 0px 2px;
 padding: 1px 8px;
 }
 
-#content #panel #subscribe .button.disabled { font-weight: bold; background: #FF0000; padding: 1px 20px; }
-#content #panel #subscribe .button.ignore { background: rgba(255,255,0,.1); }
-
-#status {
-box-shadow: 0 0 2px #000 inset;
-/*border-radius: 10px;*/
-padding: 4px;
+#subscribe .button.disabled { font-weight: bold; background: #FF0000; padding: 1px 20px; }
+#subscribe .button.ignore { background: rgba(255,255,0,.1); }
+#subscribe_path {
+font: 12px monospace;
+/*box-shadow: 0 0 2px #000000 inset;*/
+border: 1px solid #777;
+border-radius: 2px;
+padding: 2px 8px;
+margin: 2px 8px;
 }
 
 #status_percentage, #status_annotation, #status_artists, #status_tags, #status_finish
 { margin: 0px 5px; float:left;}
-#status_progress { clear: both; /*border-radius: 4px;*/ }
+#status_progress { clear: both; border-radius: 2px; }
 #status_progressbar { height: 10px; /*border-radius: 4px;*/ }
 #status_modified { clear: both; float:right; font-style:italic; font-size: 14px; }
 #status_framesnum_div { margin: 1px 6px; border: 1px solid #777; float: left; }
@@ -508,7 +528,7 @@ padding: 5px 4px;
 #assets .asset .type { padding: 0px 4px; float: left; text-decoration: none; }
 #assets .asset .name { padding: 0px 4px; float: left; font: bold 16px monospace;}
 
-.files_view { border: 1px solid #777; }
+.files_view { border: 1px solid #777; border-radius: 2px; background-color: #A0A0A0; }
 .files_view .panel { border: 1px solid #777; }
 .files_view .panel .button { width: 18px; height: 18px; }
 .files_view .panel .counts { clear:both; font: 14px monospace; }
@@ -679,7 +699,7 @@ box-shadow: 0 0 4px #000 inset;
 .gui .list .ctrl .name { float: left; text-transform: capitalize; padding: 3px 8px; }
 .gui .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
 .gui .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
-.gui .rules { box-shadow: 0 0 4px #000 inset; padding: 12px; margin: 4px 0px;  border-radius: 6px;}
+.gui .rules { border: 1px solid #777; font: 12px monospace; padding: 12px; margin: 4px 0px;  border-radius: 2px;}
 .gui .choise { float: left; /*box-shadow: 0 0 2px #000;*/ border-radius: 2px; font-size: 14px; margin: 0px 2px; }
 .gui .choise.selected { /*box-shadow: 0 0 2px #000 inset;*/ }
 .gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 6px 6px 0 0; box-shadow: 0 0 2px #000; cursor: pointer; float: left; }

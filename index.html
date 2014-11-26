@@ -71,11 +71,9 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 	<div id="panel">
 		<div id="subscribe" style="display:none">
 			<div id="subscribe_btn" class="button" title="Receive this location changes" onclick="nw_Subscribe()">Subscribe</div>
-			<div id="subscribe_label">Subscribed at</div>
+			<div id="subscribe_label">Subscribed</div>
 			<div id="unsubscribe_btn" class="button" title="Do not receive changes from this location" onclick="nw_Unsubscribe()">Unsubscribe</div>
-			<div id="subscribe_path"
-				style="font: 12px monospace; box-shadow: 0 0 2px #000000 inset; padding: 2px 8px; margin: 2px 8px;"
-				title="Subscribed parent location"></div>
+			<div id="subscribe_path" title="Subscribed parent location"></div>
 			<div id="news_make" class="button" title="Create some custom news" onclick="nw_MakeNewsDialog()">Make News</div>
 			<div id="news_disable" class="button" title="If news disabled, your changes does not produce any news" onclick="nw_DisableNewsToggle( true)"></div>
 			<div id="news_ignore_own" class="button" title="If you ignoring own news, you do not receive changes performed by yourself" onclick="nw_IgnoreOwnToggle( true)"></div>
@@ -443,11 +441,11 @@ Create '.hidden' in folder to hide.
 Link with hidden folder will not works.
 Hidden folders increase system speed.">
 				<div class="label">Show Hidden:</div>
-				<div class="variable" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
+				<div class="variable button" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
 			</div>
 			<div class="cgru_parameter">
 				<div class="label">Hide ScrollBars:</div>
-				<div class="variable" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
+				<div class="variable button" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
 			</div>
 		</div>
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">

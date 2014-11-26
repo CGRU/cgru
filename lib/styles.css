@@ -28,7 +28,8 @@ background-color: rgba(255,255,255,.2);
 position: absolute;
 left: 80px; right: 60px;
 top: 2px; bottom: 2px;
-box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
+/*box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);*/
+box-shadow: 0px 0px 5px rgba(255,255,255,.5);
 padding: 3px 8px;
 border: 1px solid #777;
 border-radius: 2px;
@@ -40,9 +41,9 @@ top: 0; bottom: 0; left: 0; right: 0;
 }
 .cgru_window_window {
 position: absolute;
-background: #999;
+background: #DDDDDD;
 top: 8%; bottom: 8%; left: 5%; right: 5%;
-border-radius: 10px;
+border-radius: 2px;
 box-shadow: 0px 0px 10px #000;
 color: #000000;
 }
@@ -52,8 +53,8 @@ background: #BBB;
 position: absolute;
 padding: 20px;
 top: 24px; bottom: 4px; left: 4px; right: 4px;
-box-shadow: 0px 0px 6px #000 inset;
-border-radius: 8px;
+border: 1px solid #777;
+border-radius: 2px;
 }
 .cgru_window_title {
 background: #CCC;
@@ -64,12 +65,12 @@ top: 0; left: 0; right: 0;
 }
 .cgru_window_close {
 cursor: pointer;
-background: #DDD;
-border-radius: 4px;
+background: #EEE;
+border-radius: 2px;
 position: absolute;
 top: 0px; right: 10px;
-padding: 0px 4px;
-box-shadow: 0px 0px 4px #000;
+text-align: center;
+padding: 0px 6px;
 }
 .cgru_window_close:hover { background: #FFF; }
 

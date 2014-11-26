@@ -33,6 +33,8 @@ function FilesView( i_args)
 	this.elRoot = document.createElement('div');
 	this.elParent.appendChild( this.elRoot);
 	this.elRoot.classList.add('files_view');
+	if( localStorage.back_files && localStorage.back_files.length )
+		this.elRoot.style.background = localStorage.back_files;
 
 	this.elPanel = document.createElement('div');
 	this.elRoot.appendChild( this.elPanel);

@@ -244,14 +244,25 @@ function u_ResizeGUIFinish()
 function u_ApplyStyles()
 {
 	if( p_PLAYER ) return;
-	document.body.style.background = localStorage.background;
-	document.body.style.color = localStorage.text_color;
-	var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle'];
-	for( var i = 0; i < backs.length; i++ )
-		$(backs[i]).style.background = localStorage.background;
+
+	if( localStorage.background && localStorage.background.length )
+	{
+		document.body.style.background = localStorage.background;
+		var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle'];
+		for( var i = 0; i < backs.length; i++ )
+			$(backs[i]).style.background = localStorage.background;
+	}
+
+	if( localStorage.text_color && localStorage.text_color.length )
+		document.body.style.color = localStorage.text_color;
+
 	var backs = ['asset','body','files','comments'];
 	for( var i = 0; i < backs.length; i++ )
-		$(backs[i]+'_div').style.background = localStorage['back_' + backs[i]];
+	{
+		var back = localStorage['back_' + backs[i]];
+		if( back && back.length )
+			$(backs[i]+'_div').style.background = localStorage['back_' + backs[i]];
+	}
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
