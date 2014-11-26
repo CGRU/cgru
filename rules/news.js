@@ -463,8 +463,7 @@ function nw_NewsShow()
 		elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 
-		var prj = news.path.substr(1);
-		prj = prj.substr( 0, prj.indexOf('/'));
+		var prj = news.path.split('/')[1];
 		if( projects.indexOf(prj) == -1 )
 			projects.push( prj);
 	}
@@ -478,7 +477,7 @@ function nw_NewsShow()
 		el.classList.add('button');
 		el.classList.add('nw_fb');
 		el.textContent = projects[i];
-		el.onclick=function(e){ nw_FilterBtn( e.currentTarget, e.currentTarget.textContent, true);};
+		el.onclick = function(e){ nw_FilterBtn( e.currentTarget, e.currentTarget.textContent, true);};
 
 		el.m_filter = projects[i];
 		el.m_project = true;
