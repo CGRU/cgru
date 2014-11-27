@@ -3,7 +3,7 @@
 #scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
 
-.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 6px; box-shadow: 0 0 4px #000 inset; margin: 4px;}
+.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px;}
 
 .shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
@@ -23,9 +23,9 @@
 .scene .shot {
 position: relative;
 float: left;
-border-radius: 6px;
+border-radius: 2px;
 margin: 4px;
-box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;
+/*box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;*/
 width: 200px;
 height: 44px;
 }
@@ -66,7 +66,7 @@ box-shadow: 0 0 4px rgba(255,255,255,.7);
 opacity:.9;
 }
 
-.shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #000 inset, 0 0 4px #7FF;}
+.shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #7FF inset, 0 0 4px #7FF;}
 
 #scenes_statistics .bars .bar { height: 12px; margin: 2px 0px; }
 #scenes_statistics .bars .bar .rect {

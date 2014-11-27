@@ -379,7 +379,9 @@ margin: 2px 8px;
 padding: 4px 4px;
 width: 60px;
 text-align: center;
-box-shadow: 0 0 4px #030 inset, 0 0 4px #AFA;
+border: 1px solid #777;
+border-radius: 4px;
+box-shadow: 0 0 4px #030 inset, 0 0 8px #AFA;
 background: rgba(0,20,0,.5);
 color: #00FF00;
 text-shadow: 0 0 4px #00FF00, 0 0 8px #00FF00;
@@ -485,7 +487,7 @@ margin: 2px 8px;
 #status_progress { clear: both; border-radius: 2px; }
 #status_progressbar { height: 10px; /*border-radius: 4px;*/ }
 #status_modified { clear: both; float:right; font-style:italic; font-size: 14px; }
-#status_framesnum_div { margin: 1px 6px; border: 1px solid #777; float: left; }
+#status_framesnum_div { margin: 1px 6px; border: 1px solid #777; border-radius: 2px; float: left; }
 #status_framesnum_div.updated { border: 1px solid #FFFF00; }
 #status_framesnum { font: 16px monospace; padding: 1px 6px; float: left; }
 
@@ -710,7 +712,7 @@ box-shadow: 0 0 4px #000 inset;
 .gui .list .ctrl { border-radius: 3px; }
 .gui .list .ctrl .name { float: left; text-transform: capitalize; padding: 3px 8px; }
 .gui .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
-.gui .source { border-radius: 4px; box-shadow: 0 0 4px #000 inset; margin: 8px; padding: 8px; text-align: center; }
+.gui .source { border: 1px solid #777; font: 12px monospace; border-radius: 2px; margin: 8px; padding: 8px; text-align: center; }
 .gui .rules { border: 1px solid #777; font: 12px monospace; padding: 12px; margin: 4px 0px;  border-radius: 2px;}
 .gui .choise { float: left; /*box-shadow: 0 0 2px #000;*/ border-radius: 2px; font-size: 14px; margin: 0px 2px; }
 .gui .choise.selected { /*box-shadow: 0 0 2px #000 inset;*/ }
