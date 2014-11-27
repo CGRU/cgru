@@ -18,6 +18,8 @@ cgru_params.push(['back_body','Body', '', 'Enter background style']);
 cgru_params.push(['back_files','Files', '', 'Enter background style']);
 cgru_params.push(['back_comments','Comments', '', 'Enter background style']);
 
+u_gui_size_handle = '6px'; // with a border
+
 u_thumbstime = {};
 
 function View_body_Open() { u_BodyLoad(); }
@@ -160,7 +162,7 @@ function u_CalcGUI( i_toggle_scrollbars)
 	if( localStorage.sidepanel_opened == 'true')
 	{
 		$('sidepanel_handle').style.display = 'block';
-		$('sidepanel').style.left = '6px';
+		$('sidepanel').style.left = u_gui_size_handle;
 	}
 	else
 	{
@@ -248,7 +250,7 @@ function u_ApplyStyles()
 	if( localStorage.background && localStorage.background.length )
 	{
 		document.body.style.background = localStorage.background;
-		var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle'];
+		var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle','sidepanel_handle'];
 		for( var i = 0; i < backs.length; i++ )
 			$(backs[i]).style.background = localStorage.background;
 	}

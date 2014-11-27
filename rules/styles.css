@@ -2,8 +2,8 @@ body {
 font: 16px Arial;
 }
 
-body, #header, #footer, #navig_div, #sidepanel_div, #content {
-background: #A0A0A0;
+body, #header, #footer, #navig_div, #sidepanel_div, #content, .gui_size_handle {
+background-color: #A0A0A0;
 color: #000000;
 }
 
@@ -15,8 +15,11 @@ color: #000000;
 
 div, span { margin: 0; padding: 0; overflow: hidden; }
 
-#header, #footer, #sidepanel_div, #content {
-box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,255,0.5) inset;
+#header, #footer {
+box-shadow: 0px 0px 2px #000, 0px 0px 4px rgba(255,255,255,0.5) inset;
+}
+#sidepanel_div, #content {
+/*box-shadow: 0px 0px 8px #000, 0px 0px 3px #000 inset, 0px 0px 8px rgba(255,255,255,0.5) inset;*/
 }
 
 /* ================================ */
@@ -54,21 +57,26 @@ float: left;
 
 #footer #info {
 background: rgba(255,255,255,0.2);
-/*border-radius: 4px;*/
+border: 1px solid #777;
+border-radius: 2px;
 margin: 8px 40px;
 padding: 3px 10px;
 height: 19px;
-box-shadow: 0px 0px 4px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
+box-shadow: 0px 0px 4px rgba(255,255,255,.5);
+font: 14px monospace;
 }
 #footer #log {
 display: none;
 position: absolute;
 overflow: auto;
-/*border-radius: 6px;*/
+border: 1px solid #777;
+border-radius: 2px;
 left: 10px; right: 10px; top: 40px; bottom: 5px;
-box-shadow: 0px 0px 4px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
+/*box-shadow: 0px 0px 4px #000 inset, 0px 0px 4px rgba(255,255,255,.5);*/
 padding: 2px 6px;
-font-size: 12px;
+/*font-size: 12px;*/
+font: 11px monospace;
+background-color: rgba(255,255,255,.2);
 }
 #footer #log * { margin: 4px 1px;}
 #footer #cycle {
@@ -101,7 +109,7 @@ top: 38px; bottom: 38px;
 #navig_handle {
 position: absolute;
 right: 0; top: 0; bottom: 0;
-width: 6px;
+width: 2px;
 }
 #navig_panel { position: absolute; height: 20px; left:0;right:0;top:0; box-shadow:0 0 4px #000, 0 0 4px rgba(255,255,255,.4) inset;}
 #navig_panel .button {
@@ -118,11 +126,14 @@ text-align: center;
 clear: both;
 position: relative;
 cursor: pointer;
-border: 1px solid rgba(255,255,255,.2);
+border: 2px solid #777;
 padding: 0px 0px 0px 16px;
-/*border-radius: 4px;*/
+border-radius: 2px;
 font-weight: normal;
-box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
+margin: 2px;
+margin-right: 0;
+border-right: 0;
+/*box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;*/
 }
 #navig.waiting .folder { cursor: wait; }
 #navig .folder.opened {
@@ -137,10 +148,10 @@ background: rgba(200,255,255,.5);
 position: absolute;
 left:0;right:0;top:0;bottom:0;
 }
-#navig .folder.current { border: 1px solid #000; }
+#navig .folder.current { border: 2px solid #AAFFFF; box-shadow: 0 0 4px #AAFFFF; border-right: 0;}
 #navig .folder.current > .fcolor { display: block; }
 #navig .folder.current .fname { color:#000000; }
-#navig .folder:hover { border: 1px solid rgba(200,255,255,.9); }
+#navig .folder:hover { border: 2px solid #555555; border-right: 0;}
 #navig .folder .fname { position: relative; float:left; text-decoration: none; text-shadow: none; }
 #navig .folder.dummy > .fname { font-style: italic; opacity: .5; }
 #navig .folder .progress { clear: both; }
@@ -320,21 +331,19 @@ background-position: center;
 .textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; margin: 4px; }
 .textedit_panel div { float: left; border-radius: 3px; margin: 1px; padding: 0px; width: 20px; box-shadow: 0 0 2px #000; font-size: 14px; }
 
-.gui_size_handle { cursor: col-resize; box-shadow: 0 0 1px #000 inset;}
-.gui_size_handle:hover { box-shadow: 0 0 2px #000 inset;}
+.gui_size_handle { cursor: col-resize; border: 2px solid #777777;}
+.gui_size_handle:hover { border: 2px solid #555555;}
 
 /* ========================================================= */
 /* =============== SIDE PANEL: ============================= */
 #sidepanel_div { position: absolute; right: 0; }
-#sidepanel_handle { position: absolute; width: 6px; left: 0; top: 0; bottom: 0;/* background: #FFFF00;*/ }
+#sidepanel_handle { position: absolute; width: 2px; left: 0; top: 0; bottom: 0;/* background: #FFFF00;*/ }
 #sidepanel { position: absolute; right: 0; left: 6px; top: 0; bottom: 0; }
 #sidepanel > div {
-box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF;
 margin: 4px 1px;
-border-radius: 4px;
-/* margin-left: 6px;*/
+border-radius: 2px;
 }
-#sidepanel_hide { display: none; font-size: 10px; font-style: italic; }
+#sidepanel_hide { display: none; font-size: 10px; font-style: italic; padding: 0px; }
 #sidepanel.opened { overflow-y: scroll;}
 #sidepanel.opened #sidepanel_hide { display: block;}
 #sidepanel .label {
@@ -359,6 +368,7 @@ rgba(201,255,255,.2);
 #sidepanel.opened #sidepanel_permissions .label { height:12px;}
 #sidepanel .body { clear: both; display: none; }
 #sidepanel.opened .opened .body { display: block; }
+#sidepanel.opened > div.opened { display: block;  border: 1px solid #777777;}
 #sidepanel .label:hover, #sidepanel #sidepanel_hide:hover { background-color: rgba(200,255,255,.4);}
 
 /* ============= NEWS: =============== */
@@ -377,16 +387,16 @@ font-weight: bold;
 font-family: monospace;
 display: none;
 }
-#news { border-radius: 2px; box-shadow: 0 0 2px #000 inset, 0 0 4px #FFF; margin: 4px; padding: 4px; }
+#news { /*border-radius: 2px; border: 1px solid #777; margin: 4px; padding: 4px;*/ }
 #sidepanel_news #news_refresh { display: none; float: right; }
 #sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
-.news_ctrl { margin: 2px; padding: 2px 4px; }
+.news_ctrl { margin: 2px; padding: 2px; }
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
-#channels .channel { box-shadow: 0 0 2px #000 inset; border-radius: 2px; margin: 1px 0px; }
+#channels .channel { border: 1px solid #777; border-radius: 2px; margin: 1px; }
 .news_filter { margin: 2px; padding: 0px 3px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
-#news .news { box-shadow: 0 0 2px #000 inset; border-radius: 2px; margin: 1px 0px; }
+#news .news { border: 1px solid #777; border-radius: 2px; margin: 2px; }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
@@ -402,17 +412,17 @@ display: none;
 .playlist_ctrl .button { float: left; padding: 0; }
 .playlist_ctrl_top .button { width: 20px; height: 20px; }
 .playlist_ctrl_bot .button { width: 16px; height: 16px; margin: 1px; }
-#playlist { border-radius: 2px; clear:both; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF; margin:4px; padding:4px; }
+#playlist { border-radius: 2px; clear:both; border: 1px solid #777; margin:4px; padding:4px; }
 #playlist .item {
 font-weight: normal;
 }
 #playlist .folder {
 cursor: pointer;
-border: 1px solid rgba(255,255,255,.2);
-box-shadow: 0 0 2px rgba(0,0,0,.5) inset;
-/*border-radius: 4px;*/
+border: 1px solid #777;
+border-radius: 2px;
 font-size: 16px;
 padding: 2px 0px 2px 8px;
+margin: 1px;
 }
 #playlist .location { font-size: 14px; padding: 0px 0px 0px 8px; border-top: 1px solid rgba(100,100,100,.5); }
 #playlist .location.cur_path { background: rgba( 100, 255, 255, .2 ); }
@@ -423,7 +433,7 @@ padding: 2px 0px 2px 8px;
 #playlist .folder > .folder, #playlist .folder > .location { display: none;}
 #playlist .folder.opened > .folder, #playlist .folder.opened > .location { display: block;}
 #playlist .current {font-weight: bold;}
-#playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); /*color: rgba(0,0,0,1.0);*/}
+#playlist .folder:hover { border: 1px solid #555;}
 /*#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.5) inset, 0 0 2px rgba(200,255,255,1.0); }*/
 
 /* ======= PERMISSIONS: ======== */
@@ -435,7 +445,7 @@ padding: 2px 0px 2px 8px;
 /* ============= RECENT: =============== */
 #sidepanel_recent #recent_refresh { display: none; float:right; }
 #sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
-#recent { border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF;margin:2px;padding:2px; }
+#recent { border-radius: 2px; border: 1px solid #777; margin:2px; padding:2px; }
 #recent > div { font-size: 12px; border-bottom: 1px solid #777; position: relative; }
 #recent img { width: 32px; height: 32px; border: 1px solid #777; border-radius: 4px; margin-top: 4px; float: right; }
 #recent .user { float: left; margin-right: 4px;}
@@ -509,9 +519,10 @@ padding: 4px;
 
 #assets {
 background: rgba(255,255,100,.1);
-box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
+/*box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);*/
+border: 1px solid #777;
 border-radius: 12px;
-height: 30px;
+height: 28px;
 left: 240px;
 right: 120px;
 position: absolute;
@@ -675,8 +686,8 @@ box-shadow: 0 0 4px #000 inset;
 
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */
-#upload { border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px; }
-#upload > div { border-radius: 4px; box-shadow: 0 0 3px #000 inset; margin: 1px 0px; font-size: 14px; }
+#upload { /*border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;*/ }
+#upload > div { border-radius: 4px; border: 1px solid #777; margin: 2px; font-size: 14px; }
 #upload > div.started { background: rgba(200,200,0,.3); }
 #upload > div.done { background: rgba(0,150,0,.3); }
 #upload > div.error { background: rgba(150,0,0,.3); }
