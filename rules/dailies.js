@@ -34,8 +34,25 @@ function d_Make( i_path, i_outfolder)
 
 	params.input = i_path;
 	params.output = i_outfolder;
-	params.artist = c_GetUserTitle();
 	params.activity = RULES.dailies.activity;
+
+	d_guiparams.artist = {"width":'50%'};
+	params.artist = c_GetUserTitle();
+	if( RULES.status && RULES.status.artists && RULES.status.artists.length )
+	{
+		artist = c_GetUserTitle( RULES.status.artists[0]);
+
+		if( artist != c_GetUserTitle() || ( RULES.status.artists.length > 1 ))
+		{
+			params.artist = artist;
+			var artists = [];
+			for( var i = 0; i < RULES.status.artists.length; i++)
+				artists.push( c_GetUserTitle( RULES.status.artists[i]));
+			if( artists.indexOf( c_GetUserTitle()) == -1 )
+				artists.push( c_GetUserTitle());
+			d_guiparams.artist.pulldown = artists;
+		}
+	}
 
 	var dateObj = new Date();
 	date = ''+dateObj.getFullYear();
