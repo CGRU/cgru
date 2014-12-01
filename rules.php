@@ -1161,7 +1161,9 @@ function jsf_makenews( $i_args, &$o_out)
 		// Delete news above the limit:
 		$limit = $i_args['limit'];
 		if( array_key_exists('news_limit', $user))
-			$limit = $user['news_limit'];
+			if( $user['news_limit'] > 0 )
+				$limit = $user['news_limit'];
+
 		while( count( $user['news']) > $limit)
 			array_pop( $user['news']);
 

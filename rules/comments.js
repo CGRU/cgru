@@ -182,6 +182,7 @@ Comment.prototype.init = function()
 	this.elTags.textContent = '';
 	this.elForEdit.innerHTML = '';
 	this.editing = false;
+	this.el.classList.remove('edit');
 
 	this.elEditBtnsDiv.style.display = 'none';
 
@@ -339,6 +340,7 @@ Comment.prototype.setElType = function( i_type)
 Comment.prototype.edit = function()
 {
 	this.editing = true;
+	this.el.classList.add('edit');
 	if( this._new != true )
 	{
 		if( g_auth_user == null )
@@ -363,7 +365,8 @@ Comment.prototype.edit = function()
 
 	this.elEditTypesDiv = document.createElement('div');
 	this.elForEdit.appendChild( this.elEditTypesDiv);
-	this.elEditTypesDiv.style.clear = 'both';
+	this.elEditTypesDiv.classList.add('types');
+//	this.elEditTypesDiv.style.clear = 'both';
 	for( var type in RULES.comments )
 	{
 		var el = document.createElement('div');
@@ -384,7 +387,12 @@ Comment.prototype.edit = function()
 	this.elReportEdit.appendChild( this.elEditTags);
 	this.elEditTags.classList.add('list');
 	this.elEditTags.classList.add('tags');
-	this.elEditTags.textContent = 'Tags:';
+
+	var el = document.createElement('div');
+	this.elEditTags.appendChild( el);
+	el.textContent = 'Tags:';
+	el.classList.add('label');
+
 	this.elEditTags.m_elTags = [];
 	for( var tag in RULES.tags)
 	{
@@ -399,7 +407,7 @@ Comment.prototype.edit = function()
 
 		if( this.obj.tags )
 			if( this.obj.tags.indexOf( tag) != -1 )
-				el.classList.add('selected');
+				c_ElSetSelected( el, true);
 
 		this.elEditTags.m_elTags.push( el);
 	}
@@ -437,8 +445,6 @@ Comment.prototype.edit = function()
 
 	this.elText.classList.add('editing');
 	this.elText.contentEditable = 'true';
-	this.elText.style.color = '#000000';
-	this.elText.style.background = '#DDDDDD';
 	this.elText.focus();
 }
 

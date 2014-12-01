@@ -311,7 +311,7 @@ padding:0 4px;
 .progress { position: relative; background:rgba(0,0,0,.5); }
 .progressbar { background:rgba(0,255,0,.5); }
 
-.colorbars { /*border-radius: 6px;*/ margin: 2px; border: 1px solid #000;}
+.colorbars { border-radius: 2px; margin: 2px; border: 1px solid #000; }
 .colorbars div div { float:left;}
 
 .cmdexec {
@@ -398,7 +398,7 @@ display: none;
 #channels .channel { border: 1px solid #777; border-radius: 2px; margin: 1px; }
 .news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid #777; }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
-#news .news { border: 1px solid #777; border-radius: 2px; margin: 2px; }
+#news .news { border-top: 1px solid #777; margin: 2px; }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
@@ -654,7 +654,14 @@ float: left; margin: 1px 8px;
 .comment .panel > .button { font-size: 12px; float: right;}
 .comment .panel .edit_btns_div { float: right;}
 .comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}
-.comment .edit_duration div { float: left; margin: 1px;}
+.comment.edit .panel .duration { display: none; }
+.comment.edit .panel .tags { display: none; }
+.comment.edit .text { background-color: #DDDDDD; color: #000000; }
+.comment .edit .types { clear: both; border-top: 1px solid #777; }
+.comment .edit .tags { padding: 4px; clear: both; border-top: 1px solid #777; }
+.comment .edit .tags .label { float: left; padding: 2px; opacity: .7; }
+.comment .edit_duration div { float: left; margin: 1px; }
+.comment .edit_duration { border-top: 1px solid #777; border-bottom: 1px solid #777; }
 .comment .edit_duration .sample {
 text-align: center;
 border: 1px solid rgba(0,0,0,.3);
@@ -667,8 +674,7 @@ cursor: pointer;
 text-align: center;
 border: 1px solid rgba(200,255,255,.3);
 width: 30px; height: 20px;
-border-radius: 4px;
-box-shadow: 0 0 4px #000 inset;
+border-radius: 2px;
 }
 /*.comment .uploads { margin:6px; padding:4px; border-radius: 6px; box-shadow: 0 0 4px #000 inset; }*/
 .comment .uploads .path { margin: 6px 4px; padding: 6px; border-radius: 4px; box-shadow: 0 0 2px #000 inset, 0 0 2px rgba(255,255,255,.5); }
