@@ -396,7 +396,7 @@ display: none;
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
 #channels .channel { border: 1px solid #777; border-radius: 2px; margin: 1px; }
-.news_filter { margin: 2px; padding: 0px 3px; box-shadow: 0 0 1px #000 inset, 0 0 1px #FFF; }
+.news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid #777; }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
 #news .news { border: 1px solid #777; border-radius: 2px; margin: 2px; }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
