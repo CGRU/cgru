@@ -469,7 +469,7 @@ function sc_FilterShots( i_args)
 		if( i_args.percent && found )
 		{
 			found = false;
-			if( st_obj.progress &&
+			if(( st_obj.progress != null ) &&
 				(( i_args.percent[0] == null ) || ( st_obj.progress >= i_args.percent[0] )) &&
 				(( i_args.percent[1] == null ) || ( st_obj.progress <= i_args.percent[1] )))
 				found = true;
