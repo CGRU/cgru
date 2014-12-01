@@ -135,11 +135,20 @@ function d_DailiesWalkReceived( i_data, i_args)
 	wnd.elContent.appendChild( elRules);
 	elRules.classList.add('rules');
 	elRules.textContent = 'RULES.dailies='+JSON.stringify(RULES.dailies).replace(/,/g,', ');
+
+	wnd.elContent.focus();
+	wnd.elContent.m_wnd = wnd;
+	wnd.elContent.onkeydown = function(e)
+	{
+//		console.log( e.keyCode);
+		if( e.keyCode == 13 ) d_ProcessGUI( e.currentTarget.m_wnd);
+	}
 }
 
 function d_ProcessGUI( i_wnd)
 {
 	var params = gui_GetParams( i_wnd.elContent, d_guiparams);
+//console.log( JSON.stringify( params)); return;
 
 	for( key in i_wnd.elContent.m_choises )
 		params[key] = i_wnd.elContent.m_choises[key].value;
