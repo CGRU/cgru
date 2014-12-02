@@ -1133,13 +1133,14 @@ function jsf_makenews( $i_args, &$o_out)
 			}
 
 
-		foreach( $user['channels'] as $channel )
-			if( strpos( $news['path'], $channel['id'] ) === 0 )
-			{
-				array_push( $sub_users, $user);
-				array_push( $o_out['users'], $user['id']);
-				break;
-			}
+		if( array_key_exists( 'channels', $user))
+			foreach( $user['channels'] as $channel )
+				if( strpos( $news['path'], $channel['id'] ) === 0 )
+				{
+					array_push( $sub_users, $user);
+					array_push( $o_out['users'], $user['id']);
+					break;
+				}
 	}
 
     // Add news and write files:
