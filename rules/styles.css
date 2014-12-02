@@ -491,6 +491,15 @@ margin: 2px 8px;
 #status_framesnum_div.updated { border: 1px solid #FFFF00; }
 #status_framesnum { font: 16px monospace; padding: 1px 6px; float: left; }
 
+#status_tasks_div, #status_reports_div {
+margin: 4px 8px;
+padding: 4px 8px;
+border: 1px solid #777;
+border-radius: 8px;
+}
+#status_tasks_div { float: left; }
+#status_reports_div { float:right; }
+
 #status_tasks .task { margin: 2px; border: 1px solid #777; }
 #status_tasks .task > div { float: left; margin: 2px 4px; }
 
