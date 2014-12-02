@@ -269,7 +269,7 @@ float: left;
 #content > .view .view_view { clear: both; }
 
 .editing {
-background: #DDD;
+background-color: #DDD;
 color: #000;
 border-radius: 4px;
 box-shadow: 0 0 2px #000 inset;
@@ -665,7 +665,7 @@ float: left; margin: 1px 8px;
 .comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}
 .comment.edit .panel .duration { display: none; }
 .comment.edit .panel .tags { display: none; }
-.comment.edit .text { background-color: #DDDDDD; color: #000000; }
+/*.comment.edit .text { background-color: #DDDDDD; color: #000000; }*/
 .comment .edit .types { clear: both; border-top: 1px solid #777; }
 .comment .edit .tags { padding: 4px; clear: both; border-top: 1px solid #777; }
 .comment .edit .tags .label { float: left; padding: 2px; opacity: .7; }

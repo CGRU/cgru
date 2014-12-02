@@ -183,8 +183,16 @@ Comment.prototype.init = function()
 	this.elForEdit.innerHTML = '';
 	this.editing = false;
 	this.el.classList.remove('edit');
-
 	this.elEditBtnsDiv.style.display = 'none';
+
+	this.elText.contentEditable = 'false';
+	this.elText.classList.remove('editing');
+	this.elText.style.color = localStorage.text_color;
+	if( localStorage.back_comments && ( localStorage.back_comments != ''))
+		this.elText.style.background = localStorage.back_comments;
+	else if( localStorage.background && ( localStorage.background != '' ))
+		this.elText.style.background = localStorage.background;
+
 
 //console.log( g_auth_user.id + ' ' + this.obj.user_name );
 	if( g_auth_user )
@@ -198,15 +206,6 @@ Comment.prototype.init = function()
 	}
 	else
 		this.elEdit.style.display = 'none';
-
-	this.elText.contentEditable = 'false';
-	this.elText.classList.remove('editing');
-	this.elText.style.color = localStorage.text_color;
-
-	if( localStorage.back_comments && ( localStorage.back_comments != ''))
-		this.elText.style.background = localStorage.back_comments;
-	else if( localStorage.background && ( localStorage.background != '' ))
-		this.elText.style.background = localStorage.background;
 
 	var avatar = null;
 	if( this.obj == null )
@@ -339,8 +338,6 @@ Comment.prototype.setElType = function( i_type)
 
 Comment.prototype.edit = function()
 {
-	this.editing = true;
-	this.el.classList.add('edit');
 	if( this._new != true )
 	{
 		if( g_auth_user == null )
@@ -358,6 +355,8 @@ Comment.prototype.edit = function()
 	else
 		this.elDel.style.display = 'none';
 
+	this.editing = true;
+	this.el.classList.add('edit');
 	this.elEdit.style.display = 'none';
 	this.elEditBtnsDiv.style.display = 'block';
 
@@ -444,6 +443,8 @@ Comment.prototype.edit = function()
 		u_GuestAttrsDraw( this.elForEdit);
 
 	this.elText.classList.add('editing');
+	this.elText.style.backgroundColor = '#DDDDDD';
+	this.elText.style.color = '#000000';
 	this.elText.contentEditable = 'true';
 	this.elText.focus();
 }
