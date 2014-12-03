@@ -13,6 +13,7 @@ u_body_text = '';
 u_body_editing = false;
 u_body_edit_markup = 0;
 
+u_backgroundColor = '#A0A0A0';
 cgru_params.push(['back_asset','Asset', '', 'Enter background style']);
 cgru_params.push(['back_body','Body', '', 'Enter background style']);
 cgru_params.push(['back_files','Files', '', 'Enter background style']);

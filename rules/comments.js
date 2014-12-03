@@ -187,11 +187,16 @@ Comment.prototype.init = function()
 
 	this.elText.contentEditable = 'false';
 	this.elText.classList.remove('editing');
-	this.elText.style.color = localStorage.text_color;
+	if( localStorage.text_color && ( localStorage.text_color != ''))
+		this.elText.style.color = localStorage.text_color;
+	else
+		this.elText.style.color = 'inherit';
 	if( localStorage.back_comments && ( localStorage.back_comments != ''))
 		this.elText.style.background = localStorage.back_comments;
 	else if( localStorage.background && ( localStorage.background != '' ))
 		this.elText.style.background = localStorage.background;
+	else
+		this.elText.style.backgroundColor = u_backgroundColor;
 
 
 //console.log( g_auth_user.id + ' ' + this.obj.user_name );
