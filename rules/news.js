@@ -458,8 +458,12 @@ function nw_NewsShow()
 		elLabel.classList.add('news_label');
 		elLabel.innerHTML = c_GetUserTitle(news.user, news.guest)+': '+news.title;
 
+		var elLinkDiv = document.createElement('div');
+		el.appendChild( elLinkDiv);
+		elLinkDiv.classList.add('link');
+		
 		var elLink = document.createElement('a');
-		el.appendChild( elLink);
+		elLinkDiv.appendChild( elLink);
 		elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 
@@ -704,6 +708,7 @@ function nw_RecentReceived( i_data, i_args)
 
 		var el = document.createElement('div');
 		$('recent').appendChild( el);
+		el.classList.add('recent');
 
 		var avatar = c_GetAvatar( news.user, news.guest);
 		if( avatar )
@@ -724,8 +729,12 @@ function nw_RecentReceived( i_data, i_args)
 		elTitle.classList.add('title');
 		elTitle.innerHTML = news.title;
 
+		var elLinkDiv = document.createElement('div');
+		el.appendChild( elLinkDiv);
+		elLinkDiv.classList.add('link');
+		
 		var elLink = document.createElement('a');
-		el.appendChild( elLink);
+		elLinkDiv.appendChild( elLink);
 		elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 

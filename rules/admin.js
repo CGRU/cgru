@@ -210,25 +210,28 @@ function ad_PermissionsReceived( i_data)
 		var el = document.createElement('div');
 		$('permissions').appendChild( el);
 		el.textContent = 'Groups:';
+		el.classList.add('caption');
 	}
 	for( var i = 0; i < ad_permissions.groups.length; i++)
 	{
 		var group = ad_permissions.groups[i];
 		var el = document.createElement('div');
 		$('permissions').appendChild( el);
+		el.classList.add('item');
 
 		if( group != 'admins' )
 		{
 			var elBtn = document.createElement('div');
 			el.appendChild( elBtn);
 			elBtn.classList.add('button');
-			elBtn.textContent = '-';
+			elBtn.classList.add('delete');
 			elBtn.m_group_id = group;
 			elBtn.ondblclick = function(e){ad_PermissionsRemove('groups', e.currentTarget.m_group_id)};
 		}
 
 		var elName = document.createElement('div');
 		el.appendChild( elName);
+		elName.classList.add('name');
 		elName.textContent = group;
 	}
 
@@ -237,22 +240,25 @@ function ad_PermissionsReceived( i_data)
 		var el = document.createElement('div');
 		$('permissions').appendChild( el);
 		el.textContent = 'Users:';
+		el.classList.add('caption');
 	}
 	for( var i = 0; i < ad_permissions.users.length; i++)
 	{
 		var user = ad_permissions.users[i];
 		var el = document.createElement('div');
 		$('permissions').appendChild( el);
+		el.classList.add('item');
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
-		elBtn.textContent = '-';
+		elBtn.classList.add('delete');
 		elBtn.m_user_id = user;
 		elBtn.ondblclick = function(e){ad_PermissionsRemove('users', e.currentTarget.m_user_id)};
 
 		var elName = document.createElement('div');
 		el.appendChild( elName);
+		elName.classList.add('name');
 		elName.textContent = user;
 	}
 }

@@ -131,11 +131,6 @@ function d_DailiesWalkReceived( i_data, i_args)
 	elSend.onclick = function(e){ d_ProcessGUI( e.currentTarget.m_wnd);}
 	elSend.m_wnd = wnd;
 
-	var elRules = document.createElement('div');
-	wnd.elContent.appendChild( elRules);
-	elRules.classList.add('rules');
-	elRules.textContent = 'RULES.dailies='+JSON.stringify(RULES.dailies).replace(/,/g,', ');
-
 	wnd.elContent.focus();
 	wnd.elContent.m_wnd = wnd;
 	wnd.elContent.onkeydown = function(e)

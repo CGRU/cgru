@@ -284,7 +284,7 @@ min-height: 19px;
 
 .tag {
 float:left;
-cursor: pointer;
+/*cursor: pointer;*/
 border-radius: 3px;
 border: 1px solid rgba(98,98,98,.5);
 margin:1px 4px;
@@ -336,10 +336,8 @@ background-position: center;
 #sidepanel_div { position: absolute; right: 0; }
 #sidepanel_handle { position: absolute; width: 2px; left: 0; top: 0; bottom: 0;/* background: #FFFF00;*/ }
 #sidepanel { position: absolute; right: 0; left: 6px; top: 0; bottom: 0; }
-#sidepanel > div {
-margin: 4px 1px;
-border-radius: 2px;
-}
+#sidepanel > div { margin: 4px 0px; }
+#sidepanel.opened > div.opened { display: block;  border-bottom: 2px solid rgba(98,98,98,.5);}
 #sidepanel_hide { display: none; font-size: 10px; font-style: italic; padding: 0px; }
 #sidepanel.opened { overflow-y: scroll;}
 #sidepanel.opened #sidepanel_hide { display: block;}
@@ -362,7 +360,6 @@ height:18px;
 #sidepanel.opened #sidepanel_permissions .label { height:12px;}
 #sidepanel .body { clear: both; display: none; }
 #sidepanel.opened .opened .body { display: block; }
-#sidepanel.opened > div.opened { display: block;  border: 1px solid rgba(98,98,98,.5);}
 
 /* ============= NEWS: =============== */
 #news_count {
@@ -382,29 +379,31 @@ font-weight: bold;
 font-family: monospace;
 display: none;
 }
-#news { /*border-radius: 2px; border: 1px solid rgba(98,98,98,.5); margin: 4px; padding: 4px;*/ }
 #sidepanel_news #news_refresh { display: none; float: right; }
 #sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
 .news_ctrl { margin: 2px; padding: 2px; }
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
-#channels .channel { border: 1px solid rgba(98,98,98,.5); border-radius: 2px; margin: 1px; }
+#channels .channel { border-top: 1px solid rgba(98,98,98,.5); border-radius: 2px; margin: 0px; }
 .news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid rgba(98,98,98,.5); }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
+#news { }
 #news .news { border-top: 1px solid rgba(98,98,98,.5); }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
 #news .news.cur_path          { background: rgba( 100, 255, 255, .2); }
 #news .news.assigned.cur_path { background: rgba(   0, 255, 150, .2); }
+#news .news_label { font-size: 12px; margin: 4px 0 0 0; }
 #news .news .button.delete {
 float: left;
-width: 12px;
-height: 12px;
+width: 14px;
+height: 14px;
 margin: 0 4px 0 0;
 border-top: 0;
 border-left: 0;
 border-radius: 0 0 2px 0;
 }
-#news a, #channels a { font-size: 10px; }
+#news .news .link { margin: 0 0 4px 8px; }
+#news .news a, #channels .channel { font-size: 10px; }
 #news .avatar {
 float:right;
 border: 1px solid rgba(98,98,98,.5);
@@ -412,11 +411,26 @@ border-top: 0;
 border-right: 0;
 border-radius: 0 0 2px 0;
 border-radius: 0 0 0 4px;
-width: 24px;
-height: 24px;
+width: 32px;
+height: 32px;
 margin: 0 0 0 2px;
 }
-#news .news_label { font-size:12px; }
+/* ============= RECENT: =============== */
+#sidepanel_recent #recent_refresh { display: none; float:right; }
+#sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
+#recent { }
+#recent .recent { font-size: 12px; border-top: 1px solid rgba(98,98,98,.5); position: relative; }
+#recent .recent > div { margin: 2px 4px; }
+#recent img {
+float: right;
+width: 32px;
+height: 32px;
+border: 1px solid rgba(98,98,98,.5);
+border-top: 0;
+border-right: 0;
+border-radius: 0 0 0 4px;
+}
+#recent .user { float: left; margin-right: 4px;}
 
 /* ============= PLAYLIST: =============== */
 #sidepanel_playlist #playlist_refresh { display: none; float:right; }
@@ -453,27 +467,11 @@ margin: 1px;
 
 /* ======= PERMISSIONS: ======== */
 #sidepanel_permissions { display:none; background-color: rgba(200,0,0,.2); }
-#permissions { border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF; margin:4px; padding:4px; }
-#permissions > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
-#permissions > div div { padding: 0px 4px;}
-#permissions > div .button { float: left; margin: 0px;}
-/* ============= RECENT: =============== */
-#sidepanel_recent #recent_refresh { display: none; float:right; }
-#sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
-/*#recent { border-radius: 2px; border: 1px solid rgba(98,98,98,.5); margin:2px; }*/
-#recent > div { font-size: 12px; border-top: 1px solid rgba(98,98,98,.5); position: relative; }
-#recent > div > div, #recent > div > a { margin: 2px 4px; }
-#recent img {
-float: right;
-width: 32px;
-height: 32px;
-border: 1px solid rgba(98,98,98,.5);
-border-top: 0;
-border-right: 0;
-border-radius: 0 0 0 4px;
-}
-#recent .user { float: left; margin-right: 4px;}
-
+#permissions { font-size: 14px; }
+#permissions .caption { font-style: italic; margin-top: 4px; padding: 0 8px; }
+#permissions .item { border-top: 1px solid rgba(98,98,98,.5); }
+#permissions .item .name { padding: 2px 24px; }
+#permissions .item .button { width: 12px; height: 12px; float: right; margin: 0px; }
 /* ============================================================================= */
 /* ================================ CONTENT: =================================== */
 #content {
@@ -535,6 +533,7 @@ border-radius: 8px;
 .status_edit .edit_tasks .task .dur_div { float: left; }
 .status_edit .edit_tasks .task .dur_label { float: left; }
 .status_edit .edit_tasks .task .duration { width: 40px; float: left; }
+.status_edit .tag { cursor: pointer; }
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }
@@ -543,8 +542,8 @@ table.statistics .duration { text-align: center; border-left-width: 0; }
 
 #search {
 margin: 4px 0 0 0;
-box-shadow: 0 0 4px #000000 inset;
-/*border-radius: 8px;*/
+border: 1px solid rgba(98,98,98,.5);
+border-radius: 2px;
 padding: 4px;
 }
 #search div { margin: 1px 4px; }
@@ -687,10 +686,10 @@ float: left; margin: 1px 8px;
 .comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}
 .comment.edit .panel .duration { display: none; }
 .comment.edit .panel .tags { display: none; }
-/*.comment.edit .text { background-color: #DDDDDD; color: #000000; }*/
 .comment .edit .types { clear: both; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .edit .tags { padding: 4px; clear: both; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .edit .tags .label { float: left; padding: 2px; opacity: .7; }
+.comment .edit .tag { cursor: pointer; }
 .comment .edit_duration div { float: left; margin: 1px; }
 .comment .edit_duration { border-top: 1px solid rgba(98,98,98,.5); border-bottom: 1px solid rgba(98,98,98,.5); }
 .comment .edit_duration .sample {
@@ -708,7 +707,7 @@ width: 30px; height: 20px;
 border-radius: 2px;
 }
 /*.comment .uploads { margin:6px; padding:4px; border-radius: 6px; box-shadow: 0 0 4px #000 inset; }*/
-.comment .uploads .path { margin: 6px 4px; padding: 6px; border-radius: 4px; box-shadow: 0 0 2px #000 inset, 0 0 2px rgba(255,255,255,.5); }
+.comment .uploads .path { margin: 6px 4px; padding: 6px; border-radius: 2px; box-shadow: 0 0 2px #000 inset, 0 0 2px rgba(255,255,255,.5); }
 .comment .uploads .path > a { margin: 3px 9px; }
 .comment .uploads .path .file { clear: both; margin: 2px 0px; padding: 2px 0px; border-top: 1px solid rgba(98,98,98,.5); }
 .comment .uploads .path .file .thumbnail { float: left; margin-right: 8px; }
@@ -727,7 +726,7 @@ border-radius: 2px;
 /* ====================================================================== */
 /* ==================== UPLOAD: ========================================= */
 #upload { /*border-radius: 2px; box-shadow:0 0 2px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;*/ }
-#upload > div { border-radius: 4px; border: 1px solid rgba(98,98,98,.5); margin: 2px; font-size: 14px; }
+#upload > div { border-radius: 2px; border: 1px solid rgba(98,98,98,.5); margin: 2px; font-size: 14px; }
 #upload > div.started { background: rgba(200,200,0,.3); }
 #upload > div.done { background: rgba(0,150,0,.3); }
 #upload > div.error { background: rgba(150,0,0,.3); }
