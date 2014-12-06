@@ -680,7 +680,7 @@ float: left; margin: 1px 8px;
 .comment .panel .user { width: 140px; }
 .comment .panel .duration { width: 50px; text-align:center; box-shadow: 0 0 2px #000 inset; }
 .comment .panel .date { font-size: 14px; margin-top: 2px; }
-.comment .panel .modified { margin-top: 2px; float: right; font-size: 10px; font-style:italic; opacity: .8; padding: 2px 4px;}
+.comment .panel .info { margin-top: 2px; float: right; font-size: 10px; font-style:italic; opacity: .8; padding: 2px 4px;}
 .comment .panel > .button { font-size: 12px; float: right;}
 .comment .panel .edit_btns_div { float: right;}
 .comment .panel .edit_btns_div > .button { font-size: 12px; float: right;}

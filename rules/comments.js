@@ -154,9 +154,9 @@ function Comment( i_obj)
 	this.elDate.classList.add('date');
 	this.elPanel.appendChild( this.elDate);
 
-	this.elModified = document.createElement('div');
-	this.elModified.classList.add('modified');
-	this.elPanel.appendChild( this.elModified);
+	this.elInfo = document.createElement('div');
+	this.elInfo.classList.add('info');
+	this.elPanel.appendChild( this.elInfo);
 
 	this.elText = document.createElement('div');
 	this.el.appendChild( this.elText);
@@ -202,6 +202,7 @@ Comment.prototype.init = function()
 //console.log( g_auth_user.id + ' ' + this.obj.user_name );
 	if( g_auth_user )
 	{
+		// Edit button only for admins or a comment owner:
 		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
 			this.elEdit.style.display = 'block';
 
@@ -269,11 +270,20 @@ Comment.prototype.init = function()
 	if( this.obj.duration && this.obj.duration > 0 )
 		this.elDuration.textContent = this.obj.duration;
 
+	var info = '';
+
+	// Email is shown for admins only:
+	if( g_admin && this.obj && this.obj.guest && this.obj.guest.email )
+		info += 'Guest email: ' + c_EmailDecode( this.obj.guest.email);
+
 	if( this.obj.mtime )
 	{
 		var date = c_DT_StrFromMSec( this.obj.mtime);
-		this.elModified.textContent = 'Modified: ' + c_GetUserTitle( this.obj.muser_name)+' '+date;
+		if( info.length ) info += '<br>';
+		info += 'Modified: ' + c_GetUserTitle( this.obj.muser_name)+' '+date;
 	}
+
+	this.elInfo.innerHTML = info;
 
 	if( this.obj.text )
 		this.elText.innerHTML = this.obj.text;
