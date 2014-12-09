@@ -410,7 +410,7 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 
 			if( name.indexOf('.') == 0 ) continue;
 
-			if( c_FileIsMovie( name ))
+			if( c_FileIsMovie( name ) || c_FileIsArchive( name ))
 			{
 				if( i_path )
 					i_walk.files[f].name = i_path + '/' + i_walk.files[f].name;
