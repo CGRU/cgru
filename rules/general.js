@@ -191,7 +191,7 @@ function g_NavigatePost()
 
 function g_POST(i_msg)
 {
-	if( ASSET && ASSET.post )
+	if( ASSET && (( ASSET.path == g_CurPath()) || ( ASSET.show_in_subdirectories )) && ASSET.post )
 	{
 		// Asset script should launch post function itself,
 		// as all its data load (GUI construction) can be delayed (async).

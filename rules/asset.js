@@ -7,7 +7,6 @@ function View_asset_Close() { $('asset').textContent = ''; }
 function a_Process()
 {
 	a_AutoSeek();
-//	if( ASSET ) c_RulesMergeObjs( ASSET, RULES.assets[ASSET.type]);
 	a_ShowHeaders();
 }
 
