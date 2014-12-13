@@ -433,17 +433,6 @@ void ListRenders::calcTitle()
 	m_parentWindow->setWindowTitle(QString("R[%1/%2]: B%3/%4F (n%5)").arg( total).arg( online).arg( busy).arg( free).arg( nimby));
 }
 
-void ListRenders::actPriority()
-{
-	ItemRender* item = (ItemRender*)getCurrentItem();
-	if( item == NULL ) return;
-	int current = item->getPriority();
-
-	bool ok;
-	int priority = QInputDialog::getInteger(this, "Change Priority", "Enter New Priority", current, 0, 250, 1, &ok);
-	if( !ok) return;
-	setParameter("priority", priority);
-}
 void ListRenders::actCapacity()
 {
 	ItemRender* item = (ItemRender*)getCurrentItem();
@@ -519,19 +508,6 @@ void ListRenders::actRequestInfo()
 	displayInfo( "Render info request.");
 	af::Msg * msg = new af::Msg( af::Msg::TRenderInfoRequestId, item->getId(), true);
 	Watch::sendMsg( msg);
-}
-
-void ListRenders::actAnnotate()
-{
-	ItemRender* item = (ItemRender*)getCurrentItem();
-	if( item == NULL ) return;
-	QString current = item->getAnnotation();
-
-	bool ok;
-	QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameter("annotation", afqt::qtos( text));
 }
 
 void ListRenders::actEnableService()  { setService( true );}

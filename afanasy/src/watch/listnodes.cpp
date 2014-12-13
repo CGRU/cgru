@@ -5,10 +5,12 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
+#include "wndcustomdata.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QInputDialog>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -329,4 +331,47 @@ void ListNodes::sortMatch( const std::vector<int32_t> & i_list)
    QList<Item*> selectedItems( getSelectedItems());
    ((ModelNodes*)m_model)->sortMatch( i_list);
    setSelectedItems( selectedItems);
+}
+
+void ListNodes::actPriority()
+{
+	ItemNode * item = (ItemNode*)getCurrentItem();
+	if( item == NULL ) return;
+	int current = item->m_priority;
+
+	int maximum = af::Environment::getPriority();
+	if( af::Environment::VISOR()) maximum = 250;
+	bool ok;
+	int priority = QInputDialog::getInteger( this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
+	if( !ok) return;
+
+	setParameter("priority", priority);
+}
+
+void ListNodes::actAnnotate()
+{
+	ItemNode * item = (ItemNode*)getCurrentItem();
+	if( item == NULL ) return;
+	QString current = item->m_annotation;
+
+	bool ok;
+	QString text = QInputDialog::getText( this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
+	if( !ok) return;
+
+	setParameter("annotation", afqt::qtos( text));
+}
+
+void ListNodes::actCustomData()
+{
+	ItemNode * item = (ItemNode*)getCurrentItem();
+	if( item == NULL ) return;
+
+	WndCustomData * wnd = new WndCustomData("Custom Data", item->m_custom_data);
+
+	connect( wnd, SIGNAL( textEdited( const QString & )), this, SLOT( customDataSet( const QString & )));
+}
+
+void ListNodes::customDataSet( const QString & text)
+{
+	setParameter("custom_data", af::strEscape(afqt::qtos( text)));
 }

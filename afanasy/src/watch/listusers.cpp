@@ -141,6 +141,12 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 		menu.addSeparator();
 
+		action = new QAction( "Custom Data", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
+		menu.addAction( action);
+
+		menu.addSeparator();
+
 		action = new QAction( "Delete", this);
 		action->setEnabled( useritem->numjobs == 0 );
 		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
@@ -212,34 +218,6 @@ void ListUsers::calcTitle()
 		if( itemuser->numrunningtasks > 0 ) running++;
 	}
 	m_parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
-}
-
-void ListUsers::actAnnotate()
-{
-	ItemUser* item = (ItemUser*)getCurrentItem();
-	if( item == NULL ) return;
-	QString current = item->annotation;
-
-	bool ok;
-	QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameter("annotation", afqt::qtos( text));
-}
-
-void ListUsers::actPriority()
-{
-	ItemUser* useritem = (ItemUser*)getCurrentItem();
-	if( useritem == NULL ) return;
-	int current = useritem->priority;
-
-	int maximum = af::Environment::getPriority();
-	if( af::Environment::VISOR()) maximum = 250;
-	bool ok;
-	int priority = QInputDialog::getInteger(this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
-	if( !ok) return;
-
-	setParameter("priority", priority);
 }
 
 void ListUsers::actErrorsAvoidHost()

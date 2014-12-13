@@ -66,6 +66,8 @@ void ItemJob::updateValues( af::Node *node, int type)
       return;
    }
 
+	updateNodeValues( node);
+
    // This is not item creation:
    if( state != 0 )
    {
@@ -85,8 +87,6 @@ void ItemJob::updateValues( af::Node *node, int type)
 	setDone(    job->isDone()    );
 	setError(   job->isError()   );
 
-	annotation           = afqt::stoq( job->getAnnotation().c_str());
-	priority             = job->getPriority();
 	username             = afqt::stoq( job->getUserName().c_str());
 	hostname             = afqt::stoq( job->getHostName().c_str());
 	maxrunningtasks      = job->getMaxRunningTasks();
@@ -142,7 +142,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( false == need_properties.isEmpty()  ) properties += QString(" P(%1)" ).arg( need_properties     );
    if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
    if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
-   properties += QString(" p%2").arg( priority);
+   properties += QString(" p%2").arg( m_priority);
 
    user_eta = username;
    if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
@@ -178,7 +178,7 @@ bool ItemJob::calcHeight()
 
 	m_height = Height + block_height*m_blocks_num;
 
-	if( false == annotation.isEmpty())
+	if( false == m_annotation.isEmpty())
 	{
 		m_height += HeightAnnotation;
 	}
@@ -310,11 +310,11 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
 
 	// Annotation:
-	if( false == annotation.isEmpty())
+	if( false == m_annotation.isEmpty())
 	{
 		painter->setPen( clrTextMain( option) );
 		painter->setFont( afqt::QEnvironment::f_info);
-		painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, annotation );
+		painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, m_annotation );
 	}
 
 
@@ -333,7 +333,7 @@ bool ItemJob::setSortType(   int type )
          sort_str = m_name;
          break;
       case CtrlSortFilter::TPRIORITY:
-         sort_int = priority;
+         sort_int = m_priority;
          break;
       case CtrlSortFilter::TUSERNAME:
          sort_str = username;

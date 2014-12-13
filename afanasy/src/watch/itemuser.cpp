@@ -31,8 +31,8 @@ void ItemUser::updateValues( af::Node *node, int type)
 {
 	af::User * user = (af::User*)node;
 
-	priority             = user->getPriority();
-	annotation           = afqt::stoq( user->getAnnotation());
+	updateNodeValues( node);
+
 	hostname             = afqt::stoq( user->getHostName());
 	numjobs              = user->getNumJobs();
 	numrunningtasks      = user->getRunningTasksNumber();
@@ -52,7 +52,7 @@ void ItemUser::updateValues( af::Node *node, int type)
 	else
 		setNotRunning();
 
-	strLeftTop = QString("%1-%2").arg(m_name).arg( priority);
+	strLeftTop = QString("%1-%2").arg(m_name).arg( m_priority);
 	if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
 
 	strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
@@ -84,7 +84,7 @@ bool ItemUser::calcHeight()
 {
 	int old_height = m_height;
 	m_height = HeightUser;
-	if( false == annotation.isEmpty()) m_height += HeightAnnotation;
+	if( false == m_annotation.isEmpty()) m_height += HeightAnnotation;
 	return old_height == m_height;
 }
 
@@ -109,8 +109,8 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 	painter->setPen( afqt::QEnvironment::qclr_black );
 	painter->drawText( x, y, w, height_user, Qt::AlignRight   | Qt::AlignTop,     strRightTop    );
 
-	if( false == annotation.isEmpty())
-		painter->drawText( x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, annotation );
+	if( false == m_annotation.isEmpty())
+		painter->drawText( x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, m_annotation );
 
 	{  // draw stars:
 		static const int stars_size = 8;
@@ -156,7 +156,7 @@ bool ItemUser::setSortType(   int type )
 		case CtrlSortFilter::TNONE:
 			return false;
 		case CtrlSortFilter::TPRIORITY:
-			sort_int = priority;
+			sort_int = m_priority;
 			break;
 		case CtrlSortFilter::TNAME:
 			sort_str = m_name;

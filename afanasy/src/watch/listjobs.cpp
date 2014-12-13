@@ -229,6 +229,10 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Life Time", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
 	submenu->addAction( action);
+	submenu->addSeparator();
+	action = new QAction( "Custom Data", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
+	submenu->addAction( action);
 
 	menu.addMenu( submenu);
 
@@ -494,19 +498,6 @@ void ListJobs::actRequestErrorHostsList()
 void ListJobs::actSetHidden()   { setParameter("hidden", "true",  false); }
 void ListJobs::actUnsetHidden() { setParameter("hidden", "false", false); }
 
-void ListJobs::actAnnotate()
-{
-	ItemJob* item = (ItemJob*)getCurrentItem();
-	if( item == NULL ) return;
-	QString current = item->annotation;
-
-	bool ok;
-	QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
-	if( !ok) return;
-
-	setParameter("annotation", afqt::qtos( text));
-}
-
 void ListJobs::actSetUser()
 {
 	ItemJob* item = (ItemJob*)getCurrentItem();
@@ -518,20 +509,6 @@ void ListJobs::actSetUser()
 	if( !ok) return;
 
 	setParameter("user_name", afqt::qtos( text));
-}
-
-void ListJobs::actPriority()
-{
-	ItemJob* jobitem = (ItemJob*)getCurrentItem();
-	if( jobitem == NULL ) return;
-	int current = jobitem->priority;
-
-	int maximum = 250;
-	bool ok;
-	int priority = QInputDialog::getInteger(this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
-	if( !ok) return;
-
-	setParameter("priority", priority);
 }
 
 void ListJobs::actWaitTime()

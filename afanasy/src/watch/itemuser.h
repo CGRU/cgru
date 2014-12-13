@@ -21,9 +21,7 @@ public:
    QString hostsmask;
    QString hostsmask_exclude;
 
-   int priority;
    QString hostname;
-   QString annotation;
    int numjobs;
    int numrunningtasks;
 

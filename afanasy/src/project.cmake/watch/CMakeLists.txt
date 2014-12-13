@@ -24,8 +24,9 @@ set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listusers.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/modelnodes.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/numberwidget.h"
- "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndtask.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndcustomdata.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndcustomizegui.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndtask.h"
 )
 
 qt4_wrap_cpp(moc_src ${moc_hdr})

@@ -24,6 +24,13 @@ ItemNode::~ItemNode()
 {
 }
 
+void ItemNode::updateNodeValues( const af::Node * i_node)
+{
+	m_priority    = i_node->getPriority();
+	m_annotation  = afqt::stoq( i_node->getAnnotation());
+	m_custom_data = afqt::stoq( i_node->getCustomData());
+}
+
 void ItemNode::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
    Item::paint( painter, option);

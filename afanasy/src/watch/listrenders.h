@@ -39,8 +39,6 @@ private slots:
 	void renderAdded( ItemNode * node, const QModelIndex & index);
 	void selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
 
-	void actAnnotate();
-	void actPriority();
 	void actCapacity();
 	void actMaxTasks();
 	void actNIMBY();
