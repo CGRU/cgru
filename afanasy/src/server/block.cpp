@@ -75,10 +75,16 @@ bool Block::readStoredTasks()
 
 	rapidjson::Document document;
 	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL ) return false;
+	if( res == NULL )
+	{
+		delete [] data;
+		return false;
+	}
 
 	m_data->jsonReadTasks( document);
+
 	delete [] data;
+	delete [] res;
 
 	return true;
 }

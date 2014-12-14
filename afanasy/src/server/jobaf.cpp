@@ -64,10 +64,18 @@ void JobAf::readStore()
 	int size;
 	char * data = af::fileRead( getStoreFile(), &size);
 	if( data == NULL ) return;
+
 	rapidjson::Document document;
 	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL ) return;
+	if( res == NULL )
+	{
+		delete [] data;
+		return;
+	}
+
 	jsonRead( document);
+
+	delete [] res;
 	delete [] data;
 
 	m_progress = new af::JobProgress( this);

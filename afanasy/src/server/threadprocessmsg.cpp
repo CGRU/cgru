@@ -246,8 +246,8 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 
 		o_msg->setData( msg_datalen, msg_data, af::Msg::THTTPGET);
 
-		delete file_data;
-		delete msg_data;
+		delete [] file_data;
+		delete [] msg_data;
 	}
 	else
 	{
