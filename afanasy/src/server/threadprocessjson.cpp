@@ -6,7 +6,7 @@
 #include "threadargs.h"
 #include "usercontainer.h"
 
-#include "../libafanasy/environment.cpp"
+#include "../libafanasy/farm.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -289,6 +289,10 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		else if( type == "config" )
 		{
 			o_msg_response = af::jsonMsg( af::Environment::getConfigData());
+		}
+		else if( type == "farm" )
+		{
+			o_msg_response = af::jsonMsg( af::farm()->getText());
 		}
 	}
 	else if( document.HasMember("action"))

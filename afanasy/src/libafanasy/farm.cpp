@@ -109,6 +109,8 @@ Farm::Farm( const std::string & File, bool Verbose ):
 		return;
 	}
 
+	m_text = std::string( buffer, filesize);
+
 	rapidjson::Document document;
 	char * data = af::jsonParseData( document, buffer, filesize);
 	if( data == NULL )
