@@ -245,7 +245,7 @@ Comment.prototype.init = function()
 
 	this.setElType( this.obj.type);
 	if( this.obj.key )
-		this.elType.href = g_GetLocationArgs({"cm_Goto":this.obj.key});
+		this.elType.href = this.getLink();
 
 	this.type = this.obj.type;
 
@@ -563,8 +563,6 @@ Comment.prototype.save = function()
 	edit.add = true;
 	edit.file = file;
 
-//window.console.log( JSON.stringify( edit));
-//	res = c_Parse( n_Request({"send":{"editobj":edit}}));
 	n_Request({"send":{"editobj":edit},"func":this.saveFinished,"this":this});
 }
 Comment.prototype.saveFinished = function( i_data, i_args)
@@ -577,7 +575,7 @@ Comment.prototype.saveFinished = function( i_data, i_args)
 	var news_title = 'comment';
 	if( i_args.this.obj.type == 'report' ) news_title = 'report';
 
-	nw_MakeNews({"title":news_title,"path":g_CurPath(),"user":news_user,"guest":i_args.this.obj.guest});
+	nw_MakeNews({"title":news_title,"link":i_args.this.getLink(),"user":news_user,"guest":i_args.this.obj.guest});
 
 	i_args.this.updateStatus();
 
@@ -601,7 +599,7 @@ Comment.prototype.sendEmails = function()
 		var email = c_EmailDecode( emails[i]);
 		if( false == c_EmailValidate( email)) continue;
 		var subject = 'RULES Comment: '+g_CurPath();
-		var href = g_GetLocationArgs({"cm_Goto":this.obj.key}, true);
+		var href = this.getLink( true);
 		var body = '<a href="'+href+'" target="_blank">'+href+'</a>';
 		body += '<br><br>';
 		body += this.obj.text;
@@ -736,6 +734,11 @@ Comment.prototype.showFile = function( i_path, i_file)
 	elGoto.classList.add('goto');
 	elGoto.textContent = i_file.name;
 	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto":i_path+'/'+i_file.name});
+}
+
+Comment.prototype.getLink = function( i_absolute)
+{
+	return g_GetLocationArgs({"cm_Goto":this.obj.key}, i_absolute);
 }
 
 function cm_Goto( i_key)

@@ -283,7 +283,6 @@ function nw_MakeNewsDialog()
 		"name":'news',"title":'Create News',"info":'Enter News Title'});
 }
 function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
-//function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
 function nw_MakeNews( i_news, i_args )
 {
 	if( localStorage.news_disabled == 'true') return;
@@ -312,7 +311,11 @@ function nw_MakeNews( i_news, i_args )
 
 	var email_subject = c_GetUserTitle( news.user) + ' - ' + news.title;
 	var email_body = '<a href="';
-	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname + '#' + news.path;
+	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname;
+	if( news.link )
+		email_body += news.link;
+	else
+		email_body += '#' + news.path;
 	email_body += '">' + news.path + '</a>';
 
 	var request = {};
@@ -464,7 +467,10 @@ function nw_NewsShow()
 		
 		var elLink = document.createElement('a');
 		elLinkDiv.appendChild( elLink);
-		elLink.href = '#'+news.path;
+		if( news.link )
+			elLink.href = news.link;
+		else
+			elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 
 		var prj = news.path.split('/')[1];
