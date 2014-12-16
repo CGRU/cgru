@@ -741,7 +741,10 @@ function nw_RecentReceived( i_data, i_args)
 		
 		var elLink = document.createElement('a');
 		elLinkDiv.appendChild( elLink);
-		elLink.href = '#'+news.path;
+		if( news.link )
+			elLink.href = news.link;
+		else
+			elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 
 		var elTime = document.createElement('div');
