@@ -357,13 +357,15 @@ function st_SetElColor( i_status, i_elBack, i_elColor, i_setNone)
 	}
 	else if( i_setNone )
 	{
-//		i_elBack.style.background = '';
-//		i_elColor.style.color = 'inherit';
 		if( localStorage.background && localStorage.background.length )
 			i_elBack.style.background = localStorage.background;
 		else
 			i_elBack.style.backgroundColor = u_backgroundColor;
-		i_elColor.style.color = localStorage.text_color;
+
+		if( localStorage.text_color && localStorage.text_color.length )
+			i_elColor.style.color = localStorage.text_color;
+		else
+			i_elColor.style.color = u_textColor;
 	}
 	return false;
 }

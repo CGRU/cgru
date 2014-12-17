@@ -418,53 +418,54 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.classList.add('folder');
 	elFolder.m_fobject = i_fobject;
 
-	var elColor = document.createElement('div');
-	elFolder.appendChild( elColor);
-	elColor.classList.add('fcolor');
+	var elFBody = document.createElement('div');
+	elFolder.appendChild( elFBody);
+	elFolder.m_elFBody = elFBody;
+	elFBody.classList.add('fbody');
 
 	var elName = document.createElement('a');
-	elFolder.appendChild( elName);
+	elFBody.appendChild( elName);
 	elName.classList.add('fname');
 	elName.textContent = folder;
 
 	var elPercent = document.createElement('div');
-	elFolder.appendChild( elPercent);
+	elFBody.appendChild( elPercent);
 	elFolder.m_elPercent = elPercent;
 	elPercent.classList.add('percent');
 	elPercent.classList.add('info');
 
 	var elFrames = document.createElement('div');
-	elFolder.appendChild( elFrames);
+	elFBody.appendChild( elFrames);
 	elFolder.m_elFrames = elFrames;
 	elFrames.classList.add('frames');
 	elFrames.classList.add('info');
 
 	var elSize = document.createElement('div');
-	elFolder.appendChild( elSize);
+	elFBody.appendChild( elSize);
 	elFolder.m_elSize = elSize;
 	elSize.classList.add('size');
 	elSize.classList.add('info');
 
 	var elAnn = document.createElement('div');
-	elFolder.appendChild( elAnn);
+	elFBody.appendChild( elAnn);
 	elFolder.m_elAnn = elAnn;
 	elAnn.classList.add('annotation');
 	elAnn.classList.add('info');
 
 	var elTags = document.createElement('div');
-	elFolder.appendChild( elTags);
+	elFBody.appendChild( elTags);
 	elFolder.m_elTags = elTags;
 	elTags.classList.add('tags');
 	elTags.classList.add('info');
 
 	var elArtists = document.createElement('div');
-	elFolder.appendChild( elArtists);
+	elFBody.appendChild( elArtists);
 	elFolder.m_elArtists = elArtists;
 	elArtists.classList.add('artists');
 	elArtists.classList.add('info');
 
 	elFolder.m_elProgress = document.createElement('div');
-	elFolder.appendChild( elFolder.m_elProgress);
+	elFBody.appendChild( elFolder.m_elProgress);
 	elFolder.m_elProgress.classList.add('progress');
 	elFolder.m_elProgressBar = document.createElement('div');
 	elFolder.m_elProgress.appendChild( elFolder.m_elProgressBar);
@@ -476,7 +477,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 	else
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
 	elName.href = '#' + elFolder.m_path;
-	
+
 	elFolder.onclick = g_FolderOnClick;
 	elFolder.oncontextmenu = function(e){ e.stopPropagation(); g_OpenCloseFolder( e.currentTarget); return false;};
 //	elFolder.ondblclick = g_FolderOnDblClick;
@@ -499,7 +500,10 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_elPrev = elPrev;
 	}
 
-	i_elParent.appendChild( elFolder);
+	if( i_elParent.m_elFBody )
+		i_elParent.m_elFBody.appendChild( elFolder);
+	else
+		i_elParent.appendChild( elFolder);
 	i_elParent.m_elFolders.push( elFolder);
 
 	g_elFolders[elFolder.m_path] = elFolder;
@@ -521,7 +525,7 @@ function g_FolderSetStatus( i_status, i_elFolder, i_params)
 		i_elFolder.m_fobject.status = i_status;
 
 	if(( i_params == null ) || i_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
-	if(( i_params == null ) || i_params.color      ) st_SetElColor( i_status, i_elFolder);
+	if(( i_params == null ) || i_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
 	if(( i_params == null ) || i_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
 	if(( i_params == null ) || i_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
 	if(( i_params == null ) || i_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
@@ -554,7 +558,8 @@ function g_CloseFolder( i_elFolder )
 
 	if( i_elFolder.m_elFolders && i_elFolder.m_elFolders.length )
 		for( var i = 0; i < i_elFolder.m_elFolders.length; i++)
-			i_elFolder.removeChild( i_elFolder.m_elFolders[i]);
+			i_elFolder.m_elFBody.removeChild( i_elFolder.m_elFolders[i]);
+
 	i_elFolder.m_elFolders = [];
 	i_elFolder.classList.remove('opened');
 }
