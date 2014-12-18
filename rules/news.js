@@ -431,10 +431,14 @@ function nw_NewsShow()
 		$('news').m_elArray.push( el);
 		el.classList.add('news');
 		el.m_news = news;
-
 		el.title = c_DT_StrFromSec( news.time);
-		if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
-			el.classList.add('assigned');
+
+		// Highlight news if artists is assigned,
+		// but only if artists has no subscribed channels
+		// ( if artist has no channels all news are "assigned"
+		if( g_auth_user.channels && g_auth_user.channels.length )
+			if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
+				el.classList.add('assigned');
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
