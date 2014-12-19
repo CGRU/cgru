@@ -377,8 +377,13 @@ display: none;
 #sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
 .news_ctrl { margin: 2px; padding: 2px; }
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
+#chanset .button { float: left; width: 16px; height: 16px; }
+#chanset .button.disabled { background-color: #FF0000; }
+#chanset .button.ignore { background-color: #FF9900; }
+#channels { clear: both; }
 #channels .channel .button.delete { float: right; height: 14px; width: 14px; }
 #channels .channel { border-top: 1px solid rgba(98,98,98,.5); border-radius: 2px; margin: 0px; }
+#channels .channel.current { background-color: rgba(100,255,100,.3); }
 .news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid rgba(98,98,98,.5); }
 .news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
 #news { }
@@ -483,17 +488,6 @@ float: left;
 text-align: center;
 margin: 0px 2px;
 padding: 1px 8px;
-}
-
-#subscribe .button.disabled { font-weight: bold; background: #FF0000; padding: 1px 20px; }
-#subscribe .button.ignore { background: rgba(255,255,0,.1); }
-#subscribe_path {
-font: 12px monospace;
-/*box-shadow: 0 0 2px #000000 inset;*/
-border: 1px solid rgba(98,98,98,.5);
-border-radius: 2px;
-padding: 2px 8px;
-margin: 2px 8px;
 }
 
 #status_percentage, #status_annotation, #status_artists, #status_tags, #status_finish

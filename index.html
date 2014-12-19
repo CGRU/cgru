@@ -69,15 +69,6 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 
 <div id="content">
 	<div id="panel">
-		<div id="subscribe" style="display:none">
-			<div id="subscribe_btn" class="button" title="Receive this location changes" onclick="nw_Subscribe()">Subscribe</div>
-			<div id="subscribe_label">Subscribed</div>
-			<div id="unsubscribe_btn" class="button" title="Do not receive changes from this location" onclick="nw_Unsubscribe()">Unsubscribe</div>
-			<div id="subscribe_path" title="Subscribed parent location"></div>
-			<div id="news_make" class="button" title="Create some custom news" onclick="nw_MakeNewsDialog()">Make News</div>
-			<div id="news_disable" class="button" title="If news disabled, your changes does not produce any news" onclick="nw_DisableNewsToggle( true)"></div>
-			<div id="news_ignore_own" class="button" title="If you ignoring own news, you do not receive changes performed by yourself" onclick="nw_IgnoreOwnToggle( true)"></div>
-		</div>
 		<div id="search_panel" style="float:right">
 			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
 		</div>
@@ -290,13 +281,29 @@ Remember any delete operation buttons in RULES requires double-click.
 						ondblclick="nw_DeleteFiltered(false)"></div>
 					<div class="button" title="Click to open/close subscribed locations"
 						style="background-image:url(rules/icons/news_channels.png);"
-						onclick="c_ElDisplayToggle(document.getElementById('channels'));
+						onclick="c_ElDisplayToggle(document.getElementById('chanset'));
 						this.classList.toggle('pushed')"></div>
 					<div class="button" title="Change news sorting order"
 						style="background-image:url(rules/icons/sort_order_toggle.png);"
 						onclick="nw_SortOrderToggle()"></div>
 				</div>
-				<div id="channels" style="display:none"></div>
+				<div id="chanset" style="display:none">
+					<div id="subscribe_path"
+						title="Subscribed parent location"></div>
+					<div id="subscribe_btn" class="button" onclick="nw_Subscribe()"
+						style="background-image:url(rules/icons/bell.png); display: none; float: right;"
+						title="Receive this location changes"></div>
+					<div id="news_make" class="button" onclick="nw_MakeNewsDialog()"
+						style="background-image:url(rules/icons/megaphone.png);"
+						title="Create some custom news"></div>
+					<div id="news_disable" class="button" onclick="nw_DisableNewsToggle( true)"
+						style="background-image:url(rules/icons/power_button.png);"
+						title="If news disabled, your changes does not produce any news"></div>
+					<div id="news_ignore_own" class="button" onclick="nw_IgnoreOwnToggle( true)"
+						style="background-image:url(rules/icons/listen_own.png);"
+						title="If you ignoring own news, you do not receive changes performed by yourself"></div>
+					<div id="channels"></div>
+				</div>
 			</div>
 			<div class="news_filter" style="font-size: 12px" title="News filter">
 				<div class="button nw_fb" title="Show All" id="news_filter_show_all" onclick="nw_FilterBtn(this,'_all_')">All</div>
