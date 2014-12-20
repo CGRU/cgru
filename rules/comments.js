@@ -173,6 +173,10 @@ function Comment( i_obj)
 	this.elUploads.classList.add('uploads');
 	this.elUploads.style.display = 'none';
 
+	this.elSignature = document.createElement('div');
+	this.el.appendChild( this.elSignature);
+	this.elSignature.classList.add('signature');
+
 	this.obj = i_obj;
 	this.init();
 }
@@ -199,21 +203,6 @@ Comment.prototype.init = function()
 		this.elText.style.backgroundColor = u_backgroundColor;
 
 
-//console.log( g_auth_user.id + ' ' + this.obj.user_name );
-	if( g_auth_user )
-	{
-		// Edit button only for admins or a comment owner:
-		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
-			this.elEdit.style.display = 'block';
-
-		// If this is a new comment or and own old:
-		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))
-			this.el.classList.add('own');
-	}
-	else
-		this.elEdit.style.display = 'none';
-
-	var avatar = null;
 	if( this.obj == null )
 	{
 		this.obj = {};
@@ -229,11 +218,35 @@ Comment.prototype.init = function()
 		}
 	}
 
-	if( this.obj.user_name )
+	var user = null;
+	var avatar = null;
+	var signature = null;
+
+	// Get user object:
+	if( this.obj.user_name && g_users[this.obj.user_name])
+		user = g_users[this.obj.user_name];
+	else if( this.obj.guest )
+		user = this.obj.guest;
+	if( user == null )
+		user = {};
+
+	// Signature:
+	if( user.signature )
+		this.elSignature.textContent = user.signature;
+
+//console.log( g_auth_user.id + ' ' + this.obj.user_name );
+	if( g_auth_user )
 	{
-		this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
-		avatar = c_GetAvatar( this.obj.user_name, this.obj.guest);
+		// Edit button only for admins or a comment owner:
+		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
+			this.elEdit.style.display = 'block';
+
+		// If this is a new comment or and own old:
+		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))
+			this.el.classList.add('own');
 	}
+	else
+		this.elEdit.style.display = 'none';
 
 	if( avatar != null )
 	{

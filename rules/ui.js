@@ -3,10 +3,11 @@ u_el = {};
 u_views = ['asset','files','body','comments'];
 
 u_guest_attrs = []
-u_guest_attrs.push({"name":'id',     "label":'Login Name',"required":true});
-u_guest_attrs.push({"name":'title',  "label":'Full Name'});
-u_guest_attrs.push({"name":'email',  "label":'Email',  "info":'gravarar, hidden'});
-u_guest_attrs.push({"name":'avatar', "label":'Avatar', "info":'link'});
+u_guest_attrs.push({"name":'id',        "label":'Login Name',"required":true});
+u_guest_attrs.push({"name":'title',     "label":'Full Name'});
+u_guest_attrs.push({"name":'email',     "label":'Email',  "info":'gravarar, hidden'});
+u_guest_attrs.push({"name":'avatar',    "label":'Avatar', "info":'link'});
+u_guest_attrs.push({"name":'signature', "label":'Signature'});
 
 u_body_filename = 'body.html';
 u_body_text = '';
