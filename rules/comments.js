@@ -230,6 +230,8 @@ Comment.prototype.init = function()
 	if( user == null )
 		user = {};
 
+	this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
+
 	// Signature:
 	if( user.signature )
 		this.elSignature.textContent = user.signature;
@@ -248,6 +250,7 @@ Comment.prototype.init = function()
 	else
 		this.elEdit.style.display = 'none';
 
+	avatar = c_GetAvatar( this.obj.user_name, this.obj.guest);
 	if( avatar != null )
 	{
 		this.elAvatar.src = avatar;
