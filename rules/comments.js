@@ -230,7 +230,8 @@ Comment.prototype.init = function()
 	if( user == null )
 		user = {};
 
-	this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
+	if( this.obj.user_name )
+		this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
 
 	// Signature:
 	if( user.signature )
