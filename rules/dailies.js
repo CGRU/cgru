@@ -255,7 +255,8 @@ d_cvtguiparams.fps = {"label":'FPS'};
 d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
 d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
 d_cvtguiparams.quality = {"label":'JPEG Quality',"default":'100'};
-d_cvtguiparams.afmaxtasks = {"label":'Max Tasks',"default":'-1',"tooltip":'Maximum running tasks for Afanasy job.'};
+d_cvtguiparams.afmaxtasks = {"width":"50%","label":'Max Tasks',"default":'-1',"tooltip":'Maximum running tasks for Afanasy job.'};
+d_cvtguiparams.afperhost = {"width":"50%","label":'Per Host',"default":'-1',"tooltip":'Maximum running tasks per host for Afanasy job.'};
 
 d_cvtmulti_params = {};
 d_cvtmulti_params.input = {"label":'Result Paths'};
@@ -440,6 +441,7 @@ function d_CvtImages( i_wnd, i_params)
 		cmd += ' -A';
 		cmd += ' --afuser "' + g_auth_user.id + '"';
 		cmd += ' --afmax ' + i_params.afmaxtasks;
+		cmd += ' --afmph ' + i_params.afperhost;
 
 		if( i_wnd.m_args.results )
 			cmd += ' -o "' + i_wnd.m_result.dest + '"';
@@ -530,6 +532,12 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	{
 		c_Error('Invalid "Max Tasks" value: "' + i_params.afmaxtasks + '"');
 		job.max_running_tasks = -1;
+	}
+	job.max_running_tasks_per_host = parseInt( i_params.afperhost);
+	if( isNaN( job.max_running_tasks_per_host ))
+	{
+		c_Error('Invalid "Per Host" value: "' + i_params.afperhost + '"');
+		job.max_running_tasks_per_host = -1;
 	}
 
 	var block = {};
