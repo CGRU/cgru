@@ -3,6 +3,7 @@ import copy
 import os
 import time
 import logging
+import functools
 
 import pymel.core as pm
 
@@ -25,18 +26,70 @@ class UI(object):
 
 		with pm.columnLayout(adj=True):
 			labels_width = 90
-			with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+			with pm.rowLayout(nc=4, adj=2, cw4=(labels_width, 40, 15, 15)):
 				pm.text(l='Start Frame')
-				pm.intField(
+				start_time_int_field = pm.intField(
 					'cgru_afanasy__start_frame',
 					v=pm.optionVar.get('cgru_afanasy__start_frame_ov', 1)
 				)
+				pm.button(
+					l='<',
+					ann='Use minimum animation range',
+					c=functools.partial(
+						self.set_field_value,
+						start_time_int_field,
+						functools.partial(
+							pm.playbackOptions,
+							q=True,
+							min=True
+						)
+					)
+				)
+				pm.button(
+					l='<<',
+					ann='Use minimum playback range',
+					c=functools.partial(
+						self.set_field_value,
+						start_time_int_field,
+						functools.partial(
+							pm.playbackOptions,
+							q=True,
+							ast=True
+						)
+					)
+				)
 
-			with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+			with pm.rowLayout(nc=4, adj=2, cw4=(labels_width, 40, 15, 15)):
 				pm.text(l='End Frame')
-				pm.intField(
+				end_time_int_field = pm.intField(
 					'cgru_afanasy__end_frame',
 					v=pm.optionVar.get('cgru_afanasy__end_frame_ov', 1)
+				)
+				pm.button(
+					l='<',
+					ann='Use maximum animation range',
+					c=functools.partial(
+						self.set_field_value,
+						end_time_int_field,
+						functools.partial(
+							pm.playbackOptions,
+							q=True,
+							max=True
+						)
+					)
+				)
+				pm.button(
+					l='<<',
+					ann='Use maximum playback range',
+					c=functools.partial(
+						self.set_field_value,
+						end_time_int_field,
+						functools.partial(
+							pm.playbackOptions,
+							q=True,
+							aet=True
+						)
+					)
 				)
 
 			with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
@@ -86,6 +139,19 @@ class UI(object):
 			)
 
 		pm.showWindow(self.window)
+
+	def set_field_value(self, control, value, *args, **kwargs):
+		"""sets the given field value
+
+		:param control: the UI control
+		:param value: the value, can be a callable
+		:return:
+		"""
+		try:
+			v = value()
+		except TypeError:
+			v = value
+		control.setValue(v)
 
 	def launch(self, *args, **kwargs):
 		"""launch renderer command
