@@ -329,14 +329,14 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	{
 //		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
 //		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
-		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder});
+		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":true});
 		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
 	}
 
-	if( i_walk.error || i_walk.denied )
+/*	if( i_walk.error || i_walk.denied )
 	{
 		g_elCurFolder.classList.add('dummy');
-	}
+	}*/
 /*	else
 	{
 		g_access = true;
@@ -417,11 +417,15 @@ function g_AppendFolder( i_elParent, i_fobject)
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
 	elFolder.m_fobject = i_fobject;
+	if( i_fobject.dummy )
+		elFolder.classList.add('dummy');
 
 	var elFBody = document.createElement('div');
 	elFolder.appendChild( elFBody);
 	elFolder.m_elFBody = elFBody;
 	elFBody.classList.add('fbody');
+	if( i_fobject.dummy )
+		elFBody.classList.add('dummy');
 
 	var elName = document.createElement('a');
 	elFBody.appendChild( elName);
