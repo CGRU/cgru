@@ -1,0 +1,2 @@
+DNxHD 185MBits
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vf "colormatrix=bt601:bt709" -vcodec dnxhd -b:v 185M @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
