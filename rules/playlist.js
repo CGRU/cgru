@@ -9,10 +9,10 @@ function p_Init()
 {
 	var ctrls = $('sidepanel_playlist').getElementsByClassName('playlist_ctrl');
 	for( var i = 0; i < ctrls.length; i++)
-		if( g_auth_user == null )
-			ctrls[i].style.display = 'none';
-		else
+		if( c_CanEditPlaylist())
 			ctrls[i].style.display = 'block';
+		else
+			ctrls[i].style.display = 'none';
 
 	if( RULES_TOP.playlist ) p_file = RULES_TOP.playlist;
 	p_elCurFolder = $('playlist');

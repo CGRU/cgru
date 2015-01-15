@@ -526,8 +526,10 @@ Status.prototype.edit = function( i_args)
 			}
 		}
 
-	this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,   "elEdit":this.elEdit});
-	this.editListShow({"name":'tags',   "label":'Tags:',   "list":tags,   "list_all":RULES.tags,"elEdit":this.elEdit});
+	if( c_CanAssignArtists())
+		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":this.elEdit});
+
+	this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_Color);

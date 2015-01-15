@@ -46,12 +46,13 @@ font-size: 12px;
 #footer .headeropenbtn { top: 8px;}
 #header .panel {
 position: absolute;
-left: 40px; right: 10px; bottom: 5px; height: 30px;
+left: 40px; right: 10px; bottom: 0px; height: 30px;
+padding-bottom: 5px;
 }
 #header .panel .button {
 background-size: 50%;
 width: 40px; height: 20px;
-margin: 1px 4px;
+margin: 3px 4px;
 float: left;
 }
 
