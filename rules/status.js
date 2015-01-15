@@ -864,16 +864,21 @@ Status.prototype.editTasksShow = function( i_args)
 		el.appendChild( elTags);
 		this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":elTags});
 
-		var artists = {};
-		if( tasks[t].artists )
-		for( var g = 0; g < tasks[t].artists.length; g++)
+		if( c_CanAssignArtists())
 		{
-			var id = tasks[t].artists[g];
-			artists[id] = {"title":c_GetUserTitle(id)};
+			var artists = {};
+			if( tasks[t].artists )
+			{
+				for( var g = 0; g < tasks[t].artists.length; g++)
+				{
+					var id = tasks[t].artists[g];
+					artists[id] = {"title":c_GetUserTitle(id)};
+				}
+			}
+			var elArtists = document.createElement('div');
+			el.appendChild( elArtists);
+			this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
 		}
-		var elArtists = document.createElement('div');
-		el.appendChild( elArtists);
-		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
 
 		el.m_task = tasks[t];
 		el.m_elDur = elDur;

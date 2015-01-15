@@ -239,8 +239,8 @@ function c_IsUserStateSet( i_user, i_state)
 	if( i_user == null ) i_user = g_auth_user;
 	if( i_user == null ) return false;
 
-	if(['assignart','playlist'].indexOf( i_state != -1 ))
-		if(['admin','coord','user'].indexOf( i_user.role ) != -1 ) return true;
+	if((['assignart','playlist']).indexOf( i_state ) != -1 )
+		if((['admin','coord','user']).indexOf( i_user.role ) != -1 ) return true;
 
 	if( i_user.states == null ) return false;
 	if( i_user.states.indexOf( i_state) != -1 ) return true;
