@@ -89,12 +89,11 @@ if Codec == '':
 		args.extend(['-pix_fmt','rgb48le'])
 		Options.type = 'tif'
 
-	args.extend(['-vf','colormatrix=bt709:bt601'])
 	if Options.resize != '':
 		resize = Options.resize.split('x')
 		if len(resize) < 2:
 			resize.append('-1')
-		args.append('scale=%s:%s' % (resize[0], resize[1]))
+		args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
 		Output += '.r%s' % Options.resize
 
 	if not os.path.isdir(Output):
