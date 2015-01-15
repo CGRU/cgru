@@ -7,8 +7,10 @@ ad_wnd_sort_prop = 'role';
 ad_wnd_sort_dir = 0;
 
 ad_states = {};
-ad_states.notart = {"short":'NA',"label":'NotArt',"tooltip":'Not an artist.'};
-ad_states.passwd = {"short":'PS',"label":'Passwd',"tooltip":'Can change password.'};
+ad_states.notart    = {"short":'NA',"label":'NotArt',"tooltip":'Not an artist.'};
+ad_states.passwd    = {"short":'PS',"label":'Passwd',"tooltip":'Can change password.'};
+ad_states.playlist  = {"short":'PL',"label":'Playlist',"tooltip":'Can edit playlist.'};
+ad_states.assignart = {"short":'AA',"label":'AssignArt',"tooltip":'Can assign artists.'};
 
 function ad_Init()
 {
@@ -468,6 +470,12 @@ function ad_WndDrawUsers()
 			if(( val_a > val_b ) == ad_wnd_sort_dir ) return -1;
 			if(( val_a < val_b ) == ad_wnd_sort_dir ) return  1;
 
+			if( ad_wnd_sort_prop != 'role' )
+			{
+				if(( a.role > b.role) == ad_wnd_sort_dir ) return -1;
+				if(( a.role < b.role) == ad_wnd_sort_dir ) return  1;
+			}
+
 			if(( a.disabled && ( ! b.disabled )) == ad_wnd_sort_dir ) return -1;
 			if(( b.disabled && ( ! a.disabled )) == ad_wnd_sort_dir ) return  1;
 
@@ -514,6 +522,12 @@ function ad_WndDrawUsers()
 	el.textContent = 'Role';
 	el.title = 'Needed for sorting.\nDouble click to edit.';
 	el.onclick = function(e) { ad_WndSortUsers('role'); }
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
+	el.textContent = 'DOS';
+	el.title = 'Dossier record.';
+	el.onclick = function(e) { ad_WndSortUsers('dossier'); }
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
@@ -731,6 +745,14 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
+	var dossier = '';
+	if( i_user.dossier ) dossier = i_user.dossier.split(' ')[0].split('\u00a0')[0];
+	el.innerHTML = dossier;
+	el.m_user_id = i_user.id;
+	el.ondblclick = function(e){ad_ChangeDossierOnCkick(e.currentTarget.m_user_id);};
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
 	el.textContent = i_user.tag;
 	el.m_user_id = i_user.id;
 	el.ondblclick = function(e){ad_ChangeTagOnCkick(e.currentTarget.m_user_id);};
@@ -925,6 +947,15 @@ function ad_ChangeRoleOnCkick( i_user_id)
 function ad_ChangeRole( i_role, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"role":i_role}, ad_WndRefresh);
+}
+function ad_ChangeDossierOnCkick( i_user_id)
+{
+	new cgru_Dialog({"handle":'ad_ChangeDossier',"param":i_user_id,"value":g_users[i_user_id].dossier,
+		"name":'users',"title":'Edit Dossier',"type":'text',"info":c_GetUserTitle(i_user_id) + ' dossier:'});
+}
+function ad_ChangeDossier( i_dossier, i_user_id)
+{
+	ad_SaveUser({"id":i_user_id,"dossier":i_dossier}, ad_WndRefresh);
 }
 function ad_ChangeTagOnCkick( i_user_id)
 {
