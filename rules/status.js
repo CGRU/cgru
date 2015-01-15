@@ -641,7 +641,11 @@ Status.prototype.editListShow = function( i_args)
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
 		if( i_args.name == 'artists' )
+		{
 			el.classList.add('artist');
+			if( id == g_auth_user.id )
+				el.classList.add('me');
+		}
 
 		if( i_args.list_all[id] && i_args.list_all[id].disabled )
 			el.classList.add('disabled');
@@ -660,6 +664,7 @@ Status.prototype.editListEdit = function( i_args)
 	i_args.elRoot.m_edit = true;
 	i_args.elRoot.m_elBtn.classList.remove('button');
 	i_args.elRoot.m_elList.style.display = 'none';
+	i_args.elRoot.classList.add('edit');
 
 	i_args.elEdit[i_args.name] = [];
 
@@ -728,6 +733,8 @@ Status.prototype.editArtistsEdit = function( i_args)
 			el.classList.add('tag');
 			el.classList.add('artist');
 			el.m_item = artist.id;
+			if( artist.id == g_auth_user.id )
+				el.classList.add('edit_me');
 
 			if( g_users[artist.id] && g_users[artist.id].disabled )
 				el.classList.add('disabled');
