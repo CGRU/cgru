@@ -87,7 +87,7 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/DPX","RESULT/TIF"]
+			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
@@ -243,13 +243,13 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
 	"af_capacity":100
 },
 
 "put":{
-	"input":"RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"dest":"FINAL",
 	"-dest":"/incoming",
 	"cmd":"python /cgru/utilities/put.py",

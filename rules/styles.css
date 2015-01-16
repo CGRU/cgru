@@ -524,9 +524,9 @@ border-radius: 8px;
 .status_edit .edit_tasks .task .duration { width: 40px; float: left; }
 .status_edit .tag { cursor: pointer; }
 .status_edit .list.edit .artist.edit_me {
-border: 1px solid #0F0;
+border: 1px solid #50FF50;
 border-width: 1px 3px 1px 3px;
-box-shadow: 0px 0px 12px #0F0;
+box-shadow: 0px 0px 12px #80FF80;
 }
 
 table.statistics { border-collapse: collapse; }
