@@ -1,19 +1,25 @@
 d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
-d_guiparams = {};
-d_guiparams.project = {"width":'50%'};
-d_guiparams.shot = {"width":'50%',"lwidth":'70px'};
-d_guiparams.artist = {"width":'50%'};
-d_guiparams.activity = {"width":'25%',"lwidth":'70px'};
-d_guiparams.version = {"width":'25%',"lwidth":'70px'};
-d_guiparams.input = {};
-d_guiparams.output = {};
-d_guiparams.filename = {}
-d_guiparams.af_depend_mask = {"label":'Depends',"tooltip":'Afanasy job depend mask'}
-d_guiparams.fps = {"label":'FPS',"width":'25%'};
-d_guiparams.fffirst = {"label":"F.F.First","width":'25%',"lwidth":'70px',"tooltip":'First frame is "1"\nNo matter image file name number.'};
-d_guiparams.aspect_in = {"label":'Aspect In',"width":'25%',"lwidth":'70px'};
-d_guiparams.gamma = {"width":'25%',"lwidth":'70px'};
+
+d_params_types = {};
+d_params_types.general  = {"label":'General',"tooltip":'General parameters.'};
+d_params_types.settings = {"label":'Settings',"tooltip":'Other parameters.'};
+
+d_params = {"general":{},"settings":{}};
+d_params.general.project = {"width":'50%'};
+d_params.general.shot = {"width":'50%',"lwidth":'70px'};
+d_params.general.artist = {"width":'50%'};
+d_params.general.activity = {"width":'25%',"lwidth":'70px'};
+d_params.general.version = {"width":'25%',"lwidth":'70px'};
+d_params.general.input = {};
+d_params.general.output = {};
+d_params.general.filename = {"width":'75%'}
+d_params.general.fps = {"label":'FPS',"width":'25%',"lwidth":'70px'};
+
+d_params.settings.af_depend_mask = {"label":'Depends',"tooltip":'Afanasy job depend mask'}
+d_params.settings.fffirst = {"label":"F.F.First","tooltip":'First frame is "1"\nNo matter image file name number.'};
+d_params.settings.aspect_in = {"label":'Aspect In'};
+d_params.settings.gamma = {};
 
 function d_Make( i_path, i_outfolder)
 {
@@ -36,7 +42,7 @@ function d_Make( i_path, i_outfolder)
 	params.output = i_outfolder;
 	params.activity = RULES.dailies.activity;
 
-	d_guiparams.artist = {"width":'50%'};
+	d_params.general.artist = {"width":'50%'};
 	params.artist = c_GetUserTitle();
 	if( RULES.status && RULES.status.artists && RULES.status.artists.length )
 	{
@@ -50,7 +56,7 @@ function d_Make( i_path, i_outfolder)
 				artists.push( c_GetUserTitle( RULES.status.artists[i]));
 			if( artists.indexOf( c_GetUserTitle()) == -1 )
 				artists.push( c_GetUserTitle());
-			d_guiparams.artist.pulldown = artists;
+			d_params.general.artist.pulldown = artists;
 		}
 	}
 
@@ -106,10 +112,14 @@ function d_DailiesWalkReceived( i_data, i_args)
 //window.console.log( match);
 	}
 
-	gui_Create( wnd.elContent, d_guiparams, [params, RULES.dailies]);
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	wnd.elTabs = gui_CreateTabs({"tabs":d_params_types,"elParent":wnd.elContent,"name":'d_params_types'});
+
+	for( var type in d_params_types )
+		gui_Create( wnd.elTabs[type], d_params[type], [params, RULES.dailies]);
+
+	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -142,7 +152,9 @@ function d_DailiesWalkReceived( i_data, i_args)
 
 function d_ProcessGUI( i_wnd)
 {
-	var params = gui_GetParams( i_wnd.elContent, d_guiparams);
+	var params = {};
+	for( var type in d_params_types )
+		gui_GetParams( i_wnd.elTabs[type], d_params[type], params);
 //console.log( JSON.stringify( params)); return;
 
 	for( key in i_wnd.elContent.m_choises )

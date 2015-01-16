@@ -750,9 +750,9 @@ border-radius: 2px;
 .gui .rules { border: 1px solid rgba(98,98,98,.5); font: 12px monospace; padding: 12px; margin: 4px 0px;  border-radius: 2px;}
 .gui .choise { float: left; /*box-shadow: 0 0 2px #000;*/ border-radius: 2px; font-size: 14px; margin: 0px 2px; }
 .gui .choise.selected { /*box-shadow: 0 0 4px #FFF inset;*/ }
-.gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 6px 6px 0 0; box-shadow: 0 0 2px #000; cursor: pointer; float: left; }
-.gui .tablabel.active { box-shadow: 0 0 2px #000 inset; background: rgba(100,255,255,.2); }
-.gui .tabpanel { padding: 2px 8px; box-shadow: 0 0 2px inset; clear: both; }
+.gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 2px 2px 0 0; border: 1px solid rgba(98,98,98,.5); border-bottom: 0; cursor: pointer; float: left; }
+.gui .tablabel.active { background: rgba(100,255,255,.2); }
+.gui .tabpanel { padding: 2px 8px; border-radius: 2px; border: 1px solid rgba(98,98,98,.5); clear: both; }
 .gui .pulldown_btn { font-size: 12px; }
 .gui .pulldown_btn, .gui .pulldown_item { float: right; cursor: pointer; border-radius: 2px; border: 1px solid rgba(98,98,98,.5); }
 .gui .pulldown_item:hover, .gui .pulldown_btn:hover { background: rgba(100,255,255,.2); }
