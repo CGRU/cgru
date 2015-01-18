@@ -309,7 +309,7 @@ window.console.log('Path='+g_elCurFolder.m_path);
 window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 */
 	if( g_elCurFolder != u_el.navig )
-	g_OpenFolder( g_elCurFolder );
+		g_OpenFolder( g_elCurFolder );
 	
 	var exists = false;
 	if( g_elCurFolder.m_elFolders )
@@ -325,23 +325,29 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 		}
 	}
 
-	if(( false == exists ) && ( g_elCurFolder.m_dir != null ) && ( i_folder != '' ))
-	{
-//		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-//		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
-		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":true});
+	var dummy = false;
+	if( i_walk.error || i_walk.denied )
+	{		
+//		g_elCurFolder.classList.add('dummy');
+		dummy = true;
 		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
 	}
-
-/*	if( i_walk.error || i_walk.denied )
-	{
-		g_elCurFolder.classList.add('dummy');
-	}*/
 /*	else
 	{
 		g_access = true;
 		g_denied = false;
 	}*/
+
+	if(( false == exists ) && ( g_elCurFolder.m_dir != null ) && ( i_folder != '' ))
+	{
+//		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
+//		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
+
+//		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":true});
+//		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
+
+		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":dummy});
+	}
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
