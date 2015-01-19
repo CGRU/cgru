@@ -19,7 +19,7 @@ Options, Args = Parser.parse_args()
 
 Out = dict()
 
-def errExit(i_msg):
+def errorExit(i_msg):
 	Out['error'] = i_msg
 	Out['status'] = 'error'
 	print( json.dumps({'copy': Out}, indent=4))
