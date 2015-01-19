@@ -288,19 +288,26 @@ function a_CopyReceived( i_data, i_args)
 		return;
 	}
 
-	var copies = i_data.cmdexec[0].copy.copies;
+	var copy = i_data.cmdexec[0].copy;
+	if( copy.error )
+	{
+		elResults.textContent = 'Error: ' + copy.error;
+		return;
+	}
+
+	var copies = copy.copies;
 	if( copies == null )
 	{
-		elResults.textContent = 'Copies are null.';
+		elResults.textContent = 'Error: Copies are null.';
 		return;
 	}
 	if( copies.length == 0 )
 	{
-		elResults.textContent = 'Copies are empty.';
+		elResults.textContent = 'Error: Copies are empty.';
 		return;
 	}
 
-	var path = copies[copies.length-1];
+	var path = copies[copies.length-1].dest;
 	path = cgru_PM( path, false);
 	path = path.replace('/' + RULES.root, '');
 

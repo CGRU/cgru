@@ -36,10 +36,16 @@ if not os.path.isdir( Options.dest):
 
 Out['copies'] = []
 for name in Args:
+	copy = dict()
+
 	dest = os.path.join( Options.dest, name)
+	copy['dest'] = dest
 	if not os.path.isdir( dest):
 		shutil.copytree( Options.template, dest)
-	Out['copies'].append( dest)
+	else:
+		copy['exist'] = True
+
+	Out['copies'].append( copy)
 
 print( json.dumps({'copy': Out}, indent=4))
 
