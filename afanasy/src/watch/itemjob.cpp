@@ -200,15 +200,15 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    // Draw standart backgroud
    drawBack( painter, option);
 
-   // Draw back with job state specific color (if it is not selected)
-   const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
-   if     ( state & AFJOB::STATE_ERROR_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoberror.c);
-   else if( state & AFJOB::STATE_OFFLINE_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjoboff.c  );
-   else if( state & AFJOB::STATE_WAITTIME_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
-   else if( state & AFJOB::STATE_WAITDEP_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
-   else if( state & AFJOB::STATE_DONE_MASK)     itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
-   if((option.state & QStyle::State_Selected) == false)
-      painter->fillRect( option.rect, *itemColor );
+	// Draw back with job state specific color (if it is not selected)
+	const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
+	if     ( state & AFJOB::STATE_OFFLINE_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjoboff.c  );
+	else if( state & AFJOB::STATE_ERROR_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoberror.c);
+	else if( state & AFJOB::STATE_WAITTIME_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
+	else if( state & AFJOB::STATE_WAITDEP_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
+	else if( state & AFJOB::STATE_DONE_MASK)     itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
+	if((option.state & QStyle::State_Selected) == false)
+		painter->fillRect( option.rect, *itemColor );
 
    uint32_t currenttime = time( NULL);
 
