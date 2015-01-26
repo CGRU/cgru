@@ -238,12 +238,11 @@
 	"containers":{
 		"DEFAULT": {"name":"Default", "tooltip":"Default container"},
 		"mov": {"name":"MOV", "tooltip":"QuickTime Movie"},
-		"m4v": {"name":"M4V", "tooltip":"M4V"},
-		"mp4": {"name":"MP4", "tooltip":"MP4"},
-		"mpg": {"name":"MPG", "tooltip":"MPG"},
-		"mxf": {"name":"MXF", "tooltip":"MXF"},
-		"ogg": {"name":"OGG", "tooltip":"OGG"},
-		"avi": {"name":"AVI", "tooltip":"Microsoft Video"}
+		"mp4": {"name":"MP4", "tooltip":"MPEG-4 Part 14"},
+		"m4v": {"name":"M4V", "tooltip":"Apple 'MP4'"},
+		"mxf": {"name":"MXF", "tooltip":"Material eXchange Format"},
+		"ogg": {"name":"OGG", "tooltip":"Ogg Vorbis&Theora"},
+		"avi": {"name":"AVI", "tooltip":"Microsoft Audio Video Interleave"}
 	},
 
 	"preview":{

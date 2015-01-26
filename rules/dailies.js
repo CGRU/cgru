@@ -119,8 +119,8 @@ function d_DailiesWalkReceived( i_data, i_args)
 
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
-	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
-	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'container',"value":RULES.dailies.container,"label":'Containers:',"keys":RULES.dailies.containers});
+	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -305,9 +305,10 @@ function d_Convert( i_args)
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 	if( i_args.movies == false )
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	if( i_args.results )
 	{
@@ -538,7 +539,7 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	if( i_to_sequence )
 		job.name = 'Explode ' + job.name;
 	else
-		job.name = 'Convert ' + job.name + '.' + i_params.codec;
+		job.name = 'Convert ' + job.name;
 
 	if( paths.length > 1 )
 		job.name = c_PathDir( paths[0]) + ' x' + paths.length;
@@ -574,7 +575,7 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 
 	if( i_to_sequence )
 	{
-		block.name = 'Explode to ' + i_params.imgtype;
+		block.name = 'Explode to ' + i_params.imgtype.toUpperCase();
 		cmd += ' -t ' + i_params.imgtype;
 		var q = parseInt( i_params.quality);
 		q = Math.round( 10 - ( q / 10 ));
@@ -583,8 +584,15 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	}
 	else
 	{
-		block.name = 'Convert to ' + i_params.codec;
+		job.name += '.' + i_params.codec.toUpperCase();
+		block.name = 'Convert to ' + i_params.codec.toUpperCase();
 		cmd += ' -c "' + i_params.codec + '"';
+		if( i_params.container != 'DEFAULT' )
+		{
+			cmd += ' -n ' + i_params.container;
+			job.name += '.' + i_params.container.toUpperCase();
+			block.name += '.' + i_params.container.toUpperCase();
+		}
 		cmd += ' -f ' + i_params.fps;
 	}
 
