@@ -190,6 +190,7 @@
 	"format":"1280x720",
 	"fps":"25",
 	"codec":"photojpg_high",
+	"container":"DEFAULT",
 	"colorspace":"auto",
 	"template":"dailies_withlogo",
 	"slate":"dailies_slate",
@@ -232,6 +233,17 @@
 		"dnxhd185":      {"name":"DNxHD" ,   "tooltip":"AVID DNxHD 1920x1080x25:185 [mov]"},
 		"prores444":     {"name":"Pro444",   "tooltip":"Apple ProRes444 10Bit [mov]"},
 		"prores422":     {"name":"Pro422",   "tooltip":"Apple ProRes422 10Bit [mov]"}
+	},
+
+	"containers":{
+		"DEFAULT": {"name":"Default", "tooltip":"Default container"},
+		"mov": {"name":"MOV", "tooltip":"QuickTime Movie"},
+		"m4v": {"name":"M4V", "tooltip":"M4V"},
+		"mp4": {"name":"MP4", "tooltip":"MP4"},
+		"mpg": {"name":"MPG", "tooltip":"MPG"},
+		"mxf": {"name":"MXF", "tooltip":"MXF"},
+		"ogg": {"name":"OGG", "tooltip":"OGG"},
+		"avi": {"name":"AVI", "tooltip":"Microsoft Video"}
 	},
 
 	"preview":{

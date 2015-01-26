@@ -120,6 +120,7 @@ function d_DailiesWalkReceived( i_data, i_args)
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'container',"value":RULES.dailies.container,"label":'Containers:',"keys":RULES.dailies.containers});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -157,8 +158,8 @@ function d_ProcessGUI( i_wnd)
 		gui_GetParams( i_wnd.elTabs[type], d_params[type], params);
 //console.log( JSON.stringify( params)); return;
 
-	for( key in i_wnd.elContent.m_choises )
-		params[key] = i_wnd.elContent.m_choises[key].value;
+	for( key in i_wnd.elTabs.general.m_choises )
+		params[key] = i_wnd.elTabs.general.m_choises[key].value;
 
 	i_wnd.destroy();
 
@@ -213,6 +214,9 @@ function d_MakeCmd( i_params)
 	cmd += ' -r '+params.format;
 	cmd += ' -s '+params.slate;
 	cmd += ' -t '+params.template;
+
+	if( params.container != 'DEFAULT' )
+		cmd += ' -n ' + params.container;
 
 	cmd += ' --colorspace "'+params.colorspace+'"';
 
