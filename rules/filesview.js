@@ -379,7 +379,7 @@ FilesView.prototype.showCounts = function()
 		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_frames_count);};
 	}
 }
-FilesView.prototype.createItem = function( i_path, i_obj)
+FilesView.prototype.createItem = function( i_path, i_obj, i_isFolder)
 {
 	var el = document.createElement('div');
 	el.classList.add('item');
@@ -390,10 +390,26 @@ FilesView.prototype.createItem = function( i_path, i_obj)
 	el.m_view = this;
 	el.onclick = function(e) { e.currentTarget.m_view.onClick( e);};
 
-	var elAnchor = document.createElement('a');
-	el.appendChild( elAnchor);
-	elAnchor.classList.add('anchor');
-	elAnchor.textContent = '@';
+	var elAnchor = null;
+	if( i_isFolder )
+	{
+		elAnchor = c_CreateOpenButton( el, i_path, 'a');
+		if( elAnchor ) elAnchor.style.cssFloat = 'left';
+	}
+
+	if( elAnchor == null )
+	{
+		elAnchor = document.createElement('a');
+		el.appendChild( elAnchor);
+		elAnchor.classList.add('anchor');
+
+		var icon = fv_GetFileIcon( i_path, i_isFolder);
+		if( icon )
+			elAnchor.style.backgroundImage = 'url(rules/icons/' + icon + ')';
+		else
+			elAnchor.textContent = '@';
+	}
+
 	elAnchor.href = g_GetLocationArgs({"fv_Goto":i_path});
 
 	return el;
@@ -569,15 +585,12 @@ FilesView.prototype.showFolder = function( i_folder)
 	var name = i_folder.name;
 	var path = ( this.path + '/' + name).replace( /\/\//g, '/');
 
-	var elFolder = this.createItem( path, i_folder);
+	var elFolder = this.createItem( path, i_folder, true);
 	elFolder.classList.add('folder');
 	elFolder.m_isFolder = true;
 
 	if( this.has_thumbs )
 		this.makeThumbEl( elFolder, path, 'folder');
-
-	var elOpen = c_CreateOpenButton( elFolder, path);
-	if( elOpen ) elOpen.style.cssFloat = 'left';
 
 	elFolder.m_elName = document.createElement('a');
 	elFolder.appendChild( elFolder.m_elName);
@@ -662,7 +675,7 @@ FilesView.prototype.showFile = function( i_file)
 {
 	var path = this.path + '/' + i_file.name;
 
-	var elFile = this.createItem( path, i_file);
+	var elFile = this.createItem( path, i_file, false);
 	elFile.classList.add('file');
 	elFile.m_isFile = true;
 
@@ -1114,6 +1127,16 @@ FilesView.prototype.filesDeleted = function( i_data, i_args)
 	c_Info('Deleted ' + i_args.delpath);
 
 	i_args.this.refresh();
+}
+
+function fv_GetFileIcon( i_name, i_folder)
+{
+	var icon = 'file_icon.png';
+	if     ( i_folder )                icon = 'file_folder.png';
+	else if( c_FileIsMovie(   i_name)) icon = 'file_movie.png';
+	else if( c_FileIsImage(   i_name)) icon = 'file_image.png';
+	else if( c_FileIsArchive( i_name)) icon = 'file_archive.png';
+	return icon;
 }
 
 function fv_PreviewOpen( i_el)

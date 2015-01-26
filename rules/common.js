@@ -386,10 +386,11 @@ function c_GetElInteger( i_el)
 	return num;
 }
 
-function c_CreateOpenButton( i_el, i_path)
+function c_CreateOpenButton( i_el, i_path, i_type)
 {
 	if( RULES.has_filesystem === false ) return null;
-	var el = document.createElement('div');
+	if( i_type == null ) i_type = 'div';
+	var el = document.createElement( i_type);
 	i_el.appendChild( el);
 	el.classList.add('cmdexec');
 	el.classList.add('open');
