@@ -77,6 +77,7 @@ function scene_Show()
 		elShot.style.padding = '4px';
 		elShot.classList.add('shot');
 
+		// Thumbnail - a link with an image
 		var elLink = document.createElement('a');
 		elShot.appendChild( elLink);
 		elLink.href = '#' + path;
@@ -92,6 +93,10 @@ function scene_Show()
 		elShot.appendChild( elName);
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
+
+		elShot.m_elBody = document.createElement('span');
+		elShot.appendChild( elShot.m_elBody);
+		elShot.m_elBody.classList.add('body');
 
 		var elSt = {};
 
@@ -146,8 +151,22 @@ function scene_Show()
 
 		elShot.onclick = sc_ShotClicked;
 	}
+
 	sc_DisplayStatistics();
 	sc_Post();
+
+	// Get scene shots bodies:
+	for( var i = 0; i < sc_elShots.length; i++)
+	{
+		var path = sc_elShots[i].m_path;
+		path = RULES.root + path + '/' + RULES.rufolder + '/' + u_body_filename;
+		n_GetFile({"path":path,"func":sc_BodyReceived,"info":'scene_bodies',"elShot":sc_elShots[i],"parse":false});
+	}
+}
+function sc_BodyReceived( i_data, i_args)
+{
+	if( i_data.indexOf('No such file ' + RULES.root) != -1 ) return;
+	i_args.elShot.m_elBody.innerHTML = i_data;
 }
 
 function scenes_Show()
@@ -275,6 +294,7 @@ function scenes_Received( i_data, i_args)
 			elShot.onclick = sc_ShotClicked;
 		}
 	}
+
 	sc_DisplayStatistics();
 	sc_Post();
 }

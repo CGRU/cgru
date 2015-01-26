@@ -3,9 +3,23 @@
 #scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
 
-.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px;}
+.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px; position: relative; }
 
-.shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
+.shot .thumbnail {
+float: left;
+margin-right: 20px;
+width: 360px; 
+}
+.shot .body {
+position: absolute;
+left: 380px;
+top: 20px;
+height: 80px;
+-border: 1px solid rgba(98,98,98,.5);
+-overflow: auto;
+-float: right;
+}
+
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
 .shot .status .btn_edit { float: right; font-size: 10px; }
 .shot .status .percent { float: left; margin-right: 5px; }
@@ -21,11 +35,9 @@
 .scene a { color: inherit; /*display:block;*/ }
 .scene a:hover { color: #AFF;}
 .scene .shot {
-position: relative;
 float: left;
 border-radius: 2px;
 margin: 4px;
-/*box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;*/
 width: 200px;
 height: 44px;
 }
