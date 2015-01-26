@@ -380,76 +380,6 @@ FilesView.prototype.showCounts = function()
 	}
 }
 
-FilesView.prototype.showGenericButtons = function( i_el, i_obj)
-{
-	var el = document.createElement('div');
-	i_el.appendChild( el);
-	el.classList.add('button');
-	el.style.backgroundImage = 'url(rules/icons/menu.png)';
-	el.title = 'Open menu';
-	el.onclick = function(e){
-		e.stopPropagation();
-		var el = e.currentTarget;
-		el.classList.toggle('pushed');
-		c_ElDisplayToggle( el.m_elMenu);
-	}
-
-	i_el.m_elMenu = document.createElement('div');
-	i_el.appendChild( i_el.m_elMenu);
-	el.m_elMenu = i_el.m_elMenu;
-	i_el.m_elMenu.style.display = 'none';
-	i_el.m_elMenu.classList.add('menu');
-
-	var el = document.createElement('div');
-	i_el.m_elMenu.appendChild( el);
-	el.classList.add('button');
-	el.style.backgroundImage = 'url(rules/icons/comment_add.png)';
-	el.title = 'Comment item';
-	el.m_view = this;
-	el.m_path = i_el.m_path;
-	el.onclick = function(e){
-		e.stopPropagation();
-		el = e.currentTarget;
-		var text = '<a href="' + g_GetLocationArgs({"fv_Goto":el.m_path}) + '">' + c_PathBase(el.m_path) + '</a><br><br>';
-		cm_NewOnClick( text);
-	};
-
-	if( this.can_refresh )
-	{
-		var el = document.createElement('div');
-		i_el.m_elMenu.appendChild( el);
-		el.classList.add('button');
-		el.style.backgroundImage = 'url(rules/icons/rename.png)';
-		el.title = 'Rename item';
-		el.m_view = this;
-		el.m_path = i_el.m_path;
-		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( i_el.m_path)};
-	}
-
-	if( i_el.m_isFolder || ( c_FileIsMovie( i_el.m_path)))
-	{
-		el = document.createElement('div');
-		i_el.m_elMenu.appendChild(el);
-		el.classList.add('button');
-		el.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
-		el.m_path = i_el.m_path;
-		el.onclick = function(e){
-			e.stopPropagation();
-			u_ThumbnailMake({"paths":[e.currentTarget.m_path],"info":'filesview',"no_cache":true});
-		}
-		el.title = 'Generate location thumbnail from this folder.';
-	}
-
-	if( RULES.files_detele )
-	{
-		var el = document.createElement('div');
-		i_el.m_elMenu.appendChild( el);
-		el.classList.add('button');
-		el.textContent = 'DEL';
-		el.m_view = this;
-		el.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( i_el.m_path)};
-	}
-}
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
 	if( this.masks && this.masks.length )
@@ -607,23 +537,95 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		elItem.m_elName.target = '_blank';
 	}
 
-this.showGenericButtons( elItem, i_obj);
+	// Menu show/hide button:
+	var el = document.createElement('div');
+	elItem.appendChild( el);
+	el.classList.add('button');
+	el.style.backgroundImage = 'url(rules/icons/menu.png)';
+	el.title = 'Open menu';
+	el.onclick = function(e){
+		e.stopPropagation();
+		var el = e.currentTarget;
+		el.classList.toggle('pushed');
+		c_ElDisplayToggle( el.m_elMenu);
+	}
+	// Menu div:
+	elItem.m_elMenu = document.createElement('div');
+	elItem.appendChild( elItem.m_elMenu);
+	el.m_elMenu = elItem.m_elMenu;
+	elItem.m_elMenu.style.display = 'none';
+	elItem.m_elMenu.classList.add('menu');
+
+	// Button to add a comment with a link to this item:
+	{
+		var el = document.createElement('div');
+		elItem.m_elMenu.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/comment_add.png)';
+		el.title = 'Comment item';
+		el.m_view = this;
+		el.m_path = elItem.m_path;
+		el.onclick = function(e){
+			e.stopPropagation();
+			el = e.currentTarget;
+			var text = '<a href="' + g_GetLocationArgs({"fv_Goto":el.m_path}) + '">' + c_PathBase(el.m_path) + '</a><br><br>';
+			cm_NewOnClick( text);
+		};
+	}
 
 	// Folder count files button:
 	if( i_isFolder && this.can_count )
 	{
-		var el = document.createElement('a');
+		var el = document.createElement('div');
 		elItem.m_elMenu.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/count.png)';
 		el.title = "Count files.";
-		el.style.cssFloat = 'right';
 		el.m_view = this;
 		el.m_path = path;
 		el.onclick = function(e){
 			e.stopPropagation();
 			e.currentTarget.m_view.countFiles( e.currentTarget.m_path);
 		};
+	}
+
+	// Generate location (asset-shot) thumbnail from a folder or a movie:
+	if( elItem.m_isFolder || ( c_FileIsMovie( elItem.m_path)))
+	{
+		el = document.createElement('div');
+		elItem.m_elMenu.appendChild(el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/thumbnails.png)';
+		el.m_path = elItem.m_path;
+		el.onclick = function(e){
+			e.stopPropagation();
+			u_ThumbnailMake({"paths":[e.currentTarget.m_path],"info":'filesview',"no_cache":true});
+		}
+		el.title = 'Generate location thumbnail from this folder.';
+	}
+
+	// Rename:
+	if( this.can_refresh )
+	{
+		var el = document.createElement('div');
+		elItem.m_elMenu.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/rename.png)';
+		el.title = 'Rename item';
+		el.m_view = this;
+		el.m_path = elItem.m_path;
+		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( elItem.m_path)};
+	}
+
+	// Delete button !!!
+	if( RULES.files_detele )
+	{
+		var el = document.createElement('div');
+		elItem.m_elMenu.appendChild( el);
+		el.classList.add('button');
+		el.textContent = 'DEL';
+		el.m_view = this;
+		el.ondblclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.deleteFilesDialog( elItem.m_path)};
 	}
 
 	// Folder HTML player button:
@@ -638,7 +640,6 @@ this.showGenericButtons( elItem, i_obj);
 		el.setAttribute('target', '_blank');
 		el.style.backgroundImage = 'url(rules/icons/player.png)';
 		el.title = "Open RULES player in a new window.";
-		el.style.cssFloat = 'right';
 	}
 
 	// Folder play sequence button:
@@ -714,7 +715,7 @@ this.showGenericButtons( elItem, i_obj);
 		}
 	}
 
-this.showAttrs( elItem, i_obj);
+	this.showAttrs( elItem, i_obj);
 
 	// Movie file preview:
 	if( i_isFolder == false )

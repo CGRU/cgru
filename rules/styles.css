@@ -598,7 +598,8 @@ border: 1px solid rgba(0,0,0,.5);
 border-radius: 2px;
 background-color: rgba(250,250,250,.3);
 }
-.filesview .item .menu > div { float: left; }
+.filesview .item .menu .cmdexec { padding: 1px 2px; }
+.filesview .item .menu > div, .filesview .item .menu > a { float: right; margin: 0px 2px; }
 .filesview .item .cmdexec.open { padding: 0; margin: 0px 2px; }
 .filesview .item .button {
 width: 18px; height: 18px;
