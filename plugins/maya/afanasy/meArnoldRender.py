@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 	meArnoldRender
 
@@ -51,11 +51,11 @@ class meArnoldRender ( object ) :
 	
 	"""
 	def __init__ (self, NoGUI = False) :
-	  """
-	  In case if NoGUI = True, it's possible to use external "wrapper"
-	  e.g. for Shotgun to call "generate_ass" or "submitJob" previously
-	  assign global variables  
-	  """
+		"""
+		In case if NoGUI = True, it's possible to use external "wrapper"
+		e.g. for Shotgun to call "generate_ass" or "submitJob" previously
+		assign global variables  
+		"""
 		self.NoGUI = NoGUI
 		self.winMain = ''
 
