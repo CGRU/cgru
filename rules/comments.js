@@ -194,7 +194,7 @@ Comment.prototype.init = function()
 	if( localStorage.text_color && ( localStorage.text_color != ''))
 		this.elText.style.color = localStorage.text_color;
 	else
-		this.elText.style.color = 'inherit';
+		this.elText.style.color = u_textColor;
 	if( localStorage.back_comments && ( localStorage.back_comments != ''))
 		this.elText.style.background = localStorage.back_comments;
 	else if( localStorage.background && ( localStorage.background != '' ))
