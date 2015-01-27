@@ -74,6 +74,8 @@ if jobname == '':
 
 job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
+job.setFolder('pwd', os.getcwd())
+job.setFolder('test', '/some/path')
 
 blocknames = []
 if options.labels != '':

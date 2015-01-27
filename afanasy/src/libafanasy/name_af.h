@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <list>
+#include <map>
 #include <memory.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -267,6 +268,7 @@ namespace af
 	bool jr_int64 ( const char * i_name, int64_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int32vec(  const char * i_name, std::vector<int32_t>     & o_attr, const JSON & i_object);
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
+	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object);
 
 	void jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render = false);
 
