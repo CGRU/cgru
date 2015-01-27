@@ -89,13 +89,16 @@ function scene_Show()
 		sc_elImgThumbs.push( elImg);
 		elImg.src = elImg.m_src;
 
+		// Name and Body:
+		var elDiv = document.createElement('div');
+		elShot.appendChild( elDiv);
+		elDiv.classList.add('name_body');
 		var elName = document.createElement('a');
-		elShot.appendChild( elName);
+		elDiv.appendChild( elName);
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
-
-		elShot.m_elBody = document.createElement('span');
-		elShot.appendChild( elShot.m_elBody);
+		elShot.m_elBody = document.createElement('div');
+		elDiv.appendChild( elShot.m_elBody);
 		elShot.m_elBody.classList.add('body');
 
 		var elSt = {};
@@ -167,6 +170,7 @@ function sc_BodyReceived( i_data, i_args)
 {
 	if( i_data.indexOf('No such file ' + RULES.root) != -1 ) return;
 	i_args.elShot.m_elBody.innerHTML = i_data;
+	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent;
 }
 
 function scenes_Show()

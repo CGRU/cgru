@@ -236,12 +236,12 @@
 	},
 
 	"containers":{
-		"DEFAULT": {"name":"Default", "tooltip":"Default container"},
-		"mov": {"name":"MOV", "tooltip":"QuickTime Movie"},
-		"mp4": {"name":"MP4", "tooltip":"MPEG-4 Part 14"},
+		"DEFAULT": {"name":"Default", "tooltip":"Default container:\nTheora: OGG\nAny other: MOV"},
+		"mov": {"name":"MOV", "tooltip":"Apple QuickTime Movie"},
+		"mp4": {"name":"MP4", "tooltip":"MPEG-4 Part 14\nIt is a common container."},
 		"m4v": {"name":"M4V", "tooltip":"Apple 'MP4'"},
 		"mxf": {"name":"MXF", "tooltip":"Material eXchange Format"},
-		"ogg": {"name":"OGG", "tooltip":"Ogg Vorbis&Theora"},
+		"ogg": {"name":"OGG", "tooltip":"Ogg Vorbis&Theora\nThe most free container.\nFirefox and Chrome can play it without any plugins&codecs installed."},
 		"avi": {"name":"AVI", "tooltip":"Microsoft Audio Video Interleave"}
 	},
 
