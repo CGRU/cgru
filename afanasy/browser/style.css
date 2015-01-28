@@ -1,6 +1,6 @@
 body {
 font: 12px Arial;
-background: #AB8;
+background: #A0A0A0;
 }
 a { color: inherit;  text-shadow: 0 0 2px rgba(0,0,255,.3); }
 a:hover { text-shadow: 0 0 2px rgba(100,255,255,.5); }
@@ -17,7 +17,7 @@ overflow: hidden;
 position: absolute;
 left: 0; right: 0;
 border: 2px solid #555;
-box-shadow: 0px 0px 10px #000;
+box-shadow: 0px 0px 5px #000;
 overflow: hidden;
 -o-transition: all .3s ease-in-out;
 -moz-transition: all .3s ease-in-out;
@@ -29,6 +29,7 @@ overflow: hidden;
 position: absolute;
 left: 0; right: 0; bottom: 0; top: 200px;
 }
+#footer { border-bottom-width: 0; }
 #headermain * {
 -o-select: none;
 -moz-user-select: none;
@@ -38,7 +39,7 @@ left: 0; right: 0; bottom: 0; top: 200px;
 font: 16px Arial;
 font-weight: bold;
 position: relative;
-border: 1px solid #676767;
+border: 1px solid #555;
 border-radius: 6px;
 margin: 0px 10px;
 padding: 6px 8px 3px 8px;
@@ -46,17 +47,14 @@ cursor: pointer;
 text-transform: uppercase;
 text-align: center;
 color: #222;
-box-shadow: 0px 0px 2px #000, 0px 0px 10px rgba(255,255,255,1) inset;
-text-shadow: 0px 0px 2px #FFF;
 -o-transition: all .3s ease-in-out;
 -moz-transition: all .3s ease-in-out;
 -webkit-transition: all .3s ease-in-out;
 }
 #headermain .mbutton.pushed {
 background: #EFD;
-border: 1px inset #555;
 color: #353;
-box-shadow: 0px 0px 5px #250 inset, 0px 0px 10px rgba(255,255,255,.7);
+box-shadow: 0px 0px 8px #250 inset, 0px 0px 10px rgba(255,255,255,.7);
 }
 #header .mbutton.god_only { display: none;}
 #header.su_god .mbutton.god_only { display: inline; }
@@ -76,40 +74,41 @@ cursor: pointer;
 text-align: center;
 }
 #footeropenbutton, #headeropenbutton {
-box-shadow: 0px 0px 2px #000, 0px 0px 3px rgba(255,255,255,.5) inset;
-border-radius: 3px;
+border: 1px solid #555;
+border-radius: 2px;
 float: left;
 width: 12px; height: 18px;
 margin: 3px;
 }
 #footer #log_btn, #netlog_btn {
-box-shadow: 0px 0px 3px #000, 0px 0px 5px rgba(255,255,255,.5) inset;
+border: 1px solid #555;
+border-bottom-width: 0;
 float: right;
 display: none;
 padding: 3px 6px;
-margin: 6px 3px 0px 6px;
+margin: 5px 3px 0px 6px;
 border-top-left-radius: 4px;
 border-top-right-radius: 4px;
 border-bottom-right-radius: 0;
 border-bottom-left-radius: 0;
 }
-#footer #log_btn.pushed, #netlog_btn.pushed { box-shadow: 0px 0px 1px #000, 0px 0px 5px rgba(255,255,255,.5) inset;}
+#footer #log_btn.pushed, #netlog_btn.pushed { background-color: rgba(150,255,255,.3); }
 #footer #info {
 box-shadow: 0px 0px 2px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
 padding: 3px 9px; margin: 3px 24px;
-border-radius: 6px;
+border-radius: 2px;
 }
 #footer #version {
 float: right;
 padding: 3px; margin: 3px;
 }
 #footer #log, #netlog {
+border: 1px solid #555;
 overflow: auto;
 word-wrap:break-word;
 display: none;
-box-shadow: 0px 0px 2px #000 inset;
 padding: 3px 9px; margin: 0px 9px;
-border-radius: 6px;
+border-radius: 2px;
 height: 190px;
 }
 #footer #log *, #footer #netlog * { margin: 4px 0px;}
@@ -125,10 +124,10 @@ font-size: 12px;
 position: absolute;
 left: 0; right: 0;
 height: 30px;
-box-shadow: 0px 0px 10px #000, 0px 0px 5px rgba(255,255,255,.7) inset;
+box-shadow: 0px 0px 6px #000, 0px 0px 4px rgba(255,255,255,.7) inset;
 }
-.monitor .ctrl { top: 0; }
-.monitor .info { bottom: 0;}
+.monitor .ctrl { top: 0; border-bottom: 1px solid #575757;}
+.monitor .info { bottom: 0; border-top: 1px solid #575757;}
 .monitor .ctrl,.list {
 -o-select: none;
 -moz-user-select: none;
@@ -143,10 +142,10 @@ bottom: 30px;
 }
 
 .ctrl_button {
-box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
-border-radius: 4px;
+border: 1px solid #575757;
+border-radius: 2px;
 cursor: pointer;
-margin: 4px 8px;
+margin: 3px 8px;
 padding: 4px;
 float: left;
 }
@@ -154,13 +153,10 @@ float: left;
 
 .ctrl_sort_filter { right: 30px; top: 0; bottom: 0; }
 .ctrl_sort, .ctrl_filter {
+border: 1px solid #575757;
 position: absolute;
-box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
-margin: 3px 8px;
-border-radius: 4px;
-/*-o-transition: all .3s ease-in-out;
--moz-transition: all .3s ease-in-out;
--webkit-transition: all .3s ease-in-out;*/
+margin: 2px 8px;
+border-radius: 2px;
 }
 .ctrl_sort   { left: 5px; width: 124px; }
 .ctrl_filter { left: 138px; right: 0px; }
@@ -169,10 +165,11 @@ border-radius: 4px;
 .ctrl_sort .label, .ctrl_filter .label { float: left; margin: 5px 10px; width: 30px;}
 .ctrl_filter .param, .ctrl_sort .param 
 {
+font: 11px monospace;
 float: left;
-box-shadow: 0px 0px 2px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
+border: 1px solid #575757;
 margin: 2px;
-padding: 3px 0px;
+padding: 2px 0px;
 width: 60px;
 cursor: pointer;
 text-align: center;
@@ -180,23 +177,24 @@ text-align: center;
 .ctrl_filter .input
 {
 position: absolute;
-box-shadow: 0px 0px 5px #000 inset, 0px 0px 4px rgba(255,255,255,.5);
+font: 11px monospace;
+border: 1px solid #575757;
 left: 120px; top: 0px; bottom: 0px; right: 10px;
 margin: 2px; padding: 3px;
+background-color: rgba(255,255,255,.2);
 }
 .monitor .info .text {
 position: absolute;
 top: 4px; left: 8px; right: 8px; bottom: 3px;
-background: rgba(255,255,255,.5);
-border: 1px solid #444;
-box-shadow: 0px 0px 5px #222 inset;
-border-radius: 4px;
+background: rgba(255,255,255,.2);
+border: 1px solid #575757;
+border-radius: 2px;
 padding: 4px 8px;
 }
 
 .item {
 background: rgba(255,255,255,.3);
-border: 1px solid #777;
+border: 1px solid #575757;
 position: relative;
 margin: 3px;
 padding: 1px 7px;
@@ -232,7 +230,8 @@ right: 30%;
 
 .item.render .plotter {
 background: #000;
-border: 2px inset #888;
+border: 1px solid #575757;
+border-radius: 2px;
 position: absolute;
 }
 
@@ -266,8 +265,8 @@ top: 1px; left: 0; right: 0;
 clear: both;
 margin: 2px;
 padding: 2px 5px;
-border-radius: 4px;
-box-shadow: 0px 0px 5px #000 inset;
+border-radius: 2px;
+border: 1px solid #575757;
 }
 .jobblock.selected {
 background: #DFD;
@@ -320,20 +319,19 @@ margin: 2px;
 .user .bar {
 position: absolute;
 top: 0; bottom: 0; left: 0; width: 0;
+margin-right: 2px;
 background: #FF4;
 border-radius: 3px;
 text-align: center;
-/*margin: 0px 5px;*/
-/*padding: 0px 5px;*/
-/*border: 1px solid #444;*/
-box-shadow: 0px 0px 8px #000 inset;
+-border: 1px solid #575757;
+border-radius: 2px;
 }
 
 .jobblock .progress {
 clear: both;
-border: 1px solid #444;
+border: 1px solid #575757;
 margin: 2px;
-border-radius: 3px;
+border-radius: 2px;
 }
 .jobblock .progress .bar {}
 .DON { background: #363;}
@@ -378,13 +376,13 @@ opacity: .3;
 background: #DD5;
 margin: 1px;
 /*border: 1px solid #666;*/
-border-radius: 4px;
 position: relative;
 }
 .rendertask .body {
 position: relative;
 padding: 1px 5px;
-box-shadow: 0px 0px 4px #000 inset;
+border: 1px solid #575757;
+border-radius: 2px;
 }
 .rendertask .bar {
 position: absolute;
