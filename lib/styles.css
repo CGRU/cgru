@@ -38,41 +38,29 @@ border-radius: 2px;
 position: absolute;
 background: rgba(0,0,0,0.5);
 top: 0; bottom: 0; left: 0; right: 0;
+padding: 5% 8%;
+overflow: auto;
 }
 .cgru_window_window {
-position: absolute;
+position: relative;
 background: #DDDDDD;
-top: 8%; bottom: 8%; left: 5%; right: 5%;
+/*max-height: 100%;*/
+border: 2px solid #575757;
 border-radius: 2px;
 box-shadow: 0px 0px 10px #000;
 color: #000000;
 }
+.cgru_window_title { text-align: center; }
+.cgru_window_close { cursor: pointer; opacity: 0.7; float: right; text-align: center; padding: 0px 6px; }
+.cgru_window_close:hover { opacity: 1.0; }
 .cgru_window_content {
-overflow: auto;
+position: relative;
 background: #BBB;
-position: absolute;
+margin: 3px;
 padding: 20px;
-top: 24px; bottom: 4px; left: 4px; right: 4px;
 border: 1px solid #777;
 border-radius: 2px;
 }
-.cgru_window_title {
-background: #CCC;
-position: absolute;
-height: 20px;
-text-align: center;
-top: 0; left: 0; right: 0;
-}
-.cgru_window_close {
-cursor: pointer;
-background: #EEE;
-border-radius: 2px;
-position: absolute;
-top: 0px; right: 10px;
-text-align: center;
-padding: 0px 6px;
-}
-.cgru_window_close:hover { background: #FFF; }
 
 .cgru_dialog_content * {
 margin: 0; padding: 0; overflow: hidden;

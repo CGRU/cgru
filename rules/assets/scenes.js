@@ -169,8 +169,9 @@ function scene_Show()
 function sc_BodyReceived( i_data, i_args)
 {
 	if( i_data.indexOf('No such file ' + RULES.root) != -1 ) return;
-	i_args.elShot.m_elBody.innerHTML = i_data;
-	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent;
+	// Replace <br> with spaces through some pattern:
+	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
+	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
 }
 
 function scenes_Show()
