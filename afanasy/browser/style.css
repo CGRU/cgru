@@ -7,7 +7,7 @@ a:hover { text-shadow: 0 0 2px rgba(100,255,255,.5); }
 
 #afbody { overflow:hidden;}
 
-#content,#header,#footer * {
+#content, #header, #footer * {
 margin: 0;
 padding: 0;
 overflow: hidden;
@@ -62,9 +62,11 @@ box-shadow: 0px 0px 8px #250 inset, 0px 0px 10px rgba(255,255,255,.7);
 #content {
 position: absolute;
 left: 0; right: 0;
-top: 30px;
-bottom: 30px;
+padding: 0; margin: 0;
+top: 28px;
+bottom: 26px;
 overflow: hidden;
+border: 2px solid #575757;
 }
 
 #footer { height: 26px; bottom: 0px; font-size: 12px;}
@@ -119,13 +121,35 @@ font-weight: bold;
 position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
+overflow: hidden;
 }
 .monitor * { overflow: hidden; }
+
+.view {
+position: absolute;
+left: 30px; right: 200px;
+top: 0; bottom: 0;
+}
+.panel {
+position: absolute;
+top: 0; bottom: 0;
+}
+.panel.left {
+left: 0;
+width: 28px;
+border-right: 2px solid #575757;
+}
+.panel.right {
+right: 0;
+width: 198px;
+border-left: 2px solid #575757;
+}
+
 .monitor .ctrl,.info {
 position: absolute;
 left: 0; right: 0;
 height: 30px;
-box-shadow: 0px 0px 6px #000, 0px 0px 4px rgba(255,255,255,.7) inset;
+-box-shadow: 0px 0px 6px #000, 0px 0px 4px rgba(255,255,255,.7) inset;
 }
 .monitor .ctrl { top: 0; border-bottom: 1px solid #575757;}
 .monitor .info { bottom: 0; border-top: 1px solid #575757;}

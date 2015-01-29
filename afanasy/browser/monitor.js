@@ -21,14 +21,29 @@ function Monitor( i_args)
 	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild( this.elMonitor);
 	this.elMonitor.classList.add('monitor');
+	this.elMonitor.classList.add( this.type);
 	this.elMonitor.monitor = this;
+
+	this.elView = this.document.createElement('div');
+	this.elView.classList.add('view');
+	this.elMonitor.appendChild( this.elView);
+
+	this.elPanelL = this.document.createElement('div');
+	this.elMonitor.appendChild( this.elPanelL);
+	this.elPanelL.classList.add('panel');
+	this.elPanelL.classList.add('left');
+
+	this.elPanelR = this.document.createElement('div');
+	this.elMonitor.appendChild( this.elPanelR);
+	this.elPanelR.classList.add('panel');
+	this.elPanelR.classList.add('right');
 
 	this.elList = this.document.createElement('div');
 	this.elCtrl = this.document.createElement('div');
 	this.elInfo = this.document.createElement('div');
-	this.elMonitor.appendChild( this.elList);
-	this.elMonitor.appendChild( this.elCtrl);
-	this.elMonitor.appendChild( this.elInfo);
+	this.elView.appendChild( this.elList);
+	this.elView.appendChild( this.elCtrl);
+	this.elView.appendChild( this.elInfo);
 	this.elList.classList.add('list');
 	this.elCtrl.classList.add('ctrl');
 	this.elInfo.classList.add('info');
