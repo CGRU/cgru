@@ -351,7 +351,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+//	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
@@ -393,7 +393,7 @@ function g_OpenFolderDo( i_data, i_args)
 	if( i_data )
 	{
 		el.m_dir = i_data[0];
-		el.m_dir.folders.sort( g_CompareFolders);
+//		el.m_dir.folders.sort( g_CompareFolders);
 	}
 
 	if( el.m_dir.folders == null ) return;
@@ -502,21 +502,41 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_elSize.title = title;
 	}
 
-	// set next element to previous folder:
-	if( i_elParent.m_elFolders && i_elParent.m_elFolders.length )
+	// Search index to place new folder alphabetically:
+	var index = 0;
+	for( i = 0; i < i_elParent.m_elFolders.length; i++, index++)
+		if( g_CompareFolders( elFolder.m_fobject, i_elParent.m_elFolders[i].m_fobject ) < 0 )
+			break;
+
+	// Get parent element body to insert new child (root navig element has no body):
+	var elBody = i_elParent.m_elFBody;
+	if( elBody == null ) elBody = i_elParent;
+
+	// Insert element to parent body:
+	if( i_elParent.m_elFolders.length )
+		elBody.insertBefore( elFolder, i_elParent.m_elFolders[index]);
+	else
+		elBody.appendChild( elFolder);
+
+	// Insert element in a parent array:
+	i_elParent.m_elFolders.splice( index, 0, elFolder);
+
+	// Store element in a global array:
+	g_elFolders[elFolder.m_path] = elFolder;
+
+	// Set next and previous folders:
+	if( index-1 >= 0 )
 	{
-		var elPrev = i_elParent.m_elFolders[i_elParent.m_elFolders.length-1];
+		var elPrev = i_elParent.m_elFolders[index-1];
 		elPrev.m_elNext = elFolder;
 		elFolder.m_elPrev = elPrev;
 	}
-
-	if( i_elParent.m_elFBody )
-		i_elParent.m_elFBody.appendChild( elFolder);
-	else
-		i_elParent.appendChild( elFolder);
-	i_elParent.m_elFolders.push( elFolder);
-
-	g_elFolders[elFolder.m_path] = elFolder;
+	if( index+1 < i_elParent.m_elFolders.length )
+	{
+		var elNext = i_elParent.m_elFolders[index+1];
+		elNext.m_elPrev = elFolder;
+		elFolder.m_elNext = elNext;
+	}
 
 	return elFolder;
 }
@@ -549,15 +569,22 @@ function g_FolderSetStatus( i_status, i_elFolder, i_params)
 
 function g_CompareFolders(a,b)
 {
+	// Compare folders sizes if size is shown in the navigation:
 	if( localStorage.navig_show_size == 'true' )
 	{
-		if(      a['size_total'] ==  null   ) return  1;
-		else if( b['size_total'] ==  null   ) return -1;
-		else if( a['size_total'] < b['size_total']) return  1;
-		else if( a['size_total'] > b['size_total']) return -1;
+		if(( a.size_total != null ) && ( b.size_total == null )) return  1;
+		if(( b.size_total != null ) && ( a.size_total == null )) return  1;
+		if(( a.size_total != null ) && ( b.size_total != null ))
+		{
+			if     ( a.size_total < b.size_total ) return  1;
+			else if( a.size_total > b.size_total ) return -1;
+		}
 	}
-	if( a['name'] < b['name']) return -1;
-	if( a['name'] > b['name']) return 1;
+
+	// Compare folders names:
+	if( a.name < b.name ) return -1;
+	if( a.name > b.name ) return  1;
+
 	return 0;
 }
 
