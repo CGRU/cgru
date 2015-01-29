@@ -572,7 +572,7 @@ function g_CompareFolders(a,b)
 	// Compare folders sizes if size is shown in the navigation:
 	if( localStorage.navig_show_size == 'true' )
 	{
-		if(( a.size_total != null ) && ( b.size_total == null )) return  1;
+		if(( a.size_total != null ) && ( b.size_total == null )) return -1;
 		if(( b.size_total != null ) && ( a.size_total == null )) return  1;
 		if(( a.size_total != null ) && ( b.size_total != null ))
 		{
