@@ -89,19 +89,33 @@ function scene_Show()
 		sc_elImgThumbs.push( elImg);
 		elImg.src = elImg.m_src;
 
-		// Name and Body:
+		// Right float div:
 		var elDiv = document.createElement('div');
 		elShot.appendChild( elDiv);
 		elDiv.classList.add('name_body');
+		// Name:
 		var elName = document.createElement('a');
 		elDiv.appendChild( elName);
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
+		// Body:
 		elShot.m_elBody = document.createElement('div');
 		elDiv.appendChild( elShot.m_elBody);
 		elShot.m_elBody.classList.add('body');
 
+		// Elements for status:
 		var elSt = {};
+
+		var elFramesNumDiv = document.createElement('div');
+		elDiv.insertBefore( elFramesNumDiv, elName);
+		elFramesNumDiv.classList.add('frames_num_div');
+		elSt.elFramesNum = document.createElement('div');
+		elFramesNumDiv.appendChild( elSt.elFramesNum);
+		elSt.elFramesNum.classList.add('frames_num');
+		var elFramesNumLabel = document.createElement('div');
+		elFramesNumDiv.appendChild( elFramesNumLabel);
+		elFramesNumLabel.textContent = 'F:';
+		elFramesNumLabel.classList.add('frames_num_label');
 
 		elSt.elFinish = document.createElement('div');
 		elShot.appendChild( elSt.elFinish);
@@ -110,18 +124,18 @@ function scene_Show()
 		elShot.appendChild( elShot.m_elStatus);
 		elShot.m_elStatus.classList.add('status');
 
-		var elEditBtn = document.createElement('div');
-		elShot.m_elStatus.appendChild( elEditBtn);
-		elEditBtn.classList.add('button');
-		elEditBtn.classList.add('btn_edit');
-		elEditBtn.textContent = 'Edit';
-
 		elSt.elProgress = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elProgress);
 		elSt.elProgress.classList.add('progress');
 		elSt.elProgressBar = document.createElement('div');
 		elSt.elProgress.appendChild( elSt.elProgressBar);
 		elSt.elProgressBar.classList.add('progressbar');
+
+		var elEditBtn = document.createElement('div');
+		elShot.m_elStatus.appendChild( elEditBtn);
+		elEditBtn.classList.add('button');
+		elEditBtn.classList.add('edit');
+		elEditBtn.title = 'Edit status.\nSelect several shots to edit.';
 
 		elSt.elPercentage = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elPercentage);
@@ -170,6 +184,7 @@ function sc_BodyReceived( i_data, i_args)
 {
 	if( i_data.indexOf('No such file ' + RULES.root) != -1 ) return;
 	// Replace <br> with spaces through some pattern:
+	i_args.elShot.m_elBody.style.display = 'block';
 	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
 	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
 }
