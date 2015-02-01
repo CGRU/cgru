@@ -32,11 +32,13 @@ function Monitor( i_args)
 	this.elMonitor.appendChild( this.elPanelL);
 	this.elPanelL.classList.add('panel');
 	this.elPanelL.classList.add('left');
+	this.elPanelL.classList.add('text_not_selectable');
 
 	this.elPanelR = this.document.createElement('div');
 	this.elMonitor.appendChild( this.elPanelR);
 	this.elPanelR.classList.add('panel');
 	this.elPanelR.classList.add('right');
+	this.elPanelR.classList.add('text_not_selectable');
 
 	this.elList = this.document.createElement('div');
 	this.elCtrl = this.document.createElement('div');
@@ -51,100 +53,9 @@ function Monitor( i_args)
 	this.elementsSU.push( this.elInfo);
 
 	this.elList.monitor = this;
+	this.elList.classList.add('text_not_selectable');
 	this.elList.oncontextmenu = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 	this.elList.onmousedown   = function(e){ return e.currentTarget.monitor.noneSelected(e);}
-
-	this.elCtrlButtons = this.document.createElement('div');
-	this.elCtrl.appendChild( this.elCtrlButtons);
-	this.elCtrlButtons.style.position = 'absolute';
-
-	var buttons_width = 0;
-	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
-	{
-		this.elCtrlSet = this.document.createElement('div');
-		this.elCtrlButtons.appendChild( this.elCtrlSet);
-		this.elCtrlSet.classList.add('ctrl_button');
-		this.elCtrlSet.textContent = 'SET';
-		this.elCtrlSet.monitor = this;
-		this.elCtrlSet.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e);}
-
-		buttons_width += 50;
-	}
-
-	if( this.type == 'renders')
-	{
-		this.elCtrlCmd = this.document.createElement('div');
-		this.elCtrlButtons.appendChild( this.elCtrlCmd);
-		this.elCtrlCmd.classList.add('ctrl_button');
-		this.elCtrlCmd.textContent = 'CMD';
-		this.elCtrlCmd.monitor = this;
-		this.elCtrlCmd.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'cmd');}
-
-		buttons_width += 50;
-
-		if( g_GOD())
-		{
-			this.elCtrlPow = this.document.createElement('div');
-			this.elCtrlButtons.appendChild( this.elCtrlPow);
-			this.elCtrlPow.classList.add('ctrl_button');
-			this.elCtrlPow.textContent = 'POW';
-			this.elCtrlPow.monitor = this;
-			this.elCtrlPow.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'pow');}
-
-			buttons_width += 50;
-		}
-	}
-//	this.elCtrlButtons.style.width = 50+buttons_width+'px';
-
-	this.elCtrlSortFilter = this.document.createElement('div');
-	this.elCtrl.appendChild( this.elCtrlSortFilter);
-	this.elCtrlSortFilter.style.position = 'absolute';
-	this.elCtrlSortFilter.style.left = buttons_width+'px';
-	this.elCtrlSortFilter.classList.add('ctrl_sort_filter');
-
-	this.elCtrlSort = this.document.createElement('div');
-	this.elCtrlSortFilter.appendChild( this.elCtrlSort);
-	this.elCtrlSort.classList.add('ctrl_sort');
-
-	this.elCtrlSortLabel = this.document.createElement('span');
-	this.elCtrlSort.appendChild( this.elCtrlSortLabel);
-	this.elCtrlSortLabel.classList.add('label');
-	this.elCtrlSortLabel.textContent = 'Sort:';
-
-	this.elCtrlSortParam = this.document.createElement('span');
-	this.elCtrlSort.appendChild( this.elCtrlSortParam);
-	this.elCtrlSortParam.classList.add('param');
-	this.elCtrlSortParam.textContent = 'null';
-	this.elCtrlSortParam.monitor = this;
-	this.elCtrlSortParam.ondblclick = function(e){return e.currentTarget.monitor.sortDirChanged(e);}
-	this.elCtrlSortParam.title = 'Sort Parameter\nContext menu to select.\nDouble click to toggle direction.';
-	this.elCtrlSortParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'sort');}
-
-	this.elCtrlFilter = this.document.createElement('div');
-	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
-	this.elCtrlFilter.classList.add('ctrl_filter');
-
-	this.elCtrlFilterLabel = this.document.createElement('div');
-	this.elCtrlFilter.appendChild( this.elCtrlFilterLabel);
-	this.elCtrlFilterLabel.classList.add('label');
-	this.elCtrlFilterLabel.textContent = 'Filter:';
-
-	this.elCtrlFilterParam = this.document.createElement('div');
-	this.elCtrlFilter.appendChild( this.elCtrlFilterParam);
-	this.elCtrlFilterParam.classList.add('param');
-	this.elCtrlFilterParam.textContent = 'null';
-	this.elCtrlFilterParam.title = 'Filter Parameter\nContext menu to select.\nDouble click to toggle exclude.';
-	this.elCtrlFilterParam.monitor = this;
-	this.elCtrlFilterParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'filter');}
-	this.elCtrlFilterParam.ondblclick = function(e){return e.currentTarget.monitor.filterExcludeChanged(e);}
-
-	this.elCtrlFilterInput = this.document.createElement('div');
-	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
-	this.elCtrlFilterInput.classList.add('input');
-	this.elCtrlFilterInput.contentEditable = true;
-	this.elCtrlFilterInput.monitor = this;
-	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
-	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
 	this.options = {};
 	var actions = this.nodeConstructor.actions;
@@ -170,26 +81,112 @@ function Monitor( i_args)
 
 		if( has_options )
 		{
-			this.elOptions = this.document.createElement('div');
-			this.elCtrl.appendChild( this.elOptions);
-			this.elOptions.textContent = 'O';
-			this.elOptions.classList.add('ctrl_button');
-			this.elOptions.classList.add('ctrl_options');
-			this.elOptions.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'option',false);}
-			this.elOptions.monitor = this;
+			var el = this.document.createElement('div');
+			el.classList.add('ctrl_button');
+			el.textContent = 'VIEW';
+			el.title = 'View options.';
+			this.elPanelL.appendChild( el);
+			el.onclick = function(e){ return e.currentTarget.monitor.showMenu(e,'option',false);}
+			el.monitor = this;
 		}
 	}
+
+	var el = document.createElement('div');
+	el.classList.add('ctrl_button');
+	el.textContent = 'LOG';
+	el.title = 'Show log.';
+	this.elPanelL.appendChild( el);
+	el.monitor = this;
+	el.onclick = function(e){ return e.currentTarget.monitor.mh_Get({"name":'log'}, e);}
+
+	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
+	{
+		this.elCtrlSet = this.document.createElement('div');
+		this.elPanelL.appendChild( this.elCtrlSet);
+		this.elCtrlSet.classList.add('ctrl_button');
+		this.elCtrlSet.textContent = 'SET';
+		this.elCtrlSet.title = 'Set parameter.';
+		this.elCtrlSet.monitor = this;
+		this.elCtrlSet.onclick = function(e){ return e.currentTarget.monitor.showMenu(e);}
+	}
+
+	if( this.type == 'renders')
+	{
+		this.elCtrlCmd = this.document.createElement('div');
+		this.elPanelL.appendChild( this.elCtrlCmd);
+		this.elCtrlCmd.classList.add('ctrl_button');
+		this.elCtrlCmd.textContent = 'CMD';
+		this.elCtrlCmd.monitor = this;
+		this.elCtrlCmd.onclick = function(e){ return e.currentTarget.monitor.showMenu(e,'cmd');}
+
+		if( g_GOD())
+		{
+			this.elCtrlPow = this.document.createElement('div');
+			this.elPanelL.appendChild( this.elCtrlPow);
+			this.elCtrlPow.classList.add('ctrl_button');
+			this.elCtrlPow.textContent = 'POW';
+			this.elCtrlPow.monitor = this;
+			this.elCtrlPow.onclick = function(e){ return e.currentTarget.monitor.showMenu(e,'pow');}
+		}
+	}
+
+	var el = document.createElement('div');
+	el.classList.add('ctrl_button');
+	el.textContent = 'OBJ';
+	el.title = 'Show object.';
+	this.elPanelL.appendChild( el);
+	el.monitor = this;
+	el.onclick = function(e){ return e.currentTarget.monitor.showObject(e);}
+
+	this.elCtrlSort = this.document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlSort);
+	this.elCtrlSort.classList.add('ctrl_sort');
+
+	this.elCtrlSortLabel = this.document.createElement('span');
+	this.elCtrlSort.appendChild( this.elCtrlSortLabel);
+	this.elCtrlSortLabel.classList.add('label');
+	this.elCtrlSortLabel.textContent = 'Sort:';
+
+	this.elCtrlSortParam = this.document.createElement('span');
+	this.elCtrlSort.appendChild( this.elCtrlSortParam);
+	this.elCtrlSortParam.classList.add('param');
+	this.elCtrlSortParam.textContent = 'null';
+	this.elCtrlSortParam.monitor = this;
+	this.elCtrlSortParam.ondblclick = function(e){return e.currentTarget.monitor.sortDirChanged(e);}
+	this.elCtrlSortParam.title = 'Sort Parameter\nContext menu to select.\nDouble click to toggle direction.';
+	this.elCtrlSortParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'sort');}
+
+	this.elCtrlFilter = this.document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlFilter);
+	this.elCtrlFilter.classList.add('ctrl_filter');
+
+	this.elCtrlFilterLabel = this.document.createElement('div');
+	this.elCtrlFilter.appendChild( this.elCtrlFilterLabel);
+	this.elCtrlFilterLabel.classList.add('label');
+	this.elCtrlFilterLabel.textContent = 'Filter:';
+
+	this.elCtrlFilterParam = this.document.createElement('div');
+	this.elCtrlFilter.appendChild( this.elCtrlFilterParam);
+	this.elCtrlFilterParam.classList.add('param');
+	this.elCtrlFilterParam.textContent = 'null';
+	this.elCtrlFilterParam.title = 'Filter Parameter\nContext menu to select.\nDouble click to toggle exclude.';
+	this.elCtrlFilterParam.monitor = this;
+	this.elCtrlFilterParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'filter');}
+	this.elCtrlFilterParam.ondblclick = function(e){return e.currentTarget.monitor.filterExcludeChanged(e);}
+
+	this.elCtrlFilterInput = this.document.createElement('div');
+	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
+	this.elCtrlFilterInput.classList.add('input');
+	this.elCtrlFilterInput.contentEditable = true;
+	this.elCtrlFilterInput.monitor = this;
+	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
+	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
 	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
-///*
-//this.elCtrl.textContent='ctrl';
-//this.elList.textContent='list';
-//this.elInfo.textContent='info';
-//*/
-//	this.valid = false;
+
 	for( var i = 0; i < g_recievers.length; i++)
 	{
 		if( g_recievers[i].name == this.name )
@@ -694,6 +691,12 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 	this.elSetSelected( this.cur_item.element, true);
 }
 
+Monitor.prototype.showObject = function( i_evt)
+{
+	if( this.cur_item && this.cur_item.params )
+		g_ShowObject({"object":this.cur_item.params},{"evt":i_evt,"wnd":this.window});
+}
+
 Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
 	i_evt.stopPropagation();
@@ -772,7 +775,7 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 		i_menu.addItem({"label":'invalid '+name,"enabled":false});
 }
 
-Monitor.prototype.onMouseOverSet = function( i_evt, i_name, i_need_selection)
+Monitor.prototype.showMenu = function( i_evt, i_name, i_need_selection)
 {
 	if( i_need_selection !== false )
 	{
@@ -825,6 +828,12 @@ Monitor.prototype.mh_Oper = function( i_param)
 Monitor.prototype.mh_Get = function( i_param, i_evt)
 {
 //this.info('Get = ' + i_param.name);
+	if( this.cur_item == null )
+	{
+		g_Error('No object selected.');
+		return;
+	}
+
 	get = {"type":this.type,"ids":[this.cur_item.params.id],"mode":i_param.name};
 	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.window});
 //	nw_GetNodes( this.type, [this.cur_item.params.id], i_param.name);
