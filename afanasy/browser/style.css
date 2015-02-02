@@ -143,6 +143,10 @@ right: 0;
 width: 198px;
 border-left: 2px solid #575757;
 }
+.panel.right > div {
+margin: 2px;
+padding: 2px;
+}
 
 .monitor .ctrl,.info {
 position: absolute;

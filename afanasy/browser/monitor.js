@@ -138,6 +138,9 @@ function Monitor( i_args)
 	el.monitor = this;
 	el.onclick = function(e){ return e.currentTarget.monitor.showObject(e);}
 
+	if( this.nodeConstructor.createPanelR )
+		this.nodeConstructor.createPanelR( this.elPanelR);
+
 	this.elCtrlSort = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('ctrl_sort');
@@ -631,9 +634,15 @@ Monitor.prototype.elSetSelected = function( el, on)
 	if( on )
 	{
 		this.cur_item = el.item;
+
+		if( this.cur_item.updatePanelR )
+			this.cur_item.updatePanelR();
+
 		this.info( this.cur_item.params.name);
+
 		if( el.selected ) return;
 		el.selected = true;
+
 		if( false == el.classList.contains('selected'))
 			el.classList.add('selected');
 		if( this.type == 'jobs' )
@@ -693,6 +702,7 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 
 Monitor.prototype.showObject = function( i_evt)
 {
+	if( this.hasSelection() == false ) return;
 	if( this.cur_item && this.cur_item.params )
 		g_ShowObject({"object":this.cur_item.params},{"evt":i_evt,"wnd":this.window});
 }
@@ -828,9 +838,9 @@ Monitor.prototype.mh_Oper = function( i_param)
 Monitor.prototype.mh_Get = function( i_param, i_evt)
 {
 //this.info('Get = ' + i_param.name);
-	if( this.cur_item == null )
+	if(( this.hasSelection() == false ) || ( this.cur_item == null ))
 	{
-		g_Error('No object selected.');
+		g_Info('No object selected.');
 		return;
 	}
 

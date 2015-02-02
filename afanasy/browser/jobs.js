@@ -747,6 +747,37 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 }
 
+JobNode.prototype.updatePanelR = function()
+{
+	var elFolders = this.monitor.elPanelR.m_elFolders;
+
+	if( elFolders.m_elFolders )
+		for( var i = 0; i < elFolders.m_elFolders.length; i++)
+			elFolders.removeChild( elFolders.m_elFolders[i]);
+
+	elFolders.m_elFolders = [];
+	var folders = this.params.folders;
+//console.log(JSON.stringify( folders));
+	for( var name in folders )
+	{
+		var el = document.createElement('div');
+		el.textContent = name;
+		el.title = folders[name]
+		el.classList.add('folder');
+		elFolders.appendChild( el);
+		elFolders.m_elFolders.push( el);
+		
+	}
+}
+
+JobNode.createPanelR = function( i_el)
+{
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.textContent = 'Job Folders';
+	el.classList.add('caption');
+	i_el.m_elFolders = el;
+}
 
 
 JobNode.actions = [];
