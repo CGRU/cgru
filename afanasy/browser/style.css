@@ -7,6 +7,14 @@ a:hover { text-shadow: 0 0 2px rgba(100,255,255,.5); }
 
 #afbody { overflow:hidden;}
 
+.text_selectable {
+-moz-user-select: text;
+-webkit-user-select: text;
+}
+#content, #header, #footer {
+-moz-user-select: none;
+-webkit-user-select: none;
+}
 #content, #header, #footer * {
 margin: 0;
 padding: 0;
@@ -17,12 +25,6 @@ overflow: hidden;
 -moz-transition: all .3s ease-in-out;
 -webkit-transition: all .3s ease-in-out;
 }
-.text_not_selectable {
--o-select: none;
--moz-user-select: none;
--webkit-user-select: none;
-}
-
 #header,#footer {
 position: absolute;
 left: 0; right: 0;
@@ -116,7 +118,6 @@ height: 190px;
 #footer #log *, #footer #netlog * { margin: 4px 0px;}
 
 .monitor {
-font-weight: bold;
 position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
@@ -142,10 +143,28 @@ border-right: 2px solid #575757;
 right: 0;
 width: 198px;
 border-left: 2px solid #575757;
+overflow: auto;
 }
-.panel.right > div {
-margin: 2px;
-padding: 2px;
+.panel.right .section {
+padding: 4px;
+border-bottom: 2px solid #575757;
+opacity: .5;
+}
+.panel.right .section.active {
+opacity: 1.0;
+}
+.panel.right .section .caption {
+margin: 4px 8px;
+}
+.panel.right .section .param {
+padding: 4px;
+border-top: 1px solid #575757;
+}
+.panel.right .section .param .label {
+float: left;
+}
+.panel.right .section .param .value {
+float: right;
 }
 
 .monitor .ctrl,.info {
@@ -157,6 +176,7 @@ height: 28px;
 .monitor .ctrl { top: 0; border-bottom: 2px solid #575757;}
 .monitor .info { bottom: 0; border-top: 2px solid #575757;}
 .monitor .list {
+font-weight: bold;
 position: absolute;
 left: 0; right: 0;
 overflow: auto;
@@ -164,15 +184,16 @@ top: 30px;
 bottom: 30px;
 }
 
-.ctrl_button {
+.panel .ctrl_button {
 border: 1px solid #575757;
 border-radius: 2px;
-cursor: pointer;
 margin: 3px;
 padding: 4px;
 text-align: center;
+opacity: .5;
 }
-.ctrl_button:hover { background-color: rgba(150,255,255,.2); }
+.panel .ctrl_button.active { cursor: pointer; opacity: 1.0; }
+.panel .ctrl_button.active:hover { background-color: rgba(150,255,255,.2); }
 
 .ctrl_sort, .ctrl_filter {
 position: absolute;

@@ -240,3 +240,25 @@ function cm_FillNumbers( i_string, i_number)
 
 function cm_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1).substr( i_file.lastIndexOf('\\')+1);}
 function cm_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/')).substr( 0, i_file.lastIndexOf('\\'));}
+
+function cm_CheckPermissions( i_perm)
+{
+	if( i_perm == null ) return true;
+
+	if( g_VISOR())
+	{
+		if( i_perm == 'user') return false;
+		if( g_GOD())
+		{
+			if( false == (( i_perm == 'visor') || ( i_perm == 'god')))
+				return false;
+		}
+		else if( i_perm != 'visor')
+			return false;
+	}
+	else if( i_perm != 'user')
+		return false;
+
+	return true;
+}
+

@@ -747,26 +747,81 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 }
 
-JobNode.prototype.updatePanelR = function()
+JobNode.resetPanels = function( i_monitor)
 {
-	var elFolders = this.monitor.elPanelR.m_elFolders;
+	if( i_monitor.panel_item == null ) return;
 
+	var elPanelL = i_monitor.elPanelL;
+	elPanelL.m_elLog.classList.remove('active');
+	elPanelL.m_elSet.classList.remove('active');
+	elPanelL.m_elObj.classList.remove('active');
+
+	var elPanelR = i_monitor.elPanelR;
+
+	elPanelR.m_elFolders.classList.remove('active');
+	var elFolders = elPanelR.m_elFolders;
 	if( elFolders.m_elFolders )
 		for( var i = 0; i < elFolders.m_elFolders.length; i++)
 			elFolders.removeChild( elFolders.m_elFolders[i]);
+	elFolders.m_elFolders = [];
 
+	elPanelR.m_elActions.classList.remove('active');
+	var elParams = elPanelR.m_elActions.m_elParams;
+	for( var p in elParams )
+		elParams[p].style.display = 'none';
+
+	i_monitor.panel_item = null;
+}
+JobNode.prototype.updatePanels = function()
+{
+	JobNode.resetPanels( this.monitor);
+	this.monitor.panel_item = this;
+
+	var elPanelL = this.monitor.elPanelL;
+	elPanelL.m_elLog.classList.add('active');
+	elPanelL.m_elSet.classList.add('active');
+	elPanelL.m_elObj.classList.add('active');
+
+	var elPanelR = this.monitor.elPanelR;
+
+	var elFolders = elPanelR.m_elFolders;
+	elFolders.classList.add('active');
 	elFolders.m_elFolders = [];
 	var folders = this.params.folders;
 //console.log(JSON.stringify( folders));
 	for( var name in folders )
 	{
-		var el = document.createElement('div');
-		el.textContent = name;
-		el.title = folders[name]
-		el.classList.add('folder');
-		elFolders.appendChild( el);
-		elFolders.m_elFolders.push( el);
-		
+		var elDiv = document.createElement('div');
+		elDiv.classList.add('param');
+		elDiv.classList.add('folder');
+		elFolders.appendChild( elDiv);
+		elFolders.m_elFolders.push( elDiv);
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.textContent = name;
+		elLabel.classList.add('label');
+
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elValue.textContent = name;
+		elValue.classList.add('value');
+		elValue.textContent = folders[name]
+		elValue.title = folders[name]
+	}
+
+	elPanelR.m_elActions.classList.add('active');
+	var elParams = elPanelR.m_elActions.m_elParams;
+	for( var p in elParams )
+	{
+		if( this.params[p] == null )
+		{
+			elParams[p].style.display = 'none';
+			continue;
+		}
+
+		elParams[p].m_elValue.textContent = this.params[p];
+		elParams[p].style.display = 'block';
 	}
 }
 
@@ -774,9 +829,46 @@ JobNode.createPanelR = function( i_el)
 {
 	var el = document.createElement('div');
 	i_el.appendChild( el);
-	el.textContent = 'Job Folders';
-	el.classList.add('caption');
+	el.classList.add('section');
 	i_el.m_elFolders = el;
+	var el = document.createElement('div');
+	i_el.m_elFolders.appendChild( el);
+	el.textContent = 'Folders';
+	el.classList.add('caption');
+
+	var el = document.createElement('div');
+	i_el.appendChild( el);
+	el.classList.add('section');
+	i_el.m_elActions = el;
+	var el = document.createElement('div');
+	i_el.m_elActions.appendChild( el);
+	el.textContent = 'Parameters';
+	el.classList.add('caption');
+
+	i_el.m_elActions.m_elParams = {};
+	for( var i = 0; i < JobNode.actions.length; i++ )
+	{
+		var act = JobNode.actions[i];
+		if( act.mode != 'set' ) continue;
+		if( false == cm_CheckPermissions( act.permissions )) continue;
+
+		var elDiv = document.createElement('div');
+		i_el.m_elActions.appendChild( elDiv);
+		elDiv.classList.add('param');
+		elDiv.style.display = 'none';
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = act.label;
+
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elValue.classList.add('value');
+		elDiv.m_elValue = elValue;
+
+		i_el.m_elActions.m_elParams[act.name] = elDiv;
+	}
 }
 
 

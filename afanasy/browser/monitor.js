@@ -32,13 +32,12 @@ function Monitor( i_args)
 	this.elMonitor.appendChild( this.elPanelL);
 	this.elPanelL.classList.add('panel');
 	this.elPanelL.classList.add('left');
-	this.elPanelL.classList.add('text_not_selectable');
 
 	this.elPanelR = this.document.createElement('div');
 	this.elMonitor.appendChild( this.elPanelR);
 	this.elPanelR.classList.add('panel');
 	this.elPanelR.classList.add('right');
-	this.elPanelR.classList.add('text_not_selectable');
+	this.elPanelR.classList.add('text_selectable');
 
 	this.elList = this.document.createElement('div');
 	this.elCtrl = this.document.createElement('div');
@@ -53,7 +52,6 @@ function Monitor( i_args)
 	this.elementsSU.push( this.elInfo);
 
 	this.elList.monitor = this;
-	this.elList.classList.add('text_not_selectable');
 	this.elList.oncontextmenu = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 	this.elList.onmousedown   = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 
@@ -83,10 +81,12 @@ function Monitor( i_args)
 		{
 			var el = this.document.createElement('div');
 			el.classList.add('ctrl_button');
+			el.classList.add('active');
 			el.textContent = 'VIEW';
 			el.title = 'View options.';
 			this.elPanelL.appendChild( el);
-			el.onclick = function(e){ return e.currentTarget.monitor.showMenu(e,'option',false);}
+			el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'option',false); return false;}
+			el.oncontextmenu = el.onclick;
 			el.monitor = this;
 		}
 	}
@@ -96,37 +96,45 @@ function Monitor( i_args)
 	el.textContent = 'LOG';
 	el.title = 'Show log.';
 	this.elPanelL.appendChild( el);
+	this.elPanelL.m_elLog = el;
 	el.monitor = this;
-	el.onclick = function(e){ return e.currentTarget.monitor.mh_Get({"name":'log'}, e);}
+	el.onclick = function(e){ e.currentTarget.monitor.mh_Get({"name":'log'}, e); return false;}
+	el.oncontextmenu = el.onclick;
 
 	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
 	{
-		this.elCtrlSet = this.document.createElement('div');
-		this.elPanelL.appendChild( this.elCtrlSet);
-		this.elCtrlSet.classList.add('ctrl_button');
-		this.elCtrlSet.textContent = 'SET';
-		this.elCtrlSet.title = 'Set parameter.';
-		this.elCtrlSet.monitor = this;
-		this.elCtrlSet.onclick = function(e){ return e.currentTarget.monitor.showMenu(e);}
+		var el = this.document.createElement('div');
+		this.elPanelL.appendChild( el);
+		this.elPanelL.m_elSet = el;
+		el.classList.add('ctrl_button');
+		el.textContent = 'SET';
+		el.title = 'Set parameter.';
+		el.monitor = this;
+		el.onclick = function(e){ e.currentTarget.monitor.showMenu(e); return false;}
+		el.oncontextmenu = el.onclick;
 	}
 
 	if( this.type == 'renders')
 	{
-		this.elCtrlCmd = this.document.createElement('div');
-		this.elPanelL.appendChild( this.elCtrlCmd);
-		this.elCtrlCmd.classList.add('ctrl_button');
-		this.elCtrlCmd.textContent = 'CMD';
-		this.elCtrlCmd.monitor = this;
-		this.elCtrlCmd.onclick = function(e){ return e.currentTarget.monitor.showMenu(e,'cmd');}
+		var el = this.document.createElement('div');
+		this.elPanelL.appendChild( el);
+		this.elPanelL.m_elCmd = el;
+		el.classList.add('ctrl_button');
+		el.textContent = 'CMD';
+		el.monitor = this;
+		el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cmd'); return false;}
+		el.oncontextmenu = el.onclick;
 
 		if( g_GOD())
 		{
-			this.elCtrlPow = this.document.createElement('div');
-			this.elPanelL.appendChild( this.elCtrlPow);
-			this.elCtrlPow.classList.add('ctrl_button');
-			this.elCtrlPow.textContent = 'POW';
-			this.elCtrlPow.monitor = this;
-			this.elCtrlPow.onclick = function(e){ return e.currentTarget.monitor.showMenu(e,'pow');}
+			var el = this.document.createElement('div');
+			this.elPanelL.appendChild( el);
+			this.elPanelL.m_elPow = el;
+			el.classList.add('ctrl_button');
+			el.textContent = 'POW';
+			el.monitor = this;
+			el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'pow'); return false;}
+			el.oncontextmenu = el.onclick;
 		}
 	}
 
@@ -135,8 +143,10 @@ function Monitor( i_args)
 	el.textContent = 'OBJ';
 	el.title = 'Show object.';
 	this.elPanelL.appendChild( el);
+	this.elPanelL.m_elObj = el;
 	el.monitor = this;
-	el.onclick = function(e){ return e.currentTarget.monitor.showObject(e);}
+	el.onclick = function(e){ e.currentTarget.monitor.showObject(e); return false;}
+	el.oncontextmenu = el.onclick;
 
 	if( this.nodeConstructor.createPanelR )
 		this.nodeConstructor.createPanelR( this.elPanelR);
@@ -181,12 +191,14 @@ function Monitor( i_args)
 	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
 	this.elCtrlFilterInput.classList.add('input');
 	this.elCtrlFilterInput.contentEditable = true;
+	this.elCtrlFilterInput.classList.add('text_selectable');
 	this.elCtrlFilterInput.monitor = this;
 	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
 	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
+	this.elInfoText.classList.add('text_selectable');
 	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
 
@@ -399,8 +411,13 @@ Monitor.prototype.processMsg = function( obj)
 			if( this.items[i].params.id == nodes[j].id )
 			{
 				this.items[i].update( nodes[j]);
+
+				if( this.panel_item == this.items[i] )
+					this.items[i].updatePanels();
+
 				updated.push( this.items[i]);
 				this.filterItem( this.items[i]);
+
 				found = true;
 				break;
 			}
@@ -519,6 +536,9 @@ Monitor.prototype.delNodes = function( i_ids)
 		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].params.id == i_ids[d] )
 			{
+				if( this.panel_item == this.items[i] )
+					this.nodeConstructor.resetPanels( this);
+
 				this.elList.removeChild( this.items[i].element);
 				this.items.splice(i,1);
 				break;
@@ -631,12 +651,14 @@ Monitor.prototype.onMouseOver = function( i_evt, i_el)
 
 Monitor.prototype.elSetSelected = function( el, on)
 {
+	this.window.getSelection().removeAllRanges();
+
 	if( on )
 	{
 		this.cur_item = el.item;
 
-		if( this.cur_item.updatePanelR )
-			this.cur_item.updatePanelR();
+		if( this.cur_item.updatePanels )
+			this.cur_item.updatePanels();
 
 		this.info( this.cur_item.params.name);
 
@@ -651,6 +673,9 @@ Monitor.prototype.elSetSelected = function( el, on)
 	else
 	{
 		if( false == el.selected ) return;
+
+		if( this.nodeConstructor.resetPanels )
+			this.nodeConstructor.resetPanels( this);
 		el.selected = false;
 		el.classList.remove('selected');
 	}
