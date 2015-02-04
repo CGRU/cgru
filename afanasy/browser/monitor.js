@@ -101,6 +101,9 @@ function Monitor( i_args)
 	el.onclick = function(e){ e.currentTarget.monitor.mh_Get({"name":'log'}, e); return false;}
 	el.oncontextmenu = el.onclick;
 
+	if( this.nodeConstructor.createPanelL )
+		this.nodeConstructor.createPanelL( this);
+
 	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
 	{
 		var el = this.document.createElement('div');
@@ -149,7 +152,7 @@ function Monitor( i_args)
 	el.oncontextmenu = el.onclick;
 
 	if( this.nodeConstructor.createPanelR )
-		this.nodeConstructor.createPanelR( this.elPanelR);
+		this.nodeConstructor.createPanelR( this);
 
 	this.elCtrlSort = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);

@@ -143,7 +143,12 @@ border-right: 2px solid #575757;
 right: 0;
 width: 198px;
 border-left: 2px solid #575757;
-overflow: auto;
+overflow-y: auto;
+}
+.panel.right .name {
+padding: 4px;
+text-align: center;
+font-weight: bold;
 }
 .panel.right .section {
 padding: 4px;
@@ -194,6 +199,8 @@ opacity: .5;
 }
 .panel .ctrl_button.active { cursor: pointer; opacity: 1.0; }
 .panel .ctrl_button.active:hover { background-color: rgba(150,255,255,.2); }
+.panel .ctrl_button.errors { cursor: pointer; opacity: 1.0; background-color: rgba(255,0,0,.8); }
+.panel .ctrl_button.errors:hover { background-color: rgba(255,0,0,1.0); }
 
 .ctrl_sort, .ctrl_filter {
 position: absolute;
@@ -373,13 +380,7 @@ border-radius: 2px;
 .DON { background: #363;}
 .RUN { background: #FF0;}
 .ERR { background: #F00;}
-.text.ERR {
-color: #300;
-background: #F74;
-border-radius: 2px;
-padding: 0px 5px;
-box-shadow: 0px 0px 6px #400 inset;
-}
+.text.ERR { border-radius: 4px; padding: 0px 5px; }
 
 .item .name {
 font-size: 14px;

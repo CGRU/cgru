@@ -754,9 +754,14 @@ JobNode.resetPanels = function( i_monitor)
 	var elPanelL = i_monitor.elPanelL;
 	elPanelL.m_elLog.classList.remove('active');
 	elPanelL.m_elSet.classList.remove('active');
+	elPanelL.m_elRes.classList.remove('active');
 	elPanelL.m_elObj.classList.remove('active');
+	elPanelL.m_elMov.classList.remove('active');
+	elPanelL.m_elErr.classList.remove('errors');
+	elPanelL.m_elDel.classList.remove('active');
 
 	var elPanelR = i_monitor.elPanelR;
+	elPanelR.m_elName.style.display = 'none';
 
 	elPanelR.m_elFolders.classList.remove('active');
 	var elFolders = elPanelR.m_elFolders;
@@ -779,10 +784,29 @@ JobNode.prototype.updatePanels = function()
 
 	var elPanelL = this.monitor.elPanelL;
 	elPanelL.m_elLog.classList.add('active');
+	elPanelL.m_elRes.classList.add('active');
 	elPanelL.m_elSet.classList.add('active');
 	elPanelL.m_elObj.classList.add('active');
+	elPanelL.m_elMov.classList.add('active');
+	elPanelL.m_elDel.classList.add('active');
+
+	var errors = 0;
+	var avoids = 0;
+	for( var b = 0; b < this.params.blocks.length; b++)
+	{
+		var block = this.params.blocks[b];
+		if( block.p_error_hosts )
+			errors += block.p_error_hosts;
+		if( block.p_avoid_hosts )
+			avoids += block.p_avoid_hosts;
+	}
+	if( errors || avoids || this.state.ERR )
+		elPanelL.m_elErr.classList.add('errors');
 
 	var elPanelR = this.monitor.elPanelR;
+	elPanelR.m_elName.textContent = this.params.name;
+	elPanelR.m_elName.title = 'Current job name:\n' + this.params.name;
+	elPanelR.m_elName.style.display = 'block';
 
 	var elFolders = elPanelR.m_elFolders;
 	elFolders.classList.add('active');
@@ -825,27 +849,85 @@ JobNode.prototype.updatePanels = function()
 	}
 }
 
-JobNode.createPanelR = function( i_el)
+JobNode.createPanelL = function( i_monitor)
 {
 	var el = document.createElement('div');
-	i_el.appendChild( el);
-	el.classList.add('section');
-	i_el.m_elFolders = el;
+	i_monitor.elPanelL.appendChild( el);
+	i_monitor.elPanelL.m_elErr = el;
+	el.classList.add('ctrl_button');
+	el.textContent = 'ERR';
+	el.title = 'Error hosts.\nClick to show.\nDouble click to reset.';
+	el.monitor = i_monitor;
+//	el.oncontextmenu = function(e){ e.currentTarget.monitor.mh_Get({"name":'error_hosts'}, e); return false;}
+//	el.ondblclick = function(e){ e.currentTarget.monitor.mh_Oper({"name":'reset_error_hosts'});}
+	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'errors'); return false;}
+	el.oncontextmenu = el.onclick;
+
 	var el = document.createElement('div');
-	i_el.m_elFolders.appendChild( el);
+	i_monitor.elPanelL.appendChild( el);
+	i_monitor.elPanelL.m_elRes = el;
+	el.classList.add('ctrl_button');
+	el.textContent = 'RES';
+	el.title = 'Restart job tasks.';
+	el.monitor = i_monitor;
+	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'restart'); return false;}
+	el.oncontextmenu = el.onclick;
+
+	var el = document.createElement('div');
+	i_monitor.elPanelL.appendChild( el);
+	i_monitor.elPanelL.m_elMov = el;
+	el.classList.add('ctrl_button');
+	el.textContent = 'MOV';
+	el.title = 'Change job orders.';
+	el.monitor = i_monitor;
+//	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'restart'); return false;}
+	el.oncontextmenu = el.onclick;
+/*
+	for( var a = 0; a <
+	{
+		var el = document.createElement('div');
+		i_monitor.elPanelL.m_elMov.appendChild( el);
+		el.textContent = 'Top';
+	}
+*/
+	var el = document.createElement('div');
+	i_monitor.elPanelL.appendChild( el);
+	i_monitor.elPanelL.m_elDel = el;
+	el.classList.add('ctrl_button');
+	el.textContent = 'DEL';
+	el.title = 'Double click to delete job(s).';
+	el.monitor = i_monitor;
+	el.ondblclick = function(e){ e.currentTarget.monitor.mh_Oper({"name":'delete'});}
+}
+
+JobNode.createPanelR = function( i_monitor)
+{
+	var elPanelR = i_monitor.elPanelR;
+
+	var el = document.createElement('div');
+	elPanelR.appendChild( el);
+	el.classList.add('name');
+	elPanelR.m_elName = el;
+
+	var el = document.createElement('div');
+	elPanelR.appendChild( el);
+	el.classList.add('section');
+	elPanelR.m_elFolders = el;
+	var el = document.createElement('div');
+	elPanelR.m_elFolders.appendChild( el);
 	el.textContent = 'Folders';
 	el.classList.add('caption');
 
 	var el = document.createElement('div');
-	i_el.appendChild( el);
+	elPanelR.appendChild( el);
 	el.classList.add('section');
-	i_el.m_elActions = el;
+	elPanelR.m_elActions = el;
 	var el = document.createElement('div');
-	i_el.m_elActions.appendChild( el);
+	elPanelR.m_elActions.appendChild( el);
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
 
-	i_el.m_elActions.m_elParams = {};
+	elPanelR.m_elActions.m_elParams = {};
 	for( var i = 0; i < JobNode.actions.length; i++ )
 	{
 		var act = JobNode.actions[i];
@@ -853,7 +935,7 @@ JobNode.createPanelR = function( i_el)
 		if( false == cm_CheckPermissions( act.permissions )) continue;
 
 		var elDiv = document.createElement('div');
-		i_el.m_elActions.appendChild( elDiv);
+		elPanelR.m_elActions.appendChild( elDiv);
 		elDiv.classList.add('param');
 		elDiv.style.display = 'none';
 
@@ -867,7 +949,13 @@ JobNode.createPanelR = function( i_el)
 		elValue.classList.add('value');
 		elDiv.m_elValue = elValue;
 
-		i_el.m_elActions.m_elParams[act.name] = elDiv;
+		elPanelR.m_elActions.m_elParams[act.name] = elDiv;
+
+		var el = elDiv;
+		el.title = 'Double click to edit.'
+		el.monitor = i_monitor;
+		el.action = act;
+		el.ondblclick = function(e){e.currentTarget.monitor.mh_Dialog( e.currentTarget.action);}
 	}
 }
 
@@ -876,28 +964,30 @@ JobNode.actions = [];
 
 JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_num',    "type":'num', "handle":'mh_Opt', "label":'Thumbnails Quantity', "default":10  });
 JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_height', "type":'num', "handle":'mh_Opt', "label":'Thumbnails Height',   "default":50 });
-
+/*
 JobNode.actions.push({"mode":'context', "name":'log',               "handle":'mh_Get',  "label":'Show Log'});
-JobNode.actions.push({"mode":'context', "name":'error_hosts',       "handle":'mh_Get',  "label":'Show Error Hosts'});
 JobNode.actions.push({"mode":'context', "name":'show_obj',          "handle":'mh_Show', "label":'Show Object'});
+JobNode.actions.push({"mode":'context', "name":'delete',            "handle":'mh_Oper', "label":'Delete'});
 JobNode.actions.push({"mode":'context'});
-JobNode.actions.push({"mode":'context', "name":'reset_error_hosts', "handle":'mh_Oper', "label":'Reset Error Hosts'});
-JobNode.actions.push({"mode":'context', "name":'restart_errors',    "handle":'mh_Oper', "label":'Restart Errors'});
-JobNode.actions.push({"mode":'context', "name":'restart_running',   "handle":'mh_Oper', "label":'Restart Running'});
-JobNode.actions.push({"mode":'context', "name":'restart_skipped',   "handle":'mh_Oper', "label":'Restart Skipped'});
-JobNode.actions.push({"mode":'context', "name":'restart_done',      "handle":'mh_Oper', "label":'Restart Done'});
-JobNode.actions.push({"mode":'context'});
+*/
+JobNode.actions.push({"mode":'errors', "name":'error_hosts',       "handle":'mh_Get',  "label":'Show Error Hosts'});
+JobNode.actions.push({"mode":'errors', "name":'reset_error_hosts', "handle":'mh_Oper', "label":'Reset Error Hosts'});
+JobNode.actions.push({"mode":'errors', "name":'restart_errors',    "handle":'mh_Oper', "label":'Restart Error Tasks'});
+
+JobNode.actions.push({"mode":'context', "name":'move_jobs_top',     "handle":'mh_Move', "label":'Move Top',    "permissions":'user'});
 JobNode.actions.push({"mode":'context', "name":'move_jobs_up',      "handle":'mh_Move', "label":'Move Up',     "permissions":'user'});
 JobNode.actions.push({"mode":'context', "name":'move_jobs_down',    "handle":'mh_Move', "label":'Move Down',   "permissions":'user'});
-JobNode.actions.push({"mode":'context', "name":'move_jobs_top',     "handle":'mh_Move', "label":'Move Top',    "permissions":'user'});
 JobNode.actions.push({"mode":'context', "name":'move_jobs_bottom',  "handle":'mh_Move', "label":'Move Bottom', "permissions":'user'});
 JobNode.actions.push({"mode":'context'});
 JobNode.actions.push({"mode":'context', "name":'start',             "handle":'mh_Oper', "label":'Start'});
 JobNode.actions.push({"mode":'context', "name":'pause',             "handle":'mh_Oper', "label":'Pause'});
 JobNode.actions.push({"mode":'context', "name":'stop',              "handle":'mh_Oper', "label":'Stop'});
-JobNode.actions.push({"mode":'context', "name":'restart',           "handle":'mh_Oper', "label":'Restart'});
-JobNode.actions.push({"mode":'context', "name":'restart_pause',     "handle":'mh_Oper', "label":'Restart&Pause'});
-JobNode.actions.push({"mode":'context', "name":'delete',            "handle":'mh_Oper', "label":'Delete'});
+
+JobNode.actions.push({"mode":'restart', "name":'restart',           "handle":'mh_Oper', "label":'All tasks'});
+JobNode.actions.push({"mode":'restart', "name":'restart_pause',     "handle":'mh_Oper', "label":'All and pause'});
+JobNode.actions.push({"mode":'restart', "name":'restart_running',   "handle":'mh_Oper', "label":'Running'});
+JobNode.actions.push({"mode":'restart', "name":'restart_skipped',   "handle":'mh_Oper', "label":'Skipped'});
+JobNode.actions.push({"mode":'restart', "name":'restart_done',      "handle":'mh_Oper', "label":'Done'});
 
 JobNode.actions.push({"mode":'set', "name":'annotation',                 "type":'str', "handle":'mh_Dialog', "label":'Annotation'});
 JobNode.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
