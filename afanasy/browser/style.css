@@ -15,6 +15,7 @@ a:hover { text-shadow: 0 0 2px rgba(100,255,255,.5); }
 -moz-user-select: none;
 -webkit-user-select: none;
 }
+.hide_childs > * { display: none; }
 #content, #header, #footer * {
 margin: 0;
 padding: 0;
@@ -193,7 +194,7 @@ bottom: 30px;
 border: 1px solid #575757;
 border-radius: 2px;
 margin: 3px;
-padding: 4px;
+padding: 4px 2px;
 text-align: center;
 opacity: .5;
 }
@@ -201,6 +202,12 @@ opacity: .5;
 .panel .ctrl_button.active:hover { background-color: rgba(150,255,255,.2); }
 .panel .ctrl_button.errors { cursor: pointer; opacity: 1.0; background-color: rgba(255,0,0,.8); }
 .panel .ctrl_button.errors:hover { background-color: rgba(255,0,0,1.0); }
+.panel .ctrl_button .sub_button {
+border: 1px solid #575757;
+border-radius: 2px;
+padding: 4px 2px;
+}
+.panel .ctrl_button .sub_button:hover { background-color: rgba(150,255,255,.4); }
 
 .ctrl_sort, .ctrl_filter {
 position: absolute;
