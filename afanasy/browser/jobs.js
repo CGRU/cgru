@@ -749,19 +749,15 @@ JobBlock.prototype.update = function( i_displayFull)
 
 JobNode.resetPanels = function( i_monitor)
 {
-	if( i_monitor.panel_item == null ) return;
-
 	var elPanelL = i_monitor.elPanelL;
 	elPanelL.m_elLog.classList.remove('active');
 	elPanelL.m_elRes.classList.remove('active');
-	elPanelL.m_elObj.classList.remove('active');
 	elPanelL.m_elMov.classList.remove('active');
 	elPanelL.m_elErr.classList.remove('errors');
 	elPanelL.m_elErr.classList.add('hide_childs');
 	elPanelL.m_elDel.classList.remove('active');
 
 	var elPanelR = i_monitor.elPanelR;
-	elPanelR.m_elName.style.display = 'none';
 
 	elPanelR.m_elFolders.classList.remove('active');
 	var elFolders = elPanelR.m_elFolders;
@@ -770,22 +766,16 @@ JobNode.resetPanels = function( i_monitor)
 			elFolders.removeChild( elFolders.m_elFolders[i]);
 	elFolders.m_elFolders = [];
 
-	elPanelR.m_elActions.classList.remove('active');
-	var elParams = elPanelR.m_elActions.m_elParams;
+	elPanelR.m_elParams.classList.remove('active');
+	var elParams = elPanelR.m_elParams.m_elPMap;
 	for( var p in elParams )
 		elParams[p].style.display = 'none';
-
-	i_monitor.panel_item = null;
 }
 JobNode.prototype.updatePanels = function()
 {
-	JobNode.resetPanels( this.monitor);
-	this.monitor.panel_item = this;
-
 	var elPanelL = this.monitor.elPanelL;
 	elPanelL.m_elLog.classList.add('active');
 	elPanelL.m_elRes.classList.add('active');
-	elPanelL.m_elObj.classList.add('active');
 	elPanelL.m_elMov.classList.add('active');
 	elPanelL.m_elDel.classList.add('active');
 
@@ -806,9 +796,6 @@ JobNode.prototype.updatePanels = function()
 	}
 
 	var elPanelR = this.monitor.elPanelR;
-	elPanelR.m_elName.textContent = this.params.name;
-	elPanelR.m_elName.title = 'Current job name:\n' + this.params.name;
-	elPanelR.m_elName.style.display = 'block';
 
 	var elFolders = elPanelR.m_elFolders;
 	elFolders.classList.add('active');
@@ -836,8 +823,8 @@ JobNode.prototype.updatePanels = function()
 		elValue.title = folders[name]
 	}
 
-	elPanelR.m_elActions.classList.add('active');
-	var elParams = elPanelR.m_elActions.m_elParams;
+	elPanelR.m_elParams.classList.add('active');
+	var elParams = elPanelR.m_elParams.m_elPMap;
 	for( var p in elParams )
 	{
 		if( this.params[p] == null )
@@ -860,8 +847,10 @@ JobNode.prototype.updatePanels = function()
 	}
 }
 
-JobNode.createPanelL = function( i_monitor)
+JobNode.createPanels = function( i_monitor)
 {
+	// Left Panel:
+
 	// Errors:
 	var elBtn = document.createElement('div');
 	i_monitor.elPanelL.appendChild( elBtn);
@@ -982,17 +971,11 @@ JobNode.createPanelL = function( i_monitor)
 	el.monitor = i_monitor;
 	el.ondblclick = function(e){ e.currentTarget.monitor.mh_Oper({"name":'delete'});}
 	el.oncontextmenu = function(e){ return false;}
-}
 
-JobNode.createPanelR = function( i_monitor)
-{
+
+	// Right Panel:
+
 	var elPanelR = i_monitor.elPanelR;
-
-	// Job name:
-	var el = document.createElement('div');
-	elPanelR.appendChild( el);
-	el.classList.add('name');
-	elPanelR.m_elName = el;
 
 	// Folders:
 	var el = document.createElement('div');
@@ -1008,55 +991,72 @@ JobNode.createPanelR = function( i_monitor)
 	var el = document.createElement('div');
 	elPanelR.appendChild( el);
 	el.classList.add('section');
-	elPanelR.m_elActions = el;
+	elPanelR.m_elParams = el;
 	var el = document.createElement('div');
-	elPanelR.m_elActions.appendChild( el);
+	elPanelR.m_elParams.appendChild( el);
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
 	el.title = 'Click to edit all paramters.';
-	el.m_elActions = elPanelR.m_elActions;
+	el.m_elParams = elPanelR.m_elParams;
 	el.onclick = function(e){
 		var el = e.currentTarget;
-		if( el.m_elActions.classList.contains('active') != true ) return false;
-		var elParams = el.m_elActions.m_elParams;
+		if( el.m_elParams.classList.contains('active') != true ) return false;
+		var elParams = el.m_elParams.m_elPMap;
 		for( var p in elParams )
 			elParams[p].style.display = 'block';
 		return false;
 	}
 	el.oncontextmenu = el.onclick;
 
-	elPanelR.m_elActions.m_elParams = {};
-	for( var i = 0; i < JobNode.actions.length; i++ )
+	elPanelR.m_elParams.m_elPMap = {};
+	for( var p in JobNode.params )
 	{
-		var act = JobNode.actions[i];
-		if( act.mode != 'set' ) continue;
-		if( false == cm_CheckPermissions( act.permissions )) continue;
+		var param = JobNode.params[p];
+		if( false == cm_CheckPermissions( param.permissions )) continue;
 
 		var elDiv = document.createElement('div');
-		elPanelR.m_elActions.appendChild( elDiv);
+		elPanelR.m_elParams.appendChild( elDiv);
 		elDiv.classList.add('param');
 		elDiv.style.display = 'none';
 
 		var elLabel = document.createElement('div');
 		elDiv.appendChild( elLabel);
 		elLabel.classList.add('label');
-		elLabel.textContent = act.label;
+		elLabel.textContent = param.label;
 
 		var elValue = document.createElement('div');
 		elDiv.appendChild( elValue);
 		elValue.classList.add('value');
 		elDiv.m_elValue = elValue;
 
-		elPanelR.m_elActions.m_elParams[act.name] = elDiv;
+		elPanelR.m_elParams.m_elPMap[p] = elDiv;
 
 		var el = elDiv;
 		el.title = 'Double click to edit.'
 		el.monitor = i_monitor;
-		el.action = act;
-		el.ondblclick = function(e){e.currentTarget.monitor.mh_Dialog( e.currentTarget.action);}
+		el.name = p;
+		el.param = param;
+		el.ondblclick = function(e){
+			var el = e.currentTarget;
+			el.monitor.mh_Dialog({'name':el.name,'type':el.param.type});
+		}
 	}
 }
-
+JobNode.params = {};
+JobNode.params.priority =                   {"type":'num', "label":'Priority'};
+JobNode.params.depend_mask =                {"type":'reg', "label":'Depend Mask'};
+JobNode.params.depend_mask_global =         {"type":'reg', "label":'Global Depend Mask'};
+JobNode.params.max_running_tasks =          {"type":'num', "label":'Max Runnig Tasks'};
+JobNode.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
+JobNode.params.hosts_mask =                 {"type":'reg', "label":'Hosts Mask'};
+JobNode.params.hosts_mask_exclude =         {"type":'reg', "label":'Exclude Hosts Mask'};
+JobNode.params.time_wait =                  {"type":'tim', "label":'Time Wait'};
+JobNode.params.need_os =                    {"type":'reg', "label":'OS Needed'};
+JobNode.params.need_properties =            {"type":'reg', "label":'Need Properties'};
+JobNode.params.time_life =                  {"type":'hrs', "label":'Life Time'};
+JobNode.params.annotation =                 {"type":'str', "label":'Annotation'};
+JobNode.params.hidden =                     {"type":'bl1', "label":'Hidden'};
+JobNode.params.user_name =                  {"type":'str', "label":'Owner',"permissions":'visor'};
 
 JobNode.actions = [];
 
@@ -1067,21 +1067,6 @@ JobNode.actions.push({"mode":'context', "name":'start',             "handle":'mh
 JobNode.actions.push({"mode":'context', "name":'pause',             "handle":'mh_Oper', "label":'Pause'});
 JobNode.actions.push({"mode":'context', "name":'stop',              "handle":'mh_Oper', "label":'Stop'});
 
-JobNode.actions.push({"mode":'set', "name":'annotation',                 "type":'str', "handle":'mh_Dialog', "label":'Annotation'});
-JobNode.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
-JobNode.actions.push({"mode":'set', "name":'depend_mask_global',         "type":'reg', "handle":'mh_Dialog', "label":'Global Depend Mask'});
-JobNode.actions.push({"mode":'set', "name":'max_running_tasks',          "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
-JobNode.actions.push({"mode":'set', "name":'max_running_tasks_per_host', "type":'num', "handle":'mh_Dialog', "label":'Max Run Tasks Per Host'});
-JobNode.actions.push({"mode":'set', "name":'hosts_mask',                 "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
-JobNode.actions.push({"mode":'set', "name":'hosts_mask_exclude',         "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
-JobNode.actions.push({"mode":'set', "name":'time_wait',                  "type":'tim', "handle":'mh_Dialog', "label":'Time Wait'});
-JobNode.actions.push({"mode":'set', "name":'priority',                   "type":'num', "handle":'mh_Dialog', "label":'Priority'});
-JobNode.actions.push({"mode":'set', "name":'need_os',                    "type":'reg', "handle":'mh_Dialog', "label":'OS Needed'});
-JobNode.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Need Properties'});
-JobNode.actions.push({"mode":'set', "name":'time_life',                  "type":'hrs', "handle":'mh_Dialog', "label":'Life Time'});
-JobNode.actions.push({"mode":'set', "name":'user_name',                  "type":'str', "handle":'mh_Dialog', "label":'Owner',"permissions":'visor'});
-JobNode.actions.push({"mode":'set'});
-JobNode.actions.push({"mode":'set', "name":'hidden',                     "type":'bl1', "handle":'mh_Dialog', "label":'Hidden'});
 
 JobBlock.actions = [];
 JobBlock.actions.push({"mode":'set', "name":'capacity',                   "type":'num', "handle":'mh_Dialog', "label":'Capacity'});
