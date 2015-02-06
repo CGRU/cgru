@@ -753,7 +753,6 @@ JobNode.resetPanels = function( i_monitor)
 
 	var elPanelL = i_monitor.elPanelL;
 	elPanelL.m_elLog.classList.remove('active');
-	elPanelL.m_elSet.classList.remove('active');
 	elPanelL.m_elRes.classList.remove('active');
 	elPanelL.m_elObj.classList.remove('active');
 	elPanelL.m_elMov.classList.remove('active');
@@ -786,7 +785,6 @@ JobNode.prototype.updatePanels = function()
 	var elPanelL = this.monitor.elPanelL;
 	elPanelL.m_elLog.classList.add('active');
 	elPanelL.m_elRes.classList.add('active');
-	elPanelL.m_elSet.classList.add('active');
 	elPanelL.m_elObj.classList.add('active');
 	elPanelL.m_elMov.classList.add('active');
 	elPanelL.m_elDel.classList.add('active');
@@ -845,10 +843,19 @@ JobNode.prototype.updatePanels = function()
 		if( this.params[p] == null )
 		{
 			elParams[p].style.display = 'none';
+			elParams[p].m_elValue.textContent = '';
 			continue;
 		}
 
-		elParams[p].m_elValue.textContent = this.params[p];
+		var value = this.params[p];
+		if(( typeof value ) == 'string' )
+		{
+			// word-wrap long regular expressions:
+			value = value.replace(/\./g,'.&shy;');
+			value = value.replace(/\|/g,'|&shy;');
+			value = value.replace(/\)/g,')&shy;');
+		}
+		elParams[p].m_elValue.innerHTML = value;
 		elParams[p].style.display = 'block';
 	}
 }
@@ -974,17 +981,20 @@ JobNode.createPanelL = function( i_monitor)
 	el.title = 'Double click to delete job(s).';
 	el.monitor = i_monitor;
 	el.ondblclick = function(e){ e.currentTarget.monitor.mh_Oper({"name":'delete'});}
+	el.oncontextmenu = function(e){ return false;}
 }
 
 JobNode.createPanelR = function( i_monitor)
 {
 	var elPanelR = i_monitor.elPanelR;
 
+	// Job name:
 	var el = document.createElement('div');
 	elPanelR.appendChild( el);
 	el.classList.add('name');
 	elPanelR.m_elName = el;
 
+	// Folders:
 	var el = document.createElement('div');
 	elPanelR.appendChild( el);
 	el.classList.add('section');
@@ -994,6 +1004,7 @@ JobNode.createPanelR = function( i_monitor)
 	el.textContent = 'Folders';
 	el.classList.add('caption');
 
+	// Parameters:
 	var el = document.createElement('div');
 	elPanelR.appendChild( el);
 	el.classList.add('section');
@@ -1002,6 +1013,17 @@ JobNode.createPanelR = function( i_monitor)
 	elPanelR.m_elActions.appendChild( el);
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
+	el.title = 'Click to edit all paramters.';
+	el.m_elActions = elPanelR.m_elActions;
+	el.onclick = function(e){
+		var el = e.currentTarget;
+		if( el.m_elActions.classList.contains('active') != true ) return false;
+		var elParams = el.m_elActions.m_elParams;
+		for( var p in elParams )
+			elParams[p].style.display = 'block';
+		return false;
+	}
+	el.oncontextmenu = el.onclick;
 
 	elPanelR.m_elActions.m_elParams = {};
 	for( var i = 0; i < JobNode.actions.length; i++ )

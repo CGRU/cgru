@@ -640,11 +640,10 @@ function g_OnKeyDown(e)
 	if( ! e ) return;
 	if( e.keyCode == 27 ) // ESC
 	{
+		if( cgru_EscapePopus())
+			return;
 		for( var i = 0; i < g_monitors.length; i++)
-		{
 			g_monitors[i].selectAll( false);
-		}
-		cgru_EscapePopus();
 		return;
 	}
 

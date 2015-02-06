@@ -104,7 +104,7 @@ function Monitor( i_args)
 	if( this.nodeConstructor.createPanelL )
 		this.nodeConstructor.createPanelL( this);
 
-	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
+	if( this.type == 'renders' || this.type == 'users')
 	{
 		var el = this.document.createElement('div');
 		this.elPanelL.appendChild( el);
