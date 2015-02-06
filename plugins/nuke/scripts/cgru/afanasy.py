@@ -145,6 +145,7 @@ class BlockParameters:
 		self.fullrangedepend = 0
 		self.tmpimage = 1
 		self.pathsmap = 1
+		self.imgfiles = []
 		if afnode is not None:
 			self.framefirst = int(afnode.knob('framefirst').value())
 			self.framelast = int(afnode.knob('framelast').value())
@@ -164,7 +165,6 @@ class BlockParameters:
 		if wnode.Class() == RenderNodeClassName:
 			afcommon = __import__('afcommon', globals(), locals(), [])
 			# Get images files:
-			self.imgfiles = []
 			if nuke.toNode('root').knob('proxy').value():
 				fileknob = wnode.knob('proxy')
 			else:
@@ -630,7 +630,18 @@ class JobParameters:
 		else:
 			job.setNativeOS()
 		job.setCmdPost('deletefiles "%s"' % self.scenename)
+
 		job.blocks = blocks
+
+		# Folders (for GUI only):
+		f_output = None
+		for block in blocks:
+			if 'files' in block.data and len(block.data['files']):
+				f_output = block.data['files'][0]
+				break
+		if f_output is not None:
+			job.setFolder('output', os.path.dirname( f_output))
+		job.setFolder('input', os.path.dirname( nuke.root().name()))
 
 		return job
 
