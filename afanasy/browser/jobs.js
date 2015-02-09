@@ -757,6 +757,7 @@ JobNode.resetPanels = function( i_monitor)
 		for( var i = 0; i < elFolders.m_elFolders.length; i++)
 			elFolders.removeChild( elFolders.m_elFolders[i]);
 	elFolders.m_elFolders = [];
+	elFolders.m_elRules.style.display = 'none';
 }
 JobNode.prototype.updatePanels = function()
 {
@@ -791,13 +792,29 @@ JobNode.prototype.updatePanels = function()
 	elFolders.m_elFolders = [];
 	var folders = this.params.folders;
 //console.log(JSON.stringify( folders));
+
+	if(( folders == null ) || ( folders.length == 0 ))
+	{
+		return;
+	}
+
+	var rules_link = folders.output;
+
 	for( var name in folders )
 	{
+		if( rules_link == null )
+			rules_link = folders[name];
+
+		var path = cgru_PM( folders[name]);
+
 		var elDiv = document.createElement('div');
-		elDiv.classList.add('param');
-		elDiv.classList.add('folder');
 		elFolders.appendChild( elDiv);
 		elFolders.m_elFolders.push( elDiv);
+		elDiv.classList.add('param');
+		elDiv.classList.add('folder');
+		elDiv.classList.add('cmdexec');
+		var cmd = cgru_OpenFolderCmd( path);
+		elDiv.setAttribute('cmdexec', JSON.stringify([cmd]));
 
 		var elLabel = document.createElement('div');
 		elDiv.appendChild( elLabel);
@@ -808,9 +825,12 @@ JobNode.prototype.updatePanels = function()
 		elDiv.appendChild( elValue);
 		elValue.textContent = name;
 		elValue.classList.add('value');
-		elValue.textContent = folders[name]
-		elValue.title = folders[name]
+		elValue.textContent = path;
+		elValue.title = path;
 	}
+
+	elFolders.m_elRules.style.display = 'block';
+	elFolders.m_elRules.href = cgru_RulesLink( rules_link);
 }
 
 JobNode.createPanels = function( i_monitor)
@@ -858,7 +878,14 @@ JobNode.createPanels = function( i_monitor)
 	var el = document.createElement('div');
 	elPanelR.appendChild( el);
 	el.classList.add('section');
+	el.classList.add('folders');
 	elPanelR.m_elFolders = el;
+	var el = document.createElement('a');
+	elPanelR.m_elFolders.appendChild( el);
+	elPanelR.m_elFolders.m_elRules = el;
+	el.classList.add('rules_link');
+	el.textContent = 'RULES';
+	el.setAttribute('target','_blank');
 	var el = document.createElement('div');
 	elPanelR.m_elFolders.appendChild( el);
 	el.textContent = 'Folders';

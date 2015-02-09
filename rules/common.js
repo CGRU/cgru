@@ -394,8 +394,7 @@ function c_CreateOpenButton( i_el, i_path, i_type)
 	i_el.appendChild( el);
 	el.classList.add('cmdexec');
 	el.classList.add('open');
-	var cmd = RULES.cmdexec.open_folder;
-	cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+	var cmd = cgru_OpenFolderCmd( cgru_PM('/'+RULES.root + i_path))
 	el.setAttribute('cmdexec', JSON.stringify([cmd]));
 	el.title = 'Open location in a file browser.\nRMB "Run" menu item.'
 	return el;

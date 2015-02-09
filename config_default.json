@@ -12,32 +12,13 @@
 		"":"Digest authentication realm",
 	"realm":"CGRU",
 
-	"OS_unix":{
-		"cmd_shell":"/bin/sh -c"
-	},
-	"OS_windows":{
-		"cmd_shell":"cmd.exe /c",
-
-			"":"This is a paths map example (disabled)",
-			"":"Client:Server",
-		"pathsmap":[
-			["//server/projects/","/mnt/prj/"]
-		],
-			"":"Client slashes direction plays no role, as it tries both slashes when searchs a path to replace.",
-			"":"But will replace with specified slashes, if unix slashes not forced (for Nuke, for example)."
-	},
-
-	"platforms":["linux","mac","windows"],
-
 	"":"To open shot in RULES:",
 	"rules_url":"http://rules:55555/#/",
 	"rules_projects":["/mnt/prj/","/projects/"],
-	"rules_scenes":["/nuke/","/work/"],
-		"":"It will cut projects and all after scenes:",
-		"":"Example: /mnt/prj/PROJECT/SCENES/SCENE/SHOT/work/script.nk",
-		"":"Result:  http://rules:55555/#/PROJECT/SCENES/SCENE/SHOT",
 
 	"-nuke_filenamefilter":true,
+
+	"open_folder_cmd":"open \"@PATH@\"",
 
 	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],
 
@@ -59,6 +40,27 @@
 		"":"'strftime' function format http://www.cplusplus.com/reference/clibrary/ctime/strftime",
 
 	"filenamesizemax":250,
+
+	"platforms":["linux","mac","windows"],
+
+	"OS_unix":{
+		"cmd_shell":"/bin/sh -c"
+	},
+	"OS_windows":{
+		"open_folder_cmd":"start @PATH@",
+		"cmd_shell":"cmd.exe /c",
+
+			"":"This is a paths map example (disabled)",
+			"":"Client:Server",
+		"-pathsmap":[
+			["//server/projects/","/mnt/prj/"]
+		],
+			"":"Client slashes direction plays no role, as it tries both slashes when searchs a path to replace.",
+			"":"But will replace with specified slashes, if unix slashes not forced (for Nuke, for example)."
+	},
+	"OS_linux":{
+		"open_folder_cmd":"nautilus \"@PATH@\""
+	},
 
 	"pswd_visor":"1832116180fdc61b64fd978401e462e9",
 	"pswd_god":"73bcaaa458bff0d27989ed331b68b64d",

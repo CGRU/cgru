@@ -114,7 +114,7 @@ function u_Process()
 	c_Info( path);
 	if( RULES.has_filesystem !== false )
 	{
-		$('open').setAttribute('cmdexec', JSON.stringify([RULES.cmdexec.open_folder.replace(/@PATH@/g, path)]));
+		$('open').setAttribute('cmdexec', JSON.stringify([cgru_OpenFolderCmd(path)]));
 		$('open').style.display = 'block';
 	}
 	else

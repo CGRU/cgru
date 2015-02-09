@@ -173,6 +173,13 @@ float: left;
 .panel.right .section .param .value {
 float: right;
 }
+.panel.right .section.folders .rules_link {
+float: right;
+display: none;
+}
+.panel.right .section.folders .cmdexec {
+background: inherit;
+}
 
 .monitor .ctrl,.info {
 position: absolute;

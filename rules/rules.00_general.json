@@ -104,8 +104,6 @@
 		]
 },
 
-"cmdexec":{"open_folder":"open \"@PATH@\""},
-
 "OS_unix":{
 	"cmdexec":{
 		"play_sequence":[
@@ -134,7 +132,6 @@
 
 "OS_windows":{
 	"cmdexec":{
-		"open_folder":"start @PATH@",
 		"play_sequence":[
 			{"name":"Pd++",
 				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@",
@@ -159,18 +156,6 @@
 				"cmd":"vlc @PATH@",
 				"tooltip":"Open with VLC media player."}
 		]
-	}
-},
-
-"OS_linux":{
-	"cmdexec":{
-		"open_folder":"nautilus \"@PATH@\""
-	}
-},
-
-"OS_macosx":{
-	"cmdexec":{
-		"open_folder":"open \"@PATH@\""
 	}
 },
 

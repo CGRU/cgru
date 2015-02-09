@@ -175,6 +175,10 @@ function d_ProcessGUI( i_wnd)
 	if( params.af_depend_mask.length )
 		job.depend_mask = params.af_depend_mask;
 
+	job.folders = {};
+	job.folders.input  = cgru_PM('/' + RULES.root+c_PathDir(params.input), true);
+	job.folders.output = cgru_PM('/' + RULES.root+params.output, true);
+
 	var block = {};
 	block.name = 'Dailies';
 	block.service = 'movgen';
