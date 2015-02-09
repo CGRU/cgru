@@ -315,7 +315,10 @@ const std::vector<std::string> af::getFilesListSafe( const std::string & i_path)
 	   ( path[0]         == '\\'))
 		return empty;
 
-	path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + path;
+	if( af::Environment::getHTTPServeDir().empty())
+		path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + path;
+	else
+		path = af::Environment::getHTTPServeDir() + AFGENERAL::PATH_SEPARATOR + path;
 
 	return af::getFilesList( path);
 }

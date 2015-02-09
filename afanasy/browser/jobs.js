@@ -263,7 +263,7 @@ JobNode.prototype.showThumb = function( i_path)
 		thumb.appendChild( img);
 		img.src = '@TMP@' + i_path;
 		img.style.display = 'none';
-		img.m_height = this.monitor.options.jobs_thumbs_height;
+		img.m_height = this.monitor.view_opts.jobs_thumbs_height;
 		img.onload = function( e) {
 			var img = e.currentTarget;
 			if( img.height != img.m_height )
@@ -277,7 +277,7 @@ JobNode.prototype.showThumb = function( i_path)
 	else
 		name.style.position = 'relative';
 
-	if( this.elThumbs.m_divs.length > this.monitor.options.jobs_thumbs_num )
+	if( this.elThumbs.m_divs.length > this.monitor.view_opts.jobs_thumbs_num )
 	{
 		this.elThumbs.removeChild( this.elThumbs.m_divs[0]);
 		this.elThumbs.m_divs.splice( 0, 1);
