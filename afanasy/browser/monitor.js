@@ -55,40 +55,28 @@ function Monitor( i_args)
 	this.elList.oncontextmenu = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 	this.elList.onmousedown   = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 
-	this.options = {};
-	var actions = this.nodeConstructor.actions;
-	if( actions && actions.length )
+	this.view_opts = {};
+	if( this.nodeConstructor.view_opts )
 	{
-		var has_options = false;
-		for( var i = 0; i < actions.length; i++)
+		for( var opt in this.nodeConstructor.view_opts )
 		{
-			if( actions[i].mode != 'option') continue;
+			var view_opt = this.nodeConstructor.view_opts[opt];
 
-			if( localStorage[actions[i].name] != null )
+			// Get value from a browser storage or use default:
+			if( localStorage[opt] != null )
 			{
-				if( actions[i].type == 'num' )
-					this.options[actions[i].name] = parseInt( localStorage[actions[i].name]);
+				if( view_opt.type == 'num' )
+					this.view_opts[opt] = parseInt( localStorage[opt]);
 				else
-					this.options[actions[i].name] = localStorage[actions[i].name];
+					this.view_opts[opt] = localStorage[opt];
 			}
 			else
-				this.options[actions[i].name] = actions[i].default;
-
-			has_options = true;
+				this.view_opts[opt] = view_opt.default;
 		}
 
-		if( has_options )
-		{
-			var el = this.document.createElement('div');
-			el.classList.add('ctrl_button');
-			el.classList.add('active');
-			el.textContent = 'VIEW';
-			el.title = 'View options.';
-			this.elPanelL.appendChild( el);
-			el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'option',false); return false;}
-			el.oncontextmenu = el.onclick;
-			el.monitor = this;
-		}
+		var el = this.createCtrlBtn({'name':'view_opts','label':'VIEW','tooltip':'View options.','sub_menu':this.nodeConstructor.view_opts,'handle':'mh_Opt'});
+		el.m_always_active = true;
+		el.classList.add('active');
 	}
 
 	var el = document.createElement('div');
@@ -146,15 +134,72 @@ function Monitor( i_args)
 		}
 	}
 
+	// Parameters section:
+	var el = document.createElement('div');
+	this.elPanelR.appendChild( el);
+	this.elPanelR.m_elParams = el;
+	this.elPanelR.m_elParams.m_elPMap = {};
+	el.classList.add('section');
+	// Show raw JSON onject:
 	var el = document.createElement('div');
 	el.classList.add('ctrl_button');
 	el.textContent = 'OBJ';
 	el.title = 'Show object.';
-	this.elPanelL.appendChild( el);
-	this.elPanelL.m_elObj = el;
+	this.elPanelR.m_elParams.appendChild( el);
+	this.elPanelR.m_elObj = el;
 	el.monitor = this;
 	el.onclick = function(e){ e.currentTarget.monitor.showObject(e); return false;}
 	el.oncontextmenu = el.onclick;
+	// Label:
+	var el = document.createElement('div');
+	this.elPanelR.m_elParams.appendChild( el);
+	el.textContent = 'Parameters';
+	el.classList.add('caption');
+	el.title = 'Click to edit all paramters.';
+	el.m_elParams = this.elPanelR.m_elParams;
+	el.onclick = function(e){
+		var el = e.currentTarget;
+		if( el.m_elParams.classList.contains('active') != true ) return false;
+		var elParams = el.m_elParams.m_elPMap;
+		for( var p in elParams )
+			elParams[p].style.display = 'block';
+		return false;
+	}
+	el.oncontextmenu = el.onclick;
+
+	if( this.nodeConstructor.params )
+	for( var p in this.nodeConstructor.params )
+	{
+		var param = JobNode.params[p];
+		if( false == cm_CheckPermissions( param.permissions )) continue;
+
+		var elDiv = document.createElement('div');
+		this.elPanelR.m_elParams.appendChild( elDiv);
+		elDiv.classList.add('param');
+		elDiv.style.display = 'none';
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = param.label;
+
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elValue.classList.add('value');
+		elDiv.m_elValue = elValue;
+
+		this.elPanelR.m_elParams.m_elPMap[p] = elDiv;
+
+		var el = elDiv;
+		el.title = 'Double click to edit.'
+		el.monitor = this;
+		el.name = p;
+		el.param = param;
+		el.ondblclick = function(e){
+			var el = e.currentTarget;
+			el.monitor.mh_Dialog({'name':el.name,'type':el.param.type});
+		}
+	}
 
 	this.elCtrlSort = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
@@ -751,9 +796,21 @@ Monitor.prototype.resetPanels = function()
 {
 	if( this.panel_item == null ) return;
 
-	this.elPanelL.m_elObj.classList.remove('active');
-
 	this.elPanelR.m_elName.style.display = 'none';
+
+	var els = this.elPanelL.getElementsByClassName('ctrl_button');
+	for( var i = 0; i < els.length; i++)
+		if( els[i].m_always_active != true )
+			els[i].classList.remove('active');
+	var els = this.elPanelR.getElementsByClassName('section');
+	for( var i = 0; i < els.length; i++)
+		if( els[i].m_always_active != true )
+			els[i].classList.remove('active');
+
+	this.elPanelR.m_elObj.classList.remove('active');
+	var elParams = this.elPanelR.m_elParams.m_elPMap;
+	for( var p in elParams )
+		elParams[p].style.display = 'none';
 
 	if( this.nodeConstructor.resetPanels )
 		this.nodeConstructor.resetPanels( this);
@@ -769,12 +826,40 @@ Monitor.prototype.updatePanels = function( i_item)
 
 	this.panel_item = i_item;
 
-	this.elPanelL.m_elObj.classList.add('active');
-
 	this.elPanelR.m_elName.textContent = i_item.params.name;
 	this.elPanelR.m_elName.title = 'Current job name:\n' + i_item.params.name;
 	this.elPanelR.m_elName.style.display = 'block';
 
+	var els = this.elPanelL.getElementsByClassName('ctrl_button');
+	for( var i = 0; i < els.length; i++)
+		els[i].classList.add('active');
+	var els = this.elPanelR.getElementsByClassName('section');
+	for( var i = 0; i < els.length; i++)
+		els[i].classList.add('active');
+
+	this.elPanelR.m_elObj.classList.add('active');
+
+	var elParams = this.elPanelR.m_elParams.m_elPMap;
+	for( var p in elParams )
+	{
+		if( i_item.params[p] == null )
+		{
+			elParams[p].style.display = 'none';
+			elParams[p].m_elValue.textContent = '';
+			continue;
+		}
+
+		var value = i_item.params[p];
+		if(( typeof value ) == 'string' )
+		{
+			// word-wrap long regular expressions:
+			value = value.replace(/\./g,'.&shy;');
+			value = value.replace(/\|/g,'|&shy;');
+			value = value.replace(/\)/g,')&shy;');
+		}
+		elParams[p].m_elValue.innerHTML = value;
+		elParams[p].style.display = 'block';
+	}
 	if( i_item.updatePanels )
 		i_item.updatePanels();
 }
@@ -787,7 +872,10 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 		this.selectAll( false);
 	this.elSetSelected( i_el, true);
 
-	var menu = this.createMenu( i_evt, 'context');
+	if(( i_el.item.onContextMenu == null ) && ( i_el.item.constructor.actions == null ))
+		return false;
+
+	var menu = this.createMenu( i_evt,'context');
 	if( i_el.item.onContextMenu )
 		i_el.item.onContextMenu( menu);
 	else
@@ -935,14 +1023,14 @@ Monitor.prototype.mh_Opt = function( i_param)
 	args.receiver = this;
 	args.wnd      = this.window;
 	args.handle   = 'setOption';
-	args.value    = this.options[i_param.name];
+	args.value    = this.view_opts[i_param.name];
 	args.name     = this.name + '_parameter';
 
 	new cgru_Dialog( args);
 }
 Monitor.prototype.setOption = function( i_value, i_param)
 {
-	this.options[i_param] = i_value;
+	this.view_opts[i_param] = i_value;
 	localStorage[i_param] = i_value;
 }
 
@@ -1069,6 +1157,90 @@ Monitor.prototype.createMenu = function( i_evt, i_name)
 	return menu;
 }
 
+Monitor.prototype.createCtrlBtns = function( i_acts)
+{
+	for( var a in i_acts )
+	{
+		i_acts[a].name = a;
+		this.createCtrlBtn( i_acts[a]);
+	}
+}
+
+Monitor.prototype.createCtrlBtn = function( i_args)
+{
+	if( this.ctrl_btns == null ) this.ctrl_btns = {};
+
+	var elBtn = document.createElement('div');
+
+	if( i_args.elParent )
+		i_args.elParent.appendChild( elBtn);
+	else
+		this.elPanelL.appendChild( elBtn);
+
+	this.ctrl_btns[i_args.name] = elBtn;
+
+	if( i_args.sub_button )
+		elBtn.classList.add('sub_button');
+	else
+		elBtn.classList.add('ctrl_button');
+
+	elBtn.textContent = i_args.label;
+	elBtn.title = i_args.tooltip;
+	elBtn.m_monitor = this;
+	elBtn.m_act = i_args;
+
+	if( i_args.sub_menu )
+	{
+		elBtn.onclick = function(e){ e.currentTarget.classList.toggle('hide_childs'); return false; }
+		elBtn.oncontextmenu = elBtn.onclick;
+		elBtn.classList.add('hide_childs');
+
+		var acts = i_args.sub_menu;
+		for( var a in acts )
+		{
+			acts[a].sub_button = true;
+			acts[a].name = a;
+			acts[a].elParent = elBtn;
+			if( acts[a].handle == null ) acts[a].handle = i_args.handle;
+			var el = this.createCtrlBtn( acts[a]);
+			el.m_elBtn = elBtn;
+		}
+	}
+	else
+	{
+		if( i_args.ondblclick )
+			elBtn.ondblclick = Monitor.ctrlBtnClicked;
+		else
+			elBtn.onclick = Monitor.ctrlBtnClicked;
+		elBtn.oncontextmenu = function(e){return false;}
+	}
+
+	return elBtn;
+}
+Monitor.ctrlBtnClicked = function(e)
+{
+	e.stopPropagation();
+
+	var el = e.currentTarget;
+
+	var elBtn = el;
+	if( el.m_elBtn ) elBtn = el.m_elBtn; // <-- this is sub-button in this case
+	if( elBtn.classList.contains('active') != true )
+		return false;
+
+	var args = {"name":el.m_act.name,"type":el.m_act.type,"monitor":el.m_monitor};
+
+	var handle = el.m_act.handle;
+	if( handle == null )
+		handle = 'mh_Oper';
+
+	if( el.m_monitor.nodeConstructor[handle] )
+		el.m_monitor.nodeConstructor[handle]( args);
+	else
+		el.m_monitor[handle]( args);
+
+	return false;
+}
 
 
 // --------------- Sorting: -------------------//

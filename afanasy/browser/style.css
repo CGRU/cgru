@@ -163,6 +163,7 @@ cursor: pointer;
 margin: 4px 8px;
 }
 .panel.right .section .param {
+clear: both;
 padding: 4px;
 border-top: 1px solid #575757;
 }
@@ -191,7 +192,7 @@ bottom: 30px;
 }
 
 .panel .ctrl_button {
-border: 1px solid #575757;
+border: 1px solid rgba(89,89,89,.5);
 border-radius: 2px;
 margin: 3px;
 padding: 4px 2px;
@@ -199,12 +200,13 @@ text-align: center;
 cursor: default;
 opacity: .5;
 }
+.panel.right .ctrl_button { float: right; margin: 0px; padding: 1px 8px; }
 .panel .ctrl_button.active { cursor: pointer; opacity: 1.0; }
 .panel .ctrl_button.active:hover { background-color: rgba(150,255,255,.2); }
-.panel .ctrl_button.errors { cursor: pointer; opacity: 1.0; background-color: rgba(255,0,0,.8); }
+.panel .ctrl_button.errors { background-color: rgba(255,0,0,.8); }
 .panel .ctrl_button.errors:hover { background-color: rgba(255,0,0,1.0); }
 .panel .ctrl_button .sub_button {
-border: 1px solid #575757;
+border: 1px solid rgba(89,89,89,.5);
 border-radius: 2px;
 padding: 4px 2px;
 }
@@ -257,6 +259,7 @@ position: relative;
 margin: 3px;
 padding: 1px 7px;
 border-radius: 4px;
+cursor: default;
 }
 .item.NbY { background: #88F;}
 .item.NBY { background: #77F;}

@@ -749,35 +749,19 @@ JobBlock.prototype.update = function( i_displayFull)
 
 JobNode.resetPanels = function( i_monitor)
 {
-	var elPanelL = i_monitor.elPanelL;
-	elPanelL.m_elLog.classList.remove('active');
-	elPanelL.m_elRes.classList.remove('active');
-	elPanelL.m_elMov.classList.remove('active');
-	elPanelL.m_elErr.classList.remove('errors');
-	elPanelL.m_elErr.classList.add('hide_childs');
-	elPanelL.m_elDel.classList.remove('active');
+	i_monitor.ctrl_btns.errors.classList.remove('errors');
+	i_monitor.ctrl_btns.errors.classList.add('hide_childs');
 
-	var elPanelR = i_monitor.elPanelR;
-
-	elPanelR.m_elFolders.classList.remove('active');
-	var elFolders = elPanelR.m_elFolders;
+	var elFolders = i_monitor.elPanelR.m_elFolders;
 	if( elFolders.m_elFolders )
 		for( var i = 0; i < elFolders.m_elFolders.length; i++)
 			elFolders.removeChild( elFolders.m_elFolders[i]);
 	elFolders.m_elFolders = [];
-
-	elPanelR.m_elParams.classList.remove('active');
-	var elParams = elPanelR.m_elParams.m_elPMap;
-	for( var p in elParams )
-		elParams[p].style.display = 'none';
 }
 JobNode.prototype.updatePanels = function()
 {
-	var elPanelL = this.monitor.elPanelL;
-	elPanelL.m_elLog.classList.add('active');
-	elPanelL.m_elRes.classList.add('active');
-	elPanelL.m_elMov.classList.add('active');
-	elPanelL.m_elDel.classList.add('active');
+	if( g_VISOR())
+		this.monitor.ctrl_btns.move_jobs.classList.remove('active');
 
 	var errors = 0;
 	var avoids = 0;
@@ -791,14 +775,19 @@ JobNode.prototype.updatePanels = function()
 	}
 	if( errors || avoids || this.state.ERR )
 	{
-		elPanelL.m_elErr.classList.add('errors');
-		elPanelL.m_elErr.classList.remove('hide_childs');
+		this.monitor.ctrl_btns.errors.classList.remove('hide_childs');
+		if( avoids || this.state.ERR )
+			this.monitor.ctrl_btns.errors.classList.add('errors');
+	}
+	else
+	{
+		this.monitor.ctrl_btns.errors.classList.remove('active');
 	}
 
+	var elPanelL = this.monitor.elPanelL;
 	var elPanelR = this.monitor.elPanelR;
 
 	var elFolders = elPanelR.m_elFolders;
-	elFolders.classList.add('active');
 	elFolders.m_elFolders = [];
 	var folders = this.params.folders;
 //console.log(JSON.stringify( folders));
@@ -822,29 +811,6 @@ JobNode.prototype.updatePanels = function()
 		elValue.textContent = folders[name]
 		elValue.title = folders[name]
 	}
-
-	elPanelR.m_elParams.classList.add('active');
-	var elParams = elPanelR.m_elParams.m_elPMap;
-	for( var p in elParams )
-	{
-		if( this.params[p] == null )
-		{
-			elParams[p].style.display = 'none';
-			elParams[p].m_elValue.textContent = '';
-			continue;
-		}
-
-		var value = this.params[p];
-		if(( typeof value ) == 'string' )
-		{
-			// word-wrap long regular expressions:
-			value = value.replace(/\./g,'.&shy;');
-			value = value.replace(/\|/g,'|&shy;');
-			value = value.replace(/\)/g,')&shy;');
-		}
-		elParams[p].m_elValue.innerHTML = value;
-		elParams[p].style.display = 'block';
-	}
 }
 
 JobNode.createPanels = function( i_monitor)
@@ -852,52 +818,13 @@ JobNode.createPanels = function( i_monitor)
 	// Left Panel:
 
 	// Errors:
-	var elBtn = document.createElement('div');
-	i_monitor.elPanelL.appendChild( elBtn);
-	i_monitor.elPanelL.m_elErr = elBtn;
-	elBtn.classList.add('ctrl_button');
-	elBtn.classList.add('hide_childs');
-	elBtn.textContent = 'ERR';
-	elBtn.title = 'Error tasks and hosts.';
-	elBtn.monitor = i_monitor;
-	elBtn.oncontextmenu = elBtn.onclick;
-
 	var acts = {};
 	acts.error_hosts       = {'label':'GEH', "handle":'mh_Get',  'tooltip':'Show error hosts.'};
 	acts.reset_error_hosts = {'label':'REH', 'handle':'mh_Oper', 'tooltip':'Reset error hosts.'};
 	acts.restart_errors    = {'label':'RET', 'handle':'mh_Oper', 'tooltip':'Restart error tasks.'};
-
-	for( var a in acts )
-	{
-		var el = document.createElement('div');
-		elBtn.appendChild( el);
-		el.classList.add('sub_button');
-		el.textContent = acts[a].label;
-		el.title = acts[a].tooltip;
-		el.m_action = a;
-		el.m_handle = acts[a].handle;
-		el.m_monitor = i_monitor;
-		el.onclick = function(e){
-			e.stopPropagation();
-			var el = e.currentTarget;
-			el.m_monitor[el.m_handle]({'name':el.m_action}, e);
-			return false;
-		}
-		el.oncontextmenu = el.onclick;
-	}
+	i_monitor.createCtrlBtn({'name':'errors','label':'ERR','tooltip':'Error tasks and hosts.','sub_menu':acts});
 
 	// Restart:
-	var elBtn = document.createElement('div');
-	i_monitor.elPanelL.appendChild( elBtn);
-	i_monitor.elPanelL.m_elRes = elBtn;
-	elBtn.classList.add('ctrl_button');
-	elBtn.classList.add('hide_childs');
-	elBtn.textContent = 'RES';
-	elBtn.title = 'Restart job tasks.';
-	elBtn.monitor = i_monitor;
-	elBtn.onclick = function(e){ e.currentTarget.classList.toggle('hide_childs'); return false; }
-	elBtn.oncontextmenu = elBtn.onclick;
-
 	var acts = {};
 	acts.restart         = {'label':'ALL', 'tooltip':'Restart all tasks.'};
 	acts.restart_pause   = {'label':'A&P', 'tooltip':'Restart all and pause.'};
@@ -905,73 +832,23 @@ JobNode.createPanels = function( i_monitor)
 	acts.restart_running = {'label':'RUN', 'tooltip':'Restart running tasks.'};
 	acts.restart_skipped = {'label':'SKP', 'tooltip':'Restart skipped tasks.'};
 	acts.restart_done    = {'label':'DON', 'tooltip':'Restart done task.'};
-
-	for( var a in acts )
-	{
-		var el = document.createElement('div');
-		elBtn.appendChild( el);
-		el.classList.add('sub_button');
-		el.textContent = acts[a].label;
-		el.title = acts[a].tooltip;
-		el.m_action = a;
-		el.m_monitor = i_monitor;
-		el.onclick = function(e){
-			e.stopPropagation();
-			var el = e.currentTarget;
-			el.m_monitor.mh_Oper({'name':el.m_action});
-			return false;
-		}
-		el.oncontextmenu = el.onclick;
-	}
+	i_monitor.createCtrlBtn({'name':'restart_tasks','label':'RES','tooltip':'Restart job tasks.','sub_menu':acts});
 
 	// Move:
-	var elBtn = document.createElement('div');
-	i_monitor.elPanelL.appendChild( elBtn);
-	i_monitor.elPanelL.m_elMov = elBtn;
-	elBtn.classList.add('ctrl_button');
-	elBtn.classList.add('hide_childs');
-	elBtn.textContent = 'MOV';
-	elBtn.title = 'Change jobs order.';
-	elBtn.monitor = i_monitor;
-	elBtn.onclick = function(e){ e.currentTarget.classList.toggle('hide_childs'); return false; }
-	elBtn.oncontextmenu = elBtn.onclick;
-
 	var acts = {};
-	acts.move_jobs_top    = {'label':'TOP', 'tooltip':'Move jobs top.'};
-	acts.move_jobs_up     = {'label':'UP',  'tooltip':'Move jobs up.'};
-	acts.move_jobs_down   = {'label':'DWN', 'tooltip':'Move jobs down.'};
-	acts.move_jobs_bottom = {'label':'BOT', 'tooltip':'Move jobs bottom.'};
+	acts.move_jobs_top    = {'label':'TOP','tooltip':'Move jobs top.'};
+	acts.move_jobs_up     = {'label':'UP', 'tooltip':'Move jobs up.'};
+	acts.move_jobs_down   = {'label':'DWN','tooltip':'Move jobs down.'};
+	acts.move_jobs_bottom = {'label':'BOT','tooltip':'Move jobs bottom.'};
+	i_monitor.createCtrlBtn({'name':'move_jobs','label':'MOV','tooltip':'Move jobs.','sub_menu':acts,'handle':'moveJobs'});
 
-	for( var a in acts )
-	{
-		var el = document.createElement('div');
-		elBtn.appendChild( el);
-		el.classList.add('sub_button');
-		el.textContent = acts[a].label;
-		el.title = acts[a].tooltip;
-		el.m_action = a;
-		el.m_monitor = i_monitor;
-		el.onclick = function(e){
-			e.stopPropagation();
-			var el = e.currentTarget;
-			nw_Action('users', [g_uid], {'type':el.m_action,'jids':el.m_monitor.getSelectedIds()});
-			el.m_monitor.info('Moving Jobs');
-			return false;
-		}
-		el.oncontextmenu = el.onclick;
-	}
-
-	// Delete:
-	var el = document.createElement('div');
-	i_monitor.elPanelL.appendChild( el);
-	i_monitor.elPanelL.m_elDel = el;
-	el.classList.add('ctrl_button');
-	el.textContent = 'DEL';
-	el.title = 'Double click to delete job(s).';
-	el.monitor = i_monitor;
-	el.ondblclick = function(e){ e.currentTarget.monitor.mh_Oper({"name":'delete'});}
-	el.oncontextmenu = function(e){ return false;}
-
+	// Actions:
+	var acts = {};
+	acts.start  = {"label":"STA","tooltip":'Start job.'};
+	acts.pause  = {"label":"PAU","tooltip":'Pause job.'};
+	acts.stop   = {"label":"STP","tooltip":'Double click to stop job running tasks.',"ondblclick":true};
+	acts.delete = {"label":"DEL","tooltip":'Double click delete job(s).',"ondblclick":true};
+	i_monitor.createCtrlBtns( acts);
 
 	// Right Panel:
 
@@ -986,62 +863,14 @@ JobNode.createPanels = function( i_monitor)
 	elPanelR.m_elFolders.appendChild( el);
 	el.textContent = 'Folders';
 	el.classList.add('caption');
-
-	// Parameters:
-	var el = document.createElement('div');
-	elPanelR.appendChild( el);
-	el.classList.add('section');
-	elPanelR.m_elParams = el;
-	var el = document.createElement('div');
-	elPanelR.m_elParams.appendChild( el);
-	el.textContent = 'Parameters';
-	el.classList.add('caption');
-	el.title = 'Click to edit all paramters.';
-	el.m_elParams = elPanelR.m_elParams;
-	el.onclick = function(e){
-		var el = e.currentTarget;
-		if( el.m_elParams.classList.contains('active') != true ) return false;
-		var elParams = el.m_elParams.m_elPMap;
-		for( var p in elParams )
-			elParams[p].style.display = 'block';
-		return false;
-	}
-	el.oncontextmenu = el.onclick;
-
-	elPanelR.m_elParams.m_elPMap = {};
-	for( var p in JobNode.params )
-	{
-		var param = JobNode.params[p];
-		if( false == cm_CheckPermissions( param.permissions )) continue;
-
-		var elDiv = document.createElement('div');
-		elPanelR.m_elParams.appendChild( elDiv);
-		elDiv.classList.add('param');
-		elDiv.style.display = 'none';
-
-		var elLabel = document.createElement('div');
-		elDiv.appendChild( elLabel);
-		elLabel.classList.add('label');
-		elLabel.textContent = param.label;
-
-		var elValue = document.createElement('div');
-		elDiv.appendChild( elValue);
-		elValue.classList.add('value');
-		elDiv.m_elValue = elValue;
-
-		elPanelR.m_elParams.m_elPMap[p] = elDiv;
-
-		var el = elDiv;
-		el.title = 'Double click to edit.'
-		el.monitor = i_monitor;
-		el.name = p;
-		el.param = param;
-		el.ondblclick = function(e){
-			var el = e.currentTarget;
-			el.monitor.mh_Dialog({'name':el.name,'type':el.param.type});
-		}
-	}
 }
+
+JobNode.moveJobs = function( i_args)
+{
+	nw_Action('users', [g_uid], {'type':i_args.name,'jids':i_args.monitor.getSelectedIds()});
+	i_args.monitor.info('Moving Jobs');
+}
+
 JobNode.params = {};
 JobNode.params.priority =                   {"type":'num', "label":'Priority'};
 JobNode.params.depend_mask =                {"type":'reg', "label":'Depend Mask'};
@@ -1058,14 +887,9 @@ JobNode.params.annotation =                 {"type":'str', "label":'Annotation'}
 JobNode.params.hidden =                     {"type":'bl1', "label":'Hidden'};
 JobNode.params.user_name =                  {"type":'str', "label":'Owner',"permissions":'visor'};
 
-JobNode.actions = [];
-
-JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_num',    "type":'num', "handle":'mh_Opt', "label":'Thumbnails Quantity', "default":10  });
-JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_height', "type":'num', "handle":'mh_Opt', "label":'Thumbnails Height',   "default":50 });
-
-JobNode.actions.push({"mode":'context', "name":'start',             "handle":'mh_Oper', "label":'Start'});
-JobNode.actions.push({"mode":'context', "name":'pause',             "handle":'mh_Oper', "label":'Pause'});
-JobNode.actions.push({"mode":'context', "name":'stop',              "handle":'mh_Oper', "label":'Stop'});
+JobNode.view_opts = [];
+JobNode.view_opts.jobs_thumbs_num =    {"type":'num',"label":"TQU","tooltip":'Thumbnails quantity.',"default":14  };
+JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Thumbnails height.',  "default":100 };
 
 
 JobBlock.actions = [];
