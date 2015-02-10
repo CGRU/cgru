@@ -177,7 +177,11 @@ float: right;
 float: right;
 display: none;
 }
+.panel.right .section.folders .label {
+font-style: italic;
+}
 .panel.right .section.folders .cmdexec {
+font-weight: normal;
 background: inherit;
 }
 
@@ -218,6 +222,11 @@ border-radius: 2px;
 padding: 4px 2px;
 }
 .panel .ctrl_button.active .sub_button:hover { background-color: rgba(150,255,255,.4); }
+
+.panel .ctrl_button.clicked, .panel .ctrl_button .sub_button.clicked, .panel .ctrl_button.clicked:hover {
+background-color: #FFF;
+box-shadow: 0 0 4px #FFF;
+}
 
 .ctrl_sort, .ctrl_filter {
 position: absolute;

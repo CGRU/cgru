@@ -683,7 +683,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	}
 
 	// Image edit button:
-	if( c_FileCanEdit( i_obj.name))
+	if(( i_isFolder != true ) && c_FileCanEdit( i_obj.name))
 	{
 		var el = document.createElement('a');
 		elItem.m_elMenu.appendChild( el);

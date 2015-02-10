@@ -297,7 +297,7 @@ function JobBlock( i_elParent, i_block)
 	i_elParent.appendChild( this.elRoot);
 	this.elRoot.style.clear = 'both';
 	this.elRoot.block = this;
-	this.elRoot.oncontextmenu = function(e){ return e.currentTarget.block.onContextMenu(e);}
+	this.elRoot.oncontextmenu = function(e){ e.currentTarget.block.onContextMenu(e); return false;}
 
 	this.service = this.params.service;
 	this.elIcon = document.createElement('img');
@@ -360,23 +360,60 @@ function JobBlock( i_elParent, i_block)
 	this.elRunTime = cm_ElCreateFloatText( this.element, 'right');
 }
 
-JobBlock.prototype.onContextMenu = function( evt)
+JobBlock.prototype.onContextMenu = function( i_e)
 {
-	evt.stopPropagation();
-
+	i_e.stopPropagation();
 	g_cur_monitor = this.job.monitor;
 
-	if( this.job.monitor.menu ) this.job.monitor.menu.destroy();
-	this.element.classList.add('selected');
+	if( this.selected )
+	{
+		this.setSelected( false);
+		return;
+	}
 
+	this.setSelected( true);
+
+	var jobs = this.job.monitor.getSelectedItems();
+	this.job.monitor.selectAll( false);
+
+	for( var j = 0; j < jobs.length; j++)
+	for( var b = 0; b < jobs[j].blocks.length; b++)
+		jobs[j].blocks[b].setSelected( true);
+}
+JobBlock.prototype.setSelected = function( i_select)
+{
+	if( JobBlock.selectedItems == null )
+		JobBlock.selectedItems = [];
+
+	if( i_select )
+	{
+		if( this.selected ) return;
+
+		this.selected = true;
+		this.element.classList.add('selected');
+
+		JobBlock.selectedItems.push( this);
+	}
+	else
+	{
+		if( this.selected != true ) return;
+
+		this.selected = false;
+		this.element.classList.remove('selected');
+
+		JobBlock.selectedItems.splice( JobBlock.selectedItems.indexOf( this), 1);
+	}
+}
+/*
+{
 	var onlyBlockIsSelected = false;
-	if(( this.job.element.selected == null ) || ( this.job.element.selected == false ))
+	if( this.job.element.selected != true )
 	{
 		this.job.monitor.selectAll( false);
 		onlyBlockIsSelected = true;
 	}
 
-	var menu = new cgru_Menu({"parent":document.body,"evt":evt,"name":'jobblock_context',"receiver":this,"destroy":'onContextMenuDestroy'});
+	var menu = new cgru_Menu({"parent":document.body,"evt":i_e,"name":'jobblock_context',"receiver":this,"destroy":'onContextMenuDestroy'});
 	this.job.monitor.menu = menu;
 
 	if( onlyBlockIsSelected )
@@ -397,6 +434,13 @@ JobBlock.prototype.onContextMenu = function( evt)
 	menu.show();
 
 	return false;
+}
+*/
+JobBlock.deselectAll = function()
+{
+	if( JobBlock.selectedItems )
+		while( JobBlock.selectedItems.length )
+			JobBlock.selectedItems[0].setSelected( false);
 }
 JobBlock.prototype.onContextMenuDestroy = function()
 {
@@ -793,6 +837,13 @@ JobNode.prototype.updatePanels = function()
 	var folders = this.params.folders;
 //console.log(JSON.stringify( folders));
 
+	var info = 'Created at ' + cm_DateTimeStrFromSec( this.params.time_creation);
+	if( this.params.time_started )
+		info += '<br>Started at ' + cm_DateTimeStrFromSec( this.params.time_started);
+	if( this.params.time_done )
+		info += '<br>Finished at ' + cm_DateTimeStrFromSec( this.params.time_done);
+	this.monitor.setPanelInfo( info);
+
 	if(( folders == null ) || ( folders.length == 0 ))
 	{
 		return;
@@ -815,22 +866,23 @@ JobNode.prototype.updatePanels = function()
 		elDiv.classList.add('cmdexec');
 		var cmd = cgru_OpenFolderCmd( path);
 		elDiv.setAttribute('cmdexec', JSON.stringify([cmd]));
+		elDiv.title = 'Right click and "Run" to open:\n' + path;
 
 		var elLabel = document.createElement('div');
 		elDiv.appendChild( elLabel);
-		elLabel.textContent = name;
 		elLabel.classList.add('label');
+		elLabel.textContent = name;
 
 		var elValue = document.createElement('div');
 		elDiv.appendChild( elValue);
-		elValue.textContent = name;
 		elValue.classList.add('value');
 		elValue.textContent = path;
-		elValue.title = path;
 	}
 
 	elFolders.m_elRules.style.display = 'block';
 	elFolders.m_elRules.href = cgru_RulesLink( rules_link);
+
+	JobBlock.deselectAll();
 }
 
 JobNode.createPanels = function( i_monitor)
@@ -884,11 +936,24 @@ JobNode.createPanels = function( i_monitor)
 	elPanelR.m_elFolders.appendChild( el);
 	elPanelR.m_elFolders.m_elRules = el;
 	el.classList.add('rules_link');
+	el.classList.add('caption');
+	el.title = 'Open RULES shot in a new window(tab).';
 	el.textContent = 'RULES';
 	el.setAttribute('target','_blank');
 	var el = document.createElement('div');
 	elPanelR.m_elFolders.appendChild( el);
 	el.textContent = 'Folders';
+	el.classList.add('caption');
+
+	// Blocks:
+	var el = document.createElement('div');
+	elPanelR.appendChild( el);
+	el.classList.add('section');
+	el.classList.add('blocks');
+	elPanelR.m_elBlocks = el;
+	var el = document.createElement('div');
+	elPanelR.m_elBlocks.appendChild( el);
+	el.textContent = 'Blocks';
 	el.classList.add('caption');
 }
 
@@ -915,7 +980,7 @@ JobNode.params.hidden =                     {"type":'bl1', "label":'Hidden'};
 JobNode.params.user_name =                  {"type":'str', "label":'Owner',"permissions":'visor'};
 
 JobNode.view_opts = [];
-JobNode.view_opts.jobs_thumbs_num =    {"type":'num',"label":"TQU","tooltip":'Thumbnails quantity.',"default":14  };
+JobNode.view_opts.jobs_thumbs_num =    {"type":'num',"label":"TQU","tooltip":'Thumbnails quantity.',"default":12  };
 JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Thumbnails height.',  "default":100 };
 
 
