@@ -365,25 +365,100 @@ JobBlock.prototype.onContextMenu = function( i_e)
 	i_e.stopPropagation();
 	g_cur_monitor = this.job.monitor;
 
+	JobBlock.resetPanels( this.job.monitor);
+
+	var selected_blocks = this.job.monitor.selected_blocks;
+
+	// We should to deselect other jobs blocks,
+	// as server can manipulate selected blocks of a one job only
+	if( selected_blocks )
+	{
+		var blocks_to_deselect = [];
+
+		for( var b = 0; b < selected_blocks.length; b++)
+		{
+			if( this.job.params.id == selected_blocks[b].job.params.id )
+				continue;
+
+			var blocks = selected_blocks[b].job.blocks;
+			for( var j = 0; j < blocks.length; j++)
+				if( blocks_to_deselect.indexOf( blocks[j]) == -1 )
+					blocks_to_deselect.push( blocks[j]);
+		}
+
+		for( var b = 0; b < blocks_to_deselect.length; b++)
+			blocks_to_deselect[b].setSelected( false);
+	}
+
+	// If selected, we deselecting it and exit:
 	if( this.selected )
 	{
 		this.setSelected( false);
+		if( selected_blocks.length )
+			selected_blocks[selected_blocks.length-1].updatePanels();
 		return;
 	}
 
+	// Select block:
 	this.setSelected( true);
 
+	// If jobs selected, select all selected jobs blocks,
+	// as server can manipulate all blocks of a several blocks (not special blocks of a selected jobs)
 	var jobs = this.job.monitor.getSelectedItems();
-	this.job.monitor.selectAll( false);
+	if( jobs.length )
+	{
+		this.job.monitor.selectAll( false);
+		for( var j = 0; j < jobs.length; j++)
+		for( var b = 0; b < jobs[j].blocks.length; b++)
+			jobs[j].blocks[b].setSelected( true);
+	}
 
-	for( var j = 0; j < jobs.length; j++)
-	for( var b = 0; b < jobs[j].blocks.length; b++)
-		jobs[j].blocks[b].setSelected( true);
+	// Update panels info:
+	this.updatePanels();
+}
+JobBlock.prototype.updatePanels = function()
+{
+	var elBlocks = this.job.monitor.elPanelR.m_elBlocks;
+	elBlocks.m_cur_block = this;
+	elBlocks.classList.add('active');
+
+	elBlocks.m_elName.style.display = 'block';
+	elBlocks.m_elName.textContent = this.params.name;
+
+	for( var p in JobBlock.params )
+	{
+		if( this.params[p] == null ) continue;
+
+		var el = elBlocks.m_elParams[p];
+		el.style.display = 'block';
+		el.m_elValue.textContent = this.params[p];
+	}
+
+	this.job.monitor.setPanelInfo(this.params.name);
+}
+JobBlock.resetPanels = function( i_monitor)
+{
+	var elBlocks = i_monitor.elPanelR.m_elBlocks;
+	if( elBlocks.m_cur_block == null )
+		return;
+
+	elBlocks.classList.remove('active');
+	elBlocks.m_elName.style.display = 'none';
+	for( var p in JobBlock.params )
+	{
+		var el = elBlocks.m_elParams[p];
+		el.style.display = 'none';
+		el.m_elValue.textContent = '';
+	}
+
+	i_monitor.resetPanelInfo();
+
+	elBlocks.m_cur_block = null;
 }
 JobBlock.prototype.setSelected = function( i_select)
 {
-	if( JobBlock.selectedItems == null )
-		JobBlock.selectedItems = [];
+	if( this.job.monitor.selected_blocks == null )
+		this.job.monitor.selected_blocks = [];
 
 	if( i_select )
 	{
@@ -392,7 +467,7 @@ JobBlock.prototype.setSelected = function( i_select)
 		this.selected = true;
 		this.element.classList.add('selected');
 
-		JobBlock.selectedItems.push( this);
+		this.job.monitor.selected_blocks.push( this);
 	}
 	else
 	{
@@ -401,74 +476,57 @@ JobBlock.prototype.setSelected = function( i_select)
 		this.selected = false;
 		this.element.classList.remove('selected');
 
-		JobBlock.selectedItems.splice( JobBlock.selectedItems.indexOf( this), 1);
+		this.job.monitor.selected_blocks.splice( this.job.monitor.selected_blocks.indexOf( this), 1);
 	}
 }
-/*
+JobBlock.deselectAll = function( i_monitor)
 {
-	var onlyBlockIsSelected = false;
-	if( this.job.element.selected != true )
+	if( i_monitor.selected_blocks )
+		while( i_monitor.selected_blocks.length )
+			i_monitor.selected_blocks[0].setSelected( false);
+
+	JobBlock.resetPanels( i_monitor);
+}
+JobBlock.setDialog = function( i_args)
+{
+	var block = i_args.monitor.elPanelR.m_elBlocks.m_cur_block;
+
+	if( block == null )
 	{
-		this.job.monitor.selectAll( false);
-		onlyBlockIsSelected = true;
+		g_Error('No block(s) selected.');
+		return;
 	}
 
-	var menu = new cgru_Menu({"parent":document.body,"evt":i_e,"name":'jobblock_context',"receiver":this,"destroy":'onContextMenuDestroy'});
-	this.job.monitor.menu = menu;
-
-	if( onlyBlockIsSelected )
-		menu.addItem({"label":'<b>'+this.params.name+'</b>',"enabled":false});
-	else
-		menu.addItem({"label":'<b>All Blocks</b>',"enabled":false});
-	menu.addItem();
-
-	var actions = JobBlock.actions;
-	for( var i = 0; i < actions.length; i++)
-	{
-		var item = {};
-		for( var key in actions[i] ) item[key] = actions[i][key];
-		item.receiver = this;
-		item.param = actions[i];
-		menu.addItem( item);
-	}
-	menu.show();
-
-	return false;
-}
-*/
-JobBlock.deselectAll = function()
-{
-	if( JobBlock.selectedItems )
-		while( JobBlock.selectedItems.length )
-			JobBlock.selectedItems[0].setSelected( false);
-}
-JobBlock.prototype.onContextMenuDestroy = function()
-{
-	this.element.classList.remove('selected');
-	this.job.monitor.menu = null;
-}
-JobBlock.prototype.mh_Dialog = function( i_parameter)
-{
-	new cgru_Dialog({"wnd":this.job.monitor.window,"receiver":this,"handle":'setParameter',
-		"param":i_parameter.name,"type":i_parameter.type,"value":this.params[i_parameter.name],
+	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":block,"handle":'setParameter',
+		"param":i_args.name,"type":i_args.type,"value":block.params[i_args.name],
 		"name":'jobblock_parameter'});
 }
 JobBlock.prototype.setParameter = function( i_value, i_parameter)
 {
 	var params = {};
 	params[i_parameter] = i_value;
-g_Info( this.job.params.name+'['+this.params.name+'].'+i_parameter+' = ' + i_value);
 	this.action( null, params);
 }
 JobBlock.prototype.action = function( i_operation, i_params)
 {
-	var jids = this.job.monitor.getSelectedIds();
-	var bids = [-1];
-	if( jids.length == 0 )
+	var jids = [];
+	var bids = [];
+
+	for( var b = 0; b < this.job.monitor.selected_blocks.length; b++)
 	{
-		jids = [this.job.params.id];
-		bids = [this.params.block_num];
+		var block = this.job.monitor.selected_blocks[b];
+
+		jid = block.job.params.id;
+		if( jids.indexOf( jid) == -1 )
+			jids.push( jid);
+
+		bids.push( block.params.block_num);
 	}
+
+	// If several jobs selected, we can manipulate only all their blocks.
+	if( jids.length > 1 )
+		bids = [-1];
+
 	nw_Action('jobs', jids, i_operation, i_params, bids);
 }
 
@@ -805,9 +863,21 @@ JobNode.resetPanels = function( i_monitor)
 }
 JobNode.prototype.updatePanels = function()
 {
+	var elPanelL = this.monitor.elPanelL;
+	var elPanelR = this.monitor.elPanelR;
+
+
+	// Admin can't move jobs:
 	if( g_VISOR())
 		this.monitor.ctrl_btns.move_jobs.classList.remove('active');
 
+
+	// Blocks:
+	JobBlock.deselectAll( this.monitor);
+	elPanelR.m_elBlocks.classList.remove('active');
+
+
+	// Errors control buttons:
 	var errors = 0;
 	var avoids = 0;
 	for( var b = 0; b < this.params.blocks.length; b++)
@@ -829,14 +899,8 @@ JobNode.prototype.updatePanels = function()
 		this.monitor.ctrl_btns.errors.classList.remove('active');
 	}
 
-	var elPanelL = this.monitor.elPanelL;
-	var elPanelR = this.monitor.elPanelR;
 
-	var elFolders = elPanelR.m_elFolders;
-	elFolders.m_elFolders = [];
-	var folders = this.params.folders;
-//console.log(JSON.stringify( folders));
-
+	// Info:
 	var info = 'Created at ' + cm_DateTimeStrFromSec( this.params.time_creation);
 	if( this.params.time_started )
 		info += '<br>Started at ' + cm_DateTimeStrFromSec( this.params.time_started);
@@ -844,6 +908,13 @@ JobNode.prototype.updatePanels = function()
 		info += '<br>Finished at ' + cm_DateTimeStrFromSec( this.params.time_done);
 	this.monitor.setPanelInfo( info);
 
+
+	// Folders:
+	var elFolders = elPanelR.m_elFolders;
+	elFolders.m_elFolders = [];
+	var folders = this.params.folders;
+
+//console.log(JSON.stringify( folders));
 	if(( folders == null ) || ( folders.length == 0 ))
 	{
 		return;
@@ -881,8 +952,6 @@ JobNode.prototype.updatePanels = function()
 
 	elFolders.m_elRules.style.display = 'block';
 	elFolders.m_elRules.href = cgru_RulesLink( rules_link);
-
-	JobBlock.deselectAll();
 }
 
 JobNode.createPanels = function( i_monitor)
@@ -951,10 +1020,59 @@ JobNode.createPanels = function( i_monitor)
 	el.classList.add('section');
 	el.classList.add('blocks');
 	elPanelR.m_elBlocks = el;
-	var el = document.createElement('div');
-	elPanelR.m_elBlocks.appendChild( el);
-	el.textContent = 'Blocks';
-	el.classList.add('caption');
+	var elCaption = document.createElement('div');
+	elPanelR.m_elBlocks.appendChild( elCaption);
+	elCaption.textContent = 'Blocks';
+	elCaption.classList.add('caption');
+
+	var elName = document.createElement('div');
+	elPanelR.m_elBlocks.appendChild( elName);
+	elPanelR.m_elBlocks.m_elName = elName;
+	elName.classList.add('name');
+	elName.style.display = 'none';
+
+	elPanelR.m_elBlocks.m_elParams = {};
+	for( var p in JobBlock.params )
+	{
+		var elDiv = document.createElement('div');
+		elPanelR.m_elBlocks.appendChild( elDiv);
+		elPanelR.m_elBlocks.m_elParams[p] = elDiv;
+		elDiv.classList.add('param');
+		elDiv.style.display = 'none';
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = JobBlock.params[p].label;
+
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elDiv.m_elValue = elValue;
+		elValue.classList.add('value');
+
+		var el = elDiv;
+		el.title = 'Double click to edit.'
+		el.monitor = i_monitor;
+		el.name = p;
+		el.param = JobBlock.params[p];
+		el.monitor = i_monitor;
+		el.ondblclick = function(e){
+			var el = e.currentTarget;
+			JobBlock.setDialog({'name':el.name,'type':el.param.type,'monitor':el.monitor});
+		}
+	}
+
+	var el = elCaption;
+	el.title = 'Click to edit all paramters.';
+	el.m_elBlocks = elPanelR.m_elBlocks;
+	el.onclick = function(e){
+		var el = e.currentTarget;
+		if( el.m_elBlocks.classList.contains('active') != true ) return false;
+		var elParams = el.m_elBlocks.m_elParams;
+		for( var p in elParams )
+			elParams[p].style.display = 'block';
+		return false;
+	}
 }
 
 JobNode.moveJobs = function( i_args)
@@ -984,24 +1102,21 @@ JobNode.view_opts.jobs_thumbs_num =    {"type":'num',"label":"TQU","tooltip":'Th
 JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Thumbnails height.',  "default":100 };
 
 
-JobBlock.actions = [];
-JobBlock.actions.push({"mode":'set', "name":'capacity',                   "type":'num', "handle":'mh_Dialog', "label":'Capacity'});
-JobBlock.actions.push({"mode":'set'});
-JobBlock.actions.push({"mode":'set', "name":'errors_retries',             "type":'num', "handle":'mh_Dialog', "label":'Errors Retries'});
-JobBlock.actions.push({"mode":'set', "name":'errors_avoid_host',          "type":'num', "handle":'mh_Dialog', "label":'Errors Avoid Host'});
-JobBlock.actions.push({"mode":'set', "name":'errors_task_same_host',      "type":'num', "handle":'mh_Dialog', "label":'Errors Task Same Host'});
-JobBlock.actions.push({"mode":'set', "name":'errors_forgive_time',        "type":'hrs', "handle":'mh_Dialog', "label":'Errors Forgive Time'});
-JobBlock.actions.push({"mode":'set', "name":'tasks_max_run_time',         "type":'hrs', "handle":'mh_Dialog', "label":'Tasks Max Run Time'});
-JobBlock.actions.push({"mode":'set'});
-JobBlock.actions.push({"mode":'set', "name":'non_sequential',             "type":'bl1', "handle":'mh_Dialog', "label":'Non-Sequential'});
-JobBlock.actions.push({"mode":'set'});
-JobBlock.actions.push({"mode":'set', "name":'max_running_tasks',          "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
-JobBlock.actions.push({"mode":'set', "name":'max_running_tasks_per_host', "type":'num', "handle":'mh_Dialog', "label":'Max Run Tasks Per Host'});
-JobBlock.actions.push({"mode":'set', "name":'hosts_mask',                 "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
-JobBlock.actions.push({"mode":'set', "name":'hosts_mask_exclude',         "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
-JobBlock.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
-JobBlock.actions.push({"mode":'set', "name":'tasks_depend_mask',          "type":'reg', "handle":'mh_Dialog', "label":'Tasks Depend Mask'});
-JobBlock.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Properties Needed'});
+JobBlock.params = [];
+JobBlock.params.capacity                   = {"type":'num', "label":'Capacity'};
+JobBlock.params.errors_retries             = {"type":'num', "label":'Errors Retries'};
+JobBlock.params.errors_avoid_host          = {"type":'num', "label":'Errors Avoid Host'};
+JobBlock.params.errors_task_same_host      = {"type":'num', "label":'Errors Task Same Host'};
+JobBlock.params.errors_forgive_time        = {"type":'hrs', "label":'Errors Forgive Time'};
+JobBlock.params.tasks_max_run_time         = {"type":'hrs', "label":'Tasks Max Run Time'};
+JobBlock.params.non_sequential             = {"type":'bl1', "label":'Non-Sequential'};
+JobBlock.params.max_running_tasks          = {"type":'num', "label":'Max Runnig Tasks'};
+JobBlock.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
+JobBlock.params.hosts_mask                 = {"type":'reg', "label":'Hosts Mask'};
+JobBlock.params.hosts_mask_exclude         = {"type":'reg', "label":'Exclude Hosts Mask'};
+JobBlock.params.depend_mask                = {"type":'reg', "label":'Depend Mask'};
+JobBlock.params.tasks_depend_mask          = {"type":'reg', "label":'Tasks Depend Mask'};
+JobBlock.params.need_properties            = {"type":'reg', "label":'Properties Needed'};
 
 // First array item will be used by default (on load)
 JobNode.sort = ['order','time_creation','priority','user_name','name','host_name'];

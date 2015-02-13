@@ -467,6 +467,10 @@ Monitor.prototype.processMsg = function( obj)
 				if( this.panel_item == this.items[i] )
 					this.updatePanels( this.items[i]);
 
+				if(( this.type == 'jobs' ) && this.elPanelR.m_elBlocks.m_cur_block )
+					if( this.elPanelR.m_elBlocks.m_cur_block.job.params.id == this.items[i].params.id )
+						this.elPanelR.m_elBlocks.m_cur_block.updatePanels();
+
 				updated.push( this.items[i]);
 				this.filterItem( this.items[i]);
 
@@ -758,6 +762,9 @@ Monitor.prototype.selectAll = function( on)
 {
 	for( var i = 0; i < this.items.length; i++)
 		this.elSetSelected( this.items[i].element, on);
+
+	if( this.type == 'jobs' )
+		JobBlock.deselectAll( this);
 }
 
 Monitor.prototype.selectNext = function( i_evt, previous)
@@ -789,7 +796,7 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 
 Monitor.prototype.showObject = function( i_act, i_evt)
 {
-	if( this.hasSelection() == false ) return;
+	if( this.hasSelection() == false ) return false;
 	if( this.cur_item && this.cur_item.params )
 		g_ShowObject({"object":this.cur_item.params},{"evt":i_evt,"wnd":this.window});
 }
@@ -864,6 +871,7 @@ Monitor.prototype.updatePanels = function( i_item)
 		i_item.updatePanels();
 }
 Monitor.prototype.setPanelInfo = function( i_html) { this.elPanelR.m_elInfo.m_elBody.innerHTML = i_html; }
+Monitor.prototype.resetPanelInfo = function()      { this.elPanelR.m_elInfo.m_elBody.textContent = '';   }
 
 Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
@@ -1247,14 +1255,17 @@ Monitor.ctrlBtnClicked = function(e)
 	if( handle == null )
 		handle = 'mh_Oper';
 
+	var action_accepted = true;
 	if( el.m_monitor.nodeConstructor[handle] )
-		el.m_monitor.nodeConstructor[handle]( args, e);
+		action_accepted = el.m_monitor.nodeConstructor[handle]( args, e);
 	else
-		el.m_monitor[handle]( args, e);
+		action_accepted = el.m_monitor[handle]( args, e);
 
-
-	setInterval( Monitor.ctrlBtnRelease, 1234, el);
-	el.classList.add('clicked');
+	if( action_accepted !== false )
+	{
+		setInterval( Monitor.ctrlBtnRelease, 1234, el);
+		el.classList.add('clicked');
+	}
 
 	return false;
 }
