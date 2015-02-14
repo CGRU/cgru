@@ -346,18 +346,24 @@ function d_Convert( i_args)
 
 	wnd.m_res_btns_show = [];
 
-	var elCvtBtn = document.createElement('div');
-	elBtns.appendChild( elCvtBtn);
-	elCvtBtn.textContent = title + ' To Movies';
-	elCvtBtn.classList.add('button');
-	elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);}
-	elCvtBtn.m_wnd = wnd;
-	wnd.m_res_btns_show.push( elCvtBtn);
-	if( i_args.results ) elCvtBtn.style.display = 'none';
+	if( ! i_args.images )
+	{
+		var elCvtBtn = document.createElement('div');
+		elBtns.appendChild( elCvtBtn);
+		elCvtBtn.textContent = title + ' To Movies';
+		elCvtBtn.classList.add('button');
+		elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);}
+		elCvtBtn.m_wnd = wnd;
+		wnd.m_res_btns_show.push( elCvtBtn);
+		if( i_args.results ) elCvtBtn.style.display = 'none';
+	}
 
 	var elExpBtn = document.createElement('div');
 	elBtns.appendChild( elExpBtn);
-	elExpBtn.textContent = title + ' To Sequences';
+	if( i_args.images )
+		elExpBtn.textContent = title + ' To Images';
+	else
+		elExpBtn.textContent = title + ' To Sequences';
 	elExpBtn.classList.add('button');
 	elExpBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, true);}
 	elExpBtn.m_wnd = wnd;
