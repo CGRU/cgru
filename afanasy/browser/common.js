@@ -108,7 +108,7 @@ function cm_TimeStringInterval( time1, time2)
 	return time;
 }
 
-function cm_TimeStringFromSeconds( i_seconds)
+function cm_TimeStringFromSeconds( i_seconds, i_full)
 {
 	var str = '';
 
@@ -132,7 +132,12 @@ function cm_TimeStringFromSeconds( i_seconds)
 	}
 
 	if( days )
-		str += days + 'd ';
+	{
+		if( i_full )
+			str += days + ' Days ';
+		else
+			str += days + 'd ';
+	}
 
 	if( hours )
 	{
@@ -142,7 +147,13 @@ function cm_TimeStringFromSeconds( i_seconds)
 			str += ':'; if( minutes < 10 ) str += '0'; str += minutes;
 			if( seconds ) { str += '.'; if( seconds < 10 ) str += '0'; str += seconds;}
 		}
-		else str += 'h';
+		else
+		{
+			if( i_full )
+				str += ' Hours';
+			else
+				str += 'h';
+		}
 	}
 	else if( minutes )
 	{

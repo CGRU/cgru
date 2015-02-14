@@ -530,14 +530,37 @@ RenderTask.prototype.destroy = function()
 
 RenderNode.createPanels = function( i_monitor)
 {
+	// Info:
+	var acts = {};
+	acts.tasks_log = {'label':'TSK' ,'tooltip':'Get tasks Log.'};
+	acts.full      = {'label':'FULL','tooltip':'Request full render node info.'};
+	i_monitor.createCtrlBtn({'name':'info','label':'INFO','tooltip':'Get render info.','handle':'mh_Get','sub_menu':acts});
+
+
+	// Nimby:
+	var acts = {};
+	acts.free =  {'name':'nimby', 'value':false,'handle':'mh_Param','label':'FRE','tooltip':'Set render free.'};
+	acts.nimby = {'name':'nimby', 'value':true, 'handle':'mh_Param','label':'Nim','tooltip':'Set render nimby.\nRun only owner tasks.'};
+	acts.NIMBY = {'name':'NIMBY', 'value':true, 'handle':'mh_Param','label':'NBY','tooltip':'Set render NIMBY.\nDo not run any tasks.'};
+	i_monitor.createCtrlBtns( acts);
+
+
 	// Services:
 	var acts = {};
-	acts.enable           = {'handle':'setService', 'label':'ENS','tooltip':'Enable service.'};
-	acts.disable          = {'handle':'setService', 'label':'DIS','tooltip':'Disable service.'};
-	acts.restore_defaults = {'handle':'mh_Oper',    'label':'DEF','tooltip':'Restore default farm settings.'};
+	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
+	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
+	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
 	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable serivrs\nRestore defaults.','sub_menu':acts});
 
 
+	// Eject tasks:
+	var acts = {};
+	acts.eject_tasks         = {'label':'ALL','tooltip':'Eject all running tasks.'};
+	acts.eject_tasks_keep_my = {'label':'NOM','tooltip':'Eject not my tasks.'};
+	i_monitor.createCtrlBtn({'name':'eject','label':'EJT','tooltip':'Eject tasks from render.','sub_menu':acts});
+
+
+	// Custom commands:
 	var el = document.createElement('div');
 	i_monitor.elPanelL.appendChild( el);
 	el.classList.add('ctrl_button');
@@ -546,8 +569,10 @@ RenderNode.createPanels = function( i_monitor)
 	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cmd'); return false;}
 	el.oncontextmenu = el.onclick;
 
+
 	// Admin related functions:
 	if( ! g_GOD()) return;
+
 
 	// Power/WOL:
 	var acts = {};
@@ -560,17 +585,6 @@ RenderNode.createPanels = function( i_monitor)
 	i_monitor.createCtrlBtn({'name':'power','label':'POW','tooltip':'Power / Exit / Delete.','sub_menu':acts});
 }
 
-RenderNode.actions = [];
-
-RenderNode.actions.push({"mode":'context', "name":'tasks_log', "handle":'mh_Get', "label":'Tasks Log'});
-RenderNode.actions.push({"mode":'context', "name":'full',      "handle":'mh_Get', "label":'Full Info'});
-RenderNode.actions.push({"mode":'context'});
-RenderNode.actions.push({"mode":'context', "name":'nimby', "value":true,  "handle":'mh_Param', "label":'Set nimby'});
-RenderNode.actions.push({"mode":'context', "name":'NIMBY', "value":true,  "handle":'mh_Param', "label":'Set NIMBY'});
-RenderNode.actions.push({"mode":'context', "name":'nimby', "value":false, "handle":'mh_Param', "label":'Set Free'});
-RenderNode.actions.push({"mode":'context'});
-RenderNode.actions.push({"mode":'context', "name":'eject_tasks',         "handle":'mh_Oper', "label":'Eject Tasks'});
-RenderNode.actions.push({"mode":'context', "name":'eject_tasks_keep_my', "handle":'mh_Oper', "label":'Eject Not My'});
 
 RenderNode.params = {};
 RenderNode.params.priority   = {"type":'num', "label":'Priority'};
@@ -583,6 +597,7 @@ RenderNode.params.hidden     = {"type":'bl1', "label":'Hide/Unhide'};
 RenderNode.sort = ['priority','user_name','name'];
 RenderNode.filter = ['user_name','name','host_name'];
 
+RenderNode.actions = [];
 RenderNode.actionsCreated = false;
 RenderNode.createActions = function()
 {

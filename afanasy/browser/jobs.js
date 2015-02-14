@@ -954,12 +954,14 @@ JobNode.createPanels = function( i_monitor)
 {
 	// Left Panel:
 
+
 	// Errors:
 	var acts = {};
 	acts.error_hosts       = {'label':'GEH', "handle":'mh_Get',  'tooltip':'Show error hosts.'};
 	acts.reset_error_hosts = {'label':'REH', 'handle':'mh_Oper', 'tooltip':'Reset error hosts.'};
 	acts.restart_errors    = {'label':'RET', 'handle':'mh_Oper', 'tooltip':'Restart error tasks.'};
 	i_monitor.createCtrlBtn({'name':'errors','label':'ERR','tooltip':'Error tasks and hosts.','sub_menu':acts});
+
 
 	// Restart:
 	var acts = {};
@@ -971,6 +973,7 @@ JobNode.createPanels = function( i_monitor)
 	acts.restart_done    = {'label':'DON', 'tooltip':'Restart done task.'};
 	i_monitor.createCtrlBtn({'name':'restart_tasks','label':'RES','tooltip':'Restart job tasks.','sub_menu':acts});
 
+
 	// Move:
 	var acts = {};
 	acts.move_jobs_top    = {'label':'TOP','tooltip':'Move jobs top.'};
@@ -978,6 +981,7 @@ JobNode.createPanels = function( i_monitor)
 	acts.move_jobs_down   = {'label':'DWN','tooltip':'Move jobs down.'};
 	acts.move_jobs_bottom = {'label':'BOT','tooltip':'Move jobs bottom.'};
 	i_monitor.createCtrlBtn({'name':'move_jobs','label':'MOV','tooltip':'Move jobs.','sub_menu':acts,'handle':'moveJobs'});
+
 
 	// Actions:
 	var acts = {};
@@ -987,9 +991,10 @@ JobNode.createPanels = function( i_monitor)
 	acts.delete = {"label":"DEL","tooltip":'Double click delete job(s).',"ondblclick":true};
 	i_monitor.createCtrlBtns( acts);
 
-	// Right Panel:
 
+	// Right Panel:
 	var elPanelR = i_monitor.elPanelR;
+
 
 	// Folders:
 	var el = document.createElement('div');
@@ -1009,6 +1014,7 @@ JobNode.createPanels = function( i_monitor)
 	elPanelR.m_elFolders.appendChild( el);
 	el.textContent = 'Folders';
 	el.classList.add('caption');
+
 
 	// Blocks:
 	var el = document.createElement('div');
