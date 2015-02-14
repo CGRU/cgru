@@ -1,5 +1,12 @@
 <?php
 
+ini_set('upload_max_filesize', '16G');
+ini_set('post_max_size', '16G');
+ini_set('memory_limit', '16G');
+ini_set('max_input_time', 600);
+ini_set('max_execution_time', 600);
+
+
 $GuestSites = array('rules.cgru.info','127.0.0.1');
 $CONF = array();
 $CONF['AUTH_RULES'] = false;
@@ -120,6 +127,7 @@ function jsf_start( $i_arg, &$o_out)
 	$o_out['upload_max_filesize'] = ini_get('upload_max_filesize');
 	$o_out['post_max_size'] = ini_get('post_max_size');
 	$o_out['memory_limit'] = ini_get('memory_limit');
+	$o_out['max_input_time'] = ini_get('max_input_time');
 	$o_out['max_execution_time'] = ini_get('max_execution_time');
 	if( $fHandle = fopen('version.txt','r'))
 	{
