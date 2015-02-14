@@ -88,7 +88,7 @@ function Monitor( i_args)
 	if( this.nodeConstructor.createPanels )
 		this.nodeConstructor.createPanels( this);
 
-	if( this.type == 'renders' || this.type == 'users')
+	if( this.type == 'users')
 	{
 		var el = this.document.createElement('div');
 		this.elPanelL.appendChild( el);
@@ -99,30 +99,6 @@ function Monitor( i_args)
 		el.monitor = this;
 		el.onclick = function(e){ e.currentTarget.monitor.showMenu(e); return false;}
 		el.oncontextmenu = el.onclick;
-	}
-
-	if( this.type == 'renders')
-	{
-		var el = this.document.createElement('div');
-		this.elPanelL.appendChild( el);
-		this.elPanelL.m_elCmd = el;
-		el.classList.add('ctrl_button');
-		el.textContent = 'CMD';
-		el.monitor = this;
-		el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cmd'); return false;}
-		el.oncontextmenu = el.onclick;
-
-		if( g_GOD())
-		{
-			var el = this.document.createElement('div');
-			this.elPanelL.appendChild( el);
-			this.elPanelL.m_elPow = el;
-			el.classList.add('ctrl_button');
-			el.textContent = 'POW';
-			el.monitor = this;
-			el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'pow'); return false;}
-			el.oncontextmenu = el.onclick;
-		}
 	}
 
 	// Parameters section:
@@ -154,7 +130,7 @@ function Monitor( i_args)
 	if( this.nodeConstructor.params )
 	for( var p in this.nodeConstructor.params )
 	{
-		var param = JobNode.params[p];
+		var param = this.nodeConstructor.params[p];
 		if( false == cm_CheckPermissions( param.permissions )) continue;
 
 		var elDiv = document.createElement('div');
@@ -321,6 +297,9 @@ function Monitor( i_args)
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
 
 	this.items = [];
+	this.selected_items = [];
+	this.cur_item = null;
+
 	g_recievers.push( this);
 	g_monitors.push( this);
 	this.setWindowTitle();
@@ -692,44 +671,45 @@ Monitor.prototype.onMouseDown = function( i_evt, i_el)
 		var ci = this.items.indexOf( i_el.item);
 		if(( i != ci ) && ( i != -1) && ( ci != -1))
 		{
-			this.elSetSelected( i_el, true);
+			this.setSelected( i_el.item, true);
 			var d = 1;
 			if( i > ci ) d = -1;
 			while( i != ci )
 			{
-				this.elSetSelected( this.items[i].element, true);
+				this.setSelected( this.items[i], true);
 				i += d;
 			}
 			return;
 		}
 	}
 		
-	this.elSelectToggle( i_el);
+	this.selectToggle( i_el.item);
 }
 
 Monitor.prototype.onMouseOver = function( i_evt, i_el)
 {
 	if( i_evt.buttons != 1 ) return;
-	this.elSetSelected( i_evt.currentTarget, i_evt.ctrlKey == false);
+	this.setSelected( i_evt.currentTarget.item, i_evt.ctrlKey == false);
 }
 
-Monitor.prototype.elSetSelected = function( el, on)
+Monitor.prototype.setSelected = function( i_item, on)
 {
 	this.window.getSelection().removeAllRanges();
 
 	if( on )
 	{
-		this.cur_item = el.item;
+		this.cur_item = i_item;
 
 		this.updatePanels();
 
 		this.info( this.cur_item.params.name);
 
-		if( el.selected ) return;
-		el.selected = true;
+		if( i_item.selected ) return;
 
-		if( false == el.classList.contains('selected'))
-			el.classList.add('selected');
+		i_item.selected = true;
+		i_item.element.classList.add('selected');
+		this.selected_items.push( i_item);
+
 		if( this.type == 'jobs' )
 			this.setWindowTitle();
 
@@ -740,28 +720,37 @@ Monitor.prototype.elSetSelected = function( el, on)
 	}
 	else
 	{
-		if( false == el.selected ) return;
+		if( ! i_item.selected ) return;
 
 		this.resetPanels();
 
-		el.selected = false;
-		el.classList.remove('selected');
+		i_item.selected = false;
+		i_item.element.classList.remove('selected');
+		this.selected_items.splice( this.selected_items.indexOf( i_item), 1);
+
+		if( this.selected_items.length )
+		{
+			this.cur_item = this.selected_items[this.selected_items.length-1];
+			this.updatePanels();
+		}
+		else
+			this.cur_item = null;
 	}
 }
 
-Monitor.prototype.elSelectToggle = function( el)
+Monitor.prototype.selectToggle = function( i_item)
 {
-	if( !el ) return;
-	if( el.selected )
-		this.elSetSelected( el, false);
+	if( ! i_item ) return;
+	if( i_item.selected )
+		this.setSelected( i_item, false);
 	else
-		this.elSetSelected( el, true);
+		this.setSelected( i_item, true);
 }
 
 Monitor.prototype.selectAll = function( on)
 {
 	for( var i = 0; i < this.items.length; i++)
-		this.elSetSelected( this.items[i].element, on);
+		this.setSelected( this.items[i], on);
 
 	if( this.type == 'jobs' )
 		JobBlock.deselectAll( this);
@@ -788,10 +777,10 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 	if( next_index >= this.items.length ) return;
 //	if( next_index == cur_index ) return;
 
-	this.cur_item = this.items[next_index]; 
 	if( false == i_evt.shiftKey )
 		this.selectAll( false);
-	this.elSetSelected( this.cur_item.element, true);
+
+	this.setSelected( this.items[next_index], true);
 }
 
 Monitor.prototype.showObject = function( i_act, i_evt)
@@ -832,6 +821,8 @@ Monitor.prototype.updatePanels = function( i_item)
 
 	if( i_item == null )
 		i_item = this.cur_item;
+	if( i_item == null )
+		return;
 
 	this.panel_item = i_item;
 
@@ -877,9 +868,10 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
 	i_evt.stopPropagation();
 	g_cur_monitor = this;
-	if( i_el.selected != true )
+
+	if( i_el.item.selected != true )
 		this.selectAll( false);
-	this.elSetSelected( i_el, true);
+	this.setSelected( i_el.item, true);
 
 	if(( i_el.item.onContextMenu == null ) && ( i_el.item.constructor.actions == null ))
 		return false;
@@ -936,7 +928,7 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 	{
 		var cmds = [];
 		for( var i = 0; i < this.items.length; i++)
-			if( this.items[i].element.selected == true )
+			if( this.items[i].selected == true )
 			{
 				cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
@@ -1045,26 +1037,18 @@ Monitor.prototype.setOption = function( i_value, i_param)
 Monitor.prototype.getSelectedItems = function()
 {
 	var items = [];
-	for( var i = 0; i < this.items.length; i++)
-		if( this.items[i].element.selected == true )
-			items.push( this.items[i]);
+	for( var i = 0; i < this.selected_items.length; i++)
+		items.push( this.selected_items[i]);
 	return items;
 }
 Monitor.prototype.getSelectedIds = function()
 {
 	var ids = [];
-	for( var i = 0; i < this.items.length; i++)
-		if( this.items[i].element.selected == true )
-			ids.push( this.items[i].params.id);
+	for( var i = 0; i < this.selected_items.length; i++)
+		ids.push( this.selected_items[i].params.id);
 	return ids;
 }
-Monitor.prototype.hasSelection = function()
-{
-	for( var i = 0; i < this.items.length; i++)
-		if( this.items[i].element.selected == true )
-			return true;
-	return false;
-}
+Monitor.prototype.hasSelection = function() { return ( this.selected_items.length > 0 ); }
 
 Monitor.prototype.noneSelected = function( i_evt)
 {//return false;

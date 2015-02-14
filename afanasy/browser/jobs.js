@@ -213,10 +213,6 @@ JobNode.prototype.onDoubleClick = function( i_evt)
 	g_OpenMonitor({"type":'tasks',"evt":i_evt,"id":this.params.id,"name":this.params.name,"wnd":this.monitor.window});
 }
 
-JobNode.prototype.mh_Show = function( i_param, i_evt )
-{
-	g_ShowObject({"object":this.params},{"evt":i_evt,"wnd":this.monitor.window});
-}
 JobNode.prototype.mh_Move = function( i_param)
 {
 	if( g_uid < 1 )
@@ -1097,12 +1093,12 @@ JobNode.params.annotation =                 {"type":'str', "label":'Annotation'}
 JobNode.params.hidden =                     {"type":'bl1', "label":'Hidden'};
 JobNode.params.user_name =                  {"type":'str', "label":'Owner',"permissions":'visor'};
 
-JobNode.view_opts = [];
+JobNode.view_opts = {};
 JobNode.view_opts.jobs_thumbs_num =    {"type":'num',"label":"TQU","tooltip":'Thumbnails quantity.',"default":12  };
 JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Thumbnails height.',  "default":100 };
 
 
-JobBlock.params = [];
+JobBlock.params = {};
 JobBlock.params.capacity                   = {"type":'num', "label":'Capacity'};
 JobBlock.params.errors_retries             = {"type":'num', "label":'Errors Retries'};
 JobBlock.params.errors_avoid_host          = {"type":'num', "label":'Errors Avoid Host'};
