@@ -5,6 +5,8 @@ fv_thumbnails_tomake_files = [];
 
 fv_cur_item = null;
 
+fv_first_created = false;
+
 if( localStorage.filesview == null ) localStorage.filesview = '0';
 
 function fv_Finish()
@@ -15,6 +17,16 @@ function fv_Finish()
 
 function FilesView( i_args)
 {
+	if( ! fv_first_created )
+	{
+		window.document.body.addEventListener('keydown', function(e){
+			if( e.keyCode == 27 ) // ESC
+				for( var i = 0; i < fv_views.length; i++)
+					fv_views[i].selectAll( false);
+		});
+	}
+	fv_first_created = true;
+
 	this.elParent = i_args.el;
 	this.path = i_args.path;
 	this.walk = i_args.walk;
