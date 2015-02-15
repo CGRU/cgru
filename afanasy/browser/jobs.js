@@ -897,11 +897,11 @@ JobNode.prototype.updatePanels = function()
 
 
 	// Info:
-	var info = 'Created at ' + cm_DateTimeStrFromSec( this.params.time_creation);
+	var info = 'Created:<br> ' + cm_DateTimeStrFromSec( this.params.time_creation);
 	if( this.params.time_started )
-		info += '<br>Started at ' + cm_DateTimeStrFromSec( this.params.time_started);
+		info += '<br>Started:<br> ' + cm_DateTimeStrFromSec( this.params.time_started);
 	if( this.params.time_done )
-		info += '<br>Finished at ' + cm_DateTimeStrFromSec( this.params.time_done);
+		info += '<br>Finished:<br> ' + cm_DateTimeStrFromSec( this.params.time_done);
 	this.monitor.setPanelInfo( info);
 
 

@@ -106,7 +106,7 @@ RenderNode.prototype.update = function( i_obj)
 
 		if( r == null ) return;
 
-		if(( this.state.ONL != true ) || ( this.host_resources == null ))
+		if(( this.state.ONL != true ) || ( this.params.host_resources == null ))
 		{
 			// If render just become online,
 			// or resources reciedved fisrt time,
@@ -145,7 +145,7 @@ RenderNode.prototype.update = function( i_obj)
 		}
 
 
-		this.host_resources = r;
+		this.params.host_resources = r;
 
 		var usr = r.cpu_user + r.cpu_nice;
 		var sys = r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq;
@@ -248,7 +248,7 @@ RenderNode.prototype.update = function( i_obj)
 		this.clearTasks();
 this.plottersCsDelete();
 this.elResources.style.display = 'none';
-this.host_resources = null;
+this.params.host_resources = null;
 		this.elCapacity.textContent = '';
 		this.elMaxTasks.textContent = '';
 		this.state.textContent = '';
@@ -433,14 +433,11 @@ RenderNode.prototype.updateTasksPercents = function()
 
 RenderNode.prototype.onDoubleClick = function( e)
 {
-//	nw_GetNodes('renders', [this.params.id], 'full');
 	nw_request({"send":{"get":{"type":'renders',"ids":[this.params.id],"mode":'full'}},"func":g_ShowObject,"evt":e,"wnd":this.monitor.window});
 }
 
 RenderNode.setService = function( i_args)
 {
-//	new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'serviceApply',"param":i_param.name,
-//		"name":'serivce',"title":(i_param.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
 	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'serviceApply',"param":i_args.name,
 		"name":'serivce',"title":(i_args.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
 }
@@ -583,6 +580,48 @@ RenderNode.createPanels = function( i_monitor)
 	acts.shutdown  = {'label':'SHD','tooltip':'Shutdown machine.'};
 	acts.delete    = {'label':'DEL','tooltip':'Delete render from Afanasy database.'};
 	i_monitor.createCtrlBtn({'name':'power','label':'POW','tooltip':'Power / Exit / Delete.','sub_menu':acts});
+}
+
+
+RenderNode.prototype.updatePanels = function()
+{
+	// Info:
+	var info = '';
+
+	var r = this.params.host_resources;
+	if( r )
+	{
+		info += r.cpu_mhz+'x'+r.cpu_num+'MHz';
+		info += ' '+Math.round(r.mem_total_mb/1024)+'Gb';
+		info += ' HDD'+r.hdd_total_gb+'Gb';
+		info += '<br>';
+	}
+
+	if( this.params.host.nimby_idlefree_time || this.params.host.nimby_busyfree_time )
+	{
+		info += '<br>Auto Nimby:';
+		if( this.params.host.nimby_busyfree_time )
+			info += '<br>Busy time: '
+				+ cm_TimeStringFromSeconds( this.params.host.nimby_busyfree_time)
+				+ ' CPU > ' + this.params.host.busy_cpu + '%';
+		if( this.params.host.nimby_idlefree_time )
+			info += '<br>Free time: '
+				+ cm_TimeStringFromSeconds( this.params.host.nimby_idlefree_time)
+				+ ' CPU: < ' + this.params.host.idle_cpu + '%';
+	}
+	info += '<br>';
+
+	info += '<br>Registered:<br> ' + cm_DateTimeStrFromSec( this.params.time_register);
+	if( this.params.time_launch )
+		info += '<br>Launched:<br> ' + cm_DateTimeStrFromSec( this.params.time_launch);
+	if( this.params.idle_time )
+		info += '<br>Idle since:<br> ' + cm_DateTimeStrFromSec( this.params.idle_time);
+	if( this.params.busy_time )
+		info += '<br>Busy since:<br> ' + cm_DateTimeStrFromSec( this.params.busy_time);
+	if( this.task_start_finish_time )
+		info += '<br>Task finished at:<br> ' + cm_DateTimeStrFromSec( this.params.task_start_finish_time);
+
+	this.monitor.setPanelInfo( info);
 }
 
 

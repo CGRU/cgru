@@ -996,7 +996,6 @@ Monitor.prototype.mh_Get = function( i_param, i_evt)
 
 	get = {"type":this.type,"ids":[this.cur_item.params.id],"mode":i_param.name};
 	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.window});
-//	nw_GetNodes( this.type, [this.cur_item.params.id], i_param.name);
 }
 
 Monitor.prototype.action = function( i_operation, i_params)

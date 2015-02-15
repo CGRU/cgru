@@ -11,7 +11,7 @@ a:hover { text-shadow: 0 0 2px rgba(100,255,255,.5); }
 -moz-user-select: text;
 -webkit-user-select: text;
 }
-#content, #header, #footer {
+#content, #header, #footer, .monitor {
 -moz-user-select: none;
 -webkit-user-select: none;
 }
@@ -286,7 +286,7 @@ cursor: default;
 .item.ERR { background: #965;}
 .item.OFF, .item.task.SKP { background: #777;}
 .item.DRT { border: 1px solid #955;}
-.item.selected {
+.item.selected, .item.task.selected {
 background: #DFD;
 color: #000;
 }

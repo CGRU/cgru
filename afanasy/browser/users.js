@@ -182,6 +182,16 @@ UserNode.createPanels = function( i_monitor)
 }
 
 
+UserNode.prototype.updatePanels = function()
+{
+	// Info:
+	var info = 'Registered:<br> ' + cm_DateTimeStrFromSec( this.params.time_register);
+	if( this.params.time_activity )
+		info += '<br>Last Activity:<br> ' + cm_DateTimeStrFromSec( this.params.time_activity);
+	this.monitor.setPanelInfo( info);
+}
+
+
 UserNode.prototype.onDoubleClick = function( e) { g_ShowObject({"object":this.params},{"evt":e,"wnd":this.monitor.window});}
 
 
