@@ -1076,16 +1076,16 @@ function ad_DisableUser( i_user_id)
 
 function ad_DeleteUserOnClick()
 {
-	if( g_users[i_user_id] == null )
-	{
-		c_Error('User "' + i_user_id + '" does not exist.');
-		return;
-	}
 	new cgru_Dialog({"handle":'ad_DeleteUser',
 		"name":'users',"title":'Delete User',"info":'Enter user login name to <b>delete</b>:'});
 }
 function ad_DeleteUser( i_user_id)
 {
+	if( g_users[i_user_id] == null )
+	{
+		c_Error('User "' + i_user_id + '" does not exist.');
+		return;
+	}
 	n_Request({"send":{"disableuser":{"uid":i_user_id}},"func":ad_ChangesFinished,
 		"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" deleted.'});
 }
