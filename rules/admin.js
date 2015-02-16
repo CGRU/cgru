@@ -11,6 +11,8 @@ ad_states.notart    = {"short":'NA',"label":'NotArt',"tooltip":'Not an artist.'}
 ad_states.passwd    = {"short":'PS',"label":'Passwd',"tooltip":'Can change password.'};
 ad_states.playlist  = {"short":'PL',"label":'Playlist',"tooltip":'Can edit playlist.'};
 ad_states.assignart = {"short":'AA',"label":'AssignArt',"tooltip":'Can assign artists.'};
+ad_states.edittasks = {"short":'TS',"label":'EditTasks',"tooltip":'Can edit tasks.'};
+ad_states.editbody  = {"short":'BD',"label":'EditBody',"tooltip":'Can edit body.'};
 
 function ad_Init()
 {

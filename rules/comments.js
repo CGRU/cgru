@@ -243,6 +243,8 @@ Comment.prototype.init = function()
 		// Edit button only for admins or a comment owner:
 		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
 			this.elEdit.style.display = 'block';
+		else
+			this.elEdit.style.display = 'none';
 
 		// If this is a new comment or and own old:
 		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))

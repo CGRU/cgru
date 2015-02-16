@@ -231,15 +231,17 @@ function c_ElDisplayToggle( i_el)
 		i_el.style.display = 'none';
 }
 
-function c_CanAssignArtists( i_user) { return c_IsUserStateSet( i_user,'assignart'); }
-function c_CanEditPlaylist(  i_user) { return c_IsUserStateSet( i_user,'playlist' ); }
 function c_IsNotAnArtist(    i_user) { return c_IsUserStateSet( i_user,'notart'   ); }
-function c_IsUserStateSet( i_user, i_state)
+function c_CanEditPlaylist(  i_user) { return c_IsUserStateSet( i_user,'playlist' ); }
+function c_CanAssignArtists( i_user) { return c_IsUserStateSet( i_user,'assignart'); }
+function c_CanEditTasks(     i_user) { return c_IsUserStateSet( i_user,'edittasks'); }
+function c_CanEditBody(      i_user) { return c_IsUserStateSet( i_user,'editbody'); }
+function c_IsUserStateSet(   i_user, i_state)
 {
 	if( i_user == null ) i_user = g_auth_user;
 	if( i_user == null ) return false;
 
-	if((['assignart','playlist']).indexOf( i_state ) != -1 )
+	if((['playlist','assignart','edittasks','editbody']).indexOf( i_state ) != -1 )
 		if((['admin','coord','user']).indexOf( i_user.role ) != -1 ) return true;
 
 	if( i_user.states == null ) return false;

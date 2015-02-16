@@ -541,22 +541,25 @@ Status.prototype.edit = function( i_args)
 	this.elEdit.appendChild( this.elEdit_tasks);
 	this.elEdit_tasks.classList.add('edit_tasks');
 
-	var elTasksPanel = document.createElement('div');
-	this.elEdit_tasks.appendChild( elTasksPanel);
+	if( c_CanEditTasks())
+	{
+		var elTasksPanel = document.createElement('div');
+		this.elEdit_tasks.appendChild( elTasksPanel);
 
-	var el = document.createElement('div');
-	elTasksPanel.appendChild( el);
-	el.textContent = 'Add';
-	el.classList.add('button');
-	el.style.cssFloat = 'right';
-	el.m_status = this;
-	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
+		var el = document.createElement('div');
+		elTasksPanel.appendChild( el);
+		el.textContent = 'Add';
+		el.classList.add('button');
+		el.style.cssFloat = 'right';
+		el.m_status = this;
+		el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
 
-	var el = document.createElement('div');
-	elTasksPanel.appendChild( el);
-	el.textContent = 'Tasks:';
+		var el = document.createElement('div');
+		elTasksPanel.appendChild( el);
+		el.textContent = 'Tasks:';
 
-	this.editTasksShow();
+		this.editTasksShow();
+	}
 
 
 	// Get values:
@@ -1002,7 +1005,7 @@ Status.prototype.editSave = function( i_args)
 			else if( elTask.m_task.tags )
 				task.tags = elTask.m_task.tags;
 
-			if( elTask.m_elArtists.artists)
+			if( elTask.m_elArtists && elTask.m_elArtists.artists)
 			{
 				task.artists = [];
 				elList = elTask.m_elArtists.artists;

@@ -726,7 +726,8 @@ function u_BodyEditCancel( i_text)
 	if( i_text == null ) i_text = u_body_text;
 	$('body_body').innerHTML = i_text;
 
-	$('body_btn_edit').style.display = 'block';
+	if( c_CanEditBody())
+		$('body_btn_edit').style.display = 'block';
 	$('body_btn_edit_cancel').style.display = 'none';
 	$('body_panel').style.display = 'block';
 	$('body_panel_edit').style.display = 'none';
