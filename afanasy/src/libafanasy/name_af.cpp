@@ -307,10 +307,10 @@ bool af::addUniqueToVect( std::vector<int> & o_vect, int i_value)
 	return true;
 }
 
-int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
+int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags)
 {
 //printf("af::getReadyTaskNumber:\n");
-	for( int task = i_startFrom; task < i_quantity; task++)
+	for( int task = 0; task < i_quantity; task++)
 	{
 		if( false == (flags & af::BlockData::FNonSequential))
 		{
@@ -335,7 +335,7 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 		}
 
 //printf(" task=%d, powered=%lld\n", task, powered);
-		for( int64_t i = i_startFrom; i <= powered; i++)
+		for( int64_t i = 0; i <= powered; i++)
 		{
 			int index = i;
 			if( false == nodivision_needed )
