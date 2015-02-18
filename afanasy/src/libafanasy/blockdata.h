@@ -36,8 +36,7 @@ public:
 		FMultiHost        = 1 << 2,
 		FMasterOnSlave    = 1 << 3,
 		FDependSubTask    = 1 << 4,
-		FNonSequential    = 1 << 5,
-		FGenThumbnails    = 1 << 6
+		FNonSequential    = 1 << 5
 	};
 
 	static const char DataMode_Progress[];
@@ -66,7 +65,8 @@ public:
 	TaskExec * genTask( int num) const;
 
 	bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL ) const; ///< Generate fisrt and last frame numbers for \c num task.
-	int calcTaskNumber( long long i_frame, bool & o_inValidRange) const;
+	int calcTaskNumber( long long i_frame, bool & o_valid_range) const;
+	int getReadyTaskNumber( TaskProgress ** i_tp);
 	const std::string genTaskName( int num, long long * fstart = NULL, long long * fend = NULL ) const;
 	const std::string genCommand(  int num, long long * fstart = NULL, long long * fend = NULL ) const;
 	const std::vector<std::string> genFiles(int num, long long * fstart = NULL, long long * fend = NULL ) const;
@@ -83,8 +83,6 @@ public:
 	inline bool isSequential()    const { return false == (m_flags & FNonSequential);}
 	inline bool isNonSequential() const { return m_flags & FNonSequential; }
 	inline void setNonSequential( bool i_value ) { if(i_value) m_flags |= FNonSequential; else m_flags &= (~FNonSequential);}
-
-	inline void setGenTHumbnails( bool i_value ) { if(i_value) m_flags |= FGenThumbnails; else m_flags &= (~FGenThumbnails);}
 
 	inline void setParserCoeff( int value ) { m_parser_coeff = value; }
 

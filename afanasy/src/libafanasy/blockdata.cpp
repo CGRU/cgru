@@ -170,10 +170,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_bool("non_sequential", non_sequential, i_object, io_changes);
 	setNonSequential( non_sequential);
 
-	bool gen_thumbnails = false;
-	jr_bool("gen_thumbnails", gen_thumbnails, i_object, io_changes);
-	setGenTHumbnails( gen_thumbnails);
-
 	if( m_capacity < 1 )
 		m_capacity = 1;
 
@@ -858,7 +854,7 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
    return true;
 }
 
-int BlockData::calcTaskNumber( long long i_frame, bool & o_inValidRange) const
+int BlockData::calcTaskNumber( long long i_frame, bool & o_valid_range) const
 {
    int o_tasknum = i_frame - m_frame_first;
 
@@ -867,19 +863,19 @@ int BlockData::calcTaskNumber( long long i_frame, bool & o_inValidRange) const
 
    if( m_frames_inc > 1 ) o_tasknum = o_tasknum / m_frames_inc;
 
-   o_inValidRange = true;
+   o_valid_range = true;
    if( o_tasknum < 0 )
    { 
       o_tasknum = 0;
-      o_inValidRange = false;
+      o_valid_range = false;
    }
    if( o_tasknum >= m_tasks_num )
    {
       o_tasknum = m_tasks_num - 1;
-      o_inValidRange = false;
+      o_valid_range = false;
    }
    if(( i_frame < m_frame_first ) || ( i_frame > m_frame_last ))
-		o_inValidRange = false;
+		o_valid_range = false;
 
    return o_tasknum;
 }
@@ -899,6 +895,55 @@ void BlockData::setFramesPerTask( long long perTask)
    m_frames_per_task = perTask;
 }
 
+int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
+{
+//printf("af::getReadyTaskNumber:\n");
+	for( int task = 0; task < m_tasks_num; task++)
+	{
+		if( isSequential())
+		{
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+			else
+				continue;
+		}
+
+		int64_t powered = 1;
+		while( powered < task )
+			powered <<= 1;
+
+		bool nodivision_needed = false;
+		if( powered >= m_tasks_num )
+		{
+			bool nodivision_needed = true;
+			powered = m_tasks_num;
+		}
+
+//printf(" task=%d, powered=%lld\n", task, powered);
+		for( int64_t i = 0; i <= powered; i++)
+		{
+			int index = i;
+			if( false == nodivision_needed )
+				index = int( i * int64_t(m_tasks_num) / powered );
+
+			if( index >= m_tasks_num )
+				index = m_tasks_num - 1;
+
+			if( i_tp[index]->isSolved()) continue;
+			i_tp[index]->setSolved();
+
+			if( i_tp[index]->state & AFJOB::STATE_READY_MASK )
+				return index;
+		}
+	}
+
+	// No ready tasks found:
+//printf("No ready tasks found.\n");
+	return -1;
+}
 const std::string BlockData::genCommand( int num, long long * fstart, long long * fend) const
 {
    std::string str;
