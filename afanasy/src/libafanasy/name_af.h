@@ -140,7 +140,6 @@ namespace af
 	const std::string base64encode( const char * i_data, int i_size);
 
 
-	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags);
 	const std::string fillNumbers( const std::string & pattern, long long start, long long end);
 	const std::string replaceArgs( const std::string & pattern, const std::string & arg);
 

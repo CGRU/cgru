@@ -15,9 +15,7 @@ CmdNumericCmd::CmdNumericCmd()
 	setInfo("Test numeric command fill with numbers.");
 	setHelp("numcmd [command] [number1] [number2] Fill numeric command with two provided numbers.");
 }
-
 CmdNumericCmd::~CmdNumericCmd(){}
-
 bool CmdNumericCmd::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string command = argv[0];
@@ -29,47 +27,6 @@ bool CmdNumericCmd::v_processArguments( int argc, char** argv, af::Msg &msg)
 	return true;
 }
 
-CmdNumericGen::CmdNumericGen()
-{
-	setCmd("numgen");
-	setArgsCount(1);
-	setInfo("Generate tasks numbers sequence.");
-	setHelp("numgen [quantity] Generate tasks numbers sequence.");
-}
-
-CmdNumericGen::~CmdNumericGen(){}
-
-bool CmdNumericGen::v_processArguments( int argc, char** argv, af::Msg &msg)
-{
-	int quantity = atoi(argv[0]);
-	if( quantity < 1 )
-	{
-		AFERROR("Quantity should be a number greater that zero.")
-		return false;
-	}
-
-	printf("Tasks quantity = %d:\n", quantity);
-
-	af::TaskProgress ** tp = new af::TaskProgress * [quantity];
-	for( int i = 0; i < quantity; i++)
-	{
-		tp[i] = new af::TaskProgress;
-		tp[i]->state = AFJOB::STATE_READY_MASK;
-	}
-
-	int task;
-	while(( task = af::getReadyTaskNumber( quantity, tp, af::BlockData::FNonSequential)) != -1)
-	{
-		std::cout << " " << task;
-	}
-	std::cout << std::endl;
-
-	for( int i = 0; i < quantity; i++)
-		delete tp[i];
-	delete [] tp;
-
-	return true;
-}
 
 CmdNumeric::CmdNumeric()
 {
@@ -78,9 +35,7 @@ CmdNumeric::CmdNumeric()
 	setInfo("Generate numeric tasks, find task by frame.");
 	setHelp("num [command] [start] [end] [pertask] [increment(by)] [nonsequential] [frame to find] Generate numeric tasks, find task by frame.");
 }
-
 CmdNumeric::~CmdNumeric(){}
-
 bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	// Get arguments:
@@ -119,7 +74,6 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 	// Fill tasks order:
 	int * tasks_order = new int[block.getTasksNum()];
 	int task; int order = 0;
-//	while(( task = af::getReadyTaskNumber( block.getTasksNum(), tp, af::BlockData::FNonSequential)) != -1)
 	while(( task = block.getReadyTaskNumber( tp)) != -1)
 	{
 		if( task < 0 )

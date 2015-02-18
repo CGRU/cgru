@@ -907,8 +907,8 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
 
 			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
 				return task;
-			else
-				continue;
+
+			continue;
 		}
 
 		int64_t powered = 1;

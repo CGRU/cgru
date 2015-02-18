@@ -569,8 +569,12 @@ Monitor.prototype.delNodes = function( i_ids)
 				if( this.panel_item == this.items[i] )
 					this.resetPanels();
 
+				if( this.items[i].selected )
+					this.selected_items.splice( this.selected_items.indexOf( this.items[i]), 1);
+
 				this.elList.removeChild( this.items[i].element);
 				this.items.splice(i,1);
+
 				break;
 			}
 }

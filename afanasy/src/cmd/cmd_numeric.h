@@ -10,13 +10,6 @@ public:
 	bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };
 
-class CmdNumericGen : public Cmd
-{
-public:
-	CmdNumericGen();
-	~CmdNumericGen();
-	bool v_processArguments( int argc, char** argv, af::Msg &msg);
-};
 
 class CmdNumericCmd : public Cmd
 {
