@@ -866,20 +866,12 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 		this.selectAll( false);
 	this.setSelected( i_el.item, true);
 
-	if(( i_el.item.onContextMenu == null ) && ( i_el.item.constructor.actions == null ))
-		return false;
-
-	var menu = this.createMenu( i_evt,'context');
 	if( i_el.item.onContextMenu )
-		i_el.item.onContextMenu( menu);
-	else
 	{
-		var actions = i_el.item.constructor.actions;
-		for( var i = 0; i < actions.length; i++)
-			if( actions[i].mode == 'context' )
-				this.addMenuItem( menu, actions[i]);
+		var menu = this.createMenu( i_evt,'context');
+		i_el.item.onContextMenu( menu);
+		menu.show();
 	}
-	menu.show();
 
 	return false;
 }
