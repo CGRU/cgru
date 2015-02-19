@@ -58,7 +58,6 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 -depglbl                - wait untill other jobs of any user, satisfying this mask
 -output                 - override output filename
 -images                 - images to preview (img.%04d.jpg)
--image                  - image to preview (img.0000.jpg)
 -exec                   - customize command executable.
 -extrargs               - add to command extra arguments.
 -simulate               - enable simulation
@@ -133,7 +132,6 @@ if __name__ == '__main__':
 	dependglobal = ''
 	output = ''
 	images = ''
-	image = ''
 	extrargs = ''
 	blocktype = ''
 	blockparser = ''
@@ -346,13 +344,6 @@ if __name__ == '__main__':
 			if i == argsl:
 				break
 			output = argsv[i]
-			continue
-
-		if arg == '-image':
-			i += 1
-			if i == argsl:
-				break
-			image = argsv[i]
 			continue
 
 		if arg == '-type':
@@ -854,7 +845,14 @@ if __name__ == '__main__':
 
 	# Create a Job:
 	job = af.Job(name)
+
 	job.setPriority(priority)
+
+	job.setFolder('input', os.path.dirname(scene))
+
+	if images != '':
+		job.setFolder('output', os.path.dirname(images))
+
 	if maxruntasks != -1:
 		job.setMaxRunningTasks(maxruntasks)
 
