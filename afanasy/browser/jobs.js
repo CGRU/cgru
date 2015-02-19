@@ -307,37 +307,6 @@ function JobBlock( i_elParent, i_block)
 	this.element.classList.add('jobblock');
 
 	this.elTasks = cm_ElCreateText( this.element);
-	var tasks = 't' + this.tasks_num;
-	var tasks_title = 'Block tasks:'
-	if( this.params.numeric )
-	{
-		tasks_title += ' Numeric:';
-		tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
-		tasks_title += ' from ' + this.params.frame_first + ' to ' + this.params.frame_last;
-		if( this.params.frames_per_task > 1 )
-		{
-			tasks += ':' + this.params.frames_per_task;
-			tasks_title += ' per ' + this.params.frames_per_task;
-		}
-		if( this.params.frames_inc > 1 )
-		{
-			tasks += '/' + this.params.frames_inc;
-			tasks_title += ' by ' + this.params.frames_inc;
-		}
-		tasks += ')';
-		tasks_title += '.';
-	}
-	else
-	{
-		tasks_title += ' Not numeric.';
-	}
-	tasks += ':';
-	this.elTasks.textContent = tasks;
-	this.elTasks.title = tasks_title;
-
-	this.elNonSeq = cm_ElCreateText( this.element, 'Non-Sequential Tasks Running');
-	this.elNonSeq.textContent = '(N-S)';
-
 	this.elName = cm_ElCreateText( this.element, 'Block Name');
 	this.elDepends = cm_ElCreateText( this.element);
 
@@ -624,9 +593,38 @@ JobBlock.prototype.update = function( i_displayFull)
 	{
 		this.elName.textContent = this.params.name;
 
-		this.elNonSeq.style.display = this.params.non_sequential ? 'inline':'none';
-//		if( this.params.non_sequential ) this.elNonSeq.style.display = 'none';
-//		else this.elNonSeq.textContent = '';
+		var tasks = 't' + this.tasks_num;
+		var tasks_title = 'Block tasks:'
+		if( this.params.numeric )
+		{
+			tasks_title += ' Numeric:';
+			tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
+			tasks_title += '\nFrame First: ' + this.params.frame_first;
+			tasks_title += '\nFrame Last: ' + this.params.frame_last;
+			if( this.params.frames_inc > 1 )
+			{
+				tasks += '/' + this.params.frames_inc;
+				tasks_title += '\nIncrement: ' + this.params.frames_inc;
+			}
+			if( this.params.frames_per_task > 1 )
+			{
+				tasks += ':' + this.params.frames_per_task;
+				tasks_title += '\nFrames Per Task: ' + this.params.frames_per_task;
+			}
+			if(( this.params.sequential != null ) && ( this.params.sequential != 1 ))
+			{
+				tasks += '%' + this.params.sequential;
+				tasks_title += '\nSequential: ' + this.params.sequential;
+			}
+			tasks += ')';
+		}
+		else
+		{
+			tasks_title += ' Not numeric.';
+		}
+		tasks += ':';
+		this.elTasks.textContent = tasks;
+		this.elTasks.title = tasks_title;
 
 		if( this.service != this.params.service )
 		{
@@ -1106,14 +1104,14 @@ JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Th
 
 JobBlock.params = {};
 JobBlock.params.capacity                   = {"type":'num', "label":'Capacity'};
+JobBlock.params.sequential                 = {"type":'num', "label":'Sequential'};
+JobBlock.params.max_running_tasks          = {"type":'num', "label":'Max Runnig Tasks'};
+JobBlock.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
 JobBlock.params.errors_retries             = {"type":'num', "label":'Errors Retries'};
 JobBlock.params.errors_avoid_host          = {"type":'num', "label":'Errors Avoid Host'};
 JobBlock.params.errors_task_same_host      = {"type":'num', "label":'Errors Task Same Host'};
 JobBlock.params.errors_forgive_time        = {"type":'hrs', "label":'Errors Forgive Time'};
 JobBlock.params.tasks_max_run_time         = {"type":'hrs', "label":'Tasks Max Run Time'};
-JobBlock.params.non_sequential             = {"type":'bl1', "label":'Non-Sequential'};
-JobBlock.params.max_running_tasks          = {"type":'num', "label":'Max Runnig Tasks'};
-JobBlock.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
 JobBlock.params.hosts_mask                 = {"type":'reg', "label":'Hosts Mask'};
 JobBlock.params.hosts_mask_exclude         = {"type":'reg', "label":'Exclude Hosts Mask'};
 JobBlock.params.depend_mask                = {"type":'reg', "label":'Depend Mask'};

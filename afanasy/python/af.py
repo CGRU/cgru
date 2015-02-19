@@ -169,9 +169,24 @@ class Block:
 		self.data["frames_per_task"] = pertask
 		self.data["frames_inc"] = increment
 
-	# def setFlags(self, flags):
 
-	# self.data['flags'] = flags
+	def setFramesPerTask(self, value):
+		"""Missing DocString
+
+		:param value:
+		:return:
+		"""
+		self.data["frames_per_task"] = value
+
+
+	def setSequential(self, value):
+		"""Missing DocString
+
+		:param value:
+		:return:
+		"""
+		self.data["sequential"] = value
+
 
 	def setCapacity(self, capacity):
 		"""Missing DocString
@@ -272,14 +287,6 @@ class Block:
 		:return:
 		"""
 		self.data["tasks_name"] = value
-
-	def setFramesPerTask(self, value):
-		"""Missing DocString
-
-		:param value:
-		:return:
-		"""
-		self.data["frames_per_task"] = value
 
 	def setParserCoeff(self, value):
 		"""Missing DocString

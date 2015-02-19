@@ -34,6 +34,7 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 100                     - (R) Last frame to render
 -by 1                   - Frames increment, default = 1
 -fpt 1                  - Frames per task, default = 1
+-seq 1                  - Frames sequential task solving, default = 1
 -pwd                    - Working directory, if not set current will be used.
 -name                   - Job name, if not set scene name will be used.
 -proj                   - Project ( maya project ).
@@ -110,6 +111,7 @@ if __name__ == '__main__':
 	e = integer(argsv[3])
 	fpt = 1
 	by = 1
+	seq = 1
 	pwd = os.getenv('PWD', os.getcwd())
 	file_ = ''
 	proj = ''
@@ -177,6 +179,13 @@ if __name__ == '__main__':
 			if i == argsl:
 				break
 			fpt = integer(argsv[i])
+			continue
+
+		if arg == '-seq':
+			i += 1
+			if i == argsl:
+				break
+			seq = integer(argsv[i])
 			continue
 
 		if arg == '-pwd':
@@ -789,6 +798,8 @@ if __name__ == '__main__':
 
 		block.setWorkingDirectory(pwd)
 		block.setNumeric(s, e, fpt, by)
+		if seq != 1:
+			block.setSequential( seq)
 
 		if scenetype == 'max':
 			block.setCommand(cmd, False, False)

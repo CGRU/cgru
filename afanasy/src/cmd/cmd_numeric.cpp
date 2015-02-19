@@ -33,7 +33,7 @@ CmdNumeric::CmdNumeric()
 	setCmd("num");
 	setArgsCount(6);
 	setInfo("Generate numeric tasks, find task by frame.");
-	setHelp("num [command] [start] [end] [pertask] [increment(by)] [nonsequential] [frame to find] Generate numeric tasks, find task by frame.");
+	setHelp("num [command] [start] [end] [pertask] [increment(by)] [sequential] [frame to find] Generate numeric tasks, find task by frame.");
 }
 CmdNumeric::~CmdNumeric(){}
 bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -41,11 +41,11 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 	// Get arguments:
 	std::string command = argv[0];
 
-	long long start  = af::stoi(argv[1]);
-	long long end    = af::stoi(argv[2]);
-	long long fpt    = af::stoi(argv[3]);
-	long long inc    = af::stoi(argv[4]);
-	long long nonseq = af::stoi(argv[5]);
+	long long start = af::stoi(argv[1]);
+	long long end   = af::stoi(argv[2]);
+	long long fpt   = af::stoi(argv[3]);
+	long long inc   = af::stoi(argv[4]);
+	long long seq   = af::stoi(argv[5]);
 
 	bool find_frame_on = argc > 6;
 	long long find_frame = 0;
@@ -53,7 +53,7 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 		find_frame = af::stoi(argv[6]);
 
 	// Print arguments:
-	std::cout << "str:" << start << " end:" << end << " fpt: " << fpt << " inc:" << inc << " nonseq:" << nonseq;
+	std::cout << "first:" << start << " last:" << end << " fpt: " << fpt << " finc:" << inc << " seq:" << seq;
 	if( find_frame_on )
 		std::cout << " find:" << find_frame;
 	std::cout << std::endl;
@@ -62,7 +62,7 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 	af::BlockData block;
 	block.setCommand( command);
 	block.setNumeric( start, end, fpt, inc);
-	block.setNonSequential( true);
+	block.setSequential( seq);
 
 	// Create progresses:
 	af::TaskProgress ** tp = new af::TaskProgress * [block.getTasksNum()];

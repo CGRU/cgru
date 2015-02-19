@@ -841,6 +841,7 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("Job::solve: %s:\n", m_name.c_str());
+	// Prepare for the new solving (reset previous solvind stored data):
 	for( int b = 0; b < m_blocks_num; b++)
     {
         int numtasks = m_blocks_data[b]->getTasksNum();

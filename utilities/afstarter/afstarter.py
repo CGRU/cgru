@@ -284,6 +284,7 @@ class Dialog(QtGui.QWidget):
 							   QtCore.SIGNAL('editingFinished()'),
 							   self.evaluate)
 		lFrames.addWidget(self.fields['framestart'])
+
 		self.fields['frameend'] = QtGui.QSpinBox(self)
 		self.fields['frameend'].setRange(-1000000000, 1000000000)
 		self.fields['frameend'].setValue(1)
@@ -291,20 +292,33 @@ class Dialog(QtGui.QWidget):
 							   QtCore.SIGNAL('editingFinished()'),
 							   self.evaluate)
 		lFrames.addWidget(self.fields['frameend'])
-		lFrames.addWidget(QtGui.QLabel('by', self))
+
+		lFrames.addWidget(QtGui.QLabel('By:', self))
 		self.fields['frameby'] = QtGui.QSpinBox(self)
 		lFrames.addWidget(self.fields['frameby'])
 		QtCore.QObject.connect(self.fields['frameby'],
 							   QtCore.SIGNAL('editingFinished()'),
 							   self.evaluate)
 		self.fields['frameby'].setRange(1, 1000000000)
-		lFrames.addWidget(QtGui.QLabel('per task', self))
+
+		lFrames.addWidget(QtGui.QLabel('FPT:', self))
 		self.fields['framespt'] = QtGui.QSpinBox(self)
 		lFrames.addWidget(self.fields['framespt'])
 		QtCore.QObject.connect(self.fields['framespt'],
 							   QtCore.SIGNAL('editingFinished()'),
 							   self.evaluate)
 		self.fields['framespt'].setRange(1, 1000000000)
+		self.fields['framespt'].setToolTip('Frames per task.')
+
+		lFrames.addWidget(QtGui.QLabel('Seq:', self))
+		self.fields['frameseq'] = QtGui.QSpinBox(self)
+		lFrames.addWidget(self.fields['frameseq'])
+		QtCore.QObject.connect(self.fields['frameseq'],
+							   QtCore.SIGNAL('editingFinished()'),
+							   self.evaluate)
+		self.fields['frameseq'].setRange(-1000000, 1000000)
+		self.fields['frameseq'].setValue(1)
+		self.fields['frameseq'].setToolTip('Solve task with this step at first.')
 
 
 		# Node / Camera / Take:
@@ -936,6 +950,7 @@ class Dialog(QtGui.QWidget):
 		cmd += ' %d' % self.fields['frameend'].value()
 		cmd += ' -by %d' % self.fields['frameby'].value()
 		cmd += ' -fpt %d' % self.fields['framespt'].value()
+		cmd += ' -seq %d' % self.fields['frameseq'].value()
 		if not str(self.fields['node'].text()) == '':
 			cmd += ' -node "%s"' % self.fields['node'].text()
 
