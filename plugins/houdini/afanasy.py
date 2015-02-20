@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import hou
 import time
 
@@ -204,6 +205,23 @@ class BlockParameters:
 							)
 							return
 
+		# Try to create output folder:
+		if afnode.parm('check_output_folder').eval():
+			folder = os.path.dirname( self.preview)
+			if not os.path.isdir( folder):
+				if hou.ui.displayMessage( folder, buttons=('Create','Abort'),default_choice=0,close_choice=1,
+					title='Output Folder Does Not Exist',details=folder) == 0:
+					try:
+						os.mkdirs(folder)
+					except:
+						pass
+					if not os.path.isdir( folder):
+						hou.ui.displayMessage( folder, buttons=('Abort'),default_choice=0,close_choice=1,
+							title='Can`t Create Output Folder',details=folder)
+						return
+				else:
+					return
+
 		self.valid = True
 
 	def genBlock(self, hipfilename):
@@ -318,8 +336,14 @@ class BlockParameters:
 		if self.hosts_mask_exclude != '':
 			job.setHostsMaskExclude(self.hosts_mask_exclude)
 
+		images = None
 		for blockparam in blockparams:
 			job.blocks.append(blockparam.genBlock(tmphip))
+
+			# Set ouput folder from the first block with images to preview:
+			if images is None and blockparam.preview != '':
+				images = blockparam.preview
+				job.setFolder('output', os.path.dirname( images))
 
 		job.setCmdPost('deletefiles "%s"' % tmphip)
 
