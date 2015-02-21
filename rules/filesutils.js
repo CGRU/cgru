@@ -496,21 +496,24 @@ function fu_PutMultiDo( i_wnd)
 //console.log(JSON.stringify(job));
 }
 //
-// ########################### Archivate: ################################# //
+// ########################### Archive: ################################# //
 //
 fu_arch_params = {};
-fu_arch_params.dest = {"label":'Destination'};
-fu_arch_params.split = {"tooltip":'Split archive size.'};
-function fu_Archivate( i_args)
+fu_arch_params.dest = {'label':'Destination'};
+fu_arch_params.split = {'tooltip':'Split archive size.'};
+fu_arch_params.af_capacity = {'label':'Capacity','tooltip':'Afanasy tasks capacity.','width':'33%'};
+fu_arch_params.af_maxtasks = {'label':'Max Run Tasks','tooltip':'Maximum running tasks.','width':'33%','lwidth':'150px'};
+fu_arch_params.af_perhost = {'label':'Per Host','tooltip':'Maximum running tasks per host.','default':'-1','width':'33%'};
+function fu_Archive( i_args)
 {
 //console.log( JSON.stringify( i_args));
-	var title = i_args.archive ? 'Archivate' : 'Extract Archive';
-	var wnd = new cgru_Window({"name":'archivate',"title":title});
+	var title = i_args.archive ? 'Archive' : 'Extract Archive';
+	var wnd = new cgru_Window({"name":'archive',"title":title});
 	wnd.m_args = i_args;
 
 	var params = {};
 
-	gui_Create( wnd.elContent, fu_arch_params);
+	gui_Create( wnd.elContent, fu_arch_params,[RULES.archive]);
 	if( i_args.archive )
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'type',"value":RULES.archive.default,"label":'Type:',"keys":RULES.archive.types});
 
@@ -575,13 +578,14 @@ function fu_ArchivateProcessGUI( i_wnd)
 	}
 
 	job.name += ' ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
-	job.max_running_tasks = RULES.archive.af_maxtasks;
+	job.max_running_tasks = parseInt( params.af_maxtasks);
+	job.max_running_tasks_per_host = parseInt( params.af_perhost);
 
 	var block = {};
 	block.name = c_PathDir( paths[0]);
 	block.service = RULES.archive.af_service;
 	block.parser = RULES.archive.af_parser;
-	block.capacity = RULES.archive.af_capacity;
+	block.capacity = parseInt( params.af_capacity);
 	block.tasks = [];
 	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(paths[0]), true);
 	job.blocks = [block];

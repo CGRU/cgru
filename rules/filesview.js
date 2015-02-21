@@ -134,7 +134,7 @@ genetate thumbnails.";
 	el.style.backgroundImage = 'url(rules/icons/archive.png)';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.archivate();}
-	el.title = 'Archivate foles and folders';
+	el.title = 'Archive foles and folders';
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
@@ -988,7 +988,7 @@ FilesView.prototype.archivate = function()
 	if( args.paths.length < 1 )
 		c_Error('No items selected.');
 	else
-		fu_Archivate( args);
+		fu_Archive( args);
 }
 
 FilesView.prototype.getItemPath = function( i_path)
