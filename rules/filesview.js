@@ -512,6 +512,10 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	}
 	elItem.classList.add( type);
 
+	// Drag&Drop:
+	elItem.draggable = 'true';
+	elItem.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
+
 	// Anchor Icon:
 	var elAnchor = null;
 	if( i_isFolder )
@@ -532,6 +536,9 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			elAnchor.textContent = '@';
 	}
 	elAnchor.href = g_GetLocationArgs({"fv_Goto":path});
+//	elAnchor.m_path = path;
+//	elAnchor.draggable = 'true';
+//	elAnchor.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
 
 	// Thumbnail:
 	if( this.has_thumbs )

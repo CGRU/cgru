@@ -402,6 +402,15 @@ function c_CreateOpenButton( i_el, i_path, i_type)
 	return el;
 }
 
+function c_FileDragStart( i_evt, i_path)
+{
+	var el = i_evt.currentTarget;
+	var path = cgru_PM('/' + RULES.root + i_path);
+	var dt = i_evt.dataTransfer;
+	dt.setData('text/plain','file://' + path);
+	dt.setData('text/uri-list','file://' + path);
+}
+
 function c_GetRuFilePath( i_file ) { return RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + i_file; }
 function c_RuFileExists( i_file)
 {
