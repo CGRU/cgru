@@ -174,7 +174,7 @@
 {
 	"format":"1280x720",
 	"fps":"25",
-	"codec":"photojpg_high",
+	"codec":"h264_mid",
 	"container":"DEFAULT",
 	"colorspace":"auto",
 	"template":"dailies_withlogo",
@@ -241,7 +241,11 @@
 "cut":{
 	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
-	"af_capacity":100
+	"af_capacity":500,
+	"af_maxtasks":10,
+	"af_perhost":-1,
+	"af_pertask":100,
+	"af_maxruntime":120
 },
 
 "put":{

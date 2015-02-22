@@ -631,7 +631,12 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 d_cutparams = {};
 d_cutparams.cut_name = {};
 d_cutparams.input = {};
-d_cutparams.fps = {"label":'FPS'};
+d_cutparams.fps = {"label":'FPS','width':'50%'};
+d_cutparams.af_pertask = {"label":'Frames Per Task','width':'50%','lwidth':'140px'};
+d_cutparams.af_capacity = {"label":'Capacity','width':'25%'};
+d_cutparams.af_maxtasks = {"label":'Max Run Tasks','width':'25%','lwidth':'120px'};
+d_cutparams.af_perhost = {"label":'Max Taks Per Host','width':'25%','lwidth':'140px'};
+d_cutparams.af_maxruntime = {"label":'Max Run Time','width':'25%','lwidth':'120px'};
 d_cutparams.output = {};
 
 function d_MakeCut( i_args)
@@ -713,7 +718,13 @@ function d_CutProcessGUI( i_wnd, i_test)
 	cmd += ' -r "' + params.format + '"';
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
-	cmd += ' --afcapacity ' + RULES.cut.af_capacity;
+
+	cmd += ' --afcapacity ' + parseInt( params.af_capacity);
+	cmd += ' --afmaxtasks ' + parseInt( params.af_maxtasks);
+	cmd += ' --afperhost ' + parseInt( params.af_perhost);
+	cmd += ' --afpertask ' + parseInt( params.af_pertask);
+	cmd += ' --afmaxruntime ' + parseInt( params.af_maxruntime);
+
 	cmd += ' -o "' + cgru_PM('/' + RULES.root + params.output, true) + '"';
 	if( i_test ) cmd += ' -t';
 
@@ -742,12 +753,21 @@ function d_CutFinished( i_data, i_args)
 	{
 		var el = document.createElement('div');
 		elResults.appendChild( el);
+		var text = '';
 		for( var msg in cut[i])
 		{
-			el.textContent = msg + ': ' + cut[i][msg];
-			if(( msg == 'error' ) || ( cut[i][msg].indexOf('error') != -1 ))
-				el.style.color = '#F42';
+			if( msg == 'sequence')
+			{
+				text = cut[i][msg] + ': ' + cut[i].first + ' - ' + cut[i].last + ' = ' + cut[i].count;
+				break;
+			}
+			text += ' ' + msg + ': ' + cut[i][msg];
 		}
+
+		if( text.indexOf('error') != -1 )
+			el.style.color = '#F42';
+
+		el.textContent = text;
 	}
 
 //	i_wnd.destroy();
