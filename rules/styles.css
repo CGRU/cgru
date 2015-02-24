@@ -482,14 +482,12 @@ bottom: 38px;
 padding: 10px;
 overflow-y: scroll;
 }
-#content #panel { padding: 2px;}
-#content #panel div {
-font-size: 14px;
-float: left;
-text-align: center;
-margin: 0px 2px;
-padding: 1px 8px;
-}
+
+#annotations { float: left; padding: 6px; }
+#annotations > div { float: left; margin: 0px 4px; }
+#annotations > div * { margin: 0px 2px; }
+#annotations .name { float: left; }
+#annotations .text { float: right; }
 
 #status_percentage, #status_annotation, #status_artists, #status_tags, #status_finish
 { margin: 0px 5px; float:left;}

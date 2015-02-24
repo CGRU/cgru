@@ -81,6 +81,23 @@ function u_InitAuth()
 
 function u_Process()
 {
+	if( RULES.annotations )
+		for( var name in RULES.annotations )
+		{
+			var elDiv = document.createElement('div');
+			$('annotations').appendChild( elDiv);
+
+			var el = document.createElement('div');
+			elDiv.appendChild( el);
+			el.classList.add('name');
+			el.textContent = name + ':';
+
+			var el = document.createElement('div');
+			elDiv.appendChild( el);
+			el.classList.add('text');
+			el.textContent = RULES.annotations[name];
+		}
+
 	if( c_RuFileExists(RULES.thumbnail.filename))
 	{
 		u_el.thumbnail.src = c_GetRuFilePath(RULES.thumbnail.filename);
@@ -124,6 +141,7 @@ function u_Process()
 
 function u_Finish()
 {
+	$('annotations').textContent = '';
 	u_el.thumbnail.style.display = 'none';
 
 	st_Finish();

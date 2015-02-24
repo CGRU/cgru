@@ -266,6 +266,16 @@ function g_WalksReceived( i_data, i_args)
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
+		// Store parent status annotations:
+		if( i && RULES.status && RULES.status.annotation )
+		{
+			if( RULES.annotations == null )
+				RULES.annotations = {};
+			var name = c_PathBase( walk.paths[i-1] )
+			if( name == '' ) name = '/';
+			RULES.annotations[name] = RULES.status.annotation;
+		}
+
 		// Unlike other rules, status should not be merged,
 		// it is unique for each location,
 		// no matter what parent folders status is
@@ -275,7 +285,8 @@ function g_WalksReceived( i_data, i_args)
 			return;
 	}
 
-//window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
+//console.log( JSON.stringify( RULES.annotations ));
+//console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
 	g_elCurFolder.classList.add('current');
 
 	if( g_elCurFolder.m_path == '/')
@@ -290,7 +301,7 @@ function g_WalksReceived( i_data, i_args)
 		g_FolderSetStatus( RULES.status);
 	}
 
-	g_NavigatePost()
+	g_NavigatePost();
 }
 
 function g_Goto( i_folder, i_path, i_walk)
