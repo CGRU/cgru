@@ -406,9 +406,12 @@ function c_FileDragStart( i_evt, i_path)
 {
 	var el = i_evt.currentTarget;
 	var path = cgru_PM('/' + RULES.root + i_path);
+	if( cgru_Platform.indexOf('windows') == -1 )
+		path = 'file://' + path;
 	var dt = i_evt.dataTransfer;
-	dt.setData('text/plain','file://' + path);
-	dt.setData('text/uri-list','file://' + path);
+	dt.setData('text/plain', path);
+	dt.setData('text/uri-list', path);
+//console.log(path);
 }
 
 function c_GetRuFilePath( i_file ) { return RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + i_file; }
