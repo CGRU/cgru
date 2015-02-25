@@ -31,6 +31,10 @@ extern bool AFRunning;
 void threadAcceptClient( void * i_arg );
 void threadRunCycle( void * i_args);
 
+#ifdef WINNT
+#define STDERR_FILENO 2
+#endif
+
 //####################### signal handlers ####################################
 void sig_int(int signum)
 {
