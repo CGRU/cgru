@@ -12,6 +12,7 @@ local startFrame = rendStart.frame as integer
 local endFrame = rendEnd.frame as integer
 local byFrame = rendNThFrame
 local taskFrameNumber = 1
+local seqFrameNumber = 1
 
 persistent global AfOutputImage
 persistent global AfUseSceneWDir
@@ -72,6 +73,7 @@ rollout AfanasyDialog "Afanasy"
    spinner endFrameControl "End Frame" range:[0,99999,endFrame] type:#integer scale:1 toolTip:"Last Frame to render."
    spinner byFrameControl "By Frame" range:[1,999,byFrame] type:#integer scale:1 toolTip:"Render every Nth frame."
    spinner taskFrameNumberControl "Frames Per Task" range:[1,999,taskFrameNumber] type:#integer scale:1 toolTip:"Number of frames in one task."
+   spinner seqFrameNumberControl "Sequential" range:[1,999,seqFrameNumber] type:#integer scale:1 toolTip:"Frame sequential tasks solving."
 -- Cameras:
    dropdownlist cameraControl "Override Camera" items:CameraNames toolTip:"Override render camera."
 -- Output image:
@@ -157,8 +159,9 @@ rollout AfanasyDialog "Afanasy"
       cmd += " \"" + maxFilePath + maxFileName + "\""
       cmd += " " + (startFrameControl.value as string)
       cmd += " " + (endFrameControl.value as string)
-      cmd += " -fpt " + (taskFrameNumberControl.value as string)
       cmd += " -by " + (byFrameControl.value as string)
+      cmd += " -fpt " + (taskFrameNumberControl.value as string)
+      cmd += " -seq " + (seqFrameNumberControl.value as string)
       if jobnameControl.text != "" then cmd += " -name \"" + jobnameControl.text + "\""
       if AfPriority > -1 then cmd += " -priority " + (AfPriority as string)
       if AfMaxHosts > -1 then cmd += " -maxhosts " + (AfMaxHosts as string)

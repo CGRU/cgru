@@ -27,9 +27,11 @@ public:
 /// Save string list, perform log file rotation;
 	static void saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename);
 
+	static bool writeFile( const char * data, const int length, const std::string & filename); ///< Write a file
+	inline static bool writeFile( const std::string & i_str, const std::string & i_file_name)
+		{ return writeFile( i_str.c_str(), i_str.size(), i_file_name);}
 	inline static bool writeFile( const std::ostringstream & i_str, const std::string & i_file_name)
 		{ std::string str = i_str.str(); return writeFile( str.c_str(), str.size(), i_file_name);}
-	static bool writeFile( const char * data, const int length, const std::string & filename); ///< Write a file
 
 	static const std::string getStoreDir( const std::string & i_root, int i_id, const std::string & i_name);
 	inline static const std::string getStoreDir( const std::string & i_root, const af::Node & i_node)

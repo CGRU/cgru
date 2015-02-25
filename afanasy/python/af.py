@@ -169,9 +169,24 @@ class Block:
 		self.data["frames_per_task"] = pertask
 		self.data["frames_inc"] = increment
 
-	# def setFlags(self, flags):
 
-	# self.data['flags'] = flags
+	def setFramesPerTask(self, value):
+		"""Missing DocString
+
+		:param value:
+		:return:
+		"""
+		self.data["frames_per_task"] = value
+
+
+	def setSequential(self, value):
+		"""Missing DocString
+
+		:param value:
+		:return:
+		"""
+		self.data["sequential"] = value
+
 
 	def setCapacity(self, capacity):
 		"""Missing DocString
@@ -272,14 +287,6 @@ class Block:
 		:return:
 		"""
 		self.data["tasks_name"] = value
-
-	def setFramesPerTask(self, value):
-		"""Missing DocString
-
-		:param value:
-		:return:
-		"""
-		self.data["frames_per_task"] = value
 
 	def setParserCoeff(self, value):
 		"""Missing DocString
@@ -564,6 +571,22 @@ class Job:
 		if TransferToServer:
 			command = Pathmap.toServer(command)
 		self.data["command_post"] = command
+
+	def setFolder(self, i_name, i_folder, i_transferToServer=True):
+		"""Missing DocString
+
+		:param i_name:
+		:param i_folder:
+		:param i_transferToServer:
+		:return:
+		"""
+		if i_transferToServer:
+			i_folder = Pathmap.toServer(i_folder)
+
+		if not "folders" in self.data:
+			self.data["folders"] = dict()
+
+		self.data["folders"][i_name] = i_folder
 
 	def fillBlocks(self):
 		"""Missing DocString

@@ -191,7 +191,7 @@ function g_NavigatePost()
 
 function g_POST(i_msg)
 {
-	if( ASSET && ASSET.post )
+	if( ASSET && (( ASSET.path == g_CurPath()) || ( ASSET.show_in_subdirectories )) && ASSET.post )
 	{
 		// Asset script should launch post function itself,
 		// as all its data load (GUI construction) can be delayed (async).
@@ -266,6 +266,16 @@ function g_WalksReceived( i_data, i_args)
 
 	for( var i = 0; i < walk.paths.length; i++ )
 	{
+		// Store parent status annotations:
+		if( i && RULES.status && RULES.status.annotation )
+		{
+			if( RULES.annotations == null )
+				RULES.annotations = {};
+			var name = c_PathBase( walk.paths[i-1] )
+			if( name == '' ) name = '/';
+			RULES.annotations[name] = RULES.status.annotation;
+		}
+
 		// Unlike other rules, status should not be merged,
 		// it is unique for each location,
 		// no matter what parent folders status is
@@ -275,7 +285,8 @@ function g_WalksReceived( i_data, i_args)
 			return;
 	}
 
-//window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
+//console.log( JSON.stringify( RULES.annotations ));
+//console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
 	g_elCurFolder.classList.add('current');
 
 	if( g_elCurFolder.m_path == '/')
@@ -290,7 +301,7 @@ function g_WalksReceived( i_data, i_args)
 		g_FolderSetStatus( RULES.status);
 	}
 
-	g_NavigatePost()
+	g_NavigatePost();
 }
 
 function g_Goto( i_folder, i_path, i_walk)
@@ -309,7 +320,7 @@ window.console.log('Path='+g_elCurFolder.m_path);
 window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 */
 	if( g_elCurFolder != u_el.navig )
-	g_OpenFolder( g_elCurFolder );
+		g_OpenFolder( g_elCurFolder );
 	
 	var exists = false;
 	if( g_elCurFolder.m_elFolders )
@@ -325,17 +336,12 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 		}
 	}
 
-	if(( false == exists ) && ( g_elCurFolder.m_dir != null ) && ( i_folder != '' ))
-	{
-//		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-//		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
-		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder});
-		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
-	}
-
+	var dummy = false;
 	if( i_walk.error || i_walk.denied )
-	{
-		g_elCurFolder.classList.add('dummy');
+	{		
+//		g_elCurFolder.classList.add('dummy');
+		dummy = true;
+		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
 	}
 /*	else
 	{
@@ -343,9 +349,20 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 		g_denied = false;
 	}*/
 
+	if(( false == exists ) && ( g_elCurFolder.m_dir != null ) && ( i_folder != '' ))
+	{
+//		if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
+//		g_elCurFolder.m_dir.folders.push( {"name":i_folder});
+
+//		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":true});
+//		c_Info('Dummy folder "'+i_folder+'" pushed: "'+g_elCurFolder.m_path+'"');
+
+		g_elCurFolder = g_AppendFolder( g_elCurFolder, {"name":i_folder,"dummy":dummy});
+	}
+
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+//	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
@@ -387,7 +404,7 @@ function g_OpenFolderDo( i_data, i_args)
 	if( i_data )
 	{
 		el.m_dir = i_data[0];
-		el.m_dir.folders.sort( g_CompareFolders);
+//		el.m_dir.folders.sort( g_CompareFolders);
 	}
 
 	if( el.m_dir.folders == null ) return;
@@ -417,54 +434,59 @@ function g_AppendFolder( i_elParent, i_fobject)
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
 	elFolder.m_fobject = i_fobject;
+	if( i_fobject.dummy )
+		elFolder.classList.add('dummy');
 
-	var elColor = document.createElement('div');
-	elFolder.appendChild( elColor);
-	elColor.classList.add('fcolor');
+	var elFBody = document.createElement('div');
+	elFolder.appendChild( elFBody);
+	elFolder.m_elFBody = elFBody;
+	elFBody.classList.add('fbody');
+	if( i_fobject.dummy )
+		elFBody.classList.add('dummy');
 
 	var elName = document.createElement('a');
-	elFolder.appendChild( elName);
+	elFBody.appendChild( elName);
 	elName.classList.add('fname');
 	elName.textContent = folder;
 
 	var elPercent = document.createElement('div');
-	elFolder.appendChild( elPercent);
+	elFBody.appendChild( elPercent);
 	elFolder.m_elPercent = elPercent;
 	elPercent.classList.add('percent');
 	elPercent.classList.add('info');
 
 	var elFrames = document.createElement('div');
-	elFolder.appendChild( elFrames);
+	elFBody.appendChild( elFrames);
 	elFolder.m_elFrames = elFrames;
 	elFrames.classList.add('frames');
 	elFrames.classList.add('info');
 
 	var elSize = document.createElement('div');
-	elFolder.appendChild( elSize);
+	elFBody.appendChild( elSize);
 	elFolder.m_elSize = elSize;
 	elSize.classList.add('size');
 	elSize.classList.add('info');
 
 	var elAnn = document.createElement('div');
-	elFolder.appendChild( elAnn);
+	elFBody.appendChild( elAnn);
 	elFolder.m_elAnn = elAnn;
 	elAnn.classList.add('annotation');
 	elAnn.classList.add('info');
 
 	var elTags = document.createElement('div');
-	elFolder.appendChild( elTags);
+	elFBody.appendChild( elTags);
 	elFolder.m_elTags = elTags;
 	elTags.classList.add('tags');
 	elTags.classList.add('info');
 
 	var elArtists = document.createElement('div');
-	elFolder.appendChild( elArtists);
+	elFBody.appendChild( elArtists);
 	elFolder.m_elArtists = elArtists;
 	elArtists.classList.add('artists');
 	elArtists.classList.add('info');
 
 	elFolder.m_elProgress = document.createElement('div');
-	elFolder.appendChild( elFolder.m_elProgress);
+	elFBody.appendChild( elFolder.m_elProgress);
 	elFolder.m_elProgress.classList.add('progress');
 	elFolder.m_elProgressBar = document.createElement('div');
 	elFolder.m_elProgress.appendChild( elFolder.m_elProgressBar);
@@ -476,7 +498,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 	else
 		elFolder.m_path = i_elParent.m_path+'/'+folder;
 	elName.href = '#' + elFolder.m_path;
-	
+
 	elFolder.onclick = g_FolderOnClick;
 	elFolder.oncontextmenu = function(e){ e.stopPropagation(); g_OpenCloseFolder( e.currentTarget); return false;};
 //	elFolder.ondblclick = g_FolderOnDblClick;
@@ -491,18 +513,41 @@ function g_AppendFolder( i_elParent, i_fobject)
 		elFolder.m_elSize.title = title;
 	}
 
-	// set next element to previous folder:
-	if( i_elParent.m_elFolders && i_elParent.m_elFolders.length )
+	// Search index to place new folder alphabetically:
+	var index = 0;
+	for( i = 0; i < i_elParent.m_elFolders.length; i++, index++)
+		if( g_CompareFolders( elFolder.m_fobject, i_elParent.m_elFolders[i].m_fobject ) < 0 )
+			break;
+
+	// Get parent element body to insert new child (root navig element has no body):
+	var elBody = i_elParent.m_elFBody;
+	if( elBody == null ) elBody = i_elParent;
+
+	// Insert element to parent body:
+	if( i_elParent.m_elFolders.length )
+		elBody.insertBefore( elFolder, i_elParent.m_elFolders[index]);
+	else
+		elBody.appendChild( elFolder);
+
+	// Insert element in a parent array:
+	i_elParent.m_elFolders.splice( index, 0, elFolder);
+
+	// Store element in a global array:
+	g_elFolders[elFolder.m_path] = elFolder;
+
+	// Set next and previous folders:
+	if( index-1 >= 0 )
 	{
-		var elPrev = i_elParent.m_elFolders[i_elParent.m_elFolders.length-1];
+		var elPrev = i_elParent.m_elFolders[index-1];
 		elPrev.m_elNext = elFolder;
 		elFolder.m_elPrev = elPrev;
 	}
-
-	i_elParent.appendChild( elFolder);
-	i_elParent.m_elFolders.push( elFolder);
-
-	g_elFolders[elFolder.m_path] = elFolder;
+	if( index+1 < i_elParent.m_elFolders.length )
+	{
+		var elNext = i_elParent.m_elFolders[index+1];
+		elNext.m_elPrev = elFolder;
+		elFolder.m_elNext = elNext;
+	}
 
 	return elFolder;
 }
@@ -521,7 +566,7 @@ function g_FolderSetStatus( i_status, i_elFolder, i_params)
 		i_elFolder.m_fobject.status = i_status;
 
 	if(( i_params == null ) || i_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
-	if(( i_params == null ) || i_params.color      ) st_SetElColor( i_status, i_elFolder);
+	if(( i_params == null ) || i_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
 	if(( i_params == null ) || i_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
 	if(( i_params == null ) || i_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
 	if(( i_params == null ) || i_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
@@ -535,15 +580,22 @@ function g_FolderSetStatus( i_status, i_elFolder, i_params)
 
 function g_CompareFolders(a,b)
 {
+	// Compare folders sizes if size is shown in the navigation:
 	if( localStorage.navig_show_size == 'true' )
 	{
-		if(      a['size_total'] ==  null   ) return  1;
-		else if( b['size_total'] ==  null   ) return -1;
-		else if( a['size_total'] < b['size_total']) return  1;
-		else if( a['size_total'] > b['size_total']) return -1;
+		if(( a.size_total != null ) && ( b.size_total == null )) return -1;
+		if(( b.size_total != null ) && ( a.size_total == null )) return  1;
+		if(( a.size_total != null ) && ( b.size_total != null ))
+		{
+			if     ( a.size_total < b.size_total ) return  1;
+			else if( a.size_total > b.size_total ) return -1;
+		}
 	}
-	if( a['name'] < b['name']) return -1;
-	if( a['name'] > b['name']) return 1;
+
+	// Compare folders names:
+	if( a.name < b.name ) return -1;
+	if( a.name > b.name ) return  1;
+
 	return 0;
 }
 
@@ -554,7 +606,8 @@ function g_CloseFolder( i_elFolder )
 
 	if( i_elFolder.m_elFolders && i_elFolder.m_elFolders.length )
 		for( var i = 0; i < i_elFolder.m_elFolders.length; i++)
-			i_elFolder.removeChild( i_elFolder.m_elFolders[i]);
+			i_elFolder.m_elFBody.removeChild( i_elFolder.m_elFolders[i]);
+
 	i_elFolder.m_elFolders = [];
 	i_elFolder.classList.remove('opened');
 }

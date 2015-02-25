@@ -1,2 +1,2 @@
 ProRes444 10Bit
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 3 -qscale 4 -pix_fmt yuv444p10le @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 4444 -pix_fmt yuv444p10le @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"

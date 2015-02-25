@@ -87,7 +87,7 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/DPX","RESULT/TIF"]
+			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
@@ -103,8 +103,6 @@
 			["/rules_root/","/cgru/rules_root/"]
 		]
 },
-
-"cmdexec":{"open_folder":"open \"@PATH@\""},
 
 "OS_unix":{
 	"cmdexec":{
@@ -134,7 +132,6 @@
 
 "OS_windows":{
 	"cmdexec":{
-		"open_folder":"start @PATH@",
 		"play_sequence":[
 			{"name":"Pd++",
 				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@",
@@ -162,18 +159,6 @@
 	}
 },
 
-"OS_linux":{
-	"cmdexec":{
-		"open_folder":"nautilus \"@PATH@\""
-	}
-},
-
-"OS_macosx":{
-	"cmdexec":{
-		"open_folder":"open \"@PATH@\""
-	}
-},
-
 "thumbnail":{
 	"filename":"thumbnail.jpg",
 	"colorspace":"auto",
@@ -189,7 +174,8 @@
 {
 	"format":"1280x720",
 	"fps":"25",
-	"codec":"photojpg_high",
+	"codec":"h264_mid",
+	"container":"DEFAULT",
 	"colorspace":"auto",
 	"template":"dailies_withlogo",
 	"slate":"dailies_slate",
@@ -229,8 +215,19 @@
 		"theora_high":   {"name":"Th Hi",    "tooltip":"Theora High [ogg]"},
 		"theora_mid":    {"name":"Th Mid",   "tooltip":"Theora Mid [ogg]"},
 		"theora_low":    {"name":"Th Lo" ,   "tooltip":"Theora Low [ogg]"},
+		"dnxhd185":      {"name":"DNxHD" ,   "tooltip":"AVID DNxHD 1920x1080x25:185 [mov]"},
 		"prores444":     {"name":"Pro444",   "tooltip":"Apple ProRes444 10Bit [mov]"},
 		"prores422":     {"name":"Pro422",   "tooltip":"Apple ProRes422 10Bit [mov]"}
+	},
+
+	"containers":{
+		"DEFAULT": {"name":"Default", "tooltip":"Default container:\nTheora: OGG\nAny other: MOV"},
+		"mov": {"name":"MOV", "tooltip":"Apple QuickTime Movie"},
+		"mp4": {"name":"MP4", "tooltip":"MPEG-4 Part 14\nIt is a common container."},
+		"m4v": {"name":"M4V", "tooltip":"Apple 'MP4'"},
+		"mxf": {"name":"MXF", "tooltip":"Material eXchange Format"},
+		"ogg": {"name":"OGG", "tooltip":"Ogg Vorbis&Theora\nThe most free container.\nFirefox and Chrome can play it without any plugins&codecs installed."},
+		"avi": {"name":"AVI", "tooltip":"Microsoft Audio Video Interleave"}
 	},
 
 	"preview":{
@@ -242,13 +239,17 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
-	"af_capacity":100
+	"af_capacity":500,
+	"af_maxtasks":10,
+	"af_perhost":-1,
+	"af_pertask":100,
+	"af_maxruntime":120
 },
 
 "put":{
-	"input":"RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"dest":"FINAL",
 	"-dest":"/incoming",
 	"cmd":"python /cgru/utilities/put.py",

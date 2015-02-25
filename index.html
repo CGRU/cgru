@@ -69,17 +69,7 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 
 <div id="content">
 	<div id="panel">
-		<div id="subscribe" style="display:none">
-			<div id="subscribe_btn" class="button" title="Receive this location changes" onclick="nw_Subscribe()">Subscribe</div>
-			<div id="subscribe_label">Subscribed at</div>
-			<div id="unsubscribe_btn" class="button" title="Do not receive changes from this location" onclick="nw_Unsubscribe()">Unsubscribe</div>
-			<div id="subscribe_path"
-				style="font: 12px monospace; box-shadow: 0 0 2px #000000 inset; padding: 2px 8px; margin: 2px 8px;"
-				title="Subscribed parent location"></div>
-			<div id="news_make" class="button" title="Create some custom news" onclick="nw_MakeNewsDialog()">Make News</div>
-			<div id="news_disable" class="button" title="If news disabled, your changes does not produce any news" onclick="nw_DisableNewsToggle( true)"></div>
-			<div id="news_ignore_own" class="button" title="If you ignoring own news, you do not receive changes performed by yourself" onclick="nw_IgnoreOwnToggle( true)"></div>
-		</div>
+		<div id="annotations"></div>
 		<div id="search_panel" style="float:right">
 			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
 		</div>
@@ -140,7 +130,7 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 				No results found.</div>
 		</div>
 	</div>
-	<div style="text-align:center;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
+	<div style="text-align:center; clear: both;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
 	<div id="status">
 		<div id="status_show">
 			<div class="infotooltip" style="float: left;" title="Info:
@@ -162,11 +152,11 @@ Supervisor can assign artist by creating a task."
 				<div style="padding: 1px 6px; float: right;">Frames</div>
 			</div>
 			<div style="clear:both;">
-				<div id="status_reports_div" style="float:right; margin:4px; padding:2px; border:1px solid #777">
+				<div id="status_reports_div">
 					Reports:
 					<div id="status_reports" style="margin: 4px;"></div>
 				</div>
-				<div id="status_tasks_div" style="-clear:both; -float:right; margin:4px; padding:2px; border:1px solid #777">
+				<div id="status_tasks_div">
 					Tasks:
 					<div id="status_tasks" style="margin: 4px;"></div>
 				</div>
@@ -292,13 +282,29 @@ Remember any delete operation buttons in RULES requires double-click.
 						ondblclick="nw_DeleteFiltered(false)"></div>
 					<div class="button" title="Click to open/close subscribed locations"
 						style="background-image:url(rules/icons/news_channels.png);"
-						onclick="c_ElDisplayToggle(document.getElementById('channels'));
+						onclick="c_ElDisplayToggle(document.getElementById('chanset'));
 						this.classList.toggle('pushed')"></div>
 					<div class="button" title="Change news sorting order"
 						style="background-image:url(rules/icons/sort_order_toggle.png);"
 						onclick="nw_SortOrderToggle()"></div>
 				</div>
-				<div id="channels" style="display:none"></div>
+				<div id="chanset" style="display:none">
+					<div id="subscribe_path"
+						title="Subscribed parent location"></div>
+					<div id="subscribe_btn" class="button" onclick="nw_Subscribe()"
+						style="background-image:url(rules/icons/bell.png); display: none; float: right;"
+						title="Receive this location changes"></div>
+					<div id="news_make" class="button" onclick="nw_MakeNewsDialog()"
+						style="background-image:url(rules/icons/megaphone.png);"
+						title="Create some custom news"></div>
+					<div id="news_disable" class="button" onclick="nw_DisableNewsToggle( true)"
+						style="background-image:url(rules/icons/power_button.png);"
+						title="If news disabled, your changes does not produce any news"></div>
+					<div id="news_ignore_own" class="button" onclick="nw_IgnoreOwnToggle( true)"
+						style="background-image:url(rules/icons/listen_own.png);"
+						title="If you ignoring own news, you do not receive changes performed by yourself"></div>
+					<div id="channels"></div>
+				</div>
 			</div>
 			<div class="news_filter" style="font-size: 12px" title="News filter">
 				<div class="button nw_fb" title="Show All" id="news_filter_show_all" onclick="nw_FilterBtn(this,'_all_')">All</div>
@@ -310,7 +316,7 @@ Remember any delete operation buttons in RULES requires double-click.
 				<div class="button nw_fb" title="Dailies"    onclick="nw_FilterBtn(this,'dailies')">D</div>
 				<div class="button nw_fb" title="Comment"    onclick="nw_FilterBtn(this,'comment')">C</div>
 			</div>
-			<div class="news_filter" id="news_projects" style="font: 10px monospace;" title="New projects"></div>
+			<div class="news_filter" id="news_projects" style="font: 10px monospace;" title="News Projects"></div>
 			<div id="news"></div>
 		</div>
 	</div>
@@ -318,14 +324,14 @@ Remember any delete operation buttons in RULES requires double-click.
 		<div class="label button" id="playlist_refresh" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);" onclick="p_RefreshOnClick()"></div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
-			<div class="infotooltip" style="float: right; margin: 2px 4px;" title="Playlist:
+			<div class="playlist_ctrl playlist_ctrl_top">
+				<div class="infotooltip" style="float: right; margin: 2px 4px;" title="Playlist:
 It is designed to share links.
 If you bookmark some location in your browser
 this bookmark will be visible only for you.
 Use playlist for bookmarks for all users of the RULES site.
 Guests can't edit playlist.
-"			></div>
-			<div class="playlist_ctrl playlist_ctrl_top">
+"				></div>
 				<div class="button" onclick="p_NewOnClick()" title="Create new folder"
 					style="background-image:url(rules/icons/folder_new.png);"></div>
 				<div class="button" onclick="p_AddLinkAbc()" title="Add current location to selected folder alphabetically"
@@ -335,8 +341,7 @@ Guests can't edit playlist.
 				<div class="button" onclick="p_RenameOnClick()" title="Rename current item"
 					style="background-image:url(rules/icons/rename.png);;"></div>
 			</div>
-			<div style="clear:both; box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
-				id="playlist"></div>
+			<div id="playlist"></div>
 			<div class="playlist_ctrl playlist_ctrl_bot">
 				<div class="button" onclick="p_AddLinkAfter()" title="Add item after current"
 					style="background-image:url(rules/icons/plus_down.png)"></div>
@@ -374,12 +379,12 @@ So folder will appear on unpack.
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					title="Remove not started and uploaded items" onclick="up_ClearAll()">Clear</div>
 			</div>
-			<div style="box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;" id="upload">
+			<div id="upload">
 				<!--div><input type="file" id="upload_file" onchange="up_FileSelected()" style="float:left;width:100px"></input></div-->
 			</div>
 		</div>
 	</div>
-	<div id="sidepanel_permissions" style="display:none; background-color: rgba(200,0,0,.2);">
+	<div id="sidepanel_permissions">
 		<div class="label button" style="font-size: 12px;" onclick="ad_PermissionsOnClick()">PERMISSIONS</div>
 		<div class="body">
 			<div style="padding-left:8px;">
@@ -391,8 +396,7 @@ So folder will appear on unpack.
 				<div class="button" style="float:left;font-size:11px;padding:2px 4px"
 					onclick="ad_PermissionsUsrAddOnClick()">Add User</div>
 			</div>
-			<div style="box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
-				id="permissions"></div>
+			<div id="permissions"></div>
 		</div>
 	</div>
 	<div id="sidepanel_recent">
@@ -408,7 +412,7 @@ So folder will appear on unpack.
 </div>
 
 <div id="header">
-	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px">
+	<div id="header_params">
 		<div style="top: 0px; bottom: 0px; width: 250px; position: absolute; /*border: 1px solid #000;*/">
 			<div class="cgru_parameter">
 				<div class="label">Browser Storage</div>
@@ -445,11 +449,11 @@ Create '.hidden' in folder to hide.
 Link with hidden folder will not works.
 Hidden folders increase system speed.">
 				<div class="label">Show Hidden:</div>
-				<div class="variable" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
+				<div class="variable button" id="show_hidden" style="left:110px;right:15px;cursor:pointer" onclick="u_ShowHiddenToggle()">unknown</div>
 			</div>
 			<div class="cgru_parameter">
 				<div class="label">Hide ScrollBars:</div>
-				<div class="variable" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
+				<div class="variable button" id="hide_scrollbars" style="left:110px;right:15px;cursor:pointer" onclick="u_CalcGUI(true)">unknown</div>
 			</div>
 		</div>
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">

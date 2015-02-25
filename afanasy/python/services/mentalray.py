@@ -14,9 +14,9 @@ class mentalray(service.service):
 
 	# override base service class method
 
-	def __init__(self, taskInfo):
+	def __init__(self, taskInfo, i_verbose):
 		print('mentalray.init')
-		return service.service.__init__(self, taskInfo)  # TODO: returning something from __init__ is strange
+		service.service.__init__(self, taskInfo, i_verbose)
 
 	def applycmdhosts(self, command):
 		"""Missing DocString

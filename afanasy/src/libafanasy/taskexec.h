@@ -85,7 +85,6 @@ public:
 	inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
 	inline bool hasEnv()       const { return m_environment.size();     } ///< Whether extra environment.
 	inline bool hasFiles()     const { return m_files.size();   } ///< Whether files exist.
-	inline bool genTumbnails() const { return m_block_flags & BlockData::FGenThumbnails; }
 
 	inline const std::string & getCommand()  const { return m_command; } ///< Get command.
 	inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.

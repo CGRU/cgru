@@ -7,7 +7,7 @@ import os
 import sys
 import time
 
-ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'psd', 'xcf']
+ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'psd', 'xcf']
 MovExtensions = ['mov', 'avi', 'mp4', 'mpg', 'mpeg']
 
 from optparse import OptionParser
@@ -97,6 +97,7 @@ if Options.input.find(',') != -1 or os.path.isdir(Options.input):
 			if len(files) == 0:
 				continue
 			to_skip = False
+
 			root_basename = os.path.basename(root)
 			if len(root_basename):
 				if root_basename[0] in '._':
@@ -111,11 +112,14 @@ if Options.input.find(',') != -1 or os.path.isdir(Options.input):
 					print('Skipping: "%s"' % root)
 				continue
 
+			if Options.verbose:
+				print('Scanning folder "%s"...' % root)
+
 			images = []
 			for afile in files:
 				if afile[0] in '._':
 					continue
-				split = re.split(r'\d\.', afile)
+				split = re.split(r'\.', afile)
 				if len(split) > 1 and split[-1].lower() in ImgExtensions:
 					images.append(afile)
 				elif isMovie(afile) and not Options.nomovie:

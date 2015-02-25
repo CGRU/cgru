@@ -410,7 +410,7 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 
 			if( name.indexOf('.') == 0 ) continue;
 
-			if( c_FileIsMovie( name ))
+			if( c_FileIsMovie( name ) || c_FileIsArchive( name ))
 			{
 				if( i_path )
 					i_walk.files[f].name = i_path + '/' + i_walk.files[f].name;
@@ -429,7 +429,7 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 			o_walk.folders.push( i_walk);
 
 			// Add parent folder rufiles, needed to show thumbnails:
-			if( i_parent_walk.rufiles )
+			if( i_parent_walk && i_parent_walk.rufiles )
 				for( var r = 0; r < i_parent_walk.rufiles.length; r++)
 					if( o_walk.rufiles.indexOf( i_parent_walk.rufiles[r]) == -1 )
 						o_walk.rufiles.push( i_parent_walk.rufiles[r]);

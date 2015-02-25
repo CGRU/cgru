@@ -1,14 +1,13 @@
 <style type="text/css">
 
 .shot_files {
-box-shadow: 0px 0px 3px #000 inset, 0px 0px 3px rgba(255,255,255,.7);
 clear: both;
-margin: 6px;
 }
-.shot_files  .files_view {
+.shot_files .filesview {
 margin: 10px;
+border: 1px solid #777;
+border-radius: 2px;
 }
-
 #shot_process_div > div {
 float:left;
 font-size: 12px;
@@ -18,6 +17,10 @@ margin:2px 4px;
 .shot_empty_result { float: left; padding: 2px 6px; }
 
 </style>
+
+<div class="button" style="float: left;" title="Create new shot."
+	onclick="a_Copy({'template':RULES.assets.shot.template})">
+	New</div>
 
 <div id="shot_refs_div" style="float: left; display: none;">
 	<div id="shot_refs_btn" class="button"

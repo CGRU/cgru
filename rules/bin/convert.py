@@ -9,7 +9,7 @@ import af
 
 from optparse import OptionParser
 
-ImgTypes = ['jpg', 'jpeg', 'dpx', 'cin', 'exr', 'tif', 'tiff', 'tga', 'png']
+ImgTypes = ['jpg', 'jpeg', 'dpx', 'cin', 'exr', 'tif', 'tiff', 'tga', 'png','psd']
 
 Parser = OptionParser(
 	usage="%prog [options] input\ntype \"%prog -h\" for help",
@@ -140,8 +140,6 @@ for input in Inputs:
 		elif Options.type == 'exr':
 			cmd += ' -colorspace RGB'
 
-		cmd += colorspace
-
 		if mkdir:
 			output = os.path.join(mkdir, os.path.basename(afile))
 
@@ -221,3 +219,4 @@ for i in range(0, len(Jobs)):
 
 if Options.json:
 	print(json.dumps(OUT))
+

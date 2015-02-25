@@ -337,10 +337,9 @@ function g_OpenMonitor( i_args)
 			g_TopWindow.destroy();
 		}
 
-		g_TopWindow = new cgru_Window({"name":'tasks',"title":i_args.name,"wnd":i_args.wnd,"closeOnEsc":false});
+		g_TopWindow = new cgru_Window({"name":'tasks',"title":i_args.name,"wnd":i_args.wnd,"closeOnEsc":false,"addClasses":["cgru_absolute","tasks"]});
 		g_TopWindow.closeOnEsc = false;
 		g_TopWindow.onDestroy = function(){ g_TopWindow.monitor.destroy(); g_TopWindow = null;};
-		g_TopWindow.elWindow.classList.add('tasks');
 
 		i_args.elParent = g_TopWindow.elContent;
 	}
@@ -641,11 +640,10 @@ function g_OnKeyDown(e)
 	if( ! e ) return;
 	if( e.keyCode == 27 ) // ESC
 	{
+		if( cgru_EscapePopus())
+			return;
 		for( var i = 0; i < g_monitors.length; i++)
-		{
 			g_monitors[i].selectAll( false);
-		}
-		cgru_EscapePopus();
 		return;
 	}
 

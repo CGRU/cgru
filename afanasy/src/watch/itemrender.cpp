@@ -148,13 +148,13 @@ void ItemRender::updateValues( af::Node *node, int type)
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
+		updateNodeValues( node);
+
 		setHidden(  render->isHidden()  );
 		setOffline( render->isOffline() );
 
 	    m_version            = afqt::stoq( render->getVersion());
 	    m_username           = afqt::stoq( render->getUserName());
-	    m_annotation         = afqt::stoq( render->getAnnotation());
-	    m_priority           = render->getPriority();
 	    m_capacity           = render->getCapacity();
 	    m_maxtasks           = render->getMaxTasks();
 	    m_time_launched      = render->getTimeLaunch();

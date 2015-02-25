@@ -93,7 +93,7 @@ if Codec == '':
 		resize = Options.resize.split('x')
 		if len(resize) < 2:
 			resize.append('-1')
-		args.extend(['-vf', 'scale=%s:%s' % (resize[0], resize[1])])
+		args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
 		Output += '.r%s' % Options.resize
 
 	if not os.path.isdir(Output):

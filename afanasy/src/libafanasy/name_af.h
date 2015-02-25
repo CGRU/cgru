@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <list>
+#include <map>
 #include <memory.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -139,7 +140,6 @@ namespace af
 	const std::string base64encode( const char * i_data, int i_size);
 
 
-	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags, int i_startFrom = 0);
 	const std::string fillNumbers( const std::string & pattern, long long start, long long end);
 	const std::string replaceArgs( const std::string & pattern, const std::string & arg);
 
@@ -267,6 +267,7 @@ namespace af
 	bool jr_int64 ( const char * i_name, int64_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int32vec(  const char * i_name, std::vector<int32_t>     & o_attr, const JSON & i_object);
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
+	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object);
 
 	void jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render = false);
 

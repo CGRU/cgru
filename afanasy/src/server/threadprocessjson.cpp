@@ -6,11 +6,15 @@
 #include "threadargs.h"
 #include "usercontainer.h"
 
-#include "../libafanasy/environment.cpp"
+#include "../libafanasy/rapidjson/stringbuffer.h"
+#include "../libafanasy/rapidjson/prettywriter.h"
+#include "../libafanasy/farm.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+
+af::Msg * jsonSaveObject( rapidjson::Document & i_obj);
 
 af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 {
@@ -290,12 +294,17 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		{
 			o_msg_response = af::jsonMsg( af::Environment::getConfigData());
 		}
+		else if( type == "farm" )
+		{
+			o_msg_response = af::jsonMsg( af::farm()->getText());
+		}
 	}
 	else if( document.HasMember("action"))
 	{
 		i_args->msgQueue->pushMsg( i_msg);
 		// To not to detele it, set to NULL, as it pushed to another queue
 		i_msg = NULL;
+		o_msg_response = af::jsonMsg("{\"status\":\"OK\"}");
 	}
 	else if( document.HasMember("job"))
 	{
@@ -372,9 +381,56 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				"Failed, see server logs fo details.");
 		}
 	}
+	else if( document.HasMember("save"))
+	{
+		o_msg_response = jsonSaveObject( document);
+	}
 
 	delete [] data;
 	if( i_msg ) delete i_msg;
 
 	return o_msg_response;
 }
+
+af::Msg * jsonSaveObject( rapidjson::Document & i_obj)
+{
+	JSON & jSave = i_obj["save"];
+	if( false == jSave.IsObject())
+		return af::jsonMsgError("\"save\" is not an object.");
+
+	JSON & jPath = jSave["path"];
+	if( false == jPath.IsString())
+		return af::jsonMsgError("\"path\" is not an string.");
+
+	JSON & jObj = jSave["object"];
+	if( false == jObj.IsObject())
+		return af::jsonMsgError("\"object\" is not an object.");
+
+	std::string path((char*)jPath.GetString());
+	while(( path[0] == '/' ) || ( path[0] == '/' ) || ( path[0] == '.'))
+		path = path.substr(1);
+	path = af::Environment::getCGRULocation() + '/' + path + ".json";
+
+	std::string info;
+	info = std::string("Created by afserver at ") + af::time2str();
+	jObj.AddMember("__cgru__", info.c_str(), i_obj.GetAllocator());
+
+	rapidjson::StringBuffer buffer;
+	rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+	writer.SetIndent('\t',1);
+	jObj.Accept(writer);
+	std::string text( buffer.GetString());
+
+	std::ostringstream str;
+	str << "{\"save\":\n";
+	str << "\t\"path\":\"" << path << "\",\n";
+	if( af::pathFileExists( path)) str << "\t\"overwrite\":true,\n";
+	str << "\t\"size\":" << text.size() << "\n";
+	str << "}}";
+
+	if( false == AFCommon::writeFile( text, path))
+		return af::jsonMsgError( std::string("Unable to write to \"") + path + "\", see server log for details.");
+
+	return af::jsonMsg( str);
+}
+

@@ -21,14 +21,30 @@ function Monitor( i_args)
 	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild( this.elMonitor);
 	this.elMonitor.classList.add('monitor');
+	this.elMonitor.classList.add( this.type);
 	this.elMonitor.monitor = this;
+
+	this.elView = this.document.createElement('div');
+	this.elView.classList.add('view');
+	this.elMonitor.appendChild( this.elView);
+
+	this.elPanelL = this.document.createElement('div');
+	this.elMonitor.appendChild( this.elPanelL);
+	this.elPanelL.classList.add('panel');
+	this.elPanelL.classList.add('left');
+
+	this.elPanelR = this.document.createElement('div');
+	this.elMonitor.appendChild( this.elPanelR);
+	this.elPanelR.classList.add('panel');
+	this.elPanelR.classList.add('right');
+	this.elPanelR.classList.add('text_selectable');
 
 	this.elList = this.document.createElement('div');
 	this.elCtrl = this.document.createElement('div');
 	this.elInfo = this.document.createElement('div');
-	this.elMonitor.appendChild( this.elList);
-	this.elMonitor.appendChild( this.elCtrl);
-	this.elMonitor.appendChild( this.elInfo);
+	this.elView.appendChild( this.elList);
+	this.elView.appendChild( this.elCtrl);
+	this.elView.appendChild( this.elInfo);
 	this.elList.classList.add('list');
 	this.elCtrl.classList.add('ctrl');
 	this.elInfo.classList.add('info');
@@ -39,56 +55,119 @@ function Monitor( i_args)
 	this.elList.oncontextmenu = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 	this.elList.onmousedown   = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 
-	this.elCtrlButtons = this.document.createElement('div');
-	this.elCtrl.appendChild( this.elCtrlButtons);
-	this.elCtrlButtons.style.position = 'absolute';
-
-	var buttons_width = 0;
-	if( this.type == 'jobs' || this.type == 'renders' || this.type == 'users')
+	this.view_opts = {};
+	if( this.nodeConstructor.view_opts )
 	{
-		this.elCtrlSet = this.document.createElement('div');
-		this.elCtrlButtons.appendChild( this.elCtrlSet);
-		this.elCtrlSet.classList.add('ctrl_button');
-		this.elCtrlSet.textContent = 'SET';
-		this.elCtrlSet.monitor = this;
-		this.elCtrlSet.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e);}
+		for( var opt in this.nodeConstructor.view_opts )
+		{
+			var view_opt = this.nodeConstructor.view_opts[opt];
 
-		buttons_width += 50;
+			// Get value from a browser storage or use default:
+			if( localStorage[opt] != null )
+			{
+				if( view_opt.type == 'num' )
+					this.view_opts[opt] = parseInt( localStorage[opt]);
+				else
+					this.view_opts[opt] = localStorage[opt];
+			}
+			else
+				this.view_opts[opt] = view_opt.default;
+		}
+
+		this.createCtrlBtn({'name':'view_opts','label':'VIEW','tooltip':'View options.',
+			'sub_menu':this.nodeConstructor.view_opts,'handle':'mh_Opt','always_active':true});
 	}
 
-	if( this.type == 'renders')
+	this.createCtrlBtn({"name":'log',"label":'LOG',"tooltip":'Show node log.',"handle":'mh_Get'});
+
+	var el = document.createElement('div');
+	this.elPanelR.appendChild( el);
+	this.elPanelR.m_elName = el;
+	el.classList.add('name');
+
+	if( this.nodeConstructor.createPanels )
+		this.nodeConstructor.createPanels( this);
+
+	// Parameters section:
+	var el = document.createElement('div');
+	this.elPanelR.appendChild( el);
+	this.elPanelR.m_elParams = el;
+	this.elPanelR.m_elParams.m_elPMap = {};
+	el.classList.add('section');
+	// Show raw JSON onject:
+	this.createCtrlBtn({"name":'obj',"label":'OBJ',"tooltip":'Show object.',
+		"handle":'showObject','elParent':this.elPanelR.m_elParams,'always_active':true});
+	// Label:
+	var el = document.createElement('div');
+	this.elPanelR.m_elParams.appendChild( el);
+	el.textContent = 'Parameters';
+	el.classList.add('caption');
+	el.title = 'Click to edit all paramters.';
+	el.m_elParams = this.elPanelR.m_elParams;
+	el.onclick = function(e){
+		var el = e.currentTarget;
+		if( el.m_elParams.classList.contains('active') != true ) return false;
+		var elParams = el.m_elParams.m_elPMap;
+		for( var p in elParams )
+			elParams[p].style.display = 'block';
+		return false;
+	}
+	el.oncontextmenu = el.onclick;
+
+	if( this.nodeConstructor.params )
+	for( var p in this.nodeConstructor.params )
 	{
-		this.elCtrlCmd = this.document.createElement('div');
-		this.elCtrlButtons.appendChild( this.elCtrlCmd);
-		this.elCtrlCmd.classList.add('ctrl_button');
-		this.elCtrlCmd.textContent = 'CMD';
-		this.elCtrlCmd.monitor = this;
-		this.elCtrlCmd.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'cmd');}
+		var param = this.nodeConstructor.params[p];
+		if( false == cm_CheckPermissions( param.permissions )) continue;
 
-		buttons_width += 50;
+		var elDiv = document.createElement('div');
+		this.elPanelR.m_elParams.appendChild( elDiv);
+		elDiv.classList.add('param');
+		elDiv.style.display = 'none';
 
-		if( g_GOD())
-		{
-			this.elCtrlPow = this.document.createElement('div');
-			this.elCtrlButtons.appendChild( this.elCtrlPow);
-			this.elCtrlPow.classList.add('ctrl_button');
-			this.elCtrlPow.textContent = 'POW';
-			this.elCtrlPow.monitor = this;
-			this.elCtrlPow.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'pow');}
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = param.label;
 
-			buttons_width += 50;
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elValue.classList.add('value');
+		elDiv.m_elValue = elValue;
+
+		this.elPanelR.m_elParams.m_elPMap[p] = elDiv;
+
+		var el = elDiv;
+		el.title = 'Double click to edit.'
+		el.monitor = this;
+		el.name = p;
+		el.param = param;
+		el.ondblclick = function(e){
+			var el = e.currentTarget;
+			el.monitor.mh_Dialog({'name':el.name,'type':el.param.type});
 		}
 	}
-//	this.elCtrlButtons.style.width = 50+buttons_width+'px';
 
-	this.elCtrlSortFilter = this.document.createElement('div');
-	this.elCtrl.appendChild( this.elCtrlSortFilter);
-	this.elCtrlSortFilter.style.position = 'absolute';
-	this.elCtrlSortFilter.style.left = buttons_width+'px';
-	this.elCtrlSortFilter.classList.add('ctrl_sort_filter');
+	// Info section:
+	var el = document.createElement('div');
+	this.elPanelR.appendChild( el);
+	this.elPanelR.m_elInfo = el;
+	el.classList.add('section');
+	// Label:
+	var el = document.createElement('div');
+	this.elPanelR.m_elInfo.appendChild( el);
+	el.textContent = 'Info';
+	el.classList.add('caption');
+	el.title = 'Node information.';
+	// Body:
+	var el = document.createElement('div');
+	this.elPanelR.m_elInfo.appendChild(el);
+	this.elPanelR.m_elInfo.m_elBody = el;
 
+
+	// Sort&Filter:
 	this.elCtrlSort = this.document.createElement('div');
-	this.elCtrlSortFilter.appendChild( this.elCtrlSort);
+	this.elCtrl.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('ctrl_sort');
 
 	this.elCtrlSortLabel = this.document.createElement('span');
@@ -106,7 +185,7 @@ function Monitor( i_args)
 	this.elCtrlSortParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'sort');}
 
 	this.elCtrlFilter = this.document.createElement('div');
-	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
+	this.elCtrl.appendChild( this.elCtrlFilter);
 	this.elCtrlFilter.classList.add('ctrl_filter');
 
 	this.elCtrlFilterLabel = this.document.createElement('div');
@@ -127,54 +206,17 @@ function Monitor( i_args)
 	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
 	this.elCtrlFilterInput.classList.add('input');
 	this.elCtrlFilterInput.contentEditable = true;
+	this.elCtrlFilterInput.classList.add('text_selectable');
 	this.elCtrlFilterInput.monitor = this;
 	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
 	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
-	this.options = {};
-	var actions = this.nodeConstructor.actions;
-	if( actions && actions.length )
-	{
-		var has_options = false;
-		for( var i = 0; i < actions.length; i++)
-		{
-			if( actions[i].mode != 'option') continue;
-
-			if( localStorage[actions[i].name] != null )
-			{
-				if( actions[i].type == 'num' )
-					this.options[actions[i].name] = parseInt( localStorage[actions[i].name]);
-				else
-					this.options[actions[i].name] = localStorage[actions[i].name];
-			}
-			else
-				this.options[actions[i].name] = actions[i].default;
-
-			has_options = true;
-		}
-
-		if( has_options )
-		{
-			this.elOptions = this.document.createElement('div');
-			this.elCtrl.appendChild( this.elOptions);
-			this.elOptions.textContent = 'O';
-			this.elOptions.classList.add('ctrl_button');
-			this.elOptions.classList.add('ctrl_options');
-			this.elOptions.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'option',false);}
-			this.elOptions.monitor = this;
-		}
-	}
-
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
+	this.elInfoText.classList.add('text_selectable');
 	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
-///*
-//this.elCtrl.textContent='ctrl';
-//this.elList.textContent='list';
-//this.elInfo.textContent='info';
-//*/
-//	this.valid = false;
+
 	for( var i = 0; i < g_recievers.length; i++)
 	{
 		if( g_recievers[i].name == this.name )
@@ -242,6 +284,9 @@ function Monitor( i_args)
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
 
 	this.items = [];
+	this.selected_items = [];
+	this.cur_item = null;
+
 	g_recievers.push( this);
 	g_monitors.push( this);
 	this.setWindowTitle();
@@ -384,8 +429,17 @@ Monitor.prototype.processMsg = function( obj)
 			if( this.items[i].params.id == nodes[j].id )
 			{
 				this.items[i].update( nodes[j]);
+
+				if( this.panel_item == this.items[i] )
+					this.updatePanels( this.items[i]);
+
+				if(( this.type == 'jobs' ) && this.elPanelR.m_elBlocks.m_cur_block )
+					if( this.elPanelR.m_elBlocks.m_cur_block.job.params.id == this.items[i].params.id )
+						this.elPanelR.m_elBlocks.m_cur_block.updatePanels();
+
 				updated.push( this.items[i]);
 				this.filterItem( this.items[i]);
+
 				found = true;
 				break;
 			}
@@ -407,10 +461,18 @@ Monitor.prototype.processMsg = function( obj)
 			nw_GetNodes('users',[g_uid],'jobs_order');
 
 	if( false == this.hasSelection())
+	{
 		if( new_nodes.length )
 			this.cur_item = new_nodes[new_nodes.length-1];
 		else if( updated.length )
 			this.cur_item = updated[updated.length-1];
+	}
+
+	if(( this.firstNodesReceived != true ) && new_nodes.length && ( g_VISOR() != true ))
+	{
+		this.items[this.items.length-1].element.scrollIntoView();
+		this.firstNodesReceived = true;
+	}
 
 	this.setWindowTitle();
 //this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:' + updated.length);
@@ -504,8 +566,15 @@ Monitor.prototype.delNodes = function( i_ids)
 		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].params.id == i_ids[d] )
 			{
+				if( this.panel_item == this.items[i] )
+					this.resetPanels();
+
+				if( this.items[i].selected )
+					this.selected_items.splice( this.selected_items.indexOf( this.items[i]), 1);
+
 				this.elList.removeChild( this.items[i].element);
 				this.items.splice(i,1);
+
 				break;
 			}
 }
@@ -593,61 +662,89 @@ Monitor.prototype.onMouseDown = function( i_evt, i_el)
 		var ci = this.items.indexOf( i_el.item);
 		if(( i != ci ) && ( i != -1) && ( ci != -1))
 		{
-			this.elSetSelected( i_el, true);
+			this.setSelected( i_el.item, true);
 			var d = 1;
 			if( i > ci ) d = -1;
 			while( i != ci )
 			{
-				this.elSetSelected( this.items[i].element, true);
+				this.setSelected( this.items[i], true);
 				i += d;
 			}
 			return;
 		}
 	}
 		
-	this.elSelectToggle( i_el);
+	this.selectToggle( i_el.item);
 }
 
 Monitor.prototype.onMouseOver = function( i_evt, i_el)
 {
 	if( i_evt.buttons != 1 ) return;
-	this.elSetSelected( i_evt.currentTarget, i_evt.ctrlKey == false);
+	this.setSelected( i_evt.currentTarget.item, i_evt.ctrlKey == false);
 }
 
-Monitor.prototype.elSetSelected = function( el, on)
+Monitor.prototype.setSelected = function( i_item, on)
 {
+	this.window.getSelection().removeAllRanges();
+
 	if( on )
 	{
-		this.cur_item = el.item;
+		this.cur_item = i_item;
+
+		this.updatePanels();
+
 		this.info( this.cur_item.params.name);
-		if( el.selected ) return;
-		el.selected = true;
-		if( false == el.classList.contains('selected'))
-			el.classList.add('selected');
+
+		if( i_item.selected ) return;
+
+		i_item.selected = true;
+		i_item.element.classList.add('selected');
+		this.selected_items.push( i_item);
+
 		if( this.type == 'jobs' )
 			this.setWindowTitle();
+
+		if( this.cur_item.element.offsetTop < this.elList.scrollTop )
+			this.cur_item.element.scrollIntoView();
+		if( this.cur_item.element.offsetTop + this.cur_item.element.clientHeight > this.elList.scrollTop + this.elList.clientHeight)
+			this.cur_item.element.scrollIntoView(false);
 	}
 	else
 	{
-		if( false == el.selected ) return;
-		el.selected = false;
-		el.classList.remove('selected');
+		if( ! i_item.selected ) return;
+
+		this.resetPanels();
+
+		i_item.selected = false;
+		i_item.element.classList.remove('selected');
+		this.selected_items.splice( this.selected_items.indexOf( i_item), 1);
+
+		if( this.selected_items.length )
+		{
+			this.cur_item = this.selected_items[this.selected_items.length-1];
+			this.updatePanels();
+		}
+		else
+			this.cur_item = null;
 	}
 }
 
-Monitor.prototype.elSelectToggle = function( el)
+Monitor.prototype.selectToggle = function( i_item)
 {
-	if( !el ) return;
-	if( el.selected )
-		this.elSetSelected( el, false);
+	if( ! i_item ) return;
+	if( i_item.selected )
+		this.setSelected( i_item, false);
 	else
-		this.elSetSelected( el, true);
+		this.setSelected( i_item, true);
 }
 
 Monitor.prototype.selectAll = function( on)
 {
 	for( var i = 0; i < this.items.length; i++)
-		this.elSetSelected( this.items[i].element, on);
+		this.setSelected( this.items[i], on);
+
+	if( this.type == 'jobs' )
+		JobBlock.deselectAll( this);
 }
 
 Monitor.prototype.selectNext = function( i_evt, previous)
@@ -657,47 +754,124 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 	var next_index = 0;
 	if( this.cur_item )
 	{
-		var cur_index = 0;
-		for( var i = 0; i < this.items.length; i++)
-			if( this.cur_item == this.items[i])
-			{
-				cur_index = i;
-				break;
-			}
-		var next_index = cur_index+1;
-		if( previous )
-			next_index = cur_index-1;
+		var cur_index = this.items.indexOf( this.cur_item);
+		next_index = cur_index;
+		if( this.hasSelection())
+		{
+			next_index = cur_index+1;
+			if( previous )
+				next_index = cur_index-1;
+		}
 	}
 
 	if( next_index < 0 ) return;
 	if( next_index >= this.items.length ) return;
-	if( next_index == cur_index ) return;
+//	if( next_index == cur_index ) return;
 
-	this.cur_item = this.items[next_index]; 
 	if( false == i_evt.shiftKey )
 		this.selectAll( false);
-	this.elSetSelected( this.cur_item.element, true);
+
+	this.setSelected( this.items[next_index], true);
 }
+
+Monitor.prototype.showObject = function( i_act, i_evt)
+{
+	if( this.hasSelection() == false ) return false;
+	if( this.cur_item && this.cur_item.params )
+		g_ShowObject({"object":this.cur_item.params},{"evt":i_evt,"wnd":this.window});
+}
+
+Monitor.prototype.resetPanels = function()
+{
+	if( this.panel_item == null ) return;
+
+	this.elPanelR.m_elName.style.display = 'none';
+	this.elPanelR.m_elInfo.m_elBody.textContent = '';
+
+	var els = this.elPanelL.getElementsByClassName('ctrl_button');
+	for( var i = 0; i < els.length; i++)
+		if( els[i].m_always_active != true )
+			els[i].classList.remove('active');
+	var els = this.elPanelR.getElementsByClassName('section');
+	for( var i = 0; i < els.length; i++)
+		if( els[i].m_always_active != true )
+			els[i].classList.remove('active');
+
+	var elParams = this.elPanelR.m_elParams.m_elPMap;
+	for( var p in elParams )
+		elParams[p].style.display = 'none';
+
+	if( this.nodeConstructor.resetPanels )
+		this.nodeConstructor.resetPanels( this);
+
+	this.panel_item = null;
+}
+Monitor.prototype.updatePanels = function( i_item)
+{
+	this.resetPanels();
+
+	if( i_item == null )
+		i_item = this.cur_item;
+	if( i_item == null )
+		return;
+
+	this.panel_item = i_item;
+
+	this.elPanelR.m_elName.textContent = i_item.params.name;
+	this.elPanelR.m_elName.title = 'Current job name:\n' + i_item.params.name;
+	this.elPanelR.m_elName.style.display = 'block';
+
+	var els = this.elPanelL.getElementsByClassName('ctrl_button');
+	for( var i = 0; i < els.length; i++)
+		els[i].classList.add('active');
+	var els = this.elPanelR.getElementsByClassName('section');
+	for( var i = 0; i < els.length; i++)
+		els[i].classList.add('active');
+
+	var elParams = this.elPanelR.m_elParams.m_elPMap;
+	for( var p in elParams )
+	{
+		if( i_item.params[p] == null )
+		{
+			elParams[p].style.display = 'none';
+			elParams[p].m_elValue.textContent = '';
+			continue;
+		}
+
+		var value = i_item.params[p];
+		if( this.nodeConstructor.params[p].type == 'hrs')
+			value = cm_TimeStringFromSeconds( value, true);
+		else if(( typeof value ) == 'string' )
+		{
+			// word-wrap long regular expressions:
+			value = value.replace(/\./g,'.&shy;');
+			value = value.replace(/\|/g,'|&shy;');
+			value = value.replace(/\)/g,')&shy;');
+		}
+		elParams[p].m_elValue.innerHTML = value;
+		elParams[p].style.display = 'block';
+	}
+	if( i_item.updatePanels )
+		i_item.updatePanels();
+}
+Monitor.prototype.setPanelInfo = function( i_html) { this.elPanelR.m_elInfo.m_elBody.innerHTML = i_html; }
+Monitor.prototype.resetPanelInfo = function()      { this.elPanelR.m_elInfo.m_elBody.textContent = '';   }
 
 Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
 	i_evt.stopPropagation();
 	g_cur_monitor = this;
-	if( i_el.selected != true )
-		this.selectAll( false);
-	this.elSetSelected( i_el, true);
 
-	var menu = this.createMenu( i_evt, 'context');
+	if( i_el.item.selected != true )
+		this.selectAll( false);
+	this.setSelected( i_el.item, true);
+
 	if( i_el.item.onContextMenu )
-		i_el.item.onContextMenu( menu);
-	else
 	{
-		var actions = i_el.item.constructor.actions;
-		for( var i = 0; i < actions.length; i++)
-			if( actions[i].mode == 'context' )
-				this.addMenuItem( menu, actions[i]);
+		var menu = this.createMenu( i_evt,'context');
+		i_el.item.onContextMenu( menu);
+		menu.show();
 	}
-	menu.show();
 
 	return false;
 }
@@ -739,7 +913,7 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 	{
 		var cmds = [];
 		for( var i = 0; i < this.items.length; i++)
-			if( this.items[i].element.selected == true )
+			if( this.items[i].selected == true )
 			{
 				cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
@@ -757,7 +931,7 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 		i_menu.addItem({"label":'invalid '+name,"enabled":false});
 }
 
-Monitor.prototype.onMouseOverSet = function( i_evt, i_name, i_need_selection)
+Monitor.prototype.showMenu = function( i_evt, i_name, i_need_selection)
 {
 	if( i_need_selection !== false )
 	{
@@ -810,9 +984,14 @@ Monitor.prototype.mh_Oper = function( i_param)
 Monitor.prototype.mh_Get = function( i_param, i_evt)
 {
 //this.info('Get = ' + i_param.name);
+	if(( this.hasSelection() == false ) || ( this.cur_item == null ))
+	{
+		g_Info('No object selected.');
+		return;
+	}
+
 	get = {"type":this.type,"ids":[this.cur_item.params.id],"mode":i_param.name};
 	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.window});
-//	nw_GetNodes( this.type, [this.cur_item.params.id], i_param.name);
 }
 
 Monitor.prototype.action = function( i_operation, i_params)
@@ -829,33 +1008,31 @@ Monitor.prototype.mh_Opt = function( i_param)
 	args.receiver = this;
 	args.wnd      = this.window;
 	args.handle   = 'setOption';
-	args.value    = this.options[i_param.name];
+	args.value    = this.view_opts[i_param.name];
 	args.name     = this.name + '_parameter';
 
 	new cgru_Dialog( args);
 }
 Monitor.prototype.setOption = function( i_value, i_param)
 {
-	this.options[i_param] = i_value;
+	this.view_opts[i_param] = i_value;
 	localStorage[i_param] = i_value;
 }
-
+Monitor.prototype.getSelectedItems = function()
+{
+	var items = [];
+	for( var i = 0; i < this.selected_items.length; i++)
+		items.push( this.selected_items[i]);
+	return items;
+}
 Monitor.prototype.getSelectedIds = function()
 {
 	var ids = [];
-	for( var i = 0; i < this.items.length; i++)
-		if( this.items[i].element.selected == true )
-			ids.push( this.items[i].params.id);
+	for( var i = 0; i < this.selected_items.length; i++)
+		ids.push( this.selected_items[i].params.id);
 	return ids;
 }
-
-Monitor.prototype.hasSelection = function()
-{
-	for( var i = 0; i < this.items.length; i++)
-		if( this.items[i].element.selected == true )
-			return true;
-	return false;
-}
+Monitor.prototype.hasSelection = function() { return ( this.selected_items.length > 0 ); }
 
 Monitor.prototype.noneSelected = function( i_evt)
 {//return false;
@@ -963,7 +1140,108 @@ Monitor.prototype.createMenu = function( i_evt, i_name)
 	return menu;
 }
 
+Monitor.prototype.createCtrlBtns = function( i_acts)
+{
+	for( var a in i_acts )
+	{
+		if( i_acts[a].name == null )
+			i_acts[a].name = a;
+		this.createCtrlBtn( i_acts[a]);
+	}
+}
 
+Monitor.prototype.createCtrlBtn = function( i_args)
+{
+	if( this.ctrl_btns == null ) this.ctrl_btns = {};
+
+	var elBtn = document.createElement('div');
+
+	if( i_args.elParent )
+		i_args.elParent.appendChild( elBtn);
+	else
+		this.elPanelL.appendChild( elBtn);
+
+	this.ctrl_btns[i_args.name] = elBtn;
+
+	if( i_args.sub_button )
+		elBtn.classList.add('sub_button');
+	else
+		elBtn.classList.add('ctrl_button');
+
+	if( i_args.always_active )
+	{
+		elBtn.classList.add('active');
+		elBtn.m_always_active = true;
+	}
+
+	elBtn.textContent = i_args.label;
+	elBtn.title = i_args.tooltip;
+	elBtn.m_monitor = this;
+	elBtn.m_act = i_args;
+
+	if( i_args.sub_menu )
+	{
+		elBtn.onclick = function(e){ e.currentTarget.classList.toggle('hide_childs'); return false; }
+		elBtn.oncontextmenu = elBtn.onclick;
+		elBtn.classList.add('hide_childs');
+
+		var acts = i_args.sub_menu;
+		for( var a in acts )
+		{
+			acts[a].sub_button = true;
+			if( acts[a].name == null ) acts[a].name = a;
+			acts[a].elParent = elBtn;
+			if( acts[a].handle == null ) acts[a].handle = i_args.handle;
+			var el = this.createCtrlBtn( acts[a]);
+			el.m_elBtn = elBtn;
+		}
+	}
+	else
+	{
+		if( i_args.ondblclick )
+			elBtn.ondblclick = Monitor.ctrlBtnClicked;
+		else
+			elBtn.onclick = Monitor.ctrlBtnClicked;
+		elBtn.oncontextmenu = function(e){return false;}
+	}
+
+	return elBtn;
+}
+Monitor.ctrlBtnClicked = function(e)
+{
+	e.stopPropagation();
+
+	var el = e.currentTarget;
+
+	var elBtn = el;
+	if( el.m_elBtn ) elBtn = el.m_elBtn; // <-- this is sub-button in this case
+	if( elBtn.classList.contains('active') != true )
+		return false;
+
+	var args = {'name':el.m_act.name,'type':el.m_act.type,'value':el.m_act.value,'monitor':el.m_monitor};
+
+	var handle = el.m_act.handle;
+	if( handle == null )
+		handle = 'mh_Oper';
+
+	var action_accepted = true;
+	if( el.m_monitor.nodeConstructor[handle] )
+		action_accepted = el.m_monitor.nodeConstructor[handle]( args, e);
+	else
+		action_accepted = el.m_monitor[handle]( args, e);
+
+	if( action_accepted !== false )
+	{
+		setInterval( Monitor.ctrlBtnRelease, 1234, el);
+		el.classList.add('clicked');
+	}
+
+	return false;
+}
+Monitor.ctrlBtnRelease = function( i_el)
+{
+	i_el.classList.remove('clicked');
+}
 
 // --------------- Sorting: -------------------//
 Monitor.prototype.sortDirChanged = function( i_evt)

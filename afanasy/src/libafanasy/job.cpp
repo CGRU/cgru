@@ -63,6 +63,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("user_name",     m_user_name,     i_object);
 
+	jr_stringmap("folders", m_folders, i_object);
+
 	bool offline = false;
 	jr_bool("offline",  offline, i_object, io_changes);
 	if( offline )
@@ -156,6 +158,18 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
+
+	if( m_folders.size())
+	{
+		o_str << ",\n\"folders\":{";
+		int i = 0;
+		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
+		{
+			if( i ) o_str << ",";
+			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
+		}
+		o_str << "\n}";
+	}
 
 	if( hasHostsMask())
 		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";

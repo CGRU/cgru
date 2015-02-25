@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import getpass
 import json
 import re
 import os
@@ -159,6 +160,23 @@ def processShot( i_path):
 
 	return out
 
+def processFile( io_shot, i_ext):
+	""" Process scene file name
+	File name should be:
+	output filder + softwate type + shot name + 'v000.' + extension
+	If such file exists, if appends user name (login) to file folder
+	:param io_shot: shot dict i/o
+	:param i_ext: software save file extension (without a dot)
+	"""
+	sdir = os.path.join( io_shot['path'], Options.output)
+	sdir = os.path.join( sdir, Options.soft)
+	sbase = io_shot['name'] + '_v000.' + i_ext
+	sfile = os.path.join( sdir, sbase)
+	if os.path.isfile( sfile):
+		sdir = os.path.join( sdir, getpass.getuser())
+		sfile = os.path.join( sdir, sbase)
+	io_shot['file'] = sfile
+
 def createNukeBackdrop( i_name, i_y, i_w):
 	""" Create Nuke 'Backdrop' node
 	:param i_name:
@@ -180,11 +198,8 @@ def processNuke( io_shot):
 	:param io_shot:
 	:return:
 	"""
-	io_shot['file'] = io_shot['path']
-	io_shot['file'] = os.path.join( io_shot['file'], Options.output)
-	io_shot['file'] = os.path.join( io_shot['file'], 'nuke')
-	io_shot['file'] = os.path.join( io_shot['file'], io_shot['name'])
-	io_shot['file'] += '_v000.nk'
+
+	processFile( shot, 'nk')
 
 	io_shot['nuke_name'] = io_shot['file'].replace('\\','/')
 	io_shot['nuke_path'] = io_shot['path'].replace('\\','/')

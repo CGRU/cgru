@@ -42,6 +42,7 @@ parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    de
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
+parser.add_option(      '--folder',       dest='folder',       type='string', default='', help='add a folder')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
 parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
 parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
@@ -74,6 +75,10 @@ if jobname == '':
 
 job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
+job.setFolder('pwd', os.getcwd())
+job.setFolder('test', '/this/is/a/test')
+if options.folder and len(options.folder):
+	job.setFolder('folder', options.folder)
 
 blocknames = []
 if options.labels != '':

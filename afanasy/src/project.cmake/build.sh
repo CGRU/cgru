@@ -76,6 +76,9 @@ case ${DISTRIBUTIVE} in
     RedHat)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
         ;;
+    Mageia)
+        export AF_EXTRA_LIBS="pthread"
+        ;;
     MacOSX)
         ;;
     *)

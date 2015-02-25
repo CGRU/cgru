@@ -116,6 +116,8 @@ protected:
 
 	std::string m_description; ///< Job description for statistics purposes only.
 
+	std::map< std::string, std::string > m_folders;
+
 	std::string m_thumb_path;
 	int32_t m_thumb_size;
 	char * m_thumb_data;

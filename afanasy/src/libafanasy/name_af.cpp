@@ -307,56 +307,6 @@ bool af::addUniqueToVect( std::vector<int> & o_vect, int i_value)
 	return true;
 }
 
-int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
-{
-//printf("af::getReadyTaskNumber:\n");
-	for( int task = i_startFrom; task < i_quantity; task++)
-	{
-		if( false == (flags & af::BlockData::FNonSequential))
-		{
-			if( i_tp[task]->isSolved()) continue;
-			i_tp[task]->setSolved();
-
-			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
-				return task;
-			else
-				continue;
-		}
-
-		int64_t powered = 1;
-		while( powered < task )
-			powered <<= 1;
-
-		bool nodivision_needed = false;
-		if( powered >= i_quantity )
-		{
-			bool nodivision_needed = true;
-			powered = i_quantity;
-		}
-
-//printf(" task=%d, powered=%lld\n", task, powered);
-		for( int64_t i = i_startFrom; i <= powered; i++)
-		{
-			int index = i;
-			if( false == nodivision_needed )
-				index = int( i * int64_t(i_quantity) / powered );
-
-			if( index >= i_quantity )
-				index = i_quantity - 1;
-
-			if( i_tp[index]->isSolved()) continue;
-			i_tp[index]->setSolved();
-
-			if( i_tp[index]->state & AFJOB::STATE_READY_MASK )
-				return index;
-		}
-	}
-
-	// No ready tasks found:
-//printf("No ready tasks found.\n");
-	return -1;
-}
-
 const std::string af::fillNumbers( const std::string & i_pattern, long long i_start, long long i_end)
 {
 	std::string str;

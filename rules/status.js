@@ -189,6 +189,7 @@ Status.prototype.showTasks = function()
 				var elTag = document.createElement('div');
 				elTags.appendChild( elTag);
 				elTag.classList.add('tag');
+				elTag.classList.add('artist');
 				elTag.textContent = c_GetUserTitle( task.artists[g]);
 			}
 		}
@@ -281,6 +282,7 @@ function st_SetElArtists( i_status, i_el, i_short)
 		var el = document.createElement('div');
 		i_el.appendChild( el);
 		el.classList.add('tag');
+		el.classList.add('artist');
 		el.textContent = c_GetUserTitle( i_status.artists[i], null, i_short);
 
 		if( g_users[i_status.artists[i]] && g_users[i_status.artists[i]].disabled )
@@ -355,10 +357,15 @@ function st_SetElColor( i_status, i_elBack, i_elColor, i_setNone)
 	}
 	else if( i_setNone )
 	{
-//		i_elBack.style.background = '';
-//		i_elColor.style.color = 'inherit';
-		i_elBack.style.background = localStorage.background;
-		i_elColor.style.color = localStorage.text_color;
+		if( localStorage.background && localStorage.background.length )
+			i_elBack.style.background = localStorage.background;
+		else
+			i_elBack.style.backgroundColor = u_backgroundColor;
+
+		if( localStorage.text_color && localStorage.text_color.length )
+			i_elColor.style.color = localStorage.text_color;
+		else
+			i_elColor.style.color = u_textColor;
 	}
 	return false;
 }
@@ -519,8 +526,10 @@ Status.prototype.edit = function( i_args)
 			}
 		}
 
-	this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,   "elEdit":this.elEdit});
-	this.editListShow({"name":'tags',   "label":'Tags:',   "list":tags,   "list_all":RULES.tags,"elEdit":this.elEdit});
+	if( c_CanAssignArtists())
+		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":this.elEdit});
+
+	this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_Color);
@@ -532,22 +541,25 @@ Status.prototype.edit = function( i_args)
 	this.elEdit.appendChild( this.elEdit_tasks);
 	this.elEdit_tasks.classList.add('edit_tasks');
 
-	var elTasksPanel = document.createElement('div');
-	this.elEdit_tasks.appendChild( elTasksPanel);
+	if( c_CanEditTasks())
+	{
+		var elTasksPanel = document.createElement('div');
+		this.elEdit_tasks.appendChild( elTasksPanel);
 
-	var el = document.createElement('div');
-	elTasksPanel.appendChild( el);
-	el.textContent = 'Add';
-	el.classList.add('button');
-	el.style.cssFloat = 'right';
-	el.m_status = this;
-	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
+		var el = document.createElement('div');
+		elTasksPanel.appendChild( el);
+		el.textContent = 'Add';
+		el.classList.add('button');
+		el.style.cssFloat = 'right';
+		el.m_status = this;
+		el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
 
-	var el = document.createElement('div');
-	elTasksPanel.appendChild( el);
-	el.textContent = 'Tasks:';
+		var el = document.createElement('div');
+		elTasksPanel.appendChild( el);
+		el.textContent = 'Tasks:';
 
-	this.editTasksShow();
+		this.editTasksShow();
+	}
 
 
 	// Get values:
@@ -633,6 +645,12 @@ Status.prototype.editListShow = function( i_args)
 		elRoot.m_elList.appendChild( el);
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
+		if( i_args.name == 'artists' )
+		{
+			el.classList.add('artist');
+			if( id == g_auth_user.id )
+				el.classList.add('me');
+		}
 
 		if( i_args.list_all[id] && i_args.list_all[id].disabled )
 			el.classList.add('disabled');
@@ -651,6 +669,7 @@ Status.prototype.editListEdit = function( i_args)
 	i_args.elRoot.m_edit = true;
 	i_args.elRoot.m_elBtn.classList.remove('button');
 	i_args.elRoot.m_elList.style.display = 'none';
+	i_args.elRoot.classList.add('edit');
 
 	i_args.elEdit[i_args.name] = [];
 
@@ -717,7 +736,10 @@ Status.prototype.editArtistsEdit = function( i_args)
 			var el = document.createElement('div');
 			elRole.appendChild( el);
 			el.classList.add('tag');
+			el.classList.add('artist');
 			el.m_item = artist.id;
+			if( artist.id == g_auth_user.id )
+				el.classList.add('edit_me');
 
 			if( g_users[artist.id] && g_users[artist.id].disabled )
 				el.classList.add('disabled');
@@ -845,16 +867,21 @@ Status.prototype.editTasksShow = function( i_args)
 		el.appendChild( elTags);
 		this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":elTags});
 
-		var artists = {};
-		if( tasks[t].artists )
-		for( var g = 0; g < tasks[t].artists.length; g++)
+		if( c_CanAssignArtists())
 		{
-			var id = tasks[t].artists[g];
-			artists[id] = {"title":c_GetUserTitle(id)};
+			var artists = {};
+			if( tasks[t].artists )
+			{
+				for( var g = 0; g < tasks[t].artists.length; g++)
+				{
+					var id = tasks[t].artists[g];
+					artists[id] = {"title":c_GetUserTitle(id)};
+				}
+			}
+			var elArtists = document.createElement('div');
+			el.appendChild( elArtists);
+			this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
 		}
-		var elArtists = document.createElement('div');
-		el.appendChild( elArtists);
-		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
 
 		el.m_task = tasks[t];
 		el.m_elDur = elDur;
@@ -978,7 +1005,7 @@ Status.prototype.editSave = function( i_args)
 			else if( elTask.m_task.tags )
 				task.tags = elTask.m_task.tags;
 
-			if( elTask.m_elArtists.artists)
+			if( elTask.m_elArtists && elTask.m_elArtists.artists)
 			{
 				task.artists = [];
 				elList = elTask.m_elArtists.artists;

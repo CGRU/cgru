@@ -3,20 +3,25 @@ u_el = {};
 u_views = ['asset','files','body','comments'];
 
 u_guest_attrs = []
-u_guest_attrs.push({"name":'id',     "label":'Login Name',"required":true});
-u_guest_attrs.push({"name":'title',  "label":'Full Name'});
-u_guest_attrs.push({"name":'email',  "label":'Email',  "info":'gravarar, hidden'});
-u_guest_attrs.push({"name":'avatar', "label":'Avatar', "info":'link'});
+u_guest_attrs.push({"name":'id',        "label":'Login Name',"required":true});
+u_guest_attrs.push({"name":'title',     "label":'Full Name'});
+u_guest_attrs.push({"name":'email',     "label":'Email',  "info":'gravarar, hidden'});
+u_guest_attrs.push({"name":'avatar',    "label":'Avatar', "info":'link'});
+u_guest_attrs.push({"name":'signature', "label":'Signature'});
 
 u_body_filename = 'body.html';
 u_body_text = '';
 u_body_editing = false;
 u_body_edit_markup = 0;
 
+u_backgroundColor = '#A0A0A0';
+u_textColor = '#000000';
 cgru_params.push(['back_asset','Asset', '', 'Enter background style']);
 cgru_params.push(['back_body','Body', '', 'Enter background style']);
 cgru_params.push(['back_files','Files', '', 'Enter background style']);
 cgru_params.push(['back_comments','Comments', '', 'Enter background style']);
+
+u_gui_size_handle = '6px'; // with a border
 
 u_thumbstime = {};
 
@@ -76,6 +81,23 @@ function u_InitAuth()
 
 function u_Process()
 {
+	if( RULES.annotations )
+		for( var name in RULES.annotations )
+		{
+			var elDiv = document.createElement('div');
+			$('annotations').appendChild( elDiv);
+
+			var el = document.createElement('div');
+			elDiv.appendChild( el);
+			el.classList.add('name');
+			el.textContent = name + ':';
+
+			var el = document.createElement('div');
+			elDiv.appendChild( el);
+			el.classList.add('text');
+			el.textContent = RULES.annotations[name];
+		}
+
 	if( c_RuFileExists(RULES.thumbnail.filename))
 	{
 		u_el.thumbnail.src = c_GetRuFilePath(RULES.thumbnail.filename);
@@ -109,7 +131,7 @@ function u_Process()
 	c_Info( path);
 	if( RULES.has_filesystem !== false )
 	{
-		$('open').setAttribute('cmdexec', JSON.stringify([RULES.cmdexec.open_folder.replace(/@PATH@/g, path)]));
+		$('open').setAttribute('cmdexec', JSON.stringify([cgru_OpenFolderCmd(path)]));
 		$('open').style.display = 'block';
 	}
 	else
@@ -119,6 +141,7 @@ function u_Process()
 
 function u_Finish()
 {
+	$('annotations').textContent = '';
 	u_el.thumbnail.style.display = 'none';
 
 	st_Finish();
@@ -160,7 +183,7 @@ function u_CalcGUI( i_toggle_scrollbars)
 	if( localStorage.sidepanel_opened == 'true')
 	{
 		$('sidepanel_handle').style.display = 'block';
-		$('sidepanel').style.left = '6px';
+		$('sidepanel').style.left = u_gui_size_handle;
 	}
 	else
 	{
@@ -244,14 +267,25 @@ function u_ResizeGUIFinish()
 function u_ApplyStyles()
 {
 	if( p_PLAYER ) return;
-	document.body.style.background = localStorage.background;
-	document.body.style.color = localStorage.text_color;
-	var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle'];
-	for( var i = 0; i < backs.length; i++ )
-		$(backs[i]).style.background = localStorage.background;
+
+	if( localStorage.background && localStorage.background.length )
+	{
+		document.body.style.background = localStorage.background;
+		var backs = ['header','footer','navig_div','sidepanel_div','content','navig_handle','sidepanel_handle'];
+		for( var i = 0; i < backs.length; i++ )
+			$(backs[i]).style.background = localStorage.background;
+	}
+
+	if( localStorage.text_color && localStorage.text_color.length )
+		document.body.style.color = localStorage.text_color;
+
 	var backs = ['asset','body','files','comments'];
 	for( var i = 0; i < backs.length; i++ )
-		$(backs[i]+'_div').style.background = localStorage['back_' + backs[i]];
+	{
+		var back = localStorage['back_' + backs[i]];
+		if( back && back.length )
+			$(backs[i]+'_div').style.background = localStorage['back_' + backs[i]];
+	}
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
@@ -710,7 +744,8 @@ function u_BodyEditCancel( i_text)
 	if( i_text == null ) i_text = u_body_text;
 	$('body_body').innerHTML = i_text;
 
-	$('body_btn_edit').style.display = 'block';
+	if( c_CanEditBody())
+		$('body_btn_edit').style.display = 'block';
 	$('body_btn_edit_cancel').style.display = 'none';
 	$('body_panel').style.display = 'block';
 	$('body_panel_edit').style.display = 'none';

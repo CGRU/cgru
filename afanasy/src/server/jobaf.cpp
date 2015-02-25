@@ -64,10 +64,18 @@ void JobAf::readStore()
 	int size;
 	char * data = af::fileRead( getStoreFile(), &size);
 	if( data == NULL ) return;
+
 	rapidjson::Document document;
 	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL ) return;
+	if( res == NULL )
+	{
+		delete [] data;
+		return;
+	}
+
 	jsonRead( document);
+
+	delete [] res;
 	delete [] data;
 
 	m_progress = new af::JobProgress( this);
@@ -833,6 +841,7 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("Job::solve: %s:\n", m_name.c_str());
+	// Prepare for the new solving (reset previous solvind stored data):
 	for( int b = 0; b < m_blocks_num; b++)
     {
         int numtasks = m_blocks_data[b]->getTasksNum();
@@ -841,11 +850,8 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 			// Needed for recursion function, to not to try to solve the same task again
 			m_blocks[b]->m_tasks[t]->m_solved = false;
 
-			if( m_blocks_data[b]->isNonSequential())
-			{
-				// Needed to store tasks that was tried
-				m_progress->tp[b][t]->setNotSolved();
-			}
+			// Needed to store tasks that was tried, for nonsequential case:
+			m_progress->tp[b][t]->setNotSolved();
         }
     }
 
@@ -853,68 +859,48 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 	{
 		if( false == ( m_blocks_data[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 
-		int numtasks = m_blocks_data[b]->getTasksNum();
-		int t = -1;
-		for(;;)
+		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b]);
+
+		if( task_num == -1 )
+			continue;
+
+		//static int cycle = 0;printf("cycle = %d\n", cycle++);
+		std::list<int> blocksIds;
+		af::TaskExec *task_exec = genTask( render, b, task_num, &blocksIds, monitoring);
+
+		// Job may became paused, if recursion during task generation detected:
+		if( m_state & AFJOB::STATE_OFFLINE_MASK )
 		{
-			if( m_blocks_data[b]->isSequential())
-			{
-				t++;
-				if( t >= numtasks )
-				{
-					break;
-				}
+			if( task_exec ) delete task_exec;
+			return false;
+		}
 
-				if( false == ( m_progress->tp[b][t]->state & AFJOB::STATE_READY_MASK ))
-				{
-					continue;
-				}
-			}
-			else
-			{
-				t = af::getReadyTaskNumber( numtasks, m_progress->tp[b], m_blocks_data[b]->getFlags());
-				if( t == -1 )
-					break;
-			}
-
-			//static int cycle = 0;printf("cycle = %d\n", cycle++);
-			std::list<int> blocksIds;
-			af::TaskExec *task_exec = genTask( render, b, t, &blocksIds, monitoring);
-
-			// Job may became paused, if recursion during task generation detected:
-			if( m_state & AFJOB::STATE_OFFLINE_MASK )
-			{
-				if( task_exec ) delete task_exec;
-				return false;
-			}
-
-			// Check if render is online
-			// It can be solved with offline render to check whether to WOL wake it
-			if( task_exec && render->isOffline())
-			{
-				delete task_exec;
-				return true;
-			}
-
-			// No task was generated:
-			if( task_exec == NULL ) continue;
-
-			// Job successfully solved (produced a task)
-			task_exec->setJobName( m_name);
-			task_exec->setUserName( m_user_name);
-			listeners.process( *task_exec);
-			m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring);
-
-			// If job was not started it became started
-			if( m_time_started == 0 )
-			{
-				m_time_started = time(NULL);
-				appendLog("Started.");
-				store();
-			}
-
+		// Check if render is online
+		// It can be solved with offline render to check whether to WOL wake it
+		if( task_exec && render->isOffline())
+		{
+			delete task_exec;
 			return true;
 		}
+
+		// No task was generated:
+		if( task_exec == NULL ) continue;
+
+		// Job successfully solved (produced a task)
+		task_exec->setJobName( m_name);
+		task_exec->setUserName( m_user_name);
+		listeners.process( *task_exec);
+		m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring);
+
+		// If job was not started it became started
+		if( m_time_started == 0 )
+		{
+			m_time_started = time(NULL);
+			appendLog("Started.");
+			store();
+		}
+
+		return true;
 	}
 	return false;
 }

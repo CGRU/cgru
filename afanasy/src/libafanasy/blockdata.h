@@ -35,9 +35,7 @@ public:
 		FVarCapacity      = 1 << 1,
 		FMultiHost        = 1 << 2,
 		FMasterOnSlave    = 1 << 3,
-		FDependSubTask    = 1 << 4,
-		FNonSequential    = 1 << 5,
-		FGenThumbnails    = 1 << 6
+		FDependSubTask    = 1 << 4
 	};
 
 	static const char DataMode_Progress[];
@@ -66,7 +64,8 @@ public:
 	TaskExec * genTask( int num) const;
 
 	bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL ) const; ///< Generate fisrt and last frame numbers for \c num task.
-	int calcTaskNumber( long long i_frame, bool & o_inValidRange) const;
+	int calcTaskNumber( long long i_frame, bool & o_valid_range) const;
+	int getReadyTaskNumber( TaskProgress ** i_tp);
 	const std::string genTaskName( int num, long long * fstart = NULL, long long * fend = NULL ) const;
 	const std::string genCommand(  int num, long long * fstart = NULL, long long * fend = NULL ) const;
 	const std::vector<std::string> genFiles(int num, long long * fstart = NULL, long long * fend = NULL ) const;
@@ -80,11 +79,9 @@ public:
 
 	inline void setDependSubTask( bool value = true) { if(value) m_flags |= FDependSubTask; else m_flags &= (~FDependSubTask);}
 
-	inline bool isSequential()    const { return false == (m_flags & FNonSequential);}
-	inline bool isNonSequential() const { return m_flags & FNonSequential; }
-	inline void setNonSequential( bool i_value ) { if(i_value) m_flags |= FNonSequential; else m_flags &= (~FNonSequential);}
-
-	inline void setGenTHumbnails( bool i_value ) { if(i_value) m_flags |= FGenThumbnails; else m_flags &= (~FGenThumbnails);}
+	inline bool isSequential()  const { return m_sequential == 1; }
+	inline bool notSequential() const { return m_sequential != 1; }
+	inline void setSequential( int64_t i_value ) { m_sequential = i_value; }
 
 	inline void setParserCoeff( int value ) { m_parser_coeff = value; }
 
@@ -279,11 +276,12 @@ protected:
 	uint32_t m_state;      ///< Currend block state flags.
 	uint32_t m_flags;            ///< Block type flags.
 
-	int32_t  m_tasks_num;        ///< Number of tasks in block.
-	int64_t  m_frame_first;      ///< First tasks frame.
-	int64_t  m_frame_last;       ///< Last tasks frame.
-	int64_t  m_frames_per_task;  ///< Tasks frames per task.
-	int64_t  m_frames_inc;       ///< Tasks frames increment.
+	int32_t m_tasks_num;        ///< Number of tasks in block.
+	int64_t m_frame_first;      ///< First tasks frame.
+	int64_t m_frame_last;       ///< Last tasks frame.
+	int64_t m_frames_per_task;  ///< Tasks frames per task.
+	int64_t m_frames_inc;       ///< Tasks frames increment.
+	int64_t m_sequential;       ///< Tasks solve sequential.
 
 	int32_t  m_running_tasks_counter; ///< Number of running tasks counter.
 

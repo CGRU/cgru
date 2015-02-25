@@ -18,7 +18,6 @@ function nw_Init()
 	// News:
 	nw_ShowCount();
 
-	$('subscribe').style.display = 'block';
 	$('sidepanel_news').style.display = 'block';
 	nw_initialized = true;
 
@@ -53,15 +52,11 @@ function nw_DisableNewsToggle( i_toggle)
 
 	if( localStorage.news_disabled == 'true')
 	{
-		$('news_disable').textContent = 'News Disabled';
 		$('news_disable').classList.add('disabled');
-		$('news_make').style.display = 'none';
 	}
 	else
 	{
-		$('news_disable').textContent = 'Disable News';
 		$('news_disable').classList.remove('disabled');
-		$('news_make').style.display = 'block';
 	}
 }
 
@@ -77,12 +72,10 @@ function nw_IgnoreOwnToggle( i_toggle)
 
 	if( localStorage.news_ignore_own == 'true')
 	{
-		$('news_ignore_own').textContent = 'Ignoring Own';
 		$('news_ignore_own').classList.add('ignore');
 	}
 	else
 	{
-		$('news_ignore_own').textContent = 'Listening Own';
 		$('news_ignore_own').classList.remove('ignore');
 	}
 }
@@ -99,27 +92,33 @@ function nw_SortOrderToggle()
 
 function nw_UpdateChannels()
 {
-	$('channels').innerHTML = '';
+	var elChannels = $('channels');
+	elChannels.innerHTML = '';
+	elChannels.m_elChan = [];
 	for( var i = 0; i < g_auth_user.channels.length; i++ )
 	{
-		nw_path = g_auth_user.channels[i].id;
+		var path = g_auth_user.channels[i].id;
+
 		var el = document.createElement('div');
 		$('channels').appendChild( el);
 		el.classList.add('channel');
 		el.title = 'Subscribed by '+g_auth_user.channels[i].user+' at\n'+c_DT_StrFromSec( g_auth_user.channels[i].time);
+		el.m_path = path;
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
 		elBtn.classList.add('delete');
-		elBtn.m_path = nw_path;
+		elBtn.m_path = path;
 		elBtn.ondblclick = function(e){ nw_Unsubscribe( e.currentTarget.m_path);};
 		elBtn.title = 'Double click to remove channel';
 
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
-		elLink.href = '#'+nw_path;
-		elLink.textContent = nw_path;
+		elLink.href = '#' + path;
+		elLink.textContent = path;
+
+		elChannels.m_elChan.push( el);
 	}
 }
 
@@ -130,6 +129,8 @@ function nw_Process()
 
 	if( false == nw_initialized ) return;
 
+	nw_HighlightChannels();
+
 //window.console.log(g_auth_user.channels);
 	var subscribed = false;
 	var path = g_CurPath();
@@ -139,24 +140,12 @@ function nw_Process()
 		if( path.indexOf( nw_path) == 0 )
 		{
 			subscribed = true;
-			if( path == nw_path )
-			{
-				$('subscribe_path').style.display = 'none';
-				$('unsubscribe_btn').style.display = 'block';
-			}
-			else
-			{
-				$('subscribe_path').style.display = 'block';
-				$('unsubscribe_btn').style.display = 'none';
-				$('subscribe_path').innerHTML = '<a href="#'+nw_path+'">'+nw_path+'</a>';
-			}
 			break;
 		}
 	}
 
 	if( subscribed )
 	{
-		$('subscribe_label').style.display = 'block';
 		$('subscribe_btn').style.display = 'none';
 	}
 	else
@@ -170,10 +159,7 @@ function nw_Finish( i_finish_recent)
 
 	if( false == nw_initialized ) return;
 
-	$('subscribe_label').style.display = 'none';
 	$('subscribe_btn').style.display = 'block';
-	$('unsubscribe_btn').style.display = 'none';
-	$('subscribe_path').style.display = 'none';
 }
 
 function nw_Subscribe( i_path)
@@ -203,8 +189,8 @@ function nw_SubscribeFinished( i_data, i_args)
 	}
 
 	g_auth_user.channels.push( i_args.channel);
-	nw_Process();
 	nw_UpdateChannels();
+	nw_Process();
 
 	c_Info('Subscribed at ' + i_args.channel.id);
 }
@@ -241,8 +227,8 @@ function nw_UnsubscribeFinished( i_data, i_args)
 			break;
 		}
 
-	nw_Process();
 	nw_UpdateChannels();
+	nw_Process();
 
 	c_Info('Unsubscribed from ' + path);
 }
@@ -283,7 +269,6 @@ function nw_MakeNewsDialog()
 		"name":'news',"title":'Create News',"info":'Enter News Title'});
 }
 function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
-//function nw_MakeNews( i_title, i_path, i_user_id, i_guest )
 function nw_MakeNews( i_news, i_args )
 {
 	if( localStorage.news_disabled == 'true') return;
@@ -312,7 +297,11 @@ function nw_MakeNews( i_news, i_args )
 
 	var email_subject = c_GetUserTitle( news.user) + ' - ' + news.title;
 	var email_body = '<a href="';
-	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname + '#' + news.path;
+	email_body += document.location.protocol + '//' + document.location.host + document.location.pathname;
+	if( news.link )
+		email_body += news.link;
+	else
+		email_body += '#' + news.path;
 	email_body += '">' + news.path + '</a>';
 
 	var request = {};
@@ -428,10 +417,14 @@ function nw_NewsShow()
 		$('news').m_elArray.push( el);
 		el.classList.add('news');
 		el.m_news = news;
-
 		el.title = c_DT_StrFromSec( news.time);
-		if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
-			el.classList.add('assigned');
+
+		// Highlight news if artists is assigned,
+		// but only if artists has no subscribed channels
+		// ( if artist has no channels all news are "assigned"
+		if( g_auth_user.channels && g_auth_user.channels.length )
+			if( news.artists && ( news.artists.indexOf( g_auth_user.id) != -1 ))
+				el.classList.add('assigned');
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
@@ -458,13 +451,19 @@ function nw_NewsShow()
 		elLabel.classList.add('news_label');
 		elLabel.innerHTML = c_GetUserTitle(news.user, news.guest)+': '+news.title;
 
+		var elLinkDiv = document.createElement('div');
+		el.appendChild( elLinkDiv);
+		elLinkDiv.classList.add('link');
+		
 		var elLink = document.createElement('a');
-		el.appendChild( elLink);
-		elLink.href = '#'+news.path;
+		elLinkDiv.appendChild( elLink);
+		if( news.link )
+			elLink.href = news.link;
+		else
+			elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 
-		var prj = news.path.substr(1);
-		prj = prj.substr( 0, prj.indexOf('/'));
+		var prj = news.path.split('/')[1];
 		if( projects.indexOf(prj) == -1 )
 			projects.push( prj);
 	}
@@ -478,7 +477,7 @@ function nw_NewsShow()
 		el.classList.add('button');
 		el.classList.add('nw_fb');
 		el.textContent = projects[i];
-		el.onclick=function(e){ nw_FilterBtn( e.currentTarget, e.currentTarget.textContent, true);};
+		el.onclick = function(e){ nw_FilterBtn( e.currentTarget, e.currentTarget.textContent, true);};
 
 		el.m_filter = projects[i];
 		el.m_project = true;
@@ -508,6 +507,22 @@ function nw_HighlightCurrent()
 			elNews[i].classList.add('cur_path');
 		else
 			elNews[i].classList.remove('cur_path');
+
+	nw_HighlightChannels();
+}
+
+function nw_HighlightChannels()
+{
+	if( g_CurPath() == null ) return;
+
+	var elChans = $('channels').m_elChan;
+	for( var i = 0; i < elChans.length; i++)
+	{
+		if( g_CurPath().indexOf( elChans[i].m_path) == 0 )
+			elChans[i].classList.add('current');
+		else
+			elChans[i].classList.remove('current');
+	}
 }
 
 function nw_FilterBtn(i_btn, i_filter, i_project)
@@ -705,6 +720,7 @@ function nw_RecentReceived( i_data, i_args)
 
 		var el = document.createElement('div');
 		$('recent').appendChild( el);
+		el.classList.add('recent');
 
 		var avatar = c_GetAvatar( news.user, news.guest);
 		if( avatar )
@@ -725,9 +741,16 @@ function nw_RecentReceived( i_data, i_args)
 		elTitle.classList.add('title');
 		elTitle.innerHTML = news.title;
 
+		var elLinkDiv = document.createElement('div');
+		el.appendChild( elLinkDiv);
+		elLinkDiv.classList.add('link');
+		
 		var elLink = document.createElement('a');
-		el.appendChild( elLink);
-		elLink.href = '#'+news.path;
+		elLinkDiv.appendChild( elLink);
+		if( news.link )
+			elLink.href = news.link;
+		else
+			elLink.href = '#'+news.path;
 		elLink.textContent = news.path;
 
 		var elTime = document.createElement('div');

@@ -99,22 +99,28 @@ Sources.sort()
 Sources_skip = []
 FIN_SRC = []
 FIN_DST = []
-for shot in Sources:
-	if shot[0] == '.':
+for shot_folder in Sources:
+	if shot_folder[0] == '.':
 		continue
-	if shot in Sources_skip:
+	if shot_folder in Sources_skip:
 		continue
-	src = os.path.join(Options.sources, shot)
+	src = os.path.join(Options.sources, shot_folder)
 	if not os.path.isdir(src):
 		#Out.append({'warning': "\"%s\" is not a folder" % shot})
 		continue
 
+	# Shot name:
+	shot_name = shot_folder
+	for ex in ['.mov','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
+		shot_name = shot_name.replace(ex,'')
+		shot_name = shot_name.replace(ex.upper(),'')
+
 	src_sources = [src]
 
 	for folder in Sources:
-		if folder == shot:
+		if folder == shot_folder:
 			continue
-		if Options.sameshot and isSameShot(shot, folder):
+		if Options.sameshot and isSameShot(shot_name, folder):
 			Sources_skip.append(folder)
 			src_sources.append(os.path.join(Options.sources, folder))
 
@@ -123,15 +129,13 @@ for shot in Sources:
 		ref_path = os.path.join(Options.refs, ref)
 		if not os.path.isfile(ref_path): continue
 		if ref_path in src_sources: continue
-		if isSameShot(shot, ref):
+		if isSameShot(shot_name, ref):
 			src_refs.append(os.path.join(ref_path))
-
-	shot_name = shot
 
 	# Rename shot padding:
 	if Options.padding != '':
-		words = re.findall(r'\D+', shot)
-		digits = re.findall(r'\d+', shot)
+		words = re.findall(r'\D+', shot_name)
+		digits = re.findall(r'\d+', shot_name)
 		if len(words) == len(digits):
 			shot_name = ''
 			num = 0
@@ -142,12 +146,7 @@ for shot in Sources:
 				shot_name += word
 				shot_name += ('%0' + padding + 'd') % int(digits[num])
 				num += 1
-				# print('"%s"->"%s"' % (shot, shot_name))
-
-	# Shot name:
-	for ex in ['.mov','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
-		shot_name = shot_name.replace(ex,'')
-		shot_name = shot_name.replace(ex.upper(),'')
+				# print('"%s"->"%s"' % (shot_folder, shot_name))
 
 	# Rename shot uppercase:
 	if Options.uppercase:

@@ -3,16 +3,22 @@
 #scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
 
-.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 6px; box-shadow: 0 0 4px #000 inset; margin: 4px;}
+.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px; position: relative; }
 
-.shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
+.shot .thumbnail { float: left; margin-right: 20px; }
+.shot .name_body { height: 84px; /*overflow: auto;*/ }
+.shot .frames_num_div { float: right; font: 14px monospace; }
+.shot .frames_num_label { float: left; }
+.shot .frames_num { float: right; }
+.shot .body { font-size: 14px; margin-top: 4px; display: none; }
+
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
-.shot .status .btn_edit { float: right; font-size: 10px; }
 .shot .status .percent { float: left; margin-right: 5px; }
 .shot .status .annotation { float: left; margin-right: 5px; }
 .shot .status .artists { float: left; margin-right: 5px; }
 .shot .status .tags { float: left; margin-right: 5px; }
 .shot .status .progressbar { clear: both; height: 8px; }
+.shot .status .button.edit { float: right; font-size: 10px; }
 
 #scenes_tasks .task { margin: 2px; border: 1px solid #777; }
 #scenes_tasks .task > div { float: left; margin: 2px 4px; }
@@ -21,11 +27,9 @@
 .scene a { color: inherit; /*display:block;*/ }
 .scene a:hover { color: #AFF;}
 .scene .shot {
-position: relative;
 float: left;
-border-radius: 6px;
+border-radius: 2px;
 margin: 4px;
-box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;
 width: 200px;
 height: 44px;
 }
@@ -66,7 +70,7 @@ box-shadow: 0 0 4px rgba(255,255,255,.7);
 opacity:.9;
 }
 
-.shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #000 inset, 0 0 4px #7FF;}
+.shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #7FF inset, 0 0 4px #7FF;}
 
 #scenes_statistics .bars .bar { height: 12px; margin: 2px 0px; }
 #scenes_statistics .bars .bar .rect {
@@ -80,7 +84,7 @@ border-radius: 2px;
 </style>
 
 <div id="scenes_ctrl_panel" style="float:right;">
-	<div style="box-shadow: 0 0 2px #000 inset; font-size: 12px;">
+	<div style="border: 1px solid rgba(98,98,98,.5); border-radius: 2px; font-size: 12px;">
 		<div>Select:</div>
 		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
 		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">Playlist</div>
@@ -96,7 +100,7 @@ border-radius: 2px;
 
 <div style="clear:both" id="scenes_div"></div>
 
-<div id="scenes_make_thumbnails" style="border:1px solid #777; margin: 4px; border-radius: 4px">
+<div id="scenes_make_thumbnails" style="border:1px solid #777; margin: 4px; border-radius: 2px">
 	<div class="button" style="float: right;" onclick="scenes_makeThumbnails()">Make</div>
 	<div style="float: left; padding: 4px">Thumbnails:</div>
 </div>

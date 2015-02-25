@@ -108,7 +108,7 @@ function cm_TimeStringInterval( time1, time2)
 	return time;
 }
 
-function cm_TimeStringFromSeconds( i_seconds)
+function cm_TimeStringFromSeconds( i_seconds, i_full)
 {
 	var str = '';
 
@@ -132,7 +132,12 @@ function cm_TimeStringFromSeconds( i_seconds)
 	}
 
 	if( days )
-		str += days + 'd ';
+	{
+		if( i_full )
+			str += days + ' Days ';
+		else
+			str += days + 'd ';
+	}
 
 	if( hours )
 	{
@@ -142,7 +147,13 @@ function cm_TimeStringFromSeconds( i_seconds)
 			str += ':'; if( minutes < 10 ) str += '0'; str += minutes;
 			if( seconds ) { str += '.'; if( seconds < 10 ) str += '0'; str += seconds;}
 		}
-		else str += 'h';
+		else
+		{
+			if( i_full )
+				str += ' Hours';
+			else
+				str += 'h';
+		}
 	}
 	else if( minutes )
 	{
@@ -240,3 +251,25 @@ function cm_FillNumbers( i_string, i_number)
 
 function cm_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1).substr( i_file.lastIndexOf('\\')+1);}
 function cm_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/')).substr( 0, i_file.lastIndexOf('\\'));}
+
+function cm_CheckPermissions( i_perm)
+{
+	if( i_perm == null ) return true;
+
+	if( g_VISOR())
+	{
+		if( i_perm == 'user') return false;
+		if( g_GOD())
+		{
+			if( false == (( i_perm == 'visor') || ( i_perm == 'god')))
+				return false;
+		}
+		else if( i_perm != 'visor')
+			return false;
+	}
+	else if( i_perm != 'user')
+		return false;
+
+	return true;
+}
+

@@ -59,10 +59,16 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
 
 	rapidjson::Document document;
 	char * res = af::jsonParseData( document, data, size);
-	if( res == NULL ) return;
+	if( res == NULL )
+	{
+		delete [] data;
+		return;
+	}
 
 	m_progress->jsonRead( document);
+
 	delete [] data;
+	delete [] res;
 }
 
 Task::~Task()

@@ -53,7 +53,7 @@ cd "${output}"
 function writeInstallDependsAFANASY(){
 	if [ ! -z "${DEPENDS_AFANASY}" ]; then
 		echo "echo Installing AFANASY dependences:" >> $afile
-		echo "${PACKAGE_MANAGER} install ${DEPENDS_AFANASY}" >> $afile
+		echo "${PACKAGE_INSTALL} ${DEPENDS_AFANASY}" >> $afile
 		echo "" >> $afile
 	fi
 }
@@ -61,7 +61,7 @@ function writeInstallDependsAFANASY(){
 function writeInstallDependsQTGUI(){
 	if [ ! -z "${DEPENDS_QTGUI}" ]; then
 		echo "echo Installing QTGUI dependences:" >> $afile
-		echo "${PACKAGE_MANAGER} install ${DEPENDS_QTGUI}" >> $afile
+		echo "${PACKAGE_INSTALL} ${DEPENDS_QTGUI}" >> $afile
 		echo "" >> $afile
 	fi
 }
@@ -69,7 +69,7 @@ function writeInstallDependsQTGUI(){
 function writeInstallDependsCGRU(){
 	if [ ! -z "${DEPENDS_CGRU}" ]; then
 		echo "echo Installing CGRU dependences:" >> $afile
-		echo "${PACKAGE_MANAGER} install ${DEPENDS_CGRU}" >> $afile
+		echo "${PACKAGE_INSTALL} ${DEPENDS_CGRU}" >> $afile
 		echo "" >> $afile
 	fi
 }

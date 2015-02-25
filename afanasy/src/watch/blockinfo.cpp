@@ -70,12 +70,12 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		multihost_samemaster = block->canMasterRunOnSlaveHost();
 		varcapacity          = block->canVarCapacity();
 		numeric              = block->isNumeric();
-		nonsequential      = block->isNonSequential();
 
 		frame_first          = block->getFrameFirst();
 		frame_last           = block->getFrameLast();
 		frame_pertask        = block->getFramePerTask();
 		frame_inc            = block->getFrameInc();
+		nonsequential        = block->notSequential();
 
 		tasksnum             = block->getTasksNum();
 		tasksmaxruntime      = block->getTasksMaxRunTime();

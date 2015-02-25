@@ -39,29 +39,33 @@ function n_XHRHandler()
 {
 	if( this.readyState == 4 )
 	{
-		if(( this.status == 200 ) && this.responseText.length )
+		if( this.status == 200 )
 		{
-			this.m_log += '<br><b><i>recv:</i></b> '+ this.responseText;
+			if( this.responseText.length )
+				this.m_log += '<br><b><i>recv:</i></b> '+ this.responseText;
 			g_Log( this.m_log, 'netlog');
 
 			nw_error_count = 0;
 			nw_connected = true;
 
-			var recv_obj = null;
-			try { recv_obj = JSON.parse( this.responseText);}
-			catch( err)
+			if( this.responseText.length )
 			{
-				g_Error('JSON.parse:');
-				g_Log( err.message+'<br>'+this.responseText);
-				recv_obj = null;
-			}
+				var recv_obj = null;
+				try { recv_obj = JSON.parse( this.responseText);}
+				catch( err)
+				{
+					g_Error('JSON.parse:');
+					g_Log( err.message+'<br>'+this.responseText);
+					recv_obj = null;
+				}
 
-			if( recv_obj )
-			{
-				if( this.m_args.func )
-					this.m_args.func( recv_obj, this.m_args);
-				else
-					g_ProcessMsg( recv_obj);
+				if( recv_obj )
+				{
+					if( this.m_args.func )
+						this.m_args.func( recv_obj, this.m_args);
+					else
+						g_ProcessMsg( recv_obj);
+				}
 			}
 		}
 		else

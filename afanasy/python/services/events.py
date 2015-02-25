@@ -14,8 +14,8 @@ class events(service.service):
 	"""Events Trigger
 	"""
 
-	def __init__(self, task_info):
-		service.service.__init__(self, task_info)
+	def __init__(self, task_info, i_verbose):
+		service.service.__init__(self, task_info, i_verbose)
 		data = self.taskInfo['command']
 		self.taskInfo['command'] = ''
 

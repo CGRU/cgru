@@ -1,0 +1,12 @@
+{
+	"save":
+	{
+		"path" : "saved_object",
+			"":"path will be related to CGRU_LOCATION and .json extension will be added",
+		"object":
+		{
+			"prop_a":"value A",
+			"prop_b":"value B"
+		}
+	}
+}

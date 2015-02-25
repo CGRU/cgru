@@ -14,9 +14,9 @@ class vray(service.service):
 	"""
 
 	# override base service class method
-	def __init__(self, taskInfo):
+	def __init__(self, taskInfo, i_verbose):
 		print('vray.init')
-		service.service.__init__(self, taskInfo)
+		service.service.__init__(self, taskInfo, i_verbose)
 
 	def applycmdhosts(self, command):
 		"""Missing DocString

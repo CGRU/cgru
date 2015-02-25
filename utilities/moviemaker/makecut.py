@@ -5,6 +5,7 @@ import sys
 import os
 import shutil
 import signal
+import re
 import time
 
 import af
@@ -30,8 +31,10 @@ Parser.add_option('-o', '--outdir',     dest='outdir',     type  ='string', defa
 Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='',          help='Afanasy user name')
 Parser.add_option('--afservice',        dest='afservice',  type  ='string', default='movgen',    help='Afanasy service type')
 Parser.add_option('--afcapacity',       dest='afcapacity', type  ='int',    default=100,         help='Afanasy tasks capacity')
+Parser.add_option('--afmaxtasks',       dest='afmaxtasks', type  ='int',    default=-1,          help='Afanasy max running tasks')
 Parser.add_option('--afperhost',        dest='afperhost',  type  ='int',    default=-1,          help='Afanasy max tasks per host')
-Parser.add_option('--afruntime',        dest='afruntime',  type  ='int',    default=20,          help='Afanasy max tasks run time')
+Parser.add_option('--afmaxruntime',        dest='afmaxruntime',  type  ='int',    default=120,         help='Afanasy max tasks run time')
+Parser.add_option('-p', '--afpertask',  dest='afpertask',  type  ='int',    default=100,         help='Afanasy frames per task')
 Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,   help='Test input only')
 
 
@@ -137,11 +140,53 @@ for shot in Shots:
 				break
 		if valid:
 			files.append(os.path.join(folder, item))
+
 	if len(files) == 0:
 		errExit('No files found in folder: %s' % folder)
+
 	files.sort()
 
-	print('{"sequence":"%s"},' % folder)
+	nums = re.findall(r'\d+',files[0])
+	if len(nums) == 0:
+		errExit('Can`t find numbers in %s', files[0])
+	nums = nums[-1]
+	sequence = files[0][:files[0].rfind(nums)]
+	padding = len(nums)
+	sequence += '%0' + str(padding) + 'd'
+	sequence += files[0][files[0].rfind(nums)+padding:]
+	frame_first = int(nums)
+	nums = re.findall(r'\d+',files[-1])
+	if len(nums) == 0:
+		errExit('Can`t find numbers in %s', files[-1])
+	frame_last = int(nums[-1])
+
+	print('{"sequence":"%s","first":%d,"last":%d,"count":%d},' % (sequence, frame_first, frame_last, len(files)))
+
+	f = frame_first
+	while f <= frame_last:
+		num_frames = Options.afpertask
+		if f + num_frames > frame_last:
+			num_frames = frame_last - f + 1
+
+		cmd = cmd_prefix
+		cmd += ' --project "%s"' % CutName
+		cmd += ' --shot "%s"' % name
+		cmd += ' --ver "%s"' % version
+		cmd += ' --moviename "%s"' % os.path.basename(movie_name)
+		cmd += ' --frame_input %d' % f
+		cmd += ' --frame_output %d' % file_counter
+		cmd += ' --frames_num %d' % num_frames
+		cmd += ' "%s"' % sequence
+		output = os.path.join(OutDir, TmpFiles)
+		cmd += ' "%s"' % output
+
+		commands.append(cmd)
+		task_names.append('%s: %d-%d' % (os.path.basename(sequence), f, f+num_frames-1))
+
+		f += Options.afpertask
+		file_counter += Options.afpertask
+
+	continue
 
 	for image in files:
 		cmd = cmd_prefix
@@ -169,6 +214,9 @@ cmd_encode += ' "%s"' % os.path.join(OutDir, TmpFiles)
 cmd_encode += ' "%s"' % movie_name
 
 job = af.Job('CUT ' + CutName)
+job.setMaxRunningTasks( Options.afmaxtasks)
+job.setMaxRunTasksPerHost( Options.afperhost)
+
 block = af.Block('convert', Options.afservice)
 counter = 0
 for cmd in commands:
@@ -177,8 +225,7 @@ for cmd in commands:
 	block.tasks.append(task)
 	counter += 1
 block.setCapacity( Options.afcapacity)
-block.setMaxRunTasksPerHost( Options.afperhost)
-block.setTasksMaxRunTime( Options.afruntime)
+block.setTasksMaxRunTime( Options.afmaxruntime)
 job.blocks.append(block)
 
 block = af.Block('encode', Options.afservice)

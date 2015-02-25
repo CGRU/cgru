@@ -234,7 +234,7 @@ function n_SendJob( job)
 function n_JobSended( i_data)
 {
 	if( i_data.error )
-		c_Error( i_data.error);
+		c_Error('Failed to connect AFANASY: ' + i_data.error);
 }
 
 // not used

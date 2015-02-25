@@ -154,9 +154,9 @@ function Comment( i_obj)
 	this.elDate.classList.add('date');
 	this.elPanel.appendChild( this.elDate);
 
-	this.elModified = document.createElement('div');
-	this.elModified.classList.add('modified');
-	this.elPanel.appendChild( this.elModified);
+	this.elInfo = document.createElement('div');
+	this.elInfo.classList.add('info');
+	this.elPanel.appendChild( this.elInfo);
 
 	this.elText = document.createElement('div');
 	this.el.appendChild( this.elText);
@@ -173,6 +173,10 @@ function Comment( i_obj)
 	this.elUploads.classList.add('uploads');
 	this.elUploads.style.display = 'none';
 
+	this.elSignature = document.createElement('div');
+	this.el.appendChild( this.elSignature);
+	this.elSignature.classList.add('signature');
+
 	this.obj = i_obj;
 	this.init();
 }
@@ -182,32 +186,23 @@ Comment.prototype.init = function()
 	this.elTags.textContent = '';
 	this.elForEdit.innerHTML = '';
 	this.editing = false;
-
+	this.el.classList.remove('edit');
 	this.elEditBtnsDiv.style.display = 'none';
-
-//console.log( g_auth_user.id + ' ' + this.obj.user_name );
-	if( g_auth_user )
-	{
-		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
-			this.elEdit.style.display = 'block';
-
-		// If this is a new comment or and own old:
-		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))
-			this.el.classList.add('own');
-	}
-	else
-		this.elEdit.style.display = 'none';
 
 	this.elText.contentEditable = 'false';
 	this.elText.classList.remove('editing');
-	this.elText.style.color = localStorage.text_color;
-
+	if( localStorage.text_color && ( localStorage.text_color != ''))
+		this.elText.style.color = localStorage.text_color;
+	else
+		this.elText.style.color = u_textColor;
 	if( localStorage.back_comments && ( localStorage.back_comments != ''))
 		this.elText.style.background = localStorage.back_comments;
 	else if( localStorage.background && ( localStorage.background != '' ))
 		this.elText.style.background = localStorage.background;
+	else
+		this.elText.style.backgroundColor = u_backgroundColor;
 
-	var avatar = null;
+
 	if( this.obj == null )
 	{
 		this.obj = {};
@@ -223,12 +218,42 @@ Comment.prototype.init = function()
 		}
 	}
 
-	if( this.obj.user_name )
-	{
-		this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
-		avatar = c_GetAvatar( this.obj.user_name, this.obj.guest);
-	}
+	var user = null;
+	var avatar = null;
+	var signature = null;
 
+	// Get user object:
+	if( this.obj.user_name && g_users[this.obj.user_name])
+		user = g_users[this.obj.user_name];
+	else if( this.obj.guest )
+		user = this.obj.guest;
+	if( user == null )
+		user = {};
+
+	if( this.obj.user_name )
+		this.elUser.textContent = c_GetUserTitle( this.obj.user_name, this.obj.guest);
+
+	// Signature:
+	if( user.signature )
+		this.elSignature.textContent = user.signature;
+
+//console.log( g_auth_user.id + ' ' + this.obj.user_name );
+	if( g_auth_user )
+	{
+		// Edit button only for admins or a comment owner:
+		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
+			this.elEdit.style.display = 'block';
+		else
+			this.elEdit.style.display = 'none';
+
+		// If this is a new comment or and own old:
+		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))
+			this.el.classList.add('own');
+	}
+	else
+		this.elEdit.style.display = 'none';
+
+	avatar = c_GetAvatar( this.obj.user_name, this.obj.guest);
 	if( avatar != null )
 	{
 		this.elAvatar.src = avatar;
@@ -239,7 +264,7 @@ Comment.prototype.init = function()
 
 	this.setElType( this.obj.type);
 	if( this.obj.key )
-		this.elType.href = g_GetLocationArgs({"cm_Goto":this.obj.key});
+		this.elType.href = this.getLink();
 
 	this.type = this.obj.type;
 
@@ -264,11 +289,20 @@ Comment.prototype.init = function()
 	if( this.obj.duration && this.obj.duration > 0 )
 		this.elDuration.textContent = this.obj.duration;
 
+	var info = '';
+
+	// Email is shown for admins only:
+	if( g_admin && this.obj && this.obj.guest && this.obj.guest.email )
+		info += 'Guest email: ' + c_EmailDecode( this.obj.guest.email);
+
 	if( this.obj.mtime )
 	{
 		var date = c_DT_StrFromMSec( this.obj.mtime);
-		this.elModified.textContent = 'Modified: ' + c_GetUserTitle( this.obj.muser_name)+' '+date;
+		if( info.length ) info += '<br>';
+		info += 'Modified: ' + c_GetUserTitle( this.obj.muser_name)+' '+date;
 	}
+
+	this.elInfo.innerHTML = info;
 
 	if( this.obj.text )
 		this.elText.innerHTML = this.obj.text;
@@ -338,7 +372,6 @@ Comment.prototype.setElType = function( i_type)
 
 Comment.prototype.edit = function()
 {
-	this.editing = true;
 	if( this._new != true )
 	{
 		if( g_auth_user == null )
@@ -356,6 +389,8 @@ Comment.prototype.edit = function()
 	else
 		this.elDel.style.display = 'none';
 
+	this.editing = true;
+	this.el.classList.add('edit');
 	this.elEdit.style.display = 'none';
 	this.elEditBtnsDiv.style.display = 'block';
 
@@ -363,7 +398,8 @@ Comment.prototype.edit = function()
 
 	this.elEditTypesDiv = document.createElement('div');
 	this.elForEdit.appendChild( this.elEditTypesDiv);
-	this.elEditTypesDiv.style.clear = 'both';
+	this.elEditTypesDiv.classList.add('types');
+//	this.elEditTypesDiv.style.clear = 'both';
 	for( var type in RULES.comments )
 	{
 		var el = document.createElement('div');
@@ -384,7 +420,12 @@ Comment.prototype.edit = function()
 	this.elReportEdit.appendChild( this.elEditTags);
 	this.elEditTags.classList.add('list');
 	this.elEditTags.classList.add('tags');
-	this.elEditTags.textContent = 'Tags:';
+
+	var el = document.createElement('div');
+	this.elEditTags.appendChild( el);
+	el.textContent = 'Tags:';
+	el.classList.add('label');
+
 	this.elEditTags.m_elTags = [];
 	for( var tag in RULES.tags)
 	{
@@ -399,7 +440,7 @@ Comment.prototype.edit = function()
 
 		if( this.obj.tags )
 			if( this.obj.tags.indexOf( tag) != -1 )
-				el.classList.add('selected');
+				c_ElSetSelected( el, true);
 
 		this.elEditTags.m_elTags.push( el);
 	}
@@ -436,9 +477,9 @@ Comment.prototype.edit = function()
 		u_GuestAttrsDraw( this.elForEdit);
 
 	this.elText.classList.add('editing');
-	this.elText.contentEditable = 'true';
+	this.elText.style.backgroundColor = '#DDDDDD';
 	this.elText.style.color = '#000000';
-	this.elText.style.background = '#DDDDDD';
+	this.elText.contentEditable = 'true';
 	this.elText.focus();
 }
 
@@ -541,8 +582,6 @@ Comment.prototype.save = function()
 	edit.add = true;
 	edit.file = file;
 
-//window.console.log( JSON.stringify( edit));
-//	res = c_Parse( n_Request({"send":{"editobj":edit}}));
 	n_Request({"send":{"editobj":edit},"func":this.saveFinished,"this":this});
 }
 Comment.prototype.saveFinished = function( i_data, i_args)
@@ -555,7 +594,7 @@ Comment.prototype.saveFinished = function( i_data, i_args)
 	var news_title = 'comment';
 	if( i_args.this.obj.type == 'report' ) news_title = 'report';
 
-	nw_MakeNews({"title":news_title,"path":g_CurPath(),"user":news_user,"guest":i_args.this.obj.guest});
+	nw_MakeNews({"title":news_title,"link":i_args.this.getLink(),"user":news_user,"guest":i_args.this.obj.guest});
 
 	i_args.this.updateStatus();
 
@@ -579,7 +618,7 @@ Comment.prototype.sendEmails = function()
 		var email = c_EmailDecode( emails[i]);
 		if( false == c_EmailValidate( email)) continue;
 		var subject = 'RULES Comment: '+g_CurPath();
-		var href = g_GetLocationArgs({"cm_Goto":this.obj.key}, true);
+		var href = this.getLink( true);
 		var body = '<a href="'+href+'" target="_blank">'+href+'</a>';
 		body += '<br><br>';
 		body += this.obj.text;
@@ -714,6 +753,11 @@ Comment.prototype.showFile = function( i_path, i_file)
 	elGoto.classList.add('goto');
 	elGoto.textContent = i_file.name;
 	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto":i_path+'/'+i_file.name});
+}
+
+Comment.prototype.getLink = function( i_absolute)
+{
+	return g_GetLocationArgs({"cm_Goto":this.obj.key}, i_absolute);
 }
 
 function cm_Goto( i_key)
