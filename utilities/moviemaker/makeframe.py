@@ -400,5 +400,7 @@ for f in range( 0, Options.frames_num):
 		if not Options.debug:
 			os.system(cmd)
 
-	print('PROGRESS: %d%%' % int( (f+1) * 100 / Options.frames_num ))
+	if Options.frames_num > 1:
+		print('PROGRESS: %d%%' % int( (f+1) * 100 / Options.frames_num ))
+
 	sys.stdout.flush()
