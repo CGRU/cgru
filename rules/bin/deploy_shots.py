@@ -111,7 +111,7 @@ for shot_folder in Sources:
 
 	# Shot name:
 	shot_name = shot_folder
-	for ex in ['.mov','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
+	for ex in ['.mov','.mxf','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
 		shot_name = shot_name.replace(ex,'')
 		shot_name = shot_name.replace(ex.upper(),'')
 
