@@ -296,13 +296,13 @@ function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
 		if( i_id == 'header')
 		{
 			localStorage.header_opened = 'false';
-			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_down.png)';
+//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_down.png)';
 			document.getElementById( i_id).style.top = i_closed+'px';
 		}
 		else
 		{
 			localStorage.footer_opened = 'false';
-			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_up.png)';
+//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_up.png)';
 			document.getElementById('footer').style.height = i_closed+'px';
 			document.getElementById('log').style.display= 'none';
 		}
@@ -313,13 +313,13 @@ function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
 		if( i_id == 'header')
 		{
 			localStorage.header_opened = 'true';
-			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_up.png)';
+//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_up.png)';
 			document.getElementById( i_id).style.top = i_opened+'px';
 		}
 		else
 		{
 			localStorage.footer_opened = 'true';
-			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_down.png)';
+//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_down.png)';
 			document.getElementById('footer').style.height = i_opened+'px';
 			document.getElementById('log').style.display= 'block';
 		}

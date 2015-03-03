@@ -42,8 +42,11 @@ font-size: 12px;
 }
 
 .headeropenbtn { position: absolute; left: 10px; width: 9px; height: 20px; margin:0; padding:0; opacity:.8; }
-#header .headeropenbtn { bottom: 8px;}
-#footer .headeropenbtn { top: 8px;}
+#headeropenbtn { bottom: 8px; background-image:url(icons/arrow_down.png); }
+#headeropenbtn.opened { background-image:url(icons/arrow_up.png); }
+#footeropenbtn { top: 8px; background-image:url(icons/arrow_up.png); }
+#footeropenbtn.opened { top: 8px; background-image:url(icons/arrow_down.png); }
+
 #header .panel {
 position: absolute;
 left: 40px; right: 10px; bottom: 0px; height: 30px;
