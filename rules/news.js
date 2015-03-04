@@ -326,9 +326,12 @@ function nw_MakeNewsFinished( i_data, i_args)
 
 	if( i_args.args && ( i_args.args.load === false )) return;
 
-	nw_NewsLoad();
-	nw_RecentLoad({"file_check":false});
-		
+	if( p_PLAYER != true )
+	{
+		nw_NewsLoad();
+		nw_RecentLoad({"file_check":false});
+	}
+
 	if( i_data.users.length == 0 )
 	{
 		c_Log('No subscribed users found.');

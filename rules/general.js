@@ -233,7 +233,7 @@ function g_Navigate( i_path)
 
 	c_Log('Navigating to: '+i_path);
 
-	folders = i_path.split('/');
+	var folders = i_path.split('/');
 //window.console.log( folders);
 	var walk = {};
 	walk.paths = [];

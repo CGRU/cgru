@@ -12,6 +12,7 @@
 <script type="text/javascript" src="rules/common.js"></script>
 <script type="text/javascript" src="rules/player.js"></script>
 <script type="text/javascript" src="rules/network.js"></script>
+<script type="text/javascript" src="rules/news.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
 <script type="text/javascript">
 
@@ -55,6 +56,10 @@ if( document.location.host.indexOf('rules.cgru.info') != -1 )
 			<div class="cgru_parameter">
 				<div class="label">CGRU Config</div>
 				<div class="button" style="left:120px" onclick="cgru_ConfigShow()">Show</div>
+			</div>
+			<div class="cgru_parameter">
+				<div class="label" id="rules_label">RULES</div>
+				<div class="button" style="left:120px;width:80px" onclick="p_RulesShow()">Show Current</div>
 			</div>
 			<div class="cgru_parameter">
 				<div class="label">Platform:</div>
