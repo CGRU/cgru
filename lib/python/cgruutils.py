@@ -253,7 +253,7 @@ def toStr(data):
 			return data.encode('utf-8')
 		return str(data)
 
-	return str(data, 'utf-8')  # the second argument here is unexpected
+	return str(data,'utf-8','replace')
 
 
 def webbrowse(i_url):
