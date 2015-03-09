@@ -131,7 +131,7 @@ class ORE_Submit(bpy.types.Operator):
 		try:
 			af = __import__('af', globals(), locals(), [])
 		except ImportError as err:
-			print('Unable to import Afanasy Python module: ' % err)
+			print('Unable to import Afanasy Python module: %s' % err)
 			self.report(
 				{'ERROR'},
 				'An error occurred while sending submission to Afanasy'
