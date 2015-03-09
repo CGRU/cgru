@@ -103,8 +103,8 @@ class ORE_Submit(bpy.types.Operator):
 			os.environ['CGRU_LOCATION'] = addon_prefs.cgru_location
 
 		cgrupython = os.getenv('CGRU_PYTHON')
-		if cgrupython is None or cgrupython == '':
-			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+		if not cgrupython:
+			if not addon_prefs.cgru_location:
 				if sys.platform.find('win'):
 					cgrupython = r'C:\cgru\lib\python'
 				else:
@@ -116,8 +116,8 @@ class ORE_Submit(bpy.types.Operator):
 
 		# Check and add Afanasy module in system path:
 		afpython = os.getenv('AF_PYTHON')
-		if afpython is None or afpython == '':
-			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+		if not afpython:
+			if not addon_prefs.cgru_location:
 				if sys.platform.find('win'):
 					afpython = r'C:\cgru\afanasy\python'
 				else:
@@ -160,7 +160,7 @@ class ORE_Submit(bpy.types.Operator):
 		# Get job name:
 		jobname = ore.jobname
 		# If job name is empty use scene file name:
-		if jobname is None or jobname == '':
+		if not jobname:
 			jobname = os.path.basename(scenefile)
 			# Try to cut standart '.blend' extension:
 			if jobname.endswith('.blend'):
