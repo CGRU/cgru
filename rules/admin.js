@@ -333,6 +333,7 @@ function ad_OpenWindow()
 	el.classList.add('button');
 	el.textContent = 'Refresh';
 	el.onclick = ad_WndRefresh;
+	el.style.cssFloat = 'right';
 
 	var el = document.createElement('div');
 	elBtnsDiv.appendChild( el);

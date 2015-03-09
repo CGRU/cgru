@@ -28,7 +28,7 @@
 
 	"concept" :{"title":"Concept",  "short":"Cc",  "tip":"Concept"},
 	"paint"   :{"title":"Paint",    "short":"Pt",  "tip":"Painting"},
-	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte Painting"},
+	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte painting"},
 	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
 
 	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
@@ -37,6 +37,7 @@
 	"sim"     :{"title":"Sim",      "short":"Sm",  "tip":"Simulating"},
 	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
 
+	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
 	"animatic":{"title":"Animatic", "short":"Ac",  "tip":"Animiatic"},
 	"fullcg"  :{"title":"FullCG",   "short":"FCG", "tip":"Full CG Shot"},
 	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"},
