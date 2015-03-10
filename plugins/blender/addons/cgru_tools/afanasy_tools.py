@@ -63,17 +63,16 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		col.prop(ore, 'packTextures')
 
 		layout.separator()
-		col = layout.column(align=True)
-		row = col.row(align=True)
-		row.scale_y = 1.4
-		row.prop(sce, 'frame_start')
-		row.prop(sce, 'frame_end')
-		row.prop(sce, 'frame_step')
-		row.prop(ore, 'fpertask')
-		row = col.row(align=True)
-		row.scale_y = 1.2
-		row.prop(ore, 'priority')
-		row.prop(ore, 'maxruntasks')
+		row = layout.row(align=False)
+		col = row.column(align=True)
+		col.prop(sce, 'frame_start')
+		col.prop(sce, 'frame_end')
+		col.prop(sce, 'frame_step')
+		col = row.column(align=True)
+		col.prop(ore, 'fpertask')
+		col.prop(ore, 'sequential')
+		col.prop(ore, 'priority')
+		col.prop(ore, 'maxruntasks')
 
 		layout.separator()
 		col = layout.column()
@@ -171,6 +170,7 @@ class ORE_Submit(bpy.types.Operator):
 		fend = sce.frame_end
 		finc = sce.frame_step
 		fpertask = ore.fpertask
+		sequential = ore.sequential
 
 		# Check frames settings:
 		if fpertask < 1:
@@ -242,6 +242,7 @@ class ORE_Submit(bpy.types.Operator):
 
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
+			block.setSequential(sequential)
 			job.blocks.append(block)
 
 		# Set job running parameters:

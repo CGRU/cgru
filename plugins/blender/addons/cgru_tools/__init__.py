@@ -52,6 +52,9 @@ class ORESettings(bpy.types.PropertyGroup):
 		description='Job Name. Scene name if empty.', maxlen=512, default='')
 	fpertask = IntProperty(name='Per Task', description='Frames Per One Task',
 		min=1, default=1)
+	sequential = IntProperty(name='Sequential',
+		description='Solve task with this step at first.',
+		default=1)
 	pause = BoolProperty(name='Start Job Paused',
 		description='Send job in offline state.', default=0)
 	packLinkedObjects = BoolProperty(name='Pack Linked Objects',
