@@ -74,6 +74,7 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		row.scale_y = 1.2
 		row.prop(ore, 'priority')
 		row.prop(ore, 'maxruntasks')
+		row.prop(ore, 'sequential')
 
 		layout.separator()
 		col = layout.column()
@@ -171,6 +172,7 @@ class ORE_Submit(bpy.types.Operator):
 		fend = sce.frame_end
 		finc = sce.frame_step
 		fpertask = ore.fpertask
+		sequential = ore.sequential
 
 		# Check frames settings:
 		if fpertask < 1:
@@ -242,6 +244,7 @@ class ORE_Submit(bpy.types.Operator):
 
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
+			block.setSequential(sequential)
 			job.blocks.append(block)
 
 		# Set job running parameters:
