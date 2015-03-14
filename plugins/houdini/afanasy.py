@@ -32,6 +32,7 @@ class BlockParameters:
 		self.preview = ''
 		self.name = ''
 		self.type = ''
+		self.parser = ''
 		self.cmd = ''
 		self.cmd_useprefix = True
 		self.dependmask = ''
@@ -52,6 +53,7 @@ class BlockParameters:
 		self.start_paused = int(afnode.parm('start_paused').eval())
 		self.platform = str(afnode.parm('platform').eval())
 		self.subtaskdepend = int(afnode.parm('subtaskdepend').eval())
+		self.parser = self.afnode.parm('override_parser').eval()
 		self.priority = -1
 		self.max_runtasks = -1
 		self.maxperhost = -1
@@ -163,9 +165,15 @@ class BlockParameters:
 
 			self.cmd += ' "%(hipfilename)s"'
 			self.cmd += ' "%s"' % ropnode.path()
+
+			# Override service:
+			override_service = self.afnode.parm('override_service').eval()
+			if override_service is not None and len(override_service):
+				self.type = override_service
+
 		else:
 			# Custom command driver:
-			if int(afnode.parm('cmd_add').eval()):
+			if int(afnode.parm('cmd_mode').eval()):
 				# Command:
 				cmd = self.afnode.parm('cmd_cmd')
 				self.cmd = afcommon.patternFromPaths(
@@ -182,6 +190,8 @@ class BlockParameters:
 				self.type = self.afnode.parm('cmd_service').eval()
 				if self.type is None or self.type == '':
 					self.type = self.cmd.split(' ')[0]
+				# Parser:
+				self.parser = self.afnode.parm('cmd_parser').eval()
 
 				# Prefix:
 				self.cmd_useprefix = \
@@ -239,6 +249,7 @@ class BlockParameters:
 					  (self.afnode.path()))
 
 		block = af.Block(self.name, self.type)
+		block.setParser( self.parser)
 		block.setCommand(self.cmd % vars(), self.cmd_useprefix)
 		if self.preview != '':
 			block.setFiles([self.preview])
@@ -584,7 +595,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 		if node is not None:
 			nodes.append(node)
 
-	if afnode.parm('cmd_add').eval():
+	if afnode.parm('cmd_mode').eval():
 		nodes.append(None)
 
 	nodes.reverse()

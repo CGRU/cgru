@@ -69,6 +69,7 @@
 
 "":"Job:",
 	"af_task_default_capacity":1000,
+	"af_task_default_service":"generic",
 	"af_task_log_linesmax":100,
 
 "":"Render:",

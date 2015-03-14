@@ -97,16 +97,18 @@ class Block:
 	def __init__(self, blockname='block', service='generic'):
 		self.data = dict()
 		self.data["name"] = blockname
+		self.data["service"] = cgruconfig.VARS['af_task_default_service']
 		self.data["capacity"] = int(
 			cgruconfig.VARS['af_task_default_capacity'])
 		self.data["working_directory"] = Pathmap.toServer(
 			os.getenv('PWD', os.getcwd()))
 		self.data["numeric"] = False
 		self.tasks = []
-		if self.setService(service):
-			__import__("services", globals(), locals(), [self.data["service"]])
-			parser = eval(('services.%s.parser') % self.data["service"])
-			self.setParser(parser)
+		if service is not None and len(service):
+			if self.setService(service):
+				__import__("services", globals(), locals(), [self.data["service"]])
+				parser = eval(('services.%s.parser') % self.data["service"])
+				self.setParser(parser)
 
 	def setService(self, service, nocheck=False):
 		"""Missing DocString
@@ -115,7 +117,7 @@ class Block:
 		:param nocheck:
 		:return:
 		"""
-		if service != '':
+		if service is not None and len(service):
 			result = True
 			if not nocheck:
 				if not checkClass(service, 'services'):
@@ -134,14 +136,14 @@ class Block:
 		:param nocheck:
 		:return:
 		"""
-		if parser != '':
+		if parser is not None and len(parser):
 			if not nocheck:
 				if not checkClass(parser, 'parsers'):
 					if parser != 'none':
 						print('Error: Unknown parser "%s", setting to "none"' %
 							  parser)
 						parser = 'none'
-		self.data["parser"] = parser
+			self.data["parser"] = parser
 
 	def setNumeric(self, start=1, end=10, pertask=1, increment=1):
 		"""Missing DocString
