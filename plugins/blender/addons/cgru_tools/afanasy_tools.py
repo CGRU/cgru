@@ -63,17 +63,16 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		col.prop(ore, 'packTextures')
 
 		layout.separator()
-		col = layout.column(align=True)
-		row = col.row(align=True)
-		row.scale_y = 1.4
-		row.prop(sce, 'frame_start')
-		row.prop(sce, 'frame_end')
-		row.prop(sce, 'frame_step')
-		row.prop(ore, 'fpertask')
-		row = col.row(align=True)
-		row.scale_y = 1.2
-		row.prop(ore, 'priority')
-		row.prop(ore, 'maxruntasks')
+		row = layout.row(align=False)
+		col = row.column(align=True)
+		col.prop(sce, 'frame_start')
+		col.prop(sce, 'frame_end')
+		col.prop(sce, 'frame_step')
+		col = row.column(align=True)
+		col.prop(ore, 'fpertask')
+		col.prop(ore, 'sequential')
+		col.prop(ore, 'priority')
+		col.prop(ore, 'maxruntasks')
 
 		layout.separator()
 		col = layout.column()
@@ -103,8 +102,8 @@ class ORE_Submit(bpy.types.Operator):
 			os.environ['CGRU_LOCATION'] = addon_prefs.cgru_location
 
 		cgrupython = os.getenv('CGRU_PYTHON')
-		if cgrupython is None or cgrupython == '':
-			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+		if not cgrupython:
+			if not addon_prefs.cgru_location:
 				if sys.platform.find('win'):
 					cgrupython = r'C:\cgru\lib\python'
 				else:
@@ -116,8 +115,8 @@ class ORE_Submit(bpy.types.Operator):
 
 		# Check and add Afanasy module in system path:
 		afpython = os.getenv('AF_PYTHON')
-		if afpython is None or afpython == '':
-			if addon_prefs.cgru_location is None or addon_prefs.cgru_location == '':
+		if not afpython:
+			if not addon_prefs.cgru_location:
 				if sys.platform.find('win'):
 					afpython = r'C:\cgru\afanasy\python'
 				else:
@@ -131,7 +130,7 @@ class ORE_Submit(bpy.types.Operator):
 		try:
 			af = __import__('af', globals(), locals(), [])
 		except ImportError as err:
-			print('Unable to import Afanasy Python module: ' % err)
+			print('Unable to import Afanasy Python module: %s' % err)
 			self.report(
 				{'ERROR'},
 				'An error occurred while sending submission to Afanasy'
@@ -160,7 +159,7 @@ class ORE_Submit(bpy.types.Operator):
 		# Get job name:
 		jobname = ore.jobname
 		# If job name is empty use scene file name:
-		if jobname is None or jobname == '':
+		if not jobname:
 			jobname = os.path.basename(scenefile)
 			# Try to cut standart '.blend' extension:
 			if jobname.endswith('.blend'):
@@ -171,6 +170,7 @@ class ORE_Submit(bpy.types.Operator):
 		fend = sce.frame_end
 		finc = sce.frame_step
 		fpertask = ore.fpertask
+		sequential = ore.sequential
 
 		# Check frames settings:
 		if fpertask < 1:
@@ -242,6 +242,7 @@ class ORE_Submit(bpy.types.Operator):
 
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
+			block.setSequential(sequential)
 			job.blocks.append(block)
 
 		# Set job running parameters:
