@@ -288,8 +288,8 @@ function nw_MakeNews( i_news, i_args )
 	news.time = c_DT_CurSeconds();
 	news.id = news.user + '_' + news.time + '_' + news.path;
 
-	if( localStorage.news_ignore_own == 'true' )
-		news.ignore_own = true;
+//	if( localStorage.news_ignore_own == 'true' )
+//		news.ignore_own = true;
 
 	// If news path is the current we get artists from status, if them not set in input arguments:
 	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status && RULES.status.artists )
@@ -314,6 +314,9 @@ function nw_MakeNews( i_news, i_args )
 	request.limit = RULES.news.limit;
 	request.recent_max = RULES.news.recent;
 	request.recent_file = nw_recent_file;
+	if( localStorage.news_ignore_own == 'true' )
+		request.ignore_own = true;
+
 	n_Request({"send":{"makenews":request},"func":nw_MakeNewsFinished,"args":i_args});
 }
 function nw_MakeNewsFinished( i_data, i_args)

@@ -241,6 +241,22 @@ function processUser( &$o_out)
 	$o_out['user'] = $user;
 }
 
+function writeUser( &$i_user)
+{
+	$filename = 'users/'.$i_user['id'].'.json';
+
+	if( $fHandle = fopen( $filename, 'w'))
+	{
+		flock( $fHandle, LOCK_EX);
+		fwrite( $fHandle, jsonEncode( $i_user));
+		flock( $fHandle, LOCK_UN);
+		fclose( $fHandle);
+		return true;
+	}
+
+	return false;
+}
+
 function http_digest_parse()
 {
 	if( false == isset( $_SERVER['PHP_AUTH_DIGEST']))
@@ -1091,46 +1107,41 @@ function jsf_makenews( $i_args, &$o_out)
 
 	// Read users:
 	$users = array();	
-	if( $fHandle = opendir('users'))
+	getallusers( $users);
+	if( array_key_exists('error', $users))
 	{
-		while (false !== ( $uEntry = readdir( $fHandle)))
-		{			
-			if( strrpos( $uEntry,'.json') === false ) continue;
-			if( $uHandle = fopen( 'users/'.$uEntry, 'r'))
-			{
-				flock( $uHandle, LOCK_SH);
-				$udata = fread( $uHandle, $FileMaxLength);
-				flock( $uHandle, LOCK_UN);
-				fclose( $uHandle);
-				$uobj = json_decode( $udata, true);
-				if( is_null( $uobj)) continue;
-				array_push( $users, $uobj);
-			}
-		}
-		closedir($fHandle);
+		$o_out['error'] = $users['error'];
+		return;
 	}
-
+	$users = $users['users'];
 	if( count( $users) == 0 )
 	{
 		$o_out['error'] = 'No users found.';
 		return;
 	}
 
+	// User may be does not want to receive own news:
 	$ignore_own = false;
-	if( isset( $news['ignore_own']))
-	{
-		if( $news['ignore_own'])
-			$ignore_own = true;
-		unset( $news['ignore_own']);
-	}
+	if( isset( $i_args['ignore_own']) && $i_args['ignore_own'] )
+		$ignore_own = true;
 
     // Get subscribed users:
     $sub_users = array();
 	$o_out['users'] = array();
 	foreach( $users as &$user )
 	{
-		if( $ignore_own && ( $news['user'] == $user['id']))
-			continue;
+
+		// If this is news owner:
+		if( $news['user'] == $user['id'] )
+		{
+			// Store last news time:
+			$user['ntime'] = time();
+			writeUser( $user);
+
+			// If user does not want to receive own news:
+			if( $ignore_own )
+				continue;
+		}
 
 		if( array_key_exists( 'artists', $news))
 			if( in_array( $user['id'], $news['artists']))
@@ -1177,14 +1188,7 @@ function jsf_makenews( $i_args, &$o_out)
 			array_pop( $user['news']);
 
 		// Write user file:
-		$filename = 'users/'.$user['id'].'.json';
-		if( $fHandle = fopen( $filename, 'w'))
-		{
-			flock( $fHandle, LOCK_EX);
-			fwrite( $fHandle, jsonEncode( $user));
-			flock( $fHandle, LOCK_UN);
-			fclose( $fHandle);
-		}
+		writeUser( $user);
 
 		// Send emails
 		if( array_key_exists('email', $user) == false ) continue;

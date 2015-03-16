@@ -165,9 +165,10 @@ function c_Log( i_msg)
 	c_logCount++;
 }
 
-function c_DT_StrFromSec( i_time, i_nosec) { return c_DT_StrFromMSec( i_time*1000, i_nosec);}
+function c_DT_StrFromSec( i_time, i_nosec) { if( i_time == null) return ''; return c_DT_StrFromMSec( i_time*1000, i_nosec);}
 function c_DT_StrFromMSec( i_time, i_nosec)
 {
+	if( i_time == null ) return '';
 	var date = new Date(i_time);
 	date = date.toString();
 	date = date.substr( 0, date.indexOf(' GMT'));

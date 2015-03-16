@@ -321,7 +321,7 @@ function ad_ChangesFinished( i_data, i_args)
 }
 function ad_OpenWindow()
 {
-	ad_wnd = new cgru_Window({"name":'administrate',"title":'Administrate'});
+	ad_wnd = new cgru_Window({"name":'administrate',"title":'Administrate','padding':'3% 1%'});
 	ad_wnd.elContent.classList.add('administrate');
 	ad_wnd.closeOnEsc = false;
 
@@ -581,6 +581,12 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
+	el.textContent = 'Last News';
+	el.title = 'Last news time';
+	el.onclick = function(e) { ad_WndSortUsers('ntime'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
 	el.textContent = 'State';
 	el.title = 'User states';
 	el.onclick = function(e) { ad_WndSortUsers('states'); };
@@ -814,6 +820,10 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	el.textContent = c_DT_StrFromSec( i_user.ntime).substr(4);
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
