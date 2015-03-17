@@ -53,4 +53,5 @@ class CGRUProperties(bpy.types.PropertyGroup):
 		description='Hosts to ignore pattern.',
 		maxlen=512, default='')
 
+	adv_options = BoolProperty(name="More options", default=False)
 

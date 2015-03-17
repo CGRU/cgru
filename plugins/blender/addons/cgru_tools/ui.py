@@ -16,24 +16,10 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		scene = context.scene
 		cgru_props = scene.cgru
 
-		row = layout.row()
-		row.scale_y = 1.5
-		row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
-
 		layout.separator()
 		col = layout.column()
 		col.prop(cgru_props, 'jobname')
 		col.prop(cgru_props, 'filepath')
-
-		layout.separator()
-		split = layout.split()
-		col = split.column()
-		col.prop(cgru_props, 'pause')
-		col.prop(cgru_props, 'splitRenderLayers')
-		col = split.column()
-		col.prop(cgru_props, 'packLinkedObjects')
-		col.prop(cgru_props, 'relativePaths')
-		col.prop(cgru_props, 'packTextures')
 
 		layout.separator()
 		row = layout.row(align=False)
@@ -48,10 +34,28 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		col.prop(cgru_props, 'maxruntasks')
 
 		layout.separator()
-		col = layout.column()
-		col.prop(cgru_props, 'dependmask')
-		col.prop(cgru_props, 'dependmaskglobal')
-		col.prop(cgru_props, 'hostsmask')
-		col.prop(cgru_props, 'hostsmaskexclude')
+		row = layout.row()
+		row.prop(cgru_props, 'adv_options')
 
+		if cgru_props.adv_options:
+			split = layout.split()
+			col = split.column()
+			col.prop(cgru_props, 'packLinkedObjects')
+			col.prop(cgru_props, 'relativePaths')
+			col.prop(cgru_props, 'packTextures')
+			col = split.column()
+			col.prop(cgru_props, 'pause')
+			col.prop(cgru_props, 'splitRenderLayers')
+
+			layout.separator()
+			col = layout.column()
+			col.prop(cgru_props, 'dependmask')
+			col.prop(cgru_props, 'dependmaskglobal')
+			col.prop(cgru_props, 'hostsmask')
+			col.prop(cgru_props, 'hostsmaskexclude')
+
+		layout.separator()
+		row = layout.row()
+		#row.scale_y = 1.5
+		row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
 
