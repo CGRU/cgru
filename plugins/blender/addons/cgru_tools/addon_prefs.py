@@ -20,4 +20,5 @@ class CGRUAddonPreferences(bpy.types.AddonPreferences):
 			row.prop(self, "cgru_location")
 		else:
 			row.label(text="CGRU root location: %s" % os.getenv('CGRU_LOCATION'))
+			self.cgru_location = os.getenv('CGRU_LOCATION')
 

@@ -53,6 +53,16 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 			col.prop(cgru_props, 'hostsmask')
 			col.prop(cgru_props, 'hostsmaskexclude')
 
+			layout.separator()
+			col = layout.column()
+			col.prop(cgru_props, 'make_movie')
+			if cgru_props.make_movie:
+				col.prop(cgru_props, 'mov_name')
+				col.prop(cgru_props, 'mov_codecs')
+				row = layout.row(align=True)
+				row.prop(cgru_props, 'mov_width')
+				row.prop(cgru_props, 'mov_height')
+
 		layout.separator()
 		row = layout.row(align=True)
 		#row.scale_y = 1.5

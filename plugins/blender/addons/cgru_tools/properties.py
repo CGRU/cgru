@@ -6,8 +6,9 @@ from bpy.props import (
 	BoolProperty,
 	StringProperty,
 	PointerProperty,
+	EnumProperty
 )
-
+from . import utils
 
 class CGRUProperties(bpy.types.PropertyGroup):
 	# General:
@@ -54,4 +55,10 @@ class CGRUProperties(bpy.types.PropertyGroup):
 		maxlen=512, default='')
 
 	adv_options = BoolProperty(name="More options", default=False)
+
+	make_movie = BoolProperty(name='Make movie', default=False)
+	mov_name = StringProperty(name='Movie Name', maxlen=512, default='', subtype="FILE_PATH")
+	mov_width = IntProperty(name='Movie width', default=1280)
+	mov_height = IntProperty(name='Movie height', default=720)
+	mov_codecs = EnumProperty(name="Movie codec", items=utils.get_movie_codecs)
 

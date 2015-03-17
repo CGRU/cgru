@@ -26,9 +26,9 @@ else:
 	from . import ui
 	from . import operators
 
+import bpy
 
 def register():
-	import bpy
 	bpy.utils.register_module(__name__)
 	bpy.types.Scene.cgru = bpy.props.PointerProperty(
 		type=properties.CGRUProperties,

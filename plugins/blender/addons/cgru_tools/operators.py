@@ -172,7 +172,23 @@ class CGRU_Submit(bpy.types.Operator):
 			block.setCommand(cmd)
 			block.setNumeric(fstart, fend, fpertask, finc)
 			block.setSequential(sequential)
+
 			job.blocks.append(block)
+
+			if cgru_props.make_movie:
+				movie_block = af.Block(cgru_props.mov_name + '-movie', 'movgen')
+				movie_block.setDependMask(job.blocks[-1])
+				movie_task = af.Task(cgru_props.mov_name)
+				movie_block.tasks.append(movie_task)
+				cmd = os.getenv('CGRU_LOCATION')
+				cmd = os.path.join(cmd, 'utilities','moviemaker','makemovie.py')
+				cmd = 'python "%s"' % cmd
+				cmd += ' --codec "%s"' % cgru_props.mov_codecs
+				cmd += ' -r "%sx%s"' % (cgru_props.mov_width, cgru_props.mov_height)
+				cmd += ' "%s"' % images.replace('@#', '#').replace('#@', '#')
+				cmd += ' "%s"' % cgru_props.mov_name
+				movie_task.setCommand(cmd)
+				job.blocks.append(movie_block)
 
 		# Set job running parameters:
 		if cgru_props.maxruntasks > -1:
