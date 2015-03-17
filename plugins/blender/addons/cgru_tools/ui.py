@@ -1,0 +1,57 @@
+# -*- coding: utf-8 -*-
+
+import bpy
+from . import operators
+
+class RENDER_PT_Afanasy(bpy.types.Panel):
+	bl_label = "Afanasy"
+	bl_category = 'CGRU_props'
+	bl_space_type = 'PROPERTIES'
+	bl_region_type = 'WINDOW'
+	bl_context = "render"
+	bl_options = {'DEFAULT_CLOSED'}
+
+	def draw(self, context):
+		layout = self.layout
+		scene = context.scene
+		cgru_props = scene.cgru
+
+		row = layout.row()
+		row.scale_y = 1.5
+		row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
+
+		layout.separator()
+		col = layout.column()
+		col.prop(cgru_props, 'jobname')
+		col.prop(cgru_props, 'filepath')
+
+		layout.separator()
+		split = layout.split()
+		col = split.column()
+		col.prop(cgru_props, 'pause')
+		col.prop(cgru_props, 'splitRenderLayers')
+		col = split.column()
+		col.prop(cgru_props, 'packLinkedObjects')
+		col.prop(cgru_props, 'relativePaths')
+		col.prop(cgru_props, 'packTextures')
+
+		layout.separator()
+		row = layout.row(align=False)
+		col = row.column(align=True)
+		col.prop(scene, 'frame_start')
+		col.prop(scene, 'frame_end')
+		col.prop(scene, 'frame_step')
+		col = row.column(align=True)
+		col.prop(cgru_props, 'fpertask')
+		col.prop(cgru_props, 'sequential')
+		col.prop(cgru_props, 'priority')
+		col.prop(cgru_props, 'maxruntasks')
+
+		layout.separator()
+		col = layout.column()
+		col.prop(cgru_props, 'dependmask')
+		col.prop(cgru_props, 'dependmaskglobal')
+		col.prop(cgru_props, 'hostsmask')
+		col.prop(cgru_props, 'hostsmaskexclude')
+
+

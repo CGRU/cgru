@@ -8,8 +8,6 @@ import re
 import bpy
 
 
-# bpy.errors = []
-
 LAYER_TEXT_BLOCK = '''#
 # layer '{0}'
 #
@@ -29,68 +27,15 @@ CMD_TEMPLATE = "blender -b {blend_scene} -y -E {render_engine} " \
 		"-e @#@ -j {frame_inc} -a"
 
 
-class RENDER_PT_Afanasy(bpy.types.Panel):
-	bl_label = "Afanasy"
-	bl_category = 'CGRU'
-	bl_space_type = 'PROPERTIES'
-	bl_region_type = 'WINDOW'
-	bl_context = "render"
-	bl_options = {'DEFAULT_CLOSED'}
-
-	def draw(self, context):
-		layout = self.layout
-		sce = context.scene
-		ore = sce.ore_render
-
-		layout.label(text="Engine: %s" % sce.render.engine)
-		row = layout.row()
-		row.scale_y = 1.5
-		row.operator('ore.submit', icon='RENDER_STILL')
-
-		layout.separator()
-		col = layout.column()
-		col.prop(ore, 'jobname')
-		col.prop(ore, 'filepath')
-
-		layout.separator()
-		split = layout.split()
-		col = split.column()
-		col.prop(ore, 'pause')
-		col.prop(ore, 'splitRenderLayers')
-		col = split.column()
-		col.prop(ore, 'packLinkedObjects')
-		col.prop(ore, 'relativePaths')
-		col.prop(ore, 'packTextures')
-
-		layout.separator()
-		row = layout.row(align=False)
-		col = row.column(align=True)
-		col.prop(sce, 'frame_start')
-		col.prop(sce, 'frame_end')
-		col.prop(sce, 'frame_step')
-		col = row.column(align=True)
-		col.prop(ore, 'fpertask')
-		col.prop(ore, 'sequential')
-		col.prop(ore, 'priority')
-		col.prop(ore, 'maxruntasks')
-
-		layout.separator()
-		col = layout.column()
-		col.prop(ore, 'dependmask')
-		col.prop(ore, 'dependmaskglobal')
-		col.prop(ore, 'hostsmask')
-		col.prop(ore, 'hostsmaskexclude')
-
-
-class ORE_Submit(bpy.types.Operator):
+class CGRU_Submit(bpy.types.Operator):
 	"""Submit job to Afanasy Renderfarm."""
 
-	bl_idname = "ore.submit"
+	bl_idname = "cgru.submit"
 	bl_label = "Submit Job"
 
 	def execute(self, context):
 		sce = context.scene
-		ore = sce.ore_render
+		cgru_props = sce.cgru
 		addon_prefs = context.user_preferences.addons['cgru_tools'].preferences
 		rd = context.scene.render
 		images = None
@@ -146,18 +91,18 @@ class ORE_Submit(bpy.types.Operator):
 		renderscenefile = "%s.%s.blend" % (scenefile, time.strftime('%Y%m%d%H%M%S'))
 
 		# Make all Local and pack all textures and objects
-		if ore.packLinkedObjects:
+		if cgru_props.packLinkedObjects:
 			bpy.ops.object.make_local(type='ALL')
 			sceneModified = True
-		if ore.relativePaths:
+		if cgru_props.relativePaths:
 			bpy.ops.file.make_paths_relative()
 			sceneModified = True
-		if ore.packTextures:
+		if cgru_props.packTextures:
 			bpy.ops.file.pack_all()
 			sceneModified = True
 
 		# Get job name:
-		jobname = ore.jobname
+		jobname = cgru_props.jobname
 		# If job name is empty use scene file name:
 		if not jobname:
 			jobname = os.path.basename(scenefile)
@@ -169,8 +114,8 @@ class ORE_Submit(bpy.types.Operator):
 		fstart = sce.frame_start
 		fend = sce.frame_end
 		finc = sce.frame_step
-		fpertask = ore.fpertask
-		sequential = ore.sequential
+		fpertask = cgru_props.fpertask
+		sequential = cgru_props.sequential
 
 		# Check frames settings:
 		if fpertask < 1:
@@ -185,7 +130,7 @@ class ORE_Submit(bpy.types.Operator):
 		renderlayer_names = []
 		layers = bpy.context.scene.render.layers
 
-		if ore.splitRenderLayers and len(layers) > 1:
+		if cgru_props.splitRenderLayers and len(layers) > 1:
 			for layer in layers:
 				if layer.use:
 					renderlayer_names.append(layer.name)
@@ -197,7 +142,7 @@ class ORE_Submit(bpy.types.Operator):
 			images = None
 
 			# Create block
-			if ore.splitRenderLayers and len(layers) > 1:
+			if cgru_props.splitRenderLayers and len(layers) > 1:
 				txt_block = bpy.data.texts.new("layer_%s" % renderlayer_name)
 				txt_block.write(LAYER_TEXT_BLOCK.format(renderlayer_name))
 				block = af.Block("layer_%s" % renderlayer_name, servicename)
@@ -210,17 +155,17 @@ class ORE_Submit(bpy.types.Operator):
 			elif engine_string == 'CYCLES':
 				block.setParser('blender_cycles')
 
-			if ore.filepath != '':
-				pos = ore.filepath.find('#')
+			if cgru_props.filepath != '':
+				pos = cgru_props.filepath.find('#')
 				if pos != -1:
-					if ore.filepath[pos-1] in '._- ':
-						images = "{0}{1}{2}".format(ore.filepath[:pos-1],
-							renderlayer_name, ore.filepath[pos-1:])
+					if cgru_props.filepath[pos-1] in '._- ':
+						images = "{0}{1}{2}".format(cgru_props.filepath[:pos-1],
+							renderlayer_name, cgru_props.filepath[pos-1:])
 					else:
-						images = "{0}{1}{2}".format(ore.filepath[:pos],
-							renderlayer_name, ore.filepath[pos:])
+						images = "{0}{1}{2}".format(cgru_props.filepath[:pos],
+							renderlayer_name, cgru_props.filepath[pos:])
 				else:
-					images = "{0}{1}".format(ore.filepath, renderlayer_name)
+					images = "{0}{1}".format(cgru_props.filepath, renderlayer_name)
 
 				output_images = re.sub(r'(#+)', r'@\1@', images)
 				if output_images.startswith('//'):
@@ -236,7 +181,7 @@ class ORE_Submit(bpy.types.Operator):
 					blend_scene=renderscenefile,
 					render_engine=engine_string,
 					python_options=' --python-text "layer_%s"' % renderlayer_name
-							if ore.splitRenderLayers and len(layers) > 1 else '',
+							if cgru_props.splitRenderLayers and len(layers) > 1 else '',
 					output_options=' -o "%s" ' % images if images else '',
 					frame_inc=finc)
 
@@ -246,19 +191,19 @@ class ORE_Submit(bpy.types.Operator):
 			job.blocks.append(block)
 
 		# Set job running parameters:
-		if ore.maxruntasks > -1:
-			job.setMaxRunningTasks(ore.maxruntasks)
-		if ore.priority > -1:
-			job.setPriority(ore.priority)
-		if ore.dependmask != '':
-			job.setDependMask(ore.dependmask)
-		if ore.dependmaskglobal != '':
-			job.setDependMaskGlobal(ore.dependmaskglobal)
-		if ore.hostsmask != '':
-			job.setHostsMask(ore.hostsmask)
-		if ore.hostsmaskexclude != '':
-			job.setHostsMaskExclude(ore.hostsmaskexclude)
-		if ore.pause:
+		if cgru_props.maxruntasks > -1:
+			job.setMaxRunningTasks(cgru_props.maxruntasks)
+		if cgru_props.priority > -1:
+			job.setPriority(cgru_props.priority)
+		if cgru_props.dependmask != '':
+			job.setDependMask(cgru_props.dependmask)
+		if cgru_props.dependmaskglobal != '':
+			job.setDependMaskGlobal(cgru_props.dependmaskglobal)
+		if cgru_props.hostsmask != '':
+			job.setHostsMask(cgru_props.hostsmask)
+		if cgru_props.hostsmaskexclude != '':
+			job.setHostsMaskExclude(cgru_props.hostsmaskexclude)
+		if cgru_props.pause:
 			job.offLine()
 		# Make server to delete temporary file after job deletion:
 		job.setCmdPost('deletefiles "%s"' % os.path.abspath(renderscenefile))
@@ -270,7 +215,7 @@ class ORE_Submit(bpy.types.Operator):
 		bpy.ops.wm.save_as_mainfile(filepath=renderscenefile, copy=True)
 
 		# Clean up temp text blocks
-		if ore.splitRenderLayers and len(layers) > 1:
+		if cgru_props.splitRenderLayers and len(layers) > 1:
 			for text in bpy.data.texts:
 				if "layer_" in text:
 					bpy.data.texts.remove(text)
