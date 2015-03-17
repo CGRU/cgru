@@ -16,7 +16,6 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		scene = context.scene
 		cgru_props = scene.cgru
 
-		layout.separator()
 		col = layout.column()
 		col.prop(cgru_props, 'jobname')
 		col.prop(cgru_props, 'filepath')
@@ -55,7 +54,7 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 			col.prop(cgru_props, 'hostsmaskexclude')
 
 		layout.separator()
-		row = layout.row()
+		row = layout.row(align=True)
 		#row.scale_y = 1.5
 		row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
-
+		row.operator(operators.CGRU_Browse.bl_idname)

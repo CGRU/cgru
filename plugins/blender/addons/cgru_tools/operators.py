@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import imp
 import time
 import os
@@ -7,6 +8,7 @@ import re
 
 import bpy
 
+from . import utils
 
 LAYER_TEXT_BLOCK = '''#
 # layer '{0}'
@@ -27,6 +29,25 @@ CMD_TEMPLATE = "blender -b {blend_scene} -y -E {render_engine} " \
 		"-e @#@ -j {frame_inc} -a"
 
 
+class CGRU_Browse(bpy.types.Operator):
+	bl_idname = "cgru.browse"
+	bl_label = "Show job"
+
+	def execute(self, context):
+		utils.check_cgru_env(context)
+
+		cgruconfig = utils.load_module('cgruconfig')
+		imp.reload(cgruconfig)
+
+		server_address = cgruconfig.VARS['af_servername']
+		server_port = cgruconfig.VARS['af_serverport']
+
+		import webbrowser
+		webbrowser.open('http://%s:%s' % (server_address, server_port))
+
+		return {"FINISHED"}
+
+
 class CGRU_Submit(bpy.types.Operator):
 	"""Submit job to Afanasy Renderfarm."""
 
@@ -36,52 +57,15 @@ class CGRU_Submit(bpy.types.Operator):
 	def execute(self, context):
 		sce = context.scene
 		cgru_props = sce.cgru
-		addon_prefs = context.user_preferences.addons['cgru_tools'].preferences
 		rd = context.scene.render
 		images = None
 		engine_string = sce.render.engine
 		sceneModified = False  # if the opriginal scene modified checker
 
-		# Check and add CGRU module in system path:
-		if 'CGRU_LOCATION' not in os.environ:
-			os.environ['CGRU_LOCATION'] = addon_prefs.cgru_location
-
-		cgrupython = os.getenv('CGRU_PYTHON')
-		if not cgrupython:
-			if not addon_prefs.cgru_location:
-				if sys.platform.find('win'):
-					cgrupython = r'C:\cgru\lib\python'
-				else:
-					cgrupython = r'/opt/cgru/lib/python'
-			else:
-				cgrupython = os.path.join(addon_prefs.cgru_location, 'lib', 'python')
-		if cgrupython not in sys.path:
-			sys.path.append(cgrupython)
-
-		# Check and add Afanasy module in system path:
-		afpython = os.getenv('AF_PYTHON')
-		if not afpython:
-			if not addon_prefs.cgru_location:
-				if sys.platform.find('win'):
-					afpython = r'C:\cgru\afanasy\python'
-				else:
-					afpython = r'/opt/cgru/afanasy/python'
-			else:
-				afpython = os.path.join(addon_prefs.cgru_location, 'afanasy', 'python')
-		if afpython not in sys.path:
-			sys.path.append(afpython)
+		utils.check_cgru_env(context)
 
 		# Import Afanasy module:
-		try:
-			af = __import__('af', globals(), locals(), [])
-		except ImportError as err:
-			print('Unable to import Afanasy Python module: %s' % err)
-			self.report(
-				{'ERROR'},
-				'An error occurred while sending submission to Afanasy'
-			)
-			return {'CANCELLED'}
-
+		af = utils.load_module('af')
 		imp.reload(af)
 
 		# Calculate temporary scene path:
@@ -236,13 +220,3 @@ class CGRU_Submit(bpy.types.Operator):
 		return {'FINISHED'}
 
 
-def register():
-	bpy.utils.register_module(__name__)
-
-
-def unregister():
-	bpy.utils.unregister_module(__name__)
-
-
-if __name__ == "__main__":
-	register()
