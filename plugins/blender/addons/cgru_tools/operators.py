@@ -221,7 +221,13 @@ class CGRU_Submit(bpy.types.Operator):
 					bpy.data.texts.remove(text)
 
 		#  Send job to server:
-		job.send()
+		result = job.send()
+		if not result[0]:
+			self.report({'ERROR'},
+				'An error occurred when submitting job to Afanasy. Check console.')
+		else:
+			self.report({'INFO'},
+				'Job id:%s successfully submit to Afanasy.' % result[1]['id'])
 
 		# if opriginal scene is modified - we need to reload the scene file
 		if sceneModified:
