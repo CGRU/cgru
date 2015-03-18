@@ -7,7 +7,7 @@ from . import utils
 
 def update_location(self, context):
 	self.cgru_version = utils.get_cgru_version(self.cgru_location)
-	if self.cgru_version != "NOT FOUND":
+	if self.cgru_version != utils.CGRU_NOT_FOUND:
 		utils.add_cgru_module_to_syspath(self.cgru_location)
 
 

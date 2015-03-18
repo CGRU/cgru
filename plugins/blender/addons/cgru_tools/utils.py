@@ -4,13 +4,16 @@ import os
 import sys
 
 
+CGRU_NOT_FOUND = 'NOT FOUND'
+
+
 def get_cgru_version(path):
 	try:
 		with open(os.path.join(path,'version.txt'),'r') as f:
 			version = f.read().strip()
 		return version
 	except:
-		return "NOT FOUND"
+		return CGRU_NOT_FOUND
 
 
 def add_cgru_module_to_syspath(path):

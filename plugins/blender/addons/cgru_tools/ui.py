@@ -2,6 +2,8 @@
 
 import bpy
 from . import operators
+from . import utils
+
 
 class RENDER_PT_Afanasy(bpy.types.Panel):
 	bl_label = "Afanasy"
@@ -68,3 +70,11 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 		#row.scale_y = 1.5
 		row.operator(operators.CGRU_Submit.bl_idname, icon='RENDER_STILL')
 		row.operator(operators.CGRU_Browse.bl_idname)
+
+		prefs = context.user_preferences.addons[__package__].preferences
+		if prefs.cgru_version == utils.CGRU_NOT_FOUND:
+			row.enabled = False
+			layout.label(text="Please check CGRU location in the addon preferences.", icon='ERROR')
+		else:
+			row.enabled = True
+
