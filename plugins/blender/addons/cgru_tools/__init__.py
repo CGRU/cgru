@@ -27,6 +27,8 @@ else:
 	from . import operators
 
 import bpy
+import os
+
 
 def register():
 	bpy.utils.register_module(__name__)
@@ -35,6 +37,10 @@ def register():
 		name='CGRU Settings',
 		description='CGRU Settings'
 	)
+
+	prefs = bpy.context.user_preferences.addons[__name__].preferences
+	if "CGRU_LOCATION" in os.environ:
+		prefs.cgru_location = os.environ["CGRU_LOCATION"]
 
 
 def unregister():

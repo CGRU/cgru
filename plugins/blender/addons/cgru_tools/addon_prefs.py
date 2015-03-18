@@ -1,24 +1,33 @@
 # -*- coding: utf-8 -*-
 
-import bpy
+from bpy.types import AddonPreferences
+from bpy.props import StringProperty
+from . import utils
 
 
-class CGRUAddonPreferences(bpy.types.AddonPreferences):
+def update_location(self, context):
+	self.cgru_version = utils.get_cgru_version(self.cgru_location)
+	if self.cgru_version != "NOT FOUND":
+		utils.add_cgru_module_to_syspath(self.cgru_location)
+
+
+
+class CGRUAddonPreferences(AddonPreferences):
 	bl_idname = __package__
 
-	cgru_location = bpy.props.StringProperty(
+	cgru_location = StringProperty(
 		name="CGRU Root location",
-		subtype="DIR_PATH")
+		subtype="DIR_PATH",
+		update=update_location)
+
+	cgru_version = StringProperty(name="CGRU version",
+		default="NOT FOUND")
+
 
 	def draw(self, context):
 		layout = self.layout
-		row = layout.row()
-		import os
-		if 'CGRU_LOCATION' not in os.environ:
-			row.label(text="Please, set CGRU install root location")
-			row = layout.row()
-			row.prop(self, "cgru_location")
-		else:
-			row.label(text="CGRU root location: %s" % os.getenv('CGRU_LOCATION'))
-			self.cgru_location = os.getenv('CGRU_LOCATION')
+		col = layout.column()
+		col.label(text="Please, set CGRU install root location")
+		col.prop(self, "cgru_location")
+		col.label(text="CGRU version: %s" % self.cgru_version)
 

@@ -34,15 +34,11 @@ class CGRU_Browse(bpy.types.Operator):
 	bl_label = "Show job"
 
 	def execute(self, context):
-		utils.check_cgru_env(context)
-
-		cgruconfig = utils.load_module('cgruconfig')
-		imp.reload(cgruconfig)
+		import cgruconfig
+		import webbrowser
 
 		server_address = cgruconfig.VARS['af_servername']
 		server_port = cgruconfig.VARS['af_serverport']
-
-		import webbrowser
 		webbrowser.open('http://%s:%s' % (server_address, server_port))
 
 		return {"FINISHED"}
@@ -62,11 +58,8 @@ class CGRU_Submit(bpy.types.Operator):
 		engine_string = sce.render.engine
 		sceneModified = False  # if the opriginal scene modified checker
 
-		utils.check_cgru_env(context)
-
 		# Import Afanasy module:
-		af = utils.load_module('af')
-		imp.reload(af)
+		import af
 
 		# Calculate temporary scene path:
 		scenefile = bpy.data.filepath
