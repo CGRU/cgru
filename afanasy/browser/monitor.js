@@ -654,8 +654,6 @@ Monitor.prototype.onMouseDown = function( i_evt, i_el)
 		return;
 	}
 
-	if( false == i_evt.ctrlKey )
-		this.selectAll( false);
 	if( i_evt.shiftKey && this.cur_item )
 	{
 		var i = this.items.indexOf( this.cur_item);
@@ -673,6 +671,9 @@ Monitor.prototype.onMouseDown = function( i_evt, i_el)
 			return;
 		}
 	}
+	else if( ! i_evt.ctrlKey )
+		this.selectAll( false);
+
 		
 	this.selectToggle( i_el.item);
 }
