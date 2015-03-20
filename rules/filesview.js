@@ -454,8 +454,19 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			title += '\nFolders: ' + i_obj.num_folders_total;
 			title += '\nFiles: ' + i_obj.num_files_total;
 		}
-		i_el.m_el_num_files.title = title;
 
+		if( RULES.status && ( RULES.status.frames_num != null ))
+		{
+			if( RULES.status.frames_num != num_files )
+			{
+				i_el.m_el_num_files.classList.add('error');
+				title = 'ERROR: Shot and folder files number mismatch!\n' + title;
+			}
+			else
+				i_el.m_el_num_files.classList.remove('error');
+		}
+
+		i_el.m_el_num_files.title = title;
 		i_el.m_el_num_files.m_num_files = num_files;
 		i_el.m_el_num_files.onclick = function(e){e.stopPropagation();};
 		i_el.m_el_num_files.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
