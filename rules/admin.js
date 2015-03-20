@@ -581,7 +581,7 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
-	el.textContent = 'Last News';
+	el.textContent = 'Lastest News';
 	el.title = 'Last news time';
 	el.onclick = function(e) { ad_WndSortUsers('ntime'); };
 
