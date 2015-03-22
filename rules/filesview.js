@@ -457,6 +457,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 
 		if( RULES.status && ( RULES.status.frames_num != null ))
 		{
+			i_el.m_el_num_files.classList.add('correct');
 			if( RULES.status.frames_num != num_files )
 			{
 				i_el.m_el_num_files.classList.add('error');
