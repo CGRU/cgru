@@ -458,10 +458,12 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( RULES.status && ( RULES.status.frames_num != null ))
 		{
 			i_el.m_el_num_files.classList.add('correct');
-			if( RULES.status.frames_num != num_files )
+			if( num_files != RULES.status.frames_num )
 			{
 				i_el.m_el_num_files.classList.add('error');
 				title = 'ERROR: Shot and folder files number mismatch!\n' + title;
+				if( num_files > RULES.status.frames_num )
+					i_el.m_el_num_files.classList.add('greater');
 			}
 			else
 				i_el.m_el_num_files.classList.remove('error');
