@@ -733,11 +733,6 @@ function u_BodyShowInfo()
 		$('body_timecode_duration').textContent = duration;
 		$('body_timecode_fps').textContent = RULES.fps;
 		$('body_timecode_edit_value').textContent = timecode;
-		info += '<br>Time Code: ' + timecode;
-		info += ' = ' + (frame_finish - frame_start + 1);
-		info += ' Frames at ' + RULES.fps + ' FPS ';
-		info += ' Duration: ';
-		info += duration;
 	}
 	else
 	{
