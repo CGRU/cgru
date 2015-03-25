@@ -170,7 +170,7 @@
 "avcmd":"ffmpeg",
 "skipfiles":[".","Thumbs.db"],
 
-"fps":"24",
+"fps":24,
 "dailies":
 {
 	"format":"1280x720",

@@ -697,6 +697,7 @@ function u_BodyShowInfo()
 			$('body_avatar_c').src = avatar;
 		}
 
+		info += '<i>';
 		info += 'Created by '+c_GetUserTitle( RULES.status.body.cuser, RULES.status.body.guest);
 		if( g_admin && RULES.status.body.guest && RULES.status.body.guest.email )
 			info += ' ' + c_EmailDecode( RULES.status.body.guest.email);
@@ -716,7 +717,34 @@ function u_BodyShowInfo()
 			info += '<br>Modified by '+c_GetUserTitle( RULES.status.body.muser);
 			info += ' at '+c_DT_StrFromSec( RULES.status.body.mtime);
 		}
+		info += '</i>';
 	}
+	if( RULES.status && RULES.status.timecode_start )
+	{
+		var timecode = RULES.status.timecode_start + ' - ' + RULES.status.timecode_finish;
+		var frame_start  = c_TC_FromSting( RULES.status.timecode_start);
+		var frame_finish = c_TC_FromSting( RULES.status.timecode_finish);
+		var frames_num = frame_finish - frame_start + 1;
+		var duration = c_TC_FromFrame( frames_num);
+		$('body_timecode').style.display = 'block';
+		$('body_timecode_value').textContent = timecode;
+		$('body_timecode_framesnum').textContent = frames_num;
+		$('body_timecode_framesnum').m_frames_num = frames_num;
+		$('body_timecode_duration').textContent = duration;
+		$('body_timecode_fps').textContent = RULES.fps;
+		$('body_timecode_edit_value').textContent = timecode;
+		info += '<br>Time Code: ' + timecode;
+		info += ' = ' + (frame_finish - frame_start + 1);
+		info += ' Frames at ' + RULES.fps + ' FPS ';
+		info += ' Duration: ';
+		info += duration;
+	}
+	else
+	{
+		$('body_timecode').style.display = 'none';
+		$('body_timecode_edit_value').textContent = '';
+	}
+
 	$('body_info').innerHTML = info;
 //console.log(info);
 }
@@ -760,7 +788,11 @@ function u_BodyEditSave()
 	u_body_editing = false;
 
 	if( u_body_edit_markup ) u_BodyEditMarkup();
+
 	var text = c_LinksProcess( $('body_body').innerHTML);
+
+	st_SetTimeCode( $('body_timecode_edit_value').textContent);
+
 	var res = n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename),"data":text}},"func":u_BodyEditSaveFinished,"info":'body save'});
 //console.log('RES:'+JSON.stringify( res));
 }

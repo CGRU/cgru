@@ -640,7 +640,7 @@ margin-bottom: -4px;
 .filesview .item .preview .close { background-color: #555; color: #000; }
 
 #body, #body_panel { overflow: visible; }
-#body_info { font-style: italic; font-size: 14px; }
+#body_info { font-size: 14px; }
 #body_avatar_c, #body_avatar_m {
 float: left; display: none;
 width: 50px; height: 50px;
@@ -651,6 +651,17 @@ border-radius: 8px;
 /*#body_avatar_c:hover, #body_avatar_m:hover { width: auto; height: auto; }*/
 #body_panel_edit > div { margin: 1px 4px;}
 #body_panel_edit .toggle { float:left; font-size:12px; border: 1px solid rgba(0,0,0,.5); cursor:pointer; padding:2px 3px; }
+
+#body_timecode { display: none; }
+#body_timecode > div { float: left; height: 20px; margin: 2px; padding: 2px; }
+#body_timecode .value { font: 16px monospace; }
+#body_timecode .frames_num { border: 1px solid rgba(98,98,98,.5); border-radius: 2px; }
+#body_timecode .frames_num:hover { border: 1px solid rgba(250,250,98,.5); }
+
+#body_timecode_edit > div { height: 20px; margin: 2px; padding: 2px; }
+#body_timecode_edit_label { float: left; }
+#body_timecode_edit_value { border-radius: 2px; }
+
 #body_body { clear: both; }
 
 /* ========================================================= */

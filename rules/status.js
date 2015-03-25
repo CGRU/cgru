@@ -1146,6 +1146,56 @@ function st_SetFramesNumber( i_num)
 	$('status_framesnum_div').title = 'Frames number updated\nPrevous value: ' + RULES.status.frames_num;
 }
 
+function st_SetTimeCode( i_tc)
+{
+	if(( i_tc == null ) || ( i_tc.length < 1 ))
+	{
+		return;
+	}
+
+	var tc = i_tc;
+	tc = tc.split('-');
+	if( tc.length != 2 )
+	{
+		c_Error('Invalid time code: ' + i_tc );
+		return;
+	}
+
+	var frame_start = c_TC_FromSting(tc[0].replace());
+	if( frame_start === null )
+	{
+		c_Error('Invalid start time code: ' + tc[0]);
+		return;
+	}
+
+	var frame_finish = c_TC_FromSting(tc[1]);
+	if( frame_finish === null )
+	{
+		c_Error('Invalid finish time code: ' + tc[1]);
+		return;
+	}
+	var timecode_start = c_TC_FromFrame( frame_start);
+
+	var frames_num = frame_finish - frame_start + 1;
+	if( frames_num <= 0 )
+	{
+		c_Error('Start time code is grater than finish: ' + tc[1]);
+		return;
+	}
+	var timecode_finish = c_TC_FromFrame( frame_finish);
+
+//console.log( timecode_start + ' - ' + timecode_finish + ' = ' + frames_num);
+
+	if( RULES.status == null ) RULES.status = {};
+
+	if(( RULES.status.timecode_start == timecode_start ) && ( RULES.status.timecode_finish == timecode_finish ))
+		return;
+
+	RULES.status.timecode_start = timecode_start;
+	RULES.status.timecode_finish = timecode_finish;
+	st_Save();
+}
+
 function st_UpdateProgresses( i_path, i_progresses)
 {
 	paths = [];

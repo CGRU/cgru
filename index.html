@@ -217,6 +217,17 @@ Project input and output format.
 					<img id="body_avatar_m">
 					<div id="body_info"></div>
 				</div>
+				<div id="body_timecode">
+					<div id="body_timecode_label">Time Code:</div>
+					<div id="body_timecode_value" class="value"></div>
+					<div>Duration:</div>
+					<div id="body_timecode_duration" class="value"></div>
+					<div>Frames:</div>
+					<div id="body_timecode_framesnum" class="value frames_num" title="Double click to update shot length."
+						ondblclick="st_SetFramesNumber( this.m_frames_num);"></div>
+					<div>FPS:</div>
+					<div id="body_timecode_fps" class="value"></div>
+				</div>
 				<div id="body_panel_edit" style="display:none">
 					<div class="button" style="float:right" onclick="u_BodyEditSave()" title="Save body editing (CTRL+ENTER)">
 						<b>Save</b> <small>(CTRL+ENTER)</small></div>
@@ -225,6 +236,10 @@ Project input and output format.
 					<div class="toggle" ondblclick="u_BodyEditMarkupRemove()"
 						title="Double click to remove all HTML markup from body">
 						Remove all markup</div>
+					<div id="body_timecode_edit">
+						<div id="body_timecode_edit_label">Time Code:</div>
+						<div id="body_timecode_edit_value" contenteditable="true" class="editing"></div>
+					</div>
 				</div>
 				<div id="body_body" style="padding: 5px 10px;"></div>
 			</div>

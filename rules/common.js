@@ -223,6 +223,52 @@ function c_DT_DurFromSec( i_sec)
 }
 function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
+function c_TC_FromFrame( i_frame)
+{
+	var fps = RULES.fps;
+
+	var sec = Math.floor( i_frame / fps );
+	var frm = i_frame - sec * fps;
+	var min = Math.floor( sec / 60);
+	sec = sec - min * 60;
+	var hrs = Math.floor( min / 60);
+	min = min - hrs * 60;
+
+	if( hrs < 10 ) hrs = '0' + hrs;
+	if( min < 10 ) min = '0' + min;
+	if( sec < 10 ) sec = '0' + sec;
+	if( frm < 10 ) frm = '0' + frm;
+
+	return hrs + ':' + min + ':' + sec + ':' + frm;
+}
+
+function c_TC_FromSting( i_str)
+{
+//console.log('c_TC_FromSting: ' + i_str);
+	var nums = i_str.split(/\D+/);
+	if( nums.length == 0 )
+	{
+		c_Error('Invalid time code: ' + i_str);
+		return null;
+	}
+
+	var fps = RULES.fps;
+
+	var frms = 0;
+//console.log( nums);
+	var mult = [ 1, fps, fps*60, fps*3600];
+//console.log( mult);
+	var j = 0;
+	for( var i = nums.length-1; i >=0; i-- )
+	{
+//console.log(nums[i]);
+		if( nums[i].length == 0 ) continue;
+		frms += parseInt(nums[i]) * mult[j];
+		j++;
+	}
+
+	return frms;
+}
 
 function c_ElDisplayToggle( i_el)
 {
