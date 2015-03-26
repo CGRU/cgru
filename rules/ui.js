@@ -725,13 +725,25 @@ function u_BodyShowInfo()
 		var frame_start  = c_TC_FromSting( RULES.status.timecode_start);
 		var frame_finish = c_TC_FromSting( RULES.status.timecode_finish);
 		var frames_num = frame_finish - frame_start + 1;
-		var duration = c_TC_FromFrame( frames_num);
+		var duration = c_TC_FromFrame( frames_num).replace('00:','');
 		$('body_timecode').style.display = 'block';
 		$('body_timecode_value').textContent = timecode;
 		$('body_timecode_framesnum').textContent = frames_num;
 		$('body_timecode_framesnum').m_frames_num = frames_num;
 		$('body_timecode_duration').textContent = duration;
 		$('body_timecode_fps').textContent = RULES.fps;
+		if( RULES.status.frames_num && ( frames_num != RULES.status.frames_num ))
+		{
+			$('body_timecode_framesnum').classList.add('error');
+			if( frames_num > RULES.status.frames_num )
+				$('body_timecode_framesnum').classList.add('greater');
+			else
+				$('body_timecode_framesnum').classList.remove('greater');
+		}
+		else
+		{
+			$('body_timecode_framesnum').classList.remove('error');
+		}
 		$('body_timecode_edit_value').textContent = timecode;
 	}
 	else

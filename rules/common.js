@@ -298,14 +298,14 @@ function c_IsUserStateSet(   i_user, i_state)
 }
 
 // Construct from g_users sorted roles with sorted artists:
-// Provide i_show_list to show artist even if he is disabled or not an artist
-function c_GetRolesArtists( i_show_list)
+// Provide i_users to show specified users even if he is disabled or not an artist
+function c_GetRolesArtists( i_users)
 {
 	var roles_obj = {};
 	for( var uid in g_users )
 	{
 //console.log(g_users[uid].states);
-		if(( i_show_list == null ) || ( i_show_list[uid] == null ))
+		if(( i_users == null ) || ( i_users[uid] == null ))
 		{
 			if( g_users[uid].disabled )
 				continue;
