@@ -339,8 +339,10 @@ void ListNodes::actPriority()
 	if( item == NULL ) return;
 	int current = item->m_priority;
 
-	int maximum = af::Environment::getPriority();
-	if( af::Environment::VISOR()) maximum = 250;
+	int maximum = 250;
+	if(( isTypeUsers()) && ( true != af::Environment::VISOR()))
+		maximum = af::Environment::getPriority();
+
 	bool ok;
 	int priority = QInputDialog::getInteger( this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
 	if( !ok) return;

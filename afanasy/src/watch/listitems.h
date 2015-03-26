@@ -44,6 +44,9 @@ public:
 
 	virtual bool mousePressed( QMouseEvent * event);
 
+	inline bool isTypeJobs()  const { return m_type == "jobs";  }
+	inline bool isTypeUsers() const { return m_type == "users"; }
+
 public slots:
 	void repaintItems();
 	void deleteAllItems();
