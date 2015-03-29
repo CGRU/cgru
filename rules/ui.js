@@ -422,7 +422,7 @@ function u_SearchOnClick()
 		$('search_artists').m_elArtists = [];
 
 		// Constuct atrists just once, as they are not depending on location:
-		var roles = c_GetRolesArtists();
+		var roles = c_GetRolesArtists( g_users);
 
 		for( var r = 0; r < roles.length; r++)
 		{
@@ -454,6 +454,9 @@ function u_SearchOnClick()
 				el.textContent = c_GetUserTitle( artist.id);
 				el.m_user = artist.id;
 				el.classList.add('tag');
+				el.classList.add('artist');
+				if( artist.disabled ) el.classList.add('disabled');
+				if( c_IsNotAnArtist( artist)) el.classList.add('notartist');
 				el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
 
 				elLabel.m_elArtists.push(el);
@@ -501,6 +504,17 @@ function u_SearchOnClick()
 		else
 			$('search_comment_div').style.display = 'block';
 	}
+}
+
+function u_Search_ShowDisabled( i_el)
+{
+	i_el.classList.toggle('pushed');
+	$('search_artists_div').classList.toggle('show_disabled');
+}
+function u_Search_ShowNotArtist( i_el)
+{
+	i_el.classList.toggle('pushed');
+	$('search_artists_div').classList.toggle('show_notartist');
 }
 
 function u_SearchSearch()

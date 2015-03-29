@@ -543,6 +543,10 @@ padding: 4px;
 }
 #search div { margin: 1px 4px; }
 #search .button { margin: 1px 8px; padding: 2px 8px; }
+#search_artists_div .disabled { display: none; }
+#search_artists_div.show_disabled .disabled { display: block; }
+#search_artists_div .notartist { display: none; }
+#search_artists_div.show_notartist .notartist { display: block; }
 
 #assets {
 background: rgba(200,255,200,.1);
