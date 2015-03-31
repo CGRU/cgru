@@ -289,10 +289,19 @@ margin:1px 4px;
 padding:0 4px;
 /*background-color: rgba(0,0,255,.1);*/
 }
-.artist { /*background-color: rgba(255,255,255,.2);*/border: 1px solid rgba(255,255,255,.5);}
+.artist {
+/*background-color: rgba(255,255,255,.2);*/
+border: 1px solid rgba(255,255,255,.5);
+}
+.tag.with_icon {
+background-size: 20px;
+background-repeat: no-repeat;
+background-position: left;
+padding-left: 20px;
+}
 .artist.me { background: rgba(100,255,100,.5); }
 .artist.disabled { text-decoration: line-through; }
-.tag.short { margin:0 1px; padding:0 2px; }
+.tag.short { margin: 0 1px; /*padding-right: 2px;*/ }
 .artists, .tags {
 /*box-shadow: 0 0 2px #000 inset;*/
 /*border-radius: 2px;*/

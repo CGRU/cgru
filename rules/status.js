@@ -306,6 +306,13 @@ function st_SetElArtists( i_status, i_el, i_short)
 				el.title = 'It`s me!\n - may be i should do something here?';
 			}
 		}
+
+		var avatar = c_GetAvatar( i_status.artists[i]);
+		if( avatar)
+		{
+			el.classList.add('with_icon');
+			el.style.backgroundImage = 'url(' + avatar + ')';
+		}
 	}
 }
 function st_SetElTags( i_status, i_elTags, i_short)

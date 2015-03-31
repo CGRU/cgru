@@ -296,13 +296,11 @@ function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
 		if( i_id == 'header')
 		{
 			localStorage.header_opened = 'false';
-//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_down.png)';
 			document.getElementById( i_id).style.top = i_closed+'px';
 		}
 		else
 		{
 			localStorage.footer_opened = 'false';
-//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_up.png)';
 			document.getElementById('footer').style.height = i_closed+'px';
 			document.getElementById('log').style.display= 'none';
 		}
@@ -313,13 +311,11 @@ function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_closed, i_opened)
 		if( i_id == 'header')
 		{
 			localStorage.header_opened = 'true';
-//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_up.png)';
 			document.getElementById( i_id).style.top = i_opened+'px';
 		}
 		else
 		{
 			localStorage.footer_opened = 'true';
-//			i_elBtn.style.backgroundImage = 'url(rules/icons/arrow_down.png)';
 			document.getElementById('footer').style.height = i_opened+'px';
 			document.getElementById('log').style.display= 'block';
 		}
@@ -443,6 +439,8 @@ function u_SearchOnClick()
 				if( ASSET && ASSET.filter ) u_SearchSearch();
 			}
 
+			var role_has_one_artist = false;
+			var role_has_enabled = false;
 			for( var a = 0; a < roles[r].artists.length; a++)
 			{
 				var artist = roles[r].artists[a];
@@ -455,12 +453,31 @@ function u_SearchOnClick()
 				el.m_user = artist.id;
 				el.classList.add('tag');
 				el.classList.add('artist');
-				if( artist.disabled ) el.classList.add('disabled');
-				if( c_IsNotAnArtist( artist)) el.classList.add('notartist');
+
+				if( artist.disabled )
+					el.classList.add('disabled');
+				else
+					role_has_enabled = true;
+
+				if( c_IsNotAnArtist( artist))
+					el.classList.add('notartist');
+				else
+					role_has_one_artist = true;
+
+				var avatar = c_GetAvatar( artist.id);
+				if( avatar)
+				{
+					el.classList.add('with_icon');
+					el.style.backgroundImage = 'url(' + avatar + ')';
+				}
+
 				el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
 
 				elLabel.m_elArtists.push(el);
 			}
+
+			if( role_has_one_artist != true ) elRole.classList.add('notartist');
+			if( role_has_enabled != true ) elRole.classList.add('disabled');
 		}
 	}
 
