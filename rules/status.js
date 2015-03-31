@@ -659,6 +659,15 @@ Status.prototype.editListShow = function( i_args)
 				el.classList.add('me');
 		}
 
+		var icon = null;
+		if( i_args.name == 'artists')
+			icon = c_GetAvatar( id);
+		if( icon)
+		{
+			el.classList.add('with_icon');
+			el.style.backgroundImage = 'url(' + icon + ')';
+		}
+
 		if( i_args.list_all[id] && i_args.list_all[id].disabled )
 			el.classList.add('disabled');
 
@@ -758,6 +767,13 @@ Status.prototype.editArtistsEdit = function( i_args)
 
 			if( artist.tip )
 				el.title = artist.tip;
+
+			var avatar = c_GetAvatar( artist.id);
+			if( avatar)
+			{
+				el.classList.add('with_icon');
+				el.style.backgroundImage = 'url(' + avatar + ')';
+			}
 
 			if( i_args.list[artist.id] )
 			{
