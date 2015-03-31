@@ -294,12 +294,12 @@ padding:0 4px;
 border: 1px solid rgba(255,255,255,.5);
 }
 .tag.with_icon {
+padding-left: 22px;
 background-size: 20px;
 background-repeat: no-repeat;
 background-position: left;
-padding-left: 20px;
 }
-.artist.me { background: rgba(100,255,100,.5); }
+.artist.me { background-color: rgba(100,255,100,.5); }
 .artist.disabled { text-decoration: line-through; }
 .tag.short { margin: 0 1px; /*padding-right: 2px;*/ }
 .artists, .tags {

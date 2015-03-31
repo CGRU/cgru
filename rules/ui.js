@@ -56,20 +56,22 @@ function u_Init()
 	u_CalcGUI();
 
 	$('body_panel_edit').m_panel_edit = u_EditPanelCreate( $('body_panel_edit'));
-	$('body_body').onkeydown = function(e)
-	{
-		if( u_body_editing )
-		{
-			if(( e.keyCode == 13 ) && e.ctrlKey ) // CTRL + ENTER
-			{
-				u_BodyEditSave();
-				$('body_body').blur();
-			}
-		}
-	}
+	$('body_body').onkeydown = u_BodyEditOnKeyDown;
+	$('body_timecode_edit_value').onkeydown = u_BodyEditOnKeyDown;
 
 	for( var i = 0; i < u_views.length; i++)
 		u_OpenCloseView( u_views[i], false, false);
+}
+function u_BodyEditOnKeyDown( i_e)
+{
+	if( u_body_editing )
+	{
+		if(( i_e.keyCode == 13 ) && i_e.ctrlKey ) // CTRL + ENTER
+		{
+			u_BodyEditSave();
+			i_e.currentTarget.blur();
+		}
+	}
 }
 function u_InitAuth()
 {
