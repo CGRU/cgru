@@ -768,7 +768,7 @@ function u_BodyShowInfo()
 		if( RULES.status.frames_num && ( frames_num != RULES.status.frames_num ))
 		{
 			$('body_timecode_framesnum').classList.add('error');
-			if( frames_num > RULES.status.frames_num )
+			if( RULES.status.frames_num > frames_num )
 				$('body_timecode_framesnum').classList.add('greater');
 			else
 				$('body_timecode_framesnum').classList.remove('greater');
