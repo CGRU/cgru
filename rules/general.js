@@ -80,8 +80,7 @@ function g_Init_Rules( i_data)
 	p_Init();
 	nw_InitConfigured();
 
-	$('afanasy_webgui').innerHTML =
-		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
+	$('afanasy_webgui').href = 'http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport;
 	$('rules_label').textContent = RULES_TOP.company+'-RULES';
 
 	$('panel_logo_img').src = RULES_TOP.panel_logo_img;

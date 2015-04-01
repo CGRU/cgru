@@ -321,6 +321,7 @@ function ad_ChangesFinished( i_data, i_args)
 }
 function ad_OpenWindow()
 {
+	u_OpenCloseHeader();
 	ad_wnd = new cgru_Window({"name":'administrate',"title":'Administrate','padding':'3% 1%'});
 	ad_wnd.elContent.classList.add('administrate');
 	ad_wnd.closeOnEsc = false;
@@ -1182,6 +1183,8 @@ function ad_ProfileOpen()
 		c_Error('No authenticated user found.');
 		return;
 	}
+
+	u_OpenCloseHeader();
 
 	var wnd = new cgru_Window({"name":'profile',"title":'My Profile'});
 	wnd.elContent.classList.add('profile');
