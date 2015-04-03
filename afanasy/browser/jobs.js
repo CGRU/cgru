@@ -257,6 +257,7 @@ JobNode.prototype.showThumb = function( i_path)
 	{
 		var img = document.createElement('img');
 		thumb.appendChild( img);
+		img.ondragstart = function(){return false;};
 		img.src = '@TMP@' + i_path;
 		img.style.display = 'none';
 		img.m_height = this.monitor.view_opts.jobs_thumbs_height;
