@@ -594,10 +594,18 @@ function sc_DisplayStatistics()
 //	c_Info( selShots.length + ' shots selected.');
 
 	var shots = [];
+	var omits = 0;
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
 		if( sc_elShots[i].m_hidden == true )
 			continue;
+
+		var stat = sc_elShots[i].m_status.obj;
+		if( stat && stat.tags && ( stat.tags.indexOf('omit') != -1 ))
+		{
+			omits++;
+			continue;
+		}
 
 		if( selShots.length && ( sc_elShots[i].m_selected != true ))
 			continue;
@@ -620,6 +628,7 @@ function sc_DisplayStatistics()
 	}
 
 	var info = 'Shots Count: ' + shots.length;
+	if( omits ) info += ' (+' + omits + ' omits)';
 	if( shots.length )
 		info += ' Shots Progress: ' + Math.round(progress/shots.length) + '%';
 
@@ -640,7 +649,8 @@ function sc_DisplayStatistics()
 		info = ' Scenes Count: ' + scenes_count + ' ' + info;
 	}
 
-	if( frames_count ) info += ' Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps);
+	if( frames_count )
+		info += ' Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' (at ' + RULES.fps + ' FPS)';
 
 	$('scenes_info').textContent = info;
 
