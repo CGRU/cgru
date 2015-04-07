@@ -388,12 +388,21 @@ FilesView.prototype.showCounts = function()
 		el.title = 'All folders files sum.\nDouble click to update status frames number.';
 		el.m_frames_count = frames_count;
 		el.onclick = function(e){e.stopPropagation();};
-		el.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_frames_count);};
+		el.ondblclick = function(e){
+			e.stopPropagation();
+			st_SetFramesNumber( e.currentTarget.m_frames_count);
+			fv_refreshAttrs();
+		}
 	}
 }
 
+FilesView.prototype.refreshAttrs = function() { for( var i = 0; i < this.elItems.length; i++) this.showAttrs( this.elItems[i]); }
+
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
+	// New object can be provided on update, for example on files count
+	if( i_obj ) i_el.m_obj = i_obj;
+
 	if( this.masks && this.masks.length )
 	for( var i = 0; i < this.masks.length; i++ )
 		if( this.masks[i].re.test( c_PathBase( i_el.m_path)))
@@ -402,7 +411,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_elName.title = this.masks[i].tip;
 		}
 
-	if( i_obj.mtime != null )
+	if( i_el.m_obj.mtime != null )
 	{
 		if( i_el.m_el_mtime == null )
 		{
@@ -411,11 +420,11 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_el_mtime.classList.add('mtime');
 		}
 
-		i_el.m_el_mtime.textContent = c_DT_FormStrFromSec( i_obj.mtime);
+		i_el.m_el_mtime.textContent = c_DT_FormStrFromSec( i_el.m_obj.mtime);
 	}
 
-	var size = i_obj.size_total;
-	if( size == null ) size = i_obj.size;
+	var size = i_el.m_obj.size_total;
+	if( size == null ) size = i_el.m_obj.size;
 	if( size != null )
 	{
 		if( i_el.m_el_size == null )
@@ -426,15 +435,15 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		}
 
 		i_el.m_el_size.textContent = c_Bytes2KMG( size);
-		if(( i_obj.size_total != null ) && ( i_obj.size != null ))
-			i_el.m_el_size.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_obj.size);
+		if(( i_el.m_obj.size_total != null ) && ( i_el.m_obj.size != null ))
+			i_el.m_el_size.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_el.m_obj.size);
 	}
 
 	var num_files = null;
-	if( i_obj.num_files != null )
-		num_files = i_obj.num_files;
-	if( i_obj.files && i_obj.files.length )
-		num_files = i_obj.files.length;
+	if( i_el.m_obj.num_files != null )
+		num_files = i_el.m_obj.num_files;
+	if( i_el.m_obj.files && i_el.m_obj.files.length )
+		num_files = i_el.m_obj.files.length;
 	if( num_files != null )
 	{
 		if( i_el.m_el_num_files == null )
@@ -448,11 +457,11 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 
 		var title = 'Files quantity: ' + num_files + ' (without subfolders)';
 		title += '\nDouble click to update status frames number.';
-		if(( i_obj.num_folders_total != null ) && ( i_obj.num_files_total != null ))
+		if(( i_el.m_obj.num_folders_total != null ) && ( i_el.m_obj.num_files_total != null ))
 		{
 			title += '\nTotal count with subfolders:';
-			title += '\nFolders: ' + i_obj.num_folders_total;
-			title += '\nFiles: ' + i_obj.num_files_total;
+			title += '\nFolders: ' + i_el.m_obj.num_folders_total;
+			title += '\nFiles: ' + i_el.m_obj.num_files_total;
 		}
 
 		if( RULES.status && ( RULES.status.frames_num != null ))
@@ -464,6 +473,8 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 				title = 'ERROR: Shot and folder files number mismatch!\n' + title;
 				if( num_files > RULES.status.frames_num )
 					i_el.m_el_num_files.classList.add('greater');
+				else
+					i_el.m_el_num_files.classList.remove('greater');
 			}
 			else
 				i_el.m_el_num_files.classList.remove('error');
@@ -472,25 +483,29 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		i_el.m_el_num_files.title = title;
 		i_el.m_el_num_files.m_num_files = num_files;
 		i_el.m_el_num_files.onclick = function(e){e.stopPropagation();};
-		i_el.m_el_num_files.ondblclick = function(e){e.stopPropagation();st_SetFramesNumber( e.currentTarget.m_num_files);};
+		i_el.m_el_num_files.ondblclick = function(e){
+			e.stopPropagation();
+			st_SetFramesNumber( e.currentTarget.m_num_files);
+			fv_refreshAttrs();
+		}
 	}
 /*
-	if( i_obj.checksum )
+	if( i_el.m_obj.checksum )
 	{
 		var elSums = [];
 		var time = null;
-		for( var sum in i_obj.checksum )
+		for( var sum in i_el.m_obj.checksum )
 		{
 			if( sum == 'time' )
 			{
-				time = i_obj.checksum[sum];
+				time = i_el.m_obj.checksum[sum];
 				continue;
 			}
 
 			var elSum = document.createElement('div');
 			i_el.appendChild( elSum);
 			elSum.classList.add('checksum');
-			elSum.textContent = sum+':'+i_obj.checksum[sum];
+			elSum.textContent = sum+':'+i_el.m_obj.checksum[sum];
 			elSums.push( elSum);
 		}
 
@@ -510,6 +525,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	elItem.classList.add('item');
 	this.elView.appendChild( elItem);
 	this.elItems.push( elItem);
+	elItem.m_obj = i_obj;
 	elItem.m_path = path;
 	elItem.id = path;
 	elItem.m_view = this;
@@ -748,7 +764,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		}
 	}
 
-	this.showAttrs( elItem, i_obj);
+	this.showAttrs( elItem);
 
 	// Movie file preview:
 	if( i_isFolder == false )
@@ -900,7 +916,8 @@ FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 		break;
 	}
 
-	// Update this class instance walk object:
+	// Update this class instance walk object,
+	// as it can be shown next time from cache:
 	var name = c_PathBase( i_args.wpath);
 	for( var i = 0; i < this.walk.folders.length; i++)
 	{
@@ -1304,17 +1321,9 @@ function fv_SkipFile( i_filename)
 	return false;
 }
 
-function fv_ReloadAll()
-{
-	for( var i = 0; i < fv_views.length; i++)
-		fv_views[i].refresh();
-}
-
-function fv_SelectNone()
-{
-	for( var v = 0; v < fv_views.length; v++)
-		fv_views[v].selectNone();
-}
+function fv_ReloadAll()    { for( var i = 0; i < fv_views.length; i++) fv_views[i].refresh();      }
+function fv_refreshAttrs() { for( var i = 0; i < fv_views.length; i++) fv_views[i].refreshAttrs(); }
+function fv_SelectNone()   { for( var v = 0; v < fv_views.length; v++) fv_views[v].selectNone();   }
 
 function fv_Goto( i_path )
 {
