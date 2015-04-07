@@ -964,7 +964,8 @@ Status.prototype.editSave = function( i_args)
 
 	if( this.elEdit_annotation.textContent != st_MultiValue )
 	{
-		annotation = c_Strip( this.elEdit_annotation.innerHTML);
+		this.elEdit_annotation.innerHTML = this.elEdit_annotation.textContent;
+		annotation = c_Strip( this.elEdit_annotation.textContent);
 	}
 
 	if( this.elEdit.artists )
