@@ -1065,7 +1065,7 @@ Status.prototype.editSave = function( i_args)
 	// Set values to statuses
 	var some_progress_changed = false;
 	var progresses = {};
-	var load_news = false;
+	var news = [];
 	for( var i = 0; i < statuses.length; i++)
 	{
 		if( statuses[i].obj == null ) statuses[i].obj = {};
@@ -1111,18 +1111,15 @@ Status.prototype.editSave = function( i_args)
 			statuses[i].obj.color = this.elEdit_Color.m_color;
 
 		// Status saving produce news.
-		// Making news produce loading them by default.
-		// We should reload news only at last:
-		if( i == (statuses.length - 1)) load_news = true;
-		statuses[i].save({"load_news":load_news});
+		news.push( statuses[i].save());
 
 		// Status showing causes values redraw,
 		// and destoys edit GUI if any.
 		statuses[i].show();
 	}
 
-//	this.save();
-//	this.show();
+	// Send news:
+	nw_SendNews( news);
 
 	if( some_progress_changed )
 		st_UpdateProgresses( this.path, progresses);
@@ -1130,13 +1127,13 @@ Status.prototype.editSave = function( i_args)
 	c_Info('Status(es) saved.');
 }
 
-Status.prototype.save = function( i_args)
+Status.prototype.save = function()
 {
 	this.obj.muser = g_auth_user.id;
 	this.obj.mtime = c_DT_CurSeconds();
 
 	st_Save( this.obj, this.path);
-	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists},{"load":i_args.load_news});
+	return nw_CreateNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 }
 
 function st_Save( i_status, i_path, i_func, i_args, i_navig_up)

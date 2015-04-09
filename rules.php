@@ -997,6 +997,22 @@ function jsf_save( $i_save, &$o_out)
 
 function jsf_makenews( $i_args, &$o_out)
 {
+	if( ! is_array( $i_args))
+	{
+		$o_out['error'] = 'News function argument should be an array.';
+		return;
+	}
+	$count = count( $i_args);
+	if( $count == 0 )
+	{
+		$o_out['error'] = 'News function argument array has zero length.';
+		return;
+	}
+	for( $i = 0; $i < $count; $i++)
+	makenews( $i_args[$i], $o_out);
+}
+function makenews( $i_args, &$o_out)
+{
 	global $FileMaxLength;
 
 	$news = $i_args['news'];
@@ -1147,7 +1163,8 @@ function jsf_makenews( $i_args, &$o_out)
 			if( in_array( $user['id'], $news['artists']))
 			{
 				array_push( $sub_users, $user);
-				array_push( $o_out['users'], $user['id']);
+				if( false === array_search( $user['id'], $o_out['users']))
+					array_push( $o_out['users'], $user['id']);
 				continue;
 			}
 

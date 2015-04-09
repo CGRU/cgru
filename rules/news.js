@@ -281,6 +281,11 @@ function nw_MakeNewsDialog()
 function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
 function nw_MakeNews( i_news, i_args )
 {
+	var request = nw_CreateNews( i_news);
+	nw_SendNews([request], i_args);
+}
+function nw_CreateNews( i_news)
+{
 	if( nw_disabled ) return;
 
 	var news = i_news;
@@ -323,7 +328,11 @@ function nw_MakeNews( i_news, i_args )
 	request.recent_file = nw_recent_file;
 	if( nw_ignore_own ) request.ignore_own = true;
 
-	n_Request({"send":{"makenews":request},"func":nw_MakeNewsFinished,"args":i_args});
+	return request;
+}
+function nw_SendNews( i_requests, i_args)
+{
+	n_Request({"send":{"makenews":i_requests},"func":nw_MakeNewsFinished,"args":i_args});
 }
 function nw_MakeNewsFinished( i_data, i_args)
 {
