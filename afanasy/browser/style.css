@@ -228,14 +228,17 @@ background-color: #FFF;
 box-shadow: 0 0 4px #FFF;
 }
 
-.ctrl_sort, .ctrl_filter {
+.ctrl_sort, .ctrl_filter, .ctrl_hidden {
 position: absolute;
 margin: 3px 8px;
 }
 .ctrl_sort   { left: 5px; width: 124px; }
-.ctrl_filter { left: 138px; right: 0px; }
-.ctrl_filter.filtering { background: #FC6; color:#000; }
-.ctrl_sort.sorting { background: #FC6; color:#000; }
+.ctrl_filter { left: 138px; right: 40px; }
+.ctrl_hidden { width: 30px; right: 0px;
+border: 1px solid #575757; border-radius: 2px; margin: 5px; padding: 2px; text-align: center; cursor: pointer; }
+.monitor.show_hidden .ctrl_hidden { background-color: #FC6; }
+.ctrl_filter.filtering { background-color: #FC6; color:#000; }
+.ctrl_sort.sorting { background-color: #FC6; color:#000; }
 .ctrl_sort .label, .ctrl_filter .label { float: left; margin: 5px 10px; width: 30px;}
 .ctrl_filter .param, .ctrl_sort .param 
 {
@@ -286,6 +289,8 @@ cursor: default;
 .item.ERR { background: #965;}
 .item.OFF, .item.task.SKP { background: #777;}
 .item.DRT { border: 1px solid #955;}
+.item.hidden { display: none;}
+.monitor.show_hidden .item.hidden { display: block; opacity: .5;}
 .item.selected, .item.task.selected {
 background: #DFD;
 color: #000;

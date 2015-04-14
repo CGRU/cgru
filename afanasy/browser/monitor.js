@@ -211,6 +211,23 @@ function Monitor( i_args)
 	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
 	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
+	this.elCtrlHidden = this.document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlHidden);
+	this.elCtrlHidden.textContent = 'H';
+	this.elCtrlHidden.title = 'Show hidden items.';
+	this.elCtrlHidden.classList.add('ctrl_hidden');
+	this.elCtrlHidden.m_monitor = this;
+	this.elCtrlHidden.onclick = function(e)
+	{
+		var el = e.currentTarget;
+		el.m_monitor.selectAll( false);
+		el.m_monitor.elMonitor.classList.toggle('show_hidden');
+		if( el.m_monitor.elMonitor.classList.contains('show_hidden'))
+			el.m_monitor.show_hidden = true;
+		else
+			el.m_monitor.show_hidden = false;
+	}
+
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
 	this.elInfoText.classList.add('text_selectable');
@@ -690,6 +707,9 @@ Monitor.prototype.setSelected = function( i_item, on)
 
 	if( on )
 	{
+		if(( this.show_hidden != true ) && ( i_item.hidden ))
+			return;
+
 		this.cur_item = i_item;
 
 		this.updatePanels();
@@ -742,7 +762,12 @@ Monitor.prototype.selectToggle = function( i_item)
 Monitor.prototype.selectAll = function( on)
 {
 	for( var i = 0; i < this.items.length; i++)
+	{
+		if( on && ( this.items[i].show_hidden != true ) && ( this.items[i].hidden ))
+			continue;
+
 		this.setSelected( this.items[i], on);
+	}
 
 	if( this.type == 'jobs' )
 		JobBlock.deselectAll( this);
@@ -759,15 +784,21 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 		next_index = cur_index;
 		if( this.hasSelection())
 		{
-			next_index = cur_index+1;
-			if( previous )
-				next_index = cur_index-1;
+			while(( next_index >= 0 ) && ( next_index < this.items.length ))
+			{
+				if( previous )
+					next_index--;
+				else
+					next_index++;
+				if( this.show_hidden || ( this.items[next_index] && ( this.items[next_index].hidden != true )))
+					break;
+			}
 		}
+//		if( next_index == cur_index ) return;
 	}
 
 	if( next_index < 0 ) return;
 	if( next_index >= this.items.length ) return;
-//	if( next_index == cur_index ) return;
 
 	if( false == i_evt.shiftKey )
 		this.selectAll( false);
@@ -1329,7 +1360,7 @@ Monitor.prototype.filterItem = function( i_item)
 {
 //g_Info('filtering "'+i_item.params.name+'" p"'+this.filterParm+'"');
 	var hide = false;
-	if( i_item.params.hidden && ( i_item.params.hidden == true ))
+	if( i_item.params.hidden )
 		hide = true;
 	else if( this.filterExpr && this.filterParm && i_item.params[this.filterParm] )
 	{
@@ -1339,9 +1370,17 @@ Monitor.prototype.filterItem = function( i_item)
 			hide = ( this.filterExclude ? true : false );
 	}
 	if( hide )
-		i_item.element.style.display = 'none';
+	{
+//		i_item.element.style.display = 'none';
+		i_item.element.classList.add('hidden');
+		i_item.hidden = true;
+	}
 	else
-		i_item.element.style.display = 'block';
+	{
+//		i_item.element.style.display = 'block';
+		i_item.element.classList.remove('hidden');
+		i_item.hidden = false;
+	}
 }
 Monitor.prototype.filterItems = function()
 {
