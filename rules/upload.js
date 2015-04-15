@@ -166,7 +166,7 @@ function up_Start( i_el)
 			if( xhr.status == 200 )
 			{
 				c_Log('<b style="color:#404"><i>upload'+(up_counter++)+':</i></b> '+ xhr.responseText);
-				up_Received( c_Parse( xhr.responseText));
+				up_Received( c_Parse( xhr.responseText), i_el.m_path);
 				return;
 			}
 		}
@@ -207,7 +207,7 @@ function up_Finished( i_el, i_status)
 	i_el.m_elBtnDel.style.display = 'block';
 }
 
-function up_Received( i_msg)
+function up_Received( i_msg, i_path)
 {
 	if( i_msg == null )
 	{
@@ -224,6 +224,7 @@ function up_Received( i_msg)
 	}
 
 	var els = [];
+	var news = [];
 	for( var f = 0; f < i_msg.files.length; f++)
 	{
 		for( var e = 0; e < up_elFiles.length; e++)
@@ -234,6 +235,10 @@ function up_Received( i_msg)
 			{
 				els.push( up_elFiles[e]);
 				up_Done( up_elFiles[e], i_msg.files[f]);
+
+				var news_path = c_PathDir( i_path);
+				var news_link = g_GetLocationArgs({"fv_Goto":news_path + '/' + c_PathBase(i_msg.files[f].filename)}, false, news_path)
+				news.push( nw_MakeNews({'title':'upload','path':news_path,'link':news_link}));
 			}
 		}
 	}
@@ -244,6 +249,7 @@ function up_Received( i_msg)
 		return;
 	}
 
+	nw_SendNews( news);
 //console.log( JSON.stringify( i_msg));
 }
 

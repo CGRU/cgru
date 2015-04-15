@@ -1894,6 +1894,7 @@ function upload( $i_path, &$o_out)
 			{
 				$fileObj['error'] = 'Can`t save upload';
 			}
+			$fileObj['filename'] = $path;
 		}
 
 		array_push( $o_out['files'], $fileObj);

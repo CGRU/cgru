@@ -115,9 +115,11 @@ function g_GO( i_path)
 	window.location.hash = i_path;
 }
 
-function g_GetLocationArgs( i_args, i_absolute)
+function g_GetLocationArgs( i_args, i_absolute, i_path)
 {
-	var link = '#' + g_elCurFolder.m_path + '?' + encodeURI( JSON.stringify( i_args));
+	var path = i_path;
+	if( path == null ) path = g_CurPath();
+	var link = '#' + path + '?' + encodeURI( JSON.stringify( i_args));
 	if( i_absolute ) link = window.location.protocol + '//' + window.location.host + window.location.pathname + link;
 	return link;
 }
