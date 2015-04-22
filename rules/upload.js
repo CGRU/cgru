@@ -80,7 +80,7 @@ function up_FileSelected( e)
 		if( ASSET && ASSET.uploads && ( ASSET.path == path ))
 			for( var up in ASSET.uploads )
 				for( var m = 0; m < ASSET.uploads[up].masks.length; m++ )
-					if( files[i].name.match( ASSET.uploads[up].masks[m] ))
+					if( files[i].name.match( new RegExp(ASSET.uploads[up].masks[m], 'i')))
 					{
 						path = g_CurPath() + '/' + ASSET.uploads[up].folder;
 						title = up;

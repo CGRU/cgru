@@ -91,11 +91,11 @@
 				"folder":"_UPLOADS/@DATE@_@USER@"
 			},
 			"result":{
-				"masks":[".*\\.(zip|rar|7z)"],
+				"masks":[".*\\.(zip|rar|7z)$"],
 				"folder":"RESULT/ARCHIVES/@DATE@_@USER@"
 			},
 			"dailies":{
-				"masks":[".*\\.(mov|mp4|avi)"],
+				"masks":[".*\\.(mov|mp4|avi)$"],
 				"folder":"RESULT/DAILIES"
 			}
 		},
