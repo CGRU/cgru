@@ -61,21 +61,44 @@
 	},
 	"scenes":{
 		"seek":["[project]/SCENES","[project]/SHOTS"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"uploads":{
+			"upload":{
+				"masks":[".*"],
+				"folder":"_UPLOADS/@DATE@_@USER@"
+			}
+		},
 		"name":"",
 		"filter":"sc_FilterShots",
 		"scripts":["scenes.js"]
 	},
 	"scene":{
 		"seek":["[scenes]/"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"uploads":{
+			"upload":{
+				"masks":[".*"],
+				"folder":"_UPLOADS/@DATE@_@USER@"
+			}
+		},
 		"filter":"sc_FilterShots",
 		"scripts":["scenes.js"]
 	},
 	"shot":{
 		"seek":["[scene]/"],
 		"skip":[".","_","-","tmp","temp","tmp","common","rnd"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"uploads":{
+			"upload":{
+				"masks":[".*"],
+				"folder":"_UPLOADS/@DATE@_@USER@"
+			},
+			"result":{
+				"masks":[".*\\.(zip|rar|7z)"],
+				"folder":"RESULT/ARCHIVES/@DATE@_@USER@"
+			},
+			"dailies":{
+				"masks":[".*\\.(mov|mp4|avi)"],
+				"folder":"RESULT/DAILIES"
+			}
+		},
 		"scripts":["shot.js"],
 		"subfolders_status_hide":true,
 		"subfolders_dailies_hide":true,

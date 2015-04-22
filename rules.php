@@ -1887,13 +1887,31 @@ function upload( $i_path, &$o_out)
 		}
 		else
 		{
-			$path = $i_path.'/'.$_FILES[$key]['name'];
-			$path_orig = $path; $i = 1;
-			while( is_file( $path)) $path = $path_orig.'-'.$i++;
+			$basename = $_FILES[$key]['name'];
+			$path = $i_path.'/'.$basename;
+
+			// If such file already exists, we rename the upload:
+			$dot = strrpos( $basename, '.');
+			$i = 1;
+			while( is_file( $path))
+			{
+				if( $dot )
+				{
+					$base = substr( $basename, 0, $dot);
+					$ext = substr( $basename, $dot);
+					$path = $i_path.'/'.$base.'-'.$i.$ext;
+				}
+				else
+					$path = $i_path.'/'.$basename.'-'.$i;
+				$i++;
+			}
+
+			// Move uploaded file to the desired place:
 			if( false == move_uploaded_file( $_FILES[$key]['tmp_name'], $path))
 			{
 				$fileObj['error'] = 'Can`t save upload';
 			}
+
 			$fileObj['filename'] = $path;
 		}
 

@@ -286,6 +286,12 @@ function nw_MakeNews( i_news, i_args )
 }
 function nw_CreateNews( i_news)
 {
+	if( i_news == null )
+	{
+		c_Error('Can`t create news from "null".');
+		return;
+	}
+
 	if( nw_disabled ) return;
 
 	var news = i_news;
@@ -332,6 +338,25 @@ function nw_CreateNews( i_news)
 }
 function nw_SendNews( i_requests, i_args)
 {
+	if( i_requests == null )
+	{
+		c_Error('Can`t send news from "null" request.');
+		return;
+	}
+	if( i_requests.length == 0 )
+	{
+		c_Error('Can`t send news from zero size request.');
+		return;
+	}
+	for( var i = 0; i < i_requests.length; i++)
+	{
+		if( i_requests[i] == null )
+		{
+			c_Error('Can`t send news from "null" request['+i+'].');
+			return;
+		}
+	}
+
 	n_Request({"send":{"makenews":i_requests},"func":nw_MakeNewsFinished,"args":i_args});
 }
 function nw_MakeNewsFinished( i_data, i_args)
