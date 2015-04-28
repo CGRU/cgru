@@ -207,7 +207,11 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
 	{
 		if( i_elProgressBar) i_elProgressBar.style.width = i_status.progress+'%';
-		if( i_elPercentage) i_elPercentage.textContent = i_status.progress+'%';
+		if( i_elPercentage)
+		{
+			i_elPercentage.style.display = 'block';
+			i_elPercentage.textContent = i_status.progress+'%';
+		}
 		if( i_elProgressHide)
 		{
 			i_elProgressHide.style.display = 'block';
@@ -217,7 +221,11 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 	else
 	{
 		if( i_elProgressBar) i_elProgressBar.style.width = '0';
-		if( i_elPercentage) i_elPercentage.textContent = '';
+		if( i_elPercentage)
+		{
+			i_elPercentage.textContent = '';
+			i_elPercentage.style.display = 'none';
+		}
 		if( i_elProgressHide)
 		{
 			i_elProgressHide.style.display = 'none';
@@ -1136,12 +1144,12 @@ Status.prototype.save = function()
 	return nw_CreateNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 }
 
-function st_Save( i_status, i_path, i_func, i_args, i_navig_up)
+function st_Save( i_status, i_path, i_func, i_args, i_navig_params_update)
 {
 	if( i_status == null ) i_status = RULES.status;
 	if( i_path == null ) i_path = g_CurPath();
 
-	g_FolderSetStatusPath( i_status, i_path, i_navig_up);
+	g_FolderSetStatusPath( i_status, i_path, i_navig_params_update);
 	n_walks[i_path] = null;
 
 	var obj = {};
@@ -1244,6 +1252,10 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 {
 	if( i_walks == null ) return;
 
+	// Update only progess in navig:
+	var navig_params_update = {};
+	navig_params_update.progress = true;
+
 	for( var w = i_walks.length-1; w >= 0; w--)
 	{
 //window.console.log( i_walks[w]);
@@ -1271,12 +1283,16 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 			}
 			else
 			{
-//if( folder.status ) console.log( folder.name+': '+folder.status.progress);
+				// Here we set and save 0% progress on a neighbour folders,
+				// we status or pregress is not set at all:
+
 				if(( folder.status == null ) || ( folder.status.progress == null ))
 				{
-//console.log(folder.name+': null');
+					// Siblinkgs are only at last walk ( earlier are parents )
 					if( w != (i_walks.length-1)) continue;
-					st_Save({"progress":0}, path);
+
+					// Save only progress:
+					st_Save({"progress":0}, path,/*func=*/null,/*args=*/null, navig_params_update);
 				}
 				else if( folder.status.progress < 0 ) continue;
 				else progress += folder.status.progress;
@@ -1295,16 +1311,12 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 //console.log(paths[w]+': '+progress_count+': '+progress);
 	}
 
-	// Update only progess in navig:
-	var navig_up = {};
-	navig_up.progress = true;
-
 	for( var path in progresses)
 	{
 		if( i_args.paths_skip_save.indexOf(path) != -1 )
 			continue;
 
-		st_Save({"progress":progresses[path]}, path,/*func=*/null,/*args=*/null, navig_up);
+		st_Save({"progress":progresses[path]}, path,/*func=*/null,/*args=*/null, navig_params_update);
 //console.log(path);
 	}
 }

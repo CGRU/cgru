@@ -553,29 +553,35 @@ function g_AppendFolder( i_elParent, i_fobject)
 	return elFolder;
 }
 
-function g_FolderSetStatusPath( i_status, i_path, i_params) { g_FolderSetStatus( i_status, g_elFolders[i_path], i_params);}
-function g_FolderSetStatus( i_status, i_elFolder, i_params)
+function g_FolderSetStatusPath( i_status, i_path, i_up_params)
+{
+	var elFolder = g_elFolders[i_path];
+	if( elFolder )
+		g_FolderSetStatus( i_status, elFolder, i_up_params);
+}
+function g_FolderSetStatus( i_status, i_elFolder, i_up_params)
 {
 //console.log('GFS:'+JSON.stringify(i_status));
 	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
 	if( i_elFolder.m_fobject.status == null ) i_elFolder.m_fobject.status = {};
 
-	if( i_params )
-		for( parm in i_params )
+	if( i_up_params )
+		for( parm in i_up_params )
 			i_elFolder.m_fobject.status[parm] = i_status[parm];
 	else
 		i_elFolder.m_fobject.status = i_status;
 
-	if(( i_params == null ) || i_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
-	if(( i_params == null ) || i_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
-	if(( i_params == null ) || i_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
-	if(( i_params == null ) || i_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
-	if(( i_params == null ) || i_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
-	if(( i_params == null ) || i_params.progress   )
+	if(( i_up_params == null ) || i_up_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
+	if(( i_up_params == null ) || i_up_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
+	if(( i_up_params == null ) || i_up_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
+	if(( i_up_params == null ) || i_up_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
+	if(( i_up_params == null ) || i_up_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
+	if(( i_up_params == null ) || i_up_params.progress   )
 	{
-		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
-		if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
-			i_elFolder.m_elPercent.textContent = i_status.progress + '%';
+		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress, i_elFolder.m_elPercent);
+//		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
+//		if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
+//			i_elFolder.m_elPercent.textContent = i_status.progress + '%';
 	}
 }
 
