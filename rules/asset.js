@@ -270,6 +270,8 @@ function a_CopySend( i_wnd)
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
 	cmd += ' ' + params.name;
 
+	i_wnd.m_go_path = params.destination + '/' + params.name.split(' ')[0];
+
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":a_CopyReceived,"wnd":i_wnd});
 
 	// Clear walk cache, as we need to navigate there later:
@@ -307,12 +309,7 @@ function a_CopyReceived( i_data, i_args)
 		return;
 	}
 
-	var path = copies[copies.length-1].dest;
-	path = cgru_PM( path, false);
-	path = path.replace('/' + RULES.root, '');
-
-	c_Info( path);
 	i_args.wnd.destroy();
-	g_GO( path);
+	g_GO( i_args.wnd.m_go_path);
 }
 
