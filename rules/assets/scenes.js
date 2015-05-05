@@ -686,8 +686,7 @@ function sc_DisplayStatistics()
 	if( selShots.length )
 		info = 'selected ' + info;
 
-	if( frames_count )
-		info += '<br>frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
+	info += '<br>frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
 
 	$('scenes_info').innerHTML = info;
 
