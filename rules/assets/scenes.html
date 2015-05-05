@@ -2,6 +2,8 @@
 
 #scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
+#scenes_select_panel { border: 1px solid rgba(98,98,98,.5); border-radius: 2px; font-size: 12px;}
+#scenes_select_panel > div { margin:1px; padding: 2px 4px; }
 
 .shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px; position: relative; }
 
@@ -84,10 +86,12 @@ border-radius: 2px;
 </style>
 
 <div id="scenes_ctrl_panel" style="float:right;">
-	<div style="border: 1px solid rgba(98,98,98,.5); border-radius: 2px; font-size: 12px;">
+	<div id="scenes_select_panel">
 		<div>Select:</div>
 		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
-		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">Playlist</div>
+		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">PL</div>
+		<div class="button" onclick="scenes_SelectSameColor()" title="Select Same Color">Clr</div>
+		<div class="button" onclick="scenes_SelectInvert()" title="Invert Selection">Inv</div>
 		<div class="button" onclick="scenes_SelectAll(true)" title="Select All Shots">All</div>
 	</div>
 	<div class="button" onclick="scenes_Put()" title="Put shots results"
@@ -96,7 +100,7 @@ border-radius: 2px;
 		style="width: 18px; height:18px; background-image:url(rules/icons/convert.png)"></div>
 </div>
 
-<div id="scenes_info" style="-float:left; margin: 4px 12px;"></div>
+<div id="scenes_info" style="-float:left; font-size: 14px; margin: 4px 12px;"></div>
 
 <div style="clear:both" id="scenes_div"></div>
 

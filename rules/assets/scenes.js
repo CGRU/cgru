@@ -77,12 +77,9 @@ function scene_Show()
 		elShot.style.padding = '4px';
 		elShot.classList.add('shot');
 
-		// Thumbnail - a link with an image
-		var elLink = document.createElement('a');
-		elShot.appendChild( elLink);
-		elLink.href = '#' + path;
+		// Thumbnail:
 		var elImg = document.createElement('img');
-		elLink.appendChild( elImg);
+		elShot.appendChild( elImg);
 		elImg.classList.add('thumbnail');
 		elImg.m_path = path;
 		elImg.m_src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
@@ -136,6 +133,8 @@ function scene_Show()
 		elEditBtn.classList.add('button');
 		elEditBtn.classList.add('edit');
 		elEditBtn.title = 'Edit status.\nSelect several shots to edit.';
+		if( g_auth_user == null )
+			elEditBtn.style.display = 'none';
 
 		elSt.elPercentage = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elPercentage);
@@ -379,6 +378,41 @@ function scenes_SelectAll( i_select)
 {
 	for( var i = 0; i < sc_elShots.length; i++)
 		sc_SelectShot( sc_elShots[i], i_select);
+
+	sc_DisplayStatistics();
+}
+function scenes_SelectInvert()
+{
+	for( var i = 0; i < sc_elShots.length; i++)
+		sc_SelectShot( sc_elShots[i], sc_elShots[i].m_selected != true);
+
+	sc_DisplayStatistics();
+}
+function scenes_SelectSameColor()
+{
+	var sel = scenes_GetSelectedShots()
+	if( sel.length == 0 )
+	{
+		c_Error('No shots selected.');
+		return;
+	}
+
+	var clr = null;
+	if( sel[0].m_status && sel[0].m_status.obj && sel[0].m_status.obj.color )
+		clr = sel[0].m_status.obj.color;
+
+	scenes_SelectAll( false);
+
+	for( var i = 0; i < sc_elShots.length; i++)
+	{
+		var c = null;
+		var s = sc_elShots[i];
+		if( s.m_status && s.m_status.obj && s.m_status.obj.color )
+			c = s.m_status.obj.color;
+
+		if(( clr[0] == c[0] ) && ( clr[1] == c[1] ) && ( clr[2] == c[2] ))
+			sc_SelectShot( s, true);
+	}
 
 	sc_DisplayStatistics();
 }
@@ -627,10 +661,10 @@ function sc_DisplayStatistics()
 			frames_count += stat.frames_num;
 	}
 
-	var info = 'Shots Count: ' + shots.length;
+	var info = 'shots count: ' + shots.length;
 	if( omits ) info += ' (+' + omits + ' omits)';
 	if( shots.length )
-		info += ' Shots Progress: ' + Math.round(progress/shots.length) + '%';
+		info += ', average progress: ' + Math.round(progress/shots.length) + '%';
 
 	if( ASSET.type == 'scenes')
 	{
@@ -646,13 +680,16 @@ function sc_DisplayStatistics()
 				}
 			}
 		}
-		info = ' Scenes Count: ' + scenes_count + ' ' + info;
+		info = 'scenes count: ' + scenes_count + '<br>' + info;
 	}
 
-	if( frames_count )
-		info += ' Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' (at ' + RULES.fps + ' FPS)';
+	if( selShots.length )
+		info = 'selected ' + info;
 
-	$('scenes_info').textContent = info;
+	if( frames_count )
+		info += '<br>frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
+
+	$('scenes_info').innerHTML = info;
 
 	// Statistics:
 	//

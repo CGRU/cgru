@@ -417,6 +417,12 @@ Status.prototype.edit = function( i_args)
 {
 //console.log( JSON.stringify( i_args));
 //console.log(JSON.stringify(i_status));
+	if( g_auth_user == null )
+	{
+		c_Error('Guests can`t edit status.');
+		return;
+	}
+
 	if( this.obj == null ) this.obj = {};
 
 	// If editing element is exists, status is already in edit mode:

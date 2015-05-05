@@ -412,18 +412,19 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 
 function p_GetCurrentShots()
 {
+	shots = [];
+
 	if( p_elCurFolder == null )
 	{
 		c_Error('Current folder not found.');
-		return;
+		return shots;
 	}
 	if( p_elCurFolder.m_elArray == null )
 	{
 		c_Error('Current folder not has no childs.');
-		return;
+		return shots;
 	}
 
-	shots = [];
 	for( var i = 0; i < p_elCurFolder.m_elArray.length; i++)
 		if( p_elCurFolder.m_elArray[i].m_path )
 			shots.push( p_elCurFolder.m_elArray[i].m_path);
