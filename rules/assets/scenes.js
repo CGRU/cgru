@@ -410,7 +410,12 @@ function scenes_SelectSameColor()
 		if( s.m_status && s.m_status.obj && s.m_status.obj.color )
 			c = s.m_status.obj.color;
 
-		if(( clr[0] == c[0] ) && ( clr[1] == c[1] ) && ( clr[2] == c[2] ))
+		if( c && c.length && clr && clr.length )
+		{
+			if(( clr[0] == c[0] ) && ( clr[1] == c[1] ) && ( clr[2] == c[2] ))
+				sc_SelectShot( s, true);
+		}
+		else if(( c == null ) && ( clr == null ))
 			sc_SelectShot( s, true);
 	}
 
