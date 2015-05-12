@@ -461,7 +461,17 @@ function c_FileDragStart( i_evt, i_path)
 //console.log(path);
 }
 
-function c_GetRuFilePath( i_file ) { return RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + i_file; }
+function c_GetRuFilePath( i_file, i_path )
+{
+	var path = i_path;
+	if( path == null )
+		path = g_CurPath();
+
+	path += '/' + RULES.rufolder + '/' + i_file;
+	path = RULES.root + path;
+
+	return path;
+}
 function c_RuFileExists( i_file)
 {
 	if( g_elCurFolder.m_dir == null ) return false;

@@ -8,11 +8,14 @@
 .shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px; position: relative; }
 
 .shot .thumbnail { float: left; margin-right: 20px; }
-.shot .name_body { height: 84px; /*overflow: auto;*/ }
-.shot .frames_num_div { float: right; font: 14px monospace; }
-.shot .frames_num_label { float: left; }
-.shot .frames_num { float: right; }
-.shot .body { font-size: 14px; margin-top: 4px; display: none; }
+.shot .name_body { /*height: 84px; *//*overflow: auto;*//* border: 1px solid #FF0;*/ }
+.shot .name_body .frames_num_div { float: right; font: 14px monospace; }
+.shot .name_body .frames_num_label { float: left; }
+.shot .name_body .frames_num { float: right; }
+.shot .name_body .edit { float: right; width: 10px; height: 10px; }
+.shot .name_body .edit_panel { float: right; font-size: 10px; }
+.shot .name_body .edit_panel > div { float: right; padding: 1px 4px; }
+.shot .name_body .body { height: 64px; font-size: 14px; margin-top: 4px;/* border: 1px solid #F00;*/ }
 
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
 .shot .status .percent { float: left; margin-right: 5px; }

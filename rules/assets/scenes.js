@@ -96,9 +96,44 @@ function scene_Show()
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
 		// Body:
+		if( g_auth_user )
+		{
+			var elBodyEditBtn = document.createElement('div');
+			elDiv.appendChild( elBodyEditBtn);
+			elBodyEditBtn.classList.add('button');
+			elBodyEditBtn.classList.add('edit');
+			elBodyEditBtn.title = 'Edit shot body.';
+			elBodyEditBtn.m_elShot = elShot;
+			elBodyEditBtn.onclick = sc_EditBody;
+			elShot.m_elBodyEditBtn = elBodyEditBtn;
+
+			var elBodyEditPanel = document.createElement('div');
+			elDiv.appendChild( elBodyEditPanel);
+			elBodyEditPanel.classList.add('edit_panel');
+			elBodyEditPanel.style.display = 'none';
+			elShot.m_elBodyEditPanel = elBodyEditPanel;
+
+			var elBodyCancelBtn = document.createElement('div');
+			elBodyEditPanel.appendChild( elBodyCancelBtn);
+			elBodyCancelBtn.classList.add('button');
+			elBodyCancelBtn.innerHTML = 'CANCEL <small>[ESC]</small>.';
+			elBodyCancelBtn.title = 'Cancel shot body editing.';
+			elBodyCancelBtn.m_elShot = elShot;
+			elBodyCancelBtn.onclick = sc_EditBodyCancel;
+
+			var elBodySaveBtn = document.createElement('div');
+			elBodyEditPanel.appendChild( elBodySaveBtn);
+			elBodySaveBtn.classList.add('button');
+			elBodySaveBtn.innerHTML = '<b>SAVE</b> <small>[CTRL+ENTER]</small>.';
+			elBodySaveBtn.title = 'Save shot body.';
+			elBodySaveBtn.m_elShot = elShot;
+			elBodySaveBtn.onclick = sc_EditBodySave;
+		}
+
 		elShot.m_elBody = document.createElement('div');
 		elDiv.appendChild( elShot.m_elBody);
 		elShot.m_elBody.classList.add('body');
+		elShot.m_elBody.m_elShot = elShot;
 
 		// Elements for status:
 		var elSt = {};
@@ -182,8 +217,8 @@ function scene_Show()
 function sc_BodyReceived( i_data, i_args)
 {
 	if( i_data.indexOf('No such file ' + RULES.root) != -1 ) return;
+
 	// Replace <br> with spaces through some pattern:
-	i_args.elShot.m_elBody.style.display = 'block';
 	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
 	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
 }
@@ -332,6 +367,78 @@ function sc_EditStatus( e)
 	status.edit({"statuses":statuses});
 
 	return false;
+}
+
+function sc_EditBody( i_e)
+{
+	i_e.stopPropagation();
+
+	var el = i_e.currentTarget.m_elShot;
+
+	el.m_elBody.m_text = el.m_elBody.textContent;
+	el.m_elBody.classList.add('editing');
+	el.m_elBody.contentEditable = 'true';
+	el.m_elBodyEditBtn.style.display = 'none';
+	el.m_elBodyEditPanel.style.display = 'block';
+
+	el.m_elBody.onkeydown = function( i_e)
+	{
+		if(( i_e.keyCode == 13 ) && i_e.ctrlKey ) // CTRL + ENTER
+		{
+			sc_EditBodySave( i_e);
+			i_e.currentTarget.blur();
+		}
+		if( i_e.keyCode == 27 )
+		{
+			sc_EditBodyCancel( i_e);
+			i_e.currentTarget.blur();
+		}
+	}
+
+	return false;
+}
+
+function sc_EditBodyCancel( i_e)
+{
+	i_e.stopPropagation();
+
+	var el = i_e.currentTarget.m_elShot;
+
+	el.m_elBody.textContent = el.m_elBody.m_text;
+	el.m_elBody.classList.remove('editing');
+	el.m_elBody.contentEditable = 'false';
+	el.m_elBodyEditBtn.style.display = 'block';
+	el.m_elBodyEditPanel.style.display = 'none';
+	el.m_elBody.onkeydown = null;
+
+	return false;
+}
+
+function sc_EditBodySave( i_e)
+{
+	var el = i_e.currentTarget.m_elShot;
+	var text = el.m_elBody.textContent;
+
+	sc_EditBodyCancel( i_e);
+
+	var shots = scenes_GetSelectedShots();
+	if( shots.indexOf( el) == -1 )
+		shots.push( el);
+
+	for( var i = 0; i < shots.length; i++)
+	{
+		n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename, shots[i].m_path),"data":text}},
+		"func":sc_EditBodyFinished,"elShot":shots[i],"info":'body save'});
+	}
+
+	return false;
+}
+function sc_EditBodyFinished( i_data, i_args)
+{
+	var shot = i_args.elShot;
+	var path = c_GetRuFilePath( u_body_filename, shot.m_path);
+	n_GetFile({"path":path,"func":sc_BodyReceived,"info":'scene_bodies',"elShot":shot,
+		"cache_time":-1,"parse":false});
 }
 
 function sc_ShotClicked( i_evt)
