@@ -207,12 +207,20 @@ Status.prototype.showTasks = function()
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
+	var clr = 'rgba(0,255,0,.4)';
+
 	if( i_elPercentage ) i_elPercentage.classList.remove('done');
 	if( i_elProgressBar ) i_elProgressBar.classList.remove('done');
 	if( i_elProgressHide ) i_elProgressHide.classList.remove('done');
 
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
 	{
+		if( i_status.progress < 100 )
+		{
+			clr = 255 - Math.round( 2.55 * i_status.progress );
+			clr = 'rgba('+clr+',255,0,.8)';
+		}
+
 		if( i_elProgressBar)
 		{
 			i_elProgressBar.style.width = i_status.progress+'%';
@@ -248,6 +256,9 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elProgressHide.title = null;
 		}
 	}
+
+	if( i_elProgressBar )
+		i_elProgressBar.style.backgroundColor = clr;
 }
 
 function st_SetElLabel( i_status, i_el, i_full)
