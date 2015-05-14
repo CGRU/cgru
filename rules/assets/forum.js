@@ -1,3 +1,5 @@
+forum_qid_max_len = 48;
+
 function forum_Init()
 {
 	a_SetLabel('Ask New Question');
@@ -10,6 +12,8 @@ function forum_InitHTML( i_data)
 	u_GuestAttrsDraw( $('forum_guest_form'));
 
 	if( g_auth_user == null ) $('forum_guest_form').style.display = 'block';
+
+	$('qid_max_len').textContent = forum_qid_max_len;
 }
 
 function forum_QuestionIDOnBlur( i_e )
@@ -20,7 +24,7 @@ function forum_QuestionIDOnBlur( i_e )
 function forum_QuestionIDGet()
 {
 	var id = $('forum_question_id').textContent;
-	id = c_Strip( id.toLowerCase()).replace(/\W/g,'_').substr(0,16);
+	id = c_Strip( id).replace(/\W/g,'_').substr(0,forum_qid_max_len);
 	$('forum_question_id').textContent = id;
 	n_WalkDir({"paths":[g_CurPath()],"wfunc":forum_QuestionIDReceived,"question_id":id});
 }
