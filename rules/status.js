@@ -1255,7 +1255,7 @@ function st_SetTimeCode( i_tc)
 
 	RULES.status.timecode_start = timecode_start;
 	RULES.status.timecode_finish = timecode_finish;
-	st_Save({'timecode_start':timecode_start,'timecode_finish':timecode_finish});
+	st_Save({'timecode_start':timecode_start,'timecode_finish':timecode_finish}, null, null, null, {});
 }
 
 function st_UpdateProgresses( i_path, i_progresses)
