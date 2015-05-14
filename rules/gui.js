@@ -314,8 +314,14 @@ function gui_GetParams( i_wnd, i_params, o_params)
 			}
 			params[p] = l_items;
 		}
+		else if( i_params[p].integer )
+		{
+			params[p] = parseInt( i_wnd.m_elements[p].textContent);
+		}
 		else
+		{
 			params[p] = i_wnd.m_elements[p].textContent;
+		}
 
 		if( o_params )
 			o_params[p] = params[p];

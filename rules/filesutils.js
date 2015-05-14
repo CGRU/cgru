@@ -238,7 +238,9 @@ fu_putmulti_params.input = {"label":'Result Paths'};
 fu_putmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
 fu_putmulti_params.skiperrors = {"label":'Skip Errors', "bool":false,"width":'50%'};
 fu_putmulti_params.dest = {"label":'Destination'};
-fu_putmulti_params.af_maxtasks = {"label":'Max Tasks'};
+fu_putmulti_params.af_capacity = {'label':'Capacity', 'integer':true,'width':'33%'};
+fu_putmulti_params.af_maxtasks = {'label':'Max Tasks','integer':true,'width':'33%'};
+fu_putmulti_params.af_perhost  = {'label':'Per Host', 'integer':true,'width':'33%'};
 
 fu_findres_params = {};
 fu_findres_params.input = {};
@@ -441,18 +443,14 @@ function fu_PutMultiDo( i_wnd)
 
 	var job = {};
 	job.name = 'PUT ' + result.dest;
-	job.max_running_tasks = parseInt( params.af_maxtasks);
-	if( isNaN( job.max_running_tasks ))
-	{
-		c_Error('Invalid "Max Tasks" value: "' + params.af_maxtasks + '"');
-		job.max_running_tasks = -1;
-	}
+	job.max_running_tasks = params.af_maxtasks;
+	job.max_running_tasks_per_host = params.af_perhost;
 
 	var block = {};
 	job.blocks = [block];
 	block.name = 'put';
 	block.service = RULES.put.af_service;
-	block.capacity = RULES.put.af_capacity;
+	block.capacity = params.af_capacity;
 	block.parser = 'generic';
 	block.tasks = [];
 

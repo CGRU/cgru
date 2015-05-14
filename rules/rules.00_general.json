@@ -287,7 +287,8 @@
 	"-af_service":"ftp",
 	"af_parser":"generic",
 	"af_capacity":500,
-	"af_maxtasks":5
+	"af_maxtasks":5,
+	"af_perhost":1
 },
 
 "archive":{
