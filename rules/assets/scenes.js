@@ -388,7 +388,7 @@ function sc_EditBody( i_e)
 			sc_EditBodySave( i_e);
 			i_e.currentTarget.blur();
 		}
-		if( i_e.keyCode == 27 )
+		if( i_e.keyCode == 27 ) // ESC
 		{
 			sc_EditBodyCancel( i_e);
 			i_e.currentTarget.blur();
@@ -425,11 +425,19 @@ function sc_EditBodySave( i_e)
 	if( shots.indexOf( el) == -1 )
 		shots.push( el);
 
+	var news = [];
+
 	for( var i = 0; i < shots.length; i++)
 	{
 		n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename, shots[i].m_path),"data":text}},
 		"func":sc_EditBodyFinished,"elShot":shots[i],"info":'body save'});
+
+		news.push( nw_CreateNews({'title':'body','path':shots[i].m_path,'artists':shots[i].m_status.obj.artists}));
+
+		st_BodyModified(shots[i].m_status.obj, shots[i].m_path);
 	}
+
+	nw_SendNews( news);
 
 	return false;
 }

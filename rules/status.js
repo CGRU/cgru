@@ -14,22 +14,25 @@ function st_Finish()
 	st_Status = null;
 }
 
-function st_BodyModified()
+function st_BodyModified( i_st_obj, i_path)
 {
-	if( RULES.status == null ) RULES.status = {};
-	if( RULES.status.body == null )
+	var st_obj = i_st_obj;
+	if( st_obj == null ) st_obj = RULES.status;
+	if( st_obj == null ) st_obj = {};
+
+	if( st_obj.body == null )
 	{
-		RULES.status.body = {};
-		RULES.status.body.cuser = g_auth_user.id;
-		RULES.status.body.ctime = c_DT_CurSeconds();
+		st_obj.body = {};
+		st_obj.body.cuser = g_auth_user.id;
+		st_obj.body.ctime = c_DT_CurSeconds();
 	}
 	else
 	{
-		RULES.status.body.muser = g_auth_user.id;
-		RULES.status.body.mtime = c_DT_CurSeconds();
+		st_obj.body.muser = g_auth_user.id;
+		st_obj.body.mtime = c_DT_CurSeconds();
 	}
 
-	st_Save();
+	st_Save({'body':st_obj.body}, i_path, /*func*/null, /*args*/null, /*navig folder update params*/{});
 }
 
 function st_Show( i_status)
@@ -1161,9 +1164,9 @@ function st_Save( i_status, i_path, i_func, i_args, i_navig_params_update)
 	var obj = {};
 	obj.object = {"status":i_status};
 	obj.add = true;
-	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
+	obj.file = c_GetRuFilePath('status.json', i_path);
 
-	n_Request({"send":{"editobj":obj},"func":i_func,"args":i_args,"wait":false});
+	n_Request({"send":{"editobj":obj},"func":i_func,"args":i_args,"wait":false,'info':'status save'});
 }
 
 function st_SetFramesNumber( i_num)
@@ -1228,7 +1231,7 @@ function st_SetTimeCode( i_tc)
 
 	RULES.status.timecode_start = timecode_start;
 	RULES.status.timecode_finish = timecode_finish;
-	st_Save();
+	st_Save({'timecode_start':timecode_start,'timecode_finish':timecode_finish});
 }
 
 function st_UpdateProgresses( i_path, i_progresses)
