@@ -207,18 +207,31 @@ Status.prototype.showTasks = function()
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
+	if( i_elPercentage ) i_elPercentage.classList.remove('done');
+	if( i_elProgressBar ) i_elProgressBar.classList.remove('done');
+	if( i_elProgressHide ) i_elProgressHide.classList.remove('done');
+
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
 	{
-		if( i_elProgressBar) i_elProgressBar.style.width = i_status.progress+'%';
+		if( i_elProgressBar)
+		{
+			i_elProgressBar.style.width = i_status.progress+'%';
+			if( i_status.progress >= 100 )
+				i_elProgressBar.classList.add('done');
+		}
 		if( i_elPercentage)
 		{
 			i_elPercentage.style.display = 'block';
 			i_elPercentage.textContent = i_status.progress+'%';
+			if( i_status.progress >= 100 )
+				i_elPercentage.classList.add('done');
 		}
 		if( i_elProgressHide)
 		{
 			i_elProgressHide.style.display = 'block';
 			i_elProgressHide.title = i_status.progress+'%';
+			if( i_status.progress >= 100 )
+				i_elProgressHide.classList.add('done');
 		}
 	}
 	else

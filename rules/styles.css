@@ -312,8 +312,9 @@ background-position: left;
 .tags { font-style:italic;}
 
 .progress, .progressbar { /*border-radius: 3px;*/ box-shadow: 0 0 1px #000 inset; }
-.progress { position: relative; background:rgba(0,0,0,.5); }
-.progressbar { background:rgba(0,255,0,.5); }
+.progress { position: relative; background-color: rgba(0,0,0,.5); }
+.progressbar { background-color: rgba(0,255,0,.8); }
+.progressbar.done { background-color: rgba(0,255,0,.4); }
 
 .colorbars { border-radius: 2px; margin: 2px; border: 1px solid #000; }
 .colorbars div div { float:left;}
