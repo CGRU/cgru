@@ -209,9 +209,24 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 {
 	var clr = 'rgba(0,255,0,.4)';
 
-	if( i_elPercentage ) i_elPercentage.classList.remove('done');
-	if( i_elProgressBar ) i_elProgressBar.classList.remove('done');
-	if( i_elProgressHide ) i_elProgressHide.classList.remove('done');
+	if( i_elPercentage )
+	{
+		i_elPercentage.classList.remove('done');
+		i_elPercentage.classList.remove('started');
+		i_elPercentage.classList.add('notstarted');
+	}
+	if( i_elProgressBar )
+	{
+		i_elProgressBar.classList.remove('done');
+		i_elProgressBar.classList.remove('started');
+		i_elProgressBar.classList.add('notstarted');
+	}
+	if( i_elProgressHide )
+	{
+		i_elProgressHide.classList.remove('done');
+		i_elProgressHide.classList.remove('startred');
+		i_elProgressHide.classList.add('notstarted');
+	}
 
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
 	{
@@ -224,6 +239,11 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 		if( i_elProgressBar)
 		{
 			i_elProgressBar.style.width = i_status.progress+'%';
+			if( i_status.progress > 0 )
+			{
+				i_elProgressBar.classList.add('startred');
+				i_elProgressBar.classList.remove('notstarted');
+			}
 			if( i_status.progress >= 100 )
 				i_elProgressBar.classList.add('done');
 		}
@@ -231,6 +251,11 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 		{
 			i_elPercentage.style.display = 'block';
 			i_elPercentage.textContent = i_status.progress+'%';
+			if( i_status.progress > 0 )
+			{
+				i_elPercentage.classList.add('startred');
+				i_elPercentage.classList.remove('notstarted');
+			}
 			if( i_status.progress >= 100 )
 				i_elPercentage.classList.add('done');
 		}
@@ -238,6 +263,11 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 		{
 			i_elProgressHide.style.display = 'block';
 			i_elProgressHide.title = i_status.progress+'%';
+			if( i_status.progress > 0 )
+			{
+				i_elProgressHide.classList.add('startred');
+				i_elProgressHide.classList.remove('notstarted');
+			}
 			if( i_status.progress >= 100 )
 				i_elProgressHide.classList.add('done');
 		}

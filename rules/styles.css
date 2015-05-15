@@ -154,6 +154,7 @@ border-right: 0;
 #navig .folder .dummy > .fname { font-style: italic; opacity: .5; }
 #navig .folder .progress { clear: both; }
 #navig .folder .progressbar { height: 8px; }
+#navig .folder .progressbar.notstarted { height: 6px; }
 #navig .folder .progressbar.done { height: 6px; }
 #navig .folder .info { display: none; margin: 2px 4px 0px 0px; position: relative; float: right; font: 14px Arial; } 
 #navig .folder .size { }
