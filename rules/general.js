@@ -284,6 +284,7 @@ function g_WalksReceived( i_data, i_args)
 
 		if( false == g_Goto( walk.folders[i], walk.paths[i], walk.walks[i]))
 			return;
+//console.log('STATUS:'+g_CurPath()+':'+JSON.stringify(RULES.status));
 	}
 
 //console.log( JSON.stringify( RULES.annotations ));
@@ -365,6 +366,8 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
 //	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
+//console.log('RULES:'+g_CurPath()+':'+JSON.stringify( g_elCurFolder.m_dir.rules))
+
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
 
@@ -389,7 +392,8 @@ function g_OpenFolder( i_elFolder )
 
 	if( i_elFolder.m_dir == null )
 	{
-		n_WalkDir({"paths":[i_elFolder.m_path],"lookahead":['status'],"wfunc":g_OpenFolderDo,"element":i_elFolder});
+		n_WalkDir({'paths':[i_elFolder.m_path],'rufiles':['rules','status'],'lookahead':['status'],
+			'wfunc':g_OpenFolderDo,'element':i_elFolder});
 		g_WaitingSet();
 		return;
 	}
@@ -562,6 +566,7 @@ function g_FolderSetStatusPath( i_status, i_path, i_up_params)
 function g_FolderSetStatus( i_status, i_elFolder, i_up_params)
 {
 //console.log('GFS:'+JSON.stringify(i_status));
+//return;
 	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
 	if( i_elFolder.m_fobject.status == null ) i_elFolder.m_fobject.status = {};
 

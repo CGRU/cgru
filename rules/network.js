@@ -9,6 +9,7 @@ n_gets = {};
 
 function n_WalkDir( i_args)
 {
+//i_args.cache_time = null;
 	if( i_args.info == null ) i_args.info = 'walk';
 	if( i_args.depth == null ) i_args.depth = 0;
 	if( i_args.rufolder == null ) i_args.rufolder = RULES.rufolder;
@@ -17,7 +18,10 @@ function n_WalkDir( i_args)
 	var cur_seconds = c_DT_CurSeconds();
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
-		if( i_args.cache_time && n_walks[i_args.paths[i]] && ( cur_seconds - n_walks[i_args.paths[i]].walktime) < i_args.cache_time )
+		if(( i_args.cache_time != null )
+			&& n_walks[i_args.paths[i]]
+			&& (( cur_seconds - n_walks[i_args.paths[i]].walktime) < i_args.cache_time )
+		)
 			continue;
 		else
 			n_walks[i_args.paths[i]] = null
@@ -74,6 +78,9 @@ function n_WalkDirProcess( i_data, i_args)
 		else 
 			c_Log('Walk cached '+i_args.cache_time+'s: '+i_args.paths[i]);
 		o_walks.push( walk);
+
+//console.log('nw Walk RULES:'+i_args.paths[i]+':'+JSON.stringify( walk.rules))
+
 		if( walk == null ) continue;
 //		if( walk.error ) continue;
 		n_walks[i_args.paths[i]] = walk;
