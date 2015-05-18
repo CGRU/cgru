@@ -69,7 +69,6 @@ CODECSDIR = os.path.join(MOVIEMAKER, 'codecs')
 Codec = Options.codec
 
 if Codec == '':
-	Output += '.' + Options.type
 	args = [Options.avcmd, '-y']
 	if Options.timestart != '':
 		args.extend(['-ss', Options.timestart])
@@ -95,6 +94,8 @@ if Codec == '':
 			resize.append('-1')
 		args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
 		Output += '.r%s' % Options.resize
+
+	Output += '.' + Options.type
 
 	if not os.path.isdir(Output):
 		os.makedirs(Output)
