@@ -149,6 +149,11 @@ function scene_Show()
 		elFramesNumLabel.textContent = 'F:';
 		elFramesNumLabel.classList.add('frames_num_label');
 
+		// Timecode:
+		elSt.elTimeCode = document.createElement('div');
+		elDiv.insertBefore( elSt.elTimeCode, elName);
+		elSt.elTimeCode.classList.add('timecode');
+
 		elSt.elFinish = document.createElement('div');
 		elShot.appendChild( elSt.elFinish);
 

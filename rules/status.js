@@ -115,6 +115,10 @@ Status.prototype.show = function( i_status)
 	if( this.elTags       ) st_SetElTags(       this.obj, this.elTags);
 	if( this.elFramesNum  ) st_SetElFramesNum(  this.obj, this.elFramesNum);
 	if( this.elFinish     ) st_SetElFinish(     this.obj, this.elFinish);
+	if( this.elTimeCode && this.obj && this.obj.timecode_start && this.obj.timecode_finish )
+	{
+		this.elTimeCode.textContent = 'TC:' + this.obj.timecode_start + '-' + this.obj.timecode_finish;
+	}
 	if( this.elModified   )
 	{
 		var modified = '';
