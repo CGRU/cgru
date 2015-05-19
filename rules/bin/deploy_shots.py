@@ -82,12 +82,13 @@ if Options.template == '':
 if not os.path.isdir(Options.template):
 	errExit('Shot template folder does not exist')
 
-if not Options.test:
-	if Options.dest == '':
-		errExit('Destination is not specified')
+if Options.dest == '':
+	errExit('Destination is not specified')
 
-	if not os.path.isdir(Options.dest):
-		errExit('Destination folder does not exist')
+if not os.path.isdir(Options.dest):
+	errExit('Destination folder does not exist')
+
+ExistingShots = os.listdir( Options.dest)
 
 References = []
 if Options.refs != '' and os.path.isdir(Options.refs):
@@ -97,8 +98,6 @@ if Options.refs != '' and os.path.isdir(Options.refs):
 Sources = os.listdir(Options.sources)
 Sources.sort()
 Sources_skip = []
-FIN_SRC = []
-FIN_DST = []
 for shot_folder in Sources:
 	if shot_folder[0] == '.':
 		continue
@@ -156,29 +155,40 @@ for shot_folder in Sources:
 
 	Out_Shot = dict()
 	Out_Shot['name'] = shot_name
-	Out_Shot['src'] = []
+	Out_Shot['sources'] = []
+	Out_Shot['dest'] = []
+	Out_Shot['SRC'] = []
 	for src in src_sources:
 		#print(src)
-		Out_Shot['src'].append(src)
-		FIN_SRC.append(src)
-		FIN_DST.append(os.path.join(shot_dest, Options.shot_src))
+		Out_Shot['SRC'].append(os.path.basename(src))
+		Out_Shot['sources'].append(src)
+		Out_Shot['dest'].append(os.path.join(shot_dest, Options.shot_src))
 
 	if len(src_refs):
-		Out_Shot['ref'] = []
+		Out_Shot['REF'] = []
 		for ref in src_refs:
 			#print(ref)
-			Out_Shot['ref'].append(ref)
-			FIN_SRC.append(ref)
-			FIN_DST.append(os.path.join(shot_dest, Options.shot_ref))
+			Out_Shot['REF'].append(os.path.basename(ref))
+			Out_Shot['sources'].append(ref)
+			Out_Shot['dest'].append(os.path.join(shot_dest, Options.shot_ref))
+
+	# Verify in a shot already exists:
+	exists = False
+	if shot_name in ExistingShots:
+		Out_Shot['exists'] = True
+		exists = True
 
 	Out.append({'shot': Out_Shot})
 
-	if not Options.test:
-		if not os.path.isdir(shot_dest):
-			try:
-				shutil.copytree(Options.template, shot_dest)
-			except:
-				errExit('Can`t create "%s"' % shot_dest)
+	# Skip on test or an existing shot:
+	if Options.test or exists:
+		continue
+
+	# Copy an empty template for a shot:
+	try:
+		shutil.copytree(Options.template, shot_dest)
+	except:
+		errExit('Can`t create "%s"' % shot_dest)
 
 
 if Options.afanasy:
@@ -195,40 +205,50 @@ if Options.afanasy:
 Put = os.environ['CGRU_LOCATION'] + '/utilities/put.py'
 Put = 'python "%s"' % os.path.normpath(Put)
 
-for i in range(0, len(FIN_SRC)):
-	dst = FIN_DST[i]
+for shot in Out:
+	if 'shot' in shot:
+		shot = shot['shot']
+	else:
+		continue
 
-	sources = [FIN_SRC[i]]
-	if Options.extract and os.path.isdir(FIN_SRC[i]):
-		sources = os.listdir( FIN_SRC[i])
-		for s in range(0,len(sources)):
-			sources[s] = os.path.join(FIN_SRC[i],sources[s])
+	if 'exists' in shot:
+		continue
 
-	for src in sources:
-		if Options.move:
-			if Options.verbose:
-				print('%s -> %s' % (src,dst))
-			if not Options.test:
-				try:
-					shutil.move(src, dst)
-				except:
-					errExit('Can`t move to "%s"' % dst)
-			continue
+	for i in range(0, len(shot['sources'])):
 
-		cmd = Put
-		cmd += ' -s "%s"' % src
-		cmd += ' -d "%s"' % dst
-		cmd += ' -n "%s"' % os.path.basename(src)
+		sources = [shot['sources'][i]]
+		dst = shot['dest'][i]
 
-		if Options.test:
-			continue
+		if Options.extract and os.path.isdir(shot['sources'][i]):
+			sources = os.listdir(shot['sources'][i])
+			for s in range(0,len(sources)):
+				sources[s] = os.path.join(shot['sources'][i],sources[s])
 
-		if Options.afanasy:
-			task = af.Task(os.path.basename(src))
-			task.setCommand(cmd)
-			block.tasks.append(task)
-		else:
-			os.system(cmd)
+		for src in sources:
+			if Options.move:
+				if Options.verbose:
+					print('%s -> %s' % (src,dst))
+				if not Options.test:
+					try:
+						shutil.move(src, dst)
+					except:
+						errExit('Can`t move to "%s"' % dst)
+				continue
+
+			cmd = Put
+			cmd += ' -s "%s"' % src
+			cmd += ' -d "%s"' % dst
+			cmd += ' -n "%s"' % os.path.basename(src)
+
+			if Options.test:
+				continue
+
+			if Options.afanasy:
+				task = af.Task(os.path.basename(src))
+				task.setCommand(cmd)
+				block.tasks.append(task)
+			else:
+				os.system(cmd)
 
 if Options.afanasy and not Options.move and not Options.test:
 	job.send()

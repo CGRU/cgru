@@ -165,22 +165,31 @@ function prj_ShotsDeployFinished( i_data, i_args)
 				elName.classList.add('name');
 
 				var src = '';
-				for( var i = 0; i < shot.src.length; i++)
-					src += ' ' + c_PathBase( shot.src[i]);
+				for( var i = 0; i < shot.SRC.length; i++)
+					src += ' ' + shot.SRC[i];
 				var elSrc = document.createElement('div');
 				el.appendChild( elSrc);
 				elSrc.textContent = src;
 				elSrc.classList.add('src');
 
-				if( shot.ref && shot.ref.length )
+				if( shot.REF && shot.REF.length )
 				{
 					var ref = '';
-					for( var i = 0; i < shot.ref.length; i++)
-						ref += ' ' + c_PathBase( shot.ref[i]);
+					for( var i = 0; i < shot.REF.length; i++)
+						ref += ' ' + shot.REF[i];
 					var elRef = document.createElement('div');
 					el.appendChild( elRef);
 					elRef.textContent = ref;
 					elRef.classList.add('ref');
+				}
+
+				if( shot.exists )
+				{
+					var elExist = document.createElement('div');
+					el.appendChild( elExist);
+					elExist.textContent = 'EXISTS';
+					elExist.classList.add('info');
+					el.classList.add('exist');
 				}
 
 //console.log( JSON.stringify( shot));
