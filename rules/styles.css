@@ -401,7 +401,7 @@ display: none;
 #channels .channel { border-top: 1px solid rgba(98,98,98,.5); border-radius: 2px; margin: 0px; }
 #channels .channel.current { background-color: rgba(100,255,100,.3); }
 .news_filter { margin: 2px; padding: 0px 3px; border-top: 1px solid rgba(98,98,98,.5); }
-.news_filter .button { float: left; margin: 1px 1px; padding: 1px 3px; }
+.news_filter .button { float: left; margin: 1px 1px; padding: 1px 2px; }
 #news { }
 #news .news { border-top: 1px solid rgba(98,98,98,.5); }
 #news .news.assigned          { background: rgba(   0, 255,   0, .2); }
