@@ -238,6 +238,9 @@ function up_Received( i_args, i_el)
 	{
 		up_Done( i_el, i_args.files[f]);
 
+		var filename = i_args.files[f].filename;
+		if( filename == null ) continue;
+
 		var news_link = g_GetLocationArgs({"fv_Goto":i_el.m_uppath + '/' + c_PathBase(i_args.files[f].filename)}, false, i_el.m_curpath);
 		news.push( nw_CreateNews({'title':i_el.m_uptitle,'path':i_el.m_curpath,'link':news_link}));
 	}
@@ -263,6 +266,9 @@ function up_Done( i_el, i_msg)
 	c_Info('Uploaded "'+i_el.m_upfile.name+'" to "' + i_el.m_uppath + '"');
 	i_el.m_elProgress.style.display = 'none';
 	i_el.classList.add('done');
+
+	// Refresh files views same path:
+	fv_RefreshPath( i_el.m_uppath);
 
 //	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
 }

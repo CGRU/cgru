@@ -1324,7 +1324,13 @@ function fv_SkipFile( i_filename)
 function fv_ReloadAll()    { for( var i = 0; i < fv_views.length; i++) fv_views[i].refresh();      }
 function fv_refreshAttrs() { for( var i = 0; i < fv_views.length; i++) fv_views[i].refreshAttrs(); }
 function fv_SelectNone()   { for( var v = 0; v < fv_views.length; v++) fv_views[v].selectNone();   }
-
+function fv_RefreshPath( i_path)
+{
+//console.log('fv_RefreshPath: ' + i_path);
+	for( var i = 0; i < fv_views.length; i++)
+		if( fv_views[i].path == i_path )
+			fv_views[i].refresh();
+}
 function fv_Goto( i_path )
 {
 	fv_SelectNone();
