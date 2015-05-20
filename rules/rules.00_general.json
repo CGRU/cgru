@@ -92,7 +92,8 @@
 			},
 			"result":{
 				"masks":[".*\\.(zip|rar|7z)$"],
-				"folder":"RESULT/ARCHIVES/@DATE@_@USER@"
+				"folder":"RESULT/ARCHIVES/@DATE@_@USER@",
+				"news_title":"upload"
 			},
 			"dailies":{
 				"masks":[".*\\.(mov|mp4|avi)$"],

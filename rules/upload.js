@@ -83,7 +83,8 @@ function up_FileSelected( e)
 					if( files[i].name.match( new RegExp(ASSET.uploads[up].masks[m], 'i')))
 					{
 						path = g_CurPath() + '/' + ASSET.uploads[up].folder;
-						title = up;
+						title = ASSET.uploads[up].news_title;
+						if( title == null ) title = up;
 					}
 
 		path = path.replace('@DATE@', c_DT_FormStrNow().split(' ')[0]);
