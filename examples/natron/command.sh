@@ -10,5 +10,7 @@ CMD="${CMD} -w w_jpg 1-10 $PWD/scene.ntp"
 
 echo $CMD
 
+[ -d render ] || mkdir -v -m 777 render
+
 $CMD
 
