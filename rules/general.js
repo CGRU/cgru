@@ -417,9 +417,20 @@ function g_OpenFolderDo( i_data, i_args)
 	for( var i = 0; i < el.m_dir.folders.length; i++)
 	{
 		var fobject = el.m_dir.folders[i];
-		var folder = fobject.name;
-		if( folder.charAt(0) == '.' ) continue;
-		g_AppendFolder( el, fobject);
+
+		// Skip hidden folders
+		if( fobject.name.charAt(0) == '.' )
+			continue;
+
+		var elFolder = g_AppendFolder( el, fobject);
+
+		// This can happen if the parent of the curretn folder was closed and than opened
+		// without current folder change
+		if( elFolder.m_path == g_CurPath())
+		{
+			g_elCurFolder = elFolder;
+			elFolder.classList.add('current');
+		}
 	}
 }
 
