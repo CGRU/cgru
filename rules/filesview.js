@@ -488,6 +488,19 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			st_SetFramesNumber( e.currentTarget.m_num_files);
 			fv_refreshAttrs();
 		}
+
+		// Folder count files on middle mouse button:
+		if( this.can_count )
+		{
+			i_el.m_el_num_files.m_view = this;
+			i_el.m_el_num_files.m_path = i_el.m_path;
+			i_el.m_el_num_files.onmousedown = function(e)
+			{
+				e.stopPropagation();
+				if( e.button == 1 )
+					e.currentTarget.m_view.countFiles( e.currentTarget.m_path);
+			}
+		}
 	}
 /*
 	if( i_el.m_obj.checksum )
