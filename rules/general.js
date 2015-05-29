@@ -568,6 +568,12 @@ function g_AppendFolder( i_elParent, i_fobject)
 	return elFolder;
 }
 
+function g_NavigScrollCurrent()
+{
+	if( g_elCurFolder )
+		g_elCurFolder.scrollIntoView();
+}
+
 function g_FolderSetStatusPath( i_status, i_path, i_up_params)
 {
 	var elFolder = g_elFolders[i_path];
