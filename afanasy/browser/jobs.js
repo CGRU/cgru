@@ -1096,6 +1096,7 @@ JobNode.params.need_properties =            {"type":'reg', "label":'Need Propert
 JobNode.params.time_life =                  {"type":'hrs', "label":'Life Time'};
 JobNode.params.annotation =                 {"type":'str', "label":'Annotation'};
 JobNode.params.hidden =                     {"type":'bl1', "label":'Hidden'};
+JobNode.params.ppa =                        {"type":'bl1', "label":'Preview Pending Approval'};
 JobNode.params.user_name =                  {"type":'str', "label":'Owner',"permissions":'visor'};
 
 JobNode.view_opts = {};

@@ -859,10 +859,29 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 	{
 		if( false == ( m_blocks_data[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 
-		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b]);
+		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags);
 
-		if( task_num == -1 )
+		if( task_num == AFJOB::TASK_NUM_NO_TASK )
+		{
+			// Block has no ready tasks
 			continue;
+		}
+
+		if( task_num == AFJOB::TASK_NUM_NO_SEQUENTIAL )
+		{
+			// All non sequential tasks solved, and job is PPA:
+			m_state = m_state | AFJOB::STATE_PPAPPROVAL_MASK;
+			continue;
+		}
+
+		if( m_state & AFJOB::STATE_PPAPPROVAL_MASK )
+			m_state = m_state & ( ~ AFJOB::STATE_PPAPPROVAL_MASK );
+
+		if( task_num < 0 )
+		{
+			AFERROR("JobAf::v_solve: Invalid task number returned from af::BlockData::getReadyTaskNumber()")
+			continue;
+		}
 
 		//static int cycle = 0;printf("cycle = %d\n", cycle++);
 		std::list<int> blocksIds;

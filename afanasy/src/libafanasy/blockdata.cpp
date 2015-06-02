@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "job.h"
 #include "jobprogress.h"
 #include "environment.h"
 #include "msg.h"
@@ -895,7 +896,7 @@ void BlockData::setFramesPerTask( long long perTask)
    m_frames_per_task = perTask;
 }
 
-int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
+int BlockData::getReadyTaskNumber( TaskProgress ** i_tp, const int32_t & i_job_flags)
 {
 	//printf("af::getReadyTaskNumber: %li-%li/%li:%li%%%li\n", m_frame_first, m_frame_last, m_frames_inc, m_frames_per_task, m_sequential);
 
@@ -925,6 +926,9 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
 				return task;
 		}
 
+		if( i_job_flags & af::Job::FPPApproval )
+			return AFJOB::TASK_NUM_NO_SEQUENTIAL;
+
 		for( int task = 0; task < m_tasks_num; task++)
 		{
 			// Common tasks solving:
@@ -937,7 +941,7 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
 			continue;
 		}
 
-		return -1;
+		return AFJOB::TASK_NUM_NO_TASK;
 	}
 
 	if( m_sequential < -1 )
@@ -976,7 +980,7 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
 			continue;
 		}
 
-		return -1;
+		return AFJOB::TASK_NUM_NO_TASK;
 	}
 
 	for( int task = 0; task < m_tasks_num; task++)
@@ -1039,7 +1043,7 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp)
 
 	// No ready tasks found:
 //printf("No ready tasks found.\n");
-	return -1;
+	return AFJOB::TASK_NUM_NO_TASK;
 }
 const std::string BlockData::genCommand( int num, long long * fstart, long long * fend) const
 {

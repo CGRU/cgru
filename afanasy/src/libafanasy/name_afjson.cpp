@@ -316,6 +316,7 @@ void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 		if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << " WTM";
 		if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";
 		if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
+		if( i_state & AFJOB::STATE_PPAPPROVAL_MASK      ) o_str << " PPA";
 	}
 
 	o_str << "\"";

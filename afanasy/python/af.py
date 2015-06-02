@@ -732,6 +732,9 @@ class Job:
 		"""
 		self.data["need_os"] = ''
 
+	def setPPApproval(self):
+		self.data["ppa"] = True
+
 	def pause(self):
 		"""Missing DocString
 		"""
