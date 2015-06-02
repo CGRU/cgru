@@ -1173,7 +1173,7 @@ ad_prof_props.role       = {"disabled":true,"lwidth":'170px'};
 ad_prof_props.avatar     = {};
 ad_prof_props.news_limit = {};
 ad_prof_props.email      = {"width":'70%'};
-ad_prof_props.email_news = {"width":'30%',"bool":false};
+ad_prof_props.email_news = {"width":'30%','type':"bool",'default':false};
 ad_prof_props.signature  = {};
 
 function ad_ProfileOpen()

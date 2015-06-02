@@ -140,7 +140,7 @@ function fu_PutDo( i_wnd)
 fu_sum_params = [];
 fu_sum_params.path = {"label":'Path', "disabled":true};
 fu_sum_params.type = {"label":'Type', "disabled":true};
-fu_sum_params.update_all = {"label":'Update All', "bool":false};
+fu_sum_params.update_all = {"label":'Update All','type':"bool",'default':false};
 
 function fu_Checksum( i_args)
 {
@@ -234,18 +234,18 @@ function fu_ChecksumDo( i_wnd)
 //
 
 fu_putmulti_params = {};
-fu_putmulti_params.input = {"label":'Result Paths'};
-fu_putmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
-fu_putmulti_params.skiperrors = {"label":'Skip Errors', "bool":false,"width":'50%'};
-fu_putmulti_params.dest = {"label":'Destination'};
-fu_putmulti_params.af_capacity = {'label':'Capacity', 'integer':true,'width':'33%'};
-fu_putmulti_params.af_maxtasks = {'label':'Max Tasks','integer':true,'width':'33%'};
-fu_putmulti_params.af_perhost  = {'label':'Per Host', 'integer':true,'width':'33%'};
+fu_putmulti_params.input        = {"label":'Result Paths'};
+fu_putmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'50%'};
+fu_putmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'50%'};
+fu_putmulti_params.dest         = {"label":'Destination'};
+fu_putmulti_params.af_capacity  = {'label':'Capacity', 'type':'int','width':'33%'};
+fu_putmulti_params.af_maxtasks  = {'label':'Max Tasks','type':'int','width':'33%'};
+fu_putmulti_params.af_perhost   = {'label':'Per Host', 'type':'int','width':'33%'};
 
 fu_findres_params = {};
 fu_findres_params.input = {};
 fu_findres_params.dest = {};
-fu_findres_params.skiperrors = {"bool":false};
+fu_findres_params.skiperrors = {'type':"bool",'default':false};
 
 function fu_PutMultiDialog( i_args)
 {
@@ -501,7 +501,7 @@ fu_arch_params.dest = {'label':'Destination'};
 fu_arch_params.split = {'tooltip':'Split archive size.'};
 fu_arch_params.af_capacity = {'label':'Capacity','tooltip':'Afanasy tasks capacity.','width':'33%'};
 fu_arch_params.af_maxtasks = {'label':'Max Run Tasks','tooltip':'Maximum running tasks.','width':'33%','lwidth':'150px'};
-fu_arch_params.af_perhost = {'label':'Per Host','tooltip':'Maximum running tasks per host.','default':'-1','width':'33%'};
+fu_arch_params.af_perhost = {'label':'Per Host','tooltip':'Maximum running tasks per host.','default':-1,'width':'33%'};
 function fu_Archive( i_args)
 {
 //console.log( JSON.stringify( i_args));
@@ -636,7 +636,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 fu_walk_params = {};
 fu_walk_params.path = {};
 fu_walk_params.verbose   = {"label":'Verbose Level',"default":2,"lwidth":'170px',"width":'50%'};
-fu_walk_params.upparents = {"label":'Update Parent Folders',"bool":true,"lwidth":'200px',"width":'50%'};
+fu_walk_params.upparents = {"label":'Update Parent Folders','type':"bool",'default':true,"lwidth":'200px',"width":'50%'};
 function fu_Walk( i_args)
 {
 	var wnd = new cgru_Window({"name":'walk',"title":'Send Walk Job'});

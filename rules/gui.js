@@ -89,9 +89,9 @@ function gui_Create( i_wnd, i_params, i_values)
 		elDiv.appendChild( elValue);
 		elValue.classList.add('value');
 		elValue.classList.add('editing');
-		if( i_params[p].bool != null )
+		if( i_params[p].type && ( i_params[p].type == 'bool'))
 		{
-			if( i_params[p].bool)
+			if( i_params[p].default )
 				elValue.textContent = 'ON';
 			else
 				elValue.textContent = 'OFF';
@@ -125,7 +125,7 @@ function gui_Create( i_wnd, i_params, i_values)
 
 		for( var v = 0; v < values.length; v++)
 		{
-			if( i_params[p].bool != null )
+			if( i_params[p].type == 'bool' )
 			{
 				if( values[v])
 					elValue.textContent = 'ON';
@@ -295,14 +295,7 @@ function gui_GetParams( i_wnd, i_params, o_params)
 
 	for( var p in i_params)
 	{
-		if( i_params[p].bool != null )
-		{
-			if( i_wnd.m_elements[p].textContent == 'ON' )
-				params[p] = true;
-			else
-				params[p] = false;
-		}
-		else if( i_params[p].list )
+		if( i_params[p].list )
 		{
 			var elParams = i_wnd.m_elements[p].m_elParams;
 			var l_items = [];
@@ -314,9 +307,24 @@ function gui_GetParams( i_wnd, i_params, o_params)
 			}
 			params[p] = l_items;
 		}
-		else if( i_params[p].integer )
+		else if( i_params[p].type )
 		{
-			params[p] = parseInt( i_wnd.m_elements[p].textContent);
+			if( i_params[p].type == 'bool')
+			{
+				if( i_wnd.m_elements[p].textContent == 'ON' )
+					params[p] = true;
+				else
+					params[p] = false;
+			}
+			else if( i_params[p].type == 'int')
+			{
+				var str = i_wnd.m_elements[p].textContent;
+				var num = parseInt(str);
+				if( isNaN(num))
+					c_Error('Invalid number: ' + str);
+				else
+					params[p] = num;
+			}
 		}
 		else
 		{

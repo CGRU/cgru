@@ -270,19 +270,20 @@ function d_MakeCmd( i_params)
 
 
 d_cvtguiparams = {};
-d_cvtguiparams.cvtres = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
-d_cvtguiparams.fps = {"label":'FPS'};
+d_cvtguiparams.cvtres     = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
+d_cvtguiparams.fps        = {"label":'FPS'};
 d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
 d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.quality = {"label":'JPEG Quality',"default":'100'};
+d_cvtguiparams.quality    = {"label":'JPEG Quality','type':'int',"default":100,'width':'50%'};
+d_cvtguiparams.padding    = {"label":'Padding','width':'50%'};
 d_cvtguiparams.afmaxtasks = {"width":"50%","label":'Max Tasks',"default":'-1',"tooltip":'Maximum running tasks for Afanasy job.'};
-d_cvtguiparams.afperhost = {"width":"50%","label":'Per Host',"default":'-1',"tooltip":'Maximum running tasks per host for Afanasy job.'};
+d_cvtguiparams.afperhost  = {"width":"50%","label":'Per Host',"default":'-1',"tooltip":'Maximum running tasks per host for Afanasy job.'};
 
 d_cvtmulti_params = {};
-d_cvtmulti_params.input = {"label":'Result Paths'};
-d_cvtmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
-d_cvtmulti_params.skiperrors = {"label":'Skip Errors', "bool":false,"width":'50%'};
-d_cvtmulti_params.dest = {"label":'Destination'};
+d_cvtmulti_params.input        = {"label":'Result Paths'};
+d_cvtmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'50%'};
+d_cvtmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'50%'};
+d_cvtmulti_params.dest         = {"label":'Destination'};
 
 function d_Convert( i_args)
 {
@@ -459,6 +460,7 @@ function d_CvtImages( i_wnd, i_params)
 	cmd += ' -t ' + i_params.imgtype;
 	cmd += ' -c ' + i_params.colorspace;
 	cmd += ' -q ' + i_params.quality;
+	if( i_params.padding ) cmd += ' --renumpad ' + i_params.padding;
 	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
 
 	var afanasy = false;
@@ -586,11 +588,15 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	if( i_to_sequence )
 	{
 		block.name = 'Explode to ' + i_params.imgtype.toUpperCase();
+
 		cmd += ' -t ' + i_params.imgtype;
-		var q = parseInt( i_params.quality);
+
+		var q = i_params.quality;
 		q = Math.round( 10 - ( q / 10 ));
 		if( q < 1 ) q = 1;
 		cmd += ' -q ' + q;
+
+		if( i_params.padding ) cmd += ' -p ' + i_params.padding;
 	}
 	else
 	{

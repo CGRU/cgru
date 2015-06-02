@@ -18,9 +18,9 @@ prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
 prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
-prj_deploy_shots_params.sameshot  = {"width":'25%',"bool":false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
-prj_deploy_shots_params.extract   = {"width":'25%',"bool":false,"tooltip":'Extract sources folder.'};
-prj_deploy_shots_params.uppercase = {"width":'25%',"bool":false,"tooltip":'Convert shot names to upper case.'};
+prj_deploy_shots_params.sameshot  = {"width":'25%','type':"bool",'default':false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
+prj_deploy_shots_params.extract   = {"width":'25%','type':"bool",'default':false,"tooltip":'Extract sources folder.'};
+prj_deploy_shots_params.uppercase = {"width":'25%','type':"bool",'default':false,"tooltip":'Convert shot names to upper case.'};
 prj_deploy_shots_params.padding   = {"width":'25%',"tooltip":'Example: "432" - first number will have 4 padding, next 3 and so on.'};
 
 function prj_ShotsDeploy()

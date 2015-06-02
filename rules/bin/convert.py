@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import re
 import os
 import sys
 
@@ -9,7 +10,7 @@ import af
 
 from optparse import OptionParser
 
-ImgTypes = ['jpg', 'jpeg', 'dpx', 'cin', 'exr', 'tif', 'tiff', 'tga', 'png','psd']
+ImgTypes = ['jpg','jpeg','dpx','cin','exr','tif','tiff','tga','png','psd']
 
 Parser = OptionParser(
 	usage="%prog [options] input\ntype \"%prog -h\" for help",
@@ -20,6 +21,7 @@ Parser.add_option('-t', '--type',       dest='type',       type  ='string',     
 Parser.add_option('-c', '--colorspace', dest='colorspace', type  ='string',     default='auto', help='Input images colorspace')
 Parser.add_option('-r', '--resize',     dest='resize',     type  ='string',     default='',     help='Resize (1280x720)')
 Parser.add_option('-q', '--quality',    dest='quality',    type  ='int',        default=75,     help='Quality')
+Parser.add_option(      '--renumpad',   dest='renumpad',   type  ='int',        default=None,   help='Renumerate padding')
 Parser.add_option('-o', '--output',     dest='output',     type  ='string',     default=None,   help='Output folder')
 Parser.add_option('-A', '--afanasy',    dest='afanasy',    action='store_true', default=False,  help='Use Afanasy')
 Parser.add_option(      '--afuser',     dest='afuser',     type  ='string',     default='',     help='Afanasy user')
@@ -87,6 +89,7 @@ for input in Inputs:
 	if os.path.isdir(input):
 		mkdir = '%s.%s' % (output, Options.type )
 
+	files_num = 0
 	for afile in files:
 		imgtype = afile.rfind('.')
 		if imgtype == 1:
@@ -143,6 +146,18 @@ for input in Inputs:
 		if mkdir:
 			output = os.path.join(mkdir, os.path.basename(afile))
 
+		if Options.renumpad:
+			outfolder = os.path.dirname( output)
+			outname = os.path.basename( output)
+			digits = re.findall('\d+', outname)
+			if len(digits):
+				digits = digits[-1]
+				dpos = outname.rfind(digits)
+				newname = outname[:dpos]
+				newname += ('%0'+str(Options.renumpad)+'d') % (files_num + 1)
+				outname = newname + outname[dpos+len(digits):]
+				output = os.path.join( outfolder, outname)
+
 		output,old_ext = os.path.splitext(output)
 		output += '.' + ext
 
@@ -150,10 +165,11 @@ for input in Inputs:
 
 		cmds.append(cmd)
 		files_in.append(afile)
+		files_num += 1
 
 	convert = dict()
 	convert['input'] = input
-	convert['files_num'] = len(files_in)
+	convert['files_num'] = files_num
 	if mkdir:
 		convert['output'] = mkdir
 		convert['type'] = 'folder'
@@ -177,7 +193,10 @@ for i in range(0, len(Jobs)):
 		if Options.verbose:
 			print('mkdir ' + MkDirs[i])
 		if not Options.debug and not os.path.isdir(MkDirs[i]):
-			os.makedirs(MkDirs[i])
+			try:
+				os.makedirs(MkDirs[i])
+			except:
+				errorExit('Can`t create folder: ' + MkDirs[i])
 
 	if Options.afanasy:
 		job = af.Job('CVT ' + JobNames[i])
