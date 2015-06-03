@@ -107,6 +107,8 @@ function Monitor( i_args)
 	el.onclick = function(e){
 		var el = e.currentTarget;
 		if( el.m_elParams.classList.contains('active') != true ) return false;
+		if( el.m_elParams.m_all_shown == true ) return;
+		el.m_elParams.m_all_shown = true;
 		var elParams = el.m_elParams.m_elPMap;
 		for( var p in elParams )
 			elParams[p].style.display = 'block';
@@ -584,7 +586,7 @@ Monitor.prototype.delNodes = function( i_ids)
 			if( this.items[i].params.id == i_ids[d] )
 			{
 				if( this.panel_item == this.items[i] )
-					this.resetPanels();
+					this.resetPanels({'hide_params':true});
 
 				if( this.items[i].selected )
 					this.selected_items.splice( this.selected_items.indexOf( this.items[i]), 1);
@@ -712,7 +714,7 @@ Monitor.prototype.setSelected = function( i_item, on)
 
 		this.cur_item = i_item;
 
-		this.updatePanels();
+		this.updatePanels( null, {'hide_params':true});
 
 		this.info( this.cur_item.params.name);
 
@@ -734,7 +736,7 @@ Monitor.prototype.setSelected = function( i_item, on)
 	{
 		if( ! i_item.selected ) return;
 
-		this.resetPanels();
+		this.resetPanels({'hide_params':true});
 
 		i_item.selected = false;
 		i_item.element.classList.remove('selected');
@@ -743,7 +745,7 @@ Monitor.prototype.setSelected = function( i_item, on)
 		if( this.selected_items.length )
 		{
 			this.cur_item = this.selected_items[this.selected_items.length-1];
-			this.updatePanels();
+			this.updatePanels( null, {'hide_params':true});
 		}
 		else
 			this.cur_item = null;
@@ -813,9 +815,11 @@ Monitor.prototype.showObject = function( i_act, i_evt)
 		g_ShowObject({"object":this.cur_item.params},{"evt":i_evt,"wnd":this.window});
 }
 
-Monitor.prototype.resetPanels = function()
+Monitor.prototype.resetPanels = function( i_args)
 {
 	if( this.panel_item == null ) return;
+
+	if( i_args == null ) i_args = {};
 
 	this.elPanelR.m_elName.style.display = 'none';
 	this.elPanelR.m_elInfo.m_elBody.textContent = '';
@@ -829,18 +833,22 @@ Monitor.prototype.resetPanels = function()
 		if( els[i].m_always_active != true )
 			els[i].classList.remove('active');
 
-	var elParams = this.elPanelR.m_elParams.m_elPMap;
-	for( var p in elParams )
-		elParams[p].style.display = 'none';
+	if( i_args.hide_params )
+	{
+		this.elPanelR.m_elParams.m_all_shown = false;
+		var elParams = this.elPanelR.m_elParams.m_elPMap;
+		for( var p in elParams )
+			elParams[p].style.display = 'none';
+	}
 
 	if( this.nodeConstructor.resetPanels )
 		this.nodeConstructor.resetPanels( this);
 
 	this.panel_item = null;
 }
-Monitor.prototype.updatePanels = function( i_item)
+Monitor.prototype.updatePanels = function( i_item, i_args)
 {
-	this.resetPanels();
+	this.resetPanels( i_args);
 
 	if( i_item == null )
 		i_item = this.cur_item;
@@ -865,7 +873,8 @@ Monitor.prototype.updatePanels = function( i_item)
 	{
 		if( i_item.params[p] == null )
 		{
-			elParams[p].style.display = 'none';
+			if( this.elPanelR.m_elParams.m_all_shown != true )
+				elParams[p].style.display = 'none';
 			elParams[p].m_elValue.textContent = '';
 			continue;
 		}

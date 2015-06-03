@@ -34,6 +34,7 @@ JobNode.prototype.init = function()
 
 	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
+	this.elPPApproval = cm_ElCreateFloatText( this.element, 'right', 'Preview Pending Approval','PPA');
 	this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 	this.elDependMask = cm_ElCreateFloatText( this.element, 'right', 'Depend Mask');
 	this.elDependMaskGlobal = cm_ElCreateFloatText( this.element, 'right', 'Global Depend Mask');
@@ -44,7 +45,6 @@ JobNode.prototype.init = function()
 	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Properties');
 	this.elNeedOS = cm_ElCreateFloatText( this.element, 'right', 'OS Needed');
 	
-
 	this.blocks = [];
 	for( var b = 0; b < this.params.blocks.length; b++)
 		this.blocks.push( new JobBlock( this.element, this.params.blocks[b]));
@@ -84,6 +84,11 @@ JobNode.prototype.update = function( i_obj)
 	this.elName.title = 'ID = '+this.params.id;
 	this.elPriority.textContent = 'P' + this.params.priority;
 	this.elUserName.textContent = this.params.user_name;
+
+	if( this.params.ppa )
+		this.elPPApproval.style.display = 'block';
+	else
+		this.elPPApproval.style.display = 'none';
 
 	if( this.params.thumb_path )
 		this.showThumb( this.params.thumb_path );
@@ -849,6 +854,7 @@ JobNode.resetPanels = function( i_monitor)
 	i_monitor.ctrl_btns.errors.classList.remove('errors');
 	i_monitor.ctrl_btns.errors.classList.add('hide_childs');
 
+	// Remove folders items:
 	var elFolders = i_monitor.elPanelR.m_elFolders;
 	if( elFolders.m_elFolders )
 		for( var i = 0; i < elFolders.m_elFolders.length; i++)

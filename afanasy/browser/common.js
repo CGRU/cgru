@@ -201,7 +201,7 @@ function cm_GetState( i_state, o_state, o_element)
 	}
 }
 
-function cm_ElCreateFloatText( i_elParent, i_side, i_title)
+function cm_ElCreateFloatText( i_elParent, i_side, i_title, i_text)
 {
 	var element = document.createElement('span');
 	element.classList.add('text');
@@ -214,6 +214,10 @@ function cm_ElCreateFloatText( i_elParent, i_side, i_title)
 		element.style.marginLeft = '4px';
 	else
 		element.style.marginRight = '4px';
+
+	if( i_text )
+		element.textContent = i_text;
+
 	return element;
 }
 
