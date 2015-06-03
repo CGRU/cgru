@@ -217,6 +217,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Wait Time", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actWaitTime() ));
 	submenu->addAction( action);
+	action = new QAction( "Preview Approval", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actPreviewApproval() ));
+	submenu->addAction( action);
+	action = new QAction( "No Preview Approval", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actNoPreviewApproval() ));
+	submenu->addAction( action);
 	action = new QAction( "OS Needed", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actNeedOS() ));
 	submenu->addAction( action);
@@ -497,6 +503,9 @@ void ListJobs::actRequestErrorHostsList()
 
 void ListJobs::actSetHidden()   { setParameter("hidden", "true",  false); }
 void ListJobs::actUnsetHidden() { setParameter("hidden", "false", false); }
+
+void ListJobs::actPreviewApproval()   { setParameter("ppa", "true",  false); }
+void ListJobs::actNoPreviewApproval() { setParameter("ppa", "false", false); }
 
 void ListJobs::actSetUser()
 {

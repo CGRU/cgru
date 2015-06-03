@@ -33,6 +33,7 @@ public:
 	int64_t time_done;
 	uint32_t time_run;
 	int lifetime;
+	bool ppapproval;
 	QString hostname;
 	QString username;
 	QString hostsmask;
