@@ -71,8 +71,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		m_state |= AFJOB::STATE_OFFLINE_MASK;
 
 	bool ppa = false;
-	jr_bool("ppa", ppa, i_object, io_changes);
-	setPPAFlag( ppa);
+	if( jr_bool("ppa", ppa, i_object, io_changes))
+		setPPAFlag( ppa);
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
