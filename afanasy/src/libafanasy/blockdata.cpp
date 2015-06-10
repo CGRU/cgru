@@ -903,16 +903,30 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp, const int32_t & i_job_f
 	if( m_sequential > 1 )
 	{
 		// Task solving with a positive step:
-		int task = -1;
 		long long frame = m_frame_first;
 		frame -= frame % m_sequential;
 		if( frame < m_frame_first )
 			frame += m_sequential;
 
+		// Check the first task:
+		{
+			int task = 0;
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+		}
+
+		// Check the last task:
+		{
+			int task = m_tasks_num-1;
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+		}
+
+		// Iterate sequential tasks:
 		for( ; frame <= m_frame_last; frame += m_sequential )
 		{
 			bool valid_range;
-			task = calcTaskNumber( frame, valid_range);
+			int task = calcTaskNumber( frame, valid_range);
 			if( valid_range != true )
 			{
 				AFERRAR("BlockData::getReadyTaskNumber: frame %lli is not in range.", frame)

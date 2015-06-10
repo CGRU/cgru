@@ -354,14 +354,6 @@ class Block:
 		"""
 		self.data["need_power"] = value
 
-	def setNonSequential(self, value=True):
-		"""Missing DocString
-
-		:param value:
-		:return:
-		"""
-		self.data["non_sequential"] = value
-
 	def setDependSubTask(self, value=True):
 		"""Missing DocString
 
