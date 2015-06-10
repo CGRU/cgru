@@ -21,21 +21,22 @@ Parser = OptionParser(
 		  "Type \"%prog -h\" for help", version="%prog 1.0"
 )
 
-Parser.add_option('-i', '--inputs',     dest='inputs',     type  ='string', default='RESULT/JPG',help='Inputs')
-Parser.add_option('-n', '--cutname',    dest='cutname',    type  ='string', default='',          help='Cut name')
-Parser.add_option('-f', '--fps',        dest='fps',        type  ='string', default='24',        help='FPS')
-Parser.add_option('-r', '--resolution', dest='resolution', type  ='string', default='1280x720',  help='Resolution: 1280x720')
-Parser.add_option('-c', '--codec',      dest='codec',      type  ='string', default='h264_good', help='Codec')
-Parser.add_option('--colorspace',       dest='colorspace', type  ='string', default='auto',      help='Input images colorspace')
-Parser.add_option('-o', '--outdir',     dest='outdir',     type  ='string', default='cut',       help='Output folder')
-Parser.add_option('-u', '--afuser',     dest='afuser',     type  ='string', default='',          help='Afanasy user name')
-Parser.add_option('--afservice',        dest='afservice',  type  ='string', default='movgen',    help='Afanasy service type')
-Parser.add_option('--afcapacity',       dest='afcapacity', type  ='int',    default=100,         help='Afanasy tasks capacity')
-Parser.add_option('--afmaxtasks',       dest='afmaxtasks', type  ='int',    default=-1,          help='Afanasy max running tasks')
-Parser.add_option('--afperhost',        dest='afperhost',  type  ='int',    default=-1,          help='Afanasy max tasks per host')
-Parser.add_option('--afmaxruntime',        dest='afmaxruntime',  type  ='int',    default=120,         help='Afanasy max tasks run time')
-Parser.add_option('-p', '--afpertask',  dest='afpertask',  type  ='int',    default=100,         help='Afanasy frames per task')
-Parser.add_option('-t', '--testonly',   dest='testonly',   action='store_true', default=False,   help='Test input only')
+Parser.add_option('-i', '--inputs',     dest='inputs',      type  ='string', default='RESULT/JPG',help='Inputs')
+Parser.add_option('-n', '--cutname',    dest='cutname',     type  ='string', default='',          help='Cut name')
+Parser.add_option('-f', '--fps',        dest='fps',         type  ='string', default='24',        help='FPS')
+Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string', default='1280x720',  help='Resolution: 1280x720')
+Parser.add_option('-c', '--codec',      dest='codec',       type  ='string', default='h264_good', help='Codec')
+Parser.add_option('--colorspace',       dest='colorspace',  type  ='string', default='auto',      help='Input images colorspace')
+Parser.add_option('-o', '--outdir',     dest='outdir',      type  ='string', default='cut',       help='Output folder')
+Parser.add_option('-u', '--afuser',     dest='afuser',      type  ='string', default='',          help='Afanasy user name')
+Parser.add_option('--afservice',        dest='afservice',   type  ='string', default='movgen',    help='Afanasy service type')
+Parser.add_option('--afcapacity',       dest='afcapacity',  type  ='int',    default=100,         help='Afanasy tasks capacity')
+Parser.add_option('--afmaxtasks',       dest='afmaxtasks',  type  ='int',    default=-1,          help='Afanasy max running tasks')
+Parser.add_option('--afperhost',        dest='afperhost',   type  ='int',    default=-1,          help='Afanasy max tasks per host')
+Parser.add_option('--afmaxruntime',     dest='afmaxruntime',type  ='int',    default=120,         help='Afanasy max tasks run time')
+Parser.add_option('-p', '--afpertask',  dest='afpertask',   type  ='int',    default=100,         help='Afanasy frames per task')
+Parser.add_option('-t', '--testonly',   dest='testonly',    action='store_true', default=False,   help='Test input only')
+Parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,   help='Verbose')
 
 
 def errExit(i_msg):
@@ -164,7 +165,11 @@ for shot in Shots:
 
 	f = frame_first
 	while f <= frame_last:
-		num_frames = Options.afpertask
+		num_frames = len(files)
+
+		if num_frames > Options.afpertask:		
+			num_frames = Options.afpertask
+
 		if f + num_frames > frame_last:
 			num_frames = frame_last - f + 1
 
@@ -183,25 +188,9 @@ for shot in Shots:
 		commands.append(cmd)
 		task_names.append('%s: %d-%d' % (os.path.basename(sequence), f, f+num_frames-1))
 
-		f += Options.afpertask
-		file_counter += Options.afpertask
+		f += num_frames
+		file_counter += num_frames
 
-	continue
-
-	for image in files:
-		cmd = cmd_prefix
-		cmd += ' --project "%s"' % CutName
-		cmd += ' --shot "%s"' % name
-		cmd += ' --ver "%s"' % version
-		cmd += ' --moviename "%s"' % os.path.basename(movie_name)
-		cmd += ' -f "%s"' % os.path.basename(image)
-		cmd += ' "%s"' % image
-		output = os.path.join(OutDir, TmpFiles % file_counter)
-		cmd += ' "%s"' % output
-
-		file_counter += 1
-		commands.append(cmd)
-		task_names.append(os.path.basename(image))
 
 print('{"progress":"%d sequences found"},' % len(Shots))
 print('{"progress":"%d files found"},' % file_counter)
@@ -224,6 +213,7 @@ for cmd in commands:
 	task.setCommand(cmd)
 	block.tasks.append(task)
 	counter += 1
+	if Options.verbose: print(cmd)
 block.setCapacity( Options.afcapacity)
 block.setTasksMaxRunTime( Options.afmaxruntime)
 job.blocks.append(block)
