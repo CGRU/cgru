@@ -177,8 +177,8 @@ def reformatAnnotate(infile, outfile):
 			FILEDATE = time.strftime('%y/%m/%d',
 									 time.gmtime(os.stat(infile).st_mtime))
 		# Get frame number if not specified:
-		if FRAME == '':
-			digits = re.findall(r'\d+', FILEIN)
+		if Options.frame == '':
+			digits = re.findall(r'\d+', infile)
 			if digits is not None:
 				if len(digits):
 					FRAME = digits[-1]
@@ -214,14 +214,6 @@ def reformatAnnotate(infile, outfile):
 				correction += ' '
 			correction += Options.correction
 
-		# Get frame number if not specified:
-		if FRAME == '':
-			digits = re.findall(r'\d+', FILEIN)
-			if digits is not None:
-				if len(digits):
-					FRAME = digits[-1]
-					if Verbose:
-						print('Frame = "%s"' % FRAME)
 
 		cmd = 'convert'
 		cmd += ' "%s"' % infile
