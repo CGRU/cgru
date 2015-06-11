@@ -63,6 +63,7 @@ def fileTypeList():
 	fileType_list.append((['shk'],      'shake',        'Shake'))
 	fileType_list.append((['blend'],    'blender',      'Blender'))
 	fileType_list.append((['nk'],       'nuke',         'Nuke'))
+	fileType_list.append((['ntp'],      'natron',       'Natron'))
 	fileType_list.append((['hip'],      'houdini',      'Houdini'))
 	fileType_list.append((['ifd'],      'mantra',       'Mantra'))
 	fileType_list.append((['mb', 'ma'], 'maya',         'Maya'))
@@ -112,6 +113,7 @@ def labelNodeNameDict():
 	labelNode_name = dict()
 	labelNode_name['default']      = 'Node/Camera:'
 	labelNode_name['houdini']      = 'ROP:'
+	labelNode_name['natron']       = 'Write Node:'
 	labelNode_name['nuke']         = 'Write Node:'
 	labelNode_name['maya']         = 'Camera:'
 	labelNode_name['maya_delight'] = 'Camera:'
@@ -124,11 +126,13 @@ def labelNodeNameDict():
 def labelNodeTooltipsDict():
 	labelNode_tooltip = dict()
 	labelNode_tooltip['default'] = ('Houdini ROP\n'
+									'Natron write node\n'
 									'Nuke write node\n'
 									'Maya camera\n'
 									'3DSMAX camera\n'
 									'AfterFX composition')
 	labelNode_tooltip['houdini']      = 'Houdini ROP'
+	labelNode_tooltip['natron']       = 'Natron write node\nExample: \'Write1\''
 	labelNode_tooltip['nuke']         = 'Nuke write node\nExample: \'Write1\''
 	labelNode_tooltip['maya']         = 'Maya camera\nExample: \'persp\''
 	labelNode_tooltip['maya_delight'] = 'Maya camera\nExample: \'persp\''
@@ -143,6 +147,7 @@ def labelTakeNameDict():
 	labelTake_name['default']      = 'Take/Layer/Pass/Batch:'
 	labelTake_name['houdini']      = 'Take:'
 	labelTake_name['xsi']          = 'Pass:'
+	labelTake_name['natron']       = 'Not Used:'
 	labelTake_name['nuke']         = 'Not Used:'
 	labelTake_name['maya']         = 'Layer:'
 	labelTake_name['maya_delight'] = 'Render Pass:'
@@ -162,6 +167,7 @@ def labelTakeTooltipsDict():
 	                                'AfterFX render settings template')
 	labelTake_tooltip['houdini']      = 'Houdini take'
 	labelTake_tooltip['xsi']          = 'SoftImage pass'
+	labelTake_tooltip['natron']       = '- Not used -'
 	labelTake_tooltip['nuke']         = '- Not used -'
 	labelTake_tooltip['maya']         = 'Maya render layer'
 	labelTake_tooltip['maya_delight'] = '3Delight for Maya Render Pass'

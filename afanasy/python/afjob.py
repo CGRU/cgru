@@ -472,6 +472,29 @@ if __name__ == '__main__':
 		cmd += ' -s @#@ -e @#@ -j %d -a' % by
 		blockname = blockparser
 
+	# Natron:
+	elif ext == 'ntp':
+		scenetype = 'natron'
+		if cmd is None:
+			cmd = 'natron' + cmdextension
+		if extrargs != '':
+			cmd += ' ' + extrargs
+		cmd += ' -b -w "%s"' % node
+
+		if output != '':
+			cmd += ' "%s"' % output
+			if images == '':
+				images = output
+				pos = images.find('#')
+				if pos > 0:
+					images = images[:pos] + '@' + images[pos:]
+				pos = images.rfind('#')
+				if pos > 0:
+					images = images[:pos + 1] + '@' + images[pos + 1:]
+
+		cmd += ' @#@-@#@'
+		cmd += ' "%s"' % scene
+
 	# Nuke:
 	elif ext == 'nk':
 		scenetype = 'nuke'
