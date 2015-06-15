@@ -130,14 +130,6 @@
 	"af_watch_waitforbyteswritten":8000,
 	"af_watch_refreshinterval":5,
 
-"":"Talk:",
-	"af_talk_updateperiod":5,
-	"af_talk_zombietime":18,
-	"af_talk_connectretries":3,
-	"af_talk_waitforconnected":8000,
-	"af_talk_waitforreadyread":8000,
-	"af_talk_waitforbyteswritten":8000,
-
 "":"Database:",
 		"":"sting to pass to PQconnectdb http://www.postgresql.org/docs/current/static/libpq-connect.html",
 	"af_db_conninfo":"host=localhost dbname=afanasy user=afadmin password=AfPassword",
