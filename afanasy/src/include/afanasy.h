@@ -86,9 +86,6 @@ namespace AFRENDER
     const int  UPDATETASKPERIOD         = 1;          ///< Update task state and percentage period ( seconds).
     const int  ZOMBIETIME               = 60;         ///< Seconds to wait for update to Render is zombie.
     const int  CONNECTRETRIES           = 3;          ///< Number of connect fails to turn to disconnected state.
-    const int  WAITFORCONNECTED          = 15000;      ///< Connect to server timeout milliseconds.
-    const int  WAITFORREADYREAD         = 15000;      ///< Wait for data from server timeout milliseconds.
-    const int  WAITFORBYTESWRITTEN      = 15000;      ///< Wait writing to socket timeout milliseconds.
     const int  MAXCOUNT                 = 100000;     ///< Maximum allowed online Renders.
     const int  TASKPROCESSNICE          = 10;         ///< Child process nice.
     const char DIRECTORY[]              = "renders";  ///< Renders store directory, relative to AFSERVER::TEMP_DIRECTORY
@@ -103,15 +100,6 @@ namespace AFRENDER
     const int  TASK_READ_BUFFER_SIZE    = 1024*1024;  ///< Task process read buffer.
 }
 
-/// Thumbnail options:
-namespace THUMBNAIL
-{
-	const char CMD[]                    = "convert %(filename)s %(thumbnail_filename)s";     ///< thumbnail create command.
-	const char NAMING[]                 = "%(job_id)d/%(block_id)d/%(task_id)d/%(thumbnail_filename)s";        ///< thumbnail naming template.
-	const char HTTP[]                   = "http://username:password@localhost:80/thumbnails/";                 ///< thumbnail http basebath
-	const char FILE[]                   = "//servername/sharename/thumbnails/";                                ///< thumbnail file basebath
-}
-
 /// Watch options:
 namespace AFWATCH
 {
@@ -124,18 +112,6 @@ namespace AFWATCH
     const char CMDS_ARGUMENT[]          = "@ARG@";     ///< Commands argument.
     const char CMDS_IPADDRESS[]         = "@IP@";      ///< Commands argument will be replaced with selected render ip address.
     const char CMDS_ASKCOMMAND[]        = "@ASK@";     ///< Ask a command, dialog will be raised.
-}
-
-/// Talk options:
-namespace AFTALK
-{
-    const int UPDATEPERIOD        = 5;        ///< Update status period ( seconds).
-    const int ZOMBIETIME          = 18;       ///< Seconds to wait for update to consider to kill Talk.
-    const int CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
-    const int WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
-    const int WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
-    const int WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
-    const int MAXCOUNT            = 100000;   ///< Maximum allowed online Talks.
 }
 
 /// Monitor options:

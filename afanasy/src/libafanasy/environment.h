@@ -137,13 +137,6 @@ public:
 	static inline int getMonitorWaitForBytesWritten()    { return monitor_waitforbyteswritten;  }
 	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
 
-	static inline int getTalkUpdatePeriod()              { return talk_updateperiod;            }
-	static inline int getTalkZombieTime()                { return talk_zombietime;              }
-	static inline int getTalkConnectRetries()            { return talk_connectretries;          }
-	static inline int getTalkWaitForConnected()          { return talk_waitforconnected;        }
-	static inline int getTalkWaitForReadyRead()          { return talk_waitforreadyread;        }
-	static inline int getTalkWaitForBytesWritten()       { return talk_waitforbyteswritten;     }
-
 	static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
 	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
@@ -153,9 +146,6 @@ public:
 	static inline int getRenderUpdateTaskPeriod()      { return render_updatetaskperiod;     }
 	static inline int getRenderZombieTime()            { return render_zombietime;           }
 	static inline int getRenderConnectRetries()        { return render_connectretries;       }
-	static inline int getRenderWaitForConnected()      { return render_waitforconnected;     }
-	static inline int getRenderWaitForReadyRead()      { return render_waitforreadyread;     }
-	static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
 
 	static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
@@ -167,11 +157,6 @@ public:
 	static inline const std::string & getRenderHDDSpacePath()  { return render_hddspace_path;   }
 	static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
 	static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;}
-
-//	static inline const std::string & getThumbnailCmd()        { return thumbnail_cmd;   }
-//	static inline const std::string & getThumbnailNaming()     { return thumbnail_naming;   }
-//	static inline const std::string & getThumbnailHttp()       { return thumbnail_http;   }
-//	static inline const std::string & getThumbnailFile()       { return thumbnail_file;   }
 
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
@@ -286,9 +271,6 @@ private:
 	static int render_updatetaskperiod;
 	static int render_zombietime;
 	static int render_connectretries;
-	static int render_waitforconnected;
-	static int render_waitforreadyread;
-	static int render_waitforbyteswritten;
 	static std::vector<std::string> render_windowsmustdie;
 
 	static std::string render_exec;       ///< How Render can execute anther Render.
@@ -301,11 +283,6 @@ private:
 	static std::string render_iostat_device;
 	static std::vector<std::string> render_resclasses;
 	static std::string render_networkif;
-
-	static std::string thumbnail_cmd;
-	static std::string thumbnail_naming;
-	static std::string thumbnail_http;
-	static std::string thumbnail_file;
 
 	static int errors_avoid_host;
 	static int task_error_retries;
@@ -325,13 +302,6 @@ private:
 	static int monitor_waitforreadyread;
 	static int monitor_waitforbyteswritten;
 	static int monitor_zombietime;
-
-	static int talk_updateperiod;
-	static int talk_zombietime;
-	static int talk_connectretries;
-	static int talk_waitforconnected;
-	static int talk_waitforreadyread;
-	static int talk_waitforbyteswritten;
 
 	/// Temp directory
 	static std::string temp_dir;

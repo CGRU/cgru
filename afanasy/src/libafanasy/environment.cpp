@@ -55,9 +55,6 @@ int     Environment::render_update_sec =               AFRENDER::UPDATEPERIOD;
 int     Environment::render_updatetaskperiod =         AFRENDER::UPDATETASKPERIOD;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
-int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTED;
-int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
-int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
 std::vector<std::string> Environment::render_windowsmustdie;
 std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
  
@@ -69,11 +66,6 @@ std::string Environment::render_cmd_wolwake =          AFRENDER::CMD_WOLWAKE;
 std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
-
-std::string Environment::thumbnail_cmd =               THUMBNAIL::CMD;
-std::string Environment::thumbnail_naming =            THUMBNAIL::NAMING;
-std::string Environment::thumbnail_http =              THUMBNAIL::HTTP;
-std::string Environment::thumbnail_file =              THUMBNAIL::FILE;
 
 std::string Environment::pswd_visor =                  AFUSER::PSWD_VISOR;
 std::string Environment::pswd_god =                    AFUSER::PSWD_GOD;
@@ -95,13 +87,6 @@ int     Environment::monitor_waitforconnected =        AFMONITOR::WAITFORCONNECT
 int     Environment::monitor_waitforreadyread =        AFMONITOR::WAITFORREADYREAD;
 int     Environment::monitor_waitforbyteswritten =     AFMONITOR::WAITFORBYTESWRITTEN;
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
-
-int     Environment::talk_updateperiod =               AFTALK::UPDATEPERIOD;
-int     Environment::talk_connectretries =             AFTALK::CONNECTRETRIES;
-int     Environment::talk_waitforconnected =           AFTALK::WAITFORCONNECTED;
-int     Environment::talk_waitforreadyread =           AFTALK::WAITFORREADYREAD;
-int     Environment::talk_waitforbyteswritten =        AFTALK::WAITFORBYTESWRITTEN;
-int     Environment::talk_zombietime =                 AFTALK::ZOMBIETIME;
 
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
@@ -228,14 +213,7 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, render_updatetaskperiod,           "af_render_updatetaskperiod"           );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
-	getVar( i_obj, render_waitforconnected,           "af_render_waitforconnected"           );
-	getVar( i_obj, render_waitforreadyread,           "af_render_waitforreadyread"           );
-	getVar( i_obj, render_waitforbyteswritten,        "af_render_waitforbyteswritten"        );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
-
-	getVar( i_obj, thumbnail_cmd,                     "af_thumbnail_cmd"                     );
-	getVar( i_obj, thumbnail_naming,                  "af_thumbnail_naming"                  );
-	getVar( i_obj, thumbnail_http,                    "af_thumbnail_http"                    );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
@@ -255,13 +233,6 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, sysjob_postcmd_service,            "af_sysjob_postcmd_service"            );
 	getVar( i_obj, sysjob_wol_service,                "af_sysjob_wol_service"                );
 	getVar( i_obj, sysjob_events_service,             "af_sysjob_events_service"             );
-
-	getVar( i_obj, talk_updateperiod,                 "af_talk_updateperiod"                 );
-	getVar( i_obj, talk_zombietime,                   "af_talk_zombietime"                   );
-	getVar( i_obj, talk_connectretries,               "af_talk_connectretries"               );
-	getVar( i_obj, talk_waitforconnected,             "af_talk_waitforconnected"             );
-	getVar( i_obj, talk_waitforreadyread,             "af_talk_waitforreadyread"             );
-	getVar( i_obj, talk_waitforbyteswritten,          "af_talk_waitforbyteswritten"          );
 
 	getVar( i_obj, monitor_render_idle_bar_max,       "af_monitor_render_idle_bar_max"       );
 	getVar( i_obj, monitor_updateperiod,              "af_monitor_updateperiod"              );
