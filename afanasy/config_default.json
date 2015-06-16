@@ -27,11 +27,17 @@
 
 	"OS_unix":{
 		"af_tempdirectory":"/var/tmp/afanasy",
-		"":"Render:",
 		"af_rendercmds":["vncviewer @ARG@","xterm -e \"ping @ARG@; read -s -n 1\"","xterm -e \"ping @IP@; read -s -n 1\""],
 		"af_rendercmds_admin":["xterm -e \"ssh @ARG@; read -s -n 1\"","xterm -e \"ssh @ARG@ \\\"@ASK@\\\"; read -s -n 1\""],
+		"":"Render:",
 		"af_render_cmd_reboot":"reboot",
+			"":"Command for render to reboot a machine.",
+			"":"For MS Windows you can use 'shutdown /r'.",
+
 		"af_render_cmd_shutdown":"shutdown -P 1 afrequest",
+			"":"Command for render to shutdown a machine.",
+			"":"For MS Windows you can use 'shutdown /s'.",
+
 		"af_render_cmd_wolsleep":"wolsleep",
 			"":"On UNIX sleep command usually needs root privileges.",
 			"":"Try to use 'sudo wolsleep' and add a line in /etc/sudoers:",
