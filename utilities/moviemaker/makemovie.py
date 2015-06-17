@@ -369,12 +369,16 @@ def getImages(inpattern):
 			print('Frame Range: %d - %d' %
 				  (Options.framestart, Options.frameend))
 		sys.exit(1)
+
 	allFiles.sort()
+	afile = allFiles[0]
+
+	# Parse start number:
+	start_number = int(re.findall(r'\d+', afile)[-1])
 	if Verbose:
-		print('Files fonded: %d' % len(allFiles))
+		print('Files fonded: %d, start_number=%d' % (len(allFiles), start_number))
 
 	# Input files indentify:
-	afile = allFiles[0]
 	identify = 'convert -identify "%s"'
 	if sys.platform.find('win') == 0:
 		identify += ' nul'
@@ -420,13 +424,13 @@ def getImages(inpattern):
 	elif Verbose:
 		print('AspectIn = %f' % AspectIn)
 
-	return allFiles, inputdir, prefix, padding, suffix
+	return allFiles, inputdir, prefix, padding, suffix, start_number
 
 
 # Call get images function:
-images1, inputdir, prefix, padding, suffix = getImages(Inpattern1)
+images1, inputdir, prefix, padding, suffix, start_number = getImages(Inpattern1)
 if Inpattern2 != '':
-	images2, inputdir, prefix, padding, suffix = getImages(Inpattern2)
+	images2, inputdir, prefix, padding, suffix, start_number = getImages(Inpattern2)
 	if len(images1) != len(images2):
 		print('Error: Sequences length is not the same')
 		sys.exit(1)
@@ -655,7 +659,10 @@ if len(Audio) and EncType == 'ffmpeg':
 	inputmask += ' -ab %dk' % Options.akbits
 	inputmask += ' -acodec "%s' % Options.acodec
 
-cmd_encode = cmd_encode.replace('@AVCMD@', Options.avcmd)
+# Process avcmd:
+AVCMD = '%s -start_number %d' % (Options.avcmd, start_number)
+
+cmd_encode = cmd_encode.replace('@AVCMD@', AVCMD)
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
 cmd_encode = cmd_encode.replace('@CODECSDIR@', CODECSDIR)
 cmd_encode = cmd_encode.replace('@INPUT@', inputmask)
@@ -665,7 +672,7 @@ cmd_encode = cmd_encode.replace('@OUTPUT@', Output)
 cmd_encode = cmd_encode.replace('@AUXARGS@', auxargs)
 
 if cmd_preview:
-	cmd_preview = cmd_preview.replace('@AVCMD@', Options.avcmd)
+	cmd_preview = cmd_preview.replace('@AVCMD@', AVCMD)
 	cmd_preview = cmd_preview.replace('@MOVIEMAKER@', MOVIEMAKER)
 	cmd_preview = cmd_preview.replace('@CODECSDIR@', CODECSDIR)
 	cmd_preview = cmd_preview.replace('@INPUT@', preview_input)
