@@ -788,7 +788,7 @@ function sc_DisplayStatistics()
 		}
 	}
 
-	var info = 'shots count: ' + shots.length - omits;
+	var info = 'shots count: ' + (shots.length - omits);
 	if( omits ) info += ' (+' + omits + ' omits)';
 	if( shots.length )
 		info += ', average progress: ' + Math.round(progress/shots.length) + '%';
