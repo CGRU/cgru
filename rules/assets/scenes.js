@@ -753,18 +753,10 @@ function sc_DisplayStatistics()
 //	c_Info( selShots.length + ' shots selected.');
 
 	var shots = [];
-	var omits = 0;
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
 		if( sc_elShots[i].m_hidden == true )
 			continue;
-
-		var stat = sc_elShots[i].m_status.obj;
-		if( stat && stat.tags && ( stat.tags.indexOf('omit') != -1 ))
-		{
-			omits++;
-			continue;
-		}
 
 		if( selShots.length && ( sc_elShots[i].m_selected != true ))
 			continue;
@@ -774,19 +766,29 @@ function sc_DisplayStatistics()
 
 	// Shots count, progress, frames count:
 	//
+	var omits = 0;
 	var progress = 0;
 	var frames_count = 0;
 	for( var i = 0; i < shots.length; i++)
 	{
 		var stat = shots[i].m_status.obj;
 		if( stat == null) continue;
-		if( stat.progress && ( stat.progress > 0 ))
-			progress += stat.progress;
-		if( stat.frames_num )
-			frames_count += stat.frames_num;
+
+		if( stat && stat.tags && ( stat.tags.indexOf('omit') != -1 ))
+		{
+			omits++;
+		}
+		else
+		{
+			if( stat.progress && ( stat.progress > 0 ))
+				progress += stat.progress;
+
+			if( stat.frames_num )
+				frames_count += stat.frames_num;
+		}
 	}
 
-	var info = 'shots count: ' + shots.length;
+	var info = 'shots count: ' + shots.length - omits;
 	if( omits ) info += ' (+' + omits + ' omits)';
 	if( shots.length )
 		info += ', average progress: ' + Math.round(progress/shots.length) + '%';
