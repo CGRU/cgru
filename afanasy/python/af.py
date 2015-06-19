@@ -145,7 +145,7 @@ class Block:
 						parser = 'none'
 			self.data["parser"] = parser
 
-	def setNumeric(self, start=1, end=10, pertask=1, increment=1):
+	def setNumeric(self, start=1, end=1, pertask=1, increment=1):
 		"""Missing DocString
 
 		:param int start:

@@ -95,7 +95,10 @@ class parser(
 
 		lines = data.split('\n')
 		for line in lines:
-			if line.find('@IMAGE@') != -1:
+			if line.find('@IMAGE@') != -1: # Will be used in CGRU render scripts
+				line = line[7:]
+				self.appendFile(line.strip())
+			if line.find('Image: ') == 0: # ImageMagick
 				line = line[7:]
 				self.appendFile(line.strip())
 

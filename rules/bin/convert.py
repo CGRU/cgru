@@ -6,6 +6,8 @@ import re
 import os
 import sys
 
+from cgrusequence import cgruSequence
+
 import af
 
 from optparse import OptionParser
@@ -13,7 +15,7 @@ from optparse import OptionParser
 ImgTypes = ['jpg','jpeg','dpx','cin','exr','tif','tiff','tga','png','psd']
 
 Parser = OptionParser(
-	usage="%prog [options] input\ntype \"%prog -h\" for help",
+	usage="%prog [options] inarg\ntype \"%prog -h\" for help",
 	version="%prog 1.0"
 )
 
@@ -25,6 +27,7 @@ Parser.add_option(      '--renumpad',   dest='renumpad',   type  ='int',        
 Parser.add_option('-o', '--output',     dest='output',     type  ='string',     default=None,   help='Output folder')
 Parser.add_option('-A', '--afanasy',    dest='afanasy',    action='store_true', default=False,  help='Use Afanasy')
 Parser.add_option(      '--afuser',     dest='afuser',     type  ='string',     default='',     help='Afanasy user')
+Parser.add_option(      '--affpt',      dest='affpt',      type  ='int',        default='10',   help='Afanasy frames per task')
 Parser.add_option(      '--afmax',      dest='afmax',      type  ='int',        default='-1',   help='Afanasy maximum running tasks')
 Parser.add_option(      '--afmph',      dest='afmph',      type  ='int',        default='-1',   help='Afanasy max tasks per host')
 Parser.add_option(      '--afmrt',      dest='afmrt',      type  ='int',        default='-1',   help='Afanasy max running time')
@@ -48,56 +51,58 @@ def errorExit(i_err):
 
 if len(Args) < 1:
 	errorExit('Input is not specified.')
-Inputs = Args
 
-Jobs = []
-MkDirs = []
-FilesIn = []
+ResQual = ''
+if Options.resize != '':
+	ResQual += '.r%s' % Options.resize
+if Options.type == 'jpg':
+	ResQual += '.q%d' % Options.quality
+
+Sequences = []
 JobNames = []
+MkDirs = []
 
-for input in Inputs:
+for inarg in Args:
+	inarg = os.path.normpath( inarg)
 	files = []
-	if os.path.isfile(input):
-		files = [input]
-	elif os.path.isdir(input):
-		for afile in os.listdir(input):
-			if afile[0] == '.':
-				continue
-			afile = os.path.join(input, afile)
-			if not os.path.isfile(afile):
-				continue
+	arg_is_file = False
+	arg_is_folder = True
+	if os.path.isfile(inarg):
+		files = [inarg]
+		arg_is_file = True
+		arg_is_folder = False
+	elif os.path.isdir(inarg):
+		for afile in os.listdir(inarg):
+			# check not hidden:
+			if afile[0] == '.': continue
+
+			# check extension for known image:
+			name,ext = os.path.splitext(afile)
+			if len(ext) < 1: continue
+			ext = ext.lower()[1:]
+			if not ext in ImgTypes: continue
+
+			afile = os.path.join(inarg, afile)
+
+			# check existance:
+			if not os.path.isfile(afile): continue
+
 			files.append(afile)
-		files.sort()
+
 	else:
-		errorExit('%s not found.' % input)
+		errorExit('%s not found.' % inarg)
 
-	cmds = []
-	mkdir = None
-	files_in = []
+	outfolder = Options.output
+	if outfolder is None:
+		outfolder = inarg
+	if arg_is_file:
+		outfolder = os.path.dirname( outfolder)
+	else:
+		outfolder += '%s.%s' % ( ResQual, Options.type )
 
-	output = Options.output
-	if output is None:
-		output = os.path.dirname(input)
+	seqs = cgruSequence(files, True)
 
-	output = os.path.join( output, os.path.basename(input))
-
-	if Options.type == 'jpg':
-		output += '.q%d' % Options.quality
-	if Options.resize != '':
-		output += '.r%s' % Options.resize
-
-	if os.path.isdir(input):
-		mkdir = '%s.%s' % (output, Options.type )
-
-	files_num = 0
-	for afile in files:
-		imgtype = afile.rfind('.')
-		if imgtype == 1:
-			continue
-		imgtype = afile[imgtype + 1:].lower()
-		if not imgtype in ImgTypes:
-			continue
-
+	for seq in seqs:
 		cmd = 'convert'
 
 		if Options.afanasy:
@@ -105,9 +110,18 @@ for input in Inputs:
 		elif Options.identify:
 			cmd += ' -identify'
 
-		cmd += ' "%s"' % afile
-		cmd += ' -flatten'
+		if seq['seq']:
+			inseq = '%s%%0%dd%s' % (seq['prefix'],seq['padding'],seq['suffix'])
+			if Options.afanasy:
+				cmd += ' "%s[@FIRST@-@LAST@]"' % inseq
+			else:
+				cmd += ' "%s[%d-%d]"' % (inseq,seq['first'],seq['last'])
+		else:
+			inseq = seq['name']
+			cmd += ' "%s"' % inseq
+			cmd += ' -flatten' # To merge layers (tif,psd)
 
+		# Process inarg colorspace:
 		if Options.colorspace != 'auto':
 			if Options.colorspace == 'extension':
 				if imgtype == 'exr':
@@ -121,10 +135,12 @@ for input in Inputs:
 			else:
 				cmd += ' -set colorspace ' + Options.colorspace
 
+		# Resize sequence:
 		if Options.resize != '':
 			cmd += ' -resize %s' % Options.resize
 
-		ext = Options.type
+		# Process ouput colorspace:
+		out_ext = Options.type
 		colorspace = ' -colorspace sRGB'
 		if Options.type == 'jpg':
 			cmd += ' -quality %d' % Options.quality
@@ -133,61 +149,54 @@ for input in Inputs:
 			cmd += ' -depth 10'
 			cmd += ' -colorspace Log'
 		elif Options.type == 'tif8':
-			ext = 'tif'
+			out_ext = 'tif'
 			cmd += ' -depth 8'
 			cmd += ' -colorspace sRGB'
 		elif Options.type == 'tif16':
-			ext = 'tif'
+			out_ext = 'tif'
 			cmd += ' -depth 16'
 			cmd += ' -colorspace sRGB'
 		elif Options.type == 'exr':
 			cmd += ' -colorspace RGB'
 
-		if mkdir:
-			output = os.path.join(mkdir, os.path.basename(afile))
+		outseq = inseq
+		if seq['seq']:
+			if Options.renumpad:
+				outseq = '%s%%0%dd%s' % (seq['prefix'],Options.renumpad,seq['suffix'])
+				if Options.afanasy:
+					cmd += ' -scene @SCENE@'
+				else:
+					cmd += ' -scene 1'
+			else:
+				if Options.afanasy:
+					cmd += ' -scene @SCENE@'
+				else:
+					cmd += ' -scene %d' % seq['first']
 
-		if Options.renumpad:
-			outfolder = os.path.dirname( output)
-			outname = os.path.basename( output)
-			digits = re.findall('\d+', outname)
-			if len(digits):
-				digits = digits[-1]
-				dpos = outname.rfind(digits)
-				newname = outname[:dpos]
-				newname += ('%0'+str(Options.renumpad)+'d') % (files_num + 1)
-				outname = newname + outname[dpos+len(digits):]
-				output = os.path.join( outfolder, outname)
+		outseq = os.path.join( outfolder, os.path.basename( outseq))
 
-		output,old_ext = os.path.splitext(output)
-		output += '.' + ext
+		if arg_is_folder:
+			outseq,old_ext = os.path.splitext(outseq)
+		else:
+			outseq += ResQual
+		outseq += '.' + out_ext
 
-		cmd += ' "%s"' % output
+		cmd += ' "%s"' % outseq
 
-		cmds.append(cmd)
-		files_in.append(afile)
-		files_num += 1
+		seq['cmd'] = cmd
+		seq['cmd_name'] = os.path.basename( inseq)
+		if seq['seq']:
+			seq['cmd_name'] += ':%d-%d=%d' % (seq['first'],seq['last'],seq['count'])
 
-	convert = dict()
-	convert['input'] = input
-	convert['files_num'] = files_num
-	if mkdir:
-		convert['output'] = mkdir
-		convert['type'] = 'folder'
-	else:
-		convert['output'] = output
-		convert['type'] = 'file'
+	mkdir = None
+	if arg_is_folder: mkdir = outfolder
+	MkDirs.append(mkdir)
+	JobNames.append(os.path.basename(inarg))
 
-	if len(cmds):
-		Jobs.append(cmds)
-		MkDirs.append(mkdir)
-		FilesIn.append(files_in)
-		JobNames.append(os.path.basename(convert['output']))
-	else:
-		convert['warning'] = 'No images found'
+	Sequences.append(seqs)
 
-	OUT['convert'].append(convert)
 
-for i in range(0, len(Jobs)):
+for i in range(0, len(Sequences)):
 
 	if MkDirs[i]:
 		if Options.verbose:
@@ -200,35 +209,53 @@ for i in range(0, len(Jobs)):
 
 	if Options.afanasy:
 		job = af.Job('CVT ' + JobNames[i])
-		block = af.Block('convert')
-		job.blocks.append(block)
 
 		if Options.afuser != '':
 			job.setUserName(Options.afuser)
-
 		if Options.afmax != -1:
 			job.setMaxRunningTasks(Options.afmax)
-
-		if Options.afcap != -1:
-			block.setCapacity(Options.afcap)
-
 		if Options.afmph != -1:
-			block.setMaxRunTasksPerHost(Options.afmph)
+			job.setMaxRunTasksPerHost(Options.afmph)
 
-		if Options.afmrt != -1:
-			block.setTasksMaxRunTime(Options.afmrt)
-
-	for j in range(0, len(Jobs[i])):
+	for j in range(0, len(Sequences[i])):
 		if Options.verbose or Options.debug:
-			print(Jobs[i][j])
+			print(Sequences[i][j]['cmd'])
 
 		if Options.afanasy:
-			task = af.Task(os.path.basename(FilesIn[i][j]))
-			block.tasks.append(task)
-			task.setCommand(Jobs[i][j])
+			block = af.Block(Sequences[i][j]['cmd_name'])
+			job.blocks.append(block)
+
+			if Sequences[i][j]['seq']:
+				first = Sequences[i][j]['first']
+				while first <= Sequences[i][j]['last']:
+					last = first + Options.affpt
+					if last > Sequences[i][j]['last']:
+						last = Sequences[i][j]['last']
+					scene = first
+					if Options.renumpad:
+						scene = first - Sequences[i][j]['first'] + 1
+					
+					task = af.Task( Sequences[i][j]['cmd_name'] + ('[%d-%d]' % (first,last)))
+					cmd = Sequences[i][j]['cmd']
+					cmd = cmd.replace('@FIRST@', str(first))
+					cmd = cmd.replace('@LAST@',  str(last ))
+					cmd = cmd.replace('@SCENE@', str(scene))
+					task.setCommand( cmd)
+
+					block.tasks.append( task)
+					first += Options.affpt
+			else:
+				task = af.Task( Sequences[i][j]['cmd_name'])
+				task.setCommand( Sequences[i][j]['cmd'])
+				block.tasks.append( task)
+
+			if Options.afcap != -1:
+				block.setCapacity(Options.afcap)
+			if Options.afmrt != -1:
+				block.setTasksMaxRunTime(Options.afmrt)
 
 		if not Options.afanasy and not Options.debug:
-			os.system(Jobs[i][j])
+			os.system(Sequences[i][j]['cmd'])
 
 	if Options.afanasy:
 		if Options.verbose or Options.debug:
@@ -236,6 +263,7 @@ for i in range(0, len(Jobs)):
 		if not Options.debug:
 			job.send()
 
+OUT['convert'] = Sequences
 if Options.json:
 	print(json.dumps(OUT))
 
