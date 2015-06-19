@@ -100,7 +100,7 @@ for inarg in Args:
 	else:
 		outfolder += '%s.%s' % ( ResQual, Options.type )
 
-	seqs = cgruSequence(files, True)
+	seqs = cgruSequence(files)
 
 	for seq in seqs:
 		cmd = 'convert'
@@ -122,13 +122,14 @@ for inarg in Args:
 			cmd += ' -flatten' # To merge layers (tif,psd)
 
 		# Process inarg colorspace:
+		in_body,in_ext = os.path.splitext(inseq)
 		if Options.colorspace != 'auto':
 			if Options.colorspace == 'extension':
-				if imgtype == 'exr':
+				if in_ext == 'exr':
 					cmd += ' -set colorspace RGB'
-				elif imgtype == 'dpx':
+				elif in_ext == 'dpx':
 					cmd += ' -set colorspace Log'
-				elif imgtype == 'cin':
+				elif in_ext == 'cin':
 					cmd += ' -set colorspace Log'
 				else:
 					cmd += ' -set colorspace sRGB'
@@ -183,6 +184,8 @@ for inarg in Args:
 
 		cmd += ' "%s"' % outseq
 
+		seq['inseq'] = inseq
+		seq['outseq'] = outseq
 		seq['cmd'] = cmd
 		seq['cmd_name'] = os.path.basename( inseq)
 		if seq['seq']:
@@ -194,6 +197,12 @@ for inarg in Args:
 	JobNames.append(os.path.basename(inarg))
 
 	Sequences.append(seqs)
+
+	out = dict()
+	out['input'] = inarg
+	out['mkdir'] = mkdir
+	out['sequences'] = seqs
+	OUT['convert'].append(out)
 
 
 for i in range(0, len(Sequences)):
@@ -263,7 +272,6 @@ for i in range(0, len(Sequences)):
 		if not Options.debug:
 			job.send()
 
-OUT['convert'] = Sequences
 if Options.json:
 	print(json.dumps(OUT))
 

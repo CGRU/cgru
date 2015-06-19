@@ -514,28 +514,32 @@ function d_CvtImagesFinished( i_data, i_args)
 
 	for( var i = 0; i < convert.length; i++ )
 	{
-		var c = convert[i];
+		var mkdir = convert[i].mkdir;
+		var seqs = convert[i].sequences;
+
 		var el = document.createElement('div');
 		elOut.appendChild( el);
-		var text =  JSON.stringify( c);
-		if( c.input )
+		if( mkdir )
+			el.textContent = mkdir;
+		else
+			el.textContent = convert[i].input;
+
+
+		for( var j = 0; j < seqs.length; j++ )
 		{
-			text = 'File: ';
-			if( c.type == 'folder') text = 'Folder: ';
-			text += c_PathBase( c.input );
-			if( c.files_num ) text += '[' + c.files_num + ']';
-			if( c.warning )
+			var seq = seqs[j];
+			var el = document.createElement('div');
+			elOut.appendChild( el);
+			var text = c_PathBase(seq.inseq) + ' -> ' + c_PathBase(seq.outseq);
+
+			if( seq.warning )
 			{
-				text += ' ' + c.warning;
+				text += ' ' + seq.warning;
 				el.style.color = '#F82';
 			}
-			else
-			{
-				text += ' -> ';
-				text += c_PathBase( c.output );
-			}
+
+			el.textContent = text;
 		}
-		el.textContent = text;
 	}
 }
 
