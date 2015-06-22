@@ -238,9 +238,11 @@ fu_putmulti_params.input        = {"label":'Result Paths'};
 fu_putmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'50%'};
 fu_putmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'50%'};
 fu_putmulti_params.dest         = {"label":'Destination'};
-fu_putmulti_params.af_capacity  = {'label':'Capacity', 'type':'int','width':'33%'};
-fu_putmulti_params.af_maxtasks  = {'label':'Max Tasks','type':'int','width':'33%'};
-fu_putmulti_params.af_perhost   = {'label':'Per Host', 'type':'int','width':'33%'};
+fu_putmulti_params.af_capacity  = {'label':'Capacity',  'width':'20%','type':'int',};
+fu_putmulti_params.af_maxtasks  = {'label':'Max Tasks', 'width':'15%','lwidth':'80px','type':'int'};
+fu_putmulti_params.af_perhost   = {'label':'Per Host',  'width':'15%','lwidth':'80px','type':'int'};
+fu_putmulti_params.af_hostsmask = {'label':'Hosts Mask','width':'35%','lwidth':'100px'};
+fu_putmulti_params.af_paused    = {'label':'Paused',    'width':'15%','lwidth':'50px','type':'bool'};
 
 fu_findres_params = {};
 fu_findres_params.input = {};
@@ -445,6 +447,8 @@ function fu_PutMultiDo( i_wnd)
 	job.name = 'PUT ' + result.dest;
 	job.max_running_tasks = params.af_maxtasks;
 	job.max_running_tasks_per_host = params.af_perhost;
+	job.hosts_mask = params.af_hostsmask;
+	job.offline = params.af_paused;
 
 	var block = {};
 	job.blocks = [block];

@@ -270,14 +270,18 @@ function d_MakeCmd( i_params)
 
 
 d_cvtguiparams = {};
-d_cvtguiparams.cvtres     = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
-d_cvtguiparams.fps        = {"label":'FPS'};
-d_cvtguiparams.time_start = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.duration   = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.quality    = {"label":'JPEG Quality','type':'int',"default":100,'width':'50%'};
-d_cvtguiparams.padding    = {"label":'Padding','width':'50%'};
-d_cvtguiparams.afmaxtasks = {"width":"50%","label":'Max Tasks',"default":'-1',"tooltip":'Maximum running tasks for Afanasy job.'};
-d_cvtguiparams.afperhost  = {"width":"50%","label":'Per Host',"default":'-1',"tooltip":'Maximum running tasks per host for Afanasy job.'};
+d_cvtguiparams.cvtres       = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
+d_cvtguiparams.fps          = {"label":'FPS'};
+d_cvtguiparams.time_start   = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.duration     = {"default":'00:00:00',"width":'50%'};
+d_cvtguiparams.quality      = {"label":'JPEG Quality','type':'int',"default":100,'width':'50%'};
+d_cvtguiparams.padding      = {"label":'Padding','width':'50%'};
+d_cvtguiparams.af_capacity  = {'label':'Capacity',  'width':'20%','type':'int',};
+d_cvtguiparams.af_maxtasks  = {'label':'Max Tasks', 'width':'15%','lwidth':'80px','type':'int','default':-1};
+d_cvtguiparams.af_perhost   = {'label':'Per Host',  'width':'15%','lwidth':'80px','type':'int','default':1};
+d_cvtguiparams.af_hostsmask = {'label':'Hosts Mask','width':'20%'};
+d_cvtguiparams.af_fpt       = {'label':'FPT',       'width':'15%','lwidth':'50px','type':'int','default':10,'tooltip':'Frames Per Task'};
+d_cvtguiparams.af_paused    = {'label':'Paused',    'width':'15%','lwidth':'50px','type':'bool'};
 
 d_cvtmulti_params = {};
 d_cvtmulti_params.input        = {"label":'Result Paths'};
@@ -310,7 +314,7 @@ function d_Convert( i_args)
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
-	if( i_args.movies == false )
+	if( i_args.movies !== true )
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
@@ -469,8 +473,12 @@ function d_CvtImages( i_wnd, i_params)
 		afanasy = true;
 		cmd += ' -A';
 		cmd += ' --afuser "' + g_auth_user.id + '"';
-		cmd += ' --afmax ' + i_params.afmaxtasks;
-		cmd += ' --afmph ' + i_params.afperhost;
+		cmd += ' --afcap ' + i_params.af_capacity;
+		cmd += ' --afmax ' + i_params.af_maxtasks;
+		cmd += ' --afmph ' + i_params.af_perhost;
+		cmd += ' --affpt ' + i_params.af_fpt;
+		if( i_params.af_hostsmask.length ) cmd += ' --afhostsmask "' + i_params.af_hostsmask + '"';
+		if( i_params.af_paused ) cmd += ' --afpaused';
 
 		if( i_wnd.m_args.results )
 			cmd += ' -o "' + i_wnd.m_result.dest + '"';
@@ -560,23 +568,15 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	if( paths.length > 1 )
 		job.name = c_PathDir( paths[0]) + ' x' + paths.length;
 
-	job.max_running_tasks = parseInt( i_params.afmaxtasks);
-	if( isNaN( job.max_running_tasks ))
-	{
-		c_Error('Invalid "Max Tasks" value: "' + i_params.afmaxtasks + '"');
-		job.max_running_tasks = -1;
-	}
-	job.max_running_tasks_per_host = parseInt( i_params.afperhost);
-	if( isNaN( job.max_running_tasks_per_host ))
-	{
-		c_Error('Invalid "Per Host" value: "' + i_params.afperhost + '"');
-		job.max_running_tasks_per_host = -1;
-	}
+	job.max_running_tasks = i_params.af_maxtasks;
+	job.max_running_tasks_per_host = i_params.af_perhost;
+	if( i_params.af_hostsmask.length ) job.hosts_mask = i_params.af_hostsmask;
+	if( i_params.af_paused ) job.offline = true;
 
 	var block = {};
 	block.service = 'movgen';
 	block.parser = 'generic';
-	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
+	block.capacity = i_params.af_capacity;
 	block.working_directory = c_PathDir( paths[0]);
 	block.tasks = [];
 	job.blocks = [block];

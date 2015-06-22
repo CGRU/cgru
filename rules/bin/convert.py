@@ -27,11 +27,13 @@ Parser.add_option(      '--renumpad',   dest='renumpad',   type  ='int',        
 Parser.add_option('-o', '--output',     dest='output',     type  ='string',     default=None,   help='Output folder')
 Parser.add_option('-A', '--afanasy',    dest='afanasy',    action='store_true', default=False,  help='Use Afanasy')
 Parser.add_option(      '--afuser',     dest='afuser',     type  ='string',     default='',     help='Afanasy user')
-Parser.add_option(      '--affpt',      dest='affpt',      type  ='int',        default='10',   help='Afanasy frames per task')
-Parser.add_option(      '--afmax',      dest='afmax',      type  ='int',        default='-1',   help='Afanasy maximum running tasks')
-Parser.add_option(      '--afmph',      dest='afmph',      type  ='int',        default='-1',   help='Afanasy max tasks per host')
-Parser.add_option(      '--afmrt',      dest='afmrt',      type  ='int',        default='-1',   help='Afanasy max running time')
-Parser.add_option(      '--afcap',      dest='afcap',      type  ='int',        default='-1',   help='Afanasy capacity')
+Parser.add_option(      '--affpt',      dest='affpt',      type  ='int',        default=10,     help='Afanasy frames per task')
+Parser.add_option(      '--afmax',      dest='afmax',      type  ='int',        default=-1,     help='Afanasy maximum running tasks')
+Parser.add_option(      '--afmph',      dest='afmph',      type  ='int',        default=-1,     help='Afanasy max tasks per host')
+Parser.add_option(      '--afmrt',      dest='afmrt',      type  ='int',        default=-1,     help='Afanasy max running time')
+Parser.add_option(      '--afcap',      dest='afcap',      type  ='int',        default=-1,     help='Afanasy capacity')
+Parser.add_option(      '--afhostsmask',dest='afhostsmask',type  ='string',     default=None,   help='Afanasy hosts mask')
+Parser.add_option(      '--afpaused',   dest='afpaused',   action='store_true', default=False,  help='Afanasy job paused')
 Parser.add_option('-I', '--identify',   dest='identify',   action='store_true', default=False,  help='Identify image')
 Parser.add_option('-J', '--json',       dest='json',       action='store_true', default=False,  help='Output JSON summary')
 Parser.add_option('-V', '--verbose',    dest='verbose',    action='store_true', default=False,  help='Verbose mode')
@@ -225,6 +227,10 @@ for i in range(0, len(Sequences)):
 			job.setMaxRunningTasks(Options.afmax)
 		if Options.afmph != -1:
 			job.setMaxRunTasksPerHost(Options.afmph)
+		if Options.afhostsmask is not None:
+			job.setHostsMask( Options.afhostsmask)
+		if Options.afpaused:
+			job.offline()
 
 	for j in range(0, len(Sequences[i])):
 		if Options.verbose or Options.debug:
