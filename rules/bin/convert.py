@@ -190,8 +190,6 @@ for inarg in Args:
 		seq['outseq'] = outseq
 		seq['cmd'] = cmd
 		seq['cmd_name'] = os.path.basename( inseq)
-		if seq['seq']:
-			seq['cmd_name'] += ':%d-%d=%d' % (seq['first'],seq['last'],seq['count'])
 
 	mkdir = None
 	if arg_is_folder: mkdir = outfolder
@@ -241,6 +239,7 @@ for i in range(0, len(Sequences)):
 			job.blocks.append(block)
 
 			if Sequences[i][j]['seq']:
+				block.setName( seq['cmd_name'] + ':%d-%d=%d' % (seq['first'],seq['last'],seq['count']))
 				first = Sequences[i][j]['first']
 				while first <= Sequences[i][j]['last']:
 					last = first + Options.affpt
@@ -250,7 +249,7 @@ for i in range(0, len(Sequences)):
 					if Options.renumpad:
 						scene = first - Sequences[i][j]['first'] + 1
 					
-					task = af.Task( Sequences[i][j]['cmd_name'] + ('[%d-%d]' % (first,last)))
+					task = af.Task( Sequences[i][j]['cmd_name'] + ('[%d-%d]' % (scene,scene+last-first-1)))
 					cmd = Sequences[i][j]['cmd']
 					cmd = cmd.replace('@FIRST@', str(first))
 					cmd = cmd.replace('@LAST@',  str(last ))
