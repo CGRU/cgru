@@ -252,6 +252,7 @@ function shot_MakeThumbnail( i_args)
 {
 	if( shot_thumb_paths.length == 0 ) return;
 
+	if( i_args == null ) i_args = {};
 	i_args.info = 'shot';
 	i_args.paths = [shot_thumb_paths];
 
