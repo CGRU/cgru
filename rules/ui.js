@@ -1111,6 +1111,7 @@ function u_ThumbnailMake( i_args)
 	var cmd = RULES.thumbnail.cmd_asset.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, file);
 	cmd += ' -c ' + RULES.thumbnail.colorspace;
 	if( i_args.no_cache ) cmd += ' -f';
+	if( i_args.skip_movies ) cmd += ' --nomovie';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":u_ThumbnailShow,"info":i_args.info+' thumbnail',"local":true});
 }
