@@ -147,56 +147,87 @@ function prj_ShotsDeployFinished( i_data, i_args)
 	elResults.appendChild( el);
 	el.textContent = deploy.length + ' shots founded:';
 
+	var elTable = document.createElement('table');
+	elResults.appendChild( elTable);
+
+	var elTr = document.createElement('tr');
+	elTable.appendChild( elTr);
+	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Name';
+	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Sequence';
+	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Additional sources';
+	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Refs';
+	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Comments';
+
 	for( var d = deploy.length - 1; d >= 0; d--)
 	{
 //console.log(JSON.stringify(deploy[d]));
-		var el = document.createElement('div');
-		elResults.appendChild( el);
+		var elTr = document.createElement('tr');
+		elTable.appendChild( elTr);
+
 		for( var key in deploy[d])
 		{
-			el.classList.add( key);
+			elTr.classList.add( key);
+
 			if( key == 'shot' )
 			{
 				var shot = deploy[d][key];
+console.log(JSON.stringify(shot));
 
-				var elName = document.createElement('div');
-				el.appendChild( elName);
-				elName.textContent = shot.name + ': ';
-				elName.classList.add('name');
+				// Shot name:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.textContent = shot.name;
+				el.classList.add('deploy_name');
 
+				// Main source:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.textContent = shot.SRC[0];
+				el.classList.add('deploy_src');
+
+				// Same sources:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_src');
 				var src = '';
-				for( var i = 0; i < shot.SRC.length; i++)
-					src += ' ' + shot.SRC[i];
-				var elSrc = document.createElement('div');
-				el.appendChild( elSrc);
-				elSrc.textContent = src;
-				elSrc.classList.add('src');
-
+				if( shot.SRC.length > 1 )
+					for( var i = 1; i < shot.SRC.length; i++)
+						src += ' ' + shot.SRC[i];
+				el.textContent = src;
+				
+				// References:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_ref');
+				var ref = '';
 				if( shot.REF && shot.REF.length )
 				{
-					var ref = '';
 					for( var i = 0; i < shot.REF.length; i++)
 						ref += ' ' + shot.REF[i];
-					var elRef = document.createElement('div');
-					el.appendChild( elRef);
-					elRef.textContent = ref;
-					elRef.classList.add('ref');
 				}
+				el.textContent = ref;
 
+				// Comments:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_info');
+				var comm = '';
 				if( shot.exists )
 				{
-					var elExist = document.createElement('div');
-					el.appendChild( elExist);
-					elExist.textContent = 'EXISTS';
-					elExist.classList.add('info');
-					el.classList.add('exist');
+					comm = 'EXISTS';
+					elTr.classList.add('deploy_exist');
 				}
+				el.textContent = comm;
 
 //console.log( JSON.stringify( shot));
 				break;
 			}
-
-			el.textContent = key + ': ' + deploy[d][key];
+			else
+			{
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.textContent = key + ': ' + deploy[d][key];
+			}
 		}
 	}
 }

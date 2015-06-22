@@ -3,12 +3,14 @@
 #project > .button { float: left; margin: 4px 12px; padding: 2px 8px; }
 .deploy_shots .button { float: left; }
 
-.deploy_shots .output .shot .name { color: #6F4; float: left; margin-right: 8px; }
-.deploy_shots .output .shot .src  { color: #AF4; float: left; }
-.deploy_shots .output .shot .ref  { color: #4FA; float: right;}
-.deploy_shots .output .shot .info { color: #FF2; float: right;}
-.deploy_shots .output .shot.exist { color: #777; }
-.deploy_shots .output .shot.exist .name { color: #777; }
+.deploy_shots .output table { border-collapse: collapse; }
+.deploy_shots .output table td { padding: 1px 4px; border: 1px solid rgba(100,200,50,.1); border-bottom: 0px; border-right: 0px; }
+
+.deploy_name { color: #6F4; }
+.deploy_src  { color: #AF4; }
+.deploy_ref  { color: #4FA; }
+.deploy_exist td { color: #777; }
+.deploy_info { color: #FF2; }
 .deploy_shots .output .error      { color: #F42; }
 .deploy_shots .output .warning    { color: #FF2; }
 
