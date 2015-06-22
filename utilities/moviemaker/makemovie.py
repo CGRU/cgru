@@ -660,7 +660,9 @@ if len(Audio) and EncType == 'ffmpeg':
 	inputmask += ' -acodec "%s' % Options.acodec
 
 # Process avcmd:
-AVCMD = '%s -start_number %d' % (Options.avcmd, start_number)
+AVCMD = Options.avcmd
+if not need_convert:
+	AVCMD += ' -start_number %d' % start_number
 
 cmd_encode = cmd_encode.replace('@AVCMD@', AVCMD)
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
