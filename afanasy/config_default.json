@@ -1,7 +1,7 @@
 {"cgru_config":{
 
 	"af_servername":"127.0.0.1",
-		"":"User server name or direct IP address literals",
+		"":"Afanasy server name or direct IP address literals",
 
 	"af_serverport":51000,
 	"af_clientport":51001,

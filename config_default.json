@@ -1,4 +1,5 @@
 {"cgru_config":{
+		"":"This is a CGRU default config file",
 		"":"Describe your own configuration in 'config.json', it will be included last",
 		"":"To disable property you can just prefix it with '-'",
 
