@@ -530,6 +530,8 @@ border-radius: 8px;
 .status_edit .color { clear:both;}
 .status_edit .list { padding: 4px; margin: 2px; /*border-radius: 3px;*/ /*border: 1px solid rgba(0,0,0,.2);*/ }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
+.status_edit .edit_tasks .task_add { float: left; }
+.status_edit .edit_tasks .tasks_multiedit_message { float: right; background-color: #F33; padding: 2px 6px; margin: 2px 6px; border-radius: 2px; }
 .status_edit .edit_tasks .task { box-shadow: 0 0 2px #000 inset; margin: 2px; padding: 2px; }
 .status_edit .edit_tasks .task .button { clear: both; float: left; padding: 0px 4px; }
 .status_edit .edit_tasks .task .dur_div { float: left; }

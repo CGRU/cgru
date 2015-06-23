@@ -625,22 +625,20 @@ Status.prototype.edit = function( i_args)
 
 	if( c_CanEditTasks())
 	{
-		var elTasksPanel = document.createElement('div');
-		this.elEdit_tasks.appendChild( elTasksPanel);
+		this.elTasksPanel = document.createElement('div');
+		this.elEdit_tasks.appendChild( this.elTasksPanel);
 
 		var el = document.createElement('div');
-		elTasksPanel.appendChild( el);
-		el.textContent = 'Add';
+		this.elTasksPanel.appendChild( el);
 		el.classList.add('button');
-		el.style.cssFloat = 'right';
+		el.textContent = 'Tasks';
+		el.m_args = i_args;
 		el.m_status = this;
-		el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
-
-		var el = document.createElement('div');
-		elTasksPanel.appendChild( el);
-		el.textContent = 'Tasks:';
-
-		this.editTasksShow();
+		el.onclick = function(e){
+			var el = e.currentTarget;
+			el.classList.remove('button');
+			el.m_status.editTasksShow( el.m_args);
+		}
 	}
 
 
@@ -673,6 +671,34 @@ Status.prototype.edit = function( i_args)
 	}
 
 	this.elEdit_annotation.focus();
+}
+Status.prototype.editTasksShow = function( i_args)
+{
+	// Show tasks only once:
+	if( this.elEdit_tasks.elTasks ) return;
+
+	// And remember it creating an array for task elements:
+	this.elEdit_tasks.elTasks = [];
+
+	var el = document.createElement('div');
+	this.elTasksPanel.appendChild( el);
+	el.textContent = 'Add';
+	el.classList.add('button');
+	el.classList.add('task_add');
+	el.m_status = this;
+	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
+
+	// If this is scene shots multiselection:
+	if( i_args && i_args.statuses && i_args.statuses.length )
+	{
+		var el = document.createElement('div');
+		this.elTasksPanel.appendChild( el);
+		el.textContent = 'WARNING! This is scene shots multiselection, all previous tasks information will be dropped!';
+		el.classList.add('tasks_multiedit_message');
+		return;
+	}
+
+	this.editTasksShowTasks();
 }
 Status.prototype.editOnKeyDown = function(e, i_args)
 {
@@ -904,19 +930,16 @@ Status.prototype.addTaskOnClick = function()
 	task.tags = [];
 	task.artists = [];
 
-	this.editTasksShow({"new":task});
+	this.editTasksShowTasks({"new":task});
 }
 
-Status.prototype.editTasksShow = function( i_args)
+Status.prototype.editTasksShowTasks = function( i_args)
 {
 	var tasks = this.obj.tasks;
 	if( i_args && i_args.new )
 		tasks = [i_args.new]
 
 	if( tasks == null ) return;
-
-	if( this.elEdit_tasks.elTasks == null )
-		this.elEdit_tasks.elTasks = [];
 
 	for( var t = 0; t < tasks.length; t++)
 	{
@@ -1010,6 +1033,7 @@ Status.prototype.editSave = function( i_args)
 	var progress = null;
 	var artists = null;
 	var tags = null;
+	var tasks = null;
 
 	// Get values from GUI:
 
@@ -1071,10 +1095,7 @@ Status.prototype.editSave = function( i_args)
 
 	if( this.elEdit_tasks.elTasks )
 	{
-		// Task are set to the current status only.
-		// Mutli selection edit is not supported.
-
-		this.obj.tasks = [];
+		tasks = [];
 
 		for( var t = 0; t < this.elEdit_tasks.elTasks.length; t++)
 		{
@@ -1123,7 +1144,7 @@ Status.prototype.editSave = function( i_args)
 			else if( elTask.m_task.artists )
 				task.artists = elTask.m_task.artists;
 
-			this.obj.tasks.push( task);
+			tasks.push( task);
 		}
 	}
 
@@ -1181,6 +1202,9 @@ Status.prototype.editSave = function( i_args)
 				if(( tags[id] == 'selected' ) && ( statuses[i].obj.tags.indexOf(id) == -1 ))
 					statuses[i].obj.tags.push( id);
 		}
+
+		if( tasks )
+			statuses[i].obj.tasks = tasks;
 
 		if( this.elEdit_Color.m_color_changed )
 			statuses[i].obj.color = this.elEdit_Color.m_color;
