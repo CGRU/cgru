@@ -125,6 +125,7 @@ for inarg in Args:
 
 		# Process inarg colorspace:
 		in_body,in_ext = os.path.splitext(inseq)
+		in_ext = in_ext.lower()[1:]
 		if Options.colorspace != 'auto':
 			if Options.colorspace == 'extension':
 				if in_ext == 'exr':
