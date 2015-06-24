@@ -131,9 +131,6 @@ Status.prototype.show = function( i_status)
 		this.elModified.textContent = modified;
 	}
 
-//	if( this.elTasks )
-//		this.showTasks();
-
 	var args = {};
 	args.statuses = [this.obj];
 	args.elReports = this.elReports;
@@ -142,71 +139,6 @@ Status.prototype.show = function( i_status)
 	args.elTasksDiv = this.elTasksDiv;
 
 	stcs_Show( args);
-}
-Status.prototype.showTasks = function()
-{
-	this.elTasks.textContent = '';
-	if(( this.obj == null )
-	|| ( this.obj.tasks == null )
-	|| ( this.obj.tasks.length == 0 ))
-	{
-		this.elTasksDiv.style.display = 'none';
-		return;
-	}
-	else
-		this.elTasksDiv.style.display = 'block';
-
-	var total_duration = 0;
-	for( var t = 0; t < this.obj.tasks.length; t++)
-	{
-		var task = this.obj.tasks[t];
-
-		var el = document.createElement('div');
-		this.elTasks.appendChild( el);
-		el.classList.add('task');
-
-		var elDur = document.createElement('div');
-		el.appendChild( elDur);
-		elDur.classList.add('duration');
-		elDur.textContent = task.duration;
-
-		if( task.tags && task.tags.length )
-		{
-			var elTags = document.createElement('div');
-			el.appendChild( elTags);
-			elTags.classList.add('tags');
-
-			for( var g = 0; g < task.tags.length; g++)
-			{
-				var elTag = document.createElement('div');
-				elTags.appendChild( elTag);
-				elTag.classList.add('tag');
-				elTag.textContent = c_GetTagTitle( task.tags[g]);
-			}
-		}
-
-		if( task.artists && task.artists.length )
-		{
-			var elTags = document.createElement('div');
-			el.appendChild( elTags);
-			elTags.classList.add('artists');
-
-			for( var g = 0; g < task.artists.length; g++)
-			{
-				var elTag = document.createElement('div');
-				elTags.appendChild( elTag);
-				elTag.classList.add('tag');
-				elTag.classList.add('artist');
-				elTag.textContent = c_GetUserTitle( task.artists[g]);
-			}
-		}
-
-		total_duration += task.duration;
-	}
-
-	var el = document.createElement('div');
-	this.elTasks.appendChild( el);
-	el.textContent = 'Total Duration: ' + total_duration;
 }
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
@@ -553,12 +485,10 @@ Status.prototype.edit = function( i_args)
 
 	var elProgressDiv = document.createElement('div');
 	this.elEdit.appendChild( elProgressDiv);
-//	elProgressDiv.style.cssFloat = 'left';
 	elProgressDiv.classList.add('percent');
 	var elProgressLabel = document.createElement('div');
 	elProgressDiv.appendChild( elProgressLabel);
 	elProgressLabel.textContent = 'Progress:';
-//	elProgressLabel.style.cssFloat = 'left';
 	elProgressLabel.style.fontSize = '12px';
 	this.elEdit_progress = document.createElement('div');
 	elProgressDiv.appendChild( this.elEdit_progress);
@@ -634,11 +564,7 @@ Status.prototype.edit = function( i_args)
 		el.textContent = 'Tasks';
 		el.m_args = i_args;
 		el.m_status = this;
-		el.onclick = function(e){
-			var el = e.currentTarget;
-			el.classList.remove('button');
-			el.m_status.editTasksShow( el.m_args);
-		}
+		el.onclick = function(e){ e.currentTarget.m_status.editTasksShow( e, e.currentTarget.m_args); }
 	}
 
 
@@ -672,7 +598,7 @@ Status.prototype.edit = function( i_args)
 
 	this.elEdit_annotation.focus();
 }
-Status.prototype.editTasksShow = function( i_args)
+Status.prototype.editTasksShow = function( i_evt, i_args)
 {
 	// Show tasks only once:
 	if( this.elEdit_tasks.elTasks ) return;
@@ -680,9 +606,12 @@ Status.prototype.editTasksShow = function( i_args)
 	// And remember it creating an array for task elements:
 	this.elEdit_tasks.elTasks = [];
 
+	var elTasksBtn = i_evt.currentTarget;
+	elTasksBtn.classList.remove('button');
+
 	var el = document.createElement('div');
-	this.elTasksPanel.appendChild( el);
-	el.textContent = 'Add';
+	this.elTasksPanel.insertBefore( el, elTasksBtn);
+	el.textContent = 'Add Task';
 	el.classList.add('button');
 	el.classList.add('task_add');
 	el.m_status = this;
@@ -927,6 +856,7 @@ Status.prototype.addTaskOnClick = function()
 
 	var task = {};
 	task.duration = 1;
+	task.price = 0;
 	task.tags = [];
 	task.artists = [];
 
@@ -947,6 +877,21 @@ Status.prototype.editTasksShowTasks = function( i_args)
 		this.elEdit_tasks.appendChild( el);
 		el.classList.add('task');
 
+		var elDel = document.createElement('div');
+		el.appendChild( elDel);
+		elDel.classList.add('button');
+		elDel.classList.add('delete');
+		//elDel.textContent = 'Delete';
+		elDel.title = 'Delete Task\n(by double click)';
+		elDel.m_status = this;
+		elDel.m_elTask = el;
+		elDel.ondblclick = function(e){
+			var st = e.currentTarget.m_status;
+			var el = e.currentTarget.m_elTask;
+			st.elEdit_tasks.elTasks.splice( st.elEdit_tasks.elTasks.indexOf(el),1);
+			st.elEdit_tasks.removeChild( el);
+		}
+
 		var elDurDiv = document.createElement('div');
 		el.appendChild( elDurDiv);
 		elDurDiv.classList.add('dur_div');
@@ -963,19 +908,24 @@ Status.prototype.editTasksShowTasks = function( i_args)
 		elDur.classList.add('editing');
 		elDur.classList.add('duration');
 
-		var elDel = document.createElement('div');
-		el.appendChild( elDel);
-		elDel.classList.add('button');
-		elDel.textContent = '-';
-		elDel.title = 'Delete Task\n(by double click)';
-		elDel.m_status = this;
-		elDel.m_elTask = el;
-		elDel.ondblclick = function(e){
-			var st = e.currentTarget.m_status;
-			var el = e.currentTarget.m_elTask;
-			st.elEdit_tasks.elTasks.splice( st.elEdit_tasks.elTasks.indexOf(el),1);
-			st.elEdit_tasks.removeChild( el);
-		}
+		var elPrcDiv = document.createElement('div');
+		el.appendChild( elPrcDiv);
+		elPrcDiv.classList.add('prc_div');
+		elPrcDiv.classList.add('dur_div');
+
+		var elPrcLabel = document.createElement('div');
+		elPrcDiv.appendChild( elPrcLabel);
+		elPrcLabel.textContent = 'Price: ';
+		elPrcLabel.classList.add('prc_label');
+		elPrcLabel.classList.add('dur_label');
+
+		var elPrice = document.createElement('div');
+		elPrcDiv.appendChild( elPrice);
+		elPrice.textContent = tasks[t].price;
+		elPrice.contentEditable = true;
+		elPrice.classList.add('editing');
+		elPrice.classList.add('price');
+		elPrice.classList.add('duration');
 
 		var tags = {};
 		if( tasks[t].tags )
@@ -985,6 +935,7 @@ Status.prototype.editTasksShowTasks = function( i_args)
 			tags[id] = {"title":c_GetTagTitle(id),"tooltip":c_GetTagTip(id)};
 		}
 		var elTags = document.createElement('div');
+		elTags.classList.add('tags');
 		el.appendChild( elTags);
 		this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":elTags});
 
@@ -1006,6 +957,7 @@ Status.prototype.editTasksShowTasks = function( i_args)
 
 		el.m_task = tasks[t];
 		el.m_elDur = elDur;
+		el.m_elPrice = elPrice;
 		el.m_elTags = elTags;
 		el.m_elArtists = elArtists;
 		this.elEdit_tasks.elTasks.push( el);
@@ -1102,9 +1054,13 @@ Status.prototype.editSave = function( i_args)
 			var elTask = this.elEdit_tasks.elTasks[t];
 			var task = {};
 
-			var duration = parseInt( c_Strip( elTask.m_elDur.textContent ));
+			var duration = parseFloat( c_Strip( elTask.m_elDur.textContent ));
 			if( ! isNaN( duration ))
 				task.duration = duration;
+
+			var price = parseFloat( c_Strip( elTask.m_elPrice.textContent ));
+			if( ! isNaN( price ))
+				task.price = price;
 
 			if( elTask.m_elTags.tags)
 			{

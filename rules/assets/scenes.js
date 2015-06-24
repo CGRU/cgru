@@ -831,6 +831,7 @@ function sc_DisplayStatistics()
 	args.elReportsDiv = $('scenes_reports_div');
 	args.elDiffer = $('scenes_differ');
 	args.elDifferDiv = $('scenes_differ_div');
+	args.main_artists = true;
 	args.draw_bars = true;
 
 	stcs_Show( args);
