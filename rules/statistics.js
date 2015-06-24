@@ -139,8 +139,9 @@ function stcs_Show( i_args)
 	if( tasks_t.length )
 	{
 		i_elTasksDiv.style.display = 'block';
-		stcs_ShowTable({"el":i_elTasks,"data":tasks_t,"draw_bars":i_draw_bars,"main":"tags"});
-		if( i_main_atrists )
+		if( tasks_t.length )
+			stcs_ShowTable({"el":i_elTasks,"data":tasks_t,"draw_bars":i_draw_bars,"main":"tags"});
+		if( tasks_a.length && i_main_atrists )
 			stcs_ShowTable({"el":i_elTasks,"data":tasks_a,"draw_bars":i_draw_bars,"main":"artists"});
 	}
 	else
@@ -152,11 +153,12 @@ function stcs_Show( i_args)
 	var reports_t = []; var reports_a = [];
 	for( var rtype in reps_types   ) reports_t.push( reps_types[rtype]);
 	for( var rtype in reps_artists ) reports_a.push( reps_artists[rtype]);
-	if( reports_t.length )
+	if( reports_t.length || reports_a.length )
 	{
 		i_elReportsDiv.style.display = 'block';
-		stcs_ShowTable({"el":i_elReports,"data":reports_t,"draw_bars":i_draw_bars,"main":"tags"});
-		if( i_main_atrists )
+		if( reports_t.length )
+			stcs_ShowTable({"el":i_elReports,"data":reports_t,"draw_bars":i_draw_bars,"main":"tags"});
+		if( reports_a.length && i_main_atrists )
 			stcs_ShowTable({"el":i_elReports,"data":reports_a,"draw_bars":i_draw_bars,"main":"artists"});
 	}
 	else
@@ -180,6 +182,7 @@ function stcs_ShowTable( i_args)
 	var i_el = i_args.el;
 	var i_data = i_args.data;
 	var i_draw_bars = i_args.draw_bars;
+if( i_data[0] == null ) console.log( JSON.stringify( i_args));
 	var has_price = i_data[0].price != null;
 
 	var sort = 'duration';
