@@ -44,6 +44,11 @@ function jsonEncode( &$i_obj)
 		return json_encode( $i_obj);
 }
 
+function _flock_( &$i_handle, $i_type)
+{
+//	flock( $i_handle, $i_type);
+}
+
 # Decode input:
 if( isset($_POST['upload_path']))
 	upload( $_POST['upload_path'], $Out);
@@ -247,9 +252,9 @@ function writeUser( &$i_user)
 
 	if( $fHandle = fopen( $filename, 'w'))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, jsonEncode( $i_user));
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle);
 		return true;
 	}
@@ -293,9 +298,9 @@ function http_digest_validate( &$o_out)
 	$data = null;
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 	}
 	else
@@ -670,9 +675,9 @@ function jsf_getfile( $i_file, &$o_out)
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		echo fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out = null;
 	}
@@ -718,9 +723,9 @@ function readObj( $i_file, &$o_out)
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out = json_decode( $data, true);
 	}
@@ -870,7 +875,7 @@ function jsf_editobj( $i_edit, &$o_out)
 		mkdir( dirname($i_edit['file']), 0777, true);
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		$data = fread( $fHandle, $FileMaxLength);
 		$obj = json_decode( $data, true);
 		if( is_null( $obj)) $obj = array();
@@ -888,7 +893,7 @@ function jsf_editobj( $i_edit, &$o_out)
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);
 		fwrite( $fHandle, jsonEncode( $obj));
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out['status'] = 'success';
 	}
@@ -989,9 +994,9 @@ function jsf_save( $i_save, &$o_out)
 		if( $i_save['type'] == 'base64' ) $data = base64_decode( $data);
 	}
 
-	flock( $fHandle, LOCK_EX);
+	_flock_( $fHandle, LOCK_EX);
 	fwrite( $fHandle, $data);
-	flock( $fHandle, LOCK_UN);
+	_flock_( $fHandle, LOCK_UN);
 	fclose( $fHandle );
 }
 
@@ -1059,9 +1064,9 @@ function makenews( $i_args, &$o_out)
 		if( is_file( $rfile))
 		if( $rhandle = fopen( $rfile, 'r'))
 		{
-			flock( $rhandle, LOCK_SH);
+			_flock_( $rhandle, LOCK_SH);
 			$rdata = fread( $rhandle, $FileMaxLength);
-			flock( $rhandle, LOCK_UN);
+			_flock_( $rhandle, LOCK_UN);
 			fclose( $rhandle);
 			$rarray = json_decode( $rdata, true);
 			if( is_null( $rarray))
@@ -1102,9 +1107,9 @@ function makenews( $i_args, &$o_out)
 			mkdir( dirname( $rfile));
 		if( $rhandle = fopen( $rfile, 'w'))
 		{
-			flock( $rhandle, LOCK_EX);
+			_flock_( $rhandle, LOCK_EX);
 			fwrite( $rhandle, jsonEncode( $rarray));
-			flock( $rhandle, LOCK_UN);
+			_flock_( $rhandle, LOCK_UN);
 			fclose($rhandle);
 		}
 
@@ -1309,9 +1314,9 @@ function jsf_htdigest( $i_recv, &$o_out)
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 	}
 
@@ -1344,9 +1349,9 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 	if( $fHandle = fopen( $HT_DigestFileName, 'w' ))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle );
 	}
 	else
@@ -1380,9 +1385,9 @@ function jsf_disableuser( $i_args, &$o_out)
 		{
 			if( $fHandle = fopen("users/$uid.json",'w'))
 			{
-				flock( $fHandle, LOCK_EX);
+				_flock_( $fHandle, LOCK_EX);
 				fwrite( $fHandle, jsonEncode( $i_args['uobj']));
-				flock( $fHandle, LOCK_UN);
+				_flock_( $fHandle, LOCK_UN);
 				fclose($fHandle);
 				$o_out['status'] = 'success';
 			}
@@ -1401,9 +1406,9 @@ function jsf_disableuser( $i_args, &$o_out)
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 	}
 	else
@@ -1426,9 +1431,9 @@ function jsf_disableuser( $i_args, &$o_out)
 
 	if( $fHandle = fopen( $HT_DigestFileName, 'w' ))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle );
 	}
 	else $o_out['error'] = 'Unable to write into the file.';
@@ -1459,9 +1464,9 @@ function getallusers( &$o_out)
 
 		if( $fHandle = fopen( "users/$entry", 'r'))
 		{
-			flock( $fHandle, LOCK_SH);
+			_flock_( $fHandle, LOCK_SH);
 			$user = json_decode( fread( $fHandle, $FileMaxLength), true);
-			flock( $fHandle, LOCK_UN);
+			_flock_( $fHandle, LOCK_UN);
 			if( false == is_null( $user ))
 				$o_out['users'][$user['id']] = $user;
 			fclose($fHandle);
@@ -1496,9 +1501,9 @@ function readGroups( &$o_out)
 
 	$Groups = array();
 
-	flock( $fHandle, LOCK_SH);
+	_flock_( $fHandle, LOCK_SH);
 	$data = fread( $fHandle, $FileMaxLength);
-	flock( $fHandle, LOCK_UN);
+	_flock_( $fHandle, LOCK_UN);
 	fclose($fHandle);
 
 	$lines = explode("\n", $data);
@@ -1537,9 +1542,9 @@ function jsf_writegroups( $i_groups, &$o_out)
 
 	if( $fHandle = fopen( $HT_GroupsFileName, 'w'))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle);
 	}
 	else
@@ -1571,9 +1576,9 @@ function jsf_permissionsset( $i_args, &$o_out)
 	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( $fHandle = fopen( $htaccess, 'w' ))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle );
 	}
 	else
@@ -1625,9 +1630,9 @@ function permissionsGet( $i_args, &$o_out)
 		$o_out['error'] = 'Can`t open the file.';
 		return;
 	}
-	flock( $fHandle, LOCK_SH);
+	_flock_( $fHandle, LOCK_SH);
 	$data = fread( $fHandle, $FileMaxLength);
-	flock( $fHandle, LOCK_UN);
+	_flock_( $fHandle, LOCK_UN);
 	fclose( $fHandle);
 
 	$found = false;
