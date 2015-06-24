@@ -52,11 +52,9 @@
 		"af_render_cmd_shutdown":"shutdown /s",
 		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep",
 		"af_render_windowsmustdie":[
-			"mantra.exe",
-			"mantra.exe - Application Error",
-			"3ds Max application",
 			"ImageMagick Studio library and utility programs",
 			"Microsoft Visual C++ Runtime Library",
+			"QuickTimeHelper-32.exe - Application Error",
 			"Visual Studio Just-In-Time Debugger"
 		]
 	},
