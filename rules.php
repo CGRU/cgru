@@ -252,9 +252,9 @@ function writeUser( &$i_user)
 
 	if( $fHandle = fopen( $filename, 'w'))
 	{
-		_flock_( $fHandle, LOCK_EX);
+		flock( $fHandle, LOCK_EX);
 		fwrite( $fHandle, jsonEncode( $i_user));
-		_flock_( $fHandle, LOCK_UN);
+		flock( $fHandle, LOCK_UN);
 		fclose( $fHandle);
 		return true;
 	}
@@ -298,9 +298,9 @@ function http_digest_validate( &$o_out)
 	$data = null;
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		_flock_( $fHandle, LOCK_SH);
+		flock( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		_flock_( $fHandle, LOCK_UN);
+		flock( $fHandle, LOCK_UN);
 		fclose($fHandle);
 	}
 	else
@@ -1385,9 +1385,9 @@ function jsf_disableuser( $i_args, &$o_out)
 		{
 			if( $fHandle = fopen("users/$uid.json",'w'))
 			{
-				_flock_( $fHandle, LOCK_EX);
+				flock( $fHandle, LOCK_EX);
 				fwrite( $fHandle, jsonEncode( $i_args['uobj']));
-				_flock_( $fHandle, LOCK_UN);
+				flock( $fHandle, LOCK_UN);
 				fclose($fHandle);
 				$o_out['status'] = 'success';
 			}
@@ -1406,9 +1406,9 @@ function jsf_disableuser( $i_args, &$o_out)
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		_flock_( $fHandle, LOCK_SH);
+		flock( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		_flock_( $fHandle, LOCK_UN);
+		flock( $fHandle, LOCK_UN);
 		fclose($fHandle);
 	}
 	else
@@ -1431,9 +1431,9 @@ function jsf_disableuser( $i_args, &$o_out)
 
 	if( $fHandle = fopen( $HT_DigestFileName, 'w' ))
 	{
-		_flock_( $fHandle, LOCK_EX);
+		flock( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		_flock_( $fHandle, LOCK_UN);
+		flock( $fHandle, LOCK_UN);
 		fclose( $fHandle );
 	}
 	else $o_out['error'] = 'Unable to write into the file.';
@@ -1464,9 +1464,9 @@ function getallusers( &$o_out)
 
 		if( $fHandle = fopen( "users/$entry", 'r'))
 		{
-			_flock_( $fHandle, LOCK_SH);
+			flock( $fHandle, LOCK_SH);
 			$user = json_decode( fread( $fHandle, $FileMaxLength), true);
-			_flock_( $fHandle, LOCK_UN);
+			flock( $fHandle, LOCK_UN);
 			if( false == is_null( $user ))
 				$o_out['users'][$user['id']] = $user;
 			fclose($fHandle);
@@ -1501,9 +1501,9 @@ function readGroups( &$o_out)
 
 	$Groups = array();
 
-	_flock_( $fHandle, LOCK_SH);
+	flock( $fHandle, LOCK_SH);
 	$data = fread( $fHandle, $FileMaxLength);
-	_flock_( $fHandle, LOCK_UN);
+	flock( $fHandle, LOCK_UN);
 	fclose($fHandle);
 
 	$lines = explode("\n", $data);
@@ -1542,9 +1542,9 @@ function jsf_writegroups( $i_groups, &$o_out)
 
 	if( $fHandle = fopen( $HT_GroupsFileName, 'w'))
 	{
-		_flock_( $fHandle, LOCK_EX);
+		flock( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		_flock_( $fHandle, LOCK_UN);
+		flock( $fHandle, LOCK_UN);
 		fclose( $fHandle);
 	}
 	else
