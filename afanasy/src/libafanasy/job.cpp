@@ -301,8 +301,11 @@ void Job::v_readwrite( Msg * msg)
 	rw_String  ( m_command_pre,  msg);
 	rw_String  ( m_command_post, msg);
 	rw_String  ( m_annotation,   msg);
-	rw_String  ( m_description,  msg);
+//	rw_String  ( m_description,  msg);
+	rw_String  ( m_thumb_path,   msg);
 	rw_String  ( m_custom_data,  msg);
+//	NEW VERSION:
+//	rw_String  ( m_thumb_path,   msg); // Afwatch should ask for thumbnail if this path changed
 
 	rw_RegExp  ( m_hosts_mask,         msg);
 	rw_RegExp  ( m_hosts_mask_exclude, msg);

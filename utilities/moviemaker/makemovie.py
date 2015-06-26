@@ -575,6 +575,7 @@ for i in range(2):
 
 # Generate convert commands lists:
 cmd_convert = []
+img_convert = []
 name_convert = []
 
 # Generate header:
@@ -587,9 +588,10 @@ if need_convert and Options.slate != '':
 	cmd += ' "%s"' % images1[int(len(images1) / 2)]
 	if Inpattern2 != '':
 		cmd += ' "%s"' % images2[int(len(images1) / 2)]
-	cmd += ' "%s"' % (
-		os.path.join(TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
+	slate = os.path.join(TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat
+	cmd += ' "%s"' % slate
 	cmd_convert.append(cmd)
+	img_convert.append( slate)
 	name_convert.append('Generate header')
 	imgCount += 1
 
@@ -625,10 +627,11 @@ if need_convert:
 		cmd += ' "%s"' % afile
 		if Inpattern2 != '':
 			cmd += ' "%s"' % images2[i]
-		cmd += ' "%s"' % (
-			os.path.join(TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
+		outfile = os.path.join(TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat
+		cmd += ' "%s"' % outfile
 
 		cmd_convert.append(cmd)
+		img_convert.append(outfile)
 		name_convert.append(afile)
 		imgCount += 1
 		i += 1
@@ -794,6 +797,11 @@ else:
 		sys.stdout.flush()
 		for cmd in cmd_convert:
 			print(name_convert[n])
+
+			if n <= 1 or n == len(cmd_convert)-1 or n%10 == 0:
+				# Generate thumbnail while task is running:
+				print('@IMAGE!@' + img_convert[n])
+
 			if Verbose: print(cmd)
 			# output = subprocess.Popen( cmd, stdout=subprocess.PIPE).communicate()[0]
 			cmd_array = []

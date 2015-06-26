@@ -155,6 +155,12 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 		"""
 		if self.parser is None:
 			return None
+
+		thumb_cmds = self.generateThumbnail( True)
+		for cmd in thumb_cmds:
+			print( cmd)
+			os.system(cmd)
+
 		return self.parser.parse(data, mode)
 
 	def checkExitStatus(self, i_status):
@@ -194,11 +200,11 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 		post_cmds = []
 		#print( self.parser.getFiles())
 		# if len( self.taskInfo['files']) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
-		post_cmds.extend(self.generateThumbnail())
+		post_cmds.extend(self.generateThumbnail( False))
 		# post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
 		return post_cmds
 
-	def generateThumbnail(self):
+	def generateThumbnail(self, i_onthefly):
 		"""Missing DocString
 
 		:return:
@@ -210,7 +216,10 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
 		files_list = []
 		if self.parser is not None:
-			files_list = self.parser.getFiles()
+			if i_onthefly:
+				files_list = self.parser.getFilesOnTheFly()
+			else:
+				files_list = self.parser.getFiles()
 
 		if len(files_list):
 			if len(files_list) > 3:

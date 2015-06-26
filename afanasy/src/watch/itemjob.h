@@ -45,6 +45,7 @@ public:
 	QString cmd_pre;
 	QString cmd_post;
 	QString description;
+	QString thumb_path;
 
 	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const

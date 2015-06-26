@@ -109,8 +109,9 @@ void ItemJob::updateValues( af::Node *node, int type)
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
 
+	QString new_thumb_path = afqt::stoq( job->getThumbPath());
+
 	compact_display = true;
-	bool get_thumbnail = false;
 
 	int tasks_done_old = m_tasks_done;
 	m_tasks_done = 0;
@@ -124,8 +125,6 @@ void ItemJob::updateValues( af::Node *node, int type)
 
 		m_tasks_done += m_blockinfo[b].tasksdone;
 	}
-	if( tasks_done_old != m_tasks_done )
-		get_thumbnail = true;
 
    if( time_started ) compact_display = false;
    if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
@@ -162,8 +161,9 @@ void ItemJob::updateValues( af::Node *node, int type)
 
    calcHeight();
 
-	if( get_thumbnail )
+	if( thumb_path != new_thumb_path )
 		getThumbnail();
+	thumb_path = new_thumb_path;
 }
 
 bool ItemJob::calcHeight()
