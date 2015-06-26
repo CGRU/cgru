@@ -52,6 +52,7 @@ if os.path.isdir(Input):
 		digits = re.findall(r'\d+', afile)
 		if len(digits) == 0:
 			continue
+		print('@IMAGE!@' + os.path.join(Input, afile))
 		digits = digits[-1]
 		StartNumber = int(digits)
 		Input = afile[:afile.rfind(digits)]
