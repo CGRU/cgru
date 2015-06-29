@@ -121,10 +121,6 @@ bool ListNodes::updateItems( af::Msg * msg)
             // check for item new geometry height
             if( oldheight != itemnode->getHeight()) m_view->emitSizeHintChanged( m_model->index(i));
 
-				// process show/hide node if we are not going to sort all of them
-				if( itemsToSort.size() == 0 )
-					processHidden( itemnode, i);
-
             // store last and first changed row
             if( firstChangedRow == -1 ) firstChangedRow = i;
             if(  lastChangedRow  <  i )  lastChangedRow = i;
@@ -187,18 +183,12 @@ bool ListNodes::updateItems( af::Msg * msg)
 		if( filtering )
 			new_item->setFilterType( ctrl->getFilterType() );
 
-		if( itemsToSort.size() == 0 )
-			processHidden( new_item, row);
-
       if( newitemscreated == false ) newitemscreated = true;
 
 AFINFA( "adding item \"%s\", id=%d\n", new_item->getName().toUtf8().data(), new_item->getId());
    }
 
-	if( itemsToSort.size() )
-	{
-		filter();
-	}
+	filter();
 
 //   model->revert();
 //   model->reset();
