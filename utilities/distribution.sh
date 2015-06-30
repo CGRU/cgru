@@ -85,14 +85,19 @@ case ${DISTRIBUTIVE} in
 	Mageia)
 		redhatArch
 		export PACKAGE_MANAGER="urpm"
-	  export PACKAGE_INSTALL="${PACKAGE_MANAGER}i"
+		export PACKAGE_INSTALL="${PACKAGE_MANAGER}i"
 		;;
 	Simply)
-		export DISTRIBUTIVE="AltLinux"
 		redhatArch
+		export DISTRIBUTIVE="AltLinux"
 		export PACKAGE_MANAGER="apt-get"
 		export PACKAGE_INSTALL="$PACKAGE_MANAGER install"
 		export VERSION_NAME="alt${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
+		;;
+	Fedora)
+		redhatArch
+		export PACKAGE_MANAGER="dnf"
+		export PACKAGE_INSTALL="$PACKAGE_MANAGER install"
 		;;
 	Red)
 		export DISTRIBUTIVE="RedHat"
