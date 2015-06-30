@@ -29,7 +29,7 @@ case ${DISTRIBUTIVE} in
 		;;
 	Mageia )
 		export DEPENDS_AFANASY="libpqxx"
-		export DEPENDS_CGRU="pyside imagemagick ffmpeg"
+		export DEPENDS_CGRU="python3-pyside imagemagick ffmpeg"
 		;;
 	*)
 		export DEPENDS_AFANASY="libpq5"
