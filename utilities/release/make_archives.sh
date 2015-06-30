@@ -55,17 +55,13 @@ for archive in `ls`; do
 		[ -f "${archive_file}" ] && rm -fv "${archive_file}"
 		echo $archive_cmd
 		eval $archive_cmd
+		if [ $? != 0 ]; then
+			echo "Error creating archive."
+			exit 1
+		fi
 		chmod a+rw "${archive_file}"
 	fi
 
-	archive_file="cgru.${version}.${archive}.7z"
-	7za a -r -y -t7z "${archive_file}" "${archive_dir}"
-
-	if [ $? != 0 ]; then
-		echo "Error creating archive."
-		exit 1
-	fi
-	chmod a+rw "${archive_file}"
 done
 
 echo "Done."; exit 0
