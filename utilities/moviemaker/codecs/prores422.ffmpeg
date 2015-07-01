@@ -1,2 +1,2 @@
 ProRes422 10Bit
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 3 -pix_fmt yuv422p10le @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec prores_ks -profile:v 3 -pix_fmt yuv422p10le @AUXARGS@ -r @FPS@ "@OUTPUT@.mov"

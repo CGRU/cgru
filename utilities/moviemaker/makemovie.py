@@ -46,7 +46,7 @@ Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',    
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default='25',        help='Frames per second')
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
-Parser.add_option('-n', '--container',  dest='container',   type  ='string',     default='',          help='Container')
+Parser.add_option('-n', '--container',  dest='container',   type  ='string',     default=None,        help='Container')
 Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first found')
 Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last found')
 Parser.add_option('--fffirst',          dest='fffirst',     action='store_true', default=False,       help='Draw first frame as first and not actual frame number.')
@@ -153,10 +153,14 @@ if Verbose:
 if Debug:
 	print('DEBUG MODE:')
 
-if Container == '':
+if Container is None:
+	Container = 'mp4'
+if os.path.basename(Codec).find('theora') == 0:
+	Container = 'ogg'
+elif os.path.basename(Codec).find('prores') == 0:
 	Container = 'mov'
-	if os.path.basename(Codec).find('theora') == 0:
-		Container = 'ogg'
+elif os.path.basename(Codec).find('dnxhd') == 0:
+	Container = 'mov'
 
 # Definitions:
 tmpname   = 'img'

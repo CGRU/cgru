@@ -231,12 +231,12 @@
 	},
 
 	"codecs":{
-		"photojpg_high": {"name":"JPG Hi",   "tooltip":"PhotoJPG High [mov]"},
-		"photojpg_mid":  {"name":"JPG Mid",  "tooltip":"PhotoJPG Mid [mov]"},
-		"photojpg_low":  {"name":"JPG Lo",   "tooltip":"PhotoJPG Low [mov]"},
-		"h264_high":     {"name":"H264 Hi",  "tooltip":"H.264 High [mov]"},
-		"h264_mid":      {"name":"H264 Mid", "tooltip":"H.264 Mid [mov]"},
-		"h264_low":      {"name":"H264 Lo",  "tooltip":"H.264 Low [mov]"},
+		"photojpg_high": {"name":"JPG Hi",   "tooltip":"PhotoJPG High [mp4]"},
+		"photojpg_mid":  {"name":"JPG Mid",  "tooltip":"PhotoJPG Mid [mp4]"},
+		"photojpg_low":  {"name":"JPG Lo",   "tooltip":"PhotoJPG Low [mp4]"},
+		"h264_high":     {"name":"H264 Hi",  "tooltip":"H.264 High [mp4]"},
+		"h264_mid":      {"name":"H264 Mid", "tooltip":"H.264 Mid [mp4]"},
+		"h264_low":      {"name":"H264 Lo",  "tooltip":"H.264 Low [mp4]"},
 		"theora_high":   {"name":"Th Hi",    "tooltip":"Theora High [ogg]"},
 		"theora_mid":    {"name":"Th Mid",   "tooltip":"Theora Mid [ogg]"},
 		"theora_low":    {"name":"Th Lo" ,   "tooltip":"Theora Low [ogg]"},
@@ -246,9 +246,9 @@
 	},
 
 	"containers":{
-		"DEFAULT": {"name":"Default", "tooltip":"Default container:\nTheora: OGG\nAny other: MOV"},
-		"mov": {"name":"MOV", "tooltip":"Apple QuickTime Movie"},
+		"DEFAULT": {"name":"Default", "tooltip":"Default container:\nProRes, DNxHD: MOV\nTheora: OGG\nAny other: MP4"},
 		"mp4": {"name":"MP4", "tooltip":"MPEG-4 Part 14\nIt is a common container."},
+		"mov": {"name":"MOV", "tooltip":"Apple QuickTime Movie"},
 		"m4v": {"name":"M4V", "tooltip":"Apple 'MP4'"},
 		"mxf": {"name":"MXF", "tooltip":"Material eXchange Format"},
 		"ogg": {"name":"OGG", "tooltip":"Ogg Vorbis&Theora\nThe most free container.\nFirefox and Chrome can play it without any plugins&codecs installed."},
