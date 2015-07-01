@@ -12,6 +12,8 @@ parser.add_option('-V', '--verbose', dest='verbose', action='store_true', defaul
 
 Options, Args = parser.parse_args()
 
+if Options.test: Options.verbose = True
+
 Root = os.getcwd()
 if len(Args) > 0:
 	Root = Args[0]
