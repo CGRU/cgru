@@ -47,11 +47,11 @@ Example: "UNI5_v001"'});
 		"tip":'Correct results folder name.'});
 	// Movies:
 	shot_results_masks.push({
-		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}\\.mov$'),
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}\\.(mp4|mov)$'),
 		"bg":'rgba(   0, 255, 0, .2)',
 		"tip":'Correct results movie name.'});
 	shot_results_masks.push({
-		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}_.*\\.mov$'),
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}_.*\\.(mp4|mov)$'),
 		"bg":'rgba(   0, 255, 0, .2)',
 		"tip":'Correct results movie name.'});
 
