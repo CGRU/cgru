@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import operator
 import os
 import re
 import sys
 
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] path\ntype \"%prog -h\" for help", version="%prog 1.  0")
-parser.add_option('-T', '--test' ,   dest='test',    action='store_true', default=False, help='Test mode.')
-parser.add_option('-V', '--verbose', dest='verbose', action='store_true', default=False, help='Verbose.')
+parser.add_option('-z', '--zero', dest='zero', action='store_true', default=False, help='Add a "-0" to the first existing sequence.')
+parser.add_option('-r', '--run',  dest='run',  action='store_true', default=False, help='Run rename.')
 
 Options, Args = parser.parse_args()
-
-if Options.test: Options.verbose = True
 
 Root = os.getcwd()
 if len(Args) > 0:
@@ -22,12 +21,10 @@ if not os.path.isdir( Root):
 	print('ERROR: Root folder does not exist:\n' + Root)
 	sys.exit(1)
 
-if Options.verbose:
-	print('Root = "%s"' % Root)
-
 ListDir = os.listdir(Root)
 ListDir.sort()
 
+NAMES = []
 OLD = []
 NEW = []
 
@@ -40,28 +37,61 @@ for fname in ListDir:
 
 	items = os.listdir(fpath)
 
-	for item in items:
-		if item[0] == '.':
+	name = None
+	for name in items:
+		# Skip hidden:
+		if name[0] == '.':
 			continue
 
-		name, ext = os.path.splitext(item)
-
-		if len(ext) == 0:
-			continue
-
+		# Skip with no extension:
 		name, ext = os.path.splitext(name)
-
-		if len(ext) == 0:
-			continue
-
-		OLD.append(fpath)
-		NEW.append( os.path.join( Root, name))
+		if len(ext) == 0: continue
 
 		break
 
-for i in range(0, len(OLD)):
-	if Options.verbose:
-		print('"%s" -> "%s"' % (os.path.basename(OLD[i]), os.path.basename(NEW[i])))
-	if not Options.test:
-		os.rename( OLD[i], NEW[i])
+	name = re.split('\d+$', name)[0]
+	name = name.strip(' -.()[]_')
+
+	old = fpath
+	new = os.path.join( Root, name)
+
+	# Sequence may be already exists:
+	if name in NAMES:
+		# Add to existing sequence '-0':
+		if Options.zero and new in NEW:
+			i = NEW.index(new)
+			NEW[i] += '-0'
+
+		# Search for a new sequence number:
+		n = 1
+		new_i = '%s-%d' % (new, n)
+		while new_i in NEW:
+			new_i = '%s-%d' % (new, n)
+			n += 1
+		new = new_i
+	else:
+		NAMES.append(name)
+
+	OLD.append( old)
+	NEW.append( new)
+
+
+ENT = []
+for i in range(0, len(OLD)): ENT.append({'old':OLD[i],'new':NEW[i]})
+ENT.sort( key=operator.itemgetter('new'))
+
+
+for i in range(0, len(ENT)):
+
+	old = ENT[i]['old']
+	new = ENT[i]['new']
+
+	if new == old:
+		print('Skipping: ' + os.path.basename(old))
+		continue
+
+	print('"%s" -> "%s"' % (os.path.basename(old), os.path.basename(new)))
+
+	if Options.run:
+		os.rename( old, new)
 
