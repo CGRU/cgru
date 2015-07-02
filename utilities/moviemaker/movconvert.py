@@ -4,6 +4,7 @@ import os
 import sys
 import re
 import subprocess
+import time
 
 from optparse import OptionParser
 
@@ -186,10 +187,13 @@ frames_total = -1
 fps          = -1
 frame        = -1
 progress     = -1
+progress_old =  0
 frame_old    = -1
 framereached = False
 output       = ''
 img_old      = None
+time_img     = 0
+
 while True:
 	data = process.stderr.read(1)
 	if data is None:
@@ -213,12 +217,20 @@ while True:
 			print(frame_info)
 			if progress != -1:
 				print('PROGRESS: %d%%' % progress)
-				if len(Sequence) and (progress % 10 == 0):
-					img = int( .01 * len(Sequence) * progress)
-					if img >= len(Sequence): img = len(Sequence) - 1
-					if img != img_old:
-						print('@IMAGE!@' + Sequence[img])
-						img_old = img
+
+				# Output thumbnail on-the-fly but not often than 10 % and 5 seconds:
+				if progress >= progress_old and time.time() > time_img + 5:
+					if len(Sequence):
+						img = int( .01 * len(Sequence) * progress)
+						if img >= len(Sequence): img = len(Sequence) - 1
+						if img != img_old:
+							print('@IMAGE!@' + Sequence[img])
+							img_old = img
+					elif frame > -1:
+						print('@IMAGE!@' + Output % frame)
+					progress_old += 5
+					time_img = time.time()
+
 			frame_old = frame
 		sys.stdout.flush()
 		continue
