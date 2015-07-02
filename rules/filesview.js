@@ -123,6 +123,14 @@ genetate thumbnails.";
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
 	el.classList.add('button');
+	el.style.backgroundImage = 'url(rules/icons/select_invert.png)';
+	el.title = 'Invert selection';
+	el.m_view = this;
+	el.onclick = function(e){ e.currentTarget.m_view.selectInvert()};
+
+	var el = document.createElement('div');
+	this.elPanel.appendChild( el);
+	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/convert.png)';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.convert();}
@@ -867,6 +875,13 @@ FilesView.prototype.selectAll = function( i_select)
 	}
 	else
 		c_Info('All items selected.');
+}
+FilesView.prototype.selectInvert = function()
+{
+	for( var i = 0; i < this.elItems.length; i++)
+		this.selectItem( this.elItems[i], this.elItems[i].m_selected != true );
+
+	c_Info('Unselected items selected.');
 }
 FilesView.prototype.selectNone = function() { this.selectAll( false); }
 
