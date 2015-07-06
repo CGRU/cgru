@@ -15,7 +15,7 @@ Parser = OptionParser(
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
 Parser.add_option('-r', '--resize',    dest='resize',    type  ='string', default='',       help='Resize (1280x720)')
-Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie codec')
+Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default=None,     help='Movie codec')
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
 Parser.add_option('-n', '--container', dest='container', type  ='string', default='mp4',    help='Movie Container')
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
@@ -72,7 +72,7 @@ CODECSDIR = os.path.join(MOVIEMAKER, 'codecs')
 
 Codec = Options.codec
 
-if Codec == '':
+if Codec is None:
 	args = [Options.avcmd, '-y']
 	if Options.timestart != '':
 		args.extend(['-ss', Options.timestart])
@@ -227,7 +227,8 @@ while True:
 							print('@IMAGE!@' + Sequence[img])
 							img_old = img
 					elif frame > -1:
-						print('@IMAGE!@' + Output % frame)
+						if Codec is None:
+							print('@IMAGE!@' + Output % frame)
 					progress_old += 5
 					time_img = time.time()
 
