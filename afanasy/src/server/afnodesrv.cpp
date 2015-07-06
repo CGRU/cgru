@@ -18,6 +18,7 @@ unsigned long long AfNodeSrv::sm_solve_cycle = 1;
 
 AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
     m_from_store( false),
+	m_stored_ok( false),
     m_solve_need(0.0),
 	m_solve_cycle(0), // 0 means that it was not solved at all
     m_prev_ptr( NULL),

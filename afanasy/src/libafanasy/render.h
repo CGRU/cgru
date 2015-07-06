@@ -92,7 +92,7 @@ public:
 
    virtual void v_jsonWrite( std::ostringstream & o_str, int type) const;
 
-	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
+	bool jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 
 	// Needed for GUI only:
 	std::vector<int32_t> m_tasks_percents;

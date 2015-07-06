@@ -162,6 +162,12 @@ int main(int argc, char *argv[])
 	for( int i = 0; i < folders.size(); i++)
 	{
 		RenderAf * render = new RenderAf( folders[i]);
+		if( render->isStoredOk() != true )
+		{
+			af::removeDir( render->getStoreDir());
+			delete render;
+			continue;
+		}
 		renders.addRender( render);
 	}
 	printf("%d renders registered.\n", renders.getCount());
@@ -179,6 +185,12 @@ int main(int argc, char *argv[])
 	for( int i = 0; i < folders.size(); i++)
 	{
 		UserAf * user = new UserAf( folders[i]);
+		if( user->isStoredOk() != true )
+		{
+			af::removeDir( user->getStoreDir());
+			delete user;
+			continue;
+		}
 		if( users.addUser( user) == 0 )
 			delete user;
 	}
@@ -198,10 +210,12 @@ int main(int argc, char *argv[])
 	for( int i = 0; i < folders.size(); i++)
 	{
 		JobAf * job = NULL;
+
 		if( folders[i] == sysjob_folder)
 			job = new SysJob( folders[i]);
 		else
 			job = new JobAf( folders[i]);
+
 		if( job->isValidConstructed())
 		{
 			if( job->getId() == AFJOB::SYSJOB_ID )
@@ -219,6 +233,11 @@ int main(int argc, char *argv[])
 				}
 			}
 			jobs.job_register( job, &users, NULL);
+		}
+		else
+		{
+			af::removeDir( job->getStoreDir());
+			delete job;
 		}
 	}
 	printf("%d jobs registered from store.\n", jobs.getCount());

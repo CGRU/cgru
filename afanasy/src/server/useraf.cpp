@@ -48,7 +48,8 @@ UserAf::UserAf( const std::string & i_store_dir):
 		return;
 	}
 
-	jsonRead( document);
+	if( jsonRead( document))
+		setStoredOk();
 
 	delete [] res;
 	delete [] data;

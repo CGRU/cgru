@@ -107,7 +107,9 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 	o_str << ",\n\"idle_time\":" << m_idle_time;
 	o_str << ",\n\"busy_time\":" << m_busy_time;
 
-	if( m_tasks.size())
+	// Write tasks if any.
+	// We do not need to store tasks on hdd (when type is zero).
+	if( m_tasks.size() && ( i_type != 0 ))
 	{
 		o_str << ",\n\"tasks\":[";
 		bool first = true;
@@ -123,8 +125,13 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 		o_str << "\n]";
 	}
 
-	o_str << ",\n";
-	m_host.jsonWrite( o_str);
+	// We do not need to store host on hdd,
+	// it will be taken from farm setup when online.
+	if( i_type != 0 )
+	{
+		o_str << ",\n";
+		m_host.jsonWrite( o_str);
+	}
 
 	if( m_services_disabled.size())
 	{
@@ -140,12 +147,12 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Threa
 	o_str << "\n}";
 }
 
-void Render::jsonRead( const JSON &i_object, std::string * io_changes)
+bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 {
 	if( false == i_object.IsObject())
 	{
 		AFERROR("Render::jsonRead: Not a JSON object.")
-		return;
+		return false;
 	}
 
 	jr_string("user_name",   m_user_name,   i_object, io_changes);
@@ -169,7 +176,7 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	// ( but they can be changes by other actions, like disable service)
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
-		return;
+		return true;
 
 	Node::jsonRead( i_object);
 
@@ -178,6 +185,8 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	Client::jsonRead( i_object);
 
 	jr_stringvec("services_disabled", m_services_disabled, i_object);
+
+	return true;
 }
 
 void Render::v_readwrite( Msg * msg) // Thread-safe

@@ -15,6 +15,8 @@ public:
 	void store() const;
 
 	inline bool isFromStore() const { return m_from_store; }
+	inline bool isStoredOk()  const { return m_stored_ok; }
+	inline void setStoredOk() { m_stored_ok = true; }
 	inline const std::string & getStoreDir() const { return m_store_dir; }
 	inline const std::string & getStoreFile() const { return m_store_file; }
 	bool createStoreDir() const;
@@ -94,7 +96,8 @@ private:
 //public:
 
 	af::Node * m_node;
-	bool m_from_store;            ///< Whether the node constructed from store.
+	bool m_from_store;         ///< Whether the node constructed from store.
+	bool m_stored_ok;          ///< Store read successfuly
 	std::string m_store_dir;   ///< Store directory.
 	std::string m_store_file;  ///< Store file.
 
