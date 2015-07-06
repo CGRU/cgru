@@ -232,26 +232,28 @@ for i in range(0, len(Sequences)):
 			job.offline()
 
 	for j in range(0, len(Sequences[i])):
+		seq = Sequences[i][j]
+
 		if Options.verbose or Options.debug:
-			print(Sequences[i][j]['cmd'])
+			print( seq['cmd'])
 
 		if Options.afanasy:
-			block = af.Block(Sequences[i][j]['cmd_name'])
+			block = af.Block(seq['cmd_name'])
 			job.blocks.append(block)
 
-			if Sequences[i][j]['seq']:
+			if seq['seq']:
 				block.setName( seq['cmd_name'] + ':%d-%d=%d' % (seq['first'],seq['last'],seq['count']))
-				first = Sequences[i][j]['first']
-				while first <= Sequences[i][j]['last']:
+				first = seq['first']
+				while first <= seq['last']:
 					last = first + Options.affpt
-					if last > Sequences[i][j]['last']:
-						last = Sequences[i][j]['last']
+					if last > seq['last']:
+						last = seq['last']
 					scene = first
 					if Options.renumpad:
-						scene = first - Sequences[i][j]['first'] + 1
+						scene = first - seq['first'] + 1
 					
-					task = af.Task( Sequences[i][j]['cmd_name'] + ('[%d-%d]' % (scene,scene+last-first-1)))
-					cmd = Sequences[i][j]['cmd']
+					task = af.Task( seq['cmd_name'] + ('[%d-%d]' % (scene,scene+last-first-1)))
+					cmd = seq['cmd']
 					cmd = cmd.replace('@FIRST@', str(first))
 					cmd = cmd.replace('@LAST@',  str(last ))
 					cmd = cmd.replace('@SCENE@', str(scene))
@@ -260,8 +262,8 @@ for i in range(0, len(Sequences)):
 					block.tasks.append( task)
 					first += Options.affpt
 			else:
-				task = af.Task( Sequences[i][j]['cmd_name'])
-				task.setCommand( Sequences[i][j]['cmd'])
+				task = af.Task( seq['cmd_name'])
+				task.setCommand( seq['cmd'])
 				block.tasks.append( task)
 
 			if Options.afcap != -1:
@@ -270,7 +272,7 @@ for i in range(0, len(Sequences)):
 				block.setTasksMaxRunTime(Options.afmrt)
 
 		if not Options.afanasy and not Options.debug:
-			os.system(Sequences[i][j]['cmd'])
+			os.system(seq['cmd'])
 
 	if Options.afanasy:
 		if Options.verbose or Options.debug:
