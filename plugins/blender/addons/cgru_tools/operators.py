@@ -198,6 +198,8 @@ class CGRU_Submit(bpy.types.Operator):
 			job.setHostsMaskExclude(cgru_props.hostsmaskexclude)
 		if cgru_props.pause:
 			job.offLine()
+		if cgru_props.previewPendingApproval:
+			job.setPPApproval()
 		# Make server to delete temporary file after job deletion:
 		job.setCmdPost('deletefiles "%s"' % os.path.abspath(renderscenefile))
 
