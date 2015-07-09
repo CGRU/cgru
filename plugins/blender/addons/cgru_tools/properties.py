@@ -29,7 +29,7 @@ class CGRUProperties(bpy.types.PropertyGroup):
 		description='Pack all Textures into the Blend File.', default=0)
 	splitRenderLayers = BoolProperty(name='Split Render Layers',
 		description='Split Render layer in blocks. Warning: this option disable post-processing passes (compositing nor seqeuncer are execute).', default=0)
-	previewPendingApproval = BoolProperty(name='Preview Pending Approval',default = 0)
+	previewPendingApproval = BoolProperty(name='Preview Pending Approval',default = False)
 
 	# Render Settings:
 	filepath = StringProperty(name='File Path', description='Set File Path. You can use ### to set number of frames',
