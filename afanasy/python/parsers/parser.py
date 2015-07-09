@@ -40,7 +40,7 @@ class parser(
 		if self.numframes < 1:
 			self.numframes = 1
 
-	def appendFile(self, i_file, i_onthefly):
+	def appendFile(self, i_file, i_onthefly = False):
 		"""Missing DocString
 
 		:param i_file:
