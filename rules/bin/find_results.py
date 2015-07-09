@@ -18,6 +18,7 @@ Parser = OptionParser(
 Parser.add_option('-r', '--respaths',     dest='respaths',     type  ='string',     default='RESULT/JPG,RESULT/TIF,RESULT/DPX')
 Parser.add_option('-d', '--dest',         dest='dest',         type  ='string',     default=None,  help='Destination')
 Parser.add_option('-p', '--padding',      dest='padding',      type  ='int',        default=3,     help='Version padding')
+Parser.add_option('-s', '--skipcheck',    dest='skipcheck',    action='store_true', default=False, help='Skip destination check')
 Parser.add_option('-e', '--skiperrors',   dest='skiperrors',   action='store_true', default=False, help='Skip error folders')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False, help='Verbose mode')
 
@@ -51,9 +52,10 @@ if len(args) < 1:
 DestFiles = None
 if Options.dest is not None:
 	Out['dest'] = Options.dest
-	if not os.path.isdir( Options.dest):
-		errExit('Destination folder does not exist.')
-	DestFiles = os.listdir( Options.dest)
+	if not Options.skipcheck:
+		if not os.path.isdir( Options.dest):
+			errExit('Destination folder does not exist.')
+		DestFiles = os.listdir( Options.dest)
 
 ResPaths = Options.respaths.split(',')
 
@@ -119,10 +121,11 @@ for src in args:
 
 	if Options.dest is not None:
 		result['dest'] = os.path.join(Options.dest, name)
-		for afile in DestFiles:
-			if afile.find( result['name']) == 0:
-				result['exist'] = True
-				break
+		if DestFiles is not None:
+			for afile in DestFiles:
+				if afile.find( result['name']) == 0:
+					result['exist'] = True
+					break
 
 	Results.append(result)
 

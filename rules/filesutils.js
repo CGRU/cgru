@@ -235,8 +235,9 @@ function fu_ChecksumDo( i_wnd)
 
 fu_putmulti_params = {};
 fu_putmulti_params.input        = {"label":'Result Paths'};
-fu_putmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'50%'};
-fu_putmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'50%'};
+fu_putmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'33%'};
+fu_putmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'33%'};
+fu_putmulti_params.skipcheck    = {"label":'Skip Check',   'type':"bool",'default':false,"width":'33%'};
 fu_putmulti_params.dest         = {"label":'Destination'};
 fu_putmulti_params.af_capacity  = {'label':'Capacity',  'width':'20%','type':'int',};
 fu_putmulti_params.af_maxtasks  = {'label':'Max Tasks', 'width':'15%','lwidth':'80px','type':'int'};
@@ -248,6 +249,7 @@ fu_findres_params = {};
 fu_findres_params.input = {};
 fu_findres_params.dest = {};
 fu_findres_params.skiperrors = {'type':"bool",'default':false};
+fu_findres_params.skipcheck = {'type':"bool",'default':false};
 
 function fu_PutMultiDialog( i_args)
 {
@@ -324,7 +326,8 @@ function fu_ResultsFind( i_wnd)
 	var cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
 	cmd += ' -d "' + params.dest + '"';
-	if( params.skiperrors ) cmd += ' -e';
+	if( params.skipcheck  ) cmd += ' --skipcheck';
+	if( params.skiperrors ) cmd += ' --skiperrors';
 
 	for( var i = 0; i < paths.length; i++)
 		cmd += ' "' + cgru_PM('/' + RULES.root + paths[i], true) + '"';
