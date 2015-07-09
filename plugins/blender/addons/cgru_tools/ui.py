@@ -47,6 +47,7 @@ class RENDER_PT_Afanasy(bpy.types.Panel):
 			col = split.column()
 			col.prop(cgru_props, 'pause')
 			col.prop(cgru_props, 'splitRenderLayers')
+			col.prop(cgru_props, 'previewPendingApproval')
 
 			layout.separator()
 			col = layout.column()
