@@ -1242,6 +1242,12 @@ function fv_PreviewOpen( i_el)
 	elPreview.appendChild( elVideo);
 	elVideo.controls = true;
 	elVideo.classList.add('video');
+	elVideo.onloadeddata = function(e){
+		var el = e.currentTarget;
+		var pw = el.parentNode.clientWidth;
+		if( el.videoWidth > pw )
+			el.width = Math.round(.9 * pw);
+	};
 
 	var elSource = document.createElement('source');
 	elVideo.appendChild( elSource);
