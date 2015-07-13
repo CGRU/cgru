@@ -18,6 +18,9 @@ prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
 prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
+prj_deploy_shots_params.prefix    = {"width":'33%',"tooltip":'Add a prefix to each shot name.'};
+prj_deploy_shots_params.regexp    = {"width":'33%',"tooltip":'Perform a regular expression replace.'};
+prj_deploy_shots_params.substr    = {"width":'33%',"tooltip":'Perform a regular expression replace.'};
 prj_deploy_shots_params.sameshot  = {"width":'25%','type':"bool",'default':false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
 prj_deploy_shots_params.extract   = {"width":'25%','type':"bool",'default':false,"tooltip":'Extract sources folder.'};
 prj_deploy_shots_params.uppercase = {"width":'25%','type':"bool",'default':false,"tooltip":'Convert shot names to upper case.'};
@@ -108,6 +111,9 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	if( params.extract ) cmd += ' --extract';
 	if( params.uppercase ) cmd += ' -u';
 	if( params.padding.length ) cmd += ' -p ' + params.padding;
+	if( params.prefix.length ) cmd += ' --prefix "' + params.prefix + '"';
+	if( params.regexp.length ) cmd += ' --regexp "' + params.regexp + '"';
+	if( params.substr.length ) cmd += ' --substr "' + params.substr + '"';
 
 	if( i_args.move )
 		cmd += ' -m';

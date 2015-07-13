@@ -21,7 +21,10 @@ Parser.add_option('-s', '--sources',  dest='sources',  type  ='string',     defa
 Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     default='',    help='Destination')
 Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default='',    help='References')
 Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
-Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default='',    help='Shot renaming padding (Ex:"432")')
+Parser.add_option(      '--prefix',   dest='prefix',   type  ='string',     default=None,  help='Shot renaming prefix')
+Parser.add_option(      '--regexp',   dest='regexp',   type  ='string',     default=None,  help='Shot renaming regexp')
+Parser.add_option(      '--substr',   dest='substr',   type  ='string',     default=None,  help='Shot renaming substr')
+Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default=None,  help='Shot renaming padding (Ex:"432")')
 Parser.add_option(      '--extract',  dest='extract',  action='store_true', default=False, help='Extract source folder(s)')
 Parser.add_option(      '--sameshot', dest='sameshot', action='store_true', default=False, help='"NAME" and "NAME-1" will be one shot')
 Parser.add_option('-u', '--uppercase',dest='uppercase',action='store_true', default=False, help='Rename shot uppercase')
@@ -95,6 +98,10 @@ if Options.refs != '' and os.path.isdir(Options.refs):
 	References = os.listdir(Options.refs)
 # References.sort()
 
+RegExp = None
+if Options.regexp is not None and Options.substr is not None:
+	RegExp = re.compile( Options.regexp, re.I|re.M)
+
 Sources = os.listdir(Options.sources)
 Sources.sort()
 Sources_skip = []
@@ -132,7 +139,7 @@ for shot_folder in Sources:
 			src_refs.append(os.path.join(ref_path))
 
 	# Rename shot padding:
-	if Options.padding != '':
+	if Options.padding is not None:
 		words = re.findall(r'\D+', shot_name)
 		digits = re.findall(r'\d+', shot_name)
 		if len(words) == len(digits):
@@ -150,6 +157,14 @@ for shot_folder in Sources:
 	# Rename shot uppercase:
 	if Options.uppercase:
 		shot_name = shot_name.upper()
+
+	# Rename shot regexp:
+	if RegExp is not None:
+		shot_name = RegExp.sub( Options.substr, shot_name)
+
+	# Rename shot prefix:
+	if Options.prefix is not None:
+		shot_name = Options.prefix + shot_name
 
 	shot_dest = os.path.join(Options.dest, shot_name)
 
