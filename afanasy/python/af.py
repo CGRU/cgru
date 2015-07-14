@@ -759,7 +759,7 @@ class Job:
 		"""
 		# this will only pass positive int		
 		if str(value).isdigit():
-			self.data['time_file'] = value
+			self.data['time_life'] = value
 
 
 class Cmd:
