@@ -64,7 +64,7 @@ Parser.add_option('--afuser',           dest='afuser',      type  ='string',    
 Parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makemovie+date will be used')
 Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='tga',       help='Temporary images format')
 Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
-Parser.add_option('--audio',            dest='audio',       type  ='string',     default='',          help='Add sound from audio file')
+Parser.add_option('--audio',            dest='audio',       type  ='string',     default=None,        help='Add sound from audio file')
 Parser.add_option('--afreq',            dest='afreq',       type  ='int',        default=22000,       help='Audio frequency')
 Parser.add_option('--akbits',           dest='akbits',      type  ='int',        default=128,         help='Audio kilo bits rate')
 Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='libmp3lame',help='Audio codec')
@@ -534,12 +534,11 @@ cmd_precomp = []
 name_precomp = []
 
 # Extract audio track(s) from file to flac if it is not flac already:
-if len(Audio):
+if Audio is not None:
 	if not os.path.isfile(Audio):
-		print('Error: Audio file does not exist:')
-		print(Audio)
-		exit(1)
-	if len(Audio) >= 5:
+		print('Audio file "%s" does not exist.' % Audio)
+		Audio = None
+	elif len(Audio) >= 5:
 		if Audio[-5:] != '.flac':
 			cmd_precomp.append(
 				'ffmpeg -y -i "%(audio)s" -vn -acodec flac "%(audio)s.flac"' %
@@ -660,8 +659,11 @@ else:
 	print('Unknown encoder type = "%s"' % EncType)
 	exit(1)
 
-if len(Audio) and EncType == 'ffmpeg':
-	inputmask += '" -i "%s"' % Audio
+if Audio is not None and EncType == 'ffmpeg':
+	inputmask += '"'
+	inputmask += ' -itsoffset %.3f' % ( 1.0 / float(Options.fps))
+	inputmask += ' -i "%s"' % Audio
+	inputmask += ' -shortest'
 	inputmask += ' -ar %d' % Options.afreq
 	inputmask += ' -ab %dk' % Options.akbits
 	inputmask += ' -acodec "%s' % Options.acodec
@@ -820,7 +822,7 @@ else:
 		print('')
 
 	print('ACTIVITY: Encode')
-	if Verbose: print(cmd_encode)
+	print(cmd_encode)
 	sys.stdout.flush()
 	os.system(cmd_encode)
 

@@ -16,6 +16,7 @@ d_params.general.output = {};
 d_params.general.filename = {"width":'75%'}
 d_params.general.fps = {"label":'FPS',"width":'25%',"lwidth":'70px'};
 
+d_params.settings.audio_file = {"label":'Audio',"default":"REF/sound.flac","tooltip":'Sound file'}
 d_params.settings.af_depend_mask = {"label":'Depends',"tooltip":'Afanasy job depend mask'}
 d_params.settings.fffirst = {"label":"F.F.First","tooltip":'First frame is "1"\nNo matter image file name number.'};
 d_params.settings.aspect_in = {"label":'Aspect In'};
@@ -176,15 +177,15 @@ function d_ProcessGUI( i_wnd)
 		job.depend_mask = params.af_depend_mask;
 
 	job.folders = {};
-	job.folders.input  = cgru_PM('/' + RULES.root+c_PathDir(params.input), true);
-	job.folders.output = cgru_PM('/' + RULES.root+params.output, true);
+	job.folders.input  = cgru_PM('/' + RULES.root + c_PathDir(params.input), true);
+	job.folders.output = cgru_PM('/' + RULES.root + params.output, true);
 
 	var block = {};
 	block.name = 'Dailies';
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root+params.output, true);
+	block.working_directory = cgru_PM('/' + RULES.root + g_CurPath(), true);
 	job.blocks = [block];
 
 	var task = {}
@@ -228,6 +229,14 @@ function d_MakeCmd( i_params)
 		cmd += ' -g ' + params.gamma;
 	if( params.fffirst != '' )
 		cmd += ' --fffirst';
+
+	if( params.audio_file != '' )
+	{
+		cmd += ' --audio "' + params.audio_file + '"';
+		cmd += ' --acodec "' + 'libfaac' + '"';
+		cmd += ' --afreq ' + 22000;
+		cmd += ' --akbits ' + 128;
+	}
 
 	cmd += ' --lgspath "'+params.logo_slate_path+'"';
 	cmd += ' --lgssize '+params.logo_slate_size;
