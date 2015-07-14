@@ -47,18 +47,16 @@ function d_Make( i_path, i_outfolder)
 	params.artist = c_GetUserTitle();
 	if( RULES.status && RULES.status.artists && RULES.status.artists.length )
 	{
-		artist = c_GetUserTitle( RULES.status.artists[0]);
+		if( RULES.status.artists.indexOf( g_auth_user.id) == -1 )
+			params.artist = c_GetUserTitle( RULES.status.artists[0]);
 
-		if( artist != c_GetUserTitle() || ( RULES.status.artists.length > 1 ))
-		{
-			params.artist = artist;
-			var artists = [];
-			for( var i = 0; i < RULES.status.artists.length; i++)
-				artists.push( c_GetUserTitle( RULES.status.artists[i]));
-			if( artists.indexOf( c_GetUserTitle()) == -1 )
-				artists.push( c_GetUserTitle());
+		var artists = [];
+		for( var i = 0; i < RULES.status.artists.length; i++)
+			artists.push( c_GetUserTitle( RULES.status.artists[i]));
+		if( artists.indexOf( c_GetUserTitle()) == -1 )
+			artists.push( c_GetUserTitle());
+		if( artists.length > 1 )
 			d_params.general.artist.pulldown = artists;
-		}
 	}
 
 	var dateObj = new Date();
