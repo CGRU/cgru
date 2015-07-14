@@ -719,7 +719,11 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 
 	if( ok == false) return false;
 
-	if( set_string.isEmpty() == false)
+	if( set_string.isNull())
+	{
+		i_str << set_number;
+	}
+	else
 	{
 		QRegExp rx( set_string, Qt::CaseInsensitive);
 		if( rx.isValid() == false)
@@ -729,8 +733,6 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 		}
 		i_str << '"' << set_string.toUtf8().data() << '"';
 	}
-	else
-		i_str << set_number;
 
 	i_str << '}';
 
