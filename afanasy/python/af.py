@@ -751,6 +751,15 @@ class Job:
 		"""Missing DocString
 		"""
 		self.data["offline"] = True
+		
+	def setTimeLife(self, value):
+		"""Set job's time-life after which it will automatically be deleted.
+
+		:param value: time in seconds
+		"""
+		# this will only pass positive int		
+		if str(value).isdigit():
+			self.data['time_file'] = value
 
 
 class Cmd:
