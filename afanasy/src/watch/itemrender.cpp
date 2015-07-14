@@ -201,7 +201,6 @@ void ItemRender::updateValues( af::Node *node, int type)
 		// It became offline:
 	    if( m_online && ( render->isOnline() == false))
 		{
-	        m_tooltip_resources.clear();
 	        for( unsigned i = 0; i < m_plots.size(); i++)
 	            m_plots[i]->height = 0;
 		}
@@ -280,8 +279,6 @@ void ItemRender::updateValues( af::Node *node, int type)
 	    m_state += '-' + QString::number( m_priority);
 		if( isLocked() ) m_state += " (LOCK)";
 
-		m_tooltip_base = render->v_generateInfoString( true);
-
 		if( false == becameOnline)
 		{
 			m_tasks_percents = render->m_tasks_percents;
@@ -296,8 +293,6 @@ void ItemRender::updateValues( af::Node *node, int type)
 	    m_hres.copy( render->getHostRes());
 		m_idle_time = render->getIdleTime();
 		m_busy_time = render->getBusyTime();
-
-	    m_tooltip_resources = m_hres.v_generateInfoString( true);
 
 	    int cpubusy = m_hres.cpu_user + m_hres.cpu_nice + m_hres.cpu_system + m_hres.cpu_iowait + m_hres.cpu_irq + m_hres.cpu_softirq;
 	    int mem_used = m_hres.mem_total_mb - m_hres.mem_free_mb;
@@ -375,10 +370,6 @@ void ItemRender::updateValues( af::Node *node, int type)
 	if( m_wolWaking ) m_offlineState = "Waking Up";
 	else if( m_wolSleeping || m_wolFalling) m_offlineState = "Sleeping";
 	else m_offlineState = "Offline";
-
-	tooltip = afqt::stoq( m_tooltip_base);
-	if( false == m_tooltip_resources.empty())
-	    tooltip += "\n" + afqt::stoq( m_tooltip_resources);
 }
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const

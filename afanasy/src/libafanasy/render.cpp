@@ -311,18 +311,20 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isWOLSleeping()) stream << " WOL-Sleeping";
 		if( isWOLWaking()) stream << " WOL-Waking";
 
-	  stream << "\n Priority = " << int(m_priority);
-      stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
-      stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
+		stream << "\n Priority = " << int(m_priority);
+		stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
+		stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
-	  if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
-		stream << "\n Idle Time = " << time2str( m_idle_time) << " CPU < " << m_host.m_idle_cpu << "%";
-		stream << "\n Busy Time = " << time2str( m_busy_time) << " CPU > " << m_host.m_busy_cpu << "%";
-	  if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
-	  if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
+		if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
 
-      stream << std::endl;
-	  m_host.v_generateInfoStream( stream, full);
+		stream << "\n Idle Time = " << time2str( m_idle_time);
+		stream << "\n Busy Time = " << time2str( m_busy_time);
+
+		if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
+		if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
+
+		stream << std::endl;
+		m_host.v_generateInfoStream( stream, full);
 
 	  if( m_netIFs.size())
       {
@@ -334,7 +336,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
          }
       }
 
-//      hres.generateInfoStream( stream ,full);
+		m_hres.v_generateInfoStream( stream ,full);
    }
    else
    {

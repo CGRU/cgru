@@ -38,10 +38,29 @@ public:
 	std::string m_data;
 
 	int32_t m_wol_idlesleep_time;
+
+
 	int32_t m_nimby_idlefree_time;
 	int32_t m_nimby_busyfree_time;
-	int32_t m_idle_cpu;
-	int32_t m_busy_cpu;
+
+	int32_t m_nimby_idle_cpu;
+	int32_t m_nimby_busy_cpu;
+
+	int32_t m_nimby_idle_mem;
+	int32_t m_nimby_busy_mem;
+
+	int32_t m_nimby_idle_swp;
+	int32_t m_nimby_busy_swp;
+
+	int32_t m_nimby_idle_hddgb;
+	int32_t m_nimby_busy_hddgb;
+
+	int32_t m_nimby_idle_hddio;
+	int32_t m_nimby_busy_hddio;
+
+	int32_t m_nimby_idle_netmbs;
+	int32_t m_nimby_busy_netmbs;
+
 
 	void v_readwrite( Msg * msg); ///< Read or write Host in message.
 

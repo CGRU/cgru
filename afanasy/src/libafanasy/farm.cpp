@@ -182,10 +182,30 @@ bool Farm::getFarm( const JSON & i_obj)
 		jr_int32("power", host.m_power, patterns[i]);
 		jr_int32("maxtasks", host.m_max_tasks, patterns[i]);
 		jr_int32("wol_idlesleep_time", host.m_wol_idlesleep_time, patterns[i]);
+
+
 		jr_int32("nimby_idlefree_time", host.m_nimby_idlefree_time, patterns[i]);
 		jr_int32("nimby_busyfree_time", host.m_nimby_busyfree_time, patterns[i]);
-		jr_int32("idle_cpu", host.m_idle_cpu, patterns[i]);
-		jr_int32("busy_cpu", host.m_busy_cpu, patterns[i]);
+
+		jr_int32("nimby_idle_cpu", host.m_nimby_idle_cpu, patterns[i]);
+		jr_int32("nimby_busy_cpu", host.m_nimby_busy_cpu, patterns[i]);
+
+		jr_int32("nimby_idle_mem", host.m_nimby_idle_mem, patterns[i]);
+		jr_int32("nimby_busy_mem", host.m_nimby_busy_mem, patterns[i]);
+
+		jr_int32("nimby_idle_swp", host.m_nimby_idle_swp, patterns[i]);
+		jr_int32("nimby_busy_swp", host.m_nimby_busy_swp, patterns[i]);
+
+		jr_int32("nimby_idle_hddgb", host.m_nimby_idle_hddgb, patterns[i]);
+		jr_int32("nimby_busy_hddgb", host.m_nimby_busy_hddgb, patterns[i]);
+
+		jr_int32("nimby_idle_hddio", host.m_nimby_idle_hddio, patterns[i]);
+		jr_int32("nimby_busy_hddio", host.m_nimby_busy_hddio, patterns[i]);
+
+		jr_int32("nimby_idle_netmbs", host.m_nimby_idle_netmbs, patterns[i]);
+		jr_int32("nimby_busy_netmbs", host.m_nimby_busy_netmbs, patterns[i]);
+
+
 		if( jr_stringvec("remservices", remservices, patterns[i]))
 			if( remservices.size() == 0 )
 				clear_services = true;

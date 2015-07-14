@@ -49,8 +49,6 @@ private:
 	void deletePlots();
 
 private:
-	std::string m_tooltip_base;
-	std::string m_tooltip_resources;
 
 	af::Host    m_host;
 	af::HostRes m_hres;

@@ -550,56 +550,154 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 		return;
 	}
 
-	// Update busy cpu with no task time:
-	if(( isFree() == false ) || isBusy() || ((100 - m_hres.cpu_idle) < m_host.m_busy_cpu ))
+	// Later auto nimby operations not needed if render is not online:
+	if( isOffline())
+	{
 		m_busy_time = currentTime;
+		m_idle_time = currentTime;
+		return;
+	}
+
+	// Update busy with no task time:
+	if(( isFree() == false ) || isBusy()) // already nimby or has task(s)
+	{
+		m_busy_time = currentTime;
+	}
 	else
 	{
-		// Automatic Nimby ON:
-		if(( m_host.m_nimby_busyfree_time > 0 ) && isOnline()
-			&& ( currentTime - m_busy_time > m_host.m_nimby_busyfree_time ))
+		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
+
+		// CPU % busy:
+		if(( m_host.m_nimby_busy_cpu <= 0 ) ||
+			(( 100 - m_hres.cpu_idle ) < m_host.m_nimby_busy_cpu ))
+			cpu = 1;
+
+		// Mem % used:
+		if(( m_hres.mem_total_mb <= 0 ) || ( m_host.m_nimby_busy_mem <= 0 ) ||
+			(( 100 * ( m_hres.mem_total_mb - m_hres.mem_free_mb ) / m_hres.mem_total_mb ) < m_host.m_nimby_busy_mem ))
+			mem = 1;
+
+		// Swap % used:
+		if(( m_hres.swap_total_mb <= 0 ) || (( m_host.m_nimby_busy_swp <= 0 ) ||
+			( 100 * m_hres.swap_used_mb / m_hres.swap_total_mb ) < m_host.m_nimby_busy_swp ))
+			swp = 1;
+
+		// Hdd free GB:
+		if(( m_hres.hdd_total_gb <= 0 ) || ( m_host.m_nimby_busy_hddgb <= 0 ) ||
+			( m_hres.hdd_free_gb > m_host.m_nimby_busy_hddgb ))
+			hgb = 1;
+
+		// Hdd I/O %:
+		if(( m_host.m_nimby_busy_hddio <= 0 ) ||
+			( m_hres.hdd_busy < m_host.m_nimby_busy_hddio ))
+			hio = 1;
+
+		// Net Mb/s:
+		if(( m_host.m_nimby_busy_netmbs <= 0 ) ||
+		( m_hres.net_recv_kbsec + m_hres.net_send_kbsec < 1024 * m_host.m_nimby_busy_netmbs ))
+			net = 1;
+
+		// Render will be treated as 'not busy' if all params are 'not busy'
+		if( cpu & mem & swp & hio & hgb & net )
 		{
+			m_busy_time = currentTime;
+		}
+		else if(( m_host.m_nimby_busyfree_time > 0 ) && ( currentTime - m_busy_time > m_host.m_nimby_busyfree_time ))
+		{
+		// Automatic Nimby ON:
 			std::string log("Automatic Nimby: ");
-			log += "\n CPU busy since: " + af::time2str( m_busy_time) + " CPU >= " + af::itos( m_host.m_busy_cpu) + "%";
+			log += "\n Busy since: " + af::time2str( m_busy_time);// + " CPU >= " + af::itos( m_host.m_nimby_busy_cpu) + "%";
 			log += "\n Nimby busy free time = " + af::time2strHMS( m_host.m_nimby_busyfree_time, true );
 			appendLog( log);
 			setNIMBY();
 			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 			store();
 		}
+		//printf("BUSY: %li-%li=%li\n", currentTime, m_busy_time, currentTime-m_busy_time);
 	}
-//printf("CPU busy with no task: %li-%li=%li, C%u%%(>%d%%) nbf=%dsecs\n", currentTime, m_busy_time, currentTime-m_busy_time, 100-m_hres.cpu_idle, m_host.m_busy_cpu, m_host.m_nimby_busyfree_time);
 
 	// Update idle time:
-	if( isBusy() || ((100 - m_hres.cpu_idle) >= m_host.m_idle_cpu ))
-		m_idle_time = currentTime;
-	else 
+	if( isBusy())
 	{
-		// Automatic WOL sleep:
-		if(( m_host.m_wol_idlesleep_time > 0 ) && isOnline() && ( isWOLSleeping() == false) && ( isWOLFalling() == false)
-			&& ( currentTime - m_idle_time > m_host.m_wol_idlesleep_time ))
-		{
-			std::string log("Automatic WOL Sleep: ");
-			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu) + "%";
-			log += "\n WOL idle sleep time = " + af::time2strHMS( m_host.m_wol_idlesleep_time, true );
-			appendLog( log);
-			wolSleep( monitoring);
-		}
-
-		// Automatic Nimby Free:
-		if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false)
-			&& ( currentTime - m_idle_time > m_host.m_nimby_idlefree_time ))
-		{
-			std::string log("Automatic Nimby Free: ");
-			log += "\n Idle since: " + af::time2str( m_idle_time) + " CPU < " + af::itos( m_host.m_idle_cpu) + "%";
-			log += "\n Nimby idle free time = " + af::time2strHMS( m_host.m_nimby_idlefree_time, true );
-			appendLog( log);
-			setFree();
-			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
-			store();
-		}
+		m_idle_time = currentTime;
 	}
-//printf("Idle: %li-%li=%li, C%u%%(<%d%%) (w%d,n%d)secs\n", currentTime, m_idle_time, currentTime-m_idle_time, 100-m_hres.cpu_idle, m_host.m_idle_cpu, m_host.m_wol_idlesleep_time, m_host.m_nimby_idlefree_time);
+	else if(( m_host.m_nimby_idle_cpu    <= 0 ) &&
+			( m_host.m_nimby_idle_mem    <= 0 ) &&
+			( m_host.m_nimby_idle_swp    <= 0 ) &&
+			( m_host.m_nimby_idle_hddgb  <= 0 ) &&
+			( m_host.m_nimby_idle_hddio  <= 0 ) &&
+			( m_host.m_nimby_idle_netmbs <= 0 ))
+	{
+		// If all params are 'off' there is no 'idle':
+		m_idle_time = currentTime;
+	}
+	else
+	{
+		int cpu=0,mem=0,swp=0,hgb=0,hio=0,net=0;
+
+		// CPU % busy:
+		if(( m_host.m_nimby_idle_cpu > 0 ) &&
+			(( 100 - m_hres.cpu_idle) > m_host.m_nimby_idle_cpu ))
+			cpu = 1;
+
+		// Mem % used:
+		if(( m_hres.mem_total_mb > 0 ) && ( m_host.m_nimby_idle_mem > 0 ) &&
+			(( 100 * ( m_hres.mem_total_mb - m_hres.mem_free_mb ) / m_hres.mem_total_mb ) > m_host.m_nimby_idle_mem ))
+			mem = 1;
+
+		// Swap % used:
+		if(( m_hres.swap_total_mb ) && ( m_host.m_nimby_idle_swp > 0 ) &&
+			(( 100 * m_hres.swap_used_mb / m_hres.swap_total_mb ) > m_host.m_nimby_idle_swp ))
+			swp = 1;
+
+		// Hdd free GB:
+		if(( m_hres.hdd_total_gb > 0 ) && ( m_host.m_nimby_idle_hddgb > 0 ) &&
+			( m_hres.hdd_free_gb < m_host.m_nimby_idle_hddgb ))
+			hgb = 1;
+
+		// Hdd I/O %:
+		if(( m_host.m_nimby_idle_hddio > 0 ) &&
+			( m_hres.hdd_busy > m_host.m_nimby_idle_hddio ))
+			hio = 1;
+
+		// Net Mb/s:
+		if(( m_host.m_nimby_idle_netmbs > 0 ) &&
+			( m_hres.net_recv_kbsec + m_hres.net_send_kbsec > 1024 * m_host.m_nimby_idle_netmbs ))
+			net = 1;
+
+		// it will be treated as 'not idle' any param is 'not idle'
+		if( cpu | mem | swp | hio | hgb | net )
+		{
+			m_idle_time = currentTime;
+		}
+		else 
+		{
+			// Automatic WOL sleep:
+			if(( m_host.m_wol_idlesleep_time > 0 ) && isOnline() && ( isWOLSleeping() == false) && ( isWOLFalling() == false)
+				&& ( currentTime - m_idle_time > m_host.m_wol_idlesleep_time ))
+			{
+				std::string log("Automatic WOL Sleep: ");
+				log += "\n Idle since: " + af::time2str( m_idle_time);
+				log += "\n WOL idle sleep time = " + af::time2strHMS( m_host.m_wol_idlesleep_time, true );
+				appendLog( log);
+				wolSleep( monitoring);
+			}
+
+			// Automatic Nimby Free:
+			if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false)
+				&& ( currentTime - m_idle_time > m_host.m_nimby_idlefree_time ))
+			{
+				std::string log("Automatic Nimby Free: ");
+				log += "\n Idle since: " + af::time2str( m_idle_time);
+				log += "\n Nimby idle free time = " + af::time2strHMS( m_host.m_nimby_idlefree_time, true );
+				appendLog( log);
+				setFree();
+				monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+				store();
+			}
+		}
+		//printf("IDLE: %li-%li=%li\n", currentTime, m_idle_time, currentTime-m_idle_time);
+	}
 }
 
 void RenderAf::notSolved()
