@@ -52,6 +52,7 @@ namespace AFGUI
 	const char CLR_ITEMJOB[]         = "3A464C";
 	const char CLR_ITEMJOBERROR[]    = "7F6550";
 	const char CLR_ITEMJOBOFF[]      = "50544C";
+	const char CLR_ITEMJOBPPA[]      = "887711";
 	const char CLR_ITEMJOBWTIME[]    = "477777";
 	const char CLR_ITEMJOBWDEP[]     = "61546E";
 	const char CLR_ITEMJOBDONE[]     = "2A394C";
