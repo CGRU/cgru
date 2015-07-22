@@ -12,7 +12,7 @@ from cgrupyqt import QtCore, QtGui
 Names = ['Blender','Houdini','Maya','Natron','Nuke','NukeX']
 
 if 'windows' in cgruconfig.VARS['platform']:
-	Names.extend(['3DSMax', 'Softimage'])
+	Names.extend(['3DSMax','Fusion','Softimage'])
 if 'windows' in cgruconfig.VARS['platform'] \
 	or 'macosx' in cgruconfig.VARS['platform']:
 	Names.extend(['C4D','AfterFX'])
@@ -36,6 +36,10 @@ def startC4D():
 
 def startHoudini():
 	startDetached('houdini')
+
+
+def startFusion():
+	startDetached('fusion')
 
 
 def startMaya():
@@ -93,6 +97,10 @@ def exampleBlender():
 
 def exampleC4D():
 	exampleSoftware('Cinema 4D', 'start_c4d')
+
+
+def exampleFusion():
+	exampleSoftware('Fusion', 'start_fusion')
 
 
 def exampleHoudini():
@@ -179,6 +187,10 @@ def locateBlender():
 
 def locateC4D():
 	locateSoftware('C4D')
+
+
+def locateFusion():
+	locateSoftware('Fusion')
 
 
 def locateHoudini():

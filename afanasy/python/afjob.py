@@ -769,6 +769,15 @@ if __name__ == '__main__':
 
 		cmd += ' -v 2 -nstdin -dw -dp -nocrashpopup'
 
+	# Fusion:
+	elif ext == 'comp':
+		scenetype = 'fusion'
+		if cmd is None:
+			cmd = 'fusion' + cmdextension
+
+		cmd += ' "%s"' % scene
+		cmd += ' /render /start @#@ /end @#@ /step %d /verbose /quiet /quietlicense /clean /quit' % by
+
 	# simple generic:
 	else:
 		scenetype = 'generic'
