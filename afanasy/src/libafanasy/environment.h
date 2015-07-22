@@ -146,7 +146,9 @@ public:
 	static inline int getRenderUpdateTaskPeriod()      { return render_updatetaskperiod;     }
 	static inline int getRenderZombieTime()            { return render_zombietime;           }
 	static inline int getRenderConnectRetries()        { return render_connectretries;       }
+
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
+	static inline std::vector<std::string> & getProjectsRoot()         { return projects_root;         }
 
 	static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
 	static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
@@ -317,6 +319,10 @@ private:
 	static int server_so_rcvtimeo_sec;
 	static int server_so_sndtimeo_sec;
 	static int server_so_msgtimeo_sec;
+
+	// Misc:
+
+	static std::vector<std::string> projects_root;
 
 	static Passwd * passwd;
 	static bool visor_mode;     ///< user is VISOR

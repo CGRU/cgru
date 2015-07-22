@@ -14,8 +14,9 @@
 	"realm":"CGRU",
 
 	"":"To open shot in RULES:",
-	"rules_url":"http://rules:55555/#/",
-	"rules_projects":["/mnt/prj/","/projects/"],
+	"rules_url":"http://localhost/cgru/#/",
+
+	"projects_root":["/mnt/prj/","/projects/","/cgru/rules_root/"],
 
 	"-nuke_filenamefilter":true,
 

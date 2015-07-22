@@ -42,8 +42,8 @@ parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    de
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
-parser.add_option(      '--folder',       dest='folder',       type='string', default='', help='add a folder')
-parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None,help='Sequential running')
+parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
+parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
 parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
@@ -76,10 +76,9 @@ if jobname == '':
 
 job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
-job.setFolder('pwd', os.getcwd())
-job.setFolder('test', '/this/is/a/test')
-if options.folder and len(options.folder):
+if options.folder is not None:
 	job.setFolder('folder', options.folder)
+job.setFolder('pwd', os.getcwd())
 
 blocknames = []
 if options.labels != '':

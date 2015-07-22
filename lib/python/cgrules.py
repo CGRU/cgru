@@ -14,10 +14,10 @@ def getShotURL( i_path, i_verbose = False):
 	path = i_path.replace('\\','/')
 
 	if i_verbose:
-		print('Projects:')
-		print(cgruconfig.VARS['rules_projects'])
+		print('Projects root:')
+		print(cgruconfig.VARS['projects_root'])
 
-	for prj in cgruconfig.VARS['rules_projects']:
+	for prj in cgruconfig.VARS['projects_root']:
 		if path.find( prj) == 0:
 			path = path.replace(prj,'')
 			break

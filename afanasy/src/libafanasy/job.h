@@ -59,6 +59,8 @@ public:
 	inline const std::string & getCustomData()   const { return m_custom_data; }
 	inline const std::string & getThumbPath()    const { return m_thumb_path;  }
 
+	const std::string getFolder() const;
+
 	inline bool isStarted()  const { return m_time_started != 0 ;                } ///< Whether a job is started.
 	inline bool isReady()    const { return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
 	inline bool isRunning()  const { return m_state & AFJOB::STATE_RUNNING_MASK; } ///< Whether a job is running.

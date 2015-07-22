@@ -55,7 +55,11 @@ int     Environment::render_update_sec =               AFRENDER::UPDATEPERIOD;
 int     Environment::render_updatetaskperiod =         AFRENDER::UPDATETASKPERIOD;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
+
+
+std::vector<std::string> Environment::projects_root;
 std::vector<std::string> Environment::render_windowsmustdie;
+
 std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
  
 std::string Environment::render_exec =                 AFRENDER::EXEC;
@@ -165,6 +169,8 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, serverport,                        "af_serverport"                        );
 	getVar( i_obj, clientport,                        "af_clientport"                        );
 	getVar( i_obj, http_serve_dir,                    "af_http_serve_dir"                    );
+
+	getVar( i_obj, projects_root,                     "projects_root"                        );
 
 	getVar( i_obj, pswd_visor,                        "pswd_visor"                           );
 	getVar( i_obj, pswd_god,                          "pswd_god"                             );

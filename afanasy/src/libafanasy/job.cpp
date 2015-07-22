@@ -314,6 +314,9 @@ void Job::v_readwrite( Msg * msg)
 	rw_RegExp  ( m_need_os,            msg);
 	rw_RegExp  ( m_need_properties,    msg);
 
+//	NEW VERSION:
+//	rw_StringMap( m_folders, msg);
+
 	rw_blocks(  msg);
 }
 
@@ -356,6 +359,20 @@ BlockData * Job::newBlockData( Msg * msg)
 BlockData * Job::newBlockData( const JSON & i_object, int i_num)
 {
    return new BlockData( i_object, i_num);
+}
+
+const std::string Job::getFolder() const
+{
+	std::string folder;
+
+	std::map<std::string,std::string>::const_iterator it = m_folders.begin();
+
+	if( it == m_folders.end())
+		return folder;
+
+	folder = (*it).second;
+
+	return folder;
 }
 
 int Job::v_calcWeight() const
