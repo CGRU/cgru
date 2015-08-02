@@ -579,6 +579,9 @@ if __name__ == '__main__':
 
 		if scenetype == 'maya_delight':
 			cmd += ' -r 3delight'
+		
+		if scenetype == 'maya':
+			cmd += ' -r file'
 
 		if scenetype != 'maya_delight':
 			cmd += ' -s @#@ -e @#@ -b %d' % by
@@ -599,8 +602,11 @@ if __name__ == '__main__':
 				images = afcommon.patternFromPaths(images[0], images[1])
 			else:
 				images = afcommon.patternFromFile(images[0])
-		if proj != '':
-			cmd += ' -proj "%s"' % os.path.normpath(proj)
+		if pwd != '':
+			cmd += ' -proj "%s"' % os.path.normpath(pwd)
+		
+		if output != '':
+			cmd += ' -rd "%s"' % os.path.normpath(output)
 
 		if scenetype == 'maya_mental':
 			cmd += ' -art -v 5'
