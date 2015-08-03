@@ -45,7 +45,7 @@ class CGRU_Browse(bpy.types.Operator):
 
 
 class CGRU_Submit(bpy.types.Operator):
-	"""Submit job to Afanasy Renderfarm."""
+	"""Submit job to Afanasy Renderfarm"""
 
 	bl_idname = "cgru.submit"
 	bl_label = "Submit Job"
