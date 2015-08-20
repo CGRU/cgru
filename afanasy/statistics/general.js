@@ -14,17 +14,35 @@ g_graph_intervals.hour   = {"seconds":60 * 60,"intervals":[ 1, 3, 6, 12, 24 ],"o
 g_graph_intervals.day    = {"seconds":60 * 60 * 24,"intervals":[ 1, 7, 7, 7 ],"offsets":[[0],[1,3,5],[1,5],[1]]};
 g_graph_intervals.week   = {"seconds":60 * 60 * 24 * 7,"intervals":[ 1 ],"offsets":[[0]]};
 
+
+g_args = {};
+g_args.action = 'jobs_table';
+g_args.time_min = 0;
+g_args.time_max = Math.round((new Date()).valueOf() / 1000);
+g_args.folder = '/';
+
+g_folders = [];
+
 function g_Init()
 {
-	g_Info('init');
+	g_Info('Initializing...');
 	g_Request({"send":{"init":null},"func":g_Start});
 }
 
 function g_Start( i_data, i_args)
 {
-//console.log( JSON.stringify( i_data));
-	g_Info('Started');
+	g_Log('Server: ' + JSON.stringify( i_data.server, null,' '));
 
+	// Get time min and max:
+	g_args.time_min = i_data.time.time_min;
+	g_args.time_max = i_data.time.time_max;
+
+
+	// Initialize folders:
+	g_FoldersInit( i_data);
+
+
+	// Action buttons on click:
 	for( var action in g_actions )
 	{
 		var elAct = document.createElement('span');
@@ -36,86 +54,201 @@ function g_Start( i_data, i_args)
 		g_actions[action].element = elAct;
 	}
 
+
+	// Time fields on key down:
 	for( var i = 0; i < g_time_ids.length; i++)
 		$(g_time_ids[i]).onkeydown = g_TimeKeyDown;
 
+
+	// Override arguments from hash ( if any ):
+	g_HashGet();
+	// And set merged hash back:
+	g_HashSet();
+
+
+	// Start to "listen" hash:
+	g_Info('Starting...');
 	window.onhashchange = g_HashChanged;
 	g_HashChanged();
 }
 
-function g_ActionClicked( i_evt)
+function g_Reset()
 {
-	var action = i_evt.currentTarget.m_action;
-	var hash = document.location.hash.split(',');
-	if( hash.length > 2 )
-		action += ',' + hash[1] + ',' + hash[2];
-	document.location.hash = action;
+	window.onhashchange = null;
+	document.location.hash = '';
+	document.location.reload();
 }
 
-function g_HashChanged()
+function g_FoldersInit( i_data)
+{
+	g_folders = i_data.folders;
+	if(( g_folders == null ) || ( g_folders.length == 0 ))
+	{
+		$('folders_div').style.display = 'none';
+		return;
+	}
+
+//$('g_folders').textContent = g_folders;
+	// Find root folder (common beginning for every folder):
+	var names = g_folders[0].split('/');
+//console.log(names);
+	var folder = g_args.folder;
+	for( var n = 0; n < names.length; n++)
+	{
+		if( names[n].length == 0 ) continue;
+
+		folder += names[n] + '/';
+		var allEqual = true;
+		for( var f = 0; f < g_folders.length; f++)
+		{
+			if( g_folders[f].indexOf( folder) != 0 )
+			{
+				allEqual = false;
+				break;
+			}
+		}
+		if( allEqual )
+			g_args.folder = folder;
+		else break;
+	}
+}
+
+function g_FoldersProcess( i_folder)
+{
+	if( i_folder ) g_args.folder = i_folder;
+
+	$('folders_root').textContent = '';
+	var names = g_args.folder.split('/');
+	var folder = '/';
+	for( var n = 0; n < names.length; n++)
+	{
+		var name = names[n];
+		if( name.length == 0 ) continue;
+
+		name += '/';
+		if( folder == '/' )
+		{
+			folder += name;
+			name = '/' + name;
+		}
+		else
+			folder += name;
+
+		var el = document.createElement('div');
+		$('folders_root').appendChild(el);
+		el.classList.add('folder');
+		el.textContent = name;
+		el.title = folder;
+
+		el.m_folder = folder;
+		el.onclick = g_FolderClicked;
+	}
+
+	$('folders').textContent = '';
+	var folders = [];
+	for( var f = 0; f < g_folders.length; f++)
+	{
+		var folder = g_folders[f];
+		if( folder.indexOf( g_args.folder) != 0 ) continue;
+		folder = folder.replace( g_args.folder, '');
+		folder = folder.substr( 0, folder.indexOf('/'));
+		if( folder.length == 0 ) continue;
+
+		if( folders.indexOf(folder) != -1 )
+			continue;
+
+		folders.push( folder);
+		var el = document.createElement('div');
+		$('folders').appendChild( el);
+		el.classList.add('folder');
+		el.textContent = folder;
+
+		folder = g_args.folder + folder + '/';
+		el.m_folder = folder;
+		el.onclick = g_FolderClicked;
+	}
+}
+function g_FolderClicked( i_evt)
+{
+	g_args.folder = i_evt.currentTarget.m_folder;
+	g_HashSet();
+}
+
+function g_ActionClicked( i_evt)
+{
+	g_args.action = i_evt.currentTarget.m_action;
+	g_HashSet();
+}
+
+function g_HashSet()
+{
+	document.location.hash = JSON.stringify( g_args);
+}
+
+function g_HashGet()
 {
 	var hash = document.location.hash;
 	if( hash.indexOf('#') == 0 ) hash = hash.substr(1);
 
-	hash = hash.split(',');
-	var action = hash[0];
-	var args = {};
-	if( hash.length > 2 )
-	{
-		args.time_min = hash[1];
-		args.time_max = hash[2];
-	}
+	var args = null;
+	try { args = JSON.parse( hash);}
+	catch( err) { args = null; }
+
+	if( args )
+		for( var a in args )
+			g_args[a] = args[a];
+}
+
+function g_HashChanged()
+{
+	g_HashGet();
+
+	g_TimeShow();
+	g_FoldersProcess();
 
 	for( var a in g_actions )
 		g_actions[a].element.classList.remove('enabled');
 
-	if( action == '' )
-	{
-		document.location.hash = 'jobs_table';
-		return;
-	}
-
 	$('content').textContent = '';
 
-	if( g_actions[action] )
+	if( g_actions[g_args.action] )
 	{
-		if( g_actions[action].element )
-			g_actions[action].element.classList.add('enabled');
+		if( g_actions[g_args.action].element )
+			g_actions[g_args.action].element.classList.add('enabled');
+		g_Info('Action: "' + g_actions[g_args.action].label + '".');
 	}
 	else
 	{
-		g_Error('Unknown action: "' + action + '"');
+		g_Error('Unknown action: "' + g_args.action + '"');
 		return;
 	}
 
-	g_Info( action);
 
-	if( action == 'jobs_table')
+	var args = {};
+	for( var a in g_args)
+		args[a] = g_args[a];
+
+	if( g_args.action == 'jobs_table')
 	{
 		g_Info('Requesting jobs tasks statistics table...');
-		g_GetTimeInterval( args);
 		args.select = 'service';
 		args.favorite = 'username';
 		g_Request({"send":{"get_jobs_table":args},"func":g_ShowTable,"args":args,"service":'get_jobs_table'});
 		return;
 	}
-	if( action == 'tasks_table')
+	if( g_args.action == 'tasks_table')
 	{
 		g_Info('Requesting tasks services statistics table...');
-		g_GetTimeInterval( args);
 		args.select = 'service';
 		args.favorite = 'username';
 		g_Request({"send":{"get_tasks_table":args},"func":g_ShowTable,"args":args,"service":'get_tasks_table'});
 		return;
 	}
-	if( action == 'tasks_graph')
+	if( g_args.action == 'tasks_graph')
 	{
 		g_Info('Requesting tasks services statistics graph...');
-		args.notime = {};
-		args.notime.time_max = Math.round((new Date).valueOf()/1000);
-		args.notime.time_min = args.notime.time_max - 1000000;
-		g_GetTimeInterval( args);
 		args.select = 'service';
+		args.interval = g_TimeIntervalGet();
 		g_Request({"send":{"get_tasks_graph":args},"func":g_ShowGraph,"args":args});
 		return;
 	}
@@ -132,7 +265,7 @@ function g_ShowTable( i_data, i_args)
 		return;
 	}
 
-	g_ShowTimeInterval( i_data);
+	g_Info('Statistics received.');
 
 	var select   = i_data.select;
 	var vaforite = i_data.favorite;
@@ -206,8 +339,6 @@ function g_ShowTable( i_data, i_args)
 		send[i_args.service] = args;
 		g_Request({"send":send,"func":g_ShowTable,"args":args});
 	}
-	else
-		g_Info('Statistics received.');
 }
 
 function g_ShowGraph( i_data, i_args)
@@ -224,8 +355,6 @@ function g_ShowGraph( i_data, i_args)
 	var time_min = i_data.time_min;
 	var time_max = i_data.time_max;
 	var select   = i_data.select;
-
-	g_ShowTimeInterval( i_data);
 
 	var elDiv = document.createElement('div');
 	$('content').appendChild( elDiv);
@@ -561,71 +690,45 @@ function g_TimeKeyDown( i_evt)
 		return;
 
 	i_evt.stopPropagation();
+	i_evt.currentTarget.blur();
 
-	var args = {};
-	g_GetTimeInterval( args);
+	for( var i = 0; i < g_time_ids.length; i++)
+	{
+		var date = new Date( Date.parse( $(g_time_ids[i]).textContent));
+		time = Math.round( date.valueOf() / 1000 );
+		g_args[g_time_ids[i]] = time;
+	}
 
-	var hash = document.location.hash.split(',')[0];
-	hash += ',' + args.time_min + ',' + args.time_max;
-
-	document.location.hash = hash;
+	g_HashSet();
 }
 
-function g_ShowTimeInterval( i_args)
+function g_TimeShow()
 {
 	for( var i = 0; i < g_time_ids.length; i++ )
 	{
-		var date = new Date( 1000 * i_args[g_time_ids[i]]);
+		var date = new Date( 1000 * g_args[g_time_ids[i]]);
 		date = date.toISOString();
 		date = date.substr( 0, date.indexOf('T'));
 		$(g_time_ids[i]).textContent = date;
 	}	
 }
 
-function g_GetTimeInterval( io_args)
+function g_TimeIntervalGet()
 {
-	if( io_args == null ) io_args = {};
-
-//console.log('g_GetTimeInterval:' + io_args.time_min + '-' + io_args.time_max);
-	for( var i = 0; i < g_time_ids.length; i++)
+	var interval = 1;
+	var i = 0;
+	while(( g_args.time_max - g_args.time_min ) / interval > 100 )
 	{
-		var time = io_args[g_time_ids[i]];
-		if(( time == null ) && ( $(g_time_ids[i]).textContent != '' ))
-		{
-			var date = new Date( Date.parse( $(g_time_ids[i]).textContent));
-			time = Math.round( date.valueOf() / 1000 );
-		}
-
-		if(( time == null ) && ( io_args.notime ) && ( io_args.notime[g_time_ids[i]] ))
-			time = io_args.notime[g_time_ids[i]];
-
-		if( time )
-		{
-			var date = new Date( time * 1000 );
-			date = date.toISOString();
-			date = date.substr( 0, date.indexOf('T'));
-			$(g_time_ids[i]).textContent = date;
-
-			io_args[g_time_ids[i]] = time;
-		}
+		if( i < g_graph_intervals.names.length )
+			interval = g_graph_intervals[g_graph_intervals.names[i]].seconds;
+		else
+			interval *= 10;
+		i++;
 	}
+	g_args.time_min = Math.floor( g_args.time_min / interval ) * interval;
+	g_args.time_max = Math.ceil(  g_args.time_max / interval ) * interval;
 
-	if( io_args.time_min && io_args.time_max )
-	{
-		io_args.interval = 1;
-		var i = 0;
-		while(( io_args.time_max - io_args.time_min ) / io_args.interval > 100 )
-		{
-			if( i < g_graph_intervals.names.length )
-				io_args.interval = g_graph_intervals[g_graph_intervals.names[i]].seconds;
-			else
-				io_args.interval *= 10;
-			i++;
-		}
-		io_args.time_min = Math.floor( io_args.time_min / io_args.interval ) * io_args.interval;
-		io_args.time_max = Math.ceil(  io_args.time_max / io_args.interval ) * io_args.interval;
-	}
-//console.log('g_GetTimeInterval:' + io_args.time_min + '-' + io_args.time_max);
+	return interval;
 }
 
 function g_SecToHMS( i_sec)
@@ -652,11 +755,42 @@ function g_Info( i_msg)
 {
 	$('info').innerHTML = i_msg;
 	$('info').classList.remove('error');
+	g_Log( i_msg);
 }
 function g_Error( i_msg)
 {
 	g_Info('ERROR: ' + i_msg);
 	$('info').classList.add('error');
+	g_Log( i_msg);
+}
+function g_Log( i_msg)
+{
+	var el = document.createElement('div');
+	el.classList.add('log_line');
+	$('log').insertBefore( el, $('log').firstChild);
+
+	var date = new Date();
+	var time = g_PadZero(date.getHours())+':'+g_PadZero(date.getMinutes())+':'+g_PadZero(date.getSeconds())+'.'+g_PadZero(date.getMilliseconds(),3);
+	var elTime = document.createElement('span');
+	elTime.classList.add('log_time');
+	elTime.textContent = time;
+	el.appendChild( elTime);
+
+	var elMsg = document.createElement('span');
+	elMsg.classList.add('log_msg');
+	elMsg.textContent = i_msg;
+	el.appendChild( elMsg);
+}
+function g_ShowLog( i_show)
+{
+	$('log').style.display = 'block';
+}
+function g_PadZero( i_num, i_len)
+{
+	if( i_len == null ) i_len = 2;
+	var str = ''+i_num;
+	while( str.length < i_len) str = '0'+str;
+	return str;
 }
 function g_Parse( i_data)
 {

@@ -30,12 +30,36 @@ if( false == is_null( $Out))
 
 function init( $i_args, &$o_out)
 {
-	$o_out['post_max_size'] = ini_get('post_max_size');
-	$o_out['memory_limit'] = ini_get('memory_limit');
-	$o_out['name'] = $_SERVER['SERVER_NAME'];
-	$o_out['software'] = $_SERVER['SERVER_SOFTWARE'];
-	$o_out['remote_address'] = $_SERVER['REMOTE_ADDR'];
-	$o_out['php_version'] = phpversion();
+	# Configuration:
+	$srv = array();
+	$srv['name'] = $_SERVER['SERVER_NAME'];
+	$srv['software'] = $_SERVER['SERVER_SOFTWARE'];
+	$srv['remote_address'] = $_SERVER['REMOTE_ADDR'];
+	$srv['php_version'] = phpversion();
+	$srv['post_max_size'] = ini_get('post_max_size');
+	$srv['memory_limit'] = ini_get('memory_limit');
+	$o_out['server'] = $srv;
+
+	$dbconn = db_connect();
+
+	# Time min and max:
+	$time = array();
+	$query="SELECT min(time_done) AS time_done FROM jobs WHERE time_done > 0;";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+	$time['time_min'] = (int)$line["time_done"];
+	pg_free_result($result);
+	if( $time['time_min'] == '') $time['time_min'] = 0;
+	$time['time_max'] = time();
+	$o_out['time'] = $time;
+
+	# Folders:
+	$query="SELECT min(folder) as folder FROM jobs GROUP BY folder ORDER BY folder;";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$out['folders'] = array();
+	while( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+		if( array_key_exists('folder', $line))
+			$o_out['folders'][] = $line['folder'];
 }
 
 function db_connect()
@@ -53,29 +77,17 @@ function get_jobs_table( $i_args, &$o_out)
 
 	$select   = $i_args['select'];
 	$favorite = $i_args['favorite'];
-	if( isset( $i_args['time_min'])) $time_min = $i_args['time_min'];
-	if( isset( $i_args['time_max'])) $time_max = $i_args['time_max'];
+	$time_min = $i_args['time_min'];
+	$time_max = $i_args['time_max'];
+	$folder   = $i_args['folder'];
+
 	if( isset( $i_args['order_u'])) $order_u = $i_args['order_u'];
 	if( isset( $i_args['order_s'])) $order_s = $i_args['order_s'];
 
 	$dbconn = db_connect();
 
-	if( is_null( $time_min) || is_null( $time_max))
-	{
-		$query="SELECT min(time_done) AS time_done FROM $table WHERE time_done > 0;";
-		$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-		$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-		$time_begin = $line["time_done"];
-		pg_free_result($result);
-		if( $time_begin == '') $time_begin = 0;
-		if( is_null( $time_min)) $time_min = $time_begin;
-		if( is_null( $time_max)) $time_max = time();
-	}
-
 	$o_out['select']   = $select;
 	$o_out['favorite'] = $favorite;
-	$o_out['time_min'] = $time_min;
-	$o_out['time_max'] = $time_max;
 	$o_out['table'] = array();
 
 	// Select:
@@ -89,7 +101,7 @@ SELECT $select,
  avg(CASE WHEN tasks_done>0 THEN run_time_sum/tasks_done ELSE 0 END) AS run_time_avg,
  avg(tasks_done/tasks_quantity) AS tasks_done_percent
  FROM $table
- WHERE time_done BETWEEN $time_min and $time_max
+ WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
  GROUP BY $select ORDER BY $order_s DESC;
 ";
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -136,29 +148,17 @@ function get_tasks_table( $i_args, &$o_out)
 
 	$select   = $i_args['select'];
 	$favorite = $i_args['favorite'];
-	if( isset( $i_args['time_min'])) $time_min = $i_args['time_min'];
-	if( isset( $i_args['time_max'])) $time_max = $i_args['time_max'];
+	$time_min = $i_args['time_min'];
+	$time_max = $i_args['time_max'];
+	$folder   = $i_args['folder'];
+
 	if( isset( $i_args['order_u'])) $order_u = $i_args['order_u'];
 	if( isset( $i_args['order_s'])) $order_s = $i_args['order_s'];
 
 	$dbconn = db_connect();
 
-	if( is_null( $time_min) || is_null( $time_max))
-	{
-		$query="SELECT min(time_done) AS time_done FROM $table WHERE time_done > 0;";
-		$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-		$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-		$time_begin = $line["time_done"];
-		pg_free_result($result);
-		if( $time_begin == '') $time_begin = 0;
-		if( is_null( $time_min)) $time_min = $time_begin;
-		if( is_null( $time_max)) $time_max = time();
-	}
-
 	$o_out['select']   = $select;
 	$o_out['favorite'] = $favorite;
-	$o_out['time_min'] = $time_min;
-	$o_out['time_max'] = $time_max;
 
 	$o_out['table'] = array();
 $query="
@@ -169,7 +169,7 @@ SELECT $select,
  avg(time_done-time_started) AS run_time_avg,
  avg(error) AS error_avg
  FROM $table
- WHERE time_done BETWEEN $time_min and $time_max
+ WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
  GROUP BY $select ORDER BY $order_s DESC;
 ";
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -208,14 +208,12 @@ SELECT $favorite,
 
 function get_tasks_graph( $i_args, &$o_out)
 {
-	$time_min = null;
-	$time_max = null;
 	$table = 'tasks';
-	$interval = 0;
 
-	if( isset( $i_args['time_min'])) $time_min = $i_args['time_min'];
-	if( isset( $i_args['time_max'])) $time_max = $i_args['time_max'];
-	if( isset( $i_args['interval'])) $interval = $i_args['interval'];
+	$time_min = $i_args['time_min'];
+	$time_max = $i_args['time_max'];
+	$interval = $i_args['interval'];
+	$folder   = $i_args['folder'];
 
 	$select = $i_args['select'];
 
@@ -233,7 +231,7 @@ function get_tasks_graph( $i_args, &$o_out)
 SELECT $select,
  sum(1) AS quantity
  FROM $table
- WHERE time_done BETWEEN $time_min and $time_max
+ WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
  GROUP BY $select ORDER BY quantity DESC;
 ";
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -254,7 +252,7 @@ SELECT $select,
 SELECT $select,
  sum(1) AS quantity
  FROM $table
- WHERE time_done BETWEEN $cur_time_min and $cur_time_max
+ WHERE time_done BETWEEN $cur_time_min and $cur_time_max AND folder LIKE '$folder%'
  GROUP BY $select ORDER BY quantity DESC;
 ";
 		$result = pg_query($query) or die('Query failed: ' . pg_last_error());
