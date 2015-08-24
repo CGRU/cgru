@@ -1,9 +1,9 @@
 var $ = function( id ) { return document.getElementById( id ); };
 
 g_actions = {};
-g_actions.jobs_table = {"label":'Jobs Table'};
-g_actions.tasks_table = {"label":'Tasks Table'};
-g_actions.tasks_graph = {"label":'Tasks Graph'};
+g_actions.jobs_table =  {"label":'Jobs Table' ,'func':'g_Action_JobsTable'};
+g_actions.tasks_table = {"label":'Tasks Table','func':'g_Action_TasksTable'};
+g_actions.tasks_graph = {"label":'Tasks Graph','func':'g_Action_TasksGraph'};
 
 NS = 'http://www.w3.org/2000/svg';
 
@@ -20,11 +20,13 @@ g_args.action = 'jobs_table';
 g_args.time_min = 0;
 g_args.time_max = Math.round((new Date()).valueOf() / 1000);
 g_args.folder = '/';
+g_args.folder_depth = 1;
 
 g_folders = [];
 
 function g_Init()
 {
+	window.onhashchange = g_HashChanged;
 	g_Info('Initializing...');
 	g_Request({"send":{"init":null},"func":g_Start});
 }
@@ -60,6 +62,7 @@ function g_Start( i_data, i_args)
 		$(g_time_ids[i]).onkeydown = g_TimeKeyDown;
 
 
+	var hash = document.location.hash;
 	// Override arguments from hash ( if any ):
 	g_HashGet();
 	// And set merged hash back:
@@ -68,8 +71,8 @@ function g_Start( i_data, i_args)
 
 	// Start to "listen" hash:
 	g_Info('Starting...');
-	window.onhashchange = g_HashChanged;
-	g_HashChanged();
+	if( hash == document.location.hash )
+		g_HashChanged();
 }
 
 function g_Reset()
@@ -120,6 +123,7 @@ function g_FoldersProcess( i_folder)
 	$('folders_root').textContent = '';
 	var names = g_args.folder.split('/');
 	var folder = '/';
+	g_args.folder_depth = 1;
 	for( var n = 0; n < names.length; n++)
 	{
 		var name = names[n];
@@ -139,9 +143,10 @@ function g_FoldersProcess( i_folder)
 		el.classList.add('folder');
 		el.textContent = name;
 		el.title = folder;
-
 		el.m_folder = folder;
 		el.onclick = g_FolderClicked;
+
+		g_args.folder_depth++;
 	}
 
 	$('folders').textContent = '';
@@ -223,35 +228,35 @@ function g_HashChanged()
 		return;
 	}
 
-
 	var args = {};
 	for( var a in g_args)
 		args[a] = g_args[a];
 
-	if( g_args.action == 'jobs_table')
-	{
-		g_Info('Requesting jobs tasks statistics table...');
-		args.select = 'service';
-		args.favorite = 'username';
-		g_Request({"send":{"get_jobs_table":args},"func":g_ShowTable,"args":args,"service":'get_jobs_table'});
-		return;
-	}
-	if( g_args.action == 'tasks_table')
-	{
-		g_Info('Requesting tasks services statistics table...');
-		args.select = 'service';
-		args.favorite = 'username';
-		g_Request({"send":{"get_tasks_table":args},"func":g_ShowTable,"args":args,"service":'get_tasks_table'});
-		return;
-	}
-	if( g_args.action == 'tasks_graph')
-	{
-		g_Info('Requesting tasks services statistics graph...');
-		args.select = 'service';
-		args.interval = g_TimeIntervalGet();
-		g_Request({"send":{"get_tasks_graph":args},"func":g_ShowGraph,"args":args});
-		return;
-	}
+	window[g_actions[g_args.action].func]( args);
+}
+
+function g_Action_JobsTable( i_args)
+{
+	g_Info('Requesting jobs folders statistics table...');
+	i_args.select = 'folder'
+	i_args.favorite = 'service';
+	g_Request({"send":{"get_jobs_folders":i_args},"func":g_ShowTable,"args":i_args,"service":'get_jobs_folders'});
+}
+
+function g_Action_TasksTable( i_args)
+{
+	g_Info('Requesting tasks services statistics table...');
+	i_args.select = 'service';
+	i_args.favorite = 'username';
+	g_Request({"send":{"get_tasks_table":i_args},"func":g_ShowTable,"args":i_args,"service":'get_tasks_table'});
+}
+
+function g_Action_TasksGraph( i_args)
+{
+	g_Info('Requesting tasks services statistics graph...');
+	i_args.select = 'service';
+	i_args.interval = g_TimeIntervalGet();
+	g_Request({"send":{"get_tasks_graph":i_args},"func":g_ShowGraph,"args":i_args});
 }
 
 function g_ShowTable( i_data, i_args)
@@ -321,14 +326,27 @@ function g_ShowTable( i_data, i_args)
 				if( g_parm[col].percent ) value = Math.round( 100 * value) + '%';
 				else if( g_parm[col].round ) value = Math.round( value);
 				else if( g_parm[col].time ) value = g_SecToHMS( value);
+			}
 
-				if( g_parm[col].suffix ) value += g_parm[col].suffix;
+			if( col == 'folder')
+			{
+				value = value.replace( g_args.folder, '/');
+				if( value.indexOf('/') == 0 ) value = value.substr(1);
+				value = value.split('/')[0];
 			}
 
 			elCol.textContent = value;
 		}
 	}
 
+	if( select == 'folder')
+	{
+		g_Info('Requesting jobs tasks statistics table...');
+		var args = i_args.args;
+		args.select = 'service';
+		args.favorite = 'username';
+		g_Request({"send":{"get_jobs_table":args},"func":g_ShowTable,"args":args,"service":'get_jobs_table'});
+	}
 	if( select == 'service' )
 	{
 		g_Info('Requesting tasks users statistics table...');
@@ -880,8 +898,9 @@ g_parm = {};
 
 g_parm.capacity_avg       = {"label":'Average Capacity', "round":true};
 g_parm.error_avg          = {"label":'Average Error',    "percent":true};
-g_parm.fav_name           = {"label":'Favourite Name'};
-g_parm.fav_percent        = {"label":'Favourive Percent', "percent":true};
+g_parm.fav_name           = {"label":'Favourite'};
+g_parm.fav_percent        = {"label":'Percent',          "percent":true};
+g_parm.folder             = {"label":'Folder'};
 g_parm.jobs_quantity      = {"label":'Jobs Quantity'};
 g_parm.run_time_avg       = {"label":'Average Run Time', "time":true};
 g_parm.run_time_sum       = {"label":'Sum Run Time',     "time":true};

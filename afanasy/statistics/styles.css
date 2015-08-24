@@ -105,11 +105,13 @@ height: 50px;
 .folder {
 cursor: pointer;
 float: left;
-margin: 2px;
-padding: 2px 4px;
-border: 1px solid rgba(0,0,0,.5);
+margin: 3px;
+padding: 2px 8px;
+-border: 1px solid rgba(0,0,0,.5);
+box-shadow: 0 0 3px #000, 0 0 3px #FFF inset;
 border-radius: 2px;
 }
+#folders_root .folder { box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF; }
 
 .table_div {
 text-align: center;
