@@ -272,6 +272,69 @@ SELECT $favorite,
 	pg_free_result($result);
 }
 
+function get_tasks_folders_graph( $i_args, &$o_out)
+{
+	$table = 'tasks';
+
+	$select   = $i_args['select'];
+	$time_min = $i_args['time_min'];
+	$time_max = $i_args['time_max'];
+	$interval = $i_args['interval'];
+	$folder   = $i_args['folder'];
+	$f_depth  = $i_args['folder_depth'];
+	$order    = 'jobs_quantity';
+
+	$o_out['time_min'] = $time_min;
+	$o_out['time_max'] = $time_max;
+	$o_out['interval'] = $interval;
+	$o_out['select'] = $select;
+	$o_out['graph'] = array();
+	$o_out['table'] = array();
+
+	$dbconn = db_connect();
+
+	// Query whole time interval table:
+	$query="
+SELECT min(folder) as folder,
+ sum(1) AS quantity
+ FROM $table
+ WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
+ GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
+ ORDER BY quantity DESC;
+";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+	{
+		$o_out['table'][] = $line;
+	}
+
+	// Query graph (a table per time interval):
+	$time = $time_min;
+	while( $time <= $time_max )
+	{
+		$cur_time_min = $time;
+		$cur_time_max = $time + $interval;
+		$o_out['graph'][$time] = array();
+
+		$query="
+SELECT min(folder) as folder,
+ sum(1) AS quantity
+ FROM $table
+ WHERE time_done BETWEEN $cur_time_min and $cur_time_max AND folder LIKE '$folder%'
+ GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
+ ORDER BY quantity DESC;
+";
+		$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+		while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+		{
+			$o_out['graph'][$time][$line[$select]] = $line;
+		}
+		pg_free_result($result);
+
+		$time += $interval;
+	}
+}
+
 function get_tasks_graph( $i_args, &$o_out)
 {
 	$table = 'tasks';

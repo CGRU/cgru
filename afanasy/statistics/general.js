@@ -1,9 +1,9 @@
 var $ = function( id ) { return document.getElementById( id ); };
 
 g_actions = {};
-g_actions.jobs_table =  {"label":'Jobs Table' ,'func':'g_Action_JobsTable'};
-g_actions.tasks_table = {"label":'Tasks Table','func':'g_Action_TasksTable'};
-g_actions.tasks_graph = {"label":'Tasks Graph','func':'g_Action_TasksGraph'};
+g_actions.jobs_table =  {"label":'Jobs Tables' ,'func':'g_Action_JobsTable'};
+g_actions.tasks_table = {"label":'Tasks Tables','func':'g_Action_TasksTable'};
+g_actions.tasks_graph = {"label":'Tasks Graphs','func':'g_Action_TasksGraph'};
 
 NS = 'http://www.w3.org/2000/svg';
 
@@ -253,10 +253,11 @@ function g_Action_TasksTable( i_args)
 
 function g_Action_TasksGraph( i_args)
 {
-	g_Info('Requesting tasks services statistics graph...');
-	i_args.select = 'service';
+	g_Info('Requesting tasks folders statistics graph...');
+	i_args.select = 'folder';
 	i_args.interval = g_TimeIntervalGet();
-	g_Request({"send":{"get_tasks_graph":i_args},"func":g_ShowGraph,"args":i_args});
+	g_Request({"send":{"get_tasks_folders_graph":i_args},"func":g_ShowGraph,"args":i_args});
+//	g_Request({"send":{"get_tasks_graph":i_args},"func":g_ShowGraph,"args":i_args});
 }
 
 function g_ShowTable( i_data, i_args)
@@ -328,12 +329,7 @@ function g_ShowTable( i_data, i_args)
 				else if( g_parm[col].time ) value = g_SecToHMS( value);
 			}
 
-			if( col == 'folder')
-			{
-				value = value.replace( g_args.folder, '/');
-				if( value.indexOf('/') == 0 ) value = value.substr(1);
-				value = value.split('/')[0];
-			}
+			if( col == 'folder') value = g_FolderStrip( value);
 
 			elCol.textContent = value;
 		}
@@ -357,6 +353,14 @@ function g_ShowTable( i_data, i_args)
 		send[i_args.service] = args;
 		g_Request({"send":send,"func":g_ShowTable,"args":args});
 	}
+}
+
+function g_FolderStrip( i_folder)
+{
+	var folder = i_folder.replace( g_args.folder, '/');
+	if( folder.indexOf('/') == 0 ) folder = folder.substr(1);
+	folder = folder.split('/')[0];
+	return folder;
 }
 
 function g_ShowGraph( i_data, i_args)
@@ -578,14 +582,16 @@ function g_ShowGraph( i_data, i_args)
 		r=Math.round(255*r);g=Math.round(255*g);b=Math.round(255*b);
 		var color = 'rgb('+r+','+g+','+b+')';
 
-		// Service name:
+		// Select name:
 		var text = document.createElementNS( NS, 'text');
 		svg.appendChild( text);
 		text.setAttribute('x', 10);
 		text.setAttribute('y', 20+20*s);
 		text.setAttribute('font-size', 16);
 		text.setAttribute('fill', color);
-		text.textContent = select_name;
+		var label = select_name;
+		if( select == 'folder' ) label = g_FolderStrip( label);
+		text.textContent = label;
 
 		// Start curve path:
 		var path = document.createElementNS( NS,'path');
@@ -691,7 +697,14 @@ function g_ShowGraph( i_data, i_args)
 //console.log( line)
 	}
 
-	if( select == 'service' )
+	if( select == 'folder')
+	{
+		g_Info('Requesting tasks services statistics graph...');
+		var args = i_args.args;
+		args.select = 'service';
+		g_Request({"send":{"get_tasks_graph":args},"func":g_ShowGraph,"args":args});
+	}
+	else if( select == 'service' )
 	{
 		g_Info('Requesting tasks users statistics graph...');
 		var args = i_args.args;
