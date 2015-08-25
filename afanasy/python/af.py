@@ -614,9 +614,11 @@ class Job:
 
 		# Set folder if empty:
 		if not "folders" in self.data:
+			self.data["folders"] = dict()
 			# Try to set output folder from files:
-			if "files" in self.data and len(self.data["files"]):
-				self.data["folders"]["output"] = os.path.dirname( self.data["files"][0])
+			for block in self.blocks:
+				if "files" in block.data and len(block.data["files"]):
+					self.data["folders"]["output"] = os.path.dirname( block.data["files"][0])
 
 		obj = {"job": self.data}
 		# print(json.dumps( obj))

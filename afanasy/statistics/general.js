@@ -20,7 +20,6 @@ g_args.action = 'jobs_table';
 g_args.time_min = 0;
 g_args.time_max = Math.round((new Date()).valueOf() / 1000);
 g_args.folder = '/';
-g_args.folder_depth = 1;
 
 g_folders = [];
 
@@ -92,10 +91,12 @@ function g_FoldersInit( i_data)
 	}
 
 //$('g_folders').textContent = g_folders;
-	// Set null folders to an empty string to let perform string operations:
+	// Prepare folders:
 	for( var f = 0; f < g_folders.length; f++)
-		if( g_folders[f] == null )
-			g_folders[f] = '';
+		if(( g_folders[f] == null ) || ( g_folders[f].length == 0 ))
+			g_folders[f] = '/';
+		else if( g_folders[f] != '/')
+			g_folders[f] = g_folders[f].replace( /\/+$/g , '');
 
 	// Find root folder (common beginning for every folder):
 	var names = [];
@@ -103,18 +104,22 @@ function g_FoldersInit( i_data)
 	{
 		if( g_folders[f].length == 0 ) continue;
 		names = g_folders[f].split('/');
-		if( names.length ) break;
+		if( names.length > 2 ) break;
 	}
 
-	var folder = g_args.folder;
+//console.log(names);
+	var folder = '';
 	for( var n = 0; n < names.length; n++)
 	{
 		if( names[n].length == 0 ) continue;
 
-		folder += names[n] + '/';
+		folder += '/' + names[n];
+
 		var allEqual = true;
 		for( var f = 0; f < g_folders.length; f++)
 		{
+			if( g_folders[f] == '/' ) continue;
+
 			if( g_folders[f].indexOf( folder) != 0 )
 			{
 				allEqual = false;
@@ -125,6 +130,7 @@ function g_FoldersInit( i_data)
 			g_args.folder = folder;
 		else break;
 	}
+//console.log(g_args.folder);
 }
 
 function g_FoldersProcess( i_folder)
@@ -136,21 +142,18 @@ function g_FoldersProcess( i_folder)
 
 	$('folders_root').textContent = '';
 	var names = g_args.folder.split('/');
-	var folder = '/';
-	g_args.folder_depth = 1;
+//console.log(names);
+	var folder = '';
+	if( names.length ) names[0] = '/';
+
 	for( var n = 0; n < names.length; n++)
 	{
 		var name = names[n];
 		if( name.length == 0 ) continue;
 
-		name += '/';
-		if( folder == '/' )
-		{
-			folder += name;
-			name = '/' + name;
-		}
-		else
-			folder += name;
+		if( n > 1 ) folder += '/';
+		folder += name;
+//console.log(folder);
 
 		var el = document.createElement('div');
 		$('folders_root').appendChild(el);
@@ -159,8 +162,6 @@ function g_FoldersProcess( i_folder)
 		el.title = folder;
 		el.m_folder = folder;
 		el.onclick = g_FolderClicked;
-
-		g_args.folder_depth++;
 	}
 
 	$('folders').textContent = '';
@@ -170,19 +171,25 @@ function g_FoldersProcess( i_folder)
 		var folder = g_folders[f];
 		if( folder.indexOf( g_args.folder) != 0 ) continue;
 		folder = folder.replace( g_args.folder, '');
+		folder = folder.replace( /^\/+/g , '');
 		folder = folder.substr( 0, folder.indexOf('/'));
 		if( folder.length == 0 ) continue;
 
 		if( folders.indexOf(folder) != -1 )
 			continue;
-
 		folders.push( folder);
+
 		var el = document.createElement('div');
 		$('folders').appendChild( el);
 		el.classList.add('folder');
 		el.textContent = folder;
 
-		folder = g_args.folder + folder + '/';
+//		folder = g_args.folder + '/' + folder;
+		folder = '/' + folder;
+		if( g_args.folder != '/' )
+			folder = g_args.folder + folder;
+
+		el.title = folder;
 		el.m_folder = folder;
 		el.onclick = g_FolderClicked;
 	}
@@ -271,7 +278,6 @@ function g_Action_TasksGraph( i_args)
 	i_args.select = 'folder';
 	i_args.interval = g_TimeIntervalGet();
 	g_Request({"send":{"get_tasks_folders_graph":i_args},"func":g_ShowGraph,"args":i_args});
-//	g_Request({"send":{"get_tasks_graph":i_args},"func":g_ShowGraph,"args":i_args});
 }
 
 function g_ShowTable( i_data, i_args)
@@ -371,8 +377,8 @@ function g_ShowTable( i_data, i_args)
 
 function g_FolderStrip( i_folder)
 {
-	var folder = i_folder.replace( g_args.folder, '/');
-	if( folder.indexOf('/') == 0 ) folder = folder.substr(1);
+	var folder = i_folder.replace( g_args.folder, '');
+	folder = folder.replace( /^\/+|\/+$/g , '');
 	folder = folder.split('/')[0];
 	return folder;
 }

@@ -75,8 +75,8 @@ function get_jobs_folders( $i_args, &$o_out)
 	$favorite = $i_args['favorite'];
 	$time_min = $i_args['time_min'];
 	$time_max = $i_args['time_max'];
-	$folder   = $i_args['folder'];
-	$f_depth  = $i_args['folder_depth'];
+	$folder   = rtrim( $i_args['folder'],'/');
+	$f_depth  = substr_count( $folder,'/') + 1;
 	$order    = 'jobs_quantity';
 
 	$dbconn = db_connect();
@@ -145,7 +145,7 @@ function get_jobs_table( $i_args, &$o_out)
 	$favorite = $i_args['favorite'];
 	$time_min = $i_args['time_min'];
 	$time_max = $i_args['time_max'];
-	$folder   = $i_args['folder'];
+	$folder   = rtrim( $i_args['folder'],'/');
 
 	if( isset( $i_args['order_u'])) $order_u = $i_args['order_u'];
 	if( isset( $i_args['order_s'])) $order_s = $i_args['order_s'];
@@ -280,8 +280,8 @@ function get_tasks_folders_graph( $i_args, &$o_out)
 	$time_min = $i_args['time_min'];
 	$time_max = $i_args['time_max'];
 	$interval = $i_args['interval'];
-	$folder   = $i_args['folder'];
-	$f_depth  = $i_args['folder_depth'];
+	$folder   = rtrim( $i_args['folder'],'/');
+	$f_depth  = substr_count( $folder,'/') + 1;
 	$order    = 'jobs_quantity';
 
 	$o_out['time_min'] = $time_min;

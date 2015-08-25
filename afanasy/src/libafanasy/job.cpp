@@ -301,9 +301,13 @@ void Job::v_readwrite( Msg * msg)
 	rw_String  ( m_command_pre,  msg);
 	rw_String  ( m_command_post, msg);
 	rw_String  ( m_annotation,   msg);
+
+//	NEW VERSION:
 //	rw_String  ( m_description,  msg);
 	rw_String  ( m_thumb_path,   msg);
+
 	rw_String  ( m_custom_data,  msg);
+
 //	NEW VERSION:
 //	rw_String  ( m_thumb_path,   msg); // Afwatch should ask for thumbnail if this path changed
 
@@ -363,6 +367,9 @@ BlockData * Job::newBlockData( const JSON & i_object, int i_num)
 
 const std::string Job::getFolder() const
 {
+	if( m_id == AFJOB::SYSJOB_ID )
+		return af::Environment::getAfRoot();
+
 	std::string folder;
 
 	std::map<std::string,std::string>::const_iterator it = m_folders.begin();
