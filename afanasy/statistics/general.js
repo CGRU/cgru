@@ -92,9 +92,20 @@ function g_FoldersInit( i_data)
 	}
 
 //$('g_folders').textContent = g_folders;
+	// Set null folders to an empty string to let perform string operations:
+	for( var f = 0; f < g_folders.length; f++)
+		if( g_folders[f] == null )
+			g_folders[f] = '';
+
 	// Find root folder (common beginning for every folder):
-	var names = g_folders[0].split('/');
-//console.log(names);
+	var names = [];
+	for( var f = 0; f < g_folders.length; f++)
+	{
+		if( g_folders[f].length == 0 ) continue;
+		names = g_folders[f].split('/');
+		if( names.length ) break;
+	}
+
 	var folder = g_args.folder;
 	for( var n = 0; n < names.length; n++)
 	{
@@ -118,6 +129,9 @@ function g_FoldersInit( i_data)
 
 function g_FoldersProcess( i_folder)
 {
+	if(( g_folders == null ) || ( g_folders.length == 0 ))
+		return;
+
 	if( i_folder ) g_args.folder = i_folder;
 
 	$('folders_root').textContent = '';

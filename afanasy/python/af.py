@@ -609,8 +609,14 @@ class Job:
 		"""
 		if len(self.blocks) == 0:
 			print('Error: Job has no blocks')
-		# return False
+
 		self.fillBlocks()
+
+		# Set folder if empty:
+		if not "folders" in self.data:
+			# Try to set output folder from files:
+			if "files" in self.data and len(self.data["files"]):
+				self.data["folders"]["output"] = os.path.dirname( self.data["files"][0])
 
 		obj = {"job": self.data}
 		# print(json.dumps( obj))
