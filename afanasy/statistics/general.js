@@ -591,14 +591,24 @@ function g_ShowGraph( i_data, i_args)
 	{
 		var select_name = i_data.table[s][select];
 
-		// Choose color:
-		var c = Math.round((s*3) % select_num);
-		var g = 1; var b = 0;
-		var r = 1 - c * s / select_num;
-		if( r < 1 ) { b = 3 * (c-select_num/3) / select_num; }
-		if( b > 1 ) { g = 1 - 3 * (c-2*select_num/3) / select_num; }
+		// Choose color:   //  Red
+		                   // 1|___       ___
+		var hue_min = 0.8; //  |   \     /   \
+		var hue_max = 3.5; //  |____\___/     \___hue
+		                   //  0  1  2  3  4  5
+		var hue = 0;
+		if( select_num > 1 ) hue = s / (select_num - 1);
+		hue = hue * ( hue_max - hue_min );
+		hue += hue_min;
+
+		var r = hue < 2 ? (2-hue) : (hue-4);
+		var g = hue < 3 ? ( hue ) : (4-hue);
+		var b = hue < 4 ? (hue-2) : (6-hue);
+
 		if(r<0)r=0;if(g<0)g=0;if(b<0)b=0;
 		if(r>1)r=1;if(g>1)g=1;if(b>1)b=1;
+
+		//console.log('Count='+select_num+'; num='+s+'; hue='+hue+'; rgb= ' + r + ',' + g + ',' + b);
 		r=Math.round(255*r);g=Math.round(255*g);b=Math.round(255*b);
 		var color = 'rgb('+r+','+g+','+b+')';
 
