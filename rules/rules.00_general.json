@@ -256,7 +256,7 @@
 	},
 
 	"preview":{
-		"codec":"theora_mid",
+		"codec":"h264_mid",
 		"args":"-vf scale=640:-1"
 	},
 

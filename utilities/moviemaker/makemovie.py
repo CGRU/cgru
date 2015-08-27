@@ -688,6 +688,7 @@ if cmd_preview:
 	cmd_preview = cmd_preview.replace('@CODECSDIR@', CODECSDIR)
 	cmd_preview = cmd_preview.replace('@INPUT@', preview_input)
 	cmd_preview = cmd_preview.replace('@FPS@', Options.fps)
+	cmd_preview = cmd_preview.replace('@CONTAINER@','mp4')
 	cmd_preview = cmd_preview.replace('@OUTPUT@', PFileName)
 	cmd_preview = cmd_preview.replace('@AUXARGS@', Options.pargs)
 

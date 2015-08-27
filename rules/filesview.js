@@ -793,8 +793,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		if( c_FileIsMovieHTML( i_obj.name))
 			elItem.m_preview_file = elItem.m_path;
 
-		if( this.walk.rules && ( this.walk.rufiles.indexOf( i_obj.name + '.ogg') != -1 ))
-			elItem.m_preview_file = c_PathDir( elItem.m_path) + '/' + RULES.rufolder + '/' + i_obj.name + '.ogg';
+		if( this.walk.rufiles )
+		{
+			for( var i = 0; i < c_movieTypesHTML.length; i++)
+			{
+				var ext = '.' + c_movieTypesHTML[i];
+				if( this.walk.rufiles.indexOf( i_obj.name + ext) != -1 )
+					elItem.m_preview_file = c_PathDir( elItem.m_path) + '/' + RULES.rufolder + '/' + i_obj.name + ext;
+			}
+		}
 
 		if( elItem.m_preview_file )
 		{
