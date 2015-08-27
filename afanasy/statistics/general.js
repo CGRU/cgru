@@ -380,6 +380,7 @@ function g_FolderStrip( i_folder)
 	var folder = i_folder.replace( g_args.folder, '');
 	folder = folder.replace( /^\/+|\/+$/g , '');
 	folder = folder.split('/')[0];
+	if( folder.length == 0 ) folder = '/';
 	return folder;
 }
 
