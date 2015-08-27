@@ -295,6 +295,9 @@ function gui_GetParams( i_wnd, i_params, o_params)
 
 	for( var p in i_params)
 	{
+		if( i_wnd.m_elements[p] == null )
+			continue;
+
 		if( i_params[p].list )
 		{
 			var elParams = i_wnd.m_elements[p].m_elParams;

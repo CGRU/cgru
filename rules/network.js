@@ -228,6 +228,10 @@ function n_SendJob( job)
 	if( job.host_name == null )
 		job.host_name = cgru_Browser;
 
+	if( job.folders == null )
+		job.folders = {};
+	job.folders.rules = cgru_PM('/' + RULES.root + g_CurPath(),  true);
+
 	var obj = {};
 	obj.afanasy = 1;
 	obj.job = job;

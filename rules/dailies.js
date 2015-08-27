@@ -564,6 +564,8 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 
 	var job = {};
 	job.name = c_PathBase( paths[0]);
+	job.folders = {};
+	job.folders.input = c_PathDir( paths[0]);
 
 	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
 
