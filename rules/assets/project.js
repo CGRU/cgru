@@ -178,7 +178,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 			if( key == 'shot' )
 			{
 				var shot = deploy[d][key];
-console.log(JSON.stringify(shot));
+//console.log(JSON.stringify(shot));
 
 				// Shot name:
 				var el = document.createElement('td');
