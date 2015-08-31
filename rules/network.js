@@ -1,4 +1,5 @@
 n_server = 'rules.php';
+n_connection_lost = false;
 
 n_requests = [];
 n_requests_count = 0;
@@ -183,9 +184,17 @@ function n_Request( i_args)
 function n_XHRHandler()
 {
 //console.log( this);
-//console.log( this.readyState);
+//console.log('Request status='+this.status+', text='+this.statusText+', state='+this.readyState);
+	if( this.status == 0 )
+	{
+		n_ConnectionLost();
+		return;
+	}
+
 	if( this.readyState == 4 )
 	{
+		n_ConnectionEstablished();
+
 		n_conn_count--;
 //		if( u_el && u_el.cycle ) setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
 		if( n_conn_count < 0 ) n_conn_count = 0;
@@ -327,3 +336,24 @@ function n_SendMailReceived( i_data, i_args)
 	}
 }
 
+function n_ConnectionLost()
+{
+	n_conn_count = 0;
+
+	if( n_connection_lost )
+		return;
+
+	n_connection_lost = true;
+
+	c_Error('Rules server connection lost!');
+}
+
+function n_ConnectionEstablished()
+{
+	if( n_connection_lost != true )
+		return;
+
+	n_connection_lost = false;
+
+	c_Info('Rules server connection established.');
+}
