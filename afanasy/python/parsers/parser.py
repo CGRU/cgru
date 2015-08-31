@@ -113,6 +113,10 @@ class parser(
 				self.appendFile(line.strip(), False)
 			if line.find('Image: ') == 0: # ImageMagick
 				line = line[7:]
+				self.frame += 1
+				self.calculate()
+				#print(line)
+				#print(self.frame,self.percent,self.numframes)
 				self.appendFile(line.strip(), False)
 			if line.find('@IMAGE!@') != -1: # Will be used in CGRU render scripts to generate thumb while task is still running
 				line = line[8:]
