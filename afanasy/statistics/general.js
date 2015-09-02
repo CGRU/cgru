@@ -259,17 +259,17 @@ function g_HashChanged()
 function g_Action_JobsTable( i_args)
 {
 	g_Info('Requesting jobs folders statistics table...');
+	i_args.table = 'jobs';
 	i_args.select = 'folder'
-	i_args.favorite = 'service';
-	g_Request({"send":{"get_jobs_folders":i_args},"func":g_ShowTable,"args":i_args,"service":'get_jobs_folders'});
+	g_Request({"send":{"get_jobs_folders":i_args},"func":g_ShowTable,"args":i_args,"service":'get_jobs_table'});
 }
 
 function g_Action_TasksTable( i_args)
 {
-	g_Info('Requesting tasks services statistics table...');
-	i_args.select = 'service';
-	i_args.favorite = 'username';
-	g_Request({"send":{"get_tasks_table":i_args},"func":g_ShowTable,"args":i_args,"service":'get_tasks_table'});
+	g_Info('Requesting tasks folders statistics table...');
+	i_args.table = 'tasks';
+	i_args.select = 'folder';
+	g_Request({"send":{"get_tasks_folders":i_args},"func":g_ShowTable,"args":i_args,"service":'get_tasks_table'});
 }
 
 function g_Action_TasksGraph( i_args)
@@ -357,21 +357,23 @@ function g_ShowTable( i_data, i_args)
 
 	if( select == 'folder')
 	{
-		g_Info('Requesting jobs tasks statistics table...');
 		var args = i_args.args;
+		g_Info('Requesting ' + args.table + ' services statistics table...');
 		args.select = 'service';
 		args.favorite = 'username';
-		g_Request({"send":{"get_jobs_table":args},"func":g_ShowTable,"args":args,"service":'get_jobs_table'});
+		var send = {};
+		send[i_args.service] = args;
+		g_Request({"send":send,"func":g_ShowTable,"args":args,'service':i_args.service});
 	}
 	if( select == 'service' )
 	{
-		g_Info('Requesting tasks users statistics table...');
 		var args = i_args.args;
+		g_Info('Requesting ' + args.table + ' users statistics table...');
 		args.select = 'username';
 		args.favorite = 'service';
 		var send = {};
 		send[i_args.service] = args;
-		g_Request({"send":send,"func":g_ShowTable,"args":args});
+		g_Request({"send":send,"func":g_ShowTable,"args":args,'service':i_args.service});
 	}
 }
 
@@ -940,16 +942,20 @@ function n_XHRHandler()
 
 g_parm = {};
 
-g_parm.capacity_avg       = {"label":'Average Capacity', "round":true};
-g_parm.error_avg          = {"label":'Average Error',    "percent":true};
-g_parm.fav_name           = {"label":'Favourite'};
-g_parm.fav_percent        = {"label":'Percent',          "percent":true};
-g_parm.folder             = {"label":'Folder'};
-g_parm.jobs_quantity      = {"label":'Jobs Quantity'};
-g_parm.run_time_avg       = {"label":'Average Run Time', "time":true};
-g_parm.run_time_sum       = {"label":'Sum Run Time',     "time":true};
-g_parm.service            = {"label":'Service'};
-g_parm.tasks_done_percent = {"label":'Done',             "percent":true};
+g_parm.capacity_avg        = {"label":'Average Capacity', "round":true};
+g_parm.error_avg           = {"label":'Average Error',    "percent":true};
+g_parm.fav_name            = {"label":'Favourite'};
+g_parm.fav_percent         = {"label":'Percent',          "percent":true};
+g_parm.fav_service         = {"label":'Fav. Service'};
+g_parm.fav_service_percent = {"label":'Percent',          "percent":true};
+g_parm.fav_user            = {"label":'Fav. User'};
+g_parm.fav_user_percent    = {"label":'Percent',          "percent":true};
+g_parm.folder              = {"label":'Folder'};
+g_parm.jobs_quantity       = {"label":'Jobs Quantity'};
+g_parm.run_time_avg        = {"label":'Average Run Time', "time":true};
+g_parm.run_time_sum        = {"label":'Sum Run Time',     "time":true};
+g_parm.service             = {"label":'Service'};
+g_parm.tasks_done_percent  = {"label":'Done',             "percent":true};
 g_parm.tasks_quantity     = {"label":'Tasks Quantity'};
 g_parm.tasks_quantity_avg = {"label":'Average Quantity', "round":true};
 g_parm.username           = {"label":'User'};
