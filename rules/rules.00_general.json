@@ -251,7 +251,6 @@
 		"mov": {"name":"MOV", "tooltip":"Apple QuickTime Movie"},
 		"m4v": {"name":"M4V", "tooltip":"Apple 'MP4'"},
 		"mxf": {"name":"MXF", "tooltip":"Material eXchange Format"},
-		"ogg": {"name":"OGG", "tooltip":"Ogg Vorbis&Theora\nThe most free container.\nFirefox and Chrome can play it without any plugins&codecs installed."},
 		"avi": {"name":"AVI", "tooltip":"Microsoft Audio Video Interleave"}
 	},
 
