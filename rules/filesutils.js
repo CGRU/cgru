@@ -568,7 +568,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 
 	var job = {};
 	job.folders = {};
-	job.folders.input = c_PathDir( paths[0]);
+	job.folders.input = cgru_PM('/' + RULES.root + c_PathDir( paths[0]),  true);
 
 	var arch_cmd = null;
 
