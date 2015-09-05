@@ -80,6 +80,9 @@ case ${DISTRIBUTIVE} in
     Mageia)
         export AF_EXTRA_LIBS="pthread"
         ;;
+    Arch|Manjaro)
+        export AF_EXTRA_LIBS="pthread"
+        ;;
     MacOSX)
         ;;
     *)

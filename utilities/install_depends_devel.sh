@@ -9,7 +9,7 @@ source ./distribution.sh
 packages="yasm p7zip wget inkscape cmake subversion"
 packages_noarch=""
 
-# Packages for Debian distributives:
+# Packages for Debian distributions:
 function debianArch(){
 	packages="$packages vim"
 	packages="$packages g++"
@@ -32,7 +32,7 @@ function debianArch(){
 	pkg_extension=""
 }
 
-# Packages for RedHat distributives:
+# Packages for RedHat distributions:
 function redhatArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
@@ -77,7 +77,7 @@ function fedoraArch(){
 	pkg_extension=""
 }
 
-# Packages for SUSE distributives:
+# Packages for SUSE distributions:
 function suseArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
@@ -98,7 +98,7 @@ function suseArch(){
 	pkg_extension=".$ARCHITECTURE"
 }
 
-# Packages for AltLinux distributives:
+# Packages for AltLinux distributions:
 function altArch(){
 	packages="$packages vim-console"
 	packages="$packages gcc4.5-c++"
@@ -120,7 +120,7 @@ function altArch(){
 	pkg_extension=""
 }
 
-# Packages for Mageia distributives:
+# Packages for Mageia distributions:
 function mageiaArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
@@ -142,6 +142,23 @@ function mageiaArch(){
 	pkg_extension=""
 }
 
+# Packages for Arch Linux distributions:
+function archArch(){
+	packages="$packages vim"
+	#packages="$packages gcc-c++"
+	#packages="$packages python-devel"
+	packages="$packages postgresql"
+	#packages="$packages qt4-devel-private"
+	#packages="$packages rpm-build"
+	#packages="$packages git"
+	packages="$packages python-pyqt4"
+	#packages="$packages libzip libzip-devel"
+
+	pkg_manager_cmd="pacman -S"
+	pkg_extension=""
+}
+
+
 # Case distribution:
 case ${DISTRIBUTIVE} in
 	AltLinux)
@@ -158,6 +175,9 @@ case ${DISTRIBUTIVE} in
 		;;
 	Fedora)
 		fedoraArch
+		;;
+	Arch|Manjaro)
+		archArch
 		;;
 	*)
 		redhatArch

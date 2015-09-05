@@ -2,8 +2,8 @@
 
 echo "Detecting UNIX distribution..."
 
-distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia"
-knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE"
+distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia Arch Manjaro"
+knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE Mageia Arch Manjaro"
 
 if [ `uname` == "Darwin" ]; then
 	export DISTRIBUTIVE="MacOSX"
