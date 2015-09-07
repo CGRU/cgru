@@ -26,14 +26,9 @@ def renderNodes( i_app, i_nodes, i_params = None, i_store_frame_range = False):
 
 	for node in i_nodes:
 
-		params = dict()
-		getAfParams( node, params)
+		params = getAfParams( node, i_params)
 		print( params)
-
-		afanas, writes = getInputs( node)
-
-		#print('Writes:');    for node in writes: print( node.getLabel() + ': ' + node.getScriptName() + ': ' + node.getPluginID())
-		#print('Afanasies:'); for node in afanas: print( node.getLabel() + ': ' + node.getScriptName() + ': ' + node.getPluginID())
+		if params is None: return
 
 		jobs_params.append( params)
 
@@ -41,8 +36,8 @@ def renderNodes( i_app, i_nodes, i_params = None, i_store_frame_range = False):
 
 	for params in jobs_params:
 		job = createJob( i_app, params)
-		if job is None:
-			return
+		if job is None: return
+
 		jobs.append( job)
 
 	for job in jobs:
@@ -63,12 +58,43 @@ def createJob( i_app, i_params):
 	return job
 
 
-def getAfParams( i_node, o_params):
+def getAfParams( i_node, i_params):
+	o_params = dict()
+	o_params['nodename'] = i_node.getLabel()
 	for par in i_node.getParams():
 		name = par.getScriptName()
 		if name.find('af_') != 0: continue
 		o_params[name] = par.getValue()
 
+	childs = getInputs( i_node)
+
+	o_params['childs'] = []
+
+	for child in childs:
+		params = None
+		if isNodeType( child,['write']):
+			params = getWriteParams( child)
+			if params is None: return None
+			params['afanasy'] = False
+		if isNodeType( child,['afanasy']):
+			params = getAfParams( child, i_params)
+			if params is None: return None
+			params['afanasy'] = True
+		o_params['childs'].append( params)
+
+	return o_params
+
+def getWriteParams( i_node):
+	o_params = dict()
+	o_params['nodename'] = i_node.getLabel()
+
+	pnames = ['filename']
+	for pname in pnames:
+		par = i_node.getParam(pname)
+		if par:
+			o_params[pname] = par.getValue()
+
+	return o_params
 
 def isNodeType( i_node, i_types):
 	for tp in i_types:
@@ -84,16 +110,14 @@ def getInputDot( i_node, i_index = 0):
 	return node
 
 def getInputs( i_node):
-	o_afanas = [];
-	o_writes = [];
+	o_nodes = [];
 	i = 0
 	while True:
 		node = getInputDot( i_node, i)
 		if not node: break
-		if isNodeType( node,['write']  ): o_writes.append( node)
-		if isNodeType( node,['afanasy']): o_afanas.append( node)
+		if isNodeType( node,['write','afanasy']): o_nodes.append( node)
 		i += 1
-	return o_afanas, o_writes
+	return o_nodes
 
 
 def onInputChanged( inputIndex, thisNode, thisGroup, app):

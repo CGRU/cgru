@@ -21,7 +21,7 @@ def createInstance(i_app,i_grp):
 	outputNode = i_app.createNode('fr.inria.built-in.Output', 1, i_grp)
 	outputNode.connectInput(0, inputNode)
 
-	for i in range(0,4):
+	for i in range(4):
 		i_app.createNode('fr.inria.built-in.Input', 1, i_grp)
 
 	#
