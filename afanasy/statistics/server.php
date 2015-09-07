@@ -414,7 +414,7 @@ function get_tasks_folders_graph( $i_args, &$o_out)
 	$interval = $i_args['interval'];
 	$folder   = rtrim( $i_args['folder'],'/');
 	$f_depth  = substr_count( $folder,'/') + 1;
-	$order    = 'jobs_quantity';
+	$order    = 'quantity';
 
 	$o_out['time_min'] = $time_min;
 	$o_out['time_max'] = $time_max;
@@ -434,6 +434,7 @@ SELECT min(folder) as folder,
  GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
  ORDER BY quantity DESC;
 ";
+//error_log($query);
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 	{
@@ -456,10 +457,19 @@ SELECT min(folder) as folder,
  GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
  ORDER BY quantity DESC;
 ";
+//error_log($query);
 		$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 		while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 		{
-			$o_out['graph'][$time][$line[$select]] = $line;
+			$fname = $line[$select];
+			$fname = explode('/', $fname);
+			$fname = array_slice( $fname, $f_depth, $f_depth + 1);
+			if( count( $fname))
+				$fname = $fname[0];
+			else
+				$fname = '';
+
+			$o_out['graph'][$time][$fname] = $line;
 		}
 		pg_free_result($result);
 

@@ -435,6 +435,8 @@ function g_ShowGraph( i_data, i_args)
 	for( var s = 0; s < i_data.table.length; s++)
 	{
 		var name = i_data.table[s][select];
+		if( select == 'folder')
+			name = g_FolderStrip( name);
 		for( var time in i_data.graph )
 		{
 			var quantity = 0;
@@ -593,6 +595,7 @@ function g_ShowGraph( i_data, i_args)
 	for( var s = 0; s < select_num; s++)
 	{
 		var select_name = i_data.table[s][select];
+		if( select == 'folder' ) select_name = g_FolderStrip( select_name);
 
 		// Choose color:   //  Red
 		                   // 1|___       ___
@@ -623,7 +626,6 @@ function g_ShowGraph( i_data, i_args)
 		text.setAttribute('font-size', 16);
 		text.setAttribute('fill', color);
 		var label = select_name;
-		if( select == 'folder' ) label = g_FolderStrip( label);
 		text.textContent = label;
 
 		// Start curve path:
