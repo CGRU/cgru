@@ -241,7 +241,11 @@ for i in range(0, len(Sequences)):
 			block = af.Block(seq['cmd_name'])
 			job.blocks.append(block)
 
+			job.setFolder('input',  os.path.dirname( seq['inseq'] ))
+			job.setFolder('output', os.path.dirname( seq['outseq']))
+
 			if seq['seq']:
+
 				block.setName( seq['cmd_name'] + ':%d-%d=%d' % (seq['first'],seq['last'],seq['count']))
 				block.setFramesPerTask( Options.affpt)
 				first = seq['first']
