@@ -226,6 +226,7 @@ class UI(object):
 			'-hostsexcl %(exc)s',
 			'-fpt %(fpt)s',
 			'-name "%(name)s"',
+			'-pwd "%(pwd)s"',
 			'-proj "%(proj)s"',
 			'-images "%(images)s"',
 			'-deletescene'
@@ -240,13 +241,20 @@ class UI(object):
 			'exc': hosts_exclude,
 			'fpt': frames_per_task,
 			'name': job_name,
+			'pwd': project_path,
 			'proj': project_path,
 			'images': outputs
 		}
 
 		drg = pm.PyNode('defaultRenderGlobals')
-		if drg.getAttr('currentRenderer') == 'mentalRay':
+		render_engine = drg.getAttr('currentRenderer')
+		if render_engine == 'mentalRay':
 			cmd_buffer.append('-type maya_mental')
+		elif render_engine == 'arnold':
+			cmd_buffer.append('-type maya_arnold')
+			# set the verbosity level to warning+info
+			aro = pm.PyNode('defaultArnoldRenderOptions')
+			aro.setAttr('log_verbosity', 1)
 
 		if pause:
 			cmd_buffer.append('-pause')

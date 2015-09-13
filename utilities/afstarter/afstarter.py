@@ -67,6 +67,7 @@ def fileTypeList():
 	fileType_list.append((['ifd'],      'mantra',       'Mantra'))
 	fileType_list.append((['mb', 'ma'], 'maya',         'Maya'))
 	fileType_list.append((['mb', 'ma'], 'maya_mental',  'Mental Ray'))
+	fileType_list.append((['mb', 'ma'], 'maya_arnold',  'MtoA'))
 	fileType_list.append((['mb', 'ma'], 'maya_delight', '3Delight'))
 	fileType_list.append((['scn'],      'xsi',          'Softimage'))
 	fileType_list.append((['max'],      'max',          '3dsmax'))
@@ -116,6 +117,7 @@ def labelNodeNameDict():
 	labelNode_name['maya']         = 'Camera:'
 	labelNode_name['maya_delight'] = 'Camera:'
 	labelNode_name['maya_mental']  = 'Camera:'
+	labelNode_name['maya_arnold']  = 'Camera:'
 	labelNode_name['3dsmax']       = 'Camera:'
 	labelNode_name['afterfx']      = 'Composition:'
 	return labelNode_name
@@ -133,6 +135,7 @@ def labelNodeTooltipsDict():
 	labelNode_tooltip['maya']         = 'Maya camera\nExample: \'persp\''
 	labelNode_tooltip['maya_delight'] = 'Maya camera\nExample: \'persp\''
 	labelNode_tooltip['maya_mental']  = 'Maya camera\nExample: \'persp\''
+	labelNode_tooltip['maya_arnold']  = 'Maya camera\nExample: \'persp\''
 	labelNode_tooltip['3dsmax']       = '3DSMAX camera'
 	labelNode_tooltip['afterfx']      = 'AfterFX composition\nExample: \'Comp 1\''
 	return labelNode_tooltip
@@ -147,6 +150,7 @@ def labelTakeNameDict():
 	labelTake_name['maya']         = 'Layer:'
 	labelTake_name['maya_delight'] = 'Render Pass:'
 	labelTake_name['maya_mental']  = 'Layer:'
+	labelTake_name['maya_arnold']  = 'Layer:'
 	labelTake_name['3dsmax']       = 'Batch:'
 	labelTake_name['afterfx']      = 'render settings template:'
 	return labelTake_name
@@ -166,6 +170,7 @@ def labelTakeTooltipsDict():
 	labelTake_tooltip['maya']         = 'Maya render layer'
 	labelTake_tooltip['maya_delight'] = '3Delight for Maya Render Pass'
 	labelTake_tooltip['maya_mental']  = 'Maya render layer'
+	labelTake_tooltip['maya_arnold']  = 'Maya render layer'
 	labelTake_tooltip['3dsmax']       = '3DSMAX batch'
 	labelTake_tooltip['afterfx']      = 'AfterFX render settings template\nExample: \'Best Settings\''
 	return labelTake_tooltip
