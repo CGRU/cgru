@@ -6,3 +6,7 @@ AuthDigestProvider file
 AuthGroupFile /cgru/.htgroups
 AuthUserFile /cgru/.htdigest
 #Require valid-user
+
+# Needed modules:
+# sudo a2enmod ssl auth_digest authz_groupfile
+

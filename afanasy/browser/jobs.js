@@ -34,6 +34,7 @@ JobNode.prototype.init = function()
 
 	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
+	this.elPPApproval = cm_ElCreateFloatText( this.element, 'right', 'Preview Pending Approval','PPA');
 	this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 	this.elDependMask = cm_ElCreateFloatText( this.element, 'right', 'Depend Mask');
 	this.elDependMaskGlobal = cm_ElCreateFloatText( this.element, 'right', 'Global Depend Mask');
@@ -44,7 +45,6 @@ JobNode.prototype.init = function()
 	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Properties');
 	this.elNeedOS = cm_ElCreateFloatText( this.element, 'right', 'OS Needed');
 	
-
 	this.blocks = [];
 	for( var b = 0; b < this.params.blocks.length; b++)
 		this.blocks.push( new JobBlock( this.element, this.params.blocks[b]));
@@ -84,6 +84,11 @@ JobNode.prototype.update = function( i_obj)
 	this.elName.title = 'ID = '+this.params.id;
 	this.elPriority.textContent = 'P' + this.params.priority;
 	this.elUserName.textContent = this.params.user_name;
+
+	if( this.params.ppa )
+		this.elPPApproval.style.display = 'block';
+	else
+		this.elPPApproval.style.display = 'none';
 
 	if( this.params.thumb_path )
 		this.showThumb( this.params.thumb_path );
@@ -213,10 +218,6 @@ JobNode.prototype.onDoubleClick = function( i_evt)
 	g_OpenMonitor({"type":'tasks',"evt":i_evt,"id":this.params.id,"name":this.params.name,"wnd":this.monitor.window});
 }
 
-JobNode.prototype.mh_Show = function( i_param, i_evt )
-{
-	g_ShowObject({"object":this.params},{"evt":i_evt,"wnd":this.monitor.window});
-}
 JobNode.prototype.mh_Move = function( i_param)
 {
 	if( g_uid < 1 )
@@ -261,9 +262,10 @@ JobNode.prototype.showThumb = function( i_path)
 	{
 		var img = document.createElement('img');
 		thumb.appendChild( img);
+		img.ondragstart = function(){return false;};
 		img.src = '@TMP@' + i_path;
 		img.style.display = 'none';
-		img.m_height = this.monitor.options.jobs_thumbs_height;
+		img.m_height = this.monitor.view_opts.jobs_thumbs_height;
 		img.onload = function( e) {
 			var img = e.currentTarget;
 			if( img.height != img.m_height )
@@ -277,7 +279,7 @@ JobNode.prototype.showThumb = function( i_path)
 	else
 		name.style.position = 'relative';
 
-	if( this.elThumbs.m_divs.length > this.monitor.options.jobs_thumbs_num )
+	if( this.elThumbs.m_divs.length > this.monitor.view_opts.jobs_thumbs_num )
 	{
 		this.elThumbs.removeChild( this.elThumbs.m_divs[0]);
 		this.elThumbs.m_divs.splice( 0, 1);
@@ -297,7 +299,7 @@ function JobBlock( i_elParent, i_block)
 	i_elParent.appendChild( this.elRoot);
 	this.elRoot.style.clear = 'both';
 	this.elRoot.block = this;
-	this.elRoot.oncontextmenu = function(e){ return e.currentTarget.block.onContextMenu(e);}
+	this.elRoot.oncontextmenu = function(e){ e.currentTarget.block.onContextMenu(e); return false;}
 
 	this.service = this.params.service;
 	this.elIcon = document.createElement('img');
@@ -311,37 +313,6 @@ function JobBlock( i_elParent, i_block)
 	this.element.classList.add('jobblock');
 
 	this.elTasks = cm_ElCreateText( this.element);
-	var tasks = 't' + this.tasks_num;
-	var tasks_title = 'Block tasks:'
-	if( this.params.numeric )
-	{
-		tasks_title += ' Numeric:';
-		tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
-		tasks_title += ' from ' + this.params.frame_first + ' to ' + this.params.frame_last;
-		if( this.params.frames_per_task > 1 )
-		{
-			tasks += ':' + this.params.frames_per_task;
-			tasks_title += ' per ' + this.params.frames_per_task;
-		}
-		if( this.params.frames_inc > 1 )
-		{
-			tasks += '/' + this.params.frames_inc;
-			tasks_title += ' by ' + this.params.frames_inc;
-		}
-		tasks += ')';
-		tasks_title += '.';
-	}
-	else
-	{
-		tasks_title += ' Not numeric.';
-	}
-	tasks += ':';
-	this.elTasks.textContent = tasks;
-	this.elTasks.title = tasks_title;
-
-	this.elNonSeq = cm_ElCreateText( this.element, 'Non-Sequential Tasks Running');
-	this.elNonSeq.textContent = '(N-S)';
-
 	this.elName = cm_ElCreateText( this.element, 'Block Name');
 	this.elDepends = cm_ElCreateText( this.element);
 
@@ -360,71 +331,173 @@ function JobBlock( i_elParent, i_block)
 	this.elRunTime = cm_ElCreateFloatText( this.element, 'right');
 }
 
-JobBlock.prototype.onContextMenu = function( evt)
+JobBlock.prototype.onContextMenu = function( i_e)
 {
-	evt.stopPropagation();
-
+	i_e.stopPropagation();
 	g_cur_monitor = this.job.monitor;
 
-	if( this.job.monitor.menu ) this.job.monitor.menu.destroy();
-	this.element.classList.add('selected');
+	JobBlock.resetPanels( this.job.monitor);
 
-	var onlyBlockIsSelected = false;
-	if(( this.job.element.selected == null ) || ( this.job.element.selected == false ))
+	var selected_blocks = this.job.monitor.selected_blocks;
+
+	// We should to deselect other jobs blocks,
+	// as server can manipulate selected blocks of a one job only
+	if( selected_blocks )
+	{
+		var blocks_to_deselect = [];
+
+		for( var b = 0; b < selected_blocks.length; b++)
+		{
+			if( this.job.params.id == selected_blocks[b].job.params.id )
+				continue;
+
+			var blocks = selected_blocks[b].job.blocks;
+			for( var j = 0; j < blocks.length; j++)
+				if( blocks_to_deselect.indexOf( blocks[j]) == -1 )
+					blocks_to_deselect.push( blocks[j]);
+		}
+
+		for( var b = 0; b < blocks_to_deselect.length; b++)
+			blocks_to_deselect[b].setSelected( false);
+	}
+
+	// If selected, we deselecting it and exit:
+	if( this.selected )
+	{
+		this.setSelected( false);
+		if( selected_blocks.length )
+			selected_blocks[selected_blocks.length-1].updatePanels();
+		return;
+	}
+
+	// Select block:
+	this.setSelected( true);
+
+	// If jobs selected, select all selected jobs blocks,
+	// as server can manipulate all blocks of a several blocks (not special blocks of a selected jobs)
+	var jobs = this.job.monitor.getSelectedItems();
+	if( jobs.length )
 	{
 		this.job.monitor.selectAll( false);
-		onlyBlockIsSelected = true;
+		for( var j = 0; j < jobs.length; j++)
+		for( var b = 0; b < jobs[j].blocks.length; b++)
+			jobs[j].blocks[b].setSelected( true);
 	}
 
-	var menu = new cgru_Menu({"parent":document.body,"evt":evt,"name":'jobblock_context',"receiver":this,"destroy":'onContextMenuDestroy'});
-	this.job.monitor.menu = menu;
+	// Update panels info:
+	this.updatePanels();
+}
+JobBlock.prototype.updatePanels = function()
+{
+	var elBlocks = this.job.monitor.elPanelR.m_elBlocks;
+	elBlocks.m_cur_block = this;
+	elBlocks.classList.add('active');
 
-	if( onlyBlockIsSelected )
-		menu.addItem({"label":'<b>'+this.params.name+'</b>',"enabled":false});
-	else
-		menu.addItem({"label":'<b>All Blocks</b>',"enabled":false});
-	menu.addItem();
+	elBlocks.m_elName.style.display = 'block';
+	elBlocks.m_elName.textContent = this.params.name;
 
-	var actions = JobBlock.actions;
-	for( var i = 0; i < actions.length; i++)
+	for( var p in JobBlock.params )
 	{
-		var item = {};
-		for( var key in actions[i] ) item[key] = actions[i][key];
-		item.receiver = this;
-		item.param = actions[i];
-		menu.addItem( item);
-	}
-	menu.show();
+		if( this.params[p] == null ) continue;
 
-	return false;
+		var el = elBlocks.m_elParams[p];
+		el.style.display = 'block';
+		el.m_elValue.textContent = this.params[p];
+	}
+
+	this.job.monitor.setPanelInfo(this.params.name);
 }
-JobBlock.prototype.onContextMenuDestroy = function()
+JobBlock.resetPanels = function( i_monitor)
 {
-	this.element.classList.remove('selected');
-	this.job.monitor.menu = null;
+	var elBlocks = i_monitor.elPanelR.m_elBlocks;
+	if( elBlocks.m_cur_block == null )
+		return;
+
+	elBlocks.classList.remove('active');
+	elBlocks.m_elName.style.display = 'none';
+	for( var p in JobBlock.params )
+	{
+		var el = elBlocks.m_elParams[p];
+		el.style.display = 'none';
+		el.m_elValue.textContent = '';
+	}
+
+	i_monitor.resetPanelInfo();
+
+	elBlocks.m_cur_block = null;
 }
-JobBlock.prototype.mh_Dialog = function( i_parameter)
+JobBlock.prototype.setSelected = function( i_select)
 {
-	new cgru_Dialog({"wnd":this.job.monitor.window,"receiver":this,"handle":'setParameter',
-		"param":i_parameter.name,"type":i_parameter.type,"value":this.params[i_parameter.name],
+	if( this.job.monitor.selected_blocks == null )
+		this.job.monitor.selected_blocks = [];
+
+	if( i_select )
+	{
+		if( this.selected ) return;
+
+		this.selected = true;
+		this.element.classList.add('selected');
+
+		this.job.monitor.selected_blocks.push( this);
+	}
+	else
+	{
+		if( this.selected != true ) return;
+
+		this.selected = false;
+		this.element.classList.remove('selected');
+
+		this.job.monitor.selected_blocks.splice( this.job.monitor.selected_blocks.indexOf( this), 1);
+	}
+}
+JobBlock.deselectAll = function( i_monitor)
+{
+	if( i_monitor.selected_blocks )
+		while( i_monitor.selected_blocks.length )
+			i_monitor.selected_blocks[0].setSelected( false);
+
+	JobBlock.resetPanels( i_monitor);
+}
+JobBlock.setDialog = function( i_args)
+{
+	var block = i_args.monitor.elPanelR.m_elBlocks.m_cur_block;
+
+	if( block == null )
+	{
+		g_Error('No block(s) selected.');
+		return;
+	}
+
+	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":block,"handle":'setParameter',
+		"param":i_args.name,"type":i_args.type,"value":block.params[i_args.name],
 		"name":'jobblock_parameter'});
 }
 JobBlock.prototype.setParameter = function( i_value, i_parameter)
 {
 	var params = {};
 	params[i_parameter] = i_value;
-g_Info( this.job.params.name+'['+this.params.name+'].'+i_parameter+' = ' + i_value);
 	this.action( null, params);
 }
 JobBlock.prototype.action = function( i_operation, i_params)
 {
-	var jids = this.job.monitor.getSelectedIds();
-	var bids = [-1];
-	if( jids.length == 0 )
+	var jids = [];
+	var bids = [];
+
+	for( var b = 0; b < this.job.monitor.selected_blocks.length; b++)
 	{
-		jids = [this.job.params.id];
-		bids = [this.params.block_num];
+		var block = this.job.monitor.selected_blocks[b];
+
+		jid = block.job.params.id;
+		if( jids.indexOf( jid) == -1 )
+			jids.push( jid);
+
+		bids.push( block.params.block_num);
 	}
+
+	// If several jobs selected, we can manipulate only all their blocks.
+	if( jids.length > 1 )
+		bids = [-1];
+
 	nw_Action('jobs', jids, i_operation, i_params, bids);
 }
 
@@ -526,9 +599,38 @@ JobBlock.prototype.update = function( i_displayFull)
 	{
 		this.elName.textContent = this.params.name;
 
-		this.elNonSeq.style.display = this.params.non_sequential ? 'inline':'none';
-//		if( this.params.non_sequential ) this.elNonSeq.style.display = 'none';
-//		else this.elNonSeq.textContent = '';
+		var tasks = 't' + this.tasks_num;
+		var tasks_title = 'Block tasks:'
+		if( this.params.numeric )
+		{
+			tasks_title += ' Numeric:';
+			tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
+			tasks_title += '\nFrame First: ' + this.params.frame_first;
+			tasks_title += '\nFrame Last: ' + this.params.frame_last;
+			if( this.params.frames_inc > 1 )
+			{
+				tasks += '/' + this.params.frames_inc;
+				tasks_title += '\nIncrement: ' + this.params.frames_inc;
+			}
+			if( this.params.frames_per_task > 1 )
+			{
+				tasks += ':' + this.params.frames_per_task;
+				tasks_title += '\nFrames Per Task: ' + this.params.frames_per_task;
+			}
+			if(( this.params.sequential != null ) && ( this.params.sequential != 1 ))
+			{
+				tasks += '%' + this.params.sequential;
+				tasks_title += '\nSequential: ' + this.params.sequential;
+			}
+			tasks += ')';
+		}
+		else
+		{
+			tasks_title += ' Not numeric.';
+		}
+		tasks += ':';
+		this.elTasks.textContent = tasks;
+		this.elTasks.title = tasks_title;
 
 		if( this.service != this.params.service )
 		{
@@ -747,69 +849,282 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 }
 
+JobNode.resetPanels = function( i_monitor)
+{
+	i_monitor.ctrl_btns.errors.classList.remove('errors');
+	i_monitor.ctrl_btns.errors.classList.add('hide_childs');
+
+	// Remove folders items:
+	var elFolders = i_monitor.elPanelR.m_elFolders;
+	if( elFolders.m_elFolders )
+		for( var i = 0; i < elFolders.m_elFolders.length; i++)
+			elFolders.removeChild( elFolders.m_elFolders[i]);
+	elFolders.m_elFolders = [];
+	elFolders.m_elRules.style.display = 'none';
+}
+JobNode.prototype.updatePanels = function()
+{
+	var elPanelL = this.monitor.elPanelL;
+	var elPanelR = this.monitor.elPanelR;
 
 
-JobNode.actions = [];
+	// Admin can't move jobs:
+	if( g_VISOR())
+		this.monitor.ctrl_btns.move_jobs.classList.remove('active');
 
-JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_num',    "type":'num', "handle":'mh_Opt', "label":'Thumbnails Quantity', "default":10  });
-JobNode.actions.push({"mode":'option', "name":'jobs_thumbs_height', "type":'num', "handle":'mh_Opt', "label":'Thumbnails Height',   "default":50 });
 
-JobNode.actions.push({"mode":'context', "name":'log',               "handle":'mh_Get',  "label":'Show Log'});
-JobNode.actions.push({"mode":'context', "name":'error_hosts',       "handle":'mh_Get',  "label":'Show Error Hosts'});
-JobNode.actions.push({"mode":'context', "name":'show_obj',          "handle":'mh_Show', "label":'Show Object'});
-JobNode.actions.push({"mode":'context'});
-JobNode.actions.push({"mode":'context', "name":'reset_error_hosts', "handle":'mh_Oper', "label":'Reset Error Hosts'});
-JobNode.actions.push({"mode":'context', "name":'restart_errors',    "handle":'mh_Oper', "label":'Restart Errors'});
-JobNode.actions.push({"mode":'context', "name":'restart_running',   "handle":'mh_Oper', "label":'Restart Running'});
-JobNode.actions.push({"mode":'context', "name":'restart_skipped',   "handle":'mh_Oper', "label":'Restart Skipped'});
-JobNode.actions.push({"mode":'context', "name":'restart_done',      "handle":'mh_Oper', "label":'Restart Done'});
-JobNode.actions.push({"mode":'context'});
-JobNode.actions.push({"mode":'context', "name":'move_jobs_up',      "handle":'mh_Move', "label":'Move Up',     "permissions":'user'});
-JobNode.actions.push({"mode":'context', "name":'move_jobs_down',    "handle":'mh_Move', "label":'Move Down',   "permissions":'user'});
-JobNode.actions.push({"mode":'context', "name":'move_jobs_top',     "handle":'mh_Move', "label":'Move Top',    "permissions":'user'});
-JobNode.actions.push({"mode":'context', "name":'move_jobs_bottom',  "handle":'mh_Move', "label":'Move Bottom', "permissions":'user'});
-JobNode.actions.push({"mode":'context'});
-JobNode.actions.push({"mode":'context', "name":'start',             "handle":'mh_Oper', "label":'Start'});
-JobNode.actions.push({"mode":'context', "name":'pause',             "handle":'mh_Oper', "label":'Pause'});
-JobNode.actions.push({"mode":'context', "name":'stop',              "handle":'mh_Oper', "label":'Stop'});
-JobNode.actions.push({"mode":'context', "name":'restart',           "handle":'mh_Oper', "label":'Restart'});
-JobNode.actions.push({"mode":'context', "name":'restart_pause',     "handle":'mh_Oper', "label":'Restart&Pause'});
-JobNode.actions.push({"mode":'context', "name":'delete',            "handle":'mh_Oper', "label":'Delete'});
+	// Blocks:
+	JobBlock.deselectAll( this.monitor);
+	elPanelR.m_elBlocks.classList.remove('active');
 
-JobNode.actions.push({"mode":'set', "name":'annotation',                 "type":'str', "handle":'mh_Dialog', "label":'Annotation'});
-JobNode.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
-JobNode.actions.push({"mode":'set', "name":'depend_mask_global',         "type":'reg', "handle":'mh_Dialog', "label":'Global Depend Mask'});
-JobNode.actions.push({"mode":'set', "name":'max_running_tasks',          "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
-JobNode.actions.push({"mode":'set', "name":'max_running_tasks_per_host', "type":'num', "handle":'mh_Dialog', "label":'Max Run Tasks Per Host'});
-JobNode.actions.push({"mode":'set', "name":'hosts_mask',                 "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
-JobNode.actions.push({"mode":'set', "name":'hosts_mask_exclude',         "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
-JobNode.actions.push({"mode":'set', "name":'time_wait',                  "type":'tim', "handle":'mh_Dialog', "label":'Time Wait'});
-JobNode.actions.push({"mode":'set', "name":'priority',                   "type":'num', "handle":'mh_Dialog', "label":'Priority'});
-JobNode.actions.push({"mode":'set', "name":'need_os',                    "type":'reg', "handle":'mh_Dialog', "label":'OS Needed'});
-JobNode.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Need Properties'});
-JobNode.actions.push({"mode":'set', "name":'time_life',                  "type":'hrs', "handle":'mh_Dialog', "label":'Life Time'});
-JobNode.actions.push({"mode":'set', "name":'user_name',                  "type":'str', "handle":'mh_Dialog', "label":'Owner',"permissions":'visor'});
-JobNode.actions.push({"mode":'set'});
-JobNode.actions.push({"mode":'set', "name":'hidden',                     "type":'bl1', "handle":'mh_Dialog', "label":'Hidden'});
 
-JobBlock.actions = [];
-JobBlock.actions.push({"mode":'set', "name":'capacity',                   "type":'num', "handle":'mh_Dialog', "label":'Capacity'});
-JobBlock.actions.push({"mode":'set'});
-JobBlock.actions.push({"mode":'set', "name":'errors_retries',             "type":'num', "handle":'mh_Dialog', "label":'Errors Retries'});
-JobBlock.actions.push({"mode":'set', "name":'errors_avoid_host',          "type":'num', "handle":'mh_Dialog', "label":'Errors Avoid Host'});
-JobBlock.actions.push({"mode":'set', "name":'errors_task_same_host',      "type":'num', "handle":'mh_Dialog', "label":'Errors Task Same Host'});
-JobBlock.actions.push({"mode":'set', "name":'errors_forgive_time',        "type":'hrs', "handle":'mh_Dialog', "label":'Errors Forgive Time'});
-JobBlock.actions.push({"mode":'set', "name":'tasks_max_run_time',         "type":'hrs', "handle":'mh_Dialog', "label":'Tasks Max Run Time'});
-JobBlock.actions.push({"mode":'set'});
-JobBlock.actions.push({"mode":'set', "name":'non_sequential',             "type":'bl1', "handle":'mh_Dialog', "label":'Non-Sequential'});
-JobBlock.actions.push({"mode":'set'});
-JobBlock.actions.push({"mode":'set', "name":'max_running_tasks',          "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
-JobBlock.actions.push({"mode":'set', "name":'max_running_tasks_per_host', "type":'num', "handle":'mh_Dialog', "label":'Max Run Tasks Per Host'});
-JobBlock.actions.push({"mode":'set', "name":'hosts_mask',                 "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
-JobBlock.actions.push({"mode":'set', "name":'hosts_mask_exclude',         "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
-JobBlock.actions.push({"mode":'set', "name":'depend_mask',                "type":'reg', "handle":'mh_Dialog', "label":'Depend Mask'});
-JobBlock.actions.push({"mode":'set', "name":'tasks_depend_mask',          "type":'reg', "handle":'mh_Dialog', "label":'Tasks Depend Mask'});
-JobBlock.actions.push({"mode":'set', "name":'need_properties',            "type":'reg', "handle":'mh_Dialog', "label":'Properties Needed'});
+	// Errors control buttons:
+	var errors = 0;
+	var avoids = 0;
+	for( var b = 0; b < this.params.blocks.length; b++)
+	{
+		var block = this.params.blocks[b];
+		if( block.p_error_hosts )
+			errors += block.p_error_hosts;
+		if( block.p_avoid_hosts )
+			avoids += block.p_avoid_hosts;
+	}
+	if( errors || avoids || this.state.ERR )
+	{
+		this.monitor.ctrl_btns.errors.classList.remove('hide_childs');
+		if( avoids || this.state.ERR )
+			this.monitor.ctrl_btns.errors.classList.add('errors');
+	}
+	else
+	{
+		this.monitor.ctrl_btns.errors.classList.remove('active');
+	}
+
+
+	// Info:
+	var info = 'Created:<br> ' + cm_DateTimeStrFromSec( this.params.time_creation);
+	if( this.params.time_started )
+		info += '<br>Started:<br> ' + cm_DateTimeStrFromSec( this.params.time_started);
+	if( this.params.time_done )
+		info += '<br>Finished:<br> ' + cm_DateTimeStrFromSec( this.params.time_done);
+	this.monitor.setPanelInfo( info);
+
+
+	// Folders:
+	var elFolders = elPanelR.m_elFolders;
+	elFolders.m_elFolders = [];
+	var folders = this.params.folders;
+
+//console.log(JSON.stringify( folders));
+	if(( folders == null ) || ( folders.length == 0 ))
+	{
+		return;
+	}
+
+	var rules_link = folders.output;
+
+	for( var name in folders )
+	{
+		if( rules_link == null )
+			rules_link = folders[name];
+
+		var path = cgru_PM( folders[name]);
+
+		var elDiv = document.createElement('div');
+		elFolders.appendChild( elDiv);
+		elFolders.m_elFolders.push( elDiv);
+		elDiv.classList.add('param');
+		elDiv.classList.add('folder');
+		elDiv.classList.add('cmdexec');
+		var cmd = cgru_OpenFolderCmd( path);
+		elDiv.setAttribute('cmdexec', JSON.stringify([cmd]));
+		elDiv.title = 'Right click and "Run" to open:\n' + path;
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = name;
+
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elValue.classList.add('value');
+		elValue.textContent = path;
+	}
+
+	elFolders.m_elRules.style.display = 'block';
+	elFolders.m_elRules.href = cgru_RulesLink( rules_link);
+}
+
+JobNode.createPanels = function( i_monitor)
+{
+	// Left Panel:
+
+
+	// Errors:
+	var acts = {};
+	acts.error_hosts       = {'label':'GEH', "handle":'mh_Get',  'tooltip':'Show error hosts.'};
+	acts.reset_error_hosts = {'label':'REH', 'handle':'mh_Oper', 'tooltip':'Reset error hosts.'};
+	acts.restart_errors    = {'label':'RET', 'handle':'mh_Oper', 'tooltip':'Restart error tasks.'};
+	i_monitor.createCtrlBtn({'name':'errors','label':'ERR','tooltip':'Error tasks and hosts.','sub_menu':acts});
+
+
+	// Restart:
+	var acts = {};
+	acts.restart         = {'label':'ALL', 'tooltip':'Restart all tasks.'};
+	acts.restart_pause   = {'label':'A&P', 'tooltip':'Restart all and pause.'};
+	acts.restart_errors  = {'label':'ERR', 'tooltip':'Restart error tasks.'};
+	acts.restart_running = {'label':'RUN', 'tooltip':'Restart running tasks.'};
+	acts.restart_skipped = {'label':'SKP', 'tooltip':'Restart skipped tasks.'};
+	acts.restart_done    = {'label':'DON', 'tooltip':'Restart done task.'};
+	i_monitor.createCtrlBtn({'name':'restart_tasks','label':'RES','tooltip':'Restart job tasks.','sub_menu':acts});
+
+
+	// Move:
+	var acts = {};
+	acts.move_jobs_top    = {'label':'TOP','tooltip':'Move jobs top.'};
+	acts.move_jobs_up     = {'label':'UP', 'tooltip':'Move jobs up.'};
+	acts.move_jobs_down   = {'label':'DWN','tooltip':'Move jobs down.'};
+	acts.move_jobs_bottom = {'label':'BOT','tooltip':'Move jobs bottom.'};
+	i_monitor.createCtrlBtn({'name':'move_jobs','label':'MOV','tooltip':'Move jobs.','sub_menu':acts,'handle':'moveJobs'});
+
+
+	// Actions:
+	var acts = {};
+	acts.start  = {"label":"STA","tooltip":'Start job.'};
+	acts.pause  = {"label":"PAU","tooltip":'Pause job.'};
+	acts.stop   = {"label":"STP","tooltip":'Double click to stop job running tasks.',"ondblclick":true};
+	acts.delete = {"label":"DEL","tooltip":'Double click delete job(s).',"ondblclick":true};
+	i_monitor.createCtrlBtns( acts);
+
+
+	// Right Panel:
+	var elPanelR = i_monitor.elPanelR;
+
+
+	// Folders:
+	var el = document.createElement('div');
+	elPanelR.appendChild( el);
+	el.classList.add('section');
+	el.classList.add('folders');
+	elPanelR.m_elFolders = el;
+	var el = document.createElement('a');
+	elPanelR.m_elFolders.appendChild( el);
+	elPanelR.m_elFolders.m_elRules = el;
+	el.classList.add('rules_link');
+	el.classList.add('caption');
+	el.title = 'Open RULES shot in a new window(tab).';
+	el.textContent = 'RULES';
+	el.setAttribute('target','_blank');
+	var el = document.createElement('div');
+	elPanelR.m_elFolders.appendChild( el);
+	el.textContent = 'Folders';
+	el.classList.add('caption');
+
+
+	// Blocks:
+	var el = document.createElement('div');
+	elPanelR.appendChild( el);
+	el.classList.add('section');
+	el.classList.add('blocks');
+	elPanelR.m_elBlocks = el;
+	var elCaption = document.createElement('div');
+	elPanelR.m_elBlocks.appendChild( elCaption);
+	elCaption.textContent = 'Blocks';
+	elCaption.classList.add('caption');
+
+	var elName = document.createElement('div');
+	elPanelR.m_elBlocks.appendChild( elName);
+	elPanelR.m_elBlocks.m_elName = elName;
+	elName.classList.add('name');
+	elName.style.display = 'none';
+
+	elPanelR.m_elBlocks.m_elParams = {};
+	for( var p in JobBlock.params )
+	{
+		var elDiv = document.createElement('div');
+		elPanelR.m_elBlocks.appendChild( elDiv);
+		elPanelR.m_elBlocks.m_elParams[p] = elDiv;
+		elDiv.classList.add('param');
+		elDiv.style.display = 'none';
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = JobBlock.params[p].label;
+
+		var elValue = document.createElement('div');
+		elDiv.appendChild( elValue);
+		elDiv.m_elValue = elValue;
+		elValue.classList.add('value');
+
+		var el = elDiv;
+		el.title = 'Double click to edit.'
+		el.monitor = i_monitor;
+		el.name = p;
+		el.param = JobBlock.params[p];
+		el.monitor = i_monitor;
+		el.ondblclick = function(e){
+			var el = e.currentTarget;
+			JobBlock.setDialog({'name':el.name,'type':el.param.type,'monitor':el.monitor});
+		}
+	}
+
+	var el = elCaption;
+	el.title = 'Click to edit all paramters.';
+	el.m_elBlocks = elPanelR.m_elBlocks;
+	el.onclick = function(e){
+		var el = e.currentTarget;
+		if( el.m_elBlocks.classList.contains('active') != true ) return false;
+		var elParams = el.m_elBlocks.m_elParams;
+		for( var p in elParams )
+			elParams[p].style.display = 'block';
+		return false;
+	}
+}
+
+JobNode.moveJobs = function( i_args)
+{
+	nw_Action('users', [g_uid], {'type':i_args.name,'jids':i_args.monitor.getSelectedIds()});
+	i_args.monitor.info('Moving Jobs');
+}
+
+JobNode.params = {};
+JobNode.params.priority =                   {"type":'num', "label":'Priority'};
+JobNode.params.depend_mask =                {"type":'reg', "label":'Depend Mask'};
+JobNode.params.depend_mask_global =         {"type":'reg', "label":'Global Depend Mask'};
+JobNode.params.max_running_tasks =          {"type":'num', "label":'Max Runnig Tasks'};
+JobNode.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
+JobNode.params.hosts_mask =                 {"type":'reg', "label":'Hosts Mask'};
+JobNode.params.hosts_mask_exclude =         {"type":'reg', "label":'Exclude Hosts Mask'};
+JobNode.params.time_wait =                  {"type":'tim', "label":'Time Wait'};
+JobNode.params.need_os =                    {"type":'reg', "label":'OS Needed'};
+JobNode.params.need_properties =            {"type":'reg', "label":'Need Properties'};
+JobNode.params.time_life =                  {"type":'hrs', "label":'Life Time'};
+JobNode.params.annotation =                 {"type":'str', "label":'Annotation'};
+JobNode.params.hidden =                     {"type":'bl1', "label":'Hidden'};
+JobNode.params.ppa =                        {"type":'bl1', "label":'Preview Pending Approval'};
+JobNode.params.user_name =                  {"type":'str', "label":'Owner',"permissions":'visor'};
+
+JobNode.view_opts = {};
+JobNode.view_opts.jobs_thumbs_num =    {"type":'num',"label":"TQU","tooltip":'Thumbnails quantity.',"default":12  };
+JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Thumbnails height.',  "default":100 };
+
+
+JobBlock.params = {};
+JobBlock.params.capacity                   = {"type":'num', "label":'Capacity'};
+JobBlock.params.sequential                 = {"type":'num', "label":'Sequential'};
+JobBlock.params.max_running_tasks          = {"type":'num', "label":'Max Runnig Tasks'};
+JobBlock.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
+JobBlock.params.errors_retries             = {"type":'num', "label":'Errors Retries'};
+JobBlock.params.errors_avoid_host          = {"type":'num', "label":'Errors Avoid Host'};
+JobBlock.params.errors_task_same_host      = {"type":'num', "label":'Errors Task Same Host'};
+JobBlock.params.errors_forgive_time        = {"type":'hrs', "label":'Errors Forgive Time'};
+JobBlock.params.tasks_max_run_time         = {"type":'hrs', "label":'Tasks Max Run Time'};
+JobBlock.params.hosts_mask                 = {"type":'reg', "label":'Hosts Mask'};
+JobBlock.params.hosts_mask_exclude         = {"type":'reg', "label":'Exclude Hosts Mask'};
+JobBlock.params.depend_mask                = {"type":'reg', "label":'Depend Mask'};
+JobBlock.params.tasks_depend_mask          = {"type":'reg', "label":'Tasks Depend Mask'};
+JobBlock.params.need_properties            = {"type":'reg', "label":'Properties Needed'};
 
 // First array item will be used by default (on load)
 JobNode.sort = ['order','time_creation','priority','user_name','name','host_name'];

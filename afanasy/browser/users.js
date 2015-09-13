@@ -164,31 +164,50 @@ UserNode.prototype.refresh = function()
 //window.console.log(this.params.name+'-'+percent+'% ('+this.monitor.type+'_max='+this.monitor.max_tasks+')')
 }
 
+
+UserNode.createPanels = function( i_monitor)
+{
+	// Jobs solving:
+	var acts = {};
+	acts.solve_ord = {'name':'solve_parallel','value':false,'label':'ORD','tooltip':'Solve jobs by order.','handle':'mh_Param'};
+	acts.solve_par = {'name':'solve_parallel','value':true, 'label':'PAR','tooltip':'Solve jobs parallel.','handle':'mh_Param'};
+	//i_monitor.createCtrlBtn({'name':'solve','label':'SLV','tooltip':'Jobs solving method.','sub_menu':acts});
+	i_monitor.createCtrlBtns( acts);
+
+
+	// Custom data:
+	var acts = {};
+	acts.custom_data = {'type':'json','handle':'mh_Dialog','label':'DAT','tooltip':'Set user custom data.'};
+	i_monitor.createCtrlBtns( acts);
+}
+
+
+UserNode.prototype.updatePanels = function()
+{
+	// Info:
+	var info = 'Registered:<br> ' + cm_DateTimeStrFromSec( this.params.time_register);
+	if( this.params.time_activity )
+		info += '<br>Last Activity:<br> ' + cm_DateTimeStrFromSec( this.params.time_activity);
+	this.monitor.setPanelInfo( info);
+}
+
+
 UserNode.prototype.onDoubleClick = function( e) { g_ShowObject({"object":this.params},{"evt":e,"wnd":this.monitor.window});}
 
-UserNode.actions = [];
 
-UserNode.actions.push({"mode":'context', "name":'log', "handle":'mh_Get', "label":'Show Log'});
-UserNode.actions.push({"mode":'context'});
-UserNode.actions.push({"mode":'context', "name":'priority',              "type":'num', "handle":'mh_Dialog', "label":'Priority'});
-UserNode.actions.push({"mode":'context', "name":'max_running_tasks',     "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
-UserNode.actions.push({"mode":'context', "name":'hosts_mask',            "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
-UserNode.actions.push({"mode":'context', "name":'hosts_mask_exclude',    "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
-UserNode.actions.push({"mode":'context'});
-UserNode.actions.push({"mode":'context', "name":'errors_retries',        "type":'num', "handle":'mh_Dialog', "label":'Errors Retries'});
-UserNode.actions.push({"mode":'context', "name":'errors_avoid_host',     "type":'num', "handle":'mh_Dialog', "label":'Errors Avoid Host'});
-UserNode.actions.push({"mode":'context', "name":'errors_task_same_host', "type":'num', "handle":'mh_Dialog', "label":'Errors Task Same Host'});
-UserNode.actions.push({"mode":'context', "name":'errors_forgive_time',   "type":'hrs', "handle":'mh_Dialog', "label":'Errors Forgive Time'});
+UserNode.params = {};
+UserNode.params.priority              = {'type':'num','label':'Priority'};
+UserNode.params.max_running_tasks     = {'type':'num','label':'Max Runnig Tasks'};
+UserNode.params.hosts_mask            = {'type':'reg','label':'Hosts Mask'};
+UserNode.params.hosts_mask_exclude    = {'type':'reg','label':'Exclude Hosts Mask'};
+UserNode.params.errors_retries        = {'type':'num','label':'Errors Retries'};
+UserNode.params.errors_avoid_host     = {'type':'num','label':'Errors Avoid Host'};
+UserNode.params.errors_task_same_host = {'type':'num','label':'Errors Task Same Host'};
+UserNode.params.errors_forgive_time   = {'type':'hrs','label':'Errors Forgive Time'};
+UserNode.params.jobs_life_time        = {'type':'hrs','label':'Jobs Life Time'};
+UserNode.params.annotation            = {'type':'str','label':'Annotation'};
+//UserNode.params.custom_data           = {'type':'json','label':'Custom Data'};
 
-UserNode.actions.push({"mode":'set', "name":'solve_parallel', "type":'bl1',  "handle":'mh_Dialog', "label":'Solve Jobs Parallel'});
-UserNode.actions.push({"mode":'set'});
-UserNode.actions.push({"mode":'set', "name":'jobs_life_time', "type":'hrs',  "handle":'mh_Dialog', "label":'Jobs Life Time'});
-UserNode.actions.push({"mode":'set'});
-UserNode.actions.push({"mode":'set', "name":'permanent',      "type":'bl1',  "handle":'mh_Dialog', "label":'Set Permanent'});
-UserNode.actions.push({"mode":'set'});
-UserNode.actions.push({"mode":'set', "name":'annotation',     "type":'str',  "handle":'mh_Dialog', "label":'Annotate'});
-UserNode.actions.push({"mode":'set'});
-UserNode.actions.push({"mode":'set', "name":'custom_data',    "type":'json', "handle":'mh_Dialog', "label":'Custom Data'});
 
 UserNode.sort = ['priority','name','host_name'];
 UserNode.filter = ['name','host_name'];

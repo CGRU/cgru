@@ -77,6 +77,7 @@ public:
 			_annotation,
 			_blockname,
 			_description,
+			_folder,
 			_jobname,
 			_hostname,
 			_multihost_service,

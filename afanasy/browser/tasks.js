@@ -106,8 +106,6 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	for( var attr in i_progress )
 		this.params[attr] = i_progress[attr];
 
-	if( this.params.hst == null ) this.params.hst = '';
-	if( this.params.act == null ) this.params.act = '';
 	if( this.params.str == null ) this.params.str = 0;
 	if( this.params.err == null ) this.params.err = 0;
 
@@ -116,8 +114,9 @@ TaskItem.prototype.updateProgress = function( i_progress)
 
 	this.elStarts.textContent = 's' + this.params.str;
 	this.elErrors.textContent = 'e' + this.params.err;
-	this.elHost.textContent = this.params.hst;
-	if( this.params.act != '' )
+	if( this.params.hst )
+		this.elHost.textContent = this.params.hst;
+	if( this.params.act != null )
 		this.elActivity.textContent = ': '+this.params.act;
 	else
 		this.elActivity.textContent = '';
@@ -245,7 +244,7 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 	var blocks = this.monitor.blocks;
 	for( var b = 0; b < blocks.length; b++)
 	{
-		if( blocks[b].element.selected )
+		if( blocks[b].selected )
 		{
 			o_bids.push( b);
 			break;
@@ -255,7 +254,7 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 			var tasks = blocks[b].tasks;
 			for( var t = 0; t < tasks.length; t++)
 			{
-				if( tasks[t].element.selected )
+				if( tasks[t].selected )
 				{
 					o_tids.push(t);
 				}
@@ -267,7 +266,7 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 			}
 		}
 	}
-//g_Info('bids='+o_bids+' tids='+o_tids);
+//console.log('bids='+o_bids+' tids='+o_tids);
 }
 
 TaskItem.prototype.onContextMenu = function( i_menu)
@@ -287,12 +286,6 @@ TaskItem.prototype.onContextMenu = function( i_menu)
 	}
 	else
 		i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output'});
-	i_menu.addItem();
-	i_menu.addItem({"name":'log',     "receiver":this, "handle":'mh_Get', "label":'Log'});
-	i_menu.addItem({"name":'info',    "receiver":this, "handle":'mh_Get', "label":'Info'});
-	i_menu.addItem();
-	i_menu.addItem({"name":'restart', "receiver":this, "handle":'mh_Oper', "label":'Restart'});
-	i_menu.addItem({"name":'skip',    "receiver":this, "handle":'mh_Oper', "label":'Skip'});
 }
 
 TaskItem.prototype.mh_Output = function( i_number, i_evt)
@@ -301,26 +294,38 @@ TaskItem.prototype.mh_Output = function( i_number, i_evt)
 	{
 		new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleGetOutput',"param":i_evt,
 			"type":'num',"name":this.job.name,"title":'Get Task Process Output',"info":'Enter Start Number'});
-//		new cgru_Dialog( this.monitor.window, this, 'mh_Get', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
 		return;
 	}
 	this.mh_Get('output', i_evt, i_number);
-//	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
 }
 
 TaskItem.prototype.menuHandleGetOutput = function( i_number, i_evt){ this.mh_Get('output', i_evt, i_number)}
+
 TaskItem.prototype.mh_Get = function( i_mode, i_evt, i_number)
 {
-//	var bids = []; var tids = [];
-//	this.getBlockTasksIds( bids, tids);
-//	nw_GetNodes('jobs', [this.job.id], i_mode, bids, tids, i_number)
 	var get = {"type":'jobs',"ids":[this.job.id],"mode":i_mode,"number":i_number};
 	get.block_ids = [this.block.block_num];
 	get.task_ids = [this.task_num];
 
 	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.monitor.window});
 }
+TaskItem.mh_Get = function( i_param, i_evt)
+{
+	var task = i_param.monitor.cur_item;
+	if( task == null )
+	{
+		g_Error('No tasks selected.');
+		return;
+	}
+	if( task.task_num == null )
+		return;
 
+	var get = {'type':'jobs','ids':[task.job.id],'mode':i_param.name,'number':i_param.number};
+	get.block_ids = [task.block.block_num];
+	get.task_ids = [task.task_num];
+
+	nw_request({'send':{'get':get},'func':g_ShowObject,'evt':i_evt,'wnd':task.monitor.window});
+}
 TaskItem.prototype.mh_Oper = function( i_name, i_value)
 {
 	var operation = {};
@@ -329,6 +334,28 @@ TaskItem.prototype.mh_Oper = function( i_name, i_value)
 	this.getBlockTasksIds( bids, tids);
 	if( tids.length ) operation.task_ids = tids;
 	nw_Action('jobs', [this.job.id], operation, null, bids);
+}
+TaskItem.mh_Oper = function( i_param)
+{
+	var task = i_param.monitor.cur_item;
+	if( task == null )
+	{
+		g_Error('No tasks selected.');
+		return;
+	}
+	if( task.task_num == null )
+		return;
+
+	var operation = {};
+	operation.type = i_param.name;
+
+	var bids = []; var tids = [];
+	task.getBlockTasksIds( bids, tids);
+
+	if( tids.length )
+		operation.task_ids = tids;
+
+	nw_Action('jobs', [task.job.id], operation, null, bids);
 }
 
 TaskItem.prototype.onDoubleClick = function( i_evt)
@@ -372,6 +399,36 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 		elImg.src = '@TMP@' + files[i].name;
 	}
 }
+
+TaskItem.createPanels = function( i_monitor)
+{
+	var acts = {};
+	acts.info    = {'handle':'mh_Get', 'label':'INFO','tooltip':'Get task full info.'};
+	acts.skip    = {'handle':'mh_Oper','label':'SKIP','tooltip':'Double click to skip selected task(s).','ondblclick':true};
+	acts.restart = {'handle':'mh_Oper','label':'RES', 'tooltip':'Double click to restart selected task(s).','ondblclick':true};
+	i_monitor.createCtrlBtns( acts);
+}
+
+TaskItem.prototype.updatePanels = function()
+{
+	// Info:
+	var info = '';
+
+	if( this.params.str )
+		info += 'Starts ' + this.params.str + ', last on ' + this.params.hst + ' at:<br> ' + cm_DateTimeStrFromSec( this.params.tst) + '<br>';
+
+	if( this.params.tdn && ( this.state.RUN != true ))
+	{
+		info += 'Done at:<br> ' + cm_DateTimeStrFromSec( this.params.tdn) + '<br>';
+		info += 'Running time: ' + cm_TimeStringInterval( this.params.tst, this.params.tdn) + '<br>';
+	}
+
+	if( this.params.err )
+		info += 'Errors count: '  + this.params.err + '<br>';
+
+	this.monitor.setPanelInfo( info);
+}
+
 
 TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];

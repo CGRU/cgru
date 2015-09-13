@@ -1,7 +1,7 @@
 {"cgru_config":{
 
 	"af_servername":"127.0.0.1",
-		"":"User server name or direct IP address literals",
+		"":"Afanasy server name or direct IP address literals",
 
 	"af_serverport":51000,
 	"af_clientport":51001,
@@ -26,13 +26,24 @@
 		"":"@IP@  - will be replaced with render ip address:",
 
 	"OS_unix":{
+		"af_tempdirectory":"/var/tmp/afanasy",
 		"af_rendercmds":["vncviewer @ARG@","xterm -e \"ping @ARG@; read -s -n 1\"","xterm -e \"ping @IP@; read -s -n 1\""],
 		"af_rendercmds_admin":["xterm -e \"ssh @ARG@; read -s -n 1\"","xterm -e \"ssh @ARG@ \\\"@ASK@\\\"; read -s -n 1\""],
-		"af_tempdirectory":"/var/tmp/afanasy",
+		"":"Render:",
 		"af_render_cmd_reboot":"reboot",
+			"":"Command for render to reboot a machine.",
+			"":"For MS Windows you can use 'shutdown /r'.",
+
 		"af_render_cmd_shutdown":"shutdown -P 1 afrequest",
+			"":"Command for render to shutdown a machine.",
+			"":"For MS Windows you can use 'shutdown /s'.",
+
 		"af_render_cmd_wolsleep":"wolsleep",
-		"":"On UNIX sleep command usually needs root privileges, try to use 'sudo wolsleep' and add a line in /etc/sudoers: render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep, Or configure your own way to sleep."
+			"":"On UNIX sleep command usually needs root privileges.",
+			"":"Try to use 'sudo wolsleep' and add a line in /etc/sudoers:",
+			"":"render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep",
+			"":"Or configure your own way to sleep.",
+		"":""
 	},
 	"OS_windows":{
 		"af_rendercmds":["vncviewer @ARG@","start ping /t @ARG@","start ping /t @IP@"],
@@ -41,11 +52,9 @@
 		"af_render_cmd_shutdown":"shutdown /s",
 		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep",
 		"af_render_windowsmustdie":[
-			"mantra.exe",
-			"mantra.exe - Application Error",
-			"3ds Max application",
 			"ImageMagick Studio library and utility programs",
 			"Microsoft Visual C++ Runtime Library",
+			"QuickTimeHelper-32.exe - Application Error",
 			"Visual Studio Just-In-Time Debugger"
 		]
 	},
@@ -69,36 +78,70 @@
 
 "":"Job:",
 	"af_task_default_capacity":1000,
+	"af_task_default_service":"generic",
 	"af_task_log_linesmax":100,
 
 "":"Render:",
 	"af_render_default_capacity":1000,
+		"":"Default render capacity value, if not set in farm config.",
+
 	"af_render_default_maxtasks":5,
+		"":"Maximum allowed simultaneously running tasks on render, if not set in farm config.",
 
 	"-af_render_networkif":"eth0",
-		"":"Network interface to measure traffic, it not specified all used except loopback",
+		"":"Network interface to measure traffic",
+		"":"If not specified all used except loopback",
 
 	"af_render_hddspace_path":"/",
-	"af_render_iostat_device":"*",
+		"":"Path to measure free disk space.",
+		"":"'/' - for MS Windows means the root of the system disk.",
 
+	"af_render_iostat_device":"*",
+		"":"Device to measure disk IO statistics.",
+		"":"For MS Windows - statistics only for first disk available.",
+
+	"-af_render_resclasses":["example","iostat"],
 		"":"Custom resources meters:",
 			"":"example - simple resource meter for an example only",
-			"":"iostat - parse output of linux 'iostat' command, specify device in 'render_customiostat_devices' variable",
-	"-af_render_resclasses":["example","iostat"],
+			"":"iostat - parse output of linux 'iostat' command",
+
 	"-af_render_customiostat_devices":"sda",
-		"":"To specify several devices use regular expressions, for example 'sda[2-4]'",
+		"":"Device(s) for custom python resource meter 'iostat'.",
+		"":"To watch several devices use regular expression, for example 'sda[2-4]'.",
+		"":"If several devices matching pattern are founded,",
+		"":"it calculates the sum of traffic parameters and maximum of utilization parameters.",
 
 	"af_render_nice":10,
+		"":"Renice task command process on render.",
+		"":"MS Windows priority:",
+		"":"DWORD priority = NORMAL_PRIORITY_CLASS;",
+		"":"if( nice >   0 ) priority = BELOW_NORMAL_PRIORITY_CLASS;",
+		"":"if( nice >  10 ) priority = IDLE_PRIORITY_CLASS;",
+		"":"if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;",
+		"":"if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;",
+
 	"af_render_update_sec":5,
-	"af_render_updatetaskperiod":1,
-	"af_task_update_timeout":15,
+		"":"Render resources update interval.",
+
 	"af_render_zombietime":60,
+		"":"If render will not send update its resources for this time(seconds),",
+		"":"server will put it in 'OFFLINE' stated.",
+
+	"af_render_updatetaskperiod":1,
+		"":"Period to render to update task state or percentage (even w/o a parser).",
+
+	"af_task_update_timeout":15,
+		"":"If task progress (state or percentage) has not been updated for this period,",
+		"":"It wiil considered as an error, and render will be push in error hosts list.",
+
 	"af_render_connectretries":3,
-	"af_render_waitforconnected":15000,
-	"af_render_waitforreadyread":15000,
-	"af_render_waitforbyteswritten":15000,
+		"":"Connection fails number to consider that render can`t connect to server.",
+
 	"af_render_exec":"afrender",
+		"":"Was used, will be needed, but not used for now",
+
 	"af_render_cmd_wolwake":"wolwake",
+	"":"",
 
 "":"Thumbnail:",
 	"af_thumbnail_extensions":["exr","dpx","jpg","jpeg","png","tif","tiff","tga"],
@@ -128,14 +171,6 @@
 	"af_watch_waitforreadyread":8000,
 	"af_watch_waitforbyteswritten":8000,
 	"af_watch_refreshinterval":5,
-
-"":"Talk:",
-	"af_talk_updateperiod":5,
-	"af_talk_zombietime":18,
-	"af_talk_connectretries":3,
-	"af_talk_waitforconnected":8000,
-	"af_talk_waitforreadyread":8000,
-	"af_talk_waitforbyteswritten":8000,
 
 "":"Database:",
 		"":"sting to pass to PQconnectdb http://www.postgresql.org/docs/current/static/libpq-connect.html",

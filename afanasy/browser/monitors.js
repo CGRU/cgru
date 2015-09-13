@@ -95,30 +95,30 @@ MonitorNode.prototype.refresh = function() {}
 
 MonitorNode.prototype.onDoubleClick = function( e) { g_ShowObject({"object":this.params},{"evt":e,"wnd":this.monitor.window});}
 
-MonitorNode.actions = [];
+MonitorNode.prototype.updatePanels = function()
+{
+	// Info:
+	var info = '';
 
-MonitorNode.actions.push({"mode":'context', "name":'log', "handle":'mh_Get', "label":'Show Log'});
-MonitorNode.actions.push({"mode":'context'});
-MonitorNode.actions.push({"mode":'context', "name":'priority',              "type":'num', "handle":'mh_Dialog', "label":'Priority'});
-MonitorNode.actions.push({"mode":'context', "name":'max_running_tasks',     "type":'num', "handle":'mh_Dialog', "label":'Max Runnig Tasks'});
-MonitorNode.actions.push({"mode":'context', "name":'hosts_mask',            "type":'reg', "handle":'mh_Dialog', "label":'Hosts Mask'});
-MonitorNode.actions.push({"mode":'context', "name":'hosts_mask_exclude',    "type":'reg', "handle":'mh_Dialog', "label":'Exclude Hosts Mask'});
-MonitorNode.actions.push({"mode":'context'});
-MonitorNode.actions.push({"mode":'context', "name":'errors_retries',        "type":'num', "handle":'mh_Dialog', "label":'Errors Retries'});
-MonitorNode.actions.push({"mode":'context', "name":'errors_avoid_host',     "type":'num', "handle":'mh_Dialog', "label":'Errors Avoid Host'});
-MonitorNode.actions.push({"mode":'context', "name":'errors_task_same_host', "type":'num', "handle":'mh_Dialog', "label":'Errors Task Same Host'});
-MonitorNode.actions.push({"mode":'context', "name":'errors_forgive_time',   "type":'hrs', "handle":'mh_Dialog', "label":'Errors Forgive Time'});
+	info += 'User name: ' + this.params.user_name;
 
-MonitorNode.actions.push({"mode":'set', "name":'solve_parallel', "type":'bl1',  "handle":'mh_Dialog', "label":'Solve Jobs Parallel'});
-MonitorNode.actions.push({"mode":'set'});
-MonitorNode.actions.push({"mode":'set', "name":'jobs_life_time', "type":'hrs',  "handle":'mh_Dialog', "label":'Jobs Life Time'});
-MonitorNode.actions.push({"mode":'set'});
-MonitorNode.actions.push({"mode":'set', "name":'permanent',      "type":'bl1',  "handle":'mh_Dialog', "label":'Set Permanent'});
-MonitorNode.actions.push({"mode":'set'});
-MonitorNode.actions.push({"mode":'set', "name":'annotation',     "type":'str',  "handle":'mh_Dialog', "label":'Annotate'});
-MonitorNode.actions.push({"mode":'set'});
-MonitorNode.actions.push({"mode":'set', "name":'custom_data',    "type":'json', "handle":'mh_Dialog', "label":'Custom Data'});
+	if( this.params.address )
+	{
+		info += '<br>IP: ' + this.params.address.ip;
+		if( this.params.address.port )
+			info += ' Port: ' + this.params.address.port;
+	}
 
-MonitorNode.sort = ['priority','name','host_name'];
-MonitorNode.filter = ['name','host_name'];
+	info += '<br>';
+
+	info += '<br>Launched at:<br>' + cm_DateTimeStrFromSec( this.params.time_launch);
+	info += '<br>Registered at:<br>' + cm_DateTimeStrFromSec( this.params.time_register);
+	info += '<br>Last acitvity at:<br>' + cm_DateTimeStrFromSec( this.params.time_activity);
+
+	this.monitor.setPanelInfo( info);
+}
+
+
+MonitorNode.sort = ['name'];
+MonitorNode.filter = ['name'];
 

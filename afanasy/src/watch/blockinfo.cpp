@@ -70,12 +70,12 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		multihost_samemaster = block->canMasterRunOnSlaveHost();
 		varcapacity          = block->canVarCapacity();
 		numeric              = block->isNumeric();
-		nonsequential      = block->isNonSequential();
 
 		frame_first          = block->getFrameFirst();
 		frame_last           = block->getFrameLast();
 		frame_pertask        = block->getFramePerTask();
 		frame_inc            = block->getFrameInc();
+		nonsequential        = block->notSequential();
 
 		tasksnum             = block->getTasksNum();
 		tasksmaxruntime      = block->getTasksMaxRunTime();
@@ -719,7 +719,11 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 
 	if( ok == false) return false;
 
-	if( set_string.isEmpty() == false)
+	if( set_string.isNull())
+	{
+		i_str << set_number;
+	}
+	else
 	{
 		QRegExp rx( set_string, Qt::CaseInsensitive);
 		if( rx.isValid() == false)
@@ -729,8 +733,6 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 		}
 		i_str << '"' << set_string.toUtf8().data() << '"';
 	}
-	else
-		i_str << set_number;
 
 	i_str << '}';
 

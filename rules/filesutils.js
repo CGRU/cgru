@@ -91,6 +91,8 @@ function fu_PutDo( i_wnd)
 	var name   = i_wnd.m_args.names[i];
 
 	var job = {};
+	job.folders = {};
+	job.folders.source = source;
 
 	var block = {};
 	block.name = 'put';
@@ -140,7 +142,7 @@ function fu_PutDo( i_wnd)
 fu_sum_params = [];
 fu_sum_params.path = {"label":'Path', "disabled":true};
 fu_sum_params.type = {"label":'Type', "disabled":true};
-fu_sum_params.update_all = {"label":'Update All', "bool":false};
+fu_sum_params.update_all = {"label":'Update All','type':"bool",'default':false};
 
 function fu_Checksum( i_args)
 {
@@ -234,16 +236,22 @@ function fu_ChecksumDo( i_wnd)
 //
 
 fu_putmulti_params = {};
-fu_putmulti_params.input = {"label":'Result Paths'};
-fu_putmulti_params.skipexisting = {"label":'Skip Existing', "bool":true,"width":'50%'};
-fu_putmulti_params.skiperrors = {"label":'Skip Errors', "bool":false,"width":'50%'};
-fu_putmulti_params.dest = {"label":'Destination'};
-fu_putmulti_params.af_maxtasks = {"label":'Max Tasks'};
+fu_putmulti_params.input        = {"label":'Result Paths'};
+fu_putmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'33%'};
+fu_putmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'33%'};
+fu_putmulti_params.skipcheck    = {"label":'Skip Check',   'type':"bool",'default':false,"width":'33%'};
+fu_putmulti_params.dest         = {"label":'Destination'};
+fu_putmulti_params.af_capacity  = {'label':'Capacity',  'width':'20%','type':'int',};
+fu_putmulti_params.af_maxtasks  = {'label':'Max Tasks', 'width':'15%','lwidth':'80px','type':'int'};
+fu_putmulti_params.af_perhost   = {'label':'Per Host',  'width':'15%','lwidth':'80px','type':'int'};
+fu_putmulti_params.af_hostsmask = {'label':'Hosts Mask','width':'35%','lwidth':'100px'};
+fu_putmulti_params.af_paused    = {'label':'Paused',    'width':'15%','lwidth':'50px','type':'bool'};
 
 fu_findres_params = {};
 fu_findres_params.input = {};
 fu_findres_params.dest = {};
-fu_findres_params.skiperrors = {"bool":false};
+fu_findres_params.skiperrors = {'type':"bool",'default':false};
+fu_findres_params.skipcheck = {'type':"bool",'default':false};
 
 function fu_PutMultiDialog( i_args)
 {
@@ -320,7 +328,8 @@ function fu_ResultsFind( i_wnd)
 	var cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
 	cmd += ' -d "' + params.dest + '"';
-	if( params.skiperrors ) cmd += ' -e';
+	if( params.skipcheck  ) cmd += ' --skipcheck';
+	if( params.skiperrors ) cmd += ' --skiperrors';
 
 	for( var i = 0; i < paths.length; i++)
 		cmd += ' "' + cgru_PM('/' + RULES.root + paths[i], true) + '"';
@@ -440,19 +449,17 @@ function fu_PutMultiDo( i_wnd)
 	var result = i_wnd.m_result;
 
 	var job = {};
-	job.name = 'PUT ' + result.dest;
-	job.max_running_tasks = parseInt( params.af_maxtasks);
-	if( isNaN( job.max_running_tasks ))
-	{
-		c_Error('Invalid "Max Tasks" value: "' + params.af_maxtasks + '"');
-		job.max_running_tasks = -1;
-	}
+	job.name = 'PUT ' + g_CurPath();
+	job.max_running_tasks = params.af_maxtasks;
+	job.max_running_tasks_per_host = params.af_perhost;
+	job.hosts_mask = params.af_hostsmask;
+	job.offline = params.af_paused;
 
 	var block = {};
 	job.blocks = [block];
 	block.name = 'put';
 	block.service = RULES.put.af_service;
-	block.capacity = RULES.put.af_capacity;
+	block.capacity = params.af_capacity;
 	block.parser = 'generic';
 	block.tasks = [];
 
@@ -496,21 +503,24 @@ function fu_PutMultiDo( i_wnd)
 //console.log(JSON.stringify(job));
 }
 //
-// ########################### Archivate: ################################# //
+// ########################### Archive: ################################# //
 //
 fu_arch_params = {};
-fu_arch_params.dest = {"label":'Destination'};
-fu_arch_params.split = {"tooltip":'Split archive size.'};
-function fu_Archivate( i_args)
+fu_arch_params.dest = {'label':'Destination'};
+fu_arch_params.split = {'tooltip':'Split archive size.'};
+fu_arch_params.af_capacity = {'label':'Capacity','tooltip':'Afanasy tasks capacity.','width':'33%'};
+fu_arch_params.af_maxtasks = {'label':'Max Run Tasks','tooltip':'Maximum running tasks.','width':'33%','lwidth':'150px'};
+fu_arch_params.af_perhost = {'label':'Per Host','tooltip':'Maximum running tasks per host.','default':-1,'width':'33%'};
+function fu_Archive( i_args)
 {
 //console.log( JSON.stringify( i_args));
-	var title = i_args.archive ? 'Archivate' : 'Extract Archive';
-	var wnd = new cgru_Window({"name":'archivate',"title":title});
+	var title = i_args.archive ? 'Archive' : 'Extract Archive';
+	var wnd = new cgru_Window({"name":'archive',"title":title});
 	wnd.m_args = i_args;
 
 	var params = {};
 
-	gui_Create( wnd.elContent, fu_arch_params);
+	gui_Create( wnd.elContent, fu_arch_params,[RULES.archive]);
 	if( i_args.archive )
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'type',"value":RULES.archive.default,"label":'Type:',"keys":RULES.archive.types});
 
@@ -557,6 +567,8 @@ function fu_ArchivateProcessGUI( i_wnd)
 			params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var job = {};
+	job.folders = {};
+	job.folders.input = cgru_PM('/' + RULES.root + c_PathDir( paths[0]),  true);
 
 	var arch_cmd = null;
 
@@ -575,13 +587,14 @@ function fu_ArchivateProcessGUI( i_wnd)
 	}
 
 	job.name += ' ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
-	job.max_running_tasks = RULES.archive.af_maxtasks;
+	job.max_running_tasks = parseInt( params.af_maxtasks);
+	job.max_running_tasks_per_host = parseInt( params.af_perhost);
 
 	var block = {};
 	block.name = c_PathDir( paths[0]);
 	block.service = RULES.archive.af_service;
 	block.parser = RULES.archive.af_parser;
-	block.capacity = RULES.archive.af_capacity;
+	block.capacity = parseInt( params.af_capacity);
 	block.tasks = [];
 	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(paths[0]), true);
 	job.blocks = [block];
@@ -634,7 +647,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 fu_walk_params = {};
 fu_walk_params.path = {};
 fu_walk_params.verbose   = {"label":'Verbose Level',"default":2,"lwidth":'170px',"width":'50%'};
-fu_walk_params.upparents = {"label":'Update Parent Folders',"bool":true,"lwidth":'200px',"width":'50%'};
+fu_walk_params.upparents = {"label":'Update Parent Folders','type':"bool",'default':true,"lwidth":'200px',"width":'50%'};
 function fu_Walk( i_args)
 {
 	var wnd = new cgru_Window({"name":'walk',"title":'Send Walk Job'});

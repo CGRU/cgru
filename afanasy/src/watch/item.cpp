@@ -161,6 +161,9 @@ void Item::printfState( const uint32_t state, int posx, int posy, QPainter * pai
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_WAITTIME_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_WAITTIME_NAME_S); posx+=posx_d;
 
+	painter->setPen( clrTextState( option, state & AFJOB::STATE_PPAPPROVAL_MASK));
+	painter->drawText( posx, posy, AFJOB::STATE_PPAPPROVAL_NAME_S); posx+=posx_d;
+
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_OFFLINE_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_OFFLINE_NAME_S); posx+=posx_d;
 }

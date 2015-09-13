@@ -216,3 +216,100 @@ function a_ShowHeaders()
 	}
 }
 
+
+a_copy_params = {};
+a_copy_params.template = {};
+a_copy_params.destination = {};
+a_copy_params.name = {};
+function a_Copy( i_args)
+{
+//console.log(JSON.stringify(i_args));
+	var wnd = new cgru_Window({"name":'copy',"title":'Copy Asset'});
+	wnd.m_args = i_args;
+
+	var params = {};
+	params.name = i_args.name;
+	if( params.name == null )
+	{
+		params.name = ASSET.name + '-01';
+	}
+	params.template = i_args.template;
+	params.destination = c_PathDir( g_CurPath());
+
+	gui_Create( wnd.elContent, a_copy_params, [params]);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	var elCreate = document.createElement('div');
+	elBtns.appendChild( elCreate);
+	elCreate.textContent = 'Create';
+	elCreate.classList.add('button');
+	elCreate.m_wnd = wnd;
+	elCreate.onclick = function(e){ a_CopySend( e.currentTarget.m_wnd);}
+
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+}
+function a_CopySend( i_wnd)
+{
+	var params = gui_GetParams( i_wnd.elContent, a_copy_params);
+//console.log(JSON.stringify(params));
+
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
+
+	var cmd = 'rules/bin/copy.py';
+	cmd += ' -t "' + cgru_PM('/' + RULES.root + params.template, true) + '"';
+	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
+	cmd += ' ' + params.name;
+
+	i_wnd.m_go_path = params.destination + '/' + params.name.split(' ')[0];
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":a_CopyReceived,"wnd":i_wnd});
+
+	// Clear walk cache, as we need to navigate there later:
+	n_walks[params.destination] = null;
+}
+function a_CopyReceived( i_data, i_args)
+{
+//console.log(JSON.stringify(i_data));
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+	var elResults = i_args.wnd.m_elResults;
+	elResults.textContent = '';
+
+	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ) || ( i_data.cmdexec[0].copy == null ))
+	{
+		elResults.textContent = ( JSON.stringify( i_data));
+		return;
+	}
+
+	var copy = i_data.cmdexec[0].copy;
+	if( copy.error )
+	{
+		elResults.textContent = 'Error: ' + copy.error;
+		return;
+	}
+
+	var copies = copy.copies;
+	if( copies == null )
+	{
+		elResults.textContent = 'Error: Copies are null.';
+		return;
+	}
+	if( copies.length == 0 )
+	{
+		elResults.textContent = 'Error: Copies are empty.';
+		return;
+	}
+
+	i_args.wnd.destroy();
+	g_GO( i_args.wnd.m_go_path);
+}
+

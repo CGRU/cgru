@@ -6,6 +6,9 @@ nw_recents = {};
 
 nw_filter_project = null;
 
+nw_disabled = false;
+nw_ignore_own = false;
+
 function nw_Init()
 {
 	// Recent:
@@ -21,10 +24,13 @@ function nw_Init()
 	$('sidepanel_news').style.display = 'block';
 	nw_initialized = true;
 
-	if( localStorage.news_disabled == null ) localStorage.news_disabled = 'false';
+	if( localStorage.news_disabled   == null ) localStorage.news_disabled   = 'false';
 	if( localStorage.news_ignore_own == null ) localStorage.news_ignore_own = 'false';
 
-	if( localStorage.news_opened == "true" ) nw_NewsOpen(false);
+	if( localStorage.news_disabled   == 'true') nw_disabled   = true;
+	if( localStorage.news_ignore_own == 'true') nw_ignore_own = true;
+
+	if( localStorage.news_opened == 'true') nw_NewsOpen(false);
 	else nw_NewsClose();
 
 	nw_Finish();
@@ -44,40 +50,44 @@ function nw_DisableNewsToggle( i_toggle)
 {
 	if( i_toggle === true )
 	{
-		if( localStorage.news_disabled == 'true')
+		if( nw_disabled )
+		{
+			nw_disabled = false;
 			localStorage.news_disabled = 'false';
+		}
 		else
+		{
+			nw_disabled = true;
 			localStorage.news_disabled = 'true';
+		}
 	}
 
-	if( localStorage.news_disabled == 'true')
-	{
-		$('news_disable').classList.add('disabled');
-	}
+	if( nw_disabled )
+		$('sidepanel_news').classList.add('news_disabled');
 	else
-	{
-		$('news_disable').classList.remove('disabled');
-	}
+		$('sidepanel_news').classList.remove('news_disabled');
 }
 
 function nw_IgnoreOwnToggle( i_toggle)
 {
 	if( i_toggle === true )
 	{
-		if( localStorage.news_ignore_own == 'true')
+		if( nw_ignore_own )
+		{
+			nw_ignore_own = false;
 			localStorage.news_ignore_own = 'false';
+		}
 		else
+		{
+			nw_ignore_own = true;
 			localStorage.news_ignore_own = 'true';
+		}
 	}
 
-	if( localStorage.news_ignore_own == 'true')
-	{
-		$('news_ignore_own').classList.add('ignore');
-	}
+	if( nw_ignore_own )
+		$('sidepanel_news').classList.add('news_ignore_own');
 	else
-	{
-		$('news_ignore_own').classList.remove('ignore');
-	}
+		$('sidepanel_news').classList.remove('news_ignore_own');
 }
 
 function nw_SortOrderToggle()
@@ -271,7 +281,18 @@ function nw_MakeNewsDialog()
 function nw_MakeNewsDialogApply( i_title) { nw_MakeNews({"title":i_title}); }
 function nw_MakeNews( i_news, i_args )
 {
-	if( localStorage.news_disabled == 'true') return;
+	var request = nw_CreateNews( i_news);
+	nw_SendNews([request], i_args);
+}
+function nw_CreateNews( i_news)
+{
+	if( i_news == null )
+	{
+		c_Error('Can`t create news from "null".');
+		return;
+	}
+
+	if( nw_disabled ) return;
 
 	var news = i_news;
 
@@ -287,9 +308,6 @@ function nw_MakeNews( i_news, i_args )
 
 	news.time = c_DT_CurSeconds();
 	news.id = news.user + '_' + news.time + '_' + news.path;
-
-	if( localStorage.news_ignore_own == 'true' )
-		news.ignore_own = true;
 
 	// If news path is the current we get artists from status, if them not set in input arguments:
 	if(( news.artists == null ) && ( news.path == g_CurPath()) && RULES.status && RULES.status.artists )
@@ -314,7 +332,32 @@ function nw_MakeNews( i_news, i_args )
 	request.limit = RULES.news.limit;
 	request.recent_max = RULES.news.recent;
 	request.recent_file = nw_recent_file;
-	n_Request({"send":{"makenews":request},"func":nw_MakeNewsFinished,"args":i_args});
+	if( nw_ignore_own ) request.ignore_own = true;
+
+	return request;
+}
+function nw_SendNews( i_requests, i_args)
+{
+	if( i_requests == null )
+	{
+		c_Error('Can`t send news from "null" request.');
+		return;
+	}
+	if( i_requests.length == 0 )
+	{
+		c_Error('Can`t send news from zero size request.');
+		return;
+	}
+	for( var i = 0; i < i_requests.length; i++)
+	{
+		if( i_requests[i] == null )
+		{
+			c_Error('Can`t send news from "null" request['+i+'].');
+			return;
+		}
+	}
+
+	n_Request({"send":{"makenews":i_requests},"func":nw_MakeNewsFinished,"args":i_args});
 }
 function nw_MakeNewsFinished( i_data, i_args)
 {
@@ -326,9 +369,12 @@ function nw_MakeNewsFinished( i_data, i_args)
 
 	if( i_args.args && ( i_args.args.load === false )) return;
 
-	nw_NewsLoad();
-	nw_RecentLoad({"file_check":false});
-		
+	if( p_PLAYER != true )
+	{
+		nw_NewsLoad();
+		nw_RecentLoad({"file_check":false});
+	}
+
 	if( i_data.users.length == 0 )
 	{
 		c_Log('No subscribed users found.');

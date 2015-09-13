@@ -2,6 +2,7 @@
 
 import af
 import cgruconfig
+import render
 
 from datetime import datetime, timedelta
 
@@ -11,22 +12,27 @@ free_set = False
 
 def setnimby(text='(keeper)'):
 	cmd = af.Cmd().renderSetNimby(text)
+	render.refreshAfter()
 
 
 def setNIMBY(text='(keeper)'):
 	cmd = af.Cmd().renderSetNIMBY(text)
+	render.refreshAfter()
 
 
 def setFree(text='(keeper)'):
 	cmd = af.Cmd().renderSetFree(text)
+	render.refreshAfter()
 
 
 def ejectTasks(text='(keeper)'):
 	cmd = af.Cmd().renderEjectTasks(text)
+	render.refreshAfter()
 
 
 def ejectNotMyTasks(text='(keeper)'):
 	cmd = af.Cmd().renderEjectNotMyTasks(text)
+	render.refreshAfter()
 
 
 def refresh(reset=False):

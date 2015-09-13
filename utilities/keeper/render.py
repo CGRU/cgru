@@ -4,6 +4,7 @@ import json
 
 import af
 import cmd
+import cgruconfig
 
 WndInfo = None
 
@@ -41,5 +42,29 @@ def refresh():
 			NIMBY = render["state"].find('NBY') != -1
 			busy = render["state"].find('RUN') != -1
 			cmd.Tray.showRenderIcon(online, nimby or NIMBY, busy)
+			cmd.Tray.showUser(render["user_name"])
 	else:
 		cmd.Tray.showIcon()
+
+def setUserDialog():
+	name, ok = QtGui.QInputDialog.getText(
+		None, 'Set Render User', 'Ender New Name:', text=cgruconfig.VARS['USERNAME']
+	)
+
+	if not ok:
+		return
+
+	af.Cmd().renderSetUserName( name)
+	refreshAfter()
+
+def refreshAfter( i_sec = 3):
+	timer = QtCore.QTimer( cmd.Application)
+	QtCore.QObject.connect(
+		timer,
+		QtCore.SIGNAL('timeout()'),
+		refresh
+	)
+	timer.setInterval( 1000 * i_sec)
+	timer.setSingleShot( True)
+	timer.start()
+

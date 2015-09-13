@@ -67,6 +67,7 @@ g_users = null;
 
 function p_OpenCloseHeader(){u_OpenCloseHeaderFooter($('headeropenbtn'),'header',-200,0);}
 function p_OpenCloseFooter(){u_OpenCloseHeaderFooter($('footeropenbtn'),'footer',50,250);}
+function p_RulesShow() { cgru_ShowObject( RULES, 'RULES[' + p_rules_path + ']') }
 
 function p_Init()
 {
@@ -200,9 +201,38 @@ function p_PathChanged()
 	if( p_rules_path.indexOf('//') != -1 ) p_rules_path = p_rules_path.substr( 0, p_rules_path.indexOf('//'));
 	$('rules_link').href = window.location.protocol + '//' + window.location.host + c_PathDir(window.location.pathname ) + '/#' + p_rules_path;
 
-	n_WalkDir({"paths":[p_path],"wfunc":p_WalkReceived,"info":'walk images',"rufiles":['player']});
+	c_Info('Navigating to: ' + p_rules_path);
+	var folders = p_rules_path.split('/');
+	var walk = {};
+	walk.paths = [];
+	walk.folders = [];
+	var path = '';
+	for( var i = 0; i < folders.length; i++ )
+	{
+		if(( folders[i].length == 0 ) && ( i != 0 )) continue;
+		if( path == '/' )
+			path += folders[i];
+		else
+			path += '/' + folders[i];
+		walk.folders.push( folders[i]);
+		walk.paths.push( path);
+	}
+
+	walk.rufiles = ['rules','status'];
+	walk.wfunc = p_WalkNavigateReceived;
+	walk.info = 'walk GO';
+	n_WalkDir( walk);
 }
-function p_WalkReceived( i_data)
+function p_WalkNavigateReceived( i_data, i_args)
+{
+	for( var i = 0; i < i_data.length; i++ )
+		c_RulesMergeDir( RULES, i_data[i]);
+
+//console.log(JSON.stringify(i_data));
+	
+	n_WalkDir({"paths":[p_path],"wfunc":p_WalkSequenceReceived,"info":'walk images',"rufiles":['player']});
+}
+function p_WalkSequenceReceived( i_data)
 {
 	var walk = i_data[0];
 	c_RulesMergeDir( RULES, walk);
@@ -1130,7 +1160,7 @@ function p_CommentsSave()
 
 		// Collect comments for RULES for each frame always,
 		// whenever they are saved or not,
-		// or we will lost saved comments
+		// or we will loose saved comments
 		rcm.text += '<br>';
 		rcm.text += '<br><a target="_blank" href="'+RULES.root+p_savepath+'/'+p_filenames[f]+'">'+p_filenames[f]+'</a>';
 		rcm.text += '<br>' + p_comments[f].text;
@@ -1146,31 +1176,45 @@ function p_CommentsSave()
 
 		// We need to save if at least one comment changed
 		need_save = true;
-		// RULES comments will saved all (see above)
+		// RULES comments will be saved all (see above)
 	}
 
 	if( false == need_save )
 		return;
 
-	var key = p_cm_keytime + '_' + g_auth_user.id;
 	var edit = {};
 	edit.add = true;
-
 	edit.object = {"player":{"comments":pcms}};
 	edit.file = RULES.root + p_savepath + '/' + RULES.rufolder + '/player.json';
-	var res = c_Parse( n_Request({"send":{"editobj":edit}}));
-	if( c_NullOrErrorMsg( res)) return;
+	n_Request({"send":{"editobj":edit},"func":p_CommentsSavedPlayer,"info":'player comments','cm':rcm});
+	c_Info('Saving comments for Player...');
+//console.log(JSON.stringify( rcm));
+}
+function p_CommentsSavedPlayer( i_data, i_args)
+{
+	if( c_NullOrErrorMsg( i_data)) return;
 
+	var key = p_cm_keytime + '_' + g_auth_user.id;
 	var comments = {};
-	comments[key] = rcm;
+	comments[key] = i_args.cm;
+	var edit = {};
+	edit.add = true;
 	edit.object = {"comments":comments};
 	edit.file = RULES.root + p_rules_path + '/' + RULES.rufolder + '/comments.json';
-	var res = c_Parse( n_Request({"send":{"editobj":edit}}));
-	if( c_NullOrErrorMsg( res)) return;
+	n_Request({"send":{"editobj":edit},'func':p_CommentsSavedRules,'info':'rules comments'});
+	c_Info('Saving comments for RULES...');
+}
+function p_CommentsSavedRules( i_data)
+{
+	if( c_NullOrErrorMsg( i_data)) return;
 
 	c_Info('Comments saved.');
 
-//console.log(JSON.stringify( rcm));
+	var artists = [];
+	if( RULES.status && RULES.status.artists )
+		artists = RULES.status.artists;
+
+	nw_MakeNews({'title':'comment','path':p_rules_path,'artists':artists});
 }
 
 // ====================================================

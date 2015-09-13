@@ -136,6 +136,7 @@ class BlockParameters:
 		self.framelast = nuke.root().lastFrame()
 		self.frameinc = 1
 		self.framespertask = 1
+		self.framesequential = 1
 		self.maxhosts = -1
 		self.capacity = -1
 		self.maxperhost = -1
@@ -145,11 +146,13 @@ class BlockParameters:
 		self.fullrangedepend = 0
 		self.tmpimage = 1
 		self.pathsmap = 1
+		self.imgfiles = []
 		if afnode is not None:
 			self.framefirst = int(afnode.knob('framefirst').value())
 			self.framelast = int(afnode.knob('framelast').value())
 			self.frameinc = int(afnode.knob('frameinc').value())
 			self.framespertask = int(afnode.knob('framespertask').value())
+			self.framesequential = int(afnode.knob('framesequential').value())
 			self.maxhosts = int(afnode.knob('maxhosts').value())
 			self.capacity = int(afnode.knob('capacity').value())
 			self.maxperhost = int(afnode.knob('maxperhost').value())
@@ -164,7 +167,6 @@ class BlockParameters:
 		if wnode.Class() == RenderNodeClassName:
 			afcommon = __import__('afcommon', globals(), locals(), [])
 			# Get images files:
-			self.imgfiles = []
 			if nuke.toNode('root').knob('proxy').value():
 				fileknob = wnode.knob('proxy')
 			else:
@@ -318,6 +320,8 @@ class BlockParameters:
 			block.setNumeric(self.framefirst, self.framelast,
 							 self.framespertask, self.frameinc)
 			block.setFiles(self.imgfiles)
+			if self.framesequential != 1:
+				block.setSequential( self.framesequential)
 			if self.capacity != -1:
 				block.setCapacity(self.capacity)
 			if self.maxruntime != -1:
@@ -405,6 +409,7 @@ def getBlocksParameters(afnode, subblock, prefix, fparams):
 	framelast = int(afnode.knob('framelast').value())
 	frameinc = int(afnode.knob('frameinc').value())
 	framespertask = int(afnode.knob('framespertask').value())
+	framesequential = int(afnode.knob('framesequential').value())
 	independent = int(afnode.knob('independent').value())
 	reversedepends = int(afnode.knob('reversedeps').value())
 	forceframes = int(afnode.knob('forceframes').value())
@@ -417,7 +422,8 @@ def getBlocksParameters(afnode, subblock, prefix, fparams):
 			'framefirst': framefirst,
 			'framelast': framelast,
 			'frameinc': frameinc,
-			'framespertask': framespertask
+			'framespertask': framespertask,
+			'framesequential': framesequential
 		}
 
 	# MutiWrite parameters:
@@ -630,7 +636,18 @@ class JobParameters:
 		else:
 			job.setNativeOS()
 		job.setCmdPost('deletefiles "%s"' % self.scenename)
+
 		job.blocks = blocks
+
+		# Folders (for GUI only):
+		f_output = None
+		for block in blocks:
+			if 'files' in block.data and len(block.data['files']):
+				f_output = block.data['files'][0]
+				break
+		if f_output is not None:
+			job.setFolder('output', os.path.dirname( f_output))
+		job.setFolder('input', os.path.dirname( nuke.root().name()))
 
 		return job
 
@@ -649,6 +666,7 @@ def getJobsParameters(afnode, prefix, fparams):
 	framelast = int(afnode.knob('framelast').value())
 	frameinc = int(afnode.knob('frameinc').value())
 	framespertask = int(afnode.knob('framespertask').value())
+	framesequential = int(afnode.knob('framesequential').value())
 	independent = int(afnode.knob('independent').value())
 	reversedepends = int(afnode.knob('reversedeps').value())
 	forceframes = int(afnode.knob('forceframes').value())
@@ -666,7 +684,8 @@ def getJobsParameters(afnode, prefix, fparams):
 		fparams = {
 			'framefirst': framefirst,
 			'framelast': framelast,
-			'framespertask': framespertask
+			'framespertask': framespertask,
+			'framesequential': framesequential
 		}
 
 	# Construct single job (no jobs recursion)
@@ -835,6 +854,8 @@ def render(node=None):
 	framelast_max = None
 	framespertask_min = None
 	framespertask_max = None
+	framesequential_min = None
+	framesequential_max = None
 	selectednodes = nuke.selectedNodes()
 	selectednodes.sort(None, getNodeName)
 	for node in selectednodes:
@@ -848,10 +869,13 @@ def render(node=None):
 				framefirst = int(node.knob('framefirst').value())
 				framelast = int(node.knob('framelast').value())
 				framespertask = int(node.knob('framespertask').value())
+				framesequential = int(node.knob('framesequential').value())
 			else:
 				framefirst = nuke.root().firstFrame()
 				framelast = nuke.root().lastFrame()
 				framespertask = 1
+				framesequential = 1
+
 			if framefirst_min is None:
 				framefirst_min = framefirst
 			else:
@@ -860,6 +884,7 @@ def render(node=None):
 				framefirst_max = framefirst
 			else:
 				framefirst_max = max(framefirst_max, framefirst)
+
 			if framelast_min is None:
 				framelast_min = framelast
 			else:
@@ -868,6 +893,7 @@ def render(node=None):
 				framelast_max = framelast
 			else:
 				framelast_max = max(framelast_max, framelast)
+
 			if framespertask_min is None:
 				framespertask_min = framespertask
 			else:
@@ -876,6 +902,15 @@ def render(node=None):
 				framespertask_max = framespertask
 			else:
 				framespertask_max = max(framespertask_max, framespertask)
+
+			if framesequential_min is None:
+				framesequential_min = framesequential
+			else:
+				framesequential_min = min(framesequential_min, framesequential)
+			if framesequential_max is None:
+				framesequential_max = framesequential
+			else:
+				framesequential_max = max(framesequential_max, framesequential)
 
 	if len(nodes) < 1:
 		nuke.message(
@@ -895,14 +930,21 @@ def render(node=None):
 		framefirst = '%s..%s' % (framefirst_min, framefirst_max)
 	else:
 		framefirst = framefirst_min
+
 	if framelast_min != framelast_max:
 		framelast = '%s..%s' % (framelast_min, framelast_max)
 	else:
 		framelast = framelast_min
+
 	if framespertask_min != framespertask_max:
 		framespertask = '%s..%s' % (framespertask_min, framespertask_max)
 	else:
 		framespertask = framespertask_min
+
+	if framesequential_min != framesequential_max:
+		framesequential = '%s..%s' % (framesequential_min, framesequential_max)
+	else:
+		framesequential = framesequential_min
 
 	# Dialog:
 	panel = nuke.Panel('Afanasy Render')
@@ -910,6 +952,7 @@ def render(node=None):
 	panel.addSingleLineInput('First Frame:', framefirst)
 	panel.addSingleLineInput('Last Frame:', framelast)
 	panel.addSingleLineInput('Frames Per Task:', framespertask)
+	panel.addSingleLineInput('Frame Sequential:', framesequential)
 	if hasafanasynodes:
 		panel.addBooleanCheckBox('Store Frames Settings', 0)
 	panel.addBooleanCheckBox('Start Paused', 0)
@@ -945,11 +988,13 @@ def render(node=None):
 	sframefirst = str(panel.value('First Frame:'))
 	sframelast = str(panel.value('Last Frame:'))
 	sframespertask = str(panel.value('Frames Per Task:'))
+	sframesequential = str(panel.value('Frame Sequential:'))
 	storeframes = False
 	if hasafanasynodes:
 		storeframes = int(panel.value('Store Frames Settings'))
 	if panel.value('Start Paused'):
 		fparams['startpaused'] = 1
+
 	# Check frame range was set:
 	if sframefirst.find('..') == -1:
 		try:
@@ -958,6 +1003,7 @@ def render(node=None):
 			nuke.message('Invalid first frame "%s"' % sframefirst)
 			return
 		fparams['framefirst'] = framefirst
+
 	if sframelast.find('..') == -1:
 		try:
 			framelast = int(sframelast)
@@ -965,6 +1011,7 @@ def render(node=None):
 			nuke.message('Invalid last frame "%s"' % sframelast)
 			return
 		fparams['framelast'] = framelast
+
 	if sframespertask.find('..') == -1:
 		try:
 			framespertask = int(sframespertask)
@@ -972,6 +1019,15 @@ def render(node=None):
 			nuke.message('Invalid frames per task "%s"' % sframespertask)
 			return
 		fparams['framespertask'] = framespertask
+
+	if sframesequential.find('..') == -1:
+		try:
+			framesequential = int(sframesequential)
+		except:
+			nuke.message('Invalid frames sequential "%s"' % sframesequential)
+			return
+		fparams['framesequential'] = framesequential
+
 	if not checkFrameRange(framefirst, framelast, 1, framespertask):
 		return
 

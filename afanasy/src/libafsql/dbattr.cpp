@@ -47,6 +47,7 @@ void DBAttr::init()
 	DBName[_filesize_max          ] = "filesize_max";
 	DBName[_filesize_min          ] = "filesize_min";
 	DBName[_flags                 ] = "flags";
+	DBName[_folder                ] = "folder";
 	DBName[_frame_inc             ] = "frame_inc";
 	DBName[_frame_first           ] = "frame_first";
 	DBName[_frame_last            ] = "frame_last";

@@ -21,7 +21,10 @@ Parser.add_option('-s', '--sources',  dest='sources',  type  ='string',     defa
 Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     default='',    help='Destination')
 Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default='',    help='References')
 Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
-Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default='',    help='Shot renaming padding (Ex:"432")')
+Parser.add_option(      '--prefix',   dest='prefix',   type  ='string',     default=None,  help='Shot renaming prefix')
+Parser.add_option(      '--regexp',   dest='regexp',   type  ='string',     default=None,  help='Shot renaming regexp')
+Parser.add_option(      '--substr',   dest='substr',   type  ='string',     default=None,  help='Shot renaming substr')
+Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default=None,  help='Shot renaming padding (Ex:"432")')
 Parser.add_option(      '--extract',  dest='extract',  action='store_true', default=False, help='Extract source folder(s)')
 Parser.add_option(      '--sameshot', dest='sameshot', action='store_true', default=False, help='"NAME" and "NAME-1" will be one shot')
 Parser.add_option('-u', '--uppercase',dest='uppercase',action='store_true', default=False, help='Rename shot uppercase')
@@ -82,39 +85,48 @@ if Options.template == '':
 if not os.path.isdir(Options.template):
 	errExit('Shot template folder does not exist')
 
-if not Options.test:
-	if Options.dest == '':
-		errExit('Destination is not specified')
+if Options.dest == '':
+	errExit('Destination is not specified')
 
-	if not os.path.isdir(Options.dest):
-		errExit('Destination folder does not exist')
+if not os.path.isdir(Options.dest):
+	errExit('Destination folder does not exist')
+
+ExistingShots = os.listdir( Options.dest)
 
 References = []
 if Options.refs != '' and os.path.isdir(Options.refs):
 	References = os.listdir(Options.refs)
 # References.sort()
 
+RegExp = None
+if Options.regexp is not None and Options.substr is not None:
+	RegExp = re.compile( Options.regexp, re.I|re.M)
+
 Sources = os.listdir(Options.sources)
 Sources.sort()
 Sources_skip = []
-FIN_SRC = []
-FIN_DST = []
-for shot in Sources:
-	if shot[0] == '.':
+for shot_folder in Sources:
+	if shot_folder[0] == '.':
 		continue
-	if shot in Sources_skip:
+	if shot_folder in Sources_skip:
 		continue
-	src = os.path.join(Options.sources, shot)
+	src = os.path.join(Options.sources, shot_folder)
 	if not os.path.isdir(src):
 		#Out.append({'warning': "\"%s\" is not a folder" % shot})
 		continue
 
+	# Shot name:
+	shot_name = shot_folder
+	for ex in ['.mov','.mxf','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
+		shot_name = shot_name.replace(ex,'')
+		shot_name = shot_name.replace(ex.upper(),'')
+
 	src_sources = [src]
 
 	for folder in Sources:
-		if folder == shot:
+		if folder == shot_folder:
 			continue
-		if Options.sameshot and isSameShot(shot, folder):
+		if Options.sameshot and isSameShot(shot_name, folder):
 			Sources_skip.append(folder)
 			src_sources.append(os.path.join(Options.sources, folder))
 
@@ -123,15 +135,13 @@ for shot in Sources:
 		ref_path = os.path.join(Options.refs, ref)
 		if not os.path.isfile(ref_path): continue
 		if ref_path in src_sources: continue
-		if isSameShot(shot, ref):
+		if isSameShot(shot_name, ref):
 			src_refs.append(os.path.join(ref_path))
 
-	shot_name = shot
-
 	# Rename shot padding:
-	if Options.padding != '':
-		words = re.findall(r'\D+', shot)
-		digits = re.findall(r'\d+', shot)
+	if Options.padding is not None:
+		words = re.findall(r'\D+', shot_name)
+		digits = re.findall(r'\d+', shot_name)
 		if len(words) == len(digits):
 			shot_name = ''
 			num = 0
@@ -142,44 +152,66 @@ for shot in Sources:
 				shot_name += word
 				shot_name += ('%0' + padding + 'd') % int(digits[num])
 				num += 1
-				# print('"%s"->"%s"' % (shot, shot_name))
-
-	# Shot name:
-	for ex in ['.mov','.dpx','.tif16','.tif8','.tif','.png','.jpg']:
-		shot_name = shot_name.replace(ex,'')
-		shot_name = shot_name.replace(ex.upper(),'')
+				# print('"%s"->"%s"' % (shot_folder, shot_name))
 
 	# Rename shot uppercase:
 	if Options.uppercase:
 		shot_name = shot_name.upper()
 
+	# Rename shot regexp:
+	if RegExp is not None:
+		shot_name = RegExp.sub( Options.substr, shot_name)
+
+	# Rename shot prefix:
+	if Options.prefix is not None:
+		shot_name = Options.prefix + shot_name
+
 	shot_dest = os.path.join(Options.dest, shot_name)
 
 	Out_Shot = dict()
 	Out_Shot['name'] = shot_name
-	Out_Shot['src'] = []
+	Out_Shot['FOLDER'] = os.path.basename(src)
+	Out_Shot['sources'] = []
+	Out_Shot['dest'] = []
+	Out_Shot['FOLDERS'] = []
+	Out_Shot['FILES'] = []
+	i = 0
 	for src in src_sources:
 		#print(src)
-		Out_Shot['src'].append(src)
-		FIN_SRC.append(src)
-		FIN_DST.append(os.path.join(shot_dest, Options.shot_src))
+		if i:
+			if os.path.isdir( src):
+				Out_Shot['FOLDERS'].append(os.path.basename(src))
+			else:
+				Out_Shot['FILES'].append(os.path.basename(src))
+		Out_Shot['sources'].append(src)
+		Out_Shot['dest'].append(os.path.join(shot_dest, Options.shot_src))
+		i += 1
 
 	if len(src_refs):
-		Out_Shot['ref'] = []
+		Out_Shot['REF'] = []
 		for ref in src_refs:
 			#print(ref)
-			Out_Shot['ref'].append(ref)
-			FIN_SRC.append(ref)
-			FIN_DST.append(os.path.join(shot_dest, Options.shot_ref))
+			Out_Shot['REF'].append(os.path.basename(ref))
+			Out_Shot['sources'].append(ref)
+			Out_Shot['dest'].append(os.path.join(shot_dest, Options.shot_ref))
+
+	# Verify in a shot already exists:
+	exists = False
+	if shot_name in ExistingShots:
+		Out_Shot['exists'] = True
+		exists = True
 
 	Out.append({'shot': Out_Shot})
 
-	if not Options.test:
-		if not os.path.isdir(shot_dest):
-			try:
-				shutil.copytree(Options.template, shot_dest)
-			except:
-				errExit('Can`t create "%s"' % shot_dest)
+	# Skip on test or an existing shot:
+	if Options.test or exists:
+		continue
+
+	# Copy an empty template for a shot:
+	try:
+		shutil.copytree(Options.template, shot_dest)
+	except:
+		errExit('Can`t create "%s"' % shot_dest)
 
 
 if Options.afanasy:
@@ -196,40 +228,50 @@ if Options.afanasy:
 Put = os.environ['CGRU_LOCATION'] + '/utilities/put.py'
 Put = 'python "%s"' % os.path.normpath(Put)
 
-for i in range(0, len(FIN_SRC)):
-	dst = FIN_DST[i]
+for shot in Out:
+	if 'shot' in shot:
+		shot = shot['shot']
+	else:
+		continue
 
-	sources = [FIN_SRC[i]]
-	if Options.extract and os.path.isdir(FIN_SRC[i]):
-		sources = os.listdir( FIN_SRC[i])
-		for s in range(0,len(sources)):
-			sources[s] = os.path.join(FIN_SRC[i],sources[s])
+	if 'exists' in shot:
+		continue
 
-	for src in sources:
-		if Options.move:
-			if Options.verbose:
-				print('%s -> %s' % (src,dst))
-			if not Options.test:
-				try:
-					shutil.move(src, dst)
-				except:
-					errExit('Can`t move to "%s"' % dst)
-			continue
+	for i in range(0, len(shot['sources'])):
 
-		cmd = Put
-		cmd += ' -s "%s"' % src
-		cmd += ' -d "%s"' % dst
-		cmd += ' -n "%s"' % os.path.basename(src)
+		sources = [shot['sources'][i]]
+		dst = shot['dest'][i]
 
-		if Options.test:
-			continue
+		if Options.extract and os.path.isdir(shot['sources'][i]):
+			sources = os.listdir(shot['sources'][i])
+			for s in range(0,len(sources)):
+				sources[s] = os.path.join(shot['sources'][i],sources[s])
 
-		if Options.afanasy:
-			task = af.Task(os.path.basename(src))
-			task.setCommand(cmd)
-			block.tasks.append(task)
-		else:
-			os.system(cmd)
+		for src in sources:
+			if Options.move:
+				if Options.verbose:
+					print('%s -> %s' % (src,dst))
+				if not Options.test:
+					try:
+						shutil.move(src, dst)
+					except:
+						errExit('Can`t move to "%s"' % dst)
+				continue
+
+			cmd = Put
+			cmd += ' -s "%s"' % src
+			cmd += ' -d "%s"' % dst
+			cmd += ' -n "%s"' % os.path.basename(src)
+
+			if Options.test:
+				continue
+
+			if Options.afanasy:
+				task = af.Task(os.path.basename(src))
+				task.setCommand(cmd)
+				block.tasks.append(task)
+			else:
+				os.system(cmd)
 
 if Options.afanasy and not Options.move and not Options.test:
 	job.send()

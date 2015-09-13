@@ -29,6 +29,7 @@ namespace AFJOB
 	const int NET_CONNECTTIME = 10000;
 	const int NET_SENTTIME = 10000;
 
+	// NEW VERSION: 32bit masks should be 64
 
 	const uint32_t STATE_READY_MASK                 = 1<<0;
 	const   char   STATE_READY_NAME[]               = "Ready";
@@ -76,6 +77,9 @@ namespace AFJOB
 	const   char   STATE_FAILEDPOST_NAME[]          = "Failed Post";
 	const   char   STATE_FAILEDPOST_NAME_S[]        = "FPO";
 	const uint32_t STATE_SOLVED_MASK                = 1<<30;
+	const uint32_t STATE_PPAPPROVAL_MASK            = 1<<31;
+	const   char   STATE_PPAPPROVAL_NAME[]          = "Preview pending approval.";
+	const   char   STATE_PPAPPROVAL_NAME_S[]        = "PPA";
 
 	const int  SYSJOB_ID                   = 1;  // System job ID
 	const char SYSJOB_NAME[]               = "afanasy";
@@ -90,6 +94,10 @@ namespace AFJOB
 	const int  SYSJOB_ERRORS_TASKSAMEHOST  = 1;
 	const int  SYSJOB_ERRORS_RETRIES       = 9;
 	const int  SYSJOB_ERRORS_FORGIVETIME   = 600;  // System job error hosts forgive time in seconds
+
+	// Some jobs solving constants:
+	const int TASK_NUM_NO_TASK       = -1; // No ready task founded
+	const int TASK_NUM_NO_SEQUENTIAL = -2; // All not sequential tasks finished, and job is PPA
 
 	// Tasks progess some states for GUI in ASCII
 	// Order is priority, as only one, most important state displayed in a job block progress bar

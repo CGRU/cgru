@@ -64,13 +64,6 @@ function up_CreateInput()
 
 function up_FileSelected( e)
 {
-	var path = g_CurPath();
-	if( ASSET && ASSET.upload_dir && ( ASSET.path == path ))
-	{
-		path += '/' + ASSET.upload_dir;
-		path = path.replace('@DATE@', c_DT_FormStrNow().split(' ')[0]);
-		path = path.replace('@USER@', g_auth_user.id);
-	}
 	var el = e.currentTarget.m_elFile;
 	var files = el.m_elInput.files;
 
@@ -81,21 +74,39 @@ function up_FileSelected( e)
 		{
 			el = up_InsertElement();
 		}
-		up_CreateFile( files[i], path, el );
+
+		var title = 'upload';
+		var path = g_CurPath();
+		if( ASSET && ASSET.uploads && ( ASSET.path == path ))
+			for( var up in ASSET.uploads )
+				for( var m = 0; m < ASSET.uploads[up].masks.length; m++ )
+					if( files[i].name.match( new RegExp(ASSET.uploads[up].masks[m], 'i')))
+					{
+						path = g_CurPath() + '/' + ASSET.uploads[up].folder;
+						title = ASSET.uploads[up].news_title;
+						if( title == null ) title = up;
+					}
+
+		path = path.replace('@DATE@', c_DT_FormStrNow().split(' ')[0]);
+		path = path.replace('@USER@', g_auth_user.id);
+
+		up_CreateFile({'file':files[i],'path':path,'title':title,'el':el});
 	}
 	up_CreateInput();
 }
 
-function up_CreateFile( i_file, i_path, i_el)
+function up_CreateFile( i_args)
 {
-	var file = i_file;
-	var el = i_el;
+	var file = i_args.file;
+	var path = i_args.path;
+	var el = i_args.el;
 
 	el.m_selected = true;
 	el.m_upfile = file;
-	el.m_path = i_path + '/' + file.name;
-	el.m_uppath = RULES.root + i_path;
-	el.title = i_path;
+	el.m_uppath = path;
+	el.m_uptitle = i_args.title;
+	el.m_curpath = g_CurPath();
+	el.title = path;
 
 	var elBtnAdd = document.createElement('div');
 	el.appendChild( elBtnAdd);
@@ -120,7 +131,7 @@ function up_CreateFile( i_file, i_path, i_el)
 	el.m_elInfo = elInfo;
 	elInfo.classList.add('info');
 	elInfo.innerHTML = c_Bytes2KMG(file.size) + ' ' + file.name;
-	elInfo.href = '#' + i_path;
+	elInfo.href = '#' + path;
 
 	var elProgress = document.createElement('div');
 	el.appendChild( elProgress);
@@ -146,7 +157,7 @@ function up_Start( i_el)
 	i_el.classList.add('started');
 
 	var formData = new FormData();
-	formData.append('upload_path', i_el.m_uppath);
+	formData.append('upload_path', RULES.root + i_el.m_uppath);
 	formData.append('upload_file', i_el.m_upfile);
 
 	var xhr = new XMLHttpRequest();
@@ -166,7 +177,7 @@ function up_Start( i_el)
 			if( xhr.status == 200 )
 			{
 				c_Log('<b style="color:#404"><i>upload'+(up_counter++)+':</i></b> '+ xhr.responseText);
-				up_Received( c_Parse( xhr.responseText));
+				up_Received( c_Parse( xhr.responseText), i_el);
 				return;
 			}
 		}
@@ -207,44 +218,37 @@ function up_Finished( i_el, i_status)
 	i_el.m_elBtnDel.style.display = 'block';
 }
 
-function up_Received( i_msg)
+function up_Received( i_args, i_el)
 {
-	if( i_msg == null )
+	if( i_args == null )
 	{
 		c_Error('Upload undefined error.');
 		return;
 	}
-	if(( i_msg.files == null ) || ( i_msg.files.length == 0 ))
+	if(( i_args.files == null ) || ( i_args.files.length == 0 ))
 	{
-		if( i_msg.error )
-			c_Error('Upload: ' + i_msg.error);
+		if( i_args.error )
+			c_Error('Upload: ' + i_args.error);
 		else
 			c_Error('Uploaded no files.');
 		return;
 	}
 
-	var els = [];
-	for( var f = 0; f < i_msg.files.length; f++)
+	var news = [];
+	for( var f = 0; f < i_args.files.length; f++)
 	{
-		for( var e = 0; e < up_elFiles.length; e++)
-		{
-//			if( ( up_elFiles[e].m_upfinished ) &&
-			if( ( i_msg.path == up_elFiles[e].m_uppath ) &&
-				( i_msg.files[f].name == up_elFiles[e].m_upfile.name))
-			{
-				els.push( up_elFiles[e]);
-				up_Done( up_elFiles[e], i_msg.files[f]);
-			}
-		}
+		up_Done( i_el, i_args.files[f]);
+
+		var filename = i_args.files[f].filename;
+		if( filename == null ) continue;
+
+		var news_link = g_GetLocationArgs({"fv_Goto":i_el.m_uppath + '/' + c_PathBase(i_args.files[f].filename)}, false, i_el.m_curpath);
+		news.push( nw_CreateNews({'title':i_el.m_uptitle,'path':i_el.m_curpath,'link':news_link}));
 	}
 
-	if( els.length == 0 )
-	{
-		c_Error('Upload elemants not fonded.');
-		return;
-	}
-
-//console.log( JSON.stringify( i_msg));
+	if( news.length )
+		nw_SendNews( news);
+//console.log( JSON.stringify( i_args));
 }
 
 function up_Done( i_el, i_msg)
@@ -257,15 +261,17 @@ function up_Done( i_el, i_msg)
 		c_Error('Upload: ' + i_msg.error + ': file="'+i_el.m_upfile.name+'" path="'+i_el.m_uppath+'"');
 		i_el.classList.add('error');
 		i_el.m_elProgress.textContent = i_msg.error;
-	}
-	else
-	{
-		c_Info('Uploaded "'+i_el.m_upfile.name+'" to "' + i_el.m_uppath + '"');
-		i_el.m_elProgress.style.display = 'none';
-		i_el.classList.add('done');
+		return;
 	}
 
-	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
+	c_Info('Uploaded "'+i_el.m_upfile.name+'" to "' + i_el.m_uppath + '"');
+	i_el.m_elProgress.style.display = 'none';
+	i_el.classList.add('done');
+
+	// Refresh files views same path:
+	fv_RefreshPath( i_el.m_uppath);
+
+//	c_MakeThumbnail( i_el.m_uppath + '/' + i_el.m_upfile.name);
 }
 
 function up_Remove( i_el)

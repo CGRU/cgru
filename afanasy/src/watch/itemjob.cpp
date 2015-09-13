@@ -107,9 +107,11 @@ void ItemJob::updateValues( af::Node *node, int type)
 	description          = afqt::stoq( job->getDescription());
 	num_runningtasks     = job->getRunningTasksNumber();
 	lifetime             = job->getTimeLife();
+	ppapproval           = job->isPPAFlag();
+
+	QString new_thumb_path = afqt::stoq( job->getThumbPath());
 
 	compact_display = true;
-	bool get_thumbnail = false;
 
 	int tasks_done_old = m_tasks_done;
 	m_tasks_done = 0;
@@ -123,8 +125,6 @@ void ItemJob::updateValues( af::Node *node, int type)
 
 		m_tasks_done += m_blockinfo[b].tasksdone;
 	}
-	if( tasks_done_old != m_tasks_done )
-		get_thumbnail = true;
 
    if( time_started ) compact_display = false;
    if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
@@ -143,6 +143,8 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
    if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
    properties += QString(" p%2").arg( m_priority);
+	if( ppapproval )
+		properties += " PPA";
 
    user_eta = username;
    if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
@@ -159,8 +161,9 @@ void ItemJob::updateValues( af::Node *node, int type)
 
    calcHeight();
 
-	if( get_thumbnail )
+	if( thumb_path != new_thumb_path )
 		getThumbnail();
+	thumb_path = new_thumb_path;
 }
 
 bool ItemJob::calcHeight()
@@ -200,15 +203,16 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    // Draw standart backgroud
    drawBack( painter, option);
 
-   // Draw back with job state specific color (if it is not selected)
-   const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
-   if     ( state & AFJOB::STATE_ERROR_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoberror.c);
-   else if( state & AFJOB::STATE_OFFLINE_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjoboff.c  );
-   else if( state & AFJOB::STATE_WAITTIME_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
-   else if( state & AFJOB::STATE_WAITDEP_MASK)  itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
-   else if( state & AFJOB::STATE_DONE_MASK)     itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
-   if((option.state & QStyle::State_Selected) == false)
-      painter->fillRect( option.rect, *itemColor );
+	// Draw back with job state specific color (if it is not selected)
+	const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
+	if     ( state & AFJOB::STATE_OFFLINE_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoboff.c  );
+	else if( state & AFJOB::STATE_ERROR_MASK)      itemColor = &(afqt::QEnvironment::clr_itemjoberror.c);
+	else if( state & AFJOB::STATE_PPAPPROVAL_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobppa.c);
+	else if( state & AFJOB::STATE_WAITTIME_MASK)   itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
+	else if( state & AFJOB::STATE_WAITDEP_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
+	else if( state & AFJOB::STATE_DONE_MASK)       itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
+	if((option.state & QStyle::State_Selected) == false)
+		painter->fillRect( option.rect, *itemColor );
 
    uint32_t currenttime = time( NULL);
 

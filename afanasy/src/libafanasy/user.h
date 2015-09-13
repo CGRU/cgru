@@ -73,7 +73,7 @@ public:
 
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
 
-	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
+	bool jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 
 protected:
 	std::string m_host_name;          ///< User host name.

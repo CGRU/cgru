@@ -5,8 +5,8 @@ sc_elCurShot = null;
 sc_elImgThumbs = [];
 
 sc_thumb_params = {};
-sc_thumb_params.force_update = {"width":'30%',"lwidth":'150px',"bool":false,"tooltip":'Update or skip existing thumbnails'};
-sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px',"bool":true,"tooltip":'Do not create thumbnails from movie files'};
+sc_thumb_params.force_update = {"width":'30%',"lwidth":'150px','type':"bool",'default':false,"tooltip":'Update or skip existing thumbnails'};
+sc_thumb_params.skip_movies = {"width":'30%',"lwidth":'150px','type':"bool",'default':true,"tooltip":'Do not create thumbnails from movie files'};
 
 sc_thumb_params_values = {};
 
@@ -77,23 +77,82 @@ function scene_Show()
 		elShot.style.padding = '4px';
 		elShot.classList.add('shot');
 
-		var elLink = document.createElement('a');
-		elShot.appendChild( elLink);
-		elLink.href = '#' + path;
+		// Thumbnail:
 		var elImg = document.createElement('img');
-		elLink.appendChild( elImg);
+		elShot.appendChild( elImg);
 		elImg.classList.add('thumbnail');
 		elImg.m_path = path;
 		elImg.m_src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
 		sc_elImgThumbs.push( elImg);
 		elImg.src = elImg.m_src;
 
+		// Right float div:
+		var elDiv = document.createElement('div');
+		elShot.appendChild( elDiv);
+		elDiv.classList.add('name_body');
+		// Name:
 		var elName = document.createElement('a');
-		elShot.appendChild( elName);
+		elDiv.appendChild( elName);
 		elName.href = '#' + path;
 		elName.textContent = folders[f].name;
+		// Body:
+		if( g_auth_user )
+		{
+			var elBodyEditBtn = document.createElement('div');
+			elDiv.appendChild( elBodyEditBtn);
+			elBodyEditBtn.classList.add('button');
+			elBodyEditBtn.classList.add('edit');
+			elBodyEditBtn.title = 'Edit shot body.';
+			elBodyEditBtn.m_elShot = elShot;
+			elBodyEditBtn.onclick = sc_EditBody;
+			elShot.m_elBodyEditBtn = elBodyEditBtn;
 
+			var elBodyEditPanel = document.createElement('div');
+			elDiv.appendChild( elBodyEditPanel);
+			elBodyEditPanel.classList.add('edit_panel');
+			elBodyEditPanel.style.display = 'none';
+			elShot.m_elBodyEditPanel = elBodyEditPanel;
+
+			var elBodyCancelBtn = document.createElement('div');
+			elBodyEditPanel.appendChild( elBodyCancelBtn);
+			elBodyCancelBtn.classList.add('button');
+			elBodyCancelBtn.innerHTML = 'CANCEL <small>[ESC]</small>.';
+			elBodyCancelBtn.title = 'Cancel shot body editing.';
+			elBodyCancelBtn.m_elShot = elShot;
+			elBodyCancelBtn.onclick = sc_EditBodyCancel;
+
+			var elBodySaveBtn = document.createElement('div');
+			elBodyEditPanel.appendChild( elBodySaveBtn);
+			elBodySaveBtn.classList.add('button');
+			elBodySaveBtn.innerHTML = '<b>SAVE</b> <small>[CTRL+ENTER]</small>.';
+			elBodySaveBtn.title = 'Save shot body.';
+			elBodySaveBtn.m_elShot = elShot;
+			elBodySaveBtn.onclick = sc_EditBodySave;
+		}
+
+		elShot.m_elBody = document.createElement('div');
+		elDiv.appendChild( elShot.m_elBody);
+		elShot.m_elBody.classList.add('body');
+		elShot.m_elBody.m_elShot = elShot;
+
+		// Elements for status:
 		var elSt = {};
+
+		var elFramesNumDiv = document.createElement('div');
+		elDiv.insertBefore( elFramesNumDiv, elName);
+		elFramesNumDiv.classList.add('frames_num_div');
+		elSt.elFramesNum = document.createElement('div');
+		elFramesNumDiv.appendChild( elSt.elFramesNum);
+		elSt.elFramesNum.classList.add('frames_num');
+		var elFramesNumLabel = document.createElement('div');
+		elFramesNumDiv.appendChild( elFramesNumLabel);
+		elFramesNumLabel.textContent = 'F:';
+		elFramesNumLabel.classList.add('frames_num_label');
+
+		// Timecode:
+		elSt.elTimeCode = document.createElement('div');
+		elDiv.insertBefore( elSt.elTimeCode, elName);
+		elSt.elTimeCode.classList.add('timecode');
 
 		elSt.elFinish = document.createElement('div');
 		elShot.appendChild( elSt.elFinish);
@@ -102,18 +161,20 @@ function scene_Show()
 		elShot.appendChild( elShot.m_elStatus);
 		elShot.m_elStatus.classList.add('status');
 
-		var elEditBtn = document.createElement('div');
-		elShot.m_elStatus.appendChild( elEditBtn);
-		elEditBtn.classList.add('button');
-		elEditBtn.classList.add('btn_edit');
-		elEditBtn.textContent = 'Edit';
-
 		elSt.elProgress = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elProgress);
 		elSt.elProgress.classList.add('progress');
 		elSt.elProgressBar = document.createElement('div');
 		elSt.elProgress.appendChild( elSt.elProgressBar);
 		elSt.elProgressBar.classList.add('progressbar');
+
+		var elEditBtn = document.createElement('div');
+		elShot.m_elStatus.appendChild( elEditBtn);
+		elEditBtn.classList.add('button');
+		elEditBtn.classList.add('edit');
+		elEditBtn.title = 'Edit status.\nSelect several shots to edit.';
+		if( g_auth_user == null )
+			elEditBtn.style.display = 'none';
 
 		elSt.elPercentage = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elPercentage);
@@ -146,8 +207,25 @@ function scene_Show()
 
 		elShot.onclick = sc_ShotClicked;
 	}
+
 	sc_DisplayStatistics();
 	sc_Post();
+
+	// Get scene shots bodies:
+	for( var i = 0; i < sc_elShots.length; i++)
+	{
+		var path = sc_elShots[i].m_path;
+		path = RULES.root + path + '/' + RULES.rufolder + '/' + u_body_filename;
+		n_GetFile({"path":path,"func":sc_BodyReceived,"info":'scene_bodies',"elShot":sc_elShots[i],"parse":false});
+	}
+}
+function sc_BodyReceived( i_data, i_args)
+{
+	if( i_data.indexOf('No such file ' + RULES.root) != -1 ) return;
+
+	// Replace <br> with spaces through some pattern:
+	i_args.elShot.m_elBody.innerHTML = i_data.replace(/\<\s*br\s*\/?\s*\>/g,'@@BR@@');
+	i_args.elShot.m_elBody.innerHTML = i_args.elShot.m_elBody.textContent.replace(/@@BR@@/g,' ');
 }
 
 function scenes_Show()
@@ -275,6 +353,7 @@ function scenes_Received( i_data, i_args)
 			elShot.onclick = sc_ShotClicked;
 		}
 	}
+
 	sc_DisplayStatistics();
 	sc_Post();
 }
@@ -293,6 +372,86 @@ function sc_EditStatus( e)
 	status.edit({"statuses":statuses});
 
 	return false;
+}
+
+function sc_EditBody( i_e)
+{
+	i_e.stopPropagation();
+
+	var el = i_e.currentTarget.m_elShot;
+
+	el.m_elBody.m_text = el.m_elBody.textContent;
+	el.m_elBody.classList.add('editing');
+	el.m_elBody.contentEditable = 'true';
+	el.m_elBodyEditBtn.style.display = 'none';
+	el.m_elBodyEditPanel.style.display = 'block';
+
+	el.m_elBody.onkeydown = function( i_e)
+	{
+		if(( i_e.keyCode == 13 ) && i_e.ctrlKey ) // CTRL + ENTER
+		{
+			sc_EditBodySave( i_e);
+			i_e.currentTarget.blur();
+		}
+		if( i_e.keyCode == 27 ) // ESC
+		{
+			sc_EditBodyCancel( i_e);
+			i_e.currentTarget.blur();
+		}
+	}
+
+	return false;
+}
+
+function sc_EditBodyCancel( i_e)
+{
+	i_e.stopPropagation();
+
+	var el = i_e.currentTarget.m_elShot;
+
+	el.m_elBody.textContent = el.m_elBody.m_text;
+	el.m_elBody.classList.remove('editing');
+	el.m_elBody.contentEditable = 'false';
+	el.m_elBodyEditBtn.style.display = 'block';
+	el.m_elBodyEditPanel.style.display = 'none';
+	el.m_elBody.onkeydown = null;
+
+	return false;
+}
+
+function sc_EditBodySave( i_e)
+{
+	var el = i_e.currentTarget.m_elShot;
+	var text = el.m_elBody.textContent;
+
+	sc_EditBodyCancel( i_e);
+
+	var shots = scenes_GetSelectedShots();
+	if( shots.indexOf( el) == -1 )
+		shots.push( el);
+
+	var news = [];
+
+	for( var i = 0; i < shots.length; i++)
+	{
+		n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename, shots[i].m_path),"data":text}},
+		"func":sc_EditBodyFinished,"elShot":shots[i],"info":'body save'});
+
+		news.push( nw_CreateNews({'title':'body','path':shots[i].m_path,'artists':shots[i].m_status.obj.artists}));
+
+		st_BodyModified(shots[i].m_status.obj, shots[i].m_path);
+	}
+
+	nw_SendNews( news);
+
+	return false;
+}
+function sc_EditBodyFinished( i_data, i_args)
+{
+	var shot = i_args.elShot;
+	var path = c_GetRuFilePath( u_body_filename, shot.m_path);
+	n_GetFile({"path":path,"func":sc_BodyReceived,"info":'scene_bodies',"elShot":shot,
+		"cache_time":-1,"parse":false});
 }
 
 function sc_ShotClicked( i_evt)
@@ -339,6 +498,46 @@ function scenes_SelectAll( i_select)
 {
 	for( var i = 0; i < sc_elShots.length; i++)
 		sc_SelectShot( sc_elShots[i], i_select);
+
+	sc_DisplayStatistics();
+}
+function scenes_SelectInvert()
+{
+	for( var i = 0; i < sc_elShots.length; i++)
+		sc_SelectShot( sc_elShots[i], sc_elShots[i].m_selected != true);
+
+	sc_DisplayStatistics();
+}
+function scenes_SelectSameColor()
+{
+	var sel = scenes_GetSelectedShots()
+	if( sel.length == 0 )
+	{
+		c_Error('No shots selected.');
+		return;
+	}
+
+	var clr = null;
+	if( sel[0].m_status && sel[0].m_status.obj && sel[0].m_status.obj.color )
+		clr = sel[0].m_status.obj.color;
+
+	scenes_SelectAll( false);
+
+	for( var i = 0; i < sc_elShots.length; i++)
+	{
+		var c = null;
+		var s = sc_elShots[i];
+		if( s.m_status && s.m_status.obj && s.m_status.obj.color )
+			c = s.m_status.obj.color;
+
+		if( c && c.length && clr && clr.length )
+		{
+			if(( clr[0] == c[0] ) && ( clr[1] == c[1] ) && ( clr[2] == c[2] ))
+				sc_SelectShot( s, true);
+		}
+		else if(( c == null ) && ( clr == null ))
+			sc_SelectShot( s, true);
+	}
 
 	sc_DisplayStatistics();
 }
@@ -567,21 +766,32 @@ function sc_DisplayStatistics()
 
 	// Shots count, progress, frames count:
 	//
+	var omits = 0;
 	var progress = 0;
 	var frames_count = 0;
 	for( var i = 0; i < shots.length; i++)
 	{
 		var stat = shots[i].m_status.obj;
 		if( stat == null) continue;
-		if( stat.progress && ( stat.progress > 0 ))
-			progress += stat.progress;
-		if( stat.frames_num )
-			frames_count += stat.frames_num;
+
+		if( stat && stat.tags && ( stat.tags.indexOf('omit') != -1 ))
+		{
+			omits++;
+		}
+		else
+		{
+			if( stat.progress && ( stat.progress > 0 ))
+				progress += stat.progress;
+
+			if( stat.frames_num )
+				frames_count += stat.frames_num;
+		}
 	}
 
-	var info = 'Shots Count: ' + shots.length;
+	var info = 'shots count: ' + (shots.length - omits);
+	if( omits ) info += ' (+' + omits + ' omits)';
 	if( shots.length )
-		info += ' Shots Progress: ' + Math.round(progress/shots.length) + '%';
+		info += ', average progress: ' + Math.round(progress/shots.length) + '%';
 
 	if( ASSET.type == 'scenes')
 	{
@@ -597,12 +807,15 @@ function sc_DisplayStatistics()
 				}
 			}
 		}
-		info = ' Scenes Count: ' + scenes_count + ' ' + info;
+		info = 'scenes count: ' + scenes_count + '<br>' + info;
 	}
 
-	if( frames_count ) info += ' Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps);
+	if( selShots.length )
+		info = 'selected ' + info;
 
-	$('scenes_info').textContent = info;
+	info += '<br>frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
+
+	$('scenes_info').innerHTML = info;
 
 	// Statistics:
 	//
@@ -618,6 +831,7 @@ function sc_DisplayStatistics()
 	args.elReportsDiv = $('scenes_reports_div');
 	args.elDiffer = $('scenes_differ');
 	args.elDifferDiv = $('scenes_differ_div');
+	args.main_artists = true;
 	args.draw_bars = true;
 
 	stcs_Show( args);

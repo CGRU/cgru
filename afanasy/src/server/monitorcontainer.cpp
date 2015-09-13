@@ -16,7 +16,7 @@
 #include "../include/macrooutput.h"
 
 MonitorContainer::MonitorContainer():
-	ClientContainer( "Monitors", AFTALK::MAXCOUNT),
+	ClientContainer( "Monitors", AFMONITOR::MAXCOUNT),
 	events( NULL),
 	jobEvents( NULL),
 	jobEventsUids( NULL),

@@ -4,6 +4,7 @@ import os
 import sys
 import re
 import subprocess
+import time
 
 from optparse import OptionParser
 
@@ -14,14 +15,15 @@ Parser = OptionParser(
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
 Parser.add_option('-r', '--resize',    dest='resize',    type  ='string', default='',       help='Resize (1280x720)')
-Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default='',       help='Movie codec')
+Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default=None,     help='Movie codec')
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
-Parser.add_option('-n', '--container', dest='container', type  ='string', default='mov',    help='Movie Container (mov or ogg for theora)')
+Parser.add_option('-n', '--container', dest='container', type  ='string', default='mp4',    help='Movie Container')
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string', default='',       help='Output movie or images folder (auto)')
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
 Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
 Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
+Parser.add_option('-p', '--padding',   dest='padding' ,  type  ='int',    default=7,        help='Padding')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
 
 Options, argv = Parser.parse_args()
@@ -35,29 +37,31 @@ Output = Options.output
 if Output == '':
 	Output = Input
 
-SequenceInput = False
-MovieInput = True
+Sequence = []
 StartNumber = None
 if os.path.isdir(Input):
-	SequenceInput = True
-	MovieInput = False
-	allfiles = os.listdir(Input)
+	InDir = Input
+	allfiles = os.listdir(InDir)
 	allfiles.sort()
 	for afile in allfiles:
-		if afile[0] == '.':
-			continue
-		if not os.path.isfile(os.path.join(Input, afile)):
-			continue
+		if afile[0] == '.': continue
+		afile = os.path.join( InDir, afile)
+		if os.path.isdir( afile): continue
+
+		Sequence.append( afile)
+
+		if StartNumber is not None: continue
+
+		afile = os.path.basename( afile)
 		digits = re.findall(r'\d+', afile)
-		if len(digits) == 0:
-			continue
+		if len(digits) == 0: continue
 		digits = digits[-1]
 		StartNumber = int(digits)
 		Input = afile[:afile.rfind(digits)]
 		Input += '%0' + str(len(digits)) + 'd'
 		Input += afile[afile.rfind(digits) + len(digits):]
 		Input = os.path.join(argv[0], Input)
-		break
+		continue
 else:
 	if not os.path.isfile(Input):
 		print('ERROR: Input does not exist: ' + Input)
@@ -68,8 +72,7 @@ CODECSDIR = os.path.join(MOVIEMAKER, 'codecs')
 
 Codec = Options.codec
 
-if Codec == '':
-	Output += '.' + Options.type
+if Codec is None:
 	args = [Options.avcmd, '-y']
 	if Options.timestart != '':
 		args.extend(['-ss', Options.timestart])
@@ -93,8 +96,10 @@ if Codec == '':
 		resize = Options.resize.split('x')
 		if len(resize) < 2:
 			resize.append('-1')
-		args.extend(['-vf', 'scale=%s:%s' % (resize[0], resize[1])])
+		args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
 		Output += '.r%s' % Options.resize
+
+	Output += '.' + Options.type
 
 	if not os.path.isdir(Output):
 		os.makedirs(Output)
@@ -106,7 +111,7 @@ if Codec == '':
 	if imgname is None:
 		imgname = os.path.basename( Input)
 		imgname,ext = os.path.splitext( imgname)
-	Output = os.path.join(Output, imgname + '.%07d.' + Options.type)
+	Output = os.path.join(Output, imgname + '.%0' + str(Options.padding) + 'd.' + Options.type)
 
 	args.append(Output)
 
@@ -182,9 +187,13 @@ frames_total = -1
 fps          = -1
 frame        = -1
 progress     = -1
+progress_old =  0
 frame_old    = -1
 framereached = False
 output       = ''
+img_old      = None
+time_img     = 0
+
 while True:
 	data = process.stderr.read(1)
 	if data is None:
@@ -208,6 +217,21 @@ while True:
 			print(frame_info)
 			if progress != -1:
 				print('PROGRESS: %d%%' % progress)
+
+				# Output thumbnail on-the-fly but not often than 10 % and 5 seconds:
+				if progress >= progress_old and time.time() > time_img + 5:
+					if len(Sequence):
+						img = int( .01 * len(Sequence) * progress)
+						if img >= len(Sequence): img = len(Sequence) - 1
+						if img != img_old:
+							print('@IMAGE!@' + Sequence[img])
+							img_old = img
+					elif frame > -1:
+						if Codec is None:
+							print('@IMAGE!@' + Output % frame)
+					progress_old += 5
+					time_img = time.time()
+
 			frame_old = frame
 		sys.stdout.flush()
 		continue
@@ -250,7 +274,7 @@ while True:
 		try:
 			frame = int(output[:-4])
 			if progress != -1 and frames_total > 0:
-				progress = 100 * frame / frames_total
+				progress = int(100 * frame / frames_total)
 		except Exception as e:
 			print(str(e))
 		framereached = False

@@ -14,12 +14,32 @@ Host::Host():
 	m_power(0),
 	m_os(""),
 	m_properties(""),
-	m_services_num(0),
-	m_wol_idlesleep_time(0),
-	m_nimby_idlefree_time(0),
-	m_nimby_busyfree_time(0),
-	m_idle_cpu(0),
-	m_busy_cpu(0)
+	m_wol_idlesleep_time(-1),
+
+
+	m_nimby_idlefree_time(-1),
+	m_nimby_busyfree_time(-1),
+
+	m_nimby_idle_cpu(-1),
+	m_nimby_busy_cpu(-1),
+
+	m_nimby_idle_mem(-1),
+	m_nimby_busy_mem(-1),
+
+	m_nimby_idle_swp(-1),
+	m_nimby_busy_swp(-1),
+
+	m_nimby_idle_hddgb(-1),
+	m_nimby_busy_hddgb(-1),
+
+	m_nimby_idle_hddio(-1),
+	m_nimby_busy_hddio(-1),
+
+	m_nimby_idle_netmbs(-1),
+	m_nimby_busy_netmbs(-1),
+
+
+	m_services_num(0)
 {
 }
 
@@ -94,11 +114,29 @@ void Host::mergeParameters( const Host & other)
 	if( other.m_resources.size() ) m_resources    = other.m_resources;
 	if( other.m_data.size()      ) m_data         = other.m_data;
 
-	if( other.m_wol_idlesleep_time  ) m_wol_idlesleep_time  = other.m_wol_idlesleep_time;
-	if( other.m_nimby_idlefree_time ) m_nimby_idlefree_time = other.m_nimby_idlefree_time;
-	if( other.m_nimby_busyfree_time ) m_nimby_busyfree_time = other.m_nimby_busyfree_time;
-	if( other.m_idle_cpu ) m_idle_cpu = other.m_idle_cpu;
-	if( other.m_busy_cpu ) m_busy_cpu = other.m_busy_cpu;
+	if( other.m_wol_idlesleep_time  != -1 ) m_wol_idlesleep_time  = other.m_wol_idlesleep_time;
+
+
+	if( other.m_nimby_idlefree_time != -1 ) m_nimby_idlefree_time = other.m_nimby_idlefree_time;
+	if( other.m_nimby_busyfree_time != -1 ) m_nimby_busyfree_time = other.m_nimby_busyfree_time;
+
+	if( other.m_nimby_idle_cpu      != -1 ) m_nimby_idle_cpu      = other.m_nimby_idle_cpu;
+	if( other.m_nimby_busy_cpu      != -1 ) m_nimby_busy_cpu      = other.m_nimby_busy_cpu;
+
+	if( other.m_nimby_idle_mem      != -1 ) m_nimby_idle_mem      = other.m_nimby_idle_mem;
+	if( other.m_nimby_busy_mem      != -1 ) m_nimby_busy_mem      = other.m_nimby_busy_mem;
+
+	if( other.m_nimby_idle_swp      != -1 ) m_nimby_idle_swp      = other.m_nimby_idle_swp;
+	if( other.m_nimby_busy_swp      != -1 ) m_nimby_busy_swp      = other.m_nimby_busy_swp;
+
+	if( other.m_nimby_idle_hddgb    != -1 ) m_nimby_idle_hddgb    = other.m_nimby_idle_hddgb;
+	if( other.m_nimby_busy_hddgb    != -1 ) m_nimby_busy_hddgb    = other.m_nimby_busy_hddgb;
+
+	if( other.m_nimby_idle_hddio    != -1 ) m_nimby_idle_hddio    = other.m_nimby_idle_hddio;
+	if( other.m_nimby_busy_hddio    != -1 ) m_nimby_busy_hddio    = other.m_nimby_busy_hddio;
+
+	if( other.m_nimby_idle_netmbs   != -1 ) m_nimby_idle_netmbs   = other.m_nimby_idle_netmbs;
+	if( other.m_nimby_busy_netmbs   != -1 ) m_nimby_busy_netmbs   = other.m_nimby_busy_netmbs;
 }
 
 void Host::jsonWrite( std::ostringstream & o_str) const
@@ -115,12 +153,30 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 		o_str << ",\n\"properties\":\"" << m_properties << "\"";
 	if( m_wol_idlesleep_time > 0 )
 		o_str << ",\n\"wol_idlesleep_time\":" << m_wol_idlesleep_time;
+
 	if( m_nimby_idlefree_time > 0 )
 		o_str << ",\n\"nimby_idlefree_time\":" << m_nimby_idlefree_time;
 	if( m_nimby_busyfree_time > 0 )
 		o_str << ",\n\"nimby_busyfree_time\":" << m_nimby_busyfree_time;
-	o_str << ",\n\"idle_cpu\":"  << m_idle_cpu;
-	o_str << ",\n\"busy_cpu\":"  << m_busy_cpu;
+
+	if( m_nimby_idle_cpu > 0 ) o_str << ",\n\"nimby_idle_cpu\":"  << m_nimby_idle_cpu;
+	if( m_nimby_busy_cpu > 0 ) o_str << ",\n\"nimby_busy_cpu\":"  << m_nimby_busy_cpu;
+
+	if( m_nimby_idle_mem > 0 ) o_str << ",\n\"nimby_idle_mem\":"  << m_nimby_idle_mem;
+	if( m_nimby_busy_mem > 0 ) o_str << ",\n\"nimby_busy_mem\":"  << m_nimby_busy_mem;
+
+	if( m_nimby_idle_swp > 0 ) o_str << ",\n\"nimby_idle_swp\":"  << m_nimby_idle_swp;
+	if( m_nimby_busy_swp > 0 ) o_str << ",\n\"nimby_busy_swp\":"  << m_nimby_busy_swp;
+
+	if( m_nimby_idle_hddgb > 0 ) o_str << ",\n\"nimby_idle_hddgb\":"  << m_nimby_idle_hddgb;
+	if( m_nimby_busy_hddgb > 0 ) o_str << ",\n\"nimby_busy_hddgb\":"  << m_nimby_busy_hddgb;
+
+	if( m_nimby_idle_hddio > 0 ) o_str << ",\n\"nimby_idle_hddio\":"  << m_nimby_idle_hddio;
+	if( m_nimby_busy_hddio > 0 ) o_str << ",\n\"nimby_busy_hddio\":"  << m_nimby_busy_hddio;
+
+	if( m_nimby_idle_netmbs > 0 ) o_str << ",\n\"nimby_idle_netmbs\":"  << m_nimby_idle_netmbs;
+	if( m_nimby_busy_netmbs > 0 ) o_str << ",\n\"nimby_busy_netmbs\":"  << m_nimby_busy_netmbs;
+
 /*	if( m_resources.size())
 		o_str << ",\n\"resources\":\"" << m_resources << "\"";
 	if( m_data.size())
@@ -133,8 +189,11 @@ void Host::v_readwrite( Msg * msg)
 {
 	rw_int32_t( m_max_tasks,           msg );
 	rw_int32_t( m_capacity,            msg );
-	rw_int32_t( m_idle_cpu,            msg );
-	rw_int32_t( m_busy_cpu,            msg );
+
+	// NEW VERSION // other auto nimby parameters:
+	rw_int32_t( m_nimby_idle_cpu,      msg );
+	rw_int32_t( m_nimby_busy_cpu,      msg );
+
 	rw_int32_t( m_wol_idlesleep_time,  msg );
 	rw_int32_t( m_nimby_idlefree_time, msg );
 	rw_int32_t( m_nimby_busyfree_time, msg );
@@ -156,14 +215,31 @@ void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
       stream << std::endl;
 	  stream << "   Capacity = " << m_capacity << ", Max Tasks = " << m_max_tasks << ", Power = " << m_power;
 
-		if( m_wol_idlesleep_time )
+		if( m_wol_idlesleep_time  != -1 )
 			stream << "\n   WOL Sleep Idle Time = " << time2strHMS( m_wol_idlesleep_time, true );
-		if( m_nimby_idlefree_time )
-			stream << "\n   Nimby Free Idle Time = " << time2strHMS( m_nimby_idlefree_time, true );
-		if( m_nimby_busyfree_time )
-			stream << "\n   Free Busy Nimby Time = " << time2strHMS( m_nimby_busyfree_time, true );
-		stream << "\n   Idle CPU = " << m_idle_cpu << "%";
-		stream << "\n   Busy CPU = " << m_busy_cpu << "%";
+
+		if( m_nimby_busyfree_time != -1 )
+			stream << "\n   Nimby Busy Free Time = " << time2strHMS( m_nimby_busyfree_time, true );
+		if( m_nimby_idlefree_time != -1 )
+			stream << "\n   Nimby Idle Free Time = " << time2strHMS( m_nimby_idlefree_time, true );
+
+		if( m_nimby_idle_cpu    > 0 ) stream << "\n   Idle CPU = " << m_nimby_idle_cpu << "%";
+		if( m_nimby_busy_cpu    > 0 ) stream << "\n   Busy CPU = " << m_nimby_busy_cpu << "%";
+
+		if( m_nimby_idle_mem    > 0 ) stream << "\n   Idle Mem = " << m_nimby_idle_mem << "%";
+		if( m_nimby_busy_mem    > 0 ) stream << "\n   Busy Mem = " << m_nimby_busy_mem << "%";
+
+		if( m_nimby_idle_swp    > 0 ) stream << "\n   Idle Swap = " << m_nimby_idle_swp << "%";
+		if( m_nimby_busy_swp    > 0 ) stream << "\n   Busy Swap = " << m_nimby_busy_swp << "%";
+
+		if( m_nimby_idle_hddgb  > 0 ) stream << "\n   Idle HDD = " << m_nimby_idle_hddgb << " Gb free";
+		if( m_nimby_busy_hddgb  > 0 ) stream << "\n   Busy HDD = " << m_nimby_busy_hddgb << " Gb free";
+
+		if( m_nimby_idle_hddio  > 0 ) stream << "\n   Idle HDD I/O = " << m_nimby_idle_hddio << "%";
+		if( m_nimby_busy_hddio  > 0 ) stream << "\n   Busy HDD I/O = " << m_nimby_busy_hddio << "%";
+
+		if( m_nimby_idle_netmbs > 0 ) stream << "\n   Idle Net = " << m_nimby_idle_netmbs << " Mb/s";
+		if( m_nimby_busy_netmbs > 0 ) stream << "\n   Busy Net = " << m_nimby_busy_netmbs << " Mb/s";
 
    }
    else
@@ -307,13 +383,13 @@ void HostRes::copy( const HostRes & other)
     cpu_iowait       = other.cpu_iowait;
     cpu_irq          = other.cpu_irq;
     cpu_softirq      = other.cpu_softirq;
-    mem_total_mb   = other.mem_total_mb;
+    mem_total_mb     = other.mem_total_mb;
     mem_free_mb      = other.mem_free_mb;
     mem_cached_mb    = other.mem_cached_mb;
     mem_buffers_mb   = other.mem_buffers_mb;
-    swap_total_mb  = other.swap_total_mb;
+    swap_total_mb    = other.swap_total_mb;
     swap_used_mb     = other.swap_used_mb;
-    hdd_total_gb   = other.hdd_total_gb;
+    hdd_total_gb     = other.hdd_total_gb;
     hdd_free_gb      = other.hdd_free_gb;
     hdd_rd_kbsec     = other.hdd_rd_kbsec;
     hdd_wr_kbsec     = other.hdd_wr_kbsec;
@@ -425,7 +501,7 @@ void HostRes::v_readwrite( Msg * msg)
 
 void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-    stream << "Resources: ";
+    stream << "\nResources: ";
     if( full)
     {
         stream << "\n   CPU = " << cpu_mhz << " MHz x" << cpu_num;

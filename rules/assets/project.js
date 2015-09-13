@@ -18,9 +18,12 @@ prj_deploy_shots_params.sources = {};
 prj_deploy_shots_params.references = {};
 prj_deploy_shots_params.template = {};
 prj_deploy_shots_params.destination = {};
-prj_deploy_shots_params.sameshot  = {"width":'25%',"bool":false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
-prj_deploy_shots_params.extract   = {"width":'25%',"bool":false,"tooltip":'Extract sources folder.'};
-prj_deploy_shots_params.uppercase = {"width":'25%',"bool":false,"tooltip":'Convert shot names to upper case.'};
+prj_deploy_shots_params.prefix    = {"width":'33%',"tooltip":'Add a prefix to each shot name.'};
+prj_deploy_shots_params.regexp    = {"width":'33%',"tooltip":'Perform a regular expression replace.'};
+prj_deploy_shots_params.substr    = {"width":'33%',"tooltip":'Perform a regular expression replace.'};
+prj_deploy_shots_params.sameshot  = {"width":'25%','type':"bool",'default':false,"tooltip":'Example: "NAME" and "NAME-1" will be one shot.'};
+prj_deploy_shots_params.extract   = {"width":'25%','type':"bool",'default':false,"tooltip":'Extract sources folder.'};
+prj_deploy_shots_params.uppercase = {"width":'25%','type':"bool",'default':false,"tooltip":'Convert shot names to upper case.'};
 prj_deploy_shots_params.padding   = {"width":'25%',"tooltip":'Example: "432" - first number will have 4 padding, next 3 and so on.'};
 
 function prj_ShotsDeploy()
@@ -108,6 +111,9 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	if( params.extract ) cmd += ' --extract';
 	if( params.uppercase ) cmd += ' -u';
 	if( params.padding.length ) cmd += ' -p ' + params.padding;
+	if( params.prefix.length ) cmd += ' --prefix "' + params.prefix + '"';
+	if( params.regexp.length ) cmd += ' --regexp "' + params.regexp + '"';
+	if( params.substr.length ) cmd += ' --substr "' + params.substr + '"';
 
 	if( i_args.move )
 		cmd += ' -m';
@@ -147,47 +153,96 @@ function prj_ShotsDeployFinished( i_data, i_args)
 	elResults.appendChild( el);
 	el.textContent = deploy.length + ' shots founded:';
 
+	var elTable = document.createElement('table');
+	elResults.appendChild( elTable);
+
+	var elTr = document.createElement('tr');
+	elTable.appendChild( elTr);
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Name';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Folder';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Sequences';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Files';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Refs';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Comments';
+
 	for( var d = deploy.length - 1; d >= 0; d--)
 	{
 //console.log(JSON.stringify(deploy[d]));
-		var el = document.createElement('div');
-		elResults.appendChild( el);
+		var elTr = document.createElement('tr');
+		elTable.appendChild( elTr);
+
 		for( var key in deploy[d])
 		{
-			el.classList.add( key);
+			elTr.classList.add( key);
+
 			if( key == 'shot' )
 			{
 				var shot = deploy[d][key];
+//console.log(JSON.stringify(shot));
 
-				var elName = document.createElement('div');
-				el.appendChild( elName);
-				elName.textContent = shot.name + ': ';
-				elName.classList.add('name');
+				// Shot name:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.textContent = shot.name;
+				el.classList.add('deploy_name');
 
+				// Main source:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.textContent = shot.FOLDER;
+				el.classList.add('deploy_folder');
+
+				// Same shot folders:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_folders');
 				var src = '';
-				for( var i = 0; i < shot.src.length; i++)
-					src += ' ' + c_PathBase( shot.src[i]);
-				var elSrc = document.createElement('div');
-				el.appendChild( elSrc);
-				elSrc.textContent = src;
-				elSrc.classList.add('src');
+				for( var i = 0; i < shot.FOLDERS.length; i++)
+					src += ' ' + shot.FOLDERS[i];
+				el.textContent = src;
 
-				if( shot.ref && shot.ref.length )
+				// Same shot files:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_files');
+				var src = '';
+				for( var i = 0; i < shot.FILES.length; i++)
+					src += ' ' + shot.FILES[i];
+				el.textContent = src;
+				
+				// References:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_ref');
+				var ref = '';
+				if( shot.REF && shot.REF.length )
 				{
-					var ref = '';
-					for( var i = 0; i < shot.ref.length; i++)
-						ref += ' ' + c_PathBase( shot.ref[i]);
-					var elRef = document.createElement('div');
-					el.appendChild( elRef);
-					elRef.textContent = ref;
-					elRef.classList.add('ref');
+					for( var i = 0; i < shot.REF.length; i++)
+						ref += ' ' + shot.REF[i];
 				}
+				el.textContent = ref;
+
+				// Comments:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_info');
+				var comm = '';
+				if( shot.exists )
+				{
+					comm = 'EXISTS';
+					elTr.classList.add('deploy_exist');
+				}
+				el.textContent = comm;
 
 //console.log( JSON.stringify( shot));
 				break;
 			}
-
-			el.textContent = key + ': ' + deploy[d][key];
+			else
+			{
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.textContent = key + ': ' + deploy[d][key];
+			}
 		}
 	}
 }

@@ -19,6 +19,7 @@ DBTask::DBTask()
 	dbAddAttr( new DBAttrString( DBAttr::_description,  &m_description  ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_error,        &m_error        ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_errors_count, &m_errors_count ));
+	dbAddAttr( new DBAttrString( DBAttr::_folder,       &m_folder       ));
 	dbAddAttr( new DBAttrString( DBAttr::_hostname,     &m_hostname     ));
 	dbAddAttr( new DBAttrString( DBAttr::_jobname,      &m_jobname      ));
 	dbAddAttr( new DBAttrString( DBAttr::_service,      &m_service      ));
@@ -56,6 +57,7 @@ void DBTask::add(
 	m_hostname = i_render->getName();
 
 	m_description = i_job->getDescription();
+	m_folder      = i_job->getFolder();
 	m_annotation  = i_job->getAnnotation();
 
 	// Skip not started exec:

@@ -1,5 +1,12 @@
 <?php
 
+ini_set('upload_max_filesize', '16G');
+ini_set('post_max_size', '16G');
+ini_set('memory_limit', '16G');
+ini_set('max_input_time', 600);
+ini_set('max_execution_time', 600);
+
+
 $GuestSites = array('rules.cgru.info','127.0.0.1');
 $CONF = array();
 $CONF['AUTH_RULES'] = false;
@@ -35,6 +42,11 @@ function jsonEncode( &$i_obj)
 		return json_encode( $i_obj, JSON_PRETTY_PRINT);
 	else
 		return json_encode( $i_obj);
+}
+
+function _flock_( &$i_handle, $i_type)
+{
+//	flock( $i_handle, $i_type);
 }
 
 # Decode input:
@@ -120,6 +132,7 @@ function jsf_start( $i_arg, &$o_out)
 	$o_out['upload_max_filesize'] = ini_get('upload_max_filesize');
 	$o_out['post_max_size'] = ini_get('post_max_size');
 	$o_out['memory_limit'] = ini_get('memory_limit');
+	$o_out['max_input_time'] = ini_get('max_input_time');
 	$o_out['max_execution_time'] = ini_get('max_execution_time');
 	if( $fHandle = fopen('version.txt','r'))
 	{
@@ -231,6 +244,22 @@ function processUser( &$o_out)
 	}
 
 	$o_out['user'] = $user;
+}
+
+function writeUser( &$i_user)
+{
+	$filename = 'users/'.$i_user['id'].'.json';
+
+	if( $fHandle = fopen( $filename, 'w'))
+	{
+		flock( $fHandle, LOCK_EX);
+		fwrite( $fHandle, jsonEncode( $i_user));
+		flock( $fHandle, LOCK_UN);
+		fclose( $fHandle);
+		return true;
+	}
+
+	return false;
 }
 
 function http_digest_parse()
@@ -646,9 +675,9 @@ function jsf_getfile( $i_file, &$o_out)
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		echo fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out = null;
 	}
@@ -694,9 +723,9 @@ function readObj( $i_file, &$o_out)
 
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out = json_decode( $data, true);
 	}
@@ -846,7 +875,7 @@ function jsf_editobj( $i_edit, &$o_out)
 		mkdir( dirname($i_edit['file']), 0777, true);
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		$data = fread( $fHandle, $FileMaxLength);
 		$obj = json_decode( $data, true);
 		if( is_null( $obj)) $obj = array();
@@ -864,7 +893,7 @@ function jsf_editobj( $i_edit, &$o_out)
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);
 		fwrite( $fHandle, jsonEncode( $obj));
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out['status'] = 'success';
 	}
@@ -965,13 +994,29 @@ function jsf_save( $i_save, &$o_out)
 		if( $i_save['type'] == 'base64' ) $data = base64_decode( $data);
 	}
 
-	flock( $fHandle, LOCK_EX);
+	_flock_( $fHandle, LOCK_EX);
 	fwrite( $fHandle, $data);
-	flock( $fHandle, LOCK_UN);
+	_flock_( $fHandle, LOCK_UN);
 	fclose( $fHandle );
 }
 
 function jsf_makenews( $i_args, &$o_out)
+{
+	if( ! is_array( $i_args))
+	{
+		$o_out['error'] = 'News function argument should be an array.';
+		return;
+	}
+	$count = count( $i_args);
+	if( $count == 0 )
+	{
+		$o_out['error'] = 'News function argument array has zero length.';
+		return;
+	}
+	for( $i = 0; $i < $count; $i++)
+	makenews( $i_args[$i], $o_out);
+}
+function makenews( $i_args, &$o_out)
 {
 	global $FileMaxLength;
 
@@ -1019,9 +1064,9 @@ function jsf_makenews( $i_args, &$o_out)
 		if( is_file( $rfile))
 		if( $rhandle = fopen( $rfile, 'r'))
 		{
-			flock( $rhandle, LOCK_SH);
+			_flock_( $rhandle, LOCK_SH);
 			$rdata = fread( $rhandle, $FileMaxLength);
-			flock( $rhandle, LOCK_UN);
+			_flock_( $rhandle, LOCK_UN);
 			fclose( $rhandle);
 			$rarray = json_decode( $rdata, true);
 			if( is_null( $rarray))
@@ -1062,9 +1107,9 @@ function jsf_makenews( $i_args, &$o_out)
 			mkdir( dirname( $rfile));
 		if( $rhandle = fopen( $rfile, 'w'))
 		{
-			flock( $rhandle, LOCK_EX);
+			_flock_( $rhandle, LOCK_EX);
 			fwrite( $rhandle, jsonEncode( $rarray));
-			flock( $rhandle, LOCK_UN);
+			_flock_( $rhandle, LOCK_UN);
 			fclose($rhandle);
 		}
 
@@ -1083,52 +1128,48 @@ function jsf_makenews( $i_args, &$o_out)
 
 	// Read users:
 	$users = array();	
-	if( $fHandle = opendir('users'))
+	getallusers( $users);
+	if( array_key_exists('error', $users))
 	{
-		while (false !== ( $uEntry = readdir( $fHandle)))
-		{			
-			if( strrpos( $uEntry,'.json') === false ) continue;
-			if( $uHandle = fopen( 'users/'.$uEntry, 'r'))
-			{
-				flock( $uHandle, LOCK_SH);
-				$udata = fread( $uHandle, $FileMaxLength);
-				flock( $uHandle, LOCK_UN);
-				fclose( $uHandle);
-				$uobj = json_decode( $udata, true);
-				if( is_null( $uobj)) continue;
-				array_push( $users, $uobj);
-			}
-		}
-		closedir($fHandle);
+		$o_out['error'] = $users['error'];
+		return;
 	}
-
+	$users = $users['users'];
 	if( count( $users) == 0 )
 	{
 		$o_out['error'] = 'No users found.';
 		return;
 	}
 
+	// User may be does not want to receive own news:
 	$ignore_own = false;
-	if( isset( $news['ignore_own']))
-	{
-		if( $news['ignore_own'])
-			$ignore_own = true;
-		unset( $news['ignore_own']);
-	}
+	if( isset( $i_args['ignore_own']) && $i_args['ignore_own'] )
+		$ignore_own = true;
 
     // Get subscribed users:
     $sub_users = array();
 	$o_out['users'] = array();
 	foreach( $users as &$user )
 	{
-		if( $ignore_own && ( $news['user'] == $user['id']))
-			continue;
+
+		// If this is news owner:
+		if( $news['user'] == $user['id'] )
+		{
+			// Store last news time:
+			$user['ntime'] = time();
+			writeUser( $user);
+
+			// If user does not want to receive own news:
+			if( $ignore_own )
+				continue;
+		}
 
 		if( array_key_exists( 'artists', $news))
 			if( in_array( $user['id'], $news['artists']))
 			{
 				array_push( $sub_users, $user);
-				array_push( $o_out['users'], $user['id']);
+				if( false === array_search( $user['id'], $o_out['users']))
+					array_push( $o_out['users'], $user['id']);
 				continue;
 			}
 
@@ -1169,14 +1210,7 @@ function jsf_makenews( $i_args, &$o_out)
 			array_pop( $user['news']);
 
 		// Write user file:
-		$filename = 'users/'.$user['id'].'.json';
-		if( $fHandle = fopen( $filename, 'w'))
-		{
-			flock( $fHandle, LOCK_EX);
-			fwrite( $fHandle, jsonEncode( $user));
-			flock( $fHandle, LOCK_UN);
-			fclose( $fHandle);
-		}
+		writeUser( $user);
 
 		// Send emails
 		if( array_key_exists('email', $user) == false ) continue;
@@ -1280,9 +1314,9 @@ function jsf_htdigest( $i_recv, &$o_out)
 	$data = '';
 	if( $fHandle = fopen( $HT_DigestFileName, 'r'))
 	{
-		flock( $fHandle, LOCK_SH);
+		_flock_( $fHandle, LOCK_SH);
 		$data = fread( $fHandle, $FileMaxLength);
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 	}
 
@@ -1315,9 +1349,9 @@ function jsf_htdigest( $i_recv, &$o_out)
 
 	if( $fHandle = fopen( $HT_DigestFileName, 'w' ))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle );
 	}
 	else
@@ -1542,9 +1576,9 @@ function jsf_permissionsset( $i_args, &$o_out)
 	$htaccess = $i_args['path'].'/'.$HT_AccessFileName;
 	if( $fHandle = fopen( $htaccess, 'w' ))
 	{
-		flock( $fHandle, LOCK_EX);
+		_flock_( $fHandle, LOCK_EX);
 		fwrite( $fHandle, $data );
-		flock( $fHandle, LOCK_UN);
+		_flock_( $fHandle, LOCK_UN);
 		fclose( $fHandle );
 	}
 	else
@@ -1596,9 +1630,9 @@ function permissionsGet( $i_args, &$o_out)
 		$o_out['error'] = 'Can`t open the file.';
 		return;
 	}
-	flock( $fHandle, LOCK_SH);
+	_flock_( $fHandle, LOCK_SH);
 	$data = fread( $fHandle, $FileMaxLength);
-	flock( $fHandle, LOCK_UN);
+	_flock_( $fHandle, LOCK_UN);
 	fclose( $fHandle);
 
 	$found = false;
@@ -1858,13 +1892,32 @@ function upload( $i_path, &$o_out)
 		}
 		else
 		{
-			$path = $i_path.'/'.$_FILES[$key]['name'];
-			$path_orig = $path; $i = 1;
-			while( is_file( $path)) $path = $path_orig.'-'.$i++;
+			$basename = $_FILES[$key]['name'];
+			$path = $i_path.'/'.$basename;
+
+			// If such file already exists, we rename the upload:
+			$dot = strrpos( $basename, '.');
+			$i = 1;
+			while( is_file( $path))
+			{
+				if( $dot )
+				{
+					$base = substr( $basename, 0, $dot);
+					$ext = substr( $basename, $dot);
+					$path = $i_path.'/'.$base.'-'.$i.$ext;
+				}
+				else
+					$path = $i_path.'/'.$basename.'-'.$i;
+				$i++;
+			}
+
+			// Move uploaded file to the desired place:
 			if( false == move_uploaded_file( $_FILES[$key]['tmp_name'], $path))
 			{
 				$fileObj['error'] = 'Can`t save upload';
 			}
+
+			$fileObj['filename'] = $path;
 		}
 
 		array_push( $o_out['files'], $fileObj);

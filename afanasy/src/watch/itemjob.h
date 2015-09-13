@@ -33,6 +33,7 @@ public:
 	int64_t time_done;
 	uint32_t time_run;
 	int lifetime;
+	bool ppapproval;
 	QString hostname;
 	QString username;
 	QString hostsmask;
@@ -44,6 +45,7 @@ public:
 	QString cmd_pre;
 	QString cmd_post;
 	QString description;
+	QString thumb_path;
 
 	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const

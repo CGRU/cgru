@@ -20,6 +20,7 @@ private:
 	std::string m_annotation;
 	std::string m_blockname;
 	std::string m_description;
+	std::string m_folder;
 	std::string m_hostname;
 	std::string m_jobname;
 	std::string m_service;

@@ -58,6 +58,7 @@ private:
 	ParserHost * m_parser;
 
 	std::string m_store_dir;
+	std::vector<std::string> m_collected_files;
 	uint8_t m_update_status;
 	time_t m_stop_time;
 	bool m_zombie;

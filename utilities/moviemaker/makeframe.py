@@ -46,6 +46,9 @@ Parser.add_option('--line169',          dest='line169',        type  ='string', 
 Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--font',             dest='font',           type  ='string',     default='',          help='Specify font)')
 Parser.add_option('--logopath',         dest='logopath',       type  ='string',     default='',          help='Add a specified logo image, logo should be the same format')
+Parser.add_option('--frame_input',      dest='frame_input',    type  ='int',        default=0,           help='Input frame number')
+Parser.add_option('--frame_output',     dest='frame_output',   type  ='int',        default=0,           help='Output frame number')
+Parser.add_option('--frames_num',       dest='frames_num',     type  ='int',        default=1,           help='Frames number')
 Parser.add_option('-V', '--verbose',    dest='verbose',        action='store_true', default=False,       help='Verbose mode')
 Parser.add_option('-D', '--debug',      dest='debug',          action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 
@@ -174,8 +177,8 @@ def reformatAnnotate(infile, outfile):
 			FILEDATE = time.strftime('%y/%m/%d',
 									 time.gmtime(os.stat(infile).st_mtime))
 		# Get frame number if not specified:
-		if FRAME == '':
-			digits = re.findall(r'\d+', FILEIN)
+		if Options.frame == '':
+			digits = re.findall(r'\d+', infile)
 			if digits is not None:
 				if len(digits):
 					FRAME = digits[-1]
@@ -211,14 +214,6 @@ def reformatAnnotate(infile, outfile):
 				correction += ' '
 			correction += Options.correction
 
-		# Get frame number if not specified:
-		if FRAME == '':
-			digits = re.findall(r'\d+', FILEIN)
-			if digits is not None:
-				if len(digits):
-					FRAME = digits[-1]
-					if Verbose:
-						print('Frame = "%s"' % FRAME)
 
 		cmd = 'convert'
 		cmd += ' "%s"' % infile
@@ -363,19 +358,41 @@ if Stereo:
 	Annotate2 = os.path.join(os.path.dirname(FileOut),
 							 'right.' + os.path.basename(FileOut))
 
-reformatAnnotate(FILEIN1, Annotate1)
+for f in range( 0, Options.frames_num):
 
-if Stereo:
-	if FILEIN2 != '':
-		reformatAnnotate(FILEIN2, Annotate2)
-	else:
-		Annotate2 = Annotate1
-	cmd = 'convert -size %(Width)dx%(Height)d -colorspace RGB xc:black -antialias' % globals()
-	cmd += ' "%s" -compose over -gravity West -composite' % Annotate1
-	cmd += ' "%s" -compose over -gravity East -composite' % Annotate2
-	cmd += ' -alpha Off -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
-	cmd += ' "%s"' % FileOut
-	if Verbose:
-		print(cmd + '\n')
-	if not Options.debug:
-		os.system(cmd)
+	file_in_1 = FILEIN1
+	file_out_1 = Annotate1
+	if Options.frames_num > 1:
+		file_in_1 = file_in_1 % (Options.frame_input+f)
+		file_out_1 = file_out_1 % (Options.frame_output+f)
+
+	reformatAnnotate( file_in_1, file_out_1)
+
+	if Stereo:
+
+		file_in_2 = FILEIN2
+		file_out_2 = Annotate2
+		file_out = FileOut
+		if Options.frames_num > 1:
+			file_in_2 = file_in_2 % (Options.frame_input+f)
+			file_out_2 = file_out_2 % (Options.frame_output+f)
+			file_out = file_out % (Options.frame_output+f)
+
+		if FILEIN2 != '':
+			reformatAnnotate( file_in_2, file_out_2)
+		else:
+			Annotate2 = Annotate1
+		cmd = 'convert -size %(Width)dx%(Height)d -colorspace RGB xc:black -antialias' % globals()
+		cmd += ' "%s" -compose over -gravity West -composite' % file_out_1
+		cmd += ' "%s" -compose over -gravity East -composite' % file_out_2
+		cmd += ' -alpha Off -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
+		cmd += ' "%s"' % file_out
+		if Verbose:
+			print(cmd + '\n')
+		if not Options.debug:
+			os.system(cmd)
+
+	if Options.frames_num > 1:
+		print('PROGRESS: %d%%' % int( (f+1) * 100 / Options.frames_num ))
+
+	sys.stdout.flush()

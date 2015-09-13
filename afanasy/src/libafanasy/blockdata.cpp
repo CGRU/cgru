@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "job.h"
 #include "jobprogress.h"
 #include "environment.h"
 #include "msg.h"
@@ -48,6 +49,7 @@ void BlockData::initDefaults()
 	m_frame_last = 0;
 	m_frames_per_task = 1;
 	m_frames_inc = 1;
+	m_sequential = 1;
 	m_max_running_tasks = -1;
 	m_max_running_tasks_per_host = -1;
 	m_tasks_max_run_time = 0;
@@ -161,18 +163,12 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_string("custom_data",           m_custom_data,           i_object, io_changes);
 	//jr_string("environment",         m_environment,           i_object, io_changes);
 	jr_int32 ("parser_coeff",          m_parser_coeff,          i_object, io_changes);
+	jr_int64 ("sequential",            m_sequential,            i_object, io_changes);
+
 
 	bool depend_sub_task = false;
 	jr_bool("depend_sub_task", depend_sub_task, i_object, io_changes);
 	setDependSubTask( depend_sub_task);
-
-	bool non_sequential = false;
-	jr_bool("non_sequential", non_sequential, i_object, io_changes);
-	setNonSequential( non_sequential);
-
-	bool gen_thumbnails = false;
-	jr_bool("gen_thumbnails", gen_thumbnails, i_object, io_changes);
-	setGenTHumbnails( gen_thumbnails);
 
 	if( m_capacity < 1 )
 		m_capacity = 1;
@@ -366,10 +362,10 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
         o_str << ",\n\"frame_last\":"      << m_frame_last;
         o_str << ",\n\"frames_per_task\":" << m_frames_per_task;
         o_str << ",\n\"frames_inc\":"      << m_frames_inc;
+		if( m_sequential != 1 ) // this is the default value
+	        o_str << ",\n\"sequential\":"      << m_sequential;
 		if( isDependSubTask())
             o_str << ",\n\"depend_sub_task\":true";
-		if( isNonSequential())
-            o_str << ",\n\"non_sequential\":true";
 		if( canVarCapacity())
 		{
             o_str << ",\n\"capacity_coeff_min\":" << m_capacity_coeff_min;
@@ -552,6 +548,7 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int64_t ( m_frame_last,            msg);
 		rw_int64_t ( m_frames_per_task,       msg);
 		rw_int64_t ( m_frames_inc,            msg);
+//		rw_int64_t ( m_sequential,            msg); // NEW VERSION
 		rw_int64_t ( m_file_size_min,         msg);
 		rw_int64_t ( m_file_size_max,         msg);
 		rw_int32_t ( m_capacity_coeff_min,    msg);
@@ -858,7 +855,7 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
    return true;
 }
 
-int BlockData::calcTaskNumber( long long i_frame, bool & o_inValidRange) const
+int BlockData::calcTaskNumber( long long i_frame, bool & o_valid_range) const
 {
    int o_tasknum = i_frame - m_frame_first;
 
@@ -867,19 +864,19 @@ int BlockData::calcTaskNumber( long long i_frame, bool & o_inValidRange) const
 
    if( m_frames_inc > 1 ) o_tasknum = o_tasknum / m_frames_inc;
 
-   o_inValidRange = true;
+   o_valid_range = true;
    if( o_tasknum < 0 )
    { 
       o_tasknum = 0;
-      o_inValidRange = false;
+      o_valid_range = false;
    }
    if( o_tasknum >= m_tasks_num )
    {
       o_tasknum = m_tasks_num - 1;
-      o_inValidRange = false;
+      o_valid_range = false;
    }
    if(( i_frame < m_frame_first ) || ( i_frame > m_frame_last ))
-		o_inValidRange = false;
+		o_valid_range = false;
 
    return o_tasknum;
 }
@@ -899,6 +896,169 @@ void BlockData::setFramesPerTask( long long perTask)
    m_frames_per_task = perTask;
 }
 
+int BlockData::getReadyTaskNumber( TaskProgress ** i_tp, const int32_t & i_job_flags)
+{
+	//printf("af::getReadyTaskNumber: %li-%li/%li:%li%%%li\n", m_frame_first, m_frame_last, m_frames_inc, m_frames_per_task, m_sequential);
+
+	if( m_sequential > 1 )
+	{
+		// Task solving with a positive step:
+		long long frame = m_frame_first;
+		frame -= frame % m_sequential;
+		if( frame < m_frame_first )
+			frame += m_sequential;
+
+		// Check the first task:
+		{
+			int task = 0;
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+		}
+
+		// Check the last task:
+		{
+			int task = m_tasks_num-1;
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+		}
+
+		// Iterate sequential tasks:
+		for( ; frame <= m_frame_last; frame += m_sequential )
+		{
+			bool valid_range;
+			int task = calcTaskNumber( frame, valid_range);
+			if( valid_range != true )
+			{
+				AFERRAR("BlockData::getReadyTaskNumber: frame %lli is not in range.", frame)
+				break;
+			}
+
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+		}
+
+		if( i_job_flags & af::Job::FPPApproval )
+			return AFJOB::TASK_NUM_NO_SEQUENTIAL;
+
+		for( int task = 0; task < m_tasks_num; task++)
+		{
+			// Common tasks solving:
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+
+			continue;
+		}
+
+		return AFJOB::TASK_NUM_NO_TASK;
+	}
+
+	if( m_sequential < -1 )
+	{
+		// Task solving with a negative step:
+		int task = -1;
+		long long frame = m_frame_last;
+		frame -= frame % m_sequential;
+
+		for( ; frame >= m_frame_first; frame += m_sequential )
+		{
+			bool valid_range;
+			task = calcTaskNumber( frame, valid_range);
+			if( valid_range != true )
+			{
+				AFERRAR("BlockData::getReadyTaskNumber: frame %lli is not in range.", frame)
+				break;
+			}
+
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+		}
+
+		for( int task = m_tasks_num-1; task >= 0; task--)
+		{
+			// Common tasks solving:
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+
+			continue;
+		}
+
+		return AFJOB::TASK_NUM_NO_TASK;
+	}
+
+	for( int task = 0; task < m_tasks_num; task++)
+	{
+		if( isSequential())
+		{
+			// Common tasks solving:
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
+
+			continue;
+		}
+
+		if( m_sequential == -1 )
+		{
+			// Reverse tasks solving:
+			int index = m_tasks_num - 1 - task;
+
+			if( i_tp[index]->isSolved()) continue;
+			i_tp[index]->setSolved();
+
+			if( i_tp[index]->state & AFJOB::STATE_READY_MASK )
+				return index;
+
+			continue;
+		}
+
+		// Middle task solving:
+		int64_t powered = 1;
+		while( powered < task )
+			powered <<= 1;
+
+		bool nodivision_needed = false;
+		if( powered >= m_tasks_num )
+		{
+			bool nodivision_needed = true;
+			powered = m_tasks_num;
+		}
+
+		//printf(" task=%d, powered=%lld\n", task, powered);
+		for( int64_t i = 0; i <= powered; i++)
+		{
+			int index = i;
+			if( false == nodivision_needed )
+				index = int( i * int64_t(m_tasks_num) / powered );
+
+			if( index >= m_tasks_num )
+				index = m_tasks_num - 1;
+
+			if( i_tp[index]->isSolved()) continue;
+			i_tp[index]->setSolved();
+
+			if( i_tp[index]->state & AFJOB::STATE_READY_MASK )
+				return index;
+		}
+	}
+
+	// No ready tasks found:
+//printf("No ready tasks found.\n");
+	return AFJOB::TASK_NUM_NO_TASK;
+}
 const std::string BlockData::genCommand( int num, long long * fstart, long long * fend) const
 {
    std::string str;
@@ -1112,11 +1272,12 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
 
       if( full ) o_str << "\nProperties:";
 
-      if( isNumeric())
-      {
-         o_str << "\n Frames: " << m_frame_first << " - " << m_frame_last << ": Per Task = " << m_frames_per_task;
-         if( m_frames_inc > 1 ) o_str << ", Increment = " << m_frames_inc;
-      }
+		if( isNumeric())
+		{
+			o_str << "\n Frames: " << m_frame_first << " - " << m_frame_last << ": Per Task = " << m_frames_per_task;
+			if( m_frames_inc > 1 ) o_str << ", Increment = " << m_frames_inc;
+			if( notSequential() ) o_str << ", Sequential = " << m_sequential;
+		}
 
       if( full && ( m_parser_coeff != 1 )) o_str << "\n Parser Coefficient = " << m_parser_coeff;
 
@@ -1150,7 +1311,6 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
       }
 
       if( isDependSubTask() ) o_str << "\n   Sub Task Dependence.";
-      if( isNonSequential() ) o_str << "\n   Non-sequential tasks solving.";
 
       if( full || ( m_max_running_tasks != -1 )) o_str << "\n Max Running Tasks = " << m_max_running_tasks;
       if( full && ( m_max_running_tasks == -1 )) o_str << " (no limit)";

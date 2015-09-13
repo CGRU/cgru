@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """
 	meArnoldRender
 
@@ -30,7 +30,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meArnoldRender_'
-meArnoldRenderVer = '0.3.3'
+meArnoldRenderVer = '0.3.4'
 meArnoldRenderMainWnd = self_prefix + 'MainWnd'
 
 job_separator_list = ['none', '.', '_' ]
@@ -46,11 +46,17 @@ ar_verbosity_list = [
 ]
 
 class meArnoldRender ( object ) :
-	"""meArnoldRender
 	"""
-
-	def __init__(self, selection=''):
-		self.selection = selection
+	meArnoldRender
+	
+	"""
+	def __init__ (self, NoGUI = False) :
+		"""
+		In case if NoGUI = True, it's possible to use external "wrapper"
+		e.g. for Shotgun to call "generate_ass" or "submitJob" previously
+		assign global variables  
+		"""
+		self.NoGUI = NoGUI
 		self.winMain = ''
 
 		self.os = sys.platform
@@ -61,7 +67,7 @@ class meArnoldRender ( object ) :
 		elif self.os == 'win32':
 			self.os = 'win'
 
-		print('sys.platform = %s self.os = %s' % (sys.platform, self.os))
+		print ('sys.platform = %s self.os = %s' % (sys.platform, self.os))
 
 		if cmds.getAttr('defaultRenderGlobals.currentRenderer') != 'arnold':
 			cmds.warning('Arnold is not current renderer!')
@@ -102,9 +108,9 @@ class meArnoldRender ( object ) :
 	# print( ">> meArnoldRender: Class deleted" )
 
 	def initParameters(self):
-		"""Init all parameters
 		"""
-
+		Init all parameters
+		"""
 		#
 		# Job parameters
 		#
@@ -164,8 +170,8 @@ class meArnoldRender ( object ) :
 		self.ass_param['ass_dirname'] = \
 			getDefaultStrValue(self_prefix, 'ass_dirname', ass_dirname ) 
 
-		self.ass_param['ass_perframe'] = \
-			getDefaultIntValue(self_prefix, 'ass_perframe', 1) is 1
+		#self.ass_param['ass_perframe'] = \
+		#	getDefaultIntValue(self_prefix, 'ass_perframe', 1) is 1
 
 		self.ass_param['ass_selection'] = \
 			getDefaultIntValue(self_prefix, 'ass_selection', 0) is 1
@@ -381,6 +387,7 @@ class meArnoldRender ( object ) :
 		separator = self.job_param['job_separator']
 		if separator == 'none' :
 			separator = ''
+			
 		filename = self.ass_param['ass_dirname']
 		if layer is not None:
 			if layer == 'defaultRenderLayer':
@@ -401,14 +408,12 @@ class meArnoldRender ( object ) :
 		filename = cmds.workspace(expandName=filename)
 
 		if suffix:
-			pad_str = getPadStr(
-				self.job_param['job_padding'],
-				self.ass_param['ass_perframe']
-			)
-			if self.ass_param['ass_perframe'] :
-				filename += '%s%s%s%s.ass' % ( separator, decorator, pad_str, decorator )
-			else :	
-				filename += '.ass'	
+			pad_str = getPadStr( self.job_param['job_padding'], True )
+
+			#if self.ass_param['ass_perframe'] :
+			filename += '%s%s%s%s.ass' % ( separator, decorator, pad_str, decorator )
+			#else :	
+			#	filename += '.ass'	
 			if self.ass_param['ass_compressed'] :
 				# !!! There is error in maya translator 
 				# for "defaultArnoldRenderOptions.output_ass_compressed" flag
@@ -420,10 +425,7 @@ class meArnoldRender ( object ) :
 	def get_image_name ( self ) :
 		"""get_image_name
 		"""
-		pad_str = getPadStr(
-			self.job_param['job_padding'],
-			self.ass_param['ass_perframe']
-		)
+		pad_str = getPadStr( self.job_param['job_padding'], True )
 
 		images = cmds.renderSettings(
 			fullPath=True,
@@ -450,7 +452,7 @@ class meArnoldRender ( object ) :
 		ass_selection = self.ass_param['ass_selection']
 		ass_dirname = self.ass_param['ass_dirname']
 		ass_padding = self.job_param['job_padding']
-		ass_perframe = self.ass_param['ass_perframe']
+		#ass_perframe = self.ass_param['ass_perframe']
 		ass_deferred = self.ass_param['ass_deferred']  
 		
 		ass_binary = self.ass_param['ass_binary']
@@ -535,7 +537,7 @@ class meArnoldRender ( object ) :
 		ass_selection = self.ass_param['ass_selection']
 		ass_dirname = self.ass_param['ass_dirname']
 		ass_padding = self.job_param['job_padding']
-		ass_perframe = self.ass_param['ass_perframe']
+		#ass_perframe = self.ass_param['ass_perframe']
 		ass_deferred = self.ass_param['ass_deferred']
 		
 		ass_binary = self.ass_param['ass_binary']
@@ -559,13 +561,13 @@ class meArnoldRender ( object ) :
 
 		dirname = os.path.dirname(filename)
 		if not os.path.exists(dirname):
-			print("path %s not exists" % dirname)
+			print('path %s not exists... create it!' % dirname)
 			os.mkdir(dirname)
 
 		# TODO!!! check if files are exist and have to be overwritten
 		if isSubmitingJob and ass_reuse:
 			skipExport = True
-			print("Skipping .ass files generation ...")
+			print('Skipping .ass files generation ...')
 
 		if not skipExport:
 			if not animation:
@@ -606,7 +608,10 @@ class meArnoldRender ( object ) :
 			# Clear .output_ass_filename to force using default filename from RenderGlobals
 			#
 			cmds.setAttr(aiGlobals + '.output_ass_filename', '', type='string' )
-
+			
+			cmds.workspace( fileRule=('ASS',self.ass_param['ass_dirname']) )
+			cmds.workspace( saveWorkspace=True )
+		
 			if ass_deferred:
 				# generate unique maya scene name and save it
 				# with current render and .ass generation settings
@@ -666,7 +671,8 @@ class meArnoldRender ( object ) :
 					assgen_cmd += ' -endFrame %d' % stop
 					assgen_cmd += ' -frameStep %d' % step
 
-					#cmds.setAttr( defGlobals + '.imageFilePrefix', image_name, type='string' ) # will use MayaSceneName if empty 
+					#cmds.setAttr( defGlobals + '.imageFilePrefix', image_name, type='string' ) 
+					# will use MayaSceneName if empty 
 
 					print(assgen_cmd)
 					mel.eval(assgen_cmd)
@@ -683,7 +689,8 @@ class meArnoldRender ( object ) :
 					)
 
 	def submitJob ( self, param=None ) :
-		"""submitJob
+		"""
+		submitJob
 
 		:param param: dummy parameter
 		"""
@@ -745,6 +752,7 @@ class meArnoldRender ( object ) :
 		self.job.stop = self.job_param['job_end']
 		self.job.step = self.job_param['job_step']
 
+				
 		self.generate_ass(True)  # isSubmitingJob=True
 
 		self.job.setup_range(int(cmds.currentTime(q=True)))
@@ -971,7 +979,7 @@ class meArnoldRender ( object ) :
 			af_os_lst.append( 'linux' )	
 		if val3 :
 			af_os_lst.append( 'mac' )	
-		af_os_str = ' '.join ( af_os_lst )
+		af_os_str = '|'.join ( af_os_lst )
 
 		setDefaultStrValue( self_prefix, 'af_os', self.afanasy_param, af_os_str )
 		
@@ -1113,7 +1121,8 @@ class meArnoldRender ( object ) :
 				firstRun = False
 
 	def setupUI ( self ) :
-		"""setupUI
+		"""
+		setupUI
 		
 		Main window setup
 		
@@ -1131,7 +1140,7 @@ class meArnoldRender ( object ) :
 
 		self.mainMenu = cmds.menu(label='Commands', tearOff=False)
 		cmds.menuItem(label='Render Globals ...', command=maya_render_globals)
-		cmds.menuItem(label='Check Shaders ...', command=mrShaderManager)
+		cmds.menuItem(label='Check Texture Paths ...', command = checkTextures)
 		cmds.menuItem(label='Generate .ass', command=self.generate_ass)
 		cmds.menuItem(label='Submit Job', command=self.submitJob)
 		cmds.menuItem(divider=True)
@@ -1599,7 +1608,7 @@ class meArnoldRender ( object ) :
 			),
 			cc=partial(self.assDirNameChanged, 'ass_dirname')
 		)
-
+		"""
 		cmds.checkBoxGrp(
 			'ass_perframe',
 			cw=((1, cw1), (2, cw1 * 2)),
@@ -1608,7 +1617,7 @@ class meArnoldRender ( object ) :
 			value1=self.ass_param['ass_perframe'],
 			cc=partial(self.assDirNameChanged, 'ass_perframe')
 		)
-
+		"""
 		cmds.checkBoxGrp(
 			'ass_selection',
 			cw=((1, cw1), (2, cw1 * 2)),
@@ -2182,7 +2191,8 @@ class meArnoldRender ( object ) :
 			)
 		)
 
-		cmds.showWindow(self.winMain)
+		if not self.NoGUI :
+			cmds.showWindow(self.winMain)
 
 		return form
 

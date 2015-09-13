@@ -194,7 +194,7 @@ Comment.prototype.init = function()
 	if( localStorage.text_color && ( localStorage.text_color != ''))
 		this.elText.style.color = localStorage.text_color;
 	else
-		this.elText.style.color = 'inherit';
+		this.elText.style.color = u_textColor;
 	if( localStorage.back_comments && ( localStorage.back_comments != ''))
 		this.elText.style.background = localStorage.back_comments;
 	else if( localStorage.background && ( localStorage.background != '' ))
@@ -243,6 +243,8 @@ Comment.prototype.init = function()
 		// Edit button only for admins or a comment owner:
 		if( g_admin || ( this.obj && ( this.obj.user_name == g_auth_user.id )))
 			this.elEdit.style.display = 'block';
+		else
+			this.elEdit.style.display = 'none';
 
 		// If this is a new comment or and own old:
 		if(( this.obj == null ) || ( this.obj.user_name == g_auth_user.id ))

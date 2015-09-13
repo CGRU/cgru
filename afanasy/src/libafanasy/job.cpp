@@ -63,10 +63,16 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("user_name",     m_user_name,     i_object);
 
+	jr_stringmap("folders", m_folders, i_object);
+
 	bool offline = false;
-	jr_bool("offline",  offline, i_object, io_changes);
+	jr_bool("offline", offline, i_object, io_changes);
 	if( offline )
 		m_state |= AFJOB::STATE_OFFLINE_MASK;
+
+	bool ppa = false;
+	if( jr_bool("ppa", ppa, i_object, io_changes))
+		setPPAFlag( ppa);
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
@@ -102,7 +108,7 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	for( int b = 0; b < m_blocks_num; b++) m_blocks_data[b] = NULL;
 	for( int b = 0; b < m_blocks_num; b++)
 	{
-		m_blocks_data[b] = v_newBlockData( blocks[b], b);
+		m_blocks_data[b] = newBlockData( blocks[b], b);
 		if( m_blocks_data[b] == NULL)
 		{
 			AFERROR("Job::jsonRead: Can not allocate memory for new block.\n");
@@ -132,14 +138,17 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		jw_state( m_state, o_str);
 	}
 
+	if( isPPAFlag())
+		o_str << ",\n\"ppa\":true";
+
 	if( m_command_pre.size())
-		o_str << ",\n\"command_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
+		o_str << ",\n\"command_pre\":\""  << af::strEscape( m_command_pre  ) << "\"";
 	if( m_command_post.size())
-		o_str << ",\n\"command_post\":\""     << af::strEscape( m_command_post    ) << "\"";
+		o_str << ",\n\"command_post\":\"" << af::strEscape( m_command_post ) << "\"";
 	if( m_description.size())
-		o_str << ",\n\"description\":\""  << af::strEscape( m_description ) << "\"";
+		o_str << ",\n\"description\":\""  << af::strEscape( m_description  ) << "\"";
 	if( m_thumb_path.size())
-		o_str << ",\n\"thumb_path\":\"" << af::strEscape( m_thumb_path ) << "\"";
+		o_str << ",\n\"thumb_path\":\""   << af::strEscape( m_thumb_path   ) << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
@@ -156,6 +165,18 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
+
+	if( m_folders.size())
+	{
+		o_str << ",\n\"folders\":{";
+		int i = 0;
+		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
+		{
+			if( i ) o_str << ",";
+			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
+		}
+		o_str << "\n}";
+	}
 
 	if( hasHostsMask())
 		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
@@ -280,8 +301,15 @@ void Job::v_readwrite( Msg * msg)
 	rw_String  ( m_command_pre,  msg);
 	rw_String  ( m_command_post, msg);
 	rw_String  ( m_annotation,   msg);
-	rw_String  ( m_description,  msg);
+
+//	NEW VERSION:
+//	rw_String  ( m_description,  msg);
+	rw_String  ( m_thumb_path,   msg);
+
 	rw_String  ( m_custom_data,  msg);
+
+//	NEW VERSION:
+//	rw_String  ( m_thumb_path,   msg); // Afwatch should ask for thumbnail if this path changed
 
 	rw_RegExp  ( m_hosts_mask,         msg);
 	rw_RegExp  ( m_hosts_mask_exclude, msg);
@@ -289,6 +317,9 @@ void Job::v_readwrite( Msg * msg)
 	rw_RegExp  ( m_depend_mask_global, msg);
 	rw_RegExp  ( m_need_os,            msg);
 	rw_RegExp  ( m_need_properties,    msg);
+
+//	NEW VERSION:
+//	rw_StringMap( m_folders, msg);
 
 	rw_blocks(  msg);
 }
@@ -314,7 +345,7 @@ void Job::rw_blocks( Msg * msg)
 	  for( int b = 0; b < m_blocks_num; b++) m_blocks_data[b] = NULL;
 	  for( int b = 0; b < m_blocks_num; b++)
       {
-		 m_blocks_data[b] = v_newBlockData( msg);
+		 m_blocks_data[b] = newBlockData( msg);
 		 if( m_blocks_data[b] == NULL)
          {
             AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
@@ -324,14 +355,31 @@ void Job::rw_blocks( Msg * msg)
    }
 }
 
-BlockData * Job::v_newBlockData( Msg * msg)
+BlockData * Job::newBlockData( Msg * msg)
 {
    return new BlockData( msg);
 }
 
-BlockData * Job::v_newBlockData( const JSON & i_object, int i_num)
+BlockData * Job::newBlockData( const JSON & i_object, int i_num)
 {
    return new BlockData( i_object, i_num);
+}
+
+const std::string Job::getFolder() const
+{
+	if( m_id == AFJOB::SYSJOB_ID )
+		return af::Environment::getAfRoot();
+
+	std::string folder;
+
+	std::map<std::string,std::string>::const_iterator it = m_folders.begin();
+
+	if( it == m_folders.end())
+		return folder;
+
+	folder = (*it).second;
+
+	return folder;
 }
 
 int Job::v_calcWeight() const

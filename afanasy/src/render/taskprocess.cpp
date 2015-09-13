@@ -443,11 +443,8 @@ void TaskProcess::sendTaskSate()
 		stdout_size,
 		stdout_data);
 
-	if( type == af::Msg::TTaskUpdateState )
-	{
-		collectFiles( taskup);
-		taskup.setParsedFiles( m_service->getParsedFiles());
-	}
+	collectFiles( taskup);
+	taskup.setParsedFiles( m_service->getParsedFiles());
 
 	af::Msg * msg = new af::Msg( type, &taskup);
 	if( toRecieve) msg->setReceiving();
@@ -625,6 +622,19 @@ void TaskProcess::collectFiles( af::MCTaskUp & i_task_up)
 	std::vector<std::string> list = af::getFilesList( m_store_dir);
 	for( int i = 0; i < list.size(); i++)
 	{
+		bool already_collected = false;
+		for( int j = 0; j < m_collected_files.size(); j++)
+		{
+			if( m_collected_files[j] == list[i] )
+			{
+				//printf("File '%s' already collected\n", list[i].c_str());
+				already_collected = true;
+				break;
+			}
+		}
+		if( already_collected ) continue;
+		m_collected_files.push_back( list[i]);
+
 		std::string path = m_store_dir + AFGENERAL::PATH_SEPARATOR + list[i];
 		#ifdef WINNT
 		path = af::strReplace( path, '/','\\');

@@ -31,6 +31,12 @@ public:
 
     void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
+	// NEW VERSION: flags should be 64 bit:
+	enum JobFlags
+	{
+		FPPApproval = 1<<31
+	};
+
 	//inline unsigned getFlags() const { return flags;}
 	inline unsigned getState() const { return m_state;}
 
@@ -51,13 +57,20 @@ public:
 	inline const std::string & getCmdPost()      const { return m_command_post;}
 	inline const std::string & getDescription()  const { return m_description; }
 	inline const std::string & getCustomData()   const { return m_custom_data; }
+	inline const std::string & getThumbPath()    const { return m_thumb_path;  }
 
-	inline bool isStarted() const {return m_time_started != 0 ; }                ///< Whether a job is started.
-	inline bool isReady()   const {return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
-	inline bool isRunning() const {return m_state & AFJOB::STATE_RUNNING_MASK; } ///< Whether a job is running.
-	inline bool isDone()    const {return m_state & AFJOB::STATE_DONE_MASK;    } ///< Whether a job is done.
-	inline bool isOffline() const {return m_state & AFJOB::STATE_OFFLINE_MASK; } ///< Whether a ojb is offline (paused).
-	inline bool isError()   const {return m_state & AFJOB::STATE_ERROR_MASK;   } ///< Whether a ojb has error(s).
+	const std::string getFolder() const;
+
+	inline bool isStarted()  const { return m_time_started != 0 ;                } ///< Whether a job is started.
+	inline bool isReady()    const { return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
+	inline bool isRunning()  const { return m_state & AFJOB::STATE_RUNNING_MASK; } ///< Whether a job is running.
+	inline bool isDone()     const { return m_state & AFJOB::STATE_DONE_MASK;    } ///< Whether a job is done.
+	inline bool isOffline()  const { return m_state & AFJOB::STATE_OFFLINE_MASK; } ///< Whether a job is offline (paused).
+	inline bool isError()    const { return m_state & AFJOB::STATE_ERROR_MASK;   } ///< Whether a job has error(s).
+	inline bool isStatePPA() const { return m_state & AFJOB::STATE_PPAPPROVAL_MASK; }
+
+    inline bool isPPAFlag() const { return ( m_flags & FPPApproval ); }
+    inline void setPPAFlag( bool i_ppa = true) { if( i_ppa ) m_flags = m_flags | FPPApproval; else m_flags = m_flags & (~FPPApproval); }
 
 	inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_hosts_mask, str, "job hosts mask", errOutput);}
@@ -116,6 +129,8 @@ protected:
 
 	std::string m_description; ///< Job description for statistics purposes only.
 
+	std::map< std::string, std::string > m_folders;
+
 	std::string m_thumb_path;
 	int32_t m_thumb_size;
 	char * m_thumb_data;
@@ -167,8 +182,8 @@ private:
 	void v_readwrite( Msg * msg); ///< Read or write data in buffer.
 	void rw_blocks( Msg * msg); ///< Read or write blocks.
 
-    virtual BlockData * v_newBlockData( Msg * msg);
-    virtual BlockData * v_newBlockData( const JSON & i_object, int i_num);
+	BlockData * newBlockData( Msg * i_msg);
+	BlockData * newBlockData( const JSON & i_object, int i_num);
 
     void generateInfoStreamJob(    std::ostringstream & o_str, bool full = false) const; /// Generate information.
     void generateInfoStreamBlocks( std::ostringstream & o_str, bool full = false) const;

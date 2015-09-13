@@ -1,25 +1,25 @@
 function stcs_Show( i_args)
 {
-//console.log( JSON.stringify( i_args));
-	var i_statuses = i_args.statuses;
-	var i_elReports = i_args.elReports;
+	var i_statuses     = i_args.statuses;
+	var i_elReports    = i_args.elReports;
 	var i_elReportsDiv = i_args.elReportsDiv;
-	var i_elTasks = i_args.elTasks;
-	var i_elTasksDiv = i_args.elTasksDiv;
-	var i_elDiffer = i_args.elDiffer;
-	var i_elDifferDiv = i_args.elDifferDiv;
-	var i_draw_bars = i_args.draw_bars;
+	var i_elTasks      = i_args.elTasks;
+	var i_elTasksDiv   = i_args.elTasksDiv;
+	var i_elDiffer     = i_args.elDiffer;
+	var i_elDifferDiv  = i_args.elDifferDiv;
+	var i_main_atrists = i_args.main_artists;
+	var i_draw_bars    = i_args.draw_bars;
 
 	if( i_elTasks == null ) return;
 	if( i_elReports == null ) return;
 
 	i_elTasks.textContent = '';
 	var tasks_types = {};
-	var tasks_duration = 0;
+	var tasks_artists = {};
 
 	i_elReports.textContent = '';
 	var reps_types = {};
-	var reps_duration = 0;
+	var reps_artists = {};
 
 	for( var s = 0; s < i_statuses.length; s++)
 	{
@@ -31,30 +31,48 @@ function stcs_Show( i_args)
 		{
 			var task = i_statuses[s].tasks[t];
 
-			tasks_duration += task.duration;
+			if(( task.tags == null ) || ( task.tags.length == 0 ))
+				task.tags = ['other'];
+			if(( task.artists == null ) || ( task.tags.artists == 0 ))
+				task.artists = ['other'];
 
 			if( i_statuses.length == 1 )
 			{
 				tasks_types[t] = task;
+				tasks_artists[t] = task;
 				continue;
 			}
-
-			if(( task.tags == null ) || ( task.tags.length == 0 ))
-				task.tags = ['other'];
 
 			for( var g = 0; g < task.tags.length; g++)
 			{
 				var tag = task.tags[g];
 
 				if( tasks_types[tag] == null )
-					tasks_types[tag] = {"tags":[tag],"duration":0,"artists":[]};
+					tasks_types[tag] = {"tags":[tag],"duration":0,"price":0,"artists":[]};
 
 				if( task.artists && task.artists.length )
 				for( var a = 0; a < task.artists.length; a++)
 					if( tasks_types[tag].artists.indexOf( task.artists[a]) == -1 )
 						tasks_types[tag].artists.push( task.artists[a]);
 
-				tasks_types[tag].duration += task.duration;
+				if( task.duration ) tasks_types[tag].duration += task.duration;
+				if( task.price ) tasks_types[tag].price += task.price;
+			}
+
+			for( var a = 0; a < task.artists.length; a++)
+			{
+				var artist = task.artists[a];
+
+				if( tasks_artists[artist] == null )
+					tasks_artists[artist] = {"artists":[artist],"duration":0,"price":0,"tags":[]};
+
+				if( task.tags && task.tags.length )
+				for( var g = 0; g < task.tags.length; g++)
+					if( tasks_artists[artist].tags.indexOf( task.tags[g]) == -1 )
+						tasks_artists[artist].tags.push( task.tags[g]);
+
+				tasks_artists[artist].duration += task.duration;
+				tasks_artists[artist].price += task.price;
 			}
 		}
 
@@ -87,34 +105,61 @@ function stcs_Show( i_args)
 
 				if( rtype.artists.indexOf( report.artist) == -1 )
 					rtype.artists.push( report.artist);
-
 			}
 
-			reps_duration += report.duration;
+			var rartist;
+			var rartist;
+			if( reps_artists[report.artist])
+			{
+				rartist = reps_types[report.artist];
+			}
+			else
+			{
+				rtype = {};
+				rtype.duration = 0;
+				rtype.artists = [report.artist];
+				rtype.tags = report.tags;
+				reps_artists[report.artist] = rtype;
+			}
+
+			rtype.duration += report.duration;
+
+			for( var t = 0; t < report.tags.length; t++)
+				if( rtype.tags.indexOf( report.tags[t]) == -1 )
+					rtype.tags.push( report.tags[t]);
 		}
 //console.log( JSON.stringify( report));
 	}
 
 
 	// Tasks show:
-	var tasks = [];
-	for( var ttype in tasks_types ) tasks.push( tasks_types[ttype]);
-	if( tasks.length )
+	var tasks_t = []; var tasks_a = [];
+	for( var ttype in tasks_types   ) tasks_t.push( tasks_types[ttype]);
+	for( var ttype in tasks_artists ) tasks_a.push( tasks_artists[ttype]);
+	if( tasks_t.length )
 	{
 		i_elTasksDiv.style.display = 'block';
-		stcs_ShowTable({"el":i_elTasks,"data":tasks,"total_duration":tasks_duration,"draw_bars":i_draw_bars});
+		if( tasks_t.length )
+			stcs_ShowTable({"el":i_elTasks,"data":tasks_t,"draw_bars":i_draw_bars,"main":"tags"});
+		if( tasks_a.length && i_main_atrists )
+			stcs_ShowTable({"el":i_elTasks,"data":tasks_a,"draw_bars":i_draw_bars,"main":"artists"});
 	}
 	else
 		i_elTasksDiv.style.display = 'none';
 
 
+//console.log( JSON.stringify( reps_artists));
 	// Reports show:
-	var reports = [];
-	for( var rtype in reps_types ) reports.push( reps_types[rtype]);
-	if( reports.length )
+	var reports_t = []; var reports_a = [];
+	for( var rtype in reps_types   ) reports_t.push( reps_types[rtype]);
+	for( var rtype in reps_artists ) reports_a.push( reps_artists[rtype]);
+	if( reports_t.length || reports_a.length )
 	{
 		i_elReportsDiv.style.display = 'block';
-		stcs_ShowTable({"el":i_elReports,"data":reports,"total_duration":reps_duration,"draw_bars":i_draw_bars});
+		if( reports_t.length )
+			stcs_ShowTable({"el":i_elReports,"data":reports_t,"draw_bars":i_draw_bars,"main":"tags"});
+		if( reports_a.length && i_main_atrists )
+			stcs_ShowTable({"el":i_elReports,"data":reports_a,"draw_bars":i_draw_bars,"main":"artists"});
 	}
 	else
 		i_elReportsDiv.style.display = 'none';
@@ -123,10 +168,10 @@ function stcs_Show( i_args)
 	if( i_elDiffer == null ) return;
 
 	i_elDiffer.textContent = '';
-	if( tasks.length && reports.length )
+	if( tasks_t.length && reports_t.length )
 	{
 		i_elDifferDiv.style.display = 'block';
-		stcs_ShowDifference({"el":i_elDiffer,"tasks":tasks,"reports":reports});
+		stcs_ShowDifference({"el":i_elDiffer,"tasks":tasks_t,"reports":reports_t});
 	}
 	else
 		i_elDifferDiv.style.display = 'none';
@@ -136,10 +181,13 @@ function stcs_ShowTable( i_args)
 {
 	var i_el = i_args.el;
 	var i_data = i_args.data;
-	var i_total_duration = i_args.total_duration;
 	var i_draw_bars = i_args.draw_bars;
+if( i_data[0] == null ) console.log( JSON.stringify( i_args));
+	var has_price = i_data[0].price != null;
 
-	i_data.sort( function(a,b){if(a.duration<b.duration)return 1});
+	var sort = 'duration';
+	if( has_price && ( i_args.main == 'artists' )) sort = 'price';
+	i_data.sort( function(a,b){if(a[sort]<b[sort])return 1});
 
 	var elTb = document.createElement('table');
 	i_el.appendChild( elTb);
@@ -148,46 +196,75 @@ function stcs_ShowTable( i_args)
 	var elTr = document.createElement('tr');
 	elTb.appendChild( elTr);
 
-	var elTh = document.createElement('th');
-	elTr.appendChild( elTh);
-	elTh.textContent = 'D';
-	elTh.title = 'Duration';
+	var elThD = document.createElement('th');
+	elTr.appendChild( elThD);
+	elThD.textContent = 'D';
+	elThD.title = 'Duration';
+
+	if( has_price )
+	{
+		var elTh = document.createElement('th');
+		elTh.textContent = 'P';
+		elTh.title = 'Price';
+		if( sort =='price' )
+			elTr.insertBefore( elTh, elThD);
+		else
+			elTr.appendChild( elTh);
+	}
+
+	var elThT = document.createElement('th');
+	elTr.appendChild( elThT);
+	elThT.textContent = 'Tags';
+	elThT.title = 'Tags';
 
 	var elTh = document.createElement('th');
-	elTr.appendChild( elTh);
-	elTh.textContent = 'Tags';
-	elTh.title = 'Tags';
-
-	var elTh = document.createElement('th');
-	elTr.appendChild( elTh);
 	elTh.textContent = 'Artists';
 	elTh.title = 'Artists';
+	if( sort == 'price' )
+		elTr.insertBefore( elTh, elThD);
+	else if( i_args.main == 'artists')
+		elTr.insertBefore( elTh, elThT);
+	else
+		elTr.appendChild( elTh);
 
+	var summs = {"duration":0,"price":0};
 	for( var r = 0; r < i_data.length; r++)
 	{
 		var elTr = document.createElement('tr');
 		elTb.appendChild( elTr);
 
-		var elTd = document.createElement('td');
-		elTr.appendChild( elTd);
-		elTd.classList.add('duration');
-		elTd.textContent = i_data[r].duration;
-		elTd.title = '/8 = ' + (i_data[r].duration/8.0).toPrecision(2);
+		var elTdD = document.createElement('td');
+		elTr.appendChild( elTdD);
+		elTdD.classList.add('duration');
+		elTdD.textContent = i_data[r].duration;
+		elTdD.title = '/8 = ' + (i_data[r].duration/8.0).toPrecision(2);
 
-		var elTd = document.createElement('td');
-		elTr.appendChild( elTd);
+		if( has_price )
+		{
+			var elTd = document.createElement('td');
+			elTd.classList.add('price');
+			elTd.textContent = i_data[r].price;
+			elTd.title = '/1000 = ' + (i_data[r].price/1000.0).toPrecision(2);
+
+			if( i_args.main == 'artists' )
+				elTr.insertBefore( elTd, elTdD);
+			else
+				elTr.appendChild( elTd);
+		}
+
+		var elTdT = document.createElement('td');
+		elTr.appendChild( elTdT);
 		var txt = '';
 		for( var t = 0; t < i_data[r].tags.length; t++)
 		{
 			if( t ) txt += ',';
 			txt += ' ' + c_GetTagTitle( i_data[r].tags[t]);
 		}
-		elTd.textContent = txt;
+		elTdT.textContent = txt;
 		if( i_data[r].tags.length == 1 )
-			elTd.title = c_GetTagTip( i_data[r].tags[0]);
+			elTdT.title = c_GetTagTip( i_data[r].tags[0]);
 
 		var elTd = document.createElement('td');
-		elTr.appendChild( elTd);
 		var txt = '';
 		for( var a = 0; a < i_data[r].artists.length; a++)
 		{
@@ -195,34 +272,64 @@ function stcs_ShowTable( i_args)
 			txt += ' ' + c_GetUserTitle( i_data[r].artists[a]);
 		}
 		elTd.textContent = txt;
+		if( sort == 'price' )
+			elTr.insertBefore( elTd, elTdD);
+		else if( i_args.main == 'artists')
+			elTr.insertBefore( elTd, elTdT);
+		else
+			elTr.appendChild( elTd);
+
+		summs.duration += i_data[r].duration;
+		summs.price += i_data[r].price;
 	}
 
 	var elTr = document.createElement('tr');
 	elTb.appendChild( elTr);
 
-	var elTd = document.createElement('th');
-	elTr.appendChild( elTd);
-	elTd.textContent = i_total_duration;
-	elTd.title = '/8 = ' + (i_total_duration/8.0).toPrecision(2);
+	var elTdD = document.createElement('th');
+	elTdD.textContent = summs.duration;
+	elTdD.title = '/8 = ' + (summs.duration/8.0).toPrecision(2);
+	elTr.appendChild( elTdD);
 
-	var elTd = document.createElement('th');
-	elTr.appendChild( elTd);
-	elTd.textContent = 'total';
+	var elTdT = document.createElement('th');
+	elTdT.textContent = 'total';
+
+	if( has_price )
+	{
+		var elTdP = document.createElement('th');
+		elTdP.textContent = summs.price;
+		elTdP.title = '/1000 = ' + (summs.price/1000.0).toPrecision(2);
+		elTr.appendChild( elTdP);
+		if( i_args.main == 'artists' )
+		{
+			elTr.insertBefore( elTdP, elTdD);
+			elTr.insertBefore( elTdT, elTdD);
+		}
+		else
+		{
+			elTr.appendChild( elTdP);
+			elTr.appendChild( elTdT);
+		}
+	}
 
 	if( i_draw_bars !== true ) return;
+
 
 	var elBarsDiv = document.createElement('div');
 	i_el.appendChild( elBarsDiv);
 	elBarsDiv.classList.add('bars');
 
-	var width_coeff = 100 / i_data[0].duration;
+	var width_coeff = 100 / i_data[0][sort];
 
 	for( var i = 0; i < i_data.length; i++)
 	{
-		var rect_w = i_data[i].duration * width_coeff;
-		var info = Math.round( 100.0 * i_data[i].duration / i_total_duration ) + '% ';
-		info += c_GetTagTitle( i_data[i].tags[0]);
-		var tooltip = 'Duration: ' + i_data[i].duration + ' ( /8=' + (i_data[i].duration/8.0).toPrecision(2) + ' )';
+		var rect_w = i_data[i][sort] * width_coeff;
+		var info = Math.round( 100.0 * i_data[i][sort] / summs[sort] ) + '% ';
+		var key = i_data[i][i_args.main][0];
+		if( i_args.main == 'artists' )
+			info += c_GetUserTitle( key);
+		else
+			info += c_GetTagTitle( key);
 
 		var elBar = document.createElement('div');
 		elBarsDiv.appendChild( elBar);
@@ -233,7 +340,6 @@ function stcs_ShowTable( i_args)
 		elBar.appendChild( elBarRect);
 		elBarRect.classList.add('rect');
 		elBarRect.style.width =  rect_w + '%';
-		elBarRect.title = tooltip;
 
 		var elBarInfo = document.createElement('div');
 		elBar.appendChild( elBarInfo);
@@ -241,7 +347,6 @@ function stcs_ShowTable( i_args)
 		elBarInfo.textContent = info;
 		elBarInfo.style.position = 'absolute';
 		elBarInfo.style.top = '-2px';
-		elBarInfo.title = tooltip;
 		if( rect_w < 50 )
 			elBarInfo.style.left = rect_w + '%';
 		else

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import hou
 import time
 
@@ -25,17 +26,19 @@ class BlockParameters:
 		self.afnode = afnode
 		self.ropnode = None
 		self.subblock = subblock
+		self.frame_pertask = 1
+		self.frame_sequential = 1
 		self.prefix = prefix
 		self.preview = ''
 		self.name = ''
 		self.type = ''
+		self.parser = ''
 		self.cmd = ''
 		self.cmd_useprefix = True
 		self.dependmask = ''
 		self.fullrangedepend = False
 		self.numeric = True
-		self.frame_first, self.frame_last, \
-		self.frame_inc, self.frame_pertask = frame_range
+		self.frame_first, self.frame_last, self.frame_inc = frame_range
 		self.tasks_names = []
 		self.tasks_cmds = []
 		self.tasks_previews = []
@@ -44,10 +47,13 @@ class BlockParameters:
 		self.soho_outputmode = None
 
 		# Get parameters:
+		self.frame_pertask = int(afnode.parm('frame_pertask').eval())
+		self.frame_sequential = int(afnode.parm('frame_sequential').eval())
 		self.job_name = str(afnode.parm('job_name').eval())
 		self.start_paused = int(afnode.parm('start_paused').eval())
 		self.platform = str(afnode.parm('platform').eval())
 		self.subtaskdepend = int(afnode.parm('subtaskdepend').eval())
+		self.parser = self.afnode.parm('override_parser').eval()
 		self.priority = -1
 		self.max_runtasks = -1
 		self.maxperhost = -1
@@ -159,9 +165,15 @@ class BlockParameters:
 
 			self.cmd += ' "%(hipfilename)s"'
 			self.cmd += ' "%s"' % ropnode.path()
+
+			# Override service:
+			override_service = self.afnode.parm('override_service').eval()
+			if override_service is not None and len(override_service):
+				self.type = override_service
+
 		else:
 			# Custom command driver:
-			if int(afnode.parm('cmd_add').eval()):
+			if int(afnode.parm('cmd_mode').eval()):
 				# Command:
 				cmd = self.afnode.parm('cmd_cmd')
 				self.cmd = afcommon.patternFromPaths(
@@ -178,6 +190,8 @@ class BlockParameters:
 				self.type = self.afnode.parm('cmd_service').eval()
 				if self.type is None or self.type == '':
 					self.type = self.cmd.split(' ')[0]
+				# Parser:
+				self.parser = self.afnode.parm('cmd_parser').eval()
 
 				# Prefix:
 				self.cmd_useprefix = \
@@ -204,6 +218,25 @@ class BlockParameters:
 							)
 							return
 
+		# Try to create output folder:
+		if self.preview != '' and afnode.parm('check_output_folder').eval():
+			folder = os.path.dirname( self.preview)
+			if not os.path.isdir( folder):
+				if hou.ui.displayMessage( folder, buttons=('Create','Abort'),default_choice=0,close_choice=1,
+					title='Output Folder Does Not Exist',details=folder) == 0:
+					try:
+						os.makedirs(folder)
+					except Exception as e:
+						hou.ui.displayMessage( folder, buttons=('Abort',),default_choice=0,close_choice=1,
+							title='Error Creating Output Folder',details=str(e))
+						return
+					if not os.path.isdir( folder):
+						hou.ui.displayMessage( folder, buttons=('Abort',),default_choice=0,close_choice=1,
+							title='Can`t Create Output Folder',details=folder)
+						return
+				else:
+					return
+
 		self.valid = True
 
 	def genBlock(self, hipfilename):
@@ -216,6 +249,7 @@ class BlockParameters:
 					  (self.afnode.path()))
 
 		block = af.Block(self.name, self.type)
+		block.setParser( self.parser)
 		block.setCommand(self.cmd % vars(), self.cmd_useprefix)
 		if self.preview != '':
 			block.setFiles([self.preview])
@@ -237,6 +271,8 @@ class BlockParameters:
 				block.tasks.append(task)
 				t += 1
 			block.setFramesPerTask(self.frame_pertask)
+
+		block.setSequential( self.frame_sequential)
 
 		block.setCapacity(self.capacity)
 		if self.capacity_min != -1 or self.capacity_max != -1:
@@ -288,6 +324,7 @@ class BlockParameters:
 
 		job = af.Job()
 		job.setName(self.job_name)
+
 		if self.start_paused:
 			job.offLine()
 
@@ -318,8 +355,16 @@ class BlockParameters:
 		if self.hosts_mask_exclude != '':
 			job.setHostsMaskExclude(self.hosts_mask_exclude)
 
+		job.setFolder('input', os.path.dirname( hou.hipFile.name()))
+
+		images = None
 		for blockparam in blockparams:
 			job.blocks.append(blockparam.genBlock(tmphip))
+
+			# Set ouput folder from the first block with images to preview:
+			if images is None and blockparam.preview != '':
+				images = blockparam.preview
+				job.setFolder('output', os.path.dirname( images))
 
 		job.setCmdPost('deletefiles "%s"' % tmphip)
 
@@ -529,9 +574,8 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 		frame_first = hou.frame()
 		frame_last = frame_first
 		frame_inc = 1
-		frame_pertask = 1
 	else:
-		frame_first, frame_last, frame_inc, frame_pertask = frame_range
+		frame_first, frame_last, frame_inc = frame_range
 
 	trange = afnode.parm('trange')
 
@@ -539,9 +583,8 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 		frame_first = int(afnode.parm('f1').eval())
 		frame_last = int(afnode.parm('f2').eval())
 		frame_inc = int(afnode.parm('f3').eval())
-		frame_pertask = int(afnode.parm('frame_pertask').eval())
 
-	frame_range = frame_first, frame_last, frame_inc, frame_pertask
+	frame_range = frame_first, frame_last, frame_inc
 
 	params = []
 	connections = []
@@ -552,7 +595,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 		if node is not None:
 			nodes.append(node)
 
-	if afnode.parm('cmd_add').eval():
+	if afnode.parm('cmd_mode').eval():
 		nodes.append(None)
 
 	nodes.reverse()

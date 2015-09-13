@@ -9,10 +9,10 @@ import cgruutils
 import cgrupyqt
 from cgrupyqt import QtCore, QtGui
 
-Names = ['Blender', 'Houdini', 'Maya', 'Nuke', 'NukeX']
+Names = ['Blender','Houdini','Maya','Natron','Nuke','NukeX']
 
 if 'windows' in cgruconfig.VARS['platform']:
-	Names.extend(['3DSMax', 'Softimage'])
+	Names.extend(['3DSMax','Fusion','Softimage'])
 if 'windows' in cgruconfig.VARS['platform'] \
 	or 'macosx' in cgruconfig.VARS['platform']:
 	Names.extend(['C4D','AfterFX'])
@@ -38,8 +38,16 @@ def startHoudini():
 	startDetached('houdini')
 
 
+def startFusion():
+	startDetached('fusion')
+
+
 def startMaya():
 	startDetached('maya')
+
+
+def startNatron():
+	startDetached('natron')
 
 
 def startNuke():
@@ -91,12 +99,20 @@ def exampleC4D():
 	exampleSoftware('Cinema 4D', 'start_c4d')
 
 
+def exampleFusion():
+	exampleSoftware('Fusion', 'start_fusion')
+
+
 def exampleHoudini():
 	exampleSoftware('houdini', 'start_houdini')
 
 
 def exampleMaya():
 	exampleSoftware('maya', 'start_maya')
+
+
+def exampleNatron():
+	exampleSoftware('natron', 'start_natron')
 
 
 def exampleNuke():
@@ -173,12 +189,20 @@ def locateC4D():
 	locateSoftware('C4D')
 
 
+def locateFusion():
+	locateSoftware('Fusion')
+
+
 def locateHoudini():
 	locateSoftware('Houdini')
 
 
 def locateMaya():
 	locateSoftware('Maya')
+
+
+def locateNatron():
+	locateSoftware('Natron')
 
 
 def locateNuke():

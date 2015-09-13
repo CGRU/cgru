@@ -54,6 +54,7 @@ RMB - open/close folder (faster)
 Use [ART],[TAG],[ANN] buttons
 to show/hige folder status info."
 			></div>
+		<div class="button" style="width:16px;" title="Scroll to current" onclick="g_NavigScrollCurrent()">&gt;&lt;</div>
 		<div class="button" id="navig_show_artists"    title="Show artists"    onclick="g_NavigShowInfo(this)">ART</div>
 		<div class="button" id="navig_show_tags"       title="Show tags"       onclick="g_NavigShowInfo(this)">TAG</div>
 		<div class="button" id="navig_show_annotation" title="Show annotation" onclick="g_NavigShowInfo(this)">ANN</div>
@@ -69,6 +70,7 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 
 <div id="content">
 	<div id="panel">
+		<div id="annotations"></div>
 		<div id="search_panel" style="float:right">
 			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
 		</div>
@@ -90,7 +92,11 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 			<div id="search_annotation" class="editing" contenteditable="true"></div>
 		</div>
 		<div id="search_artists_div" style="display:none">
-			<div style="float:left;">Artists:</div>
+			<div style="float:left;">
+				<div>Artists:</div>
+				<div class="button" onclick="u_Search_ShowDisabled(this)" title="Show disabled artitst.">DS</div>
+				<div class="button" onclick="u_Search_ShowNotArtist(this)" title="Show not an artists.">NA</div>
+			</div>
 			<div id="search_artists" class="artists"></div>
 		</div>
 		<div>
@@ -129,7 +135,7 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 				No results found.</div>
 		</div>
 	</div>
-	<div style="text-align:center;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
+	<div style="text-align:center; clear: both;"><img id="thumbnail" class="thumbnail" style="margin-top:4px"></div>
 	<div id="status">
 		<div id="status_show">
 			<div class="infotooltip" style="float: left;" title="Info:
@@ -216,6 +222,17 @@ Project input and output format.
 					<img id="body_avatar_m">
 					<div id="body_info"></div>
 				</div>
+				<div id="body_timecode">
+					<div id="body_timecode_label">Time Code:</div>
+					<div id="body_timecode_value" class="value"></div>
+					<div>Duration:</div>
+					<div id="body_timecode_duration" class="value"></div>
+					<div>Frames:</div>
+					<div id="body_timecode_framesnum" class="value frames_num" title="Double click to update shot length."
+						ondblclick="st_SetFramesNumber( this.m_frames_num);this.classList.remove('error')"></div>
+					<div>FPS:</div>
+					<div id="body_timecode_fps" class="value"></div>
+				</div>
 				<div id="body_panel_edit" style="display:none">
 					<div class="button" style="float:right" onclick="u_BodyEditSave()" title="Save body editing (CTRL+ENTER)">
 						<b>Save</b> <small>(CTRL+ENTER)</small></div>
@@ -224,6 +241,10 @@ Project input and output format.
 					<div class="toggle" ondblclick="u_BodyEditMarkupRemove()"
 						title="Double click to remove all HTML markup from body">
 						Remove all markup</div>
+					<div id="body_timecode_edit">
+						<div id="body_timecode_edit_label">Time Code:</div>
+						<div id="body_timecode_edit_value" contenteditable="true" class="editing"></div>
+					</div>
 				</div>
 				<div id="body_body" style="padding: 5px 10px;"></div>
 			</div>
@@ -256,7 +277,7 @@ Comment can be an artist report with a tag and duration.
 	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
 		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()" title="Refresh news" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);"></div>
-		<div class="label button" onclick="nw_NewsOnClick()">News</div>
+		<div class="label button" id="news_sidepanel_btn" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
 			<div class="news_ctrl">
 				<div class="infotooltip" style="float: right; margin: 0; padding: 0;" title="News:
@@ -279,7 +300,8 @@ Remember any delete operation buttons in RULES requires double-click.
 					<div class="button" title="Double click to delete hidden news"
 						style="background-image:url(rules/icons/delete_hidden.png);"
 						ondblclick="nw_DeleteFiltered(false)"></div>
-					<div class="button" title="Click to open/close subscribed locations"
+					<div class="button" id="news_settings_btn"
+						title="Click to open/close subscribed locations"
 						style="background-image:url(rules/icons/news_channels.png);"
 						onclick="c_ElDisplayToggle(document.getElementById('chanset'));
 						this.classList.toggle('pushed')"></div>
@@ -291,29 +313,30 @@ Remember any delete operation buttons in RULES requires double-click.
 					<div id="subscribe_path"
 						title="Subscribed parent location"></div>
 					<div id="subscribe_btn" class="button" onclick="nw_Subscribe()"
-						style="background-image:url(rules/icons/bell.png); display: none; float: right;"
+						style="background-image:url(rules/icons/bell.png); display: none;"
 						title="Receive this location changes"></div>
 					<div id="news_make" class="button" onclick="nw_MakeNewsDialog()"
 						style="background-image:url(rules/icons/megaphone.png);"
 						title="Create some custom news"></div>
 					<div id="news_disable" class="button" onclick="nw_DisableNewsToggle( true)"
-						style="background-image:url(rules/icons/power_button.png);"
+						style="background-image:url(rules/icons/power_button.png); float: right;"
 						title="If news disabled, your changes does not produce any news"></div>
 					<div id="news_ignore_own" class="button" onclick="nw_IgnoreOwnToggle( true)"
-						style="background-image:url(rules/icons/listen_own.png);"
+						style="background-image:url(rules/icons/listen_own.png); float: right;"
 						title="If you ignoring own news, you do not receive changes performed by yourself"></div>
 					<div id="channels"></div>
 				</div>
 			</div>
 			<div class="news_filter" style="font-size: 12px" title="News filter">
 				<div class="button nw_fb" title="Show All" id="news_filter_show_all" onclick="nw_FilterBtn(this,'_all_')">All</div>
-				<div class="button nw_fb" title="I Am Assigned" onclick="nw_FilterBtn(this,'_ia_')">IA</div>
-				<div class="button nw_fb" title="By me"      onclick="nw_FilterBtn(this,'_me_')"   >My</div>
-				<div class="button nw_fb" title="Body"       onclick="nw_FilterBtn(this,'body')"   >B</div>
-				<div class="button nw_fb" title="Status"     onclick="nw_FilterBtn(this,'status')" >S</div>
-				<div class="button nw_fb" title="Report"     onclick="nw_FilterBtn(this,'report')" >R</div>
-				<div class="button nw_fb" title="Dailies"    onclick="nw_FilterBtn(this,'dailies')">D</div>
-				<div class="button nw_fb" title="Comment"    onclick="nw_FilterBtn(this,'comment')">C</div>
+				<div class="button nw_fb" title="I Am Assigned" onclick="nw_FilterBtn(this,'_ia_')"   >IA</div>
+				<div class="button nw_fb" title="By me"         onclick="nw_FilterBtn(this,'_me_')"   >My</div>
+				<div class="button nw_fb" title="Body"          onclick="nw_FilterBtn(this,'body')"   >B</div>
+				<div class="button nw_fb" title="Status"        onclick="nw_FilterBtn(this,'status')" >S</div>
+				<div class="button nw_fb" title="Report"        onclick="nw_FilterBtn(this,'report')" >R</div>
+				<div class="button nw_fb" title="Dailies"       onclick="nw_FilterBtn(this,'dailies')">D</div>
+				<div class="button nw_fb" title="Comment"       onclick="nw_FilterBtn(this,'comment')">C</div>
+				<div class="button nw_fb" title="Upload"        onclick="nw_FilterBtn(this,'upload')" >U</div>
 			</div>
 			<div class="news_filter" id="news_projects" style="font: 10px monospace;" title="News Projects"></div>
 			<div id="news"></div>
@@ -464,17 +487,20 @@ Hidden folders increase system speed.">
 				title="Edit my profile settings"
 				onclick="ad_ProfileOpen()">My Profile</div>
 			<div style="text-align:center; padding: 10px 0 0 0;">
-				<a href="http://cgru.info/rules/general" target="_blank">Documentation</a></div>
-			<div style="text-align:center; padding: 10px 0 0 0;" id="afanasy_webgui"></div>
+				<a href="http://cgru.info/rules/general" target="_blank" onclick="u_OpenCloseHeader()">
+					Documentation</a></div>
+			<div style="text-align:center; padding: 10px 0 0 0;">
+				<a id="afanasy_webgui" target="_blank" onclick="u_OpenCloseHeader()">
+					AFANASY</a></div>
 			<!--div style="text-align:center; padding: 10px 0 0 0;">
 				<a href="afanasy/webvisor/" target="_blank">Database Statistics</a></div-->
 			<div style="text-align:center; padding: 10px 0 0 0;">
-				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank">Firefox Add-on</a></div>
+				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank" onclick="u_OpenCloseHeader()">
+					Firefox Add-on</a></div>
 		</div>
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()"
-		title="Open/close settings"
-		style="background-image:url(rules/icons/arrow_down.png)"></div>
+		title="Open/close settings"></div>
 	<div class="panel">
 		<a class="button" id="navigate_root" title="Navigate RULES root and refresh"
 			style="background-image:url(rules/icons/top.png);"></a>
@@ -493,8 +519,7 @@ Click to refresh and open news." style="display: none;"></div>
 
 <div id="footer">
 	<div id="footeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseFooter()"
-		title="Open/close system log"
-		style="background-image:url(rules/icons/arrow_up.png)"></div>
+		title="Open/close system log"></div>
 	<div id="cycle"></div>
 	<div id="version" style="float:right;margin:10px;" title="CGRU version">v?</div>
 	<div id="open" class="cmdexec open" style="height: 26px; float:right; margin:8px;" title="Open location a file browser.

@@ -133,31 +133,43 @@ class Tray(QtGui.QSystemTrayIcon):
 		self.menu['AFANASY'].addAction(action)
 		self.menu['AFANASY'].addSeparator()
 
+		self.action_user = QtGui.QAction('Set User...', self)
+		QtCore.QObject.connect(self.action_user,
+							   QtCore.SIGNAL('triggered()'),
+							   render.setUserDialog)
+		self.action_user.setToolTip('Change local render user name.')
+		self.menu['AFANASY'].addAction(self.action_user)
+
 		action = QtGui.QAction('Set nimby', self)
 		QtCore.QObject.connect(action,
 							   QtCore.SIGNAL('triggered()'),
 							   nimby.setnimby)
 		self.menu['AFANASY'].addAction(action)
+
 		action = QtGui.QAction('Set NIMBY', self)
 		QtCore.QObject.connect(action,
 							   QtCore.SIGNAL('triggered()'),
 							   nimby.setNIMBY)
 		self.menu['AFANASY'].addAction(action)
+
 		action = QtGui.QAction('Set Free', self)
 		QtCore.QObject.connect(action,
 							   QtCore.SIGNAL('triggered()'),
 							   nimby.setFree)
 		self.menu['AFANASY'].addAction(action)
+
 		action = QtGui.QAction('Eject Tasks', self)
 		QtCore.QObject.connect(action,
 							   QtCore.SIGNAL('triggered()'),
 							   nimby.ejectTasks)
 		self.menu['AFANASY'].addAction(action)
+
 		action = QtGui.QAction('Eject Not My Tasks', self)
 		QtCore.QObject.connect(action,
 							   QtCore.SIGNAL('triggered()'),
 							   nimby.ejectNotMyTasks)
 		self.menu['AFANASY'].addAction(action)
+
 		action = QtGui.QAction('Render Info', self)
 		QtCore.QObject.connect(action,
 							   QtCore.SIGNAL('triggered()'),
@@ -339,6 +351,9 @@ class Tray(QtGui.QSystemTrayIcon):
 
 		QtCore.QObject.connect(action, QtCore.SIGNAL('triggered()'), function)
 		self.menu[menuname].addAction(action)
+
+	def showUser(self, i_user_name):
+		self.action_user.setText('User: "%s"' % i_user_name)
 
 	def makeIcon(self, name, online, nimby, busy):
 		painting = self.icon_epmty

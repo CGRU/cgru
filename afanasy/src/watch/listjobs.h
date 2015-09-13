@@ -49,6 +49,8 @@ private slots:
 	void actLifeTime();
 	void actSetHidden();
 	void actUnsetHidden();
+	void actPreviewApproval();
+	void actNoPreviewApproval();
 
 	void blockAction( int id_block, QString i_action);
 

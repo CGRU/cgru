@@ -28,7 +28,7 @@
 
 	"concept" :{"title":"Concept",  "short":"Cc",  "tip":"Concept"},
 	"paint"   :{"title":"Paint",    "short":"Pt",  "tip":"Painting"},
-	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte Painting"},
+	"matte"   :{"title":"MtPaint",  "short":"Mp",  "tip":"Matte painting"},
 	"textur"  :{"title":"Textur",   "short":"Tx",  "tip":"Texturing"},
 
 	"model"   :{"title":"Model",    "short":"Md",  "tip":"Modeling"},
@@ -37,6 +37,7 @@
 	"sim"     :{"title":"Sim",      "short":"Sm",  "tip":"Simulating"},
 	"render"  :{"title":"Render",   "short":"Rn",  "tip":"Rendering"},
 
+	"rnd"     :{"title":"R&D",      "short":"RnD", "tip":"Research and development"},
 	"animatic":{"title":"Animatic", "short":"Ac",  "tip":"Animiatic"},
 	"fullcg"  :{"title":"FullCG",   "short":"FCG", "tip":"Full CG Shot"},
 	"titles"  :{"title":"Titles",   "short":"Tt",  "tip":"Titles"},
@@ -60,21 +61,45 @@
 	},
 	"scenes":{
 		"seek":["[project]/SCENES","[project]/SHOTS"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"uploads":{
+			"upload":{
+				"masks":[".*"],
+				"folder":"_UPLOADS/@DATE@_@USER@"
+			}
+		},
 		"name":"",
 		"filter":"sc_FilterShots",
 		"scripts":["scenes.js"]
 	},
 	"scene":{
 		"seek":["[scenes]/"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"uploads":{
+			"upload":{
+				"masks":[".*"],
+				"folder":"_UPLOADS/@DATE@_@USER@"
+			}
+		},
 		"filter":"sc_FilterShots",
 		"scripts":["scenes.js"]
 	},
 	"shot":{
 		"seek":["[scene]/"],
 		"skip":[".","_","-","tmp","temp","tmp","common","rnd"],
-		"upload_dir":"_UPLOADS/@DATE@_@USER@",
+		"uploads":{
+			"upload":{
+				"masks":[".*"],
+				"folder":"_UPLOADS/@DATE@_@USER@"
+			},
+			"result":{
+				"masks":[".*\\.(zip|rar|7z)$"],
+				"folder":"RESULT/ARCHIVES/@DATE@_@USER@",
+				"news_title":"upload"
+			},
+			"dailies":{
+				"masks":[".*\\.(mov|mp4|avi)$"],
+				"folder":"RESULT/DAILIES"
+			}
+		},
 		"scripts":["shot.js"],
 		"subfolders_status_hide":true,
 		"subfolders_dailies_hide":true,
@@ -87,7 +112,7 @@
 			"path":["SRC","SOURCE"]
 		},
 		"result":{
-			"path":["RESULT/JPG","RESULT/DPX","RESULT/TIF"]
+			"path":["RESULT/JPG","RESULT/PNG","RESULT/DPX","RESULT/TIF"]
 		},
 		"dailies":{
 			"path":["RESULT/DAILIES"]
@@ -103,8 +128,6 @@
 			["/rules_root/","/cgru/rules_root/"]
 		]
 },
-
-"cmdexec":{"open_folder":"open \"@PATH@\""},
 
 "OS_unix":{
 	"cmdexec":{
@@ -134,7 +157,6 @@
 
 "OS_windows":{
 	"cmdexec":{
-		"open_folder":"start @PATH@",
 		"play_sequence":[
 			{"name":"Pd++",
 				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@",
@@ -162,18 +184,6 @@
 	}
 },
 
-"OS_linux":{
-	"cmdexec":{
-		"open_folder":"nautilus \"@PATH@\""
-	}
-},
-
-"OS_macosx":{
-	"cmdexec":{
-		"open_folder":"open \"@PATH@\""
-	}
-},
-
 "thumbnail":{
 	"filename":"thumbnail.jpg",
 	"colorspace":"auto",
@@ -184,12 +194,13 @@
 "avcmd":"ffmpeg",
 "skipfiles":[".","Thumbs.db"],
 
-"fps":"24",
+"fps":24,
 "dailies":
 {
 	"format":"1280x720",
 	"fps":"25",
-	"codec":"photojpg_high",
+	"codec":"h264_mid",
+	"container":"DEFAULT",
 	"colorspace":"auto",
 	"template":"dailies_withlogo",
 	"slate":"dailies_slate",
@@ -220,21 +231,31 @@
 	},
 
 	"codecs":{
-		"photojpg_high": {"name":"JPG Hi",   "tooltip":"PhotoJPG High [mov]"},
-		"photojpg_mid":  {"name":"JPG Mid",  "tooltip":"PhotoJPG Mid [mov]"},
-		"photojpg_low":  {"name":"JPG Lo",   "tooltip":"PhotoJPG Low [mov]"},
-		"h264_high":     {"name":"H264 Hi",  "tooltip":"H.264 High [mov]"},
-		"h264_mid":      {"name":"H264 Mid", "tooltip":"H.264 Mid [mov]"},
-		"h264_low":      {"name":"H264 Lo",  "tooltip":"H.264 Low [mov]"},
+		"photojpg_high": {"name":"JPG Hi",   "tooltip":"PhotoJPG High [mp4]"},
+		"photojpg_mid":  {"name":"JPG Mid",  "tooltip":"PhotoJPG Mid [mp4]"},
+		"photojpg_low":  {"name":"JPG Lo",   "tooltip":"PhotoJPG Low [mp4]"},
+		"h264_high":     {"name":"H264 Hi",  "tooltip":"H.264 High [mp4]"},
+		"h264_mid":      {"name":"H264 Mid", "tooltip":"H.264 Mid [mp4]"},
+		"h264_low":      {"name":"H264 Lo",  "tooltip":"H.264 Low [mp4]"},
 		"theora_high":   {"name":"Th Hi",    "tooltip":"Theora High [ogg]"},
 		"theora_mid":    {"name":"Th Mid",   "tooltip":"Theora Mid [ogg]"},
 		"theora_low":    {"name":"Th Lo" ,   "tooltip":"Theora Low [ogg]"},
+		"dnxhd185":      {"name":"DNxHD" ,   "tooltip":"AVID DNxHD 1920x1080x25:185 [mov]"},
 		"prores444":     {"name":"Pro444",   "tooltip":"Apple ProRes444 10Bit [mov]"},
 		"prores422":     {"name":"Pro422",   "tooltip":"Apple ProRes422 10Bit [mov]"}
 	},
 
+	"containers":{
+		"DEFAULT": {"name":"Default", "tooltip":"Default container:\nProRes, DNxHD: MOV\nTheora: OGG\nAny other: MP4"},
+		"mp4": {"name":"MP4", "tooltip":"MPEG-4 Part 14\nIt is a common container."},
+		"mov": {"name":"MOV", "tooltip":"Apple QuickTime Movie"},
+		"m4v": {"name":"M4V", "tooltip":"Apple 'MP4'"},
+		"mxf": {"name":"MXF", "tooltip":"Material eXchange Format"},
+		"avi": {"name":"AVI", "tooltip":"Microsoft Audio Video Interleave"}
+	},
+
 	"preview":{
-		"codec":"theora_mid",
+		"codec":"h264_mid",
 		"args":"-vf scale=640:-1"
 	},
 
@@ -242,13 +263,17 @@
 },
 
 "cut":{
-	"input":"RESULT/JPG,RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/JPG,RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"output":"COMMON/_cut",
-	"af_capacity":100
+	"af_capacity":500,
+	"af_maxtasks":10,
+	"af_perhost":-1,
+	"af_pertask":100,
+	"af_maxruntime":120
 },
 
 "put":{
-	"input":"RESULT/TIF,RESULT/DPX",
+	"input":"RESULT/PNG,RESULT/TIF,RESULT/DPX",
 	"dest":"FINAL",
 	"-dest":"/incoming",
 	"cmd":"python /cgru/utilities/put.py",
@@ -262,7 +287,8 @@
 	"-af_service":"ftp",
 	"af_parser":"generic",
 	"af_capacity":500,
-	"af_maxtasks":5
+	"af_maxtasks":5,
+	"af_perhost":1
 },
 
 "archive":{

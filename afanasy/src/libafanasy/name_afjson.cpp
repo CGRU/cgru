@@ -267,6 +267,23 @@ bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, c
 	return true;
 }
 
+bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object)
+{
+	const JSON & map = i_object[i_name];
+	if( false == map.IsObject())
+		return false;
+
+	for( JSON::ConstMemberIterator it = map.MemberBegin(); it != map.MemberEnd(); ++it)
+	{
+		std::string name = it->name.GetString();
+		const JSON & path = it->value;
+		if( false == path.IsString()) continue;
+		o_attr[name] = path.GetString();
+	}
+
+	return true;
+}
+
 void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 {
 	o_str << "\"state\":\"";
@@ -299,6 +316,7 @@ void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 		if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << " WTM";
 		if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";
 		if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
+		if( i_state & AFJOB::STATE_PPAPPROVAL_MASK      ) o_str << " PPA";
 	}
 
 	o_str << "\"";

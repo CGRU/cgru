@@ -8,7 +8,7 @@ import sys
 import time
 
 ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'psd', 'xcf']
-MovExtensions = ['mov', 'avi', 'mp4', 'mpg', 'mpeg']
+MovExtensions = ['mov', 'avi', 'mp4','ogg','mxf', 'mpg', 'mpeg']
 
 from optparse import OptionParser
 

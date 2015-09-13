@@ -42,11 +42,15 @@ parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    de
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
+parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
+parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
+parser.add_option(      '--nofiles',      dest='nofiles',      action='store_true', default=False, help='do not set any files')
+parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
+parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
 parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
 parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
 parser.add_option(      '--sub',          dest='subdep',       action='store_true', default=False, help='sub task dependence')
-parser.add_option(      '--nonseq',       dest='nonseq',       action='store_true', default=False, help='task non-sequential running')
 parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False, help='generate not numeric blocks')
 parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
 parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
@@ -74,6 +78,12 @@ if jobname == '':
 
 job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
+
+# Set job folder:
+if options.folder is not None:
+	job.setFolder('folder', options.folder)
+if not options.nofolder:
+	job.setFolder('pwd', os.getcwd())
 
 blocknames = []
 if options.labels != '':
@@ -124,8 +134,11 @@ for b in range(numblocks):
 	if options.capacity != 0:
 		block.setCapacity(options.capacity)
 
-	if options.nonseq:
-		block.setNonSequential()
+	if options.sequential != None:
+		block.setSequential( options.sequential)
+
+	if options.ppapproval:
+		job.setPPApproval()
 
 	str_capacity = ''
 	if options.capmin != -1 or options.capmax != -1:
@@ -159,23 +172,30 @@ for b in range(numblocks):
 			   '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
 		block.setCommand(cmd, False)
+
 		if options.frames != '':
 			fr = frames[b].split('/')
 			block.setNumeric(int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
 		else:
 			block.setNumeric(1, numtasks, options.pertask, increment)
-		if options.pertask > 1:
-			block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@',
-							'file_b.@#@.@###@-file_b.@#@.@###@'])
-		else:
-			block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
+
+		if not options.nofiles:
+			if options.pertask > 1:
+				block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@',
+								'file_b.@#@.@###@-file_b.@#@.@###@'])
+			else:
+				block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
 	else:
 		block.setCommand(
 			'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
 			False
 		)
+
 		block.setTasksName('task @#@')
-		block.setFiles(['file_a.@#@', 'file_b.@#@'])
+
+		if not options.nofiles:
+			block.setFiles(['file_a.@#@', 'file_b.@#@'])
+
 		if options.frames != '':
 			fr = frames[b].split('/')
 			block.setFramesPerTask(int(fr[2]))
@@ -184,7 +204,10 @@ for b in range(numblocks):
 			timesec_task = timesec + randtime * random.random()
 			task = af.Task('#' + str(t))
 			task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
-			task.setFiles(['%04d' % t])
+
+			if not options.nofiles:
+				task.setFiles(['%04d' % t])
+
 			block.tasks.append(task)
 
 if options.cmdpre != '':

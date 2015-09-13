@@ -47,11 +47,11 @@ Example: "UNI5_v001"'});
 		"tip":'Correct results folder name.'});
 	// Movies:
 	shot_results_masks.push({
-		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}\\.mov$'),
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}\\.(mp4|mov)$'),
 		"bg":'rgba(   0, 255, 0, .2)',
 		"tip":'Correct results movie name.'});
 	shot_results_masks.push({
-		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}_.*\\.mov$'),
+		"re":new RegExp('^' + ASSET.name + '_v\\d{3,3}_.*\\.(mp4|mov)$'),
 		"bg":'rgba(   0, 255, 0, .2)',
 		"tip":'Correct results movie name.'});
 
@@ -248,11 +248,15 @@ function shot_FilesCounted( i_args, i_walk)
 	}
 }
 
-function shot_MakeThumbnail()
+function shot_MakeThumbnail( i_args)
 {
 	if( shot_thumb_paths.length == 0 ) return;
 
-	u_ThumbnailMake({"paths":[shot_thumb_paths],"info":'shot'});
+	if( i_args == null ) i_args = {};
+	i_args.info = 'shot';
+	i_args.paths = [shot_thumb_paths];
+
+	u_ThumbnailMake( i_args);
 }
 
 function shot_ShowRefs()
@@ -335,6 +339,7 @@ function shot_SourcesReceived( i_data, i_args)
 	el.classList.remove('waiting');
 	var found = false;
 	var not_empty_paths = [];
+	var thumb_skip_movies = false;
 	for( var i = 0; i < i_data.length; i++)
 	{
 		var walk = {}
@@ -372,13 +377,16 @@ function shot_SourcesReceived( i_data, i_args)
 			not_empty_paths.push( i_args.paths[i]);
 			found = true;
 		}
+
+		if( walk.folders.length )
+			thumb_skip_movies = true;
 	}
 
 	if( false == found )
 	{
 		var e = document.createElement('div');
 		el.appendChild( e);
-		e.textContent = 'No sequences founded in: ';
+		e.textContent = 'No sources founded in: ';
 		e.classList.add('shot_empty_result');
 
 		for( var i = 0; i < ASSET.source.path.length; i++)
@@ -395,7 +403,7 @@ function shot_SourcesReceived( i_data, i_args)
 	if( shot_thumb_paths.length == 0 )
 	{
 		shot_thumb_paths = not_empty_paths;
-		shot_MakeThumbnail();
+		shot_MakeThumbnail({'skip_movies':thumb_skip_movies});
 	}
 }
 

@@ -79,6 +79,7 @@ protected:
 
    mutable bool m_locked;    ///< Lock state.
 
+// NEW VERSION: 32 bit masks should be 64
     uint32_t m_state;   ///< State.
     uint32_t m_flags;   ///< Flags.
 

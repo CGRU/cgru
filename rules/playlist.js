@@ -9,10 +9,10 @@ function p_Init()
 {
 	var ctrls = $('sidepanel_playlist').getElementsByClassName('playlist_ctrl');
 	for( var i = 0; i < ctrls.length; i++)
-		if( g_auth_user == null )
-			ctrls[i].style.display = 'none';
-		else
+		if( c_CanEditPlaylist())
 			ctrls[i].style.display = 'block';
+		else
+			ctrls[i].style.display = 'none';
 
 	if( RULES_TOP.playlist ) p_file = RULES_TOP.playlist;
 	p_elCurFolder = $('playlist');
@@ -76,7 +76,7 @@ function p_NewFolder( i_value)
 	obj.user = g_auth_user.id;
 	obj.time = c_DT_CurSeconds();
 	obj.playlist = [];
-	p_Action( obj, 'add');
+	p_Action([obj], 'add');
 }
 
 function p_AddLinkAbc()
@@ -97,47 +97,73 @@ function p_AddLinkBefore()
 }
 function p_AddLink( i_id_before, i_abc)
 {
-	var name = g_elCurFolder.m_path.split('/');
-	name = name[name.length-1];
+	if( g_CurPath() == '/' )
+	{
+		c_Error('Can`t add root folder to playlist.');
+		return;
+	}
 
-	var obj = {};
-	obj.label = name;
-	obj.id = p_elCurFolder.m_obj.id + '/' + name;
+	var objs = [];
 
-	if( i_abc ) // Search for an index by alphabet
-	if( p_elCurFolder && p_elCurFolder.m_elArray && ( p_elCurFolder.m_elArray.length > 1 ))
-		for( var i = 1; i < p_elCurFolder.m_elArray.length; i++)
-			if( obj.id < p_elCurFolder.m_elArray[i].m_obj.id )
+	if( fv_cur_item )
+	{
+		// Files view selection:
+		var obj = {};
+		obj.label = c_PathBase( g_CurPath());
+		obj.item = fv_cur_item.m_path;
+		obj.id = p_elCurFolder.m_obj.id + '/' + obj.label;
+		obj.id += '_' + c_PathBase( obj.item);
+		obj.path = g_GetLocationArgs({"fv_Goto":fv_cur_item.m_path});
+		objs.push( obj);
+	}
+	else if(( ASSETS.scene && ASSETS.scene.path == g_CurPath() ) || ( ASSETS.scenes && ASSETS.scenes.path == g_CurPath()))
+	{
+		var elShots = scenes_GetSelectedShots();
+		for( var i = 0; i < elShots.length; i++)
+		{
+			var obj = {};
+			obj.path = elShots[i].m_path;
+			obj.label = c_PathBase( obj.path);
+			obj.id = p_elCurFolder.m_obj.id + '/' + obj.label;
+			objs.push( obj);
+		}
+	}
+
+	if( objs.length == 0 )
+	{
+		var obj = {};
+		obj.label = c_PathBase( g_CurPath());
+		obj.path = document.location.hash;
+		obj.id = p_elCurFolder.m_obj.id + '/' + obj.label;
+		objs.push( obj);
+	}
+
+	for( var i = 0; i < objs.length; i++)
+	{
+		if( objs[i].path.indexOf('#') == 0 )
+			objs[i].path = objs[i].path.substr(1);
+
+		objs[i].user = g_auth_user.id;
+		objs[i].time = c_DT_CurSeconds();
+	}
+
+	// Search for an index by alphabetically
+	if( i_abc && p_elCurFolder && p_elCurFolder.m_elArray && p_elCurFolder.m_elArray.length )
+		for( var i = 0; i < p_elCurFolder.m_elArray.length; i++)
+			if( objs[0].id < p_elCurFolder.m_elArray[i].m_obj.id )
 			{
 				i_id_before = p_elCurFolder.m_elArray[i].m_obj.id;
 				break;
 			}
 
-	if( fv_cur_item )
-	{
-		obj.item = fv_cur_item.m_path;
-		obj.path = g_GetLocationArgs({"fv_Goto":fv_cur_item.m_path});
-		obj.id += '_' + c_PathBase( obj.item);
-	}
-	else
-		obj.path = document.location.hash;
-//		obj.path = g_CurPath();
-//	obj.path = g_elCurFolder.m_path;
-
-	if( obj.path.indexOf('#') == 0 )
-		obj.path = obj.path.substr(1);
-
-	obj.user = g_auth_user.id;
-	obj.time = c_DT_CurSeconds();
-
-	p_Action( obj, 'add', i_id_before);
+	p_Action( objs, 'add', i_id_before);
 }
 function p_Rename( i_value)
 {
 	var obj = {};
 	obj.label = i_value;
 	obj.id = p_elCurItem.m_obj.id;
-	p_Action( obj, 'rename');
+	p_Action([obj], 'rename');
 }
 
 function p_FolderOnClick( i_evt)
@@ -195,30 +221,30 @@ function p_LinkOnClick( i_evt)
 function p_DelOnClick()
 {
 	if( p_elCurItem == null ) return;
-	p_Action({"id":p_elCurItem.m_obj.id}, 'del' );
+	p_Action([{"id":p_elCurItem.m_obj.id}], 'del' );
 }
 function p_MoveUp()
 {
 	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elFirst))
-		p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.previousSibling.m_obj.id);
+		p_Action([p_elCurItem.m_obj], 'add', p_elCurItem.previousSibling.m_obj.id);
 }
 function p_MoveTop()
 {
 	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elFirst))
-		p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.m_elParent.m_elFirst.m_obj.id);
+		p_Action([p_elCurItem.m_obj], 'add', p_elCurItem.m_elParent.m_elFirst.m_obj.id);
 }
 function p_MoveBottom()
 {
 	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elLast))
-		p_Action( p_elCurItem.m_obj, 'add');
+		p_Action([p_elCurItem.m_obj], 'add');
 }
 function p_MoveDown()
 {
 	if( p_elCurItem && ( p_elCurItem != p_elCurItem.m_elParent.m_elLast))
 		if( p_elCurItem.nextSibling.nextSibling && ( p_elCurItem.nextSibling.nextSibling != p_elCurItem.m_elParent.m_elFirst))
-			p_Action( p_elCurItem.m_obj, 'add', p_elCurItem.nextSibling.nextSibling.m_obj.id);
+			p_Action([p_elCurItem.m_obj], 'add', p_elCurItem.nextSibling.nextSibling.m_obj.id);
 		else
-			p_Action( p_elCurItem.m_obj, 'add');
+			p_Action([p_elCurItem.m_obj], 'add');
 }
 function p_SetCurItem( i_el)
 {
@@ -230,44 +256,46 @@ function p_SetCurItem( i_el)
 	p_elCurItem.classList.add('current');
 }
 
-function p_Action( i_obj, i_action, i_id_before)
+function p_Action( i_objects, i_action, i_id_before)
 {
 	var obj = {};
-	if( i_obj.id )
-		i_obj.id = i_obj.id.replace(/ /g,'_');
+
+	for( var i = 0; i < i_objects.length; i++)
+		if( i_objects[i].id )
+			i_objects[i].id = i_objects[i].id.replace(/ /g,'_');
 
 	if( i_action == 'add' )
 	{
 		if( p_fileExist )
 		{	
-			obj.objects = [i_obj];
+			obj.objects = i_objects;
 			obj.pusharray = 'playlist';
 			obj.id_before = i_id_before;
 			obj.id = p_elCurFolder.m_obj.id;
 
 			// If we are moving a folder:
-			if( i_obj.id == p_elCurFolder.m_obj.id )
+			if(i_objects[0].id == p_elCurFolder.m_obj.id )
 				obj.id = p_elCurFolder.m_elParent.m_obj.id;
 		}
 		else
 		{
-			obj.object = {"id":"","playlist":[i_obj]};
+			obj.object = {"id":"","playlist":i_objects};
 			obj.add = true;
 		}
 	}
 	else if( i_action == 'del')
 	{
-		obj.objects = [i_obj];
+		obj.objects = i_objects;
 		obj.delobj = true;
 	}
 	else if( i_action == 'rename')
 	{
-		obj.objects = [i_obj];
+		obj.objects = i_objects;
 		obj.replace = true;
 	}
 	else
 	{
-		c_Error('Playlist: Unknown action = '+i_action+'<br> Object: '+JSON.stringify(i_obj));
+		c_Error('Playlist: Unknown action = '+i_action+'<br> Object: '+JSON.stringify(i_objects));
 		return;
 	}
 	obj.file = p_file;
@@ -412,18 +440,19 @@ function p_CreateElement( i_obj, i_elParent, i_type)
 
 function p_GetCurrentShots()
 {
+	shots = [];
+
 	if( p_elCurFolder == null )
 	{
 		c_Error('Current folder not found.');
-		return;
+		return shots;
 	}
 	if( p_elCurFolder.m_elArray == null )
 	{
 		c_Error('Current folder not has no childs.');
-		return;
+		return shots;
 	}
 
-	shots = [];
 	for( var i = 0; i < p_elCurFolder.m_elArray.length; i++)
 		if( p_elCurFolder.m_elArray[i].m_path )
 			shots.push( p_elCurFolder.m_elArray[i].m_path);

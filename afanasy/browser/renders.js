@@ -106,7 +106,7 @@ RenderNode.prototype.update = function( i_obj)
 
 		if( r == null ) return;
 
-		if(( this.state.ONL != true ) || ( this.host_resources == null ))
+		if(( this.state.ONL != true ) || ( this.params.host_resources == null ))
 		{
 			// If render just become online,
 			// or resources reciedved fisrt time,
@@ -145,7 +145,7 @@ RenderNode.prototype.update = function( i_obj)
 		}
 
 
-		this.host_resources = r;
+		this.params.host_resources = r;
 
 		var usr = r.cpu_user + r.cpu_nice;
 		var sys = r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq;
@@ -248,7 +248,7 @@ RenderNode.prototype.update = function( i_obj)
 		this.clearTasks();
 this.plottersCsDelete();
 this.elResources.style.display = 'none';
-this.host_resources = null;
+this.params.host_resources = null;
 		this.elCapacity.textContent = '';
 		this.elMaxTasks.textContent = '';
 		this.state.textContent = '';
@@ -433,15 +433,13 @@ RenderNode.prototype.updateTasksPercents = function()
 
 RenderNode.prototype.onDoubleClick = function( e)
 {
-//	nw_GetNodes('renders', [this.params.id], 'full');
 	nw_request({"send":{"get":{"type":'renders',"ids":[this.params.id],"mode":'full'}},"func":g_ShowObject,"evt":e,"wnd":this.monitor.window});
 }
 
-RenderNode.prototype.mh_Service = function( i_param)
+RenderNode.setService = function( i_args)
 {
-//	new cgru_Dialog( this.monitor.window, this, 'serviceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
-	new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'serviceApply',"param":i_param.name,
-		"name":this.type+'_parameter',"title":(i_param.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
+	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'serviceApply',"param":i_args.name,
+		"name":'serivce',"title":(i_args.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
 }
 RenderNode.prototype.serviceApply = function( i_value, i_name)
 {
@@ -527,43 +525,118 @@ RenderTask.prototype.destroy = function()
 }
 
 
-RenderNode.actions = [];
+RenderNode.createPanels = function( i_monitor)
+{
+	// Info:
+	var acts = {};
+	acts.tasks_log = {'label':'TSK' ,'tooltip':'Get tasks Log.'};
+	acts.full      = {'label':'FULL','tooltip':'Request full render node info.'};
+	i_monitor.createCtrlBtn({'name':'info','label':'INFO','tooltip':'Get render info.','handle':'mh_Get','sub_menu':acts});
 
-RenderNode.actions.push({"mode":'context', "name":'log',       "handle":'mh_Get', "label":'Show Log'});
-RenderNode.actions.push({"mode":'context', "name":'tasks_log', "handle":'mh_Get', "label":'Tasks Log'});
-RenderNode.actions.push({"mode":'context', "name":'full',      "handle":'mh_Get', "label":'Full Info'});
-RenderNode.actions.push({"mode":'context'});
-RenderNode.actions.push({"mode":'context', "name":'nimby', "value":true,  "handle":'mh_Param', "label":'Set nimby'});
-RenderNode.actions.push({"mode":'context', "name":'NIMBY', "value":true,  "handle":'mh_Param', "label":'Set NIMBY'});
-RenderNode.actions.push({"mode":'context', "name":'nimby', "value":false, "handle":'mh_Param', "label":'Set Free'});
-RenderNode.actions.push({"mode":'context'});
-RenderNode.actions.push({"mode":'context', "name":'eject_tasks',         "handle":'mh_Oper', "label":'Eject Tasks'});
-RenderNode.actions.push({"mode":'context', "name":'eject_tasks_keep_my', "handle":'mh_Oper', "label":'Eject Not My'});
 
-RenderNode.actions.push({"mode":'set', "name":'priority',  "type":'num', "handle":'mh_Dialog', "label":'Priority'});
-RenderNode.actions.push({"mode":'set', "name":'capacity',  "type":'num', "handle":'mh_Dialog', "label":'Capacity'});
-RenderNode.actions.push({"mode":'set', "name":'max_tasks', "type":'num', "handle":'mh_Dialog', "label":'Maximum Tasks'});
-RenderNode.actions.push({"mode":'set', "name":'restore_defaults', "handle":'mh_Oper', "label":'Restore Defaults'});
-RenderNode.actions.push({"mode":'set'});
-RenderNode.actions.push({"mode":'set', "name":'enable',  "handle":'mh_Service', "label":'Enable Service'});
-RenderNode.actions.push({"mode":'set', "name":'disable', "handle":'mh_Service', "label":'Disable Service'});
-RenderNode.actions.push({"mode":'set'});
-RenderNode.actions.push({"mode":'set', "name":'hidden',     "type":'bl1', "handle":'mh_Dialog', "label":'Hide/Unhide'});
-RenderNode.actions.push({"mode":'set'});
-RenderNode.actions.push({"mode":'set', "name":'user_name',  "type":'str', "handle":'mh_Dialog', "label":'User Name'});
-RenderNode.actions.push({"mode":'set'});
-RenderNode.actions.push({"mode":'set', "name":'annotation', "type":'str', "handle":'mh_Dialog', "label":'Annotation'});
+	// Nimby:
+	var acts = {};
+	acts.free =  {'name':'nimby', 'value':false,'handle':'mh_Param','label':'FRE','tooltip':'Set render free.'};
+	acts.nimby = {'name':'nimby', 'value':true, 'handle':'mh_Param','label':'Nim','tooltip':'Set render nimby.\nRun only owner tasks.'};
+	acts.NIMBY = {'name':'NIMBY', 'value':true, 'handle':'mh_Param','label':'NBY','tooltip':'Set render NIMBY.\nDo not run any tasks.'};
+	i_monitor.createCtrlBtns( acts);
 
-RenderNode.actions.push({"mode":'pow', "name":'wol_sleep', "handle":'mh_Oper', "label":'WOL Sleep'});
-RenderNode.actions.push({"mode":'pow', "name":'wol_wake' , "handle":'mh_Oper', "label":'WOL Wake'});
-RenderNode.actions.push({"mode":'pow', "name":'exit',      "handle":'mh_Oper', "label":'Exit Client'});
-RenderNode.actions.push({"mode":'pow', "name":'reboot',    "handle":'mh_Oper', "label":'Reboot Machine'});
-RenderNode.actions.push({"mode":'pow', "name":'shutdown',  "handle":'mh_Oper', "label":'Shutdown Machine'});
-RenderNode.actions.push({"mode":'pow', "name":'delete',    "handle":'mh_Oper', "label":'Delete From DB'});
+
+	// Services:
+	var acts = {};
+	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
+	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
+	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
+	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable serivrs\nRestore defaults.','sub_menu':acts});
+
+
+	// Eject tasks:
+	var acts = {};
+	acts.eject_tasks         = {'label':'ALL','tooltip':'Eject all running tasks.'};
+	acts.eject_tasks_keep_my = {'label':'NOM','tooltip':'Eject not my tasks.'};
+	i_monitor.createCtrlBtn({'name':'eject','label':'EJT','tooltip':'Eject tasks from render.','sub_menu':acts});
+
+
+	// Custom commands:
+	var el = document.createElement('div');
+	i_monitor.elPanelL.appendChild( el);
+	el.classList.add('ctrl_button');
+	el.textContent = 'CMD';
+	el.monitor = i_monitor;
+	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cmd'); return false;}
+	el.oncontextmenu = el.onclick;
+
+
+	// Admin related functions:
+	if( ! g_GOD()) return;
+
+
+	// Power/WOL:
+	var acts = {};
+	acts.wol_sleep = {'label':'WSL','tooltip':'Wake-On-Lan sleep.'};
+	acts.wol_wake  = {'label':'WWK','tooltip':'Wake-On-Lan wake.'};
+	acts.exit      = {'label':'EXT','tooltip':'Exit client.'};
+	acts.reboot    = {'label':'REB','tooltip':'Reboot machine.'};
+	acts.shutdown  = {'label':'SHD','tooltip':'Shutdown machine.'};
+	acts.delete    = {'label':'DEL','tooltip':'Delete render from Afanasy database.'};
+	i_monitor.createCtrlBtn({'name':'power','label':'POW','tooltip':'Power / Exit / Delete.','sub_menu':acts});
+}
+
+
+RenderNode.prototype.updatePanels = function()
+{
+	// Info:
+	var info = '';
+
+	var r = this.params.host_resources;
+	if( r )
+	{
+		info += r.cpu_mhz+'x'+r.cpu_num+'MHz';
+		info += ' '+Math.round(r.mem_total_mb/1024)+'Gb';
+		info += ' HDD'+r.hdd_total_gb+'Gb';
+		info += '<br>';
+	}
+
+	if( this.params.host.nimby_idlefree_time || this.params.host.nimby_busyfree_time )
+	{
+		info += '<br>Auto Nimby:';
+		if( this.params.host.nimby_busyfree_time )
+			info += '<br>Busy time: '
+				+ cm_TimeStringFromSeconds( this.params.host.nimby_busyfree_time)
+				+ ' CPU > ' + this.params.host.busy_cpu + '%';
+		if( this.params.host.nimby_idlefree_time )
+			info += '<br>Free time: '
+				+ cm_TimeStringFromSeconds( this.params.host.nimby_idlefree_time)
+				+ ' CPU: < ' + this.params.host.idle_cpu + '%';
+	}
+	info += '<br>';
+
+	info += '<br>Registered:<br> ' + cm_DateTimeStrFromSec( this.params.time_register);
+	if( this.params.time_launch )
+		info += '<br>Launched:<br> ' + cm_DateTimeStrFromSec( this.params.time_launch);
+	if( this.params.idle_time )
+		info += '<br>Idle since:<br> ' + cm_DateTimeStrFromSec( this.params.idle_time);
+	if( this.params.busy_time )
+		info += '<br>Busy since:<br> ' + cm_DateTimeStrFromSec( this.params.busy_time);
+	if( this.task_start_finish_time )
+		info += '<br>Task finished at:<br> ' + cm_DateTimeStrFromSec( this.params.task_start_finish_time);
+
+	this.monitor.setPanelInfo( info);
+}
+
+
+RenderNode.params = {};
+RenderNode.params.priority   = {"type":'num', "label":'Priority'};
+RenderNode.params.capacity   = {"type":'num', "label":'Capacity'};
+RenderNode.params.max_tasks  = {"type":'num', "label":'Maximum Tasks'};
+RenderNode.params.user_name  = {"type":'str', "label":'User Name'};
+RenderNode.params.annotation = {"type":'str', "label":'Annotation'};
+RenderNode.params.hidden     = {"type":'bl1', "label":'Hide/Unhide'};
 
 RenderNode.sort = ['priority','user_name','name'];
 RenderNode.filter = ['user_name','name','host_name'];
 
+RenderNode.actions = [];
 RenderNode.actionsCreated = false;
 RenderNode.createActions = function()
 {

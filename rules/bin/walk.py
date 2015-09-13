@@ -134,7 +134,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 
 		if os.path.isfile(path):
 			CurFiles += 1
-			out['num_files'] += 1
+			if entry[0] != '.': out['num_files'] += 1
 			out['num_files_total'] += 1
 			out['size_total'] += os.path.getsize(path)
 			out['size'] += os.path.getsize(path)

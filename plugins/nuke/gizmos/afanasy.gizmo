@@ -15,6 +15,7 @@ Gizmo {
    }
    addUserKnob { 26 "" l "" }
    addUserKnob {  3 framespertask   l "Frames Per Task"  }
+   addUserKnob {  3 framesequential l "Sequential"  -STARTLINE }
    addUserKnob { 26 "" l ""}
    addUserKnob { 22 knob_1 l RENDER T "cgru.render( nuke.toNode(\"this\"))"}
    addUserKnob {  6 startpaused     l "Start Paused" -STARTLINE }
@@ -57,6 +58,7 @@ Gizmo {
 	frameinc        1
 	framespertask   1
 	framespertask   1
+	framesequential 1
 	startpaused     0
 
 	maxhosts       -1

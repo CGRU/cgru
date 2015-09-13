@@ -3,8 +3,8 @@ RULES = {};
 RULES.rufolder = 'rules';
 RULES_TOP = {};
 
-c_movieTypes = ['mpg','mpeg','mov','avi','mp4','ogg','flv'];
-c_movieTypesHTML = ['ogg'];
+c_movieTypes = ['mpg','mpeg','mov','avi','mp4','m4v','ogg','ogv','mxf','flv'];
+c_movieTypesHTML = ['mp4','ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
 c_archives = ['zip','rar','7z','001'];
@@ -165,9 +165,10 @@ function c_Log( i_msg)
 	c_logCount++;
 }
 
-function c_DT_StrFromSec( i_time, i_nosec) { return c_DT_StrFromMSec( i_time*1000, i_nosec);}
+function c_DT_StrFromSec( i_time, i_nosec) { if( i_time == null) return ''; return c_DT_StrFromMSec( i_time*1000, i_nosec);}
 function c_DT_StrFromMSec( i_time, i_nosec)
 {
+	if( i_time == null ) return '';
 	var date = new Date(i_time);
 	date = date.toString();
 	date = date.substr( 0, date.indexOf(' GMT'));
@@ -222,6 +223,52 @@ function c_DT_DurFromSec( i_sec)
 }
 function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
+function c_TC_FromFrame( i_frame)
+{
+	var fps = RULES.fps;
+
+	var sec = Math.floor( i_frame / fps );
+	var frm = i_frame - sec * fps;
+	var min = Math.floor( sec / 60);
+	sec = sec - min * 60;
+	var hrs = Math.floor( min / 60);
+	min = min - hrs * 60;
+
+	if( hrs < 10 ) hrs = '0' + hrs;
+	if( min < 10 ) min = '0' + min;
+	if( sec < 10 ) sec = '0' + sec;
+	if( frm < 10 ) frm = '0' + frm;
+
+	return hrs + ':' + min + ':' + sec + ':' + frm;
+}
+
+function c_TC_FromSting( i_str)
+{
+//console.log('c_TC_FromSting: ' + i_str);
+	var nums = i_str.split(/\D+/);
+	if( nums.length == 0 )
+	{
+		c_Error('Invalid time code: ' + i_str);
+		return null;
+	}
+
+	var fps = RULES.fps;
+
+	var frms = 0;
+//console.log( nums);
+	var mult = [ 1, fps, fps*60, fps*3600];
+//console.log( mult);
+	var j = 0;
+	for( var i = nums.length-1; i >=0; i-- )
+	{
+//console.log(nums[i]);
+		if( nums[i].length == 0 ) continue;
+		frms += parseInt(nums[i]) * mult[j];
+		j++;
+	}
+
+	return frms;
+}
 
 function c_ElDisplayToggle( i_el)
 {
@@ -231,19 +278,38 @@ function c_ElDisplayToggle( i_el)
 		i_el.style.display = 'none';
 }
 
+function c_IsNotAnArtist(    i_user) { return c_IsUserStateSet( i_user,'notart'   ); }
+function c_CanEditPlaylist(  i_user) { return c_IsUserStateSet( i_user,'playlist' ); }
+function c_CanAssignArtists( i_user) { return c_IsUserStateSet( i_user,'assignart'); }
+function c_CanEditTasks(     i_user) { return c_IsUserStateSet( i_user,'edittasks'); }
+function c_CanEditBody(      i_user) { return c_IsUserStateSet( i_user,'editbody'); }
+function c_IsUserStateSet(   i_user, i_state)
+{
+	if( i_user == null ) i_user = g_auth_user;
+	if( i_user == null ) return false;
+
+	if((['playlist','assignart','edittasks','editbody']).indexOf( i_state ) != -1 )
+		if((['admin','coord','user']).indexOf( i_user.role ) != -1 ) return true;
+
+	if( i_user.states == null ) return false;
+	if( i_user.states.indexOf( i_state) != -1 ) return true;
+
+	return false;
+}
+
 // Construct from g_users sorted roles with sorted artists:
-// Provide i_show_list to show artist even if he is disabled or not an artist
-function c_GetRolesArtists( i_show_list)
+// Provide i_users to show specified users even if he is disabled or not an artist
+function c_GetRolesArtists( i_users)
 {
 	var roles_obj = {};
 	for( var uid in g_users )
 	{
 //console.log(g_users[uid].states);
-		if(( i_show_list == null ) || ( i_show_list[uid] == null ))
+		if(( i_users == null ) || ( i_users[uid] == null ))
 		{
 			if( g_users[uid].disabled )
 				continue;
-			if( g_users[uid].states && ( g_users[uid].states.indexOf('notart') != -1 ))
+			if( c_IsNotAnArtist( g_users[uid]))
 				continue;
 		}
 
@@ -369,21 +435,43 @@ function c_GetElInteger( i_el)
 	return num;
 }
 
-function c_CreateOpenButton( i_el, i_path)
+function c_CreateOpenButton( i_el, i_path, i_type)
 {
 	if( RULES.has_filesystem === false ) return null;
-	var el = document.createElement('div');
+	if( i_type == null ) i_type = 'div';
+	var el = document.createElement( i_type);
 	i_el.appendChild( el);
 	el.classList.add('cmdexec');
 	el.classList.add('open');
-	var cmd = RULES.cmdexec.open_folder;
-	cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+	var cmd = cgru_OpenFolderCmd( cgru_PM('/'+RULES.root + i_path))
 	el.setAttribute('cmdexec', JSON.stringify([cmd]));
 	el.title = 'Open location in a file browser.\nRMB "Run" menu item.'
 	return el;
 }
 
-function c_GetRuFilePath( i_file ) { return RULES.root + g_CurPath() + '/' + RULES.rufolder + '/' + i_file; }
+function c_FileDragStart( i_evt, i_path)
+{
+	var el = i_evt.currentTarget;
+	var path = cgru_PM('/' + RULES.root + i_path);
+	if( cgru_Platform.indexOf('windows') == -1 )
+		path = 'file://' + path;
+	var dt = i_evt.dataTransfer;
+	dt.setData('text/plain', path);
+	dt.setData('text/uri-list', path);
+//console.log(path);
+}
+
+function c_GetRuFilePath( i_file, i_path )
+{
+	var path = i_path;
+	if( path == null )
+		path = g_CurPath();
+
+	path += '/' + RULES.rufolder + '/' + i_file;
+	path = RULES.root + path;
+
+	return path;
+}
 function c_RuFileExists( i_file)
 {
 	if( g_elCurFolder.m_dir == null ) return false;

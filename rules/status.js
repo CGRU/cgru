@@ -14,22 +14,25 @@ function st_Finish()
 	st_Status = null;
 }
 
-function st_BodyModified()
+function st_BodyModified( i_st_obj, i_path)
 {
-	if( RULES.status == null ) RULES.status = {};
-	if( RULES.status.body == null )
+	var st_obj = i_st_obj;
+	if( st_obj == null ) st_obj = RULES.status;
+	if( st_obj == null ) st_obj = {};
+
+	if( st_obj.body == null )
 	{
-		RULES.status.body = {};
-		RULES.status.body.cuser = g_auth_user.id;
-		RULES.status.body.ctime = c_DT_CurSeconds();
+		st_obj.body = {};
+		st_obj.body.cuser = g_auth_user.id;
+		st_obj.body.ctime = c_DT_CurSeconds();
 	}
 	else
 	{
-		RULES.status.body.muser = g_auth_user.id;
-		RULES.status.body.mtime = c_DT_CurSeconds();
+		st_obj.body.muser = g_auth_user.id;
+		st_obj.body.mtime = c_DT_CurSeconds();
 	}
 
-	st_Save();
+	st_Save({'body':st_obj.body}, i_path, /*func*/null, /*args*/null, /*navig folder update params*/{});
 }
 
 function st_Show( i_status)
@@ -112,6 +115,10 @@ Status.prototype.show = function( i_status)
 	if( this.elTags       ) st_SetElTags(       this.obj, this.elTags);
 	if( this.elFramesNum  ) st_SetElFramesNum(  this.obj, this.elFramesNum);
 	if( this.elFinish     ) st_SetElFinish(     this.obj, this.elFinish);
+	if( this.elTimeCode && this.obj && this.obj.timecode_start && this.obj.timecode_finish )
+	{
+		this.elTimeCode.textContent = 'TC:' + this.obj.timecode_start + '-' + this.obj.timecode_finish;
+	}
 	if( this.elModified   )
 	{
 		var modified = '';
@@ -124,9 +131,6 @@ Status.prototype.show = function( i_status)
 		this.elModified.textContent = modified;
 	}
 
-//	if( this.elTasks )
-//		this.showTasks();
-
 	var args = {};
 	args.statuses = [this.obj];
 	args.elReports = this.elReports;
@@ -136,94 +140,91 @@ Status.prototype.show = function( i_status)
 
 	stcs_Show( args);
 }
-Status.prototype.showTasks = function()
-{
-	this.elTasks.textContent = '';
-	if(( this.obj == null )
-	|| ( this.obj.tasks == null )
-	|| ( this.obj.tasks.length == 0 ))
-	{
-		this.elTasksDiv.style.display = 'none';
-		return;
-	}
-	else
-		this.elTasksDiv.style.display = 'block';
-
-	var total_duration = 0;
-	for( var t = 0; t < this.obj.tasks.length; t++)
-	{
-		var task = this.obj.tasks[t];
-
-		var el = document.createElement('div');
-		this.elTasks.appendChild( el);
-		el.classList.add('task');
-
-		var elDur = document.createElement('div');
-		el.appendChild( elDur);
-		elDur.classList.add('duration');
-		elDur.textContent = task.duration;
-
-		if( task.tags && task.tags.length )
-		{
-			var elTags = document.createElement('div');
-			el.appendChild( elTags);
-			elTags.classList.add('tags');
-
-			for( var g = 0; g < task.tags.length; g++)
-			{
-				var elTag = document.createElement('div');
-				elTags.appendChild( elTag);
-				elTag.classList.add('tag');
-				elTag.textContent = c_GetTagTitle( task.tags[g]);
-			}
-		}
-
-		if( task.artists && task.artists.length )
-		{
-			var elTags = document.createElement('div');
-			el.appendChild( elTags);
-			elTags.classList.add('artists');
-
-			for( var g = 0; g < task.artists.length; g++)
-			{
-				var elTag = document.createElement('div');
-				elTags.appendChild( elTag);
-				elTag.classList.add('tag');
-				elTag.classList.add('artist');
-				elTag.textContent = c_GetUserTitle( task.artists[g]);
-			}
-		}
-
-		total_duration += task.duration;
-	}
-
-	var el = document.createElement('div');
-	this.elTasks.appendChild( el);
-	el.textContent = 'Total Duration: ' + total_duration;
-}
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
+	var clr = 'rgba(0,255,0,.4)';
+
+	if( i_elPercentage )
+	{
+		i_elPercentage.classList.remove('done');
+		i_elPercentage.classList.remove('started');
+		i_elPercentage.classList.add('notstarted');
+	}
+	if( i_elProgressBar )
+	{
+		i_elProgressBar.classList.remove('done');
+		i_elProgressBar.classList.remove('started');
+		i_elProgressBar.classList.add('notstarted');
+	}
+	if( i_elProgressHide )
+	{
+		i_elProgressHide.classList.remove('done');
+		i_elProgressHide.classList.remove('startred');
+		i_elProgressHide.classList.add('notstarted');
+	}
+
 	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
 	{
-		if( i_elProgressBar) i_elProgressBar.style.width = i_status.progress+'%';
-		if( i_elPercentage) i_elPercentage.textContent = i_status.progress+'%';
+		if( i_status.progress < 100 )
+		{
+			clr = 255 - Math.round( 2.55 * i_status.progress );
+			clr = 'rgba('+clr+',255,0,.8)';
+		}
+
+		if( i_elProgressBar)
+		{
+			i_elProgressBar.style.width = i_status.progress+'%';
+			if( i_status.progress > 0 )
+			{
+				i_elProgressBar.classList.add('startred');
+				i_elProgressBar.classList.remove('notstarted');
+			}
+			if( i_status.progress >= 100 )
+				i_elProgressBar.classList.add('done');
+		}
+		if( i_elPercentage)
+		{
+			i_elPercentage.style.display = 'block';
+			i_elPercentage.textContent = i_status.progress+'%';
+			if( i_status.progress > 0 )
+			{
+				i_elPercentage.classList.add('startred');
+				i_elPercentage.classList.remove('notstarted');
+			}
+			if( i_status.progress >= 100 )
+				i_elPercentage.classList.add('done');
+		}
 		if( i_elProgressHide)
 		{
 			i_elProgressHide.style.display = 'block';
 			i_elProgressHide.title = i_status.progress+'%';
+			if( i_status.progress > 0 )
+			{
+				i_elProgressHide.classList.add('startred');
+				i_elProgressHide.classList.remove('notstarted');
+			}
+			if( i_status.progress >= 100 )
+				i_elProgressHide.classList.add('done');
 		}
 	}
 	else
 	{
 		if( i_elProgressBar) i_elProgressBar.style.width = '0';
-		if( i_elPercentage) i_elPercentage.textContent = '';
+		if( i_elPercentage)
+		{
+			i_elPercentage.textContent = '';
+			i_elPercentage.style.display = 'none';
+		}
 		if( i_elProgressHide)
 		{
 			i_elProgressHide.style.display = 'none';
 			i_elProgressHide.title = null;
 		}
 	}
+
+	if( i_elProgressBar )
+		i_elProgressBar.style.backgroundColor = clr;
 }
 
 function st_SetElLabel( i_status, i_el, i_full)
@@ -305,6 +306,13 @@ function st_SetElArtists( i_status, i_el, i_short)
 			{
 				el.title = 'It`s me!\n - may be i should do something here?';
 			}
+		}
+
+		var avatar = c_GetAvatar( i_status.artists[i]);
+		if( avatar)
+		{
+			el.classList.add('with_icon');
+			el.style.backgroundImage = 'url(' + avatar + ')';
 		}
 	}
 }
@@ -402,6 +410,12 @@ Status.prototype.edit = function( i_args)
 {
 //console.log( JSON.stringify( i_args));
 //console.log(JSON.stringify(i_status));
+	if( g_auth_user == null )
+	{
+		c_Error('Guests can`t edit status.');
+		return;
+	}
+
 	if( this.obj == null ) this.obj = {};
 
 	// If editing element is exists, status is already in edit mode:
@@ -471,12 +485,10 @@ Status.prototype.edit = function( i_args)
 
 	var elProgressDiv = document.createElement('div');
 	this.elEdit.appendChild( elProgressDiv);
-//	elProgressDiv.style.cssFloat = 'left';
 	elProgressDiv.classList.add('percent');
 	var elProgressLabel = document.createElement('div');
 	elProgressDiv.appendChild( elProgressLabel);
 	elProgressLabel.textContent = 'Progress:';
-//	elProgressLabel.style.cssFloat = 'left';
 	elProgressLabel.style.fontSize = '12px';
 	this.elEdit_progress = document.createElement('div');
 	elProgressDiv.appendChild( this.elEdit_progress);
@@ -526,8 +538,10 @@ Status.prototype.edit = function( i_args)
 			}
 		}
 
-	this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,   "elEdit":this.elEdit});
-	this.editListShow({"name":'tags',   "label":'Tags:',   "list":tags,   "list_all":RULES.tags,"elEdit":this.elEdit});
+	if( c_CanAssignArtists())
+		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":this.elEdit});
+
+	this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_Color);
@@ -539,22 +553,19 @@ Status.prototype.edit = function( i_args)
 	this.elEdit.appendChild( this.elEdit_tasks);
 	this.elEdit_tasks.classList.add('edit_tasks');
 
-	var elTasksPanel = document.createElement('div');
-	this.elEdit_tasks.appendChild( elTasksPanel);
+	if( c_CanEditTasks())
+	{
+		this.elTasksPanel = document.createElement('div');
+		this.elEdit_tasks.appendChild( this.elTasksPanel);
 
-	var el = document.createElement('div');
-	elTasksPanel.appendChild( el);
-	el.textContent = 'Add';
-	el.classList.add('button');
-	el.style.cssFloat = 'right';
-	el.m_status = this;
-	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
-
-	var el = document.createElement('div');
-	elTasksPanel.appendChild( el);
-	el.textContent = 'Tasks:';
-
-	this.editTasksShow();
+		var el = document.createElement('div');
+		this.elTasksPanel.appendChild( el);
+		el.classList.add('button');
+		el.textContent = 'Tasks';
+		el.m_args = i_args;
+		el.m_status = this;
+		el.onclick = function(e){ e.currentTarget.m_status.editTasksShow( e, e.currentTarget.m_args); }
+	}
 
 
 	// Get values:
@@ -586,6 +597,37 @@ Status.prototype.edit = function( i_args)
 	}
 
 	this.elEdit_annotation.focus();
+}
+Status.prototype.editTasksShow = function( i_evt, i_args)
+{
+	// Show tasks only once:
+	if( this.elEdit_tasks.elTasks ) return;
+
+	// And remember it creating an array for task elements:
+	this.elEdit_tasks.elTasks = [];
+
+	var elTasksBtn = i_evt.currentTarget;
+	elTasksBtn.classList.remove('button');
+
+	var el = document.createElement('div');
+	this.elTasksPanel.insertBefore( el, elTasksBtn);
+	el.textContent = 'Add Task';
+	el.classList.add('button');
+	el.classList.add('task_add');
+	el.m_status = this;
+	el.onclick = function(e){ e.currentTarget.m_status.addTaskOnClick()};
+
+	// If this is scene shots multiselection:
+	if( i_args && i_args.statuses && i_args.statuses.length )
+	{
+		var el = document.createElement('div');
+		this.elTasksPanel.appendChild( el);
+		el.textContent = 'WARNING! This is scene shots multiselection, all previous tasks information will be dropped!';
+		el.classList.add('tasks_multiedit_message');
+		return;
+	}
+
+	this.editTasksShowTasks();
 }
 Status.prototype.editOnKeyDown = function(e, i_args)
 {
@@ -641,7 +683,20 @@ Status.prototype.editListShow = function( i_args)
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
 		if( i_args.name == 'artists' )
+		{
 			el.classList.add('artist');
+			if( id == g_auth_user.id )
+				el.classList.add('me');
+		}
+
+		var icon = null;
+		if( i_args.name == 'artists')
+			icon = c_GetAvatar( id);
+		if( icon)
+		{
+			el.classList.add('with_icon');
+			el.style.backgroundImage = 'url(' + icon + ')';
+		}
 
 		if( i_args.list_all[id] && i_args.list_all[id].disabled )
 			el.classList.add('disabled');
@@ -660,6 +715,7 @@ Status.prototype.editListEdit = function( i_args)
 	i_args.elRoot.m_edit = true;
 	i_args.elRoot.m_elBtn.classList.remove('button');
 	i_args.elRoot.m_elList.style.display = 'none';
+	i_args.elRoot.classList.add('edit');
 
 	i_args.elEdit[i_args.name] = [];
 
@@ -728,6 +784,8 @@ Status.prototype.editArtistsEdit = function( i_args)
 			el.classList.add('tag');
 			el.classList.add('artist');
 			el.m_item = artist.id;
+			if( artist.id == g_auth_user.id )
+				el.classList.add('edit_me');
 
 			if( g_users[artist.id] && g_users[artist.id].disabled )
 				el.classList.add('disabled');
@@ -739,6 +797,13 @@ Status.prototype.editArtistsEdit = function( i_args)
 
 			if( artist.tip )
 				el.title = artist.tip;
+
+			var avatar = c_GetAvatar( artist.id);
+			if( avatar)
+			{
+				el.classList.add('with_icon');
+				el.style.backgroundImage = 'url(' + avatar + ')';
+			}
 
 			if( i_args.list[artist.id] )
 			{
@@ -791,13 +856,14 @@ Status.prototype.addTaskOnClick = function()
 
 	var task = {};
 	task.duration = 1;
+	task.price = 0;
 	task.tags = [];
 	task.artists = [];
 
-	this.editTasksShow({"new":task});
+	this.editTasksShowTasks({"new":task});
 }
 
-Status.prototype.editTasksShow = function( i_args)
+Status.prototype.editTasksShowTasks = function( i_args)
 {
 	var tasks = this.obj.tasks;
 	if( i_args && i_args.new )
@@ -805,14 +871,26 @@ Status.prototype.editTasksShow = function( i_args)
 
 	if( tasks == null ) return;
 
-	if( this.elEdit_tasks.elTasks == null )
-		this.elEdit_tasks.elTasks = [];
-
 	for( var t = 0; t < tasks.length; t++)
 	{
 		var el = document.createElement('div');
 		this.elEdit_tasks.appendChild( el);
 		el.classList.add('task');
+
+		var elDel = document.createElement('div');
+		el.appendChild( elDel);
+		elDel.classList.add('button');
+		elDel.classList.add('delete');
+		//elDel.textContent = 'Delete';
+		elDel.title = 'Delete Task\n(by double click)';
+		elDel.m_status = this;
+		elDel.m_elTask = el;
+		elDel.ondblclick = function(e){
+			var st = e.currentTarget.m_status;
+			var el = e.currentTarget.m_elTask;
+			st.elEdit_tasks.elTasks.splice( st.elEdit_tasks.elTasks.indexOf(el),1);
+			st.elEdit_tasks.removeChild( el);
+		}
 
 		var elDurDiv = document.createElement('div');
 		el.appendChild( elDurDiv);
@@ -830,19 +908,24 @@ Status.prototype.editTasksShow = function( i_args)
 		elDur.classList.add('editing');
 		elDur.classList.add('duration');
 
-		var elDel = document.createElement('div');
-		el.appendChild( elDel);
-		elDel.classList.add('button');
-		elDel.textContent = '-';
-		elDel.title = 'Delete Task\n(by double click)';
-		elDel.m_status = this;
-		elDel.m_elTask = el;
-		elDel.ondblclick = function(e){
-			var st = e.currentTarget.m_status;
-			var el = e.currentTarget.m_elTask;
-			st.elEdit_tasks.elTasks.splice( st.elEdit_tasks.elTasks.indexOf(el),1);
-			st.elEdit_tasks.removeChild( el);
-		}
+		var elPrcDiv = document.createElement('div');
+		el.appendChild( elPrcDiv);
+		elPrcDiv.classList.add('prc_div');
+		elPrcDiv.classList.add('dur_div');
+
+		var elPrcLabel = document.createElement('div');
+		elPrcDiv.appendChild( elPrcLabel);
+		elPrcLabel.textContent = 'Price: ';
+		elPrcLabel.classList.add('prc_label');
+		elPrcLabel.classList.add('dur_label');
+
+		var elPrice = document.createElement('div');
+		elPrcDiv.appendChild( elPrice);
+		elPrice.textContent = tasks[t].price;
+		elPrice.contentEditable = true;
+		elPrice.classList.add('editing');
+		elPrice.classList.add('price');
+		elPrice.classList.add('duration');
 
 		var tags = {};
 		if( tasks[t].tags )
@@ -852,22 +935,29 @@ Status.prototype.editTasksShow = function( i_args)
 			tags[id] = {"title":c_GetTagTitle(id),"tooltip":c_GetTagTip(id)};
 		}
 		var elTags = document.createElement('div');
+		elTags.classList.add('tags');
 		el.appendChild( elTags);
 		this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":elTags});
 
-		var artists = {};
-		if( tasks[t].artists )
-		for( var g = 0; g < tasks[t].artists.length; g++)
+		if( c_CanAssignArtists())
 		{
-			var id = tasks[t].artists[g];
-			artists[id] = {"title":c_GetUserTitle(id)};
+			var artists = {};
+			if( tasks[t].artists )
+			{
+				for( var g = 0; g < tasks[t].artists.length; g++)
+				{
+					var id = tasks[t].artists[g];
+					artists[id] = {"title":c_GetUserTitle(id)};
+				}
+			}
+			var elArtists = document.createElement('div');
+			el.appendChild( elArtists);
+			this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
 		}
-		var elArtists = document.createElement('div');
-		el.appendChild( elArtists);
-		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":elArtists});
 
 		el.m_task = tasks[t];
 		el.m_elDur = elDur;
+		el.m_elPrice = elPrice;
 		el.m_elTags = elTags;
 		el.m_elArtists = elArtists;
 		this.elEdit_tasks.elTasks.push( el);
@@ -895,6 +985,7 @@ Status.prototype.editSave = function( i_args)
 	var progress = null;
 	var artists = null;
 	var tags = null;
+	var tasks = null;
 
 	// Get values from GUI:
 
@@ -924,7 +1015,8 @@ Status.prototype.editSave = function( i_args)
 
 	if( this.elEdit_annotation.textContent != st_MultiValue )
 	{
-		annotation = c_Strip( this.elEdit_annotation.innerHTML);
+		this.elEdit_annotation.innerHTML = this.elEdit_annotation.textContent;
+		annotation = c_Strip( this.elEdit_annotation.textContent);
 	}
 
 	if( this.elEdit.artists )
@@ -955,19 +1047,20 @@ Status.prototype.editSave = function( i_args)
 
 	if( this.elEdit_tasks.elTasks )
 	{
-		// Task are set to the current status only.
-		// Mutli selection edit is not supported.
-
-		this.obj.tasks = [];
+		tasks = [];
 
 		for( var t = 0; t < this.elEdit_tasks.elTasks.length; t++)
 		{
 			var elTask = this.elEdit_tasks.elTasks[t];
 			var task = {};
 
-			var duration = parseInt( c_Strip( elTask.m_elDur.textContent ));
+			var duration = parseFloat( c_Strip( elTask.m_elDur.textContent ));
 			if( ! isNaN( duration ))
 				task.duration = duration;
+
+			var price = parseFloat( c_Strip( elTask.m_elPrice.textContent ));
+			if( ! isNaN( price ))
+				task.price = price;
 
 			if( elTask.m_elTags.tags)
 			{
@@ -988,7 +1081,7 @@ Status.prototype.editSave = function( i_args)
 			else if( elTask.m_task.tags )
 				task.tags = elTask.m_task.tags;
 
-			if( elTask.m_elArtists.artists)
+			if( elTask.m_elArtists && elTask.m_elArtists.artists)
 			{
 				task.artists = [];
 				elList = elTask.m_elArtists.artists;
@@ -1007,7 +1100,7 @@ Status.prototype.editSave = function( i_args)
 			else if( elTask.m_task.artists )
 				task.artists = elTask.m_task.artists;
 
-			this.obj.tasks.push( task);
+			tasks.push( task);
 		}
 	}
 
@@ -1024,7 +1117,7 @@ Status.prototype.editSave = function( i_args)
 	// Set values to statuses
 	var some_progress_changed = false;
 	var progresses = {};
-	var load_news = false;
+	var news = [];
 	for( var i = 0; i < statuses.length; i++)
 	{
 		if( statuses[i].obj == null ) statuses[i].obj = {};
@@ -1066,22 +1159,22 @@ Status.prototype.editSave = function( i_args)
 					statuses[i].obj.tags.push( id);
 		}
 
+		if( tasks )
+			statuses[i].obj.tasks = tasks;
+
 		if( this.elEdit_Color.m_color_changed )
 			statuses[i].obj.color = this.elEdit_Color.m_color;
 
 		// Status saving produce news.
-		// Making news produce loading them by default.
-		// We should reload news only at last:
-		if( i == (statuses.length - 1)) load_news = true;
-		statuses[i].save({"load_news":load_news});
+		news.push( statuses[i].save());
 
 		// Status showing causes values redraw,
 		// and destoys edit GUI if any.
 		statuses[i].show();
 	}
 
-//	this.save();
-//	this.show();
+	// Send news:
+	nw_SendNews( news);
 
 	if( some_progress_changed )
 		st_UpdateProgresses( this.path, progresses);
@@ -1089,29 +1182,29 @@ Status.prototype.editSave = function( i_args)
 	c_Info('Status(es) saved.');
 }
 
-Status.prototype.save = function( i_args)
+Status.prototype.save = function()
 {
 	this.obj.muser = g_auth_user.id;
 	this.obj.mtime = c_DT_CurSeconds();
 
 	st_Save( this.obj, this.path);
-	nw_MakeNews({"title":'status',"path":this.path,"artists":this.obj.artists},{"load":i_args.load_news});
+	return nw_CreateNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 }
 
-function st_Save( i_status, i_path, i_func, i_args, i_navig_up)
+function st_Save( i_status, i_path, i_func, i_args, i_navig_params_update)
 {
 	if( i_status == null ) i_status = RULES.status;
 	if( i_path == null ) i_path = g_CurPath();
 
-	g_FolderSetStatusPath( i_status, i_path, i_navig_up);
+	g_FolderSetStatusPath( i_status, i_path, i_navig_params_update);
 	n_walks[i_path] = null;
 
 	var obj = {};
 	obj.object = {"status":i_status};
 	obj.add = true;
-	obj.file = RULES.root + i_path + '/' + RULES.rufolder + '/status.json';
+	obj.file = c_GetRuFilePath('status.json', i_path);
 
-	n_Request({"send":{"editobj":obj},"func":i_func,"args":i_args,"wait":false});
+	n_Request({"send":{"editobj":obj},"func":i_func,"args":i_args,"wait":false,'info':'status save'});
 }
 
 function st_SetFramesNumber( i_num)
@@ -1127,6 +1220,56 @@ function st_SetFramesNumber( i_num)
 
 	$('status_framesnum_div').classList.add('updated');
 	$('status_framesnum_div').title = 'Frames number updated\nPrevous value: ' + RULES.status.frames_num;
+}
+
+function st_SetTimeCode( i_tc)
+{
+	if(( i_tc == null ) || ( i_tc.length < 1 ))
+	{
+		return;
+	}
+
+	var tc = i_tc;
+	tc = tc.split('-');
+	if( tc.length != 2 )
+	{
+		c_Error('Invalid time code: ' + i_tc );
+		return;
+	}
+
+	var frame_start = c_TC_FromSting(tc[0].replace());
+	if( frame_start === null )
+	{
+		c_Error('Invalid start time code: ' + tc[0]);
+		return;
+	}
+
+	var frame_finish = c_TC_FromSting(tc[1]);
+	if( frame_finish === null )
+	{
+		c_Error('Invalid finish time code: ' + tc[1]);
+		return;
+	}
+	var timecode_start = c_TC_FromFrame( frame_start);
+
+	var frames_num = frame_finish - frame_start + 1;
+	if( frames_num <= 0 )
+	{
+		c_Error('Start time code is grater than finish: ' + tc[1]);
+		return;
+	}
+	var timecode_finish = c_TC_FromFrame( frame_finish);
+
+//console.log( timecode_start + ' - ' + timecode_finish + ' = ' + frames_num);
+
+	if( RULES.status == null ) RULES.status = {};
+
+	if(( RULES.status.timecode_start == timecode_start ) && ( RULES.status.timecode_finish == timecode_finish ))
+		return;
+
+	RULES.status.timecode_start = timecode_start;
+	RULES.status.timecode_finish = timecode_finish;
+	st_Save({'timecode_start':timecode_start,'timecode_finish':timecode_finish}, null, null, null, {});
 }
 
 function st_UpdateProgresses( i_path, i_progresses)
@@ -1156,6 +1299,10 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 {
 	if( i_walks == null ) return;
 
+	// Update only progess in navig:
+	var navig_params_update = {};
+	navig_params_update.progress = true;
+
 	for( var w = i_walks.length-1; w >= 0; w--)
 	{
 //window.console.log( i_walks[w]);
@@ -1183,12 +1330,16 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 			}
 			else
 			{
-//if( folder.status ) console.log( folder.name+': '+folder.status.progress);
+				// Here we set and save 0% progress on a neighbour folders,
+				// we status or pregress is not set at all:
+
 				if(( folder.status == null ) || ( folder.status.progress == null ))
 				{
-//console.log(folder.name+': null');
+					// Siblinkgs are only at last walk ( earlier are parents )
 					if( w != (i_walks.length-1)) continue;
-					st_Save({"progress":0}, path);
+
+					// Save only progress:
+					st_Save({"progress":0}, path,/*func=*/null,/*args=*/null, navig_params_update);
 				}
 				else if( folder.status.progress < 0 ) continue;
 				else progress += folder.status.progress;
@@ -1207,16 +1358,12 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 //console.log(paths[w]+': '+progress_count+': '+progress);
 	}
 
-	// Update only progess in navig:
-	var navig_up = {};
-	navig_up.progress = true;
-
 	for( var path in progresses)
 	{
 		if( i_args.paths_skip_save.indexOf(path) != -1 )
 			continue;
 
-		st_Save({"progress":progresses[path]}, path,/*func=*/null,/*args=*/null, navig_up);
+		st_Save({"progress":progresses[path]}, path,/*func=*/null,/*args=*/null, navig_params_update);
 //console.log(path);
 	}
 }

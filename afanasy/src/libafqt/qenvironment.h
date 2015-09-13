@@ -84,6 +84,7 @@ public:
 	static AttrColor clr_selected;
 	static AttrColor clr_itemjob;
 	static AttrColor clr_itemjoboff;
+	static AttrColor clr_itemjobppa;
 	static AttrColor clr_itemjobwtime;
 	static AttrColor clr_itemjobwdep;
 	static AttrColor clr_itemjobdone;

@@ -14,6 +14,7 @@ DBJob::DBJob()
 	dbAddAttr( new DBAttrString( DBAttr::_blockname,      &m_blockname      ));
 	dbAddAttr( new DBAttrInt32 ( DBAttr::_capacity,       &m_capacity       ));
 	dbAddAttr( new DBAttrString( DBAttr::_description,    &m_description    ));
+	dbAddAttr( new DBAttrString( DBAttr::_folder,         &m_folder         ));
 	dbAddAttr( new DBAttrString( DBAttr::_jobname,        &m_jobname        ));
 	dbAddAttr( new DBAttrString( DBAttr::_hostname,       &m_hostname       ));
 	dbAddAttr( new DBAttrString( DBAttr::_service,        &m_service        ));
@@ -34,6 +35,7 @@ void DBJob::add( const af::Job * i_job, std::list<std::string> * o_queries)
 	// Get job parameters:
 	m_jobname     = i_job->getName();
 	m_description = i_job->getDescription();
+	m_folder      = i_job->getFolder();
 	m_annotation  = i_job->getAnnotation();
 	m_username    = i_job->getUserName();
 	m_hostname    = i_job->getHostName();

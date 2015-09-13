@@ -2,17 +2,29 @@
 
 #scenes_ctrl_panel { -float: right; margin: 2px 8px; font-size: 14px; }
 #scenes_ctrl_panel div { float: left; margin: 2px 4px; }
+#scenes_select_panel { border: 1px solid rgba(98,98,98,.5); border-radius: 2px; font-size: 12px;}
+#scenes_select_panel > div { margin:1px; padding: 2px 4px; }
 
-.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px;}
+.shot, .scene { border: 2px solid rgba(0,0,0,.6); border-radius: 2px; margin: 4px; position: relative; }
 
-.shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
+.shot .thumbnail { float: left; margin-right: 20px; }
+.shot .name_body { /*height: 84px; *//*overflow: auto;*//* border: 1px solid #FF0;*/ }
+.shot .name_body .timecode { padding: 1px 8px; float: right; font-size: 12px; }
+.shot .name_body .frames_num_div { float: right; font: 14px monospace; }
+.shot .name_body .frames_num_label { float: left; }
+.shot .name_body .frames_num { float: right; }
+.shot .name_body .edit { float: right; width: 10px; height: 10px; }
+.shot .name_body .edit_panel { float: right; font-size: 10px; }
+.shot .name_body .edit_panel > div { float: right; padding: 1px 4px; }
+.shot .name_body .body { height: 64px; font-size: 14px; margin-top: 4px;/* border: 1px solid #F00;*/ }
+
 .shot .status { clear:both; /*border: 1px solid #000;*/ }
-.shot .status .btn_edit { float: right; font-size: 10px; }
 .shot .status .percent { float: left; margin-right: 5px; }
 .shot .status .annotation { float: left; margin-right: 5px; }
 .shot .status .artists { float: left; margin-right: 5px; }
 .shot .status .tags { float: left; margin-right: 5px; }
 .shot .status .progressbar { clear: both; height: 8px; }
+.shot .status .button.edit { float: right; font-size: 10px; }
 
 #scenes_tasks .task { margin: 2px; border: 1px solid #777; }
 #scenes_tasks .task > div { float: left; margin: 2px 4px; }
@@ -21,11 +33,9 @@
 .scene a { color: inherit; /*display:block;*/ }
 .scene a:hover { color: #AFF;}
 .scene .shot {
-position: relative;
 float: left;
 border-radius: 2px;
 margin: 4px;
-/*box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;*/
 width: 200px;
 height: 44px;
 }
@@ -68,6 +78,8 @@ opacity:.9;
 
 .shot.selected { border: 2px solid #7FF; box-shadow: 0 0 4px #7FF inset, 0 0 4px #7FF;}
 
+#scenes_statistics > div { margin: 4px; padding: 2px; border-radius: 2px; border: 1px solid #777; }
+#scenes_statistics > div > div { margin: 4px; }
 #scenes_statistics .bars .bar { height: 12px; margin: 2px 0px; }
 #scenes_statistics .bars .bar .rect {
 background: rgba(0,250,0,.3);
@@ -80,10 +92,12 @@ border-radius: 2px;
 </style>
 
 <div id="scenes_ctrl_panel" style="float:right;">
-	<div style="border: 1px solid rgba(98,98,98,.5); border-radius: 2px; font-size: 12px;">
+	<div id="scenes_select_panel">
 		<div>Select:</div>
 		<div class="button" onclick="scenes_SelectAll(false)" title="Unselect All Shots">None</div>
-		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">Playlist</div>
+		<div class="button" onclick="scenes_SelectPlaylist()" title="Select Currnet Playlist">PL</div>
+		<div class="button" onclick="scenes_SelectSameColor()" title="Select Same Color">Clr</div>
+		<div class="button" onclick="scenes_SelectInvert()" title="Invert Selection">Inv</div>
 		<div class="button" onclick="scenes_SelectAll(true)" title="Select All Shots">All</div>
 	</div>
 	<div class="button" onclick="scenes_Put()" title="Put shots results"
@@ -92,7 +106,7 @@ border-radius: 2px;
 		style="width: 18px; height:18px; background-image:url(rules/icons/convert.png)"></div>
 </div>
 
-<div id="scenes_info" style="-float:left; margin: 4px 12px;"></div>
+<div id="scenes_info" style="-float:left; font-size: 14px; margin: 4px 12px;"></div>
 
 <div style="clear:both" id="scenes_div"></div>
 
@@ -102,17 +116,17 @@ border-radius: 2px;
 </div>
 
 <div id="scenes_statistics">
-	<div id="scenes_tasks_div" style="margin:4px; padding:2px; border:1px solid #777">
+	<div id="scenes_tasks_div">
 		Tasks:
-		<div id="scenes_tasks" style="margin: 4px;"></div>
+		<div id="scenes_tasks"></div>
 	</div>
-	<div id="scenes_reports_div" style="margin:4px; padding:2px; border:1px solid #777">
+	<div id="scenes_reports_div">
 		Reports:
-		<div id="scenes_reports" style="margin: 4px;"></div>
+		<div id="scenes_reports"></div>
 	</div>
-	<div id="scenes_differ_div" style="margin:4px; padding:2px; border:1px solid #777">
+	<div id="scenes_differ_div">
 		Tasks / Reports Difference:
-		<div id="scenes_differ" style="margin: 4px;"></div>
+		<div id="scenes_differ"></div>
 	</div>
 </div>
 

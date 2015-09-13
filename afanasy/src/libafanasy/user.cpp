@@ -96,12 +96,12 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << "\n}";
 }
 
-void User::jsonRead( const JSON &i_object, std::string * io_changes)
+bool User::jsonRead( const JSON &i_object, std::string * io_changes)
 {
 	if( false == i_object.IsObject())
 	{
 		AFERROR("User::jsonRead: Not a JSON object.")
-		return;
+		return false;
 	}
 
 	jr_int32 ("max_running_tasks",     m_max_running_tasks,     i_object, io_changes);
@@ -125,12 +125,14 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
-		return;
+		return true;
 
 	jr_int64("time_activity", m_time_activity, i_object);
 	jr_int64("time_register", m_time_register, i_object);
 
 	Node::jsonRead( i_object);
+
+	return true;
 }
 
 void User::v_readwrite( Msg * msg)
