@@ -131,12 +131,6 @@ const std::string DBAttr::DBString( const std::string * str) const
 		int size = str->size();
 		dbstr = *str;
 		dbstr.resize(DBLength[type]);
-		AFERRAR("DBAttr::DBString: Attribute '%s' of type '%s' with lenght=%d clampled to %d.\n\tOriginal Value:\n%s\n\tClamped Value:\n%s",
-					DBName[type].c_str(),
-					DBType[type].c_str(),
-					size, DBLength[type],
-					str->c_str(),
-					dbstr.c_str())
 		dbstr = af::Environment::get_DB_StringQuotes() + dbstr + af::Environment::get_DB_StringQuotes();
 	}
 	else

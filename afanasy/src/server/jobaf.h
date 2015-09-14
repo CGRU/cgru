@@ -67,7 +67,7 @@ public:
 
 /// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/
-     bool v_canRun();
+     virtual bool v_canRun();
 
 /// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/

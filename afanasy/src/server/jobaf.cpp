@@ -909,7 +909,15 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		task_exec->setJobName( m_name);
 		task_exec->setUserName( m_user_name);
 		listeners.process( *task_exec);
-		m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring);
+
+		// Job was not able to start a task.
+		// This should not happen.
+		// This is some error situation (probably system job), see server log.
+		if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring))
+		{
+			delete task_exec;
+			continue;
+		}
 
 		// If job was not started it became started
 		if( m_time_started == 0 )

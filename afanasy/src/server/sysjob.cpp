@@ -104,9 +104,13 @@ void SysTask::v_refresh( time_t currentTime, RenderContainer * renders, MonitorC
 {
 AFINFO("SysTask::refresh:");
 	Task::v_refresh( currentTime, renders, monitoring, errorHostId);
-	if( m_birthtime == 0 ) m_birthtime = currentTime;
+
+	if( m_birthtime == 0 )
+		m_birthtime = currentTime;
+
 	if((currentTime - m_birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
 	{
+		// Probably sys tasts can`t run (no service, nimby, etc)
 		std::string message = std::string("Error: Task age(") + af::itos( currentTime - m_birthtime) + ") > " + af::itos( af::Environment::getSysJobTaskLife());
 		v_appendLog( message);
 		// Store error in job log
@@ -206,21 +210,27 @@ bool SysBlock::isReady() const
 			ready = false;
 		}
 	}
-	if( ready ) m_taskprogress->state |= AFJOB::STATE_READY_MASK;
+
+	if( ready )
+		m_taskprogress->state |= AFJOB::STATE_READY_MASK;
 
 	return ready;
 }
 
-void SysBlock::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
+bool SysBlock::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
-AFINFO("SysBlock::startTask:");
+//printf("SysBlock::startTask:\n");
 	taskexec->setBlockName( m_data->getName());
 	SysTask * systask = getReadySysTask();
 
 	// Add new ready task:
 	if( systask == NULL ) systask = addTask( taskexec);
 
-	if( systask == NULL ) return;
+	if( systask == NULL )
+	{
+		AFERRAR("Can`t start system task of '%s' block.", m_data->getName().c_str())
+		return false;
+	}
 
 	systask->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
 
@@ -228,12 +238,16 @@ AFINFO("SysBlock::startTask:");
 	m_taskprogress->starts_count++;
 
 	if( monitoring ) m_tasks[0]->v_monitor( monitoring);
+
+	return true;
 }
 
 SysTask * SysBlock::getReadySysTask() const
 {
 	for( std::list<SysTask*>::const_iterator it = m_systasks.begin(); it != m_systasks.end(); it++)
-		if( (*it)->isReady() ) return *it;
+		if( (*it)->isReady() )
+			return *it;
+
 	return NULL;
 }
 
@@ -265,6 +279,9 @@ AFINFO("SysBlock::addTask:");
 		}
 		if( found ) break;
 	}
+
+	// There is alrady lots of tasks in quere,
+	// probably system job can`t run at all
 	if( false == found )
 	{
 		std::string message = std::string("Can't find task number (max=") + af::itos(af::Environment::getSysJobTasksMax()) + ")";
@@ -275,6 +292,7 @@ AFINFO("SysBlock::addTask:");
 
 	// Create system task:
 	SysTask * systask = new SysTask( taskexec, command, this, number);
+
 	// Delete first command pointer ( command data will be deleted in task destructor):
 	m_commands.pop_front();
 
@@ -525,12 +543,29 @@ void SysJob::AddEventCommand( const std::string & i_cmd, const std::string & i_w
 	ms_block_events->addCommand( new SysCmd( i_cmd, i_wdir, i_user_name, i_job_name, i_task_name));
 }
 
-bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
+bool SysJob::isReady()
 {
-//printf("SysJob::solve:\n");
 	for( int b = 0; b < m_blocks_num; b++ )
 		if(((SysBlock*)(m_blocks[b]))->isReady())
-			return JobAf::v_solve( render, monitoring);
+			return true;
+
+	return false;
+}
+
+bool SysJob::v_canRun()
+{
+//printf("SysJob::v_canRun():\n");
+	if( false == isReady())
+		return false;
+
+	return JobAf::v_canRun();
+}
+
+bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
+{
+//printf("SysJob::solve():\n");
+	if( isReady())
+		return JobAf::v_solve( render, monitoring);
 
 	return false;
 }

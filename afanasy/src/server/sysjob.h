@@ -71,7 +71,7 @@ public:
 
 	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_getErrorHostsList( std::list<std::string> & o_list) const;
-	virtual void v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+	virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 	virtual void v_errorHostsAppend( int task, int hostId, RenderContainer * renders);
 	virtual void v_errorHostsReset();
 
@@ -116,6 +116,7 @@ public:
 
 	bool initSystem();
 
+	virtual bool v_canRun();
 	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
@@ -132,6 +133,8 @@ protected:
 	virtual Block * v_newBlock( int numBlock);
 
 private:
+	bool isReady();
+
 	static SysJob * ms_sysjob;
 	static SysBlock * ms_block_cmdpost;
 	static SysBlock * ms_block_wol;
