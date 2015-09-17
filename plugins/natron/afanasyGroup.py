@@ -176,7 +176,7 @@ def createInstance(i_app,i_grp):
 	p.setAddNewLine(True)
 	page.addParam(p)
 
-	p = i_grp.createButtonParam('af_send_job','Send Afanasy Job')
+	p = i_grp.createButtonParam('afanasy_button_send_job','Send Afanasy Job')
 	p.setHelp('Constuct and send job to Afanasy server.')
 	p.setAddNewLine(False)
 	p.setPersistant(False)
