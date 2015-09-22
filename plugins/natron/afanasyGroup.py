@@ -140,6 +140,13 @@ def createInstance(i_app,i_grp):
 	p.setAddNewLine(True)
 	page.addParam(p)
 
+	p = i_grp.createButtonParam('afanasy_button_frame_range','Get Frame Range From Project Settigs')
+	p.setHelp('Set first and last frame parameters from current project settings.')
+	p.setAddNewLine(False)
+	p.setPersistant(False)
+	p.setEvaluateOnChange(False)
+	page.addParam(p)
+
 	p = i_grp.createIntParam('af_frame_first','First Frame')
 	p.setDefaultValue( i_app.timelineGetLeftBound(), 0)
 	p.setEvaluateOnChange(False)
@@ -170,7 +177,7 @@ def createInstance(i_app,i_grp):
 
 	p = i_grp.createIntParam('af_frame_sequential','Sequential')
 	p.setDefaultValue( 1, 0)
-	p.setHelp('1: Task by task.\n2: Each second frame first, than others.\n-1: The same, but backwards.\n0: Middle task.')
+	p.setHelp('Tasks solving method:\n1: Task by task.\n2: Each second frame first, than others.\n-1: The same, but backwards.\n0: Middle task.')
 	p.setEvaluateOnChange(False)
 	p.setAnimationEnabled(False)
 	p.setAddNewLine(True)
