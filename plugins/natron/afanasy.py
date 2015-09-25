@@ -1,5 +1,8 @@
 # Afanasy related tools
 
+import os
+import time
+
 # For messages/warnings:
 import NatronGui
 
@@ -37,20 +40,22 @@ def renderNodes( i_app, i_nodes, i_params = None, i_store_frame_range = False):
 
 		jobs_params.append( params)
 
-	jobs = []
+	results = []
 
 	for params in jobs_params:
-		job = createJob( i_app, params)
-		if job is None: return
 
-		jobs.append( job)
+		res = createJob( i_app, params)
+		if res is None: return
+		results.append( res)
 
-	for job in jobs:
-		job.output()
+	for res in results:
+		res['job'].output()
 
-		if not job.send()[0]:
+		if not res['job'].send()[0]:
 			NatronGui.natron.errorDialog('Error','Can`t send job to Afanasy server.\nSee script editor for details.')
 			break
+
+		i_app.saveTempProject( res['prj'])
 
 
 def getAfParams( i_app, i_node, i_params):
@@ -110,13 +115,24 @@ def getWriteParams( i_node):
 
 
 def createJob( i_app, i_params):
-
+	# Construct job name:
 	name = i_params['af_job_name']
+	ext = '.ntp'
 	if name == '':
-		name = i_app.getProjectParam('projectName').getValue()
-
+		name, ext = os.path.splitext( i_app.getProjectParam('projectName').getValue())
+		name += '.' + i_params['nodename']
 	job = af.Job( name)
 
+	# Generate temp project filename:
+	prj = name
+	prj += '.' + str(time.strftime('%y%M%d%H%M%S')) + str((time.time() - int(time.time())))[2:5]
+	prj += ext
+	prj = os.path.join( i_app.getProjectParam('projectPath').getValue(), prj)
+
+	# Temp project should be deleteed at job deletion:
+	job.setCmdPost('deletefiles "%s"' % prj)
+
+	# Set job parameters:
 	if len( i_params['af_platform']):
 		job.setNeedOS( i_params['af_platform'])
 	if i_params['af_priority'] >= 0:
@@ -132,12 +148,13 @@ def createJob( i_app, i_params):
 	if i_params['af_job_paused']:
 		job.setOffline()
 
+	# Construct blocks travering through network:
 	traverseChilds( job, i_params)
 
 	# Childs were reversed, see above
 	job.blocks.reverse()
 
-	return job
+	return {'job':job,'prj':prj}
 
 
 def traverseChilds( i_job, i_params, i_mask = '', i_prefix = ''):
@@ -154,7 +171,7 @@ def traverseChilds( i_job, i_params, i_mask = '', i_prefix = ''):
 		else:
 			i_job.blocks.append( createBlock( i_params, params, mask, i_prefix))
 			if not i_params['af_multi_independed']:
-				mask = params['nodename']
+				mask = prefix + params['nodename']
 
 
 def createBlock( i_afparams, i_wparams, i_mask, i_prefix):
@@ -167,6 +184,13 @@ def createBlock( i_afparams, i_wparams, i_mask, i_prefix):
 		i_afparams['af_frame_increment']
 	)
 	block.setSequential( i_afparams['af_frame_sequential'])
+
+	if i_afparams['af_capacity'] != -1:
+		block.setCapacity( i_afparams['af_capacity'])
+	if i_afparams['af_maxtasks'] != -1:
+		block.setMaxRunningTasks( i_afparams['af_maxtasks'])
+	if i_afparams['af_maxtasks_perhost'] != -1:
+		block.setMaxRunTasksPerHost( i_afparams['af_maxtasks'])
 
 	if len( i_mask):
 		if i_afparams['af_multi_wholerange']:
