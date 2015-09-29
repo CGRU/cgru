@@ -1,16 +1,24 @@
+#
 # Afanasy related tools
+#
 
 import os
 import time
 
-# For messages/warnings:
-import NatronGui
+# Natron:
+import NatronEngine
 
 # Just to reload Afanasy group before each creation:
 import afanasyGroup
 
 # Afanasy Python API:
 import af
+import afcommon
+
+
+if not NatronEngine.natron.isBackground():
+	# For messages/warnings on job submission (gui mode only):
+	NatronGui = __import__('NatronGui', globals(), locals())
 
 
 def createNode( app):
@@ -67,21 +75,23 @@ def getAfParams( i_app, i_node, i_params):
 		if name.find('af_') != 0: continue
 		o_params[name] = par.getValue()
 
-	if len( o_params) == 0:
-		NatronGui.natron.warningDialog('Error','No Afanasy parameters found on "%s"' % i_node.getLabel())
-		return None;
+	if len(o_params) == 0:
+		NatronGui.natron.errorDialog('Error','No Afanasy parameters found on "%s"' % i_node.getLabel())
+		return None
 
 	o_params['nodename'] = i_node.getLabel()
-	o_params['filepath'] = i_app.getProjectParam('projectName').getValue()
 
 	childs = getInputs( i_node)
+	if len(childs) == 0:
+		NatronGui.natron.errorDialog('Error','No valid connections found on "%s"' % i_node.getLabel())
+		return None
 
 	o_params['childs'] = []
 
 	for child in childs:
 		params = None
 		if isNodeType( child,['write']):
-			params = getWriteParams( child)
+			params = getWriteParams( i_app, o_params, child)
 			if params is None: return None
 			params['afanasy'] = False
 		if isNodeType( child,['group']):
@@ -96,20 +106,22 @@ def getAfParams( i_app, i_node, i_params):
 	return o_params
 
 
-def getWriteParams( i_node):
+def getWriteParams( i_app, i_afparams, i_wnode):
 	o_params = dict()
 
 	pnames = ['filename']
 	for pname in pnames:
-		par = i_node.getParam(pname)
+		par = i_wnode.getParam(pname)
 		if par:
 			o_params[pname] = par.getValue()
 
 	if len(o_params) == 0:
-		NatronGui.natron.warningDialog('Error','No "filename" parameter found on "%s"' % i_node.getLabel())
+		NatronGui.natron.warningDialog('Error','No "filename" parameter found on "%s"' % i_wnode.getLabel())
 		return None
 
-	o_params['nodename'] = i_node.getLabel()
+	o_params['nodename'] = i_wnode.getLabel()
+
+	o_params['files'] = [afcommon.patternFromStdC(afcommon.patternFromDigits( o_params['filename']))]
 
 	return o_params
 
@@ -149,7 +161,7 @@ def createJob( i_app, i_params):
 		job.setOffline()
 
 	# Construct blocks travering through network:
-	traverseChilds( job, i_params)
+	traverseChilds( job, i_params, prj)
 
 	# Childs were reversed, see above
 	job.blocks.reverse()
@@ -157,7 +169,7 @@ def createJob( i_app, i_params):
 	return {'job':job,'prj':prj}
 
 
-def traverseChilds( i_job, i_params, i_mask = '', i_prefix = ''):
+def traverseChilds( i_job, i_params, i_prj, i_mask = '', i_prefix = ''):
 
 	mask = i_mask
 	prefix = i_prefix
@@ -165,16 +177,16 @@ def traverseChilds( i_job, i_params, i_mask = '', i_prefix = ''):
 	for params in i_params['childs']:
 		if params['afanasy']:
 			prefix = params['nodename'] + '_'
-			traverseChilds( i_job, params, mask, prefix)
+			traverseChilds( i_job, params, i_prj, mask, prefix)
 			if not i_params['af_multi_independed']:
 				mask = params['nodename'] + '.*'
 		else:
-			i_job.blocks.append( createBlock( i_params, params, mask, i_prefix))
+			i_job.blocks.append( createBlock( i_params, params, i_prj, mask, i_prefix))
 			if not i_params['af_multi_independed']:
 				mask = prefix + params['nodename']
 
 
-def createBlock( i_afparams, i_wparams, i_mask, i_prefix):
+def createBlock( i_afparams, i_wparams, i_prj, i_mask, i_prefix):
 
 	block = af.Block( i_prefix + i_wparams['nodename'],'natron')
 	block.setNumeric(
@@ -198,10 +210,14 @@ def createBlock( i_afparams, i_wparams, i_mask, i_prefix):
 		else:
 			block.setTasksDependMask( i_mask)
 
-	cmd = 'natron'
+	block.setFiles( i_wparams['files'])
+
+	cmd = 'natron -b'
 	cmd += ' -w "%s"' % i_wparams['nodename']
 	cmd += ' @#@-@#@'
-	cmd += ' "%s"' % i_afparams['filepath']
+	cmd += ' "%s"' % i_prj
+
+	block.setCommand( cmd)
 
 	return block
 
