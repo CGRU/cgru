@@ -3,7 +3,7 @@
 <boost_serialization signature="serialization::archive" version="10">
 <Background_project>0</Background_project>
 <Project class_id="0" tracking_level="0" version="5">
-	<NatronVersion>Natron v2.0.0 from git branch workshop commit df344eceba919482ce5fa7d5f61acd1efd56c598  for   Linux 64bit</NatronVersion>
+	<NatronVersion>Natron v2.0.0 from git branch workshop commit 8e5f0d2d42bfed5b55a6483bee7415be4dd7d012  for   Linux 64bit</NatronVersion>
 	<NodesCollection class_id="1" tracking_level="0" version="1">
 		<NodesCount>5</NodesCount>
 		<item class_id="2" tracking_level="0" version="12">
@@ -21,7 +21,7 @@
 					<second>w_jpg</second>
 				</item>
 			</Inputs_map>
-			<KnobsAge>2</KnobsAge>
+			<KnobsAge>7</KnobsAge>
 			<MasterNode></MasterNode>
 			<HasRotoContext>0</HasRotoContext>
 			<MultiInstanceParent></MultiInstanceParent>
@@ -447,7 +447,7 @@
 					<second>Transform1</second>
 				</item>
 			</Inputs_map>
-			<KnobsAge>14</KnobsAge>
+			<KnobsAge>19</KnobsAge>
 			<MasterNode></MasterNode>
 			<HasRotoContext>0</HasRotoContext>
 			<MultiInstanceParent></MultiInstanceParent>
@@ -660,7 +660,7 @@
 					<second>CheckerBoard1</second>
 				</item>
 			</Inputs_map>
-			<KnobsAge>20</KnobsAge>
+			<KnobsAge>25</KnobsAge>
 			<MasterNode></MasterNode>
 			<HasRotoContext>0</HasRotoContext>
 			<MultiInstanceParent></MultiInstanceParent>
@@ -673,8 +673,8 @@
 			<CacheID>Transform1</CacheID>
 		</item>
 		<item>
-			<Plugin_label>af_all</Plugin_label>
-			<Plugin_script_name>Afanasy1</Plugin_script_name>
+			<Plugin_label>af</Plugin_label>
+			<Plugin_script_name>Afanasy2</Plugin_script_name>
 			<Plugin_id>fr.inria.built-in.Group</Plugin_id>
 			<PythonModule>/cgru/plugins/natron/afanasyGroup.py</PythonModule>
 			<PythonModuleVersion>207</PythonModuleVersion>
@@ -746,7 +746,7 @@
 					<second>w_jpg</second>
 				</item>
 			</Inputs_map>
-			<KnobsAge>13</KnobsAge>
+			<KnobsAge>18</KnobsAge>
 			<MasterNode></MasterNode>
 			<HasRotoContext>0</HasRotoContext>
 			<MultiInstanceParent></MultiInstanceParent>
@@ -1137,7 +1137,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<UserKnob>1</UserKnob>
 					<Label>Afanasy Job Name</Label>
 					<Help>If empty, project name will be used.</Help>
-					<NewLine>1</NewLine>
+					<NewLine>0</NewLine>
 					<Evaluate>0</Evaluate>
 					<Animates>0</Animates>
 					<Persistent>1</Persistent>
@@ -1203,7 +1203,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<item>
 						<Enabled>1</Enabled>
 						<HasAnimation>0</HasAnimation>
-						<Value>5</Value>
+						<Value>11</Value>
 						<HasMaster>0</HasMaster>
 						<Expression></Expression>
 						<ExprHasRet>0</ExprHasRet>
@@ -1219,7 +1219,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<Max>2147483647</Max>
 					<DMin>-2147483648</DMin>
 					<DMax>2147483647</DMax>
-					<DefaultValue>20</DefaultValue>
+					<DefaultValue>11</DefaultValue>
 				</item>
 				<Type>Regular</Type>
 				<item>
@@ -1296,7 +1296,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 2: Each second frame first, than others.
 -1: The same, but backwards.
 0: Middle task.</Help>
-					<NewLine>1</NewLine>
+					<NewLine>0</NewLine>
 					<Evaluate>0</Evaluate>
 					<Animates>0</Animates>
 					<Persistent>1</Persistent>
@@ -1363,7 +1363,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<count>0</count>
 					<item_version>0</item_version>
 				</Inputs_map>
-				<KnobsAge>16</KnobsAge>
+				<KnobsAge>4</KnobsAge>
 				<MasterNode></MasterNode>
 				<HasRotoContext>0</HasRotoContext>
 				<MultiInstanceParent></MultiInstanceParent>
@@ -1390,7 +1390,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 						<second>Input1</second>
 					</item>
 				</Inputs_map>
-				<KnobsAge>19</KnobsAge>
+				<KnobsAge>7</KnobsAge>
 				<MasterNode></MasterNode>
 				<HasRotoContext>0</HasRotoContext>
 				<MultiInstanceParent></MultiInstanceParent>
@@ -1413,7 +1413,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<count>0</count>
 					<item_version>0</item_version>
 				</Inputs_map>
-				<KnobsAge>16</KnobsAge>
+				<KnobsAge>4</KnobsAge>
 				<MasterNode></MasterNode>
 				<HasRotoContext>0</HasRotoContext>
 				<MultiInstanceParent></MultiInstanceParent>
@@ -1436,7 +1436,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<count>0</count>
 					<item_version>0</item_version>
 				</Inputs_map>
-				<KnobsAge>16</KnobsAge>
+				<KnobsAge>4</KnobsAge>
 				<MasterNode></MasterNode>
 				<HasRotoContext>0</HasRotoContext>
 				<MultiInstanceParent></MultiInstanceParent>
@@ -1459,7 +1459,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<count>0</count>
 					<item_version>0</item_version>
 				</Inputs_map>
-				<KnobsAge>16</KnobsAge>
+				<KnobsAge>4</KnobsAge>
 				<MasterNode></MasterNode>
 				<HasRotoContext>0</HasRotoContext>
 				<MultiInstanceParent></MultiInstanceParent>
@@ -1482,7 +1482,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 					<count>0</count>
 					<item_version>0</item_version>
 				</Inputs_map>
-				<KnobsAge>16</KnobsAge>
+				<KnobsAge>4</KnobsAge>
 				<MasterNode></MasterNode>
 				<HasRotoContext>0</HasRotoContext>
 				<MultiInstanceParent></MultiInstanceParent>
@@ -1510,7 +1510,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 		<item>
 			<Enabled>1</Enabled>
 			<HasAnimation>0</HasAnimation>
-			<Value>&lt;Name&gt;OCIO&lt;/Name&gt;&lt;Value&gt;/data/soft/natron/2.0.0-2015.09.29/Resources/OpenColorIO-Configs/blender&lt;/Value&gt;&lt;Name&gt;Project&lt;/Name&gt;&lt;Value&gt;/cgru/examples/natron&lt;/Value&gt;</Value>
+			<Value>&lt;Name&gt;OCIO&lt;/Name&gt;&lt;Value&gt;/data/soft/natron/2.0.0-2015.09.30/Resources/OpenColorIO-Configs/blender&lt;/Value&gt;&lt;Name&gt;Project&lt;/Name&gt;&lt;Value&gt;/cgru/examples/natron&lt;/Value&gt;</Value>
 			<HasMaster>0</HasMaster>
 			<Expression></Expression>
 			<ExprHasRet>0</ExprHasRet>
@@ -1567,7 +1567,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 		<item>
 			<Enabled>1</Enabled>
 			<HasAnimation>0</HasAnimation>
-			<Value>Wed Sep 30 00:48:18 2015</Value>
+			<Value>Fri Oct 2 00:21:57 2015</Value>
 			<HasMaster>0</HasMaster>
 			<Expression></Expression>
 			<ExprHasRet>0</ExprHasRet>
@@ -1642,8 +1642,8 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1</Name>
-			<X_position>538.22654168445661</X_position>
+			<Name>Afanasy2</Name>
+			<X_position>529.25</X_position>
 			<Y_position>186.27231122182684</Y_position>
 			<Preview_enabled>0</Preview_enabled>
 			<r>0.69999236</r>
@@ -1655,7 +1655,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1.Input1</Name>
+			<Name>Afanasy2.Input1</Name>
 			<X_position>60</X_position>
 			<Y_position>16.25</Y_position>
 			<Preview_enabled>0</Preview_enabled>
@@ -1668,7 +1668,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1.Output1</Name>
+			<Name>Afanasy2.Output1</Name>
 			<X_position>60</X_position>
 			<Y_position>16.25</Y_position>
 			<Preview_enabled>0</Preview_enabled>
@@ -1681,7 +1681,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1.Input2</Name>
+			<Name>Afanasy2.Input2</Name>
 			<X_position>60</X_position>
 			<Y_position>16.25</Y_position>
 			<Preview_enabled>0</Preview_enabled>
@@ -1694,7 +1694,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1.Input3</Name>
+			<Name>Afanasy2.Input3</Name>
 			<X_position>60</X_position>
 			<Y_position>16.25</Y_position>
 			<Preview_enabled>0</Preview_enabled>
@@ -1707,7 +1707,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1.Input4</Name>
+			<Name>Afanasy2.Input4</Name>
 			<X_position>60</X_position>
 			<Y_position>16.25</Y_position>
 			<Preview_enabled>0</Preview_enabled>
@@ -1720,7 +1720,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 			<HasOverlayColor>0</HasOverlayColor>
 		</item>
 		<item>
-			<Name>Afanasy1.Input5</Name>
+			<Name>Afanasy2.Input5</Name>
 			<X_position>60</X_position>
 			<Y_position>16.25</Y_position>
 			<Preview_enabled>0</Preview_enabled>
@@ -1742,7 +1742,7 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 				<Orientation>1</Orientation>
 				<ChildIsSplitter>1</ChildIsSplitter>
 				<Child object_id="_1">
-					<Sizes>361 360</Sizes>
+					<Sizes>296 425</Sizes>
 					<Orientation>2</Orientation>
 					<ChildIsSplitter>0</ChildIsSplitter>
 					<Child class_id="21" tracking_level="1" version="5" object_id="_2">
@@ -1833,9 +1833,11 @@ For example, render with 2000 capacity can run 1x1000 task and 2x500 tasks at on
 		<item_version>0</item_version>
 	</Histograms>
 	<OpenedPanels>
-		<count>1</count>
+		<count>3</count>
 		<item_version>0</item_version>
-		<item>Afanasy1</item>
+		<item>Afanasy2</item>
+		<item>w_jpg</item>
+		<item>Natron_Project_Settings_Panel</item>
 	</OpenedPanels>
 	<ScriptEditorInput></ScriptEditorInput>
 	<NumPyPanels>0</NumPyPanels>
