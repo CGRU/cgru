@@ -49,7 +49,7 @@ def renderNodes( i_app, i_nodes, i_params = None):
 			afparams = getAfParams( i_app, node, i_params)
 		elif isNodeWrite( node):
 			afparams = i_params
-			afparams['nodename'] = node.getLabel()
+			afparams['nodelabel'] = node.getLabel()
 			wparams = getWriteParams( i_app, afparams, node)
 			if wparams is None: return
 			afparams['childs'] = [wparams]
@@ -96,7 +96,7 @@ def getAfParams( i_app, i_node, i_params):
 		return None
 
 	o_params['afanasy'] = True
-	o_params['nodename'] = i_node.getLabel()
+	o_params['nodelabel'] = i_node.getLabel()
 
 	childs = getInputs( i_node)
 	if len(childs) == 0:
@@ -140,7 +140,8 @@ def getWriteParams( i_app, i_afparams, i_wnode):
 		return None
 
 	o_params['afanasy'] = False
-	o_params['nodename'] = i_wnode.getLabel()
+	o_params['nodelabel'] = i_wnode.getLabel()
+	o_params['nodename'] = i_wnode.getScriptName()
 
 	files = o_params['filename']
 	files = afcommon.patternFromStdC(files)
@@ -158,7 +159,7 @@ def createJob( i_app, i_params):
 	ext = '.ntp'
 	if name == '':
 		name, ext = os.path.splitext( i_app.getProjectParam('projectName').getValue())
-		name += '.' + i_params['nodename']
+		name += '.' + i_params['nodelabel']
 	job = af.Job( name)
 
 	# Generate temp project filename:
@@ -202,19 +203,19 @@ def traverseChilds( i_job, i_params, i_prj, i_mask = '', i_prefix = ''):
 
 	for params in i_params['childs']:
 		if params['afanasy']:
-			prefix = params['nodename'] + '_'
+			prefix = params['nodelabel'] + '_'
 			traverseChilds( i_job, params, i_prj, mask, prefix)
 			if 'af_multi_independed' in i_params and not i_params['af_multi_independed']:
-				mask = params['nodename'] + '.*'
+				mask = params['nodelabel'] + '.*'
 		else:
 			i_job.blocks.append( createBlock( i_params, params, i_prj, mask, i_prefix))
 			if 'af_multi_independed' in i_params and not i_params['af_multi_independed']:
-				mask = prefix + params['nodename']
+				mask = prefix + params['nodelabel']
 
 
 def createBlock( i_afparams, i_wparams, i_prj, i_mask, i_prefix):
 
-	block = af.Block( i_prefix + i_wparams['nodename'],'natron')
+	block = af.Block( i_prefix + i_wparams['nodelabel'],'natron')
 	block.setNumeric(
 		i_afparams['af_frame_first'],
 		i_afparams['af_frame_last'],
