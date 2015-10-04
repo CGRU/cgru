@@ -3,12 +3,10 @@ call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
 rem Setup CGRU common scripts if location provided
 set "FUSION_CGRU_PATH=%CGRU_LOCATION%\plugins\fusion"
-if defined CGRU_LOCATION (
-   if defined FUSION_PATH (
-      set "FUSION_PATH=%NUKE_CGRU_PATH%;%NUKE_PATH%"
-   ) else (
-      set "FUSION_PATH=%NUKE_CGRU_PATH%"
-   )
+if defined FUSION_MasterPrefs (
+	set "FUSION_MasterPrefs=%FUSION_CGRU_PATH%\cgru.prefs;%FUSION_MasterPrefs%"
+) else (
+	set "FUSION_MasterPrefs=%FUSION_CGRU_PATH%\cgru.prefs"
 )
 
 SET "APP_DIR=C:\Program Files\Blackmagic Design\Fusion"
