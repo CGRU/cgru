@@ -5,8 +5,7 @@
 import NatronEngine
 
 def getPluginID():
-	#return 'afanasy'
-	return 'fr.inria.groups.afanasy'
+	return 'cgru.afanasy'
 
 def getLabel():
 	return 'Afanasy'

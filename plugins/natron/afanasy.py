@@ -23,8 +23,7 @@ if not NatronEngine.natron.isBackground():
 
 def createNode( app):
 	reload( afanasyGroup)
-	#app.createNode('afanasy')
-	app.createNode('fr.inria.groups.afanasy')
+	app.createNode('cgru.afanasy')
 
 
 def onParamChanged( thisParam, thisNode, thisGroup, app, userEdited):
@@ -257,9 +256,8 @@ def isNodeType( i_node, i_types):
 			return True
 	return False
 
-def isNodeAfanasy( i_node): return isNodeType( i_node,'group')
+def isNodeAfanasy( i_node): return isNodeType( i_node,'afanasy')
 def isNodeWrite(   i_node): return isNodeType( i_node,'write')
-
 
 def getInputDot( i_node, i_index = 0):
 	node = i_node.getInput( i_index)
@@ -305,7 +303,7 @@ def renderSelected( i_app):
 	fields['af_frame_first'  ] = dialog.createIntParam(    'af_frame_first','First Frame')
 	fields['af_frame_last'   ] = dialog.createIntParam(    'af_frame_last','Last Frame')
 	fields['af_frame_pertast'] = dialog.createIntParam(    'af_frame_pertast','Per Task')
-	fields['af_job_paused'   ] = dialog.createBooleanParam('af_job_paused','Send job paused')
+	fields['af_job_paused'   ] = dialog.createBooleanParam('af_job_paused','Send Job Paused')
 
 	fields['af_frame_first'  ].setDefaultValue( i_app.timelineGetLeftBound(), 0)
 	fields['af_frame_last'   ].setDefaultValue( i_app.timelineGetRightBound(), 0)
