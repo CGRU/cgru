@@ -77,7 +77,9 @@ createDir $dest/plugins
 rcopy plugins/afterfx $dest/plugins
 rcopy plugins/c4d $dest/plugins
 rcopy plugins/blender $dest/plugins
+rcopy plugins/fusion $dest/plugins
 rcopy plugins/houdini $dest/plugins
+rcopy plugins/natron $dest/plugins
 rcopy plugins/nuke $dest/plugins
 rcopy plugins/max $dest/plugins
 rcopy plugins/xsi $dest/plugins
