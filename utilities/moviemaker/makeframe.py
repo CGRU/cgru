@@ -49,6 +49,7 @@ Parser.add_option('--logopath',         dest='logopath',       type  ='string', 
 Parser.add_option('--frame_input',      dest='frame_input',    type  ='int',        default=0,           help='Input frame number')
 Parser.add_option('--frame_output',     dest='frame_output',   type  ='int',        default=0,           help='Output frame number')
 Parser.add_option('--frames_num',       dest='frames_num',     type  ='int',        default=1,           help='Frames number')
+Parser.add_option('--mkdir',            dest='mkdir',          action='store_true', default=False,       help='Make out folder if needed')
 Parser.add_option('-V', '--verbose',    dest='verbose',        action='store_true', default=False,       help='Verbose mode')
 Parser.add_option('-D', '--debug',      dest='debug',          action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 
@@ -162,10 +163,20 @@ draw235_h = Height - draw235_y
 
 # Frame manipulate function:
 def reformatAnnotate(infile, outfile):
+
 	global Width, Height, Stereo
 	global MOVIENAME, DATETIME, COMPANY, PROJECT, SHOT, VERSION, ARTIST, \
 		ACTIVITY, COMMENTS, FRAME, FRAMERANGE, FILEDATE, FILEINBASE
 	global FILEIN
+
+	# Check ouptut folder:
+	outdir = os.path.dirname( outfile)
+	if not os.path.isdir( outdir):
+		if Options.mkdir:
+			os.makedirs( outdir)
+		else:
+			Parser.error('Output folder doos not exit:\n' + outdir)
+
 	FILEIN = os.path.basename(infile)
 	# Input file indentify:
 	if infile != '':
