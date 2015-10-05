@@ -49,6 +49,10 @@ def renderNodes( i_app, i_nodes, i_params = None):
 			afparams = getAfParams( i_app, node, i_params)
 		elif isNodeWrite( node):
 			afparams = i_params
+			if not 'af_frame_first' in afparams:
+				afparams['af_frame_first'] = i_app.timelineGetLeftBound()
+			if not 'af_frame_last' in afparams:
+				afparams['af_frame_last'] = i_app.timelineGetRightBound()
 			afparams['nodelabel'] = node.getLabel()
 			wparams = getWriteParams( i_app, afparams, node)
 			if wparams is None: return
@@ -288,8 +292,8 @@ def renderSelected( i_app):
 	Render selected node(s)
 	'''
 
+	# Collect selected Afanasy and Write nodes:
 	sel_nodes = i_app.getSelectedNodes()
-
 	nodes = []
 
 	for node in sel_nodes:
@@ -299,15 +303,49 @@ def renderSelected( i_app):
 		NatronGui.natron.errorDialog('Error','No Afanasy or Write node(s) selected.')
 		return
 
+	# Get first and last frames:
+	frame_first_min = None
+	frame_first_max = None
+	frame_last_min  = None
+	frame_last_max  = None
+	for node in nodes:
+		if isNodeAfanasy( node):
+			frame_first = node.getParam('af_frame_first').get()
+			frame_last  = node.getParam('af_frame_last').get()
+			if frame_first_min is None:
+				frame_first_min = frame_first
+				frame_first_max = frame_first
+				frame_last_min  = frame_last
+				frame_last_max  = frame_last
+			else:
+				if frame_first < frame_first_min: frame_first_min = frame_first
+				if frame_first > frame_first_max: frame_first_max = frame_first
+				if frame_last  < frame_last_min:  frame_last_min  = frame_last
+				if frame_last  > frame_last_max:  frame_last_max  = frame_last
+	# If no Afanasy selected get first and last frames from project settings:
+	if frame_first_min is None:
+		frame_first_min = i_app.timelineGetLeftBound()
+		frame_first_max = i_app.timelineGetLeftBound()
+		frame_last_min  = i_app.timelineGetRightBound()
+		frame_last_max  = i_app.timelineGetRightBound()
+
+	frame_first = str(frame_first_min)
+	frame_last  = str(frame_last_min)
+	if frame_first_min != frame_first_max:
+		frame_first = '%d..%d' % (frame_first_min, frame_first_max)
+	if frame_last_min != frame_last_max:
+		frame_last  = '%d..%d' % (frame_last_min,  frame_last_max)
+
+	# Create dialog:
 	dialog = i_app.createModalDialog()
 	fields = dict()
-	fields['af_frame_first'  ] = dialog.createIntParam(    'af_frame_first','First Frame')
-	fields['af_frame_last'   ] = dialog.createIntParam(    'af_frame_last','Last Frame')
+	fields['frame_first'     ] = dialog.createStringParam( 'frame_first','First Frame')
+	fields['frame_last'      ] = dialog.createStringParam( 'frame_last','Last Frame')
 	fields['af_frame_pertast'] = dialog.createIntParam(    'af_frame_pertast','Per Task')
 	fields['af_job_paused'   ] = dialog.createBooleanParam('af_job_paused','Send Job Paused')
 
-	fields['af_frame_first'  ].setDefaultValue( i_app.timelineGetLeftBound(), 0)
-	fields['af_frame_last'   ].setDefaultValue( i_app.timelineGetRightBound(), 0)
+	fields['frame_first'  ].setDefaultValue( frame_first)
+	fields['frame_last'   ].setDefaultValue( frame_last)
 	fields['af_frame_pertast'].setDefaultValue( 1, 0)
 
 	for field in fields:
@@ -317,12 +355,19 @@ def renderSelected( i_app):
 
 	if not dialog.exec_(): return
 
+	# Get paramtets from dialog:
 	params = dict()
 	for field in fields:
 		params[field] = fields[field].get()
 
+	if params['frame_first'].find('..') == -1:
+		params['af_frame_first'] = int(params['frame_first'])
+	if params['frame_last'].find('..') == -1:
+		params['af_frame_last'] = int(params['frame_last'])
+
 	params['af_frame_increment'] = 1
 
+	# Render nodes:
 	renderNodes( i_app, nodes, params)
 
 
