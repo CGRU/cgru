@@ -4,9 +4,10 @@
 #include <maya/MArrayDataBuilder.h>
 #include <maya/MArrayDataHandle.h>
 
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
-#include <iostream>
+#include <windows.h>
 
 #define tm_kxb__id                     0xEA301
 #define tm_kxbci__id                   0xEA302

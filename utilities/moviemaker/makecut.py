@@ -79,21 +79,15 @@ if CutName == '':
 
 OutDir = Options.outdir + '/' + CutName
 OutDir = os.path.normpath(OutDir)
-if not Options.testonly:
-	if os.path.isdir(OutDir):
-		print('{"progress":"Deleting folder: %s"},' % OutDir)
-		shutil.rmtree(OutDir)
-	os.makedirs(OutDir)
-	print('{"progress":"Creating folder: %s"},' % OutDir)
 
 movie_name = os.path.basename(CutName) + time.strftime('_%y-%m-%d_%H-%M-%S')
 movie_name = os.path.join(Options.outdir, movie_name)
 
 commands = []
 task_names = []
-# cmd_prefix = os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/makeframe.py'
 cmd_prefix = os.path.join(os.path.dirname(sys.argv[0]), 'makeframe.py')
 cmd_prefix = 'python "%s"' % os.path.normpath(cmd_prefix)
+cmd_prefix += ' --mkdir'
 cmd_prefix += ' -t "dailies"'
 cmd_prefix += ' -r %s' % Options.resolution
 cmd_prefix += ' -d "%s"' % time.strftime('%y-%m-%d')
@@ -202,11 +196,26 @@ cmd_encode += ' -c %s' % Options.codec
 cmd_encode += ' "%s"' % os.path.join(OutDir, TmpFiles)
 cmd_encode += ' "%s"' % movie_name
 
+
+# Afanasy job creation:
 job = af.Job('CUT ' + CutName)
 job.setMaxRunningTasks( Options.afmaxtasks)
 job.setMaxRunTasksPerHost( Options.afperhost)
+if Options.afuser != '': job.setUserName(Options.afuser)
 
+# Delete previous sequence block:
+delete_name = None
+if os.path.isdir(OutDir):
+	delete_name = 'delete'
+	block = af.Block( delete_name)
+	task = af.Task( delete_name + ' ' + os.path.basename( OutDir))
+	task.setCommand('deletefiles "%s"' % OutDir)
+	block.tasks.append(task)
+	job.blocks.append(block)
+
+# Convert block:
 block = af.Block('convert', Options.afservice)
+if delete_name: block.setDependMask( delete_name)
 counter = 0
 for cmd in commands:
 	task = af.Task(task_names[counter])
@@ -218,6 +227,7 @@ block.setCapacity( Options.afcapacity)
 block.setTasksMaxRunTime( Options.afmaxruntime)
 job.blocks.append(block)
 
+# Encode block:
 block = af.Block('encode', Options.afservice)
 block.setDependMask('convert')
 task = af.Task('encode')
@@ -225,8 +235,6 @@ task.setCommand(cmd_encode)
 block.tasks.append(task)
 job.blocks.append(block)
 
-if Options.afuser != '':
-	job.setUserName(Options.afuser)
 
 if not Options.testonly:
 	if not job.send():

@@ -1,9 +1,11 @@
+#
 # Afanasy Group
+#
 
 import NatronEngine
 
 def getPluginID():
-	return 'afanasy'
+	return 'cgru.afanasy'
 
 def getLabel():
 	return 'Afanasy'
@@ -142,7 +144,7 @@ def createInstance(i_app,i_grp):
 
 	p = i_grp.createButtonParam('afanasy_button_frame_range','Get Frame Range From Project Settigs')
 	p.setHelp('Set first and last frame parameters from current project settings.')
-	p.setAddNewLine(False)
+	p.setAddNewLine(True)
 	p.setPersistant(False)
 	p.setEvaluateOnChange(False)
 	page.addParam(p)
@@ -185,7 +187,7 @@ def createInstance(i_app,i_grp):
 
 	p = i_grp.createButtonParam('afanasy_button_send_job','Send Afanasy Job')
 	p.setHelp('Constuct and send job to Afanasy server.')
-	p.setAddNewLine(False)
+	p.setAddNewLine(True)
 	p.setPersistant(False)
 	p.setEvaluateOnChange(False)
 	page.addParam(p)
@@ -195,7 +197,7 @@ def createInstance(i_app,i_grp):
 	p.setDefaultValue( False)
 	p.setEvaluateOnChange(False)
 	p.setAnimationEnabled(False)
-	p.setAddNewLine(True)
+	p.setAddNewLine(False)
 	page.addParam(p)
 
 	'''
