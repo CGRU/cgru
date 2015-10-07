@@ -245,7 +245,7 @@ def createBlock( i_afparams, i_wparams, i_prj, i_mask, i_prefix):
 
 	block.setFiles( i_wparams['files'])
 
-	cmd = 'natron -b'
+	cmd = os.getenv('NATRON_AF_RENDER','natron -b')
 	cmd += ' -w "%s"' % i_wparams['nodename']
 	cmd += ' @#@-@#@'
 	cmd += ' "%s"' % i_prj
