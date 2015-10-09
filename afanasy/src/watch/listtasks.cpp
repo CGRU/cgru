@@ -273,7 +273,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 bool ListTasks::caseMessage( af::Msg * msg)
 {
 #ifdef AFOUTPUT
-printf("ListTasks::caseMessage:\n"); msg->stdOut();
+printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 #endif
 	switch( msg->type())
 	{

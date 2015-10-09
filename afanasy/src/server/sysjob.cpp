@@ -407,7 +407,7 @@ bool SysBlock::v_refresh( time_t currentTime, RenderContainer * renders, Monitor
 		// If block progress changed there, the function will add block in monitoring itself
 		blockProgress_changed = true;
 	}
-	else
+	else if( blockProgress_changed)
 	{
 		// Add block to monitoring if it was not, but has changes
 		if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
