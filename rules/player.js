@@ -5,6 +5,7 @@ p_savepath = '.commented';
 p_imgTypes = ['jpg','jpeg','png'];
 
 p_path = null;
+p_args = {};
 p_rules_path = null;
 p_imageMode = false;
 p_elImg = [];
@@ -182,18 +183,36 @@ function p_Deactivate()
 
 function p_PathChanged()
 {
+	// Process path:
+	path = c_GetHashPath();
+	args = path.split('?');
+	path = args[0];
+	if( path == p_path ) return;
+	p_path = path;
+
+	// Process arguments:
+	if( args.length > 1 )
+	{
+		args = args[1];
+		if( args.length )
+		{
+			args = c_Parse( decodeURI( args));
+			if( args )
+				p_args = args;
+		}
+	}
+
 	p_loaded = false;
 	p_numloaded = 0;
 	p_PushAllButtons();
 
 	p_StopTimer();
 	p_frame = 0;
+	if( p_args.f ) p_frame = p_args.f;
 	p_playing = 0;
 
 	p_images = [];
 	p_paintElCanvas = [];
-
-	p_path = c_GetHashPath();
 
 	p_rules_path = document.location.hash;
 	if( p_rules_path.indexOf('#') == 0 ) p_rules_path = p_rules_path.substr(1);
@@ -223,6 +242,14 @@ function p_PathChanged()
 	walk.info = 'walk GO';
 	n_WalkDir( walk);
 }
+
+function p_Link()
+{
+	p_args.f = p_frame;
+	hash = p_path + '?' + encodeURI( JSON.stringify(p_args));
+	document.location.hash = hash;
+}
+
 function p_WalkNavigateReceived( i_data, i_args)
 {
 	for( var i = 0; i < i_data.length; i++ )
@@ -232,6 +259,7 @@ function p_WalkNavigateReceived( i_data, i_args)
 	
 	n_WalkDir({"paths":[p_path],"wfunc":p_WalkSequenceReceived,"info":'walk images',"rufiles":['player']});
 }
+
 function p_WalkSequenceReceived( i_data)
 {
 	var walk = i_data[0];
@@ -425,7 +453,9 @@ function p_WalkReceivedComments( i_data)
 
 	p_ShowFrame( p_frame);
 	p_SetEditingState( true);
-	p_Play();
+
+	if( p_args.f == null )
+		p_Play();
 }
 
 function p_CreateImages()
