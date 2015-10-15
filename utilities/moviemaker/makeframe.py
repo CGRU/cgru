@@ -373,8 +373,10 @@ for f in range( 0, Options.frames_num):
 
 	file_in_1 = FILEIN1
 	file_out_1 = Annotate1
-	if Options.frames_num > 1:
+
+	if file_in_1.find('%0') != -1:
 		file_in_1 = file_in_1 % (Options.frame_input+f)
+	if file_out_1.find('%0') != -1:
 		file_out_1 = file_out_1 % (Options.frame_output+f)
 
 	reformatAnnotate( file_in_1, file_out_1)
@@ -384,9 +386,12 @@ for f in range( 0, Options.frames_num):
 		file_in_2 = FILEIN2
 		file_out_2 = Annotate2
 		file_out = FileOut
-		if Options.frames_num > 1:
+
+		if file_in_2.find('%0') != -1:
 			file_in_2 = file_in_2 % (Options.frame_input+f)
+		if file_out_2.find('%0') != -1:
 			file_out_2 = file_out_2 % (Options.frame_output+f)
+		if file_out.find('%0') != -1:
 			file_out = file_out % (Options.frame_output+f)
 
 		if FILEIN2 != '':
