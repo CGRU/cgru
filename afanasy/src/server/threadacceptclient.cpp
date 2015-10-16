@@ -13,6 +13,8 @@
 #include <sys/types.h>
 #endif
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/common/dlThread.h"
 
 #include "../libafanasy/environment.h"
@@ -116,13 +118,8 @@ void threadAcceptPort( void * i_arg, int i_port)
 	}
 	//
 	// set socket options for reuseing address immediatly after bind
-	#ifdef WINNT
-	#define TOCHAR (char *)
-	#else
-	#define TOCHAR
-	#endif
 	int value = 1;
-	if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, TOCHAR(&value), sizeof(value)) != 0)
+	if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, WINNT_TOCHAR(&value), sizeof(value)) != 0)
 		AFERRPE("set socket SO_REUSEADDR option failed")
 
 	value = -1;

@@ -172,9 +172,18 @@ public:
 	static inline int                 get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
 	static inline int                 get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
-	static inline int getServer_SO_RCVTIMEO_SEC() { return server_so_rcvtimeo_sec;  }
-	static inline int getServer_SO_SNDTIMEO_SEC() { return server_so_sndtimeo_sec;  }
-	static inline int getServer_SO_MSGTIMEO_SEC() { return server_so_msgtimeo_sec; }
+
+	/// Socket Options:
+	static inline int getSockOpt_Accept_SO_RCVTIMEO_SEC()   { return server_accept_so_rcvtimeo_sec; }
+	static inline int getSockOpt_Accept_SO_SNDTIMEO_SEC()   { return server_accept_so_sndtimeo_sec; }
+	static inline int getSockOpt_Dispatch_SO_RCVTIMEO_SEC()
+		{ return m_server ? server_dispatch_so_rcvtimeo_sec : client_dispatch_so_rcvtimeo_sec; }
+	static inline int getSockOpt_Dispatch_SO_SNDTIMEO_SEC()
+		{ return m_server ? server_dispatch_so_sndtimeo_sec : client_dispatch_so_sndtimeo_sec; }
+	static inline int getSockOpt_Dispatch_TCP_NODELAY()
+		{ return m_server ? server_dispatch_tcp_nodelay : client_dispatch_tcp_nodelay; }
+
+
 
 private:
 
@@ -305,6 +314,7 @@ private:
 	static int monitor_waitforbyteswritten;
 	static int monitor_zombietime;
 
+
 	/// Temp directory
 	static std::string temp_dir;
 	static std::string jobs_dir;
@@ -316,9 +326,18 @@ private:
 	static int         db_stringnamelen;  ///< Database string name length
 	static int         db_stringexprlen;  ///< Database string expression length
 
-	static int server_so_rcvtimeo_sec;
-	static int server_so_sndtimeo_sec;
-	static int server_so_msgtimeo_sec;
+
+	/// Socket Options:
+	static int server_accept_so_rcvtimeo_sec;
+	static int server_accept_so_sndtimeo_sec;
+	static int server_dispatch_so_rcvtimeo_sec;
+	static int server_dispatch_so_sndtimeo_sec;
+	static int server_dispatch_tcp_nodelay;
+
+	static int client_dispatch_so_rcvtimeo_sec;
+	static int client_dispatch_so_sndtimeo_sec;
+	static int client_dispatch_tcp_nodelay;
+
 
 	// Misc:
 

@@ -50,9 +50,6 @@ namespace AFUSER
 /// Server options:
 namespace AFSERVER
 {
-	const int  SO_RCVTIMEO_SEC   = 2;  ///< Receive timeout seconds.
-	const int  SO_SNDTIMEO_SEC   = 2;  ///< Send timeout seconds.
-	const int  SO_MSGTIMEO_SEC   = 1;  ///< Dispatch messages to clients timeout seconds.
 	#ifdef WINNT
 	const char TEMP_DIRECTORY[]  = "\\afanasy"; ///< Server store logs, tasks output.
 	#else
@@ -125,6 +122,20 @@ namespace AFMONITOR
     const int WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
     const int WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
     const int ZOMBIETIME          = 40;       ///< Seconds to wait for update to consider to kill Monitor.
+}
+
+/// Network options:
+namespace AFNETWORK
+{
+	const int SERVER_ACCEPT_SO_RCVTIMEO_SEC   = 2;
+	const int SERVER_ACCEPT_SO_SNDTIMEO_SEC   = 2;
+	const int SERVER_DISPATCH_SO_RCVTIMEO_SEC = 2;
+	const int SERVER_DISPATCH_SO_SNDTIMEO_SEC = 2;
+	const int SERVER_DISPATCH_TCP_NODELAY     = true;
+
+	const int CLIENT_DISPATCH_SO_RCVTIMEO_SEC = 8;
+	const int CLIENT_DISPATCH_SO_SNDTIMEO_SEC = 8;
+	const int CLIENT_DISPATCH_TCP_NODELAY     = false;
 }
 
 #ifdef WINNT

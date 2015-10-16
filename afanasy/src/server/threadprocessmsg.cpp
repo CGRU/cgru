@@ -123,15 +123,16 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 	//AFINFO("Trying to recieve message...")
 
 	// set max allowed time to block recieveing data from client socket
-	timeval so_rcvtimeo;
-	so_rcvtimeo.tv_sec = af::Environment::getServer_SO_RCVTIMEO_SEC();
-	so_rcvtimeo.tv_usec = 0;
-
-	if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
+	if( af::Environment::getSockOpt_Accept_SO_RCVTIMEO_SEC() != -1 )
 	{
-		AFERRPE("readMessage: setsockopt failed.");
-		af::printAddress( &(i_args->ss));
-		return false;
+		timeval so_rcvtimeo;
+		so_rcvtimeo.tv_sec = af::Environment::getSockOpt_Accept_SO_RCVTIMEO_SEC();
+		so_rcvtimeo.tv_usec = 0;
+		if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
+		{
+			AFERRPE("readMessage: setsockopt SO_RCVTIMEO failed:");
+			af::printAddress( &(i_args->ss));
+		}
 	}
 
 	// Reading message from client socket.
@@ -150,16 +151,17 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 {
 	// set socket maximum time to wait for an output operation to complete
-	timeval so_sndtimeo;
-	so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
-	so_sndtimeo.tv_usec = 0;
-
-	if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
+	if( af::Environment::getSockOpt_Accept_SO_SNDTIMEO_SEC() != -1 )
 	{
-		AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
-		af::printAddress( &(i_args->ss));
-		i_msg->v_stdOut();
-		return;
+		timeval so_sndtimeo;
+		so_sndtimeo.tv_sec = af::Environment::getSockOpt_Accept_SO_SNDTIMEO_SEC();
+		so_sndtimeo.tv_usec = 0;
+		if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
+		{
+			AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
+			af::printAddress( &(i_args->ss));
+			i_msg->v_stdOut();
+		}
 	}
 
 	// writing message back to client socket

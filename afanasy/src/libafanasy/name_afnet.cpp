@@ -216,26 +216,38 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 #endif //WINNT
 */
 
-	//
-	// set socket maximum time to wait for an output operation to complete
-	timeval so_timeo;
-	so_timeo.tv_usec = 0;
-	so_timeo.tv_sec = af::Environment::getServer_SO_MSGTIMEO_SEC();
-	if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+	if( af::Environment::getSockOpt_Dispatch_SO_RCVTIMEO_SEC() != -1 )
 	{
-		AFERRPE("msgsendtoaddress: set socket SO_RCVTIMEO option failed")
-		i_address.v_stdOut(); printf("\n");
+		timeval so_timeo;
+		so_timeo.tv_usec = 0;
+		so_timeo.tv_sec = af::Environment::getSockOpt_Dispatch_SO_RCVTIMEO_SEC();
+		if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+		{
+			AFERRPE("msgsendtoaddress: set socket SO_RCVTIMEO option failed")
+			i_address.v_stdOut(); printf("\n");
+		}
 	}
-	if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+
+	if( af::Environment::getSockOpt_Dispatch_SO_SNDTIMEO_SEC() != -1 )
 	{
-		AFERRPE("msgsendtoaddress: set socket SO_SNDTIMEO option failed")
-		i_address.v_stdOut(); printf("\n");
+		timeval so_timeo;
+		so_timeo.tv_usec = 0;
+		so_timeo.tv_sec = af::Environment::getSockOpt_Dispatch_SO_SNDTIMEO_SEC();
+		if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+		{
+			AFERRPE("msgsendtoaddress: set socket SO_SNDTIMEO option failed")
+			i_address.v_stdOut(); printf("\n");
+		}
 	}
-	int nodelay = 1;
-	if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+
+	if( af::Environment::getSockOpt_Dispatch_TCP_NODELAY() != -1 )
 	{
-	   AFERRPE("msgsendtoaddress: set socket TCP_NODELAY option failed")
-	   i_address.v_stdOut(); printf("\n");
+		int nodelay = af::Environment::getSockOpt_Dispatch_TCP_NODELAY();
+		if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+		{
+		   AFERRPE("msgsendtoaddress: set socket TCP_NODELAY option failed")
+		   i_address.v_stdOut(); printf("\n");
+		}
 	}
 
 	//
