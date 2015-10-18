@@ -8,10 +8,10 @@ source "$CGRU_LOCATION/software_setup/setup__all.sh"
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then
 	export NATRON_CGRU_PATH="${CGRU_LOCATION}/plugins/natron"
-	if [ -z "${NATRON_PATH}" ]; then
+	if [ -z "${NATRON_PLUGIN_PATH}" ]; then
 		export NATRON_PLUGIN_PATH="${NATRON_CGRU_PATH}"
 	else
-		export NATRON_PLUGIN_PATH="${NATRON_PATH};${NATRON_CGRU_PATH}"
+ 		export NATRON_PLUGIN_PATH="${NATRON_PLUGIN_PATH};${NATRON_CGRU_PATH}"
 	fi
 fi
 
