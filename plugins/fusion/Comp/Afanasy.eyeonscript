@@ -4,7 +4,7 @@
 
 -- SUBMIT TO AFANASY
 
-::again::
+-- ::again::
 
 	-- create dialog on unsaved composition
 function MessageBox(msg, title)
