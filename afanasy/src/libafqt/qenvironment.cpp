@@ -37,9 +37,12 @@ AttrNumber QEnvironment::star_radiusout( "star_radiusout", "Outer Radius", AFGUI
 AttrNumber QEnvironment::star_radiusin(  "star_radiusin",  "Inner Radius", AFGUI::STAR_RADIUSIN  );
 AttrNumber QEnvironment::star_rotate(    "star_rotate",    "Rotate Angle", AFGUI::STAR_ROTATE    );
 
-Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Job Added",               ""                             );
-Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Job Done",                ""                             );
-Attr       QEnvironment::soundJobError(      "sound_job_error",      "Job Error",               ""                             );
+AttrNumber QEnvironment::ntf_job_added_alert("ntf_job_added_alert", "Alert", 0 );
+Attr       QEnvironment::ntf_job_added_sound("ntf_job_added_sound", "Sound", "");
+AttrNumber QEnvironment::ntf_job_done_alert( "ntf_job_done_alert",  "Alert", 0 );
+Attr       QEnvironment::ntf_job_done_sound( "ntf_job_done_sound",  "Sound", "");
+AttrNumber QEnvironment::ntf_job_error_alert("ntf_job_error_alert", "Alert", 0 );
+Attr       QEnvironment::ntf_job_error_sound("ntf_job_error_sound", "Sound", "");
 
 AttrNumber QEnvironment::savePrefsOnExit(    "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT         );
 AttrNumber QEnvironment::saveWndRectsOnExit( "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS            );
@@ -135,9 +138,12 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append( &saveGUIOnExit      );
     ms_attrs_prefs.append( &showOfflineNoise   );
 
-    ms_attrs_prefs.append( &soundJobAdded     );
-    ms_attrs_prefs.append( &soundJobDone      );
-    ms_attrs_prefs.append( &soundJobError     );
+    ms_attrs_prefs.append( &ntf_job_added_alert );
+    ms_attrs_prefs.append( &ntf_job_added_sound );
+    ms_attrs_prefs.append( &ntf_job_done_alert  );
+    ms_attrs_prefs.append( &ntf_job_done_sound  );
+    ms_attrs_prefs.append( &ntf_job_error_alert );
+    ms_attrs_prefs.append( &ntf_job_error_sound );
 
     ms_attrs_gui.append( &image_back            );
     ms_attrs_gui.append( &image_border_top      );

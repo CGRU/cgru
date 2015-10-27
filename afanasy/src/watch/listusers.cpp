@@ -197,7 +197,7 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
 	return true;
 }
 
-ItemNode* ListUsers::createNewItem( af::Node *node)
+ItemNode* ListUsers::v_createNewItem( af::Node *node, bool i_subscibed)
 {
 	return new ItemUser( (af::User*)node);
 }

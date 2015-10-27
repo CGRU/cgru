@@ -14,7 +14,7 @@ public:
 	~ListJobs();
 
 	bool caseMessage( af::Msg * msg);
-	ItemNode* createNewItem( af::Node *node);
+	ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
 

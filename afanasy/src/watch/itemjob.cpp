@@ -21,7 +21,7 @@ const int ItemJob::Height = 30;
 const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
-ItemJob::ItemJob( ListJobs * i_list, af::Job *job):
+ItemJob::ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed):
 	ItemNode( (af::Node*)job),
 	m_list( i_list),
 	m_blocks_num(  job->getBlocksNum()),
@@ -45,6 +45,9 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job *job):
    }
 
    updateValues( (af::Node*)job, af::Msg::TJobsList);
+
+//	if( i_subscibed )
+		Watch::ntf_JobAdded( this);
 }
 
 ItemJob::~ItemJob()
@@ -74,12 +77,12 @@ void ItemJob::updateValues( af::Node *node, int type)
        // Just done:
        if( false == ( state & AFJOB::STATE_DONE_MASK ))
             if( job->getState() & AFJOB::STATE_DONE_MASK )
-                Watch::someJobDone();
+                Watch::ntf_JobDone( this);
 
        // Just got an error:
        if( false == ( state & AFJOB::STATE_ERROR_MASK ))
             if( job->getState() & AFJOB::STATE_ERROR_MASK )
-                Watch::someJobError();
+                Watch::ntf_JobError( this);
    }
 
 	setHidden(  job->isHidden()  );

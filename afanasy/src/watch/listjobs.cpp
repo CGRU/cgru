@@ -356,7 +356,6 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 		af::MCGeneral ids( msg);
 		deleteItems( ids);
 		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
-		Watch::someJobAdded();
 		break;
 	}
 	case af::Msg::TMonitorJobsChanged:
@@ -381,9 +380,9 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	return true;
 }
 
-ItemNode * ListJobs::createNewItem( af::Node *node)
+ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
 {
-	return new ItemJob( this, (af::Job*)node);
+	return new ItemJob( this, (af::Job*)node, i_subscibed);
 }
 
 void ListJobs::resetSorting()

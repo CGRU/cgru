@@ -11,8 +11,10 @@
 #include "buttonmonitor.h"
 #include "dialog.h"
 #include "item.h"
+#include "itemjob.h"
 #include "monitorhost.h"
 #include "listtasks.h"
+#include "popup.h"
 #include "reciever.h"
 #include "wndlist.h"
 #include "wndlistenjob.h"
@@ -47,6 +49,7 @@ QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 QApplication * Watch::ms_app = NULL;
 Dialog * Watch::ms_d = NULL;
 MonitorHost * Watch::ms_m = NULL;
+Popup * Watch::ms_popup = NULL;
 
 Watch::Watch( Dialog * pDialog, QApplication * pApplication)
 {
@@ -275,25 +278,29 @@ void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
 #endif
 }
 
-void Watch::someJobAdded()
+void Watch::ntf_JobAdded( const ItemJob * i_job)
 {
-    displayInfo("Job added.");
-    if( false == afqt::QEnvironment::soundJobAdded.str.isEmpty())
-        QSound::play( afqt::QEnvironment::soundJobAdded.str );
+	displayInfo("Job added.");
+	if( false == afqt::QEnvironment::ntf_job_added_sound.str.isEmpty())
+		QSound::play( afqt::QEnvironment::ntf_job_added_sound.str );
+
+	if( afqt::QEnvironment::ntf_job_added_alert.n )
+		Watch::notify("Job Added", i_job->getName());
 }
 
-void Watch::someJobDone()
+void Watch::ntf_JobDone( const ItemJob * i_job)
 {
-    displayInfo("Job Done.");
-    if( false == afqt::QEnvironment::soundJobDone.str.isEmpty())
-        QSound::play( afqt::QEnvironment::soundJobDone.str );
+	displayInfo("Job Done.");
+
+	if( false == afqt::QEnvironment::ntf_job_done_sound.str.isEmpty())
+		QSound::play( afqt::QEnvironment::ntf_job_done_sound.str );
 }
 
-void Watch::someJobError()
+void Watch::ntf_JobError( const ItemJob * i_job)
 {
-    displayWarning("Job Error.");
-    if( false == afqt::QEnvironment::soundJobError.str.isEmpty())
-        QSound::play( afqt::QEnvironment::soundJobError.str );
+	displayWarning("Job Error.");
+	if( false == afqt::QEnvironment::ntf_job_error_sound.str.isEmpty())
+		QSound::play( afqt::QEnvironment::ntf_job_error_sound.str );
 }
 
 void Watch::repaintStart()  { if( ms_d) ms_d->repaintStart(100); }
@@ -388,4 +395,12 @@ void Watch::repaint()
     for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
     for( QLinkedList<Wnd*>::iterator wIt = ms_windows.begin(); wIt != ms_windows.end(); wIt++) (*wIt)->update();
 //printf("Watch::repaint: finish\n");
+}
+
+void Watch::notify( const QString & i_title, const QString & i_msg)
+{
+	if( ms_popup != NULL )
+		ms_popup->close();
+
+	ms_popup = new Popup( i_title, i_msg);
 }

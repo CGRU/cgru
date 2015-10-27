@@ -39,7 +39,7 @@ protected:
 
 	virtual bool init( bool createModelView = true);
 
-	virtual ItemNode* createNewItem( af::Node *node) = 0;
+	virtual ItemNode * v_createNewItem( af::Node *node, bool i_subscibed) = 0;
 
 	bool updateItems( af::Msg* msg);
 

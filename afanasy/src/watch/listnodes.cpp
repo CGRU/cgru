@@ -169,7 +169,7 @@ bool ListNodes::updateItems( af::Msg * msg)
          }
       }
       if( exists) continue;
-      ItemNode* new_item = createNewItem( node);
+      ItemNode* new_item = v_createNewItem( node, isSubscribed());
       if( new_item == NULL) continue;
 
       int row;

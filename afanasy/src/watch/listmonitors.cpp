@@ -115,7 +115,7 @@ AFINFO("ListMonitors::caseMessage( Msg msg)\n");
 	return true;
 }
 
-ItemNode* ListMonitors::createNewItem( af::Node *node)
+ItemNode* ListMonitors::v_createNewItem( af::Node *node, bool i_subscibed)
 {
 	return new ItemMonitor( (af::Monitor*)node);
 }
