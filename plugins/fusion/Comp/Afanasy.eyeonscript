@@ -55,6 +55,7 @@ dialog = composition:AskUser(
     { "Start Frame", Name = "Start Frame", "Text", Lines = 1, Wrap = false, Default = frf },
     { "Last Frame" , Name = "Last Frame" , "Text", Lines = 1, Wrap = false, Default = lrf },
     { "Frames Per Task" , Name = "Frames Per Task" , "Text", Lines = 1, Wrap = false, Default = 5 },
+    { "Hosts Mask" , Name = "Hosts Mask" , "Text", Lines = 1, Wrap = false, Default = "" },
     { "Status"  , Name = "Status"  , "Text", Lines = 1, Wrap = false, Default = msg, ReadOnly = true },
   }
 )
@@ -73,8 +74,11 @@ mlrf = dialog["Last Frame"]
 	-- get frames per task
 fpt = "-fpt" .." ".. dialog["Frames Per Task"]
 
+	-- get host mask
+hosts_mask = "-hostsmask" .." ".. dialog["Hosts Mask"]
+
 	-- collect main command for cmd
-rcom = afpy .." ".. fcn .." ".. mfrf .." ".. mlrf .." ".. fpt .. " -tempscene -deletescene"
+rcom = afpy .." ".. fcn .." ".. mfrf .." ".. mlrf .." ".. fpt .. " ".. hosts_mask .. " -tempscene -deletescene"
 
 
 	-- print the main command in console
