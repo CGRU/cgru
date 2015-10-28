@@ -44,9 +44,9 @@ Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
 	label->setAutoFillBackground( true);
 	QColor clr = afqt::QEnvironment::clr_item.c;
 	if( i_state & AFJOB::STATE_DONE_MASK )
-		clr = afqt::QEnvironment::clr_done.c;
+		clr = afqt::QEnvironment::clr_itemjobdone.c;
 	if( i_state & AFJOB::STATE_ERROR_MASK )
-		clr = afqt::QEnvironment::clr_error.c;
+		clr = afqt::QEnvironment::clr_itemjoberror.c;
 	QPalette pal = palette();
 	pal.setColor( QPalette::Background, clr);
 	label->setPalette( pal);

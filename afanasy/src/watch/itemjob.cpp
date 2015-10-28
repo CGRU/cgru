@@ -69,21 +69,11 @@ void ItemJob::updateValues( af::Node *node, int type)
       return;
    }
 
+	// Store previous state to check difference for notifications.
+	uint32_t prev_state = state;
+
 	updateNodeValues( node);
 
-   // This is not item creation:
-   if( state != 0 )
-   {
-       // Just done:
-       if( false == ( state & AFJOB::STATE_DONE_MASK ))
-            if( job->getState() & AFJOB::STATE_DONE_MASK )
-                Watch::ntf_JobDone( this);
-
-       // Just got an error:
-       if( false == ( state & AFJOB::STATE_ERROR_MASK ))
-            if( job->getState() & AFJOB::STATE_ERROR_MASK )
-                Watch::ntf_JobError( this);
-   }
 
 	setHidden(  job->isHidden()  );
 	setOffline( job->isOffline() );
@@ -167,6 +157,21 @@ void ItemJob::updateValues( af::Node *node, int type)
 	if( thumb_path != new_thumb_path )
 		getThumbnail();
 	thumb_path = new_thumb_path;
+
+
+	// Notifications:
+	if( prev_state != 0 ) //< This is not item creation:
+	{
+		// Just done:
+		if( false == ( prev_state & AFJOB::STATE_DONE_MASK ))
+			if( state & AFJOB::STATE_DONE_MASK )
+				Watch::ntf_JobDone( this);
+
+		// Just got an error:
+		if( false == ( prev_state & AFJOB::STATE_ERROR_MASK ))
+			if( state & AFJOB::STATE_ERROR_MASK )
+				Watch::ntf_JobError( this);
+	}
 }
 
 bool ItemJob::calcHeight()
