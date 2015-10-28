@@ -184,7 +184,7 @@ function p_Deactivate()
 function p_PathChanged()
 {
 	// Process path:
-	path = c_GetHashPath();
+	path = c_GetHash();
 	args = path.split('?');
 	path = args[0];
 	if( path == p_path ) return;
