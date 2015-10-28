@@ -109,14 +109,12 @@ public:
 
 	void static browseImages( const QString & i_image, const QString & i_wdir);
 
-	void static notify( const QString & i_title, const QString & i_msg);
+	void static notify( const QString & i_title, const QString & i_msg, uint32_t i_state = 0);
 
 private:
 	static MonitorHost * ms_m;
 	static Dialog * ms_d;
 	static QApplication * ms_app;
-
-	static Popup * ms_popup;
 
 	static QLinkedList<Wnd*> ms_windows;
 	static QLinkedList<Reciever*> ms_recievers;

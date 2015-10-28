@@ -46,7 +46,7 @@ ItemJob::ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed):
 
    updateValues( (af::Node*)job, af::Msg::TJobsList);
 
-//	if( i_subscibed )
+	if( i_subscibed )
 		Watch::ntf_JobAdded( this);
 }
 

@@ -1,7 +1,8 @@
 #include "popup.h"
 
+#include "../include/afjob.h"
+
 #include "dialog.h"
-#include "watch.h"
 
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
@@ -12,9 +13,17 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Popup::Popup( const QString & i_title, const QString & i_msg):
+Popup * Popup::ms_popup = NULL;
+
+Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
    QWidget( Watch::getDialog())
 {
+	printf("Notification: %s - %s\n", i_title.toUtf8().data(), i_msg.toUtf8().data());
+
+	// Close previusly opened popup:
+	if( ms_popup != NULL )
+		ms_popup->close();
+
 	setAttribute( Qt::WA_DeleteOnClose, true );
 	setAttribute( Qt::WA_ShowWithoutActivating);
 
@@ -26,16 +35,31 @@ Popup::Popup( const QString & i_title, const QString & i_msg):
 
 	QVBoxLayout * vlayout = new QVBoxLayout( this);
 
-	QLabel * label = new QLabel( QString("<b>%1</b><br><br>%2").arg( i_title, i_msg), this);
-
+	QLabel * label = new QLabel( QString("AFANASY<br><br><b>%1</b><br><br>%2").arg( i_title, i_msg), this);
 	vlayout->addWidget( label);
+	label->setMinimumSize( 240, 120);
+	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
 
+	// Background color:
+	label->setAutoFillBackground( true);
+	QColor clr = afqt::QEnvironment::clr_item.c;
+	if( i_state & AFJOB::STATE_DONE_MASK )
+		clr = afqt::QEnvironment::clr_done.c;
+	if( i_state & AFJOB::STATE_ERROR_MASK )
+		clr = afqt::QEnvironment::clr_error.c;
+	QPalette pal = palette();
+	pal.setColor( QPalette::Background, clr);
+	label->setPalette( pal);
+
+	// Placement:
 	setGeometry(QStyle::alignedRect(
 		Qt::RightToLeft,
 		Qt::AlignTop,
 		size(),
 		qApp->desktop()->availableGeometry())
 	);
+
+	ms_popup = this;
 
 	show();
 }
@@ -46,5 +70,10 @@ void Popup::mousePressEvent( QMouseEvent * event)
 {
 	Watch::getDialog()->raise();
 	close();
+}
+
+void Popup::closeEvent( QCloseEvent * event)
+{
+	ms_popup = NULL;
 }
 

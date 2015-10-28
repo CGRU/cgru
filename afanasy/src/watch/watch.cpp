@@ -49,7 +49,6 @@ QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 QApplication * Watch::ms_app = NULL;
 Dialog * Watch::ms_d = NULL;
 MonitorHost * Watch::ms_m = NULL;
-Popup * Watch::ms_popup = NULL;
 
 Watch::Watch( Dialog * pDialog, QApplication * pApplication)
 {
@@ -285,7 +284,7 @@ void Watch::ntf_JobAdded( const ItemJob * i_job)
 		QSound::play( afqt::QEnvironment::ntf_job_added_sound.str );
 
 	if( afqt::QEnvironment::ntf_job_added_alert.n )
-		Watch::notify("Job Added", i_job->getName());
+		Watch::notify("Job Added", i_job->getName(), i_job->state);
 }
 
 void Watch::ntf_JobDone( const ItemJob * i_job)
@@ -294,6 +293,9 @@ void Watch::ntf_JobDone( const ItemJob * i_job)
 
 	if( false == afqt::QEnvironment::ntf_job_done_sound.str.isEmpty())
 		QSound::play( afqt::QEnvironment::ntf_job_done_sound.str );
+
+	if( afqt::QEnvironment::ntf_job_added_alert.n )
+		Watch::notify("Job Done", i_job->getName(), i_job->state);
 }
 
 void Watch::ntf_JobError( const ItemJob * i_job)
@@ -301,6 +303,9 @@ void Watch::ntf_JobError( const ItemJob * i_job)
 	displayWarning("Job Error.");
 	if( false == afqt::QEnvironment::ntf_job_error_sound.str.isEmpty())
 		QSound::play( afqt::QEnvironment::ntf_job_error_sound.str );
+
+	if( afqt::QEnvironment::ntf_job_added_alert.n )
+		Watch::notify("Job Error", i_job->getName(), i_job->state);
 }
 
 void Watch::repaintStart()  { if( ms_d) ms_d->repaintStart(100); }
@@ -397,10 +402,7 @@ void Watch::repaint()
 //printf("Watch::repaint: finish\n");
 }
 
-void Watch::notify( const QString & i_title, const QString & i_msg)
+void Watch::notify( const QString & i_title, const QString & i_msg, uint32_t i_state)
 {
-	if( ms_popup != NULL )
-		ms_popup->close();
-
-	ms_popup = new Popup( i_title, i_msg);
+	new Popup( i_title, i_msg, i_state);
 }
