@@ -213,7 +213,7 @@ function g_HashSet()
 
 function g_HashGet()
 {
-	var hash = document.location.hash;
+	var hash = decodeURI( document.location.hash);
 	if( hash.indexOf('#') == 0 ) hash = hash.substr(1);
 
 	var args = null;
