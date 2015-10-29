@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtGui/QWidget>
-
 #include "watch.h"
+
+#include <QtGui/QWidget>
 
 class Popup : public QWidget
 {
