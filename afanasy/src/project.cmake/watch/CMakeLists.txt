@@ -46,4 +46,11 @@ if(WIN32)
    target_link_libraries(afwatch Ws2_32.lib)
 endif(WIN32)
 
+if(APPLE)
+   find_library(SYSTEMCONFIGURATION_FRAMEWORK SystemConfiguration)
+   find_library(SECURITY_FRAMEWORK Security)
+   target_link_libraries(afwatch ${SYSTEMCONFIGURATION_FRAMEWORK}
+	   ${SECURITY_FRAMEWORK})
+endif(APPLE)
+
 target_link_libraries(afwatch afqt $ENV{AF_EXTRA_LIBS} )
