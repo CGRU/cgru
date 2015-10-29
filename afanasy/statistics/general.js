@@ -750,6 +750,18 @@ function g_ShowGraph( i_data, i_args)
 		g_Info('Statistics received.');
 }
 
+function g_FolderDelete( i_evt)
+{
+	var folder = $('folder_delete').textContent;
+	g_Log('Deleting folder: ' + folder);
+	g_Request({"send":{"folder_delete":{"folder":folder}},"func":g_FoldersDeleted});
+}
+function g_FoldersDeleted( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+	g_HashChanged();
+}
+
 function g_TimeKeyDown( i_evt)
 {
 	if( i_evt.keyCode != 13 ) // Enter

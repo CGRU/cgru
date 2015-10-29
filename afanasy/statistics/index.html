@@ -39,6 +39,16 @@
 <div id="info"></div>
 
 <div id="folders_div">
+	<div id="folders_ctrl_div">
+		<div onclick="this.style.display='none';$('folders_ctrl').style.display='block'">CTRL</div>
+		<div id="folders_ctrl" style="display: none">
+			<div id="folder_delete" contenteditable=true class="editing"></div>
+			<div ondblclick="g_FolderDelete()"
+				title="Double click to delete.
+Use '%' character for any string.">
+				DELETE</div>
+		</div>
+	</div>
 	<div id="folders_root"></div>
 	<div id="folders"></div>
 </div>

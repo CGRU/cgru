@@ -80,8 +80,8 @@ function get_jobs_folders( $i_args, &$o_out)
 
 	$dbconn = db_connect();
 
-	$o_out['select']   = $select;
-	$o_out['table'] = array();
+	$o_out['select'] = $select;
+	$o_out['table']  = array();
 
 	// Select:
 // SELECT min(folder),sum(1) FROM tasks GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[2];
@@ -254,8 +254,8 @@ function get_tasks_folders( $i_args, &$o_out)
 
 	$dbconn = db_connect();
 
-	$o_out['select']   = $select;
-	$o_out['table'] = array();
+	$o_out['select'] = $select;
+	$o_out['table']  = array();
 
 $query="
 SELECT min($select) as $select,
@@ -535,6 +535,26 @@ SELECT $select,
 
 		$time += $interval;
 	}
+}
+
+function folder_delete( $i_args, &$o_out)
+{
+	$folder = $i_args['folder'];
+
+	$dbconn = db_connect();
+
+
+	$query="DELETE FROM jobs WHERE folder LIKE '$folder'";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$o_out['jobs'] = array();
+	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+		$o_out['jobs'][] = $line;
+
+	$query="DELETE FROM tasks WHERE folder LIKE '$folder'";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$o_out['tasks'] = array();
+	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+		$o_out['tasks'][] = $line;
 }
 
 ?>
