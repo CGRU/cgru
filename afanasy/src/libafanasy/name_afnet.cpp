@@ -552,9 +552,9 @@ af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 	return NULL;
 }
 
-void af::socketDisconnect( int i_sd)
+void af::socketDisconnect( int i_sd, int i_waitForClient)
 {
-	if( af::Environment::isServer())
+	if( af::Environment::isServer() && i_waitForClient)
 	{
 		// Server waits client have closed socket first:
 		char buf[1024];

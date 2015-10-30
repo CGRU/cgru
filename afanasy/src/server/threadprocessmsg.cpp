@@ -51,7 +51,7 @@ void threadProcessMsg( void * i_args)
 	// arguments are deleted in any way.
 	processMessage( threadArgs);
 
-	af::socketDisconnect( threadArgs->sd);
+	af::socketDisconnect( threadArgs->sd, false);
 
 	delete threadArgs;
 }

@@ -245,7 +245,7 @@ namespace af
 	Msg * msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
 
 	/// Close socket
-	void socketDisconnect( int i_sd);
+	void socketDisconnect( int i_sd, int i_waitForClient = true);
 
 
 	// Python:
