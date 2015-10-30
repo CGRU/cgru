@@ -554,6 +554,7 @@ af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 
 void af::socketDisconnect( int i_sd, int i_waitForClient)
 {
+/*
 	if( af::Environment::isServer() && i_waitForClient)
 	{
 		// Server waits client have closed socket first:
@@ -561,7 +562,7 @@ void af::socketDisconnect( int i_sd, int i_waitForClient)
 		int r = 1;
 		while( r ) r = read( i_sd, buf, 1024);
 	}
-
+*/
 	closesocket( i_sd);
 }
 
