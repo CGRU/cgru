@@ -9,7 +9,6 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#define closesocket close
 #endif
 
 #include "../include/afanasy.h"
@@ -52,7 +51,7 @@ void threadProcessMsg( void * i_args)
 	// arguments are deleted in any way.
 	processMessage( threadArgs);
 
-	closesocket(threadArgs->sd);
+	af::socketDisconnect( threadArgs->sd);
 
 	delete threadArgs;
 }

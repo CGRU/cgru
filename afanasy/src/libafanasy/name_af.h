@@ -244,6 +244,9 @@ namespace af
 	/// Send a message to all its addresses and receive an answer if needed
 	Msg * msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
 
+	/// Close socket
+	void socketDisconnect( int i_sd);
+
 
 	// Python:
 	bool PyGetString( PyObject * i_obj, std::string & o_str, const char * i_err_info = NULL);

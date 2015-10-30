@@ -192,8 +192,8 @@
 	"af_server_accept_so_sndtimeo_sec":2,
 	"af_server_dispatch_so_rcvtimeo_sec":2,
 	"af_server_dispatch_so_sndtimeo_sec":2,
-	"af_server_dispatch_tcp_nodelay":1,
- 
+	"af_server_dispatch_tcp_nodelay":0,
+
 	"af_client_dispatch_so_rcvtimeo_sec":8,
 	"af_client_dispatch_so_sndtimeo_sec":8,
 	"af_client_dispatch_tcp_nodelay":0,

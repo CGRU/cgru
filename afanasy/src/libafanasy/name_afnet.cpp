@@ -279,14 +279,16 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	{
 		AFERRAR("af::msgsend: can't send message to client: %s",
 				i_address.v_generateInfoString().c_str())
-		closesocket(socketfd);
+
+		af::socketDisconnect( socketfd);
+
 		o_ok = false;
 		return NULL;
 	}
 
 	if( false == i_msg->isReceiving())
 	{
-		closesocket(socketfd);
+		af::socketDisconnect( socketfd);
 		return NULL;
 	}
 
@@ -322,7 +324,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 			o_ok = false;
 		}
 
-		closesocket(socketfd);
+		af::socketDisconnect( socketfd);
 		return o_msg;
 	}
 
@@ -332,13 +334,14 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	if( false == af::msgread( socketfd, o_msg))
 	{
 	   AFERROR("msgsendtoaddress: Reading binary answer failed.")
-	   closesocket( socketfd);
+		af::socketDisconnect( socketfd);
 	   delete o_msg;
 	   o_ok = false;
 	   return NULL;
 	}
 
-	closesocket(socketfd);
+	af::socketDisconnect( socketfd);
+
 	return o_msg;
 }
 
@@ -547,6 +550,19 @@ af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 	}
 
 	return NULL;
+}
+
+void af::socketDisconnect( int i_sd)
+{
+	if( af::Environment::isServer())
+	{
+		// Server waits client have closed socket first:
+		char buf[1024];
+		int r = 1;
+		while( r ) r = read( i_sd, buf, 1024);
+	}
+
+	closesocket( i_sd);
 }
 
 af::Msg * af::msgString( const std::string & i_str)
