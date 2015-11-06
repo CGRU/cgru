@@ -31,7 +31,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void processMessage( ThreadArgs * i_args);
+uint32_t processMessage( ThreadArgs * i_args);
 
 bool readMessage( ThreadArgs * i_args, af::Msg * i_msg);
 
@@ -49,15 +49,17 @@ void threadProcessMsg( void * i_args)
 	// Message processing in separate function
 	// to ensure that descriptor closed and
 	// arguments are deleted in any way.
-	processMessage( threadArgs);
+	uint32_t response_type = processMessage( threadArgs);
 
-	af::socketDisconnect( threadArgs->sd, false);
+	af::socketDisconnect( threadArgs->sd, response_type);
 
 	delete threadArgs;
 }
 
-void processMessage( ThreadArgs * i_args)
+uint32_t processMessage( ThreadArgs * i_args)
 {
+	uint32_t response_type = -1; // Error
+
 	// Construct a new message to read.
 	// Using a constructor that stores client address in message,
 	// this client address will be used for a new client,
@@ -70,14 +72,16 @@ void processMessage( ThreadArgs * i_args)
 	{
 		// There was some error reading message
 		delete msg_request;
-		return;
+		return response_type;
 	}
 
 #ifdef AFOUTPUT
 printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
 #endif
 
-	if( msg_request->type() == af::Msg::THTTPGET )
+	uint32_t request_type = msg_request->type();
+
+	if( request_type == af::Msg::THTTPGET )
 		msg_response = processHTTPGet( msg_request);
 
 	// Check message IP trust mask:
@@ -87,7 +91,7 @@ printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_re
 		if( false == Auth::process( msg_request, &msg_response))
 		{
 			delete msg_request;
-			return;
+			return response_type;
 		}
 	}
 
@@ -96,25 +100,33 @@ printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_re
 		msg_response = threadProcessMsgCase( i_args, msg_request);
 	// If request not needed any more it will be deleted there.
 
+	response_type = 0; // No response
+
 	if( msg_response == NULL)
 	{
 		// No response needed, returning
-		return;
+		return response_type;
 	}
 
 	// Set HTTP message type.
 	// On writing header will be send first for web browsers.
-	if( msg_request->type() == af::Msg::THTTP )
+	if( request_type == af::Msg::THTTP )
 		msg_response->setTypeHTTP();
+	else if( request_type == af::Msg::TJSONBIN )
+		msg_response->setJSONBIN();
 
 #ifdef AFOUTPUT
 printf("Response: "); msg_response->v_stdOut();
 #endif
 
+	response_type = msg_response->type();
+
 	// Write response message back to client socket
 	writeMessage( i_args, msg_response);
 
 	delete msg_response;
+
+	return response_type;
 }
 
 bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
@@ -168,7 +180,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AFERROR("writeMessage: can't send message to client.")
 		af::printAddress( &(i_args->ss));
-		i_msg->v_stdOut();
+		i_msg->stdOutData();
 		return;
 	}
 
@@ -179,9 +191,9 @@ bool validateGetFileName( const std::string & i_name);
 
 af::Msg * processHTTPGet( const af::Msg * i_msg)
 {
-	static const char header_OK[] = "HTTP/1.1 200 OK\r\n\r\n";
-	static const  int header_OK_len = strlen( header_OK);
-	static const char header_ERROR[] = "HTTP/1.1 404 Not Found\r\n\r\n";
+	//static const char header_OK[] = "HTTP/1.1 200 OK\r\n\r\n";
+	//static const  int header_OK_len = strlen( header_OK);
+	//static const char header_ERROR[] = "HTTP/1.1 404 Not Found\r\n\r\n";
 
 	static const char tasks_file[] = "@TMP@";
 	static const  int tasks_file_len = strlen( tasks_file);
@@ -239,11 +251,17 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 
 	if( file_data )
 	{
-		int msg_datalen = header_OK_len + file_size;
+		char buffer[1024];
+		sprintf( buffer, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", file_size);
+		int buffer_len = strlen( buffer);
+
+//		int msg_datalen = header_OK_len + file_size;
+		int msg_datalen = buffer_len + file_size;
 		char * msg_data = new char[msg_datalen];
 
-		memcpy( msg_data, header_OK, header_OK_len);
-		memcpy( msg_data + header_OK_len, file_data, file_size);
+//		memcpy( msg_data, header_OK, header_OK_len);
+		memcpy( msg_data, buffer, buffer_len);
+		memcpy( msg_data + buffer_len, file_data, file_size);
 
 		o_msg->setData( msg_datalen, msg_data, af::Msg::THTTPGET);
 
@@ -252,7 +270,7 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 	}
 	else
 	{
-		std::string error( header_ERROR);
+		std::string error("HTTP/1.1 404 Not Found\r\n\r\n");
 		error += "File not found: ";
 		error += file_name;
 		o_msg->setData( error.size(), error.c_str(), af::Msg::THTTPGET);

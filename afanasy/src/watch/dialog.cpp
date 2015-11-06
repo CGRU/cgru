@@ -349,6 +349,14 @@ void Dialog::newMessage( af::Msg *msg)
 		Watch::filesReceived( taskup);
         break;
 	}
+	case af::Msg::TJSON:
+	case af::Msg::TJSONBIN:
+	case af::Msg::THTTP:
+	case af::Msg::THTTPGET:
+	{
+		msg->stdOutData();
+		break;
+	}
     default:
         Watch::caseMessage( msg);
     }

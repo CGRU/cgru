@@ -233,6 +233,9 @@ namespace af
 
 	Msg * msgString( const std::string & i_str);
 
+	// Read message header from message buffer;
+	int processHeader( af::Msg * io_msg, int i_bytes);
+
 	/// Recieve message from given file discriptor \c desc to \c buffer
 	/** Return true if success. This function will block process.**/
 	bool msgread( int desc, af::Msg* msg);
@@ -245,7 +248,7 @@ namespace af
 	Msg * msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
 
 	/// Close socket
-	void socketDisconnect( int i_sd, int i_waitForClient = true);
+	void socketDisconnect( int i_sd, uint32_t i_response_type = -1);
 
 
 	// Python:

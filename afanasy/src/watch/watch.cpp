@@ -89,8 +89,9 @@ void Watch::sendMsg( af::Msg * msg)
 {
 	if( msg->type() == af::Msg::TJSON )
 	{
-		std::string str( msg->data(), msg->dataLen());
-		printf("\n%s\n", str.c_str());
+		msg->setJSONBIN();
+		msg->setReceiving();
+		msg->stdOutData();
 	}
 	if( ms_d ) ms_d->sendMsg( msg);
 }

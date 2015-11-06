@@ -27,6 +27,7 @@ switch ( i_msg->type())
 {
 	case af::Msg::THTTP:
 	case af::Msg::TJSON:
+	case af::Msg::TJSONBIN:
 	{
 		threadRunJSON( i_args, i_msg);
 		break;
