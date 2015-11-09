@@ -568,7 +568,6 @@ void af::socketDisconnect( int i_sd, uint32_t i_response_type)
 {
 //	if(0)
 	if( af::Environment::isServer() && 
-		( i_response_type > 0) &&
 		( i_response_type != af::Msg::THTTP ) &&
 		( i_response_type != af::Msg::THTTPGET ))
 	{
@@ -588,6 +587,7 @@ void af::socketDisconnect( int i_sd, uint32_t i_response_type)
 		}
 		//printf("Server socket closed.\n");
 	}
+	//else{ printf("closing socket w/0 waiting other side %s.\n", af::Msg::TNAMES[i_response_type]); }
 
 	closesocket( i_sd);
 }
