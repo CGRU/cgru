@@ -577,7 +577,11 @@ void af::socketDisconnect( int i_sd, uint32_t i_response_type)
 		//printf("Server socket wait...\n");
 		while( r > 0 )
 		{
+			#ifdef WINNT
+			r = recv( i_sd, buf, af::Msg::SizeHeader, 0);
+			#else
 			r = read( i_sd, buf, af::Msg::SizeHeader);
+			#endif
 		/*	if( r > 0 )
 			{
 				printf("Server socket wait: %d\n", r);
