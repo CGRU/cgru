@@ -112,7 +112,7 @@ printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_re
 	// On writing header will be send first for web browsers.
 	if( request_type == af::Msg::THTTP )
 		msg_response->setTypeHTTP();
-	else if( request_type == af::Msg::TJSONBIN )
+	else if(( request_type == af::Msg::TJSONBIN ) && ( response_type == af::Msg::TJSON ))
 		msg_response->setJSONBIN();
 
 #ifdef AFOUTPUT

@@ -208,7 +208,7 @@ void Msg::setJSONBIN()
 {
 	if( m_type != TJSON )
 	{
-		AFERROR("Can't set JSON to binary, as message is not JSON");
+		AFERROR("Can't set JSON to binary, as message is not JSON:");
 		v_stdOut();
 		return;
 	}
