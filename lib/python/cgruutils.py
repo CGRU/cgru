@@ -9,6 +9,33 @@ import re
 import webbrowser
 
 
+ImgExts = ['jpg','png','exr','dpx','tif','psd','tga']
+
+
+def isImageExt( i_name):
+	name, ext = os.path.splitext( i_name)
+	if ext.lower()[1:] in ImgExts:
+		return True
+	return False
+
+
+def sepThousands(i_int):
+	"""
+	:param i_int: input number
+	:return: string with a space separated thousands
+	"""
+	s = str(int(i_int))
+	o = ''
+	for i in range(0, len(s)):
+		o += s[len(s) - i - 1]
+		if (i + 1) % 3 == 0:
+			o += ' '
+	s = ''
+	for i in range(0, len(o)):
+		s += o[len(o) - i - 1]
+	return s
+
+
 def copy_file(source_file, destination_file, delete_original=False, debug=False):
 	"""Missing DocString
 

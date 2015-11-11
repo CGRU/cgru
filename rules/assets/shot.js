@@ -151,7 +151,7 @@ function shot_ResultsReceived( i_data, i_args)
 			shot_thumb_paths.push( path);
 
 		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],
-			"show_walk":false,"can_count":true,"masks":shot_results_masks}));
+			"show_walk":false,"can_count":true,"masks":shot_results_masks,"count_images":true}));
 
 		found = true;
 	}
