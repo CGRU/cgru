@@ -24,7 +24,10 @@
 	<div style="overflow:hidden; height:40px; background:url('images/header.png') repeat-x"></div>
 </div>
 
+<div id="info"></div>
+
 <div id="top_panel">
+
 	<div style="float:left;" class="time_div">
 		<div class="label">Date From:</div>
 		<div id="time_min" contenteditable=true class="editing"></div>
@@ -34,9 +37,6 @@
 		<div id="time_max" contenteditable=true class="editing"></div>
 	</div>
 	<div id="actions"></div>
-</div>
-
-<div id="info"></div>
 
 <div id="folders_div">
 	<div id="folders_ctrl_div">
@@ -44,13 +44,17 @@
 		<div id="folders_ctrl" style="display: none">
 			<div id="folder_delete" contenteditable=true class="editing"></div>
 			<div ondblclick="g_FolderDelete()"
-				title="Double click to delete.
+				title="Double click to delete folder(s).
 Use '%' character for any string.">
 				DELETE</div>
 		</div>
 	</div>
 	<div id="folders_root"></div>
 	<div id="folders"></div>
+</div>
+
+<div id="waiting"></div>
+
 </div>
 
 <div id="content"></div>

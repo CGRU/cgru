@@ -19,6 +19,13 @@ text-align: center;
 border-radius: 6px;
 box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF;
 padding: 8px 8px;
+position: relative;
+}
+#waiting {
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background-color: #000;
+opacity: .5;
 }
 #actions {
 /*border: 1px solid #000;*/
@@ -99,9 +106,8 @@ text-shadow: 0 0 4px rgba(2550,0,0,.9);
 }
 
 #folders_div {
-margin: 4px 20px;
-padding: 4px 12px;
--height: 50px;
+margin: 2px;
+padding: 2px;
 }
 #folders_ctrl_div {
 float: right;
