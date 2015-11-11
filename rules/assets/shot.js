@@ -426,8 +426,14 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 			}
 
 			if( false == c_FileIsImage( name )) continue;
+
 			img_num++;
-			if( img_num < 2 ) continue;
+		}
+//			if( img_num < 2 ) continue;
+
+		if( img_num )
+		{
+			i_walk.num_files = img_num;
 
 			if( i_path )
 				i_walk.name = i_path;
@@ -442,7 +448,7 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 					if( o_walk.rufiles.indexOf( i_parent_walk.rufiles[r]) == -1 )
 						o_walk.rufiles.push( i_parent_walk.rufiles[r]);
 
-			break;
+//			break;
 		}
 	}
 

@@ -448,10 +448,10 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 	}
 
 	var num_files = null;
-	if( i_el.m_obj.num_files != null )
-		num_files = i_el.m_obj.num_files;
 	if( i_el.m_obj.files && i_el.m_obj.files.length )
 		num_files = i_el.m_obj.files.length;
+	if( i_el.m_obj.num_files != null )
+		num_files = i_el.m_obj.num_files;
 	if( num_files != null )
 	{
 		if( i_el.m_el_num_files == null )
