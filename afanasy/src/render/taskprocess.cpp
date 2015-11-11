@@ -201,7 +201,7 @@ void TaskProcess::launchCommand()
 	if( false == m_doing_post )
 		m_taskexec->v_stdOut( af::Environment::isVerboseMode());
 	else
-		printf("POST: %s\n", m_cmd.c_str());
+		printf("POST:\n%s\n", m_cmd.c_str());
 }
 
 TaskProcess::~TaskProcess()

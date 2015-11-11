@@ -158,6 +158,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
 		thumb_cmds = self.generateThumbnail( True)
 		for cmd in thumb_cmds:
+			print('Generating thumbnail "on-the-fly":')
 			print( cmd)
 			os.system(cmd)
 
@@ -228,7 +229,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 					files_list[int(len(files_list) / 2)],
 					files_list[-1]
 				]
-		elif len(self.taskInfo['files']):
+		elif len(self.taskInfo['files']) and not i_onthefly:
 			for afile in self.taskInfo['files']:
 				files_list.append(afile)
 			# files_list.append(afile.decode('utf-8'))
