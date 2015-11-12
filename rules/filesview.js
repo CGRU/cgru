@@ -393,7 +393,7 @@ FilesView.prototype.showCounts = function()
 		var el = document.createElement('div');
 		this.elCounts.appendChild( el);
 		el.classList.add('frames_count');
-		el.textContent = 'F:' + frames_count;
+		el.textContent = 'sF:' + frames_count;
 		el.title = 'All folders files sum.\nDouble click to update status frames number.';
 		el.m_frames_count = frames_count;
 		el.onclick = function(e){e.stopPropagation();};
@@ -466,7 +466,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( i_el.m_obj.num_images && this.count_images )
 		{
 			f_count = i_el.m_obj.num_images;
-			i_el.m_el_num_files.textContent = 'IF:' + f_count;
+			i_el.m_el_num_files.textContent = 'iF:' + f_count;
 		}
 		else
 			i_el.m_el_num_files.textContent = 'F:' + f_count;
