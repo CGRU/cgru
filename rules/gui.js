@@ -372,6 +372,8 @@ function gui_CreateChoises( i_args)
 
 	for( var key in keys)
 	{
+		if( keys[key].disabled ) continue;
+
 		var el = document.createElement('div');
 		elChoises.appendChild( el);
 		el.classList.add('choise');

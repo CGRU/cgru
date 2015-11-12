@@ -322,8 +322,12 @@ function d_Convert( i_args)
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
 	if( i_args.movies !== true )
+	{
+		RULES.dailies.codecs.copy.disabled = true;
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	}
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	RULES.dailies.codecs.copy.disabled = false;
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	if( i_args.results )
