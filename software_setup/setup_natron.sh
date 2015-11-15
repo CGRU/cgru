@@ -28,7 +28,10 @@ else
 	NATRON_INSTALL_DIR="/opt"
 fi
 
-NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron.app/Contents/MacOS/"
+NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron"
+if [ `uname` == "Darwin" ]; then
+	NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron.app/Contents/MacOS/"
+fi
 NATRON_EXEC="Natron"
 
 export NATRON_EXEC="${NATRON_LOCATION}/${NATRON_EXEC}"
