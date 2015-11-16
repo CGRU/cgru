@@ -399,7 +399,7 @@ function d_Convert( i_args)
 	{
 		var elWmBtn = document.createElement('div');
 		elBtns.appendChild(elWmBtn);
-		elWmBtn.textContent = 'Watermark';
+		elWmBtn.textContent = 'Add Movie Watermark';
 		elWmBtn.classList.add('button');
 		elWmBtn.style.cssFloat = 'right';
 		elWmBtn.m_wnd = wnd;
@@ -497,7 +497,7 @@ function d_CvtImages( i_wnd, i_params)
 	cmd += ' -c ' + i_params.colorspace;
 	cmd += ' -q ' + i_params.quality;
 	if( i_params.padding ) cmd += ' --renumpad ' + i_params.padding;
-	if( i_params.format != '' ) cmd += ' -r ' + i_params.format;
+	if( i_params.format && ( i_params.format != 'asis' )) cmd += ' -r ' + i_params.format;
 
 	var afanasy = false;
 	if( i_wnd.m_args.folders || ( paths.length > 1 ))
@@ -592,7 +592,8 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	job.folders = {};
 	job.folders.input = c_PathDir( paths[0]);
 
-	if( i_params.format ) job.name += '-' + i_params.format;
+	if( i_params.format && ( i_params.format != 'asis' ))
+		job.name += '-' + i_params.format;
 
 	if( i_to_sequence )
 		job.name = 'Explode ' + job.name;
@@ -617,7 +618,7 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avcmd;
-	if( i_params.format )
+	if( i_params.format && ( i_params.format != 'asis' ))
 		cmd += ' -r "' + i_params.format + '"';
 	if( i_params.time_start != d_cvtguiparams.time_start.default )
 		cmd += ' -s ' + i_params.time_start;
