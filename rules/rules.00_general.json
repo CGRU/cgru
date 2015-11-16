@@ -222,6 +222,7 @@
 	},
 
 	"formats":{
+		"asis":   {"name":"As Is",   "value":null},
 		"pal":    {"name":"PAL",     "value":"720x576x1.09"},
 		"pal768": {"name":"PAL 768", "value":"768x576"},
 		"1k43":   {"name":"1k 4:3",  "value":"1024x768"},

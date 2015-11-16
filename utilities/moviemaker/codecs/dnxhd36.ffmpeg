@@ -1,2 +1,2 @@
 DNxHD 36MBits
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec dnxhd -b 36M @AUXARGS@ -r @FPS@ "@OUTPUT@.mov"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec dnxhd -b 36M -r @FPS@ "@OUTPUT@.mov"

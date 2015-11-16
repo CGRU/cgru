@@ -858,3 +858,15 @@ box-shadow: 0 0 8px #000;
 height: 20px;
 }
 
+/* ================== Watermark: ===================== */
+.watermark_back {
+position: absolute;
+top: 0; bottom: 0; left: 0; right: 0;
+background-color: rgba( 0,0,0,0.5);
+text-align: center;
+}
+.watermark_ctrls { background-color: rgba( 128, 128, 128, 0.8);}
+.watermark_btns > div { float: left; padding: 2px 12px; margin: 2px 12px; }
+
+.watermark_enabled { background-color: rgba( 255, 255, 0, 0.5);}
+
