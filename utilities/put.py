@@ -168,6 +168,9 @@ if Options.ftp is None:
 		if not Options.rsync:
 			print('PROGRESS: %d%%' % int(100.0 * (i + 1.0) / len(Files)))
 
+		if i == int(len(Files)/2):
+			print('@IMAGE@' + afile)
+
 		sys.stdout.flush()
 
 		i += 1

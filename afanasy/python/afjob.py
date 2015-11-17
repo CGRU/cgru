@@ -566,6 +566,8 @@ if __name__ == '__main__':
 			scenetype = 'maya_mental'
 		elif blocktype == 'maya_delight':
 			scenetype = 'maya_delight'
+		elif blocktype == 'maya_arnold':
+			scenetype = 'maya_arnold'
 		else:
 			blocktype = 'maya'
 			scenetype = 'maya'

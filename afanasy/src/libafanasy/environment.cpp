@@ -94,9 +94,19 @@ int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
-int Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
-int Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
-int Environment::server_so_msgtimeo_sec =          AFSERVER::SO_MSGTIMEO_SEC;
+
+/// Socket Options:
+int Environment::server_accept_so_rcvtimeo_sec    = AFNETWORK::SERVER_ACCEPT_SO_RCVTIMEO_SEC;
+int Environment::server_accept_so_sndtimeo_sec    = AFNETWORK::SERVER_ACCEPT_SO_SNDTIMEO_SEC;
+int Environment::server_dispatch_so_rcvtimeo_sec  = AFNETWORK::SERVER_DISPATCH_SO_RCVTIMEO_SEC;
+int Environment::server_dispatch_so_sndtimeo_sec  = AFNETWORK::SERVER_DISPATCH_SO_SNDTIMEO_SEC;
+int Environment::server_dispatch_tcp_nodelay      = AFNETWORK::SERVER_DISPATCH_TCP_NODELAY;
+
+int Environment::client_dispatch_so_rcvtimeo_sec  = AFNETWORK::CLIENT_DISPATCH_SO_RCVTIMEO_SEC;
+int Environment::client_dispatch_so_sndtimeo_sec  = AFNETWORK::CLIENT_DISPATCH_SO_SNDTIMEO_SEC;
+int Environment::client_dispatch_tcp_nodelay      = AFNETWORK::CLIENT_DISPATCH_TCP_NODELAY;
+
+
 
 std::string Environment::db_conninfo =                     AFDATABASE::CONNINFO;
 std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
@@ -194,9 +204,19 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, db_stringnamelen,                  "af_db_stringnamelen"                  );
 	getVar( i_obj, db_stringexprlen,                  "af_db_stringexprlen"                  );
 
-	getVar( i_obj, server_so_rcvtimeo_sec,            "af_server_so_rcvtimeo_sec"            );
-	getVar( i_obj, server_so_sndtimeo_sec,            "af_server_so_sndtimeo_sec"            );
-	getVar( i_obj, server_so_msgtimeo_sec,            "af_server_so_msgtimeo_sec"            );
+
+	/// Socket Options:
+	getVar( i_obj, server_accept_so_rcvtimeo_sec,     "af_server_accept_so_rcvtimeo_sec"     );
+	getVar( i_obj, server_accept_so_sndtimeo_sec,     "af_server_accept_so_sndtimeo_sec"     );
+	getVar( i_obj, server_dispatch_so_rcvtimeo_sec,   "af_server_dispatch_so_rcvtimeo_sec"   );
+	getVar( i_obj, server_dispatch_so_sndtimeo_sec,   "af_server_dispatch_so_sndtimeo_sec"   );
+	getVar( i_obj, server_dispatch_tcp_nodelay,       "af_server_dispatch_tcp_nodelay"       );
+
+	getVar( i_obj, client_dispatch_so_rcvtimeo_sec,   "af_client_dispatch_so_rcvtimeo_sec"   );
+	getVar( i_obj, client_dispatch_so_sndtimeo_sec,   "af_client_dispatch_so_sndtimeo_sec"   );
+	getVar( i_obj, client_dispatch_tcp_nodelay,       "af_client_dispatch_tcp_nodelay"       );
+
+
 
 	getVar( i_obj, serve_tasks_speed,                 "af_serve_tasks_speed"                 );
 	getVar( i_obj, task_default_capacity,             "af_task_default_capacity"             );

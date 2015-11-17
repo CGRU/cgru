@@ -7,6 +7,7 @@ import socket
 import sys
 
 import cgruconfig
+import cgruutils
 
 
 def genHeader(data_size):
@@ -82,26 +83,47 @@ def sendServer(data, receive=True, verbose=False):
 	while total_send < len(data):
 		sent = s.send(data[total_send:])
 		if sent == 0:
+			disconnectSocket( s)
 			print('Error: Unable send data to socket')
 			return False, None
 		total_send += sent
 
 	if not receive:
+		disconnectSocket( s)
 		return True, None
 
+
 	data = b''
+	msg_len = None
 	while True:
 		buffer = s.recv(4096)
+
 		if not buffer:
 			break
+
 		data += buffer
-	s.close()
+
+		if msg_len is None:
+			dataStr = cgruutils.toStr(data)
+			if dataStr.find('AFANASY') != -1 and dataStr.find('JSON') != -1:
+				msg_len = dataStr[:dataStr.find('JSON')+4]
+				msg_len = len(msg_len) + int(msg_len.split(' ')[1])
+
+		if verbose:
+			print('Received %d of %d bytes.' % ( len(data), msg_len))
+
+		if msg_len is not None:
+			if len( data) >= msg_len:
+				break
+
+	disconnectSocket( s)
 
 	struct = None
 
 	try:
 		if not isinstance(data, str):
-			data = str(data, 'utf-8')
+			data = cgruutils.toStr(data)
+		data = data[data.find('JSON')+4:]
 		struct = json.loads(data)
 	except:  # TODO: Too broad exception clause
 		print('afnetwork.py: Received data:')
@@ -111,3 +133,9 @@ def sendServer(data, receive=True, verbose=False):
 		struct = None
 
 	return True, struct
+
+
+def disconnectSocket( i_sd):
+
+	i_sd.close()
+

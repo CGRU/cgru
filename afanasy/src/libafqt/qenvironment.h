@@ -53,9 +53,12 @@ public:
 	static AttrNumber star_radiusin;
 	static AttrNumber star_rotate;
 
-	static Attr soundJobAdded;
-	static Attr soundJobDone;
-	static Attr soundJobError;
+	static AttrNumber ntf_job_added_alert;
+	static Attr       ntf_job_added_sound;
+	static AttrNumber ntf_job_done_alert;
+	static Attr       ntf_job_done_sound;
+	static AttrNumber ntf_job_error_alert;
+	static Attr       ntf_job_error_sound;
 
 	static AttrNumber savePrefsOnExit;
 	static AttrNumber saveWndRectsOnExit;

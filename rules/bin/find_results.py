@@ -104,6 +104,7 @@ for src in args:
 			version = ver
 
 			result['src'] = os.path.join(respath, item)
+			result['respath'] = res
 
 	if result['src'] is None:
 		result['error'] = 'Not founded'
@@ -117,7 +118,6 @@ for src in args:
 	result['name'] = name
 	result['version'] = version
 	result['asset'] = src
-	result['respath'] = res
 
 	if Options.dest is not None:
 		result['dest'] = os.path.join(Options.dest, name)

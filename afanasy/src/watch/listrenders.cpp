@@ -410,7 +410,7 @@ bool ListRenders::caseMessage( af::Msg * msg)
 	return true;
 }
 
-ItemNode* ListRenders::createNewItem( af::Node *node)
+ItemNode* ListRenders::v_createNewItem( af::Node *node, bool i_subscibed)
 {
 	return new ItemRender( (af::Render*)node);
 }

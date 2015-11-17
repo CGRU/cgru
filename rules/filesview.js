@@ -31,6 +31,7 @@ function FilesView( i_args)
 	this.path = i_args.path;
 	this.walk = i_args.walk;
 	this.masks = i_args.masks;
+	this.count_images = i_args.count_images;
 
 	this.can_refresh = ! ( i_args.can_refresh === false );
 	this.can_count   =     i_args.can_count;
@@ -392,7 +393,7 @@ FilesView.prototype.showCounts = function()
 		var el = document.createElement('div');
 		this.elCounts.appendChild( el);
 		el.classList.add('frames_count');
-		el.textContent = 'F:' + frames_count;
+		el.textContent = 'sF:' + frames_count;
 		el.title = 'All folders files sum.\nDouble click to update status frames number.';
 		el.m_frames_count = frames_count;
 		el.onclick = function(e){e.stopPropagation();};
@@ -448,10 +449,10 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 	}
 
 	var num_files = null;
-	if( i_el.m_obj.num_files != null )
-		num_files = i_el.m_obj.num_files;
 	if( i_el.m_obj.files && i_el.m_obj.files.length )
 		num_files = i_el.m_obj.files.length;
+	if( i_el.m_obj.num_files != null )
+		num_files = i_el.m_obj.num_files;
 	if( num_files != null )
 	{
 		if( i_el.m_el_num_files == null )
@@ -461,13 +462,24 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_el_num_files.classList.add('filesnum');
 		}
 
-		i_el.m_el_num_files.textContent = 'F:' + num_files;
+		var f_count = num_files;
+		if( i_el.m_obj.num_images && this.count_images )
+		{
+			f_count = i_el.m_obj.num_images;
+			i_el.m_el_num_files.textContent = 'iF:' + f_count;
+		}
+		else
+			i_el.m_el_num_files.textContent = 'F:' + f_count;
 
-		var title = 'Files quantity: ' + num_files + ' (without subfolders)';
-		title += '\nDouble click to update status frames number.';
+		var title = 'Double click to update status frames number.\n';
+
+		title += '\nFiles quantity: ' + num_files + ' (without subfolders)';
+		if( i_el.m_obj.num_images )
+			title += '\nImages quantity: ' + i_el.m_obj.num_images;
+
 		if(( i_el.m_obj.num_folders_total != null ) && ( i_el.m_obj.num_files_total != null ))
 		{
-			title += '\nTotal count with subfolders:';
+			title += '\n\nTotal count with subfolders:';
 			title += '\nFolders: ' + i_el.m_obj.num_folders_total;
 			title += '\nFiles: ' + i_el.m_obj.num_files_total;
 		}
@@ -475,11 +487,11 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( RULES.status && ( RULES.status.frames_num != null ))
 		{
 			i_el.m_el_num_files.classList.add('correct');
-			if( num_files != RULES.status.frames_num )
+			if( f_count != RULES.status.frames_num )
 			{
 				i_el.m_el_num_files.classList.add('error');
-				title = 'ERROR: Shot and folder files number mismatch!\n' + title;
-				if( num_files > RULES.status.frames_num )
+				title = 'ERROR: Shot and folder files number mismatch!\n\n' + title;
+				if( f_count > RULES.status.frames_num )
 					i_el.m_el_num_files.classList.add('greater');
 				else
 					i_el.m_el_num_files.classList.remove('greater');
@@ -489,7 +501,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		}
 
 		i_el.m_el_num_files.title = title;
-		i_el.m_el_num_files.m_num_files = num_files;
+		i_el.m_el_num_files.m_num_files = f_count;
 		i_el.m_el_num_files.onclick = function(e){e.stopPropagation();};
 		i_el.m_el_num_files.ondblclick = function(e){
 			e.stopPropagation();
@@ -793,8 +805,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		if( c_FileIsMovieHTML( i_obj.name))
 			elItem.m_preview_file = elItem.m_path;
 
-		if( this.walk.rules && ( this.walk.rufiles.indexOf( i_obj.name + '.ogg') != -1 ))
-			elItem.m_preview_file = c_PathDir( elItem.m_path) + '/' + RULES.rufolder + '/' + i_obj.name + '.ogg';
+		if( this.walk.rufiles )
+		{
+			for( var i = 0; i < c_movieTypesHTML.length; i++)
+			{
+				var ext = '.' + c_movieTypesHTML[i];
+				if( this.walk.rufiles.indexOf( i_obj.name + ext) != -1 )
+					elItem.m_preview_file = c_PathDir( elItem.m_path) + '/' + RULES.rufolder + '/' + i_obj.name + ext;
+			}
+		}
 
 		if( elItem.m_preview_file )
 		{
@@ -897,7 +916,7 @@ FilesView.prototype.getSelected = function()
 FilesView.prototype.countFiles = function( i_path, i_args)
 {
 	c_LoadingElSet( this.elRoot);
-	var cmd = 'rules/bin/walk.py "' + RULES.root + i_path + '"';
+	var cmd = 'rules/bin/walk.sh "' + RULES.root + i_path + '"';
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"this":this,"wpath":i_path,"post_args":i_args});
 }
 FilesView.prototype.countFilesFinished = function( i_data, i_args) { i_args.this.countFilesUpdate(i_data, i_args);}

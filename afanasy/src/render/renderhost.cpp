@@ -262,8 +262,6 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
         if( ms_tasks[t]->is( i_taskpos))
         {
 			ms_tasks[t]->close();
-//            delete ms_tasks[t];
-//            ms_tasks.erase( ms_tasks.begin() + t);
             return;
         }
     }

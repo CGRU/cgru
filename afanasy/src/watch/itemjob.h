@@ -10,7 +10,7 @@ class ListJobs;
 class ItemJob : public ItemNode
 {
 public:
-	ItemJob( ListJobs * i_list, af::Job *job);
+	ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed);
 	~ItemJob();
 
 	void updateValues( af::Node *node, int type);

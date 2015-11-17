@@ -6,6 +6,8 @@ import os
 import sys
 import time
 
+import cgruutils
+
 from optparse import OptionParser
 
 Parser = OptionParser(
@@ -73,7 +75,7 @@ def checkDict(io_dict):
 		io_dict['folders'] = dict()
 	if not 'files' in io_dict:
 		io_dict['files'] = dict()
-	num_keys = ['num_files', 'num_folders', 'size', 'num_files_total',
+	num_keys = ['num_files', 'num_folders','num_images', 'size', 'num_files_total',
 				'num_folders_total', 'size_total']
 	for key in num_keys:
 		if not key in io_dict:
@@ -134,7 +136,10 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 
 		if os.path.isfile(path):
 			CurFiles += 1
-			if entry[0] != '.': out['num_files'] += 1
+			if entry[0] != '.':
+				out['num_files'] += 1
+				if cgruutils.isImageExt( path):
+					out['num_images'] += 1
 			out['num_files_total'] += 1
 			out['size_total'] += os.path.getsize(path)
 			out['size'] += os.path.getsize(path)
@@ -165,18 +170,6 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 	return out
 
 
-def sepTh(i_int):
-	s = str(int(i_int))
-	o = ''
-	for i in range(0, len(s)):
-		o += s[len(s) - i - 1]
-		if (i + 1) % 3 == 0:
-			o += ' '
-	s = ''
-	for i in range(0, len(o)):
-		s += o[len(o) - i - 1]
-	return s
-
 # #############################################################################
 time_start = time.time()
 outInfo('time_start', time.ctime(time_start))
@@ -190,8 +183,8 @@ if prev is not None:
 
 if PrevFiles:
 	outInfo('previous','%s files, %s folders, %s bytes' % (
-		sepTh(prev['num_files_total']), sepTh(prev['num_folders_total']),
-		sepTh(prev['size_total'])))
+		cgruutils.sepThousands(prev['num_files_total']), cgruutils.sepThousands(prev['num_folders_total']),
+		cgruutils.sepThousands(prev['size_total'])))
 
 # Walk in subfolders:
 walk = walkdir(StartPath, True)
@@ -225,15 +218,15 @@ if not Options.noupdate:
 time_finish = time.time()
 outInfo('time_finish', time.ctime(time_finish))
 outInfo('processed','%s files, %s folders, %s bytes' % (
-	sepTh(walk['num_files_total']),
-	sepTh(walk['num_folders_total']),
-	sepTh(walk['size_total']))
+	cgruutils.sepThousands(walk['num_files_total']),
+	cgruutils.sepThousands(walk['num_folders_total']),
+	cgruutils.sepThousands(walk['size_total']))
 )
 print('"walk":%s,' % json.dumps(walk,indent=1))
 
 if d_files is not None:
 	outInfo('delta','%s files, %s folders, %s bytes' %
-		(sepTh(d_files), sepTh(d_folders), sepTh(d_size)))
+		(cgruutils.sepThousands(d_files), cgruutils.sepThousands(d_folders), cgruutils.sepThousands(d_size)))
 
 sec = time_finish - time_start
 hrs = int(sec / 3600)

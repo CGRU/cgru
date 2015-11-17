@@ -1,2 +1,2 @@
 H.264 Good
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec libx264 -pix_fmt yuv420p -profile baseline -refs 2 -crf 18 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec libx264 -pix_fmt yuv420p -profile baseline -refs 2 -crf 18 -r @FPS@ "@OUTPUT@.@CONTAINER@"

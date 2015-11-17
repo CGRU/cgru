@@ -158,11 +158,12 @@ function prj_ShotsDeployFinished( i_data, i_args)
 
 	var elTr = document.createElement('tr');
 	elTable.appendChild( elTr);
-	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Name';
-	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Sequence';
-	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Additional sources';
-	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Refs';
-	var el = document.createElement('th'); elTr.appendChild( el); el.textContent = 'Comments';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Name';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Folder';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Sequences';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Files';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Refs';
+	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Comments';
 
 	for( var d = deploy.length - 1; d >= 0; d--)
 	{
@@ -177,7 +178,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 			if( key == 'shot' )
 			{
 				var shot = deploy[d][key];
-console.log(JSON.stringify(shot));
+//console.log(JSON.stringify(shot));
 
 				// Shot name:
 				var el = document.createElement('td');
@@ -188,17 +189,25 @@ console.log(JSON.stringify(shot));
 				// Main source:
 				var el = document.createElement('td');
 				elTr.appendChild( el);
-				el.textContent = shot.SRC[0];
-				el.classList.add('deploy_src');
+				el.textContent = shot.FOLDER;
+				el.classList.add('deploy_folder');
 
-				// Same sources:
+				// Same shot folders:
 				var el = document.createElement('td');
 				elTr.appendChild( el);
-				el.classList.add('deploy_src');
+				el.classList.add('deploy_folders');
 				var src = '';
-				if( shot.SRC.length > 1 )
-					for( var i = 1; i < shot.SRC.length; i++)
-						src += ' ' + shot.SRC[i];
+				for( var i = 0; i < shot.FOLDERS.length; i++)
+					src += ' ' + shot.FOLDERS[i];
+				el.textContent = src;
+
+				// Same shot files:
+				var el = document.createElement('td');
+				elTr.appendChild( el);
+				el.classList.add('deploy_files');
+				var src = '';
+				for( var i = 0; i < shot.FILES.length; i++)
+					src += ' ' + shot.FILES[i];
 				el.textContent = src;
 				
 				// References:

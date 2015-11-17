@@ -295,6 +295,9 @@ function gui_GetParams( i_wnd, i_params, o_params)
 
 	for( var p in i_params)
 	{
+		if( i_wnd.m_elements[p] == null )
+			continue;
+
 		if( i_params[p].list )
 		{
 			var elParams = i_wnd.m_elements[p].m_elParams;
@@ -369,6 +372,8 @@ function gui_CreateChoises( i_args)
 
 	for( var key in keys)
 	{
+		if( keys[key].disabled ) continue;
+
 		var el = document.createElement('div');
 		elChoises.appendChild( el);
 		el.classList.add('choise');

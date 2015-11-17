@@ -1,2 +1,2 @@
 PhotoJPG (copy)
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec copy @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec copy -r @FPS@ "@OUTPUT@.@CONTAINER@"

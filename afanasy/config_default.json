@@ -187,9 +187,16 @@
 	"af_sysjob_events_service":"events",
 
 "":"Network:",
-	"af_server_so_rcvtimeo_sec":2,
-	"af_server_so_sndtimeo_sec":2,
-	"af_server_so_msgtimeo_sec":2,
- 
+		"":"Use -1 value not to set socket option at all",
+	"af_server_accept_so_rcvtimeo_sec":2,
+	"af_server_accept_so_sndtimeo_sec":2,
+	"af_server_dispatch_so_rcvtimeo_sec":2,
+	"af_server_dispatch_so_sndtimeo_sec":2,
+	"af_server_dispatch_tcp_nodelay":0,
+
+	"af_client_dispatch_so_rcvtimeo_sec":8,
+	"af_client_dispatch_so_sndtimeo_sec":8,
+	"af_client_dispatch_tcp_nodelay":0,
+
 	"":""
 }}

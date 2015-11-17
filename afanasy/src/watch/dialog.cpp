@@ -23,7 +23,7 @@
 #include "watch.h"
 #include "wnd.h"
 #include "wndcustomizegui.h"
-#include "wndcustomizesounds.h"
+#include "wndnotifications.h"
 #include "wndtask.h"
 #include "wndtext.h"
 #include "wndlist.h"
@@ -177,8 +177,8 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
     connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
     menu.addAction( action);
 
-    action = new QAction( "Sound Events...", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actSounds() ));
+    action = new QAction( "Notifications...", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actNotifications() ));
     menu.addAction( action);
 
     menu.addSeparator();
@@ -349,6 +349,14 @@ void Dialog::newMessage( af::Msg *msg)
 		Watch::filesReceived( taskup);
         break;
 	}
+	case af::Msg::TJSON:
+	case af::Msg::TJSONBIN:
+	case af::Msg::THTTP:
+	case af::Msg::THTTPGET:
+	{
+		msg->stdOutData();
+		break;
+	}
     default:
         Watch::caseMessage( msg);
     }
@@ -488,10 +496,10 @@ void Dialog::actColors()
     Watch::displayInfo("Opening 'GUI' Window");
 }
 
-void Dialog::actSounds()
+void Dialog::actNotifications()
 {
-    new WndCustomizeSounds();
-    Watch::displayInfo("Opening 'Sounds' Window");
+    new WndNotifications();
+    Watch::displayInfo("Opening 'Notifications' Window");
 }
 
 void Dialog::actSavePreferencesOnExit()   { afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;     }

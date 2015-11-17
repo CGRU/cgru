@@ -44,8 +44,9 @@ public:
 	bool setData( int i_size, const char * i_msgData, int i_type = TDATA);
 
 	/// To JSON data message with binary header (not for python or browser).
-	bool setJSON_headerBin( const std::string & i_str);
-	inline bool setJSON_headerBin( const std::ostringstream & i_str) { return setJSON_headerBin( i_str.str());}
+	void setJSONBIN();
+//	bool setJSON_headerBin( const std::string & i_str);
+//	inline bool setJSON_headerBin( const std::ostringstream & i_str) { return setJSON_headerBin( i_str.str());}
 
 	/// To set zero (\c Msg::TNone ) message to QString message. Return \c true on success.
 	bool setString( const std::string & qstring);
@@ -79,7 +80,7 @@ public:
 
 /// Request messages, sizes, quantities statistics. Can be requested displayed by anatoly.
 /**/TStatRequest/**/,
-
+/// NEW VERSION
 /**/DEPRECATED_TConfigLoad/**/,                ///< Reload config file
 /**/DEPRECATED_TFarmLoad/**/,                  ///< Reload farm file
 
@@ -164,6 +165,7 @@ TRESERVED09,
 
 /*- Talk messages -*/
 /// Register Talk. Send by Talk client to register. Server sends back its id \c TTalkId.
+/// NEW VERSION
 /**/DEPRECATED_TTalkRegister/**/,
 /**/DEPRECATED_TTalksListRequestIds/**/,       ///< Request a list of Talks with given ids.
 /**/DEPRECATED_TTalksList/**/,                 ///< Message with a list of online Talks.
@@ -225,12 +227,14 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /*- Users messages -*/
 /**/TUsersListRequestIds/**/,       ///< Request a list of Users with given ids.
 /**/TUsersList/**/,                 ///< Active users information.
+/// NEW VERSION
 /**/DEPRECATED_TUserAdd/**/,                   ///< Add a permatent user.
 /**/TUserIdRequest/**/,             ///< Request an id of user with given name.
 /**/TUserJobsOrder/**/,             ///< Jobs ids in server list order.
 
 
 /*- Job messages -*/
+/// NEW VERSION
 /**/DEPRECATED_TJobRegister/**/,               ///< Register job.
 /**/TJobsListRequestIds/**/,        ///< Request a list of Jobs with given ids.
 /**/TJobsListRequestUsersIds/**/,   ///< Request brief of jobs od users with given ids.
@@ -255,7 +259,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTasksRun/**/,                  ///< Job tasks run data.
 
 /**/TTaskOutput/**/,                ///< Job task output data (for task listening: from afrender directly to afwatch).
-/**/TRESERVED11/**/,
+/**/TJSONBIN/**/,
 /**/TRESERVED12/**/,
 /**/TRESERVED13/**/,
 /**/TRESERVED14/**/,

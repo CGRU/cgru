@@ -44,7 +44,7 @@ public:
 
 	bool canRunOn( RenderAf * render);
 
-    virtual void v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+    virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
 	void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 

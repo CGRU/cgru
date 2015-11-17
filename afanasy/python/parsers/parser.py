@@ -28,6 +28,7 @@ class parser(
 
 		self.files = []
 		self.files_onthefly = []
+		self.files_all = []
 
 	def setTaskInfo(self, taskInfo):
 		"""Missing DocString
@@ -46,14 +47,16 @@ class parser(
 		:param i_file:
 		:return:
 		"""
+		if i_file in self.files_all:
+			return
+		self.files_all.append( i_file)
+
 		i_file = os.path.join(self.taskInfo['wdir'], i_file)
-		if not i_file in self.files:
-			if os.path.isfile(i_file):
-				if i_onthefly:
-					self.files_onthefly.append(i_file)
-				else:
-					self.files.append(i_file)
-			# print('PARSED FILE APPENDED:\n' + i_file)
+		if os.path.isfile(i_file):
+			if i_onthefly:
+				self.files_onthefly.append(i_file)
+			else:
+				self.files.append(i_file)
 
 	def getFiles(self):
 		"""Missing DocString
@@ -111,10 +114,14 @@ class parser(
 			if line.find('@IMAGE@') != -1: # Will be used in CGRU render scripts
 				line = line[7:]
 				self.appendFile(line.strip(), False)
-			if line.find('Image: ') == 0: # ImageMagick
+			elif line.find('Image: ') == 0: # ImageMagick
 				line = line[7:]
+				self.frame += 1
+				self.calculate()
+				#print(line)
+				#print(self.frame,self.percent,self.numframes)
 				self.appendFile(line.strip(), False)
-			if line.find('@IMAGE!@') != -1: # Will be used in CGRU render scripts to generate thumb while task is still running
+			elif line.find('@IMAGE!@') != -1: # Will be used in CGRU render scripts to generate thumb while task is still running
 				line = line[8:]
 				self.appendFile(line.strip(), True)
 

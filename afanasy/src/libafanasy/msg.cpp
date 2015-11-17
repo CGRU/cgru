@@ -204,6 +204,19 @@ bool Msg::setData( int i_size, const char * i_msgData, int i_type)
 	return true;
 }
 
+void Msg::setJSONBIN()
+{
+	if( m_type != TJSON )
+	{
+		AFERROR("Can't set JSON to binary, as message is not JSON:");
+		v_stdOut();
+		return;
+	}
+	m_type = TJSONBIN;
+	m_header_offset = 0;
+	rw_header( true);
+}
+/*
 bool Msg::setJSON_headerBin( const std::string & i_str)
 {
 	bool result = setData( i_str.size(), i_str.c_str(), TJSON);
@@ -213,7 +226,7 @@ bool Msg::setJSON_headerBin( const std::string & i_str)
 
 	return result;
 }
-
+*/
 bool Msg::set( int msgType, Af * afClass, bool i_receiving)
 {
 	if(checkZero( true) == false ) return false;
@@ -426,7 +439,9 @@ void Msg::stdOutData( bool withHeader)
 	switch( m_type)
 	{
 	case Msg::TDATA:
+	case Msg::THTTP:
 	case Msg::TJSON:
+	case Msg::TJSONBIN:
 	{
 		if( m_data[0] == '/')
 			break;
@@ -652,7 +667,7 @@ const char * Msg::TNAMES[]=
 	"TTasksRun",                  ///< Job tasks run data.
 
 	"TTaskOutput",                ///< Job task output data (for task listening: from afrender directly to afwatch).
-	"TRESERVED11",
+	"TJSONBIN",
 	"TRESERVED12",
 	"TRESERVED13",
 	"TRESERVED14",

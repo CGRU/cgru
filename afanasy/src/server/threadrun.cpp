@@ -147,14 +147,14 @@ void threadRunCycle( void * i_args)
 	}
 
 	// cycle on renders, which produced a task
-	static const int renders_cycle_limit = 100000;
+	static const int renders_cycle_limit = 100;
 	int renders_cycle = 0;
 	while( solved_renders.size())
 	{
 		renders_cycle++;
 		if( renders_cycle > renders_cycle_limit )
 		{
-			AFERROR("Renders solve cycles limit reached.");
+			AFERRAR("Renders solve cycles reached limit %d.", renders_cycle_limit)
 			break;
 		}
 

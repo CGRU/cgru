@@ -11,8 +11,10 @@ class QPixmap;
 
 class ButtonMonitor;
 class Dialog;
+class ItemJob;
 class ListItems;
 class MonitorHost;
+class Popup;
 class Reciever;
 class Wnd;
 class WndList;
@@ -84,9 +86,9 @@ public:
 	static void addJobId( int jId );
 	static void delJobId( int jId );
 
-	static void someJobAdded();
-	static void someJobDone();
-	static void someJobError();
+	static void ntf_JobAdded( const ItemJob * i_job);
+	static void ntf_JobDone(  const ItemJob * i_job);
+	static void ntf_JobError( const ItemJob * i_job);
 
 	static WndList* opened[WLAST];
 
@@ -106,6 +108,8 @@ public:
 	void static loadImage( QPixmap & o_pixmap, const QString & i_filename);
 
 	void static browseImages( const QString & i_image, const QString & i_wdir);
+
+	void static notify( const QString & i_title, const QString & i_msg, uint32_t i_state = 0);
 
 private:
 	static MonitorHost * ms_m;

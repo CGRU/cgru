@@ -170,14 +170,22 @@ for shot_folder in Sources:
 
 	Out_Shot = dict()
 	Out_Shot['name'] = shot_name
+	Out_Shot['FOLDER'] = os.path.basename(src)
 	Out_Shot['sources'] = []
 	Out_Shot['dest'] = []
-	Out_Shot['SRC'] = []
+	Out_Shot['FOLDERS'] = []
+	Out_Shot['FILES'] = []
+	i = 0
 	for src in src_sources:
 		#print(src)
-		Out_Shot['SRC'].append(os.path.basename(src))
+		if i:
+			if os.path.isdir( src):
+				Out_Shot['FOLDERS'].append(os.path.basename(src))
+			else:
+				Out_Shot['FILES'].append(os.path.basename(src))
 		Out_Shot['sources'].append(src)
 		Out_Shot['dest'].append(os.path.join(shot_dest, Options.shot_src))
+		i += 1
 
 	if len(src_refs):
 		Out_Shot['REF'] = []

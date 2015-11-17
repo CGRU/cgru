@@ -139,13 +139,13 @@ function g_PathChanged()
 	var old_path = null;
 	if( g_elCurFolder ) old_path = g_elCurFolder.m_path;
 
-	var new_path = c_GetHashPath();
+	var new_path = c_GetHash();
 	g_arguments = null;
 	if( new_path.indexOf('?') != -1 )
 	{
 		new_path = new_path.split('?');
 		if( new_path.length > 0 )
-			g_arguments = c_Parse( decodeURI( new_path[1]));
+			g_arguments = c_Parse( new_path[1]);
 		new_path = new_path[0];
 	}
 

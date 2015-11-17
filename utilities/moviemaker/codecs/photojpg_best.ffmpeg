@@ -1,2 +1,2 @@
 PhotoJPG (best)
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec mjpeg -pix_fmt yuv420p -qscale 1 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec mjpeg -pix_fmt yuv420p -qscale 1 -r @FPS@ "@OUTPUT@.@CONTAINER@"

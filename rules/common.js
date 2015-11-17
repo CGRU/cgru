@@ -27,9 +27,9 @@ function c_Init()
 	u_ApplyStyles();
 }
 
-function c_GetHashPath()
+function c_GetHash()
 {
-	var path = document.location.hash;
+	var path = decodeURI( document.location.hash);
 //window.console.log( 'hash = ' + path);
 	if( path.indexOf('#') == 0 )
 		path = path.substr(1);

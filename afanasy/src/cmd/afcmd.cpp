@@ -56,7 +56,8 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 							std::string str = command->getStreamString();
 							if( str.size())
 							{
-								msg.setJSON_headerBin( str);
+								msg.setData( str.size(), str.c_str(), af::Msg::TJSON);
+								msg.setJSONBIN();
 							}
 							else
 							{
@@ -97,6 +98,7 @@ void AfCmd::msgOutput( af::Msg &msg)
 		{
 			case af::Msg::TDATA:
 			case af::Msg::TJSON:
+			case af::Msg::TJSONBIN:
 			case af::Msg::TString:
 			case af::Msg::TStringList:
 				msg.stdOutData( false);

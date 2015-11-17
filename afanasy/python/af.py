@@ -838,6 +838,18 @@ class Cmd:
 		self.data['mode'] = 'full'
 		return self.getJobList(verbose)
 
+	def renderSetUserName(self, i_user_name):
+		"""Missing DocString
+
+		:param i_name:
+		:return:
+		"""
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+		self.data['params'] = {'user_name': i_user_name}
+		self._sendRequest()
+
 	def renderSetNimby(self, text):
 		"""Missing DocString
 

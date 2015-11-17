@@ -8,6 +8,7 @@ import sys
 
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] path\ntype \"%prog -h\" for help", version="%prog 1.  0")
+parser.add_option('-u', '--upc',  dest='upc',  action='store_true', default=False, help='Uppercase.')
 parser.add_option('-z', '--zero', dest='zero', action='store_true', default=False, help='Add a "-0" to the first existing sequence.')
 parser.add_option('-r', '--run',  dest='run',  action='store_true', default=False, help='Run rename.')
 
@@ -51,6 +52,7 @@ for fname in ListDir:
 
 	name = re.split('\d+$', name)[0]
 	name = name.strip(' -.()[]_')
+	if Options.upc: name = name.upper()
 
 	old = fpath
 	new = os.path.join( Root, name)

@@ -64,7 +64,7 @@ private slots:
     void repaintWatch();
 
     void actColors();
-    void actSounds();
+    void actNotifications();
     void actSavePreferencesOnExit();
     void actSaveGUIOnExit();
     void actSaveWndRectsOnExit();

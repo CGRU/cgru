@@ -40,8 +40,10 @@ xcopy plugins %dest%\plugins\ /y
 xcopy plugins\afterfx %dest%\plugins\afterfx\ /ys
 xcopy plugins\c4d %dest%\plugins\c4d\ /ys
 xcopy plugins\blender %dest%\plugins\blender\ /ys
+xcopy plugins\fusion %dest%\plugins\fusion\ /ys
 xcopy plugins\houdini %dest%\plugins\houdini\ /ys
 xcopy plugins\max %dest%\plugins\max\ /ys
+xcopy plugins\natron %dest%\plugins\natron\ /ys
 xcopy plugins\nuke %dest%\plugins\nuke\ /ys
 xcopy plugins\xsi %dest%\plugins\xsi\ /ys
 

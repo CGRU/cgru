@@ -180,7 +180,7 @@ void Block::v_errorHostsReset()
    for( int t = 0; t < m_data->getTasksNum(); t++) m_tasks[t]->errorHostsReset();
 }
 
-void Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
+bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
    // Store block name in task executable:
    taskexec->setBlockName( m_data->getName());
@@ -204,6 +204,8 @@ void Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
    addRenderCounts( render);
 
    m_tasks[taskexec->getTaskNum()]->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
+
+	return true;
 }
 
 void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)

@@ -151,7 +151,7 @@ function shot_ResultsReceived( i_data, i_args)
 			shot_thumb_paths.push( path);
 
 		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],
-			"show_walk":false,"can_count":true,"masks":shot_results_masks}));
+			"show_walk":false,"can_count":true,"masks":shot_results_masks,"count_images":true}));
 
 		found = true;
 	}
@@ -200,15 +200,15 @@ function shot_ResultsReceived( i_data, i_args)
 		}
 		if( folder == null ) continue;
 
-		if( folder.num_files != null )
+		if( folder.num_images != null )
 		{
 			// if status frames numbers is undefined, but no update needed, we set status frames number:
 			if( r == ( res_filesviews.length - 1 ))
 			{
 				if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 				{
-					st_SetFramesNumber( folder.num_files);
-					c_Log('Shot length updated from "' + (fv.path+'/'+folder.name) + '": ' + folder.num_files);
+					st_SetFramesNumber( folder.num_images);
+					c_Log('Shot length updated from "' + (fv.path+'/'+folder.name) + '": ' + folder.num_images);
 				}
 			}
 
@@ -219,7 +219,7 @@ function shot_ResultsReceived( i_data, i_args)
 
 		// Update status frames number if it is still not defined:
 		var args = null;
-		if( RULES.status.frames_num == null )
+		if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 		{
 			args = {};
 			args.func = shot_FilesCounted;
@@ -240,10 +240,10 @@ function shot_Post()
 
 function shot_FilesCounted( i_args, i_walk)
 {
-	if( i_walk.num_files )
+	if( i_walk.num_images )
 	{
-		st_SetFramesNumber( i_walk.num_files);
-		c_Log('Shot length updated from "' + i_args.path + '": ' + i_walk.num_files);
+		st_SetFramesNumber( i_walk.num_images);
+		c_Log('Shot length updated from "' + i_args.path + '": ' + i_walk.num_images);
 		return;
 	}
 }
@@ -297,7 +297,7 @@ function shot_RefsReceived( i_data, i_args)
 			((  files == null ) || (   files.length == 0 )))
 			 continue;
 		not_empty_paths.push( walk.paths[i]);
-		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false})
+		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false,"count_images":true})
 		found = true;
 	}
 	if( false == found )
@@ -353,14 +353,14 @@ function shot_SourcesReceived( i_data, i_args)
 		if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 		{
 			var frames_num = null;
-			// Update only if all ssource sequences have the same length:
+			// Update only if all source sequences have the same length:
 			for( var f = 0; f < walk.folders.length; f++)
 			{
 				if(( frames_num == null ) && walk.folders[f].files && walk.folders[f].files.length )
 				{
-					frames_num = walk.folders[f].files.length;
+					frames_num = walk.folders[f].num_images;
 				}
-				else if( walk.folders[f].files && walk.folders[f].files.length && ( frames_num != walk.folders[f].files.length ))
+				else if( walk.folders[f].num_images && ( frames_num != walk.folders[f].num_images ))
 				{
 					frames_num = null;
 					break;
@@ -373,7 +373,7 @@ function shot_SourcesReceived( i_data, i_args)
 
 		if( walk.folders.length || walk.files.length )
 		{
-			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"-thumbs":false,"can_refresh":false});
+			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"count_images":true,"can_refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
 			found = true;
 		}
@@ -426,8 +426,14 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 			}
 
 			if( false == c_FileIsImage( name )) continue;
+
 			img_num++;
-			if( img_num < 2 ) continue;
+		}
+//			if( img_num < 2 ) continue;
+
+		if( img_num )
+		{
+			i_walk.num_images = img_num;
 
 			if( i_path )
 				i_walk.name = i_path;
@@ -442,7 +448,7 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 					if( o_walk.rufiles.indexOf( i_parent_walk.rufiles[r]) == -1 )
 						o_walk.rufiles.push( i_parent_walk.rufiles[r]);
 
-			break;
+//			break;
 		}
 	}
 

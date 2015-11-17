@@ -7,6 +7,7 @@ include(${QT_USE_FILE})
 set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/actionid.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/buttonmonitor.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/checkboxwidget.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/colorwidget.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrljobs.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlrenders.h"
@@ -44,5 +45,12 @@ if(WIN32)
    set_target_properties(afwatch PROPERTIES WIN32_EXECUTABLE 1)
    target_link_libraries(afwatch Ws2_32.lib)
 endif(WIN32)
+
+if(APPLE)
+   find_library(SYSTEMCONFIGURATION_FRAMEWORK SystemConfiguration)
+   find_library(SECURITY_FRAMEWORK Security)
+   target_link_libraries(afwatch ${SYSTEMCONFIGURATION_FRAMEWORK}
+	   ${SECURITY_FRAMEWORK})
+endif(APPLE)
 
 target_link_libraries(afwatch afqt $ENV{AF_EXTRA_LIBS} )

@@ -91,6 +91,8 @@ function fu_PutDo( i_wnd)
 	var name   = i_wnd.m_args.names[i];
 
 	var job = {};
+	job.folders = {};
+	job.folders.source = source;
 
 	var block = {};
 	block.name = 'put';
@@ -447,7 +449,7 @@ function fu_PutMultiDo( i_wnd)
 	var result = i_wnd.m_result;
 
 	var job = {};
-	job.name = 'PUT ' + result.dest;
+	job.name = 'PUT ' + g_CurPath();
 	job.max_running_tasks = params.af_maxtasks;
 	job.max_running_tasks_per_host = params.af_perhost;
 	job.hosts_mask = params.af_hostsmask;
@@ -565,6 +567,8 @@ function fu_ArchivateProcessGUI( i_wnd)
 			params[key] = i_wnd.elContent.m_choises[key].value;
 
 	var job = {};
+	job.folders = {};
+	job.folders.input = cgru_PM('/' + RULES.root + c_PathDir( paths[0]),  true);
 
 	var arch_cmd = null;
 

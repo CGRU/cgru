@@ -72,7 +72,6 @@ function get_jobs_folders( $i_args, &$o_out)
 	$table = 'jobs';
 
 	$select   = $i_args['select'];
-	$favorite = $i_args['favorite'];
 	$time_min = $i_args['time_min'];
 	$time_max = $i_args['time_max'];
 	$folder   = rtrim( $i_args['folder'],'/');
@@ -81,9 +80,8 @@ function get_jobs_folders( $i_args, &$o_out)
 
 	$dbconn = db_connect();
 
-	$o_out['select']   = $select;
-	$o_out['favorite'] = $favorite;
-	$o_out['table'] = array();
+	$o_out['select'] = $select;
+	$o_out['table']  = array();
 
 	// Select:
 // SELECT min(folder),sum(1) FROM tasks GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[2];
@@ -91,11 +89,8 @@ $query="
 SELECT min(folder) as folder,
  sum(1) AS jobs_quantity,
  sum(tasks_quantity) AS tasks_quantity,
- sum(tasks_quantity)/sum(1) AS tasks_quantity_avg,
- avg(capacity) AS capacity_avg,
  sum(run_time_sum) AS run_time_sum,
- avg(CASE WHEN tasks_done>0 THEN run_time_sum/tasks_done ELSE 0 END) AS run_time_avg,
- avg(tasks_done/tasks_quantity) AS tasks_done_percent
+ avg(CASE WHEN tasks_done>0 THEN run_time_sum/tasks_done ELSE 0 END) AS run_time_avg
  FROM $table
  WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
  GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
@@ -104,31 +99,64 @@ SELECT min(folder) as folder,
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 	{
-		# Get service favorite user:
+		$where = $line[$select];
+		$names = explode('/', $where);
+		$names = array_slice( $names, 0, $f_depth + 1);
+		$where = implode('/', $names);
+
+		# Get folder favorite service:
 		$sub_query="
-SELECT $favorite,
- sum(1) AS tasks_quantity
- FROM $table
- WHERE $select='".$line[$select]."'
+SELECT service,
+ sum(1) AS quantity
+ FROM jobs
+ WHERE folder LIKE '$where%'
  AND time_done BETWEEN $time_min and $time_max
- GROUP BY $favorite ORDER BY tasks_quantity DESC;
+ GROUP BY service ORDER BY quantity DESC;
 ";
+//error_log($sub_query);
 		$sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
 		$sub_total = 0;
 		$sub_favourite = 0;
 		$sub_name = 0;
 		while ( $sub_line = pg_fetch_array( $sub_result, null, PGSQL_ASSOC))
 		{
-			if( $sub_favourite < $sub_line["tasks_quantity"])
+			if( $sub_favourite < $sub_line['quantity'])
 			{
-				$sub_favourite = $sub_line["tasks_quantity"];
-				$sub_name = $sub_line[$favorite];
+				$sub_favourite = $sub_line['quantity'];
+				$sub_name = $sub_line['service'];
 			}
-			$sub_total += $sub_line["tasks_quantity"];
+			$sub_total += $sub_line['quantity'];
 		}
 		pg_free_result($sub_result);
-		$line['fav_name'] = $sub_name;
-		$line['fav_percent'] = $sub_favourite/$sub_total;
+		$line['fav_service'] = $sub_name;
+		$line['fav_service_percent'] = $sub_favourite/$sub_total;
+
+		# Get folder favorite user:
+		$sub_query="
+SELECT username,
+ sum(1) AS quantity
+ FROM jobs
+ WHERE folder LIKE '$where%'
+ AND time_done BETWEEN $time_min and $time_max
+ GROUP BY username ORDER BY quantity DESC;
+";
+//error_log($sub_query);
+		$sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
+		$sub_total = 0;
+		$sub_favourite = 0;
+		$sub_name = 0;
+		while ( $sub_line = pg_fetch_array( $sub_result, null, PGSQL_ASSOC))
+		{
+			if( $sub_favourite < $sub_line['quantity'])
+			{
+				$sub_favourite = $sub_line['quantity'];
+				$sub_name = $sub_line['username'];
+			}
+			$sub_total += $sub_line['quantity'];
+		}
+		pg_free_result($sub_result);
+		$line['fav_user'] = $sub_name;
+		$line['fav_user_percent'] = $sub_favourite/$sub_total;
 
 		$o_out['table'][] = $line;
 	}
@@ -167,7 +195,10 @@ SELECT $select,
  avg(CASE WHEN tasks_done>0 THEN run_time_sum/tasks_done ELSE 0 END) AS run_time_avg,
  avg(tasks_done/tasks_quantity) AS tasks_done_percent
  FROM $table
- WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
+ WHERE
+ time_done BETWEEN $time_min and $time_max
+ AND
+ folder LIKE '$folder%'
  GROUP BY $select ORDER BY $order_s DESC;
 ";
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -176,28 +207,129 @@ SELECT $select,
 		# Get service favorite user:
 		$sub_query="
 SELECT $favorite,
- sum(1) AS tasks_quantity
+ sum(1) AS quantity
  FROM $table
- WHERE $select='".$line[$select]."'
- AND time_done BETWEEN $time_min and $time_max
- GROUP BY $favorite ORDER BY tasks_quantity DESC;
+ WHERE
+ $select='".$line[$select]."'
+ AND
+ time_done BETWEEN $time_min and $time_max
+ AND
+ folder LIKE '$folder%'
+ GROUP BY $favorite
+ ORDER BY quantity DESC;
 ";
+//error_log($sub_query);
 		$sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
 		$sub_total = 0;
 		$sub_favourite = 0;
 		$sub_name = 0;
 		while ( $sub_line = pg_fetch_array( $sub_result, null, PGSQL_ASSOC))
 		{
-			if( $sub_favourite < $sub_line["tasks_quantity"])
+			if( $sub_favourite < $sub_line['quantity'])
 			{
-				$sub_favourite = $sub_line["tasks_quantity"];
+				$sub_favourite = $sub_line['quantity'];
 				$sub_name = $sub_line[$favorite];
 			}
-			$sub_total += $sub_line["tasks_quantity"];
+			$sub_total += $sub_line['quantity'];
 		}
 		pg_free_result($sub_result);
 		$line['fav_name'] = $sub_name;
 		$line['fav_percent'] = $sub_favourite/$sub_total;
+
+		$o_out['table'][] = $line;
+	}
+	pg_free_result($result);
+}
+
+function get_tasks_folders( $i_args, &$o_out)
+{
+	$table = 'tasks';
+
+	$select   = $i_args['select'];
+	$time_min = $i_args['time_min'];
+	$time_max = $i_args['time_max'];
+	$folder   = rtrim( $i_args['folder'],'/');
+	$f_depth  = substr_count( $folder,'/') + 1;
+	$order = 'tasks_quantity';
+
+	$dbconn = db_connect();
+
+	$o_out['select'] = $select;
+	$o_out['table']  = array();
+
+$query="
+SELECT min($select) as $select,
+ sum(1) AS tasks_quantity,
+ avg(capacity) AS capacity_avg,
+ sum(time_done-time_started) AS run_time_sum,
+ avg(time_done-time_started) AS run_time_avg,
+ avg(error) AS error_avg
+ FROM $table
+ WHERE time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
+ GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
+ ORDER BY $order DESC;
+";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+	{
+		$where = $line[$select];
+		$names = explode('/', $where);
+		$names = array_slice( $names, 0, $f_depth + 1);
+		$where = implode('/', $names);
+
+		# Get folder favorite service:
+		$sub_query="
+SELECT service,
+ sum(1) AS quantity
+ FROM tasks
+ WHERE folder LIKE '$where%'
+ AND time_done BETWEEN $time_min and $time_max
+ GROUP BY service ORDER BY quantity DESC;
+";
+//error_log($sub_query);
+		$sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
+		$sub_total = 0;
+		$sub_favourite = 0;
+		$sub_name = 0;
+		while ( $sub_line = pg_fetch_array( $sub_result, null, PGSQL_ASSOC))
+		{
+			if( $sub_favourite < $sub_line['quantity'])
+			{
+				$sub_favourite = $sub_line['quantity'];
+				$sub_name = $sub_line['service'];
+			}
+			$sub_total += $sub_line['quantity'];
+		}
+		pg_free_result($sub_result);
+		$line['fav_service'] = $sub_name;
+		$line['fav_service_percent'] = $sub_favourite/$sub_total;
+
+		# Get folder favorite user:
+		$sub_query="
+SELECT username,
+ sum(1) AS quantity
+ FROM tasks
+ WHERE folder LIKE '$where%'
+ AND time_done BETWEEN $time_min and $time_max
+ GROUP BY username ORDER BY quantity DESC;
+";
+//error_log($sub_query);
+		$sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
+		$sub_total = 0;
+		$sub_favourite = 0;
+		$sub_name = 0;
+		while ( $sub_line = pg_fetch_array( $sub_result, null, PGSQL_ASSOC))
+		{
+			if( $sub_favourite < $sub_line['quantity'])
+			{
+				$sub_favourite = $sub_line['quantity'];
+				$sub_name = $sub_line['username'];
+			}
+			$sub_total += $sub_line['quantity'];
+		}
+		pg_free_result($sub_result);
+		$line['fav_user'] = $sub_name;
+		$line['fav_user_percent'] = $sub_favourite/$sub_total;
 
 		$o_out['table'][] = $line;
 	}
@@ -247,7 +379,7 @@ SELECT $favorite,
  sum(1) AS tasks_quantity
  FROM $table
  WHERE $select='".$line[$select]."'
- AND time_done BETWEEN $time_min and $time_max
+ AND time_done BETWEEN $time_min and $time_max AND folder LIKE '$folder%'
  GROUP BY $favorite ORDER BY tasks_quantity DESC;
 ";
 		$sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
@@ -282,7 +414,7 @@ function get_tasks_folders_graph( $i_args, &$o_out)
 	$interval = $i_args['interval'];
 	$folder   = rtrim( $i_args['folder'],'/');
 	$f_depth  = substr_count( $folder,'/') + 1;
-	$order    = 'jobs_quantity';
+	$order    = 'quantity';
 
 	$o_out['time_min'] = $time_min;
 	$o_out['time_max'] = $time_max;
@@ -302,6 +434,7 @@ SELECT min(folder) as folder,
  GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
  ORDER BY quantity DESC;
 ";
+//error_log($query);
 	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 	{
@@ -324,10 +457,19 @@ SELECT min(folder) as folder,
  GROUP BY (regexp_split_to_array(btrim(folder,'/'),'/'))[$f_depth]
  ORDER BY quantity DESC;
 ";
+//error_log($query);
 		$result = pg_query($query) or die('Query failed: ' . pg_last_error());
 		while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 		{
-			$o_out['graph'][$time][$line[$select]] = $line;
+			$fname = $line[$select];
+			$fname = explode('/', $fname);
+			$fname = array_slice( $fname, $f_depth, $f_depth + 1);
+			if( count( $fname))
+				$fname = $fname[0];
+			else
+				$fname = '';
+
+			$o_out['graph'][$time][$fname] = $line;
 		}
 		pg_free_result($result);
 
@@ -393,6 +535,26 @@ SELECT $select,
 
 		$time += $interval;
 	}
+}
+
+function folder_delete( $i_args, &$o_out)
+{
+	$folder = $i_args['folder'];
+
+	$dbconn = db_connect();
+
+
+	$query="DELETE FROM jobs WHERE folder LIKE '$folder'";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$o_out['jobs'] = array();
+	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+		$o_out['jobs'][] = $line;
+
+	$query="DELETE FROM tasks WHERE folder LIKE '$folder'";
+	$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+	$o_out['tasks'] = array();
+	while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+		$o_out['tasks'][] = $line;
 }
 
 ?>

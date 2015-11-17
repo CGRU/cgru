@@ -948,8 +948,33 @@ function afanasy( $i_obj, &$o_out)
 	$header = 'AFANASY '.strlen($data).' JSON';
 
 	fwrite( $socket, $header.$data);
+
+	$len = -1;
+	$data = '';
+	while( true)
+	{
+		$part = fread( $socket, 4096);
+		if( $part == FALSE ) break;
+		$data = $data.$part;
+
+		// Try to parse header and find length
+		if(( $len == -1 ) && ( strpos( $part,'AFANASY') == 0 ) && ( strpos( $part,'JSON') !== FALSE ))
+		{
+			$part = substr( $part, 8); // cut 'AFANASY'
+			$part = substr( $part, 0, strpos( $part,' ')); // cut to the first space
+			$len = intval($part);
+		}
+
+		if(( $len != -1 ) && ( strlen($data) >= $len ))
+			break;
+	}
+
 	fclose( $socket);
 
+	// Cut header:
+	$data = substr( $data, strpos( $data,'JSON')+4);
+
+	$o_out['response'] = json_decode( $data, true);
 	$o_out['satus'] = 'success';
 }
 

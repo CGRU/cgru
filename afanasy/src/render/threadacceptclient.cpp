@@ -111,13 +111,8 @@ void threadAcceptClient( void * i_arg )
     }
 
     int value = 1;
-#ifdef WINNT
-#define TOCHAR (char *)
-#else
-#define TOCHAR
-    if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, TOCHAR &value, sizeof(value)) != 0)
+    if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, WINNT_TOCHAR(&value), sizeof(value)) != 0)
         AFERRPE("set socket SO_REUSEADDR option failed")
-#endif
 
     int port = af::Environment::getClientPort();
     int maxports = 0xffff-port;
