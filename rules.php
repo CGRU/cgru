@@ -1592,7 +1592,6 @@ function jsf_permissionsset( $i_args, &$o_out)
 	if( array_key_exists('users', $i_args) && count( $i_args['users']))
 	{
 		array_push( $lines, 'Require user '.implode(' ', $i_args['users']));
-		array_push( $lines, 'Satisfy Any');
 	}
 
 	$data = implode("\n", $lines)."\n";
