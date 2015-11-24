@@ -141,10 +141,31 @@ function jsf_start( $i_arg, &$o_out)
 	}
 	$o_out['name'] = $_SERVER['SERVER_NAME'];
 	$o_out['software'] = $_SERVER['SERVER_SOFTWARE'];
-	$o_out['remote_address'] = $_SERVER['REMOTE_ADDR'];
 	$o_out['php_version'] = phpversion();
 	foreach( $CONF as $key => $val ) $o_out[$key] = $val;
 	if( $CONF['AUTH_RULES']) $o_out['nonce'] = md5(rand());
+
+	$o_out['client_ip'] = get_client_ip();
+}
+
+function get_client_ip()
+{
+	$ipaddress = '';
+	if ($_SERVER['HTTP_CLIENT_IP'])
+		$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+	else if($_SERVER['HTTP_X_FORWARDED_FOR'])
+		$ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	else if($_SERVER['HTTP_X_FORWARDED'])
+		$ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+	else if($_SERVER['HTTP_FORWARDED_FOR'])
+		$ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+	else if($_SERVER['HTTP_FORWARDED'])
+		$ipaddress = $_SERVER['HTTP_FORWARDED'];
+	else if($_SERVER['REMOTE_ADDR'])
+		$ipaddress = $_SERVER['REMOTE_ADDR'];
+	else
+		$ipaddress = 'UNKNOWN';
+	return $ipaddress;
 }
 
 function jsf_initialize( $i_arg, &$o_out)
