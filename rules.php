@@ -253,8 +253,10 @@ function processUser( &$o_out)
 	if( false == isset( $user['channels'])) $user['channels'] = array();
 	if( false == isset( $user['news']    )) $user['news']     = array();
 	if( false == isset( $user['ctime']   )) $user['ctime']    = time();
-
 	$user['rtime'] = time();
+
+	processUserIP( $user);
+
 	$editobj['object'] = $user;
 	$out = array();
 	jsf_editobj( $editobj, $out);
@@ -265,6 +267,28 @@ function processUser( &$o_out)
 	}
 
 	$o_out['user'] = $user;
+}
+
+function processUserIP( &$o_user)
+{
+	$ip = get_client_ip();
+
+	if( false == isset( $o_user['ips'] ))
+	{
+		$o_user['ips'] = array();
+	}
+	else if( count($o_user['ips']))
+	{
+		if( $o_user['ips'][0] == $ip )
+			return;
+
+		if( array_key_exists( $ip, $o_user['ips']))
+			array_splice( $o_user['ips'], array_search( $ip, $o_user['ips']), 1);
+	}
+
+	array_unshift( $o_user['ips'], $ip);
+
+	array_slice( $o_user['ips'], 0, 10);
 }
 
 function writeUser( &$i_user)
