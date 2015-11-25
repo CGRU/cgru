@@ -11,6 +11,9 @@ RUN apt-get -qq update \
  && tar xzvf cgru*.tar.gz \
  && dpkg -i /tmp/cgru-common*.deb /tmp/afanasy-common*.deb /tmp/afanasy-render*.deb \
  && rm -r /tmp/*
+ 
+COPY resources/config.json /opt/cgru/
 
 WORKDIR /opt/cgru
+VOLUME /var/tmp/afanasy
 CMD ["start/AFANASY/_afrender.sh"]

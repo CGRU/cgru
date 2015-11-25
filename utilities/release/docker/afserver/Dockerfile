@@ -14,4 +14,5 @@ RUN apt-get -qq update \
 
 WORKDIR /opt/cgru
 EXPOSE 51000
+VOLUME /var/tmp/afanasy
 CMD ["start/AFANASY/_afserver.sh"]
