@@ -124,7 +124,7 @@ float: left;
 width: 40px;
 text-align: center;
 }
-#navig_panel #navig_show_frames, #navig_panel #navig_show_percent { width: 20px; }
+#navig_panel #navig_show_price, #navig_panel #navig_show_frames, #navig_panel #navig_show_percent { width: 20px; }
 #navig { position: absolute; overflow-y: scroll; left: 0; right: 6px; top: 20px; bottom: 0; /*padding-right: 6px;*/ }
 #navig .folder {
 clear: both;
@@ -158,6 +158,7 @@ border-right: 0;
 #navig .folder .progressbar.done { height: 6px; }
 #navig .folder .info { display: none; margin: 2px 4px 0px 0px; position: relative; float: right; font: 14px Arial; } 
 #navig .folder .size { }
+#navig .folder .price { font-weight: bold; background-color: rgba( 255,255,255,.3); padding: 0px 4px; }
 #navig .folder .frames { width:50px; }
 #navig .folder .annotation { }
 #navig .folder .tags { font-style: italic; }
@@ -173,6 +174,7 @@ border: 1px solid rgba(0,0,0,.3);
 #navig.navig_show_annotation .folder .annotation { display: inline; }
 #navig.navig_show_size       .folder .size       { display: inline; }
 #navig.navig_show_frames     .folder .frames     { display: inline; }
+#navig.navig_show_price      .folder .price      { display: inline; }
 #navig.navig_show_percent    .folder .percent    { display: inline; }
 
 /* ========================================== */

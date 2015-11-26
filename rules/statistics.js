@@ -55,8 +55,10 @@ function stcs_Show( i_args)
 					if( tasks_types[tag].artists.indexOf( task.artists[a]) == -1 )
 						tasks_types[tag].artists.push( task.artists[a]);
 
-				if( task.duration ) tasks_types[tag].duration += task.duration;
-				if( task.price ) tasks_types[tag].price += task.price;
+				if( task.duration )
+					tasks_types[tag].duration += task.duration;
+				if( task.price )
+					tasks_types[tag].price += task.price;
 			}
 
 			for( var a = 0; a < task.artists.length; a++)
@@ -71,8 +73,10 @@ function stcs_Show( i_args)
 					if( tasks_artists[artist].tags.indexOf( task.tags[g]) == -1 )
 						tasks_artists[artist].tags.push( task.tags[g]);
 
-				tasks_artists[artist].duration += task.duration;
-				tasks_artists[artist].price += task.price;
+				if( task.duration )
+					tasks_artists[artist].duration += task.duration;
+				if( task.price )
+					tasks_artists[artist].price += task.price;
 			}
 		}
 

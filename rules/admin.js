@@ -820,7 +820,9 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
-	el.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
+	el.m_user = i_user;
+	ad_UserShowEntries( el);
+	el.ondblclick = function(e){ad_UserShowEntries( e.currentTarget, true);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -1016,6 +1018,26 @@ function ad_UserNewsLimitSet( i_limit, i_user_id)
 		return;
 	}
 	ad_SaveUser({"id":i_user_id,"news_limit":limit}, ad_WndRefresh);
+}
+function ad_UserShowEntries( i_el, i_show_ips)
+{
+	var user = i_el.m_user;
+
+	var text = c_DT_StrFromSec( user.rtime).substr(4);
+
+	if( user.ips && user.ips.length && i_show_ips && ( i_el.m_ips_shown != true ))
+	{
+		for( var i = 0; i < user.ips.length; i++)
+			text += '<br>' + user.ips[i];
+
+		i_el.m_ips_shown = true;
+	}
+	else
+	{
+		i_el.m_ips_shown = false;
+	}
+
+	i_el.innerHTML = text;
 }
 function ad_SaveUser( i_user, i_func)
 {
