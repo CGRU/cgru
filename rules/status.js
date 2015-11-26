@@ -257,6 +257,14 @@ function st_SetElFramesNum( i_status, i_el, i_full)
 
 	i_el.textContent = num;
 }
+function st_SetElPrice( i_status, i_el)
+{
+	var price = '';
+	if( i_status && i_status.price )
+		price = i_status.price;
+
+	i_el.textContent = price;
+}
 function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
 function st_SetElText( i_status, i_el, i_field, i_full)
 {
@@ -1160,7 +1168,15 @@ Status.prototype.editSave = function( i_args)
 		}
 
 		if( tasks )
+		{
+			var price = 0;
+			for( var t = 0; t < tasks.length; t++)
+				if( tasks[t].price )
+					price += tasks[t].price;
+			
 			statuses[i].obj.tasks = tasks;
+			statuses[i].obj.price = price;
+		}
 
 		if( this.elEdit_Color.m_color_changed )
 			statuses[i].obj.color = this.elEdit_Color.m_color;
