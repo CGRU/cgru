@@ -292,7 +292,7 @@ class Dialog(QtGui.QWidget):
 		self.fields['framestart'].setRange(-1000000000, 1000000000)
 		self.fields['framestart'].setValue(1)
 		QtCore.QObject.connect(self.fields['framestart'],
-							   QtCore.SIGNAL('editingFinished()'),
+							   QtCore.SIGNAL('valueChanged(int)'),
 							   self.evaluate)
 		lFrames.addWidget(self.fields['framestart'])
 
@@ -300,7 +300,7 @@ class Dialog(QtGui.QWidget):
 		self.fields['frameend'].setRange(-1000000000, 1000000000)
 		self.fields['frameend'].setValue(1)
 		QtCore.QObject.connect(self.fields['frameend'],
-							   QtCore.SIGNAL('editingFinished()'),
+							   QtCore.SIGNAL('valueChanged(int)'),
 							   self.evaluate)
 		lFrames.addWidget(self.fields['frameend'])
 
@@ -308,7 +308,7 @@ class Dialog(QtGui.QWidget):
 		self.fields['frameby'] = QtGui.QSpinBox(self)
 		lFrames.addWidget(self.fields['frameby'])
 		QtCore.QObject.connect(self.fields['frameby'],
-							   QtCore.SIGNAL('editingFinished()'),
+							   QtCore.SIGNAL('valueChanged(int)'),
 							   self.evaluate)
 		self.fields['frameby'].setRange(1, 1000000000)
 
@@ -316,7 +316,7 @@ class Dialog(QtGui.QWidget):
 		self.fields['framespt'] = QtGui.QSpinBox(self)
 		lFrames.addWidget(self.fields['framespt'])
 		QtCore.QObject.connect(self.fields['framespt'],
-							   QtCore.SIGNAL('editingFinished()'),
+							   QtCore.SIGNAL('valueChanged(int)'),
 							   self.evaluate)
 		self.fields['framespt'].setRange(1, 1000000000)
 		self.fields['framespt'].setToolTip('Frames per task.')
@@ -325,7 +325,7 @@ class Dialog(QtGui.QWidget):
 		self.fields['frameseq'] = QtGui.QSpinBox(self)
 		lFrames.addWidget(self.fields['frameseq'])
 		QtCore.QObject.connect(self.fields['frameseq'],
-							   QtCore.SIGNAL('editingFinished()'),
+							   QtCore.SIGNAL('valueChanged(int)'),
 							   self.evaluate)
 		self.fields['frameseq'].setRange(-1000000, 1000000)
 		self.fields['frameseq'].setValue(1)

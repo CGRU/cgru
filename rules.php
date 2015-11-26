@@ -141,10 +141,31 @@ function jsf_start( $i_arg, &$o_out)
 	}
 	$o_out['name'] = $_SERVER['SERVER_NAME'];
 	$o_out['software'] = $_SERVER['SERVER_SOFTWARE'];
-	$o_out['remote_address'] = $_SERVER['REMOTE_ADDR'];
 	$o_out['php_version'] = phpversion();
 	foreach( $CONF as $key => $val ) $o_out[$key] = $val;
 	if( $CONF['AUTH_RULES']) $o_out['nonce'] = md5(rand());
+
+	$o_out['client_ip'] = get_client_ip();
+}
+
+function get_client_ip()
+{
+	$ipaddress = '';
+	if ($_SERVER['HTTP_CLIENT_IP'])
+		$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+	else if($_SERVER['HTTP_X_FORWARDED_FOR'])
+		$ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	else if($_SERVER['HTTP_X_FORWARDED'])
+		$ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+	else if($_SERVER['HTTP_FORWARDED_FOR'])
+		$ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+	else if($_SERVER['HTTP_FORWARDED'])
+		$ipaddress = $_SERVER['HTTP_FORWARDED'];
+	else if($_SERVER['REMOTE_ADDR'])
+		$ipaddress = $_SERVER['REMOTE_ADDR'];
+	else
+		$ipaddress = 'UNKNOWN';
+	return $ipaddress;
 }
 
 function jsf_initialize( $i_arg, &$o_out)
@@ -232,8 +253,10 @@ function processUser( &$o_out)
 	if( false == isset( $user['channels'])) $user['channels'] = array();
 	if( false == isset( $user['news']    )) $user['news']     = array();
 	if( false == isset( $user['ctime']   )) $user['ctime']    = time();
-
 	$user['rtime'] = time();
+
+	processUserIP( $user);
+
 	$editobj['object'] = $user;
 	$out = array();
 	jsf_editobj( $editobj, $out);
@@ -244,6 +267,28 @@ function processUser( &$o_out)
 	}
 
 	$o_out['user'] = $user;
+}
+
+function processUserIP( &$o_user)
+{
+	$ip = get_client_ip();
+
+	if( false == isset( $o_user['ips'] ))
+	{
+		$o_user['ips'] = array();
+	}
+	else if( count($o_user['ips']))
+	{
+		if( $o_user['ips'][0] == $ip )
+			return;
+
+		if( array_key_exists( $ip, $o_user['ips']))
+			array_splice( $o_user['ips'], array_search( $ip, $o_user['ips']), 1);
+	}
+
+	array_unshift( $o_user['ips'], $ip);
+
+	array_slice( $o_user['ips'], 0, 10);
 }
 
 function writeUser( &$i_user)
@@ -1592,7 +1637,6 @@ function jsf_permissionsset( $i_args, &$o_out)
 	if( array_key_exists('users', $i_args) && count( $i_args['users']))
 	{
 		array_push( $lines, 'Require user '.implode(' ', $i_args['users']));
-		array_push( $lines, 'Satisfy Any');
 	}
 
 	$data = implode("\n", $lines)."\n";
