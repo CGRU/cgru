@@ -208,11 +208,11 @@ function a_ShowHeaders()
 		elType.textContent = a_type + ':';
 		elType.href = href;
 
-		elName = document.createElement('a');
+		elName = document.createElement('span');
 		elHeader.appendChild( elName);
 		elName.classList.add('name');
 		elName.textContent = a_name;
-		elName.href = href;
+//		elName.href = href;
 	}
 }
 
