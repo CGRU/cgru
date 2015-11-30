@@ -67,7 +67,7 @@
 				"folder":"_UPLOADS/@DATE@_@USER@"
 			}
 		},
-		"name":"",
+		"-name":"",
 		"filter":"sc_FilterShots",
 		"scripts":["scenes.js"]
 	},
