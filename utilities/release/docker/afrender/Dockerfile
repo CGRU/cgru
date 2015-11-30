@@ -1,5 +1,7 @@
 FROM ubuntu:14.04
 
+STOPSIGNAL SIGINT
+
 ADD http://downloads.sourceforge.net/project/cgru/2.0.7/cgru.2.0.7.ubuntu14.04.3_amd64.tar.gz /tmp
 WORKDIR /tmp
 RUN apt-get -qq update \
