@@ -1,6 +1,9 @@
 {
 	"cgru_config":
 	{
-		"af_servername":"afserver"
+		"af_servername":"afserver",
+		"af_render_cmd_reboot":"killall -s SIGINT afrender",
+		"af_render_cmd_shutdown":"killall -s SIGINT afrender",
+		"af_render_cmd_wolsleep":"killall -s SIGINT afrender"
 	}
 }
