@@ -1,0 +1,11 @@
+afserver:
+ build: afserver/.
+ net: "$CGRU_NETWORK"
+ ports:
+  - "51000:51000"
+
+afrender:
+ build: afrender/.
+ net: "$CGRU_NETWORK"
+ environment:
+  AF_SERVERNAME: "cgru_afserver_1"
