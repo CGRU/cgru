@@ -14,6 +14,9 @@ parser.add_option('-r', '--run',  dest='run',  action='store_true', default=Fals
 
 Options, Args = parser.parse_args()
 
+if Options.run is False:
+	parser.print_help()
+
 Root = os.getcwd()
 if len(Args) > 0:
 	Root = Args[0]
