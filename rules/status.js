@@ -265,6 +265,14 @@ function st_SetElPrice( i_status, i_el)
 
 	i_el.textContent = price;
 }
+function st_SetElDuration( i_status, i_el)
+{
+	var duration = '';
+	if( i_status && i_status.duration )
+		duration = i_status.duration;
+
+	i_el.textContent = duration;
+}
 function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
 function st_SetElText( i_status, i_el, i_field, i_full)
 {
@@ -1169,12 +1177,18 @@ Status.prototype.editSave = function( i_args)
 
 		if( tasks )
 		{
+			var duration = 0;
 			var price = 0;
 			for( var t = 0; t < tasks.length; t++)
+			{
+				if( tasks[t].duration )
+					duration += tasks[t].duration;
 				if( tasks[t].price )
 					price += tasks[t].price;
+			}
 			
 			statuses[i].obj.tasks = tasks;
+			statuses[i].obj.duration = duration;
 			statuses[i].obj.price = price;
 		}
 

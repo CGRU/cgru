@@ -483,6 +483,12 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elPrice.classList.add('price');
 	elPrice.classList.add('info');
 
+	var elDuration = document.createElement('div');
+	elFBody.appendChild( elDuration);
+	elFolder.m_elDuration = elDuration;
+	elDuration.classList.add('duration');
+	elDuration.classList.add('info');
+
 	var elSize = document.createElement('div');
 	elFBody.appendChild( elSize);
 	elFolder.m_elSize = elSize;
@@ -603,6 +609,7 @@ function g_FolderSetStatus( i_status, i_elFolder, i_up_params)
 	if(( i_up_params == null ) || i_up_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
 	if(( i_up_params == null ) || i_up_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
 	if(( i_up_params == null ) || i_up_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
+	if(( i_up_params == null ) || i_up_params.duration   ) st_SetElDuration( i_status, i_elFolder.m_elDuration);
 	if(( i_up_params == null ) || i_up_params.price      ) st_SetElPrice( i_status, i_elFolder.m_elPrice);
 	if(( i_up_params == null ) || i_up_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
 	if(( i_up_params == null ) || i_up_params.progress   )
@@ -692,7 +699,7 @@ function g_FolderOnDblClick( i_evt)
 
 function g_NavigShowInfo( i_toggle)
 {
-	var infos = ['annotation','size','artists','tags','price','frames','percent'];
+	var infos = ['annotation','size','artists','tags','duration','price','frames','percent'];
 	for( var i = 0; i < infos.length; i++ )
 	{
 		var name = 'navig_show_'+infos[i];
