@@ -1,7 +1,9 @@
 {
 	"cgru_config":
 	{
-		"af_servername":"afserver",
+		"af_servername":"${AF_SERVERNAME}",
+		"af_serverport":51000,
+		"af_clientport":51001,
 		"af_render_cmd_reboot":"killall -s SIGINT afrender",
 		"af_render_cmd_shutdown":"killall -s SIGINT afrender",
 		"af_render_cmd_wolsleep":"killall -s SIGINT afrender"

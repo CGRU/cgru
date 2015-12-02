@@ -5,5 +5,7 @@ afserver:
 
 afrender:
  image: cgru/afrender
+ environment:
+  AF_SERVERNAME: "afserver"
  links:
   - afserver
