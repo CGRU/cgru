@@ -1,9 +1,0 @@
-afserver:
- build: afserver/.
- ports:
-  - "51000:51000"
-
-afrender:
- build: afrender/.
- links:
-  - afserver

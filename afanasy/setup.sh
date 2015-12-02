@@ -25,8 +25,8 @@ if [ ! -z "$setup_files" ] ; then
    done
 fi
 
-# Override hostname:
+# Override username:
 # export AF_USERNAME=$USER
 
-# Override username:
+# Override hostname:
 # export AF_HOSTNAME=$HOSTNAME
