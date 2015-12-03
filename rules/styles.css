@@ -151,6 +151,7 @@ border-right: 0;
 #navig .folder.current { border: 1px solid #AAFFFF; border-left-width: 11px; margin-left: -10px; box-shadow: 0 0 8px #AAFFFF; border-right: 0;}
 #navig .folder.current > .fbody { border: 2px solid #AAFFFF; box-shadow: 0 0 8px #AAFFFF inset; border-right: 0;}
 #navig .folder .fname { position: relative; float:left; text-decoration: none; text-shadow: none; }
+#navig .folder .auxiliary > .fname { font-style: italic; font-size: 14px; opacity: .6; text-shadow: 0 0 2px rgba(0,255,255,.2); }
 #navig .folder .dummy > .fname { font-style: italic; opacity: .5; }
 #navig .folder .progress { clear: both; }
 #navig .folder .progressbar { height: 8px; }

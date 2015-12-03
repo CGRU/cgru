@@ -165,6 +165,15 @@ function c_Log( i_msg)
 	c_logCount++;
 }
 
+function c_AuxFolder( i_name)
+{
+	var name = c_PathBase( i_name);
+	for( var i = 0; i < RULES.aux_folders.length; i++)
+		if( name.toLowerCase().indexOf( RULES.aux_folders[i]) === 0 )
+			return true;
+	return false;
+}
+
 function c_DT_StrFromSec( i_time, i_nosec) { if( i_time == null) return ''; return c_DT_StrFromMSec( i_time*1000, i_nosec);}
 function c_DT_StrFromMSec( i_time, i_nosec)
 {

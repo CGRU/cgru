@@ -450,15 +450,23 @@ function g_AppendFolder( i_elParent, i_fobject)
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
 	elFolder.m_fobject = i_fobject;
-	if( i_fobject.dummy )
-		elFolder.classList.add('dummy');
 
 	var elFBody = document.createElement('div');
 	elFolder.appendChild( elFBody);
 	elFolder.m_elFBody = elFBody;
 	elFBody.classList.add('fbody');
+
+	if( c_AuxFolder( i_fobject.name ))
+	{
+		i_fobject.auxiliary = true;
+		elFolder.classList.add('auxiliary');
+		elFBody.classList.add('auxiliary');
+	}
 	if( i_fobject.dummy )
+	{
+		elFolder.classList.add('dummy');
 		elFBody.classList.add('dummy');
+	}
 
 	var elName = document.createElement('a');
 	elFBody.appendChild( elName);
@@ -608,16 +616,22 @@ function g_FolderSetStatus( i_status, i_elFolder, i_up_params)
 	if(( i_up_params == null ) || i_up_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
 	if(( i_up_params == null ) || i_up_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
 	if(( i_up_params == null ) || i_up_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
-	if(( i_up_params == null ) || i_up_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
 	if(( i_up_params == null ) || i_up_params.duration   ) st_SetElDuration( i_status, i_elFolder.m_elDuration);
 	if(( i_up_params == null ) || i_up_params.price      ) st_SetElPrice( i_status, i_elFolder.m_elPrice);
 	if(( i_up_params == null ) || i_up_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
+
+	if( i_elFolder.m_fobject.auxiliary )
+	{
+		i_elFolder.m_elFrames.style.display = 'none';
+		i_elFolder.m_elPercent.style.display = 'none';
+		i_elFolder.m_elProgress.style.display = 'none';
+		return;
+	}
+
+	if(( i_up_params == null ) || i_up_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
 	if(( i_up_params == null ) || i_up_params.progress   )
 	{
 		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress, i_elFolder.m_elPercent);
-//		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
-//		if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
-//			i_elFolder.m_elPercent.textContent = i_status.progress + '%';
 	}
 }
 
