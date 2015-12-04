@@ -366,7 +366,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-//	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
 //console.log('RULES:'+g_CurPath()+':'+JSON.stringify( g_elCurFolder.m_dir.rules))
 
@@ -411,7 +411,7 @@ function g_OpenFolderDo( i_data, i_args)
 	if( i_data )
 	{
 		el.m_dir = i_data[0];
-//		el.m_dir.folders.sort( g_CompareFolders);
+		el.m_dir.folders.sort( g_CompareFolders);
 	}
 
 	if( el.m_dir.folders == null ) return;
@@ -650,6 +650,13 @@ function g_CompareFolders(a,b)
 			else if( a.size_total > b.size_total ) return -1;
 		}
 	}
+
+	// Move auxiliary folders to bottom:
+	var a_aux = c_AuxFolder( a.name);
+	var b_aux = c_AuxFolder( b.name);
+
+	if( a_aux && ( false == b_aux )) return  1;
+	if( b_aux && ( false == a_aux )) return -1;
 
 	// Compare folders names:
 	if( a.name < b.name ) return -1;
