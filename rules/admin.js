@@ -1028,7 +1028,7 @@ function ad_UserShowEntries( i_el, i_show_ips)
 	if( user.ips && user.ips.length && i_show_ips && ( i_el.m_ips_shown != true ))
 	{
 		for( var i = 0; i < user.ips.length; i++)
-			text += '<br>' + user.ips[i];
+			text += '<br><br>' + user.ips[i].ip  + ' : ' + c_DT_StrFromSec(user.ips[i].time) + '<br>' + user.ips[i].url;
 
 		i_el.m_ips_shown = true;
 	}

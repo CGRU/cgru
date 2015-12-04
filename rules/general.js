@@ -34,7 +34,9 @@ function g_Init_Server( i_data)
 	if( SERVER.version )
 		$('version').innerHTML = c_Strip( SERVER.version);
 
-	n_Request({"send":{"initialize":{}},"func":g_Init_Config,"info":'init'});
+	var url = decodeURI( document.location.href);
+
+	n_Request({"send":{"initialize":{'url':url}},"func":g_Init_Config,"info":'init'});
 }
 function g_Init_Config( i_data)
 {
