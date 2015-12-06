@@ -1,6 +1,6 @@
 #!/bin/bash
 
-packages="ilmbase-2.1.0 openexr-2.1.0"
+packages="ilmbase-2.2.0 openexr-2.2.0"
 location="http://download.savannah.nongnu.org/releases/openexr"
 
 for package in $packages; do
