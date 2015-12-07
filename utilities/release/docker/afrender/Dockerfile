@@ -1,11 +1,10 @@
 FROM ubuntu:14.04
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
-ENV CGRU_VERSION="2.0.7"
+ENV CGRU_VERSION="2.0.8"
 LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
 
 STOPSIGNAL SIGINT
 
-ADD http://downloads.sourceforge.net/project/cgru/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz /tmp
 WORKDIR /tmp
 RUN apt-get -qq update \
  && apt-get -y install \
@@ -14,10 +13,12 @@ RUN apt-get -qq update \
  	python3-sip \
  	tcpdump \
  && apt-get -yqq clean \
- && rm -rf /var/lib/apt/lists/* \
- && tar xzvf cgru*.tar.gz \
- && dpkg -i /tmp/cgru-common*.deb /tmp/afanasy-common*.deb /tmp/afanasy-render*.deb \
- && rm -r /tmp/*
+ && rm -rf /var/lib/apt/lists/*
+ 
+ADD http://downloads.sourceforge.net/project/cgru/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz ./
+RUN tar xzvf cgru*.tar.gz \
+ && dpkg -i cgru-common*.deb afanasy-common*.deb afanasy-render*.deb \
+ && rm -rf *
  
 ADD https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux /usr/local/bin/ep
 COPY resources/config.json /home/render/.cgru/config.json
