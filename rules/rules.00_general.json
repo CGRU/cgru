@@ -118,7 +118,7 @@
 		"dailies":{
 			"path":["RESULT/DAILIES"]
 		},
-		"template":"/CG_PROJECT/SCENES/COMMON/_template",
+		"template":"rules/assets/shot",
 		"nuke_template":"/cgru/plugins/nuke/_template.nk"
 	}
 },
@@ -273,6 +273,10 @@
 	"af_perhost":-1,
 	"af_pertask":100,
 	"af_maxruntime":120
+},
+
+"tmpfio":{
+	"template":"rules/assets/tmpfio"
 },
 
 "put":{

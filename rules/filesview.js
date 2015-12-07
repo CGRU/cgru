@@ -164,6 +164,17 @@ genetate thumbnails.";
 		el.title = 'Top secret feature.';
 	}
 
+	if( g_admin )
+	{
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/tmpfio.png)';
+		el.m_view = this;
+		el.onclick = function(e){ fu_TmpFio({"fview":e.currentTarget.m_view});}
+		el.title = 'Create a shared folder.';
+	}
+
 	if( this.has_thumbs )
 	{
 		var elThumbDiv = document.createElement('div');

@@ -466,6 +466,14 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 	}
 }
 
+function shot_Copy()
+{
+	var args = {};
+	args.template = RULES.assets.shot.template;
+	args.destination = c_PathDir( g_CurPath());
+	a_Copy( args);
+}
+
 if( ASSETS.shot && ( ASSETS.shot.path == g_CurPath()))
 {
 	shot_Init();

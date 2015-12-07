@@ -713,3 +713,20 @@ function fu_WalkProcessGUI( i_wnd)
 
 	i_wnd.destroy();
 }
+
+
+// ############################# TMPFIO: ##################################//
+
+function fu_TmpFio( i_args)
+{
+console.log(JSON.stringify(i_args.fview.path));
+
+	var args = {};
+
+	args.template = RULES.tmpfio.template;
+	args.destination = i_args.fview.path;
+	args.name = 'tmpfio_' + Math.random().toString(36).substring(2);
+
+	a_Copy( args);
+}
+
