@@ -103,7 +103,7 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	cmd += ' -s "' + cgru_PM('/' + RULES.root + params.sources, true) + '"';
 	if( params.references.length )
 		cmd += ' -r "' + cgru_PM('/' + RULES.root + params.references, true) + '"';
-	cmd += ' -t "' + cgru_PM('/' + RULES.root + params.template, true) + '"';
+	cmd += ' -t "' + params.template + '"';
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
 	cmd += ' --shot_src "' + RULES.assets.shot.source.path[0] + '"'
 	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'

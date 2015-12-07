@@ -11,7 +11,10 @@ g_elFolders = {};
 g_nav_clicked = false;
 g_arguments = null;
 
-g_default_infos = ['annotation','artists','percent'];
+g_navig_infos = {};
+g_navig_infos.all = ['annotation','size','artists','tags','duration','price','frames','percent'];
+g_navig_infos.default = ['annotation','artists','percent'];
+g_navig_infos.current = [];
 
 function cgru_params_OnChange( i_param, i_value) { u_ApplyStyles();}
 
@@ -640,7 +643,7 @@ function g_FolderSetStatus( i_status, i_elFolder, i_up_params)
 function g_CompareFolders(a,b)
 {
 	// Compare folders sizes if size is shown in the navigation:
-	if( localStorage.navig_show_size == 'true' )
+	if( g_navig_infos.current.navig_show_size )
 	{
 		if(( a.size_total != null ) && ( b.size_total == null )) return -1;
 		if(( b.size_total != null ) && ( a.size_total == null )) return  1;
@@ -722,31 +725,48 @@ function g_FolderOnDblClick( i_evt)
 
 function g_NavigShowInfo( i_toggle)
 {
-	var infos = ['annotation','size','artists','tags','duration','price','frames','percent'];
-	for( var i = 0; i < infos.length; i++ )
+	for( var i = 0; i < g_navig_infos.all.length; i++ )
 	{
-		var name = 'navig_show_'+infos[i];
+		var name = 'navig_show_'+g_navig_infos.all[i];
 		if( localStorage[name] == null )
 		{
-			if( g_default_infos.indexOf(infos[i]) != -1 )
+			if( g_navig_infos.default.indexOf(g_navig_infos.all[i]) != -1 )
+			{
 				localStorage[name] = 'true';
+				g_navig_infos.current[name] = true;
+			}
 			else
+			{
 				localStorage[name] = 'false';
+				g_navig_infos.current[name] = false;
+			}
 		}
+
 		if( i_toggle && ( i_toggle.id == name ))
 		{
-			if( localStorage[name] == 'true' ) localStorage[name] = 'false';
-			else localStorage[name] = 'true';
+			if( localStorage[name] == 'true' )
+			{
+				localStorage[name] = 'false';
+				g_navig_infos.current[name] = false;
+			}
+			else
+			{
+				localStorage[name] = 'true';
+				g_navig_infos.current[name] = true;
+			}
 		}
+
 		if( localStorage[name] == 'true' )
 		{
 			$(name).classList.add('selected');
 			u_el.navig.classList.add( name);
+			g_navig_infos.current[name] = true;
 		}
 		else
 		{
 			$(name).classList.remove('selected');
 			u_el.navig.classList.remove( name);
+			g_navig_infos.current[name] = false;
 		}
 	}
 }
