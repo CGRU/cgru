@@ -138,19 +138,20 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 
 		if os.path.isfile(path):
 			CurFiles += 1
+			size = os.path.getsize(path)
 			if entry[0] != '.':
 				out['num_files'] += 1
 				if cgruutils.isImageExt( path):
 					if Options.thumb is not None:
 						if out['num_images'] == 0:
-							if ThumbFolderCount % Options.thumb == 0:
+							if ThumbFolderCount % Options.thumb == 0 and size < 10000000:
 								print('@IMAGE!@'+path)
 								sys.stdout.flush()
 							ThumbFolderCount += 1
 					out['num_images'] += 1
 			out['num_files_total'] += 1
-			out['size_total'] += os.path.getsize(path)
-			out['size'] += os.path.getsize(path)
+			out['size_total'] += size
+			out['size'] += size
 
 	# Just output progress:
 	if PrevFiles:
