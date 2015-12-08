@@ -2,7 +2,11 @@ ASSETS = {};
 ASSET = null;
 
 function View_asset_Open() { a_Show(); }
-function View_asset_Close() { $('asset').textContent = ''; }
+function View_asset_Close()
+{
+	$('asset').textContent = '';
+	$('asset_top_left').textContent = '';
+}
 
 function a_Process()
 {
@@ -18,6 +22,7 @@ function a_Finish()
 	a_SetLabel('Asset');
 	$('asset_tooltip').style.display = 'none';
 	$('asset_div').style.display = 'none';
+	$('asset_top_left').textContent = '';
 	u_el.assets.innerHTML = '';
 	u_el.asset.innerHTML = '';
 }

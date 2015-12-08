@@ -63,8 +63,25 @@ function shot_InitHTML( i_data)
 {
 	$('asset').innerHTML = i_data;
 
-	// Show actions buttons:
-	if( c_CanCreateShot ) $('shot_new_btn').style.display = 'block';
+	// Show top buttons:
+	if( c_CanCreateShot())
+	{
+		var el = document.createElement('div');
+		$('asset_top_left').appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'NEW';
+		el.title = 'Create new shot.';
+		el.onclick = shot_Copy;
+	}
+	if( g_admin )
+	{
+		var el = document.createElement('div');
+		$('asset_top_left').appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'RENAME';
+		el.title = 'Rename new shot.';
+		el.onclick = shot_Rename;
+	}
 
 	// Set process buttons commands:
 	var path = cgru_PM('/' + RULES.root + g_CurPath());
@@ -475,6 +492,81 @@ function shot_Copy()
 	args.template = RULES.assets.shot.template;
 	args.destination = c_PathDir( g_CurPath());
 	a_Copy( args);
+}
+
+shot_rename_params = {};
+shot_rename_params.new_name = {};
+function shot_Rename()
+{
+//	var args = {};
+	var wnd = new cgru_Window({"name":'rename',"title":'Rename Shot'});
+//	wnd.m_args = args;
+
+	var params = {};
+	params.new_name = c_PathBase( g_CurPath()) + '-01';
+
+	gui_Create( wnd.elContent, shot_rename_params, [params]);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	var elCreate = document.createElement('div');
+	elBtns.appendChild( elCreate);
+	elCreate.textContent = 'Rename';
+	elCreate.classList.add('button');
+	elCreate.m_wnd = wnd;
+	elCreate.onclick = function(e){ shot_RenameSend( e.currentTarget.m_wnd);}
+
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+}
+function shot_RenameSend( i_wnd)
+{
+	var params = gui_GetParams( i_wnd.elContent, shot_rename_params);
+//console.log(JSON.stringify(params));
+
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
+
+	var old_name = g_CurPath();
+	var new_name = c_PathDir( old_name) + '/' + params.new_name;
+
+	var cmd = 'rules/bin/move.py';
+	cmd += ' "' + cgru_PM('/' + RULES.root + old_name, true) + '"';
+	cmd += ' "' + cgru_PM('/' + RULES.root + new_name, true) + '"';
+
+	i_wnd.m_go_path = new_name;
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":shot_RenameReceived,"wnd":i_wnd});
+
+	// Clear walk cache, as we need to navigate there later:
+	n_walks[old_name] = null;
+	n_walks[new_name] = null;
+}
+function shot_RenameReceived( i_data, i_args)
+{
+//console.log(JSON.stringify(i_data));
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+	var elResults = i_args.wnd.m_elResults;
+	elResults.textContent = '';
+
+	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ))
+	{
+		elResults.textContent = ( JSON.stringify( i_data));
+		return;
+	}
+
+	i_args.wnd.destroy();
+
+	g_RemoveFolder( g_elCurFolder);
+
+	g_GO( i_args.wnd.m_go_path);
 }
 
 if( ASSETS.shot && ( ASSETS.shot.path == g_CurPath()))

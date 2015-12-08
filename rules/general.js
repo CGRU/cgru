@@ -455,6 +455,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
 	elFolder.m_fobject = i_fobject;
+	elFolder.m_elParent = i_elParent;
 
 	var elFBody = document.createElement('div');
 	elFolder.appendChild( elFBody);
@@ -591,6 +592,48 @@ function g_AppendFolder( i_elParent, i_fobject)
 	}
 
 	return elFolder;
+}
+
+function g_RemoveFolder( i_elFolder)
+{
+	var elParent = i_elFolder.m_elParent;
+
+	for( var i = 0; i < elParent.m_elFolders.length; i++)
+	{
+		if( elParent.m_elFolders[i] == i_elFolder )
+		{
+			elParent.m_elFolders.splice( i, 1);
+
+			// Set prev folder next link:
+			if( i > 0 )
+			{
+				if( i < elParent.m_elFolders.length )
+					elParent.m_elFolders[i-1].m_elNext = elParent.m_elFolders[i];
+				else
+					elParent.m_elFolders[i-1].m_elNext = null;
+			}
+
+			// Set next folder prev link:
+			if( i < elParent.m_elFolders.length )
+			{
+				if( i > 0 )
+					elParent.m_elFolders[i].m_elPrev = elParent.m_elFolders[i-1];
+				else
+					elParent.m_elFolders[i].m_elPrev = null;
+			}
+
+			break;
+		}
+	}
+
+	// Remove element from a global array:
+	g_elFolders[i_elFolder.m_path] = null;
+
+	// Get parent element body to insert new child (root navig element has no body):
+	var elBody = elParent.m_elFBody;
+	if( elBody == null ) elBody = elParent;
+
+	elBody.removeChild( i_elFolder);
 }
 
 function g_NavigScrollCurrent()
