@@ -95,6 +95,7 @@ void JobAf::initializeValues()
     m_deletion         = false;
     m_logsWeight       = 0;
     m_blackListsWeight = 0;
+	m_thumb_changed    = false;
 }
 
 void JobAf::initStoreDirs()
@@ -1087,6 +1088,12 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		}
 	}
 
+	if( m_thumb_changed )
+	{
+		jobchanged = af::Msg::TMonitorJobsChanged;
+		m_thumb_changed = false;
+	}
+
    // Check age and delete if life finished:
    if( m_id != AFJOB::SYSJOB_ID ) // skip system job
    {
@@ -1411,6 +1418,8 @@ void JobAf::setThumbnail( const std::string & i_path, int i_size, const char * i
 	if( m_thumb_data ) delete [] m_thumb_data;
 	m_thumb_data = new char[m_thumb_size];
 	memcpy( m_thumb_data, i_data, m_thumb_size);
+
+	m_thumb_changed = true;
 //printf("JobAf::setThumbnail: '%s'[%d]\n", i_path.c_str(), i_size);
 }
 
