@@ -63,6 +63,9 @@ function shot_InitHTML( i_data)
 {
 	$('asset').innerHTML = i_data;
 
+	// Show actions buttons:
+	if( c_CanCreateShot ) $('shot_new_btn').style.display = 'block';
+
 	// Set process buttons commands:
 	var path = cgru_PM('/' + RULES.root + g_CurPath());
 

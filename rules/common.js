@@ -305,6 +305,15 @@ function c_IsUserStateSet(   i_user, i_state)
 
 	return false;
 }
+function c_CanCreateShot( i_user)
+{
+	if( i_user == null ) i_user = g_auth_user;
+	if( i_user == null ) return false;
+
+	if((['admin','coord','user']).indexOf( i_user.role ) != -1 )
+		return true;
+	return false;
+}
 
 // Construct from g_users sorted roles with sorted artists:
 // Provide i_users to show specified users even if he is disabled or not an artist

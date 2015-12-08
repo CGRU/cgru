@@ -1193,7 +1193,7 @@ FilesView.prototype.rename = function( i_path)
 FilesView.prototype.renameDo = function( i_value, i_path)
 {
 	new_path = RULES.root + c_PathDir( i_path) + '/' + i_value;
-	cmd = 'rules/bin/rename.py "' + RULES.root + i_path + '" "' + new_path + '"';
+	cmd = 'rules/bin/move.py "' + RULES.root + i_path + '" "' + new_path + '"';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.renameFinished,"this":this,"old_path":i_path,"new_path":new_path,"info":'rename'});
 }
