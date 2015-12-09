@@ -72,6 +72,7 @@ function Status( i_obj, i_args)
 		this.elEditBtn     = $('status_edit_btn');
 		this.elColor       = $('status');
 		this.elAnnotation  = $('status_annotation');
+		this.elAdinfo      = $('status_adinfo');
 		this.elProgress    = $('status_progress');
 		this.elProgressBar = $('status_progressbar');
 		this.elPercentage  = $('status_percentage');
@@ -129,6 +130,20 @@ Status.prototype.show = function( i_status)
 			if( modified != '' ) modified = 'Modified' + modified;
 		}
 		this.elModified.textContent = modified;
+	}
+
+	if( this.elAdinfo )
+	{
+		if( g_admin && this.obj && this.obj.adinfo )
+		{
+			this.elAdinfo.textContent = atob( this.obj.adinfo);
+			this.elAdinfo.style.display = 'block';
+		}
+		else
+		{
+			this.elAdinfo.textContent = '';
+			this.elAdinfo.style.display = 'none';
+		}
 	}
 
 	var args = {};
@@ -565,6 +580,16 @@ Status.prototype.edit = function( i_args)
 	u_DrawColorBars({"el":this.elEdit_Color,"onclick":st_EditColorOnClick,"data":this});
 
 
+	if( g_admin )
+	{
+		this.elEdit_adinfo = document.createElement('div');
+		this.elEdit.appendChild( this.elEdit_adinfo);
+		this.elEdit_adinfo.classList.add('adinfo');
+		this.elEdit_adinfo.classList.add('editing');
+		this.elEdit_adinfo.contentEditable = 'true';
+	}
+
+
 	this.elEdit_tasks = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_tasks);
 	this.elEdit_tasks.classList.add('edit_tasks');
@@ -586,6 +611,7 @@ Status.prototype.edit = function( i_args)
 
 	// Get values:
 	var annotation = this.obj.annotation;
+	var adinfo = this.obj.adinfo;
 	var progress = this.obj.progress;
 	var finish = this.obj.finish;
 
@@ -601,6 +627,10 @@ Status.prototype.edit = function( i_args)
 	if( annotation != null )
 	{
 		this.elEdit_annotation.textContent = annotation;
+	}
+	if( g_admin && ( adinfo != null ))
+	{
+		this.elEdit_adinfo.textContent = atob( adinfo);
 	}
 	if( finish != null )
 	{
@@ -998,6 +1028,7 @@ Status.prototype.editSave = function( i_args)
 
 	var finish = null;
 	var annotation = null;
+	var adinfo = null;
 	var progress = null;
 	var artists = null;
 	var tags = null;
@@ -1033,6 +1064,13 @@ Status.prototype.editSave = function( i_args)
 	{
 		this.elEdit_annotation.innerHTML = this.elEdit_annotation.textContent;
 		annotation = c_Strip( this.elEdit_annotation.textContent);
+	}
+
+	if( g_admin )
+	{
+		this.elEdit_adinfo.innerHTML = this.elEdit_adinfo.textContent;
+		adinfo = c_Strip( this.elEdit_adinfo.textContent);
+		adinfo = btoa( adinfo);
 	}
 
 	if( this.elEdit.artists )
@@ -1139,6 +1177,7 @@ Status.prototype.editSave = function( i_args)
 		if( statuses[i].obj == null ) statuses[i].obj = {};
 
 		if( annotation !== null ) statuses[i].obj.annotation = annotation;
+		if( adinfo     !== null ) statuses[i].obj.adinfo     = adinfo;
 		if( finish     !== null ) statuses[i].obj.finish     = finish;
 		if( progress   !== null )
 		{
