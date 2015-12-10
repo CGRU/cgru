@@ -51,6 +51,7 @@
 			{"name":"arnold"},
 			{"name":"blender"},
 			{"name":"c4d"},
+			{"name":"ffmpeg"},
 			{"name":"fusion"},
 			{"name":"hbatch"},
 			{"name":"hbatch_prman"},
