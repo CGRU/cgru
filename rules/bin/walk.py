@@ -17,6 +17,7 @@ Parser = OptionParser(
 
 Parser.add_option('-o', '--output',   dest='output',   type = 'string',     default='.rules/walk.json', help='File to save results.')
 Parser.add_option('-n', '--noupdate', dest='noupdate', action='store_true', default=False,              help='Skip update upfolders.')
+Parser.add_option('-t', '--thumb',    dest='thumb',    type = 'int',        default=None,               help='Make thumbnail frequency.')
 Parser.add_option('-V', '--verbose',  dest='verbose',  type = 'int',        default=0,                  help='Verbose mode.')
 Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,              help='Debug mode.')
 
@@ -26,6 +27,7 @@ Progress = 0
 PrevFiles = None
 CurFiles = 0
 StartPath = '.'
+ThumbFolderCount = 0
 os.umask(0000)
 
 print('{"walk":{')
@@ -69,7 +71,6 @@ def jsonLoad(i_filename):
 
 	return obj
 
-
 def checkDict(io_dict):
 	if not 'folders' in io_dict:
 		io_dict['folders'] = dict()
@@ -86,6 +87,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 	global Progress
 	global PrevFiles
 	global CurFiles
+	global ThumbFolderCount
 
 	if Options.verbose > i_curdepth and i_subwalk:
 		outInfo('cur_path',i_path)
@@ -136,13 +138,20 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 
 		if os.path.isfile(path):
 			CurFiles += 1
+			size = os.path.getsize(path)
 			if entry[0] != '.':
 				out['num_files'] += 1
 				if cgruutils.isImageExt( path):
+					if Options.thumb is not None:
+						if out['num_images'] == 0:
+							if ThumbFolderCount % Options.thumb == 0 and size < 10000000:
+								print('@IMAGE!@'+path)
+								sys.stdout.flush()
+							ThumbFolderCount += 1
 					out['num_images'] += 1
 			out['num_files_total'] += 1
-			out['size_total'] += os.path.getsize(path)
-			out['size'] += os.path.getsize(path)
+			out['size_total'] += size
+			out['size'] += size
 
 	# Just output progress:
 	if PrevFiles:

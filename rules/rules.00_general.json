@@ -51,6 +51,8 @@
 	"message":{"title":"Message","color":[150,150,200]}
 },
 
+"aux_folders":[".","_","-","tmp","temp","tmp","common","rnd"],
+
 "assets":{
 	"project":{
 		"seek":["/"],
@@ -84,7 +86,6 @@
 	},
 	"shot":{
 		"seek":["[scene]/"],
-		"skip":[".","_","-","tmp","temp","tmp","common","rnd"],
 		"uploads":{
 			"upload":{
 				"masks":[".*"],
@@ -117,7 +118,7 @@
 		"dailies":{
 			"path":["RESULT/DAILIES"]
 		},
-		"template":"/CG_PROJECT/SCENES/COMMON/_template",
+		"template":"rules/assets/shot",
 		"nuke_template":"/cgru/plugins/nuke/_template.nk"
 	}
 },
@@ -272,6 +273,10 @@
 	"af_perhost":-1,
 	"af_pertask":100,
 	"af_maxruntime":120
+},
+
+"tmpfio":{
+	"template":"rules/assets/tmpfio"
 },
 
 "put":{

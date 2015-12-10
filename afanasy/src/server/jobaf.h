@@ -145,6 +145,8 @@ private:
 
 	std::string m_store_dir_tasks;   ///< Tasks store directory.
 
+	bool m_thumb_changed; ///< Store that thumbnail was changed, to emit event for monitors
+
 private:
 	mutable int progressWeight;
 	mutable int m_logsWeight;

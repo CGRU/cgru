@@ -2,7 +2,11 @@ ASSETS = {};
 ASSET = null;
 
 function View_asset_Open() { a_Show(); }
-function View_asset_Close() { $('asset').textContent = ''; }
+function View_asset_Close()
+{
+	$('asset').textContent = '';
+	$('asset_top_left').textContent = '';
+}
 
 function a_Process()
 {
@@ -18,6 +22,7 @@ function a_Finish()
 	a_SetLabel('Asset');
 	$('asset_tooltip').style.display = 'none';
 	$('asset_div').style.display = 'none';
+	$('asset_top_left').textContent = '';
 	u_el.assets.innerHTML = '';
 	u_el.asset.innerHTML = '';
 }
@@ -228,13 +233,15 @@ function a_Copy( i_args)
 	wnd.m_args = i_args;
 
 	var params = {};
+	params.template = i_args.template;
+
 	params.name = i_args.name;
 	if( params.name == null )
-	{
 		params.name = ASSET.name + '-01';
-	}
-	params.template = i_args.template;
-	params.destination = c_PathDir( g_CurPath());
+
+	params.destination = i_args.destination;
+	if( params.destination == null )
+		params.destination = g_CurPath();
 
 	gui_Create( wnd.elContent, a_copy_params, [params]);
 
@@ -266,7 +273,7 @@ function a_CopySend( i_wnd)
 	elWait.classList.add('wait');
 
 	var cmd = 'rules/bin/copy.py';
-	cmd += ' -t "' + cgru_PM('/' + RULES.root + params.template, true) + '"';
+	cmd += ' -t "' + params.template + '"';
 	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
 	cmd += ' ' + params.name;
 

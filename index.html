@@ -61,10 +61,11 @@ to show/hige folder status info."
 		<div class="button" id="navig_show_size"       title="Show size
 Only if it was calculated
 Refresh browser to sort by size" onclick="g_NavigShowInfo(this)">SIZE</div>
-		<div class="button" id="navig_show_price"      title="Show prices" onclick="g_NavigShowInfo(this)">P</div>
-		<div class="button" id="navig_show_frames"     title="Show frames number
+		<div class="button small" id="navig_show_duration"   title="Show duration" onclick="g_NavigShowInfo(this)">D</div>
+		<div class="button small" id="navig_show_price"      title="Show price" onclick="g_NavigShowInfo(this)">P</div>
+		<div class="button small" id="navig_show_frames"     title="Show frames number
 Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
-		<div class="button" id="navig_show_percent"    title="Show percentage"    onclick="g_NavigShowInfo(this)">%</div>
+		<div class="button small" id="navig_show_percent"    title="Show percentage"    onclick="g_NavigShowInfo(this)">%</div>
 	</div>
 	<div id="navig_handle" class="gui_size_handle" onmousedown="u_ResizeGUIStart('navig_width',1)"></div>
 </div>
@@ -157,6 +158,7 @@ Supervisor can assign artist by creating a task."
 					style="font: 16px monospace; padding: 1px 6px; float: left;"></div>
 				<div style="padding: 1px 6px; float: right;">Frames</div>
 			</div>
+			<div id="status_adinfo" style="clear:both; display: none;"></div>
 			<div style="clear:both;">
 				<div id="status_reports_div">
 					Reports:
@@ -178,6 +180,7 @@ Supervisor can assign artist by creating a task."
 			<div id="asset_tooltip" class="infotooltip" style="float: right; margin: 2px; display: none;"></div>
 			<div class="button openclose" onclick="u_OpenCloseView('asset')"
 				title="Hide asset view"></div>
+			<div id="asset_top_left"></div>
 			<div id="asset_label" style="text-align:center; margin-top: 4px;">Asset</div>
 			<div id="asset" class="view_view"></div>
 		</div>

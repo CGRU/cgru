@@ -64,7 +64,7 @@ function scene_Show()
 	var folders = g_elCurFolder.m_dir.folders;
 	for( var f = 0; f < folders.length; f++ )
 	{
-		if( sc_SkipFolder( folders[f].name)) continue;
+		if( c_AuxFolder( folders[f].name)) continue;
 
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
@@ -249,7 +249,7 @@ function scenes_Received( i_data, i_args)
 	for( var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
-		if( sc_SkipFolder( fobj.name)) continue;
+		if( c_AuxFolder( fobj.name)) continue;
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
@@ -280,7 +280,7 @@ function scenes_Received( i_data, i_args)
 		for( var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
-			if( sc_SkipFolder( fobj.name)) continue;
+			if( c_AuxFolder( fobj.name)) continue;
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);
@@ -581,14 +581,6 @@ function scenes_GetSelectedShots()
 		shots.push( sc_elShots[i]);
 	}
 	return shots;
-}
-function sc_SkipFolder( i_name)
-{
-	var name = c_PathBase( i_name);
-	for( var i = 0; i < RULES.assets.shot.skip.length; i++)
-		if( name.toLowerCase().indexOf( RULES.assets.shot.skip[i]) === 0 )
-			return true;
-	return false;
 }
 
 function sc_FilterShots( i_args)

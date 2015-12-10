@@ -11,7 +11,10 @@ g_elFolders = {};
 g_nav_clicked = false;
 g_arguments = null;
 
-g_default_infos = ['annotation','artists','percent'];
+g_navig_infos = {};
+g_navig_infos.all = ['annotation','size','artists','tags','duration','price','frames','percent'];
+g_navig_infos.default = ['annotation','artists','percent'];
+g_navig_infos.current = [];
 
 function cgru_params_OnChange( i_param, i_value) { u_ApplyStyles();}
 
@@ -34,7 +37,9 @@ function g_Init_Server( i_data)
 	if( SERVER.version )
 		$('version').innerHTML = c_Strip( SERVER.version);
 
-	n_Request({"send":{"initialize":{}},"func":g_Init_Config,"info":'init'});
+	var url = decodeURI( document.location.href);
+
+	n_Request({"send":{"initialize":{'url':url}},"func":g_Init_Config,"info":'init'});
 }
 function g_Init_Config( i_data)
 {
@@ -364,7 +369,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	g_elCurFolder.m_dir = i_walk;
 	if( g_elCurFolder.m_dir.folders == null ) g_elCurFolder.m_dir.folders = [];
-//	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
 //console.log('RULES:'+g_CurPath()+':'+JSON.stringify( g_elCurFolder.m_dir.rules))
 
@@ -409,7 +414,7 @@ function g_OpenFolderDo( i_data, i_args)
 	if( i_data )
 	{
 		el.m_dir = i_data[0];
-//		el.m_dir.folders.sort( g_CompareFolders);
+		el.m_dir.folders.sort( g_CompareFolders);
 	}
 
 	if( el.m_dir.folders == null ) return;
@@ -450,15 +455,24 @@ function g_AppendFolder( i_elParent, i_fobject)
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
 	elFolder.m_fobject = i_fobject;
-	if( i_fobject.dummy )
-		elFolder.classList.add('dummy');
+	elFolder.m_elParent = i_elParent;
 
 	var elFBody = document.createElement('div');
 	elFolder.appendChild( elFBody);
 	elFolder.m_elFBody = elFBody;
 	elFBody.classList.add('fbody');
+
+	if( c_AuxFolder( i_fobject.name ))
+	{
+		i_fobject.auxiliary = true;
+		elFolder.classList.add('auxiliary');
+		elFBody.classList.add('auxiliary');
+	}
 	if( i_fobject.dummy )
+	{
+		elFolder.classList.add('dummy');
 		elFBody.classList.add('dummy');
+	}
 
 	var elName = document.createElement('a');
 	elFBody.appendChild( elName);
@@ -482,6 +496,12 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.m_elPrice = elPrice;
 	elPrice.classList.add('price');
 	elPrice.classList.add('info');
+
+	var elDuration = document.createElement('div');
+	elFBody.appendChild( elDuration);
+	elFolder.m_elDuration = elDuration;
+	elDuration.classList.add('duration');
+	elDuration.classList.add('info');
 
 	var elSize = document.createElement('div');
 	elFBody.appendChild( elSize);
@@ -574,6 +594,48 @@ function g_AppendFolder( i_elParent, i_fobject)
 	return elFolder;
 }
 
+function g_RemoveFolder( i_elFolder)
+{
+	var elParent = i_elFolder.m_elParent;
+
+	for( var i = 0; i < elParent.m_elFolders.length; i++)
+	{
+		if( elParent.m_elFolders[i] == i_elFolder )
+		{
+			elParent.m_elFolders.splice( i, 1);
+
+			// Set prev folder next link:
+			if( i > 0 )
+			{
+				if( i < elParent.m_elFolders.length )
+					elParent.m_elFolders[i-1].m_elNext = elParent.m_elFolders[i];
+				else
+					elParent.m_elFolders[i-1].m_elNext = null;
+			}
+
+			// Set next folder prev link:
+			if( i < elParent.m_elFolders.length )
+			{
+				if( i > 0 )
+					elParent.m_elFolders[i].m_elPrev = elParent.m_elFolders[i-1];
+				else
+					elParent.m_elFolders[i].m_elPrev = null;
+			}
+
+			break;
+		}
+	}
+
+	// Remove element from a global array:
+	g_elFolders[i_elFolder.m_path] = null;
+
+	// Get parent element body to insert new child (root navig element has no body):
+	var elBody = elParent.m_elFBody;
+	if( elBody == null ) elBody = elParent;
+
+	elBody.removeChild( i_elFolder);
+}
+
 function g_NavigScrollCurrent()
 {
 	if( g_elCurFolder )
@@ -602,22 +664,29 @@ function g_FolderSetStatus( i_status, i_elFolder, i_up_params)
 	if(( i_up_params == null ) || i_up_params.annotation ) st_SetElLabel( i_status, i_elFolder.m_elAnn);
 	if(( i_up_params == null ) || i_up_params.color      ) st_SetElColor( i_status, i_elFolder.m_elFBody);
 	if(( i_up_params == null ) || i_up_params.artists    ) st_SetElArtists( i_status, i_elFolder.m_elArtists, true);
-	if(( i_up_params == null ) || i_up_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
+	if(( i_up_params == null ) || i_up_params.duration   ) st_SetElDuration( i_status, i_elFolder.m_elDuration);
 	if(( i_up_params == null ) || i_up_params.price      ) st_SetElPrice( i_status, i_elFolder.m_elPrice);
 	if(( i_up_params == null ) || i_up_params.tags       ) st_SetElTags( i_status, i_elFolder.m_elTags, true);
+
+	if( i_elFolder.m_fobject.auxiliary )
+	{
+		i_elFolder.m_elFrames.style.display = 'none';
+		i_elFolder.m_elPercent.style.display = 'none';
+		i_elFolder.m_elProgress.style.display = 'none';
+		return;
+	}
+
+	if(( i_up_params == null ) || i_up_params.frames_num ) st_SetElFramesNum( i_status, i_elFolder.m_elFrames, false);
 	if(( i_up_params == null ) || i_up_params.progress   )
 	{
 		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress, i_elFolder.m_elPercent);
-//		st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
-//		if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
-//			i_elFolder.m_elPercent.textContent = i_status.progress + '%';
 	}
 }
 
 function g_CompareFolders(a,b)
 {
 	// Compare folders sizes if size is shown in the navigation:
-	if( localStorage.navig_show_size == 'true' )
+	if( g_navig_infos.current.navig_show_size )
 	{
 		if(( a.size_total != null ) && ( b.size_total == null )) return -1;
 		if(( b.size_total != null ) && ( a.size_total == null )) return  1;
@@ -627,6 +696,13 @@ function g_CompareFolders(a,b)
 			else if( a.size_total > b.size_total ) return -1;
 		}
 	}
+
+	// Move auxiliary folders to bottom:
+	var a_aux = c_AuxFolder( a.name);
+	var b_aux = c_AuxFolder( b.name);
+
+	if( a_aux && ( false == b_aux )) return  1;
+	if( b_aux && ( false == a_aux )) return -1;
 
 	// Compare folders names:
 	if( a.name < b.name ) return -1;
@@ -692,31 +768,48 @@ function g_FolderOnDblClick( i_evt)
 
 function g_NavigShowInfo( i_toggle)
 {
-	var infos = ['annotation','size','artists','tags','price','frames','percent'];
-	for( var i = 0; i < infos.length; i++ )
+	for( var i = 0; i < g_navig_infos.all.length; i++ )
 	{
-		var name = 'navig_show_'+infos[i];
+		var name = 'navig_show_'+g_navig_infos.all[i];
 		if( localStorage[name] == null )
 		{
-			if( g_default_infos.indexOf(infos[i]) != -1 )
+			if( g_navig_infos.default.indexOf(g_navig_infos.all[i]) != -1 )
+			{
 				localStorage[name] = 'true';
+				g_navig_infos.current[name] = true;
+			}
 			else
+			{
 				localStorage[name] = 'false';
+				g_navig_infos.current[name] = false;
+			}
 		}
+
 		if( i_toggle && ( i_toggle.id == name ))
 		{
-			if( localStorage[name] == 'true' ) localStorage[name] = 'false';
-			else localStorage[name] = 'true';
+			if( localStorage[name] == 'true' )
+			{
+				localStorage[name] = 'false';
+				g_navig_infos.current[name] = false;
+			}
+			else
+			{
+				localStorage[name] = 'true';
+				g_navig_infos.current[name] = true;
+			}
 		}
+
 		if( localStorage[name] == 'true' )
 		{
 			$(name).classList.add('selected');
 			u_el.navig.classList.add( name);
+			g_navig_infos.current[name] = true;
 		}
 		else
 		{
 			$(name).classList.remove('selected');
 			u_el.navig.classList.remove( name);
+			g_navig_infos.current[name] = false;
 		}
 	}
 }

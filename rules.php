@@ -195,7 +195,7 @@ function jsf_initialize( $i_arg, &$o_out)
 		}
 	}
 
-	processUser( $o_out);
+	processUser( $i_arg, $o_out);
 	if( array_key_exists('error', $o_out)) return;
 
 	$out = array();
@@ -227,7 +227,7 @@ function jsf_initialize( $i_arg, &$o_out)
 	if( isAdmin( $out)) $o_out['admin'] = true;
 }
 
-function processUser( &$o_out)
+function processUser( $i_arg, &$o_out)
 {
 	global $UserID;
 
@@ -255,7 +255,7 @@ function processUser( &$o_out)
 	if( false == isset( $user['ctime']   )) $user['ctime']    = time();
 	$user['rtime'] = time();
 
-	processUserIP( $user);
+	processUserIP( $i_arg, $user);
 
 	$editobj['object'] = $user;
 	$out = array();
@@ -269,26 +269,27 @@ function processUser( &$o_out)
 	$o_out['user'] = $user;
 }
 
-function processUserIP( &$o_user)
+function processUserIP( $i_arg, &$o_user)
 {
 	$ip = get_client_ip();
 
 	if( false == isset( $o_user['ips'] ))
-	{
 		$o_user['ips'] = array();
-	}
-	else if( count($o_user['ips']))
-	{
-		if( $o_user['ips'][0] == $ip )
-			return;
 
-		if( array_key_exists( $ip, $o_user['ips']))
-			array_splice( $o_user['ips'], array_search( $ip, $o_user['ips']), 1);
-	}
+	for( $i = 0; $i < count($o_user['ips']); )
+		if(( false == isset($o_user['ips'][$i]['ip'])) || ( $o_user['ips'][$i]['ip'] == $ip ))
+			array_splice( $o_user['ips'], $i, 1);
+		else
+			$i++;
 
-	array_unshift( $o_user['ips'], $ip);
+	$rec = array();
+	$rec['ip'] = $ip;
+	$rec['time'] = time();
+	$rec['url'] = $i_arg['url'];
 
-	array_slice( $o_user['ips'], 0, 10);
+	array_unshift( $o_user['ips'], $rec);
+
+	$o_user['ips'] = array_slice( $o_user['ips'], 0, 10);
 }
 
 function writeUser( &$i_user)

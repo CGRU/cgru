@@ -586,6 +586,9 @@ function fu_ArchivateProcessGUI( i_wnd)
 		arch_cmd = cgru_PM('/cgru/utilities/arch_x.py', true);
 	}
 
+	// Output path for thumbnails frequency:
+	arch_cmd += ' --thumbsec 5';
+
 	job.name += ' ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
 	job.max_running_tasks = parseInt( params.af_maxtasks);
 	job.max_running_tasks_per_host = parseInt( params.af_perhost);
@@ -703,6 +706,7 @@ function fu_WalkProcessGUI( i_wnd)
 	block.tasks = [task];
 
 	var cmd = cgru_PM( RULES.walk.cmd, true);
+	cmd += ' -t 100';
 	if( params.upparents == false ) cmd += ' -n';
 	cmd += ' -V ' + params.verbose;
 	cmd += ' "' + cgru_PM('/' + RULES.root + params.path, true) + '"';
@@ -713,3 +717,20 @@ function fu_WalkProcessGUI( i_wnd)
 
 	i_wnd.destroy();
 }
+
+
+// ############################# TMPFIO: ##################################//
+
+function fu_TmpFio( i_args)
+{
+console.log(JSON.stringify(i_args.fview.path));
+
+	var args = {};
+
+	args.template = RULES.tmpfio.template;
+	args.destination = i_args.fview.path;
+	args.name = 'tmpfio_' + Math.random().toString(36).substring(2);
+
+	a_Copy( args);
+}
+

@@ -81,6 +81,7 @@ case ${DISTRIBUTIVE} in
 	openSUSE)
 		redhatArch
 		export PACKAGE_MANAGER="zypper"
+		export PACKAGE_INSTALL="$PACKAGE_MANAGER install"
 		;;
 	Mageia)
 		redhatArch
