@@ -175,6 +175,27 @@ genetate thumbnails.";
 		el.title = 'Create a shared folder.';
 	}
 
+	if( g_admin )
+	{
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/buffer_add.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.bufferAdd();}
+		el.title = 'Add selected files to buffer.';
+
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/buffer_take.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.bufferPut();}
+		el.title = 'Put files from buffer.';
+		el.style.display = 'none';
+		this.elBufferPut = el;
+	}
+
 	if( this.has_thumbs )
 	{
 		var elThumbDiv = document.createElement('div');
@@ -360,6 +381,11 @@ FilesView.prototype.show = function()
 
 	this.limitApply();
 	this.showCounts();
+
+	if( fu_BufferExists())
+		this.elBufferPut.style.display = 'block';
+	else
+		this.elBufferPut.style.display = 'none';
 }
 
 FilesView.prototype.showCounts = function()
@@ -1234,6 +1260,88 @@ FilesView.prototype.filesDeleted = function( i_data, i_args)
 	i_args.this.refresh();
 }
 
+FilesView.prototype.bufferAdd = function()
+{
+	var elItems = this.getSelected();
+	if( elItems.length == 0 )
+	{
+		c_Error('No items selected.');
+		return;
+	}
+
+	for( var i = 0; i < elItems.length; i++)
+		fu_BufferAdd( elItems[i].m_path);
+}
+FilesView.prototype.bufferAdded = function() { this.elBufferPut.style.display = 'block'; }
+FilesView.prototype.bufferEmpty = function() { this.elBufferPut.style.display = 'none';  }
+FilesView.prototype.bufferPut = function()
+{
+	var paths = fu_BufferTakeSelected();
+	if( paths.length == 0 )
+	{
+		c_Error('No buffer items selected.');
+		return;
+	}
+
+	var cmds = [];
+	var dest = cgru_PM( RULES.root + this.path, true) + '/';
+	for( var i = 0; i < paths.length; i++)
+	{
+		// Remove parent folder from walk buffer:
+		var parent_path = c_PathDir(paths[i]);
+		if( parent_path == this.path )
+		{
+			c_Error('Buffer and destination folders are the same.');
+			continue;
+		}
+
+		n_walks[parent_path] = null;
+
+		var src = cgru_PM( RULES.root + paths[i], true);
+		cmd = 'rules/bin/move.py "' + src + '" "' + dest + '"';
+		cmds.push( cmd);
+	}
+
+	if( cmds.length == 0 )
+		return;
+
+	n_Request({"send":{"cmdexec":{"cmds":cmds}},"func":this.bufferPutFinished,"this":this,"info":'buffer move'});
+}
+FilesView.prototype.bufferPutFinished = function( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+
+	var invalid = false;
+
+	if( i_data && i_data.cmdexec )
+	{
+		for( var i = 0; i < i_data.cmdexec.length; i++)
+		{
+			var data = i_data.cmdexec[i];
+			if(( data == null ) || ( data.move == null ))
+			{
+				invalid = true;
+			}
+			else
+			{
+				var move = data.move;
+				if( move.error )
+					c_Error( move.error );
+				else
+					c_Info(move.src + ' -> ' + move.dst);
+			}
+		}
+	}
+
+	if( invalid )
+	{
+		c_Log( JSON.stringify( data));
+		c_Error('Invalid output received.');
+	}
+
+	fv_ReloadAll();
+}
+
 function fv_GetFileIcon( i_name, i_folder)
 {
 	var icon = 'file_icon.png';
@@ -1388,6 +1496,8 @@ function fv_SkipFile( i_filename)
 function fv_ReloadAll()    { for( var i = 0; i < fv_views.length; i++) fv_views[i].refresh();      }
 function fv_refreshAttrs() { for( var i = 0; i < fv_views.length; i++) fv_views[i].refreshAttrs(); }
 function fv_SelectNone()   { for( var v = 0; v < fv_views.length; v++) fv_views[v].selectNone();   }
+function fv_BufferAdded()  { for( var v = 0; v < fv_views.length; v++) fv_views[v].bufferAdded();  }
+function fv_BufferEmpty()  { for( var v = 0; v < fv_views.length; v++) fv_views[v].bufferEmpty();  }
 function fv_RefreshPath( i_path)
 {
 //console.log('fv_RefreshPath: ' + i_path);

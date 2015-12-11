@@ -677,6 +677,38 @@ margin-bottom: -4px;
 .filesview .item .preview .video { border-radius: 6px; border: 2px solid #000; }
 .filesview .item .preview .close { background-color: #555; color: #000; }
 
+
+#buffer_div {
+border: 2px solid rgba(98,98,98,.5);
+border-radius: 2px;
+}
+#buffer_panel > div {
+float: left;
+}
+#buffer_panel > div.label {
+margin: 2px 8px;
+padding: 2px 8px;
+}
+#buffer_panel > div.button {
+font-size: 14px;
+margin: 3px 4px;
+padding: 1px 4px;
+}
+#buffer { clear: both; }
+#buffer .item {
+border-top: 1px solid rgba(98,98,98,.5);
+margin: 0px 8px;
+padding: 2px 8px;
+}
+#buffer .item .button {
+float: right;
+background-image: url(icons/delete.png);
+width: 12px; height: 12px;
+margin: 3px 0px;
+padding: 0;
+}
+
+
 #body, #body_panel { overflow: visible; }
 #body_info { font-size: 14px; }
 #body_avatar_c, #body_avatar_m {
