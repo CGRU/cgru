@@ -23,8 +23,7 @@ RUN tar xzvf cgru*.tar.gz \
 ADD https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux /usr/local/bin/ep
 COPY resources/config.json /home/render/.cgru/config.json
 COPY resources/bin/ /usr/local/bin/
-RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/ && chown render:render /home/render/.cgru/config.json
-
+RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/ && chown -R render:render /home/render/
 VOLUME /var/tmp/afanasy
 EXPOSE 51001
 ENV AF_USERNAME="render" AF_SERVERNAME="afrender"
