@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from parsers import p
+from parsers import parser
 
 import re
 
