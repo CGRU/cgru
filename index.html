@@ -200,6 +200,16 @@ Here are shown curret location files.
 			<div id="files" class="view_view"></div>
 		</div>
 	</div>
+	<div id="buffer_div" style="display: none;">
+		<div id="buffer_panel">
+			<div class="label"><b>Buffer:</b></div>
+			<div class="button" ondblclick="fu_BufferClear()" title="Double click to clear buffer.">Clear</div>
+			<div class="label">Select</div>
+			<div class="button" onclick="fu_BufferSelectAll()">All</div>
+			<div class="button" onclick="fu_BufferSelectNone()">None</div>
+		</div>
+		<div id="buffer"></div>
+	</div>
 	<div id="body_div" class="view">
 		<div class="button show" onclick="u_OpenCloseView('body')"
 			title="Show body">Body

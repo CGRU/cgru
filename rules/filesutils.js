@@ -734,3 +734,102 @@ console.log(JSON.stringify(i_args.fview.path));
 	a_Copy( args);
 }
 
+// ############################### BUFFER: ################################ //
+
+fu_bufferItems = [];
+
+function fu_BufferAdd( i_path)
+{
+	$('buffer_div').style.display = 'block';
+
+	for( var i = 0; i < fu_bufferItems.length; i++)
+		if( fu_bufferItems[i].m_path == i_path )
+			return;
+
+	var elItem = document.createElement('div');
+	$('buffer').appendChild( elItem);
+	fu_bufferItems.push( elItem);
+	elItem.classList.add('item');
+	elItem.m_path = i_path;
+
+	var el = document.createElement('div');
+	elItem.appendChild( el);
+	el.classList.add('button');
+	el.m_elItem = elItem;
+	el.ondblclick = function(e){fu_BufferRemove( e.currentTarget.m_elItem)};
+	el.title = 'Double click to delete an item.';
+
+	var el = document.createElement('div');
+	elItem.appendChild( el);
+	el.classList.add('name');
+	el.textContent = i_path;
+	el.m_elItem = elItem;
+	el.onclick = function(e){fu_BufferClick( e.currentTarget.m_elItem)};
+
+	fv_BufferAdded();
+}
+
+function fu_BufferClick( i_elItem) { fu_BufferSelect( i_elItem, null); }
+function fu_BufferSelect( i_elItem, i_sel)
+{
+	if( i_sel === null )
+	{
+		if( i_elItem.selected ) i_sel = false;
+		else i_sel = true;
+	}
+
+	if( i_sel )
+	{
+		i_elItem.selected = true;
+		i_elItem.classList.add('selected');
+	}
+	else
+	{
+		i_elItem.selected = false;
+		i_elItem.classList.remove('selected');
+	}
+}
+function fu_BufferSelectAll( i_sel)
+{
+	if( i_sel !== false ) i_sel = true;
+	for( var i = 0; i < fu_bufferItems.length; i++)
+		fu_BufferSelect( fu_bufferItems[i], i_sel);
+}
+function fu_BufferSelectNone() { fu_BufferSelectAll( false);}
+function fu_BufferRemove( i_elItem)
+{
+	for( var i = 0; i < fu_bufferItems.length; i++)
+		if( fu_bufferItems[i] == i_elItem )
+		{
+			fu_bufferItems.splice( i, 1);
+			break;
+		}
+
+	$('buffer').removeChild( i_elItem);
+
+	if( fu_bufferItems.length == 0 )
+	{
+		$('buffer_div').style.display = 'none';
+		fv_BufferEmpty();
+	}
+}
+function fu_BufferClear() { while( fu_bufferItems.length ) fu_BufferRemove( fu_bufferItems[0]); }
+function fu_BufferExists() { return fu_bufferItems.length != 0; }
+
+function fu_BufferTakeSelected()
+{
+	var items = [];
+	for( var i = 0; i < fu_bufferItems.length; i++)
+		if( fu_bufferItems[i].selected )
+			items.push( fu_bufferItems[i]);
+
+	var paths = [];
+	for( var i = 0; i < items.length; i++)
+	{
+		paths.push( items[i].m_path);
+		fu_BufferRemove( items[i]);
+	}
+
+	return paths;
+}
+

@@ -21,7 +21,7 @@ RUN tar xzvf cgru*.tar.gz \
  && rm -rf *
  
 COPY resources/bin/ /usr/local/bin/
-RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/
+RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/ && chown -R render:render /home/render/
 
 VOLUME /var/tmp/afanasy
 EXPOSE 51000
