@@ -1392,7 +1392,10 @@ af::Msg * JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i
 void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
 {
 //printf("JobAf::listenOutput: (%s) ", onoff?"ON":"OFF");address->stdOut();printf(", jobid=%d:\n", id);
-   if( listeners.process( mclisten) == false ) return;
+	if( listeners.process( mclisten) == false )
+	{
+		return;
+	}
 
    if( mclisten.justTask())
    {

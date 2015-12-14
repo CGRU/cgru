@@ -324,7 +324,7 @@ void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
       AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return;
    }
-printf("Listening running task:"); mclisten.v_stdOut();
+	//printf("Listening running task:"); mclisten.v_stdOut();
    RenderContainerIt rendersIt( renders);
    RenderAf * render = rendersIt.getRender( m_hostId);
    if( render != NULL) render->sendOutput( mclisten, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
