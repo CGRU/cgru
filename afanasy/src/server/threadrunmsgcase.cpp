@@ -69,7 +69,7 @@ switch ( i_msg->type())
 		JobContainerIt jobsIt( i_args->jobs);
 		JobAf* job = jobsIt.getJob( mclass.getJobId());
 		if( mclass.fromRender() == false ) mclass.setIP( i_msg->getAddress());
-mclass.v_stdOut();
+		//mclass.v_stdOut();
 		if( job ) job->listenOutput( mclass, i_args->renders);
 		break;
 	}
