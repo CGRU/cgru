@@ -382,10 +382,13 @@ FilesView.prototype.show = function()
 	this.limitApply();
 	this.showCounts();
 
-	if( fu_BufferExists())
-		this.elBufferPut.style.display = 'block';
-	else
-		this.elBufferPut.style.display = 'none';
+	if( g_admin )
+	{
+		if( fu_BufferExists())
+			this.elBufferPut.style.display = 'block';
+		else
+			this.elBufferPut.style.display = 'none';
+	}
 }
 
 FilesView.prototype.showCounts = function()
