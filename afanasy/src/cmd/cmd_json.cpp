@@ -84,7 +84,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 		if( false == af::pathFileExists( filename))
 		{
-			AFERRAR("File not fouded:\n%s", filename.c_str())
+			AFERRAR("File not found:\n%s", filename.c_str())
 			return false;
 		}
 
