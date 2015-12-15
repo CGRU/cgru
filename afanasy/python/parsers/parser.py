@@ -20,11 +20,13 @@ class parser(
 		self.percent = 0
 		self.frame = 0
 		self.percentframe = 0
-		self.activity = ''
 		self.error = False
 		self.warning = False
 		self.badresult = False
 		self.finishedsuccess = False
+		self.activity = ''
+		self.report = ''
+		self.result = None
 
 		self.files = []
 		self.files_onthefly = []
@@ -96,10 +98,11 @@ class parser(
 		mode = cgruutils.toStr(mode)
 
 		self.activity = ''
+		self.report = ''
 		self.warning = False
 		self.error = False
 		self.badresult = False
-		result = None
+		self.result = None
 		if data.find(str_warning) != -1:
 			self.warning = True
 		if data.find(str_error) != -1:
@@ -126,14 +129,12 @@ class parser(
 				self.appendFile(line.strip(), True)
 
 		try:
-			result = self.do(data, mode)
+			self.result = self.do(data, mode)
 		except:  # TODO: too broad exception clause
 			print('Error parsing output:')
 			#print(str(sys.exc_info()[1]))
 			traceback.print_exc(file=sys.stdout)
-		return result, self.percent, self.frame, self.percentframe, \
-			   self.warning, self.error, self.badresult, self.finishedsuccess, \
-			   self.activity
+
 
 	def calculate(self):
 		"""Missing DocString

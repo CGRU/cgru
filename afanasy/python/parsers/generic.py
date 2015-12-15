@@ -2,12 +2,14 @@
 
 from parsers import parser
 
-FRAME = 'FRAME: '
-PERCENT = 'PROGRESS: '
+FRAME    = 'FRAME: '
+PERCENT  = 'PROGRESS: '
 ACTIVITY = 'ACTIVITY: '
+REPORT   = 'REPORT: '
 
-PERCENT_len = len(PERCENT)
+PERCENT_len  = len(PERCENT)
 ACTIVITY_len = len(ACTIVITY)
+REPORT_len   = len(REPORT)
 
 
 class generic(parser.parser):
@@ -46,6 +48,11 @@ class generic(parser.parser):
 		if activity_pos > -1:
 			activity_pos += ACTIVITY_len
 			self.activity = data[activity_pos: data.find('\n', activity_pos)]
+
+		report_pos = data.rfind(REPORT)
+		if report_pos > -1:
+			report_pos += REPORT_len
+			self.report = data[report_pos: data.find('\n', report_pos)]
 
 		if needcalc:
 			self.calculate()

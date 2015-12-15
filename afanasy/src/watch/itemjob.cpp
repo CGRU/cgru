@@ -98,6 +98,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 	cmd_pre              = afqt::stoq( job->getCmdPre());
 	cmd_post             = afqt::stoq( job->getCmdPost());
 	description          = afqt::stoq( job->getDescription());
+	report               = afqt::stoq( job->getReport());
 	num_runningtasks     = job->getRunningTasksNumber();
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
@@ -190,6 +191,11 @@ bool ItemJob::calcHeight()
 	m_height = Height + block_height*m_blocks_num;
 
 	if( false == m_annotation.isEmpty())
+	{
+		m_height += HeightAnnotation;
+	}
+
+	if( false == report.isEmpty())
 	{
 		m_height += HeightAnnotation;
 	}
@@ -320,6 +326,17 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 //		tx -= m_thumbs[i]->size().width();
 	}
 
+
+	// Report:
+	if( false == report.isEmpty())
+	{
+		painter->setPen( clrTextMain( option) );
+		painter->setFont( afqt::QEnvironment::f_info);
+		int y_report = y;
+		if( false == m_annotation.isEmpty())
+			y_report -= HeightAnnotation;
+		painter->drawText( x, y_report, w, h, Qt::AlignHCenter | Qt::AlignBottom, report );
+	}
 
 	// Annotation:
 	if( false == m_annotation.isEmpty())

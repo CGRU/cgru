@@ -415,16 +415,17 @@ void TaskProcess::sendTaskSate()
 		toRecieve = true;
 		stdout_data = m_parser->getData( &stdout_size);
 	}
-
+/*
 	int percent        = 0;
 	int frame          = 0;
 	int percentframe   = 0;
 	std::string activity = "";
-
-	percent        = m_parser->getPercent();
-	frame          = m_parser->getFrame();
-	percentframe   = m_parser->getPercentFrame();
-	activity       = m_parser->getActivity();
+*/
+	int percent          = m_parser->getPercent();
+	int frame            = m_parser->getFrame();
+	int percentframe     = m_parser->getPercentFrame();
+	std::string activity = m_parser->getActivity();
+	std::string report   = m_parser->getReport();
 
 	af::MCTaskUp taskup(
 		RenderHost::getId(),
@@ -439,6 +440,7 @@ void TaskProcess::sendTaskSate()
 		frame,
 		percentframe,
 		activity,
+		report,
 
 		stdout_size,
 		stdout_data);

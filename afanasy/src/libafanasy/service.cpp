@@ -187,69 +187,38 @@ Service::~Service()
 {
 }
 
-bool Service::parse( const std::string & i_mode, std::string & i_data,
-							int & percent, int & frame, int & percentframe, std::string & activity,
+void Service::parse( const std::string & i_mode, std::string & i_data,
+							int & percent, int & frame, int & percentframe,
+							std::string & activity, std::string & report,
 							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
 {
-	bool result = false;
-//	if( data.size() < 1) return result;
-
 	PyObject * pArgs = PyTuple_New( 2);
 	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( i_data.data(), i_data.size()));
 	PyTuple_SetItem( pArgs, 1, PyBytes_FromStringAndSize( i_mode.data(), i_mode.size()));
 
-	PyObject * pTuple = PyObject_CallObject( m_PyObj_FuncParse, pArgs);
-	if( pTuple != NULL)
+	PyObject * pClass = PyObject_CallObject( m_PyObj_FuncParse, pArgs);
+	if( pClass != NULL)
 	{
-		if( PyTuple_Check( pTuple))
+		if( pClass != Py_None )
 		{
-			if( PyTuple_Size( pTuple) == 9)
-			{
-				percent           = PyLong_AsLong(   PyTuple_GetItem( pTuple, 1));
-				frame             = PyLong_AsLong(   PyTuple_GetItem( pTuple, 2));
-				percentframe      = PyLong_AsLong(   PyTuple_GetItem( pTuple, 3));
-				warning           = PyObject_IsTrue( PyTuple_GetItem( pTuple, 4));
-				error             = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
-				badresult         = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
-				finishedsuccess   = PyObject_IsTrue( PyTuple_GetItem( pTuple, 7));
+			std::string err = std::string("Service::parse[" + m_parser_type + "]: ");
 
-				PyObject * pActivity = PyTuple_GetItem( pTuple, 8);
-				if( pActivity == NULL)
-				{
-					if( PyErr_Occurred()) PyErr_Print();
-				}
-				else
-				{
-					af::PyGetString( pActivity, activity, "Service::parse: activity");
-//printf("Activity: %s\n", activity.c_str());
-				}
+			af::PyGetAttrInt( pClass,"percent",      percent,      err);
+			af::PyGetAttrInt( pClass,"frame",        frame,        err);
+			af::PyGetAttrInt( pClass,"percentframe", percentframe, err);
 
-				PyObject * pOutput = PyTuple_GetItem( pTuple, 0);
-				if( pOutput == NULL)
-				{
-					if( PyErr_Occurred()) PyErr_Print();
-				}
-				else if( pOutput == Py_None)
-				{
-					result = true;
-				}
-				else
-				{
-					if( af::PyGetString( pOutput, i_data, "Service::parse: output"))
-						result = true;
-				}
-			}
-			else
-			{
-				AFERRAR("Service::parse: parser=\"%s\" returned tuple size != 9\n", m_parser_type.c_str());
-			}
+			af::PyGetAttrBool( pClass,"warning",         warning,         err);
+			af::PyGetAttrBool( pClass,"error",           error,           err);
+			af::PyGetAttrBool( pClass,"badresult",       badresult,       err);
+			af::PyGetAttrBool( pClass,"finishedsuccess", finishedsuccess, err);
+
+			af::PyGetAttrStr( pClass,"activity", activity, err);
+			af::PyGetAttrStr( pClass,"report",   report,   err);
+
+			PyObject * pAttr = PyObject_GetAttrString( pClass, "result");
+			if( PyString_Check( pAttr ))
+				af::PyGetString( pAttr, i_data, "Service::parse: result");
 		}
-		else if( pTuple != Py_None)
-		{
-			AFERRAR("Service::parse: parser=\"%s\" returned value is not a tuple\n", m_parser_type.c_str());
-		}
-
-		Py_DECREF( pTuple);
 	}
 	else
 	{
@@ -257,8 +226,6 @@ bool Service::parse( const std::string & i_mode, std::string & i_data,
 	}
 
 	Py_DECREF( pArgs);
-
-	return result;
 }
 
 bool Service::checkExitStatus( int i_status) const

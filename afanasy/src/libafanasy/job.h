@@ -58,6 +58,7 @@ public:
 	inline const std::string & getDescription()  const { return m_description; }
 	inline const std::string & getCustomData()   const { return m_custom_data; }
 	inline const std::string & getThumbPath()    const { return m_thumb_path;  }
+	inline const std::string & getReport()       const { return m_report;      }
 
 	const std::string getFolder() const;
 
@@ -130,6 +131,8 @@ protected:
 	std::string m_description; ///< Job description for statistics purposes only.
 
 	std::map< std::string, std::string > m_folders;
+
+	std::string m_report;
 
 	std::string m_thumb_path;
 	int32_t m_thumb_size;

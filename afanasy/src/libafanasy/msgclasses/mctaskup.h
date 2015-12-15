@@ -10,7 +10,6 @@ namespace af
 class MCTaskUp : public MsgClass
 {
 public:
-//	MCTaskUp();
 	MCTaskUp
 		(
 			int i_clientid,
@@ -25,6 +24,7 @@ public:
 			int i_frame            = -1,
 			int i_percent_frame    = -1,
 			std::string i_activity = "",
+			std::string i_report   = "",
 			int i_datalen          = 0,
 			char * i_data          = NULL
 		);
@@ -43,6 +43,7 @@ public:
 	inline int getFrame()                    const { return m_frame;         }
 	inline int getPercentFrame()             const { return m_percent_frame; }
   	inline const std::string & getActivity() const { return m_activity;      }
+  	inline const std::string & getReport()   const { return m_report;        }
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
 
@@ -71,6 +72,7 @@ private:
 	int32_t m_frame;
 	int8_t  m_percent_frame;
 	std::string m_activity;
+	std::string m_report;
 
 	int32_t m_datalen;
 	char * m_data;

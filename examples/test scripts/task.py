@@ -91,6 +91,7 @@ while frame <= frame_end:
 			print('ACTIVITY: Generating')
 		if p == 50:
 			print('ACTIVITY: Rendering')
+			print('REPORT: ' + str(random.random()))
 		if p == 90:
 			print('ACTIVITY: Finalizing')
 		if random.random() * 100 * 100 < options.pkp:

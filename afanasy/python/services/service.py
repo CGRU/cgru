@@ -156,13 +156,15 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 		if self.parser is None:
 			return None
 
+		self.parser.parse(data, mode)
+
 		thumb_cmds = self.generateThumbnail( True)
 		for cmd in thumb_cmds:
 			print('Generating thumbnail "on-the-fly":')
 			print( cmd)
 			os.system(cmd)
 
-		return self.parser.parse(data, mode)
+		return self.parser
 
 	def checkExitStatus(self, i_status):
 		""" This function needed to check task process exit status.

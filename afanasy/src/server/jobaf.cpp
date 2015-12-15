@@ -93,9 +93,12 @@ void JobAf::initializeValues()
     m_blocks           = NULL;
 	m_progress         = NULL;
     m_deletion         = false;
+
+	m_thumb_changed    = false;
+	m_report_changed   = false;
+
     m_logsWeight       = 0;
     m_blackListsWeight = 0;
-	m_thumb_changed    = false;
 }
 
 void JobAf::initStoreDirs()
@@ -939,6 +942,13 @@ void JobAf::v_updateTaskState( const af::MCTaskUp& taskup, RenderContainer * ren
    bool errorHost = false;
    m_blocks[taskup.getNumBlock()]->m_tasks[taskup.getNumTask()]->v_updateState( taskup, renders, monitoring, errorHost);
    if( errorHost) m_blocks[taskup.getNumBlock()]->v_errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
+
+	std::string new_report = taskup.getReport();
+	if( new_report.size() && ( new_report != m_report ))
+	{
+		m_report = new_report;
+		m_report_changed = true;
+	}
 }
 
 void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -1088,10 +1098,11 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 		}
 	}
 
-	if( m_thumb_changed )
+	if( m_thumb_changed || m_report_changed )
 	{
 		jobchanged = af::Msg::TMonitorJobsChanged;
 		m_thumb_changed = false;
+		m_report_changed = false;
 	}
 
    // Check age and delete if life finished:

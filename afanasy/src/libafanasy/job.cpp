@@ -149,6 +149,8 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"description\":\""  << af::strEscape( m_description  ) << "\"";
 	if( m_thumb_path.size())
 		o_str << ",\n\"thumb_path\":\""   << af::strEscape( m_thumb_path   ) << "\"";
+	if( m_report.size())
+		o_str << ",\n\"report\":\""       << af::strEscape( m_report       ) << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
@@ -296,29 +298,23 @@ void Job::v_readwrite( Msg * msg)
 	rw_int64_t ( m_time_done,                  msg);
 	rw_int32_t ( m_time_life,                  msg);
 
-	rw_String  ( m_user_name,    msg);
-	rw_String  ( m_host_name,    msg);
-	rw_String  ( m_command_pre,  msg);
-	rw_String  ( m_command_post, msg);
-	rw_String  ( m_annotation,   msg);
+	rw_String ( m_user_name,    msg);
+	rw_String ( m_host_name,    msg);
+	rw_String ( m_command_pre,  msg);
+	rw_String ( m_command_post, msg);
+	rw_String ( m_annotation,   msg);
+	rw_String ( m_report,       msg);
+	rw_String ( m_description,  msg);
+	rw_String ( m_custom_data,  msg);
+	rw_String ( m_thumb_path,   msg);
 
-//	NEW VERSION:
-//	rw_String  ( m_description,  msg);
-	rw_String  ( m_thumb_path,   msg);
+	rw_RegExp ( m_hosts_mask,         msg);
+	rw_RegExp ( m_hosts_mask_exclude, msg);
+	rw_RegExp ( m_depend_mask,        msg);
+	rw_RegExp ( m_depend_mask_global, msg);
+	rw_RegExp ( m_need_os,            msg);
+	rw_RegExp ( m_need_properties,    msg);
 
-	rw_String  ( m_custom_data,  msg);
-
-//	NEW VERSION:
-//	rw_String  ( m_thumb_path,   msg); // Afwatch should ask for thumbnail if this path changed
-
-	rw_RegExp  ( m_hosts_mask,         msg);
-	rw_RegExp  ( m_hosts_mask_exclude, msg);
-	rw_RegExp  ( m_depend_mask,        msg);
-	rw_RegExp  ( m_depend_mask_global, msg);
-	rw_RegExp  ( m_need_os,            msg);
-	rw_RegExp  ( m_need_properties,    msg);
-
-//	NEW VERSION:
 //	rw_StringMap( m_folders, msg);
 
 	rw_blocks(  msg);
@@ -463,6 +459,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    }
 
    if( m_annotation.size()) o_str << "\n    " << m_annotation;
+   if( m_report.size()) o_str << "\n    " << m_report;
    if( m_description.size()) o_str << "\n    " << m_description;
 
    o_str << "\n Time created  = " << af::time2str( m_time_creation);

@@ -71,3 +71,59 @@ bool af::PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, c
 	return true;
 }
 
+bool af::PyGetAttrBool( PyObject * i_obj, const char * i_name, bool & o_bool, const std::string & i_err_info)
+{
+	PyObject * pAttr = PyObject_GetAttrString( i_obj, i_name);
+
+	if( pAttr == NULL)
+	{
+		AFERRAR("%s: has no '%s' attr.", i_err_info.c_str(), i_name)
+		return false;
+	}
+	if( ! PyBool_Check( pAttr ))
+	{
+		AFERRAR("%s: '%s' is not a boolean.", i_err_info.c_str(), i_name)
+		return false;
+	}
+
+	o_bool = PyObject_IsTrue( pAttr);
+
+	return true;
+}
+bool af::PyGetAttrInt(  PyObject * i_obj, const char * i_name, int & o_int, const std::string & i_err_info)
+{
+	PyObject * pAttr = PyObject_GetAttrString( i_obj, i_name);
+
+	if( pAttr == NULL)
+	{
+		AFERRAR("%s: has no '%s' attr.", i_err_info.c_str(), i_name)
+		return false;
+	}
+	if( ! PyInt_Check( pAttr ))
+	{
+		AFERRAR("%s: '%s' is not an integer.", i_err_info.c_str(), i_name)
+		return false;
+	}
+
+	o_int = PyInt_AsLong( pAttr);
+
+	return true;
+}
+bool af::PyGetAttrStr(  PyObject * i_obj, const char * i_name, std::string & o_str, const std::string & i_err_info)
+{
+	PyObject * pAttr = PyObject_GetAttrString( i_obj, i_name);
+
+	if( pAttr == NULL)
+	{
+		AFERRAR("%s: has no '%s' attr.", i_err_info.c_str(), i_name)
+		return false;
+	}
+	if( ! PyString_Check( pAttr ))
+	{
+		AFERRAR("%s: '%s' is not an string.", i_err_info.c_str(), i_name)
+		return false;
+	}
+
+	return af::PyGetString( pAttr, o_str, i_err_info.c_str());
+}
+

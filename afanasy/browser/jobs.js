@@ -54,6 +54,11 @@ JobNode.prototype.init = function()
 	this.elThumbs.classList.add('thumbnails');
 	this.elThumbs.style.display = 'none';
 
+	this.elReport = document.createElement('div');
+	this.element.appendChild( this.elReport);
+	this.elReport.title = 'Report';
+	this.elReport.style.textAlign = 'center';
+
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild( this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
@@ -128,6 +133,10 @@ JobNode.prototype.update = function( i_obj)
 	if( this.params.need_os)
 		this.elNeedOS.textContent = this.params.need_os;
 	else this.elNeedOS.textContent = '';
+
+	if( this.params.report )
+		this.elReport.textContent = this.params.report;
+	else this.elReport.textContent = '';
 
 	if( this.params.annotation )
 		this.elAnnotation.textContent = this.params.annotation;
