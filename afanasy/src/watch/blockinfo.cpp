@@ -373,6 +373,10 @@ void BlockInfo::drawProgress(
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
 			painter->drawRect( x, posy, w+offset, height);
 			break;
+		case 'Y': // STATE_READY_MASK | STATE_ERROR_READY_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_errorready.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
 		case 'W': // STATE_WAITDEP_MASK
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern ));
 			painter->drawRect( x, posy, w+offset, height);

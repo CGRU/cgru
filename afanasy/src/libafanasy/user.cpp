@@ -139,8 +139,8 @@ void User::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
 
-	rw_uint32_t( m_state,                 msg);
-	rw_uint32_t( m_flags,                 msg);
+	rw_int64_t ( m_state,                 msg);
+	rw_int64_t ( m_flags,                 msg);
 	rw_int64_t ( m_time_activity,         msg);
 	rw_String  ( m_host_name,             msg);
 	rw_int32_t ( m_max_running_tasks,     msg);

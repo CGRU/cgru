@@ -288,6 +288,7 @@ cursor: default;
 .item.WTM { background: #599;}
 .item.RUN { background: #8A6;}
 .item.ERR { background: #965;}
+.item.RER { background: #F77;}
 .item.OFF, .item.task.SKP { background: #777;}
 .item.DRT { border: 1px solid #955;}
 .item.hidden { display: none;}

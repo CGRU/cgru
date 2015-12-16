@@ -70,7 +70,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    }
 
 	// Store previous state to check difference for notifications.
-	uint32_t prev_state = state;
+	int64_t prev_state = state;
 
 	updateNodeValues( node);
 

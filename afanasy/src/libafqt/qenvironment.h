@@ -101,6 +101,7 @@ public:
 	static AttrColor clr_itemrendernimby;
 	static AttrColor clr_itemrenderpltclr;
 	static AttrColor clr_error;
+	static AttrColor clr_errorready;
 	static AttrColor clr_running;
 	static AttrColor clr_done;
 	static AttrColor clr_outline;

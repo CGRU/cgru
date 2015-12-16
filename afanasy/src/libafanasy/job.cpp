@@ -83,7 +83,7 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("host_name", m_host_name,     i_object);
 	//jr_uint32("flags",   m_flags,         i_object);
-	jr_uint32("st",        m_state,         i_object);
+	jr_int64("st",        m_state,         i_object);
 	//jr_int32 ("user_list_order",          m_user_list_order,            i_object);
 
 	jr_int64 ("time_creation", m_time_creation, i_object);
@@ -287,8 +287,8 @@ void Job::v_readwrite( Msg * msg)
 	Node::v_readwrite( msg);
 
 	rw_int32_t ( m_blocks_num,                 msg);
-	rw_uint32_t( m_flags,                      msg);
-	rw_uint32_t( m_state,                      msg);
+	rw_int64_t ( m_flags,                      msg);
+	rw_int64_t ( m_state,                      msg);
 	rw_int32_t ( m_max_running_tasks,          msg);
 	rw_int32_t ( m_max_running_tasks_per_host, msg);
 	rw_int32_t ( m_user_list_order,            msg);

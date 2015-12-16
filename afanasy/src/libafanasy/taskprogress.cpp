@@ -29,7 +29,7 @@ TaskProgress::~TaskProgress()
 
 void TaskProgress::v_readwrite( Msg * msg)
 {
-   rw_uint32_t( state,        msg);
+	rw_int64_t( state,        msg);
    rw_int8_t  ( percent,      msg);
    rw_int64_t ( frame,        msg);
    rw_int8_t  ( percentframe, msg);
@@ -38,12 +38,12 @@ void TaskProgress::v_readwrite( Msg * msg)
    rw_int64_t ( time_start,   msg);
    rw_int64_t ( time_done,    msg);
    rw_String  ( hostname,     msg);
-	rw_String  ( activity,     msg);
+	rw_String ( activity,     msg);
 }
 
 void TaskProgress::jsonRead( const JSON & i_obj)
 {
-	jr_uint32("st",  state,        i_obj);
+	jr_int64 ("st",  state,        i_obj);
 	jr_int32 ("str", starts_count, i_obj);
 	jr_int32 ("err", errors_count, i_obj);
 	jr_int64 ("tst", time_start,   i_obj);

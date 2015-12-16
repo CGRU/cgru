@@ -29,57 +29,58 @@ namespace AFJOB
 	const int NET_CONNECTTIME = 10000;
 	const int NET_SENTTIME = 10000;
 
-	// NEW VERSION: 32bit masks should be 64
-
-	const uint32_t STATE_READY_MASK                 = 1<<0;
-	const   char   STATE_READY_NAME[]               = "Ready";
-	const   char   STATE_READY_NAME_S[]             = "RDY";
-	const uint32_t STATE_RUNNING_MASK               = 1<<1;
-	const   char   STATE_RUNNING_NAME[]             = "Running";
-	const   char   STATE_RUNNING_NAME_S[]           = "RUN";
-	const uint32_t STATE_WAITDEP_MASK               = 1<<2;
-	const   char   STATE_WAITDEP_NAME[]             = "Wainting dependences";
-	const   char   STATE_WAITDEP_NAME_S[]           = "WD";
-	const uint32_t STATE_WAITTIME_MASK              = 1<<3;
-	const   char   STATE_WAITTIME_NAME[]            = "Wainting time";
-	const   char   STATE_WAITTIME_NAME_S[]          = "WT";
-	const uint32_t STATE_DONE_MASK                  = 1<<4;
-	const   char   STATE_DONE_NAME[]                = "Done";
-	const   char   STATE_DONE_NAME_S[]              = "DON";
-	const uint32_t STATE_ERROR_MASK                 = 1<<5;
-	const   char   STATE_ERROR_NAME[]               = "Error";
-	const   char   STATE_ERROR_NAME_S[]             = "ERR";
-	const uint32_t STATE_STDOUT_MASK                = 1<<6;
-	const   char   STATE_STDOUT_NAME[]              = "StdOut";
-	const   char   STATE_STDOUT_NAME_S[]            = "StO";
-	const uint32_t STATE_STDERR_MASK                = 1<<7;
-	const   char   STATE_STDERR_NAME[]              = "StdErr";
-	const   char   STATE_STDERR_NAME_S[]            = "StE";
-	const uint32_t STATE_SKIPPED_MASK               = 1<<8;
-	const   char   STATE_SKIPPED_NAME[]             = "Skipped";
-	const   char   STATE_SKIPPED_NAME_S[]           = "SKP";
-	const uint32_t STATE_OFFLINE_MASK               = 1<<9;
-	const   char   STATE_OFFLINE_NAME[]             = "Offline";
-	const   char   STATE_OFFLINE_NAME_S[]           = "OFF";
-	const uint32_t STATE_WARNING_MASK               = 1<<10;
-	const   char   STATE_WARNING_NAME[]             = "Warning";
-	const   char   STATE_WARNING_NAME_S[]           = "WRN";
-	const uint32_t STATE_PARSERERROR_MASK           = 1<<11;
-	const   char   STATE_PARSERERROR_NAME[]         = "Parser Error";
-	const   char   STATE_PARSERERROR_NAME_S[]       = "PER";
-	const uint32_t STATE_PARSERBADRESULT_MASK       = 1<<12;
-	const   char   STATE_PARSERBADRESULT_NAME[]     = "Parser Bad Result";
-	const   char   STATE_PARSERBADRESULT_NAME_S[]   = "PBR";
-	const uint32_t STATE_PARSERSUCCESS_MASK         = 1<<13;
-	const   char   STATE_PARSERSUCCESS_NAME[]       = "Parser Finished Success";
-	const   char   STATE_PARSERSUCCESS_NAME_S[]     = "PBR";
-	const uint32_t STATE_FAILEDPOST_MASK            = 1<<14;
-	const   char   STATE_FAILEDPOST_NAME[]          = "Failed Post";
-	const   char   STATE_FAILEDPOST_NAME_S[]        = "FPO";
-	const uint32_t STATE_SOLVED_MASK                = 1<<30;
-	const uint32_t STATE_PPAPPROVAL_MASK            = 1<<31;
-	const   char   STATE_PPAPPROVAL_NAME[]          = "Preview pending approval.";
-	const   char   STATE_PPAPPROVAL_NAME_S[]        = "PPA";
+	const int64_t STATE_READY_MASK                 = 1ULL<<0;
+	const   char  STATE_READY_NAME[]               = "Ready";
+	const   char  STATE_READY_NAME_S[]             = "RDY";
+	const int64_t STATE_RUNNING_MASK               = 1ULL<<1;
+	const   char  STATE_RUNNING_NAME[]             = "Running";
+	const   char  STATE_RUNNING_NAME_S[]           = "RUN";
+	const int64_t STATE_WAITDEP_MASK               = 1ULL<<2;
+	const   char  STATE_WAITDEP_NAME[]             = "Wainting dependences";
+	const   char  STATE_WAITDEP_NAME_S[]           = "WD";
+	const int64_t STATE_WAITTIME_MASK              = 1ULL<<3;
+	const   char  STATE_WAITTIME_NAME[]            = "Wainting time";
+	const   char  STATE_WAITTIME_NAME_S[]          = "WT";
+	const int64_t STATE_DONE_MASK                  = 1ULL<<4;
+	const   char  STATE_DONE_NAME[]                = "Done";
+	const   char  STATE_DONE_NAME_S[]              = "DON";
+	const int64_t STATE_ERROR_MASK                 = 1ULL<<5;
+	const   char  STATE_ERROR_NAME[]               = "Error";
+	const   char  STATE_ERROR_NAME_S[]             = "ERR";
+	const int64_t STATE_STDOUT_MASK                = 1ULL<<6;
+	const   char  STATE_STDOUT_NAME[]              = "StdOut";
+	const   char  STATE_STDOUT_NAME_S[]            = "StO";
+	const int64_t STATE_STDERR_MASK                = 1ULL<<7;
+	const   char  STATE_STDERR_NAME[]              = "StdErr";
+	const   char  STATE_STDERR_NAME_S[]            = "StE";
+	const int64_t STATE_SKIPPED_MASK               = 1ULL<<8;
+	const   char  STATE_SKIPPED_NAME[]             = "Skipped";
+	const   char  STATE_SKIPPED_NAME_S[]           = "SKP";
+	const int64_t STATE_OFFLINE_MASK               = 1ULL<<9;
+	const   char  STATE_OFFLINE_NAME[]             = "Offline";
+	const   char  STATE_OFFLINE_NAME_S[]           = "OFF";
+	const int64_t STATE_WARNING_MASK               = 1ULL<<10;
+	const   char  STATE_WARNING_NAME[]             = "Warning";
+	const   char  STATE_WARNING_NAME_S[]           = "WRN";
+	const int64_t STATE_PARSERERROR_MASK           = 1ULL<<11;
+	const   char  STATE_PARSERERROR_NAME[]         = "Parser Error";
+	const   char  STATE_PARSERERROR_NAME_S[]       = "PER";
+	const int64_t STATE_PARSERBADRESULT_MASK       = 1ULL<<12;
+	const   char  STATE_PARSERBADRESULT_NAME[]     = "Parser Bad Result";
+	const   char  STATE_PARSERBADRESULT_NAME_S[]   = "PBR";
+	const int64_t STATE_PARSERSUCCESS_MASK         = 1ULL<<13;
+	const   char  STATE_PARSERSUCCESS_NAME[]       = "Parser Finished Success";
+	const   char  STATE_PARSERSUCCESS_NAME_S[]     = "PBR";
+	const int64_t STATE_FAILEDPOST_MASK            = 1ULL<<14;
+	const   char  STATE_FAILEDPOST_NAME[]          = "Failed Post";
+	const   char  STATE_FAILEDPOST_NAME_S[]        = "FPO";
+	const int64_t STATE_SOLVED_MASK                = 1ULL<<30;
+	const int64_t STATE_PPAPPROVAL_MASK            = 1ULL<<31;
+	const   char  STATE_PPAPPROVAL_NAME[]          = "Preview pending approval.";
+	const   char  STATE_PPAPPROVAL_NAME_S[]        = "PPA";
+	const int64_t STATE_ERROR_READY_MASK           = 1ULL<<32;
+	const   char  STATE_ERROR_READY_NAME[]         = "Restarted Error";
+	const   char  STATE_ERROR_READY_NAME_S[]       = "RER";
 
 	const int  SYSJOB_ID                   = 1;  // System job ID
 	const char SYSJOB_NAME[]               = "afanasy";
@@ -101,8 +102,8 @@ namespace AFJOB
 
 	// Tasks progess some states for GUI in ASCII
 	// Order is priority, as only one, most important state displayed in a job block progress bar
-	const int ASCII_PROGRESS_COUNT = 9;
-	const int ASCII_PROGRESS_STATES[ASCII_PROGRESS_COUNT*2] = {
+	const int ASCII_PROGRESS_COUNT = 10;
+	const int64_t ASCII_PROGRESS_STATES[ASCII_PROGRESS_COUNT*2] = {
 		' ', 0,
 		'D', STATE_DONE_MASK,
 		'S', STATE_SKIPPED_MASK | STATE_DONE_MASK,
@@ -111,8 +112,9 @@ namespace AFJOB
 		'W', STATE_WAITDEP_MASK,
 		'R', STATE_RUNNING_MASK,
 		'N', STATE_RUNNING_MASK | STATE_WARNING_MASK,
+		'Y', STATE_ERROR_READY_MASK | STATE_READY_MASK,
 		'E', STATE_ERROR_MASK};
-	const uint32_t ASCII_PROGRESS_MASK = STATE_READY_MASK | STATE_DONE_MASK | STATE_SKIPPED_MASK |
-		STATE_DONE_MASK | STATE_WARNING_MASK | STATE_RUNNING_MASK | STATE_ERROR_MASK;
+	const int64_t ASCII_PROGRESS_MASK = STATE_READY_MASK | STATE_DONE_MASK | STATE_SKIPPED_MASK |
+		STATE_DONE_MASK | STATE_WARNING_MASK | STATE_RUNNING_MASK | STATE_ERROR_READY_MASK | STATE_ERROR_MASK;
 	const int ASCII_PROGRESS_LENGTH = 128;
 }

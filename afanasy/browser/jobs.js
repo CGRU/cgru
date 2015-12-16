@@ -9,6 +9,7 @@ BarDWRrgb = '#141';
 BarWDPrgb = '#A2A';
 BarRUNrgb = '#FF0';
 BarRWRrgb = '#FA0';
+BarRERrgb = '#F77';
 BarERRrgb = '#F00';
 
 JobNode.prototype.init = function() 
@@ -846,6 +847,7 @@ JobBlock.prototype.update = function( i_displayFull)
 					case 'W': rgb = BarWDPrgb; break;// WDP
 					case 'R': rgb = BarRUNrgb; break;// RUN
 					case 'N': rgb = BarRWRrgb; break;// RUN | WRN
+					case 'Y': rgb = BarRERrgb; break;// RER
 					case 'E': rgb = BarERRrgb; break;// ERR
 				}
 				ctx.strokeStyle = rgb;

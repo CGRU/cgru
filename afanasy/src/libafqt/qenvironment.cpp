@@ -93,6 +93,7 @@ AttrColor QEnvironment::clr_itemrenderpltclr("clr_itemrenderpltclr", "Plotter Te
 AttrColor QEnvironment::clr_running(         "clr_running",          "Running Bar",             AFGUI::CLR_RUNNING             );
 AttrColor QEnvironment::clr_done(            "clr_done",             "Done Bar",                AFGUI::CLR_DONE                );
 AttrColor QEnvironment::clr_error(           "clr_error",            "Error Bar",               AFGUI::CLR_ERROR               );
+AttrColor QEnvironment::clr_errorready(      "clr_errorready",       "Error Ready Bar",         AFGUI::CLR_ERRORREADY          );
 AttrColor QEnvironment::clr_outline(         "clr_outline",          "Bars Outline",            AFGUI::CLR_OUTLINE             );
 AttrColor QEnvironment::clr_star(            "clr_star",             "Star",                    AFGUI::CLR_STAR                );
 AttrColor QEnvironment::clr_starline(        "clr_starline",         "Star Outline",            AFGUI::CLR_STARLINE            );
@@ -205,6 +206,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_running         );
     ms_attrs_gui.append( &clr_done            );
     ms_attrs_gui.append( &clr_error           );
+    ms_attrs_gui.append( &clr_errorready      );
     ms_attrs_gui.append( &clr_star            );
     ms_attrs_gui.append( &clr_outline         );
     ms_attrs_gui.append( &clr_starline        );

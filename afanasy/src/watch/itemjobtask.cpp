@@ -134,13 +134,19 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 		drawPercent ( painter, x, y, w - WidthInfo, Height-1,
 			100, percent, 0, 0 , !(taskprogress.state & AFJOB::STATE_DONE_MASK));
 	}
-	else if(( taskprogress.state & AFJOB::STATE_ERROR_MASK || taskprogress.state & AFJOB::STATE_DONE_MASK ))
+//	else if(( taskprogress.state & AFJOB::STATE_ERROR_MASK || taskprogress.state & AFJOB::STATE_DONE_MASK ))
+	else if( taskprogress.state &
+		( AFJOB::STATE_ERROR_MASK
+		| AFJOB::STATE_DONE_MASK
+		| AFJOB::STATE_ERROR_READY_MASK ))
 	{
 		painter->setPen( Qt::NoPen );
 		painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
 
 		if( taskprogress.state & AFJOB::STATE_ERROR_MASK )
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+		else if( taskprogress.state & AFJOB::STATE_ERROR_READY_MASK )
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_errorready.c, Qt::SolidPattern ));
 		else if( taskprogress.state & AFJOB::STATE_WARNING_MASK )
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningdone.c, Qt::SolidPattern ));
 		else if( taskprogress.state & AFJOB::STATE_SKIPPED_MASK )

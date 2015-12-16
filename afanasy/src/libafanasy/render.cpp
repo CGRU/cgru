@@ -180,7 +180,7 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
-	jr_uint32("st", m_state, i_object);
+	jr_int64("st", m_state, i_object);
 
 	Client::jsonRead( i_object);
 
@@ -224,8 +224,8 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_String  ( m_version,      msg);
 	  rw_String  ( m_name,         msg);
 	  rw_String  ( m_user_name,    msg);
-	  rw_uint32_t( m_state,        msg);
-	  rw_uint32_t( m_flags,        msg);
+	  rw_int64_t ( m_state,        msg);
+	  rw_int64_t ( m_flags,        msg);
 	  rw_uint8_t ( m_priority,     msg);
 	  rw_int64_t ( m_time_launch,  msg);
 	  m_host.v_readwrite( msg);

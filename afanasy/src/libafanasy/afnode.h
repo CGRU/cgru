@@ -28,6 +28,9 @@ public:
    inline void  getName( std::string & str) const { str =  m_name;    } ///< Get Node name.
    inline const std::string & getName()     const { return m_name;    } ///< Get Node name.
 
+	inline int64_t getFlags() const { return m_flags;}
+	inline int64_t getState() const { return m_state;}
+
 	inline const std::string & getAnnotation() const { return m_annotation; }
 	inline const std::string & getCustomData() const { return m_custom_data;}
 
@@ -79,9 +82,8 @@ protected:
 
    mutable bool m_locked;    ///< Lock state.
 
-// NEW VERSION: 32 bit masks should be 64
-    uint32_t m_state;   ///< State.
-    uint32_t m_flags;   ///< Flags.
+	int64_t m_state;   ///< State.
+	int64_t m_flags;   ///< Flags.
 
 	std::string m_annotation;
 	std::string m_custom_data;

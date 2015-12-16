@@ -26,7 +26,7 @@ public:
 
 	int maxrunningtasks;
 	int maxruntasksperhost;
-	uint32_t state;
+	int64_t state;
 	int64_t time_creation;
 	int64_t time_started;
 	int64_t time_wait;

@@ -67,6 +67,7 @@ namespace AFGUI
 	const char CLR_RUNNING[]         = "FFFFFF";
 	const char CLR_DONE[]            = "D67F00";
 	const char CLR_ERROR[]           = "B92803";
+	const char CLR_ERRORREADY[]      = "B96060";
 	const char CLR_OUTLINE[]         = "727272";
 	const char CLR_STAR[]            = "9099A3";
 	const char CLR_STARLINE[]        = "000000";
@@ -124,6 +125,7 @@ namespace AFGUI
 	const char CLR_RUNNING[]         = "A0D26E";
 	const char CLR_DONE[]            = "14320A";
 	const char CLR_ERROR[]           = "FA320A";
+	const char CLR_ERRORREADY[]      = "FA7070";
 	const char CLR_OUTLINE[]         = "ADBD1F";
 	const char CLR_STAR[]            = "FA320A";
 	const char CLR_STARLINE[]        = "FFE838";

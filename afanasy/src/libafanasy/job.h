@@ -37,9 +37,6 @@ public:
 		FPPApproval = 1<<31
 	};
 
-	//inline unsigned getFlags() const { return flags;}
-	inline unsigned getState() const { return m_state;}
-
 	inline int getBlocksNum()           const { return m_blocks_num;                 }
 	inline int getTimeLife()            const { return m_time_life;                 }
 	inline int getUserListOrder()       const { return m_user_list_order;           }
