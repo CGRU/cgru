@@ -103,6 +103,13 @@ void ItemJob::updateValues( af::Node *node, int type)
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
 
+	folders.clear();
+	const std::map<std::string,std::string> & stdf = job->getFolders();
+	if( stdf.size())
+	for( std::map<std::string,std::string>::const_iterator it = stdf.begin(); it != stdf.end(); it++)
+		folders[afqt::stoq((*it).first)] = afqt::stoq((*it).second);
+printf("folders.size = %d\n", folders.size());
+
 	QString new_thumb_path = afqt::stoq( job->getThumbPath());
 
 	compact_display = true;

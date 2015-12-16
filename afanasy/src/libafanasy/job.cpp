@@ -315,7 +315,7 @@ void Job::v_readwrite( Msg * msg)
 	rw_RegExp ( m_need_os,            msg);
 	rw_RegExp ( m_need_properties,    msg);
 
-//	rw_StringMap( m_folders, msg);
+	rw_StringMap( m_folders, msg);
 
 	rw_blocks(  msg);
 }
@@ -487,6 +487,16 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_need_properties.notEmpty()) o_str << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
    if( m_command_pre.size()) o_str << "\n Pre command:\n" << m_command_pre;
    if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
+
+	if( m_folders.size())
+	{
+		o_str << "\nFolders:";
+		int i = 0;
+		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
+		{
+			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
+		}
+	}
 }
  
 void Job::v_generateInfoStream( std::ostringstream & o_str, bool full) const

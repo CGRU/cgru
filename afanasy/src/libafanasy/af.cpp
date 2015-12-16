@@ -319,6 +319,28 @@ void Af::w_StringList( const std::list<std::string> & stringList, Msg * msg)
 //std::cout << "w_StringList: length = \"" << length << "\"\n";
 }
 
+void Af::rw_StringMap( std::map< std::string, std::string > & stringMap, Msg * msg)
+{
+	uint32_t size = stringMap.size();
+	rw_uint32_t( size, msg);
+
+	if( msg->isWriting())
+		for( std::map<std::string,std::string>::const_iterator it = stringMap.begin(); it != stringMap.end(); it++)
+		{
+			w_String((*it).first,  msg);
+			w_String((*it).second, msg);
+		}
+	else
+		for( unsigned i = 0; i < size; i++)
+		{
+			std::string name;
+			rw_String( name, msg);
+			std::string value;
+			rw_String( value, msg);
+			stringMap[name] = value;
+		}
+}
+
 void Af::rw_Int32_List( std::list<int32_t> &list, Msg * msg)
 {
 	uint32_t count;

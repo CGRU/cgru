@@ -47,6 +47,7 @@ public:
 	QString description;
 	QString thumb_path;
 	QString report;
+	QMap<QString,QString> folders;
 
 	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const

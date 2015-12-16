@@ -121,6 +121,24 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	if( jobitem == NULL ) return;
 	int selectedItemsCount = getSelectedItemsCount();
 
+	if( jobitem->folders.size())
+	{
+		submenu = new QMenu("Folders", this);
+
+		QMapIterator<QString,QString> it( jobitem->folders);
+		while( it.hasNext())
+		{
+			it.next();
+
+			action = new QAction( it.key() + ':' + it.value(), this);
+//			connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+			submenu->addAction( action);
+		}
+
+		menu.addMenu( submenu);
+		menu.addSeparator();
+	}
+
 	action = new QAction( "Show Log", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
 	menu.addAction( action);

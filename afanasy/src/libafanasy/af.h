@@ -49,6 +49,7 @@ protected:
 	static void rw_StringList(       std::list<std::string> & stringList, Msg * msg);
 	static void  w_StringList( const std::list<std::string> & stringList, Msg * msg);
 	static void rw_StringVect(     std::vector<std::string> & stringVect, Msg * msg);
+	static void rw_StringMap( std::map< std::string, std::string > & stringMap, Msg * msg);
 
 	static void rw_RegExp( RegExp & regExp, Msg * msg);
 

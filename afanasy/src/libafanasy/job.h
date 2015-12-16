@@ -58,6 +58,7 @@ public:
 	inline const std::string & getReport()       const { return m_report;      }
 
 	const std::string getFolder() const;
+	inline const std::map<std::string,std::string> & getFolders() const { return m_folders; }
 
 	inline bool isStarted()  const { return m_time_started != 0 ;                } ///< Whether a job is started.
 	inline bool isReady()    const { return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
