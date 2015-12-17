@@ -1,7 +1,7 @@
 FROM ubuntu:14.04
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 ENV CGRU_VERSION="2.0.8"
-LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
+LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.1.0"
 
 STOPSIGNAL SIGINT
 
@@ -12,6 +12,7 @@ RUN apt-get -qq update \
  	libpython2.7 \
  	python3-sip \
  	tcpdump \
+ 	imagemagick \
  && apt-get -yqq clean \
  && rm -rf /var/lib/apt/lists/*
  
