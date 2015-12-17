@@ -71,6 +71,8 @@ private slots:
 
 	void actListenJob();
 
+	void actBrowseFolder( QString i_folder);
+
 private:
 	void moveJobs( const std::string & i_operation);
 

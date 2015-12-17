@@ -3,6 +3,7 @@
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
+#include "../libafanasy/service.h"
 
 #include "itemjob.h"
 #include "ctrljobs.h"
@@ -130,9 +131,13 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 		{
 			it.next();
 
-			action = new QAction( it.key() + ':' + it.value(), this);
-//			connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+			action = new QAction( QString("\"") + it.key() + "\":", this);
+			action->setEnabled( false);
 			submenu->addAction( action);
+
+			ActionString * action_str = new ActionString( it.value(), it.value(), this);
+			connect( action_str, SIGNAL( triggeredString(QString) ), this, SLOT( actBrowseFolder(QString) ));
+			submenu->addAction( action_str);
 		}
 
 		menu.addMenu( submenu);
@@ -746,6 +751,14 @@ void ListJobs::actListenJob()
 	Item* item = getCurrentItem();
 	if( item == NULL ) return;
 	if( Watch::isConnected()) Watch::listenJob( item->getId(), item->getName());
+}
+
+void ListJobs::actBrowseFolder( QString i_folder)
+{
+	af::Service service("service", afqt::qtos(i_folder), "");
+	i_folder = afqt::stoq( service.getWDir());
+
+	Watch::browseFolder( i_folder);
 }
 
 

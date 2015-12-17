@@ -107,7 +107,8 @@ public:
 
 	void static loadImage( QPixmap & o_pixmap, const QString & i_filename);
 
-	void static browseImages( const QString & i_image, const QString & i_wdir);
+	void static browseImages( const QString & i_image,  const QString & i_wdir);
+	void static browseFolder( const QString & i_folder, const QString & i_wdir = QString());
 
 	void static notify( const QString & i_title, const QString & i_msg, uint32_t i_state = 0);
 

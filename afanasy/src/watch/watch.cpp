@@ -367,11 +367,16 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
     if( folder == i_image )
         folder = i_wdir;
 
+	Watch::browseFolder( folder, i_wdir);
+}
+
+void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
+{
     QDir dir( i_wdir);
     if( dir.exists())
-        dir.cd( folder);
+        dir.cd( i_folder);
     else
-        dir.setPath( folder);
+        dir.setPath( i_folder);
 
     if( false == dir.exists())
     {
@@ -385,7 +390,7 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
 #else
 	QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
 #endif
-	cmd += " \"" + folder + "\"";
+	cmd += " \"" + i_folder + "\"";
 	Watch::startProcess( cmd, i_wdir);
 }
 
