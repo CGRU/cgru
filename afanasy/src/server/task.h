@@ -50,7 +50,7 @@ public:
 
 	/// Store task output:
 	/// Need to be virtual, as system job task output storing is not needed
-	virtual void v_writeTaskOutput( const af::MCTaskUp & taskup) const;
+	virtual void v_writeTaskOutput( const char * i_data, int i_size) const;
 
 	virtual void v_monitor( MonitorContainer * monitoring) const;
 

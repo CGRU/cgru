@@ -72,7 +72,7 @@ std::string const SysTask::v_getInfo(bool full) const
 
 void SysTask::v_monitor( MonitorContainer * monitoring) const {}
 void SysTask::v_store() {}
-void SysTask::v_writeTaskOutput( const af::MCTaskUp& taskup) const {}
+void SysTask::v_writeTaskOutput( const char * i_data, int i_size) const {}
 
 void SysTask::v_appendLog( const std::string & message)
 {

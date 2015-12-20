@@ -31,11 +31,14 @@ public:
 	virtual ~BlockData();
 
 	enum Flags{
-		FNumeric          = 1ULL << 0,
-		FVarCapacity      = 1ULL << 1,
-		FMultiHost        = 1ULL << 2,
-		FMasterOnSlave    = 1ULL << 3,
-		FDependSubTask    = 1ULL << 4
+		FNumeric            = 1ULL << 0,
+		FVarCapacity        = 1ULL << 1,
+		FMultiHost          = 1ULL << 2,
+		FMasterOnSlave      = 1ULL << 3,
+		FDependSubTask      = 1ULL << 4,
+		FSkipThumbnails     = 1ULL << 5,
+		FSkipExistingFiles  = 1ULL << 6,
+		FCheckRenderedFiles = 1ULL << 7
 	};
 
 	static const char DataMode_Progress[];
@@ -157,7 +160,6 @@ public:
 	inline void setErrorsForgiveTime(     int value) { m_errors_forgive_time  = value; }
 
 	bool setNumeric( long long start, long long end, long long perTask = 1, long long increment = 1);
-//	bool setFlags( unsigned int flags);
 	void setFramesPerTask( long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string & getName()         const { return m_name;                }  ///< Get name.

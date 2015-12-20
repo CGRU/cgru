@@ -169,6 +169,12 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
          message = "Parser bad result.";
          m_progress->state = m_progress->state | AFJOB::STATE_PARSERBADRESULT_MASK;
       }
+   case af::TaskExec::UPBadRenderedFiles:
+      if( message.size() == 0)
+      {
+         message = "Bad rendered files.";
+         m_progress->state = m_progress->state | AFJOB::STATE_BADRENDEREDFILES_MASK;
+      }
    case af::TaskExec::UPFinishedError:
    {
       if( message.size() == 0) message = "Finished error.";
@@ -212,10 +218,6 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    default:
       AFERRAR("TaskRun::update: Unknown task update status = %d", taskup.getStatus())
    }
-
-	std::string log = taskup.getLog();
-	if( log.size())
-		m_task->v_appendLog( log);
 }
 
 bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)

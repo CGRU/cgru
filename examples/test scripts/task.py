@@ -22,29 +22,22 @@ print('Started at ' + strftime('%A %d %B %H:%M:%S'))
 
 from optparse import OptionParser
 
-parser = OptionParser(usage='usage: %prog [options]', version='%prog 1.0')
-parser.add_option('-s', '--start',     dest='start',     type='int',    default=1,  help='start frame number')
-parser.add_option('-e', '--end',       dest='end',       type='int',    default=1,  help='end frame number')
-parser.add_option('-i', '--increment', dest='increment', type='int',    default=1,  help='frame increment')
-parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=2,  help='time per frame in seconds')
-parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,  help='random time per frame in seconds')
-parser.add_option('-f', '--file',      dest='filename',  type='string', default='', help='file name to open and print in stdout')
-parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=0,  help='verbose')
-parser.add_option('-c', '--cpunum',    dest='cpunum',    type='int',    default=0,  help='number of processors to use')
-parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=10, help='parser key percentage')
-parser.add_option('-H', '--HOSTS',     dest='hosts',     type='string', default='', help='hosts list')
-parser.add_option('--exitstatus',      dest='exitstatus',type='int',    default=0,  help='good exit status')
+Parser = OptionParser(usage='usage: %prog [Options]', version='%prog 1.0')
+Parser.add_option('-s', '--start',     dest='start',     type='int',    default=1,    help='Start frame number')
+Parser.add_option('-e', '--end',       dest='end',       type='int',    default=1,    help='End frame number')
+Parser.add_option('-i', '--increment', dest='increment', type='int',    default=1,    help='Frame increment')
+Parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=2,    help='Time per frame in seconds')
+Parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,    help='Random time per frame in seconds')
+Parser.add_option('-f', '--fileout',   dest='fileout',   type='string', default=None, help='File to write')
+Parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=0,    help='Verbose')
+Parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=10,   help='Parser key percentage')
+Parser.add_option('--exitstatus',      dest='exitstatus',type='int',    default=0,    help='Good exit status')
 
-options, args = parser.parse_args()
+Options, Args = Parser.parse_args()
 
-frame_start = options.start
-frame_end = options.end
-frame_inc = options.increment
-timesec = options.timesec
-randtime = options.randtime
-filename = options.filename
-verbose = options.verbose
-cpunum = options.cpunum
+frame_start = Options.start
+frame_end = Options.end
+frame_inc = Options.increment
 
 ParserKeys = ['[ PARSER WARNING ]', '[ PARSER ERROR ]',
 			  '[ PARSER BAD RESULT ]', '[ PARSER FINISHED SUCCESS ]']
@@ -65,16 +58,7 @@ if frame_inc < 1:
 	frame_inc = 1
 	print('[ PARSER WARNING ]')
 
-# Open some file if specified:
-if filename != '':
-	print('FILE:')
-	print(filename)
-	with open(filename) as f:
-		for line in f:
-			print(line)
-
-#sleepsec = .01 * (timesec + randtime*random.random()) / ( verbose + 1 )
-sleepsec = .01 * (timesec + randtime * random.random())
+sleepsec = .01 * (Options.timesec + Options.randtime * random.random())
 
 frame = frame_start
 parserKey_CurIndex = int(random.random() * 100) % len(ParserKeys)
@@ -87,31 +71,46 @@ while frame <= frame_end:
 	#	time.sleep(sleepsec)
 	for p in range(100):
 		print('PROGRESS: {progress}%'.format(progress=p + 1))
+
 		if p == 10:
 			print('ACTIVITY: Generating')
+
 		if p == 50:
 			print('ACTIVITY: Rendering')
 			print('REPORT: ' + str(random.random()))
+
 		if p == 90:
 			print('ACTIVITY: Finalizing')
-		if random.random() * 100 * 100 < options.pkp:
+
+		if random.random() * 100 * 100 < Options.pkp:
 			print(ParserKeys[parserKey_CurIndex])
 			parserKey_CurIndex += 1
 			if parserKey_CurIndex >= len(ParserKeys):
 				parserKey_CurIndex = 0
-				# if p == 50:
-				#     print('[ PARSER FINISHED SUCCESS ]')
-				# if p == 50:
-				#     print('[ PARSER ERROR ]')
-		for v in range(verbose):
+
+		for v in range(Options.verbose):
 			print(
 				'%s: %s: %s: QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasd'
 				'fghjklzxcvbnm' % (frame, p, v)
 			)
 			# sys.stdout.flush()
 			# time.sleep(sleepsec)
+
 		sys.stdout.flush()
 		time.sleep(sleepsec)
+
+		if Options.fileout and random.random() > .1:
+			fileout = Options.fileout
+			dirout = os.path.dirname( fileout)
+			if not os.path.isdir( dirout):
+				os.makedirs( dirout)
+			while fileout.find('%') != -1:
+				fileout = fileout % frame
+			fobj = open( fileout,'w')
+			for i in range(0,10):
+				fobj.write('0123456789')
+			fobj.close()
+
 	frame += frame_inc
 
 time_finish = time.time()
@@ -121,6 +120,8 @@ print('Running time = %d seconds.' % (time_finish - time_start))
 
 sys.stdout.flush()
 
-if options.exitstatus != 0:
-	print('Good exit status is "%d"' % options.exitstatus)
-sys.exit( options.exitstatus)
+if Options.exitstatus != 0:
+	print('Good exit status is "%d"' % Options.exitstatus)
+
+sys.exit( Options.exitstatus)
+

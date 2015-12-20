@@ -130,8 +130,7 @@ BlockData::BlockData( const JSON & i_object, int i_num)
 
 void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 {
-	//jr_uint32("flags",               m_flags,                 i_object);
-
+	jr_int64 ("flags",                 m_flags,                 i_object, io_changes);
 	jr_int32 ("capacity",              m_capacity,              i_object, io_changes);
 	jr_int32 ("need_memory",           m_need_memory,           i_object, io_changes);
 	jr_int32 ("need_power",            m_need_power,            i_object, io_changes);
@@ -185,8 +184,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	bool numeric = ( m_tasks_data == NULL );
 
 	// But on store reading, tasks are read later from separate file
-	if( numeric )
-		jr_bool("numeric", numeric, i_object);
+//	if( numeric ) jr_bool("numeric", numeric, i_object);
 
 	// On store reading, block can be not numeric, but tasks will be read later from separate file
 	if( false == numeric )
@@ -216,16 +214,18 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int64 ("frame_last",      frame_last,      i_object);
 	jr_int64 ("frames_per_task", frames_per_task, i_object);
 	jr_int64 ("frames_inc",      frames_inc,      i_object);
-//	jr_uint32 ("flags",          flags,           i_object);
+
 	jr_int32 ("capacity_coeff_min", capacity_coeff_min, i_object);
 	jr_int32 ("capacity_coeff_max", capacity_coeff_max, i_object);
+
 	jr_int8  ("multihost_min",             multihost_min,             i_object);
 	jr_int8  ("multihost_max",             multihost_max,             i_object);
 	jr_uint16("multihost_max_wait",        multihost_max_wait,        i_object);
 	jr_uint16("multihost_service_wait",    multihost_service_wait,    i_object);
 	jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
-	//jr_int64 ("file_size_min", m_file_size_min, i_object);
-	//jr_int64 ("file_size_max", m_file_size_max, i_object);
+
+	jr_int64 ("file_size_min", m_file_size_min, i_object);
+	jr_int64 ("file_size_max", m_file_size_max, i_object);
 
 /*
 //	case Msg::TBlocksProgress:
@@ -356,7 +356,7 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
         o_str << ",\n\"service\":\""       << m_service << "\"";
         o_str << ",\n\"capacity\":"        << m_capacity;
 		o_str << ",\n\"flags\":"           << m_flags;
-		o_str << ",\n\"numeric\":"         << (isNumeric() ? "true":"false");
+		//o_str << ",\n\"numeric\":"         << (isNumeric() ? "true":"false");
 		o_str << ",\n\"tasks_num\":"       << m_tasks_num;
 		o_str << ",\n\"frame_first\":"     << m_frame_first;
         o_str << ",\n\"frame_last\":"      << m_frame_last;
@@ -380,8 +380,10 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 			if( canMasterRunOnSlaveHost())
                 o_str << ",\n\"multihost_master_on_slave\":true";
 		}
-        //o_str << ",\n\"file_size_min\":"         << m_file_size_min;
-        //o_str << ",\n\"file_size_max\":"         << m_file_size_max;
+		if( m_file_size_min > 0 )
+	        o_str << ",\n\"file_size_min\":" << m_file_size_min;
+		if( m_file_size_max > 0 )
+	        o_str << ",\n\"file_size_max\":" << m_file_size_max;
 		if( m_max_running_tasks != -1 )
             o_str << ",\n\"max_running_tasks\":"          << m_max_running_tasks;
 		if( m_max_running_tasks_per_host != -1 )
@@ -548,7 +550,7 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int64_t ( m_frame_last,            msg);
 		rw_int64_t ( m_frames_per_task,       msg);
 		rw_int64_t ( m_frames_inc,            msg);
-//		rw_int64_t ( m_sequential,            msg); // NEW VERSION
+		rw_int64_t ( m_sequential,            msg);
 		rw_int64_t ( m_file_size_min,         msg);
 		rw_int64_t ( m_file_size_max,         msg);
 		rw_int32_t ( m_capacity_coeff_min,    msg);
@@ -772,11 +774,11 @@ bool BlockData::setNumeric( long long start, long long end, long long perTask, l
       AFERROR("BlockData::setNumeric(): this block already has tasks.")
       return false;
    }
-   if( isNumeric())
+/*   if( isNumeric())
    {
       AFERROR("BlockData::setNumeric(): this block is already numeric and numbers are set.")
       return false;
-   }
+   }*/
    if( start > end)
    {
       AFERRAR("BlockData::setNumeric(): start > end ( %lld > %lld - setting end to %lld)", start, end, start)
@@ -795,12 +797,7 @@ bool BlockData::setNumeric( long long start, long long end, long long perTask, l
 
    return true;
 }
-/*
-bool BlockData::setFlags (unsigned int flags) {
-   m_flags = m_flags | FDoPost;
-   return true;
-}
-*/
+
 bool BlockData::genNumbers( long long & start, long long & end, int num, long long * frames_num) const
 {
    start = 0;

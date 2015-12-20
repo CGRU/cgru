@@ -6,6 +6,8 @@ import re
 
 import traceback
 
+import afcommon
+
 import cgruconfig
 import cgrupathmap
 import cgruutils
@@ -52,6 +54,31 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 			self.taskInfo['files'][i] = \
 				self.pm.toClient(self.taskInfo['files'][i])
 
+		# Check files:
+		if self.isSkippingExistingFiles():
+			allFilesExist = True
+			for i in range(0, len(self.taskInfo['files'])):
+				afile = self.taskInfo['files'][i]
+				afile = os.path.join( taskInfo['wdir'], afile)
+				if not os.path.isfile( afile):
+					allFilesExist = False
+					break
+				# Check files size:
+				file_size_min = self.taskInfo['file_size_min']
+				file_size_max = self.taskInfo['file_size_max']
+				if file_size_min > 0 or file_size_max > 0:
+					size = os.path.getsize(afile)
+					if file_size_min > 0 and size < file_size_min:
+						allFilesExist = False
+						break
+					if file_size_max > 0 and size > file_size_max:
+						allFilesExist = False
+						break
+
+			if allFilesExist:
+				self.log = 'Task file(s) exits.'
+				self.taskInfo['command'] = ''
+
 		# When GUI receives task exec to show files,
 		# server sends exec with parsed files.
 		for i in range(0, len(self.taskInfo['parsed_files'])):
@@ -75,6 +102,8 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 		if self.verbose:
 			print(taskInfo)
 
+	def isSkippingExistingFiles(self):
+		return afcommon.checkBlockFlag( self.taskInfo['block_flags'], 'skipexistingfiles')
 
 	def getWDir(self):
 		"""Missing DocString
@@ -209,23 +238,13 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
 		:return:
 		"""
-		# def check_flag(byte, flag_name):
-		# return True
-		# flags = {
-		#					'numeric': 0x01,
-		#					'thumbnails': 0x64
-		#					}
-		#			if flags[flag_name]:
-		#				mask = flags.get(flag_name)
-		#				return byte & mask
-		#			else:
-		#				return 0
-
 		post_cmds = []
-		#print( self.parser.getFiles())
-		# if len( self.taskInfo['files']) and check_flag( self.taskInfo.get('block_flags', 0), 'thumbnails'):
-		post_cmds.extend(self.generateThumbnail( False))
+
+		if not afcommon.checkBlockFlag( self.taskInfo['block_flags'],'skipthumbnails'):
+			post_cmds.extend(self.generateThumbnail( False))
+
 		# post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
+
 		return post_cmds
 
 	def generateThumbnail(self, i_onthefly):
@@ -293,22 +312,33 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
 		return cmds
 
-	# Not used:
-	def checkfiles(self, sizemin, sizemax):
+	def checkRenderedFiles(self):
 		"""Missing DocString
-
-		:param sizemin:
-		:param sizemax:
 		:return:
 		"""
-		print(
-		'Checking for "%s" %s-%s' %
-		(self.taskInfo['files'], sizemin, sizemax)
-		)
 
-		if self.taskInfo['files'] == '':
-			print('Error: service::checkfiles: Files not set!')
-			return False
+		file_size_min = self.taskInfo['file_size_min']
+		file_size_max = self.taskInfo['file_size_max']
+
+		for i in range(0, len(self.taskInfo['files'])):
+			afile = self.taskInfo['files'][i]
+			afile = os.path.join( self.taskInfo['wdir'], afile)
+			#print('Checking for "%s" %d-%d' %( afile, file_size_min, file_size_max ))
+
+			if not os.path.isfile( afile):
+				self.log = 'File does not exist:\n' + afile
+				return False
+
+			if file_size_min > 0 or file_size_max > 0:
+				size = os.path.getsize(afile)
+
+				if file_size_min > 0 and size < file_size_min:
+					self.log = 'File size less than minimum (%d < %d):\n%s' % ( size, file_size_min, afile)
+					return False
+
+				if file_size_max > 0 and size > file_size_max:
+					self.log = 'File size greater than maximum (%d < %d):\n%s' % ( size, file_size_max, afile)
+					return False
 
 		return True
 

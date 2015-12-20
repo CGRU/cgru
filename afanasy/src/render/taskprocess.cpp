@@ -535,6 +535,11 @@ printf("Finished PID=%d: Exit Code=%d Status=%d %s\n", m_pid, i_exitCode, WEXITS
 		m_update_status = af::TaskExec::UPFinishedParserBadResult;
 		AFINFO("Bad result from parser.")
 	}
+	else if( m_taskexec->hasFileSizeCheck() &&
+		( false == m_service->checkRenderedFiles()))
+	{
+		m_update_status = af::TaskExec::UPBadRenderedFiles;
+	}
 	else
 	{
 		if( false == m_doing_post )

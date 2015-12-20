@@ -33,6 +33,7 @@ public:
 
 	const std::string getLog() const;
 
+	bool checkRenderedFiles() const;
 	bool checkExitStatus( int i_status) const;
 
 	// Return an empty string on sucess or an error message on error
@@ -52,6 +53,7 @@ private:
 	PyObject * m_PyObj_FuncParse;
 	PyObject * m_PyObj_FuncGetLog;
 	PyObject * m_PyObj_FuncCheckExitStatus;
+	PyObject * m_PyObj_FuncCheckRenderedFiles;
 	PyObject * m_PyObj_FuncDoPost;
 
 	bool m_initialized;

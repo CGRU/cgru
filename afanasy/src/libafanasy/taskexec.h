@@ -94,7 +94,7 @@ public:
 	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
 	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
 
-	inline bool hasFileSizeCheck() const { return ((m_file_size_min != -1) || (m_file_size_max != -1));}
+	inline bool hasFileSizeCheck() const { return m_block_flags & af::BlockData::FCheckRenderedFiles ;}
 
 	inline long long getFileSizeMin()   const { return m_file_size_min;}
 	inline long long getFileSizeMax()   const { return m_file_size_max;}
@@ -127,24 +127,25 @@ public:
 		/* 09 */ UPFinishedParserBadResult,
 		/* 10 */ UPFinishedParserSuccess,
 		/* 11 */ UPFinishedFailedPost,
+		/* 12 */ UPBadRenderedFiles,
 
-		/* 12 */ UPRenderDeregister,
-		/* 13 */ UPRenderExit,
-		/* 14 */ UPRenderZombie,
+		/* 13 */ UPRenderDeregister,
+		/* 14 */ UPRenderExit,
+		/* 15 */ UPRenderZombie,
 
-		/* 15 */ UPTimeOut,
-		/* 16 */ UPMaxRunTime,
+		/* 16 */ UPTimeOut,
+		/* 17 */ UPMaxRunTime,
 
-		/* 17 */ UPStop,
-		/* 18 */ UPSkip,
-		/* 19 */ UPRestart,
-		/* 20 */ UPEject,
+		/* 18 */ UPStop,
+		/* 19 */ UPSkip,
+		/* 20 */ UPRestart,
+		/* 21 */ UPEject,
 
-		/* 21 */ UPFailedToStart,
-		/* 22 */ UPNoTaskRunning,
-		/* 23 */ UPNoJob,
+		/* 22 */ UPFailedToStart,
+		/* 23 */ UPNoTaskRunning,
+		/* 24 */ UPNoJob,
 
-		/* 24 */ UPLAST
+		/* 25 */ UPLAST
 	};
 
 	inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }

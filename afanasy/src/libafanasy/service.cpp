@@ -54,6 +54,7 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncGetFiles = NULL;
 	m_PyObj_FuncGetParsedFiles = NULL;
 	m_PyObj_FuncParse = NULL;
+	m_PyObj_FuncCheckRenderedFiles = NULL;
 	m_PyObj_FuncCheckExitStatus = NULL;
 	m_PyObj_FuncDoPost = NULL;
 	m_initialized = false;
@@ -78,12 +79,14 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	PyObject *task_info;
 	task_info = PyDict_New();
 
-	PyDict_SetItemString( task_info, "wdir",         PyBytes_FromString( i_task_exec->getWDir().c_str()));
-	PyDict_SetItemString( task_info, "command",      PyBytes_FromString( i_task_exec->getCommand().c_str()));
-	PyDict_SetItemString( task_info, "capacity",     PyLong_FromLong( i_task_exec->getCapCoeff()));
-	PyDict_SetItemString( task_info, "files",        pFilesList);
-	PyDict_SetItemString( task_info, "hosts",        pHostsList);
-	PyDict_SetItemString( task_info, "parsed_files", pParsedFilesList);
+	PyDict_SetItemString( task_info, "wdir",          PyBytes_FromString( i_task_exec->getWDir().c_str()));
+	PyDict_SetItemString( task_info, "command",       PyBytes_FromString( i_task_exec->getCommand().c_str()));
+	PyDict_SetItemString( task_info, "capacity",      PyLong_FromLong( i_task_exec->getCapCoeff()));
+	PyDict_SetItemString( task_info, "files",         pFilesList);
+	PyDict_SetItemString( task_info, "file_size_min", PyLong_FromLong( i_task_exec->getFileSizeMin()));
+	PyDict_SetItemString( task_info, "file_size_max", PyLong_FromLong( i_task_exec->getFileSizeMax()));
+	PyDict_SetItemString( task_info, "hosts",         pHostsList);
+	PyDict_SetItemString( task_info, "parsed_files",  pParsedFilesList);
 
 	PyDict_SetItemString( task_info, "parser",     PyBytes_FromString( m_parser_type.c_str()));
 	PyDict_SetItemString( task_info, "frames_num", PyLong_FromLong(    i_task_exec->getFramesNum()));
@@ -143,6 +146,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 
 	m_PyObj_FuncCheckExitStatus = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKEXITSTATUS);
 	if( m_PyObj_FuncParse == NULL ) return;
+
+	m_PyObj_FuncCheckRenderedFiles = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKRENDEREDFILES);
+	if( m_PyObj_FuncCheckRenderedFiles == NULL ) return;
 
 	m_PyObj_FuncDoPost = getFunction( AFPYNAMES::SERVICE_FUNC_DOPOST);
 	if( m_PyObj_FuncDoPost == NULL ) return;
@@ -272,6 +278,28 @@ bool Service::checkExitStatus( int i_status) const
 	Py_DECREF( pResult);
 
 	//printf("Service::checkExitStatus: %d %d\n", i_status, result);
+	return result;
+}
+
+bool Service::checkRenderedFiles() const
+{
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncCheckRenderedFiles, NULL);
+	if( pResult == NULL)
+	{
+		if( PyErr_Occurred()) PyErr_Print();
+		return true;
+	}
+
+	if( true != PyBool_Check( pResult))
+	{
+		AFERROR("Service::checkRenderedFiles: Return object type is not a boolean.")
+		return true;
+	}
+
+	bool result = PyObject_IsTrue( pResult);
+
+	Py_DECREF( pResult);
+
 	return result;
 }
 

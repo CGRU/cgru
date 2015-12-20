@@ -9,6 +9,8 @@ import time
 
 import cgruconfig
 import cgrupathmap
+
+import afcommon
 import afnetwork
 import services  # this seems unneccessary not used
 
@@ -96,13 +98,14 @@ class Block:
 
 	def __init__(self, blockname='block', service='generic'):
 		self.data = dict()
+		self.data["flags"] = 0
 		self.data["name"] = blockname
 		self.data["service"] = cgruconfig.VARS['af_task_default_service']
 		self.data["capacity"] = int(
 			cgruconfig.VARS['af_task_default_capacity'])
 		self.data["working_directory"] = Pathmap.toServer(
 			os.getenv('PWD', os.getcwd()))
-		self.data["numeric"] = False
+		#self.data["numeric"] = False
 		self.tasks = []
 		if service is not None and len(service):
 			if self.setService(service):
@@ -165,7 +168,7 @@ class Block:
 		if pertask < 1:
 			print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
 			pertask = 1
-		self.data["numeric"] = True
+		#self.data["numeric"] = True
 		self.data["frame_first"] = start
 		self.data["frame_last"] = end
 		self.data["frames_per_task"] = pertask
@@ -434,16 +437,22 @@ class Block:
 		if checkRegExp(value):
 			self.data["need_properties"] = value
 
-	# def setGenThumbnails(self, value = True):
-	# self.data["gen_thumbnails"] = value;
+	def skipThumbnails( self):
+		self.data["flags"] = afcommon.setBlockFlag( self.data["flags"], 'skipthumbnails')
 
-	def setDoPost(self, value=True):
-		"""Missing DocString
+	def skipExistingFiles( self, i_size_min = -1, i_size_max = -1):
+		self.data["flags"] = afcommon.setBlockFlag( self.data["flags"], 'skipexistingfiles')
+		if i_size_min != -1 :
+			self.data['file_size_min'] = i_size_min
+		if i_size_min != -1 :
+			self.data['file_size_max'] = i_size_max
 
-		:param value:
-		:return:
-		"""
-		self.data["do_post"] = value
+	def checkRenderedFiles( self, i_size_min = -1, i_size_max = -1):
+		self.data["flags"] = afcommon.setBlockFlag( self.data["flags"], 'checkrenderedfiles')
+		if i_size_min != -1 :
+			self.data['file_size_min'] = i_size_min
+		if i_size_min != -1 :
+			self.data['file_size_max'] = i_size_max
 
 	def setMultiHost(self, h_min, h_max, h_max_wait, master_on_slave=False,
 					 service=None, service_wait=-1):

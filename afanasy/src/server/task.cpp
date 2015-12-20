@@ -130,8 +130,21 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 	//printf("Task::updateState:\n");
 	m_run->update( taskup, renders, monitoring, errorHost);
 
-	if( taskup.getDataLen() != 0 )
-		v_writeTaskOutput( taskup);
+	std::string log = taskup.getLog();
+	if( log.size())
+		v_appendLog( log);
+
+	if( taskup.getDataLen() || log.size())
+	{
+		const char * data = log.c_str();
+		int size = log.size();
+		if( taskup.getDataLen())
+		{
+			data = taskup.getData();
+			size = taskup.getDataLen();
+		}
+		v_writeTaskOutput( data, size);
+	}
 
 	if( taskup.getParsedFiles().size())
 		m_parsed_files = taskup.getParsedFiles();
@@ -330,9 +343,10 @@ void Task::v_appendLog( const std::string & message)
    while( m_logStringList.size() > af::Environment::getTaskLogLinesMax() ) m_logStringList.pop_front();
 }
 
-void Task::v_writeTaskOutput( const af::MCTaskUp& taskup) const
+void Task::v_writeTaskOutput( const char * i_data, int i_size) const
 {
-	AFCommon::QueueFileWrite( new FileData( taskup.getData(), taskup.getDataLen(), getOutputFileName( m_progress->starts_count),
+//	AFCommon::QueueFileWrite( new FileData( taskup.getData(), taskup.getDataLen(), getOutputFileName( m_progress->starts_count),
+	AFCommon::QueueFileWrite( new FileData( i_data, i_size, getOutputFileName( m_progress->starts_count),
 		m_store_dir_output));
 }
 

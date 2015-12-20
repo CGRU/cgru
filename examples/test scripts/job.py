@@ -8,6 +8,7 @@ import sys
 import time
 
 import af
+import afcommon
 
 import services.service
 
@@ -31,6 +32,7 @@ parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    de
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
 parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
 parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
+parser.add_option(      '--fileout',      dest='fileout',      type='string', default=None, help='Tasks out file')
 parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
 parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
 parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
@@ -44,7 +46,6 @@ parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', de
 parser.add_option(      '--parser',       dest='parser',       type='string', default=None, help='parser type, default if not set')
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
-parser.add_option(      '--nofiles',      dest='nofiles',      action='store_true', default=False, help='do not set any files')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
@@ -169,6 +170,13 @@ for b in range(numblocks):
 		cmd = os.path.join(os.getcwd(), cmd)
 		cmd = 'python "%s"' % cmd
 		cmd += ' --exitstatus %d ' % options.exitstatus
+
+		if options.fileout:
+			cmd += ' --fileout "%s"' % options.fileout
+			block.skipExistingFiles()
+			block.checkRenderedFiles( 10, 1000000)
+			block.setFiles([afcommon.patternFromStdC(options.fileout)])
+
 		cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
 			   '-i %(increment)d -t %(timesec)g -r %(randtime)g ' \
 			   '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
@@ -181,12 +189,6 @@ for b in range(numblocks):
 		else:
 			block.setNumeric(1, numtasks, options.pertask, increment)
 
-		if not options.nofiles:
-			if options.pertask > 1:
-				block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@',
-								'file_b.@#@.@###@-file_b.@#@.@###@'])
-			else:
-				block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
 	else:
 		block.setCommand(
 			'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
@@ -195,8 +197,8 @@ for b in range(numblocks):
 
 		block.setTasksName('task @#@')
 
-		if not options.nofiles:
-			block.setFiles(['file_a.@#@', 'file_b.@#@'])
+		if options.fileout:
+			block.setFiles([options.fileout])
 
 		if options.frames != '':
 			fr = frames[b].split('/')
@@ -207,7 +209,7 @@ for b in range(numblocks):
 			task = af.Task('#' + str(t))
 			task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
 
-			if not options.nofiles:
+			if options.fileout:
 				task.setFiles(['%04d' % t])
 
 			block.tasks.append(task)

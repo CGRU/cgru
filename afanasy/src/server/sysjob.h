@@ -38,7 +38,7 @@ public:
 	virtual void v_start( af::TaskExec * i_taskexec, int * i_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring);
 	virtual void v_refresh( time_t i_currentTime, RenderContainer * i_renders, MonitorContainer * i_monitoring, int & i_errorHostId);
 	virtual void v_updateState( const af::MCTaskUp & i_taskup, RenderContainer * i_renders, MonitorContainer * i_monitoring, bool & i_errorHost);
-	virtual void v_writeTaskOutput( const af::MCTaskUp & i_taskup) const;  ///< Write task output in tasksOutputDir.
+	virtual void v_writeTaskOutput( const char * i_data, int i_size) const;  ///< Write task output in tasksOutputDir.
 	virtual const std::string v_getInfo( bool i_full = false) const;
 	virtual void v_appendLog( const std::string & i_message);
 	virtual void v_monitor( MonitorContainer * i_monitoring) const;

@@ -2,6 +2,30 @@
 
 Digits = '01234567890'
 
+BlockFlags = {
+	'numeric'            : 1 << 0,
+	'varcapacity'        : 1 << 1,
+	'multihost'          : 1 << 2,
+	'masteronslave'      : 1 << 3,
+	'dependsubtask'      : 1 << 4,
+	'skipthumbnails'     : 1 << 5,
+	'skipexistingfiles'  : 1 << 6,
+	'checkrenderedfiles' : 1 << 7
+}
+
+def checkBlockFlag( i_flags, i_name):
+	if not i_name in BlockFlags:
+		print('AFERROR: block flag "%s" does not exists.' % i_name)
+		print('Existing flags are: ' + str(BlockFlags))
+		return False
+	return i_flags & BlockFlags[i_name]
+
+def setBlockFlag( i_flags, i_name):
+	if not i_name in BlockFlags:
+		print('AFERROR: block flag "%s" does not exists.' % i_name)
+		print('Existing flags are: ' + str(BlockFlags))
+		return i_flags
+	return i_flags | BlockFlags[i_name]
 
 def filterFileName(filename):
 	"""Replace "bad" characters in filename on "_":

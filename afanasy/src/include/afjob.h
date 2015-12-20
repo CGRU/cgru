@@ -74,13 +74,17 @@ namespace AFJOB
 	const int64_t STATE_FAILEDPOST_MASK            = 1ULL<<14;
 	const   char  STATE_FAILEDPOST_NAME[]          = "Failed Post";
 	const   char  STATE_FAILEDPOST_NAME_S[]        = "FPO";
-	const int64_t STATE_SOLVED_MASK                = 1ULL<<30;
-	const int64_t STATE_PPAPPROVAL_MASK            = 1ULL<<31;
+	const int64_t STATE_BADRENDEREDFILES_MASK      = 1ULL<<15;
+	const   char  STATE_BADRENDEREDFILES_NAME[]    = "Bad rendered files";
+	const   char  STATE_BADRENDEREDFILES_NAME_S[]  = "BRF";
+	const int64_t STATE_PPAPPROVAL_MASK            = 1ULL<<16;
 	const   char  STATE_PPAPPROVAL_NAME[]          = "Preview pending approval.";
 	const   char  STATE_PPAPPROVAL_NAME_S[]        = "PPA";
-	const int64_t STATE_ERROR_READY_MASK           = 1ULL<<32;
+	const int64_t STATE_ERROR_READY_MASK           = 1ULL<<17;
 	const   char  STATE_ERROR_READY_NAME[]         = "Restarted Error";
 	const   char  STATE_ERROR_READY_NAME_S[]       = "RER";
+
+	const int64_t STATE_SOLVED_MASK                = 1ULL<<62;
 
 	const int  SYSJOB_ID                   = 1;  // System job ID
 	const char SYSJOB_NAME[]               = "afanasy";

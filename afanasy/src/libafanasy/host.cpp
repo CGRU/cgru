@@ -190,9 +190,18 @@ void Host::v_readwrite( Msg * msg)
 	rw_int32_t( m_max_tasks,           msg );
 	rw_int32_t( m_capacity,            msg );
 
-	// NEW VERSION // other auto nimby parameters:
 	rw_int32_t( m_nimby_idle_cpu,      msg );
 	rw_int32_t( m_nimby_busy_cpu,      msg );
+	rw_int32_t( m_nimby_idle_mem,      msg );
+	rw_int32_t( m_nimby_busy_mem,      msg );
+	rw_int32_t( m_nimby_idle_swp,      msg );
+	rw_int32_t( m_nimby_busy_swp,      msg );
+	rw_int32_t( m_nimby_idle_hddgb,    msg );
+	rw_int32_t( m_nimby_busy_hddgb,    msg );
+	rw_int32_t( m_nimby_idle_hddio,    msg );
+	rw_int32_t( m_nimby_busy_hddio,    msg );
+	rw_int32_t( m_nimby_idle_netmbs,   msg );
+	rw_int32_t( m_nimby_busy_netmbs,   msg );
 
 	rw_int32_t( m_wol_idlesleep_time,  msg );
 	rw_int32_t( m_nimby_idlefree_time, msg );
