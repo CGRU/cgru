@@ -201,7 +201,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRendersResources/**/,          ///< Message with a list of resources of Renders.
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
-
+/**/TRenderLaunchAndExit/**/,       ///< Ask render to launch a command an exit, may be needed for updates.
 
 /*- Users messages -*/
 /**/TUsersListRequestIds/**/,       ///< Request a list of Users with given ids.
