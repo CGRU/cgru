@@ -491,22 +491,12 @@ const char * Msg::TNAMES[]=
 	/// Request messages, sizes, quantities statistics.
 	"TStatRequest",
 
-	"DEPRECATED_TConfigLoad",                ///< Reload config file
-	"DEPRECATED_TFarmLoad",                  ///< Reload farm file
-
-
+	/*- Client messages -*/
 	"TClientExitRequest",         ///< Request to client to exit,
 	"TClientRestartRequest",      ///< Restart client application,
 	"TClientWOLSleepRequest",     ///< Request to client to fall a sleep,
 	"TClientRebootRequest",       ///< Reboot client host computer,
 	"TClientShutdownRequest",     ///< Shutdown client host computer,
-
-	/*- Talk messages -*/
-	"DEPRECATED_TTalkId",                    ///< Id for new Talk. Server sends it back when new Talk registered.
-	"DEPRECATED_TTalkUpdateId",              ///< Update Talk with given id ( No information for updating Talk needed).
-	"DEPRECATED_TTalksListRequest",          ///< Request online Talks list.
-	"DEPRECATED_TTalkDeregister",            ///< Deregister talk with given id.
-
 
 	/*- Monitor messages -*/
 	"TMonitorId",                 ///< Id for new Monitor. Server sends it back when new Talk registered.
@@ -524,14 +514,12 @@ const char * Msg::TNAMES[]=
 	"TRenderInfoRequestId",       ///< Request a string information about a Render with given id.
 	"TRenderDeregister",          ///< Deregister Render with given id.
 
-
 	/*- Users messages -*/
 	"TUsersListRequest",          ///< Active users information.
 	/// Uset id. Afanasy sends it back as an answer on \c TUserIdRequest , which contains user name.
 	"TUserId",
 	"TUserLogRequestId",          ///< Request a log of User with given id.
 	"TUserJobsOrderRequestId",    ///< Request User(id) jobs ids in server list order.
-
 
 	/*- Job messages -*/
 	"TJobsListRequest",           ///< Request brief of jobs.
@@ -544,7 +532,6 @@ const char * Msg::TNAMES[]=
 	"TJobRequestId",
 	/// Request a job progress with given id. The answer is TJobProgress. If there is no job with such id the answer is TJobProgressRequestId.
 	"TJobProgressRequestId",
-
 
 	"TRESERVED00",
 	"TRESERVED01",
@@ -564,24 +551,14 @@ const char * Msg::TNAMES[]=
 
 	"TDATA",                      ///< Some data.
 	"TTESTDATA",                  ///< Test some data transfer.
-	"TJSON",                      ///< JSON
+	"TJSON",                      ///< JSON with text header
+	"TJSONBIN",                   ///< JSON with binary header
 	"THTTP",                      ///< HTTP - with JSON POST data
 	"THTTPGET",                   ///< HTTP Get request.
 	"TString",                    ///< QString text message.
 	"TStringList",                ///< QStringList text message.
 
 	"TStatData",                  ///< Statistics data.
-
-	/*- Client messages -*/
-
-	/*- Talk messages -*/
-	/// Register Talk. Send by Talk client to register. Server sends back its id \c TTalkId.
-	"DEPRECATED_TTalkRegister",
-	"DEPRECATED_TTalksListRequestIds",       ///< Request a list of Talks with given ids.
-	"DEPRECATED_TTalksList",                 ///< Message with a list of online Talks.
-	"DEPRECATED_TTalkDistributeData",        ///< Message with a list Talk's users and a text to send to them.
-	"DEPRECATED_TTalkData",                  ///< Message to Talk with text.
-
 
 	/*- Monitor messages -*/
 	/// Register Monitor. Send by Monitor client to register. Server sends back its id \c TMonitorId.
@@ -637,13 +614,10 @@ const char * Msg::TNAMES[]=
 	/*- Users messages -*/
 	"TUsersListRequestIds",       ///< Request a list of Users with given ids.
 	"TUsersList",                 ///< Active users information.
-	"DEPRECATED_TUserAdd",                   ///< Add a permatent user.
 	"TUserIdRequest",             ///< Request an id of user with given name.
 	"TUserJobsOrder",             ///< Jobs ids in server list order.
 
-
 	/*- Job messages -*/
-	"DEPRECATED_TJobRegister",               ///< Register job.
 	"TJobsListRequestIds",        ///< Request a list of Jobs with given ids.
 	"TJobsListRequestUsersIds",   ///< Request brief of jobs od users with given ids.
 	"TJobsList",                  ///< Jobs list information.
@@ -665,9 +639,10 @@ const char * Msg::TNAMES[]=
 	"TTaskListenOutput",          ///< Request to send task output to provided address.
 	"TTaskFiles",                 ///< Task (or entire job) files
 	"TTasksRun",                  ///< Job tasks run data.
-
 	"TTaskOutput",                ///< Job task output data (for task listening: from afrender directly to afwatch).
-	"TJSONBIN",
+
+	"TRESERVED10",
+	"TRESERVED11",
 	"TRESERVED12",
 	"TRESERVED13",
 	"TRESERVED14",
