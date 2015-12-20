@@ -24,8 +24,11 @@ MCTaskUp::MCTaskUp
 	int i_percent,
 	int i_frame,
 	int i_percent_frame,
+
+	std::string i_log,
 	std::string i_activity,
 	std::string i_report,
+
 	int i_datalen,
 	char * i_data
 ):
@@ -40,6 +43,8 @@ MCTaskUp::MCTaskUp
 	m_percent       ( i_percent),
 	m_frame         ( i_frame),
 	m_percent_frame ( i_percent_frame),
+
+	m_log           ( i_log),
 	m_activity      ( i_activity),
 	m_report        ( i_report),
 
@@ -79,8 +84,10 @@ void MCTaskUp::v_readwrite( Msg * msg)
 	rw_int8_t ( m_percent,        msg);
 	rw_int32_t( m_frame,          msg);
 	rw_int8_t ( m_percent_frame,  msg);
+
 	rw_String ( m_activity,       msg);
 	rw_String ( m_report,         msg);
+	rw_String ( m_log,            msg);
 
 	rw_StringVect( m_parsed_files, msg);
 	rw_int32_t(    m_datalen,      msg);
@@ -182,7 +189,8 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< ", task="     << m_numtask
 			<< ", number="   << m_number
 			<< ", activity=" << m_activity
-			<< ", reporty="  << m_report
+			<< ", report="   << m_report
+			<< ", log="      << m_log
 			<< ", datalen="  << m_datalen
 			<< ", files="    << m_files_num
 			<< ", status="   << int(m_status)
@@ -199,6 +207,7 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< " #" << m_number
 			<< " A" << m_activity
 			<< " R" << m_report
+			<< " L" << m_log
 			<< " D" << m_datalen
 			<< " F" << m_files_num
 			<< " S" << int(m_status)

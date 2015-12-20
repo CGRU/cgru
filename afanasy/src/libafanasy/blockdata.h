@@ -31,11 +31,11 @@ public:
 	virtual ~BlockData();
 
 	enum Flags{
-		FNumeric          = 1 << 0,
-		FVarCapacity      = 1 << 1,
-		FMultiHost        = 1 << 2,
-		FMasterOnSlave    = 1 << 3,
-		FDependSubTask    = 1 << 4
+		FNumeric          = 1ULL << 0,
+		FVarCapacity      = 1ULL << 1,
+		FMultiHost        = 1ULL << 2,
+		FMasterOnSlave    = 1ULL << 3,
+		FDependSubTask    = 1ULL << 4
 	};
 
 	static const char DataMode_Progress[];
@@ -273,8 +273,8 @@ protected:
 
 	std::string m_name;  ///< Block name.
 
-	uint32_t m_state;      ///< Currend block state flags.
-	uint32_t m_flags;            ///< Block type flags.
+	int64_t m_state;      ///< Currend block state flags.
+	int64_t m_flags;            ///< Block type flags.
 
 	int32_t m_tasks_num;        ///< Number of tasks in block.
 	int64_t m_frame_first;      ///< First tasks frame.

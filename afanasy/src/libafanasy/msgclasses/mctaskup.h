@@ -23,6 +23,7 @@ public:
 			int i_percent          = -1,
 			int i_frame            = -1,
 			int i_percent_frame    = -1,
+			std::string i_log      = "",
 			std::string i_activity = "",
 			std::string i_report   = "",
 			int i_datalen          = 0,
@@ -44,6 +45,7 @@ public:
 	inline int getPercentFrame()             const { return m_percent_frame; }
   	inline const std::string & getActivity() const { return m_activity;      }
   	inline const std::string & getReport()   const { return m_report;        }
+  	inline const std::string & getLog()      const { return m_log;           }
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
 
@@ -71,8 +73,10 @@ private:
 	int8_t  m_percent;
 	int32_t m_frame;
 	int8_t  m_percent_frame;
+
 	std::string m_activity;
 	std::string m_report;
+	std::string m_log;
 
 	int32_t m_datalen;
 	char * m_data;

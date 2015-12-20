@@ -25,6 +25,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 	def __init__(self, taskInfo, i_verbose):
 		self.taskInfo = taskInfo
 		self.verbose = i_verbose
+		self.log = None
 
 		self.pm = cgrupathmap.PathMap()
 
@@ -113,6 +114,26 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 			return files
 		else:
 			return []
+
+	def getLog( self):
+		"""
+			This string will appear in server task log
+		"""
+		log = ''
+
+		if self.parser is not None:
+			parser_log = self.parser.getLog()
+			if parser_log is not None and len(parser_log):
+				log = 'Parser: ' + parser_log
+
+		if self.log is not None and len(self.log):
+			if len(log):
+				log += '\n'
+			log += 'Service: ' + self.log
+
+		print(log)
+
+		return log
 
 	def applyCmdCapacity(self, command):
 		"""Missing DocString

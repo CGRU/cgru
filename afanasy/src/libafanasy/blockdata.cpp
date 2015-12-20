@@ -178,7 +178,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if( io_changes )
 		return;
 
-	jr_uint32("st", m_state, i_object);
+	jr_int64("st", m_state, i_object);
 
 	jsonReadTasks( i_object);
 	// If tasks are not preset in json data, condider that block is numeric at first
@@ -526,7 +526,7 @@ void BlockData::v_readwrite( Msg * msg)
 	{
 	case Msg::TJob:
 	case Msg::TBlocks:
-		rw_uint32_t( m_flags,                 msg);
+		rw_int64_t( m_flags,                  msg);
 		if( isNotNumeric()) rw_tasks(         msg);
 
 	case Msg::TBlocksProperties:
@@ -543,7 +543,7 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_StringVect ( m_files,              msg);
 
 	case Msg::TJobsList:
-		rw_uint32_t( m_flags,                 msg);
+		rw_int64_t ( m_flags,                 msg);
 		rw_int64_t ( m_frame_first,           msg);
 		rw_int64_t ( m_frame_last,            msg);
 		rw_int64_t ( m_frames_per_task,       msg);
@@ -588,7 +588,7 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int32_t ( p_tasks_error,            msg);
 		rw_int64_t ( p_tasks_run_time,       msg);
 
-		rw_uint32_t( m_state,                 msg);
+		rw_int64_t ( m_state,                 msg);
 		rw_int32_t ( m_job_id,                msg);
 		rw_int32_t ( m_block_num,             msg);
 

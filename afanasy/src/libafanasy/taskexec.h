@@ -37,7 +37,7 @@ public:
 
 			int i_job_id,
 			int i_block_number,
-			unsigned int i_block_flags,
+			long long i_block_flags,
 			int i_tast_number,
 
 			int i_parser_coeff = 1
@@ -67,19 +67,19 @@ public:
 	// Get block data:
 	inline const std::string & getBlockName() const { return m_block_name; }
 	inline int getBlockNum() const { return m_block_num; }
-	inline unsigned int getBlockFlags() const { return m_block_flags; }
+	inline int64_t getBlockFlags() const { return m_block_flags; }
 
 	// Get job data:
 	inline const std::string & getJobName() const { return m_job_name; }
 	inline int getJobId() const { return m_job_id; }
-	inline unsigned int getJobFlags() const { return m_job_flags; }
+	inline int64_t getJobFlags() const { return m_job_flags; }
 
 	// Get user data:
 	inline const std::string & getUserName() const { return m_user_name;  }
-	inline unsigned int getUserFlags() const { return m_user_flags; }
+	inline int64_t getUserFlags() const { return m_user_flags; }
 
 	// Get render data:
-	inline unsigned int getRenderFlags() const { return m_render_flags; }
+	inline int64_t getRenderFlags() const { return m_render_flags; }
 
 	inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
 	inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
@@ -113,38 +113,38 @@ public:
 
 	enum UpStatus
 	{
-		UPNULL,
-		UPNoUpdate,
+		/* 00 */ UPNULL,
+		/* 01 */ UPNoUpdate,
 
-		UPStarted,
-		UPPercent,
-		UPWarning,
+		/* 02 */ UPStarted,
+		/* 03 */ UPPercent,
+		/* 04 */ UPWarning,
 
-		UPFinishedSuccess,
-		UPFinishedError,
-		UPFinishedKilled,
-		UPFinishedParserError,
-		UPFinishedParserBadResult,
-		UPFinishedParserSuccess,
-		UPFinishedFailedPost,
+		/* 05 */ UPFinishedSuccess,
+		/* 06 */ UPFinishedError,
+		/* 07 */ UPFinishedKilled,
+		/* 08 */ UPFinishedParserError,
+		/* 09 */ UPFinishedParserBadResult,
+		/* 10 */ UPFinishedParserSuccess,
+		/* 11 */ UPFinishedFailedPost,
 
-		UPRenderDeregister,
-		UPRenderExit,
-		UPRenderZombie,
+		/* 12 */ UPRenderDeregister,
+		/* 13 */ UPRenderExit,
+		/* 14 */ UPRenderZombie,
 
-		UPTimeOut,
-		UPMaxRunTime,
+		/* 15 */ UPTimeOut,
+		/* 16 */ UPMaxRunTime,
 
-		UPStop,
-		UPSkip,
-		UPRestart,
-		UPEject,
+		/* 17 */ UPStop,
+		/* 18 */ UPSkip,
+		/* 19 */ UPRestart,
+		/* 20 */ UPEject,
 
-		UPFailedToStart,
-		UPNoTaskRunning,
-		UPNoJob,
+		/* 21 */ UPFailedToStart,
+		/* 22 */ UPNoTaskRunning,
+		/* 23 */ UPNoJob,
 
-		UPLAST
+		/* 24 */ UPLAST
 	};
 
 	inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }
@@ -204,10 +204,10 @@ private:
 	int32_t m_task_num;       ///< Task number in block.
 	int32_t m_number;         ///< Task number (aux).
 
-	uint32_t m_block_flags;   ///< Block flags.
-	uint32_t m_job_flags;     ///< Job flags.
-	uint32_t m_user_flags;    ///< User flags.
-	uint32_t m_render_flags;  ///< Render flags.
+	int64_t m_block_flags;   ///< Block flags.
+	int64_t m_job_flags;     ///< Job flags.
+	int64_t m_user_flags;    ///< User flags.
+	int64_t m_render_flags;  ///< Render flags.
 
 	int64_t m_frame_start;   ///< First frame.
 	int64_t m_frame_finish;  ///< Last frame.

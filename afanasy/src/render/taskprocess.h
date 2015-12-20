@@ -69,6 +69,8 @@ private:
 	std::string m_wdir;
 	pid_t m_pid;
 
+	int m_commands_launched;
+
 	bool m_doing_post;
 	std::vector<std::string> m_post_cmds;
 

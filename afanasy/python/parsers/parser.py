@@ -27,6 +27,7 @@ class parser(
 		self.activity = ''
 		self.report = ''
 		self.result = None
+		self.log = None
 
 		self.files = []
 		self.files_onthefly = []
@@ -75,6 +76,12 @@ class parser(
 		files = self.files_onthefly
 		self.files_onthefly = []
 		return files
+
+	def getLog( self):
+		"""
+			This string will appear in a server task log
+		"""
+		return self.log
 
 	def do(self, data, mode):
 		"""Missing DocString

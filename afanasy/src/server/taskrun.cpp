@@ -139,6 +139,12 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 			message = "Finished, but post failed.";
 			m_progress->state = m_progress->state | AFJOB::STATE_FAILEDPOST_MASK;
 		}
+	case af::TaskExec::UPSkip:
+		if( message.empty())
+		{
+			message = "Skipped by service on render.";
+			m_progress->state = m_progress->state | AFJOB::STATE_SKIPPED_MASK;
+		}
 	case af::TaskExec::UPFinishedSuccess:
 	{
 		if( message.empty())
@@ -204,11 +210,12 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       break;
    }
    default:
-   {
       AFERRAR("TaskRun::update: Unknown task update status = %d", taskup.getStatus())
-      return;
    }
-   }
+
+	std::string log = taskup.getLog();
+	if( log.size())
+		m_task->v_appendLog( log);
 }
 
 bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)

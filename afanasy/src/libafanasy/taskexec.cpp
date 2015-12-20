@@ -28,7 +28,7 @@ TaskExec::TaskExec(
 
 		int i_job_id,
 		int i_block_number,
-		unsigned int i_block_flags,
+		long long i_block_flags,
 		int i_task_number,
 
 		int i_parser_coeff
@@ -190,10 +190,10 @@ void TaskExec::v_readwrite( Msg * msg)
 	case Msg::TTask:
 		rw_int32_t ( m_job_id,            msg);
 		rw_int32_t ( m_block_num,         msg);
-		rw_uint32_t( m_block_flags,       msg);
-		rw_uint32_t( m_job_flags,         msg);
-		rw_uint32_t( m_user_flags,        msg);
-		rw_uint32_t( m_render_flags,      msg);
+		rw_int64_t ( m_block_flags,       msg);
+		rw_int64_t ( m_job_flags,         msg);
+		rw_int64_t ( m_user_flags,        msg);
+		rw_int64_t ( m_render_flags,      msg);
 		rw_int32_t ( m_task_num,          msg);
 		rw_int64_t ( m_frames_num,        msg);
 		rw_int64_t ( m_frame_start,       msg);

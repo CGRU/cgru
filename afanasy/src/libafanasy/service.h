@@ -31,6 +31,8 @@ public:
 				std::string & activity, std::string & report,
 				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
 
+	const std::string getLog() const;
+
 	bool checkExitStatus( int i_status) const;
 
 	// Return an empty string on sucess or an error message on error
@@ -48,6 +50,7 @@ private:
 	PyObject * m_PyObj_FuncGetFiles;
 	PyObject * m_PyObj_FuncGetParsedFiles;
 	PyObject * m_PyObj_FuncParse;
+	PyObject * m_PyObj_FuncGetLog;
 	PyObject * m_PyObj_FuncCheckExitStatus;
 	PyObject * m_PyObj_FuncDoPost;
 

@@ -101,14 +101,14 @@ public:
 
 	enum State
 	{
-		SOnline      = 1<<0,
-		Snimby       = 1<<1,
-		SNIMBY       = 1<<2,
-		SBusy        = 1<<3,
-		SDirty       = 1<<4,
-		SWOLFalling  = 1<<5,
-		SWOLSleeping = 1<<6,
-		SWOLWaking   = 1<<7
+		SOnline      = 1ULL << 0,
+		Snimby       = 1ULL << 1,
+		SNIMBY       = 1ULL << 2,
+		SBusy        = 1ULL << 3,
+		SDirty       = 1ULL << 4,
+		SWOLFalling  = 1ULL << 5,
+		SWOLSleeping = 1ULL << 6,
+		SWOLWaking   = 1ULL << 7
 	};
 
 protected:

@@ -47,6 +47,8 @@
 			{"name":"wakeonlan"},
 			{"name":"walk","count":1},
 
+			{"name":"test"},
+
 			{"name":"afterfx"},
 			{"name":"arnold"},
 			{"name":"blender"},

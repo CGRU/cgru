@@ -138,6 +138,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncParse = getFunction( AFPYNAMES::SERVICE_FUNC_PARSE);
 	if( m_PyObj_FuncParse == NULL ) return;
 
+	m_PyObj_FuncGetLog = getFunction( AFPYNAMES::SERVICE_FUNC_GETLOG);
+	if( m_PyObj_FuncGetLog == NULL ) return;
+
 	m_PyObj_FuncCheckExitStatus = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKEXITSTATUS);
 	if( m_PyObj_FuncParse == NULL ) return;
 
@@ -226,6 +229,23 @@ void Service::parse( const std::string & i_mode, std::string & i_data,
 	}
 
 	Py_DECREF( pArgs);
+}
+
+const std::string Service::getLog() const
+{
+	std::string log;
+
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncGetLog, NULL);
+	if( pResult == NULL)
+	{
+		if( PyErr_Occurred()) PyErr_Print();
+		return log;
+	}
+
+	af::PyGetString( pResult, log);
+
+	Py_DECREF( pResult);
+	return log;
 }
 
 bool Service::checkExitStatus( int i_status) const

@@ -70,6 +70,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_update_status( af::TaskExec::UPPercent),
 	m_stop_time( 0),
 	m_pid(0),
+	m_commands_launched(0),
 	m_doing_post( false),
 	m_zombie( false),
 	m_dead_cycle(0)
@@ -85,10 +86,20 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	af::pathMakePath( m_store_dir);
 
 	m_service = new af::Service( m_taskexec, m_store_dir);
-	m_cmd  = m_service->getCommand();
-	m_wdir = m_service->getWDir();
-
 	m_parser = new ParserHost( m_service);
+
+	m_cmd = m_service->getCommand();
+	AFINFA("TaskProcess::TaskProcess(): \"%s\"", m_cmd.c_str())
+	if( m_cmd.size() == 0 )
+	{
+		m_update_status = af::TaskExec::UPSkip;
+		printf("Skipping: ");
+		m_taskexec->v_stdOut( af::Environment::isVerboseMode());
+		sendTaskSate();
+		return;
+	}
+
+	m_wdir = m_service->getWDir();
 
 	// Process task working directory:
 	if( m_wdir.size())
@@ -96,7 +107,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 #ifdef WINNT
 		if( m_wdir.find("\\\\") == 0)
 		{
-			AFERRAR("Working directory starts with '\\':\n%s\nUNC path can't be current.", m_wdir.c_str())
+			printf("Working directory starts with '\\':\n%s\nUNC path can't be current.", m_wdir.c_str())
 			m_wdir.clear();
 		}
 #endif
@@ -126,9 +137,10 @@ void TaskProcess::launchCommand()
 {
 //printf("TaskProcess::launchCommand: command:\n%s\n", m_cmd.c_str());
 
-	// Close handles remained from main process:
-	if( m_doing_post )
-		closeHandles();
+	// Close handles remained from previous launch:
+	closeHandles();
+
+	m_commands_launched++;
 
 	#ifdef WINNT
 	DWORD priority = NORMAL_PRIORITY_CLASS;
@@ -206,16 +218,16 @@ void TaskProcess::launchCommand()
 
 TaskProcess::~TaskProcess()
 {
-//printf(" ~ TaskProcess(): m_pid = %d, Z = %s, m_stop_time = %llu\n", m_pid, m_zombie ? "TRUE":"FALSE", m_stop_time);
+	AFINFA(" ~ TaskProcess(): m_pid = %d, Z = %s, m_stop_time = %llu",
+		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
+	#ifdef AFOUTPUT
+	m_taskexec->v_stdOut();
+	#endif
+
 	m_update_status = 0;
 
 	killProcess();
 	closeHandles();
-
-#ifdef AFOUTPUT
-	printf(" ~ TaskProcess(): ");
-	m_taskexec->stdOut();
-#endif
 
 	delete m_taskexec;
 	delete m_service;
@@ -226,6 +238,9 @@ TaskProcess::~TaskProcess()
 
 void TaskProcess::closeHandles()
 {
+	if( m_commands_launched < 1 )
+		return;
+
 	if( false == RenderHost::noOutputRedirection())
 	{
 		fclose( m_io_input);
@@ -236,6 +251,11 @@ void TaskProcess::closeHandles()
 
 void TaskProcess::refresh()
 {
+	if( m_zombie ) return;
+
+	AFINFA("TaskProcess::refresh(): pid=%d, zombie=%s, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
+
 	// If task was asked to stop
 	if( m_stop_time )
 	{
@@ -291,6 +311,9 @@ void TaskProcess::refresh()
 		pid = -1;
 	}
 #else
+	AFINFA("TaskProcess::refresh(): wainting for pid=%d, zombie=%s, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
+
 	pid = waitpid( m_pid, &status, WNOHANG);
 #endif
 //printf("TaskProcess::refresh(): pid=%d, m_pid=%d\n", pid, m_pid);
@@ -317,7 +340,8 @@ void TaskProcess::close()
 {
 // Server asked render to close a task
 // So it is not needed for server any more
-//printf("TaskProcess::close(): m_pid = %d, Z = %s, m_stop_time = %llu\n", m_pid, m_zombie ? "TRUE":"FALSE", m_stop_time);
+	AFINFA("TaskProcess::close(): pid=%d, zombie=%s, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
 
 	// Zero value means that message for server is not needed
    	m_update_status = 0;
@@ -337,6 +361,9 @@ void TaskProcess::close()
 
 void TaskProcess::readProcess( const std::string & i_mode, bool i_read_empty)
 {
+	AFINFA("TaskProcess::readProcess(): pid=%d, zombie=%s, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
+
 	if( RenderHost::noOutputRedirection()) return;
 
 	std::string output;
@@ -403,10 +430,14 @@ void TaskProcess::sendTaskSate()
 		return;
 	}
 
+	AFINFA("TaskProcess::sendTaskSate(): pid=%d, zombie=%s, m_update_status=%d, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", m_update_status, (long long)m_stop_time)
+
 	int    type = af::Msg::TTaskUpdatePercent;
 	bool   toRecieve = false;
 	char * stdout_data = NULL;
 	int    stdout_size = 0;
+	std::string log;
 
 	if(( m_update_status != af::TaskExec::UPPercent ) &&
 		( m_update_status != af::TaskExec::UPWarning ))
@@ -414,13 +445,9 @@ void TaskProcess::sendTaskSate()
 		type = af::Msg::TTaskUpdateState;
 		toRecieve = true;
 		stdout_data = m_parser->getData( &stdout_size);
+		log = m_service->getLog();
 	}
-/*
-	int percent        = 0;
-	int frame          = 0;
-	int percentframe   = 0;
-	std::string activity = "";
-*/
+
 	int percent          = m_parser->getPercent();
 	int frame            = m_parser->getFrame();
 	int percentframe     = m_parser->getPercentFrame();
@@ -439,6 +466,8 @@ void TaskProcess::sendTaskSate()
 		percent,
 		frame,
 		percentframe,
+
+		log,
 		activity,
 		report,
 
@@ -528,6 +557,9 @@ printf("Finished PID=%d: Exit Code=%d Status=%d %s\n", m_pid, i_exitCode, WEXITS
 
 void TaskProcess::stop()
 {
+	AFINFA("TaskProcess::stop(): pid=%d, zombie=%s, m_update_status=%d, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", m_update_status, (long long)m_stop_time)
+
 	// If time was not asked to stop before
 	if( m_stop_time == 0 )
 	{
@@ -552,6 +584,10 @@ void TaskProcess::stop()
 void TaskProcess::killProcess()
 {
 	if( m_pid == 0 ) return;
+
+	AFINFA("TaskProcess::killProcess(): pid=%d, zombie=%s, m_update_status=%d, stop_time = %lld",
+		m_pid, m_zombie ? "TRUE":"FALSE", m_update_status, (long long)m_stop_time)
+
 	printf("KILLING NOT TERMINATED TASK.\n");
 #ifdef UNIX
 	killpg( getpgid( m_pid), SIGKILL);
