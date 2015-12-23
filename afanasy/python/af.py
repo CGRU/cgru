@@ -98,7 +98,7 @@ class Block:
 
 	def __init__(self, blockname='block', service='generic'):
 		self.data = dict()
-		self.data["flags"] = 0
+		self.data['flags'] = 0
 		self.data["name"] = blockname
 		self.data["service"] = cgruconfig.VARS['af_task_default_service']
 		self.data["capacity"] = int(
@@ -357,13 +357,10 @@ class Block:
 		"""
 		self.data["need_power"] = value
 
-	def setDependSubTask(self, value=True):
+	def setDependSubTask(self):
 		"""Missing DocString
-
-		:param value:
-		:return:
 		"""
-		self.data["depend_sub_task"] = value
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'dependsubtask')
 
 	def setTasksMaxRunTime(self, value):
 		"""Missing DocString
@@ -438,17 +435,17 @@ class Block:
 			self.data["need_properties"] = value
 
 	def skipThumbnails( self):
-		self.data["flags"] = afcommon.setBlockFlag( self.data["flags"], 'skipthumbnails')
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'skipthumbnails')
 
 	def skipExistingFiles( self, i_size_min = -1, i_size_max = -1):
-		self.data["flags"] = afcommon.setBlockFlag( self.data["flags"], 'skipexistingfiles')
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'skipexistingfiles')
 		if i_size_min != -1 :
 			self.data['file_size_min'] = i_size_min
 		if i_size_min != -1 :
 			self.data['file_size_max'] = i_size_max
 
 	def checkRenderedFiles( self, i_size_min = -1, i_size_max = -1):
-		self.data["flags"] = afcommon.setBlockFlag( self.data["flags"], 'checkrenderedfiles')
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'checkrenderedfiles')
 		if i_size_min != -1 :
 			self.data['file_size_min'] = i_size_min
 		if i_size_min != -1 :
@@ -481,12 +478,13 @@ class Block:
 				  'service was not specified.')
 			return False
 
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'multihost')
 		self.data['multihost_min'] = h_min
 		self.data['multihost_max'] = h_max
 		self.data['multihost_max_wait'] = h_max_wait
 
 		if master_on_slave:
-			self.data['multihost_master_on_slave'] = master_on_slave
+			self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'masteronslave')
 
 		if service:
 			self.data['multihost_service'] = service
