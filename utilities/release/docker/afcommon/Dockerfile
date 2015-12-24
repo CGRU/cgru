@@ -23,14 +23,17 @@ RUN tar xzvf cgru*.tar.gz \
  && rm -rf *
  
 ADD https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux /usr/local/bin/ep
-COPY resources/config.json /tmp/config.json
 COPY resources/bin/ /usr/local/bin/
 RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/ \
- && mkdir /root/.cgru/ \
- && cp /tmp/config.json /root/.cgru/config.json \
- && mv /tmp/config.json /home/render/.cgru/config.json \
- && chmod -R a+r,u+Xw /root/.cgru /home/render/.cgru \
- && chown -R render:render /home/render/.cgru
+ && chmod 666 /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_servername":".\+",/"af_servername":"${AF_SERVERNAME}",/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_serverport":[0-9]\+,/"af_serverport":${AF_SERVERPORT},/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_clientport":[0-9]\+,/"af_serverport":${AF_CLIENTPORT},/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_render_cmd_reboot":".\+",/"af_render_cmd_reboot":"${AF_RENDER_CMD_REBOOT}",/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_render_cmd_shutdown":".\+",/"af_render_cmd_shutdown":"${AF_RENDER_CMD_SHUTDOWN}",/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_render_cmd_wolsleep":".\+",/"af_render_cmd_wolsleep":"${AF_RENDER_CMD_WOLSLEEP}",/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_thumbnail_extensions":.\+,/"af_thumbnail_extensions":${AF_THUMBNAIL_EXTENSIONS},/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_thumbnail_cmd":".\+",/"af_thumbnail_cmd":"${AF_THUMBNAIL_CMD}",/' /opt/cgru/afanasy/config_default.json
 
 VOLUME /var/tmp/afanasy
 ENV AF_USERNAME="render" \

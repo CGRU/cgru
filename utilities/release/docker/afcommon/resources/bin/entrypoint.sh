@@ -27,7 +27,7 @@ export CGRU_PYTHONEXE="python3"
 
 export PYTHONPATH="${CGRU_PYTHON}:${AF_PYTHON}"
 
-/usr/local/bin/ep -v "${HOME}/.cgru/config.json"
+/usr/local/bin/ep -v "/opt/cgru/afanasy/config_default.json"
 
 if [ "${AF_SERVER_WAIT}x" == "yesx" ]
 then 
