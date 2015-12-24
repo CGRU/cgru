@@ -1,6 +1,6 @@
 FROM cgru/afcommon
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
-LABEL cgru_container_version="1.2.0"
+LABEL cgru_container_version="1.3.0"
 
 EXPOSE 51000
 
