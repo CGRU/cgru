@@ -1,3 +1,6 @@
+afcommon:
+ build: afcommon/.
+
 afserver:
  build: afserver/.
  net: "$CGRU_NETWORK"
