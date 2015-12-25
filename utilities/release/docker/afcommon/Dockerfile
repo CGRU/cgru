@@ -3,7 +3,7 @@ MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 ENV CGRU_VERSION="2.0.8"
 LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
 
-STOPSIGNAL SIGINT
+#STOPSIGNAL SIGINT
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq install \
