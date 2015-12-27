@@ -256,6 +256,26 @@ function cm_FillNumbers( i_string, i_number)
 function cm_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1).substr( i_file.lastIndexOf('\\')+1);}
 function cm_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/')).substr( 0, i_file.lastIndexOf('\\'));}
 
+cm_blockFlags = {};
+cm_blockFlags.numeric            = 1 << 0;
+cm_blockFlags.varCapacity        = 1 << 1,
+cm_blockFlags.multiHost          = 1 << 2,
+cm_blockFlags.masterOnSlave      = 1 << 3,
+cm_blockFlags.dependSubTask      = 1 << 4,
+cm_blockFlags.skipThumbnails     = 1 << 5,
+cm_blockFlags.skipExistingFiles  = 1 << 6,
+cm_blockFlags.checkRenderedFiles = 1 << 7
+function cm_CheckBlockFlag( i_flags, i_name)
+{
+	if( cm_blockFlags[i_name] )
+		return cm_blockFlags[i_name] & i_flags;
+
+	g_Error('Block flag "' + i_name + '" does not exitst.');
+	g_Log('Valid flags are: ' + JSON.stringify( cm_blockFlags));
+
+	return false;
+}
+
 function cm_CheckPermissions( i_perm)
 {
 	if( i_perm == null ) return true;

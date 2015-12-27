@@ -611,7 +611,7 @@ JobBlock.prototype.update = function( i_displayFull)
 
 		var tasks = 't' + this.tasks_num;
 		var tasks_title = 'Block tasks:'
-		if( this.params.numeric )
+		if( cm_CheckBlockFlag( this.params.flags, 'numeric' ))
 		{
 			tasks_title += ' Numeric:';
 			tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
