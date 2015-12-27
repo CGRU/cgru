@@ -85,6 +85,7 @@ public:
 	inline bool isSequential()  const { return m_sequential == 1; }
 	inline bool notSequential() const { return m_sequential != 1; }
 	inline void setSequential( int64_t i_value ) { m_sequential = i_value; }
+	inline int64_t getSequential() const { return m_sequential; }
 
 	inline void setParserCoeff( int value ) { m_parser_coeff = value; }
 

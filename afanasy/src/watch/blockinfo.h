@@ -68,7 +68,6 @@ private:
 	long long taskssumruntime;
 
 	bool numeric;              ///< Whether the block is numeric.
-	bool nonsequential;
 	bool varcapacity;
 	bool multihost;
 	bool multihost_samemaster;
@@ -77,6 +76,7 @@ private:
 	long long frame_last;      ///< Last tasks frame.
 	long long frame_pertask;   ///< Tasks frames per task.
 	long long frame_inc;       ///< Tasks frames increment.
+	long long sequential;
 
 	int avoidhostsnum;
 	int errorhostsnum;
