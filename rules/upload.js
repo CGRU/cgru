@@ -155,6 +155,7 @@ function up_Start( i_el)
 	i_el.m_elBtnDel.style.display = 'none';
 	i_el.m_elBtnAdd.onclick = null;
 	i_el.classList.add('started');
+	i_el.m_time = (new Date() / 1000);
 
 	var formData = new FormData();
 	formData.append('upload_path', RULES.root + i_el.m_uppath);
@@ -169,6 +170,7 @@ function up_Start( i_el)
 	xhr.addEventListener('abort', up_Abort, false);
 	xhr.open('POST', n_server);
 	xhr.send( formData);
+	i_el.m_xhr = xhr;
 
 	xhr.onreadystatechange = function()
 	{
@@ -190,31 +192,57 @@ function up_Progress( e)
 {
 	var el = e.currentTarget.m_elFile;
 
+	var dur = c_DT_DurFromNow( el.m_time);
+	var text = dur;
+
     if( e.lengthComputable )
 	{
 		if( e.total > 0 )
 		{
-			var percent = Math.round( 100 * e.loaded / e.total ) + '%';
-			el.m_elUpInfo.textContent = percent;
-			el.m_elBar.style.width = percent;
+			var percent = Math.round( 100 * e.loaded / e.total );
+			if( el.m_percent && ( el.m_percent > percent ))
+			{
+				c_Error('Upload: ' + dur + ' - ' + el.m_percent + ' > ' + percent);
+			}
+			text += ' ' + percent + '%';
+			el.m_elBar.style.width = percent + '%';
+			el.m_percent = percent;
 		}
     }
-    else
-	{
-		el.m_elUpInfo.textContent = 'N/A';
-	}
+
+	el.m_elUpInfo.textContent = text;
 }
 
-function up_Load( e) { up_Finished( e.currentTarget.m_elFile,'saving'); }
-function up_Error( e) { up_Finished( e.currentTarget.m_elFile,'error');}
-function up_Abort( e) { up_Finished( e.currentTarget.m_elFile,'abort');}
+function up_Load( e) { up_Finished( e.currentTarget.m_elFile,'saving', this);}
+function up_Error( e) { up_Finished( e.currentTarget.m_elFile,'error', this);}
+function up_Abort( e) { up_Finished( e.currentTarget.m_elFile,'abort', this);}
 
-function up_Finished( i_el, i_status)
+function up_Finished( i_el, i_status, i_xhr)
 {
-	i_el.m_elUpInfo.textContent = i_status;
+	if( i_el.m_done ) return;
+
+	var info = i_status;
+	if( info == null )
+		info = '';
+	else
+		info += ': '
+
+	var time = (new Date()) / 1000 - i_el.m_time;
+	var speed = i_el.m_upfile.size;
+	if(( time > 0 ) && ( speed > 0 ))
+	{
+		speed = c_Bytes2KMG( speed / time) + '/s';
+		info += c_DT_DurFromNow( i_el.m_time) + ' x ' + speed;
+	}
+
+	if( i_xhr )
+		i_el.title += '\n' + i_xhr.status + ': ' + i_xhr.statusText;
+
+	i_el.m_elUpInfo.innerHTML = info;
 	i_el.m_upfinished = true;
 	i_el.m_elBar.style.width = '100%';
-	i_el.m_elBar.classList.add( i_status);
+	if( i_status )
+		i_el.m_elBar.classList.add( i_status);
 	i_el.m_elBtnDel.style.display = 'block';
 }
 
@@ -228,7 +256,7 @@ function up_Received( i_args, i_el)
 	if(( i_args.files == null ) || ( i_args.files.length == 0 ))
 	{
 		if( i_args.error )
-			c_Error('Upload: ' + i_args.error);
+			c_Error('Upload server: ' + i_args.error);
 		else
 			c_Error('Uploaded no files.');
 		return;
@@ -253,6 +281,8 @@ function up_Received( i_args, i_el)
 
 function up_Done( i_el, i_msg)
 {
+	up_Finished( i_el);
+
 	i_el.m_done = true;
 	i_el.classList.remove('started');
 
@@ -265,7 +295,6 @@ function up_Done( i_el, i_msg)
 	}
 
 	c_Info('Uploaded "'+i_el.m_upfile.name+'" to "' + i_el.m_uppath + '"');
-	i_el.m_elProgress.style.display = 'none';
 	i_el.classList.add('done');
 
 	// Refresh files views same path:
