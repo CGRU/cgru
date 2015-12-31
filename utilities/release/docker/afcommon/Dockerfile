@@ -17,7 +17,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && rm -rf /var/lib/apt/lists/*
  
 WORKDIR /tmp
-ADD http://downloads.sourceforge.net/project/cgru/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz ./
+ADD http://sourceforge.net/projects/cgru/files/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz ./
 RUN tar xzvf cgru*.tar.gz \
  && dpkg -i cgru-common*.deb afanasy-common*.deb afanasy-server*.deb afanasy-render*.deb \
  && rm -rf *
