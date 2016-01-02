@@ -230,6 +230,7 @@ function c_DT_DurFromSec( i_sec)
 	secs      = Math.round( secs - ( mins * 60 ));
 	return hours + ':' + c_PadZero( mins) + ':' + c_PadZero( secs);
 }
+function c_DT_DurFromNow( i_sec) { return c_DT_DurFromSec( (new Date()) / 1000 - i_sec); }
 function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
 function c_TC_FromFrame( i_frame)

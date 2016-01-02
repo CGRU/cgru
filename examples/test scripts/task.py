@@ -8,6 +8,13 @@ import sys
 import time
 
 
+print('Started at ' + time.strftime('%A %d %B %H:%M:%S'))
+print('COMMAND:')
+print(sys.argv)
+print('WORKING DIRECTORY:')
+print(os.getcwd())
+
+
 def interrupt(signum, frame):
 	exit('\nInterrupt signal received...')
 
@@ -15,10 +22,6 @@ def interrupt(signum, frame):
 # signal.signal( signal.SIGTERM, interrupt)
 # signal.signal( signal.SIGABRT, interrupt)
 #signal.signal( signal.SIGINT,  interrupt)
-
-from time import strftime
-
-print('Started at ' + strftime('%A %d %B %H:%M:%S'))
 
 from optparse import OptionParser
 
@@ -31,6 +34,7 @@ Parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=
 Parser.add_option('-f', '--fileout',   dest='fileout',   type='string', default=None, help='File to write')
 Parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=0,    help='Verbose')
 Parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=10,   help='Parser key percentage')
+Parser.add_option('-H', '--hosts',     dest='hosts',     type='string', default=None, help='Hosts list for mutihost tasks')
 Parser.add_option('--exitstatus',      dest='exitstatus',type='int',    default=0,    help='Good exit status')
 
 Options, Args = Parser.parse_args()
@@ -41,11 +45,6 @@ frame_inc = Options.increment
 
 ParserKeys = ['[ PARSER WARNING ]', '[ PARSER ERROR ]',
 			  '[ PARSER BAD RESULT ]', '[ PARSER FINISHED SUCCESS ]']
-
-print('COMMAND:')
-print(sys.argv)
-print('WORKING DIRECTORY:')
-print(os.getcwd())
 
 # Check frame range settings:
 if frame_end < frame_start:

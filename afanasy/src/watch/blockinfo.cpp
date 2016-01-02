@@ -75,7 +75,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		frame_last           = block->getFrameLast();
 		frame_pertask        = block->getFramePerTask();
 		frame_inc            = block->getFrameInc();
-		nonsequential        = block->notSequential();
+		sequential           = block->getSequential();
 
 		tasksnum             = block->getTasksNum();
 		tasksmaxruntime      = block->getTasksMaxRunTime();
@@ -203,6 +203,8 @@ void BlockInfo::refresh()
 			if( frame_inc > 1 )
 				tasksinfo += QString("/%1").arg( frame_inc);
 		}
+		if( sequential != 1 )
+			tasksinfo += "%" + QString::number( sequential);
 		tasksinfo += ")";
 	}
 	else if( frame_pertask > 1)
@@ -214,21 +216,19 @@ void BlockInfo::refresh()
 		tasksinfo += QString("/%1").arg( -frame_pertask);
 	}
 
-	if( nonsequential )
-		tasksinfo += "*";
-
-	str_compact = QString("%1: ").arg( tasksinfo);
-	if( tasksdone) str_compact += QString("%1: ").arg( str_runtime);
+	str_compact = tasksinfo + ": ";
+	if( tasksdone) str_compact += str_runtime + ": ";
 	str_compact += name;
 
 	str_percent = QString::number( percentage) + "%";
 	if( false == name.isEmpty()) str_percent += ' ' + name;
 
-	str_progress = QString("%1: r%3 d%5 e%6")
-		.arg( tasksinfo)
+	str_progress = tasksinfo;
+	str_progress += QString(" r%1 d%2 e%3")
 		.arg( runningtasksnumber)
 		.arg( tasksdone)
 		.arg( taskserror);
+
 	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" ready:%1").arg( tasksready);
 
 	if( false == depends.isEmpty())
@@ -445,11 +445,7 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
 	if( submenu != NULL )
 		 menu = submenu;
 
-	action = new ActionIdString( id_block, "non_sequential", "Set Non-Sequential", qwidget);
-	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
-	menu->addAction( action);
-
-	action = new ActionIdString( id_block, "non_sequential_unset", "Unset Non-Sequential", qwidget);
+	action = new ActionIdString( id_block, "sequential", "Set Sequential", qwidget);
 	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
 	menu->addAction( action);
 
@@ -576,22 +572,9 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	// Parameter change:
 
 	i_str << ",\n\"params\":{\n";
-
-	if( i_action == "non_sequential_unset" )
-	{
-		i_str << "\"non_sequential\":false}";
-		return true;
-	}
-
 	i_str << '"' << i_action.toUtf8().data() << "\":";
 
-	if( i_action == "non_sequential" )
-	{
-		i_str << "true}";
-		return true;
-	}
-
-	// For other actions we should query some number or string:
+	// We should query some number or string:
 
 	bool ok = true;
 	int cur_number = 0;
@@ -603,6 +586,11 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	{
 		if( id_block == blocknum ) cur_number = capacity;
 		set_number = QInputDialog::getInteger( listitems, "Change Capacity", "Enter Capacity", cur_number, -1, INT_MAX, 1, &ok);
+	}
+	if( i_action == "sequential" )
+	{
+		if( id_block == blocknum ) cur_number = sequential;
+		set_number = QInputDialog::getInteger( listitems, "Change Sequential", "Enter Sequential", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_retries" )
 	{

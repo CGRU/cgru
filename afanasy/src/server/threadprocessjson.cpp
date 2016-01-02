@@ -25,7 +25,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AFCommon::QueueLogError( error);
 		delete i_msg;
-		return NULL;
+		return af::jsonMsgError(error);
 	}
 
 	af::Msg * o_msg_response = NULL;
