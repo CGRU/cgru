@@ -3,6 +3,7 @@ MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 ENV CGRU_VERSION="2.0.8"
 LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
 
+#DUMMY COMMENT TO TEST DOCKER HUB AUTOBUILD
 #STOPSIGNAL SIGINT
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
@@ -17,7 +18,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && rm -rf /var/lib/apt/lists/*
  
 WORKDIR /tmp
-ADD http://downloads.sourceforge.net/project/cgru/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz ./
+ADD http://downloads.sourceforge.net/project/cgru/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz ./cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz
 RUN tar xzvf cgru*.tar.gz \
  && dpkg -i cgru-common*.deb afanasy-common*.deb afanasy-server*.deb afanasy-render*.deb \
  && rm -rf *
