@@ -29,7 +29,7 @@ RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/ \
  && chmod 666 /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_servername":".\+",/"af_servername":"${AF_SERVERNAME}",/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_serverport":[0-9]\+,/"af_serverport":${AF_SERVERPORT},/' /opt/cgru/afanasy/config_default.json \
- && sed -i 's/"af_clientport":[0-9]\+,/"af_serverport":${AF_CLIENTPORT},/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_clientport":[0-9]\+,/"af_clientport":${AF_CLIENTPORT},/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_render_cmd_reboot":".\+",/"af_render_cmd_reboot":"${AF_RENDER_CMD_REBOOT}",/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_render_cmd_shutdown":".\+",/"af_render_cmd_shutdown":"${AF_RENDER_CMD_SHUTDOWN}",/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_render_cmd_wolsleep":".\+",/"af_render_cmd_wolsleep":"${AF_RENDER_CMD_WOLSLEEP}",/' /opt/cgru/afanasy/config_default.json \
