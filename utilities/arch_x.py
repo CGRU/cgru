@@ -18,6 +18,8 @@ Parser.add_option('-V', '--verbose', dest='verbose',  action='store_true', defau
 Parser.add_option('-D', '--debug',   dest='debug',    action='store_true', default=False, help='Debug mode')
 Options, Args = Parser.parse_args()
 
+os.umask(0000)
+
 def errorExit(i_err):
 	print('ERROR: %s' % i_err)
 	sys.exit(1)
@@ -107,10 +109,13 @@ print('Size Total: %d' % SizeTotal)
 
 print(' '.join(Cmd))
 
+returncode = Process.wait()
+if returncode != 0:
+	sys.exit(returncode)
+
 if Options.debug:
 	sys.exit(0)
 
-os.umask(0000)
 
 Process = subprocess.Popen( Cmd, shell=False, stdout=subprocess.PIPE)
 
@@ -140,4 +145,7 @@ while True:
 					ThumbTime = curtime
 
 	sys.stdout.flush()
+
+returncode = Process.wait()
+sys.exit(returncode)
 

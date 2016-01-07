@@ -292,3 +292,8 @@ while True:
 		framereached = False
 		output = ''
 	continue
+
+
+returncode = process.wait()
+sys.exit(returncode)
+

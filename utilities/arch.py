@@ -109,3 +109,6 @@ while True:
 
 	sys.stdout.flush()
 
+returncode = Process.wait()
+sys.exit(returncode)
+
