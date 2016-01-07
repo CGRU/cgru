@@ -32,7 +32,7 @@ def checkPath( i_path):
 
 checkPath( src)
 checkPath( os.path.dirname( src))
-checkPath( dst)
+checkPath( os.path.dirname( dst))
 
 
 try:

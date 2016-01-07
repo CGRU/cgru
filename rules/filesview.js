@@ -1228,7 +1228,7 @@ FilesView.prototype.renameDo = function( i_value, i_path)
 }
 FilesView.prototype.renameFinished = function( i_data, i_args)
 {
-	if( c_NullOrErrorMsg( i_data)) return;
+	if( c_NullOrErrorCmd( i_data,'move')) return;
 
 	c_Info('Renamed: ' + c_PathBase(i_args.old_path) + ' -> ' + c_PathBase(i_args.new_path));
 

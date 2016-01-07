@@ -68,14 +68,52 @@ function c_Parse( i_data)
 
 function c_NullOrErrorMsg( i_obj)
 {
-//	if( i_obj == null ) return true;
-//	if( i_obj.error )
-	if(( i_obj == null ) || ( i_obj.error ))
+//console.log(JSON.stringify(i_obj));
+	if( i_obj == null )
+	{
+		c_Error('No responce received.');
+		return true;
+	}
+	if( i_obj.error )
 	{
 		c_Error( i_obj.error);
 		return true;
 	}
 	return false;
+}
+function c_NullOrErrorCmd( i_obj, i_name)
+{
+//console.log(JSON.stringify(i_obj));
+	if( c_NullOrErrorMsg( i_obj ))
+		return true;
+
+	if( i_obj.cmdexec == null )
+	{
+		c_Error('Null command execution data.');
+		return true;
+	}
+
+	if( ! i_obj.cmdexec.length )
+	{
+		c_Error('Zero command execution data.');
+		return true;
+	}
+
+	var ret = false;
+	for( var i = 0; i < i_obj.cmdexec.length; i++)
+	{
+		var obj = i_obj.cmdexec[i];
+		if( obj[i_name] == null )
+		{
+			c_Error('Command execution has no "' + i_name + '" data.');
+			ret = true;
+		}
+
+		if( c_NullOrErrorMsg( obj[i_name]))
+			ret = true;
+	}
+
+	return ret;
 }
 
 function c_CloneObj( i_obj)
