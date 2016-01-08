@@ -118,15 +118,15 @@ function ad_Logout()
 		window.location.reload();
 		return;
 	}
-//*
+/*
  	var obj = {};
 	obj.logout = {"realm":cgru_Config.realm};
 	n_Request({"send":obj,"func":ad_LogoutReceived,"info":'logout'});
 }
 function ad_LogoutReceived( i_data)
 {
-//c_Log( i_data);
-//	*/
+console.log( JSON.stringify( i_data));
+*/
 ///*
 	var xhr = new XMLHttpRequest;
 	xhr.open('GET', '/', true, 'null', 'null');

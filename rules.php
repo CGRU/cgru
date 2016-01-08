@@ -435,12 +435,13 @@ function jsf_login( $i_arg, &$o_out)
 	#die('Text to send if user hits Cancel button');
 	//$o_out['PHP_AUTH_DIGEST'] = $_SERVER['PHP_AUTH_DIGEST'];
 }
-
+/* Javascript logout used, PHP way does not work
 function jsf_logout( $i_arg, &$o_out)
 {
 	header('HTTP/1.1 401 Unauthorized');
+	session_destroy();
 }
-
+*/
 function skipFile( $file)
 {
 	global $SkipFiles;
