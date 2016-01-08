@@ -61,6 +61,7 @@ except hou.LoadWarning:
 # hou.hipFile.load( hip, True)
 
 if force_hip:
+	hou.hscript('set HIPNAME=%s' % os.path.basename(hip))
 	hou.hscript('set HIP=%s' % envhip)
 	print('HIP set to "%s"' % envhip)
 
