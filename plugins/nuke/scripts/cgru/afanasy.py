@@ -137,6 +137,7 @@ class BlockParameters:
 		self.frameinc = 1
 		self.framespertask = 1
 		self.framesequential = 1
+		self.skipexisting = 0
 		self.maxhosts = -1
 		self.capacity = -1
 		self.maxperhost = -1
@@ -153,6 +154,7 @@ class BlockParameters:
 			self.frameinc = int(afnode.knob('frameinc').value())
 			self.framespertask = int(afnode.knob('framespertask').value())
 			self.framesequential = int(afnode.knob('framesequential').value())
+			self.skipexisting = int(afnode.knob('skipexisting').value())
 			self.maxhosts = int(afnode.knob('maxhosts').value())
 			self.capacity = int(afnode.knob('capacity').value())
 			self.maxperhost = int(afnode.knob('maxperhost').value())
@@ -161,6 +163,8 @@ class BlockParameters:
 			self.pathsmap = int(afnode.knob('pathsmap').value())
 			self.hostsmask = afnode.knob('hostsmask').value()
 			self.hostsmaskexclude = afnode.knob('hostsmaskexcl').value()
+
+		if self.skipexisting: self.framespertask = 1
 
 		self.writename = str(wnode.fullName())
 
@@ -320,6 +324,8 @@ class BlockParameters:
 			block.setNumeric(self.framefirst, self.framelast,
 							 self.framespertask, self.frameinc)
 			block.setFiles(self.imgfiles)
+			if self.skipexisting:
+				block.skipExistingFiles()
 			if self.framesequential != 1:
 				block.setSequential( self.framesequential)
 			if self.capacity != -1:
