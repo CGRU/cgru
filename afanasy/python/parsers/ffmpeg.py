@@ -4,10 +4,10 @@ from parsers import parser
 
 import re
 
-str_warning = '[ PARSER WARNING ]'
-str_error = '[ PARSER ERROR ]'
-str_badresult = '[ PARSER BAD RESULT ]'
-str_finishedsuccess = '[ PARSER FINISHED SUCCESS ]'
+Warnings	= []
+Errors		= []
+Badresults	= ['Output file is empty']
+Finisheds	= []
 
 re_time		= re.compile(r'(\d{2}):(\d{2}):(\d{2}).(\d{2})')
 re_position	= re.compile(r'time=(\d{2}:\d{2}:\d{2}.\d{2})')
@@ -36,6 +36,26 @@ class ffmpeg(parser.parser):
 		:param mode:
 		:return:
 		"""
+
+		self.warning = False
+		self.error = False
+		self.badresult = False
+		for warning in Warnings:
+			if data.find(warning) != -1:
+				self.warning = True
+				break
+		for error in Errors:
+			if data.find(error) != -1:
+				self.error = True
+				break
+		for badresult in Badresults:
+			if data.find(badresult) != -1:
+				self.badresult = True
+				break
+		for finished in Finisheds:
+			if data.find(finished) != -1:
+				self.finishedsuccess = True
+				break
 
 		res = re_duration.findall(data)
 		if len(res):
