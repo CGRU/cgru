@@ -6,6 +6,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
+#include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/render.h"
 
 #include "res.h"
@@ -34,6 +35,7 @@ void sig_int(int signum)
 // Functions:
 void threadAcceptClient( void * i_arg );
 void msgCase( af::Msg * msg);
+void launchAndExit( af::Msg * i_msg);
 
 int main(int argc, char *argv[])
 {
@@ -300,6 +302,11 @@ printf("msgCase: "); msg->stdOut();
 		RenderHost::listenTasks( mcaddr);
 		break;
 	}
+	case af::Msg::TRenderLaunchAndExit:
+	{
+		launchAndExit( msg);
+		break;
+	}
 	default:
 	{
 		AFERROR("Unknown message recieved:")
@@ -310,3 +317,17 @@ printf("msgCase: "); msg->stdOut();
 
 	delete msg;
 }
+
+void launchAndExit( af::Msg * i_msg)
+{
+	af::MCGeneral mcg( i_msg);
+
+	std::string cmd = mcg.getString();
+
+	printf("%s\n%s\n","Launching command and exiting:", cmd.c_str());
+
+	af::launchProgram( cmd);
+
+	AFRunning = false;
+}
+

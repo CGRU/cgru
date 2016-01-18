@@ -270,6 +270,21 @@ void RenderAf::v_action( Action & i_action)
 			exitClient( af::Msg::TClientExitRequest, i_action.jobs, i_action.monitors);
 			return;
 		}
+		else if( type == "launch_and_exit")
+		{
+			if( false == isOnline()) return;
+			std::string cmd;
+			if( af::jr_string("cmd", cmd, operation))
+			{
+				appendLog("Launch command exit request by " + i_action.author + "\n" + cmd);
+				launchAndExit( cmd, i_action.jobs, i_action.monitors);
+			}
+			else
+			{
+				appendLog("Launch command exit request by " + i_action.author + "has no 'cmd'");
+			}
+			return;
+		}
 		else if( type == "eject_tasks")
 		{
 			if( false == isBusy()) return;
@@ -386,6 +401,15 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
 {
 	if( false == isOnline() ) return;
 	af::Msg* msg = new af::Msg( type);
+	msg->setAddress( this);
+	ms_msg_queue->pushMsg( msg);
+	offline( jobs, af::TaskExec::UPRenderExit, monitoring);
+}
+
+void RenderAf::launchAndExit( const std::string & cmd, JobContainer * jobs, MonitorContainer * monitoring)
+{
+	af::MCGeneral mcgen( cmd);
+	af::Msg * msg = new af::Msg( af::Msg::TRenderLaunchAndExit, &mcgen);
 	msg->setAddress( this);
 	ms_msg_queue->pushMsg( msg);
 	offline( jobs, af::TaskExec::UPRenderExit, monitoring);
