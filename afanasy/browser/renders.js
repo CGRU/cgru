@@ -330,7 +330,6 @@ RenderNode.prototype.refresh = function()
 
 	var stateTime = 'NEW';
 	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval( this.params.idle_time);
-	stateTimeTitle += '\nIdle CPU < ' + this.params.host.idle_cpu + '%';
 
 	// Draw idle bar (almost in all cases)
 	if(( this.params.host.wol_idlesleep_time > 0 ) ||
