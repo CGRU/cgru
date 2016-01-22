@@ -603,11 +603,11 @@ RenderNode.prototype.updatePanels = function()
 		if( this.params.host.nimby_busyfree_time )
 			info += '<br>Busy time: '
 				+ cm_TimeStringFromSeconds( this.params.host.nimby_busyfree_time)
-				+ ' CPU > ' + this.params.host.busy_cpu + '%';
+				+ ' CPU > ' + this.params.host.nimby_busy_cpu + '%';
 		if( this.params.host.nimby_idlefree_time )
 			info += '<br>Free time: '
 				+ cm_TimeStringFromSeconds( this.params.host.nimby_idlefree_time)
-				+ ' CPU: < ' + this.params.host.idle_cpu + '%';
+				+ ' CPU: < ' + this.params.host.nimby_idle_cpu + '%';
 	}
 	info += '<br>';
 
