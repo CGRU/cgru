@@ -99,13 +99,21 @@ bool af::PyGetAttrInt(  PyObject * i_obj, const char * i_name, int & o_int, cons
 		AFERRAR("%s: has no '%s' attr.", i_err_info.c_str(), i_name)
 		return false;
 	}
+#if PY_MAJOR_VERSION < 3
+	if( ! PyInt_Check( pAttr ))
+#else
 	if( ! PyLong_Check( pAttr ))
+#endif
 	{
 		AFERRAR("%s: '%s' is not an integer.", i_err_info.c_str(), i_name)
 		return false;
 	}
 
+#if PY_MAJOR_VERSION < 3
+	o_int = PyInt_AsLong( pAttr);
+#else
 	o_int = PyLong_AsLong( pAttr);
+#endif
 
 	return true;
 }

@@ -225,7 +225,7 @@ void Service::parse( const std::string & i_mode, std::string & i_data,
 			af::PyGetAttrStr( pClass,"report",   report,   err);
 
 			PyObject * pAttr = PyObject_GetAttrString( pClass, "result");
-			if( pAttr )
+			if( pAttr && ( pAttr != Py_None ))
 				af::PyGetString( pAttr, i_data, "Service::parse: result");
 		}
 	}
