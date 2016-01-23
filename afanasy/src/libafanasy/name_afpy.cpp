@@ -99,13 +99,13 @@ bool af::PyGetAttrInt(  PyObject * i_obj, const char * i_name, int & o_int, cons
 		AFERRAR("%s: has no '%s' attr.", i_err_info.c_str(), i_name)
 		return false;
 	}
-	if( ! PyInt_Check( pAttr ))
+	if( ! PyLong_Check( pAttr ))
 	{
 		AFERRAR("%s: '%s' is not an integer.", i_err_info.c_str(), i_name)
 		return false;
 	}
 
-	o_int = PyInt_AsLong( pAttr);
+	o_int = PyLong_AsLong( pAttr);
 
 	return true;
 }
@@ -116,11 +116,6 @@ bool af::PyGetAttrStr(  PyObject * i_obj, const char * i_name, std::string & o_s
 	if( pAttr == NULL)
 	{
 		AFERRAR("%s: has no '%s' attr.", i_err_info.c_str(), i_name)
-		return false;
-	}
-	if( ! PyString_Check( pAttr ))
-	{
-		AFERRAR("%s: '%s' is not an string.", i_err_info.c_str(), i_name)
 		return false;
 	}
 

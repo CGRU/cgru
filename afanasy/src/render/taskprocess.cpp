@@ -107,7 +107,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 #ifdef WINNT
 		if( m_wdir.find("\\\\") == 0)
 		{
-			printf("Working directory starts with '\\':\n%s\nUNC path can't be current.", m_wdir.c_str())
+			printf("Working directory starts with '\\':\n%s\nUNC path can't be current.", m_wdir.c_str());
 			m_wdir.clear();
 		}
 #endif
