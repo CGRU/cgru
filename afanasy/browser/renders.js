@@ -523,6 +523,12 @@ RenderTask.prototype.destroy = function()
 	this.elParent.removeChild( this.elRoot);
 }
 
+RenderNode.launchCmdExit = function( i_args)
+{
+console.log( i_args);
+//	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'launchCmdExitDo',"param":i_args.name,
+//		"name":'serivce',"title":'Launch Command' + (i_args.name == 'exit' ? 'And Exit':''),"info":'Enter command:'});
+}
 
 RenderNode.createPanels = function( i_monitor)
 {
@@ -579,6 +585,12 @@ RenderNode.createPanels = function( i_monitor)
 	acts.shutdown  = {'label':'SHD','tooltip':'Shutdown machine.'};
 	acts.delete    = {'label':'DEL','tooltip':'Delete render from Afanasy database.'};
 	i_monitor.createCtrlBtn({'name':'power','label':'POW','tooltip':'Power / Exit / Delete.','sub_menu':acts});
+
+
+	// Launch and Exit:
+	var acts = {};
+	acts.lce = {'name':'lce','handle':'launchCmdExit','label':'LCE','tooltip':'Launch command and exit.'};
+	i_monitor.createCtrlBtns( acts);
 }
 
 

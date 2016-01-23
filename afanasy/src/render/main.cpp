@@ -251,13 +251,13 @@ printf("msgCase: "); msg->stdOut();
 		RenderHost::runTask( msg);
 		break;
 	}
-	case af::Msg::TClientRestartRequest:
+/*	case af::Msg::TClientRestartRequest:
 	{
 		printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
 		af::launchProgram(af::Environment::getRenderExec());
 		AFRunning = false;
 		break;
-	}
+	}*/
 //   case af::Msg::TClientStartRequest:
 //   {
 //	  printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());

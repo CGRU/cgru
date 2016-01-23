@@ -493,7 +493,7 @@ const char * Msg::TNAMES[]=
 
 	/*- Client messages -*/
 	"TClientExitRequest",         ///< Request to client to exit,
-	"TClientRestartRequest",      ///< Restart client application,
+//	"TClientRestartRequest",      ///< Restart client application,
 	"TClientWOLSleepRequest",     ///< Request to client to fall a sleep,
 	"TClientRebootRequest",       ///< Reboot client host computer,
 	"TClientShutdownRequest",     ///< Shutdown client host computer,
@@ -609,6 +609,7 @@ const char * Msg::TNAMES[]=
 	"TRendersResources",          ///< Message with a list of resources of Renders.
 	"TRenderStopTask",            ///< Signal from Afanasy to Render to stop task.
 	"TRenderCloseTask",           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
+	"TRenderLaunch",              ///< Ask render to launch a command.
 	"TRenderLaunchAndExit",       ///< Ask render to launch a command an exit, may be needed for updates.
 
 	/*- Users messages -*/
