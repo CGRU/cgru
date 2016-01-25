@@ -8,7 +8,8 @@
 		"type"       : "renders",
 		"operation" :
 		{
-			"type" : "launch_and_exit",
+			"type" : "launch_cmd",
+			"exit" : true,
 			"cmd"  : "gedit"
 		}
 	}

@@ -112,7 +112,7 @@ private:
 
 	void exitClient( int type, JobContainer * jobs, MonitorContainer * monitoring);	///< Exit Render client program.
 
-	void launchAndExit( const std::string & cmd, JobContainer * jobs, MonitorContainer * monitoring);
+	void launchAndExit( const std::string & i_cmd, bool i_exit, JobContainer * i_jobs, MonitorContainer * i_monitoring);
 
 /// Set Render to Ofline. \c updateTaskState - whether to update it's state.
 	void offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie = false );

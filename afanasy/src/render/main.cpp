@@ -35,7 +35,7 @@ void sig_int(int signum)
 // Functions:
 void threadAcceptClient( void * i_arg );
 void msgCase( af::Msg * msg);
-void launchAndExit( af::Msg * i_msg);
+void launchAndExit( af::Msg * i_msg, bool i_exit);
 
 int main(int argc, char *argv[])
 {
@@ -302,9 +302,14 @@ printf("msgCase: "); msg->stdOut();
 		RenderHost::listenTasks( mcaddr);
 		break;
 	}
+	case af::Msg::TRenderLaunch:
+	{
+		launchAndExit( msg, false);
+		break;
+	}
 	case af::Msg::TRenderLaunchAndExit:
 	{
-		launchAndExit( msg);
+		launchAndExit( msg, true);
 		break;
 	}
 	default:
@@ -318,16 +323,22 @@ printf("msgCase: "); msg->stdOut();
 	delete msg;
 }
 
-void launchAndExit( af::Msg * i_msg)
+void launchAndExit( af::Msg * i_msg, bool i_exit)
 {
 	af::MCGeneral mcg( i_msg);
 
 	std::string cmd = mcg.getString();
 
-	printf("%s\n%s\n","Launching command and exiting:", cmd.c_str());
+	if( i_exit )
+	{
+		printf("%s\n%s\n","Launching command and exiting:", cmd.c_str());
+		AFRunning = false;
+	}
+	else
+	{
+		printf("%s\n%s\n","Launching command:", cmd.c_str());
+	}
 
 	af::launchProgram( cmd);
-
-	AFRunning = false;
 }
 
