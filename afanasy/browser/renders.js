@@ -525,9 +525,19 @@ RenderTask.prototype.destroy = function()
 
 RenderNode.launchCmdExit = function( i_args)
 {
-console.log( i_args);
-//	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'launchCmdExitDo',"param":i_args.name,
-//		"name":'serivce',"title":'Launch Command' + (i_args.name == 'exit' ? 'And Exit':''),"info":'Enter command:'});
+//console.log( i_args);
+	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'launchCmdExitDo',"param":i_args.name,
+		"name":'serivce',"title":'Launch Command' + (i_args.name == 'lcex' ? ' And Exit':''),"info":'Enter command:'});
+}
+RenderNode.prototype.launchCmdExitDo = function( i_value, i_name)
+{
+g_Info('launchCmdExit = ' + i_name + ',' + i_value);
+	var operation = {};
+	operation.type = 'launch_cmd';
+	operation.cmd = i_value;
+	if( i_name == 'lcex' )
+		operation.exit = true;
+	nw_Action( 'renders', this.monitor.getSelectedIds(), operation, null);
 }
 
 RenderNode.createPanels = function( i_monitor)
@@ -589,7 +599,8 @@ RenderNode.createPanels = function( i_monitor)
 
 	// Launch and Exit:
 	var acts = {};
-	acts.lce = {'name':'lce','handle':'launchCmdExit','label':'LCE','tooltip':'Launch command and exit.'};
+	acts.lcmd = {'name':'lcmd','label':'LCMD','handle':'launchCmdExit','tooltip':'Launch command.'};
+	acts.lcex = {'name':'lcex','label':'LCEX','handle':'launchCmdExit','tooltip':'Launch command and exit.'};
 	i_monitor.createCtrlBtns( acts);
 }
 
