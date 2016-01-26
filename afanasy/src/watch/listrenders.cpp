@@ -242,49 +242,19 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 		menu.addSeparator();
 
-		{
-			QMenu * submenu = new QMenu( "Eject", this);
+		QMenu * submenu = new QMenu( "Eject", this);
 
-			action = new QAction( "All Tasks", this);
-			if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actEjectTasks() ));
-			submenu->addAction( action);
+		action = new QAction( "All Tasks", this);
+		if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
+		connect( action, SIGNAL( triggered() ), this, SLOT( actEjectTasks() ));
+		submenu->addAction( action);
 
-			action = new QAction( "Not My Tasks", this);
-			if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actEjectNotMyTasks() ));
-			submenu->addAction( action);
+		action = new QAction( "Not My Tasks", this);
+		if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
+		connect( action, SIGNAL( triggered() ), this, SLOT( actEjectNotMyTasks() ));
+		submenu->addAction( action);
 
-			menu.addMenu( submenu);
-		}
-	}
-
-	if( af::Environment::GOD())
-	{
-		menu.addSeparator();
-
-		action = new QAction( "Set Hidden", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
-		menu.addAction( action);
-		action = new QAction( "Unset Hidden", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
-		menu.addAction( action);
-
-		{
-			QMenu * submenu = new QMenu( "Exit", this);
-
-			action = new QAction( "Render", this);
-			if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
-			submenu->addAction( action);
-
-			menu.addMenu( submenu);
-		}
-
-		action = new QAction( "Delete Render", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
-		if( selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
-		menu.addAction( action);
+		menu.addMenu( submenu);
 	}
 
 	QMenu * custom_submenu = NULL;
@@ -317,49 +287,61 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 		menu.addMenu( custom_submenu);
 	}
 
+	// Menu completed for user mode:
+
+	if( ! af::Environment::GOD())
+	{
+		menu.exec( event->globalPos());
+		return;
+	}
+		
+	// Administare ( super user mode ):
+
 	menu.addSeparator();
 
-	if( af::Environment::GOD())
-	{
-		{
-			QMenu * submenu = new QMenu( "Wake-On-Lan", this);
+	QMenu * submenu = new QMenu("Administrate", this);
+	menu.addMenu( submenu);
+/*
+	action = new QAction("Set Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+	submenu->addAction( action);
+	action = new QAction("Unset Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+	submenu->addAction( action);
 
-			action = new QAction( "Sleep", this);
-			if( selectedItemsCount == 1) action->setEnabled( render->isOnline() && ( false == render->isBusy()) && ( false == render->isWOLFalling()));
-			connect( action, SIGNAL( triggered() ), this, SLOT( actWOLSleep()));
-			submenu->addAction( action);
-			action = new QAction( "Wake", this);
-			if( selectedItemsCount == 1) action->setEnabled( render->isOffline());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actWOLWake()));
-			submenu->addAction( action);
+	submenu->addSeparator();
+*/
+	action = new QAction("Exit Client", this);
+	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
+	connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
+	submenu->addAction( action);
+	action = new QAction("Delete Client", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
+	if( selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
+	submenu->addAction( action);
 
-			menu.addMenu( submenu);
-		}
+	submenu->addSeparator();
 
-		{
-			QMenu * submenu = new QMenu( "Reboot", this);
+	action = new QAction("Wake-On-Lan Sleep", this);
+	if( selectedItemsCount == 1)
+		action->setEnabled( render->isOnline() && ( false == render->isBusy()) && ( false == render->isWOLFalling()));
+	connect( action, SIGNAL( triggered() ), this, SLOT( actWOLSleep()));
+	submenu->addAction( action);
+	action = new QAction("Wake-On-Lan Wake", this);
+	if( selectedItemsCount == 1) action->setEnabled( render->isOffline());
+	connect( action, SIGNAL( triggered() ), this, SLOT( actWOLWake()));
+	submenu->addAction( action);
 
-			action = new QAction( "Computer", this);
-			if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
-			submenu->addAction( action);
+	submenu->addSeparator();
 
-			menu.addMenu( submenu);
-		}
-
-		menu.addSeparator();
-
-		{
-			QMenu * submenu = new QMenu( "Shutdown", this);
-
-			action = new QAction( "Computer", this);
-			if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-			connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
-			submenu->addAction( action);
-
-			menu.addMenu( submenu);
-		}
-	}
+	action = new QAction("Reboot Machine", this);
+	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
+	connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
+	submenu->addAction( action);
+	action = new QAction("Shutdown Machine", this);
+	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
+	connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
+	submenu->addAction( action);
 
 	menu.exec( event->globalPos());
 }
