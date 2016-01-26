@@ -311,6 +311,17 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu->addSeparator();
 */
+	action = new QAction("Launch Command", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmd() ));
+	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
+	submenu->addAction( action);
+	action = new QAction("Launch And Exit", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmdExit() ));
+	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
 	action = new QAction("Exit Client", this);
 	if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
 	connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
@@ -563,3 +574,28 @@ void ListRenders::actCommand( int number)
 		Watch::startProcess( final_command);
 	}
 }
+
+void ListRenders::actLaunchCmd()     { launchCmdExit( false);}
+void ListRenders::actLaunchCmdExit() { launchCmdExit( true );}
+void ListRenders::launchCmdExit( bool i_exit)
+{
+	Item* item = getCurrentItem();
+	if( item == NULL ) return;
+
+	QString caption("Launch Command");
+	if( i_exit ) caption += "And Exit";
+
+	bool ok;
+	QString cmd = QInputDialog::getText( this, caption,"Enter Command", QLineEdit::Normal, QString(), &ok);
+	if( !ok) return;
+
+	std::ostringstream str;
+	af::jsonActionOperationStart( str, "renders", "launch_cmd", "", getSelectedIds());
+	str << ",\n\"cmd\":\"" << afqt::qtos( cmd) << "\"";
+	if( i_exit )
+		str << ",\n\"exit\":true";
+	af::jsonActionOperationFinish( str);
+	Watch::sendMsg( af::jsonMsg( str));
+}
+
+

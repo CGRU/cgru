@@ -53,6 +53,8 @@ private slots:
 	void actRestoreDefaults();
 	void actSetHidden();
 	void actUnsetHidden();
+	void actLaunchCmd();
+	void actLaunchCmdExit();
 
 	void actEjectTasks();
 	void actEjectNotMyTasks();
@@ -73,6 +75,7 @@ private:
 
 private:
 	void setService( bool enable);
+	void launchCmdExit( bool i_exit);
 	void calcTitle();
 	void setSpacing();
 
