@@ -142,8 +142,8 @@ else:
 		if Options.resize is not None:
 			resize = Options.resize.split('x')
 			if len(resize) < 2:
-				resize.append('-1')
-			filter_complex += 'scale=%s:-1,crop=%s:%s' % (resize[0], resize[0], resize[1])
+				hresize.append('-1')
+			filter_complex += 'scale=%s:-1,crop=%s:min(%s\\,ih),pad=%s:%s:0:max((%s-ih)/2\\,0)' % (resize[0], resize[0],resize[1], resize[0],resize[1],resize[1])
 			Output += '.r%s' % Options.resize
 		if Options.watermark is not None:
 			if not os.path.isfile( Options.watermark):
