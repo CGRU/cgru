@@ -13,8 +13,9 @@
 		"":"Digest authentication realm",
 	"realm":"CGRU",
 
-	"":"To open shot in RULES:",
-	"rules_url":"http://localhost/cgru/#/",
+	"":"To open location/shot in RULES:",
+	"-rules_url":"http://localhost/cgru/#/",
+		"":"By default it is disabled",
 
 	"projects_root":["/mnt/prj/","/projects/","/cgru/rules_root/"],
 

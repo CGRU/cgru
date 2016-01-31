@@ -962,8 +962,12 @@ JobNode.prototype.updatePanels = function()
 		elValue.textContent = path;
 	}
 
-	elFolders.m_elRules.style.display = 'block';
-	elFolders.m_elRules.href = cgru_RulesLink( rules_link);
+	rules_href = cgru_RulesLink( rules_link);
+	if( rules_href )
+	{
+		elFolders.m_elRules.style.display = 'block';
+		elFolders.m_elRules.href = cgru_RulesLink( rules_link);
+	}
 }
 
 JobNode.createPanels = function( i_monitor)

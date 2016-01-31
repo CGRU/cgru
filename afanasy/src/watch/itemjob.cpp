@@ -499,3 +499,16 @@ void ItemJob::v_filesReceived( const af::MCTaskUp & i_taskup)
 		m_list->itemsHeightChanged();
 }
 
+const QString ItemJob::getFirstFolder()
+{
+	QString folder;
+
+	if( folders.size() == 0 )
+		return folder;
+
+	QMap<QString,QString>::const_iterator it = folders.begin();
+	folder = it.value();
+
+	return folder;
+}
+

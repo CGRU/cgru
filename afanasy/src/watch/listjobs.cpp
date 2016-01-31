@@ -124,6 +124,15 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	if( jobitem->folders.size())
 	{
+		if( af::Environment::hasRULES())
+		{
+			action = new QAction("Open RULES", this);
+			connect( action, SIGNAL( triggered() ), this, SLOT( actOpenRULES() ));
+			menu.addAction( action);
+
+			menu.addSeparator();
+		}
+
 		submenu = new QMenu("Folders", this);
 
 		QMapIterator<QString,QString> it( jobitem->folders);
@@ -761,6 +770,19 @@ void ListJobs::actBrowseFolder( QString i_folder)
 	Watch::browseFolder( i_folder);
 }
 
+void ListJobs::actOpenRULES()
+{
+	ItemJob* jobitem = (ItemJob*)getCurrentItem();
+	if( jobitem == NULL )
+		return;
+
+	QString path = jobitem->getFirstFolder();
+	if( path.isEmpty())
+		return;
+
+	QString cmd = QString("rules -s \"") + path + "\"";
+	Watch::startProcess( cmd);
+}
 
 void ListJobs::blockAction( int id_block, QString i_action)
 {

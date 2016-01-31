@@ -147,8 +147,9 @@ public:
 	static inline int getRenderZombieTime()            { return render_zombietime;           }
 	static inline int getRenderConnectRetries()        { return render_connectretries;       }
 
+	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
-	static inline std::vector<std::string> & getProjectsRoot()         { return projects_root;         }
+//	static inline std::vector<std::string> & getProjectsRoot()         { return projects_root;         }
 
 	static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
 	static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
@@ -341,6 +342,7 @@ private:
 
 	// Misc:
 
+	static std::string rules_url;
 	static std::vector<std::string> projects_root;
 
 	static Passwd * passwd;
