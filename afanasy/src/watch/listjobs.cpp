@@ -165,26 +165,59 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
 	menu.addAction( action);
 
-	action = new QAction( "Restart Errors", this);
+	action = new QAction( "Restart Error Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
 	menu.addAction( action);
 
-	action = new QAction( "Restart Running", this);
+	menu.addSeparator();
+
+	submenu = new QMenu("Start/Stop/Restart", this);
+	menu.addMenu( submenu);
+
+	action = new QAction( "Restart Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartRunning() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
-	menu.addAction( action);
+	submenu->addAction( action);
 
-	action = new QAction( "Restart Skipped", this);
+	action = new QAction( "Restart Skipped Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartSkipped() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_SKIPPED_MASK);
-	menu.addAction( action);
+	submenu->addAction( action);
 
-	action = new QAction( "Restart Done", this);
+	action = new QAction( "Restart Done Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartDone() ));
-	menu.addAction( action);
+	submenu->addAction( action);
 
 	menu.addSeparator();
+
+	action = new QAction("Start Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actStart()   ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_OFFLINE_MASK);
+	submenu->addAction( action);
+
+	action = new QAction("Pause Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actPause()   ));
+	if( selectedItemsCount == 1) action->setEnabled( false == (jobitem->state & AFJOB::STATE_OFFLINE_MASK));
+	submenu->addAction( action);
+
+	action = new QAction("Stop Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actStop()    ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
+	submenu->addAction( action);
+
+	action = new QAction("Restart Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
+	submenu->addAction( action);
+
+	action = new QAction("Restart&&Pause", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
+	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
+	submenu->addAction( action);
+
+	menu.addSeparator();
+
 	if( af::Environment::VISOR() == false)
 	{
 		  action = new QAction( "Move Up", this);
@@ -208,18 +241,8 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	}
 	menu.addSeparator();
 
-	action = new QAction( "Annotate", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-	menu.addAction( action);
-
 	submenu = new QMenu( "Set Parameter", this);
 
-	action = new QAction( "Hidden", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
-	submenu->addAction( action);
-	action = new QAction( "Not Hidden", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
-	submenu->addAction( action);
 	action = new QAction( "Max Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 	submenu->addAction( action);
@@ -267,7 +290,21 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Life Time", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
 	submenu->addAction( action);
+
 	submenu->addSeparator();
+
+	action = new QAction( "Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+	submenu->addAction( action);
+	action = new QAction( "Not Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
+	action = new QAction( "Annotation", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+	submenu->addAction( action);
 	action = new QAction( "Custom Data", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
 	submenu->addAction( action);
@@ -300,33 +337,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 		jobitem->generateMenu( -1, submenu, this);
 	}
 	menu.addMenu( submenu);
-
-	menu.addSeparator();
-
-	action = new QAction( "Start", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actStart()   ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_OFFLINE_MASK);
-	menu.addAction( action);
-
-	action = new QAction( "Pause", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actPause()   ));
-	if( selectedItemsCount == 1) action->setEnabled( false == (jobitem->state & AFJOB::STATE_OFFLINE_MASK));
-	menu.addAction( action);
-
-	action = new QAction( "Stop", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actStop()    ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
-	menu.addAction( action);
-
-	action = new QAction( "Restart", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
-	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
-	menu.addAction( action);
-
-	action = new QAction( "Restart&&Pause", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
-	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
-	menu.addAction( action);
 
 	menu.addSeparator();
 
