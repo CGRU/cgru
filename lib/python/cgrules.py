@@ -4,6 +4,9 @@ import cgruconfig
 import cgruutils
 
 
+def hasRULES():
+	return 'rules_url' in cgruconfig.VARS
+
 def toRulesURL( i_path, i_verbose = False):
 	"""
 		Prepend Rules URL to path
