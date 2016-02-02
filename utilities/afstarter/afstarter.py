@@ -856,6 +856,9 @@ class Dialog(QtGui.QWidget):
 		self.save(filename, True)
 
 	def evaluate(self):
+		self.evaluateCmd()
+
+	def evaluateCmd(self, i_start = False):
 		if not self.constructed:
 			return
 
@@ -865,41 +868,48 @@ class Dialog(QtGui.QWidget):
 
 		# Check parameters:
 		# Frame range:
-		if self.fields['framestart'].value() > self.fields['frameend'].value():
-			self.fields['frameend'].setValue(self.fields['framestart'].value())
 
 		framestart = self.fields['framestart'].value()
 		frameend = self.fields['frameend'].value()
 		frameby = self.fields['frameby'].value()
 		framespt = self.fields['framespt'].value()
 
-		tasksnum = (1.0 + frameend - framestart) / (1.0 * frameby * framespt)
+		if i_start:
 
-		if tasksnum > 10000.0:
-			answer = QtGui.QMessageBox.warning(
-				self,
-				'Warning',
-				'Number of tasks > 10000',
-				QtGui.QMessageBox.Yes | QtGui.QMessageBox.Abort
-			)
-			if answer != QtGui.QMessageBox.Yes:
+			if framestart > frameend:
+				QtGui.QMessageBox.critical(
+					self,
+					'Critical',
+					'First frame is greater that last.')
 				return
 
-		if tasksnum > 100000.0:
-			answer = QtGui.QMessageBox.warning(
-				self,
-				'Warning',
-				'Number of tasks > 100000',
-				QtGui.QMessageBox.Yes | QtGui.QMessageBox.Abort
-			)
-			if answer != QtGui.QMessageBox.Yes:
+			tasksnum = (1.0 + frameend - framestart) / (1.0 * frameby * framespt)
+
+			if tasksnum > 10000.0:
+				answer = QtGui.QMessageBox.warning(
+					self,
+					'Warning',
+					'Number of tasks > 10000',
+					QtGui.QMessageBox.Yes | QtGui.QMessageBox.Abort
+				)
+				if answer != QtGui.QMessageBox.Yes:
+					return
+			if tasksnum > 100000.0:
+				answer = QtGui.QMessageBox.warning(
+					self,
+					'Warning',
+					'Number of tasks > 100000',
+					QtGui.QMessageBox.Yes | QtGui.QMessageBox.Abort
+				)
+				if answer != QtGui.QMessageBox.Yes:
+					return
+			if tasksnum > 1000000.0:
+				self.teCmd.setText(
+					'The number of tasks over one million. Call you system '
+					'administrator, supervisor or TD.'
+				)
 				return
-		if tasksnum > 1000000.0:
-			self.teCmd.setText(
-				'The number of tasks over one million. Call you system '
-				'administrator, supervisor or TD.'
-			)
-			return
+
 		# Check wdir:
 		if self.fields['scenewdir'].isChecked():
 			self.fields['wdir'].setEnabled(False)
@@ -1023,7 +1033,7 @@ class Dialog(QtGui.QWidget):
 		print('Evaluated')
 
 	def start(self):
-		self.evaluate()
+		self.evaluateCmd( True)
 		if not self.evaluated:
 			return
 
