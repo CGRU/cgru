@@ -165,10 +165,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int64 ("sequential",            m_sequential,            i_object, io_changes);
 
 
-	bool depend_sub_task = false;
-	jr_bool("depend_sub_task", depend_sub_task, i_object, io_changes);
-	setDependSubTask( depend_sub_task);
-
 	if( m_capacity < 1 )
 		m_capacity = 1;
 
