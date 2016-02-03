@@ -228,6 +228,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 	}
 }
 
+// Needed for mulihost tasks
 void RenderAf::startTask( af::TaskExec *taskexec)
 {
 	if( isOffline())
