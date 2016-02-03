@@ -130,7 +130,6 @@ BlockData::BlockData( const JSON & i_object, int i_num)
 
 void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 {
-	jr_int64 ("flags",                 m_flags,                 i_object, io_changes);
 	jr_int32 ("capacity",              m_capacity,              i_object, io_changes);
 	jr_int32 ("need_memory",           m_need_memory,           i_object, io_changes);
 	jr_int32 ("need_power",            m_need_power,            i_object, io_changes);
@@ -173,7 +172,10 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if( io_changes )
 		return;
 
+
 	jr_int64("st", m_state, i_object);
+	jr_int64("flags", m_flags, i_object);
+
 
 	jsonReadTasks( i_object);
 	// If tasks are not preset in json data, condider that block is numeric at first
@@ -192,8 +194,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	int64_t frames_per_task = 1;
 	int64_t frames_inc      = 1;
 
-	uint32_t flags          = 0;
-	
 	int32_t capacity_coeff_min = -1;
 	int32_t capacity_coeff_max = -1;
 
@@ -252,8 +252,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 		setNumeric( frame_first, frame_last, frames_per_task, frames_inc);
 	else if( frames_per_task != 0 )
 		m_frames_per_task = frames_per_task;
-
-//	setFlags(flags);
 
 	if(( capacity_coeff_min != -1 ) || ( capacity_coeff_max != -1 ))
 		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
