@@ -10,7 +10,8 @@ BlockFlags = {
 	'dependsubtask'      : 1 << 4,
 	'skipthumbnails'     : 1 << 5,
 	'skipexistingfiles'  : 1 << 6,
-	'checkrenderedfiles' : 1 << 7
+	'checkrenderedfiles' : 1 << 7,
+	'slavelostignore'    : 1 << 8
 }
 
 def checkBlockFlag( i_flags, i_name):

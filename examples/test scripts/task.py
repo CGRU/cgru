@@ -67,7 +67,7 @@ print('Started at: %s' % time.ctime(time_start))
 
 while frame <= frame_end:
 	print('FRAME: %s' % frame)
-	#	time.sleep(sleepsec)
+
 	for p in range(100):
 		print('PROGRESS: {progress}%'.format(progress=p + 1))
 

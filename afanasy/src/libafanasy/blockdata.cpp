@@ -202,7 +202,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	uint16_t    multihost_max_wait        = 0;
 	std::string multihost_service;
 	uint16_t    multihost_service_wait    = 0;
-	bool        multihost_master_on_slave = false;
+//	bool        multihost_master_on_slave = false;
 
 	jr_string("multihost_service",     multihost_service,       i_object);
 
@@ -218,7 +218,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int8  ("multihost_max",             multihost_max,             i_object);
 	jr_uint16("multihost_max_wait",        multihost_max_wait,        i_object);
 	jr_uint16("multihost_service_wait",    multihost_service_wait,    i_object);
-	jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
+//	jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
 
 	jr_int64 ("file_size_min", m_file_size_min, i_object);
 	jr_int64 ("file_size_max", m_file_size_max, i_object);
@@ -256,9 +256,11 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if(( capacity_coeff_min != -1 ) || ( capacity_coeff_max != -1 ))
 		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
 
-	if(( multihost_min != -1 ) || ( multihost_max != -1 ))
+	if( isMultiHost())
 		setMultiHost( multihost_min, multihost_max, multihost_max_wait,
-				multihost_master_on_slave, multihost_service, multihost_service_wait);
+			multihost_service, multihost_service_wait);
+	else
+		m_flags = m_flags & (~FMultiHost);
 }
 
 void BlockData::jsonReadTasks( const JSON & i_object)
@@ -371,8 +373,8 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
             o_str << ",\n\"multihost_max\":"          << int(m_multihost_max);
             o_str << ",\n\"multihost_max_wait\":"     << int(m_multihost_max_wait);
             o_str << ",\n\"multihost_service_wait\":" << int(m_multihost_service_wait);
-			if( canMasterRunOnSlaveHost())
-                o_str << ",\n\"multihost_master_on_slave\":true";
+//			if( canMasterRunOnSlaveHost())
+//                o_str << ",\n\"multihost_master_on_slave\":true";
 		}
 		if( m_file_size_min > 0 )
 	        o_str << ",\n\"file_size_min\":" << m_file_size_min;
@@ -664,37 +666,38 @@ void BlockData::setVariableCapacity( int i_capacity_coeff_min, int i_capacity_co
 	m_capacity_coeff_max = i_capacity_coeff_max;
 }
 
-void BlockData::setMultiHost( int i_min, int i_max, int i_waitmax,
-        bool i_masterOnSlave, const std::string & i_service, int i_waitsrv)
+bool BlockData::setMultiHost( int i_min, int i_max, int i_waitmax,
+		const std::string & i_service, int i_waitsrv)
 {
    if( i_min < 1)
    {
       AFERROR("BlockData::setMultiHost: Minimum must be greater then zero.")
-      return;
+      return false;
    }
    if( i_max < i_min)
    {
       AFERROR("BlockData::setMultiHost: Maximum must be greater or equal then minimum.")
-      return;
+      return false;
    }
    if(( i_min > AFJOB::TASK_MULTIHOSTMAXHOSTS) || ( i_max > AFJOB::TASK_MULTIHOSTMAXHOSTS))
    {
       AFERRAR("BlockData::setMultiHost: Maximum hosts number is limited to %d.", AFJOB::TASK_MULTIHOSTMAXHOSTS)
-      return;
+      return false;
    }
-   if( i_masterOnSlave && ( false == i_service.empty() ))
+   if( canMasterRunOnSlaveHost() && ( false == i_service.empty() ))
    {
       AFERROR("BlockData::setMultiHost: Block can't have multihost service if master and slave can be the same host.")
-      i_masterOnSlave = false;
+		m_flags = m_flags & (~FMasterOnSlave);
    }
 
-   m_flags = m_flags | FMultiHost;
-   if( i_masterOnSlave) m_flags = m_flags | FMasterOnSlave;
    m_multihost_min  = i_min;
    m_multihost_max  = i_max;
    m_multihost_max_wait = i_waitmax;
    m_multihost_service_wait = i_waitsrv;
-   if( false == i_service.empty()) m_multihost_service = i_service;
+   if( false == i_service.empty())
+		m_multihost_service = i_service;
+
+	return true;
 }
 
 bool BlockData::setCapacityCoeffMin( int value)

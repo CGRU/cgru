@@ -38,7 +38,8 @@ public:
 		FDependSubTask      = 1ULL << 4,
 		FSkipThumbnails     = 1ULL << 5,
 		FSkipExistingFiles  = 1ULL << 6,
-		FCheckRenderedFiles = 1ULL << 7
+		FCheckRenderedFiles = 1ULL << 7,
+		FSlaveLostIgnore    = 1ULL << 8
 	};
 
 	static const char DataMode_Progress[];
@@ -78,6 +79,7 @@ public:
 	inline bool canVarCapacity() const { return m_flags & FVarCapacity;} ///< Whether the block can variate tasks capacity.
 	inline bool isMultiHost() const { return m_flags & FMultiHost;} ///< Whether the one block task can run on several hosts.
 	inline bool canMasterRunOnSlaveHost() const { return m_flags & FMasterOnSlave;} ///< Can multihost task run master host on slave machines.
+	inline bool isSlaveLostIgnore() const { return m_flags & FSlaveLostIgnore;} ///< Mutihost master will ignore slave loosing.
 	inline bool isDependSubTask() const { return m_flags & FDependSubTask;} ///< Other block can depend this block sub task
 
 	inline void setDependSubTask( bool value = true) { if(value) m_flags |= FDependSubTask; else m_flags &= (~FDependSubTask);}
@@ -357,8 +359,8 @@ private:
 	void rw_tasks( Msg * msg); ///< Read & write tasks data.
 
 	void setVariableCapacity( int i_capacity_coeff_min, int i_capacity_coeff_max);
-	void setMultiHost( int i_min, int i_max, int i_waitmax,
-			bool i_sameHostMaster, const std::string & i_service, int i_waitsrv);
+	bool setMultiHost( int i_min, int i_max, int i_waitmax,
+			const std::string & i_service, int i_waitsrv);
 
 // Functions to update tasks progress and progeress bar:
 // (for information purpoces only, no meaning for server)

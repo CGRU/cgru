@@ -492,6 +492,12 @@ class Block:
 		if service_wait > 0:
 			self.data['multihost_service_wait'] = service_wait
 
+	def setSlaveLostIgnore(self):
+		if not afcommon.checkBlockFlag( self.data['flags'], 'multihost'):
+			print('Block::setSlaveLostIgnore: Block is not multihost.')
+			return
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'slavelostignore')
+
 	def fillTasks(self):
 		"""Missing DocString
 		"""

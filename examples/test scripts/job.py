@@ -27,6 +27,7 @@ parser.add_option('-f', '--frames',       dest='frames',       type='string', de
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
+parser.add_option(      '--pkp',          dest='pkp',          type='int',    default=10, help='Parser key percentage')
 parser.add_option(      '--send',         dest='sendjob',      type='int',    default=1,  help='send job')
 parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    default=0,  help='set job to wait to start time')
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
@@ -40,6 +41,7 @@ parser.add_option(      '--mhmax',        dest='mhmax',        type='int',    de
 parser.add_option(      '--mhwaitmax',    dest='mhwaitmax',    type='int',    default=0,  help='multi host tasks max hosts wait time seconds')
 parser.add_option(      '--mhwaitsrv',    dest='mhwaitsrv',    type='int',    default=0,  help='multi host tasks service start wait time seconds')
 parser.add_option(      '--mhsame',       dest='mhsame',       type='int',    default=0,  help='multi host tasks same host slave and master')
+parser.add_option(      '--mhignorelost', dest='mhignorelost', type='int',    default=0,  help='multi host mosater will ignore slave lost')
 parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    default='', help='multi host tasks service command')
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
@@ -61,6 +63,7 @@ options, args = parser.parse_args()
 jobname     = options.jobname
 timesec     = options.timesec
 randtime    = options.randtime
+pkp         = options.pkp
 numblocks   = options.numblocks
 numtasks    = options.numtasks
 increment   = options.increment
@@ -157,6 +160,8 @@ for b in range(numblocks):
 			options.mhmin, options.mhmax, options.mhwaitmax,
 			options.mhsame, options.mhservice, options.mhwaitsrv
 		)
+		if options.mhignorelost:
+			block.setSlaveLostIgnore()
 		str_hosts = ' ' + services.service.str_hosts
 
 	negative_pertask = False
@@ -178,7 +183,7 @@ for b in range(numblocks):
 			block.setFiles([afcommon.patternFromStdC(options.fileout)])
 
 		cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
-			   '-i %(increment)d -t %(timesec)g -r %(randtime)g ' \
+			   '-i %(increment)d -t %(timesec)g -r %(randtime)g --pkp %(pkp)d ' \
 			   '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
 		block.setCommand(cmd, False)

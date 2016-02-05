@@ -56,6 +56,8 @@ private:
 	void startServices( RenderContainer * renders);
 	void startMaster( RenderContainer * renders, MonitorContainer * monitoring);
 	void releaseHost( RenderContainer * renders, MonitorContainer * monitoring, const af::MCTaskUp * taskup = NULL);
+	void setProgressHostame();
+	void stopSlaveService(  RenderContainer * renders, MonitorContainer * monitoring, const af::MCTaskUp & taskup);
 
 private:
 	bool m_has_service;
