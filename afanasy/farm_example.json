@@ -33,8 +33,8 @@
 		"nimby_busy_hddio": 95,
 		"-nimby_idle_netmbs": 10,
 		"-nimby_busy_netmbs": 100,
-		"nimby_idlefree_time": 1800,
-		"nimby_busyfree_time": 30,
+		"-nimby_idlefree_time": 1800,
+		"-nimby_busyfree_time": 30,
 
 		"services":[
 			{"name":"arch"},
