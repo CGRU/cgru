@@ -177,10 +177,13 @@ void Plotter::addValue( int grp, int val, bool store)
 		}
 
 		// Append label text by autoscale value:
-		float scale_val = float(scale) / (label_value != 0 ? label_value : 1);
-		QString scale_str = QString("%1").arg( scale_val);
-		if( scale_str.indexOf('0') == 0) scale_str = scale_str.remove( 0, 1);
-		label_text = label.arg( scale_str);
+		if( label_text.contains("%1"))
+		{
+			float scale_val = float(scale) / (label_value != 0 ? label_value : 1);
+			QString scale_str = QString("%1").arg( scale_val);
+			if( scale_str.indexOf('0') == 0) scale_str = scale_str.remove( 0, 1);
+			label_text = label.arg( scale_str);
+		}
 
 		// Calculate blue backgroud color:
 		int value = scale;
