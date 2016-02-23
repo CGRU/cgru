@@ -5,20 +5,29 @@ import sys
 import struct
 import socket
 
+from optparse import OptionParser
+Parser = OptionParser(usage="%prog [options] path\ntype \"%prog -h\" for help", version="%prog 1.  0")
+Parser.add_option('--wake',  dest='wake',  action='store_true', default=False, help='Wake mode, not used.')
+Parser.add_option('--sleep', dest='sleep', action='store_true', default=False, help='Sleep mode, not used.')
+Parser.add_option('--ip',    dest='ip',    type='string',       default=None,  help='IP address, not used.')
+Options, Args = Parser.parse_args()
+
+print(sys.argv)
 
 def usageErrorExit():
-	print('Usage %s mac1 mac2 .. macN' % sys.argv[0])
+	print('Usage %s --(wake|sleep) --ip IP mac1 mac2 .. macN' % sys.argv[0])
 	print('MAC address(es) should be without any separators, just a string of '
 		  '12 characters.')
 	sys.exit(1)
 
 
-if len(sys.argv) < 2:
+if len(Args) < 2:
 	print('No mac address(es) specified.')
 	usageErrorExit()
 
-for addr in sys.argv:
-	if addr == sys.argv[0]:
+
+for addr in Args:
+	if addr == Args[0]:
 		continue
 	if len(addr) != 12:
 		print('Invalid mac address: "%s"' % addr)

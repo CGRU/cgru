@@ -98,10 +98,11 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 		sendTaskSate();
 		return;
 	}
+	m_taskexec->setCommand( m_cmd);
 
-	m_wdir = m_service->getWDir();
 
 	// Process task working directory:
+	m_wdir = m_service->getWDir();
 	if( m_wdir.size())
 	{
 #ifdef WINNT
@@ -117,9 +118,10 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 			m_wdir.clear();
 		}
 	}
-
 	if( m_wdir.empty())
 		m_wdir = af::Environment::getTempDir();
+	m_taskexec->setWDir( m_wdir);
+
 
 	if( af::Environment::isVerboseMode()) printf("%s\n", m_cmd.c_str());
 

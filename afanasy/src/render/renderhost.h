@@ -64,6 +64,8 @@ public:
     static void windowsMustDie();
 #endif
 
+	static void wolSleep( const std::string & i_str);
+
 private:
     static RenderHost * ms_obj;
 

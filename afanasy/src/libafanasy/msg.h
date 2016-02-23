@@ -85,8 +85,6 @@ public:
 
 /*- Client messages -*/
 /**/TClientExitRequest/**/,         ///< Request to client to exit,
-//**/TClientRestartRequest/**/,      ///< Restart client application,
-/**/TClientWOLSleepRequest/**/,     ///< Request to client to fall a sleep,
 /**/TClientRebootRequest/**/,       ///< Reboot client host computer,
 /**/TClientShutdownRequest/**/,     ///< Shutdown client host computer,
 
@@ -203,6 +201,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
 /**/TRenderLaunch/**/,              ///< Ask render to launch a command.
 /**/TRenderLaunchAndExit/**/,       ///< Ask render to launch a command and exit, may be needed for updates.
+/**/TRenderWOLSleepRequest/**/,     ///< Request to client to fall a sleep,
 
 /*- Users messages -*/
 /**/TUsersListRequestIds/**/,       ///< Request a list of Users with given ids.

@@ -318,3 +318,12 @@ void RenderHost::getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg
     AFERROR("RenderHost::closeTask: No such task:\n")
     i_taskpos.v_stdOut();
 }
+
+void RenderHost::wolSleep( const std::string & i_str)
+{
+	af::Service service( af::Environment::getSysWolService(),"SLEEP", i_str);
+	std::string cmd = service.getCommand();
+	printf("Sleep request, executing command:\n%s\n", cmd.c_str());
+	af::launchProgram( cmd);
+}
+

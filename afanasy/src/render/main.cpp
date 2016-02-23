@@ -278,10 +278,10 @@ printf("msgCase: "); msg->stdOut();
 		af::launchProgram( af::Environment::getRenderCmdShutdown());
 		break;
 	}
-	case af::Msg::TClientWOLSleepRequest:
+	case af::Msg::TRenderWOLSleepRequest:
 	{
-		printf("Sleep request, executing command:\n%s\n", af::Environment::getRenderCmdWolSleep().c_str());
-		af::launchProgram( af::Environment::getRenderCmdWolSleep());
+		af::MCGeneral mg( msg);
+		RenderHost::wolSleep( mg.getString());
 		break;
 	}
 	case af::Msg::TRenderStopTask:

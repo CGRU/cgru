@@ -460,7 +460,10 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 	store();
 	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
-	af::Msg* msg = new af::Msg( af::Msg::TClientWOLSleepRequest);
+	std::ostringstream str;
+	v_jsonWrite( str, af::Msg::TRendersList);
+	af::MCGeneral mg( str.str());
+	af::Msg* msg = new af::Msg( af::Msg::TRenderWOLSleepRequest, &mg);
 	msg->setAddress( this);
 	ms_msg_queue->pushMsg( msg);
 }
@@ -493,10 +496,10 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 	store();
 	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
-	std::string cmd = af::Environment::getRenderCmdWolWake();
-	for( int i = 0; i < m_netIFs.size(); i++) cmd += " " + m_netIFs[i]->getMACAddrString( false);
+	std::ostringstream str;
+	v_jsonWrite( str, af::Msg::TRendersList);
 
-	SysJob::AddWOLCommand( cmd, "", m_name, m_name);
+	SysJob::AddWOLCommand( str.str(), "", m_name, m_name);
 }
 
 void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
