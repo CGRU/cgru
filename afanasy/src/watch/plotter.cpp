@@ -177,7 +177,7 @@ void Plotter::addValue( int grp, int val, bool store)
 		}
 
 		// Append label text by autoscale value:
-		if( label_text.contains("%1"))
+		if( label.contains("%1"))
 		{
 			float scale_val = float(scale) / (label_value != 0 ? label_value : 1);
 			QString scale_str = QString("%1").arg( scale_val);
