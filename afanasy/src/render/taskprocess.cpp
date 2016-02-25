@@ -62,7 +62,7 @@ int setNonblocking(int fd)
 }
 #endif
 
-long long TaskProcess::counter = 0;
+long long TaskProcess::ms_counter = 0;
 
 TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_taskexec( i_taskExec),
@@ -73,13 +73,14 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 	m_commands_launched(0),
 	m_doing_post( false),
 	m_zombie( false),
+	m_cycle(0),
 	m_dead_cycle(0)
 {
 	m_store_dir = af::Environment::getTempDir() + AFGENERAL::PATH_SEPARATOR + "tasks" + AFGENERAL::PATH_SEPARATOR;
 	m_store_dir += af::itos( m_taskexec->getJobId());
 	m_store_dir += '.' + af::itos( m_taskexec->getBlockNum());
 	m_store_dir += '.' + af::itos( m_taskexec->getTaskNum());
-	m_store_dir += '_' + af::itos( ++counter);
+	m_store_dir += '_' + af::itos( ++ms_counter);
 
 	if( af::pathIsFolder( m_store_dir))
 		af::removeDir( m_store_dir);
@@ -254,6 +255,8 @@ void TaskProcess::closeHandles()
 void TaskProcess::refresh()
 {
 	if( m_zombie ) return;
+
+	m_cycle++;
 
 	AFINFA("TaskProcess::refresh(): pid=%d, zombie=%s, stop_time = %lld",
 		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
@@ -449,6 +452,13 @@ void TaskProcess::sendTaskSate()
 		stdout_data = m_parser->getData( &stdout_size);
 		log = m_service->getLog();
 	}
+	else if(( af::Environment::getRenderUpdateTaskPeriod > 0 ) &&
+		(( m_cycle % af::Environment::getRenderUpdateTaskPeriod()) != 0 ))
+	{
+		// We should update percentage only every
+		// "af_render_updatetaskperiod" seconds
+		return;
+	}
 
 	int percent          = m_parser->getPercent();
 	int frame            = m_parser->getFrame();
@@ -482,7 +492,7 @@ void TaskProcess::sendTaskSate()
 	af::Msg * msg = new af::Msg( type, &taskup);
 	if( toRecieve) msg->setReceiving();
 
-//    printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
+    //printf("TaskProcess::sendTaskSate:(%d)\n", m_cycle);msg->v_stdOut();printf("\n");
 
 	RenderHost::dispatchMessage( msg);
 }

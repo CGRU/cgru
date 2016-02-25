@@ -62,8 +62,10 @@ private:
 	uint8_t m_update_status;
 	time_t m_stop_time;
 	bool m_zombie;
+
+	static long long ms_counter;
 	int m_dead_cycle;
-	static long long counter;
+	int m_cycle;
 
 	std::string m_cmd;
 	std::string m_wdir;
