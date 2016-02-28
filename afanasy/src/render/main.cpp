@@ -229,13 +229,19 @@ printf("msgCase: "); msg->stdOut();
 		else if ( new_id == 0 )
 		{
 			printf("Zero ID recieved, no such online render, re-connecting...\n");
-			RenderHost::connectionLost();
+			RenderHost::connectionLost( true);
 		}
 		// Bad case, should not ever happen, try to re-register.
 		else if ( RenderHost::getId() != new_id )
 		{
 			AFERRAR("IDs mistatch: this %d != %d new, re-connecting...", RenderHost::getId(), new_id);
-			RenderHost::connectionLost();
+			RenderHost::connectionLost( true);
+		}
+		// Id, that returns from server is equals to stored on client.
+		// This is a normal case.
+		else
+		{
+			RenderHost::connectionEstablished();
 		}
 		break;
 	}

@@ -35,7 +35,8 @@ public:
 
     static bool isConnected() { return ms_connected;  }
     static void setRegistered( int i_id);
-    static void connectionLost();
+    static void connectionLost( bool i_any_case = false);
+	static void connectionEstablished() { ms_connection_lost_count = 0; }
 
     static void setUpdateMsgType( int i_type);
 
@@ -77,6 +78,7 @@ private:
     static af::MsgQueue * ms_msgDispatchQueue;
 
     static bool ms_connected;
+	static int  ms_connection_lost_count;
 
     static int ms_updateMsgType;
 

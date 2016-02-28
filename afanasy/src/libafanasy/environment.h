@@ -141,7 +141,7 @@ public:
 	static inline int getRenderUpdateSec()             { return render_update_sec;           } ///< Get Render update interval ( in seconds ).
 	static inline int getRenderUpdateTaskPeriod()      { return render_updatetaskperiod;     }
 	static inline int getRenderZombieTime()            { return render_zombietime;           }
-//	static inline int getRenderConnectRetries()        { return render_connectretries;       }
+	static inline int getRenderConnectRetries()        { return render_connectretries;       }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }

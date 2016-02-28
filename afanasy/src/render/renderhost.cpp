@@ -23,6 +23,7 @@ af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
 af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
 int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
 bool RenderHost::ms_connected = false;
+int RenderHost::ms_connection_lost_count = 0;
 std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
 bool RenderHost::ms_listening = false;
@@ -132,11 +133,19 @@ void RenderHost::setRegistered( int i_id)
     ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
     setUpdateMsgType( af::Msg::TRenderUpdate);
     printf("Render registered.\n");
+	RenderHost::connectionEstablished();
 }
 
-void RenderHost::connectionLost()
+void RenderHost::connectionLost( bool i_any_case)
 {
-    if( ms_connected == false ) return;
+    if( ms_connected == false )
+		return;
+
+	ms_connection_lost_count++;
+
+	if(( false == i_any_case ) &&
+		( ms_connection_lost_count <= af::Environment::getRenderConnectRetries() ))
+		return;
 
     ms_connected = false;
 
