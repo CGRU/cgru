@@ -438,7 +438,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		long long curtime = time(0);
 		int bar_secs = curtime - m_idle_time;
 		int busy_secs = curtime - m_busy_time;
-		int max = af::Environment::getMonitorRenderIdleBarMax();
+		int max = af::Environment::getWatchRenderIdleBarMax();
 		painter->setBrush( QBrush( afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern ));
 
 		if( m_host.m_wol_idlesleep_time > 0 )

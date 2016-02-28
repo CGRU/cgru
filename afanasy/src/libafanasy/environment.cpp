@@ -42,11 +42,15 @@ int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::clientport =                      AFADDR::CLIENT_PORT;
 
+int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
+
+int     Environment::watch_updateperiod =              AFWATCH::UPDATEPERIOD;
 int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
 int     Environment::watch_waitforconnected =          AFWATCH::WAITFORCONNECTED;
 int     Environment::watch_waitforreadyread =          AFWATCH::WAITFORREADYREAD;
 int     Environment::watch_waitforbyteswritten =       AFWATCH::WAITFORBYTESWRITTEN;
 int     Environment::watch_refreshinterval =           AFWATCH::REFRESHINTERVAL;
+int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
 
 int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY;
 int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
@@ -84,14 +88,6 @@ int         Environment::sysjob_tasksmax =            AFJOB::SYSJOB_TASKSMAX;
 std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_SERVICE;
 std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_SERVICE;
 std::string Environment::sysjob_events_service =      AFJOB::SYSJOB_EVENTS_SERVICE;
-
-int     Environment::monitor_render_idle_bar_max =     AFMONITOR::RENDER_IDLE_BAR_MAX;
-int     Environment::monitor_updateperiod =            AFMONITOR::UPDATEPERIOD;
-int     Environment::monitor_connectretries =          AFMONITOR::CONNECTRETRIES;
-int     Environment::monitor_waitforconnected =        AFMONITOR::WAITFORCONNECTED;
-int     Environment::monitor_waitforreadyread =        AFMONITOR::WAITFORREADYREAD;
-int     Environment::monitor_waitforbyteswritten =     AFMONITOR::WAITFORBYTESWRITTEN;
-int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
@@ -245,11 +241,15 @@ void Environment::getVars( const JSON & i_obj)
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
+	getVar( i_obj, watch_updateperiod,                "af_watch_updateperiod"                );
 	getVar( i_obj, watch_refreshinterval,             "af_watch_refreshinterval"             );
 	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
 	getVar( i_obj, watch_waitforconnected,            "af_watch_waitforconnected"            );
 	getVar( i_obj, watch_waitforreadyread,            "af_watch_waitforreadyread"            );
 	getVar( i_obj, watch_waitforbyteswritten,         "af_watch_waitforbyteswritten"         );
+	getVar( i_obj, watch_render_idle_bar_max,         "af_watch_render_idle_bar_max"         );
+
+	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
 
 	getVar( i_obj, errors_forgivetime,                "af_errors_forgivetime"                );
 	getVar( i_obj, errors_avoid_host,                 "af_errors_avoid_host"                 );
@@ -261,14 +261,6 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, sysjob_postcmd_service,            "af_sysjob_postcmd_service"            );
 	getVar( i_obj, sysjob_wol_service,                "af_sysjob_wol_service"                );
 	getVar( i_obj, sysjob_events_service,             "af_sysjob_events_service"             );
-
-	getVar( i_obj, monitor_render_idle_bar_max,       "af_monitor_render_idle_bar_max"       );
-	getVar( i_obj, monitor_updateperiod,              "af_monitor_updateperiod"              );
-	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
-	getVar( i_obj, monitor_connectretries,            "af_monitor_connectretries"            );
-	getVar( i_obj, monitor_waitforconnected,          "af_monitor_waitforconnected"          );
-	getVar( i_obj, monitor_waitforreadyread,          "af_monitor_waitforreadyread"          );
-	getVar( i_obj, monitor_waitforbyteswritten,       "af_monitor_waitforbyteswritten"       );
 }
 
 bool Environment::getVar( const JSON & i_obj, std::string & o_value, const char * i_name)

@@ -99,11 +99,15 @@ public:
 	static inline const std::vector<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
 	static inline const std::vector<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
 
+	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
+
+	static inline int getWatchUpdatePeriod()           { return watch_updateperiod;        }
 	static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
 	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
 	static inline int getWatchWaitForConnected()       { return watch_waitforconnected;    }
 	static inline int getWatchWaitForReadyRead()       { return watch_waitforreadyread;    }
 	static inline int getWatchWaitForBytesWritten()    { return watch_waitforbyteswritten; }
+	static inline int getWatchRenderIdleBarMax()       { return watch_render_idle_bar_max; }
 
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
 
@@ -129,14 +133,6 @@ public:
 	static inline const std::string & getSysPostCmdService() { return sysjob_postcmd_service;    }
 	static inline const std::string & getSysEventsService()  { return sysjob_events_service;     }
 
-	static inline int getMonitorRenderIdleBarMax()       { return monitor_render_idle_bar_max;  }
-	static inline int getMonitorUpdatePeriod()           { return monitor_updateperiod;         }
-	static inline int getMonitorConnectRetries()         { return monitor_connectretries;       }
-	static inline int getMonitorWaitForConnected()       { return monitor_waitforconnected;     }
-	static inline int getMonitorWaitForReadyRead()       { return monitor_waitforreadyread;     }
-	static inline int getMonitorWaitForBytesWritten()    { return monitor_waitforbyteswritten;  }
-	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
-
 	static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
 	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
@@ -145,7 +141,7 @@ public:
 	static inline int getRenderUpdateSec()             { return render_update_sec;           } ///< Get Render update interval ( in seconds ).
 	static inline int getRenderUpdateTaskPeriod()      { return render_updatetaskperiod;     }
 	static inline int getRenderZombieTime()            { return render_zombietime;           }
-	static inline int getRenderConnectRetries()        { return render_connectretries;       }
+//	static inline int getRenderConnectRetries()        { return render_connectretries;       }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
@@ -264,10 +260,14 @@ private:
 	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_refreshinterval;
+	static int watch_updateperiod;
 	static int watch_connectretries;
 	static int watch_waitforconnected;
 	static int watch_waitforreadyread;
 	static int watch_waitforbyteswritten;
+	static int watch_render_idle_bar_max;
+
+	static int monitor_zombietime;
 
 	static std::string timeformat;    ///< Default time format.
 
@@ -306,14 +306,6 @@ private:
 	static std::string sysjob_wol_service;
 	static std::string sysjob_postcmd_service;
 	static std::string sysjob_events_service;
-
-	static int monitor_render_idle_bar_max;
-	static int monitor_updateperiod;
-	static int monitor_connectretries;
-	static int monitor_waitforconnected;
-	static int monitor_waitforreadyread;
-	static int monitor_waitforbyteswritten;
-	static int monitor_zombietime;
 
 
 	/// Temp directory

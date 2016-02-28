@@ -100,28 +100,25 @@ namespace AFRENDER
 /// Watch options:
 namespace AFWATCH
 {
-    const int  CONNECTRETRIES           = 3;        ///< Number of connect fails to turn to disconnected state.
-    const int  WAITFORCONNECTED         = 8000;     ///< Connect to server timeout milliseconds.
-    const int  WAITFORREADYREAD         = 8000;     ///< Wait for data from server timeout milliseconds.
-    const int  WAITFORBYTESWRITTEN      = 8000;     ///< Wait writing to socket timeout milliseconds.
-    const int  REFRESHINTERVAL          = 5;        ///< Node items update interval time in seconds.
+    const int  UPDATEPERIOD        = 10;       ///< Update status period ( seconds).
+    const int  CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
+    const int  WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
+    const int  WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
+    const int  WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
+    const int  REFRESHINTERVAL     = 5;        ///< Node items update interval time in seconds.
 
-    const char CMDS_ARGUMENT[]          = "@ARG@";     ///< Commands argument.
-    const char CMDS_IPADDRESS[]         = "@IP@";      ///< Commands argument will be replaced with selected render ip address.
-    const char CMDS_ASKCOMMAND[]        = "@ASK@";     ///< Ask a command, dialog will be raised.
+    const char CMDS_ARGUMENT[]     = "@ARG@";     ///< Commands argument.
+    const char CMDS_IPADDRESS[]    = "@IP@";      ///< Commands argument will be replaced with selected render ip address.
+    const char CMDS_ASKCOMMAND[]   = "@ASK@";     ///< Ask a command, dialog will be raised.
+
+    const int  RENDER_IDLE_BAR_MAX = 3600;     ///< Seconds - idle bar "width"
 }
 
 /// Monitor options:
 namespace AFMONITOR
 {
-    const int RENDER_IDLE_BAR_MAX = 3600;     ///< Seconds - idle bar "width"
-    const int UPDATEPERIOD        = 10;       ///< Update status period ( seconds).
-    const int MAXCOUNT            = 100000;   ///< Maximum allowed online Monitors.
-    const int CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
-    const int WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
-    const int WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
-    const int WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
-    const int ZOMBIETIME          = 40;       ///< Seconds to wait for update to consider to kill Monitor.
+    const int MAXCOUNT   = 100000;   ///< Maximum allowed online Monitors.
+    const int ZOMBIETIME = 40;       ///< Seconds to wait for update to consider to kill Monitor.
 }
 
 /// Network options:
