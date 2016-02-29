@@ -143,9 +143,14 @@ void RenderHost::connectionLost( bool i_any_case)
 
 	ms_connection_lost_count++;
 
-	if(( false == i_any_case ) &&
-		( ms_connection_lost_count <= af::Environment::getRenderConnectRetries() ))
-		return;
+	if( false == i_any_case )
+	{
+		printf("Connection lost count = %d of %d\n", ms_connection_lost_count, af::Environment::getRenderConnectRetries());
+		if( ms_connection_lost_count <= af::Environment::getRenderConnectRetries() )
+		{
+			return;
+		}
+	}
 
     ms_connected = false;
 
