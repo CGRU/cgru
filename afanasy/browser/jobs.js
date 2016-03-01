@@ -1009,6 +1009,7 @@ JobNode.createPanels = function( i_monitor)
 	acts.pause  = {"label":"PAU","tooltip":'Pause job.'};
 	acts.stop   = {"label":"STP","tooltip":'Double click to stop job running tasks.',"ondblclick":true};
 	acts.delete = {"label":"DEL","tooltip":'Double click delete job(s).',"ondblclick":true};
+	acts.deldone= {"label":"DDJ","tooltip":'Double click delete all done jobs.',"ondblclick":true,"always_active":true,"handle":'delDoneJobs'};
 	i_monitor.createCtrlBtns( acts);
 
 
@@ -1101,6 +1102,26 @@ JobNode.moveJobs = function( i_args)
 {
 	nw_Action('users', [g_uid], {'type':i_args.name,'jids':i_args.monitor.getSelectedIds()});
 	i_args.monitor.info('Moving Jobs');
+}
+
+JobNode.delDoneJobs = function( i_args)
+{
+	var ids = [];
+	for( var i = 0; i < i_args.monitor.items.length; i++)
+	{
+		var job = i_args.monitor.items[i];
+		if( job.state.DON == true )
+			ids.push( job.params.id );
+	}
+
+	if( ids.length == 0 )
+	{
+		g_Error('No done jobs.');
+		return;
+	}
+
+	nw_Action('jobs', ids, {"type":'delete'});
+	i_args.monitor.info('Deleting all done jobs.');
 }
 
 JobNode.params = {};
