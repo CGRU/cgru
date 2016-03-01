@@ -784,6 +784,10 @@ Status.prototype.editListShow = function( i_args)
 		elRoot.style.background = localStorage.background;
 	else
 		elRoot.style.backgroundColor = u_backgroundColor;
+	if( localStorage.text_color && localStorage.text_color.length )
+		elRoot.style.color = localStorage.text_color;
+	else
+		elRoot.style.color = u_textColor;
 
 	elRoot.m_elBtn = document.createElement('div');
 	elRoot.appendChild( elRoot.m_elBtn);
