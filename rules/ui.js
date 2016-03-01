@@ -502,6 +502,22 @@ function u_SearchOnClick()
 		$('search_btn').textContent = 'Close Search';
 		$('search').style.display = 'block';
 
+		if( $('search_flags').m_elFlags )
+			for( var i = 0; i < $('search_flags').m_elFlags.length; i++ )
+				$('search_flags').removeChild( $('search_flags').m_elFlags[i]);
+		$('search_flags').m_elFlags = [];
+		for( var flag in RULES.flags )
+		{
+			el = document.createElement('div');
+			$('search_flags').appendChild( el);
+			el.style.cssFloat = 'left';
+			el.textContent = c_GetFlagTitle( flag);
+			el.m_flag = flag;
+			el.classList.add('flag');
+			el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
+			$('search_flags').m_elFlags.push( el);
+		}
+
 		if( $('search_tags').m_elTags )
 			for( var i = 0; i < $('search_tags').m_elTags.length; i++ )
 				$('search_tags').removeChild( $('search_tags').m_elTags[i]);
@@ -559,6 +575,12 @@ function u_SearchSearch()
 			if( args.artists == null ) args.artists = [];
 			args.artists.push( $('search_artists').m_elArtists[i].m_user);
 		}
+	for( var i = 0; i < $('search_flags').m_elFlags.length; i++)
+		if( $('search_flags').m_elFlags[i].m_selected )
+		{
+			if( args.flags == null ) args.flags = [];
+			args.flags.push( $('search_flags').m_elFlags[i].m_flag);
+		}
 	for( var i = 0; i < $('search_tags').m_elTags.length; i++)
 		if( $('search_tags').m_elTags[i].m_selected )
 		{
@@ -599,6 +621,9 @@ function u_Search( i_args)
 	if( i_args.artists )
 		for( i = 0; i < $('search_artists').m_elArtists.length; i++ )
 			c_ElSetSelected( $('search_artists').m_elArtists[i], i_args.artists.indexOf( $('search_artists').m_elArtists[i].m_user ) != -1 )
+	if( i_args.flags ) 
+		for( i = 0; i < $('search_flags').m_elFlags.length; i++ )
+			c_ElSetSelected( $('search_flags').m_elFlags[i], i_args.flags.indexOf( $('search_flags').m_elFlags[i].m_flag ) != -1 )
 	if( i_args.tags ) 
 		for( i = 0; i < $('search_tags').m_elTags.length; i++ )
 			c_ElSetSelected( $('search_tags').m_elTags[i], i_args.tags.indexOf( $('search_tags').m_elTags[i].m_tag ) != -1 )

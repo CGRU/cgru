@@ -287,6 +287,14 @@ min-height: 19px;
 
 .thumbnail { box-shadow: 0 0 2px rgba(255,255,255,.5); border-radius: 4px; border: 1px solid rgba(98,98,98,.5); }
 
+.flag {
+float:left;
+border-radius: 3px;
+border: 1px solid rgba(98,255,98,.5);
+margin:1px 4px;
+padding:0 4px;
+/*background-color: rgba(0,0,255,.1);*/
+}
 .tag {
 float:left;
 /*cursor: pointer;*/

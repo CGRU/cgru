@@ -420,30 +420,21 @@ function c_GetUserTitle( i_uid, i_guest, i_short)
 	return title;
 }
 
-function c_GetTagTitle( i_tag)
+function c_GetFlagTitle( i_flag) { return c_GetTagProp( i_flag,'flag','title'); }
+function c_GetTagTitle(  i_tag ) { return c_GetTagProp( i_tag, 'tag', 'title'); }
+function c_GetFlagTip (  i_flag) { return c_GetTagProp( i_flag,'flag','tip'); }
+function c_GetTagTip(    i_tag ) { return c_GetTagProp( i_tag, 'tag', 'tip'); }
+function c_GetFlagShort( i_flag) { return c_GetTagProp( i_flag,'flag','short', 3); }
+function c_GetTagShort(  i_tag ) { return c_GetTagProp( i_tag, 'tag', 'short', 3); }
+function c_GetTagProp( i_name, i_type, i_key, i_clamp )
 {
-	var tag = i_tag;
-	if( RULES.tags[tag] && RULES.tags[tag].title )
-		tag = RULES.tags[tag].title;
-	return tag;
-}
-
-function c_GetTagTip( i_tag)
-{
-	var tag = i_tag;
-	if( RULES.tags[tag] && RULES.tags[tag].tip )
-		tag = RULES.tags[tag].tip;
-	return tag;
-}
-
-function c_GetTagShort( i_tag)
-{
-	var tag = i_tag;
-	if( RULES.tags[tag] && RULES.tags[tag].short )
-		tag = RULES.tags[tag].short;
-	else if( tag.length > 3 )
-		tag = tag.substr(0,3);
-	return tag;
+	var val = i_name;
+	var types = i_type + 's';
+	if( RULES[types][i_name] && RULES[types][i_name][i_key] )
+		val = RULES[types][i_name][i_key];
+	if( i_clamp && ( val.length > i_clamp ))
+		val = val.substr(0, i_clamp);
+	return val;
 }
 
 function c_CompareFiles(a,b)

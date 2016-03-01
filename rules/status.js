@@ -77,6 +77,7 @@ function Status( i_obj, i_args)
 		this.elProgressBar = $('status_progressbar');
 		this.elPercentage  = $('status_percentage');
 		this.elArtists     = $('status_artists');
+		this.elFlags       = $('status_flags');
 		this.elTags        = $('status_tags');
 		this.elFramesNum   = $('status_framesnum');
 		this.elFinish      = $('status_finish');
@@ -113,6 +114,7 @@ Status.prototype.show = function( i_status)
 	if( this.elAnnotation ) st_SetElAnnotation( this.obj, this.elAnnotation);
 	if( this.elProgress   ) st_SetElProgress(   this.obj, this.elProgressBar, this.elProgress, this.elPercentage);
 	if( this.elArtists    ) st_SetElArtists(    this.obj, this.elArtists);
+	if( this.elFlags      ) st_SetElFlags(      this.obj, this.elFlags);
 	if( this.elTags       ) st_SetElTags(       this.obj, this.elTags);
 	if( this.elFramesNum  ) st_SetElFramesNum(  this.obj, this.elFramesNum);
 	if( this.elFinish     ) st_SetElFinish(     this.obj, this.elFinish);
@@ -347,6 +349,68 @@ function st_SetElArtists( i_status, i_el, i_short)
 		}
 	}
 }
+function st_SetElFlags( i_status, i_elFlags, i_short)
+{
+	if( i_short )
+	{
+		var flags = '';
+		if( i_status && i_status.flags )
+			for( var i = 0; i < i_status.flags.length; i++)
+			{
+				if( i ) flags += ' ';
+				flags += c_GetFlagShort( i_status.flags[i]);
+			}
+		i_elFlags.textContent = flags;
+		return;
+	}
+
+	if( i_elFlags.m_elFlags )
+		for( i = 0; i < i_elFlags.m_elFlags.length; i++ )
+			i_elFlags.removeChild( i_elFlags.m_elFlags[i]);
+	i_elFlags.m_elFlags = [];
+
+	if( i_status && i_status.flags )
+		for( var i = 0; i < i_status.flags.length; i++)
+		{
+			var el = document.createElement('div');
+			i_elFlags.appendChild( el);
+			i_elFlags.m_elFlags.push( el);
+			el.classList.add('flag');
+			el.textContent = c_GetFlagTitle( i_status.flags[i]);
+			el.title = c_GetFlagTip( i_status.flags[i]);
+		}
+}
+function st_SetElFlags( i_status, i_elFlags, i_short)
+{
+	if( i_short )
+	{
+		var flags = '';
+		if( i_status && i_status.flags )
+			for( var i = 0; i < i_status.flags.length; i++)
+			{
+				if( i ) flags += ' ';
+				flags += c_GetTagShort( i_status.flags[i]);
+			}
+		i_elFlags.textContent = flags;
+		return;
+	}
+
+	if( i_elFlags.m_elFlags )
+		for( i = 0; i < i_elFlags.m_elFlags.length; i++ )
+			i_elFlags.removeChild( i_elFlags.m_elFlags[i]);
+	i_elFlags.m_elFlags = [];
+
+	if( i_status && i_status.flags )
+		for( var i = 0; i < i_status.flags.length; i++)
+		{
+			var el = document.createElement('div');
+			i_elFlags.appendChild( el);
+			i_elFlags.m_elFlags.push( el);
+			el.classList.add('flag');
+			el.textContent = c_GetFlagTitle( i_status.flags[i]);
+			el.title = c_GetFlagTip( i_status.flags[i]);
+		}
+}
 function st_SetElTags( i_status, i_elTags, i_short)
 {
 	if( i_short )
@@ -531,11 +595,16 @@ Status.prototype.edit = function( i_args)
 	this.elEdit_progress.onkeydown = function(e){ if( e.keyCode == 13 ) return false; };
 
 	var artists = {};
+	var flags = {};
 	var tags = {};
 
 	if( this.obj.artists )
 		for( var a = 0; a < this.obj.artists.length; a++)
 			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a])};
+
+	if( this.obj.flags )
+		for( var a = 0; a < this.obj.flags.length; a++)
+			flags[this.obj.flags[a]] = {"title":c_GetFlagTitle( this.obj.flags[a]),"tooltip":c_GetFlagTip( this.obj.flags[a])};
 
 	if( this.obj.tags )
 		for( var a = 0; a < this.obj.tags.length; a++)
@@ -546,6 +615,7 @@ Status.prototype.edit = function( i_args)
 		for( var s = 0; s < i_args.statuses.length; s++)
 		{
 			for( var id in artists ) artists[id].half = true;
+			for( var id in flags   ) flags[id].half   = true;
 			for( var id in tags    ) tags[id].half    = true;
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.artists )
@@ -556,6 +626,16 @@ Status.prototype.edit = function( i_args)
 					artists[id].half = false;
 				else
 					artists[id] = {"title":c_GetUserTitle(id),"half":true};
+			}
+
+			if( i_args.statuses[s].obj && i_args.statuses[s].obj.flags )
+			for( var a = 0; a < i_args.statuses[s].obj.flags.length; a++)
+			{
+				var id = i_args.statuses[s].obj.flags[a];
+				if( flags[id] )
+					flags[id].half = false;
+				else
+					flags[id] = {"title":c_GetFlagTitle(id),"half":true,"tooltip":c_GetFlagTip(id)};
 			}
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.tags )
@@ -572,7 +652,8 @@ Status.prototype.edit = function( i_args)
 	if( c_CanAssignArtists())
 		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":this.elEdit});
 
-	this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":this.elEdit});
+	this.editListShow({"name":'flags',"label":'Flags:',"list":flags,"list_all":RULES.flags,"elEdit":this.elEdit});
+	this.editListShow({"name":'tags', "label":'Tags:', "list":tags, "list_all":RULES.tags, "elEdit":this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_Color);
@@ -1031,6 +1112,7 @@ Status.prototype.editSave = function( i_args)
 	var adinfo = null;
 	var progress = null;
 	var artists = null;
+	var flags = null;
 	var tags = null;
 	var tasks = null;
 
@@ -1083,6 +1165,19 @@ Status.prototype.editSave = function( i_args)
 				artists[elList[i].m_item] = 'selected';
 			else if( elList[i].classList.contains('half_selected'))
 				artists[elList[i].m_item] = 'half';
+		}
+	}
+
+	if( this.elEdit.flags )
+	{
+		flags = {};
+		var elList = this.elEdit.flags;
+		for( var i = 0; i < elList.length; i++)
+		{
+			if( elList[i].m_selected )
+				flags[elList[i].m_item] = 'selected';
+			else if( elList[i].classList.contains('half_selected'))
+				flags[elList[i].m_item] = 'half';
 		}
 	}
 
@@ -1198,6 +1293,20 @@ Status.prototype.editSave = function( i_args)
 			for( var id in artists )
 				if(( artists[id] == 'selected' ) && ( statuses[i].obj.artists.indexOf(id) == -1 ))
 					statuses[i].obj.artists.push( id);
+		}
+
+		if( flags )
+		{
+			if( statuses[i].obj.flags == null )
+				statuses[i].obj.flags = [];
+
+			for( var a = 0; a < statuses[i].obj.flags.length; a++ )
+				if( flags[statuses[i].obj.flags[a]] == null )
+					statuses[i].obj.flags.splice(a,1);
+
+			for( var id in flags )
+				if(( flags[id] == 'selected' ) && ( statuses[i].obj.flags.indexOf(id) == -1 ))
+					statuses[i].obj.flags.push( id);
 		}
 
 		if( tags )

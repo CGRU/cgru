@@ -639,6 +639,15 @@ function sc_FilterShots( i_args)
 		}
 		else found = true;
 
+		if( i_args.flags && found )
+		{
+			found = false;
+			if( st_obj.flags )
+				for( i = 0; i < i_args.flags.length; i++ )
+					if( st_obj.flags.indexOf( i_args.flags[i]) != -1 )
+						{ found = true; break; }
+		}
+
 		if( i_args.tags && found )
 		{
 			found = false;

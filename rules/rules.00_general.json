@@ -12,13 +12,16 @@
 	"recent":99
 },
 
-"tags":{
+"flags":{
 	"started" :{"title":"START",    "short":"St",  "tip":"Started"},
 	"error"   :{"title":"ERROR",    "short":"Err", "tip":"Error"},
 	"hold"    :{"title":"HOLD",     "short":"Hl",  "tip":"On hold"},
 	"omit"    :{"title":"OMIT",     "short":"Om",  "tip":"Omit"},
 	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
+	"sent"    :{"title":"SENT",     "short":"ST",  "tip":"Sent"}
+},
 
+"tags":{
 	"wirem"   :{"title":"WiRem",    "short":"WR",  "tip":"Wire remove"},
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
 	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
