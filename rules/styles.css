@@ -290,9 +290,10 @@ min-height: 19px;
 .flag {
 float:left;
 border-radius: 3px;
-border: 1px solid rgba(98,255,98,.5);
+border: 2px solid rgba(98,255,98,.5);
 margin:1px 4px;
 padding:0 4px;
+font-weight: bold;
 /*background-color: rgba(0,0,255,.1);*/
 }
 .tag {

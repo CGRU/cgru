@@ -447,9 +447,20 @@ function st_SetElColor( i_status, i_elBack, i_elColor, i_setNone)
 	if( i_elColor == null ) i_elColor = i_elBack;
 	if( i_setNone == null ) i_setNone = true;
 
+	var c = null;
 	if( i_status && i_status.color)
 	{
-		var c = i_status.color;
+		c = i_status.color;
+	}
+	else if( i_status && i_status.flags && i_status.flags.length )
+	{
+		var flag = i_status.flags[i_status.flags.length-1];
+		if( RULES.flags[flag] && RULES.flags[flag].clr )
+			c = RULES.flags[flag].clr;
+	}
+
+	if( c )
+	{ 
 		i_elBack.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
 		if( c[0]+c[1]+.3*c[2] > 300 )
 			i_elColor.style.color = '#000';

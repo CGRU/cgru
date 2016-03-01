@@ -188,6 +188,10 @@ function scene_Show()
 		elShot.m_elStatus.appendChild( elSt.elArtists);
 		elSt.elArtists.classList.add('artists');
 
+		elSt.elFlags = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elFlags);
+		elSt.elFlags.classList.add('flags');
+
 		elSt.elTags = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elTags);
 		elSt.elTags.classList.add('tags');
@@ -325,6 +329,10 @@ function scenes_Received( i_data, i_args)
 			elSt.elProgressBar = document.createElement('div');
 			elSt.elProgress.appendChild( elSt.elProgressBar);
 			elSt.elProgressBar.classList.add('progressbar');
+
+			elSt.elFlags = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elFlags);
+			elSt.elFlags.classList.add('flags');
 
 			elSt.elTags = document.createElement('div');
 			elShot.m_elStatus.appendChild( elSt.elTags);
@@ -775,7 +783,7 @@ function sc_DisplayStatistics()
 		var stat = shots[i].m_status.obj;
 		if( stat == null) continue;
 
-		if( stat && stat.tags && ( stat.tags.indexOf('omit') != -1 ))
+		if( stat && stat.flags && ( stat.flags.indexOf('omit') != -1 ))
 		{
 			omits++;
 		}

@@ -13,12 +13,12 @@
 },
 
 "flags":{
-	"started" :{"title":"START",    "short":"St",  "tip":"Started"},
-	"error"   :{"title":"ERROR",    "short":"Err", "tip":"Error"},
-	"hold"    :{"title":"HOLD",     "short":"Hl",  "tip":"On hold"},
-	"omit"    :{"title":"OMIT",     "short":"Om",  "tip":"Omit"},
-	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
-	"sent"    :{"title":"SENT",     "short":"ST",  "tip":"Sent"}
+	"closed"  :{"title":"CLOSED",  "clr":[ 11, 55, 11],"short":"CLS", "tip":"Closed"},
+	"hold"    :{"title":"HOLD",                        "short":"Hl",  "tip":"On hold"},
+	"omit"    :{"title":"OMIT",    "clr":[ 99, 99, 99],"short":"Om",  "tip":"Omit"},
+	"done"    :{"title":"DONE",    "clr":[121,155,121],"short":"D",   "tip":"Done"},
+	"error"   :{"title":"ERROR",   "clr":[255, 55, 55],"short":"Err", "tip":"Error"},
+	"comment" :{"title":"COMMENT", "clr":[222,111,222],"short":"Cmm", "tip":"Comment"}
 },
 
 "tags":{
