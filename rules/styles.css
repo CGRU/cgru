@@ -287,15 +287,6 @@ min-height: 19px;
 
 .thumbnail { box-shadow: 0 0 2px rgba(255,255,255,.5); border-radius: 4px; border: 1px solid rgba(98,98,98,.5); }
 
-.flag {
-float:left;
-border-radius: 3px;
-border: 2px solid rgba(98,255,98,.5);
-margin:1px 4px;
-padding:0 4px;
-font-weight: bold;
-/*background-color: rgba(0,0,255,.1);*/
-}
 .tag {
 float:left;
 /*cursor: pointer;*/
@@ -303,6 +294,15 @@ border-radius: 3px;
 border: 1px solid rgba(98,98,98,.5);
 margin:1px 4px;
 padding:0 4px;
+/*background-color: rgba(0,0,255,.1);*/
+}
+.flag {
+float:left;
+border-radius: 3px;
+border: 2px solid rgba(98,98,98,.5);
+margin:1px 4px;
+padding:0 4px;
+font-weight: bold;
 /*background-color: rgba(0,0,255,.1);*/
 }
 .artist {
@@ -542,7 +542,7 @@ border-radius: 8px;
 .status_edit { clear: both; }
 .status_edit .percent { float:left; margin: 0px 6px; }
 .status_edit .color { clear:both;}
-.status_edit .list { padding: 4px; margin: 2px; /*border-radius: 3px;*/ /*border: 1px solid rgba(0,0,0,.2);*/ }
+.status_edit .list { padding: 4px; margin: 4px; border-radius: 3px; border: 1px solid rgba(98,98,98,.5); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
 .status_edit .edit_tasks .task_add { float: left; }
 .status_edit .edit_tasks .tasks_multiedit_message { float: right; background-color: #F33; padding: 2px 6px; margin: 2px 6px; border-radius: 2px; }
@@ -555,6 +555,7 @@ border-radius: 8px;
 .status_edit .edit_tasks .task .duration { width: 60px; float: left; }
 .status_edit .edit_tasks .tags { clear: both; }
 .status_edit .tag { cursor: pointer; }
+.status_edit .flag { border-width: 4px; padding: 0px 2px; }
 .status_edit .list.edit .artist.edit_me {
 border: 1px solid #50FF50;
 border-width: 1px 3px 1px 3px;

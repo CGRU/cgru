@@ -378,37 +378,12 @@ function st_SetElFlags( i_status, i_elFlags, i_short)
 			el.classList.add('flag');
 			el.textContent = c_GetFlagTitle( i_status.flags[i]);
 			el.title = c_GetFlagTip( i_status.flags[i]);
-		}
-}
-function st_SetElFlags( i_status, i_elFlags, i_short)
-{
-	if( i_short )
-	{
-		var flags = '';
-		if( i_status && i_status.flags )
-			for( var i = 0; i < i_status.flags.length; i++)
-			{
-				if( i ) flags += ' ';
-				flags += c_GetTagShort( i_status.flags[i]);
-			}
-		i_elFlags.textContent = flags;
-		return;
-	}
 
-	if( i_elFlags.m_elFlags )
-		for( i = 0; i < i_elFlags.m_elFlags.length; i++ )
-			i_elFlags.removeChild( i_elFlags.m_elFlags[i]);
-	i_elFlags.m_elFlags = [];
-
-	if( i_status && i_status.flags )
-		for( var i = 0; i < i_status.flags.length; i++)
-		{
-			var el = document.createElement('div');
-			i_elFlags.appendChild( el);
-			i_elFlags.m_elFlags.push( el);
-			el.classList.add('flag');
-			el.textContent = c_GetFlagTitle( i_status.flags[i]);
-			el.title = c_GetFlagTip( i_status.flags[i]);
+			var clr = null;
+			if( RULES.flags[i_status.flags[i]] && RULES.flags[i_status.flags[i]].clr )
+				clr = RULES.flags[i_status.flags[i]].clr;
+			if( clr )
+				st_SetElColor({"color":clr}, el);
 		}
 }
 function st_SetElTags( i_status, i_elTags, i_short)
@@ -805,10 +780,15 @@ Status.prototype.editListShow = function( i_args)
 	i_args.elRoot = elRoot;
 	elRoot.classList.add('list');
 	elRoot.classList.add( i_args.name);
+	if( localStorage.background && localStorage.background.length )
+		elRoot.style.background = localStorage.background;
+	else
+		elRoot.style.backgroundColor = u_backgroundColor;
+
 	elRoot.m_elBtn = document.createElement('div');
 	elRoot.appendChild( elRoot.m_elBtn);
 	elRoot.m_elBtn.classList.add('button');
-	elRoot.m_elBtn.style.cssFloat = 'left';;
+	elRoot.m_elBtn.style.cssFloat = 'left';
 	elRoot.m_elBtn.textContent = i_args.label;
 	elRoot.m_elBtn.m_status = this;
 	elRoot.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editListEdit( i_args);};
@@ -820,6 +800,12 @@ Status.prototype.editListShow = function( i_args)
 		elRoot.m_elList.appendChild( el);
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
+		if( i_args.name == 'flags' )
+		{
+			el.classList.add('flag');
+			if( RULES.flags[id] )
+				st_SetElColor({"color":RULES.flags[id].clr}, el);
+		}
 		if( i_args.name == 'artists' )
 		{
 			el.classList.add('artist');
@@ -868,6 +854,15 @@ Status.prototype.editListEdit = function( i_args)
 		var el = document.createElement('div');
 		i_args.elRoot.appendChild( el);
 		el.classList.add('tag');
+		if( i_args.name == 'flags' )
+		{
+			el.classList.add('flag');
+			if( RULES.flags[item] && RULES.flags[item].clr )
+			{
+				var c = RULES.flags[item].clr;
+				el.style.borderColor = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+			}
+		}
 		el.m_item = item;
 
 		if( i_args.list_all[item].title )
