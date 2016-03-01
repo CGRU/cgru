@@ -1008,8 +1008,8 @@ JobNode.createPanels = function( i_monitor)
 	acts.start  = {"label":"STA","tooltip":'Start job.'};
 	acts.pause  = {"label":"PAU","tooltip":'Pause job.'};
 	acts.stop   = {"label":"STP","tooltip":'Double click to stop job running tasks.',"ondblclick":true};
-	acts.delete = {"label":"DEL","tooltip":'Double click delete job(s).',"ondblclick":true};
-	acts.deldone= {"label":"DDJ","tooltip":'Double click delete all done jobs.',"ondblclick":true,"always_active":true,"handle":'delDoneJobs'};
+	acts.delete = {"label":"DEL","tooltip":'Double click to delete job(s).',"ondblclick":true};
+	acts.deldone= {"label":"DDJ","tooltip":'Double click to delete all done jobs.',"ondblclick":true,"always_active":true,"handle":'delDoneJobs'};
 	i_monitor.createCtrlBtns( acts);
 
 
