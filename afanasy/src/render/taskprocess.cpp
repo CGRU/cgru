@@ -523,7 +523,13 @@ printf("Finished PID=%d: Exit Code=%d Status=%d %s\n", m_pid, i_exitCode, WEXITS
 	// Force to read even empty output to let user to perform finalizing actions.
 	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time),/* i_read_empty = */ true);
 
-	bool success = m_service->checkExitStatus( WEXITSTATUS( i_exitCode));
+#ifdef WINNT
+	bool success = m_service->checkExitStatus( i_exitCode);
+#else
+	bool success = false;
+	if( WIFEXITED( i_exitCode))
+		success = m_service->checkExitStatus( WEXITSTATUS( i_exitCode));
+#endif
 
 	if(( success != true ) || ( m_stop_time != 0 ))
 	{
