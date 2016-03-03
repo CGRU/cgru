@@ -249,13 +249,13 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
       errorHostId = m_hostId;
    }
 
-   // Tasks stop timeout check:
-   if( m_stopTime &&( currentTime - m_stopTime > AFJOB::TASK_STOP_TIMEOUT ))
-   {
-      finish("Task stop timeout.", renders, monitoring);
-      if( changed == false) changed = true;
-      errorHostId = m_hostId;
-   }
+	// Tasks stop timeout check:
+	if( m_stopTime && ( currentTime - m_stopTime > af::Environment::getTaskStopTimeout()))
+	{
+		finish("Task stop timeout.", renders, monitoring);
+		if( changed == false) changed = true;
+		errorHostId = m_hostId;
+	}
 
    return changed;
 }

@@ -120,6 +120,7 @@ public:
 	static inline int getServeTasksSpeed()               { return serve_tasks_speed;            }
 	static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
 	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
+	static inline int getTaskStopTimeout()               { return task_stop_timeout;            }
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
 
 	static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
@@ -273,6 +274,7 @@ private:
 
 	static int serve_tasks_speed;
 	static int task_update_timeout;
+	static int task_stop_timeout;
 	static int task_default_capacity;
 	static int task_log_linesmax;
 

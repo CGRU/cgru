@@ -130,9 +130,13 @@
 	"af_render_updatetaskperiod":1,
 		"":"Period to render to update task state or percentage (even w/o a parser).",
 
-	"af_task_update_timeout":15,
+	"af_task_update_timeout":30,
 		"":"If task progress (state or percentage) has not been updated for this period,",
 		"":"It wiil considered as an error, and render will be push in error hosts list.",
+
+	"af_task_stop_timeout":15,
+		"":"If render was asked to stop a task, but it did not send task finish message,",
+		"":"it wiil be considered as not running any way.",
 
 	"af_render_connectretries":3,
 		"":"Connection fails number to consider that render can`t connect to server.",
