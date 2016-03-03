@@ -600,39 +600,47 @@ Status.prototype.edit = function( i_args)
 	if( i_args && i_args.statuses )
 		for( var s = 0; s < i_args.statuses.length; s++)
 		{
-			for( var id in artists ) artists[id].half = true;
-			for( var id in flags   ) flags[id].half   = true;
-			for( var id in tags    ) tags[id].half    = true;
-
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.artists )
 			for( var a = 0; a < i_args.statuses[s].obj.artists.length; a++)
 			{
+				for( var id in artists )
+					if( i_args.statuses[s].obj.artists.indexOf( id) == -1 ) 
+						artists[id].half = true;
+
 				var id = i_args.statuses[s].obj.artists[a];
-				if( artists[id] )
-					artists[id].half = false;
-				else
+				if( artists[id] == null )
 					artists[id] = {"title":c_GetUserTitle(id),"half":true};
 			}
+			else
+				for( var id in artists ) artists[id].half = true;
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.flags )
 			for( var a = 0; a < i_args.statuses[s].obj.flags.length; a++)
 			{
+				for( var id in flags )
+					if( i_args.statuses[s].obj.flags.indexOf( id) == -1 ) 
+						flags[id].half = true;
+
 				var id = i_args.statuses[s].obj.flags[a];
-				if( flags[id] )
-					flags[id].half = false;
-				else
+				if( flags[id] == null )
 					flags[id] = {"title":c_GetFlagTitle(id),"half":true,"tooltip":c_GetFlagTip(id)};
 			}
+			else
+				for( var id in flags ) flags[id].half = true;
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.tags )
 			for( var a = 0; a < i_args.statuses[s].obj.tags.length; a++)
 			{
+				for( var id in tags )
+					if( i_args.statuses[s].obj.tags.indexOf( id) == -1 ) 
+						tags[id].half = true;
+
 				var id = i_args.statuses[s].obj.tags[a];
-				if( tags[id] )
-					tags[id].half = false;
-				else
+				if( tags[id] == null )
 					tags[id] = {"title":c_GetTagTitle(id),"half":true,"tooltip":c_GetTagTip(id)};
 			}
+			else
+				for( var id in tags ) tags[id].half = true;
 		}
 
 	if( c_CanAssignArtists())
@@ -922,7 +930,7 @@ Status.prototype.editArtistsEdit = function( i_args)
 			el.classList.add('artist');
 			el.m_item = artist.id;
 			if( artist.id == g_auth_user.id )
-				el.classList.add('edit_me');
+				el.classList.add('me');
 
 			if( g_users[artist.id] && g_users[artist.id].disabled )
 				el.classList.add('disabled');
@@ -1170,12 +1178,8 @@ Status.prototype.editSave = function( i_args)
 		artists = {};
 		var elList = this.elEdit.artists;
 		for( var i = 0; i < elList.length; i++)
-		{
 			if( elList[i].m_selected )
 				artists[elList[i].m_item] = 'selected';
-			else if( elList[i].classList.contains('half_selected'))
-				artists[elList[i].m_item] = 'half';
-		}
 	}
 
 	if( this.elEdit.flags )
@@ -1183,12 +1187,8 @@ Status.prototype.editSave = function( i_args)
 		flags = {};
 		var elList = this.elEdit.flags;
 		for( var i = 0; i < elList.length; i++)
-		{
 			if( elList[i].m_selected )
 				flags[elList[i].m_item] = 'selected';
-			else if( elList[i].classList.contains('half_selected'))
-				flags[elList[i].m_item] = 'half';
-		}
 	}
 
 	if( this.elEdit.tags )
@@ -1196,12 +1196,8 @@ Status.prototype.editSave = function( i_args)
 		tags = {};
 		var elList = this.elEdit.tags;
 		for( var i = 0; i < elList.length; i++)
-		{
 			if( elList[i].m_selected )
 				tags[elList[i].m_item] = 'selected';
-			else if( elList[i].classList.contains('half_selected'))
-				tags[elList[i].m_item] = 'half';
-		}
 	}
 
 	if( this.elEdit_tasks.elTasks )
@@ -1296,9 +1292,10 @@ Status.prototype.editSave = function( i_args)
 			if( statuses[i].obj.artists == null )
 				statuses[i].obj.artists = [];
 
-			for( var a = 0; a < statuses[i].obj.artists.length; a++ )
+			for( var a = 0; a < statuses[i].obj.artists.length; )
 				if( artists[statuses[i].obj.artists[a]] == null )
 					statuses[i].obj.artists.splice(a,1);
+				else a++;
 
 			for( var id in artists )
 				if(( artists[id] == 'selected' ) && ( statuses[i].obj.artists.indexOf(id) == -1 ))
@@ -1310,9 +1307,10 @@ Status.prototype.editSave = function( i_args)
 			if( statuses[i].obj.flags == null )
 				statuses[i].obj.flags = [];
 
-			for( var a = 0; a < statuses[i].obj.flags.length; a++ )
+			for( var a = 0; a < statuses[i].obj.flags.length; )
 				if( flags[statuses[i].obj.flags[a]] == null )
 					statuses[i].obj.flags.splice(a,1);
+				else a++;
 
 			for( var id in flags )
 				if(( flags[id] == 'selected' ) && ( statuses[i].obj.flags.indexOf(id) == -1 ))
@@ -1324,9 +1322,10 @@ Status.prototype.editSave = function( i_args)
 			if( statuses[i].obj.tags == null )
 				statuses[i].obj.tags = [];
 
-			for( var a = 0; a < statuses[i].obj.tags.length; a++ )
+			for( var a = 0; a < statuses[i].obj.tags.length; )
 				if( tags[statuses[i].obj.tags[a]] == null )
 					statuses[i].obj.tags.splice(a,1);
+				else a++;
 
 			for( var id in tags )
 				if(( tags[id] == 'selected' ) && ( statuses[i].obj.tags.indexOf(id) == -1 ))

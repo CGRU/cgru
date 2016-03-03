@@ -315,7 +315,7 @@ background-size: 20px;
 background-repeat: no-repeat;
 background-position: left;
 }
-.artist.me { background-color: rgba(100,255,100,.5); }
+.artist.me { border: 1px solid #88FF88; box-shadow: 0 0 8px #88FF88 inset, 0 0 2px #88FF88; border-width: 1px 3px 1px 3px; }
 .artist.disabled { text-decoration: line-through; }
 .tag.short { margin: 0 1px; /*padding-right: 2px;*/ }
 .artists, .tags {
@@ -556,11 +556,6 @@ border-radius: 8px;
 .status_edit .edit_tasks .tags { clear: both; }
 .status_edit .tag { cursor: pointer; }
 .status_edit .flag { border-width: 4px; padding: 0px 2px; }
-.status_edit .list.edit .artist.edit_me {
-border: 1px solid #50FF50;
-border-width: 1px 3px 1px 3px;
-box-shadow: 0px 0px 12px #80FF80;
-}
 
 table.statistics { border-collapse: collapse; }
 table.statistics th { font-weight: normal; font-style: italic; }
