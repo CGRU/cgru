@@ -1312,9 +1312,37 @@ Status.prototype.editSave = function( i_args)
 					statuses[i].obj.flags.splice(a,1);
 				else a++;
 
+			// Store existing flags to check was it ON before:
+			var _flags = [];
+			for( var a = 0; a < statuses[i].obj.flags.length; a++)
+				_flags.push(statuses[i].obj.flags[a]);
+
 			for( var id in flags )
-				if(( flags[id] == 'selected' ) && ( statuses[i].obj.flags.indexOf(id) == -1 ))
+				if(( flags[id] == 'selected' ) && ( _flags.indexOf(id) == -1 ))
+				{
+					if( RULES.flags[id])
+					{
+						// Flag can limit minium and maximum progress percentage:
+						var p_min = RULES.flags[id].p_min;
+						var p_max = RULES.flags[id].p_max;
+						var progress = statuses[i].obj.progress;
+
+						if( p_min && (( progress == null ) || ( progress < p_min )))
+							progress = p_min;
+
+						if( p_max && (( p_max < 0 ) || ( progress > p_max )))
+							progress = p_max;
+
+						if( progress != null )
+							statuses[i].obj.progress = progress;
+
+						// Flag can be exclusive, so we should delete other flags:
+						if( RULES.flags[id].excl )
+							statuses[i].obj.flags = [];
+					}
+
 					statuses[i].obj.flags.push( id);
+				}
 		}
 
 		if( tags )
