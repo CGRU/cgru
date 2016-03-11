@@ -45,6 +45,9 @@ ViewItems::ViewItems( QWidget * parent):
     setSpacing( 3);
     setUniformItemSizes( false);
 
+    setHorizontalScrollMode(ScrollPerPixel);
+    setVerticalScrollMode(ScrollPerPixel);
+
     #if QT_VERSION >= 0x040300
     setSelectionRectVisible( true);
     #endif
