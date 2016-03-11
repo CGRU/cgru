@@ -797,10 +797,12 @@ function sc_DisplayStatistics()
 		}
 	}
 
-	var info = 'shots count: ' + (shots.length - omits);
+	var info = 'Shots count: <big><b>' + (shots.length - omits) + '</big></b>';
 	if( omits ) info += ' (+' + omits + ' omits)';
 	if( shots.length )
-		info += ', average progress: ' + Math.floor(progress/(shots.length-omits)) + '%';
+		info += '<br>Average progress: ' + Math.floor(progress/(shots.length-omits)) + '%';
+
+	info += '<br>Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
 
 	if( ASSET.type == 'scenes')
 	{
@@ -816,13 +818,11 @@ function sc_DisplayStatistics()
 				}
 			}
 		}
-		info = 'scenes count: ' + scenes_count + '<br>' + info;
+		info += '<br>Scenes count: ' + scenes_count;
 	}
 
 	if( selShots.length )
-		info = 'selected ' + info;
-
-	info += '<br>frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
+		info = '<i><b>Selected:</b></i><br>' + info;
 
 	$('scenes_info').innerHTML = info;
 
