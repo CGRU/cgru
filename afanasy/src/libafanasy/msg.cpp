@@ -99,7 +99,7 @@ void Msg::construct()
 bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 {
 	if( m_type == Msg::TInvalid) return false;
-	if( i_size > Msg::SizeBufferLimit)
+    if( i_size < 0 || i_size > Msg::SizeBufferLimit)
 	{
 		AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)", i_size, Msg::SizeBufferLimit)
 		setInvalid();

@@ -26,6 +26,13 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std
 
 char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err)
 {
+    if( i_data_len < 0 || i_data_len > Msg::SizeBufferLimit)
+    {
+        if( o_err )
+            *o_err = "Invalid buffer size";
+        AFERRAR("jsonParseData: size > Msg::SizeBufferLimit ( %d > %d)", i_data_len, Msg::SizeBufferLimit);
+        return NULL;
+    }
 	char * data = new char[i_data_len+1];
 	memcpy( data, i_data, i_data_len);
 	data[i_data_len] = '\0';
