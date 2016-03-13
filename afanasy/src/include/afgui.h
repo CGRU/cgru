@@ -2,7 +2,7 @@
 
 namespace AFGUI
 {
-	const char THEME[] = "Civil";
+	const char THEME[] = "Light";
 
 	const int SAVEPREFSONEXIT = 1;
 	const int SAVEWNDRECTS = 1;
