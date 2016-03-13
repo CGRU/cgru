@@ -1283,7 +1283,8 @@ Status.prototype.editSave = function( i_args)
 		if( progress   !== null )
 		{
 			progresses[statuses[i].path] = progress;
-			if( progress != statuses[i].obj.progress ) some_progress_changed = true;
+			if( progress != statuses[i].obj.progress )
+				some_progress_changed = true;
 			statuses[i].obj.progress = progress;
 		}
 
@@ -1334,7 +1335,13 @@ Status.prototype.editSave = function( i_args)
 							progress = p_max;
 
 						if( progress != null )
+						{
 							statuses[i].obj.progress = progress;
+
+							// This needed to update upper pogresses:
+							progresses[statuses[i].path] = progress;
+							some_progress_changed = true;
+						}
 
 						// Flag can be exclusive, so we should delete other flags:
 						if( RULES.flags[id].excl )
@@ -1489,8 +1496,8 @@ function st_SetTimeCode( i_tc)
 
 function st_UpdateProgresses( i_path, i_progresses)
 {
-	paths = [];
-	progresses = {};
+	var paths = [];
+	var progresses = {};
 	if( i_progresses ) progresses = i_progresses;
 
 	var paths_skip_save = [];
@@ -1507,12 +1514,17 @@ function st_UpdateProgresses( i_path, i_progresses)
 	}
 //console.log( paths);
 //console.log(JSON.stringify(i_progresses));
-	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,"paths_skip_save":paths_skip_save,
+	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,
+		"progresses":progresses,"paths_skip_save":paths_skip_save,
 		"info":'walk upstatuses',"rufiles":['status'],"lookahead":['status']});
 }
 function st_UpdateProgressesWalkReceived( i_walks, i_args)
 {
 	if( i_walks == null ) return;
+
+//console.log(JSON.stringify(i_args));
+	var paths = i_args.paths;
+	var progresses = i_args.progresses;
 
 	// Update only progess in navig:
 	var navig_params_update = {};
@@ -1520,7 +1532,7 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 
 	for( var w = i_walks.length-1; w >= 0; w--)
 	{
-//window.console.log( i_walks[w]);
+//console.log(JSON.stringify(i_walks[w]));
 		if( i_walks[w].error )
 		{
 			c_Error( i_walks[w].error);
@@ -1542,25 +1554,27 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 			if( c_AuxFolder( folder.name)) continue;
 
 			var path = paths[w] + '/' + folder.name;
-			if( progresses[path] != null )
+			if(( progresses[path] != null ) && ( progresses[path] != -1 ))
 			{
 				progress += progresses[path];
 			}
 			else
 			{
-				// Here we set and save 0% progress on a neighbour folders,
-				// we status or pregress is not set at all:
-
 				if(( folder.status == null ) || ( folder.status.progress == null ))
 				{
-					// Siblinkgs are only at last walk ( earlier are parents )
+				// Here we set and save 0% progress on a neighbour folders,
+				// if status or progress is not set at all:
+
+					// Siblings are only at last walk ( earlier are parents )
 					if( w != (i_walks.length-1)) continue;
 
 					// Save only progress:
 					st_Save({"progress":0}, path,/*func=*/null,/*args=*/null, navig_params_update);
 				}
-				else if( folder.status.progress < 0 ) continue;
-				else progress += folder.status.progress;
+				else if( folder.status.progress < 0 )
+					continue;
+				else
+					progress += folder.status.progress;
 			}
 			progress_count++;
 		}
