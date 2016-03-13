@@ -88,6 +88,9 @@ WndCustomizeGUI::WndCustomizeGUI():
 
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Highlight       ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_HighlightedText ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Link            ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_LinkVisited     ));
+
 
 	label = new QLabel("Watch specific colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
@@ -109,13 +112,6 @@ WndCustomizeGUI::WndCustomizeGUI():
 	vlayout->setSpacing( 2);
 	hlayout->addLayout( vlayout);
 
-
-	label = new QLabel("Qt not used palette:", this);
-	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
-	vlayout->addWidget( label);
-
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Link        ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_LinkVisited ));
 
 	label = new QLabel("Job Colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);

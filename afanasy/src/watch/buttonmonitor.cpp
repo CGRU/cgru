@@ -107,10 +107,10 @@ void ButtonMonitor::createImage()
       height = img.height();
       static const int images_num = 4;
       QImage * images[images_num] = { &img, &img_h, &img_p, &img_t};
-      QColor back;
-      if( af::Environment::GOD())         back = afqt::QEnvironment::clr_LinkVisited.c;
-      else if( af::Environment::VISOR())  back = afqt::QEnvironment::clr_Link.c;
-      else                                back = afqt::QEnvironment::clr_Window.c;
+
+		QColor back;
+		back = afqt::QEnvironment::clr_Window.c;
+
       for( int i = 0; i < 4; i++)
       for( int y = 0; y < height; y++)
       for( int x = 0; x < width; x++)
@@ -138,18 +138,8 @@ void ButtonMonitor::createImage()
    }
    else
    {
-      switch( type)
-      {
-         case Watch::WJobs:
-         case Watch::WRenders:
-         case Watch::WUsers:
-            width = 110;
-            height = 30;
-            break;
-         case Watch::WMonitors:
-            width = 40;
-            height = 24;
-      }
+		width = 110;
+		height = 30;
    }
 
    setFixedSize( width, height);

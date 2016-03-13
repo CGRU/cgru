@@ -97,7 +97,8 @@ Dialog::Dialog():
     m_labelversion = new LabelVersion(this);
     m_vlayout_b->addWidget( m_labelversion);
 
-    m_topleft  = new QWidget( this);
+//    m_topleft  = new QWidget( this);
+	m_topleft  = new QLabel("", this);
     m_topright = new QWidget( this);
     m_hlayout_b->addWidget( m_topleft);
     m_btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
@@ -191,6 +192,8 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
     connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferencesOnExit() ));
     submenu->addAction( action);
 
+	submenu->addSeparator();
+
     action = new QAction( "Save GUI", this);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveGUIOnExit.n != 0);
@@ -202,6 +205,8 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
     action->setChecked( afqt::QEnvironment::saveWndRectsOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveWndRectsOnExit() ));
     submenu->addAction( action);
+
+	submenu->addSeparator();
 
     action = new QAction( "Show Offline Noise", this);
     action->setCheckable( true);
@@ -462,13 +467,11 @@ void Dialog::keyPressEvent( QKeyEvent * event)
          m_btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
          m_hlayout_b->addWidget( m_btnMonitor[Watch::WMonitors]);
 
-         setBackgroundRole( QPalette::LinkVisited );
-         displayWarning("GOD MODE");
+			m_topleft->setText("GOD MODE");
       }
       else if( af::Environment::VISOR())
       {
-         setBackgroundRole( QPalette::Link );
-         displayWarning("VISOR MODE");
+			m_topleft->setText("VISOR MODE");
       }
       else
       {
@@ -477,9 +480,7 @@ void Dialog::keyPressEvent( QKeyEvent * event)
             delete m_btnMonitor[Watch::WMonitors];
             m_btnMonitor[Watch::WMonitors] = NULL;
          }
-
-         setBackgroundRole( QPalette::NoRole );
-         displayWarning("SUPER USER MODE OFF");
+			m_topleft->setText("");
       }
       int opened_type = m_monitorType ;
       closeList();

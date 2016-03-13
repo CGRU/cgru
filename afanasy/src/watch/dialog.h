@@ -14,6 +14,7 @@
 #include <QtGui/QListWidget>
 #include <QtCore/QTimer>
 #include <QtGui/QWidget>
+#include <QtGui/QLabel>
 
 class ButtonOut;
 class ButtonMonitor;
@@ -121,7 +122,8 @@ private:
     QPixmap m_img_botleft;
     QPixmap m_img_botright;
 
-    QWidget * m_topleft;
+//	QWidget * m_topleft;
+	QLabel * m_topleft;
     QWidget * m_topright;
 
     static int ms_size_border_top;
