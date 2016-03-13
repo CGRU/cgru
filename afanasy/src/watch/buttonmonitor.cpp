@@ -256,14 +256,31 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
          painter.drawImage( rect(), img_h);
       else
          painter.drawImage( rect(), img);
+
+		return;
    }
-   else
-   {
-      QString text = Watch::BtnName[type];
-      if( pressed ) text = QString("[%1]").arg(text);
-      else if( type == CurrentType) text = QString("[*%1*]").arg(text);
-      else if( hovered ) text = QString("=%1=").arg(text);
-      painter.drawText( 0, 0, width-1, height-1, Qt::AlignHCenter | Qt::AlignVCenter, text);
-      painter.drawRect( 0, 0, width-1, height-1);
-   }
+
+	static const int margin_x = 2;
+	static const int margin_y = 2;
+	QRect rct( margin_x, margin_y, width-1-margin_x, height-1-margin_y);
+
+	QColor color( afqt::QEnvironment::clr_Light.c);
+	if( pressed )
+		color.setAlphaF( .8);
+	else if( type == CurrentType )
+		color.setAlphaF( .6);
+	else if( hovered )
+		color.setAlphaF( .4);
+	else
+		color.setAlphaF( .2);
+	painter.setBrush( QBrush( color, Qt::SolidPattern));
+	painter.drawRoundedRect( rct, 2.5, 2.5);
+
+	QFont font = painter.font();
+	font.setBold( false);
+	if( type == CurrentType )
+		font.setBold( true);
+	painter.setFont( font);
+
+	painter.drawText( rct, Qt::AlignHCenter | Qt::AlignVCenter, Watch::BtnName[type]);
 }
