@@ -29,6 +29,7 @@ namespace AFGUI
 	// Qt GUI Palette:
 	const char CLR_WINDOW[]          = "4E4E4E";
 	const char CLR_WINDOWTEXT[]      = "CFCFCF";
+	const char CLR_DISABLEDTEXT[]    = "777777";
 	const char CLR_BASE[]            = "3F3F3F";
 	const char CLR_TEXT[]            = "BABABA";
 	const char CLR_BUTTON[]          = "919191";
@@ -87,6 +88,7 @@ namespace AFGUI
 	// Qt GUI Palette:
 	const char CLR_WINDOW[]          = "5F7844";
 	const char CLR_WINDOWTEXT[]      = "320000";
+	const char CLR_DISABLEDTEXT[]    = "777777";
 	const char CLR_BASE[]            = "AAE682";
 	const char CLR_TEXT[]            = "0A1E05";
 	const char CLR_BUTTON[]          = "93BE57";

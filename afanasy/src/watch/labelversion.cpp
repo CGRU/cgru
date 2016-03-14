@@ -115,7 +115,7 @@ void LabelVersion::paintEvent( QPaintEvent * event)
       p.drawPixmap( 0, 0, logo);
 */
     // Draw text:
-    p.setPen( afqt::QEnvironment::qclr_black);
+	p.setPen( afqt::QEnvironment::clr_DisabledText.c);
     p.setFont( font);
     p.drawText( rect(), Qt::AlignCenter, label);
 }

@@ -67,6 +67,7 @@ public:
 
 	static AttrColor clr_Window;
 	static AttrColor clr_WindowText;
+	static AttrColor clr_DisabledText;
 	static AttrColor clr_Base;
 	// static   AttrColor clr_AlternateBase;
 	static AttrColor clr_Text;

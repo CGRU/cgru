@@ -9,7 +9,7 @@
 #include <QtGui/QContextMenuEvent>
 
 CtrlRenders::CtrlRenders( QWidget * i_parent, ListRenders * i_renderslist):
-	QLabel( "[View Oprions]", i_parent ),
+	QLabel( "[View Options]", i_parent ),
    m_list( i_renderslist)
 {
    setFixedHeight(16);

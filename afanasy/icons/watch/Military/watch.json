@@ -29,7 +29,8 @@
 	"font_sizeplotter"      : 7,
 
 	"clr_Window"            :"5F7844",
-	"clr_WindowText"        :"320000",
+	"clr_WindowText"        :"002000",
+	"clr_DisabledText"      :"103000",
 	"clr_Base"              :"AAE682",
 	"clr_Text"              :"0A1E05",
 	"clr_Button"            :"93BE57",

@@ -75,6 +75,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Window          ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_WindowText      ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_DisabledText    ));
 	//vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_AlternateBase ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Base            ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Text            ));

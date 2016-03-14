@@ -30,6 +30,7 @@
 
 	"clr_Window"            :"C894C1",
 	"clr_WindowText"        :"141414",
+	"clr_DisabledText"      :"775599",
 	"clr_Base"              :"E6E6E6",
 	"clr_Text"              :"1E1E1E",
 	"clr_Button"            :"BEBEBE",

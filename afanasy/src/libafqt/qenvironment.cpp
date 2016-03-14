@@ -57,6 +57,7 @@ AttrNumber QEnvironment::font_sizeplotter(   "font_sizeplotter",     "Size Plott
 
 AttrColor QEnvironment::clr_Window(          "clr_Window",           "Window",                  AFGUI::CLR_WINDOW              );
 AttrColor QEnvironment::clr_WindowText(      "clr_WindowText",       "Window Text",             AFGUI::CLR_WINDOWTEXT          );
+AttrColor QEnvironment::clr_DisabledText(    "clr_DisabledText",     "Disabled Text",           AFGUI::CLR_DISABLEDTEXT        );
 AttrColor QEnvironment::clr_Base(            "clr_Base",             "Base Color",              AFGUI::CLR_BASE                );
 //AttrColor QEnvironment::clr_AlternateBase AFGUI::CLR_ALTERNATEBASE
 AttrColor QEnvironment::clr_Text(            "clr_Text",             "Text",                    AFGUI::CLR_TEXT                );
@@ -174,6 +175,7 @@ QEnvironment::QEnvironment( const QString & i_name)
 
     ms_attrs_gui.append( &clr_Window          );
     ms_attrs_gui.append( &clr_WindowText      );
+    ms_attrs_gui.append( &clr_DisabledText    );
     ms_attrs_gui.append( &clr_Base            );
     //attrs_gui.append( &clr_AlternateBase   );
     ms_attrs_gui.append( &clr_Text            );
@@ -306,6 +308,9 @@ void QEnvironment::setPalette( QPalette & palette)
 	palette.setColor( QPalette::HighlightedText, clr_HighlightedText.c );
 	palette.setColor( QPalette::Link,            clr_Link.c            );
 	palette.setColor( QPalette::LinkVisited,     clr_LinkVisited.c     );
+
+	palette.setColor( QPalette::Disabled, QPalette::WindowText, clr_DisabledText.c );
+	palette.setColor( QPalette::Disabled, QPalette::Highlight,  clr_Window.c       );
 }
 
 bool QEnvironment::save()
