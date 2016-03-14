@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
 
    QApplication app(argc, argv);
    app.setWindowIcon( QIcon( afqt::stoq( ENV.getCGRULocation()) + "/icons/afwatch.png"));
+	app.setStyle("plastique");
 
    Dialog dialog;
    if( !dialog.isInitialized())

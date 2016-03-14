@@ -284,26 +284,28 @@ QEnvironment::~QEnvironment()
 
 void QEnvironment::setPalette( QPalette & palette)
 {
-   for( int i = 0; i < 3; i++)
-   {
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Window,          clr_Window.c          );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::WindowText,      clr_WindowText.c      );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Base,            clr_Base.c            );
-//      palette.setColor( QPalette::ColorGroup(i), QPalette::AlternateBase,   clr_AlternateBase.c   );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Text,            clr_Text.c            );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Button,          clr_Button.c          );
+	palette.setColor( QPalette::Window,          clr_Window.c          );
+	palette.setColor( QPalette::WindowText,      clr_WindowText.c      );
+	palette.setColor( QPalette::Base,            clr_Base.c            );
+	palette.setColor( QPalette::Text,            clr_Text.c            );
+	palette.setColor( QPalette::Button,          clr_Button.c          );
 
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Light,           clr_Light.c           );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Midlight,        clr_Midlight.c        );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Mid,             clr_Mid.c             );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Dark,            clr_Dark.c            );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Shadow,          clr_Shadow.c          );
+	palette.setColor( QPalette::ButtonText,      clr_Text.c            );
+	palette.setColor( QPalette::BrightText,      clr_Text.c            );
+	palette.setColor( QPalette::ToolTipBase,     clr_Window.c          );
+	palette.setColor( QPalette::ToolTipText,     clr_WindowText.c      );
+	palette.setColor( QPalette::AlternateBase,   clr_Base.c            );
 
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Highlight,       clr_Highlight.c       );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::HighlightedText, clr_HighlightedText.c );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::Link,            clr_Link.c            );
-      palette.setColor( QPalette::ColorGroup(i), QPalette::LinkVisited,     clr_LinkVisited.c     );
-   }
+	palette.setColor( QPalette::Light,           clr_Light.c           );
+	palette.setColor( QPalette::Midlight,        clr_Midlight.c        );
+	palette.setColor( QPalette::Mid,             clr_Mid.c             );
+	palette.setColor( QPalette::Dark,            clr_Dark.c            );
+	palette.setColor( QPalette::Shadow,          clr_Shadow.c          );
+
+	palette.setColor( QPalette::Highlight,       clr_Highlight.c       );
+	palette.setColor( QPalette::HighlightedText, clr_HighlightedText.c );
+	palette.setColor( QPalette::Link,            clr_Link.c            );
+	palette.setColor( QPalette::LinkVisited,     clr_LinkVisited.c     );
 }
 
 bool QEnvironment::save()
