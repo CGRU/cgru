@@ -190,8 +190,8 @@ void BlockInfo::refresh()
 	if( varcapacity   ) str_properties += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
 	str_properties += QString("%1]").arg( capacity);
 
-	if( errorhostsnum ) str_avoiderrors  = QString( "e%1").arg( errorhostsnum);
-	if( avoidhostsnum ) str_avoiderrors += QString(" %1A").arg( avoidhostsnum);
+	if( errorhostsnum ) str_avoiderrors  = QString( "Hosts Err:%1").arg( errorhostsnum);
+	if( avoidhostsnum ) str_avoiderrors += QString("/%1:Avoid").arg( avoidhostsnum);
 
 	QString tasksinfo = QString("t%1").arg( tasksnum);
 	if( numeric )
@@ -268,7 +268,8 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 	static const int y_bars       = 12;
 
 	painter->setFont( afqt::QEnvironment::f_info);
-	painter->setPen( Item::clrTextInfo( runningtasksnumber, option.state & QStyle::State_Selected, item->isLocked()));
+	QPen pen( Item::clrTextInfo( runningtasksnumber, option.state & QStyle::State_Selected, item->isLocked()));
+	painter->setPen( pen);
 	QRect rect_properties;
 	painter->drawText( x, y+y_properties, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_properties, &rect_properties );
 
@@ -293,46 +294,49 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 		xoffset += 40;
 	}
 
-	painter->drawText( x+xoffset, y+y_properties, w-rect_properties.width()-20-xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
-	QRect rect_progress;
-	painter->drawText( x+xoffset, y+y_progress,   w-5-xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_progress, &rect_progress);
-	painter->drawText( x+xoffset, y+y_progress,   w-rect_progress.width()-10-xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
-
-	int progress_w_offset = 0;
-
+	int error_hosts_text_width = 0;
 	if( errorhostsnum )
 	{
-		progress_w_offset = 20;
 		if( avoidhostsnum )
-		{
 			painter->setPen( afqt::QEnvironment::clr_error.c);
-			progress_w_offset += 30;
-		}
-		painter->drawText( x, y+y_bars+2, w, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors );
+		else
+			painter->setPen( afqt::QEnvironment::clr_errorready.c);
+
+		QRect rect_errorhosts;
+		painter->drawText( x+xoffset, y+y_progress, w-5-xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors, &rect_errorhosts);
+		error_hosts_text_width = rect_errorhosts.width() + 10;
 	}
+
+	painter->setPen( pen);
+	painter->drawText( x+xoffset, y+y_properties, w-rect_properties.width()-20-xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
+	QRect rect_progress;
+	painter->drawText( x+xoffset, y+y_progress,   w-5-xoffset-error_hosts_text_width, 15, Qt::AlignRight | Qt::AlignTop, str_progress, &rect_progress);
+	painter->drawText( x+xoffset, y+y_progress,   w-rect_progress.width()-10-xoffset-error_hosts_text_width, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
+
+
 	Item::drawPercent
 	(
-		painter, x+xoffset, y+y_bars, w-progress_w_offset-xoffset, 4,
+		painter, x+xoffset, y+y_bars, w-xoffset, 4,
 		jobid == AFJOB::SYSJOB_ID ? runningtasksnumber + tasksready + taskserror : tasksnum,
 		jobid == AFJOB::SYSJOB_ID ? 0 : tasksdone, taskserror, runningtasksnumber,
 		false
 	);
 	Item::drawPercent
 	(
-		painter, x+xoffset, y+y_bars+4, w-progress_w_offset-xoffset, 4,
+		painter, x+xoffset, y+y_bars+4, w-xoffset, 4,
 		100,
 		percentage, 0, 0,
 		false
 	);
 	drawProgress
 	(
-		painter, x+1+xoffset, y+y_bars+8, w-progress_w_offset-xoffset, 6,
+		painter, x+1+xoffset, y+y_bars+8, w-xoffset, 6,
 		backcolor
 	);
 
 	painter->setPen( afqt::QEnvironment::clr_outline.c );
 	painter->setBrush( Qt::NoBrush);
-	painter->drawRect( x-1+xoffset, y+y_bars-1, w-progress_w_offset+1-xoffset, 15);
+	painter->drawRect( x-1+xoffset, y+y_bars-1, w+1-xoffset, 15);
 }
 
 void BlockInfo::drawProgress(
