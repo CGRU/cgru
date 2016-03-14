@@ -6,7 +6,7 @@
 #include <QtGui/QContextMenuEvent>
 
 CtrlJobs::CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs):
-	QLabel( "[O]", i_parent ),
+	QLabel( "[View Options]", i_parent ),
 	m_listjobs( i_listjobs)
 {
 	setFixedHeight(16);

@@ -255,6 +255,8 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
 	QRect rct( margin_x, margin_y, width-1-margin_x, height-1-margin_y);
 
 	QColor color( afqt::QEnvironment::clr_Light.c);
+	QPen pen( Qt::SolidLine);
+	pen.setColor( afqt::QEnvironment::clr_Dark.c);
 	if( pressed )
 		color.setAlphaF( .8);
 	else if( type == CurrentType )
@@ -263,6 +265,7 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
 		color.setAlphaF( .4);
 	else
 		color.setAlphaF( .2);
+	painter.setPen( pen);
 	painter.setBrush( QBrush( color, Qt::SolidPattern));
 	painter.drawRoundedRect( rct, 2.5, 2.5);
 
@@ -271,6 +274,9 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
 	if( type == CurrentType )
 		font.setBold( true);
 	painter.setFont( font);
+
+	pen.setColor( afqt::QEnvironment::clr_Text.c);
+	painter.setPen( pen);
 
 	painter.drawText( rct, Qt::AlignHCenter | Qt::AlignVCenter, Watch::BtnName[type]);
 }

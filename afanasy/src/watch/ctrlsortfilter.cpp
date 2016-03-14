@@ -54,7 +54,7 @@ const char * CtrlSortFilter::TNAMES_SHORT[] = {
 
 CtrlSortFilter::CtrlSortFilter( QWidget * parent,
       int * SortType, bool * SortAscending, int * FilterType, bool * FilterInclude, bool * FilterMatch, QString * FilterString):
-   QWidget(       parent         ),
+   QFrame(        parent         ),
    sorttype(      SortType       ),
    sortascending( SortAscending  ),
    filter(        FilterString   ),
@@ -73,15 +73,15 @@ CtrlSortFilter::CtrlSortFilter( QWidget * parent,
    label = new QLabel( "label", this);
 
    QLineEdit * lineEdit = new QLineEdit( *filter, this);
-   lineEdit->setFrame( false);
 
    layout = new QHBoxLayout( this);
    layout->addWidget( label);
    layout->addWidget( lineEdit);
 
-//   setAttribute ( Qt::WA_DeleteOnClose, true );
-   setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed);
-   setAutoFillBackground( true);
+//   setSizePolicy( QSizePolicy::Minimum, QSizePolicy::Fixed);
+	setAutoFillBackground( true);
+	setFrameShape(QFrame::StyledPanel);
+	setFrameShadow(QFrame::Raised);
 
    connect( lineEdit, SIGNAL( textChanged( const QString & )), this, SLOT( actFilter( const QString & )) );
 
@@ -261,30 +261,3 @@ void CtrlSortFilter::selLabel()
       setBackgroundRole( QPalette::Link );
 }
 
-void CtrlSortFilter::paintEvent( QPaintEvent * event)
-{
-   QPainter painter( this);
-   QRect r( rect());
-   r.adjust( 0,0,-1,0);
-   painter.setPen( afqt::QEnvironment::clr_item.c);
-   painter.drawRect( r);
-
-   int wx = x()+1;
-   int wy = y()+1;
-   int w = width()-2;
-   int h = height()-2;
-
-   painter.setPen( afqt::QEnvironment::qclr_black );
-   painter.setOpacity( 0.2);
-   painter.drawLine( wx, wy+1, wx, wy+h-1);
-   painter.drawLine( wx+w-1, wy+1, wx+w-1, wy+h-1);
-   painter.setOpacity( 0.6);
-   painter.drawLine( wx, wy, wx+w-1, wy);
-
-   painter.setPen( afqt::QEnvironment::qclr_white );
-   painter.setOpacity( 0.4);
-
-   painter.drawLine( wx, wy+h, wx+w-1, wy+h);
-
-   painter.setOpacity( 1.0);
-}

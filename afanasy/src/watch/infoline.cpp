@@ -4,7 +4,6 @@ InfoLine::InfoLine( QWidget *parent):
    QLineEdit( parent)
 {
    setReadOnly( true);
-   setFrame( false);
 }
 
 InfoLine::~InfoLine()
