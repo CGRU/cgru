@@ -187,11 +187,11 @@ bool ItemJob::calcHeight()
 
 	if( compact_display )
 	{
-		block_height = BlockInfo::HeightCompact;
+		block_height = BlockInfo::HeightCompact + 3;
 	}
 	else
 	{
-		block_height = BlockInfo::Height;
+		block_height = BlockInfo::Height + 5;
 	}
 
 	m_height = Height + block_height*m_blocks_num;
@@ -220,9 +220,6 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 {
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
 
-   // Draw standart backgroud
-   drawBack( painter, option);
-
 	// Draw back with job state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
 	if     ( state & AFJOB::STATE_OFFLINE_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjoboff.c  );
@@ -231,8 +228,9 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 	else if( state & AFJOB::STATE_WAITTIME_MASK)   itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
 	else if( state & AFJOB::STATE_WAITDEP_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
 	else if( state & AFJOB::STATE_DONE_MASK)       itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
-	if((option.state & QStyle::State_Selected) == false)
-		painter->fillRect( option.rect, *itemColor );
+
+	// Draw standart backgroud
+	drawBack( painter, option, itemColor);
 
    uint32_t currenttime = time( NULL);
 
@@ -291,7 +289,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
    for( int b = 0; b < m_blocks_num; b++)
       m_blockinfo[b].paint( painter, option,
-         x+5, y + Height + block_height*b, w-9,
+         x+5, y + Height + block_height*b + 3, w-12,
          compact_display, itemColor);
 
    if( state & AFJOB::STATE_RUNNING_MASK )
@@ -351,10 +349,6 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 		painter->setFont( afqt::QEnvironment::f_info);
 		painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, m_annotation );
 	}
-
-
-   // Draw standart post effects:
-   drawPost( painter, option);
 }
 
 bool ItemJob::setSortType(   int type )

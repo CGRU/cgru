@@ -747,7 +747,7 @@ JobBlock.prototype.update = function( i_displayFull)
 		{
 			var sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
 			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / this.params.p_tasks_done));
-			this.elRunTime.textContent = sum +'/'+avg;
+			this.elRunTime.textContent = 'RT: S' + sum +'/A'+avg;
 			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
 		}
 		else

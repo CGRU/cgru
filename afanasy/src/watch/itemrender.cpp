@@ -404,16 +404,14 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	int right_text_x = x + plot_x + allplots_w - 5;
 	int right_text_w = w - plot_x - allplots_w;
 
-	// Draw standart backgroud
-	drawBack( painter, option);
-
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
 	if     ( m_online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
 	else if( m_NIMBY || m_nimby  ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
 	else if( m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
-	if((option.state & QStyle::State_Selected) == false)
-		painter->fillRect( option.rect, *itemColor );
+
+	// Draw standart backgroud
+	drawBack( painter, option, itemColor);
 
 	QString offlineState_time = m_offlineState;
 	if( m_wol_operation_time > 0 )
@@ -511,7 +509,6 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	    if( false == m_annotation.isEmpty() && (ListRenders::getDisplaySize() != ListRenders::ESMallSize))
 	            painter->drawText( x+5, y+2, w-10, ms_HeightOffline-4 + ms_HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 
-		drawPost( painter, option);
 		return;
 	}
 
@@ -681,8 +678,6 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		painter->setPen( afqt::QEnvironment::clr_star.c);
 		painter->drawText( x, y, w, h, Qt::AlignCenter, offlineState_time);
 	}
-
-	drawPost( painter, option);
 }
 
 bool ItemRender::setSortType(   int type )

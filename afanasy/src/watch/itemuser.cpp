@@ -144,8 +144,6 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 			painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
 		}
 	}
-
-	drawPost( painter, option);
 }
 
 bool ItemUser::setSortType(   int type )

@@ -22,17 +22,10 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const int BlockInfo::Height        = 40;
-const int BlockInfo::HeightCompact = 12;
+const int BlockInfo::Height        = 44;
+const int BlockInfo::HeightCompact = 14;
 
 BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
-	str_runtime("Run Time"),
-	str_progress("Progress numbers"),
-	str_percent("Percentage"),
-	str_compact("(compact display)"),
-	str_properties("Block Properties"),
-	str_avoiderrors("ea"),
-
 	tasksnum(1),
 	tasksdone(0),
 	taskserror(0),
@@ -155,87 +148,84 @@ if( type == af::Msg::TBlocksProgress)
 
 void BlockInfo::refresh()
 {
-	if( tasksdone) str_runtime = QString("RT: S%1/A%2")
-		.arg( af::time2strHMS( taskssumruntime, true).c_str())
-		.arg( af::time2strHMS( taskssumruntime/tasksdone, true).c_str());
-	else str_runtime = "Run Time";
-
-	str_properties.clear();
-
-	if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
-		str_properties += QString("E:%1b|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
-	if( errors_forgivetime >= 0 ) str_properties += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
-
-	if( tasksmaxruntime) str_properties += QString(" Max%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
-
-	if( maxrunningtasks    != -1 ) str_properties += QString(" m%1").arg( maxrunningtasks);
-	if( maxruntasksperhost != -1 ) str_properties += QString(" mph%1").arg( maxruntasksperhost);
-	if( false == hostsmask.isEmpty()          ) str_properties += QString(" H(%1)").arg( hostsmask         );
-	if( false == hostsmask_exclude.isEmpty()  ) str_properties += QString(" E(%1)").arg( hostsmask_exclude );
-	if( false == need_properties.isEmpty()    ) str_properties += QString(" P(%1)").arg( need_properties   );
-	if( need_memory > 0 ) str_properties += QString(" M>%1").arg( need_memory);
-	if( need_hdd    > 0 ) str_properties += QString(" H>%1").arg( need_hdd);
-	if( need_power  > 0 ) str_properties += QString(" P>%1").arg( need_power);
-	if( multihost )
-	{
-		str_properties += QString(" MH(%1,%2)").arg( multihost_min).arg( multihost_max);
-		if( multihost_samemaster) str_properties += 'S';
-		if( multihost_waitmax) str_properties += QString(":%1wm").arg(multihost_waitmax);
-		if( multihost_waitsrv) str_properties += QString(":%1ws").arg(multihost_waitsrv);
-	}
-	if((filesize_min != -1) || (filesize_max != -1))
-		str_properties += QString(" F(%1,%2)").arg( filesize_min).arg( filesize_max);
-
-	str_properties += " [";
-	if( varcapacity   ) str_properties += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
-	str_properties += QString("%1]").arg( capacity);
-
-	if( errorhostsnum ) str_avoiderrors  = QString( "Hosts Err:%1").arg( errorhostsnum);
-	if( avoidhostsnum ) str_avoiderrors += QString("/%1:Avoid").arg( avoidhostsnum);
-
-	QString tasksinfo = QString("t%1").arg( tasksnum);
+	// General information:
+	str_info = QString("t%1").arg( tasksnum);
 	if( numeric )
 	{
-		tasksinfo += QString("(%1-%2").arg( frame_first).arg( frame_last);
+		str_info += QString("(%1-%2").arg( frame_first).arg( frame_last);
 		if(( frame_pertask > 1 ) || ( frame_inc > 1 ))
 		{
-			tasksinfo += QString(":%1").arg( frame_pertask);
+			str_info += QString(":%1").arg( frame_pertask);
 			if( frame_inc > 1 )
-				tasksinfo += QString("/%1").arg( frame_inc);
+				str_info += QString("/%1").arg( frame_inc);
 		}
 		if( sequential != 1 )
-			tasksinfo += "%" + QString::number( sequential);
-		tasksinfo += ")";
+			str_info += "%" + QString::number( sequential);
+		str_info += ")";
 	}
 	else if( frame_pertask > 1)
 	{
-		tasksinfo += QString("*%1").arg( frame_pertask);
+		str_info += QString("*%1").arg( frame_pertask);
 	}
 	else if( frame_pertask < 0)
 	{
-		tasksinfo += QString("/%1").arg( -frame_pertask);
+		str_info += QString("/%1").arg( -frame_pertask);
 	}
 
-	str_compact = tasksinfo + ": ";
-	if( tasksdone) str_compact += str_runtime + ": ";
-	str_compact += name;
+	str_info += QString(": %1").arg( name);
 
-	str_percent = QString::number( percentage) + "%";
-	if( false == name.isEmpty()) str_percent += ' ' + name;
+	if( false == depends.isEmpty())
+		str_info += depends;
 
-	str_progress = tasksinfo;
-	str_progress += QString(" r%1 d%2 e%3")
+
+	// Parameters:
+	str_params.clear();
+
+	if( tasksdone) str_params += QString(" RT: S%1/A%2")
+		.arg( af::time2strHMS( taskssumruntime, true).c_str())
+		.arg( af::time2strHMS( taskssumruntime/tasksdone, true).c_str());
+
+	if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
+		str_params += QString("E:%1b|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
+	if( errors_forgivetime >= 0 ) str_params += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+
+	if( tasksmaxruntime) str_params += QString(" Max%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
+
+	if( maxrunningtasks    != -1 ) str_params += QString(" m%1").arg( maxrunningtasks);
+	if( maxruntasksperhost != -1 ) str_params += QString(" mph%1").arg( maxruntasksperhost);
+	if( false == hostsmask.isEmpty()          ) str_params += QString(" H(%1)").arg( hostsmask         );
+	if( false == hostsmask_exclude.isEmpty()  ) str_params += QString(" E(%1)").arg( hostsmask_exclude );
+	if( false == need_properties.isEmpty()    ) str_params += QString(" P(%1)").arg( need_properties   );
+	if( need_memory > 0 ) str_params += QString(" M>%1").arg( need_memory);
+	if( need_hdd    > 0 ) str_params += QString(" H>%1").arg( need_hdd);
+	if( need_power  > 0 ) str_params += QString(" P>%1").arg( need_power);
+	if( multihost )
+	{
+		str_params += QString(" MH(%1,%2)").arg( multihost_min).arg( multihost_max);
+		if( multihost_samemaster) str_params += 'S';
+		if( multihost_waitmax) str_params += QString(":%1wm").arg(multihost_waitmax);
+		if( multihost_waitsrv) str_params += QString(":%1ws").arg(multihost_waitsrv);
+	}
+	if((filesize_min != -1) || (filesize_max != -1))
+		str_params += QString(" F(%1,%2)").arg( filesize_min).arg( filesize_max);
+
+	str_params += " [";
+	if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
+	str_params += QString("%1]").arg( capacity);
+
+
+	// Progress:
+	str_progress = QString::number( percentage) + "%";
+	str_progress += QString(" Run:%1 Done:%2 Err:%3")
 		.arg( runningtasksnumber)
 		.arg( tasksdone)
 		.arg( taskserror);
+	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( tasksready);
 
-	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" ready:%1").arg( tasksready);
 
-	if( false == depends.isEmpty())
-	{
-		str_percent += depends;
-		str_compact += depends;
-	}
+	// Error Hosts:
+	if( errorhostsnum ) str_avoiderrors  = QString( "Hosts Err:%1").arg( errorhostsnum);
+	if( avoidhostsnum ) str_avoiderrors += QString("/%1:Avoid").arg( avoidhostsnum);
 }
 
 void BlockInfo::stdOutFlags( char* data, int size) const
@@ -263,18 +253,13 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 		return;
 	}
 
-	static const int y_properties = -1;
-	static const int y_progress   = 27;
-	static const int y_bars       = 12;
+	static const int y_info     =  0;
+	static const int y_bars     = 14;
+	static const int y_progress = 30;
 
-	painter->setFont( afqt::QEnvironment::f_info);
-	QPen pen( Item::clrTextInfo( runningtasksnumber, option.state & QStyle::State_Selected, item->isLocked()));
-	painter->setPen( pen);
-	QRect rect_properties;
-	painter->drawText( x, y+y_properties, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_properties, &rect_properties );
 
-	int xoffset = 1;
-
+	// Paint an icon and calculate an offset for further info:
+	int xoffset = 3;
 	if( compact_display)
 	{
 		if( icon_small )
@@ -282,18 +267,45 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 			painter->drawPixmap( x, y-2, *icon_small);
 			xoffset += 15;
 		}
-		painter->drawText(  x+xoffset, y-2, w-rect_properties.width()-20, 15, Qt::AlignTop | Qt::AlignLeft, str_compact );
-		return;
 	}
-
-	xoffset = 5;
-
-	if( icon_large )
+	else
 	{
-		painter->drawPixmap( x, y-2, *icon_large);
-		xoffset += 40;
+		xoffset = 7;
+
+		if( icon_large )
+		{
+			painter->drawPixmap( x, y-2, *icon_large);
+			xoffset += 40;
+		}
 	}
 
+
+	// Paint border:
+	painter->setPen( afqt::QEnvironment::clr_outline.c );
+	painter->setBrush( Qt::NoBrush);
+	painter->drawRoundedRect( x+xoffset-3, y-1, w+4-xoffset, compact_display ? HeightCompact : Height, 3, 3);
+
+
+	// Setup font size and color:
+	painter->setFont( afqt::QEnvironment::f_info);
+	QPen pen( Item::clrTextInfo( runningtasksnumber, option.state & QStyle::State_Selected, item->isLocked()));
+	painter->setPen( pen);
+
+
+	// Paint parameters:
+	QRect rect_params;
+	painter->drawText( x, y+y_info, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_params, &rect_params );
+
+	// Paint general information:
+	painter->drawText( x+xoffset+5, y+y_info, w-rect_params.width()-10-xoffset, 15, Qt::AlignLeft | Qt::AlignTop, str_info);
+
+
+	// On compact display we dont show progress, error hosts and progress bars.
+	if( compact_display )
+		return;
+
+
+	// Paint error hosts:
 	int error_hosts_text_width = 0;
 	if( errorhostsnum )
 	{
@@ -303,40 +315,41 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 			painter->setPen( afqt::QEnvironment::clr_errorready.c);
 
 		QRect rect_errorhosts;
-		painter->drawText( x+xoffset, y+y_progress, w-5-xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors, &rect_errorhosts);
+		painter->drawText( x+xoffset+5, y+y_progress, w-10-xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_avoiderrors, &rect_errorhosts);
 		error_hosts_text_width = rect_errorhosts.width() + 10;
 	}
 
+
+	// Paint progress:
 	painter->setPen( pen);
-	painter->drawText( x+xoffset, y+y_properties, w-rect_properties.width()-20-xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
-	QRect rect_progress;
-	painter->drawText( x+xoffset, y+y_progress,   w-5-xoffset-error_hosts_text_width, 15, Qt::AlignRight | Qt::AlignTop, str_progress, &rect_progress);
-	painter->drawText( x+xoffset, y+y_progress,   w-rect_progress.width()-10-xoffset-error_hosts_text_width, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
+	painter->drawText( x+xoffset+5, y+y_progress, w-15-xoffset-error_hosts_text_width, 15, Qt::AlignLeft | Qt::AlignTop, str_progress);
 
 
+	xoffset += 2;
+	// Paint progress bars:
 	Item::drawPercent
 	(
-		painter, x+xoffset, y+y_bars, w-xoffset, 4,
+		painter, x+xoffset, y+y_bars, w-xoffset-2, 4,
 		jobid == AFJOB::SYSJOB_ID ? runningtasksnumber + tasksready + taskserror : tasksnum,
 		jobid == AFJOB::SYSJOB_ID ? 0 : tasksdone, taskserror, runningtasksnumber,
 		false
 	);
 	Item::drawPercent
 	(
-		painter, x+xoffset, y+y_bars+4, w-xoffset, 4,
+		painter, x+xoffset, y+y_bars+4, w-xoffset-2, 4,
 		100,
 		percentage, 0, 0,
 		false
 	);
 	drawProgress
 	(
-		painter, x+1+xoffset, y+y_bars+8, w-xoffset, 6,
+		painter, x+1+xoffset, y+y_bars+8, w-xoffset-2, 6,
 		backcolor
 	);
 
 	painter->setPen( afqt::QEnvironment::clr_outline.c );
 	painter->setBrush( Qt::NoBrush);
-	painter->drawRect( x-1+xoffset, y+y_bars-1, w+1-xoffset, 15);
+	painter->drawRoundedRect( x-1+xoffset, y+y_bars-1, w-1-xoffset, 15, 2, 2);
 }
 
 void BlockInfo::drawProgress(
@@ -591,7 +604,7 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 		if( id_block == blocknum ) cur_number = capacity;
 		set_number = QInputDialog::getInteger( listitems, "Change Capacity", "Enter Capacity", cur_number, -1, INT_MAX, 1, &ok);
 	}
-	if( i_action == "sequential" )
+	else if( i_action == "sequential" )
 	{
 		if( id_block == blocknum ) cur_number = sequential;
 		set_number = QInputDialog::getInteger( listitems, "Change Sequential", "Enter Sequential", cur_number, -1, INT_MAX, 1, &ok);

@@ -215,8 +215,6 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	if( m_thumbs_num )
 		for( int i = 0; i < m_thumbs_num; i++ )	
 			painter->drawImage( x + 110*i, y + ItemJobTask::TaskHeight, * m_thumbs_imgs[i]);
-
-	drawPost( painter, option, .5);
 }
 
 bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) const

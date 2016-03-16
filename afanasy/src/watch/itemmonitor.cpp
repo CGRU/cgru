@@ -92,14 +92,9 @@ void ItemMonitor::updateValues( af::Node *node, int type)
 
 void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
-   drawBack( painter, option);
+   drawBack( painter, option, superuser ? &(afqt::QEnvironment::clr_LinkVisited.c) : NULL);
 
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
-
-   if( superuser && ( false == (option.state & QStyle::State_Selected) ))
-   {
-      painter->fillRect( option.rect, afqt::QEnvironment::clr_Link.c);
-   }
 
    painter->setPen(   clrTextMain( option) );
    painter->setFont(  afqt::QEnvironment::f_name);
@@ -127,8 +122,6 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsids );
 
    painter->drawText( x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, version );
-
-   drawPost( painter, option);
 }
 
 bool ItemMonitor::setSortType(   int type )

@@ -42,7 +42,7 @@ ViewItems::ViewItems( QWidget * parent):
     QListView( parent),
     listitems( NULL)
 {
-    setSpacing( 3);
+    setSpacing( 2);
     setUniformItemSizes( false);
 
     setHorizontalScrollMode(ScrollPerPixel);

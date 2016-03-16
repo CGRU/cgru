@@ -171,8 +171,6 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    linex -= WHost;
    painter->setOpacity( sorting_fields_line_opacity);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
-
-   drawPost( painter, option);
 }
 
 bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)

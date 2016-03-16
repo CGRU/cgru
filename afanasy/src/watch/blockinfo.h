@@ -55,11 +55,10 @@ private:
 
 	QString name;
 	QString service;
-	QString str_runtime;
+
+	QString str_info;
+	QString str_params;
 	QString str_progress;
-	QString str_percent;
-	QString str_compact;
-	QString str_properties;
 	QString str_avoiderrors;
 
 	int tasksnum;

@@ -81,42 +81,20 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 	else   return (option.state & QStyle::State_Selected) ? afqt::QEnvironment::clr_textbright.c : afqt::QEnvironment::clr_textmuted.c;
 }
 
-void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option) const
+void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clr) const
 {
 	painter->setOpacity( 1.0);
 	painter->setRenderHint( QPainter::Antialiasing, false);
 
 	if( option.state & QStyle::State_Selected )
-		painter->fillRect( option.rect, afqt::QEnvironment::clr_selected.c);
-	else
-		painter->fillRect( option.rect, afqt::QEnvironment::clr_item.c);
-}
+		i_clr = &afqt::QEnvironment::clr_selected.c;
+	else if( i_clr == NULL )
+		i_clr = &afqt::QEnvironment::clr_item.c;
 
-void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option, float alpha) const
-{
-	painter->setRenderHint( QPainter::Antialiasing, false);
-
-	int x = option.rect.x();
-	int y = option.rect.y();
-	int w = option.rect.width();
-	int h = option.rect.height();
-
-	painter->setPen( afqt::QEnvironment::qclr_black );
-	painter->setOpacity( 0.7 * alpha);
-
-	painter->drawLine( x, y+h, x+w-1, y+h);
-
-	painter->setOpacity( 0.2 * alpha);
-
-	painter->drawLine( x, y+1, x, y+h-1);
-	painter->drawLine( x+w-1, y+1, x+w-1, y+h-1);
-
-	painter->setPen( afqt::QEnvironment::qclr_white );
-	painter->setOpacity( 0.5 * alpha);
-
-	painter->drawLine( x, y, x+w-1, y);
-
-	painter->setOpacity( 1.0);
+//	painter->fillRect( option.rect, *i_clr);
+	painter->setPen( afqt::QEnvironment::clr_outline.c );
+	painter->setBrush( *i_clr);
+	painter->drawRoundedRect( option.rect, 2, 2);
 }
 
 void Item::paint( QPainter *painter, const QStyleOptionViewItem &option) const
