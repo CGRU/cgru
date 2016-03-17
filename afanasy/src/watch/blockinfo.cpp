@@ -264,8 +264,8 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 	{
 		if( icon_small )
 		{
-			painter->drawPixmap( x, y-2, *icon_small);
-			xoffset += 15;
+			painter->drawPixmap( x, y, *icon_small);
+			xoffset += 16;
 		}
 	}
 	else
@@ -274,8 +274,8 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 
 		if( icon_large )
 		{
-			painter->drawPixmap( x, y-2, *icon_large);
-			xoffset += 40;
+			painter->drawPixmap( x, y, *icon_large);
+			xoffset += 42;
 		}
 	}
 
