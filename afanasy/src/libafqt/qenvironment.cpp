@@ -230,8 +230,16 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_valid = true;
 
     loadAttrs( ms_filename);
+	bool theme_loaded = true;
     if( false == loadTheme( theme.str))
+	{
 		loadTheme( AFGUI::THEME);
+		theme_loaded = false;
+		
+	}
+    loadAttrs( ms_filename); // We should reload attts, as theme colors can be customized
+	if( false == theme_loaded )
+		theme.str = AFGUI::THEME;
 
 	int datalen = -1;
 	char * data = af::fileRead( qtos( ms_filename), &datalen);
@@ -479,10 +487,8 @@ bool QEnvironment::loadTheme( const QString & i_theme)
 {
     QString filename = ms_themes_folder + AFGENERAL::PATH_SEPARATOR + i_theme + AFGENERAL::PATH_SEPARATOR + "watch.json";
     if( loadAttrs( filename))
-    {
-        theme.str = i_theme;
         return true;
-    }
+
     AFERRAR("QEnvironment::loadTheme: Failed to load theme '%s' from:\n%s",
             i_theme.toUtf8().data(), filename.toUtf8().data())
     return false;
