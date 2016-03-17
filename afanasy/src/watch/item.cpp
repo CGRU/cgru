@@ -81,19 +81,18 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 	else   return (option.state & QStyle::State_Selected) ? afqt::QEnvironment::clr_textbright.c : afqt::QEnvironment::clr_textmuted.c;
 }
 
-void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clr) const
+void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem, const QColor * i_clrBorder) const
 {
 	painter->setOpacity( 1.0);
 	painter->setRenderHint( QPainter::Antialiasing, false);
 
 	if( option.state & QStyle::State_Selected )
-		i_clr = &afqt::QEnvironment::clr_selected.c;
-	else if( i_clr == NULL )
-		i_clr = &afqt::QEnvironment::clr_item.c;
+		i_clrItem = &afqt::QEnvironment::clr_selected.c;
+	else if( i_clrItem == NULL )
+		i_clrItem = &afqt::QEnvironment::clr_item.c;
 
-//	painter->fillRect( option.rect, *i_clr);
-	painter->setPen( afqt::QEnvironment::clr_outline.c );
-	painter->setBrush( *i_clr);
+	painter->setPen( i_clrBorder ? (*i_clrBorder) : (afqt::QEnvironment::clr_outline.c));
+	painter->setBrush( *i_clrItem);
 	painter->drawRoundedRect( option.rect, 2, 2);
 }
 

@@ -61,7 +61,7 @@ public:
 	virtual bool calcHeight();
 
 protected:
-	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clr = NULL ) const;
+	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
 
 	/// Print AFJOB::STATE informaton
 	void printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const;

@@ -411,19 +411,11 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	else if( m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
 
 	// Draw standart backgroud
-	drawBack( painter, option, itemColor);
+	drawBack( painter, option, itemColor, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);
 
 	QString offlineState_time = m_offlineState;
 	if( m_wol_operation_time > 0 )
 	    offlineState_time = m_offlineState + " " + afqt::stoq( af::time2strHMS( time(NULL) - m_wol_operation_time ));
-
-	if( m_dirty )
-	{
-		painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::NoBrush ));
-		painter->setPen( afqt::QEnvironment::clr_error.c);
-		painter->drawRect( x,y,w,h);
-	}
-
 
 	// Draw busy/idle bar:
 	if( m_online )
