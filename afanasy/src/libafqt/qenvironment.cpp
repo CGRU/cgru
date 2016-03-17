@@ -230,8 +230,8 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_valid = true;
 
     loadAttrs( ms_filename);
-    loadTheme( theme.str);
-    loadAttrs( ms_filename);
+    if( false == loadTheme( theme.str))
+		loadTheme( AFGUI::THEME);
 
 	int datalen = -1;
 	char * data = af::fileRead( qtos( ms_filename), &datalen);
