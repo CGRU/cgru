@@ -202,7 +202,7 @@ function up_Progress( e)
 			var percent = Math.round( 100 * e.loaded / e.total );
 			if( el.m_percent && ( el.m_percent > percent ))
 			{
-				c_Error('Upload: ' + dur + ' - ' + el.m_percent + ' > ' + percent);
+				c_Error('Upload: New progress lowered (' + el.m_percent + ' > ' + percent + ') at ' + dur);
 			}
 			text += ' ' + percent + '%';
 			el.m_elBar.style.width = percent + '%';
