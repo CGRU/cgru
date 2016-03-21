@@ -1,5 +1,7 @@
 #pragma once
 
+#include "watch.h"
+
 #include <QtGui/QWidget>
 
 class ListItems;
