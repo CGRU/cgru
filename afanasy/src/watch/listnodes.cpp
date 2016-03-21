@@ -42,9 +42,9 @@ bool ListNodes::init( bool createModelView)
       m_view = new ViewItems( this);
       m_view->setModel( m_model);
 
-      if( ctrl ) m_layout->addWidget( ctrl);
-      m_layout->addWidget( m_view);
-      m_layout->addWidget( m_infoline);
+      if( ctrl ) m_vlayout->addWidget( ctrl);
+      m_vlayout->addWidget( m_view);
+      m_vlayout->addWidget( m_infoline);
    }
 
    if( ListItems::init( false) == false) return false;

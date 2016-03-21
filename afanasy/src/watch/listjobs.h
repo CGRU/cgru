@@ -65,6 +65,7 @@ private slots:
 	void actPause();
 	void actRestartPause();
 	void actDelete();
+	void actDeleteDone();
 
 	void actRequestLog();
 	void actRequestErrorHostsList();

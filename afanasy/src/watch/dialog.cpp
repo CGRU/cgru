@@ -76,7 +76,7 @@ Dialog::Dialog():
     m_hlayout_a->setSpacing( 0);
     m_vlayout_a->setSpacing( 0);
     m_hlayout_b->setSpacing( 0);
-    m_vlayout_b->setSpacing( 0);
+    m_vlayout_b->setSpacing( 3);
 
     m_btn_out_left = new ButtonOut( ButtonOut::Left,  this);
     m_btn_out_right = new ButtonOut( ButtonOut::Right, this);
@@ -121,7 +121,7 @@ Dialog::Dialog():
 
     connect( &m_repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
 
-    setFocusPolicy(Qt::StrongFocus);
+//    setFocusPolicy(Qt::StrongFocus);
     setAutoFillBackground( true);
     QRect rect;
     if( afqt::QEnvironment::getRect( "Main", rect)) setGeometry( rect);
@@ -198,6 +198,12 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveGUIOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveGUIOnExit() ));
+    submenu->addAction( action);
+
+    action = new QAction( "Save Hotkeys", this);
+    action->setCheckable( true);
+    action->setChecked( afqt::QEnvironment::saveHotkeysOnExit.n != 0);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actSaveHotkeysOnExit() ));
     submenu->addAction( action);
 
     action = new QAction( "Save Windows Geometry", this);
@@ -505,6 +511,7 @@ void Dialog::actNotifications()
 
 void Dialog::actSavePreferencesOnExit()   { afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;     }
 void Dialog::actSaveGUIOnExit()           { afqt::QEnvironment::saveGUIOnExit.n      = 1 - afqt::QEnvironment::saveGUIOnExit.n;       }
+void Dialog::actSaveHotkeysOnExit()       { afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n;   }
 void Dialog::actSaveWndRectsOnExit()      { afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;  }
 void Dialog::actShowOfflineNoise()        { afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;    }
 

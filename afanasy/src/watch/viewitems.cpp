@@ -38,9 +38,9 @@ void ItemDelegate::emitSizeHintChanged( const QModelIndex &index)
     #endif
 }
 
-ViewItems::ViewItems( QWidget * parent):
-    QListView( parent),
-    listitems( NULL)
+ViewItems::ViewItems( ListItems * parent):
+	QListView( parent),
+	m_listitems( parent)
 {
     setSpacing( 2);
     setUniformItemSizes( false);
@@ -108,21 +108,26 @@ void ViewItems::emitSizeHintChanged( const QModelIndex &index)
 
 void ViewItems::keyPressEvent( QKeyEvent * event)
 {
-    if(( selectionMode() != QAbstractItemView::NoSelection ) && ( event->key() == Qt::Key_Escape )) clearSelection();
-    QListView::keyPressEvent( event);
+	// Clear selection on Escape:
+	if(( selectionMode() != QAbstractItemView::NoSelection ) && ( event->key() == Qt::Key_Escape ))
+		clearSelection();
 
-#if QT_VERSION >= 0x040600
-    Watch::keyPressEvent( event);
-#endif
+	// Process List view keys:
+	QListView::keyPressEvent( event);
+
+	// Process dialog keys (for admin mode):
+	Watch::keyPressEvent( event);
+
+	// Process parent (ListItems class) keys (panel buttons):
+	m_listitems->keyPressEvent( event);
 }
 
 void ViewItems::mousePressEvent( QMouseEvent * event)
 {
-    if( listitems)
-        if( listitems->mousePressed( event))
-            return;
+	if( m_listitems->mousePressed( event))
+		return;
 
-    QListView::mousePressEvent( event);
+	QListView::mousePressEvent( event);
 }
 
 void ViewItems::repaintViewport()

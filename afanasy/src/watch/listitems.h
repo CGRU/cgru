@@ -10,10 +10,10 @@
 
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>
-#include <QtGui/QToolBar>
 
 class QVBoxLayout;
 class QHBoxLayout;
+class QKeyEvent;
 class QMouseEvent;
 class QAction;
 class QIcon;
@@ -21,6 +21,7 @@ class QIcon;
 class QModelIndex;
 
 class Item;
+class ButtonPanel;
 class ModelItems;
 class ViewItems;
 
@@ -43,6 +44,7 @@ public:
 	void itemsHeightCalc();
 
 	virtual bool mousePressed( QMouseEvent * event);
+	virtual void keyPressEvent( QKeyEvent * i_evt);
 
 	inline bool isTypeJobs()  const { return m_type == "jobs";  }
 	inline bool isTypeUsers() const { return m_type == "users"; }
@@ -62,7 +64,7 @@ protected:
 	inline void setParameter( const std::string & i_name, long long i_value) const
 		{ setParameter( i_name, af::itos( i_value), false);}
 	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
-	void operation( const std::string & i_operation) const;
+	void operation( const std::string & i_operation);
 
 	void deleteItems( af::MCGeneral & ids);
 
@@ -85,14 +87,18 @@ protected:
 	virtual void v_connectionLost();
 	virtual void v_connectionEstablished();
 
+	ButtonPanel * addButtonPanel(
+		const QString & i_label,
+		const QString & i_name,
+		const QString & i_description,
+		const QString & i_hotkey = "",
+		bool i_dblclick = false);
+
 protected:
-	QVBoxLayout * m_layout;
-	QVBoxLayout * m_toolbarvbox;
-	QHBoxLayout * m_viewlayout;
-
-	QToolBar * m_viewtoolbar;
-
-	QAction * m_thumbnailbutton;
+	QHBoxLayout * m_hlayout;
+	QVBoxLayout * m_panel_l;
+	QVBoxLayout * m_vlayout;
+	QVBoxLayout * m_panel_r;
 
 	InfoLine * m_infoline;
 
@@ -115,4 +121,6 @@ private:
 	int  m_requestmsgtype;
 	bool m_subscribed;
 	bool m_subscribeFirstTime;
+
+	std::vector<ButtonPanel*> m_btns;
 };

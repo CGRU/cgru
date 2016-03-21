@@ -27,15 +27,12 @@ public:
 class ViewItems: public QListView
 {
 public:
-    ViewItems( QWidget * parent);
+    ViewItems( ListItems * parent);
     virtual ~ViewItems();
 
     void emitSizeHintChanged( const QModelIndex &index);
 
     inline void updateGeometries() { QListView::updateGeometries();}
-
-    //   inline void set_mousePressEvent_handler( bool (*handler)( QMouseEvent  *)) { mousePressEvent_handler = handler;}
-    inline void setListItems( ListItems * ptr) { listitems = ptr;}
 
     void repaintViewport();
 
@@ -50,10 +47,9 @@ private:
     void loadImage();
 
 private:
-//   bool (*mousePressEvent_handler)( QMouseEvent * );
     ItemDelegate * itemDelegate;
 
-    ListItems * listitems;
+ 	ListItems * m_listitems;
 
     QPixmap m_back_pixmap;
     QString m_back_filename;

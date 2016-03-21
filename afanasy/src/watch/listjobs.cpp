@@ -5,6 +5,7 @@
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/service.h"
 
+#include "buttonpanel.h"
 #include "itemjob.h"
 #include "ctrljobs.h"
 #include "ctrlsortfilter.h"
@@ -82,6 +83,29 @@ Sort & Filter Jobs.\n\
 Press RMB for Options.\
 ");
 	ctrl->getLayout()->addWidget( control);
+
+
+	// Add left panel buttons:
+	ButtonPanel * bp;
+
+	bp = addButtonPanel("PAU","jobs_pause","Pause selected jobs.","P");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
+
+	bp = addButtonPanel("STA","jobs_start","Start selected jobs.","S");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
+
+	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset avoid hosts.","A");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
+
+	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","E");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+
+	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","D");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDelete()));
+
+	bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDeleteDone()));
+
 
 	init();
 
@@ -349,8 +373,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	// System job ID is 1, and can not be deleted
 	if( jobitem->getId() != 1 )
 	{
+		action = new QAction( "Delete All Done", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actDeleteDone()));
+		menu.addAction( action);
+
 		action = new QAction( "Delete", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()  ));
+		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
 		menu.addAction( action);
 	}
 
@@ -523,6 +551,29 @@ void ListJobs::actResetErrorHosts() { operation("reset_error_hosts");}
 void ListJobs::actPause()           { operation("pause"            );}
 void ListJobs::actRestartPause()    { operation("restart_pause"    );}
 void ListJobs::actDelete()          { operation("delete"           );}
+
+void ListJobs::actDeleteDone()
+{
+	std::vector<int> ids;
+	for( int i = 0; i < m_model->count(); i++)
+	{
+		ItemJob * job = (ItemJob*)(m_model->item(i));
+		if( job->state & AFJOB::STATE_DONE_MASK )
+			ids.push_back( job->getId());
+	}
+
+	if( ids.size() == 0 )
+	{
+		displayWarning("No done jobs founded.");
+		return;
+	}
+
+	std::ostringstream str;
+	af::jsonActionOperation( str,"jobs","delete","", ids);
+	Watch::sendMsg( af::jsonMsg( str));
+
+	displayInfo("Delete all done jobs.");
+}
 
 void ListJobs::actRequestLog()
 {

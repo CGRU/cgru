@@ -53,8 +53,6 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 //   view->setUniformItemSizes( true);
 //   view->setBatchSize( 10000);
 
-	m_view->setListItems( this);
-
 	Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, m_job_id, true));
 
 	m_parentWindow->setWindowTitle( m_job_name);

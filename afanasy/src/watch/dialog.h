@@ -68,6 +68,7 @@ private slots:
     void actNotifications();
     void actSavePreferencesOnExit();
     void actSaveGUIOnExit();
+	void actSaveHotkeysOnExit();
     void actSaveWndRectsOnExit();
     void actSavePreferences();
     void actShowOfflineNoise();

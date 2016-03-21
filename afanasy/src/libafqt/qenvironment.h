@@ -30,6 +30,7 @@ public:
 	static bool save();
 	static void saveWndRects( QByteArray & data);
 	static void saveGUI( QByteArray & data);
+	static void saveHotkeys( QByteArray & data);
 
 	static bool getRect( const QString & i_name, QRect & rect);
 	static void setRect( const QString & i_name, const QRect & rect);
@@ -63,6 +64,7 @@ public:
 	static AttrNumber savePrefsOnExit;
 	static AttrNumber saveWndRectsOnExit;
 	static AttrNumber saveGUIOnExit;
+	static AttrNumber saveHotkeysOnExit;
 	static AttrNumber showOfflineNoise;
 
 	static AttrColor clr_Window;
@@ -145,6 +147,9 @@ public:
 
 	static bool loadAttrs( const QString & i_filename );
 
+	static void getHotkey( const QString & i_name, QString & o_str);
+	static void setHotkey( const QString & i_name, const QString & i_str);
+
 private:
    static void solveServerAddress();
 
@@ -163,4 +168,6 @@ private:
 	static QList<Attr*> ms_attrs_prefs;
 	static QList<AttrRect*> ms_attrs_wndrects;
 	static QList<Attr*> ms_attrs_gui;
+	static QMap<QString, Attr*> ms_attrs_hotkeys;
+	static QStringList ms_hotkeys_names;
 };

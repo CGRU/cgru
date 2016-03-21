@@ -47,6 +47,7 @@ Attr       QEnvironment::ntf_job_error_sound("ntf_job_error_sound", "Sound", "")
 AttrNumber QEnvironment::savePrefsOnExit(    "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT         );
 AttrNumber QEnvironment::saveWndRectsOnExit( "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS            );
 AttrNumber QEnvironment::saveGUIOnExit(      "saveguionexit",        "Save Gui Settings",       AFGUI::SAVEGUI                 );
+AttrNumber QEnvironment::saveHotkeysOnExit(  "savehotkeysonexit",    "Save Hotkeys",            AFGUI::SAVEHOTKEYS             );
 AttrNumber QEnvironment::showOfflineNoise(   "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE        );
 
 Attr       QEnvironment::font_family(        "font_family",          "Font Family",             AFGUI::FONT_FAMILY             );
@@ -121,6 +122,8 @@ QFont QEnvironment::f_min;
 QList<Attr*>     QEnvironment::ms_attrs_prefs;
 QList<AttrRect*> QEnvironment::ms_attrs_wndrects;
 QList<Attr*>     QEnvironment::ms_attrs_gui;
+QMap<QString,Attr*> QEnvironment::ms_attrs_hotkeys;
+QStringList QEnvironment::ms_hotkeys_names;
 
 bool QEnvironment::ms_valid = false;
 
@@ -138,6 +141,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append( &savePrefsOnExit    );
     ms_attrs_prefs.append( &saveWndRectsOnExit );
     ms_attrs_prefs.append( &saveGUIOnExit      );
+    ms_attrs_prefs.append( &saveHotkeysOnExit  );
     ms_attrs_prefs.append( &showOfflineNoise   );
 
     ms_attrs_prefs.append( &ntf_job_added_alert );
@@ -217,6 +221,21 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_textmuted       );
     ms_attrs_gui.append( &clr_textdone        );
     ms_attrs_gui.append( &clr_textstars       );
+
+
+	// Hotheys:
+	ms_hotkeys_names << "jobs_pause";
+	ms_hotkeys_names << "jobs_start";
+	ms_hotkeys_names << "jobs_reset_avoid_hosts";
+	ms_hotkeys_names << "jobs_restart_error_tasks";
+	ms_hotkeys_names << "jobs_delete";
+	ms_hotkeys_names << "jobs_delete_done";
+	for( int i = 0; i < ms_hotkeys_names.size(); i++)
+	{
+		Attr * a = new Attr( ms_hotkeys_names.at(i),"","");
+		ms_attrs_hotkeys[ms_hotkeys_names.at(i)] = a;
+	}
+
 
     ms_filename = stoq( af::Environment::getHomeAfanasy())
            + AFGENERAL::PATH_SEPARATOR + ms_appname.toUtf8().data() + ".json";
@@ -337,6 +356,11 @@ bool QEnvironment::save()
 		data.append(",\n");
 		saveGUI( data);
 	}
+	if( saveHotkeysOnExit.n != 0)
+	{
+		data.append(",\n");
+		saveHotkeys( data);
+	}
 	if( saveWndRectsOnExit.n != 0)
 	{
 		data.append(",\n");
@@ -365,7 +389,19 @@ void QEnvironment::saveGUI( QByteArray & data)
 		ms_attrs_gui[i]->v_write( data);
 	}
 }
-
+void QEnvironment::saveHotkeys( QByteArray & data)
+{
+	QMapIterator<QString, Attr*> i(ms_attrs_hotkeys);
+	bool first = true;
+	while( i.hasNext())
+	{
+		if( false == first )
+			data.append(",\n");
+		first = false;
+		i.next();
+		(i.value())->v_write( data);
+	}
+}
 void QEnvironment::saveWndRects( QByteArray & data)
 {
 	data.append("    \"wnd_rects\":[");
@@ -517,6 +553,13 @@ bool QEnvironment::loadAttrs( const QString & i_filename )
 	{
 		for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->v_read( obj);
 		for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->v_read( obj);
+
+		QMapIterator<QString, Attr*> i(ms_attrs_hotkeys);
+		while( i.hasNext())
+		{
+			i.next();
+			(i.value())->v_read( obj);
+		}
 	}
 
 	delete [] buffer;
@@ -526,3 +569,19 @@ bool QEnvironment::loadAttrs( const QString & i_filename )
 
     return true;
 }
+
+void QEnvironment::getHotkey( const QString & i_name, QString & o_str)
+{
+	if( false == ms_attrs_hotkeys.contains( i_name))
+		return;
+
+	QString str = ms_attrs_hotkeys[i_name]->str;
+	if( str.size())
+		o_str = str;
+}
+void QEnvironment::setHotkey( const QString & i_name, const QString & i_str)
+{
+	if( ms_attrs_hotkeys.contains( i_name))
+		ms_attrs_hotkeys[i_name]->str = i_str;
+}
+
