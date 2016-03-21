@@ -94,13 +94,13 @@ Press RMB for Options.\
 	bp = addButtonPanel("STA","jobs_start","Start selected jobs.","S");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
 
-	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset avoid hosts.","A");
+	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset avoid hosts.","E");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
 
-	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","E");
+	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
 
-	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","D");
+	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","D", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDelete()));
 
 	bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
