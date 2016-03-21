@@ -22,11 +22,12 @@ bool ServiceLimit::canRun( const std::string & i_hostname) const
 	if( m_max_hosts != -1 ) // Check maximum hosts
 	{
 		// If host already exists service can run on it:
-		for( std::list< std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++)
-			if( *it == i_hostname ) return true;
+		std::list<std::string>::const_iterator nIt = m_hosts_names.begin();
+		for( ; nIt != m_hosts_names.end(); nIt++)
+			if( *nIt == i_hostname ) return true;
 
 		// Check whether we can add one more host:
-		if( m_hosts_list.size() >= m_max_hosts ) return false;
+		if( m_hosts_names.size() >= m_max_hosts ) return false;
 	}
 	return true;
 }
@@ -34,9 +35,9 @@ bool ServiceLimit::canRun( const std::string & i_hostname) const
 void ServiceLimit::generateInfoStream( std::ostringstream & o_stream, bool i_full) const
 {
 	if( i_full )
-		o_stream << "Count = " << m_counter << "/" <<  m_max_count << "; Hosts = " << m_hosts_list.size() << "/" << m_max_hosts;
+		o_stream << "Count = " << m_counter << "/" <<  m_max_count << "; Hosts = " << m_hosts_names.size() << "/" << m_max_hosts;
 	else
-		o_stream << "c" << m_counter << "/" <<  m_max_count << " h" << m_hosts_list.size() << "/" << m_max_hosts;
+		o_stream << "c" << m_counter << "/" <<  m_max_count << " h" << m_hosts_names.size() << "/" << m_max_hosts;
 }
 void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
 {
@@ -44,10 +45,11 @@ void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
 	o_str << "\"m_count\":" << m_counter;
 	o_str << ",\"max_count\":" << m_max_count;
 	o_str << ",\"hosts\":[";
-	for( std::list<std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++)
+	std::list<std::string>::const_iterator nIt = m_hosts_names.begin();
+	for( ; nIt != m_hosts_names.end(); nIt++)
 	{
-		if( it != m_hosts_list.begin()) o_str << ",";
-		o_str << "\"" << *it << "\"";
+		if( nIt != m_hosts_names.begin()) o_str << ",";
+		o_str << "\"" << *nIt << "\"";
 	}
 	o_str << "],\"max_hosts\":" << m_max_hosts;
 	o_str << "}";
@@ -57,14 +59,28 @@ void ServiceLimit::increment( const std::string & i_hostname)
 {
 	// Increase m_counter
 	m_counter++;										  
-
-	// Ensure that hostname exists in the list:
-	for( std::list< std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++)
-		if( *it == i_hostname )
+/*
+printf("SL::increment: ");
+for( std::list< std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++) printf(" %s", (*it).c_str());
+printf(" + %s\n", i_hostname.c_str());
+*/
+	// If host name already exists we increment its count:
+	std::list<std::string>::const_iterator nIt = m_hosts_names.begin();
+	std::list<int>::iterator cIt = m_hosts_counts.begin();
+	for( ; nIt != m_hosts_names.end(); nIt++, cIt++)
+		if( *nIt == i_hostname )
+		{
+			(*cIt)++;
 			return;
-
-	// Appent m_hosts_list with hostname if it does not exist
-	m_hosts_list.push_back( i_hostname);
+		}
+/*
+printf("SL::host added: ");
+for( std::list< std::string>::const_iterator it = m_hosts_list.begin(); it != m_hosts_list.end(); it++) printf(" %s", (*it).c_str());
+printf("\n");
+*/
+	// Appent hosts names and counts with hostname if it does not exist:
+	m_hosts_names.push_back( i_hostname);
+	m_hosts_counts.push_back( 1);
 }
 
 void ServiceLimit::releaseHost( const std::string & i_hostname)
@@ -72,19 +88,28 @@ void ServiceLimit::releaseHost( const std::string & i_hostname)
 	if( m_counter > 0 )
 		m_counter--;
 
-	std::list< std::string>::iterator it = m_hosts_list.begin();
-	for( ; it != m_hosts_list.end(); it++)
-		if( *it == i_hostname )
+	std::list< std::string>::iterator nIt = m_hosts_names.begin();
+	std::list<int>::iterator cIt = m_hosts_counts.begin();
+	for( ; nIt != m_hosts_names.end(); nIt++, cIt++)
+		if( *nIt == i_hostname )
 		{
-			m_hosts_list.erase( it);
+			(*cIt)--;
+			if( *cIt < 1 )
+			{
+				m_hosts_names.erase( nIt);
+				m_hosts_counts.erase( cIt);
+			}
 			break;
 		}
 }
 
 void ServiceLimit::getLimits( const ServiceLimit & i_other)
 {
-	if( i_other.m_counter >= 0 ) m_counter = i_other.m_counter;
-	m_hosts_list = i_other.m_hosts_list;
+	if( i_other.m_counter >= 0 )
+		m_counter = i_other.m_counter;
+
+	m_hosts_names = i_other.m_hosts_names;
+	m_hosts_counts = i_other.m_hosts_counts;
 }
 
 //############################################## Farm ########################################

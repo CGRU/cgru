@@ -25,7 +25,8 @@ private:
 	int m_max_hosts;
 
 	int m_counter;
-	std::list<std::string> m_hosts_list;
+	std::list<std::string> m_hosts_names;
+	std::list<int> m_hosts_counts;
 };
 
 class Farm
