@@ -24,6 +24,8 @@ public:
 
 	bool caseMessage( af::Msg * msg);
 
+	virtual bool processEvents( const af::MonitorEvents & i_me);
+
 	bool mousePressed( QMouseEvent * event);
 
 	void sortBlock( int numblock);
@@ -75,7 +77,10 @@ private:
 	void construct( af::Job * job);
 
 	bool updateProgress( const af::JobProgress * progress);
-	bool updateTasks( af::MCTasksProgress * mctasksprogress);
+	bool updateTasks(
+		const std::vector<int32_t> & i_blocks,
+		const std::vector<int32_t> & i_tasks,
+		const std::vector<af::TaskProgress> & i_tps);
 
 	int getRow( int block, int task = -1);
 

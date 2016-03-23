@@ -112,8 +112,8 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 		if( monitoring )
 		{
 			AFINFO("JobContainer::job_register: monitor new job events.")
-			monitoring->addJobEvent( af::Msg::TMonitorJobsAdd, job->getId(), user->getId());
-			monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+			monitoring->addJobEvent( af::Monitor::EVT_jobs_add, job->getId(), user->getId());
+			monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 		}
 	}
 
@@ -127,8 +127,8 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 		{
 			AfContainerLock mLock( monitoring,  AfContainerLock::WRITELOCK  );
 
-			monitoring->addJobEvent( af::Msg::TMonitorJobsDel, job->getId(), user->getId());
-			monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+			monitoring->addJobEvent( af::Monitor::EVT_jobs_del, job->getId(), user->getId());
+			monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 		}
 
 		{   // Set job to zombie:
@@ -146,8 +146,8 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 		AfContainerLock mLock( monitoring,  AfContainerLock::WRITELOCK  );
 
 		AFINFO("JobContainer::job_register: monitor unlock job and user events.")
-		monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, job->getId(), user->getId());
-		monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+		monitoring->addJobEvent( af::Monitor::EVT_jobs_change, job->getId(), user->getId());
+		monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 	}
 
 	AFCommon::QueueLog("Job registered: " + job->v_generateInfoString());

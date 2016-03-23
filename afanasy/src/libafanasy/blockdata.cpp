@@ -32,6 +32,14 @@ const char * BlockData::DataModeFromMsgType( int i_type)
 	AFERRAR("BlockData::DataModeFromMsgTyp: Invalid block write mode: %d", i_type);
 	return "invalid";
 }
+const int32_t BlockData::DataModeFromString(  const std::string & i_mode)
+{
+	if( i_mode == DataMode_Progress   ) return af::Msg::TBlocksProgress;
+	if( i_mode == DataMode_Properties ) return af::Msg::TBlocksProperties;
+	if( i_mode == DataMode_Full       ) return af::Msg::TBlocks;	
+	AFERRAR("BlockData::DataModeFromString: Unknown data mode '%s'", i_mode.c_str())
+	return 0;
+}
 
 BlockData::BlockData()
 {

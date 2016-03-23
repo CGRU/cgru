@@ -5,7 +5,7 @@
 #include "wndtext.h"
 #include "reciever.h"
 
-class WndListenTask : public WndText, public Reciever
+class WndListenTask : public WndText, public Receiver
 {
 public:
    WndListenTask( int JobId, int BlockNum, int TaskNum, const QString & Name);

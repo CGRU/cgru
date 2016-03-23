@@ -4,6 +4,7 @@
 
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "action.h"
@@ -27,8 +28,6 @@ MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 	AfNodeSrv( this),
 	af::Monitor( i_obj)
 {
-	m_event_nodeids.resize( af::Monitor::EventsCount);
-
 	UserAf * user = i_users->getUser( m_user_name);
 	if( user )
 	{
@@ -45,7 +44,7 @@ void MonitorAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorCon
 {
 	if( getTimeUpdate() < (currentTime - af::Environment::getMonitorZombieTime()))
 	{
-		if( monitoring) monitoring->addEvent( af::Msg::TMonitorMonitorsDel, m_id);
+		if( monitoring) monitoring->addEvent( af::Monitor::EVT_monitors_del, m_id);
 		{
 			AFCommon::QueueLog("Monitor zombie: " + v_generateInfoString( false));
 			setZombie();
@@ -57,7 +56,7 @@ void MonitorAf::deregister()
 {
 	AFCommon::QueueLog("Monitor deregister: " + v_generateInfoString( false));
 	setZombie();
-	m_monitors->addEvent( af::Msg::TMonitorMonitorsDel, getId());
+	m_monitors->addEvent( af::Monitor::EVT_monitors_del, getId());
 }
 
 void MonitorAf::v_action( Action & i_action)
@@ -91,9 +90,9 @@ void MonitorAf::v_action( Action & i_action)
 
 			if( opclass == "jobs")
 			{
-				eids.push_back( af::Msg::TMonitorJobsAdd);
-				eids.push_back( af::Msg::TMonitorJobsChanged);
-				eids.push_back( af::Msg::TMonitorJobsDel);
+				eids.push_back( af::Monitor::EVT_jobs_add);
+				eids.push_back( af::Monitor::EVT_jobs_change);
+				eids.push_back( af::Monitor::EVT_jobs_del);
 				af::jr_int32vec("uids", uids, operation);
 				if( uids.size())
 				{
@@ -114,21 +113,21 @@ void MonitorAf::v_action( Action & i_action)
 			}
 			else if( opclass == "renders")
 			{
-				eids.push_back( af::Msg::TMonitorRendersAdd);
-				eids.push_back( af::Msg::TMonitorRendersChanged);
-				eids.push_back( af::Msg::TMonitorRendersDel);
+				eids.push_back( af::Monitor::EVT_renders_add);
+				eids.push_back( af::Monitor::EVT_renders_change);
+				eids.push_back( af::Monitor::EVT_renders_del);
 			}
 			else if( opclass == "users")
 			{
-				eids.push_back( af::Msg::TMonitorUsersAdd);
-				eids.push_back( af::Msg::TMonitorUsersChanged);
-				eids.push_back( af::Msg::TMonitorUsersDel);
+				eids.push_back( af::Monitor::EVT_users_add);
+				eids.push_back( af::Monitor::EVT_users_change);
+				eids.push_back( af::Monitor::EVT_users_del);
 			}
 			else if( opclass == "monitors")
 			{
-				eids.push_back( af::Msg::TMonitorMonitorsAdd);
-				eids.push_back( af::Msg::TMonitorMonitorsChanged);
-				eids.push_back( af::Msg::TMonitorMonitorsDel);
+				eids.push_back( af::Monitor::EVT_monitors_add);
+				eids.push_back( af::Monitor::EVT_monitors_change);
+				eids.push_back( af::Monitor::EVT_monitors_del);
 			}
 			else
 			{
@@ -140,7 +139,7 @@ void MonitorAf::v_action( Action & i_action)
 				// Subscribe or unsubscibe common events:
 				setEvents( eids, subscribe);
 			}
-			m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
+			m_monitors->addEvent( af::Monitor::EVT_monitors_change, getId());
 			appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_action.author);
 			m_time_activity = time( NULL);
 			return;
@@ -202,42 +201,42 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 
 void MonitorAf::setJobsUsersIds( const std::vector<int32_t> & i_ids)
 {
-	jobsUsersIds.clear();
+	m_jobsUsersIds.clear();
 	for( int i = 0; i < i_ids.size(); i++)
-		jobsUsersIds.push_back( i_ids[i]);
+		m_jobsUsersIds.push_back( i_ids[i]);
 }
 
 void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 {
 	for( int i = 0; i < i_ids.size(); i++)
 	{
-		int eventNum = i_ids[i] - EventsShift;
-		//printf("MonitorAf::setEvents: [%s] - %s\n", af::Msg::TNAMES[ids.getId(i)], value ? "ADD" : "DEL");
-		if((eventNum >= 0) && (eventNum < EventsCount))
+		int eventNum = i_ids[i];
+		if(( eventNum >= 0) && ( eventNum < EVT_COUNT))
 		{
-			events[eventNum] = value;
+			m_events[eventNum] = value;
 		}
 		else
 		{
-			AFERRAR("MonitorAf::addEvent: Invalid event: %d\n", i_ids[i]);
+			AFERRAR("MonitorAf::addEvent: Invalid event number: %d\n", eventNum);
 		}
 	}
+//printf("MonitorAf::setEvents:\n"); v_stdOut(true);
 }
 
 bool MonitorAf::hasJobUid( int uid) const
 {
-   for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
+   for( std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin(); it != m_jobsUsersIds.end(); it++)
       if( *it == uid) return true;
    return false;
 }
 
 bool MonitorAf::hasJobEvent( int type, int uid) const
 {
-   int count = jobsUsersIds.size();
+   int count = m_jobsUsersIds.size();
    if( count < 1) return false;
    if( hasEvent( type) == false) return false;
 
-   std::list<int32_t>::const_iterator it = jobsUsersIds.begin();
+   std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin();
    if(( count == 1 ) && ( *it == 0 )) return true;
 
    return hasJobUid( uid);
@@ -245,7 +244,7 @@ bool MonitorAf::hasJobEvent( int type, int uid) const
 
 bool MonitorAf::hasJobId( int id) const
 {
-	for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
+	for( std::list<int32_t>::const_iterator it = m_jobsIds.begin(); it != m_jobsIds.end(); it++)
 	{
 		if( *it == id) return true;
 	}
@@ -259,7 +258,7 @@ void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 	{
 		if( hasJobId( i_ids[i]) == false)
 		{
-			jobsIds.push_back( i_ids[i]);
+			m_jobsIds.push_back( i_ids[i]);
 		}
 	}
 }
@@ -267,25 +266,19 @@ void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
 {
 //printf("MonitorAf::setJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
-	jobsIds.clear();
-	for( int i = 0; i < i_ids.size(); i++) jobsIds.push_back( i_ids[i]);
+	m_jobsIds.clear();
+	for( int i = 0; i < i_ids.size(); i++) m_jobsIds.push_back( i_ids[i]);
 }
 
 void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
 //printf("MonitorAf::delJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
-	for( int i = 0; i < i_ids.size(); i++) jobsIds.remove( i_ids[i]);
+	for( int i = 0; i < i_ids.size(); i++) m_jobsIds.remove( i_ids[i]);
 }
 
 void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 {
-	if( m_event_nodeids.size() == 0)
-	{
-		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
-		return;
-	}
-
-	if(( i_type >= af::Monitor::EventsCount ) || ( i_type < 0 ))
+	if(( i_type >= af::Monitor::EVT_COUNT ) || ( i_type < 0 ))
 	{
 		AFERRAR("MonitorAf::addEvents: Event %d is invalid.", i_type)
 		return;
@@ -294,7 +287,7 @@ void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 	std::list<int32_t>::const_iterator it = i_ids.begin();
 	while( it != i_ids.end())
 	{
-		af::addUniqueToVect( m_event_nodeids[i_type], *it);
+		af::addUniqueToVect( m_e.m_events[i_type], *it);
 		it++;
 	}
 
@@ -305,79 +298,92 @@ void MonitorAf::addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgre
 {
 //std::ostringstream str;af::jw_state( i_tp->state, str);printf("MonitorAf::addTaskProgress():j=%d b=%d t=%d s='%s'\n", i_j, i_b, i_t, str.str().c_str());
 
-	for( int j = 0; j < m_tp.size(); j++)
+	for( int j = 0; j < m_e.m_tp.size(); j++)
 	{
-		if( m_tp[j].job_id != i_j ) continue;
+		if( m_e.m_tp[j].job_id != i_j ) continue;
 
-		for( int t = 0; t < m_tp[j].tp.size(); t++)
+		for( int t = 0; t < m_e.m_tp[j].tp.size(); t++)
 		{
-			if(( m_tp[j].blocks[t] == i_t ) && ( m_tp[j].tasks[t] == i_b ))
+			if(( m_e.m_tp[j].blocks[t] == i_t ) && ( m_e.m_tp[j].tasks[t] == i_b ))
 			{
-				m_tp[j].tp[t] = *i_tp;
+				m_e.m_tp[j].tp[t] = *i_tp;
 //printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
 				return;
 			}
 		}
 
-		m_tp[j].blocks.push_back( i_b);
-		m_tp[j].tasks.push_back(  i_t);
-		m_tp[j].tp.push_back( *i_tp);
+		m_e.m_tp[j].blocks.push_back( i_b);
+		m_e.m_tp[j].tasks.push_back(  i_t);
+		m_e.m_tp[j].tp.push_back( *i_tp);
 
 //printf("MonitorAf::addTaskProgress(): Task progress of the same job pushed.\n");
 		return;
 	}
 
-	const int last = m_tp.size();
-	m_tp.push_back( MTaskProgresses());
-	m_tp[last].job_id = i_j;
-	m_tp[last].blocks.push_back( i_b);
-	m_tp[last].tasks.push_back( i_t);
-	m_tp[last].tp.push_back( *i_tp);
+	const int last = m_e.m_tp.size();
+	m_e.m_tp.push_back( af::MonitorEvents::MTaskProgresses());
+	m_e.m_tp[last].job_id = i_j;
+	m_e.m_tp[last].blocks.push_back( i_b);
+	m_e.m_tp[last].tasks.push_back( i_t);
+	m_e.m_tp[last].tp.push_back( *i_tp);
 //printf("MonitorAf::addTaskProgress(): New job task progress pushed.\n");
 }
 
 void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 {
-	for( int i = 0; i < m_bids.size(); i++)
+	for( int i = 0; i < m_e.m_bids.size(); i++)
 	{
-		if(( m_bids[i].job_id == i_j ) && ( m_bids[i].block_num == i_b ))
+		if(( m_e.m_bids[i].job_id == i_j ) && ( m_e.m_bids[i].block_num == i_b ))
 		{
-			if( m_bids[i].mode < i_mode )
-				m_bids[i].mode = i_mode;
+			if( m_e.m_bids[i].mode < i_mode )
+				m_e.m_bids[i].mode = i_mode;
 			return;
 		}
 	}
 
-	int i = m_bids.size();
-	m_bids.push_back( MBlocksIds());
-	m_bids[i].job_id = i_j;
-	m_bids[i].block_num = i_b;
-	m_bids[i].mode = i_mode;
+	int i = m_e.m_bids.size();
+	m_e.m_bids.push_back( af::MonitorEvents::MBlocksIds());
+	m_e.m_bids[i].job_id = i_j;
+	m_e.m_bids[i].block_num = i_b;
+	m_e.m_bids[i].mode = i_mode;
 }
 
 void MonitorAf::addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids)
 {
-	for( int i = 0; i < m_jobs_order_uids.size(); i++)
-		if( m_jobs_order_uids[i] == i_uid )
+	for( int i = 0; i < m_e.m_jobs_order_uids.size(); i++)
+		if( m_e.m_jobs_order_uids[i] == i_uid )
 		{
-			m_jobs_order_jids[i] = i_jids;
+			m_e.m_jobs_order_jids[i] = i_jids;
 			return;
 		}
 
-	m_jobs_order_uids.push_back( i_uid);
-	m_jobs_order_jids.push_back( i_jids);
+	m_e.m_jobs_order_uids.push_back( i_uid);
+	m_e.m_jobs_order_jids.push_back( i_jids);
 }
 
-af::Msg * MonitorAf::getEvents()
+af::Msg * MonitorAf::getEventsBin()
+{
+	updateTime();
+
+	DlScopeLocker mutex( &m_mutex);
+
+	af::Msg * msg = NULL;
+
+	if( m_e.isEmpty())
+		msg = new af::Msg( af::Msg::TMonitorId, getId());
+	else
+		msg = new af::Msg( af::Msg::TMonitorEvents, &m_e);
+
+	m_e.clear();
+
+	return msg;
+}
+
+af::Msg * MonitorAf::getEventsJSON()
 {
 	updateTime();
 
 	af::Msg * msg = new af::Msg();
-	if( false == collectingEvents())
-	{
-		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
-		return msg;
-	}
 
 	std::ostringstream stream;
 	stream << "{\"events\":";
@@ -386,9 +392,9 @@ af::Msg * MonitorAf::getEvents()
 	DlScopeLocker mutex( &m_mutex);
 
 	// Nodes events:
-	for( int e = 0; e < af::Monitor::EventsCount; e++)
+	for( int e = 0; e < af::Monitor::EVT_COUNT; e++)
 	{
-		if( m_event_nodeids[e].size() == 0 )
+		if( m_e.m_events[e].size() == 0 )
 			continue;
 
 		if( hasevents )
@@ -396,23 +402,22 @@ af::Msg * MonitorAf::getEvents()
 		else
 			stream << "{";
 
-		stream << "\n\"" << af::Monitor::EventsNames[e] << "\":";
+		stream << "\n\"" << af::Monitor::EVT_NAMES[e] << "\":";
 		stream << "[";
 
-		for( int i = 0; i < m_event_nodeids[e].size(); i++)
+		for( int i = 0; i < m_e.m_events[e].size(); i++)
 		{
 			if( i )
 				stream << ",";
-			stream << m_event_nodeids[e][i];
+			stream << m_e.m_events[e][i];
 		}
 
 		stream << "]";
 		hasevents = true;
-		m_event_nodeids[e].clear();
 	}
 
 	// Tasks progress:
-	if( m_tp.size())
+	if( m_e.m_tp.size())
 	{
 		if( hasevents )
 			stream << ",";
@@ -420,37 +425,36 @@ af::Msg * MonitorAf::getEvents()
 			stream << "{";
 
 		stream << "\n\"tasks_progress\":[";
-		for( int j = 0; j < m_tp.size(); j++)
+		for( int j = 0; j < m_e.m_tp.size(); j++)
 		{
 			if( j > 0 ) stream << ",";
-			stream << "{\"job_id\":" << m_tp[j].job_id;
+			stream << "{\"job_id\":" << m_e.m_tp[j].job_id;
 			stream << ",\"blocks\":[";
-			for( int t = 0; t < m_tp[j].blocks.size(); t++)
+			for( int t = 0; t < m_e.m_tp[j].blocks.size(); t++)
 			{
 				if( t > 0 ) stream << ",";
-				stream << m_tp[j].blocks[t];
+				stream << m_e.m_tp[j].blocks[t];
 			}
 			stream << "],\"tasks\":[";
-			for( int t = 0; t < m_tp[j].tasks.size(); t++)
+			for( int t = 0; t < m_e.m_tp[j].tasks.size(); t++)
 			{
 				if( t > 0 ) stream << ",";
-				stream << m_tp[j].tasks[t];
+				stream << m_e.m_tp[j].tasks[t];
 			}
 			stream << "],\"progress\":[";
-			for( int t = 0; t < m_tp[j].tp.size(); t++)
+			for( int t = 0; t < m_e.m_tp[j].tp.size(); t++)
 			{
 				if( t > 0 ) stream << ",";
-				m_tp[j].tp[t].jsonWrite( stream);
+				m_e.m_tp[j].tp[t].jsonWrite( stream);
 			}	
 			stream << "]}";
 		}
 		stream << "]";
 		hasevents = true;
-		m_tp.clear();
 	}
 
 	// Blocks ids:
-	if( m_bids.size())
+	if( m_e.m_bids.size())
 	{
 		if( hasevents )
 			stream << ",";
@@ -460,35 +464,33 @@ af::Msg * MonitorAf::getEvents()
 		stream << "\n\"block_ids\":{";
 
 		stream << "\"job_id\":[";
-		for( int i = 0; i < m_bids.size(); i++)
+		for( int i = 0; i < m_e.m_bids.size(); i++)
 		{
 			if( i > 0 ) stream << ",";
-			stream << m_bids[i].job_id;
+			stream << m_e.m_bids[i].job_id;
 		}
 		stream << "],";
 
 		stream << "\"block_num\":[";
-		for( int i = 0; i < m_bids.size(); i++)
+		for( int i = 0; i < m_e.m_bids.size(); i++)
 		{
 			if( i > 0 ) stream << ",";
-			stream << m_bids[i].block_num;
+			stream << m_e.m_bids[i].block_num;
 		}
 		stream << "],";
 
 		stream << "\"mode\":[";
-		for( int i = 0; i < m_bids.size(); i++)
+		for( int i = 0; i < m_e.m_bids.size(); i++)
 		{
 			if( i > 0 ) stream << ",";
-			stream << '"' << af::BlockData::DataModeFromMsgType( m_bids[i].mode) << '"';
+			stream << '"' << af::BlockData::DataModeFromMsgType( m_e.m_bids[i].mode) << '"';
 		}
 		stream << "]}";
 
 		hasevents = true;
-
-		m_bids.clear();
 	}
 
-	if( m_jobs_order_uids.size())
+	if( m_e.m_jobs_order_uids.size())
 	{
 		if( hasevents )
 			stream << ",";
@@ -496,29 +498,26 @@ af::Msg * MonitorAf::getEvents()
 			stream << "{";
 
 		stream << "\"jobs_order\":{\"uids\":[";
-		for( int i = 0; i < m_jobs_order_uids.size(); i++)
+		for( int i = 0; i < m_e.m_jobs_order_uids.size(); i++)
 		{
 			if( i > 0 ) stream << ",";
-			stream << m_jobs_order_uids[i];
+			stream << m_e.m_jobs_order_uids[i];
 		}
 		stream << "],\"jids\":[";
-		for( int i = 0; i < m_jobs_order_jids.size(); i++)
+		for( int i = 0; i < m_e.m_jobs_order_jids.size(); i++)
 		{
 			if( i > 0 ) stream << ",";
 			stream << "[";
-			for( int j = 0; j < m_jobs_order_jids[i].size(); j++)
+			for( int j = 0; j < m_e.m_jobs_order_jids[i].size(); j++)
 			{
 				if( j > 0 ) stream << ",";
-				stream << m_jobs_order_jids[i][j];
+				stream << m_e.m_jobs_order_jids[i][j];
 			}
 			stream << "]";
 		}
 		stream << "]}";
 
 		hasevents = true;
-
-		m_jobs_order_uids.clear();
-		m_jobs_order_jids.clear();
 	}
 
 
@@ -531,6 +530,8 @@ af::Msg * MonitorAf::getEvents()
 //if( hasevents ) printf("MonitorAf::getEvents():\n%s\n", stream.str().c_str());
 
 	msg->setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
+
+	m_e.clear();
 
 	return msg;
 }

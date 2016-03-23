@@ -1,7 +1,9 @@
 #include "listmonitors.h"
 
-#include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
+#include "../libafanasy/environment.h"
+#include "../libafanasy/monitor.h"
+#include "../libafanasy/monitorevents.h"
 
 #include "itemmonitor.h"
 #include "ctrlsortfilter.h"
@@ -42,9 +44,9 @@ ListMonitors::ListMonitors( QWidget* parent):
 	ctrl->addFilterType( CtrlSortFilter::TADDRESS);
 	initSortFilterCtrl();
 
-	m_eventsShowHide << af::Msg::TMonitorMonitorsAdd;
-	m_eventsShowHide << af::Msg::TMonitorMonitorsChanged;
-	m_eventsOnOff    << af::Msg::TMonitorMonitorsDel;
+	m_eventsShowHide << af::Monitor::EVT_monitors_add;
+	m_eventsShowHide << af::Monitor::EVT_monitors_change;
+	m_eventsOnOff    << af::Monitor::EVT_monitors_del;
 
 	m_parentWindow->setWindowTitle("Monitors");
 
@@ -86,33 +88,36 @@ AFINFO("ListMonitors::caseMessage( Msg msg)\n");
 		calcTitle();
 		break;
 	}
-	case af::Msg::TMonitorMonitorsDel:
-	{
-		af::MCGeneral ids( msg);
-//printf("case af::Msg::TMonitorMonitorsDel: "); ids.stdOut( true);
-		deleteItems( ids);
-		calcTitle();
-		break;
-	}
-	case af::Msg::TMonitorMonitorsAdd:
-	{
-		af::MCGeneral ids( msg);
-//printf("case af::Msg::TMonitorMonitorsAdd: "); ids.stdOut( true);
-		deleteItems( ids);
-		Watch::sendMsg( new af::Msg( af::Msg::TMonitorsListRequestIds, &ids, true));
-		break;
-	}
-	case af::Msg::TMonitorMonitorsChanged:
-	{
-		af::MCGeneral ids( msg);
-//printf("case af::Msg::TMonitorMonitorsChanged: "); ids.stdOut( true);
-		Watch::sendMsg( new af::Msg( af::Msg::TMonitorsListRequestIds, &ids, true));
-		break;
-	}
 	default:
 		return false;
 	}
 	return true;
+}
+
+bool ListMonitors::processEvents( const af::MonitorEvents & i_me)
+{
+	if( i_me.m_events[af::Monitor::EVT_monitors_del].size())
+	{
+		deleteItems( i_me.m_events[af::Monitor::EVT_monitors_del]);
+		calcTitle();
+		return true;
+	}
+
+	af::MCGeneral ids;
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_monitors_change].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_monitors_change][i]);
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_monitors_add].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_monitors_add][i]);
+
+	if( ids.getCount())
+	{
+		Watch::sendMsg( new af::Msg( af::Msg::TMonitorsListRequestIds, &ids, true));
+		return true;
+	}
+
+	return false;
 }
 
 ItemNode* ListMonitors::v_createNewItem( af::Node *node, bool i_subscibed)

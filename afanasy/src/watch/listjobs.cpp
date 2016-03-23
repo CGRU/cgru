@@ -42,9 +42,9 @@ QString ListJobs::FilterString_SU = "";
 ListJobs::ListJobs( QWidget* parent):
 	ListNodes( parent, "jobs")
 {
-	m_eventsShowHide << af::Msg::TMonitorJobsAdd;
-	m_eventsShowHide << af::Msg::TMonitorJobsChanged;
-	m_eventsOnOff    << af::Msg::TMonitorJobsDel;
+	m_eventsShowHide << af::Monitor::EVT_jobs_add;
+	m_eventsShowHide << af::Monitor::EVT_jobs_change;
+	m_eventsOnOff    << af::Monitor::EVT_jobs_del;
 
 	if( af::Environment::VISOR())
 	{
@@ -413,25 +413,9 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 			}
 			v_subscribe();
 		}
-		break;
-	}
-	case af::Msg::TMonitorJobsDel:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		break;
-	}
-	case af::Msg::TMonitorJobsAdd:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
-		break;
-	}
-	case af::Msg::TMonitorJobsChanged:
-	{
-		af::MCGeneral ids( msg);
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
+
+		calcTotals();
+
 		break;
 	}
 	case af::Msg::TUserJobsOrder:
@@ -441,13 +425,50 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 		sortMatch( ids.getList());
 		break;
 	}
+
 	default:
 		return false;
 	}
 
-	calcTotals();
-
 	return true;
+}
+
+bool ListJobs::processEvents( const af::MonitorEvents & i_me)
+{
+	if( i_me.m_events[af::Monitor::EVT_jobs_del].size())
+	{
+		deleteItems( i_me.m_events[af::Monitor::EVT_jobs_del]);
+		calcTotals();
+		return true;
+	}
+
+	af::MCGeneral ids;
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_change].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_jobs_change][i]);
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_add].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_jobs_add][i]);
+
+	if( ids.getCount())
+	{
+		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
+		return true;
+	}
+
+	if( i_me.m_jobs_order_uids.size())
+	{
+		for( int u = 0; u < i_me.m_jobs_order_uids.size(); u++)
+		{
+			if( i_me.m_jobs_order_uids[u] == Watch::getUid())
+			{
+				sortMatch( i_me.m_jobs_order_jids[u]);
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)

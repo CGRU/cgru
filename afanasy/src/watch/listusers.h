@@ -13,7 +13,10 @@ public:
 	~ListUsers();
 
 	bool caseMessage( af::Msg * msg);
+
 	ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
+
+	virtual bool processEvents( const af::MonitorEvents & i_me);
 
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);

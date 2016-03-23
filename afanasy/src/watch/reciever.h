@@ -1,16 +1,19 @@
 #pragma once
 
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/name_af.h"
 
 #include <QtGui/QTextEdit>
 
-class Reciever
+class Receiver
 {
 public:
-	Reciever();
-	virtual ~Reciever();
+	Receiver();
+	virtual ~Receiver();
 
 	virtual bool caseMessage( af::Msg * msg) = 0;
+
+	virtual bool processEvents( const af::MonitorEvents & i_me);
 
 	virtual bool v_filesReceived( const af::MCTaskUp & i_taskup);
 

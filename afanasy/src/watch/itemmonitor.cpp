@@ -53,12 +53,11 @@ void ItemMonitor::updateValues( af::Node *node, int type)
 
    events.clear();
    eventscount = 0;
-   for( int e = 0; e < af::Monitor::EventsCount; e++)
+   for( int e = 0; e < af::Monitor::EVT_COUNT; e++)
    {
-      int etype = e + af::Monitor::EventsShift;
-      if( monitor->hasEvent(etype))
+      if( monitor->hasEvent(e))
       {
-         events << af::Msg::TNAMES[etype];
+         events << af::Monitor::EVT_NAMES[e];
          eventscount ++;
       }
    }

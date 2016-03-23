@@ -36,24 +36,14 @@ MonitorNode.prototype.init = function()
 
 	this.element.appendChild( document.createElement('br'));
 
+	this.elEvents = document.createElement('div');
+	this.element.appendChild( this.elEvents);
+
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild( this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
 	this.elAnnotation.style.textAlign = 'center';
 	this.elAnnotation.classList.add('prestar');
-
-	this.elBarParent = document.createElement('div');
-	this.element.appendChild( this.elBarParent);
-	this.elBarParent.style.position = 'absolute';
-	this.elBarParent.style.left = '120px';
-	this.elBarParent.style.right = '50px';
-	this.elBarParent.style.top = '18px';
-	this.elBarParent.style.height = '12px';
-
-	this.elBar = document.createElement('div');
-	this.elBarParent.appendChild( this.elBar);
-	this.elBar.classList.add('bar');
-//	this.elBar.style.textAlign = 'right';
 }
 
 MonitorNode.prototype.update = function( i_obj)
@@ -74,6 +64,15 @@ MonitorNode.prototype.update = function( i_obj)
 	this.elAddress.textContent = this.params.address.ip + ':' + this.params.address.port;
 
 	this.elIP.textContent = 'IP=' + this.params.address.ip;
+
+	var events = '';
+	if( this.params.users_ids && this.params.users_ids.length )
+		events += ' UIDs:' + JSON.stringify( this.params.users_ids);
+	if( this.params.jobs_ids && this.params.jobs_ids.length )
+		events += ' JIDs:' + JSON.stringify( this.params.jobs_ids);
+	if( this.params.events && this.params.events.length )
+		events += ' EVTs:' + JSON.stringify( this.params.events);
+	this.elEvents.textContent = events;
 
 	if( this.params.annotation )
 		this.elAnnotation.textContent = this.params.annotation;

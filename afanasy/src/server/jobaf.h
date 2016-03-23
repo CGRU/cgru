@@ -42,7 +42,7 @@ public:
 
 	af::Msg * writeProgress( bool json);   ///< Write job progress in message.
 
-	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const;
+	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes, bool i_binary) const;
 
 	af::Msg * writeTask( int i_b, int i_t, const std::string & i_mode, bool i_binary) const;
 

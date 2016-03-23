@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../libafanasy/monitor.h"
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "afnodesrv.h"
@@ -32,11 +33,10 @@ public:
 
 	static void setMonitorContainer( MonitorContainer * i_monitors) { m_monitors = i_monitors;}
 
-	inline bool collectingEvents() { return m_event_nodeids.size() != 0;}
-
 	void addEvents( int i_type, const std::list<int32_t> i_ids);
 
-	af::Msg * getEvents();
+	af::Msg * getEventsBin();
+	af::Msg * getEventsJSON();
 
 	void addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgress * i_tp);
 
@@ -54,28 +54,10 @@ private:
 	void delJobIds( const std::vector<int32_t> & i_ids);
 
 private:
-	std::vector<std::vector<int> > m_event_nodeids;
+	af::MonitorEvents m_e;
 
-	struct MTaskProgresses {
-		int job_id;
-		std::vector<int> blocks;
-		std::vector<int> tasks;
-		std::vector<af::TaskProgress> tp;
-	};
-	std::vector<MTaskProgresses> m_tp;
-
-	struct MBlocksIds {
-		int job_id;
-		int block_num;
-		int mode;
-	};
-	std::vector<MBlocksIds> m_bids;
-
-	std::vector<int32_t> m_jobs_order_uids;
-	std::vector<std::vector<int32_t> > m_jobs_order_jids;
+	DlMutex m_mutex;
 
 private:
 	static MonitorContainer * m_monitors;
-
-	DlMutex m_mutex;
 };

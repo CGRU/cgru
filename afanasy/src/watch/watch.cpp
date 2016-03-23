@@ -35,7 +35,7 @@ const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Monitor
 WndList* Watch::opened[WLAST] = {0,0,0,0,0};
 
 QLinkedList<Wnd*>      Watch::ms_windows;
-QLinkedList<Reciever*> Watch::ms_recievers;
+QLinkedList<Receiver*> Watch::ms_receivers;
 QLinkedList<int>       Watch::ms_listenjobids;
 QLinkedList<int>       Watch::ms_watchtasksjobids;
 QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
@@ -123,36 +123,50 @@ void Watch::addWindow( Wnd * wnd)
    }
    else ms_windows.append( wnd);
 }
-void Watch::addReciever( Reciever * reciever)
+void Watch::addReceiver( Receiver * receiver)
 {
-   if( ms_recievers.contains( reciever))
+   if( ms_receivers.contains( receiver))
    {
-      AFERROR("Watch::addReciever: Reciever already exists.")
+      AFERROR("Watch::addReciever: Receiver already exists.")
    }
-   else ms_recievers.append( reciever);
+   else ms_receivers.append( receiver);
 }
 void Watch::removeWindow(   Wnd      * wnd      ) {   ms_windows.removeAll( wnd);      }
-void Watch::removeReciever( Reciever * reciever ) { ms_recievers.removeAll( reciever); }
+void Watch::removeReceiver( Receiver * receiver ) { ms_receivers.removeAll( receiver); }
 
 void Watch::caseMessage( af::Msg * msg)
 {
-   bool recieved = false;
-   QLinkedList<Reciever*>::iterator rIt;
-   for( rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+   bool received = false;
+
+	QLinkedList<Receiver*>::iterator rIt;
+	for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+	{
+		msg->resetWrittenSize();
+		if( (*rIt)->caseMessage( msg) && (false == received)) received = true;
+	}
+
+	if( msg->type() == af::Msg::TMonitorEvents )
+	{
+		msg->resetWrittenSize();
+		af::MonitorEvents me( msg);
+
+		for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+		{
+			msg->resetWrittenSize();
+			if( (*rIt)->processEvents( me) && (false == received)) received = true;
+		}
+	}
+
+   if( false == received)
    {
-      msg->resetWrittenSize();
-      if( (*rIt)->caseMessage( msg) && (false == recieved)) recieved = true;
-   }
-   if( false == recieved)
-   {
-      AFERROR("Watch::caseMessage: Unknown message recieved:")
-      msg->v_stdOut();
+		printf("Unknown message received: ");
+		msg->v_stdOut();
    }
 }
 
 void Watch::filesReceived( const af::MCTaskUp & i_taskup)
 {
-	for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+	for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
 		if((*rIt)->v_filesReceived( i_taskup))
 			return;
@@ -225,14 +239,14 @@ void Watch::watchJodTasksWindowRem( int id)
 
 void Watch::connectionLost()
 {
-   for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+   for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionLost();
    if(ms_m) ms_m->connectionLost();
 }
 
 void Watch::connectionEstablished()
 {
-   for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+   for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionEstablished();
    if(ms_m) ms_m->connectionEstablished();
 }

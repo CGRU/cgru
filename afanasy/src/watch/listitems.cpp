@@ -139,16 +139,28 @@ void ListItems::itemsHeightChanged() { m_model->itemsHeightChanged();}
 void ListItems::itemsHeightCalc() { m_model->itemsHeightCalc();}
 void ListItems::repaintItems() { m_view->repaintViewport();}
 
-void ListItems::deleteItems( af::MCGeneral & ids)
+void ListItems::deleteItems( const std::vector<int32_t> & i_ids)
 {
 	int row = 0;
 	while( row < m_model->count())
-		if( ids.hasId( m_model->item(row)->getId()))
-			m_model->delItem( row);
-		else
-			row++;
-}
+	{
+		bool deleted = false;
+		for( int i = 0; i < i_ids.size(); i++)
+		{
+			if( i_ids[i] == m_model->item(row)->getId())
+			{
+				m_model->delItem( row);
+				deleted = true;
+				break;
+			}
+		}
 
+		if( deleted )
+			continue;
+
+		row++;
+	}
+}
 void ListItems::setAllowSelection( bool allow)
 {
 	if( allow ) m_view->setSelectionMode( QAbstractItemView::ExtendedSelection  );
@@ -253,6 +265,42 @@ void ListItems::operation( const std::string & i_operation)
 	Watch::sendMsg( af::jsonMsg( str));
 
 	displayInfo(QString("Operation: \"%1\".").arg( afqt::stoq( i_operation)));
+}
+
+void ListItems::get(
+		const char * i_type,
+		const std::vector<int32_t> & i_ids,
+		const std::vector<std::string> & i_modes,
+		const std::vector<int32_t> & i_blocks)
+{
+//	{"get":{"type":"jobs","ids":[6],"mode":["progress"],"block_ids":[0]}}
+	std::ostringstream str;
+
+	str << "{\"get\":{\"binary\":true,\"type\":\"" << i_type << "\",\"ids\":[";
+	for( int i = 0; i < i_ids.size(); i++ ) { if(i) str << ','; str << i_ids[i]; }
+	str << "]";
+
+	if( i_modes.size())
+	{
+		str << ",\"mode\":[";
+		for( int i = 0; i < i_modes.size(); i++ ) { if(i) str << ','; str << '"' << i_modes[i] << '"'; }
+		str << "]";
+	}
+
+	if( i_blocks.size())
+	{
+		str << ",\"block_ids\":[";
+		for( int i = 0; i < i_blocks.size(); i++ ) { if(i) str << ','; str << i_blocks[i]; }
+		str << "]";
+	}
+
+	str << "}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+
+	msg->setReceiving( true);
+
+	Watch::sendMsg( msg);
 }
 
 const std::vector<int> ListItems::getSelectedIds() const

@@ -46,6 +46,7 @@ public:
 	static const char DataMode_Properties[];
 	static const char DataMode_Full[];
 	static const char * DataModeFromMsgType( int i_type);
+	static const int32_t DataModeFromString( const std::string & i_mode);
 
 	inline uint32_t getFlags() const { return m_flags;}
 

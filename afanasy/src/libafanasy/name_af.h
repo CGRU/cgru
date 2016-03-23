@@ -279,6 +279,8 @@ namespace af
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
 	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object);
 
+	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
+	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);
 	void jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render = false);
 
 	af::Msg * jsonMsg( const std::string & i_str);

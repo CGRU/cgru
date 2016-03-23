@@ -25,7 +25,7 @@ class ButtonPanel;
 class ModelItems;
 class ViewItems;
 
-class ListItems : public QWidget, public Reciever
+class ListItems : public QWidget, public Receiver
 {
 Q_OBJECT
 public:
@@ -61,12 +61,18 @@ protected:
 
 	void action( af::MCGeneral & mcgeneral, int type);
 
+	void get(
+		const char * i_type,
+		const std::vector<int32_t> & i_ids,
+		const std::vector<std::string> & i_modes = std::vector<std::string>(),
+		const std::vector<int32_t> & i_blocks = std::vector<int32_t>());
+
 	inline void setParameter( const std::string & i_name, long long i_value) const
 		{ setParameter( i_name, af::itos( i_value), false);}
 	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
 	void operation( const std::string & i_operation);
 
-	void deleteItems( af::MCGeneral & ids);
+	void deleteItems( const std::vector<int32_t> & i_ids);
 
 	void setAllowSelection( bool allow);
 	Item* getCurrentItem() const;

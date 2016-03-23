@@ -65,7 +65,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
       if( id != 0 )
       {
 			newRender->initialize();
-         if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersAdd, id);
+         if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_add, id);
          AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
 //if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
       }

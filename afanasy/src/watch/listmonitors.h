@@ -14,8 +14,11 @@ public:
    ListMonitors( QWidget* parent);
    ~ListMonitors();
 
-   bool caseMessage( af::Msg * msg);
-   ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
+	bool caseMessage( af::Msg * msg);
+
+	ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
+
+	virtual bool processEvents( const af::MonitorEvents & i_me);
 
 protected:
    void contextMenuEvent( QContextMenuEvent *event);

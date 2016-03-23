@@ -302,7 +302,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
       {
 //printf("JobAf::deleteNode: runningtaskscounter = %d\n", runningtaskscounter);
          restartAllTasks("Job deletion.", renders, monitoring, AFJOB::STATE_RUNNING_MASK);
-         if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+         if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
          return;
       }
    }
@@ -330,7 +330,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
 	AFCommon::DBAddJob( this);
 
-   if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
+   if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_del, getId(), getUid());
    AFCommon::QueueLog("Deleting a job: " + v_generateInfoString());
    unLock();
 }
@@ -370,7 +370,7 @@ void JobAf::v_action( Action & i_action)
 				}
 
 				if( job_progress_changed )
-					i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+					i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 
 				if( i_action.log.size() )
 					store();
@@ -406,7 +406,7 @@ void JobAf::v_action( Action & i_action)
 			appendLog("Deleted by " + i_action.author);
 			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_action.author);
 			deleteNode( i_action.renders, i_action.monitors);
-			i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
+			i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_del, getId(), getUid());
 			return;
 		}
 		else if( type == "start")
@@ -464,7 +464,7 @@ void JobAf::v_action( Action & i_action)
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
-		i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 		store();
 		return;
 	}
@@ -485,14 +485,14 @@ void JobAf::v_action( Action & i_action)
 			return;
 		}
 
-        i_action.monitors->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
-        i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), m_user->getId());
+        i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
+        i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_del, getId(), m_user->getId());
 
         m_user->removeJob( this);
         user->addJob( this);
 
-        i_action.monitors->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
-        i_action.monitors->addJobEvent( af::Msg::TMonitorJobsAdd, getId(), m_user->getId());
+        i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
+        i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_add, getId(), m_user->getId());
 
 		store();
 
@@ -502,7 +502,7 @@ void JobAf::v_action( Action & i_action)
 	if( i_action.log.size() )
 	{
 		store();
-		i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 	}
 }
 
@@ -630,7 +630,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          {
             appendLog( std::string("Block[") + m_blocks_data[block]->getName() + "] appears second time while job generating a task.\nJob has a recursive blocks tasks dependence.");
             m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
-            if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+            if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
             return NULL;
          }
          bIt++;
@@ -979,14 +979,14 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
       if( m_time_wait > currentTime ) m_state = m_state |   AFJOB::STATE_WAITTIME_MASK;
       else                          m_state = m_state & (~AFJOB::STATE_WAITTIME_MASK);
       bool nowWaining = m_state & AFJOB::STATE_WAITTIME_MASK;
-      if( wasWaiting != nowWaining) jobchanged = af::Msg::TMonitorJobsChanged;
+      if( wasWaiting != nowWaining) jobchanged = af::Monitor::EVT_jobs_change;
    }
 
    //
    // Update blocks (blocks will uptate its tasks):
    for( int b = 0; b < m_blocks_num; b++)
       if( m_blocks[b]->v_refresh( currentTime, renders, monitoring))
-         jobchanged = af::Msg::TMonitorJobsChanged;
+         jobchanged = af::Monitor::EVT_jobs_change;
 
    //
    // job state calculation
@@ -1021,7 +1021,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
             appendLog("Started.");
          }
          appendLog("Done.");
-         jobchanged = af::Msg::TMonitorJobsChanged;
+         jobchanged = af::Monitor::EVT_jobs_change;
 			store();
       }
    }
@@ -1050,7 +1050,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 
 	if( m_state != old_state )
 	{
-		jobchanged = af::Msg::TMonitorJobsChanged;
+		jobchanged = af::Monitor::EVT_jobs_change;
 
 		// If it is no job monitoring, job just came to server and it is first it refresh,
 		// so no change event and database storing needed
@@ -1100,7 +1100,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 
 	if( m_thumb_changed || m_report_changed )
 	{
-		jobchanged = af::Msg::TMonitorJobsChanged;
+		jobchanged = af::Monitor::EVT_jobs_change;
 		m_thumb_changed = false;
 		m_report_changed = false;
 	}
@@ -1115,7 +1115,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
          appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
          m_user->appendLog( std::string("Job \"") + m_name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
          deleteNode( renders, monitoring);
-         jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
+         jobchanged = af::Monitor::EVT_jobs_del, getId(), getUid();
       }
    }
 
@@ -1232,7 +1232,7 @@ af::Msg * JobAf::writeProgress( bool json)
 	return msg;
 }
 
-af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const
+af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes, bool i_binary) const
 {
 //printf("JobAf::writeBlocks: bs=%d, ms=%d\n", i_block_ids.size(), i_modes.size());
 //printf("bids:");for(int i=0;i<i_block_ids.size();i++)printf(" %d",i_block_ids[i])    ;printf("\n");
@@ -1242,6 +1242,14 @@ af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std:
 		AFERRAR("JobAf::writeBlocks: i_block_ids.size() != i_modes.size(): %d != %d",
 				int(i_block_ids.size()), int(i_modes.size()));
 		return NULL;
+	}
+
+	if( i_binary )
+	{
+		af::MCAfNodes mcblocks;
+		for( int b = 0; b < i_block_ids.size(); b++)
+		mcblocks.addNode( m_blocks_data[i_block_ids[b]]);
+		return new af::Msg( af::BlockData::DataModeFromString( i_modes[0]), &mcblocks);
 	}
 
 	std::ostringstream str;

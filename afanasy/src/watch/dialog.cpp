@@ -36,7 +36,7 @@
 #include <QtGui/QScrollArea>
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 int Dialog::ms_size_border_top   = 40;
@@ -371,9 +371,7 @@ void Dialog::newMessage( af::Msg *msg)
     default:
         Watch::caseMessage( msg);
     }
-    AFINFO("Dialog::newMessage: Reaction finished deleting message.")
     delete msg;
-    AFINFO("Dialog::newMessage: Message successfully deleted.")
 }
 
 void Dialog::closeList()

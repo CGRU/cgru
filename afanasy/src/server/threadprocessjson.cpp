@@ -171,7 +171,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						{
 							std::vector<std::string> modes;
 							af::jr_stringvec("mode", modes, getObj);
-							o_msg_response = job->writeBlocks( block_ids, modes);
+							o_msg_response = job->writeBlocks( block_ids, modes, binary);
 						}
 					}
 					else if( mode.size())
@@ -258,7 +258,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 					MonitorAf* node = it.getMonitor( ids[0]);
 					if( node != NULL )
 					{
-						o_msg_response = node->getEvents();
+						o_msg_response = node->getEventsJSON();
 					}
 					else
 					{
@@ -348,7 +348,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
 			{
 				render->getFarmHost();
-				i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
+				i_args->monitors->addEvent( af::Monitor::EVT_renders_change, render->getId());
 			}
 			printf("\n	========= FARM RELOADED SUCCESSFULLY =========\n\n");
 			o_msg_response = af::jsonMsgStatus( true, "reload_farm",

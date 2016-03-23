@@ -1,6 +1,8 @@
 #include "listusers.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/monitor.h"
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "itemuser.h"
@@ -43,9 +45,9 @@ ListUsers::ListUsers( QWidget* parent):
 	ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
 	initSortFilterCtrl();
 
-	m_eventsShowHide << af::Msg::TMonitorUsersAdd;
-	m_eventsShowHide << af::Msg::TMonitorUsersChanged;
-	m_eventsOnOff    << af::Msg::TMonitorUsersDel;
+	m_eventsShowHide << af::Monitor::EVT_users_add;
+	m_eventsShowHide << af::Monitor::EVT_users_change;
+	m_eventsOnOff    << af::Monitor::EVT_users_del;
 
 	m_parentWindow->setWindowTitle("Users");
 
@@ -171,30 +173,36 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
 		v_subscribe();
 		break;
 	}
-	case af::Msg::TMonitorUsersDel:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		calcTitle();
-		break;
-	}
-	case af::Msg::TMonitorUsersAdd:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
-		break;
-	}
-	case af::Msg::TMonitorUsersChanged:
-	{
-		af::MCGeneral ids( msg);
-		Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
-		break;
-	}
 	default:
 		return false;
 	}
 	return true;
+}
+
+bool ListUsers::processEvents( const af::MonitorEvents & i_me)
+{
+	if( i_me.m_events[af::Monitor::EVT_users_del].size())
+	{
+		deleteItems( i_me.m_events[af::Monitor::EVT_users_del]);
+		calcTitle();
+		return true;
+	}
+
+	af::MCGeneral ids;
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_users_change].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_users_change][i]);
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_users_add].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_users_add][i]);
+
+	if( ids.getCount())
+	{
+		Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
+		return true;
+	}
+
+	return false;
 }
 
 ItemNode* ListUsers::v_createNewItem( af::Node *node, bool i_subscibed)

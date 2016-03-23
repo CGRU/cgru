@@ -570,9 +570,8 @@ const char * Msg::TNAMES[]=
 	"TMonitorJobsIdsSet",         ///< Set jobs ids for monitoring.
 	"TMonitorJobsIdsDel",         ///< Delete monitoring jobs ids.
 	"TMonitorMessage",            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
-
-	"TMonitorEvents_BEGIN",       ///< Events types start.
-
+	"TMonitorEvents",             ///< Events.
+/*
 	"TMonitorJobEvents_BEGIN",    ///< Job events types start.
 	"TMonitorJobsAdd",            ///< IDs of new jobs.
 	"TMonitorJobsChanged",        ///< IDs of changed jobs.
@@ -594,7 +593,7 @@ const char * Msg::TNAMES[]=
 	"TMonitorCommonEvents_END",   ///< Common events types end.
 
 	"TMonitorEvents_END",         ///< Events types end.
-
+*/
 
 	/*- Render messages -*/
 	/** Sent by Render on start, when it's server begin to listen post.
@@ -638,7 +637,7 @@ const char * Msg::TNAMES[]=
 	"TTaskUpdateState",           ///< New state for task.
 	"TTaskListenOutput",          ///< Request to send task output to provided address.
 	"TTaskFiles",                 ///< Task (or entire job) files
-	"TTasksRun",                  ///< Job tasks run data.
+//	"TTasksRun",                  ///< Job tasks run data.
 	"TTaskOutput",                ///< Job task output data (for task listening: from afrender directly to afwatch).
 
 	"TRESERVED10",

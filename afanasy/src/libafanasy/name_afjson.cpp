@@ -291,6 +291,29 @@ bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & 
 	return true;
 }
 
+void af::jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str)
+{
+	o_str << "\n,\"" << i_name << "\":[";
+	std::list<int32_t>::const_iterator it = i_list.begin();
+	for( ; it != i_list.end(); it++)
+	{
+		if( it != i_list.begin()) o_str << ',';
+		o_str << *it;
+	}
+	o_str << "]";
+}
+
+void af::jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str)
+{
+	o_str << "\n,\"" << i_name << "\":[";
+	for( int i = 0; i < i_vec.size(); i++)
+	{
+		if( i ) o_str << ',';
+		o_str << i_vec[i];
+	}
+	o_str << "]";
+}
+
 void af::jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render)
 {
 	o_str << "\"state\":\"";

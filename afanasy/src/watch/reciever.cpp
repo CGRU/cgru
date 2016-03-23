@@ -6,16 +6,17 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Reciever::Reciever()
+Receiver::Receiver()
 {
-	Watch::addReciever( this);
+	Watch::addReceiver( this);
 }
 
-Reciever::~Reciever()
+Receiver::~Receiver()
 {
-	Watch::removeReciever( this);
+	Watch::removeReceiver( this);
 }
 
-bool Reciever::v_filesReceived( const af::MCTaskUp & i_taskup){ return false;}
-void Reciever::v_connectionLost(){}
-void Reciever::v_connectionEstablished(){}
+bool Receiver::processEvents( const af::MonitorEvents & i_me) { return false;}
+bool Receiver::v_filesReceived( const af::MCTaskUp & i_taskup){ return false;}
+void Receiver::v_connectionLost(){}
+void Receiver::v_connectionEstablished(){}

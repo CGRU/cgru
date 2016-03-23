@@ -7,6 +7,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/service.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
@@ -316,17 +317,12 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		delete progress;
 		break;
 	}
-	case af::Msg::TTasksRun:
-	{
-		af::MCTasksProgress mctsp( msg);
-		if( mctsp.getJobId() != m_job_id ) return false;
-		return updateTasks( &mctsp);
-	}
-	case af::Msg::TMonitorJobsDel:
+/*	case af::Msg::TMonitorJobsDel:
 	{
 		af::MCGeneral ids( msg);
 		if( ids.hasId( m_job_id) == false) break;
 	}
+*/
 	case af::Msg::TJobRequestId:
 	case af::Msg::TJobProgressRequestId:
 	{  // this messages sent if where is no job with given id.
@@ -335,6 +331,7 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		m_parentWindow->close();
 		break;
 	}
+/*
 	case af::Msg::TMonitorJobsAdd:
 	{
 		af::MCGeneral ids( msg);
@@ -342,6 +339,7 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 			Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, m_job_id, true));
 		break;
 	}
+*/
 	case af::Msg::TBlocks:
 	case af::Msg::TBlocksProperties:
 	case af::Msg::TBlocksProgress:
@@ -372,6 +370,53 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		return false;
 	}
 	return true;
+}
+
+bool ListTasks::processEvents( const af::MonitorEvents & i_me)
+{
+	bool founded = false;
+
+	if( i_me.m_tp.size())
+	{
+		for( int j = 0; j < i_me.m_tp.size(); j++ )
+		{
+			if( i_me.m_tp[j].job_id != m_job_id )
+				continue;
+
+			updateTasks( i_me.m_tp[j].blocks, i_me.m_tp[j].tasks, i_me.m_tp[j].tp);
+
+			founded = true;
+
+			break;
+		}
+	}
+
+	if( i_me.m_bids.size())
+	{
+		std::vector<int32_t> job_ids;
+		std::vector<int32_t> block_ids;
+		std::vector<std::string> modes;
+
+		for( int j = 0; j < i_me.m_bids.size(); j++ )
+		{
+			if( i_me.m_bids[j].job_id != m_job_id )
+				continue;
+
+			job_ids.push_back( m_job_id);
+			block_ids.push_back( i_me.m_bids[j].block_num);
+
+			modes.push_back( af::BlockData::DataModeFromMsgType( i_me.m_bids[j].mode));
+		}
+
+		if( block_ids.size())
+		{
+			get( "jobs", job_ids, modes, block_ids);
+
+			founded = true;
+		}
+	}
+
+	return founded;
 }
 
 int ListTasks::getRow( int block, int task)
@@ -423,41 +468,39 @@ bool ListTasks::updateProgress( const af::JobProgress * progress/*bool blocksOnl
 	return true;
 }
 
-bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
+bool ListTasks::updateTasks(
+	const std::vector<int32_t> & i_blocks,
+	const std::vector<int32_t> & i_tasks,
+	const std::vector<af::TaskProgress> & i_tps)
 {
-	const std::list<int32_t> * tasks  = mctasksprogress->getTasks();
-	const std::list<int32_t> * blocks = mctasksprogress->getBlocks();
-	std::list<af::TaskProgress*> * tasksprogress = mctasksprogress->getTasksRun();
-
-	std::list<int32_t>::const_iterator tIt = tasks->begin();
-	std::list<int32_t>::const_iterator bIt = blocks->begin();
-	std::list<af::TaskProgress*>::iterator trIt = tasksprogress->begin();
+	if(( i_tps.size() != i_blocks.size()) && ( i_tps.size() != i_tasks.size()))
+	{
+		AFERRAR("ListTasks::updateTasks: input sizes mismatch: %d, %d, %d", int(i_tasks.size()), int(i_blocks.size()), int(i_tps.size()))
+		return false;
+	}
 
 	int firstChangedRow = -1;
 	int lastChangedRow = -1;
-	int count = int( tasks->size());
-	for( int i = 0; i < count; i++)
+	for( int i = 0; i < i_tps.size(); i++)
 	{
-		if( *bIt > m_blocks_num)
+		if( i_blocks[i] > m_blocks_num)
 		{
-			AFERRAR("ListTasks::updateTasks: block > m_blocks_num (%d>%d)", *bIt, m_blocks_num)
+			AFERRAR("ListTasks::updateTasks: block > m_blocks_num (%d>%d)", i_blocks[i], m_blocks_num)
 			return false;
 		}
-		if( *tIt > m_tasks_num[*bIt])
+		if( i_tasks[i] > m_tasks_num[i_blocks[i]])
 		{
-			AFERRAR("ListTasks::updateTasks: task > m_tasks_num[%d] (%d>%d)", *bIt, *tIt, m_tasks_num[*bIt])
+			AFERRAR("ListTasks::updateTasks: task > m_tasks_num[%d] (%d>%d)", i_blocks[i], i_tasks[i], m_tasks_num[i_blocks[i]])
 			return false;
 		}
-		m_tasks[*bIt][*tIt]->upProgress( **trIt );
+		m_tasks[i_blocks[i]][i_tasks[i]]->upProgress( i_tps[i]);
 
-		int row = getRow( *bIt, *tIt);
+		int row = getRow( i_blocks[i], i_tasks[i]);
 		if( row != -1 )
 		{
 			if((firstChangedRow == -1) || (firstChangedRow > row)) firstChangedRow = row;
 			if(  lastChangedRow < row) lastChangedRow = row;
 		}
-
-		tIt++; bIt++; trIt++;
 	}
 
 	if( firstChangedRow != -1 ) m_model->emit_dataChanged( firstChangedRow, lastChangedRow);

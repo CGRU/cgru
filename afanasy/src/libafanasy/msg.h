@@ -163,29 +163,29 @@ TRESERVED09,
 /**/TMonitorJobsIdsDel/**/,         ///< Delete monitoring jobs ids.
 /**/TMonitorMessage/**/,            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
 
-/**/TMonitorEvents_BEGIN/**/,       ///< Events types start.
+/**/TMonitorEvents/**/,             ///< Events.
 
-/**/TMonitorJobEvents_BEGIN/**/,    ///< Job events types start.
-/**/TMonitorJobsAdd/**/,            ///< IDs of new jobs.
-/**/TMonitorJobsChanged/**/,        ///< IDs of changed jobs.
-/**/TMonitorJobsDel/**/,            ///< IDs of deleted jobs.
-/**/TMonitorJobEvents_END/**/,      ///< Job events types end.
+//**/TMonitorJobEvents_BEGIN/**/,    ///< Job events types start.
+//**/TMonitorJobsAdd/**/,            ///< IDs of new jobs.
+//**/TMonitorJobsChanged/**/,        ///< IDs of changed jobs.
+//**/TMonitorJobsDel/**/,            ///< IDs of deleted jobs.
+//**/TMonitorJobEvents_END/**/,      ///< Job events types end.
 
-/**/TMonitorCommonEvents_BEGIN/**/, ///< Common events types start.
-/**/TMonitorUsersAdd/**/,           ///< IDs of new users.
-/**/TMonitorUsersChanged/**/,       ///< IDs of changed users.
-/**/TMonitorUsersDel/**/,           ///< IDs of deleted users.
-/**/TMonitorRendersAdd/**/,         ///< IDs of new renders.
-/**/TMonitorRendersChanged/**/,     ///< IDs of changed renders.
-/**/TMonitorRendersDel/**/,         ///< IDs of deleted renders.
-/**/TMonitorMonitorsAdd/**/,        ///< IDs of new monitors.
-/**/TMonitorMonitorsChanged/**/,    ///< IDs of changed monitors.
-/**/TMonitorMonitorsDel/**/,        ///< IDs of deleted monitors.
-/**/TMonitorTalksAdd/**/,           ///< IDs of new talks.
-/**/TMonitorTalksDel/**/,           ///< IDs of deleted talks.
-/**/TMonitorCommonEvents_END/**/,   ///< Common events types end.
+//**/TMonitorCommonEvents_BEGIN/**/, ///< Common events types start.
+//**/TMonitorUsersAdd/**/,           ///< IDs of new users.
+//**/TMonitorUsersChanged/**/,       ///< IDs of changed users.
+//**/TMonitorUsersDel/**/,           ///< IDs of deleted users.
+//**/TMonitorRendersAdd/**/,         ///< IDs of new renders.
+//**/TMonitorRendersChanged/**/,     ///< IDs of changed renders.
+//**/TMonitorRendersDel/**/,         ///< IDs of deleted renders.
+//**/TMonitorMonitorsAdd/**/,        ///< IDs of new monitors.
+//**/TMonitorMonitorsChanged/**/,    ///< IDs of changed monitors.
+//**/TMonitorMonitorsDel/**/,        ///< IDs of deleted monitors.
+//**/TMonitorTalksAdd/**/,           ///< IDs of new talks.
+//**/TMonitorTalksDel/**/,           ///< IDs of deleted talks.
+//**/TMonitorCommonEvents_END/**/,   ///< Common events types end.
 
-/**/TMonitorEvents_END/**/,         ///< Events types end.
+//**/TMonitorEvents_END/**/,         ///< Events types end.
 
 
 /*- Render messages -*/
@@ -230,7 +230,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTaskUpdateState/**/,           ///< New state for task.
 /**/TTaskListenOutput/**/,          ///< Request to send task output to provided address.
 /**/TTaskFiles/**/,                 ///< Task (or entire job) files
-/**/TTasksRun/**/,                  ///< Job tasks run data.
+//**/TTasksRun/**/,                  ///< Job tasks run data.
 /**/TTaskOutput/**/,                ///< Job task output data (for task listening: from afrender directly to afwatch).
 
 /**/TRESERVED10/**/,

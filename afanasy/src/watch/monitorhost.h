@@ -25,9 +25,9 @@ public:
    void connectionEstablished();
 
 private:
-   int * events_counts;
-   std::list<int32_t> jobsUsersIds_counts;
-   std::list<int32_t> jobsIds_counts;
+   int * m_events_counts;
+   std::list<int32_t> m_jobsUsersIds_counts;
+   std::list<int32_t> m_jobsIds_counts;
 
 private:
    void setEvents( int type, const QList<int> & eIds);

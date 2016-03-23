@@ -15,7 +15,7 @@ class ItemJob;
 class ListItems;
 class MonitorHost;
 class Popup;
-class Reciever;
+class Receiver;
 class Wnd;
 class WndList;
 
@@ -53,8 +53,8 @@ public:
 
 	static void addWindow(      Wnd      * wnd      );
 	static void removeWindow(   Wnd      * wnd      );
-	static void addReciever(    Reciever * reciever );
-	static void removeReciever( Reciever * reciever );
+	static void addReceiver(    Receiver * receiver );
+	static void removeReceiver( Receiver * receiver );
 
 	static void caseMessage( af::Msg * msg);
 
@@ -118,7 +118,7 @@ private:
 	static QApplication * ms_app;
 
 	static QLinkedList<Wnd*> ms_windows;
-	static QLinkedList<Reciever*> ms_recievers;
+	static QLinkedList<Receiver*> ms_receivers;
 
 	static QStringList ms_previewcmds;
 	static QStringList ms_rendercmds;

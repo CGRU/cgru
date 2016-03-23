@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../libafanasy/msg.h"
+#include "../libafanasy/monitor.h"
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "listnodes.h"
@@ -14,7 +16,10 @@ public:
 	~ListJobs();
 
 	bool caseMessage( af::Msg * msg);
+
 	ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
+
+	virtual bool processEvents( const af::MonitorEvents & i_me);
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
 
@@ -76,7 +81,10 @@ private slots:
 	void actOpenRULES();
 
 private:
+
 	void moveJobs( const std::string & i_operation);
+
+	void calcTotals();
 
 private:
 	// Sorting filtering settings ordinary user:
@@ -94,6 +102,4 @@ private:
 	static int     FilterType_SU;
 	static bool    FilterInclude_SU;
 	static bool    FilterMatch_SU;
-
-	void calcTotals();
 };

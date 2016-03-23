@@ -123,7 +123,7 @@ void UserAf::v_action( Action & i_action)
 	if( i_action.log.size() )
 	{
 		store();
-		i_action.monitors->addEvent( af::Msg::TMonitorUsersChanged, m_id);
+		i_action.monitors->addEvent( af::Monitor::EVT_users_change, m_id);
 	}
 }
 
@@ -143,7 +143,7 @@ void UserAf::deleteNode( MonitorContainer * i_monitoring)
 
 	setZombie();
 
-	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
+	if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_users_del, m_id);
 }
 
 void UserAf::addJob( JobAf * i_job)
@@ -242,7 +242,7 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 		 ( _numjobs             != m_jobs_num              ) ||
 		 ( _runningtasksnumber  != m_running_tasks_num   )) &&
 			monitoring )
-			monitoring->addEvent( af::Msg::TMonitorUsersChanged, m_id);
+			monitoring->addEvent( af::Monitor::EVT_users_change, m_id);
 
 	m_jobs_num = _numjobs;
 	m_running_jobs_num = _numrunningjobs;

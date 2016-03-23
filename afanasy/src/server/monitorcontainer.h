@@ -19,38 +19,37 @@ public:
 	/// Add new Monitor to container.
 	af::Msg * addMonitor( MonitorAf * i_monitor, bool i_json = false);
 
-   void sendMessage( const af::MCGeneral & mcgeneral);
+   void sendMessage( const af::MCGeneral & i_mcgeneral);
 
-   void sendMessage( const std::string & str);
+   void sendMessage( const std::string & i_str);
 
-   bool setInterest( int type, af::MCGeneral & ids);
+   bool setInterest( int i_type, af::MCGeneral & i_ids);
 
-   void addEvent( int type, int id);
+   void addEvent( int i_type, int i_nodeId);
 
-   void addJobEvent( int type, int id, int uid);
+   void addJobEvent( int i_type, int i_jid, int i_uid);
 
-   void addTask( int jobid, int block, int task, af::TaskProgress * tp);
+   void addTask( int i_jobid, int i_block, int i_task, af::TaskProgress * i_tp);
 
-   void addBlock( int type, af::BlockData * block);
+   void addBlock( int i_type, af::BlockData * i_block);
 
-   void addUser( UserAf * user);
+   void addUser( UserAf * i_user);
 
    void dispatch();
 
 private:
 
-   std::list<int32_t> * events;
+	std::list<int32_t> * m_events;
 
-   std::list<int32_t> * jobEvents;
-   std::list<int32_t> * jobEventsUids;
-   int jobEventsCount;
+	std::list<int32_t> * m_jobEvents;
+	std::list<int32_t> * m_jobEventsUids;
 
-   std::list<af::BlockData*> blocks;
-   std::list<int32_t> blocks_types;
+	std::list<af::BlockData*> m_blocks;
+	std::list<int32_t> m_blocks_types;
 
-   std::list<af::MCTasksProgress*> tasks;
+	std::list<af::MCTasksProgress*> m_tasks;
 
-	std::list<UserAf*> usersJobOrderChanged;
+	std::list<UserAf*> m_usersJobOrderChanged;
 
    void clearEvents();
 };

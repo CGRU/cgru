@@ -2,8 +2,10 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
+#include "../libafanasy/environment.h"
+#include "../libafanasy/monitor.h"
+#include "../libafanasy/monitorevents.h"
 
 #include "actionid.h"
 #include "dialog.h"
@@ -64,9 +66,9 @@ Press RMB for Options.\
 ");
 	ctrl->getLayout()->addWidget( control);
 
-	m_eventsShowHide << af::Msg::TMonitorRendersAdd;
-	m_eventsShowHide << af::Msg::TMonitorRendersChanged;
-	m_eventsOnOff    << af::Msg::TMonitorRendersDel;
+	m_eventsShowHide << af::Monitor::EVT_renders_add;
+	m_eventsShowHide << af::Monitor::EVT_renders_change;
+	m_eventsOnOff    << af::Monitor::EVT_renders_del;
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
@@ -377,30 +379,36 @@ bool ListRenders::caseMessage( af::Msg * msg)
 		calcTitle();
 		break;
 	}
-	case af::Msg::TMonitorRendersDel:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		calcTitle();
-		break;
-	}
-	case af::Msg::TMonitorRendersAdd:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		Watch::sendMsg( new af::Msg( af::Msg::TRendersListRequestIds, &ids, true));
-		break;
-	}
-	case af::Msg::TMonitorRendersChanged:
-	{
-		af::MCGeneral ids( msg);
-		Watch::sendMsg( new af::Msg( af::Msg::TRendersListRequestIds, &ids, true));
-		break;
-	}
 	default:
 		return false;
 	}
 	return true;
+}
+
+bool ListRenders::processEvents( const af::MonitorEvents & i_me)
+{
+	if( i_me.m_events[af::Monitor::EVT_renders_del].size())
+	{
+		deleteItems( i_me.m_events[af::Monitor::EVT_renders_del]);
+		calcTitle();
+		return true;
+	}
+
+	af::MCGeneral ids;
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_change].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_renders_change][i]);
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_add].size(); i++)
+		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_renders_add][i]);
+
+	if( ids.getCount())
+	{
+		Watch::sendMsg( new af::Msg( af::Msg::TRendersListRequestIds, &ids, true));
+		return true;
+	}
+
+	return false;
 }
 
 ItemNode* ListRenders::v_createNewItem( af::Node *node, bool i_subscibed)

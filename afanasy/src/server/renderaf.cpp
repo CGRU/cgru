@@ -128,14 +128,14 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 		appendLog("Waiting for deletion.");
 		setZombie();
 //		AFCommon::saveLog( getLog(), af::Environment::getRendersDir(), m_name);
-		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, m_id);
+		if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_del, m_id);
 	}
 	else
 	{
 		AFCommon::QueueLog("Render Offline: " + v_generateInfoString( false));
 		appendLog("Offline.");
 		m_time_launch = 0;
-		if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+		if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 		store();
 	}
 }
@@ -178,7 +178,7 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 	update( render);
 	std::string str = "Online v'" + m_version + "'.";
 	appendLog( str);
-	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 	store();
 	return true;
 }
@@ -209,7 +209,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
 	addTask( taskexec);
 	addService( taskexec->getServiceType());
-	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 
 	if( start)
 	{
@@ -351,7 +351,7 @@ void RenderAf::v_action( Action & i_action)
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
-		i_action.monitors->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
 		store();
 		return;
 	}
@@ -363,7 +363,7 @@ void RenderAf::v_action( Action & i_action)
 	if( i_action.log.size() )
 	{
 		store();
-		i_action.monitors->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+		i_action.monitors->addEvent( af::Monitor::EVT_renders_change, m_id);
 	}
 }
 
@@ -458,7 +458,7 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 	appendLog("Sending WOL sleep request.");
 	m_wol_operation_time = time( NULL);
 	store();
-	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 
 	std::ostringstream str;
 	v_jsonWrite( str, af::Msg::TRendersList);
@@ -494,7 +494,7 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 	setWOLWaking( true);
 	m_wol_operation_time = time( NULL);
 	store();
-	if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+	if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 
 	std::ostringstream str;
 	v_jsonWrite( str, af::Msg::TRendersList);
@@ -527,7 +527,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
-	if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 }
 
 void RenderAf::addTask( af::TaskExec * taskexec)
@@ -648,7 +648,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			log += "\n Nimby busy free time = " + af::time2strHMS( m_host.m_nimby_busyfree_time, true );
 			appendLog( log);
 			setNIMBY();
-			monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+			monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 			store();
 		}
 		//printf("BUSY: %li-%li=%li\n", currentTime, m_busy_time, currentTime-m_busy_time);
@@ -730,7 +730,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 				log += "\n Nimby idle free time = " + af::time2strHMS( m_host.m_nimby_idlefree_time, true );
 				appendLog( log);
 				setFree();
-				monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+				monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 				store();
 			}
 		}

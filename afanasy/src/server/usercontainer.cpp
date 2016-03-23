@@ -41,7 +41,7 @@ UserAf* UserContainer::addUser( const std::string & i_usernmae, const std::strin
 				if( user->getHostName() != i_hostname)
 				{
 					user->setHostName( i_hostname);
-					if( i_monitoring) i_monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+					if( i_monitoring) i_monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 				}
 				return user;
 			}
@@ -56,7 +56,7 @@ UserAf* UserContainer::addUser( const std::string & i_usernmae, const std::strin
 		return NULL;
 	}
 
-	if( i_monitoring) i_monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
+	if( i_monitoring) i_monitoring->addEvent( af::Monitor::EVT_users_add, user->getId());
 
 	AFCommon::QueueLog("New job user registered: " + user->v_generateInfoString( false));
 	return user;
@@ -130,7 +130,7 @@ af::Msg * UserContainer::addUser( UserAf * i_user, MonitorContainer * i_monitori
 
 //AFCommon::QueueDBAddItem( i_user);
 	i_user->store();
-	if( i_monitoring) i_monitoring->addEvent( af::Msg::TMonitorUsersAdd, i_user->getId());
+	if( i_monitoring) i_monitoring->addEvent( af::Monitor::EVT_users_add, i_user->getId());
 
 	AFCommon::QueueLog("User registered: " + i_user->v_generateInfoString( false));
 

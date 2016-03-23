@@ -96,15 +96,14 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TMonitorUpdateId:
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
+		MonitorContainerIt it( i_args->monitors);
+		MonitorAf * node = it.getMonitor( i_msg->int32());
 
-	  if( i_args->monitors->updateId( i_msg->int32()))
-	  {
-		 o_msg_response = new af::Msg( af::Msg::TMonitorId, i_msg->int32());
-	  }
-	  else
-	  {
-		 o_msg_response = new af::Msg( af::Msg::TMonitorId, 0);
-	  }
+		if( node )
+			o_msg_response = node->getEventsBin();
+		else
+			o_msg_response = new af::Msg( af::Msg::TMonitorId, 0);
+
 	  break;
 	}
 	case af::Msg::TMonitorsListRequest:

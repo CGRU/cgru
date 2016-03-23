@@ -10,33 +10,8 @@
 
 using namespace af;
 
-const int Monitor::EventsShift = af::Msg::TMonitorEvents_BEGIN + 1;
-const int Monitor::EventsCount = af::Msg::TMonitorEvents_END - Monitor::EventsShift;
-
-const char Monitor::EventsNames[Monitor::EventsCount][32] = {
-	"JOB_BEGIN",
-	"jobs_add",
-	"jobs_change",
-	"jobs_del",
-	"JOB_END",
-	"COMMON_BEGIN",
-	"users_add",
-	"users_change",
-	"users_del",
-	"renders_add",
-	"renders_change",
-	"renders_del",
-	"monitors_add",
-	"monitors_change",
-	"monitors_del",
-	"talks_add",
-	"talks_del",
-	"COMMON_END"
-};
-
 Monitor::Monitor():
    Client( Client::GetEnvironment, 0)
-//	m_listening_port(true)
 {
    construct();
    m_name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + m_address.generatePortString().c_str();
@@ -44,7 +19,6 @@ Monitor::Monitor():
 
 Monitor::Monitor( Msg * msg):
    Client( Client::DoNotGetAnyValues, 0)
-//	m_listening_port(true)
 {
    if( construct() == false) return;
    read( msg);
@@ -52,7 +26,6 @@ Monitor::Monitor( Msg * msg):
 
 Monitor::Monitor( const JSON & obj):
    Client( Client::DoNotGetAnyValues, 0)
-//	m_listening_port(false)
 {
 	m_time_launch = time(NULL);
 	m_time_activity = 0;
@@ -71,19 +44,15 @@ bool Monitor::construct()
 {
 	m_uid = -1;
 
-   events = new bool[EventsCount];
-   if( events == NULL)
-   {
-      AFERROR("Monitor::construct(): Can't allocate memory for events table.")
-      return false;
-   }
-   for( int e = 0; e < EventsCount; e++) events[e] = false;
-   return true;
+	m_events.resize( EVT_COUNT);
+	for( int e = 0; e < m_events.size(); e++)
+		m_events[e] = false;
+
+	return true;
 }
 
 Monitor::~Monitor()
 {
-   if( events ) delete [] events;
 }
 
 void Monitor::v_readwrite( Msg * msg)
@@ -96,10 +65,15 @@ void Monitor::v_readwrite( Msg * msg)
    rw_String ( m_user_name,     msg);
    rw_String ( m_version,       msg);
 
-   for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
+	for( int e = 0; e < m_events.size(); e++)
+	{
+		bool b = m_events[e];
+		rw_bool( b, msg);
+		m_events[e] = b;
+	}
 
-   rw_Int32_List( jobsUsersIds, msg);
-   rw_Int32_List( jobsIds,      msg);
+   rw_Int32_List( m_jobsUsersIds, msg);
+   rw_Int32_List( m_jobsIds,      msg);
 
    m_address.v_readwrite( msg);
 }
@@ -113,21 +87,46 @@ void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << "\n,\"uid\":" << m_uid;
 	o_str << "\n,\"time_activity\":" << m_time_activity;
 
+	if( m_events.size())
+	{
+		o_str << "\n,\"events\":[";
+		bool evt_written = false;
+		for( int e = 0; e < m_events.size(); e++)
+		{
+			if( m_events[e] != true )
+				continue;
+
+			if( evt_written ) o_str << ',';
+
+			o_str << "\"" << EVT_NAMES[e] << "\"";
+			evt_written = true;
+		}
+		o_str << "]";
+	}
+
+	if( m_jobsUsersIds.size())
+		jw_int32list("users_ids", m_jobsUsersIds, o_str);
+
+	if( m_jobsIds.size())
+		jw_int32list("jobs_ids", m_jobsUsersIds, o_str);
+
 	o_str << "\n}";
 }
 
-bool Monitor::hasEvent( int type) const
+bool Monitor::hasEvent( int i_type) const
 {
-   int eventNum = type - EventsShift;
-   if((eventNum >= 0) && (eventNum < EventsCount))
-   {
-      return events[eventNum];
-   }
-   else
-   {
-      AFERRAR("Monitor::hasEvent: Invalid event: [%s]", af::Msg::TNAMES[type])
-      return false;
-   }
+	if( i_type < 0 )
+	{
+		AFERRAR("Monitor::hasEvent: Event type is negative: %d", i_type)
+		return false;
+	}
+	if( i_type >= EVT_COUNT )
+	{
+		AFERRAR("Monitor::hasEvent: Event type is too big: %d", i_type)
+		return false;
+	}
+
+	return m_events[i_type];
 }
 
 void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) const
@@ -141,21 +140,20 @@ void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) cons
 		if( m_time_activity )
 			stream << "\n Time Activity: " + af::time2str( m_time_activity);
 
-      stream << "\n UIds[" << jobsUsersIds.size() << "]:";
-      for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
+      stream << "\n UIds[" << m_jobsUsersIds.size() << "]:";
+      for( std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin(); it != m_jobsUsersIds.end(); it++)
          stream << " " << *it;
-      stream << "\n JIds[" << jobsIds.size() << "]:";
-      for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
+      stream << "\n JIds[" << m_jobsIds.size() << "]:";
+      for( std::list<int32_t>::const_iterator it = m_jobsIds.begin(); it != m_jobsIds.end(); it++)
          stream << " " << *it;
 
-      stream << "\n System Events:";
-      for( int e = 0; e < af::Monitor::EventsCount; e++)
-      {
-         int etype = e + af::Monitor::EventsShift;
-         stream << "\n    " << af::Msg::TNAMES[etype] << " : ";
-         if( hasEvent(etype)) stream << " SUBMITTED";
-         else stream << "   ---";
-      }
+		stream << "\n System Events:";
+		for( int e = 0; e < EVT_COUNT; e++)
+		{
+			stream << "\n    " << EVT_NAMES[e] << " : ";
+			if( hasEvent(e)) stream << " SUBMITTED";
+			else stream << "   ---";
+		}
    }
    else
    {
@@ -164,3 +162,22 @@ void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) cons
       m_address.v_generateInfoStream( stream, full);
    }
 }
+
+const char * Monitor::EVT_NAMES[] =
+{
+	"jobs_add",
+	"jobs_change",
+	"jobs_del",
+	"JOBS_COUNT",
+	"users_add",
+	"users_change",
+	"users_del",
+	"renders_add",
+	"renders_change",
+	"renders_del",
+	"monitors_add",
+	"monitors_change",
+	"monitors_del",
+	"COUNT"
+};
+
