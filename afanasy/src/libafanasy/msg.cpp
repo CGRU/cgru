@@ -520,8 +520,8 @@ const char * Msg::TNAMES[]=
 	"TUserJobsOrderRequestId",    ///< Request User(id) jobs ids in server list order.
 
 	/*- Job messages -*/
-	"TJobsListRequest",           ///< Request brief of jobs.
-	"TJobsListRequestUserId",     ///< Request brief of jobs of user with given id.
+//	"TJobsListRequest",           ///< Request brief of jobs.
+//	"TJobsListRequestUserId",     ///< Request brief of jobs of user with given id.
 	"TJobLogRequestId",           ///< Request a log of a job with given id.
 	"TJobErrorHostsRequestId",    ///< Request a list of hosts produced tasks with errors.
 	"TJobsWeightRequest",         ///< Request all jobs weight.
@@ -617,8 +617,8 @@ const char * Msg::TNAMES[]=
 	"TUserJobsOrder",             ///< Jobs ids in server list order.
 
 	/*- Job messages -*/
-	"TJobsListRequestIds",        ///< Request a list of Jobs with given ids.
-	"TJobsListRequestUsersIds",   ///< Request brief of jobs od users with given ids.
+//	"TJobsListRequestIds",        ///< Request a list of Jobs with given ids.
+//	"TJobsListRequestUsersIds",   ///< Request brief of jobs od users with given ids.
 	"TJobsList",                  ///< Jobs list information.
 	"TJobProgress",               ///< Jobs progress.
 	"TJobsWeight",                ///< All jobs weight data.

@@ -364,22 +364,22 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  job->writeProgress( *o_msg_response);
 	  break;
 	}
-	case af::Msg::TJobsListRequest:
+/*	case af::Msg::TJobsListRequest:
 	{
 	  AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 
 	  o_msg_response = i_args->jobs->generateList( af::Msg::TJobsList);
 	  break;
-	}
-	case af::Msg::TJobsListRequestIds:
+	}*/
+/*	case af::Msg::TJobsListRequestIds:
 	{
 	  AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 
 	  af::MCGeneral ids( i_msg);
 	  o_msg_response = i_args->jobs->generateList( af::Msg::TJobsList, ids);
 	  break;
-	}
-	case af::Msg::TJobsListRequestUserId:
+	}*/
+/*	case af::Msg::TJobsListRequestUserId:
 	{
 	  AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
 	  AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
@@ -390,8 +390,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 o_msg_response = new af::Msg( af::Msg::TUserId, 0);
 	  }
 	  break;
-	}
-	case af::Msg::TJobsListRequestUsersIds:
+	}*/
+/*	case af::Msg::TJobsListRequestUsersIds:
 	{
 	  AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
 	  AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
@@ -400,7 +400,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  std::string type_name;
 	  o_msg_response = i_args->users->generateJobsList( mcids.getList(), type_name);
 	  break;
-	}
+	}*/
 	case af::Msg::TTaskRequest:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);

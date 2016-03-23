@@ -68,6 +68,26 @@ void ListNodes::initSortFilterCtrl()
    connect( ctrl, SIGNAL( filterSettingsChanged()  ), this, SLOT( filterSettingsChanged() ));
 }
 
+void ListNodes::get( const std::vector<int32_t> & i_ids) const
+{
+	if( i_ids.size() == 0 )
+	{
+		AFERROR("ListNodes::get: Zero length ids.")
+		return;
+	}
+
+	std::string str = "\"type\":\"";
+	str += getType() + "\",\"ids\":[";
+	for( int i = 0; i < i_ids.size(); i++)
+	{
+		if( i ) str += ',';
+		str += af::itos( i_ids[i]);
+	}
+	str += "]";
+
+	Watch::get( str);
+}
+
 bool ListNodes::updateItems( af::Msg * msg)
 {
    QMutexLocker lock( &m_mutex);

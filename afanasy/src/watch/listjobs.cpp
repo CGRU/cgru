@@ -121,11 +121,15 @@ void ListJobs::v_shownFunc()
 	if( Watch::isConnected() == false) return;
 
 	if( af::Environment::VISOR())
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequest, 0, true));
+		Watch::get("\"type\":\"jobs\"");
 	else
 	{
 		if( Watch::getUid())
-			Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestUserId, Watch::getUid(), true));
+		{
+			std::string str = "\"type\":\"jobs\",\"uids\":[";
+			str += af::itos( Watch::getUid()) + "]";
+			Watch::get( str);
+		}
 		else
 			if( m_parentWindow != (QWidget*)Watch::getDialog()) close();
 	}
@@ -442,17 +446,17 @@ bool ListJobs::processEvents( const af::MonitorEvents & i_me)
 		return true;
 	}
 
-	af::MCGeneral ids;
+	std::vector<int> ids;
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_change].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_jobs_change][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_jobs_change][i]);
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_add].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_jobs_add][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_jobs_add][i]);
 
-	if( ids.getCount())
+	if( ids.size())
 	{
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
+		get( ids);
 		return true;
 	}
 

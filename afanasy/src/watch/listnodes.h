@@ -41,6 +41,8 @@ protected:
 
 	virtual ItemNode * v_createNewItem( af::Node *node, bool i_subscibed) = 0;
 
+	void get( const std::vector<int32_t> & i_ids) const;
+
 	bool updateItems( af::Msg* msg);
 
 	CtrlSortFilter * ctrl;

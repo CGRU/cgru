@@ -19,14 +19,14 @@ CmdJobsList::CmdJobsList()
 {
 	setCmd("jlist");
 	setInfo("List of online jobs.");
-	setMsgType( af::Msg::TJobsListRequest);
+	setMsgType( af::Msg::TJSON);
 	setMsgOutType( af::Msg::TJobsList);
 	setRecieving();
 }
 CmdJobsList::~CmdJobsList(){}
 bool CmdJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	msg.set( getMsgType());
+	m_str << "{\"get\":{\"type\":\"jobs\"}}";
 	return true;
 }
 void CmdJobsList::v_msgOut( af::Msg& msg)

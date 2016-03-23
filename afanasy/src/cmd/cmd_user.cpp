@@ -36,16 +36,15 @@ CmdUserJobsList::CmdUserJobsList()
 	setArgsCount(1);
 	setInfo("List of user jobs.");
 	setHelp("ujobs [id] Request a list of jobs of user with given id.");
-	setMsgType( af::Msg::TJobsListRequestUserId);
+	setMsgType( af::Msg::TJSON);
 	setMsgOutType( af::Msg::TJobsList);
 	setRecieving();
 }
 CmdUserJobsList::~CmdUserJobsList(){}
 bool CmdUserJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-   int number = atoi(argv[0]);
-   msg.set( getMsgType(), number);
-   return true;
+	m_str << "{\"get\":{\"type\":\"jobs\",\"uids\":[" << atoi(argv[0]) << "]}}";
+	return true;
 }
 void CmdUserJobsList::v_msgOut( af::Msg& msg)
 {

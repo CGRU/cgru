@@ -96,6 +96,51 @@ void Watch::sendMsg( af::Msg * msg)
 	if( ms_d ) ms_d->sendMsg( msg);
 }
 
+void Watch::get( const std::string & i_str)
+{
+	std::string str = "{\"get\":{\"binary\":true,";
+	str += i_str + "}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	msg->setReceiving( true);
+	Watch::sendMsg( msg);
+}
+
+void Watch::get(
+		const char * i_type,
+		const std::vector<int32_t> & i_ids,
+		const std::vector<std::string> & i_modes,
+		const std::vector<int32_t> & i_blocks)
+{
+//	{"get":{"type":"jobs","ids":[6],"mode":["progress"],"block_ids":[0]}}
+	std::ostringstream str;
+
+	str << "\"type\":\"" << i_type << "\"";
+
+	if( i_ids.size())
+	{
+		str << ",\"ids\":[";
+		for( int i = 0; i < i_ids.size(); i++ ) { if(i) str << ','; str << i_ids[i]; }
+		str << "]";
+	}
+
+	if( i_modes.size())
+	{
+		str << ",\"mode\":[";
+		for( int i = 0; i < i_modes.size(); i++ ) { if(i) str << ','; str << '"' << i_modes[i] << '"'; }
+		str << "]";
+	}
+
+	if( i_blocks.size())
+	{
+		str << ",\"block_ids\":[";
+		for( int i = 0; i < i_blocks.size(); i++ ) { if(i) str << ','; str << i_blocks[i]; }
+		str << "]";
+	}
+
+	get( str.str());
+}
+
 void Watch::displayInfo(    const QString &message){if(ms_d){ms_d->displayInfo(    message);if(ms_d->isHidden())ms_d->show();}}
 void Watch::displayWarning( const QString &message){if(ms_d){ms_d->displayWarning( message);if(ms_d->isHidden())ms_d->show();}}
 void Watch::displayError(   const QString &message){if(ms_d){ms_d->displayError(   message);if(ms_d->isHidden())ms_d->show();}}

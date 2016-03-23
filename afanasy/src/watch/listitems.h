@@ -46,6 +46,7 @@ public:
 	virtual bool mousePressed( QMouseEvent * event);
 	virtual void keyPressEvent( QKeyEvent * i_evt);
 
+	inline const std::string & getType() const { return m_type; }
 	inline bool isTypeJobs()  const { return m_type == "jobs";  }
 	inline bool isTypeUsers() const { return m_type == "users"; }
 
@@ -60,12 +61,6 @@ protected:
 	virtual void doubleClicked( Item * item);
 
 	void action( af::MCGeneral & mcgeneral, int type);
-
-	void get(
-		const char * i_type,
-		const std::vector<int32_t> & i_ids,
-		const std::vector<std::string> & i_modes = std::vector<std::string>(),
-		const std::vector<int32_t> & i_blocks = std::vector<int32_t>());
 
 	inline void setParameter( const std::string & i_name, long long i_value) const
 		{ setParameter( i_name, af::itos( i_value), false);}

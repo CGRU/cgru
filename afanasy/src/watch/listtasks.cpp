@@ -410,7 +410,7 @@ bool ListTasks::processEvents( const af::MonitorEvents & i_me)
 
 		if( block_ids.size())
 		{
-			get( "jobs", job_ids, modes, block_ids);
+			Watch::get( "jobs", job_ids, modes, block_ids);
 
 			founded = true;
 		}

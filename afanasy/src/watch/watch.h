@@ -51,6 +51,14 @@ public:
 
 	static void sendMsg( af::Msg * msg);
 
+
+	static void get( const std::string & i_str);
+	static void get( const char * i_type,
+		const std::vector<int32_t> & i_ids,
+		const std::vector<std::string> & i_modes = std::vector<std::string>(),
+		const std::vector<int32_t> & i_blocks = std::vector<int32_t>());
+
+
 	static void addWindow(      Wnd      * wnd      );
 	static void removeWindow(   Wnd      * wnd      );
 	static void addReceiver(    Receiver * receiver );
