@@ -39,12 +39,12 @@ switch ( i_msg->type())
 		if( node ) node->deregister();
 		break;
 	}
-	case af::Msg::TMonitorMessage:
+/*	case af::Msg::TMonitorMessage:
 	{
 		af::MCGeneral mcgeneral( i_msg);
 		i_args->monitors->sendMessage( mcgeneral);
 		break;
-	}
+	}*/
 	case af::Msg::TMonitorSubscribe:
 	case af::Msg::TMonitorUnsubscribe:
 	case af::Msg::TMonitorUsersJobs:

@@ -13,12 +13,9 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-af::MsgQueue * ClientContainer::ms_msg_queue = NULL;
-
 ClientContainer::ClientContainer( std::string ContainerName, int MaximumSize):
    AfContainer( ContainerName, MaximumSize)
 {
-	ms_msg_queue = new af::MsgQueue(std::string("Send messages to ") + ContainerName, af::AfQueue::e_start_thread);
 }
 
 ClientContainer::~ClientContainer()

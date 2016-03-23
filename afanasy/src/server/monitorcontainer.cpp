@@ -12,7 +12,7 @@
 #include "useraf.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 MonitorContainer::MonitorContainer():
@@ -22,7 +22,7 @@ MonitorContainer::MonitorContainer():
 	m_jobEventsUids( NULL)
 {
 	MonitorAf::setMonitorContainer( this);
-	MonitorAf::setMsgQueue( ms_msg_queue);
+//	MonitorAf::setMsgQueue( ms_msg_queue);
 
 	m_events = new std::list<int32_t>[ af::Monitor::EVT_COUNT];
 	m_jobEvents	  = new std::list<int32_t>[ af::Monitor::EVT_JOBS_COUNT];
@@ -136,7 +136,7 @@ void MonitorContainer::dispatch()
 //      int eventType = af::Msg::TMonitorCommonEvents_BEGIN+1 + e;
 //      int eventType = e + af::Monitor::EventsShift;
 //printf("MonitorContainer::dispatch: [%s]\n", af::Msg::TNAMES[eventType]);
-		af::Msg * msg = NULL;
+//		af::Msg * msg = NULL;
 		MonitorContainerIt monitorsIt( this);
 		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
 		{
@@ -158,10 +158,10 @@ void MonitorContainer::dispatch()
 				}*/
 			}
 		}
-		if( msg )
+/*		if( msg )
 		{
 			 ms_msg_queue->pushMsg( msg);
-		}
+		}*/
 	}
 
 	//
@@ -222,7 +222,7 @@ void MonitorContainer::dispatch()
 	std::list<af::MCTasksProgress*>::const_iterator tIt = m_tasks.begin();
 	while( tIt != m_tasks.end())
 	{
-		af::Msg * msg = NULL;
+//		af::Msg * msg = NULL;
 		MonitorContainerIt monitorsIt( this);
 		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
 		{
@@ -250,10 +250,10 @@ void MonitorContainer::dispatch()
 			}*/
 			}
 		}
-		if( msg )
+/*		if( msg )
 		{
 			ms_msg_queue->pushMsg( msg);
-		}
+		}*/
 		tIt++;
 	}
 
@@ -357,7 +357,7 @@ void MonitorContainer::clearEvents()
 
 	m_usersJobOrderChanged.clear();
 }
-
+/*
 void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
 {
 //printf("MonitorContainer::sendMessage:\n"); mcgeneral.stdOut( true);
@@ -394,7 +394,7 @@ void MonitorContainer::sendMessage( const std::string & str)
 		ms_msg_queue->pushMsg( msg);
 	else delete msg;
 }
-
+*/
 void MonitorContainer::addTask( int i_jobid, int i_block, int i_task, af::TaskProgress * i_tp)
 {
 	af::MCTasksProgress * t = NULL;

@@ -16,7 +16,9 @@ public:
 /// Add new Render to container, new id returned on success, else return 0.
    af::Msg * addRender( RenderAf *newRender, MonitorContainer * monitoring = NULL);
 
-/// Set Render with \c id zombie, by calling RenderAf::setZombie( \c updateTaskState ) function.
+private:
+
+	static af::MsgQueue * ms_msg_queue;
 };
 
 /// Renders iterator.

@@ -24,7 +24,7 @@ protected:
    void contextMenuEvent( QContextMenuEvent *event);
 
 private slots:
-   void actSendMessage();
+//	void actSendMessage();
    void actExit();
 
 private:

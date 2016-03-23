@@ -161,7 +161,7 @@ TRESERVED09,
 /**/TMonitorJobsIdsAdd/**/,         ///< Add jobs ids for monitoring.
 /**/TMonitorJobsIdsSet/**/,         ///< Set jobs ids for monitoring.
 /**/TMonitorJobsIdsDel/**/,         ///< Delete monitoring jobs ids.
-/**/TMonitorMessage/**/,            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
+//**/TMonitorMessage/**/,            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
 
 /**/TMonitorEvents/**/,             ///< Events.
 

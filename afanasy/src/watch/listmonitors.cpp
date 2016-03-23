@@ -61,11 +61,11 @@ void ListMonitors::contextMenuEvent( QContextMenuEvent *event)
 {
 	QMenu menu(this);
 	QAction *action;
-
+/*
 	action = new QAction( "Send Message", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actSendMessage() ));
 	menu.addAction( action);
-
+*/
 	action = new QAction( "Exit Monitor", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
 	menu.addAction( action);
@@ -136,7 +136,7 @@ void ListMonitors::calcTitle()
 	}
 	m_parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
 }
-
+/*
 void ListMonitors::actSendMessage()
 {
 	ItemMonitor* item = (ItemMonitor*)getCurrentItem();
@@ -149,6 +149,6 @@ void ListMonitors::actSendMessage()
 	af::MCGeneral mcgeneral( text.toUtf8().data());
 	action( mcgeneral, af::Msg::TMonitorMessage);
 }
-
+*/
 void ListMonitors::actExit() { operation("exit"); }
 

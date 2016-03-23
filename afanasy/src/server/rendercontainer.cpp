@@ -11,9 +11,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+af::MsgQueue * RenderContainer::ms_msg_queue = NULL;
+
 RenderContainer::RenderContainer():
 	ClientContainer( "Renders", AFRENDER::MAXCOUNT)
 {
+	ms_msg_queue = new af::MsgQueue("Send messages to renders", af::AfQueue::e_start_thread);
 	RenderAf::setRenderContainer( this);
 	RenderAf::setMsgQueue( ms_msg_queue);
 }

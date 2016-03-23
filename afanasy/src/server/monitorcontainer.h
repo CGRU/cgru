@@ -19,9 +19,9 @@ public:
 	/// Add new Monitor to container.
 	af::Msg * addMonitor( MonitorAf * i_monitor, bool i_json = false);
 
-   void sendMessage( const af::MCGeneral & i_mcgeneral);
+//   void sendMessage( const af::MCGeneral & i_mcgeneral);
 
-   void sendMessage( const std::string & i_str);
+//   void sendMessage( const std::string & i_str);
 
    bool setInterest( int i_type, af::MCGeneral & i_ids);
 

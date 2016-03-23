@@ -65,8 +65,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		if( str.empty()) break;
 
 		AFCommon::QueueLog( str);
-		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-		i_args->monitors->sendMessage( str);
+//		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+//		i_args->monitors->sendMessage( str);
 		break;
 	}
 	case af::Msg::TStatRequest:
@@ -590,7 +590,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TMonitorJobsIdsAdd:
 	case af::Msg::TMonitorJobsIdsSet:
 	case af::Msg::TMonitorJobsIdsDel:
-	case af::Msg::TMonitorMessage:
+//	case af::Msg::TMonitorMessage:
 	{
 		// Push message for run cycle thread.
 		i_args->msgQueue->pushMsg( i_msg);
