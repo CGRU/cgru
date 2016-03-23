@@ -6,7 +6,7 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "infoline.h"
-#include "reciever.h"
+#include "receiver.h"
 
 #include <QtCore/QMutex>
 #include <QtGui/QWidget>

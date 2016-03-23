@@ -15,7 +15,7 @@
 #include "monitorhost.h"
 #include "listtasks.h"
 #include "popup.h"
-#include "reciever.h"
+#include "receiver.h"
 #include "wndlist.h"
 #include "wndlistenjob.h"
 #include "wndlistentask.h"

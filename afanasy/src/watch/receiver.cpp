@@ -1,4 +1,4 @@
-#include "reciever.h"
+#include "receiver.h"
 
 #include "watch.h"
 

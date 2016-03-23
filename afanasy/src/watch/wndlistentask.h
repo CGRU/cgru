@@ -3,7 +3,7 @@
 #include "../libafanasy/name_af.h"
 
 #include "wndtext.h"
-#include "reciever.h"
+#include "receiver.h"
 
 class WndListenTask : public WndText, public Receiver
 {
