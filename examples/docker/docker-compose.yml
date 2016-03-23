@@ -1,11 +1,24 @@
-afserver:
- image: cgru/afserver
- ports:
-  - "51000:51000"
+version: '2'
 
-afrender:
- image: cgru/afrender
- environment:
-  AF_SERVERNAME: "afserver"
- links:
-  - afserver
+services:
+ afserver:
+  image: cgru/afserver
+  ports:
+   - "51000:51000"
+  # volumes:
+  #  - /Users/abuisine/Documents/cgru:/opt/cgru
+
+
+ afrender:
+  image: cgru/afrender
+  environment:
+   AF_SERVERNAME: "afserver"
+  links:
+   - afserver
+  volumes:
+   - datavolume:/data
+   # - /Users/abuisine/Documents/cgru:/opt/cgru
+
+volumes:
+ datavolume:
+  driver: 'local'
