@@ -20,7 +20,7 @@ LabelVersion::LabelVersion( QWidget *parent):
                      "\nRevision: %2"
                      "\nPython version: %3"
                      "\nQt version: %4")
-         .arg( af::Environment::getVersionDate().c_str())
+         .arg( af::Environment::getBuildDate().c_str())
          .arg( af::Environment::getVersionRevision().c_str())
          .arg( af::Environment::getVersionPython().c_str())
          .arg( qVersion());

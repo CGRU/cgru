@@ -32,7 +32,7 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_register_str = TimeRegister   .arg( afqt::time2Qstr( time_register));
 
    address_str = Address.arg( monitor->getAddress().generateIPString( true).c_str());
-   version = monitor->getVersion().c_str();
+   engine = monitor->getEngine().c_str();
 
    updateValues( monitor, 0);
 }
@@ -108,7 +108,7 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsidstitle );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsids );
 
-   painter->drawText( x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, version );
+   painter->drawText( x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, engine );
 }
 
 bool ItemMonitor::setSortType(   int type )
@@ -130,8 +130,8 @@ bool ItemMonitor::setSortType(   int type )
       case CtrlSortFilter::TTIMEACTIVITY:
          sort_int = time_activity;
          break;
-      case CtrlSortFilter::TVERSION:
-         sort_str = version;
+      case CtrlSortFilter::TENGINE:
+         sort_str = engine;
          break;
       case CtrlSortFilter::TADDRESS:
          sort_str = address_str;
@@ -153,8 +153,8 @@ bool ItemMonitor::setFilterType( int type )
       case CtrlSortFilter::TNAME:
          filter_str = m_name;
          break;
-      case CtrlSortFilter::TVERSION:
-         filter_str = version;
+      case CtrlSortFilter::TENGINE:
+         filter_str = engine;
          break;
       case CtrlSortFilter::TADDRESS:
          filter_str = address_str;

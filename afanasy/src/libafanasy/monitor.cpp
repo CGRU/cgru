@@ -30,14 +30,11 @@ Monitor::Monitor( const JSON & obj):
 	m_time_launch = time(NULL);
 	m_time_activity = 0;
 	construct();
-	jr_string("gui_name",  m_gui_name,  obj);
 	jr_string("user_name", m_user_name, obj);
 	jr_string("host_name", m_host_name, obj);
 	jr_string("engine",    m_engine,    obj);
 
-	m_name = m_user_name+"@"+m_host_name+":"+m_gui_name;
-
-	m_version = af::Environment::getVersionCGRU();
+	m_name = m_user_name + "@" + m_host_name;
 }
 
 bool Monitor::construct()
@@ -64,7 +61,7 @@ void Monitor::v_readwrite( Msg * msg)
    rw_int64_t( m_time_activity, msg);
    rw_String ( m_name,          msg);
    rw_String ( m_user_name,     msg);
-   rw_String ( m_version,       msg);
+	rw_String ( m_engine,        msg);
 
 	for( int e = 0; e < m_events.size(); e++)
 	{
@@ -135,7 +132,7 @@ void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) cons
    if( full )
    {
       stream << "Monitor name = \"" << m_name << "\" (id=" << getId() << ")";
-      stream << "\n Version: " << m_version;
+		stream << "\n Engine: " << m_engine;
       stream << "\n Launch Time: " + af::time2str( m_time_launch);
       stream << "\n Register Time: " + af::time2str( m_time_register);
 		if( m_time_activity )
@@ -159,7 +156,7 @@ void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) cons
    else
    {
       stream << m_name << "[" << m_id << "]";
-      stream << " v'" << m_version << "' ";
+      stream << " e'" << m_engine << "' ";
       m_address.v_generateInfoStream( stream, full);
    }
 }

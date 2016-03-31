@@ -25,7 +25,7 @@ const char * CtrlSortFilter::TNAMES[] = {
 "Time Activity",
 "Time Finished",
 "Time Running",
-"Version",
+"Engine",
 "Address",
 "[LAST]"
 };
@@ -47,7 +47,7 @@ const char * CtrlSortFilter::TNAMES_SHORT[] = {
 "Activity",
 "Finished",
 "Running",
-"Version",
+"Engine",
 "Address",
 "[LAST]"
 };

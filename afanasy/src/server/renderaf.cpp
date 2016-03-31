@@ -171,12 +171,12 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 	m_address.copy( render->getAddress());
 	grabNetIFs( render->m_netIFs);
 	m_time_launch = render->m_time_launch;
-	m_version = render->m_version;
+	m_engine = render->m_engine;
 	m_task_start_finish_time = 0;
 	getFarmHost( &render->m_host);
 	setOnline();
 	update( render);
-	std::string str = "Online v'" + m_version + "'.";
+	std::string str = "Online e'" + m_engine + "'.";
 	appendLog( str);
 	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 	store();

@@ -41,7 +41,8 @@ Client::Client( int i_flags, int Id):
 	  m_time_launch = time(NULL);
 	  m_user_name = af::Environment::getUserName();
 	  m_name = af::Environment::getHostName();
-	  m_version = af::Environment::getVersionCGRU();
+
+		m_engine = af::Environment::getVersionCGRU();
    }
 }
 
@@ -76,8 +77,8 @@ void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << "\n]";
 	}
 
-	if( m_version.size())
-		o_str << ",\n\"version\":\"" << m_version << "\"";
+	if( m_engine.size())
+		o_str << ",\n\"engine\":\"" << m_engine << "\"";
 }
 
 void Client::jsonRead( const JSON & i_object)
@@ -127,7 +128,7 @@ int Client::v_calcWeight() const
 //printf("Client::calcWeight: Node::calcWeight: %d bytes\n", weight);
    weight += sizeof(Client) - sizeof( Node);
    weight += weigh( m_user_name);
-   weight += weigh( m_version );
+	weight += weigh( m_engine );
    weight += m_address.calcWeight();
    for( int i = 0; i < m_netIFs.size(); i++) weight += m_netIFs[i]->calcWeight();
 //printf("Client::calcWeight: %d bytes ( sizeof Client = %d)\n", weight, sizeof( Client));

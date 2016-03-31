@@ -153,7 +153,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		setHidden(  render->isHidden()  );
 		setOffline( render->isOffline() );
 
-	    m_version            = afqt::stoq( render->getVersion());
+	    m_engine             = afqt::stoq( render->getEngine());
 	    m_username           = afqt::stoq( render->getUserName());
 	    m_capacity           = render->getCapacity();
 	    m_maxtasks           = render->getMaxTasks();
@@ -495,7 +495,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 		QRect rect_center;
 	    painter->drawText( x+5, y, w-10, ms_HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
-	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    m_name + ' ' + m_version );
+	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    m_name + ' ' + m_engine);
 
 		// Print annonation at next line if display is not small
 	    if( false == m_annotation.isEmpty() && (ListRenders::getDisplaySize() != ListRenders::ESMallSize))
@@ -509,7 +509,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	case ListRenders::ESMallSize:
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + m_version);
+	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + m_engine);
 
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -519,7 +519,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	default:
 		painter->setPen(   clrTextMain( option) );
 		painter->setFont(  afqt::QEnvironment::f_name);
-	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_version);
+	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
 
 		painter->setPen(   afqt::QEnvironment::qclr_black );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -700,8 +700,8 @@ bool ItemRender::setSortType(   int type )
 		case CtrlSortFilter::TTASKUSER:
 	        sort_str = m_tasksusers;
 			break;
-		case CtrlSortFilter::TVERSION:
-	        sort_str = m_version;
+		case CtrlSortFilter::TENGINE:
+	        sort_str = m_engine;
 			break;
 		case CtrlSortFilter::TADDRESS:
 	        sort_str = m_address_str;
@@ -729,8 +729,8 @@ bool ItemRender::setFilterType( int type )
 		case CtrlSortFilter::TTASKUSER:
 	        filter_str = m_tasksusers;
 			break;
-		case CtrlSortFilter::TVERSION:
-	        filter_str = m_version;
+		case CtrlSortFilter::TENGINE:
+	        filter_str = m_engine;
 			break;
 		case CtrlSortFilter::TADDRESS:
 	        filter_str = m_address_str;

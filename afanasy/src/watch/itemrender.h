@@ -53,7 +53,7 @@ private:
 	af::Host    m_host;
 	af::HostRes m_hres;
 
-	QString m_version;
+	QString m_engine;
 	QString m_username;
 	QString m_tasksusers; ///< For sorting and filtering only
 	QString m_tasks_users_counts; ///< One string collection of all tasks users and counts

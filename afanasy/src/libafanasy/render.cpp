@@ -221,7 +221,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 
    case Msg::TRenderRegister:
 
-	  rw_String  ( m_version,      msg);
+	  rw_String  ( m_engine,       msg);
 	  rw_String  ( m_name,         msg);
 	  rw_String  ( m_user_name,    msg);
 	  rw_int64_t ( m_state,        msg);
@@ -293,7 +293,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
    if( full)
    {
 	  stream << "Render " << m_name << "@" << m_user_name << " (id=" << m_id << "):";
-	  stream << "\n Version = \"" << m_version;
+	  stream << "\n Engine = \"" << m_engine;
 
       if( isDirty()) stream << "\nDirty! Capacity|Max Tasks changed, or service(s) disabled.";
 
@@ -359,7 +359,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		stream << " I:" << time2str( m_idle_time);
 		stream << " B:" << time2str( m_busy_time);
 
-		stream << " v'" << m_version << "'";
+		stream << " e'" << m_engine << "'";
 */
 		stream << " ";
 		m_address.v_generateInfoStream( stream ,full);

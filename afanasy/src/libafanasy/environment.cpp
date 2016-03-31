@@ -159,7 +159,7 @@ std::string Environment::version_revision;
 std::string Environment::version_cgru;
 std::string Environment::version_python;
 std::string Environment::version_gcc;
-std::string Environment::version_date;
+std::string Environment::build_date;
 
 void Environment::getVars( const JSON & i_obj)
 {
@@ -492,8 +492,8 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //############ Versions: ########################
 
 	// Date:
-	version_date = std::string(__DATE__) + " " __TIME__;
-	QUIET("Compilation date = '%s'\n", version_date.c_str());
+	build_date = std::string(__DATE__) + " " __TIME__;
+	QUIET("Compilation date = '%s'\n", build_date.c_str());
 
 	// CGRU:
 	version_cgru = getenv("CGRU_VERSION");

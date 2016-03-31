@@ -156,10 +156,9 @@ function g_RegisterSend()
 
 	var obj = {};
 	obj.monitor = {};
-	obj.monitor.gui_name = localStorage['gui_name'];
 	obj.monitor.user_name = localStorage['user_name'];
 	obj.monitor.host_name = localStorage['host_name'];
-	obj.monitor.engine = navigator.userAgent;
+	obj.monitor.engine = cgru_Browser;
 	nw_send(obj);
 
 	setTimeout('g_RegisterSend()', 5000);

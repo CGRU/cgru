@@ -56,8 +56,6 @@ public:
 protected:
 	int32_t m_uid; // Needed to detect user id ( web gui )
 	std::string m_host_name;
-	std::string m_gui_name;
-	std::string m_engine;
 
 	std::vector<bool> m_events;
 //   std::list<int32_t> m_jobsUsersIds;

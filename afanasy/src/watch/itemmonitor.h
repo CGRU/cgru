@@ -34,7 +34,7 @@ private:
    QString time_activity_str;
 
    QString address_str;
-   QString version;
+	QString engine;
 
    QString eventstitle;
    QStringList events;
