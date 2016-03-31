@@ -37,8 +37,6 @@ public:
     inline bool isInitialized() const { return m_initialized; }
     inline bool isConnected()   const { return m_connected;   }
 
-    inline int getUid() const { return m_uid;}
-
     void inline displayInfo(    const QString &message) { m_infoline->displayInfo(    message); }
     void inline displayWarning( const QString &message) { m_infoline->displayWarning( message); }
     void inline displayError(   const QString &message) { m_infoline->displayError(   message); }
@@ -46,8 +44,6 @@ public:
     void sendMsg( af::Msg * msg);
 
     bool openMonitor( int type, bool open);
-
-    inline MonitorHost * getMonitor() { return m_monitor;}
 
     void repaintStart( int mseconds = 1000);
     void repaintFinish();
@@ -81,6 +77,7 @@ protected:
 
 private:
     void sendRegister();
+	void idReceived( int i_id, int i_uid = -1);
     void closeList();
     void connectionEstablished();
     void setDefaultWindowTitle();
@@ -88,7 +85,6 @@ private:
 private:
     bool m_initialized;
     bool m_connected;
-    int  m_uid;
     MonitorHost * m_monitor;
 
     int m_monitorType;

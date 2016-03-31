@@ -84,7 +84,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 
 // ---------------------------------- Monitor ---------------------------------//
-	case af::Msg::TMonitorRegister:
+/*	case af::Msg::TMonitorRegister:
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::WRITELOCK);
 		AfContainerLock ulock( i_args->users,    AfContainerLock::READLOCK);
@@ -93,7 +93,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  newMonitor->setAddressIP( i_msg->getAddress());
 	  o_msg_response = i_args->monitors->addMonitor( newMonitor);
 	  break;
-	}
+	}*/
 	case af::Msg::TMonitorUpdateId:
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
@@ -242,7 +242,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 
 // ---------------------------------- Users -------------------------------//
-	case af::Msg::TUserIdRequest:
+/*	case af::Msg::TUserIdRequest:
 	{
 	  AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
 
@@ -259,7 +259,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  }
 	  o_msg_response = new af::Msg( af::Msg::TUserId, id);
 	  break;
-	}
+	}*/
 /*	case af::Msg::TUsersListRequest:
 	{
 	  AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);

@@ -8,6 +8,7 @@
 #include "itemuser.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
+#include "monitorhost.h"
 #include "viewitems.h"
 #include "watch.h"
 
@@ -64,7 +65,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	ItemUser* useritem = (ItemUser*)getCurrentItem();
 	if( useritem == NULL ) return;
 	bool me = false;
-	if( useritem->getId() == Watch::getUid()) me = true;
+	if( useritem->getId() == MonitorHost::getUid()) me = true;
 
 
 	QMenu menu(this);
@@ -209,7 +210,7 @@ ItemNode* ListUsers::v_createNewItem( af::Node *node, bool i_subscibed)
 void ListUsers::userAdded( ItemNode * node, const QModelIndex & index)
 {
 //printf("node->getId()=%d ,   Watch::getUid()=%d,  row=%d\n", node->getId(), Watch::getUid(), index.row());
-	if( node->getId() == Watch::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
+	if( node->getId() == MonitorHost::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
 }
 
 void ListUsers::calcTitle()

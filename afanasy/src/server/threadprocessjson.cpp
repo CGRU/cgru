@@ -325,11 +325,14 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	else if( document.HasMember("monitor"))
 	{
+		bool binary = false;
+		af::jr_bool("binary", binary, document["monitor"]);
+
 		AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
 		AfContainerLock ulock( i_args->users,    AfContainerLock::READLOCK);
 		MonitorAf * newMonitor = new MonitorAf( document["monitor"], i_args->users);
 		newMonitor->setAddressIP( i_msg->getAddress());
-		o_msg_response = i_args->monitors->addMonitor( newMonitor, /*JSON = */ true);
+		o_msg_response = i_args->monitors->addMonitor( newMonitor, binary);
 	}
 	else if( document.HasMember("user"))
 	{

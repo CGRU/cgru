@@ -46,7 +46,6 @@ int Dialog::ms_size_border_right = 75;
 
 Dialog::Dialog():
     m_connected(false),
-    m_uid(0),
     m_monitorType( Watch::WNONE),
     m_qThreadClientUpdate( this, false, af::Environment::getWatchUpdatePeriod(), af::Environment::getWatchConnectRetries()),
     m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
@@ -147,7 +146,8 @@ Dialog::~Dialog()
 void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}
 void Dialog::repaintFinish()             { m_repaintTimer.stop();}
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
-void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, m_monitor, true));}
+//void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, m_monitor, true));}
+void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( MonitorHost::genRegisterMsg());}
 void Dialog::sendMsg( af::Msg * msg)
 {
 #ifdef AFOUTPUT
@@ -244,9 +244,9 @@ void Dialog::connectionLost()
 
     displayError("Connection lost.");
     m_connected = false;
-    m_uid = 0;
-    m_monitor->setId( 0);
     setWindowTitle( "Watch - " + afqt::stoq( af::Environment::getUserName()) + " (connecting...)");
+
+	MonitorHost::connectionLost();
 
     sendRegister();
 
@@ -263,9 +263,7 @@ void Dialog::connectionEstablished()
     displayInfo("Connection established.");
     m_connected = true;
     setDefaultWindowTitle();
-    m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
-
-    Watch::connectionEstablished();
+//    m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
 }
 
 void Dialog::newMessage( af::Msg *msg)
@@ -286,8 +284,18 @@ void Dialog::newMessage( af::Msg *msg)
         emit stop();
         break;
     }
+	case af::Msg::TMonitor:
+	{
+		af::Monitor monitor( msg);
+
+		idReceived( monitor.getId(), monitor.getUid());
+
+		break;
+	}
     case af::Msg::TMonitorId:
     {
+		idReceived( msg->int32());
+/*
         if( m_monitor->getId() != 0 )
         {
             if( msg->int32() != m_monitor->getId()) connectionLost();
@@ -306,9 +314,10 @@ void Dialog::newMessage( af::Msg *msg)
                 m_qThreadClientUpdate.setUpMsg( msg);
             }
         }
+*/
         break;
     }
-    case af::Msg::TUserId:
+/*    case af::Msg::TUserId:
     {
         m_uid = msg->int32();
         if( m_uid == 0 )
@@ -329,7 +338,7 @@ void Dialog::newMessage( af::Msg *msg)
             }
         }
         break;
-    }
+    }*/
     case af::Msg::TDATA:
     {
         new WndText( "Data", msg);
@@ -374,6 +383,53 @@ void Dialog::newMessage( af::Msg *msg)
     delete msg;
 }
 
+void Dialog::idReceived( int i_id, int i_uid)
+{
+	if( m_monitor->getId() > 0 )
+	{
+		if( i_id != m_monitor->getId())
+		{
+			connectionLost();
+		}
+	}
+	else
+	{
+		if( i_id == 0)
+		{
+			connectionLost();
+		}
+		else
+		{
+			AFINFA("Dialog::idReceived: ID=%d UID=%d\n", i_id, i_uid)
+
+			MonitorHost::connectionEstablished( i_id, i_uid);
+			connectionEstablished();
+			Watch::connectionEstablished();
+
+			if( i_uid == -1 )
+			{
+				if( m_monitorType == Watch::WJobs )
+				{
+					ButtonMonitor::unset();
+					closeList();
+				}
+				displayWarning("You are not exist.");
+			}
+			else
+			{
+				displayInfo("You have registered.");
+				if( m_monitorType == Watch::WNONE )
+				{
+					ButtonMonitor::pushButton( Watch::WJobs);
+				}
+			}
+
+			af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, i_id, true);
+			m_qThreadClientUpdate.setUpMsg( msg);
+		}
+	}
+}
+
 void Dialog::closeList()
 {
     if( m_listitems != NULL) m_listitems->close();
@@ -392,11 +448,12 @@ bool Dialog::openMonitor( int type, bool open)
    }
 
    if( !m_connected ) return false;
-   if(( type == Watch::WJobs) && ( m_uid == 0 ) && ( af::Environment::VISOR() == false ))
+
+	if(( type == Watch::WJobs) && ( MonitorHost::getUid() < 0 ) && ( af::Environment::VISOR() == false ))
    {
       ButtonMonitor::unset();
-      displayWarning("You are not registered ( and have no jobs).");
-      m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
+      displayWarning("You are not registered (have no jobs).");
+//      m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
       return false;
    }
 
@@ -468,6 +525,8 @@ void Dialog::keyPressEvent( QKeyEvent * event)
    {
       if( af::Environment::GOD())
       {
+			MonitorHost::setUid(0);
+
          m_btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
          m_hlayout_b->addWidget( m_btnMonitor[Watch::WMonitors]);
 
@@ -475,10 +534,14 @@ void Dialog::keyPressEvent( QKeyEvent * event)
       }
       else if( af::Environment::VISOR())
       {
+			MonitorHost::setUid(0);
+
 			m_topleft->setText("VISOR MODE");
       }
       else
       {
+			MonitorHost::setUid(-1);
+
          if( m_btnMonitor[Watch::WMonitors])
          {
             delete m_btnMonitor[Watch::WMonitors];

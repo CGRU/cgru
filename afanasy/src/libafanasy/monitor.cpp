@@ -70,7 +70,6 @@ void Monitor::v_readwrite( Msg * msg)
 		m_events[e] = b;
 	}
 
-//   rw_Int32_List( m_jobsUsersIds, msg);
    rw_Int32_List( m_jobsIds,      msg);
 
    m_address.v_readwrite( msg);
@@ -102,8 +101,6 @@ void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << "]";
 	}
 
-/*	if( m_jobsUsersIds.size())
-		jw_int32list("users_ids", m_jobsUsersIds, o_str);*/
 
 	if( m_jobsIds.size())
 		jw_int32list("jobs_ids", m_jobsIds, o_str);
@@ -138,9 +135,6 @@ void Monitor::v_generateInfoStream( std::ostringstream & stream, bool full) cons
 		if( m_time_activity )
 			stream << "\n Time Activity: " + af::time2str( m_time_activity);
 
-//      stream << "\n UIds[" << m_jobsUsersIds.size() << "]:";
-//      for( std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin(); it != m_jobsUsersIds.end(); it++)
-//         stream << " " << *it;
       stream << "\n JIds[" << m_jobsIds.size() << "]:";
       for( std::list<int32_t>::const_iterator it = m_jobsIds.begin(); it != m_jobsIds.end(); it++)
          stream << " " << *it;

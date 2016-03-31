@@ -17,7 +17,7 @@ public:
    ~MonitorContainer();
 
 	/// Add new Monitor to container.
-	af::Msg * addMonitor( MonitorAf * i_monitor, bool i_json = false);
+	af::Msg * addMonitor( MonitorAf * i_monitor, bool i_binary);
 
 //   void sendMessage( const af::MCGeneral & i_mcgeneral);
 

@@ -43,8 +43,6 @@ public:
 
 	static bool isInitialized();
 	static bool isConnected();
-	static int  getUid();
-	static int  getId();
 
 	static void connectionLost();
 	static void connectionEstablished();
@@ -83,16 +81,7 @@ public:
 	static void listenTask( int jobid, int block, int task, const QString & name);
 
 	inline static Dialog * getDialog()  { return ms_d;}
-	static const af::Address & getClientAddress();
 	static void keyPressEvent( QKeyEvent * event);
-
-//	static void   subscribe( const QList<int> & events);
-//	static void unsubscribe( const QList<int> & events);
-
-	static void setUid(   int uid );
-
-	static void addJobId( int jId );
-	static void delJobId( int jId );
 
 	static void ntf_JobAdded( const ItemJob * i_job);
 	static void ntf_JobDone(  const ItemJob * i_job);
@@ -121,7 +110,6 @@ public:
 	void static notify( const QString & i_title, const QString & i_msg, uint32_t i_state = 0);
 
 private:
-	static MonitorHost * ms_m;
 	static Dialog * ms_d;
 	static QApplication * ms_app;
 

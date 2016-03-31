@@ -9,6 +9,7 @@
 #include "itemjob.h"
 #include "ctrljobs.h"
 #include "ctrlsortfilter.h"
+#include "monitorhost.h"
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
@@ -43,15 +44,11 @@ ListJobs::ListJobs( QWidget* parent):
 	ListNodes( parent, "jobs")
 {
 	if( af::Environment::VISOR())
-	{
-		Watch::setUid( 0);
-		ctrl = new CtrlSortFilter( this, &SortType_SU, &SortAscending_SU, &FilterType_SU, &FilterInclude_SU, &FilterMatch_SU, &FilterString_SU);
-	}
+		ctrl = new CtrlSortFilter( this,
+			&SortType_SU, &SortAscending_SU, &FilterType_SU, &FilterInclude_SU, &FilterMatch_SU, &FilterString_SU);
 	else
-	{
-		Watch::setUid( Watch::getUid());
-		ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-	}
+		ctrl = new CtrlSortFilter( this,
+			&SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
 
 	ctrl->addSortType(   CtrlSortFilter::TNONE);
 	ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
@@ -122,10 +119,10 @@ void ListJobs::v_showFunc()
 		get();
 	else
 	{
-		if( Watch::getUid())
+		if( MonitorHost::getUid() > 0 )
 		{
 			std::string str = "\"type\":\"jobs\",\"uids\":[";
-			str += af::itos( Watch::getUid()) + "]";
+			str += af::itos( MonitorHost::getUid()) + "]";
 			Watch::get( str);
 		}
 		else
@@ -405,7 +402,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	{
 		if( updateItems( msg) && (af::Environment::VISOR() == false))
 		{
-			Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+			Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid(), true));
 		}
 		if( false == isSubscribed() )
 		{
@@ -423,7 +420,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	case af::Msg::TUserJobsOrder:
 	{
 		af::MCGeneral ids( msg);
-		if( ids.getId() != Watch::getUid()) return true;
+		if( ids.getId() != MonitorHost::getUid()) return true;
 		sortMatch( ids.getList());
 		break;
 	}
@@ -473,7 +470,7 @@ ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
 void ListJobs::resetSorting()
 {
 	if( af::Environment::VISOR() == false )
-		Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+		Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid(), true));
 }
 
 void ListJobs::calcTotals()
@@ -540,7 +537,7 @@ void ListJobs::moveJobs( const std::string & i_operation)
 {
 	std::ostringstream str;
 	std::vector<int> uids;
-	uids.push_back( Watch::getUid());
+	uids.push_back( MonitorHost::getUid());
 	af::jsonActionOperationStart( str, "users", i_operation, "", uids);
 	std::vector<int> jids = getSelectedIds();
 	str << ",\n\"jids\":[";

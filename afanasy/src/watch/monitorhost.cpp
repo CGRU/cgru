@@ -1,5 +1,6 @@
 #include "monitorhost.h"
 
+#include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "watch.h"
@@ -26,6 +27,27 @@ MonitorHost::~MonitorHost()
 {
 //	delete m_events_counts;
 }
+
+af::Msg * MonitorHost::genRegisterMsg()
+{
+//{"monitor":{"user_name":"timurhai","host_name":"pc","engine":"firefox"}}
+
+	std::ostringstream str;
+
+	str << "{\"monitor\":{";
+	str << "\"binary\":true";
+	str << ",\"user_name\":\"" << af::Environment::getUserName() << "\"";
+	str << ",\"host_name\":\"" << af::Environment::getHostName() << "\"";
+	str << ",\"engine\":\"" << af::Environment::getVersionCGRU() << "\"";
+	str << "}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+
+	msg->setReceiving( true);
+
+	return msg;
+}
+
 /*
 void MonitorHost::setEvents( int type, const QList<int> & eIds)
 {
@@ -72,6 +94,9 @@ printf("\n");
 */
 void MonitorHost::connectionLost()
 {
+	m_->m_id  =  0;
+	m_->m_uid =  0;
+	ms_uid    = -1;
 //	for( int e = 0; e < EVT_COUNT; e++)
 //	{
 //		m_events_counts[e] = 0;
@@ -79,13 +104,32 @@ void MonitorHost::connectionLost()
 //	}
 }
 
-void MonitorHost::connectionEstablished(){}
+void MonitorHost::connectionEstablished( int i_id, int i_uid)
+{
+	m_->m_id = i_id;
+	m_->m_uid = i_uid;
+	ms_uid = i_uid;
+}
+
+void MonitorHost::subscribe( const std::string & i_class, bool i_subscribe)
+{
+	std::vector<int> ids;
+	ids.push_back( m_->getId());
+
+	std::ostringstream str;
+	af::jsonActionOperationStart( str,"monitors","watch", std::string(), ids);
+	str << ",\"class\":\"" << i_class << "\"";
+	str << ",\"status\":\"" << ( i_subscribe ? "subscribe":"unsubscribe") << "\"";
+	af::jsonActionOperationFinish( str);
+
+	Watch::sendMsg( af::jsonMsg( str));
+}
 
 void MonitorHost::setJobId( int type, int jId)
 {
 AFINFA("MonitorHost::setJobId: type=[%s], id=%d", af::Msg::TNAMES[type], jId);
 	af::MCGeneral ids;
-	ids.setId( Watch::getId());
+	ids.setId( m_->getId());
 #ifdef AFOUTPUT
 {
 int counts = m_->m_jobsIds_counts.size();
@@ -153,7 +197,6 @@ AFINFO("MonitorHost::setUid:");
 	// Negative value means restore original:
 	if( i_uid < 0 )
 		i_uid = m_->m_uid;
-
 
 	std::vector<int> ids;
 	ids.push_back( m_->getId());

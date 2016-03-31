@@ -20,6 +20,7 @@
 #include "itemjobblock.h"
 #include "itemjobtask.h"
 #include "modelitems.h"
+#include "monitorhost.h"
 #include "viewitems.h"
 #include "watch.h"
 
@@ -95,7 +96,7 @@ void ListTasks::construct( af::Job * job)
 
 ListTasks::~ListTasks()
 {
-	Watch::delJobId( m_job_id);
+	MonitorHost::delJobId( m_job_id);
 
 	for( int b = 0; b < m_blocks_num; b++) delete [] m_tasks[b];
 	delete [] m_tasks_num;
@@ -292,7 +293,7 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		{
 			construct( job);
 			Watch::sendMsg( new af::Msg( af::Msg::TJobProgressRequestId, m_job_id, true));
-			Watch::addJobId( m_job_id);
+			MonitorHost::addJobId( m_job_id);
 		}
 		else
 		{

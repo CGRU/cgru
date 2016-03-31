@@ -3,6 +3,7 @@
 #include "itemnode.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
+#include "monitorhost.h"
 #include "viewitems.h"
 #include "watch.h"
 #include "wndcustomdata.h"
@@ -104,17 +105,7 @@ void ListNodes::subscribe( bool i_subscribe)
 //{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[1],"operation":{"type":"watch","class":"monitors","status":"unsubscribe"}}}
 	if( m_subscribed == i_subscribe ) return;
 
-	std::ostringstream str;
-
-	std::vector<int> ids;
-	ids.push_back( Watch::getId());
-
-	af::jsonActionOperationStart( str,"monitors","watch", std::string(), ids);
-	str << ",\"class\":\"" << getType() << "\"";
-	str << ",\"status\":\"" << ( i_subscribe ? "subscribe":"unsubscribe") << "\"";
-	af::jsonActionOperationFinish( str);
-
-	Watch::sendMsg( af::jsonMsg( str));
+	MonitorHost::subscribe( getType(), i_subscribe);
 
 	m_subscribed = i_subscribe;
 }

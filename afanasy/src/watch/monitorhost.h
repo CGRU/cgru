@@ -11,18 +11,20 @@ public:
 	MonitorHost();
 	~MonitorHost();
 
-	static inline void setId( int new_id) { m_->m_id = new_id;}
+	static af::Msg * genRegisterMsg();
 
-//   inline void   subscribe( const QList<int> & eIds ) { setEvents( af::Msg::TMonitorSubscribe,   eIds);}
-//   inline void unsubscribe( const QList<int> & eIds ) { setEvents( af::Msg::TMonitorUnsubscribe, eIds);}
+	static void subscribe( const std::string & i_class, bool i_subscribe);
+
+	static const af::Address & getClientAddress() { return m_->getAddress();}
 
 	static inline void addJobId( int jId ) { setJobId( af::Msg::TMonitorJobsIdsAdd, jId);}
 	static inline void delJobId( int jId ) { setJobId( af::Msg::TMonitorJobsIdsDel, jId);}
 
 	static void setUid( int i_uid);
+	static int getUid() { return ms_uid ;}
 
 	static void connectionLost();
-	static void connectionEstablished();
+	static void connectionEstablished( int i_id, int i_uid);
 
 private:
 	static MonitorHost * m_;

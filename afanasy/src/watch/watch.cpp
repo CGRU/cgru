@@ -48,13 +48,11 @@ QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 
 QApplication * Watch::ms_app = NULL;
 Dialog * Watch::ms_d = NULL;
-MonitorHost * Watch::ms_m = NULL;
 
 Watch::Watch( Dialog * pDialog, QApplication * pApplication)
 {
    ms_app = pApplication;
    ms_d = pDialog;
-   ms_m = ms_d->getMonitor();
 
 // Get services icons:
    QDir dir( afqt::stoq( af::Environment::getCGRULocation()) + "/icons/software");
@@ -83,7 +81,7 @@ Watch::~Watch()
    for( QMap<QString, QPixmap *>::iterator it = ms_services_icons_small.begin(); it != ms_services_icons_small.end(); it++) delete *it;
 }
 
-void Watch::destroy() { ms_d = NULL; ms_m = NULL;}
+void Watch::destroy() { ms_d = NULL; }
 
 void Watch::sendMsg( af::Msg * msg)
 {
@@ -149,16 +147,6 @@ void Watch::keyPressEvent( QKeyEvent * event) { if(ms_d) ms_d->keyPressEvent( ev
 
 bool Watch::isInitialized() { if(ms_d) return ms_d->isInitialized(); else return false;  }
 bool Watch::isConnected()   { if(ms_d) return ms_d->isConnected();   else return false;  }
-int  Watch::getUid()        { if(ms_d) return ms_d->getUid();        else return 0;      }
-int  Watch::getId()         { if(ms_m) return ms_m->getId();         else return 0;      }
-
-const af::Address & Watch::getClientAddress() { return ms_m->getAddress();}
-
-//void Watch::subscribe(   const QList<int> & events) { if(ms_m) ms_m->  subscribe( events );}
-//void Watch::unsubscribe( const QList<int> & events) { if(ms_m) ms_m->unsubscribe( events );}
-void Watch::addJobId( int jId ) { if(ms_m) ms_m->addJobId( jId );}
-void Watch::delJobId( int jId ) { if(ms_m) ms_m->delJobId( jId );}
-void Watch::setUid(   int uid ) { if(ms_m) ms_m->setUid(   uid );}
 
 void Watch::addWindow( Wnd * wnd)
 {
@@ -286,14 +274,12 @@ void Watch::connectionLost()
 {
    for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionLost();
-   if(ms_m) ms_m->connectionLost();
 }
 
 void Watch::connectionEstablished()
 {
    for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionEstablished();
-   if(ms_m) ms_m->connectionEstablished();
 }
 
 bool Watch::openMonitor( int type, bool open)

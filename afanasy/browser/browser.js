@@ -268,6 +268,7 @@ function g_Deregistered()
 	this.document.title = 'AF (deregistered)';
 	g_id = 0;
 	g_uid = -1;
+	g_uid_orig = -1;
 	g_Info('Deregistered.');
 	$('registered').textContent = 'Deregistered';
 	$('id').textContent = g_id;

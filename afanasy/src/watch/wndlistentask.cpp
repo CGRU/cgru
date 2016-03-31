@@ -5,6 +5,7 @@
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskoutput.h"
 
+#include "monitorhost.h"
 #include "watch.h"
 
 #include <QtGui/QLayout>
@@ -36,7 +37,9 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    setWindowTitle( taskname);
    taskname += " %1:";
 
-   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK | af::MCListenAddress::TOLISTEN, Watch::getClientAddress(), jobid, block, task);
+   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK | af::MCListenAddress::TOLISTEN,
+		MonitorHost::getClientAddress(), jobid, block, task);
+
    Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
 }
 
@@ -46,8 +49,10 @@ WndListenTask::~WndListenTask()
 
 void WndListenTask::closeEvent( QCloseEvent * event)
 {
-   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, Watch::getClientAddress(), jobid, block, task);
+   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, MonitorHost::getClientAddress(), jobid, block, task);
+
    Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
+
    Wnd::closeEvent( event);
 }
 

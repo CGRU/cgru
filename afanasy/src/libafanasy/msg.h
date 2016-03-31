@@ -89,7 +89,7 @@ public:
 /**/TClientShutdownRequest/**/,     ///< Shutdown client host computer,
 
 /*- Monitor messages -*/
-/**/TMonitorId/**/,                 ///< Id for new Monitor. Server sends it back when new Talk registered.
+/**/TMonitorId/**/,                 ///< Server sends ID back to monitor when no new events happened.
 /**/TMonitorUpdateId/**/,           ///< Update Monitor with given id ( No information for updating Monitor needed).
 //**/TMonitorsListRequest/**/,       ///< Request online Monitors list.
 /**/TMonitorDeregister/**/,         ///< Deregister monitor with given id.
@@ -107,7 +107,7 @@ public:
 /*- Users messages -*/
 //**/TUsersListRequest/**/,          ///< Active users information.
 /// Uset id. Afanasy sends it back as an answer on \c TUserIdRequest , which contains user name.
-/**/TUserId/**/,
+///**/TUserId/**/,
 /**/TUserLogRequestId/**/,          ///< Request a log of User with given id.
 /**/TUserJobsOrderRequestId/**/,    ///< Request User(id) jobs ids in server list order.
 
@@ -152,7 +152,8 @@ TRESERVED09,
 
 /*- Monitor messages -*/
 /// Register Monitor. Send by Monitor client to register. Server sends back its id \c TMonitorId.
-/**/TMonitorRegister/**/,
+//**/TMonitorRegister/**/,
+/**/TMonitor/**/,                   ///< Server sends it for a new registered monitor.
 ///**/TMonitorsListRequestIds/**/,    ///< Request a list of Monitors with given ids.
 /**/TMonitorsList/**/,              ///< Message with a list of online Monitors.
 //**/TMonitorSubscribe/**/,          ///< Subscribe monitor on some events.
@@ -206,7 +207,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /*- Users messages -*/
 //**/TUsersListRequestIds/**/,       ///< Request a list of Users with given ids.
 /**/TUsersList/**/,                 ///< Active users information.
-/**/TUserIdRequest/**/,             ///< Request an id of user with given name.
+//**/TUserIdRequest/**/,             ///< Request an id of user with given name.
 /**/TUserJobsOrder/**/,             ///< Jobs ids in server list order.
 
 /*- Job messages -*/

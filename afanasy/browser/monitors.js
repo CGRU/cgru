@@ -9,7 +9,7 @@ MonitorNode.prototype.init = function()
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
-	this.elName.title = 'User Name';
+	this.elName.title = 'Name';
 	this.elName.classList.add('prestar');
 
 	this.elHostName = cm_ElCreateFloatText( this.element, 'right', 'Host Name');
@@ -52,7 +52,7 @@ MonitorNode.prototype.update = function( i_obj)
 
 	this.elUid.textContent = 'UID: ' + this.params.uid;
 
-	this.elName.textContent = this.params.name.substr( 0, this.params.name.indexOf(':'));
+	this.elName.textContent = this.params.name;
 
 	if( this.params.host_name ) this.elHostName.textContent = this.params.host_name;
 	else this.elHostName.textContent = '';

@@ -5,6 +5,7 @@
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskoutput.h"
 
+#include "monitorhost.h"
 #include "watch.h"
 
 #include <QtGui/QLayout>
@@ -33,8 +34,8 @@ WndListenJob::WndListenJob( int JobId, const QString & Name):
    qTextEdit->setWordWrapMode( QTextOption::NoWrap);
    setWindowTitle( jobname);
 
-   af::MCListenAddress mclass( af::MCListenAddress::TOLISTEN, Watch::getClientAddress(), jobid);
-   Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
+	af::MCListenAddress mclass( af::MCListenAddress::TOLISTEN, MonitorHost::getClientAddress(), jobid);
+	Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
 }
 
 WndListenJob::~WndListenJob()
@@ -44,9 +45,9 @@ WndListenJob::~WndListenJob()
 
 void WndListenJob::closeEvent( QCloseEvent * event)
 {
-   af::MCListenAddress mclass( 0, Watch::getClientAddress(), jobid);
-   Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
-   Wnd::closeEvent( event);
+	af::MCListenAddress mclass( 0, MonitorHost::getClientAddress(), jobid);
+	Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
+	Wnd::closeEvent( event);
 }
 
 bool WndListenJob::caseMessage( af::Msg * msg)

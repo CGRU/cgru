@@ -38,39 +38,21 @@ AFINFO("MonitorContainer::~MonitorContainer:\n");
 	if( m_jobEventsUids != NULL ) delete [] m_jobEventsUids;
 }
 
-af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
+af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_binary)
 {
-	int id = 0;
-	if( i_json )
+	if( add( i_monitor))
 	{
-		// Considering that JSON monitors does not listening any port.
-		// So we do not need check whether another client with the same address exists.
-		id = add( i_monitor);
-		if( id == 0 )
-		{
-			delete i_monitor;
-		}
-		else
-		{
-			i_monitor->setRegisterTime();
-		}
+		i_monitor->setRegisterTime();
+		AFCommon::QueueLog("Monitor registered: " + i_monitor->v_generateInfoString( false));
+		addEvent( af::Monitor::EVT_monitors_add, i_monitor->getId());
 	}
 	else
 	{
-		// If client is listening a port, it has an address.
-		// We should delete older client with the same address,
-		// that is why monitor container pointer and event type is needed.
-		id = addClient( i_monitor, true, this, af::Monitor::EVT_monitors_del);
+		delete i_monitor;
 	}
 
-	if( id != 0 )
-	{
-		AFCommon::QueueLog("Monitor registered: " + i_monitor->v_generateInfoString( false));
-		addEvent( af::Monitor::EVT_monitors_add, id);
-	}
-
-	if( i_json == false )
-		return new af::Msg( af::Msg::TMonitorId, id);
+	if( i_binary )
+		return new af::Msg( af::Msg::TMonitor, i_monitor);
 
 	std::ostringstream str;
 	str << "{\"monitor\":";
