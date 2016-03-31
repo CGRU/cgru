@@ -982,11 +982,15 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
       if( wasWaiting != nowWaining) jobchanged = af::Monitor::EVT_jobs_change;
    }
 
-   //
-   // Update blocks (blocks will uptate its tasks):
-   for( int b = 0; b < m_blocks_num; b++)
-      if( m_blocks[b]->v_refresh( currentTime, renders, monitoring))
-         jobchanged = af::Monitor::EVT_jobs_change;
+	//
+	// Update blocks (blocks will uptate its tasks):
+	for( int b = 0; b < m_blocks_num; b++)
+		if( m_blocks[b]->v_refresh( currentTime, renders, monitoring))
+			jobchanged = af::Monitor::EVT_jobs_change;
+	// Check block depends after main block refresh as states can be changed there:
+	for( int b = 0; b < m_blocks_num; b++)
+		if( m_blocks[b]->checkDepends( monitoring))
+			jobchanged = af::Monitor::EVT_jobs_change;
 
    //
    // job state calculation

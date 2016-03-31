@@ -15,13 +15,10 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-ListItems::ListItems( QWidget* parent, const std::string & type, int RequestMsgType):
+ListItems::ListItems( QWidget* parent, const std::string & type):
 	QWidget( parent),
 	m_type( type),
-	m_parentWindow( parent),
-	m_requestmsgtype( RequestMsgType),
-	m_subscribed( false),
-	m_subscribeFirstTime( true)
+	m_parentWindow( parent)
 {
 AFINFO("ListItems::ListItems.\n");
 	setAttribute ( Qt::WA_DeleteOnClose, true );
@@ -76,62 +73,12 @@ bool ListItems::init( bool createModelView)
 ListItems::~ListItems()
 {
 AFINFO("ListItems::~ListItems.\n");
-
-	Watch::unsubscribe( m_eventsOnOff);
 }
 
 int ListItems::count() const { return m_model->count();}
 
 bool ListItems::mousePressed( QMouseEvent * event) { return false;}
 
-void ListItems::showEvent( QShowEvent * event)
-{
-	v_shownFunc();
-}
-
-void ListItems::v_shownFunc()
-{
-	if( Watch::isConnected() && m_requestmsgtype ) Watch::sendMsg( new af::Msg( m_requestmsgtype, 0, true));
-}
-
-void ListItems::hideEvent( QHideEvent * event)
-{
-	v_unSubscribe();
-}
-
-void ListItems::v_subscribe()
-{
-	if( m_subscribed) return;
-	if( m_subscribeFirstTime )
-	{
-		QList<int> eventsAll;
-		eventsAll << m_eventsOnOff;
-		eventsAll << m_eventsShowHide;
-		Watch::subscribe( eventsAll);
-		m_subscribeFirstTime = false;
-	}
-	else
-	{
-		Watch::subscribe( m_eventsShowHide);
-	}
-	m_subscribed = true;
-}
-
-void ListItems::v_unSubscribe()
-{
-	if( m_subscribed == false) return;
-	Watch::unsubscribe( m_eventsShowHide);
-	m_subscribed = false;
-}
-
-void ListItems::v_connectionLost()
-{
-	v_unSubscribe();
-	Watch::unsubscribe( m_eventsOnOff);
-	deleteAllItems();
-}
-
-void ListItems::v_connectionEstablished() { if( isVisible()) v_shownFunc(); }
 void ListItems::deleteAllItems() { m_model->deleteAllItems();}
 void ListItems::doubleClicked( Item * item) {}
 void ListItems::revertModel()  { m_model->revert();}
@@ -208,21 +155,6 @@ void ListItems::setSelectedItems( const QList<Item*> & items, bool resetSelectio
 	}
 	if( lastselectedrow != -1)
 		m_view->selectionModel()->setCurrentIndex( m_model->index(lastselectedrow), QItemSelectionModel::Current);
-}
-
-void ListItems::action( af::MCGeneral& mcgeneral, int type)
-{
-	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
-	for( int i = 0; i < indexes.count(); i++)
-		if( qVariantCanConvert<Item*>( indexes[i].data()))
-			mcgeneral.addId( qVariantValue<Item*>( indexes[i].data())->getId());
-
-	if( mcgeneral.getCount() == 0) return;
-//printf("ListNodes::action:\n"); mcgeneral.stdOut( true);
-
-	af::Msg * msg = new af::Msg( type, &mcgeneral);
-
-	Watch::sendMsg( msg);
 }
 
 void ListItems::doubleClicked_slot( const QModelIndex & index )

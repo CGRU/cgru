@@ -13,7 +13,7 @@ class MonitorAf: public af::Monitor, public AfNodeSrv
 {
 public:
 
-	MonitorAf( af::Msg * msg);
+	MonitorAf( af::Msg * msg, UserContainer * i_users);
 
 	MonitorAf( const JSON & i_obj, UserContainer * i_users);
 
@@ -25,7 +25,7 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-	bool hasJobUid( int uid) const;
+	bool sameUid( int i_uid) const { return i_uid == m_uid; }
 
 	bool hasJobEvent( int type, int uid) const;
 
@@ -42,13 +42,13 @@ public:
 
 	void addBlock( int i_j, int i_b, int i_mode);
 
-	void addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids);
+	inline void setUserJobsOrder( std::vector<int32_t> i_jids) { m_e.m_jobs_order_ids = i_jids;}
 
 	void deregister();
 
 private:
 	void setEvents( const std::vector<int32_t> & i_ids, bool value);
-	void setJobsUsersIds( const std::vector<int32_t> & i_ids);
+//	void setJobsUsersIds( const std::vector<int32_t> & i_ids);
 	void addJobIds( const std::vector<int32_t> & i_ids);
 	void setJobIds( const std::vector<int32_t> & i_ids);
 	void delJobIds( const std::vector<int32_t> & i_ids);

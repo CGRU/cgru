@@ -39,8 +39,7 @@ public:
 	};
 	std::vector<MBlocksIds> m_bids;
 
-	std::vector<int32_t> m_jobs_order_uids;
-	std::vector<std::vector<int32_t> > m_jobs_order_jids;
+	std::vector<int32_t> m_jobs_order_ids;
 
 private:
 

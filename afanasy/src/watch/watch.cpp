@@ -154,8 +154,8 @@ int  Watch::getId()         { if(ms_m) return ms_m->getId();         else return
 
 const af::Address & Watch::getClientAddress() { return ms_m->getAddress();}
 
-void Watch::subscribe(   const QList<int> & events) { if(ms_m) ms_m->  subscribe( events );}
-void Watch::unsubscribe( const QList<int> & events) { if(ms_m) ms_m->unsubscribe( events );}
+//void Watch::subscribe(   const QList<int> & events) { if(ms_m) ms_m->  subscribe( events );}
+//void Watch::unsubscribe( const QList<int> & events) { if(ms_m) ms_m->unsubscribe( events );}
 void Watch::addJobId( int jId ) { if(ms_m) ms_m->addJobId( jId );}
 void Watch::delJobId( int jId ) { if(ms_m) ms_m->delJobId( jId );}
 void Watch::setUid(   int uid ) { if(ms_m) ms_m->setUid(   uid );}

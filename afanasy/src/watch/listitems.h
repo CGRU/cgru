@@ -30,7 +30,7 @@ class ListItems : public QWidget, public Receiver
 Q_OBJECT
 public:
 
-	ListItems( QWidget* parent, const std::string & type = "", int RequestMsgType = 0);
+	ListItems( QWidget* parent, const std::string & type = "");
 	virtual ~ListItems();
 
 	int count() const;
@@ -60,8 +60,6 @@ protected:
 
 	virtual void doubleClicked( Item * item);
 
-	void action( af::MCGeneral & mcgeneral, int type);
-
 	inline void setParameter( const std::string & i_name, long long i_value) const
 		{ setParameter( i_name, af::itos( i_value), false);}
 	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
@@ -75,18 +73,6 @@ protected:
 	const QList<Item*> getSelectedItems() const;
 	const std::vector<int> getSelectedIds() const;
 	void setSelectedItems( const QList<Item*> & items, bool resetSelection = true);
-
-	virtual void showEvent(       QShowEvent  * event );
-	virtual void hideEvent(       QHideEvent  * event );
-
-	virtual void v_shownFunc();
-	virtual void v_subscribe();
-	virtual void v_unSubscribe();
-
-	inline bool isSubscribed() const { return m_subscribed;}
-
-	virtual void v_connectionLost();
-	virtual void v_connectionEstablished();
 
 	ButtonPanel * addButtonPanel(
 		const QString & i_label,
@@ -108,9 +94,6 @@ protected:
 
 	QWidget * m_parentWindow;
 
-	QList<int> m_eventsOnOff;
-	QList<int> m_eventsShowHide;
-
 	QMutex m_mutex;
 
 private slots:
@@ -119,9 +102,6 @@ private slots:
 
 private:
 	std::string m_type;
-	int  m_requestmsgtype;
-	bool m_subscribed;
-	bool m_subscribeFirstTime;
 
 	std::vector<ButtonPanel*> m_btns;
 };

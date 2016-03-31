@@ -42,10 +42,6 @@ QString ListJobs::FilterString_SU = "";
 ListJobs::ListJobs( QWidget* parent):
 	ListNodes( parent, "jobs")
 {
-	m_eventsShowHide << af::Monitor::EVT_jobs_add;
-	m_eventsShowHide << af::Monitor::EVT_jobs_change;
-	m_eventsOnOff    << af::Monitor::EVT_jobs_del;
-
 	if( af::Environment::VISOR())
 	{
 		Watch::setUid( 0);
@@ -116,12 +112,14 @@ Press RMB for Options.\
 	m_parentWindow->setWindowTitle("Jobs:");
 }
 
-void ListJobs::v_shownFunc()
+void ListJobs::v_showFunc()
 {
+//{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[1],"operation":{"type":"watch","class":"jobs","status":"subscribe","uids":[0]}}}
+//{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[1],"operation":{"type":"watch","class":"jobs","status":"unsubscribe","uids":[0]}}}
 	if( Watch::isConnected() == false) return;
 
 	if( af::Environment::VISOR())
-		Watch::get("\"type\":\"jobs\"");
+		get();
 	else
 	{
 		if( Watch::getUid())
@@ -134,12 +132,12 @@ void ListJobs::v_shownFunc()
 			if( m_parentWindow != (QWidget*)Watch::getDialog()) close();
 	}
 }
-
+/*
 void ListJobs::v_connectionLost()
 {
 	if( m_parentWindow != (QWidget*)Watch::getDialog()) m_parentWindow->close();
 }
-
+*/
 void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 {
 	QMenu menu(this);
@@ -415,7 +413,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 			{
 				m_view->scrollToBottom();
 			}
-			v_subscribe();
+			subscribe();
 		}
 
 		calcTotals();
@@ -460,17 +458,9 @@ bool ListJobs::processEvents( const af::MonitorEvents & i_me)
 		return true;
 	}
 
-	if( i_me.m_jobs_order_uids.size())
-	{
-		for( int u = 0; u < i_me.m_jobs_order_uids.size(); u++)
-		{
-			if( i_me.m_jobs_order_uids[u] == Watch::getUid())
-			{
-				sortMatch( i_me.m_jobs_order_jids[u]);
-				return true;
-			}
-		}
-	}
+	if( i_me.m_jobs_order_ids.size())
+		sortMatch( i_me.m_jobs_order_ids);
+
 
 	return false;
 }

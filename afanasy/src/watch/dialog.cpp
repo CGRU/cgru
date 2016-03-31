@@ -318,7 +318,7 @@ void Dialog::newMessage( af::Msg *msg)
                 ButtonMonitor::unset();
                 closeList();
             }
-            displayWarning("You do not exist.");
+            displayWarning("You are not exist.");
         }
         else
         {

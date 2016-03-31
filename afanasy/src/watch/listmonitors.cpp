@@ -28,7 +28,7 @@ bool    ListMonitors::FilterMatch    = false;
 QString ListMonitors::FilterString   = "";
 
 ListMonitors::ListMonitors( QWidget* parent):
-	ListNodes(  parent, "monitors", af::Msg::TMonitorsListRequest)
+	ListNodes(  parent, "monitors")
 {
 	ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
 	ctrl->addSortType(   CtrlSortFilter::TNONE);
@@ -43,10 +43,6 @@ ListMonitors::ListMonitors( QWidget* parent):
 	ctrl->addFilterType( CtrlSortFilter::TVERSION);
 	ctrl->addFilterType( CtrlSortFilter::TADDRESS);
 	initSortFilterCtrl();
-
-	m_eventsShowHide << af::Monitor::EVT_monitors_add;
-	m_eventsShowHide << af::Monitor::EVT_monitors_change;
-	m_eventsOnOff    << af::Monitor::EVT_monitors_del;
 
 	m_parentWindow->setWindowTitle("Monitors");
 
@@ -84,7 +80,7 @@ AFINFO("ListMonitors::caseMessage( Msg msg)\n");
 	case af::Msg::TMonitorsList:
 	{
 		updateItems( msg);
-		v_subscribe();
+		subscribe();
 		calcTitle();
 		break;
 	}
@@ -103,17 +99,17 @@ bool ListMonitors::processEvents( const af::MonitorEvents & i_me)
 		return true;
 	}
 
-	af::MCGeneral ids;
+	std::vector<int> ids;
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_monitors_change].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_monitors_change][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_monitors_change][i]);
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_monitors_add].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_monitors_add][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_monitors_add][i]);
 
-	if( ids.getCount())
+	if( ids.size())
 	{
-		Watch::sendMsg( new af::Msg( af::Msg::TMonitorsListRequestIds, &ids, true));
+		get( ids);
 		return true;
 	}
 
@@ -132,7 +128,7 @@ void ListMonitors::calcTitle()
 	for( int i = 0; i < total; i++)
 	{
 		ItemMonitor * itemmonitor = (ItemMonitor*)(m_model->item(i));
-		if( itemmonitor->superuser ) super++;
+		if( itemmonitor->isSuperUser()) super++;
 	}
 	m_parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
 }

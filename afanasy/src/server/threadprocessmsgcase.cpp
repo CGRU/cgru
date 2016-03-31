@@ -87,8 +87,9 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TMonitorRegister:
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock ulock( i_args->users,    AfContainerLock::READLOCK);
 
-	  MonitorAf * newMonitor = new MonitorAf( i_msg);
+		MonitorAf * newMonitor = new MonitorAf( i_msg, i_args->users);
 	  newMonitor->setAddressIP( i_msg->getAddress());
 	  o_msg_response = i_args->monitors->addMonitor( newMonitor);
 	  break;
@@ -106,21 +107,21 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 
 	  break;
 	}
-	case af::Msg::TMonitorsListRequest:
+/*	case af::Msg::TMonitorsListRequest:
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 
 	  o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList);
 	  break;
-	}
-	case af::Msg::TMonitorsListRequestIds:
+	}*/
+/*	case af::Msg::TMonitorsListRequestIds:
 	{
 	  AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 
 	  af::MCGeneral ids( i_msg);
 	  o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList, ids);
 	  break;
-	}
+	}*/
 	case af::Msg::TMonitorLogRequestId:
 	{
 		AfContainerLock lock( i_args->monitors,  AfContainerLock::READLOCK);
@@ -168,21 +169,21 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg( af::Msg::TRenderId, id);
 	  break;
 	}
-	case af::Msg::TRendersListRequest:
+/*	case af::Msg::TRendersListRequest:
 	{
 	  AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
 	  o_msg_response = i_args->renders->generateList( af::Msg::TRendersList);
 	  break;
-	}
-	case af::Msg::TRendersListRequestIds:
+	}*/
+/*	case af::Msg::TRendersListRequestIds:
 	{
 	  AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
 	  af::MCGeneral ids( i_msg);
 	  o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, ids);
 	  break;
-	}
+	}*/
 	case af::Msg::TRendersResourcesRequestIds:
 	{
 	  AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
@@ -259,21 +260,21 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg( af::Msg::TUserId, id);
 	  break;
 	}
-	case af::Msg::TUsersListRequest:
+/*	case af::Msg::TUsersListRequest:
 	{
 	  AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
 
 	  o_msg_response = i_args->users->generateList( af::Msg::TUsersList);
 	  break;
-	}
-	case af::Msg::TUsersListRequestIds:
+	}*/
+/*	case af::Msg::TUsersListRequestIds:
 	{
 	  AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
 
 	  af::MCGeneral ids( i_msg);
 	  o_msg_response = i_args->users->generateList( af::Msg::TUsersList, ids);
 	  break;
-	}
+	}*/
 	case af::Msg::TUserLogRequestId:
 	{
 	  AfContainerLock lock( i_args->users,  AfContainerLock::READLOCK);
@@ -583,10 +584,10 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TTaskUpdatePercent:
 	case af::Msg::TTaskListenOutput:
 	case af::Msg::TRenderDeregister:
-	case af::Msg::TMonitorSubscribe:
-	case af::Msg::TMonitorUnsubscribe:
+//	case af::Msg::TMonitorSubscribe:
+//	case af::Msg::TMonitorUnsubscribe:
 	case af::Msg::TMonitorDeregister:
-	case af::Msg::TMonitorUsersJobs:
+//	case af::Msg::TMonitorUsersJobs:
 	case af::Msg::TMonitorJobsIdsAdd:
 	case af::Msg::TMonitorJobsIdsSet:
 	case af::Msg::TMonitorJobsIdsDel:

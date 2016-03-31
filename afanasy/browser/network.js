@@ -97,13 +97,13 @@ function nw_Subscribe( i_class, i_subscribe, i_ids)
 		obj.action.operation.status = 'unsubscribe';
 	if( i_ids != null )
 		obj.action.operation.ids = i_ids;
-	if( i_class == 'jobs' )
+/*	if( i_class == 'jobs' )
 	{
 		var uid = g_uid;
 		if( g_VISOR() || g_GOD() || ( uid < 0 ))
 			uid = 0
 		obj.action.operation.uids = [uid];
-	}
+	}*/
 
 	nw_send(obj);
 }

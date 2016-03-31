@@ -107,7 +107,8 @@ ListTasks::~ListTasks()
 
 void ListTasks::v_connectionLost()
 {
-	if( m_parentWindow != (QWidget*)Watch::getDialog()) m_parentWindow->close();
+//	if( m_parentWindow != (QWidget*)Watch::getDialog())
+		m_parentWindow->close();
 }
 
 void ListTasks::contextMenuEvent(QContextMenuEvent *event)

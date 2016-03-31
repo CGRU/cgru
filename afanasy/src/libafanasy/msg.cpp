@@ -499,21 +499,21 @@ const char * Msg::TNAMES[]=
 	/*- Monitor messages -*/
 	"TMonitorId",                 ///< Id for new Monitor. Server sends it back when new Talk registered.
 	"TMonitorUpdateId",           ///< Update Monitor with given id ( No information for updating Monitor needed).
-	"TMonitorsListRequest",       ///< Request online Monitors list.
+//	"TMonitorsListRequest",       ///< Request online Monitors list.
 	"TMonitorDeregister",         ///< Deregister monitor with given id.
 	"TMonitorLogRequestId",       ///< Request a log of a Monitor with given id.
 
 	/*- Render messages -*/
 	/** When Server successfully registered new Render it's send back it's id.**/
 	"TRenderId",
-	"TRendersListRequest",        ///< Request online Renders list message.
+//	"TRendersListRequest",        ///< Request online Renders list message.
 	"TRenderLogRequestId",        ///< Request a log of Render with given id.
 	"TRenderTasksLogRequestId",   ///< Request a log of Render with given id.
 	"TRenderInfoRequestId",       ///< Request a string information about a Render with given id.
 	"TRenderDeregister",          ///< Deregister Render with given id.
 
 	/*- Users messages -*/
-	"TUsersListRequest",          ///< Active users information.
+//	"TUsersListRequest",          ///< Active users information.
 	/// Uset id. Afanasy sends it back as an answer on \c TUserIdRequest , which contains user name.
 	"TUserId",
 	"TUserLogRequestId",          ///< Request a log of User with given id.
@@ -561,11 +561,11 @@ const char * Msg::TNAMES[]=
 	/*- Monitor messages -*/
 	/// Register Monitor. Send by Monitor client to register. Server sends back its id \c TMonitorId.
 	"TMonitorRegister",
-	"TMonitorsListRequestIds",    ///< Request a list of Monitors with given ids.
+//	"TMonitorsListRequestIds",    ///< Request a list of Monitors with given ids.
 	"TMonitorsList",              ///< Message with a list of online Monitors.
-	"TMonitorSubscribe",          ///< Subscribe monitor on some events.
-	"TMonitorUnsubscribe",        ///< Unsubscribe monitor from some events.
-	"TMonitorUsersJobs",          ///< Set users ids to monitor their jobs.
+//	"TMonitorSubscribe",          ///< Subscribe monitor on some events.
+//	"TMonitorUnsubscribe",        ///< Unsubscribe monitor from some events.
+//	"TMonitorUsersJobs",          ///< Set users ids to monitor their jobs.
 	"TMonitorJobsIdsAdd",         ///< Add jobs ids for monitoring.
 	"TMonitorJobsIdsSet",         ///< Set jobs ids for monitoring.
 	"TMonitorJobsIdsDel",         ///< Delete monitoring jobs ids.
@@ -600,7 +600,7 @@ const char * Msg::TNAMES[]=
 	And when Render can't connect to Afanasy. Afanasy register new Render and send back it's id \c TRenderId. **/
 	"TRenderRegister",
 	"TRenderUpdate",              ///< Update Render, message contains its resources.
-	"TRendersListRequestIds",     ///< Request a list of Renders with given ids.
+//	"TRendersListRequestIds",     ///< Request a list of Renders with given ids.
 	"TRendersResourcesRequestIds",///< Request a list of resources of Renders with given ids.
 	"TRendersList",               ///< Message with a list of Renders.
 	"TRendersResources",          ///< Message with a list of resources of Renders.
@@ -611,7 +611,7 @@ const char * Msg::TNAMES[]=
 	"TRenderWOLSleepRequest",     ///< Request to client to fall a sleep,
 
 	/*- Users messages -*/
-	"TUsersListRequestIds",       ///< Request a list of Users with given ids.
+//	"TUsersListRequestIds",       ///< Request a list of Users with given ids.
 	"TUsersList",                 ///< Active users information.
 	"TUserIdRequest",             ///< Request an id of user with given name.
 	"TUserJobsOrder",             ///< Jobs ids in server list order.

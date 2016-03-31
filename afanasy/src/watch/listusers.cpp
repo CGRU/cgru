@@ -29,7 +29,7 @@ bool    ListUsers::FilterMatch    = false;
 QString ListUsers::FilterString   = "";
 
 ListUsers::ListUsers( QWidget* parent):
-	ListNodes(  parent, "users", af::Msg::TUsersListRequest)
+	ListNodes(  parent, "users")
 {
 	ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
 	ctrl->addSortType(   CtrlSortFilter::TNONE);
@@ -44,10 +44,6 @@ ListUsers::ListUsers( QWidget* parent):
 	ctrl->addFilterType( CtrlSortFilter::TNAME);
 	ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
 	initSortFilterCtrl();
-
-	m_eventsShowHide << af::Monitor::EVT_users_add;
-	m_eventsShowHide << af::Monitor::EVT_users_change;
-	m_eventsOnOff    << af::Monitor::EVT_users_del;
 
 	m_parentWindow->setWindowTitle("Users");
 
@@ -170,7 +166,7 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
 	{
 		updateItems( msg);
 		calcTitle();
-		v_subscribe();
+		subscribe();
 		break;
 	}
 	default:
@@ -188,17 +184,17 @@ bool ListUsers::processEvents( const af::MonitorEvents & i_me)
 		return true;
 	}
 
-	af::MCGeneral ids;
+	std::vector<int> ids;
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_users_change].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_users_change][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_users_change][i]);
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_users_add].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_users_add][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_users_add][i]);
 
-	if( ids.getCount())
+	if( ids.size())
 	{
-		Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
+		get( ids);
 		return true;
 	}
 

@@ -18,10 +18,16 @@
 
 MonitorContainer * MonitorAf::m_monitors = NULL;
 
-MonitorAf::MonitorAf( af::Msg * msg):
+MonitorAf::MonitorAf( af::Msg * msg, UserContainer * i_users):
 	af::Monitor( msg),
 	AfNodeSrv( this)
 {
+	UserAf * user = i_users->getUser( m_user_name);
+	if( user )
+	{
+		m_uid = user->getId();
+		user->updateTimeActivity();
+	}
 }
 
 MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
@@ -88,19 +94,26 @@ void MonitorAf::v_action( Action & i_action)
 			if( opstatus == "subscribe")
 				subscribe = true;
 
+			if( opclass == "perm")
+			{
+				int32_t new_uid = -1;
+				af::jr_int32("uid", new_uid, operation);
+				if( new_uid >= 0 )
+					m_uid = new_uid;
+			}
 			if( opclass == "jobs")
 			{
 				eids.push_back( af::Monitor::EVT_jobs_add);
 				eids.push_back( af::Monitor::EVT_jobs_change);
 				eids.push_back( af::Monitor::EVT_jobs_del);
-				af::jr_int32vec("uids", uids, operation);
+/*				af::jr_int32vec("uids", uids, operation);
 				if( uids.size())
 				{
 					// Set ids of user(s) whos jobs we are interested in
 					// Zero id means super user - interested in all jobs
 					setJobsUsersIds( uids);
 					appendLog("User ids set to: '" + af::vectToStr( uids) + "'");
-				}
+				}*/
 			}
 			else if( opclass == "tasks")
 			{
@@ -160,7 +173,7 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 //printf("MonitorAf::setInterest: [%s]:\n", af::Msg::TNAMES[type]);
    switch(type)
    {
-      case af::Msg::TMonitorSubscribe:
+/*      case af::Msg::TMonitorSubscribe:
       {
          setEvents( ids.getList(), true);
          break;
@@ -169,12 +182,12 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
       {
          setEvents( ids.getList(), false);
          break;
-      }
-      case af::Msg::TMonitorUsersJobs:
+      }*/
+/*      case af::Msg::TMonitorUsersJobs:
       {
          setJobsUsersIds( ids.getList());
          break;
-      }
+      }*/
       case af::Msg::TMonitorJobsIdsAdd:
       {
          addJobIds( ids.getList());
@@ -198,14 +211,14 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
    }
    return true;
 }
-
+/*
 void MonitorAf::setJobsUsersIds( const std::vector<int32_t> & i_ids)
 {
 	m_jobsUsersIds.clear();
 	for( int i = 0; i < i_ids.size(); i++)
 		m_jobsUsersIds.push_back( i_ids[i]);
 }
-
+*/
 void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 {
 	for( int i = 0; i < i_ids.size(); i++)
@@ -222,24 +235,23 @@ void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 	}
 //printf("MonitorAf::setEvents:\n"); v_stdOut(true);
 }
-
+/*
 bool MonitorAf::hasJobUid( int uid) const
 {
    for( std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin(); it != m_jobsUsersIds.end(); it++)
       if( *it == uid) return true;
    return false;
 }
-
+*/
 bool MonitorAf::hasJobEvent( int type, int uid) const
 {
-   int count = m_jobsUsersIds.size();
-   if( count < 1) return false;
-   if( hasEvent( type) == false) return false;
-
-   std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin();
-   if(( count == 1 ) && ( *it == 0 )) return true;
-
-   return hasJobUid( uid);
+//printf("MonitorAf::hasJobEvent: hasEvent=%d, uid=%d, m_uid=%d\n", hasEvent(type), uid, m_uid);
+	if( hasEvent( type))
+	{
+		if( uid == m_uid ) return true;
+		if( m_uid == 0 ) return true;
+	}
+	return false;
 }
 
 bool MonitorAf::hasJobId( int id) const
@@ -347,7 +359,7 @@ void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 	m_e.m_bids[i].block_num = i_b;
 	m_e.m_bids[i].mode = i_mode;
 }
-
+/*
 void MonitorAf::addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids)
 {
 	for( int i = 0; i < m_e.m_jobs_order_uids.size(); i++)
@@ -360,7 +372,7 @@ void MonitorAf::addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids)
 	m_e.m_jobs_order_uids.push_back( i_uid);
 	m_e.m_jobs_order_jids.push_back( i_jids);
 }
-
+*/
 af::Msg * MonitorAf::getEventsBin()
 {
 	updateTime();
@@ -490,30 +502,18 @@ af::Msg * MonitorAf::getEventsJSON()
 		hasevents = true;
 	}
 
-	if( m_e.m_jobs_order_uids.size())
+	if( m_e.m_jobs_order_ids.size())
 	{
 		if( hasevents )
 			stream << ",";
 		else
 			stream << "{";
 
-		stream << "\"jobs_order\":{\"uids\":[";
-		for( int i = 0; i < m_e.m_jobs_order_uids.size(); i++)
+		stream << "\"jobs_order_ids\":[";
+		for( int i = 0; i < m_e.m_jobs_order_ids.size(); i++)
 		{
-			if( i > 0 ) stream << ",";
-			stream << m_e.m_jobs_order_uids[i];
-		}
-		stream << "],\"jids\":[";
-		for( int i = 0; i < m_e.m_jobs_order_jids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << "[";
-			for( int j = 0; j < m_e.m_jobs_order_jids[i].size(); j++)
-			{
-				if( j > 0 ) stream << ",";
-				stream << m_e.m_jobs_order_jids[i][j];
-			}
-			stream << "]";
+			if( i ) stream << ",";
+			stream << m_e.m_jobs_order_ids[i];
 		}
 		stream << "]}";
 

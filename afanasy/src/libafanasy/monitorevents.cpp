@@ -71,17 +71,7 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	}
 
 
-	rw_Int32_Vect( m_jobs_order_uids, msg);
-
-	int32_t size = m_jobs_order_jids.size();
-	rw_int32_t( size, msg);
-	for( int i = 0; i < size; i++)
-	{
-		if( msg->isReading())
-			m_jobs_order_jids.push_back(std::vector<int32_t>());
-
-		rw_Int32_Vect( m_jobs_order_jids[i], msg);
-	}
+	rw_Int32_Vect( m_jobs_order_ids, msg);
 }
 
 void MonitorEvents::clear()
@@ -93,8 +83,7 @@ void MonitorEvents::clear()
 
 	m_bids.clear();
 
-	m_jobs_order_uids.clear();
-	m_jobs_order_jids.clear();
+	m_jobs_order_ids.clear();
 }
 
 bool MonitorEvents::isEmpty() const
@@ -107,8 +96,7 @@ bool MonitorEvents::isEmpty() const
 
 	if( m_bids.size()) return false;
 
-	if( m_jobs_order_uids.size()) return false;
-	if( m_jobs_order_jids.size()) return false;
+	if( m_jobs_order_ids.size()) return false;
 
 	return true;
 }

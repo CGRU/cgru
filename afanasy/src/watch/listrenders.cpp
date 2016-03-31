@@ -38,7 +38,7 @@ bool    ListRenders::FilterMatch    = false;
 QString ListRenders::FilterString   = "";
 
 ListRenders::ListRenders( QWidget* parent):
-	ListNodes( parent, "renders", af::Msg::TRendersListRequest)
+	ListNodes( parent, "renders")
 {
 	ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
 	ctrl->addSortType(   CtrlSortFilter::TNONE);
@@ -65,10 +65,6 @@ Sort & Filter Renders.\n\
 Press RMB for Options.\
 ");
 	ctrl->getLayout()->addWidget( control);
-
-	m_eventsShowHide << af::Monitor::EVT_renders_add;
-	m_eventsShowHide << af::Monitor::EVT_renders_change;
-	m_eventsOnOff    << af::Monitor::EVT_renders_del;
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
@@ -372,7 +368,7 @@ bool ListRenders::caseMessage( af::Msg * msg)
 	switch( msg->type())
 	{
 	case af::Msg::TRendersList:
-		v_subscribe();
+		subscribe();
 	case af::Msg::TRendersResources:
 	{
 		updateItems( msg);
@@ -394,17 +390,17 @@ bool ListRenders::processEvents( const af::MonitorEvents & i_me)
 		return true;
 	}
 
-	af::MCGeneral ids;
+	std::vector<int> ids;
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_change].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_renders_change][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_renders_change][i]);
 
 	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_renders_add].size(); i++)
-		ids.addUniqueId( i_me.m_events[af::Monitor::EVT_renders_add][i]);
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_renders_add][i]);
 
-	if( ids.getCount())
+	if( ids.size())
 	{
-		Watch::sendMsg( new af::Msg( af::Msg::TRendersListRequestIds, &ids, true));
+		get( ids);
 		return true;
 	}
 

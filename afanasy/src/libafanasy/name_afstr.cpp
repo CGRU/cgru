@@ -90,6 +90,7 @@ const std::string af::time2strHMS( int time32, bool clamp)
 const std::string af::state2str( int state)
 {
 	std::string str;
+	if( state & AFJOB::STATE_WAITDEP_MASK  ) str += std::string( AFJOB::STATE_WAITDEP_NAME_S ) + " ";
 	if( state & AFJOB::STATE_READY_MASK    ) str += std::string( AFJOB::STATE_READY_NAME_S   ) + " ";
 	if( state & AFJOB::STATE_RUNNING_MASK  ) str += std::string( AFJOB::STATE_RUNNING_NAME_S ) + " ";
 	if( state & AFJOB::STATE_DONE_MASK     ) str += std::string( AFJOB::STATE_DONE_NAME_S    ) + " ";

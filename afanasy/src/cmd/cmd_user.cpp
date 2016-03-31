@@ -14,14 +14,13 @@ CmdUserList::CmdUserList()
 {
 	setCmd("ulist");
 	setInfo("List of permanent users.");
-	setMsgType( af::Msg::TUsersListRequest);
-	setMsgOutType( af::Msg::TUsersList);
+	setMsgType( af::Msg::TJSON);
 	setRecieving();
 }
 CmdUserList::~CmdUserList(){}
 bool CmdUserList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	msg.set( getMsgType());
+	m_str << "{\"get\":{\"type\":\"users\"}}";
 	return true;
 }
 void CmdUserList::v_msgOut( af::Msg& msg)

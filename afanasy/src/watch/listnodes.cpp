@@ -13,18 +13,19 @@
 #include <QtGui/QInputDialog>
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 uint32_t ListNodes::ms_flagsHideShow = e_HideHidden;
 
-ListNodes::ListNodes( QWidget* parent, const std::string & type, int RequestMsgType):
-   ListItems( parent, type, RequestMsgType),
+ListNodes::ListNodes( QWidget* parent, const std::string & type):
+   ListItems( parent, type),
    ctrl( NULL),
    sorting( false),
    sortascending( false),
    filtering( false),
-   filterinclude( true)
+	filterinclude( true),
+	m_subscribed( false)
 {
 AFINFO("ListNodes::ListNodes.\n");
 }
@@ -32,6 +33,8 @@ AFINFO("ListNodes::ListNodes.\n");
 ListNodes::~ListNodes()
 {
 AFINFO("ListNodes::~ListNodes.\n");
+
+	unSubscribe();
 }
 
 bool ListNodes::init( bool createModelView)
@@ -68,6 +71,13 @@ void ListNodes::initSortFilterCtrl()
    connect( ctrl, SIGNAL( filterSettingsChanged()  ), this, SLOT( filterSettingsChanged() ));
 }
 
+void ListNodes::get() const
+{
+	std::string str = "\"type\":\"";
+	str += getType() + "\"";
+	Watch::get( str);
+}
+
 void ListNodes::get( const std::vector<int32_t> & i_ids) const
 {
 	if( i_ids.size() == 0 )
@@ -86,6 +96,46 @@ void ListNodes::get( const std::vector<int32_t> & i_ids) const
 	str += "]";
 
 	Watch::get( str);
+}
+
+void ListNodes::subscribe( bool i_subscribe)
+{
+//{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[3],"operation":{"type":"watch","class":"monitors","status":"subscribe"}}}
+//{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[1],"operation":{"type":"watch","class":"monitors","status":"unsubscribe"}}}
+	if( m_subscribed == i_subscribe ) return;
+
+	std::ostringstream str;
+
+	std::vector<int> ids;
+	ids.push_back( Watch::getId());
+
+	af::jsonActionOperationStart( str,"monitors","watch", std::string(), ids);
+	str << ",\"class\":\"" << getType() << "\"";
+	str << ",\"status\":\"" << ( i_subscribe ? "subscribe":"unsubscribe") << "\"";
+	af::jsonActionOperationFinish( str);
+
+	Watch::sendMsg( af::jsonMsg( str));
+
+	m_subscribed = i_subscribe;
+}
+
+void ListNodes::v_connectionLost()
+{
+	unSubscribe();
+	deleteAllItems();
+}
+
+void ListNodes::v_connectionEstablished() { if( isVisible()) v_showFunc(); }
+
+void ListNodes::showEvent( QShowEvent * event)
+{
+	v_showFunc();
+}
+
+void ListNodes::v_showFunc()
+{
+	if( Watch::isConnected())
+		get();
 }
 
 bool ListNodes::updateItems( af::Msg * msg)

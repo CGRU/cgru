@@ -26,11 +26,11 @@ public:
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
 
+	void v_showFunc();
+
 	void doubleClicked( Item * item);
 
-	void v_shownFunc();
-
-	void v_connectionLost();
+//	void v_connectionLost();
 
 	void resetSorting();
 

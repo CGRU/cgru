@@ -1497,12 +1497,12 @@ bool BlockData::updateProgress( JobProgress * progress)
 	if( new_tasks_skipped) new_state = new_state |   AFJOB::STATE_SKIPPED_MASK;
 	else                   new_state = new_state & (~AFJOB::STATE_SKIPPED_MASK);
 
-	if( m_state & AFJOB::STATE_WAITDEP_MASK)
-	new_state = new_state & (~AFJOB::STATE_READY_MASK);
+//	if( m_state & AFJOB::STATE_WAITDEP_MASK)
+//	new_state = new_state & (~AFJOB::STATE_READY_MASK);
 
-   bool depend = m_state & AFJOB::STATE_WAITDEP_MASK;
+//   bool depend = m_state & AFJOB::STATE_WAITDEP_MASK;
    m_state = new_state;
-   if( depend ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
+//   if( depend ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 
    return changed;
 }

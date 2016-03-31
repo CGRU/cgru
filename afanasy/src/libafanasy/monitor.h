@@ -41,11 +41,12 @@ public:
 
 	bool hasEvent( int i_type) const;
 
+	inline const int32_t & getUid()        const { return m_uid; }
    inline long long getTimeActivity()      const { return m_time_activity;     }
-   inline size_t    getJobsUsersIdsCount() const { return m_jobsUsersIds.size(); }
+//   inline size_t    getJobsUsersIdsCount() const { return m_jobsUsersIds.size(); }
    inline size_t    getJobsIdsCount()      const { return m_jobsIds.size();      }
 
-   inline const std::list<int32_t> * getJobsUsersIds() const { return &m_jobsUsersIds; }
+//   inline const std::list<int32_t> * getJobsUsersIds() const { return &m_jobsUsersIds; }
    inline const std::list<int32_t> * getJobsIds()      const { return &m_jobsIds;      }
 
    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
@@ -59,7 +60,7 @@ protected:
 	std::string m_engine;
 
 	std::vector<bool> m_events;
-   std::list<int32_t> m_jobsUsersIds;
+//   std::list<int32_t> m_jobsUsersIds;
    std::list<int32_t> m_jobsIds;
    int64_t m_time_activity;     ///< Last activity
 

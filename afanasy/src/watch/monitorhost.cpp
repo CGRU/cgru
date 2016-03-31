@@ -8,18 +8,25 @@
 //#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+MonitorHost * MonitorHost::m_ = NULL;
+
+int MonitorHost::ms_uid = -1;
+
+std::list<int32_t> MonitorHost::m_jobsIds_counts;
+
 MonitorHost::MonitorHost()
 {
-	m_id = 0;
-	m_events_counts = new int[EVT_COUNT];
-	for( int e = 0; e < EVT_COUNT; e++) m_events_counts[e] = 0;
+	m_ = this;
+//	m_id = 0;
+//	m_events_counts = new int[EVT_COUNT];
+//	for( int e = 0; e < EVT_COUNT; e++) m_events_counts[e] = 0;
 }
 
 MonitorHost::~MonitorHost()
 {
-	delete m_events_counts;
+//	delete m_events_counts;
 }
-
+/*
 void MonitorHost::setEvents( int type, const QList<int> & eIds)
 {
 #ifdef AFOUTPUT
@@ -62,14 +69,14 @@ printf("\n");
 
 	if( ids.getCount() && Watch::isConnected()) Watch::sendMsg( new af::Msg( type, &ids));
 }
-
+*/
 void MonitorHost::connectionLost()
 {
-	for( int e = 0; e < EVT_COUNT; e++)
-	{
-		m_events_counts[e] = 0;
-		m_events[e] = false;
-	}
+//	for( int e = 0; e < EVT_COUNT; e++)
+//	{
+//		m_events_counts[e] = 0;
+//		m_events[e] = false;
+//	}
 }
 
 void MonitorHost::connectionEstablished(){}
@@ -81,17 +88,17 @@ AFINFA("MonitorHost::setJobId: type=[%s], id=%d", af::Msg::TNAMES[type], jId);
 	ids.setId( Watch::getId());
 #ifdef AFOUTPUT
 {
-int counts = m_jobsIds_counts.size();
-std::list<int32_t>::iterator jIt = m_jobsIds.begin();
-std::list<int32_t>::iterator cIt = m_jobsIds_counts.begin();
+int counts = m_->m_jobsIds_counts.size();
+std::list<int32_t>::iterator jIt = m_->m_jobsIds.begin();
+std::list<int32_t>::iterator cIt = m_->m_jobsIds_counts.begin();
 if( counts ) for( int j = 0; j < counts; j++, jIt++, cIt++)
 	printf("jobsIds[%d] = %d, jobsIds_counts[%d] = %d\n", j, *jIt, j, *cIt);
 else printf("No ids.\n");
 }
 #endif
-	std::list<int32_t>::iterator jIt = m_jobsIds.begin();
-	std::list<int32_t>::iterator cIt = m_jobsIds_counts.begin();
-	int counts = int( m_jobsIds_counts.size());
+	std::list<int32_t>::iterator jIt = m_->m_jobsIds.begin();
+	std::list<int32_t>::iterator cIt = m_->m_jobsIds_counts.begin();
+	int counts = int( m_->m_jobsIds_counts.size());
 	bool found = false;
 	for( int j = 0; j < counts; j++, jIt++, cIt++)
 	{
@@ -109,8 +116,8 @@ else printf("No ids.\n");
 				if( *cIt == 0 )
 				{
 					ids.addId( jId);
-					m_jobsIds.erase( jIt);
-					m_jobsIds_counts.erase( cIt);
+					m_->m_jobsIds.erase( jIt);
+					m_->m_jobsIds_counts.erase( cIt);
 				}
 			}
 			break;
@@ -119,14 +126,14 @@ else printf("No ids.\n");
 	if((found == false) && (type == af::Msg::TMonitorJobsIdsAdd))
 	{
 		ids.addId( jId);
-		m_jobsIds.push_back( jId);
-		m_jobsIds_counts.push_back( 1);
+		m_->m_jobsIds.push_back( jId);
+		m_->m_jobsIds_counts.push_back( 1);
 	}
 #ifdef AFOUTPUT
 {
-int counts = m_jobsIds_counts.size();
-std::list<int32_t>::iterator jIt = m_jobsIds.begin();
-std::list<int32_t>::iterator cIt = m_jobsIds_counts.begin();
+int counts = m_->m_jobsIds_counts.size();
+std::list<int32_t>::iterator jIt = m_->m_jobsIds.begin();
+std::list<int32_t>::iterator cIt = m_->m_jobsIds_counts.begin();
 if( counts ) for( int j = 0; j < counts; j++, jIt++, cIt++)
 	printf("R: jobsIds[%d] = %d, jobsIds_counts[%d] = %d\n", j, *jIt, j, *cIt);
 else printf("R: No ids.\n");
@@ -135,13 +142,28 @@ else printf("R: No ids.\n");
 	if( ids.getCount() && Watch::isConnected()) Watch::sendMsg( new af::Msg( type, &ids));
 }
 
-void MonitorHost::setUid( int uid)
+void MonitorHost::setUid( int i_uid)
 {
 AFINFO("MonitorHost::setUid:");
-	m_jobsUsersIds.clear();
-	m_jobsUsersIds.push_back( uid);
-	af::MCGeneral ids;
-	ids.setId( Watch::getId());
-	ids.addId( uid);
-	if( Watch::isConnected()) Watch::sendMsg( new af::Msg( af::Msg::TMonitorUsersJobs, &ids));
+
+	// If it is first time, we store it;
+	if( ms_uid < 0 )
+		ms_uid = i_uid;
+
+	// Negative value means restore original:
+	if( i_uid < 0 )
+		i_uid = m_->m_uid;
+
+
+	std::vector<int> ids;
+	ids.push_back( m_->getId());
+
+	std::ostringstream str;
+	af::jsonActionOperationStart( str,"monitors","watch","", ids);
+	str << ",\"class\":\"perm\"";
+	str << ",\"uid\":" << i_uid;
+	af::jsonActionOperationFinish( str);
+
+	Watch::sendMsg( af::jsonMsg( str));
 }
+

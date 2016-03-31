@@ -406,9 +406,8 @@ Monitor.prototype.processMsg = function( obj)
 		if( ids.length > 0 )
 			nw_GetNodes( this.type, ids);
 
-		if(( this.type == 'jobs') && obj.events.jobs_order )
-			if( g_uid == obj.events.jobs_order.uids[0] )
-				this.sortByIds( obj.events.jobs_order.jids[0] );
+		if(( this.type == 'jobs') && obj.events.jobs_order_ids && obj.events.jobs_order_ids.length )
+			this.sortByIds( obj.events.jobs_order_ids);
 
 		return;
 	}

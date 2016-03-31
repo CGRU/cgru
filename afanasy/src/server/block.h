@@ -51,6 +51,8 @@ public:
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
     virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
+	bool checkDepends( MonitorContainer * i_monitoring);
+
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
 	bool action( Action & i_action);
 

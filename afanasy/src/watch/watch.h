@@ -86,8 +86,8 @@ public:
 	static const af::Address & getClientAddress();
 	static void keyPressEvent( QKeyEvent * event);
 
-	static void   subscribe( const QList<int> & events);
-	static void unsubscribe( const QList<int> & events);
+//	static void   subscribe( const QList<int> & events);
+//	static void unsubscribe( const QList<int> & events);
 
 	static void setUid(   int uid );
 

@@ -45,9 +45,9 @@ switch ( i_msg->type())
 		i_args->monitors->sendMessage( mcgeneral);
 		break;
 	}*/
-	case af::Msg::TMonitorSubscribe:
-	case af::Msg::TMonitorUnsubscribe:
-	case af::Msg::TMonitorUsersJobs:
+//	case af::Msg::TMonitorSubscribe:
+//	case af::Msg::TMonitorUnsubscribe:
+//	case af::Msg::TMonitorUsersJobs:
 	case af::Msg::TMonitorJobsIdsAdd:
 	case af::Msg::TMonitorJobsIdsSet:
 	case af::Msg::TMonitorJobsIdsDel:

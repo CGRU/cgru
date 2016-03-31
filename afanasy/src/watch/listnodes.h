@@ -19,7 +19,7 @@ class ListNodes : public ListItems
 
 public:
 
-	ListNodes( QWidget* parent, const std::string & type, int RequestMsgType = 0);
+	ListNodes( QWidget* parent, const std::string & type);
 	virtual ~ListNodes();
 
 	enum e_HideShow {
@@ -32,15 +32,28 @@ public:
 
 	int32_t getFlagsHideShow() const { return ms_flagsHideShow; }
 
+	virtual void v_connectionEstablished();
+
 public slots:
 	void actHideShow( int i_type);
 
 protected:
 
+	virtual void showEvent( QShowEvent  * event );
+
+	virtual void v_showFunc();
+
+	void subscribe( bool i_subscribe = true);
+	inline void unSubscribe() { subscribe( false);}
+	inline bool isSubscribed() const { return m_subscribed;}
+
+	virtual void v_connectionLost();
+
 	virtual bool init( bool createModelView = true);
 
 	virtual ItemNode * v_createNewItem( af::Node *node, bool i_subscibed) = 0;
 
+	void get() const;
 	void get( const std::vector<int32_t> & i_ids) const;
 
 	bool updateItems( af::Msg* msg);
@@ -78,6 +91,9 @@ private:
 
 private:
 	static uint32_t ms_flagsHideShow;
+
+private:
+	bool m_subscribed;
 
 	QRegExp filter_exp;
 	QString filter_str;

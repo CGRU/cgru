@@ -2,6 +2,7 @@ g_cycle = 0;
 g_last_msg_cycle = g_cycle;
 g_id = 0;
 g_uid = -1;
+g_uid_orig = -1;
 g_keysdown = '';
 
 g_auth = {};
@@ -242,7 +243,11 @@ function g_RegisterRecieved( i_obj)
 {
 	g_id = i_obj.id;
 	if( i_obj.uid && ( i_obj.uid > 0 ))
-		g_uid = i_obj.uid;
+	{
+		g_uid_orig = i_obj.uid;
+		if( g_uid == -1 )
+			g_uid = g_uid_orig;
+	}
 
 	this.document.title = 'AF';
 	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
@@ -682,6 +687,7 @@ function g_CheckSequence()
 		localStorage.removeItem('visor');
 		localStorage.removeItem('god');
 		g_Info('USER MODE');
+		g_uid = g_uid_orig;
 	}
 	else
 	{
@@ -715,20 +721,34 @@ function g_SuperUserProcessGUI()
 //g_Info('g_SuperUserProcessGUI()')
 	if( g_GOD())
 	{
+		g_uid = 0;
 		$('header').classList.add('su_god');
 		$('footer').classList.add('su_god');
 	}
 	else if( g_VISOR())
 	{
+		g_uid = 0;
 		$('header').classList.add('su_visor');
 		$('footer').classList.add('su_visor');
 	}
 	else
 	{
+		g_uid = g_uid_orig;
 		$('header').classList.remove('su_visor');
 		$('header').classList.remove('su_god');
 		$('footer').classList.remove('su_visor');
 		$('footer').classList.remove('su_god');
+	}
+
+	if( g_uid == 0 )
+	{
+		var obj = nw_ConstructActionObject('monitors', [g_id]);
+		obj.action.operation = {};
+		obj.action.operation.type = 'watch';
+		obj.action.operation.class = 'perm';
+		obj.action.operation.uid = 0;
+
+		nw_send(obj);
 	}
 }
 /*

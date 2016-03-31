@@ -20,7 +20,6 @@ CmdJobsList::CmdJobsList()
 	setCmd("jlist");
 	setInfo("List of online jobs.");
 	setMsgType( af::Msg::TJSON);
-	setMsgOutType( af::Msg::TJobsList);
 	setRecieving();
 }
 CmdJobsList::~CmdJobsList(){}

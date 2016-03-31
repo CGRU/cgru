@@ -356,30 +356,40 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    // Update block tasks progress and bars
 	  if( m_data->updateProgress( m_jobprogress)) blockProgress_changed = true;
 
-   //
-   // Blocksdata depend check
-   m_data->setStateDependent( false);
-   if( m_dependBlocks.size())
-      for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
-      {
-		 if( m_job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK) continue;
-		 m_data->setStateDependent( true);
-         break;
-      }
-      //printf("Block::refresh: checking '%s': %s\n", data->getName().toUtf8().data(), data->state & AFJOB::STATE_READY_MASK ? "READY" : "NOT ready");
 
    if( old_block_state != m_data->getState()) blockProgress_changed = true;
 
    // update block monitoring and database if needed
    if( blockProgress_changed && monitoring )
-   {
-	  if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
-
-      // No need to update state in database, state is calculated attribute
-// AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
-   }
+		monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
 
    return blockProgress_changed;
+}
+
+bool Block::checkDepends( MonitorContainer * i_monitoring)
+{
+	uint32_t old_block_state = m_data->getState();
+	m_data->setStateDependent( false);
+
+	if( m_dependBlocks.size())
+		for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
+		{
+			if( m_job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK)
+				continue;
+
+			m_data->setStateDependent( true);
+			break;
+		}
+
+	if( old_block_state != m_data->getState())
+	{
+		if( i_monitoring )
+			i_monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool Block::action( Action & i_action)
@@ -441,6 +451,7 @@ bool Block::action( Action & i_action)
 
 			blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;
+			constructDependBlocks();
 		}
 	}
 

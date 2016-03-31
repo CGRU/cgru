@@ -24,8 +24,8 @@ MonitorNode.prototype.init = function()
 	this.elCenter.style.textAlign = 'center';
 	this.elCenter.classList.add('prestar');
 
-	this.elForgive = cm_ElCreateText( this.elCenter, 'Errors Forgive Time');
-	this.elJobsLifeTime = cm_ElCreateText( this.elCenter, 'Jobs Life Time');
+	this.elUid = cm_ElCreateText( this.elCenter, 'User ID');
+	this.elJobsIds = cm_ElCreateText( this.elCenter, 'Jobs IDs');
 
 	this.element.appendChild( document.createElement('br'));
 
@@ -50,26 +50,21 @@ MonitorNode.prototype.update = function( i_obj)
 {
 	if( i_obj ) this.params = i_obj;
 
+	this.elUid.textContent = 'UID: ' + this.params.uid;
+
 	this.elName.textContent = this.params.name.substr( 0, this.params.name.indexOf(':'));
 
 	if( this.params.host_name ) this.elHostName.textContent = this.params.host_name;
 	else this.elHostName.textContent = '';
 
-	if( this.params.errors_forgive_time ) this.elForgive.textContent = 'F'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time);
-	else this.elForgive.textContent = '';
-
-	if( this.params.jobs_life_time ) this.elJobsLifeTime.textContent = 'L'+ cm_TimeStringFromSeconds( this.params.jobs_life_time);
-	else this.elJobsLifeTime.textContent = '';
+	if( this.params.jobs_ids && this.params.jobs_ids.length )
+		this.elJobsIds.textContent = 'JIDs:' + JSON.stringify( this.params.jobs_ids);
 
 	this.elAddress.textContent = this.params.address.ip + ':' + this.params.address.port;
 
 	this.elIP.textContent = 'IP=' + this.params.address.ip;
 
 	var events = '';
-	if( this.params.users_ids && this.params.users_ids.length )
-		events += ' UIDs:' + JSON.stringify( this.params.users_ids);
-	if( this.params.jobs_ids && this.params.jobs_ids.length )
-		events += ' JIDs:' + JSON.stringify( this.params.jobs_ids);
 	if( this.params.events && this.params.events.length )
 		events += ' EVTs:' + JSON.stringify( this.params.events);
 	this.elEvents.textContent = events;

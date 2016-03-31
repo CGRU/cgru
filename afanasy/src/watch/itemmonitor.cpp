@@ -15,8 +15,8 @@
 #include "../include/macrooutput.h"
 
 const QString EventsName     = "Events[%1]:";
-const QString UsersIdsName   = "UsersIds[%1]:";
-const QString JobsIdsName    = "JobsIds[%1]:";
+const QString UserIdName     = "User Id: %1";
+const QString JobsIdsName    = "Jobs Ids[%1]:";
 const QString TimeLaunch     = "L: %1";
 const QString TimeRegister   = "R: %1";
 const QString TimeActivity   = "A: %1";
@@ -65,19 +65,8 @@ void ItemMonitor::updateValues( af::Node *node, int type)
    m_height = 25 + 12*eventscount;
    if( m_height < 75) m_height = 75;
 
-   superuser = false;
-   usersids.clear();
-   const std::list<int32_t> * ulist = monitor->getJobsUsersIds();
-   int usersidscount = int( ulist->size());
-   for( std::list<int32_t>::const_iterator it = ulist->begin(); it != ulist->end(); it++)
-   {
-      usersids += QString(" %1").arg( *it);
-      if(( *it == 0 ) && ( false == superuser ))
-      {
-         superuser = true;
-      }
-   }
-   usersidstitle = UsersIdsName.arg( usersidscount);
+	m_user_id = monitor->getUid();
+	m_user_id_str = UserIdName.arg( m_user_id);
 
    jobsids.clear();
    const std::list<int32_t> * jlist = monitor->getJobsIds();
@@ -91,7 +80,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
 
 void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
-   drawBack( painter, option, superuser ? &(afqt::QEnvironment::clr_LinkVisited.c) : NULL);
+   drawBack( painter, option, isSuperUser() ? &(afqt::QEnvironment::clr_LinkVisited.c) : NULL);
 
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
 
@@ -115,8 +104,7 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address_str );
 
    i = y+2;
-   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, usersidstitle );
-   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, usersids );
+   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, m_user_id_str );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsidstitle );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsids );
 

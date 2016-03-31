@@ -165,7 +165,7 @@ void MonitorContainer::dispatch()
 	}
 
 	//
-	// Job Events, which depend on interested users ids:
+	// Job Events, which depends on uid:
 	//
 	for( int e = 0; e < af::Monitor::EVT_JOBS_COUNT; e++)
 	{
@@ -299,18 +299,18 @@ void MonitorContainer::dispatch()
 	while( uIt != m_usersJobOrderChanged.end())
 	{
 //		af::Msg * msg = NULL;
-		std::vector<int32_t> ids = (*uIt)->generateJobsIds();
+		std::vector<int32_t> jids = (*uIt)->generateJobsIds();
 //		af::MCGeneral mcIds;
 //		mcIds.setId( (*uIt)->getId());
 //		mcIds.setList( ids);
 
 		MonitorContainerIt monitorsIt( this);
 		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-			if( monitor->hasJobUid((*uIt)->getId()))
+			if( monitor->sameUid((*uIt)->getId()))
 			{
 //				if( monitor->collectingEvents() )
 				{
-					monitor->addUserJobsOrder((*uIt)->getId(), ids);
+					monitor->setUserJobsOrder( jids);
 				}
 /*				else
 				{
