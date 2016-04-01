@@ -85,7 +85,6 @@ private:
 private:
     bool m_initialized;
     bool m_connected;
-    MonitorHost * m_monitor;
 
     int m_monitorType;
 

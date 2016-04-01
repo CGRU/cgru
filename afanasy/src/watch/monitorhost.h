@@ -13,6 +13,8 @@ public:
 
 	static af::Msg * genRegisterMsg();
 
+	static inline int id() { return m_->getId();}
+
 	static void subscribe( const std::string & i_class, bool i_subscribe);
 
 	static const af::Address & getClientAddress() { return m_->getAddress();}

@@ -114,8 +114,6 @@ Dialog::Dialog():
     connect( &m_qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
     connect( &m_qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
 
-    m_monitor = new MonitorHost();
-
     connectionLost();
 
     connect( &m_repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
@@ -139,8 +137,7 @@ Dialog::~Dialog()
     AFINFO("Dialog::~Dialog:")
     Watch::destroy();
 	if( m_connected )
-		m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, m_monitor->getId()));
-    delete m_monitor;
+		m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, MonitorHost::id()));
 }
 
 void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}
@@ -385,9 +382,9 @@ void Dialog::newMessage( af::Msg *msg)
 
 void Dialog::idReceived( int i_id, int i_uid)
 {
-	if( m_monitor->getId() > 0 )
+	if( MonitorHost::id() > 0 )
 	{
-		if( i_id != m_monitor->getId())
+		if( i_id != MonitorHost::id())
 		{
 			connectionLost();
 		}
