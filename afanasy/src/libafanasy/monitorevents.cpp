@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "../libafanasy/blockdata.h"
+
 #include "monitor.h"
 #include "msg.h"
 #include "name_af.h"
@@ -25,6 +27,15 @@ MonitorEvents::MonitorEvents( Msg * msg)
 
 MonitorEvents::~MonitorEvents()
 {
+}
+
+void MonitorEvents::addInstruction( const std::string & i_str)
+{
+	for( int i = 0; i < m_instructions.size(); i++)
+		if( i_str == m_instructions[i])
+			return;
+
+	m_instructions.push_back( i_str);
 }
 
 void MonitorEvents::v_readwrite( Msg * msg)
@@ -72,6 +83,153 @@ void MonitorEvents::v_readwrite( Msg * msg)
 
 
 	rw_Int32_Vect( m_jobs_order_ids, msg);
+
+	rw_StringVect( m_instructions, msg);
+}
+
+void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
+{
+	bool hasevents = false;
+	// Nodes events:
+	for( int e = 0; e < af::Monitor::EVT_COUNT; e++)
+	{
+		if( m_events[e].size() == 0 )
+			continue;
+
+		if( hasevents )
+			o_str << ",";
+		else
+			o_str << "{";
+
+		o_str << "\n\"" << af::Monitor::EVT_NAMES[e] << "\":";
+		o_str << "[";
+
+		for( int i = 0; i < m_events[e].size(); i++)
+		{
+			if( i )
+				o_str << ",";
+			o_str << m_events[e][i];
+		}
+
+		o_str << "]";
+		hasevents = true;
+	}
+
+	// Tasks progress:
+	if( m_tp.size())
+	{
+		if( hasevents )
+			o_str << ",";
+		else
+			o_str << "{";
+
+		o_str << "\n\"tasks_progress\":[";
+		for( int j = 0; j < m_tp.size(); j++)
+		{
+			if( j > 0 ) o_str << ",";
+			o_str << "{\"job_id\":" << m_tp[j].job_id;
+			o_str << ",\"blocks\":[";
+			for( int t = 0; t < m_tp[j].blocks.size(); t++)
+			{
+				if( t > 0 ) o_str << ",";
+				o_str << m_tp[j].blocks[t];
+			}
+			o_str << "],\"tasks\":[";
+			for( int t = 0; t < m_tp[j].tasks.size(); t++)
+			{
+				if( t > 0 ) o_str << ",";
+				o_str << m_tp[j].tasks[t];
+			}
+			o_str << "],\"progress\":[";
+			for( int t = 0; t < m_tp[j].tp.size(); t++)
+			{
+				if( t > 0 ) o_str << ",";
+				m_tp[j].tp[t].jsonWrite( o_str);
+			}	
+			o_str << "]}";
+		}
+		o_str << "]";
+		hasevents = true;
+	}
+
+	// Blocks ids:
+	if( m_bids.size())
+	{
+		if( hasevents )
+			o_str << ",";
+		else
+			o_str << "{";
+
+		o_str << "\n\"block_ids\":{";
+
+		o_str << "\"job_id\":[";
+		for( int i = 0; i < m_bids.size(); i++)
+		{
+			if( i > 0 ) o_str << ",";
+			o_str << m_bids[i].job_id;
+		}
+		o_str << "],";
+
+		o_str << "\"block_num\":[";
+		for( int i = 0; i < m_bids.size(); i++)
+		{
+			if( i > 0 ) o_str << ",";
+			o_str << m_bids[i].block_num;
+		}
+		o_str << "],";
+
+		o_str << "\"mode\":[";
+		for( int i = 0; i < m_bids.size(); i++)
+		{
+			if( i > 0 ) o_str << ",";
+			o_str << '"' << af::BlockData::DataModeFromMsgType( m_bids[i].mode) << '"';
+		}
+		o_str << "]}";
+
+		hasevents = true;
+	}
+
+	if( m_jobs_order_ids.size())
+	{
+		if( hasevents )
+			o_str << ",";
+		else
+			o_str << "{";
+
+		o_str << "\"jobs_order_ids\":[";
+		for( int i = 0; i < m_jobs_order_ids.size(); i++)
+		{
+			if( i ) o_str << ",";
+			o_str << m_jobs_order_ids[i];
+		}
+		o_str << "]}";
+
+		hasevents = true;
+	}
+
+	if( m_instructions.size())
+	{
+		if( hasevents )
+			o_str << ",";
+		else
+			o_str << "{";
+
+		o_str << "\"instructions\":[";
+		for( int i = 0; i < m_instructions.size(); i++)
+		{
+			if( i ) o_str << ",";
+			o_str << "\"" << m_instructions[i] << "\"";
+		}
+		o_str << "]}";
+
+		hasevents = true;
+	}
+
+
+	if( false == hasevents )
+		o_str << "\nnull";
+	else
+		o_str << "\n}";
 }
 
 void MonitorEvents::clear()
@@ -84,6 +242,8 @@ void MonitorEvents::clear()
 	m_bids.clear();
 
 	m_jobs_order_ids.clear();
+
+	m_instructions.clear();
 }
 
 bool MonitorEvents::isEmpty() const
@@ -97,6 +257,8 @@ bool MonitorEvents::isEmpty() const
 	if( m_bids.size()) return false;
 
 	if( m_jobs_order_ids.size()) return false;
+
+	if( m_instructions.size()) return false;
 
 	return true;
 }

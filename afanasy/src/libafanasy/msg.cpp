@@ -491,11 +491,6 @@ const char * Msg::TNAMES[]=
 	/// Request messages, sizes, quantities statistics.
 	"TStatRequest",
 
-	/*- Client messages -*/
-	"TClientExitRequest",         ///< Request to client to exit,
-	"TClientRebootRequest",       ///< Reboot client host computer,
-	"TClientShutdownRequest",     ///< Shutdown client host computer,
-
 	/*- Monitor messages -*/
 	"TMonitorId",                 ///< Id for new Monitor. Server sends it back when new Talk registered.
 	"TMonitorUpdateId",           ///< Update Monitor with given id ( No information for updating Monitor needed).
@@ -505,6 +500,9 @@ const char * Msg::TNAMES[]=
 	/** When Server successfully registered new Render it's send back it's id.**/
 	"TRenderId",
 	"TRenderDeregister",          ///< Deregister Render with given id.
+	"TRenderExitRequest",         ///< Request to client to exit,
+	"TRenderRebootRequest",       ///< Reboot client host computer,
+	"TRenderShutdownRequest",     ///< Shutdown client host computer,
 
 	/*- Users messages -*/
 	"TUserJobsOrderRequestId",    ///< Request User(id) jobs ids in server list order.

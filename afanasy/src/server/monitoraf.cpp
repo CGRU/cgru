@@ -2,10 +2,8 @@
 
 #include "../libafanasy/common/dlScopeLocker.h"
 
-#include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/monitorevents.h"
-#include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -74,9 +72,7 @@ void MonitorAf::v_action( Action & i_action)
 		af::jr_string("type", optype, operation);
 		if( optype == "exit")
 		{
-			af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
-			msg->setAddress( this);
-			ms_msg_queue->pushMsg( msg);
+			m_e.addInstruction("exit");
 			return;
 		}
 		if( optype == "deregister")
@@ -106,14 +102,6 @@ void MonitorAf::v_action( Action & i_action)
 				eids.push_back( af::Monitor::EVT_jobs_add);
 				eids.push_back( af::Monitor::EVT_jobs_change);
 				eids.push_back( af::Monitor::EVT_jobs_del);
-/*				af::jr_int32vec("uids", uids, operation);
-				if( uids.size())
-				{
-					// Set ids of user(s) whos jobs we are interested in
-					// Zero id means super user - interested in all jobs
-					setJobsUsersIds( uids);
-					appendLog("User ids set to: '" + af::vectToStr( uids) + "'");
-				}*/
 			}
 			else if( opclass == "tasks")
 			{
@@ -165,65 +153,7 @@ void MonitorAf::v_action( Action & i_action)
 		appendLog("Operation \"" + optype + "\" by " + i_action.author);
 	}
 }
-/*
-bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
-{
-	AFERRAR("MonitorAf::action: Since 2.1.0 all monitor actions are JSON")
-	return false;
 
-
-	m_time_activity = time( NULL);
-
-//printf("MonitorAf::setInterest: [%s]:\n", af::Msg::TNAMES[type]);
-   switch(type)
-   {
-      case af::Msg::TMonitorSubscribe:
-      {
-         setEvents( ids.getList(), true);
-         break;
-      }
-      case af::Msg::TMonitorUnsubscribe:
-      {
-         setEvents( ids.getList(), false);
-         break;
-      }
-      case af::Msg::TMonitorUsersJobs:
-      {
-         setJobsUsersIds( ids.getList());
-         break;
-      }
-      case af::Msg::TMonitorJobsIdsAdd:
-      {
-         addJobIds( ids.getList());
-         break;
-      }
-      case af::Msg::TMonitorJobsIdsSet:
-      {
-         setJobIds( ids.getList());
-         break;
-      }
-      case af::Msg::TMonitorJobsIdsDel:
-      {
-         delJobIds( ids.getList());
-         break;
-      }
-      default:
-      {
-         AFERRAR("MonitorAf::action: Unknown action: %s\n", af::Msg::TNAMES[type]);
-         return false;
-      }
-   }
-   return true;
-}
-*/
-/*
-void MonitorAf::setJobsUsersIds( const std::vector<int32_t> & i_ids)
-{
-	m_jobsUsersIds.clear();
-	for( int i = 0; i < i_ids.size(); i++)
-		m_jobsUsersIds.push_back( i_ids[i]);
-}
-*/
 void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 {
 	for( int i = 0; i < i_ids.size(); i++)
@@ -240,14 +170,7 @@ void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 	}
 //printf("MonitorAf::setEvents:\n"); v_stdOut(true);
 }
-/*
-bool MonitorAf::hasJobUid( int uid) const
-{
-   for( std::list<int32_t>::const_iterator it = m_jobsUsersIds.begin(); it != m_jobsUsersIds.end(); it++)
-      if( *it == uid) return true;
-   return false;
-}
-*/
+
 bool MonitorAf::hasJobEvent( int type, int uid) const
 {
 //printf("MonitorAf::hasJobEvent: hasEvent=%d, uid=%d, m_uid=%d\n", hasEvent(type), uid, m_uid);
@@ -280,13 +203,6 @@ void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 	}
 }
 
-/*void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
-{
-//printf("MonitorAf::setJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
-	m_jobsIds.clear();
-	for( int i = 0; i < i_ids.size(); i++) m_jobsIds.push_back( i_ids[i]);
-}
-*/
 void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
 //printf("MonitorAf::delJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
@@ -364,20 +280,6 @@ void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 	m_e.m_bids[i].block_num = i_b;
 	m_e.m_bids[i].mode = i_mode;
 }
-/*
-void MonitorAf::addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids)
-{
-	for( int i = 0; i < m_e.m_jobs_order_uids.size(); i++)
-		if( m_e.m_jobs_order_uids[i] == i_uid )
-		{
-			m_e.m_jobs_order_jids[i] = i_jids;
-			return;
-		}
-
-	m_e.m_jobs_order_uids.push_back( i_uid);
-	m_e.m_jobs_order_jids.push_back( i_jids);
-}
-*/
 af::Msg * MonitorAf::getEventsBin()
 {
 	updateTime();
@@ -404,132 +306,11 @@ af::Msg * MonitorAf::getEventsJSON()
 
 	std::ostringstream stream;
 	stream << "{\"events\":";
-	bool hasevents = false;
 
 	DlScopeLocker mutex( &m_mutex);
 
-	// Nodes events:
-	for( int e = 0; e < af::Monitor::EVT_COUNT; e++)
-	{
-		if( m_e.m_events[e].size() == 0 )
-			continue;
+	m_e.jsonWrite( stream);
 
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\n\"" << af::Monitor::EVT_NAMES[e] << "\":";
-		stream << "[";
-
-		for( int i = 0; i < m_e.m_events[e].size(); i++)
-		{
-			if( i )
-				stream << ",";
-			stream << m_e.m_events[e][i];
-		}
-
-		stream << "]";
-		hasevents = true;
-	}
-
-	// Tasks progress:
-	if( m_e.m_tp.size())
-	{
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\n\"tasks_progress\":[";
-		for( int j = 0; j < m_e.m_tp.size(); j++)
-		{
-			if( j > 0 ) stream << ",";
-			stream << "{\"job_id\":" << m_e.m_tp[j].job_id;
-			stream << ",\"blocks\":[";
-			for( int t = 0; t < m_e.m_tp[j].blocks.size(); t++)
-			{
-				if( t > 0 ) stream << ",";
-				stream << m_e.m_tp[j].blocks[t];
-			}
-			stream << "],\"tasks\":[";
-			for( int t = 0; t < m_e.m_tp[j].tasks.size(); t++)
-			{
-				if( t > 0 ) stream << ",";
-				stream << m_e.m_tp[j].tasks[t];
-			}
-			stream << "],\"progress\":[";
-			for( int t = 0; t < m_e.m_tp[j].tp.size(); t++)
-			{
-				if( t > 0 ) stream << ",";
-				m_e.m_tp[j].tp[t].jsonWrite( stream);
-			}	
-			stream << "]}";
-		}
-		stream << "]";
-		hasevents = true;
-	}
-
-	// Blocks ids:
-	if( m_e.m_bids.size())
-	{
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\n\"block_ids\":{";
-
-		stream << "\"job_id\":[";
-		for( int i = 0; i < m_e.m_bids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << m_e.m_bids[i].job_id;
-		}
-		stream << "],";
-
-		stream << "\"block_num\":[";
-		for( int i = 0; i < m_e.m_bids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << m_e.m_bids[i].block_num;
-		}
-		stream << "],";
-
-		stream << "\"mode\":[";
-		for( int i = 0; i < m_e.m_bids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << '"' << af::BlockData::DataModeFromMsgType( m_e.m_bids[i].mode) << '"';
-		}
-		stream << "]}";
-
-		hasevents = true;
-	}
-
-	if( m_e.m_jobs_order_ids.size())
-	{
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\"jobs_order_ids\":[";
-		for( int i = 0; i < m_e.m_jobs_order_ids.size(); i++)
-		{
-			if( i ) stream << ",";
-			stream << m_e.m_jobs_order_ids[i];
-		}
-		stream << "]}";
-
-		hasevents = true;
-	}
-
-
-	if( false == hasevents )
-		stream << "\nnull";
-	else
-		stream << "\n}";
 	stream << "\n}";
 
 //if( hasevents ) printf("MonitorAf::getEvents():\n%s\n", stream.str().c_str());

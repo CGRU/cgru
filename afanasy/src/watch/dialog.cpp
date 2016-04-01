@@ -275,7 +275,6 @@ void Dialog::newMessage( af::Msg *msg)
     #endif
     switch( msg->type())
     {
-    case af::Msg::TClientExitRequest:
     case af::Msg::TVersionMismatch:
     {
         emit stop();
@@ -292,50 +291,8 @@ void Dialog::newMessage( af::Msg *msg)
     case af::Msg::TMonitorId:
     {
 		idReceived( msg->int32());
-/*
-        if( m_monitor->getId() != 0 )
-        {
-            if( msg->int32() != m_monitor->getId()) connectionLost();
-        }
-        else
-        {
-            if( msg->int32() == 0)
-            {
-                connectionLost();
-            }
-            else
-            {
-                m_monitor->setId( msg->int32());
-                connectionEstablished();
-                af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, m_monitor->getId(), true);
-                m_qThreadClientUpdate.setUpMsg( msg);
-            }
-        }
-*/
         break;
     }
-/*    case af::Msg::TUserId:
-    {
-        m_uid = msg->int32();
-        if( m_uid == 0 )
-        {
-            if( m_monitorType == Watch::WJobs )
-            {
-                ButtonMonitor::unset();
-                closeList();
-            }
-            displayWarning("You are not exist.");
-        }
-        else
-        {
-            displayInfo("You have registered.");
-            if( m_monitorType == Watch::WNONE )
-            {
-                ButtonMonitor::pushButton( Watch::WJobs);
-            }
-        }
-        break;
-    }*/
     case af::Msg::TDATA:
     {
         new WndText( "Data", msg);

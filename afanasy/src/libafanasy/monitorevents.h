@@ -20,6 +20,10 @@ public:
 
 	bool isEmpty() const;
 
+	void jsonWrite( std::ostringstream & o_str) const;
+
+	void addInstruction( const std::string & i_str);
+
 public:
 
 	std::vector<std::vector<int32_t> > m_events;
@@ -40,6 +44,8 @@ public:
 	std::vector<MBlocksIds> m_bids;
 
 	std::vector<int32_t> m_jobs_order_ids;
+
+	std::vector<std::string> m_instructions;
 
 private:
 

@@ -21,8 +21,6 @@ public:
 
 	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
-//	bool setInterest( int type, const af::MCGeneral & ids);
-
 	virtual void v_action( Action & i_action);
 
 	bool sameUid( int i_uid) const { return i_uid == m_uid; }
@@ -48,9 +46,7 @@ public:
 
 private:
 	void setEvents( const std::vector<int32_t> & i_ids, bool value);
-//	void setJobsUsersIds( const std::vector<int32_t> & i_ids);
 	void addJobIds( const std::vector<int32_t> & i_ids);
-//	void setJobIds( const std::vector<int32_t> & i_ids);
 	void delJobIds( const std::vector<int32_t> & i_ids);
 
 private:

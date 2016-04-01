@@ -268,7 +268,7 @@ void RenderAf::v_action( Action & i_action)
 		{
 			if( false == isOnline()) return;
 			appendLog("Exit by " + i_action.author);
-			exitClient( af::Msg::TClientExitRequest, i_action.jobs, i_action.monitors);
+			exitClient( af::Msg::TRenderExitRequest, i_action.jobs, i_action.monitors);
 			return;
 		}
 		else if( type == "launch_cmd")
@@ -317,14 +317,14 @@ void RenderAf::v_action( Action & i_action)
 		{
 			if( false == isOnline() ) return;
 			appendLog( std::string("Reboot computer by ") + i_action.author);
-			exitClient( af::Msg::TClientRebootRequest, i_action.jobs, i_action.monitors);
+			exitClient( af::Msg::TRenderRebootRequest, i_action.jobs, i_action.monitors);
 			return;
 		}
 		else if( type == "shutdown")
 		{
 			if( false == isOnline() ) return;
 			appendLog( std::string("Shutdown computer by ") + i_action.author);
-			exitClient( af::Msg::TClientShutdownRequest, i_action.jobs, i_action.monitors);
+			exitClient( af::Msg::TRenderShutdownRequest, i_action.jobs, i_action.monitors);
 			return;
 		}
 		else if( type == "wol_sleep")

@@ -183,6 +183,16 @@ void Watch::caseMessage( af::Msg * msg)
 		msg->resetWrittenSize();
 		af::MonitorEvents me( msg);
 
+		for( int i = 0; i < me.m_instructions.size(); i++)
+		{
+			if( me.m_instructions[i] == "exit")
+			{
+				printf("Received \"exit\" instrucion. Closing dialog.\n");
+				ms_d->close();
+				return;
+			}
+		}
+
 		for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 		{
 			msg->resetWrittenSize();

@@ -246,7 +246,7 @@ printf("msgCase: "); msg->stdOut();
 		break;
 	}
 	case af::Msg::TVersionMismatch:
-	case af::Msg::TClientExitRequest:
+	case af::Msg::TRenderExitRequest:
 	{
 		printf("Render exit request received.\n");
 		AFRunning = false;
@@ -270,14 +270,14 @@ printf("msgCase: "); msg->stdOut();
 //	  af::launchProgram( af::Environment::getRenderExec());
 //	  break;
 //   }
-	case af::Msg::TClientRebootRequest:
+	case af::Msg::TRenderRebootRequest:
 	{
 		AFRunning = false;
 		printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
 		af::launchProgram( af::Environment::getRenderCmdReboot());
 		break;
 	}
-	case af::Msg::TClientShutdownRequest:
+	case af::Msg::TRenderShutdownRequest:
 	{
 		AFRunning = false;
 		printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
