@@ -122,7 +122,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList, ids);
 	  break;
 	}*/
-	case af::Msg::TMonitorLogRequestId:
+/*	case af::Msg::TMonitorLogRequestId:
 	{
 		AfContainerLock lock( i_args->monitors,  AfContainerLock::READLOCK);
 
@@ -135,7 +135,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		o_msg_response = new af::Msg();
 		o_msg_response->setStringList( node->getLog());
 		break;
-	}
+	}*/
 
 // ---------------------------------- Render -------------------------------//
 	case af::Msg::TRenderRegister:
@@ -192,7 +192,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = i_args->renders->generateList( af::Msg::TRendersResources, ids);
 	  break;
 	}
-	case af::Msg::TRenderLogRequestId:
+/*	case af::Msg::TRenderLogRequestId:
 	{
 	  AfContainerLock lock( i_args->renders,  AfContainerLock::READLOCK);
 
@@ -205,8 +205,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg;
 	  o_msg_response->setStringList( render->getLog());
 	  break;
-	}
-	case af::Msg::TRenderTasksLogRequestId:
+	}*/
+/*	case af::Msg::TRenderTasksLogRequestId:
 	{
 	  AfContainerLock lock( i_args->renders,  AfContainerLock::READLOCK);
 
@@ -226,8 +226,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 o_msg_response->setStringList( render->getTasksLog());
 	  }
 	  break;
-	}
-	case af::Msg::TRenderInfoRequestId:
+	}*/
+/*	case af::Msg::TRenderInfoRequestId:
 	{
 	  AfContainerLock lock( i_args->renders,  AfContainerLock::READLOCK);
 
@@ -239,7 +239,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  }
 	  o_msg_response = render->writeFullInfo();
 	  break;
-	}
+	}*/
 
 // ---------------------------------- Users -------------------------------//
 /*	case af::Msg::TUserIdRequest:
@@ -275,7 +275,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = i_args->users->generateList( af::Msg::TUsersList, ids);
 	  break;
 	}*/
-	case af::Msg::TUserLogRequestId:
+/*	case af::Msg::TUserLogRequestId:
 	{
 	  AfContainerLock lock( i_args->users,  AfContainerLock::READLOCK);
 
@@ -288,7 +288,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg();
 	  o_msg_response->setStringList( user->getLog());
 	  break;
-	}
+	}*/
 	case af::Msg::TUserJobsOrderRequestId:
 	{
 	  AfContainerLock lock( i_args->users,  AfContainerLock::READLOCK);
@@ -321,7 +321,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg( af::Msg::TJob, job);
 	  break;
 	}
-	case af::Msg::TJobLogRequestId:
+/*	case af::Msg::TJobLogRequestId:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
@@ -334,8 +334,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg();
 	  o_msg_response->setStringList( job->getLog());
 	  break;
-	}
-	case af::Msg::TJobErrorHostsRequestId:
+	}*/
+/*	case af::Msg::TJobErrorHostsRequestId:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
@@ -346,9 +346,9 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 break;
 	  }
 	  o_msg_response = new af::Msg();
-	  o_msg_response->setString( job->v_getErrorHostsListString());
+	  o_msg_response->setString( job->getErrorHostsListString());
 	  break;
-	}
+	}*/
 	case af::Msg::TJobProgressRequestId:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
@@ -402,7 +402,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = i_args->users->generateJobsList( mcids.getList(), type_name);
 	  break;
 	}*/
-	case af::Msg::TTaskRequest:
+/*	case af::Msg::TTaskRequest:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
@@ -431,8 +431,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 o_msg_response->setString( stream.str());
 	  }
 	  break;
-	}
-	case af::Msg::TTaskLogRequest:
+	}*/
+/*	case af::Msg::TTaskLogRequest:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
@@ -465,8 +465,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		 o_msg_response->setStringList( *list);
 	  }
 	  break;
-	}
-	case af::Msg::TTaskErrorHostsRequest:
+	}*/
+/*	case af::Msg::TTaskErrorHostsRequest:
 	{
 	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
@@ -481,8 +481,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg();
 	  o_msg_response->setString( job->v_getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
 	  break;
-	}
-	case af::Msg::TTaskOutputRequest:
+	}*/
+	/*case af::Msg::TTaskOutputRequest:
 	{
 		af::Msg * msg_request_render = NULL;
 		std::string filename, error;
@@ -564,7 +564,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 				AFCommon::QueueLogError("TTaskOutputRequest: Neiter message nor filename.");
 		}
 	  break;
-	}
+	}*/
 	case af::Msg::TJobsWeightRequest:
 	{
 	  AfContainerLock jLock( i_args->jobs,	 AfContainerLock::READLOCK);

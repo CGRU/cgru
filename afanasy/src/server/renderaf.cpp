@@ -764,6 +764,26 @@ void RenderAf::appendTasksLog( const std::string & message)
 	m_tasks_log.push_back( af::time2str() + " : " + message);
 }
 
+af::Msg * RenderAf::writeTasksLog( bool i_binary)
+{
+	if( false == i_binary )
+	{
+		if( m_tasks_log.empty())
+			return af::jsonMsg("tasks_log", m_name, "No tasks execution.");
+		else
+			return af::jsonMsg("tasks_log", m_name, m_tasks_log);
+	}
+
+	af::Msg * msg = new af::Msg;
+
+	if( m_tasks_log.empty())
+		msg->setString("No tasks execution.");
+	else
+		msg->setStringList( m_tasks_log);
+
+	return msg;
+}
+
 bool RenderAf::getFarmHost( af::Host * newHost)
 {
 	// Store old services usage:
@@ -966,8 +986,29 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 	ms_msg_queue->pushMsg( msg);
 }
 
-af::Msg * RenderAf::jsonWriteSrvFarm() const
+af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 {
+	if( i_binary )
+	{
+		af::Msg * o_msg = new af::Msg();
+
+		std::string str = v_generateInfoString( true);
+		if( m_custom_data.size())
+		str += "\nCustom Data:\n" + m_custom_data;
+		str += "\n";
+		str += getServicesString();
+		std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
+		if( servicelimits.size())
+		{
+			str += "\n";
+			str += servicelimits;
+		}
+
+		o_msg->setString( str);
+
+		return o_msg;
+	}
+
 	std::ostringstream str;
 	str << "{\"object\":{";
 
@@ -993,27 +1034,6 @@ af::Msg * RenderAf::jsonWriteSrvFarm() const
 	
 	str << "}}";
 	return af::jsonMsg( str);
-}
-
-af::Msg * RenderAf::writeFullInfo() const
-{
-	af::Msg * o_msg = new af::Msg();
-
-	std::string str = v_generateInfoString( true);
-	if( m_custom_data.size())
-		str += "\nCustom Data:\n" + m_custom_data;
-	str += "\n";
-	str += getServicesString();
-	std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
-	if( servicelimits.size())
-	{
-		str += "\n";
-		str += servicelimits;
-	}
-
-	o_msg->setString( str);
-
-	return o_msg;
 }
 
 int RenderAf::v_calcWeight() const

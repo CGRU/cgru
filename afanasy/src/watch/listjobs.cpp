@@ -587,23 +587,8 @@ void ListJobs::actDeleteDone()
 	displayInfo("Delete all done jobs.");
 }
 
-void ListJobs::actRequestLog()
-{
-	displayInfo( "Job log request.");
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	af::Msg * msg = new af::Msg( af::Msg::TJobLogRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
-}
-
-void ListJobs::actRequestErrorHostsList()
-{
-	displayInfo( "Job void hosts request.");
-	Item* jobitem = getCurrentItem();
-	if( jobitem == NULL ) return;
-	af::Msg * msg = new af::Msg( af::Msg::TJobErrorHostsRequestId, jobitem->getId(), true);
-	Watch::sendMsg( msg);
-}
+void ListJobs::actRequestLog() { getItemInfo("log"); }
+void ListJobs::actRequestErrorHostsList() { getItemInfo("error_hosts"); }
 
 void ListJobs::actSetHidden()   { setParameter("hidden", "true",  false); }
 void ListJobs::actUnsetHidden() { setParameter("hidden", "false", false); }

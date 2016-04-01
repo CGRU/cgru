@@ -60,9 +60,12 @@ protected:
 
 	virtual void doubleClicked( Item * item);
 
+	void getItemInfo( const std::string & i_mode);
+
 	inline void setParameter( const std::string & i_name, long long i_value) const
 		{ setParameter( i_name, af::itos( i_value), false);}
 	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
+
 	void operation( const std::string & i_operation);
 
 	void deleteItems( const std::vector<int32_t> & i_ids);

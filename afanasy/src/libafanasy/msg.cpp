@@ -501,29 +501,29 @@ const char * Msg::TNAMES[]=
 	"TMonitorUpdateId",           ///< Update Monitor with given id ( No information for updating Monitor needed).
 //	"TMonitorsListRequest",       ///< Request online Monitors list.
 	"TMonitorDeregister",         ///< Deregister monitor with given id.
-	"TMonitorLogRequestId",       ///< Request a log of a Monitor with given id.
+//	"TMonitorLogRequestId",       ///< Request a log of a Monitor with given id.
 
 	/*- Render messages -*/
 	/** When Server successfully registered new Render it's send back it's id.**/
 	"TRenderId",
 //	"TRendersListRequest",        ///< Request online Renders list message.
-	"TRenderLogRequestId",        ///< Request a log of Render with given id.
-	"TRenderTasksLogRequestId",   ///< Request a log of Render with given id.
-	"TRenderInfoRequestId",       ///< Request a string information about a Render with given id.
+//	"TRenderLogRequestId",        ///< Request a log of Render with given id.
+//	"TRenderTasksLogRequestId",   ///< Request a log of Render with given id.
+//	"TRenderInfoRequestId",       ///< Request a string information about a Render with given id.
 	"TRenderDeregister",          ///< Deregister Render with given id.
 
 	/*- Users messages -*/
 //	"TUsersListRequest",          ///< Active users information.
 	/// Uset id. Afanasy sends it back as an answer on \c TUserIdRequest , which contains user name.
 //	"TUserId",
-	"TUserLogRequestId",          ///< Request a log of User with given id.
+//	"TUserLogRequestId",          ///< Request a log of User with given id.
 	"TUserJobsOrderRequestId",    ///< Request User(id) jobs ids in server list order.
 
 	/*- Job messages -*/
 //	"TJobsListRequest",           ///< Request brief of jobs.
 //	"TJobsListRequestUserId",     ///< Request brief of jobs of user with given id.
-	"TJobLogRequestId",           ///< Request a log of a job with given id.
-	"TJobErrorHostsRequestId",    ///< Request a list of hosts produced tasks with errors.
+//	"TJobLogRequestId",           ///< Request a log of a job with given id.
+//	"TJobErrorHostsRequestId",    ///< Request a list of hosts produced tasks with errors.
 	"TJobsWeightRequest",         ///< Request all jobs weight.
 
 	/// Request a job with given id. The answer is TJob. If there is no job with such id the answer is TJobRequestId.
@@ -630,9 +630,9 @@ const char * Msg::TNAMES[]=
 	"TBlocks",                    ///< Blocks data.
 
 	"TTask",                      ///< A task of some job.
-	"TTaskRequest",               ///< Get task information.
-	"TTaskLogRequest",            ///< Get task information log.
-	"TTaskErrorHostsRequest",     ///< Get task error hosts list.
+//	"TTaskRequest",               ///< Get task information.
+//	"TTaskLogRequest",            ///< Get task information log.
+//	"TTaskErrorHostsRequest",     ///< Get task error hosts list.
 	"TTaskOutputRequest",         ///< Job task output request.
 	"TTaskUpdatePercent",         ///< New progress percentage for task.
 	"TTaskUpdateState",           ///< New state for task.

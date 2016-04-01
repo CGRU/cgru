@@ -347,11 +347,5 @@ void ListUsers::actDelete() { operation("delete"); }
 void ListUsers::actSolveJobsByOrder()  { setParameter("solve_parallel", "false", false); }
 void ListUsers::actSolveJobsParallel() { setParameter("solve_parallel", "true",  false); }
 
-void ListUsers::actRequestLog()
-{
-	displayInfo( "User log request.");
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	af::Msg * msg = new af::Msg( af::Msg::TUserLogRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
-}
+void ListUsers::actRequestLog() { getItemInfo("log"); }
+

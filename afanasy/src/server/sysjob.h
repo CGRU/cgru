@@ -127,7 +127,6 @@ public:
 	// Functions than informate that it is a system task, and this info is not abailable:
 	virtual af::Msg * v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
 		std::string & o_filename, std::string & o_error) const;
-	virtual const std::string v_getErrorHostsListString( int b, int t) const;
 
 protected:
 	virtual Block * v_newBlock( int numBlock);

@@ -86,6 +86,6 @@ private:
 
 	void blockAction( int id_block, const QString & i_action, bool i_query);
 	void tasksOpeation( const std::string & i_type);
-	void do_Info_StdOut(   int type, int number, Item * item = NULL);
+	void getTaskInfo( const std::string & i_mode, int i_number = -1, Item * item = NULL);
 	void setWindowTitleProgress();
 };

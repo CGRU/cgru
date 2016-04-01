@@ -46,12 +46,8 @@ public:
 
 	af::Msg * writeTask( int i_b, int i_t, const std::string & i_mode, bool i_binary) const;
 
-	af::Msg * writeErrorHosts() const;
+	af::Msg * writeErrorHosts( bool i_binary) const;
 	af::Msg * writeErrorHosts( int b, int t) const;
-	void writeErrorHosts( std::list<std::string> & o_list) const;
-
-    const std::string v_getErrorHostsListString() const; /// Get avoid hosts list.
-    virtual const std::string v_getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
 	const std::list<std::string> & getTaskLog( int block, int task) const;

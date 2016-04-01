@@ -168,15 +168,14 @@ CmdJobLog::CmdJobLog()
 	setArgsCount(1);
 	setInfo("Get job log.");
 	setHelp("jlog [id] Get job log with given id.");
-	setMsgType( af::Msg::TJobLogRequestId);
-//   setMsgOutType( af::Msg::TData);
+	setMsgType( af::Msg::TJSON);
 	setRecieving();
 }
 CmdJobLog::~CmdJobLog(){}
 bool CmdJobLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"monitors\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
 	return true;
 }
 

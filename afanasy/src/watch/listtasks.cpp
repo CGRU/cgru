@@ -533,15 +533,40 @@ void ListTasks::setWindowTitleProgress()
 void ListTasks::actTasksSkip()    { tasksOpeation("skip"); }
 void ListTasks::actTasksRestart() { tasksOpeation("restart"); }
 
-void ListTasks::actTaskLog()               { do_Info_StdOut(  af::Msg::TTaskLogRequest,         0);}
-void ListTasks::actTaskInfo()              { do_Info_StdOut(  af::Msg::TTaskRequest,            0);}
-void ListTasks::actTaskErrorHosts()        { do_Info_StdOut(  af::Msg::TTaskErrorHostsRequest,  0);}
-void ListTasks::actTaskStdOut( int number ){ do_Info_StdOut(  af::Msg::TTaskOutputRequest, number);}
+void ListTasks::actTaskLog()        { getTaskInfo("log");}
+void ListTasks::actTaskInfo()       { getTaskInfo("info");}
+void ListTasks::actTaskErrorHosts() { getTaskInfo("error_hosts");}
+void ListTasks::actTaskStdOut( int i_number ) { getTaskInfo("output", i_number);}
+
+void ListTasks::getTaskInfo( const std::string & i_mode, int i_number, Item * item)
+{
+//{"get":{"type":"jobs","mode":"files","ids":[2],"block_ids":[0],"task_ids":[3],"binary":true}}
+//{"get":{"type":"jobs","ids":[2],"mode":"output","number":11,"block_ids":[0],"task_ids":[4]}}
+	if( item == NULL) item = getCurrentItem();
+	if( item->getId() != ItemJobTask::ItemId )
+		return;
+
+	ItemJobTask *itemTask = (ItemJobTask*)item;
+
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\"";
+	str << ",\"mode\":\"" << i_mode << "\"";
+	str << ",\"ids\":[" << m_job_id << "]";
+	str << ",\"block_ids\":[" << itemTask->getBlockNum() << "]";
+	str << ",\"task_ids\":[" << itemTask->getTaskNum() << "]";
+	if( i_number != -1 )
+		str << ",\"output\":" << i_number;
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	msg->setReceiving( true);
+	Watch::sendMsg( msg);
+}
 
 void ListTasks::doubleClicked( Item * item)
 {
 	if( item->getId() == ItemJobTask ::ItemId )
-		do_Info_StdOut(  af::Msg::TTaskRequest, 0, item);
+		getTaskInfo("info", -1, item);
 	else if( item->getId() == ItemJobBlock::ItemId )
 	{
 		ItemJobBlock * block = (ItemJobBlock*)item;
@@ -585,16 +610,6 @@ void ListTasks::tasksOpeation( const std::string & i_type)
 
 	af::jsonActionFinish( str);
 	Watch::sendMsg( af::jsonMsg( str));
-}
-
-void ListTasks::do_Info_StdOut( int type, int number, Item * item)
-{
-	if( item == NULL) item = getCurrentItem();
-	if( item->getId() != ItemJobTask::ItemId) return;
-	ItemJobTask *itemTask = (ItemJobTask*)item;
-	af::MCTaskPos mctaskpos( m_job_id, itemTask->getBlockNum(), itemTask->getTaskNum(), number);
-	af::Msg * msg = new af::Msg( type, &mctaskpos, true);
-	Watch::sendMsg( msg);
 }
 
 void ListTasks::actBlockCommand()

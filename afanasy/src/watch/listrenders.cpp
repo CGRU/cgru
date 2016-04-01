@@ -480,32 +480,9 @@ void ListRenders::actWOLSleep()        { operation("wol_sleep"); }
 void ListRenders::actWOLWake()         { operation("wol_wake"); }
 void ListRenders::actRestoreDefaults() { operation("restore_defaults"); }
 
-void ListRenders::actRequestLog()
-{
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	displayInfo( "Render log request.");
-	af::Msg * msg = new af::Msg( af::Msg::TRenderLogRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
-}
-
-void ListRenders::actRequestTasksLog()
-{
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	displayInfo( "Render tasks log request.");
-	af::Msg * msg = new af::Msg( af::Msg::TRenderTasksLogRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
-}
-
-void ListRenders::actRequestInfo()
-{
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	displayInfo( "Render info request.");
-	af::Msg * msg = new af::Msg( af::Msg::TRenderInfoRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
-}
+void ListRenders::actRequestLog()      { getItemInfo("log"); }
+void ListRenders::actRequestTasksLog( ){ getItemInfo("tasks_log"); }
+void ListRenders::actRequestInfo()     { getItemInfo("full"); }
 
 void ListRenders::actEnableService()  { setService( true );}
 void ListRenders::actDisableService() { setService( false);}

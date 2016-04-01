@@ -606,11 +606,6 @@ void SysJob::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * r
 	JobAf::v_restartTasks( taskspos, renders, monitoring);
 }
 
-const std::string SysJob::v_getErrorHostsListString( int b, int t) const
-{
-	return "This is an empty dummy task in s system job block.\nGet job error hosts list to see its tasks error hosts.";
-}
-
 af::Msg * SysJob::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
 	std::string & o_filename, std::string & o_error) const
 {

@@ -340,8 +340,13 @@ int AfNodeSrv::calcLogWeight() const
     return weight;
 }
 
-af::Msg * AfNodeSrv::writeLog() const
+af::Msg * AfNodeSrv::writeLog( bool i_binary) const
 {
-	return af::jsonMsg( "log", m_node->m_name, m_log);
+	if( false == i_binary )
+		return af::jsonMsg( "log", m_node->m_name, m_log);
+
+	af::Msg * msg = new af::Msg;
+	msg->setStringList( m_log );
+	return msg;
 }
 

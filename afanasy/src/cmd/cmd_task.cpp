@@ -13,7 +13,7 @@ CmdTaskLog::CmdTaskLog()
 	setArgsCount(4);
 	setInfo("Get task log.");
 	setHelp("tout [jobid] [block] [task] [start] Get task log.");
-	setMsgType( af::Msg::TTaskLogRequest);
+	setMsgType( af::Msg::TJSON);
 	setRecieving();
 }
 CmdTaskLog::~CmdTaskLog(){}
@@ -28,8 +28,17 @@ bool CmdTaskLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 	if( ok == false ) return false;
 	number = af::stoi(argv[3], &ok);
 	if( ok == false ) return false;
-	af::MCTaskPos mctaskpos( job, block, task, number);
-	msg.set( getMsgType(), &mctaskpos);
+
+//{"get":{"type":"jobs","mode":"files","ids":[2],"block_ids":[0],"task_ids":[3],"binary":true}}
+	m_str << "{\"get\":{\"type\":\"jobs\"";
+	m_str << ",\"mode\":\"log\"";
+	m_str << ",\"ids\":[" << job << "]";
+	m_str << ",\"block_ids\":[" << block << "]";
+	m_str << ",\"task_ids\":[" << task << "]";
+	m_str << ",\"number\":" << number;
+	m_str << ",\"binary\":true";
+	m_str << "}}";
+
 	return true;
 }
 

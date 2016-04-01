@@ -168,6 +168,25 @@ void ListItems::currentItemChanged( const QModelIndex & current, const QModelInd
 		displayInfo( qVariantValue<Item*>( current.data())->getSelectString());
 }
 
+void ListItems::getItemInfo( const std::string & i_mode)
+{
+	Item * item = getCurrentItem();
+	if( item == NULL ) return;
+
+//{"get":{"type":"renders","ids":[1],"mode":"log"}}
+
+	std::ostringstream str;
+
+	str << "{\"get\":{";
+	str << "\"binary\":true";
+	str << ",\"type\":\"" << m_type << "\"";
+	str << ",\"ids\":[" << item->getId() << "]";
+	str << ",\"mode\":\"" << i_mode << "\"";
+	str << "}}";
+
+	Watch::sendMsg( af::jsonMsg( str));
+}
+
 void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted) const
 {
 	std::ostringstream str;

@@ -56,6 +56,8 @@ public:
 /// Refresh parameters.
 	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
+	af::Msg * writeTasksLog( bool i_binary);
+
 /// Get host parameters from farm.
 	bool getFarmHost( af::Host * newHost = NULL);
 
@@ -80,10 +82,7 @@ public:
 	void notSolved();
 
 	// Need for server to write some farm parameters (gui double-click):
-	af::Msg * jsonWriteSrvFarm() const;
-
-	// Non json version:
-	af::Msg * writeFullInfo() const;
+	af::Msg * writeFullInfo( bool binary) const;
 
 	void wolWake(  MonitorContainer * i_monitoring, const std::string & i_msg = std::string());
 

@@ -41,7 +41,6 @@ public:
 	void errorHostsAppend( const std::string & hostname);
 	bool avoidHostsCheck( const std::string & hostname) const;
 	void getErrorHostsList( std::list<std::string> & o_list) const;
-	const std::string getErrorHostsListString() const;
 	inline void errorHostsReset() { m_errorHosts.clear(); m_errorHostsCounts.clear(); m_errorHostsTime.clear();}
 
 	int calcWeight() const;

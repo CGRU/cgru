@@ -20,7 +20,6 @@ bool CmdMonitorList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	m_str << "{\"get\":{\"type\":\"monitors\"}}";
 	return true;
-   return true;
 }
 void CmdMonitorList::v_msgOut( af::Msg& msg)
 {
@@ -34,14 +33,14 @@ CmdMonitorLog::CmdMonitorLog()
 	setArgsCount(1);
 	setInfo("Get Monitor log by id.");
 	setHelp("mlog [id] Get monitor log with given id.");
-	setMsgType( af::Msg::TMonitorLogRequestId);
+	setMsgType( af::Msg::TJSON);
 	setRecieving();
 }
 CmdMonitorLog::~CmdMonitorLog(){}
 bool CmdMonitorLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"monitors\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
 	return true;
 }
 

@@ -1286,13 +1286,31 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 
 	if( i_mode == "log" )
 	{
-		return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+","+af::itos(i_t)+"]", getTaskLog( i_b, i_t));
+		const std::list<std::string> * list = &(getTaskLog( i_b, i_t));
+		std::list<std::string> emptyMsg;
+		if( list->empty())
+		{
+			emptyMsg.push_back("Task log is empty.");
+			list = &emptyMsg;
+		}
+		if( i_binary )
+		{
+			af::Msg * msg = new af::Msg;
+			msg->setStringList( *list);
+			return msg;
+		}
+		else
+			return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+"]["+af::itos(i_t)+"]", *list);
 	}
 	else if( i_mode == "info" )
 	{
 		af::TaskExec * task = generateTask( i_b, i_t);
 		if( task )
+		{
+			if( i_binary )
+				return new af::Msg( af::Msg::TTask, task);
 			task->jsonWrite( str, af::Msg::TTask);
+		}
 	}
 	else if( i_mode == "files" )
 	{
@@ -1300,6 +1318,21 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 			return m_blocks[i_b]->m_tasks[i_t]->getStoredFiles();
 		else
 			m_blocks[i_b]->m_tasks[i_t]->getStoredFiles( str);
+	}
+	else if( i_mode == "error_hosts")
+	{
+		std::list<std::string> list;
+		m_blocks[i_b]->m_tasks[i_t]->getErrorHostsList( list);
+		if( i_binary )
+		{
+			af::Msg * msg = new af::Msg;
+			msg->setStringList( list);
+			return msg;
+		}
+		else
+		{
+			return af::jsonMsg("error_hosts", m_name + "[" + af::itos(i_b) + "][" + af::itos(i_t) + "]", list);
+		}
 	}
 	else if( i_mode == "output")
 	{
@@ -1328,27 +1361,22 @@ const std::string JobAf::generateTaskName( int i_b, int i_t) const
 	else return m_blocks[i_b]->m_data->genTaskName( i_t);
 }
 
-const std::string JobAf::v_getErrorHostsListString() const
+af::Msg * JobAf::writeErrorHosts( bool i_binary) const
 {
-   std::string str("Job \"");
-   str += m_name + "\" error hosts:\n";
 	std::list<std::string> list;
-	writeErrorHosts( list);
-	str += af::strJoin( list, "\n");
-   return str;
-}
-
-void JobAf::writeErrorHosts( std::list<std::string> & o_list) const
-{
 	for( int block = 0; block < m_blocks_num; block++)
-		m_blocks[block]->v_getErrorHostsList( o_list);
-}
+		m_blocks[block]->v_getErrorHostsList( list);
 
-af::Msg * JobAf::writeErrorHosts() const
-{
-	std::list<std::string> list;
-	writeErrorHosts( list);
-	return af::jsonMsg("error_hosts", m_name, list);
+	if( false == i_binary )
+		return af::jsonMsg("error_hosts", m_name, list);
+
+	std::string str("Job \"");
+	str += m_name + "\" error hosts:\n";
+	str += af::strJoin( list, "\n");
+
+	af::Msg * msg = new af::Msg;
+	msg->setString( str);
+	return msg;
 }
 
 af::Msg * JobAf::writeErrorHosts( int b, int t) const
@@ -1365,7 +1393,7 @@ af::Msg * JobAf::writeErrorHosts( int b, int t) const
 
 	return af::jsonMsg("error_hosts", m_name, list);
 }
-
+/*
 const std::string JobAf::v_getErrorHostsListString( int b, int t) const
 {
    if( false == checkBlockTaskNumbers( b, t, "getErrorHostsList"))
@@ -1376,7 +1404,7 @@ const std::string JobAf::v_getErrorHostsListString( int b, int t) const
    if( str.empty()) str = "The task has no error hosts.";
    return str;
 }
-
+*/
 bool JobAf::checkBlockTaskNumbers( int i_b, int i_t, const char * o_str) const
 {
 	if(( i_b >= m_blocks_num) || ( i_b < 0 ))

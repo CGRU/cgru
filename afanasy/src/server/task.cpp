@@ -299,9 +299,9 @@ bool Task::avoidHostsCheck( const std::string & hostname) const
 
 void Task::getErrorHostsList( std::list<std::string> & o_list) const
 {
+	o_list.push_back( std::string("Task[") + af::itos(m_number) + "] error hosts: ");
    if( m_errorHosts.size())
    {
-		o_list.push_back( std::string("Task[") + af::itos(m_number) + "] error hosts: ");
       std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
       std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
       std::list<time_t>::const_iterator tIt = m_errorHostsTime.begin();
@@ -312,13 +312,8 @@ void Task::getErrorHostsList( std::list<std::string> & o_list) const
 			o_list.push_back( str);
       }
    }
-}
-
-const std::string Task::getErrorHostsListString() const
-{
-	std::list<std::string> list;
-	getErrorHostsList( list);
-	return af::strJoin( list, "\n");
+	else
+		o_list.push_back("No error hosts.");
 }
 
 void Task::v_monitor( MonitorContainer * monitoring) const

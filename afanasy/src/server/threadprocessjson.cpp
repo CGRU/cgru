@@ -114,7 +114,15 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
 						if( data )
 						{
-							o_msg_response = af::jsonMsg( mode, name, data, readsize);
+							if( binary )
+							{
+								o_msg_response = new af::Msg();
+								o_msg_response->setData( readsize, data);
+							}
+							else
+							{
+								o_msg_response = af::jsonMsg( mode, name, data, readsize);
+							}
 							delete [] data;
 						}
 					}
@@ -125,8 +133,13 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						af::Msg * response = af::msgsend( msg_request_render, ok, af::VerboseOn);
 						if( response )
 						{
-							o_msg_response = af::jsonMsg( mode, name, response->data(), response->dataLen());
-							delete response;
+							if( binary )
+								o_msg_response = response;
+							else
+							{
+								o_msg_response = af::jsonMsg( mode, name, response->data(), response->dataLen());
+								delete response;
+							}
 						}
 						else
 							error = "Retrieving output from render failed. See server logs for details.";
@@ -139,7 +152,10 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						error += "\nIf there is 'update timeout' check firewall.";
 						error += "\nClient should listen a port and server should be able to connect to it.";
 						if( o_msg_response == NULL )
-							o_msg_response = af::jsonMsgError( error);
+							if( binary )
+								o_msg_response = af::msgString( error);
+							else
+								o_msg_response = af::jsonMsgError( error);
 						//AFCommon::QueueLogError("TTaskOutputRequest: " + error);
 					}
 				}
@@ -181,12 +197,12 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						else if( mode == "progress" )
 							o_msg_response = job->writeProgress( json);
 						else if( mode == "error_hosts" )
-							o_msg_response = job->writeErrorHosts();
+							o_msg_response = job->writeErrorHosts( binary);
 						else if( mode == "log" )
-							o_msg_response = job->writeLog();
+							o_msg_response = job->writeLog( binary);
 					}
 				}
-				
+
 				if( o_msg_response == NULL )
 					o_msg_response = i_args->jobs->generateList(
 						full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
@@ -208,11 +224,11 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if( render )
 				{
 					if( full )
-						o_msg_response = render->jsonWriteSrvFarm();
+						o_msg_response = render->writeFullInfo( binary);
 					else if( mode == "log" )
-						o_msg_response = render->writeLog();
+						o_msg_response = render->writeLog( binary);
 					else if( mode == "tasks_log" )
-						o_msg_response = af::jsonMsg("tasks_log", render->getName(), render->getTasksLog());
+						o_msg_response = render->writeTasksLog( binary);
 				}
 			}
 			if( o_msg_response == NULL )
@@ -241,7 +257,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 					if( mode == "jobs_order" )
 						o_msg_response = user->writeJobdsOrder();
 					else if( mode == "log" )
-						o_msg_response = user->writeLog();
+						o_msg_response = user->writeLog( binary);
 				}
 			}
 			if( o_msg_response == NULL )
