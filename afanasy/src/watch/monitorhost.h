@@ -17,8 +17,8 @@ public:
 
 	static const af::Address & getClientAddress() { return m_->getAddress();}
 
-	static inline void addJobId( int jId ) { setJobId( af::Msg::TMonitorJobsIdsAdd, jId);}
-	static inline void delJobId( int jId ) { setJobId( af::Msg::TMonitorJobsIdsDel, jId);}
+	static inline void addJobId( int i_jid ) { setJobId( i_jid, true );}
+	static inline void delJobId( int i_jid ) { setJobId( i_jid, false);}
 
 	static void setUid( int i_uid);
 	static int getUid() { return ms_uid ;}
@@ -31,11 +31,6 @@ private:
 
 	static int ms_uid;
 
-//   int * m_events_counts;
-//   std::list<int32_t> m_jobsUsersIds_counts;
-	static std::list<int32_t> m_jobsIds_counts;
-
 private:
-//   void setEvents( int type, const QList<int> & eIds);
-	static void setJobId(  int type, int m_id);
+	static void setJobId( int i_jid, bool i_add);
 };

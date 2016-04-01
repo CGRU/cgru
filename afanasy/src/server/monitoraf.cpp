@@ -165,15 +165,19 @@ void MonitorAf::v_action( Action & i_action)
 		appendLog("Operation \"" + optype + "\" by " + i_action.author);
 	}
 }
-
+/*
 bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 {
+	AFERRAR("MonitorAf::action: Since 2.1.0 all monitor actions are JSON")
+	return false;
+
+
 	m_time_activity = time( NULL);
 
 //printf("MonitorAf::setInterest: [%s]:\n", af::Msg::TNAMES[type]);
    switch(type)
    {
-/*      case af::Msg::TMonitorSubscribe:
+      case af::Msg::TMonitorSubscribe:
       {
          setEvents( ids.getList(), true);
          break;
@@ -182,12 +186,12 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
       {
          setEvents( ids.getList(), false);
          break;
-      }*/
-/*      case af::Msg::TMonitorUsersJobs:
+      }
+      case af::Msg::TMonitorUsersJobs:
       {
          setJobsUsersIds( ids.getList());
          break;
-      }*/
+      }
       case af::Msg::TMonitorJobsIdsAdd:
       {
          addJobIds( ids.getList());
@@ -211,6 +215,7 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
    }
    return true;
 }
+*/
 /*
 void MonitorAf::setJobsUsersIds( const std::vector<int32_t> & i_ids)
 {
@@ -275,13 +280,13 @@ void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 	}
 }
 
-void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
+/*void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
 {
 //printf("MonitorAf::setJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
 	m_jobsIds.clear();
 	for( int i = 0; i < i_ids.size(); i++) m_jobsIds.push_back( i_ids[i]);
 }
-
+*/
 void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
 //printf("MonitorAf::delJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");

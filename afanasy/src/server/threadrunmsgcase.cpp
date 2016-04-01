@@ -48,14 +48,14 @@ switch ( i_msg->type())
 //	case af::Msg::TMonitorSubscribe:
 //	case af::Msg::TMonitorUnsubscribe:
 //	case af::Msg::TMonitorUsersJobs:
-	case af::Msg::TMonitorJobsIdsAdd:
+/*	case af::Msg::TMonitorJobsIdsAdd:
 	case af::Msg::TMonitorJobsIdsSet:
 	case af::Msg::TMonitorJobsIdsDel:
 	{
 		af::MCGeneral ids( i_msg);
 		i_args->monitors->setInterest( i_msg->type(), ids);
 		break;
-	}
+	}*/
 	case af::Msg::TRenderDeregister:
 	{
 		RenderContainerIt rendersIt( i_args->renders);

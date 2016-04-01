@@ -61,28 +61,6 @@ af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_binary)
 	return af::jsonMsg( str);
 }
 
-bool MonitorContainer::setInterest( int i_type, af::MCGeneral & i_ids)
-{
-	int monitorId = i_ids.getId();
-	if( monitorId == 0 )
-	{
-		AFCommon::QueueLogError("MonitorContainer::action: Zero monitor ID.");
-		return false;
-	}
-	MonitorContainerIt mIt( this);
-	MonitorAf * monitor = mIt.getMonitor( monitorId);
-	if( monitor == NULL )
-	{
-		AFCommon::QueueLogError("MonitorContainer::action: No monitor with id = " + af::itos( monitorId));
-		return false;
-	}
-
-	if( monitor->setInterest( i_type, i_ids) == false ) return false;
-
-	addEvent( af::Monitor::EVT_monitors_change, monitorId);
-	return true;
-}
-
 void MonitorContainer::addEvent( int i_type, int i_nodeId)
 {
 	if(( i_type < 0 ) || ( i_type >= af::Monitor::EVT_COUNT))

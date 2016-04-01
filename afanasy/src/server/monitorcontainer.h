@@ -23,8 +23,6 @@ public:
 
 //   void sendMessage( const std::string & i_str);
 
-   bool setInterest( int i_type, af::MCGeneral & i_ids);
-
    void addEvent( int i_type, int i_nodeId);
 
    void addJobEvent( int i_type, int i_jid, int i_uid);

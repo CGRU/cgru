@@ -588,9 +588,9 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 //	case af::Msg::TMonitorUnsubscribe:
 	case af::Msg::TMonitorDeregister:
 //	case af::Msg::TMonitorUsersJobs:
-	case af::Msg::TMonitorJobsIdsAdd:
-	case af::Msg::TMonitorJobsIdsSet:
-	case af::Msg::TMonitorJobsIdsDel:
+//	case af::Msg::TMonitorJobsIdsAdd:
+//	case af::Msg::TMonitorJobsIdsSet:
+//	case af::Msg::TMonitorJobsIdsDel:
 //	case af::Msg::TMonitorMessage:
 	{
 		// Push message for run cycle thread.

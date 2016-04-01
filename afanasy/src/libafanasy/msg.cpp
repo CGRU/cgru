@@ -567,9 +567,9 @@ const char * Msg::TNAMES[]=
 //	"TMonitorSubscribe",          ///< Subscribe monitor on some events.
 //	"TMonitorUnsubscribe",        ///< Unsubscribe monitor from some events.
 //	"TMonitorUsersJobs",          ///< Set users ids to monitor their jobs.
-	"TMonitorJobsIdsAdd",         ///< Add jobs ids for monitoring.
-	"TMonitorJobsIdsSet",         ///< Set jobs ids for monitoring.
-	"TMonitorJobsIdsDel",         ///< Delete monitoring jobs ids.
+//	"TMonitorJobsIdsAdd",         ///< Add jobs ids for monitoring.
+//	"TMonitorJobsIdsSet",         ///< Set jobs ids for monitoring.
+//	"TMonitorJobsIdsDel",         ///< Delete monitoring jobs ids.
 //	"TMonitorMessage",            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
 	"TMonitorEvents",             ///< Events.
 /*
