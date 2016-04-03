@@ -90,7 +90,6 @@ private:
 
     afqt::QThreadClientUp   m_qThreadClientUpdate;
     afqt::QThreadClientSend m_qThreadSend;
-    afqt::QServer           m_qServer;
 
     ListItems * m_listitems;
     OfflineScreen * m_offlinescreen;

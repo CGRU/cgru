@@ -339,6 +339,17 @@ void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
    if( render != NULL) render->sendOutput( mclisten, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
 }
 
+void TaskRun::listenOutput( bool i_subscribe)
+{
+	if( m_zombie ) return;
+	if( m_hostId == 0 ) return;
+	if( m_exec == NULL)
+	{
+		AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
+		return;
+	}
+}
+
 af::Msg * TaskRun::v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const
 {
 	if( m_exec == NULL)

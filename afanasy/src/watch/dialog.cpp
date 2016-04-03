@@ -49,18 +49,11 @@ Dialog::Dialog():
     m_monitorType( Watch::WNONE),
     m_qThreadClientUpdate( this, false, af::Environment::getWatchUpdatePeriod(), af::Environment::getWatchConnectRetries()),
     m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
-    m_qServer( this),
     m_listitems( NULL),
     m_offlinescreen( NULL),
     m_repaintTimer( this),
     m_initialized( false)
 {
-    if( m_qServer.isInitialized() == false )
-    {
-        AFERROR("Dialog::Dialog: Server initialization failed.")
-        return;
-    }
-
     for( int b = 0; b < Watch::WLAST; b++) m_btnMonitor[b] = NULL;
 
     m_hlayout_a = new QHBoxLayout( this);
@@ -108,7 +101,6 @@ Dialog::Dialog():
     m_hlayout_b->addWidget( m_btnMonitor[Watch::WUsers   ]);
     m_hlayout_b->addWidget( m_topright);
 
-    connect( &m_qServer,               SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &m_qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));

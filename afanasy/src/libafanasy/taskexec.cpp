@@ -59,6 +59,7 @@ TaskExec::TaskExec(
 
 	m_time_start( time(NULL)),
 	m_progress( NULL),
+	m_flags( 0),
 	m_on_client( false)
 {
 AFINFA("TaskExec::TaskExec: %s:", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data())
@@ -190,6 +191,7 @@ void TaskExec::v_readwrite( Msg * msg)
 	case Msg::TTask:
 		rw_int32_t ( m_job_id,            msg);
 		rw_int32_t ( m_block_num,         msg);
+		rw_int64_t ( m_flags,             msg);
 		rw_int64_t ( m_block_flags,       msg);
 		rw_int64_t ( m_job_flags,         msg);
 		rw_int64_t ( m_user_flags,        msg);
@@ -237,6 +239,17 @@ void TaskExec::v_readwrite( Msg * msg)
 	}
 
 	m_listen_addresses.v_readwrite( msg);
+}
+
+void TaskExec::listenOutput( bool i_subscribe)
+{
+	if( i_subscribe == isListening())
+		return;
+
+	if( i_subscribe )
+		m_flags = m_flags | FListen;
+	else
+		m_flags = m_flags & (~FListen);
 }
 
 void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) const

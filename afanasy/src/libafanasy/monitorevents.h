@@ -16,14 +16,6 @@ public:
 
 	virtual ~MonitorEvents();
 
-	void clear();
-
-	bool isEmpty() const;
-
-	void jsonWrite( std::ostringstream & o_str) const;
-
-	void addInstruction( const std::string & i_str);
-
 public:
 
 	std::vector<std::vector<int32_t> > m_events;
@@ -47,8 +39,28 @@ public:
 
 	std::vector<std::string> m_instructions;
 
-private:
+	struct MListen {
+		std::string hostname;
+		int32_t job_id;
+		int32_t block;
+		int32_t task;
+		std::string output;
+	};
+	std::vector<MListen> m_listens;
 
+public:
+
+	bool isEmpty() const;
+
+	void addListened( MListen i_listen);
+
+	void addInstruction( const std::string & i_str);
+
+	void jsonWrite( std::ostringstream & o_str) const;
+
+	void clear();
+
+private:
 	void v_readwrite( Msg * msg);
 };
 }

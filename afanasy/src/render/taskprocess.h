@@ -76,6 +76,8 @@ private:
 	bool m_doing_post;
 	std::vector<std::string> m_post_cmds;
 
+	std::string m_listened;
+
 #ifdef WINNT
 	PROCESS_INFORMATION m_pinfo;
 	HANDLE m_hjob;

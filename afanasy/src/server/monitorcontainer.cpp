@@ -84,6 +84,47 @@ void MonitorContainer::addJobEvent( int i_type, int i_jid, int i_uid)
 		m_jobEventsUids[i_type].push_back( i_uid);
 }
 
+void MonitorContainer::addListened( const std::string & i_hostname, int i_j, int i_b, int i_t, const std::string & i_listened)
+{
+/*
+	std::list<std::string>::iterator hIt = m_lis_h.begin();
+	std::list<int>::iterator jIt = m_lis_j.begin();
+	std::list<int>::iterator bIt = m_lis_b.begin();
+	std::list<int>::iterator tIt = m_lis_t.begin();
+	std::list<std::string>::iterator lIt = m_listened.begin();
+
+	for( ; jIt != m_lis_j.end(); jIt++, bIt++, tIt++, lIt++, hIt++)
+		if(( *jIt == i_j ) && ( *bIt == i_b ) && ( *tIt == i_t ))
+		{
+			*lIt += i_listened;
+			return;
+		}
+
+	m_lis_h.push_back( i_hostname);
+	m_lis_j.push_back( i_j);
+	m_lis_b.push_back( i_b);
+	m_lis_t.push_back( i_t);
+	m_listened.push_back( i_listened);
+*/
+	for( int i = 0; i < m_listens.size(); i++)
+	{
+		if(( m_listens[i].job_id == i_j ) && ( m_listens[i].block == i_b ) && ( m_listens[i].task == i_t ))
+		{
+			m_listens[i].output += i_listened;
+			return;
+		}
+	}
+
+	af::MonitorEvents::MListen listen;
+	listen.hostname = i_hostname;
+	listen.job_id   = i_j;
+	listen.block    = i_b;
+	listen.task     = i_t;
+	listen.output   = i_listened;
+
+	m_listens.push_back( listen);
+}
+
 void MonitorContainer::dispatch()
 {
 	//
@@ -288,6 +329,21 @@ void MonitorContainer::dispatch()
 	}
 
 	//
+	// Listening output:
+	//
+	{
+	for( int i = 0; i < m_listens.size(); i++)
+	{
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+		{
+			if( monitor->isListening( m_listens[i]))
+				monitor->addListened( m_listens[i]);
+		}
+	}
+	}
+
+	//
 	// Delete all events:
 	//
 	clearEvents();
@@ -316,6 +372,8 @@ void MonitorContainer::clearEvents()
 	m_blocks_types.clear();
 
 	m_usersJobOrderChanged.clear();
+
+	m_listens.clear();
 }
 /*
 void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)

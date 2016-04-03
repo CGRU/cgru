@@ -11,7 +11,7 @@ public:
 	Receiver();
 	virtual ~Receiver();
 
-	virtual bool caseMessage( af::Msg * msg) = 0;
+	virtual bool caseMessage( af::Msg * msg);
 
 	virtual bool processEvents( const af::MonitorEvents & i_me);
 

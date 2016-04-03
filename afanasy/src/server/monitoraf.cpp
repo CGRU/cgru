@@ -7,6 +7,7 @@
 
 #include "action.h"
 #include "afcommon.h"
+#include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "usercontainer.h"
 
@@ -129,6 +130,20 @@ void MonitorAf::v_action( Action & i_action)
 				eids.push_back( af::Monitor::EVT_monitors_add);
 				eids.push_back( af::Monitor::EVT_monitors_change);
 				eids.push_back( af::Monitor::EVT_monitors_del);
+			}
+			else if( opclass == "listen")
+			{
+				int32_t job_id = -1, block = -1, task = -1;
+				af::jr_int32("job",   job_id, operation);
+				af::jr_int32("block", block,  operation);
+				af::jr_int32("task",  task,   operation);
+printf("MonitorAf::v_action: listen: j%d b%d t%d:%d\n", job_id, block, task, subscribe);
+
+				JobContainerIt jobsIt( i_action.jobs);
+				JobAf * job = jobsIt.getJob( job_id);
+				if( job )
+					if( setListening( job_id, block, task, subscribe));
+						job->listenOutput( subscribe, block, task);
 			}
 			else
 			{
@@ -280,6 +295,56 @@ void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 	m_e.m_bids[i].block_num = i_b;
 	m_e.m_bids[i].mode = i_mode;
 }
+
+bool MonitorAf::setListening( int i_j, int i_b, int i_t, bool i_subscribe)
+{
+	std::list<int>::iterator jIt = m_lis_j.begin();
+	std::list<int>::iterator bIt = m_lis_b.begin();
+	std::list<int>::iterator tIt = m_lis_t.begin();
+
+	for( ; jIt != m_lis_j.end(); jIt++, bIt++, tIt++)
+	{
+		if(( *jIt == i_j ) && ( *bIt == i_b ) && ( *tIt == i_t ))
+		{
+			if( i_subscribe )
+				return false;
+
+			m_lis_j.erase( jIt);
+			m_lis_b.erase( bIt);
+			m_lis_t.erase( tIt);
+
+			return true;
+		}
+	}
+
+	if( false == i_subscribe )
+		return false;
+
+	m_lis_j.push_back( i_j);
+	m_lis_b.push_back( i_b);
+	m_lis_t.push_back( i_t);
+
+	return true;
+}
+
+bool MonitorAf::isListening( const af::MonitorEvents::MListen & i_listen) const
+{
+	std::list<int>::const_iterator jIt = m_lis_j.begin();
+	std::list<int>::const_iterator bIt = m_lis_b.begin();
+	std::list<int>::const_iterator tIt = m_lis_t.begin();
+
+	for( ; jIt != m_lis_j.end(); jIt++, bIt++, tIt++)
+		if( *jIt == i_listen.job_id )
+		{
+			if(( *bIt == -1 ) && ( *tIt == -1 ))
+				return true;
+			if(( *bIt == i_listen.block ) && ( *tIt == i_listen.task ))
+				return true;
+		}
+
+	return false;
+}
+
 af::Msg * MonitorAf::getEventsBin()
 {
 	updateTime();

@@ -44,13 +44,22 @@ public:
 
 	void deregister();
 
+	bool isListening( const af::MonitorEvents::MListen & i_listen) const;
+	inline void addListened( const af::MonitorEvents::MListen & i_listen) { m_e.addListened( i_listen); }
+
 private:
 	void setEvents( const std::vector<int32_t> & i_ids, bool value);
 	void addJobIds( const std::vector<int32_t> & i_ids);
 	void delJobIds( const std::vector<int32_t> & i_ids);
 
+	bool setListening( int i_j, int i_b, int i_t, bool i_subscribe);
+
 private:
 	af::MonitorEvents m_e;
+
+	std::list<int> m_lis_j;
+	std::list<int> m_lis_b;
+	std::list<int> m_lis_t;
 
 	DlMutex m_mutex;
 

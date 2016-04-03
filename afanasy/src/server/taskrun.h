@@ -49,6 +49,8 @@ public:
 /// Request to remote host to send output to specified address (or request not to do it).
    void listen( af::MCListenAddress & mclisten, RenderContainer * renders);
 
+	void listenOutput( bool i_subscribe);
+
 /// Return special message for request output from its running render.
 	virtual af::Msg * v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const;
 

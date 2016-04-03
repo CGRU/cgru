@@ -25,7 +25,8 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_block( taskBlock),
    m_number( taskNumber),
    m_progress( taskProgress),
-   m_run( NULL)
+   m_run( NULL),
+	m_listen( false)
 {
 	// If job is not from store, it is just came from network
 	// and so no we do not need to read anything
@@ -104,12 +105,16 @@ void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf
          m_run = new TaskRunMulti( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
       return;
    }
+
    if( m_run)
    {
       AFERROR("Task is already running.")
       delete taskexec;
       return;
    }
+
+	taskexec->listenOutput( m_listen);
+
    m_run = new TaskRun( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
 }
 
@@ -144,6 +149,23 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 			size = taskup.getDataLen();
 		}
 		v_writeTaskOutput( data, size);
+	}
+
+	if( taskup.hasListened())
+	{
+		RenderContainerIt it( renders);
+		std::string hostname;
+		RenderAf * render = it.getRender( taskup.getClientId());
+		if( render )
+		{
+			hostname = render->getName();
+		}
+		monitoring->addListened(
+			hostname,
+			m_block->m_job->getId(),
+			m_block->m_data->getBlockNum(),
+			m_number,
+			taskup.getListened());
 	}
 
 	if( taskup.getParsedFiles().size())
@@ -441,6 +463,17 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
 {
    if( m_run) m_run->listen( mclisten, renders);
+}
+
+void Task::listenOutput( bool i_subscribe)
+{
+	if( i_subscribe == m_listen )
+		return;
+
+	if( m_run )
+		m_run->listenOutput( i_subscribe);
+
+	m_listen = i_subscribe;
 }
 
 const std::string Task::getOutputFileName( int i_starts_count) const

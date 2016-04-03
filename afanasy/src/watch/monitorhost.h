@@ -15,6 +15,10 @@ public:
 
 	static inline int id() { return m_->getId();}
 
+	// Some operations needed an array of ids.
+	// This function simple returns an array with one id.
+	static inline const std::vector<int32_t> & ids() { return ms_ids;}
+
 	static void subscribe( const std::string & i_class, bool i_subscribe);
 
 	static const af::Address & getClientAddress() { return m_->getAddress();}
@@ -32,6 +36,8 @@ private:
 	static MonitorHost * m_;
 
 	static int ms_uid;
+
+	static std::vector<int32_t> ms_ids;
 
 private:
 	static void setJobId( int i_jid, bool i_add);

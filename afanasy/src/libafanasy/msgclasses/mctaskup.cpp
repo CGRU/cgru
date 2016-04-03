@@ -25,9 +25,10 @@ MCTaskUp::MCTaskUp
 	int i_frame,
 	int i_percent_frame,
 
-	std::string i_log,
-	std::string i_activity,
-	std::string i_report,
+	const std::string & i_log,
+	const std::string & i_activity,
+	const std::string & i_report,
+	const std::string & i_listened,
 
 	int i_datalen,
 	char * i_data
@@ -47,6 +48,8 @@ MCTaskUp::MCTaskUp
 	m_log           ( i_log),
 	m_activity      ( i_activity),
 	m_report        ( i_report),
+
+	m_listened      ( i_listened),
 
 	m_datalen       ( i_datalen ),
 	m_data          ( i_data ),
@@ -88,6 +91,8 @@ void MCTaskUp::v_readwrite( Msg * msg)
 	rw_String ( m_activity,       msg);
 	rw_String ( m_report,         msg);
 	rw_String ( m_log,            msg);
+
+	rw_String ( m_listened,       msg);
 
 	rw_StringVect( m_parsed_files, msg);
 	rw_int32_t(    m_datalen,      msg);

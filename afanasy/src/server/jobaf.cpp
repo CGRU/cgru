@@ -1461,6 +1461,21 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
    }
 }
 
+void JobAf::listenOutput( bool i_subscribe, int i_block, int i_task)
+{
+	if(( i_block > 0 ) && ( i_task > 0 ))
+	{
+		if( false == checkBlockTaskNumbers( i_block, i_task, "listenOutput")) return;
+		m_blocks[i_block]->m_tasks[i_task]->listenOutput( i_subscribe);
+	}
+	else
+	{
+		for( int b = 0; b < m_blocks_num; b++)
+			for( int t = 0; t < m_blocks_data[b]->getTasksNum(); t++)
+				m_blocks[b]->m_tasks[t]->listenOutput( i_subscribe);
+	}
+}
+
 void JobAf::setThumbnail( const std::string & i_path, int i_size, const char * i_data)
 {
 	if( m_thumb_path == i_path ) return;

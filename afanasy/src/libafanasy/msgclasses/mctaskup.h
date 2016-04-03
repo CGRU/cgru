@@ -17,17 +17,18 @@ public:
 			int i_numjob,
 			int i_numblock,
 			int i_numtask,
-			int i_number           = -1,
+			int i_number = -1,
 
-			int i_status           = -1,
-			int i_percent          = -1,
-			int i_frame            = -1,
-			int i_percent_frame    = -1,
-			std::string i_log      = "",
-			std::string i_activity = "",
-			std::string i_report   = "",
-			int i_datalen          = 0,
-			char * i_data          = NULL
+			int i_status        = -1,
+			int i_percent       = -1,
+			int i_frame         = -1,
+			int i_percent_frame = -1,
+			const std::string & i_log      = std::string(),
+			const std::string & i_activity = std::string(),
+			const std::string & i_report   = std::string(),
+			const std::string & i_listened = std::string(),
+			int i_datalen = 0,
+			char * i_data = NULL
 		);
 	MCTaskUp( Msg * msg);
 	~MCTaskUp();
@@ -48,6 +49,9 @@ public:
   	inline const std::string & getLog()      const { return m_log;           }
 	inline int getDataLen()                  const { return m_datalen;       }
 	inline const char * getData()            const { return m_data;          }
+
+	inline bool hasListened()                const { return m_listened.size(); }
+	inline const std::string & getListened() const { return m_listened;        }
 
 	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
 	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
@@ -77,6 +81,8 @@ private:
 	std::string m_activity;
 	std::string m_report;
 	std::string m_log;
+
+	std::string m_listened;
 
 	int32_t m_datalen;
 	char * m_data;

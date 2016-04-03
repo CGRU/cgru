@@ -400,6 +400,13 @@ void TaskProcess::readProcess( const std::string & i_mode, bool i_read_empty)
 		RenderHost::dispatchMessage( msg);
 	}
 
+	if( m_taskexec->isListening())
+	{
+		printf("We are listening:\n");
+		printf("%s\n", output.c_str());
+		m_listened += output;
+	}
+
 	if( m_parser->hasWarning() && ( m_update_status != af::TaskExec::UPWarning               ) &&
 	                              ( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
 	                              ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
@@ -483,11 +490,15 @@ void TaskProcess::sendTaskSate()
 		activity,
 		report,
 
+		m_listened,
+
 		stdout_size,
 		stdout_data);
 
 	collectFiles( taskup);
 	taskup.setParsedFiles( m_service->getParsedFiles());
+
+	m_listened.clear();
 
 	af::Msg * msg = new af::Msg( type, &taskup);
 	if( toRecieve) msg->setReceiving();

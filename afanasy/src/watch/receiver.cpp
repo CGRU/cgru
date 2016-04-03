@@ -16,6 +16,7 @@ Receiver::~Receiver()
 	Watch::removeReceiver( this);
 }
 
+bool Receiver::caseMessage( af::Msg * msg) { return false;}
 bool Receiver::processEvents( const af::MonitorEvents & i_me) { return false;}
 bool Receiver::v_filesReceived( const af::MCTaskUp & i_taskup){ return false;}
 void Receiver::v_connectionLost(){}

@@ -148,10 +148,20 @@ public:
 		/* 25 */ UPLAST
 	};
 
+	enum Flags{
+		FListen = 1ULL << 0
+	};
+
+	inline bool isListening() const { return m_flags & FListen; }
+	
+
 	inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }
 	inline bool      removeListenAddress( const Address & address) { return m_listen_addresses.removeAddress( address);  }
 	inline size_t getListenAddressesNum() const { return m_listen_addresses.getAddressesNum();              }
 	inline const std::list<Address> * getListenAddresses() const { return m_listen_addresses.getAddresses();       }
+
+	void listenOutput( bool i_subscribe);
+
 
 	inline void setName(      const std::string & str) { m_name      = str;}   ///< Set task name.
 	inline void setBlockName( const std::string & str) { m_block_name = str;}   ///< Set task block name.
@@ -205,6 +215,7 @@ private:
 	int32_t m_task_num;       ///< Task number in block.
 	int32_t m_number;         ///< Task number (aux).
 
+	int64_t m_flags;         ///< Flags.
 	int64_t m_block_flags;   ///< Block flags.
 	int64_t m_job_flags;     ///< Job flags.
 	int64_t m_user_flags;    ///< User flags.

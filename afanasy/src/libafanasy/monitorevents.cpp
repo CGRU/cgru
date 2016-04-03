@@ -38,6 +38,23 @@ void MonitorEvents::addInstruction( const std::string & i_str)
 	m_instructions.push_back( i_str);
 }
 
+void MonitorEvents::addListened( MListen i_listen)
+{
+	for( int i = 0; i < m_listens.size(); i++)
+	{
+		if(( m_listens[i].job_id == i_listen.job_id ) &&
+			( m_listens[i].block == i_listen.block ) &&
+			( m_listens[i].task == i_listen.task ))
+		{
+			m_listens[i].output += i_listen.output;
+			return;
+		}
+	}
+
+	m_listens.push_back( i_listen);
+printf("MonitorEvents::addListened: m_listens.size() = %d\n", m_listens.size());
+}
+
 void MonitorEvents::v_readwrite( Msg * msg)
 {
 	for( int e = 0; e < m_events.size(); e++)
@@ -85,6 +102,20 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	rw_Int32_Vect( m_jobs_order_ids, msg);
 
 	rw_StringVect( m_instructions, msg);
+
+	int32_t lis_size = m_listens.size();
+	rw_int32_t( lis_size, msg);
+	for( int i = 0; i < lis_size; i++)
+	{
+		if( msg->isReading())
+			m_listens.push_back( MListen());
+
+		rw_int32_t( m_listens[i].job_id,   msg);
+		rw_int32_t( m_listens[i].block,    msg);
+		rw_int32_t( m_listens[i].task,     msg);
+		rw_String ( m_listens[i].hostname, msg);
+		rw_String ( m_listens[i].output,   msg);
+	}
 }
 
 void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
@@ -244,6 +275,8 @@ void MonitorEvents::clear()
 	m_jobs_order_ids.clear();
 
 	m_instructions.clear();
+
+	m_listens.clear();
 }
 
 bool MonitorEvents::isEmpty() const

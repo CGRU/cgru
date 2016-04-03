@@ -77,6 +77,7 @@ public:
 
 /// Send tasks output to a specified address.
 	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
+	void listenOutput( bool i_subscribe, int i_block, int i_task);
 
 	void skipTasks(    const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Skip some tasks.
     virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.

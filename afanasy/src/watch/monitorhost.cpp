@@ -13,9 +13,12 @@ MonitorHost * MonitorHost::m_ = NULL;
 
 int MonitorHost::ms_uid = -1;
 
+std::vector<int32_t> MonitorHost::ms_ids;
+
 MonitorHost::MonitorHost()
 {
 	m_ = this;
+	ms_ids.push_back(0);
 }
 
 MonitorHost::~MonitorHost()
@@ -45,6 +48,7 @@ void MonitorHost::connectionLost()
 	m_->m_id  =  0;
 	m_->m_uid =  0;
 	ms_uid    = -1;
+	ms_ids[0] =  0;
 }
 
 void MonitorHost::connectionEstablished( int i_id, int i_uid)
@@ -52,6 +56,7 @@ void MonitorHost::connectionEstablished( int i_id, int i_uid)
 	m_->m_id = i_id;
 	m_->m_uid = i_uid;
 	ms_uid = i_uid;
+	ms_ids[0] = i_id;
 }
 
 void MonitorHost::subscribe( const std::string & i_class, bool i_subscribe)

@@ -67,6 +67,7 @@ public:
 	void getStoredFiles( std::ostringstream & i_str) const;
 
 	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
+	void listenOutput( bool i_subscribe);
 
 	void stdOut( bool full = false) const;
 
@@ -103,4 +104,7 @@ private:
 	std::list<std::string>  m_errorHosts;       ///< Avoid error hosts list.
 	std::list<int>          m_errorHostsCounts; ///< Number of errors on error host.
 	std::list<time_t>       m_errorHostsTime;   ///< Time of the last error
+
+	bool m_listen;
 };
+

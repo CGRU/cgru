@@ -14,12 +14,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QString & Name):
+WndListenTask::WndListenTask( int i_job_id, int i_block, int i_task, const QString & i_taskname):
    WndText("Listen Task"),
-   jobid(      JobId    ),
-   block(      BlockNum ),
-   task(       TaskNum  ),
-   taskname(   Name     )
+   m_job_id(i_job_id),
+   m_block(i_block),
+   m_task(i_task),
+   m_taskname(i_taskname)
 {
 #if QT_VERSION >= 0x040300
    layout->setContentsMargins( 5, 5, 5, 5);
@@ -34,13 +34,10 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    cursor.setBlockFormat( blockFormat);
    qTextEdit->setTextCursor( cursor);
    qTextEdit->setWordWrapMode( QTextOption::NoWrap);
-   setWindowTitle( taskname);
-   taskname += " %1:";
+   setWindowTitle( m_taskname);
+   m_taskname += " %1:";
 
-   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK | af::MCListenAddress::TOLISTEN,
-		MonitorHost::getClientAddress(), jobid, block, task);
-
-   Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
+	subscribe( true);
 }
 
 WndListenTask::~WndListenTask()
@@ -49,33 +46,41 @@ WndListenTask::~WndListenTask()
 
 void WndListenTask::closeEvent( QCloseEvent * event)
 {
-   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, MonitorHost::getClientAddress(), jobid, block, task);
-
-   Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
+	subscribe( false);
 
    Wnd::closeEvent( event);
 }
 
-bool WndListenTask::caseMessage( af::Msg * msg)
+void WndListenTask::subscribe( bool i_subscribe)
 {
-//printf("MonOutput::caseMessage:\n");msg.stdOutData();
-   switch( msg->type())
-   {
-   case af::Msg::TTaskOutput:
-   {
-      af::MCTaskOutput mclass( msg);
-//mclass.stdOut( true );
-      if(( mclass.getJobId()     != jobid ) ||
-         ( mclass.getNumBlock()  != block ) ||
-         ( mclass.getNumTask()   != task  )) return false;
-      qTextEdit->append( afqt::dtoq( mclass.getData(), mclass.getDataSize()));
-      setWindowTitle( taskname.arg( afqt::stoq( mclass.getRenderName())));
-      break;
-   }
-   default:
-      return false;
-   }
-   return true;
+	std::ostringstream str;
+	af::jsonActionOperationStart( str,"monitors","watch","", MonitorHost::ids());
+	str << ",\"class\":\"listen\"";
+	str << ",\"job\":" << m_job_id;
+	str << ",\"block\":" << m_block;
+	str << ",\"task\":" << m_task;
+	str << ",\"status\":\"" << ( i_subscribe ? "subscribe":"unsubscribe") << "\"";
+	af::jsonActionOperationFinish( str);
+
+	Watch::sendMsg( af::jsonMsg( str));
+}
+
+bool WndListenTask::processEvents( const af::MonitorEvents & i_me)
+{
+	for( int i = 0; i < i_me.m_listens.size(); i++)
+	{
+		if( ( i_me.m_listens[i].job_id == m_job_id ) &&
+			( i_me.m_listens[i].block  == m_block  ) &&
+			( i_me.m_listens[i].task   == m_task   ))
+		{
+			qTextEdit->append( afqt::stoq( i_me.m_listens[i].output));
+			setWindowTitle( m_taskname.arg( afqt::stoq( i_me.m_listens[i].hostname)));
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void WndListenTask::v_connectionLost()

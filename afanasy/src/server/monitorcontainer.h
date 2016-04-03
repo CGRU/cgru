@@ -2,6 +2,7 @@
 
 #include "clientcontainer.h"
 
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "monitoraf.h"
@@ -33,6 +34,8 @@ public:
 
    void addUser( UserAf * i_user);
 
+	void addListened( const std::string & i_hostname, int i_j, int i_b, int i_t, const std::string & i_listened);
+
    void dispatch();
 
 private:
@@ -49,10 +52,12 @@ private:
 
 	std::list<UserAf*> m_usersJobOrderChanged;
 
+	std::vector<af::MonitorEvents::MListen> m_listens;
+
    void clearEvents();
 };
 
-/// Monitors interator.
+/// Monitors iterator.
 class MonitorContainerIt : public AfContainerIt
 {
 public:
