@@ -266,27 +266,25 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		else if( type == "monitors")
 		{
 			AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
-			if( mode == "events")
+			if( mode.size())
 			{
-				MonitorContainerIt it( i_args->monitors);
-				if( ids.size() )
+				MonitorAf * monitor = NULL;
+				if( ids.size() == 1 )
 				{
-					MonitorAf* node = it.getMonitor( ids[0]);
-					if( node != NULL )
-					{
-						o_msg_response = node->getEventsJSON();
-					}
-					else
-					{
+					MonitorContainerIt it( i_args->monitors);
+					monitor = it.getMonitor( ids[0]);
+					if( NULL == monitor )
 						o_msg_response = af::jsonMsg("{\"monitor\":{\"id\":0}}");
-					}
 				}
-				else
+				if( monitor )
 				{
-					o_msg_response = af::jsonMsgError("id is not specified");
+					if( mode == "events")
+						o_msg_response = monitor->getEventsJSON();
+					else if( mode == "log")
+						o_msg_response = monitor->writeLog( binary);
 				}
 			}
-			else
+			if( NULL == o_msg_response )
 				o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList, type, ids, mask, json);
 		}
 		else if( type == "files")

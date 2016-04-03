@@ -25,7 +25,8 @@ protected:
 
 private slots:
 //	void actSendMessage();
-   void actExit();
+	void actRequestLog();
+	void actExit();
 
 private:
    void calcTitle();

@@ -98,7 +98,7 @@ void MonitorAf::v_action( Action & i_action)
 				if( new_uid >= 0 )
 					m_uid = new_uid;
 			}
-			if( opclass == "jobs")
+			else if( opclass == "jobs")
 			{
 				eids.push_back( af::Monitor::EVT_jobs_add);
 				eids.push_back( af::Monitor::EVT_jobs_change);

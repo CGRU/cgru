@@ -224,12 +224,29 @@ QEnvironment::QEnvironment( const QString & i_name)
 
 
 	// Hotheys:
+	ms_hotkeys_names << "jobs_log";
+	ms_hotkeys_names << "jobs_show_err_hosts";
 	ms_hotkeys_names << "jobs_pause";
 	ms_hotkeys_names << "jobs_start";
 	ms_hotkeys_names << "jobs_reset_avoid_hosts";
 	ms_hotkeys_names << "jobs_restart_error_tasks";
 	ms_hotkeys_names << "jobs_delete";
 	ms_hotkeys_names << "jobs_delete_done";
+	ms_hotkeys_names << "renders_log";
+	ms_hotkeys_names << "renders_tasks_log";
+	ms_hotkeys_names << "renders_nimby";
+	ms_hotkeys_names << "renders_NIMBY";
+	ms_hotkeys_names << "renders_free";
+	ms_hotkeys_names << "renders_eject_all";
+	ms_hotkeys_names << "renders_eject_notmy";
+	ms_hotkeys_names << "users_log";
+	ms_hotkeys_names << "users_priority";
+	ms_hotkeys_names << "users_errors_forgive_time";
+	ms_hotkeys_names << "users_jobs_life_time";
+	ms_hotkeys_names << "users_solve_ordered";
+	ms_hotkeys_names << "users_solve_parallel";
+	ms_hotkeys_names << "monitors_log";
+	ms_hotkeys_names << "monitors_exit";
 	for( int i = 0; i < ms_hotkeys_names.size(); i++)
 	{
 		Attr * a = new Attr( ms_hotkeys_names.at(i),"","");

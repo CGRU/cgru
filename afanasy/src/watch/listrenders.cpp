@@ -8,6 +8,7 @@
 #include "../libafanasy/monitorevents.h"
 
 #include "actionid.h"
+#include "buttonpanel.h"
 #include "dialog.h"
 #include "itemrender.h"
 #include "ctrlrenders.h"
@@ -65,6 +66,31 @@ Sort & Filter Renders.\n\
 Press RMB for Options.\
 ");
 	ctrl->getLayout()->addWidget( control);
+
+	// Add left panel buttons:
+	ButtonPanel * bp;
+
+	bp = addButtonPanel("LOG","renders_log","Show render log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+
+	bp = addButtonPanel("TLG","renders_tasks_log","Show tasks log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestTasksLog()));
+
+	bp = addButtonPanel("nim","renders_nimby","Set nimby.","M");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNimby()));
+
+	bp = addButtonPanel("NIM","renders_NIMBY","Set NIMBY.","N");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actNIMBY()));
+
+	bp = addButtonPanel("FRE","renders_free","Set free.","F");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actFree()));
+
+	bp = addButtonPanel("EJA","renders_eject_all","Eject all tasks.","", true);
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectTasks()));
+
+	bp = addButtonPanel("EJN","renders_eject_notmy","Eject mot my tasks.","", true);
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
+
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));

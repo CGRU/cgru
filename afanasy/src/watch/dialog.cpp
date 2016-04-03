@@ -35,7 +35,7 @@
 #include <QtGui/QScrollArea>
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 int Dialog::ms_size_border_top   = 40;

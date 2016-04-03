@@ -14,7 +14,7 @@
 #include "../include/macrooutput.h"
 
 const int ButtonPanel::ms_Width  = 50;
-const int ButtonPanel::ms_Height = 30;
+const int ButtonPanel::ms_Height = 24;
 ButtonPanel * ButtonPanel::ms_button_hotkey = NULL;
 
 ButtonPanel::ButtonPanel(

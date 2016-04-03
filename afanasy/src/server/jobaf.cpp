@@ -1321,6 +1321,8 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 	{
 		std::list<std::string> list;
 		m_blocks[i_b]->m_tasks[i_t]->getErrorHostsList( list);
+		if( list.empty())
+			list.push_back("No error hosts.");
 		if( i_binary )
 		{
 			af::Msg * msg = new af::Msg;

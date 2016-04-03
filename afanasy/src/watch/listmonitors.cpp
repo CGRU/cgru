@@ -5,6 +5,7 @@
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/monitorevents.h"
 
+#include "buttonpanel.h"
 #include "itemmonitor.h"
 #include "ctrlsortfilter.h"
 #include "modelitems.h"
@@ -44,6 +45,17 @@ ListMonitors::ListMonitors( QWidget* parent):
 	ctrl->addFilterType( CtrlSortFilter::TADDRESS);
 	initSortFilterCtrl();
 
+
+	// Add left panel buttons:
+	ButtonPanel * bp;
+
+	bp = addButtonPanel("LOG","monitors_log","Show monitor log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+
+	bp = addButtonPanel("EXT","monitors_exit","Exit monitor.","", true);
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actExit()));
+
+
 	m_parentWindow->setWindowTitle("Monitors");
 
 	init();
@@ -57,11 +69,17 @@ void ListMonitors::contextMenuEvent( QContextMenuEvent *event)
 {
 	QMenu menu(this);
 	QAction *action;
+
+	action = new QAction( "Show Log", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
+	menu.addAction( action);
 /*
 	action = new QAction( "Send Message", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actSendMessage() ));
 	menu.addAction( action);
 */
+	menu.addSeparator();
+
 	action = new QAction( "Exit Monitor", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
 	menu.addAction( action);
@@ -146,5 +164,8 @@ void ListMonitors::actSendMessage()
 	action( mcgeneral, af::Msg::TMonitorMessage);
 }
 */
+
+void ListMonitors::actRequestLog() { getItemInfo("log"); }
+
 void ListMonitors::actExit() { operation("exit"); }
 

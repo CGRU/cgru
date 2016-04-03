@@ -5,8 +5,9 @@
 #include "../libafanasy/monitorevents.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
-#include "itemuser.h"
+#include "buttonpanel.h"
 #include "ctrlsortfilter.h"
+#include "itemuser.h"
 #include "modelnodes.h"
 #include "monitorhost.h"
 #include "viewitems.h"
@@ -45,6 +46,29 @@ ListUsers::ListUsers( QWidget* parent):
 	ctrl->addFilterType( CtrlSortFilter::TNAME);
 	ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
 	initSortFilterCtrl();
+
+
+	// Add left panel buttons:
+	ButtonPanel * bp;
+
+	bp = addButtonPanel("LOG","users_log","Show user log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+
+	bp = addButtonPanel("PRI","users_priority","Set user priority.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPriority()));
+
+	bp = addButtonPanel("FOR","users_errors_forgive_time","Set user errors forgive time.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actErrorsForgiveTime()));
+
+	bp = addButtonPanel("LIF","users_jobs_life_time","Set jobs life time.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actJobsLifeTime()));
+
+	bp = addButtonPanel("ORD","users_solve_ordered","Solve jobs by order.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsByOrder()));
+
+	bp = addButtonPanel("PAR","users_solve_parallel","Solve jobs parallel.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsParallel()));
+
 
 	m_parentWindow->setWindowTitle("Users");
 

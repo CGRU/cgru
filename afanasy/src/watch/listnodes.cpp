@@ -14,7 +14,7 @@
 #include <QtGui/QInputDialog>
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 uint32_t ListNodes::ms_flagsHideShow = e_HideHidden;

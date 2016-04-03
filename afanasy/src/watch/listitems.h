@@ -62,9 +62,9 @@ protected:
 
 	void getItemInfo( const std::string & i_mode);
 
-	inline void setParameter( const std::string & i_name, long long i_value) const
+	inline void setParameter( const std::string & i_name, long long i_value)
 		{ setParameter( i_name, af::itos( i_value), false);}
-	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true) const;
+	void setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted = true);
 
 	void operation( const std::string & i_operation);
 

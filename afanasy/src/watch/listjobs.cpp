@@ -81,13 +81,19 @@ Press RMB for Options.\
 	// Add left panel buttons:
 	ButtonPanel * bp;
 
+	bp = addButtonPanel("LOG","jobs_log","Show job log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+
+	bp = addButtonPanel("EHO","jobs_show_err_hosts","Show error hosts.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
+
 	bp = addButtonPanel("PAU","jobs_pause","Pause selected jobs.","P");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
 
 	bp = addButtonPanel("STA","jobs_start","Start selected jobs.","S");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
 
-	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset avoid hosts.","E");
+	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset error hosts.","E");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
 
 	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");

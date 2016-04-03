@@ -114,12 +114,18 @@ void ListItems::setAllowSelection( bool allow)
 	else        m_view->setSelectionMode( QAbstractItemView::NoSelection        );
 }
 
-Item* ListItems::getCurrentItem() const
+Item * ListItems::getCurrentItem() const
 {
 	QModelIndex index( m_view->selectionModel()->currentIndex());
-	if( false == index.isValid()) return NULL;
-	if( false == qVariantCanConvert<Item*>(index.data())) return NULL;
-	return qVariantValue<Item*>( index.data());
+	if( index.isValid())
+		if( qVariantCanConvert<Item*>(index.data()))
+			return qVariantValue<Item*>( index.data());
+
+	QList<Item*> items = getSelectedItems();
+	if( items.size())
+		return items[0];
+
+	return NULL;
 }
 
 int ListItems::getSelectedItemsCount() const
@@ -175,6 +181,8 @@ void ListItems::getItemInfo( const std::string & i_mode)
 
 //{"get":{"type":"renders","ids":[1],"mode":"log"}}
 
+	displayInfo(QString("GET: \"%1\"").arg( afqt::stoq(i_mode)));
+
 	std::ostringstream str;
 
 	str << "{\"get\":{";
@@ -187,8 +195,16 @@ void ListItems::getItemInfo( const std::string & i_mode)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted) const
+void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted)
 {
+	if( getSelectedItemsCount() == 0 )
+	{
+		displayWarning("No items selected.");
+		return;
+	}
+
+	displayInfo(QString("\"%1\" = \"%2\"").arg( afqt::stoq(i_name), afqt::stoq( i_value)));
+
 	std::ostringstream str;
 
 	af::jsonActionParamsStart( str, m_type, "", getSelectedIds());
