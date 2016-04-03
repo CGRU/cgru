@@ -60,7 +60,7 @@ ListUsers::ListUsers( QWidget* parent):
 	bp = addButtonPanel("FOR","users_errors_forgive_time","Set user errors forgive time.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actErrorsForgiveTime()));
 
-	bp = addButtonPanel("LIF","users_jobs_life_time","Set jobs life time.");
+	bp = addButtonPanel("LIFE","users_jobs_life_time","Set jobs life time.");
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actJobsLifeTime()));
 
 	bp = addButtonPanel("ORD","users_solve_ordered","Solve jobs by order.");
