@@ -20,6 +20,7 @@ const int ItemJobBlock::HeightFooter = 14;
 
 ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
    Item( afqt::stoq( block->getName()), ItemId),
+	job_id( block->getJobId()),
    numblock( block->getBlockNum()),
    info( this, block->getBlockNum(), block->getJobId()),
    listtasks( list)
@@ -40,7 +41,6 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    switch( type)
    {
    case af::Msg::TJob:
-//   case af::Msg::TJobRegister:
    case af::Msg::TBlocks:
 
       numeric           = block->isNumeric();
@@ -57,7 +57,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
       command           = afqt::stoq( block->getCmd());
-      workingdir        = afqt::stoq( block->getWDir());
+      workingdir        = block->getWDir();
       files             = block->getFiles();
       cmdpre            = afqt::stoq( block->getCmdPre());
       cmdpost           = afqt::stoq( block->getCmdPost());

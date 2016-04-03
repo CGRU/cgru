@@ -17,12 +17,12 @@
 
 const int ItemJobTask::WidthInfo = 98;
 
-ItemJobTask::ItemJobTask( ListTasks * i_list, const af::BlockData *pBlock, int numtask):
-	Item( afqt::stoq( pBlock->genTaskName( numtask)), ItemId),
+ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
+	Item( afqt::stoq( i_bdata->genTaskName( i_numtask)), ItemId),
 	m_list( i_list),
-	m_blocknum( pBlock->getBlockNum()),
-	m_tasknum( numtask),
-	m_block( pBlock),
+	m_blocknum( i_bdata->getBlockNum()),
+	m_tasknum( i_numtask),
+	m_block( i_block),
 	m_thumbs_num( 0),
 	m_thumbs_imgs( NULL)
 {
@@ -60,14 +60,14 @@ const QVariant ItemJobTask::getToolTip() const
 
 const QString ItemJobTask::getSelectString() const
 {
-	return afqt::stoq( m_block->genTaskName( m_tasknum));
+	return m_name;
 }
 
-const std::string & ItemJobTask::getWDir() const { return m_block->getWDir(); }
+const std::string & ItemJobTask::getWDir() const { return m_block->workingdir; }
 
-const std::vector<std::string> ItemJobTask::genFiles() const { return m_block->genFiles( m_tasknum); }
+const std::vector<std::string> & ItemJobTask::genFiles() const { return m_block->files; }
 
-int ItemJobTask::getFramesNum() const { return m_block->getFramePerTask();}
+int ItemJobTask::getFramesNum() const { return m_block->pertask;}
 
 void ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
@@ -84,7 +84,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	int percent       = taskprogress.percent;
 	int frame         = taskprogress.frame;
 	int percentframe  = taskprogress.percentframe;
-	int frames_num    = m_block->getFramePerTask();
+	int frames_num    = m_block->pertask;
 
 	QString leftString = m_name;
 
@@ -108,7 +108,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 		if( frame        <   0 )        frame =   0;
 		if( percentframe <   0 ) percentframe =   0;
 		if( percentframe > 100 ) percentframe = 100;
-		if( m_block->isNumeric())
+		if( m_block->numeric)
 		{
 			if( frames_num > 1)
 				leftString = QString("%1 - f%2/%3-%4%").arg(leftString).arg(frames_num).arg(frame).arg(percentframe);
@@ -173,7 +173,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	text_x -= ItemJobBlock::WErrors;
 
 	// Shift starts counter on a system job task:
-	if( m_block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 10;
+	if( m_block->job_id == AFJOB::SYSJOB_ID ) text_x -= 10;
 
 	painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
 	if( false == rightString.isEmpty() )
@@ -185,7 +185,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	}
 
 	// Shift starts counter on a system job task:
-	if( m_block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 60;
+	if( m_block->job_id == AFJOB::SYSJOB_ID ) text_x -= 60;
 
 	painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 
@@ -255,7 +255,7 @@ void ItemJobTask::showThumbnail()
 
 	std::ostringstream str;
 	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"files\"";
-	str << ",\"ids\":[" << m_block->getJobId() << "]";
+	str << ",\"ids\":[" << m_block->job_id << "]";
 	str << ",\"block_ids\":[" << m_blocknum << "]";
 	str << ",\"task_ids\":[" << m_tasknum << "]";
 	str << ",\"binary\":true}}";

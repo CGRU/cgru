@@ -158,36 +158,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 
 // ------------------------------------- Job -------------------------------//
-	case af::Msg::TJobRequestId:
-	{
-	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
-
-	  JobContainerIt jobsIt( i_args->jobs);
-	  JobAf* job = jobsIt.getJob( i_msg->int32());
-	  if( job == NULL )
-	  {
-		 o_msg_response = new af::Msg( af::Msg::TJobRequestId, 0);
-		 break;
-	  }
-	  o_msg_response = new af::Msg( af::Msg::TJob, job);
-	  break;
-	}
-	case af::Msg::TJobProgressRequestId:
-	{
-	  AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
-
-	  JobContainerIt jobsIt( i_args->jobs);
-	  JobAf* job = jobsIt.getJob( i_msg->int32());
-	  if( job == NULL )
-	  {
-		 // FIXME: Send back the same message on error - is it good?
-		 o_msg_response = new af::Msg( af::Msg::TJobProgressRequestId, 0);
-		 break;
-	  }
-	  o_msg_response = new af::Msg;
-	  job->writeProgress( *o_msg_response);
-	  break;
-	}
 	case af::Msg::TJobsWeightRequest:
 	{
 	  AfContainerLock jLock( i_args->jobs,	 AfContainerLock::READLOCK);

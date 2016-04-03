@@ -5,6 +5,7 @@
 #include "../libafanasy/taskprogress.h"
 
 #include "item.h"
+#include "itemjobblock.h"
 
 #include <QtGui/QImage>
 
@@ -13,20 +14,20 @@ class ListTasks;
 class ItemJobTask : public Item
 {
 public:
-	ItemJobTask( ListTasks * i_list, const af::BlockData *pBlock, int numtask);
+	ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata);
 	~ItemJobTask();
 
 	virtual bool calcHeight();
 
 	void upProgress( const af::TaskProgress & tp);
 
-	inline bool isBlockNumeric() const { return m_block->isNumeric();}
+	inline bool isBlockNumeric() const { return m_block->numeric;}
 
 	inline int getBlockNum() const { return m_blocknum; }
 	inline int getTaskNum()  const { return m_tasknum;  }
 
 	const std::string & getWDir() const;
-	const std::vector<std::string> genFiles() const;
+	const std::vector<std::string> & genFiles() const;
 	int getFramesNum() const;
 
 	af::TaskProgress taskprogress;
@@ -58,7 +59,7 @@ private:
 
 	int m_blocknum;
 	int m_tasknum;
-	const af::BlockData * m_block;
+	const ItemJobBlock * m_block;
 
 	int m_thumbs_num;
 	QImage ** m_thumbs_imgs;

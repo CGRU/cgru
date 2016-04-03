@@ -24,7 +24,7 @@ public:
 
    uint32_t state;
    QString  command;
-   QString  workingdir;
+   std::string workingdir;
    std::vector<std::string> files;
    QString  cmdpre;
    QString  environment;
@@ -42,6 +42,9 @@ public:
    long long last;      ///< Last tasks frame.
    long long pertask;   ///< Tasks frames per task.
    long long inc;       ///< Tasks frames increment.
+
+	int32_t job_id;
+	int32_t numblock;
 
    QString description;
 
@@ -95,7 +98,6 @@ private:
    int height;
    int width;
 
-   int numblock;
    QString  blockToolTip;
 
    BlockInfo info;

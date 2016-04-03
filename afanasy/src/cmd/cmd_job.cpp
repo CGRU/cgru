@@ -145,21 +145,15 @@ CmdJobId::CmdJobId()
 	setArgsCount(1);
 	setInfo("Get job.");
 	setHelp("jid [id] Get job with given id.");
-	setMsgType( af::Msg::TJobRequestId);
-	setMsgOutType( af::Msg::TJob);
+	setMsgType( af::Msg::TJSON);
 	setRecieving();
 }
 CmdJobId::~CmdJobId(){}
 bool CmdJobId::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"full\",\"ids\":[" << id << "]}}";
 	return true;
-}
-void CmdJobId::v_msgOut( af::Msg& msg)
-{
-	af::Job job( &msg);
-	job.v_stdOut( true);
 }
 
 CmdJobLog::CmdJobLog()
@@ -175,7 +169,7 @@ CmdJobLog::~CmdJobLog(){}
 bool CmdJobLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	int id = atoi(argv[0]);
-	m_str << "{\"get\":{\"type\":\"monitors\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
+	m_str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
 	return true;
 }
 
@@ -185,15 +179,14 @@ CmdJobProgress::CmdJobProgress()
 	setArgsCount(1);
 	setInfo("Get job progress.");
 	setHelp("jprog [id] Get progress job with given id.");
-	setMsgType( af::Msg::TJobProgressRequestId);
-	setMsgOutType( af::Msg::TJobProgress);
+	setMsgType( af::Msg::TJSON);
 	setRecieving();
 }
 CmdJobProgress::~CmdJobProgress(){}
 bool CmdJobProgress::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"progress\",\"ids\":[" << id << "]}}";
 	return true;
 }
 void CmdJobProgress::v_msgOut( af::Msg& msg)

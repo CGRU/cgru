@@ -102,10 +102,6 @@ public:
 /*- Job messages -*/
 /**/TJobsWeightRequest/**/,         ///< Request all jobs weight.
 
-/// Request a job with given id. The answer is TJob. If there is no job with such id the answer is TJobRequestId.
-/**/TJobRequestId/**/,
-/// Request a job progress with given id. The answer is TJobProgress. If there is no job with such id the answer is TJobProgressRequestId.
-/**/TJobProgressRequestId/**/,
 
 TRESERVED00,TRESERVED01,TRESERVED02,TRESERVED03,TRESERVED04,TRESERVED05,TRESERVED06,TRESERVED07,TRESERVED08,TRESERVED09,
 

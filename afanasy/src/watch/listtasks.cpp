@@ -55,7 +55,13 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 //   view->setUniformItemSizes( true);
 //   view->setBatchSize( 10000);
 
-	Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, m_job_id, true));
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"full\",\"binary\":true";
+	str << ",\"ids\":[" << m_job_id << "]}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	msg->setReceiving( true);
+	Watch::sendMsg( msg);
 
 	m_parentWindow->setWindowTitle( m_job_name);
 }
@@ -83,7 +89,7 @@ void ListTasks::construct( af::Job * job)
 		m_tasks[b] = new ItemJobTask*[m_tasks_num[b]];
 		for( int t = 0; t < m_tasks_num[b]; t++)
 		{
-			ItemJobTask *wtask =  new ItemJobTask( this, block, t);
+			ItemJobTask *wtask =  new ItemJobTask( this, m_blocks[b], t, block);
 			m_model->addItem( wtask);
 			if( m_blocks[b]->tasksHidded) m_view->setRowHidden( row , true);
 			row++;
@@ -280,7 +286,8 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 	{
 	case af::Msg::TJob:
 	{
-		af::Job * job = new af::Job( msg);
+		af::MCAfNodes mcnodes(msg);
+		af::Job * job = (af::Job*)(mcnodes.getNode(0));
 		if( job->getId() != m_job_id )
 		{
 			AFERROR(     "ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.")
@@ -292,7 +299,15 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		if( constructed == false)
 		{
 			construct( job);
-			Watch::sendMsg( new af::Msg( af::Msg::TJobProgressRequestId, m_job_id, true));
+
+			std::ostringstream str;
+			str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"progress\",\"binary\":true";
+			str << ",\"ids\":[" << m_job_id << "]}}";
+
+			af::Msg * msg = af::jsonMsg( str);
+			msg->setReceiving( true);
+			Watch::sendMsg( msg);
+
 			MonitorHost::addJobId( m_job_id);
 		}
 		else
@@ -325,7 +340,7 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		if( ids.hasId( m_job_id) == false) break;
 	}
 */
-	case af::Msg::TJobRequestId:
+/*	case af::Msg::TJobRequestId:
 	case af::Msg::TJobProgressRequestId:
 	{  // this messages sent if where is no job with given id.
 		printf("The job does not exist any more. Closing tasks window.\n");
@@ -333,6 +348,7 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		m_parentWindow->close();
 		break;
 	}
+*/
 /*
 	case af::Msg::TMonitorJobsAdd:
 	{
@@ -624,7 +640,7 @@ void ListTasks::actBlockCommand()
 void ListTasks::actBlockWorkingDir()
 {
 	bool ok;
-	QString cur = ((ItemJobBlock*)( getCurrentItem()))->workingdir;
+	QString cur = afqt::stoq(((ItemJobBlock*)( getCurrentItem()))->workingdir);
 	QString str = QInputDialog::getText(this, "Change Working Directory", "Enter Directory", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
 	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
@@ -688,7 +704,7 @@ void ListTasks::actBrowseFolder()
 	 case ItemJobBlock::ItemId:
 	 {
 		  ItemJobBlock *itemBlock = (ItemJobBlock*)item;
-		  af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", itemBlock->files);
+		  af::Service service( "service", itemBlock->workingdir, "", itemBlock->files);
 		  image = afqt::stoq( service.getFiles()[0]);
 		  wdir = afqt::stoq( service.getWDir());
 		  break;
