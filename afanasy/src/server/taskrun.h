@@ -47,7 +47,7 @@ public:
    virtual void skip(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Request to remote host to send output to specified address (or request not to do it).
-   void listen( af::MCListenAddress & mclisten, RenderContainer * renders);
+//	void listen( af::MCListenAddress & mclisten, RenderContainer * renders);
 
 	void listenOutput( bool i_subscribe);
 

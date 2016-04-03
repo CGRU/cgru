@@ -323,7 +323,7 @@ void TaskRun::skip( const std::string & message, RenderContainer * renders, Moni
    m_progress->state = m_progress->state | AFJOB::STATE_DONE_MASK;
    stop( message+" Is running.", renders, monitoring);
 }
-
+/*
 void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
 {
    if( m_zombie ) return;
@@ -338,7 +338,7 @@ void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
    RenderAf * render = rendersIt.getRender( m_hostId);
    if( render != NULL) render->sendOutput( mclisten, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
 }
-
+*/
 void TaskRun::listenOutput( bool i_subscribe)
 {
 	if( m_zombie ) return;

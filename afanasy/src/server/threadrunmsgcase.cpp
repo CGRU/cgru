@@ -2,7 +2,6 @@
 #include <stdlib.h>
 
 #include "../libafanasy/msgclasses/mcgeneral.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msg.h"
@@ -44,16 +43,6 @@ switch ( i_msg->type())
 		RenderContainerIt rendersIt( i_args->renders);
 		RenderAf* render = rendersIt.getRender( i_msg->int32());
 		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
-		break;
-	}
-	case af::Msg::TTaskListenOutput:
-	{
-		af::MCListenAddress mclass( i_msg);
-		JobContainerIt jobsIt( i_args->jobs);
-		JobAf* job = jobsIt.getJob( mclass.getJobId());
-		if( mclass.fromRender() == false ) mclass.setIP( i_msg->getAddress());
-		//mclass.v_stdOut();
-		if( job ) job->listenOutput( mclass, i_args->renders);
 		break;
 	}
 	case af::Msg::TTaskUpdatePercent:

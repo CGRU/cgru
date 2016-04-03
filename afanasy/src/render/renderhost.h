@@ -2,8 +2,6 @@
 
 #include "../libafanasy/common/dlRWLock.h"
 
-#include "../libafanasy/msgclasses/mclistenaddress.h"
-
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
 
@@ -51,10 +49,6 @@ public:
     static void closeTask( const af::MCTaskPos & i_taskpos);
 
     static void getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg);
-
-    static void listenTasks( const af::MCListenAddress & i_mcaddr);
-
-    static void listenFailed( const af::Address & i_addr);
 
 //    inline static void   lockMutex() { ms_obj->m_mutex.WriteLock();  }
 //    inline static void unLockMutex() { ms_obj->m_mutex.WriteUnlock();}

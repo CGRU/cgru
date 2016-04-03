@@ -8,7 +8,6 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "afnodesrv.h"
-#include "listeners.h"
 
 class Action;
 class Block;
@@ -76,7 +75,6 @@ public:
     virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Send tasks output to a specified address.
-	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 	void listenOutput( bool i_subscribe, int i_block, int i_task);
 
 	void skipTasks(    const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Skip some tasks.
@@ -135,8 +133,6 @@ private:
 
 	std::list<RenderAf*> renders_ptrs;
 	std::list<int> renders_counts;
-
-	Listeners listeners;     ///> Addresses to send task output to.
 
 	UserAf * m_user;
 

@@ -61,8 +61,6 @@ public:
 /// Get host parameters from farm.
 	bool getFarmHost( af::Host * newHost = NULL);
 
-	void sendOutput( af::MCListenAddress & mclisten, int JobId, int Block, int Task);
-
 /// Deregister render, on SIGINT client recieving.
 	void deregister( JobContainer * jobs, MonitorContainer * monitoring );
 

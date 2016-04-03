@@ -2,8 +2,6 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
-#include "../libafanasy/msgclasses/mctaskoutput.h"
 
 #include "monitorhost.h"
 #include "watch.h"

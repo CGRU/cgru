@@ -460,11 +460,6 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 	i_str << "\n]}";
 }
 
-void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
-{
-   if( m_run) m_run->listen( mclisten, renders);
-}
-
 void Task::listenOutput( bool i_subscribe)
 {
 	if( i_subscribe == m_listen )

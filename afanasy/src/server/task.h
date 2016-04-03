@@ -66,7 +66,6 @@ public:
 	af::Msg * getStoredFiles() const;
 	void getStoredFiles( std::ostringstream & i_str) const;
 
-	void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 	void listenOutput( bool i_subscribe);
 
 	void stdOut( bool full = false) const;

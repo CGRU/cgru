@@ -283,42 +283,6 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
     i_taskpos.v_stdOut();
 }
 
-void RenderHost::listenTasks( const af::MCListenAddress & i_mcaddr)
-{
-    for( int t = 0; t < ms_tasks.size(); t++)
-    {
-        if( i_mcaddr.justTask())
-        {
-            if( ms_tasks[t]->is( i_mcaddr.getJobId(), i_mcaddr.getNumBlock(), i_mcaddr.getNumTask(), 0))
-            {
-                if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
-                else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
-                i_mcaddr.v_stdOut();
-            }
-        }
-        else
-        {
-            if( ms_tasks[t]->is( i_mcaddr.getJobId()))
-            {
-                if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
-                else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
-                i_mcaddr.v_stdOut();
-            }
-        }
-    }
-}
-
-void RenderHost::listenFailed( const af::Address & i_addr)
-{
-    int lasttasknum = -1;
-    for( int t = 0; t < ms_tasks.size(); t++) if( (ms_tasks[t])->removeListenAddress( i_addr)) lasttasknum = t;
-    if( lasttasknum != -1)
-    {
-        af::MCListenAddress mclass( af::MCListenAddress::FROMRENDER, i_addr, ms_tasks[lasttasknum]->exec()->getJobId());
-        dispatchMessage( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
-    }
-}
-
 void RenderHost::getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg)
 {
     for( int t = 0; t < ms_tasks.size(); t++)

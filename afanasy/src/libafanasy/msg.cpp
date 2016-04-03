@@ -576,12 +576,10 @@ const char * Msg::TNAMES[]=
 	"TBlocks",                    ///< Blocks data.
 
 	"TTask",                      ///< A task of some job.
-	"TTaskOutputRequest",         ///< Job task output request.
+	"TTaskOutputRequest",         ///< Request task output from render ( by gui thought server ).
 	"TTaskUpdatePercent",         ///< New progress percentage for task.
 	"TTaskUpdateState",           ///< New state for task.
-	"TTaskListenOutput",          ///< Request to send task output to provided address.
 	"TTaskFiles",                 ///< Task (or entire job) files
-	"TTaskOutput",                ///< Job task output data (for task listening: from afrender directly to afwatch).
 
 	"TRESERVED10",
 	"TRESERVED11",

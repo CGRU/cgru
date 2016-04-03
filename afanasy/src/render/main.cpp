@@ -200,10 +200,6 @@ printf("msgCase: "); msg->stdOut();
 			// Message was failed to send to server
 			RenderHost::connectionLost();
 		}
-		else if( msg->type() == af::Msg::TTaskOutput )
-		{
-			RenderHost::listenFailed( msg->getAddress());
-		}
 		delete msg;
 		return;
 	}
@@ -300,12 +296,6 @@ printf("msgCase: "); msg->stdOut();
 	{
 		af::MCTaskPos taskpos( msg);
 		RenderHost::closeTask( taskpos);
-		break;
-	}
-	case af::Msg::TTaskListenOutput:
-	{
-		af::MCListenAddress mcaddr( msg);
-		RenderHost::listenTasks( mcaddr);
 		break;
 	}
 	case af::Msg::TRenderLaunch:

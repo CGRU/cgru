@@ -205,7 +205,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  o_msg_response = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
 	}
 	case af::Msg::TTaskUpdatePercent:
-	case af::Msg::TTaskListenOutput:
 	case af::Msg::TRenderDeregister:
 	case af::Msg::TMonitorDeregister:
 	{

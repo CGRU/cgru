@@ -18,8 +18,6 @@ extern void (*fp_setupChildProcess)( void);
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
-#include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "renderhost.h"
@@ -387,23 +385,8 @@ void TaskProcess::readProcess( const std::string & i_mode, bool i_read_empty)
 
 	m_parser->read( i_mode, output);
 
-	// Send data to listening sockets, it not empty
-	if( output.size() && m_taskexec->getListenAddressesNum())
+	if( output.size() && m_taskexec->isListening())
 	{
-		af::MCTaskOutput mctaskoutput( RenderHost::getName(),
-			m_taskexec->getJobId(),
-			m_taskexec->getBlockNum(),
-			m_taskexec->getTaskNum(),
-			output.size(), output.data());
-		af::Msg * msg = new af::Msg( af::Msg::TTaskOutput, &mctaskoutput);
-		msg->setAddresses( *m_taskexec->getListenAddresses());
-		RenderHost::dispatchMessage( msg);
-	}
-
-	if( m_taskexec->isListening())
-	{
-		printf("We are listening:\n");
-		printf("%s\n", output.c_str());
 		m_listened += output;
 	}
 

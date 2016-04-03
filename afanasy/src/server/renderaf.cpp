@@ -3,7 +3,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/farm.h"
 
 #include "action.h"
@@ -749,13 +748,6 @@ void RenderAf::notSolved()
 		m_task_start_finish_time = time( NULL);
 		store();
 	}
-}
-
-void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block, int Task)
-{
-	af::Msg * msg = new af::Msg( af::Msg::TTaskListenOutput, &mclisten);
-	msg->setAddress( this);
-	ms_msg_queue->pushMsg( msg);
 }
 
 void RenderAf::appendTasksLog( const std::string & message)

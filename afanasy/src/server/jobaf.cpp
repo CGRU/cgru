@@ -6,7 +6,6 @@
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/jobprogress.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgqueue.h"
 
 #include "action.h"
@@ -912,7 +911,6 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		// Job successfully solved (produced a task)
 		task_exec->setJobName( m_name);
 		task_exec->setUserName( m_user_name);
-		listeners.process( *task_exec);
 
 		// Job was not able to start a task.
 		// This should not happen.
@@ -1440,27 +1438,6 @@ af::Msg * JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i
 	return m_blocks[i_b]->m_tasks[i_t]->getOutput( i_n, i_renders, o_filename, o_error);
 }
 
-void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
-{
-//printf("JobAf::listenOutput: (%s) ", onoff?"ON":"OFF");address->stdOut();printf(", jobid=%d:\n", id);
-	if( listeners.process( mclisten) == false )
-	{
-		return;
-	}
-
-   if( mclisten.justTask())
-   {
-      checkBlockTaskNumbers( mclisten.getNumBlock(), mclisten.getNumTask(), "listenOutput");
-	  m_blocks[mclisten.getNumBlock()]->m_tasks[mclisten.getNumTask()]->listenOutput( mclisten, renders);
-   }
-   else
-   {
-      for( int b = 0; b < m_blocks_num; b++)
-         for( int t = 0; t < m_blocks_data[b]->getTasksNum(); t++)
-			m_blocks[b]->m_tasks[t]->listenOutput( mclisten, renders);
-   }
-}
-
 void JobAf::listenOutput( bool i_subscribe, int i_block, int i_task)
 {
 	if(( i_block > 0 ) && ( i_task > 0 ))
@@ -1524,8 +1501,6 @@ int JobAf::v_calcWeight() const
       m_blackListsWeight += m_blocks[b]->blackListWeight();
       m_logsWeight += m_blocks[b]->logsWeight();
    }
-
-   weight += listeners.calcWeight();
 
    weight += m_blackListsWeight;
    weight += m_logsWeight;
