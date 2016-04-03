@@ -137,7 +137,6 @@ void MonitorAf::v_action( Action & i_action)
 				af::jr_int32("job",   job_id, operation);
 				af::jr_int32("block", block,  operation);
 				af::jr_int32("task",  task,   operation);
-printf("MonitorAf::v_action: listen: j%d b%d t%d:%d\n", job_id, block, task, subscribe);
 
 				JobContainerIt jobsIt( i_action.jobs);
 				JobAf * job = jobsIt.getJob( job_id);

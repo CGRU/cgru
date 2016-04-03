@@ -14,12 +14,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-WndListenTask::WndListenTask( int i_job_id, int i_block, int i_task, const QString & i_taskname):
+WndListenTask::WndListenTask( int i_job_id, int i_block, int i_task, const QString & i_name):
    WndText("Listen Task"),
    m_job_id(i_job_id),
    m_block(i_block),
    m_task(i_task),
-   m_taskname(i_taskname)
+   m_name(i_name)
 {
 #if QT_VERSION >= 0x040300
    layout->setContentsMargins( 5, 5, 5, 5);
@@ -34,8 +34,12 @@ WndListenTask::WndListenTask( int i_job_id, int i_block, int i_task, const QStri
    cursor.setBlockFormat( blockFormat);
    qTextEdit->setTextCursor( cursor);
    qTextEdit->setWordWrapMode( QTextOption::NoWrap);
-   setWindowTitle( m_taskname);
-   m_taskname += " %1:";
+
+	m_name = QString("Listening \"%1\"").arg( m_name);
+
+   setWindowTitle( m_name);
+
+	m_name += " %1:";
 
 	subscribe( true);
 }
@@ -74,7 +78,7 @@ bool WndListenTask::processEvents( const af::MonitorEvents & i_me)
 			( i_me.m_listens[i].task   == m_task   ))
 		{
 			qTextEdit->append( afqt::stoq( i_me.m_listens[i].output));
-			setWindowTitle( m_taskname.arg( afqt::stoq( i_me.m_listens[i].hostname)));
+			setWindowTitle( m_name.arg( afqt::stoq( i_me.m_listens[i].hostname)));
 
 			return true;
 		}

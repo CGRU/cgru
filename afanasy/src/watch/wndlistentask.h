@@ -8,7 +8,7 @@
 class WndListenTask : public WndText, public Receiver
 {
 public:
-	WndListenTask( int i_job_id, int i_block, int i_task, const QString & i_taskname);
+	WndListenTask( int i_job_id, int i_block, int i_task, const QString & i_name);
    ~WndListenTask();
 
 	bool processEvents( const af::MonitorEvents & i_me);
@@ -25,5 +25,5 @@ private:
    int m_job_id;
    int m_block;
    int m_task;
-   QString m_taskname;
+   QString m_name;
 };

@@ -8,10 +8,10 @@
 class WndListenJob : public WndText, public Receiver
 {
 public:
-   WndListenJob( int JobId, const QString & Name);
+	WndListenJob( int i_job_id, const QString & i_name);
    ~WndListenJob();
 
-   bool caseMessage( af::Msg * msg);
+	bool processEvents( const af::MonitorEvents & i_me);
 
    void v_connectionLost();
 
@@ -19,6 +19,9 @@ protected:
    void closeEvent( QCloseEvent * event);
 
 private:
-   int jobid;
-   QString jobname;
+	void subscribe( bool i_subscribe);
+
+private:
+	int m_job_id;
+	QString m_name;
 };

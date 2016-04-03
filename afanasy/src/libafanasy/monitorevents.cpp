@@ -52,7 +52,6 @@ void MonitorEvents::addListened( MListen i_listen)
 	}
 
 	m_listens.push_back( i_listen);
-printf("MonitorEvents::addListened: m_listens.size() = %d\n", m_listens.size());
 }
 
 void MonitorEvents::v_readwrite( Msg * msg)

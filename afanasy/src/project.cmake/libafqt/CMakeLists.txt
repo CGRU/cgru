@@ -5,8 +5,6 @@ find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork REQUIRED)
 include(${QT_USE_FILE})
 
 set(moc_hdr
- "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/qserver.h"
- "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/qserverthread.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/qthreadclient.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/qthreadclientsend.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/qthreadclientup.h"

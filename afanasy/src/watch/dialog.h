@@ -2,7 +2,6 @@
 
 #include "../libafanasy/msgclasses/msgclassuserhost.h"
 
-#include "../libafqt/qserver.h"
 #include "../libafqt/qthreadclientsend.h"
 #include "../libafqt/qthreadclientup.h"
 
