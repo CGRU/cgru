@@ -73,7 +73,7 @@ void MonitorAf::v_action( Action & i_action)
 		af::jr_string("type", optype, operation);
 		if( optype == "exit")
 		{
-			m_e.addInstruction("exit");
+			af::addUniqueToVect( m_e.m_instructions,"exit");
 			return;
 		}
 		if( optype == "deregister")

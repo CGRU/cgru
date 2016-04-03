@@ -148,6 +148,7 @@ namespace af
 
 	bool addUniqueToList( std::list<int32_t> & o_list, int i_value);
 	bool addUniqueToVect( std::vector<int> & o_vect, int i_value);
+	bool addUniqueToVect( std::vector<std::string> & o_vect, const std::string & i_str);
 
 	void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
@@ -261,7 +262,6 @@ namespace af
 
 
 	// JSON:
-	const std::string jsonMakeHeader( int size);
 	char * jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err = NULL);
 	char * jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err = NULL);
 	bool jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str = NULL);

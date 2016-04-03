@@ -175,16 +175,16 @@ void DBQueue::addTask(
 
 void DBQueue::sendAlarm()
 {
-	std::string str("ALARM! Server database connection error. Contact your system administrator.");
+	std::string str("ALARM! Server statistics database connection error. Contact your system administrator.");
 	AFCommon::QueueLog( name + ":\n" + str);
-//	AfContainerLock mLock( m_monitors, AfContainerLock::WRITELOCK);
-//	m_monitors->sendMessage( str);
+	AfContainerLock mLock( m_monitors, AfContainerLock::WRITELOCK);
+	m_monitors->announce( str);
 }
 
 void DBQueue::sendConnected()
 {
 	std::string str("AFANASY: Server database connection established.");
 	AFCommon::QueueLog( name + ":\n" + str);
-//	AfContainerLock mLock( m_monitors, AfContainerLock::WRITELOCK);
-//	m_monitors->sendMessage( str);
+	AfContainerLock mLock( m_monitors, AfContainerLock::WRITELOCK);
+	m_monitors->announce( str);
 }

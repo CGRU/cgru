@@ -307,6 +307,15 @@ bool af::addUniqueToVect( std::vector<int> & o_vect, int i_value)
 	return true;
 }
 
+bool af::addUniqueToVect( std::vector<std::string> & o_vect, const std::string & i_str)
+{
+	for( int i = 0; i < o_vect.size(); i++)
+		if( o_vect[i] == i_str)
+			return false;
+	o_vect.push_back( i_str);
+	return true;
+}
+
 const std::string af::fillNumbers( const std::string & i_pattern, long long i_start, long long i_end)
 {
 	std::string str;

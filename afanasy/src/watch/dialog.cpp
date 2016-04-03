@@ -12,7 +12,6 @@
 #include "actionid.h"
 #include "buttonmonitor.h"
 #include "buttonout.h"
-#include "labelversion.h"
 #include "listitems.h"
 #include "listjobs.h"
 #include "listusers.h"
@@ -304,9 +303,9 @@ void Dialog::newMessage( af::Msg *msg)
     {
         std::string str = msg->getString();
         if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
-            m_labelversion->showMessage( str);
+            announce( str);
         else
-            new WndText( "Message", msg);
+            new WndText("Annoncement", msg);
         break;
     }
 	case af::Msg::TTaskFiles:

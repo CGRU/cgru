@@ -22,7 +22,8 @@ public:
 
 //   void sendMessage( const af::MCGeneral & i_mcgeneral);
 
-//   void sendMessage( const std::string & i_str);
+	// Send message to all monitors:
+	inline void announce( const std::string & i_str) { m_announcement = i_str;}
 
    void addEvent( int i_type, int i_nodeId);
 
@@ -53,6 +54,8 @@ private:
 	std::list<UserAf*> m_usersJobOrderChanged;
 
 	std::vector<af::MonitorEvents::MListen> m_listens;
+
+	std::string m_announcement;
 
    void clearEvents();
 };

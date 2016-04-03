@@ -47,6 +47,8 @@ public:
 	bool isListening( const af::MonitorEvents::MListen & i_listen) const;
 	inline void addListened( const af::MonitorEvents::MListen & i_listen) { m_e.addListened( i_listen); }
 
+	inline void announce( const std::string & i_str) { m_e.m_announcement = i_str; }
+
 private:
 	void setEvents( const std::vector<int32_t> & i_ids, bool value);
 	void addJobIds( const std::vector<int32_t> & i_ids);

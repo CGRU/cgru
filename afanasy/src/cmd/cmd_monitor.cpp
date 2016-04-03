@@ -44,3 +44,21 @@ bool CmdMonitorLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 	return true;
 }
 
+CmdMonitorMsg::CmdMonitorMsg()
+{
+   setCmd("mmsg");
+   setArgsCount(1);
+   setInfo("Send message to all GUI monitors.");
+   setHelp("mmsg [message]");
+	setMsgType( af::Msg::TJSON);
+	setRecieving();
+}
+
+CmdMonitorMsg::~CmdMonitorMsg(){}
+
+bool CmdMonitorMsg::v_processArguments( int argc, char** argv, af::Msg &msg)
+{
+	m_str << "{\"announce\":\"" << argv[0] <<"\"}";
+
+   return true;
+}

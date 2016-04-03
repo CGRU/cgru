@@ -2,7 +2,6 @@
 
 #include "cmd_arguments.h"
 
-#include "cmd_msg.h"
 #include "cmd_text.h"
 #include "cmd_test.h"
 #include "cmd_confirm.h"
@@ -40,7 +39,6 @@ void AfCmd::RegisterCommands()
 	addCmd( new CmdFork);
 #endif
 
-	addCmd( new CmdMsg);
 	addCmd( new CmdText);
 	addCmd( new CmdTest);
 	addCmd( new CmdTextGenerate);
@@ -50,6 +48,7 @@ void AfCmd::RegisterCommands()
 
 	addCmd( new CmdMonitorList);
 	addCmd( new CmdMonitorLog);
+	addCmd( new CmdMonitorMsg);
 
 	addCmd( new CmdRenderList);
 	addCmd( new CmdRenderPriority);

@@ -48,13 +48,13 @@ public:
 	};
 	std::vector<MListen> m_listens;
 
+	std::string m_announcement;
+
 public:
 
 	bool isEmpty() const;
 
 	void addListened( MListen i_listen);
-
-	void addInstruction( const std::string & i_str);
 
 	void jsonWrite( std::ostringstream & o_str) const;
 

@@ -183,6 +183,7 @@ void Watch::caseMessage( af::Msg * msg)
 		msg->resetWrittenSize();
 		af::MonitorEvents me( msg);
 
+		// General instructions for an application:
 		for( int i = 0; i < me.m_instructions.size(); i++)
 		{
 			if( me.m_instructions[i] == "exit")
@@ -193,10 +194,24 @@ void Watch::caseMessage( af::Msg * msg)
 			}
 		}
 
+		// Let all receivers to process events:
 		for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 		{
 			msg->resetWrittenSize();
 			if( (*rIt)->processEvents( me) && (false == received)) received = true;
+		}
+
+		if( me.m_announcement.size())
+		{
+			if( LabelVersion::getStringStatus( me.m_announcement) != LabelVersion::SS_None )
+				ms_d->announce( me.m_announcement);
+			else
+			{
+				WndText * wnd = new WndText("Annoncement");
+				wnd->insertText( afqt::stoq( me.m_announcement));
+			}
+
+			received = true;
 		}
 	}
 

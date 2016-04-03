@@ -29,15 +29,6 @@ MonitorEvents::~MonitorEvents()
 {
 }
 
-void MonitorEvents::addInstruction( const std::string & i_str)
-{
-	for( int i = 0; i < m_instructions.size(); i++)
-		if( i_str == m_instructions[i])
-			return;
-
-	m_instructions.push_back( i_str);
-}
-
 void MonitorEvents::addListened( MListen i_listen)
 {
 	for( int i = 0; i < m_listens.size(); i++)
@@ -115,6 +106,8 @@ void MonitorEvents::v_readwrite( Msg * msg)
 		rw_String ( m_listens[i].hostname, msg);
 		rw_String ( m_listens[i].output,   msg);
 	}
+
+	rw_String( m_announcement, msg);
 }
 
 void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
@@ -276,6 +269,8 @@ void MonitorEvents::clear()
 	m_instructions.clear();
 
 	m_listens.clear();
+
+	m_announcement.clear();
 }
 
 bool MonitorEvents::isEmpty() const
@@ -291,6 +286,8 @@ bool MonitorEvents::isEmpty() const
 	if( m_jobs_order_ids.size()) return false;
 
 	if( m_instructions.size()) return false;
+
+	if( m_announcement.size()) return false;
 
 	return true;
 }

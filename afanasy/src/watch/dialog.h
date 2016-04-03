@@ -6,6 +6,7 @@
 #include "../libafqt/qthreadclientup.h"
 
 #include "infoline.h"
+#include "labelversion.h"
 #include "watch.h"
 
 #include <QtGui/QBoxLayout>
@@ -39,6 +40,8 @@ public:
     void inline displayInfo(    const QString &message) { m_infoline->displayInfo(    message); }
     void inline displayWarning( const QString &message) { m_infoline->displayWarning( message); }
     void inline displayError(   const QString &message) { m_infoline->displayError(   message); }
+
+	void inline announce( const std::string & i_str) { m_labelversion->showMessage( i_str);}
 
     void sendMsg( af::Msg * msg);
 

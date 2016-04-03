@@ -400,6 +400,16 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				"Failed, see server logs fo details.");
 		}
 	}
+	else if( document.HasMember("announce"))
+	{
+		std::string text;
+		af::jr_string("announce", text, document);
+		if( text.size())
+		{
+			i_args->monitors->announce( text);
+			o_msg_response = af::jsonMsgStatus( true,"announce","OK");
+		}
+	}
 	else if( document.HasMember("save"))
 	{
 		o_msg_response = jsonSaveObject( document);
