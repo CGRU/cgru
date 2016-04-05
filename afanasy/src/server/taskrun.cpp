@@ -245,6 +245,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    // Tasks update timeout check:
    if(( m_stopTime == 0) && ( currentTime > m_progress->time_done + af::Environment::getTaskUpdateTimeout()))
    {
+		//printf("Task update timeout: %d > %d+%d\n", currentTime, m_progress->time_done, af::Environment::getTaskUpdateTimeout());
       stop("Task update timeout.", renders, monitoring);
       errorHostId = m_hostId;
    }
@@ -262,7 +263,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 
 void TaskRun::stop( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
-//printf("TaskRun::stop: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
+//printf("TaskRun::stop: %s[%d][%d] HostID=%d: %s\n", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum, m_hostId, message.c_str());
    if( m_zombie ) return;
    if( m_stopTime ) return;
    if( m_exec == NULL)

@@ -139,19 +139,29 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 	}
 }
 
-bool RenderAf::update( const af::Render * render)
+af::Msg * RenderAf::update( const af::RenderUpdate & i_up)
 {
-	if( isOffline()) return false;
-	if( render == NULL )
+	updateTime();
+
+	if( i_up.hasResources())
+		m_hres.copy( *i_up.getResources());
+
+	if( i_up.m_taskups.size())
+		for( int i = 0; i < i_up.m_taskups.size(); i++)
+			if( i_up.m_taskups[i]->getStatus() > af::TaskExec::UPWarning )
+				m_re.addTaskClose( af::MCTaskPos( *i_up.m_taskups[i]));
+
+	if( m_re.isEmpty())
 	{
-		AFERROR("Render::update( Render * render): render == NULL")
-		return false;
+		// If there is no new events just return its id back.
+		return new af::Msg( af::Msg::TRenderId, getId());
 	}
 
-	m_hres.copy( render->getHostRes());
+	af::Msg * msg = new af::Msg( af::Msg::TRenderEvents, &m_re);
 
-	updateTime();
-	return true;
+	m_re.clear();
+
+	return msg;
 }
 
 bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
@@ -161,24 +171,31 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 		AFERROR("RenderAf::online: Render is already online.")
 		return false;
 	}
+
 	m_idle_time = time( NULL);
 	m_busy_time = m_idle_time;
 	setBusy( false);
 	setWOLSleeping( false);
 	setWOLWaking( false);
 	setWOLFalling( false);
-	m_address.copy( render->getAddress());
-	grabNetIFs( render->m_netIFs);
 	m_time_launch = render->m_time_launch;
 	m_engine = render->m_engine;
 	m_task_start_finish_time = 0;
+	m_address.copy( render->getAddress());
+	grabNetIFs( render->m_netIFs);
 	getFarmHost( &render->m_host);
 	setOnline();
-	update( render);
-	std::string str = "Online e'" + m_engine + "'.";
+	updateTime();
+	m_hres.copy( render->getHostRes());
+
+	std::string str = "Online '" + m_engine + "'.";
 	appendLog( str);
-	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+
+	if( monitoring )
+		monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
+
 	store();
+
 	return true;
 }
 
@@ -212,9 +229,10 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
 	if( start)
 	{
-		af::Msg* msg = new af::Msg( af::Msg::TTask, taskexec);
+/*		af::Msg* msg = new af::Msg( af::Msg::TTask, taskexec);
 		msg->setAddress( this);
-		ms_msg_queue->pushMsg( msg);
+		ms_msg_queue->pushMsg( msg);*/
+		m_re.m_tasks.push_back( taskexec);
 		std::string str = "Starting task: ";
 		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
@@ -267,7 +285,7 @@ void RenderAf::v_action( Action & i_action)
 		{
 			if( false == isOnline()) return;
 			appendLog("Exit by " + i_action.author);
-			exitClient( af::Msg::TRenderExitRequest, i_action.jobs, i_action.monitors);
+			exitClient("exit", i_action.jobs, i_action.monitors);
 			return;
 		}
 		else if( type == "launch_cmd")
@@ -316,14 +334,14 @@ void RenderAf::v_action( Action & i_action)
 		{
 			if( false == isOnline() ) return;
 			appendLog( std::string("Reboot computer by ") + i_action.author);
-			exitClient( af::Msg::TRenderRebootRequest, i_action.jobs, i_action.monitors);
+			exitClient("reboot", i_action.jobs, i_action.monitors);
 			return;
 		}
 		else if( type == "shutdown")
 		{
 			if( false == isOnline() ) return;
 			appendLog( std::string("Shutdown computer by ") + i_action.author);
-			exitClient( af::Msg::TRenderShutdownRequest, i_action.jobs, i_action.monitors);
+			exitClient("shutdown", i_action.jobs, i_action.monitors);
 			return;
 		}
 		else if( type == "wol_sleep")
@@ -402,27 +420,24 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
 	}
 }
 
-void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * monitoring)
+void RenderAf::exitClient( const std::string & i_type, JobContainer * i_jobs, MonitorContainer * i_monitoring)
 {
 	if( false == isOnline() ) return;
-	af::Msg* msg = new af::Msg( type);
-	msg->setAddress( this);
-	ms_msg_queue->pushMsg( msg);
-	offline( jobs, af::TaskExec::UPRenderExit, monitoring);
+
+	m_re.m_instruction = i_type;
+
+//	offline( i_jobs, af::TaskExec::UPRenderExit, i_monitoring);
 }
 
 void RenderAf::launchAndExit( const std::string & i_cmd, bool i_exit, JobContainer * i_jobs, MonitorContainer * i_monitoring)
 {
-	af::MCGeneral mcgen( i_cmd);
-	af::Msg * msg;
-	if( i_exit )
-		msg = new af::Msg( af::Msg::TRenderLaunchAndExit, &mcgen);
-	else
-		msg = new af::Msg( af::Msg::TRenderLaunch, &mcgen);
-	msg->setAddress( this);
-	ms_msg_queue->pushMsg( msg);
-	if( i_exit )
-		offline( i_jobs, af::TaskExec::UPRenderExit, i_monitoring);
+	if( false == isOnline() ) return;
+
+	m_re.m_instruction = ( i_exit ? "launch_exit" : "launch");
+	m_re.m_command = i_cmd;
+
+//	if( i_exit )
+//		offline( i_jobs, af::TaskExec::UPRenderExit, i_monitoring);
 }
 
 void RenderAf::wolSleep( MonitorContainer * monitoring)
@@ -461,10 +476,15 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 
 	std::ostringstream str;
 	v_jsonWrite( str, af::Msg::TRendersList);
+
+	m_re.m_instruction = "sleep";
+	m_re.m_command = str.str();
+/*
 	af::MCGeneral mg( str.str());
 	af::Msg* msg = new af::Msg( af::Msg::TRenderWOLSleepRequest, &mg);
 	msg->setAddress( this);
 	ms_msg_queue->pushMsg( msg);
+*/
 }
 
 void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_msg)
@@ -503,11 +523,10 @@ void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_
 
 void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
 {
+	//printf("RenderAf::stopTask: j%d b%d t%d n%d\n", jobid, blocknum, tasknum, number);
 	if( isOffline()) return;
-	af::MCTaskPos taskpos( jobid, blocknum, tasknum, number);
-	af::Msg* msg = new af::Msg( af::Msg::TRenderStopTask, &taskpos);
-	msg->setAddress( this);
-	ms_msg_queue->pushMsg( msg);
+
+	m_re.addTaskStop( af::MCTaskPos( jobid, blocknum, tasknum, number));
 }
 
 void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring)
@@ -972,10 +991,7 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 	stream << "[" << taskup.getNumJob() << "][" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "](" << taskup.getNumBlock() << ")";
 	AFCommon::QueueLogError( stream.str());
 
-	af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
-	af::Msg* msg = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
-	msg->setAddress( render);
-	ms_msg_queue->pushMsg( msg);
+	render->m_re.addTaskClose( taskup);
 }
 
 af::Msg * RenderAf::writeFullInfo( bool i_binary) const

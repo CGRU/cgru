@@ -120,12 +120,15 @@
 		"":"if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;",
 		"":"if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;",
 
-	"af_render_update_sec":5,
-		"":"Render resources update interval.",
+	"af_render_get_server_period":1,
+		"":"Render resources update period (seconds).",
+
+	"af_render_get_resources_period":5,
+		"":"Render resources update period (seconds).",
 
 	"af_render_zombietime":60,
 		"":"If render will not send update its resources for this time(seconds),",
-		"":"server will put it in 'OFFLINE' stated.",
+		"":"server will put it in 'OFFLINE' state.",
 
 	"af_render_updatetaskperiod":1,
 		"":"Period to render to update task state or percentage (even w/o a parser).",
@@ -134,7 +137,7 @@
 		"":"If task progress (state or percentage) has not been updated for this period,",
 		"":"It wiil considered as an error, and render will be push in error hosts list.",
 
-	"af_task_stop_timeout":15,
+	"af_task_stop_timeout":30,
 		"":"If render was asked to stop a task, but it did not send task finish message,",
 		"":"it wiil be considered as not running any way.",
 
@@ -164,7 +167,7 @@
 	"af_monitor_zombietime":40,
 
 "":"Watch: (qt gui - client side)",
-	"af_watch_updateperiod":1,
+	"af_watch_get_server_period":1,
 	"af_watch_connectretries":3,
 	"af_watch_waitforconnected":8000,
 	"af_watch_waitforreadyread":8000,

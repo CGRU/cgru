@@ -1,6 +1,7 @@
 #pragma once
 
 #include "msgclass.h"
+#include "mctaskup.h"
 
 namespace af
 {
@@ -8,9 +9,12 @@ namespace af
 class MCTaskPos : public MsgClass
 {
 public:
-   MCTaskPos( int job_id, int block_num, int task_num, int Number = 0);
+	MCTaskPos( int job_id = 0, int block_num = 0, int task_num = 0, int Number = 0);
+	MCTaskPos( const MCTaskUp & i_tup);
    MCTaskPos( Msg * msg);
    ~MCTaskPos();
+
+	bool equal( const MCTaskPos & i_other) const;
 
    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
@@ -24,7 +28,7 @@ private:
    int32_t blocknum;
    int32_t tasknum;
    int32_t number;
-
+public:
    void v_readwrite( Msg * msg);
 };
 }

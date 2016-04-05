@@ -45,7 +45,7 @@ int     Environment::clientport =                      AFADDR::CLIENT_PORT;
 
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
-int     Environment::watch_updateperiod =              AFWATCH::UPDATEPERIOD;
+int     Environment::watch_get_server_period =         AFWATCH::GET_SERVER_PERIOD;
 int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
 int     Environment::watch_waitforconnected =          AFWATCH::WAITFORCONNECTED;
 int     Environment::watch_waitforreadyread =          AFWATCH::WAITFORREADYREAD;
@@ -56,7 +56,8 @@ int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_
 int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY;
 int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
-int     Environment::render_update_sec =               AFRENDER::UPDATEPERIOD;
+int     Environment::render_get_server_period =        AFRENDER::GET_SERVER_PERIOD;
+int     Environment::render_get_resources_period =     AFRENDER::GET_RESOURCES_PERIOD;
 int     Environment::render_updatetaskperiod =         AFRENDER::UPDATETASKPERIOD;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
@@ -68,7 +69,6 @@ std::vector<std::string> Environment::render_windowsmustdie;
 
 std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
  
-std::string Environment::render_exec =                 AFRENDER::EXEC;
 std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
 std::string Environment::render_cmd_shutdown =         AFRENDER::CMD_SHUTDOWN;
 std::string Environment::render_cmd_wolsleep =         AFRENDER::CMD_WOLSLEEP;
@@ -225,7 +225,6 @@ void Environment::getVars( const JSON & i_obj)
 
 	getVar( i_obj, render_default_capacity,           "af_render_default_capacity"           );
 	getVar( i_obj, render_default_maxtasks,           "af_render_default_maxtasks"           );
-	getVar( i_obj, render_exec,                       "af_render_exec"                       );
 	getVar( i_obj, render_cmd_reboot,                 "af_render_cmd_reboot"                 );
 	getVar( i_obj, render_cmd_shutdown,               "af_render_cmd_shutdown"               );
 	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );
@@ -235,7 +234,8 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
-	getVar( i_obj, render_update_sec,                 "af_render_update_sec"                 );
+	getVar( i_obj, render_get_server_period,          "af_render_get_server_period"          );
+	getVar( i_obj, render_get_resources_period,       "af_render_get_resources_period"       );
 	getVar( i_obj, render_updatetaskperiod,           "af_render_updatetaskperiod"           );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
@@ -243,7 +243,7 @@ void Environment::getVars( const JSON & i_obj)
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
-	getVar( i_obj, watch_updateperiod,                "af_watch_updateperiod"                );
+	getVar( i_obj, watch_get_server_period,           "af_watch_get_server_period"           );
 	getVar( i_obj, watch_refreshinterval,             "af_watch_refreshinterval"             );
 	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
 	getVar( i_obj, watch_waitforconnected,            "af_watch_waitforconnected"            );

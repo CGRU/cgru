@@ -4,6 +4,8 @@
 
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/render.h"
+#include "../libafanasy/renderevents.h"
+#include "../libafanasy/renderupdate.h"
 #include "../libafanasy/taskexec.h"
 
 #include "afnodesrv.h"
@@ -74,7 +76,8 @@ public:
 
 	bool canRunService( const std::string & type) const; ///< Check whether block can run a service
 
-	bool update( const af::Render * render);	///< Update Render.
+	// Update render and send instructions back:
+	af::Msg * update( const af::RenderUpdate & i_up);
 
 	// Called directly from solve cycle if it was not solved.
 	void notSolved();
@@ -107,7 +110,7 @@ private:
 /// Stop tasks.
 	void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
 
-	void exitClient( int type, JobContainer * jobs, MonitorContainer * monitoring);	///< Exit Render client program.
+	void exitClient( const std::string & i_type, JobContainer * i_jobs, MonitorContainer * i_monitoring);	///< Exit Render client program.
 
 	void launchAndExit( const std::string & i_cmd, bool i_exit, JobContainer * i_jobs, MonitorContainer * i_monitoring);
 
@@ -130,6 +133,8 @@ private:
 	std::vector<int> m_services_disabled_nums;
 
 	std::list<std::string> m_tasks_log;							///< Tasks Log.
+
+	af::RenderEvents m_re;
 
 private:
 	static RenderContainer * ms_renders;

@@ -428,7 +428,7 @@ void TaskProcess::sendTaskSate()
 	AFINFA("TaskProcess::sendTaskSate(): pid=%d, zombie=%s, m_update_status=%d, stop_time = %lld",
 		m_pid, m_zombie ? "TRUE":"FALSE", m_update_status, (long long)m_stop_time)
 
-	int    type = af::Msg::TTaskUpdatePercent;
+//	int    type = af::Msg::TTaskUpdatePercent;
 	bool   toRecieve = false;
 	char * stdout_data = NULL;
 	int    stdout_size = 0;
@@ -437,7 +437,7 @@ void TaskProcess::sendTaskSate()
 	if(( m_update_status != af::TaskExec::UPPercent ) &&
 		( m_update_status != af::TaskExec::UPWarning ))
 	{
-		type = af::Msg::TTaskUpdateState;
+//		type = af::Msg::TTaskUpdateState;
 		toRecieve = true;
 		stdout_data = m_parser->getData( &stdout_size);
 		log = m_service->getLog();
@@ -456,7 +456,7 @@ void TaskProcess::sendTaskSate()
 	std::string activity = m_parser->getActivity();
 	std::string report   = m_parser->getReport();
 
-	af::MCTaskUp taskup(
+	af::MCTaskUp * taskup = new af::MCTaskUp(
 		RenderHost::getId(),
 
 		m_taskexec->getJobId(),
@@ -478,17 +478,12 @@ void TaskProcess::sendTaskSate()
 		stdout_size,
 		stdout_data);
 
-	collectFiles( taskup);
-	taskup.setParsedFiles( m_service->getParsedFiles());
+	collectFiles( *taskup);
+	taskup->setParsedFiles( m_service->getParsedFiles());
 
 	m_listened.clear();
 
-	af::Msg * msg = new af::Msg( type, &taskup);
-	if( toRecieve) msg->setReceiving();
-
-    //printf("TaskProcess::sendTaskSate:(%d)\n", m_cycle);msg->v_stdOut();printf("\n");
-
-	RenderHost::dispatchMessage( msg);
+	RenderHost::addTaskUp( taskup);
 }
 
 void TaskProcess::processFinished( int i_exitCode)

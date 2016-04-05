@@ -79,7 +79,8 @@ namespace AFRENDER
     const int  TERMINATEWAITKILL        = 10;         ///< Seconds to wait task task finish after termination, then perform kill
     const int  DEFAULTCAPACITY          = 1000;       ///< Default render capacity.
     const int  DEFAULTMAXTASKS          = 2;          ///< Maximum tasks on can run on the same render the same time (default value).
-    const int  UPDATEPERIOD             = 5;          ///< Update status period ( seconds).
+    const int  GET_SERVER_PERIOD        = 1;          ///< Server connection & update period (seconds).
+    const int  GET_RESOURCES_PERIOD     = 5;          ///< Query machine resourcs period (seconds).
     const int  UPDATETASKPERIOD         = 1;          ///< Update task state and percentage period ( seconds).
     const int  ZOMBIETIME               = 60;         ///< Seconds to wait for update to Render is zombie.
     const int  CONNECTRETRIES           = 3;          ///< Number of connect fails to turn to disconnected state.
@@ -90,7 +91,6 @@ namespace AFRENDER
     const char CMD_SHUTDOWN[]           = "shutdown"; ///< How to shutdown a computer.
     const char CMD_WOLSLEEP[]           = "wolsleep"; ///< How to sleep computer.
     const char CMD_WOLWAKE[]            = "wolwake";  ///< How to wake computer.
-    const char EXEC[]                   = "afrender"; ///< How Render to execute another Render.
     const char NETWORK_IF[]             = ".*";       ///< Network interface(s) pattern to measure traffic on.
     const char HDDSPACE_PATH[]          = "/";        ///< Path to query total and free space.
     const char IOSTAT_DEVICE[]          = "sda";      ///< Device to monitor IO.
@@ -100,7 +100,7 @@ namespace AFRENDER
 /// Watch options:
 namespace AFWATCH
 {
-    const int  UPDATEPERIOD        = 10;       ///< Update status period ( seconds).
+    const int  GET_SERVER_PERIOD   = 1;        ///< Server connection & update status period ( seconds).
     const int  CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
     const int  WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
     const int  WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.

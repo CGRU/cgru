@@ -12,6 +12,7 @@
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mcjobsweight.h"
+#include "../libafanasy/renderupdate.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -113,22 +114,28 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TRenderUpdate:
 	{
 //printf("case af::Msg::TRenderUpdate:\n");
-	  AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
+		AfContainerLock lock( i_args->renders, AfContainerLock::WRITELOCK);
 
-	  af::Render render_up( i_msg);
-//printf("Msg::TRenderUpdate: %s - %s\n", render_up.getName().toUtf8().data(), time2Qstr( time(NULL)).toUtf8().data());
-	  RenderContainerIt rendersIt( i_args->renders);
-	  RenderAf* render = rendersIt.getRender( render_up.getId());
+		af::RenderUpdate render_up( i_msg);
+		RenderContainerIt rendersIt( i_args->renders);
+		RenderAf * render = rendersIt.getRender( render_up.getId());
 
-	  int id = 0;
-	  // If there is not such render, a zero id will be send.
-	  // It is a signal for client to register again (may be server was restarted).
-	  if((render != NULL) && ( render->update( &render_up)))
-	  {
-		 id = render->getId();
-	  }
-	  o_msg_response = new af::Msg( af::Msg::TRenderId, id);
-	  break;
+		if(( NULL == render ) || ( render->isOffline()))
+		{
+			// If there is not such online render, a zero id will be send.
+			// It is a signal for client to register again (may be server was restarted).
+			o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+		}
+		else
+		{
+			o_msg_response = render->update( render_up);
+			if( render_up.m_taskups.size())
+			{
+				i_args->msgQueue->pushMsg( i_msg);
+				return o_msg_response;
+			}
+		}
+		break;
 	}
 	case af::Msg::TRendersResourcesRequestIds:
 	{
@@ -168,13 +175,13 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  break;
 	}
 	// Cases for run cycle thread:
-	case af::Msg::TTaskUpdateState:
+/*	case af::Msg::TTaskUpdateState:
 	{
 	  af::MCTaskUp taskup( i_msg);
 	  af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
 	  o_msg_response = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
 	}
-	case af::Msg::TTaskUpdatePercent:
+	case af::Msg::TTaskUpdatePercent:*/
 	case af::Msg::TRenderDeregister:
 	case af::Msg::TMonitorDeregister:
 	{

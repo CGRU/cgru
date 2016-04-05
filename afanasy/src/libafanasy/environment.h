@@ -101,7 +101,7 @@ public:
 
 	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
 
-	static inline int getWatchUpdatePeriod()           { return watch_updateperiod;        }
+	static inline int getWatchGetServerPeriod()        { return watch_get_server_period;   }
 	static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
 	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
 	static inline int getWatchWaitForConnected()       { return watch_waitforconnected;    }
@@ -138,17 +138,17 @@ public:
 	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
-	static inline int getRenderNice()                  { return render_nice;                 } ///< Get Render task process nice factor.
-	static inline int getRenderUpdateSec()             { return render_update_sec;           } ///< Get Render update interval ( in seconds ).
-	static inline int getRenderUpdateTaskPeriod()      { return render_updatetaskperiod;     }
-	static inline int getRenderZombieTime()            { return render_zombietime;           }
-	static inline int getRenderConnectRetries()        { return render_connectretries;       }
+	static inline int getRenderNice()               { return render_nice;                 } ///< Get Render task process nice factor.
+	static inline int getRenderGetServerPeriod()    { return render_get_server_period;    } ///< Get Render update interval ( in seconds ).
+	static inline int getRenderGetResourcesPeriod() { return render_get_resources_period; } ///< Get Render update interval ( in seconds ).
+	static inline int getRenderUpdateTaskPeriod()   { return render_updatetaskperiod;     }
+	static inline int getRenderZombieTime()         { return render_zombietime;           }
+	static inline int getRenderConnectRetries()     { return render_connectretries;       }
 
 	static inline bool hasRULES() { return rules_url.size(); }
 	static inline std::vector<std::string> & getRenderWindowsMustDie() { return render_windowsmustdie; }
 //	static inline std::vector<std::string> & getProjectsRoot()         { return projects_root;         }
 
-	static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
 	static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
 	static inline const std::string & getRenderCmdShutdown()   { return render_cmd_shutdown;    }
 	static inline const std::string & getRenderCmdWolSleep()   { return render_cmd_wolsleep;    }
@@ -261,7 +261,7 @@ private:
 	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_refreshinterval;
-	static int watch_updateperiod;
+	static int watch_get_server_period;
 	static int watch_connectretries;
 	static int watch_waitforconnected;
 	static int watch_waitforreadyread;
@@ -281,13 +281,13 @@ private:
 	static int render_default_capacity;
 	static int render_default_maxtasks;
 	static int render_nice;       ///< Render task process nice factor.
-	static int render_update_sec; ///< Render update interval in seconds.
+	static int render_get_server_period; ///< Render update interval in seconds.
+	static int render_get_resources_period; ///< Render update interval in seconds.
 	static int render_updatetaskperiod;
 	static int render_zombietime;
 	static int render_connectretries;
 	static std::vector<std::string> render_windowsmustdie;
 
-	static std::string render_exec;       ///< How Render can execute anther Render.
 	static std::string cmd_shell;
 	static std::string render_cmd_reboot;
 	static std::string render_cmd_shutdown;

@@ -112,6 +112,8 @@ public:
 	HostRes();
 	~HostRes();
 
+	HostRes( Msg * msg);
+
 	uint8_t cpu_loadavg[3];
 
 	int32_t cpu_num;

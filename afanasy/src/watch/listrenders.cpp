@@ -94,7 +94,7 @@ Press RMB for Options.\
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
-	timer->start( 990 * af::Environment::getRenderUpdateSec());
+	timer->start( 990 * af::Environment::getRenderGetResourcesPeriod());
 
 	m_parentWindow->setWindowTitle("Renders");
 

@@ -4,6 +4,7 @@
 
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
+#include "../libafanasy/renderupdate.h"
 
 #include "taskprocess.h"
 
@@ -26,7 +27,6 @@ public:
 	inline static bool noOutputRedirection() { return ms_no_output_redirection; }
 
     inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
-    static void dispatchMessage( af::Msg * i_msg);
 
     inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
     inline static af::Msg * acceptTry()  { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_no_wait); }
@@ -40,13 +40,16 @@ public:
 
     static void refreshTasks();
 
-    static void update();
+    static void update( const uint64_t & i_cycle);
 
     static void runTask( af::Msg * i_msg);
+	static void runTask( af::TaskExec * i_task);
 
     static void stopTask( const af::MCTaskPos & i_taskpos);
 
     static void closeTask( const af::MCTaskPos & i_taskpos);
+
+	inline static void addTaskUp( af::MCTaskUp * i_tup) { ms_up.addTaskUp( i_tup);}
 
     static void getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg);
 
@@ -60,6 +63,11 @@ public:
 #endif
 
 	static void wolSleep( const std::string & i_str);
+
+private:
+	static void getResources();
+
+    static void dispatchMessage( af::Msg * i_msg);
 
 private:
     static RenderHost * ms_obj;
@@ -81,6 +89,8 @@ private:
     static bool ms_listening;
 
 	static bool ms_no_output_redirection;
+
+	static af::RenderUpdate ms_up;
 
     DlMutex m_mutex;
 //    DlRWLock m_mutex;

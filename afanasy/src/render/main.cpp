@@ -8,12 +8,13 @@
 #include "../libafanasy/host.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/render.h"
+#include "../libafanasy/renderevents.h"
 
 #include "res.h"
 #include "renderhost.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
@@ -35,7 +36,8 @@ void sig_int(int signum)
 // Functions:
 void threadAcceptClient( void * i_arg );
 void msgCase( af::Msg * msg);
-void launchAndExit( af::Msg * i_msg, bool i_exit);
+void processEvents( const af::RenderEvents & i_me);
+void launchAndExit( const std::string & i_str, bool i_exit);
 
 int main(int argc, char *argv[])
 {
@@ -151,20 +153,25 @@ int main(int argc, char *argv[])
 			in_msgs.push_back( msg);
 
 		// Lock render:
-		RenderHost::lockMutex();
+//		RenderHost::lockMutex(); // Why we need mutex here?
+
 		// React on all incoming messages:
 		for( std::list<af::Msg*>::iterator it = in_msgs.begin(); it != in_msgs.end(); it++)
 			msgCase( *it);
 		// Let tasks to do their work:
 		RenderHost::refreshTasks();
-		// Unlock render:
-		RenderHost::unLockMutex();
 
-		// Update render resources:
-		if( cycle % af::Environment::getRenderUpdateSec() == 0)
-			RenderHost::update();
+		// Update render:
+		RenderHost::update( cycle);
+
+		// Unlock render:
+//		RenderHost::unLockMutex();
 
 		cycle++;
+
+		#ifdef AFOUTPUT
+		printf("=============================================================\n\n");
+		#endif
 
 		if( AFRunning )
 			af::sleep_sec(1);
@@ -189,7 +196,7 @@ void msgCase( af::Msg * msg)
 		return;
 	}
 #ifdef AFOUTPUT
-printf("msgCase: "); msg->stdOut();
+printf(" >>> "); msg->v_stdOut();
 #endif
 
 	// Check not sended messages first, they were pushed back in accept quere:
@@ -242,70 +249,15 @@ printf("msgCase: "); msg->stdOut();
 		break;
 	}
 	case af::Msg::TVersionMismatch:
-	case af::Msg::TRenderExitRequest:
 	{
 		printf("Render exit request received.\n");
 		AFRunning = false;
 		break;
 	}
-	case af::Msg::TTask:
+	case af::Msg::TRenderEvents:
 	{
-		RenderHost::runTask( msg);
-		break;
-	}
-/*	case af::Msg::TClientRestartRequest:
-	{
-		printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-		af::launchProgram(af::Environment::getRenderExec());
-		AFRunning = false;
-		break;
-	}*/
-//   case af::Msg::TClientStartRequest:
-//   {
-//	  printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-//	  af::launchProgram( af::Environment::getRenderExec());
-//	  break;
-//   }
-	case af::Msg::TRenderRebootRequest:
-	{
-		AFRunning = false;
-		printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
-		af::launchProgram( af::Environment::getRenderCmdReboot());
-		break;
-	}
-	case af::Msg::TRenderShutdownRequest:
-	{
-		AFRunning = false;
-		printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
-		af::launchProgram( af::Environment::getRenderCmdShutdown());
-		break;
-	}
-	case af::Msg::TRenderWOLSleepRequest:
-	{
-		af::MCGeneral mg( msg);
-		RenderHost::wolSleep( mg.getString());
-		break;
-	}
-	case af::Msg::TRenderStopTask:
-	{
-		af::MCTaskPos taskpos( msg);
-		RenderHost::stopTask( taskpos);
-		break;
-	}
-	case af::Msg::TRenderCloseTask:
-	{
-		af::MCTaskPos taskpos( msg);
-		RenderHost::closeTask( taskpos);
-		break;
-	}
-	case af::Msg::TRenderLaunch:
-	{
-		launchAndExit( msg, false);
-		break;
-	}
-	case af::Msg::TRenderLaunchAndExit:
-	{
-		launchAndExit( msg, true);
+		af::RenderEvents me( msg);
+		processEvents( me);
 		break;
 	}
 	default:
@@ -319,22 +271,75 @@ printf("msgCase: "); msg->stdOut();
 	delete msg;
 }
 
-void launchAndExit( af::Msg * i_msg, bool i_exit)
+void processEvents( const af::RenderEvents & i_me)
 {
-	af::MCGeneral mcg( i_msg);
+#ifdef AFOUTPUT
+i_me.v_stdOut();
+#endif
 
-	std::string cmd = mcg.getString();
+	// Tasks to execute:
+	for( int i = 0; i < i_me.m_tasks.size(); i++)
+		RenderHost::runTask( i_me.m_tasks[i]);
 
+
+	// Tasks to close:
+	for( int i = 0; i < i_me.m_closes.size(); i++)
+		RenderHost::closeTask( i_me.m_closes[i]);
+
+
+	// Tasks to stop:
+	for( int i = 0; i < i_me.m_stops.size(); i++)
+		RenderHost::stopTask( i_me.m_stops[i]);
+
+
+	// Instructions:
+	if( i_me.m_instruction.size())
+	{
+		if( i_me.m_instruction == "exit")
+		{
+			printf("Render exit request received.\n");
+			AFRunning = false;
+		}
+		else if( i_me.m_instruction == "sleep")
+		{
+			printf("Render sleep request received.\n");
+			RenderHost::wolSleep( i_me.m_command);
+		}
+		else if( i_me.m_instruction == "launch")
+		{
+			launchAndExit( i_me.m_command, false);
+		}
+		else if( i_me.m_instruction == "launch_exit")
+		{
+			launchAndExit( i_me.m_command, true);
+		}
+		else if( i_me.m_instruction == "reboot")
+		{
+			AFRunning = false;
+			printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
+			af::launchProgram( af::Environment::getRenderCmdReboot());
+		}
+		else if( i_me.m_instruction == "shutdown")
+		{
+			AFRunning = false;
+			printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
+			af::launchProgram( af::Environment::getRenderCmdShutdown());
+		}
+	}
+}
+
+void launchAndExit( const std::string & i_cmd, bool i_exit)
+{
 	if( i_exit )
 	{
-		printf("%s\n%s\n","Launching command and exiting:", cmd.c_str());
+		printf("%s\n%s\n","Launching command and exiting:", i_cmd.c_str());
 		AFRunning = false;
 	}
 	else
 	{
-		printf("%s\n%s\n","Launching command:", cmd.c_str());
+		printf("%s\n%s\n","Launching command:", i_cmd.c_str());
 	}
 
-	af::launchProgram( cmd);
+	af::launchProgram( i_cmd);
 }
 

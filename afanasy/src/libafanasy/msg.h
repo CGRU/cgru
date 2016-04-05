@@ -92,9 +92,6 @@ public:
 /** When Server successfully registered new Render it's send back it's id.**/
 /**/TRenderId/**/,
 /**/TRenderDeregister/**/,          ///< Deregister Render with given id.
-/**/TRenderExitRequest/**/,         ///< Request to client to exit,
-/**/TRenderRebootRequest/**/,       ///< Reboot client host computer,
-/**/TRenderShutdownRequest/**/,     ///< Shutdown client host computer,
 
 /*- Users messages -*/
 /**/TUserJobsOrderRequestId/**/,    ///< Request User(id) jobs ids in server list order.
@@ -131,14 +128,10 @@ TRESERVED00,TRESERVED01,TRESERVED02,TRESERVED03,TRESERVED04,TRESERVED05,TRESERVE
 And when Render can't connect to Afanasy. Afanasy register new Render and send back it's id \c TRenderId. **/
 /**/TRenderRegister/**/,
 /**/TRenderUpdate/**/,              ///< Update Render, message contains its resources.
+/**/TRenderEvents/**/,              ///< Server answer on render update, it contains what to do.
 /**/TRendersResourcesRequestIds/**/,///< Request a list of resources of Renders with given ids.
 /**/TRendersList/**/,               ///< Message with a list of Renders.
 /**/TRendersResources/**/,          ///< Message with a list of resources of Renders.
-/**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
-/**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
-/**/TRenderLaunch/**/,              ///< Ask render to launch a command.
-/**/TRenderLaunchAndExit/**/,       ///< Ask render to launch a command and exit, may be needed for updates.
-/**/TRenderWOLSleepRequest/**/,     ///< Request to client to fall a sleep,
 
 /*- Users messages -*/
 /**/TUsersList/**/,                 ///< Active users information.
@@ -148,7 +141,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TJobsList/**/,                  ///< Jobs list information.
 /**/TJobProgress/**/,               ///< Jobs progress.
 /**/TJobsWeight/**/,                ///< All jobs weight data.
-/**/TJob/**/,                       ///< Job (all job data).
+/**/TJob/**/,                       ///< Job (job full data, with blocks and tasks full data).
 
 /**/TBlocksProgress/**/,            ///< Blocks running progress data.
 /**/TBlocksProperties/**/,          ///< Blocks progress and properties data.
@@ -156,8 +149,6 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 
 /**/TTask/**/,                      ///< A task of some job.
 /**/TTaskOutputRequest/**/,         ///< Request task output from render ( by gui thought server ).
-/**/TTaskUpdatePercent/**/,         ///< New progress percentage for task.
-/**/TTaskUpdateState/**/,           ///< New state for task.
 /**/TTaskFiles/**/,                 ///< Task (or entire job) files
 
 TRESERVED10,TRESERVED11,TRESERVED12,TRESERVED13,TRESERVED14,TRESERVED15,TRESERVED16,TRESERVED17,TRESERVED18,TRESERVED19,

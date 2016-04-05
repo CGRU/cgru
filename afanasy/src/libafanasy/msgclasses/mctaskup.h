@@ -33,6 +33,8 @@ public:
 	MCTaskUp( Msg * msg);
 	~MCTaskUp();
 
+	bool sameTask( const MCTaskUp & i_other) const;
+
 	inline int getClientId()                 const { return m_clientid;      }
 
 	inline int getNumJob()                   const { return m_numjob;        }

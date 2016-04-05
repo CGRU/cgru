@@ -46,7 +46,7 @@ int Dialog::ms_size_border_right = 75;
 Dialog::Dialog():
     m_connected(false),
     m_monitorType( Watch::WNONE),
-    m_qThreadClientUpdate( this, false, af::Environment::getWatchUpdatePeriod(), af::Environment::getWatchConnectRetries()),
+    m_qThreadClientUpdate( this, false, af::Environment::getWatchGetServerPeriod(), af::Environment::getWatchConnectRetries()),
     m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
     m_listitems( NULL),
     m_offlinescreen( NULL),
@@ -319,7 +319,10 @@ void Dialog::newMessage( af::Msg *msg)
 	case af::Msg::THTTP:
 	case af::Msg::THTTPGET:
 	{
-		msg->stdOutData();
+		static int unused;
+		unused = ::write( 1, " >>> ", 5);
+		msg->stdOutData( false);
+		unused = ::write( 1, "\n", 1);
 		break;
 	}
     default:

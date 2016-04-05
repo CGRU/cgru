@@ -13,12 +13,13 @@
 #include "res.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
 
 RenderHost * RenderHost::ms_obj = NULL;
+af::RenderUpdate RenderHost::ms_up;
 af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
 af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
 int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
@@ -118,6 +119,10 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 {
     if( false == AFRunning ) return;
 
+	#ifdef AFOUTPUT
+	printf(" <<< "); i_msg->v_stdOut();
+	#endif
+
     if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
     {
         // Assuming that message should be send to server if no address specified.
@@ -196,27 +201,42 @@ void RenderHost::refreshTasks()
     }
 }
 
-void RenderHost::update()
+void RenderHost::getResources()
 {
-    if( false == AFRunning )
-        return;
+// Do this every update time, but not the first time, as at the begininng resources are already updated
+	static bool first_time = true;
+	if( first_time )
+	{
+		first_time = false;
+		return;
+	}
 
-    // Do this every update time, but not the first time, as at the begininng resources are already updated
-    static bool first_time = true;
+	GetResources( ms_obj->m_host, ms_obj->m_hres);
 
-    if( false == first_time )
-    {
-        GetResources( ms_obj->m_host, ms_obj->m_hres);
-        for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
-    }
-    else
-        first_time = false;
+	for( int i = 0; i < ms_pyres.size(); i++)
+		ms_pyres[i]->update();
 
 //hres.stdOut();
+	#ifdef WINNT
+	windowsMustDie();
+	#endif
+}
 
-#ifdef WINNT
-    windowsMustDie();
-#endif
+void RenderHost::update( const uint64_t & i_cycle)
+{
+	if( false == AFRunning )
+		return;
+
+	if( i_cycle % af::Environment::getRenderGetResourcesPeriod() == 0)
+	{
+		getResources();
+		ms_up.setResources( &(ms_obj->m_hres));
+	}
+
+	if( i_cycle % af::Environment::getRenderGetServerPeriod())
+		return;
+
+	ms_up.setId( getId());
 
     if( false == isListening())
     {
@@ -228,9 +248,24 @@ void RenderHost::update()
         return;
     }
 
-    af::Msg * msg = new af::Msg( ms_updateMsgType, ms_obj);
-    msg->setReceiving();
-    dispatchMessage( msg);
+	af::Msg * msg;
+
+	if( ms_updateMsgType == af::Msg::TRenderRegister )
+	{
+		msg = new af::Msg( ms_updateMsgType, ms_obj);
+	}
+	else
+	{
+		#ifdef AFOUTPUT
+		ms_up.v_stdOut();
+		#endif
+		msg = new af::Msg( ms_updateMsgType, &ms_up);
+	}
+
+	msg->setReceiving();
+	dispatchMessage( msg);
+
+	ms_up.clear();
 }
 
 #ifdef WINNT
@@ -253,6 +288,10 @@ void RenderHost::windowsMustDie()
 void RenderHost::runTask( af::Msg * i_msg)
 {
     ms_tasks.push_back( new TaskProcess( new af::TaskExec( i_msg)));
+}
+void RenderHost::runTask( af::TaskExec * i_task)
+{
+	ms_tasks.push_back( new TaskProcess( i_task));
 }
 
 void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)

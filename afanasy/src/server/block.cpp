@@ -410,23 +410,23 @@ bool Block::action( Action & i_action)
 		}
 		else if( type == "skip")
 		{
-			skipRestartTasks( true, "Block skip by " + i_action.author, i_action, operation);
+			skipRestartTasks( true, "Tasks skip by " + i_action.author, i_action, operation);
 		}
 		else if( type == "restart")
 		{
-			skipRestartTasks( false, "Block restart by " + i_action.author, i_action, operation);
+			skipRestartTasks( false, "Tasks restart by " + i_action.author, i_action, operation);
 		}
 		else if( type == "restart_running")
 		{
-			skipRestartTasks( false, "Block restart running by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
+			skipRestartTasks( false, "Tasks restart running by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
 		}
 		else if( type == "restart_skipped")
 		{
-			skipRestartTasks( false, "Block restart skipped by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
+			skipRestartTasks( false, "Tasks restart skipped by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
 		}
 		else if( type == "restart_done")
 		{
-			skipRestartTasks( false, "Block restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
+			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
 		else
 		{

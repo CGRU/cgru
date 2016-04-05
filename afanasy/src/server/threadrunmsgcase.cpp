@@ -6,6 +6,7 @@
 #include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
+#include "../libafanasy/renderupdate.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -31,6 +32,13 @@ switch ( i_msg->type())
 		threadRunJSON( i_args, i_msg);
 		break;
 	}
+	case af::Msg::TRenderUpdate:
+	{
+		af::RenderUpdate rup( i_msg);
+		for( int i = 0; i < rup.m_taskups.size(); i++)
+			i_args->jobs->updateTaskState( *rup.m_taskups[i], i_args->renders, i_args->monitors);
+		break;
+	}
 	case af::Msg::TMonitorDeregister:
 	{
 		MonitorContainerIt it( i_args->monitors);
@@ -45,13 +53,13 @@ switch ( i_msg->type())
 		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
 		break;
 	}
-	case af::Msg::TTaskUpdatePercent:
+/*	case af::Msg::TTaskUpdatePercent:
 	case af::Msg::TTaskUpdateState:
 	{
 		af::MCTaskUp taskup( i_msg);
 		i_args->jobs->updateTaskState( taskup, i_args->renders, i_args->monitors);
 		break;
-	}
+	}*/
 	case af::Msg::TConfirm:
 	{
 		AFCommon::QueueLog( std::string("af::Msg::TConfirm: ") + af::itos( i_msg->int32()));

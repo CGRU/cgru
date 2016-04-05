@@ -89,7 +89,11 @@ void Watch::sendMsg( af::Msg * msg)
 	{
 		msg->setJSONBIN();
 		msg->setReceiving();
-		msg->stdOutData();
+
+		static int unused;
+		unused = ::write( 1, " <<< ", 5);
+		msg->stdOutData( false);
+		unused = ::write( 1, "\n", 1);
 	}
 	if( ms_d ) ms_d->sendMsg( msg);
 }

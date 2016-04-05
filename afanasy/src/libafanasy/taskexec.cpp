@@ -188,6 +188,7 @@ void TaskExec::v_readwrite( Msg * msg)
 {
 	switch( msg->type())
 	{
+	case Msg::TRenderEvents:
 	case Msg::TTask:
 		rw_int32_t ( m_job_id,            msg);
 		rw_int32_t ( m_block_num,         msg);

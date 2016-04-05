@@ -74,6 +74,17 @@ MCTaskUp::~MCTaskUp()
 	if( m_files_data ) delete [] m_files_data;
 }
 
+bool MCTaskUp::sameTask( const MCTaskUp & i_other) const
+{
+	if( ( m_numjob   == i_other.m_numjob   ) &&
+		( m_numblock == i_other.m_numblock ) &&
+		( m_numtask  == i_other.m_numtask  ) &&
+		( m_number   == i_other.m_number   ))
+		return true;
+
+	return false;
+}
+
 void MCTaskUp::v_readwrite( Msg * msg)
 {
 	rw_int32_t( m_clientid,       msg);

@@ -371,6 +371,8 @@ HostRes::HostRes():
 	cpu_loadavg[0] = cpu_loadavg[1] = cpu_loadavg[2] = 0;
 }
 
+HostRes::HostRes( Msg * msg){ read( msg);}
+
 HostRes::~HostRes()
 {
     for( unsigned i = 0; i < custom.size(); i++) if( custom[i]) delete custom[i];
