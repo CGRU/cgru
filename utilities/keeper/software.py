@@ -149,7 +149,7 @@ def browse():
 
 
 def locateSoftware(soft):
-	filename = cgrupyqt.GetOpenFileName(None, 'Select %s executabe:' % soft)
+	filename = cgrupyqt.GetOpenFileName(None, 'Select %s executable:' % soft)
 	if filename is None:
 		return
 	filename = str(filename)
