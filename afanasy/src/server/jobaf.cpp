@@ -1439,18 +1439,18 @@ int JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename,
 	return m_blocks[i_b]->m_tasks[i_t]->getOutput( i_n, o_filename, o_error);
 }
 
-void JobAf::listenOutput( bool i_subscribe, int i_block, int i_task)
+void JobAf::listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task)
 {
 	if(( i_block > 0 ) && ( i_task > 0 ))
 	{
 		if( false == checkBlockTaskNumbers( i_block, i_task, "listenOutput")) return;
-		m_blocks[i_block]->m_tasks[i_task]->listenOutput( i_subscribe);
+		m_blocks[i_block]->m_tasks[i_task]->listenOutput( i_renders, i_subscribe);
 	}
 	else
 	{
 		for( int b = 0; b < m_blocks_num; b++)
 			for( int t = 0; t < m_blocks_data[b]->getTasksNum(); t++)
-				m_blocks[b]->m_tasks[t]->listenOutput( i_subscribe);
+				m_blocks[b]->m_tasks[t]->listenOutput( i_renders, i_subscribe);
 	}
 }
 

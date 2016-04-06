@@ -43,6 +43,8 @@ public:
 
 	const af::TaskExec * exec() { return m_taskexec;}
 
+	inline void listenOutput( bool i_subscribe) { m_taskexec->listenOutput( i_subscribe);}
+
 private:
 	void launchCommand();
 	void sendTaskSate();

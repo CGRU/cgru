@@ -57,13 +57,13 @@ void RenderEvents::v_readwrite( Msg * msg)
 			m_tasks[i]->write( msg);
 	}
 
-	rw_tp_vec( m_closes,  msg);
-	rw_tp_vec( m_stops,   msg);
-	rw_tp_vec( m_outputs, msg);
-	rw_tp_vec( m_listens, msg);
-
+	rw_tp_vec( m_closes,      msg);
+	rw_tp_vec( m_stops,       msg);
+	rw_tp_vec( m_outputs,     msg);
+	rw_tp_vec( m_listens_add, msg);
+	rw_tp_vec( m_listens_rem, msg);
 	rw_String( m_instruction, msg);
-	rw_String( m_command, msg);
+	rw_String( m_command,     msg);
 }
 
 void RenderEvents::clear()
@@ -73,7 +73,8 @@ void RenderEvents::clear()
 	m_closes.clear();
 	m_stops.clear();
 	m_outputs.clear();
-	m_listens.clear();
+	m_listens_add.clear();
+	m_listens_rem.clear();
 
 	m_instruction.clear();
 	m_command.clear();
@@ -86,7 +87,8 @@ bool RenderEvents::isEmpty() const
 	if( m_closes.size()) return false;
 	if( m_stops.size()) return false;
 	if( m_outputs.size()) return false;
-	if( m_listens.size()) return false;
+	if( m_listens_add.size()) return false;
+	if( m_listens_rem.size()) return false;
 
 	if( m_instruction.size()) return false;
 	if( m_command.size()) return false;
@@ -110,8 +112,11 @@ void RenderEvents::v_generateInfoStream( std::ostringstream & stream, bool full)
 	if( m_outputs.size())
 		stream << " Out["  << m_outputs.size()  << "]";
 
-	if( m_listens.size())
-		stream << " Lis["  << m_listens.size()  << "]";
+	if( m_listens_add.size())
+		stream << " Li+["  << m_listens_add.size()  << "]";
+
+	if( m_listens_rem.size())
+		stream << " Li-["  << m_listens_rem.size()  << "]";
 
 	if( m_instruction.size())
 		stream << " I[" << m_instruction << "]";

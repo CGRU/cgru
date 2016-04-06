@@ -603,3 +603,10 @@ af::Msg * af::msgString( const std::string & i_str)
 	return o_msg;
 }
 
+af::Msg * af::msgInfo( const std::string & i_kind, const std::string & i_info)
+{
+	af::Msg * o_msg = new af::Msg();
+	o_msg->setInfo( i_kind, i_info);
+	return o_msg;
+}
+

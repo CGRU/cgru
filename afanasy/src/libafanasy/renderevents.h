@@ -21,7 +21,8 @@ public:
 	inline void addTaskClose(  const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_closes  );}
 	inline void addTaskStop(   const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_stops   );}
 	inline void addTaskOutput( const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_outputs );}
-	inline void addTaskListen( const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_listens );}
+	inline void taskListenAdd( const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_listens_add );}
+	inline void taskListenRem( const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_listens_rem );}
 
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
@@ -40,7 +41,8 @@ public:
 	std::vector<MCTaskPos> m_outputs;
 
 	// Tasks listens:
-	std::vector<MCTaskPos> m_listens;
+	std::vector<MCTaskPos> m_listens_add;
+	std::vector<MCTaskPos> m_listens_rem;
 
 	// Exit, reboot, sleep and so on.
 	std::string m_instruction;

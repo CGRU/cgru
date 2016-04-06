@@ -284,6 +284,21 @@ void Dialog::newMessage( af::Msg *msg)
 		idReceived( msg->int32());
         break;
     }
+	case af::Msg::TInfo:
+	{
+		std::string kind, info;
+		if( msg->getInfo( kind, info))
+		{
+			QString qinfo = afqt::stoq( info);
+			if( kind == "info")
+				displayInfo( qinfo);
+			else if( kind == "warning")
+				displayWarning( qinfo);
+			else if( kind == "error")
+				displayError( qinfo);
+		}
+		break;
+	}
     case af::Msg::TDATA:
     {
         new WndText( "Data", msg);

@@ -267,6 +267,18 @@ bool Msg::setString( const std::string & str)
 	return true;
 }
 
+bool Msg::setInfo( const std::string & i_kind, const std::string & i_info)
+{
+	if(checkZero( true) == false ) return false;
+	m_type = TInfo;
+	m_writing = true;
+	w_String( i_kind, this);
+	w_String( i_info, this);
+	m_int32 = m_writtensize;
+	rw_header( true);
+	return true;
+}
+
 bool Msg::setStringList( const std::list<std::string> & stringlist)
 {
 	if(checkZero( true) == false ) return false;
@@ -295,6 +307,19 @@ const std::string Msg::getString()
 	std::string str;
 	getString( str);
 	return str;
+}
+bool Msg::getInfo( std::string & o_kind, std::string & o_info)
+{
+	if( m_type != TInfo)
+	{
+		AFERROR("Msg::getInfo: type is not TInfo.")
+		return false;
+	}
+	rw_String( o_kind, this);
+	rw_String( o_info, this);
+	// Reset written size to let to get string again.
+	resetWrittenSize();
+	return true;
 }
 
 bool Msg::getStringList( std::list<std::string> & stringlist)
@@ -532,6 +557,7 @@ const char * Msg::TNAMES[]=
 	"THTTPGET",                   ///< HTTP Get request.
 	"TString",                    ///< QString text message.
 	"TStringList",                ///< QStringList text message.
+	"TInfo",                      ///< Some info string for GUI to show.
 
 	"TStatData",                  ///< Statistics data.
 

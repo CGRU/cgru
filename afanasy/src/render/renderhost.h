@@ -53,6 +53,8 @@ public:
 
     static void upTaskOutput( const af::MCTaskPos & i_taskpos);
 
+	static void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe);
+
     inline static void   lockMutex() { ms_obj->m_mutex.Lock();  }
     inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
 

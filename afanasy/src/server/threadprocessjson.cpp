@@ -155,6 +155,12 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 							if( monitor )
 							{
 								monitor->waitOutput( af::MCTaskPos( ids[0], block_ids[0], task_ids[0]));
+								std::string info = "Retrieving running task output from render...";
+								if( binary )
+									o_msg_response = af::msgInfo("info", info);
+								else
+									o_msg_response = af::jsonMsg(
+										std::string("{\"info\":\"") + info + ("\"}"));
 							}
 							else
 								error = std::string("MonitorContainer::waitOutput: No monitor with ID = ")
@@ -162,17 +168,19 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						}
 					}
 	
-					if( error.size())
+					if( o_msg_response == NULL )
 					{
-						error = "Task output error:\n" + error;
-						if( o_msg_response == NULL )
+						if( error.size())
+						{
+							error = "Task output error:\n" + error;
 							if( binary )
 								o_msg_response = af::msgString( error);
 							else
 								o_msg_response = af::jsonMsgError( error);
+						}
+						else
+							o_msg_response = af::jsonMsg("{\"status\":\"OK\"}");
 					}
-					else
-						o_msg_response = af::jsonMsg("{\"status\":\"OK\"}");
 				}
 			}
 			else

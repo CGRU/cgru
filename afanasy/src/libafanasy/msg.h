@@ -54,6 +54,10 @@ public:
 	/// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
 	bool setStringList( const std::list<std::string> & stringlist);
 
+	/// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
+	bool setInfo( const std::string & i_kind, const std::string & i_info);
+	bool getInfo( std::string & o_kind, std::string & o_info);
+
 	/// Get String ( if message type is TString ).
 	bool getString( std::string & string);
 	const std::string getString();
@@ -115,6 +119,7 @@ TRESERVED00,TRESERVED01,TRESERVED02,TRESERVED03,TRESERVED04,TRESERVED05,TRESERVE
 /**/THTTPGET/**/,                   ///< HTTP Get request.
 /**/TString/**/,                    ///< String message.
 /**/TStringList/**/,                ///< Strings list message.
+/**/TInfo/**/,                      ///< Some info string for GUI to show.
 
 /**/TStatData/**/,                  ///< Statistics data.
 

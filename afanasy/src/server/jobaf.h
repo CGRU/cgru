@@ -74,7 +74,7 @@ public:
     virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Send tasks output to a specified address.
-	void listenOutput( bool i_subscribe, int i_block, int i_task);
+	void listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task);
 
 	void skipTasks(    const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Skip some tasks.
     virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.

@@ -458,15 +458,30 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 	i_str << "\n]}";
 }
 
-void Task::listenOutput( bool i_subscribe)
+void Task::listenOutput(  RenderContainer * i_renders, bool i_subscribe)
 {
 	if( i_subscribe == m_listen )
 		return;
 
-	if( m_run )
-		m_run->listenOutput( i_subscribe);
+	if( m_run && m_run->notZombie())
+	{
+		std::string error;
+		int rid = m_run->v_getRunningRenderID( error);
+		if( rid < 1 )
+			AFCommon::QueueLogError(error);
+		else
+		{
+			RenderContainerIt rId( i_renders);
+			RenderAf * render = rId.getRender( rid);
+			if( render )
+				render->listenTask(
+					af::MCTaskPos( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number), i_subscribe);
+		}
+	}
 
 	m_listen = i_subscribe;
+
+	return;
 }
 
 const std::string Task::getOutputFileName( int i_starts_count) const
@@ -488,9 +503,9 @@ int Task::getOutput( int i_startcount, std::string & o_filename, std::string & o
 	}
 	if( i_startcount == 0 )
 	{
-		if( m_run )
+		if( m_run && m_run->notZombie())
 		{
-			return m_run->v_getOutput( i_startcount, o_error);
+			return m_run->v_getRunningRenderID( o_error);
 		}
 		else
 		{

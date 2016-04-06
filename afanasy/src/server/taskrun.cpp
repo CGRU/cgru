@@ -324,34 +324,8 @@ void TaskRun::skip( const std::string & message, RenderContainer * renders, Moni
    m_progress->state = m_progress->state | AFJOB::STATE_DONE_MASK;
    stop( message+" Is running.", renders, monitoring);
 }
-/*
-void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
-{
-   if( m_zombie ) return;
-   if( m_hostId == 0 ) return;
-   if( m_exec == NULL)
-   {
-      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
-      return;
-   }
-	//printf("Listening running task:"); mclisten.v_stdOut();
-   RenderContainerIt rendersIt( renders);
-   RenderAf * render = rendersIt.getRender( m_hostId);
-   if( render != NULL) render->sendOutput( mclisten, m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
-}
-*/
-void TaskRun::listenOutput( bool i_subscribe)
-{
-	if( m_zombie ) return;
-	if( m_hostId == 0 ) return;
-	if( m_exec == NULL)
-	{
-		AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
-		return;
-	}
-}
 
-int TaskRun::v_getOutput( int i_startcount, std::string & o_error) const
+int TaskRun::v_getRunningRenderID( std::string & o_error) const
 {
 	if( m_exec == NULL)
 	{

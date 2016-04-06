@@ -296,6 +296,13 @@ i_me.v_stdOut();
 	for( int i = 0; i < i_me.m_outputs.size(); i++)
 		RenderHost::upTaskOutput( i_me.m_outputs[i]);
 
+	// Listens add:
+	for( int i = 0; i < i_me.m_listens_add.size(); i++)
+		RenderHost::listenTask( i_me.m_listens_add[i], true);
+
+	// Listens remove:
+	for( int i = 0; i < i_me.m_listens_rem.size(); i++)
+		RenderHost::listenTask( i_me.m_listens_rem[i], false);
 
 	// Instructions:
 	if( i_me.m_instruction.size())

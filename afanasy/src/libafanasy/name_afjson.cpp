@@ -78,14 +78,18 @@ af::Msg * af::jsonMsg( const std::string & i_str)
 	return o_msg;
 }
 
-af::Msg * af::jsonMsgError( const std::string & i_str)
+af::Msg * af::jsonMsgInfo( const std::string & i_kind, const std::string & i_info)
 {
-	std::string str = "{\"error\":\"";
-	str += af::strEscape( i_str);
-	str += "\"}";
+	std::string str = "{\"info\":{";
+	str += "\"kind\":\"" + af::strEscape( i_kind) + "\"";
+	str += ",\"info\":\"" + af::strEscape( i_info) + "\"";
+	str += "}}";
 	return af::jsonMsg( str);
 }
-
+af::Msg * af::jsonMsgError( const std::string & i_str)
+{
+	return af::jsonMsgInfo( "error", i_str);
+}
 af::Msg * af::jsonMsgStatus( bool i_success, const std::string & i_type, const std::string & i_msg)
 {
 	std::string str = "{\"status\":";

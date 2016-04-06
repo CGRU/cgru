@@ -88,7 +88,9 @@ public:
 	void wolWake(  MonitorContainer * i_monitoring, const std::string & i_msg = std::string());
 
 	inline void addTaskOutput( const af::MCTaskPos & i_tp) { m_re.addTaskOutput( i_tp);}
-	inline void addTaskListen( const af::MCTaskPos & i_tp) { m_re.addTaskListen( i_tp);}
+
+	inline void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
+		{ if( i_subscribe) m_re.taskListenAdd( i_tp); else m_re.taskListenRem( i_tp); }
 
 public:
 	/// Set container:

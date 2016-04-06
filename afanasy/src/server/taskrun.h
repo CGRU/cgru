@@ -32,7 +32,8 @@ public:
    virtual ~TaskRun();
 
 /// When running session finishes this class became a zombie - ready to delete.
-   inline bool isZombie() const { return m_zombie;}
+	inline bool isZombie()  const { return m_zombie;}
+	inline bool notZombie() const { return m_zombie == false;}
 
 /// Update task state by sent message, almost often from remote render host
    virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
@@ -46,13 +47,8 @@ public:
 /// Same as 'retart' function but with switch to 'skipped' state.
    virtual void skip(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
-/// Request to remote host to send output to specified address (or request not to do it).
-//	void listen( af::MCListenAddress & mclisten, RenderContainer * renders);
-
-	void listenOutput( bool i_subscribe);
-
 /// Return running render id:
-	virtual int v_getOutput( int i_startcount, std::string & o_error) const;
+	virtual int v_getRunningRenderID( std::string & o_error) const;
 
    uint32_t getStopTime() const { return m_stopTime;}
    int        getHostId() const { return m_hostId;}

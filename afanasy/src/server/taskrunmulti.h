@@ -37,7 +37,7 @@ public:
 	virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
 	/// Multi hosts tast can be running but still ready (acception hosts).
-	virtual int v_getOutput( int i_startcount, std::string & o_error) const;
+	virtual int v_getRunningRenderID( std::string & o_error) const;
 
 	virtual void stdOut( bool full = false) const;
 

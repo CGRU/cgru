@@ -233,6 +233,7 @@ namespace af
 	const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
 
 	Msg * msgString( const std::string & i_str);
+	Msg * msgInfo( const std::string & i_kind, const std::string & i_info);
 
 	// Read message header from message buffer;
 	int processHeader( af::Msg * io_msg, int i_bytes);
@@ -284,11 +285,12 @@ namespace af
 	void jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render = false);
 
 	af::Msg * jsonMsg( const std::string & i_str);
-	af::Msg * jsonMsgError( const std::string & i_str);
 	af::Msg * jsonMsg( const std::ostringstream & i_stream);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::list<std::string> & i_list);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::string & i_string);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, char * i_data, int i_size);
+	af::Msg * jsonMsgInfo( const std::string & i_kind, const std::string & i_info);
+	af::Msg * jsonMsgError( const std::string & i_str);
 	af::Msg * jsonMsgStatus( bool i_error, const std::string & i_type, const std::string & i_msg);
 
 	void jsonActionStart(  std::ostringstream & i_str, const std::string & i_type,

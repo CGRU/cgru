@@ -343,6 +343,18 @@ void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 	ms_up.addTaskOutput( i_taskpos, str);
 }
 
+void RenderHost::listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
+{
+	for( int t = 0; t < ms_tasks.size(); t++)
+	{
+		if( ms_tasks[t]->is( i_tp))
+		{
+			ms_tasks[t]->listenOutput( i_subscribe);
+			break;
+		}
+	}
+}
+
 void RenderHost::wolSleep( const std::string & i_str)
 {
 	af::Service service( af::Environment::getSysWolService(),"SLEEP", i_str);
