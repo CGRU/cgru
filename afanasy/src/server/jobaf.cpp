@@ -1428,16 +1428,15 @@ bool JobAf::checkBlockTaskNumbers( int i_b, int i_t, const char * o_str) const
 	return true;
 }
 
-af::Msg * JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
-	std::string & o_filename, std::string & o_error) const
+int JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename, std::string & o_error) const
 {
 //printf("JobAf::getTaskStdOut:\n");
 	if( false == checkBlockTaskNumbers( i_b, i_t, "getTaskStdOut"))
 	{
 		o_error = "Invalid blockb and task numbers";
-		return NULL;
+		return 0;
 	}
-	return m_blocks[i_b]->m_tasks[i_t]->getOutput( i_n, i_renders, o_filename, o_error);
+	return m_blocks[i_b]->m_tasks[i_t]->getOutput( i_n, o_filename, o_error);
 }
 
 void JobAf::listenOutput( bool i_subscribe, int i_block, int i_task)

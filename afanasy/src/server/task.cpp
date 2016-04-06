@@ -474,24 +474,23 @@ const std::string Task::getOutputFileName( int i_starts_count) const
 	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + af::itos( i_starts_count) + ".txt";
 }
 
-af::Msg * Task::getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const
+int Task::getOutput( int i_startcount, std::string & o_filename, std::string & o_error) const
 {
-//printf("Task::getOutput:\n");
 	if( m_progress->starts_count < 1 )
 	{
 		o_error = "Task is not started.";
-		return NULL;
+		return 0;
 	}
 	if( i_startcount > m_progress->starts_count )
 	{
 		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(i_startcount)+" times ).";
-		return NULL;
+		return 0;
 	}
 	if( i_startcount == 0 )
 	{
 		if( m_run )
 		{
-			return m_run->v_getOutput( i_startcount, i_renders, o_error);
+			return m_run->v_getOutput( i_startcount, o_error);
 		}
 		else
 		{
@@ -500,7 +499,7 @@ af::Msg * Task::getOutput( int i_startcount, RenderContainer * i_renders, std::s
 	}
 
 	o_filename = getOutputFileName( i_startcount);
-	return NULL;
+	return 0;
 }
 
 const std::string Task::v_getInfo( bool full) const

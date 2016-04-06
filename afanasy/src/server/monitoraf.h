@@ -44,6 +44,10 @@ public:
 
 	void deregister();
 
+	void waitOutput( const af::MCTaskPos & i_tp);
+	bool isWaintingOutput( const af::MCTaskPos & i_tp);
+	void addOutput( const af::MCTaskPos & i_tp, const std::string & i_output);
+
 	bool isListening( const af::MonitorEvents::MListen & i_listen) const;
 	inline void addListened( const af::MonitorEvents::MListen & i_listen) { m_e.addListened( i_listen); }
 
@@ -62,6 +66,8 @@ private:
 	std::list<int> m_lis_j;
 	std::list<int> m_lis_b;
 	std::list<int> m_lis_t;
+
+	std::vector<af::MCTaskPos> m_wait_output;
 
 	DlMutex m_mutex;
 

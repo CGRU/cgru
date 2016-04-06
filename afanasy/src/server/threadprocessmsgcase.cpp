@@ -66,8 +66,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		if( str.empty()) break;
 
 		AFCommon::QueueLog( str);
-//		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-//		i_args->monitors->sendMessage( str);
 		break;
 	}
 	case af::Msg::TStatRequest:
@@ -113,27 +111,45 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TRenderUpdate:
 	{
-//printf("case af::Msg::TRenderUpdate:\n");
-		AfContainerLock lock( i_args->renders, AfContainerLock::WRITELOCK);
-
 		af::RenderUpdate render_up( i_msg);
-		RenderContainerIt rendersIt( i_args->renders);
-		RenderAf * render = rendersIt.getRender( render_up.getId());
+		bool render_founded = false;
 
-		if(( NULL == render ) || ( render->isOffline()))
 		{
-			// If there is not such online render, a zero id will be send.
-			// It is a signal for client to register again (may be server was restarted).
-			o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+			AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
+
+			RenderContainerIt rendersIt( i_args->renders);
+			RenderAf * render = rendersIt.getRender( render_up.getId());
+
+			if(( NULL == render ) || ( render->isOffline()))
+			{
+				// If there is not such online render, a zero id will be send.
+				// It is a signal for client to register again (may be server was restarted).
+				o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+			}
+			else
+			{
+				o_msg_response = render->update( render_up);
+				render_founded = true;
+			}
 		}
-		else
+
+		if( render_founded)
 		{
-			o_msg_response = render->update( render_up);
+			// Task outputs received:
+			if( render_up.m_outputs.size())
+			{
+				AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
+
+				i_args->monitors->outputsReceived( render_up.m_outspos, render_up.m_outputs);
+			}
+
+			// To update tasks (if any) we push message to run thread:
 			if( render_up.m_taskups.size())
 			{
 				i_args->msgQueue->pushMsg( i_msg);
 				return o_msg_response;
 			}
+
 		}
 		break;
 	}

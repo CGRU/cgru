@@ -81,27 +81,27 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				std::vector<int32_t> block_ids;
 				std::vector<int32_t> task_ids;
 				int number = 0;
+				int mon_id = 0;
 				af::jr_int32vec("block_ids", block_ids, getObj);
 				af::jr_int32vec("task_ids", task_ids, getObj);
 				af::jr_int("number", number, getObj);
+				af::jr_int("mon_id", mon_id, getObj);
 				if(( ids.size() == 1 ) && ( block_ids.size() == 1 ) && ( task_ids.size() == 1 ))
 				{
-					af::Msg * msg_request_render = NULL;
+					int running_render_id = 0;
 					std::string filename, error, name;
 
 					// Get output from job, it can return a request message for render or a filename
 					{
 						AfContainerLock jlock( i_args->jobs,    AfContainerLock::READLOCK);
-						AfContainerLock rLock( i_args->renders, AfContainerLock::READLOCK);
 
 						JobContainerIt it( i_args->jobs);
 						JobAf * job = it.getJob( ids[0]);
 						if( job == NULL )
-							o_msg_response = af::jsonMsgError("Invalid ID");
+							error = "Invalid job ID";
 						else
 						{
-							msg_request_render = job->v_getTaskStdOut( block_ids[0], task_ids[0], number,
-								i_args->renders, filename, error);
+							running_render_id = job->v_getTaskStdOut( block_ids[0], task_ids[0], number, filename, error);
 							name = job->generateTaskName( block_ids[0], task_ids[0]);
 							if( number > 0 )
 								name += "["+af::itos(number)+"]";
@@ -126,38 +126,53 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 							delete [] data;
 						}
 					}
-					else if( msg_request_render) // Retrieving output from render
+					else if( running_render_id ) // Retrieving output from render
 					{
-						msg_request_render->setReceiving();
-						bool ok;
-						af::Msg * response = af::msgsend( msg_request_render, ok, af::VerboseOn);
-						if( response )
 						{
-							if( binary )
-								o_msg_response = response;
+							AfContainerLock rLock( i_args->renders, AfContainerLock::WRITELOCK);
+
+							RenderContainerIt rendersIt( i_args->renders);
+							RenderAf * render = rendersIt.getRender( running_render_id);
+							if( render )
+							{
+								render->addTaskOutput( af::MCTaskPos( ids[0], block_ids[0], task_ids[0]));
+							}
 							else
 							{
-								o_msg_response = af::jsonMsg( mode, name, response->data(), response->dataLen());
-								delete response;
+								error = std::string("Render not founded with ID = ")
+									+ af::itos( running_render_id);
+								running_render_id = 0;
 							}
 						}
-						else
-							error = "Retrieving output from render failed. See server logs for details.";
-						delete msg_request_render;
+
+						// If render founded, set monitor to wait output:
+						if( running_render_id )
+						{					
+							AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+
+							MonitorContainerIt it( i_args->monitors);
+							MonitorAf * monitor = it.getMonitor( mon_id);
+							if( monitor )
+							{
+								monitor->waitOutput( af::MCTaskPos( ids[0], block_ids[0], task_ids[0]));
+							}
+							else
+								error = std::string("MonitorContainer::waitOutput: No monitor with ID = ")
+									+ af::itos( mon_id);
+						}
 					}
 	
 					if( error.size())
 					{
-						error += "\nCheck task log.";
-						error += "\nIf there is 'update timeout' check firewall.";
-						error += "\nClient should listen a port and server should be able to connect to it.";
+						error = "Task output error:\n" + error;
 						if( o_msg_response == NULL )
 							if( binary )
 								o_msg_response = af::msgString( error);
 							else
 								o_msg_response = af::jsonMsgError( error);
-						//AFCommon::QueueLogError("TTaskOutputRequest: " + error);
 					}
+					else
+						o_msg_response = af::jsonMsg("{\"status\":\"OK\"}");
 				}
 			}
 			else

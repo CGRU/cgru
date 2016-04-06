@@ -215,7 +215,7 @@ void threadAcceptClient( void * i_arg )
 
         switch( msg_request->type())
         {
-        case af::Msg::TTaskOutputRequest:
+/*        case af::Msg::TTaskOutputRequest:
         {
             af::MCTaskPos taskpos( msg_request);
             af::Msg * msg_response = new af::Msg();
@@ -234,7 +234,7 @@ void threadAcceptClient( void * i_arg )
             }
             delete msg_response;
             break;
-        }
+        }*/
         default:
             RenderHost::acceptMessage( msg_request);
             closesocket(sd);

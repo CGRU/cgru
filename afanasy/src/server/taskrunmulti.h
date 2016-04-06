@@ -36,8 +36,8 @@ public:
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
 	virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
-	/// Return special message for request output from its running render.
-	virtual af::Msg * v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const;
+	/// Multi hosts tast can be running but still ready (acception hosts).
+	virtual int v_getOutput( int i_startcount, std::string & o_error) const;
 
 	virtual void stdOut( bool full = false) const;
 

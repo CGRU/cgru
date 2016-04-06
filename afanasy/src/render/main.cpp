@@ -292,6 +292,11 @@ i_me.v_stdOut();
 		RenderHost::stopTask( i_me.m_stops[i]);
 
 
+	// Tasks to outputs:
+	for( int i = 0; i < i_me.m_outputs.size(); i++)
+		RenderHost::upTaskOutput( i_me.m_outputs[i]);
+
+
 	// Instructions:
 	if( i_me.m_instruction.size())
 	{

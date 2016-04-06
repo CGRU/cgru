@@ -54,5 +54,14 @@ bool MCTaskPos::equal( const MCTaskPos & i_other) const
 
 void MCTaskPos::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "Job id = " << jobid << ", numblock = " << blocknum << ", numtask = " << tasknum;
+	if( full )
+	{
+		stream << "MCTaskPos: Job id = " << jobid << ", numblock = " << blocknum << ", numtask = " << tasknum;
+		if( number ) stream << ", number = " << number;
+	}
+	else
+	{
+		stream << "TP: j" << jobid << " b" << blocknum << " t" << tasknum;
+		if( number ) stream << "(" << number << ")";
+	}
 }

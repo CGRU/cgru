@@ -351,33 +351,21 @@ void TaskRun::listenOutput( bool i_subscribe)
 	}
 }
 
-af::Msg * TaskRun::v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const
+int TaskRun::v_getOutput( int i_startcount, std::string & o_error) const
 {
 	if( m_exec == NULL)
 	{
 		o_error = "Not started.";
-		return NULL;
-	}
-	if( m_hostId > 0 )
-	{
-		RenderContainerIt rendersIt( i_renders);
-		RenderAf * render = rendersIt.getRender( m_hostId);
-		if( render != NULL )
-		{
-			af::MCTaskPos taskpos( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_tasknum);
-			af::Msg * msg = new af::Msg( af::Msg::TTaskOutputRequest, &taskpos);
-			msg->setAddress( render);
-			return msg;
-		}
-		else
-		{
-			o_error = "TaskRun::getOutput: render is NULL.";
-			return NULL;
-		}
+		return 0;
 	}
 
-	o_error = "TaskRun::getOutput: Zero render_id.";
-	return NULL;
+	if( m_hostId > 0 )
+	{
+		return m_hostId;
+	}
+
+	o_error = "Zero render ID.";
+	return 0;
 }
 
 int TaskRun::calcWeight() const

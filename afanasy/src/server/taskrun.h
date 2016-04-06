@@ -51,8 +51,8 @@ public:
 
 	void listenOutput( bool i_subscribe);
 
-/// Return special message for request output from its running render.
-	virtual af::Msg * v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const;
+/// Return running render id:
+	virtual int v_getOutput( int i_startcount, std::string & o_error) const;
 
    uint32_t getStopTime() const { return m_stopTime;}
    int        getHostId() const { return m_hostId;}

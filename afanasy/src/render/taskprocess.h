@@ -30,7 +30,7 @@ public:
 	inline bool is( const af::MCTaskPos & i_taskpos) const
 		{ return is( i_taskpos.getJobId(), i_taskpos.getNumBlock(), i_taskpos.getNumTask(), i_taskpos.getNumber());}
 
-	void getOutput( af::Msg * o_msg) const;
+	const std::string getOutput() const;
 
 	void refresh();
 	void stop();

@@ -46,11 +46,26 @@ void RenderUpdate::addTaskUp( MCTaskUp * i_tup)
 	m_taskups.push_back( i_tup);
 }
 
+void RenderUpdate::addTaskOutput( const MCTaskPos & i_tp, const std::string & i_output)
+{
+	for( int i = 0; i < m_outspos.size(); i++)
+		if( m_outspos[i].equal( i_tp))
+		{
+			m_outputs[i] = i_output;
+			return;
+		}
+
+	m_outspos.push_back( i_tp);
+	m_outputs.push_back( i_output);
+}
+
 void RenderUpdate::v_readwrite( Msg * msg)
 {
+	// Render ID:
 	rw_int32_t( m_id, msg);
 
 
+	// Tasks updates:
 	int32_t tups_len = m_taskups.size();
 	rw_int32_t( tups_len, msg);
 	for( int i = 0; i < tups_len; i++)
@@ -62,14 +77,31 @@ void RenderUpdate::v_readwrite( Msg * msg)
 	}
 
 
-	rw_bool( m_has_hres, msg);
-	if( false == m_has_hres )
-		return;
+	// Tasks outptus:
+	int32_t outs_len = m_outputs.size();
+	rw_int32_t( outs_len, msg);
+	for( int i = 0; i < outs_len; i++)
+	{
+		if( msg->isReading())
+		{
+			m_outspos.push_back( MCTaskPos());
+			m_outputs.push_back( std::string());
+		}
 
-	if( msg->isReading())
-		m_hres = new HostRes( msg);
-	else
-		m_hres->v_readwrite( msg);
+		m_outspos[i].v_readwrite( msg);
+		rw_String( m_outputs[i], msg);
+	}
+
+
+	// Resources:
+	rw_bool( m_has_hres, msg);
+	if( m_has_hres )
+	{
+		if( msg->isReading())
+			m_hres = new HostRes( msg);
+		else
+			m_hres->v_readwrite( msg);
+	}
 }
 
 void RenderUpdate::clear()
@@ -78,6 +110,9 @@ void RenderUpdate::clear()
 		delete m_taskups[i];
 	m_taskups.clear();
 
+	m_outputs.clear();
+	m_outspos.clear();
+
 	m_has_hres = false;
 	m_hres = NULL;
 }
@@ -85,8 +120,11 @@ void RenderUpdate::clear()
 void RenderUpdate::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << " <<< RenderUpdate[" << m_id << "]:";
-	stream << " TUps[" << m_taskups.size() << "]";
-	stream << " h" << ( m_has_hres ? "1" : "0");
-	stream << " s" << ( m_server_side ? "1" : "0");
+	if( m_taskups.size())
+		stream << " TUps[" << m_taskups.size() << "]";
+	if( m_outputs.size())
+		stream << " Outs[" << m_outputs.size() << "]";
+	if( m_has_hres )
+		stream << " HRes()";
 }
 

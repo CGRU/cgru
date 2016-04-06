@@ -29,6 +29,19 @@ MonitorEvents::~MonitorEvents()
 {
 }
 
+void MonitorEvents::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
+{
+	for( int i = 0; i < m_outspos.size(); i++)
+		if( m_outspos[i].equal( i_tp))
+		{
+			m_outputs[i] = i_output;
+			return;
+		}
+
+	m_outspos.push_back( i_tp);
+	m_outputs.push_back( i_output);
+}
+
 void MonitorEvents::addListened( MListen i_listen)
 {
 	for( int i = 0; i < m_listens.size(); i++)
@@ -47,6 +60,7 @@ void MonitorEvents::addListened( MListen i_listen)
 
 void MonitorEvents::v_readwrite( Msg * msg)
 {
+	// General events:
 	for( int e = 0; e < m_events.size(); e++)
 	{
 		std::vector<int32_t> vect = m_events[e];
@@ -56,6 +70,7 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	}
 
 
+	// Tasks progresses:
 	int32_t tp_size = m_tp.size();
 	rw_int32_t( tp_size, msg);
 	for( int t = 0; t < tp_size; t++)
@@ -76,6 +91,7 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	}
 
 
+	// Block ids with modes:
 	int32_t bid_size = m_bids.size();
 	rw_int32_t( bid_size, msg);
 	for( int b = 0; b < bid_size; b++)
@@ -89,10 +105,31 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	}
 
 
+	// Task outputs:
+	int32_t outs_size = m_outputs.size();
+	rw_int32_t( outs_size, msg);
+	for( int i = 0; i < outs_size; i++)
+	{
+		if( msg->isReading())
+		{
+			m_outspos.push_back( MCTaskPos());
+			m_outputs.push_back( std::string());
+		}
+
+		m_outspos[i].v_readwrite( msg);
+		rw_String( m_outputs[i], msg);
+	}
+
+
+	// User jobs order:
 	rw_Int32_Vect( m_jobs_order_ids, msg);
 
-	rw_StringVect( m_instructions, msg);
 
+	// Instructions:
+	rw_String( m_instruction, msg);
+
+
+	// Listening:
 	int32_t lis_size = m_listens.size();
 	rw_int32_t( lis_size, msg);
 	for( int i = 0; i < lis_size; i++)
@@ -107,6 +144,8 @@ void MonitorEvents::v_readwrite( Msg * msg)
 		rw_String ( m_listens[i].output,   msg);
 	}
 
+
+	// Announcement
 	rw_String( m_announcement, msg);
 }
 
@@ -230,20 +269,15 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		hasevents = true;
 	}
 
-	if( m_instructions.size())
+	if( m_instruction.size())
 	{
 		if( hasevents )
 			o_str << ",";
 		else
 			o_str << "{";
 
-		o_str << "\"instructions\":[";
-		for( int i = 0; i < m_instructions.size(); i++)
-		{
-			if( i ) o_str << ",";
-			o_str << "\"" << m_instructions[i] << "\"";
-		}
-		o_str << "]}";
+		o_str << "\"instruction\":\"" << m_instruction << "\"";
+		o_str << "}";
 
 		hasevents = true;
 	}
@@ -266,9 +300,12 @@ void MonitorEvents::clear()
 
 	m_jobs_order_ids.clear();
 
-	m_instructions.clear();
+	m_instruction.clear();
 
 	m_listens.clear();
+
+	m_outputs.clear();
+	m_outspos.clear();
 
 	m_announcement.clear();
 }
@@ -285,10 +322,35 @@ bool MonitorEvents::isEmpty() const
 
 	if( m_jobs_order_ids.size()) return false;
 
-	if( m_instructions.size()) return false;
+	if( m_instruction.size()) return false;
+
+	if( m_outputs.size()) return false;
 
 	if( m_announcement.size()) return false;
 
 	return true;
+}
+
+void MonitorEvents::v_generateInfoStream( std::ostringstream & o_str, bool i_full) const
+{
+	o_str << "MonitorEvents:";
+
+	if( m_tp.size())
+		o_str << " TP[" << m_tp.size() << "]";
+
+	if( m_bids.size())
+		o_str << " BID[" << m_bids.size() << "]";
+
+	if( m_outputs.size())
+		o_str << " OUT[" << m_outputs.size() << "]";
+
+	if( m_listens.size())
+		o_str << " LIS[" << m_listens.size() << "]";
+
+	if( m_instruction.size())
+		o_str << " i\"" << m_instruction << "\"";
+
+	if( m_announcement.size())
+		o_str << " " << m_announcement;
 }
 

@@ -608,18 +608,15 @@ void TaskProcess::killProcess()
 #endif
 }
 
-void TaskProcess::getOutput( af::Msg * o_msg) const
+const std::string TaskProcess::getOutput() const
 {
 	int size;
 	char *data = m_parser->getData( &size);
-	if( size > 0)
-	{
-		o_msg->setData( size, data);
-	}
-	else
-	{
-		o_msg->setString("Render: Silence...");
-	}
+
+	if( size < 1 )
+		return "Render task process: Silence...";
+
+	return std::string( data, size);
 }
 
 #ifdef WINNT

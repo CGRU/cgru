@@ -322,18 +322,25 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
     i_taskpos.v_stdOut();
 }
 
-void RenderHost::getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg)
+void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
-    {
-        if( ms_tasks[t]->is( i_taskpos))
-        {
-            ms_tasks[t]->getOutput( o_msg);
-            return;
-        }
-    }
-    AFERROR("RenderHost::closeTask: No such task:\n")
-    i_taskpos.v_stdOut();
+	std::string str;
+	for( int t = 0; t < ms_tasks.size(); t++)
+	{
+		if( ms_tasks[t]->is( i_taskpos))
+		{
+			str = ms_tasks[t]->getOutput();
+			break;
+		}
+	}
+
+	if( str.size() == 0 )
+	{
+		str = "Render has no task:";
+		str += i_taskpos.v_generateInfoString();
+	}
+
+	ms_up.addTaskOutput( i_taskpos, str);
 }
 
 void RenderHost::wolSleep( const std::string & i_str)

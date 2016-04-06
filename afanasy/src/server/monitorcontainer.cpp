@@ -5,6 +5,7 @@
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
 #include "../libafanasy/msg.h"
 
@@ -82,6 +83,29 @@ void MonitorContainer::addJobEvent( int i_type, int i_jid, int i_uid)
 
 	if( af::addUniqueToList( m_jobEvents[i_type], i_jid))
 		m_jobEventsUids[i_type].push_back( i_uid);
+}
+
+void MonitorContainer::outputsReceived( const std::vector<af::MCTaskPos> & i_outspos, const std::vector<std::string> & i_outputs)
+{
+	if( i_outspos.size() != i_outputs.size())
+	{
+		AFERRAR("MonitorContainer::outputsReceived: i_outspos.size(%d) != i_outputs.size(%d)",
+			int( i_outspos.size()), int( i_outputs.size()))
+		return;
+	}
+
+	bool founded = false;
+	MonitorContainerIt monitorsIt( this);
+	for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+		for( int i = 0; i < i_outspos.size(); i++)
+			if( monitor->isWaintingOutput( i_outspos[i]))
+			{
+				monitor->addOutput( i_outspos[i], i_outputs[i]);
+				founded = true;
+			}
+
+	if( false == founded )
+		AFERROR("MonitorContainer::outputsReceived: No one waiting such outputs.")
 }
 
 void MonitorContainer::addListened( const std::string & i_hostname, int i_j, int i_b, int i_t, const std::string & i_listened)

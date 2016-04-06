@@ -51,10 +51,8 @@ public:
 
 	inline static void addTaskUp( af::MCTaskUp * i_tup) { ms_up.addTaskUp( i_tup);}
 
-    static void getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg);
+    static void upTaskOutput( const af::MCTaskPos & i_taskpos);
 
-//    inline static void   lockMutex() { ms_obj->m_mutex.WriteLock();  }
-//    inline static void unLockMutex() { ms_obj->m_mutex.WriteUnlock();}
     inline static void   lockMutex() { ms_obj->m_mutex.Lock();  }
     inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
 

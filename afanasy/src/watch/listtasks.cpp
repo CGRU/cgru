@@ -572,6 +572,7 @@ void ListTasks::getTaskInfo( const std::string & i_mode, int i_number, Item * it
 	str << ",\"task_ids\":[" << itemTask->getTaskNum() << "]";
 	if( i_number != -1 )
 		str << ",\"output\":" << i_number;
+	str << ",\"mon_id\":" << MonitorHost::id();
 	str << ",\"binary\":true}}";
 
 	af::Msg * msg = af::jsonMsg( str);

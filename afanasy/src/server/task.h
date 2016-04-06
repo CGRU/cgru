@@ -60,8 +60,8 @@ public:
 
 	const std::string getOutputFileName( int i_starts_count) const;
 
-/// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
-	af::Msg * getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const;
+/// Return render id if task is running, or filename to read output from
+	int getOutput( int i_startcount, std::string & o_filename, std::string & o_error) const;
 
 	af::Msg * getStoredFiles() const;
 	void getStoredFiles( std::ostringstream & i_str) const;

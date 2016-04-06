@@ -73,7 +73,7 @@ void MonitorAf::v_action( Action & i_action)
 		af::jr_string("type", optype, operation);
 		if( optype == "exit")
 		{
-			af::addUniqueToVect( m_e.m_instructions,"exit");
+			m_e.m_instruction = "exit";
 			return;
 		}
 		if( optype == "deregister")
@@ -324,6 +324,32 @@ bool MonitorAf::setListening( int i_j, int i_b, int i_t, bool i_subscribe)
 	m_lis_t.push_back( i_t);
 
 	return true;
+}
+
+void MonitorAf::waitOutput( const af::MCTaskPos & i_tp)
+{
+	if( isWaintingOutput( i_tp))
+		return;
+
+	m_wait_output.push_back( i_tp);
+printf("MonitorAf::waitOutput: "); i_tp.v_stdOut();
+}
+
+void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
+{
+	m_e.addOutput( i_tp, i_output);
+
+	m_wait_output.clear();
+printf("MonitorAf::addOutput: "); i_tp.v_stdOut();
+}
+
+bool MonitorAf::isWaintingOutput( const af::MCTaskPos & i_tp)
+{
+	for( int i = 0; i < m_wait_output.size(); i++)
+		if( m_wait_output[i].equal( i_tp))
+			return true;
+
+	return false;
 }
 
 bool MonitorAf::isListening( const af::MonitorEvents::MListen & i_listen) const
