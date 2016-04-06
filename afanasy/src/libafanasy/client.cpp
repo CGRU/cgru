@@ -37,7 +37,6 @@ Client::Client( int i_flags, int Id):
 		 m_netIFs[i]->v_stdOut(true);
       }
 
-	  m_address.setPort( af::Environment::getClientPort());
 	  m_time_launch = time(NULL);
 	  m_user_name = af::Environment::getUserName();
 	  m_name = af::Environment::getHostName();

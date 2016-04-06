@@ -41,7 +41,6 @@ int     Environment::task_stop_timeout =               AFJOB::TASK_STOP_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
-int     Environment::clientport =                      AFADDR::CLIENT_PORT;
 
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
@@ -175,7 +174,6 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, digest_file,                       "af_digest_file"                       );
 	getVar( i_obj, digest_realm,                      "realm"                                );
 	getVar( i_obj, serverport,                        "af_serverport"                        );
-	getVar( i_obj, clientport,                        "af_clientport"                        );
 	getVar( i_obj, http_serve_dir,                    "af_http_serve_dir"                    );
 
 	getVar( i_obj, rules_url,                         "rules_url"                            );

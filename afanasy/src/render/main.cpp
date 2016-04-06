@@ -1,4 +1,4 @@
-#include "../libafanasy/common/dlThread.h"
+//#include "../libafanasy/common/dlThread.h"
 
 #ifndef WINNT
 #include <sys/wait.h>
@@ -34,7 +34,7 @@ void sig_int(int signum)
 //#####################################################################################
 
 // Functions:
-void threadAcceptClient( void * i_arg );
+//void threadAcceptClient( void * i_arg );
 void msgCase( af::Msg * msg);
 void processEvents( const af::RenderEvents & i_me);
 void launchAndExit( const std::string & i_str, bool i_exit);
@@ -134,19 +134,12 @@ int main(int argc, char *argv[])
 
 	RenderHost * render = new RenderHost();
 
-	DlThread ServerAccept;
-	ServerAccept.Start( &threadAcceptClient, NULL);
+//	DlThread ServerAccept;
+//	ServerAccept.Start( &threadAcceptClient, NULL);
 
 	uint64_t cycle = 0;
 	while( AFRunning)
 	{
-		if( false == RenderHost::isListening() )
-		{
-			// Wait accept thread to start to listen a port.
-			af::sleep_msec( 100);
-			continue;
-		}
-
 		// Collect all available incomming messages:
 		std::list<af::Msg*> in_msgs;
 		while( af::Msg * msg = RenderHost::acceptTry() )

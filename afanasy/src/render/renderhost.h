@@ -20,15 +20,11 @@ public:
     inline static int  getId() { return ms_obj->af::Render::getId();}
     inline static const std::string & getName() { return ms_obj->af::Render::getName();}
 
-    static void setListeningPort( uint16_t i_port);
-
-    inline static bool isListening() { return ms_listening; }
-
 	inline static bool noOutputRedirection() { return ms_no_output_redirection; }
 
     inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
 
-    inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
+//    inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
     inline static af::Msg * acceptTry()  { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_no_wait); }
 
     static bool isConnected() { return ms_connected;  }
@@ -55,8 +51,8 @@ public:
 
 	static void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe);
 
-    inline static void   lockMutex() { ms_obj->m_mutex.Lock();  }
-    inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
+//    inline static void   lockMutex() { ms_obj->m_mutex.Lock();  }
+//    inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
 
 #ifdef WINNT
     static void windowsMustDie();
@@ -86,12 +82,10 @@ private:
 
     static std::vector<TaskProcess*> ms_tasks;
 
-    static bool ms_listening;
-
 	static bool ms_no_output_redirection;
 
 	static af::RenderUpdate ms_up;
 
-    DlMutex m_mutex;
+//    DlMutex m_mutex;
 //    DlRWLock m_mutex;
 };

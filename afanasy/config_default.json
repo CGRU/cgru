@@ -4,7 +4,6 @@
 		"":"Afanasy server name or direct IP address literals",
 
 	"af_serverport":51000,
-	"af_clientport":51001,
 
 		"":"Afanasy server will use IPv6 if it is configured on server interface",
 	"af_ipv6_disable":1,

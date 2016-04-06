@@ -66,9 +66,6 @@ public:
 	static inline bool getPermUserModHisPriority() { return perm_user_mod_his_priority; }
 	static inline bool getPermUserModJobPriority() { return perm_user_mod_job_priority; }
 
-	/// Set client port. Client can change its port.
-	static void setClientPort( uint16_t port) { clientport = port;}
-
 	static inline const std::string & getDigestRealm() { return digest_realm; }
 	static const std::string getDigest( const std::string & i_user_name);
 
@@ -112,7 +109,6 @@ public:
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
 
 	static inline int            getServerPort()   { return serverport;      } ///< Get afanasy server port.
-	static inline int            getClientPort()   { return clientport;      } ///< Get current client port.
 
 	static inline int    getPriority()               { return priority;         } ///< Get default host priority.
 	static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
@@ -251,8 +247,6 @@ private:
 /** Try to get \c AF_SERVER_PORT environment variable at first.
 *** If there is no \c AF_SERVER_PORT variable from \c definitions.h used.**/
 	static int serverport;
-
-	static int clientport;
 
 	static bool perm_user_mod_his_priority;
 	static bool perm_user_mod_job_priority;
