@@ -332,7 +332,7 @@ void MonitorAf::waitOutput( const af::MCTaskPos & i_tp)
 		return;
 
 	m_wait_output.push_back( i_tp);
-printf("MonitorAf::waitOutput: "); i_tp.v_stdOut();
+	//printf("MonitorAf::waitOutput: "); i_tp.v_stdOut();
 }
 
 void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
@@ -340,7 +340,7 @@ void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_out
 	m_e.addOutput( i_tp, i_output);
 
 	m_wait_output.clear();
-printf("MonitorAf::addOutput: "); i_tp.v_stdOut();
+	//printf("MonitorAf::addOutput: "); i_tp.v_stdOut();
 }
 
 bool MonitorAf::isWaintingOutput( const af::MCTaskPos & i_tp)

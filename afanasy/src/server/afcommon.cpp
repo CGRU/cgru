@@ -96,18 +96,18 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			if( false == af::pathIsFolder( thousand_dir)) continue;
 
 			HANDLE job_dir_handle;
-			WIN32_FIND_DATA job_dir_data;
-			if(( job_dir_handle = FindFirstFile(( thousand_dir + "\\*").c_str(), &job_dir_data)) != INVALID_HANDLE_VALUE)
+			WIN32_FIND_DATA node_dir_data;
+			if(( job_dir_handle = FindFirstFile(( thousand_dir + "\\*").c_str(), &node_dir_data)) != INVALID_HANDLE_VALUE)
 			{
 				do
 				{
-					std::string job_dir( job_dir_data.cFileName);
+					std::string job_dir( node_dir_data.cFileName);
 					if( job_dir.find('.') == 0 ) continue;
 					job_dir = thousand_dir + '\\' + job_dir;
 					if( false == af::pathIsFolder( job_dir)) continue;
 					o_folders.push_back( job_dir);
 				}
-				while ( FindNextFile( job_dir_handle, &job_dir_data));
+				while ( FindNextFile( job_dir_handle, &node_dir_data));
 
 				FindClose( job_dir_handle);
 			}
@@ -128,7 +128,6 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 
 #else
 
-	struct dirent * thousand_dir_data = NULL;
 	DIR * thousand_dir_handle = opendir( i_root.c_str());
 	if( thousand_dir_handle == NULL)
 	{
@@ -136,13 +135,29 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 		return o_folders;
 	}
 
-	while( thousand_dir_data = readdir( thousand_dir_handle))
+	struct dirent thousand_dir_data;
+	struct dirent * thousand_dir_ptr = NULL;
+
+	struct dirent node_dir_data;
+	struct dirent * node_dir_ptr = NULL;
+
+	for(;;)
 	{
-		if( thousand_dir_data->d_name[0] == '.' ) continue;
-		std::string thousand_dir = i_root + '/' + thousand_dir_data->d_name;
+		int error = readdir_r( thousand_dir_handle, &thousand_dir_data, &thousand_dir_ptr);
+		if( error != 0 )
+		{
+			AFERRPE("JobContainer::getStoredIds: readdir_r:")
+			return o_folders;
+		}
+
+		// The end of directory:
+		if( NULL == thousand_dir_ptr )
+			break;
+
+		if( thousand_dir_ptr->d_name[0] == '.' ) continue;
+		std::string thousand_dir = i_root + '/' + thousand_dir_ptr->d_name;
 		if( false == af::pathIsFolder( thousand_dir )) continue;
 
-		struct dirent * job_dir_data = NULL;
 		DIR * job_dir_handle = opendir( thousand_dir.c_str());
 		if( job_dir_handle == NULL)
 		{
@@ -150,10 +165,21 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			return o_folders;
 		}
 
-		while( job_dir_data = readdir( job_dir_handle))
+		for(;;)
 		{
-			if( job_dir_data->d_name[0] == '.' ) continue;
-			std::string job_dir( thousand_dir + '/' + job_dir_data->d_name);
+			int error = readdir_r( job_dir_handle, &node_dir_data, &node_dir_ptr);
+			if( error != 0 )
+			{
+				AFERRPE("JobContainer::getStoredIds: readdir_r:")
+				return o_folders;
+			}
+
+			// The end of directory:
+			if( NULL == node_dir_ptr )
+				break;
+
+			if( node_dir_ptr->d_name[0] == '.' ) continue;
+			std::string job_dir( thousand_dir + '/' + node_dir_ptr->d_name);
 			if( false == af::pathIsFolder( job_dir)) continue;
 			o_folders.push_back( job_dir);
 		}

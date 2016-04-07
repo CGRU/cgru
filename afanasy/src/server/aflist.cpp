@@ -26,45 +26,40 @@ AfList::~AfList()
 
 int AfList::add( AfNodeSrv *node)
 {
-//   m_rw_lock.WriteLock();
+	int index = -1;
 
-   int index = -1;
+	for( std::list<AfNodeSrv*>::const_iterator it = nodes_list.begin(); it != nodes_list.end(); it++)
+		if( *it == node )
+		{
+			AFERROR("AfList::add: node already exists.");
+			return index;
+		}
 
-	std::list<AfNodeSrv*>::iterator it = std::find( nodes_list.begin(), nodes_list.begin(), node);
+	if( nodes_list.size() != 0 )
+	{
+		std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
+		std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
+		bool lessPriorityFound = false;
+		while( it != end_it)
+		{
+			index++;
+			if( **it >= *node ) { it++; continue;}
 
-   if( *it == node )
-   {
-      AFERROR("AfList::add: node already exists.\n");
-      return index;
-   }
-   else
-   {
-      if( nodes_list.size() != 0 )
-      {
-         std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
-         std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
-         bool lessPriorityFound = false;
-         while( it != end_it)
-         {
-            index++;
-            if( **it >= *node ) { it++; continue;}
+			nodes_list.insert( it, node);
 
-            nodes_list.insert( it, node);
+			lessPriorityFound = true;
+			break;
+		}
+		if( lessPriorityFound == false )
+			nodes_list.push_back( node);
+	}
+	else
+		nodes_list.push_back( node);
 
-            lessPriorityFound = true;
-            break;
-         }
-         if( lessPriorityFound == false )
-            nodes_list.push_back( node);
-      }
-      else
-         nodes_list.push_back( node);
+	index++;
+	node->m_lists.push_back( this);
 
-      index++;
-      node->m_lists.push_back( this);
-   }
-
-   return index;
+	return index;
 }
 
 void AfList::remove( AfNodeSrv *node)

@@ -99,15 +99,17 @@ void Msg::construct()
 bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 {
 	if( m_type == Msg::TInvalid) return false;
+
     if( i_size < 0 || i_size > Msg::SizeBufferLimit)
 	{
 		AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)", i_size, Msg::SizeBufferLimit)
 		setInvalid();
 		return false;
 	}
+
 	char * old_buffer = m_buffer;
 	m_buffer_size = i_size;
-AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", i_size, written, old_buffer)
+	AFINFA("Msg::allocateBuffer(%s): trying %d bytes ( %d written at %p)", TNAMES[m_type], i_size, m_writtensize, old_buffer)
 	m_buffer = new char[m_buffer_size];
 	if( m_buffer == NULL )
 	{
@@ -115,7 +117,7 @@ AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", i_size, writt
 		setInvalid();
 		return false;
 	}
-AFINFA("Msg::allocateBuffer: new buffer at %p", m_buffer)
+
 	m_data         = m_buffer      + Msg::SizeHeader;
 	m_data_maxsize = m_buffer_size - Msg::SizeHeader;
 
