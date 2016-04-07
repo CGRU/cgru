@@ -1,6 +1,7 @@
 #pragma once
 
-#include "clientcontainer.h"
+#include "afcontainer.h"
+#include "afcontainerit.h"
 
 #include "../libafanasy/monitorevents.h"
 #include "../libafanasy/taskprogress.h"
@@ -11,7 +12,7 @@ class MonitorAf;
 class UserAf;
 
 /// Monitors container.
-class MonitorContainer : public ClientContainer
+class MonitorContainer : public AfContainer
 {
 public:
    MonitorContainer();
@@ -20,7 +21,6 @@ public:
 	/// Add new Monitor to container.
 	af::Msg * addMonitor( MonitorAf * i_monitor, bool i_binary);
 
-//   void sendMessage( const af::MCGeneral & i_mcgeneral);
 
 	// Send message to all monitors:
 	inline void announce( const std::string & i_str) { m_announcement = i_str;}

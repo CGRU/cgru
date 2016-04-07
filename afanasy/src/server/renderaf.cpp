@@ -229,9 +229,6 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
 	if( start)
 	{
-/*		af::Msg* msg = new af::Msg( af::Msg::TTask, taskexec);
-		msg->setAddress( this);
-		ms_msg_queue->pushMsg( msg);*/
 		m_re.m_tasks.push_back( taskexec);
 		std::string str = "Starting task: ";
 		str += taskexec->v_generateInfoString( false);
@@ -257,9 +254,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 	{
 		if( taskexec != *it) continue;
 
-		af::Msg* msg = new af::Msg( af::Msg::TTask, taskexec);
-		msg->setAddress( this);
-		ms_msg_queue->pushMsg( msg);
+		m_re.m_tasks.push_back( taskexec);
 
 		std::string str = "Starting service: ";
 		str += taskexec->v_generateInfoString( false);
@@ -479,12 +474,6 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 
 	m_re.m_instruction = "sleep";
 	m_re.m_command = str.str();
-/*
-	af::MCGeneral mg( str.str());
-	af::Msg* msg = new af::Msg( af::Msg::TRenderWOLSleepRequest, &mg);
-	msg->setAddress( this);
-	ms_msg_queue->pushMsg( msg);
-*/
 }
 
 void RenderAf::wolWake(  MonitorContainer * i_monitoring, const std::string & i_msg)

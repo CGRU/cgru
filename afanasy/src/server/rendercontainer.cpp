@@ -11,19 +11,14 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-af::MsgQueue * RenderContainer::ms_msg_queue = NULL;
-
 RenderContainer::RenderContainer():
-	ClientContainer( "Renders", AFRENDER::MAXCOUNT)
+	AfContainer( "Renders", AFRENDER::MAXCOUNT)
 {
-	ms_msg_queue = new af::MsgQueue("Send messages to renders", af::AfQueue::e_start_thread);
 	RenderAf::setRenderContainer( this);
-	RenderAf::setMsgQueue( ms_msg_queue);
 }
 
 RenderContainer::~RenderContainer()
 {
-	delete ms_msg_queue;
 AFINFO("RenderContainer::~RenderContainer:")
 }
 
@@ -63,25 +58,31 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
          }
       }
 
-      // Registering new render, no renders with this hostname exist:
-      int id = addClient( newRender);
-      if( id != 0 )
-      {
+		// Registering new render, no renders with this hostname exist:
+		int id = add( newRender);
+		if( id != 0 )
+		{
 			newRender->initialize();
-         if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_add, id);
-         AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
-//if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
-      }
-      // Return new render ID to render to tell that it was successfully registered:
-      return new af::Msg( af::Msg::TRenderId, id);
+			if( monitoring )
+				monitoring->addEvent( af::Monitor::EVT_renders_add, id);
+
+			AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
+		}
+		else
+			delete newRender;
+
+		// Return new render ID to render to tell that it was successfully registered:
+		return new af::Msg( af::Msg::TRenderId, id);
    }
 
-   // Adding offline render from database:
-   if( addClient( newRender))
-   {
-      std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
+	// Adding offline render from database:
+	if( add( newRender))
+	{
+		std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
 		newRender->initialize();
-   }
+	}
+	else
+		delete newRender;
 
    return NULL;
 }

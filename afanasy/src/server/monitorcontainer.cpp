@@ -17,13 +17,12 @@
 #include "../include/macrooutput.h"
 
 MonitorContainer::MonitorContainer():
-	ClientContainer( "Monitors", AFMONITOR::MAXCOUNT),
+	AfContainer( "Monitors", AFMONITOR::MAXCOUNT),
 	m_events( NULL),
 	m_jobEvents( NULL),
 	m_jobEventsUids( NULL)
 {
 	MonitorAf::setMonitorContainer( this);
-//	MonitorAf::setMsgQueue( ms_msg_queue);
 
 	m_events = new std::list<int32_t>[ af::Monitor::EVT_COUNT];
 	m_jobEvents	  = new std::list<int32_t>[ af::Monitor::EVT_JOBS_COUNT];
@@ -299,44 +298,7 @@ void MonitorContainer::clearEvents()
 
 	m_announcement.clear();
 }
-/*
-void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
-{
-//printf("MonitorContainer::sendMessage:\n"); mcgeneral.stdOut( true);
-	int idscount = mcgeneral.getCount();
-	if( idscount < 1 ) return;
 
-	af::Msg * msg = new af::Msg;
-	bool found = false;
-	MonitorContainerIt mIt( this);
-	for( int i = 0; i < idscount; i++)
-	{
-		MonitorAf * monitor = mIt.getMonitor( mcgeneral.getId(i));
-		if( monitor == NULL) continue;
-		msg->addAddress( monitor);
-		if( !found) found = true;
-	}
-	if( found)
-	{
-		msg->setString( mcgeneral.getUserName() + ": " + mcgeneral.getString() );
-		ms_msg_queue->pushMsg( msg);
-	}
-	else delete msg;
-}
-
-void MonitorContainer::sendMessage( const std::string & str)
-{
-	af::Msg * msg = new af::Msg;
-	msg->setString( str);
-	MonitorContainerIt mIt( this);
-
-	for( MonitorAf * monitor = mIt.monitor(); monitor != NULL; mIt.next(), monitor = mIt.monitor())
-		msg->addAddress( monitor);
-	if( msg->addressesCount() )
-		ms_msg_queue->pushMsg( msg);
-	else delete msg;
-}
-*/
 void MonitorContainer::addTask( int i_jobid, int i_block, int i_task, af::TaskProgress * i_tp)
 {
 	af::MCTasksProgress * t = NULL;

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "rendercontainer.h"
-#include "clientcontainer.h"
+#include "afcontainer.h"
+#include "afcontainerit.h"
 #include "renderaf.h"
 
 #include "../libafanasy/msgclasses/mctaskup.h"
 
 /// Renders container.
-class RenderContainer : public ClientContainer
+class RenderContainer : public AfContainer
 {
 public:
    RenderContainer();
@@ -15,10 +15,6 @@ public:
 
 /// Add new Render to container, new id returned on success, else return 0.
    af::Msg * addRender( RenderAf *newRender, MonitorContainer * monitoring = NULL);
-
-private:
-
-	static af::MsgQueue * ms_msg_queue;
 };
 
 /// Renders iterator.
