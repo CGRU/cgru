@@ -13,7 +13,6 @@ CmdMonitorList::CmdMonitorList()
    setCmd("mlist");
    setInfo("List of online Monitors.");
 	setMsgType( af::Msg::TJSON);
-   setRecieving();
 }
 CmdMonitorList::~CmdMonitorList(){}
 bool CmdMonitorList::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -34,7 +33,6 @@ CmdMonitorLog::CmdMonitorLog()
 	setInfo("Get Monitor log by id.");
 	setHelp("mlog [id] Get monitor log with given id.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdMonitorLog::~CmdMonitorLog(){}
 bool CmdMonitorLog::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -51,7 +49,6 @@ CmdMonitorMsg::CmdMonitorMsg()
    setInfo("Send message to all GUI monitors.");
    setHelp("mmsg [message]");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 
 CmdMonitorMsg::~CmdMonitorMsg(){}

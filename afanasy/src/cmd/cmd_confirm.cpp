@@ -10,7 +10,6 @@ CmdConfirm::CmdConfirm()
    setInfo("Send confirm message.");
    setHelp("Watching server output you can see threads response speed. For debug purposes.");
    setMsgType( af::Msg::TConfirm);
-   setRecieving();
 }
 
 CmdConfirm::~CmdConfirm(){}

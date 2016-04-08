@@ -103,12 +103,6 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 	printf(" <<< "); i_msg->v_stdOut();
 	#endif
 
-    if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
-    {
-        // Assuming that message should be send to server if no address specified.
-        i_msg->setAddress( af::Environment::getServerAddress());
-    }
-
 	if( ms_server_answer )
 		delete ms_server_answer;
 
@@ -244,7 +238,6 @@ void RenderHost::update( const uint64_t & i_cycle)
 		msg = new af::Msg( ms_updateMsgType, &ms_up);
 	}
 
-	msg->setReceiving();
 	dispatchMessage( msg);
 
 	ms_up.clear();

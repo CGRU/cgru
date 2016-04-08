@@ -14,7 +14,6 @@ public:
 	Cmd();
 	virtual ~Cmd();
 
-	inline void setRecieving( bool i_value = true) { m_recieving = i_value; }
 	inline void setCmd(   const std::string & str) { m_cmd    = str;   }
 	inline void setInfo(  const std::string & str) { m_info   = str;   }
 	inline void setHelp(  const std::string & str) { m_help   = str;   }
@@ -22,7 +21,6 @@ public:
 	inline void setMsgType(    int value         ) { m_msgtype     = value; }
 	inline void setMsgOutType( int value         ) { m_msgouttype  = value; }
 
-	inline bool isRecieving()                    const { return m_recieving;           }
 	inline bool isCmd( const std::string & str)  const { return m_cmd == str;          }
 	inline bool hasArgsCount( int value )        const { return m_argscount  <= value; }
 	inline bool isMsgOutType( int value )        const { return m_msgouttype == value; }
@@ -52,7 +50,6 @@ private:
 	int  m_msgtype;
 	int  m_msgouttype;
 	int  m_argscount;
-	bool m_recieving;
 
 	std::string m_cmd;
 	std::string m_info;

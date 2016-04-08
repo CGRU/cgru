@@ -283,12 +283,6 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		return NULL;
 	}
 
-	if( false == i_msg->isReceiving())
-	{
-		af::socketDisconnect( socketfd);
-		return NULL;
-	}
-
 
 	// Read JSON answer:
 	if( i_msg->type() == af::Msg::TJSON )
@@ -522,46 +516,13 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 
 af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 {
-	if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
+	if( i_msg->addressIsEmpty())
 	{
-		AFERROR("af::msgsend: Receiving message has several addresses.")
+		// Assuming that message should be send to server if no address specified.
+		i_msg->setAddress( af::Environment::getServerAddress());
 	}
 
-	if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
-	{
-		AFERROR("af::msgsend: Message has no addresses to send to.")
-		o_ok = false;
-		i_msg->v_stdOut();
-		return NULL;
-	}
-
-	if( false == i_msg->addressIsEmpty())
-	{
-		af::Msg * o_msg = ::msgsendtoaddress( i_msg, i_msg->getAddress(), o_ok, i_verbose);
-		if( o_msg != NULL )
-			return o_msg;
-	}
-
-	if( i_msg->addressesCount() < 1)
-		return NULL;
-
-	bool ok;
-	const std::list<af::Address> * addresses = i_msg->getAddresses();
-	std::list<af::Address>::const_iterator it = addresses->begin();
-	std::list<af::Address>::const_iterator it_end = addresses->end();
-	while( it != it_end)
-	{
-		::msgsendtoaddress( i_msg, *it, ok, i_verbose);
-		if( false == ok )
-		{
-			o_ok = false;
-			// Store an address that message was failed to send to
-			i_msg->setAddress( *it);
-		}
-		it++;
-	}
-
-	return NULL;
+	return ::msgsendtoaddress( i_msg, i_msg->getAddress(), o_ok, i_verbose);
 }
 
 void af::socketDisconnect( int i_sd, uint32_t i_response_type)

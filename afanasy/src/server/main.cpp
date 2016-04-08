@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 	
 	// Message Queue initialization, but without thread start.
 	// Run cycle queue will read this messages itself.
-	af::MsgQueue msgQueue("RunMsgQueue", af::AfQueue::e_no_thread);  
+	af::MsgQueue msgQueue("RunMsgQueue");
 	if( false == msgQueue.isInitialized()) 
 	  return 1;
 

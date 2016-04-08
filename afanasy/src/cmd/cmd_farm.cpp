@@ -27,7 +27,6 @@ CmdFarmLoad::CmdFarmLoad()
 	setInfo("Request server to reload farm file.");
 	setHelp("fload Request server to reload farm information.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdFarmLoad::~CmdFarmLoad(){}
 bool CmdFarmLoad::v_processArguments( int argc, char** argv, af::Msg &msg)

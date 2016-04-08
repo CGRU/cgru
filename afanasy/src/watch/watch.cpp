@@ -88,7 +88,6 @@ void Watch::sendMsg( af::Msg * msg)
 	if( msg->type() == af::Msg::TJSON )
 	{
 		msg->setJSONBIN();
-		msg->setReceiving();
 
 		static int unused;
 		unused = ::write( 1, " <<< ", 5);
@@ -104,7 +103,6 @@ void Watch::get( const std::string & i_str)
 	str += i_str + "}}";
 
 	af::Msg * msg = af::jsonMsg( str);
-	msg->setReceiving( true);
 	Watch::sendMsg( msg);
 }
 

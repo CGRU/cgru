@@ -8,7 +8,6 @@
 #include "../include/macrooutput.h"
 
 AfCmd::AfCmd():
-	recieving( false),
 	command( NULL)
 {
 	RegisterCommands();
@@ -65,7 +64,6 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 								continue;
 							}
 						}
-						recieving = command->isRecieving();
 						return true;
 					}
 				}

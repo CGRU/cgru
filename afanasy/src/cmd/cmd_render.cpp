@@ -17,7 +17,6 @@ CmdRenderList::CmdRenderList()
 	setCmd("rlist");
 	setInfo("List of online Renders.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdRenderList::~CmdRenderList(){}
 bool CmdRenderList::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -38,7 +37,6 @@ CmdRenderResoucesList::CmdRenderResoucesList()
 	setInfo("List of resources of Renders specified by mask.");
 	setMsgType( af::Msg::TRendersResourcesRequestIds);
 	setMsgOutType( af::Msg::TRendersResources);
-	setRecieving();
 }
 CmdRenderResoucesList::~CmdRenderResoucesList(){}
 bool CmdRenderResoucesList::v_processArguments( int argc, char** argv, af::Msg &msg)

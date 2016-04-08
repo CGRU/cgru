@@ -17,7 +17,6 @@ CmdJSON::CmdJSON()
 	setInfo("JSON file or stdin.");
 	setHelp("json [send] [file] JSON file, send or not.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 
 CmdJSON::~CmdJSON(){}
@@ -157,7 +156,6 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 		if( job.isValid())
 		{
 			send_stream = true;
-			setRecieving( false);
 		}
 		else
 		{

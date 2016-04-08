@@ -10,27 +10,26 @@ import cgruconfig
 import cgruutils
 
 
-def genHeader(data_size):
+def genHeader( i_data_size):
 	"""Missing DocString
 
-	:param data_size:
+	:param i_data_size:
 	:return:
 	"""
-	data = 'AFANASY %s JSON' % data_size
-	return bytearray(data, 'utf-8')
+	data = 'AFANASY %s JSON' % i_data_size
+	return bytearray( data, 'utf-8')
 
 
-def sendServer(data, receive=True, verbose=False):
+def sendServer( i_data, i_verbose = False):
 	"""Missing DocString
 
-	:param receive:
-	:param verbose:
+	:param i_verbose:
 	:return:
 	"""
-	size = len(data)
+	size = len(i_data)
 	header = genHeader(size)
-	data = header + bytearray(data, 'utf-8')
-	datalen = len(data)
+	i_data = header + bytearray(i_data, 'utf-8')
+	datalen = len(i_data)
 	# return True, None
 
 	host = cgruconfig.VARS['af_servername']
@@ -48,7 +47,7 @@ def sendServer(data, receive=True, verbose=False):
 
 	for res in reslist:
 		af, socktype, proto, canonname, sa = res
-		if verbose:
+		if i_verbose:
 			print('Trying to connect to "%s"' % str(sa[0]))
 		try:
 			s = socket.socket(af, socktype, proto)
@@ -74,23 +73,19 @@ def sendServer(data, receive=True, verbose=False):
 		print(err_msg)
 		return False, None
 
-	if verbose:
+	if i_verbose:
 		print('afnetwork.sendServer: send %d bytes' % datalen)
 
-	# s.sendall( data) #<<< !!! May not work !!!!
+	# s.sendall( i_data) #<<< !!! May not work !!!!
 
 	total_send = 0
-	while total_send < len(data):
-		sent = s.send(data[total_send:])
+	while total_send < len(i_data):
+		sent = s.send( i_data[total_send:])
 		if sent == 0:
 			disconnectSocket( s)
 			print('Error: Unable send data to socket')
 			return False, None
 		total_send += sent
-
-	if not receive:
-		disconnectSocket( s)
-		return True, None
 
 
 	data = b''
@@ -109,7 +104,7 @@ def sendServer(data, receive=True, verbose=False):
 				msg_len = dataStr[:dataStr.find('JSON')+4]
 				msg_len = len(msg_len) + int(msg_len.split(' ')[1])
 
-		if verbose:
+		if i_verbose:
 			print('Received %d of %d bytes.' % ( len(data), msg_len))
 
 		if msg_len is not None:

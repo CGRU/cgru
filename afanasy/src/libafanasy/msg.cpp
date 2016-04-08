@@ -28,16 +28,16 @@ const int Msg::SizeDataMax       = Msg::SizeBufferLimit - Msg::SizeHeader;
 
 //
 //########################## Message constructors: (and destructor) ###########################
-Msg::Msg( int msgType, int msgInt, bool i_receiving)
+Msg::Msg( int msgType, int msgInt)
 {
 	construct();
-	set( msgType, msgInt, i_receiving);
+	set( msgType, msgInt);
 }
 
-Msg::Msg( int msgType, Af * afClass, bool i_receiving )
+Msg::Msg( int msgType, Af * afClass)
 {
 	construct();
-	set( msgType, afClass, i_receiving);
+	set( msgType, afClass);
 }
 
 Msg::Msg( const struct sockaddr_storage * ss):
@@ -47,8 +47,7 @@ Msg::Msg( const struct sockaddr_storage * ss):
 	set( TNULL);
 }
 
-Msg::Msg( const char * rawData, int rawDataLen, bool i_receiving):
-	m_receive( i_receiving),
+Msg::Msg( const char * rawData, int rawDataLen):
 	m_buffer( NULL),
 	// This message not for write any more data. All data will be written in this constuctor.
 	// We will only read node parameters to constuct af::Af based classes.
@@ -85,9 +84,6 @@ void Msg::construct()
 	m_int32 = 0;
 
 	m_header_offset = 0;
-
-	m_receive = false;
-	m_sendfailed = false;
 
 	m_writing = false;
 	m_writtensize = 0;
@@ -162,9 +158,8 @@ bool Msg::checkZero( bool outerror )
 	return true;
 }
 
-bool Msg::set( int msgType, int msgInt, bool i_receiving)
+bool Msg::set( int msgType, int msgInt)
 {
-	m_receive = i_receiving;
 	if( msgType >= Msg::TDATA)
 	{
 		AFERROR("Msg::set: Trying to set data message with no data.")
@@ -229,11 +224,10 @@ bool Msg::setJSON_headerBin( const std::string & i_str)
 	return result;
 }
 */
-bool Msg::set( int msgType, Af * afClass, bool i_receiving)
+bool Msg::set( int msgType, Af * afClass)
 {
 	if(checkZero( true) == false ) return false;
 
-	m_receive = i_receiving;
 	m_type = msgType;
 	if( m_type < TDATA)
 	{

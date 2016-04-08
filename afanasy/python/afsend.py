@@ -31,7 +31,7 @@ with open(File, 'rb') as f:
 
 for i in range(0, Options.cycles):
 
-	status, answer = afnetwork.sendServer(data, True, Options.verbose)
+	status, answer = afnetwork.sendServer(data, Options.verbose)
 
 	if not status:
 		sys.exit(1)

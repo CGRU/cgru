@@ -69,8 +69,6 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     {
         if( msg.isNull() == false)
         {
-            msg.setReceiving( afcmd.isRecieving());
-
             msg.setAddress( af::Environment::getServerAddress());
 
             if( Verbose ) msg.v_stdOut();

@@ -20,8 +20,6 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-af::MsgQueue * AFCommon::MsgDispatchQueue_M = NULL;
-af::MsgQueue * AFCommon::MsgDispatchQueue_T = NULL;
 FileQueue    * AFCommon::FileWriteQueue = NULL;
 DBQueue      * AFCommon::ms_DBQueue     = NULL;
 LogQueue     * AFCommon::OutputLogQueue = NULL;
@@ -32,8 +30,6 @@ LogQueue     * AFCommon::OutputLogQueue = NULL;
 */
 AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
-	MsgDispatchQueue_M = new af::MsgQueue("Send messages for Monitors", af::AfQueue::e_start_thread);
-	MsgDispatchQueue_T = new af::MsgQueue("Send messages for Talks", af::AfQueue::e_start_thread);
 	FileWriteQueue = new FileQueue("Writing Files");
 	OutputLogQueue = new LogQueue("Log Output");
 	ms_DBQueue     = new DBQueue("AFDB_update", i_threadArgs->monitors);
@@ -42,8 +38,6 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 AFCommon::~AFCommon()
 {
 	delete FileWriteQueue;
-	delete MsgDispatchQueue_T;
-	delete MsgDispatchQueue_M;
 	delete OutputLogQueue;
 	delete ms_DBQueue;
 }

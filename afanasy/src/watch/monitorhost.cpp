@@ -38,8 +38,6 @@ af::Msg * MonitorHost::genRegisterMsg()
 
 	af::Msg * msg = af::jsonMsg( str);
 
-	msg->setReceiving( true);
-
 	return msg;
 }
 

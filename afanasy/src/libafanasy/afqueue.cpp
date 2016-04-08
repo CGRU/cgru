@@ -245,3 +245,9 @@ void AfQueue::run()
    
    AFINFA("AfQueue::run is finished for queue '%s'.", name.c_str() )
 }
+
+void AfQueue::processItem( AfQueueItem* item)
+{
+	AFERRAR("AfQueue::processItem: in %s not implemented.", name.c_str())
+}
+

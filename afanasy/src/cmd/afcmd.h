@@ -27,14 +27,9 @@ public:
     void RegisterCommands();
 
     bool processCommand( int argc, char** argv, af::Msg &msg);  ///< Generate message parsing command line arguments. Return \c true on sucsess.
-    inline bool isRecieving() const { return recieving; }
-
     void msgOutput(  af::Msg& msg);  ///< Print message information in stdout.
 
 private:
-
-    bool recieving;
-
     CmdList commands;
     Cmd * command;
 

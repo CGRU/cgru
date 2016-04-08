@@ -14,7 +14,6 @@ CmdTaskLog::CmdTaskLog()
 	setInfo("Get task log.");
 	setHelp("tout [jobid] [block] [task] [start] Get task log.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdTaskLog::~CmdTaskLog(){}
 bool CmdTaskLog::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -49,7 +48,6 @@ CmdTaskOutput::CmdTaskOutput()
 	setInfo("Get task output.");
 	setHelp("tout [jobid] [block] [task] [start] Get task output.");
 	setMsgType( af::Msg::TTaskOutputRequest);
-	setRecieving();
 }
 CmdTaskOutput::~CmdTaskOutput(){}
 bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)

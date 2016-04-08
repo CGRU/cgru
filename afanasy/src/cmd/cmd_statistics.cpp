@@ -14,7 +14,6 @@ CmdStatistics::CmdStatistics():
    setHelp("stat [columns=-1] [sorting=-1] Number of colums to output (-1:all), sort by column (-1:none).");
    setMsgType( af::Msg::TStatRequest);
    setMsgOutType( af::Msg::TStatData);
-   setRecieving();
 }
 
 CmdStatistics::~CmdStatistics(){}

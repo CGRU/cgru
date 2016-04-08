@@ -39,11 +39,7 @@ printf("QThreadClient::sendMessage: "); msg->v_stdOut();
 
 	if( connected )
 	{
-		bool send = false;
-		{
-			if( afqt::sendMessage( socket, msg)) send = true;
-		}
-		if( msg->isReceiving() && send)
+		if( afqt::sendMessage( socket, msg))
 		{
 			af::Msg * answer = new af::Msg;
 			if( afqt::recvMessage( socket, answer))
@@ -56,8 +52,12 @@ printf("QThreadClient::sendMessage: "); msg->v_stdOut();
 				delete answer;
 			}
 		}
+
 		socket->disconnectFromHost();
-		if( socket->state() != QAbstractSocket::UnconnectedState ) socket->waitForDisconnected();
+
+		if( socket->state() != QAbstractSocket::UnconnectedState )
+			socket->waitForDisconnected();
+
 		connlostcount = 0;
 	}
 	else

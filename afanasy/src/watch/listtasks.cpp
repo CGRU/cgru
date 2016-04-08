@@ -60,7 +60,6 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	str << ",\"ids\":[" << m_job_id << "]}}";
 
 	af::Msg * msg = af::jsonMsg( str);
-	msg->setReceiving( true);
 	Watch::sendMsg( msg);
 
 	m_parentWindow->setWindowTitle( m_job_name);
@@ -305,7 +304,6 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 			str << ",\"ids\":[" << m_job_id << "]}}";
 
 			af::Msg * msg = af::jsonMsg( str);
-			msg->setReceiving( true);
 			Watch::sendMsg( msg);
 
 			MonitorHost::addJobId( m_job_id);
@@ -576,7 +574,6 @@ void ListTasks::getTaskInfo( const std::string & i_mode, int i_number, Item * it
 	str << ",\"binary\":true}}";
 
 	af::Msg * msg = af::jsonMsg( str);
-	msg->setReceiving( true);
 	Watch::sendMsg( msg);
 }
 

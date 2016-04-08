@@ -19,25 +19,25 @@ class Msg : public Af, public AfQueueItem
 {
 public:
 	/// Default constructor.
-	Msg( int msgType = 0, int msgInt = 0, bool i_receiving = false);
+	Msg( int msgType = 0, int msgInt = 0);
 
 	/// Constructor from \c Af class.
-	Msg( int msgType, Af * afClass, bool i_receiving = false );
+	Msg( int msgType, Af * afClass);
 
 	/// Construct a message and set an address
 	Msg( const struct sockaddr_storage * ss);
 
-	Msg( const char * rawData, int rawDataLen, bool i_receiving = false);
+	Msg( const char * rawData, int rawDataLen);
 
 	~Msg();///< Destructor.
 
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 	/// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
-	bool set( int msgType, int msgInt = 0, bool i_receiving = false);
+	bool set( int msgType, int msgInt = 0);
 
 	/// Write \c Af class to message.
-	bool set( int msgType, Af * afClass, bool i_receiving = false);
+	bool set( int msgType, Af * afClass);
 
 	/// To set zero (\c Msg::TNone ) message to data message. Return \c true on success.
 		/// On TJSON header type will be not binary - binary header will be skipped at all.
@@ -203,41 +203,12 @@ TLAST
 
 	inline bool addressIsEmpty() const { return m_address.isEmpty();}
 
-	inline const size_t addressesCount() const { return m_addresses.size();}
-
-	/// Set to recieve an answer from the same socket after send
-	void setReceiving( bool i_value = true ) { m_receive = i_value; }
-
-	/// Set to recieve an answer from the same socket after send
-	bool isReceiving() const { return m_receive; }
-
-	/// Set to recieve an answer from the same socket after send
-	void setSendFailed( bool i_value = true ) { m_sendfailed = i_value; }
-
-	/// Set to recieve an answer from the same socket after send
-	bool wasSendFailed() { return m_sendfailed; }
-
 	/// Set message address
 	inline void setAddress( const Address & i_address)
 		{ m_address = i_address;}
 
-	/// Set message address to \c client
-	inline void setAddress( const Client* i_client)
-		{ m_address = i_client->getAddress();}
-
-	/// Set message address to \c client
-	inline void setAddresses( const std::list<Address> & i_addresses)
-		{ m_addresses = i_addresses;}
-
-	/// Add dispatch address
-	inline void addAddress( const Client* client)
-		{ m_addresses.push_back( client->getAddress());}
-
 	/// Get address constant pointer
 	inline const Address & getAddress() const { return m_address;}
-
-	/// Get addresses constant list pointer
-	inline const std::list<Address> * getAddresses() const { return &m_addresses;}
 
 	void setTypeHTTP();
 //	void createHTTPHeader();
@@ -265,9 +236,6 @@ private:
 
 // communication parameters:
 	Address m_address;                ///< Address, where message came from or will be send.
-	std::list<Address> m_addresses;   ///< Addresses to dispatch message to.
-	bool m_receive;                   ///< Whether to recieve an answer on message request.
-	bool m_sendfailed;                ///< Message was failed to send.
 
 private:
 

@@ -20,7 +20,6 @@ CmdJobsList::CmdJobsList()
 	setCmd("jlist");
 	setInfo("List of online jobs.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdJobsList::~CmdJobsList(){}
 bool CmdJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -40,7 +39,6 @@ CmdJobsWeight::CmdJobsWeight()
 	setInfo("Jobs memory weight.");
 	setMsgType( af::Msg::TJobsWeightRequest);
 	setMsgOutType( af::Msg::TJobsWeight);
-	setRecieving();
 }
 CmdJobsWeight::~CmdJobsWeight(){}
 bool CmdJobsWeight::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -146,7 +144,6 @@ CmdJobId::CmdJobId()
 	setInfo("Get job.");
 	setHelp("jid [id] Get job with given id.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdJobId::~CmdJobId(){}
 bool CmdJobId::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -163,7 +160,6 @@ CmdJobLog::CmdJobLog()
 	setInfo("Get job log.");
 	setHelp("jlog [id] Get job log with given id.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdJobLog::~CmdJobLog(){}
 bool CmdJobLog::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -180,7 +176,6 @@ CmdJobProgress::CmdJobProgress()
 	setInfo("Get job progress.");
 	setHelp("jprog [id] Get progress job with given id.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdJobProgress::~CmdJobProgress(){}
 bool CmdJobProgress::v_processArguments( int argc, char** argv, af::Msg &msg)

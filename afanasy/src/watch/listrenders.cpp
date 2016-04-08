@@ -184,7 +184,7 @@ void ListRenders::requestResources()
 
 	if( ids.getCount())
 	{
-		Watch::sendMsg( new af::Msg( af::Msg::TRendersResourcesRequestIds, &ids, true));
+		Watch::sendMsg( new af::Msg( af::Msg::TRendersResourcesRequestIds, &ids));
 	}
 }
 

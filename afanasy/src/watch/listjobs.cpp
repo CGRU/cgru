@@ -408,7 +408,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	{
 		if( updateItems( msg) && (af::Environment::VISOR() == false))
 		{
-			Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid(), true));
+			Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid()));
 		}
 		if( false == isSubscribed() )
 		{
@@ -476,7 +476,7 @@ ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
 void ListJobs::resetSorting()
 {
 	if( af::Environment::VISOR() == false )
-		Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid(), true));
+		Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid()));
 }
 
 void ListJobs::calcTotals()

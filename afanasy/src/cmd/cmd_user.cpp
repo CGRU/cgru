@@ -15,7 +15,6 @@ CmdUserList::CmdUserList()
 	setCmd("ulist");
 	setInfo("List of permanent users.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdUserList::~CmdUserList(){}
 bool CmdUserList::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -37,7 +36,6 @@ CmdUserJobsList::CmdUserJobsList()
 	setHelp("ujobs [id] Request a list of jobs of user with given id.");
 	setMsgType( af::Msg::TJSON);
 	setMsgOutType( af::Msg::TJobsList);
-	setRecieving();
 }
 CmdUserJobsList::~CmdUserJobsList(){}
 bool CmdUserJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -58,8 +56,6 @@ CmdUserAdd::CmdUserAdd()
 	setInfo("Add permanent user.");
 	setHelp("uadd [name] Add a permanent user with spcecified name.");
 	setMsgType( af::Msg::TJSON);
-//	setMsgOutType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdUserAdd::~CmdUserAdd(){}
 bool CmdUserAdd::v_processArguments( int argc, char** argv, af::Msg &msg)

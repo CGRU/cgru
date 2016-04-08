@@ -446,7 +446,6 @@ void ItemJob::getThumbnail() const
 	str << ",\"binary\":true}}";
 
 	af::Msg * msg = af::jsonMsg( str);
-	msg->setReceiving( true);
 	Watch::sendMsg( msg);
 }
 

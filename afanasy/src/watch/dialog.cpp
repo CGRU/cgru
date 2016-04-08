@@ -386,7 +386,7 @@ void Dialog::idReceived( int i_id, int i_uid)
 				}
 			}
 
-			af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, i_id, true);
+			af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, i_id);
 			m_qThreadClientUpdate.setUpMsg( msg);
 		}
 	}

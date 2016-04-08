@@ -10,8 +10,7 @@
 Cmd::Cmd():
    m_msgtype( 0),
    m_msgouttype( 0),
-   m_argscount( 0),
-   m_recieving( false)
+   m_argscount( 0)
 {
 }
 
@@ -21,8 +20,6 @@ void Cmd::v_printInfo() const
 {
    std::cout << " \t" << m_cmd;
    if( m_msgtype ) std::cout << " \t- Msg::" << af::Msg::TNAMES[m_msgtype];
-   std::cout << " \t" << m_info;
-   if( m_recieving ) std::cout << " [" << af::Msg::TNAMES[m_msgouttype] << "]";
    std::cout << std::endl;
 }
 

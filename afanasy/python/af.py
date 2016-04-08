@@ -636,7 +636,7 @@ class Job:
 		obj = {"job": self.data}
 		# print(json.dumps( obj))
 
-		return afnetwork.sendServer(json.dumps(obj), True, verbose)
+		return afnetwork.sendServer(json.dumps(obj), verbose)
 
 	def setAnnotation(self, value):
 		"""Missing DocString
@@ -803,10 +803,9 @@ class Cmd:
 			print('ERROR: Action is not set.')
 			return None
 
-		receive = (self.action == 'get')
 		obj = {self.action: self.data}
 		# print(json.dumps( obj))
-		output = afnetwork.sendServer(json.dumps(obj), receive, verbose)
+		output = afnetwork.sendServer(json.dumps(obj), verbose)
 
 		if output[0] is True:
 			return output[1]
