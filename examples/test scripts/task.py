@@ -33,7 +33,7 @@ Parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=
 Parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,    help='Random time per frame in seconds')
 Parser.add_option('-f', '--fileout',   dest='fileout',   type='string', default=None, help='File to write')
 Parser.add_option('-v', '--verbose',   dest='verbose',   type='int',    default=0,    help='Verbose')
-Parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=10,   help='Parser key percentage')
+Parser.add_option('-p', '--pkp',       dest='pkp',       type='int',    default=1,    help='Parser key percentage')
 Parser.add_option('-H', '--hosts',     dest='hosts',     type='string', default=None, help='Hosts list for mutihost tasks')
 Parser.add_option('--exitstatus',      dest='exitstatus',type='int',    default=0,    help='Good exit status')
 

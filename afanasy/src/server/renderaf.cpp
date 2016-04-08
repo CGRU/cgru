@@ -75,7 +75,7 @@ RenderAf::~RenderAf()
 {
 }
 
-bool RenderAf::initialize()
+void RenderAf::setRegistered()
 {
 	getFarmHost();
 
@@ -91,11 +91,6 @@ bool RenderAf::initialize()
 		appendLog("Registered.");
 	}
 
-	return true;
-}
-
-void RenderAf::setRegisterTime()
-{
 	af::Client::setRegisterTime();
 
 	m_task_start_finish_time = 0;

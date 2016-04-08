@@ -22,10 +22,7 @@ public:
 
 	inline static bool noOutputRedirection() { return ms_no_output_redirection; }
 
-    inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
-
-//    inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
-    inline static af::Msg * acceptTry()  { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_no_wait); }
+	inline static af::Msg * getServerAnswer() { af::Msg * o_msg = ms_server_answer; ms_server_answer = NULL; return o_msg; }
 
     static bool isConnected() { return ms_connected;  }
     static void setRegistered( int i_id);
@@ -38,7 +35,6 @@ public:
 
     static void update( const uint64_t & i_cycle);
 
-    static void runTask( af::Msg * i_msg);
 	static void runTask( af::TaskExec * i_task);
 
     static void stopTask( const af::MCTaskPos & i_taskpos);
@@ -51,8 +47,6 @@ public:
 
 	static void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe);
 
-//    inline static void   lockMutex() { ms_obj->m_mutex.Lock();  }
-//    inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
 
 #ifdef WINNT
     static void windowsMustDie();
@@ -72,8 +66,7 @@ private:
 
     static std::vector<PyRes*> ms_pyres;
 
-    static af::MsgQueue * ms_msgAcceptQueue;
-    static af::MsgQueue * ms_msgDispatchQueue;
+	static af::Msg * ms_server_answer;
 
     static bool ms_connected;
 	static int  ms_connection_lost_count;
@@ -85,7 +78,4 @@ private:
 	static bool ms_no_output_redirection;
 
 	static af::RenderUpdate ms_up;
-
-//    DlMutex m_mutex;
-//    DlRWLock m_mutex;
 };

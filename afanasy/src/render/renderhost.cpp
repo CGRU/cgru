@@ -13,15 +13,13 @@
 #include "res.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
 
 RenderHost * RenderHost::ms_obj = NULL;
 af::RenderUpdate RenderHost::ms_up;
-af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
-af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
 int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
 bool RenderHost::ms_connected = false;
 int RenderHost::ms_connection_lost_count = 0;
@@ -29,6 +27,7 @@ std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
 bool RenderHost::ms_no_output_redirection = false;
 std::vector<std::string> RenderHost::ms_windowsmustdie;
+af::Msg * RenderHost::ms_server_answer = NULL;
 
 RenderHost::RenderHost():
 	af::Render( Client::GetEnvironment)
@@ -36,12 +35,6 @@ RenderHost::RenderHost():
     ms_obj = this;
 
 	if( af::Environment::hasArgument("-nor")) ms_no_output_redirection = true;
-
-    ms_msgAcceptQueue   = new af::MsgQueue("Messages Accept Queue",   af::AfQueue::e_no_thread    );
-    ms_msgDispatchQueue = new af::MsgQueue("Messages Dispatch Queue", af::AfQueue::e_start_thread );
-    ms_msgDispatchQueue->setReturnQueue( ms_msgAcceptQueue);
-    ms_msgDispatchQueue->returnNotSended();
-    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
 
     setOnline();
 
@@ -100,10 +93,6 @@ RenderHost::~RenderHost()
         delete *it;
         it = ms_tasks.erase( it);
     }
-
-    // Delete queues:
-    delete ms_msgAcceptQueue;
-    delete ms_msgDispatchQueue;
 }
 
 void RenderHost::dispatchMessage( af::Msg * i_msg)
@@ -119,14 +108,26 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
         // Assuming that message should be send to server if no address specified.
         i_msg->setAddress( af::Environment::getServerAddress());
     }
-    ms_msgDispatchQueue->pushMsg( i_msg);
+
+	if( ms_server_answer )
+		delete ms_server_answer;
+
+	bool ok;
+	ms_server_answer = af::msgsend( i_msg, ok, af::VerboseOff);
+	if( ok )
+		connectionEstablished();
+	else
+		connectionLost();
+
+
+	delete i_msg;
 }
 
 void RenderHost::setRegistered( int i_id)
 {
     ms_connected = true;
     ms_obj->m_id = i_id;
-    ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
+//    ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
     setUpdateMsgType( af::Msg::TRenderUpdate);
     printf("Render registered.\n");
 	RenderHost::connectionEstablished();
@@ -155,7 +156,7 @@ void RenderHost::connectionLost( bool i_any_case)
     // Stop all tasks:
     for( int t = 0; t < ms_tasks.size(); t++) ms_tasks[t]->stop();
 
-    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
+//    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
 
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
@@ -266,10 +267,6 @@ void RenderHost::windowsMustDie()
 }
 #endif
 
-void RenderHost::runTask( af::Msg * i_msg)
-{
-    ms_tasks.push_back( new TaskProcess( new af::TaskExec( i_msg)));
-}
 void RenderHost::runTask( af::TaskExec * i_task)
 {
 	ms_tasks.push_back( new TaskProcess( i_task));

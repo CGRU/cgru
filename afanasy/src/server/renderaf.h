@@ -26,11 +26,8 @@ public:
 /// Construct an offline render for store.
 	RenderAf( const std::string & i_store_dir);
 
-	// Initialize render in container:
-	bool initialize();
-
 /// Set registration time ( and update time).
-	void setRegisterTime();
+	void setRegistered();
 
 /// Awake offline render
 	bool online( RenderAf * render, MonitorContainer * monitoring);

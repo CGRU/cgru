@@ -17,31 +17,24 @@ class afqt::QThreadClientUp : public afqt::QThreadClient
    Q_OBJECT
 public:
 
-   QThreadClientUp( QObject * Parent, bool Blocking, int Seconds, int NumConnLost);
+	QThreadClientUp( QObject * i_parent, int i_seconds, int i_numConnLost);
 
-   ~QThreadClientUp();                 ///< Dectructor for safety thread exit.
+	~QThreadClientUp();
 
-   virtual void run();                                ///< QThread.run() method override.
 
-   void setUpMsg( af::Msg * msg);   ///< Set message for update (Msg::TNone - the default).
+	/// QThread.run() method override.
+	virtual void run(); 
 
-   void setInterval( const int Seconds);///< Set update interval.
 
-   inline void stop() { toQuit = true; timer.stop();} ///< Stop updating.
+	/// Set message for update
+	void setUpMsg( af::Msg * msg);
 
-   inline void set_update_handler( af::Msg * (*handler_ptr)( af::Msg *))
-      { update_handler_ptr = handler_ptr;}
 
 private:
-   af::Msg * getMessage();
-   QTimer timer;     ///< Qt timer pointer.
-   QMutex mutex;
-   QWaitCondition cond;
-   int  seconds;
-   bool blocking;
-   af::Msg * (*update_handler_ptr)( af::Msg *);
-   bool toQuit;
+	af::Msg * getMessage();
 
-private slots:
-   void send();
+private:
+	int m_seconds;
+
+	bool m_exiting;
 };

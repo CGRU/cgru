@@ -144,7 +144,7 @@ void threadAcceptPort( void * i_arg, int i_port)
 		return;
 	}
 
-	if( listen( server_sd, 9) != 0)
+	if( listen( server_sd, SOMAXCONN) != 0)
 	{
 		AFERRAR("Port %d:", i_port)
 		AFERRPE("listen()")
@@ -158,10 +158,16 @@ void threadAcceptPort( void * i_arg, int i_port)
 
 	//
 	//############ accepting client connections:
+
 	int error_wait; // Timeout to pause accepting on error
 	static const int error_wait_max = 1 << 30;   // Maximum timeout value
 	static const int error_wait_min = 1 << 3;    // Minimum timeout value
 	error_wait = error_wait_min;
+
+	int64_t accepts_count = 0;
+	time_t  accepts_stat_count = 100;
+	time_t  accepts_stat_time = time( NULL);
+
 	while( AFRunning )
 	{
 		ThreadArgs * newThreadArgs = new ThreadArgs(*threadArgs);
@@ -188,15 +194,20 @@ void threadAcceptPort( void * i_arg, int i_port)
 					AFRunning = false;
 					break;
 			}
+
 			if( false == AFRunning )
 			{
 				delete threadArgs;
 				break;
 			}
+
 			af::sleep_sec( error_wait);
-			if( error_wait < error_wait_max) error_wait = error_wait << 1;
+			if( error_wait < error_wait_max)
+				error_wait = error_wait << 1;
+
 			continue;
 		}
+
 		error_wait = error_wait_min;
 
 		/* Start a detached thread for this connection, the "t" object will be deleted
@@ -208,6 +219,30 @@ void threadAcceptPort( void * i_arg, int i_port)
 		/* The 'process' function will decode the incoming request and dispatch
 		it to the proper queue. */
 		t->Start( threadProcessMsg, newThreadArgs );
+
+
+		//
+		// Server load statistics:
+		//
+		accepts_count++;
+		if( accepts_count >= accepts_stat_count )
+		{
+			time_t cur_time = time( NULL);
+			int seconds = cur_time - accepts_stat_time;
+			if( seconds > 0 )
+			{
+				int accepts_per_second = accepts_count / seconds;
+				printf("\033[1;36mServed connections per second: %d\033[0m\n", accepts_per_second);
+
+				accepts_count = 0;
+				accepts_stat_time = cur_time;
+			}
+
+			if( seconds < 10 )
+				accepts_stat_count *= 10;
+			else if(( seconds > 100 ) && ( accepts_stat_count > 100 ))
+				accepts_stat_count /= 10;
+		}
 	}
 
 	close( server_sd);

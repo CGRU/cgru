@@ -14,7 +14,7 @@
 #include "renderhost.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
@@ -141,16 +141,20 @@ int main(int argc, char *argv[])
 	while( AFRunning)
 	{
 		// Collect all available incomming messages:
-		std::list<af::Msg*> in_msgs;
-		while( af::Msg * msg = RenderHost::acceptTry() )
-			in_msgs.push_back( msg);
+//		std::list<af::Msg*> in_msgs;
+//		while( af::Msg * msg = RenderHost::acceptTry() )
+//			in_msgs.push_back( msg);
 
 		// Lock render:
 //		RenderHost::lockMutex(); // Why we need mutex here?
 
 		// React on all incoming messages:
-		for( std::list<af::Msg*>::iterator it = in_msgs.begin(); it != in_msgs.end(); it++)
-			msgCase( *it);
+//		for( std::list<af::Msg*>::iterator it = in_msgs.begin(); it != in_msgs.end(); it++)
+//			msgCase( *it);
+		msgCase( RenderHost::getServerAnswer());
+	
+
+
 		// Let tasks to do their work:
 		RenderHost::refreshTasks();
 
@@ -181,28 +185,17 @@ int main(int argc, char *argv[])
 
 void msgCase( af::Msg * msg)
 {
-	if( false == AFRunning )
-		return;
-
 	if( msg == NULL)
 	{
 		return;
 	}
+
+	if( false == AFRunning )
+		return;
+
 #ifdef AFOUTPUT
 printf(" >>> "); msg->v_stdOut();
 #endif
-
-	// Check not sended messages first, they were pushed back in accept quere:
-	if( msg->wasSendFailed())
-	{
-		if( msg->getAddress().equal( af::Environment::getServerAddress()))
-		{
-			// Message was failed to send to server
-			RenderHost::connectionLost();
-		}
-		delete msg;
-		return;
-	}
 
 	switch( msg->type())
 	{

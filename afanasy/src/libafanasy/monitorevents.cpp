@@ -335,6 +335,10 @@ void MonitorEvents::v_generateInfoStream( std::ostringstream & o_str, bool i_ful
 {
 	o_str << "MonitorEvents:";
 
+	for( int i = 0; i < m_events.size(); i++)
+		if( m_events[i].size())
+			o_str << " '" << Monitor::EVT_NAMES[i] << "'[" << m_events[i].size() << "]";
+
 	if( m_tp.size())
 		o_str << " TP[" << m_tp.size() << "]";
 
@@ -352,5 +356,7 @@ void MonitorEvents::v_generateInfoStream( std::ostringstream & o_str, bool i_ful
 
 	if( m_announcement.size())
 		o_str << " " << m_announcement;
+
+	o_str << "\n";
 }
 

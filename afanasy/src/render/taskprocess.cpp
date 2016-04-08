@@ -428,7 +428,6 @@ void TaskProcess::sendTaskSate()
 	AFINFA("TaskProcess::sendTaskSate(): pid=%d, zombie=%s, m_update_status=%d, stop_time = %lld",
 		m_pid, m_zombie ? "TRUE":"FALSE", m_update_status, (long long)m_stop_time)
 
-//	int    type = af::Msg::TTaskUpdatePercent;
 	bool   toRecieve = false;
 	char * stdout_data = NULL;
 	int    stdout_size = 0;
@@ -437,7 +436,6 @@ void TaskProcess::sendTaskSate()
 	if(( m_update_status != af::TaskExec::UPPercent ) &&
 		( m_update_status != af::TaskExec::UPWarning ))
 	{
-//		type = af::Msg::TTaskUpdateState;
 		toRecieve = true;
 		stdout_data = m_parser->getData( &stdout_size);
 		log = m_service->getLog();

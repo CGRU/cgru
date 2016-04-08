@@ -27,7 +27,7 @@ parser.add_option('-f', '--frames',       dest='frames',       type='string', de
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
-parser.add_option(      '--pkp',          dest='pkp',          type='int',    default=10, help='Parser key percentage')
+parser.add_option(      '--pkp',          dest='pkp',          type='int',    default=1,  help='Parser key percentage')
 parser.add_option(      '--send',         dest='sendjob',      type='int',    default=1,  help='send job')
 parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    default=0,  help='set job to wait to start time')
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')

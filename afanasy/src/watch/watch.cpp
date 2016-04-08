@@ -186,7 +186,7 @@ void Watch::caseMessage( af::Msg * msg)
 	{
 		msg->resetWrittenSize();
 		af::MonitorEvents me( msg);
-me.v_stdOut();
+		me.v_stdOut();
 
 		// General instructions for an application:
 		if( me.m_instruction.size())

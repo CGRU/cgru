@@ -62,7 +62,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
 		int id = add( newRender);
 		if( id != 0 )
 		{
-			newRender->initialize();
+			newRender->setRegistered();
 			if( monitoring )
 				monitoring->addEvent( af::Monitor::EVT_renders_add, id);
 
@@ -73,13 +73,13 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
 
 		// Return new render ID to render to tell that it was successfully registered:
 		return new af::Msg( af::Msg::TRenderId, id);
-   }
+	}
 
 	// Adding offline render from database:
 	if( add( newRender))
 	{
 		std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
-		newRender->initialize();
+		newRender->setRegistered();
 	}
 	else
 		delete newRender;

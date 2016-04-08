@@ -14,7 +14,7 @@ class test(service.service):
 
 		r = random.random()
 
-		ver = .1
+		ver = .03
 		if r  < ver:
 			self.taskInfo['command'] = ''
 			self.log = ('%f < %f') % ( r, ver)

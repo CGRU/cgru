@@ -46,7 +46,7 @@ int Dialog::ms_size_border_right = 75;
 Dialog::Dialog():
     m_connected(false),
     m_monitorType( Watch::WNONE),
-    m_qThreadClientUpdate( this, false, af::Environment::getWatchGetServerPeriod(), af::Environment::getWatchConnectRetries()),
+    m_qThreadClientUpdate( this, af::Environment::getWatchGetServerPeriod(), af::Environment::getWatchConnectRetries()),
     m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
     m_listitems( NULL),
     m_offlinescreen( NULL),
@@ -134,7 +134,6 @@ Dialog::~Dialog()
 void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}
 void Dialog::repaintFinish()             { m_repaintTimer.stop();}
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
-//void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, m_monitor, true));}
 void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( MonitorHost::genRegisterMsg());}
 void Dialog::sendMsg( af::Msg * msg)
 {
