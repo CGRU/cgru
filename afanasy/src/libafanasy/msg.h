@@ -203,11 +203,6 @@ TLAST
 
 	inline bool addressIsEmpty() const { return m_address.isEmpty();}
 
-	/// Set message address
-	inline void setAddress( const Address & i_address)
-		{ m_address = i_address;}
-
-	/// Get address constant pointer
 	inline const Address & getAddress() const { return m_address;}
 
 	void setTypeHTTP();

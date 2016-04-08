@@ -69,12 +69,10 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     {
         if( msg.isNull() == false)
         {
-            msg.setAddress( af::Environment::getServerAddress());
-
             if( Verbose ) msg.v_stdOut();
 
             bool ok;
-            af::Msg * answer = af::msgsend( &msg, ok, af::VerboseOn);
+            af::Msg * answer = af::sendToServer( &msg, ok, af::VerboseOn);
 
             if( false == ok )
                 return_value = 1;

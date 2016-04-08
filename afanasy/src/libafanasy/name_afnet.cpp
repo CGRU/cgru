@@ -514,15 +514,9 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 	return true;
 }
 
-af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
+af::Msg * af::sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 {
-	if( i_msg->addressIsEmpty())
-	{
-		// Assuming that message should be send to server if no address specified.
-		i_msg->setAddress( af::Environment::getServerAddress());
-	}
-
-	return ::msgsendtoaddress( i_msg, i_msg->getAddress(), o_ok, i_verbose);
+	return ::msgsendtoaddress( i_msg, af::Environment::getServerAddress(), o_ok, i_verbose);
 }
 
 void af::socketDisconnect( int i_sd, uint32_t i_response_type)

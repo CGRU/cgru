@@ -81,9 +81,8 @@ RenderHost::~RenderHost()
     if( ms_connected )
     {
         af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
-        msg.setAddress( af::Environment::getServerAddress());
         bool ok;
-        af::msgsend( & msg, ok, af::VerboseOn);
+        af::sendToServer( & msg, ok, af::VerboseOn);
         ms_connected = false;
     }
 
@@ -107,7 +106,7 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 		delete ms_server_answer;
 
 	bool ok;
-	ms_server_answer = af::msgsend( i_msg, ok, af::VerboseOff);
+	ms_server_answer = af::sendToServer( i_msg, ok, af::VerboseOff);
 	if( ok )
 		connectionEstablished();
 	else
