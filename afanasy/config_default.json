@@ -190,15 +190,15 @@
 
 "":"Network:",
 		"":"Use -1 value not to set socket option at all",
-	"af_server_accept_so_rcvtimeo_sec":2,
-	"af_server_accept_so_sndtimeo_sec":2,
-	"af_server_dispatch_so_rcvtimeo_sec":2,
-	"af_server_dispatch_so_sndtimeo_sec":2,
-	"af_server_dispatch_tcp_nodelay":0,
+	"af_so_server_RCVTIMEO_sec":12,
+	"af_so_server_SNDTIMEO_sec":12,
+	"af_so_server_TCP_NODELAY":-1,
+	"af_so_server_TCP_CORK":-1,
 
-	"af_client_dispatch_so_rcvtimeo_sec":8,
-	"af_client_dispatch_so_sndtimeo_sec":8,
-	"af_client_dispatch_tcp_nodelay":0,
+	"af_so_client_RCVTIMEO_sec":12,
+	"af_so_client_SNDTIMEO_sec":12,
+	"af_so_client_TCP_NODELAY":-1,
+	"af_so_client_TCP_CORK":-1,
 
 	"":""
 }}

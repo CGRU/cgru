@@ -199,6 +199,13 @@ int af::processHeader( af::Msg * io_msg, int i_bytes)
 af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
 						    bool & o_ok, af::VerboseMode i_verbose)
 {
+	if( af::Environment::isServer())
+	{
+		AFERROR("msgsendtoaddress: Server should not connect and send messages itself.\n")
+		o_ok = false;
+		return NULL;
+	}
+
 	o_ok = true;
 
 	if( i_address.isEmpty() )
@@ -222,37 +229,47 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 
 	AFINFO("msgsendtoaddress: tying to connect to client.")
 
-	if( af::Environment::getSockOpt_Dispatch_SO_RCVTIMEO_SEC() != -1 )
+	if( af::Environment::getSO_Client_RCVTIMEO_sec() != -1 )
 	{
 		timeval so_timeo;
 		so_timeo.tv_usec = 0;
-		so_timeo.tv_sec = af::Environment::getSockOpt_Dispatch_SO_RCVTIMEO_SEC();
+		so_timeo.tv_sec = af::Environment::getSO_Client_RCVTIMEO_sec();
 		if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
 		{
-			AFERRPE("msgsendtoaddress: set socket SO_RCVTIMEO option failed")
+			AFERRPE("Set socket SO_RCVTIMEO option failed:")
 			i_address.v_stdOut(); printf("\n");
 		}
 	}
 
-	if( af::Environment::getSockOpt_Dispatch_SO_SNDTIMEO_SEC() != -1 )
+	if( af::Environment::getSO_Client_SNDTIMEO_sec() != -1 )
 	{
 		timeval so_timeo;
 		so_timeo.tv_usec = 0;
-		so_timeo.tv_sec = af::Environment::getSockOpt_Dispatch_SO_SNDTIMEO_SEC();
+		so_timeo.tv_sec = af::Environment::getSO_Client_SNDTIMEO_sec();
 		if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
 		{
-			AFERRPE("msgsendtoaddress: set socket SO_SNDTIMEO option failed")
+			AFERRPE("Set socket SO_SNDTIMEO option failed:")
 			i_address.v_stdOut(); printf("\n");
 		}
 	}
 
-	if( af::Environment::getSockOpt_Dispatch_TCP_NODELAY() != -1 )
+	if( af::Environment::getSO_Client_TCP_NODELAY() != -1 )
 	{
-		int nodelay = af::Environment::getSockOpt_Dispatch_TCP_NODELAY();
+		int nodelay = af::Environment::getSO_Client_TCP_NODELAY();
 		if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
 		{
-		   AFERRPE("msgsendtoaddress: set socket TCP_NODELAY option failed")
-		   i_address.v_stdOut(); printf("\n");
+			AFERRPE("Set socket TCP_NODELAY option failed:")
+			i_address.v_stdOut(); printf("\n");
+		}
+	}
+
+	if( af::Environment::getSO_Client_TCP_CORK() != -1 )
+	{
+		int nodelay = af::Environment::getSO_Client_TCP_CORK();
+		if( setsockopt( socketfd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+		{
+			AFERRPE("Set socket TCP_CORK option failed:")
+			i_address.v_stdOut(); printf("\n");
 		}
 	}
 

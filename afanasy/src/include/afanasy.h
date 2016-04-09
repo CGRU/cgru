@@ -123,15 +123,15 @@ namespace AFMONITOR
 /// Network options:
 namespace AFNETWORK
 {
-	const int SERVER_ACCEPT_SO_RCVTIMEO_SEC   = 2;
-	const int SERVER_ACCEPT_SO_SNDTIMEO_SEC   = 2;
-	const int SERVER_DISPATCH_SO_RCVTIMEO_SEC = 2;
-	const int SERVER_DISPATCH_SO_SNDTIMEO_SEC = 2;
-	const int SERVER_DISPATCH_TCP_NODELAY     = true;
+	const int SO_SERVER_RCVTIMEO_SEC = 12;
+	const int SO_SERVER_SNDTIMEO_SEC = 12;
+	const int SO_SERVER_TCP_NODELAY  = -1;
+	const int SO_SERVER_TCP_CORK     = -1;
 
-	const int CLIENT_DISPATCH_SO_RCVTIMEO_SEC = 8;
-	const int CLIENT_DISPATCH_SO_SNDTIMEO_SEC = 8;
-	const int CLIENT_DISPATCH_TCP_NODELAY     = false;
+	const int SO_CLIENT_RCVTIMEO_SEC = 12;
+	const int SO_CLIENT_SNDTIMEO_SEC = 12;
+	const int SO_CLIENT_TCP_NODELAY  = -1;
+	const int SO_CLIENT_TCP_CORK     = -1;
 }
 
 #ifdef WINNT

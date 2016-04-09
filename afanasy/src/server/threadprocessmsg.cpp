@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #endif
@@ -134,17 +135,51 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 	//AFINFO("Trying to recieve message...")
 
 	// set max allowed time to block recieveing data from client socket
-	if( af::Environment::getSockOpt_Accept_SO_RCVTIMEO_SEC() != -1 )
+	if( af::Environment::getSO_Server_RCVTIMEO_sec() != -1 )
 	{
 		timeval so_rcvtimeo;
-		so_rcvtimeo.tv_sec = af::Environment::getSockOpt_Accept_SO_RCVTIMEO_SEC();
+		so_rcvtimeo.tv_sec = af::Environment::getSO_Server_RCVTIMEO_sec();
 		so_rcvtimeo.tv_usec = 0;
 		if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
 		{
-			AFERRPE("readMessage: setsockopt SO_RCVTIMEO failed:");
+			AFERRPE("Set socket SO_RCVTIMEO failed:");
 			af::printAddress( &(i_args->ss));
 		}
 	}
+
+	// set socket maximum time to wait for an output operation to complete
+	if( af::Environment::getSO_Server_SNDTIMEO_sec() != -1 )
+	{
+		timeval so_sndtimeo;
+		so_sndtimeo.tv_sec = af::Environment::getSO_Server_SNDTIMEO_sec();
+		so_sndtimeo.tv_usec = 0;
+		if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
+		{
+			AFERRPE("Set socket SO_SNDTIMEO option failed:")
+			af::printAddress( &(i_args->ss));
+		}
+	}
+
+	if( af::Environment::getSO_Client_TCP_NODELAY() != -1 )
+	{
+		int nodelay = af::Environment::getSO_Client_TCP_NODELAY();
+		if( setsockopt( i_args->sd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+		{
+			AFERRPE("Set socket TCP_NODELAY option failed:")
+			af::printAddress( &(i_args->ss));
+		}
+	}
+
+	if( af::Environment::getSO_Client_TCP_CORK() != -1 )
+	{
+		int nodelay = af::Environment::getSO_Client_TCP_CORK();
+		if( setsockopt( i_args->sd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+		{
+			AFERRPE("Set socket TCP_CORK option failed:")
+			af::printAddress( &(i_args->ss));
+		}
+	}
+
 
 	// Reading message from client socket.
 	if( false == af::msgread( i_args->sd, io_msg))
@@ -161,20 +196,6 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 
 void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 {
-	// set socket maximum time to wait for an output operation to complete
-	if( af::Environment::getSockOpt_Accept_SO_SNDTIMEO_SEC() != -1 )
-	{
-		timeval so_sndtimeo;
-		so_sndtimeo.tv_sec = af::Environment::getSockOpt_Accept_SO_SNDTIMEO_SEC();
-		so_sndtimeo.tv_usec = 0;
-		if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
-		{
-			AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
-			af::printAddress( &(i_args->ss));
-			i_msg->v_stdOut();
-		}
-	}
-
 	// writing message back to client socket
 	if( false == af::msgwrite( i_args->sd, i_msg))
 	{

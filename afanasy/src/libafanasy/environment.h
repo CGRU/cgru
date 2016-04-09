@@ -168,16 +168,15 @@ public:
 
 
 	/// Socket Options:
-	static inline int getSockOpt_Accept_SO_RCVTIMEO_SEC()   { return server_accept_so_rcvtimeo_sec; }
-	static inline int getSockOpt_Accept_SO_SNDTIMEO_SEC()   { return server_accept_so_sndtimeo_sec; }
-	static inline int getSockOpt_Dispatch_SO_RCVTIMEO_SEC()
-		{ return m_server ? server_dispatch_so_rcvtimeo_sec : client_dispatch_so_rcvtimeo_sec; }
-	static inline int getSockOpt_Dispatch_SO_SNDTIMEO_SEC()
-		{ return m_server ? server_dispatch_so_sndtimeo_sec : client_dispatch_so_sndtimeo_sec; }
-	static inline int getSockOpt_Dispatch_TCP_NODELAY()
-		{ return m_server ? server_dispatch_tcp_nodelay : client_dispatch_tcp_nodelay; }
+	static inline int getSO_Server_RCVTIMEO_sec() { return so_server_RCVTIMEO_sec; }
+	static inline int getSO_Server_SNDTIMEO_sec() { return so_server_SNDTIMEO_sec; }
+	static inline int getSO_Server_TCP_NODELAY()  { return so_server_TCP_NODELAY;  }
+	static inline int getSO_Server_TCP_CORK()     { return so_server_TCP_CORK;     }
 
-
+	static inline int getSO_Client_RCVTIMEO_sec() { return so_client_RCVTIMEO_sec; }
+	static inline int getSO_Client_SNDTIMEO_sec() { return so_client_SNDTIMEO_sec; }
+	static inline int getSO_Client_TCP_NODELAY()  { return so_client_TCP_NODELAY;  }
+	static inline int getSO_Client_TCP_CORK()     { return so_client_TCP_CORK;     }
 
 private:
 
@@ -317,15 +316,15 @@ private:
 
 
 	/// Socket Options:
-	static int server_accept_so_rcvtimeo_sec;
-	static int server_accept_so_sndtimeo_sec;
-	static int server_dispatch_so_rcvtimeo_sec;
-	static int server_dispatch_so_sndtimeo_sec;
-	static int server_dispatch_tcp_nodelay;
+	static int so_server_RCVTIMEO_sec;
+	static int so_server_SNDTIMEO_sec;
+	static int so_server_TCP_NODELAY;
+	static int so_server_TCP_CORK;
 
-	static int client_dispatch_so_rcvtimeo_sec;
-	static int client_dispatch_so_sndtimeo_sec;
-	static int client_dispatch_tcp_nodelay;
+	static int so_client_RCVTIMEO_sec;
+	static int so_client_SNDTIMEO_sec;
+	static int so_client_TCP_NODELAY;
+	static int so_client_TCP_CORK;
 
 
 	// Misc:
