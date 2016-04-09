@@ -263,13 +263,13 @@ bool Msg::setString( const std::string & str)
 	return true;
 }
 
-bool Msg::setInfo( const std::string & i_kind, const std::string & i_info)
+bool Msg::setInfo( const std::string & i_kind, const std::string & i_text)
 {
 	if(checkZero( true) == false ) return false;
 	m_type = TInfo;
 	m_writing = true;
 	w_String( i_kind, this);
-	w_String( i_info, this);
+	w_String( i_text, this);
 	m_int32 = m_writtensize;
 	rw_header( true);
 	return true;
@@ -304,7 +304,7 @@ const std::string Msg::getString()
 	getString( str);
 	return str;
 }
-bool Msg::getInfo( std::string & o_kind, std::string & o_info)
+bool Msg::getInfo( std::string & o_kind, std::string & o_text)
 {
 	if( m_type != TInfo)
 	{
@@ -312,7 +312,7 @@ bool Msg::getInfo( std::string & o_kind, std::string & o_info)
 		return false;
 	}
 	rw_String( o_kind, this);
-	rw_String( o_info, this);
+	rw_String( o_text, this);
 	// Reset written size to let to get string again.
 	resetWrittenSize();
 	return true;

@@ -78,11 +78,11 @@ af::Msg * af::jsonMsg( const std::string & i_str)
 	return o_msg;
 }
 
-af::Msg * af::jsonMsgInfo( const std::string & i_kind, const std::string & i_info)
+af::Msg * af::jsonMsgInfo( const std::string & i_kind, const std::string & i_text)
 {
 	std::string str = "{\"info\":{";
 	str += "\"kind\":\"" + af::strEscape( i_kind) + "\"";
-	str += ",\"info\":\"" + af::strEscape( i_info) + "\"";
+	str += ",\"text\":\"" + af::strEscape( i_text) + "\"";
 	str += "}}";
 	return af::jsonMsg( str);
 }

@@ -341,7 +341,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		i_args->msgQueue->pushMsg( i_msg);
 		// To not to detele it, set to NULL, as it pushed to another queue
 		i_msg = NULL;
-		o_msg_response = af::jsonMsg("{\"status\":\"OK\"}");
+		o_msg_response = af::jsonMsgInfo("log","JSON message pushed to run queue.");
 	}
 	else if( document.HasMember("job"))
 	{

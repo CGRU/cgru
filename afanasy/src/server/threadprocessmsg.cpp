@@ -103,7 +103,8 @@ uint32_t processMessage( ThreadArgs * i_args)
 
 	if( msg_response == NULL)
 	{
-		// No response needed, returning
+		printf("SERVER CODING ERROR: Message with no answer:\n");
+		msg_response->stdOutData();
 		return response_type;
 	}
 
