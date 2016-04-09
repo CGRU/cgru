@@ -4,6 +4,7 @@
 #include <windows.h>
 #else
 #include <pwd.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #endif
 
@@ -103,6 +104,10 @@ int Environment::so_client_SNDTIMEO_sec = AFNETWORK::SO_CLIENT_SNDTIMEO_SEC;
 int Environment::so_client_TCP_NODELAY  = AFNETWORK::SO_CLIENT_TCP_NODELAY;
 int Environment::so_client_TCP_CORK     = AFNETWORK::SO_CLIENT_TCP_CORK;
 
+
+/// Resources limits:
+int Environment::rlimit_NOFILE = -1;
+int Environment::rlimit_NPROC  = -1;
 
 
 std::string Environment::db_conninfo =                     AFDATABASE::CONNINFO;
@@ -513,6 +518,19 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
 	QUIET("GCC version = '%s'\n", version_gcc.c_str());
 #endif
+
+//########### Resources limit: ######################
+
+	struct rlimit rlim;
+
+	getrlimit(RLIMIT_NOFILE, &rlim);
+	rlimit_NOFILE = rlim.rlim_cur;
+	QUIET("RLIMIT_NOFILE: Files descriptors limit: %d\n", rlimit_NOFILE);
+
+	getrlimit(RLIMIT_NPROC, &rlim);
+	rlimit_NPROC = rlim.rlim_cur;
+	QUIET("RLIMIT_NPROC: Processes (threads) limit: %d\n", rlimit_NPROC);
+
 
 //###################################################
 

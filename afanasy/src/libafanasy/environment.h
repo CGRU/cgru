@@ -178,6 +178,12 @@ public:
 	static inline int getSO_Client_TCP_NODELAY()  { return so_client_TCP_NODELAY;  }
 	static inline int getSO_Client_TCP_CORK()     { return so_client_TCP_CORK;     }
 
+
+	/// Resources limits:
+	static inline int getRLimit_NOFILE() { return rlimit_NOFILE; }
+	static inline int getRLimit_NPROC()  { return rlimit_NPROC;  }
+
+
 private:
 
 	static bool m_valid;            ///< \c true if environment is valid.
@@ -325,6 +331,11 @@ private:
 	static int so_client_SNDTIMEO_sec;
 	static int so_client_TCP_NODELAY;
 	static int so_client_TCP_CORK;
+
+
+	/// Resources limits:
+	static int rlimit_NOFILE;
+	static int rlimit_NPROC;
 
 
 	// Misc:

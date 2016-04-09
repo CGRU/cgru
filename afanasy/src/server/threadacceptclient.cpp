@@ -183,10 +183,11 @@ void threadAcceptPort( void * i_arg, int i_port)
 			AFERRPE("accept")
 			switch( errno )
 			{
-				case EMFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
-					AFERROR("The per-process limit of open file descriptors has been reached.")
+				case EMFILE:
+					AFERRAR("The per-process limit of open file descriptors %d has been reached.",
+							af::Environment::getRLimit_NOFILE())
 					break;
-				case ENFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
+				case ENFILE:
 					AFERROR("The system limit on the total number of open files has been reached.")
 					break;
 				case EINTR:
