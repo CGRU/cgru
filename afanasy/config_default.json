@@ -129,9 +129,6 @@
 		"":"If render will not send update its resources for this time(seconds),",
 		"":"server will put it in 'OFFLINE' state.",
 
-	"af_render_updatetaskperiod":1,
-		"":"Period to render to update task state or percentage (even w/o a parser).",
-
 	"af_task_update_timeout":30,
 		"":"If task progress (state or percentage) has not been updated for this period,",
 		"":"It wiil considered as an error, and render will be push in error hosts list.",

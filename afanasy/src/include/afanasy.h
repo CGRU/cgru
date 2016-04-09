@@ -80,7 +80,6 @@ namespace AFRENDER
     const int  DEFAULTMAXTASKS          = 2;          ///< Maximum tasks on can run on the same render the same time (default value).
     const int  GET_SERVER_PERIOD        = 1;          ///< Server connection & update period (seconds).
     const int  GET_RESOURCES_PERIOD     = 5;          ///< Query machine resourcs period (seconds).
-    const int  UPDATETASKPERIOD         = 1;          ///< Update task state and percentage period ( seconds).
     const int  ZOMBIETIME               = 60;         ///< Seconds to wait for update to Render is zombie.
     const int  CONNECTRETRIES           = 3;          ///< Number of connect fails to turn to disconnected state.
     const int  MAXCOUNT                 = 100000;     ///< Maximum allowed online Renders.

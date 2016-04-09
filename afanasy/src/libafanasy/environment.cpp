@@ -58,7 +58,6 @@ int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
 int     Environment::render_get_server_period =        AFRENDER::GET_SERVER_PERIOD;
 int     Environment::render_get_resources_period =     AFRENDER::GET_RESOURCES_PERIOD;
-int     Environment::render_updatetaskperiod =         AFRENDER::UPDATETASKPERIOD;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
 
@@ -238,7 +237,6 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
 	getVar( i_obj, render_get_server_period,          "af_render_get_server_period"          );
 	getVar( i_obj, render_get_resources_period,       "af_render_get_resources_period"       );
-	getVar( i_obj, render_updatetaskperiod,           "af_render_updatetaskperiod"           );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );

@@ -137,7 +137,6 @@ public:
 	static inline int getRenderNice()               { return render_nice;                 } ///< Get Render task process nice factor.
 	static inline int getRenderGetServerPeriod()    { return render_get_server_period;    } ///< Get Render update interval ( in seconds ).
 	static inline int getRenderGetResourcesPeriod() { return render_get_resources_period; } ///< Get Render update interval ( in seconds ).
-	static inline int getRenderUpdateTaskPeriod()   { return render_updatetaskperiod;     }
 	static inline int getRenderZombieTime()         { return render_zombietime;           }
 	static inline int getRenderConnectRetries()     { return render_connectretries;       }
 
@@ -277,7 +276,6 @@ private:
 	static int render_nice;       ///< Render task process nice factor.
 	static int render_get_server_period; ///< Render update interval in seconds.
 	static int render_get_resources_period; ///< Render update interval in seconds.
-	static int render_updatetaskperiod;
 	static int render_zombietime;
 	static int render_connectretries;
 	static std::vector<std::string> render_windowsmustdie;

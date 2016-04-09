@@ -440,13 +440,6 @@ void TaskProcess::sendTaskSate()
 		stdout_data = m_parser->getData( &stdout_size);
 		log = m_service->getLog();
 	}
-	else if(( af::Environment::getRenderUpdateTaskPeriod > 0 ) &&
-		(( m_cycle % af::Environment::getRenderUpdateTaskPeriod()) != 0 ))
-	{
-		// We should update percentage only every
-		// "af_render_updatetaskperiod" seconds
-		return;
-	}
 
 	int percent          = m_parser->getPercent();
 	int frame            = m_parser->getFrame();
