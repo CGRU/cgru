@@ -44,6 +44,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TInvalid:
 	{
 		AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->v_generateInfoString( false));
+		o_msg_response = af::jsonMsgInfo("error","TInvalid message received.");
 		break;
 	}
 	case af::Msg::TNULL:
@@ -52,6 +53,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TStringList:
 	{
 		i_msg->stdOutData();
+		o_msg_response = af::jsonMsgInfo("log","Received data verbosed.");
 		break;
 	}
 	case af::Msg::THTTP:
@@ -63,9 +65,11 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	case af::Msg::TString:
 	{
 		std::string str = i_msg->getString();
-		if( str.empty()) break;
+		o_msg_response = af::jsonMsgInfo("log","Log appended.");
 
+		if( str.empty()) break;
 		AFCommon::QueueLog( str);
+
 		break;
 	}
 	case af::Msg::TStatRequest:
