@@ -238,6 +238,8 @@ namespace af
 	// Read message header from message buffer;
 	int processHeader( af::Msg * io_msg, int i_bytes);
 
+	void setSocketOptions( int i_fd);
+
 	/// Recieve message from given file discriptor \c desc to \c buffer
 	/** Return true if success. This function will block process.**/
 	bool msgread( int desc, af::Msg* msg);

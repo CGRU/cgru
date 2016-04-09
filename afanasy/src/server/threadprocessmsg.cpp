@@ -34,13 +34,9 @@
 
 uint32_t processMessage( ThreadArgs * i_args);
 
-bool readMessage( ThreadArgs * i_args, af::Msg * i_msg);
-
 af::Msg * processHTTPGet( const af::Msg * i_msg);
 
 af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
-
-void writeMessage( ThreadArgs * i_args, af::Msg * i_msg);
 
 // Accepted client thread entry point
 void threadProcessMsg( void * i_args)
@@ -59,6 +55,8 @@ void threadProcessMsg( void * i_args)
 
 uint32_t processMessage( ThreadArgs * i_args)
 {
+	af::setSocketOptions( i_args->sd);
+
 	uint32_t response_type = -1; // Error
 
 	// Construct a new message to read.
@@ -69,16 +67,16 @@ uint32_t processMessage( ThreadArgs * i_args)
 	af::Msg * msg_response = NULL;
 
 	// Read message data from socket
-	if( false == readMessage( i_args, msg_request))
+	if( false == af::msgread( i_args->sd, msg_request))
 	{
 		// There was some error reading message
 		delete msg_request;
 		return response_type;
 	}
 
-#ifdef AFOUTPUT
-printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
-#endif
+	#ifdef AFOUTPUT
+	printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
+	#endif
 
 	uint32_t request_type = msg_request->type();
 
@@ -116,96 +114,22 @@ printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_re
 	else if(( request_type == af::Msg::TJSONBIN ) && ( response_type == af::Msg::TJSON ))
 		msg_response->setJSONBIN();
 
-#ifdef AFOUTPUT
-printf("Response: "); msg_response->v_stdOut();
-#endif
+	#ifdef AFOUTPUT
+	printf("Response: "); msg_response->v_stdOut();
+	#endif
 
 	response_type = msg_response->type();
 
 	// Write response message back to client socket
-	writeMessage( i_args, msg_response);
+	if( false == af::msgwrite( i_args->sd, msg_response))
+	{
+		AFERROR("processMessage: can't send message to client.")
+		af::printAddress( &(i_args->ss)); msg_response->stdOutData();
+	}
 
 	delete msg_response;
 
 	return response_type;
-}
-
-bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
-{
-	//AFINFO("Trying to recieve message...")
-
-	// set max allowed time to block recieveing data from client socket
-	if( af::Environment::getSO_Server_RCVTIMEO_sec() != -1 )
-	{
-		timeval so_rcvtimeo;
-		so_rcvtimeo.tv_sec = af::Environment::getSO_Server_RCVTIMEO_sec();
-		so_rcvtimeo.tv_usec = 0;
-		if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
-		{
-			AFERRPE("Set socket SO_RCVTIMEO failed:");
-			af::printAddress( &(i_args->ss));
-		}
-	}
-
-	// set socket maximum time to wait for an output operation to complete
-	if( af::Environment::getSO_Server_SNDTIMEO_sec() != -1 )
-	{
-		timeval so_sndtimeo;
-		so_sndtimeo.tv_sec = af::Environment::getSO_Server_SNDTIMEO_sec();
-		so_sndtimeo.tv_usec = 0;
-		if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
-		{
-			AFERRPE("Set socket SO_SNDTIMEO option failed:")
-			af::printAddress( &(i_args->ss));
-		}
-	}
-
-	if( af::Environment::getSO_Client_TCP_NODELAY() != -1 )
-	{
-		int nodelay = af::Environment::getSO_Client_TCP_NODELAY();
-		if( setsockopt( i_args->sd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
-		{
-			AFERRPE("Set socket TCP_NODELAY option failed:")
-			af::printAddress( &(i_args->ss));
-		}
-	}
-
-	if( af::Environment::getSO_Client_TCP_CORK() != -1 )
-	{
-		int nodelay = af::Environment::getSO_Client_TCP_CORK();
-		if( setsockopt( i_args->sd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
-		{
-			AFERRPE("Set socket TCP_CORK option failed:")
-			af::printAddress( &(i_args->ss));
-		}
-	}
-
-
-	// Reading message from client socket.
-	if( false == af::msgread( i_args->sd, io_msg))
-	{
-		//AFERROR("readMessage: Reading message failed.")
-		//af::printAddress( &(i_args->ss));
-		return false;
-	}
-
-	//AFINFO("readMessage: Message recieved.")
-
-	return true;
-}
-
-void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
-{
-	// writing message back to client socket
-	if( false == af::msgwrite( i_args->sd, i_msg))
-	{
-		AFERROR("writeMessage: can't send message to client.")
-		af::printAddress( &(i_args->ss));
-		i_msg->stdOutData();
-		return;
-	}
-
-	//AFINFO("writeMessage: message sent.")
 }
 
 bool validateGetFileName( const std::string & i_name);

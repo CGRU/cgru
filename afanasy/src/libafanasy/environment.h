@@ -168,15 +168,10 @@ public:
 
 
 	/// Socket Options:
-	static inline int getSO_Server_RCVTIMEO_sec() { return so_server_RCVTIMEO_sec; }
-	static inline int getSO_Server_SNDTIMEO_sec() { return so_server_SNDTIMEO_sec; }
-	static inline int getSO_Server_TCP_NODELAY()  { return so_server_TCP_NODELAY;  }
-	static inline int getSO_Server_TCP_CORK()     { return so_server_TCP_CORK;     }
-
-	static inline int getSO_Client_RCVTIMEO_sec() { return so_client_RCVTIMEO_sec; }
-	static inline int getSO_Client_SNDTIMEO_sec() { return so_client_SNDTIMEO_sec; }
-	static inline int getSO_Client_TCP_NODELAY()  { return so_client_TCP_NODELAY;  }
-	static inline int getSO_Client_TCP_CORK()     { return so_client_TCP_CORK;     }
+	static inline int getSO_RCVTIMEO_sec() { return m_server ? so_server_RCVTIMEO_sec : so_client_RCVTIMEO_sec ;}
+	static inline int getSO_SNDTIMEO_sec() { return m_server ? so_server_SNDTIMEO_sec : so_client_SNDTIMEO_sec ;}
+	static inline int getSO_TCP_NODELAY()  { return m_server ? so_server_TCP_NODELAY  : so_client_TCP_NODELAY  ;}
+	static inline int getSO_TCP_CORK()     { return m_server ? so_server_TCP_CORK     : so_client_TCP_CORK     ;}
 
 
 	/// Resources limits:

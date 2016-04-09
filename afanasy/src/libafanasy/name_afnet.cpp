@@ -227,54 +227,14 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		return NULL;
 	}
 
-	AFINFO("msgsendtoaddress: tying to connect to client.")
 
-	if( af::Environment::getSO_Client_RCVTIMEO_sec() != -1 )
-	{
-		timeval so_timeo;
-		so_timeo.tv_usec = 0;
-		so_timeo.tv_sec = af::Environment::getSO_Client_RCVTIMEO_sec();
-		if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
-		{
-			AFERRPE("Set socket SO_RCVTIMEO option failed:")
-			i_address.v_stdOut(); printf("\n");
-		}
-	}
+	// Set socket options:
+	af::setSocketOptions( socketfd);
 
-	if( af::Environment::getSO_Client_SNDTIMEO_sec() != -1 )
-	{
-		timeval so_timeo;
-		so_timeo.tv_usec = 0;
-		so_timeo.tv_sec = af::Environment::getSO_Client_SNDTIMEO_sec();
-		if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
-		{
-			AFERRPE("Set socket SO_SNDTIMEO option failed:")
-			i_address.v_stdOut(); printf("\n");
-		}
-	}
-
-	if( af::Environment::getSO_Client_TCP_NODELAY() != -1 )
-	{
-		int nodelay = af::Environment::getSO_Client_TCP_NODELAY();
-		if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
-		{
-			AFERRPE("Set socket TCP_NODELAY option failed:")
-			i_address.v_stdOut(); printf("\n");
-		}
-	}
-
-	if( af::Environment::getSO_Client_TCP_CORK() != -1 )
-	{
-		int nodelay = af::Environment::getSO_Client_TCP_CORK();
-		if( setsockopt( socketfd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
-		{
-			AFERRPE("Set socket TCP_CORK option failed:")
-			i_address.v_stdOut(); printf("\n");
-		}
-	}
 
 	//
 	// connect to address
+	AFINFO("msgsendtoaddress: tying to connect to client.")
 	if( connect(socketfd, (struct sockaddr*)&client_addr, i_address.sizeofAddr()) != 0 )
 	{
 		if( i_verbose == af::VerboseOn )
@@ -286,6 +246,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		o_ok = false;
 		return NULL;
 	}
+
 
 	//
 	// send
@@ -446,6 +407,41 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
 	freeaddrinfo( res);
 
 	return af::Address();
+}
+
+void af::setSocketOptions( int i_fd)
+{
+	if( af::Environment::getSO_RCVTIMEO_sec() != -1 )
+	{
+		timeval so_timeo;
+		so_timeo.tv_usec = 0;
+		so_timeo.tv_sec = af::Environment::getSO_RCVTIMEO_sec();
+		if( setsockopt( i_fd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+			AFERRPE("Set socket SO_RCVTIMEO option failed:")
+	}
+
+	if( af::Environment::getSO_SNDTIMEO_sec() != -1 )
+	{
+		timeval so_timeo;
+		so_timeo.tv_usec = 0;
+		so_timeo.tv_sec = af::Environment::getSO_SNDTIMEO_sec();
+		if( setsockopt( i_fd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+			AFERRPE("Set socket SO_SNDTIMEO option failed:")
+	}
+
+	if( af::Environment::getSO_TCP_NODELAY() != -1 )
+	{
+		int nodelay = af::Environment::getSO_TCP_NODELAY();
+		if( setsockopt( i_fd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+			AFERRPE("Set socket TCP_NODELAY option failed:")
+	}
+
+	if( af::Environment::getSO_TCP_CORK() != -1 )
+	{
+		int nodelay = af::Environment::getSO_TCP_CORK();
+		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+			AFERRPE("Set socket TCP_CORK option failed:")
+	}
 }
 
 bool af::msgread( int desc, af::Msg* msg)
