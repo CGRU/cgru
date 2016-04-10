@@ -68,7 +68,9 @@ bool WndListenJob::processEvents( const af::MonitorEvents & i_me)
 	{
 		if( i_me.m_listens[i].job_id == m_job_id )
 		{
-			qTextEdit->append( afqt::stoq( i_me.m_listens[i].hostname) + ": " + afqt::stoq( i_me.m_listens[i].output));
+			qTextEdit->append( afqt::stoq( i_me.m_listens[i].taskname)
+					+ "[" + afqt::stoq( i_me.m_listens[i].hostname) + "]:"
+					+ "\n" + afqt::stoq( i_me.m_listens[i].output));
 			founded = true;
 		}
 	}

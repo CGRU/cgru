@@ -161,6 +161,7 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 			hostname = render->getName();
 		}
 		monitoring->addListened(
+			m_run->getTaskName(),
 			hostname,
 			m_block->m_job->getId(),
 			m_block->m_data->getBlockNum(),

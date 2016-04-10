@@ -306,6 +306,7 @@ TaskItem.prototype.mh_Get = function( i_mode, i_evt, i_number)
 	var get = {"type":'jobs',"ids":[this.job.id],"mode":i_mode,"number":i_number};
 	get.block_ids = [this.block.block_num];
 	get.task_ids = [this.task_num];
+	get.mon_id = g_id;
 
 	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.monitor.window});
 }
@@ -326,8 +327,10 @@ TaskItem.mh_Get = function( i_param, i_evt)
 
 	nw_request({'send':{'get':get},'func':g_ShowObject,'evt':i_evt,'wnd':task.monitor.window});
 }
+/*
 TaskItem.prototype.mh_Oper = function( i_name, i_value)
 {
+console.log('TaskItem.prototype.mh_Oper: ' + i_name);
 	var operation = {};
 	operation.type = i_name;
 	var bids = []; var tids = [];
@@ -335,6 +338,35 @@ TaskItem.prototype.mh_Oper = function( i_name, i_value)
 	if( tids.length ) operation.task_ids = tids;
 	nw_Action('jobs', [this.job.id], operation, null, bids);
 }
+*/
+TaskItem.mh_Lis = function( i_param)
+{
+	var task = i_param.monitor.cur_item;
+	if( task == null )
+	{
+		g_Error('No task selected.');
+		return;
+	}
+	if( task.task_num == null )
+		return;
+
+	var bids = []; var tids = [];
+	task.getBlockTasksIds( bids, tids);
+	if(( tids.length == 0 ) || ( bids.length == 0 ))
+	{
+		g_Error('No task selected to listen.');
+		return;
+	}
+
+	var args = {};
+	args.job   = task.job.id;
+	args.block = bids[0];
+	args.task  = tids[0];
+	args.parent_window = task.monitor.window;
+
+	listen_Start( args);
+}
+
 TaskItem.mh_Oper = function( i_param)
 {
 	var task = i_param.monitor.cur_item;
@@ -406,6 +438,7 @@ TaskItem.createPanels = function( i_monitor)
 	acts.info    = {'handle':'mh_Get', 'label':'INFO','tooltip':'Get task full info.'};
 	acts.skip    = {'handle':'mh_Oper','label':'SKIP','tooltip':'Double click to skip selected task(s).','ondblclick':true};
 	acts.restart = {'handle':'mh_Oper','label':'RES', 'tooltip':'Double click to restart selected task(s).','ondblclick':true};
+	acts.listen  = {'handle':'mh_Lis', 'label':'LIS', 'tooltip':'Double click to listen task.','ondblclick':true};
 	i_monitor.createCtrlBtns( acts);
 }
 

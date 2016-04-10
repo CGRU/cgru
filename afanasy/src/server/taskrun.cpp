@@ -3,7 +3,6 @@
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
-#include "../libafanasy/taskexec.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 
@@ -19,6 +18,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+std::string TaskRun::ms_no_name = "no_exec_name";
+  
 TaskRun::TaskRun( Task * runningTask,
                   af::TaskExec* taskExec,
                   af::TaskProgress * taskProgress,

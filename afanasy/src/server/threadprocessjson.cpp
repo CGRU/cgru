@@ -159,8 +159,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 								if( binary )
 									o_msg_response = af::msgInfo("info", info);
 								else
-									o_msg_response = af::jsonMsg(
-										std::string("{\"info\":\"") + info + ("\"}"));
+									o_msg_response = af::jsonMsgInfo("info", info);
 							}
 							else
 								error = std::string("MonitorContainer::waitOutput: No monitor with ID = ")

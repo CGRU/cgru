@@ -1008,6 +1008,7 @@ JobNode.createPanels = function( i_monitor)
 	acts.start  = {"label":"STA","tooltip":'Start job.'};
 	acts.pause  = {"label":"PAU","tooltip":'Pause job.'};
 	acts.stop   = {"label":"STP","tooltip":'Double click to stop job running tasks.',"ondblclick":true};
+	acts.listen = {"label":"LIS","tooltip":'Double click to listen job.',"ondblclick":true,"handle":'listen'};
 	acts.delete = {"label":"DEL","tooltip":'Double click to delete job(s).',"ondblclick":true};
 	acts.deldone= {"label":"DDJ","tooltip":'Double click to delete all done jobs.',"ondblclick":true,"always_active":true,"handle":'delDoneJobs'};
 	i_monitor.createCtrlBtns( acts);
@@ -1122,6 +1123,22 @@ JobNode.delDoneJobs = function( i_args)
 
 	nw_Action('jobs', ids, {"type":'delete'});
 	i_args.monitor.info('Deleting all done jobs.');
+}
+
+JobNode.listen = function( i_args)
+{
+	var job = i_args.monitor.cur_item;
+	if( job == null )
+	{
+		g_Error('No task selected to listen.');
+		return;
+	}
+
+	var args = {};
+	args.job = job.params.id;
+	args.parent_window = i_args.monitor.window;
+
+	listen_Start( args);
 }
 
 JobNode.params = {};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/taskexec.h"
 
 class Block;
 class RenderAf;
@@ -54,6 +55,8 @@ public:
    int        getHostId() const { return m_hostId;}
    bool isHostId( const int value) const { return m_hostId == value;}
 
+   const std::string & getTaskName() const { if( m_exec) return m_exec->getName(); else return ms_no_name;}
+
 /// Calculate memory totally allocated by class instance
    int calcWeight() const;
 
@@ -77,4 +80,6 @@ private:
    int * m_counter;
    uint32_t m_stopTime;         ///< Time, when running task was asked to stop.
    bool m_zombie;
+
+   static std::string ms_no_name;
 };

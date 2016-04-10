@@ -107,7 +107,11 @@ void MonitorContainer::outputsReceived( const std::vector<af::MCTaskPos> & i_out
 		AFERROR("MonitorContainer::outputsReceived: No one waiting such outputs.")
 }
 
-void MonitorContainer::addListened( const std::string & i_hostname, int i_j, int i_b, int i_t, const std::string & i_listened)
+void MonitorContainer::addListened(
+		const std::string & i_taskname,
+		const std::string & i_hostname,
+		int i_j, int i_b, int i_t,
+		const std::string & i_listened)
 {
 	for( int i = 0; i < m_listens.size(); i++)
 	{
@@ -119,6 +123,7 @@ void MonitorContainer::addListened( const std::string & i_hostname, int i_j, int
 	}
 
 	af::MonitorEvents::MListen listen;
+	listen.taskname = i_taskname;
 	listen.hostname = i_hostname;
 	listen.job_id   = i_j;
 	listen.block    = i_b;

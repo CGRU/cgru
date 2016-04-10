@@ -140,6 +140,7 @@ void MonitorEvents::v_readwrite( Msg * msg)
 		rw_int32_t( m_listens[i].job_id,   msg);
 		rw_int32_t( m_listens[i].block,    msg);
 		rw_int32_t( m_listens[i].task,     msg);
+		rw_String ( m_listens[i].taskname, msg);
 		rw_String ( m_listens[i].hostname, msg);
 		rw_String ( m_listens[i].output,   msg);
 	}
@@ -152,16 +153,13 @@ void MonitorEvents::v_readwrite( Msg * msg)
 void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 {
 	bool hasevents = false;
+
 	// Nodes events:
 	for( int e = 0; e < af::Monitor::EVT_COUNT; e++)
 	{
-		if( m_events[e].size() == 0 )
-			continue;
+		if( m_events[e].size() == 0 ) continue;
 
-		if( hasevents )
-			o_str << ",";
-		else
-			o_str << "{";
+		if( hasevents ) o_str << ","; else o_str << "{";
 
 		o_str << "\n\"" << af::Monitor::EVT_NAMES[e] << "\":";
 		o_str << "[";
@@ -177,13 +175,11 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		hasevents = true;
 	}
 
+
 	// Tasks progress:
 	if( m_tp.size())
 	{
-		if( hasevents )
-			o_str << ",";
-		else
-			o_str << "{";
+		if( hasevents ) o_str << ","; else o_str << "{";
 
 		o_str << "\n\"tasks_progress\":[";
 		for( int j = 0; j < m_tp.size(); j++)
@@ -214,13 +210,11 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		hasevents = true;
 	}
 
+
 	// Blocks ids:
 	if( m_bids.size())
 	{
-		if( hasevents )
-			o_str << ",";
-		else
-			o_str << "{";
+		if( hasevents ) o_str << ","; else o_str << "{";
 
 		o_str << "\n\"block_ids\":{";
 
@@ -251,14 +245,13 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		hasevents = true;
 	}
 
+
+	// Jobs order:
 	if( m_jobs_order_ids.size())
 	{
-		if( hasevents )
-			o_str << ",";
-		else
-			o_str << "{";
+		if( hasevents ) o_str << ","; else o_str << "{";
 
-		o_str << "\"jobs_order_ids\":[";
+		o_str << "\n\"jobs_order_ids\":[";
 		for( int i = 0; i < m_jobs_order_ids.size(); i++)
 		{
 			if( i ) o_str << ",";
@@ -269,14 +262,73 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		hasevents = true;
 	}
 
+
+	// Instruction:
 	if( m_instruction.size())
 	{
-		if( hasevents )
-			o_str << ",";
-		else
-			o_str << "{";
+		if( hasevents ) o_str << ","; else o_str << "{";
 
-		o_str << "\"instruction\":\"" << m_instruction << "\"";
+		o_str << "\n\"instruction\":\"" << m_instruction << "\"";
+		o_str << "}";
+
+		hasevents = true;
+	}
+
+
+	// Tasks outputs:
+	if( m_outputs.size())
+	{
+		if( hasevents ) o_str << ","; else o_str << "{";
+
+		o_str << "\n\"tasks_outputs\":[";
+		for( int i = 0; i < m_outputs.size(); i++)
+		{
+			if( i ) o_str << ",";
+
+			o_str << "\n{";
+			o_str << "\"job\":" << m_outspos[i].getJobId();
+			o_str << ",\"block\":" << m_outspos[i].getNumBlock();
+			o_str << ",\"task\":" << m_outspos[i].getNumTask();
+			o_str << "\n,\"output\":\"" << af::strEscape(m_outputs[i]) << "\"";
+			o_str << "}";
+		}
+		o_str << "]";
+
+		hasevents = true;
+	}
+
+
+	// Tasks listens:
+	if( m_listens.size())
+	{
+		if( hasevents ) o_str << ","; else o_str << "{";
+
+		o_str << "\n\"tasks_listens\":[";
+		for( int i = 0; i < m_listens.size(); i++)
+		{
+			if( i ) o_str << ",";
+
+			o_str << "\n{";
+			o_str << "\"taskname\":\"" << m_listens[i].taskname << "\"";
+			o_str << ",\"hostname\":\"" << m_listens[i].hostname << "\"";
+			o_str << ",\"job\":" << m_listens[i].job_id;
+			o_str << ",\"block\":" << m_listens[i].block;
+			o_str << ",\"task\":" << m_listens[i].task;
+			o_str << "\n,\"output\":\"" << af::strEscape(m_listens[i].output) << "\"";
+			o_str << "}";
+		}
+		o_str << "]";
+
+		hasevents = true;
+	}
+
+
+	// Announcement:
+	if( m_announcement.size())
+	{
+		if( hasevents ) o_str << ","; else o_str << "{";
+
+		o_str << "\n\"announce\":\"" << m_announcement << "\"";
 		o_str << "}";
 
 		hasevents = true;

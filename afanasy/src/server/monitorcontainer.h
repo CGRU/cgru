@@ -35,7 +35,10 @@ public:
 
    void addUser( UserAf * i_user);
 
-	void addListened( const std::string & i_hostname, int i_j, int i_b, int i_t, const std::string & i_listened);
+	void addListened( const std::string & i_taskname,
+			const std::string & i_hostname,
+			int i_j, int i_b, int i_t,
+			const std::string & i_listened);
 
 	void outputsReceived( const std::vector<af::MCTaskPos> & i_outspos, const std::vector<std::string> & i_outputs);
 

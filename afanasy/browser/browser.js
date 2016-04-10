@@ -204,10 +204,26 @@ function g_ProcessMsg( i_obj)
 		return;
 	}
 
-	if( i_obj.message || i_obj.object || i_obj.task_exec )
+	if( i_obj.message || i_obj.info || i_obj.object || i_obj.task_exec )
 	{
 		g_ShowObject( i_obj);
 		return;
+	}
+
+	if( i_obj.events && i_obj.events.tasks_outputs && i_obj.events.tasks_outputs.length )
+	{
+		var outputs = i_obj.events.tasks_outputs;
+		for( var i = 0; i < outputs.length; i++)
+		{
+			var msg = {};
+			msg.type = 'output';
+			msg.name = 'Task';
+			msg.list = [outputs[i].output];
+
+			g_ShowObject({'message':msg});
+
+			g_Info('Task output reveived.');
+		}
 	}
 
 	if( g_id == 0 )
@@ -389,8 +405,20 @@ function g_CloseAllMonitors()
 		g_monitors[0].destroy();
 }
 
+
 function g_ShowObject( i_data, i_args)
 {
+	if( i_data.info )
+	{
+		if( i_data.info.kind == 'log')
+			g_Log( i_data.info.text);
+		else if( i_data.info.kind == 'error')
+			g_Error( i_data.info.text);
+		else
+			g_Info( i_data.info.text);
+			return;
+	}
+
 	var object = i_data;
 	var type = 'object';
 	if( i_data.object )
@@ -399,16 +427,18 @@ function g_ShowObject( i_data, i_args)
 	{
 		object = i_data.message;
 		type = 'message';
+		g_Info('Message received.');
 	}
 	else if( i_data.task_exec )
 	{
 		object = i_data.task_exec;
 		type = 'task_exec';
+		g_Info('Task received.');
 	}
 
 	if( i_args == null )
 	{
-		g_Log('Global object received.');
+//		g_Log('Global object received.');
 		i_args = {};
 	}
 
