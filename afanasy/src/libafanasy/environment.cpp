@@ -105,8 +105,8 @@ int Environment::so_client_TCP_CORK     = AFNETWORK::SO_CLIENT_TCP_CORK;
 
 
 /// Resources limits:
-int Environment::rlimit_NOFILE = -1;
-int Environment::rlimit_NPROC  = -1;
+int Environment::rlimit_NOFILE = 0;
+int Environment::rlimit_NPROC  = 0;
 
 
 std::string Environment::db_conninfo =                     AFDATABASE::CONNINFO;
@@ -512,13 +512,13 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	QUIET("Python version = '%s'\n", version_python.c_str());
 
 	// GCC:
-#ifdef __GNUC__
+	#ifdef __GNUC__
 	version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
 	QUIET("GCC version = '%s'\n", version_gcc.c_str());
-#endif
+	#endif
 
 //########### Resources limit: ######################
-
+	#ifdef LINUX
 	struct rlimit rlim;
 
 	getrlimit(RLIMIT_NOFILE, &rlim);
@@ -528,8 +528,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	getrlimit(RLIMIT_NPROC, &rlim);
 	rlimit_NPROC = rlim.rlim_cur;
 	QUIET("RLIMIT_NPROC: Processes (threads) limit: %d\n", rlimit_NPROC);
-
-
+	#endif
 //###################################################
 
 	load();

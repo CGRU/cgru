@@ -428,7 +428,7 @@ void af::setSocketOptions( int i_fd)
 		if( setsockopt( i_fd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
 			AFERRPE("Set socket SO_SNDTIMEO option failed:")
 	}
-
+	#ifdef LINUX
 	if( af::Environment::getSO_TCP_NODELAY() != -1 )
 	{
 		int nodelay = af::Environment::getSO_TCP_NODELAY();
@@ -442,6 +442,7 @@ void af::setSocketOptions( int i_fd)
 		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
 			AFERRPE("Set socket TCP_CORK option failed:")
 	}
+	#endif
 }
 
 bool af::msgread( int desc, af::Msg* msg)
