@@ -135,7 +135,10 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	for( int i = 0; i < lis_size; i++)
 	{
 		if( msg->isReading())
+		{
 			m_listens.push_back( MListen());
+			m_listens[i].render_id = 0; ///< Not used on a client side.
+		}
 
 		rw_int32_t( m_listens[i].job_id,   msg);
 		rw_int32_t( m_listens[i].block,    msg);

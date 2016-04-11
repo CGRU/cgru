@@ -10,6 +10,8 @@
 #include "../libafanasy/msg.h"
 
 #include "afcommon.h"
+#include "renderaf.h"
+#include "rendercontainer.h"
 #include "useraf.h"
 
 #define AFOUTPUT
@@ -108,6 +110,7 @@ void MonitorContainer::outputsReceived( const std::vector<af::MCTaskPos> & i_out
 }
 
 void MonitorContainer::addListened(
+		int i_render_id,
 		const std::string & i_taskname,
 		const std::string & i_hostname,
 		int i_j, int i_b, int i_t,
@@ -123,6 +126,7 @@ void MonitorContainer::addListened(
 	}
 
 	af::MonitorEvents::MListen listen;
+	listen.render_id= i_render_id;
 	listen.taskname = i_taskname;
 	listen.hostname = i_hostname;
 	listen.job_id   = i_j;
@@ -133,7 +137,7 @@ void MonitorContainer::addListened(
 	m_listens.push_back( listen);
 }
 
-void MonitorContainer::dispatch()
+void MonitorContainer::dispatch( RenderContainer * i_renders)
 {
 	//
 	// Common Events:
@@ -250,11 +254,30 @@ void MonitorContainer::dispatch()
 	//
 	for( int i = 0; i < m_listens.size(); i++)
 	{
+		bool founded = false;
+
 		MonitorContainerIt monitorsIt( this);
 		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
 		{
 			if( monitor->isListening( m_listens[i]))
+			{
 				monitor->addListened( m_listens[i]);
+				founded = true;
+			}
+		}
+
+		if( false == founded )
+		{
+			AFCommon::QueueLog( std::string("Removing not listening task: ") +
+					m_listens[i].taskname + "[" + m_listens[i].hostname + "]");
+
+			RenderContainerIt rIt( i_renders);
+			RenderAf * render = rIt.getRender( m_listens[i].render_id);
+			if( render )
+				render->listenTask(
+					af::MCTaskPos(
+						m_listens[i].job_id, m_listens[i].block, m_listens[i].task),
+						false);
 		}
 	}
 

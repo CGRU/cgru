@@ -104,6 +104,6 @@ private:
 	std::list<int>          m_errorHostsCounts; ///< Number of errors on error host.
 	std::list<time_t>       m_errorHostsTime;   ///< Time of the last error
 
-	bool m_listen;
+	int m_listen_count;
 };
 

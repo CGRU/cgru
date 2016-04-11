@@ -43,6 +43,7 @@ public:
 	std::string m_instruction;
 
 	struct MListen {
+		int32_t render_id;
 		std::string taskname;
 		std::string hostname;
 		int32_t job_id;

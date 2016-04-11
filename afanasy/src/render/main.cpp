@@ -36,7 +36,7 @@ void sig_int(int signum)
 // Functions:
 //void threadAcceptClient( void * i_arg );
 void msgCase( af::Msg * msg);
-void processEvents( const af::RenderEvents & i_me);
+void processEvents( const af::RenderEvents & i_re);
 void launchAndExit( const std::string & i_str, bool i_exit);
 
 int main(int argc, char *argv[])
@@ -257,67 +257,67 @@ printf(" >>> "); msg->v_stdOut();
 	delete msg;
 }
 
-void processEvents( const af::RenderEvents & i_me)
+void processEvents( const af::RenderEvents & i_re)
 {
 #ifdef AFOUTPUT
-i_me.v_stdOut();
+i_re.v_stdOut();
 #endif
 
 	// Tasks to execute:
-	for( int i = 0; i < i_me.m_tasks.size(); i++)
-		RenderHost::runTask( i_me.m_tasks[i]);
+	for( int i = 0; i < i_re.m_tasks.size(); i++)
+		RenderHost::runTask( i_re.m_tasks[i]);
 
 
 	// Tasks to close:
-	for( int i = 0; i < i_me.m_closes.size(); i++)
-		RenderHost::closeTask( i_me.m_closes[i]);
+	for( int i = 0; i < i_re.m_closes.size(); i++)
+		RenderHost::closeTask( i_re.m_closes[i]);
 
 
 	// Tasks to stop:
-	for( int i = 0; i < i_me.m_stops.size(); i++)
-		RenderHost::stopTask( i_me.m_stops[i]);
+	for( int i = 0; i < i_re.m_stops.size(); i++)
+		RenderHost::stopTask( i_re.m_stops[i]);
 
 
 	// Tasks to outputs:
-	for( int i = 0; i < i_me.m_outputs.size(); i++)
-		RenderHost::upTaskOutput( i_me.m_outputs[i]);
+	for( int i = 0; i < i_re.m_outputs.size(); i++)
+		RenderHost::upTaskOutput( i_re.m_outputs[i]);
 
 	// Listens add:
-	for( int i = 0; i < i_me.m_listens_add.size(); i++)
-		RenderHost::listenTask( i_me.m_listens_add[i], true);
+	for( int i = 0; i < i_re.m_listens_add.size(); i++)
+		RenderHost::listenTask( i_re.m_listens_add[i], true);
 
 	// Listens remove:
-	for( int i = 0; i < i_me.m_listens_rem.size(); i++)
-		RenderHost::listenTask( i_me.m_listens_rem[i], false);
+	for( int i = 0; i < i_re.m_listens_rem.size(); i++)
+		RenderHost::listenTask( i_re.m_listens_rem[i], false);
 
 	// Instructions:
-	if( i_me.m_instruction.size())
+	if( i_re.m_instruction.size())
 	{
-		if( i_me.m_instruction == "exit")
+		if( i_re.m_instruction == "exit")
 		{
 			printf("Render exit request received.\n");
 			AFRunning = false;
 		}
-		else if( i_me.m_instruction == "sleep")
+		else if( i_re.m_instruction == "sleep")
 		{
 			printf("Render sleep request received.\n");
-			RenderHost::wolSleep( i_me.m_command);
+			RenderHost::wolSleep( i_re.m_command);
 		}
-		else if( i_me.m_instruction == "launch")
+		else if( i_re.m_instruction == "launch")
 		{
-			launchAndExit( i_me.m_command, false);
+			launchAndExit( i_re.m_command, false);
 		}
-		else if( i_me.m_instruction == "launch_exit")
+		else if( i_re.m_instruction == "launch_exit")
 		{
-			launchAndExit( i_me.m_command, true);
+			launchAndExit( i_re.m_command, true);
 		}
-		else if( i_me.m_instruction == "reboot")
+		else if( i_re.m_instruction == "reboot")
 		{
 			AFRunning = false;
 			printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
 			af::launchProgram( af::Environment::getRenderCmdReboot());
 		}
-		else if( i_me.m_instruction == "shutdown")
+		else if( i_re.m_instruction == "shutdown")
 		{
 			AFRunning = false;
 			printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());

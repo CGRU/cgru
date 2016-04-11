@@ -214,7 +214,7 @@ void threadRunCycle( void * i_args)
 	// Dispatch events to monitors:
 	//
 	AFINFO("ThreadRun::run: dispatching monitor events:")
-	a->monitors->dispatch();
+	a->monitors->dispatch( a->renders);
 
 	//
 	// Free Containers:

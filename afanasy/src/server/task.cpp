@@ -26,7 +26,7 @@ Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_number( taskNumber),
    m_progress( taskProgress),
    m_run( NULL),
-	m_listen( false)
+	m_listen_count( 0)
 {
 	// If job is not from store, it is just came from network
 	// and so no we do not need to read anything
@@ -113,7 +113,7 @@ void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf
       return;
    }
 
-	taskexec->listenOutput( m_listen);
+	taskexec->listenOutput( m_listen_count > 0);
 
    m_run = new TaskRun( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
 }
@@ -161,6 +161,7 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 			hostname = render->getName();
 		}
 		monitoring->addListened(
+			taskup.getClientId(),
 			m_run->getTaskName(),
 			hostname,
 			m_block->m_job->getId(),
@@ -461,8 +462,23 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 
 void Task::listenOutput(  RenderContainer * i_renders, bool i_subscribe)
 {
-	if( i_subscribe == m_listen )
-		return;
+	if( i_subscribe )
+	{
+		m_listen_count++;
+
+		if( m_listen_count > 1 )
+			return;
+	}
+	else
+	{
+		if( m_listen_count < 1 )
+			return;
+
+		m_listen_count--;
+
+		if( m_listen_count > 0 )
+			return;
+	}
 
 	if( m_run && m_run->notZombie())
 	{
@@ -479,8 +495,6 @@ void Task::listenOutput(  RenderContainer * i_renders, bool i_subscribe)
 					af::MCTaskPos( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number), i_subscribe);
 		}
 	}
-
-	m_listen = i_subscribe;
 
 	return;
 }
