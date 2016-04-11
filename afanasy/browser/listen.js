@@ -7,6 +7,8 @@ listen_Start = function( i_args)
 		name = 'Listen Task';
 
 	wnd = new cgru_Window({"name":name,"wnd":i_args.parent_window});
+	wnd.elContent.classList.add('listen');
+
 	wnd.listen = i_args;
 	wnd.processMsg = listen_ProcessMsg;
 	wnd.onDestroy = listen_Subscribe;
@@ -62,13 +64,17 @@ listen_ProcessMsg = function( i_obj)
 				if( wListen.task == null )
 				{
 					var el = document.createElement('div');
+					el.classList.add('name');
 					el.textContent = listen.taskname + '[' + listen.hostname + ']:';
 					listen_wnds[w].elContent.appendChild( el);
 				}
 
 				var el = document.createElement('pre');
+				el.classList.add('output');
 				el.textContent = listen.output;
 				listen_wnds[w].elContent.appendChild( el);
+
+				el.scrollIntoView( false);
 			}
 		}
 	}

@@ -541,3 +541,14 @@ background: rgba(255,255,0,.2);
 .task_exec .files > div.opened {
 clear: both; float: none;
 }
+
+.listen .name {
+font-style: italic;
+font-weight: bold;
+margin: 0 0 0 40px;
+padding: 0;
+}
+.listen .output {
+margin-top: 0;
+padding-top: 0;
+}
