@@ -943,7 +943,7 @@ class Cmd:
 		self.action = 'action'
 		self.data['type'] = 'monitors'
 		self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + \
-							cgruconfig.VARS['HOSTNAME'] + ':.*'
+							cgruconfig.VARS['HOSTNAME'] + '.*'
 		self.data['operation'] = {'type': 'exit'}
 		self._sendRequest()
 
