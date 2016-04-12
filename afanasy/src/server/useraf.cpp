@@ -201,8 +201,17 @@ void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 		mcjobs.addNode( job->node());
 }
 
-af::Msg * UserAf::writeJobdsOrder() const
+af::Msg * UserAf::writeJobdsOrder( bool i_binary) const
 {
+	if( i_binary )
+	{
+		af::MCGeneral ids;
+		ids.setId( getId());
+		ids.setList( generateJobsIds());
+		return new af::Msg( af::Msg::TUserJobsOrder, &ids);
+	}
+
+
 	std::vector<int32_t> jids = m_jobslist.generateIdsList();
 	std::ostringstream str;
 

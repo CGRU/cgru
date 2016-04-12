@@ -277,7 +277,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if( user )
 				{
 					if( mode == "jobs_order" )
-						o_msg_response = user->writeJobdsOrder();
+						o_msg_response = user->writeJobdsOrder( binary);
 					else if( mode == "log" )
 						o_msg_response = user->writeLog( binary);
 				}

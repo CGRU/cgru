@@ -522,9 +522,6 @@ const char * Msg::TNAMES[]=
 	"TRenderId",
 	"TRenderDeregister",          ///< Deregister Render with given id.
 
-	/*- Users messages -*/
-	"TUserJobsOrderRequestId",    ///< Request User(id) jobs ids in server list order.
-
 	/*- Job messages -*/
 	"TJobsWeightRequest",         ///< Request all jobs weight.
 

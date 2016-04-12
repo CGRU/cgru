@@ -260,7 +260,7 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 			if( i ) o_str << ",";
 			o_str << m_jobs_order_ids[i];
 		}
-		o_str << "]}";
+		o_str << "]";
 
 		hasevents = true;
 	}
@@ -272,7 +272,6 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		if( hasevents ) o_str << ","; else o_str << "{";
 
 		o_str << "\n\"instruction\":\"" << m_instruction << "\"";
-		o_str << "}";
 
 		hasevents = true;
 	}
@@ -332,7 +331,6 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		if( hasevents ) o_str << ","; else o_str << "{";
 
 		o_str << "\n\"announce\":\"" << m_announcement << "\"";
-		o_str << "}";
 
 		hasevents = true;
 	}

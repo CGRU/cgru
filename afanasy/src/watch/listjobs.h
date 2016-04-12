@@ -84,6 +84,8 @@ private:
 
 	void moveJobs( const std::string & i_operation);
 
+	void getUserJobsOrder();
+
 	void calcTotals();
 
 private:

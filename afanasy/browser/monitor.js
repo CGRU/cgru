@@ -475,7 +475,7 @@ Monitor.prototype.processMsg = function( obj)
 		new_nodes.push( this.createNode( nodes[new_ids[i]]));
 
 	if(( this.type == 'jobs' ) && ( this.sortParm == 'order'))
-		if( new_ids.length || updated.length )
+		if( new_ids.length )//|| updated.length )
 			nw_GetNodes('users',[g_uid],'jobs_order');
 
 	if( false == this.hasSelection())

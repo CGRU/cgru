@@ -166,24 +166,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	  break;
 	}
 
-// ---------------------------------- Users -------------------------------//
-	case af::Msg::TUserJobsOrderRequestId:
-	{
-	  AfContainerLock lock( i_args->users,  AfContainerLock::READLOCK);
-
-	  UserContainerIt usersIt( i_args->users);
-	  UserAf* user = usersIt.getUser( i_msg->int32());
-	  if( user == NULL )
-	  { // FIXME: Better to return some message in any case.
-		 break;
-	  }
-	  af::MCGeneral ids;
-		ids.setId( user->getId());
-		ids.setList( user->generateJobsIds());
-	  o_msg_response = new af::Msg( af::Msg::TUserJobsOrder, &ids);
-	  break;
-	}
-
 // ------------------------------------- Job -------------------------------//
 	case af::Msg::TJobsWeightRequest:
 	{

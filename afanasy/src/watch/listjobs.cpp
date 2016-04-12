@@ -408,7 +408,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	{
 		if( updateItems( msg) && (af::Environment::VISOR() == false))
 		{
-			Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid()));
+			getUserJobsOrder();
 		}
 		if( false == isSubscribed() )
 		{
@@ -426,8 +426,8 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	case af::Msg::TUserJobsOrder:
 	{
 		af::MCGeneral ids( msg);
-		if( ids.getId() != MonitorHost::getUid()) return true;
-		sortMatch( ids.getList());
+		if( ids.getId() == MonitorHost::getUid())
+			sortMatch( ids.getList());
 		break;
 	}
 
@@ -476,7 +476,14 @@ ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
 void ListJobs::resetSorting()
 {
 	if( af::Environment::VISOR() == false )
-		Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, MonitorHost::getUid()));
+		getUserJobsOrder();
+}
+
+void ListJobs::getUserJobsOrder()
+{
+	std::ostringstream str;
+	str <<  "{\"get\":{\"type\":\"users\",\"ids\":[" << MonitorHost::getUid() << "],\"mode\":\"jobs_order\",\"binary\":true}}";
+	Watch::sendMsg( af::jsonMsg( str));
 }
 
 void ListJobs::calcTotals()
