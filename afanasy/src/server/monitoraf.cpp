@@ -381,7 +381,10 @@ af::Msg * MonitorAf::getEventsBin()
 	if( m_e.isEmpty())
 		msg = new af::Msg( af::Msg::TMonitorId, getId());
 	else
+	{
+		prepareEvents();
 		msg = new af::Msg( af::Msg::TMonitorEvents, &m_e);
+	}
 
 	m_e.clear();
 
@@ -399,6 +402,7 @@ af::Msg * MonitorAf::getEventsJSON()
 
 	DlScopeLocker mutex( &m_mutex);
 
+	prepareEvents();
 	m_e.jsonWrite( stream);
 
 	stream << "\n}";
@@ -410,5 +414,26 @@ af::Msg * MonitorAf::getEventsJSON()
 	m_e.clear();
 
 	return msg;
+}
+
+void MonitorAf::prepareEvents()
+{
+	//
+	// Removing deleted jobs from changed:
+	//
+	{
+	std::vector<int32_t>::const_iterator delIt = m_e.m_events[af::Monitor::EVT_jobs_del].begin();
+	for( ; delIt != m_e.m_events[af::Monitor::EVT_jobs_del].end(); delIt++)
+	{
+		std::vector<int32_t>::iterator it = m_e.m_events[af::Monitor::EVT_jobs_change].begin();
+		while( it != m_e.m_events[af::Monitor::EVT_jobs_change].end())
+		{
+			if( *it == *delIt )
+				it = m_e.m_events[af::Monitor::EVT_jobs_change].erase( it);
+			else
+				it++;
+		}
+	}
+	}
 }
 

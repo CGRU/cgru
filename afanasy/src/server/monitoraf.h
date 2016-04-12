@@ -60,6 +60,8 @@ private:
 
 	bool setListening( int i_j, int i_b, int i_t, bool i_subscribe);
 
+	void prepareEvents();
+
 private:
 	af::MonitorEvents m_e;
 
