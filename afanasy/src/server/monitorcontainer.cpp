@@ -152,9 +152,31 @@ void MonitorContainer::dispatch( RenderContainer * i_renders)
 				monitor->addEvents( e, m_events[e]);
 	}
 
+
 	//
 	// Job Events, which depends on uid:
 	//
+	{
+
+	// Removing deleted jobs from other job events:
+	std::list<int32_t>::const_iterator delIt = m_jobEvents[af::Monitor::EVT_jobs_del].begin();
+	for( ; delIt != m_jobEvents[af::Monitor::EVT_jobs_del].end(); delIt++)
+	{
+		for( int e = af::Monitor::EVT_jobs_add; e <= af::Monitor::EVT_jobs_change; e++)
+		{
+			std::list<int32_t>::iterator it = m_jobEvents[e].begin();
+			while( it != m_jobEvents[e].end())
+			{
+				if( *it == *delIt )
+					it = m_jobEvents[e].erase( it);
+				else
+					it++;
+			}
+		}
+	}
+	}
+	
+	// Dispatching events to monitors:
 	for( int e = 0; e < af::Monitor::EVT_JOBS_COUNT; e++)
 	{
 		if( m_jobEvents[e].size() < 1) continue;
@@ -191,6 +213,7 @@ void MonitorContainer::dispatch( RenderContainer * i_renders)
 			monitor->addEvents( e, ids);
 		}
 	}
+
 
 	//
 	// Tasks progress events:
