@@ -93,11 +93,13 @@ int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
 
 /// Socket Options:
+int Environment::so_server_REUSEADDR    = AFNETWORK::SO_SERVER_REUSEADDR;
 int Environment::so_server_RCVTIMEO_sec = AFNETWORK::SO_SERVER_RCVTIMEO_SEC;
 int Environment::so_server_SNDTIMEO_sec = AFNETWORK::SO_SERVER_SNDTIMEO_SEC;
 int Environment::so_server_TCP_NODELAY  = AFNETWORK::SO_SERVER_TCP_NODELAY;
 int Environment::so_server_TCP_CORK     = AFNETWORK::SO_SERVER_TCP_CORK;
 
+int Environment::so_client_REUSEADDR    = AFNETWORK::SO_CLIENT_REUSEADDR;
 int Environment::so_client_RCVTIMEO_sec = AFNETWORK::SO_CLIENT_RCVTIMEO_SEC;
 int Environment::so_client_SNDTIMEO_sec = AFNETWORK::SO_CLIENT_SNDTIMEO_SEC;
 int Environment::so_client_TCP_NODELAY  = AFNETWORK::SO_CLIENT_TCP_NODELAY;
@@ -207,11 +209,13 @@ void Environment::getVars( const JSON & i_obj)
 
 
 	/// Socket Options:
+	getVar( i_obj, so_server_REUSEADDR,               "af_so_server_REUSEADDR"               );
 	getVar( i_obj, so_server_RCVTIMEO_sec,            "af_so_server_RCVTIMEO_sec"            );
 	getVar( i_obj, so_server_SNDTIMEO_sec,            "af_so_server_SNDTIMEO_sec"            );
 	getVar( i_obj, so_server_TCP_NODELAY,             "af_so_server_TCP_NODELAY"             );
 	getVar( i_obj, so_server_TCP_CORK,                "af_so_server_TCP_CORK"                );
 
+	getVar( i_obj, so_client_REUSEADDR,               "af_so_client_REUSEADDR"               );
 	getVar( i_obj, so_client_RCVTIMEO_sec,            "af_so_client_RCVTIMEO_sec"            );
 	getVar( i_obj, so_client_SNDTIMEO_sec,            "af_so_client_SNDTIMEO_sec"            );
 	getVar( i_obj, so_client_TCP_NODELAY,             "af_so_client_TCP_NODELAY"             );

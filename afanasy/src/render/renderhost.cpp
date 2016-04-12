@@ -106,7 +106,9 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 		delete ms_server_answer;
 
 	bool ok;
-	ms_server_answer = af::sendToServer( i_msg, ok, af::VerboseOff);
+	ms_server_answer = af::sendToServer( i_msg, ok,
+		i_msg->type() == af::Msg::TRenderRegister ? af::VerboseOff : af::VerboseOn);
+
 	if( ok )
 		connectionEstablished();
 	else

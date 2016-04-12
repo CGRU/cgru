@@ -167,6 +167,7 @@ public:
 
 
 	/// Socket Options:
+	static inline int getSO_REUSEADDR()    { return m_server ? so_server_REUSEADDR    : so_client_REUSEADDR    ;}
 	static inline int getSO_RCVTIMEO_sec() { return m_server ? so_server_RCVTIMEO_sec : so_client_RCVTIMEO_sec ;}
 	static inline int getSO_SNDTIMEO_sec() { return m_server ? so_server_SNDTIMEO_sec : so_client_SNDTIMEO_sec ;}
 	static inline int getSO_TCP_NODELAY()  { return m_server ? so_server_TCP_NODELAY  : so_client_TCP_NODELAY  ;}
@@ -315,11 +316,13 @@ private:
 
 
 	/// Socket Options:
+	static int so_server_REUSEADDR;
 	static int so_server_RCVTIMEO_sec;
 	static int so_server_SNDTIMEO_sec;
 	static int so_server_TCP_NODELAY;
 	static int so_server_TCP_CORK;
 
+	static int so_client_REUSEADDR;
 	static int so_client_RCVTIMEO_sec;
 	static int so_client_SNDTIMEO_sec;
 	static int so_client_TCP_NODELAY;

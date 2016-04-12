@@ -411,6 +411,14 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
 
 void af::setSocketOptions( int i_fd)
 {
+	if( af::Environment::getSO_REUSEADDR() != -1 )
+	{
+		timeval so_timeo;
+		int reuseaddr = af::Environment::getSO_REUSEADDR();
+		if( setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR, WINNT_TOCHAR(&reuseaddr), sizeof(reuseaddr)) != 0)
+			AFERRPE("Set socket SO_REUSEADDR option failed:")
+	}
+
 	if( af::Environment::getSO_RCVTIMEO_sec() != -1 )
 	{
 		timeval so_timeo;
@@ -438,8 +446,8 @@ void af::setSocketOptions( int i_fd)
 
 	if( af::Environment::getSO_TCP_CORK() != -1 )
 	{
-		int nodelay = af::Environment::getSO_TCP_CORK();
-		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+		int cork = af::Environment::getSO_TCP_CORK();
+		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&cork), sizeof(cork)) != 0)
 			AFERRPE("Set socket TCP_CORK option failed:")
 	}
 	#endif
