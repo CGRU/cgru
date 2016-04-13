@@ -94,6 +94,9 @@ function shot_InitHTML( i_data)
 	if( ASSET.nuke_template )
 		cmd += ' -t ' + cgru_PM(ASSET.nuke_template);
 
+	if( RULES.colorspace )
+		cmd += ' -c ' + RULES.colorspace
+
 	cmd += ' ' + path;
 
 //console.log( cmd);
