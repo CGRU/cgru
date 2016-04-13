@@ -413,7 +413,6 @@ void af::setSocketOptions( int i_fd)
 {
 	if( af::Environment::getSO_REUSEADDR() != -1 )
 	{
-		timeval so_timeo;
 		int reuseaddr = af::Environment::getSO_REUSEADDR();
 		if( setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR, WINNT_TOCHAR(&reuseaddr), sizeof(reuseaddr)) != 0)
 			AFERRPE("Set socket SO_REUSEADDR option failed:")
@@ -437,17 +436,26 @@ void af::setSocketOptions( int i_fd)
 			AFERRPE("Set socket SO_SNDTIMEO option failed:")
 	}
 	#ifdef LINUX
+	if( af::Environment::getSO_LINGER() != -1 )
+	{
+		linger so_linger;
+		so_linger.l_onoff  = af::Environment::getSO_LINGER();
+		so_linger.l_linger = af::Environment::getSO_LINGER();
+		if( setsockopt( i_fd, SOL_SOCKET, SO_LINGER, &so_linger, sizeof(so_linger)) != 0)
+			AFERRPE("Set socket SO_LINGER option failed:")
+	}
+
 	if( af::Environment::getSO_TCP_NODELAY() != -1 )
 	{
 		int nodelay = af::Environment::getSO_TCP_NODELAY();
-		if( setsockopt( i_fd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+		if( setsockopt( i_fd, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) != 0)
 			AFERRPE("Set socket TCP_NODELAY option failed:")
 	}
 
 	if( af::Environment::getSO_TCP_CORK() != -1 )
 	{
 		int cork = af::Environment::getSO_TCP_CORK();
-		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, WINNT_TOCHAR(&cork), sizeof(cork)) != 0)
+		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, &cork, sizeof(cork)) != 0)
 			AFERRPE("Set socket TCP_CORK option failed:")
 	}
 	#endif

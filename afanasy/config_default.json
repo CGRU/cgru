@@ -187,17 +187,19 @@
 
 "":"Network:",
 		"":"Use -1 value not to set socket option at all",
-	"af_so_server_REUSEADDR":-1,
 	"af_so_server_RCVTIMEO_sec":12,
 	"af_so_server_SNDTIMEO_sec":12,
 	"af_so_server_TCP_NODELAY":-1,
+	"af_so_server_REUSEADDR":-1,
 	"af_so_server_TCP_CORK":-1,
+	"af_so_server_LINGER":-1,
 
-	"af_so_client_REUSEADDR":-1,
 	"af_so_client_RCVTIMEO_sec":12,
 	"af_so_client_SNDTIMEO_sec":12,
 	"af_so_client_TCP_NODELAY":-1,
+	"af_so_client_REUSEADDR":-1,
 	"af_so_client_TCP_CORK":-1,
+	"af_so_client_LINGER":-1,
 
 	"":""
 }}

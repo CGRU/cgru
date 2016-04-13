@@ -122,12 +122,14 @@ namespace AFMONITOR
 /// Network options:
 namespace AFNETWORK
 {
+	const int SO_SERVER_LINGER       = -1;
 	const int SO_SERVER_REUSEADDR    = -1;
 	const int SO_SERVER_RCVTIMEO_SEC = 12;
 	const int SO_SERVER_SNDTIMEO_SEC = 12;
 	const int SO_SERVER_TCP_NODELAY  = -1;
 	const int SO_SERVER_TCP_CORK     = -1;
 
+	const int SO_CLIENT_LINGER       = -1;
 	const int SO_CLIENT_REUSEADDR    = -1;
 	const int SO_CLIENT_RCVTIMEO_SEC = 12;
 	const int SO_CLIENT_SNDTIMEO_SEC = 12;
