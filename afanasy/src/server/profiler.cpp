@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include "afcommon.h"
+
 #include "../libafanasy/common/dlScopeLocker.h"
 
 double toFloat( const timespec & i_ts)
@@ -106,13 +108,15 @@ void Profiler::Profile()
 	//
 	// Print:
 	//
-	static const char separator[] = "======================================";
+	static char buffer[1024];
+	std::string log;
+	sprintf( buffer,"Server load profiling:\n");
+	log += buffer;
+	sprintf( buffer,"Clients per second: %4.2f, Now: %d\n", per_second, ms_meter);
+	log += buffer;
+	sprintf( buffer,"Prep: %4.2f, Proc: %4.2f, Post: %4.2f, Tolal: %4.2f ms.\n", prep, proc, post, (prep + proc + post));
+	log += buffer;
 
-	printf("\n\033[1;36m%s\n", separator);
-
-	printf("Clients per second: %4.2f, Now: %d\n", per_second, ms_meter);
-	printf("Prep: %4.2f, Proc: %4.2f, Post: %4.2f, Tolal: %4.2f ms.\n", prep, proc, post, (prep + proc + post));
-
-	printf("%s\033[0m\n", separator);
+	AFCommon::QueueLog( log);
 }
 
