@@ -22,6 +22,7 @@ private:
 	static void Profile();
 
 private:
+#ifdef LINUX
 	static uint64_t ms_counter;
 
 	static int ms_meter;
@@ -37,5 +38,6 @@ private:
 	timespec m_tstart;
 	timespec m_tfinish;
 	timespec m_tcollect;
+#endif
 };
 

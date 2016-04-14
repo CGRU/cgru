@@ -1,5 +1,7 @@
 #include "profiler.h"
 
+#ifdef LINUX
+
 #include <stdio.h>
 
 #include "afcommon.h"
@@ -119,4 +121,10 @@ void Profiler::Profile()
 
 	AFCommon::QueueLog( log);
 }
-
+#else
+Profiler::Profiler(){}
+Profiler::~Profiler(){}
+void Profiler::processingStarted(){}
+void Profiler::processingFinished(){}
+void Profiler::Collect( Profiler * i_prof){ delete i_prof;}
+#endif
