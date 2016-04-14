@@ -24,6 +24,7 @@
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
+#include "profiler.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
@@ -32,7 +33,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-uint32_t processMessage( ThreadArgs * i_args);
+uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof);
 
 af::Msg * processHTTPGet( const af::Msg * i_msg);
 
@@ -42,18 +43,20 @@ af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
 void threadProcessMsg( void * i_args)
 {
 	ThreadArgs * threadArgs = (ThreadArgs*)i_args;
+	Profiler * prof = new Profiler();
 
 	// Message processing in separate function
 	// to ensure that descriptor closed and
 	// arguments are deleted in any way.
-	uint32_t response_type = processMessage( threadArgs);
+	uint32_t response_type = processMessage( threadArgs, prof);
 
 	af::socketDisconnect( threadArgs->sd, response_type);
 
 	delete threadArgs;
+	Profiler::Collect( prof);
 }
 
-uint32_t processMessage( ThreadArgs * i_args)
+uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof)
 {
 	af::setSocketOptions( i_args->sd);
 
@@ -73,6 +76,8 @@ uint32_t processMessage( ThreadArgs * i_args)
 		delete msg_request;
 		return response_type;
 	}
+
+	io_prof->processingStarted();
 
 	#ifdef AFOUTPUT
 	printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
@@ -120,6 +125,8 @@ uint32_t processMessage( ThreadArgs * i_args)
 	#endif
 
 	response_type = msg_response->type();
+
+	io_prof->processingFinished();
 
 	// Write response message back to client socket
 	if( false == af::msgwrite( i_args->sd, msg_response))
