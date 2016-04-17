@@ -6,7 +6,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
-#include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/logger.h"
 #include "../libafanasy/render.h"
 #include "../libafanasy/renderevents.h"
 
@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
 
 	Py_Finalize();
 
-	printf("Exiting render.\n");
+    AF_LOG << "Exiting render.";
 
 	return 0;
 }
@@ -230,7 +230,7 @@ printf(" >>> "); i_msg->v_stdOut();
 	}
 	default:
 	{
-		AFERROR("Unknown message recieved:")
+        AF_ERR << "Unknown message recieved: " << *i_msg;
 		i_msg->v_stdOut();
 		break;
 	}

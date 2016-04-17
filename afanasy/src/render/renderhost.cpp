@@ -4,9 +4,8 @@
 #include <fstream>
 #endif
 
-#include "../libafanasy/common/dlScopeLocker.h"
-
 #include "../libafanasy/environment.h"
+#include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
 
 #include "pyres.h"
@@ -123,7 +122,7 @@ void RenderHost::setRegistered( int i_id)
     m_connected = true;
     m_id = i_id;
     setUpdateMsgType( af::Msg::TRenderUpdate);
-    printf("Render registered.\n");
+    AF_LOG << "Render registered.";
 	RenderHost::connectionEstablished();
 }
 
