@@ -163,6 +163,8 @@ JobNode.prototype.update = function( i_obj)
 	else
 		this.elStar.style.display = 'none';
 
+	this.params.service = this.blocks[0].params.service;
+
 	this.refresh();
 }
 
@@ -1180,9 +1182,9 @@ JobBlock.params.tasks_depend_mask          = {"type":'reg', "label":'Tasks Depen
 JobBlock.params.need_properties            = {"type":'reg', "label":'Properties Needed'};
 
 // First array item will be used by default (on load)
-JobNode.sort = ['order','time_creation','priority','user_name','name','host_name'];
+JobNode.sort = ['order','time_creation','priority','user_name','name','host_name','service'];
 JobNode.sortVisor = 'time_creation';
 // If user is visor, special parameter will be used as the default
-JobNode.filter = ['name','host_name','user_name'];
+JobNode.filter = ['name','host_name','user_name','service'];
 JobNode.filterVisor = 'user_name';
 

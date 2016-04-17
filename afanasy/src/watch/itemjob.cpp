@@ -123,6 +123,9 @@ void ItemJob::updateValues( af::Node *node, int type)
 		if( block->getProgressAvoidHostsNum() > 0 )
 			compact_display = false;
 
+		if( b == 0 )
+			service = afqt::stoq( block->getService());
+
 		m_tasks_done += m_blockinfo[b].tasksdone;
 	}
 
@@ -367,6 +370,9 @@ bool ItemJob::setSortType(   int type )
       case CtrlSortFilter::TUSERNAME:
          sort_str = username;
          break;
+      case CtrlSortFilter::TSERVICE:
+         sort_str = service;
+         break;
       case CtrlSortFilter::TNUMRUNNINGTASKS:
          sort_int = num_runningtasks;
          break;
@@ -407,6 +413,9 @@ bool ItemJob::setFilterType( int type )
          break;
       case CtrlSortFilter::THOSTNAME:
          filter_str = hostname;
+         break;
+      case CtrlSortFilter::TSERVICE:
+         filter_str = service;
          break;
       default:
          AFERRAR("ItemJob::setFilterType: Invalid type number = %d", type)
