@@ -18,23 +18,15 @@
 
 extern bool AFRunning;
 
-RenderHost * RenderHost::ms_obj = NULL;
-af::RenderUpdate RenderHost::ms_up;
-int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
-bool RenderHost::ms_connected = false;
-int RenderHost::ms_connection_lost_count = 0;
-std::vector<PyRes*> RenderHost::ms_pyres;
-std::vector<TaskProcess*> RenderHost::ms_tasks;
-bool RenderHost::ms_no_output_redirection = false;
-std::vector<std::string> RenderHost::ms_windowsmustdie;
-af::Msg * RenderHost::ms_server_answer = NULL;
-
 RenderHost::RenderHost():
-	af::Render( Client::GetEnvironment)
+	af::Render( Client::GetEnvironment),
+	m_updateMsgType( af::Msg::TRenderRegister),
+	m_connected( false),
+	m_connection_lost_count( 0),
+	m_no_output_redirection( false),
+	m_server_answer( NULL)
 {
-    ms_obj = this;
-
-	if( af::Environment::hasArgument("-nor")) ms_no_output_redirection = true;
+	if( af::Environment::hasArgument("-nor")) m_no_output_redirection = true;
 
     setOnline();
 
@@ -46,24 +38,24 @@ RenderHost::RenderHost():
     {
         if( (*it).empty() ) continue;
         printf("Adding custom resource meter '%s'\n", (*it).c_str());
-        ms_pyres.push_back( new PyRes( *it, &m_hres));
+        m_pyres.push_back( new PyRes( *it, &m_hres));
     }
 
 #ifdef WINNT
     // Windows Must Die:
-	ms_windowsmustdie = af::Environment::getRenderWindowsMustDie();
-    if( ms_windowsmustdie.size())
+	m_windowsmustdie = af::Environment::getRenderWindowsMustDie();
+    if( m_windowsmustdie.size())
     {
         printf("Windows Must Die:\n");
-        for( int i = 0; i < ms_windowsmustdie.size(); i++)
-            printf("   %s\n", ms_windowsmustdie[i].c_str());
+        for( int i = 0; i < m_windowsmustdie.size(); i++)
+            printf("   %s\n", m_windowsmustdie[i].c_str());
     }
 #endif
 
 	af::sleep_msec( 100);
 
     GetResources( m_host, m_hres);
-    for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
+    for( int i = 0; i < m_pyres.size(); i++) m_pyres[i]->update();
 
     v_stdOut();
     m_host.v_stdOut( true);
@@ -73,28 +65,36 @@ RenderHost::RenderHost():
 RenderHost::~RenderHost()
 {
     // Delete custom python resources:
-    for( int i = 0; i < ms_pyres.size(); i++)
-        if( ms_pyres[i])
-            delete ms_pyres[i];
+    for( int i = 0; i < m_pyres.size(); i++)
+        if( m_pyres[i])
+            delete m_pyres[i];
 
     // Send deregister message if connected:
-    if( ms_connected )
+    if( m_connected )
     {
-        af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
+        af::Msg msg( af::Msg::TRenderDeregister, getId());
         bool ok;
         af::sendToServer( & msg, ok, af::VerboseOn);
-        ms_connected = false;
+        m_connected = false;
     }
 
     // Delete all tasks:
-    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); )
+    for( std::vector<TaskProcess*>::iterator it = m_tasks.begin(); it != m_tasks.end(); )
     {
         delete *it;
-        it = ms_tasks.erase( it);
+        it = m_tasks.erase( it);
     }
 }
 
-void RenderHost::dispatchMessage( af::Msg * i_msg)
+RenderHost * RenderHost::getInstance()
+{
+	// Does not return a reference, although sometimes recommanded for a
+	// singleton, because we need to control when it is destroyed.
+	static RenderHost * ms_obj = new RenderHost();
+	return ms_obj;
+}
+
+void RenderHost::sendMsgToServer( af::Msg * i_msg)
 {
     if( false == AFRunning ) return;
 
@@ -102,11 +102,11 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 	printf(" <<< "); i_msg->v_stdOut();
 	#endif
 
-	if( ms_server_answer )
-		delete ms_server_answer;
+	if( m_server_answer )
+		delete m_server_answer;
 
 	bool ok;
-	ms_server_answer = af::sendToServer( i_msg, ok,
+	m_server_answer = af::sendToServer( i_msg, ok,
 		i_msg->type() == af::Msg::TRenderRegister ? af::VerboseOff : af::VerboseOn);
 
 	if( ok )
@@ -120,9 +120,8 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 
 void RenderHost::setRegistered( int i_id)
 {
-    ms_connected = true;
-    ms_obj->m_id = i_id;
-//    ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
+    m_connected = true;
+    m_id = i_id;
     setUpdateMsgType( af::Msg::TRenderUpdate);
     printf("Render registered.\n");
 	RenderHost::connectionEstablished();
@@ -130,28 +129,26 @@ void RenderHost::setRegistered( int i_id)
 
 void RenderHost::connectionLost( bool i_any_case)
 {
-    if( ms_connected == false )
+    if( m_connected == false )
 		return;
 
-	ms_connection_lost_count++;
+	m_connection_lost_count++;
 
 	if( false == i_any_case )
 	{
-		printf("Connection lost count = %d of %d\n", ms_connection_lost_count, af::Environment::getRenderConnectRetries());
-		if( ms_connection_lost_count <= af::Environment::getRenderConnectRetries() )
+		printf("Connection lost count = %d of %d\n", m_connection_lost_count, af::Environment::getRenderConnectRetries());
+		if( m_connection_lost_count <= af::Environment::getRenderConnectRetries() )
 		{
 			return;
 		}
 	}
 
-    ms_connected = false;
+    m_connected = false;
 
-    ms_obj->m_id = 0;
+    m_id = 0;
 
     // Stop all tasks:
-    for( int t = 0; t < ms_tasks.size(); t++) ms_tasks[t]->stop();
-
-//    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
+    for( int t = 0; t < m_tasks.size(); t++) m_tasks[t]->stop();
 
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
@@ -161,7 +158,7 @@ void RenderHost::connectionLost( bool i_any_case)
 
 void RenderHost::setUpdateMsgType( int i_type)
 {
-    ms_updateMsgType = i_type;
+    m_updateMsgType = i_type;
 }
 
 void RenderHost::refreshTasks()
@@ -170,18 +167,18 @@ void RenderHost::refreshTasks()
         return;
 
     // Refresh tasks:
-    for( int t = 0; t < ms_tasks.size(); t++)
+    for( int t = 0; t < m_tasks.size(); t++)
     {
-        ms_tasks[t]->refresh();
+        m_tasks[t]->refresh();
     }
 
     // Remove zombies:
-    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); )
+    for( std::vector<TaskProcess*>::iterator it = m_tasks.begin(); it != m_tasks.end(); )
     {
         if((*it)->isZombie())
         {
             delete *it;
-            it = ms_tasks.erase( it);
+            it = m_tasks.erase( it);
         }
         else
             it++;
@@ -190,7 +187,7 @@ void RenderHost::refreshTasks()
 
 void RenderHost::getResources()
 {
-// Do this every update time, but not the first time, as at the begininng resources are already updated
+	// Do this every update time, but not the first time, as at the begininng resources are already updated
 	static bool first_time = true;
 	if( first_time )
 	{
@@ -198,10 +195,10 @@ void RenderHost::getResources()
 		return;
 	}
 
-	GetResources( ms_obj->m_host, ms_obj->m_hres);
+	GetResources( m_host, m_hres);
 
-	for( int i = 0; i < ms_pyres.size(); i++)
-		ms_pyres[i]->update();
+	for( int i = 0; i < m_pyres.size(); i++)
+		m_pyres[i]->update();
 
 //hres.stdOut();
 	#ifdef WINNT
@@ -217,31 +214,31 @@ void RenderHost::update( const uint64_t & i_cycle)
 	if( i_cycle % af::Environment::getRenderGetResourcesPeriod() == 0)
 	{
 		getResources();
-		ms_up.setResources( &(ms_obj->m_hres));
+		m_up.setResources( &m_hres);
 	}
 
 	if( i_cycle % af::Environment::getRenderGetServerPeriod())
 		return;
 
-	ms_up.setId( getId());
+	m_up.setId( getId());
 
 	af::Msg * msg;
 
-	if( ms_updateMsgType == af::Msg::TRenderRegister )
+	if( m_updateMsgType == af::Msg::TRenderRegister )
 	{
-		msg = new af::Msg( ms_updateMsgType, ms_obj);
+		msg = new af::Msg( m_updateMsgType, this);
 	}
 	else
 	{
 		#ifdef AFOUTPUT
-		ms_up.v_stdOut();
+		m_up.v_stdOut();
 		#endif
-		msg = new af::Msg( ms_updateMsgType, &ms_up);
+		msg = new af::Msg( m_updateMsgType, &m_up);
 	}
 
-	dispatchMessage( msg);
+	sendMsgToServer( msg);
 
-	ms_up.clear();
+	m_up.clear();
 }
 
 #ifdef WINNT
@@ -249,12 +246,12 @@ void RenderHost::windowsMustDie()
 {
 // Windows Must Die:
     AFINFO("RenderHost::windowsMustDie():");
-    for( int i = 0; i < ms_windowsmustdie.size(); i++)
+    for( int i = 0; i < m_windowsmustdie.size(); i++)
     {
-        HWND WINAPI hw = FindWindow( NULL, TEXT( ms_windowsmustdie[i].c_str()));
+        HWND WINAPI hw = FindWindow( NULL, TEXT( m_windowsmustdie[i].c_str()));
         if( hw != NULL )
         {
-            printf("Window must die found:\n%s\n", ms_windowsmustdie[i].c_str());
+            printf("Window must die found:\n%s\n", m_windowsmustdie[i].c_str());
             SendMessage( hw, WM_CLOSE, 0, 0);
         }
     }
@@ -263,45 +260,45 @@ void RenderHost::windowsMustDie()
 
 void RenderHost::runTask( af::TaskExec * i_task)
 {
-	ms_tasks.push_back( new TaskProcess( i_task));
+	m_tasks.push_back( new TaskProcess( i_task, this));
 }
 
 void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
+    for( int t = 0; t < m_tasks.size(); t++)
     {
-        if( ms_tasks[t]->is( i_taskpos))
+        if( m_tasks[t]->is( i_taskpos))
         {
-            ms_tasks[t]->stop();
+            m_tasks[t]->stop();
             return;
         }
     }
-    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(ms_tasks.size()))
+    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(m_tasks.size()))
     i_taskpos.v_stdOut();
 }
 
 void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
+    for( int t = 0; t < m_tasks.size(); t++)
     {
-        if( ms_tasks[t]->is( i_taskpos))
+        if( m_tasks[t]->is( i_taskpos))
         {
-			ms_tasks[t]->close();
+			m_tasks[t]->close();
             return;
         }
     }
-    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(ms_tasks.size()))
+    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(m_tasks.size()))
     i_taskpos.v_stdOut();
 }
 
 void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 {
 	std::string str;
-	for( int t = 0; t < ms_tasks.size(); t++)
+	for( int t = 0; t < m_tasks.size(); t++)
 	{
-		if( ms_tasks[t]->is( i_taskpos))
+		if( m_tasks[t]->is( i_taskpos))
 		{
-			str = ms_tasks[t]->getOutput();
+			str = m_tasks[t]->getOutput();
 			break;
 		}
 	}
@@ -312,16 +309,16 @@ void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 		str += i_taskpos.v_generateInfoString();
 	}
 
-	ms_up.addTaskOutput( i_taskpos, str);
+	m_up.addTaskOutput( i_taskpos, str);
 }
 
 void RenderHost::listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 {
-	for( int t = 0; t < ms_tasks.size(); t++)
+	for( int t = 0; t < m_tasks.size(); t++)
 	{
-		if( ms_tasks[t]->is( i_tp))
+		if( m_tasks[t]->is( i_tp))
 		{
-			ms_tasks[t]->listenOutput( i_subscribe);
+			m_tasks[t]->listenOutput( i_subscribe);
 			break;
 		}
 	}

@@ -13,69 +13,138 @@ class PyRes;
 
 class RenderHost: public af::Render
 {
-public:
+private:  // This is a singleton class
     RenderHost();
+
+public:
     ~RenderHost();
 
-    inline static int  getId() { return ms_obj->af::Render::getId();}
-    inline static const std::string & getName() { return ms_obj->af::Render::getName();}
+    /// Get singleton instance
+    static RenderHost * getInstance();
+	
+	/// Some getters and setters
+	inline bool noOutputRedirection() { return m_no_output_redirection; }
+	inline af::Msg * getServerAnswer() { af::Msg * o_msg = m_server_answer; m_server_answer = NULL; return o_msg; }
+	inline void connectionEstablished() { m_connection_lost_count = 0; }
 
-	inline static bool noOutputRedirection() { return ms_no_output_redirection; }
+	/*
+	* @brief Some message was failed to send.
+	* At first it counts this function call.
+	* If count > af_render_connectretries connection is lost.
+	* @param i_any_case Do not count, connection os lost in any case.
+	*/
+	void connectionLost( bool i_any_case = false);
 
-	inline static af::Msg * getServerAnswer() { af::Msg * o_msg = ms_server_answer; ms_server_answer = NULL; return o_msg; }
+	/*
+	* @brief Render was successfuly registered on server and got good (>0) id.
+	* @param i_id Render ID from server to store.
+	*/
+	void setRegistered( int i_id);
 
-    static bool isConnected() { return ms_connected;  }
-    static void setRegistered( int i_id);
-    static void connectionLost( bool i_any_case = false);
-	static void connectionEstablished() { ms_connection_lost_count = 0; }
+	/*
+	* @brief Task monitoring cycle, checking how task processes are doing
+	*/
+    void refreshTasks();
 
-    static void setUpdateMsgType( int i_type);
+	/*
+	* @brief Main cycle function, measuring host ressources and sending heartbeat to the server
+	*/
+    void update( const uint64_t & i_cycle);
 
-    static void refreshTasks();
+	/*
+	* @brief Create new TaskProcess.
+	* @param i_task Task data
+	*/
+	void runTask( af::TaskExec * i_task);
 
-    static void update( const uint64_t & i_cycle);
+	/*
+	* @brief Stop task process.
+	* @param i_taskpos Index of the task
+	*/
+    void stopTask( const af::MCTaskPos & i_taskpos);
 
-	static void runTask( af::TaskExec * i_task);
+	/*
+	* @brief Close (delete) class that controls child process.
+	* @param i_taskpos Index of the task
+	*/
+    void closeTask( const af::MCTaskPos & i_taskpos);
 
-    static void stopTask( const af::MCTaskPos & i_taskpos);
+	/*
+	* @brief Add task update data to send to server on next update.
+	* @param i_tup Task update data class
+	*/
+	inline void addTaskUp( af::MCTaskUp * i_tup) { m_up.addTaskUp( i_tup);}
 
-    static void closeTask( const af::MCTaskPos & i_taskpos);
+	/*
+	* @brief Write task output on next update.
+	* This needed when you ask running task output from GUI.
+	* @param i_taskpos Index of the task
+	*/
+	void upTaskOutput( const af::MCTaskPos & i_taskpos);
 
-	inline static void addTaskUp( af::MCTaskUp * i_tup) { ms_up.addTaskUp( i_tup);}
+	/*
+	* @brief Start (or stop) to send task output on each update.
+	* @param i_tp Index of the task
+	*/
+	void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe);
 
-    static void upTaskOutput( const af::MCTaskPos & i_taskpos);
+	/*
+	* @brief Close windows on windows.
+	* @param i_str Render data for Python service class
+	*/
+	void wolSleep( const std::string & i_str);
 
-	static void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe);
-
+private:
+	/*
+	* @brief Get machine resources.
+	* Custom resources and windowsMustDie also called there.
+	*/
+	void getResources();
 
 #ifdef WINNT
-    static void windowsMustDie();
+	/*
+	* @brief Close windows on windows.
+	*/
+    void windowsMustDie();
 #endif
 
-	static void wolSleep( const std::string & i_str);
+	/*
+	* @brief Set update message type.
+	* @param i_type New type to set.
+	*/
+	void setUpdateMsgType( int i_type);
+
+	/*
+	* @brief Send message to server (blocking).
+	*/
+    void sendMsgToServer( af::Msg * i_msg);
 
 private:
-	static void getResources();
+	// Windows to kill on windows
+	// Bad mswin applications like to raise a gui window with an error and waits for some 'Ok' button.
+    std::vector<std::string> m_windowsmustdie;
 
-    static void dispatchMessage( af::Msg * i_msg);
+	// Custom resources classes
+    std::vector<PyRes*> m_pyres;
 
-private:
-    static RenderHost * ms_obj;
+	af::Msg * m_server_answer;
 
-    static std::vector<std::string> ms_windowsmustdie;
+	/// Whether the render is connected or not
+    bool m_connected;
+	/// Count times render failed to send update message to server
+	int  m_connection_lost_count;
 
-    static std::vector<PyRes*> ms_pyres;
+	/// Heartbeat message to sent at each update.
+	/// It is initially a `TRenderRegister` and as soon as the server
+	/// registered the render, it becomes a `TRenderUpdate`.
+    int m_updateMsgType;
 
-	static af::Msg * ms_server_answer;
+	/// List of task processed being currently ran by the render
+    std::vector<TaskProcess*> m_tasks;
 
-    static bool ms_connected;
-	static int  ms_connection_lost_count;
+	/// Whether the task outputs must be redirected. Used essentially by TaskProcess
+	bool m_no_output_redirection;
 
-    static int ms_updateMsgType;
-
-    static std::vector<TaskProcess*> ms_tasks;
-
-	static bool ms_no_output_redirection;
-
-	static af::RenderUpdate ms_up;
+	/// Class to collect data to send to server on update.
+	af::RenderUpdate m_up;
 };

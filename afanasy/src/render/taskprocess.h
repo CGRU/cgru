@@ -11,11 +11,12 @@
 #include "../libafanasy/taskexec.h"
 
 class ParserHost;
+class RenderHost;
 
 class TaskProcess
 {
 public:
-	TaskProcess( af::TaskExec * i_taskExec);
+	TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render);
 	~TaskProcess();
 
 	inline bool is( int i_jobId) const
@@ -55,6 +56,8 @@ private:
 	void collectFiles( af::MCTaskUp & i_task_up);
 
 private:
+	RenderHost * m_render;
+
 	af::TaskExec * m_taskexec;
 	af::Service * m_service;
 	ParserHost * m_parser;

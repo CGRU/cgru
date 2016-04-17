@@ -35,8 +35,8 @@ void sig_int(int signum)
 
 // Functions:
 //void threadAcceptClient( void * i_arg );
-void msgCase( af::Msg * msg);
-void processEvents( const af::RenderEvents & i_re);
+void msgCase( af::Msg * i_msg, RenderHost & i_render);
+void processEvents( const af::RenderEvents & i_re, RenderHost & i_render);
 void launchAndExit( const std::string & i_str, bool i_exit);
 
 int main(int argc, char *argv[])
@@ -132,37 +132,19 @@ int main(int argc, char *argv[])
 	// Create temp directory, if it does not exist:
 	if( af::pathMakePath( ENV.getTempDir(), af::VerboseOn ) == false) return 1;
 
-	RenderHost * render = new RenderHost();
-
-//	DlThread ServerAccept;
-//	ServerAccept.Start( &threadAcceptClient, NULL);
+	RenderHost * render = RenderHost::getInstance();
 
 	uint64_t cycle = 0;
 	while( AFRunning)
 	{
-		// Collect all available incomming messages:
-//		std::list<af::Msg*> in_msgs;
-//		while( af::Msg * msg = RenderHost::acceptTry() )
-//			in_msgs.push_back( msg);
-
-		// Lock render:
-//		RenderHost::lockMutex(); // Why we need mutex here?
-
-		// React on all incoming messages:
-//		for( std::list<af::Msg*>::iterator it = in_msgs.begin(); it != in_msgs.end(); it++)
-//			msgCase( *it);
-		msgCase( RenderHost::getServerAnswer());
+		// React on a server answer:
+		msgCase( render->getServerAnswer(), *render);
 	
-
-
 		// Let tasks to do their work:
-		RenderHost::refreshTasks();
+		render->refreshTasks();
 
 		// Update render:
-		RenderHost::update( cycle);
-
-		// Unlock render:
-//		RenderHost::unLockMutex();
+		render->update( cycle);
 
 		cycle++;
 
@@ -183,9 +165,9 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void msgCase( af::Msg * msg)
+void msgCase( af::Msg * i_msg, RenderHost & i_render)
 {
-	if( msg == NULL)
+	if( i_msg == NULL)
 	{
 		return;
 	}
@@ -194,14 +176,14 @@ void msgCase( af::Msg * msg)
 		return;
 
 #ifdef AFOUTPUT
-printf(" >>> "); msg->v_stdOut();
+printf(" >>> "); i_msg->v_stdOut();
 #endif
 
-	switch( msg->type())
+	switch( i_msg->type())
 	{
 	case af::Msg::TRenderId:
 	{
-		int new_id = msg->int32();
+		int new_id = i_msg->int32();
 		// Server sends back -1 id if a render with the same hostname already exists:
 		if( new_id == -1)
 		{
@@ -210,27 +192,27 @@ printf(" >>> "); msg->v_stdOut();
 		}
 		// Render was trying to register (its id==0) and server has send id>0
 		// This is the situation when client was sucessfully registered
-		else if((new_id > 0) && (RenderHost::getId() == 0))
+		else if((new_id > 0) && (i_render.getId() == 0))
 		{
-			RenderHost::setRegistered( new_id);
+			i_render.setRegistered( new_id);
 		}
 		// Server sends back zero id on any error
 		else if ( new_id == 0 )
 		{
 			printf("Zero ID recieved, no such online render, re-connecting...\n");
-			RenderHost::connectionLost( true);
+			i_render.connectionLost( true);
 		}
 		// Bad case, should not ever happen, try to re-register.
-		else if ( RenderHost::getId() != new_id )
+		else if ( i_render.getId() != new_id )
 		{
-			AFERRAR("IDs mistatch: this %d != %d new, re-connecting...", RenderHost::getId(), new_id);
-			RenderHost::connectionLost( true);
+			AFERRAR("IDs mistatch: this %d != %d new, re-connecting...", i_render.getId(), new_id);
+			i_render.connectionLost( true);
 		}
 		// Id, that returns from server is equals to stored on client.
 		// This is a normal case.
 		else
 		{
-			RenderHost::connectionEstablished();
+			i_render.connectionEstablished();
 		}
 		break;
 	}
@@ -242,22 +224,22 @@ printf(" >>> "); msg->v_stdOut();
 	}
 	case af::Msg::TRenderEvents:
 	{
-		af::RenderEvents me( msg);
-		processEvents( me);
+		af::RenderEvents me( i_msg);
+		processEvents( me, i_render);
 		break;
 	}
 	default:
 	{
 		AFERROR("Unknown message recieved:")
-		msg->v_stdOut();
+		i_msg->v_stdOut();
 		break;
 	}
 	}
 
-	delete msg;
+	delete i_msg;
 }
 
-void processEvents( const af::RenderEvents & i_re)
+void processEvents( const af::RenderEvents & i_re, RenderHost & i_render)
 {
 #ifdef AFOUTPUT
 i_re.v_stdOut();
@@ -265,30 +247,30 @@ i_re.v_stdOut();
 
 	// Tasks to execute:
 	for( int i = 0; i < i_re.m_tasks.size(); i++)
-		RenderHost::runTask( i_re.m_tasks[i]);
+		i_render.runTask( i_re.m_tasks[i]);
 
 
 	// Tasks to close:
 	for( int i = 0; i < i_re.m_closes.size(); i++)
-		RenderHost::closeTask( i_re.m_closes[i]);
+		i_render.closeTask( i_re.m_closes[i]);
 
 
 	// Tasks to stop:
 	for( int i = 0; i < i_re.m_stops.size(); i++)
-		RenderHost::stopTask( i_re.m_stops[i]);
+		i_render.stopTask( i_re.m_stops[i]);
 
 
 	// Tasks to outputs:
 	for( int i = 0; i < i_re.m_outputs.size(); i++)
-		RenderHost::upTaskOutput( i_re.m_outputs[i]);
+		i_render.upTaskOutput( i_re.m_outputs[i]);
 
 	// Listens add:
 	for( int i = 0; i < i_re.m_listens_add.size(); i++)
-		RenderHost::listenTask( i_re.m_listens_add[i], true);
+		i_render.listenTask( i_re.m_listens_add[i], true);
 
 	// Listens remove:
 	for( int i = 0; i < i_re.m_listens_rem.size(); i++)
-		RenderHost::listenTask( i_re.m_listens_rem[i], false);
+		i_render.listenTask( i_re.m_listens_rem[i], false);
 
 	// Instructions:
 	if( i_re.m_instruction.size())
@@ -301,7 +283,7 @@ i_re.v_stdOut();
 		else if( i_re.m_instruction == "sleep")
 		{
 			printf("Render sleep request received.\n");
-			RenderHost::wolSleep( i_re.m_command);
+			i_render.wolSleep( i_re.m_command);
 		}
 		else if( i_re.m_instruction == "launch")
 		{

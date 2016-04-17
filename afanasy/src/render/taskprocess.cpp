@@ -62,8 +62,9 @@ int setNonblocking(int fd)
 
 long long TaskProcess::ms_counter = 0;
 
-TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
+TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_taskexec( i_taskExec),
+	m_render( i_render),
 	m_parser( NULL),
 	m_update_status( af::TaskExec::UPPercent),
 	m_stop_time( 0),
@@ -152,7 +153,7 @@ void TaskProcess::launchCommand()
 	if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;
 
 	// For MSWIN we need to CREATE_SUSPENDED to attach process to a job before it can spawn any child:
-	if( RenderHost::noOutputRedirection())
+	if( m_render->noOutputRedirection())
 	{
 		// Test a command w/o output redirection:
 	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, 0, 0, 0,
@@ -168,7 +169,7 @@ void TaskProcess::launchCommand()
 	#else
 	// For UNIX we can ask child prcocess to call a function to setup after fork()
 	fp_setupChildProcess = setupChildProcess;
-	if( RenderHost::noOutputRedirection())
+	if( m_render->noOutputRedirection())
 		m_pid = af::launchProgram( m_cmd, m_wdir, 0, 0, 0);
 	else
 		m_pid = af::launchProgram( m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr);
@@ -198,7 +199,7 @@ void TaskProcess::launchCommand()
 
 	#else
 	// On UNIX we set buffers and non-blocking:
-	if( false == RenderHost::noOutputRedirection())
+	if( false == m_render->noOutputRedirection())
 	{
 		setbuf( m_io_output, m_filebuffer_out);
 		setbuf( m_io_outerr, m_filebuffer_err);
@@ -242,7 +243,7 @@ void TaskProcess::closeHandles()
 	if( m_commands_launched < 1 )
 		return;
 
-	if( false == RenderHost::noOutputRedirection())
+	if( false == m_render->noOutputRedirection())
 	{
 		fclose( m_io_input);
 		fclose( m_io_output);
@@ -367,7 +368,7 @@ void TaskProcess::readProcess( const std::string & i_mode)
 	AFINFA("TaskProcess::readProcess(): pid=%d, zombie=%s, stop_time = %lld",
 		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
 
-	if( RenderHost::noOutputRedirection()) return;
+	if( m_render->noOutputRedirection()) return;
 
 	std::string output;
 
@@ -444,7 +445,7 @@ void TaskProcess::sendTaskSate()
 	std::string report   = m_parser->getReport();
 
 	af::MCTaskUp * taskup = new af::MCTaskUp(
-		RenderHost::getId(),
+		m_render->getId(),
 
 		m_taskexec->getJobId(),
 		m_taskexec->getBlockNum(),
@@ -470,7 +471,7 @@ void TaskProcess::sendTaskSate()
 
 	m_listened.clear();
 
-	RenderHost::addTaskUp( taskup);
+	m_render->addTaskUp( taskup);
 }
 
 void TaskProcess::processFinished( int i_exitCode)
