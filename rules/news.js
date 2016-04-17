@@ -182,13 +182,38 @@ function nw_Subscribe( i_path)
 	channel.time = c_DT_CurSeconds();
 	channel.user = g_auth_user.id;
 
+	var new_channels = [channel];
+
+	if( g_auth_user.channels == null )
+		g_auth_user.channels = [];
+
+	for( var i = 0; i < g_auth_user.channels.length; i++)
+	{
+		var path = g_auth_user.channels[i].id
+		if(  path == i_path )
+		{
+			c_Error('Already subscribed on: ' + path);
+			return;
+		}
+		if( path.indexOf( i_path))
+		{
+			c_Info('Already subscribed on parent path: ' + path);
+			return;
+		}
+		if( i_path.indexOf( path))
+		{
+			c_Info('Unsubscribing sub-path: ' + path);
+			continue;
+		}
+		new_channels.push( g_auth_user.channels[i]);
+	}
+
 	var obj = {};
-	obj.objects = [channel];
-	obj.pusharray = 'channels';
-	obj.id = g_auth_user.id;
+	obj.object = {'channels':new_channels};
+	obj.add = true;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request({"send":{"editobj":obj},"func":nw_SubscribeFinished,"channel":channel});
+	n_Request({"send":{"editobj":obj},"func":nw_SubscribeFinished,'path':i_path});
 }
 function nw_SubscribeFinished( i_data, i_args)
 {
@@ -198,11 +223,11 @@ function nw_SubscribeFinished( i_data, i_args)
 		return;
 	}
 
-	g_auth_user.channels.push( i_args.channel);
+	g_auth_user.channels = i_data.object.channels;
 	nw_UpdateChannels();
 	nw_Process();
 
-	c_Info('Subscribed at ' + i_args.channel.id);
+	c_Info('Subscribed at ' + i_args.path);
 }
 
 function nw_Unsubscribe( i_path)
@@ -218,7 +243,7 @@ function nw_Unsubscribe( i_path)
 	obj.id = g_auth_user.id;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request({"send":{"editobj":obj},"func":nw_UnsubscribeFinished,"news_path":i_path});
+	n_Request({"send":{"editobj":obj},"func":nw_UnsubscribeFinished,'path':i_path});
 }
 function nw_UnsubscribeFinished( i_data, i_args)
 {
@@ -228,19 +253,11 @@ function nw_UnsubscribeFinished( i_data, i_args)
 		return;
 	}
 
-	var path = i_args.news_path;
-
-	for( i = 0; i < g_auth_user.channels.length; i++)
-		if( g_auth_user.channels[i].id == path )
-		{
-			g_auth_user.channels.splice( i, 1);
-			break;
-		}
-
+	g_auth_user.channels = i_data.object.channels;
 	nw_UpdateChannels();
 	nw_Process();
 
-	c_Info('Unsubscribed from ' + path);
+	c_Info('Unsubscribed from ' + i_args.path);
 }
 
 function nw_NewsOnClick()

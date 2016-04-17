@@ -943,6 +943,7 @@ function jsf_editobj( $i_edit, &$o_out)
 		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
 		$o_out['status'] = 'success';
+		$o_out['object'] = $obj;
 	}
 	else
 	{
