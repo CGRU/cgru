@@ -324,7 +324,7 @@ void TaskProcess::refresh()
 	if( pid == 0 )
 	{
 		// Task is not finished
-		readProcess("RUN",/* i_read_empty = */ false);
+		readProcess("RUN");
 	}
 	else if( pid == m_pid )
 	{
@@ -362,7 +362,7 @@ void TaskProcess::close()
 	m_zombie = true;
 }
 
-void TaskProcess::readProcess( const std::string & i_mode, bool i_read_empty)
+void TaskProcess::readProcess( const std::string & i_mode)
 {
 	AFINFA("TaskProcess::readProcess(): pid=%d, zombie=%s, stop_time = %lld",
 		m_pid, m_zombie ? "TRUE":"FALSE", (long long)m_stop_time)
@@ -378,10 +378,6 @@ void TaskProcess::readProcess( const std::string & i_mode, bool i_read_empty)
 	readsize = readPipe( m_io_outerr);
 	if( readsize > 0 )
 		output += std::string( m_readbuffer, readsize);
-
-	// Skip parsing empty string ( it not forced )
-	if(( i_read_empty == false ) && ( output.size() == 0 ))
-		return;
 
 	m_parser->read( i_mode, output);
 
@@ -500,8 +496,7 @@ printf("Finished PID=%d: Exit Code=%d Status=%d %s\n", m_pid, i_exitCode, WEXITS
 	}
 
 	// Read process last output
-	// Force to read even empty output to let user to perform finalizing actions.
-	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time),/* i_read_empty = */ true);
+	readProcess( af::itos( i_exitCode) + ':' + af::itos( m_stop_time));
 
 #ifdef WINNT
 	bool success = m_service->checkExitStatus( i_exitCode);

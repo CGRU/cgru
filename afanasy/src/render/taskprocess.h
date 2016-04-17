@@ -48,7 +48,7 @@ public:
 private:
 	void launchCommand();
 	void sendTaskSate();
-	void readProcess( const std::string & i_mode, bool i_read_empty);
+	void readProcess( const std::string & i_mode);
 	void processFinished( int i_exitCode);
 	void killProcess();
 	void closeHandles();
