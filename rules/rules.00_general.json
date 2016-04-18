@@ -54,7 +54,7 @@
 	"message":{"title":"Message","color":[150,150,200]}
 },
 
-"aux_folders":[".","_","-","tmp","temp","tmp","common","rnd"],
+"aux_folders":[".","_","-","tmp","temp","tmp","common"],
 
 "assets":{
 	"project":{
