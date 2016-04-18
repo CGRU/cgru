@@ -95,8 +95,6 @@ RenderHost * RenderHost::getInstance()
 
 void RenderHost::sendMsgToServer( af::Msg * i_msg)
 {
-    if( false == AFRunning ) return;
-
 	#ifdef AFOUTPUT
 	printf(" <<< "); i_msg->v_stdOut();
 	#endif
@@ -112,7 +110,6 @@ void RenderHost::sendMsgToServer( af::Msg * i_msg)
 		connectionEstablished();
 	else
 		connectionLost();
-
 
 	delete i_msg;
 }
