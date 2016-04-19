@@ -50,6 +50,7 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 -hostsexcl              - job render hosts to exclude mask
 -maxruntasks            - maximum number of hosts to use
 -maxruntime             - maximum run time for task in seconds
+-maxtasksperhost        - maximum number of tasks per host
 -priority               - job priority
 -capacity               - tasks capacity
 -capmin                 - tasks minimum capacity coefficient
@@ -124,6 +125,7 @@ if __name__ == '__main__':
 	hostsexcl = ''
 	maxruntime = 0
 	maxruntasks = -1
+	maxtasksperhost = -1
 	priority = -1
 	capacity = -1
 	capmin = -1
@@ -289,6 +291,12 @@ if __name__ == '__main__':
 				break
 			maxruntime = integer(argsv[i])
 			continue
+
+		if arg == '-maxtasksperhost':
+			i += 1
+			if i == argsl:
+				break
+			maxtasksperhost = integer(argsv[i])
 
 		if arg == '-priority':
 			i += 1
@@ -581,7 +589,7 @@ if __name__ == '__main__':
 
 		if scenetype == 'maya_delight':
 			cmd += ' -r 3delight'
-		
+
 		if scenetype == 'maya':
 			cmd += ' -r file'
 
@@ -606,7 +614,7 @@ if __name__ == '__main__':
 				images = afcommon.patternFromFile(images[0])
 		if pwd != '':
 			cmd += ' -proj "%s"' % os.path.normpath(pwd)
-		
+
 		if output != '':
 			cmd += ' -rd "%s"' % os.path.normpath(output)
 
@@ -895,6 +903,9 @@ if __name__ == '__main__':
 
 	if maxruntasks != -1:
 		job.setMaxRunningTasks(maxruntasks)
+
+	if maxtasksperhost != -1:
+		job.setMaxRunTasksPerHost(maxtasksperhost)
 
 	if hostsmask != '':
 		job.setHostsMask(hostsmask)
