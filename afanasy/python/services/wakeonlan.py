@@ -65,6 +65,7 @@ class wakeonlan(service.service):
 			cmd = cgruconfig.VARS['af_render_cmd_wolwake']
 			cmd += ' --wake'
 		cmd += ' --ip "%s"' % render['address']['ip']
+		cmd += ' --hostname "%s"' % render['address']['name']
 
 		for netif in render['netifs']:
 			cmd += ' %s' % netif['mac'].replace(':','')
