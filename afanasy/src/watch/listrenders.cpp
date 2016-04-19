@@ -94,7 +94,7 @@ Press RMB for Options.\
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
-	timer->start( 990 * af::Environment::getRenderGetResourcesPeriod());
+	timer->start( 990 * af::Environment::getRenderHeartbeatSec() * af::Environment::getRenderUpResourcesPeriod());
 
 	m_parentWindow->setWindowTitle("Renders");
 
@@ -110,7 +110,7 @@ Press RMB for Options.\
 	setSpacing();
 
 	QTimer * timer = new QTimer(this);
-	timer->start( 1900 * af::Environment::getWatchRefreshInterval());
+	timer->start( 1900 * af::Environment::getWatchRefreshGuiSec());
 	connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 }
 

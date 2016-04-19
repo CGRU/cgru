@@ -46,7 +46,7 @@ int Dialog::ms_size_border_right = 75;
 Dialog::Dialog():
     m_connected(false),
     m_monitorType( Watch::WNONE),
-    m_qThreadClientUpdate( this, af::Environment::getWatchGetServerPeriod(), af::Environment::getWatchConnectRetries()),
+    m_qThreadClientUpdate( this, af::Environment::getWatchGetEventsSec(), af::Environment::getWatchConnectRetries()),
     m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
     m_listitems( NULL),
     m_offlinescreen( NULL),

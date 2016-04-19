@@ -45,19 +45,19 @@ int     Environment::serverport =                      AFADDR::SERVER_PORT;
 
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
-int     Environment::watch_get_server_period =         AFWATCH::GET_SERVER_PERIOD;
+int     Environment::watch_get_events_sec =            AFWATCH::GET_EVENTS_SEC;
 int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
 int     Environment::watch_waitforconnected =          AFWATCH::WAITFORCONNECTED;
 int     Environment::watch_waitforreadyread =          AFWATCH::WAITFORREADYREAD;
 int     Environment::watch_waitforbyteswritten =       AFWATCH::WAITFORBYTESWRITTEN;
-int     Environment::watch_refreshinterval =           AFWATCH::REFRESHINTERVAL;
+int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
 
+int     Environment::render_heartbeat_sec =            AFRENDER::HEARTBEAT_SEC;
+int     Environment::render_up_resources_period =      AFRENDER::UP_RESOURCES_PERIOD;
 int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY;
 int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
-int     Environment::render_get_server_period =        AFRENDER::GET_SERVER_PERIOD;
-int     Environment::render_get_resources_period =     AFRENDER::GET_RESOURCES_PERIOD;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
 int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
 
@@ -232,6 +232,8 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, task_stop_timeout,                 "af_task_stop_timeout"                 );
 	getVar( i_obj, task_log_linesmax,                 "af_task_log_linesmax"                 );
 
+	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
+	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );
 	getVar( i_obj, render_default_capacity,           "af_render_default_capacity"           );
 	getVar( i_obj, render_default_maxtasks,           "af_render_default_maxtasks"           );
 	getVar( i_obj, render_cmd_reboot,                 "af_render_cmd_reboot"                 );
@@ -243,16 +245,14 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
-	getVar( i_obj, render_get_server_period,          "af_render_get_server_period"          );
-	getVar( i_obj, render_get_resources_period,       "af_render_get_resources_period"       );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
 	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
-	getVar( i_obj, watch_get_server_period,           "af_watch_get_server_period"           );
-	getVar( i_obj, watch_refreshinterval,             "af_watch_refreshinterval"             );
+	getVar( i_obj, watch_get_events_sec,              "af_watch_get_events_sec"              );
+	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
 	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
 	getVar( i_obj, watch_waitforconnected,            "af_watch_waitforconnected"            );
 	getVar( i_obj, watch_waitforreadyread,            "af_watch_waitforreadyread"            );

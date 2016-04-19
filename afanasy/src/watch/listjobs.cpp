@@ -111,7 +111,7 @@ Press RMB for Options.\
 	init();
 
 	QTimer * timer = new QTimer(this);
-	timer->start( 1000 * af::Environment::getWatchRefreshInterval());
+	timer->start( 1000 * af::Environment::getWatchRefreshGuiSec());
 	connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 
 	m_parentWindow->setWindowTitle("Jobs:");

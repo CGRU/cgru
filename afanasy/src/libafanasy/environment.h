@@ -98,8 +98,8 @@ public:
 
 	static inline int getMonitorZombieTime()             { return monitor_zombietime;           }
 
-	static inline int getWatchGetServerPeriod()        { return watch_get_server_period;   }
-	static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
+	static inline int getWatchGetEventsSec()           { return watch_get_events_sec;      }
+	static inline int getWatchRefreshGuiSec()          { return watch_refresh_gui_sec;     }
 	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
 	static inline int getWatchWaitForConnected()       { return watch_waitforconnected;    }
 	static inline int getWatchWaitForReadyRead()       { return watch_waitforreadyread;    }
@@ -134,9 +134,9 @@ public:
 	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
 	static inline std::string & getCmdShell()          { return cmd_shell;}
  
-	static inline int getRenderNice()               { return render_nice;                 } ///< Get Render task process nice factor.
-	static inline int getRenderGetServerPeriod()    { return render_get_server_period;    } ///< Get Render update interval ( in seconds ).
-	static inline int getRenderGetResourcesPeriod() { return render_get_resources_period; } ///< Get Render update interval ( in seconds ).
+	static inline int getRenderHeartbeatSec()       { return render_heartbeat_sec;        }
+	static inline int getRenderUpResourcesPeriod()  { return render_up_resources_period;  }
+	static inline int getRenderNice()               { return render_nice;                 }
 	static inline int getRenderZombieTime()         { return render_zombietime;           }
 	static inline int getRenderConnectRetries()     { return render_connectretries;       }
 
@@ -255,8 +255,8 @@ private:
 	static std::vector<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
 	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
-	static int watch_refreshinterval;
-	static int watch_get_server_period;
+	static int watch_get_events_sec;
+	static int watch_refresh_gui_sec;
 	static int watch_connectretries;
 	static int watch_waitforconnected;
 	static int watch_waitforreadyread;
@@ -273,11 +273,11 @@ private:
 	static int task_default_capacity;
 	static int task_log_linesmax;
 
+	static int render_heartbeat_sec;
+	static int render_up_resources_period;
 	static int render_default_capacity;
 	static int render_default_maxtasks;
 	static int render_nice;       ///< Render task process nice factor.
-	static int render_get_server_period; ///< Render update interval in seconds.
-	static int render_get_resources_period; ///< Render update interval in seconds.
 	static int render_zombietime;
 	static int render_connectretries;
 	static std::vector<std::string> render_windowsmustdie;

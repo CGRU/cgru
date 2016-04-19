@@ -22,8 +22,7 @@ RenderHost::RenderHost():
 	m_updateMsgType( af::Msg::TRenderRegister),
 	m_connected( false),
 	m_connection_lost_count( 0),
-	m_no_output_redirection( false),
-	m_server_answer( NULL)
+	m_no_output_redirection( false)
 {
 	if( af::Environment::hasArgument("-nor")) m_no_output_redirection = true;
 
@@ -73,7 +72,8 @@ RenderHost::~RenderHost()
     {
         af::Msg msg( af::Msg::TRenderDeregister, getId());
         bool ok;
-        af::sendToServer( & msg, ok, af::VerboseOn);
+		af::Msg * answer = af::sendToServer( & msg, ok, af::VerboseOn);
+		if( answer ) delete answer;
         m_connected = false;
     }
 
@@ -91,27 +91,6 @@ RenderHost * RenderHost::getInstance()
 	// singleton, because we need to control when it is destroyed.
 	static RenderHost * ms_obj = new RenderHost();
 	return ms_obj;
-}
-
-void RenderHost::sendMsgToServer( af::Msg * i_msg)
-{
-	#ifdef AFOUTPUT
-	printf(" <<< "); i_msg->v_stdOut();
-	#endif
-
-	if( m_server_answer )
-		delete m_server_answer;
-
-	bool ok;
-	m_server_answer = af::sendToServer( i_msg, ok,
-		i_msg->type() == af::Msg::TRenderRegister ? af::VerboseOff : af::VerboseOn);
-
-	if( ok )
-		connectionEstablished();
-	else
-		connectionLost();
-
-	delete i_msg;
 }
 
 void RenderHost::setRegistered( int i_id)
@@ -196,25 +175,14 @@ void RenderHost::getResources()
 	for( int i = 0; i < m_pyres.size(); i++)
 		m_pyres[i]->update();
 
-//hres.stdOut();
-	#ifdef WINNT
-	windowsMustDie();
-	#endif
+	//hres.stdOut();
+	m_up.setResources( &m_hres);
 }
 
-void RenderHost::update( const uint64_t & i_cycle)
+af::Msg * RenderHost::updateServer()
 {
 	if( false == AFRunning )
-		return;
-
-	if( i_cycle % af::Environment::getRenderGetResourcesPeriod() == 0)
-	{
-		getResources();
-		m_up.setResources( &m_hres);
-	}
-
-	if( i_cycle % af::Environment::getRenderGetServerPeriod())
-		return;
+		return NULL;
 
 	m_up.setId( getId());
 
@@ -232,9 +200,24 @@ void RenderHost::update( const uint64_t & i_cycle)
 		msg = new af::Msg( m_updateMsgType, &m_up);
 	}
 
-	sendMsgToServer( msg);
+	#ifdef AFOUTPUT
+	printf(" <<< "); i_msg->v_stdOut();
+	#endif
+
+	bool ok;
+	af::Msg * server_answer = af::sendToServer( msg, ok,
+		msg->type() == af::Msg::TRenderRegister ? af::VerboseOff : af::VerboseOn);
+
+	if( ok )
+		connectionEstablished();
+	else
+		connectionLost();
+
+	delete msg;
 
 	m_up.clear();
+
+	return server_answer;
 }
 
 #ifdef WINNT

@@ -81,6 +81,15 @@
 	"af_task_log_linesmax":100,
 
 "":"Render:",
+	"af_render_heartbeat_sec":1,
+		"":"Render heartbeat in seconds.",
+		"":"It refresh tasks, update server, reveice an answer which can contain new tasks.",
+		"":"So every af_render_heartbeat_sec render connects, write, read and disconnects from server (TCP).",
+
+	"af_render_up_resources_period":5,
+		"":"Render resources update period.",
+		"":"If heartbeat is 3 and up_resources is 5, render will update resources every 15 seconds.",
+
 	"af_render_default_capacity":1000,
 		"":"Default render capacity value, if not set in farm config.",
 
@@ -118,12 +127,6 @@
 		"":"if( nice >  10 ) priority = IDLE_PRIORITY_CLASS;",
 		"":"if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;",
 		"":"if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;",
-
-	"af_render_get_server_period":1,
-		"":"Render resources update period (seconds).",
-
-	"af_render_get_resources_period":5,
-		"":"Render resources update period (seconds).",
 
 	"af_render_zombietime":60,
 		"":"If render will not send update its resources for this time(seconds),",
@@ -163,12 +166,12 @@
 	"af_monitor_zombietime":40,
 
 "":"Watch: (qt gui - client side)",
-	"af_watch_get_server_period":1,
+	"af_watch_get_events_sec":1,
+	"af_watch_refresh_gui_sec":5,
 	"af_watch_connectretries":3,
 	"af_watch_waitforconnected":8000,
 	"af_watch_waitforreadyread":8000,
 	"af_watch_waitforbyteswritten":8000,
-	"af_watch_refreshinterval":5,
 	"af_watch_render_idle_bar_max":3600,
 
 "":"Database:",

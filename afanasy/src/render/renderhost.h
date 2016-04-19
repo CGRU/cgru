@@ -24,7 +24,6 @@ public:
 	
 	/// Some getters and setters
 	inline bool noOutputRedirection() { return m_no_output_redirection; }
-	inline af::Msg * getServerAnswer() { af::Msg * o_msg = m_server_answer; m_server_answer = NULL; return o_msg; }
 	inline void connectionEstablished() { m_connection_lost_count = 0; }
 
 	/**
@@ -44,12 +43,25 @@ public:
 	/**
 	* @brief Task monitoring cycle, checking how task processes are doing
 	*/
-    void refreshTasks();
+	void refreshTasks();
 
 	/**
-	* @brief Main cycle function, measuring host ressources and sending heartbeat to the server
+	* @brief Send message to server and receive answer
 	*/
-    void update( const uint64_t & i_cycle);
+	af::Msg * updateServer();
+
+	/**
+	* @brief Get machine resources.
+	* Custom resources also called there.
+	*/
+	void getResources();
+
+	#ifdef WINNT
+	/**
+	* @brief Close windows on windows.
+	*/
+	void windowsMustDie();
+	#endif
 
 	/**
 	* @brief Create new TaskProcess.
@@ -97,28 +109,10 @@ public:
 
 private:
 	/**
-	* @brief Get machine resources.
-	* Custom resources and windowsMustDie also called there.
-	*/
-	void getResources();
-
-#ifdef WINNT
-	/**
-	* @brief Close windows on windows.
-	*/
-    void windowsMustDie();
-#endif
-
-	/**
 	* @brief Set update message type.
 	* @param i_type New type to set.
 	*/
 	void setUpdateMsgType( int i_type);
-
-	/**
-	* @brief Send message to server (blocking).
-	*/
-    void sendMsgToServer( af::Msg * i_msg);
 
 private:
 	/// Windows to kill on windows
@@ -127,9 +121,6 @@ private:
 
 	/// Custom resources classes
     std::vector<PyRes*> m_pyres;
-
-	/// Message that server sends back on last update
-	af::Msg * m_server_answer;
 
 	/// Whether the render is connected or not
     bool m_connected;

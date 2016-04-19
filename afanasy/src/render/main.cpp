@@ -137,23 +137,33 @@ int main(int argc, char *argv[])
 	uint64_t cycle = 0;
 	while( AFRunning)
 	{
-		// React on a server answer:
-		msgCase( render->getServerAnswer(), *render);
-	
+		// Update machine resources:
+		if( cycle % af::Environment::getRenderUpResourcesPeriod() == 0)
+			render->getResources();
+
 		// Let tasks to do their work:
 		render->refreshTasks();
 
-		// Update render:
-		render->update( cycle);
+		// Update server (send info and receive an answer):
+		af::Msg * answer = render->updateServer();
 
+		// React on a server answer:
+		msgCase( answer, *render);
+
+		// Close windows on windows:
+		#ifdef WINNT
+		render->windowsMustDie();
+		#endif
+
+		// Increment cycle:
 		cycle++;
-
 		#ifdef AFOUTPUT
 		printf("=============================================================\n\n");
 		#endif
 
+		// Sleep till the next heartbeat:
 		if( AFRunning )
-			af::sleep_sec(1);
+			af::sleep_sec( af::Environment::getRenderHeartbeatSec());
 	}
 
 	delete render;

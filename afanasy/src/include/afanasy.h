@@ -78,8 +78,8 @@ namespace AFRENDER
     const int  TERMINATEWAITKILL        = 10;         ///< Seconds to wait task task finish after termination, then perform kill
     const int  DEFAULTCAPACITY          = 1000;       ///< Default render capacity.
     const int  DEFAULTMAXTASKS          = 2;          ///< Maximum tasks on can run on the same render the same time (default value).
-    const int  GET_SERVER_PERIOD        = 1;          ///< Server connection & update period (seconds).
-    const int  GET_RESOURCES_PERIOD     = 5;          ///< Query machine resourcs period (seconds).
+    const int  HEARTBEAT_SEC            = 1;          ///< Heartbeat seconds.
+    const int  UP_RESOURCES_PERIOD      = 5;          ///< Query machine resourcs period.
     const int  ZOMBIETIME               = 60;         ///< Seconds to wait for update to Render is zombie.
     const int  CONNECTRETRIES           = 3;          ///< Number of connect fails to turn to disconnected state.
     const int  MAXCOUNT                 = 100000;     ///< Maximum allowed online Renders.
@@ -98,12 +98,12 @@ namespace AFRENDER
 /// Watch options:
 namespace AFWATCH
 {
-    const int  GET_SERVER_PERIOD   = 1;        ///< Server connection & update status period ( seconds).
+    const int  GET_EVENTS_SEC      = 1;        ///< Server connection & update status period ( seconds).
     const int  CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
     const int  WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
     const int  WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
     const int  WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
-    const int  REFRESHINTERVAL     = 5;        ///< Node items update interval time in seconds.
+    const int  REFRESH_GUI_SEC     = 5;        ///< Node items update interval time in seconds.
 
     const char CMDS_ARGUMENT[]     = "@ARG@";     ///< Commands argument.
     const char CMDS_IPADDRESS[]    = "@IP@";      ///< Commands argument will be replaced with selected render ip address.
