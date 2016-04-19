@@ -7,9 +7,10 @@ import socket
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] path\ntype \"%prog -h\" for help", version="%prog 1.  0")
-Parser.add_option('--wake',  dest='wake',  action='store_true', default=False, help='Wake mode, not used.')
-Parser.add_option('--sleep', dest='sleep', action='store_true', default=False, help='Sleep mode, not used.')
-Parser.add_option('--ip',    dest='ip',    type='string',       default=None,  help='IP address, not used.')
+Parser.add_option('--wake',     dest='wake',     action='store_true', default=False, help='Wake mode, not used.')
+Parser.add_option('--sleep',    dest='sleep',    action='store_true', default=False, help='Sleep mode, not used.')
+Parser.add_option('--ip',       dest='ip',       type='string',       default=None,  help='IP address, not used.')
+Parser.add_option('--hostname', dest='hostname', type='string',       default=None,  help='Hostname, not used.')
 Options, Args = Parser.parse_args()
 
 print(sys.argv)
