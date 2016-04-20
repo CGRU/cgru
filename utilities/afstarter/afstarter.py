@@ -416,7 +416,7 @@ class Dialog(QtGui.QWidget):
 							   QtCore.SIGNAL('stateChanged(int)'),
 							   self.evaluate)
 
-		# Capacity, max run tasks, priority:
+		# Capacity, max run tasks, priority, max tasks per host:
 		lCapMax = QtGui.QHBoxLayout()
 		joblayout.addLayout(lCapMax)
 		lCapMax.addWidget(QtGui.QLabel('Capacity:', self))
@@ -433,6 +433,14 @@ class Dialog(QtGui.QWidget):
 		self.fields['maxruntasks'].setRange(-1, 1000000)
 		self.fields['maxruntasks'].setValue(-1)
 		QtCore.QObject.connect(self.fields['maxruntasks'],
+							   QtCore.SIGNAL('valueChanged(int)'),
+							   self.evaluate)
+		lCapMax.addWidget(QtGui.QLabel('Maximum Tasks Per Host:', self))
+		self.fields['maxtasksperhost'] = QtGui.QSpinBox(self)
+		lCapMax.addWidget(self.fields['maxtasksperhost'])
+		self.fields['maxtasksperhost'].setRange(-1, 1000000)
+		self.fields['maxtasksperhost'].setValue(-1)
+		QtCore.QObject.connect(self.fields['maxtasksperhost'],
 							   QtCore.SIGNAL('valueChanged(int)'),
 							   self.evaluate)
 		lCapMax.addWidget(QtGui.QLabel('Priority:', self))
@@ -1002,6 +1010,9 @@ class Dialog(QtGui.QWidget):
 
 		if self.fields['maxruntasks'].value() > 0:
 			cmd += ' -maxruntasks %d' % self.fields['maxruntasks'].value()
+
+		if self.fields['maxtasksperhost'].value() > 0:
+			cmd += ' -maxtasksperhost %d' % self.fields['maxtasksperhost'].value()
 
 		if self.fields['priority'].value() > -1:
 			cmd += ' -priority %d' % self.fields['priority'].value()
