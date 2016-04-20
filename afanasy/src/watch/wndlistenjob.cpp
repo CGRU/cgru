@@ -68,9 +68,17 @@ bool WndListenJob::processEvents( const af::MonitorEvents & i_me)
 	{
 		if( i_me.m_listens[i].job_id == m_job_id )
 		{
+			qTextEdit->setFontWeight( QFont::Bold);
+			qTextEdit->setFontItalic( true);
+			qTextEdit->setFontUnderline( true);
 			qTextEdit->append( afqt::stoq( i_me.m_listens[i].taskname)
-					+ "[" + afqt::stoq( i_me.m_listens[i].hostname) + "]:"
-					+ "\n" + afqt::stoq( i_me.m_listens[i].output));
+					+ "[" + afqt::stoq( i_me.m_listens[i].hostname) + "]:");
+
+			qTextEdit->setFontUnderline( false);
+			qTextEdit->setFontItalic( false);
+			qTextEdit->setFontWeight( QFont::Normal);
+			qTextEdit->append( afqt::stoq( i_me.m_listens[i].output));
+
 			founded = true;
 		}
 	}
