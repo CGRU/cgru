@@ -4,10 +4,10 @@
 
 #include "dialog.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QDesktopWidget>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QLabel>
+#include <QLayout>
 
 #define AFOUTPUT
 #undef AFOUTPUT

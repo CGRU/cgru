@@ -10,8 +10,8 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QInputDialog>
+#include <QBoxLayout>
+#include <QInputDialog>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -395,7 +395,7 @@ void ListNodes::actPriority()
 		maximum = af::Environment::getPriority();
 
 	bool ok;
-	int priority = QInputDialog::getInteger( this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
+	int priority = QInputDialog::getInt( this, "Change Priority", "Enter New Priority", current, 0, maximum, 1, &ok);
 	if( !ok) return;
 
 	setParameter("priority", priority);

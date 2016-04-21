@@ -8,8 +8,8 @@
 #include "../libafqt/qenvironment.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QPainter>
 #include <QtCore/QTimer>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

@@ -1,12 +1,12 @@
 #include "ctrlsortfilter.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMenu>
-#include <QtGui/QPainter>
 #include <QtGui/QContextMenuEvent>
+#include <QtGui/QPainter>
+#include <QBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMenu>
 
 const char * CtrlSortFilter::TNAMES[] = {
 "Disabled",

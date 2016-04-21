@@ -6,8 +6,8 @@
 #include "monitorhost.h"
 #include "watch.h"
 
-#include <QtGui/QApplication>
 #include <QtGui/QIcon>
+#include <QApplication>
 
 #define AFOUTPUT
 #undef AFOUTPUT

@@ -28,11 +28,11 @@
 #include "wndlist.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QMenu>
 #include <QtGui/QPainter>
-#include <QtGui/QScrollArea>
+#include <QBoxLayout>
+#include <QMenu>
+#include <QScrollArea>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -483,7 +483,7 @@ void Dialog::keyPressEvent( QKeyEvent * event)
    const QString key( event->text());
    if( key.isNull() || key.isEmpty() ) return;
 
-   if( af::Environment::checkKey( key.at(0).toAscii()))
+   if( af::Environment::checkKey( key.at(0).toLatin1()))
    {
       if( af::Environment::GOD())
       {

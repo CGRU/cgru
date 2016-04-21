@@ -2,7 +2,7 @@
 
 #include "watch.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class ListItems;
 

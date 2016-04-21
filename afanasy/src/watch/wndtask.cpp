@@ -13,14 +13,14 @@
 #include "watch.h"
 
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMenu>
-#include <QtGui/QPushButton>
-#include <QtGui/QScrollArea>
-#include <QtGui/QSplitter>
-#include <QtGui/QTextEdit>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QMenu>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QSplitter>
+#include <QTextEdit>
 
 #define AFOUTPUT
 #undef AFOUTPUT

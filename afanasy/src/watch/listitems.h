@@ -9,7 +9,7 @@
 #include "receiver.h"
 
 #include <QtCore/QMutex>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class QVBoxLayout;
 class QHBoxLayout;

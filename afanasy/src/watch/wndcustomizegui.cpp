@@ -10,10 +10,10 @@
 #include "numberwidget.h"
 #include "watch.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QTabWidget>
+#include <QLabel>
+#include <QLayout>
+#include <QPushButton>
+#include <QTabWidget>
 
 #define AFOUTPUT
 #undef AFOUTPUT

@@ -20,10 +20,10 @@
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QMenu>
+#include <QInputDialog>
+#include <QLabel>
+#include <QLayout>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -163,9 +163,9 @@ void ListRenders::selectionChanged( const QItemSelection & selected, const QItem
 {
 	QModelIndexList indexes = selected.indexes();
 	for( int i = 0; i < indexes.count(); i++)
-		if( qVariantCanConvert<Item*>( indexes[i].data()))
+		if( Item::isItemP( indexes[i].data()))
 		{
-			ItemRender * render = (ItemRender*)qVariantValue<Item*>( indexes[i].data());
+			ItemRender * render = (ItemRender*)(Item::toItemP( indexes[i].data()));
 			if(( render->getName() != QString::fromUtf8( af::Environment::getComputerName().c_str())) && ( render->getUserName() != QString::fromUtf8( af::Environment::getUserName().c_str())))
 				m_view->selectionModel()->select( indexes[i], QItemSelectionModel::Deselect);
 		}
@@ -463,7 +463,7 @@ void ListRenders::actCapacity()
 	int current = item->getCapacity();
 
 	bool ok;
-	int capacity = QInputDialog::getInteger(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
+	int capacity = QInputDialog::getInt(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
 	if( !ok) return;
 	setParameter("capacity", capacity);
 }
@@ -474,7 +474,7 @@ void ListRenders::actMaxTasks()
 	int current = item->getMaxTasks();
 
 	bool ok;
-	int max_tasks = QInputDialog::getInteger(this, "Change Maximum Tasksy", "Enter New Limit", current, -1, 1000000, 1, &ok);
+	int max_tasks = QInputDialog::getInt(this, "Change Maximum Tasksy", "Enter New Limit", current, -1, 1000000, 1, &ok);
 	if( !ok) return;
 	setParameter("max_tasks", max_tasks);
 }
@@ -572,8 +572,8 @@ void ListRenders::actCommand( int number)
 
 	for( int i = 0; i < indexes.count(); i++)
 	{
-		if( false == qVariantCanConvert<Item*>( indexes[i].data())) continue;
-		ItemRender * item = (ItemRender*)(qVariantValue<Item*>( indexes[i].data()));
+		if( false == Item::isItemP( indexes[i].data())) continue;
+		ItemRender * item = (ItemRender*)(Item::toItemP( indexes[i].data()));
 		if( item == NULL ) continue;
 		QString final_command(cmd);
 		final_command.replace( AFWATCH::CMDS_ARGUMENT, item->getName());

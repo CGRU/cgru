@@ -4,11 +4,11 @@
 
 #include "watch.h"
 
-#include <QtGui/QFileDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPushButton>
+#include <QFileDialog>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
+#include <QPushButton>
 
 FileWidget::FileWidget( QWidget * i_parent, afqt::Attr * i_attr,
                         const QString & i_filesmask):

@@ -4,10 +4,10 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPainter>
+#include <QAction>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT

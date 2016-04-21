@@ -22,9 +22,9 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
-#include <QtGui/QApplication>
 #include <QtGui/QPixmap>
-#include <QtGui/QSound>
+#include <QApplication>
+#include <QSound>
 
 #define AFOUTPUT
 #undef AFOUTPUT

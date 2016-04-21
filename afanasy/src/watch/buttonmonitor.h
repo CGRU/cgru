@@ -3,7 +3,7 @@
 #include "watch.h"
 
 #include <QtGui/QImage>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class ButtonMonitor : public QWidget
 {

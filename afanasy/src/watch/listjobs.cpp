@@ -17,10 +17,10 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
-#include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMenu>
+#include <QBoxLayout>
+#include <QInputDialog>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -656,7 +656,7 @@ void ListJobs::actMaxRunningTasks()
 	int current = jobitem->maxrunningtasks;
 
 	bool ok;
-	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
+	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks", max);
@@ -669,7 +669,7 @@ void ListJobs::actMaxRunTasksPerHost()
 	int current = jobitem->maxruntasksperhost;
 
 	bool ok;
-	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
+	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks_per_host", max);

@@ -4,7 +4,7 @@
 
 #include "../libafqt/qenvironment.h"
 
-#include <QtGui/QListView>
+#include <QListView>
 
 #if QT_VERSION >= 0x040602
 #define DRAWBACK 1

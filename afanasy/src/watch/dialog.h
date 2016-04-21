@@ -9,12 +9,12 @@
 #include "labelversion.h"
 #include "watch.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QLinkedList>
-#include <QtGui/QListWidget>
 #include <QtCore/QTimer>
-#include <QtGui/QWidget>
-#include <QtGui/QLabel>
+#include <QBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QWidget>
 
 class ButtonOut;
 class ButtonMonitor;

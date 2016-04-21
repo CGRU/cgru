@@ -4,9 +4,9 @@
 #include "listrenders.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QContextMenuEvent>
+#include <QLabel>
+#include <QMenu>
 
 CtrlRenders::CtrlRenders( QWidget * i_parent, ListRenders * i_renderslist):
 	QLabel( "[View Options]", i_parent ),

@@ -2,7 +2,7 @@
 
 #include "../libafqt/qenvironment.h"
 
-#include <QtGui/QLabel>
+#include <QLabel>
 
 class ListRenders;
 

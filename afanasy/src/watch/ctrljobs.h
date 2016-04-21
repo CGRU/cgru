@@ -3,7 +3,7 @@
 #include "actionid.h"
 #include "listjobs.h"
 
-#include <QtGui/QLabel>
+#include <QLabel>
 
 class ListJobs;
 

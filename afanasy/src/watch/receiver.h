@@ -3,7 +3,7 @@
 #include "../libafanasy/monitorevents.h"
 #include "../libafanasy/name_af.h"
 
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 
 class Receiver
 {

@@ -7,7 +7,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QScrollBar>
+#include <QScrollBar>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -20,14 +20,14 @@ ItemDelegate::ItemDelegate( QWidget *parent):
 
 void ItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if( qVariantCanConvert<Item*>(index.data()))
-        qVariantValue<Item*>( index.data())->paint( painter, option);
+    if( Item::isItemP(index.data()))
+        Item::toItemP( index.data())->paint( painter, option);
 }
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if( qVariantCanConvert<Item*>(index.data()))
-        return qVariantValue<Item*>(index.data())->sizeHint( option);
+    if( Item::isItemP(index.data()))
+        return Item::toItemP(index.data())->sizeHint( option);
     return QSize();
 }
 

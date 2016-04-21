@@ -2,8 +2,8 @@
 
 #include "../libafanasy/afnode.h"
 
-#include <QtGui/QItemDelegate>
-#include <QtGui/QStyleOption>
+#include <QItemDelegate>
+#include <QStyleOption>
 
 class MainWidget;
 
@@ -55,6 +55,9 @@ public:
 	);
 
 	static void calcutaleStarPoints();
+
+	inline static bool  isItemP(const QVariant & i_v) { return i_v.canConvert<Item*>(); }
+	inline static Item* toItemP(const QVariant & i_v) { return i_v.value<Item*>(); }
 
 	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
 

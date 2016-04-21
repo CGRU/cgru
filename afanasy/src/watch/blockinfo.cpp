@@ -15,8 +15,8 @@
 #include "watch.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMenu>
+#include <QInputDialog>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -602,27 +602,27 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	if( i_action == "capacity" )
 	{
 		if( id_block == blocknum ) cur_number = capacity;
-		set_number = QInputDialog::getInteger( listitems, "Change Capacity", "Enter Capacity", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Capacity", "Enter Capacity", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "sequential" )
 	{
 		if( id_block == blocknum ) cur_number = sequential;
-		set_number = QInputDialog::getInteger( listitems, "Change Sequential", "Enter Sequential", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Sequential", "Enter Sequential", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_retries" )
 	{
 		if( id_block == blocknum ) cur_number = errors_retries;
-		set_number = QInputDialog::getInteger( listitems, "Set Retries Error", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Set Retries Error", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_avoid_host" )
 	{
 		if( id_block == blocknum ) cur_number = errors_avoidhost;
-		set_number = QInputDialog::getInteger( listitems, "Set Errors Avoid Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Set Errors Avoid Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_task_same_host" )
 	{
 		if( id_block == blocknum ) cur_number = errors_tasksamehost;
-		set_number = QInputDialog::getInteger( listitems, "Set Task Errors Same Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Set Task Errors Same Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "errors_forgive_time" )
 	{
@@ -641,12 +641,12 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	else if( i_action == "max_running_tasks" )
 	{
 		if( id_block == blocknum ) cur_number = maxrunningtasks;
-		set_number = QInputDialog::getInteger( listitems, "Change Maximum Running Tasks", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Maximum Running Tasks", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "max_running_tasks_per_host" )
 	{
 		if( id_block == blocknum ) cur_number = maxruntasksperhost;
-		set_number = QInputDialog::getInteger( listitems, "Change Maximum Running Tasks Per Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Maximum Running Tasks Per Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "hosts_mask" )
 	{
@@ -676,47 +676,47 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	else if( i_action == "need_memory" )
 	{
 		if( id_block == blocknum ) cur_number = need_memory;
-		set_number = QInputDialog::getInteger( listitems, "Change Needed Memory", "Enter MegaBytes", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Needed Memory", "Enter MegaBytes", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "need_hdd" )
 	{
 		if( id_block == blocknum ) cur_number = need_hdd;
-		set_number = QInputDialog::getInteger( listitems, "Change Maximum Hosts", "Enter GigaBytes", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Maximum Hosts", "Enter GigaBytes", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "need_power" )
 	{
 		if( id_block == blocknum ) cur_number = need_power;
-		set_number = QInputDialog::getInteger( listitems, "Change Maximum Hosts", "Enter Power", cur_number, -1, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Maximum Hosts", "Enter Power", cur_number, -1, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "capacity_coeff_min" )
 	{
 		if( id_block == blocknum ) cur_number = capcoeff_min;
-		set_number = QInputDialog::getInteger( listitems, "Change Capacity min coeff", "Enter Coefficient", cur_number, 0, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Capacity min coeff", "Enter Coefficient", cur_number, 0, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "capacity_coeff_max" )
 	{
 		if( id_block == blocknum ) cur_number = capcoeff_max;
-		set_number = QInputDialog::getInteger( listitems, "Change Capacity max coeff", "Enter Coefficient", cur_number, 0, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Capacity max coeff", "Enter Coefficient", cur_number, 0, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "multihost_min" )
 	{
 		if( id_block == blocknum ) cur_number = multihost_min;
-		set_number = QInputDialog::getInteger( listitems, "Change Hosts Minimun", "Enter Quantity", cur_number, 1, AFJOB::TASK_MULTIHOSTMAXHOSTS, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Hosts Minimun", "Enter Quantity", cur_number, 1, AFJOB::TASK_MULTIHOSTMAXHOSTS, 1, &ok);
 	}
 	else if( i_action == "multihost_max" )
 	{
 		if( id_block == blocknum ) cur_number = multihost_max;
-		set_number = QInputDialog::getInteger( listitems, "Change Hosts Maximum", "Enter Quantity", cur_number, 1, AFJOB::TASK_MULTIHOSTMAXHOSTS, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Change Hosts Maximum", "Enter Quantity", cur_number, 1, AFJOB::TASK_MULTIHOSTMAXHOSTS, 1, &ok);
 	}
 	else if( i_action == "multihost_max_wait" )
 	{
 		if( id_block == blocknum ) cur_number = multihost_waitmax;
-		set_number = QInputDialog::getInteger( listitems, "Set Hosts Maximum Wait Time", "Enter Seconds", cur_number, 0, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Set Hosts Maximum Wait Time", "Enter Seconds", cur_number, 0, INT_MAX, 1, &ok);
 	}
 	else if( i_action == "multihost_service_wait" )
 	{
 		if( id_block == blocknum ) cur_number = multihost_waitsrv;
-		set_number = QInputDialog::getInteger( listitems, "Set Service Start Wait", "Enter Seconds", cur_number, 0, INT_MAX, 1, &ok);
+		set_number = QInputDialog::getInt( listitems, "Set Service Start Wait", "Enter Seconds", cur_number, 0, INT_MAX, 1, &ok);
 	}
 	else
 	{

@@ -6,10 +6,10 @@
 #include "watch.h"
 
 #include <QtGui/QColor>
-#include <QtGui/QColorDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
 #include <QtGui/QPainter>
+#include <QColorDialog>
+#include <QLabel>
+#include <QLayout>
 
 ColorWidget::ColorWidget( QWidget * parent, afqt::AttrColor * color):
       QWidget( parent),

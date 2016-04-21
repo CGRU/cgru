@@ -28,12 +28,12 @@
 #include <QtCore/QEvent>
 #include <QtCore/QProcess>
 #include <QtCore/QTimer>
-#include <QtGui/QApplication>
-#include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QListWidget>
-#include <QtGui/QMenu>
+#include <QApplication>
+#include <QBoxLayout>
+#include <QInputDialog>
+#include <QListWidget>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -810,9 +810,9 @@ void ListTasks::blockAction( int id_block, const QString & i_action, bool i_quer
 bool ListTasks::mousePressed( QMouseEvent * event)
 {
 	QModelIndex index = m_view->indexAt( event->pos());
-	if( qVariantCanConvert<Item*>( index.data()) == false ) return false;
+	if( Item::isItemP( index.data()) == false ) return false;
 
-	Item * item = qVariantValue<Item*>( index.data());
+	Item * item = Item::toItemP( index.data());
 	if( item->getId() == ItemJobBlock::ItemId)
 		return ((ItemJobBlock*)item)->mousePressed( event->pos(), m_view->visualRect( index));
 

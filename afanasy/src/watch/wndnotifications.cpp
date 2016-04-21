@@ -11,9 +11,9 @@
 #include "numberwidget.h"
 #include "watch.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
+#include <QLabel>
+#include <QLayout>
+#include <QPushButton>
 
 #define AFOUTPUT
 #undef AFOUTPUT

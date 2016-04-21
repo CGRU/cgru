@@ -2,7 +2,7 @@
 
 #include "../libafqt/name_afqt.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class CheckBoxWidget : public QWidget
 {

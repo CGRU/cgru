@@ -3,6 +3,9 @@
 rem Set CGRU root:
 SET CGRU_LOCATION=%CD%
 
+rem Add libraries to path:
+SET "PATH=%CGRU_LOCATION%\dll;%PATH%"
+
 rem Add CGRU bin to path:
 SET "PATH=%CGRU_LOCATION%\bin;%PATH%"
 

@@ -4,9 +4,9 @@
 
 #include "watch.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QSpinBox>
+#include <QLabel>
+#include <QLayout>
+#include <QSpinBox>
 
 NumberWidget::NumberWidget( QWidget * parent, afqt::AttrNumber * attrNumber):
     QWidget( parent),

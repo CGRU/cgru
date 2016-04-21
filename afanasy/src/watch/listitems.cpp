@@ -7,9 +7,9 @@
 #include "watch.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QBoxLayout>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QLabel>
+#include <QBoxLayout>
+#include <QLabel>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -118,8 +118,8 @@ Item * ListItems::getCurrentItem() const
 {
 	QModelIndex index( m_view->selectionModel()->currentIndex());
 	if( index.isValid())
-		if( qVariantCanConvert<Item*>(index.data()))
-			return qVariantValue<Item*>( index.data());
+		if( Item::isItemP( index.data()))
+			return Item::toItemP( index.data());
 
 	QList<Item*> items = getSelectedItems();
 	if( items.size())
@@ -139,8 +139,8 @@ const QList<Item*> ListItems::getSelectedItems() const
 
 	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
 	for( int i = 0; i < indexes.count(); i++)
-		if( qVariantCanConvert<Item*>( indexes[i].data()))
-			items << qVariantValue<Item*>( indexes[i].data());
+		if( Item::isItemP( indexes[i].data()))
+			items << Item::toItemP( indexes[i].data());
 
 	return items;
 }
@@ -165,13 +165,14 @@ void ListItems::setSelectedItems( const QList<Item*> & items, bool resetSelectio
 
 void ListItems::doubleClicked_slot( const QModelIndex & index )
 {
-	if( qVariantCanConvert<Item*>( index.data())) doubleClicked( qVariantValue<Item*>( index.data()));
+	if( Item::isItemP( index.data()))
+		doubleClicked( Item::toItemP( index.data()));
 }
 
 void ListItems::currentItemChanged( const QModelIndex & current, const QModelIndex & previous )
 {
-	if( qVariantCanConvert<Item*>( current.data()))
-		displayInfo( qVariantValue<Item*>( current.data())->getSelectString());
+	if( Item::isItemP( current.data()))
+		displayInfo( Item::toItemP( current.data())->getSelectString());
 }
 
 void ListItems::getItemInfo( const std::string & i_mode)
@@ -239,8 +240,8 @@ const std::vector<int> ListItems::getSelectedIds() const
 	std::vector<int> ids;
 	QModelIndexList indexes( m_view->selectionModel()->selectedIndexes());
 	for( int i = 0; i < indexes.count(); i++)
-		if( qVariantCanConvert<Item*>( indexes[i].data()))
-			ids.push_back( qVariantValue<Item*>( indexes[i].data())->getId());
+		if( Item::isItemP( indexes[i].data()))
+			ids.push_back( Item::toItemP( indexes[i].data())->getId());
 	return ids;
 }
 

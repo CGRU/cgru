@@ -4,7 +4,7 @@
 
 #include "wnd.h"
 
-#include <QtGui/QPushButton>
+#include <QPushButton>
 
 class QContextMenuEvent;
 

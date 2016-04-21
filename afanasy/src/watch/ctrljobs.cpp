@@ -1,9 +1,9 @@
 #include "ctrljobs.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QMenu>
 #include <QtGui/QContextMenuEvent>
+#include <QLabel>
+#include <QMenu>
 
 CtrlJobs::CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs):
 	QLabel( "[View Options]", i_parent ),

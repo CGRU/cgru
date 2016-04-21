@@ -4,8 +4,8 @@
 
 #include "../libafqt/name_afqt.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QTextEdit>
+#include <QLayout>
+#include <QTextEdit>
 
 #define AFOUTPUT
 #undef AFOUTPUT

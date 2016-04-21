@@ -5,7 +5,7 @@
 
 #include <QtCore/QFile>
 #include <QtGui/QPainter>
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 
 LabelVersion::LabelVersion( QWidget *parent):
     QWidget( parent),

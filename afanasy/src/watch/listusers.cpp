@@ -13,11 +13,11 @@
 #include "viewitems.h"
 #include "watch.h"
 
-#include <QtGui/QMenu>
 #include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
 #include <QtGui/QContextMenuEvent>
+#include <QInputDialog>
+#include <QLayout>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -256,7 +256,7 @@ void ListUsers::actErrorsAvoidHost()
 	int current = useritem->errors_avoidhost;
 
 	bool ok;
-	int value = QInputDialog::getInteger(this, "Errors to avoid host", "Enter Number of Errors", current, 0, 99, 1, &ok);
+	int value = QInputDialog::getInt(this, "Errors to avoid host", "Enter Number of Errors", current, 0, 99, 1, &ok);
 	if( !ok) return;
 
 	setParameter("errors_avoid_host", value);
@@ -269,7 +269,7 @@ void ListUsers::actErrorsSameHost()
 	int current = useritem->errors_tasksamehost;
 
 	bool ok;
-	int value = QInputDialog::getInteger(this, "Errors same host", "Enter Number of Errors", current, 0, 99, 1, &ok);
+	int value = QInputDialog::getInt(this, "Errors same host", "Enter Number of Errors", current, 0, 99, 1, &ok);
 	if( !ok) return;
 
 	setParameter("errors_task_same_host", value);
@@ -282,7 +282,7 @@ void ListUsers::actErrorRetries()
 	int current = useritem->errors_retries;
 
 	bool ok;
-	int value = QInputDialog::getInteger(this, "Auto retry error tasks", "Enter Number of Errors", current, 0, 99, 1, &ok);
+	int value = QInputDialog::getInt(this, "Auto retry error tasks", "Enter Number of Errors", current, 0, 99, 1, &ok);
 	if( !ok) return;
 
 	setParameter("errors_retries", value);
@@ -321,7 +321,7 @@ void ListUsers::actMaxRunningTasks()
 	int current = useritem->maxrunningtasks;
 
 	bool ok;
-	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
+	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks", max);

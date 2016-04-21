@@ -7,9 +7,9 @@
 #include "wndlist.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QMenu>
 #include <QtGui/QPainter>
+#include <QContextMenuEvent>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT

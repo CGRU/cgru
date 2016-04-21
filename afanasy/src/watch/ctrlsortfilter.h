@@ -3,8 +3,8 @@
 #include "actionid.h"
 #include "listitems.h"
 
-#include <QtGui/QAction>
-#include <QtGui/QFrame>
+#include <QAction>
+#include <QFrame>
 
 class QLabel;
 class QHBoxLayout;

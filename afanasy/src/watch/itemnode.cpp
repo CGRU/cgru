@@ -5,8 +5,8 @@
 #include "../libafqt/name_afqt.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QPainter>
 #include <QtCore/QTimer>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

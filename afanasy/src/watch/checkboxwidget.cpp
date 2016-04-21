@@ -4,9 +4,9 @@
 
 #include "watch.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QCheckBox>
+#include <QCheckBox>
+#include <QLabel>
+#include <QLayout>
 
 CheckBoxWidget::CheckBoxWidget( QWidget * parent, afqt::AttrNumber * attrNumber):
 	QWidget( parent),

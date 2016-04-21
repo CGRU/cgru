@@ -34,25 +34,27 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
     m_ss << af::time2str() << ": ";
     switch( level)
     {
-    case Logger::DEBUG:
+    case Logger::LDEBUG:
         m_ss << Color::bold_grey   << "DEBUG  " << Color::nocolor;
         break;
-    case Logger::VERBOSE:
+    case Logger::LVERBOSE:
         m_ss << Color::bold_white   << "VERBOSE" << Color::nocolor;
         break;
-    case Logger::INFO:
+    case Logger::LINFO:
         m_ss << Color::bold_white   << "INFO   " << Color::nocolor;
         break;
-    case Logger::WARNING:
+    case Logger::LWARNING:
         m_ss << Color::bold_yellow << "WARNING" << Color::nocolor;
         break;
-    case Logger::ERROR:
+    case Logger::LERROR:
         m_ss << Color::bold_red    << "ERROR  " << Color::nocolor;
         break;
     }
 
+	#ifndef WINNT
     if (display_pid)
         m_ss << " [" << getpid() << "]";
+	#endif
 
     std::stringstream pos;
     pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ") ";
@@ -61,11 +63,11 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
     m_ss << Color::grey << pos.str() << Color::nocolor;
 
     switch( level) {
-    case Logger::DEBUG:   m_ss << Color::bold_grey;    break;
-    case Logger::VERBOSE: m_ss << Color::nocolor; break;
-    case Logger::INFO:    m_ss << Color::nocolor; break;
-    case Logger::WARNING: m_ss << Color::yellow;  break;
-    case Logger::ERROR:   m_ss << Color::red;     break;
+    case Logger::LDEBUG:   m_ss << Color::bold_grey;    break;
+    case Logger::LVERBOSE: m_ss << Color::nocolor; break;
+    case Logger::LINFO:    m_ss << Color::nocolor; break;
+    case Logger::LWARNING: m_ss << Color::yellow;  break;
+    case Logger::LERROR:   m_ss << Color::red;     break;
     }
 }
 
@@ -100,7 +102,7 @@ const char * Logger::shorterFilename(const char *filename)
 void Logger::align(std::stringstream &ss)
 {
     size_t l = ss.str().length();
-    Logger::align_width = std::max(Logger::align_width, l);
+    Logger::align_width = ( Logger::align_width > l ) ? Logger::align_width : 1;
     ss << std::setw(Logger::align_width - l) << "";
 }
 
