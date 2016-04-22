@@ -84,7 +84,8 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem, const QColor * i_clrBorder) const
 {
 	painter->setOpacity( 1.0);
-	painter->setRenderHint( QPainter::Antialiasing, false);
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setRenderHint(QPainter::TextAntialiasing);
 
 	if( option.state & QStyle::State_Selected )
 		i_clrItem = &afqt::QEnvironment::clr_selected.c;
