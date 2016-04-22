@@ -420,38 +420,46 @@ void af::setSocketOptions( int i_fd)
 
 	if( af::Environment::getSO_RCVTIMEO_sec() != -1 )
 	{
+		#ifdef WINNT
+		DWORD so_timeo = 1000 * af::Environment::getSO_RCVTIMEO_sec();
+		#else
 		timeval so_timeo;
 		so_timeo.tv_usec = 0;
 		so_timeo.tv_sec = af::Environment::getSO_RCVTIMEO_sec();
+		#endif
 		if( setsockopt( i_fd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
 			AFERRPE("Set socket SO_RCVTIMEO option failed:")
 	}
 
 	if( af::Environment::getSO_SNDTIMEO_sec() != -1 )
 	{
+		#ifdef WINNT
+		DWORD so_timeo = 1000 * af::Environment::getSO_SNDTIMEO_sec();
+		#else
 		timeval so_timeo;
 		so_timeo.tv_usec = 0;
 		so_timeo.tv_sec = af::Environment::getSO_SNDTIMEO_sec();
+		#endif
 		if( setsockopt( i_fd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
 			AFERRPE("Set socket SO_SNDTIMEO option failed:")
 	}
-	#ifdef LINUX
+
 	if( af::Environment::getSO_LINGER() != -1 )
 	{
 		linger so_linger;
 		so_linger.l_onoff  = af::Environment::getSO_LINGER();
 		so_linger.l_linger = af::Environment::getSO_LINGER();
-		if( setsockopt( i_fd, SOL_SOCKET, SO_LINGER, &so_linger, sizeof(so_linger)) != 0)
+		if( setsockopt( i_fd, SOL_SOCKET, SO_LINGER, WINNT_TOCHAR(&so_linger), sizeof(so_linger)) != 0)
 			AFERRPE("Set socket SO_LINGER option failed:")
 	}
 
 	if( af::Environment::getSO_TCP_NODELAY() != -1 )
 	{
 		int nodelay = af::Environment::getSO_TCP_NODELAY();
-		if( setsockopt( i_fd, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) != 0)
+		if( setsockopt( i_fd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
 			AFERRPE("Set socket TCP_NODELAY option failed:")
 	}
-
+	#ifdef LINUX
 	if( af::Environment::getSO_TCP_CORK() != -1 )
 	{
 		int cork = af::Environment::getSO_TCP_CORK();
