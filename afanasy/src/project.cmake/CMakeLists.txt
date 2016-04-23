@@ -52,6 +52,8 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../$ENV{AF_OSTYPE}/bin")
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "../../../$ENV{AF_OSTYPE}/archives")
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "_generated")
 
 add_subdirectory(libafanasy)
 add_subdirectory(render)

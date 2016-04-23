@@ -28,6 +28,7 @@ export AF_POSTGRESQL=$sql
 
 # Configure GUI:
 export AF_GUI=$gui
+export AF_QT_VER="4"
 
 cgru_python="${cgru}/python"
 if [ -d "${cgru_python}" ]; then
@@ -58,6 +59,9 @@ case ${DISTRIBUTIVE} in
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
+		if(( $(echo "$DISTRIBUTIVE_VERSION > 16" | bc -l ) )); then
+			export AF_QT_VER="5"
+		fi
         ;;
     Mint)
         export ADD_CMAKE_MODULE_PATH="$PWD"
