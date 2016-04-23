@@ -308,18 +308,22 @@ QEnvironment::QEnvironment( const QString & i_name)
 
 void QEnvironment::initFonts()
 {
-   f_name.setBold(         true              );
-   f_name.setFamily(       font_family.str   );
-   f_name.setPointSize(    font_sizename.n   );
-   f_info.setBold(         true              );
-   f_info.setFamily(       font_family.str   );
-   f_info.setPointSize(    font_sizeinfo.n   );
-   f_min.setBold(          true              );
-   f_min.setFamily(        font_family.str   );
-   f_min.setPointSize(     font_sizemin.n    );
-   f_plotter.setBold(      false             );
-   f_plotter.setFamily(    font_family.str   );
-   f_plotter.setPointSize( font_sizeplotter.n);
+   f_name.setBold(             true                   );
+   f_name.setFamily(           font_family.str        );
+   f_name.setPointSize(        font_sizename.n        );
+   f_name.setStyleStrategy(    QFont::PreferAntialias );
+   f_info.setBold(             true                   );
+   f_info.setFamily(           font_family.str        );
+   f_info.setPointSize(        font_sizeinfo.n        );
+   f_info.setStyleStrategy(    QFont::PreferAntialias );
+   f_min.setBold(              true                   );
+   f_min.setFamily(            font_family.str        );
+   f_min.setPointSize(         font_sizemin.n         );
+   f_min.setStyleStrategy(     QFont::PreferAntialias );
+   f_plotter.setBold(          false                  );
+   f_plotter.setFamily(        font_family.str        );
+   f_plotter.setPointSize(     font_sizeplotter.n     );
+   f_plotter.setStyleStrategy( QFont::PreferAntialias );
 }
 
 QEnvironment::~QEnvironment()
