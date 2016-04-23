@@ -57,6 +57,8 @@ void ButtonPanel::updateTip()
 void ButtonPanel::paintEvent( QPaintEvent * i_evt)
 {
 	QPainter painter( this);
+	painter.setRenderHint(QPainter::Antialiasing);
+	painter.setRenderHint(QPainter::TextAntialiasing);
 
 	QColor color( afqt::QEnvironment::clr_Light.c);
 	QPen pen( Qt::SolidLine);

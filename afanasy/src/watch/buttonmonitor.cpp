@@ -236,6 +236,9 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
 {
    QPainter painter( this);
 
+   painter.setRenderHint(QPainter::Antialiasing);
+   painter.setRenderHint(QPainter::TextAntialiasing);
+
    if( useimages)
    {
       if( pressed )
