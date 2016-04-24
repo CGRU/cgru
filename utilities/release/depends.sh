@@ -6,10 +6,18 @@ echo "Depends for $DISTRIBUTIVE:"
 
 # Case distribution:
 case ${DISTRIBUTIVE} in
-	Debian | Ubuntu | Mint )
+	Ubuntu | Mint )
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
-		export DEPENDS_CGRU="python-qt4 python3-pyside imagemagick"
+		export DEPENDS_CGRU="python3-pyside imagemagick"
+		if(( $(echo "$DISTRIBUTIVE_VERSION > 16" | bc -l ) )); then
+			export DEPENDS_QTGUI="libqt4-dev libqt4-network"
+		fi
+		;;
+	Debian )
+		export DEPENDS_AFANASY="libpq5"
+		export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
+		export DEPENDS_CGRU="python3-pyside imagemagick"
 		;;
 	Fedora )
 		export DEPENDS_AFANASY="libpqxx"
