@@ -59,9 +59,9 @@ case ${DISTRIBUTIVE} in
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
-		if(( $(echo "$DISTRIBUTIVE_VERSION > 16" | bc -l ) )); then
-			export AF_QT_VER="5"
-		fi
+#		if(( $(echo "$DISTRIBUTIVE_VERSION > 14" | bc -l ) )); then
+#			export AF_QT_VER="5"
+#		fi
         ;;
     Mint)
         export ADD_CMAKE_MODULE_PATH="$PWD"

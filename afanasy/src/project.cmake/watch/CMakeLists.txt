@@ -36,8 +36,9 @@ else()
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndtask.h"
 	)
 	qt4_wrap_cpp(moc_src ${moc_hdr})
-	add_executable(afwatch ${src} ${inc} ${moc_src})
 endif()
+
+add_executable(afwatch ${src} ${inc} ${moc_src})
 
 if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
    set_target_properties(afwatch PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
