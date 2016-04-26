@@ -508,6 +508,7 @@ AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_fam
 		}
 		break;
 	}
+	default: break;// Do nothing
 	}
 
 	printf("\n");

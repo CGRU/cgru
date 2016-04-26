@@ -92,7 +92,7 @@ void threadRunCycle( void * i_args)
 	*/
 
 	af::Msg *message;
-	while( message = a->msgQueue->popMsg( af::AfQueue::e_no_wait) )
+	while( (message = a->msgQueue->popMsg( af::AfQueue::e_no_wait)) )
 	{
 		threadRunCycleCase( a, message );
 	}

@@ -63,7 +63,7 @@ bool Auth::process( const af::Msg * i_msg, af::Msg ** o_msg)
 	{
 		AFCommon::QueueLogError( error);
 		delete i_msg;
-		return NULL;
+		return false;
 	}
 
 	bool access = false;

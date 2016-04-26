@@ -287,7 +287,7 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path)
 		return list;
 	}
 
-	while( de = readdir(dir))
+	while( (de = readdir(dir)) )
 	{
 		if( de->d_name[0] == '.' ) continue;
 		list.push_back( de->d_name);
@@ -379,7 +379,7 @@ bool af::removeDir( const std::string & i_folder )
 	}
 
 	// Removing all files in folder
-	while( de = readdir(dir))
+	while( (de = readdir(dir)) )
 	{
 		std::string filename( de->d_name);
 		if(( filename == ".") || ( filename == ".."))
