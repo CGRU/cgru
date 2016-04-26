@@ -141,7 +141,7 @@ void MonitorAf::v_action( Action & i_action)
 				JobContainerIt jobsIt( i_action.jobs);
 				JobAf * job = jobsIt.getJob( job_id);
 				if( job )
-					if( setListening( job_id, block, task, subscribe));
+					if( setListening( job_id, block, task, subscribe))
 						job->listenOutput( i_action.renders, subscribe, block, task);
 			}
 			else

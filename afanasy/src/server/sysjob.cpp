@@ -471,7 +471,7 @@ SysJob::SysJob( const std::string & i_folder):
 	JobAf( i_folder, true)
 {
 AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
-	m_id == AFJOB::SYSJOB_ID;
+	m_id = AFJOB::SYSJOB_ID;
 	ms_sysjob = this;
 
 	if( isFromStore())
