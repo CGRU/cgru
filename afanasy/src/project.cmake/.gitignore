@@ -5,8 +5,10 @@ CMakeFiles
 CMakeCache.txt
 Makefile
 
-# Qt moc files folders
+# Qt moc files
 */__/
+*moc_*.cpp
+*_automoc.cpp
 
 # MS Visual Studio:
 *.user
@@ -15,6 +17,7 @@ Makefile
 *.dir
 *.sln
 *.opensdf
+*.VC.db
 Debug
 Release
 ipch
