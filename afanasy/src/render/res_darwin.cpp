@@ -345,7 +345,7 @@ static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write)
 
 	io_registry_entry_t drive, parent;
 
-	while( drive = IOIteratorNext(drivelist) )
+	while( (drive = IOIteratorNext(drivelist)) )
    {
       /* get drive's parent */
       kern_return_t status =
