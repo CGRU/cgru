@@ -1,6 +1,27 @@
 #include "profiler.h"
 
-#ifdef LINUX
+#ifdef MACOSX
+#include <mach/clock.h>
+#include <mach/mach.h>
+#define CLOCK_MONOTONIC 0
+int clock_gettime(int clk_id, struct timespec *ts)
+{
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	kern_return_t retval = KERN_SUCCESS;
+
+	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
+	retval = clock_get_time(cclock, &mts);
+	mach_port_deallocate(mach_task_self(), cclock);
+
+	ts->tv_sec = mts.tv_sec;
+	ts->tv_nsec = mts.tv_nsec;
+
+	return retval;
+}
+#endif
+
+#if defined(LINUX) || defined(MACOSX)
 
 #include <stdio.h>
 

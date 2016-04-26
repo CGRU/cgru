@@ -22,7 +22,7 @@ private:
 	static void Profile();
 
 private:
-#ifdef LINUX
+#if defined(LINUX) || defined(MACOSX)
 	static uint64_t ms_counter;
 
 	static int ms_meter;
