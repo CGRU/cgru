@@ -31,11 +31,13 @@
 #	include <sys/sysinfo.h>
 #endif
 
+/*
 #ifdef DARWIN
 #	include <mach/mach.h>
 #	include <mach/mach_host.h>
 #	include <mach/host_info.h>
 #endif
+*/
 
 #include <assert.h>
 
@@ -412,31 +414,6 @@ void DlThread::SleepSelf(unsigned i_seconds)
 
 	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, 0x0);
 
-#ifdef DARWIN
-	/* the cancellation point in sleep isn't implemented in OS X, see:
-
-	http://lists.apple.com/archives/darwin-userlevel/2004/Mar/msg00016.html
-	http://lists.apple.com/archives/darwin-kernel/2004/Jan/msg00032.html
-
-	or google for 'pthread_cancel sleep OS X'. This means we have to check
-	for cancellation explicitely. This will make the cancellation 'hang' a
-	bit but there's no workaround until the OS X guys get their ass moving
-	and implement decent threads.
-	
-	Update: It looks like the OS X people behind this are complete morons:
-	http://lists.apple.com/archives/darwin-kernel/2007/Nov/msg00104.html
-
-	Update(2): This got fixed at last in 10.6:
-	http://lists.apple.com/archives/darwin-kernel/2009/Dec/msg00038.html
-	We could remove this patch when we start targetting 10.6 and up.
-	*/
-
-	for (unsigned s = 0; s < i_seconds; ++s)
-	{
-		sleep(1);
-		pthread_testcancel();
-	}
-#else
 	sleep( i_seconds );
 
 	/* It seems redhat 7 (libc 2.2.5) will not cancel properly when in the
@@ -444,7 +421,6 @@ void DlThread::SleepSelf(unsigned i_seconds)
 	   receiving a signal) so this simple test keeps us from hanging. */
 
 	pthread_testcancel();
-#endif
 
 	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, 0x0);
 
@@ -480,14 +456,7 @@ unsigned DlThread::GetNbProcessors()
 #endif
 
 #ifdef DARWIN
-	host_basic_info_data_t hostInfo;
-	mach_msg_type_number_t infoCount;
-
-	infoCount = HOST_BASIC_INFO_COUNT;
-	host_info(
-		mach_host_self(), HOST_BASIC_INFO, 
-		(host_info_t)&hostInfo, &infoCount );
-
-	return (unsigned int)(hostInfo.max_cpus);
+	return ::(unsigned)sysconf(_SC_NPROCESSORS_ONLN);
 #endif
+	return 1;
 }
