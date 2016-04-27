@@ -51,6 +51,7 @@ Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
 	pal.setColor( QPalette::Background, clr);
 	label->setPalette( pal);
 
+	show();
 	// Placement:
 	setGeometry(QStyle::alignedRect(
 		Qt::RightToLeft,
@@ -61,7 +62,6 @@ Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
 
 	ms_popup = this;
 
-	show();
 }
 
 Popup::~Popup(){}
