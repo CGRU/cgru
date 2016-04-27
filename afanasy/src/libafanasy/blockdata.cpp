@@ -187,7 +187,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 
 	jsonReadTasks( i_object);
 	// If tasks are not preset in json data, condider that block is numeric at first
-	bool numeric = ( m_tasks_data == NULL );
+	bool numeric = ( m_flags & FNumeric );
 
 	// But on store reading, tasks are read later from separate file
 //	if( numeric ) jr_bool("numeric", numeric, i_object);
