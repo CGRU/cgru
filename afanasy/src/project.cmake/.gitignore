@@ -18,6 +18,7 @@ Makefile
 *.sln
 *.opensdf
 *.VC.db
+*.VC.opendb
 Debug
 Release
 ipch
