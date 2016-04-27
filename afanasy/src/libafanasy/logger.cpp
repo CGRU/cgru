@@ -8,6 +8,30 @@ using namespace af;
 
 namespace Color
 {
+#ifdef WINNT
+
+	const std::string bold_grey      = "";
+    const std::string bold_red       = "";
+    const std::string bold_green     = "";
+    const std::string bold_yellow    = "";
+    const std::string bold_blue      = "";
+    const std::string bold_purple    = "";
+    const std::string bold_lightblue = "";
+    const std::string bold_white     = "";
+
+    const std::string grey      = "";
+    const std::string red       = "";
+    const std::string green     = "";
+    const std::string yellow    = "";
+    const std::string blue      = "";
+    const std::string purple    = "";
+    const std::string lightblue = "";
+    const std::string white     = "";
+
+    const std::string nocolor   = "";
+
+#else
+
     const std::string bold_grey      = "\033[1;30m";
     const std::string bold_red       = "\033[1;31m";
     const std::string bold_green     = "\033[1;32m";
@@ -27,6 +51,8 @@ namespace Color
     const std::string white     = "\033[0;37m";
 
     const std::string nocolor   = "\033[0m";
+
+#endif
 } // namespace Color
 
 Logger::Logger(const char *func, const char *file, int line, Logger::Level level, bool display_pid)
@@ -56,11 +82,13 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
         m_ss << " [" << getpid() << "]";
 	#endif
 
-    std::stringstream pos;
-    pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ") ";
-    Logger::align(pos);
-
-    m_ss << Color::grey << pos.str() << Color::nocolor;
+	if( level == LDEBUG )
+	{
+		std::stringstream pos;
+		pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ") ";
+		Logger::align(pos);
+		m_ss << Color::grey << pos.str() << Color::nocolor;
+	}
 
     switch( level) {
     case Logger::LDEBUG:   m_ss << Color::bold_grey;    break;
