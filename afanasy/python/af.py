@@ -169,6 +169,7 @@ class Block:
 			print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
 			pertask = 1
 		#self.data["numeric"] = True
+		self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'numeric')
 		self.data["frame_first"] = start
 		self.data["frame_last"] = end
 		self.data["frames_per_task"] = pertask
