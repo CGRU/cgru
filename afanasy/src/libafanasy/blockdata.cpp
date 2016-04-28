@@ -5,9 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "environment.h"
 #include "job.h"
 #include "jobprogress.h"
-#include "environment.h"
+#include "logger.h"
 #include "msg.h"
 #include "taskdata.h"
 #include "taskexec.h"
@@ -175,6 +176,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if( m_capacity < 1 )
 		m_capacity = 1;
 
+
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
@@ -184,18 +186,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int64("st", m_state, i_object);
 	jr_int64("flags", m_flags, i_object);
 
-
-	jsonReadTasks( i_object);
-	// If tasks are not preset in json data, condider that block is numeric at first
-	bool numeric = ( m_tasks_data == NULL );
-
-	// But on store reading, tasks are read later from separate file
-//	if( numeric ) jr_bool("numeric", numeric, i_object);
-
-	// On store reading, block can be not numeric, but tasks will be read later from separate file
-	if( false == numeric )
-		// In this case we should know tasks number for job construction
-		jr_int32 ("tasks_num", m_tasks_num, i_object);
 
 	int64_t frame_first     = 0;
 	int64_t frame_last      = 0;
@@ -231,35 +221,33 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int64 ("file_size_min", m_file_size_min, i_object);
 	jr_int64 ("file_size_max", m_file_size_max, i_object);
 
-/*
-//	case Msg::TBlocksProgress:
-
-	jr_uint32("state",                 m_state,                 i_object);
-	jr_int32 ("job_id",                m_job_id,                i_object);
-	jr_int32 ("block_num",             m_block_num,             i_object);
-	jr_int32 ("running_tasks_counter", m_running_tasks_counter, i_object);
-
-	jr_uint8 ("p_percentage",      p_percentage,      i_object);
-	jr_int32 ("p_error_hosts",   p_error_hosts,   i_object);
-	jr_int32 ("p_avoid_hosts",   p_avoid_hosts,   i_object);
-	jr_int32 ("p_tasks_ready",      p_tasks_ready,      i_object);
-	jr_int32 ("p_tasks_done",       p_tasks_done,       i_object);
-	jr_int32 ("p_tasks_error",      p_tasks_error,      i_object);
-	jr_int64 ("p_tasks_run_time", p_tasks_run_time, i_object);
-
-	//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
-	//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
-*/
-//	break;
-
-//	default:
-//		AFERRAR("BlockData::readwrite: invalid type = %s.", Msg::TNAMES[msg->type()])
-//	}
-
-	if( numeric )
+//	if( numeric )
+	if( isNumeric())
+	{
 		setNumeric( frame_first, frame_last, frames_per_task, frames_inc);
-	else if( frames_per_task != 0 )
-		m_frames_per_task = frames_per_task;
+	}
+	else
+	{
+		// There can be no "tasks" object in this JSON object.
+		// Not numeric tasks server stores in a separate file for each block.
+		// The reason is performance.
+		// In this case if you change job proirity,
+		// server will write a small file with job parameters.
+		// ( there can be a huge amount of not-numeric tasks )
+		// But on a job submission the entire job data (with all not-numeric tasks)
+		// is in one JSOB object.
+		jsonReadTasks( i_object);
+
+		// We need to read tasks number for cases
+		// when there is no tasks in this object
+		// ( on server store reading )
+		jr_int32 ("tasks_num", m_tasks_num, i_object);
+
+		// Frames per tasks for not-nueric needed
+		// to compute tasks dependency with other block
+		if( frames_per_task != 0 )
+			m_frames_per_task = frames_per_task;
+	}
 
 	if(( capacity_coeff_min != -1 ) || ( capacity_coeff_max != -1 ))
 		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
@@ -273,7 +261,12 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 
 void BlockData::jsonReadTasks( const JSON & i_object)
 {
+	// This function is also called from server/block.cpp
+	// As when server reads job from store,
+	// tasks are read from a separate file for each block.
+
 	const JSON & tasks = i_object["tasks"];
+
 	if( tasks.IsArray())
 	{
 		m_tasks_num = tasks.Size();
@@ -624,6 +617,12 @@ void BlockData::rw_tasks( Msg * msg)
 
    if( msg->isWriting() )
    {
+		if( NULL == m_tasks_data )
+		{
+			AF_ERR << "Block \"" << m_name << "\" not numeric, but m_tasks_data is NULL!";
+			return;
+		}
+
       for( int b = 0; b < m_tasks_num; b++)
       {
          m_tasks_data[b]->write( msg);
