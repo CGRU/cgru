@@ -332,30 +332,6 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		delete progress;
 		break;
 	}
-/*	case af::Msg::TMonitorJobsDel:
-	{
-		af::MCGeneral ids( msg);
-		if( ids.hasId( m_job_id) == false) break;
-	}
-*/
-/*	case af::Msg::TJobRequestId:
-	case af::Msg::TJobProgressRequestId:
-	{  // this messages sent if where is no job with given id.
-		printf("The job does not exist any more. Closing tasks window.\n");
-		displayWarning( "The job does not exist any more.");
-		m_parentWindow->close();
-		break;
-	}
-*/
-/*
-	case af::Msg::TMonitorJobsAdd:
-	{
-		af::MCGeneral ids( msg);
-		if( ids.hasId( m_job_id))
-			Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, m_job_id, true));
-		break;
-	}
-*/
 	case af::Msg::TBlocks:
 	case af::Msg::TBlocksProperties:
 	case af::Msg::TBlocksProgress:
@@ -429,6 +405,19 @@ bool ListTasks::processEvents( const af::MonitorEvents & i_me)
 			Watch::get( "jobs", job_ids, modes, block_ids);
 
 			founded = true;
+		}
+	}
+
+	//
+	// Check if this job deleted:
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_del].size(); i++)
+	{
+		if( i_me.m_events[af::Monitor::EVT_jobs_del][i] == m_job_id )
+		{
+			founded = true;
+			displayWarning( "The job does not exist any more.");
+			m_parentWindow->close();
+			break;
 		}
 	}
 

@@ -233,7 +233,15 @@ void threadAcceptPort( void * i_arg, int i_port)
 			if( seconds > 0 )
 			{
 				int accepts_per_second = accepts_count / seconds;
-				printf("\033[1;36mServed connections per second: %d\033[0m\n", accepts_per_second);
+
+				#ifndef WINNT
+				printf("\033[1;36m");
+				#endif
+				printf("Served connections per second: %d", accepts_per_second);
+				#ifndef WINNT
+				printf("\033[0m");
+				#endif
+				printf("\n");
 
 				accepts_count = 0;
 				accepts_stat_time = cur_time;
