@@ -182,6 +182,18 @@ void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )
    }
 }
 
+bool JobContainer::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
+{
+    AfList jobList;
+
+    JobContainerIt jobsIt( this);
+    for( JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
+        jobList.add( job);
+
+    return jobList.solve(af::Node::SolveByPriority, i_render, i_monitoring);
+}
+
+
 //############################################################################
 //                               JobQueueIt
 //############################################################################

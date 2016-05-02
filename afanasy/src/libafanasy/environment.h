@@ -119,6 +119,10 @@ public:
 	static inline int getTaskStopTimeout()               { return task_stop_timeout;            }
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
 
+	/// Task solving options
+	static inline bool getSolvingUseUserPriority() { return solving_use_user_priority; }
+	static inline bool getSolvingSimpler()         { return solving_simpler;           }
+
 	static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
 	static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
 	static inline int getTaskErrorRetries()              { return task_error_retries;           }
@@ -272,6 +276,10 @@ private:
 	static int task_stop_timeout;
 	static int task_default_capacity;
 	static int task_log_linesmax;
+
+	/// Task solving options
+	static bool solving_use_user_priority;  ///< Whether task solving takes user priority into account or not
+	static bool solving_simpler;            ///< Sort jobs by priority and creation time instead of using the "Need"
 
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;

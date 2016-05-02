@@ -23,6 +23,9 @@ namespace AFJOB
 	const int TASK_STOP_TIMEOUT     = 30;   ///< Time after running task was asked to stop, it become not running itself.
 	const int TASK_LOG_LINESMAX     = 100;  ///< Maximum number of lines in task log.
 
+	const bool SOLVING_USE_USER_PRIORITY = true; ///< Whether task solving takes user priority into account or not
+	const bool SOLVING_SIMPLER = false; ///< Sort jobs by priority and creation time instead of using the "Need"
+
 	const int TASK_MULTIHOSTMAXHOSTS = 100;
 
 // When job sends it's data to server to register.

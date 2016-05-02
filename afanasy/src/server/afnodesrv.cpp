@@ -222,6 +222,20 @@ bool AfNodeSrv::greaterNeed( const AfNodeSrv * i_other) const
    return m_solve_cycle < i_other->m_solve_cycle;
 }
 
+bool AfNodeSrv::greaterPriorityThenOlderCreation( const AfNodeSrv * i_other) const
+{
+    if (m_node->m_priority != i_other->m_node->m_priority)
+        return m_node->m_priority > i_other->m_node->m_priority;
+
+    // If the priority is the same, we look for the smaller creation time
+    if (m_node->getTimeCreation() != i_other->m_node->getTimeCreation())
+        return m_node->getTimeCreation() < i_other->m_node->getTimeCreation();
+
+    // If creation time is the same too (likely because this type of node does not implement getTimeCreation), use the earliest solved node
+    return m_solve_cycle < i_other->m_solve_cycle;
+}
+
+
 /// Try so solve a Node
 bool AfNodeSrv::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
@@ -279,6 +293,16 @@ struct GreaterNeed : public std::binary_function<AfNodeSrv*,AfNodeSrv*,bool>
     }
 };
 
+// Other functor for an alternative sorting algorithm
+struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSrv*,AfNodeSrv*,bool>
+{
+    inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
+    {
+        return a->greaterPriorityThenOlderCreation( b);
+    }
+};
+
+
 /// Static function to solve nodes list:
 bool AfNodeSrv::solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod i_method,
                       RenderAf * i_render, MonitorContainer * i_monitoring)
@@ -309,7 +333,11 @@ bool AfNodeSrv::solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMeth
     if( i_method != af::Node::SolveByOrder )
     {
         // Sort nodes by need
-        solvelist.sort( GreaterNeed());
+        if (af::Environment::getSolvingSimpler())
+            solvelist.sort( GreaterPriorityThenOlderCreation());
+        else
+            solvelist.sort( GreaterNeed());
+        
     }
 
     // Try to solve most needed node

@@ -74,6 +74,7 @@ public:
 
 	/// Compare nodes solving need:
 	bool greaterNeed( const AfNodeSrv * i_other) const;
+	bool greaterPriorityThenOlderCreation( const AfNodeSrv * i_other) const;
 
 protected:
 	void setStoreDir( const std::string & i_store_dir);
