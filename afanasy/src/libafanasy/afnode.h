@@ -52,7 +52,9 @@ public:
    inline bool isLocked() const { return  m_locked; }
    inline bool unLocked() const { return !m_locked; }
 
-    inline void setHidden( bool i_hide = true) { if( i_hide ) m_flags = m_flags | FHidden; else m_flags = m_flags & (~FHidden); }
+    inline void setHidden( bool i_hide = true) { m_flags = i_hide ? m_flags | FHidden : m_flags & (~FHidden); }
+    
+    virtual inline long long getTimeCreation() const { return 0; }
 
    //Solving:
    enum SolvingMethod{

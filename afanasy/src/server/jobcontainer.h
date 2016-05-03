@@ -28,6 +28,8 @@ public:
 	void updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
 	void getWeight( af::MCJobsWeight & jobsWeight );
+	
+	bool solve( RenderAf * i_render, MonitorContainer * i_monitoring);
 };
 
 //########################## Iterator ##############################
