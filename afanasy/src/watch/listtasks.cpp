@@ -289,10 +289,9 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		af::Job * job = (af::Job*)(mcnodes.getNode(0));
 		if( job->getId() != m_job_id )
 		{
-			AFERROR(     "ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.")
-			displayError("ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.");
-			delete job;
-			break;
+			// No job deletion needed.
+			// af::MCAfNodes delete all node in dtor.
+			return false;
 		}
 
 		if( constructed == false)
