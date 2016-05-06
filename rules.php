@@ -49,15 +49,17 @@ function _flock_( &$i_handle, $i_type)
 //	flock( $i_handle, $i_type);
 }
 
+$InputData = file_get_contents('php://input');
+
 # Decode input:
 if( isset($_POST['upload_path']))
 	upload( $_POST['upload_path'], $Out);
 else
 {
-	$Recv = json_decode( $HTTP_RAW_POST_DATA, true);
+	$Recv = json_decode( $InputData, true);
 	if( is_null( $Recv ))
 	{
-		$Recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
+		$Recv = json_decode( base64_decode( $InputData), true);
 	}
 	if( is_null( $Recv ))
 	{
