@@ -71,19 +71,19 @@ logrotate() {
 }
 
 function checkNOFILE() {
-	nofile=10240
-	if (( `ulimit -n` < $nofile )); then
-		echo "Process file descriptors limit is `ulimit -n` too low."
-		echo "For high server load trying to increase it to $nofile."
-		ulimit -n $nofile
-		if [ $? != 0 ]; then
-			echo "Can't raise this limit."
-		else
-			echo "Process file descriptors limit changed to `ulimit -n`."
-		fi
-	else
-		echo "Process file descriptors limit is `ulimit -n`."
-	fi
+    nofile=10240
+    if (( `ulimit -n` < $nofile )); then
+        echo "Process file descriptors limit is `ulimit -n` too low."
+        echo "For high server load trying to increase it to $nofile."
+        ulimit -n $nofile
+        if [ $? != 0 ]; then
+            echo "Can't raise this limit."
+        else
+            echo "Process file descriptors limit changed to `ulimit -n`."
+        fi
+    else
+        echo "Process file descriptors limit is `ulimit -n`."
+    fi
 }
 
 execfile="$afroot/bin/$afapp"
@@ -98,9 +98,9 @@ function start(){
 
    logrotate $logfile
 
-	if [ $afapp == "afserver" ]; then
-		checkNOFILE
-	fi
+    if [ $afapp == "afserver" ]; then
+        checkNOFILE
+    fi
 
    startcmd="$startcmd $pidfile"
    if [ "$UID" == "0" ] && [ ! -z "${nonrootuser}" ]; then
@@ -139,6 +139,21 @@ function stop(){
    echo $?
 }
 
+function _status(){
+   if [ ! -f $pidfile ]; then
+      echo "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
+      exit 1
+   fi
+   PID=`cat $pidfile`
+   if [ -d "/proc/${PID}" ]; then
+      echo "Application '$afapp.$AF_HOSTNAME' is running."
+      exit 0
+   else
+      echo "Application '$afapp.$AF_HOSTNAME' is not running."
+      exit 1
+   fi
+}
+
 case $1 in
    start)
       start
@@ -146,6 +161,10 @@ case $1 in
 
    stop)
       stop
+      ;;
+
+   status)
+      _status
       ;;
 
    restart)
@@ -165,7 +184,7 @@ case $1 in
       ;;
 
    *)
-      echo "Usage: $afapp {start|stop|restart|launch}"
+      echo "Usage: $afapp {start|stop|restart|launch|status}"
       exit 1
       ;;
 esac
