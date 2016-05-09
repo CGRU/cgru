@@ -65,12 +65,15 @@ class BlockParameters:
         self.hosts_mask_exclude = ''
         self.depend_mask = ''
         self.depend_mask_global = ''
+        self.min_memory = -1
+        self.preview_approval = afnode.parm('preview_approval').eval()
 
         if afnode.parm('enable_extended_parameters').eval():
             self.priority = int(afnode.parm('priority').eval())
             self.max_runtasks = int(afnode.parm('max_runtasks').eval())
             self.maxperhost = int(afnode.parm('maxperhost').eval())
             self.maxruntime = int(afnode.parm('maxruntime').eval())
+            self.min_memory = int(afnode.parm('min_memory').eval())
             self.capacity = int(afnode.parm('capacity').eval())
             self.capacity_min = int(
                 afnode.parm('capacity_coefficient1').eval())
@@ -162,6 +165,14 @@ class BlockParameters:
             self.cmd += ' -s @#@ -e @#@ --by %d -t "%s"' % (
                 self.frame_inc, afnode.parm('take').eval()
             )
+
+            numWedges = computeWedge(ropnode, roptype)
+            if numWedges:
+                self.frame_first = 0
+                self.frame_last = numWedges - 1
+                self.frame_inc = 1
+                self.frame_pertask = 1
+                self.parser = "mantra"
 
             self.cmd += ' "%(hipfilename)s"'
             self.cmd += ' "%s"' % ropnode.path()
@@ -302,6 +313,8 @@ class BlockParameters:
                 block.setTasksDependMask(self.dependmask)
         if self.subtaskdepend:
             block.setDependSubTask()
+        if self.min_memory > -1:
+            block.setNeedMemory(self.min_memory)
 
         return block
 
@@ -333,6 +346,9 @@ class BlockParameters:
 
         if self.start_paused:
             job.offLine()
+
+        if self.preview_approval:
+            job.setPPApproval()
 
         if self.platform != '':
             if self.platform == 'any':
@@ -671,3 +687,27 @@ def render(afnode):
             '\n'
             'Is it connected to some valid ROP node?' % afnode.path()
         )
+
+
+def computeWedge(ropnode, roptype):
+    # check if this is a wedge rendering and compute the number of wedges
+    numWedgeJobs = None
+    if roptype == "wedge":
+        if ropnode.parm("wedgemethod").eval() == 0:
+            if ropnode.parm("random").eval() == 1:
+                numWedgeJobs = ropnode.parm("numrandom").eval()
+            else:
+                numWedgeJobs = 1
+                for parm in ropnode.parm("wedgeparams").multiParmInstances():
+                    if parm.name().startswith("steps"):
+                        if parm.eval() != 0:
+                            numWedgeJobs *= parm.eval()
+        else:
+            parent = ropnode.parm("roottake").eval()
+            parentTakes = hou.hscript("takels -iqp %s" % parent)[0].split("\n")
+            takes = [takename for takename in parentTakes if takename]
+            numWedgeJobs = len(takes)
+
+        if not numWedgeJobs:
+            raise hou.OperationFailed("The specified wedge node does not compute anyting.")
+    return numWedgeJobs
