@@ -154,6 +154,16 @@ elif drivertypename == 'rib':
                     progress.set(command)
                 except:
                     print('Failed, frame progress not available.')
+elif drivertypename == "wedge":
+    ropnode.parm('wrange').set(1)
+    ropnode.parm('wedgenum').set(start)
+    driverpath = ropnode.parm('driver').eval()
+    driver = ropnode.node(driverpath)
+    if driver:
+        for parmName in ["vm_alfprogress", "alfprogress"]:
+            progress = driver.parm(parmName)
+            if progress:
+                progress.set(1)
 
 if take is not None and len(take) > 0:
     hou.hscript('takeset ' + take)
