@@ -23,7 +23,7 @@ Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     defa
 Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
 Parser.add_option(      '--prefix',   dest='prefix',   type  ='string',     default=None,  help='Shot renaming prefix')
 Parser.add_option(      '--regexp',   dest='regexp',   type  ='string',     default=None,  help='Shot renaming regexp')
-Parser.add_option(      '--substr',   dest='substr',   type  ='string',     default=None,  help='Shot renaming substr')
+Parser.add_option(      '--substr',   dest='substr',   type  ='string',     default='',    help='Shot renaming substr')
 Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default=None,  help='Shot renaming padding (Ex:"432")')
 Parser.add_option(      '--extract',  dest='extract',  action='store_true', default=False, help='Extract source folder(s)')
 Parser.add_option(      '--sameshot', dest='sameshot', action='store_true', default=False, help='"NAME" and "NAME-1" will be one shot')
@@ -99,7 +99,7 @@ if Options.refs != '' and os.path.isdir(Options.refs):
 # References.sort()
 
 RegExp = None
-if Options.regexp is not None and Options.substr is not None:
+if Options.regexp is not None:
 	RegExp = re.compile( Options.regexp, re.I|re.M)
 
 Sources = os.listdir(Options.sources)
