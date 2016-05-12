@@ -75,6 +75,9 @@
 			{"name":"shake"},
 			{"name":"vray"},
 			{"name":"xsi"},
+			{"name":"xsi_arnold"},
+			{"name":"xsi_arnold_watermarked"},
+			{"name":"xsi_redshift"},
 			{"name":"yafray"}
 		],
 
