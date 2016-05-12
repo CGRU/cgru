@@ -42,7 +42,7 @@ def Main():
 	defaultVariRenderStep = 1
 	defaultVariRenderCount = 4
 	defaultArnoldWatermarked = 0
-	defaultUseTemp = 1
+	defaultUseTemp = 0
 	defaultTempScenePath = 'P:\\- RENDERTEMP -\\'
 	defaultArnoldAutoThread = 1
 	defaultSkipFrame = 0
