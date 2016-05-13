@@ -27,11 +27,14 @@ class hbatch(parser.parser):
         if data.find('Please check for a valid license server host') != -1:
             self.error = True
 
-        if data.find(keyframe) > -1:
+        count = data.count(keyframe)
+        if count > 0:
             if self.firstframe:
                 self.firstframe = False
-            else:
-                self.frame += 1
+                count -= 1
 
-            self.percentframe = 0
-            self.calculate()
+            if count > 0:
+                self.frame += count
+                self.percentframe = 0
+                self.calculate()
+
