@@ -460,7 +460,6 @@ def SubmitButton_OnClicked():
 			job.blocks.append( block)
 			i += 1
 
-
 		
 		# Send job:
 		if not job.send()[0]:

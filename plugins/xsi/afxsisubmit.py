@@ -74,52 +74,52 @@ def Main():
 
 	if(opSet != None):
 		defaultJobNameAuto 		= 		 GetOpSetValue( opSet, 'afJobNameAuto',			defaultJobNameAuto )
-	if not defaultJobNameAuto:
-		defaultJobName		  	=		 GetOpSetValue( opSet, 'afJobName',				defaultJobName )
+		if not defaultJobNameAuto:
+			defaultJobName		  	=		 GetOpSetValue( opSet, 'afJobName',				defaultJobName )
 
-	defaultRange_frompass		= bool(  GetOpSetValue( opSet, 'afRange_frompass',		defaultRange_frompass ))
-	defaultRange_forcepass		= bool(  GetOpSetValue( opSet, 'afRange_forcepass',		defaultRange_forcepass ))
-	defaultFrame_start			= int(   GetOpSetValue( opSet, 'afFrame_start',			defaultFrame_start ))
-	defaultFrame_end			= int(   GetOpSetValue( opSet, 'afFrame_end',			defaultFrame_end ))
-	defaultFrame_by				= int(   GetOpSetValue( opSet, 'afFrame_by',			defaultFrame_by ))
-	defaultFrame_fpt			= int(   GetOpSetValue( opSet, 'afFrame_fpt',			defaultFrame_fpt ))
-	defaultSimulate				= bool(  GetOpSetValue( opSet, 'afSimulate',			defaultSimulate ))
-	defaultStartPaused			= bool(  GetOpSetValue( opSet, 'afStartPaused',			defaultStartPaused ))
+		defaultRange_frompass		= bool(  GetOpSetValue( opSet, 'afRange_frompass',		defaultRange_frompass ))
+		defaultRange_forcepass		= bool(  GetOpSetValue( opSet, 'afRange_forcepass',		defaultRange_forcepass ))
+		defaultFrame_start			= int(   GetOpSetValue( opSet, 'afFrame_start',			defaultFrame_start ))
+		defaultFrame_end			= int(   GetOpSetValue( opSet, 'afFrame_end',			defaultFrame_end ))
+		defaultFrame_by				= int(   GetOpSetValue( opSet, 'afFrame_by',			defaultFrame_by ))
+		defaultFrame_fpt			= int(   GetOpSetValue( opSet, 'afFrame_fpt',			defaultFrame_fpt ))
+		defaultSimulate				= bool(  GetOpSetValue( opSet, 'afSimulate',			defaultSimulate ))
+		defaultStartPaused			= bool(  GetOpSetValue( opSet, 'afStartPaused',			defaultStartPaused ))
 
-	# only load the pass setting from the properties when _all_ was selected and saved.
-	# when no pass is selected _currect_ is used, when there is a selected _selected_ will be used
-	afAllSaved					=		 GetOpSetValue( opSet, 'afRenderPass',		defaultRenderPass )
-	if (afAllSaved == '_all_'):
-		defaultRenderPass 		= 		 afAllSaved
+		# only load the pass setting from the properties when _all_ was selected and saved.
+		# when no pass is selected _currect_ is used, when there is a selected _selected_ will be used
+		afAllSaved					=		 GetOpSetValue( opSet, 'afRenderPass',		defaultRenderPass )
+		if (afAllSaved == '_all_'):
+			defaultRenderPass 		= 		 afAllSaved
 
-	defaultPriority		  		= int(   GetOpSetValue( opSet, 'afPriority',			defaultPriority ))
-	defaultCapacity		  		= int(   GetOpSetValue( opSet, 'afCapacity',			defaultCapacity ))
-	defaultMaxHosts		  		= int(   GetOpSetValue( opSet, 'afMaxHosts',			defaultMaxHosts ))
-	defaultMaxRunTime		  	= float( GetOpSetValue( opSet, 'afMaxRunTime',			defaultMaxRunTime ))
-	defaultHostsMask		  	=		 GetOpSetValue( opSet, 'afHostsMask',			defaultHostsMask )
-	defaultHostsMaskExclude 	=		 GetOpSetValue( opSet, 'afHostsMaskExclude',	defaultHostsMaskExclude )
-	defaultDependMask		  	=		 GetOpSetValue( opSet, 'afDependMask',			defaultDependMask )
-	defaultDependMaskGlobal 	=		 GetOpSetValue( opSet, 'afDependMaskGlobal',	defaultDependMaskGlobal )
-	defaultVariRender		  	= bool(  GetOpSetValue( opSet, 'afVariRender',			defaultVariRender ))
-	defaultVariRenderAttr	  	=		 GetOpSetValue( opSet, 'afVariRenderAttr',		defaultVariRenderAttr )
-	defaultVariRenderStart  	= int(   GetOpSetValue( opSet, 'afVariRenderStart',		defaultVariRenderStart ))
-	defaultVariRenderStep	 	= int(   GetOpSetValue( opSet, 'afVariRenderStep',		defaultVariRenderStep ))
-	defaultVariRenderCount  	= int(   GetOpSetValue( opSet, 'afVariRenderCount',		defaultVariRenderCount ))
-	defaultArnoldWatermarked	= bool(  GetOpSetValue( opSet, 'afArnoldWater',		 	defaultArnoldWatermarked ))
-	defaultTempScenePath	  	=		 GetOpSetValue( opSet, 'afTempScenePath',		defaultTempScenePath )
-	defaultUseTemp				=		 GetOpSetValue( opSet, 'afUseTemp',				defaultUseTemp )
-	defaultArnoldAutoThread	 	=		 GetOpSetValue( opSet, 'afArnoldAutoThread',	defaultArnoldAutoThread )
-	defaultSkipFrame 			= 		 GetOpSetValue( opSet, 'afSkipFrame', 			defaultSkipFrame )
-	defaultArnoldThreadsBool 	= 		 GetOpSetValue( opSet, 'afArnoldThreadsBool', 	defaultSkipFrame )
-	defaultArnoldThreadsCount 	= int(	 GetOpSetValue( opSet, 'afArnoldThreadsCount',	defaultArnoldThreadsCount ))
-	defaultBucket 				= int(	 GetOpSetValue( opSet, 'afBucket',				defaultBucket ))
-	defaultStillimage 			= 		 GetOpSetValue( opSet, 'afStillimage', 			defaultStillimage )
-	defaultProgressive 			= bool(  GetOpSetValue( opSet, 'afProgressive', 		defaultProgressive ))
+		defaultPriority		  		= int(   GetOpSetValue( opSet, 'afPriority',			defaultPriority ))
+		defaultCapacity		  		= int(   GetOpSetValue( opSet, 'afCapacity',			defaultCapacity ))
+		defaultMaxHosts		  		= int(   GetOpSetValue( opSet, 'afMaxHosts',			defaultMaxHosts ))
+		defaultMaxRunTime		  	= float( GetOpSetValue( opSet, 'afMaxRunTime',			defaultMaxRunTime ))
+		defaultHostsMask		  	=		 GetOpSetValue( opSet, 'afHostsMask',			defaultHostsMask )
+		defaultHostsMaskExclude 	=		 GetOpSetValue( opSet, 'afHostsMaskExclude',	defaultHostsMaskExclude )
+		defaultDependMask		  	=		 GetOpSetValue( opSet, 'afDependMask',			defaultDependMask )
+		defaultDependMaskGlobal 	=		 GetOpSetValue( opSet, 'afDependMaskGlobal',	defaultDependMaskGlobal )
+		defaultVariRender		  	= bool(  GetOpSetValue( opSet, 'afVariRender',			defaultVariRender ))
+		defaultVariRenderAttr	  	=		 GetOpSetValue( opSet, 'afVariRenderAttr',		defaultVariRenderAttr )
+		defaultVariRenderStart  	= int(   GetOpSetValue( opSet, 'afVariRenderStart',		defaultVariRenderStart ))
+		defaultVariRenderStep	 	= int(   GetOpSetValue( opSet, 'afVariRenderStep',		defaultVariRenderStep ))
+		defaultVariRenderCount  	= int(   GetOpSetValue( opSet, 'afVariRenderCount',		defaultVariRenderCount ))
+		defaultArnoldWatermarked	= bool(  GetOpSetValue( opSet, 'afArnoldWater',		 	defaultArnoldWatermarked ))
+		defaultTempScenePath	  	=		 GetOpSetValue( opSet, 'afTempScenePath',		defaultTempScenePath )
+		defaultUseTemp				=		 GetOpSetValue( opSet, 'afUseTemp',				defaultUseTemp )
+		defaultArnoldAutoThread	 	=		 GetOpSetValue( opSet, 'afArnoldAutoThread',	defaultArnoldAutoThread )
+		defaultSkipFrame 			= 		 GetOpSetValue( opSet, 'afSkipFrame', 			defaultSkipFrame )
+		defaultArnoldThreadsBool 	= 		 GetOpSetValue( opSet, 'afArnoldThreadsBool', 	defaultSkipFrame )
+		defaultArnoldThreadsCount 	= int(	 GetOpSetValue( opSet, 'afArnoldThreadsCount',	defaultArnoldThreadsCount ))
+		defaultBucket 				= int(	 GetOpSetValue( opSet, 'afBucket',				defaultBucket ))
+		defaultStillimage 			= 		 GetOpSetValue( opSet, 'afStillimage', 			defaultStillimage )
+		defaultProgressive 			= bool(  GetOpSetValue( opSet, 'afProgressive', 		defaultProgressive ))
 
-	pSet = None
-	Application.ExecuteCommand('DeleteObj',[str(Application.ActiveSceneRoot) + '.afSubmitProperties'])
+		pSet = None
+		Application.ExecuteCommand('DeleteObj',[str(Application.ActiveSceneRoot) + '.afSubmitProperties'])
+
 	opSet = Application.ActiveSceneRoot.AddProperty('CustomProperty',False,'afSubmitProperties')
-
 	opSet.AddParameter3('afJobNameAuto',		 constants.siBool,	  defaultJobNameAuto, 0, 1, False)
 	opSet.AddParameter3('afJobName',			 constants.siString,  defaultJobName)
 	opSet.AddParameter3('afRange_frompass',	 	 constants.siBool,	  defaultRange_frompass, 0, 1, False)
@@ -242,7 +242,7 @@ def Main():
 	oPPGLayout.EndGroup()
 
 	# currently broken and disabled
-
+	"""
 	oPPGLayout.AddSpacer(0,20)
 
 	oPPGLayout.AddGroup('Parameter Variation',True,100)
@@ -252,7 +252,7 @@ def Main():
 	oPPGLayout.AddItem('afVariRenderStep',	 'Step',			  constants.siControlNumber)
 	oPPGLayout.AddItem('afVariRenderCount',	 'Count',			  constants.siControlNumber)
 	oPPGLayout.EndGroup()
-
+	"""
 
 
 	oPPGLayout.AddButton('HelpButton',	'Show Help')
