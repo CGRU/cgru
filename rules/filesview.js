@@ -467,6 +467,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_el_mtime = document.createElement('div');
 			i_el.appendChild( i_el.m_el_mtime);
 			i_el.m_el_mtime.classList.add('mtime');
+			i_el.m_el_mtime.classList.add('attr');
 		}
 
 		i_el.m_el_mtime.textContent = c_DT_FormStrFromSec( i_el.m_obj.mtime);
@@ -481,6 +482,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_el_size = document.createElement('div');
 			i_el.appendChild( i_el.m_el_size);
 			i_el.m_el_size.classList.add('size');
+			i_el.m_el_size.classList.add('attr');
 		}
 
 		i_el.m_el_size.textContent = c_Bytes2KMG( size);
@@ -500,6 +502,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_el_num_files = document.createElement('div');
 			i_el.appendChild( i_el.m_el_num_files);
 			i_el.m_el_num_files.classList.add('filesnum');
+			i_el.m_el_num_files.classList.add('attr');
 		}
 
 		var f_count = num_files;
@@ -562,6 +565,19 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			}
 		}
 	}
+
+	if( i_el.m_obj.annotation )
+	{
+		if( i_el.m_el_annotation == null )
+		{
+			i_el.m_el_annotation = document.createElement('div');
+			i_el.appendChild( i_el.m_el_annotation);
+			i_el.m_el_annotation.classList.add('annotation');
+		}
+		i_el.m_el_annotation.textContent = i_el.m_obj.annotation;
+	}
+
+	fv_itemApplyColor( i_el, i_el.m_obj.color);
 /*
 	if( i_el.m_obj.checksum )
 	{
@@ -737,6 +753,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		el.m_view = this;
 		el.m_path = elItem.m_path;
 		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( elItem.m_path)};
+
+		var el = document.createElement('div');
+		elItem.m_elMenu.appendChild( el);
+		el.classList.add('button');
+		el.textContent = '+a';
+		el.title = 'Annotate item';
+		el.m_view = this;
+		el.m_path = elItem.m_path;
+		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.annotate( elItem)};
 	}
 
 	// Delete button !!!
@@ -1343,6 +1368,111 @@ FilesView.prototype.bufferPutFinished = function( i_data, i_args)
 	}
 
 	fv_ReloadAll();
+}
+
+FilesView.prototype.annotate = function( i_elItem)
+{
+	if( i_elItem.m_el_edit_annotation != null )
+		i_elItem.removeChild( i_elItem.m_el_edit_annotation);
+
+	if( i_elItem.m_el_annotation != null )
+		i_elItem.m_el_annotation.style.display = 'none';
+
+	var elAnn = document.createElement('div');
+	i_elItem.m_el_edit_annotation = elAnn;
+	i_elItem.appendChild( elAnn);
+	elAnn.classList.add('edit_annotation');
+	elAnn.onclick = function(e){ e.stopPropagation(); return false; }
+
+	var elText = document.createElement('div');
+	i_elItem.m_el_edit_annotation.m_el_text = elText;
+	elAnn.appendChild( elText);
+	elText.contentEditable = 'true';
+	elText.classList.add('editing');
+	if( i_elItem.m_obj.annotation )
+		elText.textContent = i_elItem.m_obj.annotation;
+
+	var elPanel = document.createElement('div');
+	elAnn.appendChild( elPanel);
+	elPanel.classList.add('edit_panel');
+
+	var elBtnCancel = document.createElement('div');
+	elPanel.appendChild( elBtnCancel);
+	elBtnCancel.classList.add('button');
+	elBtnCancel.textContent = 'Cancel';
+	elBtnCancel.m_fv = this;
+	elBtnCancel.m_el = i_elItem;
+	elBtnCancel.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateCancel( el.m_el);}
+
+	var elBtnApply = document.createElement('div');
+	elPanel.appendChild( elBtnApply);
+	elBtnApply.classList.add('button');
+	elBtnApply.textContent = 'Apply';
+	elBtnApply.m_fv = this;
+	elBtnApply.m_el = i_elItem;
+	elBtnApply.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateApply( el.m_el);}
+
+	var elColors = document.createElement('div');
+	elPanel.appendChild( elColors);
+	u_DrawColorBars({"el":elColors,"onclick":fv_editColorOnClick,"data":{"el":i_elItem}});
+}
+function fv_editColorOnClick( i_clr, i_data)
+{
+	fv_itemApplyColor( i_data.el, i_clr);
+}
+function fv_itemApplyColor( i_el, i_clr)
+{
+	i_el.m_clr = i_clr;
+
+	if( i_clr == null )
+		i_el.style.backgroundColor = null;
+	else
+		i_el.style.backgroundColor = 'rgb('+i_clr[0]+','+i_clr[1]+','+i_clr[2]+')';
+}
+FilesView.prototype.annotateApply = function( i_elItem)
+{
+	var annotation = i_elItem.m_el_edit_annotation.m_el_text.textContent;
+
+	var filename = c_PathBase( i_elItem.m_path);
+	var fileobj = {};
+	fileobj.annotation = annotation;
+	fileobj.color = i_elItem.m_clr;
+
+	var walk = {};
+	if( i_elItem.m_isFolder )
+	{
+		walk.folders = {};
+		walk.folders[filename] = fileobj;
+	}
+	else
+	{
+		walk.files = {};
+		walk.files[filename] = fileobj;
+	}
+
+	var obj = {};
+	obj.add = true;
+	obj.object = walk;
+	obj.file = c_GetRuFilePath('walk.json', this.m_path);
+
+	n_Request({"send":{"editobj":obj},"func":fv_annotateFinished,"fv":this,"elItem":i_elItem});
+}
+function fv_annotateFinished( i_data, i_args)
+{
+	i_args.fv.refresh();
+}
+FilesView.prototype.annotateCancel = function( i_elItem)
+{
+	if( i_elItem.m_el_edit_annotation )
+	{
+		i_elItem.removeChild( i_elItem.m_el_edit_annotation);
+		i_elItem.m_el_edit_annotation = null;
+	}
+
+	if( i_elItem.m_el_annotation )
+		i_elItem.m_el_annotation.style.display = 'block';
+
+	fv_itemApplyColor( i_elItem, i_elItem.m_obj.color);
 }
 
 function fv_GetFileIcon( i_name, i_folder)

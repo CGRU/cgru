@@ -71,7 +71,7 @@ def jsonLoad(i_filename):
 
 	return obj
 
-def checkDict(io_dict):
+def checkDict(io_dict, i_reset_counts = False):
 	if not 'folders' in io_dict:
 		io_dict['folders'] = dict()
 	if not 'files' in io_dict:
@@ -79,8 +79,11 @@ def checkDict(io_dict):
 	num_keys = ['num_files', 'num_folders','num_images', 'size', 'num_files_total',
 				'num_folders_total', 'size_total']
 	for key in num_keys:
-		if not key in io_dict:
+		if i_reset_counts:
 			io_dict[key] = 0
+		else:
+			if not key in io_dict:
+				io_dict[key] = 0
 
 
 def walkdir(i_path, i_subwalk, i_curdepth=0):
@@ -92,8 +95,10 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 	if Options.verbose > i_curdepth and i_subwalk:
 		outInfo('cur_path',i_path)
 
-	out = dict()
-	checkDict(out)
+	out = jsonLoad( os.path.join( i_path, Options.output))
+	if out is None:
+		out = dict()
+	checkDict(out, True)
 
 	try:
 		entries = os.listdir(i_path)
@@ -130,7 +135,14 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
 				# We do not need info for each subfolder in a child folder:
 				del fout['files']
 				del fout['folders']
-				out['folders'][entry] = fout
+
+				# Create an empty folder entry if not preset:
+				if not entry in out['folders']:
+					out['folders'][entry] = dict()
+
+				# Merge keys from subfolder:
+				for key in fout.keys():
+					out['folders'][entry][key] = fout[key]
 
 				out['num_folders_total'] += fout['num_folders_total']
 				out['num_files_total'] += fout['num_files_total']
