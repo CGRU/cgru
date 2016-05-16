@@ -1453,9 +1453,10 @@ FilesView.prototype.annotateApply = function( i_elItem)
 	var obj = {};
 	obj.add = true;
 	obj.object = walk;
-	obj.file = c_GetRuFilePath('walk.json', this.m_path);
+	obj.file = c_GetRuFilePath('walk.json', this.path);
 
 	n_Request({"send":{"editobj":obj},"func":fv_annotateFinished,"fv":this,"elItem":i_elItem});
+//console.log( JSON.stringify( obj));
 }
 function fv_annotateFinished( i_data, i_args)
 {
