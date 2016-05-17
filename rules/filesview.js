@@ -757,7 +757,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		var el = document.createElement('div');
 		elItem.m_elMenu.appendChild( el);
 		el.classList.add('button');
-		el.textContent = '+a';
+		el.style.backgroundImage = 'url(rules/icons/annotate.png)';
 		el.title = 'Annotate item';
 		el.m_view = this;
 		el.m_path = elItem.m_path;
