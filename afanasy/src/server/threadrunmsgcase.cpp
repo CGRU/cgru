@@ -37,12 +37,8 @@ switch ( i_msg->type())
 	{
 		af::RenderReconnect reco( i_msg);
 		
-		RenderAf *render;
-		{
-			//AfContainerLock rLock( i_args->renders,  AfContainerLock::READLOCK);
-			RenderContainerIt rendersIt( i_args->renders);
-			render = rendersIt.getRender( reco.getId());
-		}
+		RenderContainerIt rendersIt( i_args->renders);
+		RenderAf *render = rendersIt.getRender( reco.getId());
 		
 		std::vector<af::TaskExec*> &taskexecs = reco.getTaskExecs();
 		for( int i = 0; i < taskexecs.size(); i++)

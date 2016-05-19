@@ -117,9 +117,11 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	case af::Msg::TRenderReconnect:
 	{
+		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock rLock( i_args->renders,  AfContainerLock::READLOCK);
+		
 		af::RenderReconnect render_reco( i_msg);
 		
-		AfContainerLock rLock( i_args->renders,  AfContainerLock::READLOCK);
 		
 		RenderContainerIt rendersIt( i_args->renders);
 		RenderAf * render = rendersIt.getRender( render_reco.getId());
@@ -133,7 +135,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		
 		if ( render->isOffline())
 		{
-			AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
 			render->setOnline();
 			i_args->monitors->addEvent( af::Monitor::EVT_renders_change, render->getId());
 		}
