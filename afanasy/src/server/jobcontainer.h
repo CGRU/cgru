@@ -26,6 +26,15 @@ public:
 
 	/// Update some task state of some job.
 	void updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring);
+	
+	/**
+	 * @brief Reconnect a running task to the server
+	 * @param taskexec: TaskExec to consider as running
+	 * @param running_render: Render claiming to be running this task
+	 * @param renders: renders pool
+	 * @param monitoring: monitors pool
+	 */
+	void reconnectTask(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer * renders, MonitorContainer * monitoring);
 
 	void getWeight( af::MCJobsWeight & jobsWeight );
 	

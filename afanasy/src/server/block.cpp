@@ -205,8 +205,19 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
 
    m_tasks[taskexec->getTaskNum()]->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
 
-	return true;
+   return true;
 }
+
+void Block::reconnect(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer *renders, MonitorContainer *monitoring)
+{
+	Task *task = m_tasks[taskexec.getTaskNum()];
+	if (task->isRunning())
+	{
+		task->restart( "Reconnecting to a running render", renders, monitoring);
+	}
+	task->v_start( &taskexec, m_data->getRunningTasksCounter(), &running_render, monitoring);
+}
+
 
 void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {

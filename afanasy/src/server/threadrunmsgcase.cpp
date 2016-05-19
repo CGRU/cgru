@@ -7,6 +7,7 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/renderupdate.h"
+#include "../libafanasy/renderreconnect.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -30,6 +31,22 @@ switch ( i_msg->type())
 	case af::Msg::TJSONBIN:
 	{
 		threadRunJSON( i_args, i_msg);
+		break;
+	}
+	case af::Msg::TRenderReconnect:
+	{
+		af::RenderReconnect reco( i_msg);
+		
+		RenderAf *render;
+		{
+			//AfContainerLock rLock( i_args->renders,  AfContainerLock::READLOCK);
+			RenderContainerIt rendersIt( i_args->renders);
+			render = rendersIt.getRender( reco.getId());
+		}
+		
+		std::vector<af::TaskExec*> &taskexecs = reco.getTaskExecs();
+		for( int i = 0; i < taskexecs.size(); i++)
+			i_args->jobs->reconnectTask( *taskexecs[i], *render, i_args->renders, i_args->monitors);
 		break;
 	}
 	case af::Msg::TRenderUpdate:

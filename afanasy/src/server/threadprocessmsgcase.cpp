@@ -12,7 +12,9 @@
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mcjobsweight.h"
+#include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/renderupdate.h"
+#include "../libafanasy/renderreconnect.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -113,10 +115,40 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		o_msg_response = i_args->renders->addRender( newRender, i_args->monitors);
 		break;
 	}
+	case af::Msg::TRenderReconnect:
+	{
+		af::RenderReconnect render_reco( i_msg);
+		
+		AfContainerLock rLock( i_args->renders,  AfContainerLock::READLOCK);
+		
+		RenderContainerIt rendersIt( i_args->renders);
+		RenderAf * render = rendersIt.getRender( render_reco.getId());
+		
+		if( NULL == render)
+		{
+			// Something is wrong
+			o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+			break;
+		}
+		
+		if ( render->isOffline())
+		{
+			AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+			render->setOnline();
+			i_args->monitors->addEvent( af::Monitor::EVT_renders_change, render->getId());
+		}
+		
+		if( render_reco.getTaskExecs().size())
+		{
+			i_args->msgQueue->pushMsg( i_msg);
+		}
+		
+		return new af::Msg( af::Msg::TRenderId, render->getId());
+	}
 	case af::Msg::TRenderUpdate:
 	{
 		af::RenderUpdate render_up( i_msg);
-		bool render_founded = false;
+		bool render_found = false;
 
 		{
 			AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
@@ -124,20 +156,30 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			RenderContainerIt rendersIt( i_args->renders);
 			RenderAf * render = rendersIt.getRender( render_up.getId());
 
-			if(( NULL == render ) || ( render->isOffline()))
+			if( NULL == render)
 			{
 				// If there is not such online render, a zero id will be send.
 				// It is a signal for client to register again (may be server was restarted).
 				o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
 			}
+			else if ( render->isOffline())
+			{
+				// The server has not received any registration message from
+				// this render, but it is nevertheless running. The conclusion
+				// to reach is that the render was still running while the
+				// server have been restarted (maybe because it crashed).
+				// We ask the render to send a list of the tasks it is in charge
+				// of to reconnect it. It should then send a TRenderReconnect.
+				o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
+			}
 			else
 			{
 				o_msg_response = render->update( render_up);
-				render_founded = true;
+				render_found = true;
 			}
 		}
 
-		if( render_founded)
+		if( render_found)
 		{
 			// Task outputs received:
 			if( render_up.m_outputs.size())

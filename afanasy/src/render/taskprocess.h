@@ -42,7 +42,7 @@ public:
 	inline bool    addListenAddress( const af::Address & i_addr) { return m_taskexec->addListenAddress(    i_addr);}
 	inline bool removeListenAddress( const af::Address & i_addr) { return m_taskexec->removeListenAddress( i_addr);}
 
-	const af::TaskExec * exec() { return m_taskexec;}
+	af::TaskExec * getTaskExec() { return m_taskexec;}
 
 	inline void listenOutput( bool i_subscribe) { m_taskexec->listenOutput( i_subscribe);}
 

@@ -9,6 +9,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgqueue.h"
+#include "../libafanasy/logger.h"
 
 #include "../libafsql/dbconnection.h"
 
@@ -154,10 +155,10 @@ int main(int argc, char *argv[])
 	// Get Renders from store:
 	//
 	{
-	printf("Getting renders from store...\n");
+	AF_LOG << "Getting renders from store...";
 
 	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getRendersDir());
-	printf("%d renders found.\n", (int)folders.size());
+	AF_LOG << folders.size() << " renders found.";
 
 	for( int i = 0; i < folders.size(); i++)
 	{
@@ -170,17 +171,17 @@ int main(int argc, char *argv[])
 		}
 		renders.addRender( render);
 	}
-	printf("%d renders registered.\n", renders.getCount());
+	AF_LOG << renders.getCount() << " renders registered.";
 	}
 
 	//
 	// Get Users from store:
 	//
 	{
-	printf("Getting users from store...\n");
+	AF_LOG << "Getting users from store...";
 
 	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getUsersDir());
-	printf("%d users found.\n", (int)folders.size());
+	AF_LOG << folders.size() << " users found.";
 
 	for( int i = 0; i < folders.size(); i++)
 	{
@@ -194,19 +195,19 @@ int main(int argc, char *argv[])
 		if( users.addUser( user) == 0 )
 			delete user;
 	}
-	printf("%d users registered from store.\n", users.getCount());
+	AF_LOG << users.getCount() << " users registered from store.";
 	}
 	//
 	// Get Jobs from store:
 	//
 	bool hasSystemJob = false;
 	{
-	printf("Getting jobs from store...\n");
+	AF_LOG << "Getting jobs from store...";
 
 	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getJobsDir());
 	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getJobsDir(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
 
-	printf("%d jobs found.\n", (int)folders.size());
+	AF_LOG << folders.size() << " jobs found.";
 	for( int i = 0; i < folders.size(); i++)
 	{
 		JobAf * job = NULL;
@@ -227,7 +228,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					printf("System job retrieved from store is obsolete. Deleting it...\n");
+					AF_LOG << "System job retrieved from store is obsolete. Deleting it...";
 					delete job;
 					continue;
 				}
@@ -240,13 +241,13 @@ int main(int argc, char *argv[])
 			delete job;
 		}
 	}
-	printf("%d jobs registered from store.\n", jobs.getCount());
+	AF_LOG << jobs.getCount() << " jobs registered from store.";
 	}
 
 	// Disable new commands and editing:
 	if( af::Environment::hasArgument("-demo"))
 	{
-		printf("Demo mode, no new commands.\n");
+		AF_LOG << "Demo mode, no new commands.";
 		af::Environment::setDemoMode();
 	}
 
@@ -276,13 +277,13 @@ int main(int argc, char *argv[])
 		DlThread::Self()->Sleep( 1 );
 	}
 
-	AFINFO("afanasy::main: Waiting child threads.")
+	//AF_LOG << "Waiting child threads.";
 	//alarm(1);
 	/*FIXME: Why we don`t need to join accent thread? */
 	//ServerAccept.Cancel();
 	//ServerAccept.Join();
 
-	AFINFO("afanasy::main: Waiting Run.")
+	//AF_LOG << "Waiting Run.";
 	// No need to chanel run cycle thread as
 	// every new cycle it checks running external valiable
 	RunCycleThread.Join();

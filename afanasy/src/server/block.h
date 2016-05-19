@@ -44,12 +44,17 @@ public:
 
 	bool canRunOn( RenderAf * render);
 
-    virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+	virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+	
+	/// Records that a task execution is being performed by a given running
+	/// render. This is used when restarting the server without restarting the
+	/// renders.
+	void reconnect(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer *renders, MonitorContainer *monitoring);
 
 	void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
-    virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
 	bool checkDepends( MonitorContainer * i_monitoring);
 
