@@ -115,6 +115,10 @@ class events(service.service):
 				)
 				email_events.append(event)
 
+			# Essentially for debugging
+			if 'notify-send' in methods:
+				self.taskInfo['command'] = "notify-send Afanasy 'Job " + task_info['job_name'].replace("'", "'\\''") + ": " + event + "'"
+
 		if len(email_events):
 			cmd = cgruconfig.VARS['email_send_cmd']
 			cmd += ' -V'  # Verbose mode

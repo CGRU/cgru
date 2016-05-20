@@ -7,6 +7,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/jobprogress.h"
 #include "../libafanasy/msgqueue.h"
+#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -294,9 +295,15 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
    if( m_deletion == false )
    {
+       AF_WARN << "TEST";
       m_state = AFJOB::STATE_OFFLINE_MASK;
       lock();
       m_deletion = true;
+      
+      std::vector<std::string> events;
+      events.push_back("JOB_DELETED");
+      emitEvents(events);
+      
       if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
       {
 //printf("JobAf::deleteNode: runningtaskscounter = %d\n", runningtaskscounter);
@@ -1079,32 +1086,8 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 
 			if(( m_state & AFJOB::STATE_DONE_MASK ) && ( false == ( old_state & AFJOB::STATE_DONE_MASK )))
 				events.push_back("JOB_DONE");
-
-			// Processing command for system job is some events happened:
-			if( events.size())
-			{
-				std::ostringstream str;
-				str << "{";
-
-				str << "\n\"user\":";
-				m_user->v_jsonWrite( str, af::Msg::TUsersList);
-
-				str << ",\n\"job\":";
-				v_jsonWrite( str, af::Msg::TJobsList);
-
-				str << ",\n\"events\":[";
-
-				for( int i = 0; i < events.size(); i++ )
-				{
-					if( i ) str << ',';
-					str << '"' << events[i] << '"';
-				}
-				str << "]\n}";
-
-				SysJob::AddEventCommand( str.str(),
-					"", // working directory - no matter
-					m_user_name, m_name, events[0]);
-			}
+			
+			emitEvents(events);
 		}
 	}
 
@@ -1133,6 +1116,35 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 
    // Update solving parameters:
    v_calcNeed();
+}
+
+void JobAf::emitEvents(std::vector<std::string> events)
+{
+	// Processing command for system job if some events happened:
+	if( events.empty())
+		return;
+	
+	std::ostringstream str;
+	str << "{";
+
+	str << "\n\"user\":";
+	m_user->v_jsonWrite( str, af::Msg::TUsersList);
+
+	str << ",\n\"job\":";
+	v_jsonWrite( str, af::Msg::TJobsList);
+
+	str << ",\n\"events\":[";
+
+	for( int i = 0; i < events.size(); i++ )
+	{
+		if( i ) str << ',';
+		str << '"' << events[i] << '"';
+	}
+	str << "]\n}";
+	
+	SysJob::AddEventCommand( str.str(),
+		"", // working directory - no matter
+		m_user_name, m_name, events[0]);
 }
 
 void JobAf::v_calcNeed()
