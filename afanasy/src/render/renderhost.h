@@ -5,7 +5,6 @@
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
 #include "../libafanasy/renderupdate.h"
-#include "../libafanasy/renderreconnect.h"
 
 #include "taskprocess.h"
 
@@ -142,6 +141,4 @@ private:
 
 	/// Class to collect data to send to server on update.
 	af::RenderUpdate m_up;
-	/// Class to collect task list to send to server on reconnecting.
-	af::RenderReconnect m_reco;
 };

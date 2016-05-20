@@ -14,7 +14,6 @@
 #include "../libafanasy/msgclasses/mcjobsweight.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/renderupdate.h"
-#include "../libafanasy/renderreconnect.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -114,37 +113,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		newRender->setAddressIP( i_msg->getAddress());
 		o_msg_response = i_args->renders->addRender( newRender, i_args->monitors);
 		break;
-	}
-	case af::Msg::TRenderReconnect:
-	{
-		AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-		AfContainerLock rLock( i_args->renders,  AfContainerLock::READLOCK);
-		
-		af::RenderReconnect render_reco( i_msg);
-		
-		
-		RenderContainerIt rendersIt( i_args->renders);
-		RenderAf * render = rendersIt.getRender( render_reco.getId());
-		
-		if( NULL == render)
-		{
-			// Something is wrong
-			o_msg_response = new af::Msg( af::Msg::TRenderId, 0);
-			break;
-		}
-		
-		if ( render->isOffline())
-		{
-			render->setOnline();
-			i_args->monitors->addEvent( af::Monitor::EVT_renders_change, render->getId());
-		}
-		
-		if( render_reco.getTaskExecs().size())
-		{
-			i_args->msgQueue->pushMsg( i_msg);
-		}
-		
-		return new af::Msg( af::Msg::TRenderId, render->getId());
 	}
 	case af::Msg::TRenderUpdate:
 	{

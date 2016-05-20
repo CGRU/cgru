@@ -182,6 +182,17 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 	setOnline();
 	updateTime();
 	m_hres.copy( render->getHostRes());
+	
+	std::list<af::TaskExec*>::iterator it;
+	for( it = render->m_tasks.begin() ; it != render->m_tasks.end() ; ++it)
+	{
+		addTask(*it);
+		//i_args->jobs->reconnectTask( *taskexecs[i], *render, i_args->renders, i_args->monitors);
+	}
+	// take the ownership of taskexecs by preventing the render dtor from
+	// freeing them (which it actually doesn't do, btw...):
+	render->m_tasks.clear();
+	
 
 	std::string str = "Online '" + m_engine + "'.";
 	appendLog( str);

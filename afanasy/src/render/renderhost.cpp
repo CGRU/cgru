@@ -95,13 +95,14 @@ RenderHost * RenderHost::getInstance()
 }
 
 void RenderHost::connectionEstablished()
+
 {
-	m_connection_lost_count = 0;
-	
-	if (m_updateMsgType == af::Msg::TRenderReconnect)
+	if (m_connection_lost_count > 0)
 	{
 		AF_LOG << "Reconnected to the server";
 	}
+	
+	m_connection_lost_count = 0;
 	
 	setUpdateMsgType( af::Msg::TRenderUpdate);
 }
@@ -131,30 +132,9 @@ void RenderHost::connectionLost( bool i_any_case)
 		}
 	}
 
-
-    // Stop all tasks:
-    //for( int t = 0; t < m_tasks.size(); t++) m_tasks[t]->stop();
-    
     // Begin to try to register again:
-    if (m_tasks.empty())
-    {
-        // Complete reset
-        m_connected = false;
-        m_id = 0;
-        setUpdateMsgType( af::Msg::TRenderRegister);
-    }
-    else
-    {
-        m_reco.clear();
-        m_reco.setId( getId());
-        for( int t = 0; t < m_tasks.size(); t++)
-        {
-            af::TaskExec *taskexec = m_tasks[t]->getTaskExec();
-            m_reco.addTaskExec(taskexec);
-        }
-        setUpdateMsgType( af::Msg::TRenderReconnect);
-    }
-
+    setUpdateMsgType( af::Msg::TRenderRegister);
+    
     AF_WARN << "Render connection lost, trying to reconnect...";
     AF_LOG  << "note: tasks are still running";
 }
@@ -226,13 +206,6 @@ af::Msg * RenderHost::updateServer()
 		AF_LOG << m_up;
 		#endif
 		msg = new af::Msg( m_updateMsgType, &m_up);
-	}
-	else if( m_updateMsgType == af::Msg::TRenderReconnect )
-	{
-		#ifdef AFOUTPUT
-		AF_LOG << m_reco;
-		#endif
-		msg = new af::Msg( m_updateMsgType, &m_reco);
 	}
 
 	#ifdef AFOUTPUT

@@ -563,7 +563,6 @@ const char * Msg::TNAMES[]=
 	/** Sent by Render on start, when it's server begin to listen post.
 	And when Render can't connect to Afanasy. Afanasy register new Render and send back it's id \c TRenderId. **/
 	"TRenderRegister",
-	"TRenderReconnect",
 	"TRenderUpdate",              ///< Update Render, message contains its resources.
 	"TRenderEvents",              ///< Server answer on render update, it contains what to do.
 	"TRendersResourcesRequestIds",///< Request a list of resources of Renders with given ids.
