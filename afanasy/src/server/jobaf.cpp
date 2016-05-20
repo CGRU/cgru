@@ -295,7 +295,6 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 
    if( m_deletion == false )
    {
-       AF_WARN << "TEST";
       m_state = AFJOB::STATE_OFFLINE_MASK;
       lock();
       m_deletion = true;
