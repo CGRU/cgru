@@ -192,6 +192,9 @@ def SubmitButton_OnClicked():
 					nudel = Application.SetValue('Passes.%s.Redshift_Options.Autocrop' % cpass, True, '')
 					nudel = Application.SetValue('Passes.%s.Redshift_Options.BucketOrder' % cpass, 1, '')
 
+					# force logging
+					nudel = Application.SetValue('Passes.%s.Redshift_Options.LogLevel' % cpass, 2, '')
+
 	# save the changes
 	Application.SaveScene()
 
