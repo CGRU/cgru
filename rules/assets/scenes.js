@@ -956,3 +956,30 @@ function scenes_Convert()
 	d_Convert( args);
 }
 
+function scenes_ExportTable()
+{
+	var args = {};
+	args.shots = [];
+
+	var elShots = scenes_GetSelectedShots();
+	if( elShots.length < 1 )
+		elShots = sc_elShots;
+
+	for( var i = 0; i < elShots.length; i++)
+	{
+		var shot = {};
+		shot.path = elShots[i].m_path;
+		shot.status = elShots[i].m_status.obj;
+
+		args.shots.push( shot);
+	}
+
+	if( args.shots.length < 1 )
+	{
+		c_Error('No shots to export.');
+		return;
+	}
+
+	table_Export( args);
+}
+
