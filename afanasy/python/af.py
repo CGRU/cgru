@@ -671,14 +671,6 @@ class Job:
 		if department is not None and len(department):
 			self.data["department"] = department
 
-	def setNoProgressFor(self, value):
-		"""Set the time since when this job did not progress
-
-		:param value: Time, in seconds
-		"""
-		if value > 0:
-			self.data["no_progress_for"] = value
-
 	def setWaitTime(self, value):
 		"""Missing DocString
 
