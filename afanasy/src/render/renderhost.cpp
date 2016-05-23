@@ -7,6 +7,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
+#include "../libafanasy/taskexec.h"
 
 #include "pyres.h"
 #include "res.h"
@@ -93,11 +94,23 @@ RenderHost * RenderHost::getInstance()
 	return ms_obj;
 }
 
+void RenderHost::connectionEstablished()
+
+{
+	if (m_connection_lost_count > 0)
+	{
+		AF_LOG << "Reconnected to the server";
+	}
+	
+	m_connection_lost_count = 0;
+	
+	setUpdateMsgType( af::Msg::TRenderUpdate);
+}
+
 void RenderHost::setRegistered( int i_id)
 {
     m_connected = true;
     m_id = i_id;
-    setUpdateMsgType( af::Msg::TRenderUpdate);
     AF_LOG << "Render registered.";
 	RenderHost::connectionEstablished();
 }
@@ -111,24 +124,19 @@ void RenderHost::connectionLost( bool i_any_case)
 
 	if( false == i_any_case )
 	{
-		printf("Connection lost count = %d of %d\n", m_connection_lost_count, af::Environment::getRenderConnectRetries());
+		AF_LOG << "Connection lost count = " << m_connection_lost_count
+			   << " of " << af::Environment::getRenderConnectRetries();
 		if( m_connection_lost_count <= af::Environment::getRenderConnectRetries() )
 		{
 			return;
 		}
 	}
 
-    m_connected = false;
-
-    m_id = 0;
-
-    // Stop all tasks:
-    for( int t = 0; t < m_tasks.size(); t++) m_tasks[t]->stop();
-
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
-
-    printf("Render connection lost, connecting...\n");
+    
+    AF_WARN << "Render connection lost, trying to reconnect...";
+    AF_LOG  << "note: tasks are still running";
 }
 
 void RenderHost::setUpdateMsgType( int i_type)
@@ -185,23 +193,23 @@ af::Msg * RenderHost::updateServer()
 		return NULL;
 
 	m_up.setId( getId());
-
+	
 	af::Msg * msg;
 
 	if( m_updateMsgType == af::Msg::TRenderRegister )
 	{
 		msg = new af::Msg( m_updateMsgType, this);
 	}
-	else
+	else if( m_updateMsgType == af::Msg::TRenderUpdate )
 	{
 		#ifdef AFOUTPUT
-		m_up.v_stdOut();
+		AF_LOG << m_up;
 		#endif
 		msg = new af::Msg( m_updateMsgType, &m_up);
 	}
 
 	#ifdef AFOUTPUT
-	printf(" <<< "); i_msg->v_stdOut();
+	AF_LOG << " <<< " << msg;
 	#endif
 
 	bool ok;
@@ -239,7 +247,11 @@ void RenderHost::windowsMustDie()
 
 void RenderHost::runTask( af::TaskExec * i_task)
 {
-	m_tasks.push_back( new TaskProcess( i_task, this));
+    for( int t = 0; t < m_tasks.size(); t++)
+        if( m_tasks[t]->getTaskExec()->equals( *i_task))
+            return;
+    
+    m_tasks.push_back( new TaskProcess( i_task, this));
 }
 
 void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)

@@ -72,6 +72,9 @@ public:
 
 /// Update task state.
     virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
+     
+/// Reconnect running task
+    void reconnectTask(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Send tasks output to a specified address.
 	void listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task);

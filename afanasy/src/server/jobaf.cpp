@@ -955,6 +955,14 @@ void JobAf::v_updateTaskState( const af::MCTaskUp& taskup, RenderContainer * ren
 	}
 }
 
+void JobAf::reconnectTask(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer *renders, MonitorContainer *monitoring)
+{
+    int b = taskexec.getBlockNum();
+    int t = taskexec.getTaskNum();
+    if( false == checkBlockTaskNumbers( b, t, "reconnectTask")) return;
+    m_blocks[b]->reconnect(taskexec, running_render, renders, monitoring);
+}
+
 void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 //printf("JobAf::refresh: \"%s\"\n", getName().toUtf8().data());

@@ -24,7 +24,8 @@ public:
 	
 	/// Some getters and setters
 	inline bool noOutputRedirection() { return m_no_output_redirection; }
-	inline void connectionEstablished() { m_connection_lost_count = 0; }
+	
+	void connectionEstablished();
 
 	/**
 	* @brief Some message was failed to send.

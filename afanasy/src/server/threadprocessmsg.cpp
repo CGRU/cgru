@@ -18,6 +18,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
+#include "../libafanasy/logger.h"
 
 #include "afcommon.h"
 #include "auth.h"
@@ -80,7 +81,7 @@ uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof)
 	io_prof->processingStarted();
 
 	#ifdef AFOUTPUT
-	printf("Request:  %s: %s\n", msg_request->v_generateInfoString().c_str(), msg_request->getAddress().v_generateInfoString().c_str());
+	AF_LOG << "Request:  " << msg_request << ": " << msg_request->getAddress();
 	#endif
 
 	uint32_t request_type = msg_request->type();
@@ -108,7 +109,7 @@ uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof)
 
 	if( msg_response == NULL)
 	{
-		printf("SERVER CODING ERROR: Message with no answer:\n");
+		AF_ERR << "SERVER CODING ERROR: Message with no answer:";
 		msg_response->stdOutData();
 		return response_type;
 	}
@@ -121,7 +122,7 @@ uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof)
 		msg_response->setJSONBIN();
 
 	#ifdef AFOUTPUT
-	printf("Response: "); msg_response->v_stdOut();
+	AF_LOG << "Response: " << msg_response;
 	#endif
 
 	response_type = msg_response->type();
@@ -131,7 +132,7 @@ uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof)
 	// Write response message back to client socket
 	if( false == af::msgwrite( i_args->sd, msg_response))
 	{
-		AFERROR("processMessage: can't send message to client.")
+		AF_ERR << "Can't send message to client.";
 		af::printAddress( &(i_args->ss)); msg_response->stdOutData();
 	}
 

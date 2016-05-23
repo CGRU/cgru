@@ -89,6 +89,9 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int64 ("time_creation", m_time_creation, i_object);
 	jr_int64 ("time_started",  m_time_started,  i_object);
 	jr_int64 ("time_done",     m_time_done,     i_object);
+	
+	jr_string("project",    m_project,    i_object);
+	jr_string("department", m_department, i_object);
 
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
@@ -151,6 +154,10 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"thumb_path\":\""   << af::strEscape( m_thumb_path   ) << "\"";
 	if( m_report.size())
 		o_str << ",\n\"report\":\""       << af::strEscape( m_report       ) << "\"";
+	if( m_project.size())
+		o_str << ",\n\"project\":\""      << af::strEscape( m_project      ) << "\"";
+	if( m_department.size())
+		o_str << ",\n\"department\":\""   << af::strEscape( m_department   ) << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
@@ -307,6 +314,8 @@ void Job::v_readwrite( Msg * msg)
 	rw_String ( m_description,  msg);
 	rw_String ( m_custom_data,  msg);
 	rw_String ( m_thumb_path,   msg);
+	rw_String ( m_project,      msg);
+	rw_String ( m_department,   msg);
 
 	rw_RegExp ( m_hosts_mask,         msg);
 	rw_RegExp ( m_hosts_mask_exclude, msg);
@@ -386,6 +395,8 @@ int Job::v_calcWeight() const
 	weight += weigh( m_description);
 	weight += weigh( m_user_name);
 	weight += weigh( m_host_name);
+	weight += weigh( m_project);
+	weight += weigh( m_department);
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();
 	weight += m_depend_mask.weigh();
@@ -458,9 +469,12 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
       return;
    }
 
-   if( m_annotation.size()) o_str << "\n    " << m_annotation;
-   if( m_report.size()) o_str << "\n    " << m_report;
+   if( m_annotation.size())  o_str << "\n    " << m_annotation;
+   if( m_report.size())      o_str << "\n    " << m_report;
    if( m_description.size()) o_str << "\n    " << m_description;
+   
+   if( m_project.size())     o_str << "\n Project = " << m_project;
+   if( m_department.size())  o_str << "\n Department = " << m_department;
 
    o_str << "\n Time created  = " << af::time2str( m_time_creation);
 

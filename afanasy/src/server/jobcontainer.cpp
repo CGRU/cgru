@@ -5,6 +5,7 @@
 #include <memory.h>
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/logger.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
 #include "afcommon.h"
@@ -50,7 +51,21 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
 
     // Job does not exist!
     AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
-    if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
+            if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
+}
+
+void JobContainer::reconnectTask(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer *renders, MonitorContainer *monitoring)
+{
+    AF_LOG << "Reconnecting task " << taskexec << " claimed by render " << running_render;
+    JobContainerIt jobsIt( this);
+    JobAf* job = jobsIt.getJob( taskexec.getJobId());
+    if( NULL == job )
+    {
+        AF_ERR << "Job with id=" << taskexec.getJobId() << " does not exists.";
+        return;
+    }
+
+    job->reconnectTask( taskexec, running_render, renders, monitoring);
 }
 
 int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring)

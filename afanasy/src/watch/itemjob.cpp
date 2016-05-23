@@ -99,6 +99,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 	cmd_post             = afqt::stoq( job->getCmdPost());
 	description          = afqt::stoq( job->getDescription());
 	report               = afqt::stoq( job->getReport());
+	project              = afqt::stoq( job->getProject());
 	num_runningtasks     = job->getRunningTasksNumber();
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
@@ -113,7 +114,6 @@ void ItemJob::updateValues( af::Node *node, int type)
 
 	compact_display = true;
 
-	int tasks_done_old = m_tasks_done;
 	m_tasks_done = 0;
 	for( int b = 0; b < m_blocks_num; b++)
 	{
@@ -146,8 +146,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
    if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
    properties += QString(" p%2").arg( m_priority);
-	if( ppapproval )
-		properties += " PPA";
+   if( ppapproval ) properties += " PPA";
 
    user_eta = username;
    if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
@@ -279,9 +278,26 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
       .arg( af::time2strHMS( lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
    painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
 
+   int offset = 30;
+
    painter->setPen( clrTextMain( option) );
    painter->setFont( afqt::QEnvironment::f_name);
-   painter->drawText( x+30, y, w-40-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
+   QFontMetrics fm(afqt::QEnvironment::f_name);
+   QString id_str = QString("#%1").arg(getId());
+   painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
+   offset += fm.width(id_str) + 10;
+   
+   if (project.size())
+   {
+       painter->setPen( afqt::QEnvironment::clr_textbright.c );
+       painter->setFont( afqt::QEnvironment::f_name);
+       painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
+       offset += fm.width(project) + 25;
+   }
+   
+   painter->setPen( clrTextMain( option) );
+   painter->setFont( afqt::QEnvironment::f_name);
+   painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
 
    if( state & AFJOB::STATE_DONE_MASK)
    {
