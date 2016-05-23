@@ -48,6 +48,7 @@ public:
 	QString description;
 	QString thumb_path;
 	QString report;
+	QString project;
 	QMap<QString,QString> folders;
 
 	const QString getFirstFolder();

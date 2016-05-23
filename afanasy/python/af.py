@@ -783,6 +783,14 @@ class Job:
 		if str(value).isdigit():
 			self.data['time_life'] = value
 
+	def setProject(self, project):
+		"""Set the name of the project to which this job is related.
+		
+		:param project: Name of the project
+		"""
+		if project is not None and len(project):
+			self.data["project"] = project
+
 
 class Cmd:
 	"""Missing DocString

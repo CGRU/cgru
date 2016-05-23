@@ -84,17 +84,17 @@ public:
 	inline bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_need_properties, str, "job need properties mask", errOutput);}
 
-	inline bool hasHostsMask()          const { return m_hosts_mask.notEmpty();          }
-	inline bool hasHostsMaskExclude()   const { return m_hosts_mask_exclude.notEmpty();  }
-	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();         }
-	inline bool hasDependMaskGlobal()   const { return m_depend_mask_global.notEmpty();  }
+	inline bool hasHostsMask()          const { return m_hosts_mask.notEmpty();         }
+	inline bool hasHostsMaskExclude()   const { return m_hosts_mask_exclude.notEmpty(); }
+	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();        }
+	inline bool hasDependMaskGlobal()   const { return m_depend_mask_global.notEmpty(); }
 	inline bool hasNeedOS()             const { return m_need_os.notEmpty();            }
 	inline bool hasNeedProperties()     const { return m_need_properties.notEmpty();    }
 
-	inline const std::string & getHostsMask()          const { return m_hosts_mask.getPattern();          }
-	inline const std::string & getHostsMaskExclude()   const { return m_hosts_mask_exclude.getPattern();  }
-	inline const std::string & getDependMask()         const { return m_depend_mask.getPattern();         }
-	inline const std::string & getDependMaskGlobal()   const { return m_depend_mask_global.getPattern();  }
+	inline const std::string & getHostsMask()          const { return m_hosts_mask.getPattern();         }
+	inline const std::string & getHostsMaskExclude()   const { return m_hosts_mask_exclude.getPattern(); }
+	inline const std::string & getDependMask()         const { return m_depend_mask.getPattern();        }
+	inline const std::string & getDependMaskGlobal()   const { return m_depend_mask_global.getPattern(); }
 	inline const std::string & getNeedOS()             const { return m_need_os.getPattern();            }
 	inline const std::string & getNeedProperties()     const { return m_need_properties.getPattern();    }
 
@@ -113,6 +113,9 @@ public:
 	/// Get block constant pointer.
 	inline BlockData* getBlock( int n) const { if(n<(m_blocks_num))return m_blocks_data[n];else return NULL;}
 
+	inline const std::string & getProject() const { return m_project; }
+	inline void setProject( const std::string & project) { m_project = project; }
+	
 	virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 
 	bool jsonRead( const JSON & i_object, std::string * io_changes = NULL);
@@ -176,6 +179,10 @@ protected:
 	RegExp m_depend_mask_global;
 	RegExp m_need_os;
 	RegExp m_need_properties;
+	
+	// Here are coming a couple of metadata just use for display
+	/// Project to which this job is associated
+	std::string m_project;
 
 private:
 	void initDefaultValues();

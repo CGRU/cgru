@@ -89,6 +89,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int64 ("time_creation", m_time_creation, i_object);
 	jr_int64 ("time_started",  m_time_started,  i_object);
 	jr_int64 ("time_done",     m_time_done,     i_object);
+	
+	jr_string("project", m_project, i_object);
 
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
@@ -192,6 +194,9 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
 	if( hasNeedProperties())
 		o_str << ",\n\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
+	
+	if( m_project.size())
+		o_str << ",\n\"project\":\""  << af::strEscape( m_project  ) << "\"";
 
 	if( m_blocks_data == NULL )
 	{
@@ -307,6 +312,7 @@ void Job::v_readwrite( Msg * msg)
 	rw_String ( m_description,  msg);
 	rw_String ( m_custom_data,  msg);
 	rw_String ( m_thumb_path,   msg);
+	rw_String ( m_project,      msg);
 
 	rw_RegExp ( m_hosts_mask,         msg);
 	rw_RegExp ( m_hosts_mask_exclude, msg);
@@ -461,6 +467,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_annotation.size()) o_str << "\n    " << m_annotation;
    if( m_report.size()) o_str << "\n    " << m_report;
    if( m_description.size()) o_str << "\n    " << m_description;
+   if( m_project.size()) o_str << "\n    " << m_project;
 
    o_str << "\n Time created  = " << af::time2str( m_time_creation);
 
