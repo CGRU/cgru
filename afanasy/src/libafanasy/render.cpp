@@ -1,5 +1,6 @@
 #include "render.h"
 
+#include "logger.h"
 #include "address.h"
 #include "environment.h"
 #include "msg.h"

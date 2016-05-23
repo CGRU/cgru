@@ -1,6 +1,7 @@
 #ifdef LINUX
 #include "res.h"
 
+#include <set>
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,6 +12,8 @@
 #include <net/if.h>
 #include <ifaddrs.h>
 #include "../libafanasy/environment.h"
+
+#include <utmpx.h>
 
 /*
 	Various helper funcuntions.
@@ -396,6 +399,32 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       hres.net_recv_kbsec = int(interval_rx / (1024*etime) );
       hres.net_send_kbsec = int(interval_tx / (1024*etime) );
    }
+   
+   /*
+    * Users
+    */
+   // Is it hack to hardcoded these ignored names?
+   std::set<std::string> userignoreset;
+   userignoreset.insert("");
+   userignoreset.insert("reboot");
+   userignoreset.insert("runlevel");
+   userignoreset.insert("LOGIN");
+   // Use a set to efficiently avoid repetitions
+   std::set<std::string> userset;
+   setutxent();
+   struct utmpx *user;
+   while( (user = getutxent()) != NULL)
+   {
+       std::string username = user->ut_user;
+       if (userignoreset.count(username) == 0)
+          userset.insert(username);
+   }
+   endutxent();
+   
+   hres.logged_in_users.clear();
+   std::copy(userset.begin(),
+             userset.end(),
+             std::back_inserter(hres.logged_in_users));
 
 	return;
 }
