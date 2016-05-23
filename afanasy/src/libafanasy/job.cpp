@@ -92,8 +92,6 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	
 	jr_string("project",    m_project,    i_object);
 	jr_string("department", m_department, i_object);
-	
-	jr_int64("no_progress_for", m_no_progress_for, i_object);
 
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
@@ -176,8 +174,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
-	if( m_no_progress_for != -1 )
-		o_str << ",\n\"no_progress_for\":"            << m_no_progress_for;
 
 	if( m_folders.size())
 	{
@@ -308,7 +304,6 @@ void Job::v_readwrite( Msg * msg)
 	rw_int64_t ( m_time_started,               msg);
 	rw_int64_t ( m_time_done,                  msg);
 	rw_int32_t ( m_time_life,                  msg);
-	rw_int64_t ( m_no_progress_for,            msg);
 
 	rw_String ( m_user_name,    msg);
 	rw_String ( m_host_name,    msg);
@@ -487,9 +482,6 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
 	  o_str << "\n Time started  = " << af::time2str( m_time_started);
    if( isDone())
 	  o_str << "\n Time finished = " << af::time2str( m_time_done);
-   
-   if ( m_no_progress_for > 0)
-       o_str << "\n No Progress For = " << af::time2str( m_no_progress_for);
 
    if( m_time_life > 0 ) o_str << "\n Life Time " << m_time_life << " seconds";
 

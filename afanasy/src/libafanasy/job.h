@@ -47,7 +47,6 @@ public:
 	inline long long getTimeStarted()       const { return m_time_started;     }
 	inline long long getTimeWait()          const { return m_time_wait;        }
 	inline long long getTimeDone()          const { return m_time_done;        }
-	inline long long getNoProgressFor()     const { return m_no_progress_for;  }
 
 	inline const std::string & getUserName()     const { return m_user_name;   }
 	inline const std::string & getHostName()     const { return m_host_name;   }
@@ -169,9 +168,6 @@ protected:
 	/// set in JobAf::refresh(): if job was not done, but now is done we set job header time_done
 	int64_t m_time_done;
 	
-	/// Time since the last progress of the job
-	int64_t m_no_progress_for;
-
 	/// Job hosts mask ( huntgroup ).
 	RegExp m_hosts_mask;
 	/// Job hosts exclude mask ( huntgroup ).
