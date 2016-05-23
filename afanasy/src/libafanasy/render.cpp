@@ -205,6 +205,8 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_int64_t( m_wol_operation_time,     msg);
 	  rw_String ( m_annotation,             msg);
 
+   case Msg::TRenderRegister:
+       
       if( msg->isWriting())
       {
 		 uint32_t taskscount = uint32_t(m_tasks.size());
@@ -218,8 +220,6 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
          rw_uint32_t( taskscount, msg);
 		 for( unsigned t = 0; t < taskscount; t++) m_tasks.push_back( new TaskExec( msg));
       }
-
-   case Msg::TRenderRegister:
 
 	  rw_String  ( m_engine,       msg);
 	  rw_String  ( m_name,         msg);

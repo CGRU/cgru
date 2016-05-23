@@ -34,7 +34,7 @@ public:
 	void restart( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
 
 	void skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
-
+	
 	virtual void v_appendLog( const std::string  & message);
 	inline const std::list<std::string> & getLog() { return m_logStringList; }
 

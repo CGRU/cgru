@@ -64,10 +64,10 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
         m_ss << Color::bold_grey   << "DEBUG  " << Color::nocolor;
         break;
     case Logger::LVERBOSE:
-        m_ss << Color::bold_white   << "VERBOSE" << Color::nocolor;
+        m_ss << Color::bold_white  << "VERBOSE" << Color::nocolor;
         break;
     case Logger::LINFO:
-        m_ss << Color::bold_white   << "INFO   " << Color::nocolor;
+        m_ss << Color::bold_white  << "INFO   " << Color::nocolor;
         break;
     case Logger::LWARNING:
         m_ss << Color::bold_yellow << "WARNING" << Color::nocolor;
@@ -85,10 +85,12 @@ Logger::Logger(const char *func, const char *file, int line, Logger::Level level
 	if( level == LDEBUG )
 	{
 		std::stringstream pos;
-		pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ") ";
+		pos << " (" << func << "():" << Logger::shorterFilename(file) << ":" << line << ")";
 		Logger::align(pos);
 		m_ss << Color::grey << pos.str() << Color::nocolor;
 	}
+	
+	m_ss << " ";
 
     switch( level) {
     case Logger::LDEBUG:   m_ss << Color::bold_grey;    break;

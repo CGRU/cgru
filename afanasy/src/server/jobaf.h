@@ -72,6 +72,9 @@ public:
 
 /// Update task state.
     virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
+     
+/// Reconnect running task
+    void reconnectTask(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Send tasks output to a specified address.
 	void listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task);
@@ -162,6 +165,12 @@ private:
 	void restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state = 0);
 
 	af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
+	
+	/**
+	 * @brief Emit events and submit them to the wall job
+	 * @param events: event types, e.g. JOB_DONE, JOB_ERROR or JOB_DELETED
+	 */
+	void emitEvents(std::vector<std::string> events);
 
 private:
 	static JobContainer * ms_jobs;          ///< Jobs container pointer.
