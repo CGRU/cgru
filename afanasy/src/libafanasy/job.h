@@ -47,6 +47,7 @@ public:
 	inline long long getTimeStarted()       const { return m_time_started;     }
 	inline long long getTimeWait()          const { return m_time_wait;        }
 	inline long long getTimeDone()          const { return m_time_done;        }
+	inline long long getNoProgressFor()     const { return m_no_progress_for;  }
 
 	inline const std::string & getUserName()     const { return m_user_name;   }
 	inline const std::string & getHostName()     const { return m_host_name;   }
@@ -56,6 +57,8 @@ public:
 	inline const std::string & getCustomData()   const { return m_custom_data; }
 	inline const std::string & getThumbPath()    const { return m_thumb_path;  }
 	inline const std::string & getReport()       const { return m_report;      }
+	inline const std::string & getProject()      const { return m_project;     }
+	inline const std::string & getDepartment()   const { return m_department;  }
 
 	const std::string getFolder() const;
 	inline const std::map<std::string,std::string> & getFolders() const { return m_folders; }
@@ -112,9 +115,6 @@ public:
 
 	/// Get block constant pointer.
 	inline BlockData* getBlock( int n) const { if(n<(m_blocks_num))return m_blocks_data[n];else return NULL;}
-
-	inline const std::string & getProject() const { return m_project; }
-	inline void setProject( const std::string & project) { m_project = project; }
 	
 	virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 
@@ -168,6 +168,9 @@ protected:
 
 	/// set in JobAf::refresh(): if job was not done, but now is done we set job header time_done
 	int64_t m_time_done;
+	
+	/// Time since the last progress of the job
+	int64_t m_no_progress_for;
 
 	/// Job hosts mask ( huntgroup ).
 	RegExp m_hosts_mask;
@@ -183,6 +186,8 @@ protected:
 	// Here are coming a couple of metadata just use for display
 	/// Project to which this job is associated
 	std::string m_project;
+	/// Department responsible for this job
+	std::string m_department;
 
 private:
 	void initDefaultValues();

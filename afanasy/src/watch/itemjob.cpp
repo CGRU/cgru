@@ -146,8 +146,9 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
    if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
    properties += QString(" p%2").arg( m_priority);
-	if( ppapproval )
-		properties += " PPA";
+   if( ppapproval ) properties += " PPA";
+   long long no_progress_for = job->getNoProgressFor();
+   if( no_progress_for != -1 ) properties += QString(" npf%1").arg( no_progress_for);
 
    user_eta = username;
    if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))

@@ -62,7 +62,8 @@ libafanasy/job.cpp):
         ...
     }
 
-    // Note: I'm not sure what this is for
+    // Note: I'm not sure what this is for, but it seems to be for variable
+    // size properties only
     int Job::v_calcWeight() const
     {
         ...

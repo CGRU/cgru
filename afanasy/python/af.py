@@ -655,6 +655,30 @@ class Job:
 		"""
 		self.data["description"] = value
 
+	def setProject(self, project):
+		"""Set the name of the project to which this job is related.
+		
+		:param project: Name of the project
+		"""
+		if project is not None and len(project):
+			self.data["project"] = project
+
+	def setDepartment(self, department):
+		"""Set the name of the department which submitted this job.
+		
+		:param department: Name of the department (compositing, modeling, etc.)
+		"""
+		if department is not None and len(department):
+			self.data["department"] = department
+
+	def setNoProgressFor(self, value):
+		"""Set the time since when this job did not progress
+
+		:param value: Time, in seconds
+		"""
+		if value > 0:
+			self.data["no_progress_for"] = value
+
 	def setWaitTime(self, value):
 		"""Missing DocString
 
@@ -782,14 +806,6 @@ class Job:
 		# this will only pass positive int		
 		if str(value).isdigit():
 			self.data['time_life'] = value
-
-	def setProject(self, project):
-		"""Set the name of the project to which this job is related.
-		
-		:param project: Name of the project
-		"""
-		if project is not None and len(project):
-			self.data["project"] = project
 
 
 class Cmd:
