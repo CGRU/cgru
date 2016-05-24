@@ -520,12 +520,19 @@ void ListRenders::setService( bool enable)
 	if( enable ) caption = "Enable " + caption; else caption = "Disable " + caption;
 
 	bool ok;
-	QString service = QInputDialog::getText(this, caption, "Enter Service Name", QLineEdit::Normal, QString(), &ok);
+	QString service_mask = QInputDialog::getText(this, caption, "Enter Service Name", QLineEdit::Normal, QString(), &ok);
 	if( !ok) return;
-
+	
+	QRegExp rx( service_mask, Qt::CaseInsensitive);
+	if( rx.isValid() == false )
+	{
+		displayError( rx.errorString());
+		return;
+	}
+	
 	std::ostringstream str;
 	af::jsonActionOperationStart( str, "renders", "service", "", getSelectedIds());
-	str << ",\n\"name\":\"" << afqt::qtos( service) << "\"";
+	str << ",\n\"name\":\"" << afqt::qtos( service_mask) << "\"";
 	str << ",\n\"enable\":" << ( enable ? "true": "false" );
 	af::jsonActionOperationFinish( str);
 	Watch::sendMsg( af::jsonMsg( str));

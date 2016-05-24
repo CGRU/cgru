@@ -4,6 +4,7 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/farm.h"
+#include "../libafanasy/regexp.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -351,10 +352,15 @@ void RenderAf::v_action( Action & i_action)
 			wolWake( i_action.monitors);
 		else if( type == "service")
 		{
-			std::string name; bool enable;
-			af::jr_string("name", name, operation);
+			af::RegExp service_mask; bool enable;
+			af::jr_regexp("name", service_mask, operation);
 			af::jr_bool("enable", enable, operation);
-			setService( name, enable);
+			for (int i = 0 ; i < m_host.getServicesNum() ; ++i)
+			{
+				std::string service = m_host.getServiceName(i);
+				if( service_mask.match( service))
+					setService( service, enable);
+			}
 		}
 		else if( type == "restore_defaults")
 		{
