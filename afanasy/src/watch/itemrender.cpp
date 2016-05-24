@@ -2,6 +2,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/taskexec.h"
+#include "../libafanasy/logger.h"
 
 #include "../libafqt/qenvironment.h"
 
