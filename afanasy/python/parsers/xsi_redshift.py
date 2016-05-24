@@ -35,25 +35,29 @@ class xsi_redshift(parser.parser):
 		if match is not None:
 			frame = True
 
-			
+
+		#print("cur frame " + str(self.frame))
+
+
+		# progress line?
+		match = re_percent.findall(data)
+		if len(match):
+			# get current block
+			block = float(match[0][2])
+			# get blockCount
+			blockCount = float(match[0][4])
+
+			# calculate percentage
+			percentframe = float(100/(blockCount/block))
+			self.percent = int(percentframe)
+			self.percentframe = int(percentframe)
+
+		self.calculate()
 
 		if frame:
 			if not self.firstframe:
 				self.frame += 1
 
 			self.firstframe = False
-		else:	
-			# progress line?
-			match = re_percent.findall(data)
-			if len(match):
-				# get current block
-				block = float(match[0][2])
-				# get blockCount
-				blockCount = float(match[0][4])
-				
-				# calculate percentage
-				percentframe = float(100/(blockCount/block))
-				self.percent = int(percentframe)
-				self.percentframe = int(percentframe)
-		
-		self.calculate()
+
+
