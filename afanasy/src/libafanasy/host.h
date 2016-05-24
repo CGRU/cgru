@@ -27,7 +27,7 @@ public:
 
 	/// TODO: check number and size
 	inline const std::string & getServiceName( int n) const { return m_services_names[n];}
-
+	
 	int32_t m_capacity;
 	int32_t m_max_tasks;
 	int32_t m_power;
@@ -60,19 +60,18 @@ public:
 
 	int32_t m_nimby_idle_netmbs;
 	int32_t m_nimby_busy_netmbs;
-
+	
 
 	void v_readwrite( Msg * msg); ///< Read or write Host in message.
 
 	void jsonWrite( std::ostringstream & o_str) const;
+	
+private:
+	void mergeParameters( const Host & other);
 
 private:
 	std::vector<std::string> m_services_names;
 	std::vector<int32_t> m_services_counts;
-
-	void mergeParameters( const Host & other);
-
-private:
 	int32_t m_services_num;
 };
 
@@ -144,6 +143,9 @@ public:
 
 	int32_t net_recv_kbsec;
 	int32_t net_send_kbsec;
+	
+	/// List of users currently logged in on a machine
+	std::vector<std::string> logged_in_users;
 
 	/// Generate information.
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;

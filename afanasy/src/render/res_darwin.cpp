@@ -28,6 +28,8 @@
 
 #include "../libafanasy/environment.h"
 
+#include <utmpx.h>
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -316,6 +318,32 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    {
       hres.hdd_rd_kbsec = hres.hdd_wr_kbsec = 0;
    }
+   
+   /*
+    * Users
+    */
+   // Is it hack to hardcoded these ignored names?
+   std::set<std::string> userignoreset;
+   userignoreset.insert("");
+   userignoreset.insert("reboot");
+   userignoreset.insert("runlevel");
+   userignoreset.insert("LOGIN");
+   // Use a set to efficiently avoid repetitions
+   std::set<std::string> userset;
+   setutxent();
+   struct utmpx *user;
+   while( (user = getutxent()) != NULL)
+   {
+       std::string username = user->ut_user;
+       if (userignoreset.count(username) == 0)
+          userset.insert(username);
+   }
+   endutxent();
+   
+   hres.logged_in_users.clear();
+   std::copy(userset.begin(),
+             userset.end(),
+             std::back_inserter(hres.logged_in_users));
 }
 
 static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write)

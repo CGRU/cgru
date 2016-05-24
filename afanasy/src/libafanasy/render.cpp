@@ -1,5 +1,6 @@
 #include "render.h"
 
+#include "logger.h"
 #include "address.h"
 #include "environment.h"
 #include "msg.h"
@@ -326,15 +327,15 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		stream << std::endl;
 		m_host.v_generateInfoStream( stream, full);
 
-	  if( m_netIFs.size())
-      {
-         stream << "\nNetwork Interfaces:";
-		 for( int i = 0; i < m_netIFs.size(); i++)
-         {
-            stream << "\n   ";
-			m_netIFs[i]->v_generateInfoStream( stream, true);
-         }
-      }
+		if( m_netIFs.size())
+		{
+			stream << "\nNetwork Interfaces:";
+			for( int i = 0; i < m_netIFs.size(); i++)
+			{
+				stream << "\n   ";
+				m_netIFs[i]->v_generateInfoStream( stream, true);
+			}
+		}
 
 		m_hres.v_generateInfoStream( stream ,full);
    }
