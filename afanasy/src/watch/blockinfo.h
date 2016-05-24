@@ -84,6 +84,7 @@ private:
 	int errors_avoidhost;
 	int errors_tasksamehost;
 	int errors_forgivetime;
+	int task_progress_change_timeout;
 	uint32_t tasksmaxruntime;
 
 	char progress[AFJOB::ASCII_PROGRESS_LENGTH];
