@@ -26,6 +26,7 @@ public:
 	inline bool isBusy()          const { return m_busy;             }
 	inline bool isNimby()         const { return m_nimby;            }
 	inline bool isNIMBY()         const { return m_NIMBY;            }
+	inline bool isSuperNimby()    const { return m_super_nimby;      }
 	inline bool isDirty()         const { return m_dirty;            }
 	inline bool isWOLFalling()    const { return m_wolFalling;       }
 	inline bool isWOLSleeping()   const { return m_wolSleeping;      }
@@ -73,6 +74,7 @@ private:
 	bool m_busy;
 	bool m_NIMBY;
 	bool m_nimby;
+	bool m_super_nimby;
 	bool m_dirty;
 	bool m_wolFalling;
 	bool m_wolSleeping;

@@ -20,13 +20,14 @@ public:
 
    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-	inline bool isOnline()  const { return (m_state & SOnline ); }///< Whether Render is online.
-	inline bool isBusy()    const { return (m_state & SBusy   ); }///< Whether Render is busy.
-	inline bool isNIMBY()   const { return (m_state & SNIMBY  ); }///< Whether Render is NIMBY.
-	inline bool isNimby()   const { return (m_state & Snimby  ); }///< Whether Render is nimby.
-	inline bool isFree()    const { return (((~m_state) & SNIMBY) && ((~m_state) & Snimby));}///< Whether Render is free.
-	inline bool isOffline() const { return false == (m_state & SOnline );}///< Whether Render is offline.
-	inline bool isDirty()   const { return m_state & SDirty;}  ///< Whether Render is dirty.
+	inline bool isOnline()     const { return (m_state & SOnline    ); }///< Whether Render is online.
+	inline bool isBusy()       const { return (m_state & SBusy      ); }///< Whether Render is busy.
+	inline bool isNIMBY()      const { return (m_state & SNIMBY     ); }///< Whether Render is NIMBY.
+	inline bool isNimby()      const { return (m_state & Snimby     ); }///< Whether Render is nimby.
+	inline bool isSuperNimby() const { return (m_state & SSuperNimby); }///< Whether Render is super-nimby.
+	inline bool isFree()       const { return false == (isNIMBY() || isNimby() || isSuperNimby()); }///< Whether Render is free.
+	inline bool isOffline()    const { return false == (m_state & SOnline );}///< Whether Render is offline.
+	inline bool isDirty()      const { return m_state & SDirty;}  ///< Whether Render is dirty.
 
 	inline bool isWOLFalling()     const { return m_state & SWOLFalling;  }
 	inline bool isWOLSleeping()    const { return m_state & SWOLSleeping; }
@@ -48,6 +49,7 @@ public:
    inline bool isReady() const { return (
 			( m_state & SOnline ) &&
 			( false == ( m_state & SNIMBY )) &&
+			( false == ( m_state & SSuperNimby )) &&
 			( m_priority > 0 ) &&
 			( m_capacity_used < getCapacity() ) &&
 			( (int)m_tasks.size() < getMaxTasks() ) &&
@@ -74,6 +76,7 @@ public:
 	/// Set Nimby 
 	inline void setNIMBY() { m_state = m_state | SNIMBY; m_state = m_state & (~Snimby); m_idle_time = time(NULL); }
 	inline void setNimby() { m_state = m_state | Snimby; m_state = m_state & (~SNIMBY); m_idle_time = time(NULL); }
+	inline void setSuperNimby(bool set) { m_state = set ? m_state | SSuperNimby : m_state & (~SSuperNimby); }
 	// if not to set idle time and to current, idle host with 'nimby_idlefree_time' will be set to free immediately
 
    inline void setOnline()  { m_state = m_state |   SOnline ; m_wol_operation_time = time(NULL);}
@@ -108,7 +111,8 @@ public:
 		SDirty       = 1ULL << 4,
 		SWOLFalling  = 1ULL << 5,
 		SWOLSleeping = 1ULL << 6,
-		SWOLWaking   = 1ULL << 7
+		SWOLWaking   = 1ULL << 7,
+		SSuperNimby  = 1ULL << 8, ///< Super Nimby mode (or "paused" in the UI) is a nimby mode that cannot be left automatically
 	};
 
 protected:

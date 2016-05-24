@@ -160,7 +160,7 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int32 ("max_tasks",   m_max_tasks,   i_object, io_changes);
 	checkDirty();
 
-	bool nimby, NIMBY;
+	bool nimby, NIMBY, superNimby;
 	if( jr_bool("nimby", nimby, i_object, io_changes))
 	{
 		if( nimby ) setNimby();
@@ -170,6 +170,10 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	{
 		if( NIMBY ) setNIMBY();
 		else setFree();
+	}
+	if( jr_bool("super-nimby", superNimby, i_object, io_changes))
+	{
+		setSuperNimby( superNimby);
 	}
 
 	// Paramers below are not editable and read only on creation
@@ -307,6 +311,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isBusy()) stream << " Busy";
 		if( isNimby()) stream << " (nimby)";
 		if( isNIMBY()) stream << " (NIMBY)";
+		if( isSuperNimby()) stream << " (Paused)";
 		if( isWOLFalling()) stream << " WOL-Falling";
 		if( isWOLSleeping()) stream << " WOL-Sleeping";
 		if( isWOLWaking()) stream << " WOL-Waking";
@@ -349,9 +354,10 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isWOLSleeping()) stream << " WSL"; else stream << "    ";
 		if( isWOLWaking())   stream << " WWK"; else stream << "    ";
 
-		if( isNimby())      stream << " n";
-		else if( isNIMBY()) stream << " N";
-		else                stream << "  ";
+		if( isNimby())           stream << " n";
+		else if( isNIMBY())      stream << " N";
+		else if( isSuperNimby()) stream << " P";
+		else                     stream << "  ";
 
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
 /*
