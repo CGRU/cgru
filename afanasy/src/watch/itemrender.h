@@ -31,6 +31,14 @@ public:
 	inline bool isWOLSleeping()   const { return m_wolSleeping;      }
 	inline bool isWOLWaking()     const { return m_wolWaking;        }
 	inline bool hasTasks()        const { return m_tasks.size() > 0; }
+	
+	inline std::list<const af::TaskExec*> getTasks() const
+	{
+		std::list<const af::TaskExec*> l;
+		for (std::list<af::TaskExec*>::const_iterator it = m_tasks.begin() ; it != m_tasks.end() ; ++it)
+			l.push_back(*it);
+		return l;
+	}
 
 	bool calcHeight();
 

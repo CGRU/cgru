@@ -16,6 +16,7 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
+#include "monitorhost.h"
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
@@ -198,6 +199,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 	QMenu menu(this);
 	QAction *action;
+	QMenu * submenu;
 
 	if( selectedItemsCount <= 1 )
 	{
@@ -218,6 +220,30 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Show Info", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestInfo() ));
 	menu.addAction( action);
+	
+	submenu = new QMenu( "Show Running Task", this);
+	submenu->setEnabled( render->hasTasks());
+
+	std::list<const af::TaskExec*> l = render->getTasks();
+	std::list<const af::TaskExec*>::const_iterator it;
+	for (it = l.begin() ; it != l.end() ; ++it)
+	{
+		const af::TaskExec *task = *it;
+		QString title = QString("%1[%2][%3]")
+		                .arg( QString::fromStdString(task->getJobName()))
+		                .arg( QString::fromStdString(task->getBlockName()))
+		                .arg( QString::fromStdString(task->getName()));
+		action = new ActionIdIdId( task->getJobId(),
+		                           task->getBlockNum(),
+		                           task->getTaskNum(),
+		                           title,
+		                           this);
+		connect( action, SIGNAL( triggeredId(int,int,int) ),
+				 this, SLOT( actRequestTaskInfo(int,int,int) ));
+		submenu->addAction( action);
+	}
+	
+	menu.addMenu( submenu);
 
 	if( me || af::Environment::VISOR())
 	{
@@ -266,7 +292,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 		menu.addSeparator();
 
-		QMenu * submenu = new QMenu( "Eject", this);
+		submenu = new QMenu( "Eject", this);
 
 		action = new QAction( "All Tasks", this);
 		if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
@@ -323,7 +349,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 	menu.addSeparator();
 
-	QMenu * submenu = new QMenu("Administrate", this);
+	submenu = new QMenu("Administrate", this);
 	menu.addMenu( submenu);
 /*
 	action = new QAction("Set Hidden", this);
@@ -507,8 +533,24 @@ void ListRenders::actWOLWake()         { operation("wol_wake"); }
 void ListRenders::actRestoreDefaults() { operation("restore_defaults"); }
 
 void ListRenders::actRequestLog()      { getItemInfo("log"); }
-void ListRenders::actRequestTasksLog( ){ getItemInfo("tasks_log"); }
+void ListRenders::actRequestTasksLog() { getItemInfo("tasks_log"); }
 void ListRenders::actRequestInfo()     { getItemInfo("full"); }
+
+void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
+{
+	const std::string mode = "info";
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\"";
+	str << ",\"mode\":\"" << mode << "\"";
+	str << ",\"ids\":[" << jid << "]";
+	str << ",\"block_ids\":[" << bnum << "]";
+	str << ",\"task_ids\":[" << tnum << "]";
+	str << ",\"mon_id\":" << MonitorHost::id();
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	Watch::sendMsg( msg);
+}
 
 void ListRenders::actEnableService()  { setService( true );}
 void ListRenders::actDisableService() { setService( false);}
