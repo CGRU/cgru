@@ -535,40 +535,26 @@ void ListTasks::setWindowTitleProgress()
 void ListTasks::actTasksSkip()    { tasksOpeation("skip"); }
 void ListTasks::actTasksRestart() { tasksOpeation("restart"); }
 
-void ListTasks::actTaskLog()        { getTaskInfo("log");}
-void ListTasks::actTaskInfo()       { getTaskInfo("info");}
-void ListTasks::actTaskErrorHosts() { getTaskInfo("error_hosts");}
-void ListTasks::actTaskStdOut( int i_number ) { getTaskInfo("output", i_number);}
+void ListTasks::actTaskLog()        { getCurrentTaskInfo("log");}
+void ListTasks::actTaskInfo()       { getCurrentTaskInfo("info");}
+void ListTasks::actTaskErrorHosts() { getCurrentTaskInfo("error_hosts");}
+void ListTasks::actTaskStdOut( int i_number ) { getCurrentTaskInfo("output", i_number);}
 
-void ListTasks::getTaskInfo( const std::string & i_mode, int i_number, Item * item)
+void ListTasks::getCurrentTaskInfo( const std::string & i_mode, int i_number)
 {
 //{"get":{"type":"jobs","mode":"files","ids":[2],"block_ids":[0],"task_ids":[3],"binary":true}}
 //{"get":{"type":"jobs","ids":[2],"mode":"output","number":11,"block_ids":[0],"task_ids":[4]}}
-	if( item == NULL) item = getCurrentItem();
-	if( item->getId() != ItemJobTask::ItemId )
-		return;
-
-	ItemJobTask *itemTask = (ItemJobTask*)item;
-
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\"";
-	str << ",\"mode\":\"" << i_mode << "\"";
-	str << ",\"ids\":[" << m_job_id << "]";
-	str << ",\"block_ids\":[" << itemTask->getBlockNum() << "]";
-	str << ",\"task_ids\":[" << itemTask->getTaskNum() << "]";
-	if( i_number != -1 )
-		str << ",\"number\":" << i_number;
-	str << ",\"mon_id\":" << MonitorHost::id();
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg( str);
-	Watch::sendMsg( msg);
+	ItemJobTask *itemTask = static_cast<ItemJobTask*>(getCurrentItem());
+	getTaskInfo(m_job_id, itemTask->getBlockNum(), itemTask->getTaskNum(), i_mode, i_number);
 }
 
 void ListTasks::doubleClicked( Item * item)
 {
 	if( item->getId() == ItemJobTask ::ItemId )
-		getTaskInfo("info", -1, item);
+	{
+		ItemJobTask *itemTask = (ItemJobTask*)item;
+		getTaskInfo(m_job_id, itemTask->getBlockNum(), itemTask->getTaskNum(), "info");
+	}
 	else if( item->getId() == ItemJobBlock::ItemId )
 	{
 		ItemJobBlock * block = (ItemJobBlock*)item;
@@ -870,5 +856,22 @@ bool ListTasks::v_filesReceived( const af::MCTaskUp & i_taskup )
 	m_tasks[i_taskup.getNumBlock()][i_taskup.getNumTask()]->taskFilesReceived( i_taskup);
 
 	return true;
+}
+
+void ListTasks::getTaskInfo(int i_job_id, int i_block_num, int i_task_num, const std::string &i_mode, int i_number)
+{
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\"";
+	str << ",\"mode\":\"" << i_mode << "\"";
+	str << ",\"ids\":[" << i_job_id << "]";
+	str << ",\"block_ids\":[" << i_block_num << "]";
+	str << ",\"task_ids\":[" << i_task_num << "]";
+	if( i_number != -1 )
+		str << ",\"number\":" << i_number;
+	str << ",\"mon_id\":" << MonitorHost::id();
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	Watch::sendMsg( msg);
 }
 

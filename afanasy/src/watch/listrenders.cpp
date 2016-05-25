@@ -16,7 +16,7 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
-#include "monitorhost.h"
+#include "listtasks.h"
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
@@ -553,18 +553,7 @@ void ListRenders::actRequestInfo()     { getItemInfo("full"); }
 
 void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 {
-	const std::string mode = "info";
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\"";
-	str << ",\"mode\":\"" << mode << "\"";
-	str << ",\"ids\":[" << jid << "]";
-	str << ",\"block_ids\":[" << bnum << "]";
-	str << ",\"task_ids\":[" << tnum << "]";
-	str << ",\"mon_id\":" << MonitorHost::id();
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg( str);
-	Watch::sendMsg( msg);
+	ListTasks::getTaskInfo(jid, bnum, tnum, "info");
 }
 
 void ListRenders::actEnableService()  { setService( true );}
