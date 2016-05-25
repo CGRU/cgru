@@ -59,44 +59,45 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 	case af::Msg::TJobsList:
 	case af::Msg::TBlocks:
 	case af::Msg::TBlocksProperties:
-		multihost            = block->isMultiHost();
-		multihost_samemaster = block->canMasterRunOnSlaveHost();
-		varcapacity          = block->canVarCapacity();
-		numeric              = block->isNumeric();
+		multihost                    = block->isMultiHost();
+		multihost_samemaster         = block->canMasterRunOnSlaveHost();
+		varcapacity                  = block->canVarCapacity();
+		numeric                      = block->isNumeric();
 
-		frame_first          = block->getFrameFirst();
-		frame_last           = block->getFrameLast();
-		frame_pertask        = block->getFramePerTask();
-		frame_inc            = block->getFrameInc();
-		sequential           = block->getSequential();
+		frame_first                  = block->getFrameFirst();
+		frame_last                   = block->getFrameLast();
+		frame_pertask                = block->getFramePerTask();
+		frame_inc                    = block->getFrameInc();
+		sequential                   = block->getSequential();
 
-		tasksnum             = block->getTasksNum();
-		tasksmaxruntime      = block->getTasksMaxRunTime();
-		errors_retries       = block->getErrorsRetries();
-		errors_avoidhost     = block->getErrorsAvoidHost();
-		errors_tasksamehost  = block->getErrorsTaskSameHost();
-		errors_forgivetime   = block->getErrorsForgiveTime();
-		maxrunningtasks      = block->getMaxRunningTasks();
-		maxruntasksperhost   = block->getMaxRunTasksPerHost();
-		need_memory          = block->getNeedMemory();
-		need_power           = block->getNeedPower();
-		need_hdd             = block->getNeedHDD();
-		need_properties      = afqt::stoq( block->getNeedProperties());
-		hostsmask            = afqt::stoq(block->getHostsMask());
-		hostsmask_exclude    = afqt::stoq(block->getHostsMaskExclude());
-		need_properties      = afqt::stoq(block->getNeedProperties());
-		dependmask           = afqt::stoq(block->getDependMask());
-		tasksdependmask      = afqt::stoq(block->getTasksDependMask());
-		capacity             = block->getCapacity();
-		filesize_min         = block->getFileSizeMin();
-		filesize_max         = block->getFileSizeMax();
-		capcoeff_min         = block->getCapCoeffMin();
-		capcoeff_max         = block->getCapCoeffMax();
-		multihost_min        = block->getMultiHostMin();
-		multihost_max        = block->getMultiHostMax();
-		multihost_waitmax    = block->getMultiHostWaitMax();
-		multihost_waitsrv    = block->getMultiHostWaitSrv();
-		service              = afqt::stoq( block->getService());
+		tasksnum                     = block->getTasksNum();
+		tasksmaxruntime              = block->getTasksMaxRunTime();
+		errors_retries               = block->getErrorsRetries();
+		errors_avoidhost             = block->getErrorsAvoidHost();
+		errors_tasksamehost          = block->getErrorsTaskSameHost();
+		errors_forgivetime           = block->getErrorsForgiveTime();
+		task_progress_change_timeout = block->getTaskProgressChangeTimeout();
+		maxrunningtasks              = block->getMaxRunningTasks();
+		maxruntasksperhost           = block->getMaxRunTasksPerHost();
+		need_memory                  = block->getNeedMemory();
+		need_power                   = block->getNeedPower();
+		need_hdd                     = block->getNeedHDD();
+		need_properties              = afqt::stoq( block->getNeedProperties());
+		hostsmask                    = afqt::stoq(block->getHostsMask());
+		hostsmask_exclude            = afqt::stoq(block->getHostsMaskExclude());
+		need_properties              = afqt::stoq(block->getNeedProperties());
+		dependmask                   = afqt::stoq(block->getDependMask());
+		tasksdependmask              = afqt::stoq(block->getTasksDependMask());
+		capacity                     = block->getCapacity();
+		filesize_min                 = block->getFileSizeMin();
+		filesize_max                 = block->getFileSizeMax();
+		capcoeff_min                 = block->getCapCoeffMin();
+		capcoeff_max                 = block->getCapCoeffMax();
+		multihost_min                = block->getMultiHostMin();
+		multihost_max                = block->getMultiHostMax();
+		multihost_waitmax            = block->getMultiHostWaitMax();
+		multihost_waitsrv            = block->getMultiHostWaitSrv();
+		service                      = afqt::stoq( block->getService());
 
 
 		depends.clear();
@@ -212,6 +213,8 @@ void BlockInfo::refresh()
 	str_params += " [";
 	if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
 	str_params += QString("%1]").arg( capacity);
+	
+	if( task_progress_change_timeout != -1) str_params += QString(" npf%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 
 
 	// Progress:
@@ -487,6 +490,10 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
 	action = new ActionIdString( id_block, "errors_forgive_time", "Set Errors Forgive time", qwidget);
 	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
 	menu->addAction( action);
+	
+	action = new ActionIdString( id_block, "task_progress_change_timeout", "Set Task Progress Change Timeout", qwidget);
+	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
+	menu->addAction( action);
 
 	menu->addSeparator();
 
@@ -630,6 +637,14 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 		if( id_block == blocknum ) cur = double(errors_forgivetime) / (60*60);
 		double hours = QInputDialog::getDouble( listitems, "Set Errors forgive time", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
 		set_number = int( hours * 60*60 );
+	}
+	else if( i_action == "task_progress_change_timeout" )
+	{
+		double cur = 0;
+		if( id_block == blocknum ) cur = double(task_progress_change_timeout) / (60*60);
+		double hours = QInputDialog::getDouble( listitems, "Set Task Progress Change Timeout", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
+		set_number = int( hours * 60*60 );
+		if( set_number <= 0) set_number = -1;
 	}
 	else if( i_action == "tasks_max_run_time" )
 	{

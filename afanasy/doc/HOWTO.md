@@ -5,8 +5,8 @@ This document is a cheat sheet where to quickly log useful development
 information.
 
 
-Adding a new property to job/block/task object
-----------------------------------------------
+Adding a new property to job object
+-----------------------------------
 
 Note: I wrote this guide while adding the `project` attribute to jobs, so
 assuming that it did not get other use since then, you may simply follow the
@@ -142,3 +142,23 @@ property in the `ItemJob` in `updateValues()` first:
         ...
     }
 
+
+Adding a new property to render object
+--------------------------------------
+
+There are of course a lot of similarities with adding a property to a job. I
+will only detail the differences. First, replace "job" by "render" in file paths
+and class names.
+
+Adding the property, the getter (and maybe setter) does not change. The I/O
+methods are quite the same as well.
+
+Actually, the main think to check is whether the property you want to add really
+beyond to `Render` or if it wouldn't be more appropriate to put it in `Host` or
+`HostRes`. The former are for static properties, which do not change often or
+are set through `farm.json`, while the latter is for dynamic properties,
+regularly refreshed.
+
+In `Host`, don't forget to add your property to `mergeParameters(...)`.
+
+In `HostRes`, don't forget to add your property to `copy(...)`.

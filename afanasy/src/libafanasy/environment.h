@@ -118,6 +118,7 @@ public:
 	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
 	static inline int getTaskStopTimeout()               { return task_stop_timeout;            }
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
+	static inline int getTaskProgressChangeTimeout()     { return task_progress_change_timeout; }
 
 	/// Task solving options
 	static inline bool getSolvingUseUserPriority() { return solving_use_user_priority; }
@@ -276,6 +277,7 @@ private:
 	static int task_stop_timeout;
 	static int task_default_capacity;
 	static int task_log_linesmax;
+	static int task_progress_change_timeout; ///< If task progress did not change within this time, consider that it is erroneous
 
 	/// Task solving options
 	static bool solving_use_user_priority;  ///< Whether task solving takes user priority into account or not

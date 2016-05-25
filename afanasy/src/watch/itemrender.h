@@ -21,17 +21,25 @@ public:
 	bool setSortType(   int type );
 	bool setFilterType( int type );
 
-	inline bool isOnline()      const { return m_online;           }
-	inline bool isOffline()     const { return false == m_online;  }
-	inline bool isBusy()        const { return m_busy;             }
-	inline bool isNimby()       const { return m_nimby;            }
-	inline bool isNIMBY()       const { return m_NIMBY;            }
-	inline bool isPaused()      const { return m_paused;           }
-	inline bool isDirty()       const { return m_dirty;            }
-	inline bool isWOLFalling()  const { return m_wolFalling;       }
-	inline bool isWOLSleeping() const { return m_wolSleeping;      }
-	inline bool isWOLWaking()   const { return m_wolWaking;        }
-	inline bool hasTasks()      const { return m_tasks.size() > 0; }
+	inline bool isOnline()        const { return m_online;           }
+	inline bool isOffline()       const { return false == m_online;  }
+	inline bool isBusy()          const { return m_busy;             }
+	inline bool isNimby()         const { return m_nimby;            }
+	inline bool isNIMBY()         const { return m_NIMBY;            }
+	inline bool isPaused()        const { return m_paused;           }
+	inline bool isDirty()         const { return m_dirty;            }
+	inline bool isWOLFalling()    const { return m_wolFalling;       }
+	inline bool isWOLSleeping()   const { return m_wolSleeping;      }
+	inline bool isWOLWaking()     const { return m_wolWaking;        }
+	inline bool hasTasks()        const { return m_tasks.size() > 0; }
+	
+	inline std::list<const af::TaskExec*> getTasks() const
+	{
+		std::list<const af::TaskExec*> l;
+		for (std::list<af::TaskExec*>::const_iterator it = m_tasks.begin() ; it != m_tasks.end() ; ++it)
+			l.push_back(*it);
+		return l;
+	}
 
 	bool calcHeight();
 

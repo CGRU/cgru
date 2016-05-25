@@ -45,7 +45,7 @@ def afRender( scene, start, end, step, simulate, renderPass = '', attr = '', val
                outfile = os.path.join( outfile, str(value))
                if not os.path.isdir( outfile): os.makedirs( outfile)
                outfile = os.path.join( outfile, os.path.basename( fbpath))
-               log('Path chnaged: ' + outfile)
+               log('Path changed: ' + outfile)
                Application.SetValue("Passes.%s.%s.Filename" % (renderPass, fb.Name), outfile)
       if changeRenderOptionsOutputDir:
          outdir = Application.GetValue('Passes.RenderOptions.ResolvedOutputDir')

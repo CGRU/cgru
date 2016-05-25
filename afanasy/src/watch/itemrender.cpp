@@ -2,6 +2,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/taskexec.h"
+#include "../libafanasy/logger.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -512,13 +513,20 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 		return;
 	}
+	
+	QString users = "";
+	for (int i = 0 ; i < m_hres.logged_in_users.size() ; ++i)
+	{
+		if ( i ) users += ",";
+		users += QString::fromStdString(m_hres.logged_in_users[i]);
+	}
 
 	switch( ListRenders::getDisplaySize() )
 	{
 	case ListRenders::ESMallSize:
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + m_engine);
+	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + users + ' ' + m_engine);
 
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -536,9 +544,9 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage);
+	    painter->drawText( left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
 	}
-
+	
 	// Print Bottom|Right
 	// busy/free time for big displays or annotation+users for normal
 	switch( ListRenders::getDisplaySize() )

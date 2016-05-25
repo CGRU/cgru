@@ -17,11 +17,12 @@ namespace AFJOB
 	const char BLOCK_DEFAULT_PARSER[]   = "none";
 	const char TASK_DEFAULT_NAME[]      = "task";
 
-	const int SERVE_TASKS_SPEED     = -1;   ///< Unlimited
-	const int TASK_DEFAULT_CAPACITY = 1000;
-	const int TASK_UPDATE_TIMEOUT   = 30;   ///< Seconds for task to have no update to produce error.
-	const int TASK_STOP_TIMEOUT     = 30;   ///< Time after running task was asked to stop, it become not running itself.
-	const int TASK_LOG_LINESMAX     = 100;  ///< Maximum number of lines in task log.
+	const int SERVE_TASKS_SPEED            = -1;   ///< Unlimited
+	const int TASK_DEFAULT_CAPACITY        = 1000;
+	const int TASK_UPDATE_TIMEOUT          = 30;   ///< Seconds for task to have no update to produce error.
+	const int TASK_STOP_TIMEOUT            = 30;   ///< Time after running task was asked to stop, it become not running itself.
+	const int TASK_LOG_LINESMAX            = 100;  ///< Maximum number of lines in task log.
+	const int TASK_PROGRESS_CHANGE_TIMEOUT = -1;   ///< If task progress did not change within this time, consider that it is erroneous
 
 	const bool SOLVING_USE_USER_PRIORITY = true; ///< Whether task solving takes user priority into account or not
 	const bool SOLVING_SIMPLER = false; ///< Sort jobs by priority and creation time instead of using the "Need"

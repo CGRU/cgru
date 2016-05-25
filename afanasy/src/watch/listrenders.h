@@ -3,6 +3,7 @@
 #include "listnodes.h"
 
 #include "../libafanasy/msg.h"
+#include "../libafanasy/taskexec.h"
 
 class QItemSelection;
 
@@ -51,6 +52,7 @@ private slots:
 	void actRequestLog();
 	void actRequestTasksLog();
 	void actRequestInfo();
+	void actRequestTaskInfo(int jid, int bnum, int tnum);
 	void actEnableService();
 	void actDisableService();
 	void actRestoreDefaults();

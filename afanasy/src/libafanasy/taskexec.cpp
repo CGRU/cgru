@@ -191,14 +191,11 @@ void TaskExec::v_readwrite( Msg * msg)
 	case Msg::TRenderEvents:
 	case Msg::TRenderRegister:
 	case Msg::TTask:
-		rw_int32_t ( m_job_id,            msg);
-		rw_int32_t ( m_block_num,         msg);
 		rw_int64_t ( m_flags,             msg);
 		rw_int64_t ( m_block_flags,       msg);
 		rw_int64_t ( m_job_flags,         msg);
 		rw_int64_t ( m_user_flags,        msg);
 		rw_int64_t ( m_render_flags,      msg);
-		rw_int32_t ( m_task_num,          msg);
 		rw_int64_t ( m_frames_num,        msg);
 		rw_int64_t ( m_frame_start,       msg);
 		rw_int64_t ( m_frame_finish,      msg);
@@ -231,6 +228,10 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_int32_t ( m_capacity,          msg);
 		rw_int32_t ( m_capacity_coeff,    msg);
 		rw_int64_t ( m_time_start,        msg);
+		
+		rw_int32_t ( m_job_id,            msg);
+		rw_int32_t ( m_block_num,         msg);
+		rw_int32_t ( m_task_num,          msg);
 
 	break;
 
