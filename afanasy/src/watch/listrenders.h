@@ -54,8 +54,8 @@ private slots:
 	void actEnableService();
 	void actDisableService();
 	void actRestoreDefaults();
-	void actSetSuperNimby();
-	void actUnsetSuperNimby();
+	void actSetPaused();
+	void actUnsetPaused();
 	void actLaunchCmd();
 	void actLaunchCmdExit();
 

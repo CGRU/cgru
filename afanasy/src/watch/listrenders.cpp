@@ -327,10 +327,10 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	menu.addMenu( submenu);
 
 	action = new QAction("Set Paused", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actSetSuperNimby() ));
+	connect( action, SIGNAL( triggered() ), this, SLOT( actSetPaused() ));
 	submenu->addAction( action);
 	action = new QAction("Unset Paused", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetSuperNimby() ));
+	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetPaused() ));
 	submenu->addAction( action);
 
 	submenu->addSeparator();
@@ -479,11 +479,11 @@ void ListRenders::actMaxTasks()
 	setParameter("max_tasks", max_tasks);
 }
 
-void ListRenders::actNIMBY()           { setParameter("NIMBY",       "true",  false); }
-void ListRenders::actNimby()           { setParameter("nimby",       "true",  false); }
-void ListRenders::actFree()            { setParameter("nimby",       "false", false); }
-void ListRenders::actSetSuperNimby()   { setParameter("super-nimby", "true",  false); }
-void ListRenders::actUnsetSuperNimby() { setParameter("super-nimby", "false", false); }
+void ListRenders::actNIMBY()       { setParameter("NIMBY",  "true",  false); }
+void ListRenders::actNimby()       { setParameter("nimby",  "true",  false); }
+void ListRenders::actFree()        { setParameter("nimby",  "false", false); }
+void ListRenders::actSetPaused()   { setParameter("paused", "true",  false); }
+void ListRenders::actUnsetPaused() { setParameter("paused", "false", false); }
 
 void ListRenders::actUser()
 {
