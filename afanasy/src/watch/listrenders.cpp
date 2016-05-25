@@ -351,16 +351,16 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu = new QMenu("Administrate", this);
 	menu.addMenu( submenu);
-/*
-	action = new QAction("Set Hidden", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+
+	action = new QAction("Set Paused", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actSetPaused() ));
 	submenu->addAction( action);
-	action = new QAction("Unset Hidden", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+	action = new QAction("Unset Paused", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetPaused() ));
 	submenu->addAction( action);
 
 	submenu->addSeparator();
-*/
+
 	action = new QAction("Launch Command", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLaunchCmd() ));
 	if( selectedItemsCount == 1) action->setEnabled( render->isOnline());
@@ -508,8 +508,8 @@ void ListRenders::actMaxTasks()
 void ListRenders::actNIMBY()       { setParameter("NIMBY",  "true",  false); }
 void ListRenders::actNimby()       { setParameter("nimby",  "true",  false); }
 void ListRenders::actFree()        { setParameter("nimby",  "false", false); }
-void ListRenders::actSetHidden()   { setParameter("hidden", "true",  false); }
-void ListRenders::actUnsetHidden() { setParameter("hidden", "false", false); }
+void ListRenders::actSetPaused()   { setParameter("paused", "true",  false); }
+void ListRenders::actUnsetPaused() { setParameter("paused", "false", false); }
 
 void ListRenders::actUser()
 {

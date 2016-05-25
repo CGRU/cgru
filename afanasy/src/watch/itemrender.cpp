@@ -265,8 +265,13 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 	    m_NIMBY = render->isNIMBY();
 	    m_nimby = render->isNimby();
+		m_paused = render->isPaused();
 
-	    if( m_NIMBY )
+		if( m_paused )
+		{
+			 m_state = "(" + m_username + ")P";
+		}
+		else if( m_NIMBY )
 		{
 	         m_state = "(" + m_username + ")N";
 		}
@@ -408,7 +413,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
 	if     ( m_online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
-	else if( m_NIMBY || m_nimby  ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
+	else if( m_NIMBY || m_nimby || m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
 	else if( m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
 
 	// Draw standart backgroud
@@ -478,7 +483,11 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	}
 	else
 	{
-	    if( m_NIMBY )
+		if( m_paused )
+		{
+			ann_state = "Paused" + ann_state;
+		}
+	    else if( m_NIMBY )
 		{
 			ann_state = "NIMBY" + ann_state;
 		}

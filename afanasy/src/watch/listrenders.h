@@ -56,8 +56,8 @@ private slots:
 	void actEnableService();
 	void actDisableService();
 	void actRestoreDefaults();
-	void actSetHidden();
-	void actUnsetHidden();
+	void actSetPaused();
+	void actUnsetPaused();
 	void actLaunchCmd();
 	void actLaunchCmdExit();
 
