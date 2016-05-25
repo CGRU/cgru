@@ -221,29 +221,44 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestInfo() ));
 	menu.addAction( action);
 	
-	submenu = new QMenu( "Show Running Task", this);
-	submenu->setEnabled( render->hasTasks());
-
 	std::list<const af::TaskExec*> l = render->getTasks();
-	std::list<const af::TaskExec*>::const_iterator it;
-	for (it = l.begin() ; it != l.end() ; ++it)
+	if( l.size() == 1)
 	{
-		const af::TaskExec *task = *it;
-		QString title = QString("%1[%2][%3]")
-		                .arg( QString::fromStdString(task->getJobName()))
-		                .arg( QString::fromStdString(task->getBlockName()))
-		                .arg( QString::fromStdString(task->getName()));
+		const af::TaskExec *task = l.front();
 		action = new ActionIdIdId( task->getJobId(),
 		                           task->getBlockNum(),
 		                           task->getTaskNum(),
-		                           title,
+		                           "Running Task",
 		                           this);
 		connect( action, SIGNAL( triggeredId(int,int,int) ),
-				 this, SLOT( actRequestTaskInfo(int,int,int) ));
-		submenu->addAction( action);
+		         this, SLOT( actRequestTaskInfo(int,int,int) ));
+		menu.addAction( action);
 	}
+	else if( l.size() > 1)
+	{
+		submenu = new QMenu( "Running Tasks", this);
+		submenu->setEnabled( render->hasTasks());
 	
-	menu.addMenu( submenu);
+		std::list<const af::TaskExec*>::const_iterator it;
+		for (it = l.begin() ; it != l.end() ; ++it)
+		{
+			const af::TaskExec *task = *it;
+			QString title = QString("%1[%2][%3]")
+			                .arg( QString::fromStdString(task->getJobName()))
+			                .arg( QString::fromStdString(task->getBlockName()))
+			                .arg( QString::fromStdString(task->getName()));
+			action = new ActionIdIdId( task->getJobId(),
+			                           task->getBlockNum(),
+			                           task->getTaskNum(),
+			                           title,
+			                           this);
+			connect( action, SIGNAL( triggeredId(int,int,int) ),
+			         this, SLOT( actRequestTaskInfo(int,int,int) ));
+			submenu->addAction( action);
+		}
+		
+		menu.addMenu( submenu);
+	}
 
 	if( me || af::Environment::VISOR())
 	{
