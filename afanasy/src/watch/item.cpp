@@ -21,7 +21,8 @@ QPolygonF Item::ms_star_pointsDraw;
 const int Item::Height = 14;
 const int Item::Width  = 100;
 
-Item::Item( const QString &itemname, int itemid):
+Item::Item( const QString &itemname, int itemid, QObject *parent):
+	QObject(parent),
 	m_name( itemname),
 	m_height( Height),
 	m_locked( false),

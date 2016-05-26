@@ -17,6 +17,7 @@
 #include "viewitems.h"
 #include "watch.h"
 #include "listtasks.h"
+#include "itemjobtask.h"
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
@@ -247,14 +248,25 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			                .arg( QString::fromStdString(task->getJobName()))
 			                .arg( QString::fromStdString(task->getBlockName()))
 			                .arg( QString::fromStdString(task->getName()));
+			QMenu *taskmenu = new QMenu(title, this);
+			ItemJobTask *itemTask = new ItemJobTask( task->getJobId(),
+			                                         task->getBlockNum(),
+			                                         task->getTaskNum(),
+			                                         title,
+			                                         this);
+			itemTask->generateMenu( *taskmenu);
+			
+			taskmenu->addSeparator();
 			action = new ActionIdIdId( task->getJobId(),
 			                           task->getBlockNum(),
 			                           task->getTaskNum(),
-			                           title,
+			                           "Open Task",
 			                           this);
 			connect( action, SIGNAL( triggeredId(int,int,int) ),
 			         this, SLOT( actRequestTaskInfo(int,int,int) ));
-			submenu->addAction( action);
+			taskmenu->addAction( action);
+			
+			submenu->addMenu( taskmenu);
 		}
 		
 		menu.addMenu( submenu);

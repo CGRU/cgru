@@ -24,6 +24,7 @@ const int ItemJobTask::WidthInfo = 98;
 ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
 	Item( afqt::stoq( i_bdata->genTaskName( i_numtask)), ItemId),
 	m_list( i_list),
+	m_job_id( i_block->job_id),
 	m_blocknum( i_bdata->getBlockNum()),
 	m_tasknum( i_numtask),
 	m_block( i_block),
@@ -31,6 +32,14 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int 
 	m_thumbs_imgs( NULL)
 {
 }
+
+ItemJobTask::ItemJobTask( int i_job_id, int i_block_num, int i_task_num, const QString &itemname, QWidget *parent):
+	Item( itemname, ItemId, parent),
+	m_job_id( i_job_id),
+	m_blocknum( i_block_num),
+	m_tasknum( i_task_num),
+	m_block( NULL)
+{}
 
 ItemJobTask::~ItemJobTask()
 {
@@ -57,7 +66,7 @@ void ItemJobTask::generateMenu(QMenu &o_menu)
 	connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
 	o_menu.addAction( actionid);
 
-	if( m_block->job_id != AFJOB::SYSJOB_ID )
+	if( m_job_id != AFJOB::SYSJOB_ID )
 	{
 		int startCount = taskprogress.starts_count;
 		if( startCount > 1 )
@@ -89,6 +98,10 @@ void ItemJobTask::generateMenu(QMenu &o_menu)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
 	o_menu.addAction( action);
 
+	// If block is not initialized, we stop here
+	if ( NULL == m_block)
+		return;
+	
 	std::vector<std::string> files = genFiles();
 	if( files.size())
 	{
@@ -261,7 +274,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	text_x -= ItemJobBlock::WErrors;
 
 	// Shift starts counter on a system job task:
-	if( m_block->job_id == AFJOB::SYSJOB_ID ) text_x -= 10;
+	if( m_job_id == AFJOB::SYSJOB_ID ) text_x -= 10;
 
 	painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
 	if( false == rightString.isEmpty() )
@@ -273,7 +286,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	}
 
 	// Shift starts counter on a system job task:
-	if( m_block->job_id == AFJOB::SYSJOB_ID ) text_x -= 60;
+	if( m_job_id == AFJOB::SYSJOB_ID ) text_x -= 60;
 
 	painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 
@@ -341,7 +354,7 @@ void ItemJobTask::showThumbnail()
 		return;
 	}
 	
-	ListTasks::getTaskInfo(m_block->job_id, m_blocknum, m_tasknum, "files");
+	ListTasks::getTaskInfo(m_job_id, m_blocknum, m_tasknum, "files");
 }
 
 void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
@@ -374,7 +387,7 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 
 void ItemJobTask::getTaskInfo(const std::string &i_mode, int i_number)
 {
-	ListTasks::getTaskInfo(m_block->job_id, m_blocknum, m_tasknum, i_mode, i_number);
+	ListTasks::getTaskInfo(m_job_id, m_blocknum, m_tasknum, i_mode, i_number);
 }
 
 void ItemJobTask::thumbsCLear()
@@ -397,8 +410,8 @@ void ItemJobTask::actTaskStdOut(int i_number) { getTaskInfo("output", i_number);
 
 void ItemJobTask::actTaskListen()
 {
-	Watch::listenTask( m_block->job_id, getBlockNum(), getTaskNum(),
-					   QString("#%1 (%2)").arg(m_block->job_id).arg(getName()));
+	Watch::listenTask( m_job_id, getBlockNum(), getTaskNum(),
+	                   QString("#%1 (%2)").arg(m_job_id).arg(getName()));
 }
 
 void ItemJobTask::actTaskPreview(int num_cmd, int num_img)

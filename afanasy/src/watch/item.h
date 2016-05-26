@@ -12,7 +12,7 @@ class Item : public QObject
 {
 	Q_OBJECT
 public:
-	Item( const QString &itemname, int itemid);
+	Item(const QString &itemname, int itemid, QObject *parent = 0);
 	virtual ~Item();
 
 	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
