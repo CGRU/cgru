@@ -126,7 +126,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 		if( b == 0 )
 			service = afqt::stoq( block->getService());
 
-		m_tasks_done += m_blockinfo[b].tasksdone;
+		m_tasks_done += m_blockinfo[b].p_tasksdone;
 	}
 
    if( time_started ) compact_display = false;
@@ -246,7 +246,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 		{
 			int percentage = 0;
 			for( int b = 0; b < m_blocks_num; b++)
-				percentage += m_blockinfo[b].percentage;
+				percentage += m_blockinfo[b].p_percentage;
 
 			percentage /= m_blocks_num;
 			if(( percentage > 0 ) && ( percentage < 100 ))

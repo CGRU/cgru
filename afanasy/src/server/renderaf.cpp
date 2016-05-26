@@ -1,6 +1,7 @@
 #include "renderaf.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/farm.h"
@@ -160,7 +161,7 @@ af::Msg * RenderAf::update( const af::RenderUpdate & i_up)
 	return msg;
 }
 
-bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
+bool RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring)
 {
 	if( isOnline())
 	{
@@ -183,17 +184,15 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 	setOnline();
 	updateTime();
 	m_hres.copy( render->getHostRes());
-	
+
+
+	// Reconnect tasks if any:
 	std::list<af::TaskExec*>::iterator it;
 	for( it = render->m_tasks.begin() ; it != render->m_tasks.end() ; ++it)
 	{
-		addTask(*it);
-		//i_args->jobs->reconnectTask( *taskexecs[i], *render, i_args->renders, i_args->monitors);
+		i_jobs->reconnectTask( **it, *this, monitoring);
 	}
-	// take the ownership of taskexecs by preventing the render dtor from
-	// freeing them (which it actually doesn't do, btw...):
-	render->m_tasks.clear();
-	
+
 
 	std::string str = "Online '" + m_engine + "'.";
 	appendLog( str);
@@ -221,12 +220,12 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 {
   if( isOffline())
 	{
-		AFERROR("RenderAf::setTask: Render is offline.")
+		AF_ERR << "Render is offline.";
 		return;
 	}
 	if( taskexec == NULL)
 	{
-		AFERROR("RenderAf::setTask: taskexec == NULL.")
+		AF_ERR << "taskexec == NULL.";
 		return;
 	}
 
@@ -254,7 +253,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 {
 	if( isOffline())
 	{
-		AFERROR("RenderAf::startTask: Render is offline.")
+		AF_ERR << "Render is offline.";
 		return;
 	}
 	for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
@@ -270,7 +269,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 		return;
 	}
 
-	AFERROR("RenderAf::startTask: No such task.")
+	AF_ERR << "No such task.";
 	taskexec->v_stdOut( false);
 }
 
@@ -558,12 +557,17 @@ void RenderAf::addTask( af::TaskExec * taskexec)
 		m_task_start_finish_time = time( NULL);
 		store();
 	}
+
+	#ifdef AFOUTPUT
+	AF_DEBUG << *taskexec;
+	#endif
+
 	m_tasks.push_back( taskexec);
 
 	m_capacity_used += taskexec->getCapResult();
 
 	if( m_capacity_used > getCapacity() )
-		AFERRAR("RenderAf::addTask(): capacity_used > host.capacity (%d>%d)", m_capacity_used, m_host.m_capacity)
+		AF_ERR << "Capacity_used > host.capacity (" << m_capacity_used << " > " << m_host.m_capacity << ")";
 }
 
 void RenderAf::removeTask( const af::TaskExec * taskexec)
@@ -582,7 +586,7 @@ void RenderAf::removeTask( const af::TaskExec * taskexec)
 
 	if( m_capacity_used < taskexec->getCapResult())
 	{
-		AFERRAR("RenderAf::removeTask(): capacity_used < taskdata->getCapResult() (%d<%d)", m_capacity_used, taskexec->getCapResult())
+		AF_ERR << "Capacity_used < taskdata->getCapResult() (" << m_capacity_used << " < " << taskexec->getCapResult() << ")";
 		m_capacity_used = 0;
 	}
 	else m_capacity_used -= taskexec->getCapResult();

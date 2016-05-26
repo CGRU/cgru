@@ -137,6 +137,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 //	else if(( taskprogress.state & AFJOB::STATE_ERROR_MASK || taskprogress.state & AFJOB::STATE_DONE_MASK ))
 	else if( taskprogress.state &
 		( AFJOB::STATE_ERROR_MASK
+		| AFJOB::STATE_WAITRECONNECT_MASK
 		| AFJOB::STATE_DONE_MASK
 		| AFJOB::STATE_ERROR_READY_MASK ))
 	{
@@ -151,6 +152,8 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningdone.c, Qt::SolidPattern ));
 		else if( taskprogress.state & AFJOB::STATE_SKIPPED_MASK )
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern ));
+		else if( taskprogress.state & AFJOB::STATE_WAITRECONNECT_MASK )
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern ));
 
 		painter->drawRect( x, y, w - WidthInfo, Height-1);
 	}

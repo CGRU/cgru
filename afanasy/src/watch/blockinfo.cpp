@@ -27,12 +27,19 @@ const int BlockInfo::HeightCompact = 14;
 
 BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
 	tasksnum(1),
-	tasksdone(0),
-	taskserror(0),
-	percentage(0),
-	taskssumruntime( 0),
 
-	runningtasksnumber(0),
+	p_percentage(0),
+	p_tasksready(0),
+	p_tasksrunning(0),
+	p_tasksdone(0),
+	p_taskserror(0),
+	p_tasksskipped(0),
+	p_taskswarning(0),
+	p_taskswaitrec(0),
+	p_errorhosts(0),
+	p_avoidhosts(0),
+	p_taskssumruntime(0),
+
 	errors_retries(-1),
 	errors_avoidhost(-1),
 	errors_tasksamehost(-1),
@@ -110,16 +117,21 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 
 	case af::Msg::TBlocksProgress:
 
-		state                = block->getState();
-		avoidhostsnum        = block->getProgressAvoidHostsNum();
-		errorhostsnum        = block->getProgressErrorHostsNum();
-		runningtasksnumber   = block->getRunningTasksNumber();
-		taskssumruntime      = block->getProgressTasksSumRunTime();
-		tasksready           = block->getProgressTasksReady();
-		tasksdone            = block->getProgressTasksDone();
-		taskserror           = block->getProgressTasksError();
-		percentage           = block->getProgressPercentage();
-		memcpy( progress,      block->getProgressBar(), AFJOB::ASCII_PROGRESS_LENGTH);
+		state = block->getState();
+
+		p_percentage      = block->getProgressPercentage();
+		p_tasksready      = block->getProgressTasksReady();
+		p_tasksrunning    = block->getRunningTasksNumber();
+		p_tasksdone       = block->getProgressTasksDone();
+		p_taskserror      = block->getProgressTasksError();
+		p_tasksskipped    = block->getProgressTasksSkipped();
+		p_taskswarning    = block->getProgressTasksWarning();
+		p_taskswaitrec    = block->getProgressTasksWaitReconn();
+		p_avoidhosts      = block->getProgressAvoidHostsNum();
+		p_errorhosts      = block->getProgressErrorHostsNum();
+		p_taskssumruntime = block->getProgressTasksSumRunTime();
+
+		memcpy( progress, block->getProgressBar(), AFJOB::ASCII_PROGRESS_LENGTH);
 
 		break;
 
@@ -142,7 +154,7 @@ if( type == af::Msg::TBlocksProgress)
 }
 #endif
 
-	if( runningtasksnumber || taskserror || ((tasksdone != 0) && (tasksdone != tasksnum))) return true;
+	if( p_tasksrunning || p_taskserror || ((p_tasksdone != 0) && (p_tasksdone != tasksnum))) return true;
 
 	return false;
 }
@@ -182,9 +194,9 @@ void BlockInfo::refresh()
 	// Parameters:
 	str_params.clear();
 
-	if( tasksdone) str_params += QString(" RT: S%1/A%2")
-		.arg( af::time2strHMS( taskssumruntime, true).c_str())
-		.arg( af::time2strHMS( taskssumruntime/tasksdone, true).c_str());
+	if( p_tasksdone) str_params += QString(" RT: S%1/A%2")
+		.arg( af::time2strHMS( p_taskssumruntime, true).c_str())
+		.arg( af::time2strHMS( p_taskssumruntime/p_tasksdone, true).c_str());
 
 	if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
 		str_params += QString("E:%1b|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
@@ -218,17 +230,20 @@ void BlockInfo::refresh()
 
 
 	// Progress:
-	str_progress = QString::number( percentage) + "%";
-	str_progress += QString(" Run:%1 Done:%2 Err:%3")
-		.arg( runningtasksnumber)
-		.arg( tasksdone)
-		.arg( taskserror);
-	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( tasksready);
+	str_progress = QString::number( p_percentage) + "%";
+	if( p_tasksrunning ) str_progress += QString(" Run:%1" ).arg( p_tasksrunning);
+	if( p_tasksdone    ) str_progress += QString(" Done:%1").arg( p_tasksdone);
+	if( p_taskserror   ) str_progress += QString(" Err:%1" ).arg( p_taskserror);
+	if( p_tasksskipped ) str_progress += QString(" Skp:%1" ).arg( p_tasksskipped);
+	if( p_taskswarning ) str_progress += QString(" Wrn:%1" ).arg( p_taskswarning);
+	if( p_taskswaitrec ) str_progress += QString(" WRC:%1" ).arg( p_taskswaitrec);
+
+	if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" Ready:%1").arg( p_tasksready);
 
 
 	// Error Hosts:
-	if( errorhostsnum ) str_avoiderrors  = QString( "Hosts Err:%1").arg( errorhostsnum);
-	if( avoidhostsnum ) str_avoiderrors += QString("/%1:Avoid").arg( avoidhostsnum);
+	if( p_errorhosts ) str_avoiderrors  = QString( "Hosts Err:%1").arg( p_errorhosts);
+	if( p_avoidhosts ) str_avoiderrors += QString("/%1:Avoid").arg( p_avoidhosts);
 }
 
 void BlockInfo::stdOutFlags( char* data, int size) const
@@ -291,7 +306,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 
 	// Setup font size and color:
 	painter->setFont( afqt::QEnvironment::f_info);
-	QPen pen( Item::clrTextInfo( runningtasksnumber, option.state & QStyle::State_Selected, item->isLocked()));
+	QPen pen( Item::clrTextInfo( p_tasksrunning, option.state & QStyle::State_Selected, item->isLocked()));
 	painter->setPen( pen);
 
 
@@ -310,9 +325,9 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 
 	// Paint error hosts:
 	int error_hosts_text_width = 0;
-	if( errorhostsnum )
+	if( p_errorhosts )
 	{
-		if( avoidhostsnum )
+		if( p_avoidhosts )
 			painter->setPen( afqt::QEnvironment::clr_error.c);
 		else
 			painter->setPen( afqt::QEnvironment::clr_errorready.c);
@@ -333,15 +348,15 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 	Item::drawPercent
 	(
 		painter, x+xoffset, y+y_bars, w-xoffset-2, 4,
-		jobid == AFJOB::SYSJOB_ID ? runningtasksnumber + tasksready + taskserror : tasksnum,
-		jobid == AFJOB::SYSJOB_ID ? 0 : tasksdone, taskserror, runningtasksnumber,
+		jobid == AFJOB::SYSJOB_ID ? p_tasksrunning + p_tasksready + p_taskserror : tasksnum,
+		jobid == AFJOB::SYSJOB_ID ? 0 : p_tasksdone, p_taskserror, p_tasksrunning,
 		false
 	);
 	Item::drawPercent
 	(
 		painter, x+xoffset, y+y_bars+4, w-xoffset-2, 4,
 		100,
-		percentage, 0, 0,
+		p_percentage, 0, 0,
 		false
 	);
 	drawProgress
@@ -399,6 +414,10 @@ void BlockInfo::drawProgress(
 			break;
 		case 'W': // STATE_WAITDEP_MASK
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwdep.c, Qt::SolidPattern ));
+			painter->drawRect( x, posy, w+offset, height);
+			break;
+		case 'C': // STATE_WAITRECONNECT_MASK
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern ));
 			painter->drawRect( x, posy, w+offset, height);
 			break;
 		case 'S': // STATE_SKIPPED_MASK | STATE_DONE_MASK

@@ -251,6 +251,9 @@ public:
 	inline int       getProgressTasksReady()      const { return p_tasks_ready;    }
 	inline int       getProgressTasksDone()       const { return p_tasks_done;     }
 	inline int       getProgressTasksError()      const { return p_tasks_error;    }
+	inline int       getProgressTasksSkipped()    const { return p_tasks_skipped;  }
+	inline int       getProgressTasksWarning()    const { return p_tasks_warning;  }
+	inline int       getProgressTasksWaitReconn() const { return p_tasks_waitrec;  }
 	inline long long getProgressTasksSumRunTime() const { return p_tasks_run_time; }
 
 	inline void setState(           uint32_t  value ) { m_state       = value; }
@@ -371,7 +374,7 @@ private:
 
 // Functions to update tasks progress and progeress bar:
 // (for information purpoces only, no meaning for server)
-	bool updateBars( JobProgress * progress);
+	void updateBars( JobProgress * progress);
 /// Set one exact \c pos bit in \c array to \c value .
 	static void setProgressBit( uint8_t *array, int pos, bool value);
 /// Set progress bits in \c array with \c size at \c pos to \c value .
@@ -385,8 +388,9 @@ private:
 	int32_t p_tasks_ready;     ///< Number of ready tasks.
 	int32_t p_tasks_done;      ///< Number of done tasks.
 	int32_t p_tasks_error;     ///< Number of error (failed) tasks.
-	int p_tasks_warning;       ///< Number of skipped with warnings.
-	int p_tasks_skipped;       ///< Number of skipped tasks.
+	int32_t p_tasks_warning;   ///< Number of skipped with warnings.
+	int32_t p_tasks_skipped;   ///< Number of skipped tasks.
+	int32_t p_tasks_waitrec;   ///< Number of tasks waiting for reconnect.
 	int64_t p_tasks_run_time;  ///< Tasks run time summ.
 };
 }

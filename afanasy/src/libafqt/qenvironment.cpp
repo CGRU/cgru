@@ -88,6 +88,7 @@ AttrColor QEnvironment::clr_itemjoberror(    "clr_itemjoberror",     "Job With E
 AttrColor QEnvironment::clr_taskskipped(     "clr_taskskipped",      "Skipped Task",            AFGUI::CLR_TASKSKIPPED         );
 AttrColor QEnvironment::clr_taskwarningrun(  "clr_taskwarningrun",   "Warning Run Task",        AFGUI::CLR_TASKWARNINGRUN      );
 AttrColor QEnvironment::clr_taskwarningdone( "clr_taskwarningdone",  "Warning Done Task",       AFGUI::CLR_TASKWARNINGDONE     );
+AttrColor QEnvironment::clr_taskwaitreconn(  "clr_taskwaitreconn",   "Waiting Reconnect Task",  AFGUI::CLR_TASKWAITRECONN      );
 AttrColor QEnvironment::clr_itemrender(      "clr_itemrender",       "Render Item",             AFGUI::CLR_ITEMRENDER          );
 AttrColor QEnvironment::clr_itemrenderoff(   "clr_itemrenderoff",    "Offine Render",           AFGUI::CLR_ITEMRENDEROFF       );
 AttrColor QEnvironment::clr_itemrenderbusy(  "clr_itemrenderbusy",   "Busy Render",             AFGUI::CLR_ITEMRENDERBUSY      );

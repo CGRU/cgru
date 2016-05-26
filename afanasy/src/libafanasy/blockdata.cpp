@@ -89,6 +89,7 @@ void BlockData::initDefaults()
 	p_tasks_error    = 0;
 	p_tasks_skipped  = 0;
 	p_tasks_warning  = 0;
+	p_tasks_waitrec  = 0;
 	p_tasks_run_time = 0;
 
 	memset( p_progressbar, AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
@@ -452,6 +453,8 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
             o_str << ",\n\"p_tasks_skipped\":"  << p_tasks_skipped;
 		if( p_tasks_warning > 0 )
             o_str << ",\n\"p_tasks_warning\":"  << p_tasks_warning;
+		if( p_tasks_waitrec > 0 )
+            o_str << ",\n\"p_tasks_waitrec\":"  << p_tasks_waitrec;
 		if( p_tasks_run_time > 0 )
             o_str << ",\n\"p_tasks_run_time\":" << p_tasks_run_time;
 
@@ -590,6 +593,9 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int32_t ( p_tasks_ready,           msg);
 		rw_int32_t ( p_tasks_done,            msg);
 		rw_int32_t ( p_tasks_error,           msg);
+		rw_int32_t ( p_tasks_skipped,         msg);
+		rw_int32_t ( p_tasks_warning,         msg);
+		rw_int32_t ( p_tasks_waitrec,         msg);
 		rw_int64_t ( p_tasks_run_time,        msg);
 
 		rw_int64_t ( m_state,                 msg);
@@ -1364,6 +1370,9 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
       if( full ) o_str << "\n Tasks Ready = " << p_tasks_ready;
       if( full ) o_str << "\n Tasks Done = " << p_tasks_done;
       if( full ) o_str << "\n Tasks Error = " << p_tasks_error;
+      if( full ) o_str << "\n Tasks Skipped = " << p_tasks_skipped;
+      if( full ) o_str << "\n Tasks Warning = " << p_tasks_warning;
+      if( full ) o_str << "\n Tasks Wait Reconnect = " << p_tasks_waitrec;
 
       if( p_error_hosts ) o_str << "\n Error hosts count = " << p_error_hosts;
       if( p_avoid_hosts ) o_str << "\n Avoid hosts count = " << p_avoid_hosts;
@@ -1402,8 +1411,7 @@ bool BlockData::updateProgress( JobProgress * progress)
 {
    bool changed = false;
 
-   if( updateBars( progress))
-      changed = true;
+	updateBars( progress);
 
 	uint32_t  new_state          = 0;
 	int32_t   new_percentage     = 0;
@@ -1412,6 +1420,7 @@ bool BlockData::updateProgress( JobProgress * progress)
 	int32_t   new_tasks_error    = 0;
 	int       new_tasks_skipped  = 0;
 	int       new_tasks_warning  = 0;
+	int       new_tasks_waitrec  = 0;
 	long long new_tasks_run_time = 0;
 
 
@@ -1452,6 +1461,10 @@ bool BlockData::updateProgress( JobProgress * progress)
 		{
 			new_tasks_warning++;
 		}
+		if( task_state & AFJOB::STATE_WAITRECONNECT_MASK )
+		{
+			new_tasks_waitrec++;
+		}
 
       new_percentage += task_percent;
    }
@@ -1462,6 +1475,7 @@ bool BlockData::updateProgress( JobProgress * progress)
 	   ( p_tasks_error    != new_tasks_error    )||
 	   ( p_tasks_skipped  != new_tasks_skipped  )||
 	   ( p_tasks_warning  != new_tasks_warning  )||
+	   ( p_tasks_waitrec  != new_tasks_waitrec  )||
 	   ( p_percentage     != new_percentage     )||
 	   ( p_tasks_run_time != new_tasks_run_time ))
 		changed = true;
@@ -1471,6 +1485,7 @@ bool BlockData::updateProgress( JobProgress * progress)
 	p_tasks_error    = new_tasks_error;
 	p_tasks_skipped  = new_tasks_skipped;
 	p_tasks_warning  = new_tasks_warning;
+	p_tasks_waitrec  = new_tasks_waitrec;
 	p_percentage     = new_percentage;
 	p_tasks_run_time = new_tasks_run_time;
 
@@ -1513,10 +1528,8 @@ bool BlockData::updateProgress( JobProgress * progress)
    return changed;
 }
 
-bool BlockData::updateBars( JobProgress * progress)
+void BlockData::updateBars( JobProgress * progress)
 {
-   bool changed = false;
-
 	// Set to zeros:
 	for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
 		p_progressbar[i] = 0;
@@ -1549,9 +1562,6 @@ bool BlockData::updateBars( JobProgress * progress)
 	// Transfer values to characters:
 	for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
 		p_progressbar[i] = AFJOB::ASCII_PROGRESS_STATES[p_progressbar[i]*2];
-
-//for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)  printf("%c", p_progressbar[i]); printf("\n");
-   return changed;
 }
 
 void BlockData::stdOutProgress() const

@@ -79,10 +79,10 @@ RenderHost::~RenderHost()
     }
 
     // Delete all tasks:
-    for( std::vector<TaskProcess*>::iterator it = m_tasks.begin(); it != m_tasks.end(); )
+    for( std::vector<TaskProcess*>::iterator it = m_taskprocesses.begin(); it != m_taskprocesses.end(); )
     {
         delete *it;
-        it = m_tasks.erase( it);
+        it = m_taskprocesses.erase( it);
     }
 }
 
@@ -109,7 +109,7 @@ void RenderHost::connectionEstablished()
 
 void RenderHost::setRegistered( int i_id)
 {
-    m_connected = true;
+	m_connected = true;
     m_id = i_id;
     AF_LOG << "Render registered.";
 	RenderHost::connectionEstablished();
@@ -132,11 +132,17 @@ void RenderHost::connectionLost( bool i_any_case)
 		}
 	}
 
+	m_connected = false;
+
+	//m_id = 0;
+
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
     
     AF_WARN << "Render connection lost, trying to reconnect...";
-    AF_LOG  << "note: tasks are still running";
+
+	if( m_taskprocesses.size())
+		AF_LOG << m_taskprocesses.size() << " task(s) are still running.";
 }
 
 void RenderHost::setUpdateMsgType( int i_type)
@@ -150,18 +156,18 @@ void RenderHost::refreshTasks()
         return;
 
     // Refresh tasks:
-    for( int t = 0; t < m_tasks.size(); t++)
+    for( int t = 0; t < m_taskprocesses.size(); t++)
     {
-        m_tasks[t]->refresh();
+        m_taskprocesses[t]->refresh();
     }
 
     // Remove zombies:
-    for( std::vector<TaskProcess*>::iterator it = m_tasks.begin(); it != m_tasks.end(); )
+    for( std::vector<TaskProcess*>::iterator it = m_taskprocesses.begin(); it != m_taskprocesses.end(); )
     {
         if((*it)->isZombie())
         {
             delete *it;
-            it = m_tasks.erase( it);
+            it = m_taskprocesses.erase( it);
         }
         else
             it++;
@@ -196,9 +202,22 @@ af::Msg * RenderHost::updateServer()
 	
 	af::Msg * msg;
 
+	#ifdef AFOUTPUT
+	AF_LOG << "Tasks size = " << m_taskprocesses.size();
+	#endif
+
 	if( m_updateMsgType == af::Msg::TRenderRegister )
 	{
+		m_tasks.clear();
+
+		// Fill tasksexecs array in parent class.
+		// This only needed on register to reconnect running tasks if any.
+		for( int i = 0; i < m_taskprocesses.size(); i++)
+			m_tasks.push_back( m_taskprocesses[i]->getTaskExec());
+
 		msg = new af::Msg( m_updateMsgType, this);
+
+		m_tasks.clear();
 	}
 	else if( m_updateMsgType == af::Msg::TRenderUpdate )
 	{
@@ -247,49 +266,49 @@ void RenderHost::windowsMustDie()
 
 void RenderHost::runTask( af::TaskExec * i_task)
 {
-    for( int t = 0; t < m_tasks.size(); t++)
-        if( m_tasks[t]->getTaskExec()->equals( *i_task))
+    for( int t = 0; t < m_taskprocesses.size(); t++)
+        if( m_taskprocesses[t]->getTaskExec()->equals( *i_task))
             return;
     
-    m_tasks.push_back( new TaskProcess( i_task, this));
+    m_taskprocesses.push_back( new TaskProcess( i_task, this));
 }
 
 void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < m_tasks.size(); t++)
+    for( int t = 0; t < m_taskprocesses.size(); t++)
     {
-        if( m_tasks[t]->is( i_taskpos))
+        if( m_taskprocesses[t]->is( i_taskpos))
         {
-            m_tasks[t]->stop();
+            m_taskprocesses[t]->stop();
             return;
         }
     }
-    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(m_tasks.size()))
+    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(m_taskprocesses.size()))
     i_taskpos.v_stdOut();
 }
 
 void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < m_tasks.size(); t++)
+    for( int t = 0; t < m_taskprocesses.size(); t++)
     {
-        if( m_tasks[t]->is( i_taskpos))
+        if( m_taskprocesses[t]->is( i_taskpos))
         {
-			m_tasks[t]->close();
+			m_taskprocesses[t]->close();
             return;
         }
     }
-    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(m_tasks.size()))
+    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(m_taskprocesses.size()))
     i_taskpos.v_stdOut();
 }
 
 void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 {
 	std::string str;
-	for( int t = 0; t < m_tasks.size(); t++)
+	for( int t = 0; t < m_taskprocesses.size(); t++)
 	{
-		if( m_tasks[t]->is( i_taskpos))
+		if( m_taskprocesses[t]->is( i_taskpos))
 		{
-			str = m_tasks[t]->getOutput();
+			str = m_taskprocesses[t]->getOutput();
 			break;
 		}
 	}
@@ -305,11 +324,11 @@ void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 
 void RenderHost::listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 {
-	for( int t = 0; t < m_tasks.size(); t++)
+	for( int t = 0; t < m_taskprocesses.size(); t++)
 	{
-		if( m_tasks[t]->is( i_tp))
+		if( m_taskprocesses[t]->is( i_tp))
 		{
-			m_tasks[t]->listenOutput( i_subscribe);
+			m_taskprocesses[t]->listenOutput( i_subscribe);
 			break;
 		}
 	}

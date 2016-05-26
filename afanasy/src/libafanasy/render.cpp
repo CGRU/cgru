@@ -210,21 +210,26 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_int64_t( m_wol_operation_time,     msg);
 	  rw_String ( m_annotation,             msg);
 
-   case Msg::TRenderRegister:
-       
-      if( msg->isWriting())
-      {
-		 uint32_t taskscount = uint32_t(m_tasks.size());
-         rw_uint32_t( taskscount, msg);
-		 std::list<TaskExec*>::iterator it = m_tasks.begin();
-         for( unsigned t = 0; t < taskscount; t++) (*(it++))->write( msg);
-      }
-      else
-      {
-         uint32_t taskscount;
-         rw_uint32_t( taskscount, msg);
-		 for( unsigned t = 0; t < taskscount; t++) m_tasks.push_back( new TaskExec( msg));
-      }
+	case Msg::TRenderRegister:
+ 
+		// Writing tasks execs, needed for:
+		// - GUIs to show tasks in render item.
+		// - Server for running tasks reconnection at startup.
+		{
+			uint32_t taskscount = uint32_t(m_tasks.size());
+			rw_uint32_t( taskscount, msg);
+
+			if( msg->isWriting())
+			{
+				for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+					(*it)->write( msg);
+			}
+			else
+			{
+				for( unsigned t = 0; t < taskscount; t++)
+					m_tasks.push_back( new TaskExec( msg));
+			}
+		}
 
 	  rw_String  ( m_engine,       msg);
 	  rw_String  ( m_name,         msg);
@@ -240,6 +245,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
    case Msg::TRendersResources:
 
 		// Tasks percents, needed for GUI only:
+/* Very strange code:
 		if( msg->isWriting())
 		{
 			// Using temporary array because this function should be thread-safe
@@ -248,7 +254,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 				_tasks_percents.push_back((*it)->getPercent());
 			rw_Int32_Vect( _tasks_percents, msg);
 		}
-		else
+		else*/
 			rw_Int32_Vect( m_tasks_percents, msg);
 
 		rw_int64_t( m_idle_time, msg);
@@ -273,6 +279,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 		 if( msg->isWriting()) m_netIFs[i]->write( msg);
 		 else m_netIFs.push_back( new NetIF( msg));
    }
+
 }
 
 void Render::checkDirty()

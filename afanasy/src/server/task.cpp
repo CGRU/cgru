@@ -5,6 +5,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/blockdata.h"
+#include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
@@ -118,6 +119,21 @@ void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf
    m_run = new TaskRun( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
 }
 
+void Task::reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring)
+{
+	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
+	{
+		v_appendLog("Reconnecting previously run...");
+		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with:\n" << *i_render;
+		v_start( i_taskexec, o_runningtaskscounter, i_render, i_monitoring);
+	}
+	else
+	{
+		v_appendLog("Reconnection failed: task was not waiting it.");
+		i_render->stopTask( i_taskexec);
+	}
+}
+
 void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
 {
    if( m_run == NULL)
@@ -192,6 +208,19 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
 //printf("Task::refresh:\n");
    bool changed = false;
 
+
+	// Check reconnect timeout:
+	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
+	{
+		if( currentTime - m_progress->time_done > af::Environment::getTaskUpdateTimeout())
+		{
+			v_appendLog("Reconnect timeout reached. Setting state to READY.");
+			m_progress->state = AFJOB::STATE_READY_MASK;
+            if( false == changed ) changed = true;
+		}
+	}
+
+
    // forgive error hosts
    if(( false == m_errorHosts.empty() ) && ( m_block->getErrorsForgiveTime() > 0 ))
    {
@@ -214,6 +243,7 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
          }
     }
 
+
    if( renders != NULL )
    {
       if( m_run ) changed = m_run->refresh( currentTime, renders, monitoring, errorHostId);
@@ -231,11 +261,14 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
       }
    }
 
+
    if( changed)
    {
       v_monitor( monitoring);
       v_store();
    }
+
+   
    deleteRunningZombie();
 }
 

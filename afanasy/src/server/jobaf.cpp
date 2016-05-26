@@ -255,25 +255,31 @@ bool JobAf::initialize()
       appendLog("Initialized from database.");
    }
 
-//
-// Checking states
-   for( int b = 0; b < m_blocks_num; b++)
-   {
-//      if( b == 0 ) blocksdata[b]->state = blocksdata[b]->state | AFJOB::STATE_READY_MASK;
-//      blocksdata[b]->state = blocksdata[b]->state & (~AFJOB::STATE_WAITDEP_MASK);
-      int numtasks = m_blocks_data[b]->getTasksNum();
-      for( int t = 0; t < numtasks; t++)
-      {
-         uint32_t taskstate = m_progress->tp[b][t]->state;
-         if((  taskstate == 0                           ) ||
-            (  taskstate & AFJOB::STATE_RUNNING_MASK   ))
-         {
-            taskstate = taskstate |   AFJOB::STATE_READY_MASK;
-            taskstate = taskstate & (~AFJOB::STATE_RUNNING_MASK);
-            m_progress->tp[b][t]->state = taskstate;
-         }
-      }
-   }
+	//
+	// Checking states
+	for( int b = 0; b < m_blocks_num; b++)
+	{
+		int numtasks = m_blocks_data[b]->getTasksNum();
+		for( int t = 0; t < numtasks; t++)
+		{
+			uint32_t taskstate = m_progress->tp[b][t]->state;
+
+			if( taskstate == 0 )
+			{
+				taskstate = AFJOB::STATE_READY_MASK;
+			}
+			else if( taskstate & AFJOB::STATE_RUNNING_MASK )
+			{
+				taskstate = taskstate | AFJOB::STATE_WAITRECONNECT_MASK;
+				taskstate = taskstate & (~AFJOB::STATE_RUNNING_MASK );
+				m_progress->tp[b][t]->time_done = time(NULL);
+				m_blocks[b]->m_tasks[t]->v_appendLog(
+						"Task was running at server start. Waiting for render reconnect...");
+			}
+
+			m_progress->tp[b][t]->state = taskstate;
+		}
+	}
 
    if(( m_state & AFJOB::STATE_DONE_MASK) == false ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 
@@ -955,12 +961,12 @@ void JobAf::v_updateTaskState( const af::MCTaskUp& taskup, RenderContainer * ren
 	}
 }
 
-void JobAf::reconnectTask(af::TaskExec &taskexec, RenderAf &running_render, RenderContainer *renders, MonitorContainer *monitoring)
+void JobAf::reconnectTask(af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
-    int b = taskexec.getBlockNum();
-    int t = taskexec.getTaskNum();
-    if( false == checkBlockTaskNumbers( b, t, "reconnectTask")) return;
-    m_blocks[b]->reconnect(taskexec, running_render, renders, monitoring);
+	int b = i_taskexec.getBlockNum();
+	int t = i_taskexec.getTaskNum();
+	if( false == checkBlockTaskNumbers( b, t, "reconnectTask")) return;
+	m_blocks[b]->reconnectTask( i_taskexec, i_render, i_monitoring);
 }
 
 void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)

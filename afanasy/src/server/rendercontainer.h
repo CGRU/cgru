@@ -13,8 +13,8 @@ public:
    RenderContainer();
    ~RenderContainer();
 
-/// Add new Render to container, new id returned on success, else return 0.
-   af::Msg * addRender( RenderAf *newRender, MonitorContainer * monitoring = NULL);
+	/// Add new Render to container, new id returned on success, else return 0.
+	af::Msg * addRender( RenderAf *newRender, JobContainer * i_jobs, MonitorContainer * monitoring);
 };
 
 /// Renders iterator.

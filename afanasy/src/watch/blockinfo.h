@@ -28,8 +28,6 @@ public:
 		bool compact_display = false,
 		const QColor * backcolor = NULL ) const;
 
-	inline int getRunningTasksNumber()   const { return runningtasksnumber; }
-	inline int getPercentage()           const { return percentage;         }
 	inline int getErrorsAvoidHost()      const { return errors_avoidhost;   }
 	inline int getErrorsRetries()        const { return errors_retries;     }
 	inline int getErrorsTaskSameHost()   const { return errors_tasksamehost;}
@@ -45,13 +43,21 @@ public:
 
 	bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const;
 
-	int tasksdone;
-	int percentage;
+	int p_percentage;
+	int p_tasksready;
+	int p_tasksrunning;
+	int p_tasksdone;
+	int p_taskserror;
+	int p_tasksskipped;
+	int p_taskswarning;
+	int p_taskswaitrec;
+	int p_avoidhosts;
+	int p_errorhosts;
+	long long p_taskssumruntime;
 
 private:
 	uint32_t state;
 
-	int runningtasksnumber;
 
 	QString name;
 	QString service;
@@ -62,9 +68,6 @@ private:
 	QString str_avoiderrors;
 
 	int tasksnum;
-	int tasksready;
-	int taskserror;
-	long long taskssumruntime;
 
 	bool numeric;              ///< Whether the block is numeric.
 	bool varcapacity;
@@ -76,9 +79,6 @@ private:
 	long long frame_pertask;   ///< Tasks frames per task.
 	long long frame_inc;       ///< Tasks frames increment.
 	long long sequential;
-
-	int avoidhostsnum;
-	int errorhostsnum;
 
 	int errors_retries;
 	int errors_avoidhost;

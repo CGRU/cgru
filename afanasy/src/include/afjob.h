@@ -87,6 +87,9 @@ namespace AFJOB
 	const int64_t STATE_ERROR_READY_MASK           = 1ULL<<17;
 	const   char  STATE_ERROR_READY_NAME[]         = "Restarted Error";
 	const   char  STATE_ERROR_READY_NAME_S[]       = "RER";
+	const int64_t STATE_WAITRECONNECT_MASK         = 1ULL<<18;
+	const   char  STATE_WAITRECONNECT_NAME[]       = "Waiting reconnect";
+	const   char  STATE_WAITRECONNECT_NAME_S[]     = "WRC";
 
 	const int64_t STATE_SOLVED_MASK                = 1ULL<<62;
 
@@ -110,7 +113,7 @@ namespace AFJOB
 
 	// Tasks progess some states for GUI in ASCII
 	// Order is priority, as only one, most important state displayed in a job block progress bar
-	const int ASCII_PROGRESS_COUNT = 10;
+	const int ASCII_PROGRESS_COUNT = 11;
 	const int64_t ASCII_PROGRESS_STATES[ASCII_PROGRESS_COUNT*2] = {
 		' ', 0,
 		'D', STATE_DONE_MASK,
@@ -121,8 +124,9 @@ namespace AFJOB
 		'R', STATE_RUNNING_MASK,
 		'N', STATE_RUNNING_MASK | STATE_WARNING_MASK,
 		'Y', STATE_ERROR_READY_MASK | STATE_READY_MASK,
-		'E', STATE_ERROR_MASK};
-	const int64_t ASCII_PROGRESS_MASK = STATE_READY_MASK | STATE_DONE_MASK | STATE_SKIPPED_MASK |
+		'E', STATE_ERROR_MASK,
+		'C', STATE_WAITRECONNECT_MASK};
+	const int64_t ASCII_PROGRESS_MASK = STATE_READY_MASK | STATE_DONE_MASK | STATE_SKIPPED_MASK | STATE_WAITRECONNECT_MASK |
 		STATE_DONE_MASK | STATE_WARNING_MASK | STATE_RUNNING_MASK | STATE_ERROR_READY_MASK | STATE_ERROR_MASK;
 	const int ASCII_PROGRESS_LENGTH = 128;
 }

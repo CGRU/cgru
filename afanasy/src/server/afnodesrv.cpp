@@ -3,6 +3,7 @@
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -70,7 +71,7 @@ bool AfNodeSrv::createStoreDir() const
 
 	if( m_store_dir.empty())
 	{
-		AFERRAR("AfNodeSrv::createStoreDir: Store folder is not set for '%s'.", m_node->m_name.c_str())
+		AF_ERR << "Store folder is not set for '" << m_node->m_name << "'";
 		return false;
 	}
 

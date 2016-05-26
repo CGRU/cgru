@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
 			delete render;
 			continue;
 		}
-		renders.addRender( render);
+		renders.addRender( render, NULL, NULL);
 	}
 	AF_LOG << renders.getCount() << " renders registered.";
 	}

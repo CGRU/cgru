@@ -202,7 +202,8 @@ AF_LOG << " >>> " << i_msg;
 		}
 		// Render was trying to register (its id==0) and server has send id>0
 		// This is the situation when client was sucessfully registered
-		else if((new_id > 0) && (i_render.getId() == 0))
+//		else if((new_id > 0) && (i_render.getId() == 0))
+		else if((new_id > 0) && i_render.notConnected())
 		{
 			i_render.setRegistered( new_id);
 		}

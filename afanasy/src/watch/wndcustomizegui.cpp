@@ -127,6 +127,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskskipped     ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningrun  ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningdone ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwaitreconn  ));
 
 	label = new QLabel("Render Colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
