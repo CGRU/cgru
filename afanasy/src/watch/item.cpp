@@ -41,7 +41,11 @@ QSize Item::sizeHint( const QStyleOptionViewItem &option) const
 
 bool Item::calcHeight()
 {
-	return true;
+    return true;
+}
+
+void Item::generateMenu(QMenu & /*o_menu*/)
+{
 }
 
 const QColor & Item::clrTextMain( const QStyleOptionViewItem &option) const

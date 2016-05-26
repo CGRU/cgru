@@ -4,11 +4,13 @@
 
 #include <QItemDelegate>
 #include <QStyleOption>
+#include <QMenu>
 
 class MainWidget;
 
-class Item
+class Item : public QObject
 {
+	Q_OBJECT
 public:
 	Item( const QString &itemname, int itemid);
 	virtual ~Item();
@@ -62,6 +64,9 @@ public:
 	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
 
 	virtual bool calcHeight();
+	
+	/// Fills the provided menu with the available item's actions
+	virtual void generateMenu(QMenu & /*o_menu*/);
 
 protected:
 	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;

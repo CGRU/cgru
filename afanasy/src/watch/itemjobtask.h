@@ -13,11 +13,13 @@ class ListTasks;
 
 class ItemJobTask : public Item
 {
+	Q_OBJECT
 public:
 	ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata);
 	~ItemJobTask();
 
 	virtual bool calcHeight();
+	virtual void generateMenu(QMenu & o_menu);
 
 	void upProgress( const af::TaskProgress & tp);
 
@@ -43,13 +45,26 @@ public:
 	bool compare( int type, const ItemJobTask & other, bool ascending) const;
 
 	void taskFilesReceived( const af::MCTaskUp & i_taskup );
-
+	
+	/// Send a query for information about this task to the server
+	void getTaskInfo(const std::string &i_mode, int i_number = -1);
+	
 protected:
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
 	void thumbsCLear();
+	
+private slots:
+	void actTaskLog();
+	void actTaskInfo();
+	void actTaskErrorHosts();
+	void actTaskStdOut( int i_number );
+	void actTaskListen();
+	void actTaskPreview( int num_cmd, int num_img);
 
+	void actBrowseFolder();
+	
 private:
 	static const int TaskHeight = 13;
 	static const int TaskThumbHeight = 100;
