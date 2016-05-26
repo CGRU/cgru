@@ -16,7 +16,8 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
-#include "monitorhost.h"
+#include "listtasks.h"
+#include "itemjobtask.h"
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
@@ -247,14 +248,25 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			                .arg( QString::fromStdString(task->getJobName()))
 			                .arg( QString::fromStdString(task->getBlockName()))
 			                .arg( QString::fromStdString(task->getName()));
+			QMenu *taskmenu = new QMenu(title, this);
+			ItemJobTask *itemTask = new ItemJobTask( task->getJobId(),
+			                                         task->getBlockNum(),
+			                                         task->getTaskNum(),
+			                                         title,
+			                                         this);
+			itemTask->generateMenu( *taskmenu);
+			
+			taskmenu->addSeparator();
 			action = new ActionIdIdId( task->getJobId(),
 			                           task->getBlockNum(),
 			                           task->getTaskNum(),
-			                           title,
+			                           "Open Task",
 			                           this);
 			connect( action, SIGNAL( triggeredId(int,int,int) ),
 			         this, SLOT( actRequestTaskInfo(int,int,int) ));
-			submenu->addAction( action);
+			taskmenu->addAction( action);
+			
+			submenu->addMenu( taskmenu);
 		}
 		
 		menu.addMenu( submenu);
@@ -553,18 +565,7 @@ void ListRenders::actRequestInfo()     { getItemInfo("full"); }
 
 void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 {
-	const std::string mode = "info";
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\"";
-	str << ",\"mode\":\"" << mode << "\"";
-	str << ",\"ids\":[" << jid << "]";
-	str << ",\"block_ids\":[" << bnum << "]";
-	str << ",\"task_ids\":[" << tnum << "]";
-	str << ",\"mon_id\":" << MonitorHost::id();
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg( str);
-	Watch::sendMsg( msg);
+	ItemJobTask(jid, bnum, tnum).getTaskInfo("info");
 }
 
 void ListRenders::actEnableService()  { setService( true );}

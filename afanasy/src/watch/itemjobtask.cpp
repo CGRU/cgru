@@ -1,12 +1,17 @@
 #include "itemjobtask.h"
 
 #include "../libafanasy/msgclasses/mctaskup.h"
+#include "../libafanasy/environment.h"
+#include "../libafanasy/service.h"
+#include "../include/afanasy.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "itemjobblock.h"
 #include "listtasks.h"
 #include "watch.h"
+#include "actionid.h"
+#include "monitorhost.h"
 
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
@@ -20,6 +25,7 @@ const int ItemJobTask::WidthInfo = 98;
 ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
 	Item( afqt::stoq( i_bdata->genTaskName( i_numtask)), ItemId),
 	m_list( i_list),
+	m_job_id( i_block->job_id),
 	m_blocknum( i_bdata->getBlockNum()),
 	m_tasknum( i_numtask),
 	m_block( i_block),
@@ -27,6 +33,14 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int 
 	m_thumbs_imgs( NULL)
 {
 }
+
+ItemJobTask::ItemJobTask( int i_job_id, int i_block_num, int i_task_num, const QString &itemname, QWidget *parent):
+	Item( itemname, ItemId, parent),
+	m_job_id( i_job_id),
+	m_blocknum( i_block_num),
+	m_tasknum( i_task_num),
+	m_block( NULL)
+{}
 
 ItemJobTask::~ItemJobTask()
 {
@@ -42,6 +56,94 @@ bool ItemJobTask::calcHeight()
 		m_height += ItemJobTask::TaskThumbHeight;
 
 	return old_height == m_height;
+}
+
+void ItemJobTask::generateMenu(QMenu &o_menu)
+{
+	QAction *action;
+	QWidget *that = o_menu.parentWidget();
+	
+	ActionId * actionid = new ActionId( 0, "Output", that);
+	connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
+	o_menu.addAction( actionid);
+
+	if( m_job_id != AFJOB::SYSJOB_ID )
+	{
+		int startCount = taskprogress.starts_count;
+		if( startCount > 1 )
+		{
+			QMenu * submenu = new QMenu( "outputs", that);
+			for( int i = 1; i < startCount; i++)
+			{
+				actionid = new ActionId( i, QString("session #%1").arg(i), that);
+				connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
+				submenu->addAction( actionid);
+			}
+			o_menu.addMenu( submenu);
+		}
+	}
+
+	action = new QAction( "Log", that);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskLog() ));
+	o_menu.addAction( action);
+
+	action = new QAction( "Info", that);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskInfo() ));
+	o_menu.addAction( action);
+
+	action = new QAction( "Listen", that);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskListen() ));
+	o_menu.addAction( action);
+
+	action = new QAction( "Error Hosts", that);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
+	o_menu.addAction( action);
+
+	// If block is not initialized, we stop here
+	if ( NULL == m_block)
+		return;
+	
+	std::vector<std::string> files = genFiles();
+	if( files.size())
+	{
+		if( af::Environment::getPreviewCmds().size() > 0 )
+		{
+			o_menu.addSeparator();
+
+			action = new QAction( "Browse Files...", that);
+			connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
+			o_menu.addAction( action);
+
+		if( isBlockNumeric() )
+		{
+			QMenu * submenu_cmd = new QMenu( "Preview", that);
+			int p = 0;
+			for( std::vector<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
+			{
+				if( files.size() > 1)
+				{
+					QString file = afqt::stoq((*it).c_str());
+					QMenu * submenu_img = new QMenu( QString("%1").arg( file), that);
+					for( int i = 0; i < files.size(); i++)
+					{
+						QString imgname = file.right(99);
+						ActionIdId * actionid = new ActionIdId( p, i, imgname, that);
+						connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+						submenu_img->addAction( actionid);
+					}
+					submenu_cmd->addMenu( submenu_img);
+				}
+				else
+				{
+					ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg( QString::fromUtf8((*it).c_str())), that);
+					connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+					submenu_cmd->addAction( actionid);
+				}
+			}
+			o_menu.addMenu( submenu_cmd);
+		}
+		}
+	}
 }
 
 const QVariant ItemJobTask::getToolTip() const
@@ -176,7 +278,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	text_x -= ItemJobBlock::WErrors;
 
 	// Shift starts counter on a system job task:
-	if( m_block->job_id == AFJOB::SYSJOB_ID ) text_x -= 10;
+	if( m_job_id == AFJOB::SYSJOB_ID ) text_x -= 10;
 
 	painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
 	if( false == rightString.isEmpty() )
@@ -188,7 +290,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	}
 
 	// Shift starts counter on a system job task:
-	if( m_block->job_id == AFJOB::SYSJOB_ID ) text_x -= 60;
+	if( m_job_id == AFJOB::SYSJOB_ID ) text_x -= 60;
 
 	painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 
@@ -255,16 +357,8 @@ void ItemJobTask::showThumbnail()
 		m_list->itemsHeightChanged();
 		return;
 	}
-
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"files\"";
-	str << ",\"ids\":[" << m_block->job_id << "]";
-	str << ",\"block_ids\":[" << m_blocknum << "]";
-	str << ",\"task_ids\":[" << m_tasknum << "]";
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg( str);
-	Watch::sendMsg( msg);
+	
+	getTaskInfo("files");
 }
 
 void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
@@ -295,6 +389,23 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 		m_list->itemsHeightChanged();
 }
 
+void ItemJobTask::getTaskInfo(const std::string &i_mode, int i_number)
+{
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\"";
+	str << ",\"mode\":\"" << i_mode << "\"";
+	str << ",\"ids\":[" << m_job_id << "]";
+	str << ",\"block_ids\":[" << m_blocknum << "]";
+	str << ",\"task_ids\":[" << m_tasknum << "]";
+	if( i_number != -1 )
+		str << ",\"number\":" << i_number;
+	str << ",\"mon_id\":" << MonitorHost::id();
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	Watch::sendMsg( msg);
+}
+
 void ItemJobTask::thumbsCLear()
 {
 	if( m_thumbs_num == 0 )
@@ -306,4 +417,51 @@ void ItemJobTask::thumbsCLear()
 	m_thumbs_num = 0;
 
 	delete [] m_thumbs_imgs;
+}
+
+void ItemJobTask::actTaskLog()                { getTaskInfo("log");              }
+void ItemJobTask::actTaskInfo()               { getTaskInfo("info");             }
+void ItemJobTask::actTaskErrorHosts()         { getTaskInfo("error_hosts");      }
+void ItemJobTask::actTaskStdOut(int i_number) { getTaskInfo("output", i_number); }
+
+void ItemJobTask::actTaskListen()
+{
+	Watch::listenTask( m_job_id, getBlockNum(), getTaskNum(),
+	                   QString("#%1 (%2)").arg(m_job_id).arg(getName()));
+}
+
+void ItemJobTask::actTaskPreview(int num_cmd, int num_img)
+{
+	af::Service service( "service", getWDir(), "", genFiles());
+
+	std::vector<std::string> images = service.getFiles();
+	if( num_img >= images.size())
+	{
+		// TODO: Figure out a way to feed this back to the list
+		//displayError( "No such image nubmer.");
+		return;
+	}
+	QString arg = afqt::stoq( images[num_img]);
+	QString wdir( afqt::stoq( service.getWDir()));
+
+	if( arg.isEmpty()) return;
+	if( num_cmd >= af::Environment::getPreviewCmds().size())
+	{
+		//displayError( "No such command number.");
+		return;
+	}
+
+	QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
+	cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+
+	Watch::startProcess( cmd, wdir);
+}
+
+void ItemJobTask::actBrowseFolder()
+{
+	af::Service service("service", getWDir(), "", genFiles());
+	QString image = afqt::stoq( service.getFiles()[0]);
+	QString wdir = afqt::stoq( service.getWDir());
+
+	Watch::browseImages( image, wdir);
 }

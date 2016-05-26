@@ -31,7 +31,10 @@ public:
 	void sortBlock( int numblock);
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
-
+	
+public:
+	void generateMenu(QMenu &o_menu, Item *item);
+	
 signals:
 	void changeMonitor( int type, int id);
 
@@ -51,16 +54,8 @@ private slots:
 
 	void blockAction( int id_block, QString i_action);
 
-	void actTaskInfo();
-	void actTaskLog();
-	void actTaskStdOut( int number );
-	void actTaskErrorHosts();
-	void actTaskPreview( int num_cmd, int num_img);
-	void actTaskListen();
 	void actTasksRestart();
 	void actTasksSkip();
-
-	void actBrowseFolder();
 
 private:
 	int m_job_id;
@@ -85,7 +80,6 @@ private:
 	int getRow( int block, int task = -1);
 
 	void blockAction( int id_block, const QString & i_action, bool i_query);
-	void tasksOpeation( const std::string & i_type);
-	void getTaskInfo( const std::string & i_mode, int i_number = -1, Item * item = NULL);
+	void tasksOperation( const std::string & i_type);
 	void setWindowTitleProgress();
 };

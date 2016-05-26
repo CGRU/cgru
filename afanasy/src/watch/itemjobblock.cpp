@@ -2,9 +2,12 @@
 
 #include "itemjobtask.h"
 #include "listtasks.h"
+#include "watch.h"
 
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
+#include "../libafanasy/service.h"
+#include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -92,6 +95,24 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
    tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties);
+}
+
+void ItemJobBlock::generateMenu(QMenu &o_menu)
+{
+	QAction *action;
+	QWidget *that = o_menu.parentWidget();
+	
+	if( files.size() )
+	{
+		 action = new QAction( "Browse Files...", that);
+		 connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
+		 o_menu.addAction( action);
+		 o_menu.addSeparator();
+	}
+
+	QMenu * submenu = new QMenu( "Change Block", that);
+	info.generateMenu( getNumBlock(), &o_menu, that, submenu);
+	o_menu.addMenu( submenu);
 }
 
 ItemJobBlock::~ItemJobBlock()
@@ -243,4 +264,13 @@ case SState:   printf("State %d \n",   sort_ascending); break;
    listtasks->sortBlock( numblock);
 
    return true;
+}
+
+void ItemJobBlock::actBrowseFolder()
+{
+	af::Service service( "service", workingdir, "", files);
+	QString image = afqt::stoq( service.getFiles()[0]);
+	QString wdir = afqt::stoq( service.getWDir());
+	
+	Watch::browseImages( image, wdir);
 }
