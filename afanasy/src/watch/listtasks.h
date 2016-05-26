@@ -60,8 +60,6 @@ private slots:
 	void actTasksRestart();
 	void actTasksSkip();
 
-	void actBrowseFolder();
-
 private:
 	int m_job_id;
 	QString m_job_name;

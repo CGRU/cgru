@@ -138,21 +138,14 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 		case ItemJobBlock::ItemId:
 		{
 			ItemJobBlock *itemBlock = static_cast<ItemJobBlock*>(item);
-			if( itemBlock->files.size() )
-			{
-				 action = new QAction( "Browse Files...", this);
-				 connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
-				 o_menu.addAction( action);
-				 o_menu.addSeparator();
-			}
-
-			QMenu * submenu = new QMenu( "Change Block", this);
-			itemBlock->generateMenu( itemBlock->getNumBlock(), &o_menu, this, submenu);
-
-			o_menu.addMenu( submenu);
+			
+			// Operations on the current block item
+			itemBlock->generateMenu( o_menu);
+			
 			o_menu.addSeparator();
+			// Operations on all the selected blocks
 
-			submenu = new QMenu( "Change Tasks", this);
+			QMenu *submenu = new QMenu( "Change Tasks", this);
 			o_menu.addMenu( submenu);
 
 			action = new QAction( "Set Command", this);
@@ -186,7 +179,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 			ItemJobTask *itemTask = static_cast<ItemJobTask*>(item);
 			
 			// Operations on the current task item
-			itemTask->generateMenu(o_menu);
+			itemTask->generateMenu( o_menu);
 
 			o_menu.addSeparator();
 			// Operations on all the selected tasks
@@ -537,6 +530,15 @@ void ListTasks::actBlockWorkingDir()
 	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
 	blockAction( 0, QString("\"params\":{\"working_directory\":\"%1\"}").arg( str), false);
 }
+void ListTasks::actBlockCmdPost()
+{
+	bool ok;
+	QString cur = ((ItemJobBlock*)( getCurrentItem()))->cmdpost;
+	QString str = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, cur, &ok);
+	if( !ok) return;
+	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
+	blockAction( 0, QString("\"params\":{\"command_post\":\"%1\"}").arg(str), false);
+}
 void ListTasks::actBlockFiles()
 {
 	bool ok;
@@ -554,15 +556,6 @@ void ListTasks::actBlockFiles()
 
 	blockAction( 0, params, false);
 }
-void ListTasks::actBlockCmdPost()
-{
-	bool ok;
-	QString cur = ((ItemJobBlock*)( getCurrentItem()))->cmdpost;
-	QString str = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, cur, &ok);
-	if( !ok) return;
-	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
-	blockAction( 0, QString("\"params\":{\"command_post\":\"%1\"}").arg(str), false);
-}
 void ListTasks::actBlockService()
 {
 	bool ok;
@@ -578,41 +571,6 @@ void ListTasks::actBlockParser()
 	QString str = QInputDialog::getText(this, "Change Parser", "Enter Type", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
 	blockAction( 0, QString("\"params\":{\"parser\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
-}
-
-void ListTasks::actBrowseFolder()
-{
-	 Item* item = getCurrentItem();
-	 if( item == NULL )
-		  return;
-
-	 QString image;
-	 QString wdir;
-
-	 int id = item->getId();
-	 switch( id)
-	 {
-	 case ItemJobBlock::ItemId:
-	 {
-		  ItemJobBlock *itemBlock = (ItemJobBlock*)item;
-		  af::Service service( "service", itemBlock->workingdir, "", itemBlock->files);
-		  image = afqt::stoq( service.getFiles()[0]);
-		  wdir = afqt::stoq( service.getWDir());
-		  break;
-	 }
-	 case ItemJobTask::ItemId:
-	 {
-		  ItemJobTask* taskitem = (ItemJobTask*)item;
-		  af::Service service("service", taskitem->getWDir(), "", taskitem->genFiles());
-		  image = afqt::stoq( service.getFiles()[0]);
-		  wdir = afqt::stoq( service.getWDir());
-		  break;
-	 }
-	 default:
-		  return;
-	 }
-
-	Watch::browseImages( image, wdir);
 }
 
 void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }

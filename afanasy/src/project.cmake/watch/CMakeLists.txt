@@ -36,6 +36,7 @@ else()
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndtask.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/item.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/itemjobtask.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/itemjobblock.h"
 	)
 	qt4_wrap_cpp(moc_src ${moc_hdr})
 endif()
