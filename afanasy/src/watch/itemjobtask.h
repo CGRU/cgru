@@ -19,7 +19,7 @@ public:
 	ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata);
 	/// ctor used to generate context menu, not to add to a list.
 	/// It is just holding information about job/block/task id.
-	ItemJobTask( int i_job_id, int i_block_num, int i_task_num, const QString &itemname, QWidget *parent);
+	ItemJobTask( int i_job_id, int i_block_num, int i_task_num, const QString &itemname = "", QWidget *parent = 0);
 	~ItemJobTask();
 
 	virtual bool calcHeight();

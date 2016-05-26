@@ -33,9 +33,6 @@ public:
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
 	
 public:
-	static void getTaskInfo( int i_job_id, int i_block_num, int i_task_num,
-	                         const std::string & i_mode, int i_number = -1);
-	
 	void generateMenu(QMenu &o_menu, Item *item);
 	
 signals:

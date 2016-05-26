@@ -565,7 +565,7 @@ void ListRenders::actRequestInfo()     { getItemInfo("full"); }
 
 void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 {
-	ListTasks::getTaskInfo(jid, bnum, tnum, "info");
+	ItemJobTask(jid, bnum, tnum).getTaskInfo("info");
 }
 
 void ListRenders::actEnableService()  { setService( true );}

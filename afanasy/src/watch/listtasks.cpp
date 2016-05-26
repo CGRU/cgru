@@ -465,7 +465,7 @@ void ListTasks::doubleClicked( Item * item)
 	if( item->getId() == ItemJobTask ::ItemId )
 	{
 		ItemJobTask *itemTask = (ItemJobTask*)item;
-		getTaskInfo(m_job_id, itemTask->getBlockNum(), itemTask->getTaskNum(), "info");
+		itemTask->getTaskInfo("info");
 	}
 	else if( item->getId() == ItemJobBlock::ItemId )
 	{
@@ -688,21 +688,3 @@ bool ListTasks::v_filesReceived( const af::MCTaskUp & i_taskup )
 
 	return true;
 }
-
-void ListTasks::getTaskInfo(int i_job_id, int i_block_num, int i_task_num, const std::string &i_mode, int i_number)
-{
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\"";
-	str << ",\"mode\":\"" << i_mode << "\"";
-	str << ",\"ids\":[" << i_job_id << "]";
-	str << ",\"block_ids\":[" << i_block_num << "]";
-	str << ",\"task_ids\":[" << i_task_num << "]";
-	if( i_number != -1 )
-		str << ",\"number\":" << i_number;
-	str << ",\"mon_id\":" << MonitorHost::id();
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg( str);
-	Watch::sendMsg( msg);
-}
-

@@ -11,6 +11,7 @@
 #include "listtasks.h"
 #include "watch.h"
 #include "actionid.h"
+#include "monitorhost.h"
 
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
@@ -354,7 +355,7 @@ void ItemJobTask::showThumbnail()
 		return;
 	}
 	
-	ListTasks::getTaskInfo(m_job_id, m_blocknum, m_tasknum, "files");
+	getTaskInfo("files");
 }
 
 void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
@@ -387,7 +388,19 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 
 void ItemJobTask::getTaskInfo(const std::string &i_mode, int i_number)
 {
-	ListTasks::getTaskInfo(m_job_id, m_blocknum, m_tasknum, i_mode, i_number);
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\"";
+	str << ",\"mode\":\"" << i_mode << "\"";
+	str << ",\"ids\":[" << m_job_id << "]";
+	str << ",\"block_ids\":[" << m_blocknum << "]";
+	str << ",\"task_ids\":[" << m_tasknum << "]";
+	if( i_number != -1 )
+		str << ",\"number\":" << i_number;
+	str << ",\"mon_id\":" << MonitorHost::id();
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	Watch::sendMsg( msg);
 }
 
 void ItemJobTask::thumbsCLear()
