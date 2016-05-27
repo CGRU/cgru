@@ -134,8 +134,6 @@ void RenderHost::connectionLost( bool i_any_case)
 
 	m_connected = false;
 
-	//m_id = 0;
-
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
     

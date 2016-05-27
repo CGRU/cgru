@@ -18,6 +18,7 @@ extern void (*fp_setupChildProcess)( void);
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/logger.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "renderhost.h"
@@ -281,22 +282,10 @@ void TaskProcess::refresh()
 	// Task is finished
 	if( m_pid == 0 )
 	{
-		if( m_dead_cycle > 0 )
-		{
-	        // This class instance is not needed any more, but still exists due some error
-		    printf("Dead Cycle #%d: ", m_dead_cycle); m_taskexec->v_stdOut();
-		}
+		sendTaskSate();
 
-		// This is a first dead cycle.
-		m_dead_cycle ++;
-		// And in normal case it should be the last one.
+		m_dead_cycle++;
 
-		// Continue sending task state to server, may be some network connection error.
-		if(( m_dead_cycle % 10 ) == 0 )
-		{
-			// But only every 10 cycles, as network may be very busy (almost down in this case).
-			sendTaskSate();
-		}
 		return;
 	}
 
@@ -443,6 +432,31 @@ void TaskProcess::sendTaskSate()
 	int percentframe     = m_parser->getPercentFrame();
 	std::string activity = m_parser->getActivity();
 	std::string report   = m_parser->getReport();
+
+
+	if( m_render->notConnected() || ( m_dead_cycle ))
+	{
+		if( m_render->isConnected())
+			printf("Dead Cycle #%d: ", m_dead_cycle);
+
+		switch( m_update_status )
+		{
+			case af::TaskExec::UPFinishedSuccess:
+				printf("DON");
+				break;
+			case af::TaskExec::UPFinishedParserBadResult:
+			case af::TaskExec::UPFinishedParserError:
+			case af::TaskExec::UPFinishedError:
+				printf("ERR");
+				break;
+			default:
+				printf("%d%%", percent);
+		}
+
+		printf(" : ");
+		m_taskexec->v_stdOut();
+	}
+
 
 	af::MCTaskUp * taskup = new af::MCTaskUp(
 		m_render->getId(),

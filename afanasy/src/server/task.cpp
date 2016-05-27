@@ -124,7 +124,7 @@ void Task::reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, Re
 	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
 	{
 		v_appendLog("Reconnecting previously run...");
-		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with:\n" << *i_render;
+		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with\nRender: " << *i_render;
 		v_start( i_taskexec, o_runningtaskscounter, i_render, i_monitoring);
 	}
 	else
