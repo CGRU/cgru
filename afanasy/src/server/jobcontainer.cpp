@@ -54,7 +54,7 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
             if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
 }
 
-void JobContainer::reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
+bool JobContainer::reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
 	#ifdef AFOUTPUT
 	AF_DEBUG << "Reconnecting task " << i_taskexec << " with " << i_render;
@@ -65,10 +65,10 @@ void JobContainer::reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render
     if( NULL == job )
     {
 		AF_ERR << "Job with id=" << i_taskexec.getJobId() << " does not exists.";
-        return;
+        return false;
     }
 
-	job->reconnectTask( i_taskexec, i_render, i_monitoring);
+	return job->reconnectTask( i_taskexec, i_render, i_monitoring);
 }
 
 int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring)

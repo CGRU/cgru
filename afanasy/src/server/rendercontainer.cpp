@@ -48,8 +48,9 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
                return new af::Msg( af::Msg::TRenderId, -1);
             }
             // Offline render with the same hostname found:
-            else if( render->online( newRender, i_jobs, monitoring))
-            {
+            else
+			{
+				render->online( newRender, i_jobs, monitoring);
                int id = render->getId();
                AFCommon::QueueLog("Render: " + render->v_generateInfoString( false));
                delete newRender;

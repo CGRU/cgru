@@ -161,12 +161,12 @@ af::Msg * RenderAf::update( const af::RenderUpdate & i_up)
 	return msg;
 }
 
-bool RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring)
+void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring)
 {
 	if( isOnline())
 	{
-		AFERROR("RenderAf::online: Render is already online.")
-		return false;
+		AF_ERR << "Render is already online.";
+		return;
 	}
 
 	m_idle_time = time( NULL);
@@ -190,7 +190,10 @@ bool RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	std::list<af::TaskExec*>::iterator it;
 	for( it = render->m_tasks.begin() ; it != render->m_tasks.end() ; ++it)
 	{
-		i_jobs->reconnectTask( **it, *this, monitoring);
+		if( false == i_jobs->reconnectTask( **it, *this, monitoring))
+		{
+			delete *it;
+		}
 	}
 
 
@@ -201,8 +204,6 @@ bool RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 		monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 
 	store();
-
-	return true;
 }
 
 void RenderAf::deregister( JobContainer * jobs, MonitorContainer * monitoring )

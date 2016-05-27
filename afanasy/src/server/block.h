@@ -49,7 +49,7 @@ public:
 	/// Records that a task execution is being performed by a given running
 	/// render. This is used when restarting the server without restarting the
 	/// renders.
-	void reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
+	bool reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
 
 	void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 

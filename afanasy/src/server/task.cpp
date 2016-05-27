@@ -119,19 +119,20 @@ void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf
    m_run = new TaskRun( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
 }
 
-void Task::reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring)
+bool Task::reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
 	{
 		v_appendLog("Reconnecting previously run...");
 		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with\nRender: " << *i_render;
 		v_start( i_taskexec, o_runningtaskscounter, i_render, i_monitoring);
+		return true;
 	}
 	else
 	{
 		v_appendLog("Reconnection failed: task was not waiting it.");
 		i_render->stopTask( i_taskexec);
-		delete i_taskexec;
+		return false;
 	}
 }
 

@@ -30,7 +30,7 @@ public:
 	void setRegistered();
 
 /// Awake offline render
-	bool online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
+	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
 /// Add task \c taskexec to render, \c start or only capture it
 	void setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, bool start = true);

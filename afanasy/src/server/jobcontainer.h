@@ -34,7 +34,7 @@ public:
 	 * @param renders: renders pool
 	 * @param monitoring: monitors pool
 	 */
-	void reconnectTask(af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
+	bool reconnectTask(af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
 
 	void getWeight( af::MCJobsWeight & jobsWeight );
 	
