@@ -131,6 +131,7 @@ void Task::reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, Re
 	{
 		v_appendLog("Reconnection failed: task was not waiting it.");
 		i_render->stopTask( i_taskexec);
+		delete i_taskexec;
 	}
 }
 
