@@ -33,6 +33,7 @@ public:
 	bool online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
 /// Add task \c taskexec to render, \c start or only capture it
+/// Takes over the taskexec ownership
 	void setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, bool start = true);
 
 /// Start tast \c taskexec on remote render host, task must be set before and exists on render.
@@ -50,6 +51,7 @@ public:
 		{ stopTask(taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());}
 
 /// Make Render to finish task.
+/// Releases the ownership of taskexec (Render will not own it any more)
 	void taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring);
 
 /// Refresh parameters.

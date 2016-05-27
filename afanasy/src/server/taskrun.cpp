@@ -230,6 +230,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 
 bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
+	if( m_zombie ) return false;
 	
 	if( m_exec == NULL)
 	{
@@ -239,7 +240,6 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 		return false;
 	}
 	//printf("TaskRun::refresh: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
-	if( m_zombie ) return false;
 	bool changed = false;
 
 	// Max running time check:
@@ -323,6 +323,8 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
          m_block->taskFinished( m_exec, render, monitoring);
       }
 		AFCommon::DBAddTask( m_exec, m_progress, m_block->m_job, render);
+		delete m_exec;
+		m_exec = NULL;
    }
 
    m_task->v_monitor( monitoring );
