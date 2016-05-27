@@ -54,6 +54,9 @@ void Render::construct()
 
 Render::~Render()
 {
+	std::list<af::TaskExec*>::iterator it;
+	for( it = m_tasks.begin(); it != m_tasks.end(); it++)
+		delete *it;
 }
 
 void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Thread-safe
@@ -298,6 +301,13 @@ int Render::v_calcWeight() const
    weight += sizeof(Render) - sizeof( Client);
    for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++) weight += (*it)->calcWeight();
    return weight;
+}
+
+std::list<TaskExec *> Render::takeTasks()
+{
+	std::list<af::TaskExec*> l = m_tasks;
+	m_tasks.clear();
+	return l;
 }
 
 void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const

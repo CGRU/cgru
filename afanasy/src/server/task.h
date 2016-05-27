@@ -26,6 +26,8 @@ public:
 
 	virtual void v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
 
+	/// Reconnect Task to an existing TaskExec
+	/// This method taks the ownership of `i_taskexec`
 	void reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring);
 
 /// Update task state.

@@ -89,10 +89,6 @@ public:
 	inline void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 		{ if( i_subscribe) m_re.taskListenAdd( i_tp); else m_re.taskListenRem( i_tp); }
 
-	/// Delete tasks executables.
-	/// Needed for server to free mem of a reconnecting render.
-	void deleteTaskExecs();
-
 public:
 	/// Set container:
 	inline static void setRenderContainer( RenderContainer * i_container){ ms_renders = i_container;}
@@ -103,7 +99,11 @@ public:
 private:
 	void initDefaultValues();
 
+	/// Add the task exec to this render and take over its ownership (meaning
+	/// one should not free taskexec after having provided it to this method).
 	void addTask( af::TaskExec * taskexec);
+	/// Remove the task exec from this render and give back its ownership to the
+	/// caller.
 	void removeTask( const af::TaskExec * taskexec);
 
 	void addService( const std::string & type);
