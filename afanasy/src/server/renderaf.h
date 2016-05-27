@@ -89,6 +89,10 @@ public:
 	inline void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 		{ if( i_subscribe) m_re.taskListenAdd( i_tp); else m_re.taskListenRem( i_tp); }
 
+	/// Delete tasks executables.
+	/// Needed for server to free mem of a reconnecting render.
+	void deleteTaskExecs();
+
 public:
 	/// Set container:
 	inline static void setRenderContainer( RenderContainer * i_container){ ms_renders = i_container;}

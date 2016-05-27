@@ -999,6 +999,12 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 	render->m_re.addTaskClose( taskup);
 }
 
+void RenderAf::deleteTaskExecs()
+{
+	for( std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+		delete *it;
+}
+
 af::Msg * RenderAf::writeFullInfo( bool i_binary) const
 {
 	if( i_binary )

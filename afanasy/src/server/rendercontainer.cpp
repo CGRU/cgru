@@ -42,6 +42,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
                errLog += "\nExisting render:\n";
                errLog += render->v_generateInfoString( false);
                AFCommon::QueueLogError( errLog);
+			   newRender->deleteTaskExecs();
                delete newRender;
                // Return -1 ID to render to tell that there is already registered render with the same name:
                return new af::Msg( af::Msg::TRenderId, -1);
@@ -69,7 +70,10 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
 			AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
 		}
 		else
+		{
+			newRender->deleteTaskExecs();
 			delete newRender;
+		}
 
 		// Return new render ID to render to tell that it was successfully registered:
 		return new af::Msg( af::Msg::TRenderId, id);
@@ -82,7 +86,10 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
 		newRender->setRegistered();
 	}
 	else
+	{
+		newRender->deleteTaskExecs();
 		delete newRender;
+	}
 
    return NULL;
 }
