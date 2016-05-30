@@ -71,7 +71,7 @@ private:
 class MonitorContainerIt : public AfContainerIt
 {
 public:
-   MonitorContainerIt( MonitorContainer* container, bool skipZombies = true);
+   MonitorContainerIt( MonitorContainer* m_container, bool skipZombies = true);
    ~MonitorContainerIt();
 
 	inline MonitorAf * monitor() { return (MonitorAf*)(getNode()); }

@@ -15,10 +15,10 @@ class AfContainer
 {
 public:
 	/// Initialize container for \c maximumsize nodes.
-	AfContainer( std::string ContainerName, int MaximumSize);
+	AfContainer(std::string containerName, int maximumSize);
 	~AfContainer();
 
-	inline bool isInitialized() {  return initialized;}///< Whether container was successfully initialized.
+	inline bool isInitialized() {  return m_initialized;}///< Whether container was successfully initialized.
 
 	/// Generate MCAfNodes message with Nodes with provided ids or mask:
 	af::Msg * generateList( int i_type, const af::MCGeneral & i_mcgeneral);
@@ -40,7 +40,6 @@ public:
 	/// Perform an aciton:
 	void action( Action & i_action);
 
-	/* */
 	void ReadLock( void ) { m_rw_lock.ReadLock(); }
 	void WriteLock( void ) { m_rw_lock.WriteLock(); }
 	void ReadUnlock( void ) { m_rw_lock.ReadUnlock(); }
@@ -51,7 +50,7 @@ public:
 	friend class AfList;
 	friend class AfListIt;
 
-	inline int getCount() const { return count; }
+	inline int getCount() const { return m_count; }
 
 	/// Sort one node according to priority, called when priority attribute of any node changes.
 	void sortPriority( AfNodeSrv * i_node);
@@ -71,14 +70,14 @@ private:
 
 private:
 
-	std::string name;          ///< Container name.
+	std::string m_name;          ///< Container name.
 
 	DlRWLock m_rw_lock;
 
-	int count;                 ///< Number of nodes in container.
-	int size;                  ///< Container size ( maximun number of node can be stored).
-	AfNodeSrv * first_ptr;      ///< Pointer to first node.
-	AfNodeSrv * last_ptr;       ///< Pointer to last node.
-	AfNodeSrv ** nodesTable;          ///< Nodes pointers.
-	bool initialized;          ///< Whether container was successfully initialized.
+	int m_count;                 ///< Number of nodes in container.
+	int m_capacity;              ///< Container size ( maximun number of node can be stored).
+	AfNodeSrv * m_first_ptr;     ///< Pointer to first node.
+	AfNodeSrv * m_last_ptr;      ///< Pointer to last node.
+	AfNodeSrv ** m_nodes_table;  ///< Nodes pointers.
+	bool m_initialized;          ///< Whether container was successfully initialized.
 };

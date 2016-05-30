@@ -21,7 +21,7 @@ public:
 class RenderContainerIt : public AfContainerIt
 {
 public:
-   RenderContainerIt( RenderContainer* container, bool skipZombies = true);
+   RenderContainerIt( RenderContainer* m_container, bool skipZombies = true);
    ~RenderContainerIt();
 
 	inline RenderAf * render() { return (RenderAf*)(getNode()); }
