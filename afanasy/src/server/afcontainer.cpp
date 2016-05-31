@@ -132,6 +132,7 @@ int AfContainer::add( AfNodeSrv * i_node)
 				break;
 			}
 			after = before->m_next_ptr;
+			if( NULL == after ) break;
 			before = after;
 		}
 		
