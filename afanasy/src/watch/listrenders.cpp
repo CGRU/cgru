@@ -223,54 +223,44 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	menu.addAction( action);
 	
 	std::list<const af::TaskExec*> l = render->getTasks();
-	if( l.size() == 1)
+	submenu = new QMenu( l.size() > 1 ? "Running Tasks" : "Running Task", this);
+	submenu->setEnabled( render->hasTasks());
+
+	std::list<const af::TaskExec*>::const_iterator it;
+	for (it = l.begin() ; it != l.end() ; ++it)
 	{
-		const af::TaskExec *task = l.front();
-		action = new ActionIdIdId( task->getJobId(),
-		                           task->getBlockNum(),
-		                           task->getTaskNum(),
-		                           "Running Task",
-		                           this);
+		const af::TaskExec *task = *it;
+		QString title = QString("%1[%2][%3]")
+			.arg( QString::fromStdString(task->getJobName()))
+			.arg( QString::fromStdString(task->getBlockName()))
+			.arg( QString::fromStdString(task->getName()));
+		QMenu *taskmenu = l.size() > 1 ? new QMenu(title, this) : submenu;
+		ItemJobTask *itemTask = new ItemJobTask(
+			task->getJobId(),
+			task->getBlockNum(),
+			task->getTaskNum(),
+			title,
+			this);
+		itemTask->generateMenu( *taskmenu);
+		
+		taskmenu->addSeparator();
+		action = new ActionIdIdId(
+			task->getJobId(),
+			task->getBlockNum(),
+			task->getTaskNum(),
+			"Open Task",
+			this);
 		connect( action, SIGNAL( triggeredId(int,int,int) ),
-		         this, SLOT( actRequestTaskInfo(int,int,int) ));
-		menu.addAction( action);
-	}
-	else if( l.size() > 1)
-	{
-		submenu = new QMenu( "Running Tasks", this);
-		submenu->setEnabled( render->hasTasks());
-	
-		std::list<const af::TaskExec*>::const_iterator it;
-		for (it = l.begin() ; it != l.end() ; ++it)
+				 this, SLOT( actRequestTaskInfo(int,int,int) ));
+		taskmenu->addAction( action);
+		
+		if( l.size() > 1)
 		{
-			const af::TaskExec *task = *it;
-			QString title = QString("%1[%2][%3]")
-			                .arg( QString::fromStdString(task->getJobName()))
-			                .arg( QString::fromStdString(task->getBlockName()))
-			                .arg( QString::fromStdString(task->getName()));
-			QMenu *taskmenu = new QMenu(title, this);
-			ItemJobTask *itemTask = new ItemJobTask( task->getJobId(),
-			                                         task->getBlockNum(),
-			                                         task->getTaskNum(),
-			                                         title,
-			                                         this);
-			itemTask->generateMenu( *taskmenu);
-			
-			taskmenu->addSeparator();
-			action = new ActionIdIdId( task->getJobId(),
-			                           task->getBlockNum(),
-			                           task->getTaskNum(),
-			                           "Open Task",
-			                           this);
-			connect( action, SIGNAL( triggeredId(int,int,int) ),
-			         this, SLOT( actRequestTaskInfo(int,int,int) ));
-			taskmenu->addAction( action);
-			
 			submenu->addMenu( taskmenu);
 		}
-		
-		menu.addMenu( submenu);
 	}
+	
+	menu.addMenu( submenu);
 
 	if( me || af::Environment::VISOR())
 	{
