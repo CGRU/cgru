@@ -298,8 +298,9 @@ d_cvtguiparams.af_paused    = {'label':'Paused',    'width':'16%','lwidth':'50px
 
 d_cvtmulti_params = {};
 d_cvtmulti_params.input        = {"label":'Result Paths'};
-d_cvtmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'50%'};
-d_cvtmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'50%'};
+d_cvtmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'33%'};
+d_cvtmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'33%'};
+d_cvtmulti_params.skipcheck    = {"label":'Skip Check',   'type':"bool",'default':false,"width":'34%'};
 d_cvtmulti_params.dest         = {"label":'Destination'};
 
 function d_Convert( i_args)
