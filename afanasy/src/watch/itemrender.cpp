@@ -219,7 +219,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		deleteTasks();
 	        m_tasksusers.clear();
 	    m_tasks_users_counts.clear();
-	    m_tasks = render->getTasks();
+	    m_tasks = render->takeTasks();
 		QStringList tasks_users;
 		QList<int> tasks_counts;
 	    for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)

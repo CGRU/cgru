@@ -208,12 +208,11 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
    return true;
 }
 
-bool Block::reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
+void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
-	Task * task = m_tasks[i_taskexec.getTaskNum()];
-	return task->reconnect( &i_taskexec, m_data->getRunningTasksCounter(), &i_render, i_monitoring);
+	Task * task = m_tasks[i_taskexec->getTaskNum()];
+	task->reconnect( i_taskexec, m_data->getRunningTasksCounter(), &i_render, i_monitoring);
 }
-
 
 void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {

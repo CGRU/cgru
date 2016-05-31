@@ -54,18 +54,18 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
             if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
 }
 
-bool JobContainer::reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
+void JobContainer::reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
 	#ifdef AFOUTPUT
 	AF_DEBUG << "Reconnecting task " << i_taskexec << " with " << i_render;
 	#endif
 
     JobContainerIt jobsIt( this);
-	JobAf* job = jobsIt.getJob( i_taskexec.getJobId());
+	JobAf* job = jobsIt.getJob( i_taskexec->getJobId());
     if( NULL == job )
     {
-		AF_ERR << "Job with id=" << i_taskexec.getJobId() << " does not exists.";
-        return false;
+		AF_ERR << "Job with id=" << i_taskexec->getJobId() << " does not exists.";
+        return;
     }
 
 	return job->reconnectTask( i_taskexec, i_render, i_monitoring);
@@ -73,8 +73,6 @@ bool JobContainer::reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render
 
 int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring)
 {
-//printf("Registering new job:\n");
-
 	if( users == NULL )
 	{
 		AFERROR("JobContainer::job_register: Users container is not set.")

@@ -117,6 +117,7 @@ void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorC
 
 void TaskRunMulti::setMasterTask()
 {
+	if( isZombie()) return;
 	m_exec = m_execs.front();
 	m_hostId = m_hostids.front();
 	m_execs.pop_front();

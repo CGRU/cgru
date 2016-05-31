@@ -190,11 +190,12 @@ void RenderAf::online( RenderAf * render, JobContainer * i_jobs, MonitorContaine
 	std::list<af::TaskExec*>::iterator it;
 	for( it = render->m_tasks.begin() ; it != render->m_tasks.end() ; ++it)
 	{
-		if( false == i_jobs->reconnectTask( **it, *this, monitoring))
-		{
-			delete *it;
-		}
+		i_jobs->reconnectTask( *it, *this, monitoring);
 	}
+	// Job::reconnectTask took the ownership of the taskexecs, so we prevent
+	// them from being cleaned by render's dtor:
+	render->m_tasks.clear();
+	
 
 
 	std::string str = "Online '" + m_engine + "'.";
@@ -581,7 +582,6 @@ void RenderAf::removeTask( const af::TaskExec * taskexec)
 		if( *it == taskexec)
 		{
 			it = m_tasks.erase( it);
-			continue;
 		}
 	}
 
@@ -998,12 +998,6 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 	AFCommon::QueueLogError( stream.str());
 
 	render->m_re.addTaskClose( taskup);
-}
-
-void RenderAf::deleteTaskExecs()
-{
-	for( std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
-		delete *it;
 }
 
 af::Msg * RenderAf::writeFullInfo( bool i_binary) const

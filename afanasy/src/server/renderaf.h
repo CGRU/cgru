@@ -33,6 +33,7 @@ public:
 	void online( RenderAf * render, JobContainer * i_jobs, MonitorContainer * monitoring);
 
 /// Add task \c taskexec to render, \c start or only capture it
+/// Takes over the taskexec ownership
 	void setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, bool start = true);
 
 /// Start tast \c taskexec on remote render host, task must be set before and exists on render.
@@ -50,6 +51,7 @@ public:
 		{ stopTask(taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());}
 
 /// Make Render to finish task.
+/// Releases the ownership of taskexec (Render will not own it any more)
 	void taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring);
 
 /// Refresh parameters.
@@ -89,10 +91,6 @@ public:
 	inline void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 		{ if( i_subscribe) m_re.taskListenAdd( i_tp); else m_re.taskListenRem( i_tp); }
 
-	/// Delete tasks executables.
-	/// Needed for server to free mem of a reconnecting render.
-	void deleteTaskExecs();
-
 public:
 	/// Set container:
 	inline static void setRenderContainer( RenderContainer * i_container){ ms_renders = i_container;}
@@ -103,7 +101,11 @@ public:
 private:
 	void initDefaultValues();
 
+	/// Add the task exec to this render and take over its ownership (meaning
+	/// one should not free taskexec after having provided it to this method).
 	void addTask( af::TaskExec * taskexec);
+	/// Remove the task exec from this render and give back its ownership to the
+	/// caller.
 	void removeTask( const af::TaskExec * taskexec);
 
 	void addService( const std::string & type);

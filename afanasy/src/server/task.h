@@ -26,9 +26,11 @@ public:
 
 	virtual void v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
 
-	bool reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring);
+	/// Reconnect Task to an existing TaskExec
+	/// This method taks the ownership of `i_taskexec`
+	void reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring);
 
-/// Update task state.
+	/// Update task state.
 	virtual void v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
 
 	virtual void v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
@@ -62,7 +64,7 @@ public:
 
 	const std::string getOutputFileName( int i_starts_count) const;
 
-/// Return render id if task is running, or filename to read output from
+	/// Return render id if task is running, or filename to read output from
 	int getOutput( int i_startcount, std::string & o_filename, std::string & o_error) const;
 
 	af::Msg * getStoredFiles() const;

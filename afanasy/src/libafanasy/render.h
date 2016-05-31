@@ -90,8 +90,9 @@ public:
    virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
    inline long long getTasksStartFinishTime() const { return m_task_start_finish_time; }///< Get tasks start or finish time.
-   inline const std::list<TaskExec*> & getTasks() { return m_tasks;}
-   inline int getTasksNumber() const { return int(m_tasks.size());}
+	/// Take ownership of the task execs of the render
+	std::list<af::TaskExec*> takeTasks();
+	inline int getTasksNumber() const { return int(m_tasks.size());}
 
    virtual void v_jsonWrite( std::ostringstream & o_str, int type) const;
 

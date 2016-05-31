@@ -58,24 +58,25 @@ public:
 	/// Construct message for retrieveing output from running remote host or filename if task is not running.
 	/** Virtual for system job, it just sets an error that output is not available.**/
 	virtual int v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename, std::string & o_error) const;
-	
+
 	/// Whether the job can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
 	virtual bool v_canRun();
-	
+
 	/// Whether the job can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
-	 bool v_canRunOn( RenderAf * i_render);
-	
+	bool v_canRunOn( RenderAf * i_render);
+
 	/// Solve a job. Job send ready task to Render, if any.
 	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
-	
+
 	/// Update task state.
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
-	 
+
 	/// Reconnect running task
-	bool reconnectTask( af::TaskExec & i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
-	
+	/// This method taks the ownership of `i_taskexec`
+	void reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
+
 	/// Send tasks output to a specified address.
 	void listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task);
 	
