@@ -121,6 +121,10 @@ function table_Start( i_args)
 			'overflow: hidden;',
 			'height: 50px;',
 			'}',
+		'td.omit {',
+			'opacity: 0.5;',
+			'font-style: italic;',
+			'}',
 		'</style>'];
 	table_WriteLines( lines);
 	table_Write('<h3>' + title + '</h3>');
@@ -204,12 +208,33 @@ function table_WriteLines( i_lines)
 	for( var l = 0; l < i_lines.length; l++)
 		table_Write( i_lines[l]);
 }
-function table_Write( i_data, i_td)
+function table_Write( i_data)
 {
-	if( i_td)
-		i_data = '<td>' + i_data + '</td>';
-
 	table_doc.writeln( i_data);
+}
+function table_WriteTD( i_args)
+{
+	var data = i_args.data;
+	if( data == null )
+		data = '';
+
+	var td = '<td';
+
+	if( i_args.status && i_args.status.flags && i_args.status.flags.length )
+	{
+		var classes = ' class="';
+		for( var i = 0; i < i_args.status.flags.length; i++)
+		{
+			if( i ) classes += ' ';
+			classes += i_args.status.flags[i];
+		}
+
+		td += classes + '"';
+	}
+
+	td += '>' + data + '</td>';
+
+	table_Write( td);
 }
 
 function table_Finish()
@@ -247,7 +272,7 @@ function table_Gen_name( i_shot)
 {
 	var name = c_PathBase( i_shot.path);
 
-	table_Write( name, true);
+	table_WriteTD({'data':name,'status':i_shot.status});
 
 	table_Function();
 }
@@ -269,14 +294,14 @@ function table_Gen_picture( i_shot)
 		var reader = new FileReader();
 		reader.onloadend = function()
 		{
-			table_PictureReceived( reader.result);
+			table_PictureReceived( reader.result, i_shot);
 		}
 		reader.readAsDataURL( xhr.response);
 	}
 	xhr.open('GET', url);
 	xhr.send();
 }
-function table_PictureReceived( i_data)
+function table_PictureReceived( i_data, i_shot)
 {
 	//console.log( i_data);
 	var img = '';
@@ -284,7 +309,7 @@ function table_PictureReceived( i_data)
 	if( i_data )
 		img = '<img width="200px" src="' + i_data + '">';
 
-	table_Write( img, true);
+	table_WriteTD({'data':img,'status':i_shot.status});
 
 	table_Function();
 }
@@ -295,7 +320,7 @@ function table_Gen_state( i_shot)
 	if( i_shot.status.progress && ( i_shot.status.progress > 0 ))
 		st += i_shot.status.progress + '%';
 
-	table_Write( st, true);
+	table_WriteTD({'data':st,'status':i_shot.status});
 
 	table_Function();
 }
@@ -321,7 +346,7 @@ function table_BodyReceived( i_data, i_args)
 		info += '</div>'
 	}
 
-	table_Write( info, true);
+	table_WriteTD({'data':info,'status':i_args.shot.status});
 
 	table_Function();
 }
@@ -329,7 +354,7 @@ function table_BodyReceived( i_data, i_args)
 function table_Gen_comments( i_shot)
 {
 	var cpath = c_GetRuFilePath( cm_file, i_shot.path);
-	n_GetFile({'path':cpath,'func':table_CommentsReceived,'info':'table_comments','parse':true});
+	n_GetFile({'path':cpath,'func':table_CommentsReceived,'shot':i_shot,'info':'table_comments','parse':true});
 }
 function table_CommentsReceived( i_data, i_args)
 {
@@ -352,8 +377,7 @@ function table_CommentsReceived( i_data, i_args)
 		}
 	}
 
-//text = JSON.stringify( i_data);
-	table_Write( text, true);
+	table_WriteTD({'data':text,'status':i_args.shot.status});
 
 	table_Function();
 }
@@ -362,7 +386,7 @@ function table_Gen_tasks( i_shot)
 {
 	var tasks = '';
 
-	table_Write( tasks, true);
+	table_WriteTD({'data':tasks,'status':i_shot.status});
 
 	table_Function();
 }
@@ -373,7 +397,7 @@ function table_Gen_duration( i_shot)
 	if( i_shot.status.duration )
 		dur += i_shot.status.duration;
 
-	table_Write( dur, true);
+	table_WriteTD({'data':dur,'status':i_shot.status});
 
 	table_Function();
 }
@@ -384,7 +408,7 @@ function table_Gen_price( i_shot)
 	if( i_shot.status.price )
 		price += i_shot.status.price;
 
-	table_Write( price, true);
+	table_WriteTD({'data':price,'status':i_shot.status});
 
 	table_Function();
 }
