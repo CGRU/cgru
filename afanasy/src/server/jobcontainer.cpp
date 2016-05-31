@@ -60,13 +60,14 @@ void JobContainer::reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render
 	AF_DEBUG << "Reconnecting task " << i_taskexec << " with " << i_render;
 	#endif
 
-    JobContainerIt jobsIt( this);
+	JobContainerIt jobsIt( this);
 	JobAf* job = jobsIt.getJob( i_taskexec->getJobId());
-    if( NULL == job )
-    {
+	if( NULL == job )
+	{
 		AF_ERR << "Job with id=" << i_taskexec->getJobId() << " does not exists.";
-        return;
-    }
+		delete i_taskexec;
+		return;
+	}
 
 	return job->reconnectTask( i_taskexec, i_render, i_monitoring);
 }

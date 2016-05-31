@@ -945,7 +945,11 @@ void JobAf::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, Monitor
 {
 	int b = i_taskexec->getBlockNum();
 	int t = i_taskexec->getTaskNum();
-	if( false == checkBlockTaskNumbers( b, t, "reconnectTask")) return;
+	if( false == checkBlockTaskNumbers( b, t, "reconnectTask"))
+	{
+		delete i_taskexec;
+		return;
+	}
 	m_blocks[b]->reconnectTask( i_taskexec, i_render, i_monitoring);
 }
 

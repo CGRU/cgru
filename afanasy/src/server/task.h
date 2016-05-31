@@ -24,6 +24,7 @@ public:
 
 	af::TaskExec * genExec() const;
 
+	/// This method taks the ownership of `taskexec`
 	virtual void v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
 
 	/// Reconnect Task to an existing TaskExec
