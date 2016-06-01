@@ -1,7 +1,6 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-//#include <cstdio>
 #include <sstream>
 
 namespace af
@@ -14,46 +13,45 @@ namespace af
 class Logger
 {
 public:
-    enum Level
-    {
-        LNULL,
-        LDEBUG,
-        LVERBOSE,
-        LINFO,
-        LWARNING,
-        LERROR
-    };
+	enum Level
+	{
+		LDEBUG,
+		LVERBOSE,
+		LINFO,
+		LWARNING,
+		LERROR
+	};
 
 public:
-    Logger(const char *func, const char *file, int line, enum Level level = LINFO, bool display_pid=false);
-    ~Logger();
+	Logger(const char *func, const char *file, int line, enum Level level = LINFO, bool display_pid=false);
+	~Logger();
 
-    inline std::ostream &stream() { return m_ss; }
+	inline std::ostream &stream() { return m_ss; }
 
 private:
-    /**
-     * @brief Reduces /a/b/c/d/e/f.foo into e/f.foo
-     * @param filename file name to reduce
-     * TODO: handle filesystems where separator is not a slash (like, a backslash)
-     */
-    static const char * shorterFilename(const char *filename);
+	/**
+	 * @brief Reduces /a/b/c/d/e/f.foo into e/f.foo
+	 * @param filename file name to reduce
+	 * TODO: handle filesystems where separator is not a slash (like, a backslash)
+	 */
+	static const char * shorterFilename(const char *filename);
 
-    /**
-     * @brief Make stringstreams have the same width.
-     * The unique width is increased everytime the content of the stream is
-     * bigger than it.
-     * @param ss stringstream to pad with spaces up to the unique width.
-     */
-    static void align(std::stringstream &ss);
+	/**
+	 * @brief Make stringstreams have the same width.
+	 * The unique width is increased everytime the content of the stream is
+	 * bigger than it.
+	 * @param ss stringstream to pad with spaces up to the unique width.
+	 */
+	static void align(std::stringstream &ss);
 
 public:
-    static std::stringstream *log_batch;
+	static std::stringstream *log_batch;
 
 private:
-    std::ostringstream m_ss;  ///< accumulation stream
+	std::ostringstream m_ss;  ///< accumulation stream
 
 private:
-    static size_t align_width;
+	static size_t align_width;
 };
 
 /**
@@ -66,8 +64,8 @@ private:
 class NoLogger
 {
 public:
-    NoLogger() {}
-    template<typename T> friend const NoLogger& operator<<(const NoLogger& l, const T &) { return l; }
+	NoLogger() {}
+	template<typename T> friend const NoLogger& operator<<(const NoLogger& l, const T &) { return l; }
 };
 
 } // namespace af
