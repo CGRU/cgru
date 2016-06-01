@@ -71,7 +71,6 @@ TaskRun::~TaskRun()
 AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
    if   ( *m_counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *m_counter)
    else ( *m_counter )--;
-   if( m_exec) delete m_exec;
 
    if( m_progress->state & AFJOB::STATE_DONE_MASK    ) return;
    if( m_progress->state & AFJOB::STATE_ERROR_MASK   ) return;
@@ -97,7 +96,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 		AF_ERR << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "] task is not running.";
 		return;
 	}
-	if( m_exec == NULL)
+	if( NULL == m_exec)
 	{
 		AF_ERR << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "] Task executable is NULL.";
 		return;
@@ -232,7 +231,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 {
 	if( m_zombie ) return false;
 	
-	if( m_exec == NULL)
+	if( NULL == m_exec)
 	{
 		AF_ERR << "TaskRun::refresh: " << m_block->m_job->getName() << "["
 		       << m_block->m_data->getBlockNum() << "][" << m_tasknum
@@ -287,7 +286,7 @@ void TaskRun::stop( const std::string & message, RenderContainer * renders, Moni
 //printf("TaskRun::stop: %s[%d][%d] HostID=%d: %s\n", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum, m_hostId, message.c_str());
    if( m_zombie ) return;
    if( m_stopTime ) return;
-   if( m_exec == NULL)
+   if( NULL == m_exec)
    {
       AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
       return;
@@ -350,7 +349,7 @@ void TaskRun::skip( const std::string & message, RenderContainer * renders, Moni
 
 int TaskRun::v_getRunningRenderID( std::string & o_error) const
 {
-	if( m_exec == NULL)
+	if( NULL == m_exec)
 	{
 		o_error = "Not started.";
 		return 0;

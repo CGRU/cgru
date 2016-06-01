@@ -149,7 +149,7 @@ void TaskRunMulti::startMaster( RenderContainer * renders, MonitorContainer * mo
 {
 	RenderContainerIt rendersIt( renders);
 	RenderAf * render = rendersIt.getRender( m_hostId);
-	if( render == NULL)
+	if( NULL == render)
 	{
 		AFERRAR("TaskRunMulti::startMaster: %s[%d][%d] Render id=%d is NULL.",
 			m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum, m_hostId)

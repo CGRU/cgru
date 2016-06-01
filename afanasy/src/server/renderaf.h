@@ -43,9 +43,8 @@ public:
 	void stopTask( int jobid, int blocknum, int tasknum, int number);
 
 	/// Make Render to stop task.
-	/// This method taks the ownership of `taskexec`
 	inline void stopTask( const af::TaskExec * taskexec)
-		{ stopTask(taskexec->getJobId(), taskexec->getBlockNum(), taskexec->getTaskNum(), taskexec->getNumber()); delete taskexec; }
+		{ stopTask(taskexec->getJobId(), taskexec->getBlockNum(), taskexec->getTaskNum(), taskexec->getNumber()); }
 
 /// Make Render to stop task.
 	inline void stopTask( const af::MCTaskUp &taskup)
