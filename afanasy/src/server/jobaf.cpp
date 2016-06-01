@@ -2,7 +2,6 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/addresseslist.h"
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/jobprogress.h"

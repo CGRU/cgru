@@ -3,7 +3,6 @@
 #include "../include/afjob.h"
 
 #include "af.h"
-#include "addresseslist.h"
 #include "render.h"
 #include "msgclasses/mctaskup.h"
 #include "blockdata.h"
@@ -154,12 +153,6 @@ public:
 
 	inline bool isListening() const { return m_flags & FListen; }
 	
-
-	inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }
-	inline bool      removeListenAddress( const Address & address) { return m_listen_addresses.removeAddress( address);  }
-	inline size_t getListenAddressesNum() const { return m_listen_addresses.getAddressesNum();              }
-	inline const std::list<Address> * getListenAddresses() const { return m_listen_addresses.getAddresses();       }
-
 	void listenOutput( bool i_subscribe);
 
 
@@ -226,8 +219,6 @@ private:
 	int64_t m_frames_num;    ///< Number of frames.
 
 	int64_t m_time_start;
-
-	AddressesList m_listen_addresses;     ///< Addresses to send task output to.
 
 private:
 	// Needed for render:

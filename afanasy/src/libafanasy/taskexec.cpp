@@ -240,8 +240,6 @@ void TaskExec::v_readwrite( Msg * msg)
 		msg->v_stdOut( false);
 		return;
 	}
-
-	m_listen_addresses.v_readwrite( msg);
 }
 
 void TaskExec::listenOutput( bool i_subscribe)
@@ -263,8 +261,6 @@ void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) con
 	stream << "[" << m_name << "]";
 	if( m_number != 0 ) stream << "(" << m_number << ")";
 	if( m_capacity_coeff) stream << "x" << m_capacity_coeff << " ";
-	if( m_listen_addresses.getAddressesNum())
-		m_listen_addresses.v_generateInfoStream( stream, false);
 
 	if(full)
 	{
@@ -302,7 +298,6 @@ int TaskExec::calcWeight() const
 	weight += weigh( m_parser);
 	weight += weigh( m_custom_data_block);
 	weight += weigh( m_custom_data_task);
-	weight += m_listen_addresses.calcWeight();
 	return weight;
 }
 
