@@ -338,7 +338,7 @@ void MonitorAf::waitOutput( const af::MCTaskPos & i_tp)
 
 void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
 {
-	if( isWaintingOutput( i_tp))
+	if( false == isWaintingOutput( i_tp))
 	{
 		AF_ERR << "Not waiting for: " << i_tp;
 		return;
