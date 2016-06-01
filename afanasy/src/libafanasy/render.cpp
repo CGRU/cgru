@@ -1,6 +1,5 @@
 #include "render.h"
 
-#include "logger.h"
 #include "address.h"
 #include "environment.h"
 #include "msg.h"
@@ -9,6 +8,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 using namespace af;
 

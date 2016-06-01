@@ -4,7 +4,6 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/monitorevents.h"
-#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -15,6 +14,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 MonitorContainer * MonitorAf::m_monitors = NULL;
 

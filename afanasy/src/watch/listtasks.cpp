@@ -2,7 +2,6 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/logger.h"
 #include "../libafanasy/address.h"
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
@@ -39,6 +38,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 	ListItems( parent),

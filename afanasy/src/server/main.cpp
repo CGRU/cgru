@@ -9,7 +9,6 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgqueue.h"
-#include "../libafanasy/logger.h"
 
 #include "../libafsql/dbconnection.h"
 
@@ -25,6 +24,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 

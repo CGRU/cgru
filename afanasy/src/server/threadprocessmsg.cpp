@@ -18,7 +18,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
-#include "../libafanasy/logger.h"
 
 #include "afcommon.h"
 #include "auth.h"
@@ -33,6 +32,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 uint32_t processMessage( ThreadArgs * i_args, Profiler * io_prof);
 

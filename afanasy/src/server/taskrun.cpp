@@ -5,7 +5,6 @@
 #include "../libafanasy/job.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
-#include "../libafanasy/logger.h"
 
 #include "afcommon.h"
 #include "block.h"
@@ -18,6 +17,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 std::string TaskRun::ms_no_name = "no_exec_name";
   
@@ -39,7 +39,7 @@ TaskRun::TaskRun( Task * runningTask,
    m_stopTime( 0),
    m_zombie( false)
 {
-AFINFA("TaskRun::TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
+    AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
    (*m_counter)++;
 
    m_progress->percent = -1;

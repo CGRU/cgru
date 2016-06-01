@@ -2,7 +2,6 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/taskexec.h"
-#include "../libafanasy/logger.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -16,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const int ItemRender::ms_HeightHost = 27;
 const int ItemRender::ms_HeightHostSmall = 12;

@@ -16,6 +16,7 @@ class Logger
 public:
     enum Level
     {
+        LNULL,
         LDEBUG,
         LVERBOSE,
         LINFO,
@@ -55,10 +56,23 @@ private:
     static size_t align_width;
 };
 
+/**
+ * @brief The NoLogger class is a special logger, which actually don't log
+ * anything. It is used in macros to disable some logging level at compilation
+ * time.
+ * `NoLogger() << foo << bar` will have no effect (and hopefully be optimized
+ * out by the compiler), whatever the type of foo and bar is.
+ */
+class NoLogger
+{
+public:
+    NoLogger() {}
+    template<typename T> friend const NoLogger& operator<<(const NoLogger& l, const T &) { return l; }
+};
+
 } // namespace af
 
 #define DISPLAY_PID false
-#define AF_DEBUG   af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEBUG,   DISPLAY_PID).stream()
 #define AF_VERBOSE af::Logger(__func__, __FILE__, __LINE__, af::Logger::LVERBOSE, DISPLAY_PID).stream()
 #define AF_LOG     af::Logger(__func__, __FILE__, __LINE__, af::Logger::LINFO,    DISPLAY_PID).stream()
 #define AF_WARN    af::Logger(__func__, __FILE__, __LINE__, af::Logger::LWARNING, DISPLAY_PID).stream()
@@ -69,3 +83,13 @@ private:
 #define AF_LOGBATCH_END() { if (NULL != af::Logger::log_batch) delete af::Logger::log_batch; af::Logger::log_batch = NULL; }
 
 #endif // LOGGER_H
+
+// AF_DEBUG is enabled iff AFOUTPUT is defined in the C++ file including this
+// This block must NOT be inside `#ifdef LOGGER_H` so that the test is performed
+// again for every single C++ file
+#ifdef AFOUTPUT
+#define AF_DEBUG af::Logger(__func__, __FILE__, __LINE__, af::Logger::LDEBUG,   DISPLAY_PID).stream()
+#else
+#define AF_DEBUG af::NoLogger()
+#endif // AFOUTPUT
+

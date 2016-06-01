@@ -6,7 +6,6 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
-#include "../libafanasy/logger.h"
 #include "../libafanasy/render.h"
 #include "../libafanasy/renderevents.h"
 
@@ -16,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 

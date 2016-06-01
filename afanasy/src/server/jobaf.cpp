@@ -6,7 +6,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/jobprogress.h"
 #include "../libafanasy/msgqueue.h"
-#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -24,6 +23,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 JobContainer *JobAf::ms_jobs  = NULL;
 
@@ -44,7 +44,7 @@ JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	af::Job(),
 	AfNodeSrv( this, i_store_dir)
 {
-	AF_LOG << "store dir = " << i_store_dir;
+	AF_DEBUG << "store dir = " << i_store_dir;
 	
 	initializeValues();
 
@@ -107,7 +107,7 @@ void JobAf::initStoreDirs()
 
 void JobAf::construct()
 {
-	AF_LOG << '"' << m_name << "\": from store: " << isFromStore();
+	AF_DEBUG << '"' << m_name << "\": from store: " << isFromStore();
 
 	if( NULL != m_blocks )
 	{
@@ -159,7 +159,7 @@ bool JobAf::isValidConstructed() const
 		return false;
 	}
 
-	AF_LOG << '"' << m_name << "\": TRUE; from store: " << isFromStore();
+	AF_DEBUG << '"' << m_name << "\": TRUE; from store: " << isFromStore();
 
 	return true;
 }
@@ -192,7 +192,7 @@ void JobAf::setUser( UserAf * i_user)
 
 bool JobAf::initialize()
 {
-	AF_LOG << "'" << m_name << "'[" << m_id << "]:";
+	AF_DEBUG << "'" << m_name << "'[" << m_id << "]:";
 	
 	//
 	//	Set job ID to blocks and progress classes:

@@ -8,7 +8,6 @@
 #include "environment.h"
 #include "job.h"
 #include "jobprogress.h"
-#include "logger.h"
 #include "msg.h"
 #include "taskdata.h"
 #include "taskexec.h"
@@ -16,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 using namespace af;
 

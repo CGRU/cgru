@@ -3,7 +3,6 @@
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -12,6 +11,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 // Zero solve cycle variable in nodes is initial,
 // it means that node was not solved at all.

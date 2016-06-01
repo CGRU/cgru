@@ -5,7 +5,6 @@
 #include <memory.h>
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/logger.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
 #include "afcommon.h"
@@ -17,6 +16,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 JobContainer::JobContainer():
     AfContainer( "Jobs", AFJOB::MAXQUANTITY)

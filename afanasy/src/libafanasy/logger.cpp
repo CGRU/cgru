@@ -6,6 +6,9 @@
 
 using namespace af;
 
+size_t Logger::align_width = 0;
+std::stringstream *Logger::log_batch = NULL;
+
 namespace Color
 {
 #ifdef WINNT
@@ -135,6 +138,3 @@ void Logger::align(std::stringstream &ss)
     Logger::align_width = ( Logger::align_width > l ) ? Logger::align_width : 1;
     ss << std::setw(Logger::align_width - l) << "";
 }
-
-size_t Logger::align_width = 0;
-std::stringstream *Logger::log_batch = NULL;

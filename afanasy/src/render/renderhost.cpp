@@ -5,7 +5,6 @@
 #endif
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/taskexec.h"
 
@@ -15,6 +14,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 

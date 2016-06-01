@@ -4,7 +4,6 @@
 
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/regexp.h"
-#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -14,6 +13,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 AfContainer::AfContainer( std::string containerName, int maximumSize):
 	m_count( 0),
@@ -29,7 +29,7 @@ AfContainer::AfContainer( std::string containerName, int maximumSize):
 		AF_ERR << "Cant't allocate memory for " << m_capacity << " nodes.";
 		return;
 	}
-	AF_LOG << (m_capacity * sizeof(AfNodeSrv*)) << " bytes allocated for table at " << m_nodes_table;
+	AF_DEBUG << (m_capacity * sizeof(AfNodeSrv*)) << " bytes allocated for table at " << m_nodes_table;
 	for( int i = 0; i < m_capacity; i++ )
 		m_nodes_table[i] = NULL;
 	
@@ -38,7 +38,7 @@ AfContainer::AfContainer( std::string containerName, int maximumSize):
 
 AfContainer::~AfContainer()
 {
-	AF_LOG << "AfContainer::~AfContainer:";
+	AF_DEBUG << "AfContainer::~AfContainer:";
 	m_capacity = 0;
 	while( NULL != m_first_ptr)
 	{
@@ -162,7 +162,7 @@ int AfContainer::add( AfNodeSrv * i_node)
 	if( !found )
 		AF_ERR << "Nodes table full.";
 	
-	AF_LOG << "new id = " << i_node->m_node->m_id << ", count = " << m_count;
+	AF_DEBUG << "new id = " << i_node->m_node->m_id << ", count = " << m_count;
 	return new_id;
 }
 

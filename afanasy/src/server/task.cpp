@@ -5,7 +5,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/blockdata.h"
-#include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
@@ -21,6 +20,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_block( taskBlock),

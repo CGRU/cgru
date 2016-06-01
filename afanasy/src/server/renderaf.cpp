@@ -1,7 +1,6 @@
 #include "renderaf.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/logger.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/farm.h"
@@ -17,6 +16,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 RenderContainer * RenderAf::ms_renders = NULL;
 

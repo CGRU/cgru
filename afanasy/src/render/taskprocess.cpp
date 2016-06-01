@@ -18,7 +18,6 @@ extern void (*fp_setupChildProcess)( void);
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/logger.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "renderhost.h"
@@ -27,6 +26,7 @@ extern void (*fp_setupChildProcess)( void);
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 #ifndef WINNT
 // Setup task process for UNIX-like OSes:
