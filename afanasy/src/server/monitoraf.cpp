@@ -4,6 +4,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/monitorevents.h"
+#include "../libafanasy/logger.h"
 
 #include "action.h"
 #include "afcommon.h"
@@ -337,9 +338,20 @@ void MonitorAf::waitOutput( const af::MCTaskPos & i_tp)
 
 void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
 {
+	if( isWaintingOutput( i_tp))
+	{
+		AF_ERR << "Not waiting for: " << i_tp;
+		return;
+	}
+
 	m_e.addOutput( i_tp, i_output);
 
-	m_wait_output.clear();
+	std::vector<af::MCTaskPos>::iterator it = m_wait_output.begin();
+	while( it != m_wait_output.end())
+		if((*it).equal( i_tp))
+			m_wait_output.erase(it);
+		else
+			it++;
 	//printf("MonitorAf::addOutput: "); i_tp.v_stdOut();
 }
 
