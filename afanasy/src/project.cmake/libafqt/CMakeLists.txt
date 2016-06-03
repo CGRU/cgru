@@ -25,3 +25,7 @@ else()
 	target_link_libraries(afqt afanasy  ${QT_LIBRARIES} )
 endif()
 
+if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+   set_target_properties(afqt PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
+endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+

@@ -186,7 +186,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			{
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 				JobAf * job = NULL;
-				bool was_error = false;
 				if( ids.size() == 1 )
 				{
 					JobContainerIt it( i_args->jobs);
