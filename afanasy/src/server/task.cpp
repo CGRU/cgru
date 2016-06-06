@@ -538,32 +538,32 @@ const std::string Task::getOutputFileName( int i_starts_count) const
 	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + af::itos( i_starts_count) + ".txt";
 }
 
-int Task::getOutput( int i_startcount, std::string & o_filename, std::string & o_error) const
+void Task::getOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const
 {
 	if( m_progress->starts_count < 1 )
 	{
 		o_error = "Task is not started.";
-		return 0;
+		return;
 	}
-	if( i_startcount > m_progress->starts_count )
+	if( io_mcto.m_start_num > m_progress->starts_count )
 	{
-		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(i_startcount)+" times ).";
-		return 0;
+		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(io_mcto.m_start_num)+" times ).";
+		return;
 	}
-	if( i_startcount == 0 )
+	if( io_mcto.m_start_num == 0 )
 	{
 		if( m_run && m_run->notZombie())
 		{
-			return m_run->v_getRunningRenderID( o_error);
+			io_mcto.m_render_id = m_run->v_getRunningRenderID( o_error);
+			return;
 		}
 		else
 		{
-			i_startcount = m_progress->starts_count;
+			io_mcto.m_start_num = m_progress->starts_count;
 		}
 	}
 
-	o_filename = getOutputFileName( i_startcount);
-	return 0;
+	io_mcto.m_filename = getOutputFileName( io_mcto.m_start_num);
 }
 
 const std::string Task::v_getInfo( bool full) const

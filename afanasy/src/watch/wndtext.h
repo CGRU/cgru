@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/name_af.h"
 
 #include "wnd.h"
@@ -13,6 +14,7 @@ public:
 	WndText( const QString & i_name);
 	WndText( const QString & i_name, const std::string & i_str);
 	WndText( const QString & i_name, af::Msg * i_msg);
+	WndText( const af::MCTaskOutput & i_to);
 	~WndText();
 
 	void insertText( const char * i_text);

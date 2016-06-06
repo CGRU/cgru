@@ -327,12 +327,12 @@ bool MonitorAf::setListening( int i_j, int i_b, int i_t, bool i_subscribe)
 	return true;
 }
 
-void MonitorAf::waitOutput( const af::MCTaskPos & i_tp)
+void MonitorAf::waitOutput( const af::MCTaskOutput & i_to)
 {
-	if( isWaintingOutput( i_tp))
+	if( isWaintingOutput( i_to))
 		return;
 
-	m_wait_output.push_back( i_tp);
+	m_wait_output.push_back( i_to);
 	//printf("MonitorAf::waitOutput: "); i_tp.v_stdOut();
 }
 
@@ -344,21 +344,33 @@ void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_out
 		return;
 	}
 
-	m_e.addOutput( i_tp, i_output);
-
-	std::vector<af::MCTaskPos>::iterator it = m_wait_output.begin();
+	std::vector<af::MCTaskOutput>::iterator it = m_wait_output.begin();
 	while( it != m_wait_output.end())
-		if((*it).equal( i_tp))
+		if((*it).isSameTask( i_tp))
+		{
+			(*it).m_output = i_output;
+			m_e.addOutput(*it);
 			m_wait_output.erase(it);
+			break;
+		}
 		else
 			it++;
 	//printf("MonitorAf::addOutput: "); i_tp.v_stdOut();
 }
 
-bool MonitorAf::isWaintingOutput( const af::MCTaskPos & i_tp)
+bool MonitorAf::isWaintingOutput( const af::MCTaskPos & i_tp) const
 {
 	for( int i = 0; i < m_wait_output.size(); i++)
-		if( m_wait_output[i].equal( i_tp))
+		if( m_wait_output[i].isSameTask( i_tp))
+			return true;
+
+	return false;
+}
+
+bool MonitorAf::isWaintingOutput( const af::MCTaskOutput & i_to) const
+{
+	for( int i = 0; i < m_wait_output.size(); i++)
+		if( m_wait_output[i].isSameTask( i_to))
 			return true;
 
 	return false;

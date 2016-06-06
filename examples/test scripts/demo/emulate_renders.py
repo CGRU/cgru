@@ -39,7 +39,7 @@ def sendAction(i_type, i_mask, i_operation, i_params=None):
 		action['params'] = i_params
 
 	# print( json.dumps( {'action': action}))
-	status, answer = afnetwork.sendServer(json.dumps({'action': action}), False, False)
+	status, answer = afnetwork.sendServer(json.dumps({'action': action}), False)
 	return status
 
 

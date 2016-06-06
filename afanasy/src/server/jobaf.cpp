@@ -1350,13 +1350,13 @@ af::TaskExec * JobAf::generateTask( int block, int task) const
 	if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
 	return m_blocks[block]->m_tasks[task]->genExec();
 }
-
+/*
 const std::string JobAf::generateTaskName( int i_b, int i_t) const
 {
 	if( false == checkBlockTaskNumbers( i_b, i_t, "generateTaskName")) return "Invalid ids.";
 	else return m_blocks[i_b]->m_data->genTaskName( i_t);
 }
-
+*/
 af::Msg * JobAf::writeErrorHosts( bool i_binary) const
 {
 	std::list<std::string> list;
@@ -1413,14 +1413,31 @@ bool JobAf::checkBlockTaskNumbers( int i_b, int i_t, const char * o_str) const
 	return true;
 }
 
-int JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename, std::string & o_error) const
+/*
+const std::string JobAf::generateTaskName( int i_b, int i_t) const
 {
-	if( false == checkBlockTaskNumbers( i_b, i_t, "getTaskStdOut"))
+	if( false == checkBlockTaskNumbers( i_b, i_t, "generateTaskName")) return "Invalid ids.";
+	else return m_blocks[i_b]->m_data->genTaskName( i_t);
+}
+*/
+void JobAf::v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const
+{
+	int b = io_mcto.m_block_id;
+	int t = io_mcto.m_task_id;
+
+	if( false == checkBlockTaskNumbers( b, t, "getTaskOutput"))
 	{
-		o_error = "Invalid blockb and task numbers";
-		return 0;
+		o_error = "Invalid block and task numbers";
+		return;
 	}
-	return m_blocks[i_b]->m_tasks[i_t]->getOutput( i_n, o_filename, o_error);
+
+	io_mcto.m_job_name = getName();
+	io_mcto.m_block_name = m_blocks[b]->m_data->getName();
+	io_mcto.m_task_name  = m_blocks[b]->m_data->genTaskName( t);
+	io_mcto.m_service    = m_blocks[b]->m_data->getService();
+	io_mcto.m_parser     = m_blocks[b]->m_data->getParser();
+
+	m_blocks[b]->m_tasks[t]->getOutput( io_mcto, o_error);
 }
 
 void JobAf::listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task)

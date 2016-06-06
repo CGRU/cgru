@@ -29,17 +29,16 @@ MonitorEvents::~MonitorEvents()
 {
 }
 
-void MonitorEvents::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
+void MonitorEvents::addOutput( const af::MCTaskOutput & i_to)
 {
-	for( int i = 0; i < m_outspos.size(); i++)
-		if( m_outspos[i].equal( i_tp))
+	for( int i = 0; i < m_outputs.size(); i++)
+		if( m_outputs[i].isSameTask( i_to))
 		{
-			m_outputs[i] = i_output;
+			m_outputs[i].m_output = i_to.m_output;
 			return;
 		}
 
-	m_outspos.push_back( i_tp);
-	m_outputs.push_back( i_output);
+	m_outputs.push_back( i_to);
 }
 
 void MonitorEvents::addListened( MListen i_listen)
@@ -111,13 +110,9 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	for( int i = 0; i < outs_size; i++)
 	{
 		if( msg->isReading())
-		{
-			m_outspos.push_back( MCTaskPos());
-			m_outputs.push_back( std::string());
-		}
+			m_outputs.push_back( MCTaskOutput());
 
-		m_outspos[i].v_readwrite( msg);
-		rw_String( m_outputs[i], msg);
+		m_outputs[i].v_readwrite( msg);
 	}
 
 
@@ -285,14 +280,9 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		o_str << "\n\"tasks_outputs\":[";
 		for( int i = 0; i < m_outputs.size(); i++)
 		{
-			if( i ) o_str << ",";
+			if( i ) o_str << ",\n";
 
-			o_str << "\n{";
-			o_str << "\"job\":" << m_outspos[i].getJobId();
-			o_str << ",\"block\":" << m_outspos[i].getNumBlock();
-			o_str << ",\"task\":" << m_outspos[i].getNumTask();
-			o_str << "\n,\"output\":\"" << af::strEscape(m_outputs[i]) << "\"";
-			o_str << "}";
+			m_outputs[i].jsonWrite( o_str);
 		}
 		o_str << "]";
 
@@ -358,7 +348,6 @@ void MonitorEvents::clear()
 	m_listens.clear();
 
 	m_outputs.clear();
-	m_outspos.clear();
 
 	m_announcement.clear();
 }

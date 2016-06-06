@@ -2,6 +2,7 @@
 
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/monitorevents.h"
+#include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "afnodesrv.h"
@@ -44,8 +45,10 @@ public:
 
 	void deregister();
 
-	void waitOutput( const af::MCTaskPos & i_tp);
-	bool isWaintingOutput( const af::MCTaskPos & i_tp);
+	bool isWaintingOutput( const af::MCTaskPos    & i_tp) const;
+	bool isWaintingOutput( const af::MCTaskOutput & i_to) const;
+
+	void waitOutput( const af::MCTaskOutput & i_to);
 	void addOutput( const af::MCTaskPos & i_tp, const std::string & i_output);
 
 	bool isListening( const af::MonitorEvents::MListen & i_listen) const;
@@ -69,7 +72,7 @@ private:
 	std::list<int> m_lis_b;
 	std::list<int> m_lis_t;
 
-	std::vector<af::MCTaskPos> m_wait_output;
+	std::vector<af::MCTaskOutput> m_wait_output;
 
 	DlMutex m_mutex;
 

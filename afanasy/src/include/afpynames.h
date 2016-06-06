@@ -16,6 +16,7 @@ namespace AFPYNAMES
 	const char SERVICE_FUNC_GETFILES[]           = "getFiles";
 	const char SERVICE_FUNC_GETPARSEDFILES[]     = "getParsedFiles";
 	const char SERVICE_FUNC_PARSE[]              = "parse";
+	const char SERVICE_FUNC_TOHTML[]             = "toHTML";
 	const char SERVICE_FUNC_GETLOG[]             = "getLog";
 	const char SERVICE_FUNC_CHECKRENDEREDFILES[] = "checkRenderedFiles";
 	const char SERVICE_FUNC_CHECKEXITSTATUS[]    = "checkExitStatus";

@@ -2,6 +2,7 @@
 
 #include "../include/afjob.h"
 
+#include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/taskprogress.h"
 
@@ -65,8 +66,8 @@ public:
 
 	const std::string getOutputFileName( int i_starts_count) const;
 
-	/// Return render id if task is running, or filename to read output from
-	int getOutput( int i_startcount, std::string & o_filename, std::string & o_error) const;
+	/// Set render id if task is running, or filename to read output from
+	void getOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const;
 
 	af::Msg * getStoredFiles() const;
 	void getStoredFiles( std::ostringstream & i_str) const;

@@ -2,6 +2,7 @@
 
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/job.h"
+#include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
@@ -53,11 +54,11 @@ public:
 	
 	af::TaskExec * generateTask( int block, int task) const;
 	
-	const std::string generateTaskName( int i_b, int i_t) const;
-	
-	/// Construct message for retrieveing output from running remote host or filename if task is not running.
+	/// Construct MCTaskOutput with render ID
+	/// for retrieveing output from running remote host
+	/// or filename if task is not running.
 	/** Virtual for system job, it just sets an error that output is not available.**/
-	virtual int v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename, std::string & o_error) const;
+	virtual void v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const;
 
 	/// Whether the job can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/

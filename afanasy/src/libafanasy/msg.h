@@ -65,13 +65,8 @@ public:
 	/// Get String ( if message type is TStringList ).
 	bool getStringList( std::list<std::string> & stringlist);
 
-/**   IMPORTANT!
-***   messages with (type < MText) MUST NOT have any data to be valid:
-***   (( mdata == NULL) && ( data_len == 0)) ALWAYS !
-***   messages with (type >= MText) MUST have some data to be valid:
-***   (( mdata != NULL) && ( data_len > 0)) ALWAYS !
-**/
-   enum Type{
+
+	enum Type{
 /*------------ NONDATA MESSAGES ----------------------*/
 /// Default message with default type - zero. Only this type can be changed by \c set function.
 /**/TNULL/**/,
@@ -151,6 +146,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 
 /**/TTask/**/,                      ///< A task of some job.
 /**/TTaskOutputRequest/**/,         ///< Request task output from render ( by gui thought server ).
+/**/TTaskOutput/**/,                ///< Task output from server to GUI (af::MCTaskOutput)
 /**/TTaskFiles/**/,                 ///< Task (or entire job) files
 
 TRESERVED10,TRESERVED11,TRESERVED12,TRESERVED13,TRESERVED14,TRESERVED15,TRESERVED16,TRESERVED17,TRESERVED18,TRESERVED19,

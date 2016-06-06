@@ -7,36 +7,14 @@
 #include "../include/afanasy.h"
 #include "../include/afpynames.h"
 
-#include "../libafanasy/environment.h"
+#include "environment.h"
+#include "logger.h"
 
 using namespace af;
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
-
-Service::Service(
-	const std::string & i_type,
-	const std::string & i_wdir,
-	const std::string & i_command,
-	const std::vector<std::string> & i_files,
-	const std::string & i_store_dir
-):
-	m_name( i_type),
-	m_wdir( i_wdir),
-	m_command( i_command)
-{
-	TaskExec * i_task_exec = new TaskExec(
-			"i_name", i_type, "", i_command,
-			1, -1, -1,
-			i_files,
-			1, 1, 1,
-			i_wdir,
-			"", 1, 0, 0, 1
-		);
-	initialize( i_task_exec, i_store_dir);
-	delete i_task_exec;
-}
 
 Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir):
 	m_name( i_task_exec->getServiceType()),
@@ -45,6 +23,86 @@ Service::Service( const TaskExec * i_task_exec, const std::string & i_store_dir)
 	m_command( i_task_exec->getCommand())
 {
 	initialize( i_task_exec, i_store_dir);
+}
+
+Service::Service(
+	const std::string & i_type,
+	const std::string & i_wdir,
+	const std::string & i_command
+):
+	m_name( i_type),
+	m_parser_type("generic"),
+	m_wdir( i_wdir),
+	m_command( i_command)
+{
+	TaskExec * i_task_exec = new TaskExec(
+			"name",m_name, m_parser_type, m_command,
+			1, -1, -1,
+			std::vector<std::string>(),
+			1, 1, 1,
+			m_wdir,
+			"", 1, 0, 0, 1
+		);
+	initialize( i_task_exec, "");
+	delete i_task_exec;
+}
+
+Service::Service(
+	const std::string & i_type,
+	const std::string & i_parser_type
+):
+	m_name( i_type),
+	m_parser_type( i_parser_type)
+{
+	TaskExec * i_task_exec = new TaskExec(
+			"name", m_name, m_parser_type, "",
+			1, -1, -1,
+			std::vector<std::string>(),
+			1, 1, 1,
+			m_wdir,
+			"", 1, 0, 0, 1
+		);
+	initialize( i_task_exec, "");
+	delete i_task_exec;
+}
+
+Service::Service(
+	const std::string & i_wdir
+):
+	m_name("generic"),
+	m_parser_type("generic"),
+	m_wdir( i_wdir)
+{
+	TaskExec * i_task_exec = new TaskExec(
+			"name", m_name, m_parser_type, "",
+			1, -1, -1,
+			std::vector<std::string>(),
+			1, 1, 1,
+			m_wdir,
+			"", 1, 0, 0, 1
+		);
+	initialize( i_task_exec, "");
+	delete i_task_exec;
+}
+
+Service::Service(
+	const std::vector<std::string> & i_files,
+	const std::string & i_wdir
+):
+	m_name("generic"),
+	m_parser_type("generic"),
+	m_wdir( i_wdir)
+{
+	TaskExec * i_task_exec = new TaskExec(
+			"name", m_name, m_parser_type, "",
+			1, -1, -1,
+			i_files,
+			1, 1, 1,
+			m_wdir,
+			"", 1, 0, 0, 1
+		);
+	initialize( i_task_exec, "");
+	delete i_task_exec;
 }
 
 void Service::initialize( const TaskExec * i_task_exec, const std::string & i_store_dir)
@@ -141,6 +199,9 @@ void Service::initialize( const TaskExec * i_task_exec, const std::string & i_st
 	m_PyObj_FuncParse = getFunction( AFPYNAMES::SERVICE_FUNC_PARSE);
 	if( m_PyObj_FuncParse == NULL ) return;
 
+	m_PyObj_FuncToHTML = getFunction( AFPYNAMES::SERVICE_FUNC_TOHTML);
+	if( m_PyObj_FuncToHTML == NULL ) return;
+
 	m_PyObj_FuncGetLog = getFunction( AFPYNAMES::SERVICE_FUNC_GETLOG);
 	if( m_PyObj_FuncGetLog == NULL ) return;
 
@@ -235,6 +296,35 @@ void Service::parse( const std::string & i_mode, std::string & i_data,
 	}
 
 	Py_DECREF( pArgs);
+}
+
+const std::string Service::toHTML( const std::string & i_data) const
+{
+	PyObject * pArgs = PyTuple_New( 1);
+	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( i_data.c_str(), i_data.size()));
+
+	PyObject * pResult = PyObject_CallObject( m_PyObj_FuncToHTML, pArgs);
+
+	if( pResult == NULL)
+	{
+		if( PyErr_Occurred())
+			PyErr_Print();
+		else
+			AF_ERR << "Result is NULL.";
+		return i_data;
+	}
+
+
+	std::string text;
+	if( false == af::PyGetString( pResult, text,"Service::toHTML"))
+	{
+		AF_ERR << "Can't get string from return object.";
+		return i_data;
+	}
+
+	Py_DECREF( pResult);
+
+	return text;
 }
 
 const std::string Service::getLog() const

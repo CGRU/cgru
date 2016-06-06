@@ -125,7 +125,7 @@ public:
 	static void appendJobLog( const std::string & message);
 
 	// Functions than informate that it is a system task, and this info is not abailable:
-	virtual int v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename, std::string & o_error) const;
+	virtual void v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const;
 
 protected:
 	virtual Block * v_newBlock( int numBlock);

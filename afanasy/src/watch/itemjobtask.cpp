@@ -432,7 +432,7 @@ void ItemJobTask::actTaskListen()
 
 void ItemJobTask::actTaskPreview(int num_cmd, int num_img)
 {
-	af::Service service( "service", getWDir(), "", genFiles());
+	af::Service service( genFiles(), getWDir());
 
 	std::vector<std::string> images = service.getFiles();
 	if( num_img >= images.size())
@@ -459,7 +459,8 @@ void ItemJobTask::actTaskPreview(int num_cmd, int num_img)
 
 void ItemJobTask::actBrowseFolder()
 {
-	af::Service service("service", getWDir(), "", genFiles());
+	af::Service service( genFiles(), getWDir());
+
 	QString image = afqt::stoq( service.getFiles()[0]);
 	QString wdir = afqt::stoq( service.getWDir());
 

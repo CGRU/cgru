@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <vector>
 
+#include "msgclasses/mctaskoutput.h"
 #include "msgclasses/mctaskpos.h"
 #include "taskprogress.h"
 
@@ -53,8 +54,7 @@ public:
 	};
 	std::vector<MListen> m_listens;
 
-	std::vector<std::string> m_outputs;
-	std::vector<MCTaskPos> m_outspos;
+	std::vector<MCTaskOutput> m_outputs;
 
 	std::string m_announcement;
 
@@ -62,7 +62,7 @@ public:
 
 	bool isEmpty() const;
 
-	void addOutput( const af::MCTaskPos & i_tp, const std::string & i_output);
+	void addOutput( const af::MCTaskOutput & i_to);
 
 	void addListened( MListen i_listen);
 

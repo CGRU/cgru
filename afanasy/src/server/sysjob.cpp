@@ -606,10 +606,9 @@ void SysJob::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * r
 	JobAf::v_restartTasks( taskspos, renders, monitoring);
 }
 
-int SysJob::v_getTaskStdOut( int i_b, int i_t, int i_n, std::string & o_filename, std::string & o_error) const
+void SysJob::v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const
 {
 	o_error = "This is an empty dummy task in a system job block.\nError tasks output are stored in this task log.";
-	return 0;
 }
 
 void SysJob::appendJobLog( const std::string & message)

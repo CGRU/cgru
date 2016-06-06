@@ -837,7 +837,7 @@ void ListJobs::actListenJob()
 
 void ListJobs::actBrowseFolder( QString i_folder)
 {
-	af::Service service("service", afqt::qtos(i_folder), "");
+	af::Service service( afqt::qtos(i_folder));
 	i_folder = afqt::stoq( service.getWDir());
 
 	Watch::browseFolder( i_folder);

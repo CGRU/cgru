@@ -268,7 +268,8 @@ case SState:   printf("State %d \n",   sort_ascending); break;
 
 void ItemJobBlock::actBrowseFolder()
 {
-	af::Service service( "service", workingdir, "", files);
+	af::Service service( files, workingdir);
+
 	QString image = afqt::stoq( service.getFiles()[0]);
 	QString wdir = afqt::stoq( service.getWDir());
 	

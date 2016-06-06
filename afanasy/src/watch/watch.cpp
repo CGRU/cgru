@@ -206,7 +206,7 @@ void Watch::caseMessage( af::Msg * msg)
 
 		for( int i = 0; i < me.m_outputs.size(); i++)
 		{
-			new WndText("Data", me.m_outputs[i]);
+			new WndText( me.m_outputs[i]);
 		}
 
 		if( me.m_announcement.size())
