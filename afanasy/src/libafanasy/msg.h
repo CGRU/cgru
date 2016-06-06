@@ -193,6 +193,7 @@ TLAST
 	inline int version() const { return m_version; } ///< Get message afanasy version.
 
 	inline void resetWrittenSize() { m_writtensize = 0; }
+	inline int getWrittenSize() const { return m_writtensize; }
 
 	inline bool addressIsEmpty() const { return m_address.isEmpty();}
 
