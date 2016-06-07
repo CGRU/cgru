@@ -55,6 +55,7 @@ public:
 		TTIMERUN,
 		TENGINE,
 		TADDRESS,
+		TELDERTASKTIME,
 		TLAST
 	};
    static const char * TNAMES[];

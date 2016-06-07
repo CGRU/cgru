@@ -707,7 +707,7 @@ bool ItemRender::setSortType(   int type )
 		case CtrlSortFilter::TCAPACITY:
 	        sort_int = m_capacity;
 			break;
-		case CtrlSortFilter::TTIMERUN:
+		case CtrlSortFilter::TELDERTASKTIME:
 	        sort_int = m_elder_task_time;
 			break;
 		case CtrlSortFilter::TTIMELAUNCHED:

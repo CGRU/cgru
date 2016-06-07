@@ -28,6 +28,7 @@ const char * CtrlSortFilter::TNAMES[] = {
 "Time Running",
 "Engine",
 "Address",
+"Elder Task Runtime",
 "[LAST]"
 };
 
@@ -51,6 +52,7 @@ const char * CtrlSortFilter::TNAMES_SHORT[] = {
 "Running",
 "Engine",
 "Address",
+"Task Runtime",
 "[LAST]"
 };
 
