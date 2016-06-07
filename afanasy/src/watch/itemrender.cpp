@@ -222,6 +222,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 	    m_tasks = render->takeTasks();
 		QStringList tasks_users;
 		QList<int> tasks_counts;
+		m_elder_task_time = time(NULL);
 	    for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 		{
 	        m_tasksicons.push_back( Watch::getServiceIconSmall( QString::fromUtf8( (*it)->getServiceType().c_str())));
@@ -233,6 +234,10 @@ void ItemRender::updateValues( af::Node *node, int type)
 				tasks_users << tusr;
 				tasks_counts << 1;
 			}
+
+			// Find elder task just for sorting:
+			if((*it)->getTimeStart() < m_elder_task_time )
+				m_elder_task_time = (*it)->getTimeStart();
 		}
 		for( int i = 0; i < tasks_users.size(); i++)
 		{
@@ -701,6 +706,9 @@ bool ItemRender::setSortType(   int type )
 			break;
 		case CtrlSortFilter::TCAPACITY:
 	        sort_int = m_capacity;
+			break;
+		case CtrlSortFilter::TTIMERUN:
+	        sort_int = m_elder_task_time;
 			break;
 		case CtrlSortFilter::TTIMELAUNCHED:
 	        sort_int = m_time_launched;

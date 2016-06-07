@@ -35,28 +35,28 @@ public:
 
    inline QHBoxLayout * getLayout() { return layout;}
 
-   enum TYPE{
-      TNONE,
-      TPRIORITY,
-      TCAPACITY,
-      TNAME,
-      TUSERNAME,
-      TTASKUSER,
-      THOSTNAME,
-      TNUMJOBS,
-      TNUMRUNNINGTASKS,
-      TSERVICE,
-      TTIMECREATION,
-      TTIMELAUNCHED,
-      TTIMESTARTED,
-      TTIMEREGISTERED,
-      TTIMEACTIVITY,
-      TTIMEFINISHED,
-      TTIMERUN,
-      TENGINE,
-      TADDRESS,
-      TLAST
-   };
+	enum TYPE{
+		TNONE,
+		TPRIORITY,
+		TCAPACITY,
+		TNAME,
+		TUSERNAME,
+		TTASKUSER,
+		THOSTNAME,
+		TNUMJOBS,
+		TNUMRUNNINGTASKS,
+		TSERVICE,
+		TTIMECREATION,
+		TTIMELAUNCHED,
+		TTIMESTARTED,
+		TTIMEREGISTERED,
+		TTIMEACTIVITY,
+		TTIMEFINISHED,
+		TTIMERUN,
+		TENGINE,
+		TADDRESS,
+		TLAST
+	};
    static const char * TNAMES[];
    static const char * TNAMES_SHORT[];
 
