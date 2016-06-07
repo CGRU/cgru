@@ -15,25 +15,26 @@ class CtrlSortFilter : public QFrame
 {
 Q_OBJECT
 public:
-   CtrlSortFilter( QWidget * parent,
-      int * SortType, bool * SortAscending, int * FilterType, bool * FilterInclude, bool * FilterMatch, QString * FilterString);
-   ~CtrlSortFilter();
+	CtrlSortFilter( QWidget * parent,
+		int * SortType, bool * SortAscending,
+		int * FilterType, bool * FilterInclude, bool * FilterMatch, QString * FilterString);
+	~CtrlSortFilter();
 
-   inline void addSortType(   int type) { if(type < TLAST)   sortsarray[type] = true; }
-   inline void addFilterType( int type) { if(type < TLAST) filtersarray[type] = true; }
+	inline void addSortType(   int type) { if(type < TLAST)   sortsarray[type] = true; }
+	inline void addFilterType( int type) { if(type < TLAST) filtersarray[type] = true; }
 
-   inline int  getSortType()      const { return   *sorttype;       }
-   inline bool isSortAscending()  const { return   *sortascending;  }
-   inline bool isSortDescending() const { return !(*sortascending); }
+	inline int  getSortType()      const { return   *sorttype;       }
+	inline bool isSortAscending()  const { return   *sortascending;  }
+	inline bool isSortDescending() const { return !(*sortascending); }
 
-   inline const QString & getFilter()  const { return   *filter;         }
-   inline int  getFilterType()         const { return   *filtertype;     }
-   inline bool isFilterInclude()       const { return   *filterinclude;  }
-   inline bool isFilterExclude()       const { return !(*filterinclude); }
-   inline bool isFilterMatch()         const { return   *filtermatch;    }
-   inline bool isFilterContain()       const { return !(*filtermatch);   }
+	inline const QString & getFilter()  const { return   *filter;         }
+	inline int  getFilterType()         const { return   *filtertype;     }
+	inline bool isFilterInclude()       const { return   *filterinclude;  }
+	inline bool isFilterExclude()       const { return !(*filterinclude); }
+	inline bool isFilterMatch()         const { return   *filtermatch;    }
+	inline bool isFilterContain()       const { return !(*filtermatch);   }
 
-   inline QHBoxLayout * getLayout() { return layout;}
+	inline QHBoxLayout * getLayout() { return layout;}
 
 	enum TYPE{
 		TNONE,
@@ -58,44 +59,45 @@ public:
 		TELDERTASKTIME,
 		TLAST
 	};
-   static const char * TNAMES[];
-   static const char * TNAMES_SHORT[];
+
+	static const char * TNAMES[];
+	static const char * TNAMES_SHORT[];
 
 signals:
-   void sortTypeChanged();
-   void sortDirectionChanged();
-   void filterChanged();
-   void filterTypeChanged();
-   void filterSettingsChanged();
+	void sortTypeChanged();
+	void sortDirectionChanged();
+	void filterChanged();
+	void filterTypeChanged();
+	void filterSettingsChanged();
 
 protected:
-   void contextMenuEvent( QContextMenuEvent *event);
+	void contextMenuEvent( QContextMenuEvent *event);
 
 private slots:
-   void actSortType( int type);
-   void actSortAscending();
-   void actFilter( const QString & str);
-   void actFilterInclude();
-   void actFilterMacth();
-   void actFilterType( int type);
+	void actSortType( int type);
+	void actSortAscending();
+	void actFilter( const QString & str);
+	void actFilterInclude();
+	void actFilterMacth();
+	void actFilterType( int type);
 
 private:
 
-   bool sortsarray[TLAST];
-   bool filtersarray[TLAST];
+	bool sortsarray[TLAST];
+	bool filtersarray[TLAST];
 
-   ListItems * parernlist;
+	ListItems * parernlist;
 
-   QHBoxLayout * layout;
+	QHBoxLayout * layout;
 
-   QLabel * label;
-   void selLabel();
+	QLabel * label;
+	void selLabel();
 
-   int  * sorttype;
-   bool * sortascending;
+	int  * sorttype;
+	bool * sortascending;
 
-   QString * filter;
-   int  * filtertype;
-   bool * filterinclude;
-   bool * filtermatch;
+	QString * filter;
+	int  * filtertype;
+	bool * filterinclude;
+	bool * filtermatch;
 };
