@@ -23,8 +23,8 @@ const int ItemRender::ms_HeightAnnotation = 14;
 const int ItemRender::ms_HeightTask = 15;
 const int ItemRender::ms_HeightOffline = 15;
 
-ItemRender::ItemRender( af::Render *render):
-	ItemNode( (af::Node*)render),
+ItemRender::ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode( (af::Node*)i_render, i_ctrl_sf),
 	m_online( false),
 	m_taskstartfinishtime( 0),
 	m_plotCpu( 2),
@@ -87,7 +87,7 @@ ItemRender::ItemRender( af::Render *render):
 	m_plotIO.setLabelValue( 1000);
 	m_plotIO.setAutoScaleMaxBGC( 100000);
 
-	updateValues( render, 0);
+	updateValues( i_render, 0);
 }
 
 ItemRender::~ItemRender()
@@ -140,16 +140,16 @@ bool ItemRender::calcHeight()
 	return old_height == m_height;
 }
 
-void ItemRender::updateValues( af::Node *node, int type)
+void ItemRender::updateValues( af::Node * i_node, int i_type)
 {
-	af::Render * render = (af::Render*)node;
+	af::Render * render = (af::Render*)i_node;
 
-	switch( type )
+	switch( i_type )
 	{
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
-		updateNodeValues( node);
+		updateNodeValues( i_node);
 
 		setHidden(  render->isHidden()  );
 		setOffline( render->isOffline() );
@@ -168,7 +168,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		}
 
 		bool becameOnline = false;
-	    if(((m_online == false) && (render->isOnline())) || (type == 0))
+	    if(((m_online == false) && (render->isOnline())) || (i_type == 0))
 		{
 			becameOnline = true;
 	        m_update_counter = 0;
@@ -364,7 +364,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		break;
 	}
 	default:
-		AFERRAR("ItemRender::updateValues: Invalid type = [%s]\n", af::Msg::TNAMES[type]);
+		AFERRAR("ItemRender::updateValues: Invalid type = [%s]\n", af::Msg::TNAMES[i_type]);
 		return;
 	}
 
@@ -694,75 +694,111 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	}
 }
 
-bool ItemRender::setSortType(   int type )
+void ItemRender::setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
-	switch( type )
+
+	switch( i_type1 )
 	{
 		case CtrlSortFilter::TNONE:
-			return false;
+			break;
 		case CtrlSortFilter::TPRIORITY:
-	        sort_int = m_priority;
+	        m_sort_int1 = m_priority;
 			break;
 		case CtrlSortFilter::TCAPACITY:
-	        sort_int = m_capacity;
+	        m_sort_int1 = m_capacity;
 			break;
 		case CtrlSortFilter::TELDERTASKTIME:
-	        sort_int = m_elder_task_time;
+	        m_sort_int1 = m_elder_task_time;
 			break;
 		case CtrlSortFilter::TTIMELAUNCHED:
-	        sort_int = m_time_launched;
+	        m_sort_int1 = m_time_launched;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
-	        sort_int = m_time_registered;
+	        m_sort_int1 = m_time_registered;
 			break;
 		case CtrlSortFilter::TNAME:
-			sort_str = m_name;
+			m_sort_str1 = m_name;
 			break;
 		case CtrlSortFilter::TUSERNAME:
-	        sort_str = m_username;
+	        m_sort_str1 = m_username;
 			break;
 		case CtrlSortFilter::TTASKUSER:
-	        sort_str = m_tasksusers;
+	        m_sort_str1 = m_tasksusers;
 			break;
 		case CtrlSortFilter::TENGINE:
-	        sort_str = m_engine;
+	        m_sort_str1 = m_engine;
 			break;
 		case CtrlSortFilter::TADDRESS:
-	        sort_str = m_address_str;
+	        m_sort_str1 = m_address_str;
 			break;
 		default:
-			AFERRAR("ItemRender::setSortType: Invalid type number = %d", type);
-			return false;
+			AF_ERR << "Invalid type1 number = " << i_type1;
 	}
-	return true;
-}
 
-bool ItemRender::setFilterType( int type )
-{
-	resetFiltering();
-	switch( type )
+	switch( i_type2 )
 	{
 		case CtrlSortFilter::TNONE:
-			return false;
+			break;
+		case CtrlSortFilter::TPRIORITY:
+	        m_sort_int2 = m_priority;
+			break;
+		case CtrlSortFilter::TCAPACITY:
+	        m_sort_int2 = m_capacity;
+			break;
+		case CtrlSortFilter::TELDERTASKTIME:
+	        m_sort_int2 = m_elder_task_time;
+			break;
+		case CtrlSortFilter::TTIMELAUNCHED:
+	        m_sort_int2 = m_time_launched;
+			break;
+		case CtrlSortFilter::TTIMEREGISTERED:
+	        m_sort_int2 = m_time_registered;
+			break;
 		case CtrlSortFilter::TNAME:
-			filter_str = m_name;
+			m_sort_str2 = m_name;
 			break;
 		case CtrlSortFilter::TUSERNAME:
-	        filter_str = m_username;
+	        m_sort_str2 = m_username;
 			break;
 		case CtrlSortFilter::TTASKUSER:
-	        filter_str = m_tasksusers;
+	        m_sort_str2 = m_tasksusers;
 			break;
 		case CtrlSortFilter::TENGINE:
-	        filter_str = m_engine;
+	        m_sort_str2 = m_engine;
 			break;
 		case CtrlSortFilter::TADDRESS:
-	        filter_str = m_address_str;
+	        m_sort_str2 = m_address_str;
 			break;
 		default:
-			AFERRAR("ItemRender::setFilterType: Invalid type number = %d", type)
-			return false;
+			AF_ERR << "Invalid type2 number = " << i_type2;
 	}
-	return true;
+}
+
+void ItemRender::setFilterType( int i_type )
+{
+	resetFiltering();
+
+	switch( i_type )
+	{
+		case CtrlSortFilter::TNONE:
+			break;
+		case CtrlSortFilter::TNAME:
+			m_filter_str = m_name;
+			break;
+		case CtrlSortFilter::TUSERNAME:
+	        m_filter_str = m_username;
+			break;
+		case CtrlSortFilter::TTASKUSER:
+	        m_filter_str = m_tasksusers;
+			break;
+		case CtrlSortFilter::TENGINE:
+	        m_filter_str = m_engine;
+			break;
+		case CtrlSortFilter::TADDRESS:
+	        m_filter_str = m_address_str;
+			break;
+		default:
+			AF_ERR << "Invalid type number = " << i_type;
+	}
 }

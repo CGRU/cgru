@@ -7,13 +7,13 @@
 class ItemMonitor : public ItemNode
 {
 public:
-   ItemMonitor( af::Monitor *monitor);
+   ItemMonitor( af::Monitor * i_monitor, const CtrlSortFilter * i_ctrl_sf);
    ~ItemMonitor();
 
-   void updateValues( af::Node *node, int type);
+   void updateValues( af::Node * i_node, int i_type);
 
-   bool setSortType(   int type );
-   bool setFilterType( int type );
+	void setSortType(   int i_type1, int i_type2 );
+	void setFilterType( int i_type );
 
 	inline bool isSuperUser() const { return m_user_id == 0; }
 

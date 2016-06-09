@@ -6,10 +6,11 @@
 #include <QMenu>
 
 CtrlJobs::CtrlJobs( QWidget * i_parent, ListJobs * i_listjobs):
-	QLabel( "[View Options]", i_parent ),
+	QLabel("View Options", i_parent ),
 	m_listjobs( i_listjobs)
 {
-	setFixedHeight(16);
+	setFrameShape(QFrame::StyledPanel);
+	setFrameShadow(QFrame::Raised);
 }
 
 CtrlJobs::~CtrlJobs()
@@ -25,14 +26,14 @@ void CtrlJobs::contextMenuEvent( QContextMenuEvent * i_event)
 	action = new QAction("Hide:", this);
 	action->setEnabled( false);
 	menu.addAction( action);
-    menu.addSeparator();
+	menu.addSeparator();
 
 	action_id = new ActionId( ListNodes::e_HideInvert, "Invert", this);
 	action_id->setCheckable( true);
 	action_id->setChecked( m_listjobs->getFlagsHideShow() & ListNodes::e_HideInvert);
 	connect( action_id, SIGNAL( triggeredId( int ) ), m_listjobs, SLOT( actHideShow( int) ));
 	menu.addAction( action_id);
-    menu.addSeparator();
+	menu.addSeparator();
 
 	action_id = new ActionId( ListNodes::e_HideHidden, "Hidden", this);
 	action_id->setCheckable( true);

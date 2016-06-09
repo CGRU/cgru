@@ -13,25 +13,26 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const int ItemUser::HeightUser = 30;
 const int ItemUser::HeightAnnotation = 14;
 
-ItemUser::ItemUser( af::User *user):
-	ItemNode( (af::Node*)user)
+ItemUser::ItemUser( af::User * i_user, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode( (af::Node*)i_user, i_ctrl_sf)
 {
-	updateValues( user, 0);
+	updateValues( i_user, 0);
 }
 
 ItemUser::~ItemUser()
 {
 }
 
-void ItemUser::updateValues( af::Node *node, int type)
+void ItemUser::updateValues( af::Node * i_node, int i_type)
 {
-	af::User * user = (af::User*)node;
+	af::User * user = (af::User*)i_node;
 
-	updateNodeValues( node);
+	updateNodeValues( i_node);
 
 	hostname             = afqt::stoq( user->getHostName());
 	numjobs              = user->getNumJobs();
@@ -75,7 +76,7 @@ void ItemUser::updateValues( af::Node *node, int type)
 		strRightBottom = "Ord";
 	}
 
-	tooltip = user->v_generateInfoString( true).c_str();
+	m_tooltip = user->v_generateInfoString( true).c_str();
 
 	calcHeight();
 }
@@ -146,57 +147,84 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 	}
 }
 
-bool ItemUser::setSortType(   int type )
+void ItemUser::setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
-	switch( type )
+
+	switch( i_type1 )
 	{
 		case CtrlSortFilter::TNONE:
-			return false;
+			break;
 		case CtrlSortFilter::TPRIORITY:
-			sort_int = m_priority;
+			m_sort_int1 = m_priority;
 			break;
 		case CtrlSortFilter::TNAME:
-			sort_str = m_name;
+			m_sort_str1 = m_name;
 			break;
 		case CtrlSortFilter::THOSTNAME:
-			sort_str = hostname;
+			m_sort_str1 = hostname;
 			break;
 		case CtrlSortFilter::TNUMJOBS:
-			sort_int = numjobs;
+			m_sort_int1 = numjobs;
 			break;
 		case CtrlSortFilter::TNUMRUNNINGTASKS:
-			sort_int = numrunningtasks;
+			m_sort_int1 = numrunningtasks;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
-			sort_int = time_register;
+			m_sort_int1 = time_register;
 			break;
 		case CtrlSortFilter::TTIMEACTIVITY:
-			sort_int = time_activity;
+			m_sort_int1 = time_activity;
 			break;
 		default:
-			AFERRAR("ItemUser::setSortType: Invalid type number = %d", type)
-			return false;
+			AF_ERR << "Invalid type1 number = " << i_type1;
 	}
-	return true;
-}
 
-bool ItemUser::setFilterType( int type )
-{
-	resetFiltering();
-	switch( type )
+	switch( i_type2 )
 	{
 		case CtrlSortFilter::TNONE:
-			return false;
+			break;
+		case CtrlSortFilter::TPRIORITY:
+			m_sort_int2 = m_priority;
+			break;
 		case CtrlSortFilter::TNAME:
-			filter_str = m_name;
+			m_sort_str2 = m_name;
 			break;
 		case CtrlSortFilter::THOSTNAME:
-			filter_str = hostname;
+			m_sort_str2 = hostname;
+			break;
+		case CtrlSortFilter::TNUMJOBS:
+			m_sort_int2 = numjobs;
+			break;
+		case CtrlSortFilter::TNUMRUNNINGTASKS:
+			m_sort_int2 = numrunningtasks;
+			break;
+		case CtrlSortFilter::TTIMEREGISTERED:
+			m_sort_int2 = time_register;
+			break;
+		case CtrlSortFilter::TTIMEACTIVITY:
+			m_sort_int2 = time_activity;
 			break;
 		default:
-			AFERRAR("ItemUser::setFilterType: Invalid type number = %d", type)
-			return false;
+			AF_ERR << "Invalid type2 number = " << i_type2;
 	}
-	return true;
+}
+
+void ItemUser::setFilterType( int i_type )
+{
+	resetFiltering();
+
+	switch( i_type )
+	{
+		case CtrlSortFilter::TNONE:
+			break;
+		case CtrlSortFilter::TNAME:
+			m_filter_str = m_name;
+			break;
+		case CtrlSortFilter::THOSTNAME:
+			m_filter_str = hostname;
+			break;
+		default:
+			AF_ERR << "Invalid type number = " << i_type;
+	}
 }

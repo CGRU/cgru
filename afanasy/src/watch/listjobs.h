@@ -17,7 +17,7 @@ public:
 
 	bool caseMessage( af::Msg * msg);
 
-	ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
+	ItemNode* v_createNewItem( af::Node * i_node, bool i_subscibed);
 
 	virtual bool processEvents( const af::MonitorEvents & i_me);
 
@@ -32,7 +32,7 @@ protected:
 
 //	void v_connectionLost();
 
-	void resetSorting();
+	void v_resetSorting();
 
 private slots:
 	void actMoveUp();
@@ -90,18 +90,22 @@ private:
 
 private:
 	// Sorting filtering settings ordinary user:
-	static int     SortType;
-	static bool    SortAscending;
-	static QString FilterString;
-	static int     FilterType;
-	static bool    FilterInclude;
-	static bool    FilterMatch;
+	static int     ms_SortType1;
+	static int     ms_SortType2;
+	static bool    ms_SortAscending1;
+	static bool    ms_SortAscending2;
+	static QString ms_FilterString;
+	static int     ms_FilterType;
+	static bool    ms_FilterInclude;
+	static bool    ms_FilterMatch;
 
 	// Sorting filtering settings for super user:
-	static int     SortType_SU;
-	static bool    SortAscending_SU;
-	static QString FilterString_SU;
-	static int     FilterType_SU;
-	static bool    FilterInclude_SU;
-	static bool    FilterMatch_SU;
+	static int     ms_SortType1_SU;
+	static int     ms_SortType2_SU;
+	static bool    ms_SortAscending1_SU;
+	static bool    ms_SortAscending2_SU;
+	static QString ms_FilterString_SU;
+	static int     ms_FilterType_SU;
+	static bool    ms_FilterInclude_SU;
+	static bool    ms_FilterMatch_SU;
 };

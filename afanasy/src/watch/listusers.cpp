@@ -23,28 +23,33 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListUsers::SortType       = CtrlSortFilter::TNUMJOBS;
-bool    ListUsers::SortAscending  = false;
-int     ListUsers::FilterType     = CtrlSortFilter::TNAME;
-bool    ListUsers::FilterInclude  = true;
-bool    ListUsers::FilterMatch    = false;
-QString ListUsers::FilterString   = "";
+int     ListUsers::ms_SortType1      = CtrlSortFilter::TNUMRUNNINGTASKS;
+int     ListUsers::ms_SortType2      = CtrlSortFilter::TNUMJOBS;
+bool    ListUsers::ms_SortAscending1 = false;
+bool    ListUsers::ms_SortAscending2 = false;
+int     ListUsers::ms_FilterType     = CtrlSortFilter::TNAME;
+bool    ListUsers::ms_FilterInclude  = true;
+bool    ListUsers::ms_FilterMatch    = false;
+QString ListUsers::ms_FilterString   = "";
 
 ListUsers::ListUsers( QWidget* parent):
 	ListNodes(  parent, "users")
 {
-	ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-	ctrl->addSortType(   CtrlSortFilter::TNONE);
-	ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-	ctrl->addSortType(   CtrlSortFilter::TNAME);
-	ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
-	ctrl->addSortType(   CtrlSortFilter::TNUMJOBS);
-	ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
-	ctrl->addFilterType( CtrlSortFilter::TNONE);
-	ctrl->addFilterType( CtrlSortFilter::TNAME);
-	ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
+	m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1, &ms_SortAscending1,
+			&ms_SortType2, &ms_SortAscending2,
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TPRIORITY);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::THOSTNAME);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNUMJOBS);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNONE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::THOSTNAME);
 	initSortFilterCtrl();
 
 
@@ -226,9 +231,9 @@ bool ListUsers::processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListUsers::v_createNewItem( af::Node *node, bool i_subscibed)
+ItemNode* ListUsers::v_createNewItem( af::Node * i_node, bool i_subscibed)
 {
-	return new ItemUser( (af::User*)node);
+	return new ItemUser( (af::User*)i_node, m_ctrl_sf);
 }
 
 void ListUsers::userAdded( ItemNode * node, const QModelIndex & index)

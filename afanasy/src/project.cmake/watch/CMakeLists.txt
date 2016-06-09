@@ -18,6 +18,7 @@ else()
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrljobs.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlrenders.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlsortfilter.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlsortfiltermenu.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/dialog.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/filewidget.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/fontwidget.h"

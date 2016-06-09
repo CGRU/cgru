@@ -26,58 +26,66 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListJobs::SortType       = CtrlSortFilter::TNONE;
-bool    ListJobs::SortAscending  = false;
-int     ListJobs::FilterType     = CtrlSortFilter::TNAME;
-bool    ListJobs::FilterInclude  = true;
-bool    ListJobs::FilterMatch    = false;
-QString ListJobs::FilterString   = "";
+int     ListJobs::ms_SortType1      = CtrlSortFilter::TNONE;
+int     ListJobs::ms_SortType2      = CtrlSortFilter::TNONE;
+bool    ListJobs::ms_SortAscending1 = false;
+bool    ListJobs::ms_SortAscending2 = false;
+int     ListJobs::ms_FilterType     = CtrlSortFilter::TNAME;
+bool    ListJobs::ms_FilterInclude  = true;
+bool    ListJobs::ms_FilterMatch    = false;
+QString ListJobs::ms_FilterString   = "";
 
-int     ListJobs::SortType_SU       = CtrlSortFilter::TTIMECREATION;
-bool    ListJobs::SortAscending_SU  = false;
-int     ListJobs::FilterType_SU     = CtrlSortFilter::TUSERNAME;
-bool    ListJobs::FilterInclude_SU  = true;
-bool    ListJobs::FilterMatch_SU    = false;
-QString ListJobs::FilterString_SU = "";
+int     ListJobs::ms_SortType1_SU      = CtrlSortFilter::TTIMECREATION;
+int     ListJobs::ms_SortType2_SU      = CtrlSortFilter::TTIMERUN;
+bool    ListJobs::ms_SortAscending1_SU = false;
+bool    ListJobs::ms_SortAscending2_SU = false;
+int     ListJobs::ms_FilterType_SU     = CtrlSortFilter::TUSERNAME;
+bool    ListJobs::ms_FilterInclude_SU  = true;
+bool    ListJobs::ms_FilterMatch_SU    = false;
+QString ListJobs::ms_FilterString_SU = "";
 
 ListJobs::ListJobs( QWidget* parent):
 	ListNodes( parent, "jobs")
 {
 	if( af::Environment::VISOR())
-		ctrl = new CtrlSortFilter( this,
-			&SortType_SU, &SortAscending_SU, &FilterType_SU, &FilterInclude_SU, &FilterMatch_SU, &FilterString_SU);
+		m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1_SU, &ms_SortAscending1_SU,
+			&ms_SortType2_SU, &ms_SortAscending2_SU,
+			&ms_FilterType_SU, &ms_FilterInclude_SU, &ms_FilterMatch_SU, &ms_FilterString_SU);
 	else
-		ctrl = new CtrlSortFilter( this,
-			&SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
+		m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1, &ms_SortAscending1,
+			&ms_SortType2, &ms_SortAscending2,
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
 
-	ctrl->addSortType(   CtrlSortFilter::TNONE);
-	ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
-	ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
-	ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
-	ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
-	ctrl->addSortType(   CtrlSortFilter::TSERVICE);
-	ctrl->addSortType(   CtrlSortFilter::TNAME);
-	ctrl->addFilterType( CtrlSortFilter::TNONE);
-	ctrl->addFilterType( CtrlSortFilter::TNAME);
-	ctrl->addFilterType( CtrlSortFilter::TSERVICE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMECREATION);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMERUN);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMESTARTED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEFINISHED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TSERVICE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNONE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TSERVICE);
 	if( af::Environment::VISOR())
 	{
-		ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-		ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
-		ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
-		ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
-		ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
+		m_ctrl_sf->addSortType(   CtrlSortFilter::TPRIORITY);
+		m_ctrl_sf->addSortType(   CtrlSortFilter::THOSTNAME);
+		m_ctrl_sf->addSortType(   CtrlSortFilter::TUSERNAME);
+		m_ctrl_sf->addFilterType( CtrlSortFilter::THOSTNAME);
+		m_ctrl_sf->addFilterType( CtrlSortFilter::TUSERNAME);
 	}
 
 	initSortFilterCtrl();
 
-	CtrlJobs * control = new CtrlJobs( ctrl, this);
+	CtrlJobs * control = new CtrlJobs( m_ctrl_sf, this);
 	control->setToolTip("\
 Sort & Filter Jobs.\n\
 Press RMB for Options.\
 ");
-	ctrl->getLayout()->addWidget( control);
+	m_ctrl_sf->getLayout()->addWidget( control);
 
 
 	// Add left panel buttons:
@@ -472,10 +480,10 @@ bool ListJobs::processEvents( const af::MonitorEvents & i_me)
 
 ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
 {
-	return new ItemJob( this, (af::Job*)node, i_subscibed);
+	return new ItemJob( this, (af::Job*)node, i_subscibed, m_ctrl_sf);
 }
 
-void ListJobs::resetSorting()
+void ListJobs::v_resetSorting()
 {
 	if( af::Environment::VISOR() == false )
 		getUserJobsOrder();

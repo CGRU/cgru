@@ -21,28 +21,33 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListMonitors::SortType       = CtrlSortFilter::TNAME;
-bool    ListMonitors::SortAscending  = true;
-int     ListMonitors::FilterType     = CtrlSortFilter::TNAME;
-bool    ListMonitors::FilterInclude  = true;
-bool    ListMonitors::FilterMatch    = false;
-QString ListMonitors::FilterString   = "";
+int     ListMonitors::ms_SortType1      = CtrlSortFilter::TNAME;
+int     ListMonitors::ms_SortType2      = CtrlSortFilter::TTIMEACTIVITY;
+bool    ListMonitors::ms_SortAscending1 = true;
+bool    ListMonitors::ms_SortAscending2 = true;
+int     ListMonitors::ms_FilterType     = CtrlSortFilter::TNAME;
+bool    ListMonitors::ms_FilterInclude  = true;
+bool    ListMonitors::ms_FilterMatch    = false;
+QString ListMonitors::ms_FilterString   = "";
 
 ListMonitors::ListMonitors( QWidget* parent):
 	ListNodes(  parent, "monitors")
 {
-	ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-	ctrl->addSortType(   CtrlSortFilter::TNONE);
-	ctrl->addSortType(   CtrlSortFilter::TNAME);
-	ctrl->addSortType(   CtrlSortFilter::TTIMELAUNCHED);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
-	ctrl->addSortType(   CtrlSortFilter::TENGINE);
-	ctrl->addSortType(   CtrlSortFilter::TADDRESS);
-	ctrl->addFilterType( CtrlSortFilter::TNONE);
-	ctrl->addFilterType( CtrlSortFilter::TNAME);
-	ctrl->addFilterType( CtrlSortFilter::TENGINE);
-	ctrl->addFilterType( CtrlSortFilter::TADDRESS);
+	m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1, &ms_SortAscending1,
+			&ms_SortType2, &ms_SortAscending2,
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMELAUNCHED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TENGINE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TADDRESS);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNONE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TENGINE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TADDRESS);
 	initSortFilterCtrl();
 
 
@@ -134,9 +139,9 @@ bool ListMonitors::processEvents( const af::MonitorEvents & i_me)
 	return false;
 }
 
-ItemNode* ListMonitors::v_createNewItem( af::Node *node, bool i_subscibed)
+ItemNode* ListMonitors::v_createNewItem( af::Node * i_node, bool i_subscibed)
 {
-	return new ItemMonitor( (af::Monitor*)node);
+	return new ItemMonitor( (af::Monitor*)i_node, m_ctrl_sf);
 }
 
 void ListMonitors::calcTitle()

@@ -8,18 +8,18 @@
 class ItemRender : public ItemNode
 {
 public:
-	ItemRender( af::Render *render);
+	ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf);
 	~ItemRender();
 
-	void updateValues( af::Node *node, int type);
+	void updateValues( af::Node * i_node, int i_type);
 
 	inline const QString & getUserName()   const { return m_username;      }
 	inline const QString & getIPString()   const { return m_address_ip_str;}
 	inline int getCapacity() const { return m_capacity;  }
 	inline int getMaxTasks() const { return m_maxtasks;  }
 
-	bool setSortType(   int type );
-	bool setFilterType( int type );
+	void setSortType(   int i_type1, int i_type2 );
+	void setFilterType( int i_type );
 
 	inline bool isOnline()        const { return m_online;           }
 	inline bool isOffline()       const { return false == m_online;  }

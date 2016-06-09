@@ -4,6 +4,8 @@
 
 #include "../libafqt/name_afqt.h"
 
+#include "ctrlsortfilter.h"
+
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
@@ -11,10 +13,13 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
-ItemNode::ItemNode( af::Node *node):
+ItemNode::ItemNode( af::Node *node, const CtrlSortFilter * i_ctrl_sf):
 	Item( afqt::stoq( node->getName()), node->getId()),
-	sort_int( 0),
+	m_ctrl_sf( i_ctrl_sf),
+	m_sort_int1( 0),
+	m_sort_int2( 0),
 	m_flagshidden( 0)
 {
 	m_locked = node->isLocked();
@@ -33,63 +38,86 @@ void ItemNode::updateNodeValues( const af::Node * i_node)
 
 void ItemNode::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
-   Item::paint( painter, option);
+	Item::paint( painter, option);
 
-   painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, QString(" node "));
+	painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, QString(" node "));
 }
 
-bool ItemNode::compare( const ItemNode & other, int operation) const
+bool ItemNode::compare( const ItemNode & other) const
 {
-   if( false == sort_str.isEmpty() )
-   {
-      if( other.sort_str.isEmpty())
-         return false;
+	bool result = false;
+	bool found = false;
 
-      switch( operation)
-      {
-         case GREATER:        return ((sort_str) == (other.sort_str)) ? m_name > other.m_name : ((sort_str) >  (other.sort_str));
-         case GREATEREQUAL:   return ( sort_str) >= (other.sort_str);
-         case SMALLER:        return ((sort_str) == (other.sort_str)) ? m_name < other.m_name : ((sort_str) <  (other.sort_str));
-         case SMALLEREQUAL:   return ( sort_str) <= (other.sort_str);
-         case EQUAL:          return ( sort_str) == (other.sort_str);
-         case NOTEQUAL:       return ( sort_str) != (other.sort_str);
-         default:
-         {
-            AFERRAR("ItemNode::compare: Invalid operation = %d.", operation)
-            return false;
-         }
-      }
-   }
-   else
-   {
-      switch( operation)
-      {
-         case GREATER:        return ((sort_int) == (other.sort_int)) ? m_name > other.m_name : ((sort_int) >  (other.sort_int));
-         case GREATEREQUAL:   return ( sort_int) >= (other.sort_int);
-         case SMALLER:        return ((sort_int) == (other.sort_int)) ? m_name < other.m_name : ((sort_int) <  (other.sort_int));
-         case SMALLEREQUAL:   return ( sort_int) <= (other.sort_int);
-         case EQUAL:          return ( sort_int) == (other.sort_int);
-         case NOTEQUAL:       return ( sort_int) != (other.sort_int);
-         default:
-         {
-            AFERRAR("ItemNode::compare: Invalid operation = %d.", operation)
-            return false;
-         }
-      }
-   }
+	// Sort by the 1st parameter:
+	if(( false == m_sort_str1.isEmpty()) && ( false == other.m_sort_str1.isEmpty()))
+	{
+		if( m_sort_str1 != other.m_sort_str1 )
+		{
+			result = m_sort_str1 > other.m_sort_str1;
+			found = true;
+		}
+	}
+	else
+	{
+		if( m_sort_int1 != other.m_sort_int1 )
+		{
+			result = m_sort_int1 > other.m_sort_int1;
+			found = true;
+		}
+	}
+	if( m_ctrl_sf->isSortAscending1())
+		result = ( false == result );
 
-   return false;
+	// Sort by the 2nd parameter:
+	if( false == found )
+	{
+		if(( false == m_sort_str2.isEmpty()) && ( false == other.m_sort_str2.isEmpty()))
+		{
+			if( m_sort_str2 != other.m_sort_str2 )
+			{
+				result = m_sort_str2 > other.m_sort_str2;
+				found = true;
+			}
+		}
+		else
+		{
+			if( m_sort_int2 != other.m_sort_int2 )
+			{
+				result = m_sort_int2 > other.m_sort_int2;
+				found = true;
+			}
+		}
+
+		if( m_ctrl_sf->isSortAscending2())
+			result = ( false == result );
+	}
+
+	// Sort by the name:
+	if( false == found )
+		result = m_name > other.m_name;
+
+	return result;
 }
 
-bool ItemNode::filter( const QRegExp & regexp, const bool & filtermatch)
+bool ItemNode::filter()
 {
-	if( filter_str.isEmpty())
-		return false;
+	bool hide = false;
 
-	if( filtermatch )
-		return regexp.exactMatch( filter_str);
+	if( false == m_ctrl_sf->isFilterEnabled())
+		return hide;
 
-	return filter_str.contains( regexp);
+	if( m_ctrl_sf->isFilterEmpty())
+		return hide;
+
+	if( m_ctrl_sf->isFilterMatch())
+		hide = m_ctrl_sf->getFilterRE().exactMatch( m_filter_str);
+	else
+		hide = m_filter_str.contains( m_ctrl_sf->getFilterRE());
+
+	if( m_ctrl_sf->isFilterInclude())
+		hide = ( false == hide );
+
+	return hide;
 }
 
 bool ItemNode::getHidden( int32_t i_flags) const

@@ -14,7 +14,7 @@ public:
 
 	bool caseMessage( af::Msg * msg);
 
-	ItemNode* v_createNewItem( af::Node *node, bool i_subscibed);
+	ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed);
 
 	virtual bool processEvents( const af::MonitorEvents & i_me);
 
@@ -44,10 +44,12 @@ private:
 	void calcTitle();
 
 private:
-	static int     SortType;
-	static bool    SortAscending;
-	static QString FilterString;
-	static int     FilterType;
-	static bool    FilterInclude;
-	static bool    FilterMatch;
+	static int     ms_SortType1;
+	static int     ms_SortType2;
+	static bool    ms_SortAscending1;
+	static bool    ms_SortAscending2;
+	static QString ms_FilterString;
+	static int     ms_FilterType;
+	static bool    ms_FilterInclude;
+	static bool    ms_FilterMatch;
 };

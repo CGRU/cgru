@@ -16,35 +16,36 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const int ItemJob::Height = 30;
 const int ItemJob::HeightThumbName = 12;
 const int ItemJob::HeightAnnotation = 12;
 
-ItemJob::ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed):
-	ItemNode( (af::Node*)job),
+ItemJob::ItemJob( ListJobs * i_list, af::Job * i_job, bool i_subscibed, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode( (af::Node*)i_job, i_ctrl_sf),
 	m_list( i_list),
-	m_blocks_num(  job->getBlocksNum()),
+	m_blocks_num( i_job->getBlocksNum()),
 	m_tasks_done( -1),
 	state(0)
 {
-   if( m_blocks_num == 0)
-   {
-      AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): m_blocks_num == 0")
-      return;
-   }
+	if( m_blocks_num == 0)
+	{
+		AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): m_blocks_num == 0")
+		return;
+	}
 
-   m_blockinfo = new BlockInfo[m_blocks_num];
-   for( int b = 0; b < m_blocks_num; b++)
-   {
-      const af::BlockData * block = job->getBlock(b);
-      m_blockinfo[b].setName( afqt::stoq( block->getName()));
-      m_blockinfo[b].setItem( this);
-      m_blockinfo[b].setBlockNumber( b);
-      m_blockinfo[b].setJobId( getId());
-   }
+	m_blockinfo = new BlockInfo[m_blocks_num];
+	for( int b = 0; b < m_blocks_num; b++)
+	{
+		const af::BlockData * block = i_job->getBlock(b);
+		m_blockinfo[b].setName( afqt::stoq( block->getName()));
+		m_blockinfo[b].setItem( this);
+		m_blockinfo[b].setBlockNumber( b);
+		m_blockinfo[b].setJobId( getId());
+	}
 
-   updateValues( (af::Node*)job, af::Msg::TJobsList);
+	updateValues( (af::Node*)i_job, af::Msg::TJobsList);
 
 	if( i_subscibed )
 		Watch::ntf_JobAdded( this);
@@ -58,21 +59,21 @@ ItemJob::~ItemJob()
 		delete m_thumbs[i];
 }
 
-void ItemJob::updateValues( af::Node *node, int type)
+void ItemJob::updateValues( af::Node * i_node, int i_type)
 {
-   af::Job *job = (af::Job*)node;
+	af::Job *job = (af::Job*)i_node;
 
-   if( m_blocks_num != job->getBlocksNum())
-   {
-      AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.")
-      resetId();
-      return;
-   }
+	if( m_blocks_num != job->getBlocksNum())
+	{
+		AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.")
+		resetId();
+		return;
+	}
 
 	// Store previous state to check difference for notifications.
 	int64_t prev_state = state;
 
-	updateNodeValues( node);
+	updateNodeValues( i_node);
 
 
 	setHidden(  job->isHidden()  );
@@ -118,7 +119,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 	for( int b = 0; b < m_blocks_num; b++)
 	{
 		const af::BlockData * block = job->getBlock(b);
-		m_blockinfo[b].update( block, type);
+		m_blockinfo[b].update( block, i_type);
 
 		if( block->getProgressAvoidHostsNum() > 0 )
 			compact_display = false;
@@ -129,39 +130,39 @@ void ItemJob::updateValues( af::Node *node, int type)
 		m_tasks_done += m_blockinfo[b].p_tasksdone;
 	}
 
-   if( time_started ) compact_display = false;
-   if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
+	if( time_started ) compact_display = false;
+	if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
 
-   num_runningtasks_str = QString::number( num_runningtasks);
+	num_runningtasks_str = QString::number( num_runningtasks);
 
-   time_run = time_done - time_started;
-   if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2strHMS( time_run).c_str();
+	time_run = time_done - time_started;
+	if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2strHMS( time_run).c_str();
 
-   properties.clear();
-   if( false == dependmask_global.isEmpty()) properties += QString(" gD(%1)").arg( dependmask_global   );
-   if( false == dependmask.isEmpty()       ) properties += QString(" D(%1)" ).arg( dependmask          );
-   if( false == hostsmask.isEmpty()        ) properties += QString(" H(%1)" ).arg( hostsmask           );
-   if( false == hostsmask_exclude.isEmpty()) properties += QString(" E(%1)" ).arg( hostsmask_exclude   );
-   if( false == need_properties.isEmpty()  ) properties += QString(" P(%1)" ).arg( need_properties     );
-   if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
-   if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
-   properties += QString(" p%2").arg( m_priority);
-   if( ppapproval ) properties += " PPA";
+	properties.clear();
+	if( false == dependmask_global.isEmpty()) properties += QString(" gD(%1)").arg( dependmask_global   );
+	if( false == dependmask.isEmpty()       ) properties += QString(" D(%1)" ).arg( dependmask          );
+	if( false == hostsmask.isEmpty()        ) properties += QString(" H(%1)" ).arg( hostsmask           );
+	if( false == hostsmask_exclude.isEmpty()) properties += QString(" E(%1)" ).arg( hostsmask_exclude   );
+	if( false == need_properties.isEmpty()  ) properties += QString(" P(%1)" ).arg( need_properties     );
+	if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
+	if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
+	properties += QString(" p%2").arg( m_priority);
+	if( ppapproval ) properties += " PPA";
 
-   user_eta = username;
-   if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
-      setRunning();
-   else
-      setNotRunning();
+	user_eta = username;
+	if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
+		setRunning();
+	else
+		setNotRunning();
 
-   if( isLocked())
-   {
-      user_eta += " (LOCK)";
-   }
+	if( isLocked())
+	{
+		user_eta += " (LOCK)";
+	}
 
-   tooltip = job->v_generateInfoString( true).c_str();
+	m_tooltip = job->v_generateInfoString( true).c_str();
 
-   calcHeight();
+	calcHeight();
 
 	if( thumb_path != new_thumb_path )
 		getThumbnail();
@@ -220,7 +221,7 @@ bool ItemJob::calcHeight()
 
 void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
-   int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
+	int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
 
 	// Draw back with job state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemjob.c);
@@ -234,7 +235,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 	// Draw standart backgroud
 	drawBack( painter, option, itemColor);
 
-   uint32_t currenttime = time( NULL);
+	uint32_t currenttime = time( NULL);
 
 	QString user_time = user_eta;
 	QString properties_time = properties;
@@ -265,59 +266,59 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 		user_time = user_eta + " " + af::time2strHMS( time_wait - currenttime ).c_str();
 	}
 
-   printfState( state, x+35+(w>>3), y+25, painter, option);
+	printfState( state, x+35+(w>>3), y+25, painter, option);
 
-   painter->setFont( afqt::QEnvironment::f_info);
-   painter->setPen( clrTextInfo( option));
+	painter->setFont( afqt::QEnvironment::f_info);
+	painter->setPen( clrTextInfo( option));
 
-   int cy = y-10; int dy = 13;
+	int cy = y-10; int dy = 13;
 	QRect rect_user;
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time, &rect_user);
+	painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time, &rect_user);
 
-   if( lifetime > 0 ) properties_time += QString(" L%1-%2")
-      .arg( af::time2strHMS( lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
+	if( lifetime > 0 ) properties_time += QString(" L%1-%2")
+		.arg( af::time2strHMS( lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
+	painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_time);
 
-   int offset = 30;
+	int offset = 30;
 
-   painter->setPen( clrTextMain( option) );
-   painter->setFont( afqt::QEnvironment::f_name);
-   QFontMetrics fm(afqt::QEnvironment::f_name);
-   QString id_str = QString("#%1").arg(getId());
-   painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
-   offset += fm.width(id_str) + 10;
-   
-   if (project.size())
-   {
-       painter->setPen( afqt::QEnvironment::clr_textbright.c );
-       painter->setFont( afqt::QEnvironment::f_name);
-       painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
-       offset += fm.width(project) + 25;
-   }
-   
-   painter->setPen( clrTextMain( option) );
-   painter->setFont( afqt::QEnvironment::f_name);
-   painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
+	painter->setPen( clrTextMain( option) );
+	painter->setFont( afqt::QEnvironment::f_name);
+	QFontMetrics fm(afqt::QEnvironment::f_name);
+	QString id_str = QString("#%1").arg(getId());
+	painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, id_str);
+	offset += fm.width(id_str) + 10;
+	
+	if (project.size())
+	{
+		 painter->setPen( afqt::QEnvironment::clr_textbright.c );
+		 painter->setFont( afqt::QEnvironment::f_name);
+		 painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
+		 offset += fm.width(project) + 25;
+	}
+	
+	painter->setPen( clrTextMain( option) );
+	painter->setFont( afqt::QEnvironment::f_name);
+	painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, m_name);
 
-   if( state & AFJOB::STATE_DONE_MASK)
-   {
-      painter->setFont( afqt::QEnvironment::f_name);
-      painter->setPen( clrTextDone( option) );
-      painter->drawText(  x+3, y+26, runningTime );
-   }
+	if( state & AFJOB::STATE_DONE_MASK)
+	{
+		painter->setFont( afqt::QEnvironment::f_name);
+		painter->setPen( clrTextDone( option) );
+		painter->drawText(  x+3, y+26, runningTime );
+	}
 
-   for( int b = 0; b < m_blocks_num; b++)
-      m_blockinfo[b].paint( painter, option,
-         x+5, y + Height + block_height*b + 3, w-12,
-         compact_display, itemColor);
+	for( int b = 0; b < m_blocks_num; b++)
+		m_blockinfo[b].paint( painter, option,
+			x+5, y + Height + block_height*b + 3, w-12,
+			compact_display, itemColor);
 
-   if( state & AFJOB::STATE_RUNNING_MASK )
-   {
-      drawStar( num_runningtasks>=10 ? 14:10, x+15, y+16, painter);
-      painter->setFont( afqt::QEnvironment::f_name);
-      painter->setPen( afqt::QEnvironment::clr_textstars.c);
-      painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_runningtasks_str );
-   }
+	if( state & AFJOB::STATE_RUNNING_MASK )
+	{
+		drawStar( num_runningtasks>=10 ? 14:10, x+15, y+16, painter);
+		painter->setFont( afqt::QEnvironment::f_name);
+		painter->setPen( afqt::QEnvironment::clr_textstars.c);
+		painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_runningtasks_str );
+	}
 
 
 	// Thumbnails:
@@ -370,94 +371,130 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 	}
 }
 
-bool ItemJob::setSortType(   int type )
+void ItemJob::setSortType( int i_type1, int i_type2 )
 {
-   resetSorting();
-   switch( type )
-   {
-      case CtrlSortFilter::TNONE:
-         return false;
-      case CtrlSortFilter::TNAME:
-         sort_str = m_name;
-         break;
-      case CtrlSortFilter::TPRIORITY:
-         sort_int = m_priority;
-         break;
-      case CtrlSortFilter::TUSERNAME:
-         sort_str = username;
-         break;
-      case CtrlSortFilter::TSERVICE:
-         sort_str = service;
-         break;
-      case CtrlSortFilter::TNUMRUNNINGTASKS:
-         sort_int = num_runningtasks;
-         break;
-      case CtrlSortFilter::THOSTNAME:
-         sort_str = hostname;
-         break;
-      case CtrlSortFilter::TTIMECREATION:
-         sort_int = time_creation;
-         break;
-      case CtrlSortFilter::TTIMESTARTED:
-         sort_int = time_started;
-         break;
-      case CtrlSortFilter::TTIMEFINISHED:
-         sort_int = time_done;
-         break;
-      case CtrlSortFilter::TTIMERUN:
-         sort_int = time_run;
-         break;
-      default:
-         AFERRAR("ItemJob::setSortType: Invalid type number = %d", type)
-         return false;
-   }
-   return true;
+	resetSorting();
+
+	switch( i_type1 )
+	{
+		case CtrlSortFilter::TNONE:
+			break;
+		case CtrlSortFilter::TNAME:
+			m_sort_str1 = m_name;
+			break;
+		case CtrlSortFilter::TPRIORITY:
+			m_sort_int1 = m_priority;
+			break;
+		case CtrlSortFilter::TUSERNAME:
+			m_sort_str1 = username;
+			break;
+		case CtrlSortFilter::TSERVICE:
+			m_sort_str1 = service;
+			break;
+		case CtrlSortFilter::TNUMRUNNINGTASKS:
+			m_sort_int1 = num_runningtasks;
+			break;
+		case CtrlSortFilter::THOSTNAME:
+			m_sort_str1 = hostname;
+			break;
+		case CtrlSortFilter::TTIMECREATION:
+			m_sort_int1 = time_creation;
+			break;
+		case CtrlSortFilter::TTIMESTARTED:
+			m_sort_int1 = time_started;
+			break;
+		case CtrlSortFilter::TTIMEFINISHED:
+			m_sort_int1 = time_done;
+			break;
+		case CtrlSortFilter::TTIMERUN:
+			m_sort_int1 = time_run;
+			break;
+		default:
+			AF_ERR << "Invalid type1 number = " << i_type1;
+	}
+
+	switch( i_type2 )
+	{
+		case CtrlSortFilter::TNONE:
+			break;
+		case CtrlSortFilter::TNAME:
+			m_sort_str2 = m_name;
+			break;
+		case CtrlSortFilter::TPRIORITY:
+			m_sort_int2 = m_priority;
+			break;
+		case CtrlSortFilter::TUSERNAME:
+			m_sort_str2 = username;
+			break;
+		case CtrlSortFilter::TSERVICE:
+			m_sort_str2 = service;
+			break;
+		case CtrlSortFilter::TNUMRUNNINGTASKS:
+			m_sort_int2 = num_runningtasks;
+			break;
+		case CtrlSortFilter::THOSTNAME:
+			m_sort_str2 = hostname;
+			break;
+		case CtrlSortFilter::TTIMECREATION:
+			m_sort_int2 = time_creation;
+			break;
+		case CtrlSortFilter::TTIMESTARTED:
+			m_sort_int2 = time_started;
+			break;
+		case CtrlSortFilter::TTIMEFINISHED:
+			m_sort_int2 = time_done;
+			break;
+		case CtrlSortFilter::TTIMERUN:
+			m_sort_int2 = time_run;
+			break;
+		default:
+			AF_ERR << "Invalid type2 number = " << i_type2;
+	}
 }
 
-bool ItemJob::setFilterType( int type )
+void ItemJob::setFilterType( int i_type )
 {
-   resetFiltering();
-   switch( type )
-   {
-      case CtrlSortFilter::TNONE:
-         return false;
-      case CtrlSortFilter::TNAME:
-         filter_str = m_name;
-         break;
-      case CtrlSortFilter::TUSERNAME:
-         filter_str = username;
-         break;
-      case CtrlSortFilter::THOSTNAME:
-         filter_str = hostname;
-         break;
-      case CtrlSortFilter::TSERVICE:
-         filter_str = service;
-         break;
-      default:
-         AFERRAR("ItemJob::setFilterType: Invalid type number = %d", type)
-         return false;
-   }
-   return true;
+	resetFiltering();
+
+	switch( i_type )
+	{
+		case CtrlSortFilter::TNONE:
+			break;
+		case CtrlSortFilter::TNAME:
+			m_filter_str = m_name;
+			break;
+		case CtrlSortFilter::TUSERNAME:
+			m_filter_str = username;
+			break;
+		case CtrlSortFilter::THOSTNAME:
+			m_filter_str = hostname;
+			break;
+		case CtrlSortFilter::TSERVICE:
+			m_filter_str = service;
+			break;
+		default:
+			AF_ERR << "Invalid type number = " << i_type;
+	}
 }
 
 void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 {
-   if((id_block >= 0) && (id_block >= m_blocks_num))
-   {
-      AFERRAR("ListJobs::generateMenu: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
-      return;
-   }
-   m_blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
+	if((id_block >= 0) && (id_block >= m_blocks_num))
+	{
+		AFERRAR("ListJobs::generateMenu: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
+		return;
+	}
+	m_blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
 }
 
 bool ItemJob::blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
 {
-   if((id_block >= 0) && (id_block >= m_blocks_num))
-   {
-      AFERRAR("ListJobs::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
-      return false;
-   }
-   return m_blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
+	if((id_block >= 0) && (id_block >= m_blocks_num))
+	{
+		AFERRAR("ListJobs::blockAction: id_block >= m_blocks_num (%d>=%d)", id_block, m_blocks_num)
+		return false;
+	}
+	return m_blockinfo[ id_block >= 0 ? id_block : 0].blockAction( i_str, id_block, i_action, listitems);
 }
 
 void ItemJob::getThumbnail() const

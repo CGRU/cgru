@@ -10,7 +10,7 @@ class ListJobs;
 class ItemJob : public ItemNode
 {
 public:
-	ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed);
+	ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed, const CtrlSortFilter * i_ctrl_sf);
 	~ItemJob();
 
 	void updateValues( af::Node *node, int type);
@@ -57,8 +57,8 @@ public:
 	inline int getBlockPercent( int block ) const
 		{ if( block < m_blocks_num ) return m_blockinfo[block].p_percentage; else return 0;}
 
-	bool setSortType(   int type );
-	bool setFilterType( int type );
+	void setSortType(   int type1, int i_type2 );
+	void setFilterType( int type );
 
 	void generateMenu( int id_block, QMenu * menu, QWidget * qwidget);
 
