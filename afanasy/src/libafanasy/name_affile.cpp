@@ -393,6 +393,12 @@ bool af::removeDir( const std::string & i_folder )
 			continue;
 		}
 
+		// From man readdir (2016.06.10):
+		//     Currently, only some filesystems
+		//     (among them: Btrfs, ext2, ext3, and ext4)
+		//     have full support for returning the file type in `d_type`
+		// So we should use `st_mode` for check
+		// (which is more expensive, but not for our needs)
 		if( S_ISDIR( st.st_mode))
 		{
 			if( false == af::removeDir( filename))
