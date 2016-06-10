@@ -70,10 +70,6 @@ ListRenders::ListRenders( QWidget* parent):
 	initSortFilterCtrl();
 
 	CtrlRenders * control = new CtrlRenders( m_ctrl_sf, this);
-	control->setToolTip("\
-Sort & Filter Renders.\n\
-Press RMB for Options.\
-");
 	m_ctrl_sf->getLayout()->addWidget( control);
 
 	// Add left panel buttons:

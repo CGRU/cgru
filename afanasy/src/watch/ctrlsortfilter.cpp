@@ -74,15 +74,22 @@ CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 	m_filtermatch(    i_filtermatch    ),
 	m_parernlist(     i_parent         )
 {
+	setToolTip("Sort&filter control.\nUse RMB menu for options.");
+
 	m_sort_label = new QLabel("Sort:", this);
 	m_sort_menu1 = new CtrlSortFilterMenu( this, m_sorttype1);
 	m_sort_menu2 = new CtrlSortFilterMenu( this, m_sorttype2);
 	connect( m_sort_menu1, SIGNAL( sig_changed( int)), this, SLOT( actSortType1( int)));
 	connect( m_sort_menu2, SIGNAL( sig_changed( int)), this, SLOT( actSortType2( int)));
+	connect( m_sort_menu1, SIGNAL( sig_dblclick()), this, SLOT( actSortAscending1()));
+	connect( m_sort_menu2, SIGNAL( sig_dblclick()), this, SLOT( actSortAscending2()));
+	m_sort_menu1->setToolTip("RMB to select 1st sort field.\nDouble click to change direction.");
+	m_sort_menu2->setToolTip("RMB to select 2nd sort field.\nDouble click to change direction.");
 
 	m_filter_label = new QLabel("Filter:", this);
 	m_filter_menu = new CtrlSortFilterMenu( this, m_filtertype);
 	connect( m_filter_menu, SIGNAL( sig_changed( int)), this, SLOT( actFilterType( int)));
+	m_filter_menu->setToolTip("RMB to select filtering field.");
 
 	QLineEdit * lineEdit = new QLineEdit( *m_filter, this);
 

@@ -13,9 +13,11 @@ public:
 
 signals:
 	void sig_changed( int i_type);
+	void sig_dblclick();
 
 protected:
-	void contextMenuEvent( QContextMenuEvent *event);
+	void contextMenuEvent( QContextMenuEvent * i_event);
+	void mouseDoubleClickEvent( QMouseEvent * i_event);
 
 private slots:
 	void slot_changed( int i_type);

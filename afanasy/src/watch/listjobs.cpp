@@ -81,10 +81,6 @@ ListJobs::ListJobs( QWidget* parent):
 	initSortFilterCtrl();
 
 	CtrlJobs * control = new CtrlJobs( m_ctrl_sf, this);
-	control->setToolTip("\
-Sort & Filter Jobs.\n\
-Press RMB for Options.\
-");
 	m_ctrl_sf->getLayout()->addWidget( control);
 
 

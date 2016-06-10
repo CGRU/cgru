@@ -22,7 +22,7 @@ CtrlSortFilterMenu::~CtrlSortFilterMenu()
 {
 }
 
-void CtrlSortFilterMenu::contextMenuEvent(QContextMenuEvent *event)
+void CtrlSortFilterMenu::contextMenuEvent(QContextMenuEvent * i_event)
 {
 	QMenu menu(this);
 	QAction *action;
@@ -36,7 +36,12 @@ void CtrlSortFilterMenu::contextMenuEvent(QContextMenuEvent *event)
 		menu.addAction( action);
 	}
 
-	menu.exec( event->globalPos());
+	menu.exec( i_event->globalPos());
+}
+
+void CtrlSortFilterMenu::mouseDoubleClickEvent( QMouseEvent * i_event)
+{
+	emit sig_dblclick();
 }
 
 void CtrlSortFilterMenu::slot_changed( int i_type)
