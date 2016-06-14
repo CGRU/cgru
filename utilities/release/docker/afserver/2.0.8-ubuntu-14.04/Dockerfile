@@ -1,4 +1,4 @@
-FROM cgru/afcommon
+FROM cgru/afcommon:2.0.8-ubuntu-14.04
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 LABEL cgru_container_version="1.3.0"
 

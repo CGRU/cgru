@@ -1,10 +1,5 @@
 FROM ubuntu:14.04
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
-ENV CGRU_VERSION="2.0.8"
-LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
-
-#DUMMY COMMENT TO TEST DOCKER HUB AUTOBUILD
-#STOPSIGNAL SIGINT
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq install \
@@ -16,16 +11,19 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  	imagemagick \
  && apt-get -yqq clean \
  && rm -rf /var/lib/apt/lists/*
- 
+
+ENV CGRU_VERSION="2.0.8" CGRU_UBUNTU_VERSION="14.04.3"
+LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
+
 WORKDIR /tmp
-ADD http://downloads.sourceforge.net/project/cgru/$CGRU_VERSION/cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz ./cgru.$CGRU_VERSION.ubuntu14.04.3_amd64.tar.gz
+ADD http://downloads.sourceforge.net/project/cgru/${CGRU_VERSION}/cgru.${CGRU_VERSION}.ubuntu${CGRU_UBUNTU_VERSION}_amd64.tar.gz ./cgru.${CGRU_VERSION}.ubuntu${CGRU_UBUNTU_VERSION}_amd64.tar.gz
 RUN tar xzvf cgru*.tar.gz \
  && dpkg -i cgru-common*.deb afanasy-common*.deb afanasy-server*.deb afanasy-render*.deb \
  && rm -rf *
  
 ADD https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux /usr/local/bin/ep
-COPY resources/bin/ /usr/local/bin/
-RUN chmod -R +rx /usr/local/bin/ /usr/local/sbin/ \
+COPY docker-entrypoint.sh /
+RUN chmod +rx /usr/local/bin/ep /docker-entrypoint.sh \
  && chmod 666 /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_servername":".\+",/"af_servername":"${AF_SERVERNAME}",/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_serverport":[0-9]\+,/"af_serverport":${AF_SERVERPORT},/' /opt/cgru/afanasy/config_default.json \
@@ -51,5 +49,5 @@ ENV AF_USERNAME="render" \
 
 WORKDIR /opt/cgru
 USER render
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["/opt/cgru/afanasy/bin/afcmd"]
