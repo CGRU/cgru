@@ -1,8 +1,7 @@
-FROM cgru/afcommon
+FROM cgru/afcommon:2.1.0-ubuntu-14.04
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 LABEL cgru_container_version="1.3.0"
 
-EXPOSE 51001
-ENV AF_SERVER_WAIT="yes"
+EXPOSE 51000
 
-CMD ["/opt/cgru/afanasy/bin/afrender"]
+CMD ["/opt/cgru/afanasy/bin/afserver"]

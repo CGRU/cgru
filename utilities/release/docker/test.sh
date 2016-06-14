@@ -9,11 +9,9 @@ function launch {
 }
 
 export COMPOSE_PROJECT_NAME="cgru"
-export CGRU_NETWORK="cgru"
 
 if [ "$1x" == "bootstrapx" ]
 then
-	docker network create $CGRU_NETWORK
 	cd afcommon
 	docker build -t afcommon .
 elif [ "$1x" == "x" ]
