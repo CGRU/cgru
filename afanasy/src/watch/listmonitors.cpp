@@ -78,11 +78,13 @@ void ListMonitors::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Show Log", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
 	menu.addAction( action);
-/*
+
+	menu.addSeparator();
+
 	action = new QAction( "Send Message", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actSendMessage() ));
 	menu.addAction( action);
-*/
+
 	menu.addSeparator();
 
 	action = new QAction( "Exit Monitor", this);
@@ -155,7 +157,7 @@ void ListMonitors::calcTitle()
 	}
 	m_parentWindow->setWindowTitle(QString("M[%1]: %2S").arg( total).arg( super));
 }
-/*
+
 void ListMonitors::actSendMessage()
 {
 	ItemMonitor* item = (ItemMonitor*)getCurrentItem();
@@ -165,10 +167,14 @@ void ListMonitors::actSendMessage()
 	QString text = QInputDialog::getText(this, "Send Message", "Enter Text", QLineEdit::Normal, "", &ok);
 	if( !ok) return;
 
-	af::MCGeneral mcgeneral( text.toUtf8().data());
-	action( mcgeneral, af::Msg::TMonitorMessage);
+	std::ostringstream str;
+	af::jsonActionOperationStart( str,"monitors","message","", getSelectedIds());
+	str << ",\n\"text\":\"" << af::strEscape( afqt::qtos( text)) << "\"";
+	af::jsonActionOperationFinish( str);
+
+	Watch::sendMsg( af::jsonMsg( str));
 }
-*/
+
 
 void ListMonitors::actRequestLog() { getItemInfo("log"); }
 

@@ -77,11 +77,11 @@ void MonitorAf::v_action( Action & i_action)
 			m_e.m_instruction = "exit";
 			return;
 		}
-		if( optype == "deregister")
+		else if( optype == "deregister")
 		{
 			deregister();
 		}
-		if( optype == "watch")
+		else if( optype == "watch")
 		{
 			std::string opclass, opstatus;
 			af::jr_string("class", opclass, operation);
@@ -159,6 +159,13 @@ void MonitorAf::v_action( Action & i_action)
 			appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_action.author);
 			m_time_activity = time( NULL);
 			return;
+		}
+		else if( optype == "message")
+		{
+			std::string text;
+			af::jr_string("text", text, operation);
+			text += "\n - " + i_action.author;
+			sendMessage( text);
 		}
 		else
 		{

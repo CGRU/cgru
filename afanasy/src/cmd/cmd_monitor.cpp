@@ -55,7 +55,9 @@ CmdMonitorMsg::~CmdMonitorMsg(){}
 
 bool CmdMonitorMsg::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	m_str << "{\"announce\":\"" << argv[0] <<"\"}";
+	af::jsonActionOperationStart( m_str,"monitors","message",".*");
+	m_str << ",\n\"text\":\"" << af::strEscape( argv[0]) << "\"";
+	af::jsonActionOperationFinish( m_str);
 
-   return true;
+	return true;
 }

@@ -290,7 +290,7 @@ void MonitorContainer::dispatch( RenderContainer * i_renders)
 	{
 		MonitorContainerIt monitorsIt( this);
 		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-			monitor->announce( m_announcement);
+			monitor->sendMessage( m_announcement);
 	}
 	
 

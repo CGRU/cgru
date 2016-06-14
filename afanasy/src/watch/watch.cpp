@@ -209,12 +209,12 @@ void Watch::caseMessage( af::Msg * msg)
 			new WndText( me.m_outputs[i]);
 		}
 
-		if( me.m_announcement.size())
+		if( me.m_message.size())
 		{
-			if( LabelVersion::getStringStatus( me.m_announcement) != LabelVersion::SS_None )
-				ms_d->announce( me.m_announcement);
+			if( LabelVersion::getStringStatus( me.m_message) != LabelVersion::SS_None )
+				ms_d->announce( me.m_message);
 			else
-				new WndText("Annoncement", me.m_announcement);
+				new WndText("Message", me.m_message);
 
 			received = true;
 		}

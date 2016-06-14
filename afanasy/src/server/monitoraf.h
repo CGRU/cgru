@@ -54,7 +54,7 @@ public:
 	bool isListening( const af::MonitorEvents::MListen & i_listen) const;
 	inline void addListened( const af::MonitorEvents::MListen & i_listen) { m_e.addListened( i_listen); }
 
-	inline void announce( const std::string & i_str) { m_e.m_announcement = i_str; }
+	inline void sendMessage( const std::string & i_text) { m_e.m_message = i_text; }
 
 private:
 	void setEvents( const std::vector<int32_t> & i_ids, bool value);

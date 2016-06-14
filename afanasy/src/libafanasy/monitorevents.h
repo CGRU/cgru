@@ -56,7 +56,7 @@ public:
 
 	std::vector<MCTaskOutput> m_outputs;
 
-	std::string m_announcement;
+	std::string m_message;
 
 public:
 

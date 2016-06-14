@@ -144,8 +144,8 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	}
 
 
-	// Announcement
-	rw_String( m_announcement, msg);
+	// Message
+	rw_String( m_message, msg);
 }
 
 void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
@@ -315,12 +315,12 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 	}
 
 
-	// Announcement:
-	if( m_announcement.size())
+	// Message:
+	if( m_message.size())
 	{
 		if( hasevents ) o_str << ","; else o_str << "{";
 
-		o_str << "\n\"announce\":\"" << m_announcement << "\"";
+		o_str << "\n\"message\":\"" << m_message << "\"";
 
 		hasevents = true;
 	}
@@ -349,7 +349,7 @@ void MonitorEvents::clear()
 
 	m_outputs.clear();
 
-	m_announcement.clear();
+	m_message.clear();
 }
 
 bool MonitorEvents::isEmpty() const
@@ -368,7 +368,7 @@ bool MonitorEvents::isEmpty() const
 
 	if( m_outputs.size()) return false;
 
-	if( m_announcement.size()) return false;
+	if( m_message.size()) return false;
 
 	return true;
 }
@@ -396,8 +396,8 @@ void MonitorEvents::v_generateInfoStream( std::ostringstream & o_str, bool i_ful
 	if( m_instruction.size())
 		o_str << " i\"" << m_instruction << "\"";
 
-	if( m_announcement.size())
-		o_str << " " << m_announcement;
+	if( m_message.size())
+		o_str << " " << m_message;
 
 	o_str << "\n";
 }
