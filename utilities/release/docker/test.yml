@@ -1,14 +1,17 @@
-afcommon:
- build: afcommon/.
+version: "2"
 
-afserver:
- build: afserver/.
- net: "$CGRU_NETWORK"
- ports:
-  - "51000:51000"
+# afcommon:
+#  build: afcommon/.
 
-afrender:
- build: afrender/.
- net: "$CGRU_NETWORK"
- environment:
-  AF_SERVERNAME: "cgru_afserver_1"
+services:
+ afserver:
+  build: afserver/2.0.8-ubuntu-14.04/.
+  ports:
+   - "51000:51000"
+
+ afrender:
+  build: afrender/2.0.8-ubuntu-14.04/.
+  links:
+   - afserver
+  environment:
+   AF_SERVERNAME: "cgru_afserver_1"
