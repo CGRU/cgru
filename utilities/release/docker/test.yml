@@ -39,3 +39,18 @@ services:
    - afserver-2.1.0-ubuntu-16.04
   environment:
    AF_SERVERNAME: "cgru_afserver-2.1.0-ubuntu-16.04_1"
+
+ db:
+  image: postgres:9.5
+  environment:
+   POSTGRES_USER: afadmin
+   POSTGRES_PASSWORD: AfPassword
+   POSTGRES_DB: afanasy
+
+ phppgadmin:
+  image: zhajor/docker-phppgadmin
+  ports:
+   - "58080:80"
+  environment:
+   DB_HOST: db
+   DB_PORT: 5432
