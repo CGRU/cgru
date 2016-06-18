@@ -4,6 +4,13 @@ version: "2"
 #  build: afcommon/.
 
 services:
+ rules:
+  build: rules/.
+  ports:
+   - "50000:80"
+  volumes:
+   - rules_root:/opt/cgru/rules_root
+
  afserver-2.0.8-ubuntu-14.04:
   build: afserver/2.0.8-ubuntu-14.04/.
   ports:
@@ -59,3 +66,7 @@ services:
   build: afstatistics/.
   ports:
    - "50080:80"
+
+volumes:
+ rules_root:
+  driver: 'local'
