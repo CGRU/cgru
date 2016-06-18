@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+while /opt/cgru/afanasy/bin/afcmd db_check 2>&1 | grep -q "NOT WORKING"
+do
+	echo "Waiting for database to be ready ..."
+	sleep 1
+done
+
 echo "Checking Afanasy statistics DB structure ..."
 
 /opt/cgru/afanasy/bin/afcmd db_updatetables 2>&1 \
