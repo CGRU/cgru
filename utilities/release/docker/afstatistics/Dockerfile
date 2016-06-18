@@ -11,7 +11,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq clean \
  && rm -rf /var/lib/apt/lists/*
 
-COPY resources/apache2-foreground /usr/local/bin/
+COPY resources/afstatistics.sh /usr/local/bin/
 COPY resources/000-afstatistics.conf /etc/apache2/sites-available
 
 RUN chmod -R +x /usr/local/bin/* \
@@ -27,8 +27,10 @@ RUN chmod -R +x /usr/local/bin/* \
 ENV AF_DB_HOST="db" \
  AF_DB_NAME="afanasy" \
  AF_DB_USER="afadmin" \
- AF_DB_PASSWORD="AfPassword"
+ AF_DB_PASSWORD="AfPassword" \
+ AF_SERVER_WAIT="yes"
+ENV AF_SERVERNAME=${AF_DB_HOST}
 
 EXPOSE 80
 
-CMD ["/usr/local/bin/apache2-foreground"]
+CMD ["/usr/local/bin/afstatistics.sh"]
