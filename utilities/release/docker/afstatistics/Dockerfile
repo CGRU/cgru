@@ -1,4 +1,4 @@
-FROM cgru/afcommon:latest
+FROM cgru/afcommon:2.1.0-ubuntu-14.04
 MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 LABEL cgru_container_version="1.0.0"
 
@@ -6,8 +6,8 @@ USER root
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq install \
     apache2 \
-    libapache2-mod-php \
-    php-pgsql \
+    libapache2-mod-php5 \
+    php5-pgsql \
  && apt-get -yqq clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -21,7 +21,8 @@ RUN chmod -R +x /usr/local/bin/* \
 	-e 's!^(\s*ErrorLog)\s+\S+!\1 /proc/self/fd/2!g' \
 	/etc/apache2/apache2.conf \
  && chown -R www-data /opt/cgru/afanasy/statistics \
- && sed -i 's/"af_db_conninfo":".\+",/"af_db_conninfo":"host=${AF_DB_HOST} dbname=${AF_DB_NAME} user=${AF_DB_USER} password=${AF_DB_PASSWORD}",/' /opt/cgru/afanasy/config_default.json
+ && sed -i 's/"af_db_conninfo":".\+",/"af_db_conninfo":"host=${AF_DB_HOST} dbname=${AF_DB_NAME} user=${AF_DB_USER} password=${AF_DB_PASSWORD}",/' /opt/cgru/afanasy/config_default.json \
+ && sed -i "s/'host=localhost dbname=afanasy user=afadmin password=AfPassword'/'host=' . getenv('AF_DB_HOST') . ' dbname=' . getenv('AF_DB_NAME') . ' user=' . getenv('AF_DB_USER') . ' password=' . getenv('AF_DB_PASSWORD')/" /opt/cgru/afanasy/statistics/server.php
 
 ENV AF_DB_HOST="db" \
  AF_DB_NAME="afanasy" \
