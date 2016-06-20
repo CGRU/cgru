@@ -75,7 +75,7 @@ bool JobProgress::initBlocks()
    }
 
    tasksnum = new int32_t        [ m_blocks_num];
-   tp       = new TaskProgress **[ m_blocks_num];
+   tp       = new TaskProgress **[ m_blocks_num]();
 
    return true;
 }
