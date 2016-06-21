@@ -403,11 +403,8 @@ printf("ListJobs::~ListJobs:\n");
 #endif
 }
 
-bool ListJobs::caseMessage( af::Msg * msg)
+bool ListJobs::v_caseMessage( af::Msg * msg)
 {
-#ifdef AFOUTPUT
-printf("ListJobs::caseMessage:\n"); msg->stdOut();
-#endif
 	switch( msg->type())
 	{
 	case af::Msg::TJobsList:
@@ -444,7 +441,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
 	return true;
 }
 
-bool ListJobs::processEvents( const af::MonitorEvents & i_me)
+bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 {
 	if( i_me.m_events[af::Monitor::EVT_jobs_del].size())
 	{

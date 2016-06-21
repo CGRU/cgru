@@ -27,7 +27,7 @@ RenderEvents::~RenderEvents()
 void RenderEvents::addUniqueTask( const MCTaskPos & i_tp, std::vector<MCTaskPos> & o_vec)
 {
 	for( int i = 0; i < o_vec.size(); i++)
-		if( o_vec[i].equal( i_tp))
+		if( o_vec[i].isEqual( i_tp))
 			return;
 
 	o_vec.push_back( i_tp);

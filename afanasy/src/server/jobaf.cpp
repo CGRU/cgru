@@ -1137,67 +1137,6 @@ void JobAf::v_calcNeed()
 	// Need calculation based on running tasks number
 	calcNeedResouces( getRunningTasksNumber());
 }
-
-void JobAf::skipTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
-{
-	tasks_Skip_Restart( taskspos, false,renders, monitoring);
-}
-
-void JobAf::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
-{
-	tasks_Skip_Restart( taskspos, true, renders, monitoring);
-}
-
-void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring)
-{
-	for( int p = 0; p < taskspos.getCount(); p++)
-	{
-		int b = taskspos.getNumBlock(p);
-		if( b < 0)
-		{
-			AF_ERR << "b < 0";
-			continue;
-		}
-		if( b >= m_blocks_num)
-		{
-			AF_ERR << "b >= blocksnum ( " << b << " >= " << m_blocks_num << " )";
-			continue;
-		}
-		int start, end;
-		if( taskspos.hasTasks())
-		{
-			start = taskspos.getNumTask( p);
-			if( start >= m_blocks_data[b]->getTasksNum())
-			{
-				AF_ERR << "taskspos.getNumTask() >= numTasks, ( " << start << " >= " << m_blocks_data[b]->getTasksNum() << " )";
-				continue;
-			}
-			if( start < 0)
-			{
-				AF_ERR << "taskspos.getNumTask() < 0";
-				continue;
-			}
-			end = start+1;
-		}
-		else
-		{
-			start = 0;
-			end = m_blocks_data[b]->getTasksNum();
-		}
-		
-		std::string message;
-		if( restart) message = "Restart request by ";
-		else         message = "Skip request by ";
-		message += taskspos.getUserName() + '@' + taskspos.getHostName() + ' ' + taskspos.getMessage();
-		
-		for( int t = start; t < end; t++)
-		{
-			if( restart) m_blocks[b]->m_tasks[t]->restart( message, renders, monitoring);
-			else         m_blocks[b]->m_tasks[t]->skip( message, renders, monitoring);
-		}
-	}
-}
-
 void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
 	for( int b = 0; b < m_blocks_num; b++)
@@ -1278,33 +1217,29 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 		return af::jsonMsgError("Invalid block/task number.");
 	}
 
-	if( i_mode == "log" )
+	af::MCTask mctask( m_id, i_b, i_t);
+	fillTaskNames( mctask);
+
+	if( i_mode == "info" )
 	{
-		const std::list<std::string> * list = &(getTaskLog( i_b, i_t));
-		std::list<std::string> emptyMsg;
-		if( list->empty())
+		af::TaskExec * exec = generateTask( i_b, i_t);
+		if( exec )
 		{
-			emptyMsg.push_back("Task log is empty.");
-			list = &emptyMsg;
+			mctask.setExec( exec);
+			return mctask.generateMessage( i_binary);
 		}
-		if( i_binary )
-		{
-			af::Msg * msg = new af::Msg;
-			msg->setStringList( *list);
-			return msg;
-		}
-		else
-			return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+"]["+af::itos(i_t)+"]", *list);
 	}
-	else if( i_mode == "info" )
+	else if( i_mode == "log" )
 	{
-		af::TaskExec * task = generateTask( i_b, i_t);
-		if( task )
-		{
-			if( i_binary )
-				return new af::Msg( af::Msg::TTask, task);
-			task->jsonWrite( str, af::Msg::TTask);
-		}
+		mctask.setLog( getTaskLog( i_b, i_t));
+		return mctask.generateMessage( i_binary);
+	}
+	else if( i_mode == "error_hosts")
+	{
+		std::list<std::string> list;
+		m_blocks[i_b]->m_tasks[i_t]->getErrorHostsList( list);
+		mctask.setErrorHosts( list);
+		return mctask.generateMessage( i_binary);
 	}
 	else if( i_mode == "files" )
 	{
@@ -1313,25 +1248,11 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode, bool i
 		else
 			m_blocks[i_b]->m_tasks[i_t]->getStoredFiles( str);
 	}
-	else if( i_mode == "error_hosts")
-	{
-		std::list<std::string> list;
-		m_blocks[i_b]->m_tasks[i_t]->getErrorHostsList( list);
-		if( list.empty())
-			list.push_back("No error hosts.");
-		if( i_binary )
-		{
-			af::Msg * msg = new af::Msg;
-			msg->setStringList( list);
-			return msg;
-		}
-		else
-		{
-			return af::jsonMsg("error_hosts", m_name + "[" + af::itos(i_b) + "][" + af::itos(i_t) + "]", list);
-		}
-	}
 	else if( i_mode == "output")
 	{
+		// "output" is processed in threadProcessJSON(),
+		// as file reading or render update waiting can be needed.
+		AF_ERR << "Mode is \"output\".";
 	}
 
 	str << "}";
@@ -1350,13 +1271,6 @@ af::TaskExec * JobAf::generateTask( int block, int task) const
 	if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
 	return m_blocks[block]->m_tasks[task]->genExec();
 }
-/*
-const std::string JobAf::generateTaskName( int i_b, int i_t) const
-{
-	if( false == checkBlockTaskNumbers( i_b, i_t, "generateTaskName")) return "Invalid ids.";
-	else return m_blocks[i_b]->m_data->genTaskName( i_t);
-}
-*/
 af::Msg * JobAf::writeErrorHosts( bool i_binary) const
 {
 	std::list<std::string> list;
@@ -1412,18 +1326,10 @@ bool JobAf::checkBlockTaskNumbers( int i_b, int i_t, const char * o_str) const
 
 	return true;
 }
-
-/*
-const std::string JobAf::generateTaskName( int i_b, int i_t) const
+void JobAf::v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const
 {
-	if( false == checkBlockTaskNumbers( i_b, i_t, "generateTaskName")) return "Invalid ids.";
-	else return m_blocks[i_b]->m_data->genTaskName( i_t);
-}
-*/
-void JobAf::v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const
-{
-	int b = io_mcto.m_block_id;
-	int t = io_mcto.m_task_id;
+	int b = io_mctask.getBlockNum();
+	int t = io_mctask.getTaskNum();
 
 	if( false == checkBlockTaskNumbers( b, t, "getTaskOutput"))
 	{
@@ -1431,20 +1337,30 @@ void JobAf::v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) 
 		return;
 	}
 
-	io_mcto.m_job_name = getName();
-	io_mcto.m_block_name = m_blocks[b]->m_data->getName();
-	io_mcto.m_task_name  = m_blocks[b]->m_data->genTaskName( t);
-	io_mcto.m_service    = m_blocks[b]->m_data->getService();
-	io_mcto.m_parser     = m_blocks[b]->m_data->getParser();
+	fillTaskNames( io_mctask);
 
-	m_blocks[b]->m_tasks[t]->getOutput( io_mcto, o_error);
+	m_blocks[b]->m_tasks[t]->getOutput( io_mctask, o_error);
+}
+
+void JobAf::fillTaskNames( af::MCTask & o_mctask) const
+{
+	int b = o_mctask.getBlockNum();
+	int t = o_mctask.getTaskNum();
+	o_mctask.m_job_name   = getName();
+	o_mctask.m_block_name = m_blocks[b]->m_data->getName();
+	o_mctask.m_task_name  = m_blocks[b]->m_data->genTaskName(t);
+	o_mctask.m_service    = m_blocks[b]->m_data->getService();
+	o_mctask.m_parser     = m_blocks[b]->m_data->getParser();
+	o_mctask.m_progress   = *(m_progress->tp[b][t]);
 }
 
 void JobAf::listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task)
 {
 	if(( i_block > 0 ) && ( i_task > 0 ))
 	{
-		if( false == checkBlockTaskNumbers( i_block, i_task, "listenOutput")) return;
+		if( false == checkBlockTaskNumbers( i_block, i_task, "listenOutput"))
+			return;
+
 		m_blocks[i_block]->m_tasks[i_task]->listenOutput( i_renders, i_subscribe);
 	}
 	else

@@ -184,9 +184,8 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	menu.exec( event->globalPos());
 }
 
-bool ListUsers::caseMessage( af::Msg * msg)
+bool ListUsers::v_caseMessage( af::Msg * msg)
 {
-AFINFO("ListUsers::caseMessage( Msg msg)\n");
 #ifdef AFOUTPUT
 	msg->stdOut();
 #endif
@@ -205,7 +204,7 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
 	return true;
 }
 
-bool ListUsers::processEvents( const af::MonitorEvents & i_me)
+bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 {
 	if( i_me.m_events[af::Monitor::EVT_users_del].size())
 	{

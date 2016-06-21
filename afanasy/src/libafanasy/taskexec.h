@@ -172,8 +172,14 @@ public:
 
 	void jsonWrite( std::ostringstream & o_str, int i_type) const;
 
+	/// Needed for af::Render to write running tasks percents:
 	inline void setProgress( const TaskProgress * i_progress ) { m_progress = i_progress; }
 	inline int getPercent() const { if( m_progress ) return m_progress->percent; else return -1; }
+
+
+	/// Read or write task in message buffer.
+	void v_readwrite( Msg * msg);
+
 
 	std::string m_custom_data_task;
 	std::string m_custom_data_block;
@@ -221,13 +227,11 @@ private:
 	int64_t m_time_start;
 
 private:
-	// Needed for render:
+	/// Needed for af::Render to write running tasks percents:
 	const TaskProgress * m_progress;
 
 	bool m_on_client;
 
 private:
-
-	void v_readwrite( Msg * msg); ///< Read or write task in message buffer.
 };
 }

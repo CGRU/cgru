@@ -2,6 +2,7 @@
 
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/blockdata.h"
+#include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "item.h"
@@ -52,6 +53,8 @@ public:
 	
 	/// Send a query for information about this task to the server
 	void getTaskInfo(const std::string &i_mode, int i_number = -1);
+
+	inline const af::MCTaskPos getTaskPos() const { return af::MCTaskPos( m_job_id, m_blocknum, m_tasknum);}
 	
 protected:
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;

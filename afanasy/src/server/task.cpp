@@ -170,13 +170,19 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 
 	if( taskup.hasListened())
 	{
-		RenderContainerIt it( renders);
+		af::MCTask mctask( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number);
+		m_block->m_job->fillTaskNames( mctask);
+		mctask.setListened( taskup.getListened());
+		mctask.m_render_id = taskup.getClientId();
+		monitoring->addListened( mctask);
+/*		RenderContainerIt it( renders);
 		std::string hostname;
 		RenderAf * render = it.getRender( taskup.getClientId());
 		if( render )
 		{
 			hostname = render->getName();
 		}
+
 		monitoring->addListened(
 			taskup.getClientId(),
 			m_run->getTaskName(),
@@ -185,6 +191,7 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 			m_block->m_data->getBlockNum(),
 			m_number,
 			taskup.getListened());
+*/
 	}
 
 	if( taskup.getParsedFiles().size())
@@ -538,32 +545,35 @@ const std::string Task::getOutputFileName( int i_starts_count) const
 	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + af::itos( i_starts_count) + ".txt";
 }
 
-void Task::getOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const
+void Task::getOutput( af::MCTask & io_mctask, std::string & o_error) const
 {
 	if( m_progress->starts_count < 1 )
 	{
 		o_error = "Task is not started.";
 		return;
 	}
-	if( io_mcto.m_start_num > m_progress->starts_count )
+
+	int start_num = io_mctask.getNumber();
+	if( start_num > m_progress->starts_count )
 	{
-		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(io_mcto.m_start_num)+" times ).";
+		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(start_num)+" times ).";
 		return;
 	}
-	if( io_mcto.m_start_num == 0 )
+
+	if( start_num == 0 )
 	{
 		if( m_run && m_run->notZombie())
 		{
-			io_mcto.m_render_id = m_run->v_getRunningRenderID( o_error);
+			io_mctask.m_render_id = m_run->v_getRunningRenderID( o_error);
 			return;
 		}
 		else
 		{
-			io_mcto.m_start_num = m_progress->starts_count;
+			start_num = m_progress->starts_count;
 		}
 	}
 
-	io_mcto.m_filename = getOutputFileName( io_mcto.m_start_num);
+	io_mctask.setOutput( getOutputFileName( start_num));
 }
 
 const std::string Task::v_getInfo( bool full) const

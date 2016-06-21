@@ -94,9 +94,8 @@ void ListMonitors::contextMenuEvent( QContextMenuEvent *event)
 	menu.exec( event->globalPos());
 }
 
-bool ListMonitors::caseMessage( af::Msg * msg)
+bool ListMonitors::v_caseMessage( af::Msg * msg)
 {
-AFINFO("ListMonitors::caseMessage( Msg msg)\n");
 #ifdef AFOUTPUT
 	msg->stdOut();
 #endif
@@ -115,7 +114,7 @@ AFINFO("ListMonitors::caseMessage( Msg msg)\n");
 	return true;
 }
 
-bool ListMonitors::processEvents( const af::MonitorEvents & i_me)
+bool ListMonitors::v_processEvents( const af::MonitorEvents & i_me)
 {
 	if( i_me.m_events[af::Monitor::EVT_monitors_del].size())
 	{

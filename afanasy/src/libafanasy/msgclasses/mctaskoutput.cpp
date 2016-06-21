@@ -32,8 +32,8 @@ bool MCTaskOutput::isSameTask( const MCTaskOutput & i_other) const
 bool MCTaskOutput::isSameTask( const MCTaskPos & i_tp) const
 {
 	if( m_job_id   != i_tp.getJobId()    ) return false;
-	if( m_block_id != i_tp.getNumBlock() ) return false;
-	if( m_task_id  != i_tp.getNumTask()  ) return false;
+	if( m_block_id != i_tp.getBlockNum() ) return false;
+	if( m_task_id  != i_tp.getTaskNum()  ) return false;
 
 	return true;
 }

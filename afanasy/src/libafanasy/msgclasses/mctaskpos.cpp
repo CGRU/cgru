@@ -41,12 +41,30 @@ void MCTaskPos::v_readwrite( Msg * msg)
    rw_int32_t( number,   msg);
 }
 
-bool MCTaskPos::equal( const MCTaskPos & i_other) const
+void MCTaskPos::jsonWrite( std::ostringstream & o_str) const
+{
+	o_str << "{\"job\":"    << jobid;
+	o_str << ",\"block\":"  << blocknum;
+	o_str << ",\"task\":"   << tasknum;
+	o_str << ",\"number\":" << number << "}";
+}
+
+bool MCTaskPos::isEqual( const MCTaskPos & i_other) const
 {
 	if( ( jobid    == i_other.jobid    ) &&
 		( blocknum == i_other.blocknum ) &&
 		( tasknum  == i_other.tasknum  ) &&
 		( number   == i_other.number   ))
+		return true;
+
+	return false;
+}
+
+bool MCTaskPos::isSameTask( const MCTaskPos & i_other) const
+{
+	if( ( jobid    == i_other.jobid    ) &&
+		( blocknum == i_other.blocknum ) &&
+		( tasknum  == i_other.tasknum  ))
 		return true;
 
 	return false;

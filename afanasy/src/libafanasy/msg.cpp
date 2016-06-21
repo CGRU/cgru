@@ -584,7 +584,6 @@ const char * Msg::TNAMES[]=
 	"TBlocks",                    ///< Blocks data.
 
 	"TTask",                      ///< A task of some job.
-	"TTaskOutputRequest",         ///< Request task output from render ( by gui thought server ).
 	"TTaskOutput",                ///< Task output from server to GUI (af::MCTaskOutput)
 	"TTaskFiles",                 ///< Task (or entire job) files
 

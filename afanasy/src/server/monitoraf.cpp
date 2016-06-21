@@ -142,8 +142,11 @@ void MonitorAf::v_action( Action & i_action)
 				JobContainerIt jobsIt( i_action.jobs);
 				JobAf * job = jobsIt.getJob( job_id);
 				if( job )
-					if( setListening( job_id, block, task, subscribe))
+				{
+					af::MCTaskPos tp( job_id, block, task);
+					if( setListening( tp, subscribe))
 						job->listenOutput( i_action.renders, subscribe, block, task);
+				}
 			}
 			else
 			{
@@ -303,22 +306,18 @@ void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 	m_e.m_bids[i].mode = i_mode;
 }
 
-bool MonitorAf::setListening( int i_j, int i_b, int i_t, bool i_subscribe)
+bool MonitorAf::setListening( const af::MCTaskPos & i_tp, bool i_subscribe)
 {
-	std::list<int>::iterator jIt = m_lis_j.begin();
-	std::list<int>::iterator bIt = m_lis_b.begin();
-	std::list<int>::iterator tIt = m_lis_t.begin();
+	std::list<af::MCTaskPos>::iterator it = m_listen_pos.begin();
 
-	for( ; jIt != m_lis_j.end(); jIt++, bIt++, tIt++)
+	for( ; it != m_listen_pos.end(); it++)
 	{
-		if(( *jIt == i_j ) && ( *bIt == i_b ) && ( *tIt == i_t ))
+		if( i_tp.isSameTask( *it))
 		{
 			if( i_subscribe )
 				return false;
 
-			m_lis_j.erase( jIt);
-			m_lis_b.erase( bIt);
-			m_lis_t.erase( tIt);
+			m_listen_pos.erase( it);
 
 			return true;
 		}
@@ -327,19 +326,17 @@ bool MonitorAf::setListening( int i_j, int i_b, int i_t, bool i_subscribe)
 	if( false == i_subscribe )
 		return false;
 
-	m_lis_j.push_back( i_j);
-	m_lis_b.push_back( i_b);
-	m_lis_t.push_back( i_t);
+	m_listen_pos.push_back( i_tp);
 
 	return true;
 }
 
-void MonitorAf::waitOutput( const af::MCTaskOutput & i_to)
+void MonitorAf::waitOutput( const af::MCTask & i_mctask)
 {
-	if( isWaintingOutput( i_to))
+	if( isWaintingOutput( i_mctask))
 		return;
 
-	m_wait_output.push_back( i_to);
+	m_wait_output.push_back( i_mctask);
 	//printf("MonitorAf::waitOutput: "); i_tp.v_stdOut();
 }
 
@@ -351,11 +348,11 @@ void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_out
 		return;
 	}
 
-	std::vector<af::MCTaskOutput>::iterator it = m_wait_output.begin();
+	std::vector<af::MCTask>::iterator it = m_wait_output.begin();
 	while( it != m_wait_output.end())
 		if((*it).isSameTask( i_tp))
 		{
-			(*it).m_output = i_output;
+			(*it).setOutput( i_output);
 			m_e.addOutput(*it);
 			m_wait_output.erase(it);
 			break;
@@ -374,27 +371,25 @@ bool MonitorAf::isWaintingOutput( const af::MCTaskPos & i_tp) const
 	return false;
 }
 
-bool MonitorAf::isWaintingOutput( const af::MCTaskOutput & i_to) const
+bool MonitorAf::isWaintingOutput( const af::MCTask & i_mctask) const
 {
 	for( int i = 0; i < m_wait_output.size(); i++)
-		if( m_wait_output[i].isSameTask( i_to))
+		if( m_wait_output[i].isSameTask( i_mctask))
 			return true;
 
 	return false;
 }
 
-bool MonitorAf::isListening( const af::MonitorEvents::MListen & i_listen) const
+bool MonitorAf::isListening( const af::MCTask & i_mctask) const
 {
-	std::list<int>::const_iterator jIt = m_lis_j.begin();
-	std::list<int>::const_iterator bIt = m_lis_b.begin();
-	std::list<int>::const_iterator tIt = m_lis_t.begin();
+	std::list<af::MCTaskPos>::const_iterator it = m_listen_pos.begin();
 
-	for( ; jIt != m_lis_j.end(); jIt++, bIt++, tIt++)
-		if( *jIt == i_listen.job_id )
+	for( ; it != m_listen_pos.end(); it++)
+		if((*it).getJobId() == i_mctask.getJobId())
 		{
-			if(( *bIt == -1 ) && ( *tIt == -1 ))
+			if(((*it).getBlockNum() == -1 ) && ((*it).getTaskNum() == -1 ))
 				return true;
-			if(( *bIt == i_listen.block ) && ( *tIt == i_listen.task ))
+			if( i_mctask.isSameTask(*it))
 				return true;
 		}
 

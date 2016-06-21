@@ -60,24 +60,24 @@ void WndListenJob::subscribe( bool i_subscribe)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-bool WndListenJob::processEvents( const af::MonitorEvents & i_me)
+bool WndListenJob::v_processEvents( const af::MonitorEvents & i_me)
 {
 	bool founded = false;
 
 	for( int i = 0; i < i_me.m_listens.size(); i++)
 	{
-		if( i_me.m_listens[i].job_id == m_job_id )
+		if( i_me.m_listens[i].getJobId() == m_job_id )
 		{
 			qTextEdit->setFontWeight( QFont::Bold);
 			qTextEdit->setFontItalic( true);
 			qTextEdit->setFontUnderline( true);
-			qTextEdit->append( afqt::stoq( i_me.m_listens[i].taskname)
-					+ "[" + afqt::stoq( i_me.m_listens[i].hostname) + "]:");
+			qTextEdit->append( afqt::stoq( i_me.m_listens[i].m_task_name)
+					+ "[" + afqt::stoq( i_me.m_listens[i].m_progress.hostname) + "]:");
 
 			qTextEdit->setFontUnderline( false);
 			qTextEdit->setFontItalic( false);
 			qTextEdit->setFontWeight( QFont::Normal);
-			qTextEdit->append( afqt::stoq( i_me.m_listens[i].output));
+			qTextEdit->append( afqt::stoq( i_me.m_listens[i].getListened()));
 
 			founded = true;
 		}

@@ -36,7 +36,7 @@ RenderUpdate::~RenderUpdate()
 void RenderUpdate::addTaskUp( MCTaskUp * i_tup)
 {
 	for( int i = 0; i < m_taskups.size(); i++)
-		if( m_taskups[i]->sameTask( *i_tup))
+		if( m_taskups[i]->isSameTask( *i_tup))
 		{
 			delete m_taskups[i];
 			m_taskups[i] = i_tup;
@@ -49,7 +49,7 @@ void RenderUpdate::addTaskUp( MCTaskUp * i_tup)
 void RenderUpdate::addTaskOutput( const MCTaskPos & i_tp, const std::string & i_output)
 {
 	for( int i = 0; i < m_outspos.size(); i++)
-		if( m_outspos[i].equal( i_tp))
+		if( m_outspos[i].isEqual( i_tp))
 		{
 			m_outputs[i] = i_output;
 			return;

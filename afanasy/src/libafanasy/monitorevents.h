@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "msgclasses/mctaskoutput.h"
+#include "msgclasses/mctask.h"
 #include "msgclasses/mctaskpos.h"
 #include "taskprogress.h"
 
@@ -43,18 +43,9 @@ public:
 
 	std::string m_instruction;
 
-	struct MListen {
-		int32_t render_id;
-		std::string taskname;
-		std::string hostname;
-		int32_t job_id;
-		int32_t block;
-		int32_t task;
-		std::string output;
-	};
-	std::vector<MListen> m_listens;
+	std::vector<MCTask> m_listens;
 
-	std::vector<MCTaskOutput> m_outputs;
+	std::vector<MCTask> m_outputs;
 
 	std::string m_message;
 
@@ -62,9 +53,9 @@ public:
 
 	bool isEmpty() const;
 
-	void addOutput( const af::MCTaskOutput & i_to);
+	void addOutput( const MCTask & i_mctask);
 
-	void addListened( MListen i_listen);
+	void addListened( const MCTask & i_mctask);
 
 	void jsonWrite( std::ostringstream & o_str) const;
 

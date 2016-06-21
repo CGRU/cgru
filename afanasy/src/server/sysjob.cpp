@@ -589,24 +589,7 @@ void SysJob::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 //AFINFO("SysJob::refresh:");
 	JobAf::v_refresh( currentTime, pointer, monitoring);
 }
-
-void SysJob::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
-{
-//printf("SysJob::restartTasks:\n");
-	for( int p = 0; p < taskspos.getCount(); p++)
-	{
-		int b = taskspos.getNumBlock(p);
-		if( b >= m_blocks_num)
-		{
-			AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, m_blocks_num)
-			continue;
-		}
-		((SysBlock*)(m_blocks[b]))->clearCommands();
-	}
-	JobAf::v_restartTasks( taskspos, renders, monitoring);
-}
-
-void SysJob::v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const
+void SysJob::v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const
 {
 	o_error = "This is an empty dummy task in a system job block.\nError tasks output are stored in this task log.";
 }

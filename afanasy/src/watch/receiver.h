@@ -11,9 +11,9 @@ public:
 	Receiver();
 	virtual ~Receiver();
 
-	virtual bool caseMessage( af::Msg * msg);
+	virtual bool v_caseMessage( af::Msg * i_msg);
 
-	virtual bool processEvents( const af::MonitorEvents & i_me);
+	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
 	virtual bool v_filesReceived( const af::MCTaskUp & i_taskup);
 

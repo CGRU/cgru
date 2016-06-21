@@ -36,11 +36,7 @@ public:
 
    void addUser( UserAf * i_user);
 
-	void addListened( int i_render_id,
-			const std::string & i_taskname,
-			const std::string & i_hostname,
-			int i_j, int i_b, int i_t,
-			const std::string & i_listened);
+	void addListened( const af::MCTask & i_mctask);
 
 	void outputsReceived( const std::vector<af::MCTaskPos> & i_outspos, const std::vector<std::string> & i_outputs);
 
@@ -60,7 +56,7 @@ private:
 
 	std::list<UserAf*> m_usersJobOrderChanged;
 
-	std::vector<af::MonitorEvents::MListen> m_listens;
+	std::vector<af::MCTask> m_listens;
 
 	std::string m_announcement;
 

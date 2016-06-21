@@ -5,7 +5,6 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
 
 #include "../libafqt/qenvironment.h"
 

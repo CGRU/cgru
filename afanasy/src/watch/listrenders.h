@@ -15,11 +15,11 @@ public:
 	ListRenders( QWidget* parent);
 	~ListRenders();
 
-	bool caseMessage( af::Msg * msg);
+	bool v_caseMessage( af::Msg * msg);
 
 	ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed);
 
-	virtual bool processEvents( const af::MonitorEvents & i_me);
+	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);

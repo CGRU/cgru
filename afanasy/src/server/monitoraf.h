@@ -2,7 +2,7 @@
 
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/monitorevents.h"
-#include "../libafanasy/msgclasses/mctaskoutput.h"
+#include "../libafanasy/msgclasses/mctask.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "afnodesrv.h"
@@ -45,14 +45,14 @@ public:
 
 	void deregister();
 
-	bool isWaintingOutput( const af::MCTaskPos    & i_tp) const;
-	bool isWaintingOutput( const af::MCTaskOutput & i_to) const;
+	bool isWaintingOutput( const af::MCTaskPos & i_tp) const;
+	bool isWaintingOutput( const af::MCTask    & i_to) const;
 
-	void waitOutput( const af::MCTaskOutput & i_to);
+	void waitOutput( const af::MCTask & i_mctask);
 	void addOutput( const af::MCTaskPos & i_tp, const std::string & i_output);
 
-	bool isListening( const af::MonitorEvents::MListen & i_listen) const;
-	inline void addListened( const af::MonitorEvents::MListen & i_listen) { m_e.addListened( i_listen); }
+	bool isListening( const af::MCTask & i_mctask) const;
+	inline void addListened( const af::MCTask & i_mctask) { m_e.addListened( i_mctask); }
 
 	inline void sendMessage( const std::string & i_text) { m_e.m_message = i_text; }
 
@@ -61,18 +61,16 @@ private:
 	void addJobIds( const std::vector<int32_t> & i_ids);
 	void delJobIds( const std::vector<int32_t> & i_ids);
 
-	bool setListening( int i_j, int i_b, int i_t, bool i_subscribe);
+	bool setListening( const af::MCTaskPos & i_tp, bool i_subscribe);
 
 	void prepareEvents();
 
 private:
 	af::MonitorEvents m_e;
 
-	std::list<int> m_lis_j;
-	std::list<int> m_lis_b;
-	std::list<int> m_lis_t;
+	std::list<af::MCTaskPos> m_listen_pos;
 
-	std::vector<af::MCTaskOutput> m_wait_output;
+	std::vector<af::MCTask> m_wait_output;
 
 	DlMutex m_mutex;
 

@@ -109,32 +109,18 @@ void MonitorContainer::outputsReceived( const std::vector<af::MCTaskPos> & i_out
 		AFERROR("MonitorContainer::outputsReceived: No one waiting such outputs.")
 }
 
-void MonitorContainer::addListened(
-		int i_render_id,
-		const std::string & i_taskname,
-		const std::string & i_hostname,
-		int i_j, int i_b, int i_t,
-		const std::string & i_listened)
+void MonitorContainer::addListened( const af::MCTask & i_mctask)
 {
 	for( int i = 0; i < m_listens.size(); i++)
 	{
-		if(( m_listens[i].job_id == i_j ) && ( m_listens[i].block == i_b ) && ( m_listens[i].task == i_t ))
+		if( m_listens[i].isSameTask( i_mctask))
 		{
-			m_listens[i].output += i_listened;
+			m_listens[i].appendListened( i_mctask.getListened());
 			return;
 		}
 	}
 
-	af::MonitorEvents::MListen listen;
-	listen.render_id= i_render_id;
-	listen.taskname = i_taskname;
-	listen.hostname = i_hostname;
-	listen.job_id   = i_j;
-	listen.block    = i_b;
-	listen.task     = i_t;
-	listen.output   = i_listened;
-
-	m_listens.push_back( listen);
+	m_listens.push_back( i_mctask);
 }
 
 void MonitorContainer::dispatch( RenderContainer * i_renders)
@@ -271,15 +257,12 @@ void MonitorContainer::dispatch( RenderContainer * i_renders)
 		if( false == founded )
 		{
 			AFCommon::QueueLog( std::string("Removing not listening task: ") +
-					m_listens[i].taskname + "[" + m_listens[i].hostname + "]");
+					m_listens[i].m_task_name);
 
 			RenderContainerIt rIt( i_renders);
-			RenderAf * render = rIt.getRender( m_listens[i].render_id);
+			RenderAf * render = rIt.getRender( m_listens[i].m_render_id);
 			if( render )
-				render->listenTask(
-					af::MCTaskPos(
-						m_listens[i].job_id, m_listens[i].block, m_listens[i].task),
-						false);
+				render->listenTask( m_listens[i].getPos(), false);
 		}
 	}
 

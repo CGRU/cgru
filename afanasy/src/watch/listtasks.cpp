@@ -11,7 +11,6 @@
 #include "../libafanasy/service.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
 
@@ -23,6 +22,7 @@
 #include "monitorhost.h"
 #include "viewitems.h"
 #include "watch.h"
+#include "wndtask.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QEvent>
@@ -201,11 +201,8 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 	}
 }
 
-bool ListTasks::caseMessage( af::Msg * msg)
+bool ListTasks::v_caseMessage( af::Msg * msg)
 {
-#ifdef AFOUTPUT
-printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
-#endif
 	switch( msg->type())
 	{
 	case af::Msg::TJob:
@@ -234,8 +231,8 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 		}
 		else
 		{
-			AFERROR(     "ListTasks::caseMessage: af::Msg::TJob: Job is already constructed.")
-			displayError("ListTasks::caseMessage: af::Msg::TJob: Job is already constructed.");
+			AF_ERR << "af::Msg::TJob: Job is already constructed.";
+			displayError("af::Msg::TJob: Job is already constructed.");
 		}
 		break;
 	}
@@ -288,7 +285,7 @@ printf("ListTasks::caseMessage:\n"); msg->v_stdOut();
 	return true;
 }
 
-bool ListTasks::processEvents( const af::MonitorEvents & i_me)
+bool ListTasks::v_processEvents( const af::MonitorEvents & i_me)
 {
 	bool founded = false;
 
@@ -464,8 +461,8 @@ void ListTasks::doubleClicked( Item * item)
 {
 	if( item->getId() == ItemJobTask ::ItemId )
 	{
-		ItemJobTask *itemTask = (ItemJobTask*)item;
-		itemTask->getTaskInfo("info");
+		ItemJobTask * itemTask = (ItemJobTask*)item;
+		new WndTask( itemTask->getTaskPos());
 	}
 	else if( item->getId() == ItemJobBlock::ItemId )
 	{

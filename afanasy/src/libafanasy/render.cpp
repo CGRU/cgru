@@ -248,16 +248,17 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
    case Msg::TRendersResources:
 
 		// Tasks percents, needed for GUI only:
-/* Very strange code:
 		if( msg->isWriting())
 		{
-			// Using temporary array because this function should be thread-safe
+			// Fill in temporary array,
+			// not m_tasks_percents (which is used on client side for reading only)
+			// because this function should be thread-safe (we can't clear() m_tasks_percents here)
 			std::vector<int32_t> _tasks_percents;
 			for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 				_tasks_percents.push_back((*it)->getPercent());
 			rw_Int32_Vect( _tasks_percents, msg);
 		}
-		else*/
+		else
 			rw_Int32_Vect( m_tasks_percents, msg);
 
 		rw_int64_t( m_idle_time, msg);

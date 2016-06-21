@@ -1,7 +1,7 @@
 #include "cmd_task.h"
 
+#include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -47,7 +47,8 @@ CmdTaskOutput::CmdTaskOutput()
 	setArgsCount(4);
 	setInfo("Get task output.");
 	setHelp("tout [jobid] [block] [task] [start] Get task output.");
-	setMsgType( af::Msg::TTaskOutputRequest);
+	setMsgType( af::Msg::TJSON);
+	setMsgOutType( af::Msg::TTaskOutput);
 }
 CmdTaskOutput::~CmdTaskOutput(){}
 bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -61,11 +62,23 @@ bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
 	if( ok == false ) return false;
 	number = af::stoi(argv[3], &ok);
 	if( ok == false ) return false;
-	af::MCTaskPos mctaskpos( job, block, task, number);
-	msg.set( getMsgType(), &mctaskpos);
+
+	m_str << "{\"get\":{\"type\":\"jobs\"";
+	m_str << ",\"mode\":\"output\"";
+	m_str << ",\"ids\":[" << job << "]";
+	m_str << ",\"block_ids\":[" << block << "]";
+	m_str << ",\"task_ids\":[" << task << "]";
+	m_str << ",\"number\":" << number;
+	m_str << ",\"binary\":true";
+	m_str << "}}";
+
 	return true;
 }
-
+void CmdTaskOutput::v_msgOut( af::Msg& msg)
+{
+	af::MCTaskOutput to( &msg);
+	to.v_stdOut( true);
+}
 CmdTaskRestart::CmdTaskRestart()
 {
 	setCmd("trestart");

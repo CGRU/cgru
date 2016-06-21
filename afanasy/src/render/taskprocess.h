@@ -29,7 +29,7 @@ public:
 		          ( m_taskexec->getNumber()   == i_Number   ));}
 
 	inline bool is( const af::MCTaskPos & i_taskpos) const
-		{ return is( i_taskpos.getJobId(), i_taskpos.getNumBlock(), i_taskpos.getNumTask(), i_taskpos.getNumber());}
+		{ return is( i_taskpos.getJobId(), i_taskpos.getBlockNum(), i_taskpos.getTaskNum(), i_taskpos.getNumber());}
 
 	const std::string getOutput() const;
 

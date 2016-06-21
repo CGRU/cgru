@@ -37,6 +37,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 int Dialog::ms_size_border_top   = 40;
 int Dialog::ms_size_border_bot   = 25;
@@ -255,11 +256,11 @@ void Dialog::connectionEstablished()
 
 void Dialog::newMessage( af::Msg *msg)
 {
-    if( msg == NULL)
-    {
-        AFERROR("Dialog::caseMessage: msg == NULL")
-        return;
-    }
+	if( msg == NULL)
+	{
+		AF_ERR << "msg == NULL";
+		return;
+	}
     #ifdef AFOUTPUT
     printf(" >>> Dialog::newMessage: ");msg->v_stdOut();
     #endif
@@ -308,11 +309,6 @@ void Dialog::newMessage( af::Msg *msg)
         new WndText( "List", msg);
         break;
     }
-    case af::Msg::TTask:
-    {
-        new WndTask( "Task", msg);
-        break;
-    }
     case af::Msg::TTaskOutput:
     {
         new WndText( af::MCTaskOutput(msg));
@@ -324,7 +320,7 @@ void Dialog::newMessage( af::Msg *msg)
         if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
             announce( str);
         else
-            new WndText("Annoncement", msg);
+			new WndText("Message", msg);
         break;
     }
 	case af::Msg::TTaskFiles:

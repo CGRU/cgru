@@ -33,7 +33,7 @@ public:
 	MCTaskUp( Msg * msg);
 	~MCTaskUp();
 
-	bool sameTask( const MCTaskUp & i_other) const;
+	bool isSameTask( const MCTaskUp & i_other) const;
 
 	inline int getClientId()                 const { return m_clientid;      }
 
@@ -73,6 +73,8 @@ private:
 	int32_t m_numjob;
 	int32_t m_numblock;
 	int32_t m_numtask;
+
+	/// Used to indentify multi-host tasks:
 	int32_t m_number;
 
 	int8_t  m_status;

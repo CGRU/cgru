@@ -19,6 +19,7 @@
 #include "wndlist.h"
 #include "wndlistenjob.h"
 #include "wndlistentask.h"
+#include "wndtask.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
@@ -177,7 +178,7 @@ void Watch::caseMessage( af::Msg * msg)
 	for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
 		msg->resetWrittenSize();
-		if( (*rIt)->caseMessage( msg) && (false == received)) received = true;
+		if( (*rIt)->v_caseMessage( msg) && (false == received)) received = true;
 	}
 
 	if( msg->type() == af::Msg::TMonitorEvents )
@@ -201,12 +202,19 @@ void Watch::caseMessage( af::Msg * msg)
 		for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 		{
 			msg->resetWrittenSize();
-			if( (*rIt)->processEvents( me) && (false == received)) received = true;
+			if( (*rIt)->v_processEvents( me) && (false == received)) received = true;
 		}
 
 		for( int i = 0; i < me.m_outputs.size(); i++)
 		{
-			new WndText( me.m_outputs[i]);
+			if( WndTask::showTask( me.m_outputs[i]))
+				received = true;
+		}
+
+		for( int i = 0; i < me.m_listens.size(); i++)
+		{
+			if( WndTask::showTask( me.m_listens[i]))
+				received = true;
 		}
 
 		if( me.m_message.size())
@@ -218,6 +226,11 @@ void Watch::caseMessage( af::Msg * msg)
 
 			received = true;
 		}
+	}
+	else if( msg->type() == af::Msg::TTask )
+	{
+		af::MCTask mctask( msg);
+		received = WndTask::showTask( mctask);
 	}
 
    if( false == received)

@@ -65,8 +65,8 @@ namespace af
 	class MCAfNodesIt;
 	class MCTalkmessage;
 	class MCTalkdistmessage;
+	class MCTask;
 	class MCTaskPos;
-	class MCTasksPos;
 	class MCTasksProgress;
 	class MCListenAddress;
 	class MCTaskUp;

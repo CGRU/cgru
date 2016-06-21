@@ -29,32 +29,30 @@ MonitorEvents::~MonitorEvents()
 {
 }
 
-void MonitorEvents::addOutput( const af::MCTaskOutput & i_to)
+void MonitorEvents::addOutput( const af::MCTask & i_mctask)
 {
 	for( int i = 0; i < m_outputs.size(); i++)
-		if( m_outputs[i].isSameTask( i_to))
+		if( m_outputs[i].isSameTask( i_mctask))
 		{
-			m_outputs[i].m_output = i_to.m_output;
+			m_outputs[i].updateOutput( i_mctask.getOutput());
 			return;
 		}
 
-	m_outputs.push_back( i_to);
+	m_outputs.push_back( i_mctask);
 }
 
-void MonitorEvents::addListened( MListen i_listen)
+void MonitorEvents::addListened( const af::MCTask & i_mctask)
 {
 	for( int i = 0; i < m_listens.size(); i++)
 	{
-		if(( m_listens[i].job_id == i_listen.job_id ) &&
-			( m_listens[i].block == i_listen.block ) &&
-			( m_listens[i].task == i_listen.task ))
+		if( m_listens[i].isSameTask( i_mctask))
 		{
-			m_listens[i].output += i_listen.output;
+			m_listens[i].appendListened( i_mctask.getListened());
 			return;
 		}
 	}
 
-	m_listens.push_back( i_listen);
+	m_listens.push_back( i_mctask);
 }
 
 void MonitorEvents::v_readwrite( Msg * msg)
@@ -110,7 +108,7 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	for( int i = 0; i < outs_size; i++)
 	{
 		if( msg->isReading())
-			m_outputs.push_back( MCTaskOutput());
+			m_outputs.push_back( MCTask());
 
 		m_outputs[i].v_readwrite( msg);
 	}
@@ -130,17 +128,9 @@ void MonitorEvents::v_readwrite( Msg * msg)
 	for( int i = 0; i < lis_size; i++)
 	{
 		if( msg->isReading())
-		{
-			m_listens.push_back( MListen());
-			m_listens[i].render_id = 0; ///< Not used on a client side.
-		}
+			m_listens.push_back( MCTask());
 
-		rw_int32_t( m_listens[i].job_id,   msg);
-		rw_int32_t( m_listens[i].block,    msg);
-		rw_int32_t( m_listens[i].task,     msg);
-		rw_String ( m_listens[i].taskname, msg);
-		rw_String ( m_listens[i].hostname, msg);
-		rw_String ( m_listens[i].output,   msg);
+		m_listens[i].v_readwrite( msg);
 	}
 
 
@@ -298,16 +288,9 @@ void MonitorEvents::jsonWrite( std::ostringstream & o_str) const
 		o_str << "\n\"tasks_listens\":[";
 		for( int i = 0; i < m_listens.size(); i++)
 		{
-			if( i ) o_str << ",";
+			if( i ) o_str << ",\n";
 
-			o_str << "\n{";
-			o_str << "\"taskname\":\"" << m_listens[i].taskname << "\"";
-			o_str << ",\"hostname\":\"" << m_listens[i].hostname << "\"";
-			o_str << ",\"job\":" << m_listens[i].job_id;
-			o_str << ",\"block\":" << m_listens[i].block;
-			o_str << ",\"task\":" << m_listens[i].task;
-			o_str << "\n,\"output\":\"" << af::strEscape(m_listens[i].output) << "\"";
-			o_str << "}";
+			m_listens[i].jsonWrite( o_str);
 		}
 		o_str << "]";
 

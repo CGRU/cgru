@@ -120,12 +120,11 @@ public:
 	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
-	virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 	static void appendJobLog( const std::string & message);
 
 	// Functions than informate that it is a system task, and this info is not abailable:
-	virtual void v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const;
+	virtual void v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const;
 
 protected:
 	virtual Block * v_newBlock( int numBlock);

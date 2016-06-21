@@ -11,7 +11,7 @@ public:
 	WndListenTask( int i_job_id, int i_block, int i_task, const QString & i_name);
    ~WndListenTask();
 
-	bool processEvents( const af::MonitorEvents & i_me);
+	bool v_processEvents( const af::MonitorEvents & i_me);
 
    void v_connectionLost();
 

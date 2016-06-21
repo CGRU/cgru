@@ -3,7 +3,6 @@
 
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/renderupdate.h"
@@ -53,13 +52,6 @@ switch ( i_msg->type())
 		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
 		break;
 	}
-/*	case af::Msg::TTaskUpdatePercent:
-	case af::Msg::TTaskUpdateState:
-	{
-		af::MCTaskUp taskup( i_msg);
-		i_args->jobs->updateTaskState( taskup, i_args->renders, i_args->monitors);
-		break;
-	}*/
 	case af::Msg::TConfirm:
 	{
 		AFCommon::QueueLog( std::string("af::Msg::TConfirm: ") + af::itos( i_msg->int32()));

@@ -22,9 +22,9 @@ public:
 	ListTasks( QWidget* parent, int JobId, const QString & JobName);
 	~ListTasks();
 
-	bool caseMessage( af::Msg * msg);
+	virtual bool v_caseMessage( af::Msg * msg);
 
-	virtual bool processEvents( const af::MonitorEvents & i_me);
+	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
 	bool mousePressed( QMouseEvent * event);
 

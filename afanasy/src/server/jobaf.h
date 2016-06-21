@@ -2,10 +2,9 @@
 
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/job.h"
-#include "../libafanasy/msgclasses/mctaskoutput.h"
+#include "../libafanasy/msgclasses/mctask.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "afnodesrv.h"
@@ -58,7 +57,7 @@ public:
 	/// for retrieveing output from running remote host
 	/// or filename if task is not running.
 	/** Virtual for system job, it just sets an error that output is not available.**/
-	virtual void v_getTaskOutput( af::MCTaskOutput & io_mcto, std::string & o_error) const;
+	virtual void v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const;
 
 	/// Whether the job can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
@@ -80,10 +79,7 @@ public:
 
 	/// Send tasks output to a specified address.
 	void listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task);
-	
-	void skipTasks(    const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Skip some tasks.
-	virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
-	
+
 	/// Refresh job. Calculate attributes from tasks progress.
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
@@ -113,6 +109,9 @@ public:
 
 	void setThumbnail( const std::string & i_path, int i_size, const char * i_data );
 	inline bool hasThumbnail() const { return m_thumb_size > 0; }
+
+	/// Just fill in job, block, task and other names:
+	void fillTaskNames( af::MCTask & o_mctask) const;
 
 public:
 	/// Set Jobs Container.
@@ -155,10 +154,7 @@ private:
 	void initStoreDirs();
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
-	
-	/// Skip or restart some tasks.
-	void tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring);
-	
+
 	/// Check whether job has not done depend jobs.
 	/** If \c onlyIfDepeds == \c true , check process only if job is already waiting for others. **/
 	void checkDepends();

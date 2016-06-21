@@ -7,7 +7,7 @@
 #include "usercontainer.h"
 
 #include "../libafanasy/farm.h"
-#include "../libafanasy/msgclasses/mctaskoutput.h"
+#include "../libafanasy/msgclasses/mctask.h"
 #include "../libafanasy/rapidjson/stringbuffer.h"
 #include "../libafanasy/rapidjson/prettywriter.h"
 
@@ -89,7 +89,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				af::jr_int("mon_id", mon_id, getObj);
 				if(( ids.size() == 1 ) && ( block_ids.size() == 1 ) && ( task_ids.size() == 1 ))
 				{
-					af::MCTaskOutput mcto( ids[0], block_ids[0], task_ids[0], number);
+					af::MCTask mctask( ids[0], block_ids[0], task_ids[0], number);
 					std::string error;
 
 					// Get output from job, it can return a request message for render or a filename
@@ -101,28 +101,28 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						if( job == NULL )
 							error = "Invalid job ID";
 						else
-							job->v_getTaskOutput( mcto, error);
+							job->v_getTaskOutput( mctask, error);
 					}
 
-					if( mcto.m_filename.size()) // Reading output from file
+					if( mctask.hasOutput()) // Reading output from file
 					{
 						int readsize = -1;
-						char * data = af::fileRead( mcto.m_filename, &readsize, af::Msg::SizeDataMax, &error);
+						char * data = af::fileRead( mctask.getOutput(), &readsize, af::Msg::SizeDataMax, &error);
 						if( data )
 						{
-							mcto.m_output = std::string( data, readsize);
-							o_msg_response = mcto.generateMessage( binary);
+							mctask.updateOutput( std::string( data, readsize));
+							o_msg_response = mctask.generateMessage( binary);
 
 							delete [] data;
 						}
 					}
-					else if( mcto.m_render_id ) // Retrieving output from render
+					else if( mctask.m_render_id ) // Retrieving output from render
 					{
 						{
 							AfContainerLock rLock( i_args->renders, AfContainerLock::WRITELOCK);
 
 							RenderContainerIt rendersIt( i_args->renders);
-							RenderAf * render = rendersIt.getRender( mcto.m_render_id);
+							RenderAf * render = rendersIt.getRender( mctask.m_render_id);
 							if( render )
 							{
 								render->addTaskOutput( af::MCTaskPos( ids[0], block_ids[0], task_ids[0]));
@@ -130,13 +130,13 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 							else
 							{
 								error = std::string("Render not founded with ID = ")
-									+ af::itos( mcto.m_render_id);
-								mcto.m_render_id = 0;
+									+ af::itos( mctask.m_render_id);
+								mctask.m_render_id = 0;
 							}
 						}
 
 						// If render founded, set monitor to wait output:
-						if( mcto.m_render_id )
+						if( mctask.m_render_id )
 						{					
 							AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
 
@@ -144,7 +144,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 							MonitorAf * monitor = it.getMonitor( mon_id);
 							if( monitor )
 							{
-								monitor->waitOutput( mcto);
+								monitor->waitOutput( mctask);
 								std::string info = "Retrieving running task output from render...";
 								if( binary )
 									o_msg_response = af::msgInfo("info", info);

@@ -67,9 +67,9 @@ void WndListenTask::subscribe( bool i_subscribe)
 	Watch::sendMsg( af::jsonMsg( str));
 }
 
-bool WndListenTask::processEvents( const af::MonitorEvents & i_me)
+bool WndListenTask::v_processEvents( const af::MonitorEvents & i_me)
 {
-	for( int i = 0; i < i_me.m_listens.size(); i++)
+/*	for( int i = 0; i < i_me.m_listens.size(); i++)
 	{
 		if( ( i_me.m_listens[i].job_id == m_job_id ) &&
 			( i_me.m_listens[i].block  == m_block  ) &&
@@ -81,7 +81,7 @@ bool WndListenTask::processEvents( const af::MonitorEvents & i_me)
 			return true;
 		}
 	}
-
+*/
 	return false;
 }
 

@@ -432,7 +432,7 @@ void ListRenders::doubleClicked( Item * item)
 	actRequestInfo();
 }
 
-bool ListRenders::caseMessage( af::Msg * msg)
+bool ListRenders::v_caseMessage( af::Msg * msg)
 {
 #ifdef AFOUTPUT
 	msg->stdOut();
@@ -453,7 +453,7 @@ bool ListRenders::caseMessage( af::Msg * msg)
 	return true;
 }
 
-bool ListRenders::processEvents( const af::MonitorEvents & i_me)
+bool ListRenders::v_processEvents( const af::MonitorEvents & i_me)
 {
 	if( i_me.m_events[af::Monitor::EVT_renders_del].size())
 	{
