@@ -309,11 +309,6 @@ void Dialog::newMessage( af::Msg *msg)
         new WndText( "List", msg);
         break;
     }
-    case af::Msg::TTaskOutput:
-    {
-        new WndText( af::MCTaskOutput(msg));
-        break;
-    }
     case af::Msg::TString:
     {
         std::string str = msg->getString();

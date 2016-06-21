@@ -33,21 +33,6 @@ WndText::WndText( const QString & i_name, const std::string & i_str):
 	insertText( i_str);
 }
 
-WndText::WndText( const af::MCTaskOutput & i_to):
-	Wnd("TaskOuput")
-{
-	construct();
-
-	std::ostringstream str;
-	str << "Task [" << i_to.m_job_name << "][" << i_to.m_block_name << "][" << i_to.m_task_name
-		<< "] output(" << i_to.m_start_num << ")";
-	setWindowTitle( afqt::stoq( str.str()));
-
-	af::Service service( i_to.m_service, i_to.m_parser);
-	std::string html = service.toHTML( i_to.m_output);
-	qTextEdit->setHtml( afqt::stoq( html));
-}
-
 void WndText::construct()
 {
 	qTextEdit = new QTextEdit( this);

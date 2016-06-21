@@ -145,7 +145,6 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TBlocks/**/,                    ///< Blocks data.
 
 /**/TTask/**/,                      ///< A task of some job.
-/**/TTaskOutput/**/,                ///< Task output from server to GUI (af::MCTaskOutput)
 /**/TTaskFiles/**/,                 ///< Task (or entire job) files
 
 TRESERVED10,TRESERVED11,TRESERVED12,TRESERVED13,TRESERVED14,TRESERVED15,TRESERVED16,TRESERVED17,TRESERVED18,TRESERVED19,

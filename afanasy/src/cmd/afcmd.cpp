@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../libafanasy/msgclasses/mctask.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -109,6 +111,9 @@ void AfCmd::msgOutput( af::Msg &msg)
 				break;
 			case af::Msg::TInvalid:
 				printf("Invalid message.\n");
+				break;
+			case af::Msg::TTask:
+				af::MCTask(&msg).v_stdOut( true);
 				break;
 			default:
 				printf("Unknown (for afcmd) message recieved.\n");

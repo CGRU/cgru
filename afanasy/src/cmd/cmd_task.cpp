@@ -1,8 +1,5 @@
 #include "cmd_task.h"
 
-#include "../libafanasy/msgclasses/mctaskoutput.h"
-#include "../libafanasy/msgclasses/mctaskpos.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -48,7 +45,6 @@ CmdTaskOutput::CmdTaskOutput()
 	setInfo("Get task output.");
 	setHelp("tout [jobid] [block] [task] [start] Get task output.");
 	setMsgType( af::Msg::TJSON);
-	setMsgOutType( af::Msg::TTaskOutput);
 }
 CmdTaskOutput::~CmdTaskOutput(){}
 bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -74,11 +70,7 @@ bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	return true;
 }
-void CmdTaskOutput::v_msgOut( af::Msg& msg)
-{
-	af::MCTaskOutput to( &msg);
-	to.v_stdOut( true);
-}
+
 CmdTaskRestart::CmdTaskRestart()
 {
 	setCmd("trestart");
