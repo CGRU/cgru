@@ -351,6 +351,8 @@ bool MonitorEvents::isEmpty() const
 
 	if( m_outputs.size()) return false;
 
+	if( m_listens.size()) return false;
+
 	if( m_message.size()) return false;
 
 	return true;
