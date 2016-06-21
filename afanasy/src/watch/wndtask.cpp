@@ -42,8 +42,20 @@ WndTask::WndTask( const af::MCTaskPos & i_tp):
 	ms_wndtasks.push_back( this);
 
 	QVBoxLayout * layout = new QVBoxLayout( this);
+
+	m_progress_te = new QTextEdit( this);
+	layout->addWidget( m_progress_te);
+	m_progress_te->setReadOnly( true);
+	m_progress_te->setLineWrapMode( QTextEdit::NoWrap);
+	m_progress_te->setFocusPolicy( Qt::NoFocus);
+
+	m_progress_te->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff);
+	m_progress_te->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff);
+	m_progress_te->setFixedHeight( 28);
+
 	m_tab_widget = new QTabWidget( this);
 	layout->addWidget( m_tab_widget);
+	//m_tab_widget->setTabsClosable( true);
 
 	createTab("Executable",  &m_tab_exec,      NULL          ); 
 	createTab("Output",      &m_tab_output,   &m_output_te   ); 
@@ -167,12 +179,38 @@ void WndTask::setTaskTitle( const af::MCTask & i_mctask)
 	setWindowTitle( afqt::stoq( str.str()));
 }
 
+void WndTask::updateProgress( const af::TaskProgress & i_progress)
+{
+	m_progress = i_progress;
+
+	std::ostringstream str;
+
+	str << "Status:<b>";
+	if( m_progress.state & AFJOB::STATE_READY_MASK   ) str << ' ' << AFJOB::STATE_READY_NAME;
+	if( m_progress.state & AFJOB::STATE_RUNNING_MASK ) str << ' ' << AFJOB::STATE_RUNNING_NAME;
+	if( m_progress.state & AFJOB::STATE_DONE_MASK    ) str << ' ' << AFJOB::STATE_DONE_NAME;
+	if( m_progress.state & AFJOB::STATE_ERROR_MASK   ) str << ' ' << AFJOB::STATE_ERROR_NAME;
+	str << "</b>";
+
+	if( m_progress.state & AFJOB::STATE_RUNNING_MASK ) str << " <b>" << int(m_progress.percent) << "%</b>";
+	if( m_progress.starts_count ) str << " Starts: <b>" << m_progress.starts_count << "</b>";
+	if( m_progress.errors_count ) str << " (<b>" << m_progress.errors_count << "</b> errors)";
+	if( m_progress.hostname.size()) str << " Last host: <b>" << m_progress.hostname << "</b>";
+
+	if( m_progress.time_start && m_progress.time_done && ( false == ( m_progress.state & AFJOB::STATE_RUNNING_MASK )))
+		str << " Run Time: <b>" << af::time2strHMS( m_progress.time_done - m_progress.time_start) << "</b>";
+
+	m_progress_te->setHtml( afqt::stoq( str.str()));
+}
+
 bool WndTask::show( af::MCTask & i_mctask)
 {
 AF_LOG << i_mctask;
 
 	if( false == i_mctask.isSameTask( m_pos))
 		return false;
+
+	updateProgress( i_mctask.m_progress);
 
 	setTaskTitle( i_mctask);
 

@@ -2,6 +2,7 @@
 
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/taskprogress.h"
 
 #include "receiver.h"
 #include "wnd.h"
@@ -39,6 +40,8 @@ private:
 
 	void setTaskTitle( const af::MCTask & i_mctask);
 
+	void updateProgress( const af::TaskProgress & i_progress);
+
 	void getTaskInfo( const std::string & i_mode, int i_number = -1);
 
 	void listen( bool i_subscribe);
@@ -54,6 +57,9 @@ private slots:
 
 private:
 	af::MCTaskPos m_pos;
+
+	af::TaskProgress m_progress;
+	QTextEdit * m_progress_te;
 
 	QTabWidget * m_tab_widget;
 
