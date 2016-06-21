@@ -13,13 +13,15 @@
 class QCloseEvent;
 class QContextMenuEvent;
 
+class ListTasks;
+
 /// This class designed to request and show any task information
 
 class WndTask : public Wnd
 {
 	Q_OBJECT
 protected:
-	WndTask( const af::MCTaskPos & i_tp);
+	WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent);
 
 public:
 	~WndTask();
@@ -27,12 +29,18 @@ public:
 	/// Static function will try to find task window.
 	/// If founded, it will be raised.
 	// If not it opens one.
-	static void openTask( const af::MCTaskPos & i_tp);
+	static WndTask * openTask( const af::MCTaskPos & i_tp, ListTasks * i_parent = NULL);
 	/// ( all WndTask windows are stored in a static array )
+
 
 	/// Static function will try to find task window.
 	/// And if founded, it will ask to show info.
 	static bool showTask( af::MCTask & i_mctask);
+
+
+	/// Should be called in parent dtor to close this window.
+	void parentClosed();
+
 
 protected:
 	virtual void closeEvent( QCloseEvent * i_evt);
@@ -63,6 +71,8 @@ private slots:
 	void slot_currentChanged( int i_index);
 
 private:
+	ListTasks * m_parent;
+
 	af::MCTaskPos m_pos;
 
 	af::TaskProgress m_progress;

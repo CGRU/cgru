@@ -11,6 +11,7 @@
 
 #include "actionid.h"
 #include "monitorhost.h"
+#include "listtasks.h"
 #include "watch.h"
 
 #include <QtGui/QContextMenuEvent>
@@ -30,7 +31,7 @@
 
 std::vector<WndTask*> WndTask::ms_wndtasks;
 
-void WndTask::openTask( const af::MCTaskPos & i_tp)
+WndTask * WndTask::openTask( const af::MCTaskPos & i_tp, ListTasks * i_parent)
 {
 	std::vector<WndTask*>::iterator it = ms_wndtasks.begin();
 	while( it != ms_wndtasks.end())
@@ -39,12 +40,12 @@ void WndTask::openTask( const af::MCTaskPos & i_tp)
 			(*it)->setVisible(true);
 			(*it)->showNormal();
 			(*it)->raise();
-			return;
+			return (*it);
 		}
 		else
 			it++;
 
-	new WndTask( i_tp);
+	return new WndTask( i_tp, i_parent);
 }
 
 bool WndTask::showTask( af::MCTask & i_mctask)
@@ -59,8 +60,9 @@ bool WndTask::showTask( af::MCTask & i_mctask)
 	return false;
 }
 
-WndTask::WndTask( const af::MCTaskPos & i_tp):
+WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	Wnd("Task"),
+	m_parent( i_parent),
 	m_pos( i_tp),
 	m_log_te( NULL),
 	m_errhosts_te( NULL),
@@ -114,7 +116,11 @@ void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** 
 	}
 }
 
-WndTask::~WndTask() {}
+WndTask::~WndTask()
+{
+	if( m_parent )
+		m_parent->taskWindowClosed( this);
+}
 
 void WndTask::closeEvent( QCloseEvent * i_evt)
 {
@@ -127,6 +133,12 @@ void WndTask::closeEvent( QCloseEvent * i_evt)
 			it = ms_wndtasks.erase(it);
 		else
 			it++;
+}
+
+void WndTask::parentClosed()
+{
+	m_parent = NULL;
+	close();
 }
 
 void WndTask::slot_currentChanged( int i_index)

@@ -102,6 +102,9 @@ void ListTasks::construct( af::Job * job)
 
 ListTasks::~ListTasks()
 {
+	for( int i = 0; i < m_wndtasks.size(); i++)
+		m_wndtasks[i]->parentClosed();
+	
 	MonitorHost::delJobId( m_job_id);
 
 	for( int b = 0; b < m_blocks_num; b++) delete [] m_tasks[b];
@@ -469,7 +472,17 @@ void ListTasks::actTasksRestart() { tasksOperation("restart"); }
 
 void ListTasks::openTask( ItemJobTask * i_itemTask)
 {
-	WndTask::openTask( i_itemTask->getTaskPos());
+	m_wndtasks.push_back( WndTask::openTask( i_itemTask->getTaskPos(), this));
+}
+
+void ListTasks::taskWindowClosed( WndTask * i_wndtask)
+{
+	std::vector<WndTask*>::iterator it = m_wndtasks.begin();
+	while( it != m_wndtasks.end())
+		if( *it == i_wndtask )
+			it = m_wndtasks.erase( it);
+		else
+			it++;
 }
 
 void ListTasks::doubleClicked( Item * item)

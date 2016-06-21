@@ -14,6 +14,8 @@ class QListWidgetItem;
 class ItemJobBlock;
 class ItemJobTask;
 
+class WndTask;
+
 class ListTasks : public ListItems
 {
 	Q_OBJECT
@@ -31,16 +33,17 @@ public:
 	void sortBlock( int numblock);
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
+
+	void taskWindowClosed( WndTask * i_wndtask);
 	
 public:
 	void generateMenu(QMenu &o_menu, Item *item);
 	
-signals:
-	void changeMonitor( int type, int id);
-
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
+
 	void doubleClicked( Item * item);
+
 	void v_connectionLost();
 
 private slots:
@@ -68,6 +71,8 @@ private:
 	ItemJobTask *** m_tasks;
 
 	bool constructed;
+
+	std::vector<WndTask*> m_wndtasks;
 
 private:
 	void construct( af::Job * job);
