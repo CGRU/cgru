@@ -1356,7 +1356,7 @@ void JobAf::fillTaskNames( af::MCTask & o_mctask) const
 
 void JobAf::listenOutput( RenderContainer * i_renders, bool i_subscribe, int i_block, int i_task)
 {
-	if(( i_block > 0 ) && ( i_task > 0 ))
+	if(( i_block >= 0 ) && ( i_task >= 0 ))
 	{
 		if( false == checkBlockTaskNumbers( i_block, i_task, "listenOutput"))
 			return;
