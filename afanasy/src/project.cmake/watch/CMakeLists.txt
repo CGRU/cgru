@@ -20,8 +20,9 @@ else()
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlsortfilter.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlsortfiltermenu.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/dialog.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/filewidget.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/fontwidget.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/filewidget.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/itemjobblock.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/labelversion.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listitems.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listjobs.h"
@@ -35,9 +36,6 @@ else()
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndcustomdata.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndcustomizegui.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndtask.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/item.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/itemjobtask.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/itemjobblock.h"
 	)
 	qt4_wrap_cpp(moc_src ${moc_hdr})
 endif()

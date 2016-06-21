@@ -45,10 +45,6 @@ bool Item::calcHeight()
     return true;
 }
 
-void Item::generateMenu(QMenu & /*o_menu*/)
-{
-}
-
 const QColor & Item::clrTextMain( const QStyleOptionViewItem &option) const
 {
 	if( m_locked ) return afqt::QEnvironment::clr_textbright.c;

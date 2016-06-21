@@ -159,10 +159,10 @@ void WndTask::setTaskTitle( const af::MCTask & i_mctask)
 {
 	std::ostringstream str;
 
-	str << "Task";
-	str << " ['" << i_mctask.m_job_name + "']";
-	str << ".['" << i_mctask.m_block_name + "']";
-	str << ".['" << i_mctask.m_task_name + "']";
+	str << "Task ";
+	str << "[" << i_mctask.m_job_name   + "]";
+	str << "[" << i_mctask.m_block_name + "]";
+	str << "[" << i_mctask.m_task_name  + "]";
 
 	setWindowTitle( afqt::stoq( str.str()));
 }

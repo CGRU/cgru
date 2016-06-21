@@ -34,14 +34,6 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int 
 {
 }
 
-ItemJobTask::ItemJobTask( int i_job_id, int i_block_num, int i_task_num, const QString &itemname, QWidget *parent):
-	Item( itemname, ItemId, parent),
-	m_job_id( i_job_id),
-	m_blocknum( i_block_num),
-	m_tasknum( i_task_num),
-	m_block( NULL)
-{}
-
 ItemJobTask::~ItemJobTask()
 {
 }
@@ -56,94 +48,6 @@ bool ItemJobTask::calcHeight()
 		m_height += ItemJobTask::TaskThumbHeight;
 
 	return old_height == m_height;
-}
-
-void ItemJobTask::generateMenu(QMenu &o_menu)
-{
-	QAction *action;
-	QWidget *that = o_menu.parentWidget();
-	
-	ActionId * actionid = new ActionId( 0, "Output", that);
-	connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
-	o_menu.addAction( actionid);
-
-	if( m_job_id != AFJOB::SYSJOB_ID )
-	{
-		int startCount = taskprogress.starts_count;
-		if( startCount > 1 )
-		{
-			QMenu * submenu = new QMenu( "outputs", that);
-			for( int i = 1; i < startCount; i++)
-			{
-				actionid = new ActionId( i, QString("session #%1").arg(i), that);
-				connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
-				submenu->addAction( actionid);
-			}
-			o_menu.addMenu( submenu);
-		}
-	}
-
-	action = new QAction( "Log", that);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskLog() ));
-	o_menu.addAction( action);
-
-	action = new QAction( "Info", that);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskInfo() ));
-	o_menu.addAction( action);
-
-	action = new QAction( "Listen", that);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskListen() ));
-	o_menu.addAction( action);
-
-	action = new QAction( "Error Hosts", that);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
-	o_menu.addAction( action);
-
-	// If block is not initialized, we stop here
-	if ( NULL == m_block)
-		return;
-	
-	std::vector<std::string> files = genFiles();
-	if( files.size())
-	{
-		if( af::Environment::getPreviewCmds().size() > 0 )
-		{
-			o_menu.addSeparator();
-
-			action = new QAction( "Browse Files...", that);
-			connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
-			o_menu.addAction( action);
-
-		if( isBlockNumeric() )
-		{
-			QMenu * submenu_cmd = new QMenu( "Preview", that);
-			int p = 0;
-			for( std::vector<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
-			{
-				if( files.size() > 1)
-				{
-					QString file = afqt::stoq((*it).c_str());
-					QMenu * submenu_img = new QMenu( QString("%1").arg( file), that);
-					for( int i = 0; i < files.size(); i++)
-					{
-						QString imgname = file.right(99);
-						ActionIdId * actionid = new ActionIdId( p, i, imgname, that);
-						connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-						submenu_img->addAction( actionid);
-					}
-					submenu_cmd->addMenu( submenu_img);
-				}
-				else
-				{
-					ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg( QString::fromUtf8((*it).c_str())), that);
-					connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-					submenu_cmd->addAction( actionid);
-				}
-			}
-			o_menu.addMenu( submenu_cmd);
-		}
-		}
-	}
 }
 
 const QVariant ItemJobTask::getToolTip() const

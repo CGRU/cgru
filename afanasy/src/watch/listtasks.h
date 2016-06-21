@@ -54,6 +54,7 @@ private slots:
 
 	void blockAction( int id_block, QString i_action);
 
+	void actTaskOpen();
 	void actTasksRestart();
 	void actTasksSkip();
 
@@ -76,6 +77,8 @@ private:
 		const std::vector<int32_t> & i_blocks,
 		const std::vector<int32_t> & i_tasks,
 		const std::vector<af::TaskProgress> & i_tps);
+
+	void openTask( ItemJobTask * i_itemTask);
 
 	int getRow( int block, int task = -1);
 

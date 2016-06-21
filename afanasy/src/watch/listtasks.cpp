@@ -177,9 +177,10 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 		case ItemJobTask::ItemId:
 		{
 			ItemJobTask *itemTask = static_cast<ItemJobTask*>(item);
-			
-			// Operations on the current task item
-			itemTask->generateMenu( o_menu);
+
+			action = new QAction("Open Task", this);
+			connect( action, SIGNAL( triggered() ), this, SLOT( actTaskOpen() ));
+			o_menu.addAction( action);
 
 			o_menu.addSeparator();
 			// Operations on all the selected tasks
@@ -454,15 +455,28 @@ void ListTasks::setWindowTitleProgress()
 	m_parentWindow->setWindowTitle( QString("%1% %2").arg(total_percent/total_tasks).arg(m_job_name));
 }
 
+void ListTasks::actTaskOpen()
+{
+	Item * item = getCurrentItem();
+	if( item->getId() != ItemJobTask::ItemId )
+		return;
+
+	openTask( (ItemJobTask*)item);
+}
+
 void ListTasks::actTasksSkip()    { tasksOperation("skip"); }
 void ListTasks::actTasksRestart() { tasksOperation("restart"); }
 
+void ListTasks::openTask( ItemJobTask * i_itemTask)
+{
+	new WndTask( i_itemTask->getTaskPos());
+}
+
 void ListTasks::doubleClicked( Item * item)
 {
-	if( item->getId() == ItemJobTask ::ItemId )
+	if( item->getId() == ItemJobTask::ItemId )
 	{
-		ItemJobTask * itemTask = (ItemJobTask*)item;
-		new WndTask( itemTask->getTaskPos());
+		openTask( (ItemJobTask*)item);
 	}
 	else if( item->getId() == ItemJobBlock::ItemId )
 	{

@@ -10,7 +10,6 @@ class MainWidget;
 
 class Item : public QObject
 {
-	Q_OBJECT
 public:
 	Item(const QString &itemname, int itemid, QObject *parent = 0);
 	virtual ~Item();
@@ -65,9 +64,6 @@ public:
 
 	virtual bool calcHeight();
 	
-	/// Fills the provided menu with the available item's actions
-	virtual void generateMenu(QMenu & /*o_menu*/);
-
 protected:
 	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
 

@@ -6,18 +6,18 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/monitorevents.h"
+#include "../libafanasy/msgclasses/mctaskpos.h"
 
 #include "actionid.h"
-#include "buttonpanel.h"
 #include "dialog.h"
-#include "itemrender.h"
+#include "buttonpanel.h"
 #include "ctrlrenders.h"
 #include "ctrlsortfilter.h"
+#include "itemrender.h"
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
-#include "listtasks.h"
-#include "itemjobtask.h"
+#include "wndtask.h"
 
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
@@ -237,30 +237,18 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 			.arg( QString::fromStdString(task->getJobName()))
 			.arg( QString::fromStdString(task->getBlockName()))
 			.arg( QString::fromStdString(task->getName()));
-		QMenu *taskmenu = l.size() > 1 ? new QMenu(title, this) : submenu;
-		ItemJobTask *itemTask = new ItemJobTask(
+
+		action = new ActionIdIdId(
 			task->getJobId(),
 			task->getBlockNum(),
 			task->getTaskNum(),
 			title,
 			this);
-		itemTask->generateMenu( *taskmenu);
-		
-		taskmenu->addSeparator();
-		action = new ActionIdIdId(
-			task->getJobId(),
-			task->getBlockNum(),
-			task->getTaskNum(),
-			"Open Task",
-			this);
+
 		connect( action, SIGNAL( triggeredId(int,int,int) ),
 				 this, SLOT( actRequestTaskInfo(int,int,int) ));
-		taskmenu->addAction( action);
-		
-		if( l.size() > 1)
-		{
-			submenu->addMenu( taskmenu);
-		}
+
+		submenu->addAction( action);
 	}
 	
 	menu.addMenu( submenu);
@@ -558,7 +546,7 @@ void ListRenders::actRequestInfo()     { getItemInfo("full"); }
 
 void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 {
-	ItemJobTask(jid, bnum, tnum).getTaskInfo("info");
+	new WndTask( af::MCTaskPos( jid, bnum, tnum));
 }
 
 void ListRenders::actEnableService()  { setService( true );}
