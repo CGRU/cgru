@@ -469,7 +469,7 @@ void ListTasks::actTasksRestart() { tasksOperation("restart"); }
 
 void ListTasks::openTask( ItemJobTask * i_itemTask)
 {
-	new WndTask( i_itemTask->getTaskPos());
+	WndTask::openTask( i_itemTask->getTaskPos());
 }
 
 void ListTasks::doubleClicked( Item * item)

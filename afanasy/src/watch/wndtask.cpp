@@ -30,6 +30,35 @@
 
 std::vector<WndTask*> WndTask::ms_wndtasks;
 
+void WndTask::openTask( const af::MCTaskPos & i_tp)
+{
+	std::vector<WndTask*>::iterator it = ms_wndtasks.begin();
+	while( it != ms_wndtasks.end())
+		if((*it)->isSameTask( i_tp))
+		{
+			(*it)->setVisible(true);
+			(*it)->showNormal();
+			(*it)->raise();
+			return;
+		}
+		else
+			it++;
+
+	new WndTask( i_tp);
+}
+
+bool WndTask::showTask( af::MCTask & i_mctask)
+{
+	std::vector<WndTask*>::iterator it = ms_wndtasks.begin();
+	while( it != ms_wndtasks.end())
+		if((*it)->isSameTask( i_mctask))
+			return( (*it)->show( i_mctask));
+		else
+			it++;
+
+	return false;
+}
+
 WndTask::WndTask( const af::MCTaskPos & i_tp):
 	Wnd("Task"),
 	m_pos( i_tp),
@@ -153,18 +182,6 @@ void WndTask::listen( bool i_subscribe)
 	Watch::sendMsg( af::jsonMsg( str));
 
 	m_listening = i_subscribe;
-}
-
-bool WndTask::showTask( af::MCTask & i_mctask)
-{
-	std::vector<WndTask*>::iterator it = ms_wndtasks.begin();
-	while( it != ms_wndtasks.end())
-		if((*it)->isSameTask( i_mctask))
-			return( (*it)->show( i_mctask));
-		else
-			it++;
-
-	return false;
 }
 
 void WndTask::setTaskTitle( const af::MCTask & i_mctask)

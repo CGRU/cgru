@@ -18,21 +18,28 @@ class QContextMenuEvent;
 class WndTask : public Wnd
 {
 	Q_OBJECT
-public:
+protected:
 	WndTask( const af::MCTaskPos & i_tp);
+
+public:
 	~WndTask();
 
-	/// This is the one public interface.
+	/// Static function will try to find task window.
+	/// If founded, it will be raised.
+	// If not it opens one.
+	static void openTask( const af::MCTaskPos & i_tp);
+	/// ( all WndTask windows are stored in a static array )
+
 	/// Static function will try to find task window.
 	/// And if founded, it will ask to show info.
 	static bool showTask( af::MCTask & i_mctask);
-	/// ( all WndTask windows are stored in a static array )
 
 protected:
 	virtual void closeEvent( QCloseEvent * i_evt);
 
 private:
-	inline bool isSameTask( const af::MCTask & i_mctask) const { return i_mctask.isSameTask( m_pos); }
+	inline bool isSameTask( const af::MCTask & i_mctask ) const { return i_mctask.isSameTask( m_pos ); }
+	inline bool isSameTask( const af::MCTaskPos & i_tp  ) const { return    m_pos.isSameTask( i_tp  ); }
 
 	void createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** o_te);
 

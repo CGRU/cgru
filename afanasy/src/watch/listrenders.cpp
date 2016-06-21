@@ -546,7 +546,7 @@ void ListRenders::actRequestInfo()     { getItemInfo("full"); }
 
 void ListRenders::actRequestTaskInfo(int jid, int bnum, int tnum)
 {
-	new WndTask( af::MCTaskPos( jid, bnum, tnum));
+	WndTask::openTask( af::MCTaskPos( jid, bnum, tnum));
 }
 
 void ListRenders::actEnableService()  { setService( true );}
