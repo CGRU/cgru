@@ -42,12 +42,19 @@ public:
 	void parentClosed();
 
 
+	/// Check task position:
+	inline bool isSameTask( const af::MCTask & i_mctask ) const { return i_mctask.isSameTask( m_pos ); }
+	inline bool isSameTask( const af::MCTaskPos & i_tp  ) const { return     i_tp.isSameTask( m_pos ); }
+
+
+	/// Update task progress.
+	/// Called from tasks list ( it receives task progresses updates )
+	void updateProgress( const af::TaskProgress & i_progress);
+
 protected:
 	virtual void closeEvent( QCloseEvent * i_evt);
 
 private:
-	inline bool isSameTask( const af::MCTask & i_mctask ) const { return i_mctask.isSameTask( m_pos ); }
-	inline bool isSameTask( const af::MCTaskPos & i_tp  ) const { return    m_pos.isSameTask( i_tp  ); }
 
 	void createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** o_te);
 
@@ -55,9 +62,9 @@ private:
 
 	void setTaskTitle( const af::MCTask & i_mctask);
 
-	void updateProgress( const af::TaskProgress & i_progress);
+	void getTaskInfo( const std::string & i_mode, int i_number = -1) const;
 
-	void getTaskInfo( const std::string & i_mode, int i_number = -1);
+	void taskOperation( const std::string & i_type) const;
 
 	void listen( bool i_subscribe);
 
@@ -69,6 +76,9 @@ private:
 
 private slots:
 	void slot_currentChanged( int i_index);
+	void slot_skip();
+	void slot_restart();
+	void slot_outputChanged( int i_index);
 
 private:
 	ListTasks * m_parent;
@@ -77,6 +87,14 @@ private:
 
 	af::TaskProgress m_progress;
 	QTextEdit * m_progress_te;
+
+	QPushButton * m_btn_skip;
+	QPushButton * m_btn_restart;
+	QPushButton * m_btn_output;
+
+	QMenu * m_output_menu;
+	int m_outputs_count;
+	int m_output_current;
 
 	QTabWidget * m_tab_widget;
 

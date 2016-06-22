@@ -67,6 +67,8 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	m_log_te( NULL),
 	m_errhosts_te( NULL),
 	m_output_te( NULL),
+	m_outputs_count(-1),
+	m_output_current(-1),
 	m_tab_current( NULL),
 	m_listening( false)
 {
@@ -74,6 +76,9 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 
 	QVBoxLayout * layout = new QVBoxLayout( this);
 
+	//
+	// Progess brief:
+	//
 	m_progress_te = new QTextEdit( this);
 	layout->addWidget( m_progress_te);
 	m_progress_te->setReadOnly( true);
@@ -84,6 +89,38 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	m_progress_te->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff);
 	m_progress_te->setFixedHeight( 28);
 
+
+	//
+	// Buttons:
+	//
+	QHBoxLayout * layoutB = new QHBoxLayout();
+	layout->addLayout( layoutB);
+
+	m_btn_skip = new QPushButton("Skip", this);
+	layoutB->addWidget( m_btn_skip);
+	m_btn_skip->setEnabled( false);
+	m_btn_skip->setFixedWidth( 88);
+	connect( m_btn_skip, SIGNAL( pressed()), this, SLOT( slot_skip()));
+
+	m_btn_restart = new QPushButton("Restart", this);
+	layoutB->addWidget( m_btn_restart);
+	m_btn_restart->setEnabled( false);
+	m_btn_restart->setFixedWidth( 88);
+	connect( m_btn_restart, SIGNAL( pressed()), this, SLOT( slot_restart()));
+
+	layoutB->addStretch();
+
+	m_btn_output = new QPushButton("Output", this);
+	layoutB->addWidget( m_btn_output);
+	m_btn_output->setEnabled( false);
+	m_btn_output->setFixedWidth( 111);
+	m_output_menu = new QMenu( m_btn_output);
+	m_btn_output->setMenu( m_output_menu);
+
+
+	//
+	// Output tabs:
+	//
 	m_tab_widget = new QTabWidget( this);
 	layout->addWidget( m_tab_widget);
 	//m_tab_widget->setTabsClosable( true);
@@ -93,6 +130,8 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	createTab("Log",         &m_tab_log,      &m_log_te      ); 
 	createTab("Error Hosts", &m_tab_errhosts, &m_errhosts_te ); 
 	createTab("Listen",      &m_tab_listen,   &m_listen_te   ); 
+
+	m_tab_output->setEnabled( false);
 
 	connect( m_tab_widget, SIGNAL( currentChanged( int)), this, SLOT( slot_currentChanged( int)));
 
@@ -149,7 +188,7 @@ void WndTask::slot_currentChanged( int i_index)
 	m_tab_current = tab;
 
 	if( m_tab_current == m_tab_output)
-		getTaskInfo("output");
+		getTaskInfo("output", m_output_current);
 	else if( m_tab_current == m_tab_log)
 		getTaskInfo("log");
 	else if( m_tab_current == m_tab_errhosts)
@@ -160,7 +199,7 @@ void WndTask::slot_currentChanged( int i_index)
 //		getTaskInfo("info");
 }
 
-void WndTask::getTaskInfo( const std::string & i_mode, int i_number)
+void WndTask::getTaskInfo( const std::string & i_mode, int i_number) const
 {
 	std::ostringstream str;
 	str << "{\"get\":{\"type\":\"jobs\"";
@@ -175,6 +214,21 @@ void WndTask::getTaskInfo( const std::string & i_mode, int i_number)
 
 	af::Msg * msg = af::jsonMsg( str);
 	Watch::sendMsg( msg);
+}
+
+void WndTask::slot_skip()    { taskOperation("skip"   ); }
+void WndTask::slot_restart() { taskOperation("restart"); }
+
+void WndTask::taskOperation( const std::string & i_type) const
+{
+	std::ostringstream str;
+	af::jsonActionStart( str, "jobs", "", std::vector<int>( 1, m_pos.getJobId()));
+	str << ",\n\"operation\":{\n\"type\":\"" << i_type << '"';
+	str << ",\n\"task_ids\":[" << m_pos.getTaskNum() << "]}";
+	str << ",\n\"block_ids\":[" << m_pos.getBlockNum() << ']';
+
+	af::jsonActionFinish( str);
+	Watch::sendMsg( af::jsonMsg( str));
 }
 
 void WndTask::listen( bool i_subscribe)
@@ -210,14 +264,19 @@ void WndTask::setTaskTitle( const af::MCTask & i_mctask)
 
 void WndTask::updateProgress( const af::TaskProgress & i_progress)
 {
+	// Just copy it for storing:
 	m_progress = i_progress;
 
+	//
+	// Update brief string:
+	//
 	std::ostringstream str;
 
 	str << "Status:<b>";
 	if( m_progress.state & AFJOB::STATE_READY_MASK   ) str << ' ' << AFJOB::STATE_READY_NAME;
 	if( m_progress.state & AFJOB::STATE_RUNNING_MASK ) str << ' ' << AFJOB::STATE_RUNNING_NAME;
 	if( m_progress.state & AFJOB::STATE_DONE_MASK    ) str << ' ' << AFJOB::STATE_DONE_NAME;
+	if( m_progress.state & AFJOB::STATE_SKIPPED_MASK ) str << ' ' << AFJOB::STATE_SKIPPED_NAME;
 	if( m_progress.state & AFJOB::STATE_ERROR_MASK   ) str << ' ' << AFJOB::STATE_ERROR_NAME;
 	str << "</b>";
 
@@ -227,14 +286,75 @@ void WndTask::updateProgress( const af::TaskProgress & i_progress)
 	if( m_progress.hostname.size()) str << " Last host: <b>" << m_progress.hostname << "</b>";
 
 	if( m_progress.time_start && m_progress.time_done && ( false == ( m_progress.state & AFJOB::STATE_RUNNING_MASK )))
-		str << " Run Time: <b>" << af::time2strHMS( m_progress.time_done - m_progress.time_start) << "</b>";
+		str << " Time: <b>" << af::time2strHMS( m_progress.time_done - m_progress.time_start) << "</b>";
 
 	m_progress_te->setHtml( afqt::stoq( str.str()));
+
+	//
+	// Update buttons state:
+	//
+	m_btn_skip->setEnabled( false);
+	m_btn_restart->setEnabled( false);
+
+	if( ( m_progress.state & AFJOB::STATE_READY_MASK ) ||
+		( m_progress.state & AFJOB::STATE_RUNNING_MASK ))
+		m_btn_skip->setEnabled( true);
+
+	if( ( m_progress.state & AFJOB::STATE_RUNNING_MASK ) ||
+		( m_progress.state & AFJOB::STATE_DONE_MASK ) ||
+		( m_progress.state & AFJOB::STATE_ERROR_MASK ))
+		m_btn_restart->setEnabled( true);
+
+	//
+	// Process outputs count:
+	//
+	if( m_progress.starts_count )
+		m_tab_output->setEnabled( true);
+
+	int outputs_count = m_progress.starts_count;
+	if( m_progress.state & AFJOB::STATE_RUNNING_MASK )
+		outputs_count -= 1;
+
+	if( outputs_count != m_outputs_count )
+	{
+		m_output_menu->clear();
+		m_outputs_count = outputs_count;
+
+		if( m_outputs_count > 0 )
+		{
+			m_btn_output->setEnabled( true);
+
+			ActionId * action = new ActionId( -1,"Latest", m_output_menu);
+			m_output_menu->addAction( action);
+			connect( action, SIGNAL( triggeredId(int)), this, SLOT( slot_outputChanged(int)));
+
+			for( int i = 1; i <= m_outputs_count; i++)
+			{
+				ActionId * action = new ActionId( i, QString("Session #%1").arg(i), m_output_menu);
+				m_output_menu->addAction( action);
+				connect( action, SIGNAL( triggeredId(int)), this, SLOT( slot_outputChanged(int)));
+			}
+		}
+	}
+}
+
+void WndTask::slot_outputChanged( int i_index)
+{
+	QString label = "Ouput";
+	if( i_index > 0 )
+		label += QString("[#%1]").arg( i_index);
+	else
+		label += "[-1]";
+	m_btn_output->setText( label);
+
+	m_output_current = i_index;
+
+	getTaskInfo("output", m_output_current);
 }
 
 bool WndTask::show( af::MCTask & i_mctask)
 {
-AF_LOG << i_mctask;
+	//AF_LOG << i_mctask;
 
 	if( false == i_mctask.isSameTask( m_pos))
 		return false;

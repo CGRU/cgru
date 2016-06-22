@@ -431,6 +431,11 @@ bool ListTasks::updateTasks(
 			if((firstChangedRow == -1) || (firstChangedRow > row)) firstChangedRow = row;
 			if(  lastChangedRow < row) lastChangedRow = row;
 		}
+
+		/// Update opened tasks windows ( if any )
+		for( int w = 0; w < m_wndtasks.size(); w++)
+			if( m_wndtasks[w]->isSameTask( af::MCTaskPos( m_job_id, i_blocks[i], i_tasks[i])))
+					m_wndtasks[w]->updateProgress( i_tps[i]);
 	}
 
 	if( firstChangedRow != -1 ) m_model->emit_dataChanged( firstChangedRow, lastChangedRow);
