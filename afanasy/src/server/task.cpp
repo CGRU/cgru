@@ -175,23 +175,6 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 		mctask.setListened( taskup.getListened());
 		mctask.m_render_id = taskup.getClientId();
 		monitoring->addListened( mctask);
-/*		RenderContainerIt it( renders);
-		std::string hostname;
-		RenderAf * render = it.getRender( taskup.getClientId());
-		if( render )
-		{
-			hostname = render->getName();
-		}
-
-		monitoring->addListened(
-			taskup.getClientId(),
-			m_run->getTaskName(),
-			hostname,
-			m_block->m_job->getId(),
-			m_block->m_data->getBlockNum(),
-			m_number,
-			taskup.getListened());
-*/
 	}
 
 	if( taskup.getParsedFiles().size())
