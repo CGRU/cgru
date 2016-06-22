@@ -66,7 +66,6 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    static unsigned s_init = 0;
 
    static long s_sector_size = 512;
-   static float s_cpu_frequency = 2000;
 
    if( !s_init )
    {
@@ -81,7 +80,6 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       sg_current_time.tv_sec = current.tv_sec - info.uptime;
       sg_current_time.tv_usec = 0; 
 
-      s_cpu_frequency = get_cpu_frequency();
 #if 0
       /* in man pages of iostat they seem to say that block size in 
          in /proc/diskstats is always 512 on newer linux kernels so
@@ -101,7 +99,10 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
 
    static unsigned num_processors = sysconf(_SC_NPROCESSORS_ONLN);
    hres.cpu_num = num_processors;
-   hres.cpu_mhz = int32_t( s_cpu_frequency );
+
+	int32_t new_cpu_frequency = int32_t(get_cpu_frequency());
+	if( hres.cpu_mhz < new_cpu_frequency )
+		hres.cpu_mhz = new_cpu_frequency;
 
     /*
         Memory: we rely on sysinfo here. Used to rely on /proc/meminfo
