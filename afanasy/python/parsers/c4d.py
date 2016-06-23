@@ -7,8 +7,6 @@ import re
 re_percent = re.compile(r'Progress: \d+%')
 re_frame = re.compile(r'Rendering frame \d+')
 re_number = re.compile(r'\d+')
-Errors = ['Files cannot be written - please check output paths!',
-		  'Error rendering project']
 
 
 class c4d(parser.parser):
@@ -17,6 +15,9 @@ class c4d(parser.parser):
 
 	def __init__(self):
 		parser.parser.__init__(self)
+		self.str_error = [
+			'Files cannot be written - please check output paths!',
+			'Error rendering project']
 		self.firstFrame = True
 		self.firstFrameNumber = 0
 
@@ -28,12 +29,6 @@ class c4d(parser.parser):
 		:return:
 		"""
 		need_calc = False
-
-		# Check if there are any Errors
-		for error in Errors:
-			if data.find(error) != -1:
-				self.error = True
-				break
 
 		# Search for frame percent:
 		match = re_percent.search(data)

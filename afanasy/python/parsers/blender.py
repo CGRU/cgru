@@ -6,7 +6,7 @@ import os
 # Saved: render/mypic.0001.jpg Time: 00:00.51
 
 keyframe = 'Fra:'
-Errors = ["Warning: Unable to open", "Render error: cannot save"]
+
 
 class blender(parser.parser):
 	"""Blender Batch
@@ -14,6 +14,9 @@ class blender(parser.parser):
 
 	def __init__(self):
 		parser.parser.__init__(self)
+		self.str_error = [
+			"Warning: Unable to open",
+			"Render error: cannot save"]
 		self.firstframe = True
 		self.framestring = keyframe
 
@@ -28,11 +31,6 @@ class blender(parser.parser):
 		need_calc = False
 
 		for line in lines:
-
-			for error in Errors:
-				if line.find(error) != -1:
-					self.error = True
-					break
 
 			if line.find('Saved:') != -1:
 				line = line[6:]

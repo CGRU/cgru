@@ -10,10 +10,6 @@ PERCENT_len = len(PERCENT)
 IMAGE = 'Generating Image:'
 IMAGE_len = len(IMAGE)
 
-Warnings = ['Unable to access file', 'Unable to load texture']
-Errors = ['No licenses could be found to run this application',
-          'Please check for a valid license server host',
-          'Failed to create file']
 ErrorsRE = [re.compile(r'Error loading geometry .* from stdin')]
 
 
@@ -23,6 +19,11 @@ class mantra(parser.parser):
 
     def __init__(self):
         parser.parser.__init__(self)
+        self.str_warning = ['Unable to access file', 'Unable to load texture']
+        self.str_error = [
+            'No licenses could be found to run this application',
+            'Please check for a valid license server host',
+            'Failed to create file']
 
     def do(self, data, mode):
         """Missing DocString
@@ -31,16 +32,6 @@ class mantra(parser.parser):
         :param mode:
         :return:
         """
-
-        for warning in Warnings:
-            if data.find(warning) != -1:
-                self.warning = True
-                break
-
-        for error in Errors:
-            if data.find(error) != -1:
-                self.error = True
-                break
 
         for errorRE in ErrorsRE:
             if errorRE.search(data) is not None:

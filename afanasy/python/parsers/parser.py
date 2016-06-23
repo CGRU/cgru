@@ -5,11 +5,6 @@ import traceback
 
 import cgruutils
 
-str_warning = '[ PARSER WARNING ]'
-str_error = '[ PARSER ERROR ]'
-str_badresult = '[ PARSER BAD RESULT ]'
-str_finishedsuccess = '[ PARSER FINISHED SUCCESS ]'
-
 
 # TODO: Class names should follow CamelCase naming convention
 class parser(object):
@@ -17,6 +12,10 @@ class parser(object):
     """
 
     def __init__(self):
+        self.str_warning = ['warning']  # '[ PARSER WARNING ]'
+        self.str_error = ['error']      # '[ PARSER ERROR ]'
+        self.str_badresult = []         # '[ PARSER BAD RESULT ]'
+        self.str_finishedsuccess = []   # '[ PARSER FINISHED SUCCESS ]'
         self.percent = 0
         self.frame = 0
         self.percentframe = 0
@@ -100,14 +99,20 @@ class parser(object):
         self.error = False
         self.badresult = False
         self.result = None
-        if data.find(str_warning) != -1:
-            self.warning = True
-        if data.find(str_error) != -1:
-            self.error = True
-        if data.find(str_badresult) != -1:
-            self.badresult = True
-        if data.find(str_finishedsuccess) != -1:
-            self.finishedsuccess = True
+
+        lower = data.lower()
+        for string in self.str_warning:
+            if lower.find(string) != -1:
+                self.warning = True
+        for string in self.str_error:
+            if lower.find(string) != -1:
+                self.error = True
+        for string in self.str_badresult:
+            if lower.find(string) != -1:
+                self.badresult = True
+        for string in self.str_finishedsuccess:
+            if lower.find(string) != -1:
+                self.finishedsuccess = True
 
         lines = data.split('\n')
         for line in lines:

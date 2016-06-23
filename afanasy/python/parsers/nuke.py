@@ -6,7 +6,6 @@ import re
 key = 'Writing'
 key_len = len(key)
 
-Errors = ['Worker process failed']
 ErrorsRE = [re.compile(r'Invalid .* license key.')]
 
 
@@ -16,6 +15,7 @@ class nuke(parser.parser):
 
 	def __init__(self):
 		parser.parser.__init__(self)
+		self.str_error = ['Worker process failed']
 		self.filename = ''
 
 	def do(self, data, mode):
@@ -28,11 +28,6 @@ class nuke(parser.parser):
 		data_len = len(data)
 		if data_len < 1:
 			return
-
-		for error in Errors:
-			if data.find(error) != -1:
-				self.error = True
-				break
 
 		for errorRE in ErrorsRE:
 			if errorRE.search(data) is not None:
