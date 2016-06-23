@@ -22,7 +22,6 @@ else()
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/dialog.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/fontwidget.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/filewidget.h"
-	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/itemjobblock.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/labelversion.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listitems.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listjobs.h"

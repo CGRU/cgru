@@ -10,7 +10,6 @@ class ListTasks;
 
 class ItemJobBlock : public Item
 {
-    Q_OBJECT
 public:
    ItemJobBlock( const af::BlockData* block, ListTasks * list);
    ~ItemJobBlock();
@@ -53,7 +52,9 @@ public:
 
    bool tasksHidded;
 
-	virtual void generateMenu(QMenu & o_menu);
+	inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL)
+			{ info.generateMenu( id_block, menu, qwidget, submenu);}
+
 
 	inline bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
 		{ return info.blockAction( i_str, id_block, i_action, listitems);}
@@ -83,9 +84,6 @@ public:
 
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
-   
-private slots:
-   void actBrowseFolder();
    
 private:
    static const int HeightHeader;

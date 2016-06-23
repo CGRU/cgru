@@ -142,13 +142,25 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 		{
 			ItemJobBlock *itemBlock = static_cast<ItemJobBlock*>(item);
 			
+			if( itemBlock->files.size() )
+			{
+				action = new QAction( "Browse Files...", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
+				o_menu.addAction( action);
+				o_menu.addSeparator();
+			}
+
+			QMenu * submenu = new QMenu( "Change Block", this);
+
 			// Operations on the current block item
-			itemBlock->generateMenu( o_menu);
+			itemBlock->generateMenu( itemBlock->getNumBlock(), &o_menu, this, submenu);
+
+			o_menu.addMenu( submenu);
 			
 			o_menu.addSeparator();
 			// Operations on all the selected blocks
 
-			QMenu *submenu = new QMenu( "Change Tasks", this);
+			submenu = new QMenu( "Change Tasks", this);
 			o_menu.addMenu( submenu);
 
 			action = new QAction( "Set Command", this);
@@ -185,9 +197,49 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTaskOpen() ));
 			o_menu.addAction( action);
 
-			o_menu.addSeparator();
-			// Operations on all the selected tasks
+			if( itemTask->hasFiles())
+			{
+				const std::vector<std::string> files = itemTask->getFiles();
 
+				o_menu.addSeparator();
+
+				action = new QAction( "Browse Files...", this);
+				connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
+				o_menu.addAction( action);
+
+				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
+
+				if( preview_cmds.size())
+				{
+					QMenu * submenu_cmd = new QMenu( "Preview", this);
+					for( int p = 0; p < preview_cmds.size(); p++)
+					{
+						QString cmd = afqt::stoq( preview_cmds[p]);
+
+						if( files.size() > 1)
+						{
+							QMenu * submenu_img = new QMenu( cmd, this);
+							for( int i = 0; i < files.size(); i++)
+							{
+								ActionIdId * actionid = new ActionIdId( p, i, afqt::stoq(files[i]).right(55), this);
+								connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+								submenu_img->addAction( actionid);
+							}
+							submenu_cmd->addMenu( submenu_img);
+						}
+						else
+						{
+							ActionIdId * actionid = new ActionIdId( p, 0, cmd, this);
+							connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+							submenu_cmd->addAction( actionid);
+						}
+					}
+					o_menu.addMenu( submenu_cmd);
+				}
+			}
+
+			o_menu.addSeparator();
+			
 			action = new QAction( "Skip Tasks", this);
 			connect( action, SIGNAL( triggered() ), this, SLOT( actTasksSkip() ));
 			o_menu.addAction( action);
@@ -600,6 +652,80 @@ void ListTasks::actBlockParser()
 	QString str = QInputDialog::getText(this, "Change Parser", "Enter Type", QLineEdit::Normal, cur, &ok);
 	if( !ok) return;
 	blockAction( 0, QString("\"params\":{\"parser\":\"%1\"}").arg(str.replace("\"","\\\"")), false);
+}
+
+void ListTasks::actBrowseFolder()
+{
+	Item* item = getCurrentItem();
+	if( item == NULL )
+		return;
+
+	QString image;
+	QString wdir;
+
+	int id = item->getId();
+	switch( id)
+	{
+	case ItemJobBlock::ItemId:
+	{
+		ItemJobBlock *itemBlock = (ItemJobBlock*)item;
+		af::Service service( itemBlock->files, itemBlock->workingdir);
+		image = afqt::stoq( service.getFiles()[0]);
+		wdir = afqt::stoq( service.getWDir());
+		break;
+	}
+	case ItemJobTask::ItemId:
+	{
+		ItemJobTask* taskitem = (ItemJobTask*)item;
+		af::Service service( taskitem->getFiles(), taskitem->getWDir());
+		image = afqt::stoq( service.getFiles()[0]);
+		wdir = afqt::stoq( service.getWDir());
+		break;
+	}
+	default:
+		return;
+	}
+
+	Watch::browseImages( image, wdir);
+}
+
+void ListTasks::actTaskPreview( int num_cmd, int num_img)
+{
+	Item* item = getCurrentItem();
+	if( item == NULL )
+	{
+		displayError( "No items selected.");
+		return;
+	}
+	if( item->getId() != ItemJobTask::ItemId)
+	{
+		displayWarning( "This action for task only.");
+		return;
+	}
+
+	ItemJobTask* taskitem = (ItemJobTask*)item;
+	af::Service service( taskitem->getFiles(), taskitem->getWDir());
+
+	std::vector<std::string> images = service.getFiles();
+	if( num_img >= images.size())
+	{
+		displayError( "No such image nubmer.");
+		return;
+	}
+	QString arg = afqt::stoq( images[num_img]);
+	QString wdir( afqt::stoq( service.getWDir()));
+
+	if( arg.isEmpty()) return;
+	if( num_cmd >= af::Environment::getPreviewCmds().size())
+	{
+		displayError( "No such command number.");
+		return;
+	}
+
+	QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
+	cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+
+	Watch::startProcess( cmd, wdir);
 }
 
 void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }

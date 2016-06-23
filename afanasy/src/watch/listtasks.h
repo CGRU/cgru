@@ -58,8 +58,11 @@ private slots:
 	void blockAction( int id_block, QString i_action);
 
 	void actTaskOpen();
+	void actTaskPreview( int num_cmd, int num_img);
 	void actTasksRestart();
 	void actTasksSkip();
+
+	void actBrowseFolder();
 
 private:
 	int m_job_id;

@@ -8,10 +8,10 @@
 
 class MainWidget;
 
-class Item : public QObject
+class Item
 {
 public:
-	Item(const QString &itemname, int itemid, QObject *parent = 0);
+	Item(const QString &itemname, int itemid);
 	virtual ~Item();
 
 	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
