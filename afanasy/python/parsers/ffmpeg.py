@@ -41,6 +41,6 @@ class ffmpeg(parser.parser):
 		res = re_position.findall(data)
 		if len(res):
 			time = self.parseTime(res[-1])
-			self.percentframe = time / self.duration * 100
+			self.percentframe = int(time / self.duration * 100)
 
 			self.calculate()
