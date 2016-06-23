@@ -246,6 +246,7 @@ JobNode.prototype.mh_Move = function( i_param)
 
 JobNode.prototype.showThumb = function( i_path)
 {
+	i_path = i_path.replace(/\\/g,'/');
 //console.log('JobNode.prototype.showThumb = '+i_path);
 	if( this.elThumbs.m_divs == null )
 	{

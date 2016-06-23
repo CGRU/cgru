@@ -237,12 +237,11 @@ static const char * files_skip[] = {
 /*1*/"..",
 /*2*/"htdigest",
 /*3*/"htaccess",
-/*4*/".json",
-/*5*/":"
+/*4*/".json"
 };
 bool validateGetFileName( const std::string & i_name)
 {
-	for( int i = 0; i < 5; i++)
+	for( int i = 0; i < 4; i++)
 		if( i_name.find( files_skip[i]) != -1 ) return false;
 
 	return true;
