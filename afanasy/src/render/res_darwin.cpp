@@ -114,10 +114,6 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       {
          perror( "sysctlbyname(\"hw.memsize\",..) failed: " );
       }
-      else
-      {
-         s_physical_memory /= (1024*1024);
-      }
 
       s_pagesize = getpagesize();
 
@@ -139,17 +135,19 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    //
    {
       vm_statistics_data_t vm_stats;
-      unsigned memtotal=0, memfree=0;
-      unsigned membuffers=0, memcached=0;
-
-      memtotal = s_physical_memory;
+      int64_t memfree = 0, membuffers = 0, memcached = 0;
       unsigned count = HOST_VM_INFO_COUNT;
 
       if( host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) == KERN_SUCCESS)
       {
-         memfree = vm_stats.free_count;
+         int64_t free     = vm_stats.free_count;
+         int64_t active   = vm_stats.active_count;
+         int64_t inactive = vm_stats.inactive_count;
+         int64_t wire     = vm_stats.wire_count;
+
+         memfree    = free * s_pagesize;
          membuffers = 0;
-         memcached = vm_stats.inactive_count;
+         memcached  = inactive * s_pagesize;
       }
       else
       {
@@ -165,12 +163,12 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       }
 
       /* A convertion factor to bring us to MBs */
-      hres.mem_total_mb = s_physical_memory;
-      hres.swap_total_mb = vmusage.xsu_total >> 20;
-      hres.mem_free_mb = (memfree * s_pagesize) >> 20;
-      hres.mem_cached_mb = (memcached  * s_pagesize) >> 20;
-      hres.mem_buffers_mb = (membuffers * s_pagesize) >> 20;
-      hres.swap_used_mb = vmusage.xsu_used  >> 20;
+      hres.mem_total_mb   = s_physical_memory >> 20;
+      hres.swap_total_mb  = vmusage.xsu_total >> 20;
+      hres.mem_free_mb    = memfree           >> 20;
+      hres.mem_cached_mb  = memcached         >> 20;
+      hres.mem_buffers_mb = membuffers        >> 20;
+      hres.swap_used_mb   = vmusage.xsu_used  >> 20;
    }
 
    //
