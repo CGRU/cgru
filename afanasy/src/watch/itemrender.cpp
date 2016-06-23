@@ -418,7 +418,8 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
 	if     ( m_online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
-	else if( m_NIMBY || m_nimby || m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
+	else if( m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c );
+	else if( m_NIMBY || m_nimby ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
 	else if( m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
 
 	// Draw standart backgroud

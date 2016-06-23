@@ -137,6 +137,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderoff    ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderbusy   ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrendernimby  ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpaused ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpltclr ));
 
 	label = new QLabel("Text Colors:", this);

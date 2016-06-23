@@ -93,6 +93,7 @@ AttrColor QEnvironment::clr_itemrender(      "clr_itemrender",       "Render Ite
 AttrColor QEnvironment::clr_itemrenderoff(   "clr_itemrenderoff",    "Offine Render",           AFGUI::CLR_ITEMRENDEROFF       );
 AttrColor QEnvironment::clr_itemrenderbusy(  "clr_itemrenderbusy",   "Busy Render",             AFGUI::CLR_ITEMRENDERBUSY      );
 AttrColor QEnvironment::clr_itemrendernimby( "clr_itemrendernimby",  "Render With Nimby",       AFGUI::CLR_ITEMRENDERNIMBY     );
+AttrColor QEnvironment::clr_itemrenderpaused("clr_itemrenderpaused", "Paused Render",           AFGUI::CLR_ITEMRENDERPAUSED    );
 AttrColor QEnvironment::clr_itemrenderpltclr("clr_itemrenderpltclr", "Plotter Text Label",      AFGUI::CLR_ITEMRENDERPLTCLR    );
 AttrColor QEnvironment::clr_running(         "clr_running",          "Running Bar",             AFGUI::CLR_RUNNING             );
 AttrColor QEnvironment::clr_done(            "clr_done",             "Done Bar",                AFGUI::CLR_DONE                );
@@ -210,6 +211,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_itemrenderoff   );
     ms_attrs_gui.append( &clr_itemrenderbusy  );
     ms_attrs_gui.append( &clr_itemrendernimby );
+    ms_attrs_gui.append( &clr_itemrenderpaused);
     ms_attrs_gui.append( &clr_itemrenderpltclr);
     ms_attrs_gui.append( &clr_running         );
     ms_attrs_gui.append( &clr_done            );
