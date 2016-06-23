@@ -102,16 +102,16 @@ class parser(object):
 
         lower = data.lower()
         for string in self.str_warning:
-            if lower.find(string) != -1:
+            if lower.find(string.lower()) != -1:
                 self.warning = True
         for string in self.str_error:
-            if lower.find(string) != -1:
+            if lower.find(string.lower()) != -1:
                 self.error = True
         for string in self.str_badresult:
-            if lower.find(string) != -1:
+            if lower.find(string.lower()) != -1:
                 self.badresult = True
         for string in self.str_finishedsuccess:
-            if lower.find(string) != -1:
+            if lower.find(string.lower()) != -1:
                 self.finishedsuccess = True
 
         lines = data.split('\n')
