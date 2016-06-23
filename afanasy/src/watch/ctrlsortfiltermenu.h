@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../libafqt/name_afqt.h"
+
 #include <QLabel>
 
 class CtrlSortFilterMenu : public QLabel
