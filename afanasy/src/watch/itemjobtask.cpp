@@ -32,6 +32,8 @@ ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int 
 	m_thumbs_num( 0),
 	m_thumbs_imgs( NULL)
 {
+	i_bdata->genNumbers( m_frame_last, m_frame_first, m_tasknum, &m_frames_num);
+	m_files = i_bdata->genFiles( m_tasknum);
 }
 
 ItemJobTask::~ItemJobTask()
@@ -70,10 +72,6 @@ const QString ItemJobTask::getSelectString() const
 }
 
 const std::string & ItemJobTask::getWDir() const { return m_block->workingdir; }
-
-const std::vector<std::string> & ItemJobTask::genFiles() const { return m_block->files; }
-
-int ItemJobTask::getFramesNum() const { return m_block->pertask;}
 
 void ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
@@ -323,50 +321,3 @@ void ItemJobTask::thumbsCLear()
 	delete [] m_thumbs_imgs;
 }
 
-void ItemJobTask::actTaskLog()                { getTaskInfo("log");              }
-void ItemJobTask::actTaskInfo()               { getTaskInfo("info");             }
-void ItemJobTask::actTaskErrorHosts()         { getTaskInfo("error_hosts");      }
-void ItemJobTask::actTaskStdOut(int i_number) { getTaskInfo("output", i_number); }
-
-void ItemJobTask::actTaskListen()
-{
-	Watch::listenTask( m_job_id, getBlockNum(), getTaskNum(),
-	                   QString("#%1 (%2)").arg(m_job_id).arg(getName()));
-}
-
-void ItemJobTask::actTaskPreview(int num_cmd, int num_img)
-{
-	af::Service service( genFiles(), getWDir());
-
-	std::vector<std::string> images = service.getFiles();
-	if( num_img >= images.size())
-	{
-		// TODO: Figure out a way to feed this back to the list
-		//displayError( "No such image nubmer.");
-		return;
-	}
-	QString arg = afqt::stoq( images[num_img]);
-	QString wdir( afqt::stoq( service.getWDir()));
-
-	if( arg.isEmpty()) return;
-	if( num_cmd >= af::Environment::getPreviewCmds().size())
-	{
-		//displayError( "No such command number.");
-		return;
-	}
-
-	QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
-	cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
-
-	Watch::startProcess( cmd, wdir);
-}
-
-void ItemJobTask::actBrowseFolder()
-{
-	af::Service service( genFiles(), getWDir());
-
-	QString image = afqt::stoq( service.getFiles()[0]);
-	QString wdir = afqt::stoq( service.getWDir());
-
-	Watch::browseImages( image, wdir);
-}

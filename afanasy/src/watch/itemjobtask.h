@@ -31,8 +31,11 @@ public:
 	inline int getTaskNum()  const { return m_tasknum;  }
 
 	const std::string & getWDir() const;
-	const std::vector<std::string> & genFiles() const;
-	int getFramesNum() const;
+
+	inline bool hasFiles() const { return m_files.size(); }
+	inline const std::vector<std::string> & getFiles() const { return m_files; }
+
+	inline const long long getFramesNum() const { return m_frames_num; }
 
 	af::TaskProgress taskprogress;
 
@@ -58,17 +61,7 @@ protected:
 
 private:
 	void thumbsCLear();
-	
-private slots:
-	void actTaskLog();
-	void actTaskInfo();
-	void actTaskErrorHosts();
-	void actTaskStdOut( int i_number );
-	void actTaskListen();
-	void actTaskPreview( int num_cmd, int num_img);
 
-	void actBrowseFolder();
-	
 private:
 	static const int TaskHeight = 13;
 	static const int TaskThumbHeight = 100;
@@ -80,6 +73,11 @@ private:
 	int m_blocknum;
 	int m_tasknum;
 	const ItemJobBlock * m_block;
+
+	long long m_frame_first;
+	long long m_frame_last;
+	long long m_frames_num;
+	std::vector<std::string> m_files;
 
 	int m_thumbs_num;
 	QImage ** m_thumbs_imgs;
