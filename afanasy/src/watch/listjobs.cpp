@@ -210,22 +210,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	submenu = new QMenu("Start/Stop/Restart", this);
 	menu.addMenu( submenu);
 
-	action = new QAction( "Restart Running Tasks", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartRunning() ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
-	submenu->addAction( action);
-
-	action = new QAction( "Restart Skipped Tasks", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartSkipped() ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_SKIPPED_MASK);
-	submenu->addAction( action);
-
-	action = new QAction( "Restart Done Tasks", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartDone() ));
-	submenu->addAction( action);
-
-	menu.addSeparator();
-
 	action = new QAction("Start Job", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actStart()   ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_OFFLINE_MASK);
@@ -249,6 +233,22 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction("Restart&&Pause", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
 	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
+	action = new QAction( "Restart Running Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartRunning() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
+	submenu->addAction( action);
+
+	action = new QAction( "Restart Skipped Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartSkipped() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_SKIPPED_MASK);
+	submenu->addAction( action);
+
+	action = new QAction( "Restart Done Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartDone() ));
 	submenu->addAction( action);
 
 	menu.addSeparator();
