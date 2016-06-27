@@ -161,7 +161,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             log += 'Service: ' + self.log
 
         if len(log):
-            print('Service log: ' % log)
+            print('Log ' + log)
 
         return log
 
