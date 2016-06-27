@@ -32,9 +32,8 @@ class blender(parser.parser):
 
 		for line in lines:
 
-			if line.find('Saved:') != -1:
+			if line.find('Saved: ') != -1:
 				line = line[6:]
-				line = line[:line.find('Time:')]
 				self.appendFile(line.strip())
 				continue
 
