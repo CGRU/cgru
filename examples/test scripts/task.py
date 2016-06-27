@@ -98,19 +98,22 @@ while frame <= frame_end:
         sys.stdout.flush()
         time.sleep(sleepsec)
 
-        if Options.filesout:
-            files = Options.filesout.split(';')
-            if random.random() > .1:   
-                filesout = Options.filesout
-                dirout = os.path.dirname( filesout)
-                if not os.path.isdir( dirout):
-                    os.makedirs( dirout)
-                while filesout.find('%') != -1:
-                    filesout = filesout % frame
-                fobj = open( filesout,'w')
-                for i in range(0,10):
-                    fobj.write('0123456789')
-                fobj.close()
+    if Options.filesout:
+        files = Options.filesout.split(';')
+        for afile in files:
+
+            dirout = os.path.dirname( afile)
+            if len(dirout) and not os.path.isdir( dirout):
+                os.makedirs( dirout)
+            while afile.find('%') != -1:
+                afile = afile % frame
+
+            fobj = open( afile,'w')
+            for i in range(0,10):
+                fobj.write('0123456789')
+            fobj.close()
+
+            print('@IMAGE@' + afile)
 
     frame += frame_inc
 
