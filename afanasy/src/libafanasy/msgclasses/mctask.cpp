@@ -163,7 +163,7 @@ Msg * MCTask::generateMessage( bool i_binary)
 	else
 	{
 		std::ostringstream str;
-		str << "{\"task_output\":";
+		str << "{\"task\":";
 		jsonWrite( str);
 		str << "}";
 		std::string text = str.str();

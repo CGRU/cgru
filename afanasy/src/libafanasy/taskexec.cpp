@@ -101,9 +101,6 @@ TaskExec::TaskExec( Msg * msg):
 
 void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 {
-	if( i_type != Msg::TRendersList )
-		o_str << "\"task_exec\":";
-
 	o_str << "{\"name\":\""       << m_name       << "\"";
 	o_str << ",\"service\":\""    << m_service    << "\"";
 	o_str << ",\"capacity\":"     << m_capacity;

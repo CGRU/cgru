@@ -502,34 +502,34 @@ text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 top: 150px; bottom: 50px; left: 10%; right: 10%;
 }
 
-.task_exec > div {
+.wnd_task > div {
 padding: 6px;
 }
-.task_exec .attr {
+.wnd_task .attr {
 padding: 2px 0px;
 }
-.task_exec .attr div {
+.wnd_task .attr div {
 margin: 2px;
 padding: 2px 0px;
 }
-.task_exec .attr .label {
+.wnd_task .attr .label {
 float: left;
 width: 60px;
 }
-.task_exec .attr .value {
+.wnd_task .attr .value {
 padding: 2px 8px;
 overflow: hidden;
 font-weight: bold;
 border-radius: 4px;
 box-shadow: 0px 0px 2px #555 inset;
 }
-.task_exec .raw .object, .task_exec .files {
+.wnd_task .raw .object, .wnd_task .files {
 padding: 6px;
 border-radius: 4px;
 box-shadow: 0px 0px 2px #555 inset;
 overflow: hidden;
 }
-.task_exec .files > div {
+.wnd_task .files > div {
 cursor: pointer;
 margin: 1px;
 padding: 1px 4px;
@@ -538,7 +538,7 @@ border-radius: 2px;
 box-shadow: 0 0 2px #000, 0 0 2px #FFF inset;
 background: rgba(255,255,0,.2);
 }
-.task_exec .files > div.opened {
+.wnd_task .files > div.opened {
 clear: both; float: none;
 }
 

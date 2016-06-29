@@ -236,9 +236,9 @@ function Monitor( i_args)
 	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
 
-	for( var i = 0; i < g_recievers.length; i++)
+	for( var i = 0; i < g_receivers.length; i++)
 	{
-		if( g_recievers[i].name == this.name )
+		if( g_receivers[i].name == this.name )
 		{
 			g_Info('ERROR: Monitor[' + this.name + '] list already exists.');
 			return;
@@ -306,7 +306,7 @@ function Monitor( i_args)
 	this.selected_items = [];
 	this.cur_item = null;
 
-	g_recievers.push( this);
+	g_receivers.push( this);
 	g_monitors.push( this);
 	this.setWindowTitle();
 	g_cur_monitor = this;
@@ -330,7 +330,7 @@ Monitor.prototype.destroy = function()
 {
 	if( this.menu ) this.menu.destroy();
 	if( g_cur_monitor == this ) g_cur_monitor = null;
-	cm_ArrayRemove(	g_recievers, this);
+	cm_ArrayRemove(	g_receivers, this);
 	cm_ArrayRemove(	g_refreshers, this);
 	cm_ArrayRemove(	g_monitors, this);
 	if( this.type == 'tasks')

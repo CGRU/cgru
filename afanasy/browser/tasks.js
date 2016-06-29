@@ -392,7 +392,17 @@ TaskItem.mh_Oper = function( i_param)
 
 TaskItem.prototype.onDoubleClick = function( i_evt)
 {
-	this.mh_Get('info', i_evt);
+	var args = {};
+
+	args.pos = {};
+	args.pos.job   = this.job.id;
+	args.pos.block = this.block.block_num;
+	args.pos.task  = this.task_num;
+
+	args.wnd = this.monitor.window;
+	args.evt = i_evt;
+
+	WndTaskOpen( args);
 }
 
 TaskItem.prototype.showTumbs = function()
@@ -465,140 +475,4 @@ TaskItem.prototype.updatePanels = function()
 
 TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];
-
-t_attrs = {};
-t_attrs.name = {};
-t_attrs.capacity = {"float":'left',"width":'24%'};
-t_attrs.service = {"float":'left',"width":'38%'};
-t_attrs.parser = {"float":'left',"width":'38%'};
-t_attrs.command = {"pathmap":true};
-t_attrs.working_directory = {"label":'Directory',"pathmap":true};
-
-function t_ShowExec( i_obj, i_elParent)
-{
-	i_elParent.classList.add('task_exec');
-
-	var attrs = document.createElement('div');
-	i_elParent.appendChild( attrs);
-	attrs.classList.add('attrs');
-
-	for( attr in t_attrs )
-	{
-		if( i_obj[attr] == null )
-			continue;
-
-		var div = document.createElement('div');
-		attrs.appendChild( div);
-		div.classList.add('attr');
-		if( t_attrs[attr].float )
-			div.style.cssFloat = t_attrs[attr].float;
-		else
-			div.style.clear = 'both';
-		if( t_attrs[attr].width )
-			div.style.width = t_attrs[attr].width;
-
-		var label = document.createElement('div');
-		div.appendChild( label);
-		label.classList.add('label');
-		if( t_attrs[attr].label )
-			label.textContent = t_attrs[attr].label + ':';
-		else
-		{
-			label.textContent = attr + ':';
-			label.style.textTransform = 'capitalize';
-		}
-
-		var value = document.createElement('div');
-		div.appendChild( value);
-		value.classList.add('value');
-		if( t_attrs[attr].pathmap )
-			value.textContent = cgru_PM( i_obj[attr]);
-		else
-			value.textContent = i_obj[attr];
-	}
-
-	var files = [];
-	var label = 'Files:';
-	if( i_obj.files ) files = i_obj.files;
-	if( i_obj.parsed_files && i_obj.parsed_files.length )
-	{
-		files = i_obj.parsed_files;
-		label = 'Files (parsed):';
-	}
-	
-	var dir_pm = cgru_PM( i_obj.working_directory);
-	if( files.length )
-	{
-		var elFilesDiv = document.createElement('div');
-		i_elParent.appendChild( elFilesDiv);
-		elFilesDiv.classList.add('files_div');
-
-		var elFilesLabel = document.createElement('div');
-		elFilesDiv.appendChild( elFilesLabel);
-		elFilesLabel.textContent = label;
-
-		var elFiles = document.createElement('div');
-		elFilesDiv.appendChild( elFiles);
-		elFiles.classList.add('files');
-
-		for( var f = 0; f < files.length; f++)
-		{
-			var file = cgru_PM( files[f]);
-
-			var elFile = document.createElement('div');
-			elFiles.appendChild( elFile);
-			elFile.textContent = cm_PathBase( file);
-			elFile.title = file;
-			elFile.m_file = file;
-			elFile.m_dir = dir_pm;
-			elFile.onclick = t_FileOpen;
-		}
-	}
-
-	var elRawDiv = document.createElement('div');
-	i_elParent.appendChild( elRawDiv);
-	elRawDiv.classList.add('raw');
-
-	var elRawLabel = document.createElement('div');
-	elRawDiv.appendChild( elRawLabel);
-	elRawLabel.classList.add('label');
-	elRawLabel.textContent = 'Raw Object:';
-
-	var elRawObj = document.createElement('div');
-	elRawDiv.appendChild( elRawObj);
-	elRawObj.classList.add('object');
-	elRawObj.innerHTML = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
-}
-
-function t_FileOpen( i_evt)
-{
-	elFile = i_evt.currentTarget;
-
-	if( elFile.m_opened )
-	{
-		elFile.m_opened = false;
-		elFile.removeChild( elFile.m_elCmds);
-		elFile.classList.remove('opened');
-		return;
-	}
-
-	var file = cgru_PathJoin( elFile.m_dir, elFile.m_file);
-
-	elFile.m_opened = true;
-	elFile.classList.add('opened');
-
-	var elCmds = document.createElement('div');
-	elFile.appendChild( elCmds);
-	elFile.m_elCmds = elCmds;
-
-	for( var c = 0; c < cgru_Config.previewcmds.length; c++ )
-	{
-		var elCmd = document.createElement('div');
-		elCmds.appendChild( elCmd);
-		elCmd.classList.add('cmdexec');
-		elCmd.textContent = cgru_Config.previewcmds[c].replace('@ARG@', file);
-	}
-
-	return false;
-}
 

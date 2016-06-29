@@ -31,12 +31,12 @@ listen_Subscribe = function( i_wnd)
 
 	if( i_wnd.subscribed )
 	{
-		cm_ArrayRemove(	g_recievers, i_wnd);
+		g_ReceiverRemove( i_wnd);
 		cm_ArrayRemove(	listen_wnds, i_wnd);
 	}
 	else
 	{
-		g_recievers.push( i_wnd);
+		g_ReceiverAdd( i_wnd);
 		listen_wnds.push( i_wnd);
 		i_wnd.subscribed = true;
 	}
@@ -57,21 +57,21 @@ listen_ProcessMsg = function( i_obj)
 		for( var w = 0; w < listen_wnds.length; w++)
 		{
 			var wListen = listen_wnds[w].listen;
-			if(( listen.job == wListen.job ) &&
-			   (( wListen.block == null ) || ( listen.block == wListen.block )) &&
-			   (( wListen.task  == null ) || ( listen.task  == wListen.task  )))
+			if(( listen.pos.job == wListen.job ) &&
+			   (( wListen.block == null ) || ( listen.pos.block == wListen.block )) &&
+			   (( wListen.task  == null ) || ( listen.pos.task  == wListen.task  )))
 			{
 				if( wListen.task == null )
 				{
 					var el = document.createElement('div');
 					el.classList.add('name');
-					el.textContent = listen.taskname + '[' + listen.hostname + ']:';
+					el.textContent = listen.task_name + '[' + listen.progress.hst + ']:';
 					listen_wnds[w].elContent.appendChild( el);
 				}
 
 				var el = document.createElement('pre');
 				el.classList.add('output');
-				el.textContent = listen.output;
+				el.textContent = listen.data;
 				listen_wnds[w].elContent.appendChild( el);
 
 				el.scrollIntoView( false);

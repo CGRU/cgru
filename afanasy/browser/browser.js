@@ -9,7 +9,7 @@ g_auth = {};
 g_digest = null;
 
 g_windows = [];
-g_recievers = [];
+g_receivers = [];
 g_refreshers = [];
 g_monitors = [];
 g_cur_monitor = null;
@@ -166,7 +166,7 @@ function g_RegisterSend()
 
 function g_ProcessMsg( i_obj)
 {
-//g_Info( g_cycle+' Progessing '+g_recievers.length+' recieves');
+//g_Info( g_cycle+' Progessing '+g_receivers.length+' recieves');
 	g_last_msg_cycle = g_cycle;
 
 	// Realm is sended if message not authorized
@@ -204,35 +204,49 @@ function g_ProcessMsg( i_obj)
 		return;
 	}
 
-	if( i_obj.message || i_obj.info || i_obj.object || i_obj.task_exec )
+	if( i_obj.message || i_obj.info || i_obj.object )
 	{
 		g_ShowObject( i_obj);
 		return;
 	}
 
 	if( i_obj.events && i_obj.events.tasks_outputs && i_obj.events.tasks_outputs.length )
-	{
-		var outputs = i_obj.events.tasks_outputs;
-		for( var i = 0; i < outputs.length; i++)
-		{
-			var msg = {};
-			msg.type = 'output';
-			msg.name = 'Task';
-			msg.list = [outputs[i].output];
-
-			g_ShowObject({'message':msg});
-
-			g_Info('Task output reveived.');
-		}
-	}
+		for( var i = 0; i < i_obj.events.tasks_outputs.length; i++)
+			WndTaskShow({'task':i_obj.events.tasks_outputs[i]});
+	if( i_obj.events && i_obj.events.tasks_listens && i_obj.events.tasks_listens.length )
+		for( var i = 0; i < i_obj.events.tasks_listens.length; i++)
+			WndTaskShow({'task':i_obj.events.tasks_listens[i]});
 
 	if( g_id == 0 )
 		return;
 
-	for( var i = 0; i < g_recievers.length; i++)
+	for( var i = 0; i < g_receivers.length; i++)
 	{
-		g_recievers[i].processMsg( i_obj);
+		g_receivers[i].processMsg( i_obj);
 	}
+}
+
+function g_ReceiverAdd( i_obj)
+{
+	if( g_ReceiverExist( i_obj))
+		g_Error('g_ReceiverAdd: Receiver "' + i_obj.name + '" already exists.');
+	else
+		g_receivers.push( i_obj);
+
+}
+function g_ReceiverRemove( i_obj)
+{
+	if( g_ReceiverExist( i_obj ))
+		cm_ArrayRemove( g_receivers, i_obj);
+	else
+		g_Error('g_ReceiverRemove: Receiver "' + i_obj.name + '" does not exist.');
+}
+function g_ReceiverExist( i_obj)
+{
+	for( var i = 0; i < g_receivers.length; i++)
+		if( g_receivers[i] == i_obj )
+			return true;
+	return false;
 }
 
 function g_Refresh()
@@ -429,51 +443,19 @@ function g_ShowObject( i_data, i_args)
 		type = 'message';
 		g_Info('Message received.');
 	}
-	else if( i_data.task_exec )
-	{
-		object = i_data.task_exec;
-		type = 'task_exec';
-		g_Info('Task received.');
-	}
 
 	if( i_args == null )
 	{
-//		g_Log('Global object received.');
 		i_args = {};
 	}
 
-	var new_wnd = false;
-	var wnd = window;
-	if( i_args.wnd )
-	{
-		wnd = i_args.wnd;
-	}
-	var doc = wnd.document;
-	if( i_args.evt )
-	{
-		if( i_args.evt.shiftKey ) new_wnd = true;
-		if( i_args.evt.ctrlKey ) new_wnd = true;
-		if( i_args.evt.altKey ) new_wnd = true;
-	}
 	var title = 'Object';
 	if( object.name ) title = object.name;
 	if( i_args.name ) title = i_args.name;
 	if( object.type ) title += ' ' + object.type;
+	i_args.title = title;
 
-	var elContent = null;
-	if( new_wnd )
-	{
-		wnd = g_OpenWindowWrite('window.html', title);
-		if( wnd == null ) return;
-		elContent = wnd.document.body;
-		doc = wnd.document;
-		wnd.document.title = title;
-	}
-	else
-	{
-		wnd = new cgru_Window({"name":title,"wnd":wnd});
-		elContent = wnd.elContent;
-	}
+	var wnd = g_OpenWindow( i_args);
 
 	if( type == 'message')
 	{
@@ -481,21 +463,48 @@ function g_ShowObject( i_data, i_args)
 		{
 			var el = document.createElement('p');
 			el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
-			elContent.appendChild(el);
+			wnd.elContent.appendChild(el);
 		}
-	}
-	else if( type == 'task_exec')
-	{
-		t_ShowExec( object, elContent, doc);
 	}
 	else
 	{
 		var el = document.createElement('p');
 		el.innerHTML = JSON.stringify( object, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
-		elContent.appendChild(el);
+		wnd.elContent.appendChild(el);
 	}
 }
+function g_OpenWindow( i_args)
+{
+	var new_wnd = false;
+	var wnd = window;
+	if( i_args.wnd )
+	{
+		wnd = i_args.wnd;
+	}
+	if( i_args.evt )
+	{
+		if( i_args.evt.shiftKey ) new_wnd = true;
+		if( i_args.evt.ctrlKey ) new_wnd = true;
+		if( i_args.evt.altKey ) new_wnd = true;
+	}
 
+	var elContent = null;
+	if( new_wnd )
+	{
+		wnd = g_OpenWindowWrite( i_args.title);
+		if( wnd == null )
+			return;
+
+		wnd.elContent = wnd.document.body;
+		wnd.document.title = i_args.title;
+	}
+	else
+	{
+		wnd = new cgru_Window({"name":i_args.title,"wnd":wnd});
+	}
+
+	return wnd;
+}
 function g_OpenWindowLoad( i_file, i_name)
 {
 	for( var i = 0; i < g_windows.length; i++)
@@ -548,6 +557,7 @@ function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 		if( localStorage.text_color ) wnd.document.body.style.color = localStorage.text_color;
 	}
 	wnd.focus();
+	wnd.document.close();
 
 	return wnd;
 }
@@ -781,86 +791,3 @@ function g_SuperUserProcessGUI()
 		nw_send(obj);
 	}
 }
-/*
-function g_ShowTask( i_obj)
-{
-	var title = 'Task '+i_obj.name;
-	var wnd = g_OpenWindowWrite( title, title, true);
-	if( wnd == null ) return;
-	var doc = wnd.document;
-
-	var obj_str = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp');
-	var cmd = i_obj.command;
-	var cmdPM = cgru_PM( cmd);
-	var wdir = i_obj.working_directory;
-	var wdirPM = cgru_PM( wdir);
-
-	doc.write('</head><body class="task_exec">');
-	doc.write('<div><i>Name:</i> <b>'+i_obj.name+'</b></div>');
-	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
-	if( wdir == wdirPM )
-	{
-		doc.write('<div><i>Working Directory:</i></div>');
-		doc.write('<div class="param">'+wdir+'</div>');
-	}
-	else
-	{
-		doc.write('<div><i>Working Directory:</i></div>');
-		doc.write('<div class="param">'+wdir+'</div>');
-		doc.write('<div><i>Working Directory Client = "'+cgru_Platform+'":</i></div>');
-		doc.write('<div class="param">'+wdirPM+'</div>');
-	}
-	if( cmd == cmdPM )
-	{
-		doc.write('<div><i>Command:</i></div>');
-		doc.write('<div class="param">'+cmd+'</div>');
-	}
-	else
-	{
-		doc.write('<div><i>Command:</i></div>');
-		doc.write('<div class="param">'+cmd+'</div>');
-		doc.write('<div><i>Command Client = "'+cgru_Platform+'":</i></div>');
-		doc.write('<div class="param">'+cmdPM+'</div>');
-	}
-
-	if( i_obj.files && i_obj.files.length )
-	{
-		doc.write('<div><i>Files:</i></div>');
-		for( var f = 0; f < i_obj.files.length; f++)
-		{
-			doc.write('<div>');
-			doc.write('<div class="param">' + i_obj.files[f] + '</div>');
-			var cmds = cgru_Config.previewcmds;
-			for( var c = 0; c < cmds.length; c++ )
-			{
-				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, i_obj.files[f]));
-				doc.write('<div class="cmdexec">'+cmd+'</div>');
-			}
-			doc.write('</div>');
-		}
-	}
-
-	if( i_obj.parsed_files && i_obj.parsed_files.length )
-	{
-		doc.write('<div style="overflow:auto">');
-		for( var f = 0; f < i_obj.parsed_files.length; f++)
-		{
-//			doc.write('<div>');
-			doc.write('<span class="param" id="task_parsed_file">' + cm_PathBase( i_obj.parsed_files[f]) + '</span>');
-//			doc.write('</div>');
-		}
-		doc.write('</div>');
-	}
-
-	doc.write('<div>Raw Object:</div><div class="task_data">');
-	doc.write( obj_str.replace(/\n/g,'<br/>'));
-	doc.write('</div>');
-
-	doc.write('</body></html>');
-	doc.close();
-	if( cgru_Browser == 'firefox')
-		wnd.location.reload();
-
-	$('task_parsed_file').oncontextmenu = function(e) { alert( e.id);};
-}
-*/
