@@ -345,6 +345,7 @@ void af::jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_r
 		if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
 		if( i_state & AFJOB::STATE_PPAPPROVAL_MASK      ) o_str << " PPA";
 		if( i_state & AFJOB::STATE_ERROR_READY_MASK     ) o_str << " RER";
+		if( i_state & AFJOB::STATE_WAITRECONNECT_MASK   ) o_str << " WRC";
 	}
 
 	o_str << "\"";

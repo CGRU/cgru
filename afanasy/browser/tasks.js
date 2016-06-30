@@ -331,10 +331,8 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 TaskItem.createPanels = function( i_monitor)
 {
 	var acts = {};
-//	acts.info    = {'handle':'mh_Get', 'label':'INFO','tooltip':'Get task full info.'};
 	acts.skip    = {'handle':'mh_Oper','label':'SKIP','tooltip':'Double click to skip selected task(s).','ondblclick':true};
 	acts.restart = {'handle':'mh_Oper','label':'RES', 'tooltip':'Double click to restart selected task(s).','ondblclick':true};
-//	acts.listen  = {'handle':'mh_Lis', 'label':'LIS', 'tooltip':'Double click to listen task.','ondblclick':true};
 	i_monitor.createCtrlBtns( acts);
 }
 
