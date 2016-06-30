@@ -317,6 +317,10 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		{
 			o_msg_response = af::jsonMsg( af::farm()->getText());
 		}
+		else
+		{
+			o_msg_response = af::jsonMsgError(std::string("Invalid get type = '") + type + "'");
+		}
 	}
 	else if( document.HasMember("action"))
 	{
