@@ -118,6 +118,19 @@ height: 190px;
 }
 #footer #log *, #footer #netlog * { margin: 4px 0px;}
 
+.button {
+cursor: pointer;
+text-align: center;
+border: 1px solid #575757;
+border-radius: 2px;
+margin: 2px;
+padding: 2px 6px;
+background-color: rgba(150,255,255,.1);
+-moz-user-select: none;
+-webkit-user-select: none;
+}
+.button:hover { background-color: rgba(150,255,255,.3); }
+
 .monitor {
 position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
@@ -502,30 +515,58 @@ text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 top: 150px; bottom: 50px; left: 10%; right: 10%;
 }
 
+/*####################### Task Window: ################## */
 .wnd_task > div {
 padding: 6px;
+clear: both;
 }
-.wnd_task .attr {
-padding: 2px 0px;
+.wnd_task div {
+border-radius: 2px;
 }
-.wnd_task .attr div {
-margin: 2px;
-padding: 2px 0px;
+.wnd_task .progress {
+margin: 4px 12px;
+padding: 4px 12px;
+background-color: rgba( 255, 255, 255, .5);
+border: 1px solid #777;
 }
-.wnd_task .attr .label {
+.wnd_task .buttons_div .button { float: left; opacity: .5; }
+.wnd_task .buttons_div .button.active { opacity: 1.0; }
+.wnd_task .output_div { float: right; }
+.wnd_task .output_div > div { float: left; padding: 4px; }
+.wnd_task .output_num {
+min-width: 50px;
+height: 14px;
+background-color: rgba(255,255,255,.5);
+text-align: center;
+border: 1px solid #777;
+}
+.wnd_task .tab_btn {
 float: left;
-width: 60px;
+margin-bottom: 0px;
+border-bottom: 0px;
+border-radius: 6px 6px 0 0;
 }
+.wnd_task .tab_btn.active { background-color: rgba(255,255,255,.3); }
+.wnd_task .tab_pages_div {
+clear: both;
+padding: 10px;
+border: 1px solid #777;
+background-color: rgba(255,255,255,.3);
+}
+.wnd_task .tab_page { display: none; }
+.wnd_task .tab_page.active { display: block; }
+
+.wnd_task .attr { padding: 2px 0px; }
+.wnd_task .attr div { margin: 2px; padding: 2px 0px; }
+.wnd_task .attr .label { float: left; width: 60px; }
 .wnd_task .attr .value {
 padding: 2px 8px;
 overflow: hidden;
 font-weight: bold;
-border-radius: 4px;
 box-shadow: 0px 0px 2px #555 inset;
 }
 .wnd_task .raw .object, .wnd_task .files {
 padding: 6px;
-border-radius: 4px;
 box-shadow: 0px 0px 2px #555 inset;
 overflow: hidden;
 }
@@ -534,7 +575,6 @@ cursor: pointer;
 margin: 1px;
 padding: 1px 4px;
 float: left;
-border-radius: 2px;
 box-shadow: 0 0 2px #000, 0 0 2px #FFF inset;
 background: rgba(255,255,0,.2);
 }
@@ -542,6 +582,7 @@ background: rgba(255,255,0,.2);
 clear: both; float: none;
 }
 
+/*####################### Listen Job Window: ################## */
 .listen .name {
 font-style: italic;
 font-weight: bold;

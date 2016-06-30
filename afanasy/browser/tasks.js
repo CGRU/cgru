@@ -13,14 +13,6 @@ BlockItem.prototype.init = function()
 	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
 
 	this.state = {};
-/*
-	this.thumbnail_http_base = cgru_Config['af_thumbnail_http'];
-	this.thumbnail_http_naming = cgru_Config['af_thumbnail_naming'];
-	
-	this.thumbnail_http_path = this.thumbnail_http_base + this.thumbnail_http_naming;
-	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(job_id)d", this.params.job_id);
-	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(block_id)d", this.params.block_num);
-*/
 }
 
 BlockItem.prototype.update = function()
@@ -152,6 +144,9 @@ TaskItem.prototype.updateProgress = function( i_progress)
 		this.elStar.style.display = 'none';
 	}
 	this.elBar.style.width = ( this.percent + '%');
+
+	if( this.wndtask )
+		this.wndtask.updateProgress( i_progress);
 }
 
 TaskItem.prototype.genName = function()
@@ -179,7 +174,6 @@ TaskItem.prototype.genName = function()
 
 	// The block is numeric:
 	this.genFrames();
-//	this.generateThumbnails();
 
 	if( tasks_name && ( tasks_name != '' ))
 	{
@@ -196,27 +190,7 @@ TaskItem.prototype.genName = function()
 
 	return name;
 }
-/*
-TaskItem.prototype.generateThumbnails = function()
-{
-	if (this.block.params.files)
-	{
-		thumbnail_http_path = this.block.thumbnail_http_path.replace("%(task_id)d", this.task_num);
-		//console.log(this);
-		var files = cm_FillNumbers(this.block.params.files, this.frame_start);
-		
-		var files_list = files.split(";");
-		for(i in files_list) {
-			var filepath = files_list[i];
-			var thumbnail_name = filepath.split("/").pop();
-			var temp = thumbnail_name.split(".");
-			temp.pop();
-			thumbnail_name = temp.join(".")+".jpg";
-			thumbnail_path = thumbnail_http_path.replace("%(thumbnail_filename)s", thumbnail_name);
-		}
-	}
-}
-*/
+
 TaskItem.prototype.genFrames = function()
 {
 	var p = this.block.params;
@@ -327,18 +301,6 @@ TaskItem.mh_Get = function( i_param, i_evt)
 
 	nw_request({'send':{'get':get},'func':g_ShowObject,'evt':i_evt,'wnd':task.monitor.window});
 }
-/*
-TaskItem.prototype.mh_Oper = function( i_name, i_value)
-{
-console.log('TaskItem.prototype.mh_Oper: ' + i_name);
-	var operation = {};
-	operation.type = i_name;
-	var bids = []; var tids = [];
-	this.getBlockTasksIds( bids, tids);
-	if( tids.length ) operation.task_ids = tids;
-	nw_Action('jobs', [this.job.id], operation, null, bids);
-}
-*/
 TaskItem.mh_Lis = function( i_param)
 {
 	var task = i_param.monitor.cur_item;
@@ -392,6 +354,9 @@ TaskItem.mh_Oper = function( i_param)
 
 TaskItem.prototype.onDoubleClick = function( i_evt)
 {
+	if( this.wndtask )
+		return;
+
 	var args = {};
 
 	args.pos = {};
@@ -401,8 +366,15 @@ TaskItem.prototype.onDoubleClick = function( i_evt)
 
 	args.wnd = this.monitor.window;
 	args.evt = i_evt;
+	args.taskitem = this;
 
-	WndTaskOpen( args);
+	this.wndtask = WndTaskOpen( args);
+}
+
+TaskItem.prototype.monitorDestroy = function()
+{
+	if( this.wndtask )
+		this.wndtask.close();
 }
 
 TaskItem.prototype.showTumbs = function()

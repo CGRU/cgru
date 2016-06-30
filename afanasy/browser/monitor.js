@@ -338,8 +338,9 @@ Monitor.prototype.destroy = function()
 	else
 		nw_Subscribe( this.type, false);
 
-//	for( var i = 0; i < this.items.length; i++)
-//		this.element.removeChild(this.items[i].element);
+	for( var i = 0; i < this.items.length; i++)
+		if( this.items[i].monitorDestroy )
+			this.items[i].monitorDestroy( this);
 
 	this.items = [];
 

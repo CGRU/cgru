@@ -16,9 +16,9 @@ function WndTaskOpen( i_args)
 {
 	for( var i = 0; i < wt_windows.length; i++)
 		if( wt_same( wt_windows[i], i_args))
-			return;
+			return null;
 
-	new WndTask( i_args);
+	return new WndTask( i_args);
 }
 
 function WndTaskShow( i_obj)
@@ -37,6 +37,7 @@ function WndTaskShow( i_obj)
 function WndTask( i_args)
 {
 	this.pos = i_args.pos;
+	this.taskitem = i_args.taskitem;
 
 	this.name = 'WndTask[' + this.pos.job + '][' + this.pos.block + '][' + this.pos.task + ']';
 
@@ -48,28 +49,73 @@ function WndTask( i_args)
 	this.elContent = this.wnd.elContent;
 	this.elContent.classList.add('wnd_task');
 
-	this.elInfo = document.createElement('div');
-	this.elContent.appendChild( this.elInfo);
-	this.elInfo.classList.add('info');
+	// Progress:
+	this.elProgress = document.createElement('div');
+	this.elContent.appendChild( this.elProgress);
+	this.elProgress.classList.add('progress');
 
+	// Buttons:
 	var divBtns = document.createElement('div');
 	this.elContent.appendChild( divBtns);
-	divBtns.classList.add('buttons');
+	divBtns.classList.add('buttons_div');
 
+	this.elBtnSkip = document.createElement('div');
+	divBtns.appendChild( this.elBtnSkip);
+	this.elBtnSkip.classList.add('button');
+	this.elBtnSkip.textContent = 'Skip';
+	this.elBtnSkip.title = 'Double click to skip a task';
+	this.elBtnSkip.m_operation = 'skip';
+	this.elBtnSkip.m_window= this;
+	this.elBtnSkip.ondblclick = function(e){ var el = e.currentTarget; el.m_window.doOperation( el);}
+
+	this.elBtnRestart = document.createElement('div');
+	divBtns.appendChild( this.elBtnRestart);
+	this.elBtnRestart.classList.add('button');
+	this.elBtnRestart.textContent = 'Restart';
+	this.elBtnRestart.title = 'Double click to restart a task';
+	this.elBtnRestart.m_operation = 'restart';
+	this.elBtnRestart.m_window= this;
+	this.elBtnRestart.ondblclick = function(e){ var el = e.currentTarget; el.m_window.doOperation( el);}
+
+	// Ouput:
+	var elOutputDiv = document.createElement('div');
+	divBtns.appendChild( elOutputDiv);
+	elOutputDiv.classList.add('output_div');
+
+	var elOutputLabel = document.createElement('div');
+	elOutputDiv.appendChild( elOutputLabel);
+	elOutputLabel.classList.add('output_label');
+	elOutputLabel.textContent = 'Ouput Number:';
+
+	this.elOutputNum = document.createElement('div');
+	elOutputDiv.appendChild( this.elOutputNum);
+	this.elOutputNum.classList.add('output_num');
+	this.elOutputNum.contentEditable = true;
+	this.elOutputNum.m_wnd_task = this;
+	this.elOutputNum.onkeydown = function(e){ e.currentTarget.m_wnd_task.outNumPress(e);}
+	this.elOutputNum.onblur = function(e){ e.currentTarget.m_wnd_task.outNumBlur(e);}
+
+	// Tabs:
 	var divTabs = document.createElement('div');
 	this.elContent.appendChild( divTabs);
-	divTabs.classList.add('tabs');
+	divTabs.classList.add('tabs_div');
 
-	var divPages = document.createElement('div');
-	this.elContent.appendChild( divPages);
-	divPages.classList.add('pages');
+	var divTabBtns = document.createElement('div');
+	divTabs.appendChild( divTabBtns);
+	divTabBtns.classList.add('tabs_btns_div');
+
+	var divTabPages = document.createElement('div');
+	divTabs.appendChild( divTabPages);
+	divTabPages.classList.add('tab_pages_div');
 
 	this.elTabs = {};
 	this.elPages = {};
 	for( var i = 0; i < wt_types.length; i++)
 	{
 		var el = document.createElement('div');
-		divTabs.appendChild( el);
+		divTabBtns.appendChild( el);
+		el.classList.add('button');
+		el.classList.add('tab_btn');
 		el.textContent = wt_labels[i];
 		el.m_type = wt_types[i];
 		el.m_wndtask = this;
@@ -77,14 +123,15 @@ function WndTask( i_args)
 		this.elTabs[wt_types[i]] = el;
 
 		var el = document.createElement('div');
-		divPages.appendChild( el);
-//		el.style.display = 'none';
+		divTabPages.appendChild( el);
+		el.classList.add('tab_page');
 		this.elPages[wt_types[i]] = el;
 	}
 
 	wt_windows.push( this);
 
-	this.get('info');
+//	this.get('info');
+	this.tabClicked('TExec');
 }
 
 WndTask.prototype.destroy = function()
@@ -94,20 +141,41 @@ WndTask.prototype.destroy = function()
 
 	if( this.listening )
 		this.listen( false);
+
+	this.taskitem.wndtask = null;
 }
 
-WndTask.prototype.get = function( i_mode, i_number)
+WndTask.prototype.close = function()
 {
-	var get = {"type":'jobs',"ids":[this.pos.job],"mode":i_mode,"number":i_number};
+	if( this.wnd.destroy )
+		this.wnd.destroy();
+	else
+		this.wnd.close();
+}
+
+WndTask.prototype.get = function( i_mode)
+{
+	var get = {"type":'jobs',"ids":[this.pos.job],"mode":i_mode}
 	get.block_ids = [this.pos.block];
 	get.task_ids = [this.pos.task];
 	get.mon_id = g_id;
+	if(( i_mode == 'output' ) && this.output_number )
+		get.number = this.output_number;
 
 	nw_request({"send":{"get":get},"func":WndTaskShow});
 }
 
 WndTask.prototype.tabClicked = function( i_type)
 {
+	for( var i = 0; i < wt_types.length; i++)
+	{
+		this.elTabs[wt_types[i]].classList.remove('active');
+		this.elPages[wt_types[i]].classList.remove('active');
+	}
+
+	this.elTabs[i_type].classList.add('active');
+	this.elPages[i_type].classList.add('active');
+
 	if( i_type == 'TExec')
 		this.get('info');
 	else if( i_type == 'TOutput')
@@ -122,15 +190,24 @@ WndTask.prototype.tabClicked = function( i_type)
 
 WndTask.prototype.show = function( i_obj)
 {
-console.log('WndTask.prototype.show: ' + this.name);
-console.log( JSON.stringify( i_obj));
-//this.el.textContent = JSON.stringify( i_obj);
+//console.log('WndTask.prototype.show: ' + this.name);
+//console.log( JSON.stringify( i_obj));
 
-	var info = '';
-	info += ' State: <b>' + i_obj.progress.state + '</b>';
-	info += ' Starts: <b>' + i_obj.progress.str + '</b>';
-	this.elInfo.innerHTML = info;
+	// Update progress:
+	this.updateProgress( i_obj.progress);
 
+	//
+	// Set window title
+	//
+	var title = 'Task[' + i_obj.job_name + '][' + i_obj.block_name + '][' + i_obj.task_name + ']';
+	if( this.wnd.setTitle )
+		this.wnd.setTitle( title); // It is a CGRU window.
+	else
+		this.wnd.document.title = title; // It is a separated browser window.
+
+	//
+	// Show data:
+	//
 	if( i_obj.type == 'TExec' )
 		this.showExec( i_obj.exec);
 	else if( i_obj.type == 'TOutput' )
@@ -141,6 +218,65 @@ console.log( JSON.stringify( i_obj));
 		this.showErrorHosts( i_obj.data);
 	else if( i_obj.type == 'TListen' )
 		this.showListen( i_obj.data);
+}
+
+WndTask.prototype.updateProgress = function( i_progress)
+{
+	//
+	// Show progress info:
+	//
+	this.progress = i_progress;
+	this.state = {};
+	cm_GetState( this.progress.state, this.state);
+
+	var info = ' State: <b>' + this.progress.state + '</b>';
+	if( this.state.RUN && this.progress.per) info += ' <b>' + this.progress.per + '%</b>';
+	if( this.progress.str ) info += ' Starts: <b>' + this.progress.str + '</b>';
+	if( this.progress.err ) info += ' (<b>' + this.progress.err + '</b> errors)';
+	if( this.progress.hst ) info += ' Last host: <b>' + this.progress.hst + '</b>';
+
+	if( this.progress.tst && this.progress.tdn && ( ! this.state.RUN ))
+		info += ' Time: <b>' + cm_TimeStringInterval( this.progress.tst, this.progress.tdn) + '</b>';
+	this.elProgress.innerHTML = info;
+
+	//
+	// Update buttons state:
+	//
+	if( this.state.RDY || this.state.RUN )
+		this.elBtnSkip.classList.add('active');
+	else
+		this.elBtnSkip.classList.remove('active');
+
+	if( this.state.RUN || this.state.DON || this.state.ERR )
+		this.elBtnRestart.classList.add('active');
+	else
+		this.elBtnRestart.classList.remove('active');
+}
+
+WndTask.prototype.outNumPress = function( i_evt)
+{
+	if( i_evt.key == 'Enter' )
+	{
+		i_evt.preventDefault();
+		this.outNumProcess();
+	}
+}
+WndTask.prototype.outNumBlur = function( i_evt) { this.outNumProcess(); }
+WndTask.prototype.outNumProcess = function()
+{
+	var str = this.elOutputNum.textContent;
+	var num = parseInt( str);
+
+	if( isNaN( num))
+	{
+		this.output_number = 0;
+		this.elOutputNum.textContent = this.output_number;
+	}
+	else if( this.output_number != num )
+	{
+		this.output_number = num;
+		this.tabClicked('TOutput');
+	}
 }
 
 WndTask.prototype.showOutput = function( i_data)
@@ -367,3 +503,18 @@ function wt_FileOpen( i_evt)
 
 	return false;
 }
+
+WndTask.prototype.doOperation = function( i_el)
+{
+	if( false == i_el.classList.contains('active'))
+		return;
+
+	var operation = {};
+	operation.type = i_el.m_operation;
+	operation.task_ids = [this.pos.task];
+
+	nw_Action('jobs', [this.pos.job], operation, null,[this.pos.block]);
+
+	this.elPages.TListen.textContent = '';
+}
+
