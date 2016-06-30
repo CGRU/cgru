@@ -65,7 +65,7 @@ bool ItemNode::compare( const ItemNode & other) const
 			found = true;
 		}
 	}
-	if( m_ctrl_sf->isSortAscending1())
+	if( false == m_ctrl_sf->isSortAscending1())
 		result = ( false == result );
 
 	// Sort by the 2nd parameter:
@@ -88,7 +88,7 @@ bool ItemNode::compare( const ItemNode & other) const
 			}
 		}
 
-		if( m_ctrl_sf->isSortAscending2())
+		if( false == m_ctrl_sf->isSortAscending2())
 			result = ( false == result );
 	}
 
