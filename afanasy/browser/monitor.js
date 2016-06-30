@@ -78,7 +78,8 @@ function Monitor( i_args)
 			'sub_menu':this.nodeConstructor.view_opts,'handle':'mh_Opt','always_active':true});
 	}
 
-	this.createCtrlBtn({"name":'log',"label":'LOG',"tooltip":'Show node log.',"handle":'mh_Get'});
+	if( this.type != 'tasks' )
+		this.createCtrlBtn({"name":'log',"label":'LOG',"tooltip":'Show node log.',"handle":'mh_Get'});
 
 	var el = document.createElement('div');
 	this.elPanelR.appendChild( el);
