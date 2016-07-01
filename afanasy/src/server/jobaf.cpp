@@ -264,7 +264,7 @@ bool JobAf::initialize()
 			{
 				taskstate = AFJOB::STATE_READY_MASK;
 			}
-			else if( taskstate & AFJOB::STATE_RUNNING_MASK )
+			else if( taskstate & AFJOB::STATE_RUNNING_MASK && ( false == m_blocks_data[b]->isMultiHost()))
 			{
 				taskstate = taskstate | AFJOB::STATE_WAITRECONNECT_MASK;
 				taskstate = taskstate & (~AFJOB::STATE_RUNNING_MASK );
