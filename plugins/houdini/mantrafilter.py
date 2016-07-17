@@ -77,6 +77,8 @@ def filterPlane():
 def filterCamera():
 	if tilerender:
 		oldcrop = mantra.property('image:crop')
+		if oldcrop == [1, 0, 1, 0]: # bug from SideFX since H15.5. Must be [0, 1, 0, 1] by default (xmin,xmax,ymin,ymax)
+			oldcrop = [0, 1, 0, 1]
 		newcrop = [max(tilecrop[0], oldcrop[0]), min(tilecrop[1], oldcrop[1]),
 				   max(tilecrop[2], oldcrop[2]), min(tilecrop[3], oldcrop[3])]
 		mantra.setproperty('image:crop', newcrop)
