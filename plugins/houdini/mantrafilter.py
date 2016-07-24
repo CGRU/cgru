@@ -76,10 +76,16 @@ def filterPlane():
 # A callback to change image crop and write down main image filename:
 def filterCamera():
 	if tilerender:
+		resolution = mantra.property('image:resolution')
 		oldcrop = mantra.property('image:crop')
+		if oldcrop[0]>oldcrop[1]: # no crop in ifd file
+			oldcrop = [0, 1, 0, 1]
 		newcrop = [max(tilecrop[0], oldcrop[0]), min(tilecrop[1], oldcrop[1]),
-				   max(tilecrop[2], oldcrop[2]), min(tilecrop[3], oldcrop[3])]
-		mantra.setproperty('image:crop', newcrop)
+			   max(tilecrop[2], oldcrop[2]), min(tilecrop[3], oldcrop[3])]
+		# convert to pixels
+		newpixelcrop = [int(resolution[0] * newcrop[0]), int(resolution[0] * newcrop[1])-1,
+				int(resolution[1] * newcrop[2]), int(resolution[1] * newcrop[3])-1]
+		mantra.setproperty('image:pixelcrop', newpixelcrop)
 
 
 def filterQuit():
