@@ -228,7 +228,8 @@ RenderNode.prototype.update = function( i_obj)
 	this.elPriority.textContent = '-' + this.params.priority;
 
 	var user = this.params.user_name;
-	if( this.state.NbY ) user = 'nimby(' + user + ')n';
+	if( this.state.PAU ) user = 'Paused(' + user + ')P';
+	else if( this.state.NbY ) user = 'nimby(' + user + ')n';
 	else if( this.state.NBY ) user = 'NIMBY(' + user + ')N';
 	this.elUserName.textContent = user;
 
@@ -584,6 +585,13 @@ RenderNode.createPanels = function( i_monitor)
 
 	// Admin related functions:
 	if( ! g_GOD()) return;
+
+
+	// Paused:
+	var acts = {};
+	acts.pause   = {'name':'paused', 'value':true,  'handle':'mh_Param','label':'PAU','tooltip':'Set render paused.'};
+	acts.unpause = {'name':'paused', 'value':false, 'handle':'mh_Param','label':'UNP','tooltip':'Unset render pause.'};
+	i_monitor.createCtrlBtns( acts);
 
 
 	// Power/WOL:

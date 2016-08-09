@@ -293,8 +293,10 @@ padding: 1px 7px;
 border-radius: 4px;
 cursor: default;
 }
+.item.ONL { background: #787;}
 .item.NbY { background: #88F;}
 .item.NBY { background: #77F;}
+.item.PAU { background: #888;}
 .item.DON { background: #486;}
 .item.WDP { background: #969;}
 .item.PPA { background: #CC6;}
