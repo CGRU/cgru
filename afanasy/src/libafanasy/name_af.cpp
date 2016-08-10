@@ -169,7 +169,7 @@ char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map
 	int pos = 0;
 	for (int i = 0; i < env_vec.size(); i++)
 	{
-		strncpy( m_environ + pos, env_vec[i].c_str(), env_vec[i].size());
+		strncpy( o_environ + pos, env_vec[i].c_str(), env_vec[i].size());
 		pos += env_vec[i].size();
 		o_environ[pos] = '\0'; ///< "name=value" '\0' termination
 		pos += 1;

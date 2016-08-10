@@ -6,8 +6,7 @@ call setup.cmd
 popd
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-rem set cgru_qt=%CGRU_LOCATION%\utilities\qt\qt-everywhere-opensource-src-4.8.6
-set "cgru_qt=C:\Qt\Qt5.6.0\5.6\msvc2015_64"
+set "cgru_qt=C:\Qt\Qt5.7.0\5.7\msvc2015_64"
 if exist %cgru_qt% SET "PATH=%cgru_qt%\bin;%PATH%"
 set "AF_GUI=YES"
 set "AF_QT_VER=5"
