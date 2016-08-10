@@ -118,7 +118,7 @@ def sendServer(i_data, i_verbose=False):
         if not isinstance(data, str):
             data = cgruutils.toStr(data)
         data = data[data.find('JSON') + 4:]
-        struct = json.loads(data)
+        struct = json.loads(data, strict=False)
     except:  # TODO: Too broad exception clause
         print('afnetwork.py: Received data:')
         print(data)
