@@ -18,43 +18,43 @@ class RegExp
 public:
 
 /// Constructor.
-   RegExp();
+	RegExp();
 
-   ~RegExp();
+	~RegExp();
 
-   inline const bool empty() const { return pattern.empty(); }
-   inline const bool notEmpty() const { return false == pattern.empty(); }
-   inline const std::string & getPattern() const { return pattern;}
+	inline const bool empty() const { return pattern.empty(); }
+	inline const bool notEmpty() const { return false == pattern.empty(); }
+	inline const std::string & getPattern() const { return pattern;}
 
-   static bool Validate( const std::string & str, std::string * errOutput = NULL);
+	static bool Validate( const std::string & str, std::string * errOutput = NULL);
 
-   bool setPattern( const std::string & str, std::string * strError = NULL);
+	bool setPattern( const std::string & str, std::string * strError = NULL);
 
-   inline void setCaseSensitive()   { cflags = compile_flags; }
-   inline void setCaseInsensitive() { cflags = compile_flags | REG_ICASE; }
+	inline void setCaseSensitive()   { cflags = compile_flags; }
+	inline void setCaseInsensitive() { cflags = compile_flags | REG_ICASE; }
 
-   inline void setMatch()   { contain = false; }
-   inline void setContain() { contain = true;  }
-   inline void setInclude() { exclude = false; }
-   inline void setExclude() { exclude = true;  }
+	inline void setMatch()   { contain = false; }
+	inline void setContain() { contain = true;  }
+	inline void setInclude() { exclude = false; }
+	inline void setExclude() { exclude = true;  }
 
-   bool match( const std::string & str) const;
+	bool match( const std::string & str) const;
 
-   int weigh() const;
+	int weigh() const;
 
 private:
 
-    int cflags;
-    bool exclude;
-    bool contain;
-    std::string pattern;
+	int cflags;
+	bool exclude;
+	bool contain;
+	std::string pattern;
 
 #ifdef WINNT
-    std::tr1::regex regexp;
+	std::tr1::regex regexp;
 #else
-    regex_t regexp;
+	regex_t regexp;
 #endif
 
-    static const int compile_flags;
+	static const int compile_flags;
 };
 }
