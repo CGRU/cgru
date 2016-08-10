@@ -7,7 +7,6 @@
 #include "watch.h"
 
 #include <QApplication>
-#include <QtGlobal>
 #include <QtGui/QIcon>
 
 #define AFOUTPUT
