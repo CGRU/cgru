@@ -109,15 +109,17 @@ bool ItemNode::filter()
 	if( m_ctrl_sf->isFilterEmpty())
 		return hide;
 
-	if( m_ctrl_sf->isFilterMatch())
+/*
+   if( m_ctrl_sf->isFilterMatch())
 		hide = m_ctrl_sf->getFilterRE().exactMatch( m_filter_str);
 	else
 		hide = m_filter_str.contains( m_ctrl_sf->getFilterRE());
 
 	if( m_ctrl_sf->isFilterInclude())
 		hide = ( false == hide );
+*/
 
-	return hide;
+	return ( false == m_ctrl_sf->getFilterRE().match( m_filter_str));
 }
 
 bool ItemNode::getHidden( int32_t i_flags) const

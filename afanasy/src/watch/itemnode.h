@@ -57,7 +57,7 @@ protected:
 	long long m_sort_int2;    ///< For sorting by some number
 	QString  m_sort_str1;     ///< For sorting by some string
 	QString  m_sort_str2;     ///< For sorting by some string
-	QString  m_filter_str;   ///< For filtering by some string
+	std::string m_filter_str; ///< For filtering by some string
 
 	void updateNodeValues( const af::Node * i_node);
 

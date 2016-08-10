@@ -767,13 +767,13 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 	}
 	else
 	{
-		QRegExp rx( set_string, Qt::CaseInsensitive);
-		if( rx.isValid() == false)
+		std::string err;
+		if( false == af::RegExp::Validate( afqt::qtos( set_string), &err))
 		{
-			listitems->displayError( rx.errorString());
+			listitems->displayError( afqt::stoq( err));
 			return false;
 		}
-		i_str << '"' << set_string.toUtf8().data() << '"';
+		i_str << '"' << afqt::qtos( set_string) << '"';
 	}
 
 	i_str << '}';

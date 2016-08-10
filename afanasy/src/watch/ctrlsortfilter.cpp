@@ -62,7 +62,7 @@ const char * CtrlSortFilter::TNAMES_SHORT[] = {
 CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 		int * i_sorttype1, bool * i_sortascending1,
 		int * i_sorttype2, bool * i_sortascending2,
-		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, QString * i_filterstring):
+		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, std::string * i_filterstring):
 	QFrame(           i_parent         ),
 	m_sorttype1(      i_sorttype1      ),
 	m_sorttype2(      i_sorttype2      ),
@@ -91,7 +91,7 @@ CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 	connect( m_filter_menu, SIGNAL( sig_changed( int)), this, SLOT( actFilterType( int)));
 	m_filter_menu->setToolTip("RMB to select filtering field.");
 
-	QLineEdit * lineEdit = new QLineEdit( *m_filter, this);
+	QLineEdit * lineEdit = new QLineEdit( afqt::stoq(*m_filter), this);
 
 	m_layout = new QHBoxLayout( this);
 	m_layout->addWidget( m_sort_label);
@@ -106,6 +106,10 @@ CtrlSortFilter::CtrlSortFilter( ListItems * i_parent,
 	setFrameShadow(QFrame::Raised);
 
 	m_filter_re.setPattern( *m_filter);
+	if( *m_filterinclude ) m_filter_re.setInclude();
+	else m_filter_re.setExclude();
+	if( *m_filtermatch ) m_filter_re.setMatch();
+	else m_filter_re.setContain();
 
 	connect( lineEdit, SIGNAL( textChanged( const QString & )), this, SLOT( actFilter( const QString & )) );
 
@@ -212,17 +216,37 @@ void CtrlSortFilter::actSortAscending2()
 
 void CtrlSortFilter::actFilterInclude()
 {
-	if( *m_filterinclude ) *m_filterinclude = false;
-	else *m_filterinclude = true;
+	if( *m_filterinclude )
+	{
+		*m_filterinclude = false;
+		m_filter_re.setExclude();
+	}
+	else
+	{
+		*m_filterinclude = true;
+		m_filter_re.setInclude();
+	}
+
 	selLabel();
+
 	emit filterSettingsChanged();
 }
 
 void CtrlSortFilter::actFilterMacth()
 {
-	if( *m_filtermatch ) *m_filtermatch = false;
-	else *m_filtermatch = true;
+	if( *m_filtermatch )
+	{
+		*m_filtermatch = false;
+		m_filter_re.setContain();
+	}
+	else
+	{
+		*m_filtermatch = true;
+		m_filter_re.setMatch();
+	}
+
 	selLabel();
+
 	emit filterSettingsChanged();
 }
 
@@ -251,19 +275,19 @@ void CtrlSortFilter::actFilterType( int i_type)
 
 void CtrlSortFilter::actFilter( const QString & i_str)
 {
-	if( *m_filter == i_str )
+	std::string str = afqt::qtos( i_str);
+
+	if( *m_filter == str )
 		return;
 
-	QRegExp rx( i_str);
-	if( rx.isValid() == false)
+	std::string err;
+	if( false == m_filter_re.setPattern( str, &err))
 	{
-		m_parernlist->displayError( rx.errorString() );
+		m_parernlist->displayError( afqt::stoq( err));
 		return;
 	}
 
-	*m_filter = i_str;
-	m_filter_re.setPattern( i_str);
-
+	*m_filter = str;
 	selLabel();
 	m_parernlist->displayInfo("Filter pattern changed.");
 	emit filterChanged();
@@ -299,7 +323,7 @@ void CtrlSortFilter::selLabel()
 	m_filter_menu->setText( text);
 
 
-	if((*m_filtertype == TNONE) || m_filter->isEmpty())
+	if((*m_filtertype == TNONE) || m_filter->empty())
 		setBackgroundRole( QPalette::Window);//NoRole );
 	else
 		setBackgroundRole( QPalette::Link );

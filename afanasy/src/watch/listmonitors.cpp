@@ -28,7 +28,7 @@ bool    ListMonitors::ms_SortAscending2 = true;
 int     ListMonitors::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListMonitors::ms_FilterInclude  = true;
 bool    ListMonitors::ms_FilterMatch    = false;
-QString ListMonitors::ms_FilterString   = "";
+std::string ListMonitors::ms_FilterString   = "";
 
 ListMonitors::ListMonitors( QWidget* parent):
 	ListNodes(  parent, "monitors")

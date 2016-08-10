@@ -1,5 +1,7 @@
 #include "listitems.h"
 
+#include "../libafanasy/regexp.h"
+
 #include "buttonpanel.h"
 #include "item.h"
 #include "modelitems.h"
@@ -194,6 +196,16 @@ void ListItems::getItemInfo( const std::string & i_mode)
 	str << "}}";
 
 	Watch::sendMsg( af::jsonMsg( str));
+}
+
+void ListItems::setParameterRE( const std::string & i_name, const std::string & i_value)
+{
+	std::string err;
+
+	if( af::RegExp::Validate( i_value, &err))
+		setParameter( i_name, i_value, true);
+	else
+		displayError( afqt::stoq(err));
 }
 
 void ListItems::setParameter( const std::string & i_name, const std::string & i_value, bool i_quoted)

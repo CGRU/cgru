@@ -33,7 +33,7 @@ bool    ListJobs::ms_SortAscending2 = false;
 int     ListJobs::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListJobs::ms_FilterInclude  = true;
 bool    ListJobs::ms_FilterMatch    = false;
-QString ListJobs::ms_FilterString   = "";
+std::string ListJobs::ms_FilterString = "";
 
 int     ListJobs::ms_SortType1_SU      = CtrlSortFilter::TTIMECREATION;
 int     ListJobs::ms_SortType2_SU      = CtrlSortFilter::TTIMERUN;
@@ -42,7 +42,7 @@ bool    ListJobs::ms_SortAscending2_SU = false;
 int     ListJobs::ms_FilterType_SU     = CtrlSortFilter::TUSERNAME;
 bool    ListJobs::ms_FilterInclude_SU  = true;
 bool    ListJobs::ms_FilterMatch_SU    = false;
-QString ListJobs::ms_FilterString_SU = "";
+std::string ListJobs::ms_FilterString_SU = "";
 
 ListJobs::ListJobs( QWidget* parent):
 	ListNodes( parent, "jobs")
@@ -686,14 +686,7 @@ void ListJobs::actHostsMask()
 	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask", afqt::qtos( mask));
+	setParameterRE("hosts_mask", afqt::qtos( mask));
 }
 
 void ListJobs::actHostsMaskExclude()
@@ -706,14 +699,7 @@ void ListJobs::actHostsMaskExclude()
 	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask_exclude", afqt::qtos( mask));
+	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
 }
 
 void ListJobs::actDependMask()
@@ -726,14 +712,7 @@ void ListJobs::actDependMask()
 	QString mask = QInputDialog::getText(this, "Change Depend Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("depend_mask", afqt::qtos( mask));
+	setParameterRE("depend_mask", afqt::qtos( mask));
 }
 
 void ListJobs::actDependMaskGlobal()
@@ -746,14 +725,7 @@ void ListJobs::actDependMaskGlobal()
 	QString mask = QInputDialog::getText(this, "Change Depend Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("depend_mask_global", afqt::qtos( mask));
+	setParameterRE("depend_mask_global", afqt::qtos( mask));
 }
 
 void ListJobs::actNeedOS()
@@ -766,14 +738,7 @@ void ListJobs::actNeedOS()
 	QString mask = QInputDialog::getText(this, "Change OS Needed", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("need_os", afqt::qtos( mask));
+	setParameterRE("need_os", afqt::qtos( mask));
 }
 
 void ListJobs::actNeedProperties()
@@ -786,14 +751,7 @@ void ListJobs::actNeedProperties()
 	QString mask = QInputDialog::getText(this, "Change Properties Needed", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("need_properties", afqt::qtos( mask));
+	setParameterRE("need_properties", afqt::qtos( mask));
 }
 
 void ListJobs::actPostCommand()

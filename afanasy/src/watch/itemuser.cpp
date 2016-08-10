@@ -219,10 +219,10 @@ void ItemUser::setFilterType( int i_type )
 		case CtrlSortFilter::TNONE:
 			break;
 		case CtrlSortFilter::TNAME:
-			m_filter_str = m_name;
+			m_filter_str = afqt::qtos( m_name);
 			break;
 		case CtrlSortFilter::THOSTNAME:
-			m_filter_str = hostname;
+			m_filter_str = afqt::qtos( hostname);
 			break;
 		default:
 			AF_ERR << "Invalid type number = " << i_type;

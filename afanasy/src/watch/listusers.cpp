@@ -30,7 +30,7 @@ bool    ListUsers::ms_SortAscending2 = false;
 int     ListUsers::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListUsers::ms_FilterInclude  = true;
 bool    ListUsers::ms_FilterMatch    = false;
-QString ListUsers::ms_FilterString   = "";
+std::string ListUsers::ms_FilterString = "";
 
 ListUsers::ListUsers( QWidget* parent):
 	ListNodes(  parent, "users")
@@ -341,14 +341,7 @@ void ListUsers::actHostsMask()
 	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask", afqt::qtos( mask));
+	setParameterRE("hosts_mask", afqt::qtos( mask));
 }
 
 void ListUsers::actHostsMaskExclude()
@@ -361,14 +354,7 @@ void ListUsers::actHostsMaskExclude()
 	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask_exclude", afqt::qtos( mask));
+	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
 }
 
 void ListUsers::actDelete() { operation("delete"); }

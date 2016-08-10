@@ -40,7 +40,7 @@ bool    ListRenders::ms_SortAscending2 = false;
 int     ListRenders::ms_FilterType     = CtrlSortFilter::TNAME;
 bool    ListRenders::ms_FilterInclude  = true;
 bool    ListRenders::ms_FilterMatch    = false;
-QString ListRenders::ms_FilterString   = "";
+std::string ListRenders::ms_FilterString = "";
 
 ListRenders::ListRenders( QWidget* parent):
 	ListNodes( parent, "renders")
@@ -561,11 +561,11 @@ void ListRenders::setService( bool enable)
 	bool ok;
 	QString service_mask = QInputDialog::getText(this, caption, "Enter Service Name", QLineEdit::Normal, QString(), &ok);
 	if( !ok) return;
-	
-	QRegExp rx( service_mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
+
+	std::string err;
+	if( false == af::RegExp::Validate( afqt::qtos( service_mask), &err))
 	{
-		displayError( rx.errorString());
+		displayError( afqt::stoq( err));
 		return;
 	}
 	

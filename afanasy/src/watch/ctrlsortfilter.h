@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../libafanasy/regexp.h"
+
 #include "listitems.h"
 
 #include <QAction>
@@ -18,7 +20,7 @@ public:
 	CtrlSortFilter( ListItems * i_parent,
 		int * i_sorttype1, bool * i_sortascending1,
 		int * i_sorttype2, bool * i_sortascending2,
-		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, QString * i_filterstring);
+		int * i_filtertype, bool * i_filterinclude, bool * i_filtermatch, std::string * i_filterstring);
 	~CtrlSortFilter();
 
 	inline void addSortType(   int i_type) { if( i_type < TLAST) m_sort_types.push_back(   i_type); }
@@ -35,14 +37,14 @@ public:
 	inline bool isSortDescending2() const { return !(*m_sortascending2); }
 
 	inline bool isFilterEnabled()       const { return   *m_filtertype != TNONE; }
-	inline bool isFilterEmpty()         const { return    m_filter->isEmpty();   }
-	inline const QString & getFilter()  const { return   *m_filter;         }
+	inline bool isFilterEmpty()         const { return    m_filter->empty();}
 	inline int  getFilterType()         const { return   *m_filtertype;     }
 	inline bool isFilterInclude()       const { return   *m_filterinclude;  }
 	inline bool isFilterExclude()       const { return !(*m_filterinclude); }
 	inline bool isFilterMatch()         const { return   *m_filtermatch;    }
 	inline bool isFilterContain()       const { return !(*m_filtermatch);   }
-	inline const QRegExp & getFilterRE()const { return    m_filter_re;      }
+
+	inline const af::RegExp & getFilterRE() const { return m_filter_re; }
 
 	inline QHBoxLayout * getLayout() { return m_layout;}
 
@@ -113,11 +115,11 @@ private:
 	bool * m_sortascending1;
 	bool * m_sortascending2;
 
-	QString * m_filter;
+	std::string * m_filter;
 	int  * m_filtertype;
 	bool * m_filterinclude;
 	bool * m_filtermatch;
-	QRegExp m_filter_re;
+	af::RegExp m_filter_re;
 
 	CtrlSortFilterMenu * m_sort_menu1;
 	CtrlSortFilterMenu * m_sort_menu2;

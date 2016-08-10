@@ -94,18 +94,18 @@ private:
 	static int     ms_SortType2;
 	static bool    ms_SortAscending1;
 	static bool    ms_SortAscending2;
-	static QString ms_FilterString;
 	static int     ms_FilterType;
 	static bool    ms_FilterInclude;
 	static bool    ms_FilterMatch;
+	static std::string ms_FilterString;
 
 	// Sorting filtering settings for super user:
 	static int     ms_SortType1_SU;
 	static int     ms_SortType2_SU;
 	static bool    ms_SortAscending1_SU;
 	static bool    ms_SortAscending2_SU;
-	static QString ms_FilterString_SU;
 	static int     ms_FilterType_SU;
 	static bool    ms_FilterInclude_SU;
 	static bool    ms_FilterMatch_SU;
+	static std::string ms_FilterString_SU;
 };

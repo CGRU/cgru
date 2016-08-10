@@ -785,19 +785,19 @@ void ItemRender::setFilterType( int i_type )
 		case CtrlSortFilter::TNONE:
 			break;
 		case CtrlSortFilter::TNAME:
-			m_filter_str = m_name;
+			m_filter_str = afqt::qtos( m_name);
 			break;
 		case CtrlSortFilter::TUSERNAME:
-	        m_filter_str = m_username;
+	        m_filter_str = afqt::qtos( m_username);
 			break;
 		case CtrlSortFilter::TTASKUSER:
-	        m_filter_str = m_tasksusers;
+	        m_filter_str = afqt::qtos( m_tasksusers);
 			break;
 		case CtrlSortFilter::TENGINE:
-	        m_filter_str = m_engine;
+	        m_filter_str = afqt::qtos( m_engine);
 			break;
 		case CtrlSortFilter::TADDRESS:
-	        m_filter_str = m_address_str;
+	        m_filter_str = afqt::qtos( m_address_str);
 			break;
 		default:
 			AF_ERR << "Invalid type number = " << i_type;

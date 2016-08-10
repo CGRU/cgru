@@ -48,8 +48,8 @@ private:
 	static int     ms_SortType2;
 	static bool    ms_SortAscending1;
 	static bool    ms_SortAscending2;
-	static QString ms_FilterString;
 	static int     ms_FilterType;
 	static bool    ms_FilterInclude;
 	static bool    ms_FilterMatch;
+	static std::string ms_FilterString;
 };
