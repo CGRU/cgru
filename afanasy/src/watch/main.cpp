@@ -6,8 +6,9 @@
 #include "monitorhost.h"
 #include "watch.h"
 
-#include <QtGui/QIcon>
 #include <QApplication>
+#include <QtGlobal>
+#include <QtGui/QIcon>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -66,7 +67,11 @@ int main(int argc, char *argv[])
 
    QApplication app(argc, argv);
    app.setWindowIcon( QIcon( afqt::stoq( ENV.getCGRULocation()) + "/icons/afwatch.png"));
+	#if QT_VERSION >= 0x050000
+	app.setStyle("fusion");
+	#else
 	app.setStyle("plastique");
+	#endif
 
 	MonitorHost monitor;
 
