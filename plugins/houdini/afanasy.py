@@ -39,6 +39,7 @@ class BlockParameters:
         self.fullrangedepend = False
         self.numeric = True
         self.frame_first, self.frame_last, self.frame_inc = frame_range
+        self.auxargs = ''
         self.tasks_names = []
         self.tasks_cmds = []
         self.tasks_previews = []
@@ -85,6 +86,7 @@ class BlockParameters:
             self.depend_mask = str(afnode.parm('depend_mask').eval())
             self.depend_mask_global = str(
                 afnode.parm('depend_mask_global').eval())
+
 
         # Process frame range:
         opname = afnode.path()
@@ -174,6 +176,7 @@ class BlockParameters:
                 self.frame_pertask = 1
                 self.parser = "mantra"
 
+            self.cmd += '%(auxargs)s'
             self.cmd += ' "%(hipfilename)s"'
             self.cmd += ' "%s"' % ropnode.path()
 
@@ -265,9 +268,13 @@ class BlockParameters:
                 print('Generating command block from "%s"' %
                       (self.afnode.path()))
 
+        auxargs = self.auxargs
+        # Place hipfilename and auxargs
+        cmd = self.cmd % vars()
+
         block = af.Block(self.name, self.type)
         block.setParser(self.parser)
-        block.setCommand(self.cmd % vars(), self.cmd_useprefix)
+        block.setCommand( cmd, self.cmd_useprefix)
         if self.preview != '':
             block.setFiles([self.preview])
 
@@ -420,10 +427,12 @@ class BlockParameters:
 
 
 def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
-    params = []
-    if ropnode is not None and ropnode.type().name() == 'ifd' and afnode.parm('sep_enable').eval():
 
-        # Mantra separate render:
+    params = []
+
+    if ropnode is not None and ropnode.type().name() == 'ifd' and afnode.parm('sep_enable').eval():
+    # Case mantra separate render:
+
         block_generate = \
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
         blockname = block_generate.name
@@ -577,6 +586,30 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         if run_rop:
             params.append(block_generate)
 
+    elif len(str(afnode.parm('ds_node').eval())):
+    # Case distribute simulation:
+        ds_node_path = str( afnode.parm('ds_node').eval())
+        ds_node = hou.node( ds_node_path)
+        if not ds_node:
+            hou.ui.displayMessage('No such control node: "%s"' % ds_node_path)
+            return
+        parms = ['address','port','slice']
+        for parm in parms:
+            if not ds_node.parm( parm):
+                hou.ui.displayMessage('Control node "%s" does not have "%s" parameter' % (ds_node_path, parm))
+                return
+        ds_num_slices = int( afnode.parm('ds_num_slices').eval())
+        for s in range( 0, ds_num_slices):
+            par = BlockParameters( afnode, ropnode, subblock, prefix, frame_range)
+            par.name += '-s%d' % s
+            par.frame_pertask = par.frame_last - par.frame_first + 1
+            par.auxargs = ' --ds_node "%s"' % ds_node_path
+            par.auxargs += ' --ds_address "%s"' % str(afnode.parm('ds_address').eval())
+            par.auxargs += ' --ds_port %d' % int(afnode.parm('ds_port').eval())
+            par.auxargs += ' --ds_slice %d' % s
+            params.append( par)
+
+
     else:
         params.append(
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
@@ -613,6 +646,14 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
     for node in connections:
         if node is not None:
             nodes.append(node)
+
+    output_driver_path = afnode.parm('output_driver').eval()
+    if output_driver_path:
+        output_driver = hou.node(output_driver_path)
+        if output_driver:
+            nodes.insert( 0, output_driver)
+        else:
+            hou.ui.displayMessage('Can`t find output drive node: "%s"' % output_driver_path)
 
     if afnode.parm('cmd_mode').eval():
         nodes.append(None)
@@ -682,10 +723,10 @@ def render(afnode):
     else:
         hou.ui.displayMessage(
             'No tasks found for:'
-            '\n'
-            '%s'
-            '\n'
-            'Is it connected to some valid ROP node?' % afnode.path()
+            '\n%s'
+            '\nIs it connected to some valid ROP node?'
+            '\nOr valid Output Driver should be specified.'
+            % afnode.path()
         )
 
 

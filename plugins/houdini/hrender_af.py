@@ -10,14 +10,18 @@ import parsers.hbatch
 import hou
 
 parser = OptionParser(usage="usage: %prog [options] hip_name rop_name", version="%prog 1.0")
-parser.add_option('-s', '--start', dest='start', type='float', help='Start frame number.')
-parser.add_option('-e', '--end', dest='end', type='float', help='End frame number.')
-parser.add_option('-b', '--by', dest='by', type='float', help='Frame increment.')
-parser.add_option('-t', '--take', dest='take', type='string', help='Take name.')
-parser.add_option('-o', '--out', dest='output', type='string', help='Output file.')
-parser.add_option('--diskfile', dest='diskfile', type='string', help='Set to generate this file only.')
-parser.add_option('--numcpus', dest='numcpus', type='int', help='Number of CPUs.')
-parser.add_option('-i', '--ignore_inputs', action='store_true', dest='ignore_inputs', default=False, help='Ignore inputs')
+parser.add_option('-s', '--start',         dest='start',         type='float',  help='Start frame number.')
+parser.add_option('-e', '--end',           dest='end',           type='float',  help='End frame number.')
+parser.add_option('-b', '--by',            dest='by',            type='float',  help='Frame increment.')
+parser.add_option('-t', '--take',          dest='take',          type='string', help='Take name.')
+parser.add_option('-o', '--out',           dest='output',        type='string', help='Output file.')
+parser.add_option(      '--diskfile',      dest='diskfile',      type='string', help='Set to generate this file only.')
+parser.add_option(      '--numcpus',       dest='numcpus',       type='int',    help='Number of CPUs.')
+parser.add_option(      '--ds_node',       dest='ds_node',       type='string', help='Distribute simulation control node.')
+parser.add_option(      '--ds_address',    dest='ds_address',    type='string', help='Distribute simulation tracker address.')
+parser.add_option(      '--ds_port',       dest='ds_port',       type='int',    help='Distribute simulation tracker port.')
+parser.add_option(      '--ds_slice',      dest='ds_slice',      type='int',    help='Distribute simulation slice number.')
+parser.add_option('-i', '--ignore_inputs', dest='ignore_inputs', action='store_true', default=False, help='Ignore inputs')
 
 options, args = parser.parse_args()
 
@@ -30,15 +34,16 @@ else:
     hip = args[0]
     rop = args[1]
 
-start = options.start
-end = options.end
-by = options.by
-take = options.take
-diskfile = options.diskfile
-numcpus = options.numcpus
-output = options.output
+
+start        = options.start
+end          = options.end
+by           = options.by
+take         = options.take
+diskfile     = options.diskfile
+numcpus      = options.numcpus
+output       = options.output
 ignoreInputs = options.ignore_inputs
-# print ignore_inputs
+
 
 # Loading HIP file, and force HIP variable:
 force_hip = True  # not sure, we need to force HIP variable.
@@ -154,7 +159,9 @@ elif drivertypename == 'rib':
                     progress.set(command)
                 except:
                     print('Failed, frame progress not available.')
+
 elif drivertypename == "wedge":
+
     ropnode.parm('wrange').set(1)
     ropnode.parm('wedgenum').set(start)
     driverpath = ropnode.parm('driver').eval()
@@ -165,8 +172,21 @@ elif drivertypename == "wedge":
             if progress:
                 progress.set(1)
 
+
+#
+# Distribute simulation:
+#
+ds_node = hou.node( options.ds_node)
+if ds_node is not None:
+    ds_node.parm('address').set( options.ds_address )
+    ds_node.parm('port'   ).set( options.ds_port    )
+    ds_node.parm('slice'  ).set( options.ds_slice   )
+
+
+# Set take, if specified:
 if take is not None and len(take) > 0:
     hou.hscript('takeset ' + take)
+
 
 # If end wasn't specified, render single frame
 if end is None:
