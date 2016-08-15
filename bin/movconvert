@@ -1,3 +1,3 @@
 #!/bin/bash
 
-$CGRU_PYTHONEXE $CGRU_LOCATION/utilities/moviemaker/movconvert.py "$@"
+"$CGRU_PYTHONEXE" "$CGRU_LOCATION/utilities/moviemaker/movconvert.py" "$@"

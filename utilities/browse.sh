@@ -2,13 +2,13 @@
 
 browsers="caja thunar nautilus konqueror gnome-commander krusader"
 
-pushd `dirname $0` > /dev/null
+pushd "$(dirname "$0")" > /dev/null
 cd ..
 cgru="$PWD"
 popd > /dev/null
 
-folder=$1
-[ -z "$folder" ] && folder=$cgru
+folder="$1"
+[ -z "$folder" ] && folder="$cgru"
 [ -d "$folder" ] || folder="$cgru/$folder"
 
 if [ ! -d "$folder" ]; then
@@ -16,7 +16,7 @@ if [ ! -d "$folder" ]; then
    exit 1
 fi
 
-if [ `uname` == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
    open "$folder"
    exit 0
 fi

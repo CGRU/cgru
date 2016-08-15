@@ -1,8 +1,8 @@
 #!/bin/bash
 
-cd `dirname "$0"`
+cd "$(dirname "$0")"
 
-dest=$1
+dest="$1"
 
 if [ -z "$dest" ]; then
    echo "Specify destination."
@@ -10,7 +10,7 @@ if [ -z "$dest" ]; then
 fi
 
 function createDir(){
-   [ -d $1 ] || mkdir -p $1
+   [ -d "$1" ] || mkdir -p "$1"
 }
 
 exclude="$exclude --exclude 'config.json'"
@@ -38,60 +38,60 @@ function rcopy()
    eval "rsync -rL $exclude $1 $2;"
 }
 
-createDir $dest
-pushd $dest > /dev/null
-dest=$PWD
+createDir "$dest"
+pushd "$dest" > /dev/null
+dest="$PWD"
 cd ..
-destUP=$PWD
+destUP="$PWD"
 popd > /dev/null
 
 cd ../..
 examples/clear.sh
-cgru=$PWD
+cgru="$PWD"
 
-copy . $dest
+copy . "$dest"
 
-rcopy bin $dest
-rcopy examples $dest
-rcopy icons $dest
-rcopy lib $dest
-rcopy rules $dest
-rcopy software_setup $dest
-rcopy start $dest
+rcopy bin "$dest"
+rcopy examples "$dest"
+rcopy icons "$dest"
+rcopy lib "$dest"
+rcopy rules "$dest"
+rcopy software_setup "$dest"
+rcopy start "$dest"
 
-copy afanasy $dest/afanasy
-rcopy afanasy/bin $dest/afanasy
-rcopy afanasy/browser $dest/afanasy
-rcopy afanasy/icons $dest/afanasy
-rcopy afanasy/init $dest/afanasy
-rcopy afanasy/python $dest/afanasy
-rcopy afanasy/statistics $dest/afanasy
+copy afanasy "$dest/afanasy"
+rcopy afanasy/bin "$dest/afanasy"
+rcopy afanasy/browser "$dest/afanasy"
+rcopy afanasy/icons "$dest/afanasy"
+rcopy afanasy/init "$dest/afanasy"
+rcopy afanasy/python "$dest/afanasy"
+rcopy afanasy/statistics "$dest/afanasy"
 
-copy utilities $dest/utilities
-rcopy utilities/afstarter $dest/utilities
-rcopy utilities/keeper $dest/utilities
-rcopy utilities/moviemaker $dest/utilities
-rcopy utilities/regexp $dest/utilities
+copy utilities "$dest/utilities"
+rcopy utilities/afstarter "$dest/utilities"
+rcopy utilities/keeper "$dest/utilities"
+rcopy utilities/moviemaker "$dest/utilities"
+rcopy utilities/regexp "$dest/utilities"
 
-createDir $dest/plugins
-rcopy plugins/afterfx $dest/plugins
-rcopy plugins/c4d $dest/plugins
-rcopy plugins/blender $dest/plugins
-rcopy plugins/fusion $dest/plugins
-rcopy plugins/houdini $dest/plugins
-rcopy plugins/natron $dest/plugins
-rcopy plugins/nuke $dest/plugins
-rcopy plugins/max $dest/plugins
-rcopy plugins/xsi $dest/plugins
+createDir "$dest/plugins"
+rcopy plugins/afterfx "$dest/plugins"
+rcopy plugins/c4d "$dest/plugins"
+rcopy plugins/blender "$dest/plugins"
+rcopy plugins/fusion "$dest/plugins"
+rcopy plugins/houdini "$dest/plugins"
+rcopy plugins/natron "$dest/plugins"
+rcopy plugins/nuke "$dest/plugins"
+rcopy plugins/max "$dest/plugins"
+rcopy plugins/xsi "$dest/plugins"
 
-copy plugins/maya $dest/plugins/maya
-rcopy plugins/maya/afanasy $dest/plugins/maya
-rcopy plugins/maya/icons $dest/plugins/maya
-rcopy plugins/maya/mel $dest/plugins/maya
-[ -d plugins/maya/mll ] && rcopy plugins/maya/mll $dest/plugins/maya
+copy plugins/maya "$dest/plugins/maya"
+rcopy plugins/maya/afanasy "$dest/plugins/maya"
+rcopy plugins/maya/icons "$dest/plugins/maya"
+rcopy plugins/maya/mel "$dest/plugins/maya"
+[ -d plugins/maya/mll ] && rcopy plugins/maya/mll "$dest/plugins/maya"
 
-CGRU_VERSION=`cat version.txt`
+CGRU_VERSION="$(cat version.txt)"
 cd utilities
-source ./getrevision.sh $cgru
+source ./getrevision.sh "$cgru"
 #echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
-echo "${CGRU_REVISION}" > $dest/revision.txt
+echo "${CGRU_REVISION}" > "$dest/revision.txt"

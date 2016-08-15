@@ -9,16 +9,14 @@ export PYTHONPATH="${MAYA_CGRU_LOCATION}:${PYTHONPATH}"
 
 # Locate Maya:
 MAYA_INSTALL_DIR="/usr/autodesk"
-MAYA_FOLDERS=`ls "$MAYA_INSTALL_DIR"`
 MAYA_VERSION=""
 MAYA_LOCATION=""
 MAYA_EXEC=""
-for MAYA_FOLDER in $MAYA_FOLDERS ;
-do
-   if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, "maya")}'`" == "1" ]; then
+for MAYA_FOLDER in "$MAYA_INSTALL_DIR"/*/; do
+    if [ "$(echo "$MAYA_FOLDER" | gawk '{print match( \$1, "maya")}')" == "1" ]; then
       MAYA_LOCATION="${MAYA_INSTALL_DIR}/${MAYA_FOLDER}"
-      MAYA_VERSION="`echo $MAYA_FOLDER | gawk '{print substr( \$1, 5, 4)}'`"
-   fi
+      MAYA_VERSION="$(echo "$MAYA_FOLDER"| gawk '{print substr( \$1, 5, 4)}')"
+    fi
 done
 
 export MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"

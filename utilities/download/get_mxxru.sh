@@ -5,9 +5,9 @@ location="http://rubyforge.org/frs/download.php/53915"
 filename="Mxx_ru-$ver.gem"
 link="$location/$filename"
 
-if [ -f $filename ]; then
+if [ -f "$filename" ]; then
    echo "File $filename already exists."
    exit
 fi
 
-wget $link
+wget "$link"

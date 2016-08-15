@@ -13,7 +13,7 @@ C4D_USER_FOLDER_LOCATION="${HOME}/Library/Preferences/MAXON"
 # Find the most recent C4D-Version-User-Folder
 STDOUT=$(ls -1 "$C4D_USER_FOLDER_LOCATION")
 while read line; do
-    if [ "`echo $line | awk '{print match( \$1, "CINEMA")}'`" == "1" ]; then
+    if [ "$(echo "$line" | awk '{print match( \$1, "CINEMA")}')" == "1" ]; then
         C4D_USER_FOLDER="${C4D_USER_FOLDER_LOCATION}/${line}"
     fi
 done <<< "$STDOUT"
@@ -26,12 +26,12 @@ export C4D_LOCATION
 export C4D_USER_FOLDER
 
 # CGRU for C4D add-ons location, override it, or simple launch from current folder as an example
-export C4D_CGRU_LOCATION=$CGRU_LOCATION/plugins/c4d
-export C4D_CGRU_SCRIPTS_LOCATION=$C4D_CGRU_LOCATION/scripts
+export C4D_CGRU_LOCATION="$CGRU_LOCATION/plugins/c4d"
+export C4D_CGRU_SCRIPTS_LOCATION="$C4D_CGRU_LOCATION/scripts"
 
 # Local ones on client
-export C4D_PLUGIN_LOCATION=${C4D_USER_FOLDER}/plugins
-export C4D_PREFERENCES_LOCATION=${C4D_USER_FOLDER}/prefs
+export C4D_PLUGIN_LOCATION="${C4D_USER_FOLDER}/plugins"
+export C4D_PREFERENCES_LOCATION="${C4D_USER_FOLDER}/prefs"
 
 C4D_INSTALL_DIR="/Applications/MAXON"
 
@@ -39,7 +39,7 @@ C4D_INSTALL_DIR="/Applications/MAXON"
 # Find the most recent C4D-Version
 STDOUT=$(ls -1 "$C4D_INSTALL_DIR")
 while read line; do
-    if [ "`echo $line | awk '{print match( \$1, "CINEMA")}'`" == "1" ]; then
+    if [ "$(echo "$line" | awk '{print match( \$1, "CINEMA")}')" == "1" ]; then
         C4D_LOCATION="${C4D_INSTALL_DIR}/${line}/CINEMA 4D.app/Contents/MacOS"
     fi
 done <<< "$STDOUT"
@@ -47,7 +47,7 @@ done <<< "$STDOUT"
 
 #override c4d location based on locate_nuke.sh
 locate_c4d="$CGRU_LOCATION/software_setup/locate_c4d.sh"
-[ -f $locate_c4d ] && source $locate_c4d
+[ -f "$locate_c4d" ] && source "$locate_c4d"
 
 
 # Define that the c4d-render-script can get found. Gets used by "c4drender"

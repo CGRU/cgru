@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prefix=$PWD
+prefix="$PWD"
 
 export CPPFLAGS="-fPIC"
 
@@ -12,7 +12,7 @@ fi
 
 make clean
 
-./configure --prefix=$prefix --exec-prefix=$prefix --enable-shared=
+./configure --prefix="$prefix" --exec-prefix="$prefix" --enable-shared=
 
 make
 

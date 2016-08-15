@@ -1,37 +1,37 @@
 #!/bin/bash
 
-libogg=$PWD/libogg
+libogg="$PWD/libogg"
 cd libogg-*
 export LDFLAGS="-B/usr/lib/gold-ld/"
 if [ ! -z "$1" ]; then
    ./configure --help
 else
-   ./configure --prefix=$libogg --enable-shared=
+   ./configure --prefix="$libogg" --enable-shared=
    make && make install
 fi
 
 cd ..
 
-libvorbis=$PWD/libvorbis
+libvorbis="$PWD/libvorbis"
 cd libvorbis-*
 export CFLAGS="-B/usr/lib/gold-ld/ -I$libogg/include"
 export LDFLAGS="-B/usr/lib/gold-ld/ -L$libogg/lib -L$libogg/lib64"
 if [ ! -z "$1" ]; then
    ./configure --help
 else
-   ./configure --prefix=$libvorbis --enable-shared=
+   ./configure --prefix="$libvorbis" --enable-shared=
    make && make install
 fi
 
 cd ..
 
-libtheora=$PWD/libtheora
+libtheora="$PWD/libtheora"
 cd libtheora-*
 export CFLAGS="-B/usr/lib/gold-ld/ -I$libogg/include"
 export LDFLAGS="-B/usr/lib/gold-ld/ -L$libogg/lib -L$libogg/lib64"
 if [ ! -z "$1" ]; then
    ./configure --help
 else
-   ./configure --prefix=$libtheora --enable-shared=
+   ./configure --prefix="$libtheora" --enable-shared=
    make && make install
 fi

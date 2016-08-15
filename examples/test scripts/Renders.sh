@@ -3,14 +3,14 @@
 RENDER="afrender"
 export AF_USERNAME="renderer"
 
-count=1
-if [ "" != "$2" ]; then
-   count=$2
+HOST=$HOSTNAME
+if [ "$1" != "" ]; then
+   HOST=$1
 fi
 
-HOST=$HOSTNAME
-if [ "" != "$1" ]; then
-   HOST=$1
+count=1
+if [ "$2" != "" ]; then
+   count=$2
 fi
 
 source ./setup.sh

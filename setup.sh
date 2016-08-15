@@ -18,7 +18,7 @@ else
 fi
 
 # Get CGRU version:
-export CGRU_VERSION=`cat ${CGRU_LOCATION}/version.txt`
+export CGRU_VERSION=$(cat "${CGRU_LOCATION}"/version.txt)
 echo "CGRU_VERSION $CGRU_VERSION : '$CGRU_LOCATION'"
 
 # Source custom setup if any exists:
@@ -26,5 +26,5 @@ for setup_file in setup_*.sh
 do
 	[ -z "$setup_file"  ] && continue
 	[ -f "$setup_file"  ] || continue
-	source ./$setup_file ""
+	source ./"$setup_file" ""
 done

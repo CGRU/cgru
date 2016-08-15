@@ -16,14 +16,7 @@ export AF_PYTHON
 export PYTHONPATH
 
 # Source custom setup if any exists:
-setup_files=`ls setup_*.sh`
-if [ ! -z "$setup_files" ] ; then
-   for setup_file in $setup_files; do
-      [ -z "$setup_file" ] && continue
-      [ -f "$setup_file" ] || continue
-      source ./$setup_file ""
-   done
-fi
+find -maxdepth 1 -type f -name "setup_*.sh" -exec source {} \;
 
 # Override username:
 # export AF_USERNAME=$USER

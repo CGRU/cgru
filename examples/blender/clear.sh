@@ -2,7 +2,7 @@
 
 echo "Clearing Blender examples in '$PWD'"
 
-for scene in `ls scene.blend*`; do
+for scene in scene.blend*; do
    [ $scene == "scene.blend" ] && continue
    rm -fv $scene
 done

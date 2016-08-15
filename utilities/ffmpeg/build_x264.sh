@@ -1,13 +1,13 @@
 #!/bin/bash
 
 yasm_ver=1.2.0
-yasm_folder=$PWD/yasm-$yasm_ver
-if [ -d $yasm_folder ]; then
+yasm_folder="$PWD/yasm-$yasm_ver"
+if [ -d "$yasm_folder" ]; then
    echo "Using $yasm_folder"
    export PATH="$yasm_folder:$PATH"
 fi
 
-prefix=$PWD
+prefix="$PWD"
 
 cd x264
 
@@ -16,6 +16,6 @@ if [ ! -z "$1" ]; then
    exit
 fi
 
-./configure --enable-static --prefix=$prefix --exec-prefix=$prefix
+./configure --enable-static --prefix="$prefix" --exec-prefix="$prefix"
 make
 #make install

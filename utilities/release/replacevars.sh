@@ -1,9 +1,9 @@
 #!/bin/bash
 
-input=$1
-output=$2
+input="$1"
+output="$2"
 
-if [ ! -f ${input} ]; then
+if [ ! -f "${input}" ]; then
    echo "File '$input' does not exist."
    echo "$0: No input file found."
    exit 1

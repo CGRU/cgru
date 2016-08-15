@@ -8,9 +8,8 @@ for arg in "$@"; do
 	fi
 done
 
-cgru=`dirname $0`/../..
-pushd $cgru > /dev/null
-cgru=$PWD
+pushd "$(dirname "$0")/../.." > /dev/null
+cgru="$PWD"
 popd > /dev/null
 
 dirs_nonempty="plugins/maya/mll"
@@ -23,11 +22,11 @@ afanasy_bin="$cgru/afanasy/bin"
 # Check non-empty folders:
 for dir in $dirs_nonempty; do
 	dir="$cgru/$dir"
-	if [ ! -d $dir ]; then
+	if [ ! -d "$dir" ]; then
 		echo "Folder '$dir' does not exist."
 		exitStatus=$exitStatusError
 	fi
-	if [ -z "`ls $dir`" ]; then
+	if [ -z "$(ls $dir)" ]; then
 		echo "Folder '$dir' is empty."
 		exitStatus=$exitStatusError
 	fi
@@ -45,4 +44,3 @@ for bin in $bins; do
 done
 
 exit $exitStatus
-

@@ -3,11 +3,7 @@
 package="ImageMagick"
 location="ftp://ftp.imagemagick.org/pub/ImageMagick"
 
-allfiles=`ls`
-for afile in $allfiles; do
-   [ -d "$afile" ] || continue
-   rm -rvf $afile
-done
+find -maxdepth 1 -type d -exec rm -rvf "{}" \;
 
 archive="$package.tar.gz"
 if [ -f $archive ] ; then
@@ -15,12 +11,11 @@ if [ -f $archive ] ; then
 else
    wget "$location/$archive"
 fi
-tar xvzf $archive
+tar xvzf "$archive"
 
-allfiles=`ls`
-for afile in $allfiles; do
+for afile in ./*; do
    [ -d "$afile" ] || continue
-   [ "`echo $afile | awk '{print match( \$1, "ImageMagick")}'`" == "1" ] && ImageMagick=$afile
+   [ "$(echo "$afile" | awk '{print match( \$1, "ImageMagick")}')" == "1" ] && ImageMagick="$afile"
 done
 
-ln -svf $ImageMagick $package
+ln -svf "$ImageMagick" "$package"

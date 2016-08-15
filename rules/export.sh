@@ -1,11 +1,10 @@
 #!/bin/bash
 
-cd `dirname $0`
-cd ..
+cd "$(dirname "$0")/.."
 
 dest=$1
 [ -z "$dest" ] && dest=cgru.info
-cgru=$PWD
+cgru="$PWD"
 
 credentials=rules/export_credentials.sh
 if [ ! -f $credentials ]; then

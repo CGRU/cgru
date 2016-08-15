@@ -1,3 +1,3 @@
 #!/bin/bash
 
-$CGRU_PYTHONEXE $CGRU_LOCATION/utilities/wolwake.py "$@"
+"$CGRU_PYTHONEXE" "$CGRU_LOCATION/utilities/wolwake.py" "$@"

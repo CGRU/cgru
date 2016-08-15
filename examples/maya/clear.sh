@@ -2,7 +2,7 @@
 
 echo "Clearing Maya examples in '$PWD'"
 
-for scene in `ls scene.mb*`; do
+for scene in scene.mb*; do
    [ $scene == "scene.mb" ] && continue
    rm -fv $scene
 done
