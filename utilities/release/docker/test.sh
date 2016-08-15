@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-pushd `pwd`> /dev/null
-cd `dirname $0`
+pushd "$PWD" > /dev/null
+cd "$(dirname "$0")"
 
 function launch {
-	docker-compose -f test.yml $OPTS
+	docker-compose -f test.yml "$OPTS"
 }
 
 export COMPOSE_PROJECT_NAME="cgru"

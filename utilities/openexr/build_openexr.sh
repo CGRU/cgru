@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prefix=$PWD
+prefix="$PWD"
 
 CPPFLAGS="-fPIC -I$prefix/include -include string.h"
 
@@ -17,7 +17,7 @@ fi
 
 make clean
 
-./configure --disable-ilmbasetest --prefix=$prefix --exec-prefix=$prefix --enable-shared=
+./configure --disable-ilmbasetest --prefix="$prefix" --exec-prefix="$prefix" --enable-shared=
 
 make
 

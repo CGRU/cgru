@@ -8,5 +8,4 @@ mkdir "${dest}"
 
 [ -d "${dest}" ] || exit 1
 
-./export.sh $dest
-
+./export.sh "$dest"

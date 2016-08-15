@@ -22,26 +22,26 @@ export NATRON_AF_RENDER="natron -b"
 
 
 # Setup Natron installation location:
-if [ "`uname`" == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
 	NATRON_INSTALL_DIR="/Applications"
 else
 	NATRON_INSTALL_DIR="/opt"
 fi
 
 NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron"
-if [ `uname` == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
 	NATRON_LOCATION="${NATRON_INSTALL_DIR}/Natron.app/Contents/MacOS/"
 fi
 NATRON_EXEC="Natron"
 
 export NATRON_EXEC="${NATRON_LOCATION}/${NATRON_EXEC}"
 
-export APP_DIR=$NATRON_LOCATION
-export APP_EXE=$NATRON_EXEC
+export APP_DIR="$NATRON_LOCATION"
+export APP_EXE="$NATRON_EXEC"
 
 
 #override natron location based on locate_natron.sh
 locate_natron="$CGRU_LOCATION/software_setup/locate_natron.sh"
-[ -f $locate_natron ] && source $locate_natron
+[ -f "$locate_natron" ] && source "$locate_natron"
 
 echo "NATRON = '${APP_EXE}'"

@@ -23,7 +23,7 @@ afroot=@AFROOT@
 # Afanasy "nonroot" user:
 nonrootuser=render
 if [ -f "${afroot}/nonrootuser" ]; then
-   nonrootuser=`cat "${afroot}/nonrootuser"`
+   nonrootuser=$(cat "${afroot}/nonrootuser")
 else
    echo "${nonrootuser}" > "${afroot}/nonrootuser"
 fi
@@ -42,7 +42,7 @@ if [ ! -d "$tmpdir" ]; then
 fi
 
 # Afanasy host name:
-if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=`hostname`; fi
+if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=$(hostname); fi
 
 #
 # PID file:
@@ -72,17 +72,17 @@ logrotate() {
 
 function checkNOFILE() {
     nofile=10240
-    if (( `ulimit -n` < $nofile )); then
-        echo "Process file descriptors limit is `ulimit -n` too low."
+    if (( $(ulimit -n) < nofile )); then
+        echo "Process file descriptors limit is $(ulimit -n) too low."
         echo "For high server load trying to increase it to $nofile."
         ulimit -n $nofile
         if [ $? != 0 ]; then
             echo "Can't raise this limit."
         else
-            echo "Process file descriptors limit changed to `ulimit -n`."
+            echo "Process file descriptors limit changed to $(ulimit -n)."
         fi
     else
-        echo "Process file descriptors limit is `ulimit -n`."
+        echo "Process file descriptors limit is $(ulimit -n)."
     fi
 }
 
@@ -92,7 +92,7 @@ startcmd="$afroot/init/afstart.sh $execfile $logfile"
 function start(){
    echo "Starting $afapp..."
    if [ -f $pidfile ]; then
-      kill `cat $pidfile`
+      kill "$(cat $pidfile)"
       rm -fv $pidfile
    fi
 
@@ -127,7 +127,7 @@ function stop(){
       echo "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
       exit 1
    fi
-   kill `cat $pidfile`
+   kill "$(cat $pidfile)"
    if [ $? != 0 ]; then
       echo "Can't kill process."
       exit 1
@@ -144,7 +144,7 @@ function _status(){
       echo "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
       exit 1
    fi
-   PID=`cat $pidfile`
+   PID="$(cat $pidfile)"
    if [ -d "/proc/${PID}" ]; then
       echo "Application '$afapp.$AF_HOSTNAME' is running."
       exit 0

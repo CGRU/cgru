@@ -6,7 +6,7 @@ openexr="../openexr"
 openexr_inc="${openexr}/include/OpenEXR"
 openexr_lib="${openexr}/lib"
 
-if [ -d $openexr_inc ] ; then
+if [ -d "$openexr_inc" ] ; then
 	# Custom include:
 	CPPFLAGS="-I$openexr_inc"
 else

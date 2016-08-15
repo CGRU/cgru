@@ -1,12 +1,12 @@
 #!/bin/bash
 
-for folder in `ls`; do
+for folder in *; do
    [ ! -d $folder ] && continue
-   [ $folder == "qt" ] && continue 
-   cd $folder
+   [ $folder != "qt" ] || continue
+   pushd $folder > /dev/null
    if [ -x build.sh ]; then
       echo "#############################   $folder   #############################"
       ./build.sh
    fi
-   cd ..
+   popd > /dev/null
 done

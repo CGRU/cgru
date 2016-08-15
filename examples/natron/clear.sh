@@ -4,11 +4,11 @@ echo "Clearing Natron examples in '$PWD'"
 
 scenes="scene.ntp"
 for scene in $scenes; do
-   for tmpscene in `ls ${scene}*`; do
+   for tmpscene in ${scene}*; do
       [ $tmpscene == $scene ] && continue
       rm -fv $tmpscene
    done
 done
 
-rm -fv *.mov
+rm -fv ./*.mov
 [ -d render ] && rm -rfv render

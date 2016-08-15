@@ -12,7 +12,7 @@ cgruRoot="../.."
 function rcopy(){ rsync -rL --exclude '.svn' --exclude '.rules' --exclude '__pycache__' --exclude '*.pyc' $1 $2; }
 
 # Version and revision:
-export VERSION_NUMBER=`cat $cgruRoot/version.txt`
+export VERSION_NUMBER="$(cat "$cgruRoot/version.txt")"
 pushd $cgruRoot/utilities > /dev/null
 popd > /dev/null
 
@@ -77,8 +77,7 @@ chmod a+rwx $packages_output_dir
 # Walk in every package folder:
 packages_dirs="$cgruRoot/afanasy/package $cgruRoot/utilities/release/package"
 for packages_dir in $packages_dirs; do
-	packages=`ls "${packages_dir}"`
-	for package in $packages; do
+	for package in ${packages_dir}/*; do
 		[ -d "${packages_dir}/${package}" ] || continue
 		# check copy script:
 		copy_script="${packages_dir}/${package}.sh"
@@ -86,7 +85,7 @@ for packages_dir in $packages_dirs; do
 		echo "Creating package '$package':"
 		# copy files for package, but not control folders:
 		mkdir -p ${tmpdir}/${package}
-		for folder in `ls "${packages_dir}/${package}"`; do
+		for folder in "${packages_dir}/${package}"/*/; do
 			[ "${folder}" == "RPM" ] && continue
 			[ "${folder}" == "DEBIAN" ] && continue
 			folder="${packages_dir}/${package}/${folder}"
@@ -97,7 +96,7 @@ for packages_dir in $packages_dirs; do
 
 #continue
 		# count package size:
-		for i in `du -sk0 ${tmpdir}/${package}`; do size=$i; break; done
+		for i in $(du -sk0 ${tmpdir}/${package}); do size=$i; break; done
 		[ -z $size ] || export SIZE=$size
 
 		# perform package manager specific operations:
@@ -122,7 +121,7 @@ for packages_dir in $packages_dirs; do
 			rpmbuild -bb "RPM/SPECS/${package}.spec" --buildroot "${PWD}/RPM/BUILDROOT"
 			cd $curdir
 			# move package from RPM build directories structure:
-			for folder in `ls ${tmpdir}/${package}/RPM/RPMS`; do
+			for folder in ${tmpdir}/${package}/RPM/RPMS/*/; do
 				mv -f ${tmpdir}/${package}/RPM/RPMS/${folder}/* "${packages_output_dir}"
 			done
 		fi
@@ -138,7 +137,7 @@ done
 archive_name="cgru.${VERSION_NUMBER}.${VERSION_NAME}.tar.gz"
 curdir=$PWD
 cd "${packages_output_dir}"
-tar -cvzf "${archive_name}" *
+tar -cvzf "${archive_name}" ./*
 mv "${archive_name}" "${curdir}/"
 cd "${curdir}"
 chmod a+rwx "${archive_name}"

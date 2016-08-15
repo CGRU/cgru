@@ -8,9 +8,9 @@ function usage(){
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "   `basename $0` [clear|rebuild]"
+   echo "   $(basename "$0") [clear|rebuild]"
    echo "Example:"
-   echo "   `basename $0` rebuild"
+   echo "   $(basename "$0") rebuild"
    exit
 }
 
@@ -47,10 +47,9 @@ for iconsdir in $iconsdirssrc; do
    # Generate png icons from svg if was not:
    if [ ! -d "${src}/icons" ]; then
       echo "Generating icons in '${src}':"
-      tmp=$PWD
-      cd $src
-      ./make.sh   
-      cd $tmp
+      pushd "$src" > /dev/null
+      ./make.sh
+      popd > /dev/null
    fi
 
 done

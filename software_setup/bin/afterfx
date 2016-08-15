@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source $CGRU_LOCATION/software_setup/setup_afterfx.sh
+source "$CGRU_LOCATION/software_setup/setup_afterfx.sh"
 
 "$APP_EXE" "$@"

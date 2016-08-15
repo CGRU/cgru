@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prefix=$PWD/faac
+prefix="$PWD/faac"
 
 cd faac-*
 
@@ -10,7 +10,7 @@ if [ ! -z "$1" ]; then
    ./configure --help
    exit
 else
-   ./configure --prefix=$prefix --enable-shared=
+   ./configure --prefix="$prefix" --enable-shared=
    ../patch_faac.py
    make && make install
 fi

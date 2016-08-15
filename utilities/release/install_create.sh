@@ -17,7 +17,7 @@ packages_uninstall="cgru afanasy-qtgui afanasy-render afanasy-server afanasy-com
 
 if [ -z "${output}" ]; then
 	echo "Error: Output folder not specified."
-	echo "Usage: `basename $0` [folder]"
+	echo "Usage: $(basename "$0") [folder]"
 	exit 1
 fi
 
@@ -47,59 +47,67 @@ else
 	exit 1
 fi
 
-curdir=$PWD
+curdir="$PWD"
 cd "${output}"
 
 function writeInstallDependsAFANASY(){
 	if [ ! -z "${DEPENDS_AFANASY}" ]; then
-		echo "echo Installing AFANASY dependences:" >> $afile
-		echo "${PACKAGE_INSTALL} ${DEPENDS_AFANASY}" >> $afile
-		echo "" >> $afile
+		cat >>"$afile" <<-EOF
+echo Installing AFANASY dependences:
+${PACKAGE_INSTALL} ${DEPENDS_AFANASY}
+
+		EOF
 	fi
 }
 
 function writeInstallDependsQTGUI(){
 	if [ ! -z "${DEPENDS_QTGUI}" ]; then
-		echo "echo Installing QTGUI dependences:" >> $afile
-		echo "${PACKAGE_INSTALL} ${DEPENDS_QTGUI}" >> $afile
-		echo "" >> $afile
+		cat >>"$afile" <<-EOF
+echo Installing QTGUI dependences:
+${PACKAGE_INSTALL} ${DEPENDS_QTGUI}
+
+		EOF
 	fi
 }
 
 function writeInstallDependsCGRU(){
 	if [ ! -z "${DEPENDS_CGRU}" ]; then
-		echo "echo Installing CGRU dependences:" >> $afile
-		echo "${PACKAGE_INSTALL} ${DEPENDS_CGRU}" >> $afile
-		echo "" >> $afile
+		cat >>"$afile" <<-EOF
+echo Installing CGRU dependences:
+${PACKAGE_INSTALL} ${DEPENDS_CGRU}
+
+		EOF
 	fi
 }
 
 function writeInstallPackages(){
 	for package in $*; do
-		package_file=`bash -c "ls ${package}*${extension}"`
+		package_file=$(bash -c "ls ${package}*${extension}")
 		for package_file in $package_file; do break; done
 		if [ -z "${package_file}" ]; then
 			echo "Error: Package '${package}' does not exists."
 			exit 1
 		fi
-		echo "echo Installing ${package_file}" >> $afile
-		echo "${install_cmd} ${package_file}" >> $afile
+		cat >>"$afile" <<-EOF
+echo Installing ${package_file}
+${install_cmd} ${package_file}
+		EOF
 	done
 }
 
-afile=${install_cgru}
+afile="${install_cgru}"
 writeInstallDependsAFANASY
 writeInstallDependsQTGUI
 writeInstallDependsCGRU
-writeInstallPackages ${packages_cgru}
+writeInstallPackages "${packages_cgru}"
 
-afile=${install_afrender}
+afile="${install_afrender}"
 writeInstallDependsAFANASY
-writeInstallPackages ${packages_afrender}
+writeInstallPackages "${packages_afrender}"
 
-afile=${install_afserver}
+afile="${install_afserver}"
 writeInstallDependsAFANASY
-writeInstallPackages ${packages_afserver}
+writeInstallPackages "${packages_afserver}"
 
 for package in ${packages_uninstall}; do
 	echo "${uninstall_cmd} ${package}" >> "${uninstall}"

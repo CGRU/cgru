@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd `dirname $0` > /dev/null
+pushd "$(dirname "$0")" > /dev/null
 if [ -z "$CGRU_LOCATION" ]; then
    cd ../..
    [ -f "./setup.sh" ] && source ./setup.sh

@@ -1,33 +1,33 @@
 #!/bin/bash
 
-pythonver=$1
+pythonver="$1"
 [ -z "$pythonver" ] && pythonver=3.3.2
 
-[ "$2" != "-h" ] && options=$2
+[ "$2" != "-h" ] && options="$2"
 
-pythonsrc=Python-$pythonver$options
+pythonsrc="Python-$pythonver$options"
 if [ ! -d "$pythonsrc" ]; then
    echo "Error: No python sources '$pythonsrc' found."
    exit 1
 fi
 
-pythondir=$PWD/$pythonver$options
+pythondir="$PWD/$pythonver$options"
 
 export CFLAGS=-fPIC
-export CPPFLAGS=$CFLAGS
+export CPPFLAGS="$CFLAGS"
 
-if [ `uname` == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
    echo "Building on Mac OS X:"
    export CFLAGS="-DWITH_NEXT_FRAMEWORK"
 #   extra="--enable-framework"
 fi
 
-cd $pythonsrc
+cd "$pythonsrc"
 
 flags="$flags --prefix=$pythondir"
 flags="$flags --exec-prefix=$pythondir"
 if [ "$options" != "-utf16" ]; then
-   if [[ "$pythonver" > "3" ]]; then
+   if [[ "$pythonver" -ge "3" ]]; then
       flags="$flags --with-wide-unicode"
    else
       flags="$flags --enable-unicode=ucs4"
@@ -40,7 +40,7 @@ if [ "$2" == "-h" ]; then
    echo "FLAGS = \"$flags\""
 else
    echo "FLAGS = \"$flags\""
-   ./configure $flags
+   ./configure "$flags"
    make
    make install
 fi

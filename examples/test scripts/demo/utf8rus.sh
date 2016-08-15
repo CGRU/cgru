@@ -1,13 +1,12 @@
 #!/bin/bash
 
-if [ -z $CGRU_LOCATION ]; then
-   pwd=$PWD
-   cd ../..
+if [ -z "$CGRU_LOCATION" ]; then
+   pushd ../../
    source setup.sh
-   cd $pwd
+   popd
 fi
 
-source $CGRU_LOCATION/utilities/python/setup.sh
+source "$CGRU_LOCATION/utilities/python/setup.sh"
 
 cd ..
 

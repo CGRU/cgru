@@ -1,6 +1,6 @@
 #!/bin/bash
 
-prefix=$PWD/lame
+prefix="$PWD/lame"
 
 cd lame-*
 
@@ -10,6 +10,6 @@ if [ ! -z "$1" ]; then
    ./configure --help
    exit
 else
-   ./configure --prefix=$prefix --enable-shared=
+   ./configure --prefix="$prefix" --enable-shared=
    make && make install
 fi

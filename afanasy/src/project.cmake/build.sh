@@ -8,7 +8,7 @@ src=$PWD
 cd ../..
 cgru=$PWD
 cd utilities
-source ./getrevision.sh $src
+source ./getrevision.sh "$src"
 [ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh > /dev/null
 
 # Go to initial folder:
@@ -19,8 +19,8 @@ options=""
 sql="REQUIRED"
 gui="YES"
 for arg in "$@"; do
-	[ $arg == "--nosql" ] && sql="NO" && shift
-	[ $arg == "--nogui" ] && gui="NO" && shift
+	[ "$arg" == "--nosql" ] && sql="NO" && shift
+	[ "$arg" == "--nogui" ] && gui="NO" && shift
 done
 
 # Configure SQL:

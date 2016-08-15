@@ -5,7 +5,7 @@ echo "Detecting UNIX distribution..."
 distskeys="Debian Ubuntu CentOS Red Fedora openSUSE Simply Gentoo Mint SUSE Mageia Arch Manjaro"
 knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo Mint SUSE Mageia Arch Manjaro"
 
-if [ `uname` == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
 	export DISTRIBUTIVE="MacOSX"
 else
 	# Load issue file:
@@ -17,9 +17,9 @@ else
 	fi
 	# Search issue file:
 	for distr in $distskeys; do
-		issue=`cat "${issuefile}" | grep "${distr}"`
+		issue=$(grep "${distr}")
 		[ -z "${issue}" ] && continue
-		if [ `eval "echo \"${issue}\" | awk '{ print match(\\$0,\"${distr}\")}'"` != "0" ]; then
+		if [ "$(eval "echo \"${issue}\" | awk '{ print match(\\$0,\"${distr}\")}'")" != "0" ]; then
 			export DISTRIBUTIVE="${distr}"
 			break
 		fi
@@ -36,10 +36,10 @@ if [ -z "${DISTRIBUTIVE}" ]; then
 fi
 
 # Search distribution version:
-export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+export DISTRIBUTIVE_VERSION=$(echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}')
 
 # Check architecture:
-export ARCHITECTURE=`uname -m`
+export ARCHITECTURE=$(uname -m)
 
 # Common for Debian distributives:
 function debianArch(){

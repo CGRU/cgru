@@ -2,22 +2,18 @@
 
 export UNIXTYPE="LINUX"
 export MXX_RU_CPP_TOOLSET=gcc_linux
-if [ `uname` == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
    echo "Building on Mac OS X:"
    export UNIXTYPE="MACOSX"
    export MXX_RU_CPP_TOOLSET=gcc_darwin
 fi
 
 # Set locations:
-cgru=$PWD
-cgru=`dirname $cgru`
-cgru=`dirname $cgru`
-cgru=`dirname $cgru`
+cgru="$(dirname "$(dirname "$(dirname "$PWD")")")"
 
 # Setup Version:
-pushd .. > /dev/null
-cd $cgru/utilities
-source ./getrevision.sh $cgru
+pushd "$cgru/utilities" > /dev/null
+source ./getrevision.sh "$cgru"
 popd > /dev/null
 
 
@@ -31,6 +27,6 @@ export AF_PYTHON_MODULE_EXTRA_LIBS=
 ruby afanasy.mxw.rb $*
 
 libdir="../../lib"
-[ -d $libdir ] || mkdir -pv $libdir
+[ -d "$libdir" ] || mkdir -pv "$libdir"
 binpyaf="../../bin/pyaf.so"
-[ -f $binpyaf ] && mv -fv $binpyaf $libdir/pyaf.so
+[ -f "$binpyaf" ] && mv -fv "$binpyaf" "$libdir/pyaf.so"

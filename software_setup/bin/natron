@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source $CGRU_LOCATION/software_setup/setup_natron.sh
+source "$CGRU_LOCATION/software_setup/setup_natron.sh"
 
-$APP_EXE "$@"
+"$APP_EXE" "$@"

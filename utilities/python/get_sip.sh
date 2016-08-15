@@ -7,6 +7,6 @@ archive_ext="tar.gz"
 archive="$foldername.$archive_ext"
 link="$location/$foldername/$archive"
 
-[ -f $archive ] || wget $link
+[ -f "$archive" ] || wget "$link"
 
-[ -f $archive ] && tar -xvzf $archive
+[ -f "$archive" ] && tar -xvzf "$archive"

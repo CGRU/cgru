@@ -2,10 +2,10 @@
 
 if [ -z "$CGRU_LOCATION" ]; then
    if [ -L "$0" ]; then
-      link=`readlink "$0"`
-      pushd `dirname "$link"` > /dev/null
+      link="$(readlink "$0")"
+      pushd "$(dirname "$link")" > /dev/null
    else
-      pushd `dirname "$0"` > /dev/null
+      pushd "$(dirname "$0")" > /dev/null
    fi
    source "./setup.sh"
    popd > /dev/null

@@ -1,11 +1,9 @@
 #!/bin/bash
 
 # Get Afanasy location:
-curdir=$PWD
-cd `dirname $0`
-cd ..
+pushd "$(dirname "$0")"/..
 afroot=$PWD
-cd $curdir
+popd
 
 echo "Afanasy location = '$afroot'"
 
@@ -20,15 +18,15 @@ function usage(){
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "`basename $0` [u|c|i] [rm|add] APPLICATION"
+   echo "$(basename "$0") [u|c|i] [rm|add] APPLICATION"
    echo "'u'   - use 'update-rc.d' (Debian, Ubuntu)"
    echo "'c'   - use 'chkconfig' (CentOS, Fedora, openSUSE)"
    echo "'i'   - use 'insserv' (openSUSE)"
    echo "'add' - add application"
    echo "'rm'  - remove application"
    echo "Examples:"
-   echo "`basename $0` c add afrender"
-   echo "`basename $0` u rm afserver"
+   echo "$(basename "$0") c add afrender"
+   echo "$(basename "$0") u rm afserver"
    exit 0
 }
 
@@ -58,11 +56,11 @@ elif [ "$action" == "rm" ]; then
    removing="Removing "
 elif [ "$action" == "add" ]; then
    appfile="${afroot}/bin/${app}"
-   if [ ! -f $appfile ]; then
+   if [ ! -f "$appfile" ]; then
       ErrorMessage="Application '$appfile' does not exists."
       usage
    fi
-   if [ ! -f $daemon ]; then
+   if [ ! -f "$daemon" ]; then
       ErrorMessage="Daemon script '$daemon' does not exists."
       usage
    fi
@@ -72,24 +70,24 @@ else
 fi
 
 echo "${removing}Application = '$app'"
-if [ -f $initd/$app ]; then
+if [ -f "$initd/$app" ]; then
    echo "Removing old links:"
-   [ "${manager}" == "u" ] && update-rc.d -f $app remove
-   [ "${manager}" == "c" ] && chkconfig $app off
-   [ "${manager}" == "i" ] && insserv -r $app
-   rm -fv $initd/$app
+   [ "${manager}" == "u" ] && update-rc.d -f "$app" remove
+   [ "${manager}" == "c" ] && chkconfig "$app" off
+   [ "${manager}" == "i" ] && insserv -r "$app"
+   rm -fv "$initd/$app"
 fi
 if [ "$action" == "rm" ]; then
    exit
 fi
 
 # Getting depends:
-for depends_file in `ls $afroot/init/depends_${app}_*` ; do
+for depends_file in "$afroot"/init/depends_${app}_* ; do
    echo "Processing depends file \"$depends_file\""
    if [ -z "$depends" ]; then
-      depends=`cat $depends_file`
+      depends=$(cat "$depends_file")
    else
-      depends="$depends `cat $depends_file`"
+      depends="$depends $(cat "$depends_file")"
    fi
 done
 echo "Depends = \"$depends\""
@@ -102,11 +100,11 @@ sed \
 -e "s:@DEPENDS@:${depends}:g" \
 < "${daemon}" > "${initd}/${app}"
 
-chmod -v a+x ${initd}/${app}
+chmod -v a+x "${initd}/${app}"
 
 # Creating statrup links:
-[ "${manager}" == "u" ] && update-rc.d $app defaults 80 20
-[ "${manager}" == "c" ] && chkconfig $app on
-[ "${manager}" == "i" ] && insserv $app
+[ "${manager}" == "u" ] && update-rc.d "$app" defaults 80 20
+[ "${manager}" == "c" ] && chkconfig "$app" on
+[ "${manager}" == "i" ] && insserv "$app"
 
 echo "Done"; exit 0
