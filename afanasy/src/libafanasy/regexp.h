@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef WINNT
+#ifdef REGEX_STD
 #include <regex>
 static const int REG_EXTENDED = 0;
 static const int REG_ICASE = 1;
@@ -49,8 +49,8 @@ private:
 	bool contain;
 	std::string pattern;
 
-#ifdef WINNT
-	std::tr1::regex regexp;
+#ifdef REGEX_STD
+	std::regex regexp;
 #else
 	regex_t regexp;
 #endif

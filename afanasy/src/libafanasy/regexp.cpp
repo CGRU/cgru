@@ -4,6 +4,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+#include "../libafanasy/logger.h"
+
 using namespace af;
 
 const int RegExp::compile_flags = REG_EXTENDED;
@@ -17,21 +19,21 @@ RegExp::RegExp():
 
 RegExp::~RegExp()
 {
-#ifndef WINNT
+#ifndef REGEX_STD
 	if( false == pattern.empty()) regfree( &regexp);
 #endif
 }
 
 bool RegExp::setPattern( const std::string & str, std::string * strError)
 {
-#ifdef WINNT
+#ifdef REGEX_STD
 	if( RegExp::Validate( str, strError))
 	{
 		pattern = str;
 		if( cflags & REG_ICASE )
-			regexp = std::tr1::regex( pattern, std::tr1::regex_constants::icase);
+			regexp = std::regex( pattern, std::regex_constants::icase);
 		else
-			regexp = std::tr1::regex( pattern);
+			regexp = std::regex( pattern);
 		return true;
 	}
 	else
@@ -64,7 +66,7 @@ bool RegExp::match( const std::string & str) const
 {
 	if( pattern.empty()) return true;
 
-#ifdef WINNT
+#ifdef REGEX_STD
 
 	int retval = 1;
 	if( contain )
@@ -102,15 +104,15 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
 {
 	if( str.empty()) return true;
 
-#ifdef WINNT
+#ifdef REGEX_STD
 
 	bool valid = true;
 	std::string errStr;
 	try 
 	{
-		std::tr1::regex rx( str);
+		std::regex rx( str);
 	}
-	catch( const std::tr1::regex_error& rerr)
+	catch( const std::regex_error& rerr)
 	{
 		errStr = rerr.what();
 		valid = false;
@@ -124,7 +126,7 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
 	{
 		if( errOutput ) *errOutput = errStr;
 		else
-			AFERRAR("%x\n", errStr.c_str());
+			AF_ERR << errStr;
 	}
 	return valid;
 
@@ -141,7 +143,7 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
 		if( errOutput )
 			*errOutput = buffer;
 		else
-			AFERRAR("REGEXP: %s", buffer);
+			AF_ERR << buffer;
 	}
 
 	regfree( &check_re);
