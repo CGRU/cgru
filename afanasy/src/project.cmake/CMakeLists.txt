@@ -48,7 +48,12 @@ if(WIN32)
 	add_definitions(-DWINNT)
 endif(WIN32)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+if(CMAKE_COMPILER_IS_GNUCC)
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+		message("Setting c++11 standard for GCC ${CMAKE_CXX_COMPILER_VERSION}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+	endif()
+endif()
 
 include_directories(${PYTHON_INCLUDE_PATH})
 
