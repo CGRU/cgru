@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import socket
 import stat
 import sys
 import time
-import json
 
 import cgruutils
 
@@ -14,27 +14,48 @@ VARS = dict()
 
 
 def checkConfigFile(path):
-	status = True
-	if not os.path.isfile(path):
-		try:
-			cfile = open(path, 'w')
-		except:  # TODO: Too broad exception clause
-			print(str(sys.exc_info()[1]))
-			status = False
-		else:
-			cfile.write('{"cgru_config":{\n')
-			cfile.write(
-				'"":"Created by CGRU Keeper at %s",\n' % time.ctime())
-			cfile.write('"":""\n')
-			cfile.write('}}\n')
-			cfile.close()
+    status = True
+    if not os.path.isfile(path):
+        try:
+            cfile = open(path, 'w')
+        except PermissionError:
+            print('Warning! Permission denied to open %s.' % path)
+            raise PermissionError
+        except Exception as err:
+            print('Warning! Unexpected error.')
+            print('Please report this issue with the following information:')
+            print('Exception: %s' % type(err))
+            print('Error: %s' % err)
+            status = False
+        else:
+            cfile.write('{"cgru_config":{\n')
+            cfile.write(
+                '"":"Created by CGRU Keeper at %s",\n' % time.ctime())
+            cfile.write('"":""\n')
+            cfile.write('}}\n')
+            cfile.close()
 
-	if status:
-		try:
-			os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-		except:  # TODO: Too broad exception clause
-			print(str(sys.exc_info()[1]))
-	return status
+    if status:
+        try:
+            os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        except PermissionError:
+            if os.access(path, os.R_OK and os.W_OK):
+                continue
+            elif os.access(path, os.R_OK):
+                print('Warning! We don\'t have write permission for %s' % path)
+                raise PermissionError
+            elif os.access(path, os.W_OK):
+                print('Warning! We don\'t have read permission for %s' % path)
+                raise PermissionError
+            else:
+                print('Warning! We don\'t have read and write permission for %s' % path)
+                raise PermissionError
+        except Exception as err:
+            print('Warning! Unexpected error.')
+            print('Please report this issue with the following information:')
+            print('Exception: %s' % type(err))
+            print('Error: %s' % err)
+    return status
 
 
 class Config:
