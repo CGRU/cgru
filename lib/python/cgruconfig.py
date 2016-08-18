@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import errno
+import json
 import os
 import socket
 import stat
 import sys
 import time
-import json
 
 import cgruutils
 
@@ -14,27 +15,37 @@ VARS = dict()
 
 
 def checkConfigFile(path):
-	status = True
-	if not os.path.isfile(path):
-		try:
-			cfile = open(path, 'w')
-		except:  # TODO: Too broad exception clause
-			print(str(sys.exc_info()[1]))
-			status = False
-		else:
-			cfile.write('{"cgru_config":{\n')
-			cfile.write(
-				'"":"Created by CGRU Keeper at %s",\n' % time.ctime())
-			cfile.write('"":""\n')
-			cfile.write('}}\n')
-			cfile.close()
+    status = True
+    if not os.path.isfile(path):
+        try:
+            cfile = open(path, 'w')
+        except Exception as err:
+            if err.errno == errno.EPERM or err.errno == errno.EACCES:
+                print('Warning! Permission error while opening %s' % path)
+            else:
+                print('Warning! Unexpected error while opening %s.' % path)
+                print('Exception: %s' % type(err))
+                print('Error: %s' % err)
+            status = False
+        else:
+            cfile.write('{"cgru_config":{\n')
+            cfile.write(
+                '"":"Created by CGRU Keeper at %s",\n' % time.ctime())
+            cfile.write('"":""\n')
+            cfile.write('}}\n')
+            cfile.close()
 
-	if status:
-		try:
-			os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-		except:  # TODO: Too broad exception clause
-			print(str(sys.exc_info()[1]))
-	return status
+    if status:
+        try:
+            os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        except Exception as err:
+            if err.errno == errno.EPERM or err.errno == errno.EACCES:
+                print('Warning! Permission error while modifying the permissions for %s' % path)
+            else:
+                print('Warning! Unexpected error while modifying the permissions for %s.' % path)
+                print('Exception: %s' % type(err))
+                print('Error: %s' % err)
+    return status
 
 
 class Config:
