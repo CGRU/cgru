@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import errno
 import json
 import os
 import socket
@@ -18,14 +19,13 @@ def checkConfigFile(path):
     if not os.path.isfile(path):
         try:
             cfile = open(path, 'w')
-        except PermissionError:
-            print('Warning! Permission denied to open %s.' % path)
-            raise PermissionError
         except Exception as err:
-            print('Warning! Unexpected error.')
-            print('Please report this issue with the following information:')
-            print('Exception: %s' % type(err))
-            print('Error: %s' % err)
+            if err.errno == errno.EPERM or err.errno == errno.EACCES:
+                print('Warning! Permission error while opening %s' % path)
+            else:
+                print('Warning! Unexpected error while opening %s.' % path)
+                print('Exception: %s' % type(err))
+                print('Error: %s' % err)
             status = False
         else:
             cfile.write('{"cgru_config":{\n')
@@ -38,23 +38,13 @@ def checkConfigFile(path):
     if status:
         try:
             os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-        except PermissionError:
-            if os.access(path, os.R_OK and os.W_OK):
-                continue
-            elif os.access(path, os.R_OK):
-                print('Warning! We don\'t have write permission for %s' % path)
-                raise PermissionError
-            elif os.access(path, os.W_OK):
-                print('Warning! We don\'t have read permission for %s' % path)
-                raise PermissionError
-            else:
-                print('Warning! We don\'t have read and write permission for %s' % path)
-                raise PermissionError
         except Exception as err:
-            print('Warning! Unexpected error.')
-            print('Please report this issue with the following information:')
-            print('Exception: %s' % type(err))
-            print('Error: %s' % err)
+            if err.errno == errno.EPERM or err.errno == errno.EACCES:
+                print('Warning! Permission error while modifying the permissions for %s' % path)
+            else:
+                print('Warning! Unexpected error while modifying the permissions for %s.' % path)
+                print('Exception: %s' % type(err))
+                print('Error: %s' % err)
     return status
 
 
