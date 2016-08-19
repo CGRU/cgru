@@ -257,9 +257,6 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	{
 		menu.addSeparator();
 
-		action = new QAction( "Set Priority", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-		menu.addAction( action);
 		action = new QAction( "Set NIMBY", this);
 		if( selectedItemsCount == 1) action->setEnabled(false == render->isNIMBY());
 		connect( action, SIGNAL( triggered() ), this, SLOT( actNIMBY() ));
@@ -274,28 +271,6 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 		menu.addAction( action);
 		action = new QAction( "Set User", this);
 		connect( action, SIGNAL( triggered() ), this, SLOT( actUser() ));
-		menu.addAction( action);
-
-		menu.addSeparator();
-
-		action = new QAction( "Annotate", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-		menu.addAction( action);
-		action = new QAction( "Change Capacity", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actCapacity() ));
-		menu.addAction( action);
-		action = new QAction( "Change Max Tasks", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actMaxTasks() ));
-		menu.addAction( action);
-		action = new QAction( "Enable Service", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actEnableService() ));
-		menu.addAction( action);
-		action = new QAction( "Disable Service", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDisableService() ));
-		menu.addAction( action);
-		action = new QAction( "Restore Defaults", this);
-		if( selectedItemsCount == 1) action->setEnabled(render->isDirty());
-		connect( action, SIGNAL( triggered() ), this, SLOT( actRestoreDefaults() ));
 		menu.addAction( action);
 
 		menu.addSeparator();
@@ -360,11 +335,39 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 	submenu = new QMenu("Administrate", this);
 	menu.addMenu( submenu);
 
+	action = new QAction( "Annotate", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+	submenu->addAction( action);
+	action = new QAction( "Set Priority", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
 	action = new QAction("Set Paused", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actSetPaused() ));
 	submenu->addAction( action);
 	action = new QAction("Unset Paused", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetPaused() ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
+	action = new QAction( "Change Capacity", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actCapacity() ));
+	submenu->addAction( action);
+	action = new QAction( "Change Max Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxTasks() ));
+	submenu->addAction( action);
+	action = new QAction( "Enable Service", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actEnableService() ));
+	submenu->addAction( action);
+	action = new QAction( "Disable Service", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actDisableService() ));
+	submenu->addAction( action);
+	action = new QAction( "Restore Defaults", this);
+	if( selectedItemsCount == 1) action->setEnabled(render->isDirty());
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestoreDefaults() ));
 	submenu->addAction( action);
 
 	submenu->addSeparator();
