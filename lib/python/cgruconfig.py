@@ -22,9 +22,10 @@ def checkConfigFile(path):
         except Exception as err:
             if err.errno == errno.EPERM or err.errno == errno.EACCES:
                 print('Warning! Permission error while opening %s' % path)
+            elif err.errno is errno.EROFS:
+                print('Warning! Could not edit %s, read-only file system' % path)
             else:
                 print('Warning! Unexpected error while opening %s.' % path)
-                print('Exception: %s' % type(err))
                 print('Error: %s' % err)
             status = False
         else:
@@ -40,10 +41,9 @@ def checkConfigFile(path):
             os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
         except Exception as err:
             if err.errno == errno.EPERM or err.errno == errno.EACCES:
-                print('Warning! Permission error while modifying the permissions for %s' % path)
+                print('Warning! Could not modify permissions for %s, permission denied.' % path)
             else:
                 print('Warning! Unexpected error while modifying the permissions for %s.' % path)
-                print('Exception: %s' % type(err))
                 print('Error: %s' % err)
     return status
 

@@ -26,7 +26,7 @@ def sepThousands(i_int):
     :param i_int: input number
     :return: string with a space separated thousands
     """
-    s = str(int(i_int))
+    s = str(int(i_int)) # TODO(Why is i_int converted to int before being converted to string? This will break with . and ,)
     o = ''
     for i in range(0, len(s)):
         o += s[len(s) - i - 1]
@@ -87,7 +87,7 @@ def copy_file(source_file, destination_file, delete_original=False, debug=False)
         if delete_original:
             try:
                 os.remove(source_file)
-            except Exception as err:  # TODO(Commit to github)
+            except Exception as err:
                 if err.errno is errno.ENOENT:
                      if debug:
                          print('Debug: %s was already removed.' % source_file)
@@ -99,7 +99,8 @@ def copy_file(source_file, destination_file, delete_original=False, debug=False)
                     print('Warning! Unexpected error while trying to remove %s' % source_file)
                     print('Error: %s' % err)
                 return False
-    except Exception as err:  # TODO(Too broad exception clause)
+
+    except Exception as err:
         if err.errno is errno.EPERM or err.errno is errno.EACCES:
             print('Warning! Could not copy %s to %s, permission denied.' % (source_file, destination_file))
         elif err.errno is errno.ENOSPC:
@@ -211,20 +212,33 @@ def createFolder(path, writeToAll=True):
 
         try:
             os.makedirs(path)
-        except:  # TODO: Too broad exception clause
-            # If it did not work we check if it maybe already did exist because
-            # another task did create it in the meantime
-            if not os.path.isdir(path):
-                # Ok now we are sure that there is a "real" problem because the
-                # order does still not exist
-                print(str(sys.exc_info()[1]))
+        except Exception as err:
+            if err.errno is errno.EEXIST:
+                status = True
+                pass # Folder already exists so ignore the error
+            elif err.errno is errno.EPERM or err.errno is errno.EACCES:
+                print('Warning! Could not create direcotry %s, permission denied.' % path)
+                status = False
+            elif err.errno is errno.ENOSPC:
+                print('Warning! Could not create directory %s, no space left on device.' % path)
+                status = False
+            elif err.errno is errno.EROFS:
+                print('Warning! Could not create directory %s, read-only file system.' % path)
+                status = False
+            else:
+                print('Warning! Unexpected error while trying to create %s.' % path)
+                print('Error: %s' % err)
                 status = False
 
     if status and writeToAll:
         try:
             os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-        except:  # TODO: Too broad exception clause
-            print(str(sys.exc_info()[1]))
+        except Exception as err:
+            if err.errno is errno.EPERM or err.errno is errno.EACCES:
+                print('Warning! Could not change permissions for %s, permission denied.')
+            else:
+                print('Warning! Unexpected error while trying to change permissions for %s.' % path)
+                print('Error: %s' % err)
 
     return status
 
@@ -294,8 +308,30 @@ def copyJobFile(fileName, jobName='', fileExtension=''):
         print('Copying to ' + copyFile)
         try:
             shutil.copyfile(fileName, copyFile)
-        except:  # TODO: Too broad exception clause
-            print(str(sys.exc_info()[1]))
+        except Exception as err:
+            if err.errno is errno.EPERM or err.errno is errno.EACCES:
+                print('Warning! Could not copy %s to %s, permission denied.' % (source_file, destination_file))
+            elif err.errno is errno.ENOSPC:
+                print('Warning! Could not copy %s to %s, no space left on device.' % (source_file, destination_file))
+            elif err.errno is errno.ENOENT:
+                print('Warning! Could not copy %s to %s, folder not found.' % (source_file, destination_file))
+                print('Trying to create folder %s. ' % os.path.dirname(destination_file))
+                try:
+                    os.makedirs(os.path.dirname(destination_file))
+                    print('Directory created, trying to copy file again.')
+                    copy_file(source_file, destination_file, delete_original, debug)
+                    return copyfile
+                except Exception as err:
+                    if err.errno is errno.EPERM or err.errno is errno.EACCES:
+                        print('Warning! Could not create directory %s, permission denied' % os.path.dirname(destination_file))
+                    elif err.errno is errno.ENOSPC:
+                        print('Warning! Could not create direcotry %s, no space left on device.' % os.path.dirname(destination_file))
+                    elif err.errno is errno.EROFS:
+                        print('Warning! Could not create direcotry %s, read-only file system.' % os.path.dirname(destination_file))
+                    else:
+                        print('Warning! Unexpected error while trying to remove %s' % source_file)
+                        print('Error: %s' % err)
+                    copyfile = ''
             copyFile = ''
     return copyFile
 
