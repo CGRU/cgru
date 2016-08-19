@@ -197,9 +197,9 @@ class Config:
 				if key[3:] in VARS['platform']:
 					self.getVars(o_vars, i_obj[key], i_filename)
 
-			if type(i_obj[key]) == type(dict()):
+			if isinstance(i_obj[key], dict):
 				if key in o_vars:
-					if type(o_vars[key]) == type(dict()):
+					if isinstance(o_vars[key], dict):
 						self.getVars(o_vars[key], i_obj[key], i_filename)
 						continue
 
