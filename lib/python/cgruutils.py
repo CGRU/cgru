@@ -9,6 +9,7 @@ import sys
 import time
 import webbrowser
 
+import cgruconfig
 
 ImgExts = ['jpg', 'png', 'exr', 'dpx', 'tif', 'psd', 'tga']
 
@@ -241,9 +242,6 @@ def createFolder(path, writeToAll=True):
                 print('Error: %s' % err)
 
     return status
-
-
-import cgru.config as cgruconfig
 
 
 def getIconFileName(iconname):
