@@ -24,53 +24,52 @@ if len(args) < 1:
 
 exit_status = 0
 
-# TODO: file is a Python built-in name, replace it with "filename" or "path"
-for file in args:
+for filename in args:
 	status = 0
 	# Use Unix or MS Windows slashes only:
 	if sys.platform.find('win') == 0:
-		file = file.replace('/', '\\')
+		filename = filename.replace('/', '\\')
 	else:
-		file = file.replace('\\', '/')
+		filename = filename.replace('\\', '/')
 
-	if '*' in file:
+	if '*' in filename:
 		# Using native OS commands for files with mask "*"
 		if not Options.quiet:
-			print('Deleting file(s): "%s"' % file)
+			print('Deleting file(s): "%s"' % filename)
 		if sys.platform.find('win') == 0:
-			cmd = 'DEL /F /Q /S "%s"' % file
+			cmd = 'DEL /F /Q /S "%s"' % filename
 		else:
-			file = file.replace('*', '"*"')
-			cmd = 'rm -rvf "%s"' % file
+			filename = filename.replace('*', '"*"')
+			cmd = 'rm -rvf "%s"' % filename
 		if not Options.quiet:
 			print('Executing system command:')
 			print(cmd)
 		if not Options.debug:
 			status = os.system(cmd)
-	elif os.path.isdir(file):
+	elif os.path.isdir(filename):
 		# Removing folder(s):
 		if not Options.quiet:
-			print('Deleting directory: "%s"' % file)
+			print('Deleting directory: "%s"' % filename)
 		if not Options.debug:
 			try:
-				shutil.rmtree(file)
+				shutil.rmtree(filename)
 			except Exception as e:
 				print(str(e))
 				status = 1
-	elif os.path.isfile(file):
+	elif os.path.isfile(filename):
 		# Removing file:
 		if not Options.quiet:
-			print('Deleting file: "%s"' % file)
+			print('Deleting file: "%s"' % filename)
 		if not Options.debug:
 			try:
-				os.remove(file)
+				os.remove(filename)
 			except Exception as e:
 				print(str(e))
 				status = 1
 	else:
 		# No such file or directory:
 		print('Error: file(s) to delete not found:')
-		print(file)
+		print(filename)
 		status = 1
 
 	# Set exit status to error if it was any:
