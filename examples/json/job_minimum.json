@@ -6,10 +6,11 @@
 		"host_name"             : "host",
 		"blocks":[
 		{
-			"name"              : "Nuke",
+			"name"              : "Render",
 			"tasks_name"        : "frames @#@-@#@",
 			"service"           : "nuke",
 			"parser"            : "nuke",
+			"flags"             : 1,
 			"frame_first"       : 1,
 			"frame_last"        : 100,
 			"frames_per_task"   : 10,
