@@ -558,14 +558,6 @@ RenderNode.createPanels = function( i_monitor)
 	i_monitor.createCtrlBtns( acts);
 
 
-	// Services:
-	var acts = {};
-	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
-	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
-	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
-	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable serivrs\nRestore defaults.','sub_menu':acts});
-
-
 	// Eject tasks:
 	var acts = {};
 	acts.eject_tasks         = {'label':'ALL','tooltip':'Eject all running tasks.'};
@@ -592,6 +584,14 @@ RenderNode.createPanels = function( i_monitor)
 	acts.pause   = {'name':'paused', 'value':true,  'handle':'mh_Param','label':'PAU','tooltip':'Set render paused.'};
 	acts.unpause = {'name':'paused', 'value':false, 'handle':'mh_Param','label':'UNP','tooltip':'Unset render pause.'};
 	i_monitor.createCtrlBtns( acts);
+
+
+	// Services:
+	var acts = {};
+	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
+	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
+	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
+	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable serivrs\nRestore defaults.','sub_menu':acts});
 
 
 	// Power/WOL:
@@ -656,12 +656,12 @@ RenderNode.prototype.updatePanels = function()
 
 
 RenderNode.params = {};
-RenderNode.params.priority   = {"type":'num', "label":'Priority'};
-RenderNode.params.capacity   = {"type":'num', "label":'Capacity'};
-RenderNode.params.max_tasks  = {"type":'num', "label":'Maximum Tasks'};
-RenderNode.params.user_name  = {"type":'str', "label":'User Name'};
-RenderNode.params.annotation = {"type":'str', "label":'Annotation'};
-RenderNode.params.hidden     = {"type":'bl1', "label":'Hide/Unhide'};
+RenderNode.params.priority   = {"type":'num', "permissions":'god', "label":'Priority'};
+RenderNode.params.capacity   = {"type":'num', "permissions":'god', "label":'Capacity'};
+RenderNode.params.max_tasks  = {"type":'num', "permissions":'god', "label":'Maximum Tasks'};
+RenderNode.params.user_name  = {"type":'str', "permissions":'god', "label":'User Name'};
+RenderNode.params.annotation = {"type":'str', "permissions":'god', "label":'Annotation'};
+RenderNode.params.hidden     = {"type":'bl1', "permissions":'god', "label":'Hide/Unhide'};
 
 RenderNode.sort = ['priority','user_name','name'];
 RenderNode.filter = ['user_name','name','host_name'];
