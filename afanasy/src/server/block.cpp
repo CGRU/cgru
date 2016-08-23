@@ -374,8 +374,8 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 
 bool Block::checkDepends( MonitorContainer * i_monitoring)
 {
-	uint32_t old_block_state = m_data->getState();
-	m_data->setStateDependent( false);
+	bool was_depend = m_data->getState() & AFJOB::STATE_WAITDEP_MASK;
+	bool now_depend = false;
 
 	if( m_dependBlocks.size())
 		for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
@@ -383,12 +383,14 @@ bool Block::checkDepends( MonitorContainer * i_monitoring)
 			if( m_job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK)
 				continue;
 
-			m_data->setStateDependent( true);
+			now_depend = true;
 			break;
 		}
 
-	if( old_block_state != m_data->getState())
+	if( now_depend != was_depend )
 	{
+		m_data->setStateDependent( now_depend);
+
 		if( i_monitoring )
 			i_monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
 
@@ -509,9 +511,11 @@ void Block::constructDependBlocks()
         return;
     }
 
+	m_dependBlocks.clear();
+	m_dependTasksBlocks.clear();
+
 	if( m_data->hasDependMask())
     {
-        m_dependBlocks.clear();
 		for( int bd = 0; bd < m_job->getBlocksNum(); bd++)
         {
             // skip if it is the same block
@@ -525,7 +529,6 @@ void Block::constructDependBlocks()
 
 	if( m_data->hasTasksDependMask())
     {
-        m_dependTasksBlocks.clear();
 		for( int bd = 0; bd < m_job->getBlocksNum(); bd++)
         {
             // skip if it is the same block

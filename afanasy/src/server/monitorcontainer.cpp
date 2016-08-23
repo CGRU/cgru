@@ -344,7 +344,9 @@ void MonitorContainer::addBlock( int i_type, af::BlockData * i_block)
 	{
 		if( i_block == *bIt)
 		{
-			if( i_type < *tIt ) *tIt = i_type;
+			// Greater type number has more information,
+			// that include all info of a smaller type.
+			if( i_type > *tIt ) *tIt = i_type;
 			return;
 		}
 	}

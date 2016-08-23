@@ -1413,7 +1413,9 @@ bool BlockData::updateProgress( JobProgress * progress)
 
 	updateBars( progress);
 
-	uint32_t  new_state          = 0;
+	// Just store depend state, all other flags will be calculated
+	m_state = m_state & AFJOB::STATE_WAITDEP_MASK;
+
 	int32_t   new_percentage     = 0;
 	int32_t   new_tasks_ready    = 0;
 	int32_t   new_tasks_done     = 0;
@@ -1489,41 +1491,20 @@ bool BlockData::updateProgress( JobProgress * progress)
 	p_percentage     = new_percentage;
 	p_tasks_run_time = new_tasks_run_time;
 
-   if( new_tasks_ready)
-   {
-      new_state = new_state | AFJOB::STATE_READY_MASK;
-      new_state = new_state & (~AFJOB::STATE_DONE_MASK);
-   }
-   else
-   {
-      new_state = new_state & (~AFJOB::STATE_READY_MASK);
-   }
+	if( new_tasks_ready && ( false == (m_state & AFJOB::STATE_WAITDEP_MASK)))
+		m_state = m_state | AFJOB::STATE_READY_MASK;
 
-   if( m_running_tasks_counter )
-   {
-      new_state = new_state |   AFJOB::STATE_RUNNING_MASK;
-      new_state = new_state & (~AFJOB::STATE_DONE_MASK);
-   }
-   else
-   {
-      new_state = new_state & (~AFJOB::STATE_RUNNING_MASK);
-   }
+	if( m_running_tasks_counter )
+		m_state = m_state | AFJOB::STATE_RUNNING_MASK;
 
-	if( new_tasks_done == m_tasks_num ) new_state = new_state |   AFJOB::STATE_DONE_MASK;
-	else                                new_state = new_state & (~AFJOB::STATE_DONE_MASK);
+	if( new_tasks_done == m_tasks_num )
+		m_state = m_state | AFJOB::STATE_DONE_MASK;
 
-	if( new_tasks_error) new_state = new_state |   AFJOB::STATE_ERROR_MASK;
-	else                 new_state = new_state & (~AFJOB::STATE_ERROR_MASK);
+	if( new_tasks_error )
+		m_state = m_state | AFJOB::STATE_ERROR_MASK;
 
-	if( new_tasks_skipped) new_state = new_state |   AFJOB::STATE_SKIPPED_MASK;
-	else                   new_state = new_state & (~AFJOB::STATE_SKIPPED_MASK);
-
-//	if( m_state & AFJOB::STATE_WAITDEP_MASK)
-//	new_state = new_state & (~AFJOB::STATE_READY_MASK);
-
-//   bool depend = m_state & AFJOB::STATE_WAITDEP_MASK;
-   m_state = new_state;
-//   if( depend ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
+	if( new_tasks_skipped )
+		m_state = m_state | AFJOB::STATE_SKIPPED_MASK;
 
    return changed;
 }
