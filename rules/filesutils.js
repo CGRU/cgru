@@ -706,7 +706,8 @@ function fu_WalkProcessGUI( i_wnd)
 	block.tasks = [task];
 
 	var cmd = cgru_PM( RULES.walk.cmd, true);
-	cmd += ' -t 100';
+	cmd += ' --thumb 128';
+	cmd += ' --report 256';
 	if( params.upparents == false ) cmd += ' -n';
 	cmd += ' -V ' + params.verbose;
 	cmd += ' "' + cgru_PM('/' + RULES.root + params.path, true) + '"';

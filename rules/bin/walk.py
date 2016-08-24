@@ -19,6 +19,7 @@ Parser = OptionParser(
 Parser.add_option('-o', '--output',   dest='output',   type = 'string',     default='.rules/walk.json', help='File to save results.')
 Parser.add_option('-n', '--noupdate', dest='noupdate', action='store_true', default=False,              help='Skip update upfolders.')
 Parser.add_option('-t', '--thumb',    dest='thumb',    type = 'int',        default=None,               help='Make thumbnail frequency.')
+Parser.add_option('-r', '--report',   dest='report',   type = 'int',        default=None,               help='Print report frequency.')
 Parser.add_option('-V', '--verbose',  dest='verbose',  type = 'int',        default=0,                  help='Verbose mode.')
 Parser.add_option('-D', '--debug',    dest='debug',    action='store_true', default=False,              help='Debug mode.')
 
@@ -29,6 +30,8 @@ PrevFiles = None
 CurFiles = 0
 StartPath = '.'
 ThumbFolderCount = 0
+ReportFolderCount = 0
+TotalSpace = 0
 os.umask(0000)
 
 print('{"walk":{')
@@ -100,9 +103,20 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
     global PrevFiles
     global CurFiles
     global ThumbFolderCount
+    global ReportFolderCount
+    global TotalSpace
 
+    # Output current path:
     if Options.verbose > i_curdepth and i_subwalk:
         outInfo('cur_path',i_path)
+
+    # Output report:
+    if Options.report is not None:
+        if i_path.find( os.path.dirname( Options.output)) == -1:
+            if ReportFolderCount % Options.report == 0:
+                print('REPORT: %s - %.1f GB' % ( i_path, TotalSpace / 1024 / 1024 / 1024 ))
+                sys.stdout.flush()
+            ReportFolderCount += 1
 
     out = jsonLoad( os.path.join( i_path, Options.output))
     if out is None:
@@ -135,6 +149,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
             out['num_folders_total'] += 1
             size, space = getSizeSpace( st)
             out['space'] += space
+            TotalSpace += space
 
             fout = None
             if i_subwalk:
@@ -181,6 +196,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
             out['size_total'] += size
             out['size'] += size
             out['space'] += space
+            TotalSpace += space
 
     # Just output progress:
     if PrevFiles:
@@ -280,3 +296,6 @@ sec = int(sec)
 outInfo('time_run','%02d:%02d:%02d.%03d' % (hrs, mns, sec, msc))
 
 outStatus('success')
+
+if Options.report:
+    print('REPORT: %.1f GB' % (walk['space'] / 1024.0 / 1024.0 / 1024.0))

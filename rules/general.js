@@ -546,12 +546,16 @@ function g_AppendFolder( i_elParent, i_fobject)
 //	elFolder.ondblclick = g_FolderOnDblClick;
 
 	g_FolderSetStatus( i_fobject.status, elFolder);
-	if( i_fobject.size_total != null )
+	if( i_fobject.space != null )
 	{
-		elFolder.m_elSize.textContent = c_Bytes2KMG( i_fobject.size_total);
-		var title = 'Calculated with subfolders';
-		if( i_fobject.num_folders_total ) title += '\nTotal folders count: ' + i_fobject.num_folders_total;
-		if( i_fobject.num_files_total   ) title += '\nTotal files count: ' + i_fobject.num_files_total;
+		elFolder.m_elSize.textContent = c_Bytes2KMG( i_fobject.space);
+
+		var title = '';
+		if( i_fobject.size_total        ) title += 'Total Size: ' + c_Bytes2KMG( i_fobject.size_total);
+		if( i_fobject.space             ) title += '\nSpace on device: ' + c_Bytes2KMG( i_fobject.space);
+		if( i_fobject.num_folders_total ) title += '\nFolders count: ' + i_fobject.num_folders_total;
+		if( i_fobject.num_files_total   ) title += '\nFiles count: ' + i_fobject.num_files_total;
+
 		elFolder.m_elSize.title = title;
 	}
 
@@ -688,12 +692,12 @@ function g_CompareFolders(a,b)
 	// Compare folders sizes if size is shown in the navigation:
 	if( g_navig_infos.current.navig_show_size )
 	{
-		if(( a.size_total != null ) && ( b.size_total == null )) return -1;
-		if(( b.size_total != null ) && ( a.size_total == null )) return  1;
-		if(( a.size_total != null ) && ( b.size_total != null ))
+		if(( a.space != null ) && ( b.space == null )) return -1;
+		if(( b.space != null ) && ( a.space == null )) return  1;
+		if(( a.space != null ) && ( b.space != null ))
 		{
-			if     ( a.size_total < b.size_total ) return  1;
-			else if( a.size_total > b.size_total ) return -1;
+			if     ( a.space < b.space ) return  1;
+			else if( a.space > b.space ) return -1;
 		}
 	}
 
