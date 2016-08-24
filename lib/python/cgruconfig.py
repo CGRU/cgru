@@ -137,7 +137,11 @@ class Config:
                 os.path.join(self.Vars['HOME_CGRU'], 'config.json')
 
             if sys.platform.find('win') == 0 or os.geteuid() != 0:
-                cgruutils.createFolder(self.Vars['HOME_CGRU'])
+                if not os.path.exists( self.Vars['HOME_CGRU']):
+                    try:
+                        os.makedirs(self.Vars['HOME_CGRU'])
+                    except:
+                        pass
                 # Create cgru home config file if not preset
                 checkConfigFile(self.Vars['config_file_home'])
 
