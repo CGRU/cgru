@@ -3,6 +3,7 @@
 
 import json
 import os
+import stat
 import sys
 import time
 
@@ -39,6 +40,14 @@ def outInfo( i_key, i_msg):
 def outStatus( i_status):
     print(' "status"\t:"%s"' % i_status)
     print('}}')
+
+def getSizeSpace( i_st):
+    size = i_st.st_size
+    blksize = i_st.st_blksize
+    blocks = size / blksize
+    space = blocks * blksize
+    if space != size: space += blksize
+    return size, space
 
 if len(Args):
     StartPath = Args[0]
@@ -77,7 +86,7 @@ def checkDict(io_dict, i_reset_counts = False):
     if not 'files' in io_dict:
         io_dict['files'] = dict()
     num_keys = ['num_files', 'num_folders','num_images', 'size', 'num_files_total',
-                'num_folders_total', 'size_total']
+                'num_folders_total', 'size_total','space']
     for key in num_keys:
         if i_reset_counts:
             io_dict[key] = 0
@@ -107,19 +116,25 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
         return None
 
     for entry in entries:
-        # Skip result folder (.rules):
-        if entry == os.path.dirname(Options.output):
-            continue
 
         path = os.path.join(i_path, entry)
 
-        # We are not walking in links:
-        if os.path.islink(path):
+        st = None
+        try:
+            st = os.lstat( path)
+        except:
+            outInfo('error_listdir',str(sys.exc_info()[1]))
             continue
 
-        if os.path.isdir(path):
+        # We are not walking in links:
+        if stat.S_ISLNK( st.st_mode):
+            continue
+
+        if stat.S_ISDIR( st.st_mode):
             out['num_folders'] += 1
             out['num_folders_total'] += 1
+            size, space = getSizeSpace( st)
+            out['space'] += space
 
             fout = None
             if i_subwalk:
@@ -147,10 +162,11 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
                 out['num_folders_total'] += fout['num_folders_total']
                 out['num_files_total'] += fout['num_files_total']
                 out['size_total'] += fout['size_total']
+                out['space'] += fout['space']
 
-        if os.path.isfile(path):
+        if stat.S_ISREG( st.st_mode):
             CurFiles += 1
-            size = os.path.getsize(path)
+            size, space = getSizeSpace( st)
             if entry[0] != '.':
                 out['num_files'] += 1
                 if cgruutils.isImageExt( path):
@@ -164,6 +180,7 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
             out['num_files_total'] += 1
             out['size_total'] += size
             out['size'] += size
+            out['space'] += space
 
     # Just output progress:
     if PrevFiles:
@@ -172,6 +189,10 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
             Progress = cur_progress
             outInfo('progress','PROGRESS: %d%%' % Progress)
 
+    # Skip soting data in .rules folders, or we will create '.rules/.rules' folders
+    if os.path.basename(i_path) == os.path.dirname(Options.output):
+        return out
+            
     # Store current walk data:
     filename = os.path.join(i_path, Options.output)
 
