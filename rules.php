@@ -601,8 +601,10 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					if( false == is_null( $walk) && isset( $walk['files']) && isset( $walk['files'][$entry]))
 						$fileObj = $walk['files'][$entry];
 					$fileObj['name'] = $entry;
-					$fileObj['size'] = filesize( $path);
-					$fileObj['mtime'] = filemtime( $path);
+					$st = stat( $path);
+					$fileObj['size'] = $st['size'];
+					$fileObj['mtime'] = $st['mtime'];
+					$fileObj['space'] = $st['blocks'] * 512;
 					array_push( $o_out['files'], $fileObj);
 				}
 				continue;
