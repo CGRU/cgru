@@ -486,8 +486,16 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		}
 
 		i_el.m_el_size.textContent = c_Bytes2KMG( size);
+
+		var title = '';
+
+		if( i_el.m_obj.space )
+			title += 'Disk usage: ' + c_Bytes2KMG( i_el.m_obj.space) + '\n';
+
 		if(( i_el.m_obj.size_total != null ) && ( i_el.m_obj.size != null ))
-			i_el.m_el_size.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_el.m_obj.size);
+			title += 'Files size without subfolders: ' + c_Bytes2KMG( i_el.m_obj.size);
+
+		i_el.m_el_size.title = title;
 	}
 
 	var num_files = null;
