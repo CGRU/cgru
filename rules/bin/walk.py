@@ -45,11 +45,13 @@ def outStatus( i_status):
     print('}}')
 
 def getSizeSpace( i_st):
+    """ Return files size and space (disk usage)
+        :param i_st: stat structure (os.stat())
+        :return: tuple (size,space)
+        http://man7.org/linux/man-pages/man2/stat.2.html
+    """
     size = i_st.st_size
-    blksize = i_st.st_blksize
-    blocks = size / blksize
-    space = blocks * blksize
-    if space != size: space += blksize
+    space = i_st.st_blocks * 512
     return size, space
 
 if len(Args):
