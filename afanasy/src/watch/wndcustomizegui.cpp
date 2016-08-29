@@ -118,16 +118,16 @@ WndCustomizeGUI::WndCustomizeGUI():
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
 	vlayout->addWidget( label);
 
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoberror ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoboff   ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwtime ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwdep  ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobdone  ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjob      ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskskipped     ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningrun  ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningdone ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwaitreconn  ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoberror   ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoboff     ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwtime   ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwdep    ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobdone    ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjob        ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwarning ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningrun ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskskipped    ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwaitreconn ));
 
 	label = new QLabel("Render Colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);

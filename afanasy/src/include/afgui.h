@@ -58,9 +58,9 @@ namespace AFGUI
 	const char CLR_ITEMJOBWTIME[]    = "477777";
 	const char CLR_ITEMJOBWDEP[]     = "61546E";
 	const char CLR_ITEMJOBDONE[]     = "2A394C";
-	const char CLR_TASKSKIPPED[]     = "555555";
+	const char CLR_ITEMJOBWARNING[]  = "D67F50";
 	const char CLR_TASKWARNINGRUN[]  = "CCCC55";
-	const char CLR_TASKWARNINGDONE[] = "D67F50";
+	const char CLR_TASKSKIPPED[]     = "555555";
 	const char CLR_TASKWAITRECONN[]  = "4099CC";
 	const char CLR_ITEMRENDER[]      = "6D6C69";
 	const char CLR_ITEMRENDEROFF[]   = "50544C";
@@ -119,9 +119,9 @@ namespace AFGUI
 	const char CLR_ITEMJOBWTIME[]    = "477777";
 	const char CLR_ITEMJOBWDEP[]     = "61546E";
 	const char CLR_ITEMJOBDONE[]     = "3D664C";
-	const char CLR_TASKSKIPPED[]     = "444444";
+	const char CLR_ITEMJOBWARNING[]  = "246221";
 	const char CLR_TASKWARNINGRUN[]  = "DC7C50";
-	const char CLR_TASKWARNINGDONE[] = "246221";
+	const char CLR_TASKSKIPPED[]     = "444444";
 	const char CLR_TASKWAITRECONN[]  = "4099CC";
 	const char CLR_ITEMRENDER[]      = "43764A";
 	const char CLR_ITEMRENDEROFF[]   = "50544C";

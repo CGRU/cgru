@@ -112,7 +112,7 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->setPen(  clrTextMain( option));
    painter->drawText( x+5, y+16, info.getName());
 
-	printfState( state, x+w-108, y+8, painter, option);
+	printfState( state, x+w-125, y+8, painter, option);
 
    painter->setFont( afqt::QEnvironment::f_info);
    painter->setPen(  clrTextInfo( option));

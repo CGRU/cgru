@@ -1513,6 +1513,9 @@ bool BlockData::updateProgress( JobProgress * progress)
 	if( new_tasks_done == m_tasks_num )
 		m_state = m_state | AFJOB::STATE_DONE_MASK;
 
+	if( new_tasks_warning )
+		m_state = m_state | AFJOB::STATE_WARNING_MASK;
+
 	if( new_tasks_error )
 		m_state = m_state | AFJOB::STATE_ERROR_MASK;
 

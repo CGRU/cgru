@@ -236,6 +236,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 	else if( state & AFJOB::STATE_PPAPPROVAL_MASK) itemColor = &(afqt::QEnvironment::clr_itemjobppa.c);
 	else if( state & AFJOB::STATE_WAITTIME_MASK)   itemColor = &(afqt::QEnvironment::clr_itemjobwtime.c);
 	else if( state & AFJOB::STATE_WAITDEP_MASK)    itemColor = &(afqt::QEnvironment::clr_itemjobwdep.c );
+	else if( state & AFJOB::STATE_WARNING_MASK )   itemColor = &(afqt::QEnvironment::clr_itemjobwarning.c );
 	else if( state & AFJOB::STATE_DONE_MASK)       itemColor = &(afqt::QEnvironment::clr_itemjobdone.c );
 
 	// Draw standart backgroud

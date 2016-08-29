@@ -5,7 +5,7 @@ Block_ProgressBarHeight =  10;
 
 BarDONrgb = '#363';
 BarSKPrgb = '#444';
-BarDWRrgb = '#141';
+BarDWRrgb = '#292';
 BarWDPrgb = '#A2A';
 BarRUNrgb = '#FF0';
 BarRWRrgb = '#FA0';

@@ -181,7 +181,7 @@ function cm_DateTimeStrFromMSec( i_sec, i_nosec)
 	return date;
 }
 
-cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PAU','PER','PBR','PSC','WFL','WSL','WWK','PPA','RER','WRC'];
+cm_States = ['ONL','RDY','RUN','DON','WRN','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PAU','PER','PBR','PSC','WFL','WSL','WWK','PPA','RER','WRC'];
 function cm_GetState( i_state, o_state, o_element)
 {
 	for( var i = 0; i < cm_States.length; i++)

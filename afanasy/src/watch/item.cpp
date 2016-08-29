@@ -133,6 +133,9 @@ void Item::printfState( const uint32_t state, int posx, int posy, QPainter * pai
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_SKIPPED_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_SKIPPED_NAME_S); posx+=posx_d;
 
+	painter->setPen( clrTextState( option, state & AFJOB::STATE_WARNING_MASK));
+	painter->drawText( posx, posy, AFJOB::STATE_WARNING_NAME_S); posx+=posx_d;
+
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_WAITDEP_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_WAITDEP_NAME_S); posx+=posx_d;
 

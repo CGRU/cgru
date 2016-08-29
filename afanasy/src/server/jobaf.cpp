@@ -1014,6 +1014,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	// job state calculation
 	m_state = m_state |   AFJOB::STATE_DONE_MASK;
 	m_state = m_state & (~AFJOB::STATE_RUNNING_MASK);
+	m_state = m_state & (~AFJOB::STATE_WARNING_MASK);
 	m_state = m_state & (~AFJOB::STATE_ERROR_MASK);
 	m_state = m_state & (~AFJOB::STATE_READY_MASK);
 	m_state = m_state & (~AFJOB::STATE_SKIPPED_MASK);
@@ -1022,6 +1023,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	{
 		uint32_t state_block = m_blocks_data[b]->getState();
 		m_state  = m_state | (state_block &   AFJOB::STATE_RUNNING_MASK   );
+		m_state  = m_state | (state_block &   AFJOB::STATE_WARNING_MASK   );
 		m_state  = m_state | (state_block &   AFJOB::STATE_ERROR_MASK     );
 		m_state  = m_state | (state_block &   AFJOB::STATE_READY_MASK     );
 		m_state  = m_state | (state_block &   AFJOB::STATE_SKIPPED_MASK   );
