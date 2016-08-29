@@ -854,7 +854,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 	{
 		if( false == ( m_blocks_data[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 		
-		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags);
+		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags, render);
 		
 		if( task_num == AFJOB::TASK_NUM_NO_TASK )
 		{

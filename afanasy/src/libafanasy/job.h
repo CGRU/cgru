@@ -31,13 +31,14 @@ public:
 
     void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
-	// NEW VERSION: flags should be 64 bit:
+	// First 32 flags are reserved for af::Node (zombie, hidden, ...)
 	enum JobFlags
 	{
-		FPPApproval = 1<<31
+		FPPApproval  = 1ULL << 32,
+		FMaintenance = 1ULL << 33
 	};
 
-	inline int getBlocksNum()           const { return m_blocks_num;                 }
+	inline int getBlocksNum()           const { return m_blocks_num;                }
 	inline int getTimeLife()            const { return m_time_life;                 }
 	inline int getUserListOrder()       const { return m_user_list_order;           }
 	inline int getMaxRunningTasks()     const { return m_max_running_tasks;         }
@@ -72,6 +73,9 @@ public:
 
     inline bool isPPAFlag() const { return ( m_flags & FPPApproval ); }
     inline void setPPAFlag( bool i_ppa = true) { if( i_ppa ) m_flags = m_flags | FPPApproval; else m_flags = m_flags & (~FPPApproval); }
+
+    inline bool isMaintenanceFlag() const { return ( m_flags & FMaintenance ); }
+    inline void setMaintenanceFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FMaintenance; else m_flags = m_flags & (~FMaintenance); }
 
 	inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_hosts_mask, str, "job hosts mask", errOutput);}

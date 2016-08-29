@@ -70,7 +70,7 @@ public:
 
 	bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL ) const; ///< Generate fisrt and last frame numbers for \c num task.
 	int calcTaskNumber( long long i_frame, bool & o_valid_range) const;
-	int getReadyTaskNumber( TaskProgress ** i_tp, const int32_t & i_job_flags);
+	int getReadyTaskNumber( TaskProgress ** i_tp, const int64_t & i_job_flags, const Render * i_render);
 	const std::string genTaskName( int num, long long * fstart = NULL, long long * fend = NULL ) const;
 	const std::string genCommand(  int num, long long * fstart = NULL, long long * fend = NULL ) const;
 	const std::vector<std::string> genFiles(int num, long long * fstart = NULL, long long * fend = NULL ) const;

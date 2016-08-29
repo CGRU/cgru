@@ -74,6 +74,10 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	if( jr_bool("ppa", ppa, i_object, io_changes))
 		setPPAFlag( ppa);
 
+	bool maintenance = false;
+	if( jr_bool("maintenance", maintenance, i_object, io_changes))
+		setMaintenanceFlag( maintenance);
+
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
@@ -143,6 +147,9 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	if( isPPAFlag())
 		o_str << ",\n\"ppa\":true";
+
+	if( isMaintenanceFlag())
+		o_str << ",\n\"maintenance\":true";
 
 	if( m_command_pre.size())
 		o_str << ",\n\"command_pre\":\""  << af::strEscape( m_command_pre  ) << "\"";

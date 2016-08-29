@@ -37,6 +37,7 @@ JobNode.prototype.init = function()
 	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
 	this.elPPApproval = cm_ElCreateFloatText( this.element, 'right', 'Preview Pending Approval','PPA');
+	this.elMaintenance = cm_ElCreateFloatText( this.element, 'right', 'Maintenance','MNT');
 	this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 	this.elDependMask = cm_ElCreateFloatText( this.element, 'right', 'Depend Mask');
 	this.elDependMaskGlobal = cm_ElCreateFloatText( this.element, 'right', 'Global Depend Mask');
@@ -96,6 +97,11 @@ JobNode.prototype.update = function( i_obj)
 		this.elPPApproval.style.display = 'block';
 	else
 		this.elPPApproval.style.display = 'none';
+
+	if( this.params.maintenance )
+		this.elMaintenance.style.display = 'block';
+	else
+		this.elMaintenance.style.display = 'none';
 
 	if( this.params.thumb_path )
 		this.showThumb( this.params.thumb_path );

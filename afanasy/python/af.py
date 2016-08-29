@@ -765,6 +765,9 @@ class Job:
 	def setPPApproval(self):
 		self.data["ppa"] = True
 
+	def setMaintenance(self):
+		self.data["maintenance"] = True
+
 	def pause(self):
 		"""Missing DocString
 		"""

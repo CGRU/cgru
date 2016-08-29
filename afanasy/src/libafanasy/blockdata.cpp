@@ -908,9 +908,22 @@ void BlockData::setFramesPerTask( long long perTask)
    m_frames_per_task = perTask;
 }
 
-int BlockData::getReadyTaskNumber( TaskProgress ** i_tp, const int32_t & i_job_flags)
+int BlockData::getReadyTaskNumber( TaskProgress ** i_tp, const int64_t & i_job_flags, const Render * i_render)
 {
 	//printf("af::getReadyTaskNumber: %li-%li/%li:%li%%%li\n", m_frame_first, m_frame_last, m_frames_inc, m_frames_per_task, m_sequential);
+	if( i_render && ( i_job_flags & Job::FMaintenance ))
+	{
+		for( int task = 0; task < m_tasks_num; task++)
+		{
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+			{
+				if( genTaskName( task) == i_render->getName())
+					return task;
+			}
+		}
+
+		return AFJOB::TASK_NUM_NO_TASK;
+	}
 
 	if( m_sequential > 1 )
 	{

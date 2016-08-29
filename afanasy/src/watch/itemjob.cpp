@@ -104,6 +104,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	num_runningtasks     = job->getRunningTasksNumber();
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
+	maintenance          = job->isMaintenanceFlag();
 
 	folders.clear();
 	const std::map<std::string,std::string> & stdf = job->getFolders();
@@ -148,6 +149,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
 	properties += QString(" p%2").arg( m_priority);
 	if( ppapproval ) properties += " PPA";
+	if( maintenance ) properties += " MNT";
 
 	user_eta = username;
 	if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))

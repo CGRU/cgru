@@ -34,6 +34,7 @@ public:
 	uint32_t time_run;
 	int lifetime;
 	bool ppapproval;
+	bool maintenance;
 	QString service;
 	QString hostname;
 	QString username;
