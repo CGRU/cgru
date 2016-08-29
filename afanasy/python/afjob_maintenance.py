@@ -12,6 +12,7 @@ Parser = OptionParser(
 Parser.add_option('-n', '--jobname', dest='jobname', type='string',       default=None,      help='Job name')
 Parser.add_option('-s', '--service', dest='service', type='string',       default='generic', help='Service type')
 Parser.add_option('-p', '--parser',  dest='parser',  type='string',       default='generic', help='Parser type')
+Parser.add_option('-o', '--offline', dest='offline', action='store_true', default=False,     help='Send job offline (paused)')
 Parser.add_option('-V', '--verbose', dest='verbose', action='store_true', default=False,     help='Verbose mode')
 Parser.add_option('-D', '--debug',   dest='debug',   action='store_true', default=False,     help='Debug mode (verbose mode, no commands execution)')
 (Options, Args) = Parser.parse_args()
@@ -44,6 +45,9 @@ for render in Renders:
     block.tasks.append( task)
 
 job.blocks.append( block)
+
+if Options.offline:
+    job.offline()
 
 if Options.verbose:
     job.output()
