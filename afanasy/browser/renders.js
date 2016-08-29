@@ -228,7 +228,12 @@ RenderNode.prototype.update = function( i_obj)
 	this.elPriority.textContent = '-' + this.params.priority;
 
 	var user = this.params.user_name;
-	if( this.state.PAU ) user = 'Paused(' + user + ')P';
+	if( this.state.PAU )
+    {
+        user = 'Paused(' + user + ')P';
+        if ( this.state.NBY ) user += '+N';
+        if ( this.state.Nby ) user += '+n';
+    }
 	else if( this.state.NbY ) user = 'nimby(' + user + ')n';
 	else if( this.state.NBY ) user = 'NIMBY(' + user + ')N';
 	this.elUserName.textContent = user;

@@ -768,6 +768,12 @@ class Job:
 	def setMaintenance(self):
 		self.data["maintenance"] = True
 
+	def setIgnoreNimby(self):
+		self.data["ignorenimby"] = True
+
+	def setIgnorePaused(self):
+		self.data["ignorepaused"] = True
+
 	def pause(self):
 		"""Missing DocString
 		"""

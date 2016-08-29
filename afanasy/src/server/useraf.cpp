@@ -299,9 +299,6 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 		return false;
 	}
 
-// Check nimby:
-	if( i_render->isNimby() && (m_name != i_render->getUserName())) return false;
-
 // check hosts mask:
 	if( false == checkHostsMask( i_render->getName())) return false;
 // check exclude hosts mask:

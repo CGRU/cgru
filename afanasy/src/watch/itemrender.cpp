@@ -275,6 +275,10 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 		if( m_paused )
 		{
 			 m_state = "(" + m_username + ")P";
+             if( m_NIMBY )
+                 m_state += "+N";
+             if( m_nimby )
+                 m_state += "+n";
 		}
 		else if( m_NIMBY )
 		{

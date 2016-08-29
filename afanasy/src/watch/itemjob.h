@@ -33,8 +33,12 @@ public:
 	int64_t time_done;
 	uint32_t time_run;
 	int lifetime;
+
 	bool ppapproval;
 	bool maintenance;
+	bool ignorenimby;
+	bool ignorepaused;
+
 	QString service;
 	QString hostname;
 	QString username;

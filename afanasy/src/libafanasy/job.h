@@ -34,8 +34,10 @@ public:
 	// First 32 flags are reserved for af::Node (zombie, hidden, ...)
 	enum JobFlags
 	{
-		FPPApproval  = 1ULL << 32,
-		FMaintenance = 1ULL << 33
+		FPPApproval   = 1ULL << 32,
+		FMaintenance  = 1ULL << 33,
+		FIgnoreNimby  = 1ULL << 34,
+		FIgnorePaused = 1ULL << 35
 	};
 
 	inline int getBlocksNum()           const { return m_blocks_num;                }
@@ -76,6 +78,12 @@ public:
 
     inline bool isMaintenanceFlag() const { return ( m_flags & FMaintenance ); }
     inline void setMaintenanceFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FMaintenance; else m_flags = m_flags & (~FMaintenance); }
+
+    inline bool isIgnoreNimbyFlag() const { return ( m_flags & FIgnoreNimby ); }
+    inline void setIgnoreNimbyFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FIgnoreNimby; else m_flags = m_flags & (~FIgnoreNimby); }
+
+    inline bool isIgnorePausedFlag() const { return ( m_flags & FIgnorePaused ); }
+    inline void setIgnorePausedFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FIgnorePaused; else m_flags = m_flags & (~FIgnorePaused); }
 
 	inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_hosts_mask, str, "job hosts mask", errOutput);}

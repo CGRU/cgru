@@ -105,6 +105,8 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
 	maintenance          = job->isMaintenanceFlag();
+	ignorenimby          = job->isIgnoreNimbyFlag();
+	ignorepaused         = job->isIgnorePausedFlag();
 
 	folders.clear();
 	const std::map<std::string,std::string> & stdf = job->getFolders();
@@ -150,6 +152,8 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	properties += QString(" p%2").arg( m_priority);
 	if( ppapproval ) properties += " PPA";
 	if( maintenance ) properties += " MNT";
+	if( ignorenimby ) properties += " INB";
+	if( ignorepaused ) properties += " IPS";
 
 	user_eta = username;
 	if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))

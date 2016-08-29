@@ -38,6 +38,8 @@ JobNode.prototype.init = function()
 	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
 	this.elPPApproval = cm_ElCreateFloatText( this.element, 'right', 'Preview Pending Approval','PPA');
 	this.elMaintenance = cm_ElCreateFloatText( this.element, 'right', 'Maintenance','MNT');
+	this.elIgnoreNimby = cm_ElCreateFloatText( this.element, 'right', 'Ignore render "Nimby" state.','INB');
+	this.elIgnorePaused = cm_ElCreateFloatText( this.element, 'right', 'Ignore render "Paused" state.','IPS');
 	this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 	this.elDependMask = cm_ElCreateFloatText( this.element, 'right', 'Depend Mask');
 	this.elDependMaskGlobal = cm_ElCreateFloatText( this.element, 'right', 'Global Depend Mask');
@@ -102,6 +104,16 @@ JobNode.prototype.update = function( i_obj)
 		this.elMaintenance.style.display = 'block';
 	else
 		this.elMaintenance.style.display = 'none';
+
+	if( this.params.ignorenimby )
+		this.elIgnoreNimby.style.display = 'block';
+	else
+		this.elIgnoreNimby.style.display = 'none';
+
+	if( this.params.ignorepaused )
+		this.elIgnorePaused.style.display = 'block';
+	else
+		this.elIgnorePaused.style.display = 'none';
 
 	if( this.params.thumb_path )
 		this.showThumb( this.params.thumb_path );

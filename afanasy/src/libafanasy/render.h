@@ -48,8 +48,6 @@ public:
 /// Whether Render is ready to render tasks.
    inline bool isReady() const { return (
 			( m_state & SOnline ) &&
-			( false == ( m_state & SNIMBY )) &&
-			( false == ( m_state & SPaused )) &&
 			( m_priority > 0 ) &&
 			( m_capacity_used < getCapacity() ) &&
 			( (int)m_tasks.size() < getMaxTasks() ) &&

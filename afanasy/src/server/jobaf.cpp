@@ -788,6 +788,24 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 		return false;
 	}
 	
+	// Check Render Nimby:
+	if( false == isIgnoreNimbyFlag())
+	{
+		if( i_render->isNIMBY())
+			return false;
+
+		if( i_render->isNimby())
+			if( i_render->getUserName() != m_user_name )
+				return false;
+	}
+
+	// Check Render Paused:
+	if( false == isIgnorePausedFlag())
+	{
+		if( i_render->isPaused())
+			return false;
+	}
+
 	// check maximum running tasks per host:
 	if(( m_max_running_tasks_per_host  > 0 ) && ( getRenderCounts(i_render) >= m_max_running_tasks_per_host ))
 	{
