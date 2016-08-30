@@ -314,6 +314,7 @@ function d_Convert( i_args)
 	else if( i_args.results) title += ' Results';
 	var wnd = new cgru_Window({"name":'dailes',"title":title});
 	wnd.m_args = i_args;
+	wnd.onDestroy = d_CvtOnDestroy;
 
 	var img_types = {};
 	img_types.jpg = {"name":'JPG'};
@@ -655,6 +656,7 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 		if( i_wnd.wm )
 		{
 			cmd += ' -w "' +  i_wnd.wm.file + '"';
+			cmd += ' -u "' +  i_wnd.wm.params.text + '"';
 		}
 	}
 
@@ -674,6 +676,14 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 
 	i_wnd.destroy();
 //console.log(JSON.stringify(job));
+}
+
+
+function d_CvtOnDestroy( i_wnd)
+{
+	// Destroy watermark window if any:
+	if( i_wnd.wm )
+		d_WmDiscard( i_wnd.wm)
 }
 
 // ######################### Watermark: ####################### //
