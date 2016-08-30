@@ -19,12 +19,13 @@ Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', defaul
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
 Parser.add_option('-n', '--container', dest='container', type  ='string', default='mp4',    help='Movie Container')
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
-Parser.add_option('-o', '--output',    dest='output',    type  ='string', default='',       help='Output movie or images folder (auto)')
+Parser.add_option('-o', '--output',    dest='output',    type  ='string', default=None,     help='Output movie or images folder (auto)')
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
 Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
 Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
 Parser.add_option('-p', '--padding',   dest='padding' ,  type  ='int',    default=7,        help='Padding')
-Parser.add_option('-w', '--watermark', dest='watermark' ,type  ='string', default=None,     help='Add watermark')
+Parser.add_option('-w', '--watermark', dest='watermark', type  ='string', default=None,     help='Add watermark')
+Parser.add_option('-u', '--suffix',    dest='suffix',    type  ='string', default=None,     help='Add suffix to ouput file name')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
 
 Options, argv = Parser.parse_args()
@@ -35,7 +36,7 @@ if len(argv) < 1:
 
 Input = argv[0]
 Output = Options.output
-if Output == '':
+if Output is None:
     Output = Input
 
 Sequence = []
@@ -100,7 +101,12 @@ if Codec is None:
         args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
         Output += '.r%s' % Options.resize
 
+    # Add images type (extension,format) to output:
     Output += '.' + Options.type
+
+    # Add suffix to output:
+    if Options.suffix is not None:
+        Output += '.' + Options.suffix
 
     if not os.path.isdir(Output):
         os.makedirs(Output)
@@ -134,7 +140,17 @@ else:
         print('Invalid encode file "%s"' % Codec)
         sys.exit(1)
 
+    # Remove same extesion from ouput (same container):
+    name, ext = os.path.splitext( Output)
+    if ext[1:] == Options.container:
+        Output = name
+
+    # Add codec name to output:
     Output += '.' + os.path.basename(Codec.split('.')[0])
+
+    # Add suffix to output:
+    if Options.suffix is not None:
+        Output += '.' + Options.suffix
 
     auxargs = []
     if Options.resize is not None or Options.watermark is not None:
