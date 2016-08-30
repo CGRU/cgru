@@ -397,6 +397,7 @@ FilesView.prototype.showCounts = function()
 	var files_count = 0;
 	var frames_count = 0;
 	var size_count = 0;
+	var space_count = 0;
 
 	if( this.walk.folders)
 		for( var i = 0; i < this.walk.folders.length; i++)
@@ -409,6 +410,9 @@ FilesView.prototype.showCounts = function()
 
 				if( this.walk.folders[i].num_files )
 					frames_count += this.walk.folders[i].num_files;
+
+				if( this.walk.folders[i].space )
+					space_count += this.walk.folders[i].space;
 			}
 
 	if( this.walk.files)
@@ -417,6 +421,9 @@ FilesView.prototype.showCounts = function()
 			{
 				if( this.walk.files[i].size )
 					size_count += this.walk.files[i].size;
+
+				if( this.walk.files[i].space )
+					space_count += this.walk.files[i].space;
 
 				files_count++;
 			}
@@ -427,6 +434,7 @@ FilesView.prototype.showCounts = function()
 	if( size_count ) counts += ' Size:' + c_Bytes2KMG( size_count);
 
 	this.elCounts.textContent = counts;
+	this.elCounts.title = 'Disk Usage: ' + c_Bytes2KMG( space_count);
 
 	if( frames_count )
 	{
