@@ -74,6 +74,19 @@ function g_ConfigReceived( i_obj)
 			g_Error('Invalid config recieved.');
 			return;
 		}
+
+		var title = 'CGRU version: ' + cgru_Environment.version;
+		title += '\nBuild at: ' + cgru_Environment.builddate;
+		$('version').textContent = cgru_Environment.version;
+		$('version').title = title;
+
+		var log = 'CGRU version: ' + cgru_Environment.version;
+		log += '<br>Build at: ' + cgru_Environment.builddate;
+		log += '<br>Build revision: ' + cgru_Environment.buildrevision;
+		log += '<br>Server: ' + cgru_Environment.username + '@' + cgru_Environment.hostname + ':' + cgru_Environment.location;
+		if( cgru_Environment.servedir && cgru_Environment.servedir.length )
+			log += '<br>HTTP root override: ' + cgru_Environment.servedir;
+		g_Log( log);
 	}
 
 	if( g_digest == null )
@@ -283,7 +296,6 @@ function g_RegisterRecieved( i_obj)
 	$('registered').textContent = 'Registered';
 	$('id').textContent = g_id;
 	$('uid').textContent = g_uid;
-	$('version').textContent = i_obj.version;
 
 	g_MButtonClicked( g_main_monitor_type);
 

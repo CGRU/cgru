@@ -567,7 +567,16 @@ void Environment::load()
 	loadFile( cgrulocation + "/config_default.json");
 	loadFile( home_afanasy + "/config.json");
 
-	m_config_data += "{}]}";
+	m_config_data += "{\"cgru_environment\":{";
+	m_config_data += "\"version\":\"" + getVersionCGRU() + "\"";
+	m_config_data += ",\"builddate\":\"" + getBuildDate() + "\"";
+	m_config_data += ",\"buildrevision\":\"" + getVersionRevision() + "\"";
+	m_config_data += ",\"platform\":\"" + strJoin(getPlatform(),",") + "\"";
+	m_config_data += ",\"hostname\":\"" + getComputerName() + "\"";
+	m_config_data += ",\"username\":\"" + getUserName() + "\"";
+	m_config_data += ",\"location\":\"" + getCGRULocation() + "\"";
+	m_config_data += ",\"servedir\":\"" + getHTTPServeDir() + "\"";
+	m_config_data += "}}]}";
 /*
 	m_verbose_init = false;
 	filename = ( afroot + "/config_shadow.json");
