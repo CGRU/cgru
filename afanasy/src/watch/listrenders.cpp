@@ -96,6 +96,15 @@ ListRenders::ListRenders( QWidget* parent):
 	bp = addButtonPanel("EJN","renders_eject_notmy","Eject mot my tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
 
+	if( af::Environment::GOD())
+	{
+		bp = addButtonPanel("PAU","renders_pause","Pause selected renders.","P");
+		connect( bp, SIGNAL( sigClicked()), this, SLOT( actSetPaused()));
+
+		bp = addButtonPanel("STA","renders_unpause","Start (Unpause) selected renders.","S");
+		connect( bp, SIGNAL( sigClicked()), this, SLOT( actUnsetPaused()));
+	}
+
 
 	timer = new QTimer( this);
 	connect(timer, SIGNAL(timeout()), this, SLOT( requestResources()));
