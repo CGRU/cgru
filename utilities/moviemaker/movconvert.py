@@ -208,8 +208,10 @@ except Exception as e:
     sys.exit(1)
 
 re_duration = re.compile(r'Duration: (\d\d:\d\d:\d\d)\.(\d\d)')
-re_fps = re.compile(r'Stream.*: Video:.*(\d\d) fps')
+re_video = re.compile(r'.*Stream.*Video:\s*(.*)')
+re_fps = re.compile(r'.*Stream.*: Video:.*(\d\d) fps')
 
+video        = None
 seconds      = -1
 frames_total = -1
 fps          = -1
@@ -247,6 +249,39 @@ while True:
             print('[ PARSER BAD RESULT ]')
             break
 
+        # Search for duration (seconds):
+        if seconds == -1 and frame == -1:
+            reobj = re_duration.search(output)
+            if reobj is not None:
+                time_s, time_f = reobj.groups()
+                time_s = time_s.split(':')
+                time_slen = len(time_s)
+                if time_slen > 0:
+                    seconds = 0
+                    i = time_slen - 1
+                    mult = 1
+                    while i >= 0:
+                        seconds += int(time_s[i]) * mult
+                        mult *= 60
+                        i -= 1
+                    seconds = seconds * 100 + int(time_f)
+                print('SECONDS = %d' % seconds)
+
+        # Search for fps:
+        if fps == -1 and frame == -1:
+            reobj = re_fps.search(output)
+            if reobj is not None:
+                fps = int(reobj.groups()[0])
+                print('FPS = %d' % fps)
+
+        #if video is None and output.find('Video') != -1:
+        if video is None:
+            re_obj = re_video.search(output)
+            if re_obj:
+                video = re_obj.groups()[0]
+                print('REPORT: Input: ' + video)
+
+
         if frame_old != frame:
             frame_info = 'Frame = %d' % frame
             if frames_total != -1:
@@ -279,31 +314,6 @@ while True:
 
     output += data
 
-
-    if seconds == -1 and frame == -1:
-        reobj = re_duration.search(output)
-        if reobj is not None:
-            time_s, time_f = reobj.groups()
-            time_s = time_s.split(':')
-            time_slen = len(time_s)
-            if time_slen > 0:
-                seconds = 0
-                i = time_slen - 1
-                mult = 1
-                while i >= 0:
-                    seconds += int(time_s[i]) * mult
-                    mult *= 60
-                    i -= 1
-                seconds = seconds * 100 + int(time_f)
-            output = ''
-            continue
-
-    if fps == -1 and frame == -1:
-        reobj = re_fps.search(output)
-        if reobj is not None:
-            fps = int(reobj.groups()[0])
-            output = ''
-            continue
 
     if frame == -1 and fps != -1 and seconds != -1 and frames_total == -1:
         frames_total = 1 + seconds * fps / 100
