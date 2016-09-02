@@ -86,9 +86,9 @@ function a_Create( i_type, i_name, i_path, i_absolute)
 		ASSET = asset;
 
 	if( i_absolute )
-		c_Log('Asset specified: ' + i_type + '=' + i_name);
+		c_Log('Asset specified: ' + i_type + '=' + i_name + ': ' + i_path);
 	else
-		c_Log('Asset found: ' + i_type + '=' + i_name);
+		c_Log('Asset found: ' + i_type + '=' + i_name + ': ' + i_path);
 }
 
 function a_Append( i_path, i_rules)
@@ -110,76 +110,90 @@ function a_Append( i_path, i_rules)
 
 function a_AutoSeek()
 {
+	var log_console = false;
+	//log_console = true;
+	if( log_console) console.log('a_AutoSeek(): "' + g_CurPath() + '"');
+
 	var folders = g_elCurFolder.m_path.split('/');
 	var path = '';
 	for( var i = 0; i < folders.length; i++ )
 	{
+		// Skip "" folder if last is "/".
+		// "/temp/" should be two "" and "temp", but not three with "" at the end.
 		if(( folders[i].length == 0 ) && ( i != 0 )) continue;
 
-		var nextfolder = null;
-		if( i < folders.length ) nextfolder = folders[i+1];
-		if( nextfolder == '' ) continue;
-
+		// Construct current path:
 		if( path == '/' )
 			path += folders[i];
 		else
 			path += '/' + folders[i];
-//window.console.log('path='+path);
+		if( log_console) console.log('Asset seeking path: "' + path + '"');
 
 		for( var asset_type in RULES.assets)
 		{
 			if( ASSETS[asset_type]) continue;
-//window.console.log( asset_type);
+			if( log_console) console.log('Asset seeking: ' + asset_type);
+
 			var seekpaths = RULES.assets[asset_type].seek;
-			if( seekpaths == null ) continue;
+			if( seekpaths == null )
+				continue;
+
 			for( var l = 0; l < seekpaths.length; l++)
 			{
-				var subfolder = ( seekpaths[l].lastIndexOf('/') == (seekpaths[l].length-1))
-//window.console.log('seekpath-'+subfolder+'='+seekpaths[l]);
 				var seekpath = seekpaths[l];
-				if( subfolder )
+
+				// Replace parent asset name on its path:
+				// ("[project]/SHOTS" -> "/PRJNAME/SHOTS")
+				if( seekpath.indexOf('[') !== -1 )
 				{
-					if( nextfolder == null ) break;
-					seekpath = seekpaths[l].substr( 0, seekpaths[l].lastIndexOf('/'));
-				}
-
-				if( seekpath == '') seekpath = '/';
-
-				for( var a_type in ASSETS)
-					seekpath = seekpath.replace('['+a_type+']', ASSETS[a_type].path);
-
-				var apath = path;
-				var aname = folders[i];
-				if( subfolder )
-					aname = nextfolder;
-//window.console.log('seekpath-'+subfolder+'='+seekpath);
-//window.console.log('apath='+apath);
-
-				if( apath == seekpath )
-				{
-					if( subfolder )
+					var replaced = false;
+					for( var a_type in ASSETS)
 					{
-						if( apath == '/' ) apath = '/' + nextfolder;
-						else apath = apath + '/' + nextfolder;
+						if( seekpath.indexOf( a_type) !== -1 )
+						{
+							var seekpath_orig = seekpath;
+							seekpath = seekpath.replace('['+a_type+']', ASSETS[a_type].path);
+							replaced = true;
+							if( log_console) console.log('Asset ["' + a_type + '"] in seek path "' + seekpath_orig + '" replaced on "' + ASSETS[a_type].path + '": ' + seekpath);
+						}
 					}
 
-					// Verify whether an asset with the same path exists
-					// Delete previous asset with the same path
-					// - before: do not add new asset with the same path
-//					var exists = false;
+					if( false == replaced )
+						continue;
+				}
+
+				// Seek path can finish with '/' ("[scene]/").
+				// This means that any folder there is an asset.
+				// ( any folder in "[scene]/" is a shot asset ).
+				if( seekpath.lastIndexOf('/') == (seekpath.length-1))
+				{
+					if( i == 0 )
+						continue;
+					
+					seekpath += folders[i];
+				}
+
+				if( path == seekpath )
+				{
+					//console.log( path + ' == ' + seekpath);
+
+					// Verify whether an asset with the same path exists.
+					// Prevent adding new asset with the same path.
+					var exists = false;
 					for( var asset in ASSETS)
 					{
-//console.log( ASSETS[asset].path + ' == ' + apath);
-						if( ASSETS[asset].path == apath)
+						if( ASSETS[asset].path == path)
 						{
-//							exists = true;
-							delete ASSETS[asset];
+							//console.log( ASSETS[asset].path + ' == ' + path);
+							exists = true;
 							break;
 						}
 					}
-//					if( exists ) break;
+					if( exists ) break;
 
-					a_Create( asset_type, aname, apath, false);
+					a_Create( asset_type, folders[i], path, false);
+					if( log_console) console.log('Asset "' + asset_type + '" founded: ' + path);
+
 					break;
 				}
 			}

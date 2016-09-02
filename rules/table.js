@@ -304,12 +304,18 @@ function table_Gen_picture( i_shot)
 function table_PictureReceived( i_data, i_shot)
 {
 	//console.log( i_data);
-	var img = '';
+	//console.log( i_shot);
+
+	var args = {}
+	args.data = '';
 
 	if( i_data )
-		img = '<img width="200px" src="' + i_data + '">';
+		args.data = '<img width="200px" src="' + i_data + '">';
 
-	table_WriteTD({'data':img,'status':i_shot.status});
+	if( i_shot )
+		args.status = i_shot.status;
+
+	table_WriteTD( args);
 
 	table_Function();
 }

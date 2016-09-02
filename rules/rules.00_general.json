@@ -57,8 +57,12 @@
 "aux_folders":[".","_","-","tmp","temp","tmp","common"],
 
 "assets":{
+	"projects_root":{
+		"play_folders":false,
+		"show_files":true
+	},
 	"project":{
-		"seek":["/"],
+		"seek":["[projects_root]/","/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"play_folders":false,
 		"scripts":["project.js"],
