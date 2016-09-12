@@ -772,7 +772,10 @@ Status.prototype.getMultiVale = function( i_key, i_statuses)
 
 	for( var i = 0; i < i_statuses.length; i++)
 	{
-		var other = i_statuses[i].obj[i_key];
+		var other = null;
+		if(( i_statuses[i].obj ) && ( i_statuses[i].obj[i_key] ))
+			other = i_statuses[i].obj[i_key];
+
 		if( value != other )
 		{
 			value = st_MultiValue;
@@ -1226,11 +1229,6 @@ Status.prototype.editSave = function( i_args)
 					{
 						var tag = elList[i].m_item;
 						task.tags.push( tag);
-
-						// Add tag to status:
-						if( this.obj.tags == null ) this.obj.tags = [];
-						if( this.obj.tags.indexOf( tag) == -1 )
-							this.obj.tags.push( tag);
 					}
 			}
 			else if( elTask.m_task.tags )
@@ -1245,11 +1243,6 @@ Status.prototype.editSave = function( i_args)
 					{
 						var artist = elList[i].m_item;
 						task.artists.push( artist);
-
-						// Add artist to status:
-						if( this.obj.artists == null ) this.obj.artists = [];
-						if( this.obj.artists.indexOf( artist) == -1 )
-							this.obj.artists.push( artist);
 					}
 			}
 			else if( elTask.m_task.artists )
@@ -1377,11 +1370,42 @@ Status.prototype.editSave = function( i_args)
 					duration += tasks[t].duration;
 				if( tasks[t].price )
 					price += tasks[t].price;
+
+				// Add tag to status:
+				if( tasks[t].tags && tasks[t].tags.length )
+				{
+					if( statuses[i].obj.tags == null ) 
+						statuses[i].obj.tags = [];
+
+					for( var j = 0; j < tasks[t].tags.length; j++)
+					{
+						var tag = tasks[t].tags[j];
+
+						if( statuses[i].obj.tags.indexOf( tag) == -1 )
+							statuses[i].obj.tags.push( tag);
+					}
+				}
+
+				// Add artist to status:
+				if( tasks[t].artists && tasks[t].artists.length )
+				{
+					if( statuses[i].obj.artists == null )
+						statuses[i].obj.artists = [];
+
+					for( var j = 0; j < tasks[t].artists.length; j++)
+					{
+						var artist = tasks[t].artists[j];
+
+						if( statuses[i].obj.artists.indexOf( artist) == -1 )
+							statuses[i].obj.artists.push( artist);
+					}
+				}
 			}
 			
 			statuses[i].obj.tasks = tasks;
 			statuses[i].obj.duration = duration;
 			statuses[i].obj.price = price;
+
 		}
 
 		if( this.elEdit_Color.m_color_changed )

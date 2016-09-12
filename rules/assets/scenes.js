@@ -442,6 +442,9 @@ function sc_EditBodySave( i_e)
 
 	for( var i = 0; i < shots.length; i++)
 	{
+		if( shots[i].m_status.obj == null )
+			shots[i].m_status.obj = {};
+
 		n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename, shots[i].m_path),"data":text}},
 		"func":sc_EditBodyFinished,"elShot":shots[i],"info":'body save'});
 

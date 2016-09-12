@@ -1,7 +1,7 @@
 table_columns = {};
 table_columns.name     = {'label':'Name'};
 table_columns.picture  = {'label':'Picture'};
-table_columns.state    = {'label':'State'};
+table_columns.status   = {'label':'Status'};
 table_columns.info     = {'label':'Info'};
 table_columns.comments = {'label':'Comments'};
 table_columns.tasks    = {'label':'Tasks'};
@@ -17,11 +17,12 @@ table_functions = null;
 table_function_num = null;
 
 table_params = {};
-table_params.picture  = {'type':'bool','default':true,'width':'20%'};
-table_params.state    = {'type':'bool','default':true,'width':'20%'};
-table_params.tasks    = {'type':'bool','default':true,'width':'20%'};
-table_params.duration = {'type':'bool','default':true,'width':'20%'};
-table_params.price    = {'type':'bool','default':true,'width':'20%'};
+table_params.picture  = {'type':'bool','default':true, 'width':'16%'};
+table_params.status   = {'type':'bool','default':true, 'width':'16%'};
+table_params.tasks    = {'type':'bool','default':false,'width':'16%'};
+table_params.comments = {'type':'bool','default':false,'width':'16%'};
+table_params.duration = {'type':'bool','default':true, 'width':'16%'};
+table_params.price    = {'type':'bool','default':true, 'width':'16%'};
 
 function table_Export( i_args)
 {
@@ -161,15 +162,15 @@ function table_Start( i_args)
 	var lines = ['<table>',
 		'<tr>',
 			'<th>Count</th>',
-			'<th>Progress</th>',
-			'<th>Duration</th>',
-			'<th>Price</th>',
+			'<th style="' + (progress ? '':'display:none') + '">Progress</th>',
+			'<th style="' + (duration ? '':'display:none') + '">Duration</th>',
+			'<th style="' + (price    ? '':'display:none') + '">Price</th>',
 		'</tr>',
 		'<tr>',
 			'<td>' + ( table_shots.length - omits ) + (omits?(' ( +' + omits + ' omits)'):'') + '</td>',
-			'<td>' + progress + '%</td>',
-			'<td>' + duration + '</td>',
-			'<td>' + price + '</td>',
+			'<td style="' + (progress ? '':'display:none') + '">' + progress + '%</td>',
+			'<td style="' + (duration ? '':'display:none') + '">' + duration + '</td>',
+			'<td style="' + (price    ? '':'display:none') + '">' + price + '</td>',
 		'</tr>',
 		'</table>'];
 	table_WriteLines( lines);
@@ -320,11 +321,27 @@ function table_PictureReceived( i_data, i_shot)
 	table_Function();
 }
 
-function table_Gen_state( i_shot)
+function table_Gen_status( i_shot)
 {
 	var st = '';
+
+	if( table_args.params.tasks !== true )
+	if( i_shot.status.tags && i_shot.status.tags.length )
+		for( var i = 0; i < i_shot.status.tags.length; i++)
+		{
+			if( st.length )
+				st += '<br>';
+
+			st += c_GetTagTitle( i_shot.status.tags[i]);
+		}
+
 	if( i_shot.status.progress && ( i_shot.status.progress > 0 ))
+	{
+		if( st.length )
+			st += '<br>';
+
 		st += i_shot.status.progress + '%';
+	}
 
 	table_WriteTD({'data':st,'status':i_shot.status});
 
@@ -390,9 +407,24 @@ function table_CommentsReceived( i_data, i_args)
 
 function table_Gen_tasks( i_shot)
 {
-	var tasks = '';
+	var data = '';
 
-	table_WriteTD({'data':tasks,'status':i_shot.status});
+	var tasks = i_shot.status.tasks;
+	if( tasks && tasks.length )
+		for( var t = 0; t < tasks.length; t++)
+		{
+			var tags = '';
+			if( tasks[t].tags && tasks[t].tags.length )
+				for( var g = 0; g < tasks[t].tags.length; g++)
+					tags += ' ' + c_GetTagTitle(tasks[t].tags[g]);
+
+			if( data.length )
+				data += '<br>';
+
+			data += tags + ' - ' + tasks[t].duration;
+		}
+
+	table_WriteTD({'data':data,'status':i_shot.status});
 
 	table_Function();
 }
