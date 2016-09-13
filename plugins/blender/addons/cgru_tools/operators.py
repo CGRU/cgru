@@ -24,7 +24,7 @@ bpy.context.scene.render.filepath = bpy.context.scene.render.filepath \
 	+ '_' + "{0}" + '_'
 '''
 
-CMD_TEMPLATE = "blender -b {blend_scene} -y -E {render_engine} " \
+CMD_TEMPLATE = "blender -b \"{blend_scene}\" -y -E {render_engine} " \
 		"{python_options}" "{output_options} -s @#@ " \
 		"-e @#@ -j {frame_inc} -a"
 
