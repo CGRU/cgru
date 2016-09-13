@@ -12,10 +12,10 @@ class parser(object):
     """
 
     def __init__(self):
-        self.str_warning = ['warning']  # '[ PARSER WARNING ]'
-        self.str_error = ['error']      # '[ PARSER ERROR ]'
-        self.str_badresult = []         # '[ PARSER BAD RESULT ]'
-        self.str_finishedsuccess = []   # '[ PARSER FINISHED SUCCESS ]'
+        self.str_warning = ['warning']
+        self.str_error = ['error']
+        self.str_badresult = []
+        self.str_finishedsuccess = []
         self.percent = 0
         self.frame = 0
         self.percentframe = 0
@@ -27,6 +27,8 @@ class parser(object):
         self.report = ''
         self.result = None
         self.log = None
+        self.numframes = 0
+        self.taskInfo = {}
 
         self.files = []
         self.files_onthefly = []
@@ -174,35 +176,33 @@ class parser(object):
         if self.percent > 100:
             self.percent = 100
 
-
-    def toHTML( self, i_data):
+    def toHTML(self, i_data):
         """ Convert data to HTML.
             Designed for GUIs for escape sequences, errors highlighting.
         :param i_data: input data
         :return: converted data
         """
-        lines = i_data.replace('\r','').split('\n')
+        lines = i_data.replace('\r', '').split('\n')
         html = []
 
         for line in lines:
-            html.append( self.toHTMLline(line))
+            html.append(self.toHTMLline(line))
+        return '<br>\n'.join(html)
 
-        return '<br>\n'.join( html)
-
-    def toHTMLline( self, i_line):
+    def toHTMLline(self, i_line):
         """ Convert line to HTML.
             Designed for GUIs for escape sequences, errors highlighting.
         :param i_line: input line
         :return: converted line
         """
-        self.parse( i_line,'html')
+        self.parse(i_line, 'html')
 
         if self.error:
             i_line = '<span style="background-color:#FF0000"><b>' + i_line + '</b></span>'
         if self.badresult:
             i_line = '<span style="background-color:#FF00FF"><b>' + i_line + '</b></span>'
         if self.warning:
-            i_line = '<span style="background-color:#FFFF00"><b>' + i_line + '</b></span>'
+            i_line = '<span style="background-color:#FFA500"><b>' + i_line + '</b></span>'
         if self.finishedsuccess:
             i_line = '<span style="color:#008800"><b>' + i_line + '</b></span>'
         if len(self.activity):
@@ -210,9 +210,9 @@ class parser(object):
         if len(self.report):
             i_line = '<i><b>' + i_line + '</b></i>'
 
-        return self.tagHTML( i_line)
+        return self.tagHTML(i_line)
 
-    def tagHTML( self, i_line):
+    def tagHTML(self, i_line):
         """ Convert line to HTML.
             Designed for GUIs for escape sequences, errors highlighting.
             Function designed to be implemented in child classes, if special highlinghting needed.
