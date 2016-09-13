@@ -7,8 +7,7 @@ import re
 PERCENT = 'ALF_PROGRESS '
 PERCENT_len = len(PERCENT)
 
-IMAGE = 'Generating Image:'
-IMAGE_len = len(IMAGE)
+IMAGE_RE = re.compile(r'.*Generating Image: (.+) \(\d+x\d+\)')
 
 ErrorsRE = [re.compile(r'Error loading geometry .* from stdin')]
 
@@ -19,7 +18,11 @@ class mantra(parser.parser):
 
     def __init__(self):
         parser.parser.__init__(self)
-        self.str_warning = ['Unable to access file', 'Unable to load texture']
+        self.str_warning = ['Unable to access file', 'Unable to load texture',
+                            'Recompress failed', 'WARNING: A procedural of',
+                            ' Unknown parameter: ', ' is rendering as a packed '
+                            'procedural but has a mix of packed and '
+                            'non-packed primitives']
         self.str_error = [
             'No licenses could be found to run this application',
             'Please check for a valid license server host',
@@ -40,10 +43,9 @@ class mantra(parser.parser):
 
         lines = data.split('\n')
         for line in lines:
-            if line.find(IMAGE) != -1:
-                line = line[IMAGE_len:]
-                line = line[:line.find('(')]
-                self.appendFile(line.strip())
+            m = IMAGE_RE.match(line)
+            if m:
+                self.appendFile(m.group(1))
 
         percent_pos = data.find(PERCENT)
         if percent_pos > -1:

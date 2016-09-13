@@ -87,7 +87,6 @@ class BlockParameters:
             self.depend_mask_global = str(
                 afnode.parm('depend_mask_global').eval())
 
-
         # Process frame range:
         opname = afnode.path()
         if afnode.parm('trange').eval() > 1:
@@ -274,7 +273,7 @@ class BlockParameters:
 
         block = af.Block(self.name, self.type)
         block.setParser(self.parser)
-        block.setCommand( cmd, self.cmd_useprefix)
+        block.setCommand(cmd, self.cmd_useprefix)
         if self.preview != '':
             block.setFiles([self.preview])
 
@@ -587,29 +586,27 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             params.append(block_generate)
 
     elif len(str(afnode.parm('ds_node').eval())):
-    # Case distribute simulation:
-        ds_node_path = str( afnode.parm('ds_node').eval())
-        ds_node = hou.node( ds_node_path)
+        # Case distribute simulation:
+        ds_node_path = str(afnode.parm('ds_node').eval())
+        ds_node = hou.node(ds_node_path)
         if not ds_node:
             hou.ui.displayMessage('No such control node: "%s"' % ds_node_path)
             return
-        parms = ['address','port','slice']
+        parms = ['address', 'port', 'slice']
         for parm in parms:
-            if not ds_node.parm( parm):
+            if not ds_node.parm(parm):
                 hou.ui.displayMessage('Control node "%s" does not have "%s" parameter' % (ds_node_path, parm))
                 return
-        ds_num_slices = int( afnode.parm('ds_num_slices').eval())
-        for s in range( 0, ds_num_slices):
-            par = BlockParameters( afnode, ropnode, subblock, prefix, frame_range)
+        ds_num_slices = int(afnode.parm('ds_num_slices').eval())
+        for s in range(0, ds_num_slices):
+            par = BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
             par.name += '-s%d' % s
             par.frame_pertask = par.frame_last - par.frame_first + 1
             par.auxargs = ' --ds_node "%s"' % ds_node_path
             par.auxargs += ' --ds_address "%s"' % str(afnode.parm('ds_address').eval())
             par.auxargs += ' --ds_port %d' % int(afnode.parm('ds_port').eval())
             par.auxargs += ' --ds_slice %d' % s
-            params.append( par)
-
-
+            params.append(par)
     else:
         params.append(
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
@@ -651,7 +648,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
     if output_driver_path:
         output_driver = hou.node(output_driver_path)
         if output_driver:
-            nodes.insert( 0, output_driver)
+            nodes.insert(0, output_driver)
         else:
             hou.ui.displayMessage('Can`t find output drive node: "%s"' % output_driver_path)
 
