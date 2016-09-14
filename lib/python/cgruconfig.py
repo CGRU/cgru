@@ -70,9 +70,12 @@ class Config:
 
             self.Vars['HOSTNAME'] = socket.gethostname().lower()
 
-            cgrulocation = os.getenv('CGRU_LOCATION')
-            if cgrulocation is None or cgrulocation == '':
-                return
+            try:
+                cgrulocation = os.environ['CGRU_LOCATION']
+                if cgrulocation is None or cgrulocation == '':
+                    raise KeyError('CGRU_LOCATION')
+            except KeyError as e:
+                raise KeyError('Environment variable CGRU_LOCATION not set.')
 
             # Definitions which always must preset:
             self.Vars['CGRU_LOCATION'] = cgrulocation
