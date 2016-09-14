@@ -868,7 +868,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			if( cmds[c].submenu )
 				elParent = elItem.m_elMenu;
 
-			c_CreateLaunchButton({"command":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
+			c_CreateLaunchButton({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
 
