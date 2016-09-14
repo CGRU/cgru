@@ -131,14 +131,18 @@ function u_Process()
 
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
 	c_Info( path);
+
 	if( RULES.has_filesystem !== false )
 	{
-		$('open').setAttribute('cmdexec', JSON.stringify([cgru_OpenFolderCmd(path)]));
+		$('open').m_cmd = cgru_OpenFolderCmd(path);
 		$('open').style.display = 'block';
+    	$('open').ondblclick = c_LaunchButtonClicked;
 	}
 	else
+    {
 		$('open').style.display = 'none';
-
+    	$('open').ondblclick = null;
+    }
 }
 
 function u_Finish()
