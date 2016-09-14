@@ -811,18 +811,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		var cmds = RULES.cmdexec.play_sequence;
 		if( cmds ) for( var c = 0; c < cmds.length; c++)
 		{
-			var elCmd = document.createElement('div');
-			if( cmds[c].submenu )
-				elItem.m_elMenu.appendChild( elCmd);
-			else
-				elItem.appendChild( elCmd);
-			elCmd.classList.add('cmdexec');
-			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
 			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
-			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
-			if( cmds[c].tooltip ) elCmd.title = cmds[c].tooltip;
+
+			var elParent = elItem;
+			if( cmds[c].submenu )
+				elParent = elItem.m_elMenu;
+
+			c_CreateLaunchButton({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
 
@@ -863,18 +860,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		var cmds = RULES.cmdexec.play_movie;
 		if( cmds && ( RULES.has_filesystem !== false )) for( var c = 0; c < cmds.length; c++)
 		{
-			var elCmd = document.createElement('div');
-			if( cmds[c].submenu )
-				elItem.m_elMenu.appendChild( elCmd);
-			else
-				elItem.appendChild( elCmd);
-			elCmd.classList.add('cmdexec');
-			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
 			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
-			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
-			if( cmds[c].tooltip ) elCmd.title = cmds[c].tooltip;
+
+			var elParent = elItem;
+			if( cmds[c].submenu )
+				elParent = elItem.m_elMenu;
+
+			c_CreateLaunchButton({"command":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
 

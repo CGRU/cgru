@@ -483,17 +483,52 @@ function c_GetElInteger( i_el)
 	return num;
 }
 
+function c_CreateLaunchButton( i_args)
+{
+	var i_elParent = i_args.parent;
+	var i_elType   = i_args.type;
+	var i_label    = i_args.label;
+	var i_tooltip  = i_args.tooltip;
+	var i_cmd      = i_args.cmd;
+
+	if( i_elType == null ) i_elType = 'div';
+	var el = document.createElement( i_elType);
+	el.classList.add('cmdexec');
+	el.m_cmd = i_cmd;
+
+	if( i_elParent )
+		i_elParent.appendChild( el);
+
+	if( i_label )
+		el.textContent = i_label;
+
+	if( i_tooltip )
+		el.title = i_tooltip;
+
+	el.ondblclick = c_LaunchButtonClicked;
+
+	return el;
+}
+function c_LaunchButtonClicked( i_evt)
+{
+	var cmd = i_evt.currentTarget.m_cmd;
+	console.log('Executing:\n' + cmd);
+	var xhr = new XMLHttpRequest;
+	xhr.open('POST', 'http://127.0.0.1:50999/', true); 
+	xhr.send( cmd + '\n');
+}
 function c_CreateOpenButton( i_el, i_path, i_type)
 {
-	if( RULES.has_filesystem === false ) return null;
-	if( i_type == null ) i_type = 'div';
-	var el = document.createElement( i_type);
-	i_el.appendChild( el);
-	el.classList.add('cmdexec');
-	el.classList.add('open');
+	if( RULES.has_filesystem === false )
+		return null;
+
 	var cmd = cgru_OpenFolderCmd( cgru_PM('/'+RULES.root + i_path))
-	el.setAttribute('cmdexec', JSON.stringify([cmd]));
-	el.title = 'Open location in a file browser.\nRMB "Run" menu item.'
+	var tooltip = 'Open location in a file browser.\nDouble click to run.'
+
+	var el = c_CreateLaunchButton({"parent":i_el,"type":i_type,"cmd":cmd,"tooltip":tooltip});
+
+	el.classList.add('open');
+
 	return el;
 }
 
