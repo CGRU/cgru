@@ -2,6 +2,7 @@
 
 import os
 import sys
+import bpy
 
 CGRU_NOT_FOUND = 'NOT FOUND'
 
@@ -23,6 +24,9 @@ def add_cgru_module_to_syspath(path):
     if afmodule not in sys.path:
         sys.path.append(afmodule)
 
+    prefs = bpy.context.user_preferences.addons[__package__].preferences
+    if "CGRU_LOCATION" not in os.environ:
+        os.environ["CGRU_LOCATION"] = prefs.cgru_location
 
 def get_movie_codecs(self, context):
     addon_prefs = context.user_preferences.addons[__package__].preferences

@@ -20,11 +20,13 @@ if "bpy" in locals():
     imp.reload(properties)
     imp.reload(ui)
     imp.reload(operators)
+    imp.reload(utils)
 else:
     from . import addon_prefs
     from . import properties
     from . import ui
     from . import operators
+    from . import utils
 
 import bpy
 import os
@@ -41,6 +43,8 @@ def register():
     prefs = bpy.context.user_preferences.addons[__name__].preferences
     if "CGRU_LOCATION" in os.environ:
         prefs.cgru_location = os.environ["CGRU_LOCATION"]
+    else:
+        utils.add_cgru_module_to_syspath(prefs.cgru_location)
 
 
 def unregister():
