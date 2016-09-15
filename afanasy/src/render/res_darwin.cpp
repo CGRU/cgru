@@ -1,6 +1,7 @@
 #ifdef MACOSX
 #include "res.h"
 
+#include <set>
 #include <fcntl.h>
 #include <mach/host_info.h>
 #include <mach/mach.h>
