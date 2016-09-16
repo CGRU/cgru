@@ -514,8 +514,8 @@ function c_LaunchButtonClicked( i_evt)
 	var cmd = i_evt.currentTarget.m_cmd;
 	console.log('Executing:\n' + cmd);
 	var xhr = new XMLHttpRequest;
-	xhr.open('POST', 'http://127.0.0.1:50999/', true); 
-	xhr.send( cmd + '\n');
+	xhr.open('POST', 'https://localhost:' + cgru_Config.keeper_port_https + '/', true); 
+	xhr.send( cmd);
 }
 function c_CreateOpenButton( i_el, i_path, i_type)
 {
