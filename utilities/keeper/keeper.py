@@ -22,6 +22,8 @@ import cmd
 from refresh import Refresh
 from tray import Tray
 from server import Server
+import serverhttps
+
 
 # Define keeper launch command if was not:
 keeper_cmd = os.getenv('CGRU_KEEPER_CMD')
@@ -36,4 +38,5 @@ cmd.Application = app
 cmd.Tray = Tray(app)
 refresh = Refresh(app)
 server = Server(app)
+serverhttps.serve(cgruconfig.VARS['keeper_port_https'])
 app.exec_()
