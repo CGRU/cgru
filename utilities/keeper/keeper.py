@@ -3,6 +3,13 @@
 import sys
 import os
 
+if sys.platform.find('win') == 0 and sys.executable.find('pythonw') != -1:
+	try:
+		sys.stdout = open('c:\\temp\\cgru_keeper_log.txt', 'w')
+		sys.stderr = sys.stdout
+	except:
+		pass
+
 # Write qt.conf file on MS Windows before importing PyQt:
 if sys.platform.find('win') == 0:
 	qtconf = sys.prefix + '/qt.conf'

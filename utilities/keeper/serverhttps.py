@@ -13,6 +13,8 @@ import subprocess
 import sys
 import threading
 
+import cgruutils
+
 isRunning = False
 
 BaseServer = None
@@ -43,7 +45,7 @@ class Handler(BaseHandler):
 
     def do_POST( self):
         content_len = int(self.headers['content-length'])
-        post_body = self.rfile.read(content_len)
+        post_body = cgruutils.toStr( self.rfile.read(content_len))
 
         print('Executing:')
         print( post_body)
