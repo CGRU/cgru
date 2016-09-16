@@ -35,13 +35,8 @@ class Handler(BaseHandler):
     def do_GET( self):
         fname,ext = os.path.splitext(__file__)
         fname += '.html'
-        f = open( fname, 'rb')
-        data = f.read()
+        self.writeResponse( open( fname, 'rb').read())
 
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
-        self.wfile.write( data)
 
     def do_POST( self):
         content_len = int(self.headers['content-length'])
@@ -51,10 +46,16 @@ class Handler(BaseHandler):
         print( post_body)
         subprocess.Popen( post_body, shell=True)
 
+        self.writeResponse( b'STATUS: OK')
+
+
+    def writeResponse( self, i_bytes):
         self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write(b'STATUS: OK')
+        self.wfile.write( i_bytes)
+
 
 
 def serve( i_port):
@@ -64,7 +65,7 @@ def serve( i_port):
     certificate += '.pem'
 
     if os.path.isfile( certificate):
-        print('Starting HTTPS server at port %d with cert "%s".' % ( i_port, certificate))
+        print('Starting HTTPS server "https://localhost:%d/" with cert "%s".' % ( i_port, certificate))
     else:
         print('Certificate file "%s" not found, skipping HTTPS serving.' % certificate)
         return
