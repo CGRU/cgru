@@ -38,6 +38,7 @@
 	"email_sender_address_host":"cgru.info",
 
 	"keeper_port":50999,
+	"keeper_port_https":50443,
 
 	"timeformat":"%a %d %b %H:%M.%S",
 		"":"'strftime' function format http://www.cplusplus.com/reference/clibrary/ctime/strftime",
