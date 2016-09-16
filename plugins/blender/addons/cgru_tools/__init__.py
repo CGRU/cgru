@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+import os
 
 bl_info = {
     "name": "CGRU Tools",
     "author": "Timur Hairulin, Paul Geraskin, Sylvain Maziere",
-    "version": (1,0,0),
+    "version": (1, 0, 0),
     "blender": (2, 7, 1),
     "location": "Properties > Render > Afanasy",
     "description": "CGRU Tools",
@@ -29,7 +30,6 @@ else:
     from . import utils
 
 import bpy
-import os
 
 
 def register():

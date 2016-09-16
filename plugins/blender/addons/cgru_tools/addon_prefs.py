@@ -11,7 +11,6 @@ def update_location(self, context):
         utils.add_cgru_module_to_syspath(self.cgru_location)
 
 
-
 class CGRUAddonPreferences(AddonPreferences):
     bl_idname = __package__
 
@@ -20,9 +19,9 @@ class CGRUAddonPreferences(AddonPreferences):
         subtype="DIR_PATH",
         update=update_location)
 
-    cgru_version = StringProperty(name="CGRU version",
+    cgru_version = StringProperty(
+        name="CGRU version",
         default="NOT FOUND")
-
 
     def draw(self, context):
         layout = self.layout
@@ -30,4 +29,3 @@ class CGRUAddonPreferences(AddonPreferences):
         col.label(text="Please, set CGRU install root location")
         col.prop(self, "cgru_location")
         col.label(text="CGRU version: %s" % self.cgru_version)
-

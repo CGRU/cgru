@@ -65,7 +65,9 @@ class CGRU_Submit(bpy.types.Operator):
         scenefile = bpy.data.filepath
         if scenefile.endswith('.blend'):
             scenefile = scenefile[:-6]
-        renderscenefile = "%s.%s.blend" % (scenefile, time.strftime('%Y%m%d%H%M%S'))
+        renderscenefile = "%s.%s.blend" % (
+            scenefile,
+            time.strftime('%Y%m%d%H%M%S'))
 
         # Make all Local and pack all textures and objects
         if cgru_props.packLinkedObjects:
@@ -136,29 +138,39 @@ class CGRU_Submit(bpy.types.Operator):
                 pos = cgru_props.filepath.find('#')
                 if pos != -1:
                     if cgru_props.filepath[pos-1] in '._- ':
-                        images = "{0}{1}{2}".format(cgru_props.filepath[:pos-1],
-                            renderlayer_name, cgru_props.filepath[pos-1:])
+                        images = "{0}{1}{2}".format(
+                            cgru_props.filepath[:pos-1],
+                            renderlayer_name,
+                            cgru_props.filepath[pos-1:])
                     else:
-                        images = "{0}{1}{2}".format(cgru_props.filepath[:pos],
-                            renderlayer_name, cgru_props.filepath[pos:])
+                        images = "{0}{1}{2}".format(
+                            cgru_props.filepath[:pos],
+                            renderlayer_name,
+                            cgru_props.filepath[pos:])
                 else:
-                    images = "{0}{1}".format(cgru_props.filepath, renderlayer_name)
+                    images = "{0}{1}".format(
+                        cgru_props.filepath,
+                        renderlayer_name)
 
                 output_images = re.sub(r'(#+)', r'@\1@', images)
                 if output_images.startswith('//'):
-                    output_images = os.path.join(os.path.dirname(renderscenefile),
-                            output_images.replace('//', ''))
+                    output_images = os.path.join(
+                        os.path.dirname(renderscenefile),
+                        output_images.replace('//', ''))
 
                 if rd.file_extension not in output_images:
                     block.setFiles([output_images + rd.file_extension])
                 else:
                     block.setFiles([output_images])
 
+            if cgru_props.splitRenderLayers and len(layers) > 1:
+                python_options = ' --python-text "layer_%s"' % renderlayer_name
+            else:
+                python_options = ''
             cmd = CMD_TEMPLATE.format(
                     blend_scene=renderscenefile,
                     render_engine=engine_string,
-                    python_options=' --python-text "layer_%s"' % renderlayer_name
-                            if cgru_props.splitRenderLayers and len(layers) > 1 else '',
+                    python_options=python_options,
                     output_options=' -o "%s" ' % images if images else '',
                     frame_inc=finc)
 
@@ -169,15 +181,22 @@ class CGRU_Submit(bpy.types.Operator):
             job.blocks.append(block)
 
             if cgru_props.make_movie:
-                movie_block = af.Block(cgru_props.mov_name + '-movie', 'movgen')
+                movie_block = af.Block(
+                    cgru_props.mov_name + '-movie',
+                    'movgen')
                 movie_block.setDependMask(job.blocks[-1])
                 movie_task = af.Task(cgru_props.mov_name)
                 movie_block.tasks.append(movie_task)
                 cmd = os.getenv('CGRU_LOCATION')
-                cmd = os.path.join(cmd, 'utilities','moviemaker','makemovie.py')
+                cmd = os.path.join(cmd,
+                                   'utilities',
+                                   'moviemaker',
+                                   'makemovie.py')
                 cmd = 'python "%s"' % cmd
                 cmd += ' --codec "%s"' % cgru_props.mov_codecs
-                cmd += ' -r "%sx%s"' % (cgru_props.mov_width, cgru_props.mov_height)
+                cmd += ' -r "%sx%s"' % (
+                    cgru_props.mov_width,
+                    cgru_props.mov_height)
                 cmd += ' "%s"' % images.replace('@#', '#').replace('#@', '#')
                 cmd += ' "%s"' % cgru_props.mov_name
                 movie_task.setCommand(cmd)
@@ -218,16 +237,16 @@ class CGRU_Submit(bpy.types.Operator):
         #  Send job to server:
         result = job.send()
         if not result[0]:
-            self.report({'ERROR'},
-                'An error occurred when submitting job to Afanasy. Check console.')
+            msg = (
+                "An error occurred when submitting job to Afanasy."
+                "Check console.")
+            self.report({'ERROR'}, msg)
         else:
-            self.report({'INFO'},
-                'Job id:%s successfully submit to Afanasy.' % result[1]['id'])
+            msg = "Job id:%s successfully submit to Afanasy."
+            self.report({'INFO'}, msg % result[1]['id'])
 
         # if opriginal scene is modified - we need to reload the scene file
         if sceneModified:
             bpy.ops.wm.open_mainfile(filepath=scenefile + ".blend")
 
         return {'FINISHED'}
-
-
