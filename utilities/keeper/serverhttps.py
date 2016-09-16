@@ -1,10 +1,9 @@
 # This is HTTPS server.
 # It designed to run commands given in POST request.
-# Also it indexes curren directory like base python HTTPRequestHandler does.
-# It works only if certificate file 'serverhttps.py.pem' exists in this folder.
+# It works only if certificate file 'serverhttps.pem' exists in this folder.
 # To generate it you can use command:
 """
-openssl req -new -x509 -keyout serverhttps.py.pem -out serverhttps.py.pem -days 365 -nodes
+openssl req -new -x509 -keyout serverhttps.pem -out serverhttps.pem -days 3656 -nodes
 """
 # If file does not exist, it just skips serving.
 
@@ -13,6 +12,8 @@ import ssl
 import subprocess
 import sys
 import threading
+
+isRunning = False
 
 BaseServer = None
 BaseHandler = None
@@ -29,8 +30,19 @@ else:
 
 
 class Handler(BaseHandler):
+    def do_GET( self):
+        fname,ext = os.path.splitext(__file__)
+        fname += '.html'
+        f = open( fname, 'rb')
+        data = f.read()
+
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write( data)
+
     def do_POST( self):
-        content_len = int(self.headers.getheader('content-length', 0))
+        content_len = int(self.headers['content-length'])
         post_body = self.rfile.read(content_len)
 
         print('Executing:')
@@ -40,10 +52,11 @@ class Handler(BaseHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
-        self.wfile.write('STATUS: OK')
+        self.wfile.write(b'STATUS: OK')
 
 
 def serve( i_port):
+    global isRunning
 
     certificate,ext = os.path.splitext(__file__)
     certificate += '.pem'
@@ -59,6 +72,9 @@ def serve( i_port):
     thread = threading.Thread(target = httpd.serve_forever)
     thread.daemon = True
     thread.start()
+
+    isRunning = True
+
     return thread
 
 

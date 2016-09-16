@@ -35,8 +35,8 @@ cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper_cmd
 app = QtGui.QApplication(sys.argv)
 app.setQuitOnLastWindowClosed(False)
 cmd.Application = app
+serverhttps.serve(cgruconfig.VARS['keeper_port_https'])
 cmd.Tray = Tray(app)
 refresh = Refresh(app)
 server = Server(app)
-serverhttps.serve(cgruconfig.VARS['keeper_port_https'])
 app.exec_()
