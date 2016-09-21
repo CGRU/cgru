@@ -337,6 +337,19 @@ background-position: left;
 opacity: 0.8;
 padding: 3px 8px;
 border-radius: 2px;
+-moz-user-select: none;
+-webkit-user-select: none;
+}
+.cmdexec.clicked {
+background-color: #0F0;
+}
+.cmdexec.error {
+background-color: #F00;
+}
+.cmdexec.timeout {
+-o-transition: background-color 1s ease-out;
+-moz-transition: background-color 1s ease-out;
+-webkit-transition: background-color 1s ease-out;
 }
 .cmdexec.open {
 padding: 0px 0px;

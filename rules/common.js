@@ -494,7 +494,6 @@ function c_CreateLaunchButton( i_args)
 	if( i_elType == null ) i_elType = 'div';
 	var el = document.createElement( i_elType);
 	el.classList.add('cmdexec');
-	el.m_cmd = i_cmd;
 
 	if( i_elParent )
 		i_elParent.appendChild( el);
@@ -505,17 +504,53 @@ function c_CreateLaunchButton( i_args)
 	if( i_tooltip )
 		el.title = i_tooltip;
 
-	el.ondblclick = c_LaunchButtonClicked;
+	c_ProcessLaunchButton( el, i_cmd);
 
 	return el;
 }
+function c_ProcessLaunchButton( i_el, i_cmd)
+{
+	i_el.m_cmd = i_cmd;
+	i_el.onclick = function(e){e.stopPropagation();return false;}
+	i_el.ondblclick = c_LaunchButtonClicked;
+}
 function c_LaunchButtonClicked( i_evt)
 {
-	var cmd = i_evt.currentTarget.m_cmd;
-	console.log('Executing:\n' + cmd);
+	i_evt.stopPropagation();
+
+	var el = i_evt.currentTarget;
+	el.classList.remove('timeout');
+	el.classList.add('clicked');
+
+	var cmd = el.m_cmd;
+	c_Info('Executing:\n' + cmd);
+
 	var xhr = new XMLHttpRequest;
 	xhr.open('POST', 'https://localhost:' + cgru_Config.keeper_port_https + '/', true); 
 	xhr.send( cmd);
+	xhr.onreadystatechange = c_LaunchHandler;
+	xhr.m_el = el;
+}
+function c_LaunchHandler()
+{
+	//console.log(this);
+	var el = this.m_el;
+
+	el.classList.remove('error');
+	el.classList.add('timeout');
+	el.classList.remove('clicked');
+
+	if( this.status == 0 )
+	{
+		el.classList.add('error');
+		c_Error('Can`t execute commands. Ensure that Keeper is running and authorized.');
+		return;
+	}
+
+	if( this.readyState == 4 )
+	{
+		// Everythin is OK.
+	}
 }
 function c_CreateOpenButton( i_el, i_path, i_type)
 {
