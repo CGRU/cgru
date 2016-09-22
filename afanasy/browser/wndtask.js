@@ -495,10 +495,8 @@ function wt_FileOpen( i_evt)
 
 	for( var c = 0; c < cgru_Config.previewcmds.length; c++ )
 	{
-		var elCmd = document.createElement('div');
-		elCmds.appendChild( elCmd);
-		elCmd.classList.add('cmdexec');
-		elCmd.textContent = cgru_Config.previewcmds[c].replace('@ARG@', file);
+		var cmd = cgru_Config.previewcmds[c].replace('@ARG@', file);
+		cgru_CmdExecCreate({"parent":elCmds,"cmd":cmd,"label":cmd});
 	}
 
 	return false;

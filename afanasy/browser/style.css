@@ -193,9 +193,9 @@ display: none;
 .panel.right .section.folders .label {
 font-style: italic;
 }
-.panel.right .section.folders .cmdexec {
-font-weight: normal;
-background: inherit;
+.panel.right .section.folders .cgru_cmdexec {
+float: left;
+margin-right: 8px;
 }
 
 .monitor .ctrl,.info {

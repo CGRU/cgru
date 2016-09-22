@@ -135,7 +135,7 @@ function u_Process()
 	if( RULES.has_filesystem !== false )
 	{
 		$('open').style.display = 'block';
-		c_ProcessLaunchButton( $('open'), cgru_OpenFolderCmd(path));
+		cgru_CmdExecProcess({"element":$('open'),"cmd":cgru_OpenFolderCmd(path)});
 	}
 	else
     {

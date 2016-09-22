@@ -80,7 +80,7 @@ convert images/movies,\n\
 put in other location (may be FTP),\n\
 genetate thumbnails.";
 
-	c_CreateOpenButton( this.elPanel, this.path);
+	cgru_CmdExecCreateOpen({"parent":this.elPanel,"path":this.path});
 
 	var elPath = document.createElement('a');
 	this.elPanel.appendChild( elPath);
@@ -655,7 +655,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	var elAnchor = null;
 	if( i_isFolder )
 	{
-		elAnchor = c_CreateOpenButton( elItem, path, 'a');
+		elAnchor = cgru_CmdExecCreateOpen({"parent":elItem,"path":path,"type":'a'});
 		if( elAnchor ) elAnchor.style.cssFloat = 'left';
 	}
 	if( elAnchor == null )
@@ -819,7 +819,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			if( cmds[c].submenu )
 				elParent = elItem.m_elMenu;
 
-			c_CreateLaunchButton({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
+			cgru_CmdExecCreate({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
 
@@ -868,7 +868,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			if( cmds[c].submenu )
 				elParent = elItem.m_elMenu;
 
-			c_CreateLaunchButton({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
+			cgru_CmdExecCreate({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
 

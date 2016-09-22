@@ -969,10 +969,8 @@ JobNode.prototype.updatePanels = function()
 		elFolders.m_elFolders.push( elDiv);
 		elDiv.classList.add('param');
 		elDiv.classList.add('folder');
-		elDiv.classList.add('cmdexec');
-		var cmd = cgru_OpenFolderCmd( path);
-		elDiv.setAttribute('cmdexec', JSON.stringify([cmd]));
-		elDiv.title = 'Right click and "Run" to open:\n' + path;
+
+		var elCmdExec = cgru_CmdExecCreateOpen({"parent":elDiv,"path":path});
 
 		var elLabel = document.createElement('div');
 		elDiv.appendChild( elLabel);

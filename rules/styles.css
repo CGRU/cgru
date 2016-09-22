@@ -333,33 +333,6 @@ background-position: left;
 .colorbars { border-radius: 2px; margin: 2px; border: 1px solid #000; }
 .colorbars div div { float:left;}
 
-.cmdexec {
-opacity: 0.8;
-padding: 3px 8px;
-border-radius: 2px;
--moz-user-select: none;
--webkit-user-select: none;
-}
-.cmdexec.clicked {
-background-color: #0F0;
-}
-.cmdexec.error {
-background-color: #F00;
-}
-.cmdexec.timeout {
--o-transition: background-color 1s ease-out;
--moz-transition: background-color 1s ease-out;
--webkit-transition: background-color 1s ease-out;
-}
-.cmdexec.open {
-padding: 0px 0px;
-width: 30px; height: 20px;
-background-image: url(icons/open.png);
-background-size: 60%;
-background-repeat: no-repeat;
-background-position: center;
-}
-
 .textedit_panel { float: right; border-radius: 4px; box-shadow: 0 0 2px #000 inset; margin: 4px; }
 .textedit_panel div { float: left; border-radius: 3px; margin: 1px; padding: 0px; width: 20px; box-shadow: 0 0 2px #000; font-size: 14px; }
 
@@ -658,19 +631,19 @@ border: 1px solid rgba(0,0,0,.5);
 border-radius: 2px;
 background-color: rgba(250,250,250,.3);
 }
-.filesview .item .menu .cmdexec { padding: 1px 2px; }
+.filesview .item .menu .cgru_cmdexec { padding: 1px 2px; }
 .filesview .item .menu > div, .filesview .item .menu > a { float: right; margin: 0px 2px; }
 .filesview .item .attr {
 float: right;
 padding: 2px 6px;
 margin: 0px 4px;
 }
-.filesview .item .cmdexec {
+.filesview .item .cgru_cmdexec {
 float: right;
 padding: 2px 6px;
 margin: 0px 4px;
 }
-.filesview .item .cmdexec.open { padding: 0; margin: 0px 2px; }
+.filesview .item .cgru_cmdexec.open { padding: 0; margin: 0px 2px; }
 .filesview .item .button {
 float: right;
 width: 18px; height: 18px;
@@ -838,7 +811,7 @@ border-radius: 2px;
 .comment .uploads .path .file .goto { /*display: block;*/ }
 .comment .uploads .path .file .size { float: right; margin: 0px 8px; }
 .comment .uploads .path .file .link { float: right; margin: 0px 8px; display: block; }
-.comment .uploads .cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
+.comment .uploads .cgru_cmdexec { float: left; padding: 2px 6px; font-size: 14px; }
 
 /* ================== GUEST =================== */
 .guest_attrs .caption { margin: 4px 8px; padding: 4px 8px; }

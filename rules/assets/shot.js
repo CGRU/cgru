@@ -100,8 +100,7 @@ function shot_InitHTML( i_data)
 	cmd += ' ' + path;
 
 //console.log( cmd);
-	$('shot_nuke_new_btn').m_cmd = cmd;
-    $('shot_nuke_new_btn').ondblclick = c_LaunchButtonClicked;
+	cgru_CmdExecProcess({"element":$('shot_nuke_new_btn'),"cmd":cmd});
 
 	cmd = cgru_PM('/cgru/rules/bin/shot_open_latest', true);
 	if( ASSET.open_latest )
@@ -111,8 +110,8 @@ function shot_InitHTML( i_data)
 
 	cmd += ' ' + path;
 //console.log( cmd);
-	$('shot_nuke_latest_btn').m_cmd = cmd;
-    $('shot_nuke_latest_btn').ondblclick = c_LaunchButtonClicked;
+
+	cgru_CmdExecProcess({"element":$('shot_nuke_latest_btn'),"cmd":cmd});
 
 	shot_ResultsRead( true);
 }

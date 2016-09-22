@@ -99,6 +99,8 @@ function g_ConfigReceived( i_obj)
 
 	cgru_ConstructSettingsGUI();
 	cgru_InitParameters();
+	cgru_Info = g_Info;
+	cgru_Error = g_Error;
 	cm_ApplyStyles();
 
 	nw_GetSoftwareIcons();
