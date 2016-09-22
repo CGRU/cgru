@@ -175,6 +175,9 @@ background-size: 60%;
 background-repeat: no-repeat;
 background-position: center;
 }
+.cgru_menu_item.cgru_cmdexec {
+border: 1px solid #555;
+}
 .cgru_cmdexec:hover {
 border: 1px solid rgba(255,255,0,1);
 }

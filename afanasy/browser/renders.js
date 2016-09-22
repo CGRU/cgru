@@ -576,7 +576,7 @@ RenderNode.createPanels = function( i_monitor)
 	el.classList.add('ctrl_button');
 	el.textContent = 'CMD';
 	el.monitor = i_monitor;
-	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cmd'); return false;}
+	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cgru_cmdexec'); return false;}
 	el.oncontextmenu = el.onclick;
 
 
@@ -678,10 +678,10 @@ RenderNode.createActions = function()
 	if( RenderNode.actionsCreated ) return;
 
 	if( cgru_Config.af_rendercmds ) for( var i = 0; i < cgru_Config.af_rendercmds.length; i++)
-		RenderNode.actions.push({"mode":'cmd',"name":'cmd',"handle":cgru_Config.af_rendercmds[i],"label":cgru_Config.af_rendercmds[i]});
+		RenderNode.actions.push({"mode":'cgru_cmdexec',"name":'cmd',"handle":cgru_Config.af_rendercmds[i],"label":cgru_Config.af_rendercmds[i]});
 
 	if( cgru_Config.af_rendercmds_admin ) for( var i = 0; i < cgru_Config.af_rendercmds_admin.length; i++)
-		RenderNode.actions.push({"mode":'cmd',"name":'cmd',"handle":cgru_Config.af_rendercmds_admin[i],"label":cgru_Config.af_rendercmds_admin[i],"permissions":'god'});
+		RenderNode.actions.push({"mode":'cgru_cmdexec',"name":'cmd',"handle":cgru_Config.af_rendercmds_admin[i],"label":cgru_Config.af_rendercmds_admin[i],"permissions":'god'});
 
 	RenderNode.actionsCreated = true;
 }

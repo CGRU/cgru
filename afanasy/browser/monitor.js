@@ -951,19 +951,19 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 			return;
 	}
 
-	if( i_action.mode == 'cmd')
+	if( i_action.mode == 'cgru_cmdexec')
 	{
 		var cmds = [];
 		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].selected == true )
 			{
-				cmd = i_action.handle;
+				var cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
 				if( this.items[i].params.address.ip )
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
 				cmds.push( cmd);
 			}
-		i_menu.addItem({"name":i_action.name,"receiver":'cmdexec',"handle":cmds,"label":i_action.label});
+		i_menu.addItem({"name":i_action.name,"receiver":'cgru_cmdexec',"handle":cmds,"label":i_action.label});
 		return;
 	}
 
