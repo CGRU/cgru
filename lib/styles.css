@@ -170,7 +170,7 @@ cursor: pointer;
 .cgru_cmdexec.open {
 padding: 0px 0px;
 width: 30px; height: 20px;
-background-image: url(/lib/icons/open.png);
+background-image: url(icons/open.png);
 background-size: 60%;
 background-repeat: no-repeat;
 background-position: center;
