@@ -51,7 +51,7 @@
 		"cmd_shell":"/bin/sh -c"
 	},
 	"OS_windows":{
-		"open_folder_cmd":"start @PATH@",
+		"open_folder_cmd":"explorer \"@PATH@\"",
 		"cmd_shell":"cmd.exe /c",
 
 			"":"This is a paths map example (disabled)",
