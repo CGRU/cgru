@@ -60,5 +60,5 @@ for res in socket.getaddrinfo( Options.host, Options.port, socket.AF_UNSPEC, soc
 if s is None:
     print('Could not open socket.')
 else:
-    s.sendall(data)
+    s.sendall( bytearray(data, 'utf-8'))
 

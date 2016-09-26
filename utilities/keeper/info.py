@@ -31,7 +31,9 @@ class Window(QtGui.QTextEdit):
         self.fundefined = QtGui.QTextCharFormat()
         self.fundefined.setFontItalic(True)
 
-        self.textCursor().insertText('Python:\n', self.ftitle)
+        self.appendVar('Platform', ",".join( cgruconfig.VARS['platform']))
+
+        self.textCursor().insertText('\nPython:\n', self.ftitle)
         self.appendVar(cgrupyqt.PythonQtType, str(cgrupyqt.PythonQt))
         self.appendVar('sys.prefix', sys.prefix)
         self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))

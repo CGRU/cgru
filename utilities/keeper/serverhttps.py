@@ -13,6 +13,8 @@ import subprocess
 import sys
 import threading
 
+import cmd
+
 import cgruutils
 
 isRunning = False
@@ -42,9 +44,10 @@ class Handler(BaseHandler):
         content_len = int(self.headers['content-length'])
         post_body = cgruutils.toStr( self.rfile.read(content_len))
 
-        print('Executing:')
-        print( post_body)
-        subprocess.Popen( post_body, shell=True)
+        cmd.execute( post_body)
+        #print('Executing:')
+        #print( post_body)
+        #subprocess.Popen( post_body, shell=True)
 
         self.writeResponse( b'STATUS: OK')
 
