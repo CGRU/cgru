@@ -50,62 +50,10 @@ class Server(QtNetwork.QTcpServer):
 
     def readCommand(self):
 
-        print('Server reading...')
-
         if self.qsocket is None:
             return
 
-        isHTTP = False
-        content_len = 0
-        content_len_str = 'Content-Length: '
-        command = None
+        print('Server reading...')
 
-        while True:
-
-            line = cgruutils.toStr( self.qsocket.readLine().data())
-
-            if len( line) == 0:
-                break
-
-            #sys.stdout.write(line)
-
-            if line.find('HTTP') != -1:
-                isHTTP = True
-                continue
-            elif not isHTTP:
-                command = line
-                break
-
-            if line.find( content_len_str ) == 0:
-                content_len = int(line[len(content_len_str):])
-                if content_len == 0:
-                    break
-                continue
-
-            if isHTTP:
-                if line == '\r\n':
-                    command = cgruutils.toStr( self.qsocket.readLine( content_len).data())
-                    break
-                else:
-                    continue
-
-
-        if command is None:
-            return
-
-
-        if not isHTTP:
-            command = 'cmd.%s()' % command
-            print('Executing: "%s"' % command)
-            eval(command)
-            return
-
-        print('Executing:')
-        print( command)
-
-        self.qsocket.write('HTTP/1.1 200 OK\r\nContent-Length: 2\r\n\r\nOK')
-
-        self.qsocket.disconnectFromHost()
-
-        subprocess.Popen( command, shell=True)
+        cmd.execute( cgruutils.toStr( self.qsocket.readAll().data()))
 

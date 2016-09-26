@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import json
+import subprocess
+
 import cgrudocs
 import cgruconfig
 import cgruutils
+
+import info
 
 import af
 
 Application = None
 Tray = None
+WndInfo = None
 
 from cgrupyqt import QtCore, QtGui
 
@@ -27,6 +33,11 @@ def getVar(var, title='Set Variable', label='Enter new value:'):
 	cgruconfig.VARS[var] = str(newvalue)
 	variables = [var]
 	cgruconfig.writeVars(variables)
+
+
+def showInfo():
+    global WndInfo
+    WndInfo = info.Window()
 
 
 def cgruDocs():
@@ -73,6 +84,14 @@ def setWebBrowser():
 	)
 
 
+def setOpenCmd():
+	getVar(
+		'open_folder_cmd',
+		'Set Open Folder Command',
+		'Enter command with "@PATH@":'
+	)
+
+
 def afwebgui():
 	cgruutils.webbrowse(
 		'%s:%s' % (
@@ -115,3 +134,43 @@ def update():
 	exitClients('(keeper update)')
 	QtCore.QProcess.startDetached(cgruconfig.VARS['CGRU_UPDATE_CMD'])
 	Application.quit()
+
+
+def execute( i_str):
+
+    print('Execute:')
+    print( i_str)
+
+    obj = None
+
+    try:
+        obj = json.loads( i_str)
+    except:
+        return
+
+    if not 'cmdexec' in obj:
+        print('"cmdexec" object missing.')
+        return
+
+    cmdexec = obj['cmdexec']
+
+    if 'cmds' in cmdexec:
+        cmds = cmdexec['cmds']
+
+        for cmd in cmds:
+            print('Executing command:')
+            print(cmd)
+            subprocess.Popen( cmd, shell=True)
+
+    if 'open' in cmdexec:
+        cmd = cgruconfig.VARS['open_folder_cmd'].replace('@PATH@',cmdexec['open'])
+        print('Opening folder:')
+        print(cmd)
+        subprocess.Popen( cmd, shell=True)
+
+    if 'eval' in cmdexec:
+        cmd = cmdexec['eval']
+        print('Evaluating code:')
+        print(cmd)
+        eval(cmd)
+

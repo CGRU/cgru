@@ -246,10 +246,16 @@ class Tray(QtGui.QSystemTrayIcon):
             self.addAction('Configure', False,  'HTTPS Server...', self.httpsServer)
             self.menu['Configure'].addSeparator()
 
-        action = QtGui.QAction('Reload Config', self)
+        action = QtGui.QAction('Set Web Browser...', self)
         QtCore.QObject.connect(action,
                                QtCore.SIGNAL('triggered()'),
-                               cmd.confReload)
+                               cmd.setWebBrowser)
+        self.menu['Configure'].addAction(action)
+
+        action = QtGui.QAction('Set Open Folder...', self)
+        QtCore.QObject.connect(action,
+                               QtCore.SIGNAL('triggered()'),
+                               cmd.setOpenCmd)
         self.menu['Configure'].addAction(action)
 
         action = QtGui.QAction('Set Docs URL...', self)
@@ -258,22 +264,24 @@ class Tray(QtGui.QSystemTrayIcon):
                                cmd.setDocsURL)
         self.menu['Configure'].addAction(action)
 
+        action = QtGui.QAction('Set Text Editor...', self)
+        QtCore.QObject.connect(action,
+                               QtCore.SIGNAL('triggered()'),
+                               cmd.setTextEditor)
+        self.menu['Configure'].addAction(action)
+
         action = QtGui.QAction('Edit Config...', self)
         QtCore.QObject.connect(action,
                                QtCore.SIGNAL('triggered()'),
                                cmd.editCGRUConfig)
         self.menu['Configure'].addAction(action)
 
-        action = QtGui.QAction('Set Web Browser...', self)
-        QtCore.QObject.connect(action,
-                               QtCore.SIGNAL('triggered()'),
-                               cmd.setWebBrowser)
-        self.menu['Configure'].addAction(action)
+        self.menu['Configure'].addSeparator()
 
-        action = QtGui.QAction('Set Text Editor...', self)
+        action = QtGui.QAction('Reload Config', self)
         QtCore.QObject.connect(action,
                                QtCore.SIGNAL('triggered()'),
-                               cmd.setTextEditor)
+                               cmd.confReload)
         self.menu['Configure'].addAction(action)
 
         self.addAction('menu', True,  'Show Info...',         self.cgruInfo, 'info')
