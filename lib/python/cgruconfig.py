@@ -50,7 +50,7 @@ def checkConfigFile(path):
 
 
 class Config:
-    def __init__(self, variables=VARS, configfiles=None, Verbose=True):
+    def __init__(self, variables=VARS, configfiles=None, Verbose=False):
         self.verbose = Verbose
         self.Vars = variables
         self.recursion = False
