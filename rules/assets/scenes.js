@@ -70,7 +70,7 @@ function scene_Show()
 
 		var elShot = document.createElement('div');
 		sc_elShots.push( elShot);
-		elShot.m_hidden = false;
+		elShot.m_filtered = false;
 		elShot.m_status = folders[f].status;
 		elShot.m_path = path;
 		$('scenes_div').appendChild( elShot);
@@ -257,7 +257,7 @@ function scenes_Received( i_data, i_args)
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
-		elScene.m_hidden = false;
+		elScene.m_filtered = false;
 		elScene.m_elThumbnails = [];
 		elScene.m_elShots = [];
 		$('scenes_div').appendChild( elScene);
@@ -290,7 +290,7 @@ function scenes_Received( i_data, i_args)
 			sc_elShots.push( elShot);
 			elScene.m_elShots.push( elShot);
 			elShot.m_status = fobj.status;
-			elShot.m_hidden = false;
+			elShot.m_filtered = false;
 			elScene.appendChild( elShot);
 			elScene.m_elThumbnails.push( elShot);
 			elShot.classList.add('shot');
@@ -586,7 +586,7 @@ function scenes_GetSelectedShots()
 		if( sc_elShots[i].m_selected != true )
 			continue;
 
-		if( sc_elShots[i].m_hidden )
+		if( sc_elShots[i].m_filtered )
 			continue;
 
 		shots.push( sc_elShots[i]);
@@ -614,9 +614,6 @@ function sc_FilterShots( i_args)
 		for( var o = 0; o < anns_or.length; o++)
 			anns.push( anns_or[o].split(' '));
 	}
-
-	var scenes_count = 0;
-	var shots_count = 0;
 
 	for( var th = 0; th < sc_elShots.length; th++)
 	{
@@ -671,10 +668,14 @@ function sc_FilterShots( i_args)
 		if( i_args.artists && found )
 		{
 			found = false;
-			if( st_obj.artists )
+			if( st_obj.artists && st_obj.artists.length )
+			{
 				for( i = 0; i < i_args.artists.length; i++ )
 					if( st_obj.artists.indexOf( i_args.artists[i]) != -1 )
 						{ found = true; break; }
+			}
+			else if( i_args.artists.indexOf('_null_') != -1)
+				found = true;
 		}
 
 		if( i_args.percent && found )
@@ -701,13 +702,12 @@ function sc_FilterShots( i_args)
 		if( found )
 		{
 			el.style.display = 'block';
-			el.m_hidden = false;
-			shots_count++;
+			el.m_filtered = false;
 		}
 		else
 		{
 			el.style.display = 'none';
-			el.m_hidden = true;
+			el.m_filtered = true;
 		}
 	}
 
@@ -717,7 +717,7 @@ function sc_FilterShots( i_args)
 			var oneShown = false;
 			for( var t = 0; t < sc_elScenes[f].m_elThumbnails.length; t++)
 			{
-				if( sc_elScenes[f].m_elThumbnails[t].m_hidden != true )
+				if( sc_elScenes[f].m_elThumbnails[t].m_filtered != true )
 				{
 					oneShown = true;
 					break;
@@ -726,13 +726,12 @@ function sc_FilterShots( i_args)
 			if( oneShown )
 			{
 				sc_elScenes[f].style.display = 'block';
-				sc_elScenes[f].m_hidden = false;
-				scenes_count++;
+				sc_elScenes[f].m_filtered = false;
 			}
 			else
 			{
 				sc_elScenes[f].style.display = 'none';
-				sc_elScenes[f].m_hidden = true;
+				sc_elScenes[f].m_filtered = true;
 			}
 		}
 
@@ -746,14 +745,14 @@ function sc_ShowAllShots()
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
 		sc_elShots[i].style.display = 'block';
-		sc_elShots[i].m_hidden = false;
+		sc_elShots[i].m_filtered = false;
 	}
 
 	if( sc_elScenes )
 		for( var i = 0; i < sc_elScenes.length; i++)
 		{
 			sc_elScenes[i].style.display = 'block';
-			sc_elScenes[i].m_hidden = false;
+			sc_elScenes[i].m_filtered = false;
 		}
 
 	sc_DisplayStatistics();
@@ -764,11 +763,16 @@ function sc_DisplayStatistics()
 	var selShots = scenes_GetSelectedShots();
 //	c_Info( selShots.length + ' shots selected.');
 
+	// Gather shots:
+	var filtered = 0;
 	var shots = [];
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
-		if( sc_elShots[i].m_hidden == true )
+		if( sc_elShots[i].m_filtered == true )
+		{
+			filtered++;
 			continue;
+		}
 
 		if( selShots.length && ( sc_elShots[i].m_selected != true ))
 			continue;
@@ -802,6 +806,7 @@ function sc_DisplayStatistics()
 
 	var info = 'Shots count: <big><b>' + (shots.length - omits) + '</big></b>';
 	if( omits ) info += ' (+' + omits + ' omits)';
+	if( filtered ) info += ' (+' + filtered + ' filtered)';
 	if( shots.length )
 		info += '<br>Average progress: ' + Math.floor(progress/(shots.length-omits)) + '%';
 
@@ -825,7 +830,7 @@ function sc_DisplayStatistics()
 	}
 
 	if( selShots.length )
-		info = '<i><b>Selected:</b></i><br>' + info;
+		info = '<i><b>Selected</b></i> ' + info;
 
 	$('scenes_info').innerHTML = info;
 

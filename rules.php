@@ -1874,10 +1874,14 @@ function searchStatus( &$i_args, &$i_obj)
 	if( $found && array_key_exists('artists', $i_args))
 	{
 		$found = false;
-		if( array_key_exists('artists', $i_obj['status']))
+		if( array_key_exists('artists', $i_obj['status']) && count($i_obj['status']['artists']))
+		{
 			foreach( $i_args['artists'] as $artist )
 				if( in_array( $artist, $i_obj['status']['artists']))
 					$found = true;
+		}
+		else if( in_array('_null_', $i_args['artists']))
+			$found = true;
 	}
 
 	if( $found && array_key_exists('tags', $i_args))

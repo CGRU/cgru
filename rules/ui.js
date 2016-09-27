@@ -575,14 +575,17 @@ function u_SearchSearch()
 	if( c_Strip($('search_annotation').textContent).length )
 		args.ann = c_Strip($('search_annotation').textContent);
 
-/*	if( $('search_artists_notassigned').m_selected )
+	if( $('search_artists_notassigned').m_selected )
 	{
 		if( args.artists == null ) args.artists = [];
+
 		for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
 			c_ElSetSelected($('search_artists').m_elArtists[i], false);
+		c_ElSetSelected($('search_artists_notassigned'), true);
+
 		args.artists.push($('search_artists_notassigned').m_user);
 	}
-	else*/ for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
+	else for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
 		if( $('search_artists').m_elArtists[i].m_selected )
 		{
 			if( args.artists == null ) args.artists = [];
