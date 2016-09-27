@@ -484,6 +484,13 @@ function u_SearchOnClick()
 			if( role_has_one_artist != true ) elRole.classList.add('notartist');
 			if( role_has_enabled != true ) elRole.classList.add('disabled');
 		}
+
+		var el = $('search_artists_notassigned');
+		$('search_artists').m_elArtists.push( el);
+		el.m_user = '_null_';
+		el.classList.add('tag');
+		el.classList.add('artist');
+		el.onclick = function(e){ c_ElToggleSelected(e); if( ASSET && ASSET.filter ) u_SearchSearch();};
 	}
 
 	$('search_result').textContent = '';
@@ -557,33 +564,38 @@ function u_Search_ShowNotArtist( i_el)
 
 function u_SearchSearch()
 {
-//console.log('g_CurPath(): ' + g_CurPath());
-//console.log('search path: ' + $('search').m_path);
 	if( $('search').m_path && ( $('search').m_path != g_CurPath() ))
 	{
-//console.log('g_GO: ' + $('search').m_path);
 		g_GO($('search').m_path);
 		g_PathChanged();
 	}
 	$('search').m_path = g_CurPath();
-//console.log(g_CurPath());
 
 	var args = {};
 	if( c_Strip($('search_annotation').textContent).length )
 		args.ann = c_Strip($('search_annotation').textContent);
 
-	for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
+/*	if( $('search_artists_notassigned').m_selected )
+	{
+		if( args.artists == null ) args.artists = [];
+		for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
+			c_ElSetSelected($('search_artists').m_elArtists[i], false);
+		args.artists.push($('search_artists_notassigned').m_user);
+	}
+	else*/ for( var i = 0; i < $('search_artists').m_elArtists.length; i++)
 		if( $('search_artists').m_elArtists[i].m_selected )
 		{
 			if( args.artists == null ) args.artists = [];
 			args.artists.push( $('search_artists').m_elArtists[i].m_user);
 		}
+
 	for( var i = 0; i < $('search_flags').m_elFlags.length; i++)
 		if( $('search_flags').m_elFlags[i].m_selected )
 		{
 			if( args.flags == null ) args.flags = [];
 			args.flags.push( $('search_flags').m_elFlags[i].m_flag);
 		}
+
 	for( var i = 0; i < $('search_tags').m_elTags.length; i++)
 		if( $('search_tags').m_elTags[i].m_selected )
 		{
