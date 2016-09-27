@@ -26,7 +26,6 @@ class Refresh:
 
 	def refresh(self):
 		if self.counter > 0:
-			cgruconfig.Config()
 			keeper_refresh = 1000 * int(cgruconfig.VARS['keeper_refresh'])
 			if self.timer.interval() != keeper_refresh:
 				self.timer.setInterval(keeper_refresh)

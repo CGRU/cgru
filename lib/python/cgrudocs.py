@@ -2,15 +2,7 @@ import os
 import webbrowser
 
 import cgruconfig
-
-
-def browse(path):
-	"""Missing DocString
-
-	:param str path: The path to open the browser with
-	"""
-	webbrowser.open(path)
-
+import cgruutils
 
 def show(path=None):
 	docs_host = 'docs_host'
@@ -44,4 +36,4 @@ def show(path=None):
 		else:
 			location = os.path.join(location, path)
 
-	browse(location)
+	cgruutils.webbrowse(location)

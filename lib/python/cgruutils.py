@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import stat
+import subprocess
 import sys
 import time
 import webbrowser
@@ -372,7 +373,7 @@ def webbrowse(i_url):
         else:
             cmd += ' &'
 
-        os.system(cmd)
+        subprocess.Popen( cmd, shell=True)
 
         return
 

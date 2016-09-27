@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import collections
 import errno
 import json
 import os
@@ -49,10 +50,13 @@ def checkConfigFile(path):
 
 
 class Config:
-    def __init__(self, variables=VARS, configfiles=None, Verbose=False):
+    def __init__(self, variables=VARS, configfiles=None, Verbose=True):
         self.verbose = Verbose
         self.Vars = variables
         self.recursion = False
+
+        if self.verbose:
+            print('Loading CGRU config...')
 
         if configfiles is None:
             self.recursion = True
@@ -66,7 +70,7 @@ class Config:
             elif sys.platform[:5] == 'linux':
                 self.Vars['platform'].append('linux')
             if self.verbose:
-                print('Platform: "%s"' % self.Vars['platform'].join(' '))
+                print('Platform: "%s"' % ','.join( self.Vars['platform']))
 
             self.Vars['HOSTNAME'] = socket.gethostname().lower()
 
@@ -175,7 +179,7 @@ class Config:
 
         success = True
         try:
-            obj = json.loads(filedata)['cgru_config']
+            obj = json.loads(filedata, object_pairs_hook=collections.OrderedDict)['cgru_config']
         except:  # TODO: Too broad exception clause
             success = False
             print(filename)
@@ -203,6 +207,7 @@ class Config:
             if key[:3] == 'OS_':
                 if key[3:] in VARS['platform']:
                     self.getVars(o_vars, i_obj[key], i_filename)
+                continue
 
             if isinstance(i_obj[key], dict):
                 if key in o_vars:
@@ -210,11 +215,17 @@ class Config:
                         self.getVars(o_vars[key], i_obj[key], i_filename)
                         continue
 
+            if self.verbose:
+                print('    ' + key + ': ' + str(i_obj[key]))
             o_vars[key] = i_obj[key]
 
 
-Config()
+if len(VARS) == 0:
+    Config()
 
+def reconfigure():
+    VARS = dict()
+    Config()
 
 def writeVars(variables, configfile=VARS['config_file_home']):
     with open(configfile, 'r') as file_:

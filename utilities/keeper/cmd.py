@@ -45,7 +45,7 @@ def cgruDocs():
 
 
 def confReload():
-	cgruconfig.Config()
+	cgruconfig.reconfigure()
 
 
 def quit():
