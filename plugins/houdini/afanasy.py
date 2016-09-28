@@ -386,15 +386,24 @@ class BlockParameters:
         job.setFolder('input', os.path.dirname(hou.hipFile.name()))
 
         images = None
+        ifds = []
         for blockparam in blockparams:
             job.blocks.append(blockparam.genBlock(tmphip))
+            if blockparam.preview:
+                if blockparam.preview.endswith(".ifd"):
+                    # find ifd paths for use in deletion post command
+                    ifds.append(blockparam.preview)
+                else:
+                    # Set ouput folder from the first block with images to preview:
+                    if not images:
+                        images = blockparam.preview
+                        job.setFolder('output', os.path.dirname(images))
 
-            # Set ouput folder from the first block with images to preview:
-            if images is None and blockparam.preview != '':
-                images = blockparam.preview
-                job.setFolder('output', os.path.dirname(images))
+        postCmd = "deletefiles"
+        if ifds:
+            postCmd = postCmd + " " + " ".join('"' + ifd.replace("@####@", "*") + '"' for ifd in ifds)
 
-        job.setCmdPost('deletefiles "%s"' % tmphip)
+        job.setCmdPost(postCmd + ' "%s"' % tmphip)
 
         if VERBOSE:
             job.output(True)
