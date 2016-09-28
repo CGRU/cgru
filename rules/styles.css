@@ -244,7 +244,7 @@ text-align: center;
 .selected { background-color: rgba( 100, 255, 255, .2); }
 .half_selected { background-color: rgba( 255, 255, 100, .2); }
 
-#status, #content > .view {
+#search, #status, #content > .view {
 border: 2px solid rgba(98,98,98,.5);
 border-radius: 3px;
 }
@@ -327,7 +327,7 @@ background-position: left;
 /*box-shadow: 0 0 2px #000 inset;*/
 /*border-radius: 2px;*/
 /*padding: 0 2px;*/ }
-.artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); border-radius: 2px; }
+.artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(98,98,98,.5); border-radius: 2px; }
 .artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
 #search_artists .role .label { cursor: pointer; }
 .tags { font-style:italic;}
@@ -554,16 +554,14 @@ table.statistics td { border: 1px solid rgba(98,98,98,.5); border-right-width: 0
 table.statistics .duration { text-align: center; border-left-width: 0; }
 
 #search {
-margin: 4px 0 0 0;
-border: 1px solid rgba(98,98,98,.5);
-border-radius: 2px;
-padding: 4px;
+	margin: 4px 0;
+	padding: 4px;
 }
+#search div { margin: 1px 4px; }
 .search_grp {
-border: 1px solid rgba(98,98,98,.5);
-border-radius: 2px;
-margin: 4px;
-padding: 4px;
+	border-top: 1px solid rgba(98,98,98,.5);
+	margin: 4px;
+	padding: 4px;
 }
 .search_grp_ctrl {
 	float: left;
@@ -571,9 +569,9 @@ padding: 4px;
 }
 .search_grp_ctrl .button {
 	font-size: 14px;
+	width: 40px;
+	padding: 1px 2px;
 }
-#search div { margin: 1px 4px; }
-#search .button { margin: 1px 8px; padding: 2px 8px; }
 #search_artists_div .disabled { display: none; }
 #search_artists_div.show_disabled .disabled { display: block; }
 #search_artists_div .notartist { display: none; }
