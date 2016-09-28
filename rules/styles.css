@@ -327,7 +327,7 @@ background-position: left;
 /*box-shadow: 0 0 2px #000 inset;*/
 /*border-radius: 2px;*/
 /*padding: 0 2px;*/ }
-.artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); }
+.artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(0,0,0,.2); border-radius: 2px; }
 .artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
 #search_artists .role .label { cursor: pointer; }
 .tags { font-style:italic;}
@@ -558,6 +558,19 @@ margin: 4px 0 0 0;
 border: 1px solid rgba(98,98,98,.5);
 border-radius: 2px;
 padding: 4px;
+}
+.search_grp {
+border: 1px solid rgba(98,98,98,.5);
+border-radius: 2px;
+margin: 4px;
+padding: 4px;
+}
+.search_grp_ctrl {
+	float: left;
+	width: 60px;
+}
+.search_grp_ctrl .button {
+	font-size: 14px;
 }
 #search div { margin: 1px 4px; }
 #search .button { margin: 1px 8px; padding: 2px 8px; }
