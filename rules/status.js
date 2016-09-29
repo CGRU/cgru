@@ -517,7 +517,7 @@ Status.prototype.edit = function( i_args)
 
 	var elBtns = document.createElement('div');
 	this.elEdit.appendChild( elBtns);
-	elBtns.style.cssFloat = 'right';
+	elBtns.classList.add('buttons_div');
 
 	var elBtnCancel = document.createElement('div');
 	elBtns.appendChild( elBtnCancel);
@@ -541,18 +541,12 @@ Status.prototype.edit = function( i_args)
 	var elFinishDiv = document.createElement('div');
 	elDiv.appendChild( elFinishDiv);
 	elFinishDiv.classList.add('finish_div');
-//	elFinishDiv.style.cssFloat = 'right';
-//	elFinishDiv.style.width = '200px';
-//	elFinishDiv.style.textAlign = 'center';
-//	elFinishDiv.style.marginLeft = '10px';
 	var elFinishLabel = document.createElement('div');
 	elFinishDiv.appendChild( elFinishLabel);
 	elFinishLabel.classList.add('label');
-//	elFinishLabel.style.cssFloat = 'left';
 	elFinishLabel.textContent = 'Fin:';
 	elFinishLabel.onclick  = function(e){ e.currentTarget.m_elEdit_finish.textContent = c_DT_FormStrNow();};
 	elFinishLabel.title = 'Click to set current date.';
-//	elFinishLabel.style.cursor = 'pointer';
 	this.elEdit_finish = document.createElement('div');
 	elFinishDiv.appendChild( this.elEdit_finish);
 	this.elEdit_finish.classList.add('editing');
@@ -562,21 +556,14 @@ Status.prototype.edit = function( i_args)
 	var elProgressDiv = document.createElement('div');
 	elDiv.appendChild( elProgressDiv);
 	elProgressDiv.classList.add('progress_div');
-//	elProgressDiv.cssFloat = 'left';
-//	elProgressDiv.classList.add('percent');
 	var elProgressLabel = document.createElement('div');
 	elProgressDiv.appendChild( elProgressLabel);
 	elProgressLabel.classList.add('label');
-//	elProgressLabel.style.cssFloat = 'right';
 	elProgressLabel.textContent = '%';
-//	elProgressLabel.style.fontSize = '12px';
 	this.elEdit_progress = document.createElement('div');
 	elProgressDiv.appendChild( this.elEdit_progress);
-//	this.elEdit_progress.style.width = '40px';
-//	this.elEdit_progress.style.height = '18px';
 	this.elEdit_progress.contentEditable = 'true';
 	this.elEdit_progress.classList.add('editing');
-//	this.elEdit_progress.style.textAlign = 'center';
 	this.elEdit_progress.onkeydown = function(e){ if( e.keyCode == 13 ) return false; };
 
 	var elAnnDiv = document.createElement('div');
@@ -586,7 +573,6 @@ Status.prototype.edit = function( i_args)
 	elAnnDiv.appendChild( elAnnLabel);
 	elAnnLabel.classList.add('label');
 	elAnnLabel.textContent = 'Annotation:';
-//	elAnnLabel.style.cssFloat = 'left';
 	this.elEdit_annotation = document.createElement('div');
 	elAnnDiv.appendChild( this.elEdit_annotation);
 	this.elEdit_annotation.classList.add('editing');
@@ -815,7 +801,6 @@ Status.prototype.editListShow = function( i_args)
 	elRoot.m_elBtn = document.createElement('div');
 	elRoot.appendChild( elRoot.m_elBtn);
 	elRoot.m_elBtn.classList.add('button');
-	elRoot.m_elBtn.style.cssFloat = 'left';
 	elRoot.m_elBtn.textContent = i_args.label;
 	elRoot.m_elBtn.m_status = this;
 	elRoot.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editListEdit( i_args);};

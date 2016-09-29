@@ -327,7 +327,7 @@ background-position: left;
 /*box-shadow: 0 0 2px #000 inset;*/
 /*border-radius: 2px;*/
 /*padding: 0 2px;*/ }
-.artists .role { padding: 2px 4px; margin: 1px; border: 1px solid rgba(98,98,98,.5); border-radius: 2px; }
+.artists .role { padding: 2px 4px; margin: 1px; border-bottom: 1px solid rgba(98,98,98,.5); }
 .artists .role .label { float: left; padding: 0px 6px; font-style: italic; }
 #search_artists .role .label { cursor: pointer; }
 .tags { font-style:italic;}
@@ -531,12 +531,20 @@ border-radius: 8px;
 #status_tasks .task > div { float: left; margin: 2px 4px; }
 
 .status_edit { clear: both; }
-.status_edit_div .label { float: left;}
-.status_edit_div .progress_div { float: left;}
-.status_edit_div .finish_div { float: right;}
+.status_edit .buttons_div { float: right; }
+.status_edit .buttons_div .button { float: right; }
+.status_edit_div { padding: 2px 8px;}
+.status_edit_div .label { float: left; padding: 2px 4px; -border:1px solid #0F0;}
+.status_edit_div .progress_div { width: 60px; float: left; -border:1px solid #FF0;}
+.status_edit_div .progress_div .editing { text-align: center;}
+.status_edit_div .progress_div .label { float: right; }
+.status_edit_div .ann_div { padding-left: 24px; -border:1px solid #FF0;}
+.status_edit_div .finish_div { float: right; padding-left: 24px; width: 200px; -border:1px solid #FF0;}
+.status_edit_div .finish_div .label { cursor: pointer;}
+.status_edit_div .finish_div .editing { text-align: center;}
 .status_edit .color { clear:both;}
-.status_edit .list { padding: 4px; margin: 4px; border-radius: 3px; border: 1px solid rgba(98,98,98,.5); }
-.status_edit .list .button { margin:0 4px;padding:0 4px;}
+.status_edit .list { padding: 4px; margin: 4px; border-top: 1px solid rgba(98,98,98,.5); }
+.status_edit .list .button { margin:0 4px; padding:0 4px; width: 50px; float: left; }
 .status_edit .edit_tasks .task_add { float: left; }
 .status_edit .edit_tasks .tasks_multiedit_message { float: right; background-color: #F33; padding: 2px 6px; margin: 2px 6px; border-radius: 2px; }
 .status_edit .edit_tasks { border-top: 1px solid rgba(98,98,98,.5); margin-top: 8px; padding-top: 4px; }
