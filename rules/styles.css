@@ -531,7 +531,9 @@ border-radius: 8px;
 #status_tasks .task > div { float: left; margin: 2px 4px; }
 
 .status_edit { clear: both; }
-.status_edit .percent { float:left; margin: 0px 6px; }
+.status_edit_div .label { float: left;}
+.status_edit_div .progress_div { float: left;}
+.status_edit_div .finish_div { float: right;}
 .status_edit .color { clear:both;}
 .status_edit .list { padding: 4px; margin: 4px; border-radius: 3px; border: 1px solid rgba(98,98,98,.5); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
