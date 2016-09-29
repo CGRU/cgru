@@ -182,7 +182,7 @@ class parser(object):
         :param i_data: input data
         :return: converted data
         """
-        lines = i_data.replace('\r', '').split('\n')
+        lines = cgruutils.toStr(i_data).replace('\r', '').split('\n')
         html = []
 
         for line in lines:
