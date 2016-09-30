@@ -905,8 +905,6 @@ Status.prototype.editListEdit = function( i_args)
 }
 Status.prototype.editArtistsEdit = function( i_args)
 {
-	i_args.elRoot.m_elBtn.style.display = 'none';
-
 	var roles = c_GetRolesArtists( i_args.list);
 
 	for( var r = 0; r < roles.length; r++)

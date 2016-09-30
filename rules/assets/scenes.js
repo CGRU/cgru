@@ -55,8 +55,8 @@ function sc_InitHTML( i_data)
 function sc_Post()
 {
 	if( g_arguments )
-		if( g_arguments.u_Search )
-			sc_FilterShots( g_arguments.u_Search);
+		if( g_arguments.s_Search )
+			sc_FilterShots( g_arguments.s_Search);
 }
 
 function scene_Show()
@@ -650,19 +650,27 @@ function sc_FilterShots( i_args)
 		if( i_args.flags && found )
 		{
 			found = false;
-			if( st_obj.flags )
+			if( st_obj.flags && st_obj.flags.length )
+			{
 				for( i = 0; i < i_args.flags.length; i++ )
 					if( st_obj.flags.indexOf( i_args.flags[i]) != -1 )
 						{ found = true; break; }
+			}
+			else if( i_args.flags.indexOf('_null_') != -1)
+				found = true;
 		}
 
 		if( i_args.tags && found )
 		{
 			found = false;
-			if( st_obj.tags )
+			if( st_obj.tags && st_obj.tags.length )
+			{
 				for( i = 0; i < i_args.tags.length; i++ )
 					if( st_obj.tags.indexOf( i_args.tags[i]) != -1 )
 						{ found = true; break; }
+			}
+			else if( i_args.tags.indexOf('_null_') != -1)
+				found = true;
 		}
 
 		if( i_args.artists && found )
