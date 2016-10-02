@@ -43,7 +43,6 @@ TaskExec::TaskExec(
 	m_parser( i_parser_type),
 	m_parser_coeff( i_parser_coeff),
 	m_capacity( i_capacity),
-	m_capacity_coeff( 0),
 	m_file_size_min( i_file_size_min),
 	m_file_size_max( i_file_size_max),
 
@@ -51,43 +50,26 @@ TaskExec::TaskExec(
 	m_block_num( i_block_number),
 	m_block_flags( i_block_flags),
 	m_task_num(  i_task_number),
-	m_number( 0),
 
 	m_frame_start(   i_start_frame),
 	m_frame_finish(  i_end_frame),
 	m_frames_num(    i_frames_num),
 
-	m_time_start( time(NULL)),
-	m_progress( NULL),
-	m_flags( 0),
 	m_on_client( false)
 {
+	m_time_start = time(NULL);
+	initDefaults();
 AFINFA("TaskExec::TaskExec: %s:", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data())
 }
-/*
-TaskExec::TaskExec( const std::string & Command):
-	m_command( Command),
-	m_parser_coeff( 0),
-	m_capacity( 0),
-	m_capacity_coeff( 0),
-	m_file_size_min( 0),
-	m_file_size_max( 0),
 
-	m_job_id(    0),
-	m_block_num( 0),
-	m_task_num(  0),
-	m_number(   0),
-
-	m_frame_start(   1),
-	m_frame_finish(  1),
-	m_frames_num(    1),
-
-	m_time_start( time(NULL)),
-
-	m_on_client( true)
+void TaskExec::initDefaults()
 {
+	m_flags = 0;
+	m_number = 0;
+	m_capacity_coeff = 0;
+	m_progress = NULL;
 }
-*/
+
 TaskExec::~TaskExec()
 {
 AFINFA("TaskExec:: ~ TaskExec: %s:\n", m_job_name.toUtf8().data(), m_block_name.toUtf8().data(), m_name.toUtf8().data());
@@ -96,6 +78,7 @@ AFINFA("TaskExec:: ~ TaskExec: %s:\n", m_job_name.toUtf8().data(), m_block_name.
 TaskExec::TaskExec( Msg * msg):
 	m_on_client( true)
 {
+	initDefaults();
 	read( msg);
 }
 

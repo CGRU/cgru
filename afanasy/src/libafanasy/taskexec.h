@@ -42,8 +42,6 @@ public:
 			int i_parser_coeff = 1
 );
 
-//	TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
-
 	TaskExec( Msg * msg); ///< Read task from message.
 	~TaskExec();
 
@@ -226,12 +224,15 @@ private:
 
 	int64_t m_time_start;
 
+
+private:
+	void initDefaults();
+
+
 private:
 	/// Needed for af::Render to write running tasks percents:
 	const TaskProgress * m_progress;
 
 	bool m_on_client;
-
-private:
 };
 }
