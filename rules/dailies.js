@@ -39,8 +39,8 @@ function d_Make( i_path, i_outfolder)
 	if( match )
 		params.version = match[match.length-1];
 
-	params.input = i_path;
-	params.output = i_outfolder;
+	params.input  = i_path;
+	params.output = c_PathPM_Rules2Client( i_outfolder);
 	params.activity = RULES.dailies.activity;
 
 	d_params.general.artist = {"width":'50%'};
@@ -105,7 +105,7 @@ function d_DailiesWalkReceived( i_data, i_args)
 			var pattern = file.substr( 0, pos);
 			for( var d = 0; d < match.length-1; d++ ) pattern += '#';
 			pattern += file.substr( pos-1 + match.length);
-			params.input += '/' + pattern;
+			params.input = c_PathPM_Rules2Client( params.input + '/' + pattern);
 			break;
 		}
 //window.console.log( match);
@@ -182,15 +182,15 @@ function d_ProcessGUI( i_wnd)
 		job.depend_mask = params.af_depend_mask;
 
 	job.folders = {};
-	job.folders.input  = cgru_PM('/' + RULES.root + c_PathDir(params.input), true);
-	job.folders.output = cgru_PM('/' + RULES.root + params.output, true);
+	job.folders.input  = c_PathPM_Client2Server( c_PathDir(params.input));
+	job.folders.output = c_PathPM_Client2Server( params.output);
 
 	var block = {};
 	block.name = 'Dailies';
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + g_CurPath(), true);
+	block.working_directory = c_PathPM_Rules2Server( g_CurPath());
 	job.blocks = [block];
 
 	var task = {}
@@ -211,12 +211,12 @@ function d_MakeCmd( i_params)
 	for( var parm in i_params )
 		params[parm] = i_params[parm];
 
-	var input = cgru_PM('/' + RULES.root+params.input, true);
-	var output = cgru_PM('/' + RULES.root+params.output + '/' + params.filename, true);
+	var input  = c_PathPM_Client2Server( params.input);
+	var output = c_PathPM_Client2Server( params.output) + '/' + params.filename;
 
 	var cmd = 'python';
 
-	cmd += ' "' + cgru_PM( d_makemovie, true) + '"';
+	cmd += ' "' + c_PathPM_Client2Server( d_makemovie) + '"';
 
 	cmd += ' -a "' + RULES.avcmd + '"';
 	cmd += ' -c "'+params.codec+'"';
@@ -462,7 +462,7 @@ function d_CvtProcessGUI( i_wnd, i_to_sequence)
 	{
 		// Paths are just selected in filesview:
 		for( var i = 0; i < paths.length; i++ )
-			paths[i] = cgru_PM('/' + RULES.root + paths[i], true);
+			paths[i] = c_PathPM_Client2Server( paths[i]);
 	}
 
 	if( paths.length == 0 )
@@ -517,7 +517,7 @@ function d_CvtImages( i_wnd, i_params)
 		if( i_params.af_paused ) cmd += ' --afpaused';
 
 		if( i_wnd.m_args.results )
-			cmd += ' -o "' + i_wnd.m_result.dest + '"';
+			cmd += ' -o "' + c_PathPM_Client2Server( i_wnd.m_result.dest) + '"';
 	}
 
 	for( var i = 0; i < paths.length; i++)

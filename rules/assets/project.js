@@ -242,7 +242,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 			}
 			else if( key == 'sources' || key == 'template' || key == 'dest')
 			{
-				paths[key] = deploy[d][key];
+				paths[key] = c_PathPM_Server2Client( deploy[d][key]);
 				break;
 			}
 			else

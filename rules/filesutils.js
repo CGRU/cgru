@@ -16,7 +16,6 @@ function fu_Put( i_args)
 	i_args.names = [];
 	var params = {};
 
-//	params.src = i_path;
 	params.dest = RULES.put.dest;
 	if( params.dest.indexOf('/')  != 0 )
 	{
@@ -24,7 +23,11 @@ function fu_Put( i_args)
 			params.dest = ASSETS.project.path + '/' + params.dest;
 		else
 			params.dest = '/' + params.dest;
+
+		params.dest = c_PathPM_Rules2Client( params.dest);
 	}
+	else
+		params.dest = c_PathPM_Server2Client( params.dest);
 
 	gui_Create( wnd.elContent, fu_put_params, [RULES.put, params]);
 	if( RULES.put.ftp )
@@ -56,6 +59,8 @@ function fu_Put( i_args)
 	elResults.classList.add('output');
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
+        i_args.paths[i] = c_PathPM_Rules2Client(i_args.paths[i]);
+
 		var name = c_PathBase( i_args.paths[i]);
 		if( ASSETS.shot )
 		{
@@ -87,7 +92,8 @@ function fu_PutDo( i_wnd)
 
 	for( var i = 0; i < i_wnd.m_args.paths.length; i++)
 	{
-	var source = cgru_PM('/' + RULES.root + i_wnd.m_args.paths[i],  true);
+	var source = c_PathPM_Client2Server( i_wnd.m_args.paths[i]);
+	params.dest = c_PathPM_Client2Server( params.dest);
 	var name   = i_wnd.m_args.names[i];
 
 	var job = {};
@@ -105,7 +111,7 @@ function fu_PutDo( i_wnd)
 	task.name = name;
 	block.tasks = [task];
 
-	var cmd = cgru_PM( RULES.put.cmd, true);
+	var cmd = c_PathPM_Client2Server( RULES.put.cmd);
 	cmd += ' -s "' + source + '"';
 	if( RULES.put.ftp )
 	{
@@ -118,7 +124,6 @@ function fu_PutDo( i_wnd)
 	else
 	{
 		job.name = 'PUT ' + name;
-		//cmd += ' -d "' + cgru_PM('/' + RULES.root + params.dest, true) + '"';
 		cmd += ' -d "' + params.dest + '"';
 		cmd += ' -n "' + name + '"';
 		if( RULES.put.post_delete )
@@ -310,6 +315,7 @@ function fu_PutMultiDialog( i_args)
 
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
+		i_args.paths[i] = c_PathPM_Rules2Client( i_args.paths[i]);
 		el = document.createElement('div');
 		elResults.appendChild( el);
 		el.textContent = i_args.paths[i];
@@ -327,7 +333,7 @@ function fu_ResultsFind( i_wnd)
 
 	var cmd = 'rules/bin/find_results.py';
 	cmd += ' -r "' + params.input + '"';
-	cmd += ' -d "' + params.dest + '"';
+	cmd += ' -d "' + c_PathPM_Client2Server( params.dest) + '"';
 	if( params.skipcheck  ) cmd += ' --skipcheck';
 	if( params.skiperrors ) cmd += ' --skiperrors';
 
@@ -463,7 +469,7 @@ function fu_PutMultiDo( i_wnd)
 	block.parser = 'generic';
 	block.tasks = [];
 
-	var put = cgru_PM( RULES.put.cmd, true);
+	var put = c_PathPM_Client2Server( RULES.put.cmd);
 	if( RULES.put.ftp	)
 	{
 		put += ' --ftp ' + params.host;
@@ -552,6 +558,7 @@ function fu_Archive( i_args)
 
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
+		i_args.paths[i] = c_PathPM_Rules2Client( i_args.paths[i]);
 		el = document.createElement('div');
 		elResults.appendChild( el);
 		el.textContent = i_args.paths[i];
@@ -560,6 +567,8 @@ function fu_Archive( i_args)
 function fu_ArchivateProcessGUI( i_wnd)
 {
 	var paths = i_wnd.m_args.paths;
+	for( var i = 0; i < paths.length; i++)
+		paths[i] = c_PathPM_Client2Server( paths[i]);
 
 	var params = gui_GetParams( i_wnd.elContent, fu_arch_params);
 	if( i_wnd.elContent.m_choises )
@@ -568,14 +577,14 @@ function fu_ArchivateProcessGUI( i_wnd)
 
 	var job = {};
 	job.folders = {};
-	job.folders.input = cgru_PM('/' + RULES.root + c_PathDir( paths[0]),  true);
+	job.folders.input = c_PathDir( paths[0]);
 
 	var arch_cmd = null;
 
 	if( i_wnd.m_args.archive )
 	{
 		job.name = 'Archive ' + params.type;
-		arch_cmd = cgru_PM('/cgru/utilities/arch.py', true);
+		arch_cmd = c_PathPM_Client2Server('/cgru/utilities/arch.py', true);
 		arch_cmd += ' -t ' + params.type;
 		if( params.split != '' )
 			arch_cmd += ' -s ' + params.split;
@@ -583,7 +592,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 	else
 	{
 		job.name = 'Extract';
-		arch_cmd = cgru_PM('/cgru/utilities/arch_x.py', true);
+		arch_cmd = c_PathPM_Client2Server('/cgru/utilities/arch_x.py', true);
 	}
 
 	// Output path for thumbnails frequency:
@@ -599,7 +608,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 	block.parser = RULES.archive.af_parser;
 	block.capacity = parseInt( params.af_capacity);
 	block.tasks = [];
-	block.working_directory = cgru_PM('/' + RULES.root + c_PathDir(paths[0]), true);
+	block.working_directory = c_PathDir(paths[0]);
 	job.blocks = [block];
 
 	for( var i = 0; i < paths.length; i++)
@@ -613,7 +622,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 		var output = '';
 		if( params.dest.length )
 		{
-			output = cgru_PM('/' + RULES.root + params.dest, true) + '/';
+			output = c_PathPM_Client2Server( params.dest) + '/';
 			if( i_wnd.m_args.extract )
 			{
 				cmd += ' -o "' + output + '"';
@@ -656,7 +665,7 @@ function fu_Walk( i_args)
 	var wnd = new cgru_Window({"name":'walk',"title":'Send Walk Job'});
 	wnd.m_args = i_args;
 	var params = {};
-	params.path = i_args.path;
+	params.path = c_PathPM_Rules2Client( i_args.path);
 
 	gui_Create( wnd.elContent, fu_walk_params, [RULES.walk, params]);
 
@@ -705,12 +714,12 @@ function fu_WalkProcessGUI( i_wnd)
 	task.name = params.path;
 	block.tasks = [task];
 
-	var cmd = cgru_PM( RULES.walk.cmd, true);
+	var cmd = c_PathPM_Client2Server( RULES.walk.cmd);
 	cmd += ' --thumb 128';
 	cmd += ' --report 256';
 	if( params.upparents == false ) cmd += ' -n';
 	cmd += ' -V ' + params.verbose;
-	cmd += ' "' + cgru_PM('/' + RULES.root + params.path, true) + '"';
+	cmd += ' "' + c_PathPM_Client2Server( params.path) + '"';
 	task.command = cmd;
 //console.log( cmd);
 

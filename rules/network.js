@@ -239,7 +239,7 @@ function n_SendJob( job)
 
 	if( job.folders == null )
 		job.folders = {};
-	job.folders.rules = cgru_PM('/' + RULES.root + g_CurPath(),  true);
+	job.folders.rules = c_PathPM_Rules2Server( g_CurPath());
 
 	var obj = {};
 	obj.afanasy = 1;

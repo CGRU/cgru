@@ -84,15 +84,15 @@ function shot_InitHTML( i_data)
 	}
 
 	// Set process buttons commands:
-	var path = cgru_PM('/' + RULES.root + g_CurPath());
+	var path = c_PathPM_Rules2Client( g_CurPath());
 
-	cmd = cgru_PM('/cgru/rules/bin/shot_process', true);
+	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_process');
 	if( ASSET.process )
-		cmd = cgru_PM( ASSET.process);
+		cmd = c_PathPM_Server2Client( ASSET.process);
 
 	cmd = cmd + ' -s nuke -r nuke';
 	if( ASSET.nuke_template )
-		cmd += ' -t ' + cgru_PM(ASSET.nuke_template);
+		cmd += ' -t ' + c_PathPM_Server2Client(ASSET.nuke_template);
 
 	if( RULES.colorspace )
 		cmd += ' -c ' + RULES.colorspace
@@ -102,9 +102,9 @@ function shot_InitHTML( i_data)
 //console.log( cmd);
 	cgru_CmdExecProcess({"element":$('shot_nuke_new_btn'),"cmd":cmd});
 
-	cmd = cgru_PM('/cgru/rules/bin/shot_open_latest', true);
+	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_open_latest');
 	if( ASSET.open_latest )
-		cmd = cgru_PM( ASSET.open_latest);
+		cmd = c_PathPM_Server2Client( ASSET.open_latest);
 
 	cmd = cmd + ' -s nuke -e .nk -r nuke';
 
@@ -542,8 +542,8 @@ function shot_RenameSend( i_wnd)
 	var new_name = c_PathDir( old_name) + '/' + params.new_name;
 
 	var cmd = 'rules/bin/move.py';
-	cmd += ' "' + cgru_PM('/' + RULES.root + old_name, true) + '"';
-	cmd += ' "' + cgru_PM('/' + RULES.root + new_name, true) + '"';
+	cmd += ' "' + c_PathPM_Rules2Server( old_name) + '"';
+	cmd += ' "' + c_PathPM_Rules2Server( new_name) + '"';
 
 	i_wnd.m_go_path = new_name;
 
