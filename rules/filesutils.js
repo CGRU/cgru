@@ -266,7 +266,7 @@ function fu_PutMultiDialog( i_args)
 
 	if( RULES.put.dest.indexOf('/') !== 0 )
 		if( ASSETS.project )
-			params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest);
+			params.dest = c_PathPM_Rules2Client( ASSETS.project.path + '/' + RULES.put.dest);
 
 	gui_Create( wnd.elContent, fu_putmulti_params, [RULES.put, params]);
 	if( RULES.put.ftp )
@@ -332,7 +332,7 @@ function fu_ResultsFind( i_wnd)
 	if( params.skiperrors ) cmd += ' --skiperrors';
 
 	for( var i = 0; i < paths.length; i++)
-		cmd += ' "' + cgru_PM('/' + RULES.root + paths[i], true) + '"';
+		cmd += ' "' + c_PathPM_Client2Server( paths[i]) + '"';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":fu_ResultsReceived,"wnd":i_wnd});
 }

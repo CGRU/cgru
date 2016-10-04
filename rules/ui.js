@@ -129,7 +129,7 @@ function u_Process()
 
 	u_ViewsFuncsOpen();
 
-	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
+	var path = c_PathPM_Rules2Client( g_elCurFolder.m_path);
 	c_Info( path);
 
 	if( RULES.has_filesystem !== false )

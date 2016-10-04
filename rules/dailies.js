@@ -345,7 +345,7 @@ function d_Convert( i_args)
 	{
 		if( RULES.put.dest.indexOf('/') !== 0 )
 			if( ASSETS.project )
-				params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest);
+				params.dest = c_PathPM_Rules2Client( ASSETS.project.path + '/' + RULES.put.dest);
 		gui_Create( wnd.elContent, d_cvtmulti_params, [RULES.put,params]);
 	}
 
@@ -415,8 +415,10 @@ function d_Convert( i_args)
 		wnd.m_elResults.classList.add('output');
 	else
 		wnd.m_elResults.classList.add('source');
+
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
+        i_args.paths[i] = c_PathPM_Rules2Client(i_args.paths[i]);
 		var el = document.createElement('div');
 		wnd.m_elResults.appendChild( el);
 		el.textContent = i_args.paths[i];

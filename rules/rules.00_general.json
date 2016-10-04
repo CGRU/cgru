@@ -1,5 +1,7 @@
 {
 "root":"rules_root",
+"-root_link":"/data/prj",
+
 "rufolder":".rules",
 "company":"CGRU",
 "panel_logo_img":"rules/icons/rules.png",

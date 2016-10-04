@@ -1,4 +1,4 @@
-fv_views = [];
+ fv_views = [];
 
 fv_thumbnails_tomake = 0;
 fv_thumbnails_tomake_files = [];
@@ -80,7 +80,7 @@ convert images/movies,\n\
 put in other location (may be FTP),\n\
 genetate thumbnails.";
 
-	cgru_CmdExecCreateOpen({"parent":this.elPanel,"path":this.path});
+	c_CreateOpenButton({"parent":this.elPanel,"path":this.path});
 
 	var elPath = document.createElement('a');
 	this.elPanel.appendChild( elPath);
@@ -655,7 +655,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	var elAnchor = null;
 	if( i_isFolder )
 	{
-		elAnchor = cgru_CmdExecCreateOpen({"parent":elItem,"path":path,"type":'a'});
+		elAnchor = c_CreateOpenButton({"parent":elItem,"path":path,"type":'a'});
 		if( elAnchor ) elAnchor.style.cssFloat = 'left';
 	}
 	if( elAnchor == null )
@@ -812,7 +812,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		if( cmds ) for( var c = 0; c < cmds.length; c++)
 		{
 			var cmd = cmds[c].cmd;
-			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
+			cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client( path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 
 			var elParent = elItem;
@@ -861,7 +861,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		if( cmds && ( RULES.has_filesystem !== false )) for( var c = 0; c < cmds.length; c++)
 		{
 			var cmd = cmds[c].cmd;
-			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
+			cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client( path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 
 			var elParent = elItem;
@@ -1235,7 +1235,7 @@ FilesView.prototype.makeFolder = function()
 }
 FilesView.prototype.makeFolderDo = function( i_name)
 {
-	var path = cgru_PM( RULES.root + this.path + '/' + i_name, true);
+	var path = c_PathPM_Rules2Server( this.path + '/' + i_name);
 	n_Request({"send":{"makefolder":{"path":path}},"func":fv_makeFolderFinished,"fview":this});
 }
 function fv_makeFolderFinished( i_data, i_args)
@@ -1322,7 +1322,7 @@ FilesView.prototype.bufferPut = function()
 	}
 
 	var cmds = [];
-	var dest = cgru_PM( RULES.root + this.path, true) + '/';
+	var dest = c_PathPM_Rules2Server( this.path) + '/';
 	for( var i = 0; i < paths.length; i++)
 	{
 		// Remove parent folder from walk buffer:
@@ -1335,7 +1335,7 @@ FilesView.prototype.bufferPut = function()
 
 		n_walks[parent_path] = null;
 
-		var src = cgru_PM( RULES.root + paths[i], true);
+		var src = c_PathPM_Rules2Server( paths[i]);
 		cmd = 'rules/bin/move.py "' + src + '" "' + dest + '"';
 		cmds.push( cmd);
 	}

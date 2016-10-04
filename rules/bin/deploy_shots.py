@@ -75,21 +75,21 @@ def isSameShot(i_shot, i_name):
 
 if Options.sources is None:
 	errExit('Sources are not specified')
+Out.append({'sources': Options.sources})
 if not os.path.isdir(Options.sources):
 	errExit('Sources folder does not exist: ' + Options.sources)
-Out.append({'sources': Options.sources})
 
 if Options.template is None:
 	errExit('Shot template is not specified')
+Out.append({'template': Options.template})
 if not os.path.isdir(Options.template):
 	errExit('Shot template folder does not exist: ' + Options.template)
-Out.append({'template': Options.template})
 
 if Options.dest is None:
 	errExit('Destination is not specified')
+Out.append({'dest': Options.dest})
 if not os.path.isdir(Options.dest):
 	errExit('Destination folder does not exist: ' + Options.dest)
-Out.append({'dest': Options.dest})
 
 ExistingShots = os.listdir( Options.dest)
 

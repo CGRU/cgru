@@ -588,6 +588,19 @@ function c_MakeThumbnail( i_file, i_func)
 
 function c_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}
 function c_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));}
+function c_PathPM_Rules2Server(  i_path) { if(RULES.root_link) return (RULES.root_link + i_path); else return ('/' + RULES.root + i_path); }
+function c_PathPM_Rules2Client(  i_path) { return cgru_PM( c_PathPM_Rules2Server( i_path)); }
+function c_PathPM_Client2Server( i_path) { return cgru_PM( i_path, true); }
+function c_PathPM_Server2Client( i_path) { return cgru_PM( i_path); }
+function c_CreateOpenButton( i_args)
+{
+    if( RULES.has_filesystem === false )
+        return null;
+
+    i_args.path = c_PathPM_Rules2Client( i_args.path);
+
+    return cgru_CmdExecCreateOpen( i_args);
+}
 
 function c_MD5( i_str) { return hex_md5( i_str);}
 
