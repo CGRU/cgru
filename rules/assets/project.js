@@ -32,9 +32,9 @@ function prj_ShotsDeploy()
 	wnd.elContent.classList.add('deploy_shots');
 
 	var params = {};
-	params.sources = g_CurPath() + '/deploy/src';
+	params.sources = cgru_PM('/' + RULES.root + g_CurPath() + '/IN');
 //	params.references = g_CurPath() + '/deploy/ref';
-	params.template = RULES.assets.shot.template;
+	params.template = cgru_PM( RULES.assets.shot.template);
 
 //console.log( JSON.stringify( g_elCurFolder.m_dir));
 	params.destination = RULES.assets.scenes.seek[0];
@@ -43,6 +43,7 @@ function prj_ShotsDeploy()
 			if( RULES.assets.scenes.seek[s].indexOf( g_elCurFolder.m_dir.folders[f]) != -1 )
 				params.destination = RULES.assets.scenes.seek[s];
 	params.destination = params.destination.replace('[project]', ASSETS.project.path) + '/deploy';
+	params.destination = cgru_PM('/' + RULES.root + params.destination);
 
 	gui_Create( wnd.elContent, prj_deploy_shots_params, [params]);
 
@@ -100,11 +101,11 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	var cmd = 'rules/bin/deploy_shots.sh';
 	var params = gui_GetParams( i_wnd.elContent, prj_deploy_shots_params);
 
-	cmd += ' -s "' + cgru_PM('/' + RULES.root + params.sources, true) + '"';
+	cmd += ' -s "' + cgru_PM( params.sources, true) + '"';
 	if( params.references.length )
-		cmd += ' -r "' + cgru_PM('/' + RULES.root + params.references, true) + '"';
-	cmd += ' -t "' + params.template + '"';
-	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
+		cmd += ' -r "' + cgru_PM( params.references, true) + '"';
+	cmd += ' -t "' + cgru_PM( params.template, true) + '"';
+	cmd += ' -d "' + cgru_PM( params.destination, true) + '"';
 	cmd += ' --shot_src "' + RULES.assets.shot.source.path[0] + '"'
 	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'
 	if( params.sameshot ) cmd += ' --sameshot';
@@ -151,7 +152,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 
 	var el = document.createElement('div');
 	elResults.appendChild( el);
-	el.textContent = deploy.length + ' shots founded:';
+	el.textContent = deploy.length + ' shots founded in "' + deploy.sources + '":';
 
 	var elTable = document.createElement('table');
 	elResults.appendChild( elTable);
@@ -237,6 +238,8 @@ function prj_ShotsDeployFinished( i_data, i_args)
 //console.log( JSON.stringify( shot));
 				break;
 			}
+			else if( key == 'sources' || key == 'template' || key == 'dest')
+				continue;
 			else
 			{
 				var el = document.createElement('td');
@@ -245,5 +248,14 @@ function prj_ShotsDeployFinished( i_data, i_args)
 			}
 		}
 	}
+
+	var el = document.createElement('div');
+	elResults.appendChild( el);
+	el.textContent = 'Destination: ' + deploy.dest;
+
+	var el = document.createElement('div');
+	elResults.appendChild( el);
+	el.textContent = 'Template: ' + deploy.template;
+
 }
 

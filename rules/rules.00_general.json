@@ -289,7 +289,7 @@
 
 "put":{
 	"input":"RESULT/PNG,RESULT/TIF,RESULT/DPX",
-	"dest":"FINAL",
+	"dest":"OUT",
 	"-dest":"/incoming",
 	"cmd":"python /cgru/utilities/put.py",
 	"-ftp":{

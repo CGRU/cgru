@@ -54,7 +54,7 @@ if Options.dest is not None:
 	Out['dest'] = Options.dest
 	if not Options.skipcheck:
 		if not os.path.isdir( Options.dest):
-			errExit('Destination folder does not exist.')
+			errExit('Destination folder does not exist: ' + Options.dest)
 		DestFiles = os.listdir( Options.dest)
 
 ResPaths = Options.respaths.split(',')

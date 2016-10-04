@@ -266,7 +266,7 @@ function fu_PutMultiDialog( i_args)
 
 	if( RULES.put.dest.indexOf('/') !== 0 )
 		if( ASSETS.project )
-			params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest, true);
+			params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest);
 
 	gui_Create( wnd.elContent, fu_putmulti_params, [RULES.put, params]);
 	if( RULES.put.ftp )
