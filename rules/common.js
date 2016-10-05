@@ -488,7 +488,7 @@ function c_GetElInteger( i_el)
 function c_FileDragStart( i_evt, i_path)
 {
 	var el = i_evt.currentTarget;
-	var path = cgru_PM('/' + RULES.root + i_path);
+	var path = c_PathPM_Rules2Client( i_path);
 	if( cgru_Platform.indexOf('windows') == -1 )
 		path = 'file://' + path;
 	var dt = i_evt.dataTransfer;
