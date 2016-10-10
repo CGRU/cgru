@@ -19,7 +19,7 @@ if [ ! -z "$1" ]; then
    ./configure --help
    exit
 else
-   ./configure --enable-gpl --enable-nonfree --enable-libx264 --enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libfaac
+   ./configure --enable-gpl --enable-nonfree --enable-libx264 --enable-libmp3lame --enable-libtheora --enable-libvorbis
    make
 fi
 
