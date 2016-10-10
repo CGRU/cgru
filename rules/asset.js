@@ -247,7 +247,7 @@ function a_Copy( i_args)
 	wnd.m_args = i_args;
 
 	var params = {};
-	params.template = i_args.template;
+	params.template = c_PathPM_Server2Client( i_args.template);
 
 	params.name = i_args.name;
 	if( params.name == null )
@@ -287,8 +287,8 @@ function a_CopySend( i_wnd)
 	elWait.classList.add('wait');
 
 	var cmd = 'rules/bin/copy.py';
-	cmd += ' -t "' + params.template + '"';
-	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
+	cmd += ' -t "' + c_PathPM_Client2Server( params.template) + '"';
+	cmd += ' -d "' + c_PathPM_Rules2Server( params.destination) + '"';
 	cmd += ' ' + params.name;
 
 	i_wnd.m_go_path = params.destination + '/' + params.name.split(' ')[0];
