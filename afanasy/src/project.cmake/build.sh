@@ -21,6 +21,7 @@ gui="YES"
 for arg in "$@"; do
 	[ $arg == "--nosql" ] && sql="NO" && shift
 	[ $arg == "--nogui" ] && gui="NO" && shift
+	[ $arg == "--debug" ] && debug="-g" && shift
 done
 
 # Configure SQL:
@@ -38,7 +39,7 @@ fi
 
 
 # Configure building:
-export AF_ADD_CFLAGS=""
+export AF_ADD_CFLAGS="$debug"
 export AF_ADD_LFLAGS="-lutil"
 export AF_EXTRA_LIBS=""
 
