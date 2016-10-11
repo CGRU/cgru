@@ -12,15 +12,20 @@ import webbrowser
 
 import cgruconfig
 
-ImgExts = ['jpg', 'png', 'exr', 'dpx', 'tif', 'psd', 'tga']
+ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'psd', 'xcf']
+MovExtensions = ['mov', 'avi', 'mp4','ogg','mxf', 'mpg', 'mpeg']
 
-
-def isImageExt(i_name):
-    name, ext = os.path.splitext(i_name)
-    if ext.lower()[1:] in ImgExts:
+def isImageExt(i_file):
+    split = i_file.split('.')
+    if len(split) > 1 and split[-1].lower() in ImgExtensions:
         return True
     return False
 
+def isMovieExt(i_file):
+    split = i_file.split('.')
+    if len(split) > 1 and split[-1].lower() in MovExtensions:
+        return True
+    return False
 
 def sepThousands(i_int):
     """Missing DocString

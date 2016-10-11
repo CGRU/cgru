@@ -7,6 +7,8 @@ import stat
 import sys
 import time
 
+import mediainfo
+
 import cgruutils
 
 from optparse import OptionParser
@@ -18,6 +20,7 @@ Parser = OptionParser(
 
 Parser.add_option('-o', '--output',   dest='output',   type = 'string',     default='.rules/walk.json', help='File to save results.')
 Parser.add_option('-n', '--noupdate', dest='noupdate', action='store_true', default=False,              help='Skip update upfolders.')
+Parser.add_option('-m', '--mediainfo',dest='mediainfo',action='store_true', default=False,              help='Get media information.')
 Parser.add_option('-t', '--thumb',    dest='thumb',    type = 'int',        default=None,               help='Make thumbnail frequency.')
 Parser.add_option('-r', '--report',   dest='report',   type = 'int',        default=None,               help='Print report frequency.')
 Parser.add_option('-V', '--verbose',  dest='verbose',  type = 'int',        default=0,                  help='Verbose mode.')
@@ -194,6 +197,10 @@ def walkdir(i_path, i_subwalk, i_curdepth=0):
                                 sys.stdout.flush()
                             ThumbFolderCount += 1
                     out['num_images'] += 1
+                elif cgruutils.isMovieExt( path) and Options.mediainfo:
+                    obj = mediainfo.processMovie( path)
+                    if obj and 'mediainfo' in obj:
+                        out['files'][entry] = obj['mediainfo']
             out['num_files_total'] += 1
             out['size_total'] += size
             out['size'] += size

@@ -7,10 +7,9 @@ import os
 import sys
 import time
 
-import mediainfo
+import cgruutils
 
-ImgExtensions = ['dpx', 'exr', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'psd', 'xcf']
-MovExtensions = ['mov', 'avi', 'mp4','ogg','mxf', 'mpg', 'mpeg']
+import mediainfo
 
 from optparse import OptionParser
 
@@ -51,20 +50,6 @@ def statusExit(i_msg):
     out['status'] = i_msg
     print(json.dumps(out))
     sys.exit(0)
-
-
-def isImage(i_file):
-    split = i_file.split('.')
-    if len(split) > 1 and split[-1].lower() in ImgExtensions:
-        return True
-    return False
-
-
-def isMovie(i_file):
-    split = i_file.split('.')
-    if len(split) > 1 and split[-1].lower() in MovExtensions:
-        return True
-    return False
 
 
 if Options.input == '':
@@ -124,7 +109,7 @@ if Options.input.find(',') != -1 or os.path.isdir(Options.input):
                 split = re.split(r'\.', afile)
                 if len(split) > 1 and split[-1].lower() in ImgExtensions:
                     images.append(afile)
-                elif isMovie(afile) and not Options.nomovie:
+                elif cgruutils.isMovieExt(afile) and not Options.nomovie:
                     new_movie = os.path.join(root, afile)
                     new_mtime = int(os.path.getmtime(new_movie))
                     if new_movie > cur_mtime:
@@ -149,11 +134,11 @@ else:
     if Options.verbose:
         print('Input is a file.')
 
-    if isImage(Options.input):
+    if cgruutils.isImageExt(Options.input):
         if Options.number == 0:
             Options.number = 1
         Images.append(Options.input)
-    elif isMovie(Options.input):
+    elif cgruutils.isMovieExt(Options.input):
         Movie = Options.input
         if Options.number == 0:
             Options.number = 3
@@ -196,8 +181,8 @@ if Movie is not None:
     # Try to get movie frames count:
     frame_count = 3 # < this will be the default value
     obj = mediainfo.processMovie( Movie)
-    if obj and 'mediainfo' in obj:
-        frame_count = obj['mediainfo']['frame_count']
+    if obj and 'mediainfo' in obj and 'video' in obj['mediainfo']:
+        frame_count = obj['mediainfo']['video']['frame_count']
 
     # Calculate thumbnail interval:
     mod = frame_count / ( Options.number + 1 )

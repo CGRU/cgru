@@ -8,7 +8,7 @@ import subprocess
 
 import cgruutils
 
-def processMovie( i_file):
+def processMovie( i_file, o_file = '.rules/walk.json'):
 
     out = dict()
 
@@ -41,14 +41,32 @@ def processMovie( i_file):
         inform = None
         out['data'] = data
         out['error'] = 'JSON load error'
+        return out
 
-    if inform:
-        for key in inform:
-            if inform[key].isdigit():
-                inform[key] = int(inform[key])
+    for key in inform:
+        if inform[key].isdigit():
+            inform[key] = int(inform[key])
 
-        out['mediainfo'] = inform
+    # Write to file (to store in walk):
+    obj = {}
+    # Try to read existing file if any:
+    o_file = os.path.join( os.path.dirname( i_file), o_file)
+    if os.path.isfile( o_file):
+        try:
+            file = open( o_file, 'r')
+            obj = json.load( file)
+            file.close()
+        except:
+            obj = {}
+    # Add object:
+    if not 'files' in obj: obj['files'] = {}
+    obj['files'][os.path.basename(i_file)] = {'video':inform}
+    # Write file:
+    with open( o_file, 'w') as file:
+        json.dump( obj, file, indent=1)
 
+    # Return this object:
+    out['mediainfo'] = {'video':inform}
     return out
 
 

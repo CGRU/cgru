@@ -703,11 +703,11 @@ margin-bottom: -4px;
 .filesview .item .filesnum.correct { background-color: rgba(100,200,100,.3); }
 .filesview .item .filesnum.error { background-color: #FF3333; box-shadow: 0 0 4px #FF0000; }
 .filesview .item .filesnum.error.greater { background-color: #FF33FF; }
+.filesview .item .videoinfo { font: 10px monospace; clear: both; }
 .filesview .item .checksum { font: 12px monospace; }
 .filesview .item .preview { clear: both; margin: 4px; float: none; text-align: center; border-radius: 8px; border: 2px solid #000; background: #222; }
 .filesview .item .preview .video { border-radius: 6px; border: 2px solid #000; }
 .filesview .item .preview .close { background-color: #555; color: #000; }
----.filesview .item .color { position: absolute; top: 0; right: 0; bottom: 0; left: 0; }
 .filesview .item .annotation { clear: both; }
 .filesview .item .edit_annotation { clear: both; /*border: 1px solid #F00;*/ }
 .filesview .item .edit_annotation .editing { clear: both; /*border: 1px solid #FF0;*/ }

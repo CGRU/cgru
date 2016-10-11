@@ -582,6 +582,24 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		}
 	}
 
+console.log( i_el.m_obj);
+    var video = i_el.m_obj.video;
+    if( video )
+    {
+        if( i_el.m_el_videoinfo == null )
+        {
+			i_el.m_el_videoinfo = document.createElement('div');
+			i_el.appendChild( i_el.m_el_videoinfo);
+			i_el.m_el_videoinfo.classList.add('videoinfo');
+        }
+        info = 'Video:';
+        info += ' ' + video.width + 'x' + video.height;
+        info += ' ' + video.fps;
+        info += ' ' + video.codec;
+        info += ' ' + video.frame_count + 'f';
+        i_el.m_el_videoinfo.textContent = info;
+    }
+
 	if( i_el.m_obj.annotation )
 	{
 		if( i_el.m_el_annotation == null )
