@@ -1,4 +1,4 @@
- fv_views = [];
+fv_views = [];
 
 fv_thumbnails_tomake = 0;
 fv_thumbnails_tomake_files = [];
@@ -600,6 +600,12 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
             info += ' ' + video.fps + 'fps';
         if( video.codec )
             info += ' ' + video.codec;
+        if( video.bitdepth )
+            info += ' ' + video.colorspace;
+        if( video.colorspace )
+            info += '/' + video.chromasubsampling;
+        if( video.chromasubsampling )
+            info += '/' + video.bitdepth;
         if( video.frame_count )
             info += ' ' + video.frame_count + 'f';
         i_el.m_el_videoinfo.textContent = info;

@@ -279,7 +279,7 @@ function c_TC_FromFrame( i_frame, fps, clamp)
         fps = RULES.fps;
 
 	var sec = Math.floor( i_frame / fps );
-	var frm = i_frame - sec * fps;
+	var frm = Math.round( i_frame - sec * fps);
 	var min = Math.floor( sec / 60);
 	sec = sec - min * 60;
 	var hrs = Math.floor( min / 60);

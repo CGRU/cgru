@@ -19,11 +19,14 @@ def processMovie( i_file):
         return out
 
     params = {}
-    params['frame_count'] = 'FrameCount'
-    params['fps'] = 'FrameRate'
+    params['bitdepth'] = 'BitDepth'
+    params['chromasubsampling'] = 'ChromaSubsampling'
     params['codec'] = 'Codec'
-    params['width'] = 'Width'
+    params['colorspace'] = 'ColorSpace'
+    params['fps'] = 'FrameRate'
+    params['frame_count'] = 'FrameCount'
     params['height'] = 'Height'
+    params['width'] = 'Width'
 
     inform = ''
     for key in params:
