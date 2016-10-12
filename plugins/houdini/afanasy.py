@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import os
-import hou
+import re
 import time
+
+import hou
 
 import af
 import afcommon
@@ -30,6 +32,7 @@ class BlockParameters:
         self.frame_sequential = 1
         self.prefix = prefix
         self.preview = ''
+        self.delete_files = []
         self.name = ''
         self.type = ''
         self.parser = ''
@@ -210,6 +213,15 @@ class BlockParameters:
                 self.cmd_useprefix = \
                     int(self.afnode.parm('cmd_use_afcmdprefix').eval())
 
+                # Delete files on job deletion:
+                if self.afnode.parm('cmd_delete_files').eval():
+                    cmd_files = self.afnode.parm('cmd_files')
+                    self.delete_files.append( afcommon.patternFromPaths(
+                        cmd_files.evalAsStringAtFrame( self.frame_first),
+                        cmd_files.evalAsStringAtFrame( self.frame_last)
+                    ))
+
+
             elif not for_job_only:
                 hou.ui.displayMessage('Can\'t process "%s"' % afnode.path())
                 return
@@ -302,6 +314,13 @@ class BlockParameters:
             block.setVariableCapacity(self.capacity_min, self.capacity_max)
 
         block.setTasksMaxRunTime(self.maxruntime)
+
+        # Delete files in a block post command:
+        if len( self.delete_files):
+            post_cmd = 'deletefiles'
+            for files in self.delete_files:
+                post_cmd += ' "%s"' % re.sub('@.*@','*',files)
+            block.setCmdPost( post_cmd)
 
         if self.subblock:
             if self.max_runtasks > -1:
