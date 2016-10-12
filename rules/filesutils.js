@@ -658,8 +658,9 @@ function fu_ArchivateProcessGUI( i_wnd)
 //
 fu_walk_params = {};
 fu_walk_params.path = {};
-fu_walk_params.verbose   = {"label":'Verbose Level',"default":2,"lwidth":'170px',"width":'50%'};
-fu_walk_params.upparents = {"label":'Update Parent Folders','type':"bool",'default':true,"lwidth":'200px',"width":'50%'};
+fu_walk_params.verbose   = {"label":'Verbose Level',"default":2,"lwidth":'170px',"width":'33%'};
+fu_walk_params.upparents = {"label":'Update Parent Folders','type':"bool",'default':true,"lwidth":'200px',"width":'33%'};
+fu_walk_params.mediainfo = {"label":'Get Media Info','type':"bool",'default':false,"lwidth":'180px',"width":'33%'};
 function fu_Walk( i_args)
 {
 	var wnd = new cgru_Window({"name":'walk',"title":'Send Walk Job'});
@@ -718,6 +719,7 @@ function fu_WalkProcessGUI( i_wnd)
 	cmd += ' --thumb 128';
 	cmd += ' --report 256';
 	if( params.upparents == false ) cmd += ' -n';
+	if( params.mediainfo ) cmd += ' -m';
 	cmd += ' -V ' + params.verbose;
 	cmd += ' "' + c_PathPM_Client2Server( params.path) + '"';
 	task.command = cmd;

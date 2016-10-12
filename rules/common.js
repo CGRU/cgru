@@ -273,9 +273,10 @@ function c_DT_DurFromSec( i_sec)
 function c_DT_DurFromNow( i_sec) { return c_DT_DurFromSec( (new Date()) / 1000 - i_sec); }
 function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
-function c_TC_FromFrame( i_frame)
+function c_TC_FromFrame( i_frame, fps, clamp)
 {
-	var fps = RULES.fps;
+    if( fps == null )
+        fps = RULES.fps;
 
 	var sec = Math.floor( i_frame / fps );
 	var frm = i_frame - sec * fps;
@@ -289,7 +290,11 @@ function c_TC_FromFrame( i_frame)
 	if( sec < 10 ) sec = '0' + sec;
 	if( frm < 10 ) frm = '0' + frm;
 
-	return hrs + ':' + min + ':' + sec + ':' + frm;
+    var tc = sec + ':' + frm;
+    if(( min != '00') || ( clamp !== true)) tc = min + ':' + tc;
+    if(( hrs != '00') || ( clamp !== true)) tc = hrs + ':' + tc;
+
+	return tc;
 }
 
 function c_TC_FromSting( i_str)

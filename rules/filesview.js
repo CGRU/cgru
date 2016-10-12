@@ -592,10 +592,16 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			i_el.m_el_videoinfo.classList.add('videoinfo');
         }
         info = 'Video:';
-        info += ' ' + video.width + 'x' + video.height;
-        info += ' ' + video.fps;
-        info += ' ' + video.codec;
-        info += ' ' + video.frame_count + 'f';
+        if( video.width && video.height )
+            info += ' ' + video.width + 'x' + video.height;
+        if( video.frame_count && video.fps )
+            info += ' ' + c_TC_FromFrame( video.frame_count, video.fps, true);
+        if( video.fps )
+            info += ' ' + video.fps + 'fps';
+        if( video.codec )
+            info += ' ' + video.codec;
+        if( video.frame_count )
+            info += ' ' + video.frame_count + 'f';
         i_el.m_el_videoinfo.textContent = info;
     }
 

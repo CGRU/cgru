@@ -23,6 +23,7 @@ Parser.add_option('-y', '--yres',       dest='yres',       type='int',          
 Parser.add_option('-n', '--number',     dest='number',     type='int',          default=0,                  help='Number of images')
 Parser.add_option('-i', '--input',      dest='input',      type='string',       default='',                 help='Input image')
 Parser.add_option('-o', '--output',     dest='output',     type='string',       default='thumbnail.jpg',    help='Output image')
+Parser.add_option('-w', '--walk',       dest='walk',       type='string',       default='.rules/walk.json', help='Output mediainfo in walk data')
 Parser.add_option('-t', '--time',       dest='time',       type='int',          default=0,                  help='Midification test time')
 Parser.add_option('-s', '--skip',       dest='skip',       type='string',       default='matte,mask,layer', help='Skip folders and folders, comma separated list.')
 Parser.add_option(      '--nomovie',    dest='nomovie',    action='store_true', default=False,              help='Skip movie files.')
@@ -106,8 +107,7 @@ if Options.input.find(',') != -1 or os.path.isdir(Options.input):
             for afile in files:
                 if afile[0] in '._':
                     continue
-                split = re.split(r'\.', afile)
-                if len(split) > 1 and split[-1].lower() in ImgExtensions:
+                if cgruutils.isImageExt(afile):
                     images.append(afile)
                 elif cgruutils.isMovieExt(afile) and not Options.nomovie:
                     new_movie = os.path.join(root, afile)
@@ -180,9 +180,34 @@ if Movie is not None:
 
     # Try to get movie frames count:
     frame_count = 3 # < this will be the default value
-    obj = mediainfo.processMovie( Movie)
-    if obj and 'mediainfo' in obj and 'video' in obj['mediainfo']:
-        frame_count = obj['mediainfo']['video']['frame_count']
+    inf_obj = mediainfo.processMovie( Movie)
+    if inf_obj and 'mediainfo' in inf_obj and 'video' in inf_obj['mediainfo']:
+        frame_count = inf_obj['mediainfo']['video']['frame_count']
+
+        # Write to file (to store in walk):
+        walk_obj = {}
+        # Try to read existing file if any:
+        walk_file = os.path.join( os.path.dirname( Movie), Options.walk)
+        if os.path.isfile( walk_file):
+            try:
+                file = open( walk_file, 'r')
+                walk_obj = json.load( file)
+                file.close()
+            except:
+                walk_obj = {}
+        # Add file to walk object files:
+        if not 'files' in walk_obj: walk_obj['files'] = {}
+        walk_obj['files'][os.path.basename( Movie)] = inf_obj['mediainfo']
+        # Write walk file:
+        o_dir = os.path.dirname( walk_file) 
+        if not os.path.isdir( o_dir):
+            os.makedirs( o_dir)
+        try:
+            with open( walk_file, 'w') as file:
+                json.dump( walk_obj, file, indent=1)
+        except:       
+            pass
+
 
     # Calculate thumbnail interval:
     mod = frame_count / ( Options.number + 1 )
