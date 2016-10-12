@@ -641,9 +641,6 @@ padding: 3px 6px;
 .filesview .item.selected {
 box-shadow: 0 0 8px #77FFFF inset;
 }
-.filesview .item div {
-font-size: 14px;
-}
 .filesview .item .name {
 -float: right;
 padding: 1px 6px;
@@ -697,14 +694,17 @@ margin: 0;
 padding: 0;
 margin-bottom: -4px;
 }
-.filesview .item .size { font: 12px monospace; width: 70px; text-align: right; }
-.filesview .item .mtime { font: 12px monospace; }
-.filesview .item .filesnum { font: 10px monospace; border: 1px solid rgba(98,98,98,.5); cursor: pointer; margin: 1px; padding: 1px; }
-.filesview .item .filesnum.correct { background-color: rgba(100,200,100,.3); }
-.filesview .item .filesnum.error { background-color: #FF3333; box-shadow: 0 0 4px #FF0000; }
-.filesview .item .filesnum.error.greater { background-color: #FF33FF; }
-.filesview .item .videoinfo { font: 10px monospace; clear: both; }
-.filesview .item .checksum { font: 12px monospace; }
+.filesview .item .fbody { }
+.filesview .item .fbody div { font-size: 14px; }
+
+.filesview .item .fbody .size { font: 12px monospace; width: 70px; text-align: right; }
+.filesview .item .fbody .mtime { font: 12px monospace; }
+.filesview .item .fbody .filesnum { font: 10px monospace; border: 1px solid rgba(98,98,98,.5); cursor: pointer; margin: 1px; padding: 1px; }
+.filesview .item .fbody .filesnum.correct { background-color: rgba(100,200,100,.3); }
+.filesview .item .fbody .filesnum.error { background-color: #FF3333; box-shadow: 0 0 4px #FF0000; }
+.filesview .item .fbody .filesnum.error.greater { background-color: #FF33FF; }
+.filesview .item .fbody .checksum { font: 12px monospace; }
+.filesview .item .fbody .videoinfo { font: 10px monospace; clear: both; }
 .filesview .item .preview { clear: both; margin: 4px; float: none; text-align: center; border-radius: 8px; border: 2px solid #000; background: #222; }
 .filesview .item .preview .video { border-radius: 6px; border: 2px solid #000; }
 .filesview .item .preview .close { background-color: #555; color: #000; }

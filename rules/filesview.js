@@ -473,7 +473,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( i_el.m_el_mtime == null )
 		{
 			i_el.m_el_mtime = document.createElement('div');
-			i_el.appendChild( i_el.m_el_mtime);
+			i_el.m_elBody.appendChild( i_el.m_el_mtime);
 			i_el.m_el_mtime.classList.add('mtime');
 			i_el.m_el_mtime.classList.add('attr');
 		}
@@ -488,7 +488,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( i_el.m_el_size == null )
 		{
 			i_el.m_el_size = document.createElement('div');
-			i_el.appendChild( i_el.m_el_size);
+			i_el.m_elBody.appendChild( i_el.m_el_size);
 			i_el.m_el_size.classList.add('size');
 			i_el.m_el_size.classList.add('attr');
 		}
@@ -516,7 +516,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( i_el.m_el_num_files == null )
 		{
 			i_el.m_el_num_files = document.createElement('div');
-			i_el.appendChild( i_el.m_el_num_files);
+			i_el.m_elBody.appendChild( i_el.m_el_num_files);
 			i_el.m_el_num_files.classList.add('filesnum');
 			i_el.m_el_num_files.classList.add('attr');
 		}
@@ -582,14 +582,13 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		}
 	}
 
-console.log( i_el.m_obj);
     var video = i_el.m_obj.video;
     if( video )
     {
         if( i_el.m_el_videoinfo == null )
         {
 			i_el.m_el_videoinfo = document.createElement('div');
-			i_el.appendChild( i_el.m_el_videoinfo);
+			i_el.m_elBody.appendChild( i_el.m_el_videoinfo);
 			i_el.m_el_videoinfo.classList.add('videoinfo');
         }
         info = 'Video:';
@@ -697,8 +696,13 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	if( this.has_thumbs )
 		this.makeThumbEl( elItem, path, type);
 
+	elBody = document.createElement('div');
+	elBody.classList.add('fbody');
+	elItem.appendChild( elBody);
+	elItem.m_elBody = elBody;
+
 	elItem.m_elName = document.createElement('a');
-	elItem.appendChild( elItem.m_elName);
+	elBody.appendChild( elItem.m_elName);
 	elItem.m_elName.classList.add('name');
 	elItem.m_elName.textContent = name;
 	if( i_isFolder )
@@ -711,7 +715,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 
 	// Menu show/hide button:
 	var el = document.createElement('div');
-	elItem.appendChild( el);
+	elBody.appendChild( el);
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/menu.png)';
 	el.title = 'Open menu';
@@ -723,7 +727,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	}
 	// Menu div:
 	elItem.m_elMenu = document.createElement('div');
-	elItem.appendChild( elItem.m_elMenu);
+	elBody.appendChild( elItem.m_elMenu);
 	el.m_elMenu = elItem.m_elMenu;
 	elItem.m_elMenu.style.display = 'none';
 	elItem.m_elMenu.classList.add('menu');
@@ -833,7 +837,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client( path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 
-			var elParent = elItem;
+			var elParent = elBody;
 			if( cmds[c].submenu )
 				elParent = elItem.m_elMenu;
 
@@ -850,7 +854,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			out_path = ASSET.path+'/'+ASSET.dailies.path[0];
 
 		var el = document.createElement('div');
-		elItem.appendChild( el);
+		elBody.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/dailies.png)';
 		el.title = 'Make dailies';
@@ -882,15 +886,13 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client( path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
 
-			var elParent = elItem;
+			var elParent = elBody;
 			if( cmds[c].submenu )
 				elParent = elItem.m_elMenu;
 
 			cgru_CmdExecCreate({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
-
-	this.showAttrs( elItem);
 
 	// Movie file preview:
 	if( i_isFolder == false )
@@ -912,7 +914,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		{
 			var el = document.createElement('div');
 			elItem.m_elPreviewBtn = el;
-			elItem.appendChild( el);
+			elBody.appendChild( el);
 			el.classList.add('preview_btn');
 			el.classList.add('button');
 			el.style.backgroundImage = 'url(rules/icons/play.png)';
@@ -921,6 +923,8 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			el.onclick = function(e){ e.stopPropagation(); fv_PreviewOpen(e.currentTarget.m_el_file);};
 		}
 	}
+
+	this.showAttrs( elItem);
 }
 
 FilesView.prototype.onClick = function( i_evt)
