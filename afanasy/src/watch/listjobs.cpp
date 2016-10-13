@@ -808,7 +808,7 @@ void ListJobs::actOpenRULES()
 	if( jobitem == NULL )
 		return;
 
-	QString path = jobitem->getFirstFolder();
+	QString path = jobitem->getRulesFolder();
 	if( path.isEmpty())
 		return;
 

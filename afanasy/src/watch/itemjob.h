@@ -56,7 +56,7 @@ public:
 	QString project;
 	QMap<QString,QString> folders;
 
-	const QString getFirstFolder();
+	const QString getRulesFolder();
 
 	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const
