@@ -356,19 +356,22 @@ class BlockParameters:
                   self.afnode.name())
             return
 
-        # Calculate temporary hip name:
-        ftime = time.time()
-        tmphip = '%s_%s%s%s.hip' % (
-            hou.hipFile.name(),
-            afcommon.filterFileName(self.job_name),
-            time.strftime('.%m%d-%H%M%S-'),
-            str(ftime - int(ftime))[2:5]
-        )
+        renderhip = hou.hipFile.name()
 
-        # use mwrite, because hou.hipFile.save(tmphip)
-        # changes current scene file name to tmphip,
-        # at least in version 9.1.115
-        hou.hscript('mwrite -n "%s"' % tmphip)
+        if self.afnode.parm('render_temp_hip').eval():
+            # Calculate temporary hip name:
+            ftime = time.time()
+            renderhip = '%s_%s%s%s.hip' % (
+                renderhip,
+                afcommon.filterFileName(self.job_name),
+                time.strftime('.%m%d-%H%M%S-'),
+                str(ftime - int(ftime))[2:5]
+            )
+
+            # use mwrite, because hou.hipFile.save(renderhip)
+            # changes current scene file name to renderhip,
+            # at least in version 9.1.115
+            hou.hscript('mwrite -n "%s"' % renderhip)
 
         job = af.Job()
         job.setName(self.job_name)
@@ -410,14 +413,15 @@ class BlockParameters:
 
         images = None
         for blockparam in blockparams:
-            job.blocks.append(blockparam.genBlock(tmphip))
+            job.blocks.append(blockparam.genBlock(renderhip))
 
             # Set ouput folder from the first block with images to preview:
             if images is None and blockparam.preview != '':
                 images = blockparam.preview
                 job.setFolder('output', os.path.dirname(images))
 
-        job.setCmdPost('deletefiles "%s"' % tmphip)
+        if self.afnode.parm('render_temp_hip').eval():
+            job.setCmdPost('deletefiles "%s"' % renderhip)
 
         if VERBOSE:
             job.output(True)
