@@ -182,7 +182,7 @@ function d_ProcessGUI( i_wnd)
 		job.depend_mask = params.af_depend_mask;
 
 	job.folders = {};
-	job.folders.input  = c_PathPM_Client2Server( c_PathDir(params.input));
+	job.folders.input  = c_PathDir( c_PathPM_Client2Server( params.input));
 	job.folders.output = c_PathPM_Client2Server( params.output);
 
 	var block = {};
