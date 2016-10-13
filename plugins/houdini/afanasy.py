@@ -32,7 +32,6 @@ class BlockParameters:
         self.frame_sequential = 1
         self.prefix = prefix
         self.preview = ''
-        self.delete_files = []
         self.name = ''
         self.type = ''
         self.parser = ''
@@ -46,6 +45,10 @@ class BlockParameters:
         self.tasks_names = []
         self.tasks_cmds = []
         self.tasks_previews = []
+        # Fill in this array with files to delete in a block post command.
+        # Files should have a common afanasy "@#*@" pattern,
+        # it will be replaced with "*" for shell.
+        self.delete_files = []
         # Parameters to restore ROP changes:
         self.soho_foreground = None
         self.soho_outputmode = None
@@ -57,7 +60,6 @@ class BlockParameters:
         self.start_paused = int(afnode.parm('start_paused').eval())
         self.platform = str(afnode.parm('platform').eval())
         self.subtaskdepend = int(afnode.parm('subtaskdepend').eval())
-        self.parser = self.afnode.parm('override_parser').eval()
         self.priority = -1
         self.max_runtasks = -1
         self.maxperhost = -1
@@ -73,6 +75,7 @@ class BlockParameters:
         self.preview_approval = afnode.parm('preview_approval').eval()
 
         if afnode.parm('enable_extended_parameters').eval():
+            self.parser = self.afnode.parm('override_parser').eval()
             self.priority = int(afnode.parm('priority').eval())
             self.max_runtasks = int(afnode.parm('max_runtasks').eval())
             self.maxperhost = int(afnode.parm('maxperhost').eval())
@@ -182,10 +185,11 @@ class BlockParameters:
             self.cmd += ' "%(hipfilename)s"'
             self.cmd += ' "%s"' % ropnode.path()
 
-            # Override service:
-            override_service = self.afnode.parm('override_service').eval()
-            if override_service is not None and len(override_service):
-                self.type = override_service
+            if afnode.parm('enable_extended_parameters').eval():
+                # Override service:
+                override_service = self.afnode.parm('override_service').eval()
+                if override_service is not None and len(override_service):
+                    self.type = override_service
 
         else:
             # Custom command driver:
@@ -319,7 +323,7 @@ class BlockParameters:
         if len( self.delete_files):
             post_cmd = 'deletefiles'
             for files in self.delete_files:
-                post_cmd += ' "%s"' % re.sub('@.*@','*',files)
+                post_cmd += ' "%s"' % re.sub('@#*@','*',files)
             block.setCmdPost( post_cmd)
 
         if self.subblock:
@@ -542,8 +546,8 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             if tile_render or del_rop_files or use_tmp_img_folder:
                 block_render.cmd = 'mantrarender '
 
-            if del_rop_files and not tile_render:
-                block_render.cmd += 'd'
+            if del_rop_files:
+                block_render.delete_files.append( files)
 
             if use_tmp_img_folder:
                 block_render.cmd += 't'
@@ -576,9 +580,6 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
 
         if tile_render:
             cmd = 'exrjoin %(tile_divx)d %(tile_divy)d %(images)s d' % vars()
-
-            if del_rop_files:
-                cmd += ' && deletefiles -s "%s"' % files
 
             block_join = BlockParameters(
                 afnode, ropnode, subblock, prefix, frame_range
