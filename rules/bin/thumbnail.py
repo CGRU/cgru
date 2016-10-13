@@ -230,6 +230,7 @@ if Movie is not None:
 cmd = 'convert'
 cmd += ' "%s"'
 cmd += ' -layers flatten'
+cmd += ' -alpha Deactivate'
 if Movie is None:
     if Options.colorspace != 'auto':
         colorspace = Options.colorspace
