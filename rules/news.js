@@ -195,16 +195,18 @@ function nw_Subscribe( i_path)
 			c_Error('Already subscribed on: ' + path);
 			return;
 		}
-		if( path.indexOf( i_path))
+		if( path.indexOf( i_path) != -1 )
 		{
 			c_Info('Already subscribed on parent path: ' + path);
 			return;
 		}
-		if( i_path.indexOf( path))
+		/*
+		if( i_path.indexOf( path) != -1 )
 		{
 			c_Info('Unsubscribing sub-path: ' + path);
 			continue;
 		}
+		*/
 		new_channels.push( g_auth_user.channels[i]);
 	}
 
