@@ -46,5 +46,6 @@ namespace afqt
    const QString stoq( const std::string & str);
    const QString dtoq( const char * data, int size = -1);
    const std::string qtos( const QString & str);
+   const QMap<QString,QString> stoq( const std::map<std::string, std::string> & i_map);
    const QString time2Qstr( time_t time_sec = time( NULL));
 }

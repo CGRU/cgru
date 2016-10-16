@@ -13,6 +13,10 @@ print('COMMAND:')
 print(sys.argv)
 print('WORKING DIRECTORY:')
 print(os.getcwd())
+print('ENVIRONMENT ("CG_"):')
+for env in os.environ:
+    if env.find('CG_') == 0:
+       print('%s=%s' % (env, os.environ[env]))
 
 
 def interrupt(signum, frame):

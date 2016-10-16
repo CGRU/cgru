@@ -61,9 +61,9 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
 	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
-	jr_string("user_name",     m_user_name,     i_object);
+	jr_string("user_name",     m_user_name,     i_object, io_changes);
 
-	jr_stringmap("folders", m_folders, i_object);
+	jr_stringmap("folders", m_folders, i_object, io_changes);
 
 	bool offline = false;
 	jr_bool("offline", offline, i_object, io_changes);
@@ -197,16 +197,7 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_life\":"                  << m_time_life;
 
 	if( m_folders.size())
-	{
-		o_str << ",\n\"folders\":{";
-		int i = 0;
-		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
-		{
-			if( i ) o_str << ",";
-			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
-		}
-		o_str << "\n}";
-	}
+		af::jw_stringmap("folders", m_folders, o_str);
 
 	if( hasHostsMask())
 		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
@@ -418,6 +409,7 @@ int Job::v_calcWeight() const
 	weight += weigh( m_host_name);
 	weight += weigh( m_project);
 	weight += weigh( m_department);
+	weight += weigh( m_folders);
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();
 	weight += m_depend_mask.weigh();

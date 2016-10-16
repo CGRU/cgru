@@ -32,7 +32,7 @@ public:
 			long long i_frames_num,
 
 			const std::string & i_working_directory,
-			const std::string & i_environment,
+			const std::map<std::string, std::string> & i_environment,
 
 			int i_job_id,
 			int i_block_number,
@@ -85,8 +85,8 @@ public:
 
 	inline const std::string & getCommand()  const { return m_command; } ///< Get command.
 	inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
-	inline const std::string & getEnv()      const { return m_environment;     } ///< Get extra environment.
 	inline const std::vector<std::string> & getFiles() const { return m_files;   } ///< Get files.
+	inline const std::map<std::string, std::string> & getEnv() const { return m_environment; } ///< Get extra environment.
 
 	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
 	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
@@ -192,11 +192,12 @@ private:
 	std::string m_user_name;          ///< Task user name.
 
 	std::string m_working_directory;  ///< Working directory.
-	std::string m_environment;        ///< Extra environment.
 	std::string m_command;            ///< Command.
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.
+
+	std::map<std::string, std::string> m_environment; ///< Extra environment.
 
 	std::vector<std::string> m_files; ///< File(s).
 	std::vector<std::string> m_parsed_files; ///< File(s).

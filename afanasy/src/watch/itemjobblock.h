@@ -27,7 +27,6 @@ public:
    std::string workingdir;
    std::vector<std::string> files;
    QString  cmdpre;
-   QString  environment;
    QString  cmdpost;
    QString  tasksname;
    QString  service;

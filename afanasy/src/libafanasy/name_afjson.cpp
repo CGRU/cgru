@@ -270,7 +270,7 @@ bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, c
 	return true;
 }
 
-bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object)
+bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & map = i_object[i_name];
 	if( false == map.IsObject())
@@ -278,13 +278,34 @@ bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & 
 
 	for( JSON::ConstMemberIterator it = map.MemberBegin(); it != map.MemberEnd(); ++it)
 	{
-		std::string name = it->name.GetString();
-		const JSON & path = it->value;
-		if( false == path.IsString()) continue;
-		o_attr[name] = path.GetString();
+		const std::string name = it->name.GetString();
+		const JSON & value = it->value;
+		std::string str;
+		if( value.IsString())
+			str = value.GetString();
+        //printf("str=\"%s\"[%d]\n",str.c_str(),str.size());
+		if( str.size())
+			o_attr[name] = str;
+		else
+		    o_attr.erase( name); // This does not erasing element, why ?
+			//printf("erase(%s)=%d\n",name.c_str(),o_attr.erase( name));
+
+		if( o_str )
+			*o_str += std::string("\n") + i_name + "[" + name + "]=\"" + o_attr[name] + "\"";
 	}
 
 	return true;
+}
+
+void af::jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str)
+{
+	o_str << ",\n\"" << i_name << "\":{";
+	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+	{
+		if( it != i_map.begin()) o_str << ",";
+		o_str << "\n\"" << it->first << "\":\"" << af::strEscape(it->second) << "\"";
+	}
+	o_str << "\n}";
 }
 
 void af::jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str)

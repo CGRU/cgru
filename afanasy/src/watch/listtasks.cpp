@@ -171,6 +171,10 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockWorkingDir() ));
 			submenu->addAction( action);
 
+			action = new QAction( "Set Environment", this);
+			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockEnvironment() ));
+			submenu->addAction( action);
+
 			action = new QAction( "Set Post Command", this);
 			connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCmdPost() ));
 			submenu->addAction( action);
@@ -610,6 +614,19 @@ void ListTasks::actBlockWorkingDir()
 	if( !ok) return;
 	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
 	blockAction( 0, QString("\"params\":{\"working_directory\":\"%1\"}").arg( str), false);
+}
+void ListTasks::actBlockEnvironment()
+{
+	bool ok;
+	QString str = QInputDialog::getText( this,"Set Environment", "Enter name=value pair:", QLineEdit::Normal, QString(), &ok);
+	if( !ok) return;
+	str = afqt::stoq( af::strEscape( afqt::qtos( str)));
+    QStringList list = str.split('=');
+    if( list.size() != 2 )
+    {
+        displayError( QString("Invalid name=value pair: ") + str);
+    }
+	blockAction( 0, QString("\"params\":{\"environment\":{\"%1\":\"%2\"}}").arg( list[0], list[1]), false);
 }
 void ListTasks::actBlockCmdPost()
 {

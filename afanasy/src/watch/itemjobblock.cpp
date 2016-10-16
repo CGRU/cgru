@@ -64,7 +64,6 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       files             = block->getFiles();
       cmdpre            = afqt::stoq( block->getCmdPre());
       cmdpost           = afqt::stoq( block->getCmdPost());
-      environment       = afqt::stoq( block->getEnvironment());
       service           = afqt::stoq( block->getService());
       tasksname         = afqt::stoq( block->getTasksName());
       parser            = afqt::stoq( block->getParser());

@@ -78,6 +78,8 @@ private:
 	bool m_doing_post;
 	std::vector<std::string> m_post_cmds;
 
+	char ** m_environ;
+
 	std::string m_listened;
 
 #ifdef WINNT

@@ -43,11 +43,12 @@ bool LaunchProgramV(
 	HANDLE * o_err,
 	const char * i_commanline,
     const char * i_wdir,
+	char ** i_environ = NULL,
     DWORD i_flags,
 	bool alwaysCreateWindow);
 
 bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
-                       const std::string & i_commandline, const std::string & i_wdir,
+                       const std::string & i_commandline, const std::string & i_wdir, char ** i_environ,
                        HANDLE * o_in, HANDLE * o_out, HANDLE * o_err,
 					   DWORD i_flags, bool alwaysCreateWindow)
 {
@@ -58,7 +59,7 @@ bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
 	std::string shell_commandline = af::Environment::getCmdShell() + " ";
 	shell_commandline += i_commandline;
 
-	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_flags, alwaysCreateWindow);
+	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_environ, i_flags, alwaysCreateWindow);
 }
 void af::launchProgram( const std::string & i_commandline, const std::string & i_wdir)
 {
@@ -72,9 +73,10 @@ int LaunchProgramV(
     FILE **o_err,
     const char * i_program,
     const char * i_args[],
-    const char * wdir = NULL);
+    const char * wdir = NULL,
+	char ** i_environ = NULL);
 
-int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir,
+int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir, char ** i_environ,
                        FILE ** o_in, FILE ** o_out, FILE ** o_err)
 {
     const char * wdir = NULL;
@@ -95,13 +97,13 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 		// Shell has one argunet - most common case:
 		// "bash -c" or "cmd.exe /c"
 		const char * args[] = { shellWithArgs.back().c_str(), i_commandline.c_str(), NULL};
-		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
+		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
 	}
 	else if( shellWithArgs.size() == 1)
 	{
 		// Shell has no arguments:
 		const char * args[] = { i_commandline.c_str(), NULL};
-		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
+		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
 	}
 	else
 	{
@@ -114,7 +116,7 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 			args[i++] = (*(it++)).c_str();
 		args[shellWithArgs.size()-1] = i_commandline.c_str();
 		args[shellWithArgs.size()] = NULL;
-		int result = LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
+		int result = LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
 		delete [] args;
 		return result;
 	}
@@ -462,6 +464,14 @@ int af::weigh( const std::vector<std::string> & i_list)
    int w = 0;
    for( int i = 0; i < i_list.size(); i++) w += weigh( i_list[i]);
    return w;
+}
+
+int af::weigh( const std::map<std::string, std::string> & i_map)
+{
+	int w = 0;
+	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		w += weigh(it->first) + weigh(it->second);
+	return w;
 }
 
 const std::string af::getenv( const char * name)

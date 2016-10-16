@@ -171,9 +171,9 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
 	jr_string("custom_data",           m_custom_data,           i_object, io_changes);
-	//jr_string("environment",         m_environment,           i_object, io_changes);
 	jr_int32 ("parser_coeff",          m_parser_coeff,          i_object, io_changes);
 	jr_int64 ("sequential",            m_sequential,            i_object, io_changes);
+	jr_stringmap("environment",        m_environment,           i_object, io_changes);
 
 
 	if( m_capacity < 1 )
@@ -346,7 +346,8 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
             o_str << ",\n\"multihost_service\":\"" << m_multihost_service         << "\"";
 		if( m_custom_data.size())
 	        o_str << ",\n\"custom_data\":\""       << m_custom_data               << "\"";
-        //o_str << ",\n\"environment\":\""         << m_environment               << "\"";
+		if( m_environment.size())
+			af::jw_stringmap("environment", m_environment, o_str);
         //o_str << ",\n\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
         o_str << ',';
 
@@ -540,13 +541,13 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_String  ( m_tasks_name,            msg);
 		rw_String  ( m_parser,                msg);
 		rw_String  ( m_working_directory,     msg);
-		rw_String  ( m_environment,           msg);
 		rw_String  ( m_command,               msg);
 		rw_String  ( m_command_pre,           msg);
 		rw_String  ( m_command_post,          msg);
 		rw_String  ( m_multihost_service,     msg);
 		rw_String  ( m_custom_data,           msg);
 		rw_StringVect ( m_files,              msg);
+		rw_StringMap  ( m_environment,        msg);
 
 	case Msg::TJobsList:
 		rw_int64_t ( m_flags,                        msg);
@@ -1312,10 +1313,11 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
       if( full && (   m_parser.empty())) o_str << " is empty (no parser)";
 
       if( full && m_command_post.size()) o_str << "\n Post Command:\n" << m_command_post;
+
+      if( full && m_environment.size()) o_str << "\n Environment: " << af::strJoin( m_environment);
 /*
       if( false == m_working_directory.empty()) o_str << "\n Working Directory:\n" << m_working_directory;
       if( false == m_command.empty()) o_str << "\n Command:\n" << m_command;
-      if( false == m_environment.empty()) o_str << "\n Environment = " << m_environment;
       if( false == m_files.empty()) o_str << "\n Files:\n" << af::strReplace( m_files, ';', '\n');
       if( false == m_command_pre.empty()) o_str << "\n Pre Command:\n" << m_command_pre;
       if( false == m_custom_data.empty()) o_str << "\n Custom Data:\n" << m_custom_data;

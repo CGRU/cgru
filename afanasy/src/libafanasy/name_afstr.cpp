@@ -224,6 +224,17 @@ const std::string af::strJoin( const std::vector<std::string> & strvect, const s
 	return str;
 }
 
+const std::string af::strJoin( const std::map<std::string, std::string> & i_map, const std::string & i_sep)
+{
+	std::string str;
+	for( std::map<std::string, std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++ )
+	{
+		if( false == str.empty()) str += i_sep;
+		str += it->first + "=" + it->second;
+	}
+	return str;
+}
+
 const std::string af::strReplace( const std::string & str, char before, char after)
 {
 	std::string replaced( str);

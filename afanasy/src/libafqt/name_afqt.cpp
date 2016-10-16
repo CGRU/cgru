@@ -185,6 +185,14 @@ const std::string afqt::qtos( const QString & str)
    return std::string( str.toUtf8().data());
 }
 
+const QMap<QString,QString> afqt::stoq( const std::map<std::string, std::string> & i_map)
+{
+	QMap<QString,QString> map;
+	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		map[afqt::stoq(it->first)] = afqt::stoq(it->second);
+	return map;
+}
+
 const QString afqt::time2Qstr( time_t time_sec)
 {
    return stoq( af::time2str(time_sec));

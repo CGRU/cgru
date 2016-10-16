@@ -50,6 +50,7 @@ private slots:
 
 	void actBlockCommand();
 	void actBlockWorkingDir();
+	void actBlockEnvironment();
 	void actBlockFiles();
 	void actBlockCmdPost();
 	void actBlockService();

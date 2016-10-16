@@ -24,7 +24,7 @@ TaskExec::TaskExec(
 		long long i_frames_num,
 
 		const std::string & i_working_directory,
-		const std::string & i_environment,
+		const std::map<std::string, std::string> & i_environment,
 
 		int i_job_id,
 		int i_block_number,
@@ -136,7 +136,7 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 		if( m_custom_data_render.size())
 			o_str << ",\"custom_data_render\":\"" << af::strEscape( m_custom_data_render ) << "\"";
 		if( m_environment.size())
-			o_str << ",\"environment\":\"" << af::strEscape( m_environment ) << "\"";
+			af::jw_stringmap("environment", m_environment, o_str );
 
 		if( m_files.size())
 		{
@@ -185,8 +185,8 @@ void TaskExec::v_readwrite( Msg * msg)
 		rw_String  ( m_command,           msg);
 		rw_String  ( m_working_directory, msg);
 		rw_String  ( m_parser,            msg);
-		rw_String  ( m_environment,       msg);
 
+		rw_StringMap ( m_environment,     msg);
 		rw_StringVect( m_files,           msg);
 		rw_StringVect( m_parsed_files,    msg);
 
@@ -245,9 +245,11 @@ void TaskExec::v_generateInfoStream( std::ostringstream & stream, bool full) con
 	if(full)
 	{
 		stream << std::endl;
-		if( m_working_directory.size()) stream << "   Working directory = \"" << m_working_directory << "\".\n";
 		stream << m_command;
-		if( m_environment.size()) stream << "   Environment = \""       <<  m_environment << "\".\n";
+		if( m_working_directory.size())
+			stream << "   Working directory = \"" << m_working_directory << "\".\n";
+		if( m_environment.size())
+			stream << "   Environment = \"" << af::strJoin(m_environment) << "\".\n";
 		if( m_files.size())
 		{
 			stream << "Files:\n";

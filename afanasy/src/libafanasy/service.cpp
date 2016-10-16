@@ -41,7 +41,8 @@ Service::Service(
 			std::vector<std::string>(),
 			1, 1, 1,
 			m_wdir,
-			"", 1, 0, 0, 1
+			std::map<std::string,std::string>(),
+			1, 0, 0, 1
 		);
 	initialize( i_task_exec, "");
 	delete i_task_exec;
@@ -60,7 +61,8 @@ Service::Service(
 			std::vector<std::string>(),
 			1, 1, 1,
 			m_wdir,
-			"", 1, 0, 0, 1
+			std::map<std::string,std::string>(),
+			1, 0, 0, 1
 		);
 	initialize( i_task_exec, "");
 	delete i_task_exec;
@@ -79,7 +81,8 @@ Service::Service(
 			std::vector<std::string>(),
 			1, 1, 1,
 			m_wdir,
-			"", 1, 0, 0, 1
+			std::map<std::string,std::string>(),
+			1, 0, 0, 1
 		);
 	initialize( i_task_exec, "");
 	delete i_task_exec;
@@ -99,7 +102,8 @@ Service::Service(
 			i_files,
 			1, 1, 1,
 			m_wdir,
-			"", 1, 0, 0, 1
+			std::map<std::string,std::string>(),
+			1, 0, 0, 1
 		);
 	initialize( i_task_exec, "");
 	delete i_task_exec;

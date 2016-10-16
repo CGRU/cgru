@@ -2,6 +2,9 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <unistd.h>
+
+extern char **environ;
 
 #ifdef WINNT
 #include <windows.h>
@@ -65,6 +68,7 @@ long long TaskProcess::ms_counter = 0;
 
 TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_taskexec( i_taskExec),
+	m_environ( NULL),
 	m_render( i_render),
 	m_parser( NULL),
 	m_update_status( af::TaskExec::UPPercent),
@@ -123,6 +127,31 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 		m_wdir = af::Environment::getTempDir();
 	m_taskexec->setWDir( m_wdir);
 
+	// Process environment:
+	if( m_taskexec->hasEnv())
+	{
+		std::vector<std::string> env_vec;
+		for( char ** e = environ; *e != 0; e++)
+		{
+			std::string str(*e);
+			if( str.empty()) continue;
+			env_vec.push_back( str);
+		}
+
+		const std::map<std::string, std::string> & env_map = m_taskexec->getEnv();
+		for( std::map<std::string,std::string>::const_iterator it = env_map.begin(); it != env_map.end(); it++)
+			if((it->first).size() && (it->second).size())
+				env_vec.push_back( it->first + '=' + it->second);
+
+		m_environ = new char*[env_vec.size()+1];
+		for( int i = 0; i < env_vec.size(); i++)
+		{
+			m_environ[i] = new char[env_vec[i].size()+1];
+			memcpy( m_environ[i], env_vec[i].c_str(), env_vec[i].size());
+			m_environ[i][env_vec[i].size()] = '\0';
+		}
+		m_environ[env_vec.size()] = NULL;
+	}
 
 	if( af::Environment::isVerboseMode()) printf("%s\n", m_cmd.c_str());
 
@@ -157,13 +186,13 @@ void TaskProcess::launchCommand()
 	if( m_render->noOutputRedirection())
 	{
 		// Test a command w/o output redirection:
-	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, 0, 0, 0,
+	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, m_environ, 0, 0, 0,
 			CREATE_SUSPENDED | priority ))
 			m_pid = m_pinfo.dwProcessId;
 	}
 	else
 	{
-	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr,
+	    if( af::launchProgram( &m_pinfo, m_cmd, m_wdir, m_environ, &m_io_input, &m_io_output, &m_io_outerr,
 			CREATE_SUSPENDED | priority ))
 			m_pid = m_pinfo.dwProcessId;
 	}
@@ -171,9 +200,9 @@ void TaskProcess::launchCommand()
 	// For UNIX we can ask child prcocess to call a function to setup after fork()
 	fp_setupChildProcess = setupChildProcess;
 	if( m_render->noOutputRedirection())
-		m_pid = af::launchProgram( m_cmd, m_wdir, 0, 0, 0);
+		m_pid = af::launchProgram( m_cmd, m_wdir, m_environ, 0, 0, 0);
 	else
-		m_pid = af::launchProgram( m_cmd, m_wdir, &m_io_input, &m_io_output, &m_io_outerr);
+		m_pid = af::launchProgram( m_cmd, m_wdir, m_environ, &m_io_input, &m_io_output, &m_io_outerr);
 	#endif
 
 	if( m_pid <= 0 )
@@ -231,6 +260,13 @@ TaskProcess::~TaskProcess()
 
 	killProcess();
 	closeHandles();
+
+	if( m_environ )
+	{
+		for( char ** e = m_environ; *e != 0; e++)
+			delete [] *e;
+		delete [] m_environ;
+	}
 
 	delete m_taskexec;
 	delete m_service;

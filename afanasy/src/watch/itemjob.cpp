@@ -101,18 +101,13 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	description          = afqt::stoq( job->getDescription());
 	report               = afqt::stoq( job->getReport());
 	project              = afqt::stoq( job->getProject());
+	folders              = afqt::stoq( job->getFolders());
 	num_runningtasks     = job->getRunningTasksNumber();
 	lifetime             = job->getTimeLife();
 	ppapproval           = job->isPPAFlag();
 	maintenance          = job->isMaintenanceFlag();
 	ignorenimby          = job->isIgnoreNimbyFlag();
 	ignorepaused         = job->isIgnorePausedFlag();
-
-	folders.clear();
-	const std::map<std::string,std::string> & stdf = job->getFolders();
-	if( stdf.size())
-	for( std::map<std::string,std::string>::const_iterator it = stdf.begin(); it != stdf.end(); it++)
-		folders[afqt::stoq((*it).first)] = afqt::stoq((*it).second);
 
 	QString new_thumb_path = afqt::stoq( job->getThumbPath());
 

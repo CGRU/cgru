@@ -133,6 +133,7 @@ namespace af
 	const std::string strStrip( const std::string & i_str, Direction i_dir, const std::string & i_characters = " \n");
 	const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
 	const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
+	const std::string strJoin( const std::map<std::string, std::string> & i_map, const std::string & i_sep = ";");
 	const std::string strReplace( const std::string & str, char before, char after);
 	const std::string strEscape( const std::string & i_str);
 	const std::vector<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
@@ -162,6 +163,7 @@ namespace af
 	int weigh( const std::string & str);
 	int weigh( const std::list<std::string> & strlist);
 	int weigh( const std::vector<std::string> & i_list);
+	int weigh( const std::map<std::string, std::string> & i_map);
 
 
 	bool  init( uint32_t flags );
@@ -209,13 +211,13 @@ namespace af
 	void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
 	bool launchProgram(
 			PROCESS_INFORMATION * o_pinfo,
-			const std::string & i_commandline, const std::string & i_wdir = std::string(),
+			const std::string & i_commandline, const std::string & i_wdir = std::string(), char ** i_environ = NULL,
 			HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
 			DWORD i_flags = 0, bool alwaysCreateWindow = false
 		);
 #else
 	int launchProgram(
-			const std::string & i_commandline, const std::string & i_wdir = std::string(),
+			const std::string & i_commandline, const std::string & i_wdir = std::string(), char ** i_environ = NULL,
 			FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL
 		);
 #endif
@@ -280,8 +282,9 @@ namespace af
 	bool jr_int64 ( const char * i_name, int64_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int32vec(  const char * i_name, std::vector<int32_t>     & o_attr, const JSON & i_object);
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
-	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object);
+	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object, std::string * o_str = NULL);
 
+	void jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str);
 	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
 	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);
 	void jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render = false);

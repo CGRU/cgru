@@ -278,6 +278,18 @@ class Block:
                 afile = Pathmap.toServer(afile)
             self.data["files"].append(afile)
 
+    def setEnv(self, i_name, i_value):
+        """Missing DocString
+
+        :param i_name:
+        :param i_value:
+        :return:
+        """
+        if not "environment" in self.data:
+            self.data["environment"] = dict()
+
+        self.data["environment"][i_name] = i_value
+
     def setName(self, value):
         """Missing DocString
 
