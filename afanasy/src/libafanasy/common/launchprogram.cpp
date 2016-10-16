@@ -50,7 +50,7 @@ bool LaunchProgramV(
 	HANDLE * o_err,
     const char * i_commandline,
     const char * i_wdir,
-	char ** i_environ = NULL,
+	char * i_environ,
     DWORD i_flags,
 	bool alwaysCreateWindow)
 {
@@ -262,7 +262,7 @@ bool LaunchProgramV(
 		NULL, NULL,
 		o_in || o_out || o_err,
 		flags,
-		NULL, i_wdir,
+		(LPVOID) i_environ, i_wdir,
 		&startInfo, o_pinfo);
 
 	free(argsAndProgram);

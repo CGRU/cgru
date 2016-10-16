@@ -211,7 +211,7 @@ namespace af
 	void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
 	bool launchProgram(
 			PROCESS_INFORMATION * o_pinfo,
-			const std::string & i_commandline, const std::string & i_wdir = std::string(), char ** i_environ = NULL,
+			const std::string & i_commandline, const std::string & i_wdir = std::string(), char * i_environ = NULL,
 			HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
 			DWORD i_flags = 0, bool alwaysCreateWindow = false
 		);

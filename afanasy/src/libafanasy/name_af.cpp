@@ -43,12 +43,12 @@ bool LaunchProgramV(
 	HANDLE * o_err,
 	const char * i_commanline,
     const char * i_wdir,
-	char ** i_environ = NULL,
+	char * i_environ,
     DWORD i_flags,
 	bool alwaysCreateWindow);
 
 bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
-                       const std::string & i_commandline, const std::string & i_wdir, char ** i_environ,
+                       const std::string & i_commandline, const std::string & i_wdir, char * i_environ,
                        HANDLE * o_in, HANDLE * o_out, HANDLE * o_err,
 					   DWORD i_flags, bool alwaysCreateWindow)
 {

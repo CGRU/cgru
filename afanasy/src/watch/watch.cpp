@@ -356,8 +356,9 @@ void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
 #ifdef WINNT
 	PROCESS_INFORMATION pinfo;
 
-	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL,
-	    CREATE_NEW_CONSOLE, true);
+	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(),
+		NULL, NULL, NULL, NULL,
+		CREATE_NEW_CONSOLE, true);
 
 	CloseHandle( pinfo.hThread);
 	CloseHandle( pinfo.hProcess);

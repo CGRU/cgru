@@ -46,7 +46,7 @@ parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    de
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default=None, help='parser type, default if not set')
-parser.add_option(      '--env',          dest='environment',  type='string', default=None, help='add an evironment')
+parser.add_option(      '--env',          dest='environment',  type='string', default="CG_VAR=somevalue", help='add an evironment')
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')

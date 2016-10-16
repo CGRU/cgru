@@ -2,9 +2,6 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <unistd.h>
-
-extern char **environ;
 
 #ifdef WINNT
 #include <windows.h>
@@ -15,6 +12,8 @@ extern char **environ;
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
+#include <unistd.h>
+extern char **environ;
 extern void (*fp_setupChildProcess)( void);
 #endif
 
@@ -131,26 +130,59 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	if( m_taskexec->hasEnv())
 	{
 		std::vector<std::string> env_vec;
-		for( char ** e = environ; *e != 0; e++)
+		int env_size = 0;
+#ifdef WINNT
+		char * env_str = GetEnvironmentStrings();
+		while( env_str[env_size] != '\0')
 		{
-			std::string str(*e);
+			std::string str(env_str + env_size);
+			env_size += str.size() + 1; ///< For "name=value" '\0' termination
 			if( str.empty()) continue;
 			env_vec.push_back( str);
 		}
+		FreeEnvironmentStrings( env_str);
+		#else
+		for (char ** e = environ; *e != 0; e++)
+		{
+			std::string str(*e);
+			if (str.empty()) continue;
+			env_vec.push_back(str);
+			env_size += str.size() + 1; ///< For "name=value" '\0' termination
+		}
+		#endif
 
 		const std::map<std::string, std::string> & env_map = m_taskexec->getEnv();
 		for( std::map<std::string,std::string>::const_iterator it = env_map.begin(); it != env_map.end(); it++)
-			if((it->first).size() && (it->second).size())
-				env_vec.push_back( it->first + '=' + it->second);
+			if ((it->first).size() && (it->second).size())
+			{
+				std::string str = it->first + '=' + it->second;
+				env_vec.push_back( str);
+				env_size += str.size() + 1; ///< For "name=value" '\0' termination
+			}
 
+		env_size++; ///< For the last '\0' termination
+
+		#ifdef WINNT
+		m_environ = new char[env_size];
+		int pos = 0;
+		for (int i = 0; i < env_vec.size(); i++)
+		{
+			strncpy( m_environ + pos, env_vec[i].c_str(), env_vec[i].size());
+			pos += env_vec[i].size();
+			m_environ[pos] = '\0'; ///< "name=value" '\0' termination
+			pos += 1;
+		}
+		m_environ[env_size-1] = '\0'; /// The last '\0' termination
+		#else
 		m_environ = new char*[env_vec.size()+1];
 		for( int i = 0; i < env_vec.size(); i++)
 		{
 			m_environ[i] = new char[env_vec[i].size()+1];
 			memcpy( m_environ[i], env_vec[i].c_str(), env_vec[i].size());
-			m_environ[i][env_vec[i].size()] = '\0';
+			m_environ[i][env_vec[i].size()] = '\0'; ///< "name=value" '\0' termination
 		}
-		m_environ[env_vec.size()] = NULL;
+		m_environ[env_vec.size()] = NULL; /// The last '\0' termination
+		#endif
 	}
 
 	if( af::Environment::isVerboseMode()) printf("%s\n", m_cmd.c_str());
@@ -263,8 +295,10 @@ TaskProcess::~TaskProcess()
 
 	if( m_environ )
 	{
+		#ifndef WINNT
 		for( char ** e = m_environ; *e != 0; e++)
 			delete [] *e;
+		#endif
 		delete [] m_environ;
 	}
 

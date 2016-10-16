@@ -78,11 +78,10 @@ private:
 	bool m_doing_post;
 	std::vector<std::string> m_post_cmds;
 
-	char ** m_environ;
-
 	std::string m_listened;
 
 #ifdef WINNT
+	char * m_environ;
 	PROCESS_INFORMATION m_pinfo;
 	HANDLE m_hjob;
 	HANDLE m_io_output;
@@ -90,6 +89,7 @@ private:
 	HANDLE m_io_input;
 	int readPipe( HANDLE i_handle );
 #else
+	char ** m_environ;
 	FILE * m_io_output;
 	FILE * m_io_outerr;
 	FILE * m_io_input;
