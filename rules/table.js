@@ -5,6 +5,7 @@ table_columns.status   = {'label':'Status'};
 table_columns.info     = {'label':'Info'};
 table_columns.comments = {'label':'Comments'};
 table_columns.tasks    = {'label':'Tasks'};
+table_columns.timecode = {'label':'TC'};
 table_columns.duration = {'label':'Dur'};
 table_columns.price    = {'label':'Price'};
 
@@ -17,12 +18,13 @@ table_functions = null;
 table_function_num = null;
 
 table_params = {};
-table_params.picture  = {'type':'bool','default':true, 'width':'16%'};
-table_params.status   = {'type':'bool','default':true, 'width':'16%'};
-table_params.tasks    = {'type':'bool','default':false,'width':'16%'};
-table_params.comments = {'type':'bool','default':false,'width':'16%'};
-table_params.duration = {'type':'bool','default':true, 'width':'16%'};
-table_params.price    = {'type':'bool','default':true, 'width':'16%'};
+table_params.picture  = {'type':'bool','default':true, 'width':'25%'};
+table_params.status   = {'type':'bool','default':true, 'width':'25%'};
+table_params.comments = {'type':'bool','default':false,'width':'25%'};
+table_params.price    = {'type':'bool','default':true, 'width':'25%'};
+table_params.timecode = {'type':'bool','default':false,'width':'25%'};
+table_params.duration = {'type':'bool','default':true, 'width':'25%'};
+table_params.tasks    = {'type':'bool','default':false,'width':'25%'};
 
 function table_Export( i_args)
 {
@@ -425,6 +427,17 @@ function table_Gen_tasks( i_shot)
 		}
 
 	table_WriteTD({'data':data,'status':i_shot.status});
+
+	table_Function();
+}
+
+function table_Gen_timecode( i_shot)
+{
+	var text = '';
+	if( i_shot.status.timecode_start && i_shot.status.timecode_finish )
+		text += i_shot.status.timecode_start + ' - ' + i_shot.status.timecode_finish;
+
+	table_WriteTD({'data':text,'status':i_shot.status});
 
 	table_Function();
 }
