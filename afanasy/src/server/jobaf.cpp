@@ -343,56 +343,65 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 void JobAf::v_action( Action & i_action)
 {
 	// If action has blocks ids array - action to for blocks
-	if( i_action.data->HasMember("block_ids"))
+	if( i_action.data->HasMember("block_ids") || i_action.data->HasMember("block_mask"))
 	{
-		const JSON & blocks = (*i_action.data)["block_ids"];
-		if( blocks.IsArray())
-		{
-			std::vector<int32_t> block_ids;
+		std::vector<int32_t> block_ids;
+
+		// Try to get block ids from array:
+		const JSON & j_block_ids = (*i_action.data)["block_ids"];
+		if( j_block_ids.IsArray())
 			af::jr_int32vec("block_ids", block_ids, *i_action.data);
-			if( block_ids.size())
-			{
-				bool job_progress_changed = false;
-				// If blocks ids array has only one "-1" value - action to for all blocks
-				if(( block_ids.size() == 1 ) && ( block_ids[0] == -1 ))
-				{
-					for( int b = 0; b < m_blocks_num; b++)
-						if( m_blocks[b]->action( i_action))
-							job_progress_changed = true;
-				}
-				else
-				{
-					for( int b = 0; b < block_ids.size(); b++)
-					{
-						if(( block_ids[b] >= getBlocksNum()) || ( block_ids[b] < 0 ))
-						{
-							appendLog("Invalid block number = " + af::itos(block_ids[b]) + " " + i_action.author);
-							continue;
-						}
-						if( m_blocks[block_ids[b]]->action( i_action))
-							job_progress_changed = true;
-					}
-				}
 
-				if( job_progress_changed )
-					i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
-
-				if( i_action.log.size() )
-					store();
-
-				return;
-			}
-			else
-			{
-				appendLog("\"block_ids\" array does not contain any integers " + i_action.author);
-				return;
-			}
-		}
-		else
+		// -1 id is specified = all blocks
+		if(( block_ids.size() == 1 ) && ( block_ids[0] == -1 ))
 		{
-			appendLog("\"block_ids\" should be an array of integers " + i_action.author);
+			block_ids.clear();
+			for( int b = 0; b < m_blocks_num; b++)
+				block_ids.push_back( m_blocks[b]->m_data->getBlockNum());
+		}
+
+		// Try to fill ids from mask:
+		const JSON & j_block_mask = (*i_action.data)["block_mask"];
+		if( j_block_mask.IsString())
+		{
+			std::string mask;
+			af::jr_string("block_mask", mask, *i_action.data);
+			af::RegExp re;
+			std::string re_err;
+			if( false == re.setPattern( mask, &re_err))
+			{
+				appendLog("Invalid block mask = " + mask + " from " + i_action.author);
+				return;
+			}
+			for( int b = 0; b < m_blocks_num; b++)
+				if( re.match( m_blocks[b]->m_data->getName()))
+					block_ids.push_back( m_blocks[b]->m_data->getBlockNum());
+		}
+
+		if( block_ids.empty())
+		{
+			appendLog("\"block_ids\" array does not contain any integers or invalid \"block_mask\" from " + i_action.author);
 			return;
 		}
+
+		bool job_progress_changed = false;
+		for( int b = 0; b < block_ids.size(); b++)
+		{
+			if(( block_ids[b] >= getBlocksNum()) || ( block_ids[b] < 0 ))
+			{
+				appendLog("Invalid block number = " + af::itos(block_ids[b]) + " " + i_action.author);
+				continue;
+			}
+			if( m_blocks[block_ids[b]]->action( i_action))
+				job_progress_changed = true;
+		}
+
+		if( job_progress_changed )
+			i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
+
+		if( i_action.log.size() )
+			store();
+
 		return;
 	}
 

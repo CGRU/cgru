@@ -3,21 +3,24 @@
 	{
 		"user_name"  : "jimmy",
 		"host_name"  : "pc01",
-		"-mask"       : "_empty_.*",
-		"ids"        : [1],
+		"mask"       : "_empty_.*",
+		"-ids"        : [2],
 		"type"       : "jobs",
 		"-type"       : "renders",
 		"-type"       : "users",
 		"-type"       : "monitors",
 		"-type"       : "talks",
-		"-block_ids"  : [0,2],
+		"-block_ids"  : [1,2],
+		"block_mask" : "block[1|2]",
 		"params"     :
 		{
 			"-nimby"       : true,
-			"-hidden"     : true,
-			"-priority"   : 75,
-			"annotation" : "json action",
+			"-hidden"      : true,
+			"-priority"    : 75,
+			"-annotation"  : "json action",
 			"-hosts_mask"  : "bhm.*",
+			"depend_mask" :"dm",
+			"environment" : {"CG_VAR1":"value1","CG_VAR2":"value2"},
 			"sentinel": null
 		}
 	}
