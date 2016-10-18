@@ -178,10 +178,19 @@ elif drivertypename == "wedge":
 #
 ds_node = hou.node( options.ds_node)
 if ds_node is not None:
-    ds_node.parm('address').set( options.ds_address )
-    ds_node.parm('port'   ).set( options.ds_port    )
-    ds_node.parm('slice'  ).set( options.ds_slice   )
+    tracker_address = os.getenv('TRACKER_ADDRESS', options.ds_address )
+    tracker_port = int( os.getenv('TRACKER_PORT', options.ds_port ))
+    sim_slice = options.ds_slice
 
+    print('Setting distributed simulation parameters:')
+    print('Tracker: %s:%d' % ( tracker_address, tracker_port))
+    print('Simulation slice = %d' % sim_slice)
+
+    ds_node.parm('address').set( tracker_address)
+    ds_node.parm('port'   ).set( tracker_port   )
+    ds_node.parm('slice'  ).set( sim_slice      )
+
+    print('ACTIVITY: %s:%d/%d' % (tracker_address, tracker_port, sim_slice))
 
 # Set take, if specified:
 if take is not None and len(take) > 0:

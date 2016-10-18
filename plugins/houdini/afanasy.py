@@ -33,7 +33,7 @@ class BlockParameters:
         self.prefix = prefix
         self.preview = ''
         self.name = ''
-        self.type = ''
+        self.service = ''
         self.parser = ''
         self.cmd = ''
         self.cmd_useprefix = True
@@ -130,7 +130,7 @@ class BlockParameters:
 
         # Process output driver type to construct a command:
         if ropnode:
-            self.type = 'hbatch'
+            self.service = 'hbatch'
 
             if not isinstance(ropnode, hou.RopNode):
                 hou.ui.displayMessage(
@@ -148,7 +148,7 @@ class BlockParameters:
 
             if roptype == 'ifd':
                 if not ropnode.parm('soho_outputmode').eval():
-                    self.type = 'hbatch_mantra'
+                    self.service = 'hbatch_mantra'
 
                 vm_picture = ropnode.parm('vm_picture')
 
@@ -159,7 +159,7 @@ class BlockParameters:
                             vm_picture.evalAsStringAtFrame(self.frame_last)
                         )
             elif roptype == 'rib':
-                self.type = 'hbatch_prman'
+                self.service = 'hbatch_prman'
 
             # Block command:
             self.cmd = 'hrender_af'
@@ -189,7 +189,7 @@ class BlockParameters:
                 # Override service:
                 override_service = self.afnode.parm('override_service').eval()
                 if override_service is not None and len(override_service):
-                    self.type = override_service
+                    self.service = override_service
 
         else:
             # Custom command driver:
@@ -207,9 +207,9 @@ class BlockParameters:
                     self.name = self.cmd.split(' ')[0]
 
                 # Service:
-                self.type = self.afnode.parm('cmd_service').eval()
-                if self.type is None or self.type == '':
-                    self.type = self.cmd.split(' ')[0]
+                self.service = self.afnode.parm('cmd_service').eval()
+                if self.service is None or self.service == '':
+                    self.service = self.cmd.split(' ')[0]
                 # Parser:
                 self.parser = self.afnode.parm('cmd_parser').eval()
 
@@ -287,9 +287,9 @@ class BlockParameters:
         # Place hipfilename and auxargs
         cmd = self.cmd % vars()
 
-        block = af.Block(self.name, self.type)
-        block.setParser(self.parser)
-        block.setCommand(cmd, self.cmd_useprefix)
+        block = af.Block( self.name, self.service)
+        block.setParser( self.parser)
+        block.setCommand( cmd, self.cmd_useprefix)
         if self.preview != '':
             block.setFiles([self.preview])
 
@@ -527,9 +527,9 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 block_generate.preview = images
 
             if not join_render:
-                block_generate.type = 'hbatch'
+                block_generate.service = 'hbatch'
             else:
-                block_generate.type = 'hbatch_mantra'
+                block_generate.service = 'hbatch_mantra'
                 block_generate.cmd = block_generate.cmd.replace(
                     'hrender_af', 'hrender_separate'
                 )
@@ -543,7 +543,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                                            frame_range)
             block_render.name = blockname + '-R'
             block_render.cmd = 'mantra'
-            block_render.type = block_render.cmd
+            block_render.service = block_render.cmd
             if run_rop:
                 block_render.dependmask = block_generate.name
 
@@ -590,7 +590,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             )
 
             block_join.name = blockname + '-J'
-            block_join.type = 'generic'
+            block_join.service = 'generic'
             block_join.dependmask = block_render.name
             block_join.cmd = cmd
             block_join.cmd_useprefix = False
@@ -621,21 +621,61 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             if not ds_node.parm(parm):
                 hou.ui.displayMessage('Control node "%s" does not have "%s" parameter' % (ds_node_path, parm))
                 return
+
+        # Tracker block:
+        par_start = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, True)
+        params.append( par_start)
+        
+        # A block for each slice:
         ds_num_slices = int(afnode.parm('ds_num_slices').eval())
+        stop_dep_mask = None
         for s in range(0, ds_num_slices):
             par = BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
+            sim_blocks_mask = par.name + '.*'
             par.name += '-s%d' % s
             par.frame_pertask = par.frame_last - par.frame_first + 1
+            par.addDependMask( par_start.name)
+            par.fullrangedepend = True
             par.auxargs = ' --ds_node "%s"' % ds_node_path
             par.auxargs += ' --ds_address "%s"' % str(afnode.parm('ds_address').eval())
             par.auxargs += ' --ds_port %d' % int(afnode.parm('ds_port').eval())
             par.auxargs += ' --ds_slice %d' % s
             params.append(par)
+
+        # Stop tracker block:
+        par_stop = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, False)
+        par_stop.addDependMask( sim_blocks_mask)
+        params.append( par_stop)
+
+        # Set other block names for start tracker block.
+        # As start tracker block will set other block environment
+        # to specify started tracker and port.
+        par_start.cmd += ' --envblocks "%s|%s"' % ( sim_blocks_mask, par_stop.name)
+        # On this block depend mask will be reset on tracker start:
+        par_start.cmd += ' --depblocks "%s"' % sim_blocks_mask
+        
     else:
         params.append(
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
         )
     return params
+
+
+def getTrackerParameters(  i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range, i_start):
+    par = BlockParameters( i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range)
+    par.name = i_prefix + '-tracker'
+    par.frame_last = par.frame_first
+    par.frame_pertask = 1
+    par.subtaskdepend = False
+    par.fullrangedepend = True
+    par.service = 'htracker'
+    par.parser = 'generic'
+    if i_start:
+        par.cmd = 'htracker --start'
+    else:
+        par.cmd = 'htracker --stop'
+        par.name += '-stop'
+    return par
 
 
 def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):

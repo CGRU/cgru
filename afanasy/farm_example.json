@@ -58,6 +58,7 @@
 			{"name":"hbatch"},
 			{"name":"hbatch_prman"},
 			{"name":"hbatch_mantra"},
+			{"name":"htracker"},
 			{"name":"mantra"},
 			{"name":"max"},
 			{"name":"maya"},
