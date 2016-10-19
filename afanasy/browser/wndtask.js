@@ -379,6 +379,7 @@ WndTask.prototype.showExec = function( i_obj)
 	t_attrs.parser = {"float":'left',"width":'38%'};
 	t_attrs.command = {"pathmap":true};
 	t_attrs.working_directory = {"label":'Directory',"pathmap":true};
+	t_attrs.environment = {"label":'Environ'};
 
 	var attrs = document.createElement('div');
 	elParent.appendChild( attrs);
@@ -410,13 +411,25 @@ WndTask.prototype.showExec = function( i_obj)
 			label.style.textTransform = 'capitalize';
 		}
 
-		var value = document.createElement('div');
-		div.appendChild( value);
-		value.classList.add('value');
+		var elValue = document.createElement('div');
+		div.appendChild( elValue);
+		elValue.classList.add('value');
+		var value = i_obj[attr];
+		if( attr == 'environment' )
+		{
+			var env = value;
+			value = '';
+			for( name in env )
+			{
+				if( value.length )
+					value += ',';
+				value += name + '=' + env[name];
+			}
+		}
 		if( t_attrs[attr].pathmap )
-			value.textContent = cgru_PM( i_obj[attr]);
+			elValue.textContent = cgru_PM( value);
 		else
-			value.textContent = i_obj[attr];
+			elValue.textContent = value;
 	}
 
 	var files = [];

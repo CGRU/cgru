@@ -422,6 +422,7 @@ void WndTask::showExec( af::MCTask & i_mctask)
 	af::Service service( exec);
 	QString wdir    = afqt::stoq( service.getWDir());
 	QString command = afqt::stoq( service.getCommand());
+	std::map<std::string,std::string> environment = exec->getEnv();
 	std::vector<std::string> files = service.getFiles();
 	std::vector<std::string> parsed_files = service.getParsedFiles();
 
@@ -447,14 +448,16 @@ void WndTask::showExec( af::MCTask & i_mctask)
 	c.insertText( ",", fInfo);
 	c.insertText( QString::number( exec->getFramesNum()), fParameter);
 	c.insertText( "):", fInfo);
-	c.insertText( "\n");
-	c.insertText( "Command:", fInfo);
-	c.insertText( "\n");
+
+	c.insertText("\nCommand:\n", fInfo);
 	c.insertText( command, fParameter);
-	c.insertText( "\n");
-	c.insertText( "Working Directory:", fInfo);
-	c.insertText( "\n");
+
+	c.insertText("\nWorking Directory:\n", fInfo);
 	c.insertText( wdir, fParameter);
+
+	c.insertText("\nEnvironment:\n", fInfo);
+	c.insertText( afqt::stoq( af::strJoin( environment)), fParameter);
+
 	if( files.size())
 	{
 		c.insertText( "\n");
