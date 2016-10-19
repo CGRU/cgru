@@ -22,7 +22,11 @@ class mantra(parser.parser):
                             'Recompress failed', 'WARNING: A procedural of',
                             ' Unknown parameter: ', ' is rendering as a packed '
                             'procedural but has a mix of packed and '
-                            'non-packed primitives']
+                            'non-packed primitives', 'mantra: No velocity '
+                            'attribute found for motion blur',
+                            " primitives which may not be rendered directly",
+                            'Procedural generated out of bounds geometry',
+                            'mantra: WARNING:']
         self.str_error = [
             'No licenses could be found to run this application',
             'Please check for a valid license server host',
