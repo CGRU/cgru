@@ -300,9 +300,12 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 		lock();
 		m_deletion = true;
 		
-		std::vector<std::string> events;
-		events.push_back("JOB_DELETED");
-		emitEvents(events);
+		if( m_custom_data.size() || m_user->getCustomData().size())
+		{
+			std::vector<std::string> events;
+			events.push_back("JOB_DELETED");
+			emitEvents(events);
+		}
 		
 		if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
 		{
