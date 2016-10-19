@@ -455,8 +455,11 @@ void WndTask::showExec( af::MCTask & i_mctask)
 	c.insertText("\nWorking Directory:\n", fInfo);
 	c.insertText( wdir, fParameter);
 
-	c.insertText("\nEnvironment:\n", fInfo);
-	c.insertText( afqt::stoq( af::strJoin( environment)), fParameter);
+	if( environment.size())
+	{
+		c.insertText("\nEnvironment:\n", fInfo);
+		c.insertText( afqt::stoq( af::strJoin( environment)), fParameter);
+	}
 
 	if( files.size())
 	{
