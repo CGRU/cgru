@@ -83,7 +83,7 @@ class Task:
         :param TransferToServer:
         :return:
         """
-        if not "files" in self.data:
+        if "files" not in self.data:
             self.data["files"] = []
 
         for afile in files:
@@ -105,7 +105,7 @@ class Block:
             cgruconfig.VARS['af_task_default_capacity'])
         self.data["working_directory"] = Pathmap.toServer(
             os.getenv('PWD', os.getcwd()))
-        #self.data["numeric"] = False
+        # self.data["numeric"] = False
         self.tasks = []
         if service is not None and len(service):
             if self.setService(service):
@@ -161,20 +161,17 @@ class Block:
             print('Error: Block.setNumeric: Block already has tasks.')
             return
         if end < start:
-            print(
-            'Error: Block.setNumeric: end < start (%d < %d)' % (
-            end, start))
+            print('Error: Block.setNumeric: end < start (%d < %d)' % (end, start))
             end = start
         if pertask < 1:
             print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
             pertask = 1
-        #self.data["numeric"] = True
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'numeric')
+        # self.data["numeric"] = True
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'numeric')
         self.data["frame_first"] = start
         self.data["frame_last"] = end
         self.data["frames_per_task"] = pertask
         self.data["frames_inc"] = increment
-
 
     def setFramesPerTask(self, value):
         """Missing DocString
@@ -184,7 +181,6 @@ class Block:
         """
         self.data["frames_per_task"] = value
 
-
     def setSequential(self, value):
         """Missing DocString
 
@@ -192,7 +188,6 @@ class Block:
         :return:
         """
         self.data["sequential"] = value
-
 
     def setCapacity(self, capacity):
         """Missing DocString
@@ -270,7 +265,7 @@ class Block:
         :param TransferToServer:
         :return:
         """
-        if not "files" in self.data:
+        if "files" not in self.data:
             self.data["files"] = []
 
         for afile in files:
@@ -373,7 +368,7 @@ class Block:
     def setDependSubTask(self):
         """Missing DocString
         """
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'dependsubtask')
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'dependsubtask')
 
     def setTasksMaxRunTime(self, value):
         """Missing DocString
@@ -447,21 +442,21 @@ class Block:
         if checkRegExp(value):
             self.data["need_properties"] = value
 
-    def skipThumbnails( self):
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'skipthumbnails')
+    def skipThumbnails(self):
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'skipthumbnails')
 
-    def skipExistingFiles( self, i_size_min = -1, i_size_max = -1):
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'skipexistingfiles')
-        if i_size_min != -1 :
+    def skipExistingFiles(self, i_size_min=-1, i_size_max=-1):
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'skipexistingfiles')
+        if i_size_min != -1:
             self.data['file_size_min'] = i_size_min
-        if i_size_min != -1 :
+        if i_size_min != -1:
             self.data['file_size_max'] = i_size_max
 
-    def checkRenderedFiles( self, i_size_min = -1, i_size_max = -1):
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'checkrenderedfiles')
-        if i_size_min != -1 :
+    def checkRenderedFiles(self, i_size_min=-1, i_size_max=-1):
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'checkrenderedfiles')
+        if i_size_min != -1:
             self.data['file_size_min'] = i_size_min
-        if i_size_min != -1 :
+        if i_size_min != -1:
             self.data['file_size_max'] = i_size_max
 
     def setMultiHost(self, h_min, h_max, h_max_wait, master_on_slave=False,
@@ -491,13 +486,13 @@ class Block:
                   'service was not specified.')
             return False
 
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'multihost')
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'multihost')
         self.data['multihost_min'] = h_min
         self.data['multihost_max'] = h_max
         self.data['multihost_max_wait'] = h_max_wait
 
         if master_on_slave:
-            self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'masteronslave')
+            self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'masteronslave')
 
         if service:
             self.data['multihost_service'] = service
@@ -506,10 +501,10 @@ class Block:
             self.data['multihost_service_wait'] = service_wait
 
     def setSlaveLostIgnore(self):
-        if not afcommon.checkBlockFlag( self.data['flags'], 'multihost'):
+        if not afcommon.checkBlockFlag(self.data['flags'], 'multihost'):
             print('Block::setSlaveLostIgnore: Block is not multihost.')
             return
-        self.data['flags'] = afcommon.setBlockFlag( self.data['flags'], 'slavelostignore')
+        self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'slavelostignore')
 
     def fillTasks(self):
         """Missing DocString
@@ -603,7 +598,7 @@ class Job:
         if i_transferToServer:
             i_folder = Pathmap.toServer(i_folder)
 
-        if not "folders" in self.data:
+        if "folders" not in self.data:
             self.data["folders"] = dict()
 
         self.data["folders"][i_name] = i_folder
@@ -639,12 +634,12 @@ class Job:
         self.fillBlocks()
 
         # Set folder if empty:
-        if not "folders" in self.data:
+        if "folders" not in self.data:
             self.data["folders"] = dict()
             # Try to set output folder from files:
             for block in self.blocks:
                 if "files" in block.data and len(block.data["files"]):
-                    self.data["folders"]["output"] = os.path.dirname( block.data["files"][0])
+                    self.data["folders"]["output"] = os.path.dirname(block.data["files"][0])
 
         obj = {"job": self.data}
         # print(json.dumps( obj))
@@ -669,7 +664,7 @@ class Job:
 
     def setProject(self, project):
         """Set the name of the project to which this job is related.
-        
+
         :param project: Name of the project
         """
         if project is not None and len(project):
@@ -677,7 +672,7 @@ class Job:
 
     def setDepartment(self, department):
         """Set the name of the department which submitted this job.
-        
+
         :param department: Name of the department (compositing, modeling, etc.)
         """
         if department is not None and len(department):
@@ -810,13 +805,13 @@ class Job:
         """Missing DocString
         """
         self.data["offline"] = True
-        
+
     def setTimeLife(self, value):
         """Set job's time-life after which it will automatically be deleted.
 
         :param value: time in seconds
         """
-        # this will only pass positive int        
+        # this will only pass positive int
         if str(value).isdigit():
             self.data['time_life'] = value
 
