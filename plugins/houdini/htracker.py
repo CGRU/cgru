@@ -24,7 +24,7 @@ Parser.add_option(      '--envblocks', dest='envblocks', type='string', default=
 Parser.add_option(      '--depblocks', dest='depblocks', type='string', default=None, help='Afanasy job blocks names mask.')
 Parser.add_option(      '--start',     dest='start',     action='store_true', default=False, help='Start tracker.')
 Parser.add_option(      '--stop',      dest='stop',      action='store_true', default=False, help='Stop tracker.')
-Parser.add_option('-H', '--host',      dest='host',      type='string', default='localhost', help='Tracker host to stop.')
+Parser.add_option('-A', '--address',   dest='address',   type='string', default='localhost', help='Tracker address to stop.')
 
 Options, Args = Parser.parse_args()
 
@@ -75,7 +75,7 @@ def startTracker():
     tracker_thread = threading.Thread(target=lambda: simtracker.serve( Options.port, Options.webport))
     tracker_thread.start()
 
-    # Wait for the tracker to be ready and get the host and ports.
+    # Wait for the tracker to be ready and get the port.
     simtracker.waitForListener()
     tracker_port = simtracker.getListenPort()
     web_port = simtracker.getWebPort()
@@ -103,14 +103,14 @@ def startTracker():
 def stopTracker():
     """Stops the tracker process.
     """
-    # Get tracker host and port parameters:
-    host = os.getenv('TRACKER_ADDRESS', Options.host)
+    # Get tracker address and port parameters:
+    address = os.getenv('TRACKER_ADDRESS', Options.address)
     port = int( os.getenv('TRACKER_PORT', Options.port))
 
     # Connect to the tracker.
-    print('Trying to stop tracker at %s:%d' % ( host, port))
+    print('Trying to stop tracker at %s:%d' % ( address, port))
     s = socket.socket( socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(( host, port))
+    s.connect(( address, port))
 
     # Send the quit message.
     msg = "quit"
@@ -126,7 +126,7 @@ def stopTracker():
     s.close()
 
     # And output it for parser to set job info:
-    info = 'Tracker stopped: %s:%d' % ( host, port)
+    info = 'Tracker stopped: %s:%d' % ( address, port)
     print('REPORT: ' + info)
     print('ACTIVITY: ' + info)
 

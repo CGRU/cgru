@@ -622,9 +622,11 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 hou.ui.displayMessage('Control node "%s" does not have "%s" parameter' % (ds_node_path, parm))
                 return
 
-        # Tracker block:
-        par_start = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, True)
-        params.append( par_start)
+        enable_tracker = not afnode.parm('ds_tracker_manual').eval()
+        if enable_tracker:
+            # Tracker block:
+            par_start = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, True)
+            params.append( par_start)
         
         # A block for each slice:
         ds_num_slices = int(afnode.parm('ds_num_slices').eval())
@@ -634,7 +636,8 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             sim_blocks_mask = par.name + '.*'
             par.name += '-s%d' % s
             par.frame_pertask = par.frame_last - par.frame_first + 1
-            par.addDependMask( par_start.name)
+            if enable_tracker:
+                par.addDependMask( par_start.name)
             par.fullrangedepend = True
             par.auxargs = ' --ds_node "%s"' % ds_node_path
             par.auxargs += ' --ds_address "%s"' % str(afnode.parm('ds_address').eval())
@@ -642,17 +645,18 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
             par.auxargs += ' --ds_slice %d' % s
             params.append(par)
 
-        # Stop tracker block:
-        par_stop = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, False)
-        par_stop.addDependMask( sim_blocks_mask)
-        params.append( par_stop)
+        if enable_tracker:
+            # Stop tracker block:
+            par_stop = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, False)
+            par_stop.addDependMask( sim_blocks_mask)
+            params.append( par_stop)
 
-        # Set other block names for start tracker block.
-        # As start tracker block will set other block environment
-        # to specify started tracker and port.
-        par_start.cmd += ' --envblocks "%s|%s"' % ( sim_blocks_mask, par_stop.name)
-        # On this block depend mask will be reset on tracker start:
-        par_start.cmd += ' --depblocks "%s"' % sim_blocks_mask
+            # Set other block names for start tracker block.
+            # As start tracker block will set other block environment
+            # to specify started tracker and port.
+            par_start.cmd += ' --envblocks "%s|%s"' % ( sim_blocks_mask, par_stop.name)
+            # On this block depend mask will be reset on tracker start:
+            par_start.cmd += ' --depblocks "%s"' % sim_blocks_mask
         
     else:
         params.append(
@@ -663,13 +667,18 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
 
 def getTrackerParameters(  i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range, i_start):
     par = BlockParameters( i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range)
-    par.name = i_prefix + '-tracker'
+    if i_prefix:
+        par.name = i_prefix + '-tracker'
+    else:
+        par.name = 'tracker'
     par.frame_last = par.frame_first
-    par.frame_pertask = 1
-    par.subtaskdepend = False
+    par.frame_pertask   = 1
+    par.subtaskdepend   = False
     par.fullrangedepend = True
-    par.service = 'htracker'
-    par.parser = 'generic'
+    par.capacity        = int( i_afnode.parm('ds_tracker_capacity').eval())
+    par.hosts_mask      = str( i_afnode.parm('ds_tracker_hostmask').eval())
+    par.service         = str( i_afnode.parm('ds_tracker_service' ).eval())
+    par.parser          = str( i_afnode.parm('ds_tracker_parser'  ).eval())
     if i_start:
         par.cmd = 'htracker --start'
     else:
