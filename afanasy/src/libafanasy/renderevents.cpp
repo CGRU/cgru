@@ -24,6 +24,16 @@ RenderEvents::~RenderEvents()
 {
 }
 
+void RenderEvents::remTaskExec( const TaskExec * i_exec )
+{
+	for( std::vector<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+	if( *it == i_exec)
+	{
+		m_tasks.erase( it);
+		return;
+	}
+}
+
 void RenderEvents::addUniqueTask( const MCTaskPos & i_tp, std::vector<MCTaskPos> & o_vec)
 {
 	for( int i = 0; i < o_vec.size(); i++)
@@ -45,18 +55,22 @@ void RenderEvents::rw_tp_vec( std::vector<MCTaskPos> & io_vec, Msg * io_msg)
 	}
 }
 
-void RenderEvents::v_readwrite( Msg * msg)
+void RenderEvents::rw_texecs( std::vector<TaskExec*> & io_vec, Msg * io_msg)
 {
 	int32_t len = m_tasks.size();
-	rw_int32_t( len, msg);
+	rw_int32_t( len, io_msg);
 	for( int i = 0; i < len; i++)
 	{
-		if( msg->isReading())
-			m_tasks.push_back( new TaskExec( msg));
+		if( io_msg->isReading())
+			m_tasks.push_back( new TaskExec( io_msg));
 		else
-			m_tasks[i]->write( msg);
+			m_tasks[i]->write( io_msg);
 	}
+}
 
+void RenderEvents::v_readwrite( Msg * msg)
+{
+	rw_texecs( m_tasks,       msg);
 	rw_tp_vec( m_closes,      msg);
 	rw_tp_vec( m_stops,       msg);
 	rw_tp_vec( m_outputs,     msg);

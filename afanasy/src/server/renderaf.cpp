@@ -114,7 +114,11 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 		setWOLSleeping( true);
 	}
 
-	if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
+	if( jobs && updateTaskState)
+		ejectTasks( jobs, monitoring, updateTaskState);
+
+	// There is need to send pending tasks to offline render.
+	m_re.clearTaskExecs();
 
 	appendLog( m_hres.v_generateInfoString());
 
@@ -237,13 +241,18 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
 	if( start)
 	{
-		m_re.m_tasks.push_back( taskexec);
+		// Add exec pointer to events,
+		// so on refresh, render will receive a task to execute.
+		m_re.addTaskExec( taskexec);
+
+		// Log:
 		std::string str = "Starting task: ";
 		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
 	else
 	{
+		// This is multihost task.
 		std::string str = "Captured by task: ";
 		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
@@ -394,7 +403,9 @@ void RenderAf::v_action( Action & i_action)
 
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )
 {
-	if( m_tasks.size() < 1) return;
+	if( m_tasks.size() < 1)
+		return;
+
 	std::list<int>id_jobs;
 	std::list<int>id_blocks;
 	std::list<int>id_tasks;
@@ -411,6 +422,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
 		numbers.push_back( (*it)->getNumber());
 		appendLog( std::string("Ejecting task: ") + (*it)->v_generateInfoString( false));
 	}
+
 	JobContainerIt jobsIt( jobs);
 	std::list<int>::const_iterator jIt = id_jobs.begin();
 	std::list<int>::const_iterator bIt = id_blocks.begin();
@@ -535,6 +547,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 {
 	removeTask( taskexec);
 	remService( taskexec->getServiceType());
+
 	if( taskexec->getNumber())
 	{
 		std::string str = "Finished service: ";
@@ -547,6 +560,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 		str += taskexec->v_generateInfoString( false);
 		appendTasksLog( str);
 	}
+
 	if( monitoring ) monitoring->addEvent( af::Monitor::EVT_renders_change, m_id);
 }
 
@@ -572,25 +586,32 @@ void RenderAf::addTask( af::TaskExec * taskexec)
 		AF_ERR << "Capacity_used > host.capacity (" << m_capacity_used << " > " << m_host.m_capacity << ")";
 }
 
-void RenderAf::removeTask( const af::TaskExec * taskexec)
+void RenderAf::removeTask( const af::TaskExec * i_exec)
 {
 	// Do not set free status here, even if this task was last.
 	// May it will take another task in this run cycle
 
+	// We should remove af::TaskExec poiter from everywhere!
+	// As this af::TaskExec will be deleted by TaskRun very soon.
+
+	// Remove exec pointer:
 	for( std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 	{
-		if( *it == taskexec)
+		if( *it == i_exec)
 		{
 			it = m_tasks.erase( it);
 		}
 	}
 
-	if( m_capacity_used < taskexec->getCapResult())
+	// Remove exec pointer from events:
+	m_re.remTaskExec( i_exec);
+
+	if( m_capacity_used < i_exec->getCapResult())
 	{
-		AF_ERR << "Capacity_used < taskdata->getCapResult() (" << m_capacity_used << " < " << taskexec->getCapResult() << ")";
+		AF_ERR << "Capacity_used < getCapResult() (" << m_capacity_used << " < " << i_exec->getCapResult() << ")";
 		m_capacity_used = 0;
 	}
-	else m_capacity_used -= taskexec->getCapResult();
+	else m_capacity_used -= i_exec->getCapResult();
 }
 
 void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)

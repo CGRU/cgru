@@ -18,6 +18,10 @@ public:
 
 	~RenderEvents();
 
+	inline void addTaskExec( TaskExec * i_exec ) { m_tasks.push_back( i_exec);}
+	void remTaskExec( const TaskExec * i_exec );
+	inline void clearTaskExecs() { m_tasks.clear();}
+
 	inline void addTaskClose(  const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_closes  );}
 	inline void addTaskStop(   const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_stops   );}
 	inline void addTaskOutput( const MCTaskPos & i_tp) { addUniqueTask( i_tp, m_outputs );}
@@ -61,6 +65,7 @@ private:
 	void addUniqueTask( const MCTaskPos & i_tp, std::vector<MCTaskPos> & o_vec);
 
 	void rw_tp_vec( std::vector<MCTaskPos> & io_vec, Msg * io_msg);
+	void rw_texecs( std::vector<TaskExec*> & io_vec, Msg * io_msg);
 
 	void v_readwrite( Msg * msg);
 };
