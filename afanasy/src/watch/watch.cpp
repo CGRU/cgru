@@ -347,7 +347,7 @@ AFINFO("Watch::raiseWindow: trying to raise a window.")
 AFINFA("Watch::raiseWindow: \"%s\" window raised.", name->toUtf8().data())
 }
 
-void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
+void Watch::startProcess( const QString & i_cmd, const QString & i_wdir, const std::map<std::string,std::string> & i_env_map)
 {
 	printf("Starting '%s'", i_cmd.toUtf8().data());
 	if( false == i_wdir.isEmpty()) printf(" in '%s'", i_wdir.toUtf8().data());
@@ -356,15 +356,20 @@ void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
 #ifdef WINNT
 	PROCESS_INFORMATION pinfo;
 
-	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(),
-		NULL, NULL, NULL, NULL,
+	char * env = af::processEnviron( i_env_map);
+	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(), env,
+		NULL, NULL, NULL,
 		CREATE_NEW_CONSOLE, true);
 
 	CloseHandle( pinfo.hThread);
 	CloseHandle( pinfo.hProcess);
 #else
-	af::launchProgram( i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL);
+	char ** env = af::processEnviron( i_env_map);
+	af::launchProgram( i_cmd.toStdString(), i_wdir.toStdString(), env);
 #endif
+
+	if( env )
+		delete [] env;
 }
 
 void Watch::ntf_JobAdded( const ItemJob * i_job)

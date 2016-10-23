@@ -95,7 +95,9 @@ public:
 	static void repaintStart();
 	static void repaintFinish();
 
-	static void startProcess( const QString & cmd, const QString & wdir = QString());
+	static void startProcess( const QString & i_cmd,
+			const QString & i_wdir = QString(),
+			const std::map<std::string,std::string> & i_env_map = std::map<std::string,std::string>());
 
 	inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return ms_services_icons_large.value( service_name, NULL);}
 	inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return ms_services_icons_small.value( service_name, NULL);}

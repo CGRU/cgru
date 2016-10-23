@@ -526,7 +526,7 @@ void WndTask::showExec( af::MCTask & i_mctask)
 		fileField->setReadOnly(true);
 		fileField->setText( afqt::stoq( files[i]));
 
-		ButtonMenu * btnBrowse = new ButtonMenu( afqt::stoq( files[i]), wdir, m_tab_exec);
+		ButtonMenu * btnBrowse = new ButtonMenu( afqt::stoq( files[i]), wdir, exec->getEnv(), m_tab_exec);
 		layoutR->addWidget( btnBrowse);
 	}
 
@@ -574,10 +574,12 @@ void WndTask::showListen( const af::MCTask & i_mctask)
 }
 
 
-ButtonMenu::ButtonMenu( const QString & i_file, const QString & i_wdir, QWidget * i_parent):
+ButtonMenu::ButtonMenu( const QString & i_file, const QString & i_wdir,
+		const std::map<std::string,std::string> i_env, QWidget * i_parent):
 	QPushButton("Launch", i_parent),
 	m_file( i_file),
-	m_wdir( i_wdir)
+	m_wdir( i_wdir),
+	m_env( i_env)
 {
 	std::vector<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
 	for( ; it != af::Environment::getPreviewCmds().end(); it++)
@@ -631,7 +633,7 @@ void ButtonMenu::launchCmd( int i_index)
 		return;
 	}
 	
-	Watch::startProcess( m_cmds[i_index], m_wdir);
+	Watch::startProcess( m_cmds[i_index], m_wdir, m_env);
 }
 
 

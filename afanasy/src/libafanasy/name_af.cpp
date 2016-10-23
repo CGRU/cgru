@@ -123,6 +123,72 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 }
 #endif
 
+#ifdef WINNT
+char *  af::processEnviron( const std::map<std::string, std::string> & i_env_map)
+#else
+char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map)
+#endif
+{
+	if( i_env_map.empty())
+		return NULL;
+
+	std::vector<std::string> env_vec;
+	int env_size = 0;
+	#ifdef WINNT
+	char * env_str = GetEnvironmentStrings();
+	while( env_str[env_size] != '\0')
+	{
+		std::string str(env_str + env_size);
+		env_size += str.size() + 1; ///< For "name=value" '\0' termination
+		if( str.empty()) continue;
+		env_vec.push_back( str);
+	}
+	FreeEnvironmentStrings( env_str);
+	#else
+	for (char ** e = environ; *e != 0; e++)
+	{
+		std::string str(*e);
+		if (str.empty()) continue;
+		env_vec.push_back(str);
+		env_size += str.size() + 1; ///< For "name=value" '\0' termination
+	}
+	#endif
+
+	for( std::map<std::string,std::string>::const_iterator it = i_env_map.begin(); it != i_env_map.end(); it++)
+		if ((it->first).size() && (it->second).size())
+		{
+			std::string str = it->first + '=' + it->second;
+			env_vec.push_back( str);
+			env_size += str.size() + 1; ///< For "name=value" '\0' termination
+		}
+
+	env_size++; ///< For the last '\0' termination
+
+	#ifdef WINNT
+	char * o_environ = new char[env_size];
+	int pos = 0;
+	for (int i = 0; i < env_vec.size(); i++)
+	{
+		strncpy( m_environ + pos, env_vec[i].c_str(), env_vec[i].size());
+		pos += env_vec[i].size();
+		o_environ[pos] = '\0'; ///< "name=value" '\0' termination
+		pos += 1;
+	}
+	o_environ[env_size-1] = '\0'; /// The last '\0' termination
+	#else
+	char ** o_environ = new char*[env_vec.size()+1];
+	for( int i = 0; i < env_vec.size(); i++)
+	{
+		o_environ[i] = new char[env_vec[i].size()+1];
+		memcpy( o_environ[i], env_vec[i].c_str(), env_vec[i].size());
+		o_environ[i][env_vec[i].size()] = '\0'; ///< "name=value" '\0' termination
+	}
+	o_environ[env_vec.size()] = NULL; /// The last '\0' termination
+	#endif
+
+	return o_environ;
+}
+
 void af::outError( const char * errMsg, const char * baseMsg)
 {
    if( baseMsg )

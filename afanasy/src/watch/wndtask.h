@@ -122,7 +122,9 @@ class ButtonMenu : public QPushButton
 {
 Q_OBJECT
 public:
-	ButtonMenu( const QString & i_file, const QString & i_wdir, QWidget * i_parent);
+	ButtonMenu( const QString & i_file, const QString & i_wdir,
+			const std::map<std::string,std::string> i_env,
+			QWidget * i_parent);
 
 public slots:
 	void pushed_slot();
@@ -134,6 +136,7 @@ protected:
 private:
 	QString m_file;
 	QString m_wdir;
+	std::map<std::string,std::string> m_env;
 	QStringList m_labels;
 	QStringList m_cmds;
 };

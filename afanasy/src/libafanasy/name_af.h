@@ -208,6 +208,7 @@ namespace af
 	bool netIsIpAddr( const std::string & addr, bool verbose = false);
 
 #ifdef WINNT
+	char * processEnviron( const std::map<std::string, std::string> & i_env_map);
 	void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
 	bool launchProgram(
 			PROCESS_INFORMATION * o_pinfo,
@@ -216,6 +217,7 @@ namespace af
 			DWORD i_flags = 0, bool alwaysCreateWindow = false
 		);
 #else
+	char ** processEnviron( const std::map<std::string, std::string> & i_env_map);
 	int launchProgram(
 			const std::string & i_commandline, const std::string & i_wdir = std::string(), char ** i_environ = NULL,
 			FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL
