@@ -225,6 +225,9 @@ function d_MakeCmd( i_params)
 	cmd += ' -s '+params.slate;
 	cmd += ' -t '+params.template;
 
+	if( RULES.dailies.font )
+		cmd += ' --font "' + RULES.dailies.font + '"';
+
 	if( params.container != 'DEFAULT' )
 		cmd += ' -n ' + params.container;
 

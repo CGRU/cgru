@@ -214,6 +214,7 @@
 	"colorspace":"auto",
 	"template":"dailies_withlogo",
 	"slate":"dailies_slate",
+	"-font":"DejaVuSans",
 	"naming":"(s)_(v)_(d)",
 	"logo_slate_path":"logo.png",
 	"logo_slate_size":20,
