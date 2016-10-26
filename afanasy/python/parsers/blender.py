@@ -16,7 +16,8 @@ class blender(parser.parser):
 		parser.parser.__init__(self)
 		self.str_error = [
 			"Warning: Unable to open",
-			"Render error: cannot save"]
+			"Render error: cannot save",
+			"Error: CUDA error"]
 		self.firstframe = True
 		self.framestring = keyframe
 
