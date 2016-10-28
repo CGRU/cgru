@@ -31,9 +31,6 @@
 void AfCmd::RegisterCommands()
 {
 	addCmd( new CmdVerbose);
-	addCmd( new CmdProtocol);
-	addCmd( new CmdServerName);
-	addCmd( new CmdServerPort);
 	addCmd( new CmdHelp);
 #ifndef WINNT
 	addCmd( new CmdFork);

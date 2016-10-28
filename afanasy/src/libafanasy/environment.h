@@ -40,8 +40,7 @@ public:
 
 	static inline bool isHelpMode()    { return help_mode;   }
 	static inline bool isVerboseMode() { return m_verbose_mode;}
-	static inline void addUsage( const std::string & arg, const std::string & help)
-		{ cmdarguments_usagearg.push_back( arg); cmdarguments_usagehelp.push_back( help);}
+	static inline void addUsage( const std::string & i_arg, const std::string & i_help) { cmdarguments_usage[i_arg] = i_help; }
 
 	static inline bool isDemoMode()  { return demo_mode; }
 	static inline bool notDemoMode() { return false == demo_mode; }
@@ -50,10 +49,6 @@ public:
 	static bool reload();
 
 	static void setVerboseInit( bool value = true) { m_verbose_init = value;}
-	static bool getVar( const JSON & i_obj, std::string & o_value, const char * i_name );
-	static bool getVar( const JSON & i_obj, int & o_value, const char * i_name );
-	static bool getVar( const JSON & i_obj, bool & o_value, const char * i_name );
-	static bool getVar( const JSON & i_obj, std::vector<std::string> & o_value, const char * i_name );
 
 	static const std::string & getConfigData() { return m_config_data;}
 
@@ -197,8 +192,7 @@ private:
 	static std::string m_config_data;
 
 	static std::vector<std::string> cmdarguments;
-	static std::vector<std::string> cmdarguments_usagearg;
-	static std::vector<std::string> cmdarguments_usagehelp;
+	static std::map<std::string,std::string> cmdarguments_usage;
 	static bool help_mode;
 	static bool demo_mode;
 
@@ -206,7 +200,12 @@ private:
 	static void printUsage(); ///< Output command usage
 	static void load();
 	static void loadFile( const std::string & i_filename);
-	static void getVars( const JSON & i_obj);
+	static void getVars( const JSON * i_obj);
+	static void getVar( const JSON * i_obj, std::string & o_value, const char * i_name );
+	static void getVar( const JSON * i_obj, int & o_value, const char * i_name );
+	static void getVar( const JSON * i_obj, bool & o_value, const char * i_name );
+	static void getVar( const JSON * i_obj, std::vector<std::string> & o_value, const char * i_name );
+	static const std::string getVarEnv( const char * i_name);
 	static bool initAfterLoad();
 
 	static std::string digest_file;

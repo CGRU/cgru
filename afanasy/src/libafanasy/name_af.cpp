@@ -540,12 +540,13 @@ int af::weigh( const std::map<std::string, std::string> & i_map)
 	return w;
 }
 
-const std::string af::getenv( const char * name)
+const std::string af::getenv( const std::string & i_name) { return af::getenv( i_name.c_str()); }
+const std::string af::getenv( const char * i_name)
 {
-   std::string envvar;
-   char * ptr = ::getenv( name);
-   if( ptr != NULL ) envvar = ptr;
-   return envvar;
+	std::string envvar;
+	char * ptr = ::getenv( i_name);
+	if( ptr != NULL ) envvar = ptr;
+	return envvar;
 }
 
 bool isDec( char c)

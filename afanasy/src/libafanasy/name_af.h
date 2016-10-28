@@ -125,7 +125,8 @@ namespace af
 	// String functions:
 	const long long stoi( const std::string & str, bool * ok = NULL);
 	const std::string itos( long long integer);
-	const std::string getenv( const char * name);
+	const std::string getenv( const std::string & i_name);
+	const std::string getenv( const char * i_name);
 	const std::string state2str( int state);
 	const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");

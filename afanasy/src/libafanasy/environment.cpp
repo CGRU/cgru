@@ -157,14 +157,13 @@ std::string Environment::m_config_data;
 Passwd * Environment::passwd = NULL;
 
 std::vector<std::string> Environment::platform;
-std::vector<std::string> Environment::cmdarguments;
-std::vector<std::string> Environment::cmdarguments_usagearg;
-std::vector<std::string> Environment::cmdarguments_usagehelp;
 std::vector<std::string> Environment::previewcmds;
 std::vector<std::string> Environment::rendercmds;
 std::vector<std::string> Environment::rendercmds_admin;
 std::vector<std::string> Environment::ip_trust;
 std::vector<std::string> Environment::render_resclasses;
+std::vector<std::string> Environment::cmdarguments;
+std::map<std::string,std::string> Environment::cmdarguments_usage;
 
 std::string Environment::version_revision;
 std::string Environment::version_cgru;
@@ -172,9 +171,9 @@ std::string Environment::version_python;
 std::string Environment::version_gcc;
 std::string Environment::build_date;
 
-void Environment::getVars( const JSON & i_obj)
+void Environment::getVars( const JSON * i_obj)
 {
-	if( false == i_obj.IsObject())
+	if( i_obj && ( false == i_obj->IsObject()))
 	{
 		AFERROR("Environment::getVars: Not an object.")
 		return;
@@ -281,49 +280,104 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, sysjob_events_service,             "af_sysjob_events_service"             );
 }
 
-bool Environment::getVar( const JSON & i_obj, std::string & o_value, const char * i_name)
+const std::string Environment::getVarEnv( const char * i_name)
 {
-	if( af::jr_string( i_name, o_value, i_obj))
-	{
-		PRINT("\t%s = '%s'\n", i_name, o_value.c_str());
-		return true;
-	}
-	return false;
+	// Get from environment:
+	std::string env_name = std::string("CGRU_") + i_name;
+	std::transform( env_name.begin(), env_name.end(), env_name.begin(), ::toupper);
+	std::string value = af::getenv( env_name);
+
+	// Get from command arguments:
+	getArgument( std::string("--") + i_name, value);
+
+	return value;
 }
 
-bool Environment::getVar( const JSON & i_obj, int & o_value, const char * i_name)
+void Environment::getVar( const JSON * i_obj, std::string & o_value, const char * i_name)
 {
-	if( af::jr_int( i_name, o_value, i_obj))
-	{
-		PRINT("\t%s = %d\n", i_name, o_value);
-		return true;
-	}
-	return false;
-}
+	bool found = false;
 
-bool Environment::getVar( const JSON & i_obj, bool & o_value, const char * i_name)
-{
-	if( af::jr_bool( i_name, o_value, i_obj))
+	if( i_obj )
 	{
-		PRINT("\t%s = %d\n", i_name, o_value);
-		return true;
+		if( af::jr_string( i_name, o_value, *i_obj))
+			found = true;
 	}
-	return false;
-}
-
-bool Environment::getVar( const JSON & i_obj, std::vector<std::string> & o_value, const char * i_name)
-{
-	if( af::jr_stringvec( i_name, o_value, i_obj))
+	else
 	{
-		if( m_verbose_init )
+		std::string env_val = getVarEnv( i_name);
+		if( env_val.size())
 		{
-			printf("\t%s:\n", i_name);
-			for( int i = 0; i < o_value.size(); i++)
-				printf("\t\t%s\n", o_value[i].c_str());
+			o_value = env_val;
+			found = true;
 		}
-		return true;
 	}
-	return false;
+
+	if( found )
+		PRINT("\t%s = '%s'\n", i_name, o_value.c_str());
+}
+
+void Environment::getVar( const JSON * i_obj, int & o_value, const char * i_name)
+{
+	bool found = false;
+
+	if( i_obj )
+	{
+		if( af::jr_int( i_name, o_value, *i_obj))
+			found = true;
+	}
+	else
+	{
+		std::string env_val = getVarEnv( i_name);
+		if( env_val.size())
+		{
+			o_value = af::stoi( env_val);
+			found = true;
+		}
+	}
+
+	if( found )
+		PRINT("\t%s = %d\n", i_name, o_value);
+}
+
+void Environment::getVar( const JSON * i_obj, bool & o_value, const char * i_name)
+{
+	bool found = false;
+
+	if( i_obj )
+	{
+		if( af::jr_bool( i_name, o_value, *i_obj))
+			found = true;
+	}
+	else
+	{
+		std::string env_val = getVarEnv( i_name);
+		if( env_val.size())
+		{
+			o_value = af::stoi( env_val);
+			found = true;
+		}
+	}
+
+	if( found )
+		PRINT("\t%s = %d\n", i_name, o_value);
+}
+
+void Environment::getVar( const JSON * i_obj, std::vector<std::string> & o_value, const char * i_name)
+{
+	bool found = false;
+
+	if( i_obj )
+	{
+		if( af::jr_stringvec( i_name, o_value, *i_obj))
+			found = true;
+	}
+
+	if( found && m_verbose_init )
+	{
+		printf("\t%s:\n", i_name);
+		for( int i = 0; i < o_value.size(); i++)
+			printf("\t\t%s\n", o_value[i].c_str());
+	}
 }
 
 Environment::Environment( uint32_t flags, int argc, char** argv )
@@ -339,7 +393,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 //
 //############ afanasy root directory:
-	afroot = getenv("AF_ROOT");
+	afroot = af::getenv("AF_ROOT");
 	if( afroot.size() == 0 )
 	{
 		 afroot = argv[0];
@@ -360,7 +414,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 //
 //############ cgru root directory:
-	cgrulocation = getenv("CGRU_LOCATION");
+	cgrulocation = af::getenv("CGRU_LOCATION");
 	if( cgrulocation.size() == 0 )
 	{
 		 cgrulocation = afroot;
@@ -384,7 +438,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 // Afanasy python path:
 	if( flags & AppendPythonPath)
 	{
-		std::string afpython = getenv("AF_PYTHON");
+		std::string afpython = af::getenv("AF_PYTHON");
 		if( afpython.size() == 0 )
 		{
 			std::string script = ""
@@ -417,9 +471,9 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //
 //############ user name:
 	getArgument("-username", username);
-	if( username.empty()) username = getenv("AF_USERNAME");
-	if( username.empty()) username = getenv("USER");
-	if( username.empty()) username = getenv("USERNAME");
+	if( username.empty()) username = af::getenv("AF_USERNAME");
+	if( username.empty()) username = af::getenv("USER");
+	if( username.empty()) username = af::getenv("USERNAME");
 	if( username.empty())
 	{
 #ifdef WINNT
@@ -446,9 +500,9 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //
 //############ Local host name:
 	getArgument("-hostname", hostname);
-	if( hostname.empty()) hostname = getenv("AF_HOSTNAME");
+	if( hostname.empty()) hostname = af::getenv("AF_HOSTNAME");
 #ifdef WINNT
-	computername = getenv("COMPUTERNAME");
+	computername = af::getenv("COMPUTERNAME");
 	WSADATA wsaData;
 	WORD wVersionRequested = MAKEWORD(2, 2);
 	if( WSAStartup( wVersionRequested, &wsaData) != 0 )
@@ -457,7 +511,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 		 return;
 	}
 #else
-	computername = getenv("HOSTNAME");
+	computername = af::getenv("HOSTNAME");
 #endif
 	if( computername.empty())
 	{
@@ -512,7 +566,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	QUIET("Compilation date = '%s'\n", build_date.c_str());
 
 	// CGRU:
-	version_cgru = getenv("CGRU_VERSION");
+	version_cgru = af::getenv("CGRU_VERSION");
 	QUIET("CGRU version = '%s'\n", version_cgru.c_str());
 
 	// Build Revision:
@@ -566,6 +620,9 @@ void Environment::load()
 
 	loadFile( cgrulocation + "/config_default.json");
 	loadFile( home_afanasy + "/config.json");
+
+	PRINT("Getting variables from environment:\n");
+	getVars( NULL);
 
 	m_config_data += "{\"cgru_environment\":{";
 	m_config_data += "\"version\":\"" + getVersionCGRU() + "\"";
@@ -628,7 +685,7 @@ void Environment::loadFile( const std::string & i_filename)
 	}
 	else
 	{
-		getVars( obj);
+		getVars( &obj);
 
 		for( int i = 0; i < platform.size(); i++)
 		{
@@ -638,7 +695,7 @@ void Environment::loadFile( const std::string & i_filename)
 			if( obj_os.IsObject())
 			{
 				PRINT("'%s' secific parameters:\n", obj_os_name.c_str());
-				getVars( obj_os);
+				getVars( &obj_os);
 			}
 		}
 
@@ -744,7 +801,6 @@ void Environment::initCommandArguments( int argc, char** argv)
 
 		if( false == m_verbose_mode)
 		if(( cmdarguments.back() == "-V"    ) ||
-			( cmdarguments.back() == "--V"   ) ||
 			( cmdarguments.back() == "--Verbose")
 			)
 		{
@@ -758,11 +814,7 @@ void Environment::initCommandArguments( int argc, char** argv)
 			( cmdarguments.back() == "-?"    ) ||
 			( cmdarguments.back() == "?"     ) ||
 			( cmdarguments.back() == "/?"    ) ||
-			( cmdarguments.back() == "h"     ) ||
 			( cmdarguments.back() == "-h"    ) ||
-			( cmdarguments.back() == "--h"   ) ||
-			( cmdarguments.back() == "help"  ) ||
-			( cmdarguments.back() == "-help" ) ||
 			( cmdarguments.back() == "--help")
 			)
 		{
@@ -789,9 +841,12 @@ bool Environment::getArgument( const std::string & argument, std::string & value
 	{
 		if( *it == argument )
 		{
-			// check for next argument:
+			// check for the next argument:
 			it++;
-			if( it != cmdarguments.end()) value = *it;
+
+			if( it != cmdarguments.end())
+				value = *it;
+
 			return true;
 		}
 	}
@@ -810,15 +865,14 @@ const std::string Environment::getDigest( const std::string & i_user_name)
 void Environment::printUsage()
 {
 	if( false == help_mode ) return;
-	if( cmdarguments_usagearg.empty() ) return;
+	if( cmdarguments_usage.empty() ) return;
 	printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
-	std::vector<std::string>::const_iterator aIt = cmdarguments_usagearg.begin();
-	std::vector<std::string>::const_iterator hIt = cmdarguments_usagehelp.begin();
-	for( ; aIt != cmdarguments_usagearg.end(); aIt++, hIt++)
+	std::map<std::string,std::string>::const_iterator it = cmdarguments_usage.begin();
+	for( ; it != cmdarguments_usage.end(); it++)
 	{
 		printf("   %s:\n      %s\n",
-			(*aIt).c_str(),
-			(*hIt).c_str()
+			(it->first).c_str(),
+			(it->second).c_str()
 			);
 	}
 }
