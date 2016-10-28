@@ -9,6 +9,7 @@
 <script type="text/javascript" src="lib/js/md5.js"></script>
 <script type="text/javascript" src="rules/admin.js"></script>
 <script type="text/javascript" src="rules/asset.js"></script>
+<script type="text/javascript" src="rules/bookmarks.js"></script>
 <script type="text/javascript" src="rules/comments.js"></script>
 <script type="text/javascript" src="rules/common.js"></script>
 <script type="text/javascript" src="rules/dailies.js"></script>
@@ -379,6 +380,13 @@ Remember any delete operation buttons in RULES requires double-click.
 			</div>
 			<div class="news_filter" id="news_projects" style="font: 10px monospace;" title="News Projects"></div>
 			<div id="news"></div>
+		</div>
+	</div>
+	<div id="sidepanel_bookmarks">
+		<div class="label button" onclick="bm_OnClick()">Bookmarks</div>
+		<div class="body">
+			<div id="bookmarks_ctrl"></div>
+			<div id="bookmarks"></div>
 		</div>
 	</div>
 	<div id="sidepanel_playlist">

@@ -1261,6 +1261,7 @@ Status.prototype.editSave = function( i_args)
 	var some_progress_changed = false;
 	var progresses = {};
 	var news = [];
+	var st_objs = [];
 	for( var i = 0; i < statuses.length; i++)
 	{
 		if( statuses[i].obj == null ) statuses[i].obj = {};
@@ -1406,12 +1407,16 @@ Status.prototype.editSave = function( i_args)
 		if( this.elEdit_Color.m_color_changed )
 			statuses[i].obj.color = this.elEdit_Color.m_color;
 
-		// Status saving produce news.
-		news.push( statuses[i].save());
+		// Status saving can produce some news.
+		nw = statuses[i].save();
+		var if( nw )
+			news.push( nw);
 
 		// Status showing causes values redraw,
 		// and destoys edit GUI if any.
 		statuses[i].show();
+
+		st_objs.push(statuses[i].obj);
 	}
 
 	// Send news:
