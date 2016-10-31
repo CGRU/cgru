@@ -21,11 +21,13 @@ class hbatch(parser.parser):
         :return:
         """
 
-        if data.find('No licenses could be found to run this application') != -1:
-            self.error = True
+        self.str_error = [
+            'No licenses could be found to run this application',
+            'Please check for a valid license server host']  
 
-        if data.find('Please check for a valid license server host') != -1:
-            self.error = True
+        self.str_warning = [
+            'OpenCL Exception',
+            'Failed to create']
 
         count = data.count(keyframe)
         if count > 0:
