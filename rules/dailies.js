@@ -836,7 +836,7 @@ function d_MakeCut( i_args)
 
 	var params = {};
 	params.cut_name = i_args.cut_name;
-	params.output = i_args.output;
+	params.output = c_PathPM_Rules2Client( i_args.output);
 	params.input = RULES.assets.shot.result.path.join(',');
 	if( RULES.cut.input ) params.input = RULES.cut.input;
 
@@ -914,11 +914,11 @@ function d_CutProcessGUI( i_wnd, i_test)
 	cmd += ' --afpertask ' + parseInt( params.af_pertask);
 	cmd += ' --afmaxruntime ' + parseInt( params.af_maxruntime);
 
-	cmd += ' -o "' + cgru_PM('/' + RULES.root + params.output, true) + '"';
+	cmd += ' -o "' + c_PathPM_Client2Server( params.output) + '"';
 	if( i_test ) cmd += ' -t';
 
 	for( var i = 0; i < shots.length; i++)
-		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
+		cmd += ' "' + c_PathPM_Rules2Server( shots[i]) + '"'
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CutFinished,"wnd":i_wnd});
 }
