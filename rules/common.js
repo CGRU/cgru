@@ -660,7 +660,7 @@ function c_GetAvatar( i_user_id, i_guest )
 		if( i_guest )
 			avatar = c_EmailDecode( avatar);
 		avatar = c_MD5( avatar.toLowerCase());
-		avatar = 'http://www.gravatar.com/avatar/' + avatar;
+		avatar = 'https://www.gravatar.com/avatar/' + avatar;
 	}
 
 	if( avatar && avatar.length )

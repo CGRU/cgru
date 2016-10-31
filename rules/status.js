@@ -1408,8 +1408,8 @@ Status.prototype.editSave = function( i_args)
 			statuses[i].obj.color = this.elEdit_Color.m_color;
 
 		// Status saving can produce some news.
-		nw = statuses[i].save();
-		var if( nw )
+		var nw = statuses[i].save();
+		if( nw )
 			news.push( nw);
 
 		// Status showing causes values redraw,
