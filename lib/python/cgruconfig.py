@@ -161,6 +161,26 @@ class Config:
         for filename in configfiles:
             self.load(filename)
 
+        # Get values overrides from environment:
+        for name in self.Vars:
+
+            env_name = 'CGRU_' + name.upper()
+            env_val  = os.getenv( env_name)
+            if env_val is None:
+                continue
+
+            if self.verbose:
+                print('%s=%s' %  (env_name ,env_val))
+
+            if isinstance( self.Vars[name], int):
+                self.Vars[name] = int(env_val)
+            elif isinstance( self.Vars[name], float):
+                self.Vars[name] = float(env_val)
+            elif isinstance( self.Vars[name], bool):
+                self.Vars[name] = bool(env_val)
+            else:
+                self.Vars[name] = env_val
+
     def load(self, filename):
         if self.recursion:
             if filename in self.Vars['filenames']:
@@ -195,6 +215,7 @@ class Config:
                 afile = os.path.join(os.path.dirname(filename), afile)
                 self.load(afile)
                 continue
+
 
     def getVars(self, o_vars, i_obj, i_filename):
         for key in i_obj:
