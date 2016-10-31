@@ -112,6 +112,33 @@ function bm_NavigatePost()
 	bm_HighlightCurrent();
 }
 
+function bm_Process()
+{
+	if(( RULES.status == null ) || ( RULES.status.artists == null ))
+		return;
+
+	if( RULES.status.artists.indexOf( g_auth_user.id ) != -1 )
+		bm_Add();
+}
+
+function bm_Add()
+{
+	if( g_auth_user.bookmarks == null )
+		g_auth_user.bookmarks = [];
+
+	var bm = {};
+	bm.path = g_CurPath();
+	bm.ctime = c_DT_CurSeconds();
+
+	for( var b = 0; b < g_auth_user.bookmarks.length; b++)
+		if( bm.path == g_auth_user.bookmarks.path )
+			return;
+
+	g_auth_user.bookmarks.push(bm);
+
+//console.log( JSON.stringify( g_auth_user));
+}
+
 function bm_HighlightCurrent()
 {
 	var path = g_CurPath();

@@ -71,6 +71,7 @@ function g_Init_Config( i_data)
 	}
 
 	nw_Init();
+	bm_Init();
 
 	n_WalkDir({"paths":['.'],"wfunc":g_Init_Rules,"info":'walk config',"rufiles":['rules']});
 }
@@ -178,6 +179,7 @@ function g_NavigatePost()
 	g_nav_clicked = false;
 
 	nw_NavigatePost();
+	bm_NavigatePost();
 	p_NavigatePost();
 
 	$('navigate_up').href = '#' + c_PathDir( g_CurPath());
