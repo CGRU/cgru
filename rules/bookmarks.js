@@ -1,5 +1,8 @@
 bm_initialized = false;
 
+bm_projects = [];
+bm_elements = [];
+
 function bm_Init()
 {
 	// Recent:
@@ -37,17 +40,17 @@ function bm_Close()
 {
 	$('sidepanel_bookmarks').classList.remove('opened');
 	$('bookmarks').innerHTML = '';
-	localStorage.bookmarks_opened = false;
+	localStorage.bookmarks_opened = 'false';
 }
 function bm_Open()
 {
 	$('sidepanel_bookmarks').classList.add('opened');
-	localStorage.bookmarks_opened = true;
+	localStorage.bookmarks_opened = 'true';
+	bm_Load();
 }
 
 function bm_Load()
 {
-//console.log('nw_NewsLoad()');
 	if( g_auth_user == null ) return;
 
 	$('bookmarks').innerHTML = 'Loading...';
@@ -65,49 +68,99 @@ function bm_Received( i_user)
 		return;
 	}
 
-	g_auth_user.bookmarks = i_user.bookmarks;
+	g_auth_user.bookmarks = i_user.bookmarks.sort( bm_Compare);
 
 	bm_Show();
 }
 
 function bm_Show()
 {
+//console.log(JSON.stringify(g_auth_user.bookmarks));
 	$('bookmarks').innerHTML = '';
-	$('bookmarks').m_elArray = [];
+	$('bookmarks_label').textContent = 'Bookmarks';
+	bm_projects = [];
+	bm_elements = [];
 
-	var projects = [];
-
-	if( g_auth_user.bookmarks == null )
+	if(( g_auth_user.bookmarks == null ) || ( g_auth_user.bookmarks.length == 0 ))
 		return;
 
+	$('bookmarks_label').textContent = 'Bookmarks[' + g_auth_user.bookmarks.length + ']';
+
+	// Collect projects:
+	var project = null;
 	for( var i = 0; i < g_auth_user.bookmarks.length; i++ )
 	{
-		var bm = g_auth_user.news[i];
+		var bm = g_auth_user.bookmarks[i];
 
-		var el = document.createElement('div');
-		$('bookmarks').appendChild( el);
-		$('bookmarks').m_elArray.push( el);
-		el.classList.add('bookmark');
+		var names = bm.path.split('/');
+
+		if(( project == null ) || ( project.name != names[1] ))
+		{
+			project = {};
+			project.name = names[1];
+			project.bms = [];
+			project.elBMs = [];
+
+			bm_projects.push( project);
+		}
+
+		project.bms.push( bm);
 	}
 
-	// News projects:
-	$('bookmarks_projects').innerHTML = '';
-	for( var i = 0; i < projects.length; i++ )
+	// Construct elements:
+	for( var p = 0; p < bm_projects.length; p++)
 	{
-		var el = document.createElement('div');
-		$('bookmarks_projects').appendChild( el);
-		el.classList.add('button');
-		el.classList.add('bm_prj');
-		el.textContent = projects[i];
-		el.onclick = function(e){ bm_FilterBtn( e.currentTarget, projects[i]);};
+		var project = bm_projects[p];
+
+		project.el = document.createElement('div');
+		project.el.classList.add('project');
+		$('bookmarks').appendChild( project.el);
+		project.el.textContent = project.name + '[' + project.bms.length + ']';
+
+		for( var b = 0; b < project.bms.length; b++)
+		{
+			var bm = project.bms[b];
+
+			var name = bm.path.split('/');
+			var cuts = 3;
+			if( cuts > name.length )
+				cuts = 0;
+			if( cuts )
+				name = name.splice( cuts);
+			name = name.join('/');
+
+			var el = document.createElement('div');
+			project.el.appendChild( el);
+			el.classList.add('bookmark');
+
+			var elDel = document.createElement('div');
+			el.appendChild( elDel);
+			elDel.classList.add('button');
+			elDel.classList.add('delete');
+			elDel.m_path = bm.path;
+			elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
+			elDel.title = 'Double click to delete.';
+
+			var elPath = document.createElement('a');
+			el.appendChild( elPath);
+			elPath.textContent = name;
+			elPath.href = '#' + bm.path;
+
+			el.m_bookmark = bm;
+			project.elBMs.push( el);
+			bm_elements.push( el);
+		}
 	}
 
 	bm_HighlightCurrent();
-	bm_Filter();
+//	bm_Filter();
 }
 
 function bm_NavigatePost()
 {
+	if( $('sidepanel').classList.contains('opened') != true )
+		return;
+
 	bm_Process();
 	bm_HighlightCurrent();
 }
@@ -131,26 +184,41 @@ function bm_Add()
 	bm.ctime = c_DT_CurSeconds();
 
 	for( var b = 0; b < g_auth_user.bookmarks.length; b++)
-		if( bm.path == g_auth_user.bookmarks.path )
+		if( bm.path == g_auth_user.bookmarks[b].path )
 			return;
 
 	g_auth_user.bookmarks.push(bm);
+	g_auth_user.bookmarks.sort( bm_Compare);
 
+	bm_Save()
 //console.log( JSON.stringify( g_auth_user));
+}
+
+function bm_Save( i_args)
+{
+	if( i_args == null )
+		i_args = {};
+
+	var i_user = i_args.user;
+	if( i_user == null ) i_user = g_auth_user;
+	
+	var obj = {};
+	obj.add = true;
+	obj.object = i_user;
+	obj.file = 'users/' + i_user.id + '.json';
+
+	n_Request({"send":{"editobj":obj},"func":bm_Load,"info":"bookmarks save"});
 }
 
 function bm_HighlightCurrent()
 {
 	var path = g_CurPath();
-	var elBMs = $('bookmarks').m_elArray;
-	if( elBMs == null )
-		return;
 
-	for( var i = 0; i < elBMs.length; i++)
-		if( path == elBMs[i].m_bookmark.path )
-			elBMs[i].classList.add('cur_path');
+	for( var i = 0; i < bm_elements.length; i++)
+		if( path == bm_elements[i].m_bookmark.path )
+			bm_elements[i].classList.add('cur_path');
 		else
-			elBMs[i].classList.remove('cur_path');
+			bm_elements[i].classList.remove('cur_path');
 }
 
 function bm_FilterBtn( i_btn, i_project)
@@ -186,16 +254,15 @@ function bm_Filter()
 			project = btns[i].m_project;
 		}
 
-	var elBMs = $('news').m_elArray;
-	for( var i = 0; i < elBMs.length; i++)
+	for( var i = 0; i < bm_elements.length; i++)
 	{
-		if( project && ( elBMs[i].m_news.path.indexOf( filter ) == 1 ))
+		if( project && ( bm_elements[i].m_news.path.indexOf( filter ) == 1 ))
 		{
 			elMBs[i].style.display = 'block';
 		}
 		else
 		{
-			elBMs[i].style.display = 'none';
+			bm_elements[i].style.display = 'none';
 		}
 	}
 
@@ -203,19 +270,18 @@ function bm_Filter()
 		bm_filter_project = filter;
 }
 
-function bm_Delete( i_ids)
+function bm_Delete( i_paths)
 {
-	// Delete all new if ids is not specified:
-	if( i_ids == null )
+	// Delete all bookmakrs if paths are not specified:
+	if( i_paths == null )
 	{
-		i_ids = [];
-		var elNews = $('news').m_elArray;
+		i_paths = [];
 		// Make an array with all ids:
-		for( var i = 0; i < elNews.length; i++)
-			i_ids.push( elNews[i].m_news.id);
+		for( var i = 0; i < bm_elements.length; i++)
+			i_paths.push( bm_elements[i].m_news.id);
 	}
 
-	if( i_ids.length == 0 )
+	if( i_paths.length == 0 )
 	{
 		c_Error('No news to delete.');
 		bm_Load();
@@ -224,8 +290,8 @@ function bm_Delete( i_ids)
 
 	var obj = {};
 	obj.objects = [];
-	for( var i = 0; i < i_ids.length; i++ )
-		obj.objects.push({"id":i_ids[i]});
+	for( var i = 0; i < i_paths.length; i++ )
+		obj.objects.push({"path":i_paths[i]});
 	obj.delobj = true;
 
 	obj.file = 'users/'+g_auth_user.id+'.json';
@@ -243,3 +309,9 @@ function bm_DeleteFinished( i_data)
 	bm_Load();
 }
 
+function bm_Compare(a,b)
+{
+	if( a.path > b.path ) return  1;
+	if( a.path < b.path ) return -1;
+	return 0;
+}

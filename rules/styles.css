@@ -435,6 +435,31 @@ width: 32px;
 height: 32px;
 margin: 0 0 0 2px;
 }
+
+
+/* ============= BOOKMARKS: =============== */
+#bookmarks .project {
+text-align: center;
+padding: 4px;
+font-size: 14px;
+}
+#bookmarks .bookmark {
+border-top: 1px solid rgba(98,98,98,.5);
+font-size: 12px;
+padding: 4px 0;
+}
+#bookmarks .bookmark.cur_path { background: rgba( 100, 255, 255, .2); }
+#bookmarks .bookmark .button.delete {
+float: left;
+width: 14px;
+height: 14px;
+margin: 0 4px 0 0;
+border-top: 0;
+border-left: 0;
+border-radius: 0 0 2px 0;
+}
+
+
 /* ============= RECENT: =============== */
 #sidepanel_recent #recent_refresh { display: none; float:right; }
 #sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
@@ -451,6 +476,7 @@ border-right: 0;
 border-radius: 0 0 0 4px;
 }
 #recent .user { float: left; margin-right: 4px;}
+
 
 /* ============= PLAYLIST: =============== */
 #sidepanel_playlist #playlist_refresh { display: none; float:right; }
