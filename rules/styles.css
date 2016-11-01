@@ -439,8 +439,11 @@ margin: 0 0 0 2px;
 
 /* ============= BOOKMARKS: =============== */
 #bookmarks .project {
+border-top: 2px solid rgba(98,98,98,.5);
+padding: 4px 0;
+}
+#bookmarks .project .label {
 text-align: center;
-padding: 4px;
 font-size: 14px;
 }
 #bookmarks .bookmark {

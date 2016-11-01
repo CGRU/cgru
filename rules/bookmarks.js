@@ -115,14 +115,19 @@ function bm_Show()
 		project.el = document.createElement('div');
 		project.el.classList.add('project');
 		$('bookmarks').appendChild( project.el);
-		project.el.textContent = project.name + '[' + project.bms.length + ']';
+
+		var el = document.createElement('div');
+		project.elLabel = el;
+		project.el.appendChild( el);
+		el.classList.add('label');
+		el.textContent = project.name + '[' + project.bms.length + ']';
 
 		for( var b = 0; b < project.bms.length; b++)
 		{
 			var bm = project.bms[b];
 
 			var name = bm.path.split('/');
-			var cuts = 3;
+			var cuts = 4;
 			if( cuts > name.length )
 				cuts = 0;
 			if( cuts )
