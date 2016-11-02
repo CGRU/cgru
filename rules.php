@@ -869,12 +869,14 @@ function delObject( &$o_obj, $i_obj)
 {
 //error_log('obj:'.json_encode($o_obj));
 //error_log('delobj:'.json_encode($i_obj));
-	if( is_null( $i_obj) || is_null( $o_obj)) return;
+	if( is_null( $i_obj) || is_null( $o_obj))
+		return;
+
 	foreach( $o_obj as $name => $obj )
 	{
 		if( is_array( $obj) && count( $obj))
 		{
-//error_log('ckecking:'.json_encode($o_obj[$name]));
+			//error_log('ckecking:'.json_encode($o_obj[$name]));
 			$allkeysequal = true;
 			foreach( $i_obj as $key => $val )
 			{
@@ -885,14 +887,17 @@ function delObject( &$o_obj, $i_obj)
 				$allkeysequal = false;
 				break;
 			}
+
 			if( $allkeysequal )
 			{
-//error_log('unsetting:'.json_encode($o_obj[$name]));
+				//error_log('unsetting:'.json_encode($o_obj[$name]));
 				if( is_int( $name))
 					array_splice( $o_obj, $name, 1);
 				else
 					unset( $o_obj[$name]);
-//error_log('unset:'.json_encode($o_obj));
+
+				return;
+				//error_log('unset:'.json_encode($o_obj));
 			}
 			else
 				delObject( $o_obj[$name], $i_obj);

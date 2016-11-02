@@ -451,7 +451,10 @@ function nw_NewsReceived( i_user)
 		return;
 	}
 
-	g_auth_user.news = i_user.news;
+	g_auth_user.news = [];
+	for( var i = 0; i < i_user.news.length; i++)
+		if( i_user.news[i])
+			g_auth_user.news.push( i_user.news[i]);
 
 	nw_NewsShow();
 }
