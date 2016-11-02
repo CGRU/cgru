@@ -89,8 +89,6 @@ function bm_Received( i_user, i_args)
 		if( i_user.bookmarks[i] )
 			g_auth_user.bookmarks.push( i_user.bookmarks[i]);
 
-	g_auth_user.bookmarks.sort( bm_Compare);
-
 	i_args.args.func( i_args.args)
 }
 
@@ -106,6 +104,8 @@ function bm_Show()
 		return;
 
 	$('bookmarks_label').textContent = 'Bookmarks[' + g_auth_user.bookmarks.length + ']';
+
+	g_auth_user.bookmarks.sort( bm_Compare);
 
 	// Collect projects:
 	var project = null;
