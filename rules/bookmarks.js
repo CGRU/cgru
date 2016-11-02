@@ -15,7 +15,7 @@ function bm_Init()
 	bm_initialized = true;
 
 	if( localStorage.bookmarks_opened == 'true')
-		bm_Open();
+		bm_Open( false);
 	else
 		bm_Close();
 }
@@ -42,23 +42,36 @@ function bm_Close()
 	$('bookmarks').innerHTML = '';
 	localStorage.bookmarks_opened = 'false';
 }
-function bm_Open()
+function bm_Open( i_load)
 {
 	$('sidepanel_bookmarks').classList.add('opened');
 	localStorage.bookmarks_opened = 'true';
-	bm_Load();
+
+	if( i_load !== false )
+		bm_Load({"info":'open'});
+	else
+		bm_Show();
 }
 
-function bm_Load()
+function bm_Load( i_args)
 {
 	if( g_auth_user == null ) return;
 
+	if( i_args == null )
+		i_args = {};
+
+	if( i_args.func == null )
+		i_args.func = bm_Show;
+
+	if( i_args.info == null )
+		i_args.info = 'load';
+
 	$('bookmarks').innerHTML = 'Loading...';
 	var filename = 'users/'+g_auth_user.id+'.json';
-	n_Request({"send":{"getfile":filename},"func":bm_Received,"info":"bookmarks"});
+	n_Request({"send":{"getfile":filename},"func":bm_Received,"args":i_args,"info":"bookmarks " + i_args.info});
 }
 
-function bm_Received( i_user)
+function bm_Received( i_user, i_args)
 {
 //console.log('nw_NewsReceived()');
 	if( i_user == null ) return;
@@ -68,9 +81,17 @@ function bm_Received( i_user)
 		return;
 	}
 
-	g_auth_user.bookmarks = i_user.bookmarks.sort( bm_Compare);
+	if( i_user.bookmarks == null )
+		i_user.bookmarks = [];
 
-	bm_Show();
+	g_auth_user.bookmarks = [];
+	for( var i = 0; i < i_user.bookmarks.length; i++)
+		if( i_user.bookmarks[i] )
+			g_auth_user.bookmarks.push( i_user.bookmarks[i]);
+
+	g_auth_user.bookmarks.sort( bm_Compare);
+
+	i_args.args.func( i_args.args)
 }
 
 function bm_Show()
@@ -91,6 +112,9 @@ function bm_Show()
 	for( var i = 0; i < g_auth_user.bookmarks.length; i++ )
 	{
 		var bm = g_auth_user.bookmarks[i];
+
+		if( bm == null )
+			continue;
 
 		var names = bm.path.split('/');
 
@@ -172,47 +196,33 @@ function bm_NavigatePost()
 
 function bm_Process()
 {
+	if( g_auth_user == null )
+		return;
+
 	if(( RULES.status == null ) || ( RULES.status.artists == null ))
 		return;
 
-	if( RULES.status.artists.indexOf( g_auth_user.id ) != -1 )
-		bm_Add();
-}
+	if( RULES.status.artists.indexOf( g_auth_user.id ) == -1 )
+		return;
 
-function bm_Add()
-{
-	if( g_auth_user.bookmarks == null )
-		g_auth_user.bookmarks = [];
+	var path = g_CurPath();
+
+	if( g_auth_user.bookmarks )
+		for( var b = 0; b < g_auth_user.bookmarks.length; b++)
+			if( g_auth_user.bookmarks[b] && ( path == g_auth_user.bookmarks[b].path ))
+				return;
 
 	var bm = {};
-	bm.path = g_CurPath();
+	bm.path = path;
 	bm.ctime = c_DT_CurSeconds();
 
-	for( var b = 0; b < g_auth_user.bookmarks.length; b++)
-		if( bm.path == g_auth_user.bookmarks[b].path )
-			return;
-
-	g_auth_user.bookmarks.push(bm);
-	g_auth_user.bookmarks.sort( bm_Compare);
-
-	bm_Save()
-//console.log( JSON.stringify( g_auth_user));
-}
-
-function bm_Save( i_args)
-{
-	if( i_args == null )
-		i_args = {};
-
-	var i_user = i_args.user;
-	if( i_user == null ) i_user = g_auth_user;
-	
 	var obj = {};
-	obj.add = true;
-	obj.object = i_user;
-	obj.file = 'users/' + i_user.id + '.json';
+	obj.pusharray = 'bookmarks';
+	obj.objects = [bm];
+	obj.keyname = 'path';
+	obj.file = 'users/' + g_auth_user.id + '.json';
 
-	n_Request({"send":{"editobj":obj},"func":bm_Load,"info":"bookmarks save"});
+	n_Request({"send":{"editobj":obj},"func":bm_Load,"info":"bookmarks add"});
 }
 
 function bm_HighlightCurrent()
@@ -288,8 +298,8 @@ function bm_Delete( i_paths)
 
 	if( i_paths.length == 0 )
 	{
-		c_Error('No news to delete.');
-		bm_Load();
+		c_Error('No bookmakrs to delete.');
+		bm_Load({"info":'not deleted'});
 		return;
 	}
 
@@ -311,7 +321,7 @@ function bm_DeleteFinished( i_data)
 	}
 
 	c_Info('Bookmarks deleted');
-	bm_Load();
+	bm_Load({"info":'deleted'});
 }
 
 function bm_Compare(a,b)

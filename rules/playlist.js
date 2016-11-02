@@ -349,6 +349,9 @@ function p_Read( i_playlist, i_params, i_elParent)
 
 	for( var i = 0; i < i_playlist.length; i++)
 	{
+		if( i_playlist[i] == null )
+			continue;
+
 		var el = null;
 		if( i_playlist[i].playlist )
 		{

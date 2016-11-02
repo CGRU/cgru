@@ -807,12 +807,22 @@ function mergeObjs( &$o_obj, $i_obj)
 		$o_obj[$key] = $val;
 	}
 }
-function pushArray( &$o_obj, $i_edit)
+function pushArray( &$o_obj, &$i_edit, $io_depth = 0 )
 {
 //error_log('pushArray: '.json_encode($i_edit));
-	if( is_null( $i_edit) || is_null( $o_obj)) return;
-	if( false == is_array( $o_obj)) return;
-	if( array_key_exists('id', $o_obj) && ( $o_obj['id'] == $i_edit['id']))
+	if( is_null( $i_edit) || is_null( $o_obj))
+		return false;
+
+	if( false == is_array( $o_obj))
+		return false;
+
+	$id = 'id';
+	if( array_key_exists('keyname', $i_edit))
+		$id = $i_edit['keyname'];
+
+	// If id is provided, we should operate with an array with this id
+	if(( array_key_exists( $id, $i_edit) == false ) || ( array_key_exists( $id, $o_obj) && ( $o_obj[$id] == $i_edit[$id])))
+	{
 		if( array_key_exists( $i_edit['pusharray'], $o_obj) && is_array( $o_obj[$i_edit['pusharray']]))
 		{
 			$pusharray = &$o_obj[$i_edit['pusharray']];
@@ -820,26 +830,40 @@ function pushArray( &$o_obj, $i_edit)
 
 			// Delete any other items with the same ids as input objects:
 			for( $e = 0; $e < count( $i_edit['objects']); $e++)
-				if( array_key_exists('id', $i_edit['objects'][$e] ))
+				if( array_key_exists( $id, $i_edit['objects'][$e] ))
 					for( $i = 0; $i < count( $pusharray); $i++)
-						if( array_key_exists( 'id', $pusharray[$i]))
-							if( $pusharray[$i]['id'] == $i_edit['objects'][$e]['id'])
+						if( array_key_exists( $id, $pusharray[$i]))
+							if( $pusharray[$i][$id] == $i_edit['objects'][$e][$id])
 								array_splice( $pusharray, $i, 1);
 
 			// Search for an index to insert before:
 			if( array_key_exists( 'id_before', $i_edit))
 				for( $i = 0; $i < count( $pusharray); $i++)
-					if( array_key_exists( 'id', $pusharray[$i]))
-						if( $pusharray[$i]['id'] == $i_edit['id_before'])
+					if( array_key_exists( $id, $pusharray[$i]))
+						if( $pusharray[$i][$id] == $i_edit['id_before'])
 							$offset = $i;
 
 //error_log('id_before = '.$i_edit['id_before']);
 //error_log('offset = '.$offset);
 			array_splice( $pusharray, $offset, 0, $i_edit['objects']);
 
-			return;
+			return true;
 		}
-	foreach( $o_obj as &$obj ) pushArray( $obj, $i_edit);
+	}
+
+	// Search for an array deeper:
+	foreach( $o_obj as &$obj )
+		if( pushArray( $obj, $i_edit, $io_depth + 1 ))
+			return true;
+
+	// Create an array in the object root, if it was not founded:
+	if( $io_depth == 0 )
+	{
+		$o_obj[$i_edit['pusharray']] = array();
+		return pushArray( $o_obj, $i_edit, 1 );
+	}
+
+	return false;
 }
 function delObject( &$o_obj, $i_obj)
 {
