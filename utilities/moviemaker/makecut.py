@@ -234,6 +234,7 @@ job.blocks.append(block)
 # Encode block:
 block = af.Block('encode', Options.afservice)
 block.setDependMask('convert')
+block.setCapacity( Options.afcapacity)
 task = af.Task('encode')
 task.setCommand(cmd_encode)
 block.tasks.append(task)
