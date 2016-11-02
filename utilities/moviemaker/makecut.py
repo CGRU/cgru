@@ -26,6 +26,7 @@ Parser.add_option('-n', '--cutname',    dest='cutname',     type  ='string', def
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string', default='24',        help='FPS')
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string', default='1280x720',  help='Resolution: 1280x720')
 Parser.add_option('-c', '--codec',      dest='codec',       type  ='string', default='h264_good', help='Codec')
+Parser.add_option(      '--font',       dest='font' ,       type  ='string', default=None,        help='Annotations font')
 Parser.add_option('--colorspace',       dest='colorspace',  type  ='string', default='auto',      help='Input images colorspace')
 Parser.add_option('-o', '--outdir',     dest='outdir',      type  ='string', default='cut',       help='Output folder')
 Parser.add_option('-u', '--afuser',     dest='afuser',      type  ='string', default='',          help='Afanasy user name')
@@ -92,6 +93,8 @@ cmd_prefix += ' -t "dailies"'
 cmd_prefix += ' -r %s' % Options.resolution
 cmd_prefix += ' -d "%s"' % time.strftime('%y-%m-%d')
 cmd_prefix += ' --colorspace "%s"' % Options.colorspace
+if Options.font:
+    cmd_prefix += ' --font "%s"' % Options.font
 
 file_counter = 0
 

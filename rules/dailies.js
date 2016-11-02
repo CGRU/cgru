@@ -908,6 +908,9 @@ function d_CutProcessGUI( i_wnd, i_test)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
 
+	if( RULES.dailies.font )
+		cmd += ' --font "' + RULES.dailies.font + '"';
+
 	cmd += ' --afcapacity ' + parseInt( params.af_capacity);
 	cmd += ' --afmaxtasks ' + parseInt( params.af_maxtasks);
 	cmd += ' --afperhost ' + parseInt( params.af_perhost);
