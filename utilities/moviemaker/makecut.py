@@ -16,9 +16,9 @@ Extensions = ['jpg', 'png', 'dpx']
 TmpFiles = 'img.%07d.jpg'
 
 Parser = OptionParser(
-	usage="%prog [options] input\n"
-		  "Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n"
-		  "Type \"%prog -h\" for help", version="%prog 1.0"
+    usage="%prog [options] input\n"
+          "Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n"
+          "Type \"%prog -h\" for help", version="%prog 1.0"
 )
 
 Parser.add_option('-i', '--inputs',     dest='inputs',      type  ='string', default='RESULT/JPG',help='Inputs')
@@ -41,13 +41,13 @@ Parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true',
 
 
 def errExit(i_msg):
-	print('{"error":"%s"},' % i_msg)
-	print('{"status":"error"}]}')
-	sys.exit(1)
+    print('{"error":"%s"},' % i_msg)
+    print('{"status":"error"}]}')
+    sys.exit(1)
 
 
 def interrupt(signum, frame):
-	errExit('Interrupt received')
+    errExit('Interrupt received')
 
 
 signal.signal(signal.SIGTERM, interrupt)
@@ -59,24 +59,24 @@ print('{"cut":[')
 (Options, args) = Parser.parse_args()
 
 if len(args) < 1:
-	errExit('Not enough arguments provided.')
+    errExit('Not enough arguments provided.')
 
 Inputs = Options.inputs.split(',')
 Shots = args
 CutName = Options.cutname
 
 if os.path.isfile(args[-1]):
-	Shots = args[-1]
-	if CutName == '':
-		CutName = os.path.basename(Shots)
-	with open(Shots) as f:
-		Shots = f.readlines()
+    Shots = args[-1]
+    if CutName == '':
+        CutName = os.path.basename(Shots)
+    with open(Shots) as f:
+        Shots = f.readlines()
 
 if len(Shots) < 2:
-	errExit('Less than 2 shots provided.')
+    errExit('Less than 2 shots provided.')
 
 if CutName == '':
-	CutName = os.path.basename(os.path.dirname(Shots[0]))
+    CutName = os.path.basename(os.path.dirname(Shots[0]))
 
 OutDir = Options.outdir + '/' + CutName
 OutDir = os.path.normpath(OutDir)
@@ -99,94 +99,94 @@ if Options.font:
 file_counter = 0
 
 for shot in Shots:
-	shot = shot.strip()
-	if len(shot) == 0:
-		continue
-	if shot[0] == '#':
-		continue
+    shot = shot.strip()
+    if len(shot) == 0:
+        continue
+    if shot[0] == '#':
+        continue
 
-	folder = None
-	version = None
-	name = os.path.basename(shot)
+    folder = None
+    version = None
+    name = os.path.basename(shot)
 
-	for inp in Inputs:
-		inp = os.path.join(shot, inp)
-		if not os.path.isdir(inp):
-			continue
+    for inp in Inputs:
+        inp = os.path.join(shot, inp)
+        if not os.path.isdir(inp):
+            continue
 
-		for item in os.listdir(inp):
-			if item[0] in '._':
-				continue
-			if not os.path.isdir(os.path.join(inp, item)):
-				continue
-			ver = item.replace(name, '').strip('_. ')
-			if version is not None:
-				if version >= ver:
-					continue
-			version = ver
-			folder = os.path.join(inp, item)
+        for item in os.listdir(inp):
+            if item[0] in '._':
+                continue
+            if not os.path.isdir(os.path.join(inp, item)):
+                continue
+            ver = item.replace(name, '').strip('_. ')
+            if version is not None:
+                if version >= ver:
+                    continue
+            version = ver
+            folder = os.path.join(inp, item)
 
-	if folder is None:
-		errExit('Input not found for: %s' % shot)
+    if folder is None:
+        errExit('Input not found for: %s' % shot)
 
-	files = []
-	for item in os.listdir(folder):
-		valid = False
-		for ext in Extensions:
-			if item[-len(ext):].lower() == ext:
-				valid = True
-				break
-		if valid:
-			files.append(os.path.join(folder, item))
+    files = []
+    for item in os.listdir(folder):
+        valid = False
+        for ext in Extensions:
+            if item[-len(ext):].lower() == ext:
+                valid = True
+                break
+        if valid:
+            files.append(os.path.join(folder, item))
 
-	if len(files) == 0:
-		errExit('No files found in folder: %s' % folder)
+    if len(files) == 0:
+        errExit('No files found in folder: %s' % folder)
 
-	files.sort()
+    files.sort()
 
-	nums = re.findall(r'\d+',files[0])
-	if len(nums) == 0:
-		errExit('Can`t find numbers in %s', files[0])
-	nums = nums[-1]
-	sequence = files[0][:files[0].rfind(nums)]
-	padding = len(nums)
-	sequence += '%0' + str(padding) + 'd'
-	sequence += files[0][files[0].rfind(nums)+padding:]
-	frame_first = int(nums)
-	nums = re.findall(r'\d+',files[-1])
-	if len(nums) == 0:
-		errExit('Can`t find numbers in %s', files[-1])
-	frame_last = int(nums[-1])
+    nums = re.findall(r'\d+',files[0])
+    if len(nums) == 0:
+        errExit('Can`t find numbers in %s', files[0])
+    nums = nums[-1]
+    sequence = files[0][:files[0].rfind(nums)]
+    padding = len(nums)
+    sequence += '%0' + str(padding) + 'd'
+    sequence += files[0][files[0].rfind(nums)+padding:]
+    frame_first = int(nums)
+    nums = re.findall(r'\d+',files[-1])
+    if len(nums) == 0:
+        errExit('Can`t find numbers in %s', files[-1])
+    frame_last = int(nums[-1])
 
-	print('{"sequence":"%s","first":%d,"last":%d,"count":%d},' % (sequence, frame_first, frame_last, len(files)))
+    print('{"sequence":"%s","first":%d,"last":%d,"count":%d},' % (sequence, frame_first, frame_last, len(files)))
 
-	f = frame_first
-	while f <= frame_last:
-		num_frames = len(files)
+    f = frame_first
+    while f <= frame_last:
+        num_frames = len(files)
 
-		if num_frames > Options.afpertask:		
-			num_frames = Options.afpertask
+        if num_frames > Options.afpertask:        
+            num_frames = Options.afpertask
 
-		if f + num_frames > frame_last:
-			num_frames = frame_last - f + 1
+        if f + num_frames > frame_last:
+            num_frames = frame_last - f + 1
 
-		cmd = cmd_prefix
-		cmd += ' --project "%s"' % CutName
-		cmd += ' --shot "%s"' % name
-		cmd += ' --ver "%s"' % version
-		cmd += ' --moviename "%s"' % os.path.basename(movie_name)
-		cmd += ' --frame_input %d' % f
-		cmd += ' --frame_output %d' % file_counter
-		cmd += ' --frames_num %d' % num_frames
-		cmd += ' "%s"' % sequence
-		output = os.path.join(OutDir, TmpFiles)
-		cmd += ' "%s"' % output
+        cmd = cmd_prefix
+        cmd += ' --project "%s"' % CutName
+        cmd += ' --shot "%s"' % name
+        cmd += ' --ver "%s"' % version
+        cmd += ' --moviename "%s"' % os.path.basename(movie_name)
+        cmd += ' --frame_input %d' % f
+        cmd += ' --frame_output %d' % file_counter
+        cmd += ' --frames_num %d' % num_frames
+        cmd += ' "%s"' % sequence
+        output = os.path.join(OutDir, TmpFiles)
+        cmd += ' "%s"' % output
 
-		commands.append(cmd)
-		task_names.append('%s: %d-%d' % (os.path.basename(sequence), f, f+num_frames-1))
+        commands.append(cmd)
+        task_names.append('%s: %d-%d' % (os.path.basename(sequence), f, f+num_frames-1))
 
-		f += num_frames
-		file_counter += num_frames
+        f += num_frames
+        file_counter += num_frames
 
 
 print('{"progress":"%d sequences found"},' % len(Shots))
@@ -209,23 +209,24 @@ if Options.afuser != '': job.setUserName(Options.afuser)
 # Delete previous sequence block:
 delete_name = None
 if os.path.isdir(OutDir):
-	delete_name = 'delete'
-	block = af.Block( delete_name)
-	task = af.Task( delete_name + ' ' + os.path.basename( OutDir))
-	task.setCommand('deletefiles "%s"' % OutDir)
-	block.tasks.append(task)
-	job.blocks.append(block)
+    delete_name = 'delete'
+    block = af.Block( delete_name)
+    block.setCapacity( 1)
+    task = af.Task( delete_name + ' ' + os.path.basename( OutDir))
+    task.setCommand('deletefiles "%s"' % OutDir)
+    block.tasks.append(task)
+    job.blocks.append(block)
 
 # Convert block:
 block = af.Block('convert', Options.afservice)
 if delete_name: block.setDependMask( delete_name)
 counter = 0
 for cmd in commands:
-	task = af.Task(task_names[counter])
-	task.setCommand(cmd)
-	block.tasks.append(task)
-	counter += 1
-	if Options.verbose: print(cmd)
+    task = af.Task(task_names[counter])
+    task.setCommand(cmd)
+    block.tasks.append(task)
+    counter += 1
+    if Options.verbose: print(cmd)
 block.setCapacity( Options.afcapacity)
 block.setTasksMaxRunTime( Options.afmaxruntime)
 job.blocks.append(block)
@@ -240,7 +241,7 @@ job.blocks.append(block)
 
 
 if not Options.testonly:
-	if not job.send():
-		errExit('Can`t send job to server.')
+    if not job.send():
+        errExit('Can`t send job to server.')
 
 print('{"status":"success"}]}')
