@@ -865,43 +865,76 @@ function pushArray( &$o_obj, &$i_edit, $io_depth = 0 )
 
 	return false;
 }
-function delObject( &$o_obj, $i_obj)
+function delArray( &$o_obj, $i_edit)
 {
-//error_log('obj:'.json_encode($o_obj));
-//error_log('delobj:'.json_encode($i_obj));
-	if( is_null( $i_obj) || is_null( $o_obj))
+	//error_log('o_obj:'.json_encode($o_obj));
+	//error_log('i_edit:'.json_encode($i_edit));
+
+	if( false == is_array( $o_obj))
 		return;
 
-	foreach( $o_obj as $name => $obj )
+	// Iterate object to search delarray
+	foreach( $o_obj as $name => &$arr )
 	{
-		if( is_array( $obj) && count( $obj))
+		if( false == is_array( $arr))
+			continue;
+
+		if( count( $arr) == 0 )
+			continue;
+
+		if( $i_edit['delarray'] === $name)
 		{
-			//error_log('ckecking:'.json_encode($o_obj[$name]));
-			$allkeysequal = true;
-			foreach( $i_obj as $key => $val )
+			//error_log( $i_edit['delarray'].'<>'.$name);
+
+			// Iteate delarray
+			for( $i = 0; $i < count( $arr); )
 			{
-				if( array_key_exists( $key, $obj))
-					if( $obj[$key] == $val )
-						continue;
+				// Array member to delete should be an array too
+				if( false == is_array( $arr[$i]))
+				{
+					$i++;
+					continue;
+				}
+				/*if( is_null( $arr[$i]))
+				{
+					array_splice( $arr, $i, 1);
+					continue;
+				}*/
 
-				$allkeysequal = false;
-				break;
+				//error_log('ckecking:'.json_encode($arr[$i]));
+
+				$deleted = false;
+				// Iterate objects to delete:
+				foreach( $i_edit['objects'] as $delobj )
+				{
+					$allkeysequal = true;
+					// Iterate all provided keys to found a member to delete
+					foreach( $delobj as $key => $val )
+					{
+						if( array_key_exists( $key, $arr[$i]))
+							if( $arr[$i][$key] == $val )
+								continue;
+
+						$allkeysequal = false;
+						break;
+					}
+
+					if( $allkeysequal )
+					{
+						//error_log('unsetting:'.json_encode($arr[$i]));
+						array_splice( $arr, $i, 1);
+						$deleted = true;
+						break;
+					}
+				}
+
+				if( false == $deleted )
+					$i++;
 			}
-
-			if( $allkeysequal )
-			{
-				//error_log('unsetting:'.json_encode($o_obj[$name]));
-				if( is_int( $name))
-					array_splice( $o_obj, $name, 1);
-				else
-					unset( $o_obj[$name]);
-
-				return;
-				//error_log('unset:'.json_encode($o_obj));
-			}
-			else
-				delObject( $o_obj[$name], $i_obj);
 		}
+
+		// Recursively going deeper to find delarray:
+		delArray( $o_obj[$name], $i_edit);
 	}
 }
 function replaceObject( &$o_obj, $i_obj)
@@ -958,7 +991,10 @@ function jsf_editobj( $i_edit, &$o_out)
 		_flock_( $fHandle, LOCK_EX);
 		$data = fread( $fHandle, $FileMaxLength);
 		$obj = json_decode( $data, true);
-		if( is_null( $obj)) $obj = array();
+
+		if( is_null( $obj))
+			$obj = array();
+
 		if( array_key_exists('add', $i_edit) && ( $i_edit['add'] == true ))
 			mergeObjs( $obj, $i_edit['object']);
 		else if( array_key_exists('pusharray', $i_edit))
@@ -966,9 +1002,9 @@ function jsf_editobj( $i_edit, &$o_out)
 		else if( array_key_exists('replace', $i_edit) && ( $i_edit['replace'] == true ))
 			foreach( $i_edit['objects'] as $newobj )
 				replaceObject( $obj, $newobj);
-		else if( array_key_exists('delobj', $i_edit) && ( $i_edit['delobj'] == true ))
-			foreach( $i_edit['objects'] as $delobj )
-				delObject( $obj, $delobj);
+		else if( array_key_exists('delarray', $i_edit))
+			delArray( $obj, $i_edit);
+
 //error_log('obj:'.json_encode($obj));
 		rewind( $fHandle);
 		ftruncate( $fHandle, 0);

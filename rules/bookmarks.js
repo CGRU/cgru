@@ -287,7 +287,7 @@ function bm_Filter()
 
 function bm_Delete( i_paths)
 {
-	// Delete all bookmakrs if paths are not specified:
+	// Delete all bookmarks if paths are not specified:
 	if( i_paths == null )
 	{
 		i_paths = [];
@@ -298,7 +298,7 @@ function bm_Delete( i_paths)
 
 	if( i_paths.length == 0 )
 	{
-		c_Error('No bookmakrs to delete.');
+		c_Error('No bookmarks to delete.');
 		bm_Load({"info":'not deleted'});
 		return;
 	}
@@ -307,7 +307,7 @@ function bm_Delete( i_paths)
 	obj.objects = [];
 	for( var i = 0; i < i_paths.length; i++ )
 		obj.objects.push({"path":i_paths[i]});
-	obj.delobj = true;
+	obj.delarray = 'bookmarks';
 
 	obj.file = 'users/'+g_auth_user.id+'.json';
 	n_Request({"send":{"editobj":obj},"func":bm_DeleteFinished});

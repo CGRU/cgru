@@ -197,7 +197,7 @@ function nw_Subscribe( i_path)
 		}
 		if( path.indexOf( i_path) != -1 )
 		{
-			c_Info('Already subscribed on parent path: ' + path);
+			c_Info('Already subscribed on sub-folder: ' + path);
 			return;
 		}
 		/*
@@ -241,7 +241,7 @@ function nw_Unsubscribe( i_path)
 	var obj = {};
 
 	obj.objects = [{"id":i_path}];
-	obj.delobj = true;
+	obj.delarray = 'channels';
 	obj.id = g_auth_user.id;
 	obj.file = 'users/' + g_auth_user.id + '.json';
 
@@ -706,7 +706,7 @@ function nw_DeleteNews( i_ids)
 	obj.objects = [];
 	for( var i = 0; i < i_ids.length; i++ )
 		obj.objects.push({"id":i_ids[i]});
-	obj.delobj = true;
+	obj.delarray = 'news';
 
 	obj.file = 'users/'+g_auth_user.id+'.json';
 	n_Request({"send":{"editobj":obj},"func":nw_DeleteNewsFinished});
