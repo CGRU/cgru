@@ -404,6 +404,9 @@ function nw_MakeNewsFinished( i_data, i_args)
 	for( var i = 0; i < i_data.users.length; i++)
 		info += ' '+i_data.users[i];
 	c_Log( info);
+
+	if( i_args.args && i_args.args.func )
+		i_args.args.func( i_args.args);
 }
 
 function nw_ShowCount( i_hidden_count)

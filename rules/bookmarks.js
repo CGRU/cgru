@@ -66,7 +66,7 @@ function bm_Load( i_args)
 	if( i_args.info == null )
 		i_args.info = 'load';
 
-	$('bookmarks').innerHTML = 'Loading...';
+	//$('bookmarks').innerHTML = 'Loading...';
 	var filename = 'users/'+g_auth_user.id+'.json';
 	n_Request({"send":{"getfile":filename},"func":bm_Received,"args":i_args,"info":"bookmarks " + i_args.info});
 }
@@ -162,13 +162,16 @@ function bm_Show()
 			project.el.appendChild( el);
 			el.classList.add('bookmark');
 
-			var elDel = document.createElement('div');
-			el.appendChild( elDel);
-			elDel.classList.add('button');
-			elDel.classList.add('delete');
-			elDel.m_path = bm.path;
-			elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
-			elDel.title = 'Double click to delete.';
+			if( bm.status && bm.status.progress && ( bm.status.progress >= 100 ))
+			{
+				var elDel = document.createElement('div');
+				el.appendChild( elDel);
+				elDel.classList.add('button');
+				elDel.classList.add('delete');
+				elDel.m_path = bm.path;
+				elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
+				elDel.title = 'Double click to delete.';
+			}
 
 			var elPath = document.createElement('a');
 			el.appendChild( elPath);
@@ -205,16 +208,33 @@ function bm_Process()
 	if( RULES.status.artists.indexOf( g_auth_user.id ) == -1 )
 		return;
 
+	var bm = null;
 	var path = g_CurPath();
 
 	if( g_auth_user.bookmarks )
 		for( var b = 0; b < g_auth_user.bookmarks.length; b++)
 			if( g_auth_user.bookmarks[b] && ( path == g_auth_user.bookmarks[b].path ))
-				return;
+			{
+				bm = g_auth_user.bookmarks[b];
+				break;
+			}
 
-	var bm = {};
-	bm.path = path;
-	bm.ctime = c_DT_CurSeconds();
+
+	if( bm == null )
+	{
+	// Create a new bookmark:
+
+		// Do not create a new bookmark on done shot:
+		if( RULES.status.progress && ( RULES.status.progress >= 100 ))
+			return;
+
+		bm = {};
+		bm.path = path;
+		bm.ctime = c_DT_CurSeconds();
+	}
+
+	bm.mtime = c_DT_CurSeconds();
+	bm.status = RULES.status;
 
 	var obj = {};
 	obj.pusharray = 'bookmarks';

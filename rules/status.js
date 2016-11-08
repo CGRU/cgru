@@ -1420,7 +1420,8 @@ Status.prototype.editSave = function( i_args)
 	}
 
 	// Send news:
-	nw_SendNews( news);
+	nw_SendNews( news, {"func":bm_Process});
+	// And process bookmarks, but after, to not modify the same user data file at once
 
 	if( some_progress_changed )
 		st_UpdateProgresses( this.path, progresses);
