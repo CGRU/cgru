@@ -447,19 +447,27 @@ text-align: center;
 font-size: 14px;
 }
 #bookmarks .bookmark {
+position: relative;
 border-top: 1px solid rgba(98,98,98,.5);
 font-size: 12px;
 padding: 4px 0;
 }
+#bookmarks .bookmark a {
+padding: 0 4px;
+}
+#bookmarks .bookmark .bar {
+position: absolute;
+bottom: 1px;
+left: 0px;
+height: 4px;
+background-color: rgba(0,200,0,.5);
+opacity: 0.5;
+}
 #bookmarks .bookmark.cur_path { background: rgba( 100, 255, 255, .2); }
 #bookmarks .bookmark .button.delete {
-float: left;
+float: right;
 width: 14px;
 height: 14px;
-margin: 0 4px 0 0;
-border-top: 0;
-border-left: 0;
-border-radius: 0 0 2px 0;
 }
 
 

@@ -148,44 +148,57 @@ function bm_Show()
 
 		for( var b = 0; b < project.bms.length; b++)
 		{
-			var bm = project.bms[b];
-
-			var name = bm.path.split('/');
-			var cuts = 4;
-			if( cuts > name.length )
-				cuts = 0;
-			if( cuts )
-				name = name.splice( cuts);
-			name = name.join('/');
-
-			var el = document.createElement('div');
-			project.el.appendChild( el);
-			el.classList.add('bookmark');
-
-			if( bm.status && bm.status.progress && ( bm.status.progress >= 100 ))
-			{
-				var elDel = document.createElement('div');
-				el.appendChild( elDel);
-				elDel.classList.add('button');
-				elDel.classList.add('delete');
-				elDel.m_path = bm.path;
-				elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
-				elDel.title = 'Double click to delete.';
-			}
-
-			var elPath = document.createElement('a');
-			el.appendChild( elPath);
-			elPath.textContent = name;
-			elPath.href = '#' + bm.path;
-
-			el.m_bookmark = bm;
-			project.elBMs.push( el);
+			var el = bm_CreateElements( project.bms[b]);
 			bm_elements.push( el);
+			project.elBMs.push( el);
+			project.el.appendChild( el);
 		}
 	}
 
 	bm_HighlightCurrent();
 //	bm_Filter();
+}
+
+function bm_CreateElements( i_bm)
+{
+	var name = i_bm.path.split('/');
+	var cuts = 4;
+	if( cuts > name.length )
+		cuts = 0;
+	if( cuts )
+		name = name.splice( cuts);
+	name = name.join('/');
+
+	var el = document.createElement('div');
+	el.classList.add('bookmark');
+
+	if( i_bm.status && i_bm.status.progress && ( i_bm.status.progress > 0 ))
+	{
+		var elBar = document.createElement('div');
+		el.appendChild( elBar);
+		elBar.classList.add('bar');
+		st_SetElProgress( i_bm.status, elBar);
+	}
+
+	if( bm_StatusOld( i_bm.status ))
+	{
+		var elDel = document.createElement('div');
+		el.appendChild( elDel);
+		elDel.classList.add('button');
+		elDel.classList.add('delete');
+		elDel.m_path = i_bm.path;
+		elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
+		elDel.title = 'Double click to delete.';
+	}
+
+	var elPath = document.createElement('a');
+	el.appendChild( elPath);
+	elPath.textContent = name;
+	elPath.href = '#' + i_bm.path;
+
+	el.m_bookmark = i_bm;
+
+	return el;
 }
 
 function bm_NavigatePost()
@@ -195,6 +208,26 @@ function bm_NavigatePost()
 
 	bm_Process();
 	bm_HighlightCurrent();
+}
+
+function bm_StatusOld( i_status)
+{
+	if( i_status == null )
+		return false;
+
+	if( i_status.progress )
+	{
+		if( i_status.progress >= 100 )
+			return true;
+	}
+
+	if( i_status.flags )
+	{
+		if( i_status.flags.indexOf('omit') != -1 )
+			return true;
+	}
+
+	return false;
 }
 
 function bm_Process()
@@ -223,9 +256,7 @@ function bm_Process()
 	if( bm == null )
 	{
 	// Create a new bookmark:
-
-		// Do not create a new bookmark on done shot:
-		if( RULES.status.progress && ( RULES.status.progress >= 100 ))
+		if( bm_StatusOld( RULES.status))
 			return;
 
 		bm = {};

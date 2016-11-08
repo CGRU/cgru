@@ -552,6 +552,12 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
+	el.textContent = 'Bmrs';
+	el.title = 'Bookmarks count.\nDouble click clear bookmarks.';
+	el.onclick = function(e) { ad_WndSortUsers('bookmarks'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
 	el.textContent = 'Cnls';
 	el.title = 'News subscribed channels.\nDouble click clear channels.';
 	el.onclick = function(e) { ad_WndSortUsers('channels'); };
@@ -781,6 +787,14 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.m_user_id = i_user.id;
 		el.ondblclick = function(e){ad_SetPasswordDialog( e.currentTarget.m_user_id);};
 	}
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
+	if( i_user.bookmarks )
+		el.textContent = i_user.bookmarks.length;
+	el.m_user_id = i_user.id;
+//	if( i_user.disabled !== true )
+//		el.ondblclick = function(e){ad_UserChannelsClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
