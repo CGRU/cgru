@@ -199,7 +199,10 @@ class Config:
 
         success = True
         try:
-            obj = json.loads(filedata, object_pairs_hook=collections.OrderedDict)['cgru_config']
+            if sys.hexversion > 0x02070000:
+                obj = json.loads( filedata, object_pairs_hook=collections.OrderedDict)['cgru_config']
+            else:
+                obj = json.loads( filedata)['cgru_config']
         except:  # TODO: Too broad exception clause
             success = False
             print(filename)
