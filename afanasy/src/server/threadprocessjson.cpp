@@ -83,10 +83,14 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				std::vector<int32_t> task_ids;
 				int number = 0;
 				int mon_id = 0;
+
 				af::jr_int32vec("block_ids", block_ids, getObj);
 				af::jr_int32vec("task_ids", task_ids, getObj);
 				af::jr_int("number", number, getObj);
-				af::jr_int("mon_id", mon_id, getObj);
+
+				// This request can be from afcmd, for example
+				bool has_monitor = af::jr_int("mon_id", mon_id, getObj);
+
 				if(( ids.size() == 1 ) && ( block_ids.size() == 1 ) && ( task_ids.size() == 1 ))
 				{
 					af::MCTask mctask( ids[0], block_ids[0], task_ids[0], number);
@@ -116,7 +120,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 							delete [] data;
 						}
 					}
-					else if( mctask.m_render_id ) // Retrieving output from render
+					else if( mctask.m_render_id && has_monitor ) // Retrieving output from render
 					{
 						{
 							AfContainerLock rLock( i_args->renders, AfContainerLock::WRITELOCK);
@@ -154,13 +158,17 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 									+ af::itos( mon_id);
 						}
 					}
+					else if( mctask.m_render_id && ( false == has_monitor ))
+					{
+						error = std::string("Can't get ouput of a running task.");
+					}
 	
 					if( o_msg_response == NULL )
 					{
 						if( error.empty())
-							error = "Error getting task ouput...\nSee server logs for details.";
+							error = "Failed to get task ouput...\nSee server logs for details.";
 
-						mctask.setOutput( error);
+						mctask.setOutput( std::string("ERROR: ") + error);
 
 						o_msg_response = mctask.generateMessage( binary);
 					}
