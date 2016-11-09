@@ -1,6 +1,7 @@
 #include "dialog.h"
 
 #include "../include/afanasy.h"
+#include "../include/afgui.h"
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -149,6 +150,18 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
     QMenu menu(this);
     QAction *action;
     QMenu * submenu;
+
+    submenu = new QMenu("Set UI Level", this);
+	const char *jedi_names[] = {"Padawan","Jedi","Sith"};
+    for( int i = 0; i < AFGUI::SITH+1; i++)
+    {
+        ActionId * action_id = new ActionId( i, jedi_names[i], this);
+        action_id->setCheckable( true);
+        action_id->setChecked( afqt::QEnvironment::level.n == i);
+        connect( action_id, SIGNAL( triggeredId(int)), this, SLOT( actGuiLevel(int)));
+        submenu->addAction( action_id);
+    }
+    menu.addMenu( submenu);
 
     submenu = new QMenu( "Choose Theme", this);
     QStringList themes = afqt::QEnvironment::getThemes();
@@ -540,6 +553,28 @@ void Dialog::actSavePreferences()
       Watch::displayInfo(QString("Saved '%1'").arg( afqt::QEnvironment::getFileName()));
    else
       Watch::displayError(QString("Failed to save to'%1'").arg( afqt::QEnvironment::getFileName()));
+}
+
+void Dialog::actGuiLevel( int i_level)
+{
+	switch( i_level)
+	{
+		case AFGUI::PADAWAN:
+			Watch::displayInfo("Hello my young Padawan.");
+			break;
+		case AFGUI::JEDI:
+			Watch::displayInfo("Let the force be with you.");
+			break;
+		case AFGUI::SITH:
+			Watch::displayInfo("Welcome to the dark side.");
+			break;
+		default:
+			Watch::displayInfo(QString("Invalid theme number: %1").arg( i_level));
+			return;
+	}
+
+    afqt::QEnvironment::level.n = i_level;
+    Watch::refreshGui();
 }
 
 void Dialog::actGuiTheme( QString theme)

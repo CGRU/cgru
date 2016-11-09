@@ -19,6 +19,8 @@
 
 using namespace afqt;
 
+AttrNumber QEnvironment::level("level", "UI Level", AFGUI::PADAWAN );
+
 Attr       QEnvironment::theme("theme", "Theme", AFGUI::THEME );
 
 Attr       QEnvironment::image_back(            "image_back",            "Items Background",        "");
@@ -140,6 +142,7 @@ QEnvironment::QEnvironment( const QString & i_name)
 {
     ms_appname = i_name;
 
+    ms_attrs_prefs.append( &level              );
     ms_attrs_prefs.append( &theme              );
     ms_attrs_prefs.append( &savePrefsOnExit    );
     ms_attrs_prefs.append( &saveWndRectsOnExit );

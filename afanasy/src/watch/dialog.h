@@ -70,7 +70,8 @@ private slots:
     void actSaveWndRectsOnExit();
     void actSavePreferences();
     void actShowOfflineNoise();
-    void actGuiTheme( QString theme);
+	void actGuiTheme( QString theme);
+    void actGuiLevel( int i_level);
 
 protected:
     void contextMenuEvent( QContextMenuEvent * event);

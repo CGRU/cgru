@@ -4,6 +4,10 @@ namespace AFGUI
 {
 	const char THEME[] = "Light";
 
+	const int PADAWAN = 0;
+	const int JEDI    = 1;
+	const int SITH    = 2;
+
 	const int SAVEPREFSONEXIT = 1;
 	const int SAVEWNDRECTS = 1;
 	const int SAVEGUI = 0;

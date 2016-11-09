@@ -35,6 +35,8 @@ public:
 	static bool getRect( const QString & i_name, QRect & rect);
 	static void setRect( const QString & i_name, const QRect & rect);
 
+	static AttrNumber level;
+
 	static Attr theme;
 
 	static Attr image_back;
