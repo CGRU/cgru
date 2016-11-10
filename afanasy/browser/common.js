@@ -14,7 +14,46 @@ cm_Attrs.push(['str',             'Starts',   'Starts Count']);
 cm_Attrs.push(['err',             'Errors',   'Errors Count']);
 cm_Attrs.push(['hst',             'Host',     'Host Name']);
 
+cm_UILevels = ['Padawan','Jedi','Sith'];
+
 var $ = function( id ) { return document.getElementById( id ); };
+
+function cm_Init()
+{
+	if( localStorage.ui_level == null )
+		localStorage.ui_level = 'Padawan';
+
+	for( var i = 0; i < cm_UILevels.length; i++)
+	{
+		var el = document.createElement('div');
+		$('ui_level').appendChild( el);
+		if( cm_UILevels[i] == localStorage.ui_level )
+		{
+		}
+		else
+		{
+			el.classList.add('button');
+			el.textContent = cm_UILevels[i];
+		}
+		el.ondblclick = function(e) { cm_ApplyUILevel( e.currentTarget.textContent);}
+	}
+}
+
+function cm_ApplyUILevel( i_level)
+{
+	if( cm_UILevels.indexOf( i_level) == -1 )
+	{
+		g_Error('Invalid UI Level: ' + i_level);
+		return;
+	}
+
+	g_Info( i_level);
+
+	if( localStorage.ui_level == i_level )
+		return;
+
+	localStorage.ui_level = i_level;
+}
 
 function cm_ApplyStyles()
 {

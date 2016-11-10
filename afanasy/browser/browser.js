@@ -30,6 +30,7 @@ function g_Init()
 {
 	g_Info('HTML body load.');
 	cgru_Init();
+	cm_Init();
 
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
