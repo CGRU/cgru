@@ -1,5 +1,6 @@
 #include "itemjob.h"
 
+#include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
@@ -137,20 +138,56 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2strHMS( time_run).c_str();
 
 	properties.clear();
-	if( false == dependmask_global.isEmpty()) properties += QString(" gD(%1)").arg( dependmask_global   );
-	if( false == dependmask.isEmpty()       ) properties += QString(" D(%1)" ).arg( dependmask          );
-	if( false == hostsmask.isEmpty()        ) properties += QString(" H(%1)" ).arg( hostsmask           );
-	if( false == hostsmask_exclude.isEmpty()) properties += QString(" E(%1)" ).arg( hostsmask_exclude   );
-	if( false == need_properties.isEmpty()  ) properties += QString(" P(%1)" ).arg( need_properties     );
-	if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
-	if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
-	properties += QString(" p%2").arg( m_priority);
-	if( ppapproval ) properties += " PPA";
-	if( maintenance ) properties += " MNT";
-	if( ignorenimby ) properties += " INB";
-	if( ignorepaused ) properties += " IPS";
+	if( Watch::isPadawan())
+	{
+		if( false == dependmask_global.isEmpty()) properties += QString(" Global Depends(%1)").arg( dependmask_global);
+		if( false == dependmask.isEmpty()       ) properties += QString(" Depends(%1)").arg( dependmask);
+		if( false == hostsmask.isEmpty()        ) properties += QString(" HostsMask(%1)").arg( hostsmask);
+		if( false == hostsmask_exclude.isEmpty()) properties += QString(" ExcludeHosts(%1)").arg( hostsmask_exclude);
+		if( false == need_properties.isEmpty()  ) properties += QString(" Properities(%1)").arg( need_properties);
+		if( maxrunningtasks != -1 ) properties += QString(" MaxTasks:%1").arg( maxrunningtasks);
+		if( maxruntasksperhost != -1 ) properties += QString(" MaxPerHost:%1").arg( maxruntasksperhost);
+		properties += QString(" Priority:%1").arg( m_priority);
+		if( ppapproval ) properties += " PPA";
+		if( maintenance ) properties += " MNT";
+		if( ignorenimby ) properties += " INB";
+		if( ignorepaused ) properties += " IPS";
+	}
+	else if( Watch::isJedi())
+	{
+		if( false == dependmask_global.isEmpty()) properties += QString(" GDep(%1)").arg( dependmask_global);
+		if( false == dependmask.isEmpty()       ) properties += QString(" Dep(%1)").arg( dependmask);
+		if( false == hostsmask.isEmpty()        ) properties += QString(" Host(%1)" ).arg( hostsmask);
+		if( false == hostsmask_exclude.isEmpty()) properties += QString(" Exclude(%1)").arg( hostsmask_exclude);
+		if( false == need_properties.isEmpty()  ) properties += QString(" Props(%1)").arg( need_properties);
+		if( maxrunningtasks != -1 ) properties += QString(" Max:%1").arg( maxrunningtasks);
+		if( maxruntasksperhost != -1 ) properties += QString(" PerHost:%1").arg( maxruntasksperhost);
+		properties += QString(" Pri:%1").arg( m_priority);
+		if( ppapproval ) properties += " PPA";
+		if( maintenance ) properties += " MNT";
+		if( ignorenimby ) properties += " INB";
+		if( ignorepaused ) properties += " IPS";
+	}
+	else
+	{
+		if( false == dependmask_global.isEmpty()) properties += QString(" g(%1)").arg( dependmask_global);
+		if( false == dependmask.isEmpty()       ) properties += QString(" d(%1)").arg( dependmask       );
+		if( false == hostsmask.isEmpty()        ) properties += QString(" h(%1)").arg( hostsmask        );
+		if( false == hostsmask_exclude.isEmpty()) properties += QString(" e(%1)").arg( hostsmask_exclude);
+		if( false == need_properties.isEmpty()  ) properties += QString(" p(%1)").arg( need_properties  );
+		if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
+		if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
+		properties += QString(" p%1").arg( m_priority);
+		if( ppapproval ) properties += " ppa";
+		if( maintenance ) properties += " mnt";
+		if( ignorenimby ) properties += " inb";
+		if( ignorepaused ) properties += " ips";
+	}
 
-	user_eta = username;
+	user_eta.clear();
+	if( af::Environment::VISOR())
+		user_eta = username;
+
 	if( time_started && ((state & AFJOB::STATE_DONE_MASK) == false))
 		setRunning();
 	else
@@ -243,7 +280,12 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 	QString properties_time = properties;
 	if( time_started && (( state & AFJOB::STATE_DONE_MASK) == false))
 	{
-		properties_time += " " + QString(af::time2strHMS( currenttime - time_started).c_str());
+		QString runtime = QString(af::time2strHMS( currenttime - time_started).c_str());
+		if( Watch::isPadawan())
+			properties_time += " RunTime: " + runtime;
+		else
+			properties_time += " " + runtime;
+
 		// ETA (but not for the system job):
 		if( getId() != AFJOB::SYSJOB_ID )
 		{
@@ -258,14 +300,26 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 				int sec_all = sec_run * 100.0 / percentage;
 				int eta = sec_all - sec_run;
 				if( eta > 0 )
-					user_time = QString::fromUtf8("ETA≈") + afqt::stoq( af::time2strHMS( eta)) + " " + user_eta;
+				{
+					QString etas = afqt::stoq( af::time2strHMS( eta)) + " " + user_eta;
+					if( Watch::isPadawan() || Watch::isJedi())
+						user_time = QString::fromUtf8("ETA≈") + etas;
+					else
+						user_time = QString::fromUtf8("eta≈") + etas;
+				}
 			}
 		}
 	}
 
 	if( time_wait > currenttime )
 	{
-		user_time = user_eta + " " + af::time2strHMS( time_wait - currenttime ).c_str();
+		QString wait = af::time2strHMS( time_wait - currenttime ).c_str();
+		if( Watch::isPadawan())
+			user_time = user_eta + " Waiting Time:" + wait;
+		else if( Watch::isJedi())
+			user_time = user_eta + " Wait:" + wait;
+		else
+			user_time = user_eta + " w:" + wait;
 	}
 
 	printfState( state, x+35+(w>>3), y+25, painter, option);

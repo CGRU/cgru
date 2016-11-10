@@ -249,7 +249,18 @@ void ItemRender::updateValues( af::Node * i_node, int i_type)
 	    m_dirty = render->isDirty();
 
 	    m_capacity_used = render->getCapacityUsed();
-	    m_capacity_usage = QString("%1/%2 (%3/%4)").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		if( Watch::isPadawan())
+		{
+		    m_capacity_usage = QString("Capacity: %1 of %2; Tasks: %3 of %4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		}
+		else if( Watch::isJedi())
+		{
+		    m_capacity_usage = QString("C:%1/%2 T:%3/%4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		}
+		else
+		{
+		    m_capacity_usage = QString("%1/%2 (%3/%4)").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		}
 
 	    if( m_busy )
 		{

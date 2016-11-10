@@ -560,13 +560,14 @@ void Dialog::actGuiLevel( int i_level)
 	switch( i_level)
 	{
 		case AFGUI::PADAWAN:
-			Watch::displayInfo("Hello my young Padawan.");
+			Watch::displayInfo("Patience you must have. My young Padawan.");
 			break;
 		case AFGUI::JEDI:
 			Watch::displayInfo("Let the force be with you.");
 			break;
 		case AFGUI::SITH:
-			Watch::displayInfo("Welcome to the dark side.");
+			//Watch::displayInfo("Welcome to the dark side.");
+			Watch::displayInfo("Powerful you have become, the dark side I sense in you.");
 			break;
 		default:
 			Watch::displayInfo(QString("Invalid theme number: %1").arg( i_level));

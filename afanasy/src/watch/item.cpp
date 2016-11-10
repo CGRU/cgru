@@ -7,6 +7,8 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "watch.h"
+
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
@@ -147,6 +149,58 @@ void Item::printfState( const uint32_t state, int posx, int posy, QPainter * pai
 
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_OFFLINE_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_OFFLINE_NAME_S); posx+=posx_d;
+}
+
+const QString Item::generateErrorsSolvingInfo( int i_block, int i_task, int i_retries)
+{
+	QString info;
+
+	if( Watch::isPadawan())
+	{
+		if( i_block >= 0 )
+		{
+			info += QString("AvoidBlock:%1").arg( i_block);
+		}
+		if( i_task >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("AvoidTask:%1").arg( i_task);
+		}
+		if( i_retries >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("Retries:%1").arg( i_retries);
+		}
+		info = QString(" ErrorsSolving:%1").arg( info);
+	}
+	else if( Watch::isJedi())
+	{
+		if( i_block >= 0 )
+		{
+			info += QString("%1B").arg( i_block);
+		}
+		if( i_task >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("%1T").arg( i_task);
+		}
+		if( i_retries >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("%1R").arg( i_retries);
+		}
+		info = QString(" ErrSlv:%1").arg( info);
+	}
+	else
+	{
+		info = QString(" es:%1b,%2t,%3r").arg( i_block).arg( i_task).arg( i_retries);
+	}
+
+	return info;
 }
 
 void Item::drawPercent

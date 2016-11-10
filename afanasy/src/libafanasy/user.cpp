@@ -183,21 +183,6 @@ int User::v_calcWeight() const
 	return weight;
 }
 
-const std::string User::generateErrorsSolvingString() const
-{
-   std::ostringstream stream;
-   generateErrorsSolvingStream( stream);
-   return stream.str();
-}
-
-void User::generateErrorsSolvingStream( std::ostringstream & stream) const
-{
-   stream << "E-" << int(m_errors_avoid_host) << "j|"
-         << int(m_errors_task_same_host) << "t|"
-         << int(m_errors_retries) << "r";
-   if( m_errors_forgive_time > 0 ) stream << " F" << af::time2strHMS( m_errors_forgive_time, true);
-}
-
 void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
@@ -214,7 +199,6 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
       if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << m_hosts_mask_exclude.getPattern() << "\"";
 
       stream << "\n Errors Solving: ";
-      generateErrorsSolvingStream( stream);
       stream << "\n    Errors To Avoid Host = " << int(m_errors_avoid_host);
       stream << "\n    Maximum Errors Same Task = " << int(m_errors_task_same_host);
       stream << "\n    Task Errors To Retry = " << int(m_errors_retries);

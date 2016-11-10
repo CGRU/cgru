@@ -45,6 +45,8 @@ public:
 	inline void   setNotRunning() const { m_running = false; } ///< Set item not m_running ( to change text colors only).
 	inline const bool isRunning() const { return m_running;  } ///< Return whether node is "m_running".
 
+	static const QString generateErrorsSolvingInfo( int i_block, int i_task, int i_retries);
+
 	/// Draw a percent bar.
 	static void drawPercent
 	(
