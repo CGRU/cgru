@@ -45,6 +45,7 @@ public:
 	static bool notPadawan() { return afqt::QEnvironment::level.n != AFGUI::PADAWAN; }
 	static bool isJedi( )    { return afqt::QEnvironment::level.n == AFGUI::JEDI;    }
 	static bool isSith()     { return afqt::QEnvironment::level.n == AFGUI::SITH;    }
+	static bool notSith()    { return afqt::QEnvironment::level.n != AFGUI::SITH;    }
 
 	static const QString BtnName[WLAST];
 	static const QString WndName[WLAST];

@@ -33,6 +33,7 @@
 #include <QtGui/QPainter>
 #include <QBoxLayout>
 #include <QMenu>
+#include <QMenuBar>
 #include <QScrollArea>
 
 #define AFOUTPUT
@@ -57,7 +58,10 @@ Dialog::Dialog():
 {
     for( int b = 0; b < Watch::WLAST; b++) m_btnMonitor[b] = NULL;
 
-    m_hlayout_a = new QHBoxLayout( this);
+	QWidget * cw = new QWidget( this);
+	setCentralWidget( cw);
+
+    m_hlayout_a = new QHBoxLayout( cw);
     m_vlayout_a = new QVBoxLayout();
     m_hlayout_b = new QHBoxLayout();
     m_vlayout_b = new QVBoxLayout();
@@ -109,6 +113,10 @@ Dialog::Dialog():
 
     connectionLost();
 
+	createMenus();
+	if( Watch::isSith())
+		menuBar()->hide();
+
     connect( &m_repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
 
 //    setFocusPolicy(Qt::StrongFocus);
@@ -145,89 +153,124 @@ printf(" <<< Dialog::sendMsg: ");msg->v_stdOut();
     m_qThreadSend.send( msg);
 }
 
-void Dialog::contextMenuEvent(QContextMenuEvent *event)
+void Dialog::createMenus()
 {
-    QMenu menu(this);
-    QAction *action;
-    QMenu * submenu;
+	m_contextMenu = new QMenu( this);
 
-    submenu = new QMenu("Set UI Level", this);
+	m_levelMenu = new QMenu("UI Level", this);
+	menuBar()->addMenu( m_levelMenu);
+	m_contextMenu->addMenu( m_levelMenu);
+	connect( m_levelMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuLevel()));
+
+	m_themeMenu = new QMenu("Color Theme", this);
+	menuBar()->addMenu( m_themeMenu);
+	m_contextMenu->addMenu( m_themeMenu);
+	connect( m_themeMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuTheme()));
+
+	m_contextMenu->addSeparator();
+
+    QAction *action;
+	QMenu * editMenu = menuBar()->addMenu("Settings");
+    action = new QAction( "Customize GUI...", editMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
+    editMenu->addAction( action);
+	m_contextMenu->addAction( action);
+    action = new QAction( "Notifications...", editMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actNotifications() ));
+    editMenu->addAction( action);
+	m_contextMenu->addAction( action);
+    editMenu->addSeparator();
+
+	m_prefsMenu = new QMenu("Preferences", this);
+	menuBar()->addMenu( m_prefsMenu);
+	m_contextMenu->addMenu( m_prefsMenu);
+	connect( m_prefsMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuPrefs()));
+
+	m_contextMenu->addSeparator();
+
+    action = new QAction( "Save Preferences", editMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferences() ));
+    editMenu->addAction( action);
+	m_contextMenu->addAction( action);
+}
+
+void Dialog::showMenuLevel()
+{
+	m_levelMenu->clear();
+
 	const char *jedi_names[] = {"Padawan","Jedi","Sith"};
     for( int i = 0; i < AFGUI::SITH+1; i++)
     {
-        ActionId * action_id = new ActionId( i, jedi_names[i], this);
+        ActionId * action_id = new ActionId( i, jedi_names[i], m_levelMenu);
         action_id->setCheckable( true);
         action_id->setChecked( afqt::QEnvironment::level.n == i);
         connect( action_id, SIGNAL( triggeredId(int)), this, SLOT( actGuiLevel(int)));
-        submenu->addAction( action_id);
+        m_levelMenu->addAction( action_id);
     }
-    menu.addMenu( submenu);
 
-    submenu = new QMenu( "Choose Theme", this);
+}
+
+void Dialog::showMenuTheme()
+{
+	m_themeMenu->clear();
+
     QStringList themes = afqt::QEnvironment::getThemes();
     for( int i = 0; i < themes.size(); i++)
     {
-        ActionString * action_str = new ActionString( themes[i], themes[i], this);
+        ActionString * action_str = new ActionString( themes[i], themes[i], m_themeMenu);
         action_str->setCheckable( true);
         action_str->setChecked( afqt::QEnvironment::theme.str == themes[i]);
         connect( action_str, SIGNAL( triggeredString(QString)), this, SLOT( actGuiTheme(QString)));
-        submenu->addAction( action_str);
+        m_themeMenu->addAction( action_str);
     }
-    menu.addMenu( submenu);
+}
 
-    action = new QAction( "Customize GUI...", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
-    menu.addAction( action);
+void Dialog::showMenuPrefs()
+{
+	m_prefsMenu->clear();
+	QAction * action;
 
-    action = new QAction( "Notifications...", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actNotifications() ));
-    menu.addAction( action);
-
-    menu.addSeparator();
-
-    submenu = new QMenu( "Preferences", this);
-
-    action = new QAction( "Save Prefs on Exit", this);
+    action = new QAction( "Save Prefs on Exit", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::savePrefsOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferencesOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-	submenu->addSeparator();
+	m_prefsMenu->addSeparator();
 
-    action = new QAction( "Save GUI", this);
+    action = new QAction( "Save GUI", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveGUIOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveGUIOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-    action = new QAction( "Save Hotkeys", this);
+    action = new QAction( "Save Hotkeys", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveHotkeysOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveHotkeysOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-    action = new QAction( "Save Windows Geometry", this);
+    action = new QAction( "Save Windows Geometry", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveWndRectsOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveWndRectsOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-	submenu->addSeparator();
+	m_prefsMenu->addSeparator();
 
-    action = new QAction( "Show Offline Noise", this);
+    action = new QAction( "Show Offline Noise", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::showOfflineNoise.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actShowOfflineNoise() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
+}
 
-    menu.addMenu( submenu);
+void Dialog::contextMenuEvent(QContextMenuEvent *event)
+{
+	if( Watch::isPadawan())
+		return;
 
-    action = new QAction( "Save Preferences", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferences() ));
-    menu.addAction( action);
-
-    menu.exec( event->globalPos());
+	m_contextMenu->exec( event->globalPos());
 }
 
 void Dialog::connectionLost()
@@ -562,12 +605,15 @@ void Dialog::actGuiLevel( int i_level)
 	switch( i_level)
 	{
 		case AFGUI::PADAWAN:
+			menuBar()->show();
 			message = "Patience you must have. My young Padawan.";
 			break;
 		case AFGUI::JEDI:
+			menuBar()->show();
 			message = "Let the force be with you.";
 			break;
 		case AFGUI::SITH:
+			menuBar()->hide();
 			Watch::displayInfo("Welcome to the dark side.");
 			message = "Powerful you have become, the dark side I sense in you.";
 			break;

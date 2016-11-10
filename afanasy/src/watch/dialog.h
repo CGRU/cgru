@@ -14,6 +14,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QMainWindow>
 #include <QWidget>
 
 class ButtonOut;
@@ -26,7 +27,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QScrollArea;
 
-class Dialog : public QWidget
+class Dialog : public QMainWindow
 {
     Q_OBJECT
 
@@ -58,6 +59,10 @@ signals:
     void stop();
 
 private slots:
+	void showMenuLevel();
+	void showMenuTheme();
+	void showMenuPrefs();
+
     void newMessage( af::Msg * msg);
     void connectionLost();
     void repaintWatch();
@@ -79,6 +84,8 @@ protected:
     void paintEvent ( QPaintEvent * event );
 
 private:
+	void createMenus();
+
     void sendRegister();
 	void idReceived( int i_id, int i_uid = -1);
     void closeList();
@@ -86,6 +93,11 @@ private:
     void setDefaultWindowTitle();
 
 private:
+	QMenu * m_contextMenu;
+	QMenu * m_levelMenu;
+	QMenu * m_themeMenu;
+	QMenu * m_prefsMenu;
+
     bool m_initialized;
     bool m_connected;
 
