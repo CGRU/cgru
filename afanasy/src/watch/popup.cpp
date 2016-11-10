@@ -18,7 +18,7 @@ Popup * Popup::ms_popup = NULL;
 Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
    QWidget( Watch::getDialog())
 {
-	printf("Notification: %s - %s\n", i_title.toUtf8().data(), i_msg.toUtf8().data());
+	printf("Notification: %s %s\n", i_title.toUtf8().data(), i_msg.toUtf8().data());
 
 	// Close previusly opened popup:
 	if( ms_popup != NULL )
@@ -37,6 +37,7 @@ Popup::Popup( const QString & i_title, const QString & i_msg, uint32_t i_state):
 
 	QLabel * label = new QLabel( QString("AFANASY<br><br><b>%1</b><br><br>%2").arg( i_title, i_msg), this);
 	vlayout->addWidget( label);
+	label->setContentsMargins( 20, 20, 20, 20);
 	label->setMinimumSize( 240, 120);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
 

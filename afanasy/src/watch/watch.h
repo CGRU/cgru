@@ -117,7 +117,7 @@ public:
 	void static browseImages( const QString & i_image,  const QString & i_wdir);
 	void static browseFolder( const QString & i_folder, const QString & i_wdir = QString());
 
-	void static notify( const QString & i_title, const QString & i_msg, uint32_t i_state = 0);
+	void static notify( const QString & i_title, const QString & i_msg = QString(), uint32_t i_state = 0);
 
 private:
 	static Dialog * ms_d;

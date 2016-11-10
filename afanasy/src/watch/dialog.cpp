@@ -557,25 +557,30 @@ void Dialog::actSavePreferences()
 
 void Dialog::actGuiLevel( int i_level)
 {
+	QString message;
+
 	switch( i_level)
 	{
 		case AFGUI::PADAWAN:
-			Watch::displayInfo("Patience you must have. My young Padawan.");
+			message = "Patience you must have. My young Padawan.";
 			break;
 		case AFGUI::JEDI:
-			Watch::displayInfo("Let the force be with you.");
+			message = "Let the force be with you.";
 			break;
 		case AFGUI::SITH:
-			//Watch::displayInfo("Welcome to the dark side.");
-			Watch::displayInfo("Powerful you have become, the dark side I sense in you.");
+			Watch::displayInfo("Welcome to the dark side.");
+			message = "Powerful you have become, the dark side I sense in you.";
 			break;
 		default:
-			Watch::displayInfo(QString("Invalid theme number: %1").arg( i_level));
+			Watch::displayError(QString("Invalid theme number: %1").arg( i_level));
 			return;
 	}
 
-    afqt::QEnvironment::level.n = i_level;
-    Watch::refreshGui();
+	//Watch::displayInfo( message);
+	Watch::notify( message);
+
+	afqt::QEnvironment::level.n = i_level;
+	Watch::refreshGui();
 }
 
 void Dialog::actGuiTheme( QString theme)
