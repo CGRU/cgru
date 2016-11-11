@@ -220,11 +220,10 @@ class BlockParameters:
                 # Delete files on job deletion:
                 if self.afnode.parm('cmd_delete_files').eval():
                     cmd_files = self.afnode.parm('cmd_files')
-                    self.delete_files.append( afcommon.patternFromPaths(
-                        cmd_files.evalAsStringAtFrame( self.frame_first),
-                        cmd_files.evalAsStringAtFrame( self.frame_last)
+                    self.delete_files.append(afcommon.patternFromPaths(
+                        cmd_files.evalAsStringAtFrame(self.frame_first),
+                        cmd_files.evalAsStringAtFrame(self.frame_last)
                     ))
-
 
             elif not for_job_only:
                 hou.ui.displayMessage('Can\'t process "%s"' % afnode.path())
@@ -287,9 +286,9 @@ class BlockParameters:
         # Place hipfilename and auxargs
         cmd = self.cmd % vars()
 
-        block = af.Block( self.name, self.service)
-        block.setParser( self.parser)
-        block.setCommand( cmd, self.cmd_useprefix)
+        block = af.Block(self.name, self.service)
+        block.setParser(self.parser)
+        block.setCommand(cmd, self.cmd_useprefix)
         if self.preview != '':
             block.setFiles([self.preview])
 
@@ -320,11 +319,11 @@ class BlockParameters:
         block.setTasksMaxRunTime(self.maxruntime)
 
         # Delete files in a block post command:
-        if len( self.delete_files):
+        if len(self.delete_files):
             post_cmd = 'deletefiles'
             for files in self.delete_files:
-                post_cmd += ' "%s"' % re.sub('@#*@','*',files)
-            block.setCmdPost( post_cmd)
+                post_cmd += ' "%s"' % re.sub('@#*@', '*', files)
+            block.setCmdPost(post_cmd)
 
         if self.subblock:
             if self.max_runtasks > -1:
@@ -457,7 +456,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
     params = []
 
     if ropnode is not None and ropnode.type().name() == 'ifd' and afnode.parm('sep_enable').eval():
-    # Case mantra separate render:
+        # Case mantra separate render:
 
         block_generate = \
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
@@ -551,7 +550,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                 block_render.cmd = 'mantrarender '
 
             if del_rop_files:
-                block_render.delete_files.append( files)
+                block_render.delete_files.append(files)
 
             if use_tmp_img_folder:
                 block_render.cmd += 't'
@@ -626,18 +625,17 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         if enable_tracker:
             # Tracker block:
             par_start = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, True)
-            params.append( par_start)
-        
+            params.append(par_start)
+
         # A block for each slice:
         ds_num_slices = int(afnode.parm('ds_num_slices').eval())
-        stop_dep_mask = None
         for s in range(0, ds_num_slices):
             par = BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
             sim_blocks_mask = par.name + '.*'
             par.name += '-s%d' % s
             par.frame_pertask = par.frame_last - par.frame_first + 1
             if enable_tracker:
-                par.addDependMask( par_start.name)
+                par.addDependMask(par_start.name)
             par.fullrangedepend = True
             par.auxargs = ' --ds_node "%s"' % ds_node_path
             par.auxargs += ' --ds_address "%s"' % str(afnode.parm('ds_address').eval())
@@ -648,16 +646,16 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         if enable_tracker:
             # Stop tracker block:
             par_stop = getTrackerParameters(afnode, ropnode, subblock, prefix, frame_range, False)
-            par_stop.addDependMask( sim_blocks_mask)
-            params.append( par_stop)
+            par_stop.addDependMask(sim_blocks_mask)
+            params.append(par_stop)
 
             # Set other block names for start tracker block.
             # As start tracker block will set other block environment
             # to specify started tracker and port.
-            par_start.cmd += ' --envblocks "%s|%s"' % ( sim_blocks_mask, par_stop.name)
+            par_start.cmd += ' --envblocks "%s|%s"' % (sim_blocks_mask, par_stop.name)
             # On this block depend mask will be reset on tracker start:
             par_start.cmd += ' --depblocks "%s"' % sim_blocks_mask
-        
+
     else:
         params.append(
             BlockParameters(afnode, ropnode, subblock, prefix, frame_range)
@@ -665,20 +663,20 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
     return params
 
 
-def getTrackerParameters(  i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range, i_start):
-    par = BlockParameters( i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range)
+def getTrackerParameters(i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range, i_start):
+    par = BlockParameters(i_afnode, i_ropnode, i_subblock, i_prefix, i_frame_range)
     if i_prefix:
         par.name = i_prefix + '-tracker'
     else:
         par.name = 'tracker'
     par.frame_last = par.frame_first
-    par.frame_pertask   = 1
-    par.subtaskdepend   = False
+    par.frame_pertask = 1
+    par.subtaskdepend = False
     par.fullrangedepend = True
-    par.capacity        = int( i_afnode.parm('ds_tracker_capacity').eval())
-    par.hosts_mask      = str( i_afnode.parm('ds_tracker_hostmask').eval())
-    par.service         = str( i_afnode.parm('ds_tracker_service' ).eval())
-    par.parser          = str( i_afnode.parm('ds_tracker_parser'  ).eval())
+    par.capacity = int(i_afnode.parm('ds_tracker_capacity').eval())
+    par.hosts_mask = str(i_afnode.parm('ds_tracker_hostmask').eval())
+    par.service = str(i_afnode.parm('ds_tracker_service').eval())
+    par.parser = str(i_afnode.parm('ds_tracker_parser').eval())
     if i_start:
         par.cmd = 'htracker --start'
     else:
