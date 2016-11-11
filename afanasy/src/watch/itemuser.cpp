@@ -65,6 +65,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" HostsMask(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" ExcludeHosts(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
+		if( errors_forgivetime > 0 ) strHCenterTop += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 		if( jobs_lifetime > 0 ) strHCenterTop += QString(" JobsLifeTime:%1").arg( af::time2strHMS( jobs_lifetime, true).c_str());
 
 		strRightTop.clear();
@@ -88,6 +89,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" Hosts(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" Exclude(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
+		if( errors_forgivetime > 0 ) strHCenterTop += QString(" ErrForgive:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 		if( jobs_lifetime > 0 ) strHCenterTop += QString(" JobsLife:%1").arg( af::time2strHMS( jobs_lifetime, true).c_str());
 
 		strRightTop.clear();
@@ -110,6 +112,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( false == hostsmask.isEmpty()) strHCenterTop += QString(" h(%1)").arg( hostsmask);
 		if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" e(%1)").arg( hostsmask_exclude);
 		strHCenterTop += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
+		if( errors_forgivetime > 0 ) strHCenterTop += QString(" f%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 		if( jobs_lifetime > 0 ) strHCenterTop += QString(" l%1").arg( af::time2strHMS( jobs_lifetime, true).c_str());
 
 		strRightTop = hostname;

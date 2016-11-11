@@ -159,13 +159,13 @@ const QString Item::generateErrorsSolvingInfo( int i_block, int i_task, int i_re
 	{
 		if( i_block >= 0 )
 		{
-			info += QString("AvoidBlock:%1").arg( i_block);
+			info += QString("Avoid:%1").arg( i_block);
 		}
 		if( i_task >= 0 )
 		{
 			if( info.size())
 				info += ",";
-			info += QString("AvoidTask:%1").arg( i_task);
+			info += QString("Task:%1").arg( i_task);
 		}
 		if( i_retries >= 0 )
 		{
@@ -173,7 +173,7 @@ const QString Item::generateErrorsSolvingInfo( int i_block, int i_task, int i_re
 				info += ",";
 			info += QString("Retries:%1").arg( i_retries);
 		}
-		info = QString(" ErrorsSolving:%1").arg( info);
+		info = QString(" ErrorsSolving(%1)").arg( info);
 	}
 	else if( Watch::isJedi())
 	{
