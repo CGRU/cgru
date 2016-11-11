@@ -19,10 +19,15 @@ RenderNode.prototype.init = function()
 
 	this.elVersion = cm_ElCreateText( this.element, 'Client Version');
 
-	this.elPriority = document.createElement('span');
-	this.element.appendChild( this.elPriority);
-	this.elPriority.style.cssFloat = 'right';
-	this.elPriority.title = 'Priority';
+	if( cm_IsSith())
+	{
+		this.elPriority = document.createElement('div');
+		this.element.appendChild( this.elPriority);
+		this.elPriority.style.cssFloat = 'right';
+		this.elPriority.title = 'Priority';
+	}
+	else
+		this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 
 	this.elUserName = cm_ElCreateFloatText( this.element, 'right', 'User Name and "Nimby" Status');
 
@@ -34,9 +39,9 @@ RenderNode.prototype.init = function()
 	this.elNewLine = document.createElement('br');
 	this.element.appendChild( this.elNewLine);
 
-	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used/Total');
+	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used / Total');
 	this.elCapacity.classList.add('prestar');
-	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running/Maximum');
+	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running / Maximum');
 	this.elStateTime = cm_ElCreateFloatText( this.element, 'right', 'Busy/Free Status and Time');
 
 	this.elAnnotation = document.createElement('div');
@@ -109,7 +114,7 @@ RenderNode.prototype.update = function( i_obj)
 		if(( this.state.ONL != true ) || ( this.params.host_resources == null ))
 		{
 			// If render just become online,
-			// or resources reciedved fisrt time,
+			// or resources received first time,
 			// we need to set plotter scales:
 
 			this.elResources.style.display = 'block';
@@ -217,7 +222,7 @@ RenderNode.prototype.update = function( i_obj)
 
 	cm_GetState( this.params.state, this.state, this.element);
 
-	this.elName.textContent = this.params.name;
+	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
 	this.elName.title = this.params.host.os;
 
 	if( this.params.version != null )
@@ -225,21 +230,32 @@ RenderNode.prototype.update = function( i_obj)
 	else
 		this.elVersion.textContent = '';
 
-	this.elPriority.textContent = '-' + this.params.priority;
+	if( cm_IsPadawan())
+	{
+		this.elPriority.innerHTML = ' Priority:<b>' + this.params.priority + '</b>';
+	}
+	else if( cm_IsJedi())
+	{
+		this.elPriority.innerHTML = ' Pri:<b>' + this.params.priority + '</b>';
+	}
+	else
+	{
+		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
+	}
 
-	var user = this.params.user_name;
+	var user = '<b>' + this.params.user_name + '</b>';
 	if( this.state.PAU )
     {
-        user = 'Paused(' + user + ')P';
-        if ( this.state.NBY ) user += '+N';
-        if ( this.state.Nby ) user += '+n';
+        user = 'Paused(<b>' + user + '</b>)<b>P</b>';
+        if ( this.state.NBY ) user += '+<b>N</b>';
+        if ( this.state.Nby ) user += '+<b>n</b>';
     }
-	else if( this.state.NbY ) user = 'nimby(' + user + ')n';
-	else if( this.state.NBY ) user = 'NIMBY(' + user + ')N';
-	this.elUserName.textContent = user;
+	else if( this.state.NbY ) user = 'nimby(<b>' + user + '</b>)<b>n</b>';
+	else if( this.state.NBY ) user = 'NIMBY(<b>' + user + '</b>)<b>N</b>';
+	this.elUserName.innerHTML = user;
 
 	if( this.params.annotation )
-		this.elAnnotation.textContent = this.params.annotation;
+		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</b></i>';
 	else
 		this.elAnnotation.textContent = '';
 
@@ -252,9 +268,9 @@ RenderNode.prototype.update = function( i_obj)
 	{
 		this.elStar.style.display = 'none';
 		this.clearTasks();
-this.plottersCsDelete();
-this.elResources.style.display = 'none';
-this.params.host_resources = null;
+		this.plottersCsDelete();
+		this.elResources.style.display = 'none';
+		this.params.host_resources = null;
 		this.elCapacity.textContent = '';
 		this.elMaxTasks.textContent = '';
 		this.state.textContent = '';
@@ -267,24 +283,35 @@ this.params.host_resources = null;
 
 	if( this.params.capacity == null)
 		this.params.capacity = this.params.host.capacity;
-	var capacity = this.params.capacity_used + '/' + this.params.capacity;
-	this.elCapacity.textContent = '['+capacity+']';
-
 	if( this.params.max_tasks == null )
 		this.params.max_tasks = this.params.host.max_tasks;
+	this.params.run_tasks = 0;
+	if( this.params.tasks )
+		this.params.run_tasks = this.params.tasks.length;
+
+	if( cm_IsPadawan())
+	{
+		this.elCapacity.innerHTML = 'Capacity[ Used:<b>' + this.params.capacity_used + '</b> / Total:<b>' + this.params.capacity + '</b> ]';
+		this.elMaxTasks.innerHTML = '( Run:<b>' + this.params.run_tasks + '</b> / Max:<b>' + this.params.max_tasks + '</b> )Tasks';
+	}
+	else if( cm_IsJedi())
+	{
+		this.elCapacity.innerHTML = 'Cap[ <b>' + this.params.capacity_used + '</b> / <b>' + this.params.capacity + '</b> ]';
+		this.elMaxTasks.innerHTML = '( <b>' + this.params.run_tasks + '</b> / <b>' + this.params.max_tasks + '</b> )Tasks';
+	}
+	else
+	{
+		this.elCapacity.innerHTML = '[<b>' + this.params.capacity_used + '</b>/<b>' + this.params.capacity + '</b>]';
+		this.elMaxTasks.innerHTML = '(<b>' + this.params.run_tasks + '</b>/<b>' + this.params.max_tasks + '</b>)';
+	}
 
 	if( this.state.RUN == true )
 	{
 		this.elStar.style.display = 'block';
 		this.elStarCount.textContent = this.params.tasks.length;
-		var max_tasks = '(' + this.params.tasks.length + '/' + this.params.max_tasks + ')';
 	}
 	else
-	{
 		this.elStar.style.display = 'none';
-		var max_tasks = '(0/' + this.params.max_tasks + ')';
-	}
-	this.elMaxTasks.textContent = max_tasks;	
 
 	this.clearTasks();
 	if( this.params.tasks != null )
@@ -414,6 +441,7 @@ RenderNode.prototype.refresh = function()
 	}
 	else
 		this.elIdleBox.style.display = 'none';
+
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{
 		stateTime = cm_TimeStringInterval( this.params.task_start_finish_time);
@@ -422,7 +450,7 @@ RenderNode.prototype.refresh = function()
 		else
 			stateTime += ' free';
 	}
-	this.elStateTime.textContent = stateTime;
+	this.elStateTime.innerHTML = stateTime;
 	this.elStateTime.title = stateTimeTitle;
 
 	for( var t = 0; t < this.tasks.length; t++)

@@ -36,10 +36,10 @@ JobNode.prototype.init = function()
 
 	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
-	this.elPPApproval = cm_ElCreateFloatText( this.element, 'right', 'Preview Pending Approval','PPA');
-	this.elMaintenance = cm_ElCreateFloatText( this.element, 'right', 'Maintenance','MNT');
-	this.elIgnoreNimby = cm_ElCreateFloatText( this.element, 'right', 'Ignore render "Nimby" state.','INB');
-	this.elIgnorePaused = cm_ElCreateFloatText( this.element, 'right', 'Ignore render "Paused" state.','IPS');
+	this.elPPApproval = cm_ElCreateFloatText( this.element, 'right', 'Preview Pending Approval','<b>PPA</b>');
+	this.elMaintenance = cm_ElCreateFloatText( this.element, 'right', 'Maintenance','<b>MNT</b>');
+	this.elIgnoreNimby = cm_ElCreateFloatText( this.element, 'right', 'Ignore render "Nimby" state.','<b>INB</b>');
+	this.elIgnorePaused = cm_ElCreateFloatText( this.element, 'right', 'Ignore render "Paused" state.','<b>IPS</b>');
 	this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 	this.elDependMask = cm_ElCreateFloatText( this.element, 'right', 'Depend Mask');
 	this.elDependMaskGlobal = cm_ElCreateFloatText( this.element, 'right', 'Global Depend Mask');
@@ -92,16 +92,16 @@ JobNode.prototype.update = function( i_obj)
 
 	cm_GetState( this.params.state, this.state, this.element);
 	if( this.params.state == null ) this.params.state = '';
-	this.elState.textContent = this.params.state;
+	this.elState.innerHTML = '<b>' + this.params.state + '</b>';
 
 	var displayFull = false;
 	if( this.state.ERR || this.state.RUN || this.state.SKP ||
 	  ((this.state.DON == false) && (this.params.time_started > 0 )))
 		displayFull = true;
 
-	this.elName.textContent = this.params.name;
+	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
 	this.elName.title = 'ID = '+this.params.id;
-	this.elUserName.textContent = this.params.user_name;
+	this.elUserName.innerHTML = '<b>' + this.params.user_name + '</b>';
 	if( false == g_VISOR())
 		this.elUserName.style.display = 'none';
 
@@ -130,131 +130,131 @@ JobNode.prototype.update = function( i_obj)
 
 	if( cm_IsPadawan())
 	{
-		this.elPriority.textContent = 'Priority:' + this.params.priority;
+		this.elPriority.innerHTML = 'Priority:<b>' + this.params.priority + '</b>';
 
 		if( this.params.time_life )
-			this.elLifeTime.textContent = 'LifeTime(' + cm_TimeStringFromSeconds( this.params.time_life) + ')';
+			this.elLifeTime.innerHTML = 'LifeTime(<b>' + cm_TimeStringFromSeconds( this.params.time_life) + '</b>)';
 		else this.elLifeTime.textContent = '';
 
 		if( this.params.depend_mask )
-			this.elDependMask.textContent = 'DepmendMask(' + this.params.depend_mask + ')';
+			this.elDependMask.innerHTML = 'DepmendMask(<b>' + this.params.depend_mask + '</b>)';
 		else this.elDependMask.textContent = '';
 
 		if( this.params.depend_mask_global )
-			this.elDependMaskGlobal.textContent = 'GlobalDepends(' + this.params.depend_mask_global + ')';
+			this.elDependMaskGlobal.innerHTML = 'GlobalDepends(<b>' + this.params.depend_mask_global + '</b>)';
 		else this.elDependMaskGlobal.textContent = '';
 
 		if( this.params.hosts_mask )
-			this.elHostsMask.textContent = 'HostsMask(' + this.params.hosts_mask + ')';
+			this.elHostsMask.innerHTML = 'HostsMask(<b>' + this.params.hosts_mask + '</b>)';
 		else this.elHostsMask.textContent = '';
 
 		if( this.params.hosts_mask_exclude )
-			this.elHostsMaskExclude.textContent = 'ExcludeHosts(' + this.params.hosts_mask_exclude + ')';
+			this.elHostsMaskExclude.innerHTML = 'ExcludeHosts(<b>' + this.params.hosts_mask_exclude + '</b>)';
 		else this.elHostsMaskExclude.textContent = '';
 
 		if( this.params.max_running_tasks != null )
-			this.elMaxRunTasks.textContent = 'MaxTasks:' + this.params.max_running_tasks;
+			this.elMaxRunTasks.innerHTML = 'MaxTasks:<b>' + this.params.max_running_tasks + '</b>';
 		else this.elMaxRunTasks.textContent = '';
 
 		if( this.params.max_running_tasks_per_host != null )
-			this.elMaxRunTasksPH.textContent = 'MaxPerHost:' + this.params.max_running_tasks_per_host;
+			this.elMaxRunTasksPH.innerHTML = 'MaxPerHost:<b>' + this.params.max_running_tasks_per_host + '</b>';
 		else this.elMaxRunTasksPH.textContent = '';
 
 		if( this.params.need_properties )
-			this.elNeedProperties.textContent = 'Properties(' + this.params.need_properties + ')';
+			this.elNeedProperties.innerHTML = 'Properties(<b>' + this.params.need_properties + ')</b>';
 		else this.elNeedProperties.textContent = '';
 
 		if( this.params.need_os)
-			this.elNeedOS.textContent = 'OS(' + this.params.need_os + ')';
+			this.elNeedOS.innerHTML = 'OS(<b>' + this.params.need_os + ')</b>';
 		else this.elNeedOS.textContent = '';
 	}
 	else if( cm_IsJedi())
 	{
-		this.elPriority.textContent = 'Pri:' + this.params.priority;
+		this.elPriority.innerHTML = 'Pri:<b>' + this.params.priority + '</b>';
 
 		if( this.params.time_life )
-			this.elLifeTime.textContent = 'Life(' + cm_TimeStringFromSeconds( this.params.time_life) + ')';
+			this.elLifeTime.innerHTML = 'Life(<b>' + cm_TimeStringFromSeconds( this.params.time_life) + '</b>)';
 		else this.elLifeTime.textContent = '';
 
 		if( this.params.depend_mask )
-			this.elDependMask.textContent = 'Dep(' + this.params.depend_mask + ')';
+			this.elDependMask.innerHTML = 'Dep(<b>' + this.params.depend_mask + '</b>)';
 		else this.elDependMask.textContent = '';
 
 		if( this.params.depend_mask_global )
-			this.elDependMaskGlobal.textContent = 'GDep(' + this.params.depend_mask_global + ')';
+			this.elDependMaskGlobal.innerHTML = 'GDep(<b>' + this.params.depend_mask_global + '</b>)';
 		else this.elDependMaskGlobal.textContent = '';
 
 		if( this.params.hosts_mask )
-			this.elHostsMask.textContent = 'Hosts(' + this.params.hosts_mask + ')';
+			this.elHostsMask.innerHTML = 'Hosts(<b>' + this.params.hosts_mask + '</b>)';
 		else this.elHostsMask.textContent = '';
 
 		if( this.params.hosts_mask_exclude )
-			this.elHostsMaskExclude.textContent = 'Exclude(' + this.params.hosts_mask_exclude + ')';
+			this.elHostsMaskExclude.innerHTML = 'Exclude(<b>' + this.params.hosts_mask_exclude + '</b>)';
 		else this.elHostsMaskExclude.textContent = '';
 
 		if( this.params.max_running_tasks != null )
-			this.elMaxRunTasks.textContent = 'Max:' + this.params.max_running_tasks;
+			this.elMaxRunTasks.innerHTML = 'Max:<b>' + this.params.max_running_tasks + '</b>';
 		else this.elMaxRunTasks.textContent = '';
 
 		if( this.params.max_running_tasks_per_host != null )
-			this.elMaxRunTasksPH.textContent = 'MPH:' + this.params.max_running_tasks_per_host;
+			this.elMaxRunTasksPH.innerHTML = 'MPH:<b>' + this.params.max_running_tasks_per_host + '</b>';
 		else this.elMaxRunTasksPH.textContent = '';
 
 		if( this.params.need_properties )
-			this.elNeedProperties.textContent = 'Props(' + this.params.need_properties + ')';
+			this.elNeedProperties.innerHTML = 'Props(<b>' + this.params.need_properties + '</b>)';
 		else this.elNeedProperties.textContent = '';
 
 		if( this.params.need_os)
-			this.elNeedOS.textContent = 'OS(' + this.params.need_os + ')';
+			this.elNeedOS.innerHTML = 'OS(<b>' + this.params.need_os + '</b>)';
 		else this.elNeedOS.textContent = '';
 	}
 	else
 	{
-		this.elPriority.textContent = 'p' + this.params.priority;
+		this.elPriority.innerHTML = 'p<b>' + this.params.priority + '</b>';
 
 		if( this.params.time_life )
-			this.elLifeTime.textContent = 'l(' + cm_TimeStringFromSeconds( this.params.time_life) + ')';
+			this.elLifeTime.innerHTML = 'l(<b>' + cm_TimeStringFromSeconds( this.params.time_life) + '</b>)';
 		else this.elLifeTime.textContent = '';
 
 		if( this.params.depend_mask )
-			this.elDependMask.textContent = 'd(' + this.params.depend_mask + ')';
+			this.elDependMask.innerHTML = 'd(<b>' + this.params.depend_mask + '</b>)';
 		else this.elDependMask.textContent = '';
 
 		if( this.params.depend_mask_global )
-			this.elDependMaskGlobal.textContent = 'g(' + this.params.depend_mask_global + ')';
+			this.elDependMaskGlobal.innerHTML = 'g(<b>' + this.params.depend_mask_global + '</b>)';
 		else this.elDependMaskGlobal.textContent = '';
 
 		if( this.params.hosts_mask )
-			this.elHostsMask.textContent = 'h(' + this.params.hosts_mask + ')';
+			this.elHostsMask.innerHTML = 'h(<b>' + this.params.hosts_mask + '</b>)';
 		else this.elHostsMask.textContent = '';
 
 		if( this.params.hosts_mask_exclude )
-			this.elHostsMaskExclude.textContent = 'e(' + this.params.hosts_mask_exclude + ')';
+			this.elHostsMaskExclude.innerHTML = 'e(<b>' + this.params.hosts_mask_exclude + '</b>)';
 		else this.elHostsMaskExclude.textContent = '';
 
 		if( this.params.max_running_tasks != null )
-			this.elMaxRunTasks.textContent = 'm' + this.params.max_running_tasks;
+			this.elMaxRunTasks.innerHTML = 'm<b>' + this.params.max_running_tasks + '</b>';
 		else this.elMaxRunTasks.textContent = '';
 
 		if( this.params.max_running_tasks_per_host != null )
-			this.elMaxRunTasksPH.textContent = 'mph' + this.params.max_running_tasks_per_host;
+			this.elMaxRunTasksPH.innerHTML = 'mph<b>' + this.params.max_running_tasks_per_host + '</b>';
 		else this.elMaxRunTasksPH.textContent = '';
 
 		if( this.params.need_properties )
-			this.elNeedProperties.textContent = this.params.need_properties;
+			this.elNeedProperties.innerHTML = '<b>' + this.params.need_properties + '</b>';
 		else this.elNeedProperties.textContent = '';
 
 		if( this.params.need_os)
-			this.elNeedOS.textContent = this.params.need_os;
+			this.elNeedOS.innerHTML = '<b>' + this.params.need_os + '</b>';
 		else this.elNeedOS.textContent = '';
 	}
 
 	if( this.params.report )
-		this.elReport.textContent = this.params.report;
+		this.elReport.innerHTML = '<b>' + this.params.report + '</b>';
 	else this.elReport.textContent = '';
 
 	if( this.params.annotation )
-		this.elAnnotation.textContent = this.params.annotation;
+		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</i></b>';
 	else this.elAnnotation.textContent = '';
 
 	this.running_tasks = 0;
@@ -290,7 +290,7 @@ JobNode.prototype.refresh = function()
 
 	if( this.params.time_wait && this.state.WTM )
 	{
-		time_txt = cm_TimeStringInterval( new Date().getTime()/1000, this.params.time_wait);
+		time_txt = '<b>' + cm_TimeStringInterval( new Date().getTime()/1000, this.params.time_wait) + '</b>';
 		if( cm_IsPadawan())
 			time_txt = 'Waiting:' + time_txt;
 		else if( cm_IsJedi())
@@ -301,17 +301,18 @@ JobNode.prototype.refresh = function()
 	{
 		if( this.state.DON == true )
 		{
-			time_txt = cm_TimeStringInterval( this.params.time_started, this.params.time_done );
+			time_txt =  cm_TimeStringInterval( this.params.time_started, this.params.time_done );
+			time_tip = 'Done at: ' + cm_DateTimeStrFromSec( this.params.time_done);
+			time_tip += '\nRunning time: ' + time_txt;
+			time_txt = '<b>' + time_txt + '</b>';
 			if( cm_IsPadawan())
 				time_txt = 'RunningTime:' + time_txt;
 			else if( cm_IsJedi())
 				time_txt = 'RunTime:' + time_txt;
-			time_tip = 'Done at: ' + cm_DateTimeStrFromSec( this.params.time_done);
-			time_tip += '\nRunning time: ' + time_txt;
 		}
 		else
 		{
-			time_txt = cm_TimeStringInterval( this.params.time_started);
+			time_txt = '<b>' + cm_TimeStringInterval( this.params.time_started) + '</b>';
 			if( cm_IsPadawan())
 				time_txt = 'RunningTime:' + time_txt;
 			else if( cm_IsJedi())
@@ -336,7 +337,7 @@ JobNode.prototype.refresh = function()
 					if( eta > 0 )
 					{
 						eta = cm_TimeStringInterval( 0, eta);
-						eta = 'ETA≈' + eta;
+						eta = 'ETA≈<b>' + eta + '</b>';
 					}
 				}
 			}
@@ -346,9 +347,9 @@ JobNode.prototype.refresh = function()
 
 	time_tip = 'Created at: ' + cm_DateTimeStrFromSec( this.params.time_creation) + '\n' + time_tip;
 
-	this.elTime.textContent = time_txt;
+	this.elTime.innerHTML = time_txt;
 	this.elTime.title = time_tip;
-	this.elETA.textContent = eta;
+	this.elETA.innerHTML = eta;
 }
 
 JobNode.prototype.onDoubleClick = function( i_evt)
@@ -700,6 +701,7 @@ JobBlock.prototype.constructFull = function()
 	this.elTasksRun = cm_ElCreateText( this.elFull, 'Running Tasks Counter');
 	this.elTasksSkp = cm_ElCreateText( this.elFull, 'Skipped Tasks Counter');
 	this.elTasksWrn = cm_ElCreateText( this.elFull, 'Warning Tasks Counter');
+	this.elTasksWrc = cm_ElCreateText( this.elFull, 'Waiting Reconnect Tasks Counter');
 	this.elTasksErr = cm_ElCreateText( this.elFull, 'Error Tasks Counter');
 
 //	this.elTasksDon.classList.add('font-done');
@@ -736,40 +738,76 @@ JobBlock.prototype.update = function( i_displayFull)
 
 	if( this.params.name )
 	{
-		this.elName.textContent = this.params.name;
+		this.elName.innerHTML = '<b>' + this.params.name + '</b>';
 
-		var tasks = 't' + this.tasks_num;
-		var tasks_title = 'Block tasks:'
+		// Tasks tooltip:
+		var tasks_title = 'Block is not numeric.';
 		if( cm_CheckBlockFlag( this.params.flags, 'numeric' ))
 		{
-			tasks_title += ' Numeric:';
-			tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
-			tasks_title += '\nFrame First: ' + this.params.frame_first;
-			tasks_title += '\nFrame Last: ' + this.params.frame_last;
+			tasks_title = 'Frame Range:'
+			tasks_title += '\nFirst: ' + this.params.frame_first;
+			tasks_title += '\nLast: ' + this.params.frame_last;
 			if( this.params.frames_inc > 1 )
-			{
-				tasks += '/' + this.params.frames_inc;
 				tasks_title += '\nIncrement: ' + this.params.frames_inc;
-			}
 			if( this.params.frames_per_task > 1 )
-			{
-				tasks += ':' + this.params.frames_per_task;
-				tasks_title += '\nFrames Per Task: ' + this.params.frames_per_task;
-			}
+				tasks_title += '\nPer Task: ' + this.params.frames_per_task;
 			if(( this.params.sequential != null ) && ( this.params.sequential != 1 ))
-			{
-				tasks += '%' + this.params.sequential;
 				tasks_title += '\nSequential: ' + this.params.sequential;
+		}
+		this.elTasks.title = tasks_title;
+
+		// Tasks brief text:
+		var tasks = '';
+		if( cm_IsPadawan())
+		{
+			tasks = 'Tasks[<b>' + this.tasks_num + '</b>]';
+			if( cm_CheckBlockFlag( this.params.flags,'numeric'))
+			{
+				tasks = 'Frames[<b>' + this.tasks_num + '</b>]';
+				tasks += '( <b>' + this.params.frame_first + '</b> - <b>' + this.params.frame_last + '</b>';
+				if( this.params.frames_inc > 1 )
+					tasks += ' / Increment:<b>' + this.params.frames_inc + '</b>';
+				if( this.params.frames_per_task > 1 )
+					tasks += ' : PerTask:<b>' + this.params.frames_per_task + '</b>';
+				if(( this.params.sequential != null ) && ( this.params.sequential != 1 ))
+					tasks += ' % Sequential:<b>' + this.params.sequential + '</b>';
+				tasks += ' )';
 			}
-			tasks += ')';
+		}
+		else if( cm_IsJedi())
+		{
+			tasks = 'Tasks[<b>' + this.tasks_num + '</b>]';
+			if( cm_CheckBlockFlag( this.params.flags,'numeric'))
+			{
+				tasks = 'Frames[<b>' + this.tasks_num + '</b>]';
+				tasks += '( <b>' + this.params.frame_first + '</b> - <b>' + this.params.frame_last + '</b>';
+				if( this.params.frames_inc > 1 )
+					tasks += ' / Inc:<b>' + this.params.frames_inc + '</b>';
+				if( this.params.frames_per_task > 1 )
+					tasks += ' : FPT:<b>' + this.params.frames_per_task + '</b>';
+				if(( this.params.sequential != null ) && ( this.params.sequential != 1 ))
+					tasks += ' % Seq:<b>' + this.params.sequential + '</b>';
+				tasks += ' )';
+			}
 		}
 		else
 		{
-			tasks_title += ' Not numeric.';
+			tasks = 't<b>' + this.tasks_num + '</b>';
+			if( cm_CheckBlockFlag( this.params.flags,'numeric'))
+			{
+				tasks = 'f<b>' + this.tasks_num + '</b>';
+				tasks += '(<b>' + this.params.frame_first + '</b>-<b>' + this.params.frame_last + '</b>';
+				if( this.params.frames_inc > 1 )
+					tasks += '/<b>' + this.params.frames_inc + '</b>';
+				if( this.params.frames_per_task > 1 )
+					tasks += ':<b>' + this.params.frames_per_task + '</b>';
+				if(( this.params.sequential != null ) && ( this.params.sequential != 1 ))
+					tasks += '%<b>' + this.params.sequential + '</b>';
+				tasks += ')';
+			}
 		}
-		tasks += ':';
-		this.elTasks.textContent = tasks;
-		this.elTasks.title = tasks_title;
+
+		this.elTasks.innerHTML = tasks + ':';
 
 		if( this.service != this.params.service )
 		{
@@ -778,109 +816,267 @@ JobBlock.prototype.update = function( i_displayFull)
 		}
 		this.elIcon.title = this.service;
 
-		var deps = '';
-		var deps_title = ''
+		// Depends title:
+		var deps_title = '';
 		if( this.params.depend_mask )
 		{
-			deps += ' [' + this.params.depend_mask + ']';
 			if( deps_title.length ) deps_title += '\n';
 			deps_title += 'Depend mask = \"' + this.params.depend_mask + '\".'
 		}
 		if( this.params.tasks_depend_mask )
 		{
-			deps += ' T[' + this.params.tasks_depend_mask + ']';
 			if( deps_title.length ) deps_title += '\n';
 			deps_title += 'Tasks depend mask = \"' + this.params.tasks_depend_mask + '\".'
 		}
 		if( this.params.depend_sub_task )
 		{
-			deps += ' [SUB]';
 			if( deps_title.length ) deps_title += '\n';
 			deps_title += 'Subtasks depend.'
 		}
-		this.elDepends.textContent = deps;
 		this.elDepends.title = deps_title;
 
-		this.elCapacity.textContent = '[' + this.params.capacity + ']';
+		// Depends brief info:
+		var deps = '';
+		if( cm_IsPadawan())
+		{
+			if( this.params.depend_mask )
+				deps += ' Depends(<b>' + this.params.depend_mask + '</b>)';
+			if( this.params.tasks_depend_mask )
+				deps += ' TasksDepepends[<b>' + this.params.tasks_depend_mask + '</b>]';
+			if( this.params.depend_sub_task )
+				deps += ' [<b>Sub-Task Dependence</b>]';
+		}
+		else if( cm_IsJedi())
+		{
+			if( this.params.depend_mask )
+				deps += ' Dep(<b>' + this.params.depend_mask + '</b>)';
+			if( this.params.tasks_depend_mask )
+				deps += ' TDep[<b>' + this.params.tasks_depend_mask + '</b>]';
+			if( this.params.depend_sub_task )
+				deps += ' [<b>Sub-Task</b>]';
+		}
+		else
+		{
+			if( this.params.depend_mask )
+				deps += ' d(<b>' + this.params.depend_mask + '</b>)';
+			if( this.params.tasks_depend_mask )
+				deps += ' t[<b>' + this.params.tasks_depend_mask + '</b>]';
+			if( this.params.depend_sub_task )
+				deps += ' [<b>sub</b>]';
+		}
+		this.elDepends.innerHTML = deps;
 
-		var errTxt = '';
-		var errTit = '';
+		//
+		// Errros solving:
 		var eah = -1, eth = -1, ert = -1;
 		if( this.params.errors_avoid_host ) eah = this.params.errors_avoid_host;
 		if( this.params.errors_task_same_host) eth = this.params.errors_task_same_host;
 		if( this.params.errors_retries) ert = this.params.errors_retries;
+		// Tooltip:
+		var errTit = '';
 		if(( eah != -1 ) || ( eth != -1 ) || ( ert != -1 ))
 		{
-			errTxt = 'Err:';
 			errTit = 'Errors Solving:';
 
-			errTxt += eah + 'J';
 			errTit += '\nAvoid Job Block: ' + eah;
-			if( eah == 0 ) errTit = ' (unlimited)';
-			else if( eah == -1 ) errTit = ' (user settings used)';
+			if( eah == 0 ) errTit += ' (unlimited)';
+			else if( eah == -1 ) errTit += ' (user settings used)';
 
-			errTxt += ',' + eth + 'T';
 			errTit += '\nAvoid Task Same Host: ' + eth;
-			if( eth == 0 ) errTit = ' (unlimited)';
-			else if( eth == -1 ) errTit = ' (user settings used)';
+			if( eth == 0 ) errTit += ' (unlimited)';
+			else if( eth == -1 ) errTit += ' (user settings used)';
 
-			errTxt += ',' + ert + 'R';
 			errTit += '\nTask Errors Retries: ' + ert;
-			if( ert == 0 ) errTit = ' (unlimited)';
-			else if( ert == -1 ) errTit = ' (user settings used)';
+			if( ert == 0 ) errTit += ' (unlimited)';
+			else if( ert == -1 ) errTit += ' (user settings used)';
 		}
-		this.elErrSolving.textContent = errTxt;
 		this.elErrSolving.title = errTit;
 
-		if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
-			this.elForgiveTime.textContent = 'F'+cm_TimeStringFromSeconds( this.params.errors_forgive_time);
-		else this.elForgiveTime.textContent = '';
+		var runtime_sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
+		var runtime_avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / this.params.p_tasks_done));
 
-		if( this.params.tasks_max_run_time != null )
-			this.elMaxRunTime.textContent = 'MRT'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time);
-		else this.elMaxRunTime.textContent = '';
-
-		if( this.params.max_running_tasks != null )
-			this.elMaxRunTasks.textContent = 'Max'+this.params.max_running_tasks;
-		else this.elMaxRunTasks.textContent = '';
-
-		if( this.params.max_running_tasks_per_host != null )
-			this.elMaxRunTasksPH.textContent = 'MPH'+this.params.max_running_tasks_per_host;
-		else this.elMaxRunTasksPH.textContent = '';
-
-		if( this.params.hosts_mask)
-			this.elHostsMask.textContent = 'H('+this.params.hosts_mask+')';
-		else this.elHostsMask.textContent = '';
-
-		if( this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.textContent = 'E('+this.params.hosts_mask_exclude+')';
-		else this.elHostsMaskExclude.textContent = '';
-
-		if( this.params.need_memory)
-			this.elNeedMem.textContent = 'RAM'+this.params.need_memory;
-		else this.elNeedMem.textContent = '';
-
-		if( this.params.need_hdd)
-			this.elNeedHDD.textContent = 'HDD'+this.params.need_hdd;
-		else this.elNeedHDD.textContent = '';
-
-		if( this.params.need_power)
-			this.elNeedPower.textContent = 'Pow'+this.params.need_power;
-		else this.elNeedPower.textContent = '';
-
-		if( this.params.need_properties)
-			this.elNeedProperties.textContent = this.params.need_properties;
-		else this.elNeedProperties.textContent = '';
-
-		if( this.params.p_tasks_run_time && this.params.p_tasks_done )
+		if( cm_IsPadawan())
 		{
-			var sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
-			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / this.params.p_tasks_done));
-			this.elRunTime.textContent = 'RT: S' + sum +'/A'+avg;
-			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
+			this.elCapacity.innerHTML = 'Capacity[<b>' + this.params.capacity + '</b>]';
+
+			var errTxt = '';
+			if( eah != -1 )
+				errTxt += ' Avoid:<b>' + eah;
+			if( eth != -1 )
+				errTxt += ' Task:<b>' + eth;
+			if( ert != -1 )
+				errTxt += ' Retries:<b>' + ert;
+			if( errTxt.length )
+				errTxt = 'ErrorsSolving(' + errTxt + ')';
+			this.elErrSolving.innerHTML = errTxt;
+
+			if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
+				this.elForgiveTime.innerHTML = 'ErrorsForgiveTime:<b>'+cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
+			else this.elForgiveTime.textContent = '';
+
+			if( this.params.tasks_max_run_time != null )
+				this.elMaxRunTime.innerHTML = 'TaskMaxRunTime:<b>'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time) + '</b>';
+			else this.elMaxRunTime.textContent = '';
+
+			if( this.params.max_running_tasks != null )
+				this.elMaxRunTasks.innerHTML = 'MaxRunTasks:<b>'+this.params.max_running_tasks + '</b>';
+			else this.elMaxRunTasks.textContent = '';
+
+			if( this.params.max_running_tasks_per_host != null )
+				this.elMaxRunTasksPH.innerHTML = 'MaxPerHost:<b>'+this.params.max_running_tasks_per_host + '</b>';
+			else this.elMaxRunTasksPH.textContent = '';
+
+			if( this.params.hosts_mask)
+				this.elHostsMask.innerHTML = 'HostsMask(<b>'+this.params.hosts_mask+'</b>)';
+			else this.elHostsMask.textContent = '';
+
+			if( this.params.hosts_mask_exclude)
+				this.elHostsMaskExclude.innerHTML = 'ExcludeHosts(<b>'+this.params.hosts_mask_exclude+'</b>)';
+			else this.elHostsMaskExclude.textContent = '';
+
+			if( this.params.need_memory)
+				this.elNeedMem.innerHTML = 'Memory><b>'+this.params.need_memory + '</b>';
+			else this.elNeedMem.textContent = '';
+
+			if( this.params.need_hdd)
+				this.elNeedHDD.innerHTML = 'HDDSpace><b>'+this.params.need_hdd + '</b>';
+			else this.elNeedHDD.textContent = '';
+
+			if( this.params.need_power)
+				this.elNeedPower.innerHTML = 'Power><b>'+this.params.need_power + '</b>';
+			else this.elNeedPower.textContent = '';
+
+			if( this.params.need_properties)
+				this.elNeedProperties.innerHTML = 'Properties(<b>' + this.params.need_properties + '</b>)';
+			else this.elNeedProperties.textContent = '';
+
+			if( this.params.p_tasks_run_time && this.params.p_tasks_done )
+				this.elRunTime.innerHTML = 'Render Timings: Sum:<b>' + runtime_sum + '</b> / Average:<b>'+runtime_avg + '</b>';
+		}
+		else if( cm_IsJedi())
+		{
+			this.elCapacity.innerHTML = 'Cap[<b>' + this.params.capacity + '</b>]';
+
+			var errTxt = '';
+			if( eah != -1 )
+				errTxt += ' Block:<b>' + eah + '</b>';
+			if( eth != -1 )
+				errTxt += ' Task:<b>' + eth + '</b>';
+			if( ert != -1 )
+				errTxt += ' Retries:<b>' + ert + '</b>';
+			if( errTxt.length )
+				errTxt = 'ErrSlv(' + errTxt + ')';
+			this.elErrSolving.textContent = errTxt;
+
+			if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
+				this.elForgiveTime.innerHTML = 'ErrForgive:<b>'+cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
+			else this.elForgiveTime.textContent = '';
+
+			if( this.params.tasks_max_run_time != null )
+				this.elMaxRunTime.innerHTML = 'MaxRun:<b>'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time) + '</b>';
+			else this.elMaxRunTime.textContent = '';
+
+			if( this.params.max_running_tasks != null )
+				this.elMaxRunTasks.innerHTML = 'MaxTasks:<b>'+this.params.max_running_tasks + '</b>';
+			else this.elMaxRunTasks.textContent = '';
+
+			if( this.params.max_running_tasks_per_host != null )
+				this.elMaxRunTasksPH.innerHTML = 'PerHost:<b>'+this.params.max_running_tasks_per_host + '</b>';
+			else this.elMaxRunTasksPH.textContent = '';
+
+			if( this.params.hosts_mask)
+				this.elHostsMask.innerHTML = 'Hosts(<b>'+this.params.hosts_mask+'</b>)';
+			else this.elHostsMask.textContent = '';
+
+			if( this.params.hosts_mask_exclude)
+				this.elHostsMaskExclude.innerHTML = 'Exclude(<b>'+this.params.hosts_mask_exclude+'</b>)';
+			else this.elHostsMaskExclude.textContent = '';
+
+			if( this.params.need_memory)
+				this.elNeedMem.innerHTML = 'Mem><b>'+this.params.need_memory + '</b>';
+			else this.elNeedMem.textContent = '';
+
+			if( this.params.need_hdd)
+				this.elNeedHDD.innerHTML = 'HDD><b>'+this.params.need_hdd + '</b>';
+			else this.elNeedHDD.textContent = '';
+
+			if( this.params.need_power)
+				this.elNeedPower.innerHTML = 'Pow><b>'+this.params.need_power + '</b>';
+			else this.elNeedPower.textContent = '';
+
+			if( this.params.need_properties)
+				this.elNeedProperties.innerHTML = 'Props(<b>' + this.params.need_properties + '</b>)';
+			else this.elNeedProperties.textContent = '';
+
+			if( this.params.p_tasks_run_time && this.params.p_tasks_done )
+				this.elRunTime.innerHTML = 'Timings: Sum:<b>' + runtime_sum + '</b> / Avg:<b>'+runtime_avg + '</b>';
 		}
 		else
 		{
+			this.elCapacity.innerHTML = '[<b>' + this.params.capacity + '</b>]';
+			
+			var errTxt = '';
+			if(( eah != -1 ) || ( eth != -1 ) || ( ert != -1 ))
+			{
+				errTxt = 'e:';
+				errTxt += 'b<b>' + eah;
+				errTxt += ',t<b>' + eth;
+				errTxt += ',r<b>' + ert;
+			}
+			this.elErrSolving.innerHTML = errTxt;
+
+			if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
+				this.elForgiveTime.innerHTML = 'f<b>'+cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
+			else this.elForgiveTime.textContent = '';
+
+			if( this.params.tasks_max_run_time != null )
+				this.elMaxRunTime.innerHTML = 'mrt<b>'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time) + '</b>';
+			else this.elMaxRunTime.textContent = '';
+
+			if( this.params.max_running_tasks != null )
+				this.elMaxRunTasks.innerHTML = 'm<b>'+this.params.max_running_tasks + '</b>';
+			else this.elMaxRunTasks.textContent = '';
+
+			if( this.params.max_running_tasks_per_host != null )
+				this.elMaxRunTasksPH.innerHTML = 'mph<b>'+this.params.max_running_tasks_per_host + '</b>';
+			else this.elMaxRunTasksPH.textContent = '';
+
+			if( this.params.hosts_mask)
+				this.elHostsMask.innerHTML = 'h(<b>'+this.params.hosts_mask+'</b>)';
+			else this.elHostsMask.textContent = '';
+
+			if( this.params.hosts_mask_exclude)
+				this.elHostsMaskExclude.innerHTML = 'e(<b>'+this.params.hosts_mask_exclude+'</b>)';
+			else this.elHostsMaskExclude.textContent = '';
+
+			if( this.params.need_memory)
+				this.elNeedMem.innerHTML = 'm><b>'+this.params.need_memory + '</b>';
+			else this.elNeedMem.textContent = '';
+
+			if( this.params.need_hdd)
+				this.elNeedHDD.innerHTML = 'h><b>'+this.params.need_hdd + '</b>';
+			else this.elNeedHDD.textContent = '';
+
+			if( this.params.need_power)
+				this.elNeedPower.innerHTML = 'p><b>'+this.params.need_power + '</b>';
+			else this.elNeedPower.textContent = '';
+
+			if( this.params.need_properties)
+				this.elNeedProperties.innerHTML = '<b>' + this.params.need_properties + '</b>';
+			else this.elNeedProperties.textContent = '';
+
+			if( this.params.p_tasks_run_time && this.params.p_tasks_done )
+				this.elRunTime.innerHTML = 'rt:s<b>' + runtime_sum + '</b>/a<b>'+runtime_avg + '</b>';
+		}
+
+		if( this.params.p_tasks_run_time && this.params.p_tasks_done )
+		{
+			this.elRunTime.style.display = 'inline';
+			this.elRunTime.title = 'Running Time:\nTotal Sum: '+runtime_sum+'\nAverage per task: '+runtime_avg;
+		}
+		else
+		{
+			this.elRunTime.style.display = 'none';
 			this.elRunTime.textContent = '';
 			this.elRunTime.title = '';
 		}
@@ -890,67 +1086,137 @@ JobBlock.prototype.update = function( i_displayFull)
 	{
 		var percentage = 0;
 		if( this.params.p_percentage ) percentage = this.params.p_percentage;
-		this.elPercentage.textContent = percentage + '%';
+		this.elPercentage.innerHTML = '<b>' + percentage + '%</b>';
 
+		// This 4 parameters we need even if they are null in params
+		// ( default values are not wrote to json )
 		var tasks_done = 0;
-		if( this.params.p_tasks_done ) tasks_done = this.params.p_tasks_done;
-		this.elTasksDon.textContent = 'don:'+tasks_done;
-
 		var tasks_rdy = 0;
-		if( this.params.p_tasks_ready ) tasks_rdy = this.params.p_tasks_ready;
-		this.elTasksRdy.textContent = 'rdy:'+tasks_rdy;
-
 		var tasks_run = 0;
-		if( this.params.running_tasks_counter )
-		{
-			tasks_run = this.params.running_tasks_counter;
-			this.elTasksRun.textContent = 'run:'+tasks_run;
-		}
-		else this.elTasksRun.textContent = '';
-
 		var tasks_err = 0;
-		if( this.params.p_tasks_error )
+		if( this.params.p_tasks_done ) tasks_done = this.params.p_tasks_done;
+		if( this.params.p_tasks_ready ) tasks_rdy = this.params.p_tasks_ready;
+		if( this.params.running_tasks_counter ) tasks_run = this.params.running_tasks_counter;
+		if( this.params.p_tasks_error ) tasks_err = this.params.p_tasks_error;
+
+		if( cm_IsPadawan())
 		{
-			tasks_err = this.params.p_tasks_error;
-			this.elTasksErr.textContent = 'err:'+tasks_err;
-			this.elTasksErr.style.display = 'inline';
+			this.elTasksDon.innerHTML = 'Done:<b>'+tasks_done + '</b>';
+			this.elTasksRdy.innerHTML = 'Ready:<b>'+tasks_rdy + '</b>';
+
+			if( tasks_run)
+				this.elTasksRun.innerHTML = 'Running:<b>'+tasks_run + '</b>';
+			else this.elTasksRun.textContent = '';
+
+			if( tasks_err )
+				this.elTasksErr.innerHTML = 'Errors:<b>'+tasks_err + '</b>';
+
+			if( this.params.p_tasks_skipped )
+				this.elTasksSkp.innerHTML = 'Skipped:<b>'+this.params.p_tasks_skipped + '</b>';
+			else this.elTasksSkp.textContent = '';
+
+			if( this.params.p_tasks_warning )
+				this.elTasksWrn.innerHTML = 'Warnings:<b>'+this.params.p_tasks_warning + '</b>';
+			else this.elTasksWrn.textContent = '';
+
+			if( this.params.p_tasks_waitrec )
+				this.elTasksWrc.innerHTML = 'WaintingReconnect:<b>'+this.params.p_tasks_waitrec + '</b>';
+			else this.elTasksWrc.textContent = '';
+
+			var he_txt = '';
+			if( this.params.p_error_hosts )
+			{
+				he_txt = 'ErrorHosts: <b>' + this.params.p_error_hosts + '</b>';
+				if( this.params.p_avoid_hosts )
+					he_txt += ' / <b>' + this.params.p_avoid_hosts + '</b> Avoiding';
+			}
+			this.elErrHosts.innerHTML = he_txt;
+		}
+		else if( cm_IsJedi())
+		{
+			this.elTasksDon.innerHTML = 'Don:<b>'+tasks_done + '</b>';
+			this.elTasksRdy.innerHTML = 'Rdy:<b>'+tasks_rdy + '</b>';
+
+			if( tasks_run)
+				this.elTasksRun.innerHTML = 'Run:<b>'+tasks_run + '</b>';
+			else this.elTasksRun.textContent = '';
+
+			if( tasks_err )
+				this.elTasksErr.innerHTML = 'Err:<b>'+tasks_err + '</b>';
+
+			if( this.params.p_tasks_skipped )
+				this.elTasksSkp.innerHTML = 'Skp:<b>'+this.params.p_tasks_skipped + '</b>';
+			else this.elTasksSkp.textContent = '';
+
+			if( this.params.p_tasks_warning )
+				this.elTasksWrn.innerHTML = 'Wrn:<b>'+this.params.p_tasks_warning + '</b>';
+			else this.elTasksWrn.textContent = '';
+
+			if( this.params.p_tasks_waitrec )
+				this.elTasksWrc.innerHTML = 'WRC:<b>'+this.params.p_tasks_waitrec + '</b>';
+			else this.elTasksWrc.textContent = '';
+
+			var he_txt = '';
+			if( this.params.p_error_hosts )
+			{
+				he_txt = 'ErrHosts: <b>' + this.params.p_error_hosts + '</b>';
+				if( this.params.p_avoid_hosts )
+					he_txt += ' / <b>' + this.params.p_avoid_hosts + '</b> Avoid';
+			}
+			this.elErrHosts.innerHTML = he_txt;
 		}
 		else
 		{
-			this.elTasksErr.textContent = '';
+			this.elTasksDon.innerHTML = 'd<b>'+tasks_done + '</b>';
+			this.elTasksRdy.innerHTML = 'r<b>'+tasks_rdy + '</b>';
+
+			if( tasks_run)
+				this.elTasksRun.innerHTML = 'run<b>'+tasks_run + '</b>';
+			else this.elTasksRun.textContent = '';
+
+			if( tasks_err )
+				this.elTasksErr.innerHTML = 'e<b>'+tasks_err + '</b>';
+
+			if( this.params.p_tasks_skipped )
+				this.elTasksSkp.innerHTML = 's<b>'+this.params.p_tasks_skipped + '</b>';
+			else this.elTasksSkp.textContent = '';
+
+			if( this.params.p_tasks_warning )
+				this.elTasksWrn.innerHTML = 'w<b>'+this.params.p_tasks_warning + '</b>';
+			else this.elTasksWrn.textContent = '';
+
+			if( this.params.p_tasks_waitrec )
+				this.elTasksWrc.innerHTML = 'wrc<b>'+this.params.p_tasks_waitrec + '</b>';
+			else this.elTasksWrc.textContent = '';
+
+			var he_txt = '';
+			if( this.params.p_error_hosts )
+			{
+				he_txt = 'rh:<b>' + this.params.p_error_hosts + '</b>';
+				if( this.params.p_avoid_hosts )
+					he_txt += '/<b>' + this.params.p_avoid_hosts + '</b>a';
+			}
+			this.elErrHosts.innerHTML = he_txt;
+		}
+
+		// Show/Hire error hosts counter as it has a special style.
+		// And set an empty string (like on other counters) is not anough.
+		if( tasks_err )
+			this.elTasksErr.style.display = 'inline';
+		else
 			this.elTasksErr.style.display = 'none';
-		}
 
-		var tasks_skp = 0;
-		if( this.params.p_tasks_skipped )
-		{
-			tasks_skp = this.params.p_tasks_skipped;
-			this.elTasksSkp.textContent = 'skp:'+tasks_skp;
-		}
-		else this.elTasksSkp.textContent = '';
-
-		var tasks_wrn = 0;
-		if( this.params.p_tasks_warning )
-		{
-			tasks_wrn = this.params.p_tasks_warning;
-			this.elTasksWrn.textContent = 'wrn:'+tasks_wrn;
-		}
-		else this.elTasksWrn.textContent = '';
-
-		var he_txt = '', he_tit = '';
+		var he_tit = '';
 		this.elErrHosts.classList.remove('ERR');
 		if( this.params.p_error_hosts )
 		{
-			he_txt = 'Eh' + this.params.p_error_hosts;
 			he_tit = 'Error Hosts: ' + this.params.p_error_hosts;
 			if( this.params.p_avoid_hosts )
 			{
-				he_txt += ': ' + this.params.p_avoid_hosts + ' Avoid';
 				he_tit += '\nAvoiding Hosts: ' + this.params.p_avoid_hosts;
 				this.elErrHosts.classList.add('ERR');
 			}
 		}
-		this.elErrHosts.textContent = he_txt;
 		this.elErrHosts.title = he_tit;
 
 		this.elBarPercentage.style.width = percentage + '%';

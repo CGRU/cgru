@@ -43,10 +43,10 @@ left: 0; right: 0; bottom: 0; top: 200px;
 #headermain .mbutton {
 font: 16px Arial;
 font-weight: bold;
-position: relative;
-border: 1px solid #575757;
-border-radius: 6px;
-margin: 0px 10px;
+float: left;
+border: 2px solid #575757;
+border-radius: 2px 2px 16px 16px;
+margin: -8px 10px;
 padding: 6px 8px 3px 8px;
 cursor: pointer;
 text-transform: uppercase;
@@ -207,7 +207,6 @@ height: 28px;
 .monitor .ctrl { top: 0; border-bottom: 2px solid #575757;}
 .monitor .info { bottom: 0; border-top: 2px solid #575757;}
 .monitor .list {
-font-weight: bold;
 position: absolute;
 left: 0; right: 0;
 overflow: auto;
@@ -465,6 +464,7 @@ opacity: .3;
 
 /*.item.render .task {*/
 .rendertask {
+font-weight: bold;
 background: #DD5;
 margin: 1px;
 /*border: 1px solid #666;*/

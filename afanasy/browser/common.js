@@ -219,7 +219,7 @@ function cm_TimeStringFromSeconds( i_seconds, i_full)
 	}
 	else if( seconds )
 	{
-		str += seconds + 's ';
+		str += seconds + 's';
 	}
 
 	return str;
@@ -272,7 +272,7 @@ function cm_ElCreateFloatText( i_elParent, i_side, i_title, i_text)
 		element.style.marginRight = '4px';
 
 	if( i_text )
-		element.textContent = i_text;
+		element.innerHTML = i_text;
 
 	return element;
 }
