@@ -315,6 +315,10 @@ background: #DFD;
 color: #000;
 }
 
+.lowercase {
+text-transform: lowercase;
+}
+
 .render .resources {
 background: #EEEE99;
 position: absolute;

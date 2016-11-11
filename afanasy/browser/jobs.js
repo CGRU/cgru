@@ -25,7 +25,7 @@ JobNode.prototype.init = function()
 	this.elName.classList.add('prestar');
 
 	this.elUserName = cm_ElCreateFloatText( this.element,'right','User Name');
-	this.elETA = cm_ElCreateFloatText( this.element,'right','ETA:');
+	this.elETA = cm_ElCreateFloatText( this.element,'right','Estimated Time Of Arrival (Done)');
 
 	this.element.appendChild( document.createElement('br'));
 
@@ -49,6 +49,15 @@ JobNode.prototype.init = function()
 	this.elMaxRunTasksPH = cm_ElCreateFloatText( this.element, 'right', 'Maximum Running Tasks Per Host');
 	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Properties');
 	this.elNeedOS = cm_ElCreateFloatText( this.element, 'right', 'OS Needed');
+
+	if( cm_IsSith())
+	{
+		this.elETA.classList.add('lowercase');
+		this.elPPApproval.classList.add('lowercase');
+		this.elMaintenance.classList.add('lowercase');
+		this.elIgnoreNimby.classList.add('lowercase');
+		this.elIgnorePaused.classList.add('lowercase');
+	}
 	
 	this.blocks = [];
 	for( var b = 0; b < this.params.blocks.length; b++)
@@ -92,8 +101,9 @@ JobNode.prototype.update = function( i_obj)
 
 	this.elName.textContent = this.params.name;
 	this.elName.title = 'ID = '+this.params.id;
-	this.elPriority.textContent = 'P' + this.params.priority;
 	this.elUserName.textContent = this.params.user_name;
+	if( false == g_VISOR())
+		this.elUserName.style.display = 'none';
 
 	if( this.params.ppa )
 		this.elPPApproval.style.display = 'block';
@@ -118,41 +128,126 @@ JobNode.prototype.update = function( i_obj)
 	if( this.params.thumb_path )
 		this.showThumb( this.params.thumb_path );
 
-	if( this.params.time_life )
-		this.elLifeTime.textContent = 'L' + cm_TimeStringFromSeconds( this.params.time_life);
-	else this.elLifeTime.textContent = '';
+	if( cm_IsPadawan())
+	{
+		this.elPriority.textContent = 'Priority:' + this.params.priority;
 
-	if( this.params.depend_mask )
-		this.elDependMask.textContent = 'D(' + this.params.depend_mask + ')';
-	else this.elDependMask.textContent = '';
+		if( this.params.time_life )
+			this.elLifeTime.textContent = 'LifeTime(' + cm_TimeStringFromSeconds( this.params.time_life) + ')';
+		else this.elLifeTime.textContent = '';
 
-	if( this.params.depend_mask_global )
-		this.elDependMaskGlobal.textContent = 'G(' + this.params.depend_mask_global + ')';
-	else this.elDependMaskGlobal.textContent = '';
+		if( this.params.depend_mask )
+			this.elDependMask.textContent = 'DepmendMask(' + this.params.depend_mask + ')';
+		else this.elDependMask.textContent = '';
 
-	if( this.params.hosts_mask )
-		this.elHostsMask.textContent = 'H(' + this.params.hosts_mask + ')';
-	else this.elHostsMask.textContent = '';
+		if( this.params.depend_mask_global )
+			this.elDependMaskGlobal.textContent = 'GlobalDepends(' + this.params.depend_mask_global + ')';
+		else this.elDependMaskGlobal.textContent = '';
 
-	if( this.params.hosts_mask_exclude )
-		this.elHostsMaskExclude.textContent = 'E(' + this.params.hosts_mask_exclude + ')';
-	else this.elHostsMaskExclude.textContent = '';
+		if( this.params.hosts_mask )
+			this.elHostsMask.textContent = 'HostsMask(' + this.params.hosts_mask + ')';
+		else this.elHostsMask.textContent = '';
 
-	if( this.params.max_running_tasks != null )
-		this.elMaxRunTasks.textContent = 'Max' + this.params.max_running_tasks;
-	else this.elMaxRunTasks.textContent = '';
+		if( this.params.hosts_mask_exclude )
+			this.elHostsMaskExclude.textContent = 'ExcludeHosts(' + this.params.hosts_mask_exclude + ')';
+		else this.elHostsMaskExclude.textContent = '';
 
-	if( this.params.max_running_tasks_per_host != null )
-		this.elMaxRunTasksPH.textContent = 'MPH' + this.params.max_running_tasks_per_host;
-	else this.elMaxRunTasksPH.textContent = '';
+		if( this.params.max_running_tasks != null )
+			this.elMaxRunTasks.textContent = 'MaxTasks:' + this.params.max_running_tasks;
+		else this.elMaxRunTasks.textContent = '';
 
-	if( this.params.need_properties )
-		this.elNeedProperties.textContent = this.params.need_properties;
-	else this.elNeedProperties.textContent = '';
+		if( this.params.max_running_tasks_per_host != null )
+			this.elMaxRunTasksPH.textContent = 'MaxPerHost:' + this.params.max_running_tasks_per_host;
+		else this.elMaxRunTasksPH.textContent = '';
 
-	if( this.params.need_os)
-		this.elNeedOS.textContent = this.params.need_os;
-	else this.elNeedOS.textContent = '';
+		if( this.params.need_properties )
+			this.elNeedProperties.textContent = 'Properties(' + this.params.need_properties + ')';
+		else this.elNeedProperties.textContent = '';
+
+		if( this.params.need_os)
+			this.elNeedOS.textContent = 'OS(' + this.params.need_os + ')';
+		else this.elNeedOS.textContent = '';
+	}
+	else if( cm_IsJedi())
+	{
+		this.elPriority.textContent = 'Pri:' + this.params.priority;
+
+		if( this.params.time_life )
+			this.elLifeTime.textContent = 'Life(' + cm_TimeStringFromSeconds( this.params.time_life) + ')';
+		else this.elLifeTime.textContent = '';
+
+		if( this.params.depend_mask )
+			this.elDependMask.textContent = 'Dep(' + this.params.depend_mask + ')';
+		else this.elDependMask.textContent = '';
+
+		if( this.params.depend_mask_global )
+			this.elDependMaskGlobal.textContent = 'GDep(' + this.params.depend_mask_global + ')';
+		else this.elDependMaskGlobal.textContent = '';
+
+		if( this.params.hosts_mask )
+			this.elHostsMask.textContent = 'Hosts(' + this.params.hosts_mask + ')';
+		else this.elHostsMask.textContent = '';
+
+		if( this.params.hosts_mask_exclude )
+			this.elHostsMaskExclude.textContent = 'Exclude(' + this.params.hosts_mask_exclude + ')';
+		else this.elHostsMaskExclude.textContent = '';
+
+		if( this.params.max_running_tasks != null )
+			this.elMaxRunTasks.textContent = 'Max:' + this.params.max_running_tasks;
+		else this.elMaxRunTasks.textContent = '';
+
+		if( this.params.max_running_tasks_per_host != null )
+			this.elMaxRunTasksPH.textContent = 'MPH:' + this.params.max_running_tasks_per_host;
+		else this.elMaxRunTasksPH.textContent = '';
+
+		if( this.params.need_properties )
+			this.elNeedProperties.textContent = 'Props(' + this.params.need_properties + ')';
+		else this.elNeedProperties.textContent = '';
+
+		if( this.params.need_os)
+			this.elNeedOS.textContent = 'OS(' + this.params.need_os + ')';
+		else this.elNeedOS.textContent = '';
+	}
+	else
+	{
+		this.elPriority.textContent = 'p' + this.params.priority;
+
+		if( this.params.time_life )
+			this.elLifeTime.textContent = 'l(' + cm_TimeStringFromSeconds( this.params.time_life) + ')';
+		else this.elLifeTime.textContent = '';
+
+		if( this.params.depend_mask )
+			this.elDependMask.textContent = 'd(' + this.params.depend_mask + ')';
+		else this.elDependMask.textContent = '';
+
+		if( this.params.depend_mask_global )
+			this.elDependMaskGlobal.textContent = 'g(' + this.params.depend_mask_global + ')';
+		else this.elDependMaskGlobal.textContent = '';
+
+		if( this.params.hosts_mask )
+			this.elHostsMask.textContent = 'h(' + this.params.hosts_mask + ')';
+		else this.elHostsMask.textContent = '';
+
+		if( this.params.hosts_mask_exclude )
+			this.elHostsMaskExclude.textContent = 'e(' + this.params.hosts_mask_exclude + ')';
+		else this.elHostsMaskExclude.textContent = '';
+
+		if( this.params.max_running_tasks != null )
+			this.elMaxRunTasks.textContent = 'm' + this.params.max_running_tasks;
+		else this.elMaxRunTasks.textContent = '';
+
+		if( this.params.max_running_tasks_per_host != null )
+			this.elMaxRunTasksPH.textContent = 'mph' + this.params.max_running_tasks_per_host;
+		else this.elMaxRunTasksPH.textContent = '';
+
+		if( this.params.need_properties )
+			this.elNeedProperties.textContent = this.params.need_properties;
+		else this.elNeedProperties.textContent = '';
+
+		if( this.params.need_os)
+			this.elNeedOS.textContent = this.params.need_os;
+		else this.elNeedOS.textContent = '';
+	}
 
 	if( this.params.report )
 		this.elReport.textContent = this.params.report;
@@ -196,19 +291,31 @@ JobNode.prototype.refresh = function()
 	if( this.params.time_wait && this.state.WTM )
 	{
 		time_txt = cm_TimeStringInterval( new Date().getTime()/1000, this.params.time_wait);
+		if( cm_IsPadawan())
+			time_txt = 'Waiting:' + time_txt;
+		else if( cm_IsJedi())
+			time_txt = 'Wait:' + time_txt;
 		time_tip = 'Waiting for: ' + cm_DateTimeStrFromSec( this.params.time_wait);
 	}
 	else if( this.params.time_started )
 	{
 		if( this.state.DON == true )
 		{
-			time_txt = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
+			time_txt = cm_TimeStringInterval( this.params.time_started, this.params.time_done );
+			if( cm_IsPadawan())
+				time_txt = 'RunningTime:' + time_txt;
+			else if( cm_IsJedi())
+				time_txt = 'RunTime:' + time_txt;
 			time_tip = 'Done at: ' + cm_DateTimeStrFromSec( this.params.time_done);
 			time_tip += '\nRunning time: ' + time_txt;
 		}
 		else
 		{
 			time_txt = cm_TimeStringInterval( this.params.time_started);
+			if( cm_IsPadawan())
+				time_txt = 'RunningTime:' + time_txt;
+			else if( cm_IsJedi())
+				time_txt = 'RunTime:' + time_txt;
 
 			// ETA (but not for the system job which id == 1):
 			if( this.params.id > 1 )

@@ -157,12 +157,12 @@ void Dialog::createMenus()
 {
 	m_contextMenu = new QMenu( this);
 
-	m_levelMenu = new QMenu("UI Level", this);
+	m_levelMenu = new QMenu("UI &Level", this);
 	menuBar()->addMenu( m_levelMenu);
 	m_contextMenu->addMenu( m_levelMenu);
 	connect( m_levelMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuLevel()));
 
-	m_themeMenu = new QMenu("Color Theme", this);
+	m_themeMenu = new QMenu("Color &Theme", this);
 	menuBar()->addMenu( m_themeMenu);
 	m_contextMenu->addMenu( m_themeMenu);
 	connect( m_themeMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuTheme()));
@@ -170,7 +170,7 @@ void Dialog::createMenus()
 	m_contextMenu->addSeparator();
 
     QAction *action;
-	QMenu * editMenu = menuBar()->addMenu("Settings");
+	QMenu * editMenu = menuBar()->addMenu("&Edit");
     action = new QAction( "Customize GUI...", editMenu);
     connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
     editMenu->addAction( action);
@@ -181,7 +181,7 @@ void Dialog::createMenus()
 	m_contextMenu->addAction( action);
     editMenu->addSeparator();
 
-	m_prefsMenu = new QMenu("Preferences", this);
+	m_prefsMenu = new QMenu("&Preferences", this);
 	menuBar()->addMenu( m_prefsMenu);
 	m_contextMenu->addMenu( m_prefsMenu);
 	connect( m_prefsMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuPrefs()));

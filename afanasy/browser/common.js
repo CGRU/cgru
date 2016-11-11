@@ -21,26 +21,39 @@ var $ = function( id ) { return document.getElementById( id ); };
 function cm_Init()
 {
 	if( localStorage.ui_level == null )
-		localStorage.ui_level = 'Padawan';
+		localStorage.ui_level = cm_UILevels[0];
 
+	$('ui_level').m_elBtns = [];
 	for( var i = 0; i < cm_UILevels.length; i++)
 	{
 		var el = document.createElement('div');
 		$('ui_level').appendChild( el);
+		$('ui_level').m_elBtns.push( el);
+		el.textContent = cm_UILevels[i];
 		if( cm_UILevels[i] == localStorage.ui_level )
 		{
+			el.classList.add('current');
 		}
 		else
 		{
 			el.classList.add('button');
-			el.textContent = cm_UILevels[i];
+			el.ondblclick = function(e) {
+				cm_ApplyUILevel( e.currentTarget.textContent);
+			}
 		}
-		el.ondblclick = function(e) { cm_ApplyUILevel( e.currentTarget.textContent);}
 	}
 }
 
 function cm_ApplyUILevel( i_level)
 {
+	for( var i = 0; i < $('ui_level').m_elBtns.length; i++)
+	{
+		var el = $('ui_level').m_elBtns[i];
+		el.classList.remove('button');
+		if( el.textContent != i_level )
+			el.style.display = 'none';
+	}
+
 	if( cm_UILevels.indexOf( i_level) == -1 )
 	{
 		g_Error('Invalid UI Level: ' + i_level);
@@ -54,6 +67,9 @@ function cm_ApplyUILevel( i_level)
 
 	localStorage.ui_level = i_level;
 }
+function cm_IsPadawan() { return cm_UILevels.indexOf( localStorage.ui_level) == 0;}
+function cm_IsJedi()    { return cm_UILevels.indexOf( localStorage.ui_level) == 1;}
+function cm_IsSith()    { return cm_UILevels.indexOf( localStorage.ui_level) == 2;}
 
 function cm_ApplyStyles()
 {
