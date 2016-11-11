@@ -216,7 +216,7 @@ UserNode.prototype.update = function( i_obj)
 
 		var jobs = 'j';
 		if( this.params.jobs_num)
-			jobs += this.params.jobs_num + '</b>';
+			jobs += '<b>' + this.params.jobs_num + '</b>';
 		else
 			jobs += '<b>0</b>';
 		if( this.params.running_jobs_num )
