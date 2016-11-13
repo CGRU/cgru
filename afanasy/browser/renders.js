@@ -350,8 +350,8 @@ RenderNode.prototype.refresh = function()
 	{
 		var power = this.offlineState;
 		if( this.params.wol_operation_time )
-			power += ' ' + cm_TimeStringInterval( this.params.wol_operation_time);
-		this.elPower.textContent = power;
+			power += ' <b>' + cm_TimeStringInterval( this.params.wol_operation_time) + '</b>';
+		this.elPower.innerHTML = power;
 		if( this.state.WFL || this.state.WSL || this.state.WWK )
 			this.elPower.style.color = '#FF0';
 		else
@@ -444,7 +444,7 @@ RenderNode.prototype.refresh = function()
 
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{
-		stateTime = cm_TimeStringInterval( this.params.task_start_finish_time);
+		stateTime = '<b>' + cm_TimeStringInterval( this.params.task_start_finish_time) + '</b>';
 		if( this.state.RUN == true )
 			stateTime += ' busy';
 		else

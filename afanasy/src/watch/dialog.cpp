@@ -610,7 +610,7 @@ void Dialog::actGuiLevel( int i_level)
 			break;
 		case AFGUI::JEDI:
 			menuBar()->show();
-			message = "Let the force be with you.";
+			message = "May the force be with you.";
 			break;
 		case AFGUI::SITH:
 			menuBar()->hide();

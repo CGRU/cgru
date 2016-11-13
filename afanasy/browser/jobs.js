@@ -161,11 +161,11 @@ JobNode.prototype.update = function( i_obj)
 		else this.elMaxRunTasksPH.textContent = '';
 
 		if( this.params.need_properties )
-			this.elNeedProperties.innerHTML = 'Properties(<b>' + this.params.need_properties + ')</b>';
+			this.elNeedProperties.innerHTML = 'Properties(<b>' + this.params.need_properties + '</b>)';
 		else this.elNeedProperties.textContent = '';
 
 		if( this.params.need_os)
-			this.elNeedOS.innerHTML = 'OS(<b>' + this.params.need_os + ')</b>';
+			this.elNeedOS.innerHTML = 'OS(<b>' + this.params.need_os + '</b>)';
 		else this.elNeedOS.textContent = '';
 	}
 	else if( cm_IsJedi())
@@ -901,11 +901,11 @@ JobBlock.prototype.update = function( i_displayFull)
 
 			var errTxt = '';
 			if( eah != -1 )
-				errTxt += ' Avoid:<b>' + eah;
+				errTxt += ' Avoid:<b>' + eah + '</b>';
 			if( eth != -1 )
-				errTxt += ' Task:<b>' + eth;
+				errTxt += ' Task:<b>' + eth + '</b>';
 			if( ert != -1 )
-				errTxt += ' Retries:<b>' + ert;
+				errTxt += ' Retries:<b>' + ert + '</b>';
 			if( errTxt.length )
 				errTxt = 'ErrorsSolving(' + errTxt + ')';
 			this.elErrSolving.innerHTML = errTxt;
@@ -966,7 +966,7 @@ JobBlock.prototype.update = function( i_displayFull)
 				errTxt += ' Retries:<b>' + ert + '</b>';
 			if( errTxt.length )
 				errTxt = 'ErrSlv(' + errTxt + ')';
-			this.elErrSolving.textContent = errTxt;
+			this.elErrSolving.innerHTML = errTxt;
 
 			if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
 				this.elForgiveTime.innerHTML = 'ErrForgive:<b>'+cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
@@ -1019,9 +1019,9 @@ JobBlock.prototype.update = function( i_displayFull)
 			if(( eah != -1 ) || ( eth != -1 ) || ( ert != -1 ))
 			{
 				errTxt = 'e:';
-				errTxt += 'b<b>' + eah;
-				errTxt += ',t<b>' + eth;
-				errTxt += ',r<b>' + ert;
+				errTxt += '<b>' + eah + '</b>b';
+				errTxt += ',<b>' + eth + '</b>t';
+				errTxt += ',<b>' + ert + '</b>r';
 			}
 			this.elErrSolving.innerHTML = errTxt;
 

@@ -33,10 +33,12 @@ function cm_Init()
 		if( cm_UILevels[i] == localStorage.ui_level )
 		{
 			el.classList.add('current');
+			el.title = 'Current UI level.';
 		}
 		else
 		{
 			el.classList.add('button');
+			el.title = 'Double click to set ' + cm_UILevels[i] + ' UI level.';
 			el.ondblclick = function(e) {
 				cm_ApplyUILevel( e.currentTarget.textContent);
 			}
@@ -60,12 +62,34 @@ function cm_ApplyUILevel( i_level)
 		return;
 	}
 
-	g_Info( i_level);
+	g_Info('UI level set: ' + i_level);
 
 	if( localStorage.ui_level == i_level )
 		return;
 
 	localStorage.ui_level = i_level;
+
+	var text = 'Powerful you have become, the dark side I sense in you.';
+	if( i_level == 'Padawan' )
+		text = 'Patience you must have, my young padawan.';
+	else if( i_level == 'Jedi' )
+		text = 'May the Force be with you.';
+	else
+		g_Info('Welcome to the Dark Side.');
+
+	var elB = document.createElement('div');
+	document.body.appendChild( elB);
+	elB.classList.add('ui_level_back');
+	var elT = document.createElement('div');
+	elB.appendChild( elT);
+	elT.classList.add('ui_level_text');
+	elT.textContent = text;
+
+	elB.onclick = function(e){ document.location.reload();}
+	elB.onkeydown = function(e){ document.location.reload();}
+	elT.onclick = function(e){ document.location.reload();}
+	elT.onkeydown = function(e){ document.location.reload();}
+	setTimeout( function(){ document.location.reload()}, 3000);
 }
 function cm_IsPadawan() { return cm_UILevels.indexOf( localStorage.ui_level) == 0;}
 function cm_IsJedi()    { return cm_UILevels.indexOf( localStorage.ui_level) == 1;}

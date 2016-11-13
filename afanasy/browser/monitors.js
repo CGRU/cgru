@@ -27,10 +27,7 @@ MonitorNode.prototype.init = function()
 	this.elUid = cm_ElCreateText( this.elCenter, 'User ID');
 	this.elJobsIds = cm_ElCreateText( this.elCenter, 'Jobs IDs');
 
-	this.element.appendChild( document.createElement('br'));
-
-	this.elAddress = cm_ElCreateFloatText( this.element, 'left', 'Jobs: All/Running');
-	this.elAddress.classList.add('prestar');
+//	this.element.appendChild( document.createElement('br'));
 
 	this.elIP = cm_ElCreateFloatText( this.element, 'right');
 
@@ -50,24 +47,38 @@ MonitorNode.prototype.update = function( i_obj)
 {
 	if( i_obj ) this.params = i_obj;
 
-	this.elUid.textContent = 'UID: ' + this.params.uid;
+	this.elUid.innerHTML = 'UID:<b>' + this.params.uid + '</b>';
 
-	this.elName.textContent = this.params.name;
+	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
 
-	if( this.params.host_name ) this.elHostName.textContent = this.params.host_name;
+	if( this.params.host_name ) this.elHostName.innerHTML = '<b>' + this.params.host_name + '</b>';
 	else this.elHostName.textContent = '';
 
+	var jobs_ids = '';
 	if( this.params.jobs_ids && this.params.jobs_ids.length )
-		this.elJobsIds.textContent = 'JIDs:' + JSON.stringify( this.params.jobs_ids);
+	{
+		for( var i = 0; i < this.params.jobs_ids.length; i++)
+		{
+			if( i ) jobs_ids += ',';
+			jobs_ids += ' <b>' + this.params.jobs_ids[i] + '</b>';
+		}
+		jobs_ids = 'JIDs:[' + jobs_ids + ']';
+	}
+	this.elJobsIds.innerHTML = jobs_ids;
 
-	this.elAddress.textContent = this.params.address.ip + ':' + this.params.address.port;
-
-	this.elIP.textContent = 'IP=' + this.params.address.ip;
+	this.elIP.innerHTML = 'IP=<b>' + this.params.address.ip + '</b>';
 
 	var events = '';
 	if( this.params.events && this.params.events.length )
-		events += ' EVTs:' + JSON.stringify( this.params.events);
-	this.elEvents.textContent = events;
+	{
+		for( var i = 0; i < this.params.events.length; i++)
+		{
+			if( i ) events += ',';
+			events += ' <b>' + this.params.events[i] + '</b>';
+		}
+		events = ' EVTs: ' + events;
+	}
+	this.elEvents.innerHTML = events;
 
 	if( this.params.annotation )
 		this.elAnnotation.textContent = this.params.annotation;
