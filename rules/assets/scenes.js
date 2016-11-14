@@ -204,6 +204,10 @@ function scene_Show()
 			i_status.elShow = elShot.m_elStatus;
 		}
 
+		if( folders[f].status && folders[f].status.flags )
+			for( var fl = 0; fl < folders[f].status.flags.length; fl++)
+				elShot.classList.add( folders[f].status.flags[fl]);
+
 		var st_obj = new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot});
 		elShot.m_status = st_obj;
 		elEditBtn.m_status = st_obj;
@@ -354,10 +358,14 @@ function scenes_Received( i_data, i_args)
 				i_status.elShow = elShot.m_elStatus;
 			}
 
+			if( fobj.status && fobj.status.flags )
+				for( var f = 0; f < fobj.status.flags.length; f++)
+					elShot.classList.add( fobj.status.flags[f]);
+
 			var st_obj = new Status( fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot});
 			elShot.m_status = st_obj;
-			elShot.ondblclick = sc_EditStatus;
 
+			elShot.ondblclick = sc_EditStatus;
 			elShot.onclick = sc_ShotClicked;
 		}
 	}
@@ -790,6 +798,7 @@ function sc_DisplayStatistics()
 
 	// Shots count, progress, frames count:
 	//
+	var statuses = [];
 	var omits = 0;
 	var progress = 0;
 	var frames_count = 0;
@@ -801,15 +810,16 @@ function sc_DisplayStatistics()
 		if( stat && stat.flags && ( stat.flags.indexOf('omit') != -1 ))
 		{
 			omits++;
+			continue;
 		}
-		else
-		{
-			if( stat.progress && ( stat.progress > 0 ))
-				progress += stat.progress;
 
-			if( stat.frames_num )
-				frames_count += stat.frames_num;
-		}
+		statuses.push( stat);
+
+		if( stat.progress && ( stat.progress > 0 ))
+			progress += stat.progress;
+
+		if( stat.frames_num )
+			frames_count += stat.frames_num;
 	}
 
 	var info = 'Shots count: <big><b>' + (shots.length - omits) + '</big></b>';
@@ -844,10 +854,6 @@ function sc_DisplayStatistics()
 
 	// Statistics:
 	//
-	var statuses = [];
-	for( var i = 0; i < shots.length; i++)
-		statuses.push( shots[i].m_status.obj);
-
 	var args = {};
 	args.statuses = statuses;
 	args.elTasks = $('scenes_tasks');
