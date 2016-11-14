@@ -507,6 +507,7 @@ color: #FF5;
 text-shadow: 0px 0px 2px #000;
 }
 .star .count {
+font-weight: bold;
 position: absolute;
 top: 0px; left: 10px; right: 0; bottom: 0;
 font-size: 18px;
