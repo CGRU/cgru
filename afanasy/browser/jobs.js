@@ -842,7 +842,7 @@ JobBlock.prototype.update = function( i_displayFull)
 			if( this.params.depend_mask )
 				deps += ' Depends(<b>' + this.params.depend_mask + '</b>)';
 			if( this.params.tasks_depend_mask )
-				deps += ' TasksDepepends[<b>' + this.params.tasks_depend_mask + '</b>]';
+				deps += ' TasksDepends[<b>' + this.params.tasks_depend_mask + '</b>]';
 			if( this.params.depend_sub_task )
 				deps += ' [<b>Sub-Task Dependence</b>]';
 		}
