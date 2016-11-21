@@ -213,7 +213,13 @@ function bm_NavigatePost()
 function bm_StatusOld( i_status)
 {
 	if( i_status == null )
-		return false;
+		return true;
+
+	if( i_status.artists == null )
+		return true;
+
+	if( i_status.artists.indexOf( g_auth_user.id ) == -1 )
+		return true;
 
 	if( i_status.progress )
 	{
@@ -235,12 +241,6 @@ function bm_Process()
 	if( g_auth_user == null )
 		return;
 
-	if(( RULES.status == null ) || ( RULES.status.artists == null ))
-		return;
-
-	if( RULES.status.artists.indexOf( g_auth_user.id ) == -1 )
-		return;
-
 	var bm = null;
 	var path = g_CurPath();
 
@@ -253,12 +253,13 @@ function bm_Process()
 			}
 
 
+	// No bookmark was founded with the current path:
 	if( bm == null )
 	{
-	// Create a new bookmark:
 		if( bm_StatusOld( RULES.status))
 			return;
 
+		// Create a new bookmark:
 		bm = {};
 		bm.path = path;
 		bm.ctime = c_DT_CurSeconds();
