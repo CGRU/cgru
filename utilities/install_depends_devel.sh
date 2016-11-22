@@ -21,6 +21,8 @@ function debianArch(){
 	packages="$packages p7zip-full"
 	packages="$packages git-core"
 	packages="$packages libzip-dev"
+	# EXRJoin:
+	packages="$packages libopenexr-dev"
 	# ImageMagick:
 	#packages="$packages libjpeg62 libjpeg62-dev"
 	#packages="$packages libtiff5 libtiff5-dev"
