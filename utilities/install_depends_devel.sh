@@ -58,13 +58,17 @@ function redhatArch(){
 function fedoraArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
-	packages="$packages python-devel"
 	packages="$packages postgresql-devel"
 	packages="$packages qt-devel"
 	packages="$packages rpm-build"
 	packages="$packages git"
 	packages="$packages PyQt4"
 	packages="$packages libzip libzip-devel"
+	if [ "$DISTRIBUTIVE_VERSION" \< "24" ]; then
+		packages="$packages python-devel"
+	else
+		packages="$packages python3-devel"
+	fi
 	# ImageMagick:
 	packages="$packages libjpeg libjpeg-devel"
 	packages="$packages libjpeg-turbo libjpeg-turbo-devel"
