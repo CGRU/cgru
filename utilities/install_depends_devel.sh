@@ -23,10 +23,10 @@ function debianArch(){
 	packages="$packages libzip-dev"
 	# ImageMagick:
 	#packages="$packages libjpeg62 libjpeg62-dev"
-	packages="$packages libtiff5 libtiff5-dev"
-	packages="$packages libpng12-0 libpng12-dev"
-	packages="$packages libfreetype6 libfreetype6-dev"
-	packages="$packages libfontconfig1 libfontconfig1-dev"
+	#packages="$packages libtiff5 libtiff5-dev"
+	#packages="$packages libpng12-0 libpng12-dev"
+	#packages="$packages libfreetype6 libfreetype6-dev"
+	#packages="$packages libfontconfig1 libfontconfig1-dev"
 
 	pkg_manager_cmd="apt-get install"
 	pkg_extension=""

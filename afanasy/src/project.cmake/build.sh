@@ -9,7 +9,7 @@ cd ../..
 cgru=$PWD
 cd utilities
 source ./getrevision.sh $src
-[ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh > /dev/null
+[ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh
 
 # Go to initial folder:
 popd > /dev/null

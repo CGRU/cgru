@@ -36,7 +36,14 @@ if [ -z "${DISTRIBUTIVE}" ]; then
 fi
 
 # Search distribution version:
-export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
+	export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+	if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
+		echo "Can't detect ${DISTRIBUTIVE} version. You can:"
+		echo "export DISTRIBUTIVE_VERSION="
+		exit 1
+	fi
+fi
 
 # Check architecture:
 export ARCHITECTURE=`uname -m`
