@@ -1,4 +1,4 @@
-set "DEST=F:\cgru-data\exports\cgru-windows"
+set "DEST=E:\utilities\release\archives\windows"
 
 if exist "%DEST%" rd /s /q "%DEST%"
 

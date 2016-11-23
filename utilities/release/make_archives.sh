@@ -2,27 +2,19 @@
 
 cd archives
 
-for archive in `ls`; do
-	[ -L "$archive" ] && continue
-	[ -d "$archive" ] && continue
-	[ -f "$archive" ] || continue
-	[ -x "$archive" ] || continue
+for archive_dir in `ls`; do
+	[ -d "$archive_dir" ] || continue
 
-	archive_dir="cgru-${archive}"
-	if [ -L "${archive_dir}" ]; then
-		archive_dir=`readlink "${archive_dir}"`
-		[ -e "$archive_dir" ] || continue
-	else
-		[ -d "${archive_dir}" ] && rm -rf "${archive_dir}"
-		pushd .. > /dev/null
-		./export.sh "archives/${archive_dir}"
-		popd > /dev/null
+	if [[ "${archive_dir}" =~ cgru.* ]]; then
+		echo "Skipping processed archive '${archive_dir}'"
+		continue
 	fi
-	for version in `cat -v "${archive_dir}/version.txt" | sed -e "s/\^M//g"`; do break; done
-	echo "Creating CGRU archive for '${archive}': '${archive_dir}'-'${version}'"
 
-	# Cleanup archive folders:
-	echo "Clearing '${archive}':"
+	for version in `cat -v "${archive_dir}/version.txt" | sed -e "s/\^M//g"`; do break; done
+	echo "Creating CGRU archive for '${archive_dir}' '${version}'"
+
+	# Cleanup archive dir:
+	echo "Clearing archive folder '${archive_dir}':"
 	find "${archive_dir}" -type d -name .git -exec rm -rvf {} \;
 	find "${archive_dir}" -type f -name .gitignore -exec rm -vf {} \;
 	find "${archive_dir}" -type d -name .svn -exec rm -rvf {} \;
@@ -33,21 +25,32 @@ for archive in `ls`; do
 	rm -fv ${archive_dir}/software_setup/locate_*
 
 	# Run specific script:
-	"./${archive}" "${archive_dir}"
-	if [ $? != 0 ]; then
-		echo "Failed making archive."
-		exit 1
+	archive_script="${archive_dir}.sh"
+	if [ -x "${archive_script}" ]; then
+		echo "Executing archive specific script '${archive_script}':"
+		"./${archive_script}" "${archive_dir}"
+		if [ $? != 0 ]; then
+			echo "Failed executing archive specific script '${archive_script}'."
+			exit 1
+		fi
 	fi
 
+	# Rename Archive Dir:
+	archive_name="${archive_dir}"
+	archive_dir="cgru.${version}"
+	[ -d "${archive_dir}" ] && rm -rvf "${archive_dir}"
+	echo "Renaming archive folder:" 
+	mv -v "${archive_name}" "${archive_dir}"
+
 	# Archivate:
-	case ${archive} in
-	linux )
-		archive_file="${PWD}/cgru.${version}.${archive}.tar.gz"
-		archive_cmd="tar -cvzf \"${archive_file}\" -C \"`dirname ${archive_dir}`\" \"`basename ${archive_dir}`\""
-		;;
-	windows )
-		archive_file="cgru.${version}.${archive}.zip"
+	case ${archive_name} in
+	windows)
+		archive_file="${archive_dir}.${archive_name}.zip"
 		archive_cmd="7za a -r -y -tzip \"${archive_file}\" \"${archive_dir}\""
+		;;
+	*)
+		archive_file="${archive_dir}.${archive_name}.tar.gz"
+		archive_cmd="tar -cvzf \"${archive_file}\" \"${archive_dir}\""
 		;;
 	esac
 
@@ -61,6 +64,10 @@ for archive in `ls`; do
 		fi
 		chmod a+rw "${archive_file}"
 	fi
+
+	# Rename archive folder as processed:
+	echo "Renaming archive folder as processed:" 
+	mv -v "${archive_dir}" "${archive_dir}.${archive_name}"
 
 done
 
