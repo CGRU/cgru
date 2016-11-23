@@ -66,8 +66,10 @@ for archive_dir in `ls`; do
 	fi
 
 	# Rename archive folder as processed:
+	processed="${archive_dir}.${archive_name}"
 	echo "Renaming archive folder as processed:" 
-	mv -v "${archive_dir}" "${archive_dir}.${archive_name}"
+	[ -d "${processed}" ] && rm -rvf "${processed}"
+	mv -v "${archive_dir}" "${processed}"
 
 done
 
