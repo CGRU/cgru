@@ -145,7 +145,7 @@ def createInstance(i_app,i_grp):
 	p = i_grp.createButtonParam('afanasy_button_frame_range','Get Frame Range From Project Settigs')
 	p.setHelp('Set first and last frame parameters from current project settings.')
 	p.setAddNewLine(True)
-	p.setPersistant(False)
+	p.setPersistent(False)
 	p.setEvaluateOnChange(False)
 	page.addParam(p)
 
@@ -188,7 +188,7 @@ def createInstance(i_app,i_grp):
 	p = i_grp.createButtonParam('afanasy_button_send_job','Send Afanasy Job')
 	p.setHelp('Constuct and send job to Afanasy server.')
 	p.setAddNewLine(True)
-	p.setPersistant(False)
+	p.setPersistent(False)
 	p.setEvaluateOnChange(False)
 	page.addParam(p)
 
@@ -203,7 +203,7 @@ def createInstance(i_app,i_grp):
 	'''
 	p = i_grp.createButtonParam('add_input','Add Input')
 	p.setAddNewLine(True)
-	p.setPersistant(False)
+	p.setPersistent(False)
 	p.setEvaluateOnChange(False)
 	page.addParam(p)
 	'''
