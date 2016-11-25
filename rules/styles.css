@@ -442,9 +442,19 @@ margin: 0 0 0 2px;
 border-top: 2px solid rgba(98,98,98,.5);
 padding: 4px 0;
 }
+#bookmarks .project.closed .bookmark {
+display: none;
+}
 #bookmarks .project .label {
 text-align: center;
 font-size: 14px;
+cursor: pointer;
+}
+#bookmarks .project .label:hover {
+text-shadow: 0 0 2px rgba( 100, 255, 255, .5);
+}
+#bookmarks .project.closed .label {
+font-style: italic;
 }
 #bookmarks .bookmark {
 position: relative;

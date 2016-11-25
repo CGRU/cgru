@@ -5,8 +5,13 @@ bm_elements = [];
 
 function bm_Init()
 {
-	// Recent:
-	if( localStorage.bookmarks_opened == null ) localStorage.bookmarks_opened = 'false';
+	// Init localStorage:
+	if( localStorage.bookmarks_opened == null )
+		localStorage.bookmarks_opened = 'false';
+
+	if( localStorage.bookmarks_projects_opened == null )
+		localStorage.bookmarks_projects_opened = '';
+
 
 	// Bookmarks are not available for guests:
 	if( g_auth_user == null ) return;
@@ -103,7 +108,7 @@ function bm_Show()
 	if(( g_auth_user.bookmarks == null ) || ( g_auth_user.bookmarks.length == 0 ))
 		return;
 
-	$('bookmarks_label').textContent = 'Bookmarks[' + g_auth_user.bookmarks.length + ']';
+	$('bookmarks_label').textContent = 'Bookmarks - ' + g_auth_user.bookmarks.length;
 
 	g_auth_user.bookmarks.sort( bm_Compare);
 
@@ -132,20 +137,30 @@ function bm_Show()
 	}
 
 	// Construct elements:
+	opened = localStorage.bookmarks_projects_opened.split('|');
 	for( var p = 0; p < bm_projects.length; p++)
 	{
 		var project = bm_projects[p];
 
+		// Project element:
 		project.el = document.createElement('div');
-		project.el.classList.add('project');
 		$('bookmarks').appendChild( project.el);
+		project.el.classList.add('project');
+		if( opened.indexOf( project.name) != -1 )
+			project.el.classList.add('opened');
+		else
+			project.el.classList.add('closed');
 
+		// Project label:
 		var el = document.createElement('div');
 		project.elLabel = el;
 		project.el.appendChild( el);
 		el.classList.add('label');
-		el.textContent = project.name + '[' + project.bms.length + ']';
+		el.onclick = bm_ProjectClicked;
+		el.m_project = project;
+		el.textContent = project.name + ' - ' + project.bms.length;
 
+		// Project bookmarks:
 		for( var b = 0; b < project.bms.length; b++)
 		{
 			var el = bm_CreateElements( project.bms[b]);
@@ -199,6 +214,27 @@ function bm_CreateElements( i_bm)
 	el.m_bookmark = i_bm;
 
 	return el;
+}
+
+function bm_ProjectClicked( i_evt)
+{
+	var el = i_evt.currentTarget.m_project.el;
+	el.classList.toggle('opened');
+	el.classList.toggle('closed');
+
+	var list = ''
+	for( var p = 0; p < bm_projects.length; p++)
+	{
+		if( bm_projects[p].el.classList.contains('closed'))
+			continue;
+
+		if( list.length )
+			list += '|';
+
+		list += bm_projects[p].name;
+	}
+
+	localStorage.bookmarks_projects_opened = list;
 }
 
 function bm_NavigatePost()
@@ -282,10 +318,17 @@ function bm_HighlightCurrent()
 	var path = g_CurPath();
 
 	for( var i = 0; i < bm_elements.length; i++)
+	{
 		if( path == bm_elements[i].m_bookmark.path )
+		{
 			bm_elements[i].classList.add('cur_path');
+			//bm_elements[i].scrollIntoView();
+		}
 		else
+		{
 			bm_elements[i].classList.remove('cur_path');
+		}
+	}
 }
 
 function bm_FilterBtn( i_btn, i_project)
