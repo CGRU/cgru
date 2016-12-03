@@ -161,6 +161,19 @@ class BlockParameters:
             elif roptype == 'rib':
                 self.service = 'hbatch_prman'
 
+            elif roptype == 'arnold':
+                if not ropnode.parm('soho_outputmode').eval():
+                    self.service = 'houdinitoarnold'
+
+                ar_picture = ropnode.parm('ar_picture')
+
+                if ar_picture is not None:
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            ar_picture.evalAsStringAtFrame(self.frame_first),
+                            ar_picture.evalAsStringAtFrame(self.frame_last)
+                        )
+
             # Block command:
             self.cmd = 'hrender_af'
             if afnode.parm('ignore_inputs').eval():

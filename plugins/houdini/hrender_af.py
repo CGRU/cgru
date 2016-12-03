@@ -173,6 +173,18 @@ elif drivertypename == "wedge":
                 progress.set(1)
 
 
+elif drivertypename == "arnold":
+    # Trying to set ROP to output progress
+    progress = ropnode.parm('ar_log_verbosity')
+    if progress is not None:
+        value = progress.eval()
+        if value == 'warnings':
+            print('Trying to set "Right Output Style Progress" on arnold')
+            try:
+                progress.set('info')
+            except:
+                print('Failed, frame progress not available.')
+
 #
 # Distribute simulation:
 #
