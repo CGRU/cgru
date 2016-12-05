@@ -67,8 +67,12 @@ protected:
 	void v_calcNeed();
 
 private:
+	bool refreshCounters();
+
 	void updateJobsOrder( af::Job * newJob = NULL);
+
 	void deleteNode( MonitorContainer * i_monitoring);
+
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:

@@ -239,8 +239,11 @@ public:
 	inline int getErrorsForgiveTime()         const { return m_errors_forgive_time;          }
 	inline int getTaskProgressChangeTimeout() const { return m_task_progress_change_timeout; }
 
-	inline int * getRunningTasksCounter()      { return &m_running_tasks_counter;}
-	inline int   getRunningTasksNumber() const { return  m_running_tasks_counter;}
+	inline int32_t * getRunningTasksCounter()      { return &m_running_tasks_counter;}
+	inline int32_t   getRunningTasksNumber() const { return  m_running_tasks_counter;}
+
+	inline int64_t * getRunningCapacityCounter()      { return &m_running_capacity_counter;}
+	inline int64_t   getRunningCapacityTotal()  const { return  m_running_capacity_counter;}
 
 	bool updateProgress( JobProgress * progress);
 	inline const char * getProgressBar()          const { return p_progressbar;    }
@@ -294,7 +297,8 @@ protected:
 	int64_t m_frames_inc;       ///< Tasks frames increment.
 	int64_t m_sequential;       ///< Tasks solve sequential.
 
-	int32_t  m_running_tasks_counter; ///< Number of running tasks counter.
+	int32_t m_running_tasks_counter;    ///< Number of running tasks counter.
+	int64_t m_running_capacity_counter; ///< Number of running tasks total capacity counter.
 
 	/// Maximum number of running tasks
 	int32_t m_max_running_tasks;

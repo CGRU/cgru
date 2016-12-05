@@ -27,7 +27,8 @@ public:
             Block * taskBlock,
             RenderAf * render,
             MonitorContainer * monitoring,
-            int * runningtaskscounter
+            int32_t * i_running_tasks_counter,
+            int64_t * i_running_capacity_counter
             );
 
    virtual ~TaskRun();
@@ -77,7 +78,9 @@ protected:
    int m_hostId;       ///< Task Host Id
 
 private:
-   int * m_counter;
+	int32_t * m_running_tasks_counter;
+	int64_t * m_running_capacity_counter;
+
    uint32_t m_stopTime;         ///< Time, when running task was asked to stop.
    bool m_zombie;
 

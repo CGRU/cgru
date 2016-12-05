@@ -263,12 +263,17 @@ UserNode.prototype.refresh = function()
 	if( this.params.running_tasks_num && ( this.monitor.max_tasks > 0 ))
 	{
 		percent = 100 * this.params.running_tasks_num/this.monitor.max_tasks;
-		label = this.params.running_tasks_num;
+		if( cm_IsPadawan())
+			label = 'Running Tasks: <b>' + this.params.running_tasks_num + '</b> / Total Capacity: <b>' + this.params.running_capacity_total + '</b>';
+		else if( cm_IsJedi())
+			label = 'Tasks:<b>' + this.params.running_tasks_num + '</b> / Capacity:<b>' + this.params.running_capacity_total + '</b>';
+		else
+			label = 't<b>' + this.params.running_tasks_num + '</b> / <b>' + this.params.running_capacity_total + '</b>c';
 	}
 	else
 		percent = '0';
 	this.elBar.style.width = percent + '%';
-	this.elBar.textContent = label;
+	this.elBar.innerHTML = label;
 }
 
 

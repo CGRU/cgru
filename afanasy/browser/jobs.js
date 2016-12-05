@@ -696,9 +696,10 @@ JobBlock.prototype.constructFull = function()
 	this.canvas.style.width = '100%';
 
 	this.elPercentage = cm_ElCreateText( this.elFull, 'Block Done Percentage');
+	this.elTasksRun = cm_ElCreateText( this.elFull, 'Running Tasks Counter');
+	this.elTasksCap = cm_ElCreateText( this.elFull, 'Running Capacity Total');
 	this.elTasksDon = cm_ElCreateText( this.elFull, 'Done Tasks Counter');
 	this.elTasksRdy = cm_ElCreateText( this.elFull, 'Ready Tasks Counter');
-	this.elTasksRun = cm_ElCreateText( this.elFull, 'Running Tasks Counter');
 	this.elTasksSkp = cm_ElCreateText( this.elFull, 'Skipped Tasks Counter');
 	this.elTasksWrn = cm_ElCreateText( this.elFull, 'Warning Tasks Counter');
 	this.elTasksWrc = cm_ElCreateText( this.elFull, 'Waiting Reconnect Tasks Counter');
@@ -1108,6 +1109,10 @@ JobBlock.prototype.update = function( i_displayFull)
 				this.elTasksRun.innerHTML = 'Running:<b>'+tasks_run + '</b>';
 			else this.elTasksRun.textContent = '';
 
+			if( this.params.running_capacity_total )
+				this.elTasksCap.innerHTML = 'Capacity:<b>' + this.params.running_capacity_total + '</b>';
+			else this.elTasksCap.textContent = '';
+
 			if( tasks_err )
 				this.elTasksErr.innerHTML = 'Errors:<b>'+tasks_err + '</b>';
 
@@ -1141,6 +1146,10 @@ JobBlock.prototype.update = function( i_displayFull)
 				this.elTasksRun.innerHTML = 'Run:<b>'+tasks_run + '</b>';
 			else this.elTasksRun.textContent = '';
 
+			if( this.params.running_capacity_total )
+				this.elTasksCap.innerHTML = 'Cap:<b>' + this.params.running_capacity_total + '</b>';
+			else this.elTasksCap.textContent = '';
+
 			if( tasks_err )
 				this.elTasksErr.innerHTML = 'Err:<b>'+tasks_err + '</b>';
 
@@ -1173,6 +1182,10 @@ JobBlock.prototype.update = function( i_displayFull)
 			if( tasks_run)
 				this.elTasksRun.innerHTML = 'run<b>'+tasks_run + '</b>';
 			else this.elTasksRun.textContent = '';
+
+			if( this.params.running_capacity_total )
+				this.elTasksCap.innerHTML = 'c:<b>' + this.params.running_capacity_total + '</b>';
+			else this.elTasksCap.textContent = '';
 
 			if( tasks_err )
 				this.elTasksErr.innerHTML = 'e<b>'+tasks_err + '</b>';

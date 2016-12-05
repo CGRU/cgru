@@ -13,13 +13,14 @@ public:
 *** Multihost task not starts in constructor, it adds a first host here, and then wait for others.
 **/
 	TaskRunMulti(
-		Task * runningTask,
-		af::TaskExec * taskExec,
-		af::TaskProgress * taskProgress,
-		Block * taskBlock,
-		RenderAf * render,
-		MonitorContainer * monitoring,
-		int * runningtaskscounter
+		Task * i_runningTask,
+		af::TaskExec * i_taskExec,
+		af::TaskProgress * i_taskProgress,
+		Block * i_taskBlock,
+		RenderAf * i_render,
+		MonitorContainer * i_monitoring,
+		int32_t * io_running_tasks_counter,
+		int64_t * io_running_capacity_counter
 	);
 
 	~TaskRunMulti();

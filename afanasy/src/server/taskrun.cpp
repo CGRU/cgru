@@ -27,7 +27,8 @@ TaskRun::TaskRun( Task * runningTask,
                   Block * taskBlock,
                   RenderAf * render,
                   MonitorContainer * monitoring,
-                  int * runningtaskscounter
+                  int32_t * i_running_tasks_counter,
+                  int64_t * i_running_capacity_counter
                   ):
    m_task( runningTask),
    m_block( taskBlock),
@@ -35,12 +36,14 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress( taskProgress),
    m_tasknum( 0),
    m_hostId( 0),
-   m_counter( runningtaskscounter),
+	m_running_tasks_counter( i_running_tasks_counter),
+	m_running_capacity_counter( i_running_capacity_counter),
    m_stopTime( 0),
    m_zombie( false)
 {
-    AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
-   (*m_counter)++;
+	AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
+	(*m_running_tasks_counter)++;
+	(*m_running_capacity_counter) += m_exec->getCapResult();
 
    m_progress->percent = -1;
    m_progress->frame = -1;
@@ -69,8 +72,6 @@ TaskRun::TaskRun( Task * runningTask,
 TaskRun::~TaskRun()
 {
 AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum(), m_tasknum)
-   if   ( *m_counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *m_counter)
-   else ( *m_counter )--;
 
    if( m_progress->state & AFJOB::STATE_DONE_MASK    ) return;
    if( m_progress->state & AFJOB::STATE_ERROR_MASK   ) return;
@@ -321,7 +322,22 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
          render->taskFinished( m_exec, monitoring);
          m_block->taskFinished( m_exec, render, monitoring);
       }
+
+	  	// Write database for statistics:
 		AFCommon::DBAddTask( m_exec, m_progress, m_block->m_job, render);
+
+		// Decrement counters:
+		if( *m_running_tasks_counter <= 0)
+			AF_ERR << "Tasks counter is zero or negative: " << *m_running_tasks_counter;
+		else
+			( *m_running_tasks_counter )--;
+
+		if( *m_running_capacity_counter <= 0)
+			AF_ERR << "Tasks capacity counter is zero or negative: " << *m_running_capacity_counter;
+		else
+			( *m_running_capacity_counter ) -= m_exec->getCapResult();
+
+		// Delete task executable:
 		delete m_exec;
 		m_exec = NULL;
    }

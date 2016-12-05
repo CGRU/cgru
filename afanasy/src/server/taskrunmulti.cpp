@@ -18,39 +18,41 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-TaskRunMulti::TaskRunMulti( Task * runningTask,
-						af::TaskExec* taskExec,
-						af::TaskProgress * taskProgress,
-						Block * taskBlock,
-						RenderAf * render,
-						MonitorContainer * monitoring,
-						int * runningtaskscounter
+TaskRunMulti::TaskRunMulti( Task * i_runningTask,
+						af::TaskExec* i_taskExec,
+						af::TaskProgress * i_taskProgress,
+						Block * i_taskBlock,
+						RenderAf * i_render,
+						MonitorContainer * i_monitoring,
+						int32_t * io_running_tasks_counter,
+						int64_t * io_running_capacity_counter
 						):
-	TaskRun( runningTask,
-				NULL,    ///< SET NO EXECUTABLE! It will be set before starting master.
-				taskProgress,
-				taskBlock,
-				render,
-				monitoring,
-				runningtaskscounter
-				),
+	TaskRun( i_runningTask,
+			NULL,    ///< SET NO EXECUTABLE! It will be set before starting master.
+			i_taskProgress,
+			i_taskBlock,
+			i_render,
+			i_monitoring,
+			io_running_tasks_counter,
+			io_running_capacity_counter
+		),
 	m_master_running( false),
 	m_stopping( false),
 	m_time_last_host_added(0),
 	m_time_services_started(0),
 	m_time_services_stopped(0)
 {
-	if( taskExec == NULL)
+	if( i_taskExec == NULL)
 	{
 		AFERRAR("TaskRunMulti::TaskRunMulti: %s[%d] Task executable is NULL.",
 			m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum())
 		return;
 	}
 	m_has_service = ( m_block->m_data->getMultiHostService().empty() == false);
-	m_tasknum = taskExec->getTaskNum();
+	m_tasknum = i_taskExec->getTaskNum();
 	m_task->v_appendLog("Starting to capture hosts:");
 	m_progress->state = AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_READY_MASK;
-	addHost( taskExec, render, monitoring);
+	addHost( i_taskExec, i_render, i_monitoring);
 }
 
 TaskRunMulti::~TaskRunMulti()

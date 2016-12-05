@@ -232,9 +232,22 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 {
 	AFINFA("UserAf::refresh: \"%s\"", getName().toUtf8().data())
 
+	bool changed = refreshCounters();
+
+	if( changed && monitoring )
+		monitoring->addEvent( af::Monitor::EVT_users_change, m_id);
+
+	// Update solving parameters:
+	v_calcNeed();
+}
+
+bool UserAf::refreshCounters()
+{
 	int _numjobs = m_jobslist.getCount();
 	int _numrunningjobs = 0;
 	int _runningtasksnumber = 0;
+	int _runningcapacitytotal = 0;
+
 	{
 		AfListIt jobsListIt( &m_jobslist);
 		for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
@@ -243,22 +256,26 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 			{
 				_numrunningjobs++;
 				_runningtasksnumber += ((JobAf*)job)->getRunningTasksNumber();
+				_runningcapacitytotal += ((JobAf*)job)->getRunningCapacityTotal();
 			}
 		}
 	}
 
-	if((( _numrunningjobs      != m_running_jobs_num       ) ||
-		 ( _numjobs             != m_jobs_num              ) ||
-		 ( _runningtasksnumber  != m_running_tasks_num   )) &&
-			monitoring )
-			monitoring->addEvent( af::Monitor::EVT_users_change, m_id);
+	bool changed = false;
+
+	if(
+		( _numjobs              != m_jobs_num               ) ||
+		( _numrunningjobs       != m_running_jobs_num       ) ||
+		( _runningtasksnumber   != m_running_tasks_num      ) ||
+		( _runningcapacitytotal != m_running_capacity_total ) )
+			changed = true;
 
 	m_jobs_num = _numjobs;
 	m_running_jobs_num = _numrunningjobs;
 	m_running_tasks_num = _runningtasksnumber;
+	m_running_capacity_total = _runningcapacitytotal;
 
-	// Update solving parameters:
-	v_calcNeed();
+	return changed;
 }
 
 void UserAf::v_calcNeed()
@@ -319,10 +336,10 @@ bool UserAf::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 
 	if( m_jobslist.solve( solve_method, i_render, i_monitoring))
 	{
-		// Increase running tasks counter if render is online
+		// Increase running tasks / total capacity if render is online
 		// It can be online for WOL wake test
 		if( i_render->isOnline())
-	    	m_running_tasks_num++;
+			refreshCounters();
 
 		// Return true - that node was solved
 		return true;

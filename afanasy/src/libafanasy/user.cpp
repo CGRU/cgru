@@ -44,6 +44,7 @@ void User::initDefaultValues()
 	m_jobs_num          = 0;
 	m_running_jobs_num  = 0;
 	m_running_tasks_num = 0;
+	m_running_capacity_total = 0;
 
 	m_time_register = 0;
 	m_time_activity = 0;
@@ -92,6 +93,8 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"running_jobs_num\":" << m_running_jobs_num;
 	if( m_running_tasks_num > 0 )
 		o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
+	if( m_running_capacity_total > 0 )
+		o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;
 
 	o_str << "\n}";
 }
@@ -153,6 +156,9 @@ void User::v_readwrite( Msg * msg)
 	rw_int32_t ( m_jobs_num,              msg);
 	rw_int32_t ( m_running_jobs_num,      msg);
 	rw_int32_t ( m_running_tasks_num,     msg);
+	/* NEW VERSION
+	rw_int64_t ( m_running_capacity_total,msg);
+	*/
 	rw_RegExp  ( m_hosts_mask,            msg);
 	rw_RegExp  ( m_hosts_mask_exclude,    msg);
 	rw_String  ( m_annotation,            msg);
@@ -195,6 +201,7 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Maximum Running Tasks = " << m_max_running_tasks;
       if( m_max_running_tasks < 1 ) stream << " (no limit)";
       stream << "\n Running Tasks Number = " << m_running_tasks_num;
+      stream << "\n Running Tasks Capacity Total = " << m_running_capacity_total;
       if( hasHostsMask())        stream << "\n Hosts Mask = \"" << m_hosts_mask.getPattern() << "\"";
       if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << m_hosts_mask_exclude.getPattern() << "\"";
 
@@ -218,6 +225,7 @@ void User::v_generateInfoStream( std::ostringstream & stream, bool full) const
             << " " << m_name
             << " j" << m_jobs_num << "/" << m_running_jobs_num
             << " r" << m_running_tasks_num << "/" << m_max_running_tasks
+            << " c" << m_running_capacity_total
             << " " <<  m_host_name
             << " - " << v_calcWeight() << " bytes.";
    }

@@ -115,6 +115,7 @@ void BlockData::construct()
    m_tasks_num = 0;
    m_tasks_data = NULL;
    m_running_tasks_counter = 0;
+   m_running_capacity_counter = 0;
 
    m_depend_mask.setCaseSensitive();
    m_tasks_depend_mask.setCaseSensitive();
@@ -435,8 +436,11 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 		}
 		if( m_job_id != 0 )
             o_str << ",\n\"job_id\":" << m_job_id;
+
 		if( m_running_tasks_counter > 0 )
             o_str << ",\n\"running_tasks_counter\":" << m_running_tasks_counter;
+		if( m_running_capacity_counter > 0 )
+            o_str << ",\n\"running_capacity_total\":" << m_running_capacity_counter;
 
 		if( p_percentage > 0 )
             o_str << ",\n\"p_percentage\":"     << int(p_percentage);
@@ -587,21 +591,26 @@ void BlockData::v_readwrite( Msg * msg)
 
 	case Msg::TBlocksProgress:
 
-		rw_int32_t ( m_running_tasks_counter, msg);
-		rw_uint8_t ( p_percentage,            msg);
-		rw_int32_t ( p_error_hosts,           msg);
-		rw_int32_t ( p_avoid_hosts,           msg);
-		rw_int32_t ( p_tasks_ready,           msg);
-		rw_int32_t ( p_tasks_done,            msg);
-		rw_int32_t ( p_tasks_error,           msg);
-		rw_int32_t ( p_tasks_skipped,         msg);
-		rw_int32_t ( p_tasks_warning,         msg);
-		rw_int32_t ( p_tasks_waitrec,         msg);
-		rw_int64_t ( p_tasks_run_time,        msg);
+		rw_int32_t ( m_running_tasks_counter,    msg);
 
-		rw_int64_t ( m_state,                 msg);
-		rw_int32_t ( m_job_id,                msg);
-		rw_int32_t ( m_block_num,             msg);
+		/* NEW VERSION
+		rw_int64_t ( m_running_capacity_counter, msg);
+		*/
+
+		rw_uint8_t ( p_percentage,     msg);
+		rw_int32_t ( p_error_hosts,    msg);
+		rw_int32_t ( p_avoid_hosts,    msg);
+		rw_int32_t ( p_tasks_ready,    msg);
+		rw_int32_t ( p_tasks_done,     msg);
+		rw_int32_t ( p_tasks_error,    msg);
+		rw_int32_t ( p_tasks_skipped,  msg);
+		rw_int32_t ( p_tasks_warning,  msg);
+		rw_int32_t ( p_tasks_waitrec,  msg);
+		rw_int64_t ( p_tasks_run_time, msg);
+
+		rw_int64_t ( m_state,     msg);
+		rw_int32_t ( m_job_id,    msg);
+		rw_int32_t ( m_block_num, msg);
 
 		rw_data( p_progressbar, msg, AFJOB::ASCII_PROGRESS_LENGTH);
 

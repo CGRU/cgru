@@ -26,11 +26,11 @@ public:
 	af::TaskExec * genExec() const;
 
 	/// This method taks the ownership of `taskexec`
-	virtual void v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
+	virtual void v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter);
 
 	/// Reconnect Task to an existing TaskExec
-	/// This method taks the ownership of `i_taskexec`
-	void reconnect( af::TaskExec * i_taskexec, int * o_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring);
+	/// This method taks the ownership of `taskexec`
+	void reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter);
 
 	/// Update task state.
 	virtual void v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
