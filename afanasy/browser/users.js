@@ -269,7 +269,7 @@ UserNode.prototype.refresh = function()
 		else if( cm_IsJedi())
 			label = 'Tasks:<b>' + this.params.running_tasks_num + '</b> / Capacity:<b>' + capacity + '</b>';
 		else
-			label = 't<b>' + this.params.running_tasks_num + '</b> / <b>' + capacity + '</b>c';
+			label = 't<b>' + this.params.running_tasks_num + '</b>/c<b>' + capacity + '</b>';
 	}
 	else
 		percent = '0';
