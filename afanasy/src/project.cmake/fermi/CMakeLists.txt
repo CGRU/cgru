@@ -66,7 +66,7 @@ set (watch_cpp_src
 		 )
 
 
-add_executable(afermi ${src} ${inc} ${inc2} ${watch_cpp_src} )
+add_executable(afermer ${src} ${inc} ${inc2} ${watch_cpp_src} )
 
 if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
    set_target_properties(afwatch PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
@@ -78,11 +78,11 @@ endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
-target_link_libraries(afermi afqt ${Qt5Multimedia_LIBRARIES} 
+target_link_libraries(afermer afqt ${Qt5Multimedia_LIBRARIES} 
                                   ${Qt5Widgets_LIBRARIES} 
                                   ${Qt5Quick_LIBRARIES} 
                                   $ENV{AF_EXTRA_LIBS} ${Boost_LIBRARIES})
 
 
-add_custom_command(TARGET afermi POST_BUILD
+add_custom_command(TARGET afermer POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/../../fermi/qml" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qml )
