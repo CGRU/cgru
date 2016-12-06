@@ -209,6 +209,10 @@
 	"af_so_client_LINGER":-1,
 
 "":"Solving:",
+	"af_solving_use_capacity":true,
+		"":"Calculate need using running tasks total capacity.",
+		"":"If not, use only running tasks number",
+
 	"af_solving_use_user_priority":true,
 		"":"Whether task solving takes user priority into account or not. If set on,",
 		"":"Jobs are sorted by user's priority first, then by job priority within a user.",

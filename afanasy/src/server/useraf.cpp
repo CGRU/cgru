@@ -281,7 +281,10 @@ bool UserAf::refreshCounters()
 void UserAf::v_calcNeed()
 {
 	// Need calculation based on running tasks number
-	calcNeedResouces( m_running_tasks_num);
+	if( af::Environment::getSolvingUseCapacity())
+		calcNeedResouces( m_running_capacity_total);
+	else
+		calcNeedResouces( m_running_tasks_num);
 }
 
 bool UserAf::v_canRun()

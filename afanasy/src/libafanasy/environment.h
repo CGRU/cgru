@@ -116,6 +116,7 @@ public:
 	static inline int getTaskProgressChangeTimeout()     { return task_progress_change_timeout; }
 
 	/// Task solving options
+	static inline bool getSolvingUseCapacity()     { return solving_use_capacity;      }
 	static inline bool getSolvingUseUserPriority() { return solving_use_user_priority; }
 	static inline bool getSolvingSimpler()         { return solving_simpler;           }
 
@@ -279,6 +280,7 @@ private:
 	static int task_progress_change_timeout; ///< If task progress did not change within this time, consider that it is erroneous
 
 	/// Task solving options
+	static bool solving_use_capacity;       ///< Use running tasks total capacity or simpe running tasks number to calculate "Need"
 	static bool solving_use_user_priority;  ///< Whether task solving takes user priority into account or not
 	static bool solving_simpler;            ///< Sort jobs by priority and creation time instead of using the "Need"
 

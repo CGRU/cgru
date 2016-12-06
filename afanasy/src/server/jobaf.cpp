@@ -1169,7 +1169,10 @@ void JobAf::emitEvents(std::vector<std::string> events)
 void JobAf::v_calcNeed()
 {
 	// Need calculation based on running tasks number
-	calcNeedResouces( getRunningTasksNumber());
+	if( af::Environment::getSolvingUseCapacity())
+		calcNeedResouces( getRunningCapacityTotal());
+	else
+		calcNeedResouces( getRunningTasksNumber());
 }
 void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {

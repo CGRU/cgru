@@ -42,6 +42,7 @@ int     Environment::task_stop_timeout =               AFJOB::TASK_STOP_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 int     Environment::task_progress_change_timeout =    AFJOB::TASK_PROGRESS_CHANGE_TIMEOUT;
 /// Task solving options
+bool    Environment::solving_use_capacity =            AFJOB::SOLVING_USE_CAPACITY;
 bool    Environment::solving_use_user_priority =       AFJOB::SOLVING_USE_USER_PRIORITY;
 bool    Environment::solving_simpler =                 AFJOB::SOLVING_SIMPLER;
 
@@ -236,6 +237,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, task_log_linesmax,                 "af_task_log_linesmax"                 );
 	getVar( i_obj, task_progress_change_timeout,      "af_task_progress_change_timeout"      );
 
+	getVar( i_obj, solving_use_capacity,              "af_solving_use_capacity"              );
 	getVar( i_obj, solving_use_user_priority,         "af_solving_use_user_priority"         );
 	getVar( i_obj, solving_simpler,                   "af_solving_simpler"                   );
 

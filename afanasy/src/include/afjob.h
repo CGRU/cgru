@@ -24,6 +24,7 @@ namespace AFJOB
 	const int TASK_LOG_LINESMAX            = 100;  ///< Maximum number of lines in task log.
 	const int TASK_PROGRESS_CHANGE_TIMEOUT = -1;   ///< If task progress did not change within this time, consider that it is erroneous
 
+	const bool SOLVING_USE_CAPACITY = true; ///< Use running tasks total capacity or simpe running tasks number to calculate "Need"
 	const bool SOLVING_USE_USER_PRIORITY = true; ///< Whether task solving takes user priority into account or not
 	const bool SOLVING_SIMPLER = false; ///< Sort jobs by priority and creation time instead of using the "Need"
 
