@@ -1110,7 +1110,7 @@ JobBlock.prototype.update = function( i_displayFull)
 			else this.elTasksRun.textContent = '';
 
 			if( this.params.running_capacity_total )
-				this.elTasksCap.innerHTML = 'Capacity:<b>' + this.params.running_capacity_total + '</b>';
+				this.elTasksCap.innerHTML = 'Capacity:<b>' + cm_ToKMG( this.params.running_capacity_total) + '</b>';
 			else this.elTasksCap.textContent = '';
 
 			if( tasks_err )
@@ -1147,7 +1147,7 @@ JobBlock.prototype.update = function( i_displayFull)
 			else this.elTasksRun.textContent = '';
 
 			if( this.params.running_capacity_total )
-				this.elTasksCap.innerHTML = 'Cap:<b>' + this.params.running_capacity_total + '</b>';
+				this.elTasksCap.innerHTML = 'Cap:<b>' + cm_ToKMG( this.params.running_capacity_total) + '</b>';
 			else this.elTasksCap.textContent = '';
 
 			if( tasks_err )
@@ -1184,7 +1184,7 @@ JobBlock.prototype.update = function( i_displayFull)
 			else this.elTasksRun.textContent = '';
 
 			if( this.params.running_capacity_total )
-				this.elTasksCap.innerHTML = 'c:<b>' + this.params.running_capacity_total + '</b>';
+				this.elTasksCap.innerHTML = 'c:<b>' + cm_ToKMG( this.params.running_capacity_total) + '</b>';
 			else this.elTasksCap.textContent = '';
 
 			if( tasks_err )

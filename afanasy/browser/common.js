@@ -260,6 +260,38 @@ function cm_DateTimeStrFromMSec( i_sec, i_nosec)
 	return date;
 }
 
+function cm_ToKMG( i_value, i_args)
+{
+	var lables = ['','K','M','G','T','P'];
+
+	if( i_args == null ) i_args = {};
+
+	var i_base = i_args.base;
+	var i_floats = i_args.floats;
+	var i_stripzeros = i_args.stripzeros;
+
+	if( i_base == null ) i_base = 1000.0;
+	if( i_floats == null ) i_floats = 1;
+	if( i_stripzeros == null ) i_stripzeros = true;
+
+	var th = 1, pow = 0;
+	while( th * i_base < i_value )
+	{
+		th *= i_base;
+		pow++;
+
+		if( pow == lables.length -1 )
+			break;
+	}
+
+	var str = ( i_value / th).toFixed( i_floats);
+	if( i_stripzeros )
+		str = str.replace(/\.0+/,'');
+	str += lables[pow];
+
+	return str;
+}
+
 cm_States = ['ONL','RDY','RUN','DON','WRN','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PAU','PER','PBR','PSC','WFL','WSL','WWK','PPA','RER','WRC'];
 function cm_GetState( i_state, o_state, o_element)
 {
