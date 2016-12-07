@@ -176,7 +176,7 @@ af::Msg * processHTTPGet( const af::Msg * i_msg)
 		{
 			get_start += tasks_file_len;
 			file_name = std::string( get + get_start, get_finish - get_start);
-			if( file_name.find( af::Environment::getTempDir()) != 0 )
+			if( file_name.find( af::Environment::getStoreFolder()) != 0 )
 			{
 				AFCommon::QueueLogError("GET: Invalid @TMP@ folder from " + i_msg->getAddress().v_generateInfoString() + "\n" + file_name);
 				file_name.clear();

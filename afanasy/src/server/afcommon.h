@@ -34,14 +34,18 @@ public:
 		{ std::string str = i_str.str(); return writeFile( str.c_str(), str.size(), i_file_name);}
 
 	static const std::string getStoreDir( const std::string & i_root, int i_id, const std::string & i_name);
+
 	inline static const std::string getStoreDir( const std::string & i_root, const af::Node & i_node)
 		{ return getStoreDir( i_root, i_node.getId(), i_node.getName());}
+
 	inline static const std::string getStoreDirJob( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getJobsDir(), i_node);}
-	inline static const std::string getStoreDirUser( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getUsersDir(), i_node);}
+		{ return getStoreDir( af::Environment::getStoreFolderJobs(), i_node);}
+
 	inline static const std::string getStoreDirRender( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getRendersDir(), i_node);}
+		{ return getStoreDir( af::Environment::getStoreFolderRenders(), i_node);}
+
+	inline static const std::string getStoreDirUser( const af::Node & i_node)
+		{ return getStoreDir( af::Environment::getStoreFolderUsers(), i_node);}
 
 	static const std::vector<std::string> getStoredFolders( const std::string & i_root);
 

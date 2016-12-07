@@ -25,7 +25,7 @@
 		"":"@IP@  - will be replaced with render ip address:",
 
 	"OS_unix":{
-		"af_tempdirectory":"/var/tmp/afanasy",
+		"af_store_folder":"/var/tmp/afanasy",
 		"af_rendercmds":["vncviewer @ARG@","xterm -e \"ping @ARG@; read -s -n 1\"","xterm -e \"ping @IP@; read -s -n 1\""],
 		"af_rendercmds_admin":["xterm -e \"ssh @ARG@; read -s -n 1\"","xterm -e \"ssh @ARG@ \\\"@ASK@\\\"; read -s -n 1\""],
 		"":"Render:",
@@ -46,7 +46,7 @@
 	},
 	"OS_windows":{
 		"af_rendercmds":["vncviewer @ARG@","start ping /t @ARG@","start ping /t @IP@"],
-		"af_tempdirectory":"c:/temp/afanasy",
+		"af_store_folder":"c:/temp/afanasy",
 		"af_render_cmd_reboot":"shutdown /r",
 		"af_render_cmd_shutdown":"shutdown /s",
 		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep",

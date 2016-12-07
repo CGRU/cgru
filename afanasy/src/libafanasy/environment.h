@@ -156,10 +156,10 @@ public:
 
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
-	static inline const std::string & getTempDir()    { return temp_dir;    } ///< Get temp directory.
-	static inline const std::string & getJobsDir()    { return jobs_dir;    } ///< Get jobs store directory.
-	static inline const std::string & getRendersDir() { return renders_dir; } ///< Get renders store directory.
-	static inline const std::string & getUsersDir()   { return users_dir;   } ///< Get users store directory.
+	static inline const std::string & getStoreFolder()        { return store_folder;         }
+	static inline const std::string & getStoreFolderJobs()    { return store_folder_jobs;    }
+	static inline const std::string & getStoreFolderRenders() { return store_folder_renders; }
+	static inline const std::string & getStoreFolderUsers()   { return store_folder_users;   }
 
 	static inline const std::string & get_DB_ConnInfo()        { return db_conninfo;     } ///< Get database connection information.
 	static inline const std::string & get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
@@ -316,10 +316,10 @@ private:
 
 
 	/// Temp directory
-	static std::string temp_dir;
-	static std::string jobs_dir;
-	static std::string users_dir;
-	static std::string renders_dir;
+	static std::string store_folder;
+	static std::string store_folder_jobs;
+	static std::string store_folder_renders;
+	static std::string store_folder_users;
 
 	static std::string db_conninfo;       ///< Database connection info
 	static std::string db_stringquotes;   ///< Database string quotes

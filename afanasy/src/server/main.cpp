@@ -71,10 +71,10 @@ int main(int argc, char *argv[])
 	if( ENV.isHelpMode()) return 0;
 
 	// create directories if it is not exists
-	if( af::pathMakePath( ENV.getTempDir(),    af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getJobsDir(),    af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getUsersDir(),   af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getRendersDir(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakePath( ENV.getStoreFolder(),        af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderJobs(),    af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderRenders(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderUsers(),   af::VerboseOn ) == false) return 1;
 
 // Server for windows can be me more simple and not use signals at all.
 // Windows is not a server platform, so it designed for individual tests or very small companies with easy load.
@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
 	{
 	AF_LOG << "Getting renders from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getRendersDir());
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getStoreFolderRenders());
 	AF_LOG << folders.size() << " renders found.";
 
 	for( int i = 0; i < folders.size(); i++)
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 	{
 	AF_LOG << "Getting users from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getUsersDir());
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getStoreFolderUsers());
 	AF_LOG << folders.size() << " users found.";
 
 	for( int i = 0; i < folders.size(); i++)
@@ -204,8 +204,8 @@ int main(int argc, char *argv[])
 	{
 	AF_LOG << "Getting jobs from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getJobsDir());
-	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getJobsDir(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getStoreFolderJobs());
+	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getStoreFolderJobs(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
 
 	AF_LOG << folders.size() << " jobs found.";
 	for( int i = 0; i < folders.size(); i++)

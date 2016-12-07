@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 	}
 
 	// Create temp directory, if it does not exist:
-	if( af::pathMakePath( ENV.getTempDir(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakePath( ENV.getStoreFolder(), af::VerboseOn ) == false) return 1;
 
 	RenderHost * render = RenderHost::getInstance();
 

@@ -123,10 +123,10 @@ std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUO
 int Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
 int Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
 
-std::string Environment::temp_dir = AFSERVER::TEMP_DIRECTORY;
-std::string Environment::renders_dir;
-std::string Environment::jobs_dir;
-std::string Environment::users_dir;
+std::string Environment::store_folder = AFGENERAL::STORE_FOLDER;
+std::string Environment::store_folder_jobs;
+std::string Environment::store_folder_renders;
+std::string Environment::store_folder_users;
 
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
@@ -206,7 +206,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, priority,                          "af_priority"                          );
 	getVar( i_obj, maxrunningtasks,                   "af_maxrunningtasks"                   );
 
-	getVar( i_obj, temp_dir,                          "af_tempdirectory"                     );
+	getVar( i_obj, store_folder,                          "af_store_folder"                     );
 
 	getVar( i_obj, db_conninfo,                       "af_db_conninfo"                       );
 	getVar( i_obj, db_stringquotes,                   "af_db_stringquotes"                   );
@@ -732,9 +732,9 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 bool Environment::initAfterLoad()
 {
 	// Store folders:
-	jobs_dir    = temp_dir + AFGENERAL::PATH_SEPARATOR +    AFJOB::DIRECTORY;
-	renders_dir = temp_dir + AFGENERAL::PATH_SEPARATOR + AFRENDER::DIRECTORY;
-	users_dir   = temp_dir + AFGENERAL::PATH_SEPARATOR +   AFUSER::DIRECTORY;
+	store_folder_jobs    = store_folder + AFGENERAL::PATH_SEPARATOR +    AFJOB::STORE_FOLDER;
+	store_folder_renders = store_folder + AFGENERAL::PATH_SEPARATOR + AFRENDER::STORE_FOLDER;
+	store_folder_users   = store_folder + AFGENERAL::PATH_SEPARATOR +   AFUSER::STORE_FOLDER;
 
 	// HTTP serve folder:
 	if( http_serve_dir.empty()) 
