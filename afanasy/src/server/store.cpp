@@ -51,17 +51,31 @@ Store::~Store()
 
 void Store::save()
 {
+	static const char timeformat[] = "%Y.%m.%d %H:%M.%S";
+
 	std::ostringstream oss;
-	oss << "{";
-	oss << "\n\t\"\":\"This is server store file.\"";
+	oss << "{\n";
+	oss << "\t\"\":\"This is server store file.\",\n";
 
-	oss << ",\n\t\"time_created\" :" << m_time_created;
-	oss << ",\n\t\"time_started\" :" << m_time_started;
-	oss << ",\n\t\"time_modified\":" << m_time_modified;
+	oss << std::endl;
+	oss << "\t\"time_created\":" << m_time_created << ",\n";
+		oss << "\t\t\"\":\"Time the file was created.\",\n";
+		oss << "\t\t\"time_created_str\":\"" << af::time2str( m_time_created, timeformat) << "\",\n";
 
-	oss << ",\n\t\"jobs_serial\":" << m_jobs_serial;
+	oss << std::endl;
+	oss << "\t\"time_started\":" << m_time_started << ",\n";
+		oss << "\t\t\"\":\"Time the server was started.\",\n";
+		oss << "\t\t\"time_started_str\":\"" << af::time2str( m_time_started, timeformat) << "\",\n";
 
-	oss << "\n}";
+	oss << std::endl;
+	oss << "\t\"time_modified\":" << m_time_modified << ",\n";
+		oss << "\t\t\"\":\"Time the file was modified by server.\",\n";
+		oss << "\t\t\"time_modified_str\":\"" << af::time2str( m_time_modified, timeformat) << "\",\n";
+
+	oss << std::endl;
+	oss << "\t\"jobs_serial\":" << m_jobs_serial << ",\n";
+
+	oss << "\n\"\":\"\"\n}";
 	AFCommon::QueueFileWrite( new FileData( oss, m_filename));
 }
 
