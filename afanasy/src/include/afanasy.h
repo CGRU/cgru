@@ -55,6 +55,7 @@ namespace AFUSER
 /// Server options:
 namespace AFSERVER
 {
+	const char STORE_FILE[] = "server.json";
 }
 
 /// Database options:

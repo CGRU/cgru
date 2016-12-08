@@ -6,9 +6,10 @@
 
 #include "../libafsql/name_afsql.h"
 
-#include "filequeue.h"
 #include "dbqueue.h"
+#include "filequeue.h"
 #include "logqueue.h"
+#include "store.h"
 
 struct ThreadArgs;
 
@@ -67,9 +68,11 @@ public:
 		{ if( ms_DBQueue ) ms_DBQueue->addTask( i_exec, i_progress, i_job, i_render );}
 
 private:
-	static FileQueue    * FileWriteQueue;
-	static LogQueue     * OutputLogQueue;
-	static DBQueue      * ms_DBQueue;
+	static FileQueue * FileWriteQueue;
+	static LogQueue  * OutputLogQueue;
+	static DBQueue   * ms_DBQueue;
+
+	static Store * ms_store;
 
 //   static bool detach();
 };
