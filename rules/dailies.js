@@ -763,7 +763,7 @@ function d_WmCreate( i_wm)
 	if( params.text.length == 0 )
 		return;
 
-	i_wm.file = cgru_PM('/' + RULES.root + params.file, true);
+	i_wm.file = c_PathPM_Rules2Server( params.file);
 
 	var cmd = 'bin/convert';
 	cmd += ' -size "' + params.size + '"';
