@@ -79,7 +79,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 	m_cycle(0),
 	m_dead_cycle(0)
 {
-	m_store_dir = af::Environment::getTempDir() + AFGENERAL::PATH_SEPARATOR + "tasks" + AFGENERAL::PATH_SEPARATOR;
+	m_store_dir = af::Environment::getStoreFolder() + AFGENERAL::PATH_SEPARATOR + "tasks" + AFGENERAL::PATH_SEPARATOR;
 	m_store_dir += af::itos( m_taskexec->getJobId());
 	m_store_dir += '.' + af::itos( m_taskexec->getBlockNum());
 	m_store_dir += '.' + af::itos( m_taskexec->getTaskNum());
@@ -123,7 +123,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render):
 		}
 	}
 	if( m_wdir.empty())
-		m_wdir = af::Environment::getTempDir();
+		m_wdir = af::Environment::getStoreFolder();
 	m_taskexec->setWDir( m_wdir);
 
 	// Process environment:

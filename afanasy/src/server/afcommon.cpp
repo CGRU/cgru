@@ -20,9 +20,11 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-FileQueue    * AFCommon::FileWriteQueue = NULL;
-DBQueue      * AFCommon::ms_DBQueue     = NULL;
-LogQueue     * AFCommon::OutputLogQueue = NULL;
+Store * AFCommon::ms_store = NULL;
+
+FileQueue * AFCommon::FileWriteQueue = NULL;
+DBQueue   * AFCommon::ms_DBQueue     = NULL;
+LogQueue  * AFCommon::OutputLogQueue = NULL;
 
 /*
    This ctor will start the various job queues. Note that threads
@@ -33,6 +35,8 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 	FileWriteQueue = new FileQueue("Writing Files");
 	OutputLogQueue = new LogQueue("Log Output");
 	ms_DBQueue     = new DBQueue("AFDB_update", i_threadArgs->monitors);
+
+	ms_store = new Store();
 }
 
 AFCommon::~AFCommon()
