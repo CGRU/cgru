@@ -12,6 +12,7 @@ using namespace af;
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 Job::Job( int i_id)
 {
@@ -142,7 +143,7 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
-	o_str << ",\n\"serial\":\"" << m_serial << "\"";
+	o_str << ",\n\"serial\":" << m_serial;
 
 	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\n\"host_name\":\"" << m_host_name << "\"";

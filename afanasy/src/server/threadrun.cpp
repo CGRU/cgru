@@ -4,6 +4,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgqueue.h"
 
+#include "afcommon.h"
 #include "auth.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -241,6 +242,11 @@ void threadRunCycle( void * i_args)
 	a->users    ->freeZombies();
 
 	}// - lock containers
+
+	// Save store
+	{
+		AFCommon::saveStore();
+	}
 
 	//
 	// Sleeping

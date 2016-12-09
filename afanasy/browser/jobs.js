@@ -1322,7 +1322,8 @@ JobNode.prototype.updatePanels = function()
 
 
 	// Info:
-	var info = 'Created:<br> ' + cm_DateTimeStrFromSec( this.params.time_creation);
+	var info = 'S/N: ' + this.params.serial;
+	info += '<br>Created:<br> ' + cm_DateTimeStrFromSec( this.params.time_creation);
 	if( this.params.time_started )
 		info += '<br>Started:<br> ' + cm_DateTimeStrFromSec( this.params.time_started);
 	if( this.params.time_done )

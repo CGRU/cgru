@@ -34,6 +34,9 @@ public:
 	inline static bool writeFile( const std::ostringstream & i_str, const std::string & i_file_name)
 		{ std::string str = i_str.str(); return writeFile( str.c_str(), str.size(), i_file_name);}
 
+	//
+	// Store folders:
+	//
 	static const std::string getStoreDir( const std::string & i_root, int i_id, const std::string & i_name);
 
 	inline static const std::string getStoreDir( const std::string & i_root, const af::Node & i_node)
@@ -50,7 +53,13 @@ public:
 
 	static const std::vector<std::string> getStoredFolders( const std::string & i_root);
 
+	//
+	// Store operations:
+	//
+	static void saveStore() { return ms_store->save(); }
+
 	static int64_t getJobSerial() { return ms_store->getJobSerial(); }
+
 
 //   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 

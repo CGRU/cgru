@@ -40,6 +40,7 @@ JobAf::JobAf( JSON & i_object):
 	construct();
 
 	m_serial = AFCommon::getJobSerial();
+	// System job never constructed from incoming JSON object and always has zero serial
 }
 
 JobAf::JobAf( const std::string & i_store_dir, bool i_system):
@@ -58,8 +59,12 @@ JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	readStore();
 
 	// Zero serial means that the job was created serials appeared in the project:
-	if( m_serial == 0 )
+	// ( system job has zero serial )
+	if( m_serial == 0 && ( false == i_system ))
+	{
 		m_serial = AFCommon::getJobSerial();
+		store();
+	}
 }
 
 void JobAf::readStore()

@@ -182,7 +182,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 	return newJobId;
 }
 
-const std::vector<std::int32_t> JobContainer::getIdsBySerials( const std::vector<std::int64_t> & i_serials)
+const std::vector<int32_t> JobContainer::getIdsBySerials( const std::vector<int64_t> & i_serials)
 {
 	std::vector<int32_t> ids;
 

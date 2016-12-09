@@ -53,6 +53,8 @@ void Store::save()
 {
 	static const char timeformat[] = "%Y.%m.%d %H:%M.%S";
 
+	m_time_modified = time(NULL);
+
 	std::ostringstream oss;
 	oss << "{\n";
 	oss << "\t\"\":\"This is server store file.\",\n";
@@ -74,6 +76,10 @@ void Store::save()
 
 	oss << std::endl;
 	oss << "\t\"jobs_serial\":" << m_jobs_serial << ",\n";
+
+	oss << std::endl;
+	oss << "\t\t\"\":\"up:  " << af::time2strHMS( m_time_modified - m_time_started ) << "\",\n";
+	oss << "\t\t\"\":\"age: " << af::time2strHMS( m_time_modified - m_time_created ) << "\",\n";
 
 	oss << "\n\"\":\"\"\n}";
 	AFCommon::QueueFileWrite( new FileData( oss, m_filename));

@@ -37,7 +37,7 @@ public:
 	 */
 	void reconnectTask(af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
 
-	const std::vector<std::int32_t> getIdsBySerials( const std::vector<std::int64_t> & i_serials);
+	const std::vector<int32_t> getIdsBySerials( const std::vector<int64_t> & i_serials);
 
 	void getWeight( af::MCJobsWeight & jobsWeight );
 
