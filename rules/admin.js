@@ -793,8 +793,8 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( i_user.bookmarks )
 		el.textContent = i_user.bookmarks.length;
 	el.m_user_id = i_user.id;
-//	if( i_user.disabled !== true )
-//		el.ondblclick = function(e){ad_UserChannelsClean( e.currentTarget.m_user_id);};
+	if( i_user.disabled !== true )
+		el.ondblclick = function(e){ad_UserBookmakrsClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -1009,6 +1009,10 @@ function ad_ChangeEmailOnCkick( i_user_id)
 function ad_ChangeEmail( i_email, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"email":i_email}, ad_WndRefresh);
+}
+function ad_UserBookmakrsClean( i_user_id)
+{
+	ad_SaveUser({"id":i_user_id,"bookmarks":[]}, ad_WndRefresh);
 }
 function ad_UserChannelsClean( i_user_id)
 {
