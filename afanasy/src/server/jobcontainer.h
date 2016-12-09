@@ -21,8 +21,9 @@ public:
 	JobContainer();
 	~JobContainer();
 
-	/// Register a new job, new id returned on success, else return 0.
-	int job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring);
+	/// Register a new job:
+	af::Msg * registerJob( JSON & i_object, UserContainer * i_users, MonitorContainer * i_monitoring);
+	bool registerJob( JobAf *job, std::string & o_err, UserContainer *users, MonitorContainer * monitoring);
 
 	/// Update some task state of some job.
 	void updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring);

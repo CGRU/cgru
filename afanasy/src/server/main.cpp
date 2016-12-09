@@ -233,7 +233,11 @@ int main(int argc, char *argv[])
 					continue;
 				}
 			}
-			jobs.job_register( job, &users, NULL);
+
+			std::string err;
+			jobs.registerJob( job, err, &users, NULL);
+			if( err.size())
+				AF_ERR << err;
 		}
 		else
 		{
@@ -256,7 +260,11 @@ int main(int argc, char *argv[])
 	if( hasSystemJob == false )
 	{
 		SysJob* job = new SysJob();
-		jobs.job_register( job, &users, NULL);
+
+		std::string err;
+		jobs.registerJob( job, err, &users, NULL);
+		if( err.size())
+			AF_ERR << err;
 	}
 
 	/*
