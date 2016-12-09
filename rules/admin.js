@@ -1119,6 +1119,7 @@ function ad_DisableUser( i_user_id)
 	uobj.disabled = true;
 	delete uobj.news;
 	delete uobj.channels;
+	delete uobj.bookmarks;
 
 	n_Request({"send":{"disableuser":{"uid":i_user_id,"uobj":uobj}},"func":ad_ChangesFinished,
 			"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" disabled.'});
