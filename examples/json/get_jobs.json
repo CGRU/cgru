@@ -3,9 +3,10 @@
 	{
 		"type"  : "jobs",
 		"-ids"   : [1],
+		"-serials": [1,2],
 		"-uids"  : [1,2],
 		"-mode"  : "full",
-		"users" : ["alex","peter"],
+		"-users" : ["alex","peter"],
 		"-mask"  : "afanasy|_empty_.*"
 	}
 }

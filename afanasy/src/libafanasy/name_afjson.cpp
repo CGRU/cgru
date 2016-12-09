@@ -256,6 +256,20 @@ bool af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const 
 	return true;
 }
 
+bool af::jr_int64vec( const char * i_name, std::vector<int64_t> & o_attr, const JSON & i_object)
+{
+	const JSON & array = i_object[i_name];
+	if( false == array.IsArray())
+		return false;
+
+	o_attr.clear();
+	for( int i = 0; i < array.Size(); i++)
+		if( array[i].IsInt64())
+			o_attr.push_back( array[i].GetInt64());
+
+	return true;
+}
+
 bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object)
 {
 	const JSON & array = i_object[i_name];

@@ -50,14 +50,16 @@ public:
 
 	static const std::vector<std::string> getStoredFolders( const std::string & i_root);
 
+	static int64_t getJobSerial() { return ms_store->getJobSerial(); }
+
 //   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 
 	inline static void QueueFileWrite( FileData * i_filedata)      { FileWriteQueue->pushFile( i_filedata); }
 	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { FileWriteQueue->pushNode( i_node);     }
 
-	inline static bool QueueLog(        const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Info  ); else return false;}
-	inline static bool QueueLogError(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Error ); else return false;}
-	inline static bool QueueLogErrno(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Errno ); else return false;}
+	inline static void QueueLog(      const std::string & log) { OutputLogQueue->pushLog( log, LogData::Info  );}
+	inline static void QueueLogError( const std::string & log) { OutputLogQueue->pushLog( log, LogData::Error );}
+	inline static void QueueLogErrno( const std::string & log) { OutputLogQueue->pushLog( log, LogData::Errno );}
 
 	inline static void DBAddJob( const af::Job * i_job) { if( ms_DBQueue ) ms_DBQueue->addJob( i_job );}
 	inline static void DBAddTask(

@@ -38,6 +38,8 @@ JobAf::JobAf( JSON & i_object):
 	
 	m_progress = new af::JobProgress( this);
 	construct();
+
+	m_serial = AFCommon::getJobSerial();
 }
 
 JobAf::JobAf( const std::string & i_store_dir, bool i_system):
@@ -54,6 +56,10 @@ JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	if( i_system ) return;
 
 	readStore();
+
+	// Zero serial means that the job was created serials appeared in the project:
+	if( m_serial == 0 )
+		m_serial = AFCommon::getJobSerial();
 }
 
 void JobAf::readStore()

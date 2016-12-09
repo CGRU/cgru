@@ -40,6 +40,8 @@ public:
 		FIgnorePaused = 1ULL << 35
 	};
 
+	inline int64_t getSerial() const { return m_serial; }
+
 	inline int getBlocksNum()           const { return m_blocks_num;                }
 	inline int getTimeLife()            const { return m_time_life;                 }
 	inline int getUserListOrder()       const { return m_user_list_order;           }
@@ -140,6 +142,8 @@ public:
 protected:
 	BlockData  ** m_blocks_data;    ///< Blocks pointer.
 	int32_t m_blocks_num;   ///< Number of blocks in job.
+
+	int64_t m_serial;
 
 	int32_t m_user_list_order;   ///< Job order in user jobs list.
 

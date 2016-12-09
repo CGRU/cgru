@@ -87,7 +87,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 		return 0;
 	}
 
-	// Job from sore already checked for validness during afret reading files
+	// Job from store is already checked for validness
 	if(( job->isFromStore() == false ) && (job->isValidConstructed() == false ))
 	{
 		AFCommon::QueueLogError("Deleting invalid job.");
@@ -180,6 +180,29 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 	}
 
 	return newJobId;
+}
+
+const std::vector<std::int32_t> JobContainer::getIdsBySerials( const std::vector<std::int64_t> & i_serials)
+{
+	std::vector<int32_t> ids;
+
+	JobContainerIt jobsIt( this);
+	for( JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
+	{
+		for( int i = 0; i < i_serials.size(); i++)
+		{
+			if( i_serials[i] == job->getSerial())
+			{
+				ids.push_back( job->getId());
+				break;
+			}
+		}
+	}
+
+	if( ids.size() == 0 )
+		ids.push_back(-1);
+
+	return ids;
 }
 
 void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )

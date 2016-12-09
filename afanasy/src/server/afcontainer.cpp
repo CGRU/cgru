@@ -250,6 +250,10 @@ void AfContainer::generateListIDs( int i_type, af::MCAfNodes & o_mcnodes, std::o
 			AFCommon::QueueLogError("AfContainer::generateListIDs: position >= size");
 			continue;
 		}
+
+		if( i_ids[i] <= 0 )
+			continue;
+
 		AfNodeSrv * node = m_nodes_table[ i_ids[i]];
 		if( NULL == node)
 			continue;

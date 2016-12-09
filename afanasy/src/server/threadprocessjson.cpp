@@ -217,8 +217,16 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				}
 
 				if( o_msg_response == NULL )
+				{
+					std::vector<int64_t> serials;
+					if( af::jr_int64vec("serials", serials, getObj))
+					{
+						ids = i_args->jobs->getIdsBySerials( serials);
+					}
+
 					o_msg_response = i_args->jobs->generateList(
 						full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
+				}
 			}
 		}
 		else if( type == "renders")

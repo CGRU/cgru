@@ -93,6 +93,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
+	jr_int64 ("serial", m_serial, i_object);
+
 	jr_string("host_name", m_host_name,     i_object);
 	//jr_uint32("flags",   m_flags,         i_object);
 	jr_int64("st",        m_state,         i_object);
@@ -139,6 +141,8 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	o_str << "{";
 
 	Node::v_jsonWrite( o_str, i_type);
+
+	o_str << ",\n\"serial\":\"" << m_serial << "\"";
 
 	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
@@ -231,6 +235,7 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 void Job::initDefaultValues()
 {
 	m_id = 0;
+	m_serial = 0;
 	m_blocks_num = 0;
 	m_max_running_tasks = -1;
 	m_max_running_tasks_per_host = -1;
@@ -304,6 +309,9 @@ Job::~Job()
 void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
+	/* NEW VERSON
+	rw_int64_t ( m_serial, msg);
+	*/
 
 	rw_int32_t ( m_blocks_num,                 msg);
 	rw_int64_t ( m_flags,                      msg);
