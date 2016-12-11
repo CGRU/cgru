@@ -8,29 +8,9 @@ fi
 
 cd ..
 
-./Renders.sh rf0 10
-sleep 1
-./Renders.sh rf1 5
-sleep 1
-./Renders.sh wl0 5
+./Renders.sh rf 5
 sleep 1
 
-afcmd rpri rf1. 200
-sleep 1
-afcmd rpri rf0. 150
-sleep 1
-afcmd rpri wl0. 100
-sleep 1
-
-afcmd ruser wl00 timurhai
-afcmd ruser wl01 john
-afcmd ruser wl02 bob
-afcmd ruser wl03 alex
-afcmd ruser wl04 peter
-sleep 1
-
-afcmd rnimby "wl0."
-afcmd rNIMBY "wl0[0\|2]"
 
 export AF_USERNAME=timurhai
 export AF_HOSTNAME=wl00
