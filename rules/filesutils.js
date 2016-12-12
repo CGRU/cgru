@@ -514,9 +514,10 @@ function fu_PutMultiDo( i_wnd)
 fu_arch_params = {};
 fu_arch_params.dest = {'label':'Destination'};
 fu_arch_params.split = {'tooltip':'Split archive size.'};
-fu_arch_params.af_capacity = {'label':'Capacity','tooltip':'Afanasy tasks capacity.','width':'33%'};
-fu_arch_params.af_maxtasks = {'label':'Max Run Tasks','tooltip':'Maximum running tasks.','width':'33%','lwidth':'150px'};
-fu_arch_params.af_perhost = {'label':'Per Host','tooltip':'Maximum running tasks per host.','default':-1,'width':'33%'};
+fu_arch_params.af_capacity = {'label':'Capacity','tooltip':'Afanasy tasks capacity.','width':'25%'};
+fu_arch_params.af_maxtasks = {'label':'Max Run Tasks','tooltip':'Maximum running tasks.','width':'25%','lwidth':'150px'};
+fu_arch_params.af_perhost = {'label':'Max Per Host','tooltip':'Maximum running tasks per host.','default':-1,'width':'25%'};
+fu_arch_params.af_hostsmaks = {'label':'Hosts Mask','tooltip':'Hosts Mask.','width':'25%'};
 function fu_Archive( i_args)
 {
 //console.log( JSON.stringify( i_args));
@@ -601,6 +602,7 @@ function fu_ArchivateProcessGUI( i_wnd)
 	job.name += ' ' + c_PathBase( c_PathDir( paths[0])) + ' x' + paths.length;
 	job.max_running_tasks = parseInt( params.af_maxtasks);
 	job.max_running_tasks_per_host = parseInt( params.af_perhost);
+	job.hosts_mask = params.af_hostsmaks;
 
 	var block = {};
 	block.name = c_PathDir( paths[0]);
