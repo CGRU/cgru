@@ -303,6 +303,34 @@ function nw_MakeNews( i_news, i_args )
 	var request = nw_CreateNews( i_news);
 	nw_SendNews([request], i_args);
 }
+function nw_StatusesChanged( i_statuses)
+{
+	var news_requests = [];
+	var bookmarks = [];
+
+	for( var i = 0; i < i_statuses.length; i++)
+	{
+		var request = nw_CreateNews({"title":'status',"path":i_statuses[i].path,"artists":i_statuses[i].obj.artists});
+		if( request )
+			news_requests.push( request);
+
+		var bm = {};
+		bm.status = i_statuses[i].obj;
+		bm.path = i_statuses[i].path;
+		bookmarks.push( bm);
+	}
+
+	var obj = {};
+	obj.send = {};
+	obj.send.makenews = {};
+	obj.send.makenews.news_requests = news_requests;
+	obj.send.makenews.bookmarks = bookmarks;
+	obj.func = nw_MakeNewsFinished;
+	obj.args = {'func': bm_StatusesChanged};
+	obj.info = 'news statuses';
+
+	n_Request( obj);
+}
 function nw_CreateNews( i_news)
 {
 	if( i_news == null )
@@ -359,7 +387,7 @@ function nw_SendNews( i_requests, i_args)
 {
 	if( i_requests == null )
 	{
-		c_Error('Can`t send news from "null" request.');
+		c_Error('Can`t send news from "null" requests.');
 		return;
 	}
 	if( i_requests.length == 0 )
@@ -376,7 +404,7 @@ function nw_SendNews( i_requests, i_args)
 		}
 	}
 
-	n_Request({"send":{"makenews":i_requests},"func":nw_MakeNewsFinished,"args":i_args});
+	n_Request({'send':{'makenews':{'news_requests':i_requests}},'info':'news make','func':nw_MakeNewsFinished,'args':i_args});
 }
 function nw_MakeNewsFinished( i_data, i_args)
 {

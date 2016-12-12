@@ -1260,8 +1260,7 @@ Status.prototype.editSave = function( i_args)
 	// Set values to statuses
 	var some_progress_changed = false;
 	var progresses = {};
-	var news = [];
-	var st_objs = [];
+
 	for( var i = 0; i < statuses.length; i++)
 	{
 		if( statuses[i].obj == null ) statuses[i].obj = {};
@@ -1407,21 +1406,14 @@ Status.prototype.editSave = function( i_args)
 		if( this.elEdit_Color.m_color_changed )
 			statuses[i].obj.color = this.elEdit_Color.m_color;
 
-		// Status saving can produce some news.
-		var nw = statuses[i].save();
-		if( nw )
-			news.push( nw);
-
-		// Status showing causes values redraw,
-		// and destoys edit GUI if any.
+		statuses[i].save();
 		statuses[i].show();
-
-		st_objs.push(statuses[i].obj);
+		//^ Status showing causes values redraw,
+		// and destoys edit GUI if any.
 	}
 
-	// Send news:
-	nw_SendNews( news, {"func":bm_Process});
-	// And process bookmarks, but after, to not modify the same user data file at once
+	// News & Bookmarks:
+	nw_StatusesChanged( statuses);
 
 	if( some_progress_changed )
 		st_UpdateProgresses( this.path, progresses);
@@ -1435,7 +1427,6 @@ Status.prototype.save = function()
 	this.obj.mtime = c_DT_CurSeconds();
 
 	st_Save( this.obj, this.path);
-	return nw_CreateNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 }
 
 function st_Save( i_status, i_path, i_func, i_args, i_navig_params_update)

@@ -242,10 +242,6 @@ function processUser( $i_arg, &$o_out)
 	$filename = $dirname.'/'.$UserID.'.json';
 	$user = array();
 
-	$editobj = array();
-	$editobj['add'] = true;
-	$editobj['file'] = $filename;
-
 	if( is_file( $filename))
 		readObj( $filename, $user);
 	if( array_key_exists('error', $user))
@@ -259,12 +255,17 @@ function processUser( $i_arg, &$o_out)
 
 	processUserIP( $i_arg, $user);
 
-	$editobj['object'] = $user;
-	$out = array();
-	jsf_editobj( $editobj, $out);
-	if( array_key_exists('error', $out))
+	// Delete nulls from some arrays:
+	$arrays = array('news','bookmarks','channels');
+	foreach( $arrays as $arr)
+		for( $i = 0; $i < count($user[$arr]); )
+			if( is_null( $user[$arr][$i]))
+				array_splice( $user[$arr], $i, 1);
+			else $i++;
+
+	if( false == writeUser( $user))
 	{
-		$o_out['error'] = $out['error'];
+		$o_out['error'] = 'Can`t write current user';
 		return;
 	}
 
@@ -1190,21 +1191,53 @@ function jsf_save( $i_save, &$o_out)
 
 function jsf_makenews( $i_args, &$o_out)
 {
-	if( ! is_array( $i_args))
+	// Read all users:
+	$users = array();	
+	getallusers( $users);
+	if( array_key_exists('error', $users))
 	{
-		$o_out['error'] = 'News function argument should be an array.';
+		$o_out['error'] = $users['error'];
 		return;
 	}
-	$count = count( $i_args);
-	if( $count == 0 )
+	$users = $users['users'];
+	if( count( $users) == 0 )
 	{
-		$o_out['error'] = 'News function argument array has zero length.';
+		$o_out['error'] = 'No users found.';
 		return;
 	}
-	for( $i = 0; $i < $count; $i++)
-	makenews( $i_args[$i], $o_out);
+
+	$users_changed = array();
+
+	foreach( $i_args['news_requests'] as $request)
+	{
+		$ids = makenews( $request, $users, $o_out);
+		if( isset( $o_out['error']))
+			return;
+
+		foreach( $ids as $id)
+			if( false == in_array( $id, $users_changed))
+				array_push( $users_changed, $id);
+	}
+
+	if( isset( $i_args['bookmarks']))
+		foreach( $i_args['bookmarks'] as $bm)
+		{
+			$ids = makebookmarks( $bm, $users, $o_out);
+			if( isset( $o_out['error']))
+				return;
+
+			foreach( $ids as $id)
+				if( false == in_array( $id, $users_changed))
+					array_push( $users_changed, $id);
+		}
+
+	// Write changed users:
+	foreach( $users_changed as $id)
+		writeUser( $users[$id]);
+
+	$o_out['users'] = $users_changed;
 }
-function makenews( $i_args, &$o_out)
+function makenews( $i_args, &$io_users, &$o_out)
 {
 	global $FileMaxLength;
 
@@ -1314,21 +1347,6 @@ function makenews( $i_args, &$o_out)
 
 	// Process users subsriptions:
 
-	// Read users:
-	$users = array();	
-	getallusers( $users);
-	if( array_key_exists('error', $users))
-	{
-		$o_out['error'] = $users['error'];
-		return;
-	}
-	$users = $users['users'];
-	if( count( $users) == 0 )
-	{
-		$o_out['error'] = 'No users found.';
-		return;
-	}
-
 	// User may be does not want to receive own news:
 	$ignore_own = false;
 	if( isset( $i_args['ignore_own']) && $i_args['ignore_own'] )
@@ -1336,16 +1354,16 @@ function makenews( $i_args, &$o_out)
 
     // Get subscribed users:
     $sub_users = array();
-	$o_out['users'] = array();
-	foreach( $users as &$user )
+	$changed_users = array();
+	foreach( $io_users as &$user )
 	{
-
 		// If this is news owner:
 		if( $news['user'] == $user['id'] )
 		{
 			// Store last news time:
 			$user['ntime'] = time();
-			writeUser( $user);
+			if( false == in_array( $user['id'], $changed_users))
+				array_push( $changed_users, $user['id']);
 
 			// If user does not want to receive own news:
 			if( $ignore_own )
@@ -1355,9 +1373,8 @@ function makenews( $i_args, &$o_out)
 		if( array_key_exists( 'artists', $news))
 			if( in_array( $user['id'], $news['artists']))
 			{
-				array_push( $sub_users, $user);
-				if( false === array_search( $user['id'], $o_out['users']))
-					array_push( $o_out['users'], $user['id']);
+				if( false == in_array( $user['id'], $sub_users))
+					array_push( $sub_users, $user['id']);
 				continue;
 			}
 
@@ -1366,15 +1383,22 @@ function makenews( $i_args, &$o_out)
 			foreach( $user['channels'] as $channel )
 				if( strpos( $news['path'], $channel['id'] ) === 0 )
 				{
-					array_push( $sub_users, $user);
-					array_push( $o_out['users'], $user['id']);
+					if( false == in_array( $user['id'], $sub_users))
+						array_push( $sub_users, $user['id']);
 					break;
 				}
 	}
 
+
     // Add news and write files:
-    foreach( $sub_users as &$user)
+    foreach( $sub_users as $id)
     {
+		$user = &$io_users[$id];
+
+		// Add uid to changed array:
+		if( false == in_array( $user['id'], $changed_users))
+			array_push( $changed_users, $user['id']);
+
 		// Delete older news with the same path:
 		for( $i = 0; $i < count($user['news']); $i++)
 		{
@@ -1397,9 +1421,6 @@ function makenews( $i_args, &$o_out)
 		while( count( $user['news']) > $limit)
 			array_pop( $user['news']);
 
-		// Write user file:
-		writeUser( $user);
-
 		// Send emails
 		if( array_key_exists('email', $user) == false ) continue;
 		if( array_key_exists('email_news', $user) == false ) continue;
@@ -1414,6 +1435,62 @@ function makenews( $i_args, &$o_out)
 		$out = array();
 		jsf_sendmail( $mail, $out);
 	}
+
+	return $changed_users;
+}
+function makebookmarks( $i_bm, &$io_users, &$o_out)
+{
+	global $UserID;
+
+	$changed_users = array();
+	foreach( $io_users as &$user )
+	{
+		$bm = null;
+
+		// Try to found existing bookmark with the same path:
+		if( isset( $user['bookmarks']))
+		{
+			foreach( $user['bookmarks'] as &$ubm)
+			{
+				if( is_null( $ubm))
+					continue;
+
+				if( $ubm['path'] == $i_bm['path'])
+				{
+					$bm = &$ubm;
+					break;
+				}
+			}
+		}
+
+		if( is_null($bm))
+		{
+			// Check whether the bookmark is needed:
+			if( is_null( $i_bm['status'])) continue;
+			if( false == isset( $i_bm['status']['artists'])) continue;
+			if( false == in_array( $user['id'], $i_bm['status']['artists'])) continue;
+			if( isset( $i_bm['status']['progress']) && ($i_bm['status']['progress'] >= 100)) continue;
+			if( isset( $i_bm['status']['flags']) && in_array('omit', $i_bm['status']['flags'])) continue;
+
+			// Create a new bookmark:
+			$bm = array();
+			$bm['path'] = $i_bm['path'];
+			$bm['cuser'] = $UserID;
+			$bm['ctime'] = time();
+		}
+
+		$bm['status'] = $i_bm['status'];
+		$bm['muser'] = $UserID;
+		$bm['mtime'] = time();
+
+		if( false == isset( $user['bookmarks']))
+			$user['bookmarks'] = array();
+
+		array_push( $user['bookmarks'], $bm);
+		array_push( $changed_users, $user['id']);
+	}
+
+	return $changed_users;
 }
 
 function isAdmin( &$o_out)

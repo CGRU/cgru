@@ -475,9 +475,13 @@ opacity: 0.5;
 }
 #bookmarks .bookmark.cur_path { background: rgba( 100, 255, 255, .2); }
 #bookmarks .bookmark .button.delete {
+display: none;
 float: right;
 width: 14px;
 height: 14px;
+}
+#bookmarks .bookmark.obsolete .button.delete {
+display: block;
 }
 
 

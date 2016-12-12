@@ -82,7 +82,7 @@ function bm_Load( i_args)
 
 	//$('bookmarks').innerHTML = 'Loading...';
 	var filename = 'users/'+g_auth_user.id+'.json';
-	n_Request({"send":{"getfile":filename},"func":bm_Received,"args":i_args,"info":"bookmarks " + i_args.info});
+	n_Request({"send":{"getobject":{'file':filename,'object':'bookmarks'}},"func":bm_Received,"args":i_args,"info":"bookmarks " + i_args.info});
 }
 
 function bm_Received( i_user, i_args)
@@ -180,7 +180,6 @@ function bm_Show()
 	}
 
 	bm_HighlightCurrent();
-//	bm_Filter();
 }
 
 function bm_CreateElements( i_bm)
@@ -204,21 +203,28 @@ function bm_CreateElements( i_bm)
 		st_SetElProgress( i_bm.status, elBar);
 	}
 
-	if( bm_StatusOld( i_bm.status ))
-	{
-		var elDel = document.createElement('div');
-		el.appendChild( elDel);
-		elDel.classList.add('button');
-		elDel.classList.add('delete');
-		elDel.m_path = i_bm.path;
-		elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
-		elDel.title = 'Double click to delete.';
-	}
+	var elDel = document.createElement('div');
+	el.appendChild( elDel);
+	elDel.classList.add('button');
+	elDel.classList.add('delete');
+	elDel.m_path = i_bm.path;
+	elDel.ondblclick = function(e){ bm_Delete([e.currentTarget.m_path]);};
+	elDel.title = 'Double click to delete.';
 
 	var elPath = document.createElement('a');
 	el.appendChild( elPath);
 	elPath.textContent = name;
 	elPath.href = '#' + i_bm.path;
+
+	var tooltip = '';
+	if( i_bm.cuser ) tooltip += 'Created by: '  + c_GetUserTitle(  i_bm.cuser) + '\n';
+	if( i_bm.ctime ) tooltip += 'Created at: '  + c_DT_StrFromSec( i_bm.ctime) + '\n';
+	if( i_bm.muser ) tooltip += 'Modified by: ' + c_GetUserTitle(  i_bm.muser) + '\n';
+	if( i_bm.mtime ) tooltip += 'Modified at: ' + c_DT_StrFromSec( i_bm.mtime) + '\n';
+	el.title = tooltip;
+
+	if( bm_Obsolete( i_bm ))
+		el.classList.add('obsolete');
 
 	el.m_bookmark = i_bm;
 
@@ -251,75 +257,38 @@ function bm_NavigatePost()
 	if( $('sidepanel').classList.contains('opened') != true )
 		return;
 
-	bm_Process();
 	bm_HighlightCurrent();
 }
 
-function bm_StatusOld( i_status)
+function bm_Obsolete( i_bm)
 {
-	if( i_status == null )
+	if( i_bm.status == null )
 		return true;
 
-	if( i_status.artists == null )
+	if( i_bm.status.artists == null )
 		return true;
 
-	if( i_status.artists.indexOf( g_auth_user.id ) == -1 )
+	if( i_bm.status.artists.indexOf( g_auth_user.id ) == -1 )
 		return true;
 
-	if( i_status.progress )
+	if( i_bm.status.progress )
 	{
-		if( i_status.progress >= 100 )
+		if( i_bm.status.progress >= 100 )
 			return true;
 	}
 
-	if( i_status.flags )
+	if( i_bm.status.flags )
 	{
-		if( i_status.flags.indexOf('omit') != -1 )
+		if( i_bm.status.flags.indexOf('omit') != -1 )
 			return true;
 	}
 
 	return false;
 }
 
-function bm_Process()
+function bm_StatusesChanged( i_args)
 {
-	if( false == bm_initialized )
-		return;
-
-	var bm = null;
-	var path = g_CurPath();
-
-	if( g_auth_user.bookmarks )
-		for( var b = 0; b < g_auth_user.bookmarks.length; b++)
-			if( g_auth_user.bookmarks[b] && ( path == g_auth_user.bookmarks[b].path ))
-			{
-				bm = g_auth_user.bookmarks[b];
-				break;
-			}
-
-
-	// No bookmark was founded with the current path:
-	if( bm == null )
-	{
-		if( bm_StatusOld( RULES.status))
-			return;
-
-		// Create a new bookmark:
-		bm = {};
-		bm.path = path;
-		bm.ctime = c_DT_CurSeconds();
-	}
-
-	bm.mtime = c_DT_CurSeconds();
-	bm.status = RULES.status;
-
-	var obj = {};
-	obj.pusharray = 'bookmarks';
-	obj.objects = [bm];
-	obj.keyname = 'path';
-	obj.file = 'users/' + g_auth_user.id + '.json';
-
-	n_Request({"send":{"editobj":obj},"func":bm_Load,"info":"bookmarks add"});
+	bm_Load({'info':'statuses'});
 }
 
 function bm_HighlightCurrent()
@@ -331,6 +300,8 @@ function bm_HighlightCurrent()
 		if( path == bm_elements[i].m_bookmark.path )
 		{
 			bm_elements[i].classList.add('cur_path');
+			if( g_CurPathDummy())
+				bm_elements[i].classList.add('obsolete');
 			//bm_elements[i].scrollIntoView();
 		}
 		else
@@ -338,55 +309,6 @@ function bm_HighlightCurrent()
 			bm_elements[i].classList.remove('cur_path');
 		}
 	}
-}
-
-function bm_FilterBtn( i_btn, i_project)
-{
-	i_btn.m_filter = i_filter;
-	i_btn.m_project = i_project;
-
-	// Get all news filter buttons and remove push:
-	var btns = document.getElementsByClassName('bm_prj');
-	for( var i = 0; i < btns.length; i++)
-		btns[i].classList.remove('pushed');
-
-	// Add push on clicked button except 'All':
-	if( i_filter == '_all_')
-		bm_filter_project = null;
-	else
-		i_btn.classList.add('pushed');
-
-	bm_Filter();
-}
-
-function bm_Filter()
-{
-	var filter = null;
-	var project = null;
-
-	// Get all news filter buttons and remove push:
-	var btns = document.getElementsByClassName('bm_prj');
-	for( var i = 0; i < btns.length; i++)
-		if( btns[i].classList.contains('pushed'))
-		{
-			filter = btns[i].m_filter;
-			project = btns[i].m_project;
-		}
-
-	for( var i = 0; i < bm_elements.length; i++)
-	{
-		if( project && ( bm_elements[i].m_news.path.indexOf( filter ) == 1 ))
-		{
-			elMBs[i].style.display = 'block';
-		}
-		else
-		{
-			bm_elements[i].style.display = 'none';
-		}
-	}
-
-	if( project )
-		bm_filter_project = filter;
 }
 
 function bm_Delete( i_paths)
@@ -430,6 +352,8 @@ function bm_DeleteFinished( i_data)
 
 function bm_Compare(a,b)
 {
+	if( a == null ) return  1;
+	if( b == null ) return -1;
 	if( a.path > b.path ) return  1;
 	if( a.path < b.path ) return -1;
 	return 0;

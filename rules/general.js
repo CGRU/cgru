@@ -105,6 +105,7 @@ function g_Init_Rules( i_data)
 }
 
 function g_CurPath() { if( g_elCurFolder ) return g_elCurFolder.m_path; else return null;}
+function g_CurPathDummy() { if( g_elCurFolder ) return g_elCurFolder.m_fobject.dummy; else return true;}
 
 function g_OnKeyDown(e)
 {
