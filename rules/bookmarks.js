@@ -14,7 +14,12 @@ function bm_Init()
 
 
 	// Bookmarks are not available for guests:
-	if( g_auth_user == null ) return;
+	if( g_auth_user == null )
+		return;
+
+	// Bookmarks are available only for artists:
+	if( c_IsNotAnArtist())
+		return;
 
 	$('sidepanel_bookmarks').style.display = 'block';
 	bm_initialized = true;
@@ -49,6 +54,9 @@ function bm_Close()
 }
 function bm_Open( i_load)
 {
+	if( false == bm_initialized )
+		return;
+
 	$('sidepanel_bookmarks').classList.add('opened');
 	localStorage.bookmarks_opened = 'true';
 
@@ -60,7 +68,8 @@ function bm_Open( i_load)
 
 function bm_Load( i_args)
 {
-	if( g_auth_user == null ) return;
+	if( false == bm_initialized )
+		return;
 
 	if( i_args == null )
 		i_args = {};
@@ -274,7 +283,7 @@ function bm_StatusOld( i_status)
 
 function bm_Process()
 {
-	if( g_auth_user == null )
+	if( false == bm_initialized )
 		return;
 
 	var bm = null;
