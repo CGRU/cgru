@@ -1445,25 +1445,25 @@ function makebookmarks( $i_bm, &$io_users, &$o_out)
 	$changed_users = array();
 	foreach( $io_users as &$user )
 	{
-		$bm = null;
+		if( false == isset( $user['bookmarks']))
+			$user['bookmarks'] = array();
 
-		// Try to found existing bookmark with the same path:
-		if( isset( $user['bookmarks']))
+		// Try to find existing bookmark index with the same path:
+		$bm_index = -1;
+		for( $i = 0; $i < count($user['bookmarks']); $i++)
 		{
-			foreach( $user['bookmarks'] as &$ubm)
-			{
-				if( is_null( $ubm))
-					continue;
+			if( is_null( $user['bookmarks'][$i]))
+				continue;
 
-				if( $ubm['path'] == $i_bm['path'])
-				{
-					$bm = &$ubm;
-					break;
-				}
+			if( $user['bookmarks'][$i]['path'] == $i_bm['path'])
+			{
+				$bm_index = $i;
+				break;
 			}
 		}
 
-		if( is_null($bm))
+		// Bookmark with the same path does not exist:
+		if( $bm_index == -1 )
 		{
 			// Check whether the bookmark is needed:
 			if( is_null( $i_bm['status'])) continue;
@@ -1472,21 +1472,24 @@ function makebookmarks( $i_bm, &$io_users, &$o_out)
 			if( isset( $i_bm['status']['progress']) && ($i_bm['status']['progress'] >= 100)) continue;
 			if( isset( $i_bm['status']['flags']) && in_array('omit', $i_bm['status']['flags'])) continue;
 
-			// Create a new bookmark:
-			$bm = array();
-			$bm['path'] = $i_bm['path'];
-			$bm['cuser'] = $UserID;
-			$bm['ctime'] = time();
+			// Initialize parameters:
+			$i_bm['cuser'] = $UserID;
+			$i_bm['ctime'] = time();
+		}
+		else
+		{
+			// Copy paramters:
+			$i_bm['cuser'] = $user['bookmarks'][$i]['cuser'];
+			$i_bm['ctime'] = $user['bookmarks'][$i]['ctime'];
+
+			// Delete existing bookmark:
+			array_splice( $user['bookmarks'], $i, 1);
 		}
 
-		$bm['status'] = $i_bm['status'];
-		$bm['muser'] = $UserID;
-		$bm['mtime'] = time();
+		$i_bm['muser'] = $UserID;
+		$i_bm['mtime'] = time();
 
-		if( false == isset( $user['bookmarks']))
-			$user['bookmarks'] = array();
-
-		array_push( $user['bookmarks'], $bm);
+		array_push( $user['bookmarks'], $i_bm);
 		array_push( $changed_users, $user['id']);
 	}
 
