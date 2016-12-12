@@ -736,6 +736,52 @@ function jsf_getfile( $i_file, &$o_out)
 		$o_out['error'] = 'Unable to load file '.$i_file;
 }
 
+function jsf_getobject( $i_args, &$o_out)
+{
+	global $FileMaxLength;
+
+	if( false == isset( $i_args['file']))
+	{
+		$o_out['error'] = 'File is not set.';
+		return;
+	}
+	if( false == isset( $i_args['object']))
+	{
+		$o_out['error'] = 'Object is not set.';
+		return;
+	}
+
+	$file = $i_args['file'];
+	$object = $i_args['object'];
+
+	if( false == is_file( $file))
+	{
+		$o_out['error'] = 'No such file '.$file;
+		return;
+	}
+	if( false == htaccessPath( $file))
+	{
+		$o_out['error'] = 'Permissions denied';
+		return;
+	}
+
+	if( $fHandle = fopen( $file, 'r'))
+	{
+		_flock_( $fHandle, LOCK_SH);
+
+		$data = json_decode( fread( $fHandle, $FileMaxLength), true);
+		if(( false == is_null($data )) && isset($data[$object]))
+			$o_out[$object] = $data[$object];
+		else
+			$o_out[$object] = null;
+
+		_flock_( $fHandle, LOCK_UN);
+		fclose($fHandle);
+	}
+	else
+		$o_out['error'] = 'Unable to load file '.$file;
+}
+
 function jsf_makefolder( $i_args, &$o_out)
 {
 	$dirname = $i_args['path'];

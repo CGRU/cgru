@@ -441,23 +441,27 @@ function nw_NewsLoad( i_refresh)
 
 	$('news').innerHTML = 'Loading...';
 	var filename = 'users/'+g_auth_user.id+'.json';
-	n_Request({"send":{"getfile":filename},"func":nw_NewsReceived,"info":"news"});
+	n_Request({'send':{'getobject':{'file':filename,'object':'news'}},'func':nw_NewsReceived,'info':'news'});
 }
 
-function nw_NewsReceived( i_user)
+function nw_NewsReceived( i_data)
 {
 //console.log('nw_NewsReceived()');
-	if( i_user == null ) return;
-	if( i_user.error )
+	if( i_data == null ) return;
+	if( i_data.error )
 	{
-		c_Error( i_user.error);
+		c_Error( i_data.error);
 		return;
 	}
 
+	var news = [];
+	if( i_data.news )
+		news = i_data.news;
+
 	g_auth_user.news = [];
-	for( var i = 0; i < i_user.news.length; i++)
-		if( i_user.news[i])
-			g_auth_user.news.push( i_user.news[i]);
+	for( var i = 0; i < news.length; i++)
+		if( news[i])
+			g_auth_user.news.push( news[i]);
 
 	nw_NewsShow();
 }
