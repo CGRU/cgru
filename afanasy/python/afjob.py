@@ -806,6 +806,8 @@ if __name__ == '__main__':
         cmd += ' -start_frame @#@ -end_frame @#@ -frame_step %d' % by
         if output != '':
             cmd += ' -output "%s"' % output
+            images = output
+        cmd += ' -log_width 0'
 
     # simple generic:
     else:

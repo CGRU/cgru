@@ -9,6 +9,8 @@ re_percent_number = re.compile(r'\d+')
     
 re_frame = re.compile(r'Saving Image:')
 
+re_image = re.compile(r'File \'(.*)\'')
+
 
 class clarisse(parser.parser):
     """Isotropix Clarisse
@@ -37,6 +39,11 @@ class clarisse(parser.parser):
         if match is not None:
             self.frame += 1
             need_calc = True
+
+        # Search for an image for thumbnail:
+        match = re_image.search(data)
+        if match is not None:
+            self.appendFile( match.group(1))
 
         if need_calc:
             self.calculate()
