@@ -807,6 +807,8 @@ if __name__ == '__main__':
         if output != '':
             cmd += ' -output "%s"' % output
             images = output
+        if take != '':
+            cmd += ' -format "%s"' % take
         cmd += ' -log_width 0'
 
     # simple generic:

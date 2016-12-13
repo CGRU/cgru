@@ -73,6 +73,7 @@ def fileTypeList():
 	fileType_list.append((['scn'],      'xsi',          'Softimage'))
 	fileType_list.append((['max'],      'max',          '3dsmax'))
 	fileType_list.append((['aep'],      'afterfx',      'After Effects'))
+	fileType_list.append((['render'],   'clarisse',     'Isotropix Clarisse'))
 	return fileType_list
 
 
@@ -122,6 +123,7 @@ def labelNodeNameDict():
 	labelNode_name['maya_arnold']  = 'Camera:'
 	labelNode_name['3dsmax']       = 'Camera:'
 	labelNode_name['afterfx']      = 'Composition:'
+	labelNode_name['clarisse']     = 'Image:'
 	return labelNode_name
 
 
@@ -142,6 +144,7 @@ def labelNodeTooltipsDict():
 	labelNode_tooltip['maya_arnold']  = 'Maya camera\nExample: \'persp\''
 	labelNode_tooltip['3dsmax']       = '3DSMAX camera'
 	labelNode_tooltip['afterfx']      = 'AfterFX composition\nExample: \'Comp 1\''
+	labelNode_tooltip['clarisse']     = 'Image item path\nExample:\nscene/image'
 	return labelNode_tooltip
 
 
@@ -158,6 +161,7 @@ def labelTakeNameDict():
 	labelTake_name['maya_arnold']  = 'Layer:'
 	labelTake_name['3dsmax']       = 'Batch:'
 	labelTake_name['afterfx']      = 'render settings template:'
+	labelTake_name['clarisse']     = 'Format:'
 	return labelTake_name
 
 
@@ -179,6 +183,7 @@ def labelTakeTooltipsDict():
 	labelTake_tooltip['maya_arnold']  = 'Maya render layer'
 	labelTake_tooltip['3dsmax']       = '3DSMAX batch'
 	labelTake_tooltip['afterfx']      = 'AfterFX render settings template\nExample: \'Best Settings\''
+	labelTake_tooltip['clarisse']     = 'Ouput images format name\nExample:\njpg, exr16, exr32, ...\nSee available format names in docs.'
 	return labelTake_tooltip
 
 
