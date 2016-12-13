@@ -380,7 +380,7 @@ width:18px; height:18px;
 background-image: url(icons/refresh.png);
 display: none;
 }
-#sidepanel > div.opened .button.refresh { display: block; }
+#sidepanel.opened > div.opened .button.refresh { display: block; }
 
 
 /* ============= NEWS: =============== */
