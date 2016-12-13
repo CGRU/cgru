@@ -85,6 +85,7 @@ function g_Init_Rules( i_data)
 	RULES = RULES_TOP;
 	p_Init();
 	nw_InitConfigured();
+	bm_InitConfigured();
 
 	$('afanasy_webgui').href = 'http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport;
 	$('rules_label').textContent = RULES_TOP.company+'-RULES';

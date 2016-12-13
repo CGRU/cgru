@@ -469,7 +469,7 @@ function nw_NewsLoad( i_refresh)
 
 	$('news').innerHTML = 'Loading...';
 	var filename = 'users/'+g_auth_user.id+'.json';
-	n_Request({'send':{'getobject':{'file':filename,'object':'news'}},'func':nw_NewsReceived,'info':'news'});
+	n_Request({'send':{'getobjects':{'file':filename,'objects':['news']}},'func':nw_NewsReceived,'info':'news'});
 }
 
 function nw_NewsReceived( i_data)

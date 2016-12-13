@@ -27,7 +27,14 @@ function bm_Init()
 	if( localStorage.bookmarks_opened == 'true')
 		bm_Open( false);
 	else
-		bm_Close();
+		bm_Show();
+}
+
+function bm_InitConfigured()
+{
+	if( RULES.bookmarks.refresh == null ) return;
+	if( RULES.bookmarks.refresh < 1 ) return;
+	setInterval( bm_Load, RULES.bookmarks.refresh * 1000);
 }
 
 function bm_OnClick()
@@ -80,13 +87,15 @@ function bm_Load( i_args)
 	if( i_args.info == null )
 		i_args.info = 'load';
 
-	//$('bookmarks').innerHTML = 'Loading...';
 	var filename = 'users/'+g_auth_user.id+'.json';
-	n_Request({"send":{"getobject":{'file':filename,'object':'bookmarks'}},"func":bm_Received,"args":i_args,"info":"bookmarks " + i_args.info});
+	n_Request({'send':{'getobjects':{'file':filename,'objects':['bookmarks']}},'func':bm_Received,'args':i_args,'info':'bookmarks ' + i_args.info});
 }
 
 function bm_Received( i_user, i_args)
 {
+	if( false == bm_initialized )
+		return;
+
 //console.log('nw_NewsReceived()');
 	if( i_user == null ) return;
 	if( i_user.error )
@@ -103,7 +112,8 @@ function bm_Received( i_user, i_args)
 		if( i_user.bookmarks[i] )
 			g_auth_user.bookmarks.push( i_user.bookmarks[i]);
 
-	i_args.args.func( i_args.args)
+//	i_args.args.func( i_args.args);
+	bm_Show();
 }
 
 function bm_Show()

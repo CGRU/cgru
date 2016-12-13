@@ -374,6 +374,15 @@ height:18px;
 #sidepanel .body { clear: both; display: none; }
 #sidepanel.opened .opened .body { display: block; }
 
+#sidepanel > div .button.refresh {
+float: right;
+width:18px; height:18px; 
+background-image: url(icons/refresh.png);
+display: none;
+}
+#sidepanel > div.opened .button.refresh { display: block; }
+
+
 /* ============= NEWS: =============== */
 #news_count {
 float: right;
@@ -392,10 +401,8 @@ font-weight: bold;
 font-family: monospace;
 display: none;
 }
-#sidepanel_news #news_refresh { display: none; float: right; }
 #sidepanel_news.news_ignore_own { background-color: rgba(200,100,0,.3); }
 #sidepanel_news.news_disabled   { background-color: rgba(200,  0,0,.3); }
-#sidepanel.opened #sidepanel_news.opened #news_refresh { display: block; }
 .news_ctrl { margin: 2px; padding: 2px; }
 .news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #chanset .button { float: left; width: 16px; height: 16px; }
@@ -486,8 +493,6 @@ display: block;
 
 
 /* ============= RECENT: =============== */
-#sidepanel_recent #recent_refresh { display: none; float:right; }
-#sidepanel.opened #sidepanel_recent.opened #recent_refresh { display: block; }
 #recent { }
 #recent .recent { font-size: 12px; border-top: 1px solid rgba(98,98,98,.5); position: relative; }
 #recent .recent > div { margin: 2px 4px; }
@@ -504,8 +509,6 @@ border-radius: 0 0 0 4px;
 
 
 /* ============= PLAYLIST: =============== */
-#sidepanel_playlist #playlist_refresh { display: none; float:right; }
-#sidepanel.opened #sidepanel_playlist.opened #playlist_refresh { display: block; }
 .playlist_ctrl { padding-left: 6px; }
 .playlist_ctrl .button { float: left; padding: 0; }
 .playlist_ctrl_top { border-bottom: 1px solid rgba(98,98,98,.5); }

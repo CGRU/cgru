@@ -316,7 +316,7 @@ Comment can be an artist report with a tag and duration.
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
-		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()" title="Refresh news" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);"></div>
+		<div class="label button refresh" id="news_refresh" onclick="nw_NewsLoad()" title="Refresh news"></div>
 		<div class="label button" id="news_sidepanel_btn" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
 			<div class="news_ctrl">
@@ -383,6 +383,7 @@ Remember any delete operation buttons in RULES requires double-click.
 		</div>
 	</div>
 	<div id="sidepanel_bookmarks" style="display:none">
+		<div class="label button refresh" id="bookmarks_refresh" onclick="bm_Load()" title="Refresh bookmakrs"></div>
 		<div id="bookmarks_label" class="label button" onclick="bm_OnClick()">Bookmarks</div>
 		<div class="body">
 			<div id="bookmarks_ctrl"></div>
@@ -390,7 +391,7 @@ Remember any delete operation buttons in RULES requires double-click.
 		</div>
 	</div>
 	<div id="sidepanel_playlist">
-		<div class="label button" id="playlist_refresh" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);" onclick="p_RefreshOnClick()"></div>
+		<div class="label button refresh" id="playlist_refresh" onclick="p_RefreshOnClick()"></div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div class="playlist_ctrl playlist_ctrl_top">
@@ -469,8 +470,7 @@ So folder will appear on unpack.
 		</div>
 	</div>
 	<div id="sidepanel_recent">
-		<div class="label button" id="recent_refresh" onclick="nw_RecentRefresh()"
-			style="width:18px; height:18px; background-image:url(rules/icons/refresh.png)";></div>
+		<div class="label button refresh" id="recent_refresh" onclick="nw_RecentRefresh()"></div>
 		<div class="label button" onclick="nw_RecentOnClick()">Recent</div>
 		<div class="body">
 			<div id="recent"></div>

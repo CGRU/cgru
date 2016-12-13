@@ -737,7 +737,7 @@ function jsf_getfile( $i_file, &$o_out)
 		$o_out['error'] = 'Unable to load file '.$i_file;
 }
 
-function jsf_getobject( $i_args, &$o_out)
+function jsf_getobjects( $i_args, &$o_out)
 {
 	global $FileMaxLength;
 
@@ -746,14 +746,14 @@ function jsf_getobject( $i_args, &$o_out)
 		$o_out['error'] = 'File is not set.';
 		return;
 	}
-	if( false == isset( $i_args['object']))
+	if( false == isset( $i_args['objects']))
 	{
 		$o_out['error'] = 'Object is not set.';
 		return;
 	}
 
 	$file = $i_args['file'];
-	$object = $i_args['object'];
+	$objects = $i_args['objects'];
 
 	if( false == is_file( $file))
 	{
@@ -771,10 +771,13 @@ function jsf_getobject( $i_args, &$o_out)
 		_flock_( $fHandle, LOCK_SH);
 
 		$data = json_decode( fread( $fHandle, $FileMaxLength), true);
-		if(( false == is_null($data )) && isset($data[$object]))
-			$o_out[$object] = $data[$object];
-		else
-			$o_out[$object] = null;
+		foreach( $objects as $object )
+		{
+			if( false == is_null($data ) && isset($data[$object]))
+				$o_out[$object] = $data[$object];
+			else
+				$o_out[$object] = null;
+		}
 
 		_flock_( $fHandle, LOCK_UN);
 		fclose($fHandle);
