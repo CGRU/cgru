@@ -9,7 +9,7 @@ import cgruutils
 import cgrupyqt
 from cgrupyqt import QtCore, QtGui
 
-Names = ['Blender','Houdini','Maya','Natron','Nuke','NukeX']
+Names = ['Blender','Clarisse','Houdini','Maya','Natron','Nuke','NukeX']
 
 if 'windows' in cgruconfig.VARS['platform']:
 	Names.extend(['3DSMax','Fusion','Softimage'])
@@ -32,6 +32,10 @@ def startBlender():
 
 def startC4D():
 	startDetached('c4d')
+
+
+def startClarisse():
+	startDetached('clarisse')
 
 
 def startHoudini():
@@ -97,6 +101,10 @@ def exampleBlender():
 
 def exampleC4D():
 	exampleSoftware('Cinema 4D', 'start_c4d')
+
+
+def exampleClarisse():
+	exampleSoftware('clarisse', 'start_clarisse')
 
 
 def exampleFusion():
@@ -187,6 +195,10 @@ def locateBlender():
 
 def locateC4D():
 	locateSoftware('C4D')
+
+
+def locateClarisse():
+	locateSoftware('Clarisse')
 
 
 def locateFusion():
