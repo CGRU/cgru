@@ -439,20 +439,19 @@ function nw_MakeNewsFinished( i_data, i_args)
 
 function nw_ShowCount( i_hidden_count)
 {
-	if( g_auth_user && g_auth_user.news && g_auth_user.news.length )
+	if( g_auth_user == null )
+		return;
+
+	if( g_auth_user.news && g_auth_user.news.length )
 	{
 		var count = g_auth_user.news.length;
 		if( i_hidden_count )
 			count += '/' + (g_auth_user.news.length - i_hidden_count);
-		$('news_count').textContent = count;
-		$('news_count').style.display = 'block';
-		$('panel_logo').style.display = 'none';
+		$('news_label').textContent = 'News - ' + count;
 	}
 	else
 	{
-		$('news_count').style.display = 'none';
-		$('news_count').textContent = '';
-		$('panel_logo').style.display = 'block';
+		$('news_label').textContent = 'News';
 	}
 }
 
