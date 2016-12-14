@@ -1426,6 +1426,9 @@ Status.prototype.save = function()
 	this.obj.muser = g_auth_user.id;
 	this.obj.mtime = c_DT_CurSeconds();
 
+	if( this.path == g_CurPath())
+		RULES.status = this.obj;
+
 	st_Save( this.obj, this.path);
 }
 

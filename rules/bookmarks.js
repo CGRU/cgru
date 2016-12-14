@@ -323,7 +323,9 @@ function bm_HighlightCurrent()
 		{
 			bm_elements[i].classList.add('cur_path');
 			if( g_CurPathDummy() || bm_ObsoleteStatus( RULES.status))
+			{
 				bm_elements[i].classList.add('obsolete');
+			}
 			//bm_elements[i].scrollIntoView();
 		}
 		else
