@@ -116,6 +116,14 @@ function bm_Received( i_user, i_args)
 	bm_Show();
 }
 
+function bm_Compare(a,b)
+{
+	if( a == null ) return  1;
+	if( b == null ) return -1;
+	if( a.path > b.path ) return  1;
+	if( a.path < b.path ) return -1;
+	return 0;
+}
 function bm_Show()
 {
 //console.log(JSON.stringify(g_auth_user.bookmarks));
@@ -233,7 +241,7 @@ function bm_CreateElements( i_bm)
 	if( i_bm.mtime ) tooltip += 'Modified at: ' + c_DT_StrFromSec( i_bm.mtime) + '\n';
 	el.title = tooltip;
 
-	if( bm_Obsolete( i_bm ))
+	if( bm_ObsoleteStatus( i_bm.status ))
 		el.classList.add('obsolete');
 
 	el.m_bookmark = i_bm;
@@ -270,26 +278,26 @@ function bm_NavigatePost()
 	bm_HighlightCurrent();
 }
 
-function bm_Obsolete( i_bm)
+function bm_ObsoleteStatus( i_status)
 {
-	if( i_bm.status == null )
+	if( i_status == null )
 		return true;
 
-	if( i_bm.status.artists == null )
+	if( i_status.artists == null )
 		return true;
 
-	if( i_bm.status.artists.indexOf( g_auth_user.id ) == -1 )
+	if( i_status.artists.indexOf( g_auth_user.id ) == -1 )
 		return true;
 
-	if( i_bm.status.progress )
+	if( i_status.progress )
 	{
-		if( i_bm.status.progress >= 100 )
+		if( i_status.progress >= 100 )
 			return true;
 	}
 
-	if( i_bm.status.flags )
+	if( i_status.flags )
 	{
-		if( i_bm.status.flags.indexOf('omit') != -1 )
+		if( i_status.flags.indexOf('omit') != -1 )
 			return true;
 	}
 
@@ -323,15 +331,6 @@ function bm_HighlightCurrent()
 
 function bm_Delete( i_paths)
 {
-	// Delete all bookmarks if paths are not specified:
-	if( i_paths == null )
-	{
-		i_paths = [];
-		// Make an array with all ids:
-		for( var i = 0; i < bm_elements.length; i++)
-			i_paths.push( bm_elements[i].m_news.id);
-	}
-
 	if( i_paths.length == 0 )
 	{
 		c_Error('No bookmarks to delete.');
@@ -360,11 +359,24 @@ function bm_DeleteFinished( i_data)
 	bm_Load({"info":'deleted'});
 }
 
-function bm_Compare(a,b)
+function bm_DeleteObsoleteOnClick()
 {
-	if( a == null ) return  1;
-	if( b == null ) return -1;
-	if( a.path > b.path ) return  1;
-	if( a.path < b.path ) return -1;
-	return 0;
+	var paths = [];
+	for( var i = 0; i < bm_elements.length; i++)
+		if( bm_elements[i].classList.contains('obsolete'))
+			paths.push( bm_elements[i].m_bookmark.path);
+
+	if( paths.length == 0 )
+	{
+		c_Info('No obsolete bookmarks founded.');
+		return;
+	}
+
+	bm_Delete( paths);
 }
+
+function bm_ThumbnailsOnClick( i)
+{
+console.log( i);
+}
+

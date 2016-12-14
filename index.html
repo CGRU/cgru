@@ -319,7 +319,7 @@ Comment can be an artist report with a tag and duration.
 		<div class="label button refresh" onclick="nw_NewsLoad()" title="Refresh news"></div>
 		<div class="label button" id="news_label" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
-			<div class="news_ctrl">
+			<div id="news_ctrl">
 				<div class="infotooltip" style="float: right; margin: 0; padding: 0;" title="News:
 If you assigned on any shot (location) you will receive all its changes.
 To receive all news from some location and all its subfolders (project,scene)
@@ -330,7 +330,7 @@ You can remove all [DA] news, only visible [DV] or hidden [DH] news during filte
 To remove only one news link double click [-] button at the top-left corner.
 Remember any delete operation buttons in RULES requires double-click.
 "				></div>
-				<div class="news_ctrl_btns">
+				<div id="news_ctrl_btns">
 					<div class="button" title="Double click to delete all news"
 						style="background-image:url(rules/icons/delete_all.png);"
 						ondblclick="nw_DeleteNews()"></div>
@@ -386,7 +386,24 @@ Remember any delete operation buttons in RULES requires double-click.
 		<div class="label button refresh" onclick="bm_Load()" title="Refresh bookmakrs"></div>
 		<div id="bookmarks_label" class="label button" onclick="bm_OnClick()">Bookmarks</div>
 		<div class="body">
-			<div id="bookmarks_ctrl"></div>
+			<div id="bookmarks_ctrl">
+				<div class="infotooltip" style="float: right; margin: 0; padding: 0;" title="Bookmarks:
+This is links to shots (locations) that you was assigned.
+Bookmark is created when you was added to the artists list.
+You can delete bookmark only in special cases:
+1. You are already not assigned.
+2. Shot was omitted.
+3. Location does not exist any more.
+"				></div>
+				<div class="button"
+					onclick="bm_ThumbnailsOnClick(this)"
+					title="Display thumbnails.">
+					Thmb</div>
+				<div class="button"
+					ondblclick="bm_DeleteObsoleteOnClick()"
+					title="Double click to delete obsolete bookmarks.">
+					DOB</div>
+			</div>
 			<div id="bookmarks"></div>
 		</div>
 	</div>

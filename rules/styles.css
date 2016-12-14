@@ -386,8 +386,8 @@ display: none;
 /* ============= NEWS: =============== */
 #sidepanel_news.news_ignore_own { background-color: rgba(200,100,0,.3); }
 #sidepanel_news.news_disabled   { background-color: rgba(200,  0,0,.3); }
-.news_ctrl { margin: 2px; padding: 2px; }
-.news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
+#news_ctrl { margin: 2px; padding: 2px; }
+#news_ctrl_btns .button { font-size: 14px; width: 20px; height: 20px; float: left; margin: 1px 4px; padding: 0; }
 #chanset .button { float: left; width: 16px; height: 16px; }
 #sidepanel_news.news_disabled   #news_disable    { background-color: #FF0000; }
 #sidepanel_news.news_ignore_own #news_ignore_own { background-color: #FF9900; }
@@ -428,6 +428,14 @@ margin: 0 0 0 2px;
 
 
 /* ============= BOOKMARKS: =============== */
+#bookmarks_ctrl {
+margin: 2px; padding: 2px;
+}
+#bookmarks_ctrl .button {
+float: left;
+font-size: 14px;
+margin: 0px 2px;
+}
 #bookmarks .project {
 border-top: 2px solid rgba(98,98,98,.5);
 padding: 4px 0;
