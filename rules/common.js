@@ -457,6 +457,7 @@ function c_ElToggleSelected( i_e)
 	var el = i_e;
 	if( i_e.currentTarget ) el = i_e.currentTarget;
 	c_ElSetSelected( el, el.m_selected != true );
+	return el.m_selected;
 }
 
 function c_ElSetSelected( i_e, i_selected )

@@ -12,6 +12,9 @@ function bm_Init()
 	if( localStorage.bookmarks_projects_opened == null )
 		localStorage.bookmarks_projects_opened = '';
 
+	if( localStorage.bookmarks_thumbnails_show == null )
+		localStorage.bookmarks_thumbnails_show = 'false';
+
 
 	// Bookmarks are not available for guests:
 	if( g_auth_user == null )
@@ -23,15 +26,15 @@ function bm_Init()
 
 	$('sidepanel_bookmarks').style.display = 'block';
 	bm_initialized = true;
-
-	if( localStorage.bookmarks_opened == 'true')
-		bm_Open( false);
-	else
-		bm_Show();
 }
 
 function bm_InitConfigured()
 {
+	if( localStorage.bookmarks_opened == 'true')
+		bm_Open( false);
+	else
+		bm_Show();
+
 	if( RULES.bookmarks.refresh == null ) return;
 	if( RULES.bookmarks.refresh < 1 ) return;
 	setInterval( bm_Load, RULES.bookmarks.refresh * 1000);
@@ -198,6 +201,7 @@ function bm_Show()
 	}
 
 	bm_HighlightCurrent();
+	bm_ThumbnailsShowHide();
 }
 
 function bm_CreateElements( i_bm)
@@ -318,7 +322,7 @@ function bm_HighlightCurrent()
 		if( path == bm_elements[i].m_bookmark.path )
 		{
 			bm_elements[i].classList.add('cur_path');
-			if( g_CurPathDummy())
+			if( g_CurPathDummy() || bm_ObsoleteStatus( RULES.status))
 				bm_elements[i].classList.add('obsolete');
 			//bm_elements[i].scrollIntoView();
 		}
@@ -375,8 +379,54 @@ function bm_DeleteObsoleteOnClick()
 	bm_Delete( paths);
 }
 
-function bm_ThumbnailsOnClick( i)
+function bm_ThumbnailsOnClick()
 {
-console.log( i);
+	if( localStorage.bookmarks_thumbnails_show == 'true' )
+		localStorage.bookmarks_thumbnails_show = 'false';
+	else
+		localStorage.bookmarks_thumbnails_show = 'true';
+	bm_ThumbnailsShowHide();
+}
+function bm_ThumbnailsShowHide()
+{
+	if( localStorage.bookmarks_thumbnails_show == 'true' )
+		bm_ThumbnailsShow();
+	else
+		bm_ThumbnailsHide();
+}
+function bm_ThumbnailsShow()
+{
+	c_ElSetSelected( $('bookmakrs_thumbs_btn'), true);
+
+	for( var i = 0; i < bm_elements.length; i++)
+	{
+		var el = bm_elements[i];
+
+		if( el.m_elTh == null )
+		{
+			el.m_elTh = document.createElement('a');
+			el.appendChild( el.m_elTh);
+			el.m_elTh.href = '#' + el.m_bookmark.path;
+
+			var img = document.createElement('img');
+			el.m_elTh.appendChild( img);
+			img.src = RULES.root + el.m_bookmark.path + '/' + RULES.rufolder + '/thumbnail.jpg';
+			img.style.display = 'none';
+			img.onload = function( i_el) { i_el.currentTarget.style.display = 'block';}
+		}
+
+		el.m_elTh.style.display = 'block';
+	}
+}
+function bm_ThumbnailsHide()
+{
+	c_ElSetSelected( $('bookmakrs_thumbs_btn'), false);
+
+	for( var i = 0; i < bm_elements.length; i++)
+	{
+		var el = bm_elements[i];
+		if( el.m_elTh )
+			el.m_elTh.style.display = 'none';
+	}
 }
 

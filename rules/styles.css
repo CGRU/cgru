@@ -463,6 +463,9 @@ padding: 4px 0;
 #bookmarks .bookmark a {
 padding: 0 4px;
 }
+#bookmarks .bookmark img {
+width: 100%;
+}
 #bookmarks .bookmark .bar {
 position: absolute;
 bottom: 1px;
