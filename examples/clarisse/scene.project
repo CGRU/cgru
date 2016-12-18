@@ -8,7 +8,7 @@ Context "scene" {
         name "camera"
         #version 0.9
         #created 1455809270
-        #modified 1481642208
+        #modified 1482088694
         translate 0.0 1 3
         rotate -10 0.0 0.0
         aim_distance 44.8218696620299
@@ -18,8 +18,9 @@ Context "scene" {
         name "path_tracer"
         #version 0.95
         #created 1462890443
-        #modified 1481642896
-        anti_aliasing_sample_count 4
+        #modified 1482093711
+        anti_aliasing_sample_count 1
+        material_sample_count 1
         diffuse_depth 1
         export_aovs no
     }
@@ -27,19 +28,20 @@ Context "scene" {
         name "image"
         #version 0.92
         #created 1462886391
-        #modified 1481642065
+        #modified 1482088709
         active_layer 0
         layers ".background"
         render_to_disk yes
         first_frame 0
         last_frame 10
+        save_as "/cgru/examples/clarisse/render/img.####"
         format 2
         embedded_objects {
             Layer3d {
                 name "background"
                 #version 0.96
                 #created 1462886428
-                #modified 1481642065
+                #modified 1482088694
                 first_frame 0
                 last_frame 50
                 deep_output_data_precision 0
@@ -59,7 +61,7 @@ Context "scene" {
         name "sphere"
         #version 0.9
         #created 1481640390
-        #modified 1481642180
+        #modified 1482093751
         translate {
             value[] {
                 fcurve {
@@ -92,7 +94,7 @@ Context "scene" {
         name "sphere1"
         #version 0.91
         #created 1481640523
-        #modified 1481642065
+        #modified 1482088694
         translate 1 1 1
         exposure 5
     }
@@ -100,7 +102,7 @@ Context "scene" {
         name "polygrid"
         #version 0.9
         #created 1481642221
-        #modified 1481642232
+        #modified 1482088694
         scale 10 10 10
         uv_maps "parametric"
         uv_maps_loaded yes
@@ -115,8 +117,10 @@ Context "scene" {
         name "sphere2"
         #version 0.9
         #created 1481642591
-        #modified 1481642597
+        #modified 1482088697
         scale 10 10 10
+        uv_maps "parametric"
+        uv_maps_loaded yes
         shading_groups "surface"
         materials "project://default/material"
         clip_maps ""
@@ -139,6 +143,7 @@ Context "scene" {
     }
     selection {
         selection_slots {
+            slot "Global" "project://scene/path_tracer"
         }
         slots_working_contexts {
             slot "Global" "project://scene"
@@ -193,7 +198,7 @@ Context "scene" {
                         selection_locked no
                     }
                     split_v {
-                        ratio 0.8
+                        ratio 0.603312302839117
                         split_h {
                             ratio 0.946
                             split_h {
@@ -412,8 +417,8 @@ Context "scene" {
                                             local_selection {
                                             }
                                         }
-                                        first_frame 0
-                                        last_frame 50
+                                        first_frame 1
+                                        last_frame 10
                                     }
                                     selection_locked no
                                 }
@@ -429,8 +434,8 @@ Context "scene" {
                                         local_selection {
                                         }
                                     }
-                                    first_frame 0
-                                    last_frame 50
+                                    first_frame 1
+                                    last_frame 10
                                 }
                                 toolbar_minimized yes
                                 selection_locked no
@@ -448,7 +453,7 @@ Context "scene" {
                                             local_selection {
                                             }
                                         }
-                                        attribute_groups "Scene Object Name" yes "Canvas" no "Display" no "Overscan" no "Sampling" yes "Layers" yes "Output" yes "Kinematics" yes "Advanced Kinematics" no "3d View" no "Rendering" no "General" yes "Depth Of Field" yes "Visibility" no "Lighting" yes "Shading" yes "Deformation" yes "Displacement" yes "Utility" yes "Smoothing" yes "Geometry" yes "Arbitrary Output Variables" yes "Normal" yes "Material Sampling" no "Indirect Path Depth" yes "Anti Aliasing" yes "Tone Mapping" no "Clamping" no "Motion Blur" no "Debug" yes "Path Depth" yes "Subdivision Surfaces" yes
+                                        attribute_groups "Scene Object Name" yes "Canvas" no "Display" no "Overscan" no "Sampling" no "Layers" no "Output" yes "Kinematics" yes "Advanced Kinematics" no "3d View" no "Rendering" no "General" yes "Depth Of Field" yes "Visibility" no "Lighting" yes "Shading" yes "Deformation" yes "Displacement" yes "Utility" yes "Smoothing" yes "Geometry" yes "Arbitrary Output Variables" yes "Normal" yes "Material Sampling" no "Indirect Path Depth" no "Anti Aliasing" no "Tone Mapping" no "Clamping" no "Motion Blur" no "Debug" no "Path Depth" yes "Subdivision Surfaces" yes
                                         attributes_filter ""
                                     }
                                     selection_locked no
@@ -465,7 +470,7 @@ Context "scene" {
                                         local_selection {
                                         }
                                     }
-                                    attribute_groups "Scene Object Name" yes "Canvas" no "Display" no "Overscan" no "Sampling" yes "Layers" yes "Output" yes "Kinematics" yes "Advanced Kinematics" no "3d View" no "Rendering" no "General" yes "Depth Of Field" yes "Visibility" no "Lighting" yes "Shading" yes "Deformation" yes "Displacement" yes "Utility" yes "Smoothing" yes "Geometry" yes "Arbitrary Output Variables" yes "Normal" yes "Material Sampling" no "Indirect Path Depth" yes "Anti Aliasing" yes "Tone Mapping" no "Clamping" no "Motion Blur" no "Debug" yes "Path Depth" yes "Subdivision Surfaces" yes
+                                    attribute_groups "Scene Object Name" yes "Canvas" no "Display" no "Overscan" no "Sampling" no "Layers" no "Output" yes "Kinematics" yes "Advanced Kinematics" no "3d View" no "Rendering" no "General" yes "Depth Of Field" yes "Visibility" no "Lighting" yes "Shading" yes "Deformation" yes "Displacement" yes "Utility" yes "Smoothing" yes "Geometry" yes "Arbitrary Output Variables" yes "Normal" yes "Material Sampling" no "Indirect Path Depth" no "Anti Aliasing" no "Tone Mapping" no "Clamping" no "Motion Blur" no "Debug" no "Path Depth" yes "Subdivision Surfaces" yes
                                     attributes_filter ""
                                 }
                                 toolbar_minimized no
