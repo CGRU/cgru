@@ -1,5 +1,6 @@
 import os
 
+import cgrudocs
 import cgrules
 
 # Add CGRU to main window menu:
@@ -20,7 +21,7 @@ cgru_submenu.addCommand('Open Translated', 'cgru.pmOpenTranslated()')
 
 cgru_menu.addCommand("-", "", "")
 
-cgru_menu.addCommand('Documentation', 'cgru.docsNuke()')
+cgru_menu.addCommand('Documentation', 'cgrudocs.showSoftware("nuke")')
 
 # Add afanasy gizmo to nodes:
 icons = os.path.join(os.environ['CGRU_LOCATION'], 'icons')
