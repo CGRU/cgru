@@ -224,12 +224,12 @@ def displayInfo( i_text):
 def browseArchive():
     filename = QtWidgets.QFileDialog.getSaveFileName( None,'Select Archive', Fields['archive'].text())
     if "PySide" in QtCompat.__binding__: filename = filename[0]
-    Fields['archive'].setText(filename)
+    if filename  and len(filename): Fields['archive'].setText(filename)
 
 def browseOutput():
     filename = QtWidgets.QFileDialog.getSaveFileName( None,'Select Output', Fields['output'].text())
     if "PySide" in QtCompat.__binding__: filename = filename[0]
-    Fields['output'].setText(filename)
+    if filename  and len(filename): Fields['output'].setText(filename)
 
 def processArchive():
     global Archive
