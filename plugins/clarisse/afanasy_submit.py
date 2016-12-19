@@ -132,7 +132,7 @@ def createDialog():
     createField({'name':'format','label':'Format','layout':h_layout,'lwidth':60,'ewidth':rwidth,
             'tip':'Output images format.\nIf empty, it will not be changed.'})
 
-    # Ouput:
+    # Output:
     h_layout = createLayoutH({'layout':tab_layout})
     createField({'name':'output','label':'Output','layout':h_layout,'lwidth':lwidth})
     imageChanged()
@@ -200,8 +200,7 @@ def createDialog():
     Fields['btn_send'] = createButton({'label':'Send Job','slot':createJob,'layout':h_layout})
     # Paused:
     paused = QtWidgets.QCheckBox('Paused')
-    paused.setToolTip('Job will be sent with "OFFLINE" state.\nTasks execution paused.')
-    #paused.setSizePolicy( QtWidgets.QSizePolicy.Fixed,  QtWidgets.QSizePolicy.Minimum)
+    paused.setToolTip('Job will be sent with "OFFLINE" state.\nTasks execution is paused.')
     paused.setFixedWidth( rwidth+10)
     h_layout.addWidget( paused)
     Fields['paused'] = paused
@@ -243,12 +242,14 @@ def processArchive():
         if not ix.application.export_render_archive( Archive):
             Archive = None
 
+def enableJobSend(): Fields['btn_send'].setEnabled( True)
+
 def createJob():
 
     # Just to prevent double click and double job:
     Fields['btn_send'].setEnabled( False)
 
-    # Import afanasy Python module:
+    # Import Afanasy Python module:
     af = None
     try:
     	af = __import__('af', globals(), locals(), [])
@@ -274,8 +275,8 @@ def createJob():
     job.setHostsMask( Fields['hosts_mask'].text())
     job.setHostsMaskExclude( Fields['hosts_mask_exclude'].text())
     job.setWaitTime( Fields['wait_time'].dateTime().toTime_t())
-    job.setFolder('input', os.path.basename( Archive))
-    job.setFolder('output', os.path.basename( Fields['output'].text()))
+    job.setFolder('input', os.path.dirname( Archive))
+    job.setFolder('output', os.path.dirname( Fields['output'].text()))
     if Fields['archive_del'].isChecked():
         job.setPostDeleteFiles( Archive)
     if Fields['paused'].isChecked():
@@ -309,8 +310,6 @@ def createJob():
             print('AF: Removing render archive.')
             os.remove( Archive)
         displayInfo('Unable send job to afserver.')
-
-def enableJobSend(): Fields['btn_send'].setEnabled( True)
 
 def genCommand():
     cmd = Fields['engine'].currentText()
