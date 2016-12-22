@@ -13,7 +13,6 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
-extern char **environ;
 extern void (*fp_setupChildProcess)( void);
 #endif
 

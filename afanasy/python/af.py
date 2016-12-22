@@ -23,6 +23,9 @@ def checkRegExp(pattern):
     :param pattern:
     :return:
     """
+    if len(pattern) == 0:
+        return False
+
     result = True
     try:
         re.compile(pattern)
@@ -587,6 +590,15 @@ class Job:
             command = Pathmap.toServer(command)
         self.data["command_post"] = command
 
+    def setPostDeleteFiles(self, i_path, TransferToServer=True):
+        """Missing DocString
+
+        :param command:
+        :param TransferToServer:
+        :return:
+        """
+        self.setCmdPost('deletefiles "%s"' % i_path, TransferToServer)
+
     def setFolder(self, i_name, i_folder, i_transferToServer=True):
         """Missing DocString
 
@@ -684,7 +696,7 @@ class Job:
         :param value:
         :return:
         """
-        if value > 0:
+        if value > time.time():
             self.data["time_wait"] = value
 
     def setMaxRunningTasks(self, value):
