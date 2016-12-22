@@ -7,6 +7,7 @@ knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo M
 
 if [ `uname` == "Darwin" ]; then
 	export DISTRIBUTIVE="MacOSX"
+	export DISTRIBUTIVE_VERSION=$(sw_vers -productVersion)
 else
 	# Load issue file:
 	issuefile="/etc/system-release"
