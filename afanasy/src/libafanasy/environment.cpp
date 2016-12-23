@@ -627,14 +627,14 @@ void Environment::load()
 	getVars( NULL);
 
 	m_config_data += "{\"cgru_environment\":{";
-	m_config_data += "\"version\":\"" + getVersionCGRU() + "\"";
-	m_config_data += ",\"builddate\":\"" + getBuildDate() + "\"";
-	m_config_data += ",\"buildrevision\":\"" + getVersionRevision() + "\"";
-	m_config_data += ",\"platform\":\"" + strJoin(getPlatform(),",") + "\"";
-	m_config_data += ",\"hostname\":\"" + getComputerName() + "\"";
-	m_config_data += ",\"username\":\"" + getUserName() + "\"";
-	m_config_data += ",\"location\":\"" + getCGRULocation() + "\"";
-	m_config_data += ",\"servedir\":\"" + getHTTPServeDir() + "\"";
+	m_config_data += "\"version\":\""        + strEscape( getVersionCGRU()    ) + "\"";
+	m_config_data += ",\"builddate\":\""     + strEscape( getBuildDate()      ) + "\"";
+	m_config_data += ",\"buildrevision\":\"" + strEscape( getVersionRevision()) + "\"";
+	m_config_data += ",\"platform\":\""      + strEscape( strJoin(getPlatform(),",")) + "\"";
+	m_config_data += ",\"hostname\":\""      + strEscape( getComputerName()   ) + "\"";
+	m_config_data += ",\"username\":\""      + strEscape( getUserName()       ) + "\"";
+	m_config_data += ",\"location\":\""      + strEscape( getCGRULocation()   ) + "\"";
+	m_config_data += ",\"servedir\":\""      + strEscape( getHTTPServeDir()   ) + "\"";
 	m_config_data += "}}]}";
 /*
 	m_verbose_init = false;
