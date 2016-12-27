@@ -6,7 +6,7 @@ import time
 import cgruconfig
 import cgruutils
 
-from Qt import QtCore, QtWidgets, QtCompat
+from Qt import QtCore, QtGui, QtWidgets, QtCompat
 
 Names = ['Blender','Clarisse','Houdini','Maya','Natron','Nuke','NukeX']
 
@@ -77,7 +77,7 @@ def getIcon(soft):
     iconpath = cgruutils.getIconFileName(
         os.path.join('software', soft.lower()))
     if iconpath is not None:
-        return QtWidgets.QIcon(iconpath)
+        return QtGui.QIcon(iconpath)
     return None
 
 

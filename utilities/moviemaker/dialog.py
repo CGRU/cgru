@@ -10,7 +10,7 @@ import time
 import cgruconfig
 import cgruutils
 
-from Qt import QtCore, QtWidgets, QtCompat
+from Qt import QtCore, QtGui, QtWidgets
 
 # Save files settings:
 FilePrefix = 'moviemaker.'
@@ -290,9 +290,7 @@ class Dialog(QtWidgets.QWidget):
                 self.fields['format'].setCurrentIndex(i)
             i += 1
 
-        QtCore.QObject.connect(self.fields['format'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['format'].currentIndexChanged.connect( self.evaluate)
         layout.addWidget(self.fields['format'])
 
         label = QtWidgets.QLabel('FPS:', self)
@@ -305,9 +303,7 @@ class Dialog(QtWidgets.QWidget):
             if fps == Options.fps:
                 self.fields['fps'].setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.fields['fps'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['fps'].currentIndexChanged.connect( self.evaluate)
         layout.addWidget(self.fields['fps'])
 
         label = QtWidgets.QLabel('Codec:', self)
@@ -319,9 +315,7 @@ class Dialog(QtWidgets.QWidget):
             if os.path.basename(CodecFiles[i]) == Options.codec:
                 self.fields['codec'].setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.fields['codec'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['codec'].currentIndexChanged.connect( self.evaluate)
         layout.addWidget(label)
         layout.addWidget(self.fields['codec'])
 
@@ -338,9 +332,7 @@ class Dialog(QtWidgets.QWidget):
             if cont == Options.container:
                 self.fields['container'].setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.fields['container'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['container'].currentIndexChanged.connect( self.evaluate)
         layout.addWidget(self.fields['container'])
 
         generallayout.addLayout(layout)
@@ -360,33 +352,25 @@ class Dialog(QtWidgets.QWidget):
         )
         self.fields['company'] = QtWidgets.QLineEdit(Options.company, self)
         layout.addWidget(self.fields['company'])
-        QtCore.QObject.connect(self.fields['company'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['company'].editingFinished.connect( self.evaluate)
         label = QtWidgets.QLabel('Project:', self)
         layout.addWidget(label)
         label.setToolTip('Project name.')
         self.fields['project'] = QtWidgets.QLineEdit(Options.project, self)
         layout.addWidget(self.fields['project'])
-        QtCore.QObject.connect(self.fields['project'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['project'].editingFinished.connect( self.evaluate)
         label = QtWidgets.QLabel('Shot:', self)
         layout.addWidget(label)
         label.setToolTip('Shot name.')
         self.fields['shot'] = QtWidgets.QLineEdit('', self)
         layout.addWidget(self.fields['shot'])
-        QtCore.QObject.connect(self.fields['shot'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['shot'].editingFinished.connect( self.evaluate)
         label = QtWidgets.QLabel('Version:', self)
         layout.addWidget(label)
         label.setToolTip('Shot version.')
         self.fields['version'] = QtWidgets.QLineEdit('', self)
         layout.addWidget(self.fields['version'])
-        QtCore.QObject.connect(self.fields['version'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['version'].editingFinished.connect( self.evaluate)
         self.fields['autotitles'] = QtWidgets.QCheckBox('Auto', self)
         layout.addWidget(self.fields['autotitles'])
         self.fields['autotitles'].setToolTip(
@@ -394,9 +378,7 @@ class Dialog(QtWidgets.QWidget):
             'file name and folder.'
         )
         self.fields['autotitles'].setChecked(True)
-        QtCore.QObject.connect(self.fields['autotitles'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.autoTitles)
+        self.fields['autotitles'].stateChanged.connect( self.autoTitles)
 
         layout = QtWidgets.QHBoxLayout()
         label = QtWidgets.QLabel('Artist:', self)
@@ -404,32 +386,24 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(label)
         self.fields['artist'] = QtWidgets.QLineEdit(Artist, self)
         layout.addWidget(self.fields['artist'])
-        QtCore.QObject.connect(self.fields['artist'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['artist'].editingFinished.connect( self.evaluate)
         label = QtWidgets.QLabel('Activity:', self)
         label.setToolTip('Shot activity to show.')
         layout.addWidget(label)
         self.fields['activity'] = QtWidgets.QLineEdit('', self)
         layout.addWidget(self.fields['activity'])
-        QtCore.QObject.connect(self.fields['activity'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['activity'].editingFinished.connect( self.evaluate)
         self.cbActivity = QtWidgets.QComboBox(self)
         for act in Activities:
             self.cbActivity.addItem(act)
         layout.addWidget(self.cbActivity)
-        QtCore.QObject.connect(self.cbActivity,
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.activityChanged)
+        self.cbActivity.currentIndexChanged.connect( self.activityChanged)
         grouplayout.addLayout(layout)
 
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(QtWidgets.QLabel('Comments:', self))
         self.fields['comments'] = QtWidgets.QLineEdit(self)
-        QtCore.QObject.connect(self.fields['comments'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['comments'].editingFinished.connect( self.evaluate)
         layout.addWidget(self.fields['comments'])
         grouplayout.addLayout(layout)
 
@@ -444,9 +418,7 @@ class Dialog(QtWidgets.QWidget):
             'You put folder name, file name or files patters here.\n'
             'Pattern digits can be represented by "%04d" or "####".'
         )
-        QtCore.QObject.connect(self.fields['input0'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.inputFileChanged)
+        self.fields['input0'].textEdited.connect( self.inputFileChanged)
         grouplayout.addWidget(self.fields['input0'])
 
         layout = QtWidgets.QHBoxLayout()
@@ -468,15 +440,11 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(label)
         self.fields['framestart'] = QtWidgets.QSpinBox(self)
         self.fields['framestart'].setRange(-1, -1)
-        QtCore.QObject.connect(self.fields['framestart'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['framestart'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['framestart'])
         self.sbFrameLast = QtWidgets.QSpinBox(self)
         self.sbFrameLast.setRange(-1, -1)
-        QtCore.QObject.connect(self.sbFrameLast,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.sbFrameLast.valueChanged.connect( self.evaluate)
         layout.addWidget(self.sbFrameLast)
         self.fields['fffirst'] = QtWidgets.QCheckBox('F.F.First', self)
         self.fields['fffirst'].setChecked(Options.fffirst)
@@ -484,15 +452,11 @@ class Dialog(QtWidgets.QWidget):
             'First Frame First:\n'
             'Draw first frame number as one.'
         )
-        QtCore.QObject.connect(self.fields['fffirst'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['fffirst'].stateChanged.connect( self.evaluate)
         layout.addWidget(self.fields['fffirst'])
 
         self.btnBrowseInput = QtWidgets.QPushButton('Browse Sequence', self)
-        QtCore.QObject.connect(self.btnBrowseInput,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseInput)
+        self.btnBrowseInput.pressed.connect( self.browseInput)
         layout.addWidget(self.btnBrowseInput)
         grouplayout.addLayout(layout)
 
@@ -503,9 +467,7 @@ class Dialog(QtWidgets.QWidget):
         self.editIdentify = QtWidgets.QLineEdit(self)
         self.editIdentify.setEnabled(False)
         self.btnIdentify = QtWidgets.QPushButton('Refresh', self)
-        QtCore.QObject.connect(self.btnIdentify,
-                               QtCore.SIGNAL('pressed()'),
-                               self.inputFileChanged)
+        self.btnIdentify.pressed.connect( self.inputFileChanged)
         lIdentify.addWidget(self.cbIdentify)
         lIdentify.addWidget(self.editIdentify)
         lIdentify.addWidget(self.btnIdentify)
@@ -526,23 +488,17 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(label)
         self.fields['outputname'] = QtWidgets.QLineEdit(self)
         layout.addWidget(self.fields['outputname'])
-        QtCore.QObject.connect(self.fields['outputname'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['outputname'].editingFinished.connect( self.evaluate)
         self.fields['usenamerule'] = QtWidgets.QCheckBox('Rule:', self)
         self.fields['usenamerule'].setChecked(True)
         self.fields['usenamerule'].setToolTip('Use Naming Rule.')
-        QtCore.QObject.connect(self.fields['usenamerule'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.autoOutputName)
+        self.fields['usenamerule'].stateChanged.connect( self.autoOutputName)
         layout.addWidget(self.fields['usenamerule'])
         naming = Options.naming
         if naming == '':
             naming = Namings[0]
         self.fields['namerule'] = QtWidgets.QLineEdit(naming, self)
-        QtCore.QObject.connect(self.fields['namerule'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['namerule'].editingFinished.connect( self.evaluate)
         self.fields['namerule'].setMaximumWidth(150)
         layout.addWidget(self.fields['namerule'])
         self.cbNaming = QtWidgets.QComboBox(self)
@@ -553,9 +509,7 @@ class Dialog(QtWidgets.QWidget):
                 self.cbNaming.setCurrentIndex(i)
             i += 1
         self.cbNaming.setMaximumWidth(120)
-        QtCore.QObject.connect(self.cbNaming,
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.namingChanged)
+        self.cbNaming.currentIndexChanged.connect( self.namingChanged)
         layout.addWidget(self.cbNaming)
         grouplayout.addLayout(layout)
 
@@ -564,14 +518,10 @@ class Dialog(QtWidgets.QWidget):
         label.setToolTip('Result movie will be placed in this directory.')
         layout.addWidget(label)
         self.fields['outputfolder'] = QtWidgets.QLineEdit(self)
-        QtCore.QObject.connect(self.fields['outputfolder'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['outputfolder'].editingFinished.connect( self.evaluate)
         layout.addWidget(self.fields['outputfolder'])
         self.btnBrowseOutputDir = QtWidgets.QPushButton('Browse', self)
-        QtCore.QObject.connect(self.btnBrowseOutputDir,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseOutputFolder)
+        self.btnBrowseOutputDir.pressed.connect( self.browseOutputFolder)
         layout.addWidget(self.btnBrowseOutputDir)
         grouplayout.addLayout(layout)
 
@@ -598,19 +548,13 @@ class Dialog(QtWidgets.QWidget):
             self.fields['template'].addItem(template)
         self.fields['slate'].setCurrentIndex(TemplateS)
         self.fields['template'].setCurrentIndex(TemplateF)
-        QtCore.QObject.connect(self.fields['slate'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
-        QtCore.QObject.connect(self.fields['template'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['slate'].currentIndexChanged.connect( self.evaluate)
+        self.fields['template'].currentIndexChanged.connect( self.evaluate)
         drawinglayout.addLayout(layout)
 
         self.fields['addtime'] = QtWidgets.QCheckBox('Add Time To Date', self)
         self.fields['addtime'].setChecked(False)
-        QtCore.QObject.connect(self.fields['addtime'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['addtime'].stateChanged.connect( self.evaluate)
         drawinglayout.addWidget(self.fields['addtime'])
 
         layout = QtWidgets.QHBoxLayout()
@@ -619,9 +563,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['cacher_aspect'].setRange(0.1, 10.0)
         self.fields['cacher_aspect'].setDecimals(6)
         self.fields['cacher_aspect'].setValue(Options.cacher_aspect)
-        QtCore.QObject.connect(self.fields['cacher_aspect'],
-                               QtCore.SIGNAL('valueChanged(double)'),
-                               self.evaluate)
+        self.fields['cacher_aspect'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['cacher_aspect'])
         layout.addWidget(QtWidgets.QLabel('Cacher Opacity:', self))
         self.fields['cacher_opacity'] = QtWidgets.QComboBox(self)
@@ -631,9 +573,7 @@ class Dialog(QtWidgets.QWidget):
             if CacherValues[i] == str(Options.cacher_opacity):
                 self.fields['cacher_opacity'].setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.fields['cacher_opacity'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['cacher_opacity'].currentIndexChanged.connect( self.evaluate)
         layout.addWidget(self.fields['cacher_opacity'])
         drawinglayout.addLayout(layout)
 
@@ -643,17 +583,13 @@ class Dialog(QtWidgets.QWidget):
         self.fields['line_aspect'].setRange(0.1, 10.0)
         self.fields['line_aspect'].setDecimals(6)
         self.fields['line_aspect'].setValue(Options.line_aspect)
-        QtCore.QObject.connect(self.fields['line_aspect'],
-                               QtCore.SIGNAL('valueChanged(double)'),
-                               self.evaluate)
+        self.fields['line_aspect'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['line_aspect'])
         tCacherLine = QtWidgets.QLabel('Cacher Line Color:', self)
         tCacherLine.setToolTip('Example "255,255,0" - yellow.')
         layout.addWidget(tCacherLine)
         self.fields['line_color'] = QtWidgets.QLineEdit(Options.line_color, self)
-        QtCore.QObject.connect(self.fields['line_color'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['line_color'].editingFinished.connect( self.evaluate)
         layout.addWidget(self.fields['line_color'])
         drawinglayout.addLayout(layout)
 
@@ -667,9 +603,7 @@ class Dialog(QtWidgets.QWidget):
             if CacherValues[i] == str(Options.draw169):
                 self.cbCacher169.setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.cbCacher169,
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.cbCacher169.currentIndexChanged.connect( self.evaluate)
         layout.addWidget(QtWidgets.QLabel('2.35 Cacher:', self))
         self.cbCacher235 = QtWidgets.QComboBox(self)
         layout.addWidget(self.cbCacher235)
@@ -679,9 +613,7 @@ class Dialog(QtWidgets.QWidget):
             if CacherValues[i] == str(Options.draw235):
                 self.cbCacher235.setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.cbCacher235,
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.cbCacher235.currentIndexChanged.connect( self.evaluate)
         drawinglayout.addLayout(layout)
 
         layout = QtWidgets.QHBoxLayout()
@@ -690,17 +622,13 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(label)
         self.fields['line169'] = QtWidgets.QLineEdit(Options.line169, self)
         layout.addWidget(self.fields['line169'])
-        QtCore.QObject.connect(self.fields['line169'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['line169'].editingFinished.connect( self.evaluate)
         label = QtWidgets.QLabel('Line 2.35 Color:', self)
         label.setToolTip('Example "255,255,0" - yellow.')
         layout.addWidget(label)
         self.fields['line235'] = QtWidgets.QLineEdit(Options.line235, self)
         layout.addWidget(self.fields['line235'])
-        QtCore.QObject.connect(self.fields['line235'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['line235'].editingFinished.connect( self.evaluate)
         drawinglayout.addLayout(layout)
 
         # Logos:
@@ -709,21 +637,15 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Slate Logo:', self))
         self.fields['lgspath'] = QtWidgets.QLineEdit(Options.lgspath, self)
         layout.addWidget(self.fields['lgspath'])
-        QtCore.QObject.connect(self.fields['lgspath'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['lgspath'].editingFinished.connect( self.evaluate)
         self.btnBrowseLgs = QtWidgets.QPushButton('Browse', self)
-        QtCore.QObject.connect(self.btnBrowseLgs,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseLgs)
+        self.btnBrowseLgs.pressed.connect( self.browseLgs)
         layout.addWidget(self.btnBrowseLgs)
         layout.addWidget(QtWidgets.QLabel('Size:', self))
         self.fields['lgssize'] = QtWidgets.QSpinBox(self)
         self.fields['lgssize'].setRange(1, 100)
         self.fields['lgssize'].setValue(Options.lgssize)
-        QtCore.QObject.connect(self.fields['lgssize'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['lgssize'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['lgssize'])
         layout.addWidget(QtWidgets.QLabel('%  Position:', self))
         self.fields['lgsgrav'] = QtWidgets.QComboBox(self)
@@ -734,9 +656,7 @@ class Dialog(QtWidgets.QWidget):
                 self.fields['lgsgrav'].setCurrentIndex(i)
             i += 1
         layout.addWidget(self.fields['lgsgrav'])
-        QtCore.QObject.connect(self.fields['lgsgrav'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['lgsgrav'].currentIndexChanged.connect( self.evaluate)
         drawinglayout.addLayout(layout)
 
         # Frame logo:
@@ -744,21 +664,15 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Frame Logo:', self))
         self.fields['lgfpath'] = QtWidgets.QLineEdit(Options.lgfpath, self)
         layout.addWidget(self.fields['lgfpath'])
-        QtCore.QObject.connect(self.fields['lgfpath'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['lgfpath'].editingFinished.connect( self.evaluate)
         self.btnBrowseLgf = QtWidgets.QPushButton('Browse', self)
-        QtCore.QObject.connect(self.btnBrowseLgf,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseLgf)
+        self.btnBrowseLgf.pressed.connect( self.browseLgf)
         layout.addWidget(self.btnBrowseLgf)
         layout.addWidget(QtWidgets.QLabel('Size:', self))
         self.fields['lgfsize'] = QtWidgets.QSpinBox(self)
         self.fields['lgfsize'].setRange(1, 100)
         self.fields['lgfsize'].setValue(Options.lgfsize)
-        QtCore.QObject.connect(self.fields['lgfsize'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['lgfsize'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['lgfsize'])
         layout.addWidget(QtWidgets.QLabel('%  Position:', self))
         self.fields['lgfgrav'] = QtWidgets.QComboBox(self)
@@ -769,9 +683,7 @@ class Dialog(QtWidgets.QWidget):
                 self.fields['lgfgrav'].setCurrentIndex(i)
             i += 1
         layout.addWidget(self.fields['lgfgrav'])
-        QtCore.QObject.connect(self.fields['lgfgrav'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['lgfgrav'].currentIndexChanged.connect( self.evaluate)
         drawinglayout.addLayout(layout)
 
         # Font:
@@ -780,16 +692,12 @@ class Dialog(QtWidgets.QWidget):
         lFont.addWidget(tFont)
         self.fields['font'] = QtWidgets.QLineEdit('', self)
         lFont.addWidget(self.fields['font'])
-        QtCore.QObject.connect(self.fields['font'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['font'].editingFinished.connect( self.evaluate)
         self.cbFont = QtWidgets.QComboBox(self)
         for font in FontsList:
             self.cbFont.addItem(font)
         lFont.addWidget(self.cbFont)
-        QtCore.QObject.connect(self.cbFont,
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.fontChanged)
+        self.cbFont.currentIndexChanged.connect( self.fontChanged)
         drawinglayout.addLayout(lFont)
 
 
@@ -800,9 +708,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(label)
         label.setToolTip('AV tools command.')
         self.fields['avcmd'] = QtWidgets.QLineEdit(Options.avcmd, self)
-        QtCore.QObject.connect(self.fields['avcmd'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['avcmd'].editingFinished.connect( self.evaluate)
         layout.addWidget(self.fields['avcmd'])
 
         # Fake time:
@@ -810,9 +716,7 @@ class Dialog(QtWidgets.QWidget):
         parameterslayout.addLayout(layout)
         self.cbFakeTime = QtWidgets.QCheckBox('Fake Time:', self)
         self.cbFakeTime.setChecked(False)
-        QtCore.QObject.connect(self.cbFakeTime,
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.cbFakeTime.stateChanged.connect( self.evaluate)
         layout.addWidget(self.cbFakeTime)
         self.fakeTime = QtWidgets.QDateTimeEdit(
             QtCore.QDateTime.currentDateTime(),
@@ -821,9 +725,7 @@ class Dialog(QtWidgets.QWidget):
         self.fakeTime.setDisplayFormat(TimeFormat)
         self.fakeTime.setCalendarPopup(True)
         layout.addWidget(self.fakeTime)
-        QtCore.QObject.connect(self.fakeTime,
-                               QtCore.SIGNAL('dateTimeChanged()'),
-                               self.evaluate)
+        self.fakeTime.dateTimeChanged.connect( self.evaluate)
 
         # Image Aspect:
         group = QtWidgets.QGroupBox('Aspect')
@@ -837,9 +739,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['aspect_in'].setRange(-1.0, 10.0)
         self.fields['aspect_in'].setDecimals(6)
         self.fields['aspect_in'].setValue(Options.aspect_in)
-        QtCore.QObject.connect(self.fields['aspect_in'],
-                               QtCore.SIGNAL('valueChanged(double)'),
-                               self.evaluate)
+        self.fields['aspect_in'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['aspect_in'])
         layout.addWidget(QtWidgets.QLabel(' (-1 = no changes) ', self))
         grouplayout.addLayout(layout)
@@ -855,9 +755,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['aspect_auto'].setRange(-1.0, 10.0)
         self.fields['aspect_auto'].setDecimals(3)
         self.fields['aspect_auto'].setValue(Options.aspect_auto)
-        QtCore.QObject.connect(self.fields['aspect_auto'],
-                               QtCore.SIGNAL('valueChanged(double)'),
-                               self.evaluate)
+        self.fields['aspect_auto'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['aspect_auto'])
         layout.addWidget(QtWidgets.QLabel(' (-1 = no changes) ', self))
         grouplayout.addLayout(layout)
@@ -868,9 +766,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['aspect_out'].setRange(-1.0, 10.0)
         self.fields['aspect_out'].setDecimals(6)
         self.fields['aspect_out'].setValue(Options.aspect_out)
-        QtCore.QObject.connect(self.fields['aspect_out'],
-                               QtCore.SIGNAL('valueChanged(double)'),
-                               self.evaluate)
+        self.fields['aspect_out'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['aspect_out'])
         layout.addWidget(QtWidgets.QLabel(' (-1 = no changes) ', self))
         grouplayout.addLayout(layout)
@@ -896,9 +792,7 @@ class Dialog(QtWidgets.QWidget):
             if colorspace == Options.colorspace:
                 self.fields['colorspace'].setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.fields['colorspace'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['colorspace'].currentIndexChanged.connect( self.evaluate)
         grouplayout.addWidget(self.fields['colorspace'])
 
         layout = QtWidgets.QHBoxLayout()
@@ -908,9 +802,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['gamma'].setDecimals(1)
         self.fields['gamma'].setSingleStep(0.1)
         self.fields['gamma'].setValue(1.0)
-        QtCore.QObject.connect(self.fields['gamma'],
-                               QtCore.SIGNAL('valueChanged(double)'),
-                               self.evaluate)
+        self.fields['gamma'].valueChanged.connect( self.evaluate)
         layout.addWidget(self.fields['gamma'])
         grouplayout.addLayout(layout)
 
@@ -919,9 +811,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(label)
         label.setToolTip('Add this options to convert command.')
         self.fields['correction'] = QtWidgets.QLineEdit(Options.correction, self)
-        QtCore.QObject.connect(self.fields['correction'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['correction'].editingFinished.connect( self.evaluate)
         layout.addWidget(self.fields['correction'])
         grouplayout.addLayout(layout)
 
@@ -940,18 +830,14 @@ class Dialog(QtWidgets.QWidget):
             if format == Options.tmpformat:
                 self.fields['tmpformat'].setCurrentIndex(i)
             i += 1
-        QtCore.QObject.connect(self.fields['tmpformat'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['tmpformat'].currentIndexChanged.connect( self.evaluate)
         grouplayout.addWidget(self.fields['tmpformat'])
 
         label = QtWidgets.QLabel('Quality Options:', self)
         grouplayout.addWidget(label)
         label.setToolTip('Add this options to temporary image saving.')
         self.fields['tmpquality'] = QtWidgets.QLineEdit(Options.tmpquality, self)
-        QtCore.QObject.connect(self.fields['tmpquality'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['tmpquality'].editingFinished.connect( self.evaluate)
         grouplayout.addWidget(self.fields['tmpquality'])
 
 
@@ -962,16 +848,12 @@ class Dialog(QtWidgets.QWidget):
             QtWidgets.QCheckBox('Append Movie File Name With Date', self)
         self.fields['datesuffix'].setChecked(False)
         layout.addWidget(self.fields['datesuffix'])
-        QtCore.QObject.connect(self.fields['datesuffix'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['datesuffix'].stateChanged.connect( self.evaluate)
         self.fields['timesuffix'] = \
             QtWidgets.QCheckBox('Append Movie File Name With Time', self)
         self.fields['timesuffix'].setChecked(False)
         layout.addWidget(self.fields['timesuffix'])
-        QtCore.QObject.connect(self.fields['timesuffix'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['timesuffix'].stateChanged.connect( self.evaluate)
 
 
         # Stereo:
@@ -979,9 +861,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['stereodub'] = \
             QtWidgets.QCheckBox('Duplicate first sequence', self)
         self.fields['stereodub'].setChecked(Options.stereodub)
-        QtCore.QObject.connect(self.fields['stereodub'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evalStereo)
+        self.fields['stereodub'].stateChanged.connect( self.evalStereo)
         stereolayout.addWidget(self.fields['stereodub'])
 
         # Second Pattern:
@@ -992,17 +872,13 @@ class Dialog(QtWidgets.QWidget):
 
         self.fields['input1'] = QtWidgets.QLineEdit(InFile1, self)
         grouplayout.addWidget(self.fields['input1'])
-        QtCore.QObject.connect(self.fields['input1'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.inputFileChanged2)
+        self.fields['input1'].textEdited.connect( self.inputFileChanged2)
 
         layout = QtWidgets.QHBoxLayout()
         self.btnInputFileCopy = \
             QtWidgets.QPushButton('Copy&&Paste First Sequence', self)
         layout.addWidget(self.btnInputFileCopy)
-        QtCore.QObject.connect(self.btnInputFileCopy,
-                               QtCore.SIGNAL('pressed()'),
-                               self.copyInput)
+        self.btnInputFileCopy.pressed.connect( self.copyInput)
         layout.addWidget(QtWidgets.QLabel('Files count:', self))
         self.editInputFilesCount2 = QtWidgets.QLineEdit(self)
         layout.addWidget(self.editInputFilesCount2)
@@ -1013,9 +889,7 @@ class Dialog(QtWidgets.QWidget):
         self.editInputFilesPattern2.setEnabled(False)
         self.btnInputFileBrowse2 = QtWidgets.QPushButton('Browse', self)
         layout.addWidget(self.btnInputFileBrowse2)
-        QtCore.QObject.connect(self.btnInputFileBrowse2,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseInput2)
+        self.btnInputFileBrowse2.pressed.connect( self.browseInput2)
         grouplayout.addLayout(layout)
 
         layout = QtWidgets.QHBoxLayout()
@@ -1025,9 +899,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(self.editIdentify2)
         self.btnInputFileRefresh2 = QtWidgets.QPushButton('Refresh', self)
         layout.addWidget(self.btnInputFileRefresh2)
-        QtCore.QObject.connect(self.btnInputFileRefresh2,
-                               QtCore.SIGNAL('pressed()'),
-                               self.inputFileChanged2)
+        self.btnInputFileRefresh2.pressed.connect( self.inputFileChanged2)
         grouplayout.addLayout(layout)
 
         layout = QtWidgets.QHBoxLayout()
@@ -1043,9 +915,7 @@ class Dialog(QtWidgets.QWidget):
         # Decode:
         self.decodeEnable = QtWidgets.QCheckBox('Enable', self)
         decodeLayout.addWidget(self.decodeEnable)
-        QtCore.QObject.connect(self.decodeEnable,
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.decodeEnable.stateChanged.connect( self.evaluate)
         self.decodeEnable.setChecked(True)
         group = QtWidgets.QGroupBox('Input Movie')
         decodeLayout.addWidget(group)
@@ -1054,14 +924,10 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         self.decodeInputFileName = QtWidgets.QLineEdit(self)
         layout.addWidget(self.decodeInputFileName)
-        QtCore.QObject.connect(self.decodeInputFileName,
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.decodeInputChanged)
+        self.decodeInputFileName.textEdited.connect( self.decodeInputChanged)
         self.decodeInputBrowse = QtWidgets.QPushButton('Browse')
         layout.addWidget(self.decodeInputBrowse)
-        QtCore.QObject.connect(self.decodeInputBrowse,
-                               QtCore.SIGNAL('pressed()'),
-                               self.decodeBrowseInput)
+        self.decodeInputBrowse.pressed.connect( self.decodeBrowseInput)
 
         group = QtWidgets.QGroupBox('Output Sequence')
         decodeLayout.addWidget(group)
@@ -1070,14 +936,10 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         self.decodeOutputSequence = QtWidgets.QLineEdit(self)
         layout.addWidget(self.decodeOutputSequence)
-        QtCore.QObject.connect(self.decodeOutputSequence,
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.decodeOutputChanged)
+        self.decodeOutputSequence.textEdited.connect( self.decodeOutputChanged)
         self.decodeOutputBrowse = QtWidgets.QPushButton('Browse')
         layout.addWidget(self.decodeOutputBrowse)
-        QtCore.QObject.connect(self.decodeOutputBrowse,
-                               QtCore.SIGNAL('pressed()'),
-                               self.decodeBrowseOutput)
+        self.decodeOutputBrowse.pressed.connect( self.decodeBrowseOutput)
         grouplayout.addWidget(QtWidgets.QLabel('Absolute Location:'))
         self.decodeOutputAbs = QtWidgets.QLineEdit(self)
         self.decodeOutputAbs.setReadOnly(True)
@@ -1095,14 +957,10 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         self.fields['audiofile'] = QtWidgets.QLineEdit(self)
         layout.addWidget(self.fields['audiofile'])
-        QtCore.QObject.connect(self.fields['audiofile'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.audioInputChanged)
+        self.fields['audiofile'].textEdited.connect( self.audioInputChanged)
         self.audioInputBrowse = QtWidgets.QPushButton('Browse')
         layout.addWidget(self.audioInputBrowse)
-        QtCore.QObject.connect(self.audioInputBrowse,
-                               QtCore.SIGNAL('pressed()'),
-                               self.audioBrowseInput)
+        self.audioInputBrowse.pressed.connect( self.audioBrowseInput)
 
         group = QtWidgets.QGroupBox('Settings')
         audioLayout.addWidget(group)
@@ -1115,9 +973,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['audiofreq'].setRange(1, 96)
         self.fields['audiofreq'].setValue(22)
         layout.addWidget(QtWidgets.QLabel('kHz'))
-        QtCore.QObject.connect(self.fields['audiofreq'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['audiofreq'].valueChanged.connect( self.evaluate)
         layout = QtWidgets.QHBoxLayout()
         grouplayout.addLayout(layout)
         layout.addWidget(QtWidgets.QLabel('Bit Rate:'))
@@ -1126,9 +982,7 @@ class Dialog(QtWidgets.QWidget):
         self.fields['audiorate'].setRange(32, 256)
         self.fields['audiorate'].setValue(128)
         layout.addWidget(QtWidgets.QLabel('kB/s'))
-        QtCore.QObject.connect(self.fields['audiorate'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['audiorate'].valueChanged.connect( self.evaluate)
         layout = QtWidgets.QHBoxLayout()
         grouplayout.addLayout(layout)
         layout.addWidget(QtWidgets.QLabel('Codec:'))
@@ -1139,17 +993,13 @@ class Dialog(QtWidgets.QWidget):
             self.fields['audiocodec'].addItem(acodec, AudioCodecValues[i])
             i += 1
         self.fields['audiocodec'].setCurrentIndex(0)
-        QtCore.QObject.connect(self.fields['audiocodec'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.evaluate)
+        self.fields['audiocodec'].currentIndexChanged.connect( self.evaluate)
 
 
         # Afanasy:
         self.cAfanasy = QtWidgets.QCheckBox('Enable', self)
         self.cAfanasy.setChecked(Options.afanasy)
-        QtCore.QObject.connect(self.cAfanasy,
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.cAfanasy.stateChanged.connect( self.evaluate)
         afanasylayout.addWidget(self.cAfanasy)
 
         # Priority
@@ -1158,9 +1008,7 @@ class Dialog(QtWidgets.QWidget):
         self.sbAfPriority = QtWidgets.QSpinBox(self)
         self.sbAfPriority.setRange(-1, 1000000)
         self.sbAfPriority.setValue(Options.afpriority)
-        QtCore.QObject.connect(self.sbAfPriority,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.sbAfPriority.valueChanged.connect( self.evaluate)
         layout.addWidget(self.sbAfPriority)
         layout.addWidget(QtWidgets.QLabel('"-1" Means default value.', self))
         afanasylayout.addLayout(layout)
@@ -1177,9 +1025,7 @@ class Dialog(QtWidgets.QWidget):
         self.sbAfMaxHosts = QtWidgets.QSpinBox(self)
         self.sbAfMaxHosts.setRange(-1, 1000000)
         self.sbAfMaxHosts.setValue(Options.afmaxhosts)
-        QtCore.QObject.connect(self.sbAfMaxHosts,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.sbAfMaxHosts.valueChanged.connect( self.evaluate)
         layout.addWidget(self.sbAfMaxHosts)
         layout.addWidget(
             QtWidgets.QLabel('"-1" Means no hosts count limit.', self)
@@ -1189,9 +1035,7 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         layout.addWidget(QtWidgets.QLabel('Hosts Names Mask:', self))
         self.editAfHostsMask = QtWidgets.QLineEdit(Options.afhostsmask, self)
-        QtCore.QObject.connect(self.editAfHostsMask,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.editAfHostsMask.valueChanged.connect( self.evaluate)
         layout.addWidget(self.editAfHostsMask)
         layout.addWidget(QtWidgets.QLabel('Leave empty to run on any host.', self))
 
@@ -1200,9 +1044,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Exclude Hosts Names Mask:', self))
         self.editAfHostsMaskExclude = \
             QtWidgets.QLineEdit(Options.afhostsmaskex, self)
-        QtCore.QObject.connect(self.editAfHostsMaskExclude,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.editAfHostsMaskExclude.valueChanged.connect( self.evaluate)
         layout.addWidget(self.editAfHostsMaskExclude)
         layout.addWidget(
             QtWidgets.QLabel('Leave empty not to exclude any host.', self))
@@ -1217,9 +1059,7 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         layout.addWidget(QtWidgets.QLabel('Depend Jobs Mask:', self))
         self.editAfDependMask = QtWidgets.QLineEdit(Options.afdependmask, self)
-        QtCore.QObject.connect(self.editAfDependMask,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.editAfDependMask.valueChanged.connect( self.evaluate)
         layout.addWidget(self.editAfDependMask)
         layout.addWidget(
             QtWidgets.QLabel('Leave empty not to wait any jobs.', self)
@@ -1230,9 +1070,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Global Depend Jobs Mask:', self))
         self.editAfDependMaskGlobal = \
             QtWidgets.QLineEdit(Options.afdependmaskgl, self)
-        QtCore.QObject.connect(self.editAfDependMaskGlobal,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.editAfDependMaskGlobal.valueChanged.connect( self.evaluate)
         layout.addWidget(self.editAfDependMaskGlobal)
         layout.addWidget(QtWidgets.QLabel('Set mask to wait any user jobs.', self))
 
@@ -1244,36 +1082,28 @@ class Dialog(QtWidgets.QWidget):
 
         self.cAfOneTask = QtWidgets.QCheckBox('One Task', self)
         self.cAfOneTask.setChecked(True)
-        QtCore.QObject.connect(self.cAfOneTask,
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.cAfOneTask.stateChanged.connect( self.evaluate)
         layout.addWidget(self.cAfOneTask)
 
         layout.addWidget(QtWidgets.QLabel('Capacity:', self))
         self.sbAfCapacity = QtWidgets.QSpinBox(self)
         self.sbAfCapacity.setRange(-1, 1000000)
         self.sbAfCapacity.setValue(Options.afcapacity)
-        QtCore.QObject.connect(self.sbAfCapacity,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.sbAfCapacity.valueChanged.connect( self.evaluate)
         layout.addWidget(self.sbAfCapacity)
 
         layout.addWidget(QtWidgets.QLabel('Convert:', self))
         self.sbAfCapConvert = QtWidgets.QSpinBox(self)
         self.sbAfCapConvert.setRange(-1, 1000000)
         self.sbAfCapConvert.setValue(Options.afcapacity)
-        QtCore.QObject.connect(self.sbAfCapConvert,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.sbAfCapConvert.valueChanged.connect( self.evaluate)
         layout.addWidget(self.sbAfCapConvert)
 
         layout.addWidget(QtWidgets.QLabel('Encode:', self))
         self.sbAfCapEncode = QtWidgets.QSpinBox(self)
         self.sbAfCapEncode.setRange(-1, 1000000)
         self.sbAfCapEncode.setValue(Options.afcapacity)
-        QtCore.QObject.connect(self.sbAfCapEncode,
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.sbAfCapEncode.valueChanged.connect( self.evaluate)
         layout.addWidget(self.sbAfCapEncode)
 
 
@@ -1283,9 +1113,7 @@ class Dialog(QtWidgets.QWidget):
 
         self.cAfPause = QtWidgets.QCheckBox('Start Job Paused', self)
         self.cAfPause.setChecked(Options.afpause)
-        QtCore.QObject.connect(self.cAfPause,
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.cAfPause.stateChanged.connect( self.evaluate)
         layout.addWidget(self.cAfPause)
 
         layout.addWidget(QtWidgets.QLabel('Start At Time:', self))
@@ -1293,9 +1121,7 @@ class Dialog(QtWidgets.QWidget):
             QtCore.QDateTime.currentDateTime(), self)
         self.editAfTime.setDisplayFormat(TimeFormat)
         self.editAfTime.setCalendarPopup(True)
-        QtCore.QObject.connect(self.editAfTime,
-                               QtCore.SIGNAL('dateTimeChanged()'),
-                               self.evaluate)
+        self.editAfTime.dateTimeChanged.connect( self.evaluate)
         layout.addWidget(self.editAfTime)
 
 
@@ -1313,21 +1139,15 @@ class Dialog(QtWidgets.QWidget):
         self.btnStart = QtWidgets.QPushButton('&Start', self)
         layout.addWidget(self.btnStart)
         self.btnStart.setEnabled(False)
-        QtCore.QObject.connect(self.btnStart,
-                               QtCore.SIGNAL('pressed()'),
-                               self.execute)
+        self.btnStart.pressed.connect( self.execute)
 
         self.btnRefresh = QtWidgets.QPushButton('&Refresh', self)
         layout.addWidget(self.btnRefresh)
-        QtCore.QObject.connect(self.btnRefresh,
-                               QtCore.SIGNAL('pressed()'),
-                               self.evaluate)
+        self.btnRefresh.pressed.connect( self.evaluate)
 
         self.btnStop = QtWidgets.QPushButton('Sto&p', self)
         self.btnStop.setEnabled(False)
-        QtCore.QObject.connect(self.btnStop,
-                               QtCore.SIGNAL('pressed()'),
-                               self.processStop)
+        self.btnStop.pressed.connect( self.processStop)
         layout.addWidget(self.btnStop)
 
         layout.addItem(QtWidgets.QSpacerItem(20, 20, QtWidgets.QSizePolicy.Expanding))
@@ -1338,21 +1158,15 @@ class Dialog(QtWidgets.QWidget):
 
         self.bBrowseLoad = QtWidgets.QPushButton('Load', self)
         layout.addWidget(self.bBrowseLoad)
-        QtCore.QObject.connect(self.bBrowseLoad,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseLoad)
+        self.bBrowseLoad.pressed.connect( self.browseLoad)
 
         self.bBrowseSave = QtWidgets.QPushButton('Save', self)
         layout.addWidget(self.bBrowseSave)
-        QtCore.QObject.connect(self.bBrowseSave,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseSave)
+        self.bBrowseSave.pressed.connect( self.browseSave)
 
         # self.bQuitSave = QtWidgets.QPushButton('&Quit&&Store', self)
         # layout.addWidget(self.bQuitSave)
-        # QtCore.QObject.connect(self.bQuitSave,
-        # QtCore.SIGNAL('pressed()'),
-        #                        self.quitsave)
+        # self.bQuitSave.'pressed.connect( self.quitsave)
 
         self.autoTitles()
         self.activityChanged()
@@ -1365,23 +1179,21 @@ class Dialog(QtWidgets.QWidget):
 
     # Decode:
     def decodeBrowseInput(self):
-        afile = QtWidgets.QFileDialog.getOpenFileName(
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self,
             'Choose a movie file',
             self.decodeInputFileName.text()
         )
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
         if len(afile):
             self.decodeInputFileName.setText(afile)
             self.decodeInputChanged()
 
     def decodeBrowseOutput(self):
-        afile = QtWidgets.QFileDialog.getOpenFileName(
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self,
             'Choose a sequence',
             self.decodeOutputSequence.text()
         )
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
         if len(afile):
             self.decodeOutputSequence.setText(afile)
             self.decodeOutputChanged()
@@ -1453,12 +1265,11 @@ class Dialog(QtWidgets.QWidget):
 
     # Encode:
     def audioBrowseInput(self):
-        afile = QtWidgets.QFileDialog.getOpenFileName(
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self,
             'Choose an audio or movie file with sound',
             self.fields['audiofile'].text()
         )
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
         if len(afile):
             self.fields['audiofile'].setText(afile)
             self.audioInputChanged()
@@ -1545,8 +1356,7 @@ class Dialog(QtWidgets.QWidget):
             dirname = os.path.dirname(oldlogo)
             if dirname != '':
                 lgspath = dirname
-        afile = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose a file', lgspath)
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose a file', lgspath)
         if len(afile):
             self.fields['lgspath'].setText('%s' % afile)
             self.evaluate()
@@ -1558,8 +1368,7 @@ class Dialog(QtWidgets.QWidget):
             dirname = os.path.dirname(oldlogo)
             if dirname != '':
                 lgfpath = dirname
-        afile = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose a file', lgfpath)
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose a file', lgfpath)
         if len(afile):
             self.fields['lgfpath'].setText('%s' % afile)
             self.evaluate()
@@ -1576,23 +1385,21 @@ class Dialog(QtWidgets.QWidget):
             self.fields['outputfolder'].setText(folder)
 
     def browseInput(self):
-        afile = QtWidgets.QFileDialog.getOpenFileName(
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self,
             'Choose a file',
             self.fields['input0'].text()
         )
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
         if len(afile):
             self.fields['input0'].setText(afile)
             self.inputFileChanged()
 
     def browseInput2(self):
-        afile = QtWidgets.QFileDialog.getOpenFileName(
+        afile, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self,
             'Choose a file',
             self.fields['input1'].text()
         )
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
         if len(afile):
             self.fields['input1'].setText(afile)
             self.inputFileChanged2()
@@ -2105,15 +1912,9 @@ class Dialog(QtWidgets.QWidget):
             self.running = True
             self.process = QtCore.QProcess(self)
             self.process.setProcessChannelMode(QtCore.QProcess.MergedChannels)
-            QtCore.QObject.connect(self.process,
-                                   QtCore.SIGNAL('error( int)'),
-                                   self.processerror)
-            QtCore.QObject.connect(self.process,
-                                   QtCore.SIGNAL('finished( int)'),
-                                   self.processfinished)
-            QtCore.QObject.connect(self.process,
-                                   QtCore.SIGNAL('readyRead()'),
-                                   self.processoutput)
+            self.process.error.connect( self.processerror)
+            self.process.finished.connect( self.processfinished)
+            self.process.readyRead.connect( self.processoutput)
             print('\n################################################\n')
             if sys.version_info[0] < 3:
                 print(command)
@@ -2229,8 +2030,7 @@ class Dialog(QtWidgets.QWidget):
         return True
 
     def browseSave(self):
-        filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU'])
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
+        filename, fltr = QtWidgets.QFileDialog.getSaveFileName(self, 'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU'])
         if filename == '': return
         filendir = os.path.dirname(filename)
         filename = os.path.basename(filename)
@@ -2239,8 +2039,7 @@ class Dialog(QtWidgets.QWidget):
         self.save(filename, True)
 
     def browseLoad(self):
-        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU'])
-        if "PySide" in QtCompat.__binding__: afile = afile[0]
+        filename, fltr = QtWidgets.QFileDialog.getOpenFileName(self, 'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU'])
         if filename == '': return
         self.load(filename, True)
 
@@ -2293,9 +2092,7 @@ class Dialog(QtWidgets.QWidget):
         self.refreshRecent()
 
     def refreshRecent(self):
-        QtCore.QObject.disconnect(self.cbRecent,
-                                  QtCore.SIGNAL('activated(int)'),
-                                  self.loadRecent)
+        self.cbRecent.activated.disconnect( self.loadRecent)
         self.cbRecent.clear()
         for afile in self.getRecentFilesList():
             if afile[: len(FilePrefix)] == FilePrefix:
@@ -2309,16 +2106,14 @@ class Dialog(QtWidgets.QWidget):
             if len(short) > 20:
                 short = short[:10] + ' .. ' + short[-10:]
             self.cbRecent.addItem(short, afile)
-        QtCore.QObject.connect(self.cbRecent,
-                               QtCore.SIGNAL('activated(int)'),
-                               self.loadRecent)
+        self.cbRecent.activated.connect( self.loadRecent)
 
     def loadRecent(self):
         self.load(getComboBoxString(self.cbRecent))
 
 
 app = QtWidgets.QApplication(sys.argv)
-app.setWindowIcon(QtWidgets.QIcon(cgruutils.getIconFileName(Options.wndicon)))
+app.setWindowIcon( QtGui.QIcon(cgruutils.getIconFileName(Options.wndicon)))
 dialog = Dialog()
 dialog.show()
 app.exec_()

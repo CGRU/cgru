@@ -31,7 +31,7 @@ class Window(QtWidgets.QTextEdit):
         self.appendVar('Platform', ",".join( cgruconfig.VARS['platform']))
 
         self.textCursor().insertText('\nPython:\n', self.ftitle)
-#self.appendVar(cgrupyqt.PythonQtType, str(cgrupyqt.PythonQt))
+        self.appendVar('Qt', '%s %s %s' % ( QtCompat.__qt_version__, QtCompat.__binding__, QtCompat.__binding_version__))
         self.appendVar('sys.prefix', sys.prefix)
         self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))
         self.appendVar('Version', sys.version)
