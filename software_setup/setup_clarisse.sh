@@ -5,6 +5,10 @@
 #
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
+# Try PySide first:
+# https://github.com/mottosso/Qt.py
+export QT_PREFERRED_BINDING="PySide2:PySide:PyQt4"
+
 #
 # Search for Clarisse installation:
 #
