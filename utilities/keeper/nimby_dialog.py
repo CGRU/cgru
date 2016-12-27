@@ -3,14 +3,14 @@
 import cgruconfig
 import cgruutils
 
-from cgrupyqt import QtCore, QtGui
+from Qt import QtCore, QtWidgets, QtCompat
 
 import nimby
 
 
-class NimbyDialog(QtGui.QWidget):
+class NimbyDialog(QtWidgets.QWidget):
 	def __init__(self, parent=None):
-		QtGui.QWidget.__init__(self, parent)
+		QtWidgets.QWidget.__init__(self, parent)
 		self.setWindowTitle('Edit Nimby')
 		rows = ['day', 'begin', 'dash', 'end', 'enable', 'allow', 'eject']
 		self.weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday',
@@ -23,12 +23,12 @@ class NimbyDialog(QtGui.QWidget):
 		self.cb_allow = dict()
 		self.cb_eject = dict()
 
-		toplayout = QtGui.QVBoxLayout(self)
-		columns = QtGui.QHBoxLayout()
+		toplayout = QtWidgets.QVBoxLayout(self)
+		columns = QtWidgets.QHBoxLayout()
 		toplayout.addLayout(columns)
 		vlayouts = dict()
 		for row in rows:
-			vlayouts[row] = QtGui.QVBoxLayout()
+			vlayouts[row] = QtWidgets.QVBoxLayout()
 			columns.addLayout(vlayouts[row])
 
 		daynum = 0
@@ -61,42 +61,42 @@ class NimbyDialog(QtGui.QWidget):
 					enable = True
 
 			vlayouts['day'].addWidget(
-				QtGui.QLabel(self.weekdays[daynum], self)
+				QtWidgets.QLabel(self.weekdays[daynum], self)
 			)
 
-			self.te_begin[day] = QtGui.QTimeEdit(
+			self.te_begin[day] = QtWidgets.QTimeEdit(
 				QtCore.QTime.fromString(time_begin, self.time_format)
 			)
 			self.te_begin[day].setDisplayFormat(self.time_format)
 			vlayouts['begin'].addWidget(self.te_begin[day])
 
-			label = QtGui.QLabel(' - ', self)
+			label = QtWidgets.QLabel(' - ', self)
 			label.setFixedWidth(16)
 			vlayouts['dash'].addWidget(label)
 
-			self.te_end[day] = QtGui.QTimeEdit(
+			self.te_end[day] = QtWidgets.QTimeEdit(
 				QtCore.QTime.fromString(time_end, self.time_format)
 			)
 			self.te_end[day].setDisplayFormat(self.time_format)
 			vlayouts['end'].addWidget(self.te_end[day])
 
-			self.cb_enable[day] = QtGui.QCheckBox('Enable', self)
+			self.cb_enable[day] = QtWidgets.QCheckBox('Enable', self)
 			self.cb_enable[day].setChecked(enable)
 			vlayouts['enable'].addWidget(self.cb_enable[day])
 
-			self.cb_allow[day] = QtGui.QCheckBox('Allow My Jobs', self)
+			self.cb_allow[day] = QtWidgets.QCheckBox('Allow My Jobs', self)
 			self.cb_allow[day].setChecked(allow)
 			vlayouts['allow'].addWidget(self.cb_allow[day])
 
-			self.cb_eject[day] = QtGui.QCheckBox('Eject Running Tasks', self)
+			self.cb_eject[day] = QtWidgets.QCheckBox('Eject Running Tasks', self)
 			self.cb_eject[day].setChecked(eject)
 			vlayouts['eject'].addWidget(self.cb_eject[day])
 
 			daynum += 1
 
-		hlayout = QtGui.QHBoxLayout()
-		b_accept = QtGui.QPushButton('Accept', self)
-		b_cancel = QtGui.QPushButton('Cancel', self)
+		hlayout = QtWidgets.QHBoxLayout()
+		b_accept = QtWidgets.QPushButton('Accept', self)
+		b_cancel = QtWidgets.QPushButton('Cancel', self)
 		hlayout.addWidget(b_accept)
 		hlayout.addWidget(b_cancel)
 		toplayout.addLayout(hlayout)
@@ -114,7 +114,7 @@ class NimbyDialog(QtGui.QWidget):
 		# Set window icon:
 		iconpath = cgruutils.getIconFileName('afanasy')
 		if iconpath is not None:
-			self.setWindowIcon(QtGui.QIcon(iconpath))
+			self.setWindowIcon(QtWidgets.QIcon(iconpath))
 
 		self.show()
 

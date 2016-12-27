@@ -5,30 +5,30 @@ import sys
 import cgruconfig
 import cgruutils
 
-from cgrupyqt import QtCore, QtGui
+from Qt import QtCore, QtWidgets, QtCompat
 
 
-class Dialog(QtGui.QWidget):
+class Dialog(QtWidgets.QWidget):
 	def __init__(self):
-		QtGui.QWidget.__init__(self)
+		QtWidgets.QWidget.__init__(self)
 		title = 'Qt RegExp checker   CGRU ' + cgruconfig.VARS['CGRU_VERSION']
 		self.setWindowTitle(title)
 
-		layout = QtGui.QVBoxLayout(self)
+		layout = QtWidgets.QVBoxLayout(self)
 
-		self.leName = QtGui.QLineEdit('render01', self)
+		self.leName = QtWidgets.QLineEdit('render01', self)
 		layout.addWidget(self.leName)
 		QtCore.QObject.connect(self.leName,
 							   QtCore.SIGNAL('textEdited(QString)'),
 							   self.evaluate)
 
-		self.lePattern = QtGui.QLineEdit('((render|workstation)0[1-4]+)', self)
+		self.lePattern = QtWidgets.QLineEdit('((render|workstation)0[1-4]+)', self)
 		layout.addWidget(self.lePattern)
 		QtCore.QObject.connect(self.lePattern,
 							   QtCore.SIGNAL('textEdited(QString)'),
 							   self.evaluate)
 
-		self.leResult = QtGui.QLineEdit(
+		self.leResult = QtWidgets.QLineEdit(
 			'render01-render04 or workstation01-workstation04', self)
 		layout.addWidget(self.leResult)
 		self.leResult.setReadOnly(True)
@@ -48,7 +48,7 @@ class Dialog(QtGui.QWidget):
 			self.leResult.setText('NOT MATCH')
 
 
-app = QtGui.QApplication(sys.argv)
-app.setWindowIcon(QtGui.QIcon(cgruutils.getIconFileName('regexp')))
+app = QtWidgets.QApplication(sys.argv)
+app.setWindowIcon(QtWidgets.QIcon(cgruutils.getIconFileName('regexp')))
 dialog = Dialog()
 app.exec_()

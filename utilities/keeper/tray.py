@@ -17,7 +17,7 @@ import software
 
 from nimby_dialog import NimbyDialog
 
-from cgrupyqt import QtCore, QtGui
+from Qt import QtCore, QtGui
 
 
 class ActionCommand(QtGui.QAction):

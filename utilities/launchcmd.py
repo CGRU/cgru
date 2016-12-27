@@ -7,20 +7,20 @@ if len(sys.argv) <= 1:
 	print('Error: No command specified.')
 	sys.exit(1)
 
-from cgrupyqt import QtCore, QtGui
+from Qt import QtCore, QtWidgets, QtCompat
 
 
-class Dialog(QtGui.QWidget):
+class Dialog(QtWidgets.QWidget):
 	def __init__(self):
-		QtGui.QWidget.__init__(self)
+		QtWidgets.QWidget.__init__(self)
 
 		self.setWindowTitle(sys.argv[0])
 
-		layout = QtGui.QVBoxLayout(self)
-		self.cmdField = QtGui.QTextEdit(self)
+		layout = QtWidgets.QVBoxLayout(self)
+		self.cmdField = QtWidgets.QTextEdit(self)
 		self.cmdField.setReadOnly(True)
 		layout.addWidget(self.cmdField)
-		self.outputField = QtGui.QTextEdit(self)
+		self.outputField = QtWidgets.QTextEdit(self)
 		self.outputField.setReadOnly(True)
 		layout.addWidget(self.outputField)
 
@@ -77,10 +77,10 @@ class Dialog(QtGui.QWidget):
 		output = output.strip()
 		print('%s' % output)
 		self.outputField.insertPlainText(output + '\n')
-		self.outputField.moveCursor(QtGui.QTextCursor.End)
+		self.outputField.moveCursor(QtWidgets.QTextCursor.End)
 
 
-app = QtGui.QApplication(sys.argv)
+app = QtWidgets.QApplication(sys.argv)
 dialog = Dialog()
 dialog.show()
 app.exec_()

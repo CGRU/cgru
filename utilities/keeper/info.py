@@ -6,14 +6,11 @@ import os
 import cgruconfig
 import cgruutils
 
-from cgrupyqt import QtCore, QtGui
+from Qt import QtCore, QtWidgets, QtCompat
 
-import cgrupyqt
-
-
-class Window(QtGui.QTextEdit):
+class Window(QtWidgets.QTextEdit):
     def __init__(self, parent=None):
-        QtGui.QTextEdit.__init__(self, parent)
+        QtWidgets.QTextEdit.__init__(self, parent)
 
         self.setWindowTitle(
             'Configuration: %s version %s' % (
@@ -22,19 +19,19 @@ class Window(QtGui.QTextEdit):
             )
         )
 
-        self.ftitle = QtGui.QTextCharFormat()
-        self.ftitle.setFontWeight(QtGui.QFont.Bold)
+        self.ftitle = QtWidgets.QTextCharFormat()
+        self.ftitle.setFontWeight(QtWidgets.QFont.Bold)
         self.ftitle.setFontItalic(True)
-        self.fname = QtGui.QTextCharFormat()
-        self.fname.setFontWeight(QtGui.QFont.Bold)
-        self.fvalue = QtGui.QTextCharFormat()
-        self.fundefined = QtGui.QTextCharFormat()
+        self.fname = QtWidgets.QTextCharFormat()
+        self.fname.setFontWeight(QtWidgets.QFont.Bold)
+        self.fvalue = QtWidgets.QTextCharFormat()
+        self.fundefined = QtWidgets.QTextCharFormat()
         self.fundefined.setFontItalic(True)
 
         self.appendVar('Platform', ",".join( cgruconfig.VARS['platform']))
 
         self.textCursor().insertText('\nPython:\n', self.ftitle)
-        self.appendVar(cgrupyqt.PythonQtType, str(cgrupyqt.PythonQt))
+#self.appendVar(cgrupyqt.PythonQtType, str(cgrupyqt.PythonQt))
         self.appendVar('sys.prefix', sys.prefix)
         self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))
         self.appendVar('Version', sys.version)
@@ -60,10 +57,10 @@ class Window(QtGui.QTextEdit):
         # Set window icon:
         iconpath = cgruutils.getIconFileName('info')
         if iconpath is not None:
-            self.setWindowIcon(QtGui.QIcon(iconpath))
+            self.setWindowIcon(QtWidgets.QIcon(iconpath))
 
         self.resize(self.viewport().size())
-        self.moveCursor(QtGui.QTextCursor.Start)
+        self.moveCursor(QtWidgets.QTextCursor.Start)
         self.setReadOnly(True)
         self.show()
 
