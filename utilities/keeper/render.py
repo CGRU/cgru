@@ -8,7 +8,7 @@ import cgruconfig
 
 WndInfo = None
 
-from Qt import QtCore, QtWidgets, QtCompat
+from Qt import QtCore, QtWidgets
 
 def showInfo(tray=None):
 	renders = af.Cmd().renderGetLocal()
@@ -58,11 +58,7 @@ def setUserDialog():
 
 def refreshAfter( i_sec = 3):
 	timer = QtCore.QTimer( cmd.Application)
-	QtCore.QObject.connect(
-		timer,
-		QtCore.SIGNAL('timeout()'),
-		refresh
-	)
+	timer.timeout.connect( refresh)
 	timer.setInterval( 1000 * i_sec)
 	timer.setSingleShot( True)
 	timer.start()

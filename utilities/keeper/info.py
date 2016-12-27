@@ -6,7 +6,7 @@ import os
 import cgruconfig
 import cgruutils
 
-from Qt import QtCore, QtWidgets, QtCompat
+from Qt import QtCore, QtGui, QtWidgets, QtCompat
 
 class Window(QtWidgets.QTextEdit):
     def __init__(self, parent=None):
@@ -19,19 +19,19 @@ class Window(QtWidgets.QTextEdit):
             )
         )
 
-        self.ftitle = QtWidgets.QTextCharFormat()
-        self.ftitle.setFontWeight(QtWidgets.QFont.Bold)
+        self.ftitle = QtGui.QTextCharFormat()
+        self.ftitle.setFontWeight( QtGui.QFont.Bold)
         self.ftitle.setFontItalic(True)
-        self.fname = QtWidgets.QTextCharFormat()
-        self.fname.setFontWeight(QtWidgets.QFont.Bold)
-        self.fvalue = QtWidgets.QTextCharFormat()
-        self.fundefined = QtWidgets.QTextCharFormat()
+        self.fname = QtGui.QTextCharFormat()
+        self.fname.setFontWeight( QtGui.QFont.Bold)
+        self.fvalue = QtGui.QTextCharFormat()
+        self.fundefined = QtGui.QTextCharFormat()
         self.fundefined.setFontItalic(True)
 
         self.appendVar('Platform', ",".join( cgruconfig.VARS['platform']))
 
         self.textCursor().insertText('\nPython:\n', self.ftitle)
-        self.appendVar('Qt', '%s %s %s' % ( QtCompat.__qt_version__, QtCompat.__binding__, QtCompat.__binding_version__))
+        self.appendVar('Qt', '%s %s-%s' % ( QtCompat.__qt_version__, QtCompat.__binding__, QtCompat.__binding_version__))
         self.appendVar('sys.prefix', sys.prefix)
         self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))
         self.appendVar('Version', sys.version)
@@ -57,10 +57,10 @@ class Window(QtWidgets.QTextEdit):
         # Set window icon:
         iconpath = cgruutils.getIconFileName('info')
         if iconpath is not None:
-            self.setWindowIcon(QtWidgets.QIcon(iconpath))
+            self.setWindowIcon( QtGui.QIcon(iconpath))
 
         self.resize(self.viewport().size())
-        self.moveCursor(QtWidgets.QTextCursor.Start)
+        self.moveCursor( QtGui.QTextCursor.Start)
         self.setReadOnly(True)
         self.show()
 

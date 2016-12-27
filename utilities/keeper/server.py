@@ -11,7 +11,7 @@ import nimby
 import render
 import tray
 
-from cgrupyqt import QtCore, QtNetwork
+from Qt import QtCore, QtNetwork
 
 
 class Server(QtNetwork.QTcpServer):

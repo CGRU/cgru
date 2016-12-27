@@ -25,9 +25,9 @@ Parser = OptionParser(usage="%prog [options] [file or folder]\ntype \"%prog -h\"
 Parser.add_option('-a', '--avcmd',           dest='avcmd',           type  ='string',     default='ffmpeg',       help='AV tool command')
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies_withlogo', help='Sequence frame template')
-Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Codec preset')
-Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576x1.09', help='Resolution')
-Parser.add_option('-n', '--container',       dest='container',       type  ='string',     default='mov',          help='Container')
+Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='h264_mid.ffmpeg', help='Codec preset')
+Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='1280x720',     help='Resolution')
+Parser.add_option('-n', '--container',       dest='container',       type  ='string',     default='mp4',          help='Container')
 Parser.add_option('--aspect_in',             dest='aspect_in',       type  ='float',      default=-1.0,           help='Input image aspect, -1 = no changes')
 Parser.add_option('--aspect_auto',           dest='aspect_auto',     type  ='float',      default=-1.0,           help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('--aspect_out',            dest='aspect_out',      type  ='float',      default=-1.0,           help='Output movie aspect, "-1" = no changes')
@@ -1035,7 +1035,7 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         layout.addWidget(QtWidgets.QLabel('Hosts Names Mask:', self))
         self.editAfHostsMask = QtWidgets.QLineEdit(Options.afhostsmask, self)
-        self.editAfHostsMask.valueChanged.connect( self.evaluate)
+        self.editAfHostsMask.textEdited.connect( self.evaluate)
         layout.addWidget(self.editAfHostsMask)
         layout.addWidget(QtWidgets.QLabel('Leave empty to run on any host.', self))
 
@@ -1044,7 +1044,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Exclude Hosts Names Mask:', self))
         self.editAfHostsMaskExclude = \
             QtWidgets.QLineEdit(Options.afhostsmaskex, self)
-        self.editAfHostsMaskExclude.valueChanged.connect( self.evaluate)
+        self.editAfHostsMaskExclude.textEdited.connect( self.evaluate)
         layout.addWidget(self.editAfHostsMaskExclude)
         layout.addWidget(
             QtWidgets.QLabel('Leave empty not to exclude any host.', self))
@@ -1059,7 +1059,7 @@ class Dialog(QtWidgets.QWidget):
         grouplayout.addLayout(layout)
         layout.addWidget(QtWidgets.QLabel('Depend Jobs Mask:', self))
         self.editAfDependMask = QtWidgets.QLineEdit(Options.afdependmask, self)
-        self.editAfDependMask.valueChanged.connect( self.evaluate)
+        self.editAfDependMask.textEdited.connect( self.evaluate)
         layout.addWidget(self.editAfDependMask)
         layout.addWidget(
             QtWidgets.QLabel('Leave empty not to wait any jobs.', self)
@@ -1070,7 +1070,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Global Depend Jobs Mask:', self))
         self.editAfDependMaskGlobal = \
             QtWidgets.QLineEdit(Options.afdependmaskgl, self)
-        self.editAfDependMaskGlobal.valueChanged.connect( self.evaluate)
+        self.editAfDependMaskGlobal.textEdited.connect( self.evaluate)
         layout.addWidget(self.editAfDependMaskGlobal)
         layout.addWidget(QtWidgets.QLabel('Set mask to wait any user jobs.', self))
 
@@ -1154,6 +1154,7 @@ class Dialog(QtWidgets.QWidget):
         layout.addWidget(QtWidgets.QLabel('Recent:', self))
 
         self.cbRecent = QtWidgets.QComboBox(self)
+        self.cbRecent.activated.connect( self.loadRecent)
         layout.addWidget(self.cbRecent)
 
         self.bBrowseLoad = QtWidgets.QPushButton('Load', self)
@@ -1299,7 +1300,7 @@ class Dialog(QtWidgets.QWidget):
                     'one sequence.'
                 )
                 self.stereoStatusLabel.setAutoFillBackground(True)
-                self.stereoStatusLabel.setBackgroundRole(QtWidgets.QPalette.Window)
+                self.stereoStatusLabel.setBackgroundRole( QtGui.QPalette.Window)
         else:
             self.fields['stereodub'].setChecked(False)
             self.fields['stereodub'].setEnabled(False)
@@ -1948,7 +1949,7 @@ class Dialog(QtWidgets.QWidget):
         output = output.strip()
         print('%s' % output)
         self.cmdField.insertPlainText(output + '\n')
-        self.cmdField.moveCursor(QtWidgets.QTextCursor.End)
+        self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
     def processStop(self):
         if self.process.pid() is None or self.process.pid() == 0:
@@ -2106,6 +2107,7 @@ class Dialog(QtWidgets.QWidget):
             if len(short) > 20:
                 short = short[:10] + ' .. ' + short[-10:]
             self.cbRecent.addItem(short, afile)
+
         self.cbRecent.activated.connect( self.loadRecent)
 
     def loadRecent(self):

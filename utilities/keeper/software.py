@@ -156,8 +156,7 @@ def browse():
 
 
 def locateSoftware(soft):
-    filename = QtWidgets.QFileDialog.getOpenFileName(None, 'Select %s executable:' % soft)
-    if "PySide" in QtCompat.__binding__: filename = filename[0]
+    filename, fltr = QtWidgets.QFileDialog.getOpenFileName(None, 'Select %s executable:' % soft)
     if filename is None: return
     filename = str(filename)
     if filename == '': return
