@@ -223,14 +223,17 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 		QueueLogError("AFCommon::writeFile: File name is empty.");
 		return false;
 	}
+
+	std::string filetemp = filename + ".tmp";
+
 	#ifdef WINNT
-	int fd = _open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
+	int fd = _open( filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
 	#else
-	int fd = open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	int fd = open( filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	#endif
 	if( fd == -1 )
 	{
-		QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
+		QueueLogErrno( std::string("AFCommon::writeFile: ") + filetemp);
 		return false;
 	}
 	int bytes = 0;
@@ -239,7 +242,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 		int written = write( fd, data+bytes, length-bytes);
 		if( written == -1 )
 		{
-			QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
+			QueueLogErrno( std::string("AFCommon::writeFile: ") + filetemp);
 			close( fd);
 			return false;
 		}
@@ -248,10 +251,12 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 
 	close( fd);
 
-	/* FIXME: do we need this chmod() ? If so, in what case ? */
-	chmod( filename.c_str(), 0644);
+	rename( filetemp.c_str(), filename.c_str());
 
-	// AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
+	/* FIXME: do we need this chmod() ? If so, in what case ? */
+	// chmod( filename.c_str(), 0644);
+
 	AFINFA("AFCommon::writeFile - \"%s\"", filename.c_str())
 	return true;
 }
+
