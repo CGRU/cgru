@@ -15,12 +15,18 @@ function debianArch(){
 	packages="$packages g++"
 	packages="$packages python-dev"
 	packages="$packages libpq-dev"
-	packages="$packages qt4-dev-tools"
-	packages="$packages qt4-qmake"
 	packages="$packages python-qt4"
 	packages="$packages p7zip-full"
 	packages="$packages git-core"
 	packages="$packages libzip-dev"
+	# Qt4:
+	packages="$packages qt4-dev-tools"
+	packages="$packages qt4-qmake"
+	# Qt5:
+	packages="$packages qt5-default"
+	packages="$packages qtmultimedia5-dev"
+	# Qt5-AFermer:
+	packages="$packages qtdeclarative5-dev"
 	# EXRJoin:
 	packages="$packages libopenexr-dev"
 	# ImageMagick:
@@ -66,7 +72,7 @@ function fedoraArch(){
 	packages="$packages git"
 	packages="$packages PyQt4"
 	packages="$packages libzip libzip-devel"
-	if [ "$DISTRIBUTIVE_VERSION" \< "24" ]; then
+	if [[ "$DISTRIBUTIVE_VERSION" < "24" ]]; then
 		packages="$packages python-devel"
 	else
 		packages="$packages python3-devel"

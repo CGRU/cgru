@@ -9,8 +9,8 @@ case ${DISTRIBUTIVE} in
 	Ubuntu | Mint )
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_CGRU="python3-pyside imagemagick"
-		export DEPENDS_QTGUI="libqtcore4 libqtgui4 libqt4-network"
-		if [ "$DISTRIBUTIVE_VERSION" \< "16" ]; then
+		export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
+		if [[ "$DISTRIBUTIVE_VERSION" < "16" ]]; then
 			export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
 		fi
 		;;
@@ -18,7 +18,7 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_CGRU="python3-pyside imagemagick"
 		export DEPENDS_QTGUI="libqtcore4 libqtgui4 libqt4-network"
-		if [ "$DISTRIBUTIVE_VERSION" \< "9" ]; then
+		if [[ "$DISTRIBUTIVE_VERSION" < "9" ]]; then
 			export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
 		else
 			export DEPENDS_AFANASY="${DEPENDS_AFANASY} libpython2.7"

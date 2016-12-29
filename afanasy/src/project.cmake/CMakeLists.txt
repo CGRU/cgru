@@ -18,7 +18,7 @@ endif( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_
 if( "$ENV{AF_POSTGRESQL}" STREQUAL "NO" )
 	message("\nWARNING! Building without SQL.\n")
 else()
-	set(PostgreSQL_ADDITIONAL_VERSIONS "9.2" "9.3" "9.4")
+	#set(PostgreSQL_ADDITIONAL_VERSIONS "9.2" "9.3" "9.4" "9.5")
 	if( "$ENV{AF_POSTGRESQL}" STREQUAL "REQUIRED" )
 		find_package(PostgreSQL REQUIRED)
 	else()
