@@ -51,13 +51,6 @@ function redhatArch(){
 	packages="$packages git"
 	packages="$packages PyQt4"
 	packages="$packages libzip libzip-devel"
-	# ImageMagick:
-	packages="$packages libjpeg libjpeg-devel"
-	packages="$packages libjpeg-turbo libjpeg-turbo-devel"
-	packages="$packages libtiff libtiff-devel"
-	packages="$packages libpng libpng-devel"
-	packages="$packages freetype freetype-devel"
-	packages="$packages fontconfig fontconfig-devel"
 
 	pkg_manager_cmd="yum install"
 	pkg_extension=".$ARCHITECTURE"
