@@ -230,7 +230,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_textstars       );
 
 
-	// Hotheys:
+	// Hotkeys:
 	ms_hotkeys_names << "jobs_log";
 	ms_hotkeys_names << "jobs_show_err_hosts";
 	ms_hotkeys_names << "jobs_pause";

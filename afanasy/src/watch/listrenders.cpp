@@ -93,7 +93,7 @@ ListRenders::ListRenders( QWidget* parent):
 	bp = addButtonPanel("EJA","renders_eject_all","Eject all tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectTasks()));
 
-	bp = addButtonPanel("EJN","renders_eject_notmy","Eject mot my tasks.","", true);
+	bp = addButtonPanel("EJN","renders_eject_notmy","Eject not my tasks.","", true);
 	connect( bp, SIGNAL( sigClicked()), this, SLOT( actEjectNotMyTasks()));
 
 	if( af::Environment::GOD())
