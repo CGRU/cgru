@@ -1023,7 +1023,21 @@ class Cmd:
             if 'renders' in data:
                 return data['renders']
         return None
+    
+    def renderGetRessources(self):
+        """Missing DocString
 
+        :return:
+        """
+        self.action = 'get'
+        self.data['type'] = 'renders'
+        self.data['mode'] = 'ressources'
+        data = self._sendRequest()
+        if data is not None:
+            if 'renders' in data:
+                return data['renders']
+        return None
+        
     def renderGetLocal(self):
         """Missing DocString
 
