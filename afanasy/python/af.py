@@ -849,9 +849,8 @@ class Cmd:
             return None
 
         obj = {self.action: self.data}
-        # print(json.dumps( obj))
+        #print(json.dumps( obj))
         output = afnetwork.sendServer(json.dumps(obj), verbose)
-
         if output[0] is True:
             return output[1]
         else:
@@ -894,7 +893,24 @@ class Cmd:
         self.data['ids'] = [jobId]
         self.data['mode'] = 'full'
         return self.getJobList(verbose)
+    
+    def getJobProgress(self, jobId, verbose=False):
+        """Missing DocString
 
+        :param jobId:
+        :param bool verbose:
+        :return:
+        """
+        self.data['ids'] = [jobId]
+        self.data['mode'] = 'progress'
+        self.action = 'get'
+        self.data['type'] = 'jobs'
+        data = self._sendRequest()
+        if data is not None:
+            if 'job_progress' in data:
+                return data['job_progress']
+        return None
+    
     def renderSetUserName(self, i_user_name):
         """Missing DocString
 
