@@ -851,6 +851,7 @@ class Cmd:
         obj = {self.action: self.data}
         #print(json.dumps( obj))
         output = afnetwork.sendServer(json.dumps(obj), verbose)
+        self.__init__()
         if output[0] is True:
             return output[1]
         else:
