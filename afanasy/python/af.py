@@ -1037,7 +1037,7 @@ class Cmd:
             if 'renders' in data:
                 return data['renders']
         return None
-        
+
     def renderGetLocal(self):
         """Missing DocString
 
