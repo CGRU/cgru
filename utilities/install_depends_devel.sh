@@ -95,11 +95,14 @@ function suseArch(){
 function altArch(){
 	packages="$packages vim-console"
 	packages="$packages gcc4.5-c++"
-	packages="$packages python-dev"
+	packages="$packages git-core"
+	packages="$packages python3-dev"
+	packages="$packages python3-module-PySide"
 	packages="$packages postgresql-devel"
 	packages="$packages qt4-devel"
-	packages="$packages PyQt"
-	packages="$packages git-core"
+	packages="$packages qt5-base-devel"
+	packages="$packages libEGL-devel"
+	packages="$packages qt5-multimedia-devel"
 	packages="$packages libzip libzip-devel"
 	packages="$packages rpm-build"
 

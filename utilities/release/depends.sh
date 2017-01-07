@@ -37,8 +37,8 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_CGRU="PyQt4 ImageMagick"
 		;;
 	AltLinux )
-		export DEPENDS_AFANASY="libpq5.4"
-		export DEPENDS_CGRU="python-module-PyQt4 openexr ImageMagick ffmpeg"
+		export DEPENDS_AFANASY="libpqxx"
+		export DEPENDS_CGRU="python3 python3-module-PySide openexr ImageMagick ffmpeg"
 		;;
 	Mageia )
 		export DEPENDS_AFANASY="libpqxx"
