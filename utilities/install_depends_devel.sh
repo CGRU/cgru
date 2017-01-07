@@ -13,11 +13,11 @@ packages_noarch=""
 function debianArch(){
 	packages="$packages vim"
 	packages="$packages g++"
-	packages="$packages python-dev"
-	packages="$packages libpq-dev"
-	packages="$packages python-qt4"
-	packages="$packages p7zip-full"
 	packages="$packages git-core"
+	packages="$packages python3-dev"
+	packages="$packages python3-pyside"
+	packages="$packages libpq-dev"
+	packages="$packages p7zip-full"
 	packages="$packages libzip-dev"
 	# Qt4:
 	packages="$packages qt4-dev-tools"
@@ -71,13 +71,6 @@ function fedoraArch(){
 	else
 		packages="$packages python3-devel"
 	fi
-	# ImageMagick:
-	packages="$packages libjpeg libjpeg-devel"
-	packages="$packages libjpeg-turbo libjpeg-turbo-devel"
-	packages="$packages libtiff libtiff-devel"
-	packages="$packages libpng libpng-devel"
-	packages="$packages freetype freetype-devel"
-	packages="$packages fontconfig fontconfig-devel"
 
 	pkg_manager_cmd="dnf install"
 	pkg_extension=""
@@ -93,12 +86,6 @@ function suseArch(){
 	packages="$packages python-qt4"
 	packages="$packages libzip libzip-devel git"
 	packages="$packages rpm-build"
-	# ImageMagick:
-	packages="$packages libjpeg6 libjpeg-devel"
-	packages="$packages libtiff3 libtiff-devel"
-	packages="$packages libpng12-0 libpng-devel"
-	packages="$packages freetype freetype2 freetype2-devel"
-	packages="$packages fontconfig fontconfig-devel"
 
 	pkg_manager_cmd="zypper install"
 	pkg_extension=".$ARCHITECTURE"
@@ -115,12 +102,6 @@ function altArch(){
 	packages="$packages git-core"
 	packages="$packages libzip libzip-devel"
 	packages="$packages rpm-build"
-	# ImageMagick:
-	packages="$packages libjpeg libjpeg-devel"
-	packages="$packages libtiff libtiff-devel"
-	packages="$packages libpng12 libpng-devel"
-	packages="$packages libfreetype libfreetype-devel"
-	packages="$packages fontconfig fontconfig-devel"
 
 	pkg_manager_cmd="apt-get install"
 	pkg_extension=""
@@ -137,12 +118,6 @@ function mageiaArch(){
 	packages="$packages git"
 	packages="$packages PyQt4"
 	packages="$packages libzip libzip-devel"
-	# ImageMagick:
-	packages="$packages libjpeg libjpeg-devel"
-	packages="$packages libtiff libtiff-devel"
-	packages="$packages libpng libpng-devel"
-	packages="$packages freetype freetype-devel"
-	packages="$packages fontconfig fontconfig-devel"
 
 	pkg_manager_cmd="urpmi"
 	pkg_extension=""
