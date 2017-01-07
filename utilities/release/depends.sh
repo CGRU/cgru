@@ -9,9 +9,6 @@ case ${DISTRIBUTIVE} in
 	Ubuntu | Mint )
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_QTGUI="libqt5network5 libqt5widgets5 libqt5multimedia5"
-		if [[ "$DISTRIBUTIVE_VERSION" < "16" ]]; then
-			export DEPENDS_QTGUI="libqt4-core libqt4-gui libqt4-network"
-		fi
 		export DEPENDS_CGRU="python3-pyside openexr imagemagick"
 		;;
 	Debian )
