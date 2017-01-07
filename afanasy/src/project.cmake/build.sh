@@ -40,9 +40,11 @@ echo "Building on '${DISTRIBUTIVE}'"
 case ${DISTRIBUTIVE} in
     openSUSE)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
+		export AF_QT_VER="5"
         ;;
     SUSE)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
+		export AF_QT_VER="5"
         ;;
     Debian)
         export ADD_CMAKE_MODULE_PATH="$PWD"

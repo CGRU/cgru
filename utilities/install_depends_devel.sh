@@ -80,10 +80,11 @@ function fedoraArch(){
 function suseArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
-	packages="$packages python-devel"
+	packages="$packages python3-devel"
 	packages="$packages postgresql-devel"
-	packages="$packages libqt4-devel"
-	packages="$packages python-qt4"
+	packages="$packages libqt5-qtbase-devel"
+	packages="$packages libqt5-qtmultimedia-devel"
+	packages="$packages python3-pyside"
 	packages="$packages libzip libzip-devel git"
 	packages="$packages rpm-build"
 
