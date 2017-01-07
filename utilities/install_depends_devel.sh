@@ -26,6 +26,7 @@ function debianArch(){
 	packages="$packages qt5-default"
 	packages="$packages qtmultimedia5-dev"
 	# Qt5-AFermer:
+	packages="$packages libboost-filesystem-dev"
 	packages="$packages qtdeclarative5-dev"
 	# EXRJoin:
 	packages="$packages libopenexr-dev"
