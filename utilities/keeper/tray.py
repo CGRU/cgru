@@ -369,15 +369,15 @@ class Tray(QtWidgets.QSystemTrayIcon):
         self.showIcon(name)
 
     def activated_slot(self, reason):
-        if reason == QtGui.QSystemTrayIcon.Trigger:
+        if reason == QtWidgets.QSystemTrayIcon.Trigger:
             return
-        elif reason == QtGui.QSystemTrayIcon.DoubleClick:
+        elif reason == QtWidgets.QSystemTrayIcon.DoubleClick:
             render.refresh()
-        elif reason == QtGui.QSystemTrayIcon.MiddleClick:
+        elif reason == QtWidgets.QSystemTrayIcon.MiddleClick:
             return
-        elif reason == QtGui.QSystemTrayIcon.Context:
+        elif reason == QtWidgets.QSystemTrayIcon.Context:
             return
-        elif reason == QtGui.QSystemTrayIcon.Unknown:
+        elif reason == QtWidgets.QSystemTrayIcon.Unknown:
             return
 
     def renderInfo(self):

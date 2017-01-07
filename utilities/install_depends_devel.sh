@@ -84,7 +84,7 @@ function suseArch(){
 	packages="$packages postgresql-devel"
 	packages="$packages libqt5-qtbase-devel"
 	packages="$packages libqt5-qtmultimedia-devel"
-	packages="$packages python3-pyside"
+	packages="$packages python3-qt5"
 	packages="$packages libzip libzip-devel git"
 	packages="$packages rpm-build"
 
