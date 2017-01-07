@@ -113,14 +113,17 @@ function altArch(){
 
 # Packages for Mageia distributions:
 function mageiaArch(){
-	packages="$packages vim"
-	packages="$packages gcc-c++"
-	packages="$packages python-devel"
-	packages="$packages postgresql-devel"
-	packages="$packages qt4-devel-private"
-	packages="$packages rpm-build"
+	packages="$packages vim-minimal"
 	packages="$packages git"
-	packages="$packages PyQt4"
+	packages="$packages gcc-c++"
+	packages="$packages lib64python3-devel"
+	packages="$packages python3-pyside"
+	packages="$packages postgresql-devel"
+	packages="$packages lib64qt5base5-devel"
+	packages="$packages lib64qt5multimedia-devel"
+	packages="$packages qtmultimedia5"
+	packages="$packages lib64OpenEXR-devel"
+	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
 
 	pkg_manager_cmd="urpmi"

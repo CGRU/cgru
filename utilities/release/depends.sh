@@ -41,8 +41,8 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_CGRU="python3 python3-module-PySide openexr ImageMagick ffmpeg"
 		;;
 	Mageia )
-		export DEPENDS_AFANASY="libpqxx"
-		export DEPENDS_CGRU="python3-pyside imagemagick ffmpeg"
+		export DEPENDS_AFANASY="lib64pq9.3_5.6 lib64qt5core5 lib64qt5gui5 lib64qt5multimedia5 lib64qt5network5 lib64qt5widgets5"
+		export DEPENDS_CGRU="python3-pyside OpenEXR imagemagick ffmpeg"
 		;;
 	*)
 		export DEPENDS_AFANASY="libpq5"

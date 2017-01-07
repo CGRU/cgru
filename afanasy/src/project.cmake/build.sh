@@ -84,6 +84,7 @@ case ${DISTRIBUTIVE} in
         ;;
     Mageia)
         export AF_EXTRA_LIBS="pthread"
+		export AF_QT_VER="5"
         ;;
     Arch|Manjaro)
         export AF_EXTRA_LIBS="pthread"
