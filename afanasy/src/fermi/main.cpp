@@ -7,6 +7,8 @@
 #include <stdlib.h>     /* getenv */
 #include <stdio.h>
 
+#include "libafanasy/name_af.h"
+
 #include <QtQuick/QQuickView>
 #include <QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>

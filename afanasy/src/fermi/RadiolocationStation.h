@@ -1,6 +1,8 @@
 #ifndef __FERMIMESSAGE__
 #define __FERMIMESSAGE__
 
+#include "libafanasy/name_af.h"
+
 #include <QtNetwork/QTcpSocket>
 #include <boost/shared_ptr.hpp>
 

@@ -1,3 +1,5 @@
+#include "libafanasy/name_af.h"
+
 #include <QAbstractListModel>
 #include <QStringList>
 #include "TaskObject.h"
