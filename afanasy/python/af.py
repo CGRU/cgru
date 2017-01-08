@@ -884,6 +884,33 @@ class Cmd:
         self.data['operation'] = {'type': 'delete'}
         return self._sendRequest(verbose)
 
+    def deleteJobById(self, jobId, verbose=False):
+        """Missing DocString
+
+        :param str jobName:
+        :param bool verbose:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['ids'] = [jobId]
+        self.data['operation'] = {'type': 'delete'}
+        return self._sendRequest(verbose)
+    
+    def setJobState(self, jobId, state, verbose=False):
+        """Missing DocString
+
+        :param jobId:
+        :param str state:
+        :param bool verbose:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['ids'] = [jobId]
+        self.data['operation'] = {'type': state}
+        return self._sendRequest(verbose)
+
     def getJobInfo(self, jobId, verbose=False):
         """Missing DocString
 
