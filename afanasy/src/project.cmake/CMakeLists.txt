@@ -71,6 +71,10 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "../../../$ENV{AF_OSTYPE}/archives")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "_generated")
 
+if(POLICY CMP0020)
+	cmake_policy(SET CMP0020 OLD)
+endif()
+
 add_subdirectory(libafanasy)
 add_subdirectory(render)
 add_subdirectory(libafsql)
