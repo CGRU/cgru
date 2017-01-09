@@ -73,6 +73,11 @@ case ${DISTRIBUTIVE} in
     CentOS)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
+		if [[ "$DISTRIBUTIVE_VERSION" < "7" ]]; then
+			export AF_QT_VER="4"
+		else
+			export AF_QT_VER="5"
+		fi
         ;;
     RedHat)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
