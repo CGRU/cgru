@@ -1,5 +1,5 @@
-#ifndef __FERMIMESSAGE__
-#define __FERMIMESSAGE__
+#ifndef __FERMERMESSAGE__
+#define __FERMERMESSAGE__
 
 #include "libafanasy/name_af.h"
 
@@ -18,7 +18,7 @@
 #include "common.h"
 
 
-namespace fermi
+namespace afermer
 {
 
 class Waves

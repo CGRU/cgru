@@ -20,7 +20,7 @@
 #include <boost/lexical_cast.hpp>
 
 
-using namespace fermi;
+using namespace afermer;
 
 const std::string Time2strHMS( int time32, bool clamp);
 int combine(int a, int b, int c);
@@ -184,13 +184,112 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
                             , QString::fromStdString( Time2strHMS(time_task, false) )
                             , status
                             , QString::fromStdString( taskexec->getName() )
-                            , QString::fromStdString(  taskprogress->hostname )
+                            , QString::fromStdString( taskprogress->hostname )
                         );
         o_tasks.push_back(o);
 
     }
 
     return true;
+}
+
+QList<int> RadiolocationService::getTasksRawTime(int i_index)
+{
+
+    QList<int> o_tasks;
+
+    long long curtime = time(0);
+
+    int job_id, block_id, x;
+    unpack(i_index, &job_id, &block_id, &x);
+
+    std::ostringstream ostr;
+
+    ostr << "{\"get\":{\"type\":\"jobs\",\"mode\":\"full\",\"binary\":true,\"ids\":[" << job_id << "]}}";
+    Waves::Ptr answer4 = m_station->push(ostr);
+
+    ostr.str("");
+
+    af::MCAfNodes mcNodes( answer4.get() );
+
+    std::vector<af::Af*> * list = mcNodes.getList();
+    af::Job * itemjob = (af::Job*)((*list)[0]);
+
+    ostr << "{\"get\":{\"binary\":true,\"type\":\"jobs\",\"ids\":[" << job_id << "],\"mode\":\"progress\"}}";
+    Waves::Ptr answer5 = m_station->push(ostr);
+
+    af::JobProgress progress(answer5.get());
+
+    const af::BlockData * block = itemjob->getBlock(block_id);
+
+
+    for( int t = 0; t < block->getTasksNum(); t++)
+    {
+        boost::shared_ptr<af::TaskExec> taskexec( block->genTask( t ) );
+        af::TaskProgress * taskprogress = progress.tp[block_id][t] ;
+
+        long long time_task = curtime - taskprogress->time_start;
+
+        if( taskprogress->state & AFJOB::STATE_DONE_MASK )
+        {
+            time_task = taskprogress->time_done - taskprogress->time_start ;
+        }
+        else if ( taskprogress->state & AFJOB::STATE_SKIPPED_MASK )
+        {
+            time_task = taskprogress->time_done - taskprogress->time_start ;
+        }
+
+        if( taskprogress->state & AFJOB::STATE_READY_MASK )
+        {
+            time_task = 0;
+        }
+        else if (taskprogress->state & AFJOB::STATE_ERROR_MASK)
+        {
+            time_task = 0;
+        }
+
+        o_tasks.push_back(time_task);
+    }
+
+    return o_tasks;
+}
+
+QList<QString> RadiolocationService::getTasksFrame(int i_index)
+{
+    QList<QString> o_tasks;
+
+    int job_id, block_id, x;
+    unpack(i_index, &job_id, &block_id, &x);
+
+    std::ostringstream ostr;
+
+    ostr << "{\"get\":{\"type\":\"jobs\",\"mode\":\"full\",\"binary\":true,\"ids\":[" << job_id << "]}}";
+    Waves::Ptr answer4 = m_station->push(ostr);
+
+    ostr.str("");
+
+    af::MCAfNodes mcNodes( answer4.get() );
+
+    std::vector<af::Af*> * list = mcNodes.getList();
+    af::Job * itemjob = (af::Job*)((*list)[0]);
+
+    const af::BlockData * block = itemjob->getBlock(block_id);
+
+    for( int t = 0; t < block->getTasksNum(); t++)
+    {
+        boost::shared_ptr<af::TaskExec> taskexec( block->genTask( t ) );
+
+        QString frame = QString::number( taskexec->getFrameStart() );
+        if ( taskexec->getFramesNum() > 1 )
+        {
+            frame += "-";
+            frame += QString::number( taskexec->getFrameFinish() );
+        }
+
+        o_tasks.push_back(frame);
+    }
+
+    return o_tasks;
 }
 
 
@@ -306,6 +405,14 @@ void RadiolocationService::taskCommand(QString& o_ret, int i_index)
 
 
 //////////////////////////////////// JOBS ///////////////////////////////////////////////////////////////
+int getAvalibleSlots(af::Render * i_render, int i_total_slots)
+{
+    std::list<af::TaskExec*> active_task_list = i_render->takeTasks();
+    int busy_slots = 0;
+    for( std::list<af::TaskExec*>::const_iterator it = active_task_list.begin(); it != active_task_list.end(); it++)
+        busy_slots += (*it)->getCapacity();
+    return i_total_slots - busy_slots;
+}
 bool RadiolocationService::get(QList<JobObject> &o_jobs)
 {
     m_total_jobs = 0;
@@ -400,15 +507,71 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
             const af::BlockData * block = itemjob->getBlock(block_num);
 
             QList<QString> blades;
+
+            float percent=0;
+            long long test_time=0;
+            long long total_time_progress=0;
+            //int elapsed_time_task;
+            long long total_time_tasks=0;
+            long long average_time_tasks=0;
+            float time_dones=0;
+            int tasks_running=0;
+            QString approx_time;
+            long long curtime = time(0);//block->getTasksNum()
+
+            //For DONE TASKS
             for( int t = 0; t < block->getTasksNum(); t++)
             {
                 af::TaskProgress taskprogress = *(progress.tp[block_num][t]) ;
-                if (taskprogress.state & AFJOB::STATE_RUNNING_MASK)
+                //long long elapsed_time_task = curtime - taskprogress.time_start;
+
+                if (taskprogress.state & AFJOB::STATE_RUNNING_MASK){
+
+                    // need to wait until Sergiy will come
+                    //long long time_progress=(elapsed_time_task*((100/percent)-1));
+
                     blades.push_back( QString::fromStdString(taskprogress.hostname) );
+                }
+
+                if(taskprogress.state & AFJOB::STATE_DONE_MASK){
+                    total_time_tasks=(taskprogress.time_done - taskprogress.time_start)+total_time_tasks;
+                    time_dones++;
+                }
+                if( taskprogress.state & AFJOB::STATE_READY_MASK)
+                {
+                    tasks_running++;
+                }
+            }
+            //For RUNNING TASKS
+            for( int t = 0; t < block->getTasksNum(); t++)
+            {
+                af::TaskProgress taskprogress = *(progress.tp[block_num][t]) ;
+
+                if (taskprogress.state & AFJOB::STATE_RUNNING_MASK){
+                    if (time_dones!=0){
+                        percent=taskprogress.percent;
+                        average_time_tasks=total_time_tasks/time_dones;
+                        long long time_progress=average_time_tasks*(1-(percent*0.01));
+                        total_time_progress=std::max(time_progress,total_time_progress);
+                    }
+                }
             }
 
             std::sort( blades.begin(), blades.end() );
             blades.erase( std::unique( blades.begin(), blades.end() ), blades.end() );
+            int blades_length = blades.size();
+
+            //std::cout<<"ssss "<<test_time<<endl;
+            //approx_time=QString::fromStdString(std::to_string(test_time));
+            //approx_time=QString::fromStdString(Time2strHMS(total_time_progress,false));
+            float raw_approx_time=(average_time_tasks*tasks_running);
+            if (blades_length==0){
+                approx_time=QString::fromStdString(Time2strHMS(raw_approx_time+total_time_progress, false));
+            }
+            else{
+                approx_time=QString::fromStdString(Time2strHMS(raw_approx_time/blades_length+total_time_progress, false));
+            }
+
 
             QString service = afqt::stoq( block->getService() );
             if (service=="postcmd") continue;
@@ -430,6 +593,7 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
             {
                 m_total_done_jobs++;
                 status = JobState::State::DONE;
+                approx_time="Done";
             }
             else if ( block_state & AFJOB::STATE_OFFLINE_MASK )
             {
@@ -445,13 +609,12 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
             {
                 m_total_ready_jobs++;
                 status = JobState::State::READY;
+                //approx_time="Waiting";
             }
 
             int block_percentage = block->getProgressPercentage();
             int block_capacity = block->getCapacity();
             QString block_name = QString::fromStdString(  block->getName() );
-            
-            int blades_length = blades.size();
 
             JobObject b = JobObject( user_name
                     ,status
@@ -470,6 +633,7 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
                     ,block_name
                     ,job_id
                     ,blades_length
+                    ,approx_time
                 );
     
             o_jobs.append(b);

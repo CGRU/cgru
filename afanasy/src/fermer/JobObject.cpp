@@ -22,4 +22,6 @@ QString JobObject::block_name() const
  { return m_block_name; }
 int JobObject::blades_length() const
  { return m_blades_length; }
+QString JobObject::approxTime()
+ { return m_block_name; }
 

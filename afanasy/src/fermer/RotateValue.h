@@ -10,7 +10,7 @@
 #include <functional>
 #include <string>
 
-namespace fermi
+namespace afermer
 {
 
 class RotateValue

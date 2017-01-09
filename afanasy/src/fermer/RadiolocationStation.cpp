@@ -4,7 +4,7 @@
 #include "libafanasy/monitorevents.h"
 #include "libafanasy/taskexec.h"
 
-using namespace fermi;
+using namespace afermer;
 
 
 
@@ -28,7 +28,6 @@ int RadiolocationStation::getAvalibleSlots(af::Render * i_render, int i_total_sl
         busy_slots += (*it)->getCapacity();
     return i_total_slots - busy_slots;
 } 
-
 
 bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
 {
@@ -145,7 +144,7 @@ Waves::Ptr RadiolocationStation::push(Waves::Ptr msg_up)
 
 void RadiolocationStation::pullMessage( af::Msg *msg)
 {
-    // std::cout << "Monitor::pullMessage: " << af::Msg::TNAMES[ msg->type() ] << std::endl;
+    //std::cout << "Monitor::pullMessage: " << af::Msg::TNAMES[ msg->type() ] << std::endl;
     switch( msg->type())
     {
         case af::Msg::TMonitor:
@@ -165,7 +164,7 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
             {
                 events_off = false;
                 af::MonitorEvents me( msg);
-                // me.v_stdOut();
+
                 size_t output_len = me.m_outputs.size();
                 if (output_len > 0)
                 {

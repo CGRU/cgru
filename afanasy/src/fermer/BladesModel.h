@@ -6,7 +6,7 @@
 #include <time.h>
 #include "RadiolocationService.h"
 
-namespace fermi
+namespace afermer
 {
 
 class BladesModel : public QAbstractListModel

@@ -23,7 +23,7 @@
 
 namespace fs = boost::filesystem;
 
-using namespace fermi;
+using namespace afermer;
 
 int main(int argc, char *argv[])
 {
@@ -31,12 +31,12 @@ int main(int argc, char *argv[])
 
     //  Load env from QML path
     char* qml_env_path;
-    qml_env_path = getenv("FERMI_QML_PATH");
+    qml_env_path = getenv("AFERMER_QML_PATH");
     
     fs::path qml_app_path("/");
     if (qml_env_path == NULL)
     {
-        std::cerr << "FERMI_QML_PATH not present or directory does not exist. Take directory from startup " << std::endl;
+        std::cerr << "AFERMER_QML_PATH not present or directory does not exist. Take directory from startup " << std::endl;
 
         fs::path full_path( fs::initial_path<fs::path>() );
         full_path = fs::system_complete( fs::path( argv[0] ) );
@@ -55,11 +55,12 @@ int main(int argc, char *argv[])
         qml_app_path = fs::path(qml_env_path);
     }
 
-    qml_app_path /= "main.qml";
 
     fs::path qml_app_icon_path(qml_app_path);
     qml_app_icon_path /= "icons";
     qml_app_icon_path /= "soft_circl_icon.png";
+
+    qml_app_path /= "main.qml";
 
     QGuiApplication app(argc, argv);
     app.setWindowIcon(QIcon(qml_app_icon_path.string().c_str()));

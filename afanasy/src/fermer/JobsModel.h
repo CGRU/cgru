@@ -6,7 +6,7 @@
 #include <time.h>
 #include "RadiolocationService.h"
 
-namespace fermi
+namespace afermer
 {
 
 class JobsModel : public QAbstractListModel
@@ -36,6 +36,7 @@ public:
         GroupRandGreenValueRole,
         GroupRandBlueValueRole,
         BladesLenRole,
+        ApproxTimeRole,
         SelectsRole
     };
 
@@ -48,7 +49,6 @@ public:
     Q_INVOKABLE void clear();
     Q_INVOKABLE QList<int> getJobsStatistic();
 
-    QList<int>       getSelectedIds();
     Q_INVOKABLE void deleteJob();
     Q_INVOKABLE void skipJobs();
     Q_INVOKABLE void pauseJob();
@@ -85,14 +85,16 @@ public:
     Q_INVOKABLE void clearSelected();
     Q_INVOKABLE int  multiselected();
     Q_INVOKABLE int  sizeSelected();
+    Q_INVOKABLE QList<int> getSelectedIds();
     void saveSelected();
+    bool checkUniqueID(QList<int>&,int);
 
 
 
     QVariant data(const QModelIndex & i_index, int i_role = Qt::DisplayRole) const;
 
 public slots:
-    void updateInteraction(const QString& i_filter="");
+    void updateInteraction(const QString& filter="");
     Q_INVOKABLE int rowCount(const QModelIndex & i_parent = QModelIndex()) const;
 
 

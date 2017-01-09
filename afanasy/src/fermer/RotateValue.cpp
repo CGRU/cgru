@@ -1,7 +1,7 @@
 #include "RotateValue.h"
 #include <algorithm>    // std::rotate
 
-using namespace fermi;
+using namespace afermer;
 
 RotateValue::RotateValue()
 {

@@ -1,5 +1,5 @@
-#ifndef __FERMI_MONITOR__
-#define __FERMI_MONITOR__
+#ifndef __FERMER_MONITOR__
+#define __FERMER_MONITOR__
 
 
 #include <QtCore>
@@ -16,7 +16,7 @@
 #include "RotateValue.h"
 
 
-namespace fermi
+namespace afermer
 {
 
 
@@ -166,6 +166,9 @@ public:
     void taskErrorHosts(QString&, int);
     bool taskSkip(int);
     bool taskRestart(int);
+
+    QList<int> getTasksRawTime(int);
+    QList<QString> getTasksFrame(int);
 
     bool deleteJob(const QList<int>&);
     bool pauseJob(const QList<int>&);

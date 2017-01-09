@@ -9,7 +9,9 @@
 #include <cstdio>
 #include <ctime>
 
-namespace fermi
+
+
+namespace afermer
 {
 
 class TasksModel : public QAbstractListModel
@@ -50,6 +52,14 @@ public slots:
     Q_INVOKABLE QString taskErrorHost(int);
     Q_INVOKABLE void taskRestart(int);
     Q_INVOKABLE void taskSkip(int);
+
+    Q_INVOKABLE int taskTimes(int,int);
+    Q_INVOKABLE int maxTaskTimes(int);
+    Q_INVOKABLE int maxTasksTimes(QList<int>);
+    Q_INVOKABLE int tasksSize(int);
+    Q_INVOKABLE int sizeSelected(QList<int>);
+    Q_INVOKABLE QString tasksFrame(int,int);
+    Q_INVOKABLE QList<double> randomColor(int);
 
 protected:
     QHash<int, QByteArray> roleNames() const;

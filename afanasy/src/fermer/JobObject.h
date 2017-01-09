@@ -25,6 +25,7 @@ public:
                   ,const QString &block_name
                   ,int job_id
                   ,int blades_length
+                  ,const QString approx_time
             ) :
           m_user_name(user_name)
         , m_status(status)
@@ -43,6 +44,7 @@ public:
         , m_block_name(block_name)
         , m_job_id(job_id)
         , m_blades_length(blades_length)
+        , m_approx_time(approx_time)
       {m_selected=0;}
 
 
@@ -56,6 +58,7 @@ public:
     int id() const;
     QList<QString> blades() const;
     QString block_name() const;
+    QString approxTime();
     int blades_length() const;
 
 
@@ -76,6 +79,7 @@ public:
     QList<QString> m_blades;
     QString m_block_name;
     int m_blades_length;
+    QString m_approx_time;
     int m_selected;
 };
 

@@ -1,6 +1,6 @@
 #include "BladesModel.h"
 
-using namespace fermi;
+using namespace afermer;
 
 BladesModel::BladesModel(QObject *i_parent)
     : QAbstractListModel(i_parent)
@@ -69,7 +69,7 @@ bool BladesModel::actLaunchCmd(int i_index, bool i_exit, const QString& i_cmd) {
 QString BladesModel::actRequestLog(int i_index) { return m_RLS->actRequestLog(i_index); }
 QString BladesModel::actRequestTasksLog(int i_index) { return m_RLS->actRequestTasksLog(i_index); }
 QString BladesModel::actRequestInfo(int i_index) { return m_RLS->actRequestInfo(i_index); }
-void BladesModel::actCapacity(int i_index, const QString& i_val) { return m_RLS->actCapacity(i_index, i_val); }
+void BladesModel::actCapacity(int i_index, const QString& i_val) { m_RLS->actCapacity(i_index, i_val); }
 void BladesModel::actMaxTasks(int i_index, const QString& i_val) { return m_RLS->actMaxTasks(i_index, i_val); }
 void BladesModel::actUser(int i_index, const QString& i_val) { return m_RLS->actUser(i_index, i_val); }
 void BladesModel::actNIMBY(int i_index) { return m_RLS->actNIMBY(i_index); }

@@ -1,6 +1,6 @@
 #include "JobsModel.h"
 
-using namespace fermi;
+using namespace afermer;
 
 JobsModel::JobsModel(QObject *i_parent)
     : QAbstractListModel(i_parent)
@@ -76,15 +76,6 @@ QList<int> JobsModel::getJobsStatistic()
 }
 
 //-------Context Functions-----
-
-QList<int> JobsModel::getSelectedIds(){
-    QList<int> temp_ids;
-    for (int i=0;i<m_selects.size();i++){
-        int temp_id=m_job[m_selects[i]].id();
-        temp_ids.append(temp_id);
-    }
-    return temp_ids;
-}
 
 void JobsModel::deleteJob()
 {
@@ -226,6 +217,7 @@ int JobsModel::doneJobs(){return m_RLS->doneJobs();}
 int JobsModel::offlineJobs(){return m_RLS->offlineJobs();}
 int JobsModel::readyJobs(){return m_RLS->readyJobs();}
 
+//---------------Selects----------------------
 
 void JobsModel::setSelected(int i_index){
     clearSelected();
@@ -285,6 +277,38 @@ int JobsModel::sizeSelected(){
     return m_selects.size();
 }
 
+bool JobsModel::checkUniqueID(QList<int> &list,int id){
+    for (int i=0;i<list.size();i++){
+        if (list[i]==id){
+            return true;
+        }
+    }
+    return false;
+}
+
+QList<int> JobsModel::getSelectedIds(){
+    QList<int> temp_ids;
+    for (int i=0;i<m_selects.size();i++){
+        int temp_id=m_job[m_selects[i]].id();
+        if (checkUniqueID(temp_ids,temp_id)){continue;}
+        temp_ids.append(temp_id);
+    }
+    if (m_selects.size()==0){
+        if (m_job.size()>0){
+            temp_ids.append(m_job[0].id());
+        }
+    }
+        //temp_ids.clear();
+    //temp_ids.append(15728926);
+    //temp_ids.append(11534588);
+
+    for (int i=0;i<temp_ids.size();i++){
+        qDebug()<<"temp_ids"<<temp_ids[i]<<" "<<i;
+    }
+    return temp_ids;
+}
+
+//-------------------------------------------
 
 int JobsModel::rowCount(const QModelIndex & i_parent) const {
     Q_UNUSED(i_parent);
@@ -355,6 +379,8 @@ QVariant JobsModel::data(const QModelIndex &i_index, int i_role) const
             return QVariant::fromValue(job_rand_blue);
         case BladesLenRole:
             return QVariant::fromValue(dobj.m_blades_length);
+        case ApproxTimeRole:
+            return QVariant::fromValue(dobj.m_approx_time);
         case SelectsRole:
             return QVariant::fromValue(dobj.m_selected);
         default:
@@ -385,6 +411,7 @@ QHash<int, QByteArray> JobsModel::roleNames() const {
     roles[GroupRandGreenValueRole] = "group_rand_green";
     roles[GroupRandBlueValueRole] = "group_rand_blue";
     roles[BladesLenRole] = "blades_length";
+    roles[ApproxTimeRole] = "approx_time";
     roles[SelectsRole] = "selected";
     return roles;
 }
