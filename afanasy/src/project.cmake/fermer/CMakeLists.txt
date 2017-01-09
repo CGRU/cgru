@@ -1,7 +1,3 @@
-file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/*.cpp")
-file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/*.h")
-file(GLOB_RECURSE inc2 RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/*.hpp")
-
 if( "$ENV{AF_QT_VER}" STREQUAL "5" )
 	find_package(Qt5Widgets REQUIRED)
 	find_package(Qt5Multimedia REQUIRED)
@@ -11,6 +7,15 @@ if( "$ENV{AF_QT_VER}" STREQUAL "5" )
 else()
 	message(FATAL_ERROR "Qt5 only")
 endif()
+
+if (Qt5Widgets_VERSION VERSION_LESS 5.7.0)
+	message("Afermer minimum supported Qt version is 5.7, skipping project.")
+	return()
+endif()
+
+file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/*.cpp")
+file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/*.h")
+file(GLOB_RECURSE inc2 RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/*.hpp")
 
 set (watch_cpp_src 
 		"../../watch/wndlistenjob.cpp"
