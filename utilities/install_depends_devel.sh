@@ -45,12 +45,14 @@ function debianArch(){
 function redhatArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
+	packages="$packages git"
 	packages="$packages python-devel"
 	packages="$packages postgresql-devel"
-	packages="$packages qt-devel"
-	packages="$packages rpm-build"
-	packages="$packages git"
 	packages="$packages PyQt4"
+	packages="$packages qt-devel"
+	packages="$packages qt5-qtbase-devel"
+	packages="$packages qt5-qtmultimedia-devel"
+	packages="$packages rpm-build"
 	packages="$packages libzip libzip-devel"
 
 	pkg_manager_cmd="yum install"
