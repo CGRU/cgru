@@ -146,6 +146,28 @@ function archArch(){
 	pkg_extension=""
 }
 
+# Packages for MacOSX
+function macosxArch(){
+	packages="yasm"
+	packages="$packages cmake"
+	packages="$packages wget"
+	packages="$packages p7zip"
+	packages="$packages openexr"
+	packages="$packages imagemagick"
+	packages="$packages postgresql"
+	packages="$packages qt5"
+	packages="$packages python3"
+	packages="$packages pyqt5"
+
+	if hash brew 2>/dev/null; then
+		pkg_manager_cmd="brew install"
+	else
+		pkg_manager_cmd="port install"
+	fi
+
+	pkg_extension=""
+}
+
 
 # Case distribution:
 case ${DISTRIBUTIVE} in
@@ -166,6 +188,9 @@ case ${DISTRIBUTIVE} in
 		;;
 	Arch|Manjaro)
 		archArch
+		;;
+	MacOSX)
+		macosxArch
 		;;
 	*)
 		redhatArch
