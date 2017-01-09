@@ -69,11 +69,11 @@ set (watch_cpp_src
 add_executable(afermer ${src} ${inc} ${inc2} ${watch_cpp_src} )
 
 if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
-   set_target_properties(afwatch PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
+   set_target_properties(afermer PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
 endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 
 if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
-   set_target_properties(afwatch PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
+   set_target_properties(afermer PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
