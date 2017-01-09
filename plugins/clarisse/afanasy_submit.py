@@ -3,7 +3,7 @@ import os
 import time
 
 # https://github.com/mottosso/Qt.py
-from Qt import QtCore, QtWidgets, QtCompat
+from Qt import QtCore, QtWidgets
 import pyqt_clarisse
 
 import cgrudocs
@@ -63,7 +63,7 @@ def createDialog():
         btn = QtWidgets.QPushButton( i_args['label'])
         i_args['layout'].addWidget( btn)
         if 'width' in i_args: btn.setFixedWidth( i_args['width'])
-        QtCore.QObject.connect( btn, QtCore.SIGNAL('pressed()'), i_args['slot'])
+        btn.pressed.connect( i_args['slot'])
         return btn
 
     # Top widget:
@@ -126,7 +126,7 @@ def createDialog():
     for img in getAllImages():
         name = img.get_full_name().replace('project://','')
         combo.addItem( name)
-    QtCore.QObject.connect( combo, QtCore.SIGNAL('currentIndexChanged(int)'), imageChanged)
+    combo.currentIndexChanged.connect( imageChanged)
     h_layout.addWidget( combo)
     Fields['image'] = combo
     createField({'name':'format','label':'Format','layout':h_layout,'lwidth':60,'ewidth':rwidth,
@@ -222,14 +222,12 @@ def displayInfo( i_text):
     Fields['info'].setText( i_text)
 
 def browseArchive():
-    filename = QtWidgets.QFileDialog.getSaveFileName( None,'Select Archive', Fields['archive'].text())
-    if "PySide" in QtCompat.__binding__: filename = filename[0]
-    if filename  and len(filename): Fields['archive'].setText(filename)
+    filename, fltr = QtWidgets.QFileDialog.getSaveFileName( None,'Select Archive', Fields['archive'].text())
+    if filename and len(filename): Fields['archive'].setText(filename)
 
 def browseOutput():
-    filename = QtWidgets.QFileDialog.getSaveFileName( None,'Select Output', Fields['output'].text())
-    if "PySide" in QtCompat.__binding__: filename = filename[0]
-    if filename  and len(filename): Fields['output'].setText(filename)
+    filename, fltr = QtWidgets.QFileDialog.getSaveFileName( None,'Select Output', Fields['output'].text())
+    if filename and len(filename): Fields['output'].setText(filename)
 
 def processArchive():
     global Archive
@@ -327,7 +325,7 @@ def genCommand():
 
 # Create dialog:
 Dialog = createDialog()
-QtCore.QObject.connect( App, QtCore.SIGNAL('aboutToQuit()'), Dialog.close)
+App.aboutToQuit.connect( Dialog.close)
 displayInfo('CGRU Version: %s' % cgruconfig.VARS['CGRU_VERSION'])
 
 # instead of calling app.exec_() like you would do normally in PyQt,

@@ -16,6 +16,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+#include "../libafanasy/logger.h"
+
 extern bool AFRunning;
 
 // Messages reaction case function
@@ -51,8 +53,12 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 **/
 void threadRunCycle( void * i_args)
 {
-	AFINFO("ThreadRun::run:")
+	AF_LOG << "Main thread started.";
+
 	ThreadArgs * a = (ThreadArgs*)i_args;
+
+	// Save store to store start time:
+	AFCommon::saveStore();
 
 	long long cycle = 0;
 
@@ -244,7 +250,10 @@ void threadRunCycle( void * i_args)
 	}// - lock containers
 
 	// Save store
+	if( cycle % 100 == 0 )
 	{
+		// Store should be save on change.
+		// But it can be also used to see some statistics.
 		AFCommon::saveStore();
 	}
 
@@ -256,6 +265,10 @@ void threadRunCycle( void * i_args)
 
 	cycle++;
 	}// - while running
+
+	// Save store on exit:
+	AFCommon::saveStore();
+	AF_LOG << "Main thread finished.";
 
 }// - end of the thead function
 

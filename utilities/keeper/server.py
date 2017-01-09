@@ -11,20 +11,16 @@ import nimby
 import render
 import tray
 
-from cgrupyqt import QtCore, QtNetwork
+from Qt import QtCore, QtNetwork
 
 
 class Server(QtNetwork.QTcpServer):
-    def __init__(self, application):
-        QtNetwork.QTcpServer.__init__(self, application)
-        self.parent = application
+    def __init__(self, i_parent = None):
+        QtNetwork.QTcpServer.__init__(self, i_parent)
+        self.parent = i_parent
         self.setMaxPendingConnections(1)
         self.port = int(cgruconfig.VARS['keeper_port'])
-        QtCore.QObject.connect(
-            self,
-            QtCore.SIGNAL('newConnection()'),
-            self.connection
-        )
+        self.newConnection.connect( self.connection)
         if not self.listen(QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.port):
             print('Can`t listen %d port.' % self.port)
         else:
@@ -42,11 +38,7 @@ class Server(QtNetwork.QTcpServer):
             print('Server connected...')
             self.qsocket = qsocket
 
-            QtCore.QObject.connect(
-                self.qsocket,
-                QtCore.SIGNAL('readyRead()'),
-                self.readCommand
-            )
+            self.qsocket.readyRead.connect( self.readCommand)
 
     def readCommand(self):
 

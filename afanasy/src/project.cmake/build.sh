@@ -31,13 +31,6 @@ export AF_POSTGRESQL=$sql
 export AF_GUI=$gui
 export AF_QT_VER="4"
 
-cgru_python="${cgru}/python"
-if [ -d "${cgru_python}" ]; then
-	export AF_PYTHON_INCLUDE_PATH="${cgru_python}/include/python3.3m"
-	export AF_PYTHON_LIBRARIES="${cgru_python}/lib/libpython3.3m.a"
-fi
-
-
 # Configure building:
 export AF_ADD_CFLAGS="$debug"
 export AF_ADD_LFLAGS="-lutil"
@@ -47,22 +40,23 @@ echo "Building on '${DISTRIBUTIVE}'"
 case ${DISTRIBUTIVE} in
     openSUSE)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
+		export AF_QT_VER="5"
         ;;
     SUSE)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -ldl"
+		export AF_QT_VER="5"
         ;;
     Debian)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -lrt"
+		export AF_QT_VER="5"
         ;;
     Gentoo)
         ;;
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
-#		if(( $(echo "$DISTRIBUTIVE_VERSION > 14" | bc -l ) )); then
-#			export AF_QT_VER="5"
-#		fi
+		export AF_QT_VER="5"
         ;;
     Mint)
         export ADD_CMAKE_MODULE_PATH="$PWD"
@@ -74,6 +68,7 @@ case ${DISTRIBUTIVE} in
     AltLinux)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_EXTRA_LIBS="pthread"
+		export AF_QT_VER="4"
         ;;
     CentOS)
         export ADD_CMAKE_MODULE_PATH="$PWD"
@@ -84,6 +79,7 @@ case ${DISTRIBUTIVE} in
         ;;
     Mageia)
         export AF_EXTRA_LIBS="pthread"
+		export AF_QT_VER="5"
         ;;
     Arch|Manjaro)
         export AF_EXTRA_LIBS="pthread"

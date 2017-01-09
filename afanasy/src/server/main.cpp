@@ -298,5 +298,7 @@ int main(int argc, char *argv[])
 
 	af::destroy();
 
+	AF_LOG << "Exiting process...";
+
 	return 0;
 }

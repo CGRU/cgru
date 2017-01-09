@@ -8,8 +8,7 @@ import cgruconfig
 
 WndInfo = None
 
-from cgrupyqt import QtCore, QtGui
-
+from Qt import QtCore, QtWidgets
 
 def showInfo(tray=None):
 	renders = af.Cmd().renderGetLocal()
@@ -24,7 +23,7 @@ def showInfo(tray=None):
 
 	global WndInfo
 
-	WndInfo = QtGui.QTextEdit()
+	WndInfo = QtWidgets.QTextEdit()
 	WndInfo.setPlainText(json.dumps(renders[0], sort_keys=True, indent=4))
 	WndInfo.setReadOnly(True)
 	WndInfo.resize(WndInfo.viewport().size())
@@ -47,7 +46,7 @@ def refresh():
 		cmd.Tray.showIcon()
 
 def setUserDialog():
-	name, ok = QtGui.QInputDialog.getText(
+	name, ok = QtWidgets.QInputDialog.getText(
 		None, 'Set Render User', 'Ender New Name:', text=cgruconfig.VARS['USERNAME']
 	)
 
@@ -59,11 +58,7 @@ def setUserDialog():
 
 def refreshAfter( i_sec = 3):
 	timer = QtCore.QTimer( cmd.Application)
-	QtCore.QObject.connect(
-		timer,
-		QtCore.SIGNAL('timeout()'),
-		refresh
-	)
+	timer.timeout.connect( refresh)
 	timer.setInterval( 1000 * i_sec)
 	timer.setSingleShot( True)
 	timer.start()

@@ -3,7 +3,7 @@ import os
 import sys
 import time
 
-from Qt import QtCore, QtWidgets, QtCompat
+from Qt import QtCore, QtGui, QtWidgets
 
 import cgruconfig
 import cgruutils
@@ -232,9 +232,7 @@ class Dialog(QtWidgets.QWidget):
         lFileType.addWidget(QtWidgets.QLabel('Override Service Type:', self))
         self.fields['servicetype'] = QtWidgets.QComboBox(self)
         lFileType.addWidget(self.fields['servicetype'])
-        QtCore.QObject.connect(self.fields['servicetype'],
-                               QtCore.SIGNAL('currentIndexChanged(int)'),
-                               self.setFileType)
+        self.fields['servicetype'].currentIndexChanged.connect( self.setFileType)
 
         # Scene:
         lScene = QtWidgets.QHBoxLayout()
@@ -242,14 +240,10 @@ class Dialog(QtWidgets.QWidget):
         lScene.addWidget(QtWidgets.QLabel('File:', self))
         self.fields['scenefile'] = QtWidgets.QLineEdit(Scene, self)
         lScene.addWidget(self.fields['scenefile'])
-        QtCore.QObject.connect(self.fields['scenefile'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['scenefile'].editingFinished.connect( self.evaluate)
         bBrowseScene = QtWidgets.QPushButton('Browse', self)
         lScene.addWidget(bBrowseScene)
-        QtCore.QObject.connect(bBrowseScene,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseScene)
+        bBrowseScene.pressed.connect( self.browseScene)
 
         # Working Directory:
         lWDir = QtWidgets.QHBoxLayout()
@@ -257,14 +251,10 @@ class Dialog(QtWidgets.QWidget):
         lWDir.addWidget(QtWidgets.QLabel('Working Directory/Project:', self))
         self.fields['wdir'] = QtWidgets.QLineEdit(self)
         lWDir.addWidget(self.fields['wdir'])
-        QtCore.QObject.connect(self.fields['wdir'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['wdir'].editingFinished.connect( self.evaluate)
         self.fields['scenewdir'] = QtWidgets.QCheckBox('Use Scene Folder', self)
         self.fields['scenewdir'].setChecked(True)
-        QtCore.QObject.connect(self.fields['scenewdir'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['scenewdir'].stateChanged.connect( self.evaluate)
         lWDir.addWidget(self.fields['scenewdir'])
 
         # Output images:
@@ -273,20 +263,14 @@ class Dialog(QtWidgets.QWidget):
         lImages.addWidget(QtWidgets.QLabel('Output Images:', self))
         self.fields['outimages'] = QtWidgets.QLineEdit(self)
         lImages.addWidget(self.fields['outimages'])
-        QtCore.QObject.connect(self.fields['outimages'],
-                               QtCore.SIGNAL('editingFinished()'),
-                               self.evaluate)
+        self.fields['outimages'].editingFinished.connect( self.evaluate)
         lImages.addWidget(QtWidgets.QLabel('Browse'))
         bBrowseOutImages = QtWidgets.QPushButton('File', self)
         lImages.addWidget(bBrowseOutImages)
-        QtCore.QObject.connect(bBrowseOutImages,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseOutImages)
+        bBrowseOutImages.pressed.connect( self.browseOutImages)
         bBrowseOutFolder = QtWidgets.QPushButton('Dir', self)
         lImages.addWidget(bBrowseOutFolder)
-        QtCore.QObject.connect(bBrowseOutFolder,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseOutFolder)
+        bBrowseOutFolder.pressed.connect( self.browseOutFolder)
 
         # Frames:
         lFrames = QtWidgets.QHBoxLayout()
@@ -295,42 +279,32 @@ class Dialog(QtWidgets.QWidget):
         self.fields['framestart'] = QtWidgets.QSpinBox(self)
         self.fields['framestart'].setRange(-1000000000, 1000000000)
         self.fields['framestart'].setValue(1)
-        QtCore.QObject.connect(self.fields['framestart'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['framestart'].valueChanged.connect( self.evaluate)
         lFrames.addWidget(self.fields['framestart'])
 
         self.fields['frameend'] = QtWidgets.QSpinBox(self)
         self.fields['frameend'].setRange(-1000000000, 1000000000)
         self.fields['frameend'].setValue(1)
-        QtCore.QObject.connect(self.fields['frameend'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['frameend'].valueChanged.connect( self.evaluate)
         lFrames.addWidget(self.fields['frameend'])
 
         lFrames.addWidget(QtWidgets.QLabel('By:', self))
         self.fields['frameby'] = QtWidgets.QSpinBox(self)
         lFrames.addWidget(self.fields['frameby'])
-        QtCore.QObject.connect(self.fields['frameby'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['frameby'].valueChanged.connect( self.evaluate)
         self.fields['frameby'].setRange(1, 1000000000)
 
         lFrames.addWidget(QtWidgets.QLabel('FPT:', self))
         self.fields['framespt'] = QtWidgets.QSpinBox(self)
         lFrames.addWidget(self.fields['framespt'])
-        QtCore.QObject.connect(self.fields['framespt'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['framespt'].valueChanged.connect( self.evaluate)
         self.fields['framespt'].setRange(1, 1000000000)
         self.fields['framespt'].setToolTip('Frames per task.')
 
         lFrames.addWidget(QtWidgets.QLabel('Seq:', self))
         self.fields['frameseq'] = QtWidgets.QSpinBox(self)
         lFrames.addWidget(self.fields['frameseq'])
-        QtCore.QObject.connect(self.fields['frameseq'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['frameseq'].valueChanged.connect( self.evaluate)
         self.fields['frameseq'].setRange(-1000000, 1000000)
         self.fields['frameseq'].setValue(1)
         self.fields['frameseq'].setToolTip('Solve task with this step at first.')
@@ -344,17 +318,13 @@ class Dialog(QtWidgets.QWidget):
         self.labels['node'].setToolTip(self.labelNode_tooltip['default'])
         self.fields['node'] = QtWidgets.QLineEdit(self)
         lNode.addWidget(self.fields['node'])
-        QtCore.QObject.connect(self.fields['node'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['node'].textEdited.connect( self.evaluate)
         self.labels['take'] = QtWidgets.QLabel(self.labelTake_name['default'])
         lNode.addWidget(self.labels['take'])
         self.labels['take'].setToolTip(self.labelTake_tooltip['default'])
         self.fields['take'] = QtWidgets.QLineEdit(self)
         lNode.addWidget(self.fields['take'])
-        QtCore.QObject.connect(self.fields['take'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['take'].textEdited.connect( self.evaluate)
 
         # Advanced:
         # OS Type:
@@ -363,9 +333,7 @@ class Dialog(QtWidgets.QWidget):
         osLayout.addWidget(QtWidgets.QLabel('Operating System Type:'))
         self.fields['os'] = QtWidgets.QLineEdit(self)
         osLayout.addWidget(self.fields['os'])
-        QtCore.QObject.connect(self.fields['os'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['os'].textEdited.connect( self.evaluate)
 
         # Tasks Command:
         exelayout = QtWidgets.QHBoxLayout()
@@ -375,14 +343,10 @@ class Dialog(QtWidgets.QWidget):
         exelayout.addWidget(label)
         self.fields['exec'] = QtWidgets.QLineEdit(self)
         exelayout.addWidget(self.fields['exec'])
-        QtCore.QObject.connect(self.fields['exec'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['exec'].textEdited.connect( self.evaluate)
         self.execBrowseButton = QtWidgets.QPushButton('Browse', self)
         exelayout.addWidget(self.execBrowseButton)
-        QtCore.QObject.connect(self.execBrowseButton,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseExec)
+        self.execBrowseButton.pressed.connect( self.browseExec)
 
         # Extra Arguments:
         exarglayout = QtWidgets.QHBoxLayout()
@@ -390,9 +354,7 @@ class Dialog(QtWidgets.QWidget):
         exarglayout.addWidget(QtWidgets.QLabel('Extra Arguments:'))
         self.fields['extrargs'] = QtWidgets.QLineEdit(self)
         exarglayout.addWidget(self.fields['extrargs'])
-        QtCore.QObject.connect(self.fields['extrargs'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['extrargs'].textEdited.connect( self.evaluate)
 
         # Preview:
         prvlayout = QtWidgets.QHBoxLayout()
@@ -400,9 +362,7 @@ class Dialog(QtWidgets.QWidget):
         prvlayout.addWidget(QtWidgets.QLabel('Preview:'))
         self.fields['preview'] = QtWidgets.QLineEdit(self)
         prvlayout.addWidget(self.fields['preview'])
-        QtCore.QObject.connect(self.fields['preview'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['preview'].textEdited.connect( self.evaluate)
 
         # Job:
         lJobName = QtWidgets.QHBoxLayout()
@@ -410,15 +370,11 @@ class Dialog(QtWidgets.QWidget):
         lJobName.addWidget(QtWidgets.QLabel('Name:', self))
         self.fields['jobname'] = QtWidgets.QLineEdit(self)
         lJobName.addWidget(self.fields['jobname'])
-        QtCore.QObject.connect(self.fields['jobname'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['jobname'].textEdited.connect( self.evaluate)
         self.fields['jobnamescene'] = QtWidgets.QCheckBox('Use Scene Name', self)
         lJobName.addWidget(self.fields['jobnamescene'])
         self.fields['jobnamescene'].setChecked(True)
-        QtCore.QObject.connect(self.fields['jobnamescene'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['jobnamescene'].stateChanged.connect( self.evaluate)
 
         # Capacity, max run tasks, priority, max tasks per host:
         lCapMax = QtWidgets.QHBoxLayout()
@@ -428,33 +384,25 @@ class Dialog(QtWidgets.QWidget):
         lCapMax.addWidget(self.fields['capacity'])
         self.fields['capacity'].setRange(-1, 1000000)
         self.fields['capacity'].setValue(-1)
-        QtCore.QObject.connect(self.fields['capacity'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['capacity'].valueChanged.connect( self.evaluate)
         lCapMax.addWidget(QtWidgets.QLabel('Maximum Running Tasks:', self))
         self.fields['maxruntasks'] = QtWidgets.QSpinBox(self)
         lCapMax.addWidget(self.fields['maxruntasks'])
         self.fields['maxruntasks'].setRange(-1, 1000000)
         self.fields['maxruntasks'].setValue(-1)
-        QtCore.QObject.connect(self.fields['maxruntasks'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['maxruntasks'].valueChanged.connect( self.evaluate)
         lCapMax.addWidget(QtWidgets.QLabel('Maximum Tasks Per Host:', self))
         self.fields['maxtasksperhost'] = QtWidgets.QSpinBox(self)
         lCapMax.addWidget(self.fields['maxtasksperhost'])
         self.fields['maxtasksperhost'].setRange(-1, 1000000)
         self.fields['maxtasksperhost'].setValue(-1)
-        QtCore.QObject.connect(self.fields['maxtasksperhost'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['maxtasksperhost'].valueChanged.connect( self.evaluate)
         lCapMax.addWidget(QtWidgets.QLabel('Priority:', self))
         self.fields['priority'] = QtWidgets.QSpinBox(self)
         lCapMax.addWidget(self.fields['priority'])
         self.fields['priority'].setRange(-1, 250)
         self.fields['priority'].setValue(-1)
-        QtCore.QObject.connect(self.fields['priority'],
-                               QtCore.SIGNAL('valueChanged(int)'),
-                               self.evaluate)
+        self.fields['priority'].valueChanged.connect( self.evaluate)
 
         # Depend Masks:
         lDepends = QtWidgets.QHBoxLayout()
@@ -462,15 +410,11 @@ class Dialog(QtWidgets.QWidget):
         lDepends.addWidget(QtWidgets.QLabel('Depend Mask:', self))
         self.fields['dependmask'] = QtWidgets.QLineEdit(self)
         lDepends.addWidget(self.fields['dependmask'])
-        QtCore.QObject.connect(self.fields['dependmask'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['dependmask'].textEdited.connect( self.evaluate)
         lDepends.addWidget(QtWidgets.QLabel('Global:', self))
         self.fields['dependglobal'] = QtWidgets.QLineEdit(self)
         lDepends.addWidget(self.fields['dependglobal'])
-        QtCore.QObject.connect(self.fields['dependglobal'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['dependglobal'].textEdited.connect( self.evaluate)
 
         # Host Masks:
         lHostMasks = QtWidgets.QHBoxLayout()
@@ -478,32 +422,25 @@ class Dialog(QtWidgets.QWidget):
         lHostMasks.addWidget(QtWidgets.QLabel('Hosts Mask:', self))
         self.fields['hostsmask'] = QtWidgets.QLineEdit(self)
         lHostMasks.addWidget(self.fields['hostsmask'])
-        QtCore.QObject.connect(self.fields['hostsmask'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['hostsmask'].textEdited.connect( self.evaluate)
         lHostMasks.addWidget(QtWidgets.QLabel('Exclude:', self))
         self.fields['hostsexclude'] = QtWidgets.QLineEdit(self)
         lHostMasks.addWidget(self.fields['hostsexclude'])
-        QtCore.QObject.connect(self.fields['hostsexclude'],
-                               QtCore.SIGNAL('textEdited(QString)'),
-                               self.evaluate)
+        self.fields['hostsexclude'].textEdited.connect( self.evaluate)
 
         # Presets:
         presetsLayout = QtWidgets.QHBoxLayout()
         topLayout.addLayout(presetsLayout)
         presetsLayout.addWidget(QtWidgets.QLabel('Recent:', self))
         self.cbRecent = QtWidgets.QComboBox(self)
+        self.cbRecent.activated.connect( self.loadRecent)
         presetsLayout.addWidget(self.cbRecent)
         self.bBrowseLoad = QtWidgets.QPushButton('Load', self)
         presetsLayout.addWidget(self.bBrowseLoad)
-        QtCore.QObject.connect(self.bBrowseLoad,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseLoad)
+        self.bBrowseLoad.pressed.connect( self.browseLoad)
         self.bBrowseSave = QtWidgets.QPushButton('Save', self)
         presetsLayout.addWidget(self.bBrowseSave)
-        QtCore.QObject.connect(self.bBrowseSave,
-                               QtCore.SIGNAL('pressed()'),
-                               self.browseSave)
+        self.bBrowseSave.pressed.connect( self.browseSave)
 
 
         # Command Field:
@@ -515,31 +452,23 @@ class Dialog(QtWidgets.QWidget):
         topLayout.addLayout(buttonsLayout)
         self.bStart = QtWidgets.QPushButton('&Start', self)
         buttonsLayout.addWidget(self.bStart)
-        QtCore.QObject.connect(self.bStart,
-                               QtCore.SIGNAL('pressed()'),
-                               self.start)
+        self.bStart.pressed.connect( self.start)
         self.fields['paused'] = QtWidgets.QCheckBox('Paused', self)
         buttonsLayout.addWidget(self.fields['paused'])
-        QtCore.QObject.connect(self.fields['paused'],
-                               QtCore.SIGNAL('stateChanged(int)'),
-                               self.evaluate)
+        self.fields['paused'].stateChanged.connect( self.evaluate)
         self.bRefresh = QtWidgets.QPushButton('&Refresh', self)
         buttonsLayout.addWidget(self.bRefresh)
-        QtCore.QObject.connect(self.bRefresh,
-                               QtCore.SIGNAL('pressed()'),
-                               self.evaluate)
+        self.bRefresh.pressed.connect( self.evaluate)
         self.bQuitSave = QtWidgets.QPushButton('&Quit&&Store', self)
         buttonsLayout.addWidget(self.bQuitSave)
-        QtCore.QObject.connect(self.bQuitSave,
-                               QtCore.SIGNAL('pressed()'),
-                               self.quitsave)
+        self.bQuitSave.pressed.connect( self.quitsave)
 
         self.constructed = True
 
         # Set window icon:
         iconpath = cgruutils.getIconFileName('afanasy')
         if iconpath is not None:
-            self.setWindowIcon(QtWidgets.QIcon(iconpath))
+            self.setWindowIcon( QtGui.QIcon(iconpath))
 
         # Refresh recent:
         self.refreshRecent()
@@ -549,23 +478,21 @@ class Dialog(QtWidgets.QWidget):
             self.evaluate()
 
     def browseScene(self):
-        path = QtWidgets.QFileDialog.getOpenFileName(
+        path, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self, 'Choose a file',
             self.fields['scenefile'].text()
         )
-        if "PySide" in QtCompat.__binding__: path = path[0]
         if path == '': return
         self.fields['scenefile'].setText(os.path.normpath(path))
         self.fileChange()
         self.evaluate()
 
     def browseOutImages(self):
-        path = QtWidgets.QFileDialog.getSaveFileName(
+        path, fltr = QtWidgets.QFileDialog.getSaveFileName(
             self,
             'Choose a file',
             self.fields['outimages'].text()
         )
-        if "PySide" in QtCompat.__binding__: path = path[0]
         if path == '': return
         self.fields['outimages'].setText(os.path.normpath(path))
         self.evaluate()
@@ -581,12 +508,11 @@ class Dialog(QtWidgets.QWidget):
         self.evaluate()
 
     def browseExec(self):
-        path = QtWidgets.QFileDialog.getOpenFileName(
+        path, fltr = QtWidgets.QFileDialog.getOpenFileName(
             self,
             'Choose a file',
             self.fields['exec'].text()
         )
-        if "PySide" in QtCompat.__binding__: path = path[0]
         if path == '': return
         self.fields['exec'].setText(os.path.normpath(path))
         self.evaluate()
@@ -766,12 +692,7 @@ class Dialog(QtWidgets.QWidget):
         self.refreshRecent()
 
     def refreshRecent(self):
-        # QtCore.QObject.disconnect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
-        QtCore.QObject.disconnect(
-            self.cbRecent,
-            QtCore.SIGNAL('activated(int)'),
-            self.loadRecent
-        )
+        self.cbRecent.activated.disconnect( self.loadRecent)
         self.cbRecent.clear()
         for afile in self.getRecentFilesList():
             if afile[: len(FilePrefix)] == FilePrefix:
@@ -785,12 +706,8 @@ class Dialog(QtWidgets.QWidget):
             if len(short) > 20:
                 short = short[:10] + ' .. ' + short[-10:]
             self.cbRecent.addItem(short, afile)
-        # QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
-        QtCore.QObject.connect(
-            self.cbRecent,
-            QtCore.SIGNAL('activated(int)'),
-            self.loadRecent
-        )
+        
+        self.cbRecent.activated.connect( self.loadRecent)
 
     def loadRecent(self):
         self.load(getComboBoxString(self.cbRecent))
@@ -841,22 +758,20 @@ class Dialog(QtWidgets.QWidget):
         return True
 
     def browseLoad(self):
-        path = QtWidgets.QFileDialog.getOpenFileName(
+        path, fltr = QtWidgets.QFileDialog.getOpenFileName(
                 self,
                 'Choose afstarter file',
                 cgruconfig.VARS['HOME_CGRU']
             )
-        if "PySide" in QtCompat.__binding__: path = path[0]
         if path == '': return
         self.load(path, True)
 
     def browseSave(self):
-        path = QtWidgets.QFileDialog.getSaveFileName(
+        path, fltr = QtWidgets.QFileDialog.getSaveFileName(
                 self,
                 'Choose afstarter file',
                 cgruconfig.VARS['HOME_CGRU']
             )
-        if "PySide" in QtCompat.__binding__: path = path[0]
         if path == '': return
         self.save(path, True)
 
@@ -1055,16 +970,8 @@ class Dialog(QtWidgets.QWidget):
         time.sleep(.1)
         self.process = QtCore.QProcess(self)
         self.process.setProcessChannelMode(QtCore.QProcess.MergedChannels)
-        QtCore.QObject.connect(
-            self.process,
-            QtCore.SIGNAL('finished( int)'),
-            self.processfinished
-        )
-        QtCore.QObject.connect(
-            self.process,
-            QtCore.SIGNAL('readyRead()'),
-            self.processoutput
-        )
+        self.process.finished.connect( self.processfinished)
+        self.process.readyRead.connect( self.processoutput)
         self.output = ''
         self.process.start(command)
 

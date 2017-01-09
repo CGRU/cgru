@@ -18,7 +18,8 @@ public:
 	/// Save to disk:
 	void save();
 
-	inline int64_t getJobSerial() { return ++m_jobs_serial; }
+	inline int64_t getJobSerial()
+		{ int64_t serial = ++m_jobs_serial; save(); return serial; }
 
 private:
 	void read( const JSON & i_object);
