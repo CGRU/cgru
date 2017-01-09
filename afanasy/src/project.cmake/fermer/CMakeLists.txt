@@ -85,4 +85,4 @@ target_link_libraries(afermer afqt ${Qt5Multimedia_LIBRARIES}
 
 
 add_custom_command(TARGET afermer POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/../../fermi/qml" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qml )
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/../../fermer/qml" ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/qml )
