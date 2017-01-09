@@ -12,7 +12,7 @@ std::ostream& operator<<(std::ostream& out, const std::vector<int>& rhs)
     std::copy(rhs.begin(), rhs.end(), std::ostream_iterator<int>(joined, delim));
 
     out << "[";
-    out << joined;
+    out << joined.str();
     out << "]";
     return out;
 }
