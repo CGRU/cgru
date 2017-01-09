@@ -81,6 +81,17 @@ Rectangle{
                 }
             }
             Text {
+                Layout.preferredWidth: jobs_view.job_minimum_Width.approximate_time
+
+                horizontalAlignment : Text.AlignHCenter
+                layer.enabled: true
+                color: "white"
+                opacity: 0.45
+                text: "Approx. Finish Time"
+                font.letterSpacing:1.2
+                font { family: robotoRegular.name; pixelSize: 14}
+            }
+            Text {
                 Layout.preferredWidth: jobs_view.job_minimum_Width.slots
 
                 horizontalAlignment : Text.AlignHCenter

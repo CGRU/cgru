@@ -14,7 +14,11 @@ Rectangle {
 	samples: 17
 	radius:2
     }
-
+    signal jobClicked
+    onJobClicked: {
+        jobs_side_view.jobClicked.call()
+        //jobs_side_view.job_timegraph_.jobClicked.call()
+    }
     states: [
         State {
           name: "JobView"
@@ -45,6 +49,11 @@ Rectangle {
     Item{
         id: jobs_side_view
         anchors.fill: parent
+        signal jobClicked
+        onJobClicked: {
+            job_timegraph_.jobClicked.call()
+        }
+
         state:"Info"
         states: [
             State {
@@ -185,6 +194,7 @@ Rectangle {
                     onClicked: {
                         jobs_side_view.state = "Timegraph"
                         root.side_state="Timegraph"
+                        jobClicked.call()
                     }
                 }
             }
@@ -200,18 +210,11 @@ Rectangle {
         }
         JobTimeGraph{
             id:job_timegraph_
-            anchors.fill: parent
 
-            Text {
-                anchors.centerIn: parent
-                color: "white"
-                opacity: 0.8
-                text:"Not Implemented Yet"
-                font.letterSpacing:1.2
-                font { family: robotoRegular.name; pixelSize: 18}
-                font.weight: Font.Thin
-            }
+            anchors.fill: parent
+            anchors.topMargin: job_tasks.height+main_menu.height
         }
+
     }
     Item{
         id: blades_side_view
@@ -226,9 +229,9 @@ Rectangle {
             Layout.fillWidth: true
             layer.enabled: true
             layer.effect: DropShadow {
-            transparentBorder: true
-            samples: 17
-            radius:7
+                transparentBorder: true
+                samples: 17
+                radius:7
             }
 
             color:side_view.color

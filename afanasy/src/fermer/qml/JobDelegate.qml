@@ -35,6 +35,7 @@ Rectangle {
                   JobsModel.setSelected(index)
                   if (root.side_state=="Tasks"){
                     TasksModel.updateTasksByJobID(v_job_id)
+                    //console.log(" updateTasksByJobID "+v_job_id)
                   }
               }
 
@@ -47,6 +48,7 @@ Rectangle {
                   JobsModel.addToSelected(index)
                   JobsModel.shiftSelected()
               }
+              jobClicked()
           }
           onReleased: {
                   if (mouse.button === Qt.RightButton) {
@@ -242,6 +244,18 @@ Rectangle {
                     font.pointSize: 8
                     text: job_name
               }
+          }
+          Text {
+                layer.enabled: true
+                color: "white"
+                opacity: 0.8
+                Layout.preferredWidth: jobs_view.job_minimum_Width.approximate_time
+
+                anchors.verticalCenter: parent.verticalCenter
+                horizontalAlignment : aligntype
+                font.family:robotoRegular.name
+                font.pointSize: 10.5
+                text: approx_time
           }
 
           Text {

@@ -68,6 +68,8 @@ ApplicationWindow {
         Component.onCompleted:{
             console.log(" background.visible():")
         }
+        visible: false
+        onStatusChanged: if (background.status == Loader.Ready) visible=true
     }
 
     onOpenglContextCreated:  {

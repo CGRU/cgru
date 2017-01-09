@@ -107,7 +107,7 @@ Item{
         color: "white"
         }
     Text {
-        text: "Blades Running"
+        text: "Tasks Running"
         anchors.right: parent.right
         font.pixelSize: parent.custom_font_size
         font.family:parent.custom_font
@@ -136,7 +136,7 @@ Item{
 		color: "white"
 	    }
 	Text {
-        text: jobs_ListView.currentItem.v_state
+        text: ""//jobs_ListView.currentItem.v_state
 		anchors.left: parent.left
 		font.pixelSize: parent.custom_font_size
 		font.family:parent.custom_font

@@ -266,8 +266,13 @@ Item{
 		color: "white"
 	    }
 	Text {
-        text:BladeState.BUSY==blades_ListView.currentItem.v_state ? "Working" 
-        	: BladeState.OFFLINE==blades_ListView.currentItem.v_state ? "Offline" : "Idle"
+        text: blades_ListView.currentItem.v_state==BladeState.BUSY ? "Working"
+                                              : blades_ListView.currentItem.v_state==BladeState.OFFLINE ? "Offline"
+                                              : blades_ListView.currentItem.v_state==BladeState.READY ? "Idle"
+                                              : blades_ListView.currentItem.v_state==BladeState.NIMBY ? "Skip"
+                                              : blades_ListView.currentItem.v_state==BladeState.BIG_NIMBY ? "Skip"
+                                              : blades_ListView.currentItem.v_state==BladeState.DIRTY ? "DIRTY"
+                                              : "else"
         anchors.left: parent.left
 		font.pixelSize: parent.custom_font_size
 		font.family:parent.custom_font

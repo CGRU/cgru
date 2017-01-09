@@ -17,6 +17,7 @@ Rectangle {
     property string v_working_time:working_time
     property string v_ip_address:ip_address
     property string v_blade_id:blade_id
+    property string v_avalible_performance_slots:avalible_performance_slots
 
 
     MouseArea {
@@ -83,7 +84,13 @@ Rectangle {
                   anchors.centerIn: parent
                   width: 1
                   height: 30
-                  color: state_machine==BladeState.BUSY ? "#fa9201" : state_machine==BladeState.OFFLINE ? "#82898d" : "#80cbc4"
+                  color: state_machine==BladeState.BUSY ? "#fa9201"
+                                                        : state_machine==BladeState.OFFLINE ? "#82898d"
+                                                        : state_machine==BladeState.READY ? "#80cbc4"
+                                                        : state_machine==BladeState.NIMBY ? "#80cbff"
+                                                        : state_machine==BladeState.BIG_NIMBY ? "#80cbff"
+                                                        : state_machine==BladeState.DIRTY ? "red"
+                                                        : "#ffffff"
                   opacity: 0.9
                   layer.enabled: true
               }
@@ -209,7 +216,7 @@ Rectangle {
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
                 font.pointSize: 10.5
-                text: loaded_net
+                text: loaded_net+" Kb/s"
           }
           Text {
                 layer.enabled: true

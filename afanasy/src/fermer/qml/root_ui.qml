@@ -51,7 +51,7 @@ Item {
     id: root
     visible: false
     Component.onCompleted:{
-        visible= true
+        visible=true
     }
     Item {
         id:item_states
@@ -63,6 +63,7 @@ Item {
                   PropertyChanges {target: main_menu; state:"JobView"}
                   PropertyChanges {target: side_view; state:"JobView"}
                   PropertyChanges {target: not_implemented_view; visible: false}
+                  PropertyChanges {target: node_view; visible: false}
                   PropertyChanges {target: metrics_view; visible: false}
                   PropertyChanges {target: jobs_view; visible: true}
                   PropertyChanges {target: root; update_state: 0}
@@ -73,6 +74,7 @@ Item {
                   PropertyChanges {target: main_menu; state:"BladeView"}
                   PropertyChanges {target: side_view; state:"BladeView"}
                   PropertyChanges {target: not_implemented_view; visible: false}
+                  PropertyChanges {target: node_view; visible: false}
                   PropertyChanges {target: metrics_view; visible: false}
                   PropertyChanges {target: jobs_view; visible: false}
                   PropertyChanges {target: root; update_state: 1}
@@ -82,7 +84,7 @@ Item {
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"NodeView"}
                     PropertyChanges {target: side_view; state:"NodeView"}
-                    PropertyChanges {target: not_implemented_view; visible: true}
+                    PropertyChanges {target: node_view; visible: true}
                     PropertyChanges {target: metrics_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
                     PropertyChanges {target: root; update_state: 2}
@@ -93,6 +95,7 @@ Item {
                     PropertyChanges {target: main_menu; state:"UsersView"}
                     PropertyChanges {target: side_view; state:"UsersView"}
                     PropertyChanges {target: not_implemented_view; visible: true}
+                    PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
             },
@@ -102,6 +105,7 @@ Item {
                     PropertyChanges {target: main_menu; state:"MetricView"}
                     PropertyChanges {target: side_view; state:"MetricView"}
                     PropertyChanges {target: not_implemented_view; visible: false}
+                    PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: true}
                     PropertyChanges {target: jobs_view; visible: false}
                     PropertyChanges {target: root; update_state: 4}
@@ -109,11 +113,14 @@ Item {
         ]
     }
     property var custom_aligntype: Text.AlignLeft
-    property bool transient_toggl:true
+    property bool transient_toggl:false
     property bool farm_usage_toggl: true
     property string side_state: "Info"
     property int update_state: 99
     property string filtered_text: ""
+    property int task_height: 24
+
+    signal jobClicked
 
     property int totalJobs
     property int doneJobs
@@ -197,11 +204,12 @@ Item {
         property var job_minimum_Width: {"progress": 130,
                                          "elapsed": 100,
                                          "user": 35,
-                                         "job_name": 280,
+                                         "job_name": 230,
                                          "slots": 40,
                                          "priority": 60,
-                                         "started": 120,
-                                         "software": 170}
+                                         "started": 100,
+                                         "software": 100,
+                                         "approximate_time": 142}
         property int selection
 
         Component{
@@ -248,13 +256,6 @@ Item {
                   model: JobsModel.jobsModel
                   focus: true
                   cacheBuffer:40
-
-                  property var indexes: []
-                  property int __clicks
-                  property int __previousRow: -1
-                  property int __modifiers: 0
-                  property int __firstKeyRow: -1
-
                 }
         }
 
@@ -278,8 +279,7 @@ Item {
                 color: "white"
                 Keys.onReturnPressed: {
                     popJobSetPriority.close();
-                    JobsModel.setPriority(jobs_ListView.currentItem.v_job_id,
-                                          set_priority_text_input_dialog.text)
+                    JobsModel.setPriority(set_priority_text_input_dialog.text)
                 }
             }
             Rectangle {
@@ -359,8 +359,7 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         popJobSetHostsMask.close();
-                        JobsModel.setHostMask(jobs_ListView.currentItem.v_job_id,
-                                              set_host_mask_text_input_dialog.text)
+                        JobsModel.setHostMask(set_host_mask_text_input_dialog.text)
                     }
                 }
             }
@@ -434,9 +433,72 @@ Item {
                   cacheBuffer:40
                 }
         }
+        InputDialog {
+            id: popBladeSetMaxSlots
+            title: "Set Max Slots"
+
+            TextInput {
+                id: set_max_slots_input_dialog
+                anchors.top: parent.top
+                anchors.topMargin: 28
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width*0.85
+                height: 20
+                text: "99"
+                opacity: 0.9
+                selectByMouse: true
+                inputMethodHints:Qt.ImhDigitsOnly
+
+                color: "white"
+                Keys.onReturnPressed: {
+                    popBladeSetMaxSlots.close();
+                    BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
+                }
+            }
+            Rectangle {
+                height: 25
+                width:59
+                color: "#374a52"
+
+                anchors.bottom: parent.bottom
+                anchors.left: parent.horizontalCenter
+                anchors.leftMargin: 10
+                anchors.bottomMargin: 10
+                opacity:0.85
+                layer.enabled: true
+                layer.effect: DropShadow {
+                transparentBorder: true
+                samples: 12
+                radius:4
+                }
+                Text {
+                    text: "Ok"
+                    anchors.centerIn: parent
+                    color: "white"
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        popBladeSetMaxSlots.close();
+                        BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
+                    }
+                }
+            }
+        }
         BladeContextMenu{
             id: blade_context_menu
         }
+    }
+
+    NodeView{
+        id:node_view
+        width:jobs_view.width
+        height: 400
+
+        anchors.right: side_view.left
+        anchors.rightMargin: 10
+        anchors.top:main_menu.top
+        anchors.topMargin: 50
     }
 
     MetricsView{
@@ -469,12 +531,14 @@ Item {
         }
     }
 
+    onJobClicked: {
+        side_view.jobClicked.call()
+    }
     SideView{
         id: side_view
         width: parent.width/4
         height: parent.height
         x:parent.width-parent.width/4
-
     }
 
     MainMenu{
@@ -493,7 +557,7 @@ Item {
         id: popJobAboutDialog
         title: "About Fermer"
         width: 220
-        height: 110
+        height: 70
     }
 
 
@@ -556,10 +620,10 @@ Item {
        MenuItem {
            text: "About"
            onTriggered:{
-               popJobAboutDialog.text=("     QT:              "+BladesModel.qt_version()
-                                       +"\n     Fermer:       0.4.8"
-                                       +"\n\n     Developed In 'Platige Image'"
-                                       +"\n             www.platige.com")
+               popJobAboutDialog.text=("     QT:                "+BladesModel.qt_version()
+                                       +"\n     AFermer:       0.5.2")
+                                       //+"\n\n     Developed In 'Platige Image'"
+                                       //+"\n             www.platige.com")
                popJobAboutDialog.show()
            }
        }

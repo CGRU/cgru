@@ -72,7 +72,7 @@ Item{
         id:task_delegate
         TaskDelegate{
             width: parent.width
-            height: 24
+            height: task_height
             aligntype: custom_aligntype
         }
     }

@@ -25,7 +25,9 @@ Menu {
    MenuItem {
        text: "Set Max Slots"
        onTriggered:{
-           BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id)
+           set_max_slots_input_dialog.text=blades_ListView.currentItem.v_avalible_performance_slots;
+           popBladeSetMaxSlots.show();
+           //BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id)
        }
    }
    MenuItem {
