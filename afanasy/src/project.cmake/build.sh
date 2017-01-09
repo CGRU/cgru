@@ -85,6 +85,7 @@ case ${DISTRIBUTIVE} in
         export AF_EXTRA_LIBS="pthread"
         ;;
     MacOSX)
+        export AF_QT_VER="5"
         ;;
     *)
         echo "Warning: Untested system: '${DISTRIBUTIVE}'"
