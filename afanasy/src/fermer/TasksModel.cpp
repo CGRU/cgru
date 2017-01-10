@@ -72,10 +72,10 @@ QVariant TasksModel::data(const QModelIndex &i_index, int i_role) const
 }
 
 
-QString TasksModel::taskOutput(int i_index)
+QString TasksModel::taskOutput(int i_index, TaskState::State state)
 {
     QString info;
-    m_RLS->taskStdOut(info, i_index);
+    m_RLS->taskStdOut(info, i_index, state);
     return info;
 }
 

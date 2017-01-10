@@ -46,7 +46,7 @@ public slots:
     Q_INVOKABLE int rowCount(const QModelIndex & i_parent = QModelIndex()) const;
 
 
-    Q_INVOKABLE QString taskOutput(int);
+    Q_INVOKABLE QString taskOutput(int,TaskState::State);
     Q_INVOKABLE QString taskInfo(int);
     Q_INVOKABLE QString taskLog(int);
     Q_INVOKABLE QString taskErrorHost(int);

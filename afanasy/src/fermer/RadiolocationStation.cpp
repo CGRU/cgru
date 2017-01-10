@@ -68,9 +68,9 @@ bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
 
 RadiolocationStation::~RadiolocationStation()
 {
-	std::cerr << "PI INFO: af::Msg::TMonitorDeregister " << std::endl;
+    std::cerr << "PI INFO: af::Msg::TMonitorDeregister " << std::endl;
     Waves::Ptr query4 = Waves::create( af::Msg::TMonitorDeregister, m_monitor->getId() );
-	push( query4 );
+    push( query4 );
 }
 
 
@@ -144,8 +144,7 @@ Waves::Ptr RadiolocationStation::push(Waves::Ptr msg_up)
 
 void RadiolocationStation::pullMessage( af::Msg *msg)
 {
-    //std::cout << "Monitor::pullMessage: " << af::Msg::TNAMES[ msg->type() ] << std::endl;
-    switch( msg->type())
+    switch( msg->type() )
     {
         case af::Msg::TMonitor:
             {
@@ -156,13 +155,11 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
             }
         case af::Msg::TMonitorId:
             {
-                events_off = true;
                 monitor_id = msg->int32();
                 break;
             }
         case af::Msg::TMonitorEvents: // watch.cpp
             {
-                events_off = false;
                 af::MonitorEvents me( msg);
 
                 size_t output_len = me.m_outputs.size();
@@ -177,7 +174,6 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
                                 {
                                     task_output_body += "\n";
                                     task_output_body += i_mctask.getOutput();
-
                                     emit outputComplited();
 
                                     break;
@@ -192,21 +188,21 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
         case af::Msg::TTask:
             {
                 af::MCTask i_mctask( msg );
-                        switch( i_mctask.getType())
+                switch( i_mctask.getType())
+                {
+                    case af::MCTask::TOutput:
                         {
-                            case af::MCTask::TOutput:
-                                {
-                                    task_output_body += "\n";
-                                    task_output_body += i_mctask.getOutput();
+                            task_output_body += "\n";
+                            task_output_body += i_mctask.getOutput();
 
-                                    if (events_off)
-                                        emit outputComplited();
+                            if (!wait_task_stdout)
+                                 emit outputComplited();
 
-                                    break;
-                                }
-                            default:
-                                break;
+                            break;
                         }
+                    default:
+                        break;
+                }
             }
 
         default:
@@ -252,10 +248,12 @@ bool RadiolocationStation::setOperation(const std::string& i_name_object
 
 
 
-void RadiolocationStation::getTaskOutput(QString& o_str, int i_job_id, int i_block_id, int i_task_id)
+void RadiolocationStation::getTaskOutput(QString& o_str, int i_job_id, int i_block_id, int i_task_id, TaskState::State i_state)
 {
     std::string i_mode("output");
     std::ostringstream str;
+
+    wait_task_stdout = (i_state == TaskState::State::DONE) ? false : true ;
     //str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"output\",\"ids\":[6],\"block_ids\":[0],\"task_ids\":[0],\"mon_id\":1,\"binary\":true}}";
     str << "{\"get\":{\"type\":\"jobs\"";
     str << ",\"mode\":\"" << i_mode << "\"";

@@ -302,9 +302,6 @@ QList<int> JobsModel::getSelectedIds(){
     //temp_ids.append(15728926);
     //temp_ids.append(11534588);
 
-    for (int i=0;i<temp_ids.size();i++){
-        qDebug()<<"temp_ids"<<temp_ids[i]<<" "<<i;
-    }
     return temp_ids;
 }
 

@@ -296,7 +296,7 @@ QList<QString> RadiolocationService::getTasksFrame(int i_index)
 
 void RadiolocationService::taskLog(QString& o_ret, int i_index) { tasksGetOut(o_ret, "log", i_index ); }
 void RadiolocationService::taskErrorHosts(QString& o_ret, int i_index) { tasksGetOut(o_ret, "error_hosts" , i_index ); }
-void RadiolocationService::taskStdOut(QString& o_ret, int i_index) 
+void RadiolocationService::taskStdOut(QString& o_ret, int i_index, TaskState::State state) 
 { 
     if ( !checkIndexInTaskResources(i_index) )
         return;
@@ -304,7 +304,7 @@ void RadiolocationService::taskStdOut(QString& o_ret, int i_index)
     int job_id, block_id, task_id;
     unpack(i_index, &job_id, &block_id, &task_id);
 
-    m_station->getTaskOutput(o_ret, job_id, block_id, task_id);
+    m_station->getTaskOutput(o_ret, job_id, block_id, task_id, state);
 }
 
 

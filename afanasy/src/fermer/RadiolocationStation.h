@@ -16,7 +16,7 @@
 
 
 #include "common.h"
-
+#include "state.hpp"
 
 namespace afermer
 {
@@ -68,14 +68,15 @@ public:
     MonitorHost* m_monitor;
     size_t monitor_id;
 
-    void getTaskOutput(QString&, int, int, int);
+    void getTaskOutput(QString&, int, int, int, TaskState::State);
 
 private:
     afqt::QThreadClientUp   m_qThreadClientUpdate;
     afqt::QThreadClientSend m_qThreadSend;
     Waves::Ptr push(Waves::Ptr);
+    
     std::string task_output_body;
-    bool events_off;
+    bool wait_task_stdout;
 
 };
 

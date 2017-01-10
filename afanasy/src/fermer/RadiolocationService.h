@@ -160,7 +160,7 @@ public:
     QString jobOutputFolder(int);
     QString jobShowErrorBlades(int);
 
-    void taskStdOut(QString&, int);
+    void taskStdOut(QString&, int, TaskState::State);
     void taskCommand(QString&, int);
     void taskLog(QString&, int);
     void taskErrorHosts(QString&, int);
