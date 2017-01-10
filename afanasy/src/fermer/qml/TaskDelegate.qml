@@ -33,7 +33,7 @@ Rectangle {
           onDoubleClicked: {
               popTaskOutputDialog.text="Retrieving running task output from render..."
               popTaskOutputDialog.show()
-              popTaskOutputDialog.text=TasksModel.taskOutput(v_id)
+              popTaskOutputDialog.text=TasksModel.taskOutput(v_id,status)
           }
       }
 
