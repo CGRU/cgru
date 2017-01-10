@@ -29,7 +29,7 @@ public:
         return m_hash_fn(i_str);
     }
 
-    bool addValue(int);
+    void addValue(int);
     QList<int> getValues() const;
 
 protected:

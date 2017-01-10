@@ -19,6 +19,7 @@
 
 #include <boost/lexical_cast.hpp>
 
+#undef max
 
 using namespace afermer;
 
@@ -910,7 +911,7 @@ QString RadiolocationService::jobOutputFolder(int i_index)
 #ifdef WINNT
     PROCESS_INFORMATION pinfo;
 
-    af::launchProgram( &pinfo, "start", folder, NULL, NULL, NULL,
+    af::launchProgram( &pinfo, "start", folder, NULL, NULL, NULL, NULL,
         CREATE_NEW_CONSOLE, true);
 
     CloseHandle( pinfo.hThread);

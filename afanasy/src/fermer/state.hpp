@@ -9,6 +9,7 @@
     #include <QtQml/QQmlApplicationEngine>
 #endif
 
+#undef ERROR
 
 class TaskState : public QObject
 {

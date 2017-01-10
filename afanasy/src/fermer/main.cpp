@@ -1,7 +1,9 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem.hpp>
+#ifndef WINNT
 #include <unistd.h>
+#endif
 
 #include <iostream>
 #include <stdlib.h>     /* getenv */

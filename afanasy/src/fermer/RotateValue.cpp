@@ -10,7 +10,7 @@ RotateValue::RotateValue()
 }
 
 
-bool RotateValue::addValue(int i_val)
+void RotateValue::addValue(int i_val)
 {
     std::rotate(m_list.rbegin(),m_list.rbegin()+1,m_list.rend());
     m_list[0] = i_val;
