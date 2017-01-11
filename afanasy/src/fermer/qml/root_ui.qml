@@ -46,12 +46,16 @@ import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.1
 import JobStateEnums 1.0
+import Qt.labs.settings 1.0
 
 Item {
     id: root
     visible: false
     Component.onCompleted:{
         visible=true
+    }
+    Component.onDestruction: {
+        settings.custom_aligntype_s = item_align.state
     }
     Item {
         id:item_states
@@ -112,9 +116,15 @@ Item {
             }
         ]
     }
+    Settings {
+        id: settings
+        property alias transient_toggl: root.transient_toggl
+        property alias farm_usage_toggl: root.farm_usage_toggl
+        property string custom_aligntype_s: "AlignCenter"
+    }
     property var custom_aligntype: Text.AlignLeft
-    property bool transient_toggl:false
-    property bool farm_usage_toggl: true
+    property bool transient_toggl:true
+    property bool farm_usage_toggl: false
     property string side_state: "Info"
     property int update_state: 99
     property string filtered_text: ""
@@ -129,7 +139,7 @@ Item {
     property int errorJobs
     Item {
         id:item_align
-        state:"AlignCenter"
+        state:settings.custom_aligntype_s
         states: [
             State {
               name: "AlignCenter"
