@@ -239,7 +239,7 @@ Item {
                 decrementControl: Rectangle {
                     implicitWidth: 12
                     implicitHeight: 2
-                    color: "red"
+                    color: "white"
                     opacity: 0.3
                 }
                 incrementControl: Rectangle {
@@ -418,10 +418,28 @@ Item {
             anchors.topMargin: 35
             highlightOnFocus:true
             style: ScrollViewStyle {
-                transientScrollBars: true
+                transientScrollBars: root.transient_toggl
                 scrollBarBackground: Item {
-                    implicitWidth: 14
+                    implicitWidth: 12
                     implicitHeight: 26
+                }
+                handle: Rectangle {
+                    implicitWidth: 12
+                    implicitHeight: 26
+                    color: "white"
+                    opacity: 0.4
+                }
+                decrementControl: Rectangle {
+                    implicitWidth: 12
+                    implicitHeight: 2
+                    color: "white"
+                    opacity: 0.3
+                }
+                incrementControl: Rectangle {
+                    implicitWidth: 12
+                    implicitHeight: 1
+                    color: "white"
+                    opacity: 0.3
                 }
             }
                 ListView {
