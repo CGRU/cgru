@@ -1072,7 +1072,7 @@ def setFramesFromTimeCode( i_afnode):
     i_afnode.knob('framelast').setValue( frange[1])
     i_afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( frange[0], frange[1]))
 
-def setTimeCodeFromFrames( i_afnode)
+def setTimeCodeFromFrames( i_afnode):
     ffirst = int(i_afnode.knob('framefirst').value())
     flast = int(i_afnode.knob('framelast').value())
     i_afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( ffirst, flast))
