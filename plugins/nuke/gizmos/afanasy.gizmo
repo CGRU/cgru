@@ -20,6 +20,8 @@ Gizmo {
    addUserKnob { 26 "" l ""}
    addUserKnob { 22 knob_1 l RENDER T "cgru.render( nuke.toNode(\"this\"))"}
    addUserKnob {  6 startpaused     l "Start Paused" -STARTLINE }
+   addUserKnob { 26 "" l ""}
+   addUserKnob {  1 timecode        l "Time Code" }
 
    addUserKnob { 20 "" Parameters }
    addUserKnob {  4 platform M { "Any" "Native"}  l "Plafrorm" }

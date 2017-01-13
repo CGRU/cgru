@@ -45,6 +45,32 @@ def sepThousands(i_int):
     return s
 
 
+def timecodeToFrame( i_tc, i_fps = 24):
+    tc = re.findall('\d.*\d', i_tc)
+    if len( tc) == 0:
+        return None
+
+    tc = re.findall('\d+', tc[0])
+    if len( tc) == 0:
+        return None
+
+    frame = 0
+    counts = [1,i_fps,i_fps*60,i_fps*3600]
+    for i in range(0,len(tc)):
+        if i >= len(counts): break
+        frame += int(tc[-i-1])*counts[i]
+
+    return frame
+
+
+def timecodesToFrameRange( i_tc, i_fps = 24):
+    tc = i_tc.split('-')
+    if len(tc) != 2:
+        return None
+
+    return timecodeToFrame( tc[0]), timecodeToFrame( tc[1])
+
+
 def copy_file(source_file, destination_file, delete_original=False, debug=False):
     """Missing DocString
 
