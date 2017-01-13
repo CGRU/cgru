@@ -166,14 +166,16 @@ class BlockParameters:
             self.hostsmask = afnode.knob('hostsmask').value()
             self.hostsmaskexclude = afnode.knob('hostsmaskexcl').value()
 
-            timecode = afnode.knob('timecode').value()
-            if len (timecode):
-                frange = cgruutils.timecodesToFrameRange( timecode, nuke.root().fps())
-                if frange is None or frange[0] is None or frange[1] is None:
-                    nuke.message('Invalid timecode: "%s"' % timecode)
-                    return None
-                self.framefirst = frange[0]
-                self.framelast  = frange[1]
+            if int(afnode.knob('timecode_use').value()):
+                timecode = afnode.knob('timecode').value()
+                if len (timecode):
+                    frange = cgruutils.timecodesToFrameRange( timecode, nuke.root().fps())
+                    if frange is None or frange[0] is None or frange[1] is None:
+                        nuke.message('Invalid timecode: "%s"' % timecode)
+                        return None
+                    self.framefirst = frange[0]
+                    self.framelast  = frange[1]
+                    afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( frange[0], frange[1]))
 
         if self.skipexisting: self.framespertask = 1
 
@@ -1051,3 +1053,27 @@ def render(node=None):
 
     # Render selected nodes:
     renderNodes(nodes, fparams, storeframes)
+
+
+def setFramesFromTimeCode( i_afnode):
+
+    timecode = i_afnode.knob('timecode').value()
+
+    if len(timecode) == 0:
+        nuke.message('Timecode is empty.')
+        return
+
+    frange = cgruutils.timecodesToFrameRange( timecode, nuke.root().fps())
+    if frange is None or frange[0] is None or frange[1] is None:
+        nuke.message('Invalid timecode: "%s"' % timecode)
+        return
+
+    i_afnode.knob('framefirst').setValue( frange[0])
+    i_afnode.knob('framelast').setValue( frange[1])
+    i_afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( frange[0], frange[1]))
+
+def setTimeCodeFromFrames( i_afnode)
+    ffirst = int(i_afnode.knob('framefirst').value())
+    flast = int(i_afnode.knob('framelast').value())
+    i_afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( ffirst, flast))
+

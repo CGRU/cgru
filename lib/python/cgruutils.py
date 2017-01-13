@@ -71,6 +71,22 @@ def timecodesToFrameRange( i_tc, i_fps = 24):
     return timecodeToFrame( tc[0]), timecodeToFrame( tc[1])
 
 
+def timecodeFromFrame( i_frame, i_fps = 24):
+    h = i_frame / (i_fps * 3600)
+    f = i_frame - (i_fps * 3600) * h
+    m = f / (i_fps * 60)
+    f = f - (i_fps * 60 * m)
+    s = f / (i_fps)
+    f = f - (i_fps * s)
+    return '%02d:%02d:%02d:%02d' % (h,m,s,f)
+
+
+def timecodesFromFrameRange( i_ffirst, i_flast, i_fps = 24):
+    tc_first = timecodeFromFrame( i_ffirst, i_fps)
+    tc_last  = timecodeFromFrame( i_flast,  i_fps)
+    return '%s - %s' % (tc_first,tc_last)
+
+
 def copy_file(source_file, destination_file, delete_original=False, debug=False):
     """Missing DocString
 
