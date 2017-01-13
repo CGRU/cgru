@@ -517,44 +517,14 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
             long long average_time_tasks=0;
             float time_dones=0;
             int tasks_running=0;
-            QString approx_time;
             long long curtime = time(0);//block->getTasksNum()
 
-            //For DONE TASKS
             for( int t = 0; t < block->getTasksNum(); t++)
             {
                 af::TaskProgress taskprogress = *(progress.tp[block_num][t]) ;
-                //long long elapsed_time_task = curtime - taskprogress.time_start;
 
                 if (taskprogress.state & AFJOB::STATE_RUNNING_MASK){
-
-                    // need to wait until Sergiy will come
-                    //long long time_progress=(elapsed_time_task*((100/percent)-1));
-
                     blades.push_back( QString::fromStdString(taskprogress.hostname) );
-                }
-
-                if(taskprogress.state & AFJOB::STATE_DONE_MASK){
-                    total_time_tasks=(taskprogress.time_done - taskprogress.time_start)+total_time_tasks;
-                    time_dones++;
-                }
-                if( taskprogress.state & AFJOB::STATE_READY_MASK)
-                {
-                    tasks_running++;
-                }
-            }
-            //For RUNNING TASKS
-            for( int t = 0; t < block->getTasksNum(); t++)
-            {
-                af::TaskProgress taskprogress = *(progress.tp[block_num][t]) ;
-
-                if (taskprogress.state & AFJOB::STATE_RUNNING_MASK){
-                    if (time_dones!=0){
-                        percent=taskprogress.percent;
-                        average_time_tasks=total_time_tasks/time_dones;
-                        long long time_progress=average_time_tasks*(1-(percent*0.01));
-                        total_time_progress=std::max(time_progress,total_time_progress);
-                    }
                 }
             }
 
@@ -562,18 +532,38 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
             blades.erase( std::unique( blades.begin(), blades.end() ), blades.end() );
             int blades_length = blades.size();
 
-            //std::cout<<"ssss "<<test_time<<endl;
-            //approx_time=QString::fromStdString(std::to_string(test_time));
-            //approx_time=QString::fromStdString(Time2strHMS(total_time_progress,false));
-            float raw_approx_time=(average_time_tasks*tasks_running);
-            if (blades_length==0){
-                approx_time=QString::fromStdString(Time2strHMS(raw_approx_time+total_time_progress, false));
+            int percentage = block->getProgressPercentage();
+
+            QString approx_time = "-"; 
+            int time_delta = 0;
+            
+            std::map<size_t, JobTimeApproximationContainer::Ptr >::iterator m_job_time_it = m_job_time.find(hash);
+            if (m_job_time_it == m_job_time.end())
+            {
+                m_job_time[hash] = JobTimeApproximationContainer::create(percentage, curtime);
             }
-            else{
-                approx_time=QString::fromStdString(Time2strHMS(raw_approx_time/blades_length+total_time_progress, false));
+            else
+            {
+                if (m_job_time[hash]->m_progress != percentage)
+                    m_job_time[hash] = JobTimeApproximationContainer::create(percentage, curtime);
             }
 
+            if( time_started && (( state & AFJOB::STATE_DONE_MASK) == false))
+            {
+                if(( percentage > 0 ) && ( percentage < 100 ))
+                {
+                    int sec_run = m_job_time[hash]->m_time - time_started;
+                    int sec_all = sec_run * 100.0 / percentage;
+                    int eta = sec_all - sec_run;
+                    int time_delta = curtime - m_job_time[hash]->m_time;
+                    if( eta > 0 )
+                        approx_time =  QString::fromStdString( Time2strHMS( eta - time_delta, false ) );
+                }
+            }
 
+            if( time_wait > curtime )
+                approx_time = QString::fromStdString(Time2strHMS( time_wait - curtime, false  ) );
+            
             QString service = afqt::stoq( block->getService() );
             if (service=="postcmd") continue;
             if (service=="wakeonlan") continue;

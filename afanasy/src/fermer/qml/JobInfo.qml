@@ -107,6 +107,14 @@ Item{
         color: "white"
         }
     Text {
+        text: "Appr. Time To Finish "
+        anchors.right: parent.right
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
+    Text {
         text: "Tasks Running"
         anchors.right: parent.right
         font.pixelSize: parent.custom_font_size
@@ -214,6 +222,14 @@ Item{
         }
     Text {
         text: jobs_ListView.currentItem.v_blades_mask
+        anchors.left: parent.left
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
+    Text {
+        text: jobs_ListView.currentItem.v_approx_time
         anchors.left: parent.left
         font.pixelSize: parent.custom_font_size
         font.family:parent.custom_font

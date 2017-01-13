@@ -56,7 +56,7 @@ ApplicationWindow {
 
     width: 1400
     height: 800
-    minimumWidth: 1200
+    minimumWidth: 1250
     minimumHeight: 400
 
     color: "#1d262b"
@@ -66,15 +66,14 @@ ApplicationWindow {
 
         anchors.fill: parent
         Component.onCompleted:{
-            console.log(" background.visible():")
+            //console.log(" background.visible():")
         }
         visible: false
         onStatusChanged: if (background.status == Loader.Ready) visible=true
     }
 
     onOpenglContextCreated:  {
-             console.log(" rowCount():")
+             //console.log(" rowCount():")
              background.source = "root_ui.qml"
          }
-
 }

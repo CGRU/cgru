@@ -253,7 +253,7 @@ void RadiolocationStation::getTaskOutput(QString& o_str, int i_job_id, int i_blo
     std::string i_mode("output");
     std::ostringstream str;
 
-    wait_task_stdout = (i_state == TaskState::State::DONE) ? false : true ;
+    wait_task_stdout = (i_state == TaskState::State::RUNNING) ? true : false ;
     //str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"output\",\"ids\":[6],\"block_ids\":[0],\"task_ids\":[0],\"mon_id\":1,\"binary\":true}}";
     str << "{\"get\":{\"type\":\"jobs\"";
     str << ",\"mode\":\"" << i_mode << "\"";

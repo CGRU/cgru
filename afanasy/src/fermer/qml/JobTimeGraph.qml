@@ -162,13 +162,14 @@ Item{
                                 gradient.addColorStop(0, Qt.rgba(random_color[0],random_color[1],random_color[2],0.6))//1-(max_val/max)
                                 gradient.addColorStop(1, "transparent")
                                 ctx.lineTo(0,0);
+                                //console.log(" max "+max)
 
                                 for (var i = 0; i < tasks_size; i++) {
                                     //console.log(" tasktime "+i)
 
-                                    //ctx.lineTo(canvas_memory.width*TasksModel.taskTimes(11534588,i)/max, canvas_memory.height/(size-i));
-                                    //ctx.lineTo(canvas_graph.width*(TasksModel.taskTimes(job_selected_id,i)/max),
-                                    //           task_height*i);
+                                    //ctx.lineTo(canvas_graph.width*TasksModel.taskTimes(11534588,i)/max, canvas_graph.height/(size-i));
+                                    ctx.lineTo(canvas_graph.width*(TasksModel.taskTimes(job_selected_id,i)/max),
+                                               task_height*i);
                                     //console.log(" canvas_memory "+TasksModel.taskTimes(job_selected_ids,i))
                                 }
                                 ctx.lineTo(0, (tasks_size-1)*task_height);

@@ -219,7 +219,7 @@ Item {
                                          "priority": 60,
                                          "started": 100,
                                          "software": 100,
-                                         "approximate_time": 142}
+                                         "approximate_time": 90}
         property int selection
 
         Component{
@@ -641,7 +641,7 @@ Item {
            checked:transient_toggl
            onToggled: {
                transient_toggl=scrollbar_transient_menuitem.checked
-               console.log(" rowCount():"+scrollbar_transient_menuitem.checked)
+               //console.log(" rowCount():"+scrollbar_transient_menuitem.checked)
            }
        }
        MenuSeparator { }

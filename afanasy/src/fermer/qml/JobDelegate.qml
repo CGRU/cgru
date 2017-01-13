@@ -22,6 +22,7 @@ Rectangle {
     property int    v_priority: priority
     property int    v_blades_length:blades_length
     property int    v_group_size: group_size
+    property string v_approx_time:approx_time
 
       MouseArea {
           id: mouseArea

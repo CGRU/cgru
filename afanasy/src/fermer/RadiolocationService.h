@@ -19,6 +19,18 @@
 namespace afermer
 {
 
+struct JobTimeApproximationContainer
+{
+    PI_TYPEDEF_SMART_PTRS(JobTimeApproximationContainer);
+    PI_DEFINE_CREATE_FUNC_2_ARGS(JobTimeApproximationContainer, int, int);
+
+    int m_progress;
+    int m_time;
+
+    JobTimeApproximationContainer(int p, int t): m_progress(p), m_time(t) {}
+    
+};
+
 
 struct TaskContainer
 {
@@ -186,6 +198,8 @@ public:
 
 private:
     static RadiolocationService::Ptr m_single;
+
+    std::map<size_t, JobTimeApproximationContainer::Ptr > m_job_time;
 
     QList< BladeContainer::Ptr > m_resources;
 

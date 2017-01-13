@@ -87,7 +87,7 @@ Rectangle{
                 layer.enabled: true
                 color: "white"
                 opacity: 0.45
-                text: "Approx. Finish Time"
+                text: "AFT"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
             }
