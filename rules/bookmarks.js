@@ -30,6 +30,9 @@ function bm_Init()
 
 function bm_InitConfigured()
 {
+	if( false == bm_initialized )
+		return;
+
 	if( localStorage.bookmarks_opened == 'true')
 		bm_Open( false);
 	else
@@ -129,6 +132,9 @@ function bm_Compare(a,b)
 }
 function bm_Show()
 {
+	if( false == bm_initialized )
+		return;
+
 //console.log(JSON.stringify(g_auth_user.bookmarks));
 	$('bookmarks').innerHTML = '';
 	$('bookmarks_label').textContent = 'Bookmarks';
