@@ -98,6 +98,8 @@ Rectangle {
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             source:"icons/search.svg"
+            sourceSize.width: 18
+            sourceSize.height: 18
         }
         TextInput {
             id:search_text_input
@@ -135,6 +137,8 @@ Rectangle {
             anchors.rightMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             source:"icons/remove.svg"
+            sourceSize.width: 14
+            sourceSize.height: 14
             MouseArea {
                 acceptedButtons: Qt.LeftButton
                 anchors.fill: parent
@@ -215,6 +219,8 @@ Rectangle {
             anchors.verticalCenter: tooltip.verticalCenter
             image:"icons/align_left.svg"
             st_opacity: left_opacity
+            size_x: 18
+            size_y: 18
             onClicked:{
                     item_align.state="AlignLeft"
                 }
@@ -227,6 +233,8 @@ Rectangle {
             anchors.verticalCenter: tooltip.verticalCenter
             image:"icons/align_center.svg"
             st_opacity: center_opacity
+            size_x: 18
+            size_y: 18
             onClicked:{
                     item_align.state="AlignCenter"
                 }
@@ -239,6 +247,8 @@ Rectangle {
             anchors.verticalCenter: tooltip.verticalCenter
             image:"icons/align_right.svg"
             st_opacity: right_opacity
+            size_x: 18
+            size_y: 18
             onClicked:{
                     item_align.state="AlignRight"
                 }
@@ -250,7 +260,10 @@ Rectangle {
             anchors.left: parent.left
             anchors.leftMargin: 23
             anchors.verticalCenter: parent.verticalCenter
+            sourceSize.width: 151
+            sourceSize.height: 39
             anchors.verticalCenterOffset: 5
+	    
             source: "icons/fermer.svg"
         }
         Image {
@@ -258,6 +271,8 @@ Rectangle {
             y:  parent.height/2-10
             x: parent.width-60
             source: "icons/dots_menu.svg"
+            sourceSize.width: 26
+            sourceSize.height: 21
             MouseArea {
                             acceptedButtons: Qt.LeftButton
                             anchors.fill: parent
