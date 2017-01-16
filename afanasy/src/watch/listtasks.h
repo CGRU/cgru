@@ -57,6 +57,7 @@ private slots:
 	void actBlockParser();
 
 	void blockAction( int id_block, QString i_action);
+	void actBlockPreview( int num_cmd, int num_img);
 
 	void actTaskOpen();
 	void actTaskPreview( int num_cmd, int num_img);
