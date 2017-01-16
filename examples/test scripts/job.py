@@ -179,7 +179,7 @@ for b in range(numblocks):
     if not Options.stringtype and not negative_pertask:
         cmd = 'task.py'
         cmd = os.path.join(os.getcwd(), cmd)
-        cmd = 'python "%s"' % cmd
+        cmd = '$CGRU_PYTHONEXE "%s"' % cmd
         cmd += ' --exitstatus %d ' % Options.exitstatus
 
         if Options.filesout:
@@ -202,7 +202,7 @@ for b in range(numblocks):
 
     else:
         block.setCommand(
-            'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
+            '$CGRU_PYTHONEXE task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
             False
         )
 
