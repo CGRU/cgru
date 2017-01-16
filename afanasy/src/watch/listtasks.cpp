@@ -147,9 +147,44 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				action = new QAction( "Browse Files...", this);
 				connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
 				o_menu.addAction( action);
-				o_menu.addSeparator();
+				
+				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
+                if( preview_cmds.size())
+                {
+                    QMenu * submenu_cmd = new QMenu( "Preview", this);
+                    
+                    if( itemBlock->files.size() > 1)
+                    {
+                        for( int i = 0; i < itemBlock->files.size(); i++)
+                        {
+                            QMenu * submenu_img = new QMenu( afqt::stoq(itemBlock->files[i]).right(55), this);
+                            for( int p = 0; p < preview_cmds.size(); p++)
+                            {
+                                QString cmd = afqt::stoq( preview_cmds[p]);
+                                
+                                ActionIdId * actionid = new ActionIdId( p, i, QString(cmd).replace("@ARG@", afqt::stoq(itemBlock->files[i]).right(55)), this);
+                                connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
+                                submenu_img->addAction( actionid);
+                            }
+                            submenu_cmd->addMenu( submenu_img);
+                        }
+                    }
+                    else
+                    {
+                        for( int p = 0; p < preview_cmds.size(); p++)
+                        {
+                            QString cmd = afqt::stoq( preview_cmds[p]);
+                            
+                            ActionIdId * actionid = new ActionIdId( p, 0, QString(cmd).replace("@ARG@", afqt::stoq(itemBlock->files[0]).right(55)), this);
+                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
+                            submenu_cmd->addAction( actionid);
+                        }
+                    }
+                    o_menu.addMenu( submenu_cmd);
+                }
+                o_menu.addSeparator();
 			}
-
+            
 			QMenu * submenu = new QMenu( "Change Block", this);
 
 			// Operations on the current block item
@@ -732,7 +767,7 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 	std::vector<std::string> images = service.getFiles();
 	if( num_img >= images.size())
 	{
-		displayError( "No such image nubmer.");
+		displayError( "No such image number.");
 		return;
 	}
 	QString arg = afqt::stoq( images[num_img]);
@@ -749,6 +784,45 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 	cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
 	Watch::startProcess( cmd, wdir);
+}
+
+void ListTasks::actBlockPreview( int num_cmd, int num_img)
+{
+    Item* item = getCurrentItem();
+    if( item == NULL )
+    {
+        displayError( "No items selected.");
+        return;
+    }
+    if( item->getId() != ItemJobBlock::ItemId)
+    {
+        displayWarning( "This action for block only.");
+        return;
+    }
+
+    ItemJobBlock* blockitem = (ItemJobBlock*)item;
+    af::Service service( blockitem->files, blockitem->workingdir);
+
+    std::vector<std::string> images = service.getFiles();
+    if( num_img >= images.size())
+    {
+        displayError( "No such image number.");
+        return;
+    }
+    QString arg = afqt::stoq( images[num_img]);
+    QString wdir( afqt::stoq( service.getWDir()));
+
+    if( arg.isEmpty()) return;
+    if( num_cmd >= af::Environment::getPreviewCmds().size())
+    {
+        displayError( "No such command number.");
+        return;
+    }
+
+    QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
+    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+
+    Watch::startProcess( cmd, wdir);
 }
 
 void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }
