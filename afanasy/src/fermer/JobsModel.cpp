@@ -20,6 +20,7 @@ JobsModel* JobsModel::jobsModel()
 
 void JobsModel::updateInteraction(const QString& i_filter)
 {
+
     m_job.clear();
     m_RLS->get(m_job);
 
@@ -56,6 +57,7 @@ void JobsModel::updateInteraction(const QString& i_filter)
     saveSelected();
 
     m_job_size=m_job.size();
+
 
     emit dataChanged(index(0, 0), index(rowCount()-1, 0));
 }

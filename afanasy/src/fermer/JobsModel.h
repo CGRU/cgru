@@ -110,6 +110,7 @@ private:
     bool m_state_sort;
     QList<int> m_selects;
     bool m_multiselected_state=false;
+    bool m_test=true;
 
 //![2]
 };
