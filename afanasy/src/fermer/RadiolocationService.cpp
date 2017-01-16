@@ -96,6 +96,9 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
     af::MCAfNodes mcNodes( answer4.get() );
 
     std::vector<af::Af*> * list = mcNodes.getList();
+    if (int( list->size() )<1){
+        return false;
+    }
     af::Job * itemjob = (af::Job*)((*list)[0]);
 
     ostr << "{\"get\":{\"binary\":true,\"type\":\"jobs\",\"ids\":[" << job_id << "],\"mode\":\"progress\"}}";
@@ -214,7 +217,11 @@ QList<int> RadiolocationService::getTasksRawTime(int i_index)
     af::MCAfNodes mcNodes( answer4.get() );
 
     std::vector<af::Af*> * list = mcNodes.getList();
+    if (int( list->size() )<1){
+        return o_tasks;
+    }
     af::Job * itemjob = (af::Job*)((*list)[0]);
+
 
     ostr << "{\"get\":{\"binary\":true,\"type\":\"jobs\",\"ids\":[" << job_id << "],\"mode\":\"progress\"}}";
     Waves::Ptr answer5 = m_station->push(ostr);
@@ -272,6 +279,9 @@ QList<QString> RadiolocationService::getTasksFrame(int i_index)
     af::MCAfNodes mcNodes( answer4.get() );
 
     std::vector<af::Af*> * list = mcNodes.getList();
+    if (int( list->size() )<1){
+        return o_tasks;
+    }
     af::Job * itemjob = (af::Job*)((*list)[0]);
 
     const af::BlockData * block = itemjob->getBlock(block_id);
@@ -434,6 +444,9 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
     std::vector<af::Af*> * list = mcNodes.getList();
 
     int count = int( list->size() );
+    if (count<1){
+        return false;
+    }
     long long curtime = time(0);
 
     for (int i = 0 ; i < count; ++i)
@@ -442,11 +455,11 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
 
         int block_count = itemjob->getBlocksNum();
         int job_id = itemjob->getId();
-        str.str("");
-        str << "{\"get\":{\"binary\":true,\"type\":\"jobs\",\"ids\":[" << job_id << "],\"mode\":\"progress\"}}";
-        Waves::Ptr answer5 = m_station->push( str );
+        // str.str("");
+        // str << "{\"get\":{\"binary\":true,\"type\":\"jobs\",\"ids\":[" << job_id << "],\"mode\":\"progress\"}}";
+        // Waves::Ptr answer5 = m_station->push( str );
        
-        af::JobProgress progress(answer5.get());
+        // af::JobProgress progress(answer5.get());
 
         std::map<std::string,std::string> folders = itemjob->getFolders();
 
@@ -519,18 +532,18 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
             int tasks_running=0;
             long long curtime = time(0);//block->getTasksNum()
 
-            for( int t = 0; t < block->getTasksNum(); t++)
-            {
-                af::TaskProgress taskprogress = *(progress.tp[block_num][t]) ;
+            // for( int t = 0; t < block->getTasksNum(); t++)
+            // {
+            //     af::TaskProgress taskprogress = *(progress.tp[block_num][t]) ;
 
-                if (taskprogress.state & AFJOB::STATE_RUNNING_MASK){
-                    blades.push_back( QString::fromStdString(taskprogress.hostname) );
-                }
-            }
+            //     if (taskprogress.state & AFJOB::STATE_RUNNING_MASK){
+            //         blades.push_back( QString::fromStdString(taskprogress.hostname) );
+            //     }
+            // }
 
-            std::sort( blades.begin(), blades.end() );
-            blades.erase( std::unique( blades.begin(), blades.end() ), blades.end() );
-            int blades_length = blades.size();
+            // std::sort( blades.begin(), blades.end() );
+            // blades.erase( std::unique( blades.begin(), blades.end() ), blades.end() );
+            int blades_length = 0;//blades.size();
 
             int percentage = block->getProgressPercentage();
 
@@ -556,8 +569,9 @@ bool RadiolocationService::get(QList<JobObject> &o_jobs)
                     int sec_all = sec_run * 100.0 / percentage;
                     int eta = sec_all - sec_run;
                     int time_delta = curtime - m_job_time[hash]->m_time;
+                    eta -= time_delta;
                     if( eta > 0 )
-                        approx_time =  QString::fromStdString( Time2strHMS( eta - time_delta, false ) );
+                        approx_time =  QString::fromStdString( Time2strHMS( eta, false ) );
                 }
             }
 
