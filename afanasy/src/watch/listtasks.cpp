@@ -216,28 +216,34 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				if( preview_cmds.size())
 				{
 					QMenu * submenu_cmd = new QMenu( "Preview", this);
-					for( int p = 0; p < preview_cmds.size(); p++)
-					{
-						QString cmd = afqt::stoq( preview_cmds[p]);
-
-						if( files.size() > 1)
-						{
-							QMenu * submenu_img = new QMenu( cmd, this);
-							for( int i = 0; i < files.size(); i++)
-							{
-								ActionIdId * actionid = new ActionIdId( p, i, afqt::stoq(files[i]).right(55), this);
-								connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-								submenu_img->addAction( actionid);
-							}
-							submenu_cmd->addMenu( submenu_img);
-						}
-						else
-						{
-							ActionIdId * actionid = new ActionIdId( p, 0, cmd, this);
-							connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-							submenu_cmd->addAction( actionid);
-						}
-					}
+					
+					if( files.size() > 1)
+                    {
+                        for( int i = 0; i < files.size(); i++)
+                        {
+                            QMenu * submenu_img = new QMenu( afqt::stoq(files[i]).right(55), this);
+                            for( int p = 0; p < preview_cmds.size(); p++)
+                            {
+                                QString cmd = afqt::stoq( preview_cmds[p]);
+                                
+                                ActionIdId * actionid = new ActionIdId( p, i, QString(cmd).replace("@ARG@", afqt::stoq(files[i]).right(55)), this);
+                                connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+                                submenu_img->addAction( actionid);
+                            }
+                            submenu_cmd->addMenu( submenu_img);
+                        }
+                    }
+                    else
+                    {
+                        for( int p = 0; p < preview_cmds.size(); p++)
+                        {
+                            QString cmd = afqt::stoq( preview_cmds[p]);
+                            
+                            ActionIdId * actionid = new ActionIdId( p, 0, QString(cmd).replace("@ARG@", afqt::stoq(files[0]).right(55)), this);
+                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+                            submenu_cmd->addAction( actionid);
+                        }
+                    }
 					o_menu.addMenu( submenu_cmd);
 				}
 			}
