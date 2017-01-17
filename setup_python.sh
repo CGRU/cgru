@@ -12,7 +12,7 @@ if [ -z "${CGRU_PYTHONEXE}" ]; then
       [ -x "${pythonexe}" ] && export CGRU_PYTHONEXE="${python}/bin/python3"
    else
       which python3 >& /dev/null
-      [ "$?" == "0" ] && export CGRU_PYTHONEXE="python3"
+      [ "$?" = "0" ] && export CGRU_PYTHONEXE="python3"
    fi
 fi
 
