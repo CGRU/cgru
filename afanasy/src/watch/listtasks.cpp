@@ -247,7 +247,6 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				o_menu.addAction( action);
 
 				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
-
 				if( preview_cmds.size())
 				{
 					QMenu * submenu_cmd = new QMenu( "Preview", this);
@@ -260,8 +259,9 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
                             for( int p = 0; p < preview_cmds.size(); p++)
                             {
                                 QString cmd = afqt::stoq( preview_cmds[p]);
+                                QStringList cmdSplit = cmd.split("|");
                                 
-                                ActionIdId * actionid = new ActionIdId( p, i, QString(cmd).replace("@ARG@", afqt::stoq(files[i]).right(55)), this);
+                                ActionIdId * actionid = new ActionIdId( p, i, QString(cmdSplit.first()), this);
                                 connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
                                 submenu_img->addAction( actionid);
                             }
@@ -273,8 +273,9 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
                         for( int p = 0; p < preview_cmds.size(); p++)
                         {
                             QString cmd = afqt::stoq( preview_cmds[p]);
+                            QStringList cmdSplit = cmd.split("|");
                             
-                            ActionIdId * actionid = new ActionIdId( p, 0, QString(cmd).replace("@ARG@", afqt::stoq(files[0]).right(55)), this);
+                            ActionIdId * actionid = new ActionIdId( p, 0, QString(cmdSplit.first()).replace("@ARG@", afqt::stoq(files[0]).right(55)), this);
                             connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
                             submenu_cmd->addAction( actionid);
                         }
@@ -782,8 +783,9 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
 
 	QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
 	cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+	QStringList cmdSplit = cmd.split("|");
 
-	Watch::startProcess( cmd, wdir);
+	Watch::startProcess( cmdSplit.last(), wdir);
 }
 
 void ListTasks::actBlockPreview( int num_cmd, int num_img)
@@ -821,8 +823,9 @@ void ListTasks::actBlockPreview( int num_cmd, int num_img)
 
     QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
     cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+    QStringList cmdSplit = cmd.split("|");
 
-    Watch::startProcess( cmd, wdir);
+    Watch::startProcess( cmdSplit.last(), wdir);
 }
 
 void ListTasks::blockAction( int id_block, QString i_action) { blockAction( id_block, i_action, true); }
