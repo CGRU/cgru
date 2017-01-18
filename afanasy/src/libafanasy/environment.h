@@ -257,8 +257,8 @@ private:
 	static bool perm_user_mod_his_priority;
 	static bool perm_user_mod_job_priority;
 
-	static std::vector<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
-	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+	static std::vector<std::string> previewcmds;      ///< Preview commannds
+	static std::vector<std::string> rendercmds;       ///< Render commannds
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_get_events_sec;
 	static int watch_refresh_gui_sec;

@@ -41,9 +41,6 @@ QLinkedList<int>       Watch::ms_listenjobids;
 QLinkedList<int>       Watch::ms_watchtasksjobids;
 QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
 
-QStringList Watch::ms_previewcmds;
-QStringList Watch::ms_rendercmds;
-
 QMap<QString, QPixmap *> Watch::ms_services_icons_large;
 QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 
