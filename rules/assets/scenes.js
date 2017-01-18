@@ -989,6 +989,9 @@ function scenes_ExportTable()
 
 	for( var i = 0; i < elShots.length; i++)
 	{
+		if( elShots[i].m_filtered )
+			continue;
+
 		var shot = {};
 		shot.path = elShots[i].m_path;
 		shot.status = elShots[i].m_status.obj;
