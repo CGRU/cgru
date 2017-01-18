@@ -35,3 +35,16 @@ def show(i_path=None):
 def showSoftware( i_soft):
     return show('software/%s' % i_soft)
 
+def showForum( i_forum = None):
+
+    forums = dict()
+    forums['nuke']  = 20
+    forums['watch'] = 16
+
+    url = cgruconfig.VARS['forum_url']
+
+    if i_forum is not None and i_forum in forums:
+        url += '/viewforum.php?f=%d' % forums[i_forum]
+
+    cgruutils.webbrowse( url)
+

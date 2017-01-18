@@ -192,6 +192,11 @@ void Dialog::createMenus()
     connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferences() ));
     editMenu->addAction( action);
 	m_contextMenu->addAction( action);
+
+	m_helpMenu = new QMenu("&Help", this);
+	menuBar()->addMenu( m_helpMenu);
+	m_contextMenu->addMenu( m_helpMenu);
+	connect( m_helpMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuHelp()));
 }
 
 void Dialog::showMenuLevel()
@@ -263,6 +268,20 @@ void Dialog::showMenuPrefs()
     action->setChecked( afqt::QEnvironment::showOfflineNoise.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actShowOfflineNoise() ));
     m_prefsMenu->addAction( action);
+}
+
+void Dialog::showMenuHelp()
+{
+	m_helpMenu->clear();
+	QAction * action;
+
+    action = new QAction("Documentation...", m_helpMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actShowDocs() ));
+    m_helpMenu->addAction( action);
+
+    action = new QAction("Forum...", m_helpMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actShowForum() ));
+    m_helpMenu->addAction( action);
 }
 
 void Dialog::contextMenuEvent(QContextMenuEvent *event)
@@ -589,6 +608,8 @@ void Dialog::actSaveGUIOnExit()           { afqt::QEnvironment::saveGUIOnExit.n 
 void Dialog::actSaveHotkeysOnExit()       { afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n;   }
 void Dialog::actSaveWndRectsOnExit()      { afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;  }
 void Dialog::actShowOfflineNoise()        { afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;    }
+void Dialog::actShowDocs()  { Watch::showDocs();  }
+void Dialog::actShowForum() { Watch::showForum(); }
 
 void Dialog::actSavePreferences()
 {

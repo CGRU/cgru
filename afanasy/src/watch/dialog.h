@@ -62,6 +62,7 @@ private slots:
 	void showMenuLevel();
 	void showMenuTheme();
 	void showMenuPrefs();
+	void showMenuHelp();
 
     void newMessage( af::Msg * msg);
     void connectionLost();
@@ -77,6 +78,8 @@ private slots:
     void actShowOfflineNoise();
 	void actGuiTheme( QString theme);
     void actGuiLevel( int i_level);
+	void actShowDocs();
+	void actShowForum();
 
 protected:
     void contextMenuEvent( QContextMenuEvent * event);
@@ -97,6 +100,7 @@ private:
 	QMenu * m_levelMenu;
 	QMenu * m_themeMenu;
 	QMenu * m_prefsMenu;
+	QMenu * m_helpMenu;
 
     bool m_initialized;
     bool m_connected;

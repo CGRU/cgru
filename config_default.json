@@ -26,6 +26,7 @@
 	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\"","cd `dirname @ARG@` && xterm"],
 
 	"docs_host":"cgru.info",
+	"forum_url":"http://forum.cgru.info",
 
 	"":"Configure SMTP server to send emails from",
 	"email_smtp_server":"localhost",

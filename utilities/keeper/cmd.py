@@ -43,6 +43,9 @@ def showInfo():
 def cgruDocs():
 	cgrudocs.show()
 
+def cgruForum():
+	cgrudocs.showForum()
+
 
 def confReload():
 	cgruconfig.reconfigure()

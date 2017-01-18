@@ -81,6 +81,9 @@ public:
 	static void displayWarning( const QString &message);
 	static void displayError(   const QString &message);
 
+	static void showDocs();
+	static void showForum();
+
 	static bool openMonitor( int type, bool open);
 
 	static void listenJob(  int id, const QString & name);

@@ -503,3 +503,7 @@ void Watch::notify( const QString & i_title, const QString & i_msg, uint32_t i_s
 {
 	new Popup( i_title, i_msg, i_state);
 }
+
+void Watch::showDocs() { Watch::startProcess("documentation \"afanasy/gui#watch\""); }
+void Watch::showForum() { Watch::startProcess("forum \"watch\""); }
+

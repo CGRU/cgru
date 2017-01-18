@@ -241,7 +241,8 @@ class Tray(QtWidgets.QSystemTrayIcon):
         self.menu['Configure'].addAction(action)
 
         self.addAction('menu', True,  'Show Info...',         self.cgruInfo, 'info')
-        self.addAction('menu', True,  'Documentation',        cmd.cgruDocs)
+        self.addAction('menu', True,  'Documentation...',     cmd.cgruDocs)
+        self.addAction('menu', False, 'Forum...',             cmd.cgruForum)
         self.addAction('menu', True,  'Restart',              cmd.restart)
         self.addAction('menu', False, 'Quit',                 cmd.quit)
 
