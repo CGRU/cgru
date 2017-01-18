@@ -152,33 +152,24 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
                 if( preview_cmds.size())
                 {
                     QMenu * submenu_cmd = new QMenu( "Preview", this);
-                    
-                    if( itemBlock->files.size() > 1)
+                    for( int i = 0; i < itemBlock->files.size(); i++)
                     {
-                        for( int i = 0; i < itemBlock->files.size(); i++)
-                        {
-                            QMenu * submenu_img = new QMenu( afqt::stoq(itemBlock->files[i]).right(55), this);
-                            for( int p = 0; p < preview_cmds.size(); p++)
-                            {
-                                QString cmd = afqt::stoq( preview_cmds[p]);
-                                
-                                ActionIdId * actionid = new ActionIdId( p, i, QString(cmd).replace("@ARG@", afqt::stoq(itemBlock->files[i]).right(55)), this);
-                                connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
-                                submenu_img->addAction( actionid);
-                            }
-                            submenu_cmd->addMenu( submenu_img);
-                        }
-                    }
-                    else
-                    {
+                        action = new QAction( afqt::stoq(itemBlock->files[i]).right(55), this);
+                        action->setEnabled( false);
+                        QFont f = action->font();
+                        f.setItalic(true);
+                        action->setFont(f);
+                        submenu_cmd->addAction( action);
                         for( int p = 0; p < preview_cmds.size(); p++)
                         {
                             QString cmd = afqt::stoq( preview_cmds[p]);
-                            
-                            ActionIdId * actionid = new ActionIdId( p, 0, QString(cmd).replace("@ARG@", afqt::stoq(itemBlock->files[0]).right(55)), this);
+                            QStringList cmdSplit = cmd.split("|");
+                                
+                            ActionIdId * actionid = new ActionIdId( p, i, QString("    " + cmdSplit.first()), this);
                             connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
                             submenu_cmd->addAction( actionid);
                         }
+                        submenu_cmd->addSeparator();
                     }
                     o_menu.addMenu( submenu_cmd);
                 }
@@ -248,40 +239,30 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 
 				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
 				if( preview_cmds.size())
-				{
-					QMenu * submenu_cmd = new QMenu( "Preview", this);
-					
-					if( files.size() > 1)
+                {
+                    QMenu * submenu_cmd = new QMenu( "Preview", this);
+                    for( int i = 0; i < files.size(); i++)
                     {
-                        for( int i = 0; i < files.size(); i++)
-                        {
-                            QMenu * submenu_img = new QMenu( afqt::stoq(files[i]).right(55), this);
-                            for( int p = 0; p < preview_cmds.size(); p++)
-                            {
-                                QString cmd = afqt::stoq( preview_cmds[p]);
-                                QStringList cmdSplit = cmd.split("|");
-                                
-                                ActionIdId * actionid = new ActionIdId( p, i, QString(cmdSplit.first()), this);
-                                connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-                                submenu_img->addAction( actionid);
-                            }
-                            submenu_cmd->addMenu( submenu_img);
-                        }
-                    }
-                    else
-                    {
+                        action = new QAction( afqt::stoq(files[i]).right(55), this);
+                        action->setEnabled( false);
+                        QFont f = action->font();
+                        f.setItalic(true);
+                        action->setFont(f);
+                        submenu_cmd->addAction( action);
                         for( int p = 0; p < preview_cmds.size(); p++)
                         {
                             QString cmd = afqt::stoq( preview_cmds[p]);
                             QStringList cmdSplit = cmd.split("|");
-                            
-                            ActionIdId * actionid = new ActionIdId( p, 0, QString(cmdSplit.first()).replace("@ARG@", afqt::stoq(files[0]).right(55)), this);
-                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+                                
+                            ActionIdId * actionid = new ActionIdId( p, i, QString("    " + cmdSplit.first()), this);
+                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
                             submenu_cmd->addAction( actionid);
                         }
+                        submenu_cmd->addSeparator();
                     }
-					o_menu.addMenu( submenu_cmd);
-				}
+                    o_menu.addMenu( submenu_cmd);
+                }
+                o_menu.addSeparator();
 			}
 
 			o_menu.addSeparator();
