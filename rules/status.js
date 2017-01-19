@@ -1460,7 +1460,6 @@ function st_SetFramesNumber( i_num)
 	st_Show( RULES.status);
 
 	$('status_framesnum_div').classList.add('updated');
-	$('status_framesnum_div').title = 'Frames number updated\nPrevous value: ' + RULES.status.frames_num;
 }
 
 function st_SetTimeCode( i_tc)
@@ -1501,8 +1500,6 @@ function st_SetTimeCode( i_tc)
 	}
 	var timecode_finish = c_TC_FromFrame( frame_finish);
 
-//console.log( timecode_start + ' - ' + timecode_finish + ' = ' + frames_num);
-
 	if( RULES.status == null ) RULES.status = {};
 
 	if(( RULES.status.timecode_start == timecode_start ) && ( RULES.status.timecode_finish == timecode_finish ))
@@ -1510,7 +1507,23 @@ function st_SetTimeCode( i_tc)
 
 	RULES.status.timecode_start = timecode_start;
 	RULES.status.timecode_finish = timecode_finish;
-	st_Save({'timecode_start':timecode_start,'timecode_finish':timecode_finish}, null, null, null, {});
+
+	var save_fields = {};
+	save_fields.timecode_start = timecode_start;
+	save_fields.timecode_finish = timecode_finish;
+
+	var navig_params_update = {};
+		
+	if(( RULES.status.frames_num == null ) || ( RULES.status.frames_num <= 0 ))
+	{
+		RULES.status.frames_num = frames_num;
+		save_fields.frames_num = frames_num;
+		navig_params_update.frames_num = true;
+
+		st_SetElFramesNum( RULES.status, $('status_framesnum'));
+	}
+
+	st_Save( save_fields, null, null, null, navig_params_update);
 }
 
 function st_UpdateProgresses( i_path, i_progresses)
