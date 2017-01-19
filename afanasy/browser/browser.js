@@ -76,6 +76,11 @@ function g_ConfigReceived( i_obj)
 			return;
 		}
 
+		if( cgru_Config.docs_url )
+			$('docs_link').href = cgru_Config.docs_url + '/afanasy/gui#web';
+		if( cgru_Config.forum_url )
+			$('forum_link').href = cgru_Config.forum_url;
+
 		var title = 'CGRU version: ' + cgru_Environment.version;
 		title += '\nBuild at: ' + cgru_Environment.builddate;
 		$('version').textContent = cgru_Environment.version;

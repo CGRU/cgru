@@ -77,6 +77,15 @@ border: 2px solid #575757;
 cursor: pointer;
 text-align: center;
 }
+#header_panel_right {
+	float: right;
+	margin-right: 12px;
+}
+#header_panel_right > div {
+	margin: 2px;
+	padding: 4px 8px;
+	float: left;
+}
 #footeropenbutton, #headeropenbutton {
 border: 1px solid #575757;
 border-radius: 2px;
