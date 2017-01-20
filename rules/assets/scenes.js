@@ -64,7 +64,7 @@ function scene_Show()
 	var folders = g_elCurFolder.m_dir.folders;
 	for( var f = 0; f < folders.length; f++ )
 	{
-		if( c_AuxFolder( folders[f].name)) continue;
+		if( c_AuxFolder( folders[f])) continue;
 
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
@@ -257,7 +257,7 @@ function scenes_Received( i_data, i_args)
 	for( var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
-		if( c_AuxFolder( fobj.name)) continue;
+		if( c_AuxFolder( fobj)) continue;
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
@@ -288,7 +288,7 @@ function scenes_Received( i_data, i_args)
 		for( var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
-			if( c_AuxFolder( fobj.name)) continue;
+			if( c_AuxFolder( fobj)) continue;
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);

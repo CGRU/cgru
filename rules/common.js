@@ -205,12 +205,25 @@ function c_Log( i_msg)
 	c_logCount++;
 }
 
-function c_AuxFolder( i_name)
+function c_AuxFolder( i_folder)
 {
-	var name = c_PathBase( i_name);
-	for( var i = 0; i < RULES.aux_folders.length; i++)
-		if( name.toLowerCase().indexOf( RULES.aux_folders[i]) === 0 )
+	if( i_folder.status )
+	{
+		if( i_folder.status.flags && ( i_folder.status.flags.indexOf('aux') != -1 ))
 			return true;
+
+		if( i_folder.status.progress && ( i_folder.status.progress < 0 ))
+			return true;
+	}
+
+	if( i_folder.name )
+	{
+		var name = c_PathBase( i_folder.name);
+		for( var i = 0; i < RULES.aux_folders.length; i++)
+			if( name.toLowerCase().indexOf( RULES.aux_folders[i]) === 0 )
+				return true;
+	}
+
 	return false;
 }
 

@@ -466,7 +466,7 @@ function g_AppendFolder( i_elParent, i_fobject)
 	elFolder.m_elFBody = elFBody;
 	elFBody.classList.add('fbody');
 
-	if( c_AuxFolder( i_fobject.name ))
+	if( c_AuxFolder( i_fobject ))
 	{
 		i_fobject.auxiliary = true;
 		elFolder.classList.add('auxiliary');
@@ -706,8 +706,8 @@ function g_CompareFolders(a,b)
 	}
 
 	// Move auxiliary folders to bottom:
-	var a_aux = c_AuxFolder( a.name);
-	var b_aux = c_AuxFolder( b.name);
+	var a_aux = c_AuxFolder( a);
+	var b_aux = c_AuxFolder( b);
 
 	if( a_aux && ( false == b_aux )) return  1;
 	if( b_aux && ( false == a_aux )) return -1;
