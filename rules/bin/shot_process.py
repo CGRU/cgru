@@ -10,7 +10,7 @@ import sys
 
 from optparse import OptionParser
 
-ImgTypes = ['jpg','png','exr','dpx','tif','tiff','cin','tga']
+ImgTypes = ['jpg','jpeg','png','exr','dpx','tif','tiff','cin','tga']
 #MovTypes = ['mov','avi','mpg','mpeg','mp4']
 
 Parser = OptionParser(
