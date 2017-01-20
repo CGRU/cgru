@@ -150,6 +150,10 @@ class BlockParameters:
         self.tmpimage = 1
         self.pathsmap = 1
         self.imgfiles = []
+
+        # Just to add to the final job name some info, for example timecode
+        self.jobname_suffix = ''
+
         if afnode is not None:
             self.framefirst = int(afnode.knob('framefirst').value())
             self.framelast = int(afnode.knob('framelast').value())
@@ -176,6 +180,9 @@ class BlockParameters:
                     self.framefirst = frange[0]
                     self.framelast  = frange[1]
                     afnode.knob('timecode').setValue( cgruutils.timecodesFromFrameRange( frange[0], frange[1]))
+
+                    # Add timecode to a final job name:
+                    self.jobname_suffix += '.' + timecode.replace(' ','')
 
         if self.skipexisting: self.framespertask = 1
 
@@ -611,6 +618,8 @@ class JobParameters:
         self.scenename = \
             renderscenename + afcommon.filterFileName('.%s.nk' % self.jobname)
 
+        jobname = str(self.jobname)
+
         blocks = []
         for bparams in self.blocksparameters:
             block = bparams.genBlock(self.scenename)
@@ -620,12 +629,14 @@ class JobParameters:
                           (self.nodename, bparams.name))
                 return
             blocks.append(block)
+            jobname += bparams.jobname_suffix
+
         if len(blocks) == 0:
             if VERBOSE:
                 print('No blocks generated error on "%s"' % self.nodename)
             return
 
-        job = af.Job(str(self.jobname))
+        job = af.Job( jobname)
         if self.priority != -1:
             job.setPriority(self.priority)
         if self.maxhosts != -1:
