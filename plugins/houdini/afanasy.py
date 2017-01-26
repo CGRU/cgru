@@ -573,7 +573,8 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
                                    block_generate.frame_inc):
                     arguments = afnode.parm(
                         'sep_render_arguments').evalAsStringAtFrame(frame)
-                    arguments = arguments.replace('@FILES@', files)
+                    arguments = arguments.replace(
+                        '@FILES@', parm_files.evalAsStringAtFrame( frame))
 
                     for tile in range(0, tiles):
                         block_render.tasks_names.append(
