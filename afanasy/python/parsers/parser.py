@@ -12,8 +12,8 @@ class parser(object):
     """
 
     def __init__(self):
-        self.str_warning = ['warning']
-        self.str_error = ['error']
+        self.str_warning = []
+        self.str_error = []
         self.str_badresult = []
         self.str_finishedsuccess = []
         self.percent = 0
