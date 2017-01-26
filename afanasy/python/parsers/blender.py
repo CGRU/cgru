@@ -3,7 +3,7 @@ from parsers import parser
 import os
 
 # Fra:1 Mem:8.55M (11.55M, peak 29.22M) | Scene, Part 1-16
-# Saved: render/mypic.0001.jpg Time: 00:00.51
+# Saved: 'render/mypic.0001.jpg'
 
 keyframe = 'Fra:'
 
@@ -35,7 +35,7 @@ class blender(parser.parser):
 
 			if line.find('Saved: ') != -1:
 				line = line[6:]
-				self.appendFile(line.strip())
+				self.appendFile( line.strip(' \'"`;:,()[]<>{}'))
 				continue
 
 			if line.find(keyframe) < 0:
