@@ -139,6 +139,7 @@ public:
 	static inline int getRenderUpResourcesPeriod()  { return render_up_resources_period;  }
 	static inline int getRenderNice()               { return render_nice;                 }
 	static inline int getRenderZombieTime()         { return render_zombietime;           }
+	static inline int getRenderExitNoTaskTime()     { return render_exit_no_task_time;    }
 	static inline int getRenderConnectRetries()     { return render_connectretries;       }
 
 	static inline bool hasRULES() { return rules_url.size(); }
@@ -290,6 +291,7 @@ private:
 	static int render_default_maxtasks;
 	static int render_nice;       ///< Render task process nice factor.
 	static int render_zombietime;
+	static int render_exit_no_task_time;
 	static int render_connectretries;
 	static std::vector<std::string> render_windowsmustdie;
 

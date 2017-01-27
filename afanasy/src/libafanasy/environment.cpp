@@ -64,6 +64,7 @@ int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY
 int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
 int     Environment::render_zombietime =               AFRENDER::ZOMBIETIME;
+int     Environment::render_exit_no_task_time =        AFRENDER::EXIT_NO_TASK_TIME;
 int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
 
 
@@ -255,6 +256,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
 	getVar( i_obj, render_nice,                       "af_render_nice"                       );
 	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
+	getVar( i_obj, render_exit_no_task_time,          "af_render_exit_no_task_time"          );
 	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
 	getVar( i_obj, render_windowsmustdie,             "af_render_windowsmustdie"             );
 
