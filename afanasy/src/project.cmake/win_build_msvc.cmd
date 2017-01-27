@@ -9,9 +9,9 @@ setlocal EnableDelayedExpansion
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
 SET "cgru_qt_install_dir=C:\Qt"
-For /F "Tokens=*" %%I in ('dir /b "%cgru_qt_install_dir%\Qt5.7*"') Do SET "cgru_qt=%%I"
+For /F "Tokens=*" %%I in ('dir /b "%cgru_qt_install_dir%\Qt5.8*"') Do SET "cgru_qt=%%I"
 if defined cgru_qt (
-	SET "cgru_qt=!cgru_qt_install_dir!\!cgru_qt!\5.7\msvc2015_64"
+	SET "cgru_qt=!cgru_qt_install_dir!\!cgru_qt!\5.8\msvc2015_64"
 	echo Adding "!cgru_qt!" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
 )
