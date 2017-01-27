@@ -1064,6 +1064,24 @@ class Cmd:
                 return data['renders']
         return None
     
+    def renderGetId(self, i_id, i_mode=None):
+        """Missing DocString
+        :param i_id:
+        :param i_mode:
+        :return:
+        """
+        self.action = 'get'
+        self.data['type'] = 'renders'
+        self.data['ids'] = [i_id]
+        if i_mode is not None:
+            self.data['mode'] = i_mode
+        data = self._sendRequest()
+        return data
+        if data is not None:
+            if 'renders' in data:
+                return data['renders']
+        return None
+    
     def renderGetRessources(self):
         """Missing DocString
 
