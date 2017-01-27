@@ -24,6 +24,10 @@ def setFree(text='(keeper)'):
 	cmd = af.Cmd().renderSetFree(text)
 	render.refreshAfter()
 
+def setFreeUnpause(text='(keeper)'):
+	cmd = af.Cmd().renderSetFreeUnpause(text)
+	render.refreshAfter()
+
 
 def ejectTasks(text='(keeper)'):
 	cmd = af.Cmd().renderEjectTasks(text)

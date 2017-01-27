@@ -987,6 +987,18 @@ class Cmd:
         self.data['params'] = {'nimby': False}
         self._sendRequest()
 
+    def renderSetFreeUnpause(self, text):
+        """Missing DocString
+
+        :param text:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'renders'
+        self.data['mask'] = cgruconfig.VARS['HOSTNAME']
+        self.data['params'] = {'nimby':False,'paused':False}
+        self._sendRequest()
+
     def renderEjectTasks(self, text):
         """Missing DocString
 
