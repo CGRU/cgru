@@ -767,7 +767,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 			}
 
 			// Automatic Nimby Free:
-			if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isFree() == false)
+			if(( m_host.m_nimby_idlefree_time > 0 ) && isOnline() && ( isNimby() || isNIMBY())
 				&& ( currentTime - m_idle_time > m_host.m_nimby_idlefree_time ))
 			{
 				std::string log("Automatic Nimby Free: ");
