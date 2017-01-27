@@ -144,4 +144,7 @@ private:
 
 	/// Class to collect data to send to server on update.
 	af::RenderUpdate m_up;
+
+	/// Time when render has at least on task:
+	time_t m_has_tasks_time;
 };

@@ -25,6 +25,8 @@ RenderHost::RenderHost():
 	m_connection_lost_count( 0),
 	m_no_output_redirection( false)
 {
+	m_has_tasks_time = time(NULL);
+
 	if( af::Environment::hasArgument("-nor")) m_no_output_redirection = true;
 
     setOnline();
@@ -158,6 +160,18 @@ void RenderHost::refreshTasks()
     {
         m_taskprocesses[t]->refresh();
     }
+
+	// Time render has task(s):
+	if( m_taskprocesses.size())
+	{
+		m_has_tasks_time = time(NULL);
+	}
+	else if(( af::Environment::getRenderExitNoTaskTime() >= 0 ) &&
+		( time(NULL) - m_has_tasks_time >= af::Environment::getRenderExitNoTaskTime()))
+	{
+		AF_LOG << "No tasks for " << af::Environment::getRenderExitNoTaskTime() << " seconds.";
+		AFRunning = false;
+	}
 
     // Remove zombies:
     for( std::vector<TaskProcess*>::iterator it = m_taskprocesses.begin(); it != m_taskprocesses.end(); )
