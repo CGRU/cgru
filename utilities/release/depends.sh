@@ -26,7 +26,7 @@ case ${DISTRIBUTIVE} in
 		;;
 	openSUSE )
 		export DEPENDS_AFANASY="libpq5"
-		export DEPENDS_CGRU="python3-qt5 ImageMagick"
+		export DEPENDS_CGRU="python3-qt5 openexr ImageMagick"
 		;;
 	CentOS )
 		export DEPENDS_AFANASY="postgresql-libs"
