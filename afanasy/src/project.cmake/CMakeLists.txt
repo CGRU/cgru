@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.10)
+cmake_minimum_required(VERSION 2.8.8)
 project(afanasy)
 
 set(CMAKE_BUILD_TYPE "Release")

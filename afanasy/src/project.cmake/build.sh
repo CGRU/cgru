@@ -49,7 +49,11 @@ case ${DISTRIBUTIVE} in
     Debian)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread -lrt"
-		export AF_QT_VER="5"
+		if [[ "$DISTRIBUTIVE_VERSION" < "8" ]]; then
+			export AF_QT_VER="4"
+		else
+			export AF_QT_VER="5"
+		fi
         ;;
     Gentoo)
         ;;
