@@ -63,16 +63,13 @@ function fedoraArch(){
 	packages="$packages vim"
 	packages="$packages gcc-c++"
 	packages="$packages postgresql-devel"
-	packages="$packages qt-devel"
+	packages="$packages qt5-qtmultimedia-devel"
 	packages="$packages rpm-build"
 	packages="$packages git"
-	packages="$packages PyQt4"
+	packages="$packages PyQt5"
 	packages="$packages libzip libzip-devel"
-	if [[ "$DISTRIBUTIVE_VERSION" < "24" ]]; then
-		packages="$packages python-devel"
-	else
-		packages="$packages python3-devel"
-	fi
+	packages="$packages python3-devel"
+	packages="$packages OpenEXR-devel"
 
 	pkg_manager_cmd="dnf install"
 	pkg_extension=""

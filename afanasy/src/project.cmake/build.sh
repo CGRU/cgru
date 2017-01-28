@@ -68,6 +68,7 @@ case ${DISTRIBUTIVE} in
         ;;
     Fedora)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
+		export AF_QT_VER="5"
         ;;
     AltLinux)
         export ADD_CMAKE_MODULE_PATH="$PWD"
