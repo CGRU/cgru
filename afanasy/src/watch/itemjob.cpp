@@ -102,6 +102,7 @@ void ItemJob::updateValues( af::Node * i_node, int i_type)
 	description          = afqt::stoq( job->getDescription());
 	report               = afqt::stoq( job->getReport());
 	project              = afqt::stoq( job->getProject());
+	department           = afqt::stoq( job->getDepartment());
 	folders              = afqt::stoq( job->getFolders());
 	num_runningtasks     = job->getRunningTasksNumber();
 	lifetime             = job->getTimeLife();
@@ -346,10 +347,16 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 	
 	if (project.size())
 	{
-		 painter->setPen( afqt::QEnvironment::clr_textbright.c );
-		 painter->setFont( afqt::QEnvironment::f_name);
-		 painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
-		 offset += fm.width(project) + 25;
+		painter->setPen( afqt::QEnvironment::clr_textbright.c );
+		painter->setFont( afqt::QEnvironment::f_name);
+		painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, project);
+		offset += fm.width(project);
+		if (department.size())
+		{
+			painter->drawText( x+offset, y, w-10-offset-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, "(" + department + ")");
+			offset += fm.width(department);
+		}
+		offset += 25;
 	}
 	
 	painter->setPen( clrTextMain( option) );
