@@ -651,7 +651,7 @@ class Job:
             # Try to set output folder from files:
             for block in self.blocks:
                 if "files" in block.data and len(block.data["files"]):
-                    self.data["folders"]["output"] = os.path.dirname(block.data["files"][0])
+                    self.data["folders"][block.data['name']] = os.path.dirname(block.data["files"][0])
 
         obj = {"job": self.data}
         # print(json.dumps( obj))
