@@ -255,7 +255,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
                             QStringList cmdSplit = cmd.split("|");
                                 
                             ActionIdId * actionid = new ActionIdId( p, i, QString("    " + cmdSplit.first()), this);
-                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actBlockPreview(int,int) ));
+                            connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
                             submenu_cmd->addAction( actionid);
                         }
                         submenu_cmd->addSeparator();
