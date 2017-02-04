@@ -1176,8 +1176,12 @@ Status.prototype.editSave = function( i_args)
 		artists = {};
 		var elList = this.elEdit.artists;
 		for( var i = 0; i < elList.length; i++)
+		{
 			if( elList[i].m_selected )
 				artists[elList[i].m_item] = 'selected';
+			else if( elList[i].m_half_selected )
+				artists[elList[i].m_item] = 'half_selected';
+		}
 	}
 
 	if( this.elEdit.flags )
@@ -1185,8 +1189,12 @@ Status.prototype.editSave = function( i_args)
 		flags = {};
 		var elList = this.elEdit.flags;
 		for( var i = 0; i < elList.length; i++)
+		{
 			if( elList[i].m_selected )
 				flags[elList[i].m_item] = 'selected';
+			else if( elList[i].m_half_selected )
+				flags[elList[i].m_item] = 'half_selected';
+		}
 	}
 
 	if( this.elEdit.tags )
@@ -1194,8 +1202,12 @@ Status.prototype.editSave = function( i_args)
 		tags = {};
 		var elList = this.elEdit.tags;
 		for( var i = 0; i < elList.length; i++)
+		{
 			if( elList[i].m_selected )
 				tags[elList[i].m_item] = 'selected';
+			else if( elList[i].m_half_selected )
+				tags[elList[i].m_item] = 'half_selected';
+		}
 	}
 
 	if( this.elEdit_tasks.elTasks )

@@ -446,7 +446,7 @@ void Dialog::idReceived( int i_id, int i_uid)
 					ButtonMonitor::unset();
 					closeList();
 				}
-				displayWarning("You are not exist.");
+				displayWarning("You do not exist.");
 			}
 			else
 			{
