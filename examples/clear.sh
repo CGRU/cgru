@@ -8,14 +8,14 @@ examples=$PWD
 
 echo "Clearing examples in '${examples}'"
 
-folders=`ls`
 script="clear.sh"
 
-for folder in $folders; do
+for folder in *; do
    [ -d "$folder" ] || continue
-   cd $folder
+   cd "$folder"
    if [ -x "$script" ]; then
       ./$script
    fi
    cd ..
 done
+

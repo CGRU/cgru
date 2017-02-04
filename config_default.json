@@ -23,7 +23,12 @@
 
 	"open_folder_cmd":"open \"@PATH@\"",
 
-	"previewcmds":["nuke|nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay|mplay \"@ARG@\"","cd `dirname @ARG@` && xterm"],
+	"previewcmds":[
+		"Nuke|nuke -v \"@ARG@\"",
+		"Mplay|mplay \"@ARG@\"",
+		"IMDisplay|display \"@ARG@\"",
+		"XTerm Folder|cd `dirname @ARG@` && xterm"
+    ],
 
 	"docs_url":"http://cgru.info",
 	"forum_url":"http://forum.cgru.info",

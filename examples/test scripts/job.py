@@ -23,7 +23,7 @@ parser.add_option('-t', '--time',         dest='timesec',      type='float',  de
 parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
 parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
 parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
-parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
+parser.add_option(      '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
@@ -33,7 +33,7 @@ parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    de
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
 parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
 parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
-parser.add_option(      '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file')
+parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file')
 parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
 parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
 parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
@@ -185,7 +185,7 @@ for b in range(numblocks):
         if Options.filesout:
             cmd += ' --filesout "%s"' % Options.filesout
             block.skipExistingFiles()
-            block.checkRenderedFiles( 10, 1000000)
+            block.checkRenderedFiles( 100)
             block.setFiles(Options.filesout.split(';'))
 
         cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
