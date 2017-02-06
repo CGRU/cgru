@@ -585,8 +585,10 @@ ButtonMenu::ButtonMenu( const QString & i_file, const QString & i_wdir,
 	for( ; it != af::Environment::getPreviewCmds().end(); it++)
 	{
 		QString cmd( afqt::stoq(*it));
-		m_labels.append( cmd);
-		cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, m_file);
+		QStringList cmdSplit = cmd.split("|");
+		
+		m_labels.append( cmdSplit.first());
+		cmd = cmdSplit.last().replace( AFWATCH::CMDS_ARGUMENT, m_file);
 		m_cmds.append( cmd);
 	}
 
