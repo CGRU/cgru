@@ -32,5 +32,8 @@ set "MAYA_SCRIPT_PATH=%MAYA_CGRU_LOCATION%\mel\AETemplates;%MAYA_SCRIPT_PATH%"
 set "MAYA_PLUG_IN_PATH=%MAYA_CGRU_LOCATION%\mll\%MAYA_VERSION%;%MAYA_PLUG_IN_PATH%"
 set "XBMLANGPATH=%MAYA_CGRU_LOCATION%\icons"
 
+rem Disable the Customer Improvement Program
+set "MAYA_DISABLE_CIP=1"
+
 rem Add Afanasy scripts:
 set "MAYA_SCRIPT_PATH=%MAYA_CGRU_LOCATION%\afanasy;%MAYA_SCRIPT_PATH%"
