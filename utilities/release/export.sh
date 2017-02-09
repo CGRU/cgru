@@ -76,6 +76,7 @@ rcopy utilities/regexp $dest/utilities
 createDir $dest/plugins
 rcopy plugins/afterfx $dest/plugins
 rcopy plugins/c4d $dest/plugins
+rcopy plugins/clarisse $dest/clarisse
 rcopy plugins/blender $dest/plugins
 rcopy plugins/fusion $dest/plugins
 rcopy plugins/houdini $dest/plugins

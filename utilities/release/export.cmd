@@ -40,6 +40,7 @@ xcopy utilities\regexp %dest%\utilities\regexp\ /ys
 
 xcopy plugins %dest%\plugins\ /y
 xcopy plugins\afterfx %dest%\plugins\afterfx\ /ys
+xcopy plugins\clarisse %dest%\plugins\clarisse\ /ys
 xcopy plugins\c4d %dest%\plugins\c4d\ /ys
 xcopy plugins\blender %dest%\plugins\blender\ /ys
 xcopy plugins\fusion %dest%\plugins\fusion\ /ys
