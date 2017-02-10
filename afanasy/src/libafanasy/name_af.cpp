@@ -35,6 +35,7 @@ af::Farm* ferma = NULL;
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 #ifdef WINNT
 bool LaunchProgramV(
@@ -203,8 +204,10 @@ bool af::init( uint32_t flags)
    AFINFO("af::init:\n");
    if( flags & InitFarm)
    {
-      AFINFO("af::init: trying to load farm\n");
-      if( loadFarm( flags & InitVerbose) == false)  return false;
+      AFINFO("af::init: trying to load farm.");
+
+      if( loadFarm( flags & InitVerbose ? VerboseOn : VerboseOff) == false)
+		  return false;
    }
    return true;
 }
@@ -214,42 +217,43 @@ af::Farm * af::farm()
    return ferma;
 }
 
-bool af::loadFarm( bool verbose)
+bool af::loadFarm( VerboseMode i_verbose)
 {
 	std::string filename = af::Environment::getAfRoot() + "/farm.json";
-	if( loadFarm( filename,  verbose) == false)
+	if( loadFarm( filename, i_verbose) == false)
 	{
 		filename = af::Environment::getAfRoot() + "/farm_example.json";
-		if( loadFarm( filename,  verbose) == false)
+		if( loadFarm( filename, i_verbose) == false)
 		{
-			AFERRAR("Can't load default farm settings file:\n%s\n", filename.c_str());
+			AF_ERR << "Can't load default farm settings file:\n" << filename;
 			return false;
 		}
 	}
 	return true;
 }
 
-bool af::loadFarm( const std::string & filename, bool verbose )
+bool af::loadFarm( const std::string & filename, VerboseMode i_verbose)
 {
-   af::Farm * new_farm = new Farm( filename);//, verbose);
-   if( new_farm == NULL)
-   {
-      AFERROR("af::loadServices: Can't allocate memory for farm settings")
-      return false;
-   }
-   if( false == new_farm->isValid())
-   {
-      delete new_farm;
-      return false;
-   }
-   if( ferma != NULL)
-   {
-      new_farm->servicesLimitsGetUsage( *ferma);
-      delete ferma;
-   }
-   ferma = new_farm;
-   if( verbose) ferma->stdOut( true);
-   return true;
+	af::Farm * new_farm = new Farm( filename);
+
+	if( false == new_farm->isValid())
+	{
+		delete new_farm;
+		return false;
+	}
+
+	if( ferma != NULL)
+	{
+		new_farm->servicesLimitsGetUsage( *ferma);
+		delete ferma;
+	}
+
+	ferma = new_farm;
+
+	if( i_verbose == VerboseOn)
+		ferma->stdOut( true);
+
+	return true;
 }
 
 void af::destroy()

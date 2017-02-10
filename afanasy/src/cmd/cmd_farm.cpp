@@ -17,7 +17,7 @@ CmdFarm::~CmdFarm(){}
 bool CmdFarm::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string filename( argv[0]);
-	af::loadFarm( filename,  true);
+	af::loadFarm( filename, af::VerboseOn);
 	return true;
 }
 

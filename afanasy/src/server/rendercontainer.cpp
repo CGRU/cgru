@@ -10,6 +10,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 RenderContainer::RenderContainer():
 	AfContainer( "Renders", AFRENDER::MAXCOUNT)
@@ -90,6 +91,33 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs
 	}
 
    return NULL;
+}
+
+bool RenderContainer::farmLoad( std::string & o_status, MonitorContainer * i_monitors)
+{
+	AF_LOG << "Reloading farm.";
+
+	if( false == af::loadFarm( af::VerboseOn))
+	{
+		o_status = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
+		AF_ERR << o_status;
+
+		return false;
+	}
+
+	RenderContainerIt rendersIt( this);
+	for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+	{
+		render->getFarmHost();
+
+		if( i_monitors )
+			i_monitors->addEvent( af::Monitor::EVT_renders_change, render->getId());
+	}
+
+	o_status = "Farm reloaded successfully.";
+	AF_LOG << o_status;
+
+	return true;
 }
 
 //##############################################################################

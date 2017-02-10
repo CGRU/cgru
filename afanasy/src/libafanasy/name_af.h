@@ -170,8 +170,8 @@ namespace af
 	bool  init( uint32_t flags );
 	void  destroy();
 
-	bool  loadFarm( bool verbose = false);
-	bool  loadFarm( const std::string & filename, bool verbose = false);
+	bool  loadFarm( VerboseMode i_verbose = VerboseOff);
+	bool  loadFarm( const std::string & filename, VerboseMode i_verbose = VerboseOff);
 	Farm * farm();
 
 
