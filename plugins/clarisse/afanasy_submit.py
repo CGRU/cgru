@@ -235,12 +235,29 @@ def processArchive():
     Archive = Archive.replace('@TIME@',time.strftime('%y%m%d%H%M%S'))
     
     if Fields['archive_save'].isChecked():
+        if not checkCreateFolder( os.path.dirname( Archive),'Archive'):
+            Archive = None
+            return
         print('AF: Saving archive to render:')
         print( Archive)
         if not ix.application.export_render_archive( Archive):
             Archive = None
 
+def checkCreateFolder( i_folder, i_name):
+    i_folder = os.path.normpath( i_folder)
+    if os.path.isdir( i_folder):
+        return True
+    if QtWidgets.QMessageBox.question( None,
+            '%s Folder' % i_name,
+            '%s\ndoes not exist, create it?' % i_folder,
+            QtWidgets.QMessageBox.Abort | QtWidgets.QMessageBox.Ok ) == QtWidgets.QMessageBox.Ok:
+        os.makedirs( i_folder)
+        return True
+    return False
+
 def enableJobSend(): Fields['btn_send'].setEnabled( True)
+
+def enableJobSendDelayed( i_seconds = 1): QtCore.QTimer.singleShot( i_seconds * 1000, enableJobSend)
 
 def createJob():
 
@@ -259,6 +276,13 @@ def createJob():
     processArchive()
     if Archive is None:
         displayInfo('Unable to save render archive.')
+        enableJobSendDelayed()
+        return
+
+    # Check images folder:
+    if not checkCreateFolder( os.path.dirname( Fields['output'].text()),'Output'):
+        displayInfo('Images folder does not exist.')
+        enableJobSendDelayed()
         return
 
     # Job object:
@@ -302,7 +326,7 @@ def createJob():
     status, data = job.send()
     if status:
         displayInfo( json.dumps(data))
-        QtCore.QTimer.singleShot( 1000, enableJobSend)
+        enableJobSendDelayed()
     else:
         if Fields['archive_save'].isChecked():
             print('AF: Removing render archive.')
