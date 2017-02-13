@@ -1,4 +1,4 @@
-#include "pattern.h"
+#include "farmpattern.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -6,7 +6,7 @@
 
 using namespace af;
 
-Pattern::Pattern( const std::string & patternName):
+FarmPattern::FarmPattern( const std::string & patternName):
    ptr_next( NULL),
    name( patternName),
    clear_services( false),
@@ -14,33 +14,33 @@ Pattern::Pattern( const std::string & patternName):
 {
 }
 
-Pattern::~Pattern()
+FarmPattern::~FarmPattern()
 {
 }
 
-bool Pattern::isValid() const
+bool FarmPattern::isValid() const
 {
    if( name.size() == 0 )
    {
-      AFERROR("Pattern::isValid: name is empty.")
+      AFERROR("FarmPattern::isValid: name is empty.")
       return false;
    }
    if( regexp.empty())
    {
-      AFERRAR("Pattern::isValid: \"%s\" mask is empty.", name.c_str())
+      AFERRAR("FarmPattern::isValid: \"%s\" mask is empty.", name.c_str())
       return false;
    }
    return true;
 }
 
-void Pattern::getHost( Host & newhost) const
+void FarmPattern::getHost( Host & newhost) const
 {
    if( clear_services) newhost.clearServices();
    else if( remservices.size()) newhost.remServices( remservices);
    newhost.merge( host);
 }
 
-void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
+void FarmPattern::generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	if( full)
 	{
@@ -66,7 +66,7 @@ void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 	}
 }
 
-void Pattern::stdOut( bool full) const
+void FarmPattern::stdOut( bool full) const
 {
    std::ostringstream stream;
    generateInfoStream( stream, full);

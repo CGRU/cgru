@@ -11,12 +11,29 @@
 		"":"if you drop maxhosts or maxcount paramter it will be '-1'",
 		"":"-1 means no limit",
 
+	"pools":[
+		{
+			"name":"local",
+			"pools":[
+				{"name":"aux"},
+				{"name":"blender"},
+				{"name":"natron"}
+			]
+		},{
+			"name":"remote",
+			"pools":[
+				{"name":"blender"},
+				{"name":"natron"}
+			]
+		}
+	],
+
 	"patterns":[
 	{
 		"name":"Some Host",
 		"mask":".*",
 			"":"Mask '.*' will match any render name. So here defined some default settings for any host.",
-
+		"pool":"local",
 		"description":"Default machine",
 		"capacity":1100,
 		"maxtasks":10,
@@ -92,6 +109,7 @@
 
 		"name":"Linux Render",
 		"mask":"linux_render.*",
+		"pool":"local",
 		"description":"Linux render farm machine.",
 		"capacity":10000,
 		"maxtasks":100,
@@ -103,6 +121,7 @@
 
 		"name":"Server",
 		"mask":"server.*|srv.*",
+		"pool":"local/aux",
 		"description":"Captain.",
 		"capacity":1100,
 		"maxtasks":2,

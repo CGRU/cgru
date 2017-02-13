@@ -176,7 +176,7 @@ bool Farm::getFarm( const JSON & i_obj)
 	{
 		if( false == patterns[i].IsObject() )
 		{
-			AFERRAR("Farm: Pattern[%d] is not an object.", i)
+			AFERRAR("Farm: FarmPattern[%d] is not an object.", i)
 			return false;
 		}
 
@@ -189,12 +189,12 @@ bool Farm::getFarm( const JSON & i_obj)
 
 		if( name.empty())
 		{
-			AFERRAR("Pattern[%d] has no name.", i)
+			AFERRAR("FarmPattern[%d] has no name.", i)
 			return false;
 		}
 		if( mask.empty())
 		{
-			AFERRAR("Pattern '%s' has an empty hosts name mask.", name.c_str())
+			AFERRAR("FarmPattern '%s' has an empty hosts name mask.", name.c_str())
 			return false;
 		}
 
@@ -246,7 +246,7 @@ bool Farm::getFarm( const JSON & i_obj)
 				jr_string("name", service_name, services[j]);
 				if( name.empty())
 				{
-					AFERRAR("Farm: Pattern['%s'] service[%d] has no name.", name.c_str(), j)
+					AFERRAR("Farm: FarmPattern['%s'] service[%d] has no name.", name.c_str(), j)
 					return false;
 				}
 
@@ -256,7 +256,7 @@ bool Farm::getFarm( const JSON & i_obj)
 			}
 		}
 
-		Pattern * pat = new Pattern( name);
+		FarmPattern * pat = new FarmPattern( name);
 		pat->setMask( mask);
 		pat->setDescription( description);
 		if( clear_services )
@@ -348,22 +348,22 @@ void Farm::addServiceLimit( const std::string & name, int maxcount, int maxhosts
 	m_servicelimits[name] = new ServiceLimit( maxcount, maxhosts);
 }
 
-bool Farm::addPattern( Pattern * pattern)
+bool Farm::addPattern( FarmPattern * i_pattern)
 {
-	if( pattern->isValid() == false)
+	if( i_pattern->isValid() == false)
 	{
-		AFERRAR("Farm::addPattern: invalid pattern \"%s\"", pattern->getName().c_str())
+		AFERRAR("Farm::addPattern: invalid pattern \"%s\"", i_pattern->getName().c_str())
 		return false;
 	}
 	if( m_ptr_first == NULL)
 	{
-		m_ptr_first = pattern;
+		m_ptr_first = i_pattern;
 	}
 	else
 	{
-		m_ptr_last->ptr_next = pattern;
+		m_ptr_last->ptr_next = i_pattern;
 	}
-	m_ptr_last = pattern;
+	m_ptr_last = i_pattern;
 	m_count++;
 	return true;
 }
@@ -371,7 +371,7 @@ bool Farm::addPattern( Pattern * pattern)
 void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << "Farm filename = \"" << m_filename << "\":";
-	Pattern * pattern = m_ptr_first;
+	FarmPattern * pattern = m_ptr_first;
 	while( pattern != NULL)
 	{
 		stream << std::endl;
@@ -401,8 +401,8 @@ void Farm::stdOut( bool full) const
 
 bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const
 {
-	Pattern * ptr = NULL;
-	for( Pattern * p = m_ptr_first; p != NULL; p = p->ptr_next)
+	FarmPattern * ptr = NULL;
+	for( FarmPattern * p = m_ptr_first; p != NULL; p = p->ptr_next)
 	{
 		if( p->match( hostname)) ptr = p;
 		if( ptr == NULL) continue;

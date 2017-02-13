@@ -5,11 +5,11 @@
 
 namespace af
 {
-class Pattern
+class FarmPattern
 {
 public:
-   Pattern( const std::string & patternName);
-   ~Pattern();
+   FarmPattern( const std::string & patternName);
+   ~FarmPattern();
 
    bool isValid() const;
 
@@ -30,7 +30,7 @@ public:
 
    inline bool match( const std::string & hostname) const { return regexp.match( hostname); }
 
-   Pattern * ptr_next;
+   FarmPattern * ptr_next;
 
 private:
    std::string name;

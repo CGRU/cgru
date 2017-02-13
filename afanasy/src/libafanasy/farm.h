@@ -2,7 +2,7 @@
 
 #include <map>
 
-#include "pattern.h"
+#include "farmpattern.h"
 
 namespace af
 {
@@ -39,7 +39,7 @@ public:
 
 	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-	bool addPattern( Pattern * p);
+	bool addPattern( FarmPattern * p);
 
 	void stdOut( bool full = false ) const;
 
@@ -69,8 +69,8 @@ private:
 	std::string m_filename;
 	std::string m_text;
 
-	Pattern * m_ptr_first;
-	Pattern * m_ptr_last;
+	FarmPattern * m_ptr_first;
+	FarmPattern * m_ptr_last;
 
 	/// Services limits description:
 	std::map< std::string, ServiceLimit * > m_servicelimits;
