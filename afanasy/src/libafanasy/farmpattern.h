@@ -30,8 +30,6 @@ public:
 
    inline bool match( const std::string & hostname) const { return regexp.match( hostname); }
 
-   FarmPattern * ptr_next;
-
 private:
    std::string name;
    std::string description;

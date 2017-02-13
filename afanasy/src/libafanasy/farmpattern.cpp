@@ -7,7 +7,6 @@
 using namespace af;
 
 FarmPattern::FarmPattern( const std::string & patternName):
-   ptr_next( NULL),
    name( patternName),
    clear_services( false),
    description("")
