@@ -115,10 +115,7 @@ void ServiceLimit::getLimits( const ServiceLimit & i_other)
 //############################################## Farm ########################################
 
 Farm::Farm( const std::string & File, bool Verbose ):
-	m_count( 0),
 	m_filename( File),
-	m_ptr_first( NULL),
-	m_ptr_last( NULL),
 	m_valid( false)
 {
 	if( false == pathFileExists( m_filename))
@@ -313,12 +310,9 @@ bool Farm::getFarm( const JSON & i_obj)
 
 Farm::~Farm()
 {
-	while( m_ptr_first != NULL)
-	{
-		m_ptr_last = m_ptr_first;
-		m_ptr_first = m_ptr_first->ptr_next;
-		delete m_ptr_last;
-	}
+	for( int i = 0; i < m_patterns.size(); i++)
+		delete m_patterns[i];
+
 	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
 		delete (*it).second;
 }
@@ -355,28 +349,20 @@ bool Farm::addPattern( FarmPattern * i_pattern)
 		AFERRAR("Farm::addPattern: invalid pattern \"%s\"", i_pattern->getName().c_str())
 		return false;
 	}
-	if( m_ptr_first == NULL)
-	{
-		m_ptr_first = i_pattern;
-	}
-	else
-	{
-		m_ptr_last->ptr_next = i_pattern;
-	}
-	m_ptr_last = i_pattern;
-	m_count++;
+
+	m_patterns.push_back( i_pattern);
+
 	return true;
 }
 
 void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
 {
 	stream << "Farm filename = \"" << m_filename << "\":";
-	FarmPattern * pattern = m_ptr_first;
-	while( pattern != NULL)
+
+	for( int i = 0; i < m_patterns.size(); i++)
 	{
 		stream << std::endl;
-		pattern->generateInfoStream( stream, full);
-		pattern = pattern->ptr_next;
+		m_patterns[i]->generateInfoStream( stream, full);
 	}
 
 	if( m_servicelimits.empty()) return;
@@ -401,17 +387,29 @@ void Farm::stdOut( bool full) const
 
 bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const
 {
-	FarmPattern * ptr = NULL;
-	for( FarmPattern * p = m_ptr_first; p != NULL; p = p->ptr_next)
+	bool found = false;
+
+	int index = 0;
+	for( int i; i < m_patterns.size(); i++)
 	{
-		if( p->match( hostname)) ptr = p;
-		if( ptr == NULL) continue;
-		ptr->getHost( host);
+		if( false == m_patterns[i]->match( hostname))
+			continue;
+
+		found = true;
+		index = i;
+
+		// We should get (update) host on each next match.
+		// As next pattern can be based on previous.
+		m_patterns[index]->getHost( host);
 	}
-	if( ptr == NULL ) return false;
-	name = ptr->getName();
-	description = ptr->getDescription();
-	return true;
+
+	if( found )
+	{
+		name = m_patterns[index]->getName();
+		description = m_patterns[index]->getDescription();
+	}
+
+	return found;
 }
 
 bool Farm::serviceLimitCheck( const std::string & service, const std::string & hostname) const

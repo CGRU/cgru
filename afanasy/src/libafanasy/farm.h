@@ -63,14 +63,12 @@ public:
 	inline const std::string & getText() const { return m_text; }
 
 private:
-	int m_count;
 	bool m_valid;
 
 	std::string m_filename;
 	std::string m_text;
 
-	FarmPattern * m_ptr_first;
-	FarmPattern * m_ptr_last;
+	std::vector<FarmPattern *> m_patterns;
 
 	/// Services limits description:
 	std::map< std::string, ServiceLimit * > m_servicelimits;
