@@ -4,6 +4,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq install \
  	libpq5 \
  	libpython2.7 \
+ 	libpython3.5 \
  	python3-sip \
  	tcpdump \
  	telnet \
