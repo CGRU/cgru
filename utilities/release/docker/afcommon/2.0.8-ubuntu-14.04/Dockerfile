@@ -1,5 +1,4 @@
 FROM ubuntu:14.04
-MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq install \
@@ -12,6 +11,8 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq clean \
  && rm -rf /var/lib/apt/lists/*
 
+LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>"
+
 ENV CGRU_VERSION="2.0.8" CGRU_UBUNTU_VERSION="14.04.3"
 LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
 
@@ -20,7 +21,7 @@ ADD http://downloads.sourceforge.net/project/cgru/${CGRU_VERSION}/cgru.${CGRU_VE
 RUN tar xzvf cgru*.tar.gz \
  && dpkg -i cgru-common*.deb afanasy-common*.deb afanasy-server*.deb afanasy-render*.deb \
  && rm -rf *
- 
+
 ADD https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux /usr/local/bin/ep
 COPY docker-entrypoint.sh /
 RUN chmod +rx /usr/local/bin/ep /docker-entrypoint.sh \

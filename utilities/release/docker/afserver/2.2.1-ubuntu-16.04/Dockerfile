@@ -1,7 +1,7 @@
-FROM cgru/afcommon:2.1.0-ubuntu-16.04
+FROM cgru/afcommon:2.2.1-ubuntu-16.04
 
 LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>"
-LABEL cgru_container_version="1.3.0"
+LABEL cgru_container_version="1.0.0"
 
 USER root
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \

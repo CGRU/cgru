@@ -13,7 +13,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
 
 LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>"
 
-ENV CGRU_VERSION="2.1.0" CGRU_UBUNTU_VERSION="14.04.4"
+ENV CGRU_VERSION="2.2.1" CGRU_UBUNTU_VERSION="14.04.5"
 LABEL cgru_version=$CGRU_VERSION cgru_container_version="1.0.0"
 
 WORKDIR /tmp

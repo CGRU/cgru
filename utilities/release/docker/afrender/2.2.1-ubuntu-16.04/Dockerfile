@@ -1,7 +1,7 @@
-FROM cgru/afcommon:2.1.0-ubuntu-14.04
+FROM cgru/afcommon:2.2.1-ubuntu-16.04
 
 LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>"
-LABEL cgru_container_version="1.3.0"
+LABEL cgru_container_version="1.0.0"
 
 ENV AF_SERVER_WAIT="yes"
 

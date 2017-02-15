@@ -1,5 +1,6 @@
-FROM cgru/afcommon:2.1.0-ubuntu-14.04
-MAINTAINER Alexandre Buisine <alexandrejabuisine@gmail.com>
+FROM cgru/afcommon:2.2.1-ubuntu-14.04
+
+LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>"
 LABEL cgru_container_version="1.0.0"
 
 USER root
