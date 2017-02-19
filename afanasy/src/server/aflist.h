@@ -1,6 +1,5 @@
 #pragma once
 
-#include "solver.h"
 #include "afnodesrv.h"
 
 class AfListIt;
@@ -20,9 +19,7 @@ public:
 
 	int add( AfNodeSrv * i_node);    ///< Add node to list.
 
-	/// Solve nodes list:
-	inline bool solve( af::Node::SolvingMethod i_method, RenderAf * i_render, MonitorContainer * i_monitoring)
-		{ return Solver::SolveList( m_nodes_list, i_method, i_render, i_monitoring);}
+	inline std::list<AfNodeSrv*> & getStdList() { return m_nodes_list; }
 
 	void moveNodes( const std::vector<int32_t> & i_list, int i_type);
 

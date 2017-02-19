@@ -338,7 +338,7 @@ bool UserAf::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 		solve_method = af::Node::SolveByPriority;
 	}
 
-	if( m_jobslist.solve( solve_method, i_render, i_monitoring))
+	if( Solver::SolveList( m_jobslist.getStdList(), solve_method, i_render, i_monitoring))
 	{
 		// Increase running tasks / total capacity if render is online
 		// It can be online for WOL wake test
