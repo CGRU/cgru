@@ -57,19 +57,19 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 // Functor for sorting algorithm
 struct GreaterNeed : public std::binary_function<AfNodeSrv*,AfNodeSrv*,bool>
 {
-    inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
-    {
-        return a->greaterNeed( b);
-    }
+	inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
+	{
+		return a->greaterNeed( b);
+	}
 };
 
 // Other functor for an alternative sorting algorithm
 struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSrv*,AfNodeSrv*,bool>
 {
-    inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
-    {
-        return a->greaterPriorityThenOlderCreation( b);
-    }
+	inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
+	{
+		return a->greaterPriorityThenOlderCreation( b);
+	}
 };
 
 void Solver::solve()
@@ -193,48 +193,47 @@ bool Solver::SolveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod 
 		RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	if( i_list.size() == 0 )
-    {
-        // No nodes - no solve needed
-        return false;
-    }
-
-    std::list<AfNodeSrv*> solvelist;
-    for( std::list<AfNodeSrv*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
 	{
-//printf("AfNodeSrv::solvelist: name = %s\n", (*it)->m_node->m_name.c_str());
-        if((*it)->v_canRunOn( i_render))
-       {
-		   solvelist.push_back(*it);
-       }
+		// No nodes - no solve needed
+		return false;
 	}
 
-    if( solvelist.size() == 0 )
-    {
-        // No nodes to solve
-        return false;
-    }
+	std::list<AfNodeSrv*> solvelist;
+	for( std::list<AfNodeSrv*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
+	{
+//printf("AfNodeSrv::solvelist: name = %s\n", (*it)->m_node->m_name.c_str());
+		if((*it)->v_canRunOn( i_render))
+		{
+			solvelist.push_back(*it);
+		}
+	}
 
-    // If not just do it by order, we should sort it:
-    if( i_method != af::Node::SolveByOrder )
-    {
-        if (af::Environment::getSolvingSimpler())
-            solvelist.sort( GreaterPriorityThenOlderCreation());
-        else
-            solvelist.sort( GreaterNeed());
-        
-    }
+	if( solvelist.size() == 0 )
+	{
+		// No nodes to solve
+		return false;
+	}
 
-    // Try to solve most needed node
-    for( std::list<AfNodeSrv*>::iterator it = solvelist.begin(); it != solvelist.end(); it++)
-    {
-        if((*it)->trySolve( i_render, i_monitoring))
-        {
-            // Return true - that some node was solved
-           return true;
-        }
-    }
+	// If not just do it by order, we should sort it:
+	if( i_method != af::Node::SolveByOrder )
+	{
+		if (af::Environment::getSolvingSimpler())
+			solvelist.sort( GreaterPriorityThenOlderCreation());
+		else
+			solvelist.sort( GreaterNeed());
+	}
 
-    // Return false - that no nodes was not solved
-    return false;
+	// Try to solve most needed node
+	for( std::list<AfNodeSrv*>::iterator it = solvelist.begin(); it != solvelist.end(); it++)
+	{
+		if((*it)->trySolve( i_render, i_monitoring))
+		{
+			// Return true - that some node was solved
+			return true;
+		}
+	}
+
+	// Return false - that no nodes was not solved
+	return false;
 }
 
