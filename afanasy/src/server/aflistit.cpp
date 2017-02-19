@@ -40,8 +40,8 @@ void AfListIt::next()
 
 void AfListIt::reset()
 {
-   m_it = m_list->nodes_list.begin();
-   m_it_end = m_list->nodes_list.end();
+   m_it = m_list->m_nodes_list.begin();
+   m_it_end = m_list->m_nodes_list.end();
    if( m_it == m_it_end)
    {
        return;

@@ -65,9 +65,8 @@ public:
 	/** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
 	virtual bool v_canRunOn( RenderAf * i_render);
 
-	/// Solve nodes list:
-	static bool solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod i_method, RenderAf * i_render,
-				MonitorContainer * i_monitoring);
+	// Try to solve a node, v_solve is called there:
+	bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
 
 	/// Main solving function should be implemented in child classes (if solving needed):
 	virtual bool v_solve( RenderAf * i_render, MonitorContainer * i_monitoring);
@@ -88,8 +87,6 @@ protected:
 	virtual void v_calcNeed();
 
 private:
-	// Try to solve a node
-	bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 

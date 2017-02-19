@@ -9,6 +9,7 @@
 #include "aflistit.h"
 #include "jobaf.h"
 #include "renderaf.h"
+#include "solver.h"
 #include "monitorcontainer.h"
 #include "usercontainer.h"
 

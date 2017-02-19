@@ -9,6 +9,7 @@
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
+#include "solver.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -23,32 +24,6 @@ extern bool AFRunning;
 // Messages reaction case function
 void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg);
 
-struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
-{
-	inline bool operator()( const RenderAf * a, const RenderAf * b)
-	{
-		if( a->getTasksNumber() < b->getTasksNumber()) return true;
-		if( a->getTasksNumber() > b->getTasksNumber()) return false;
-
-		if( a->getCapacityFree() > b->getCapacityFree()) return true;
-		if( a->getCapacityFree() < b->getCapacityFree()) return false;
-
-		if( a->getPriority() > b->getPriority()) return true;
-		if( a->getPriority() < b->getPriority()) return false;
-
-		if( a->getTasksStartFinishTime() < b->getTasksStartFinishTime()) return true;
-		if( a->getTasksStartFinishTime() > b->getTasksStartFinishTime()) return false;
-
-		if( a->getCapacity() > b->getCapacity()) return true;
-		if( a->getCapacity() < b->getCapacity()) return false;
-
-		if( a->getMaxTasks() > b->getMaxTasks()) return true;
-		if( a->getMaxTasks() < b->getMaxTasks()) return false;
-
-		return a->getName().compare( b->getName()) < 0;
-	}
-};
-
 /** This is a main run cycle thread entry point
 **/
 void threadRunCycle( void * i_args)
@@ -56,6 +31,9 @@ void threadRunCycle( void * i_args)
 	AF_LOG << "Main thread started.";
 
 	ThreadArgs * a = (ThreadArgs*)i_args;
+
+	// Jobs solving class:
+	Solver solver( a->jobs, a->renders, a->users, a->monitors);
 
 	// Save store to store start time:
 	AFCommon::saveStore();
@@ -113,125 +91,12 @@ void threadRunCycle( void * i_args)
 	a->renders  ->refresh( a->jobs,     a->monitors);
 	a->users    ->refresh( NULL,        a->monitors);
 
-	{
+
 	//
 	// Jobs sloving:
 	//
-	AFINFO("ThreadRun::run: Solving jobs:")
-
-	int tasks_solved = 0;
-	std::list<RenderAf*> renders;
-	std::list<RenderAf*> solved_renders;
-
-	RenderContainerIt rendersIt( a->renders);
-	for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-		renders.push_back( render);
-
-	renders.sort( MostReadyRender());
-
-	// ask every ready render to produce a task
-	for( std::list<RenderAf*>::iterator rIt = renders.begin(); rIt != renders.end(); rIt++)
-	{
-		if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
-			( tasks_solved >= af::Environment::getServeTasksSpeed()))
-			break;
-
-		RenderAf * render = *rIt;
-
-		if( render->isReady())
-		{
-			// store render Id if it produced a task
-			bool solved;
-			if (af::Environment::getSolvingUseUserPriority())
-				solved = a->users->solve( render, a->monitors);
-			else
-				solved = a->jobs->solve( render, a->monitors);
-			if(solved)
-			{
-				solved_renders.push_back( render);
-				tasks_solved++;
-				continue;
-			}
-		}
-
-		// Render not solved, needed to update render status
-		render->notSolved();
-	}
-
-	// cycle on renders, which produced a task
-	static const int renders_cycle_limit = 100;
-	int renders_cycle = 0;
-	while( solved_renders.size())
-	{
-		renders_cycle++;
-		if( renders_cycle > renders_cycle_limit )
-		{
-			AFERRAR("Renders solve cycles reached limit %d.", renders_cycle_limit)
-			break;
-		}
-
-		if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
-			( tasks_solved >= af::Environment::getServeTasksSpeed()))
-			break;
-
-		solved_renders.sort( MostReadyRender());
-
-		AFINFA("ThreadRun::run: Renders on cycle: %d", int(solved_renders.size()))
-		std::list<RenderAf*>::iterator rIt = solved_renders.begin();
-		while( rIt != solved_renders.end())
-		{
-			if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
-				( tasks_solved >= af::Environment::getServeTasksSpeed()))
-				break;
-
-			RenderAf * render = *rIt;
-			if( render->isReady())
-			{
-				bool solved;
-				if (af::Environment::getSolvingUseUserPriority())
-					solved = a->users->solve( render, a->monitors);
-				else
-					solved = a->jobs->solve( render, a->monitors);
-				if(solved)
-				{
-					rIt++;
-					tasks_solved++;
-					continue;
-				}
-			}
-
-			// delete render id from list if it can't produce a task
-			rIt = solved_renders.erase( rIt);
-		}
-	}
-	}// - jobs solving
-
-	{
-	//
-	// Wake-On-Lan:
-	//
-	AFINFO("ThreadRun::run: Wake-On-Lan:")
-	RenderContainerIt rendersIt( a->renders);
-	{
-		for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-		{
-			if( render->isWOLWakeAble())
-			{
-				bool solved;
-				if (af::Environment::getSolvingUseUserPriority())
-					solved = a->users->solve( render, a->monitors);
-				else
-					solved = a->jobs->solve( render, a->monitors);
-				if(solved)
-				{
-					render->wolWake( a->monitors, std::string("Automatic waking by a job."));
-					continue;
-				}
-			}
-		}
-	}
-	}// - wake-on-lan
-
+	solver.solve();
+	
 	//
 	// Dispatch events to monitors:
 	//

@@ -453,3 +453,19 @@ void AfContainer::sortPriority( AfNodeSrv * i_node)
 	std::list<AfList*>::iterator end_it = i_node->m_lists.end();
 	while( it != end_it) (*it++)->sortPriority( i_node);
 }
+
+const std::list<AfNodeSrv*> AfContainer::getNodesStdList()
+{
+	std::list<AfNodeSrv*> list;
+
+	for( AfNodeSrv * node = m_first_ptr; node != NULL; node = node->m_next_ptr )
+	{
+		if( node->m_node->isZombie())
+			continue;
+
+        list.push_back( node);
+	}
+
+    return list;
+}
+

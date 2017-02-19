@@ -29,6 +29,8 @@ public:
 	/// Generate nodes message matching provided ids or mask:
 	af::Msg * generateList( int i_type, const std::string & i_type_name, const std::vector<int32_t> & i_ids, const std::string & i_mask, bool i_json);
 
+	const std::list<AfNodeSrv*> getNodesStdList();
+
 	bool setZombie( int id);
 
 	/// Free zombie nodes memory.

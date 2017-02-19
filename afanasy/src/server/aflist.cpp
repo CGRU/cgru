@@ -15,10 +15,14 @@
    Just use an AVL tree! An stl sorted container for example.
 */
 
+AfList::AfList()
+{
+}
+
 AfList::~AfList()
 {
-	std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
-	std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
+	std::list<AfNodeSrv*>::iterator it = m_nodes_list.begin();
+	std::list<AfNodeSrv*>::iterator end_it = m_nodes_list.end();
 
    while( it != end_it)
 	  (*it++)->m_lists.remove( this);
@@ -28,33 +32,33 @@ int AfList::add( AfNodeSrv *node)
 {
 	int index = -1;
 
-	for( std::list<AfNodeSrv*>::const_iterator it = nodes_list.begin(); it != nodes_list.end(); it++)
+	for( std::list<AfNodeSrv*>::const_iterator it = m_nodes_list.begin(); it != m_nodes_list.end(); it++)
 		if( *it == node )
 		{
 			AFERROR("AfList::add: node already exists.");
 			return index;
 		}
 
-	if( nodes_list.size() != 0 )
+	if( m_nodes_list.size() != 0 )
 	{
-		std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
-		std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
+		std::list<AfNodeSrv*>::iterator it = m_nodes_list.begin();
+		std::list<AfNodeSrv*>::iterator end_it = m_nodes_list.end();
 		bool lessPriorityFound = false;
 		while( it != end_it)
 		{
 			index++;
 			if( **it >= *node ) { it++; continue;}
 
-			nodes_list.insert( it, node);
+			m_nodes_list.insert( it, node);
 
 			lessPriorityFound = true;
 			break;
 		}
 		if( lessPriorityFound == false )
-			nodes_list.push_back( node);
+			m_nodes_list.push_back( node);
 	}
 	else
-		nodes_list.push_back( node);
+		m_nodes_list.push_back( node);
 
 	index++;
 	node->m_lists.push_back( this);
@@ -62,31 +66,31 @@ int AfList::add( AfNodeSrv *node)
 	return index;
 }
 
-void AfList::remove( AfNodeSrv *node)
+void AfList::remove( AfNodeSrv * i_node)
 {
-   nodes_list.remove(node);
-   node->m_lists.remove(this);
+   m_nodes_list.remove( i_node);
+   i_node->m_lists.remove( this);
 }
 
 int AfList::sortPriority( AfNodeSrv * i_node)
 {
-   if( nodes_list.size() < 2 )
+   if( m_nodes_list.size() < 2 )
    {
       return -1;
    }
 
    int index = -1;
 
-   nodes_list.remove( i_node);
-   std::list<AfNodeSrv*>::iterator it = nodes_list.begin();
-   std::list<AfNodeSrv*>::iterator end_it = nodes_list.end();
+   m_nodes_list.remove( i_node);
+   std::list<AfNodeSrv*>::iterator it = m_nodes_list.begin();
+   std::list<AfNodeSrv*>::iterator end_it = m_nodes_list.end();
    bool lessPriorityFound = false;
 
    while( it != end_it)
    {
       index++;
       if( **it >= *i_node ) { it++; continue;}
-      nodes_list.insert( it, i_node);
+      m_nodes_list.insert( it, i_node);
       lessPriorityFound = true;
       break;
    }
@@ -94,7 +98,7 @@ int AfList::sortPriority( AfNodeSrv * i_node)
    if( lessPriorityFound == false )
    {
       index++;
-      nodes_list.push_back( i_node);
+      m_nodes_list.push_back( i_node);
    }
 
    return index;
@@ -128,8 +132,8 @@ printf("AfList::moveNodes:\n");
 //    creating move nodes list
 //
 	std::list<AfNodeSrv*> move_list;
-	std::list<AfNodeSrv*>::iterator it_begin = nodes_list.begin();
-	std::list<AfNodeSrv*>::iterator it_end   = nodes_list.end();
+	std::list<AfNodeSrv*>::iterator it_begin = m_nodes_list.begin();
+	std::list<AfNodeSrv*>::iterator it_end   = m_nodes_list.end();
 	std::list<AfNodeSrv*>::iterator it = it_begin;
    while( it != it_end)
    {
@@ -184,7 +188,7 @@ printf("Found a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node-
 //printf("Processing node \"%s\"-%d\n", node->getName().c_str(), node->getId());
 printf("Processing node \"%s\"-%d\n",  node->m_node->m_name.c_str(), node->m_node->m_id );
 #endif
-      std::list<AfNodeSrv*>::iterator it_insert = nodes_list.begin();
+      std::list<AfNodeSrv*>::iterator it_insert = m_nodes_list.begin();
       while( it_insert != it_end)
       {
          if((*it_insert) == node) break;
@@ -294,8 +298,8 @@ printf("AfList::MoveBottom:\n");
 #ifdef AFOUTPUT
 printf("Pushing node back\n");
 #endif
-         nodes_list.remove( node);
-         nodes_list.push_back( node);
+         m_nodes_list.remove( node);
+         m_nodes_list.push_back( node);
          continue;
       }
       AfNodeSrv * node_move = (*it_insert);
@@ -317,16 +321,16 @@ printf("Node is already at it's position.\n");
 //printf("Inserting at \"%s\"-%d\n", node_move->getName().c_str(), node_move->getId());
 printf("Inserting at \"%s\"-%d\n", node_move->m_node->m_name.c_str(), node_move->m_node->m_id );
 #endif
-      nodes_list.remove( node);
-      nodes_list.insert( it_insert, node);
+      m_nodes_list.remove( node);
+      m_nodes_list.insert( it_insert, node);
    }
 }
 
 const std::vector<int32_t> AfList::generateIdsList() const
 {
 	std::vector<int32_t> ids;
-	std::list<AfNodeSrv*>::const_iterator it = nodes_list.begin();
-	while( it != nodes_list.end())
+	std::list<AfNodeSrv*>::const_iterator it = m_nodes_list.begin();
+	while( it != m_nodes_list.end())
 		ids.push_back( (*(it++))->m_node->m_id);
 
 	return ids;

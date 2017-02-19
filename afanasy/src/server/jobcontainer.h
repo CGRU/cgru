@@ -41,8 +41,6 @@ public:
 	const std::vector<int32_t> getIdsBySerials( const std::vector<int64_t> & i_serials);
 
 	void getWeight( af::MCJobsWeight & jobsWeight );
-
-	bool solve( RenderAf * i_render, MonitorContainer * i_monitoring);
 };
 
 //########################## Iterator ##############################

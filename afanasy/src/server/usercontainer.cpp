@@ -93,9 +93,6 @@ int UserContainer::addUser( UserAf * i_user)
 	if( false == add( i_user))
 		return 0;
 
-	// Add user to solving list:
-	m_userslist.add( i_user);
-
 	// Initialize user:
 	if( false == i_user->initialize())
 		return 0;
@@ -139,12 +136,6 @@ af::Msg * UserContainer::addUser( UserAf * i_user, MonitorContainer * i_monitori
 	i_user->v_jsonWrite( str, /*type no matter*/ 0);
 	str << "\n}";
 	return af::jsonMsg( str);
-}
-
-bool UserContainer::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
-{
-//printf("\nUserContainer::genTask: render - %s\n", render->getName().c_str());
-	return m_userslist.solve( af::Node::SolveByPriority, i_render, i_monitoring);
 }
 
 af::Msg* UserContainer::generateJobsList( int id)
