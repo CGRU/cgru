@@ -88,6 +88,7 @@ public:
 	static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
 	static inline const std::vector<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get preview commands
+	static inline const std::vector<std::string> & getAnnotations()     { return annotations;} ///< Get predefined annotations
 	static inline const std::vector<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
 	static inline const std::vector<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
 
@@ -259,6 +260,7 @@ private:
 	static bool perm_user_mod_job_priority;
 
 	static std::vector<std::string> previewcmds;      ///< Preview commannds
+	static std::vector<std::string> annotations;      ///< Predefined annotations
 	static std::vector<std::string> rendercmds;       ///< Render commannds
 	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
 	static int watch_get_events_sec;

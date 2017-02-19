@@ -69,6 +69,7 @@ protected:
 
 private slots:
 	void actAnnotate();
+	void actAnnotate(QString text);
 	void actPriority();
 	void actCustomData();
 

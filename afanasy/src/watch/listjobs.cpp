@@ -275,6 +275,24 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 		  menu.addAction( action);
 	}
 	menu.addSeparator();
+	
+	submenu = new QMenu( "Annotation", this);
+	
+	const std::vector<std::string> annotations = af::Environment::getAnnotations();
+	for( int p = 0; p < annotations.size(); p++)
+	{
+		QString annotation = afqt::stoq( annotations[p]);
+		ActionString * action_str = new ActionString(annotation, annotation, this);
+		connect( action_str, SIGNAL( triggeredString(QString) ), this, SLOT( actAnnotate(QString) ));
+		submenu->addAction( action_str);
+	}
+	action = new QAction( "Custom", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+	submenu->addAction( action);
+	
+	menu.addMenu( submenu);
+	
+	menu.addSeparator();
 
 	submenu = new QMenu( "Set Parameter", this);
 
@@ -337,9 +355,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu->addSeparator();
 
-	action = new QAction( "Annotation", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-	submenu->addAction( action);
 	action = new QAction( "Custom Data", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
 	submenu->addAction( action);

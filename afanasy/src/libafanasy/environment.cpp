@@ -160,6 +160,7 @@ Passwd * Environment::passwd = NULL;
 
 std::vector<std::string> Environment::platform;
 std::vector<std::string> Environment::previewcmds;
+std::vector<std::string> Environment::annotations;
 std::vector<std::string> Environment::rendercmds;
 std::vector<std::string> Environment::rendercmds_admin;
 std::vector<std::string> Environment::ip_trust;
@@ -201,6 +202,7 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, filenamesizemax,                   "filenamesizemax"                      );
 	getVar( i_obj, timeformat,                        "timeformat"                           );
 	getVar( i_obj, previewcmds,                       "previewcmds"                          );
+	getVar( i_obj, annotations,                       "annotations"                          );
 	getVar( i_obj, cmd_shell,                         "cmd_shell"                            );
 
 	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"                );
