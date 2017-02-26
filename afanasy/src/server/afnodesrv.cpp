@@ -184,25 +184,25 @@ void AfNodeSrv::v_action( Action & i_action)
 
 void AfNodeSrv::v_priorityChanged( MonitorContainer * i_monitoring ){}
 
-/// Main solving functions should be implemented in child classes (if solving needed):
-bool AfNodeSrv::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
+/// Solving function should be implemented in child classes (if solving needed):
+RenderAf * AfNodeSrv::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
-    AFERRAR("AfNodeSrv::solve(): Not implemented on '%s'.", m_node->m_name.c_str())
-    return false;
+    AF_ERR << "AfNodeSrv::solve(): Not implemented: " <<  m_node->m_name.c_str();
+    return NULL;
 }
 void AfNodeSrv::v_calcNeed()
 {
-    AFERRAR("AfNodeSrv::calcNeed(): Not implememted on '%s'.\n", m_node->m_name.c_str())
+    AF_ERR << "AfNodeSrv::calcNeed(): Not implememted: " << m_node->m_name.c_str();
     calcNeedResouces(-1);
 }
 bool AfNodeSrv::v_canRun()
 {
-    AFERRAR("AfNodeSrv::canRun(): Not implememted on '%s'.\n", m_node->m_name.c_str())
+    AF_ERR << "AfNodeSrv::canRun(): Not implememted: " << m_node->m_name.c_str();
     return false;
 }
 bool AfNodeSrv::v_canRunOn( RenderAf * i_render)
 {
-    AFERRAR("AfNodeSrv::canRunOn(): Not implememted on '%s'.\n", m_node->m_name.c_str())
+    AF_ERR << "AfNodeSrv::canRunOn(): Not implememted: " << m_node->m_name.c_str();
     return false;
 }
 
@@ -236,14 +236,15 @@ bool AfNodeSrv::greaterPriorityThenOlderCreation( const AfNodeSrv * i_other) con
     return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-
 /// Try so solve a Node
-bool AfNodeSrv::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
+RenderAf * AfNodeSrv::trySolve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
-    if( false == v_solve( i_render, i_monitoring))
+    RenderAf * render = v_solve( i_renders_list, i_monitoring);
+
+    if( NULL == render )
     {
-        // Returning that node was not solved
-        return false;
+        // Was not solved
+        return NULL;
     }
 
     // Node solved successfully:
@@ -259,7 +260,7 @@ bool AfNodeSrv::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
     sm_solve_cycle++;
 
     // Returning that node was solved
-    return true;
+    return render;
 //printf("AfNodeSrv::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
 }
 

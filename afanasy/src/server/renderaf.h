@@ -79,7 +79,7 @@ public:
 	af::Msg * update( const af::RenderUpdate & i_up);
 
 	// Called directly from solve cycle if it was not solved.
-	void notSolved();
+	void solvingFinished();
 
 	// Need for server to write some farm parameters (gui double-click):
 	af::Msg * writeFullInfo( bool binary) const;

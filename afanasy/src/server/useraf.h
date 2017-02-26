@@ -40,7 +40,8 @@ public:
 	/** Used to limit nodes for heavy solve algorithm **/
 	bool v_canRunOn( RenderAf * i_render);
 
-	bool v_solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
+	/// Generate task for \c render from list, return \c render if task generated or NULL.
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring); 
 
 	void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 	

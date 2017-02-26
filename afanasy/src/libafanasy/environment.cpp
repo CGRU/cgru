@@ -35,16 +35,18 @@ int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORI
 int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
 
-int     Environment::serve_tasks_speed =               AFJOB::SERVE_TASKS_SPEED;
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
 int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOUT;
 int     Environment::task_stop_timeout =               AFJOB::TASK_STOP_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 int     Environment::task_progress_change_timeout =    AFJOB::TASK_PROGRESS_CHANGE_TIMEOUT;
-/// Task solving options
-bool    Environment::solving_use_capacity =            AFJOB::SOLVING_USE_CAPACITY;
-bool    Environment::solving_use_user_priority =       AFJOB::SOLVING_USE_USER_PRIORITY;
-bool    Environment::solving_simpler =                 AFJOB::SOLVING_SIMPLER;
+
+/// Jobs solving options:
+bool    Environment::solving_use_capacity =            AFSERVER::SOLVING_USE_CAPACITY;
+bool    Environment::solving_use_user_priority =       AFSERVER::SOLVING_USE_USER_PRIORITY;
+bool    Environment::solving_simpler =                 AFSERVER::SOLVING_SIMPLER;
+int     Environment::solving_tasks_speed =             AFSERVER::SOLVING_TASKS_SPEED;
+int     Environment::solving_wake_per_cycle =          AFSERVER::SOLVING_WAKE_PER_CYCLE;
 
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 
@@ -233,7 +235,6 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, so_client_TCP_CORK,                "af_so_client_TCP_CORK"                );
 
 
-	getVar( i_obj, serve_tasks_speed,                 "af_serve_tasks_speed"                 );
 	getVar( i_obj, task_default_capacity,             "af_task_default_capacity"             );
 	getVar( i_obj, task_update_timeout,               "af_task_update_timeout"               );
 	getVar( i_obj, task_stop_timeout,                 "af_task_stop_timeout"                 );
@@ -243,6 +244,8 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, solving_use_capacity,              "af_solving_use_capacity"              );
 	getVar( i_obj, solving_use_user_priority,         "af_solving_use_user_priority"         );
 	getVar( i_obj, solving_simpler,                   "af_solving_simpler"                   );
+	getVar( i_obj, solving_tasks_speed,               "af_solving_tasks_speed"               );
+	getVar( i_obj, solving_wake_per_cycle,            "af_solving_wake_per_cycle"            );
 
 	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
 	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );

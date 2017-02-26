@@ -783,7 +783,7 @@ void RenderAf::v_refresh( time_t currentTime,  AfContainer * pointer, MonitorCon
 	}
 }
 
-void RenderAf::notSolved()
+void RenderAf::solvingFinished()
 {
 	// If render was busy but has no tasks after solve it is not busy now
 	// Needed not to reset busy render status if it run one task after other

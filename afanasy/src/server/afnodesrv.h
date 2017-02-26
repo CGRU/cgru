@@ -66,10 +66,12 @@ public:
 	virtual bool v_canRunOn( RenderAf * i_render);
 
 	// Try to solve a node, v_solve is called there:
-	bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
+//bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
+	RenderAf * trySolve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring);
 
-	/// Main solving function should be implemented in child classes (if solving needed):
-	virtual bool v_solve( RenderAf * i_render, MonitorContainer * i_monitoring);
+	/// Solving function should be implemented in child classes (if solving needed):
+	/// Generate task for \c some render from list, return \c render if task generated or NULL.
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring);
 
 	/// Compare nodes solving need:
 	bool greaterNeed( const AfNodeSrv * i_other) const;

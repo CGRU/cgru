@@ -68,7 +68,7 @@ public:
 	bool v_canRunOn( RenderAf * i_render);
 
 	/// Solve a job. Job send ready task to Render, if any.
-	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring);
 
 	/// Update task state.
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
@@ -152,6 +152,8 @@ private:
 private:
 	void initializeValues();
 	void initStoreDirs();
+
+	bool solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring);
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 

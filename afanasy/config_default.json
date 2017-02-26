@@ -70,11 +70,6 @@
 	"af_priority":99,
 	"af_maxrunningtasks":-1,
 
-	"af_serve_tasks_speed":-1,
-		"":"Server tasks solving speed limit (~tasks/second)",
-		"":"You can set this parameter to zero to pause job solving (see docs to reload config 'on-the-fly')",
-		"":"'-1' means unlimited.",
-
 "":"Job:",
 	"af_task_default_capacity":1000,
 	"af_task_default_service":"generic",
@@ -225,6 +220,15 @@
 	"af_solving_simpler":false,
 		"":"Use a simplified solving algorithm. No notion of 'need' is used: jobs are",
 		"":"sorted by priority first, and creation date then (older first).",
+
+	"af_solving_tasks_speed":-1,
+		"":"Server tasks solving speed limit (~tasks/second)",
+		"":"You can set this parameter to zero to pause job solving (see docs to reload config 'on-the-fly')",
+		"":"'-1' means unlimited.",
+
+	"af_solving_wake_per_cycle":1,
+		"":"Number of afrenders that can be waken per solve cycle (per second).",
+		"":"Zero or nagative value will disable Wake-On-Lan at all (in a default farm setup it is disabled).",
 
 	"":""
 }}

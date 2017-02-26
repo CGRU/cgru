@@ -561,13 +561,13 @@ bool SysJob::v_canRun()
 	return JobAf::v_canRun();
 }
 
-bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
+RenderAf * SysJob::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring)
 {
 //printf("SysJob::solve():\n");
 	if( isReady())
-		return JobAf::v_solve( render, monitoring);
+		return JobAf::v_solve( i_renders_list, monitoring);
 
-	return false;
+	return NULL;
 }
 
 void SysJob::v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)

@@ -805,12 +805,6 @@ bool JobAf::v_canRun()
 
 bool JobAf::v_canRunOn( RenderAf * i_render)
 {
-	if( false == v_canRun())
-	{
-		// Unable to run at all
-		return false;
-	}
-	
 	// Check Render Nimby:
 	if( false == isIgnoreNimbyFlag())
 	{
@@ -875,7 +869,18 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	return true;
 }
 
-bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
+RenderAf * JobAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
+{
+	for( std::list<RenderAf*>::iterator rIt = i_renders_list.begin(); rIt != i_renders_list.end(); rIt++)
+	{
+		if( solveOnRender( *rIt, i_monitoring))
+			return *rIt;
+	}
+
+	return NULL;
+}
+
+bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	// Prepare for the new solving (reset previous solvind stored data):
 	for( int b = 0; b < m_blocks_num; b++)
@@ -895,7 +900,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 	{
 		if( false == ( m_blocks_data[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 		
-		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags, render);
+		int task_num = m_blocks_data[b]->getReadyTaskNumber( m_progress->tp[b], m_flags, i_render);
 		
 		if( task_num == AFJOB::TASK_NUM_NO_TASK )
 		{
@@ -920,7 +925,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		}
 		
 		std::list<int> blocksIds;
-		af::TaskExec *task_exec = genTask( render, b, task_num, &blocksIds, monitoring);
+		af::TaskExec *task_exec = genTask( i_render, b, task_num, &blocksIds, i_monitoring);
 		
 		// Job may became paused, if recursion during task generation detected:
 		if( m_state & AFJOB::STATE_OFFLINE_MASK )
@@ -931,7 +936,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		
 		// Check if render is online
 		// It can be solved with offline render to check whether to WOL wake it
-		if( task_exec && render->isOffline())
+		if( task_exec && i_render->isOffline())
 		{
 			delete task_exec;
 			return true;
@@ -947,7 +952,7 @@ bool JobAf::v_solve( RenderAf *render, MonitorContainer * monitoring)
 		// Job was not able to start a task.
 		// This should not happen.
 		// This is some error situation (probably system job), see server log.
-		if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, render, monitoring))
+		if( false == m_blocks[task_exec->getBlockNum()]->v_startTask( task_exec, i_render, i_monitoring))
 		{
 			delete task_exec;
 			continue;

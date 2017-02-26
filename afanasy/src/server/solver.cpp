@@ -14,17 +14,26 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
+JobContainer     * Solver::ms_jobcontainer    = NULL;
+RenderContainer  * Solver::ms_rendercontainer = NULL;
+UserContainer    * Solver::ms_usercontainer   = NULL;
+MonitorContainer * Solver::ms_monitorcontaier = NULL;
+
+int Solver::ms_solve_cycles_limit = 100000;
+int Solver::ms_awaken_renders;
+
 Solver::Solver(
 		JobContainer     * i_jobcontainer,
 		RenderContainer  * i_rendercontainer,
 		UserContainer    * i_usercontainer,
 		MonitorContainer * i_monitorcontainer
-	):
-	m_jobcontainer    ( i_jobcontainer     ),
-	m_rendercontainer ( i_rendercontainer  ),
-	m_usercontainer   ( i_usercontainer    ),
-	m_monitorcontaier ( i_monitorcontainer )
-{}
+	)
+{
+	ms_jobcontainer    = i_jobcontainer;
+	ms_rendercontainer = i_rendercontainer;
+	ms_usercontainer   = i_usercontainer;
+	ms_monitorcontaier = i_monitorcontainer;
+}
 
 Solver::~Solver(){}
 
@@ -75,165 +84,128 @@ struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSrv*
 void Solver::solve()
 {
 	//
-	// Jobs sloving:
+	// Jobs solving:
 	//
 	AF_DEBUG << "Solving jobs...";
 
-	int tasks_solved = 0;
-
+	// Get initial solve nodes list:
 	std::list<AfNodeSrv*> solve_list;
 	if( af::Environment::getSolvingUseUserPriority())
-		solve_list = m_usercontainer->getNodesStdList();
+		solve_list = ms_usercontainer->getNodesStdList();
 	else
-		solve_list = m_jobcontainer->getNodesStdList();
+		solve_list = ms_jobcontainer->getNodesStdList();
 
-	std::list<RenderAf*> renders;
-	std::list<RenderAf*> solved_renders;
+//########################################
 
-	RenderContainerIt rendersIt( m_rendercontainer);
-	for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-		renders.push_back( render);
+	int solve_cycle = 0;
+	int tasks_solved = 0;
+	ms_awaken_renders = 0;
 
-	renders.sort( MostReadyRender());
-
-	// ask every ready render to produce a task
-	for( std::list<RenderAf*>::iterator rIt = renders.begin(); rIt != renders.end(); rIt++)
+	// Run solve cycle:
+	while( solve_list.size())
 	{
-		if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
-			( tasks_solved >= af::Environment::getServeTasksSpeed()))
-			break;
-
-		RenderAf * render = *rIt;
-
-		if( render->isReady())
+		// Increment cycle and check limit:
+		solve_cycle++;
+		if( solve_cycle > ms_solve_cycles_limit )
 		{
-			bool solved = SolveList( solve_list, af::Node::SolveByPriority, render, m_monitorcontaier);
+			// This should not happen.
+			// Most probably it is a bug in solving code.
+			AF_WARN << "Solve reached cycles limit: " << ms_solve_cycles_limit;
+			break;
+		}
 
-			if( solved)
+		// Function exits on each solve success (just 1 task solved),
+		// removes nodes that was not solved from list.
+		RenderAf * render = SolveList( solve_list, af::Node::SolveByPriority);
+		if( render )
+		{
+			// Check Wake-On-LAN:
+			if( render->isWOLWakeAble())
 			{
-				// store render Id if it produced a task
-				solved_renders.push_back( render);
+				AF_DEBUG << "Solving waking up render '" << render->node()->getName() << "'.";
+				render->wolWake( ms_monitorcontaier, std::string("Automatic waking by a job."));
+				ms_awaken_renders++;
+			}
+			else
 				tasks_solved++;
-				continue;
-			}
 		}
 
-		// Render not solved, needed to update render status
-		render->notSolved();
-	}
-
-	// cycle on renders, which produced a task
-	static const int renders_cycle_limit = 100;
-	int renders_cycle = 0;
-	while( solved_renders.size())
-	{
-		renders_cycle++;
-		if( renders_cycle > renders_cycle_limit )
+		// Check tasks solving speed limit:
+		if(( af::Environment::getSolvingTasksSpeed() >= 0 ) &&
+			( tasks_solved >= af::Environment::getSolvingTasksSpeed()))
 		{
-			AFERRAR("Renders solve cycles reached limit %d.", renders_cycle_limit)
 			break;
 		}
-
-		if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
-			( tasks_solved >= af::Environment::getServeTasksSpeed()))
-			break;
-
-		solved_renders.sort( MostReadyRender());
-
-		AFINFA("ThreadRun::run: Renders on cycle: %d", int(solved_renders.size()))
-		std::list<RenderAf*>::iterator rIt = solved_renders.begin();
-		while( rIt != solved_renders.end())
-		{
-			if(( af::Environment::getServeTasksSpeed() >= 0 ) &&
-				( tasks_solved >= af::Environment::getServeTasksSpeed()))
-				break;
-
-			RenderAf * render = *rIt;
-			if( render->isReady())
-			{
-				bool solved = SolveList( solve_list, af::Node::SolveByPriority, render, m_monitorcontaier);
-
-				if( solved)
-				{
-					rIt++;
-					tasks_solved++;
-					continue;
-				}
-			}
-
-			// delete render id from list if it can't produce a task
-			rIt = solved_renders.erase( rIt);
-		}
 	}
 
-	//
-	// Wake-On-Lan:
-	//
-	AF_DEBUG << "Wake-On-Lan...";
+	AF_DEBUG << "Solved " << tasks_solved << " tasks within " << solve_cycle << " cycles.";
 
-	rendersIt.reset();
-
-	for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-	{
-		if( render->isWOLWakeAble())
-		{
-			bool solved = SolveList( solve_list, af::Node::SolveByPriority, render, m_monitorcontaier);
-
-			if( solved)
-			{
-				render->wolWake( m_monitorcontaier, std::string("Automatic waking by a job."));
-				continue;
-			}
-		}
-	}
+	// This needed to set render not busy if has no tasks.
+	// This prevents not to reset render busy state if it runs tasks one by one.
+	RenderContainerIt rendersIt( ms_rendercontainer);
+	for( RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+		render->solvingFinished();
 }
 
-/// Static function to solve nodes list:
-bool Solver::SolveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod i_method,
-		RenderAf * i_render, MonitorContainer * i_monitoring)
+RenderAf * Solver::SolveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod i_method)
 {
-	if( i_list.size() == 0 )
+	// Remove node that need no solving at all (done, offline, ...)
+	for( std::list<AfNodeSrv*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
-		// No nodes - no solve needed
-		return false;
+		if((*it)->v_canRun())
+			it++;
+		else
+			it = i_list.erase( it);
 	}
 
-	std::list<AfNodeSrv*> solvelist;
-	for( std::list<AfNodeSrv*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
-	{
-//printf("AfNodeSrv::solvelist: name = %s\n", (*it)->m_node->m_name.c_str());
-		if((*it)->v_canRunOn( i_render))
-		{
-			solvelist.push_back(*it);
-		}
-	}
-
-	if( solvelist.size() == 0 )
-	{
-		// No nodes to solve
-		return false;
-	}
-
-	// If not just do it by order, we should sort it:
+	// Sort list if needed.
+	// ( there is not need to sort when solving user jobs by list order )
 	if( i_method != af::Node::SolveByOrder )
 	{
-		if (af::Environment::getSolvingSimpler())
-			solvelist.sort( GreaterPriorityThenOlderCreation());
+		if( af::Environment::getSolvingSimpler())
+			i_list.sort( GreaterPriorityThenOlderCreation());
 		else
-			solvelist.sort( GreaterNeed());
+			i_list.sort( GreaterNeed());
 	}
 
-	// Try to solve most needed node
-	for( std::list<AfNodeSrv*>::iterator it = solvelist.begin(); it != solvelist.end(); it++)
+	// Iterate solving nodes list:
+	for( std::list<AfNodeSrv*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
-		if((*it)->trySolve( i_render, i_monitoring))
+		// Get renders:
+		std::list<RenderAf*> renders_list;
+		RenderContainerIt rendersIt( ms_rendercontainer);
+		for( RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
 		{
-			// Return true - that some node was solved
-			return true;
+			// Check that render is ready to run a task:
+			if( false == render->isReady())
+			{
+				// Render is not ready, but may be we can wake it up
+				if(( false == render->isWOLWakeAble()) || ( ms_awaken_renders >= af::Environment::getSolvingWakePerCycle() ))
+				{
+					continue; ///< - We can't
+				}
+
+				AF_DEBUG << "Sleeping render '" << render->node()->getName() << "' solved by '" << (*it)->node()->getName() << "'";
+			}
+
+			// Check that the node can run this render:
+			if( false == (*it)->v_canRunOn( render))
+				continue;
+
+			renders_list.push_back( render);
 		}
+
+		// Sort renders:
+		renders_list.sort( MostReadyRender());
+
+		RenderAf * render = (*it)->trySolve( renders_list, ms_monitorcontaier);
+
+		if( render )
+			return render;
+
+		it = i_list.erase( it);
 	}
 
-	// Return false - that no nodes was not solved
-	return false;
+	return NULL;
 }
 

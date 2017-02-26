@@ -109,7 +109,6 @@ public:
 	static inline int    getPriority()               { return priority;         } ///< Get default host priority.
 	static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
 
-	static inline int getServeTasksSpeed()               { return serve_tasks_speed;            }
 	static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
 	static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
 	static inline int getTaskStopTimeout()               { return task_stop_timeout;            }
@@ -120,6 +119,8 @@ public:
 	static inline bool getSolvingUseCapacity()     { return solving_use_capacity;      }
 	static inline bool getSolvingUseUserPriority() { return solving_use_user_priority; }
 	static inline bool getSolvingSimpler()         { return solving_simpler;           }
+	static inline int  getSolvingTasksSpeed()      { return solving_tasks_speed;       }
+	static inline int  getSolvingWakePerCycle()    { return solving_wake_per_cycle;    }
 
 	static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
 	static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
@@ -275,7 +276,6 @@ private:
 
 	static std::string timeformat;    ///< Default time format.
 
-	static int serve_tasks_speed;
 	static int task_update_timeout;
 	static int task_stop_timeout;
 	static int task_default_capacity;
@@ -286,6 +286,8 @@ private:
 	static bool solving_use_capacity;       ///< Use running tasks total capacity or simpe running tasks number to calculate "Need"
 	static bool solving_use_user_priority;  ///< Whether task solving takes user priority into account or not
 	static bool solving_simpler;            ///< Sort jobs by priority and creation time instead of using the "Need"
+	static int  solving_tasks_speed;
+	static int  solving_wake_per_cycle;
 
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;

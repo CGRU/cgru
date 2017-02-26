@@ -290,9 +290,15 @@ void UserAf::v_calcNeed()
 
 bool UserAf::v_canRun()
 {
-	if( m_priority == 0)
+	if( m_priority == 0 )
 	{
 		// Zero priority - turns user jobs solving off
+		return false;
+	}
+
+	if( m_max_running_tasks == 0 )
+	{
+		// Can't run tasks at all - turns user jobs solving off
 		return false;
 	}
 
@@ -303,7 +309,7 @@ bool UserAf::v_canRun()
 	}
 
 	// Check maximum running tasks:
-	if(( m_max_running_tasks >= 0 ) && ( m_running_tasks_num >= m_max_running_tasks ))
+	if(( m_max_running_tasks > 0 ) && ( m_running_tasks_num >= m_max_running_tasks ))
 	{
 		return false;
 	}
@@ -314,12 +320,6 @@ bool UserAf::v_canRun()
 
 bool UserAf::v_canRunOn( RenderAf * i_render)
 {
-	if( false == v_canRun())
-	{
-		// Unable to run at all
-		return false;
-	}
-
 // check hosts mask:
 	if( false == checkHostsMask( i_render->getName())) return false;
 // check exclude hosts mask:
@@ -329,7 +329,7 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 	return true;
 }
 
-bool UserAf::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
+RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
 	af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
 
@@ -338,19 +338,23 @@ bool UserAf::v_solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 		solve_method = af::Node::SolveByPriority;
 	}
 
-	if( Solver::SolveList( m_jobslist.getStdList(), solve_method, i_render, i_monitoring))
+	std::list<AfNodeSrv*> solve_list( m_jobslist.getStdList());
+
+	RenderAf * render = Solver::SolveList( solve_list, solve_method);
+
+	if( render )
 	{
 		// Increase running tasks / total capacity if render is online
 		// It can be online for WOL wake test
-		if( i_render->isOnline())
+		if( render->isOnline())
 			refreshCounters();
 
-		// Return true - that node was solved
-		return true;
+		// Return solved render
+		return render;
 	}
 
-	// Return false - that node was not solved
-	return false;
+	// Node was not solved
+	return NULL;
 }
 
 int UserAf::v_calcWeight() const

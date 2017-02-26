@@ -55,6 +55,13 @@ namespace AFUSER
 namespace AFSERVER
 {
 	const char STORE_FILE[] = "server.json";
+
+	const bool SOLVING_USE_CAPACITY      = true;  ///< Use running tasks total capacity or simpe running tasks number to calculate "Need"
+	const bool SOLVING_USE_USER_PRIORITY = true;  ///< Whether task solving takes user priority into account or not
+	const bool SOLVING_SIMPLER           = false; ///< Sort jobs by priority and creation time instead of using the "Need"
+	const int  SOLVING_TASKS_SPEED       = -1;
+	const int  SOLVING_WAKE_PER_CYCLE    = 1;
+
 }
 
 /// Database options:
