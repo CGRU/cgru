@@ -538,8 +538,16 @@ void WndTask::showOutput( const af::MCTask & i_mctask)
 	m_tab_widget->setCurrentWidget( m_tab_output);
 
 	af::Service service( i_mctask.m_service, i_mctask.m_parser);
-	std::string html = service.toHTML( i_mctask.getOutput());
-	m_output_te->setHtml( afqt::stoq( html));
+
+	if( service.isInitialized() && service.hasParser())
+	{
+		std::string html = service.toHTML( i_mctask.getOutput());
+		m_output_te->setHtml( afqt::stoq( html));
+	}
+	else
+	{
+		m_output_te->setPlainText( afqt::stoq( i_mctask.getOutput()));
+	}
 }
 
 void WndTask::showLog( const af::MCTask & i_mctask)

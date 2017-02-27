@@ -197,6 +197,9 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         print(command)
         return command
 
+    def hasParser( self):
+        return self.parser is not None
+
     def parse(self, data, mode):
         """Missing DocString
 
