@@ -1,8 +1,9 @@
 #ifdef WINNT
 #include "res.h"
 
-#include <Winbase.h>
 #include <Iphlpapi.h>
+#include <Powrprof.h>
+#include <Winbase.h>
 
 #include "../libafanasy/environment.h"
 
@@ -12,6 +13,15 @@
 
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
+typedef struct _PROCESSOR_POWER_INFORMATION {
+	ULONG Number;
+	ULONG MaxMhz;
+	ULONG CurrentMhz;
+	ULONG MhzLimit;
+	ULONG MaxIdleState;
+	ULONG CurrentIdleState;
+} PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
 
 struct cpu
 {
@@ -42,15 +52,6 @@ struct io
 
 int now = 0;
 
-/*
-void WINAPI GetSystemTimeAsFileTime(
-  __out  LPFILETIME lpSystemTimeAsFileTime
-);
-typedef struct _FILETIME {
-  DWORD dwLowDateTime;
-  DWORD dwHighDateTime;
-} FILETIME, *PFILETIME;
-*/
 ULONGLONG g_time_prev = 0;
 
 void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
@@ -74,45 +75,80 @@ printf("\nGetResources:\n");
     /* Will be set to 1 after first run. */
     static unsigned s_init = 0;
 
-   //
-   // CPU info:
-   //
-   if( !s_init)
-   {
-      // number of pocessors
-      SYSTEM_INFO sysinfo;
-      GetSystemInfo( &sysinfo);
-      hres.cpu_num = sysinfo.dwNumberOfProcessors;
+	//
+	// Number of pocessors:
+	//
+	if (!s_init)
+	{
+		// number of pocessors
+		SYSTEM_INFO sysinfo;
+		GetSystemInfo(&sysinfo);
+		hres.cpu_num = sysinfo.dwNumberOfProcessors;
+	}
 
-      // frequency of first pocessor
-      HKEY hKey;
-      char Buffer[_MAX_PATH];
-      DWORD BufSize = _MAX_PATH;
-      DWORD dwMHz = _MAX_PATH;
-      long lError = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                        "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+	//
+	// Frequency of the first pocessor:
+	//
+	{
+	// Allocate buffer to get info for each processor:
+	const int size = hres.cpu_num * sizeof(PROCESSOR_POWER_INFORMATION);
+	LPBYTE pBuffer = new BYTE[size];
+	long lError = ::CallNtPowerInformation(ProcessorInformation, NULL, 0, pBuffer, size);
+	if (lError == ERROR_SUCCESS)
+	{
+		// list each processor frequency 
+		PPROCESSOR_POWER_INFORMATION ppi = (PPROCESSOR_POWER_INFORMATION)pBuffer;
+		for (DWORD nIndex = 0; nIndex < hres.cpu_num; nIndex++)
+		{
+			if (hres.cpu_mhz < ppi->CurrentMhz)
+				hres.cpu_mhz = ppi->CurrentMhz;
+			ppi++;
+		}
+	}
+	else
+	{
+		char Buffer[_MAX_PATH];
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
+			NULL,
+			lError,
+			0,
+			Buffer,
+			_MAX_PATH,
+			0);
+		AFERRAR("%s", Buffer);
+		hres.cpu_mhz = 1000;
+	}
+	delete[]pBuffer;
+	}
+	/*
+	An old mothod to read from registry:
+    HKEY hKey;
+    char Buffer[_MAX_PATH];
+    DWORD BufSize = _MAX_PATH;
+    DWORD dwMHz = _MAX_PATH;
+    long lError = RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                    "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+                    0,
+                    KEY_READ,
+                    &hKey);
+    if( lError == ERROR_SUCCESS)
+    {
+        RegQueryValueEx( hKey, "~MHz", NULL, NULL, (LPBYTE) &dwMHz, &BufSize);
+        hres.cpu_mhz = dwMHz;
+    }
+    else
+    {
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
+                        NULL,
+                        lError,
                         0,
-                        KEY_READ,
-                        &hKey);
-      if( lError == ERROR_SUCCESS)
-      {
-         RegQueryValueEx( hKey, "~MHz", NULL, NULL, (LPBYTE) &dwMHz, &BufSize);
-         hres.cpu_mhz = dwMHz;
-      }
-      else
-      {
-         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
-                         NULL,
-                         lError,
-                         0,
-                         Buffer,
-                         _MAX_PATH,
-                         0);
-         AFERRAR("%s", Buffer);
-         hres.cpu_mhz = 1000;
-      }
-   }
-
+                        Buffer,
+                        _MAX_PATH,
+                        0);
+        AFERRAR("%s", Buffer);
+        hres.cpu_mhz = 1000;
+    }
+	*/
    //
    // Memory & Swap total and usage:
    //
