@@ -41,6 +41,11 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 {
 	inline bool operator()( const RenderAf * a, const RenderAf * b)
 	{
+		// Offline renders needed for Wake-On-Lan.
+		// Offline render is less ready.
+		if( a->isOnline() && b->isOffline()) return true;
+		if( a->isOffline() && b->isOnline()) return false;
+
 		if( a->getTasksNumber() < b->getTasksNumber()) return true;
 		if( a->getTasksNumber() > b->getTasksNumber()) return false;
 
@@ -114,9 +119,27 @@ void Solver::solve()
 			break;
 		}
 
+		// Get ready renders:
+		std::list<RenderAf*> renders_list;
+		RenderContainerIt rendersIt( ms_rendercontainer);
+		for( RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+		{
+			// Check that render is ready to run a task:
+			if( false == render->isReady())
+			{
+				// Render is not ready, but may be we can wake it up
+				if(( false == render->isWOLWakeAble()) || ( ms_awaken_renders >= af::Environment::getSolvingWakePerCycle() ))
+				{
+					continue; ///< - We can't
+				}
+			}
+
+			renders_list.push_back( render);
+		}
+
 		// Function exits on each solve success (just 1 task solved),
 		// removes nodes that was not solved from list.
-		RenderAf * render = SolveList( solve_list, af::Node::SolveByPriority);
+		RenderAf * render = SolveList( solve_list, renders_list, af::Node::SolveByPriority);
 		if( render )
 		{
 			// Check Wake-On-LAN:
@@ -147,9 +170,9 @@ void Solver::solve()
 		render->solvingFinished();
 }
 
-RenderAf * Solver::SolveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMethod i_method)
+RenderAf * Solver::SolveList( std::list<AfNodeSrv*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method)
 {
-	// Remove node that need no solving at all (done, offline, ...)
+	// Remove nodes that need no solving at all (done, offline, ...)
 	for( std::list<AfNodeSrv*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
 		if((*it)->v_canRun())
@@ -171,34 +194,21 @@ RenderAf * Solver::SolveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingM
 	// Iterate solving nodes list:
 	for( std::list<AfNodeSrv*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
-		// Get renders:
-		std::list<RenderAf*> renders_list;
-		RenderContainerIt rendersIt( ms_rendercontainer);
-		for( RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+		// Get renders that node can run on:
+		std::list<RenderAf*> renders;
+		for( std::list<RenderAf*>::iterator rIt = i_renders.begin(); rIt != i_renders.end(); rIt++)
 		{
-			// Check that render is ready to run a task:
-			if( false == render->isReady())
-			{
-				// Render is not ready, but may be we can wake it up
-				if(( false == render->isWOLWakeAble()) || ( ms_awaken_renders >= af::Environment::getSolvingWakePerCycle() ))
-				{
-					continue; ///< - We can't
-				}
-
-				AF_DEBUG << "Sleeping render '" << render->node()->getName() << "' solved by '" << (*it)->node()->getName() << "'";
-			}
-
 			// Check that the node can run this render:
-			if( false == (*it)->v_canRunOn( render))
+			if( false == (*it)->v_canRunOn( *rIt))
 				continue;
 
-			renders_list.push_back( render);
+			renders.push_back( *rIt);
 		}
 
 		// Sort renders:
-		renders_list.sort( MostReadyRender());
+		renders.sort( MostReadyRender());
 
-		RenderAf * render = (*it)->trySolve( renders_list, ms_monitorcontaier);
+		RenderAf * render = (*it)->trySolve( renders, ms_monitorcontaier);
 
 		if( render )
 			return render;

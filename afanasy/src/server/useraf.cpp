@@ -340,7 +340,7 @@ RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContai
 
 	std::list<AfNodeSrv*> solve_list( m_jobslist.getStdList());
 
-	RenderAf * render = Solver::SolveList( solve_list, solve_method);
+	RenderAf * render = Solver::SolveList( solve_list, i_renders_list, solve_method);
 
 	if( render )
 	{

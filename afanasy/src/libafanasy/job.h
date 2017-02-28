@@ -149,6 +149,8 @@ protected:
 
 	std::string m_description; ///< Job description for statistics purposes only.
 
+	std::map< std::string, int32_t > m_pools;
+
 	std::map< std::string, std::string > m_folders;
 
 	std::string m_report;

@@ -311,6 +311,37 @@ bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & 
 	return true;
 }
 
+bool af::jr_intmap( const char * i_name, std::map<std::string,int32_t> & o_map, const JSON & i_object, std::string * o_str)
+{
+	const JSON & map = i_object[i_name];
+	if( false == map.IsObject())
+		return false;
+
+	for( JSON::ConstMemberIterator it = map.MemberBegin(); it != map.MemberEnd(); ++it)
+	{
+		const std::string name = it->name.GetString();
+		const JSON & value = it->value;
+		if( false == value.IsInt())
+			return false;
+		o_map[name] = value.GetInt();
+		if( o_str )
+			*o_str += std::string("\n") + i_name + "[" + name + "]=\"" + af::itos(o_map[name]) + "\"";
+	}
+
+	return true;
+}
+
+void af::jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i_map, std::ostringstream & o_str)
+{
+	o_str << ",\n\"" << i_name << "\":{";
+	for( std::map<std::string,int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+	{
+		if( it != i_map.begin()) o_str << ",";
+		o_str << "\n\"" << it->first << "\":" << it->second;
+	}
+	o_str << "\n}";
+}
+
 void af::jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str)
 {
 	o_str << ",\n\"" << i_name << "\":{";

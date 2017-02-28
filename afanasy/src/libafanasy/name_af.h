@@ -164,6 +164,7 @@ namespace af
 	int weigh( const std::string & str);
 	int weigh( const std::list<std::string> & strlist);
 	int weigh( const std::vector<std::string> & i_list);
+	int weigh( const std::map<std::string, int32_t> & i_map);
 	int weigh( const std::map<std::string, std::string> & i_map);
 
 
@@ -287,7 +288,9 @@ namespace af
 	bool jr_int64vec(  const char * i_name, std::vector<int64_t>     & o_attr, const JSON & i_object);
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
 	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	bool jr_intmap( const char * i_name, std::map<std::string,int32_t> & o_map, const JSON & i_object, std::string * o_str = NULL);
 
+	void jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i_map, std::ostringstream & o_str);
 	void jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str);
 	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
 	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);

@@ -64,6 +64,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("user_name",     m_user_name,     i_object, io_changes);
 
+	jr_intmap("pools", m_pools, i_object, io_changes);
+
 	jr_stringmap("folders", m_folders, i_object, io_changes);
 
 	bool offline = false;
@@ -200,6 +202,9 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
+
+	if( m_pools.size())
+		af::jw_intmap("folders", m_pools, o_str);
 
 	if( m_folders.size())
 		af::jw_stringmap("folders", m_folders, o_str);
@@ -418,6 +423,7 @@ int Job::v_calcWeight() const
 	weight += weigh( m_host_name);
 	weight += weigh( m_project);
 	weight += weigh( m_department);
+	weight += weigh( m_pools);
 	weight += weigh( m_folders);
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();
@@ -524,11 +530,20 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_command_pre.size()) o_str << "\n Pre command:\n" << m_command_pre;
    if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
 
+	if( m_pools.size())
+	{
+		o_str << "\nPools:";
+		for( std::map<std::string,int32_t>::const_iterator it = m_pools.begin(); it != m_pools.end(); it++)
+		{
+			if( it != m_pools.begin()) o_str << ",";
+			o_str << " \"" << (*it).first << "\": "<< (*it).second;
+		}
+	}
+
 	if( m_folders.size())
 	{
 		o_str << "\nFolders:";
-		int i = 0;
-		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
+		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++)
 		{
 			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
 		}

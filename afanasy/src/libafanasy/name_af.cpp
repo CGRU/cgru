@@ -545,6 +545,14 @@ int af::weigh( const std::map<std::string, std::string> & i_map)
 	return w;
 }
 
+int af::weigh( const std::map<std::string, int32_t> & i_map)
+{
+	int w = 0;
+	for( std::map<std::string,int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		w += weigh(it->first) + sizeof(it->second);
+	return w;
+}
+
 const std::string af::getenv( const std::string & i_name) { return af::getenv( i_name.c_str()); }
 const std::string af::getenv( const char * i_name)
 {
