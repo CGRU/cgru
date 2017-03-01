@@ -82,6 +82,7 @@ if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../fermer")
 
 target_link_libraries(afermer afqt ${Qt5Multimedia_LIBRARIES} 
                                   ${Qt5Widgets_LIBRARIES} 

@@ -244,6 +244,14 @@ Item{
 		font.letterSpacing:1
 		color: "white"
 	    }
+    Text {
+        text: "Jobs In"
+        anchors.right: parent.right
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
 
     }
 
@@ -465,7 +473,7 @@ Item{
 		color: "white"
 	    }
 	Text {
-		text: BladesModel.getBladeInfoByIndex(blades_ListView.currentIndex, "hdd_busy")
+        text: blades_ListView.currentItem.v_hdd_busy
 		anchors.left: parent.left
 		font.pixelSize: parent.custom_font_size
 		font.family:parent.custom_font
@@ -488,5 +496,13 @@ Item{
 		font.letterSpacing:1
 		color: "white"
 	    }
+    Text {
+        text: blades_ListView.currentItem.v_jobsIn
+        anchors.left: parent.left
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
     }
 } 

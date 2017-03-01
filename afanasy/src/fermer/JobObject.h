@@ -3,16 +3,43 @@
 
 #include <QStringList>
 #include "state.hpp"
+#include "common.h"
+
+
 
 class JobObject
 {
 public:
 
+    AFERMER_TYPEDEF_SMART_PTRS(JobObject);
+    AFERMER_DEFINE_CREATE_FUNC_22_ARGS(JobObject, const QString&,
+                  JobState::State,
+                  const QString &
+                  ,int
+                  ,const QString&
+                  ,const QString&
+                  ,const QString&
+                  ,int
+                  ,int
+                  ,int
+                  ,const QString&
+                  ,int
+                  ,int
+                  ,const QList<QString>&
+                  ,const QString&
+                  ,int
+                  ,int
+                  ,const QString&
+                  ,const QString&
+                  ,const QString&
+                  ,const QString&
+                  ,int);
+
       JobObject(   const QString &user_name
                   ,JobState::State status
                   ,const QString &time_creation
                   ,int blocks_num
-                  ,const QString &time_done
+                  ,const QString &time_elapsed
                   ,const QString &hosts_mask
                   ,const QString &software
                   ,int priority
@@ -25,13 +52,17 @@ public:
                   ,const QString &block_name
                   ,int job_id
                   ,int blades_length
-                  ,const QString approx_time
+                  ,const QString &approx_time
+                  ,const QString &error_blades
+                  ,const QString &depends
+                  ,const QString &user_color
+                  ,int errors_avoid_blades
             ) :
           m_user_name(user_name)
         , m_status(status)
         , m_time_creation(time_creation)
         , m_blocks_num(blocks_num)
-        , m_time_done(time_done)
+        , m_time_elapsed(time_elapsed)
         , m_hosts_mask(hosts_mask)
         , m_software(software)
         , m_priority(priority)
@@ -45,7 +76,11 @@ public:
         , m_job_id(job_id)
         , m_blades_length(blades_length)
         , m_approx_time(approx_time)
-      {m_selected=0;}
+        , m_error_blades(error_blades)
+        , m_depends(depends)
+        , m_user_color(user_color)
+        , m_errors_avoid_blades(errors_avoid_blades)
+{m_selected=0;m_notify_showed=false;}
 
 
     QString user_name() const;
@@ -60,13 +95,38 @@ public:
     QString block_name() const;
     QString approxTime();
     int blades_length() const;
+    QString error_blades() const;
+    QString depends() const;
+    void update(const QString &user_name
+                  ,JobState::State status
+                  ,const QString &time_creation
+                  ,int blocks_num
+                  ,const QString &time_elapsed
+                  ,const QString &hosts_mask
+                  ,const QString &software
+                  ,int priority
+                  ,int slot
+                  ,int progress
+                  ,const QString &name
+                  ,int id
+                  ,int block_order
+                  ,const QList<QString> &blades
+                  ,const QString &block_name
+                  ,int job_id
+                  ,int blades_length
+                  ,const QString &approx_time
+                  ,const QString &error_blades
+                  ,const QString &depends
+                  ,const QString &user_color
+                  ,int errors_avoid_blades);
+
 
 
     QString m_user_name;
     JobState::State m_status;
     QString m_time_creation;
     int m_blocks_num;
-    QString m_time_done;
+    QString m_time_elapsed;
     QString m_hosts_mask;
     QString m_software;
     int m_priority;
@@ -80,7 +140,35 @@ public:
     QString m_block_name;
     int m_blades_length;
     QString m_approx_time;
+    QString m_error_blades;
     int m_selected;
+    int m_node_posx;
+    int m_node_posy;
+    QString m_depends;
+    int m_group_node_posx;
+    int m_group_node_posy;
+    int m_group_node_width;
+    int m_group_node_height;
+    QString m_output_folder;
+    bool set_refreshed;
+    QString m_user_color;
+    int m_errors_avoid_blades;
+    bool m_notify_showed;
 };
+
+
+
+struct JobTimeApproximationManager
+{
+    AFERMER_TYPEDEF_SMART_PTRS(JobTimeApproximationManager);
+    AFERMER_DEFINE_CREATE_FUNC_2_ARGS(JobTimeApproximationManager, int, int);
+
+    int m_progress;
+    int m_time;
+
+    JobTimeApproximationManager(int p, int t): m_progress(p), m_time(t) {}
+    
+};
+
 
 #endif

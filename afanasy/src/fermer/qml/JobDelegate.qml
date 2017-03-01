@@ -1,4 +1,4 @@
-import QtQuick 2.5
+import QtQuick 2.7
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
@@ -20,9 +20,10 @@ Rectangle {
     property string v_block_name:block_name
     property string v_blades_mask:blades_mask
     property int    v_priority: priority
-    property int    v_blades_length:blades_length
+    //property int    v_blades_length:blades_length
     property int    v_group_size: group_size
     property string v_approx_time:approx_time
+    property string v_depends:depends
 
       MouseArea {
           id: mouseArea
@@ -35,8 +36,8 @@ Rectangle {
                   delegateItem.ListView.view.currentIndex = index
                   JobsModel.setSelected(index)
                   if (root.side_state=="Tasks"){
-                    TasksModel.updateTasksByJobID(v_job_id)
-                    //console.log(" updateTasksByJobID "+v_job_id)
+                        TasksModel.updateTasksByJobID(v_job_id)
+
                   }
               }
 
@@ -56,8 +57,7 @@ Rectangle {
                       delegateItem.ListView.view.currentIndex = index
                       JobsModel.contextSelected(index)
                       job_context_menu.multiselected=JobsModel.multiselected()
-                      job_context_menu.size_selected=35//JobsModel.sizeSelected()
-                       //console.log(" JobsModel.sizeSelected():"+JobsModel.sizeSelected())
+                      //job_context_menu.size_selected=35//JobsModel.sizeSelected()
                       job_context_menu.popup()
                   }
           }
@@ -72,7 +72,7 @@ Rectangle {
       width: parent.width
       anchors.right:parent.right
       color: selected ? item_active_color
-                     :  mouseArea.containsMouse ? item_active_color
+                     : mouseArea.containsMouse ? item_active_color
                      : item_color
       Rectangle {
           id: bottom_line
@@ -167,9 +167,20 @@ Rectangle {
                   //width:progress_fill.width
                   color:JobState.DONE==v_state ? "#009688"
                                 : JobState.RUNNING==v_state ? "#81ccc4"
-                                : JobState.OFFLINE==v_state ? "#fe9400"
+                                : JobState.OFFLINE==v_state ? "#375753"
                                 : JobState.READY==v_state ? "#fe9400"
                                 : JobState.ERROR==v_state ? "#f14c22" : "white"
+              }
+              Text{
+                  //anchors.horizontalCenter: parent.horizontalCenter
+                  anchors.top: parent.bottom
+                  anchors.topMargin: 5
+                  font.family:robotoRegular.name
+                  font.letterSpacing: 1.5
+                  font.pointSize: 8
+                  color:"#f14c22"
+                  text:"Avoiding Blades:"+avoiding_blades
+                  visible:avoiding_blades
               }
           }
 
@@ -184,7 +195,7 @@ Rectangle {
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
                 font.pointSize: 10.5
-                text: elapsed  
+                text: elapsed
           }
 
           Item {
@@ -198,11 +209,11 @@ Rectangle {
                    anchors.verticalCenter: parent.verticalCenter
                    width: 33<parent.height?33:parent.height
                    height: 33
-                   color: "white"
-                   border.color: "white"
+                   color: user_color
+                   border.color: user_color
                    border.width: 1
                    radius: width*0.5
-                   opacity: 0.25
+                   opacity: 0.4
                 }
                 Text {
                     layer.enabled: false
@@ -231,7 +242,9 @@ Rectangle {
                     font.weight: Font.Normal
                     font.pointSize: 10.5
                     font.letterSpacing: 2
-                    text: block_name
+                    clip:true
+                    width: parent.width
+                    text: swap_jobs_name ? job_name : block_name
               }
               Text {
                     layer.enabled: true
@@ -243,7 +256,9 @@ Rectangle {
                     font.family:robotoRegular.name
                     font.letterSpacing: 1.7
                     font.pointSize: 8
-                    text: job_name
+                    clip:true
+                    width: parent.width
+                    text: swap_jobs_name ? block_name : job_name
               }
           }
           Text {

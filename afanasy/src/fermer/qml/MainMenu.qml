@@ -58,6 +58,15 @@ Rectangle {
                     PropertyChanges {target: button_nodes; st_opacity:0.38}
                     PropertyChanges {target: button_users; st_opacity:0.38}
                     PropertyChanges {target: button_metric; st_opacity:0.78}
+            },
+            State {
+                    name: "TerminalView"
+                    PropertyChanges {target: button_jobs; st_opacity:0.38}
+                    PropertyChanges {target: button_blades; st_opacity:0.38}
+                    PropertyChanges {target: button_nodes; st_opacity:0.38}
+                    PropertyChanges {target: button_users; st_opacity:0.38}
+                    PropertyChanges {target: button_metric; st_opacity:0.38}
+                    PropertyChanges {target: button_terminal; st_opacity:0.78}
             }
         ]
         Rectangle {
@@ -198,9 +207,21 @@ Rectangle {
                 }
         }
 
+        ToolTipButton{
+            id: button_terminal
+            anchors.left: button_nodes.left
+            anchors.leftMargin: 135
+            anchors.verticalCenter: tooltip.verticalCenter
+            image:"icons/terminal.svg"
+            onClicked:{
+                    item_states.state="TerminalView"
+                }
+            visible:supervisor_mode
+        }
+
         Rectangle {
             id: vertical_right_divider
-            anchors.left: button_metric.right
+            anchors.left: supervisor_mode ? button_terminal.right : button_metric.right
             anchors.leftMargin: 15
             anchors.verticalCenter: parent.verticalCenter
             width: 1

@@ -10,103 +10,35 @@
 
 #include "common.h"
 #include "TaskObject.h"
+#include "UserObject.h"
 #include "BladeObject.h"
 #include "JobObject.h"
-#include "RadiolocationStation.h"
+#include "Managers/Service/Station/RadiolocationStation.h"
+#include "Managers/Lorries/UserObjectsLorry.h"
+#include "Managers/Lorries/JobObjectsLorry.h"
+#include "Managers/Lorries/BladeObjectsLorry.h"
 #include "RotateValue.h"
 
 
 namespace afermer
 {
 
-struct JobTimeApproximationContainer
+
+struct TaskManager
 {
-    PI_TYPEDEF_SMART_PTRS(JobTimeApproximationContainer);
-    PI_DEFINE_CREATE_FUNC_2_ARGS(JobTimeApproximationContainer, int, int);
-
-    int m_progress;
-    int m_time;
-
-    JobTimeApproximationContainer(int p, int t): m_progress(p), m_time(t) {}
-    
-};
-
-
-struct TaskContainer
-{
-    PI_TYPEDEF_SMART_PTRS(TaskContainer);
-    PI_DEFINE_CREATE_FUNC_2_ARGS(TaskContainer, const std::string&, size_t);
+    AFERMER_TYPEDEF_SMART_PTRS(TaskManager);
+    AFERMER_DEFINE_CREATE_FUNC_2_ARGS(TaskManager, const std::string&, size_t);
 
     std::string m_command;
     size_t m_task_number;
 
-    TaskContainer(const std::string& c, size_t t): m_command(c), m_task_number(t) {}
+    TaskManager(const std::string& c, size_t t): m_command(c), m_task_number(t) {}
     
 };
 
 
-struct BladeContainer
+class RadiolocationService
 {
-    PI_TYPEDEF_SMART_PTRS(BladeContainer);
-    PI_DEFINE_CREATE_FUNC_19_ARGS(BladeContainer, 
-            size_t, size_t, const std::string&, const std::string&, 
-            const std::string&, size_t, size_t, 
-            size_t, size_t, size_t, size_t, size_t, size_t, 
-            size_t, size_t, size_t, size_t , size_t , size_t );
-
-    size_t m_performance_slots;
-    size_t m_avalible_performance_slots;
-    std::string m_properties;
-    std::string m_resources;
-    std::string m_data;
-    size_t m_cpu_num;
-    size_t m_cpu_mhz;
-    size_t m_mem_total_mb;
-    size_t m_mem_free_mb;
-    size_t m_mem_cached_mb;
-    size_t m_mem_buffers_mb;
-    size_t m_swap_used_mb;
-    size_t m_hdd_total_gb;
-    size_t m_hdd_free_gb;
-    size_t m_hdd_rd_kbsec;
-    size_t m_hdd_wr_kbsec;
-    size_t m_hdd_busy;
-    size_t m_net_recv_kbsec;
-    size_t m_net_send_kbsec;
-
-    BladeContainer(size_t performance_slots, size_t avalible_performance_slots, 
-                    const std::string& properties, const std::string& resources, 
-                    const std::string& data, size_t cpu_num, size_t cpu_mhz, 
-                    size_t mem_total_mb, size_t mem_free_mb, size_t mem_cached_mb, 
-                    size_t mem_buffers_mb, size_t swap_used_mb, size_t hdd_total_gb, 
-                    size_t hdd_free_gb, size_t hdd_rd_kbsec, size_t 
-                    hdd_wr_kbsec, size_t hdd_busy, size_t net_recv_kbsec, 
-                    size_t net_send_kbsec)
-        : m_performance_slots(performance_slots),
-            m_avalible_performance_slots(avalible_performance_slots),
-            m_properties(properties),
-            m_resources(resources),
-            m_data(data),
-            m_cpu_num(cpu_num),
-            m_cpu_mhz(cpu_mhz),
-            m_mem_total_mb(mem_total_mb),
-            m_mem_free_mb(mem_free_mb),
-            m_mem_cached_mb(mem_cached_mb),
-            m_mem_buffers_mb(mem_buffers_mb),
-            m_swap_used_mb(swap_used_mb),
-            m_hdd_total_gb(hdd_total_gb),
-            m_hdd_free_gb(hdd_free_gb),
-            m_hdd_rd_kbsec(hdd_rd_kbsec),
-            m_hdd_wr_kbsec(hdd_wr_kbsec),
-            m_hdd_busy(hdd_busy),
-            m_net_recv_kbsec(net_recv_kbsec),
-            m_net_send_kbsec(net_send_kbsec) {}
-    
-};
-
-class RadiolocationService : public QObject
-{
-    Q_OBJECT
 public:
     typedef RadiolocationService* Ptr; 
     
@@ -120,13 +52,11 @@ public:
     RadiolocationService();
     ~RadiolocationService();
 
-    bool get(QList<BladeObject>&);
-    bool get(QList<JobObject>&);
     bool get(QList<TaskObject>&, int);
     
     void getBladeInfo(QMap<QString,QString>&, int);
     bool getJobsStatistic(QList<int>&);
-
+    void getJobDependencies(int index, QList<JobObject::Ptr> &);
     bool blockBlades(QList<QString>&, int);
 
     bool setGodMode(bool);
@@ -134,9 +64,9 @@ public:
     // BLADES
     bool setBladeService(int, bool, const QString&);
     bool actLaunchCmd(int, bool, const QString&);
-    QString actRequestLog(int);
-    QString actRequestTasksLog(int);
-    QString actRequestInfo(int);
+    void actRequestLog(int, QString&);
+    void actRequestTasksLog(int, QString&);
+    void actRequestInfo(int, QString&);
     void actCapacity(int, const QString&);
     void actMaxTasks(int, const QString&);
     void actUser(int, const QString&);
@@ -182,7 +112,7 @@ public:
     QList<int> getTasksRawTime(int);
     QList<QString> getTasksFrame(int);
 
-    bool deleteJob(const QList<int>&);
+    bool deleteJobGroup(const QList<int>&);
     bool pauseJob(const QList<int>&);
     bool startJob(const QList<int>&);
     bool stopJob(const QList<int>&);
@@ -195,18 +125,34 @@ public:
     int offlineJobs();
     int readyJobs();
 
+    bool isConnected();
+
+    JobObjectsLorry::Ptr m_jobs;
+    JobObjectsLorry::Ptr jobsLorry();
+    void jobsUpdate(bool show_all_users_job = true);
+
+    BladeObjectsLorry::Ptr m_blades;
+    BladeObjectsLorry::Ptr bladesLorry();
+    void bladesUpdate();
+
+    // USERS
+    UserObjectsLorry::Ptr m_users;
+    UserObjectsLorry::Ptr usersLorry();
+    void usersUpdate();
+
+
+    void exit();
+
+    void getServerIPAddress(std::string&);
+    void getUserName(std::string&);
+
 
 private:
     static RadiolocationService::Ptr m_single;
 
-    std::map<size_t, JobTimeApproximationContainer::Ptr > m_job_time;
+    std::map<int, QList<int> > m_blade_indeces;
 
-    QList< BladeContainer::Ptr > m_resources;
-
-    std::map<size_t, std::string > m_job_resources;
-    bool checkIndexInJobResources(int);
-
-    std::map<size_t, TaskContainer::Ptr > m_task_resources;
+    std::map<size_t, TaskManager::Ptr > m_task_resources;
     bool checkIndexInTaskResources(int);
 
     bool groupJobAction(const std::string&, const QList<int>&);
@@ -224,6 +170,9 @@ private:
     int m_total_offline_jobs;
     int m_total_ready_jobs;
 
+    bool previos_show_all_users_job;
+
+
 protected:
 
     RadiolocationStation::Ptr m_station;
@@ -233,7 +182,6 @@ protected:
     std::map<size_t, RotateValue::Ptr> m_rotate;
     std::map<size_t, RotateValue::Ptr>::iterator m_it_rotate;
     std::map<size_t, int> m_tasks_per_day;
-    std::vector<size_t> m_deleted_jobs;
 
 };
 

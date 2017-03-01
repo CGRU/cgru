@@ -3,11 +3,16 @@
 #include <QAbstractListModel>
 #include <QStringList>
 #include "JobObject.h"
+#include "Managers/JobObjectsManager.h"
 #include <time.h>
-#include "RadiolocationService.h"
+#include "common.h"
+
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace afermer
 {
+
 
 class JobsModel : public QAbstractListModel
 {
@@ -32,12 +37,22 @@ public:
         BladesRole,
         GroupSizeRole,
         GroupIDRole,
+        AvoidingBladesRole,
+        UserColorRole,
         GroupRandRedValueRole,
         GroupRandGreenValueRole,
         GroupRandBlueValueRole,
         BladesLenRole,
         ApproxTimeRole,
-        SelectsRole
+        SelectsRole,
+        DependsRole,
+        NodePoseXRole,
+        NodePoseYRole,
+        GroupNodePoseXRole,
+        GroupNodePoseYRole,
+        GroupNodeWidthXRole,
+        GroupNodeHeightXRole,
+        ErrorsAvoidBladesRole
     };
 
     JobsModel(QObject *parent = 0);
@@ -48,8 +63,9 @@ public:
 
     Q_INVOKABLE void clear();
     Q_INVOKABLE QList<int> getJobsStatistic();
+    Q_INVOKABLE void setShowAllJobs(bool);
 
-    Q_INVOKABLE void deleteJob();
+    Q_INVOKABLE void deleteJobGroup();
     Q_INVOKABLE void skipJobs();
     Q_INVOKABLE void pauseJob();
     Q_INVOKABLE void startJob();
@@ -67,6 +83,7 @@ public:
     Q_INVOKABLE void jobRestartPause();
     Q_INVOKABLE QString getHostMask();
     Q_INVOKABLE void setHostMask(const QString&);
+    Q_INVOKABLE void passUpdate();
 
     Q_INVOKABLE void multiSorting(int);
     Q_INVOKABLE void sortingChangeState();
@@ -83,12 +100,26 @@ public:
     Q_INVOKABLE void contextSelected(int);
     Q_INVOKABLE void shiftSelected();
     Q_INVOKABLE void clearSelected();
+    Q_INVOKABLE void drawSelection(int,int,int,int);
     Q_INVOKABLE int  multiselected();
-    Q_INVOKABLE int  sizeSelected();
     Q_INVOKABLE QList<int> getSelectedIds();
-    void saveSelected();
-    bool checkUniqueID(QList<int>&,int);
 
+    Q_INVOKABLE void setNodePos(int,int,int);
+    Q_INVOKABLE void dragSelection(int,int);
+    Q_INVOKABLE void arangeNodes();
+    Q_INVOKABLE int getNodePosX(int);
+    Q_INVOKABLE int getNodePosY(int);
+    Q_INVOKABLE void updateGroupNodeSize();
+    Q_INVOKABLE int getJobDepends(int);
+    Q_INVOKABLE int getDependNodePosx(int,int);
+    Q_INVOKABLE int getDependNodePosy(int,int);
+    Q_INVOKABLE bool isDrawSelection();
+    Q_INVOKABLE int getCenterNodePosX();
+    Q_INVOKABLE int getCenterNodePosY();
+
+    Q_INVOKABLE QString areJobsDone();
+    Q_INVOKABLE void clearNotify();
+    void firstInitialize();
 
 
     QVariant data(const QModelIndex & i_index, int i_role = Qt::DisplayRole) const;
@@ -101,16 +132,16 @@ public slots:
 protected:
     QHash<int, QByteArray> roleNames() const;
 private:
-    QList<JobObject> m_job;
     RadiolocationService::Ptr m_RLS;
+    JobObjectsManager::Ptr m_job;
     QMap<QString,QString> m_map;
     int m_job_size;
-    bool m_pass;
-    int m_sort_type;
+    bool m_pass_update;
+    int  m_sort_type;
     bool m_state_sort;
-    QList<int> m_selects;
-    bool m_multiselected_state=false;
-    bool m_test=true;
+    bool m_multiselected_state;
+    bool m_draw_selection;
+    bool m_show_all_jobs;
 
 //![2]
 };

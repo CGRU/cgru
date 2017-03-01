@@ -17,8 +17,8 @@ class RotateValue
 {
 
 public:
-    PI_TYPEDEF_SMART_PTRS(RotateValue)
-    PI_DEFINE_CREATE_FUNC(RotateValue)
+    AFERMER_TYPEDEF_SMART_PTRS(RotateValue)
+    AFERMER_DEFINE_CREATE_FUNC(RotateValue)
 
     RotateValue();
     ~RotateValue() {};

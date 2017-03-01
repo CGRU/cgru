@@ -1,4 +1,4 @@
-import QtQuick 2.5
+import QtQuick 2.7
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.1
@@ -11,6 +11,7 @@ Rectangle {
     property real v_progress:progress
     property int v_id:id
     property var aligntype: Text.AlignLeft
+    property var v_state: status
 
       MouseArea {
           id: mouseArea

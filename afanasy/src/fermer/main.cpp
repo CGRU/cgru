@@ -17,9 +17,12 @@
 #include <QtQml/qqmlcontext.h>
 #include <QDebug>
 #include <QtCore>
+#include<QTimer>
 
+#include "General.h"
 #include "BladesModel.h"
 #include "JobsModel.h"
+#include "UsersModel.h"
 #include "TasksModel.h"
 #include "state.hpp"
 
@@ -27,14 +30,30 @@ namespace fs = boost::filesystem;
 
 using namespace afermer;
 
+
+void unit_test(){
+    General general;
+    JobsModel jobs_model;
+    BladesModel blades_model;
+    TasksModel tasks_model;
+
+    for (int i=0;i<10;i++){
+        sleep(1);
+        qDebug()<<"jobs_model.updateInteraction() "<<i;
+        jobs_model.updateInteraction();
+        blades_model.updateInteraction();
+        tasks_model.updateTasksByJobID(15729664);
+    }
+    qDebug()<<"unit_test end";
+}
+
 int main(int argc, char *argv[])
 {
     qDebug()<<"Version Of QT: "<<qVersion();
-
     //  Load env from QML path
     char* qml_env_path;
     qml_env_path = getenv("AFERMER_QML_PATH");
-    
+
     fs::path qml_app_path("/");
     if (qml_env_path == NULL)
     {
@@ -65,11 +84,15 @@ int main(int argc, char *argv[])
     qml_app_path /= "main.qml";
 
     QGuiApplication app(argc, argv);
+    app.setOrganizationName("afermer");
+
     app.setWindowIcon(QIcon(qml_app_icon_path.string().c_str()));
 
-    qRegisterMetaType<JobsModel *>( "JobsModel");
-    qRegisterMetaType<BladesModel *>( "BladesModel");
-    qRegisterMetaType<TasksModel *>( "TasksModel");
+    //qRegisterMetaType<JobsModel *>( "JobsModel");
+
+    //qRegisterMetaType<BladesModel *>( "BladesModel");
+
+    //qRegisterMetaType<TasksModel *>( "TasksModel");
 
     BladeState::declareQML();
     JobState::declareQML();
@@ -77,15 +100,25 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
 
+    General general;
     JobsModel jobs_model;
     BladesModel blades_model;
+    UsersModel users_model;
     TasksModel tasks_model;
 
     QQmlContext *ctxt =engine.rootContext();
 
+    //ctxt->setContextProperty("server_exist", "yes");
+
+    ctxt->setContextProperty("General", &general);
     ctxt->setContextProperty("JobsModel", &jobs_model);
     ctxt->setContextProperty("BladesModel", &blades_model);
+    ctxt->setContextProperty("UsersModel", &users_model);
     ctxt->setContextProperty("TasksModel", &tasks_model);
+
+    //QTimer::singleShot(60, &app, unit_test);
+    //QTimer::singleShot(15000, &app, SLOT(quit()));
+
 
     engine.load(QUrl::fromLocalFile(qml_app_path.string().c_str()));
     QObject *rootObject = engine.rootObjects().first();
@@ -94,6 +127,3 @@ int main(int argc, char *argv[])
 
     return app.exec();
 }
-
-
-

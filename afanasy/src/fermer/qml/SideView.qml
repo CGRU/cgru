@@ -24,26 +24,37 @@ Rectangle {
           name: "JobView"
               PropertyChanges {target: jobs_side_view; visible: true}
               PropertyChanges {target: blades_side_view; visible: false}
+              PropertyChanges {target: users_side_view; visible: false}
         },
         State {
               name: "BladeView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: true}
+              PropertyChanges {target: users_side_view; visible: false}
         },
         State {
               name: "NodeView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
+              PropertyChanges {target: users_side_view; visible: false}
         },
         State {
               name: "UsersView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
+              PropertyChanges {target: users_side_view; visible: true}
         },
         State {
               name: "MetricView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
+              PropertyChanges {target: users_side_view; visible: false}
+        },
+        State {
+              name: "TerminalView"
+              PropertyChanges {target: jobs_side_view; visible: false}
+              PropertyChanges {target: blades_side_view; visible: false}
+              PropertyChanges {target: users_side_view; visible: false}
         }
     ]
     Item{
@@ -199,9 +210,11 @@ Rectangle {
                 }
             }
         }
-        JobInfo{
-            id:job_info_
+        Loader {
+            id: job_info_
             anchors.fill: parent
+            source: jobs_ListView.currentIndex!=-1 ? "JobInfo.qml" : ""
+            //source: "JobInfo.qml"
         }
         JobTasks{
             id:job_task_
@@ -214,7 +227,6 @@ Rectangle {
             anchors.fill: parent
             anchors.topMargin: job_tasks.height+main_menu.height
         }
-
     }
     Item{
         id: blades_side_view
@@ -260,9 +272,61 @@ Rectangle {
                 onClicked: parent.clicked()
             }
         }
-        BladesInfo{
-            id:blades_info
+
+        Loader {
+            id: blades_info
             anchors.fill: parent
+            source: blades_ListView.currentIndex!=-1 ? "BladesInfo.qml" : ""
+        }
+    }
+    Item{
+        id: users_side_view
+        anchors.fill: parent
+        Rectangle {
+            width:parent.width
+            height:33
+            anchors.topMargin: 84
+            anchors.top: parent.top
+
+            Layout.fillWidth: true
+            layer.enabled: true
+            layer.effect: DropShadow {
+                transparentBorder: true
+                samples: 17
+                radius:7
+            }
+
+            color:side_view.color
+
+            Text {
+                   text: "INFO"
+                   anchors.centerIn: parent
+                   font.pixelSize: 13
+                   font.family: robotoRegular.name
+                   font.weight: Font.Thin
+                   color: "white"
+                   opacity:0.9
+               }
+            Rectangle {
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: 1
+                color:"#fe9400"
+                opacity: 0.9
+                layer.enabled: true
+            }
+
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: parent.clicked()
+            }
+        }
+
+        Loader {
+            id: users_info
+            anchors.fill: parent
+            source: users_ListView.currentIndex!=-1 ? "UsersInfo.qml" : ""
         }
     }
 } 

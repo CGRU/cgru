@@ -110,7 +110,7 @@ void TasksModel::taskSkip(int i_index)
 
 int TasksModel::taskTimes(int job_id,int i_index)
 {
-    //qDebug()<<"job_ids ID: "<<job_ids[0];
+    //qDebug()<<"job_ids ID: "<<job_id;
     QList<int> times=m_RLS->getTasksRawTime(job_id);
     if (i_index>times.size()){return 0;}
     return times[i_index];

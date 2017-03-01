@@ -107,7 +107,7 @@ Item{
         color: "white"
         }
     Text {
-        text: "Appr. Time To Finish "
+        text: "Appr. Time To Finish"
         anchors.right: parent.right
         font.pixelSize: parent.custom_font_size
         font.family:parent.custom_font
@@ -115,13 +115,22 @@ Item{
         color: "white"
         }
     Text {
-        text: "Tasks Running"
+        text: "Dependency"
         anchors.right: parent.right
         font.pixelSize: parent.custom_font_size
         font.family:parent.custom_font
         font.letterSpacing:1
         color: "white"
         }
+    /*
+    Text {
+        text: "Tasks Running"
+        anchors.right: parent.right
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }*/
 
     }
 
@@ -144,7 +153,7 @@ Item{
 		color: "white"
 	    }
 	Text {
-        text: ""//jobs_ListView.currentItem.v_state
+        text: jobs_ListView.currentItem.v_state
 		anchors.left: parent.left
 		font.pixelSize: parent.custom_font_size
 		font.family:parent.custom_font
@@ -154,7 +163,7 @@ Item{
 	Text {
         text:3==jobs_ListView.currentItem.v_state ? "Done"
                                                   : JobState.RUNNING==jobs_ListView.currentItem.v_state ? jobs_ListView.currentItem.v_progress+"%"
-                                                  : JobState.OFFLINE==jobs_ListView.currentItem.v_state ? "Paused on "+jobs_ListView.currentItem.v_progress+"%"
+                                                  : JobState.OFFLINE==jobs_ListView.currentItem.v_state ? "Stopped on "+jobs_ListView.currentItem.v_progress+"%"
                                                   : JobState.READY==jobs_ListView.currentItem.v_state ? "Waiting on "+jobs_ListView.currentItem.v_progress+"%"
                                                   : JobState.ERROR==jobs_ListView.currentItem.v_state ? "Errored" : jobs_ListView.currentItem.v_progress+"%"
 		anchors.left: parent.left
@@ -237,12 +246,21 @@ Item{
         color: "white"
         }
     Text {
-        text: jobs_ListView.currentItem.v_blades_length
+        text: jobs_ListView.currentItem.v_depends
         anchors.left: parent.left
         font.pixelSize: parent.custom_font_size
         font.family:parent.custom_font
         font.letterSpacing:1
         color: "white"
         }
+    /*
+    Text {
+        text: jobs_ListView.currentItem.v_blades_length
+        anchors.left: parent.left
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }*/
     }
 } 

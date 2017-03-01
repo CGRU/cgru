@@ -103,4 +103,4 @@ case ${DISTRIBUTIVE} in
 esac
 
 # Build:
-cmake . && make $@
+cmake -DCMAKE_CXX_STANDARD=11 . && make $@

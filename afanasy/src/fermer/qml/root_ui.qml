@@ -47,47 +47,50 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.1
 import JobStateEnums 1.0
 import Qt.labs.settings 1.0
+import QtQuick.Dialogs 1.1
 
 Item {
     id: root
-    visible: false
-    Component.onCompleted:{
-        visible=true
-    }
     Component.onDestruction: {
         settings.custom_aligntype_s = item_align.state
+        settings.view_states = item_states.state
     }
+
     Item {
         id:item_states
-        state:"JobView"
+        state:settings.view_states
         states: [
             State {
               name: "JobView"
                   PropertyChanges {target: blades_view; visible: false}
                   PropertyChanges {target: main_menu; state:"JobView"}
                   PropertyChanges {target: side_view; state:"JobView"}
-                  PropertyChanges {target: not_implemented_view; visible: false}
+                  PropertyChanges {target: users_view; visible: false}
                   PropertyChanges {target: node_view; visible: false}
                   PropertyChanges {target: metrics_view; visible: false}
                   PropertyChanges {target: jobs_view; visible: true}
                   PropertyChanges {target: root; update_state: 0}
+                  PropertyChanges {target: not_implemented_view; visible: false}
             },
             State {
               name: "BladeView"
                   PropertyChanges {target: blades_view; visible: true}
                   PropertyChanges {target: main_menu; state:"BladeView"}
                   PropertyChanges {target: side_view; state:"BladeView"}
-                  PropertyChanges {target: not_implemented_view; visible: false}
+                  PropertyChanges {target: users_view; visible: false}
                   PropertyChanges {target: node_view; visible: false}
                   PropertyChanges {target: metrics_view; visible: false}
                   PropertyChanges {target: jobs_view; visible: false}
                   PropertyChanges {target: root; update_state: 1}
+                  PropertyChanges {target: not_implemented_view; visible: false}
             },
             State {
                name: "NodeView"
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"NodeView"}
                     PropertyChanges {target: side_view; state:"NodeView"}
+                    PropertyChanges {target: not_implemented_view; visible: false}
+                    PropertyChanges {target: users_view; visible: false}
                     PropertyChanges {target: node_view; visible: true}
                     PropertyChanges {target: metrics_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
@@ -98,37 +101,63 @@ Item {
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"UsersView"}
                     PropertyChanges {target: side_view; state:"UsersView"}
-                    PropertyChanges {target: not_implemented_view; visible: true}
+                    PropertyChanges {target: users_view; visible: true}
                     PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
+                    PropertyChanges {target: not_implemented_view; visible: false}
+                    PropertyChanges {target: root; update_state: 3}
             },
             State {
                 name: "MetricView"
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"MetricView"}
                     PropertyChanges {target: side_view; state:"MetricView"}
-                    PropertyChanges {target: not_implemented_view; visible: false}
+                    PropertyChanges {target: users_view; visible: false}
                     PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: true}
                     PropertyChanges {target: jobs_view; visible: false}
                     PropertyChanges {target: root; update_state: 4}
+                    PropertyChanges {target: not_implemented_view; visible: false}
+            },
+            State {
+                name: "TerminalView"
+                    PropertyChanges {target: blades_view; visible: false}
+                    PropertyChanges {target: main_menu; state:"TerminalView"}
+                    PropertyChanges {target: side_view; state:"TerminalView"}
+                    PropertyChanges {target: not_implemented_view; visible: true}
+                    PropertyChanges {target: node_view; visible: false}
+                    PropertyChanges {target: users_view; visible: false}
+                    PropertyChanges {target: metrics_view; visible: false}
+                    PropertyChanges {target: jobs_view; visible: false}
+                    PropertyChanges {target: root; update_state: 5}
             }
         ]
     }
     Settings {
         id: settings
+        category: "Fermer"
+        property alias notify_toggl: root.notify_toggl
+        property alias show_all_jobs: root.show_all_jobs
+        property alias swap_jobs_name: root.swap_jobs_name
         property alias transient_toggl: root.transient_toggl
         property alias farm_usage_toggl: root.farm_usage_toggl
+        property alias supervisor_mode: root.supervisor_mode
         property string custom_aligntype_s: "AlignCenter"
+        property string view_states: "JobView"
     }
+    property bool notify_toggl:true
     property var custom_aligntype: Text.AlignLeft
     property bool transient_toggl:true
     property bool farm_usage_toggl: false
+    property bool supervisor_mode: false
     property string side_state: "Info"
     property int update_state: 99
     property string filtered_text: ""
     property int task_height: 24
+    property alias job_context_menu: job_context_menu_.item
+    property bool swap_jobs_name: false
+    property bool show_all_jobs: false
 
     signal jobClicked
 
@@ -166,27 +195,57 @@ Item {
     }
 
     function timeChanged()  {
-        if (update_state==0){
-            JobsModel.updateInteraction(filtered_text)
-            if (root.side_state=="Tasks"){
-                TasksModel.updateTasksByJobID(jobs_ListView.currentItem.v_job_id)
+        if (General.serverExist()){
+            if (update_state==0){
+                if (jobs_ListView.currentIndex!=-1){
+                    JobsModel.updateInteraction(filtered_text)
+                    JobsModel.setShowAllJobs(show_all_jobs)
+                    //console.log("gg "+JobsModel.areJobsDone().length)
+                    if (root.side_state=="Tasks"){
+                        TasksModel.updateTasksByJobID(jobs_ListView.currentItem.v_job_id)
+                    }
+                    //--- Title State Info
+                    window_root.title=jobs_ListView.currentItem.v_progress+"%"+" - "+jobs_ListView.currentItem.v_block_name+"  ::  AFermer  ::  Render Manager"
+
+                    if (JobState.OFFLINE==jobs_ListView.currentItem.v_state){
+                        window_root.title="Stop  ::  AFermer  ::  Render Manager"
+                    }
+                    if (JobState.ERROR==jobs_ListView.currentItem.v_state){
+                        window_root.title="Error  ::  AFermer  ::  Render Manager"
+                    }
+                    if (JobState.READY==jobs_ListView.currentItem.v_state){
+                        window_root.title="Waiting  ::  AFermer  ::  Render Manager"
+                    }
+                }
+                else{
+                    window_root.title="No Jobs"
+                }
             }
-            //--- Title State Info
-            window_root.title=jobs_ListView.currentItem.v_progress+"%"+" - "+jobs_ListView.currentItem.v_block_name+"  ::  AFermer  ::  Render Manager"
-            if (JobState.OFFLINE==jobs_ListView.currentItem.v_state){
-                window_root.title="Stop  ::  AFermer  ::  Render Manager"
+            if (update_state==1){
+                BladesModel.updateInteraction(filtered_text)
             }
-            if (JobState.ERROR==jobs_ListView.currentItem.v_state){
-                window_root.title="Error  ::  AFermer  ::  Render Manager"
+            if (update_state==2){
+                JobsModel.updateInteraction(filtered_text)
+                //BladesModel.updateInteraction(filtered_text)
+                JobsModel.updateGroupNodeSize()
+                //JobsModel.arangeNodes()
             }
-            if (JobState.READY==jobs_ListView.currentItem.v_state){
-                window_root.title="Waiting  ::  AFermer  ::  Render Manager"
+            if (update_state==3){
+                UsersModel.updateInteraction(filtered_text)
             }
-            //--------------------
+
+            if(notify_toggl){
+                if (JobsModel.areJobsDone().length){
+                    notifyer.custom_text=JobsModel.areJobsDone()
+                    notifyer.show()
+                }
+            }
+
         }
-        if (update_state==1){
-            BladesModel.updateInteraction(filtered_text)
+        else{
+            background.source = "NoConnection.qml"
         }
+
         totalJobs=JobsModel.totalJobs();
         doneJobs=JobsModel.doneJobs();
         waitingJobs=JobsModel.readyJobs();
@@ -214,12 +273,12 @@ Item {
         property var job_minimum_Width: {"progress": 130,
                                          "elapsed": 100,
                                          "user": 35,
-                                         "job_name": 230,
+                                         "job_name": root.width-side_view.width-750,
                                          "slots": 40,
                                          "priority": 60,
                                          "started": 100,
                                          "software": 100,
-                                         "approximate_time": 90}
+                                         "approximate_time": 70}
         property int selection
 
         Component{
@@ -384,9 +443,10 @@ Item {
             id: popJobErrorDialog
             title: "Error Blades"
         }
-
-        JobContextMenu{
-            id: job_context_menu
+        Loader {
+            id: job_context_menu_
+            anchors.fill: parent
+            source: jobs_ListView.currentIndex!=-1 ? "JobContextMenu.qml" : ""
         }
     }
 
@@ -478,6 +538,7 @@ Item {
                 inputMethodHints:Qt.ImhDigitsOnly
 
                 color: "white"
+
                 Keys.onReturnPressed: {
                     popBladeSetMaxSlots.close();
                     BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
@@ -520,13 +581,89 @@ Item {
 
     NodeView{
         id:node_view
-        width:jobs_view.width
-        height: 400
+        width:jobs_view.width+18
+        height: root.height-85
 
         anchors.right: side_view.left
         anchors.rightMargin: 10
-        anchors.top:main_menu.top
-        anchors.topMargin: 50
+        anchors.top:main_menu.bottom
+    }
+
+    UsersView{
+        id:users_view
+        width: root.width-side_view.width-18
+        height: root.height-85
+
+        anchors.right: side_view.left
+        anchors.rightMargin: 10
+        anchors.top:main_menu.bottom
+        anchors.topMargin: 0
+
+        property var user_minimum_Width: {"user_machine_ip": 140,
+                                         "user": 45,
+                                         "tasks_running": root.width-side_view.width-400,
+                                         "jobs_size": 85,
+                                         "priority": 80}
+        property int selection
+
+        Component{
+            id:user_delegate
+            UserDelegate{
+                aligntype: custom_aligntype
+                height: 45
+
+            }
+        }
+        ScrollView {
+            anchors.fill: parent
+            anchors.topMargin: 35
+            highlightOnFocus:true
+            style: ScrollViewStyle {
+                transientScrollBars: root.transient_toggl
+                scrollBarBackground: Item {
+                    implicitWidth: 12
+                    implicitHeight: 26
+                }
+                handle: Rectangle {
+                    implicitWidth: 12
+                    implicitHeight: 26
+                    color: "white"
+                    opacity: 0.4
+                }
+                decrementControl: Rectangle {
+                    implicitWidth: 12
+                    implicitHeight: 2
+                    color: "white"
+                    opacity: 0.3
+                }
+                incrementControl: Rectangle {
+                    implicitWidth: 12
+                    implicitHeight: 1
+                    color: "white"
+                    opacity: 0.3
+                }
+            }
+                ListView {
+                  id: users_ListView
+                  anchors.fill: parentss
+                  delegate:user_delegate
+                  model: UsersModel.usersModel
+                  focus: true
+                  cacheBuffer:40
+                }
+        }
+        UserContextMenu{
+            id: user_context_menu
+        }
+        ColorDialog {
+            id: color_dialog
+            visible: false
+            modality: Qt.WindowModal
+            title: "Choose a color"
+            onAccepted: {
+                UsersModel.setUserColor(users_ListView.currentItem.v_user_name,color_dialog.color)
+            }
+        }
     }
 
     MetricsView{
@@ -562,6 +699,16 @@ Item {
     onJobClicked: {
         side_view.jobClicked.call()
     }
+    /*
+    Loader {
+        id: side_view
+        width: parent.width/4
+        height: parent.height
+        x:parent.width-parent.width/4
+        //source: jobs_ListView.currentIndex!=-1 ? "SideView.qml" : ""
+        source: "SideView.qml"
+    }
+    */
     SideView{
         id: side_view
         width: parent.width/4
@@ -581,13 +728,80 @@ Item {
     }
 
 
-    InfoDialog {
-        id: popJobAboutDialog
-        title: "About Fermer"
-        width: 220
-        height: 70
-    }
 
+    About {
+        id: popAboutDialog
+    }
+    Window {
+        id: notifyer
+        title: "AFermer Info"
+        width: 300
+        height: 70
+        x:Screen.width - width-20
+        y:Screen.height
+        flags:Qt.WindowStaysOnTopHint|Qt.FramelessWindowHint
+        modality: Qt.NonModal
+        color: "transparent"
+        property string custom_text:''
+        Rectangle{
+            anchors.fill: parent
+            color: "#1d262b"
+            opacity: 0.8
+            layer.enabled: true
+            ScrollView {
+                width: 270
+                height: 50
+                anchors.top:parent.top
+                anchors.topMargin: 10
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                highlightOnFocus:true
+                style: ScrollViewStyle {
+                    transientScrollBars: root.transient_toggl
+                }
+                Text{
+                    anchors.centerIn: parent
+                    font.pixelSize: 14
+                    font.family: robotoRegular.name
+                    font.weight: Font.Light
+                    font.letterSpacing:1.2
+                    color:   "white"
+                    text:    notifyer.custom_text
+                }
+            }
+            Text{
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 20
+                color:   "white"
+                text:    "Jobs Are Done"
+            }
+            Rectangle {
+                height: 20
+                width:50
+                color: "#1d262b"
+                layer.enabled: true
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.leftMargin: 10
+                anchors.bottomMargin: 2
+                Text {
+                    text: "Close"
+                    anchors.centerIn: parent
+                    color: "white"
+                }
+                MouseArea {
+                    id: mouseArea
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.clearNotify()
+                        notifyer.close();
+                    }
+                }
+            }
+        }
+    }
 
     Menu {
        id: main_contextMenu
@@ -612,19 +826,27 @@ Item {
            }
        }
        MenuItem {
-           id: usermode_menuitem
-           text: "User Mode (not impl.)"
-           checkable: true
-           checked: supervisormode_menuitem.checked ? false : true
-       }
-       MenuItem {
            id: supervisormode_menuitem
            text: "Supervisor Mode (not impl.)"
            checkable: true
-           checked: usermode_menuitem.checked ? false : true
+           checked: supervisor_mode
+           onToggled: {
+               supervisor_mode=supervisormode_menuitem.checked
+           }
        }
        MenuSeparator { }
-       iconSource: "icons/remove.png"
+       MenuItem {
+           id: showalljobs_menuitem
+           text: "Show All Jobs"
+           checkable: true
+           checked:show_all_jobs
+           onToggled: {
+               show_all_jobs=showalljobs_menuitem.checked
+               JobsModel.setShowAllJobs(show_all_jobs)
+               JobsModel.updateInteraction(filtered_text)
+           }
+           //checked:  ? false : true
+       }
        MenuItem {
            id: farm_usage_menuitem
            checkable: true
@@ -644,15 +866,38 @@ Item {
                //console.log(" rowCount():"+scrollbar_transient_menuitem.checked)
            }
        }
+       MenuItem {
+           id: swap_jobs_names_menuitem
+           checkable: true
+           text: "Swap Jobs Names"
+           checked:swap_jobs_name
+           onToggled: {
+               swap_jobs_name=swap_jobs_names_menuitem.checked
+           }
+       }
        MenuSeparator { }
+       MenuItem {
+           id: notif_my_jobs_complete_menuitem
+           checkable: true
+           text: "Notifier My Job Completed "
+           checked: notify_toggl
+           onTriggered: {
+               notify_toggl=notif_my_jobs_complete_menuitem.checked
+           }
+       }
+       MenuItem {
+           id: notif_blades_memory_overflow_menuitem
+           checkable: true
+           text: "Notifier Blades Memory Overflow (not impl.)"
+       }
+       MenuSeparator { }
+       MenuItem {
+           text: "Help (not impl.)"
+       }
        MenuItem {
            text: "About"
            onTriggered:{
-               popJobAboutDialog.text=("     QT:                "+BladesModel.qt_version()
-                                       +"\n     AFermer:       0.5.2")
-                                       //+"\n\n     Developed In 'Platige Image'"
-                                       //+"\n             www.platige.com")
-               popJobAboutDialog.show()
+               popAboutDialog.show()
            }
        }
        

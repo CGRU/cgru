@@ -1,9 +1,10 @@
-import QtQuick 2.5
+import QtQuick 2.7
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.2
 import QtQuick.Window 2.0
+import TaskStateEnums 1.0
 
 Item{
     id: job_task_
@@ -140,7 +141,7 @@ Item{
            onTriggered:{
                popTaskOutputDialog.text="Retrieving running task output from render..."
                popTaskOutputDialog.show()
-               popTaskOutputDialog.text=TasksModel.taskOutput(task_ListView.currentItem.v_id)
+               popTaskOutputDialog.text=TasksModel.taskOutput(task_ListView.currentItem.v_id,task_ListView.currentItem.v_state)
            }
        }
        MenuItem {

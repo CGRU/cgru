@@ -1,6 +1,8 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/*.h")
 
+set(CMAKE_CXX_STANDARD 11)
+
 if( "$ENV{AF_QT_VER}" STREQUAL "5" )
 	find_package(Qt5Core REQUIRED)
 	find_package(Qt5Network REQUIRED)

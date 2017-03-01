@@ -11,13 +11,15 @@ Rectangle {
     property int    v_state:state_machine
     property string v_name:machine_name
     property string v_blades_group:blades_group
-    property real v_loaded_cpu:loaded_cpu
-    property real v_loaded_mem:loaded_mem[0]
-    property real v_loaded_net:loaded_net
+    property real v_loaded_cpu:state_machine==BladeState.OFFLINE ? 0 : loaded_cpu
+    property real v_loaded_mem:state_machine==BladeState.OFFLINE ? 0 : loaded_mem[0]
+    property real v_loaded_net:state_machine==BladeState.OFFLINE ? 0 : loaded_net
     property string v_working_time:working_time
     property string v_ip_address:ip_address
     property string v_blade_id:blade_id
     property string v_avalible_performance_slots:avalible_performance_slots
+    property string v_jobsIn: ""+jobsIn
+    property int v_hdd_busy: loaded_hdd
 
 
     MouseArea {
@@ -36,7 +38,7 @@ Rectangle {
           }
       }
 
-      property real loadedcpu : loaded_cpu*1.96;
+      property real loadedcpu : v_loaded_cpu*1.96;
       property real angle : 0;
       PropertyAnimation {id: animateCPU; target: delegateItem; properties: "angle"; to: loadedcpu; duration: 1000}
 
@@ -87,8 +89,8 @@ Rectangle {
                   color: state_machine==BladeState.BUSY ? "#fa9201"
                                                         : state_machine==BladeState.OFFLINE ? "#82898d"
                                                         : state_machine==BladeState.READY ? "#80cbc4"
-                                                        : state_machine==BladeState.NIMBY ? "#80cbff"
-                                                        : state_machine==BladeState.BIG_NIMBY ? "#80cbff"
+                                                        : state_machine==BladeState.NIMBY ? "#5e90ff"
+                                                        : state_machine==BladeState.BIG_NIMBY ? "#5e90ff"
                                                         : state_machine==BladeState.DIRTY ? "red"
                                                         : "#ffffff"
                   opacity: 0.9
@@ -106,6 +108,7 @@ Rectangle {
                 font.pointSize: 10.5
                 text: machine_name
           }
+          /*
           Text {
                 layer.enabled: true
                 color: "white"
@@ -116,7 +119,7 @@ Rectangle {
                 font.family:robotoRegular.name
                 font.pointSize: 10.5
                 text: blades_group
-          }
+          }*/
           Canvas {
               id: canvas_cpu;
               width: 50
@@ -186,8 +189,11 @@ Rectangle {
 
 
                   ctx.lineTo(canvas_memory.width, canvas_memory.height);
-                  for (var i = 0; i < 25; i++) {
-                      ctx.lineTo(widthPos(i,canvas_memory.width,canvas_memory.width), heightPos(i,canvas_memory.height,canvas_memory.height));
+                  if (state_machine!=BladeState.OFFLINE)
+                  {
+                      for (var i = 0; i < 25; i++) {
+                          ctx.lineTo(widthPos(i,canvas_memory.width,canvas_memory.width), heightPos(i,canvas_memory.height,canvas_memory.height));
+                      }
                   }
                   ctx.lineTo(0, canvas_memory.height);
 
@@ -216,7 +222,7 @@ Rectangle {
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
                 font.pointSize: 10.5
-                text: loaded_net+" Kb/s"
+                text: v_loaded_net+" Kb/s"
           }
           Text {
                 layer.enabled: true

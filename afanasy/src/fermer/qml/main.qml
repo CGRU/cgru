@@ -61,19 +61,36 @@ ApplicationWindow {
 
     color: "#1d262b"
 
+    Text {
+        id: loading_back
+        anchors.centerIn: parent
+        color: "white"
+        opacity: 0.45
+        text:"Loading ..."
+        font.letterSpacing:1.2
+        font { family: robotoRegular.name; pixelSize: 18}
+    }
+
     Loader {
         id: background
-
+        asynchronous: true
         anchors.fill: parent
-        Component.onCompleted:{
-            //console.log(" background.visible():")
-        }
-        visible: false
-        onStatusChanged: if (background.status == Loader.Ready) visible=true
+        onStatusChanged: if (background.status == Loader.Ready){
+                             loading_back.visible=false
+                         }
     }
 
     onOpenglContextCreated:  {
-             //console.log(" rowCount():")
-             background.source = "root_ui.qml"
+             //console.log(" :"+General.serverExist())
+             if (General.serverExist()){
+                background.source = "root_ui.qml"
+             }
+             else{
+                background.source = "NoConnection.qml"
+             }
+
          }
+    onClosing: {
+        General.app_exit()
+    }
 }

@@ -87,7 +87,7 @@ Rectangle{
                 layer.enabled: true
                 color: "white"
                 opacity: 0.45
-                text: "AFT"
+                text: "ETA"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
             }

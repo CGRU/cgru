@@ -24,9 +24,9 @@ namespace afermer
 class Waves
 {
 public:
-    PI_TYPEDEF_SMART_PTRS(af::Msg)
-    PI_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, size_t)
-    PI_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, af::Af *)
+    AFERMER_TYPEDEF_SMART_PTRS(af::Msg)
+    AFERMER_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, size_t)
+    AFERMER_DEFINE_CREATE_FUNC_2_ARGS(af::Msg, size_t, af::Af *)
 };
 
 class RadiolocationStation : public QObject
@@ -40,16 +40,17 @@ protected:
 
 private slots:
     void pullMessage( af::Msg *msg);
+    void connectionLost();
 
 signals:
     void outputComplited();
 
 public:
-    PI_TYPEDEF_SMART_PTRS(RadiolocationStation)
-    PI_DEFINE_CREATE_FUNC(RadiolocationStation)
+    AFERMER_TYPEDEF_SMART_PTRS(RadiolocationStation)
+    AFERMER_DEFINE_CREATE_FUNC(RadiolocationStation)
 
     static bool QStringFromMsg(QString&, Waves::Ptr);
-    static int getAvalibleSlots(af::Render *, int);
+    static int getAvalibleSlotsAndJobNames(af::Render *, int, QString&, QList<int>&);
     static void getItemInfo( std::ostringstream&, const std::string &, const std::string &, int);
 
 
@@ -64,11 +65,16 @@ public:
     void addJobId( int i_jid, bool i_add);
 
     size_t getId();
+    size_t getUserId();
+    void getServerIPAddress(std::string&);
+    void getUserName(std::string&);
 
     MonitorHost* m_monitor;
     size_t monitor_id;
 
     void getTaskOutput(QString&, int, int, int, TaskState::State);
+
+    bool isConnected();
 
 private:
     afqt::QThreadClientUp   m_qThreadClientUpdate;
@@ -77,6 +83,12 @@ private:
     
     std::string task_output_body;
     bool wait_task_stdout;
+    bool m_connected;
+
+    size_t user_id;
+    std::string user_name;
+
+    af::Msg* msg_monitor_id;
 
 };
 

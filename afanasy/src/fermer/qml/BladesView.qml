@@ -77,6 +77,7 @@ Rectangle{
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
             }
+            /*
             Text {
                 Layout.preferredWidth: blades_view.blade_minimum_Width.blades_group*1
                 horizontalAlignment : Text.AlignHCenter
@@ -86,7 +87,7 @@ Rectangle{
                 text:"Blades Gr."
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
-            }
+            }*/
             Text {
                 Layout.preferredWidth: blades_view.blade_minimum_Width.cpu*1
                 horizontalAlignment : Text.AlignHCenter

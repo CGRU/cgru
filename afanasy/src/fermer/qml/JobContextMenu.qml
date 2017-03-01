@@ -103,7 +103,7 @@ Menu {
    MenuItem {
        text: jobs_ListView.currentItem.v_group_size>1 ? "Delete Group" : "Delete"
        onTriggered:{
-            JobsModel.deleteJob()
+            JobsModel.deleteJobGroup()
        }
    }
    style: MenuStyle {
