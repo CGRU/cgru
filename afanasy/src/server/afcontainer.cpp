@@ -125,7 +125,7 @@ int AfContainer::add( AfNodeSrv * i_node)
 		AfNodeSrv *after  = NULL;
 		while( before != NULL )
 		{
-			if( *before < *i_node )
+			if( before->priority() < i_node->priority())
 			{
 				after = before;
 				before = before->m_prev_ptr;

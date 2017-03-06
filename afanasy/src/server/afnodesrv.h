@@ -11,6 +11,7 @@ public:
 	virtual ~AfNodeSrv();
 
 	inline af::Node * node() { return m_node; }
+	int priority() const { return m_node->getPriority(); }
 
 	void store() const;
 
@@ -21,6 +22,7 @@ public:
 	inline const std::string & getStoreFile() const { return m_store_file; }
 	bool createStoreDir() const;
 
+/*
 	/// Nodes comparison by priority ( wich is private property).
 	inline bool operator <  ( const AfNodeSrv & other) const { return m_node->m_priority <  other.m_node->m_priority;}
 	inline bool operator <= ( const AfNodeSrv & other) const { return m_node->m_priority <= other.m_node->m_priority;}
@@ -28,7 +30,7 @@ public:
 	inline bool operator >= ( const AfNodeSrv & other) const { return m_node->m_priority >= other.m_node->m_priority;}
 	inline bool operator == ( const AfNodeSrv & other) const { return m_node->m_priority == other.m_node->m_priority;}
 	inline bool operator != ( const AfNodeSrv & other) const { return m_node->m_priority != other.m_node->m_priority;}
-
+*/
 	/// Set some node attribute by incoming message.
 	void action( Action & i_action);
 
@@ -41,8 +43,8 @@ public:
 	friend class AfContainer;
 	friend class AfContainerIt;
 
-	inline void lock()     const { m_node->m_locked =  true; }
-	inline void unLock()   const { m_node->m_locked = false; }
+	inline void lock()   const { m_node->setLocked( true);  }
+	inline void unLock() const { m_node->setLocked( false); }
 
 	// Request to delete a node.
 	void setZombie();

@@ -29,7 +29,7 @@ AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
 
 void AfNodeSrv::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-	AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
+	AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->getName().c_str(), m_node->getId())
 	return;
 }
 
@@ -39,7 +39,7 @@ AfNodeSrv::~AfNodeSrv()
 
 void AfNodeSrv::setZombie()
 {
-	m_node->m_flags = m_node->m_flags | af::Node::FZombie;
+	m_node->setZombieFlag();
 
 	// Delete store folder (with recursion)
 	if( m_store_dir.size())
@@ -61,7 +61,7 @@ bool AfNodeSrv::createStoreDir() const
 
 	if( m_store_dir.empty())
 	{
-		AF_ERR << "Store folder is not set for '" << m_node->m_name << "'";
+		AF_ERR << "Store folder is not set for '" << m_node->getName() << "'";
 		return false;
 	}
 
@@ -160,7 +160,7 @@ void AfNodeSrv::action( Action & i_action)
 	{
 		if( i_action.log[0] == '\n' )
 			i_action.log[0] = ' ';
-		i_action.users->logAction( i_action, m_node->m_name);
+		i_action.users->logAction( i_action, m_node->getName());
 		i_action.log += std::string(" by ") + i_action.author;
 		appendLog( i_action.log);
 	}
@@ -187,7 +187,7 @@ int AfNodeSrv::calcLogWeight() const
 af::Msg * AfNodeSrv::writeLog( bool i_binary) const
 {
 	if( false == i_binary )
-		return af::jsonMsg( "log", m_node->m_name, m_log);
+		return af::jsonMsg( "log", m_node->getName(), m_log);
 
 	af::Msg * msg = new af::Msg;
 	msg->setStringList( m_log );

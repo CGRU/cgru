@@ -33,7 +33,6 @@ public:
 	void setZombie();
 
 	friend class AfList;
-	friend class AfListIt;
 
 protected:
 	/// General need calculation function,

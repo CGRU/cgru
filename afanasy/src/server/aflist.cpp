@@ -47,7 +47,11 @@ int AfList::add( AfNodeSolve *node)
 		while( it != end_it)
 		{
 			index++;
-			if( **it >= *node ) { it++; continue;}
+			if((*it)->priority() >= node->priority())
+			{
+				it++;
+				continue;
+			}
 
 			m_nodes_list.insert( it, node);
 
@@ -89,7 +93,12 @@ int AfList::sortPriority( AfNodeSolve * i_node)
    while( it != end_it)
    {
       index++;
-      if( **it >= *i_node ) { it++; continue;}
+      if((*it)->priority() >= i_node->priority())
+	  {
+		  it++;
+		  continue;
+	  }
+
       m_nodes_list.insert( it, i_node);
       lessPriorityFound = true;
       break;
@@ -139,11 +148,10 @@ printf("AfList::moveNodes:\n");
    {
       for( unsigned n = 0; n < i_list.size(); n++)
       {
-         if( (*it)->m_node->m_id == i_list[n] )
+         if( (*it)->node()->m_id == i_list[n] )
          {
 #ifdef AFOUTPUT
-//printf("Found a node \"%s\"-%d\n", (*it)->getName().c_str(), (*it)->m_node->m_id);
-printf("Found a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node->m_id );
+printf("Found a node \"%s\"-%d\n", (*it)->node()->m_name.c_str(), (*it)->node()->m_id );
 #endif
             move_list.push_back( *it);
             break;
@@ -185,8 +193,7 @@ printf("Found a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node-
          it_move++;
       }
 #ifdef AFOUTPUT
-//printf("Processing node \"%s\"-%d\n", node->getName().c_str(), node->getId());
-printf("Processing node \"%s\"-%d\n",  node->m_node->m_name.c_str(), node->m_node->m_id );
+printf("Processing node \"%s\"-%d\n",  node->node()->getName().c_str(), node->node()->getId());
 #endif
       std::list<AfNodeSolve*>::iterator it_insert = m_nodes_list.begin();
       while( it_insert != it_end)
@@ -196,7 +203,7 @@ printf("Processing node \"%s\"-%d\n",  node->m_node->m_name.c_str(), node->m_nod
       }
       if( it_insert == it_end)
       {
-         AFERRAR("AfList::moveNodes: Lost node - \"%s\" - %d.\n", node->m_node->m_name.c_str(), node->m_node->m_id);
+         AFERRAR("AfList::moveNodes: Lost node - \"%s\" - %d", node->node()->getName().c_str(), node->node()->getId());
          continue;
       }
 
@@ -215,7 +222,7 @@ printf("Node is already at top.\n");
                continue;
             }
             it_insert--;
-            if( **it_insert != *node)
+            if((*it_insert)->priority() != node->priority())
             {
 #ifdef AFOUTPUT
 printf("Node above has another priority\n");
@@ -237,7 +244,7 @@ printf("Node is already at bottom.\n");
 #endif
                continue;
             }
-            if( **it_insert != *node )
+            if((*it_insert)->priority() != node->priority())
             {
 #ifdef AFOUTPUT
 printf("Node below has another priority\n");
@@ -262,7 +269,7 @@ printf("Node is already at top.\n");
             for(;;)
             {
                it_insert--;
-               if( **it_insert != *node )
+               if((*it_insert)->priority() != node->priority())
                {
                   it_insert++;
                   break;
@@ -286,9 +293,13 @@ printf("AfList::MoveBottom:\n");
 #endif
             for(;;)
             {
-               if( **it_insert != *node ) break;
+               if((*it_insert)->priority() != node->priority())
+				   break;
+
                it_insert++;
-               if( it_insert == it_end) break;
+
+               if( it_insert == it_end)
+				   break;
             }
             break;
          }
@@ -318,8 +329,7 @@ printf("Node is already at it's position.\n");
       }
 
 #ifdef AFOUTPUT
-//printf("Inserting at \"%s\"-%d\n", node_move->getName().c_str(), node_move->getId());
-printf("Inserting at \"%s\"-%d\n", node_move->m_node->m_name.c_str(), node_move->m_node->m_id );
+printf("Inserting at \"%s\"-%d\n", node_move->node()->getName().c_str(), node_move->node()->getId());
 #endif
       m_nodes_list.remove( node);
       m_nodes_list.insert( it_insert, node);
@@ -331,7 +341,7 @@ const std::vector<int32_t> AfList::generateIdsList() const
 	std::vector<int32_t> ids;
 	std::list<AfNodeSolve*>::const_iterator it = m_nodes_list.begin();
 	while( it != m_nodes_list.end())
-		ids.push_back( (*(it++))->m_node->m_id);
+		ids.push_back( (*(it++))->node()->getId());
 
 	return ids;
 }
@@ -359,7 +369,7 @@ void AfListIt::next()
 	if( m_it == m_it_end)
 		return;
 
-	while( (*m_it)->m_node->isZombie())
+	while( (*m_it)->node()->isZombie())
 		if( ++m_it == m_it_end )
 			return;
 
@@ -373,7 +383,7 @@ void AfListIt::reset()
 	if( m_it == m_it_end)
 		 return;
 
-	while( (*m_it)->m_node->isZombie())
+	while( (*m_it)->node()->isZombie())
 		 if( ++m_it == m_it_end )
 			  return;
 
