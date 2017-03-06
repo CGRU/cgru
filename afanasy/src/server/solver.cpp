@@ -3,7 +3,7 @@
 #include "../include/afanasy.h"
 #include "../libafanasy/environment.h"
 
-#include "afnodesrv.h"
+#include "afnodesolve.h"
 #include "jobcontainer.h"
 #include "rendercontainer.h"
 #include "usercontainer.h"
@@ -69,18 +69,18 @@ struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 };
 
 // Functor for sorting algorithm
-struct GreaterNeed : public std::binary_function<AfNodeSrv*,AfNodeSrv*,bool>
+struct GreaterNeed : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
 {
-	inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
+	inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
 	{
 		return a->greaterNeed( b);
 	}
 };
 
 // Other functor for an alternative sorting algorithm
-struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSrv*,AfNodeSrv*,bool>
+struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
 {
-	inline bool operator()(const AfNodeSrv * a, const AfNodeSrv * b)
+	inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
 	{
 		return a->greaterPriorityThenOlderCreation( b);
 	}
@@ -94,11 +94,15 @@ void Solver::solve()
 	AF_DEBUG << "Solving jobs...";
 
 	// Get initial solve nodes list:
-	std::list<AfNodeSrv*> solve_list;
+	std::list<AfNodeSrv*> nodes_list;
 	if( af::Environment::getSolvingUseUserPriority())
-		solve_list = ms_usercontainer->getNodesStdList();
+		nodes_list = ms_usercontainer->getNodesStdList();
 	else
-		solve_list = ms_jobcontainer->getNodesStdList();
+		nodes_list = ms_jobcontainer->getNodesStdList();
+
+	std::list<AfNodeSolve*> solve_list;
+	for( std::list<AfNodeSrv*>::iterator it = nodes_list.begin(); it != nodes_list.end(); it++)
+		solve_list.push_back((AfNodeSolve*)(*it));
 
 //########################################
 
@@ -170,10 +174,10 @@ void Solver::solve()
 		render->solvingFinished();
 }
 
-RenderAf * Solver::SolveList( std::list<AfNodeSrv*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method)
+RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method)
 {
 	// Remove nodes that need no solving at all (done, offline, ...)
-	for( std::list<AfNodeSrv*>::iterator it = i_list.begin(); it != i_list.end(); )
+	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
 		if((*it)->v_canRun())
 			it++;
@@ -192,7 +196,7 @@ RenderAf * Solver::SolveList( std::list<AfNodeSrv*> & i_list, std::list<RenderAf
 	}
 
 	// Iterate solving nodes list:
-	for( std::list<AfNodeSrv*>::iterator it = i_list.begin(); it != i_list.end(); )
+	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
 		// Get renders that node can run on:
 		std::list<RenderAf*> renders;

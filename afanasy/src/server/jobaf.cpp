@@ -9,7 +9,6 @@
 
 #include "action.h"
 #include "afcommon.h"
-#include "aflistit.h"
 #include "block.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -29,7 +28,7 @@ JobContainer *JobAf::ms_jobs  = NULL;
 
 JobAf::JobAf( JSON & i_object):
 	af::Job(),
-	AfNodeSrv( this)
+	AfNodeSolve( this)
 {
 	initializeValues();
 	
@@ -45,7 +44,7 @@ JobAf::JobAf( JSON & i_object):
 
 JobAf::JobAf( const std::string & i_store_dir, bool i_system):
 	af::Job(),
-	AfNodeSrv( this, i_store_dir)
+	AfNodeSolve( this, i_store_dir)
 {
 	AF_DEBUG << "store dir = " << i_store_dir;
 	
@@ -536,8 +535,7 @@ void JobAf::v_action( Action & i_action)
 
 void JobAf::v_priorityChanged( MonitorContainer * i_monitoring)
 {
-	if( i_monitoring ) i_monitoring->addUser( m_user);
-	ms_jobs->sortPriority( this);
+	m_user->jobPriorityChanged( this, i_monitoring);
 }
 
 void JobAf::setUserListOrder( int index, bool updateDtabase)

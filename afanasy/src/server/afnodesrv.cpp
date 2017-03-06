@@ -13,22 +13,13 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-// Zero solve cycle variable in nodes is initial,
-// it means that node was not solved at all.
-unsigned long long AfNodeSrv::sm_solve_cycle = 1;
-
 AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
     m_from_store( false),
 	m_stored_ok( false),
-    m_solve_need(0.0),
-	m_solve_cycle(0), // 0 means that it was not solved at all
     m_prev_ptr( NULL),
     m_next_ptr( NULL),
 	m_node( i_node)
 {
-//	AFINFO("AfNodeSrv::AfNodeSrv:");
-//printf("this = %p\n", (void*)(this));
-//printf("m_node = %p\n", (void*)(m_node));
 	if( i_store_dir.size())
 	{
 		m_from_store = true;
@@ -38,13 +29,12 @@ AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
 
 void AfNodeSrv::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
-   return;
+	AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
+	return;
 }
 
 AfNodeSrv::~AfNodeSrv()
 {
-//AFINFO("AfNodeSrv::~Node():")
 }
 
 void AfNodeSrv::setZombie()
@@ -178,113 +168,7 @@ void AfNodeSrv::action( Action & i_action)
 		i_action.users->updateTimeActivity( i_action.user_name);
 }
 
-void AfNodeSrv::v_action( Action & i_action)
-{
-}
-
-void AfNodeSrv::v_priorityChanged( MonitorContainer * i_monitoring ){}
-
-/// Solving function should be implemented in child classes (if solving needed):
-RenderAf * AfNodeSrv::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
-{
-    AF_ERR << "AfNodeSrv::solve(): Not implemented: " <<  m_node->m_name.c_str();
-    return NULL;
-}
-void AfNodeSrv::v_calcNeed()
-{
-    AF_ERR << "AfNodeSrv::calcNeed(): Not implememted: " << m_node->m_name.c_str();
-    calcNeedResouces(-1);
-}
-bool AfNodeSrv::v_canRun()
-{
-    AF_ERR << "AfNodeSrv::canRun(): Not implememted: " << m_node->m_name.c_str();
-    return false;
-}
-bool AfNodeSrv::v_canRunOn( RenderAf * i_render)
-{
-    AF_ERR << "AfNodeSrv::canRunOn(): Not implememted: " << m_node->m_name.c_str();
-    return false;
-}
-
-/// Compare nodes need for solve:
-bool AfNodeSrv::greaterNeed( const AfNodeSrv * i_other) const
-{
-   if( m_solve_need > i_other->m_solve_need )
-   {
-      return true;
-   }
-   if( m_solve_need < i_other->m_solve_need )
-   {
-      return false;
-   }
-
-   /// If need parameters are equal,
-   /// Greater node is a node that was solved earlier
-   return m_solve_cycle < i_other->m_solve_cycle;
-}
-
-bool AfNodeSrv::greaterPriorityThenOlderCreation( const AfNodeSrv * i_other) const
-{
-    if (m_node->m_priority != i_other->m_node->m_priority)
-        return m_node->m_priority > i_other->m_node->m_priority;
-
-    // If the priority is the same, we look for the smaller creation time
-    if (m_node->getTimeCreation() != i_other->m_node->getTimeCreation())
-        return m_node->getTimeCreation() < i_other->m_node->getTimeCreation();
-
-    // If creation time is the same too (likely because this type of node does not implement getTimeCreation), use the earliest solved node
-    return m_solve_cycle < i_other->m_solve_cycle;
-}
-
-/// Try so solve a Node
-RenderAf * AfNodeSrv::trySolve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
-{
-    RenderAf * render = v_solve( i_renders_list, i_monitoring);
-
-    if( NULL == render )
-    {
-        // Was not solved
-        return NULL;
-    }
-
-    // Node solved successfully:
-
-    // Store solve cycle
-    m_solve_cycle = sm_solve_cycle;
-
-    // Calculace new need value as node got some more resource
-    // ( nodes shoud increment resource value in solve function )
-    v_calcNeed();
-
-    // Icrement solve cycle
-    sm_solve_cycle++;
-
-    // Returning that node was solved
-    return render;
-//printf("AfNodeSrv::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
-}
-
-void AfNodeSrv::calcNeedResouces( int i_resourcesquantity)
-{
-//printf("AfNodeSrv::calcNeedResouces: '%s': resourcesquantity = %d\n", name.c_str(), i_resourcesquantity);
-	m_solve_need = 0.0;
-
-// Need calculation no need as there is no need at all for some reason.
-	if( i_resourcesquantity < 0)
-	{
-		return;
-	}
-
-	if( false == v_canRun())
-	{
-		// Cannot run at all - no solving needed
-		return;
-	}
-
-	// Main solving function:
-	// ( each priority point gives 10% more resources )
-	m_solve_need = pow( 1.1, m_node->m_priority) / (i_resourcesquantity + 1.0);
-}
+void AfNodeSrv::v_action( Action & i_action){}
 
 void AfNodeSrv::appendLog( const std::string & message)
 {

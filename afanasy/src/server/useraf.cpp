@@ -6,7 +6,6 @@
 
 #include "action.h"
 #include "afcommon.h"
-#include "aflistit.h"
 #include "jobaf.h"
 #include "renderaf.h"
 #include "solver.h"
@@ -16,26 +15,27 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 UserContainer * UserAf::ms_users = NULL;
 
 UserAf::UserAf( const std::string & username, const std::string & host):
 	af::User( username, host),
-	AfNodeSrv( this)
+	AfNodeSolve( this)
 {
 	appendLog("Registered from job.");
 }
 
 UserAf::UserAf( JSON & i_object):
     af::User(),
-	AfNodeSrv( this)
+	AfNodeSolve( this)
 {
 	jsonRead( i_object);
 }
 
 UserAf::UserAf( const std::string & i_store_dir):
 	af::User(),
-	AfNodeSrv( this, i_store_dir)
+	AfNodeSolve( this, i_store_dir)
 {
 	int size;
 	char * data = af::fileRead( getStoreFile(), &size);
@@ -84,8 +84,6 @@ UserAf::~UserAf()
 {
 }
 
-void UserAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_users->sortPriority( this);}
-
 void UserAf::v_action( Action & i_action)
 {
 	const JSON & operation = (*i_action.data)["operation"];
@@ -126,6 +124,14 @@ void UserAf::v_action( Action & i_action)
 		store();
 		i_action.monitors->addEvent( af::Monitor::EVT_users_change, m_id);
 	}
+}
+
+void UserAf::jobPriorityChanged( JobAf * i_job, MonitorContainer * i_monitoring)
+{
+	AF_DEBUG << "UserAf::jobPriorityChanged:";
+	m_jobslist.sortPriority( i_job);
+	updateJobsOrder();
+	i_monitoring->addUser( this);
 }
 
 void UserAf::logAction( const Action & i_action, const std::string & i_node_name)
@@ -231,8 +237,6 @@ af::Msg * UserAf::writeJobdsOrder( bool i_binary) const
 
 void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-	AFINFA("UserAf::refresh: \"%s\"", getName().toUtf8().data())
-
 	bool changed = refreshCounters();
 
 	if( changed && monitoring )
@@ -338,14 +342,14 @@ RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContai
 		solve_method = af::Node::SolveByPriority;
 	}
 
-	std::list<AfNodeSrv*> solve_list( m_jobslist.getStdList());
+	std::list<AfNodeSolve*> solve_list( m_jobslist.getStdList());
 
 	RenderAf * render = Solver::SolveList( solve_list, i_renders_list, solve_method);
 
 	if( render )
 	{
 		// Increase running tasks / total capacity if render is online
-		// It can be online for WOL wake test
+		// It can be offline for WOL wake test
 		if( render->isOnline())
 			refreshCounters();
 

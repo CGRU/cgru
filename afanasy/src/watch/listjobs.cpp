@@ -25,6 +25,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 int     ListJobs::ms_SortType1      = CtrlSortFilter::TNONE;
 int     ListJobs::ms_SortType2      = CtrlSortFilter::TNONE;
@@ -123,8 +124,6 @@ ListJobs::ListJobs( QWidget* parent):
 
 void ListJobs::v_showFunc()
 {
-//{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[1],"operation":{"type":"watch","class":"jobs","status":"subscribe","uids":[0]}}}
-//{"action":{"user_name":"timurhai","host_name":"pc","type":"monitors","ids":[1],"operation":{"type":"watch","class":"jobs","status":"unsubscribe","uids":[0]}}}
 	if( Watch::isConnected() == false) return;
 
 	if( af::Environment::VISOR())
@@ -141,12 +140,7 @@ void ListJobs::v_showFunc()
 			if( m_parentWindow != (QWidget*)Watch::getDialog()) close();
 	}
 }
-/*
-void ListJobs::v_connectionLost()
-{
-	if( m_parentWindow != (QWidget*)Watch::getDialog()) m_parentWindow->close();
-}
-*/
+
 void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 {
 	QMenu menu(this);
@@ -413,9 +407,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 ListJobs::~ListJobs()
 {
-#ifdef AFOUTPUT
-printf("ListJobs::~ListJobs:\n");
-#endif
 }
 
 bool ListJobs::v_caseMessage( af::Msg * msg)
@@ -428,6 +419,7 @@ bool ListJobs::v_caseMessage( af::Msg * msg)
 		{
 			getUserJobsOrder();
 		}
+
 		if( false == isSubscribed() )
 		{
 			if( af::Environment::VISOR() == false )
@@ -444,6 +436,7 @@ bool ListJobs::v_caseMessage( af::Msg * msg)
 	case af::Msg::TUserJobsOrder:
 	{
 		af::MCGeneral ids( msg);
+		AF_DEBUG << "Jobs order received: " << ids.v_generateInfoString( true);
 		if( ids.getId() == MonitorHost::getUid())
 			sortMatch( ids.getList());
 		break;
@@ -458,11 +451,13 @@ bool ListJobs::v_caseMessage( af::Msg * msg)
 
 bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 {
+	bool processed = false;
+
 	if( i_me.m_events[af::Monitor::EVT_jobs_del].size())
 	{
 		deleteItems( i_me.m_events[af::Monitor::EVT_jobs_del]);
 		calcTotals();
-		return true;
+		processed = true;
 	}
 
 	std::vector<int> ids;
@@ -476,14 +471,16 @@ bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 	if( ids.size())
 	{
 		get( ids);
-		return true;
+		processed = true;
 	}
 
 	if( i_me.m_jobs_order_ids.size())
+	{
 		sortMatch( i_me.m_jobs_order_ids);
+		processed = true;
+	}
 
-
-	return false;
+	return processed;
 }
 
 ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)

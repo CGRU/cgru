@@ -7,7 +7,7 @@
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
-#include "afnodesrv.h"
+#include "afnodesolve.h"
 
 class Action;
 class Block;
@@ -20,7 +20,7 @@ class Task;
 class UserAf;
 
 /// Server side of Afanasy job.
-class JobAf : public af::Job , public AfNodeSrv
+class JobAf : public af::Job , public AfNodeSolve
 {
 public:
 	/// Construct job from JSON.

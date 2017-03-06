@@ -21,18 +21,18 @@ AfList::AfList()
 
 AfList::~AfList()
 {
-	std::list<AfNodeSrv*>::iterator it = m_nodes_list.begin();
-	std::list<AfNodeSrv*>::iterator end_it = m_nodes_list.end();
+	std::list<AfNodeSolve*>::iterator it = m_nodes_list.begin();
+	std::list<AfNodeSolve*>::iterator end_it = m_nodes_list.end();
 
    while( it != end_it)
 	  (*it++)->m_lists.remove( this);
 }
 
-int AfList::add( AfNodeSrv *node)
+int AfList::add( AfNodeSolve *node)
 {
 	int index = -1;
 
-	for( std::list<AfNodeSrv*>::const_iterator it = m_nodes_list.begin(); it != m_nodes_list.end(); it++)
+	for( std::list<AfNodeSolve*>::const_iterator it = m_nodes_list.begin(); it != m_nodes_list.end(); it++)
 		if( *it == node )
 		{
 			AFERROR("AfList::add: node already exists.");
@@ -41,8 +41,8 @@ int AfList::add( AfNodeSrv *node)
 
 	if( m_nodes_list.size() != 0 )
 	{
-		std::list<AfNodeSrv*>::iterator it = m_nodes_list.begin();
-		std::list<AfNodeSrv*>::iterator end_it = m_nodes_list.end();
+		std::list<AfNodeSolve*>::iterator it = m_nodes_list.begin();
+		std::list<AfNodeSolve*>::iterator end_it = m_nodes_list.end();
 		bool lessPriorityFound = false;
 		while( it != end_it)
 		{
@@ -66,13 +66,13 @@ int AfList::add( AfNodeSrv *node)
 	return index;
 }
 
-void AfList::remove( AfNodeSrv * i_node)
+void AfList::remove( AfNodeSolve * i_node)
 {
    m_nodes_list.remove( i_node);
    i_node->m_lists.remove( this);
 }
 
-int AfList::sortPriority( AfNodeSrv * i_node)
+int AfList::sortPriority( AfNodeSolve * i_node)
 {
    if( m_nodes_list.size() < 2 )
    {
@@ -82,8 +82,8 @@ int AfList::sortPriority( AfNodeSrv * i_node)
    int index = -1;
 
    m_nodes_list.remove( i_node);
-   std::list<AfNodeSrv*>::iterator it = m_nodes_list.begin();
-   std::list<AfNodeSrv*>::iterator end_it = m_nodes_list.end();
+   std::list<AfNodeSolve*>::iterator it = m_nodes_list.begin();
+   std::list<AfNodeSolve*>::iterator end_it = m_nodes_list.end();
    bool lessPriorityFound = false;
 
    while( it != end_it)
@@ -131,10 +131,10 @@ printf("AfList::moveNodes:\n");
 //
 //    creating move nodes list
 //
-	std::list<AfNodeSrv*> move_list;
-	std::list<AfNodeSrv*>::iterator it_begin = m_nodes_list.begin();
-	std::list<AfNodeSrv*>::iterator it_end   = m_nodes_list.end();
-	std::list<AfNodeSrv*>::iterator it = it_begin;
+	std::list<AfNodeSolve*> move_list;
+	std::list<AfNodeSolve*>::iterator it_begin = m_nodes_list.begin();
+	std::list<AfNodeSolve*>::iterator it_end   = m_nodes_list.end();
+	std::list<AfNodeSolve*>::iterator it = it_begin;
    while( it != it_end)
    {
       for( unsigned n = 0; n < i_list.size(); n++)
@@ -163,15 +163,15 @@ printf("Found a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node-
 //
 //    moving nodes in move list
 //
-	std::list<AfNodeSrv*>::iterator it_move_begin = move_list.begin();
-	std::list<AfNodeSrv*>::iterator it_move_end   = move_list.end();
-	std::list<AfNodeSrv*>::iterator it_move;
+	std::list<AfNodeSolve*>::iterator it_move_begin = move_list.begin();
+	std::list<AfNodeSolve*>::iterator it_move_end   = move_list.end();
+	std::list<AfNodeSolve*>::iterator it_move;
    if(( i_type == MoveDown) || ( i_type == MoveTop)) it_move = it_move_end;
    else it_move = it_move_begin;
 
    for(;;)
    {
-      AfNodeSrv * node;
+      AfNodeSolve * node;
       if(( i_type == MoveDown) || ( i_type == MoveTop))
       {
          if( it_move == it_move_begin ) break;
@@ -188,7 +188,7 @@ printf("Found a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node-
 //printf("Processing node \"%s\"-%d\n", node->getName().c_str(), node->getId());
 printf("Processing node \"%s\"-%d\n",  node->m_node->m_name.c_str(), node->m_node->m_id );
 #endif
-      std::list<AfNodeSrv*>::iterator it_insert = m_nodes_list.begin();
+      std::list<AfNodeSolve*>::iterator it_insert = m_nodes_list.begin();
       while( it_insert != it_end)
       {
          if((*it_insert) == node) break;
@@ -302,7 +302,7 @@ printf("Pushing node back\n");
          m_nodes_list.push_back( node);
          continue;
       }
-      AfNodeSrv * node_move = (*it_insert);
+      AfNodeSolve * node_move = (*it_insert);
       if( node_move == NULL)
       {
          AFERROR("AfList::moveNodes: node_move == NULL\n");
@@ -329,10 +329,54 @@ printf("Inserting at \"%s\"-%d\n", node_move->m_node->m_name.c_str(), node_move-
 const std::vector<int32_t> AfList::generateIdsList() const
 {
 	std::vector<int32_t> ids;
-	std::list<AfNodeSrv*>::const_iterator it = m_nodes_list.begin();
+	std::list<AfNodeSolve*>::const_iterator it = m_nodes_list.begin();
 	while( it != m_nodes_list.end())
 		ids.push_back( (*(it++))->m_node->m_id);
 
 	return ids;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
+/////////////////////        Iterator        /////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+
+AfListIt::AfListIt( AfList* i_aflist):
+	m_node( NULL),
+	m_list( i_aflist)
+{
+	reset();
+}
+
+AfListIt::~AfListIt(){}
+
+void AfListIt::next()
+{
+	m_node = NULL;
+	m_it++;
+	if( m_it == m_it_end)
+		return;
+
+	while( (*m_it)->m_node->isZombie())
+		if( ++m_it == m_it_end )
+			return;
+
+	m_node = *m_it;
+}
+
+void AfListIt::reset()
+{
+	m_it = m_list->m_nodes_list.begin();
+	m_it_end = m_list->m_nodes_list.end();
+	if( m_it == m_it_end)
+		 return;
+
+	while( (*m_it)->m_node->isZombie())
+		 if( ++m_it == m_it_end )
+			  return;
+
+	m_node = *m_it;
 }
 

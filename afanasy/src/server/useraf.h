@@ -5,7 +5,7 @@
 #include "../libafanasy/user.h"
 
 #include "aflist.h"
-#include "afnodesrv.h"
+#include "afnodesolve.h"
 
 class Action;
 class JobAf;
@@ -13,7 +13,7 @@ class RenderAf;
 class UserContainer;
 
 /// Server side of Afanasy user.
-class UserAf : public af::User, public AfNodeSrv
+class UserAf : public af::User, public AfNodeSolve
 {
 public:
 	/// Create a new user. User on job creation by unknown user.
@@ -57,6 +57,8 @@ public:
 
 	inline const std::vector<int32_t> generateJobsIds() const { return m_jobslist.generateIdsList();}
 
+	void jobPriorityChanged( JobAf * i_job, MonitorContainer * i_monitoring);
+
 	af::Msg * writeJobdsOrder( bool i_binary) const;
 
 	/// Set container.
@@ -73,8 +75,6 @@ private:
 	void updateJobsOrder( af::Job * newJob = NULL);
 
 	void deleteNode( MonitorContainer * i_monitoring);
-
-	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
 	AfList m_jobslist; ///< Jobs list.

@@ -92,7 +92,6 @@ protected:
 	std::string m_custom_data;
 
 private:
-/// Try to solve a node
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 	std::list<std::string> m_log; ///< Log.

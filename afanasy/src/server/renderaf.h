@@ -128,8 +128,6 @@ private:
 
 	void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
-	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
-
 private:
 	std::string m_farm_host_name;
 	std::string m_farm_host_description;

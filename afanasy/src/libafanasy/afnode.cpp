@@ -51,14 +51,15 @@ void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorCon
 	jr_bool("hidden", hidden, i_object, io_changes);
 	setHidden( hidden);
 
-	// Paramers below are not editable and read only on creation
-	// When use edit parameters, log provided to store changes
 	if( io_changes )
 	{
 		if( priority != -1 )
 			v_priorityChanged( i_monitoring);
 		return;
 	}
+
+	// Paramers below are not editable and read only on creation
+	// When use edit parameters, log provided to store changes
 
 	jr_string("name",   m_name,   i_object);
 	jr_int32 ("id",     m_id,     i_object);

@@ -284,8 +284,6 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 	taskexec->v_stdOut( false);
 }
 
-void RenderAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_renders->sortPriority( this);}
-
 void RenderAf::v_action( Action & i_action)
 {
 	const JSON & operation = (*i_action.data)["operation"];

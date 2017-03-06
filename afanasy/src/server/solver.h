@@ -3,7 +3,7 @@
 #include "../libafanasy/afnode.h"
 #include "../libafanasy/name_af.h"
 
-class AfNodeSrv;
+class AfNodeSolve;
 class JobContainer;
 class MonitorContainer;
 class RenderAf;
@@ -24,7 +24,7 @@ public:
 
 	void solve();
 
-	static RenderAf * SolveList( std::list<AfNodeSrv*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method);
+	static RenderAf * SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method);
 
 private:
 	static JobContainer     * ms_jobcontainer;

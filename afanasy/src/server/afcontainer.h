@@ -2,7 +2,6 @@
 
 #include "../libafanasy/common/dlRWLock.h"
 
-#include "../libafanasy/afnode.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
@@ -53,9 +52,6 @@ public:
 	friend class AfListIt;
 
 	inline int getCount() const { return m_count; }
-
-	/// Sort one node according to priority, called when priority attribute of any node changes.
-	void sortPriority( AfNodeSrv * i_node);
 
 protected:
 	int add( AfNodeSrv *node);   ///< Add node to container.
