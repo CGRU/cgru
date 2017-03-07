@@ -1,8 +1,6 @@
-#include "libafanasy/name_af.h"
-
+#include "Managers/Service/RadiolocationService.h"
 #include <QStringList>
 #include <time.h>
-#include "Managers/Service/RadiolocationService.h"
 
 namespace afermer
 {

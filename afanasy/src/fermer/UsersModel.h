@@ -1,10 +1,9 @@
-#include "libafanasy/name_af.h"
-
+#include "Managers/UserObjectsManager.h"
 #include <QAbstractListModel>
 #include <QStringList>
 #include "UserObject.h"
 #include <time.h>
-#include "Managers/UserObjectsManager.h"
+
 #include "common.h"
 
 #include <boost/algorithm/string/split.hpp>

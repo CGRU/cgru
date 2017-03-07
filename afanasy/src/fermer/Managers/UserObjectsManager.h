@@ -1,8 +1,8 @@
 #ifndef __USERCONT__
 #define __USERCONT__
 
-#include "Managers/Lorries/UserObjectsLorry.h"
 #include "Managers/Service/RadiolocationService.h"
+#include "Managers/Lorries/UserObjectsLorry.h"
 #include "common.h"
 
 

@@ -1,9 +1,8 @@
-#include "libafanasy/name_af.h"
+#include "Managers/JobObjectsManager.h"
 
 #include <QAbstractListModel>
 #include <QStringList>
 #include "JobObject.h"
-#include "Managers/JobObjectsManager.h"
 #include <time.h>
 #include "common.h"
 

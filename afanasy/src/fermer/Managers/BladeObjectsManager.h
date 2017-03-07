@@ -1,10 +1,11 @@
 #ifndef __BLADEOBJECTCONT__
 #define __BLADEOBJECTCONT__
 
-#include "JobObject.h"
-#include "Managers/Lorries/BladeObjectsLorry.h"
 #include "Managers/Service/RadiolocationService.h"
 #include "common.h"
+
+#include "JobObject.h"
+#include "Managers/Lorries/BladeObjectsLorry.h"
 
 namespace afermer
 {

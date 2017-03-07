@@ -1,8 +1,7 @@
-#include "libafanasy/name_af.h"
-
+#include "Managers/BladeObjectsManager.h"
 #include <QAbstractListModel>
 #include <QStringList>
-#include "Managers/BladeObjectsManager.h"
+
 #include <time.h>
 
 #include <boost/numeric/conversion/cast.hpp>

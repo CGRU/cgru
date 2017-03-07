@@ -1,23 +1,23 @@
 #ifndef __FERMER_MONITOR__
 #define __FERMER_MONITOR__
 
-
-#include <QtCore>
-#include <string>
-#include <vector>
-#include <iostream>
-#include <QPixmap>
+#include "Managers/Service/Station/RadiolocationStation.h"
 
 #include "common.h"
 #include "TaskObject.h"
 #include "UserObject.h"
 #include "BladeObject.h"
 #include "JobObject.h"
-#include "Managers/Service/Station/RadiolocationStation.h"
 #include "Managers/Lorries/UserObjectsLorry.h"
 #include "Managers/Lorries/JobObjectsLorry.h"
 #include "Managers/Lorries/BladeObjectsLorry.h"
 #include "RotateValue.h"
+
+#include <QtCore>
+#include <string>
+#include <vector>
+#include <iostream>
+#include <QPixmap>
 
 
 namespace afermer
