@@ -480,7 +480,7 @@ void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Ac
 	int length = m_data->getTasksNum();
 	if( tasks_vec.size())
 		length = tasks_vec.size();
-//printf("Block::skipRestartTasks: BEGIN:\n");
+
 	for( int i = 0; i < length; i++)
 	{
 		int t = i;
@@ -500,7 +500,6 @@ void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Ac
 		else
 			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
 	}
-//printf("Block::skipRestartTasks: END:\n");
 }
 
 void Block::constructDependBlocks()

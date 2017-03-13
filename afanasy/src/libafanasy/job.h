@@ -3,7 +3,7 @@
 #include "af.h"
 #include "../include/afjob.h"
 
-#include "afnode.h"
+#include "afwork.h"
 #include "blockdata.h"
 #include "msg.h"
 #include "regexp.h"
@@ -11,7 +11,7 @@
 namespace af
 {
 /// Job class. Main structure Afanasy was written for.
-class Job : public Node
+class Job : public Work
 {
 public:
 	Job( int i_id = 0);
@@ -148,8 +148,6 @@ protected:
 	int32_t m_user_list_order;   ///< Job order in user jobs list.
 
 	std::string m_description; ///< Job description for statistics purposes only.
-
-	std::map< std::string, int32_t > m_pools;
 
 	std::map< std::string, std::string > m_folders;
 

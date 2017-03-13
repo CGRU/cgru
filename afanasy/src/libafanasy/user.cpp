@@ -65,6 +65,8 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
+	Work::jsonWrite( o_str, i_type);
+
 	o_str << ",\n\"time_register\":" << m_time_register;
 	o_str << ",\n\"time_activity\":" << m_time_activity;
 	o_str << ",\n\"errors_retries\":" << int(m_errors_retries);
@@ -116,13 +118,15 @@ bool User::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object, io_changes);
 	jr_int32 ("jobs_life_time",        m_jobs_life_time,        i_object, io_changes);
 
+	Work::jsonRead( i_object, io_changes);
+
 	bool solve_parallel = false;
 	if( jr_bool("solve_parallel", solve_parallel, i_object, io_changes))
 	{
 		if( solve_parallel )
-			setJobsSolveMethod( af::Node::SolveByPriority);
+			setJobsSolveMethod( af::Work::SolveByPriority);
 		else
-			setJobsSolveMethod( af::Node::SolveByOrder);
+			setJobsSolveMethod( af::Work::SolveByOrder);
 	}
 
 	// Paramers below are not editable and read only on creation
@@ -141,6 +145,7 @@ bool User::jsonRead( const JSON &i_object, std::string * io_changes)
 void User::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
+	Work::readwrite( msg);
 
 	rw_int64_t ( m_state,                 msg);
 	rw_int64_t ( m_flags,                 msg);
@@ -169,10 +174,10 @@ void User::setJobsSolveMethod( int i_method )
 {
     switch( i_method)
     {
-    case af::Node::SolveByOrder:
+    case af::Work::SolveByOrder:
 		m_state = m_state & (~SolveJobsParallel);
         break;
-    case af::Node::SolveByPriority:
+    case af::Work::SolveByPriority:
 		m_state = m_state | SolveJobsParallel;
         break;
     }
@@ -180,8 +185,8 @@ void User::setJobsSolveMethod( int i_method )
 
 int User::v_calcWeight() const
 {
-	int weight = Node::v_calcWeight();
-	weight += sizeof(User) - sizeof( Node);
+	int weight = Work::calcWeight();
+	weight += sizeof(User) - sizeof( Work);
 	weight += weigh(m_host_name);
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();

@@ -2,7 +2,7 @@
 
 #include <time.h>
 
-#include "afnode.h"
+#include "afwork.h"
 #include "name_af.h"
 #include "regexp.h"
 
@@ -11,7 +11,7 @@ namespace af
 /// Afanasy user class
 /** When Afanasy register a new job, it register a new user, or add job to existing user (with the same name).
 **/
-class User : public Node
+class User : public Work
 {
 public:
 

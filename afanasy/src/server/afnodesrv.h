@@ -22,15 +22,6 @@ public:
 	inline const std::string & getStoreFile() const { return m_store_file; }
 	bool createStoreDir() const;
 
-/*
-	/// Nodes comparison by priority ( wich is private property).
-	inline bool operator <  ( const AfNodeSrv & other) const { return m_node->m_priority <  other.m_node->m_priority;}
-	inline bool operator <= ( const AfNodeSrv & other) const { return m_node->m_priority <= other.m_node->m_priority;}
-	inline bool operator >  ( const AfNodeSrv & other) const { return m_node->m_priority >  other.m_node->m_priority;}
-	inline bool operator >= ( const AfNodeSrv & other) const { return m_node->m_priority >= other.m_node->m_priority;}
-	inline bool operator == ( const AfNodeSrv & other) const { return m_node->m_priority == other.m_node->m_priority;}
-	inline bool operator != ( const AfNodeSrv & other) const { return m_node->m_priority != other.m_node->m_priority;}
-*/
 	/// Set some node attribute by incoming message.
 	void action( Action & i_action);
 

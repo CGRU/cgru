@@ -15,8 +15,9 @@
 // it means that node was not solved at all.
 unsigned long long AfNodeSolve::sm_solve_cycle = 1;
 
-AfNodeSolve::AfNodeSolve( af::Node * i_node, const std::string & i_store_dir):
-	AfNodeSrv( i_node, i_store_dir),
+AfNodeSolve::AfNodeSolve( af::Work * i_work, const std::string & i_store_dir):
+	AfNodeSrv( i_work, i_store_dir),
+	m_work( i_work),
     m_solve_need(0.0),
 	m_solve_cycle(0) // 0 means that it was not solved at all
 {

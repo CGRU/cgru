@@ -64,8 +64,6 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("user_name",     m_user_name,     i_object, io_changes);
 
-	jr_intmap("pools", m_pools, i_object, io_changes);
-
 	jr_stringmap("folders", m_folders, i_object, io_changes);
 
 	bool offline = false;
@@ -88,6 +86,8 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	bool ignorepaused = false;
 	if( jr_bool("ignorepaused", ignorepaused, i_object, io_changes))
 		setIgnorePausedFlag( ignorepaused);
+
+	Work::jsonRead( i_object, io_changes);
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
@@ -145,13 +145,12 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
+	Work::jsonWrite( o_str, i_type);
+
 	o_str << ",\n\"serial\":" << m_serial;
 
 	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
-
-/*	if( m_flags != 0 )
-		o_str << ",\n\"flags\":"                      << m_flags;*/
 
 	o_str << ",\n\"st\":" << m_state;
 	if( m_state != 0 )
@@ -202,9 +201,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
 		o_str << ",\n\"time_life\":"                  << m_time_life;
-
-	if( m_pools.size())
-		af::jw_intmap("folders", m_pools, o_str);
 
 	if( m_folders.size())
 		af::jw_stringmap("folders", m_folders, o_str);
@@ -315,7 +311,8 @@ Job::~Job()
 void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
-	/* NEW VERSON
+	Work::readwrite( msg);
+	/* NEW VERSION
 	rw_int64_t ( m_serial, msg);
 	*/
 
@@ -415,7 +412,7 @@ const std::string Job::getFolder() const
 
 int Job::v_calcWeight() const
 {
-	int weight = Node::v_calcWeight();
+	int weight = Work::calcWeight();
 	weight += sizeof(Job) - sizeof( Node);
 	for( int b = 0; b < m_blocks_num; b++) weight += m_blocks_data[b]->calcWeight();
 	weight += weigh( m_description);
@@ -423,7 +420,6 @@ int Job::v_calcWeight() const
 	weight += weigh( m_host_name);
 	weight += weigh( m_project);
 	weight += weigh( m_department);
-	weight += weigh( m_pools);
 	weight += weigh( m_folders);
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();
@@ -469,6 +465,8 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_host_name.size()) o_str << "@" << m_host_name;
    o_str << "[" << m_user_list_order << "]";
 	if( isHidden()) o_str << " (hidden)";
+
+	Work::generateInfoStream( o_str, full);
 
 	bool display_blocks = true;
 	if( m_blocks_num == 0)
@@ -529,16 +527,6 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_need_properties.notEmpty()) o_str << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
    if( m_command_pre.size()) o_str << "\n Pre command:\n" << m_command_pre;
    if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
-
-	if( m_pools.size())
-	{
-		o_str << "\nPools:";
-		for( std::map<std::string,int32_t>::const_iterator it = m_pools.begin(); it != m_pools.end(); it++)
-		{
-			if( it != m_pools.begin()) o_str << ",";
-			o_str << " \"" << (*it).first << "\": "<< (*it).second;
-		}
-	}
 
 	if( m_folders.size())
 	{

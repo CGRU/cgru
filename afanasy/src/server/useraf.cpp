@@ -335,11 +335,11 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 
 RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
-	af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
+	af::Work::SolvingMethod solve_method = af::Work::SolveByOrder;
 
 	if( solveJobsParallel())
 	{
-		solve_method = af::Node::SolveByPriority;
+		solve_method = af::Work::SolveByPriority;
 	}
 
 	std::list<AfNodeSolve*> solve_list( m_jobslist.getStdList());

@@ -468,9 +468,7 @@ void JobAf::v_action( Action & i_action)
 		}
 		else if( type == "restart")
 		{
-			//printf("Msg::TJobRestart:\n");
 			restartAllTasks("Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
-			//printf("Msg::TJobRestart: tasks restarted.\n");
 			checkDepends();
 			m_time_started = 0;
 		}
@@ -963,6 +961,10 @@ bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 			appendLog("Started.");
 			store();
 		}
+
+		// Set RUNNING state if it was not:
+		if( false == ( m_state & AFJOB::STATE_RUNNING_MASK ))
+			m_state |= AFJOB::STATE_RUNNING_MASK;
 		
 		return true;
 	}

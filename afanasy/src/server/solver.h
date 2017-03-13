@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libafanasy/afnode.h"
+#include "../libafanasy/afwork.h"
 #include "../libafanasy/name_af.h"
 
 class AfNodeSolve;
@@ -24,7 +24,7 @@ public:
 
 	void solve();
 
-	static RenderAf * SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method);
+	static RenderAf * SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Work::SolvingMethod i_method);
 
 private:
 	static JobContainer     * ms_jobcontainer;

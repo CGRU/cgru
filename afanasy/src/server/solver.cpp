@@ -37,8 +37,9 @@ Solver::Solver(
 
 Solver::~Solver(){}
 
-struct MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
+class MostReadyRender : public std::binary_function <RenderAf*,RenderAf*,bool>
 {
+	public:
 	inline bool operator()( const RenderAf * a, const RenderAf * b)
 	{
 		// Offline renders needed for Wake-On-Lan.
@@ -143,7 +144,7 @@ void Solver::solve()
 
 		// Function exits on each solve success (just 1 task solved),
 		// removes nodes that was not solved from list.
-		RenderAf * render = SolveList( solve_list, renders_list, af::Node::SolveByPriority);
+		RenderAf * render = SolveList( solve_list, renders_list, af::Work::SolveByPriority);
 		if( render )
 		{
 			// Check Wake-On-LAN:
@@ -174,7 +175,7 @@ void Solver::solve()
 		render->solvingFinished();
 }
 
-RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Node::SolvingMethod i_method)
+RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Work::SolvingMethod i_method)
 {
 	// Remove nodes that need no solving at all (done, offline, ...)
 	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
@@ -187,7 +188,7 @@ RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<Render
 
 	// Sort list if needed.
 	// ( there is not need to sort when solving user jobs by list order )
-	if( i_method != af::Node::SolveByOrder )
+	if( i_method != af::Work::SolveByOrder )
 	{
 		if( af::Environment::getSolvingSimpler())
 			i_list.sort( GreaterPriorityThenOlderCreation());

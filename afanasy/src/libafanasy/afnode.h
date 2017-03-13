@@ -57,12 +57,6 @@ public:
 	
 	virtual inline long long getTimeCreation() const { return 0; }
 	
-	//Solving:
-	enum SolvingMethod{
-		SolveByOrder     = 0,
-		SolveByPriority  = 1
-	};
-
 	void jsonRead( const JSON & i_object, std::string * io_changes = NULL, MonitorContainer * i_monitoring = NULL);
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
 

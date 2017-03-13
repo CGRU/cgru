@@ -1,11 +1,13 @@
 #pragma once
 
+#include "../libafanasy/afwork.h"
+
 #include "afnodesrv.h"
 
 class AfNodeSolve : public AfNodeSrv
 {
 public:
-	AfNodeSolve( af::Node * i_node, const std::string & i_store_dir = "");
+	AfNodeSolve( af::Work * i_work, const std::string & i_store_dir = "");
 	virtual ~AfNodeSolve();
 
 	// Just interesting - good to show server load
@@ -44,6 +46,8 @@ protected:
 	virtual void v_calcNeed();
 
 private:
+	af::Work * m_work;
+
 /// List of lists which have this node ( for a exapmle: each user has some jobs).
 	std::list<AfList*> m_lists;
 
