@@ -38,7 +38,7 @@ void unit_test(){
     TasksModel tasks_model;
 
     for (int i=0;i<10;i++){
-        sleep(1);
+		af::sleep_sec(1);
         qDebug()<<"jobs_model.updateInteraction() "<<i;
         jobs_model.updateInteraction();
         blades_model.updateInteraction();

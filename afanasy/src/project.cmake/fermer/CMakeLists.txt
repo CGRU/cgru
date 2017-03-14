@@ -84,6 +84,10 @@ endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../fermer")
 
+if(WIN32)
+   target_link_libraries(afwatch Ws2_32.lib)
+endif(WIN32)
+
 target_link_libraries(afermer afqt ${Qt5Multimedia_LIBRARIES} 
                                   ${Qt5Widgets_LIBRARIES} 
                                   ${Qt5Quick_LIBRARIES} 

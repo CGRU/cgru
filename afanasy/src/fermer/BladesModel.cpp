@@ -2,6 +2,9 @@
 
 using namespace afermer;
 
+#undef min
+#undef max
+
 BladesModel::BladesModel(QObject *i_parent)
     : QAbstractListModel(i_parent)
 {

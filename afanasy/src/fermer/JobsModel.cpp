@@ -2,6 +2,8 @@
 
 using namespace afermer;
 
+#undef min
+#undef max
 
 JobsModel::JobsModel(QObject *i_parent)
     : QAbstractListModel(i_parent)
