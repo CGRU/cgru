@@ -26,6 +26,7 @@ xcopy start %dest%\start\ /ys
 
 xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
+xcopy afanasy\bin\imageformats %dest%\afanasy\bin\imageformats\ /y
 xcopy afanasy\bin\platforms %dest%\afanasy\bin\platforms\ /y
 xcopy afanasy\bin\qml %dest%\afanasy\bin\qml\ /y
 xcopy afanasy\browser %dest%\afanasy\browser\ /y

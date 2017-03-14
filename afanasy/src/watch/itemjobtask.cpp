@@ -283,6 +283,7 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 		if( false == m_thumbs_imgs[i]->loadFromData( (const unsigned char *) i_taskup.getFileData(i), i_taskup.getFileSize(i)))
 		{
 			AFERRAR("Can't constuct an image '%s'[%d]", i_taskup.getFileName(i).c_str(), i_taskup.getFileSize(i))
+			Watch::displayError("Can't constuct an image.");
 			continue;
 		}
 	}
