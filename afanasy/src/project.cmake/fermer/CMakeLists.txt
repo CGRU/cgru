@@ -85,7 +85,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../fermer")
 
 if(WIN32)
-   target_link_libraries(afwatch Ws2_32.lib)
+   target_link_libraries(afermer Ws2_32.lib)
 endif(WIN32)
 
 target_link_libraries(afermer afqt ${Qt5Multimedia_LIBRARIES} 
