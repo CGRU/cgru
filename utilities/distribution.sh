@@ -36,6 +36,11 @@ if [ -z "${DISTRIBUTIVE}" ]; then
 	exit 1
 fi
 
+# Search distribution version for Manjaro
+if [ "${DISTRIBUTIVE}" == "Manjaro" ]; then
+	export DISTRIBUTIVE_VERSION=`echo "/etc/lsb-release" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+fi
+
 # Search distribution version:
 if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
 	export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
