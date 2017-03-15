@@ -24,6 +24,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 
@@ -219,7 +220,31 @@ void threadAcceptPort( void * i_arg, int i_port)
 
 		/* The 'process' function will decode the incoming request and dispatch
 		it to the proper queue. */
-		t->Start( threadProcessMsg, newThreadArgs );
+		int retval = t->Start( threadProcessMsg, newThreadArgs );
+
+		if( retval != 0 )
+		{
+			// It seems that we can't raise a thread.
+			std::string errstr;
+			switch( retval)
+			{
+				case EAGAIN:
+					errstr = "Insufficient resources to create another thread.";
+					break;
+				case EINVAL:
+					errstr = "Invalid thread settings.";
+					break;
+				case EPERM:
+					errstr = "No permission to set the scheduling policy and parameters specified.";
+					break;
+				default:
+					errstr = "Unknown error.";
+			}
+			AF_ERR << errstr;
+
+			af::socketDisconnect( newThreadArgs->sd, 0);
+			delete newThreadArgs;
+		}
 
 
 		//

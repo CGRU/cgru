@@ -36,7 +36,7 @@ public:
 	void SetDetached();
 
 	/* Start a new thread. */
-	void Start(void (*i_thread_func)(void*), void *i_arg);
+	int Start(void (*i_thread_func)(void*), void *i_arg);
 	
 	/*
 		Join

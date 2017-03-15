@@ -7,6 +7,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 CmdTestMsg::CmdTestMsg()
 {
@@ -58,12 +59,37 @@ bool CmdTestThreads::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	for( int i = 0; i < count; i++)
 	{
+		af::sleep_msec(1);
+
 		DlThread *t = new DlThread();
 		int * args = new int[1024];
 		args[0] = i;
 
 		t->SetDetached();
-		t->Start( testThread, args);
+		int result = t->Start( testThread, args);
+
+		switch( result)
+		{
+			case 0:
+				continue;
+
+			case EAGAIN:
+				printf("Insufficient resources to create another thread [%d].\n", i);
+				break;
+
+			case EINVAL:
+				printf("Invalid thread settings [%d].\n", i);
+				break;
+
+			case EPERM:
+				printf("No permission to set the scheduling policy and parameters specified [%d].\n", i);
+				break;
+
+			default:
+				AF_ERR << "Unknown error [" << i << "].";
+		}
+
+		return true;
 	}
 
 	af::sleep_sec(2);
