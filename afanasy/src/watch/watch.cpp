@@ -28,7 +28,7 @@
 #include <QSound>
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 const QString Watch::BtnName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};

@@ -137,7 +137,7 @@ JobNode.prototype.update = function( i_obj)
 		else this.elLifeTime.textContent = '';
 
 		if( this.params.depend_mask )
-			this.elDependMask.innerHTML = 'DepmendMask(<b>' + this.params.depend_mask + '</b>)';
+			this.elDependMask.innerHTML = 'DependMask(<b>' + this.params.depend_mask + '</b>)';
 		else this.elDependMask.textContent = '';
 
 		if( this.params.depend_mask_global )
@@ -1281,12 +1281,15 @@ JobNode.resetPanels = function( i_monitor)
 			elFolders.removeChild( elFolders.m_elFolders[i]);
 	elFolders.m_elFolders = [];
 	elFolders.m_elRules.style.display = 'none';
+
+	w_ResetPanels( i_monitor);
 }
 JobNode.prototype.updatePanels = function()
 {
 	var elPanelL = this.monitor.elPanelL;
 	var elPanelR = this.monitor.elPanelR;
 
+	w_UpdatePanels( this.monitor, this);
 
 	// Admin can't move jobs:
 	if( g_VISOR())
@@ -1444,6 +1447,10 @@ JobNode.createPanels = function( i_monitor)
 	elPanelR.m_elFolders.appendChild( el);
 	el.textContent = 'Folders';
 	el.classList.add('caption');
+
+
+	// Work:
+	w_CreatePanels( i_monitor);
 
 
 	// Blocks:

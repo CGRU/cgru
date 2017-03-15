@@ -35,6 +35,9 @@ void Work::jsonWrite( std::ostringstream & o_str, int i_type) const
 
 void Work::generateInfoStream( std::ostringstream & o_str, bool full) const
 {
+	if( false == full )
+		return;
+
 	if( m_pools.size())
 	{
 		o_str << "\nPools:";
@@ -44,7 +47,6 @@ void Work::generateInfoStream( std::ostringstream & o_str, bool full) const
 			o_str << " \"" << (*it).first << "\": "<< (*it).second;
 		}
 	}
-
 }
 
 int Work::calcWeight() const

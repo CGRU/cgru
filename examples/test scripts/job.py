@@ -49,6 +49,7 @@ parser.add_option(      '--parser',       dest='parser',       type='string', de
 parser.add_option(      '--env',          dest='environment',  type='string', default="CG_VAR=somevalue", help='add an evironment')
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
+parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
@@ -89,6 +90,13 @@ if Options.folder is not None:
     job.setFolder('folder', Options.folder)
 if not Options.nofolder:
     job.setFolder('pwd', os.getcwd())
+
+if Options.pools is not None:
+    pools = dict()
+    for pool in Options.pools.split(','):
+        pool = pool.split(':')
+        pools[pool[0]] = int(pool[1])
+    job.setPools( pools)
 
 blocknames = []
 if Options.labels != '':

@@ -615,6 +615,9 @@ class Job:
 
         self.data["folders"][i_name] = i_folder
 
+    def setPools( self, i_pools):
+        self.data['pools'] = i_pools
+
     def fillBlocks(self):
         """Missing DocString
 
