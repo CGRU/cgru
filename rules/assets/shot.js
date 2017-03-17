@@ -184,7 +184,7 @@ function shot_ResultsReceived( i_data, i_args)
 	{
 		var e = document.createElement('div');
 		el.appendChild( e);
-		e.textContent = 'No results founded in: ';
+		e.textContent = 'No results found in: ';
 		e.classList.add('shot_empty_result');
 
 		for( var i = 0; i < i_args.paths.length; i++)
@@ -410,7 +410,7 @@ function shot_SourcesReceived( i_data, i_args)
 	{
 		var e = document.createElement('div');
 		el.appendChild( e);
-		e.textContent = 'No sources founded in: ';
+		e.textContent = 'No sources found in: ';
 		e.classList.add('shot_empty_result');
 
 		for( var i = 0; i < ASSET.source.path.length; i++)
