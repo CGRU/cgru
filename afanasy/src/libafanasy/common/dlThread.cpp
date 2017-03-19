@@ -237,12 +237,18 @@ int DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 	   Right now, there isn't so we don't bother.
 	*/
 	unsigned thread_id;
+	unsigned initflag = 0;
+
+	if( m_data->m_stack_size )
+	{
+		initflag = STACK_SIZE_PARAM_IS_A_RESERVATION;
+	}
 	
 	HANDLE handle = (HANDLE) _beginthreadex(
 		0x0,
-		0,
+		m_data->m_stack_size,
 		&thread_routine, this,
-		0,
+		initflag,
 		&thread_id);
 
 	if( detached )
@@ -259,7 +265,7 @@ int DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 	pthread_attr_t attr;
 	pthread_attr_init( &attr );
 
-	if( m_data->m_stack_size > 0 )
+	if( m_data->m_stack_size )
 	{
 		pthread_attr_setstacksize( &attr, m_data->m_stack_size);
 	}
