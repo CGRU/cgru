@@ -231,6 +231,11 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	submenu->addSeparator();
 
+	action = new QAction( "Restart Warning Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartWarnings() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_WARNING_MASK);
+	submenu->addAction( action);
+
 	action = new QAction( "Restart Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartRunning() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
@@ -584,6 +589,7 @@ void ListJobs::actStart()           { operation("start"            );}
 void ListJobs::actStop()            { operation("stop"             );}
 void ListJobs::actRestart()         { operation("restart"          );}
 void ListJobs::actRestartErrors()   { operation("restart_errors"   );}
+void ListJobs::actRestartWarnings() { operation("restart_warnings" );}
 void ListJobs::actRestartRunning()  { operation("restart_running"  );}
 void ListJobs::actRestartSkipped()  { operation("restart_skipped"  );}
 void ListJobs::actRestartDone()     { operation("restart_done"     );}

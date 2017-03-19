@@ -449,17 +449,21 @@ void JobAf::v_action( Action & i_action)
 		   restartAllTasks("Job stopped by " + i_action.author, i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
+		else if( type == "restart_warnings")
+		{
+			restartAllTasks("Job restart warnings by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_WARNING_MASK);
+		}
 		else if( type == "restart_running")
 		{
-			restartAllTasks("Job restarted running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
+			restartAllTasks("Job restart running by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_RUNNING_MASK);
 		}
 		else if( type == "restart_skipped")
 		{
-			restartAllTasks("Job restarted skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
+			restartAllTasks("Job restart skipped by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_SKIPPED_MASK);
 		}
 		else if( type == "restart_done")
 		{
-			restartAllTasks("Job restarted done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
+			restartAllTasks("Job restart done by " + i_action.author,  i_action.renders, i_action.monitors, AFJOB::STATE_DONE_MASK);
 		}
 		else if( type == "reset_error_hosts")
 		{

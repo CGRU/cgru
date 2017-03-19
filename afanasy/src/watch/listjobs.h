@@ -63,6 +63,7 @@ private slots:
 	void actStop();
 	void actRestart();
 	void actRestartErrors();
+	void actRestartWarnings();
 	void actRestartRunning();
 	void actRestartSkipped();
 	void actRestartDone();
