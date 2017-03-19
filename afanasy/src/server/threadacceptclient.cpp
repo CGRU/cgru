@@ -218,6 +218,9 @@ void threadAcceptPort( void * i_arg, int i_port)
 		DlThread *t = new DlThread();
 		t->SetDetached();
 
+		/* Reduce new thread size */
+		t->SetStackSize( 32768);
+
 		/* The 'process' function will decode the incoming request and dispatch
 		it to the proper queue. */
 		int retval = t->Start( threadProcessMsg, newThreadArgs );
