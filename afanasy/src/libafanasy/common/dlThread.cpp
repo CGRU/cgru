@@ -73,6 +73,9 @@ struct DlThread::ThreadData
 	/* true when signaled with Cancel() */
 	bool m_must_cancel;
 
+	/* new thread stack size */
+	int m_stack_size;
+
 	/* true if the thread is to be started in a detached state. */
 	bool m_start_detached;
 
@@ -109,6 +112,7 @@ DlThread::DlThread()
 	m_data = new ThreadData;
 
 	m_data->m_must_cancel = false;
+	m_data->m_stack_size = 0;
 	m_data->m_start_detached = false;
 	m_data->m_handle = 0;
 
@@ -154,6 +158,12 @@ void DlThread::SetDetached()
 	}
 
 	m_data->m_start_detached = true;
+}
+
+/* Set stack size of a new thread */
+void DlThread::SetStackSize( int i_size)
+{
+	m_data->m_stack_size = i_size;
 }
 
 /*
@@ -248,6 +258,12 @@ int DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 #else
 	pthread_attr_t attr;
 	pthread_attr_init( &attr );
+
+	if( m_data->m_stack_size > 0 )
+	{
+		pthread_attr_setstacksize( &attr, m_data->m_stack_size);
+	}
+
 	if( detached )
 	{
 		pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );

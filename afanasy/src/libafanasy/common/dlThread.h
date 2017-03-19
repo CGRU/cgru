@@ -35,6 +35,12 @@ public:
 	*/
 	void SetDetached();
 
+	/*
+	   Set new thread stack size.
+	   Should be called before Start().
+	*/
+	void SetStackSize( int i_size);
+
 	/* Start a new thread. */
 	int Start(void (*i_thread_func)(void*), void *i_arg);
 	
