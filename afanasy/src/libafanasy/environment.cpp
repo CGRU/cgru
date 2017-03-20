@@ -99,6 +99,7 @@ std::string Environment::sysjob_events_service =      AFJOB::SYSJOB_EVENTS_SERVI
 
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
+int Environment::server_process_conn_stack = AFSERVER::PROCESS_CONN_STACK;
 
 /// Socket Options:
 int Environment::so_server_LINGER       = AFNETWORK::SO_SERVER_LINGER;
@@ -211,13 +212,14 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, priority,                          "af_priority"                          );
 	getVar( i_obj, maxrunningtasks,                   "af_maxrunningtasks"                   );
 
-	getVar( i_obj, store_folder,                          "af_store_folder"                     );
+	getVar( i_obj, store_folder,                      "af_store_folder"                      );
 
 	getVar( i_obj, db_conninfo,                       "af_db_conninfo"                       );
 	getVar( i_obj, db_stringquotes,                   "af_db_stringquotes"                   );
 	getVar( i_obj, db_stringnamelen,                  "af_db_stringnamelen"                  );
 	getVar( i_obj, db_stringexprlen,                  "af_db_stringexprlen"                  );
 
+	getVar( i_obj, server_process_conn_stack,         "af_server_process_conn_stack"         );
 
 	/// Socket Options:
 	getVar( i_obj, so_server_LINGER,                  "af_so_server_LINGER"                  );

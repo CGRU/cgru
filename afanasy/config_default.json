@@ -192,7 +192,11 @@
 	"af_sysjob_events_service":"events",
 
 "":"Network:",
-		"":"Use -1 value not to set socket option at all",
+	"":"Server thread raised to process client connection stack.",
+	"af_server_process_conn_stack":32768,
+		"":"Zero, negative value or no parameter means to use system default",
+
+	"":"Use -1 value not to set socket option at all",
 	"af_so_server_RCVTIMEO_sec":12,
 	"af_so_server_SNDTIMEO_sec":12,
 	"af_so_server_TCP_NODELAY":-1,
