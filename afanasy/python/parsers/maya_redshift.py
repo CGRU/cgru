@@ -8,18 +8,18 @@ import re
 re_percent = re.compile(
     r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU)'
 )
-re_frame = re.compile(r'Rendering frame [0-9]+')
+re_frame = re.compile(r'Rendering.*frame [0-9]+')
 
 
 class maya_redshift(parser.parser):
     """Maya Redshift
     """
-    
+
     def __init__(self):
         parser.parser.__init__(self)
         self.firstframe = True
         self.data_all = ''
-    
+
     def do(self, data, mode):
         """Missing DocString
 
@@ -39,9 +39,6 @@ class maya_redshift(parser.parser):
         if match is not None:
             frame = True
 
-        # print("cur frame " + str(self.frame))
-
-
         # progress line?
         match = re_percent.findall(data)
         if len(match):
@@ -49,16 +46,16 @@ class maya_redshift(parser.parser):
             block = float(match[0][2])
             # get blockCount
             blockCount = float(match[0][4])
-            
+
             # calculate percentage
             percentframe = float(100 / (blockCount / block))
             self.percent = int(percentframe)
             self.percentframe = int(percentframe)
-        
+
         self.calculate()
-        
+
         if frame:
             if not self.firstframe:
                 self.frame += 1
-            
+
             self.firstframe = False
