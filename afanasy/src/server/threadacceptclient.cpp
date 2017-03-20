@@ -219,7 +219,8 @@ void threadAcceptPort( void * i_arg, int i_port)
 		t->SetDetached();
 
 		/* Reduce new thread size */
-		t->SetStackSize( af::Environment::getServerProcessConnStack());
+		if( af::Environment::getServerProcessConnStack() > 0 )
+			t->SetStackSize( af::Environment::getServerProcessConnStack());
 
 		/* The 'process' function will decode the incoming request and dispatch
 		it to the proper queue. */
