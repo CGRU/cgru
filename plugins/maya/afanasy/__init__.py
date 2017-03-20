@@ -331,9 +331,14 @@ class UI(object):
             cmd_buffer.append('-type maya_mental')
         elif render_engine == 'arnold':
             cmd_buffer.append('-type maya_arnold')
-            # set the verbosity level to warnin+info
+            # set the verbosity level to warning+info
             aro = pm.PyNode('defaultArnoldRenderOptions')
             aro.setAttr('log_verbosity', 1)
+        elif render_engine == 'redshift':
+            cmd_buffer.append('-type maya_redshift')
+            # set the verbosity level to detailed+info
+            redshift = pm.PyNode('redshiftOptions')
+            redshift.logLevel.set(1)
 
         if pause:
             cmd_buffer.append('-pause')

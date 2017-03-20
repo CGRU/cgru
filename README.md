@@ -58,8 +58,9 @@ As if you miss one '=' character, it will not be an error, it will be assignment
 		return true;
 	}
 
-You can notice, that some parts of the code is not following this rules.
-This is mostly because such code was written before this rules or rules were changed.
+You will notice, that some parts of the code is not following these rules. This
+is mostly because such code has been written before these rules were created or
+changed.
 
 
 ### Some names:

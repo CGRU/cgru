@@ -68,6 +68,7 @@ def fileTypeList():
     fileType_list.append((['mb', 'ma'], 'maya',         'Maya'))
     fileType_list.append((['mb', 'ma'], 'maya_mental',  'Mental Ray'))
     fileType_list.append((['mb', 'ma'], 'maya_arnold',  'MtoA'))
+    fileType_list.append((['mb', 'ma'], 'maya_redshift', 'Redshift'))
     fileType_list.append((['mb', 'ma'], 'maya_delight', '3Delight'))
     fileType_list.append((['scn'],      'xsi',          'Softimage'))
     fileType_list.append((['max'],      'max',          '3dsmax'))
@@ -120,6 +121,7 @@ def labelNodeNameDict():
     labelNode_name['maya_delight'] = 'Camera:'
     labelNode_name['maya_mental']  = 'Camera:'
     labelNode_name['maya_arnold']  = 'Camera:'
+    labelNode_name['maya_redshift']  = 'Camera:'
     labelNode_name['3dsmax']       = 'Camera:'
     labelNode_name['afterfx']      = 'Composition:'
     labelNode_name['clarisse']     = 'Image:'
@@ -141,6 +143,7 @@ def labelNodeTooltipsDict():
     labelNode_tooltip['maya_delight'] = 'Maya camera\nExample: \'persp\''
     labelNode_tooltip['maya_mental']  = 'Maya camera\nExample: \'persp\''
     labelNode_tooltip['maya_arnold']  = 'Maya camera\nExample: \'persp\''
+    labelNode_tooltip['maya_redshift']  = 'Maya camera\nExample: \'persp\''
     labelNode_tooltip['3dsmax']       = '3DSMAX camera'
     labelNode_tooltip['afterfx']      = 'AfterFX composition\nExample: \'Comp 1\''
     labelNode_tooltip['clarisse']     = 'Image item path\nExample:\nscene/image'
@@ -158,6 +161,7 @@ def labelTakeNameDict():
     labelTake_name['maya_delight'] = 'Render Pass:'
     labelTake_name['maya_mental']  = 'Layer:'
     labelTake_name['maya_arnold']  = 'Layer:'
+    labelTake_name['maya_redshift']  = 'Layer:'
     labelTake_name['3dsmax']       = 'Batch:'
     labelTake_name['afterfx']      = 'render settings template:'
     labelTake_name['clarisse']     = 'Format:'
@@ -180,6 +184,7 @@ def labelTakeTooltipsDict():
     labelTake_tooltip['maya_delight'] = '3Delight for Maya Render Pass'
     labelTake_tooltip['maya_mental']  = 'Maya render layer'
     labelTake_tooltip['maya_arnold']  = 'Maya render layer'
+    labelTake_tooltip['maya_redshift']  = 'Maya render layer'
     labelTake_tooltip['3dsmax']       = '3DSMAX batch'
     labelTake_tooltip['afterfx']      = 'AfterFX render settings template\nExample: \'Best Settings\''
     labelTake_tooltip['clarisse']     = 'Ouput images format name\nExample:\njpg, exr16, exr32, ...\nSee available format names in docs.'
