@@ -43,7 +43,7 @@ public:
 
 	void stdOut( bool full = false ) const;
 
-	bool getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const;
+	bool getHost( const std::string & hostname, Host & host, std::string & name, std::string & description, bool i_verbose = false) const;
 
 	/// Check if farm can run a service on a hostname:
 	bool serviceLimitCheck( const std::string & service, const std::string & hostname) const;

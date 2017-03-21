@@ -385,15 +385,26 @@ void Farm::stdOut( bool full) const
 	std::cout << stream.str() << std::endl;
 }
 
-bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const
+bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description, bool i_verbose) const
 {
 	bool found = false;
 
 	int index = 0;
 	for( int i; i < m_patterns.size(); i++)
 	{
+		if( i_verbose )
+			printf("Checking '%s' and '%s': ", hostname.c_str(), m_patterns[i]->getMask().c_str());
+
 		if( false == m_patterns[i]->match( hostname))
+		{
+			if( i_verbose )
+				printf("Not match.\n");
+
 			continue;
+		}
+
+		if( i_verbose )
+			printf("MATCH.\n");
 
 		found = true;
 		index = i;
