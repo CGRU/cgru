@@ -390,7 +390,7 @@ bool Farm::getHost( const std::string & hostname, Host & host, std::string & nam
 	bool found = false;
 
 	int index = 0;
-	for( int i; i < m_patterns.size(); i++)
+	for( int i = 0; i < m_patterns.size(); i++)
 	{
 		if( i_verbose )
 			printf("Checking '%s' and '%s': ", hostname.c_str(), m_patterns[i]->getMask().c_str());
