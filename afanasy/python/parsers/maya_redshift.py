@@ -49,7 +49,7 @@ class maya_redshift(parser.parser):
 
             # calculate percentage
             percentframe = float(100 / (blockCount / block))
-            self.percent = int(percentframe)
+            # self.percent = int(percentframe)
             self.percentframe = int(percentframe)
 
         self.calculate()
