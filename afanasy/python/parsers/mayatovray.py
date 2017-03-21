@@ -2,10 +2,10 @@
 
 from parsers import parser
 
-FRAME = 'FRAME: '
+FRAME = 'Appending '
+RESET_COUNT = 'Render complete'
 PERCENT = 'PROGRESS: '
 PERCENT_len = len(PERCENT)
-
 
 class mayatovray(parser.parser):
 	"""Simple generic parser (mayatovray)
@@ -14,6 +14,7 @@ class mayatovray(parser.parser):
 	def __init__(self):
 		parser.parser.__init__(self)
 		self.firstframe = True
+		self.layer = 1
 
 	def do(self, data, mode):
 		"""Missing DocString
@@ -29,7 +30,12 @@ class mayatovray(parser.parser):
 				self.firstframe = False
 			else:
 				self.frame += 1
+				self.activity = 'Layer ' + str(self.layer) + ':'
 				needcalc = True
+		if data.find(RESET_COUNT) > -1:
+			self.layer += 1
+			self.firstframe = True
+			self.frame = 0
 		percent_pos = data.find(PERCENT)
 		if percent_pos > -1:
 			ppos = data.find('%')
