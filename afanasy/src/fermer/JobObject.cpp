@@ -30,6 +30,8 @@ QString JobObject::error_blades() const
  { return m_error_blades; }
 QString JobObject::depends() const
  { return m_depends; }
+std::string JobObject::repr() const
+{  return m_json_represent; }
 
 void JobObject::update(const QString &user_name
                   ,JobState::State status
@@ -52,7 +54,8 @@ void JobObject::update(const QString &user_name
                   ,const QString &error_blades
                   ,const QString &depends
                   ,const QString &user_color
-                  ,int errors_avoid_blades)
+                  ,int errors_avoid_blades
+                  ,const std::string& json_represent)
 {
 
     m_user_name = user_name;
@@ -77,6 +80,7 @@ void JobObject::update(const QString &user_name
          m_depends = depends;
          m_user_color = user_color;
          m_errors_avoid_blades = errors_avoid_blades;
+         m_json_represent = json_represent;
 }
 
 

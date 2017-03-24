@@ -120,6 +120,7 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
         return false;
     
     o_tasks.clear();
+    m_task_resources.clear();
 
     long long curtime = time(0);
 
@@ -240,8 +241,10 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
 
 QList<int> RadiolocationService::getTasksRawTime(int i_index)
 {
-
     QList<int> o_tasks;
+
+    if (i_index == 0)
+        return o_tasks;
 
     long long curtime = time(0);
 
@@ -521,6 +524,9 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
     {
         af::Job * itemjob = (af::Job*)((*list)[i]);
 
+        str.str("");
+        itemjob->v_jsonWrite(str,0);
+        
         int64_t group_state = itemjob->getState();
 
         int block_count = itemjob->getBlocksNum();
@@ -679,6 +685,8 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
             QString user_color;
             m_users->getUserColor(user_name, user_color);
 
+            std::string repr = str.str();
+
             m_jobs->insert(  user_name
                             ,status
                             ,time_creation
@@ -702,6 +710,7 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
                             ,QString::fromStdString(output_folder)
                             ,user_color
                             ,block->getProgressErrorHostsNum()
+                            ,repr
                     ) ;
         } // for block_num
     }// for count
@@ -1128,7 +1137,11 @@ void RadiolocationService::bladesUpdate()
         int total_slots = render->getCapacity();
         int avalible_slots = RadiolocationStation::getAvalibleSlotsAndJobNames(render, total_slots, job_names, job_hashes);
 
-        m_blade_indeces.insert( std::pair<int,QList<int> >(i,job_hashes) );
+        m_it_blades = m_blade_indeces.find(i);
+        if (m_it_blades == m_blade_indeces.end())
+            m_blade_indeces.insert( std::pair<int,QList<int> >(i,job_hashes) );
+        else
+            m_blade_indeces[i] = job_hashes;
 
         if (busy_time != 0)
             busy_time = curtime - busy_time;

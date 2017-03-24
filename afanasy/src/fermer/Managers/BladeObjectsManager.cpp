@@ -3,6 +3,8 @@
 
 using namespace afermer;
 
+BladeObjectsManager::Ptr BladeObjectsManager::m_single = NULL;
+
 
 BladeObject::Ptr BladeObjectsManager::at(int i_index)
 {
@@ -42,6 +44,7 @@ BladeObjectPtrIt BladeObjectsManager::end()
 {
     return m_lorry->m_objects.end();
 }
+
 
 void BladeObjectsManager::getJobDependencies(int index, QList<JobObject::Ptr> & o_objects) 
 {

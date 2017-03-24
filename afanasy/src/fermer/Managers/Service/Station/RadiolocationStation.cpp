@@ -3,9 +3,10 @@
 // #include <QSplashScreen>
 #include "libafanasy/monitorevents.h"
 #include "libafanasy/taskexec.h"
-
+#include <boost/filesystem.hpp>
 using namespace afermer;
 
+namespace fs = boost::filesystem;
 
 int combine(int a, int b, int c);
 
@@ -49,7 +50,7 @@ int RadiolocationStation::getAvalibleSlotsAndJobNames(af::Render * i_render
         int hash = combine(job_id, block_num, 0);
         if(o_job_hash.indexOf(hash) == -1 )
             o_job_hash.push_back(hash);
-        
+
         busy_slots += (*it)->getCapacity();
     }
 
@@ -124,6 +125,21 @@ RadiolocationStation::RadiolocationStation():
     , m_connected(false)
     , user_id(0)
 {
+
+    std::streambuf* oldCoutStreamBuf = std::cerr.rdbuf();
+    std::ostringstream strCout;
+    std::cerr.rdbuf( strCout.rdbuf() );
+    // ************************************
+    // Redirect stderr to file to hide afanasy errors on start
+    fpos_t pos;
+    fgetpos(stderr, &pos);
+    int fd = dup(fileno(stderr));
+
+    fs::path temp = fs::unique_path();
+    freopen (temp.native().c_str(),"w",stderr);
+    // ************************************
+
+
     int argc = 1;
     char* argv[] = {"afermer"};
 
@@ -142,30 +158,17 @@ RadiolocationStation::RadiolocationStation():
     user_name = ENV->getUserName();
     afqt::QEnvironment QENV( "watch" );
 
-    // Message::Ptr query4( MonitorHost::genRegisterMsg() );
-    // Message::Ptr answer = push( query4 );
+    // ************************************ UNIX variant for printf
+    fflush(stderr);
+    dup2(fd, fileno(stderr));
+    close(fd);
+    clearerr(stderr);
+    fsetpos(stderr, &pos);
+    fs::remove(temp);
+    // ************************************
 
-    // af::Monitor monitor( answer.get() );
-
-    // m_monitor = new MonitorHost();
-    // m_monitor->connectionEstablished( monitor.getId(), monitor.getUid() );
-
-    // monitor_id = m_monitor->getId();
+    std::cerr.rdbuf( oldCoutStreamBuf );
     
-    // std::ostringstream str;
-    // str << "{\"action\":{\"";
-    // str << "user_name\":\"" << af::Environment::getUserName();
-    // str << "\",\"host_name\":\"" << af::Environment::getHostName();
-    // str << "\",\"type\":\"monitors\",\"ids\":[" << monitor.getId();
-    // str << "],\"operation\":{\"type\":\"watch\",\"class\":\"jobs\",\"status\":\"subscribe\"}}}";
-    // push(str);
-
-    // Message::Ptr query5 = Message::create( af::Msg::TMonitorUpdateId, monitor_id );
-    // push( query5 );
-
-    // std::cerr <<  MonitorHost::getUid() << std::endl;
-
-    // std::cerr << "afqt::QEnvironment::getAfServerQHostAddress " << afqt::QEnvironment::getAfServerQHostAddress().toString().toUtf8().data()  << std::endl;
 
     connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
     connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
@@ -243,7 +246,7 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
         case af::Msg::TMonitor:
             {
                 af::Monitor monitor( msg);
-                monitor_id = msg->int32();
+                monitor_id = monitor.getId();
                 user_id = monitor.getUid();
                 msg_monitor_id = new af::Msg( af::Msg::TMonitorUpdateId, monitor_id);
                 m_qThreadClientUpdate.setUpMsg( msg_monitor_id );
@@ -252,9 +255,9 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
             }
         case af::Msg::TMonitorId:
             {
-                monitor_id = msg->int32();
                 msg_monitor_id = new af::Msg( af::Msg::TMonitorUpdateId, monitor_id);
                 m_qThreadClientUpdate.setUpMsg( msg_monitor_id );
+
                 break;
             }
         case af::Msg::TMonitorEvents: // watch.cpp
@@ -355,14 +358,11 @@ void RadiolocationStation::getTaskOutput(QString& o_str, int i_job_id, int i_blo
     std::ostringstream str;
 
     wait_task_stdout = (i_state == TaskState::State::RUNNING) ? true : false ;
-    //str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"output\",\"ids\":[6],\"block_ids\":[0],\"task_ids\":[0],\"mon_id\":1,\"binary\":true}}";
     str << "{\"get\":{\"type\":\"jobs\"";
     str << ",\"mode\":\"" << i_mode << "\"";
     str << ",\"ids\":[" << i_job_id << "]";
     str << ",\"block_ids\":[" << i_block_id << "]";
     str << ",\"task_ids\":[" << i_task_id << "]";
-//     if( i_number != -1 )
-//         str << ",\"number\":" << i_number;
     str << ",\"mon_id\":" << monitor_id;
     str << ",\"binary\":true}}";
 

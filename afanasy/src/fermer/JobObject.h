@@ -12,7 +12,7 @@ class JobObject
 public:
 
     AFERMER_TYPEDEF_SMART_PTRS(JobObject);
-    AFERMER_DEFINE_CREATE_FUNC_22_ARGS(JobObject, const QString&,
+    AFERMER_DEFINE_CREATE_FUNC_23_ARGS(JobObject, const QString&,
                   JobState::State,
                   const QString &
                   ,int
@@ -33,7 +33,8 @@ public:
                   ,const QString&
                   ,const QString&
                   ,const QString&
-                  ,int);
+                  ,int
+                  ,const std::string&);
 
       JobObject(   const QString &user_name
                   ,JobState::State status
@@ -57,6 +58,7 @@ public:
                   ,const QString &depends
                   ,const QString &user_color
                   ,int errors_avoid_blades
+                  ,const std::string& json_represent
             ) :
           m_user_name(user_name)
         , m_status(status)
@@ -80,6 +82,7 @@ public:
         , m_depends(depends)
         , m_user_color(user_color)
         , m_errors_avoid_blades(errors_avoid_blades)
+        , m_json_represent(json_represent)
 {m_selected=0;m_notify_showed=false;}
 
 
@@ -97,6 +100,7 @@ public:
     int blades_length() const;
     QString error_blades() const;
     QString depends() const;
+    std::string repr() const;
     void update(const QString &user_name
                   ,JobState::State status
                   ,const QString &time_creation
@@ -118,7 +122,8 @@ public:
                   ,const QString &error_blades
                   ,const QString &depends
                   ,const QString &user_color
-                  ,int errors_avoid_blades);
+                  ,int errors_avoid_blades
+                  ,const std::string& json_represent);
 
 
 
@@ -154,6 +159,7 @@ public:
     QString m_user_color;
     int m_errors_avoid_blades;
     bool m_notify_showed;
+    std::string m_json_represent;
 };
 
 

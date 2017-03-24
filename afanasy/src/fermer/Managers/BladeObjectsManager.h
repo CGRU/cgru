@@ -1,10 +1,9 @@
 #ifndef __BLADEOBJECTCONT__
 #define __BLADEOBJECTCONT__
 
-#include "Managers/Service/RadiolocationService.h"
 #include "common.h"
-
 #include "JobObject.h"
+#include "Managers/Service/RadiolocationService.h"
 #include "Managers/Lorries/BladeObjectsLorry.h"
 
 namespace afermer
@@ -12,9 +11,7 @@ namespace afermer
 
 struct BladeObjectsManager
 {
-    AFERMER_TYPEDEF_SMART_PTRS(BladeObjectsManager);
-    AFERMER_DEFINE_CREATE_FUNC(BladeObjectsManager);
-    
+    AFERMER_SINGLETON(BladeObjectsManager)
 
     BladeObjectsManager() 
     {

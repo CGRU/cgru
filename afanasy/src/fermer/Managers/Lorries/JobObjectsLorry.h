@@ -39,7 +39,8 @@ struct JobObjectsLorry
                   ,const QString &depends
                   ,const QString &output_folder
                   ,const QString &user_color
-                  ,int errors_avoid_blades);
+                  ,int errors_avoid_blades
+                  ,const std::string& json_represent);
     JobObjectPtrIt find(int);
     JobObjectPtrIt find(const QString&);
 

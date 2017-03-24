@@ -11,11 +11,18 @@ namespace afermer
 
 struct JobObjectsManager
 {
-    AFERMER_TYPEDEF_SMART_PTRS(JobObjectsManager);
-    AFERMER_DEFINE_CREATE_FUNC(JobObjectsManager);
+    AFERMER_SINGLETON(JobObjectsManager)
 
     RadiolocationService::Ptr m_RLS;
     JobObjectsLorry::Ptr m_lorry;
+    
+    JobObject::Ptr at(int);
+    void removeAt(int);
+    size_t size();
+    void update(bool);
+
+
+public:
     
     JobObjectsManager() 
     {
@@ -23,11 +30,6 @@ struct JobObjectsManager
         m_lorry = m_RLS->jobsLorry();
     }
 
-    JobObject::Ptr at(int);
-    void removeAt(int);
-    size_t size();
-    void update(bool);
-    
     void deleteGroup(const QList<int>& i_ids);
     void skip(const QList<int>& i_ids);
     void pause(const QList<int>& i_ids);

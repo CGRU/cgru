@@ -113,7 +113,8 @@ void JobObjectsLorry::insert(const QString& user_name
                   ,const QString &depends
                   ,const QString &output_folder
                   ,const QString &user_color
-                  ,int errors_avoid_blades)
+                  ,int errors_avoid_blades
+                  ,const std::string& json_represent)
 {
     // if ( isDeleted(id) ) return;
 
@@ -143,6 +144,7 @@ void JobObjectsLorry::insert(const QString& user_name
                 ,depends
                 ,user_color
                 ,errors_avoid_blades
+                ,json_represent
             );
         (*it)->m_output_folder = output_folder;
         (*it)->set_refreshed = true;
@@ -171,6 +173,7 @@ void JobObjectsLorry::insert(const QString& user_name
                 ,depends
                 ,user_color
                 ,errors_avoid_blades
+                ,json_represent
             );
         b->m_output_folder = output_folder;
         b->set_refreshed = true;
