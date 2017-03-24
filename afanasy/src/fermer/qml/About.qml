@@ -19,8 +19,8 @@ Window {
         anchors.horizontalCenter: parent.horizontalCenter
         color:"white"
         opacity: 0.8
-        text: "QT:          "+BladesModel.qt_version()+
-              "\nFermer:   0.7.4"
+        text: "QT:           "+BladesModel.qt_version()+
+              "\nFermer:    "+General.version()
     }
     Image {
         anchors.centerIn: parent
