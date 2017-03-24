@@ -164,7 +164,8 @@ Rectangle {
             anchors.verticalCenter: tooltip.verticalCenter
             image:"icons/tasks.svg"
             onClicked:{
-                item_states.state="JobView"
+                    item_states.state="JobView"
+                    JobsModel.updateInteraction(filtered_text)
                 }
         }
         ToolTipButton{
@@ -175,6 +176,7 @@ Rectangle {
             image:"icons/blades.svg"
             onClicked:{
                     item_states.state="BladeView"
+                    BladesModel.updateInteraction(filtered_text)
                 }
 
         }
@@ -194,6 +196,7 @@ Rectangle {
             image:"icons/users.svg"
             onClicked:{
                     item_states.state="UsersView"
+                    UsersModel.updateInteraction(filtered_text)
                 }
         }
         ToolTipButton{

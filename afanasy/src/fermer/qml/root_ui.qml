@@ -69,6 +69,7 @@ Item {
                   PropertyChanges {target: node_view; visible: false}
                   PropertyChanges {target: metrics_view; visible: false}
                   PropertyChanges {target: jobs_view; visible: true}
+                  PropertyChanges {target: terminal_view; visible: false}
                   PropertyChanges {target: root; update_state: 0}
                   PropertyChanges {target: not_implemented_view; visible: false}
             },
@@ -81,6 +82,7 @@ Item {
                   PropertyChanges {target: node_view; visible: false}
                   PropertyChanges {target: metrics_view; visible: false}
                   PropertyChanges {target: jobs_view; visible: false}
+                  PropertyChanges {target: terminal_view; visible: false}
                   PropertyChanges {target: root; update_state: 1}
                   PropertyChanges {target: not_implemented_view; visible: false}
             },
@@ -93,6 +95,7 @@ Item {
                     PropertyChanges {target: users_view; visible: false}
                     PropertyChanges {target: node_view; visible: true}
                     PropertyChanges {target: metrics_view; visible: false}
+                    PropertyChanges {target: terminal_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
                     PropertyChanges {target: root; update_state: 2}
             },
@@ -105,6 +108,7 @@ Item {
                     PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
+                    PropertyChanges {target: terminal_view; visible: false}
                     PropertyChanges {target: not_implemented_view; visible: false}
                     PropertyChanges {target: root; update_state: 3}
             },
@@ -117,6 +121,7 @@ Item {
                     PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: true}
                     PropertyChanges {target: jobs_view; visible: false}
+                    PropertyChanges {target: terminal_view; visible: false}
                     PropertyChanges {target: root; update_state: 4}
                     PropertyChanges {target: not_implemented_view; visible: false}
             },
@@ -125,7 +130,8 @@ Item {
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"TerminalView"}
                     PropertyChanges {target: side_view; state:"TerminalView"}
-                    PropertyChanges {target: not_implemented_view; visible: true}
+                    PropertyChanges {target: not_implemented_view; visible: false}
+                    PropertyChanges {target: terminal_view; visible: true}
                     PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: users_view; visible: false}
                     PropertyChanges {target: metrics_view; visible: false}
@@ -145,6 +151,8 @@ Item {
         property alias supervisor_mode: root.supervisor_mode
         property string custom_aligntype_s: "AlignCenter"
         property string view_states: "JobView"
+        property string python_edit: "import af\nimport afermer"
+        property string notif_color: "#1d262b"
     }
     property bool notify_toggl:true
     property var custom_aligntype: Text.AlignLeft
@@ -159,7 +167,10 @@ Item {
     property bool swap_jobs_name: false
     property bool show_all_jobs: false
 
+    property string python_output: "empty"
+
     signal jobClicked
+    //
 
     property int totalJobs
     property int doneJobs
@@ -226,8 +237,9 @@ Item {
             }
             if (update_state==2){
                 JobsModel.updateInteraction(filtered_text)
-                //BladesModel.updateInteraction(filtered_text)
+                BladesModel.updateInteraction(filtered_text)
                 JobsModel.updateGroupNodeSize()
+                node_view.linesUpdate.call()
                 //JobsModel.arangeNodes()
             }
             if (update_state==3){
@@ -587,6 +599,8 @@ Item {
         anchors.right: side_view.left
         anchors.rightMargin: 10
         anchors.top:main_menu.bottom
+
+        //signal linesUpdate
     }
 
     UsersView{
@@ -677,6 +691,15 @@ Item {
         anchors.topMargin: 50
     }
 
+    TerminalView{
+        id:terminal_view
+        width:jobs_view.width
+        height: root.height-85
+        anchors.right: side_view.left
+        anchors.rightMargin: 10
+        anchors.top:main_menu.bottom
+    }
+
 
     Item{
         id:not_implemented_view
@@ -745,7 +768,7 @@ Item {
         property string custom_text:''
         Rectangle{
             anchors.fill: parent
-            color: "#1d262b"
+            color: settings.notif_color
             opacity: 0.8
             layer.enabled: true
             ScrollView {
@@ -780,7 +803,7 @@ Item {
             Rectangle {
                 height: 20
                 width:50
-                color: "#1d262b"
+                color: settings.notif_color
                 layer.enabled: true
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
@@ -800,6 +823,16 @@ Item {
                     }
                 }
             }
+        }
+    }
+
+    ColorDialog {
+        id: id_notif_color_dialog
+        visible: false
+        modality: Qt.WindowModal
+        title: "Choose a color"
+        onAccepted: {
+            settings.notif_color=id_notif_color_dialog.color
         }
     }
 
@@ -889,6 +922,13 @@ Item {
            id: notif_blades_memory_overflow_menuitem
            checkable: true
            text: "Notifier Blades Memory Overflow (not impl.)"
+       }
+       MenuItem {
+           id: notif_color_menuitem
+           text: "Notifier Color"
+           onTriggered: {
+                id_notif_color_dialog.open()
+           }
        }
        MenuSeparator { }
        MenuItem {
