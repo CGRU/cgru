@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from parsers import parser
-import cgruutils
 
 FRAME = "FumeFX: Frame: "
 
