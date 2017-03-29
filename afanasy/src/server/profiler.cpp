@@ -137,7 +137,7 @@ void Profiler::Profile()
 	log += buffer;
 	sprintf( buffer,"Clients per second: %4.2f, Now: %d\n", per_second, ms_meter);
 	log += buffer;
-	sprintf( buffer,"Prep: %4.2f, Proc: %4.2f, Post: %4.2f, Tolal: %4.2f ms.\n", prep, proc, post, (prep + proc + post));
+	sprintf( buffer,"Prep: %4.2f, Proc: %4.2f, Post: %4.2f, Total: %4.2f ms.\n", prep, proc, post, (prep + proc + post));
 	log += buffer;
 
 	AFCommon::QueueLog( log);
