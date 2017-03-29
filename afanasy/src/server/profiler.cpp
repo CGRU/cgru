@@ -105,7 +105,7 @@ void Profiler::Profile()
 	{
 		prep += toFloat( ms_profiles[i]->m_tstart   ) - toFloat( ms_profiles[i]->m_tinit   );
 		proc += toFloat( ms_profiles[i]->m_tfinish  ) - toFloat( ms_profiles[i]->m_tstart  );
-		proc += toFloat( ms_profiles[i]->m_tcollect ) - toFloat( ms_profiles[i]->m_tfinish );
+		post += toFloat( ms_profiles[i]->m_tcollect ) - toFloat( ms_profiles[i]->m_tfinish );
 	}
 	prep /= double( ms_stat_period ) / 1000.0;
 	proc /= double( ms_stat_period ) / 1000.0;
