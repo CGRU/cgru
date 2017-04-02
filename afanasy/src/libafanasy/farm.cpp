@@ -366,7 +366,7 @@ void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
 	}
 
 	if( m_servicelimits.empty()) return;
-
+	
 	if( full ) stream << "\n\nServices Limits:";
 	else stream << " limits:";
 	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
@@ -500,5 +500,20 @@ void Farm::jsonWriteLimits( std::ostringstream & o_str) const
 	}
 
 	o_str << "}";
+}
+const std::string Farm::jsonWriteLimits() const
+{
+    std::ostringstream stream;
+    stream << "{\"services_limits\":{";
+
+    for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
+    {
+        if( it != m_servicelimits.begin()) stream << ",";
+        stream << "\"" << (*it).first << "\":";
+        (*it).second->jsonWrite( stream);
+    }
+
+    stream << "}}";
+    return stream.str();
 }
 
