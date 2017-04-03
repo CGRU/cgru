@@ -159,7 +159,7 @@ Rectangle {
                   color:"white"
                   opacity: 0.27
                   layer.enabled: false
-              }/*
+              }
               Rectangle {
                   anchors.verticalCenter: parent.verticalCenter
                   height:2
@@ -170,7 +170,8 @@ Rectangle {
                                 : JobState.OFFLINE==v_state ? "#375753"
                                 : JobState.READY==v_state ? "#fe9400"
                                 : JobState.ERROR==v_state ? "#f14c22" : "white"
-              }*/
+              }
+              /*
               Repeater {
                   id:percent_state
                   anchors.verticalCenter: parent.verticalCenter
@@ -187,7 +188,7 @@ Rectangle {
                       opacity: 0.8
                       layer.enabled: false
                   }
-              }
+              }*/
               Text{
                   //anchors.horizontalCenter: parent.horizontalCenter
                   anchors.top: parent.bottom

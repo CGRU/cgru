@@ -68,8 +68,8 @@ Rectangle{
             text:settings.python_edit
 
             Keys.onPressed: {
-                console.log("selHand"+event.modifiers)
-                console.log("tab "+Qt.Key_Tab)
+                //console.log("selHand"+event.modifiers)
+                //console.log("tab "+Qt.Key_Tab)
                 if ((event.key == Qt.Key_Tab)&&(event.modifiers & Qt.ShiftModifier)){
                     console.log("selHand")
                 }
@@ -77,7 +77,6 @@ Rectangle{
             Shortcut {
                 sequence: "Ctrl+E"
                 onActivated: {
-                    console.log("ho")
                     var start_line=text_input.getText(0,text_input.cursorPosition).lastIndexOf("\n")
                     var start_space=text_input.getText(start_line+2,text_input.cursorPosition).lastIndexOf(" ")
                     var start_pos=start_line
@@ -123,7 +122,7 @@ Rectangle{
             }
 
             Keys.onTabPressed:{
-                console.log("event.modifiers . "+event.modifiers)
+                //console.log("event.modifiers . "+event.modifiers)
                 if (event.modifiers & Qt.ShiftModifier){
                     console.log("event.modifiers . "+event.modifiers)
                 }

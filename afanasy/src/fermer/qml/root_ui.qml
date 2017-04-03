@@ -860,7 +860,7 @@ Item {
        }
        MenuItem {
            id: supervisormode_menuitem
-           text: "Supervisor Mode (not impl.)"
+           text: "Supervisor Mode (not fully impl.)"
            checkable: true
            checked: supervisor_mode
            onToggled: {
@@ -929,6 +929,23 @@ Item {
            onTriggered: {
                 id_notif_color_dialog.open()
            }
+       }
+       MenuSeparator { }
+       MenuItem {
+           checkable: true
+           text: "Show Afanasy Jobs (not impl.)"
+       }
+       MenuItem {
+           checkable: true
+           text: "Show Afanasy Blades (not impl.)"
+       }
+       MenuItem {
+           checkable: true
+           text: "Show Qube Jobs (not impl.)"
+       }
+       MenuItem {
+           checkable: true
+           text: "Show Qube Blades (not impl.)"
        }
        MenuSeparator { }
        MenuItem {

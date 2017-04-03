@@ -264,7 +264,7 @@ Rectangle {
                     running: loaded_cpu>1 ? true : false
                     NumberAnimation { target: cpu_led; property: "opacity"; to: 1; duration: 100 }
                     NumberAnimation { target: cpu_led; property: "opacity"; to: 0; duration: 100 }
-                    NumberAnimation { target: cpu_led; property: "opacity"; to: 0; duration: 1000-(loaded_cpu*10) }
+                    NumberAnimation { target: cpu_led; property: "opacity"; to: 0; duration: Math.max(1000-(loaded_cpu*10),0) }
                 }
                 SequentialAnimation {
                     loops : -1
