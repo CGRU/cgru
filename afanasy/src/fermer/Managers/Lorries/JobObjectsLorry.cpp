@@ -6,14 +6,14 @@ using namespace afermer;
 struct HasHash
 {
     int hash;
-    HasHash( int h ) : hash(h) { }
+    explicit HasHash( int h ) : hash(h) { }
     bool operator() (JobObject::CPtr n) { return (n->id() == hash); }
 };
 
 struct HasName
 {
     QString name;
-    HasName(const QString& n ) : name(n) { }
+    explicit HasName(const QString& n ) : name(n) { }
     bool operator() (JobObject::CPtr n) { return n->name() == name; }
 };
 
@@ -22,6 +22,7 @@ JobObjectPtrIt JobObjectsLorry::find(int hash)
 {
     return std::find_if( std::begin(m_objects), std::end(m_objects), HasHash(hash) );
 }
+
 
 JobObjectPtrIt JobObjectsLorry::find(const QString& name)
 {
@@ -109,7 +110,6 @@ void JobObjectsLorry::insert(const QString& user_name
                   ,int job_id
                   ,int blades_length
                   ,const QString &approx_time
-                  ,const QString &error_blades
                   ,const QString &depends
                   ,const QString &output_folder
                   ,const QString &user_color
@@ -140,7 +140,6 @@ void JobObjectsLorry::insert(const QString& user_name
                 ,job_id
                 ,blades_length
                 ,approx_time
-                ,error_blades
                 ,depends
                 ,user_color
                 ,errors_avoid_blades
@@ -169,7 +168,6 @@ void JobObjectsLorry::insert(const QString& user_name
                 ,job_id
                 ,blades_length
                 ,approx_time
-                ,error_blades
                 ,depends
                 ,user_color
                 ,errors_avoid_blades
