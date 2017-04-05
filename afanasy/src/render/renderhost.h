@@ -85,6 +85,11 @@ public:
 	*/
     void closeTask( const af::MCTaskPos & i_taskpos);
 
+	bool hasTasks() const { return m_taskprocesses.size(); }
+	int getTasksCount() const { return m_taskprocesses.size(); }
+	inline int getRunningTasksCount() const
+		{ int c = 0; for( int i = 0; i < m_taskprocesses.size(); i++) if( m_taskprocesses[i]->isRunning()) c++; return c;}
+
 	/**
 	* @brief Add task update data to send to server on next update.
 	* @param i_tup Task update data class
