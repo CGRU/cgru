@@ -624,7 +624,7 @@ RenderNode.createPanels = function( i_monitor)
 	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
 	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
 	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
-	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable serivrs\nRestore defaults.','sub_menu':acts});
+	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable service\nRestore defaults.','sub_menu':acts});
 
 
 	// Power/WOL:
