@@ -37,11 +37,18 @@ public:
 	void stop();
 	void close();
 
-	inline bool isZombie() const { return m_zombie;}
+	inline bool isRunning() const { return m_pid != 0;}
+	inline bool isClosed()  const { return m_closed;}
+	inline bool isZombie()  const { return m_zombie;}
 
 	af::TaskExec * getTaskExec() { return m_taskexec;}
 
 	inline void listenOutput( bool i_subscribe) { m_taskexec->listenOutput( i_subscribe);}
+
+	const std::string generateInfoString( bool i_full = false) const;
+	void generateInfoStream( std::ostringstream & o_str, bool i_full = false) const;
+
+	friend std::ostream& operator<<( std::ostream& i_str, const TaskProcess * i_obj) { i_str << i_obj->generateInfoString(); return i_str; }
 
 private:
 	void launchCommand();
@@ -63,6 +70,7 @@ private:
 	std::vector<std::string> m_collected_files;
 	uint8_t m_update_status;
 	time_t m_stop_time;
+	bool m_closed;
 	bool m_zombie;
 
 	static long long ms_counter;

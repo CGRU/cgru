@@ -3,9 +3,16 @@
 
 using namespace afermer;
 
-/////////////////////////////////// JobObjectsManager /////////////////////////////////////
+JobObjectsManager::Ptr JobObjectsManager::m_single = NULL;
+
+
 JobObject::Ptr JobObjectsManager::at(int index)
 {
+    if (m_lorry->m_objects.size() < 1)
+    {
+        JobObject::Ptr ret;
+        return ret;
+    }
     return m_lorry->m_objects[index];
 }
 

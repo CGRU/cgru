@@ -278,11 +278,21 @@ void RenderHost::windowsMustDie()
 
 void RenderHost::runTask( af::TaskExec * i_task)
 {
-    for( int t = 0; t < m_taskprocesses.size(); t++)
-        if( m_taskprocesses[t]->getTaskExec()->equals( *i_task))
-            return;
-    
-    m_taskprocesses.push_back( new TaskProcess( i_task, this));
+	// Check that this task is not exist:
+	for( int t = 0; t < m_taskprocesses.size(); t++)
+	{
+		// Skipping closed tasks
+		if( m_taskprocesses[t]->isClosed())
+			continue;
+
+		if( m_taskprocesses[t]->getTaskExec()->equals( *i_task))
+		{
+			AF_ERR << "Render asked to run task that is active: " << i_task;
+			return;
+		}
+	}
+
+	m_taskprocesses.push_back( new TaskProcess( i_task, this));
 }
 
 void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
@@ -295,8 +305,8 @@ void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
             return;
         }
     }
-    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(m_taskprocesses.size()))
-    i_taskpos.v_stdOut();
+
+    AF_ERR << "RenderHost::stopTask: No such task: " << i_taskpos << " (now running " << int(m_taskprocesses.size()) << " tasks).";
 }
 
 void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)

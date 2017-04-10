@@ -15,6 +15,7 @@ Rectangle {
 	radius:2
     }
     signal jobClicked
+    property alias terminal_output:terminal_side_view
     onJobClicked: {
         jobs_side_view.jobClicked.call()
         //jobs_side_view.job_timegraph_.jobClicked.call()
@@ -25,36 +26,42 @@ Rectangle {
               PropertyChanges {target: jobs_side_view; visible: true}
               PropertyChanges {target: blades_side_view; visible: false}
               PropertyChanges {target: users_side_view; visible: false}
+              PropertyChanges {target: terminal_side_view; visible: false}
         },
         State {
               name: "BladeView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: true}
               PropertyChanges {target: users_side_view; visible: false}
+              PropertyChanges {target: terminal_side_view; visible: false}
         },
         State {
               name: "NodeView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
               PropertyChanges {target: users_side_view; visible: false}
+              PropertyChanges {target: terminal_side_view; visible: false}
         },
         State {
               name: "UsersView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
               PropertyChanges {target: users_side_view; visible: true}
+              PropertyChanges {target: terminal_side_view; visible: false}
         },
         State {
               name: "MetricView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
               PropertyChanges {target: users_side_view; visible: false}
+              PropertyChanges {target: terminal_side_view; visible: false}
         },
         State {
               name: "TerminalView"
               PropertyChanges {target: jobs_side_view; visible: false}
               PropertyChanges {target: blades_side_view; visible: false}
               PropertyChanges {target: users_side_view; visible: false}
+              PropertyChanges {target: terminal_side_view; visible: true}
         }
     ]
     Item{
@@ -328,5 +335,66 @@ Rectangle {
             anchors.fill: parent
             source: users_ListView.currentIndex!=-1 ? "UsersInfo.qml" : ""
         }
+    }
+    Item{
+        id: terminal_side_view
+        anchors.fill: parent
+        Rectangle {
+            id:terminal_side_view_header
+            width:parent.width
+            height:33
+            anchors.topMargin: 84
+            anchors.top: parent.top
+
+            Layout.fillWidth: true
+            layer.enabled: true
+            layer.effect: DropShadow {
+                transparentBorder: true
+                samples: 17
+                radius:7
+            }
+
+            color:side_view.color
+
+            Text {
+                   text: "OUTPUT"
+                   anchors.centerIn: parent
+                   font.pixelSize: 13
+                   font.family: robotoRegular.name
+                   font.weight: Font.Thin
+                   color: "white"
+                   opacity:0.9
+               }
+            Rectangle {
+                anchors.bottom: parent.bottom
+                width: parent.width
+                height: 1
+                color:"#fe9400"
+                opacity: 0.9
+                layer.enabled: true
+            }
+        }
+        TextArea {
+            id: terminal_side_text_output
+            anchors.top: terminal_side_view_header.bottom
+            anchors.topMargin: 5
+            anchors.left: parent.left
+            anchors.leftMargin: 5
+            width: terminal_side_view.width-10
+            height: root.height-33-85
+            font.letterSpacing: 1.5
+            selectByMouse: true
+            font.weight: Font.Light
+            font {family: robotoRegular.name; pixelSize: 12}
+            wrapMode: TextEdit.WrapAnywhere
+            text:python_output
+            style: TextAreaStyle {
+                textColor: Qt.rgba(1,1,1,0.7)
+                selectionColor: Qt.rgba(0.88,0.51,0,0.5)
+                selectedTextColor: "white"
+                backgroundColor: "#32434a"
+            }
+        }
+
     }
 } 

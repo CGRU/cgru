@@ -2,6 +2,8 @@
 
 using namespace afermer;
 
+UserObjectsManager::Ptr UserObjectsManager::m_single = NULL;
+
 UserObject::Ptr UserObjectsManager::at(int i_index)
 {
     return m_lorry->m_objects[i_index];
@@ -32,5 +34,15 @@ void UserObjectsManager::setUserColor(const QString& user_name,const QString& co
     UserObjectPtrIt it = m_lorry->find(user_name);
     if( it != m_lorry->m_objects.end() )
         (*it)->m_user_color = color;
+}
+
+UserObjectPtrIt UserObjectsManager::begin()
+{
+    return m_lorry->m_objects.begin();
+}
+
+UserObjectPtrIt UserObjectsManager::end()
+{
+    return m_lorry->m_objects.end();
 }
 

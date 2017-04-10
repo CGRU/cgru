@@ -171,6 +171,24 @@ Rectangle {
                                 : JobState.READY==v_state ? "#fe9400"
                                 : JobState.ERROR==v_state ? "#f14c22" : "white"
               }
+              /*
+              Repeater {
+                  id:percent_state
+                  anchors.verticalCenter: parent.verticalCenter
+                  width: progress_fill.width
+                  height:2
+                  model:1
+                  property var ui_progress_percent: width/100
+                  Rectangle {
+                      width: progress_fill.width/2
+                      anchors.left: progress_fill.left
+                      anchors.leftMargin:percent_state.ui_progress_percent*0
+                      height: 2
+                      color:"#f14c22"
+                      opacity: 0.8
+                      layer.enabled: false
+                  }
+              }*/
               Text{
                   //anchors.horizontalCenter: parent.horizontalCenter
                   anchors.top: parent.bottom

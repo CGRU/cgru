@@ -321,8 +321,11 @@ QList<int> JobsModel::getSelectedIds(){
             temp_ids.append(m_job->at(i)->id());
         }
     }
-    if (temp_ids.size()==0){
-        temp_ids.append(m_job->at(0)->id());
+    if (temp_ids.size()==0)
+    {
+        JobObject::Ptr obj = m_job->at(0);
+        if (obj != NULL)
+            temp_ids.append(obj->id());
     }
     return temp_ids;
 }
@@ -396,8 +399,9 @@ void JobsModel::updateGroupNodeSize(){
                 to_change.append(i);
             }
         }
-        emit dataChanged(index(to_change[i_name], 0), index(to_change[i_name]+1, 0));
+        //emit dataChanged(index(to_change[i_name], 0), index(to_change[i_name]+1, 0));
     }
+    emit dataChanged(index(0, 0), index(rowCount()-1, 0));
 }
 
 std::vector<std::string> splitStringByBoost(QString qstr){

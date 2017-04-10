@@ -11,8 +11,7 @@ namespace afermer
 
 struct UserObjectsManager
 {
-    AFERMER_TYPEDEF_SMART_PTRS(UserObjectsManager);
-    AFERMER_DEFINE_CREATE_FUNC(UserObjectsManager);
+    AFERMER_SINGLETON(UserObjectsManager)
 
     UserObjectsManager() 
     {
@@ -27,6 +26,10 @@ struct UserObjectsManager
     void update();
 
     void setUserColor(const QString&,const QString&);
+    
+    UserObjectPtrIt begin();
+    UserObjectPtrIt end();
+
     
     UserObjectsLorry::Ptr m_lorry;
     RadiolocationService::Ptr m_RLS;

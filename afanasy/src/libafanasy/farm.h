@@ -43,7 +43,7 @@ public:
 
 	void stdOut( bool full = false ) const;
 
-	bool getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const;
+	bool getHost( const std::string & hostname, Host & host, std::string & name, std::string & description, bool i_verbose = false) const;
 
 	/// Check if farm can run a service on a hostname:
 	bool serviceLimitCheck( const std::string & service, const std::string & hostname) const;
@@ -59,6 +59,7 @@ public:
 	const std::string serviceLimitsInfoString( bool full = false) const; /// Generate services limits information.
 
 	void jsonWriteLimits( std::ostringstream & o_str) const; /// Generate services limits information.
+	const std::string jsonWriteLimits( ) const; /// Generate services limits information.
 
 	inline const std::string & getText() const { return m_text; }
 

@@ -17,7 +17,7 @@
 #include <QtQml/qqmlcontext.h>
 #include <QDebug>
 #include <QtCore>
-#include<QTimer>
+#include <QTimer>
 
 #include "General.h"
 #include "BladesModel.h"
@@ -26,29 +26,16 @@
 #include "TasksModel.h"
 #include "state.hpp"
 
+#include <Python.h>
+
 namespace fs = boost::filesystem;
 
 using namespace afermer;
 
-
-void unit_test(){
-    General general;
-    JobsModel jobs_model;
-    BladesModel blades_model;
-    TasksModel tasks_model;
-
-    for (int i=0;i<10;i++){
-		af::sleep_sec(1);
-        qDebug()<<"jobs_model.updateInteraction() "<<i;
-        jobs_model.updateInteraction();
-        blades_model.updateInteraction();
-        tasks_model.updateTasksByJobID(15729664);
-    }
-    qDebug()<<"unit_test end";
-}
-
 int main(int argc, char *argv[])
 {
+    Py_SetProgramName(argv[0]);
+
     qDebug()<<"Version Of QT: "<<qVersion();
     //  Load env from QML path
     char* qml_env_path;
@@ -88,12 +75,6 @@ int main(int argc, char *argv[])
 
     app.setWindowIcon(QIcon(qml_app_icon_path.string().c_str()));
 
-    //qRegisterMetaType<JobsModel *>( "JobsModel");
-
-    //qRegisterMetaType<BladesModel *>( "BladesModel");
-
-    //qRegisterMetaType<TasksModel *>( "TasksModel");
-
     BladeState::declareQML();
     JobState::declareQML();
     TaskState::declareQML();
@@ -116,14 +97,11 @@ int main(int argc, char *argv[])
     ctxt->setContextProperty("UsersModel", &users_model);
     ctxt->setContextProperty("TasksModel", &tasks_model);
 
-    //QTimer::singleShot(60, &app, unit_test);
-    //QTimer::singleShot(15000, &app, SLOT(quit()));
-
-
     engine.load(QUrl::fromLocalFile(qml_app_path.string().c_str()));
     QObject *rootObject = engine.rootObjects().first();
     rootObject->setProperty("visible", true);
     engine.collectGarbage();
-
+   
+    
     return app.exec();
 }

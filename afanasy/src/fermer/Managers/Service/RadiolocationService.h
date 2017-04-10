@@ -40,14 +40,7 @@ struct TaskManager
 class RadiolocationService
 {
 public:
-    typedef RadiolocationService* Ptr; 
-    
-    static Ptr create()                   
-    { 
-        if (m_single == NULL)
-            m_single = new RadiolocationService();
-        return m_single;
-    }           
+    AFERMER_SINGLETON(RadiolocationService)
 
     RadiolocationService();
     ~RadiolocationService();
@@ -148,8 +141,6 @@ public:
 
 
 private:
-    static RadiolocationService::Ptr m_single;
-
     std::map<int, QList<int> > m_blade_indeces;
 
     std::map<size_t, TaskManager::Ptr > m_task_resources;
@@ -182,7 +173,7 @@ protected:
     std::map<size_t, RotateValue::Ptr> m_rotate;
     std::map<size_t, RotateValue::Ptr>::iterator m_it_rotate;
     std::map<size_t, int> m_tasks_per_day;
-
+    std::map<int, QList<int> >::iterator m_it_blades;
 };
 
 
