@@ -18,6 +18,8 @@ class maya_arnold(parser.parser):
         self.firstframe = True
         self.data_all = ''
 
+        self.str_error = ['[mtoa] Failed batch render']
+
     def do(self, data, mode):
         """Missing DocString
 
