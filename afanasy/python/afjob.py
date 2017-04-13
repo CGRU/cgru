@@ -48,6 +48,7 @@ path/scene.shk          - (R) Scene, which file extension determinate run comman
 -os                     - OS needed mask, "any" to render on any platform
 -hostsmask              - job render hosts mask
 -hostsexcl              - job render hosts to exclude mask
+-lifetime               - job life time in seconds
 -maxruntasks            - maximum number of hosts to use
 -maxruntime             - maximum run time for task in seconds
 -maxtasksperhost        - maximum number of tasks per host
@@ -145,6 +146,7 @@ if __name__ == '__main__':
     mname = ''
     mcodec = ''
     mres = ''
+    lifetime = -1
 
     Verbose = False
     cmd = None
@@ -428,6 +430,12 @@ if __name__ == '__main__':
             Verbose = True
             continue
 
+        if arg == '-lifetime':
+            i += 1
+            if i == argsl:
+                break
+            lifetime = argsv[i]
+            continue
     #
     # command construction:
     cmdextension = os.getenv('AF_CMDEXTENSION', '')
@@ -794,7 +802,8 @@ if __name__ == '__main__':
             cmd = 'fusion' + cmdextension
 
         cmd += ' "%s"' % scene
-        cmd += ' /render /start @#@ /end @#@ /step %d /verbose /quiet /quietlicense /clean /quit' % by
+        cmd += ' /render /start @#@ /end @#@ /step %d /quiet /quietlicense /clean /quit' % by
+        cmd += ' /log %TEMP%/fusion_render.log'
 
     # Clarisse:
     elif ext == 'render':
@@ -937,6 +946,9 @@ if __name__ == '__main__':
 
     if dependglobal != '':
         job.setDependMaskGlobal(dependglobal)
+
+    if lifetime != -1:
+        job.setTimeLife(integer(lifetime))
 
     if deletescene:
         job.setCmdPost('deletefiles "%s"' % os.path.abspath(scene))
