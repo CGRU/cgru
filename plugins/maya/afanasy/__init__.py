@@ -305,7 +305,7 @@ class UI(object):
             '-hostsexcl %(exc)s',
             '-fpt %(fpt)s',
             '-name "%(name)s"',
-            '-pwd "%(pwd)s"',
+            # '-pwd "%(pwd)s"',
             '-proj "%(proj)s"',
             '-images "%(images)s"',
             '-deletescene'
@@ -320,7 +320,7 @@ class UI(object):
             'exc': hosts_exclude,
             'fpt': frames_per_task,
             'name': job_name,
-            'pwd': project_path,
+            # 'pwd': project_path,
             'proj': project_path,
             'images': outputs
         }

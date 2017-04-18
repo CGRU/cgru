@@ -577,7 +577,7 @@ if __name__ == '__main__':
         cmd += ' -V a -f "%s"' % scene
 
     # Maya (3Delight and Mental Ray):
-    elif (ext == 'mb') or (ext == 'ma'):
+    elif ext in ['ma', 'mb']:
         if blocktype == 'maya_mental':
             scenetype = 'maya_mental'
         elif blocktype == 'maya_delight':
@@ -622,8 +622,14 @@ if __name__ == '__main__':
                 images = afcommon.patternFromPaths(images[0], images[1])
             else:
                 images = afcommon.patternFromFile(images[0])
-        if pwd != '':
-            cmd += ' -proj "%s"' % os.path.normpath(pwd)
+
+        if proj:
+            cmd += ' -proj "%s"' % os.path.normpath(proj)
+        else:
+            if pwd != '':
+                cmd += ' -proj "%s"' % os.path.normpath(pwd)
+            else:
+                cmd += ' -proj "%s"' % os.path.normpath(os.path.dirname(scene))
 
         if output != '':
             cmd += ' -rd "%s"' % os.path.normpath(output)
@@ -802,8 +808,8 @@ if __name__ == '__main__':
             cmd = 'fusion' + cmdextension
 
         cmd += ' "%s"' % scene
-        cmd += ' /render /start @#@ /end @#@ /step %d /quiet /quietlicense /clean /quit' % by
-        cmd += ' /log %TEMP%/fusion_render.log'
+        cmd += ' /render /start @#@ /end @#@ /step %d /quiet' % by
+        cmd += ' /quietlicense /clean /quit /log %TEMP%/fusion_render.log'
 
     # Clarisse:
     elif ext == 'render':
