@@ -234,7 +234,7 @@ void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 	for( int i = 0; i < i_ids.size(); i++) m_jobsIds.remove( i_ids[i]);
 }
 
-void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
+void MonitorAf::addEvents( int i_type, const std::list<int32_t> & i_ids)
 {
 	if(( i_type >= af::Monitor::EVT_COUNT ) || ( i_type < 0 ))
 	{
