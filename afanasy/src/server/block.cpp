@@ -472,7 +472,7 @@ bool Block::action( Action & i_action)
 	return job_progress_changed;
 }
 
-void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
+void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
 {
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
