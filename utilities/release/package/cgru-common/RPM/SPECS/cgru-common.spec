@@ -41,7 +41,7 @@ exit 0
 %preun
 echo "CGRU-common pre remove: $1"
 [ "$1" != "0" ] && exit 0
-/opt/cgru/utilities/keeper/cmdkeeper.sh quit
+/opt/cgru/utilities/keeper/cmdkeeper.sh -e "quit()"
 echo "Cleaning CGRU"
 [ -d /opt/cgru ] && find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
 [ -d /opt/cgru ] && find /opt/cgru -type d -name __pycache__ -exec rm -rvf {} \;

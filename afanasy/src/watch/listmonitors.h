@@ -8,30 +8,36 @@ class MCMonitorOnlineList;
 
 class ListMonitors : public ListNodes
 {
-   Q_OBJECT
+	Q_OBJECT
 
 public:
-   ListMonitors( QWidget* parent);
-   ~ListMonitors();
+	ListMonitors( QWidget* parent);
+	~ListMonitors();
 
-   bool caseMessage( af::Msg * msg);
-   ItemNode* createNewItem( af::Node *node);
+	bool v_caseMessage( af::Msg * msg);
+
+	ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed);
+
+	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
 protected:
    void contextMenuEvent( QContextMenuEvent *event);
 
 private slots:
-   void actSendMessage();
-   void actExit();
+	void actSendMessage();
+	void actRequestLog();
+	void actExit();
 
 private:
-   void calcTitle();
+	void calcTitle();
 
 private:
-   static int     SortType;
-   static bool    SortAscending;
-   static QString FilterString;
-   static int     FilterType;
-   static bool    FilterInclude;
-   static bool    FilterMatch;
+	static int     ms_SortType1;
+	static int     ms_SortType2;
+	static bool    ms_SortAscending1;
+	static bool    ms_SortAscending2;
+	static int     ms_FilterType;
+	static bool    ms_FilterInclude;
+	static bool    ms_FilterMatch;
+	static std::string ms_FilterString;
 };

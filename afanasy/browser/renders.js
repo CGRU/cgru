@@ -19,10 +19,15 @@ RenderNode.prototype.init = function()
 
 	this.elVersion = cm_ElCreateText( this.element, 'Client Version');
 
-	this.elPriority = document.createElement('span');
-	this.element.appendChild( this.elPriority);
-	this.elPriority.style.cssFloat = 'right';
-	this.elPriority.title = 'Priority';
+	if( cm_IsSith())
+	{
+		this.elPriority = document.createElement('div');
+		this.element.appendChild( this.elPriority);
+		this.elPriority.style.cssFloat = 'right';
+		this.elPriority.title = 'Priority';
+	}
+	else
+		this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
 
 	this.elUserName = cm_ElCreateFloatText( this.element, 'right', 'User Name and "Nimby" Status');
 
@@ -34,9 +39,9 @@ RenderNode.prototype.init = function()
 	this.elNewLine = document.createElement('br');
 	this.element.appendChild( this.elNewLine);
 
-	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used/Total');
+	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used / Total');
 	this.elCapacity.classList.add('prestar');
-	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running/Maximum');
+	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running / Maximum');
 	this.elStateTime = cm_ElCreateFloatText( this.element, 'right', 'Busy/Free Status and Time');
 
 	this.elAnnotation = document.createElement('div');
@@ -109,7 +114,7 @@ RenderNode.prototype.update = function( i_obj)
 		if(( this.state.ONL != true ) || ( this.params.host_resources == null ))
 		{
 			// If render just become online,
-			// or resources reciedved fisrt time,
+			// or resources received first time,
 			// we need to set plotter scales:
 
 			this.elResources.style.display = 'block';
@@ -217,7 +222,7 @@ RenderNode.prototype.update = function( i_obj)
 
 	cm_GetState( this.params.state, this.state, this.element);
 
-	this.elName.textContent = this.params.name;
+	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
 	this.elName.title = this.params.host.os;
 
 	if( this.params.version != null )
@@ -225,15 +230,32 @@ RenderNode.prototype.update = function( i_obj)
 	else
 		this.elVersion.textContent = '';
 
-	this.elPriority.textContent = '-' + this.params.priority;
+	if( cm_IsPadawan())
+	{
+		this.elPriority.innerHTML = ' Priority:<b>' + this.params.priority + '</b>';
+	}
+	else if( cm_IsJedi())
+	{
+		this.elPriority.innerHTML = ' Pri:<b>' + this.params.priority + '</b>';
+	}
+	else
+	{
+		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
+	}
 
-	var user = this.params.user_name;
-	if( this.state.NbY ) user = 'nimby(' + user + ')n';
-	else if( this.state.NBY ) user = 'NIMBY(' + user + ')N';
-	this.elUserName.textContent = user;
+	var user = '<b>' + this.params.user_name + '</b>';
+	if( this.state.PAU )
+    {
+        user = 'Paused(<b>' + user + '</b>)<b>P</b>';
+        if ( this.state.NBY ) user += '+<b>N</b>';
+        if ( this.state.Nby ) user += '+<b>n</b>';
+    }
+	else if( this.state.NbY ) user = 'nimby(<b>' + user + '</b>)<b>n</b>';
+	else if( this.state.NBY ) user = 'NIMBY(<b>' + user + '</b>)<b>N</b>';
+	this.elUserName.innerHTML = user;
 
 	if( this.params.annotation )
-		this.elAnnotation.textContent = this.params.annotation;
+		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</b></i>';
 	else
 		this.elAnnotation.textContent = '';
 
@@ -246,9 +268,9 @@ RenderNode.prototype.update = function( i_obj)
 	{
 		this.elStar.style.display = 'none';
 		this.clearTasks();
-this.plottersCsDelete();
-this.elResources.style.display = 'none';
-this.params.host_resources = null;
+		this.plottersCsDelete();
+		this.elResources.style.display = 'none';
+		this.params.host_resources = null;
 		this.elCapacity.textContent = '';
 		this.elMaxTasks.textContent = '';
 		this.state.textContent = '';
@@ -261,24 +283,35 @@ this.params.host_resources = null;
 
 	if( this.params.capacity == null)
 		this.params.capacity = this.params.host.capacity;
-	var capacity = this.params.capacity_used + '/' + this.params.capacity;
-	this.elCapacity.textContent = '['+capacity+']';
-
 	if( this.params.max_tasks == null )
 		this.params.max_tasks = this.params.host.max_tasks;
+	this.params.run_tasks = 0;
+	if( this.params.tasks )
+		this.params.run_tasks = this.params.tasks.length;
+
+	if( cm_IsPadawan())
+	{
+		this.elCapacity.innerHTML = 'Capacity[ Used:<b>' + this.params.capacity_used + '</b> / Total:<b>' + this.params.capacity + '</b> ]';
+		this.elMaxTasks.innerHTML = '( Run:<b>' + this.params.run_tasks + '</b> / Max:<b>' + this.params.max_tasks + '</b> )Tasks';
+	}
+	else if( cm_IsJedi())
+	{
+		this.elCapacity.innerHTML = 'Cap[ <b>' + this.params.capacity_used + '</b> / <b>' + this.params.capacity + '</b> ]';
+		this.elMaxTasks.innerHTML = '( <b>' + this.params.run_tasks + '</b> / <b>' + this.params.max_tasks + '</b> )Tasks';
+	}
+	else
+	{
+		this.elCapacity.innerHTML = '[<b>' + this.params.capacity_used + '</b>/<b>' + this.params.capacity + '</b>]';
+		this.elMaxTasks.innerHTML = '(<b>' + this.params.run_tasks + '</b>/<b>' + this.params.max_tasks + '</b>)';
+	}
 
 	if( this.state.RUN == true )
 	{
 		this.elStar.style.display = 'block';
 		this.elStarCount.textContent = this.params.tasks.length;
-		var max_tasks = '(' + this.params.tasks.length + '/' + this.params.max_tasks + ')';
 	}
 	else
-	{
 		this.elStar.style.display = 'none';
-		var max_tasks = '(0/' + this.params.max_tasks + ')';
-	}
-	this.elMaxTasks.textContent = max_tasks;	
 
 	this.clearTasks();
 	if( this.params.tasks != null )
@@ -317,8 +350,8 @@ RenderNode.prototype.refresh = function()
 	{
 		var power = this.offlineState;
 		if( this.params.wol_operation_time )
-			power += ' ' + cm_TimeStringInterval( this.params.wol_operation_time);
-		this.elPower.textContent = power;
+			power += ' <b>' + cm_TimeStringInterval( this.params.wol_operation_time) + '</b>';
+		this.elPower.innerHTML = power;
 		if( this.state.WFL || this.state.WSL || this.state.WWK )
 			this.elPower.style.color = '#FF0';
 		else
@@ -330,7 +363,6 @@ RenderNode.prototype.refresh = function()
 
 	var stateTime = 'NEW';
 	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval( this.params.idle_time);
-	stateTimeTitle += '\nIdle CPU < ' + this.params.host.idle_cpu + '%';
 
 	// Draw idle bar (almost in all cases)
 	if(( this.params.host.wol_idlesleep_time > 0 ) ||
@@ -409,15 +441,16 @@ RenderNode.prototype.refresh = function()
 	}
 	else
 		this.elIdleBox.style.display = 'none';
+
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{
-		stateTime = cm_TimeStringInterval( this.params.task_start_finish_time);
+		stateTime = '<b>' + cm_TimeStringInterval( this.params.task_start_finish_time) + '</b>';
 		if( this.state.RUN == true )
 			stateTime += ' busy';
 		else
 			stateTime += ' free';
 	}
-	this.elStateTime.textContent = stateTime;
+	this.elStateTime.innerHTML = stateTime;
 	this.elStateTime.title = stateTimeTitle;
 
 	for( var t = 0; t < this.tasks.length; t++)
@@ -524,6 +557,22 @@ RenderTask.prototype.destroy = function()
 	this.elParent.removeChild( this.elRoot);
 }
 
+RenderNode.launchCmdExit = function( i_args)
+{
+//console.log( i_args);
+	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'launchCmdExitDo',"param":i_args.name,
+		"name":'serivce',"title":'Launch Command' + (i_args.name == 'lcex' ? ' And Exit':''),"info":'Enter command:'});
+}
+RenderNode.prototype.launchCmdExitDo = function( i_value, i_name)
+{
+g_Info('launchCmdExit = ' + i_name + ',' + i_value);
+	var operation = {};
+	operation.type = 'launch_cmd';
+	operation.cmd = i_value;
+	if( i_name == 'lcex' )
+		operation.exit = true;
+	nw_Action( 'renders', this.monitor.getSelectedIds(), operation, null);
+}
 
 RenderNode.createPanels = function( i_monitor)
 {
@@ -542,14 +591,6 @@ RenderNode.createPanels = function( i_monitor)
 	i_monitor.createCtrlBtns( acts);
 
 
-	// Services:
-	var acts = {};
-	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
-	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
-	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
-	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable serivrs\nRestore defaults.','sub_menu':acts});
-
-
 	// Eject tasks:
 	var acts = {};
 	acts.eject_tasks         = {'label':'ALL','tooltip':'Eject all running tasks.'};
@@ -563,12 +604,27 @@ RenderNode.createPanels = function( i_monitor)
 	el.classList.add('ctrl_button');
 	el.textContent = 'CMD';
 	el.monitor = i_monitor;
-	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cmd'); return false;}
+	el.onclick = function(e){ e.currentTarget.monitor.showMenu(e,'cgru_cmdexec'); return false;}
 	el.oncontextmenu = el.onclick;
 
 
 	// Admin related functions:
 	if( ! g_GOD()) return;
+
+
+	// Paused:
+	var acts = {};
+	acts.pause   = {'name':'paused', 'value':true,  'handle':'mh_Param','label':'PAU','tooltip':'Set render paused.'};
+	acts.unpause = {'name':'paused', 'value':false, 'handle':'mh_Param','label':'UNP','tooltip':'Unset render pause.'};
+	i_monitor.createCtrlBtns( acts);
+
+
+	// Services:
+	var acts = {};
+	acts.enable           = {'handle':'setService','label':'ENS','tooltip':'Enable service.'};
+	acts.disable          = {'handle':'setService','label':'DIS','tooltip':'Disable service.'};
+	acts.restore_defaults = {'handle':'mh_Oper',   'label':'DEF','tooltip':'Restore default farm settings.'};
+	i_monitor.createCtrlBtn({'name':'services','label':'SRV','tooltip':'Enable/Disable service\nRestore defaults.','sub_menu':acts});
 
 
 	// Power/WOL:
@@ -580,6 +636,13 @@ RenderNode.createPanels = function( i_monitor)
 	acts.shutdown  = {'label':'SHD','tooltip':'Shutdown machine.'};
 	acts.delete    = {'label':'DEL','tooltip':'Delete render from Afanasy database.'};
 	i_monitor.createCtrlBtn({'name':'power','label':'POW','tooltip':'Power / Exit / Delete.','sub_menu':acts});
+
+
+	// Launch and Exit:
+	var acts = {};
+	acts.lcmd = {'name':'lcmd','label':'LCMD','handle':'launchCmdExit','tooltip':'Launch command.'};
+	acts.lcex = {'name':'lcex','label':'LCEX','handle':'launchCmdExit','tooltip':'Launch command and exit.'};
+	i_monitor.createCtrlBtns( acts);
 }
 
 
@@ -603,11 +666,11 @@ RenderNode.prototype.updatePanels = function()
 		if( this.params.host.nimby_busyfree_time )
 			info += '<br>Busy time: '
 				+ cm_TimeStringFromSeconds( this.params.host.nimby_busyfree_time)
-				+ ' CPU > ' + this.params.host.busy_cpu + '%';
+				+ ' CPU > ' + this.params.host.nimby_busy_cpu + '%';
 		if( this.params.host.nimby_idlefree_time )
 			info += '<br>Free time: '
 				+ cm_TimeStringFromSeconds( this.params.host.nimby_idlefree_time)
-				+ ' CPU: < ' + this.params.host.idle_cpu + '%';
+				+ ' CPU: < ' + this.params.host.nimby_idle_cpu + '%';
 	}
 	info += '<br>';
 
@@ -626,12 +689,12 @@ RenderNode.prototype.updatePanels = function()
 
 
 RenderNode.params = {};
-RenderNode.params.priority   = {"type":'num', "label":'Priority'};
-RenderNode.params.capacity   = {"type":'num', "label":'Capacity'};
-RenderNode.params.max_tasks  = {"type":'num', "label":'Maximum Tasks'};
-RenderNode.params.user_name  = {"type":'str', "label":'User Name'};
-RenderNode.params.annotation = {"type":'str', "label":'Annotation'};
-RenderNode.params.hidden     = {"type":'bl1', "label":'Hide/Unhide'};
+RenderNode.params.priority   = {"type":'num', "permissions":'god', "label":'Priority'};
+RenderNode.params.capacity   = {"type":'num', "permissions":'god', "label":'Capacity'};
+RenderNode.params.max_tasks  = {"type":'num', "permissions":'god', "label":'Maximum Tasks'};
+RenderNode.params.user_name  = {"type":'str', "permissions":'god', "label":'User Name'};
+RenderNode.params.annotation = {"type":'str', "permissions":'god', "label":'Annotation'};
+RenderNode.params.hidden     = {"type":'bl1', "permissions":'god', "label":'Hide/Unhide'};
 
 RenderNode.sort = ['priority','user_name','name'];
 RenderNode.filter = ['user_name','name','host_name'];
@@ -643,10 +706,10 @@ RenderNode.createActions = function()
 	if( RenderNode.actionsCreated ) return;
 
 	if( cgru_Config.af_rendercmds ) for( var i = 0; i < cgru_Config.af_rendercmds.length; i++)
-		RenderNode.actions.push({"mode":'cmd',"name":'cmd',"handle":cgru_Config.af_rendercmds[i],"label":cgru_Config.af_rendercmds[i]});
+		RenderNode.actions.push({"mode":'cgru_cmdexec',"name":'cmd',"handle":cgru_Config.af_rendercmds[i],"label":cgru_Config.af_rendercmds[i]});
 
 	if( cgru_Config.af_rendercmds_admin ) for( var i = 0; i < cgru_Config.af_rendercmds_admin.length; i++)
-		RenderNode.actions.push({"mode":'cmd',"name":'cmd',"handle":cgru_Config.af_rendercmds_admin[i],"label":cgru_Config.af_rendercmds_admin[i],"permissions":'god'});
+		RenderNode.actions.push({"mode":'cgru_cmdexec',"name":'cmd',"handle":cgru_Config.af_rendercmds_admin[i],"label":cgru_Config.af_rendercmds_admin[i],"permissions":'god'});
 
 	RenderNode.actionsCreated = true;
 }

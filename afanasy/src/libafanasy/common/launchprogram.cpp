@@ -50,6 +50,7 @@ bool LaunchProgramV(
 	HANDLE * o_err,
     const char * i_commandline,
     const char * i_wdir,
+	char * i_environ,
     DWORD i_flags,
 	bool alwaysCreateWindow)
 {
@@ -261,7 +262,7 @@ bool LaunchProgramV(
 		NULL, NULL,
 		o_in || o_out || o_err,
 		flags,
-		NULL, i_wdir,
+		(LPVOID) i_environ, i_wdir,
 		&startInfo, o_pinfo);
 
 	free(argsAndProgram);
@@ -294,7 +295,8 @@ int LaunchProgramV(
 	FILE **o_err,
     const char * i_program,
     const char * i_args[],
-    const char * i_wdir = NULL)
+    const char * i_wdir = NULL,
+	char ** i_environ = NULL)
 {
 	if (o_in)
 	{
@@ -431,10 +433,24 @@ int LaunchProgramV(
                     if( chdir( i_wdir) != 0 )
                         perror("LaunchProgram: chdir(): ");
 
-		err =
-			( (i_program[0] != '/') ?
-				execvp(i_program, const_cast<char*const*>(Args)) :
-				execv(i_program, const_cast<char*const*>(Args)) );
+		if( i_program[0] == '/')
+		{
+			if( i_environ )
+				err = execve( i_program, const_cast<char*const*>(Args), i_environ);
+			else
+				err = execv(  i_program, const_cast<char*const*>(Args));
+		}
+		else
+		{
+			if( i_environ )
+#ifdef MACOSX
+				err = execve( i_program, const_cast<char*const*>(Args), i_environ);
+#else
+				err = execvpe( i_program, const_cast<char*const*>(Args), i_environ);
+#endif
+			else
+				err = execvp(  i_program, const_cast<char*const*>(Args));
+		}
 
 		// If we get here, something is definitely bad in child process
 

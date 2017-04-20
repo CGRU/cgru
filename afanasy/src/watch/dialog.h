@@ -2,18 +2,20 @@
 
 #include "../libafanasy/msgclasses/msgclassuserhost.h"
 
-#include "../libafqt/qserver.h"
 #include "../libafqt/qthreadclientsend.h"
 #include "../libafqt/qthreadclientup.h"
 
 #include "infoline.h"
+#include "labelversion.h"
 #include "watch.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QLinkedList>
-#include <QtGui/QListWidget>
 #include <QtCore/QTimer>
-#include <QtGui/QWidget>
+#include <QBoxLayout>
+#include <QLabel>
+#include <QListWidget>
+#include <QMainWindow>
+#include <QWidget>
 
 class ButtonOut;
 class ButtonMonitor;
@@ -25,7 +27,7 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QScrollArea;
 
-class Dialog : public QWidget
+class Dialog : public QMainWindow
 {
     Q_OBJECT
 
@@ -36,17 +38,15 @@ public:
     inline bool isInitialized() const { return m_initialized; }
     inline bool isConnected()   const { return m_connected;   }
 
-    inline int getUid() const { return m_uid;}
-
     void inline displayInfo(    const QString &message) { m_infoline->displayInfo(    message); }
     void inline displayWarning( const QString &message) { m_infoline->displayWarning( message); }
     void inline displayError(   const QString &message) { m_infoline->displayError(   message); }
 
+	void inline announce( const std::string & i_str) { m_labelversion->showMessage( i_str);}
+
     void sendMsg( af::Msg * msg);
 
     bool openMonitor( int type, bool open);
-
-    inline MonitorHost * getMonitor() { return m_monitor;}
 
     void repaintStart( int mseconds = 1000);
     void repaintFinish();
@@ -59,18 +59,27 @@ signals:
     void stop();
 
 private slots:
+	void showMenuLevel();
+	void showMenuTheme();
+	void showMenuPrefs();
+	void showMenuHelp();
+
     void newMessage( af::Msg * msg);
     void connectionLost();
     void repaintWatch();
 
     void actColors();
-    void actSounds();
+    void actNotifications();
     void actSavePreferencesOnExit();
     void actSaveGUIOnExit();
+	void actSaveHotkeysOnExit();
     void actSaveWndRectsOnExit();
     void actSavePreferences();
     void actShowOfflineNoise();
-    void actGuiTheme( QString theme);
+	void actGuiTheme( QString theme);
+    void actGuiLevel( int i_level);
+	void actShowDocs();
+	void actShowForum();
 
 protected:
     void contextMenuEvent( QContextMenuEvent * event);
@@ -78,22 +87,28 @@ protected:
     void paintEvent ( QPaintEvent * event );
 
 private:
+	void createMenus();
+
     void sendRegister();
+	void idReceived( int i_id, int i_uid = -1);
     void closeList();
     void connectionEstablished();
     void setDefaultWindowTitle();
 
 private:
+	QMenu * m_contextMenu;
+	QMenu * m_levelMenu;
+	QMenu * m_themeMenu;
+	QMenu * m_prefsMenu;
+	QMenu * m_helpMenu;
+
     bool m_initialized;
     bool m_connected;
-    int  m_uid;
-    MonitorHost * m_monitor;
 
     int m_monitorType;
 
     afqt::QThreadClientUp   m_qThreadClientUpdate;
     afqt::QThreadClientSend m_qThreadSend;
-    afqt::QServer           m_qServer;
 
     ListItems * m_listitems;
     OfflineScreen * m_offlinescreen;
@@ -121,7 +136,8 @@ private:
     QPixmap m_img_botleft;
     QPixmap m_img_botright;
 
-    QWidget * m_topleft;
+//	QWidget * m_topleft;
+	QLabel * m_topleft;
     QWidget * m_topright;
 
     static int ms_size_border_top;

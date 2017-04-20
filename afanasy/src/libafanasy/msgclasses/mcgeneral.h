@@ -24,6 +24,7 @@ public:
    inline void setString( const std::string & String) { string = String;}
 
    inline void addId( int ID) { list.push_back( ID);}
+	inline void addUniqueId( int i_id) { if( false == hasId( i_id)) list.push_back( i_id);}
    inline void setId( int ID) { id = ID;}
 
    virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;

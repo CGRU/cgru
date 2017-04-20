@@ -1,7 +1,6 @@
 #pragma once
 
-//#include "../libafanasy/afnode.h"
-#include "afnodesrv.h"
+#include "afnodesolve.h"
 
 class AfListIt;
 class AfContainer;
@@ -12,40 +11,62 @@ class RenderAf;
 class AfList
 {
 public:
-   AfList()
-   {
-   }
+	AfList();
 
-   ~AfList();
+	~AfList();
 
-   inline int getCount() const { return nodes_list.size();}
+	inline int getCount() const { return m_nodes_list.size();}
 
-	int add( AfNodeSrv * i_node);    ///< Add node to list.
+	int add( AfNodeSolve * i_node);    ///< Add node to list.
 
-   /// Solve nodes list:
-   inline bool solve( af::Node::SolvingMethod i_method, RenderAf * i_render, MonitorContainer * i_monitoring)
-                { return AfNodeSrv::solveList( nodes_list, i_method, i_render, i_monitoring);}
+	inline std::list<AfNodeSolve*> & getStdList() { return m_nodes_list; }
 
-   void moveNodes( const std::vector<int32_t> & i_list, int i_type);
+	void moveNodes( const std::vector<int32_t> & i_list, int i_type);
 
-   enum MoveType{
-      MoveUp,
-      MoveDown,
-      MoveTop,
-      MoveBottom
-   };
+	enum MoveType{
+		MoveUp,
+		MoveDown,
+		MoveTop,
+		MoveBottom
+	};
 
 	const std::vector<int32_t> generateIdsList() const;
 
-   friend class AfContainer;
-   friend class AfListIt;
+	friend class AfContainer;
+	friend class AfListIt;
 
-//protected:
-	void remove( AfNodeSrv *node); ///< Remove node from list.
+	void remove( AfNodeSolve * i_node); ///< Remove node from list.
 
-private:
-	int sortPriority( AfNodeSrv * i_node);   ///< Sort nodes by priority.
+	int sortPriority( AfNodeSolve * i_node);   ///< Sort nodes by priority.
 
 private:
-	std::list<AfNodeSrv*> nodes_list;      ///< Nodes list.
+	std::list<AfNodeSolve*> m_nodes_list;      ///< Nodes list.
 };
+
+
+
+//////////////////////////////////////////////////////////////////////
+/////////////////////        Iterator        /////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+/// AFlist nodes iterator.
+class AfListIt
+{
+public:
+/// Create iterator for given \c aflist .
+	AfListIt( AfList* i_aflist);
+	~AfListIt();
+
+	inline AfNodeSolve * node() { return m_node; }   ///< Get current node.
+	void next();   ///< Set iterator to next node.
+	void reset();  ///< Reset iterator to initial position.
+
+protected:
+	AfNodeSolve* m_node;                              ///< Current node.
+
+private:
+	AfList* m_list;                 ///< Iterator's list.
+	std::list<AfNodeSolve*>::iterator m_it;       ///< First node iterator.
+	std::list<AfNodeSolve*>::iterator m_it_end;   ///< Last node iterator.
+};
+

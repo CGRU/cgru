@@ -5,7 +5,7 @@
 #include "watch.h"
 #include "listitems.h"
 
-#include <QtGui/QLayout>
+#include <QLayout>
 
 #define AFOUTPUT
 #undef AFOUTPUT

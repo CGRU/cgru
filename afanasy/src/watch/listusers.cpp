@@ -1,51 +1,79 @@
 #include "listusers.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/monitor.h"
+#include "../libafanasy/monitorevents.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
-#include "itemuser.h"
+#include "buttonpanel.h"
 #include "ctrlsortfilter.h"
+#include "itemuser.h"
 #include "modelnodes.h"
+#include "monitorhost.h"
 #include "viewitems.h"
 #include "watch.h"
 
-#include <QtGui/QMenu>
 #include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
 #include <QtGui/QContextMenuEvent>
+#include <QInputDialog>
+#include <QLayout>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListUsers::SortType       = CtrlSortFilter::TNUMJOBS;
-bool    ListUsers::SortAscending  = false;
-int     ListUsers::FilterType     = CtrlSortFilter::TNAME;
-bool    ListUsers::FilterInclude  = true;
-bool    ListUsers::FilterMatch    = false;
-QString ListUsers::FilterString   = "";
+int     ListUsers::ms_SortType1      = CtrlSortFilter::TNUMRUNNINGTASKS;
+int     ListUsers::ms_SortType2      = CtrlSortFilter::TNUMJOBS;
+bool    ListUsers::ms_SortAscending1 = false;
+bool    ListUsers::ms_SortAscending2 = false;
+int     ListUsers::ms_FilterType     = CtrlSortFilter::TNAME;
+bool    ListUsers::ms_FilterInclude  = true;
+bool    ListUsers::ms_FilterMatch    = false;
+std::string ListUsers::ms_FilterString = "";
 
 ListUsers::ListUsers( QWidget* parent):
-	ListNodes(  parent, "users", af::Msg::TUsersListRequest)
+	ListNodes(  parent, "users")
 {
-	ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-	ctrl->addSortType(   CtrlSortFilter::TNONE);
-	ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-	ctrl->addSortType(   CtrlSortFilter::TNAME);
-	ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
-	ctrl->addSortType(   CtrlSortFilter::TNUMJOBS);
-	ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
-	ctrl->addFilterType( CtrlSortFilter::TNONE);
-	ctrl->addFilterType( CtrlSortFilter::TNAME);
-	ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
+	m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1, &ms_SortAscending1,
+			&ms_SortType2, &ms_SortAscending2,
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TPRIORITY);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::THOSTNAME);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNUMJOBS);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNONE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::THOSTNAME);
 	initSortFilterCtrl();
 
-	m_eventsShowHide << af::Msg::TMonitorUsersAdd;
-	m_eventsShowHide << af::Msg::TMonitorUsersChanged;
-	m_eventsOnOff    << af::Msg::TMonitorUsersDel;
+
+	// Add left panel buttons:
+	ButtonPanel * bp;
+
+	bp = addButtonPanel("LOG","users_log","Show user log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+
+	bp = addButtonPanel("PRI","users_priority","Set user priority.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPriority()));
+
+	bp = addButtonPanel("FOR","users_errors_forgive_time","Set user errors forgive time.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actErrorsForgiveTime()));
+
+	bp = addButtonPanel("LIFE","users_jobs_life_time","Set jobs life time.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actJobsLifeTime()));
+
+	bp = addButtonPanel("ORD","users_solve_ordered","Solve jobs by order.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsByOrder()));
+
+	bp = addButtonPanel("PAR","users_solve_parallel","Solve jobs parallel.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actSolveJobsParallel()));
+
 
 	m_parentWindow->setWindowTitle("Users");
 
@@ -66,7 +94,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	ItemUser* useritem = (ItemUser*)getCurrentItem();
 	if( useritem == NULL ) return;
 	bool me = false;
-	if( useritem->getId() == Watch::getUid()) me = true;
+	if( useritem->getId() == MonitorHost::getUid()) me = true;
 
 
 	QMenu menu(this);
@@ -156,9 +184,8 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 	menu.exec( event->globalPos());
 }
 
-bool ListUsers::caseMessage( af::Msg * msg)
+bool ListUsers::v_caseMessage( af::Msg * msg)
 {
-AFINFO("ListUsers::caseMessage( Msg msg)\n");
 #ifdef AFOUTPUT
 	msg->stdOut();
 #endif
@@ -168,27 +195,7 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
 	{
 		updateItems( msg);
 		calcTitle();
-		v_subscribe();
-		break;
-	}
-	case af::Msg::TMonitorUsersDel:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		calcTitle();
-		break;
-	}
-	case af::Msg::TMonitorUsersAdd:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
-		break;
-	}
-	case af::Msg::TMonitorUsersChanged:
-	{
-		af::MCGeneral ids( msg);
-		Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
+		subscribe();
 		break;
 	}
 	default:
@@ -197,15 +204,41 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
 	return true;
 }
 
-ItemNode* ListUsers::createNewItem( af::Node *node)
+bool ListUsers::v_processEvents( const af::MonitorEvents & i_me)
 {
-	return new ItemUser( (af::User*)node);
+	if( i_me.m_events[af::Monitor::EVT_users_del].size())
+	{
+		deleteItems( i_me.m_events[af::Monitor::EVT_users_del]);
+		calcTitle();
+		return true;
+	}
+
+	std::vector<int> ids;
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_users_change].size(); i++)
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_users_change][i]);
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_users_add].size(); i++)
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_users_add][i]);
+
+	if( ids.size())
+	{
+		get( ids);
+		return true;
+	}
+
+	return false;
+}
+
+ItemNode* ListUsers::v_createNewItem( af::Node * i_node, bool i_subscibed)
+{
+	return new ItemUser( (af::User*)i_node, m_ctrl_sf);
 }
 
 void ListUsers::userAdded( ItemNode * node, const QModelIndex & index)
 {
 //printf("node->getId()=%d ,   Watch::getUid()=%d,  row=%d\n", node->getId(), Watch::getUid(), index.row());
-	if( node->getId() == Watch::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
+	if( node->getId() == MonitorHost::getUid()) m_view->selectionModel()->select( index, QItemSelectionModel::Select);
 }
 
 void ListUsers::calcTitle()
@@ -227,7 +260,7 @@ void ListUsers::actErrorsAvoidHost()
 	int current = useritem->errors_avoidhost;
 
 	bool ok;
-	int value = QInputDialog::getInteger(this, "Errors to avoid host", "Enter Number of Errors", current, 0, 99, 1, &ok);
+	int value = QInputDialog::getInt(this, "Errors to avoid host", "Enter Number of Errors", current, 0, 99, 1, &ok);
 	if( !ok) return;
 
 	setParameter("errors_avoid_host", value);
@@ -240,7 +273,7 @@ void ListUsers::actErrorsSameHost()
 	int current = useritem->errors_tasksamehost;
 
 	bool ok;
-	int value = QInputDialog::getInteger(this, "Errors same host", "Enter Number of Errors", current, 0, 99, 1, &ok);
+	int value = QInputDialog::getInt(this, "Errors same host", "Enter Number of Errors", current, 0, 99, 1, &ok);
 	if( !ok) return;
 
 	setParameter("errors_task_same_host", value);
@@ -253,7 +286,7 @@ void ListUsers::actErrorRetries()
 	int current = useritem->errors_retries;
 
 	bool ok;
-	int value = QInputDialog::getInteger(this, "Auto retry error tasks", "Enter Number of Errors", current, 0, 99, 1, &ok);
+	int value = QInputDialog::getInt(this, "Auto retry error tasks", "Enter Number of Errors", current, 0, 99, 1, &ok);
 	if( !ok) return;
 
 	setParameter("errors_retries", value);
@@ -292,7 +325,7 @@ void ListUsers::actMaxRunningTasks()
 	int current = useritem->maxrunningtasks;
 
 	bool ok;
-	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
+	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks", max);
@@ -308,14 +341,7 @@ void ListUsers::actHostsMask()
 	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask", afqt::qtos( mask));
+	setParameterRE("hosts_mask", afqt::qtos( mask));
 }
 
 void ListUsers::actHostsMaskExclude()
@@ -328,25 +354,12 @@ void ListUsers::actHostsMaskExclude()
 	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask_exclude", afqt::qtos( mask));
+	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
 }
 
 void ListUsers::actDelete() { operation("delete"); }
 void ListUsers::actSolveJobsByOrder()  { setParameter("solve_parallel", "false", false); }
 void ListUsers::actSolveJobsParallel() { setParameter("solve_parallel", "true",  false); }
 
-void ListUsers::actRequestLog()
-{
-	displayInfo( "User log request.");
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	af::Msg * msg = new af::Msg( af::Msg::TUserLogRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
-}
+void ListUsers::actRequestLog() { getItemInfo("log"); }
+

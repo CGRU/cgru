@@ -2,7 +2,7 @@
 
 #include "../libafqt/qenvironment.h"
 
-#include <QtGui/QLineEdit>
+#include <QLineEdit>
 
 class InfoLine : public QLineEdit
 {

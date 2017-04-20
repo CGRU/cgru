@@ -7,9 +7,9 @@
 #include "wndlist.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QMenu>
 #include <QtGui/QPainter>
+#include <QContextMenuEvent>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -107,10 +107,10 @@ void ButtonMonitor::createImage()
       height = img.height();
       static const int images_num = 4;
       QImage * images[images_num] = { &img, &img_h, &img_p, &img_t};
-      QColor back;
-      if( af::Environment::GOD())         back = afqt::QEnvironment::clr_LinkVisited.c;
-      else if( af::Environment::VISOR())  back = afqt::QEnvironment::clr_Link.c;
-      else                                back = afqt::QEnvironment::clr_Window.c;
+
+		QColor back;
+		back = afqt::QEnvironment::clr_Window.c;
+
       for( int i = 0; i < 4; i++)
       for( int y = 0; y < height; y++)
       for( int x = 0; x < width; x++)
@@ -138,18 +138,8 @@ void ButtonMonitor::createImage()
    }
    else
    {
-      switch( type)
-      {
-         case Watch::WJobs:
-         case Watch::WRenders:
-         case Watch::WUsers:
-            width = 110;
-            height = 30;
-            break;
-         case Watch::WMonitors:
-            width = 40;
-            height = 24;
-      }
+		width = 110;
+		height = 30;
    }
 
    setFixedSize( width, height);
@@ -246,6 +236,9 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
 {
    QPainter painter( this);
 
+   painter.setRenderHint(QPainter::Antialiasing);
+   painter.setRenderHint(QPainter::TextAntialiasing);
+
    if( useimages)
    {
       if( pressed )
@@ -256,14 +249,37 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
          painter.drawImage( rect(), img_h);
       else
          painter.drawImage( rect(), img);
+
+		return;
    }
-   else
-   {
-      QString text = Watch::BtnName[type];
-      if( pressed ) text = QString("[%1]").arg(text);
-      else if( type == CurrentType) text = QString("[*%1*]").arg(text);
-      else if( hovered ) text = QString("=%1=").arg(text);
-      painter.drawText( 0, 0, width-1, height-1, Qt::AlignHCenter | Qt::AlignVCenter, text);
-      painter.drawRect( 0, 0, width-1, height-1);
-   }
+
+	static const int margin_x = 2;
+	static const int margin_y = 2;
+	QRect rct( margin_x, margin_y, width-1-margin_x, height-1-margin_y);
+
+	QColor color( afqt::QEnvironment::clr_Light.c);
+	QPen pen( Qt::SolidLine);
+	pen.setColor( afqt::QEnvironment::clr_Dark.c);
+	if( pressed )
+		color.setAlphaF( .8);
+	else if( type == CurrentType )
+		color.setAlphaF( .6);
+	else if( hovered )
+		color.setAlphaF( .4);
+	else
+		color.setAlphaF( .2);
+	painter.setPen( pen);
+	painter.setBrush( QBrush( color, Qt::SolidPattern));
+	painter.drawRoundedRect( rct, 2.5, 2.5);
+
+	QFont font = painter.font();
+	font.setBold( false);
+	if( type == CurrentType )
+		font.setBold( true);
+	painter.setFont( font);
+
+	pen.setColor( afqt::QEnvironment::clr_Text.c);
+	painter.setPen( pen);
+
+	painter.drawText( rct, Qt::AlignHCenter | Qt::AlignVCenter, Watch::BtnName[type]);
 }

@@ -11,14 +11,6 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const std::string af::jsonMakeHeader( int size)
-{
-	std::string header = "AFANASY ";
-	header += af::itos( size);
-	header += " JSON";
-	return header;
-}
-
 char * af::jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err)
 {
 	return af::jsonParseData( o_doc, i_msg->data(), i_msg->dataLen(), o_err);
@@ -26,6 +18,13 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std
 
 char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err)
 {
+    if( i_data_len < 0 || i_data_len > Msg::SizeBufferLimit)
+    {
+        if( o_err )
+            *o_err = "Invalid buffer size";
+        AFERRAR("jsonParseData: size > Msg::SizeBufferLimit ( %d > %d)", i_data_len, Msg::SizeBufferLimit);
+        return NULL;
+    }
 	char * data = new char[i_data_len+1];
 	memcpy( data, i_data, i_data_len);
 	data[i_data_len] = '\0';
@@ -79,14 +78,18 @@ af::Msg * af::jsonMsg( const std::string & i_str)
 	return o_msg;
 }
 
-af::Msg * af::jsonMsgError( const std::string & i_str)
+af::Msg * af::jsonMsgInfo( const std::string & i_kind, const std::string & i_text)
 {
-	std::string str = "{\"error\":\"";
-	str += af::strEscape( i_str);
-	str += "\"}";
+	std::string str = "{\"info\":{";
+	str += "\"kind\":\"" + af::strEscape( i_kind) + "\"";
+	str += ",\"text\":\"" + af::strEscape( i_text) + "\"";
+	str += "}}";
 	return af::jsonMsg( str);
 }
-
+af::Msg * af::jsonMsgError( const std::string & i_str)
+{
+	return af::jsonMsgInfo( "error", i_str);
+}
 af::Msg * af::jsonMsgStatus( bool i_success, const std::string & i_type, const std::string & i_msg)
 {
 	std::string str = "{\"status\":";
@@ -253,6 +256,20 @@ bool af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const 
 	return true;
 }
 
+bool af::jr_int64vec( const char * i_name, std::vector<int64_t> & o_attr, const JSON & i_object)
+{
+	const JSON & array = i_object[i_name];
+	if( false == array.IsArray())
+		return false;
+
+	o_attr.clear();
+	for( int i = 0; i < array.Size(); i++)
+		if( array[i].IsInt64())
+			o_attr.push_back( array[i].GetInt64());
+
+	return true;
+}
+
 bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object)
 {
 	const JSON & array = i_object[i_name];
@@ -267,7 +284,7 @@ bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, c
 	return true;
 }
 
-bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object)
+bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & map = i_object[i_name];
 	if( false == map.IsObject())
@@ -275,16 +292,91 @@ bool af::jr_stringmap( const char * i_name, std::map<std::string,std::string> & 
 
 	for( JSON::ConstMemberIterator it = map.MemberBegin(); it != map.MemberEnd(); ++it)
 	{
-		std::string name = it->name.GetString();
-		const JSON & path = it->value;
-		if( false == path.IsString()) continue;
-		o_attr[name] = path.GetString();
+		const std::string name = it->name.GetString();
+		const JSON & value = it->value;
+		std::string str;
+		if( value.IsString())
+			str = value.GetString();
+        //printf("str=\"%s\"[%d]\n",str.c_str(),str.size());
+		if( str.size())
+			o_attr[name] = str;
+		else
+		    o_attr.erase( name); // This does not erasing element, why ?
+			//printf("erase(%s)=%d\n",name.c_str(),o_attr.erase( name));
+
+		if( o_str )
+			*o_str += std::string("\n") + i_name + "[" + name + "]=\"" + o_attr[name] + "\"";
 	}
 
 	return true;
 }
 
-void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
+bool af::jr_intmap( const char * i_name, std::map<std::string,int32_t> & o_map, const JSON & i_object, std::string * o_str)
+{
+	const JSON & map = i_object[i_name];
+	if( false == map.IsObject())
+		return false;
+
+	for( JSON::ConstMemberIterator it = map.MemberBegin(); it != map.MemberEnd(); ++it)
+	{
+		const std::string name = it->name.GetString();
+		const JSON & value = it->value;
+		if( false == value.IsInt())
+			return false;
+		o_map[name] = value.GetInt();
+		if( o_str )
+			*o_str += std::string("\n") + i_name + "[" + name + "]=\"" + af::itos(o_map[name]) + "\"";
+	}
+
+	return true;
+}
+
+void af::jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i_map, std::ostringstream & o_str)
+{
+	o_str << ",\n\"" << i_name << "\":{";
+	for( std::map<std::string,int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+	{
+		if( it != i_map.begin()) o_str << ",";
+		o_str << "\n\"" << it->first << "\":" << it->second;
+	}
+	o_str << "\n}";
+}
+
+void af::jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str)
+{
+	o_str << ",\n\"" << i_name << "\":{";
+	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+	{
+		if( it != i_map.begin()) o_str << ",";
+		o_str << "\n\"" << it->first << "\":\"" << af::strEscape(it->second) << "\"";
+	}
+	o_str << "\n}";
+}
+
+void af::jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str)
+{
+	o_str << "\n,\"" << i_name << "\":[";
+	std::list<int32_t>::const_iterator it = i_list.begin();
+	for( ; it != i_list.end(); it++)
+	{
+		if( it != i_list.begin()) o_str << ',';
+		o_str << *it;
+	}
+	o_str << "]";
+}
+
+void af::jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str)
+{
+	o_str << "\n,\"" << i_name << "\":[";
+	for( int i = 0; i < i_vec.size(); i++)
+	{
+		if( i ) o_str << ',';
+		o_str << i_vec[i];
+	}
+	o_str << "]";
+}
+
+void af::jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render)
 {
 	o_str << "\"state\":\"";
 
@@ -299,6 +391,7 @@ void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 		if( i_state & Render::SWOLFalling  ) o_str << " WFL";
 		if( i_state & Render::SWOLSleeping ) o_str << " WSL";
 		if( i_state & Render::SWOLWaking   ) o_str << " WWK";
+		if( i_state & Render::SPaused  ) o_str << " PAU";
 	}
 	else
 	{
@@ -317,6 +410,8 @@ void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 		if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";
 		if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
 		if( i_state & AFJOB::STATE_PPAPPROVAL_MASK      ) o_str << " PPA";
+		if( i_state & AFJOB::STATE_ERROR_READY_MASK     ) o_str << " RER";
+		if( i_state & AFJOB::STATE_WAITRECONNECT_MASK   ) o_str << " WRC";
 	}
 
 	o_str << "\"";

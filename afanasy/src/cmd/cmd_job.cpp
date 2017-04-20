@@ -19,14 +19,12 @@ CmdJobsList::CmdJobsList()
 {
 	setCmd("jlist");
 	setInfo("List of online jobs.");
-	setMsgType( af::Msg::TJobsListRequest);
-	setMsgOutType( af::Msg::TJobsList);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdJobsList::~CmdJobsList(){}
 bool CmdJobsList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	msg.set( getMsgType());
+	m_str << "{\"get\":{\"type\":\"jobs\"}}";
 	return true;
 }
 void CmdJobsList::v_msgOut( af::Msg& msg)
@@ -41,7 +39,6 @@ CmdJobsWeight::CmdJobsWeight()
 	setInfo("Jobs memory weight.");
 	setMsgType( af::Msg::TJobsWeightRequest);
 	setMsgOutType( af::Msg::TJobsWeight);
-	setRecieving();
 }
 CmdJobsWeight::~CmdJobsWeight(){}
 bool CmdJobsWeight::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -146,21 +143,14 @@ CmdJobId::CmdJobId()
 	setArgsCount(1);
 	setInfo("Get job.");
 	setHelp("jid [id] Get job with given id.");
-	setMsgType( af::Msg::TJobRequestId);
-	setMsgOutType( af::Msg::TJob);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdJobId::~CmdJobId(){}
 bool CmdJobId::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"full\",\"ids\":[" << id << "]}}";
 	return true;
-}
-void CmdJobId::v_msgOut( af::Msg& msg)
-{
-	af::Job job( &msg);
-	job.v_stdOut( true);
 }
 
 CmdJobLog::CmdJobLog()
@@ -169,15 +159,13 @@ CmdJobLog::CmdJobLog()
 	setArgsCount(1);
 	setInfo("Get job log.");
 	setHelp("jlog [id] Get job log with given id.");
-	setMsgType( af::Msg::TJobLogRequestId);
-//   setMsgOutType( af::Msg::TData);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdJobLog::~CmdJobLog(){}
 bool CmdJobLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
 	return true;
 }
 
@@ -187,15 +175,13 @@ CmdJobProgress::CmdJobProgress()
 	setArgsCount(1);
 	setInfo("Get job progress.");
 	setHelp("jprog [id] Get progress job with given id.");
-	setMsgType( af::Msg::TJobProgressRequestId);
-	setMsgOutType( af::Msg::TJobProgress);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdJobProgress::~CmdJobProgress(){}
 bool CmdJobProgress::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"progress\",\"ids\":[" << id << "]}}";
 	return true;
 }
 void CmdJobProgress::v_msgOut( af::Msg& msg)

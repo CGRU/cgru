@@ -2,7 +2,7 @@
 
 from services import service
 
-parser = 'generic'
+parser = 'fusion'
 
 class fusion(service.service):
 	""" Fusion

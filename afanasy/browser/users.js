@@ -12,9 +12,12 @@ UserNode.prototype.init = function()
 	this.elName.title = 'User Name';
 	this.elName.classList.add('prestar');
 
-	this.elPriority = document.createElement('span');
-	this.element.appendChild( this.elPriority);
-	this.elPriority.title = 'Priority';
+	if( false == cm_IsPadawan())
+	{
+		this.elPriority = document.createElement('span');
+		this.element.appendChild( this.elPriority);
+		this.elPriority.title = 'Priority';
+	}
 
 	this.elHostName = cm_ElCreateFloatText( this.element, 'right', 'Host Name');
 	this.elHostName.classList.add('name');
@@ -28,6 +31,8 @@ UserNode.prototype.init = function()
 	this.elCenter.style.textAlign = 'center';
 	this.elCenter.classList.add('prestar');
 
+	if( cm_IsPadawan())
+		this.elPriority = cm_ElCreateText( this.elCenter, 'Priority');
 	this.elMaxRunningTasks = cm_ElCreateText( this.elCenter, 'Maximum Running Tasks');
 	this.elHostsMask = cm_ElCreateText( this.elCenter, 'Hosts Mask');
 	this.elHostsMaskExclude = cm_ElCreateText( this.elCenter, 'Exclude Hosts Mask');
@@ -53,42 +58,21 @@ UserNode.prototype.init = function()
 	this.elBarParent = document.createElement('div');
 	this.element.appendChild( this.elBarParent);
 	this.elBarParent.style.position = 'absolute';
-	this.elBarParent.style.left = '120px';
-	this.elBarParent.style.right = '50px';
+	this.elBarParent.style.left = '220px';
+	this.elBarParent.style.right = '220px';
 	this.elBarParent.style.top = '18px';
 	this.elBarParent.style.height = '12px';
 
 	this.elBar = document.createElement('div');
 	this.elBarParent.appendChild( this.elBar);
 	this.elBar.classList.add('bar');
-//	this.elBar.style.textAlign = 'right';
 }
 
 UserNode.prototype.update = function( i_obj)
 {
 	if( i_obj ) this.params = i_obj;
 
-	this.elName.textContent = this.params.name;
-
-	this.elPriority.textContent = '-' + this.params.priority;
-
-	if( this.params.host_name ) this.elHostName.textContent = this.params.host_name;
-	else this.elHostName.textContent = '';
-
-	if( this.params.max_running_tasks ) this.elMaxRunningTasks.textContent = 'Max('+this.params.max_running_tasks+')';
-	else this.elMaxRunningTasks.textContent = '';
-
-	if( this.params.hosts_mask ) this.elHostsMask.textContent = 'H('+this.params.hosts_mask+')';
-	else this.elHostsMask.textContent = '';
-
-	if( this.params.hosts_mask_exclude ) this.elHostsMaskExclude.textContent = 'E('+this.params.hosts_mask_exclude+')';
-	else this.elHostsMaskExclude.textContent = '';
-
-	if( this.params.errors_forgive_time ) this.elForgive.textContent = 'F'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time);
-	else this.elForgive.textContent = '';
-
-	if( this.params.jobs_life_time ) this.elJobsLifeTime.textContent = 'L'+ cm_TimeStringFromSeconds( this.params.jobs_life_time);
-	else this.elJobsLifeTime.textContent = '';
+	this.elName.innerHTML = '<b>'+this.params.name+'</b>';
 
 	if( this.params.running_tasks_num )
 	{
@@ -98,43 +82,168 @@ UserNode.prototype.update = function( i_obj)
 	else
 		this.elStar.style.display = 'none';
 
-	var errstr = 'Err:';
-	var errtit = 'Errors solving:';
-	errstr += this.params.errors_avoid_host + 'J,';
-	errtit += '\nJob blocks to avoid host: ' + this.params.errors_avoid_host;
-	errstr += this.params.errors_task_same_host + 'T,';
-	errtit += '\nJob tasks to avoid host: ' + this.params.errors_task_same_host;
-	errstr += this.params.errors_retries + 'R';
-	errtit += '\nError task retries: ' + this.params.errors_retries;
-	this.elErrors.textContent = errstr;
-	this.elErrors.title = errtit;
+	if( cm_IsPadawan())
+	{
+		this.elPriority.innerHTML = 'Priority:<b>' + this.params.priority + '</b>';
 
-	var jobs = 'j';
-	if( this.params.jobs_num)
-		jobs += this.params.jobs_num;
+		if( this.params.host_name )
+			this.elHostName.innerHTML = '<small>Latest Activity Host:</small><b>' + this.params.host_name + '</b>';
+		else this.elHostName.textContent = '';
+
+		if( this.params.max_running_tasks )
+			this.elMaxRunningTasks.innerHTML = 'MaxRunTasks:<b>'+this.params.max_running_tasks+'</b>';
+		else this.elMaxRunningTasks.textContent = '';
+
+		if( this.params.hosts_mask )
+			this.elHostsMask.innerHTML = 'HostsMask(<b>'+this.params.hosts_mask+'</b>)';
+		else this.elHostsMask.textContent = '';
+
+		if( this.params.hosts_mask_exclude )
+			this.elHostsMaskExclude.innerHTML = 'ExcludeHosts(<b>'+this.params.hosts_mask_exclude+'</b>)';
+		else this.elHostsMaskExclude.textContent = '';
+
+		if( this.params.errors_forgive_time )
+			this.elForgive.innerHTML = 'ErrorsForgiveTime:<b>'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
+		else this.elForgive.textContent = '';
+
+		if( this.params.jobs_life_time )
+			this.elJobsLifeTime.innerHTML = 'JobsLifeTime:<b>'+ cm_TimeStringFromSeconds( this.params.jobs_life_time) + '</b>';
+		else this.elJobsLifeTime.textContent = '';
+
+		var errstr = 'ErrorsSolving(';
+		errstr += ' Avoid:<b>' + this.params.errors_avoid_host + '</b>';
+		errstr += ' Task:<b>' + this.params.errors_task_same_host + '</b>';
+		errstr += ' Retries:<b>' + this.params.errors_retries + '</b>';
+		errstr += ')';
+		this.elErrors.innerHTML = errstr;
+
+		var jobs = 'Jobs Total:';
+		if( this.params.jobs_num)
+			jobs += ' <b>' + this.params.jobs_num + '</b>';
+		else
+			jobs += ' <b>0</b>';
+		if( this.params.running_jobs_num )
+			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
+		this.elJobs.innerHTML = jobs;
+
+		if( this.params.solve_parallel )
+			this.elSolving.innerHTML = 'Solving:<b>Parrallel</b>';
+		else
+			this.elSolving.innerHTML = 'Solving:<b>Ordered</b>';
+	}
+	else if( cm_IsJedi())
+	{
+		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
+
+		if( this.params.host_name )
+			this.elHostName.innerHTML = '<b>' + this.params.host_name + '</b>';
+		else this.elHostName.textContent = '';
+
+		if( this.params.max_running_tasks )
+			this.elMaxRunningTasks.innerHTML = 'Max:<b>'+this.params.max_running_tasks+')</b>';
+		else this.elMaxRunningTasks.textContent = '';
+
+		if( this.params.hosts_mask )
+			this.elHostsMask.innerHTML = 'Hosts(<b>'+this.params.hosts_mask+')</b>';
+		else this.elHostsMask.textContent = '';
+
+		if( this.params.hosts_mask_exclude )
+			this.elHostsMaskExclude.innerHTML = 'Exclude(<b>'+this.params.hosts_mask_exclude+')</b>';
+		else this.elHostsMaskExclude.textContent = '';
+
+		if( this.params.errors_forgive_time )
+			this.elForgive.innerHTML = 'ErrForgive:<b>'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
+		else this.elForgive.textContent = '';
+
+		if( this.params.jobs_life_time )
+			this.elJobsLifeTime.innerHTML = 'JobsLife:<b>'+ cm_TimeStringFromSeconds( this.params.jobs_life_time) + '</b>';
+		else this.elJobsLifeTime.textContent = '';
+
+		var errstr = 'ErrSlv(';
+		errstr += 'A:<b>' + this.params.errors_avoid_host + '</b>';
+		errstr += ',T:<b>' + this.params.errors_task_same_host + '</b>';
+		errstr += ',R:<b>' + this.params.errors_retries + '</b>';
+		errstr += ')';
+		this.elErrors.innerHTML = errstr;
+
+		var jobs = 'Jobs:';
+		if( this.params.jobs_num)
+			jobs += '<b>' + this.params.jobs_num + '</b>';
+		else
+			jobs += '<b>0</b>';
+		if( this.params.running_jobs_num )
+			jobs += ' / <b>'+this.params.running_jobs_num + '</b>Run';
+		this.elJobs.innerHTML = jobs;
+
+		if( this.params.solve_parallel )
+			this.elSolving.innerHTML = '<b>Parallel</b>';
+		else
+			this.elSolving.innerHTML = '<b>Ordered</b>';
+	}
 	else
-		jobs += '0';
-	if( this.params.running_jobs_num )
-		jobs += '/'+this.params.running_jobs_num;
-//	if( this.params.running_tasks_num )
-//		jobs += '-' + this.params.running_tasks_num;
-	this.elJobs.textContent = jobs;
+	{
+		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
+
+		if( this.params.host_name )
+			this.elHostName.innerHTML = '<b>' + this.params.host_name + '</b>';
+		else this.elHostName.textContent = '';
+
+		if( this.params.max_running_tasks )
+			this.elMaxRunningTasks.innerHTML = 'm<b>'+this.params.max_running_tasks+'</b>';
+		else this.elMaxRunningTasks.textContent = '';
+
+		if( this.params.hosts_mask )
+			this.elHostsMask.innerHTML = 'h(<b>'+this.params.hosts_mask+')</b>';
+		else this.elHostsMask.textContent = '';
+
+		if( this.params.hosts_mask_exclude )
+			this.elHostsMaskExclude.innerHTML = 'e(<b>'+this.params.hosts_mask_exclude+')</b>';
+		else this.elHostsMaskExclude.textContent = '';
+
+		if( this.params.errors_forgive_time )
+			this.elForgive.innerHTML = 'f<b>'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time) + '</b>';
+		else this.elForgive.textContent = '';
+
+		if( this.params.jobs_life_time )
+			this.elJobsLifeTime.innerHTML = 'l<b>'+ cm_TimeStringFromSeconds( this.params.jobs_life_time) + '</b>';
+		else this.elJobsLifeTime.textContent = '';
+
+		var errstr = 'e:';
+		errstr += '<b>' + this.params.errors_avoid_host + '</b>b';
+		errstr += ',<b>' + this.params.errors_task_same_host + '</b>t';
+		errstr += ',<b>' + this.params.errors_retries + '</b>r';
+		this.elErrors.innerHTML = errstr;
+
+		var jobs = 'j';
+		if( this.params.jobs_num)
+			jobs += '<b>' + this.params.jobs_num + '</b>';
+		else
+			jobs += '<b>0</b>';
+		if( this.params.running_jobs_num )
+			jobs += '/<b>'+this.params.running_jobs_num + '</b>r';
+		this.elJobs.innerHTML = jobs;
+
+		if( this.params.solve_parallel )
+			this.elSolving.innerHTML = '<b>par</b>';
+		else
+			this.elSolving.innerHTML = '<b>ord</b>';
+	}
 
 	var solving = 'User jobs solving method:';
 	if( this.params.solve_parallel )
-	{
-		this.elSolving.textContent = 'Par';
 		solving += '\nParallel: All together according to jobs priority.\n';
-	}
 	else
-	{
-		this.elSolving.textContent = 'Ord';
 		solving += '\nOrdered: Queued by jobs priority and order.\n';
-	}
 	this.elSolving.title = solving;
 
+	var errtit = 'Errors solving:';
+	errtit += '\nJob blocks to avoid host: ' + this.params.errors_avoid_host;
+	errtit += '\nJob tasks to avoid host: ' + this.params.errors_task_same_host;
+	errtit += '\nError task retries: ' + this.params.errors_retries;
+	this.elErrors.title = errtit;
+
 	if( this.params.annotation )
-		this.elAnnotation.textContent = this.params.annotation;
+		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</i></b>';
 	else
 		this.elAnnotation.textContent = '';
 
@@ -142,7 +251,6 @@ UserNode.prototype.update = function( i_obj)
 	title += 'Time Registered: ' + cm_DateTimeStrFromSec( this.params.time_register) + '\n';
 	title += 'Last Acitvity: ' + cm_DateTimeStrFromSec( this.params.time_activity) + '\n';
 	title += 'ID = ' + this.params.id + '\n';
-//	this.elName.title = title;
 	this.element.title = title;
 
 	this.refresh();
@@ -155,13 +263,18 @@ UserNode.prototype.refresh = function()
 	if( this.params.running_tasks_num && ( this.monitor.max_tasks > 0 ))
 	{
 		percent = 100 * this.params.running_tasks_num/this.monitor.max_tasks;
-		label = this.params.running_tasks_num;
+		var capacity = cm_ToKMG( this.params.running_capacity_total);
+		if( cm_IsPadawan())
+			label = 'Running Tasks: <b>' + this.params.running_tasks_num + '</b> / Total Capacity: <b>' + capacity + '</b>';
+		else if( cm_IsJedi())
+			label = 'Tasks:<b>' + this.params.running_tasks_num + '</b> / Capacity:<b>' + capacity + '</b>';
+		else
+			label = 't<b>' + this.params.running_tasks_num + '</b>/c<b>' + capacity + '</b>';
 	}
 	else
 		percent = '0';
 	this.elBar.style.width = percent + '%';
-	this.elBar.textContent = label;
-//window.console.log(this.params.name+'-'+percent+'% ('+this.monitor.type+'_max='+this.monitor.max_tasks+')')
+	this.elBar.innerHTML = label;
 }
 
 
@@ -171,7 +284,6 @@ UserNode.createPanels = function( i_monitor)
 	var acts = {};
 	acts.solve_ord = {'name':'solve_parallel','value':false,'label':'ORD','tooltip':'Solve jobs by order.','handle':'mh_Param'};
 	acts.solve_par = {'name':'solve_parallel','value':true, 'label':'PAR','tooltip':'Solve jobs parallel.','handle':'mh_Param'};
-	//i_monitor.createCtrlBtn({'name':'solve','label':'SLV','tooltip':'Jobs solving method.','sub_menu':acts});
 	i_monitor.createCtrlBtns( acts);
 
 

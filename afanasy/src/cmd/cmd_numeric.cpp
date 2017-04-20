@@ -74,7 +74,7 @@ bool CmdNumeric::v_processArguments( int argc, char** argv, af::Msg &msg)
 	// Fill tasks order:
 	int * tasks_order = new int[block.getTasksNum()];
 	int task; int order = 0;
-	while(( task = block.getReadyTaskNumber( tp, 0)) != -1)
+	while(( task = block.getReadyTaskNumber( tp, 0, NULL)) != -1)
 	{
 		if( task < 0 )
 		{

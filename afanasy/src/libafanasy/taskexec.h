@@ -3,7 +3,6 @@
 #include "../include/afjob.h"
 
 #include "af.h"
-#include "addresseslist.h"
 #include "render.h"
 #include "msgclasses/mctaskup.h"
 #include "blockdata.h"
@@ -33,17 +32,15 @@ public:
 			long long i_frames_num,
 
 			const std::string & i_working_directory,
-			const std::string & i_environment,
+			const std::map<std::string, std::string> & i_environment,
 
 			int i_job_id,
 			int i_block_number,
-			unsigned int i_block_flags,
+			long long i_block_flags,
 			int i_tast_number,
 
 			int i_parser_coeff = 1
 );
-
-//	TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
 
 	TaskExec( Msg * msg); ///< Read task from message.
 	~TaskExec();
@@ -67,19 +64,19 @@ public:
 	// Get block data:
 	inline const std::string & getBlockName() const { return m_block_name; }
 	inline int getBlockNum() const { return m_block_num; }
-	inline unsigned int getBlockFlags() const { return m_block_flags; }
+	inline int64_t getBlockFlags() const { return m_block_flags; }
 
 	// Get job data:
 	inline const std::string & getJobName() const { return m_job_name; }
 	inline int getJobId() const { return m_job_id; }
-	inline unsigned int getJobFlags() const { return m_job_flags; }
+	inline int64_t getJobFlags() const { return m_job_flags; }
 
 	// Get user data:
 	inline const std::string & getUserName() const { return m_user_name;  }
-	inline unsigned int getUserFlags() const { return m_user_flags; }
+	inline int64_t getUserFlags() const { return m_user_flags; }
 
 	// Get render data:
-	inline unsigned int getRenderFlags() const { return m_render_flags; }
+	inline int64_t getRenderFlags() const { return m_render_flags; }
 
 	inline bool hasCommand()   const { return m_command.size(); } ///< Whether command exists.
 	inline bool hasWDir()      const { return m_working_directory.size();    } ///< Whether working directory exists.
@@ -88,13 +85,13 @@ public:
 
 	inline const std::string & getCommand()  const { return m_command; } ///< Get command.
 	inline const std::string & getWDir()     const { return m_working_directory;    } ///< Get working directory.
-	inline const std::string & getEnv()      const { return m_environment;     } ///< Get extra environment.
 	inline const std::vector<std::string> & getFiles() const { return m_files;   } ///< Get files.
+	inline const std::map<std::string, std::string> & getEnv() const { return m_environment; } ///< Get extra environment.
 
 	inline void setParsedFiles( const std::vector<std::string> & i_files) { m_parsed_files = i_files; }
 	inline const std::vector<std::string> & getParsedFiles() const { return m_parsed_files; }
 
-	inline bool hasFileSizeCheck() const { return ((m_file_size_min != -1) || (m_file_size_max != -1));}
+	inline bool hasFileSizeCheck() const { return m_block_flags & af::BlockData::FCheckRenderedFiles ;}
 
 	inline long long getFileSizeMin()   const { return m_file_size_min;}
 	inline long long getFileSizeMax()   const { return m_file_size_max;}
@@ -113,44 +110,49 @@ public:
 
 	enum UpStatus
 	{
-		UPNULL,
-		UPNoUpdate,
+		/* 00 */ UPNULL,
+		/* 01 */ UPNoUpdate,
 
-		UPStarted,
-		UPPercent,
-		UPWarning,
+		/* 02 */ UPStarted,
+		/* 03 */ UPPercent,
+		/* 04 */ UPWarning,
 
-		UPFinishedSuccess,
-		UPFinishedError,
-		UPFinishedKilled,
-		UPFinishedParserError,
-		UPFinishedParserBadResult,
-		UPFinishedParserSuccess,
-		UPFinishedFailedPost,
+		/* 05 */ UPFinishedSuccess,
+		/* 06 */ UPFinishedError,
+		/* 07 */ UPFinishedKilled,
+		/* 08 */ UPFinishedParserError,
+		/* 09 */ UPFinishedParserBadResult,
+		/* 10 */ UPFinishedParserSuccess,
+		/* 11 */ UPFinishedFailedPost,
+		/* 12 */ UPBadRenderedFiles,
 
-		UPRenderDeregister,
-		UPRenderExit,
-		UPRenderZombie,
+		/* 13 */ UPRenderDeregister,
+		/* 14 */ UPRenderExit,
+		/* 15 */ UPRenderZombie,
 
-		UPTimeOut,
-		UPMaxRunTime,
+		/* 16 */ UPTimeOut,
+		/* 17 */ UPMaxRunTime,
 
-		UPStop,
-		UPSkip,
-		UPRestart,
-		UPEject,
+		/* 18 */ UPStop,
+		/* 19 */ UPSkip,
+		/* 20 */ UPRestart,
+		/* 21 */ UPEject,
 
-		UPFailedToStart,
-		UPNoTaskRunning,
-		UPNoJob,
+		/* 22 */ UPFailedToStart,
+		/* 23 */ UPNoTaskRunning,
+		/* 24 */ UPNoJob,
 
-		UPLAST
+		/* 25 */ UPLAST
 	};
 
-	inline bool         addListenAddress( const Address & address) { return m_listen_addresses.addAddress( address);     }
-	inline bool      removeListenAddress( const Address & address) { return m_listen_addresses.removeAddress( address);  }
-	inline size_t getListenAddressesNum() const { return m_listen_addresses.getAddressesNum();              }
-	inline const std::list<Address> * getListenAddresses() const { return m_listen_addresses.getAddresses();       }
+	enum Flags{
+		FListen = 1ULL << 0
+	};
+
+	inline bool isListening() const { return m_flags & FListen; }
+	
+	void listenOutput( bool i_subscribe);
+
 
 	inline void setName(      const std::string & str) { m_name      = str;}   ///< Set task name.
 	inline void setBlockName( const std::string & str) { m_block_name = str;}   ///< Set task block name.
@@ -168,8 +170,14 @@ public:
 
 	void jsonWrite( std::ostringstream & o_str, int i_type) const;
 
+	/// Needed for af::Render to write running tasks percents:
 	inline void setProgress( const TaskProgress * i_progress ) { m_progress = i_progress; }
 	inline int getPercent() const { if( m_progress ) return m_progress->percent; else return -1; }
+
+
+	/// Read or write task in message buffer.
+	void v_readwrite( Msg * msg);
+
 
 	std::string m_custom_data_task;
 	std::string m_custom_data_block;
@@ -184,11 +192,12 @@ private:
 	std::string m_user_name;          ///< Task user name.
 
 	std::string m_working_directory;  ///< Working directory.
-	std::string m_environment;        ///< Extra environment.
 	std::string m_command;            ///< Command.
 	std::string m_service;            ///< Task service type.
 	std::string m_parser;             ///< Task parser type.
 	int32_t     m_parser_coeff;       ///< Parser koefficient.
+
+	std::map<std::string, std::string> m_environment; ///< Extra environment.
 
 	std::vector<std::string> m_files; ///< File(s).
 	std::vector<std::string> m_parsed_files; ///< File(s).
@@ -204,10 +213,11 @@ private:
 	int32_t m_task_num;       ///< Task number in block.
 	int32_t m_number;         ///< Task number (aux).
 
-	uint32_t m_block_flags;   ///< Block flags.
-	uint32_t m_job_flags;     ///< Job flags.
-	uint32_t m_user_flags;    ///< User flags.
-	uint32_t m_render_flags;  ///< Render flags.
+	int64_t m_flags;         ///< Flags.
+	int64_t m_block_flags;   ///< Block flags.
+	int64_t m_job_flags;     ///< Job flags.
+	int64_t m_user_flags;    ///< User flags.
+	int64_t m_render_flags;  ///< Render flags.
 
 	int64_t m_frame_start;   ///< First frame.
 	int64_t m_frame_finish;  ///< Last frame.
@@ -215,16 +225,15 @@ private:
 
 	int64_t m_time_start;
 
-	AddressesList m_listen_addresses;     ///< Addresses to send task output to.
 
 private:
-	// Needed for render:
+	void initDefaults();
+
+
+private:
+	/// Needed for af::Render to write running tasks percents:
 	const TaskProgress * m_progress;
 
 	bool m_on_client;
-
-private:
-
-	void v_readwrite( Msg * msg); ///< Read or write task in message buffer.
 };
 }

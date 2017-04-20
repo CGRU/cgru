@@ -2,7 +2,7 @@
 
 #include "../libafqt/qenvironment.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class Wnd : public QWidget
 {

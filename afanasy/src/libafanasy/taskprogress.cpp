@@ -29,7 +29,7 @@ TaskProgress::~TaskProgress()
 
 void TaskProgress::v_readwrite( Msg * msg)
 {
-   rw_uint32_t( state,        msg);
+	rw_int64_t( state,        msg);
    rw_int8_t  ( percent,      msg);
    rw_int64_t ( frame,        msg);
    rw_int8_t  ( percentframe, msg);
@@ -38,12 +38,12 @@ void TaskProgress::v_readwrite( Msg * msg)
    rw_int64_t ( time_start,   msg);
    rw_int64_t ( time_done,    msg);
    rw_String  ( hostname,     msg);
-	rw_String  ( activity,     msg);
+	rw_String ( activity,     msg);
 }
 
 void TaskProgress::jsonRead( const JSON & i_obj)
 {
-	jr_uint32("st",  state,        i_obj);
+	jr_int64 ("st",  state,        i_obj);
 	jr_int32 ("str", starts_count, i_obj);
 	jr_int32 ("err", errors_count, i_obj);
 	jr_int64 ("tst", time_start,   i_obj);
@@ -65,6 +65,8 @@ void TaskProgress::jsonWrite( std::ostringstream & o_str) const
 	if( time_done    > 0 ) o_str << ",\"tdn\":" << time_done;
 	if( hostname.size()  ) o_str << ",\"hst\":\"" << hostname << "\"";
 	if( activity.size()  ) o_str << ",\"act\":\"" << activity << "\"";
+	int no_progress_for = last_percent_change - time( NULL );
+	if( no_progress_for > 0 ) o_str << ",\"npf\":" << no_progress_for;
 	o_str << "}";
 }
 
@@ -85,5 +87,7 @@ void TaskProgress::v_generateInfoStream( std::ostringstream & stream, bool full 
    stream << " (" << af::time2str( time_start, time_format);
    stream << "-" << af::time2str( time_done, time_format);
    stream << "=" << af::time2str( time_done - time_start, time_format) << ")";
+   int no_progress_for = last_percent_change - time( NULL );
+   if( no_progress_for > 0 ) stream << " npf" << no_progress_for;
    if( false == hostname.empty()) stream << " - " << hostname;
 }

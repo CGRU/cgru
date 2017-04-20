@@ -20,12 +20,14 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    m_block( taskBlock),
    m_number( taskNumber),
    m_progress( taskProgress),
-   m_run( NULL)
+   m_run( NULL),
+	m_listen_count( 0)
 {
 	// If job is not from store, it is just came from network
 	// and so no we do not need to read anything
@@ -94,23 +96,43 @@ af::TaskExec * Task::genExec() const
 	return exec;
 }
 
-void Task::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
+void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
 {
    if( m_block->m_data->isMultiHost())
    {
       if( m_run )
-         ((TaskRunMulti*)(m_run))->addHost( taskexec, render, monitoring);
+         ((TaskRunMulti*)(m_run))->addHost( i_taskexec, i_render, i_monitoring);
       else
-         m_run = new TaskRunMulti( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
+         m_run = new TaskRunMulti( this, i_taskexec, m_progress, m_block, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
       return;
    }
+
    if( m_run)
    {
-      AFERROR("Task is already running.")
-      delete taskexec;
+      AF_ERR << "Task is already running.";
+      delete i_taskexec;
       return;
    }
-   m_run = new TaskRun( this, taskexec, m_progress, m_block, render, monitoring, runningtaskscounter);
+
+	i_taskexec->listenOutput( m_listen_count > 0);
+
+	m_run = new TaskRun( this, i_taskexec, m_progress, m_block, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+}
+
+void Task::reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+{
+	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
+	{
+		v_appendLog("Reconnecting previously run...");
+		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with\nRender: " << *i_render;
+		v_start( i_taskexec, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+	}
+	else
+	{
+		v_appendLog("Reconnection failed: task was not waiting it.");
+		i_render->stopTask( i_taskexec);
+		delete i_taskexec;
+	}
 }
 
 void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
@@ -130,8 +152,30 @@ void Task::v_updateState( const af::MCTaskUp & taskup, RenderContainer * renders
 	//printf("Task::updateState:\n");
 	m_run->update( taskup, renders, monitoring, errorHost);
 
-	if( taskup.getDataLen() != 0 )
-		v_writeTaskOutput( taskup);
+	std::string log = taskup.getLog();
+	if( log.size())
+		v_appendLog( log);
+
+	if( taskup.getDataLen() || log.size())
+	{
+		const char * data = log.c_str();
+		int size = log.size();
+		if( taskup.getDataLen())
+		{
+			data = taskup.getData();
+			size = taskup.getDataLen();
+		}
+		v_writeTaskOutput( data, size);
+	}
+
+	if( taskup.hasListened())
+	{
+		af::MCTask mctask( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number);
+		m_block->m_job->fillTaskNames( mctask);
+		mctask.setListened( taskup.getListened());
+		mctask.m_render_id = taskup.getClientId();
+		monitoring->addListened( mctask);
+	}
 
 	if( taskup.getParsedFiles().size())
 		m_parsed_files = taskup.getParsedFiles();
@@ -155,6 +199,19 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
 //printf("Task::refresh:\n");
    bool changed = false;
 
+
+	// Check reconnect timeout:
+	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
+	{
+		if( currentTime - m_progress->time_done > af::Environment::getTaskUpdateTimeout())
+		{
+			v_appendLog("Reconnect timeout reached. Setting state to READY.");
+			m_progress->state = AFJOB::STATE_READY_MASK;
+            if( false == changed ) changed = true;
+		}
+	}
+
+
    // forgive error hosts
    if(( false == m_errorHosts.empty() ) && ( m_block->getErrorsForgiveTime() > 0 ))
    {
@@ -177,6 +234,7 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
          }
     }
 
+
    if( renders != NULL )
    {
       if( m_run ) changed = m_run->refresh( currentTime, renders, monitoring, errorHostId);
@@ -186,6 +244,7 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
          if((m_progress->state & AFJOB::STATE_ERROR_MASK) && (m_progress->errors_count <= m_block->getErrorsRetries()))
          {
             m_progress->state = m_progress->state |   AFJOB::STATE_READY_MASK;
+            m_progress->state = m_progress->state |   AFJOB::STATE_ERROR_READY_MASK;
             m_progress->state = m_progress->state & (~AFJOB::STATE_ERROR_MASK);
             v_appendLog( std::string("Automatically retrying error task") + af::itos( m_progress->errors_count) + " of " + af::itos( m_block->getErrorsRetries()) + ".");
             if( changed == false) changed = true;
@@ -193,11 +252,14 @@ void Task::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCont
       }
    }
 
+
    if( changed)
    {
       v_monitor( monitoring);
       v_store();
    }
+
+   
    deleteRunningZombie();
 }
 
@@ -300,13 +362,6 @@ void Task::getErrorHostsList( std::list<std::string> & o_list) const
    }
 }
 
-const std::string Task::getErrorHostsListString() const
-{
-	std::list<std::string> list;
-	getErrorHostsList( list);
-	return af::strJoin( list, "\n");
-}
-
 void Task::v_monitor( MonitorContainer * monitoring) const
 {
    if( monitoring ) monitoring->addTask( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number, m_progress);
@@ -329,9 +384,10 @@ void Task::v_appendLog( const std::string & message)
    while( m_logStringList.size() > af::Environment::getTaskLogLinesMax() ) m_logStringList.pop_front();
 }
 
-void Task::v_writeTaskOutput( const af::MCTaskUp& taskup) const
+void Task::v_writeTaskOutput( const char * i_data, int i_size) const
 {
-	AFCommon::QueueFileWrite( new FileData( taskup.getData(), taskup.getDataLen(), getOutputFileName( m_progress->starts_count),
+//	AFCommon::QueueFileWrite( new FileData( taskup.getData(), taskup.getDataLen(), getOutputFileName( m_progress->starts_count),
+	AFCommon::QueueFileWrite( new FileData( i_data, i_size, getOutputFileName( m_progress->starts_count),
 		m_store_dir_output));
 }
 
@@ -428,9 +484,43 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 	i_str << "\n]}";
 }
 
-void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
+void Task::listenOutput(  RenderContainer * i_renders, bool i_subscribe)
 {
-   if( m_run) m_run->listen( mclisten, renders);
+	if( i_subscribe )
+	{
+		m_listen_count++;
+
+		if( m_listen_count > 1 )
+			return;
+	}
+	else
+	{
+		if( m_listen_count < 1 )
+			return;
+
+		m_listen_count--;
+
+		if( m_listen_count > 0 )
+			return;
+	}
+
+	if( m_run && m_run->notZombie())
+	{
+		std::string error;
+		int rid = m_run->v_getRunningRenderID( error);
+		if( rid < 1 )
+			AFCommon::QueueLogError(error);
+		else
+		{
+			RenderContainerIt rId( i_renders);
+			RenderAf * render = rId.getRender( rid);
+			if( render )
+				render->listenTask(
+					af::MCTaskPos( m_block->m_job->getId(), m_block->m_data->getBlockNum(), m_number), i_subscribe);
+		}
+	}
+
+	return;
 }
 
 const std::string Task::getOutputFileName( int i_starts_count) const
@@ -438,33 +528,35 @@ const std::string Task::getOutputFileName( int i_starts_count) const
 	return m_store_dir_output + AFGENERAL::PATH_SEPARATOR + af::itos( i_starts_count) + ".txt";
 }
 
-af::Msg * Task::getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const
+void Task::getOutput( af::MCTask & io_mctask, std::string & o_error) const
 {
-//printf("Task::getOutput:\n");
 	if( m_progress->starts_count < 1 )
 	{
 		o_error = "Task is not started.";
-		return NULL;
+		return;
 	}
-	if( i_startcount > m_progress->starts_count )
+
+	int start_num = io_mctask.getNumber();
+	if( start_num > m_progress->starts_count )
 	{
-		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(i_startcount)+" times ).";
-		return NULL;
+		o_error += "Task was started "+af::itos(m_progress->starts_count)+" times ( less than "+af::itos(start_num)+" times ).";
+		return;
 	}
-	if( i_startcount == 0 )
+
+	if( start_num == 0 )
 	{
-		if( m_run )
+		if( m_run && m_run->notZombie())
 		{
-			return m_run->v_getOutput( i_startcount, i_renders, o_error);
+			io_mctask.m_render_id = m_run->v_getRunningRenderID( o_error);
+			return;
 		}
 		else
 		{
-			i_startcount = m_progress->starts_count;
+			start_num = m_progress->starts_count;
 		}
 	}
 
-	o_filename = getOutputFileName( i_startcount);
-	return NULL;
+	io_mctask.setOutput( getOutputFileName( start_num));
 }
 
 const std::string Task::v_getInfo( bool full) const

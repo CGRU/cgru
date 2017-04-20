@@ -44,12 +44,20 @@ public:
 
 	bool canRunOn( RenderAf * render);
 
-    virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+	virtual bool v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+	
+	/// Records that a task execution is being performed by a given running
+	/// render. This is used when restarting the server without restarting the
+	/// renders.
+	/// This method taks the ownership of `i_taskexec`
+	void reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
 
 	void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
 	/// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
-    virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+	virtual bool v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+
+	bool checkDepends( MonitorContainer * i_monitoring);
 
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
 	bool action( Action & i_action);
@@ -85,7 +93,7 @@ private:
 
 	const std::string getStoreTasksFileName() const;
 
-	void skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state = 0);
+	void skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state = 0);
 
 	void addRenderCounts( RenderAf * render);
 	int  getRenderCounts( RenderAf * render) const;

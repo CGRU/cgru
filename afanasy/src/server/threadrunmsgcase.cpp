@@ -2,11 +2,10 @@
 #include <stdlib.h>
 
 #include "../libafanasy/msgclasses/mcgeneral.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
+#include "../libafanasy/renderupdate.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -27,8 +26,16 @@ switch ( i_msg->type())
 {
 	case af::Msg::THTTP:
 	case af::Msg::TJSON:
+	case af::Msg::TJSONBIN:
 	{
 		threadRunJSON( i_args, i_msg);
+		break;
+	}
+	case af::Msg::TRenderUpdate:
+	{
+		af::RenderUpdate rup( i_msg);
+		for( int i = 0; i < rup.m_taskups.size(); i++)
+			i_args->jobs->updateTaskState( *rup.m_taskups[i], i_args->renders, i_args->monitors);
 		break;
 	}
 	case af::Msg::TMonitorDeregister:
@@ -38,45 +45,11 @@ switch ( i_msg->type())
 		if( node ) node->deregister();
 		break;
 	}
-	case af::Msg::TMonitorMessage:
-	{
-		af::MCGeneral mcgeneral( i_msg);
-		i_args->monitors->sendMessage( mcgeneral);
-		break;
-	}
-	case af::Msg::TMonitorSubscribe:
-	case af::Msg::TMonitorUnsubscribe:
-	case af::Msg::TMonitorUsersJobs:
-	case af::Msg::TMonitorJobsIdsAdd:
-	case af::Msg::TMonitorJobsIdsSet:
-	case af::Msg::TMonitorJobsIdsDel:
-	{
-		af::MCGeneral ids( i_msg);
-		i_args->monitors->setInterest( i_msg->type(), ids);
-		break;
-	}
 	case af::Msg::TRenderDeregister:
 	{
 		RenderContainerIt rendersIt( i_args->renders);
 		RenderAf* render = rendersIt.getRender( i_msg->int32());
 		if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
-		break;
-	}
-	case af::Msg::TTaskListenOutput:
-	{
-		af::MCListenAddress mclass( i_msg);
-		JobContainerIt jobsIt( i_args->jobs);
-		JobAf* job = jobsIt.getJob( mclass.getJobId());
-		if( mclass.fromRender() == false ) mclass.setIP( i_msg->getAddress());
-mclass.v_stdOut();
-		if( job ) job->listenOutput( mclass, i_args->renders);
-		break;
-	}
-	case af::Msg::TTaskUpdatePercent:
-	case af::Msg::TTaskUpdateState:
-	{
-		af::MCTaskUp taskup( i_msg);
-		i_args->jobs->updateTaskState( taskup, i_args->renders, i_args->monitors);
 		break;
 	}
 	case af::Msg::TConfirm:

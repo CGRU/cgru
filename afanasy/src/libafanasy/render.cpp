@@ -8,6 +8,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 using namespace af;
 
@@ -53,6 +54,9 @@ void Render::construct()
 
 Render::~Render()
 {
+	std::list<af::TaskExec*>::iterator it;
+	for( it = m_tasks.begin(); it != m_tasks.end(); it++)
+		delete *it;
 }
 
 void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const // Thread-safe
@@ -160,7 +164,7 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_int32 ("max_tasks",   m_max_tasks,   i_object, io_changes);
 	checkDirty();
 
-	bool nimby, NIMBY;
+	bool nimby, NIMBY, paused;
 	if( jr_bool("nimby", nimby, i_object, io_changes))
 	{
 		if( nimby ) setNimby();
@@ -171,6 +175,10 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 		if( NIMBY ) setNIMBY();
 		else setFree();
 	}
+	if( jr_bool("paused", paused, i_object, io_changes))
+	{
+		setPaused( paused);
+	}
 
 	// Paramers below are not editable and read only on creation
 	// ( but they can be changes by other actions, like disable service)
@@ -180,7 +188,7 @@ bool Render::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
-	jr_uint32("st", m_state, i_object);
+	jr_int64("st", m_state, i_object);
 
 	Client::jsonRead( i_object);
 
@@ -205,27 +213,32 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 	  rw_int64_t( m_wol_operation_time,     msg);
 	  rw_String ( m_annotation,             msg);
 
-      if( msg->isWriting())
-      {
-		 uint32_t taskscount = uint32_t(m_tasks.size());
-         rw_uint32_t( taskscount, msg);
-		 std::list<TaskExec*>::iterator it = m_tasks.begin();
-         for( unsigned t = 0; t < taskscount; t++) (*(it++))->write( msg);
-      }
-      else
-      {
-         uint32_t taskscount;
-         rw_uint32_t( taskscount, msg);
-		 for( unsigned t = 0; t < taskscount; t++) m_tasks.push_back( new TaskExec( msg));
-      }
+	case Msg::TRenderRegister:
+ 
+		// Writing tasks execs, needed for:
+		// - GUIs to show tasks in render item.
+		// - Server for running tasks reconnection at startup.
+		{
+			uint32_t taskscount = uint32_t(m_tasks.size());
+			rw_uint32_t( taskscount, msg);
 
-   case Msg::TRenderRegister:
+			if( msg->isWriting())
+			{
+				for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+					(*it)->write( msg);
+			}
+			else
+			{
+				for( unsigned t = 0; t < taskscount; t++)
+					m_tasks.push_back( new TaskExec( msg));
+			}
+		}
 
-	  rw_String  ( m_version,      msg);
+	  rw_String  ( m_engine,       msg);
 	  rw_String  ( m_name,         msg);
 	  rw_String  ( m_user_name,    msg);
-	  rw_uint32_t( m_state,        msg);
-	  rw_uint32_t( m_flags,        msg);
+	  rw_int64_t ( m_state,        msg);
+	  rw_int64_t ( m_flags,        msg);
 	  rw_uint8_t ( m_priority,     msg);
 	  rw_int64_t ( m_time_launch,  msg);
 	  m_host.v_readwrite( msg);
@@ -237,7 +250,9 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 		// Tasks percents, needed for GUI only:
 		if( msg->isWriting())
 		{
-			// Using temporary array because this function should be thread-safe
+			// Fill in temporary array,
+			// not m_tasks_percents (which is used on client side for reading only)
+			// because this function should be thread-safe (we can't clear() m_tasks_percents here)
 			std::vector<int32_t> _tasks_percents;
 			for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 				_tasks_percents.push_back((*it)->getPercent());
@@ -268,6 +283,7 @@ void Render::v_readwrite( Msg * msg) // Thread-safe
 		 if( msg->isWriting()) m_netIFs[i]->write( msg);
 		 else m_netIFs.push_back( new NetIF( msg));
    }
+
 }
 
 void Render::checkDirty()
@@ -288,12 +304,19 @@ int Render::v_calcWeight() const
    return weight;
 }
 
+std::list<TaskExec *> Render::takeTasks()
+{
+	std::list<af::TaskExec*> l = m_tasks;
+	m_tasks.clear();
+	return l;
+}
+
 void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
 	  stream << "Render " << m_name << "@" << m_user_name << " (id=" << m_id << "):";
-	  stream << "\n Version = \"" << m_version;
+	  stream << "\n Engine = \"" << m_engine;
 
       if( isDirty()) stream << "\nDirty! Capacity|Max Tasks changed, or service(s) disabled.";
 
@@ -307,6 +330,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isBusy()) stream << " Busy";
 		if( isNimby()) stream << " (nimby)";
 		if( isNIMBY()) stream << " (NIMBY)";
+		if( isPaused()) stream << " (Paused)";
 		if( isWOLFalling()) stream << " WOL-Falling";
 		if( isWOLSleeping()) stream << " WOL-Sleeping";
 		if( isWOLWaking()) stream << " WOL-Waking";
@@ -326,15 +350,15 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		stream << std::endl;
 		m_host.v_generateInfoStream( stream, full);
 
-	  if( m_netIFs.size())
-      {
-         stream << "\nNetwork Interfaces:";
-		 for( int i = 0; i < m_netIFs.size(); i++)
-         {
-            stream << "\n   ";
-			m_netIFs[i]->v_generateInfoStream( stream, true);
-         }
-      }
+		if( m_netIFs.size())
+		{
+			stream << "\nNetwork Interfaces:";
+			for( int i = 0; i < m_netIFs.size(); i++)
+			{
+				stream << "\n   ";
+				m_netIFs[i]->v_generateInfoStream( stream, true);
+			}
+		}
 
 		m_hres.v_generateInfoStream( stream ,full);
    }
@@ -349,9 +373,10 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isWOLSleeping()) stream << " WSL"; else stream << "    ";
 		if( isWOLWaking())   stream << " WWK"; else stream << "    ";
 
-		if( isNimby())      stream << " n";
-		else if( isNIMBY()) stream << " N";
-		else                stream << "  ";
+		if( isNimby())           stream << " n";
+		else if( isNIMBY())      stream << " N";
+		else if( isPaused()) stream << " P";
+		else                     stream << "  ";
 
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
 /*
@@ -359,7 +384,7 @@ void Render::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		stream << " I:" << time2str( m_idle_time);
 		stream << " B:" << time2str( m_busy_time);
 
-		stream << " v'" << m_version << "'";
+		stream << " e'" << m_engine << "'";
 */
 		stream << " ";
 		m_address.v_generateInfoStream( stream ,full);

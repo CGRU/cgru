@@ -24,7 +24,12 @@ MCTaskUp::MCTaskUp
 	int i_percent,
 	int i_frame,
 	int i_percent_frame,
-	std::string i_activity,
+
+	const std::string & i_log,
+	const std::string & i_activity,
+	const std::string & i_report,
+	const std::string & i_listened,
+
 	int i_datalen,
 	char * i_data
 ):
@@ -39,7 +44,12 @@ MCTaskUp::MCTaskUp
 	m_percent       ( i_percent),
 	m_frame         ( i_frame),
 	m_percent_frame ( i_percent_frame),
+
+	m_log           ( i_log),
 	m_activity      ( i_activity),
+	m_report        ( i_report),
+
+	m_listened      ( i_listened),
 
 	m_datalen       ( i_datalen ),
 	m_data          ( i_data ),
@@ -64,6 +74,17 @@ MCTaskUp::~MCTaskUp()
 	if( m_files_data ) delete [] m_files_data;
 }
 
+bool MCTaskUp::isSameTask( const MCTaskUp & i_other) const
+{
+	if( ( m_numjob   == i_other.m_numjob   ) &&
+		( m_numblock == i_other.m_numblock ) &&
+		( m_numtask  == i_other.m_numtask  ) &&
+		( m_number   == i_other.m_number   ))
+		return true;
+
+	return false;
+}
+
 void MCTaskUp::v_readwrite( Msg * msg)
 {
 	rw_int32_t( m_clientid,       msg);
@@ -77,7 +98,12 @@ void MCTaskUp::v_readwrite( Msg * msg)
 	rw_int8_t ( m_percent,        msg);
 	rw_int32_t( m_frame,          msg);
 	rw_int8_t ( m_percent_frame,  msg);
+
 	rw_String ( m_activity,       msg);
+	rw_String ( m_report,         msg);
+	rw_String ( m_log,            msg);
+
+	rw_String ( m_listened,       msg);
 
 	rw_StringVect( m_parsed_files, msg);
 	rw_int32_t(    m_datalen,      msg);
@@ -179,6 +205,8 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< ", task="     << m_numtask
 			<< ", number="   << m_number
 			<< ", activity=" << m_activity
+			<< ", report="   << m_report
+			<< ", log="      << m_log
 			<< ", datalen="  << m_datalen
 			<< ", files="    << m_files_num
 			<< ", status="   << int(m_status)
@@ -194,6 +222,8 @@ void MCTaskUp::v_generateInfoStream( std::ostringstream & stream, bool full) con
 			<< " T" << m_numtask
 			<< " #" << m_number
 			<< " A" << m_activity
+			<< " R" << m_report
+			<< " L" << m_log
 			<< " D" << m_datalen
 			<< " F" << m_files_num
 			<< " S" << int(m_status)

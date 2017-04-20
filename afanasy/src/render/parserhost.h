@@ -17,11 +17,12 @@ public:
 	inline int getPercent()           const { return m_percent;         }
 	inline int getFrame()             const { return m_frame;           }
 	inline int getPercentFrame()      const { return m_percentframe;    }
-	inline std::string getActivity()  const { return m_activity;        }
 	inline int hasWarning()           const { return m_warning;         }
 	inline int hasError()             const { return m_error;           }
 	inline int isBadResult()          const { return m_badresult;       }
 	inline int isFinishedSuccess()    const { return m_finishedsuccess; }
+	inline std::string getActivity()  const { return m_activity;        }
+	inline std::string getReport()    const { return m_report;          }
 	inline char* getData( int *size ) const { *size = m_datasize; return m_data;}
 
 private:
@@ -35,6 +36,7 @@ private:
 	bool m_badresult;
 	bool m_finishedsuccess;
 	std::string m_activity;
+	std::string m_report;
 
 	char*              m_data;
 	int                m_datasize;

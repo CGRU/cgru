@@ -3,10 +3,10 @@
 #include "../libafqt/qenvironment.h"
 
 #include "dialog.h"
-
+#include "monitorhost.h"
 #include "watch.h"
 
-#include <QtGui/QApplication>
+#include <QApplication>
 #include <QtGui/QIcon>
 
 #define AFOUTPUT
@@ -66,6 +66,13 @@ int main(int argc, char *argv[])
 
    QApplication app(argc, argv);
    app.setWindowIcon( QIcon( afqt::stoq( ENV.getCGRULocation()) + "/icons/afwatch.png"));
+	#if QT_VERSION >= 0x050000
+	app.setStyle("fusion");
+	#else
+	app.setStyle("plastique");
+	#endif
+
+	MonitorHost monitor;
 
    Dialog dialog;
    if( !dialog.isInitialized())

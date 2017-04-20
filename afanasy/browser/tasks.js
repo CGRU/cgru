@@ -13,14 +13,6 @@ BlockItem.prototype.init = function()
 	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
 
 	this.state = {};
-/*
-	this.thumbnail_http_base = cgru_Config['af_thumbnail_http'];
-	this.thumbnail_http_naming = cgru_Config['af_thumbnail_naming'];
-	
-	this.thumbnail_http_path = this.thumbnail_http_base + this.thumbnail_http_naming;
-	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(job_id)d", this.params.job_id);
-	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(block_id)d", this.params.block_num);
-*/
 }
 
 BlockItem.prototype.update = function()
@@ -152,6 +144,9 @@ TaskItem.prototype.updateProgress = function( i_progress)
 		this.elStar.style.display = 'none';
 	}
 	this.elBar.style.width = ( this.percent + '%');
+
+	if( this.wndtask )
+		this.wndtask.updateProgress( i_progress);
 }
 
 TaskItem.prototype.genName = function()
@@ -179,7 +174,6 @@ TaskItem.prototype.genName = function()
 
 	// The block is numeric:
 	this.genFrames();
-//	this.generateThumbnails();
 
 	if( tasks_name && ( tasks_name != '' ))
 	{
@@ -196,27 +190,7 @@ TaskItem.prototype.genName = function()
 
 	return name;
 }
-/*
-TaskItem.prototype.generateThumbnails = function()
-{
-	if (this.block.params.files)
-	{
-		thumbnail_http_path = this.block.thumbnail_http_path.replace("%(task_id)d", this.task_num);
-		//console.log(this);
-		var files = cm_FillNumbers(this.block.params.files, this.frame_start);
-		
-		var files_list = files.split(";");
-		for(i in files_list) {
-			var filepath = files_list[i];
-			var thumbnail_name = filepath.split("/").pop();
-			var temp = thumbnail_name.split(".");
-			temp.pop();
-			thumbnail_name = temp.join(".")+".jpg";
-			thumbnail_path = thumbnail_http_path.replace("%(thumbnail_filename)s", thumbnail_name);
-		}
-	}
-}
-*/
+
 TaskItem.prototype.genFrames = function()
 {
 	var p = this.block.params;
@@ -269,72 +243,6 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 //console.log('bids='+o_bids+' tids='+o_tids);
 }
 
-TaskItem.prototype.onContextMenu = function( i_menu)
-{
-	var maxShownOutputs = 5;
-	if( this.params.str && ( this.params.str > 1 ))
-	{
-		for( var i = this.params.str; i > 0; i--)
-		{
-			if( i <= this.params.str - maxShownOutputs) break;
-			var num = i;
-			if( i == this.params.str ) num = 0;
-			i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output '+i, "param":num});
-		}
-		if( this.params.str > maxShownOutputs )
-			i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output...', "param":-1});
-	}
-	else
-		i_menu.addItem({"name":'output', "receiver":this, "handle":'mh_Output', "label":'Output'});
-}
-
-TaskItem.prototype.mh_Output = function( i_number, i_evt)
-{
-	if( i_number == -1 )
-	{
-		new cgru_Dialog({"wnd":this.monitor.window,"receiver":this,"handle":'menuHandleGetOutput',"param":i_evt,
-			"type":'num',"name":this.job.name,"title":'Get Task Process Output',"info":'Enter Start Number'});
-		return;
-	}
-	this.mh_Get('output', i_evt, i_number);
-}
-
-TaskItem.prototype.menuHandleGetOutput = function( i_number, i_evt){ this.mh_Get('output', i_evt, i_number)}
-
-TaskItem.prototype.mh_Get = function( i_mode, i_evt, i_number)
-{
-	var get = {"type":'jobs',"ids":[this.job.id],"mode":i_mode,"number":i_number};
-	get.block_ids = [this.block.block_num];
-	get.task_ids = [this.task_num];
-
-	nw_request({"send":{"get":get},"func":g_ShowObject,"evt":i_evt,"wnd":this.monitor.window});
-}
-TaskItem.mh_Get = function( i_param, i_evt)
-{
-	var task = i_param.monitor.cur_item;
-	if( task == null )
-	{
-		g_Error('No tasks selected.');
-		return;
-	}
-	if( task.task_num == null )
-		return;
-
-	var get = {'type':'jobs','ids':[task.job.id],'mode':i_param.name,'number':i_param.number};
-	get.block_ids = [task.block.block_num];
-	get.task_ids = [task.task_num];
-
-	nw_request({'send':{'get':get},'func':g_ShowObject,'evt':i_evt,'wnd':task.monitor.window});
-}
-TaskItem.prototype.mh_Oper = function( i_name, i_value)
-{
-	var operation = {};
-	operation.type = i_name;
-	var bids = []; var tids = [];
-	this.getBlockTasksIds( bids, tids);
-	if( tids.length ) operation.task_ids = tids;
-	nw_Action('jobs', [this.job.id], operation, null, bids);
-}
 TaskItem.mh_Oper = function( i_param)
 {
 	var task = i_param.monitor.cur_item;
@@ -360,7 +268,27 @@ TaskItem.mh_Oper = function( i_param)
 
 TaskItem.prototype.onDoubleClick = function( i_evt)
 {
-	this.mh_Get('info', i_evt);
+	if( this.wndtask )
+		return;
+
+	var args = {};
+
+	args.pos = {};
+	args.pos.job   = this.job.id;
+	args.pos.block = this.block.block_num;
+	args.pos.task  = this.task_num;
+
+	args.wnd = this.monitor.window;
+	args.evt = i_evt;
+	args.taskitem = this;
+
+	this.wndtask = WndTaskOpen( args);
+}
+
+TaskItem.prototype.monitorDestroy = function()
+{
+	if( this.wndtask )
+		this.wndtask.close();
 }
 
 TaskItem.prototype.showTumbs = function()
@@ -403,7 +331,6 @@ TaskItem.prototype.thumbsReceived = function( i_obj)
 TaskItem.createPanels = function( i_monitor)
 {
 	var acts = {};
-	acts.info    = {'handle':'mh_Get', 'label':'INFO','tooltip':'Get task full info.'};
 	acts.skip    = {'handle':'mh_Oper','label':'SKIP','tooltip':'Double click to skip selected task(s).','ondblclick':true};
 	acts.restart = {'handle':'mh_Oper','label':'RES', 'tooltip':'Double click to restart selected task(s).','ondblclick':true};
 	i_monitor.createCtrlBtns( acts);
@@ -432,140 +359,4 @@ TaskItem.prototype.updatePanels = function()
 
 TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];
-
-t_attrs = {};
-t_attrs.name = {};
-t_attrs.capacity = {"float":'left',"width":'24%'};
-t_attrs.service = {"float":'left',"width":'38%'};
-t_attrs.parser = {"float":'left',"width":'38%'};
-t_attrs.command = {"pathmap":true};
-t_attrs.working_directory = {"label":'Directory',"pathmap":true};
-
-function t_ShowExec( i_obj, i_elParent)
-{
-	i_elParent.classList.add('task_exec');
-
-	var attrs = document.createElement('div');
-	i_elParent.appendChild( attrs);
-	attrs.classList.add('attrs');
-
-	for( attr in t_attrs )
-	{
-		if( i_obj[attr] == null )
-			continue;
-
-		var div = document.createElement('div');
-		attrs.appendChild( div);
-		div.classList.add('attr');
-		if( t_attrs[attr].float )
-			div.style.cssFloat = t_attrs[attr].float;
-		else
-			div.style.clear = 'both';
-		if( t_attrs[attr].width )
-			div.style.width = t_attrs[attr].width;
-
-		var label = document.createElement('div');
-		div.appendChild( label);
-		label.classList.add('label');
-		if( t_attrs[attr].label )
-			label.textContent = t_attrs[attr].label + ':';
-		else
-		{
-			label.textContent = attr + ':';
-			label.style.textTransform = 'capitalize';
-		}
-
-		var value = document.createElement('div');
-		div.appendChild( value);
-		value.classList.add('value');
-		if( t_attrs[attr].pathmap )
-			value.textContent = cgru_PM( i_obj[attr]);
-		else
-			value.textContent = i_obj[attr];
-	}
-
-	var files = [];
-	var label = 'Files:';
-	if( i_obj.files ) files = i_obj.files;
-	if( i_obj.parsed_files && i_obj.parsed_files.length )
-	{
-		files = i_obj.parsed_files;
-		label = 'Files (parsed):';
-	}
-	
-	var dir_pm = cgru_PM( i_obj.working_directory);
-	if( files.length )
-	{
-		var elFilesDiv = document.createElement('div');
-		i_elParent.appendChild( elFilesDiv);
-		elFilesDiv.classList.add('files_div');
-
-		var elFilesLabel = document.createElement('div');
-		elFilesDiv.appendChild( elFilesLabel);
-		elFilesLabel.textContent = label;
-
-		var elFiles = document.createElement('div');
-		elFilesDiv.appendChild( elFiles);
-		elFiles.classList.add('files');
-
-		for( var f = 0; f < files.length; f++)
-		{
-			var file = cgru_PM( files[f]);
-
-			var elFile = document.createElement('div');
-			elFiles.appendChild( elFile);
-			elFile.textContent = cm_PathBase( file);
-			elFile.title = file;
-			elFile.m_file = file;
-			elFile.m_dir = dir_pm;
-			elFile.onclick = t_FileOpen;
-		}
-	}
-
-	var elRawDiv = document.createElement('div');
-	i_elParent.appendChild( elRawDiv);
-	elRawDiv.classList.add('raw');
-
-	var elRawLabel = document.createElement('div');
-	elRawDiv.appendChild( elRawLabel);
-	elRawLabel.classList.add('label');
-	elRawLabel.textContent = 'Raw Object:';
-
-	var elRawObj = document.createElement('div');
-	elRawDiv.appendChild( elRawObj);
-	elRawObj.classList.add('object');
-	elRawObj.innerHTML = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
-}
-
-function t_FileOpen( i_evt)
-{
-	elFile = i_evt.currentTarget;
-
-	if( elFile.m_opened )
-	{
-		elFile.m_opened = false;
-		elFile.removeChild( elFile.m_elCmds);
-		elFile.classList.remove('opened');
-		return;
-	}
-
-	var file = cgru_PathJoin( elFile.m_dir, elFile.m_file);
-
-	elFile.m_opened = true;
-	elFile.classList.add('opened');
-
-	var elCmds = document.createElement('div');
-	elFile.appendChild( elCmds);
-	elFile.m_elCmds = elCmds;
-
-	for( var c = 0; c < cgru_Config.previewcmds.length; c++ )
-	{
-		var elCmd = document.createElement('div');
-		elCmds.appendChild( elCmd);
-		elCmd.classList.add('cmdexec');
-		elCmd.textContent = cgru_Config.previewcmds[c].replace('@ARG@', file);
-	}
-
-	return false;
-}
 

@@ -65,8 +65,8 @@ namespace af
 	class MCAfNodesIt;
 	class MCTalkmessage;
 	class MCTalkdistmessage;
+	class MCTask;
 	class MCTaskPos;
-	class MCTasksPos;
 	class MCTasksProgress;
 	class MCListenAddress;
 	class MCTaskUp;
@@ -125,7 +125,8 @@ namespace af
 	// String functions:
 	const long long stoi( const std::string & str, bool * ok = NULL);
 	const std::string itos( long long integer);
-	const std::string getenv( const char * name);
+	const std::string getenv( const std::string & i_name);
+	const std::string getenv( const char * i_name);
 	const std::string state2str( int state);
 	const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
 	const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
@@ -133,6 +134,7 @@ namespace af
 	const std::string strStrip( const std::string & i_str, Direction i_dir, const std::string & i_characters = " \n");
 	const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
 	const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
+	const std::string strJoin( const std::map<std::string, std::string> & i_map, const std::string & i_sep = ";");
 	const std::string strReplace( const std::string & str, char before, char after);
 	const std::string strEscape( const std::string & i_str);
 	const std::vector<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
@@ -148,6 +150,7 @@ namespace af
 
 	bool addUniqueToList( std::list<int32_t> & o_list, int i_value);
 	bool addUniqueToVect( std::vector<int> & o_vect, int i_value);
+	bool addUniqueToVect( std::vector<std::string> & o_vect, const std::string & i_str);
 
 	void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
@@ -161,13 +164,15 @@ namespace af
 	int weigh( const std::string & str);
 	int weigh( const std::list<std::string> & strlist);
 	int weigh( const std::vector<std::string> & i_list);
+	int weigh( const std::map<std::string, int32_t> & i_map);
+	int weigh( const std::map<std::string, std::string> & i_map);
 
 
 	bool  init( uint32_t flags );
 	void  destroy();
 
-	bool  loadFarm( bool verbose = false);
-	bool  loadFarm( const std::string & filename, bool verbose = false);
+	bool  loadFarm( VerboseMode i_verbose = VerboseOff);
+	bool  loadFarm( const std::string & filename, VerboseMode i_verbose = VerboseOff);
 	Farm * farm();
 
 
@@ -205,16 +210,18 @@ namespace af
 	bool netIsIpAddr( const std::string & addr, bool verbose = false);
 
 #ifdef WINNT
+	char * processEnviron( const std::map<std::string, std::string> & i_env_map);
 	void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
 	bool launchProgram(
 			PROCESS_INFORMATION * o_pinfo,
-			const std::string & i_commandline, const std::string & i_wdir = std::string(),
+			const std::string & i_commandline, const std::string & i_wdir = std::string(), char * i_environ = NULL,
 			HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
 			DWORD i_flags = 0, bool alwaysCreateWindow = false
 		);
 #else
+	char ** processEnviron( const std::map<std::string, std::string> & i_env_map);
 	int launchProgram(
-			const std::string & i_commandline, const std::string & i_wdir = std::string(),
+			const std::string & i_commandline, const std::string & i_wdir = std::string(), char ** i_environ = NULL,
 			FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL
 		);
 #endif
@@ -232,6 +239,12 @@ namespace af
 	const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
 
 	Msg * msgString( const std::string & i_str);
+	Msg * msgInfo( const std::string & i_kind, const std::string & i_info);
+
+	// Read message header from message buffer;
+	int processHeader( af::Msg * io_msg, int i_bytes);
+
+	void setSocketOptions( int i_fd);
 
 	/// Recieve message from given file discriptor \c desc to \c buffer
 	/** Return true if success. This function will block process.**/
@@ -242,16 +255,22 @@ namespace af
 	bool msgwrite( int i_desc, const af::Msg * i_msg);
 
 	/// Send a message to all its addresses and receive an answer if needed
-	Msg * msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
+	Msg * sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
+
+	/// Close socket
+	void socketDisconnect( int i_sd, uint32_t i_response_type = -1);
 
 
 	// Python:
 	bool PyGetString( PyObject * i_obj, std::string & o_str, const char * i_err_info = NULL);
 	bool PyGetStringList( PyObject * i_obj, std::vector<std::string> & o_list, const char * i_err_info = NULL);
 
+	bool PyGetAttrBool( PyObject * i_obj, const char * i_name, bool        & o_bool, const std::string & i_err_info);
+	bool PyGetAttrInt(  PyObject * i_obj, const char * i_name, int         & o_int,  const std::string & i_err_info);
+	bool PyGetAttrStr(  PyObject * i_obj, const char * i_name, std::string & o_str,  const std::string & i_err_info);
+
 
 	// JSON:
-	const std::string jsonMakeHeader( int size);
 	char * jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err = NULL);
 	char * jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err = NULL);
 	bool jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str = NULL);
@@ -266,17 +285,24 @@ namespace af
 	bool jr_uint32( const char * i_name, uint32_t    & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int64 ( const char * i_name, int64_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int32vec(  const char * i_name, std::vector<int32_t>     & o_attr, const JSON & i_object);
+	bool jr_int64vec(  const char * i_name, std::vector<int64_t>     & o_attr, const JSON & i_object);
 	bool jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object);
-	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object);
+	bool jr_stringmap( const char * i_name, std::map<std::string,std::string> & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	bool jr_intmap( const char * i_name, std::map<std::string,int32_t> & o_map, const JSON & i_object, std::string * o_str = NULL);
 
-	void jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render = false);
+	void jw_intmap( const char * i_name, const std::map<std::string,int32_t> & i_map, std::ostringstream & o_str);
+	void jw_stringmap( const char * i_name, const std::map<std::string,std::string> & i_map, std::ostringstream & o_str);
+	void jw_int32list( const char * i_name, const std::list<int32_t> & i_list, std::ostringstream & o_str);
+	void jw_int32vec( const char * i_name, const std::vector<int32_t> & i_vec, std::ostringstream & o_str);
+	void jw_state( const int64_t & i_state, std::ostringstream & o_str, bool i_render = false);
 
 	af::Msg * jsonMsg( const std::string & i_str);
-	af::Msg * jsonMsgError( const std::string & i_str);
 	af::Msg * jsonMsg( const std::ostringstream & i_stream);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::list<std::string> & i_list);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::string & i_string);
 	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, char * i_data, int i_size);
+	af::Msg * jsonMsgInfo( const std::string & i_kind, const std::string & i_info);
+	af::Msg * jsonMsgError( const std::string & i_str);
 	af::Msg * jsonMsgStatus( bool i_error, const std::string & i_type, const std::string & i_msg);
 
 	void jsonActionStart(  std::ostringstream & i_str, const std::string & i_type,

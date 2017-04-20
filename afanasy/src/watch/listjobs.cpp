@@ -3,10 +3,13 @@
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
+#include "../libafanasy/service.h"
 
+#include "buttonpanel.h"
 #include "itemjob.h"
 #include "ctrljobs.h"
 #include "ctrlsortfilter.h"
+#include "monitorhost.h"
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
@@ -14,101 +17,128 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
-#include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMenu>
+#include <QBoxLayout>
+#include <QInputDialog>
+#include <QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
-int     ListJobs::SortType       = CtrlSortFilter::TNONE;
-bool    ListJobs::SortAscending  = false;
-int     ListJobs::FilterType     = CtrlSortFilter::TNAME;
-bool    ListJobs::FilterInclude  = true;
-bool    ListJobs::FilterMatch    = false;
-QString ListJobs::FilterString   = "";
+int     ListJobs::ms_SortType1      = CtrlSortFilter::TNONE;
+int     ListJobs::ms_SortType2      = CtrlSortFilter::TNONE;
+bool    ListJobs::ms_SortAscending1 = false;
+bool    ListJobs::ms_SortAscending2 = false;
+int     ListJobs::ms_FilterType     = CtrlSortFilter::TNAME;
+bool    ListJobs::ms_FilterInclude  = true;
+bool    ListJobs::ms_FilterMatch    = false;
+std::string ListJobs::ms_FilterString = "";
 
-int     ListJobs::SortType_SU       = CtrlSortFilter::TTIMECREATION;
-bool    ListJobs::SortAscending_SU  = false;
-int     ListJobs::FilterType_SU     = CtrlSortFilter::TUSERNAME;
-bool    ListJobs::FilterInclude_SU  = true;
-bool    ListJobs::FilterMatch_SU    = false;
-QString ListJobs::FilterString_SU = "";
+int     ListJobs::ms_SortType1_SU      = CtrlSortFilter::TTIMECREATION;
+int     ListJobs::ms_SortType2_SU      = CtrlSortFilter::TTIMERUN;
+bool    ListJobs::ms_SortAscending1_SU = false;
+bool    ListJobs::ms_SortAscending2_SU = false;
+int     ListJobs::ms_FilterType_SU     = CtrlSortFilter::TUSERNAME;
+bool    ListJobs::ms_FilterInclude_SU  = true;
+bool    ListJobs::ms_FilterMatch_SU    = false;
+std::string ListJobs::ms_FilterString_SU = "";
 
 ListJobs::ListJobs( QWidget* parent):
 	ListNodes( parent, "jobs")
 {
-	m_eventsShowHide << af::Msg::TMonitorJobsAdd;
-	m_eventsShowHide << af::Msg::TMonitorJobsChanged;
-	m_eventsOnOff    << af::Msg::TMonitorJobsDel;
-
 	if( af::Environment::VISOR())
-	{
-		Watch::setUid( 0);
-		ctrl = new CtrlSortFilter( this, &SortType_SU, &SortAscending_SU, &FilterType_SU, &FilterInclude_SU, &FilterMatch_SU, &FilterString_SU);
-	}
+		m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1_SU, &ms_SortAscending1_SU,
+			&ms_SortType2_SU, &ms_SortAscending2_SU,
+			&ms_FilterType_SU, &ms_FilterInclude_SU, &ms_FilterMatch_SU, &ms_FilterString_SU);
 	else
-	{
-		Watch::setUid( Watch::getUid());
-		ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-	}
+		m_ctrl_sf = new CtrlSortFilter( this,
+			&ms_SortType1, &ms_SortAscending1,
+			&ms_SortType2, &ms_SortAscending2,
+			&ms_FilterType, &ms_FilterInclude, &ms_FilterMatch, &ms_FilterString);
 
-	ctrl->addSortType(   CtrlSortFilter::TNONE);
-	ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
-	ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
-	ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
-	ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
-	ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
-	ctrl->addSortType(   CtrlSortFilter::TNAME);
-	ctrl->addFilterType( CtrlSortFilter::TNONE);
-	ctrl->addFilterType( CtrlSortFilter::TNAME);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNONE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMECREATION);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMERUN);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMESTARTED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TTIMEFINISHED);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TSERVICE);
+	m_ctrl_sf->addSortType(   CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNONE);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TNAME);
+	m_ctrl_sf->addFilterType( CtrlSortFilter::TSERVICE);
 	if( af::Environment::VISOR())
 	{
-		ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-		ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
-		ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
-		ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
-		ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
+		m_ctrl_sf->addSortType(   CtrlSortFilter::TPRIORITY);
+		m_ctrl_sf->addSortType(   CtrlSortFilter::THOSTNAME);
+		m_ctrl_sf->addSortType(   CtrlSortFilter::TUSERNAME);
+		m_ctrl_sf->addFilterType( CtrlSortFilter::THOSTNAME);
+		m_ctrl_sf->addFilterType( CtrlSortFilter::TUSERNAME);
 	}
 
 	initSortFilterCtrl();
 
-	CtrlJobs * control = new CtrlJobs( ctrl, this);
-	control->setToolTip("\
-Sort & Filter Jobs.\n\
-Press RMB for Options.\
-");
-	ctrl->getLayout()->addWidget( control);
+	CtrlJobs * control = new CtrlJobs( m_ctrl_sf, this);
+	m_ctrl_sf->getLayout()->addWidget( control);
+
+
+	// Add left panel buttons:
+	ButtonPanel * bp;
+
+	bp = addButtonPanel("LOG","jobs_log","Show job log.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestLog()));
+
+	bp = addButtonPanel("EHO","jobs_show_err_hosts","Show error hosts.");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRequestErrorHostsList()));
+
+	bp = addButtonPanel("PAU","jobs_pause","Pause selected jobs.","P");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actPause()));
+
+	bp = addButtonPanel("STA","jobs_start","Start selected jobs.","S");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actStart()));
+
+	bp = addButtonPanel("REH","jobs_reset_avoid_hosts","Reset error hosts.","E");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actResetErrorHosts()));
+
+	bp = addButtonPanel("RET","jobs_restart_error_tasks","Restart error tasks.","R");
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actRestartErrors()));
+
+	bp = addButtonPanel("DEL","jobs_delete","Delete selected jobs.","D", true);
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDelete()));
+
+	bp = addButtonPanel("DDJ","jobs_delete_done","Delete all done jobs.","", true);
+	connect( bp, SIGNAL( sigClicked()), this, SLOT( actDeleteDone()));
+
 
 	init();
 
 	QTimer * timer = new QTimer(this);
-	timer->start( 1000 * af::Environment::getWatchRefreshInterval());
+	timer->start( 1000 * af::Environment::getWatchRefreshGuiSec());
 	connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 
 	m_parentWindow->setWindowTitle("Jobs:");
 }
 
-void ListJobs::v_shownFunc()
+void ListJobs::v_showFunc()
 {
 	if( Watch::isConnected() == false) return;
 
 	if( af::Environment::VISOR())
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequest, 0, true));
+		get();
 	else
 	{
-		if( Watch::getUid())
-			Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestUserId, Watch::getUid(), true));
+		if( MonitorHost::getUid() > 0 )
+		{
+			std::string str = "\"type\":\"jobs\",\"uids\":[";
+			str += af::itos( MonitorHost::getUid()) + "]";
+			Watch::get( str);
+		}
 		else
 			if( m_parentWindow != (QWidget*)Watch::getDialog()) close();
 	}
-}
-
-void ListJobs::v_connectionLost()
-{
-	if( m_parentWindow != (QWidget*)Watch::getDialog()) m_parentWindow->close();
 }
 
 void ListJobs::contextMenuEvent( QContextMenuEvent *event)
@@ -120,6 +150,37 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	ItemJob* jobitem = (ItemJob*)getCurrentItem();
 	if( jobitem == NULL ) return;
 	int selectedItemsCount = getSelectedItemsCount();
+
+	if( jobitem->folders.size())
+	{
+		if( af::Environment::hasRULES())
+		{
+			action = new QAction("Open RULES", this);
+			connect( action, SIGNAL( triggered() ), this, SLOT( actOpenRULES() ));
+			menu.addAction( action);
+
+			menu.addSeparator();
+		}
+
+		submenu = new QMenu("Folders", this);
+
+		QMapIterator<QString,QString> it( jobitem->folders);
+		while( it.hasNext())
+		{
+			it.next();
+
+			action = new QAction( QString("\"") + it.key() + "\":", this);
+			action->setEnabled( false);
+			submenu->addAction( action);
+
+			ActionString * action_str = new ActionString( it.value(), it.value(), this);
+			connect( action_str, SIGNAL( triggeredString(QString) ), this, SLOT( actBrowseFolder(QString) ));
+			submenu->addAction( action_str);
+		}
+
+		menu.addMenu( submenu);
+		menu.addSeparator();
+	}
 
 	action = new QAction( "Show Log", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
@@ -133,26 +194,64 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
 	menu.addAction( action);
 
-	action = new QAction( "Restart Errors", this);
+	action = new QAction( "Restart Error Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
 	menu.addAction( action);
 
-	action = new QAction( "Restart Running", this);
+	menu.addSeparator();
+
+	submenu = new QMenu("Start/Stop/Restart", this);
+	menu.addMenu( submenu);
+
+	action = new QAction("Start Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actStart()   ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_OFFLINE_MASK);
+	submenu->addAction( action);
+
+	action = new QAction("Pause Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actPause()   ));
+	if( selectedItemsCount == 1) action->setEnabled( false == (jobitem->state & AFJOB::STATE_OFFLINE_MASK));
+	submenu->addAction( action);
+
+	action = new QAction("Stop Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actStop()    ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
+	submenu->addAction( action);
+
+	action = new QAction("Restart Job", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
+	submenu->addAction( action);
+
+	action = new QAction("Restart&&Pause", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
+	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
+	action = new QAction( "Restart Warning Tasks", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartWarnings() ));
+	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_WARNING_MASK);
+	submenu->addAction( action);
+
+	action = new QAction( "Restart Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartRunning() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
-	menu.addAction( action);
+	submenu->addAction( action);
 
-	action = new QAction( "Restart Skipped", this);
+	action = new QAction( "Restart Skipped Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartSkipped() ));
 	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_SKIPPED_MASK);
-	menu.addAction( action);
+	submenu->addAction( action);
 
-	action = new QAction( "Restart Done", this);
+	action = new QAction( "Restart Done Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartDone() ));
-	menu.addAction( action);
+	submenu->addAction( action);
 
 	menu.addSeparator();
+
 	if( af::Environment::VISOR() == false)
 	{
 		  action = new QAction( "Move Up", this);
@@ -175,19 +274,27 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 		  menu.addAction( action);
 	}
 	menu.addSeparator();
-
-	action = new QAction( "Annotate", this);
+	
+	submenu = new QMenu( "Annotation", this);
+	
+	const std::vector<std::string> annotations = af::Environment::getAnnotations();
+	for( int p = 0; p < annotations.size(); p++)
+	{
+		QString annotation = afqt::stoq( annotations[p]);
+		ActionString * action_str = new ActionString(annotation, annotation, this);
+		connect( action_str, SIGNAL( triggeredString(QString) ), this, SLOT( actAnnotate(QString) ));
+		submenu->addAction( action_str);
+	}
+	action = new QAction( "Custom", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-	menu.addAction( action);
+	submenu->addAction( action);
+	
+	menu.addMenu( submenu);
+	
+	menu.addSeparator();
 
 	submenu = new QMenu( "Set Parameter", this);
 
-	action = new QAction( "Hidden", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
-	submenu->addAction( action);
-	action = new QAction( "Not Hidden", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
-	submenu->addAction( action);
 	action = new QAction( "Max Running Tasks", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
 	submenu->addAction( action);
@@ -235,7 +342,18 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	action = new QAction( "Life Time", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
 	submenu->addAction( action);
+
 	submenu->addSeparator();
+
+	action = new QAction( "Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+	submenu->addAction( action);
+	action = new QAction( "Not Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+	submenu->addAction( action);
+
+	submenu->addSeparator();
+
 	action = new QAction( "Custom Data", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actCustomData() ));
 	submenu->addAction( action);
@@ -271,33 +389,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 	menu.addSeparator();
 
-	action = new QAction( "Start", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actStart()   ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_OFFLINE_MASK);
-	menu.addAction( action);
-
-	action = new QAction( "Pause", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actPause()   ));
-	if( selectedItemsCount == 1) action->setEnabled( false == (jobitem->state & AFJOB::STATE_OFFLINE_MASK));
-	menu.addAction( action);
-
-	action = new QAction( "Stop", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actStop()    ));
-	if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
-	menu.addAction( action);
-
-	action = new QAction( "Restart", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
-	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
-	menu.addAction( action);
-
-	action = new QAction( "Restart&&Pause", this);
-	connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
-	if( selectedItemsCount == 1) action->setEnabled(( jobitem->time_started != 0 ) || ( jobitem->state & AFJOB::STATE_SKIPPED_MASK ));
-	menu.addAction( action);
-
-	menu.addSeparator();
-
 	action = new QAction( "Listen", this);
 	connect( action, SIGNAL( triggered() ), this, SLOT( actListenJob() ));
 	menu.addAction( action);
@@ -307,8 +398,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 	// System job ID is 1, and can not be deleted
 	if( jobitem->getId() != 1 )
 	{
+		action = new QAction( "Delete All Done", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actDeleteDone()));
+		menu.addAction( action);
+
 		action = new QAction( "Delete", this);
-		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()  ));
+		connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()));
 		menu.addAction( action);
 	}
 
@@ -317,79 +412,98 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
 ListJobs::~ListJobs()
 {
-#ifdef AFOUTPUT
-printf("ListJobs::~ListJobs:\n");
-#endif
 }
 
-bool ListJobs::caseMessage( af::Msg * msg)
+bool ListJobs::v_caseMessage( af::Msg * msg)
 {
-#ifdef AFOUTPUT
-printf("ListJobs::caseMessage:\n"); msg->stdOut();
-#endif
 	switch( msg->type())
 	{
 	case af::Msg::TJobsList:
 	{
 		if( updateItems( msg) && (af::Environment::VISOR() == false))
 		{
-			Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+			getUserJobsOrder();
 		}
+
 		if( false == isSubscribed() )
 		{
 			if( af::Environment::VISOR() == false )
 			{
 				m_view->scrollToBottom();
 			}
-			v_subscribe();
+			subscribe();
 		}
-		break;
-	}
-	case af::Msg::TMonitorJobsDel:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		break;
-	}
-	case af::Msg::TMonitorJobsAdd:
-	{
-		af::MCGeneral ids( msg);
-		deleteItems( ids);
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
-		Watch::someJobAdded();
-		break;
-	}
-	case af::Msg::TMonitorJobsChanged:
-	{
-		af::MCGeneral ids( msg);
-		Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
+
+		calcTotals();
+
 		break;
 	}
 	case af::Msg::TUserJobsOrder:
 	{
 		af::MCGeneral ids( msg);
-		if( ids.getId() != Watch::getUid()) return true;
-		sortMatch( ids.getList());
+		AF_DEBUG << "Jobs order received: " << ids.v_generateInfoString( true);
+		if( ids.getId() == MonitorHost::getUid())
+			sortMatch( ids.getList());
 		break;
 	}
+
 	default:
 		return false;
 	}
 
-	calcTotals();
-
 	return true;
 }
 
-ItemNode * ListJobs::createNewItem( af::Node *node)
+bool ListJobs::v_processEvents( const af::MonitorEvents & i_me)
 {
-	return new ItemJob( this, (af::Job*)node);
+	bool processed = false;
+
+	if( i_me.m_events[af::Monitor::EVT_jobs_del].size())
+	{
+		deleteItems( i_me.m_events[af::Monitor::EVT_jobs_del]);
+		calcTotals();
+		processed = true;
+	}
+
+	std::vector<int> ids;
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_change].size(); i++)
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_jobs_change][i]);
+
+	for( int i = 0; i < i_me.m_events[af::Monitor::EVT_jobs_add].size(); i++)
+		af::addUniqueToVect( ids, i_me.m_events[af::Monitor::EVT_jobs_add][i]);
+
+	if( ids.size())
+	{
+		get( ids);
+		processed = true;
+	}
+
+	if( i_me.m_jobs_order_ids.size())
+	{
+		sortMatch( i_me.m_jobs_order_ids);
+		processed = true;
+	}
+
+	return processed;
 }
 
-void ListJobs::resetSorting()
+ItemNode * ListJobs::v_createNewItem( af::Node *node, bool i_subscibed)
+{
+	return new ItemJob( this, (af::Job*)node, i_subscibed, m_ctrl_sf);
+}
+
+void ListJobs::v_resetSorting()
 {
 	if( af::Environment::VISOR() == false )
-		Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+		getUserJobsOrder();
+}
+
+void ListJobs::getUserJobsOrder()
+{
+	std::ostringstream str;
+	str <<  "{\"get\":{\"type\":\"users\",\"ids\":[" << MonitorHost::getUid() << "],\"mode\":\"jobs_order\",\"binary\":true}}";
+	Watch::sendMsg( af::jsonMsg( str));
 }
 
 void ListJobs::calcTotals()
@@ -456,7 +570,7 @@ void ListJobs::moveJobs( const std::string & i_operation)
 {
 	std::ostringstream str;
 	std::vector<int> uids;
-	uids.push_back( Watch::getUid());
+	uids.push_back( MonitorHost::getUid());
 	af::jsonActionOperationStart( str, "users", i_operation, "", uids);
 	std::vector<int> jids = getSelectedIds();
 	str << ",\n\"jids\":[";
@@ -475,6 +589,7 @@ void ListJobs::actStart()           { operation("start"            );}
 void ListJobs::actStop()            { operation("stop"             );}
 void ListJobs::actRestart()         { operation("restart"          );}
 void ListJobs::actRestartErrors()   { operation("restart_errors"   );}
+void ListJobs::actRestartWarnings() { operation("restart_warnings" );}
 void ListJobs::actRestartRunning()  { operation("restart_running"  );}
 void ListJobs::actRestartSkipped()  { operation("restart_skipped"  );}
 void ListJobs::actRestartDone()     { operation("restart_done"     );}
@@ -483,23 +598,31 @@ void ListJobs::actPause()           { operation("pause"            );}
 void ListJobs::actRestartPause()    { operation("restart_pause"    );}
 void ListJobs::actDelete()          { operation("delete"           );}
 
-void ListJobs::actRequestLog()
+void ListJobs::actDeleteDone()
 {
-	displayInfo( "Job log request.");
-	Item* item = getCurrentItem();
-	if( item == NULL ) return;
-	af::Msg * msg = new af::Msg( af::Msg::TJobLogRequestId, item->getId(), true);
-	Watch::sendMsg( msg);
+	std::vector<int> ids;
+	for( int i = 0; i < m_model->count(); i++)
+	{
+		ItemJob * job = (ItemJob*)(m_model->item(i));
+		if( job->state & AFJOB::STATE_DONE_MASK )
+			ids.push_back( job->getId());
+	}
+
+	if( ids.size() == 0 )
+	{
+		displayWarning("No done jobs founded.");
+		return;
+	}
+
+	std::ostringstream str;
+	af::jsonActionOperation( str,"jobs","delete","", ids);
+	Watch::sendMsg( af::jsonMsg( str));
+
+	displayInfo("Delete all done jobs.");
 }
 
-void ListJobs::actRequestErrorHostsList()
-{
-	displayInfo( "Job void hosts request.");
-	Item* jobitem = getCurrentItem();
-	if( jobitem == NULL ) return;
-	af::Msg * msg = new af::Msg( af::Msg::TJobErrorHostsRequestId, jobitem->getId(), true);
-	Watch::sendMsg( msg);
-}
+void ListJobs::actRequestLog() { getItemInfo("log"); }
+void ListJobs::actRequestErrorHostsList() { getItemInfo("error_hosts"); }
 
 void ListJobs::actSetHidden()   { setParameter("hidden", "true",  false); }
 void ListJobs::actUnsetHidden() { setParameter("hidden", "false", false); }
@@ -552,7 +675,7 @@ void ListJobs::actMaxRunningTasks()
 	int current = jobitem->maxrunningtasks;
 
 	bool ok;
-	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
+	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks", max);
@@ -565,7 +688,7 @@ void ListJobs::actMaxRunTasksPerHost()
 	int current = jobitem->maxruntasksperhost;
 
 	bool ok;
-	int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
+	int max = QInputDialog::getInt(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
 	if( !ok) return;
 
 	setParameter("max_running_tasks_per_host", max);
@@ -581,14 +704,7 @@ void ListJobs::actHostsMask()
 	QString mask = QInputDialog::getText(this, "Change Hosts Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask", afqt::qtos( mask));
+	setParameterRE("hosts_mask", afqt::qtos( mask));
 }
 
 void ListJobs::actHostsMaskExclude()
@@ -601,14 +717,7 @@ void ListJobs::actHostsMaskExclude()
 	QString mask = QInputDialog::getText(this, "Change Exclude Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("hosts_mask_exclude", afqt::qtos( mask));
+	setParameterRE("hosts_mask_exclude", afqt::qtos( mask));
 }
 
 void ListJobs::actDependMask()
@@ -621,14 +730,7 @@ void ListJobs::actDependMask()
 	QString mask = QInputDialog::getText(this, "Change Depend Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("depend_mask", afqt::qtos( mask));
+	setParameterRE("depend_mask", afqt::qtos( mask));
 }
 
 void ListJobs::actDependMaskGlobal()
@@ -641,14 +743,7 @@ void ListJobs::actDependMaskGlobal()
 	QString mask = QInputDialog::getText(this, "Change Depend Mask", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("depend_mask_global", afqt::qtos( mask));
+	setParameterRE("depend_mask_global", afqt::qtos( mask));
 }
 
 void ListJobs::actNeedOS()
@@ -661,14 +756,7 @@ void ListJobs::actNeedOS()
 	QString mask = QInputDialog::getText(this, "Change OS Needed", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("need_os", afqt::qtos( mask));
+	setParameterRE("need_os", afqt::qtos( mask));
 }
 
 void ListJobs::actNeedProperties()
@@ -681,14 +769,7 @@ void ListJobs::actNeedProperties()
 	QString mask = QInputDialog::getText(this, "Change Properties Needed", "Enter New Mask", QLineEdit::Normal, current, &ok);
 	if( !ok) return;
 
-	QRegExp rx( mask, Qt::CaseInsensitive);
-	if( rx.isValid() == false )
-	{
-		displayError( rx.errorString());
-		return;
-	}
-
-	setParameter("need_properties", afqt::qtos( mask));
+	setParameterRE("need_properties", afqt::qtos( mask));
 }
 
 void ListJobs::actPostCommand()
@@ -731,6 +812,27 @@ void ListJobs::actListenJob()
 	if( Watch::isConnected()) Watch::listenJob( item->getId(), item->getName());
 }
 
+void ListJobs::actBrowseFolder( QString i_folder)
+{
+	af::Service service( afqt::qtos(i_folder));
+	i_folder = afqt::stoq( service.getWDir());
+
+	Watch::browseFolder( i_folder);
+}
+
+void ListJobs::actOpenRULES()
+{
+	ItemJob* jobitem = (ItemJob*)getCurrentItem();
+	if( jobitem == NULL )
+		return;
+
+	QString path = jobitem->getRulesFolder();
+	if( path.isEmpty())
+		return;
+
+	QString cmd = QString("rules -s \"") + path + "\"";
+	Watch::startProcess( cmd);
+}
 
 void ListJobs::blockAction( int id_block, QString i_action)
 {

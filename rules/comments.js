@@ -654,11 +654,11 @@ Comment.prototype.updateStatus = function()
 		if( obj.deleted ) continue;
 		if( obj.type !== 'report') continue;
 		if( obj.duration == null ) continue;
-		if( obj.duration < 0 ) continue;
 
 //console.log( JSON.stringify( obj));
 		var rep = {};
 		rep.duration = obj.duration;
+		if( rep.duration < 0 ) rep.duration = 0;
 		rep.tags = obj.tags;
 		rep.artist = obj.user_name;
 		rep.time = obj.time;

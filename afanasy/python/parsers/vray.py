@@ -9,6 +9,7 @@ re_number = re.compile(r'[0-9]+')
 re_percent = re.compile(
 	r'Rendering image...:([ ]{,})([0-9]{1,2}.*)(%[ ]{,}).*'
 )
+IMAGE = r'Successfully written image file '
 
 
 class vray(parser.parser):
@@ -33,6 +34,16 @@ class vray(parser.parser):
 
 		if len(data) < 1:
 			return
+
+		lines = data.split('\n')
+		for line in lines:
+			pattern = re.compile(IMAGE)
+			res = pattern.search(line)
+			if res != None:
+				quotes = re.split("\"", line)
+				if quotes[1] != "":
+					self.appendFile(quotes[1].strip())
+
 
 		match = re_percent.findall(data)
 		if len(match):

@@ -24,6 +24,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 
@@ -144,7 +145,7 @@ void threadAcceptPort( void * i_arg, int i_port)
 		return;
 	}
 
-	if( listen( server_sd, 9) != 0)
+	if( listen( server_sd, SOMAXCONN) != 0)
 	{
 		AFERRAR("Port %d:", i_port)
 		AFERRPE("listen()")
@@ -158,10 +159,16 @@ void threadAcceptPort( void * i_arg, int i_port)
 
 	//
 	//############ accepting client connections:
+
 	int error_wait; // Timeout to pause accepting on error
 	static const int error_wait_max = 1 << 30;   // Maximum timeout value
 	static const int error_wait_min = 1 << 3;    // Minimum timeout value
 	error_wait = error_wait_min;
+
+	int64_t accepts_count = 0;
+	time_t  accepts_stat_count = 100;
+	time_t  accepts_stat_time = time( NULL);
+
 	while( AFRunning )
 	{
 		ThreadArgs * newThreadArgs = new ThreadArgs(*threadArgs);
@@ -177,10 +184,11 @@ void threadAcceptPort( void * i_arg, int i_port)
 			AFERRPE("accept")
 			switch( errno )
 			{
-				case EMFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
-					AFERROR("The per-process limit of open file descriptors has been reached.")
+				case EMFILE:
+					AFERRAR("The per-process limit of open file descriptors %d has been reached.",
+							af::Environment::getRLimit_NOFILE())
 					break;
-				case ENFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
+				case ENFILE:
 					AFERROR("The system limit on the total number of open files has been reached.")
 					break;
 				case EINTR:
@@ -188,15 +196,20 @@ void threadAcceptPort( void * i_arg, int i_port)
 					AFRunning = false;
 					break;
 			}
+
 			if( false == AFRunning )
 			{
 				delete threadArgs;
 				break;
 			}
+
 			af::sleep_sec( error_wait);
-			if( error_wait < error_wait_max) error_wait = error_wait << 1;
+			if( error_wait < error_wait_max)
+				error_wait = error_wait << 1;
+
 			continue;
 		}
+
 		error_wait = error_wait_min;
 
 		/* Start a detached thread for this connection, the "t" object will be deleted
@@ -205,9 +218,69 @@ void threadAcceptPort( void * i_arg, int i_port)
 		DlThread *t = new DlThread();
 		t->SetDetached();
 
+		/* Reduce new thread size */
+		if( af::Environment::getServerProcessConnStack() > 0 )
+			t->SetStackSize( af::Environment::getServerProcessConnStack());
+
 		/* The 'process' function will decode the incoming request and dispatch
 		it to the proper queue. */
-		t->Start( threadProcessMsg, newThreadArgs );
+		int retval = t->Start( threadProcessMsg, newThreadArgs );
+
+		if( retval != 0 )
+		{
+			// It seems that we can't raise a thread.
+			std::string errstr;
+			switch( retval)
+			{
+				case EAGAIN:
+					errstr = "Insufficient resources to create another thread.";
+					break;
+				case EINVAL:
+					errstr = "Invalid thread settings.";
+					break;
+				case EPERM:
+					errstr = "No permission to set the scheduling policy and parameters specified.";
+					break;
+				default:
+					errstr = "Unknown error.";
+			}
+			AF_ERR << errstr;
+
+			af::socketDisconnect( newThreadArgs->sd, 0);
+			delete newThreadArgs;
+		}
+
+
+		//
+		// Server load statistics:
+		//
+		accepts_count++;
+		if( accepts_count >= accepts_stat_count )
+		{
+			time_t cur_time = time( NULL);
+			int seconds = cur_time - accepts_stat_time;
+			if( seconds > 0 )
+			{
+				int accepts_per_second = accepts_count / seconds;
+
+				#ifndef WINNT
+				printf("\033[1;36m");
+				#endif
+				printf("Served connections per second: %d", accepts_per_second);
+				#ifndef WINNT
+				printf("\033[0m");
+				#endif
+				printf("\n");
+
+				accepts_count = 0;
+				accepts_stat_time = cur_time;
+			}
+
+			if( seconds < 10 )
+				accepts_stat_count *= 10;
+			else if(( seconds > 100 ) && ( accepts_stat_count > 100 ))
+				accepts_stat_count /= 10;
+		}
 	}
 
 	close( server_sd);

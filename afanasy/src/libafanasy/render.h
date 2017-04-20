@@ -20,11 +20,12 @@ public:
 
    void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-	inline bool isOnline()  const { return (m_state & SOnline ); }///< Whether Render is online.
-	inline bool isBusy()    const { return (m_state & SBusy   ); }///< Whether Render is busy.
-	inline bool isNIMBY()   const { return (m_state & SNIMBY  ); }///< Whether Render is NIMBY.
-	inline bool isNimby()   const { return (m_state & Snimby  ); }///< Whether Render is nimby.
-	inline bool isFree()    const { return (((~m_state) & SNIMBY) && ((~m_state) & Snimby));}///< Whether Render is free.
+	inline bool isOnline()  const { return (m_state & SOnline); }///< Whether Render is online.
+	inline bool isBusy()    const { return (m_state & SBusy  ); }///< Whether Render is busy.
+	inline bool isNIMBY()   const { return (m_state & SNIMBY ); }///< Whether Render is NIMBY.
+	inline bool isNimby()   const { return (m_state & Snimby ); }///< Whether Render is nimby.
+	inline bool isPaused()  const { return (m_state & SPaused); }///< Whether Render is paused.
+	inline bool isFree()    const { return false == (isNIMBY() || isNimby() || isPaused()); }///< Whether Render is free.
 	inline bool isOffline() const { return false == (m_state & SOnline );}///< Whether Render is offline.
 	inline bool isDirty()   const { return m_state & SDirty;}  ///< Whether Render is dirty.
 
@@ -47,7 +48,6 @@ public:
 /// Whether Render is ready to render tasks.
    inline bool isReady() const { return (
 			( m_state & SOnline ) &&
-			( false == ( m_state & SNIMBY )) &&
 			( m_priority > 0 ) &&
 			( m_capacity_used < getCapacity() ) &&
 			( (int)m_tasks.size() < getMaxTasks() ) &&
@@ -58,8 +58,6 @@ public:
 			isOffline() &&
 			isWOLSleeping() &&
 			( false == isWOLWaking()) &&
-			( m_host.m_wol_idlesleep_time > 0 ) &&
-			( false == isNimby()) &&
 			( getCapacity() > 0 ) &&
 			( getMaxTasks() > 0 ) &&
 			( m_priority > 0 )
@@ -74,6 +72,7 @@ public:
 	/// Set Nimby 
 	inline void setNIMBY() { m_state = m_state | SNIMBY; m_state = m_state & (~Snimby); m_idle_time = time(NULL); }
 	inline void setNimby() { m_state = m_state | Snimby; m_state = m_state & (~SNIMBY); m_idle_time = time(NULL); }
+	inline void setPaused(bool set) { m_state = set ? m_state | SPaused : m_state & (~SPaused); }
 	// if not to set idle time and to current, idle host with 'nimby_idlefree_time' will be set to free immediately
 
    inline void setOnline()  { m_state = m_state |   SOnline ; m_wol_operation_time = time(NULL);}
@@ -87,8 +86,9 @@ public:
    virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
    inline long long getTasksStartFinishTime() const { return m_task_start_finish_time; }///< Get tasks start or finish time.
-   inline const std::list<TaskExec*> & getTasks() { return m_tasks;}
-   inline int getTasksNumber() const { return int(m_tasks.size());}
+	/// Take ownership of the task execs of the render
+	std::list<af::TaskExec*> takeTasks();
+	inline int getTasksNumber() const { return int(m_tasks.size());}
 
    virtual void v_jsonWrite( std::ostringstream & o_str, int type) const;
 
@@ -101,14 +101,15 @@ public:
 
 	enum State
 	{
-		SOnline      = 1<<0,
-		Snimby       = 1<<1,
-		SNIMBY       = 1<<2,
-		SBusy        = 1<<3,
-		SDirty       = 1<<4,
-		SWOLFalling  = 1<<5,
-		SWOLSleeping = 1<<6,
-		SWOLWaking   = 1<<7
+		SOnline      = 1ULL << 0,
+		Snimby       = 1ULL << 1,
+		SNIMBY       = 1ULL << 2,
+		SBusy        = 1ULL << 3,
+		SDirty       = 1ULL << 4,
+		SWOLFalling  = 1ULL << 5,
+		SWOLSleeping = 1ULL << 6,
+		SWOLWaking   = 1ULL << 7,
+		SPaused  = 1ULL << 8, ///< Paused mode is a kind of "super nimby" mode that cannot be left automatically
 	};
 
 protected:

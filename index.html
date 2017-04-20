@@ -9,6 +9,7 @@
 <script type="text/javascript" src="lib/js/md5.js"></script>
 <script type="text/javascript" src="rules/admin.js"></script>
 <script type="text/javascript" src="rules/asset.js"></script>
+<script type="text/javascript" src="rules/bookmarks.js"></script>
 <script type="text/javascript" src="rules/comments.js"></script>
 <script type="text/javascript" src="rules/common.js"></script>
 <script type="text/javascript" src="rules/dailies.js"></script>
@@ -19,9 +20,11 @@
 <script type="text/javascript" src="rules/network.js"></script>
 <script type="text/javascript" src="rules/news.js"></script>
 <script type="text/javascript" src="rules/playlist.js"></script>
+<script type="text/javascript" src="rules/table.js"></script>
 <script type="text/javascript" src="rules/statistics.js"></script>
 <script type="text/javascript" src="rules/status.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
+<script type="text/javascript" src="rules/search.js"></script>
 <script type="text/javascript" src="rules/upload.js"></script>
 <script type="text/javascript">
 
@@ -61,9 +64,11 @@ to show/hige folder status info."
 		<div class="button" id="navig_show_size"       title="Show size
 Only if it was calculated
 Refresh browser to sort by size" onclick="g_NavigShowInfo(this)">SIZE</div>
-		<div class="button" id="navig_show_frames"     title="Show frames number
+		<div class="button small" id="navig_show_duration"   title="Show duration" onclick="g_NavigShowInfo(this)">D</div>
+		<div class="button small" id="navig_show_price"      title="Show price" onclick="g_NavigShowInfo(this)">P</div>
+		<div class="button small" id="navig_show_frames"     title="Show frames number
 Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
-		<div class="button" id="navig_show_percent"    title="Show percentage"    onclick="g_NavigShowInfo(this)">%</div>
+		<div class="button small" id="navig_show_percent"    title="Show percentage"    onclick="g_NavigShowInfo(this)">%</div>
 	</div>
 	<div id="navig_handle" class="gui_size_handle" onmousedown="u_ResizeGUIStart('navig_width',1)"></div>
 </div>
@@ -72,7 +77,8 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 	<div id="panel">
 		<div id="annotations"></div>
 		<div id="search_panel" style="float:right">
-			<div id="search_btn" class="button" onclick="u_SearchOnClick()">Search</div>
+			<div id="search_btn" class="button" style= "float:right;" onclick="s_SearchOnClick()">Search</div>
+			<div id="search_btn_process" class="button" style="float:right;display:none" onclick="s_ProcessGUI()">Search</div>
 		</div>
 	</div>
 	<div id="search" style="display:none">
@@ -85,41 +91,62 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 			<div id="search_finishmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
 			<div style="float:left"> - </div>
 			<div id="search_finishmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div class="button" style="float:right" onclick="u_SearchSearch()">Search</div>
 		</div>
 		<div>
 			<div style="float:left;">Annotation:</div>
 			<div id="search_annotation" class="editing" contenteditable="true"></div>
 		</div>
-		<div id="search_artists_div" style="display:none">
-			<div style="float:left;">
+		<div id="search_artists_div" class="search_grp" style="display:none">
+			<div class="search_grp_ctrl">
 				<div>Artists:</div>
-				<div class="button" onclick="u_Search_ShowDisabled(this)" title="Show disabled artitst.">DS</div>
-				<div class="button" onclick="u_Search_ShowNotArtist(this)" title="Show not an artists.">NA</div>
+				<div class="button" onclick="s_ShowDisabledArtists(this)" title="Show disabled artitst.">Dis</div>
+				<div class="button" onclick="s_ShowNotArtists(this)" title="Show not only artists.">All</div>
+				<div class="button" id="search_artists_notassigned"
+					title="Search shots that not assigned to any artist.">
+					N/A
+				</div>
 			</div>
 			<div id="search_artists" class="artists"></div>
 		</div>
-		<div>
-			<div style="float:left;">Tags:</div>
+		<div class="search_grp">
+			<div class="search_grp_ctrl">
+				<div>Flags:</div>
+				<div class="button" id="search_noflags"
+					title="Search shots that has not any flags.">
+					N/F
+				</div>
+			</div>
+			<div id="search_flags" class="flags"></div>
+		</div>
+		<div class="search_grp">
+			<div class="search_grp_ctrl">
+				<div>Tags:</div>
+				<div class="button" id="search_notags"
+					title="Search shots that has not any tags.">
+					N/T
+				</div>
+			</div>
 			<div id="search_tags" class="tags"></div>
 		</div>
-		<div>
-			<div style="float:left">Status Modified:</div>
-			<div id="search_statmodmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left"> - </div>
-			<div id="search_statmodmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left">Body Modified:</div>
-			<div id="search_bodymodmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-			<div style="float:left"> - </div>
-			<div id="search_bodymodmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
-		</div>
-		<div>
-			<div style="float:left;">Body:</div>
-			<div id="search_body" class="editing" contenteditable="true"></div>
-		</div>
-		<div id="search_comment_div">
-			<div style="float:left;">Comments:</div>
-			<div id="search_comment" class="editing" contenteditable="true"></div>
+		<div class="search_grp">
+			<div>
+				<div style="float:left">Status Modified:</div>
+				<div id="search_statmodmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+				<div style="float:left"> - </div>
+				<div id="search_statmodmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+				<div style="float:left">Body Modified:</div>
+				<div id="search_bodymodmin" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+				<div style="float:left"> - </div>
+				<div id="search_bodymodmax" class="editing" style="float:left;width:40px;text-align:center;" contenteditable="true"></div>
+			</div>
+			<div>
+				<div style="float:left;">Body:</div>
+				<div id="search_body" class="editing" contenteditable="true"></div>
+			</div>
+			<div id="search_comment_div">
+				<div style="float:left;">Comments:</div>
+				<div id="search_comment" class="editing" contenteditable="true"></div>
+			</div>
 		</div>
 		<div id="search_result_div" style="display:none; box-shadow:0 0 3px #000 inset;">
 			<div id="search_info">
@@ -147,6 +174,7 @@ Supervisor can assign artist by creating a task."
 			<div id="status_percentage"></div>
 			<div id="status_annotation"></div>
 			<div id="status_artists" class="artists"></div>
+			<div id="status_flags" class="flags"></div>
 			<div id="status_tags" class="tags"></div>
 			<div id="status_finish" class="finish"></div>
 			<div id="status_progress" class="progress"><div id="status_progressbar" class="progressbar"></div></div>
@@ -156,6 +184,7 @@ Supervisor can assign artist by creating a task."
 					style="font: 16px monospace; padding: 1px 6px; float: left;"></div>
 				<div style="padding: 1px 6px; float: right;">Frames</div>
 			</div>
+			<div id="status_adinfo" style="clear:both; display: none;"></div>
 			<div style="clear:both;">
 				<div id="status_reports_div">
 					Reports:
@@ -177,6 +206,7 @@ Supervisor can assign artist by creating a task."
 			<div id="asset_tooltip" class="infotooltip" style="float: right; margin: 2px; display: none;"></div>
 			<div class="button openclose" onclick="u_OpenCloseView('asset')"
 				title="Hide asset view"></div>
+			<div id="asset_top_left"></div>
 			<div id="asset_label" style="text-align:center; margin-top: 4px;">Asset</div>
 			<div id="asset" class="view_view"></div>
 		</div>
@@ -195,6 +225,16 @@ Here are shown curret location files.
 			<div id="files_label" style="text-align:center; margin-top: 4px;">Files</div>
 			<div id="files" class="view_view"></div>
 		</div>
+	</div>
+	<div id="buffer_div" style="display: none;">
+		<div id="buffer_panel">
+			<div class="label"><b>Buffer:</b></div>
+			<div class="button" ondblclick="fu_BufferClear()" title="Double click to clear buffer.">Clear</div>
+			<div class="label">Select</div>
+			<div class="button" onclick="fu_BufferSelectAll()">All</div>
+			<div class="button" onclick="fu_BufferSelectNone()">None</div>
+		</div>
+		<div id="buffer"></div>
 	</div>
 	<div id="body_div" class="view">
 		<div class="button show" onclick="u_OpenCloseView('body')"
@@ -276,10 +316,10 @@ Comment can be an artist report with a tag and duration.
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" title="Hide side panel" onclick="u_SidePanelHideOnClick()">&gt;&gt; H I D E &gt;&gt;</div>
 	<div id="sidepanel_news" style="display:none">
-		<div class="label button" id="news_refresh" onclick="nw_NewsLoad()" title="Refresh news" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);"></div>
-		<div class="label button" id="news_sidepanel_btn" onclick="nw_NewsOnClick()">News</div>
+		<div class="label button refresh" onclick="nw_NewsLoad()" title="Refresh news"></div>
+		<div class="label button" id="news_label" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
-			<div class="news_ctrl">
+			<div id="news_ctrl">
 				<div class="infotooltip" style="float: right; margin: 0; padding: 0;" title="News:
 If you assigned on any shot (location) you will receive all its changes.
 To receive all news from some location and all its subfolders (project,scene)
@@ -290,7 +330,7 @@ You can remove all [DA] news, only visible [DV] or hidden [DH] news during filte
 To remove only one news link double click [-] button at the top-left corner.
 Remember any delete operation buttons in RULES requires double-click.
 "				></div>
-				<div class="news_ctrl_btns">
+				<div id="news_ctrl_btns">
 					<div class="button" title="Double click to delete all news"
 						style="background-image:url(rules/icons/delete_all.png);"
 						ondblclick="nw_DeleteNews()"></div>
@@ -342,8 +382,33 @@ Remember any delete operation buttons in RULES requires double-click.
 			<div id="news"></div>
 		</div>
 	</div>
+	<div id="sidepanel_bookmarks" style="display:none">
+		<div class="label button refresh" onclick="bm_Load()" title="Refresh bookmakrs"></div>
+		<div id="bookmarks_label" class="label button" onclick="bm_OnClick()">Bookmarks</div>
+		<div class="body">
+			<div id="bookmarks_ctrl">
+				<div class="infotooltip" style="float: right; margin: 0; padding: 0;" title="Bookmarks:
+This is links to shots (locations) that you was assigned.
+Bookmark is created when you was added to the artists list.
+You can delete bookmark only in special cases:
+1. You are already not assigned.
+2. Shot was omitted.
+3. Location does not exist any more.
+"				></div>
+				<div class="button" id="bookmakrs_thumbs_btn"
+					onclick="bm_ThumbnailsOnClick()"
+					title="Display thumbnails.">
+					Thmb</div>
+				<div class="button"
+					ondblclick="bm_DeleteObsoleteOnClick()"
+					title="Double click to delete obsolete bookmarks.">
+					DOB</div>
+			</div>
+			<div id="bookmarks"></div>
+		</div>
+	</div>
 	<div id="sidepanel_playlist">
-		<div class="label button" id="playlist_refresh" style="width:18px; height:18px; background-image:url(rules/icons/refresh.png);" onclick="p_RefreshOnClick()"></div>
+		<div class="label button refresh" onclick="p_RefreshOnClick()"></div>
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div class="playlist_ctrl playlist_ctrl_top">
@@ -422,8 +487,7 @@ So folder will appear on unpack.
 		</div>
 	</div>
 	<div id="sidepanel_recent">
-		<div class="label button" id="recent_refresh" onclick="nw_RecentRefresh()"
-			style="width:18px; height:18px; background-image:url(rules/icons/refresh.png)";></div>
+		<div class="label button refresh" onclick="nw_RecentRefresh()"></div>
 		<div class="label button" onclick="nw_RecentOnClick()">Recent</div>
 		<div class="body">
 			<div id="recent"></div>
@@ -494,9 +558,6 @@ Hidden folders increase system speed.">
 					AFANASY</a></div>
 			<!--div style="text-align:center; padding: 10px 0 0 0;">
 				<a href="afanasy/webvisor/" target="_blank">Database Statistics</a></div-->
-			<div style="text-align:center; padding: 10px 0 0 0;">
-				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank" onclick="u_OpenCloseHeader()">
-					Firefox Add-on</a></div>
 		</div>
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()"
@@ -510,8 +571,6 @@ Hidden folders increase system speed.">
 			style="background-image:url(rules/icons/previous.png);"></a>
 		<a class="button" id="navigate_next" title="Navigate to the next folder (shot)"
 			style="background-image:url(rules/icons/next.png);"></a>
-		<div id="news_count" onclick="u_SidePanelOpen();nw_NewsOpen()" title="News Counter.
-Click to refresh and open news." style="display: none;"></div>
 		<div id="panel_logo"><img id="panel_logo_img" src="rules/icons/rules.png" width="90px" height="30px"></div>
 		<div id="assets"></div>
 	</div>
@@ -522,8 +581,8 @@ Click to refresh and open news." style="display: none;"></div>
 		title="Open/close system log"></div>
 	<div id="cycle"></div>
 	<div id="version" style="float:right;margin:10px;" title="CGRU version">v?</div>
-	<div id="open" class="cmdexec open" style="height: 26px; float:right; margin:8px;" title="Open location a file browser.
-RMB 'Run' menu item."></div>
+	<div id="open" class="open" style="height: 26px; float:right; margin:8px;" title="Open location a file browser.
+Double click to launch."></div>
 	<div id="info"></div>
 	<div id="log"></div>
 </div>

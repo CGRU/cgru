@@ -43,7 +43,7 @@ bool afsql::execute( PGconn * i_conn, const std::list<std::string> * i_queries)
 		PGresult * res = PQexec( i_conn, (*it).c_str());
 		if( PQresultStatus(res) != PGRES_COMMAND_OK)
 		{
-			AFERRAR("SQL command execution faled:\n%s\n%s", (*it).c_str(), PQerrorMessage( i_conn));
+			AFERRAR("SQL command execution failed:\n%s\n%s", (*it).c_str(), PQerrorMessage( i_conn));
 			o_result = false;
 		}
 		PQclear( res);

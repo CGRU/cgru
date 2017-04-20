@@ -15,15 +15,12 @@ fi
 
 source ./setup.sh
 
-for(( n=0; n<$count; n++))
+for n in $(seq -f "%04g" 1 $count)
 do
-   if [ $count == 1 ]; then
-      export AF_HOSTNAME="$1"
-   else
-      export AF_HOSTNAME="$1$n"
-   fi
-   echo $AF_HOSTNAME
-   if [ "$3" != "no" ]; then
-      afrender >& /dev/null &
-   fi
+	export AF_HOSTNAME="$1$n"
+	echo $AF_HOSTNAME
+
+	afrender >& /dev/null &
+
+	sleep .07
 done

@@ -203,9 +203,15 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
    // Store render pointer:
    addRenderCounts( render);
 
-   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
+   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
 
-	return true;
+   return true;
+}
+
+void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
+{
+	Task * task = m_tasks[i_taskexec->getTaskNum()];
+	task->reconnect( i_taskexec, &i_render, i_monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
 }
 
 void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
@@ -356,30 +362,42 @@ bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    // Update block tasks progress and bars
 	  if( m_data->updateProgress( m_jobprogress)) blockProgress_changed = true;
 
-   //
-   // Blocksdata depend check
-   m_data->setStateDependent( false);
-   if( m_dependBlocks.size())
-      for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
-      {
-		 if( m_job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK) continue;
-		 m_data->setStateDependent( true);
-         break;
-      }
-      //printf("Block::refresh: checking '%s': %s\n", data->getName().toUtf8().data(), data->state & AFJOB::STATE_READY_MASK ? "READY" : "NOT ready");
 
    if( old_block_state != m_data->getState()) blockProgress_changed = true;
 
    // update block monitoring and database if needed
    if( blockProgress_changed && monitoring )
-   {
-	  if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
-
-      // No need to update state in database, state is calculated attribute
-// AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
-   }
+		monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
 
    return blockProgress_changed;
+}
+
+bool Block::checkDepends( MonitorContainer * i_monitoring)
+{
+	bool was_depend = m_data->getState() & AFJOB::STATE_WAITDEP_MASK;
+	bool now_depend = false;
+
+	if( m_dependBlocks.size())
+		for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
+		{
+			if( m_job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK)
+				continue;
+
+			now_depend = true;
+			break;
+		}
+
+	if( now_depend != was_depend )
+	{
+		m_data->setStateDependent( now_depend);
+
+		if( i_monitoring )
+			i_monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
+
+		return true;
+	}
+
+	return false;
 }
 
 bool Block::action( Action & i_action)
@@ -400,23 +418,23 @@ bool Block::action( Action & i_action)
 		}
 		else if( type == "skip")
 		{
-			skipRestartTasks( true, "Block skip by " + i_action.author, i_action, operation);
+			skipRestartTasks( true, "Tasks skip by " + i_action.author, i_action, operation);
 		}
 		else if( type == "restart")
 		{
-			skipRestartTasks( false, "Block restart by " + i_action.author, i_action, operation);
+			skipRestartTasks( false, "Tasks restart by " + i_action.author, i_action, operation);
 		}
 		else if( type == "restart_running")
 		{
-			skipRestartTasks( false, "Block restart running by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
+			skipRestartTasks( false, "Tasks restart running by " + i_action.author, i_action, operation, AFJOB::STATE_RUNNING_MASK);
 		}
 		else if( type == "restart_skipped")
 		{
-			skipRestartTasks( false, "Block restart skipped by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
+			skipRestartTasks( false, "Tasks restart skipped by " + i_action.author, i_action, operation, AFJOB::STATE_SKIPPED_MASK);
 		}
 		else if( type == "restart_done")
 		{
-			skipRestartTasks( false, "Block restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
+			skipRestartTasks( false, "Tasks restart done by " + i_action.author, i_action, operation, AFJOB::STATE_DONE_MASK);
 		}
 		else
 		{
@@ -441,6 +459,7 @@ bool Block::action( Action & i_action)
 
 			blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;
+			constructDependBlocks();
 		}
 	}
 
@@ -453,7 +472,7 @@ bool Block::action( Action & i_action)
 	return job_progress_changed;
 }
 
-void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
+void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state)
 {
 	std::vector<int32_t> tasks_vec;
 	af::jr_int32vec("task_ids", tasks_vec, i_operation);
@@ -461,7 +480,7 @@ void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Ac
 	int length = m_data->getTasksNum();
 	if( tasks_vec.size())
 		length = tasks_vec.size();
-//printf("Block::skipRestartTasks: BEGIN:\n");
+
 	for( int i = 0; i < length; i++)
 	{
 		int t = i;
@@ -481,7 +500,6 @@ void Block::skipRestartTasks( bool i_skip, const std::string i_message, const Ac
 		else
 			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
 	}
-//printf("Block::skipRestartTasks: END:\n");
 }
 
 void Block::constructDependBlocks()
@@ -492,9 +510,11 @@ void Block::constructDependBlocks()
         return;
     }
 
+	m_dependBlocks.clear();
+	m_dependTasksBlocks.clear();
+
 	if( m_data->hasDependMask())
     {
-        m_dependBlocks.clear();
 		for( int bd = 0; bd < m_job->getBlocksNum(); bd++)
         {
             // skip if it is the same block
@@ -508,7 +528,6 @@ void Block::constructDependBlocks()
 
 	if( m_data->hasTasksDependMask())
     {
-        m_dependTasksBlocks.clear();
 		for( int bd = 0; bd < m_job->getBlocksNum(); bd++)
         {
             // skip if it is the same block

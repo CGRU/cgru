@@ -12,6 +12,7 @@ using namespace af;
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 Job::Job( int i_id)
 {
@@ -61,9 +62,9 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
 	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
-	jr_string("user_name",     m_user_name,     i_object);
+	jr_string("user_name",     m_user_name,     i_object, io_changes);
 
-	jr_stringmap("folders", m_folders, i_object);
+	jr_stringmap("folders", m_folders, i_object, io_changes);
 
 	bool offline = false;
 	jr_bool("offline", offline, i_object, io_changes);
@@ -74,6 +75,20 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	if( jr_bool("ppa", ppa, i_object, io_changes))
 		setPPAFlag( ppa);
 
+	bool maintenance = false;
+	if( jr_bool("maintenance", maintenance, i_object, io_changes))
+		setMaintenanceFlag( maintenance);
+
+	bool ignorenimby = false;
+	if( jr_bool("ignorenimby", ignorenimby, i_object, io_changes))
+		setIgnoreNimbyFlag( ignorenimby);
+
+	bool ignorepaused = false;
+	if( jr_bool("ignorepaused", ignorepaused, i_object, io_changes))
+		setIgnorePausedFlag( ignorepaused);
+
+	Work::jsonRead( i_object, io_changes);
+
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes
 	if( io_changes )
@@ -81,14 +96,19 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	Node::jsonRead( i_object);
 
+	jr_int64 ("serial", m_serial, i_object);
+
 	jr_string("host_name", m_host_name,     i_object);
 	//jr_uint32("flags",   m_flags,         i_object);
-	jr_uint32("st",        m_state,         i_object);
+	jr_int64("st",        m_state,         i_object);
 	//jr_int32 ("user_list_order",          m_user_list_order,            i_object);
 
 	jr_int64 ("time_creation", m_time_creation, i_object);
 	jr_int64 ("time_started",  m_time_started,  i_object);
 	jr_int64 ("time_done",     m_time_done,     i_object);
+	
+	jr_string("project",    m_project,    i_object);
+	jr_string("department", m_department, i_object);
 
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
@@ -125,11 +145,12 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	Node::v_jsonWrite( o_str, i_type);
 
+	Work::jsonWrite( o_str, i_type);
+
+	o_str << ",\n\"serial\":" << m_serial;
+
 	o_str << ",\n\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\n\"host_name\":\"" << m_host_name << "\"";
-
-/*	if( m_flags != 0 )
-		o_str << ",\n\"flags\":"                      << m_flags;*/
 
 	o_str << ",\n\"st\":" << m_state;
 	if( m_state != 0 )
@@ -141,6 +162,15 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( isPPAFlag())
 		o_str << ",\n\"ppa\":true";
 
+	if( isMaintenanceFlag())
+		o_str << ",\n\"maintenance\":true";
+
+	if( isIgnoreNimbyFlag())
+		o_str << ",\n\"ignorenimby\":true";
+
+	if( isIgnorePausedFlag())
+		o_str << ",\n\"ignorepaused\":true";
+
 	if( m_command_pre.size())
 		o_str << ",\n\"command_pre\":\""  << af::strEscape( m_command_pre  ) << "\"";
 	if( m_command_post.size())
@@ -149,6 +179,12 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"description\":\""  << af::strEscape( m_description  ) << "\"";
 	if( m_thumb_path.size())
 		o_str << ",\n\"thumb_path\":\""   << af::strEscape( m_thumb_path   ) << "\"";
+	if( m_report.size())
+		o_str << ",\n\"report\":\""       << af::strEscape( m_report       ) << "\"";
+	if( m_project.size())
+		o_str << ",\n\"project\":\""      << af::strEscape( m_project      ) << "\"";
+	if( m_department.size())
+		o_str << ",\n\"department\":\""   << af::strEscape( m_department   ) << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
@@ -167,16 +203,7 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"time_life\":"                  << m_time_life;
 
 	if( m_folders.size())
-	{
-		o_str << ",\n\"folders\":{";
-		int i = 0;
-		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++, i++)
-		{
-			if( i ) o_str << ",";
-			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
-		}
-		o_str << "\n}";
-	}
+		af::jw_stringmap("folders", m_folders, o_str);
 
 	if( hasHostsMask())
 		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
@@ -210,6 +237,7 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 void Job::initDefaultValues()
 {
 	m_id = 0;
+	m_serial = 0;
 	m_blocks_num = 0;
 	m_max_running_tasks = -1;
 	m_max_running_tasks_per_host = -1;
@@ -283,10 +311,14 @@ Job::~Job()
 void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
+	Work::readwrite( msg);
+	/* NEW VERSION
+	rw_int64_t ( m_serial, msg);
+	*/
 
 	rw_int32_t ( m_blocks_num,                 msg);
-	rw_uint32_t( m_flags,                      msg);
-	rw_uint32_t( m_state,                      msg);
+	rw_int64_t ( m_flags,                      msg);
+	rw_int64_t ( m_state,                      msg);
 	rw_int32_t ( m_max_running_tasks,          msg);
 	rw_int32_t ( m_max_running_tasks_per_host, msg);
 	rw_int32_t ( m_user_list_order,            msg);
@@ -296,30 +328,26 @@ void Job::v_readwrite( Msg * msg)
 	rw_int64_t ( m_time_done,                  msg);
 	rw_int32_t ( m_time_life,                  msg);
 
-	rw_String  ( m_user_name,    msg);
-	rw_String  ( m_host_name,    msg);
-	rw_String  ( m_command_pre,  msg);
-	rw_String  ( m_command_post, msg);
-	rw_String  ( m_annotation,   msg);
+	rw_String ( m_user_name,    msg);
+	rw_String ( m_host_name,    msg);
+	rw_String ( m_command_pre,  msg);
+	rw_String ( m_command_post, msg);
+	rw_String ( m_annotation,   msg);
+	rw_String ( m_report,       msg);
+	rw_String ( m_description,  msg);
+	rw_String ( m_custom_data,  msg);
+	rw_String ( m_thumb_path,   msg);
+	rw_String ( m_project,      msg);
+	rw_String ( m_department,   msg);
 
-//	NEW VERSION:
-//	rw_String  ( m_description,  msg);
-	rw_String  ( m_thumb_path,   msg);
+	rw_RegExp ( m_hosts_mask,         msg);
+	rw_RegExp ( m_hosts_mask_exclude, msg);
+	rw_RegExp ( m_depend_mask,        msg);
+	rw_RegExp ( m_depend_mask_global, msg);
+	rw_RegExp ( m_need_os,            msg);
+	rw_RegExp ( m_need_properties,    msg);
 
-	rw_String  ( m_custom_data,  msg);
-
-//	NEW VERSION:
-//	rw_String  ( m_thumb_path,   msg); // Afwatch should ask for thumbnail if this path changed
-
-	rw_RegExp  ( m_hosts_mask,         msg);
-	rw_RegExp  ( m_hosts_mask_exclude, msg);
-	rw_RegExp  ( m_depend_mask,        msg);
-	rw_RegExp  ( m_depend_mask_global, msg);
-	rw_RegExp  ( m_need_os,            msg);
-	rw_RegExp  ( m_need_properties,    msg);
-
-//	NEW VERSION:
-//	rw_StringMap( m_folders, msg);
+	rw_StringMap( m_folders, msg);
 
 	rw_blocks(  msg);
 }
@@ -384,12 +412,15 @@ const std::string Job::getFolder() const
 
 int Job::v_calcWeight() const
 {
-	int weight = Node::v_calcWeight();
+	int weight = Work::calcWeight();
 	weight += sizeof(Job) - sizeof( Node);
 	for( int b = 0; b < m_blocks_num; b++) weight += m_blocks_data[b]->calcWeight();
 	weight += weigh( m_description);
 	weight += weigh( m_user_name);
 	weight += weigh( m_host_name);
+	weight += weigh( m_project);
+	weight += weigh( m_department);
+	weight += weigh( m_folders);
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();
 	weight += m_depend_mask.weigh();
@@ -435,6 +466,8 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    o_str << "[" << m_user_list_order << "]";
 	if( isHidden()) o_str << " (hidden)";
 
+	Work::generateInfoStream( o_str, full);
+
 	bool display_blocks = true;
 	if( m_blocks_num == 0)
 	{
@@ -462,8 +495,12 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
       return;
    }
 
-   if( m_annotation.size()) o_str << "\n    " << m_annotation;
+   if( m_annotation.size())  o_str << "\n    " << m_annotation;
+   if( m_report.size())      o_str << "\n    " << m_report;
    if( m_description.size()) o_str << "\n    " << m_description;
+   
+   if( m_project.size())     o_str << "\n Project = " << m_project;
+   if( m_department.size())  o_str << "\n Department = " << m_department;
 
    o_str << "\n Time created  = " << af::time2str( m_time_creation);
 
@@ -490,6 +527,15 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_need_properties.notEmpty()) o_str << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
    if( m_command_pre.size()) o_str << "\n Pre command:\n" << m_command_pre;
    if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
+
+	if( m_folders.size())
+	{
+		o_str << "\nFolders:";
+		for( std::map<std::string,std::string>::const_iterator it = m_folders.begin(); it != m_folders.end(); it++)
+		{
+			o_str << "\n\"" << (*it).first << "\":\""<< af::strEscape((*it).second) << "\"";
+		}
+	}
 }
  
 void Job::v_generateInfoStream( std::ostringstream & o_str, bool full) const

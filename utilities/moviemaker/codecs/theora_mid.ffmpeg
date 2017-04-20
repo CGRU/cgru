@@ -1,2 +1,2 @@
 Theora (mid)
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -pix_fmt yuv420p -vcodec theora -qscale 8 @AUXARGS@ -r @FPS@ "@OUTPUT@.ogg"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -pix_fmt yuv420p -vcodec theora -qscale 8 -r @FPS@ "@OUTPUT@.ogg"

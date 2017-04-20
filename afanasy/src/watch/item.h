@@ -2,15 +2,16 @@
 
 #include "../libafanasy/afnode.h"
 
-#include <QtGui/QItemDelegate>
-#include <QtGui/QStyleOption>
+#include <QItemDelegate>
+#include <QStyleOption>
+#include <QMenu>
 
 class MainWidget;
 
 class Item
 {
 public:
-	Item( const QString &itemname, int itemid);
+	Item(const QString &itemname, int itemid);
 	virtual ~Item();
 
 	virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
@@ -44,6 +45,8 @@ public:
 	inline void   setNotRunning() const { m_running = false; } ///< Set item not m_running ( to change text colors only).
 	inline const bool isRunning() const { return m_running;  } ///< Return whether node is "m_running".
 
+	static const QString generateErrorsSolvingInfo( int i_block, int i_task, int i_retries);
+
 	/// Draw a percent bar.
 	static void drawPercent
 	(
@@ -56,13 +59,15 @@ public:
 
 	static void calcutaleStarPoints();
 
+	inline static bool  isItemP(const QVariant & i_v) { return i_v.canConvert<Item*>(); }
+	inline static Item* toItemP(const QVariant & i_v) { return i_v.value<Item*>(); }
+
 	virtual void v_filesReceived( const af::MCTaskUp & i_taskup);
 
 	virtual bool calcHeight();
-
+	
 protected:
-	virtual void drawBack( QPainter *painter, const QStyleOptionViewItem &option) const;
-	virtual void drawPost( QPainter *painter, const QStyleOptionViewItem &option, float alpha = 1.0) const;
+	void drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem = NULL, const QColor * i_clrBorder = NULL) const;
 
 	/// Print AFJOB::STATE informaton
 	void printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const;

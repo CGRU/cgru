@@ -5,7 +5,7 @@
 #include "../libafanasy/user.h"
 
 #include "aflist.h"
-#include "afnodesrv.h"
+#include "afnodesolve.h"
 
 class Action;
 class JobAf;
@@ -13,7 +13,7 @@ class RenderAf;
 class UserContainer;
 
 /// Server side of Afanasy user.
-class UserAf : public af::User, public AfNodeSrv
+class UserAf : public af::User, public AfNodeSolve
 {
 public:
 	/// Create a new user. User on job creation by unknown user.
@@ -40,7 +40,8 @@ public:
 	/** Used to limit nodes for heavy solve algorithm **/
 	bool v_canRunOn( RenderAf * i_render);
 
-	bool v_solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
+	/// Generate task for \c render from list, return \c render if task generated or NULL.
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring); 
 
 	void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 	
@@ -56,7 +57,9 @@ public:
 
 	inline const std::vector<int32_t> generateJobsIds() const { return m_jobslist.generateIdsList();}
 
-	af::Msg * writeJobdsOrder() const;
+	void jobPriorityChanged( JobAf * i_job, MonitorContainer * i_monitoring);
+
+	af::Msg * writeJobdsOrder( bool i_binary) const;
 
 	/// Set container.
 	inline static void setUserContainer( UserContainer * i_users ) { ms_users = i_users;}
@@ -67,9 +70,11 @@ protected:
 	void v_calcNeed();
 
 private:
+	bool refreshCounters();
+
 	void updateJobsOrder( af::Job * newJob = NULL);
+
 	void deleteNode( MonitorContainer * i_monitoring);
-	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
 	AfList m_jobslist; ///< Jobs list.

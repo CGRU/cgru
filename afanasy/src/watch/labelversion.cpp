@@ -4,8 +4,9 @@
 #include "wndtext.h"
 
 #include <QtCore/QFile>
+#include <QtGui/QImageReader>
 #include <QtGui/QPainter>
-#include <QtGui/QTextEdit>
+#include <QTextEdit>
 
 LabelVersion::LabelVersion( QWidget *parent):
     QWidget( parent),
@@ -20,7 +21,7 @@ LabelVersion::LabelVersion( QWidget *parent):
                      "\nRevision: %2"
                      "\nPython version: %3"
                      "\nQt version: %4")
-         .arg( af::Environment::getVersionDate().c_str())
+         .arg( af::Environment::getBuildDate().c_str())
          .arg( af::Environment::getVersionRevision().c_str())
          .arg( af::Environment::getVersionPython().c_str())
          .arg( qVersion());
@@ -37,6 +38,10 @@ LabelVersion::LabelVersion( QWidget *parent):
          .arg( af::Environment::getHomeAfanasy().c_str())
          .arg( af::Environment::getServerName().c_str());
 
+	QList<QByteArray> qList(QImageReader::supportedImageFormats());
+	tooltip += "\nSupported image formats:\n";
+	for (int i = 0; i < qList.size(); i++)
+		tooltip += " " + qList[i];
 /*
 // Try to load user's custom logo
    QString filename = af::Environment::getHomeAfanasy() + "/logo.png";
@@ -115,7 +120,7 @@ void LabelVersion::paintEvent( QPaintEvent * event)
       p.drawPixmap( 0, 0, logo);
 */
     // Draw text:
-    p.setPen( afqt::QEnvironment::qclr_black);
+	p.setPen( afqt::QEnvironment::clr_DisabledText.c);
     p.setFont( font);
     p.drawText( rect(), Qt::AlignCenter, label);
 }

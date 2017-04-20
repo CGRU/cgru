@@ -7,6 +7,7 @@ knowndists="Debian Ubuntu CentOS RedHat Fedora openSUSE AltLinux MacOSX Gentoo M
 
 if [ `uname` == "Darwin" ]; then
 	export DISTRIBUTIVE="MacOSX"
+	export DISTRIBUTIVE_VERSION=$(sw_vers -productVersion)
 else
 	# Load issue file:
 	issuefile="/etc/system-release"
@@ -35,8 +36,20 @@ if [ -z "${DISTRIBUTIVE}" ]; then
 	exit 1
 fi
 
+# Search distribution version for Manjaro
+if [ "${DISTRIBUTIVE}" == "Manjaro" ]; then
+	export DISTRIBUTIVE_VERSION=`echo "/etc/lsb-release" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+fi
+
 # Search distribution version:
-export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
+	export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
+	if [ -z "${DISTRIBUTIVE_VERSION}" ]; then
+		echo "Can't detect ${DISTRIBUTIVE} version. You can:"
+		echo "export DISTRIBUTIVE_VERSION="
+		exit 1
+	fi
+fi
 
 # Check architecture:
 export ARCHITECTURE=`uname -m`
@@ -81,6 +94,7 @@ case ${DISTRIBUTIVE} in
 	openSUSE)
 		redhatArch
 		export PACKAGE_MANAGER="zypper"
+		export PACKAGE_INSTALL="$PACKAGE_MANAGER install"
 		;;
 	Mageia)
 		redhatArch

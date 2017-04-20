@@ -4,7 +4,7 @@
 
 #include "../libafqt/qenvironment.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class ButtonOut : public QWidget
 {

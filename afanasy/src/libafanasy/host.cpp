@@ -190,9 +190,18 @@ void Host::v_readwrite( Msg * msg)
 	rw_int32_t( m_max_tasks,           msg );
 	rw_int32_t( m_capacity,            msg );
 
-	// NEW VERSION // other auto nimby parameters:
 	rw_int32_t( m_nimby_idle_cpu,      msg );
 	rw_int32_t( m_nimby_busy_cpu,      msg );
+	rw_int32_t( m_nimby_idle_mem,      msg );
+	rw_int32_t( m_nimby_busy_mem,      msg );
+	rw_int32_t( m_nimby_idle_swp,      msg );
+	rw_int32_t( m_nimby_busy_swp,      msg );
+	rw_int32_t( m_nimby_idle_hddgb,    msg );
+	rw_int32_t( m_nimby_busy_hddgb,    msg );
+	rw_int32_t( m_nimby_idle_hddio,    msg );
+	rw_int32_t( m_nimby_busy_hddio,    msg );
+	rw_int32_t( m_nimby_idle_netmbs,   msg );
+	rw_int32_t( m_nimby_busy_netmbs,   msg );
 
 	rw_int32_t( m_wol_idlesleep_time,  msg );
 	rw_int32_t( m_nimby_idlefree_time, msg );
@@ -362,6 +371,8 @@ HostRes::HostRes():
 	cpu_loadavg[0] = cpu_loadavg[1] = cpu_loadavg[2] = 0;
 }
 
+HostRes::HostRes( Msg * msg){ read( msg);}
+
 HostRes::~HostRes()
 {
     for( unsigned i = 0; i < custom.size(); i++) if( custom[i]) delete custom[i];
@@ -396,6 +407,7 @@ void HostRes::copy( const HostRes & other)
     hdd_busy         = other.hdd_busy;
     net_recv_kbsec   = other.net_recv_kbsec;
     net_send_kbsec   = other.net_send_kbsec;
+    logged_in_users  = other.logged_in_users;
 
     if( custom.size() != other.custom.size())
     {
@@ -439,6 +451,17 @@ void HostRes::jsonWrite( std::ostringstream & o_str) const
 	o_str << ",\n\"net_recv_kbsec\":" << net_recv_kbsec;
 	o_str << ",\n\"net_send_kbsec\":" << net_send_kbsec;
 
+	if( logged_in_users.size())
+	{
+		o_str << ",\n\"logged_in_users\":[";
+		for( int i = 0; i < logged_in_users.size(); i++)
+		{
+			if( i ) o_str << ",";
+			o_str << '\"' << af::strEscape( logged_in_users[i] ) << '\"';
+		}
+		o_str << ']';
+	}
+	
 	if( custom.size())
 	{
 		o_str << ",\n\"custom\":[";
@@ -483,6 +506,7 @@ void HostRes::v_readwrite( Msg * msg)
     rw_int8_t ( hdd_busy,         msg);
     rw_int32_t( net_recv_kbsec,   msg);
     rw_int32_t( net_send_kbsec,   msg);
+    rw_StringVect( logged_in_users, msg);
 
     uint8_t custom_count = uint8_t(custom.size());
 
@@ -524,6 +548,16 @@ void HostRes::v_generateInfoStream( std::ostringstream & stream, bool full) cons
         stream << "\n   Network: Recieved " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
         stream << "\n   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
         stream << "\n   HDD: " << hdd_total_gb << " Gb / " << hdd_free_gb  << " Gb free";
+        
+        if( logged_in_users.size())
+		{
+			stream << ",\n   Logged in users = ";
+			for( int i = 0; i < logged_in_users.size(); i++)
+			{
+				if( i ) stream << ",";
+				stream << af::strEscape( logged_in_users[i] );
+			}
+		}
     }
     else
     {

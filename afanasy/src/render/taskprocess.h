@@ -11,11 +11,12 @@
 #include "../libafanasy/taskexec.h"
 
 class ParserHost;
+class RenderHost;
 
 class TaskProcess
 {
 public:
-	TaskProcess( af::TaskExec * i_taskExec);
+	TaskProcess( af::TaskExec * i_taskExec, RenderHost * i_render);
 	~TaskProcess();
 
 	inline bool is( int i_jobId) const
@@ -28,31 +29,39 @@ public:
 		          ( m_taskexec->getNumber()   == i_Number   ));}
 
 	inline bool is( const af::MCTaskPos & i_taskpos) const
-		{ return is( i_taskpos.getJobId(), i_taskpos.getNumBlock(), i_taskpos.getNumTask(), i_taskpos.getNumber());}
+		{ return is( i_taskpos.getJobId(), i_taskpos.getBlockNum(), i_taskpos.getTaskNum(), i_taskpos.getNumber());}
 
-	void getOutput( af::Msg * o_msg) const;
+	const std::string getOutput() const;
 
 	void refresh();
 	void stop();
 	void close();
 
-	inline bool isZombie() const { return m_zombie;}
+	inline bool isRunning() const { return m_pid != 0;}
+	inline bool isClosed()  const { return m_closed;}
+	inline bool isZombie()  const { return m_zombie;}
 
-	inline bool    addListenAddress( const af::Address & i_addr) { return m_taskexec->addListenAddress(    i_addr);}
-	inline bool removeListenAddress( const af::Address & i_addr) { return m_taskexec->removeListenAddress( i_addr);}
+	af::TaskExec * getTaskExec() { return m_taskexec;}
 
-	const af::TaskExec * exec() { return m_taskexec;}
+	inline void listenOutput( bool i_subscribe) { m_taskexec->listenOutput( i_subscribe);}
+
+	const std::string generateInfoString( bool i_full = false) const;
+	void generateInfoStream( std::ostringstream & o_str, bool i_full = false) const;
+
+	friend std::ostream& operator<<( std::ostream& i_str, const TaskProcess * i_obj) { i_str << i_obj->generateInfoString(); return i_str; }
 
 private:
 	void launchCommand();
 	void sendTaskSate();
-	void readProcess( const std::string & i_mode, bool i_read_empty);
+	void readProcess( const std::string & i_mode);
 	void processFinished( int i_exitCode);
 	void killProcess();
 	void closeHandles();
 	void collectFiles( af::MCTaskUp & i_task_up);
 
 private:
+	RenderHost * m_render;
+
 	af::TaskExec * m_taskexec;
 	af::Service * m_service;
 	ParserHost * m_parser;
@@ -61,18 +70,26 @@ private:
 	std::vector<std::string> m_collected_files;
 	uint8_t m_update_status;
 	time_t m_stop_time;
+	bool m_closed;
 	bool m_zombie;
+
+	static long long ms_counter;
 	int m_dead_cycle;
-	static long long counter;
+	int m_cycle;
 
 	std::string m_cmd;
 	std::string m_wdir;
 	pid_t m_pid;
 
+	int m_commands_launched;
+
 	bool m_doing_post;
 	std::vector<std::string> m_post_cmds;
 
+	std::string m_listened;
+
 #ifdef WINNT
+	char * m_environ;
 	PROCESS_INFORMATION m_pinfo;
 	HANDLE m_hjob;
 	HANDLE m_io_output;
@@ -80,6 +97,7 @@ private:
 	HANDLE m_io_input;
 	int readPipe( HANDLE i_handle );
 #else
+	char ** m_environ;
 	FILE * m_io_output;
 	FILE * m_io_outerr;
 	FILE * m_io_input;

@@ -9,23 +9,27 @@ class ItemNode;
 
 class ModelNodes : public ModelItems
 {
-Q_OBJECT
+	Q_OBJECT
+
 public:
-   ModelNodes( QObject * parent);
-   virtual ~ModelNodes();
 
-   int addNode( ItemNode * node, int row = -1);
+	ModelNodes( QObject * parent);
 
-   int addNodeSorted( ItemNode * node, bool ascending);
+	virtual ~ModelNodes();
 
-   void sortnodes( const QList<ItemNode*> & itemstosort, bool ascending);
+	int addNode( ItemNode * node, int row = -1);
 
-   void sortnodes( bool ascending = true);
+	int addNodeSorted( ItemNode * node);
 
-   void sortMatch( const std::vector<int32_t> & i_list);
+	void sortnodes( const QList<ItemNode*> & itemstosort);
+
+	void sortnodes();
+
+	void sortMatch( const std::vector<int32_t> & i_list);
 
 signals:
-   void nodeAdded( ItemNode * node, const QModelIndex & index);
+
+	void nodeAdded( ItemNode * node, const QModelIndex & index);
 
 private:
 };

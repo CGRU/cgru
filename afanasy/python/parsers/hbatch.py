@@ -6,32 +6,38 @@ keyframe = 'RopNode.render: frame '
 
 
 class hbatch(parser.parser):
-	"""Houdini9.x batch
-	"""
+    """Houdini9.x batch
+    """
 
-	def __init__(self):
-		parser.parser.__init__(self)
-		self.firstframe = True
+    def __init__(self):
+        parser.parser.__init__(self)
+        self.firstframe = True
 
-	def do(self, data, mode):
-		"""Missing DocString
+        self.str_error = [
+            'No licenses could be found to run this application',
+            'Please check for a valid license server host']  
 
-		:param data:
-		:param mode:
-		:return:
-		"""
+        self.str_warning = [
+            'OpenCL Exception',
+            'Failed to create']
 
-		if data.find('No licenses could be found to run this application') != -1:
-			self.error = True
 
-		if data.find('Please check for a valid license server host') != -1:
-			self.error = True
+    def do(self, data, mode):
+        """Missing DocString
 
-		if data.find(keyframe) > -1:
-			if self.firstframe:
-				self.firstframe = False
-			else:
-				self.frame += 1
+        :param data:
+        :param mode:
+        :return:
+        """
 
-			self.percentframe = 0
-			self.calculate()
+        count = data.count(keyframe)
+        if count > 0:
+            if self.firstframe:
+                self.firstframe = False
+                count -= 1
+
+            if count > 0:
+                self.frame += count
+                self.percentframe = 0
+                self.calculate()
+

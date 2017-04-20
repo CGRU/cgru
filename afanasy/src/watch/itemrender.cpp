@@ -15,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 const int ItemRender::ms_HeightHost = 27;
 const int ItemRender::ms_HeightHostSmall = 12;
@@ -22,8 +23,8 @@ const int ItemRender::ms_HeightAnnotation = 14;
 const int ItemRender::ms_HeightTask = 15;
 const int ItemRender::ms_HeightOffline = 15;
 
-ItemRender::ItemRender( af::Render *render):
-	ItemNode( (af::Node*)render),
+ItemRender::ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf):
+	ItemNode( (af::Node*)i_render, i_ctrl_sf),
 	m_online( false),
 	m_taskstartfinishtime( 0),
 	m_plotCpu( 2),
@@ -86,7 +87,7 @@ ItemRender::ItemRender( af::Render *render):
 	m_plotIO.setLabelValue( 1000);
 	m_plotIO.setAutoScaleMaxBGC( 100000);
 
-	updateValues( render, 0);
+	updateValues( i_render, 0);
 }
 
 ItemRender::~ItemRender()
@@ -139,21 +140,21 @@ bool ItemRender::calcHeight()
 	return old_height == m_height;
 }
 
-void ItemRender::updateValues( af::Node *node, int type)
+void ItemRender::updateValues( af::Node * i_node, int i_type)
 {
-	af::Render * render = (af::Render*)node;
+	af::Render * render = (af::Render*)i_node;
 
-	switch( type )
+	switch( i_type )
 	{
 	case 0: // The item was just created
 	case af::Msg::TRendersList:
 	{
-		updateNodeValues( node);
+		updateNodeValues( i_node);
 
 		setHidden(  render->isHidden()  );
 		setOffline( render->isOffline() );
 
-	    m_version            = afqt::stoq( render->getVersion());
+	    m_engine             = afqt::stoq( render->getEngine());
 	    m_username           = afqt::stoq( render->getUserName());
 	    m_capacity           = render->getCapacity();
 	    m_maxtasks           = render->getMaxTasks();
@@ -167,7 +168,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		}
 
 		bool becameOnline = false;
-	    if(((m_online == false) && (render->isOnline())) || (type == 0))
+	    if(((m_online == false) && (render->isOnline())) || (i_type == 0))
 		{
 			becameOnline = true;
 	        m_update_counter = 0;
@@ -218,9 +219,10 @@ void ItemRender::updateValues( af::Node *node, int type)
 		deleteTasks();
 	        m_tasksusers.clear();
 	    m_tasks_users_counts.clear();
-	    m_tasks = render->getTasks();
+	    m_tasks = render->takeTasks();
 		QStringList tasks_users;
 		QList<int> tasks_counts;
+		m_elder_task_time = time(NULL);
 	    for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 		{
 	        m_tasksicons.push_back( Watch::getServiceIconSmall( QString::fromUtf8( (*it)->getServiceType().c_str())));
@@ -232,6 +234,10 @@ void ItemRender::updateValues( af::Node *node, int type)
 				tasks_users << tusr;
 				tasks_counts << 1;
 			}
+
+			// Find elder task just for sorting:
+			if((*it)->getTimeStart() < m_elder_task_time )
+				m_elder_task_time = (*it)->getTimeStart();
 		}
 		for( int i = 0; i < tasks_users.size(); i++)
 		{
@@ -243,7 +249,18 @@ void ItemRender::updateValues( af::Node *node, int type)
 	    m_dirty = render->isDirty();
 
 	    m_capacity_used = render->getCapacityUsed();
-	    m_capacity_usage = QString("%1/%2 (%3/%4)").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		if( Watch::isPadawan())
+		{
+		    m_capacity_usage = QString("Capacity: %1 of %2; Tasks: %3 of %4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		}
+		else if( Watch::isJedi())
+		{
+		    m_capacity_usage = QString("C:%1/%2 T:%3/%4").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		}
+		else
+		{
+		    m_capacity_usage = QString("%1/%2 (%3/%4)").arg( m_capacity_used).arg( m_capacity).arg( m_tasks.size()).arg( m_maxtasks);
+		}
 
 	    if( m_busy )
 		{
@@ -264,8 +281,17 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 	    m_NIMBY = render->isNIMBY();
 	    m_nimby = render->isNimby();
+		m_paused = render->isPaused();
 
-	    if( m_NIMBY )
+		if( m_paused )
+		{
+			 m_state = "(" + m_username + ")P";
+             if( m_NIMBY )
+                 m_state += "+N";
+             if( m_nimby )
+                 m_state += "+n";
+		}
+		else if( m_NIMBY )
 		{
 	         m_state = "(" + m_username + ")N";
 		}
@@ -353,7 +379,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 		break;
 	}
 	default:
-		AFERRAR("ItemRender::updateValues: Invalid type = [%s]\n", af::Msg::TNAMES[type]);
+		AFERRAR("ItemRender::updateValues: Invalid type = [%s]\n", af::Msg::TNAMES[i_type]);
 		return;
 	}
 
@@ -404,28 +430,19 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	int right_text_x = x + plot_x + allplots_w - 5;
 	int right_text_w = w - plot_x - allplots_w;
 
-	// Draw standart backgroud
-	drawBack( painter, option);
-
 	// Draw back with render state specific color (if it is not selected)
 	const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
 	if     ( m_online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
-	else if( m_NIMBY || m_nimby  ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
+	else if( m_paused ) itemColor = &(afqt::QEnvironment::clr_itemrenderpaused.c );
+	else if( m_NIMBY || m_nimby ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
 	else if( m_busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
-	if((option.state & QStyle::State_Selected) == false)
-		painter->fillRect( option.rect, *itemColor );
+
+	// Draw standart backgroud
+	drawBack( painter, option, itemColor, m_dirty ? &(afqt::QEnvironment::clr_error.c) : NULL);
 
 	QString offlineState_time = m_offlineState;
 	if( m_wol_operation_time > 0 )
 	    offlineState_time = m_offlineState + " " + afqt::stoq( af::time2strHMS( time(NULL) - m_wol_operation_time ));
-
-	if( m_dirty )
-	{
-		painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::NoBrush ));
-		painter->setPen( afqt::QEnvironment::clr_error.c);
-		painter->drawRect( x,y,w,h);
-	}
-
 
 	// Draw busy/idle bar:
 	if( m_online )
@@ -438,7 +455,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		long long curtime = time(0);
 		int bar_secs = curtime - m_idle_time;
 		int busy_secs = curtime - m_busy_time;
-		int max = af::Environment::getMonitorRenderIdleBarMax();
+		int max = af::Environment::getWatchRenderIdleBarMax();
 		painter->setBrush( QBrush( afqt::QEnvironment::clr_itemrenderoff.c, Qt::SolidPattern ));
 
 		if( m_host.m_wol_idlesleep_time > 0 )
@@ -487,7 +504,11 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	}
 	else
 	{
-	    if( m_NIMBY )
+		if( m_paused )
+		{
+			ann_state = "Paused" + ann_state;
+		}
+	    else if( m_NIMBY )
 		{
 			ann_state = "NIMBY" + ann_state;
 		}
@@ -505,14 +526,20 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 		QRect rect_center;
 	    painter->drawText( x+5, y, w-10, ms_HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
-	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    m_name + ' ' + m_version );
+	    painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), ms_HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    m_name + ' ' + m_engine);
 
 		// Print annonation at next line if display is not small
 	    if( false == m_annotation.isEmpty() && (ListRenders::getDisplaySize() != ListRenders::ESMallSize))
 	            painter->drawText( x+5, y+2, w-10, ms_HeightOffline-4 + ms_HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, m_annotation);
 
-		drawPost( painter, option);
 		return;
+	}
+	
+	QString users = "";
+	for (int i = 0 ; i < m_hres.logged_in_users.size() ; ++i)
+	{
+		if ( i ) users += ",";
+		users += QString::fromStdString(m_hres.logged_in_users[i]);
 	}
 
 	switch( ListRenders::getDisplaySize() )
@@ -520,7 +547,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	case ListRenders::ESMallSize:
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + m_version);
+	    painter->drawText( left_text_x, y+1, left_text_w, h, Qt::AlignVCenter | Qt::AlignLeft, m_name + ' ' + m_capacity_usage + ' ' + users + ' ' + m_engine);
 
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -530,7 +557,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 	default:
 		painter->setPen(   clrTextMain( option) );
 		painter->setFont(  afqt::QEnvironment::f_name);
-	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_version);
+	    painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, m_name + ' ' + m_engine);
 
 		painter->setPen(   afqt::QEnvironment::qclr_black );
 		painter->setFont(  afqt::QEnvironment::f_info);
@@ -538,9 +565,9 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 		painter->setPen(   clrTextInfo( option) );
 		painter->setFont(  afqt::QEnvironment::f_info);
-	    painter->drawText( left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage);
+	    painter->drawText( left_text_x,  y, left_text_w,  base_height+2, Qt::AlignBottom | Qt::AlignLeft,  m_capacity_usage + ' ' + users);
 	}
-
+	
 	// Print Bottom|Right
 	// busy/free time for big displays or annotation+users for normal
 	switch( ListRenders::getDisplaySize() )
@@ -681,76 +708,113 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 		painter->setPen( afqt::QEnvironment::clr_star.c);
 		painter->drawText( x, y, w, h, Qt::AlignCenter, offlineState_time);
 	}
-
-	drawPost( painter, option);
 }
 
-bool ItemRender::setSortType(   int type )
+void ItemRender::setSortType( int i_type1, int i_type2 )
 {
 	resetSorting();
-	switch( type )
+
+	switch( i_type1 )
 	{
 		case CtrlSortFilter::TNONE:
-			return false;
+			break;
 		case CtrlSortFilter::TPRIORITY:
-	        sort_int = m_priority;
+	        m_sort_int1 = m_priority;
 			break;
 		case CtrlSortFilter::TCAPACITY:
-	        sort_int = m_capacity;
+	        m_sort_int1 = m_capacity;
+			break;
+		case CtrlSortFilter::TELDERTASKTIME:
+	        m_sort_int1 = m_elder_task_time;
 			break;
 		case CtrlSortFilter::TTIMELAUNCHED:
-	        sort_int = m_time_launched;
+	        m_sort_int1 = m_time_launched;
 			break;
 		case CtrlSortFilter::TTIMEREGISTERED:
-	        sort_int = m_time_registered;
+	        m_sort_int1 = m_time_registered;
 			break;
 		case CtrlSortFilter::TNAME:
-			sort_str = m_name;
+			m_sort_str1 = m_name;
 			break;
 		case CtrlSortFilter::TUSERNAME:
-	        sort_str = m_username;
+	        m_sort_str1 = m_username;
 			break;
 		case CtrlSortFilter::TTASKUSER:
-	        sort_str = m_tasksusers;
+	        m_sort_str1 = m_tasksusers;
 			break;
-		case CtrlSortFilter::TVERSION:
-	        sort_str = m_version;
+		case CtrlSortFilter::TENGINE:
+	        m_sort_str1 = m_engine;
 			break;
 		case CtrlSortFilter::TADDRESS:
-	        sort_str = m_address_str;
+	        m_sort_str1 = m_address_str;
 			break;
 		default:
-			AFERRAR("ItemRender::setSortType: Invalid type number = %d", type);
-			return false;
+			AF_ERR << "Invalid type1 number = " << i_type1;
 	}
-	return true;
-}
 
-bool ItemRender::setFilterType( int type )
-{
-	resetFiltering();
-	switch( type )
+	switch( i_type2 )
 	{
 		case CtrlSortFilter::TNONE:
-			return false;
+			break;
+		case CtrlSortFilter::TPRIORITY:
+	        m_sort_int2 = m_priority;
+			break;
+		case CtrlSortFilter::TCAPACITY:
+	        m_sort_int2 = m_capacity;
+			break;
+		case CtrlSortFilter::TELDERTASKTIME:
+	        m_sort_int2 = m_elder_task_time;
+			break;
+		case CtrlSortFilter::TTIMELAUNCHED:
+	        m_sort_int2 = m_time_launched;
+			break;
+		case CtrlSortFilter::TTIMEREGISTERED:
+	        m_sort_int2 = m_time_registered;
+			break;
 		case CtrlSortFilter::TNAME:
-			filter_str = m_name;
+			m_sort_str2 = m_name;
 			break;
 		case CtrlSortFilter::TUSERNAME:
-	        filter_str = m_username;
+	        m_sort_str2 = m_username;
 			break;
 		case CtrlSortFilter::TTASKUSER:
-	        filter_str = m_tasksusers;
+	        m_sort_str2 = m_tasksusers;
 			break;
-		case CtrlSortFilter::TVERSION:
-	        filter_str = m_version;
+		case CtrlSortFilter::TENGINE:
+	        m_sort_str2 = m_engine;
 			break;
 		case CtrlSortFilter::TADDRESS:
-	        filter_str = m_address_str;
+	        m_sort_str2 = m_address_str;
 			break;
 		default:
-			AFERRAR("ItemRender::setFilterType: Invalid type number = %d", type)
-			return false;
+			AF_ERR << "Invalid type2 number = " << i_type2;
 	}
-	return true;
+}
+
+void ItemRender::setFilterType( int i_type )
+{
+	resetFiltering();
+
+	switch( i_type )
+	{
+		case CtrlSortFilter::TNONE:
+			break;
+		case CtrlSortFilter::TNAME:
+			m_filter_str = afqt::qtos( m_name);
+			break;
+		case CtrlSortFilter::TUSERNAME:
+	        m_filter_str = afqt::qtos( m_username);
+			break;
+		case CtrlSortFilter::TTASKUSER:
+	        m_filter_str = afqt::qtos( m_tasksusers);
+			break;
+		case CtrlSortFilter::TENGINE:
+	        m_filter_str = afqt::qtos( m_engine);
+			break;
+		case CtrlSortFilter::TADDRESS:
+	        m_filter_str = afqt::qtos( m_address_str);
+			break;
+		default:
+			AF_ERR << "Invalid type number = " << i_type;
+	}
 }

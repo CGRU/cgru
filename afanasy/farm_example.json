@@ -11,12 +11,29 @@
 		"":"if you drop maxhosts or maxcount paramter it will be '-1'",
 		"":"-1 means no limit",
 
+	"pools":[
+		{
+			"name":"local",
+			"pools":[
+				{"name":"aux"},
+				{"name":"blender"},
+				{"name":"natron"}
+			]
+		},{
+			"name":"remote",
+			"pools":[
+				{"name":"blender"},
+				{"name":"natron"}
+			]
+		}
+	],
+
 	"patterns":[
 	{
 		"name":"Some Host",
 		"mask":".*",
 			"":"Mask '.*' will match any render name. So here defined some default settings for any host.",
-
+		"pool":"local",
 		"description":"Default machine",
 		"capacity":1100,
 		"maxtasks":10,
@@ -33,8 +50,8 @@
 		"nimby_busy_hddio": 95,
 		"-nimby_idle_netmbs": 10,
 		"-nimby_busy_netmbs": 100,
-		"nimby_idlefree_time": 1800,
-		"nimby_busyfree_time": 30,
+		"-nimby_idlefree_time": 1800,
+		"-nimby_busyfree_time": 30,
 
 		"services":[
 			{"name":"arch"},
@@ -47,20 +64,27 @@
 			{"name":"wakeonlan"},
 			{"name":"walk","count":1},
 
+			{"name":"test"},
+
 			{"name":"afterfx"},
 			{"name":"arnold"},
 			{"name":"blender"},
 			{"name":"c4d"},
+			{"name":"clarisse"},
+			{"name":"ffmpeg"},
 			{"name":"fusion"},
 			{"name":"hbatch"},
 			{"name":"hbatch_prman"},
 			{"name":"hbatch_mantra"},
+			{"name":"houdinitoarnold"},
+			{"name":"htracker"},
 			{"name":"mantra"},
 			{"name":"max"},
 			{"name":"maya"},
 			{"name":"maya_delight"},
 			{"name":"maya_mental"},
 			{"name":"maya_arnold"},
+			{"name":"maya_redshift"},
 			{"name":"mayatoarnold"},
 			{"name":"mayatomr"},
 			{"name":"mayatovray"},
@@ -72,6 +96,9 @@
 			{"name":"shake"},
 			{"name":"vray"},
 			{"name":"xsi"},
+			{"name":"xsi_arnold"},
+			{"name":"xsi_arnold_watermarked"},
+			{"name":"xsi_redshift"},
 			{"name":"yafray"}
 		],
 
@@ -83,6 +110,7 @@
 
 		"name":"Linux Render",
 		"mask":"linux_render.*",
+		"pool":"local",
 		"description":"Linux render farm machine.",
 		"capacity":10000,
 		"maxtasks":100,
@@ -94,6 +122,7 @@
 
 		"name":"Server",
 		"mask":"server.*|srv.*",
+		"pool":"local/aux",
 		"description":"Captain.",
 		"capacity":1100,
 		"maxtasks":2,

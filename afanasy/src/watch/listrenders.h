@@ -3,6 +3,7 @@
 #include "listnodes.h"
 
 #include "../libafanasy/msg.h"
+#include "../libafanasy/taskexec.h"
 
 class QItemSelection;
 
@@ -14,8 +15,11 @@ public:
 	ListRenders( QWidget* parent);
 	~ListRenders();
 
-	bool caseMessage( af::Msg * msg);
-	ItemNode* createNewItem( af::Node *node);
+	bool v_caseMessage( af::Msg * msg);
+
+	ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed);
+
+	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
 protected:
 	void contextMenuEvent( QContextMenuEvent *event);
@@ -48,11 +52,14 @@ private slots:
 	void actRequestLog();
 	void actRequestTasksLog();
 	void actRequestInfo();
+	void actRequestTaskInfo(int jid, int bnum, int tnum);
 	void actEnableService();
 	void actDisableService();
 	void actRestoreDefaults();
-	void actSetHidden();
-	void actUnsetHidden();
+	void actSetPaused();
+	void actUnsetPaused();
+	void actLaunchCmd();
+	void actLaunchCmdExit();
 
 	void actEjectTasks();
 	void actEjectNotMyTasks();
@@ -73,16 +80,19 @@ private:
 
 private:
 	void setService( bool enable);
+	void launchCmdExit( bool i_exit);
 	void calcTitle();
 	void setSpacing();
 
 private:
 	static EDisplaySize ms_displaysize;
 
-	static int     SortType;
-	static bool    SortAscending;
-	static QString FilterString;
-	static int     FilterType;
-	static bool    FilterInclude;
-	static bool    FilterMatch;
+	static int     ms_SortType1;
+	static int     ms_SortType2;
+	static bool    ms_SortAscending1;
+	static bool    ms_SortAscending2;
+	static int     ms_FilterType;
+	static bool    ms_FilterInclude;
+	static bool    ms_FilterMatch;
+	static std::string ms_FilterString;
 };

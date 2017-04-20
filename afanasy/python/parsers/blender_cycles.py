@@ -19,7 +19,7 @@ class blender_cycles(blender.blender):
 			# print( line)
 			ptpos = line.find(keypart)
 			if ptpos > 0:
-				parts = line[ptpos + len(keypart):].split('/')
+				parts = line[ptpos + len(keypart):].split(',')[0].split('/')
 				parts[1] = parts[1].split(',')[0]
 				if len(parts) == 2:
 					ok = True

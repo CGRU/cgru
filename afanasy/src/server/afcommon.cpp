@@ -20,11 +20,11 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-af::MsgQueue * AFCommon::MsgDispatchQueue_M = NULL;
-af::MsgQueue * AFCommon::MsgDispatchQueue_T = NULL;
-FileQueue    * AFCommon::FileWriteQueue = NULL;
-DBQueue      * AFCommon::ms_DBQueue     = NULL;
-LogQueue     * AFCommon::OutputLogQueue = NULL;
+Store * AFCommon::ms_store = NULL;
+
+FileQueue * AFCommon::FileWriteQueue = NULL;
+DBQueue   * AFCommon::ms_DBQueue     = NULL;
+LogQueue  * AFCommon::OutputLogQueue = NULL;
 
 /*
    This ctor will start the various job queues. Note that threads
@@ -32,18 +32,16 @@ LogQueue     * AFCommon::OutputLogQueue = NULL;
 */
 AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
-	MsgDispatchQueue_M = new af::MsgQueue("Send messages for Monitors", af::AfQueue::e_start_thread);
-	MsgDispatchQueue_T = new af::MsgQueue("Send messages for Talks", af::AfQueue::e_start_thread);
 	FileWriteQueue = new FileQueue("Writing Files");
 	OutputLogQueue = new LogQueue("Log Output");
 	ms_DBQueue     = new DBQueue("AFDB_update", i_threadArgs->monitors);
+
+	ms_store = new Store();
 }
 
 AFCommon::~AFCommon()
 {
 	delete FileWriteQueue;
-	delete MsgDispatchQueue_T;
-	delete MsgDispatchQueue_M;
 	delete OutputLogQueue;
 	delete ms_DBQueue;
 }
@@ -96,18 +94,18 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			if( false == af::pathIsFolder( thousand_dir)) continue;
 
 			HANDLE job_dir_handle;
-			WIN32_FIND_DATA job_dir_data;
-			if(( job_dir_handle = FindFirstFile(( thousand_dir + "\\*").c_str(), &job_dir_data)) != INVALID_HANDLE_VALUE)
+			WIN32_FIND_DATA node_dir_data;
+			if(( job_dir_handle = FindFirstFile(( thousand_dir + "\\*").c_str(), &node_dir_data)) != INVALID_HANDLE_VALUE)
 			{
 				do
 				{
-					std::string job_dir( job_dir_data.cFileName);
+					std::string job_dir( node_dir_data.cFileName);
 					if( job_dir.find('.') == 0 ) continue;
 					job_dir = thousand_dir + '\\' + job_dir;
 					if( false == af::pathIsFolder( job_dir)) continue;
 					o_folders.push_back( job_dir);
 				}
-				while ( FindNextFile( job_dir_handle, &job_dir_data));
+				while ( FindNextFile( job_dir_handle, &node_dir_data));
 
 				FindClose( job_dir_handle);
 			}
@@ -128,7 +126,6 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 
 #else
 
-	struct dirent * thousand_dir_data = NULL;
 	DIR * thousand_dir_handle = opendir( i_root.c_str());
 	if( thousand_dir_handle == NULL)
 	{
@@ -136,13 +133,29 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 		return o_folders;
 	}
 
-	while( thousand_dir_data = readdir( thousand_dir_handle))
+	struct dirent thousand_dir_data;
+	struct dirent * thousand_dir_ptr = NULL;
+
+	struct dirent node_dir_data;
+	struct dirent * node_dir_ptr = NULL;
+
+	for(;;)
 	{
-		if( thousand_dir_data->d_name[0] == '.' ) continue;
-		std::string thousand_dir = i_root + '/' + thousand_dir_data->d_name;
+		int error = readdir_r( thousand_dir_handle, &thousand_dir_data, &thousand_dir_ptr);
+		if( error != 0 )
+		{
+			AFERRPE("JobContainer::getStoredIds: readdir_r:")
+			return o_folders;
+		}
+
+		// The end of directory:
+		if( NULL == thousand_dir_ptr )
+			break;
+
+		if( thousand_dir_ptr->d_name[0] == '.' ) continue;
+		std::string thousand_dir = i_root + '/' + thousand_dir_ptr->d_name;
 		if( false == af::pathIsFolder( thousand_dir )) continue;
 
-		struct dirent * job_dir_data = NULL;
 		DIR * job_dir_handle = opendir( thousand_dir.c_str());
 		if( job_dir_handle == NULL)
 		{
@@ -150,10 +163,21 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			return o_folders;
 		}
 
-		while( job_dir_data = readdir( job_dir_handle))
+		for(;;)
 		{
-			if( job_dir_data->d_name[0] == '.' ) continue;
-			std::string job_dir( thousand_dir + '/' + job_dir_data->d_name);
+			int error = readdir_r( job_dir_handle, &node_dir_data, &node_dir_ptr);
+			if( error != 0 )
+			{
+				AFERRPE("JobContainer::getStoredIds: readdir_r:")
+				return o_folders;
+			}
+
+			// The end of directory:
+			if( NULL == node_dir_ptr )
+				break;
+
+			if( node_dir_ptr->d_name[0] == '.' ) continue;
+			std::string job_dir( thousand_dir + '/' + node_dir_ptr->d_name);
 			if( false == af::pathIsFolder( job_dir)) continue;
 			o_folders.push_back( job_dir);
 		}
@@ -199,14 +223,17 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 		QueueLogError("AFCommon::writeFile: File name is empty.");
 		return false;
 	}
+
+	std::string filetemp = filename + ".tmp";
+
 	#ifdef WINNT
-	int fd = _open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
+	int fd = _open( filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
 	#else
-	int fd = open( filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	int fd = open( filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	#endif
 	if( fd == -1 )
 	{
-		QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
+		QueueLogErrno( std::string("AFCommon::writeFile: ") + filetemp);
 		return false;
 	}
 	int bytes = 0;
@@ -215,7 +242,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 		int written = write( fd, data+bytes, length-bytes);
 		if( written == -1 )
 		{
-			QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
+			QueueLogErrno( std::string("AFCommon::writeFile: ") + filetemp);
 			close( fd);
 			return false;
 		}
@@ -224,10 +251,12 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 
 	close( fd);
 
-	/* FIXME: do we need this chmod() ? If so, in what case ? */
-	chmod( filename.c_str(), 0644);
+	rename( filetemp.c_str(), filename.c_str());
 
-	// AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
+	/* FIXME: do we need this chmod() ? If so, in what case ? */
+	// chmod( filename.c_str(), 0644);
+
 	AFINFA("AFCommon::writeFile - \"%s\"", filename.c_str())
 	return true;
 }
+

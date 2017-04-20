@@ -2,7 +2,7 @@
 
 #include "../libafqt/qenvironment.h"
 
-#include <QtGui/QAction>
+#include <QAction>
 
 class ActionId : public QAction
 {

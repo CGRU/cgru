@@ -37,15 +37,9 @@ public:
 	/// Generate MCJobs message for users with provided names:
 	af::Msg * generateJobsList( const std::vector<std::string> & i_names, const std::string & i_type_name, bool i_json = false);
 
-	/// Generate task for \c render , return \c true on success.
-	bool solve( RenderAf *render, MonitorContainer * monitoring);
-
 	UserAf * getUser( const std::string & i_name );
 	void updateTimeActivity( const std::string & i_name );
 	void logAction( const Action & i_action, const std::string & i_node_name);
-
-private:
-	AfList m_userslist; ///< Users list.
 };
 
 //########################## Iterator ##############################

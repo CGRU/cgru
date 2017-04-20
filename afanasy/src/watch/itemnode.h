@@ -5,46 +5,35 @@
 
 #include "../libafanasy/afnode.h"
 
+class CtrlSortFilter;
 class MainWidget;
 
 class ItemNode : public Item
 {
 public:
-	ItemNode( af::Node *node);
+	ItemNode( af::Node * i_node, const CtrlSortFilter * i_ctrl_sf);
 	virtual ~ItemNode();
 
 	virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-	virtual inline const QVariant getToolTip() const { return tooltip;}
+	virtual inline const QVariant getToolTip() const { return m_tooltip;}
 
-	virtual void updateValues( af::Node *node, int type) = 0;   ///< Update ItemNode attributes ( copy them from given node).
+	/// Update ItemNode attributes ( copy them from given node).
+	virtual void updateValues( af::Node *node, int type) = 0;
 
-	inline bool operator >  ( const ItemNode &other) const { return compare( other, GREATER       );}
-	inline bool operator >= ( const ItemNode &other) const { return compare( other, GREATEREQUAL  );}
-	inline bool operator <  ( const ItemNode &other) const { return compare( other, SMALLER       );}
-	inline bool operator <= ( const ItemNode &other) const { return compare( other, SMALLEREQUAL  );}
-	inline bool operator == ( const ItemNode &other) const { return compare( other, EQUAL         );}
-	inline bool operator != ( const ItemNode &other) const { return compare( other, NOTEQUAL      );}
+	virtual void setSortType(   int i_type1, int i_type2 ) = 0;
+	virtual void setFilterType( int i_type ) = 0;
 
-	virtual bool setSortType(   int type ) = 0;
-	virtual bool setFilterType( int type ) = 0;
+	inline void resetSorting()   { m_sort_int1 = 0; m_sort_int2 = 0; m_sort_str1.clear(); m_sort_str2.clear(); }
+	inline void resetFiltering() { m_filter_str.clear(); }
 
-	inline void resetSorting()   { sort_int = 0; sort_str.clear(); }
-	inline void resetFiltering() { filter_str.clear(); }
-	bool filter( const QRegExp & regexp, const bool & filtermatch);
+	bool compare( const ItemNode & i_other) const;
+	bool filter();
 
-	bool compare( const ItemNode & other, int operation) const;
-	enum COP{
-	   GREATER,
-	   GREATEREQUAL,
-	   SMALLER,
-	   SMALLEREQUAL,
-	   EQUAL,
-	   NOTEQUAL
-	};
-
-	inline const long long & getSortInt() const { return sort_int; }
-	inline const QString   & getSortStr() const { return sort_str; }
+	inline const long long & getSortInt1() const { return m_sort_int1; }
+	inline const long long & getSortInt2() const { return m_sort_int2; }
+	inline const QString   & getSortStr1() const { return m_sort_str1; }
+	inline const QString   & getSortStr2() const { return m_sort_str2; }
 
 	inline void setHidden(  bool i_value)
 		{ if( i_value ) m_flagshidden |= ListNodes::e_HideHidden;  else m_flagshidden &= ~ListNodes::e_HideHidden;  }
@@ -62,14 +51,18 @@ public:
 	QString m_custom_data;
 
 protected:
-	QString tooltip;
+	QString m_tooltip;
 
-	long long sort_int;    ///< For sorting by some number
-	QString  sort_str;     ///< For sorting by some string
-	QString  filter_str;   ///< For filtering by some string
+	long long m_sort_int1;    ///< For sorting by some number
+	long long m_sort_int2;    ///< For sorting by some number
+	QString  m_sort_str1;     ///< For sorting by some string
+	QString  m_sort_str2;     ///< For sorting by some string
+	std::string m_filter_str; ///< For filtering by some string
 
 	void updateNodeValues( const af::Node * i_node);
 
 private:
 	int32_t m_flagshidden;
+
+	const CtrlSortFilter * m_ctrl_sf;
 };

@@ -286,7 +286,7 @@ function p_Action( i_objects, i_action, i_id_before)
 	else if( i_action == 'del')
 	{
 		obj.objects = i_objects;
-		obj.delobj = true;
+		obj.delarray = 'playlist';
 	}
 	else if( i_action == 'rename')
 	{
@@ -349,6 +349,9 @@ function p_Read( i_playlist, i_params, i_elParent)
 
 	for( var i = 0; i < i_playlist.length; i++)
 	{
+		if( i_playlist[i] == null )
+			continue;
+
 		var el = null;
 		if( i_playlist[i].playlist )
 		{

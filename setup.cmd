@@ -1,7 +1,10 @@
 @echo off
 
 rem Set CGRU root:
-SET CGRU_LOCATION=%CD%
+SET "CGRU_LOCATION=%CD%"
+
+rem Add libraries to path:
+SET "PATH=%CGRU_LOCATION%\dll;%PATH%"
 
 rem Add CGRU bin to path:
 SET "PATH=%CGRU_LOCATION%\bin;%PATH%"
@@ -10,11 +13,11 @@ rem Add software to PATH:
 SET "PATH=%CGRU_LOCATION%\software_setup\bin;%PATH%"
 
 rem Python module path:
-SET CGRU_PYTHON=%CGRU_LOCATION%\lib\python
+SET "CGRU_PYTHON=%CGRU_LOCATION%\lib\python"
 if defined PYTHONPATH (
-   SET PYTHONPATH=%CGRU_PYTHON%;%PYTHONPATH%
+   SET "PYTHONPATH=%CGRU_PYTHON%;%PYTHONPATH%"
 ) else (
-   SET PYTHONPATH=%CGRU_PYTHON%
+   SET "PYTHONPATH=%CGRU_PYTHON%"
 )
 
 rem Get CGRU version:

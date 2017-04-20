@@ -1,0 +1,96 @@
+version: "2"
+
+# afcommon:
+#  build: ../afcommon/.
+
+services:
+ # rules:
+ #  build: ../rules/.
+ #  ports:
+ #   - "50000:80"
+ #  volumes:
+ #   - rules_root:/opt/cgru/rules_root
+
+ afserver-2.0.8-ubuntu-14.04:
+  build: ../afserver/2.0.8-ubuntu-14.04/.
+  ports:
+   - "52084:51000"
+
+ afrender-2.0.8-ubuntu-14.04:
+  build: ../afrender/2.0.8-ubuntu-14.04/.
+  links:
+   - afserver-2.0.8-ubuntu-14.04
+  environment:
+   AF_SERVERNAME: "cgru_afserver-2.0.8-ubuntu-14.04_1"
+
+ afserver-2.1.0-ubuntu-14.04:
+  build: ../afserver/2.1.0-ubuntu-14.04/.
+  ports:
+   - "52104:51000"
+
+ afrender-2.1.0-ubuntu-14.04:
+  build: ../afrender/2.1.0-ubuntu-14.04/.
+  links:
+   - afserver-2.1.0-ubuntu-14.04
+  environment:
+   AF_SERVERNAME: "cgru_afserver-2.1.0-ubuntu-14.04_1"
+
+ afserver-2.1.0-ubuntu-16.04:
+  build: ../afserver/2.1.0-ubuntu-16.04/.
+  ports:
+   - "52106:51000"
+
+ afrender-2.1.0-ubuntu-16.04:
+  build: ../afrender/2.1.0-ubuntu-16.04/.
+  links:
+   - afserver-2.1.0-ubuntu-16.04
+  environment:
+   AF_SERVERNAME: "cgru_afserver-2.1.0-ubuntu-16.04_1"
+
+ afserver-2.2.1-ubuntu-14.04:
+  build: ../afserver/2.2.1-ubuntu-14.04/.
+  ports:
+   - "52214:51000"
+
+ afrender-2.2.1-ubuntu-14.04:
+  build: ../afrender/2.2.1-ubuntu-14.04/.
+  links:
+   - afserver-2.2.1-ubuntu-14.04
+  environment:
+   AF_SERVERNAME: "cgru_afserver-2.2.1-ubuntu-14.04_1"
+
+ afserver-2.2.1-ubuntu-16.04:
+  build: ../afserver/2.2.1-ubuntu-16.04/.
+  ports:
+   - "52216:51000"
+
+ afrender-2.2.1-ubuntu-16.04:
+  build: ../afrender/2.2.1-ubuntu-16.04/.
+  links:
+   - afserver-2.2.1-ubuntu-16.04
+  environment:
+   AF_SERVERNAME: "cgru_afserver-2.2.1-ubuntu-16.04_1"
+
+ db:
+  image: postgres:9.5
+  environment:
+   POSTGRES_USER: afadmin
+   POSTGRES_PASSWORD: AfPassword
+   POSTGRES_DB: afanasy
+
+ phppgadmin:
+  image: zhajor/docker-phppgadmin
+  ports:
+   - "58080:80"
+  environment:
+   DB_HOST: db
+   DB_PORT: 5432
+ 
+ afstatistics:
+  build: ../afstatistics/.
+  ports:
+   - "50080:80"
+
+volumes:
+ rules_root:
+  driver: 'local'

@@ -13,8 +13,9 @@
 		"":"Digest authentication realm",
 	"realm":"CGRU",
 
-	"":"To open shot in RULES:",
-	"rules_url":"http://localhost/cgru/#/",
+	"":"To open location/shot in RULES:",
+	"-rules_url":"http://localhost/cgru/#/",
+		"":"By default it is disabled",
 
 	"projects_root":["/mnt/prj/","/projects/","/cgru/rules_root/"],
 
@@ -22,9 +23,19 @@
 
 	"open_folder_cmd":"open \"@PATH@\"",
 
-	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],
+	"previewcmds":[
+		"Nuke|nuke -v \"@ARG@\"",
+		"Mplay|mplay \"@ARG@\"",
+		"IMDisplay|display \"@ARG@\"",
+		"XTerm Folder|cd `dirname @ARG@` && xterm"
+    ],
+    "annotations":[
+        "APPROVED",
+        "FAILED"
+    ],
 
-	"docs_host":"cgru.info",
+	"docs_url":"http://cgru.info",
+	"forum_url":"http://forum.cgru.info",
 
 	"":"Configure SMTP server to send emails from",
 	"email_smtp_server":"localhost",
@@ -37,6 +48,7 @@
 	"email_sender_address_host":"cgru.info",
 
 	"keeper_port":50999,
+	"keeper_port_https":50443,
 
 	"timeformat":"%a %d %b %H:%M.%S",
 		"":"'strftime' function format http://www.cplusplus.com/reference/clibrary/ctime/strftime",
@@ -49,7 +61,7 @@
 		"cmd_shell":"/bin/sh -c"
 	},
 	"OS_windows":{
-		"open_folder_cmd":"start @PATH@",
+		"open_folder_cmd":"explorer \"@PATH@\"",
 		"cmd_shell":"cmd.exe /c",
 
 			"":"This is a paths map example (disabled)",

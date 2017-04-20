@@ -72,10 +72,12 @@ function Status( i_obj, i_args)
 		this.elEditBtn     = $('status_edit_btn');
 		this.elColor       = $('status');
 		this.elAnnotation  = $('status_annotation');
+		this.elAdinfo      = $('status_adinfo');
 		this.elProgress    = $('status_progress');
 		this.elProgressBar = $('status_progressbar');
 		this.elPercentage  = $('status_percentage');
 		this.elArtists     = $('status_artists');
+		this.elFlags       = $('status_flags');
 		this.elTags        = $('status_tags');
 		this.elFramesNum   = $('status_framesnum');
 		this.elFinish      = $('status_finish');
@@ -112,6 +114,7 @@ Status.prototype.show = function( i_status)
 	if( this.elAnnotation ) st_SetElAnnotation( this.obj, this.elAnnotation);
 	if( this.elProgress   ) st_SetElProgress(   this.obj, this.elProgressBar, this.elProgress, this.elPercentage);
 	if( this.elArtists    ) st_SetElArtists(    this.obj, this.elArtists);
+	if( this.elFlags      ) st_SetElFlags(      this.obj, this.elFlags);
 	if( this.elTags       ) st_SetElTags(       this.obj, this.elTags);
 	if( this.elFramesNum  ) st_SetElFramesNum(  this.obj, this.elFramesNum);
 	if( this.elFinish     ) st_SetElFinish(     this.obj, this.elFinish);
@@ -129,6 +132,20 @@ Status.prototype.show = function( i_status)
 			if( modified != '' ) modified = 'Modified' + modified;
 		}
 		this.elModified.textContent = modified;
+	}
+
+	if( this.elAdinfo )
+	{
+		if( g_admin && this.obj && this.obj.adinfo )
+		{
+			this.elAdinfo.textContent = atob( this.obj.adinfo);
+			this.elAdinfo.style.display = 'block';
+		}
+		else
+		{
+			this.elAdinfo.textContent = '';
+			this.elAdinfo.style.display = 'none';
+		}
 	}
 
 	var args = {};
@@ -257,6 +274,22 @@ function st_SetElFramesNum( i_status, i_el, i_full)
 
 	i_el.textContent = num;
 }
+function st_SetElPrice( i_status, i_el)
+{
+	var price = '';
+	if( i_status && i_status.price )
+		price = i_status.price;
+
+	i_el.textContent = price;
+}
+function st_SetElDuration( i_status, i_el)
+{
+	var duration = '';
+	if( i_status && i_status.duration )
+		duration = i_status.duration;
+
+	i_el.textContent = duration;
+}
 function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
 function st_SetElText( i_status, i_el, i_field, i_full)
 {
@@ -316,6 +349,43 @@ function st_SetElArtists( i_status, i_el, i_short)
 		}
 	}
 }
+function st_SetElFlags( i_status, i_elFlags, i_short)
+{
+	if( i_short )
+	{
+		var flags = '';
+		if( i_status && i_status.flags )
+			for( var i = 0; i < i_status.flags.length; i++)
+			{
+				if( i ) flags += ' ';
+				flags += c_GetFlagShort( i_status.flags[i]);
+			}
+		i_elFlags.textContent = flags;
+		return;
+	}
+
+	if( i_elFlags.m_elFlags )
+		for( i = 0; i < i_elFlags.m_elFlags.length; i++ )
+			i_elFlags.removeChild( i_elFlags.m_elFlags[i]);
+	i_elFlags.m_elFlags = [];
+
+	if( i_status && i_status.flags )
+		for( var i = 0; i < i_status.flags.length; i++)
+		{
+			var el = document.createElement('div');
+			i_elFlags.appendChild( el);
+			i_elFlags.m_elFlags.push( el);
+			el.classList.add('flag');
+			el.textContent = c_GetFlagTitle( i_status.flags[i]);
+			el.title = c_GetFlagTip( i_status.flags[i]);
+
+			var clr = null;
+			if( RULES.flags[i_status.flags[i]] && RULES.flags[i_status.flags[i]].clr )
+				clr = RULES.flags[i_status.flags[i]].clr;
+			if( clr )
+				st_SetElColor({"color":clr}, el);
+		}
+}
 function st_SetElTags( i_status, i_elTags, i_short)
 {
 	if( i_short )
@@ -352,9 +422,20 @@ function st_SetElColor( i_status, i_elBack, i_elColor, i_setNone)
 	if( i_elColor == null ) i_elColor = i_elBack;
 	if( i_setNone == null ) i_setNone = true;
 
+	var c = null;
 	if( i_status && i_status.color)
 	{
-		var c = i_status.color;
+		c = i_status.color;
+	}
+	else if( i_status && i_status.flags && i_status.flags.length )
+	{
+		var flag = i_status.flags[i_status.flags.length-1];
+		if( RULES.flags[flag] && RULES.flags[flag].clr )
+			c = RULES.flags[flag].clr;
+	}
+
+	if( c )
+	{ 
 		i_elBack.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
 		if( c[0]+c[1]+.3*c[2] > 300 )
 			i_elColor.style.color = '#000';
@@ -436,7 +517,7 @@ Status.prototype.edit = function( i_args)
 
 	var elBtns = document.createElement('div');
 	this.elEdit.appendChild( elBtns);
-	elBtns.style.cssFloat = 'right';
+	elBtns.classList.add('buttons_div');
 
 	var elBtnCancel = document.createElement('div');
 	elBtns.appendChild( elBtnCancel);
@@ -453,58 +534,61 @@ Status.prototype.edit = function( i_args)
 	elBtnSave.m_args = i_args;
 	elBtnSave.onclick = function(e){e.currentTarget.m_status.editSave( i_args);};
 
+	var elDiv = document.createElement('div');
+	this.elEdit.appendChild(elDiv);
+	elDiv.classList.add('status_edit_div');
+
 	var elFinishDiv = document.createElement('div');
-	this.elEdit.appendChild( elFinishDiv);
-	elFinishDiv.style.cssFloat = 'right';
-	elFinishDiv.style.width = '200px';
-	elFinishDiv.style.textAlign = 'center';
-	elFinishDiv.style.marginLeft = '10px';
+	elDiv.appendChild( elFinishDiv);
+	elFinishDiv.classList.add('finish_div');
 	var elFinishLabel = document.createElement('div');
 	elFinishDiv.appendChild( elFinishLabel);
-	elFinishLabel.style.cssFloat = 'left';
-	elFinishLabel.textContent = 'Finish:';
+	elFinishLabel.classList.add('label');
+	elFinishLabel.textContent = 'Fin:';
 	elFinishLabel.onclick  = function(e){ e.currentTarget.m_elEdit_finish.textContent = c_DT_FormStrNow();};
-	elFinishLabel.title = 'Double click to set current date.';
-	elFinishLabel.style.cursor = 'pointer';
+	elFinishLabel.title = 'Click to set current date.';
 	this.elEdit_finish = document.createElement('div');
 	elFinishDiv.appendChild( this.elEdit_finish);
 	this.elEdit_finish.classList.add('editing');
 	this.elEdit_finish.contentEditable = 'true';
 	elFinishLabel.m_elEdit_finish = this.elEdit_finish;
 
+	var elProgressDiv = document.createElement('div');
+	elDiv.appendChild( elProgressDiv);
+	elProgressDiv.classList.add('progress_div');
+	var elProgressLabel = document.createElement('div');
+	elProgressDiv.appendChild( elProgressLabel);
+	elProgressLabel.classList.add('label');
+	elProgressLabel.textContent = '%';
+	this.elEdit_progress = document.createElement('div');
+	elProgressDiv.appendChild( this.elEdit_progress);
+	this.elEdit_progress.contentEditable = 'true';
+	this.elEdit_progress.classList.add('editing');
+	this.elEdit_progress.onkeydown = function(e){ if( e.keyCode == 13 ) return false; };
+
 	var elAnnDiv = document.createElement('div');
-	this.elEdit.appendChild( elAnnDiv);
+	elDiv.appendChild( elAnnDiv);
+	elAnnDiv.classList.add('ann_div');
 	var elAnnLabel = document.createElement('div');
 	elAnnDiv.appendChild( elAnnLabel);
+	elAnnLabel.classList.add('label');
 	elAnnLabel.textContent = 'Annotation:';
-	elAnnLabel.style.cssFloat = 'left';
 	this.elEdit_annotation = document.createElement('div');
 	elAnnDiv.appendChild( this.elEdit_annotation);
 	this.elEdit_annotation.classList.add('editing');
 	this.elEdit_annotation.contentEditable = 'true';
 
-	var elProgressDiv = document.createElement('div');
-	this.elEdit.appendChild( elProgressDiv);
-	elProgressDiv.classList.add('percent');
-	var elProgressLabel = document.createElement('div');
-	elProgressDiv.appendChild( elProgressLabel);
-	elProgressLabel.textContent = 'Progress:';
-	elProgressLabel.style.fontSize = '12px';
-	this.elEdit_progress = document.createElement('div');
-	elProgressDiv.appendChild( this.elEdit_progress);
-	this.elEdit_progress.style.width = '40px';
-	this.elEdit_progress.style.height = '18px';
-	this.elEdit_progress.contentEditable = 'true';
-	this.elEdit_progress.classList.add('editing');
-	this.elEdit_progress.style.textAlign = 'center';
-	this.elEdit_progress.onkeydown = function(e){ if( e.keyCode == 13 ) return false; };
-
 	var artists = {};
+	var flags = {};
 	var tags = {};
 
 	if( this.obj.artists )
 		for( var a = 0; a < this.obj.artists.length; a++)
 			artists[this.obj.artists[a]] = {"title":c_GetUserTitle( this.obj.artists[a])};
+
+	if( this.obj.flags )
+		for( var a = 0; a < this.obj.flags.length; a++)
+			flags[this.obj.flags[a]] = {"title":c_GetFlagTitle( this.obj.flags[a]),"tooltip":c_GetFlagTip( this.obj.flags[a])};
 
 	if( this.obj.tags )
 		for( var a = 0; a < this.obj.tags.length; a++)
@@ -514,39 +598,69 @@ Status.prototype.edit = function( i_args)
 	if( i_args && i_args.statuses )
 		for( var s = 0; s < i_args.statuses.length; s++)
 		{
-			for( var id in artists ) artists[id].half = true;
-			for( var id in tags    ) tags[id].half    = true;
-
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.artists )
 			for( var a = 0; a < i_args.statuses[s].obj.artists.length; a++)
 			{
+				for( var id in artists )
+					if( i_args.statuses[s].obj.artists.indexOf( id) == -1 ) 
+						artists[id].half = true;
+
 				var id = i_args.statuses[s].obj.artists[a];
-				if( artists[id] )
-					artists[id].half = false;
-				else
+				if( artists[id] == null )
 					artists[id] = {"title":c_GetUserTitle(id),"half":true};
 			}
+			else
+				for( var id in artists ) artists[id].half = true;
+
+			if( i_args.statuses[s].obj && i_args.statuses[s].obj.flags )
+			for( var a = 0; a < i_args.statuses[s].obj.flags.length; a++)
+			{
+				for( var id in flags )
+					if( i_args.statuses[s].obj.flags.indexOf( id) == -1 ) 
+						flags[id].half = true;
+
+				var id = i_args.statuses[s].obj.flags[a];
+				if( flags[id] == null )
+					flags[id] = {"title":c_GetFlagTitle(id),"half":true,"tooltip":c_GetFlagTip(id)};
+			}
+			else
+				for( var id in flags ) flags[id].half = true;
 
 			if( i_args.statuses[s].obj && i_args.statuses[s].obj.tags )
 			for( var a = 0; a < i_args.statuses[s].obj.tags.length; a++)
 			{
+				for( var id in tags )
+					if( i_args.statuses[s].obj.tags.indexOf( id) == -1 ) 
+						tags[id].half = true;
+
 				var id = i_args.statuses[s].obj.tags[a];
-				if( tags[id] )
-					tags[id].half = false;
-				else
+				if( tags[id] == null )
 					tags[id] = {"title":c_GetTagTitle(id),"half":true,"tooltip":c_GetTagTip(id)};
 			}
+			else
+				for( var id in tags ) tags[id].half = true;
 		}
 
 	if( c_CanAssignArtists())
 		this.editListShow({"name":'artists',"label":'Artists:',"list":artists,"list_all":g_users,"elEdit":this.elEdit});
 
-	this.editListShow({"name":'tags',"label":'Tags:',"list":tags,"list_all":RULES.tags,"elEdit":this.elEdit});
+	this.editListShow({"name":'flags',"label":'Flags:',"list":flags,"list_all":RULES.flags,"elEdit":this.elEdit});
+	this.editListShow({"name":'tags', "label":'Tags:', "list":tags, "list_all":RULES.tags, "elEdit":this.elEdit});
 
 	this.elEdit_Color = document.createElement('div');
 	this.elEdit.appendChild( this.elEdit_Color);
 	this.elEdit_Color.classList.add('color');
 	u_DrawColorBars({"el":this.elEdit_Color,"onclick":st_EditColorOnClick,"data":this});
+
+
+	if( g_admin )
+	{
+		this.elEdit_adinfo = document.createElement('div');
+		this.elEdit.appendChild( this.elEdit_adinfo);
+		this.elEdit_adinfo.classList.add('adinfo');
+		this.elEdit_adinfo.classList.add('editing');
+		this.elEdit_adinfo.contentEditable = 'true';
+	}
 
 
 	this.elEdit_tasks = document.createElement('div');
@@ -570,6 +684,7 @@ Status.prototype.edit = function( i_args)
 
 	// Get values:
 	var annotation = this.obj.annotation;
+	var adinfo = this.obj.adinfo;
 	var progress = this.obj.progress;
 	var finish = this.obj.finish;
 
@@ -585,6 +700,10 @@ Status.prototype.edit = function( i_args)
 	if( annotation != null )
 	{
 		this.elEdit_annotation.textContent = annotation;
+	}
+	if( g_admin && ( adinfo != null ))
+	{
+		this.elEdit_adinfo.textContent = atob( adinfo);
 	}
 	if( finish != null )
 	{
@@ -651,7 +770,10 @@ Status.prototype.getMultiVale = function( i_key, i_statuses)
 
 	for( var i = 0; i < i_statuses.length; i++)
 	{
-		var other = i_statuses[i].obj[i_key];
+		var other = null;
+		if(( i_statuses[i].obj ) && ( i_statuses[i].obj[i_key] ))
+			other = i_statuses[i].obj[i_key];
+
 		if( value != other )
 		{
 			value = st_MultiValue;
@@ -667,10 +789,18 @@ Status.prototype.editListShow = function( i_args)
 	i_args.elRoot = elRoot;
 	elRoot.classList.add('list');
 	elRoot.classList.add( i_args.name);
+	if( localStorage.background && localStorage.background.length )
+		elRoot.style.background = localStorage.background;
+	else
+		elRoot.style.backgroundColor = u_backgroundColor;
+	if( localStorage.text_color && localStorage.text_color.length )
+		elRoot.style.color = localStorage.text_color;
+	else
+		elRoot.style.color = u_textColor;
+
 	elRoot.m_elBtn = document.createElement('div');
 	elRoot.appendChild( elRoot.m_elBtn);
 	elRoot.m_elBtn.classList.add('button');
-	elRoot.m_elBtn.style.cssFloat = 'left';;
 	elRoot.m_elBtn.textContent = i_args.label;
 	elRoot.m_elBtn.m_status = this;
 	elRoot.m_elBtn.onclick = function(e){ e.currentTarget.m_status.editListEdit( i_args);};
@@ -682,6 +812,12 @@ Status.prototype.editListShow = function( i_args)
 		elRoot.m_elList.appendChild( el);
 		el.textContent = i_args.list[id].title;
 		el.classList.add('tag');
+		if( i_args.name == 'flags' )
+		{
+			el.classList.add('flag');
+			if( RULES.flags[id] )
+				st_SetElColor({"color":RULES.flags[id].clr}, el);
+		}
 		if( i_args.name == 'artists' )
 		{
 			el.classList.add('artist');
@@ -730,6 +866,15 @@ Status.prototype.editListEdit = function( i_args)
 		var el = document.createElement('div');
 		i_args.elRoot.appendChild( el);
 		el.classList.add('tag');
+		if( i_args.name == 'flags' )
+		{
+			el.classList.add('flag');
+			if( RULES.flags[item] && RULES.flags[item].clr )
+			{
+				var c = RULES.flags[item].clr;
+				el.style.borderColor = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+			}
+		}
 		el.m_item = item;
 
 		if( i_args.list_all[item].title )
@@ -760,8 +905,6 @@ Status.prototype.editListEdit = function( i_args)
 }
 Status.prototype.editArtistsEdit = function( i_args)
 {
-	i_args.elRoot.m_elBtn.style.display = 'none';
-
 	var roles = c_GetRolesArtists( i_args.list);
 
 	for( var r = 0; r < roles.length; r++)
@@ -785,7 +928,7 @@ Status.prototype.editArtistsEdit = function( i_args)
 			el.classList.add('artist');
 			el.m_item = artist.id;
 			if( artist.id == g_auth_user.id )
-				el.classList.add('edit_me');
+				el.classList.add('me');
 
 			if( g_users[artist.id] && g_users[artist.id].disabled )
 				el.classList.add('disabled');
@@ -982,8 +1125,10 @@ Status.prototype.editSave = function( i_args)
 
 	var finish = null;
 	var annotation = null;
+	var adinfo = null;
 	var progress = null;
 	var artists = null;
+	var flags = null;
 	var tags = null;
 	var tasks = null;
 
@@ -1019,6 +1164,13 @@ Status.prototype.editSave = function( i_args)
 		annotation = c_Strip( this.elEdit_annotation.textContent);
 	}
 
+	if( g_admin )
+	{
+		this.elEdit_adinfo.innerHTML = this.elEdit_adinfo.textContent;
+		adinfo = c_Strip( this.elEdit_adinfo.textContent);
+		adinfo = btoa( adinfo);
+	}
+
 	if( this.elEdit.artists )
 	{
 		artists = {};
@@ -1027,8 +1179,21 @@ Status.prototype.editSave = function( i_args)
 		{
 			if( elList[i].m_selected )
 				artists[elList[i].m_item] = 'selected';
-			else if( elList[i].classList.contains('half_selected'))
-				artists[elList[i].m_item] = 'half';
+			else if( elList[i].m_half_selected )
+				artists[elList[i].m_item] = 'half_selected';
+		}
+	}
+
+	if( this.elEdit.flags )
+	{
+		flags = {};
+		var elList = this.elEdit.flags;
+		for( var i = 0; i < elList.length; i++)
+		{
+			if( elList[i].m_selected )
+				flags[elList[i].m_item] = 'selected';
+			else if( elList[i].m_half_selected )
+				flags[elList[i].m_item] = 'half_selected';
 		}
 	}
 
@@ -1040,8 +1205,8 @@ Status.prototype.editSave = function( i_args)
 		{
 			if( elList[i].m_selected )
 				tags[elList[i].m_item] = 'selected';
-			else if( elList[i].classList.contains('half_selected'))
-				tags[elList[i].m_item] = 'half';
+			else if( elList[i].m_half_selected )
+				tags[elList[i].m_item] = 'half_selected';
 		}
 	}
 
@@ -1071,11 +1236,6 @@ Status.prototype.editSave = function( i_args)
 					{
 						var tag = elList[i].m_item;
 						task.tags.push( tag);
-
-						// Add tag to status:
-						if( this.obj.tags == null ) this.obj.tags = [];
-						if( this.obj.tags.indexOf( tag) == -1 )
-							this.obj.tags.push( tag);
 					}
 			}
 			else if( elTask.m_task.tags )
@@ -1090,11 +1250,6 @@ Status.prototype.editSave = function( i_args)
 					{
 						var artist = elList[i].m_item;
 						task.artists.push( artist);
-
-						// Add artist to status:
-						if( this.obj.artists == null ) this.obj.artists = [];
-						if( this.obj.artists.indexOf( artist) == -1 )
-							this.obj.artists.push( artist);
 					}
 			}
 			else if( elTask.m_task.artists )
@@ -1117,17 +1272,19 @@ Status.prototype.editSave = function( i_args)
 	// Set values to statuses
 	var some_progress_changed = false;
 	var progresses = {};
-	var news = [];
+
 	for( var i = 0; i < statuses.length; i++)
 	{
 		if( statuses[i].obj == null ) statuses[i].obj = {};
 
 		if( annotation !== null ) statuses[i].obj.annotation = annotation;
+		if( adinfo     !== null ) statuses[i].obj.adinfo     = adinfo;
 		if( finish     !== null ) statuses[i].obj.finish     = finish;
 		if( progress   !== null )
 		{
 			progresses[statuses[i].path] = progress;
-			if( progress != statuses[i].obj.progress ) some_progress_changed = true;
+			if( progress != statuses[i].obj.progress )
+				some_progress_changed = true;
 			statuses[i].obj.progress = progress;
 		}
 
@@ -1136,13 +1293,63 @@ Status.prototype.editSave = function( i_args)
 			if( statuses[i].obj.artists == null )
 				statuses[i].obj.artists = [];
 
-			for( var a = 0; a < statuses[i].obj.artists.length; a++ )
+			for( var a = 0; a < statuses[i].obj.artists.length; )
 				if( artists[statuses[i].obj.artists[a]] == null )
 					statuses[i].obj.artists.splice(a,1);
+				else a++;
 
 			for( var id in artists )
 				if(( artists[id] == 'selected' ) && ( statuses[i].obj.artists.indexOf(id) == -1 ))
 					statuses[i].obj.artists.push( id);
+		}
+
+		if( flags )
+		{
+			if( statuses[i].obj.flags == null )
+				statuses[i].obj.flags = [];
+
+			for( var a = 0; a < statuses[i].obj.flags.length; )
+				if( flags[statuses[i].obj.flags[a]] == null )
+					statuses[i].obj.flags.splice(a,1);
+				else a++;
+
+			// Store existing flags to check was it ON before:
+			var _flags = [];
+			for( var a = 0; a < statuses[i].obj.flags.length; a++)
+				_flags.push(statuses[i].obj.flags[a]);
+
+			for( var id in flags )
+				if(( flags[id] == 'selected' ) && ( _flags.indexOf(id) == -1 ))
+				{
+					if( RULES.flags[id])
+					{
+						// Flag can limit minium and maximum progress percentage:
+						var p_min = RULES.flags[id].p_min;
+						var p_max = RULES.flags[id].p_max;
+						var progress = statuses[i].obj.progress;
+
+						if( p_min && (( progress == null ) || ( progress < p_min )))
+							progress = p_min;
+
+						if( p_max && (( p_max < 0 ) || ( progress > p_max )))
+							progress = p_max;
+
+						if( progress != null )
+						{
+							statuses[i].obj.progress = progress;
+
+							// This needed to update upper pogresses:
+							progresses[statuses[i].path] = progress;
+							some_progress_changed = true;
+						}
+
+						// Flag can be exclusive, so we should delete other flags:
+						if( RULES.flags[id].excl )
+							statuses[i].obj.flags = [];
+					}
+
+					statuses[i].obj.flags.push( id);
+				}
 		}
 
 		if( tags )
@@ -1150,9 +1357,10 @@ Status.prototype.editSave = function( i_args)
 			if( statuses[i].obj.tags == null )
 				statuses[i].obj.tags = [];
 
-			for( var a = 0; a < statuses[i].obj.tags.length; a++ )
+			for( var a = 0; a < statuses[i].obj.tags.length; )
 				if( tags[statuses[i].obj.tags[a]] == null )
 					statuses[i].obj.tags.splice(a,1);
+				else a++;
 
 			for( var id in tags )
 				if(( tags[id] == 'selected' ) && ( statuses[i].obj.tags.indexOf(id) == -1 ))
@@ -1160,21 +1368,64 @@ Status.prototype.editSave = function( i_args)
 		}
 
 		if( tasks )
+		{
+			var duration = 0;
+			var price = 0;
+			for( var t = 0; t < tasks.length; t++)
+			{
+				if( tasks[t].duration )
+					duration += tasks[t].duration;
+				if( tasks[t].price )
+					price += tasks[t].price;
+
+				// Add tag to status:
+				if( tasks[t].tags && tasks[t].tags.length )
+				{
+					if( statuses[i].obj.tags == null ) 
+						statuses[i].obj.tags = [];
+
+					for( var j = 0; j < tasks[t].tags.length; j++)
+					{
+						var tag = tasks[t].tags[j];
+
+						if( statuses[i].obj.tags.indexOf( tag) == -1 )
+							statuses[i].obj.tags.push( tag);
+					}
+				}
+
+				// Add artist to status:
+				if( tasks[t].artists && tasks[t].artists.length )
+				{
+					if( statuses[i].obj.artists == null )
+						statuses[i].obj.artists = [];
+
+					for( var j = 0; j < tasks[t].artists.length; j++)
+					{
+						var artist = tasks[t].artists[j];
+
+						if( statuses[i].obj.artists.indexOf( artist) == -1 )
+							statuses[i].obj.artists.push( artist);
+					}
+				}
+			}
+			
 			statuses[i].obj.tasks = tasks;
+			statuses[i].obj.duration = duration;
+			statuses[i].obj.price = price;
+
+		}
 
 		if( this.elEdit_Color.m_color_changed )
 			statuses[i].obj.color = this.elEdit_Color.m_color;
 
-		// Status saving produce news.
-		news.push( statuses[i].save());
-
-		// Status showing causes values redraw,
-		// and destoys edit GUI if any.
+		statuses[i].save();
 		statuses[i].show();
+		//^ Status showing causes values redraw,
+		// and destoys edit GUI if any.
 	}
 
-	// Send news:
-	nw_SendNews( news);
+	// News & Bookmarks:
+	nw_StatusesChanged( statuses);
 
 	if( some_progress_changed )
 		st_UpdateProgresses( this.path, progresses);
@@ -1187,8 +1438,10 @@ Status.prototype.save = function()
 	this.obj.muser = g_auth_user.id;
 	this.obj.mtime = c_DT_CurSeconds();
 
+	if( this.path == g_CurPath())
+		RULES.status = this.obj;
+
 	st_Save( this.obj, this.path);
-	return nw_CreateNews({"title":'status',"path":this.path,"artists":this.obj.artists});
 }
 
 function st_Save( i_status, i_path, i_func, i_args, i_navig_params_update)
@@ -1219,7 +1472,6 @@ function st_SetFramesNumber( i_num)
 	st_Show( RULES.status);
 
 	$('status_framesnum_div').classList.add('updated');
-	$('status_framesnum_div').title = 'Frames number updated\nPrevous value: ' + RULES.status.frames_num;
 }
 
 function st_SetTimeCode( i_tc)
@@ -1260,8 +1512,6 @@ function st_SetTimeCode( i_tc)
 	}
 	var timecode_finish = c_TC_FromFrame( frame_finish);
 
-//console.log( timecode_start + ' - ' + timecode_finish + ' = ' + frames_num);
-
 	if( RULES.status == null ) RULES.status = {};
 
 	if(( RULES.status.timecode_start == timecode_start ) && ( RULES.status.timecode_finish == timecode_finish ))
@@ -1269,13 +1519,29 @@ function st_SetTimeCode( i_tc)
 
 	RULES.status.timecode_start = timecode_start;
 	RULES.status.timecode_finish = timecode_finish;
-	st_Save({'timecode_start':timecode_start,'timecode_finish':timecode_finish}, null, null, null, {});
+
+	var save_fields = {};
+	save_fields.timecode_start = timecode_start;
+	save_fields.timecode_finish = timecode_finish;
+
+	var navig_params_update = {};
+		
+	if(( RULES.status.frames_num == null ) || ( RULES.status.frames_num <= 0 ))
+	{
+		RULES.status.frames_num = frames_num;
+		save_fields.frames_num = frames_num;
+		navig_params_update.frames_num = true;
+
+		st_SetElFramesNum( RULES.status, $('status_framesnum'));
+	}
+
+	st_Save( save_fields, null, null, null, navig_params_update);
 }
 
 function st_UpdateProgresses( i_path, i_progresses)
 {
-	paths = [];
-	progresses = {};
+	var paths = [];
+	var progresses = {};
 	if( i_progresses ) progresses = i_progresses;
 
 	var paths_skip_save = [];
@@ -1292,12 +1558,17 @@ function st_UpdateProgresses( i_path, i_progresses)
 	}
 //console.log( paths);
 //console.log(JSON.stringify(i_progresses));
-	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,"paths_skip_save":paths_skip_save,
+	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,
+		"progresses":progresses,"paths_skip_save":paths_skip_save,
 		"info":'walk upstatuses',"rufiles":['status'],"lookahead":['status']});
 }
 function st_UpdateProgressesWalkReceived( i_walks, i_args)
 {
 	if( i_walks == null ) return;
+
+//console.log(JSON.stringify(i_args));
+	var paths = i_args.paths;
+	var progresses = i_args.progresses;
 
 	// Update only progess in navig:
 	var navig_params_update = {};
@@ -1305,7 +1576,7 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 
 	for( var w = i_walks.length-1; w >= 0; w--)
 	{
-//window.console.log( i_walks[w]);
+//console.log(JSON.stringify(i_walks[w]));
 		if( i_walks[w].error )
 		{
 			c_Error( i_walks[w].error);
@@ -1322,27 +1593,32 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 		for( var f = 0; f < i_walks[w].folders.length; f++ )
 		{
 			var folder = i_walks[w].folders[f];
+
 			if( folder.name == RULES.rufolder ) continue;
+			if( c_AuxFolder( folder)) continue;
+
 			var path = paths[w] + '/' + folder.name;
-			if( progresses[path] != null )
+			if(( progresses[path] != null ) && ( progresses[path] != -1 ))
 			{
 				progress += progresses[path];
 			}
 			else
 			{
-				// Here we set and save 0% progress on a neighbour folders,
-				// we status or pregress is not set at all:
-
 				if(( folder.status == null ) || ( folder.status.progress == null ))
 				{
-					// Siblinkgs are only at last walk ( earlier are parents )
+				// Here we set and save 0% progress on a neighbour folders,
+				// if status or progress is not set at all:
+
+					// Siblings are only at last walk ( earlier are parents )
 					if( w != (i_walks.length-1)) continue;
 
 					// Save only progress:
 					st_Save({"progress":0}, path,/*func=*/null,/*args=*/null, navig_params_update);
 				}
-				else if( folder.status.progress < 0 ) continue;
-				else progress += folder.status.progress;
+				else if( folder.status.progress < 0 )
+					continue;
+				else
+					progress += folder.status.progress;
 			}
 			progress_count++;
 		}

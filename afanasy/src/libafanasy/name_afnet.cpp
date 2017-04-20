@@ -70,10 +70,10 @@ bool writedata( int fd, const char * data, int len)
 	return true;
 }
 
-// Return header offset or -1, if it was not recognized. GET request processed here.
-int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
+// Return header offset or -1, if it was not recognized.
+int af::processHeader( af::Msg * io_msg, int i_bytes)
 {
-//printf("\nReceived %d bytes:\n", i_bytes);
+	//printf("name_afnet.cpp processHeader: Received %d bytes:\n", i_bytes);
 	char * buffer = io_msg->buffer();
 	int offset = 0;
 
@@ -113,7 +113,11 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 						//printf("\nHEADER FOUND: size=%d\n", size);
 						header_processed = true;
 					}
-					else return -1;
+					else
+					{
+						AFERROR("HTTP POST request has a bad AFANASY header.")
+						return -1;
+					}
 				}
 			}
 		}
@@ -126,42 +130,51 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 		}
 
 		// Header not recongnized:
+		AFERROR("HTTP POST request was not recongnized.")
 		return -1;
 	}
 
 	// Simple header for JSON (used for example in python api and afcmd)
 	if( strncmp("AFANASY", buffer, 7) == 0 )
 	{
+		//writedata( 1, buffer+offset, i_bytes);printf("\n");
 		offset += 7;
-//writedata( 1, buffer+offset, i_bytes);
 		int size;
 		int num = sscanf( buffer + offset, "%d", &size);
-//printf("\n sscanf=%d\n",num);
+		//printf("\n sscanf=%d\n",num);
 		if( num == 1 )
 		{
 			while( ++offset < i_bytes )
 			{
 				if( strncmp( buffer+offset, "JSON", 4) == 0)
 				{
-					offset += 3;
-					while( ++offset < i_bytes )
+					offset += 4;
+					while( offset < i_bytes )
 					{
 						if( buffer[offset] == '{' )
 						{
+							break;
+						}
+						else
+						{
+							offset++;
 							//printf("FOUND: size=%d Offset=%d:\n", size, offset);
 							//write(1, buffer, offset);
 							//write(1, buffer+offset, i_bytes - offset);
 							//write(1,"\n",1);
-							io_msg->setHeader( af::Msg::TJSON, size, offset, i_bytes);
+//							io_msg->setHeader( af::Msg::TJSON, size, offset, i_bytes);
 							//return false;
 							//io_msg->stdOutData();
-							return offset;
+//							return offset;
 						}
 					}
+					io_msg->setHeader( af::Msg::TJSON, size, offset, i_bytes);
+					return offset;
 				}
 			}
 
 			// Header not recongnized:
+			AFERROR("JSON message header was not recongnized.")
 			return -1;
 		}
 	}
@@ -186,6 +199,13 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
 						    bool & o_ok, af::VerboseMode i_verbose)
 {
+	if( af::Environment::isServer())
+	{
+		AFERROR("msgsendtoaddress: Server should not connect and send messages itself.\n")
+		o_ok = false;
+		return NULL;
+	}
+
 	o_ok = true;
 
 	if( i_address.isEmpty() )
@@ -207,51 +227,14 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		return NULL;
 	}
 
-	AFINFO("msgsendtoaddress: tying to connect to client.")
-/*
-	// Use SIGALRM to unblock
-#ifndef WINNT
-	if( alarm(2) != 0 )
-		AFERROR("af::msgsend: alarm was already set.\n");
-#endif //WINNT
-*/
 
-	if( af::Environment::getSockOpt_Dispatch_SO_RCVTIMEO_SEC() != -1 )
-	{
-		timeval so_timeo;
-		so_timeo.tv_usec = 0;
-		so_timeo.tv_sec = af::Environment::getSockOpt_Dispatch_SO_RCVTIMEO_SEC();
-		if( setsockopt( socketfd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
-		{
-			AFERRPE("msgsendtoaddress: set socket SO_RCVTIMEO option failed")
-			i_address.v_stdOut(); printf("\n");
-		}
-	}
+	// Set socket options:
+	af::setSocketOptions( socketfd);
 
-	if( af::Environment::getSockOpt_Dispatch_SO_SNDTIMEO_SEC() != -1 )
-	{
-		timeval so_timeo;
-		so_timeo.tv_usec = 0;
-		so_timeo.tv_sec = af::Environment::getSockOpt_Dispatch_SO_SNDTIMEO_SEC();
-		if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
-		{
-			AFERRPE("msgsendtoaddress: set socket SO_SNDTIMEO option failed")
-			i_address.v_stdOut(); printf("\n");
-		}
-	}
-
-	if( af::Environment::getSockOpt_Dispatch_TCP_NODELAY() != -1 )
-	{
-		int nodelay = af::Environment::getSockOpt_Dispatch_TCP_NODELAY();
-		if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
-		{
-		   AFERRPE("msgsendtoaddress: set socket TCP_NODELAY option failed")
-		   i_address.v_stdOut(); printf("\n");
-		}
-	}
 
 	//
 	// connect to address
+	AFINFO("msgsendtoaddress: tying to connect to client.")
 	if( connect(socketfd, (struct sockaddr*)&client_addr, i_address.sizeofAddr()) != 0 )
 	{
 		if( i_verbose == af::VerboseOn )
@@ -260,33 +243,21 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 				af::Msg::TNAMES[i_msg->type()], i_address.v_generateInfoString().c_str())
 		}
 		closesocket(socketfd);
-/*
-#ifndef WINNT
-		alarm(0);
-#endif //WINNT
-*/
-		o_ok = false;
-		return NULL;
-	}
-/*
-#ifndef WINNT
-	alarm(0);
-#endif //WINNT
-*/
-	//
-	// send
-	if( false == af::msgwrite( socketfd, i_msg))
-	{
-		AFERRAR("af::msgsend: can't send message to client: %s",
-				i_address.v_generateInfoString().c_str())
-		closesocket(socketfd);
 		o_ok = false;
 		return NULL;
 	}
 
-	if( false == i_msg->isReceiving())
+
+	//
+	// send
+	if( false == af::msgwrite( socketfd, i_msg))
 	{
-		closesocket(socketfd);
+		AFERRAR("af::msgsendtoaddress: can't send message to client: %s",
+				i_address.v_generateInfoString().c_str())
+
+		af::socketDisconnect( socketfd);
+
+		o_ok = false;
 		return NULL;
 	}
 
@@ -322,7 +293,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 			o_ok = false;
 		}
 
-		closesocket(socketfd);
+		af::socketDisconnect( socketfd);
 		return o_msg;
 	}
 
@@ -332,13 +303,14 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	if( false == af::msgread( socketfd, o_msg))
 	{
 	   AFERROR("msgsendtoaddress: Reading binary answer failed.")
-	   closesocket( socketfd);
+		af::socketDisconnect( socketfd);
 	   delete o_msg;
 	   o_ok = false;
 	   return NULL;
 	}
 
-	closesocket(socketfd);
+	af::socketDisconnect( socketfd);
+
 	return o_msg;
 }
 
@@ -437,6 +409,66 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
 	return af::Address();
 }
 
+void af::setSocketOptions( int i_fd)
+{
+	if( af::Environment::getSO_REUSEADDR() != -1 )
+	{
+		int reuseaddr = af::Environment::getSO_REUSEADDR();
+		if( setsockopt( i_fd, SOL_SOCKET, SO_REUSEADDR, WINNT_TOCHAR(&reuseaddr), sizeof(reuseaddr)) != 0)
+			AFERRPE("Set socket SO_REUSEADDR option failed:")
+	}
+
+	if( af::Environment::getSO_RCVTIMEO_sec() != -1 )
+	{
+		#ifdef WINNT
+		DWORD so_timeo = 1000 * af::Environment::getSO_RCVTIMEO_sec();
+		#else
+		timeval so_timeo;
+		so_timeo.tv_usec = 0;
+		so_timeo.tv_sec = af::Environment::getSO_RCVTIMEO_sec();
+		#endif
+		if( setsockopt( i_fd, SOL_SOCKET, SO_RCVTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+			AFERRPE("Set socket SO_RCVTIMEO option failed:")
+	}
+
+	if( af::Environment::getSO_SNDTIMEO_sec() != -1 )
+	{
+		#ifdef WINNT
+		DWORD so_timeo = 1000 * af::Environment::getSO_SNDTIMEO_sec();
+		#else
+		timeval so_timeo;
+		so_timeo.tv_usec = 0;
+		so_timeo.tv_sec = af::Environment::getSO_SNDTIMEO_sec();
+		#endif
+		if( setsockopt( i_fd, SOL_SOCKET, SO_SNDTIMEO, WINNT_TOCHAR(&so_timeo), sizeof(so_timeo)) != 0)
+			AFERRPE("Set socket SO_SNDTIMEO option failed:")
+	}
+
+	if( af::Environment::getSO_LINGER() != -1 )
+	{
+		linger so_linger;
+		so_linger.l_onoff  = af::Environment::getSO_LINGER();
+		so_linger.l_linger = af::Environment::getSO_LINGER();
+		if( setsockopt( i_fd, SOL_SOCKET, SO_LINGER, WINNT_TOCHAR(&so_linger), sizeof(so_linger)) != 0)
+			AFERRPE("Set socket SO_LINGER option failed:")
+	}
+
+	if( af::Environment::getSO_TCP_NODELAY() != -1 )
+	{
+		int nodelay = af::Environment::getSO_TCP_NODELAY();
+		if( setsockopt( i_fd, IPPROTO_TCP, TCP_NODELAY, WINNT_TOCHAR(&nodelay), sizeof(nodelay)) != 0)
+			AFERRPE("Set socket TCP_NODELAY option failed:")
+	}
+	#ifdef LINUX
+	if( af::Environment::getSO_TCP_CORK() != -1 )
+	{
+		int cork = af::Environment::getSO_TCP_CORK();
+		if( setsockopt( i_fd, SOL_TCP, TCP_CORK, &cork, sizeof(cork)) != 0)
+			AFERRPE("Set socket TCP_CORK option failed:")
+	}
+	#endif
+}
+
 bool af::msgread( int desc, af::Msg* msg)
 {
 AFINFO("af::msgread:\n");
@@ -454,7 +486,7 @@ AFINFO("af::msgread:\n");
 	}
 
 	// Header offset is variable on not binary header (for example HTTP)
-	int header_offset = processHeader( msg, bytes, desc);
+	int header_offset = af::processHeader( msg, bytes);
 	if( header_offset < 0)
 		return false;
 
@@ -487,16 +519,31 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 {
 	if( i_msg->type() == af::Msg::THTTP )
 	{
+		char buffer[1024];
+		sprintf( buffer, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: %d\r\n\r\n",
+			i_msg->writeSize() - i_msg->getHeaderOffset());
+		//printf("%s\n", buffer);
+		::writedata( i_desc, buffer, strlen( buffer));
+/*
 		::writedata( i_desc, "HTTP/1.1 200 OK\r\n", 17);
 		::writedata( i_desc, "Content-Type: application/json\r\n", 32);
-//                            1234567890123456789012345678901234567890
-//                            0         1         2         3
+//		                      1234567890123456789012345678901234567890
+//		                      0         1         2         3
 		::writedata( i_desc, "\r\n", 2);
+*/
+	}
+	else if( i_msg->type() == af::Msg::TJSON )
+	{
+		char buffer[1024];
+		sprintf( buffer, "AFANASY %d JSON",
+			i_msg->writeSize() - i_msg->getHeaderOffset());
+		//printf("%s\n", buffer);
+		::writedata( i_desc, buffer, strlen( buffer));
 	}
 
 	if( false == ::writedata( i_desc, i_msg->buffer() + i_msg->getHeaderOffset(), i_msg->writeSize() - i_msg->getHeaderOffset() ))
 	{
-		AFERROR("af::msgwrite: Error writing message.\n")
+		AFERROR("af::msgwrite: Error writing message.")
 		return false;
 	}
 
@@ -505,54 +552,55 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 	return true;
 }
 
-af::Msg * af::msgsend( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
+af::Msg * af::sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 {
-	if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
-	{
-		AFERROR("af::msgsend: Receiving message has several addresses.")
-	}
+	return ::msgsendtoaddress( i_msg, af::Environment::getServerAddress(), o_ok, i_verbose);
+}
 
-	if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
+void af::socketDisconnect( int i_sd, uint32_t i_response_type)
+{
+//	if(0)
+	if( af::Environment::isServer() && 
+		( i_response_type  > 0 ) &&
+		( i_response_type != af::Msg::THTTP ) &&
+		( i_response_type != af::Msg::THTTPGET ))
 	{
-		AFERROR("af::msgsend: Message has no addresses to send to.")
-		o_ok = false;
-		i_msg->v_stdOut();
-		return NULL;
-	}
-
-	if( false == i_msg->addressIsEmpty())
-	{
-		af::Msg * o_msg = ::msgsendtoaddress( i_msg, i_msg->getAddress(), o_ok, i_verbose);
-		if( o_msg != NULL )
-			return o_msg;
-	}
-
-	if( i_msg->addressesCount() < 1)
-		return NULL;
-
-	bool ok;
-	const std::list<af::Address> * addresses = i_msg->getAddresses();
-	std::list<af::Address>::const_iterator it = addresses->begin();
-	std::list<af::Address>::const_iterator it_end = addresses->end();
-	while( it != it_end)
-	{
-		::msgsendtoaddress( i_msg, *it, ok, i_verbose);
-		if( false == ok )
+		// Server waits client have closed socket first:
+		char buf[256];
+		int r = 1;
+		//printf("Server socket wait...\n");
+		while( r > 0 )
 		{
-			o_ok = false;
-			// Store an address that message was failed to send to
-			i_msg->setAddress( *it);
+			#ifdef WINNT
+			r = recv( i_sd, buf, af::Msg::SizeHeader, 0);
+			#else
+			r = read( i_sd, buf, af::Msg::SizeHeader);
+			#endif
+		/*	if( r > 0 )
+			{
+				printf("Server socket wait: %d\n", r);
+				int n = write( 1, buf, r);
+				printf("\n\n");
+			}*/
 		}
-		it++;
+		//printf("Server socket closed.\n");
 	}
+	//else{ printf("closing socket w/0 waiting other side %s.\n", af::Msg::TNAMES[i_response_type]); }
 
-	return NULL;
+	closesocket( i_sd);
 }
 
 af::Msg * af::msgString( const std::string & i_str)
 {
 	af::Msg * o_msg = new af::Msg();
 	o_msg->setString( i_str);
+	return o_msg;
+}
+
+af::Msg * af::msgInfo( const std::string & i_kind, const std::string & i_info)
+{
+	af::Msg * o_msg = new af::Msg();
+	o_msg->setInfo( i_kind, i_info);
 	return o_msg;
 }
 

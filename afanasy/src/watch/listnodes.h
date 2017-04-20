@@ -19,7 +19,7 @@ class ListNodes : public ListItems
 
 public:
 
-	ListNodes( QWidget* parent, const std::string & type, int RequestMsgType = 0);
+	ListNodes( QWidget * i_parent, const std::string & i_type);
 	virtual ~ListNodes();
 
 	enum e_HideShow {
@@ -32,34 +32,44 @@ public:
 
 	int32_t getFlagsHideShow() const { return ms_flagsHideShow; }
 
+	virtual void v_connectionEstablished();
+
 public slots:
 	void actHideShow( int i_type);
 
 protected:
 
+	virtual void showEvent( QShowEvent  * event );
+
+	virtual void v_showFunc();
+
+	void subscribe( bool i_subscribe = true);
+	inline void unSubscribe() { subscribe( false);}
+	inline bool isSubscribed() const { return m_subscribed;}
+
+	virtual void v_connectionLost();
+
 	virtual bool init( bool createModelView = true);
 
-	virtual ItemNode* createNewItem( af::Node *node) = 0;
+	virtual ItemNode * v_createNewItem( af::Node * i_node, bool i_subscibed) = 0;
+
+	void get() const;
+	void get( const std::vector<int32_t> & i_ids) const;
 
 	bool updateItems( af::Msg* msg);
 
-	CtrlSortFilter * ctrl;
+	CtrlSortFilter * m_ctrl_sf;
 	void initSortFilterCtrl();
 
-	bool sorting;
-	bool sortascending;
 	void sort();
 	void sortMatch( const std::vector<int32_t> & i_list);
-	virtual void resetSorting();
 
-	bool setFilter( const QString & str);
-	bool filtering;
-	bool filterinclude;
-	bool filtermatch;
-	void filter();
+	/// Needed for jobs, to get user jobs list from server
+	virtual void v_resetSorting();
 
 private slots:
 	void actAnnotate();
+	void actAnnotate(QString text);
 	void actPriority();
 	void actCustomData();
 
@@ -72,11 +82,10 @@ private slots:
 	void filterSettingsChanged();
 
 private:
-	void processHidden( ItemNode * i_item, int i_row);
+	void processHidden();
 
-private:
 	static uint32_t ms_flagsHideShow;
 
-	QRegExp filter_exp;
-	QString filter_str;
+private:
+	bool m_subscribed;
 };

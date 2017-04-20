@@ -9,7 +9,7 @@ MonitorNode.prototype.init = function()
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
-	this.elName.title = 'User Name';
+	this.elName.title = 'Name';
 	this.elName.classList.add('prestar');
 
 	this.elHostName = cm_ElCreateFloatText( this.element, 'right', 'Host Name');
@@ -24,56 +24,61 @@ MonitorNode.prototype.init = function()
 	this.elCenter.style.textAlign = 'center';
 	this.elCenter.classList.add('prestar');
 
-	this.elForgive = cm_ElCreateText( this.elCenter, 'Errors Forgive Time');
-	this.elJobsLifeTime = cm_ElCreateText( this.elCenter, 'Jobs Life Time');
+	this.elUid = cm_ElCreateText( this.elCenter, 'User ID');
+	this.elJobsIds = cm_ElCreateText( this.elCenter, 'Jobs IDs');
 
-	this.element.appendChild( document.createElement('br'));
-
-	this.elAddress = cm_ElCreateFloatText( this.element, 'left', 'Jobs: All/Running');
-	this.elAddress.classList.add('prestar');
+//	this.element.appendChild( document.createElement('br'));
 
 	this.elIP = cm_ElCreateFloatText( this.element, 'right');
 
 	this.element.appendChild( document.createElement('br'));
+
+	this.elEvents = document.createElement('div');
+	this.element.appendChild( this.elEvents);
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild( this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
 	this.elAnnotation.style.textAlign = 'center';
 	this.elAnnotation.classList.add('prestar');
-
-	this.elBarParent = document.createElement('div');
-	this.element.appendChild( this.elBarParent);
-	this.elBarParent.style.position = 'absolute';
-	this.elBarParent.style.left = '120px';
-	this.elBarParent.style.right = '50px';
-	this.elBarParent.style.top = '18px';
-	this.elBarParent.style.height = '12px';
-
-	this.elBar = document.createElement('div');
-	this.elBarParent.appendChild( this.elBar);
-	this.elBar.classList.add('bar');
-//	this.elBar.style.textAlign = 'right';
 }
 
 MonitorNode.prototype.update = function( i_obj)
 {
 	if( i_obj ) this.params = i_obj;
 
-	this.elName.textContent = this.params.name.substr( 0, this.params.name.indexOf(':'));
+	this.elUid.innerHTML = 'UID:<b>' + this.params.uid + '</b>';
 
-	if( this.params.host_name ) this.elHostName.textContent = this.params.host_name;
+	this.elName.innerHTML = '<b>' + this.params.name + '</b>';
+
+	if( this.params.host_name ) this.elHostName.innerHTML = '<b>' + this.params.host_name + '</b>';
 	else this.elHostName.textContent = '';
 
-	if( this.params.errors_forgive_time ) this.elForgive.textContent = 'F'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time);
-	else this.elForgive.textContent = '';
+	var jobs_ids = '';
+	if( this.params.jobs_ids && this.params.jobs_ids.length )
+	{
+		for( var i = 0; i < this.params.jobs_ids.length; i++)
+		{
+			if( i ) jobs_ids += ',';
+			jobs_ids += ' <b>' + this.params.jobs_ids[i] + '</b>';
+		}
+		jobs_ids = 'JIDs:[' + jobs_ids + ']';
+	}
+	this.elJobsIds.innerHTML = jobs_ids;
 
-	if( this.params.jobs_life_time ) this.elJobsLifeTime.textContent = 'L'+ cm_TimeStringFromSeconds( this.params.jobs_life_time);
-	else this.elJobsLifeTime.textContent = '';
+	this.elIP.innerHTML = 'IP=<b>' + this.params.address.ip + '</b>';
 
-	this.elAddress.textContent = this.params.address.ip + ':' + this.params.address.port;
-
-	this.elIP.textContent = 'IP=' + this.params.address.ip;
+	var events = '';
+	if( this.params.events && this.params.events.length )
+	{
+		for( var i = 0; i < this.params.events.length; i++)
+		{
+			if( i ) events += ',';
+			events += ' <b>' + this.params.events[i] + '</b>';
+		}
+		events = ' EVTs: ' + events;
+	}
+	this.elEvents.innerHTML = events;
 
 	if( this.params.annotation )
 		this.elAnnotation.textContent = this.params.annotation;

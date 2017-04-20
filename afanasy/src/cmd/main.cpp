@@ -14,9 +14,6 @@
 
 bool Verbose;
 bool Help;
-int Protocol;
-std::string ServerName;
-int ServerPort;
 
 int main( int argc, char** argv )
 {
@@ -44,16 +41,28 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
 
     Verbose = false;
     Help = false;
-    Protocol = AF_UNSPEC;
-//
-// initialize environment variables
 
-    uint32_t envflags = af::Environment::Quiet | af::Environment::SolveServerName;
-    if( argc == 1) envflags = af::Environment::Verbose;
+	//
+	// Initialize environment:
+    uint32_t envflags = 0;
+    if( argc == 1 )
+	{
+		// Just verbose environment and nothing else to do.
+		envflags = af::Environment::Verbose;
+	}
+	else
+	{
+		// If we want to connect to server we should solve its name:
+		envflags = af::Environment::SolveServerName;
+
+		if( std::string( argv[1]) == "v" )
+			envflags |= af::Environment::Verbose;
+		else
+			envflags |= af::Environment::Quiet;
+	}
+
     af::Environment ENV( envflags, argc, argv);
     if( ENV.isValid() == false ) return 1;
-    ServerName = af::Environment::getServerName();
-    ServerPort = af::Environment::getServerPort();
 
     if( af::init( af::InitFarm | (argc == 1 ? af::InitVerbose : af::NoFlags)) == false) return 1;
     afsql::init();
@@ -69,14 +78,10 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
     {
         if( msg.isNull() == false)
         {
-            msg.setReceiving( afcmd.isRecieving());
-
-            msg.setAddress( af::Environment::getServerAddress());
-
             if( Verbose ) msg.v_stdOut();
 
             bool ok;
-            af::Msg * answer = af::msgsend( &msg, ok, af::VerboseOn);
+            af::Msg * answer = af::sendToServer( &msg, ok, af::VerboseOn);
 
             if( false == ok )
                 return_value = 1;

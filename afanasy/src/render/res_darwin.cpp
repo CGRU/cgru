@@ -1,6 +1,7 @@
 #ifdef MACOSX
 #include "res.h"
 
+#include <set>
 #include <fcntl.h>
 #include <mach/host_info.h>
 #include <mach/mach.h>
@@ -27,6 +28,8 @@
 #include <ifaddrs.h>
 
 #include "../libafanasy/environment.h"
+
+#include <utmpx.h>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -112,10 +115,6 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       {
          perror( "sysctlbyname(\"hw.memsize\",..) failed: " );
       }
-      else
-      {
-         s_physical_memory /= (1024*1024);
-      }
 
       s_pagesize = getpagesize();
 
@@ -137,17 +136,19 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    //
    {
       vm_statistics_data_t vm_stats;
-      unsigned memtotal=0, memfree=0;
-      unsigned membuffers=0, memcached=0;
-
-      memtotal = s_physical_memory;
+      int64_t memfree = 0, membuffers = 0, memcached = 0;
       unsigned count = HOST_VM_INFO_COUNT;
 
       if( host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) == KERN_SUCCESS)
       {
-         memfree = vm_stats.free_count;
+         int64_t free     = vm_stats.free_count;
+         int64_t active   = vm_stats.active_count;
+         int64_t inactive = vm_stats.inactive_count;
+         int64_t wire     = vm_stats.wire_count;
+
+         memfree    = free * s_pagesize;
          membuffers = 0;
-         memcached = vm_stats.inactive_count;
+         memcached  = inactive * s_pagesize;
       }
       else
       {
@@ -163,12 +164,12 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       }
 
       /* A convertion factor to bring us to MBs */
-      hres.mem_total_mb = s_physical_memory;
-      hres.swap_total_mb = vmusage.xsu_total >> 20;
-      hres.mem_free_mb = (memfree * s_pagesize) >> 20;
-      hres.mem_cached_mb = (memcached  * s_pagesize) >> 20;
-      hres.mem_buffers_mb = (membuffers * s_pagesize) >> 20;
-      hres.swap_used_mb = vmusage.xsu_used  >> 20;
+      hres.mem_total_mb   = s_physical_memory >> 20;
+      hres.swap_total_mb  = vmusage.xsu_total >> 20;
+      hres.mem_free_mb    = memfree           >> 20;
+      hres.mem_cached_mb  = memcached         >> 20;
+      hres.mem_buffers_mb = membuffers        >> 20;
+      hres.swap_used_mb   = vmusage.xsu_used  >> 20;
    }
 
    //
@@ -316,6 +317,32 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    {
       hres.hdd_rd_kbsec = hres.hdd_wr_kbsec = 0;
    }
+   
+   /*
+    * Users
+    */
+   // Is it hack to hardcoded these ignored names?
+   std::set<std::string> userignoreset;
+   userignoreset.insert("");
+   userignoreset.insert("reboot");
+   userignoreset.insert("runlevel");
+   userignoreset.insert("LOGIN");
+   // Use a set to efficiently avoid repetitions
+   std::set<std::string> userset;
+   setutxent();
+   struct utmpx *user;
+   while( (user = getutxent()) != NULL)
+   {
+       std::string username = user->ut_user;
+       if (userignoreset.count(username) == 0)
+          userset.insert(username);
+   }
+   endutxent();
+   
+   hres.logged_in_users.clear();
+   std::copy(userset.begin(),
+             userset.end(),
+             std::back_inserter(hres.logged_in_users));
 }
 
 static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write)
@@ -345,7 +372,7 @@ static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write)
 
 	io_registry_entry_t drive, parent;
 
-	while( drive = IOIteratorNext(drivelist) )
+	while( (drive = IOIteratorNext(drivelist)) )
    {
       /* get drive's parent */
       kern_return_t status =

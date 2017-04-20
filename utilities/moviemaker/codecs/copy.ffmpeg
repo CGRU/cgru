@@ -1,0 +1,2 @@
+COPY
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -c:v copy -c:a copy -r @FPS@ "@OUTPUT@.@CONTAINER@"

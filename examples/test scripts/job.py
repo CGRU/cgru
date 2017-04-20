@@ -8,29 +8,32 @@ import sys
 import time
 
 import af
+import afcommon
 
 import services.service
 
 from optparse import OptionParser
 
-parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
+parser = OptionParser(usage="usage: %prog [Options]", version="%prog 1.0")
 parser.add_option(      '--name',         dest='jobname',      type='string', default='', help='job name')
 parser.add_option('-u', '--user',         dest='user',         type='string', default='', help='job user name')
 parser.add_option('-l', '--labels',       dest='labels',       type='string', default='', help='blocks names (labels)')
-parser.add_option(      '--services',     dest='services',     type='string', default='', help='blocks types (services)')
+parser.add_option(      '--services',     dest='services',     type='string', default=None, help='blocks types (services)')
 parser.add_option('-t', '--time',         dest='timesec',      type='float',  default=2,  help='time per frame in seconds')
 parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
 parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
 parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
-parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
+parser.add_option(      '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
+parser.add_option(      '--pkp',          dest='pkp',          type='int',    default=1,  help='Parser key percentage')
 parser.add_option(      '--send',         dest='sendjob',      type='int',    default=1,  help='send job')
 parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    default=0,  help='set job to wait to start time')
 parser.add_option('-c', '--capacity',     dest='capacity',     type='int',    default=0,  help='tasks capacity')
 parser.add_option(      '--capmin',       dest='capmin',       type='int',    default=-1, help='tasks variable capacity coeff min')
 parser.add_option(      '--capmax',       dest='capmax',       type='int',    default=-1, help='tasks variable capacity coeff max')
+parser.add_option('-f', '--filesout',     dest='filesout',     type='string', default=None, help='Tasks out file')
 parser.add_option(      '--filemin',      dest='filemin',      type='int',    default=-1, help='tasks output file size min')
 parser.add_option(      '--filemax',      dest='filemax',      type='int',    default=-1, help='tasks output file size max')
 parser.add_option(      '--mhmin',        dest='mhmin',        type='int',    default=-1, help='multi host tasks min hosts')
@@ -38,13 +41,15 @@ parser.add_option(      '--mhmax',        dest='mhmax',        type='int',    de
 parser.add_option(      '--mhwaitmax',    dest='mhwaitmax',    type='int',    default=0,  help='multi host tasks max hosts wait time seconds')
 parser.add_option(      '--mhwaitsrv',    dest='mhwaitsrv',    type='int',    default=0,  help='multi host tasks service start wait time seconds')
 parser.add_option(      '--mhsame',       dest='mhsame',       type='int',    default=0,  help='multi host tasks same host slave and master')
+parser.add_option(      '--mhignorelost', dest='mhignorelost', type='int',    default=0,  help='multi host mosater will ignore slave lost')
 parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    default='', help='multi host tasks service command')
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
-parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
+parser.add_option(      '--parser',       dest='parser',       type='string', default=None, help='parser type, default if not set')
+parser.add_option(      '--env',          dest='environment',  type='string', default="CG_VAR=somevalue", help='add an evironment')
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
-parser.add_option(      '--nofiles',      dest='nofiles',      action='store_true', default=False, help='do not set any files')
+parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
@@ -55,189 +60,206 @@ parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_tru
 parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
 parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
 
-options, args = parser.parse_args()
+Options, args = parser.parse_args()
 
-jobname     = options.jobname
-timesec     = options.timesec
-randtime    = options.randtime
-numblocks   = options.numblocks
-numtasks    = options.numtasks
-increment   = options.increment
-verbose     = options.verbose
-xcopy       = options.xcopy
-frames      = options.frames.split(',')
+jobname     = Options.jobname
+timesec     = Options.timesec
+randtime    = Options.randtime
+pkp         = Options.pkp
+numblocks   = Options.numblocks
+numtasks    = Options.numtasks
+increment   = Options.increment
+verbose     = Options.verbose
+xcopy       = Options.xcopy
+frames      = Options.frames.split(',')
 
-if options.frames != '':
-	numblocks = len(frames)
+if Options.frames != '':
+    numblocks = len(frames)
 
 if xcopy < 1:
-	xcopy = 1
+    xcopy = 1
 
 if jobname == '':
-	jobname = '_empty_'
+    jobname = '_empty_'
 
 job = af.Job(jobname)
 job.setDescription('afanasy test - empty tasks')
 
 # Set job folder:
-if options.folder is not None:
-	job.setFolder('folder', options.folder)
-if not options.nofolder:
-	job.setFolder('pwd', os.getcwd())
+if Options.folder is not None:
+    job.setFolder('folder', Options.folder)
+if not Options.nofolder:
+    job.setFolder('pwd', os.getcwd())
+
+if Options.pools is not None:
+    pools = dict()
+    for pool in Options.pools.split(','):
+        pool = pool.split(':')
+        pools[pool[0]] = int(pool[1])
+    job.setPools( pools)
 
 blocknames = []
-if options.labels != '':
-	blocknames = options.labels.split(':')
+if Options.labels != '':
+    blocknames = Options.labels.split(':')
 else:
-	blocknames.append('block')
+    blocknames.append('block')
 
 blocktypes = []
-if options.services != '':
-	blocktypes = options.services.split(':')
+if Options.services is not None:
+    blocktypes = Options.services.split(':')
 else:
-	blocktypes.append('generic')
+    blocktypes.append('test')
 
 if numblocks < len(blocknames):
-	numblocks = len(blocknames)
+    numblocks = len(blocknames)
 
 if numblocks < len(blocktypes):
-	numblocks = len(blocktypes)
+    numblocks = len(blocktypes)
 
 for b in range(numblocks):
-	blockname = 'block'
-	blocktype = 'generic'
+    blockname = 'block'
+    blocktype = 'test'
 
-	if len(blocknames) > b:
-		blockname = blocknames[b]
-	else:
-		blockname = blocknames[len(blocknames) - 1] + str(b)
+    if len(blocknames) > b:
+        blockname = blocknames[b]
+    else:
+        blockname = blocknames[len(blocknames) - 1] + str(b)
 
-	if len(blocktypes) > b:
-		blocktype = blocktypes[b]
-	else:
-		blocktype = blocktypes[len(blocktypes) - 1]
+    if len(blocktypes) > b:
+        blocktype = blocktypes[b]
+    else:
+        blocktype = blocktypes[len(blocktypes) - 1]
 
-	block = af.Block(blockname, blocktype)
-	job.blocks.append(block)
+    block = af.Block(blockname, blocktype)
+    job.blocks.append(block)
 
-	if options.parser != '':
-		block.setParser(options.parser)
+    if Options.parser is not None:
+        block.setParser(Options.parser)
+    else:
+        block.setParser('generic')
 
-	if b > 0:
-		job.blocks[b - 1].setTasksDependMask(blockname)
-		if options.subdep:
-			job.blocks[b].setDependSubTask()
+    if b > 0:
+        job.blocks[b - 1].setTasksDependMask(blockname)
+        if Options.subdep:
+            job.blocks[b].setDependSubTask()
 
-	if options.maxtime:
-		block.setTasksMaxRunTime(options.maxtime)
+    if Options.maxtime:
+        block.setTasksMaxRunTime(Options.maxtime)
 
-	if options.capacity != 0:
-		block.setCapacity(options.capacity)
+    if Options.capacity != 0:
+        block.setCapacity(Options.capacity)
 
-	if options.sequential != None:
-		block.setSequential( options.sequential)
+    if Options.sequential != None:
+        block.setSequential( Options.sequential)
 
-	if options.ppapproval:
-		job.setPPApproval()
+    if Options.ppapproval:
+        job.setPPApproval()
 
-	str_capacity = ''
-	if options.capmin != -1 or options.capmax != -1:
-		block.setVariableCapacity(options.capmin, options.capmax)
-		str_capacity = ' -c ' + services.service.str_capacity
+    if Options.environment:
+        for env in Options.environment.split(';'):
+            val = env.split('=')
+            block.setEnv( val[0], val[1])
 
-	if options.filemin != -1 or options.filemax != -1:
-		block.setFileSizeCheck(options.filemin, options.filemax)
+    str_capacity = ''
+    if Options.capmin != -1 or Options.capmax != -1:
+        block.setVariableCapacity(Options.capmin, Options.capmax)
+        str_capacity = ' -c ' + services.service.str_capacity
 
-	str_hosts = ''
-	if options.mhmin != -1 or options.mhmax != -1:
-		block.setMultiHost(
-			options.mhmin, options.mhmax, options.mhwaitmax,
-			options.mhsame, options.mhservice, options.mhwaitsrv
-		)
-		str_hosts = ' ' + services.service.str_hosts
+    if Options.filemin != -1 or Options.filemax != -1:
+        block.setFileSizeCheck(Options.filemin, Options.filemax)
 
-	negative_pertask = False
-	if options.frames != '':
-		fr = frames[b].split('/')
-		if int(fr[2]) < 0:
-			negative_pertask = True
+    str_hosts = ''
+    if Options.mhmin != -1 or Options.mhmax != -1:
+        block.setMultiHost(
+            Options.mhmin, Options.mhmax, Options.mhwaitmax,
+            Options.mhsame, Options.mhservice, Options.mhwaitsrv
+        )
+        if Options.mhignorelost:
+            block.setSlaveLostIgnore()
+        str_hosts = ' ' + services.service.str_hosts
 
-	if not options.stringtype and not negative_pertask:
-		cmd = 'task.py'
-		cmd = os.path.join(os.getcwd(), cmd)
-		cmd = 'python "%s"' % cmd
-		cmd += ' --exitstatus %d ' % options.exitstatus
-		cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
-			   '-i %(increment)d -t %(timesec)g -r %(randtime)g ' \
-			   '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
+    negative_pertask = False
+    if Options.frames != '':
+        fr = frames[b].split('/')
+        if int(fr[2]) < 0:
+            negative_pertask = True
 
-		block.setCommand(cmd, False)
+    if not Options.stringtype and not negative_pertask:
+        cmd = 'task.py'
+        cmd = "\"%s\"" % os.path.join(os.getcwd(), cmd)
+        cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
+        cmd += ' --exitstatus %d ' % Options.exitstatus
 
-		if options.frames != '':
-			fr = frames[b].split('/')
-			block.setNumeric(int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
-		else:
-			block.setNumeric(1, numtasks, options.pertask, increment)
+        if Options.filesout:
+            cmd += ' --filesout "%s"' % Options.filesout
+            block.skipExistingFiles()
+            block.checkRenderedFiles( 100)
+            block.setFiles(Options.filesout.split(';'))
 
-		if not options.nofiles:
-			if options.pertask > 1:
-				block.setFiles(['file_a.@#@.@###@-file_a.@#@.@###@',
-								'file_b.@#@.@###@-file_b.@#@.@###@'])
-			else:
-				block.setFiles(['file_a.@#@.@####@', 'file_b.@#@.@####@'])
-	else:
-		block.setCommand(
-			'python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
-			False
-		)
+        cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ ' \
+               '-i %(increment)d -t %(timesec)g -r %(randtime)g --pkp %(pkp)d ' \
+               '-v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
 
-		block.setTasksName('task @#@')
+        block.setCommand(cmd, False)
 
-		if not options.nofiles:
-			block.setFiles(['file_a.@#@', 'file_b.@#@'])
+        if Options.frames != '':
+            fr = frames[b].split('/')
+            block.setNumeric(int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
+        else:
+            block.setNumeric(1, numtasks, Options.pertask, increment)
 
-		if options.frames != '':
-			fr = frames[b].split('/')
-			block.setFramesPerTask(int(fr[2]))
-			numtasks = int(fr[1]) - int(fr[0]) + 1
-		for t in range(numtasks):
-			timesec_task = timesec + randtime * random.random()
-			task = af.Task('#' + str(t))
-			task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
+    else:
+        cmd = 'task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(),
+        cmd = "%s %s" % (os.getenv('CGRU_PYTHONEXE','python'), cmd)
+        block.setCommand( cmd, False)
 
-			if not options.nofiles:
-				task.setFiles(['%04d' % t])
+        block.setTasksName('task @#@')
 
-			block.tasks.append(task)
+        if Options.filesout:
+            block.setFiles(Options.filesout.split(';'))
 
-if options.cmdpre != '':
-	job.setCmdPre(options.cmdpre)
-if options.cmdpost != '':
-	job.setCmdPost(options.cmdpost)
+        if Options.frames != '':
+            fr = frames[b].split('/')
+            block.setFramesPerTask(int(fr[2]))
+            numtasks = int(fr[1]) - int(fr[0]) + 1
+        for t in range(numtasks):
+            timesec_task = timesec + randtime * random.random()
+            task = af.Task('#' + str(t))
+            task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars())
 
-if options.waittime:
-	job.setWaitTime(int(time.time()) + options.waittime)
+            if Options.filesout:
+                task.setFiles(['%04d' % t])
 
-if options.user != '':
-	job.setUserName(options.user)
+            block.tasks.append(task)
 
-if options.pause:
-	job.offLine()
+if Options.cmdpre != '':
+    job.setCmdPre(Options.cmdpre)
+if Options.cmdpost != '':
+    job.setCmdPost(Options.cmdpost)
 
-if options.output:
-	job.output(1)
+if Options.waittime:
+    job.setWaitTime(int(time.time()) + Options.waittime)
+
+if Options.user != '':
+    job.setUserName(Options.user)
+
+if Options.pause:
+    job.offLine()
+
+if Options.output:
+    job.output(1)
 
 job.setNeedOS('')
 
 exit_status = 0
-if options.sendjob:
-	for x in range(xcopy):
-		status, data = job.send(verbose)
-		if not status:
-			print('Error: Job was not sent.')
-			exit_status = 1
-			break
-		if verbose:
-			print(json.dumps(data))
+if Options.sendjob:
+    for x in range(xcopy):
+        status, data = job.send(verbose)
+        if not status:
+            print('Error: Job was not sent.')
+            exit_status = 1
+            break
+        if verbose:
+            print(json.dumps(data))
 
 sys.exit(exit_status)

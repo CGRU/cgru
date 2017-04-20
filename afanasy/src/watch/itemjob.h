@@ -10,7 +10,7 @@ class ListJobs;
 class ItemJob : public ItemNode
 {
 public:
-	ItemJob( ListJobs * i_list, af::Job *job);
+	ItemJob( ListJobs * i_list, af::Job *job, bool i_subscibed, const CtrlSortFilter * i_ctrl_sf);
 	~ItemJob();
 
 	void updateValues( af::Node *node, int type);
@@ -26,14 +26,20 @@ public:
 
 	int maxrunningtasks;
 	int maxruntasksperhost;
-	uint32_t state;
+	int64_t state;
 	int64_t time_creation;
 	int64_t time_started;
 	int64_t time_wait;
 	int64_t time_done;
 	uint32_t time_run;
 	int lifetime;
+
 	bool ppapproval;
+	bool maintenance;
+	bool ignorenimby;
+	bool ignorepaused;
+
+	QString service;
 	QString hostname;
 	QString username;
 	QString hostsmask;
@@ -46,13 +52,19 @@ public:
 	QString cmd_post;
 	QString description;
 	QString thumb_path;
+	QString report;
+	QString project;
+	QString department;
+	QMap<QString,QString> folders;
+
+	const QString getRulesFolder();
 
 	inline int getBlocksNum() const { return m_blocks_num;}
 	inline int getBlockPercent( int block ) const
-		{ if( block < m_blocks_num ) return m_blockinfo[block].getPercentage(); else return 0;}
+		{ if( block < m_blocks_num ) return m_blockinfo[block].p_percentage; else return 0;}
 
-	bool setSortType(   int type );
-	bool setFilterType( int type );
+	void setSortType(   int type1, int i_type2 );
+	void setFilterType( int type );
 
 	void generateMenu( int id_block, QMenu * menu, QWidget * qwidget);
 

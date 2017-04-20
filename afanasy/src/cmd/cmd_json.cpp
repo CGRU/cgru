@@ -17,7 +17,6 @@ CmdJSON::CmdJSON()
 	setInfo("JSON file or stdin.");
 	setHelp("json [send] [file] JSON file, send or not.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 
 CmdJSON::~CmdJSON(){}
@@ -84,7 +83,7 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 		if( false == af::pathFileExists( filename))
 		{
-			AFERRAR("File not fouded:\n%s", filename.c_str())
+			AFERRAR("File not found:\n%s", filename.c_str())
 			return false;
 		}
 
@@ -157,7 +156,6 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 		if( job.isValid())
 		{
 			send_stream = true;
-			setRecieving( false);
 		}
 		else
 		{
@@ -172,29 +170,10 @@ bool CmdJSON::v_processArguments( int argc, char** argv, af::Msg &msg)
 
 	if( send )
 	{
-		char * send_data = NULL;
-		int send_data_len = 0;
-
 		if( send_stream )
-		{
-			std::string header = af::jsonMakeHeader( stream.str().size());
-			send_data_len = header.size() + stream.str().size();
-			send_data = new char[send_data_len];
-			memcpy( send_data, header.c_str(), header.size());
-			memcpy( send_data + header.size(), stream.str().c_str(), stream.str().size());
-		}
+			msg.setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSONBIN);
 		else
-		{
-			std::string header = af::jsonMakeHeader( datalen);
-			send_data_len = header.size() + datalen;
-			send_data = new char[send_data_len];
-			memcpy( send_data, header.c_str(), header.size());
-			memcpy( send_data + header.size(), data, datalen);
-		}
-
-		msg.setData( send_data_len, send_data, af::Msg::TJSON);
-
-		delete [] send_data;
+			msg.setData( datalen, data, af::Msg::TJSONBIN);
 	}
 
 	delete [] data;

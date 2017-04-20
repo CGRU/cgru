@@ -6,9 +6,10 @@
 
 #include "../libafsql/name_afsql.h"
 
-#include "filequeue.h"
 #include "dbqueue.h"
+#include "filequeue.h"
 #include "logqueue.h"
+#include "store.h"
 
 struct ThreadArgs;
 
@@ -33,29 +34,41 @@ public:
 	inline static bool writeFile( const std::ostringstream & i_str, const std::string & i_file_name)
 		{ std::string str = i_str.str(); return writeFile( str.c_str(), str.size(), i_file_name);}
 
+	//
+	// Store folders:
+	//
 	static const std::string getStoreDir( const std::string & i_root, int i_id, const std::string & i_name);
+
 	inline static const std::string getStoreDir( const std::string & i_root, const af::Node & i_node)
 		{ return getStoreDir( i_root, i_node.getId(), i_node.getName());}
+
 	inline static const std::string getStoreDirJob( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getJobsDir(), i_node);}
-	inline static const std::string getStoreDirUser( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getUsersDir(), i_node);}
+		{ return getStoreDir( af::Environment::getStoreFolderJobs(), i_node);}
+
 	inline static const std::string getStoreDirRender( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getRendersDir(), i_node);}
+		{ return getStoreDir( af::Environment::getStoreFolderRenders(), i_node);}
+
+	inline static const std::string getStoreDirUser( const af::Node & i_node)
+		{ return getStoreDir( af::Environment::getStoreFolderUsers(), i_node);}
 
 	static const std::vector<std::string> getStoredFolders( const std::string & i_root);
 
-//   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
+	//
+	// Store operations:
+	//
+	static void saveStore() { return ms_store->save(); }
 
-//	inline static void QueueMsgMonitor( af::Msg * i_msg) { MsgDispatchQueue_M->pushMsg( i_msg);   }
-//	inline static void QueueMsgTalk(    af::Msg * i_msg) { MsgDispatchQueue_T->pushMsg( i_msg);   }
+	static int64_t getJobSerial() { return ms_store->getJobSerial(); }
+
+
+//   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 
 	inline static void QueueFileWrite( FileData * i_filedata)      { FileWriteQueue->pushFile( i_filedata); }
 	inline static void QueueNodeCleanUp( const AfNodeSrv * i_node) { FileWriteQueue->pushNode( i_node);     }
 
-	inline static bool QueueLog(        const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Info  ); else return false;}
-	inline static bool QueueLogError(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Error ); else return false;}
-	inline static bool QueueLogErrno(   const std::string & log) { if( OutputLogQueue) return OutputLogQueue->pushLog( log, LogData::Errno ); else return false;}
+	inline static void QueueLog(      const std::string & log) { OutputLogQueue->pushLog( log, LogData::Info  );}
+	inline static void QueueLogError( const std::string & log) { OutputLogQueue->pushLog( log, LogData::Error );}
+	inline static void QueueLogErrno( const std::string & log) { OutputLogQueue->pushLog( log, LogData::Errno );}
 
 	inline static void DBAddJob( const af::Job * i_job) { if( ms_DBQueue ) ms_DBQueue->addJob( i_job );}
 	inline static void DBAddTask(
@@ -66,11 +79,11 @@ public:
 		{ if( ms_DBQueue ) ms_DBQueue->addTask( i_exec, i_progress, i_job, i_render );}
 
 private:
-	static af::MsgQueue * MsgDispatchQueue_M;
-	static af::MsgQueue * MsgDispatchQueue_T;
-	static FileQueue    * FileWriteQueue;
-	static LogQueue     * OutputLogQueue;
-	static DBQueue      * ms_DBQueue;
+	static FileQueue * FileWriteQueue;
+	static LogQueue  * OutputLogQueue;
+	static DBQueue   * ms_DBQueue;
+
+	static Store * ms_store;
 
 //   static bool detach();
 };

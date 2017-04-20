@@ -116,7 +116,7 @@ bool Address::equal( const af::Address & other ) const
 {
 	if( false == equalIP( other)) return false;
 	if( m_port != other.m_port ) return false;
-	return false;
+	return true;
 }
 
 bool Address::equalIP( const af::Address & other ) const
@@ -126,7 +126,7 @@ bool Address::equalIP( const af::Address & other ) const
 	if( m_family == other.m_family)
 	{
 		if( memcmp( &m_addr, &(other.m_addr), ms_addrdatalength) == 0)
-		return true;
+			return true;
 	}
 	return false;
 }
@@ -508,6 +508,7 @@ AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_fam
 		}
 		break;
 	}
+	default: break;// Do nothing
 	}
 
 	printf("\n");

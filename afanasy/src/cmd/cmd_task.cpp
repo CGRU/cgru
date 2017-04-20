@@ -1,8 +1,5 @@
 #include "cmd_task.h"
 
-#include "../libafanasy/msgclasses/mctaskpos.h"
-#include "../libafanasy/msgclasses/mctaskspos.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -13,8 +10,7 @@ CmdTaskLog::CmdTaskLog()
 	setArgsCount(4);
 	setInfo("Get task log.");
 	setHelp("tout [jobid] [block] [task] [start] Get task log.");
-	setMsgType( af::Msg::TTaskLogRequest);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdTaskLog::~CmdTaskLog(){}
 bool CmdTaskLog::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -28,8 +24,17 @@ bool CmdTaskLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 	if( ok == false ) return false;
 	number = af::stoi(argv[3], &ok);
 	if( ok == false ) return false;
-	af::MCTaskPos mctaskpos( job, block, task, number);
-	msg.set( getMsgType(), &mctaskpos);
+
+//{"get":{"type":"jobs","mode":"files","ids":[2],"block_ids":[0],"task_ids":[3],"binary":true}}
+	m_str << "{\"get\":{\"type\":\"jobs\"";
+	m_str << ",\"mode\":\"log\"";
+	m_str << ",\"ids\":[" << job << "]";
+	m_str << ",\"block_ids\":[" << block << "]";
+	m_str << ",\"task_ids\":[" << task << "]";
+	m_str << ",\"number\":" << number;
+	m_str << ",\"binary\":true";
+	m_str << "}}";
+
 	return true;
 }
 
@@ -39,8 +44,7 @@ CmdTaskOutput::CmdTaskOutput()
 	setArgsCount(4);
 	setInfo("Get task output.");
 	setHelp("tout [jobid] [block] [task] [start] Get task output.");
-	setMsgType( af::Msg::TTaskOutputRequest);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdTaskOutput::~CmdTaskOutput(){}
 bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -54,8 +58,16 @@ bool CmdTaskOutput::v_processArguments( int argc, char** argv, af::Msg &msg)
 	if( ok == false ) return false;
 	number = af::stoi(argv[3], &ok);
 	if( ok == false ) return false;
-	af::MCTaskPos mctaskpos( job, block, task, number);
-	msg.set( getMsgType(), &mctaskpos);
+
+	m_str << "{\"get\":{\"type\":\"jobs\"";
+	m_str << ",\"mode\":\"output\"";
+	m_str << ",\"ids\":[" << job << "]";
+	m_str << ",\"block_ids\":[" << block << "]";
+	m_str << ",\"task_ids\":[" << task << "]";
+	m_str << ",\"number\":" << number;
+	m_str << ",\"binary\":true";
+	m_str << "}}";
+
 	return true;
 }
 

@@ -12,15 +12,13 @@ CmdMonitorList::CmdMonitorList()
 {
    setCmd("mlist");
    setInfo("List of online Monitors.");
-   setMsgType( af::Msg::TMonitorsListRequest);
-   setMsgOutType( af::Msg::TMonitorsList);
-   setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdMonitorList::~CmdMonitorList(){}
 bool CmdMonitorList::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-   msg.set( af::Msg::TMonitorsListRequest);
-   return true;
+	m_str << "{\"get\":{\"type\":\"monitors\"}}";
+	return true;
 }
 void CmdMonitorList::v_msgOut( af::Msg& msg)
 {
@@ -34,14 +32,32 @@ CmdMonitorLog::CmdMonitorLog()
 	setArgsCount(1);
 	setInfo("Get Monitor log by id.");
 	setHelp("mlog [id] Get monitor log with given id.");
-	setMsgType( af::Msg::TMonitorLogRequestId);
-	setRecieving();
+	setMsgType( af::Msg::TJSON);
 }
 CmdMonitorLog::~CmdMonitorLog(){}
 bool CmdMonitorLog::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
-	int number = atoi(argv[0]);
-	msg.set( getMsgType(), number);
+	int id = atoi(argv[0]);
+	m_str << "{\"get\":{\"type\":\"monitors\",\"mode\":\"log\",\"ids\":[" << id << "]}}";
 	return true;
 }
 
+CmdMonitorMsg::CmdMonitorMsg()
+{
+   setCmd("mmsg");
+   setArgsCount(1);
+   setInfo("Send message to all GUI monitors.");
+   setHelp("mmsg [message]");
+	setMsgType( af::Msg::TJSON);
+}
+
+CmdMonitorMsg::~CmdMonitorMsg(){}
+
+bool CmdMonitorMsg::v_processArguments( int argc, char** argv, af::Msg &msg)
+{
+	af::jsonActionOperationStart( m_str,"monitors","message",".*");
+	m_str << ",\n\"text\":\"" << af::strEscape( argv[0]) << "\"";
+	af::jsonActionOperationFinish( m_str);
+
+	return true;
+}

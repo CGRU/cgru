@@ -8,29 +8,38 @@
 class ItemRender : public ItemNode
 {
 public:
-	ItemRender( af::Render *render);
+	ItemRender( af::Render * i_render, const CtrlSortFilter * i_ctrl_sf);
 	~ItemRender();
 
-	void updateValues( af::Node *node, int type);
+	void updateValues( af::Node * i_node, int i_type);
 
 	inline const QString & getUserName()   const { return m_username;      }
 	inline const QString & getIPString()   const { return m_address_ip_str;}
 	inline int getCapacity() const { return m_capacity;  }
 	inline int getMaxTasks() const { return m_maxtasks;  }
 
-	bool setSortType(   int type );
-	bool setFilterType( int type );
+	void setSortType(   int i_type1, int i_type2 );
+	void setFilterType( int i_type );
 
 	inline bool isOnline()        const { return m_online;           }
 	inline bool isOffline()       const { return false == m_online;  }
 	inline bool isBusy()          const { return m_busy;             }
 	inline bool isNimby()         const { return m_nimby;            }
 	inline bool isNIMBY()         const { return m_NIMBY;            }
+	inline bool isPaused()        const { return m_paused;           }
 	inline bool isDirty()         const { return m_dirty;            }
 	inline bool isWOLFalling()    const { return m_wolFalling;       }
 	inline bool isWOLSleeping()   const { return m_wolSleeping;      }
 	inline bool isWOLWaking()     const { return m_wolWaking;        }
 	inline bool hasTasks()        const { return m_tasks.size() > 0; }
+	
+	inline std::list<const af::TaskExec*> getTasks() const
+	{
+		std::list<const af::TaskExec*> l;
+		for (std::list<af::TaskExec*>::const_iterator it = m_tasks.begin() ; it != m_tasks.end() ; ++it)
+			l.push_back(*it);
+		return l;
+	}
 
 	bool calcHeight();
 
@@ -53,7 +62,7 @@ private:
 	af::Host    m_host;
 	af::HostRes m_hres;
 
-	QString m_version;
+	QString m_engine;
 	QString m_username;
 	QString m_tasksusers; ///< For sorting and filtering only
 	QString m_tasks_users_counts; ///< One string collection of all tasks users and counts
@@ -65,6 +74,7 @@ private:
 	long long m_wol_operation_time;
 	long long m_idle_time;
 	long long m_busy_time;
+	long long m_elder_task_time;
 
 	QString m_address_ip_str;
 	QString m_address_str;      ///< Client address
@@ -73,6 +83,7 @@ private:
 	bool m_busy;
 	bool m_NIMBY;
 	bool m_nimby;
+	bool m_paused;
 	bool m_dirty;
 	bool m_wolFalling;
 	bool m_wolSleeping;

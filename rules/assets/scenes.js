@@ -55,8 +55,8 @@ function sc_InitHTML( i_data)
 function sc_Post()
 {
 	if( g_arguments )
-		if( g_arguments.u_Search )
-			sc_FilterShots( g_arguments.u_Search);
+		if( g_arguments.s_Search )
+			sc_FilterShots( g_arguments.s_Search);
 }
 
 function scene_Show()
@@ -64,13 +64,13 @@ function scene_Show()
 	var folders = g_elCurFolder.m_dir.folders;
 	for( var f = 0; f < folders.length; f++ )
 	{
-		if( sc_SkipFolder( folders[f].name)) continue;
+		if( c_AuxFolder( folders[f])) continue;
 
 		var path = g_elCurFolder.m_path + '/' + folders[f].name;
 
 		var elShot = document.createElement('div');
 		sc_elShots.push( elShot);
-		elShot.m_hidden = false;
+		elShot.m_filtered = false;
 		elShot.m_status = folders[f].status;
 		elShot.m_path = path;
 		$('scenes_div').appendChild( elShot);
@@ -188,6 +188,10 @@ function scene_Show()
 		elShot.m_elStatus.appendChild( elSt.elArtists);
 		elSt.elArtists.classList.add('artists');
 
+		elSt.elFlags = document.createElement('div');
+		elShot.m_elStatus.appendChild( elSt.elFlags);
+		elSt.elFlags.classList.add('flags');
+
 		elSt.elTags = document.createElement('div');
 		elShot.m_elStatus.appendChild( elSt.elTags);
 		elSt.elTags.classList.add('tags');
@@ -199,6 +203,10 @@ function scene_Show()
 			i_status.elParent = elShot;
 			i_status.elShow = elShot.m_elStatus;
 		}
+
+		if( folders[f].status && folders[f].status.flags )
+			for( var fl = 0; fl < folders[f].status.flags.length; fl++)
+				elShot.classList.add( folders[f].status.flags[fl]);
 
 		var st_obj = new Status( folders[f].status, {"path":path,"createGUI": st_CreateSceneShot});
 		elShot.m_status = st_obj;
@@ -249,11 +257,11 @@ function scenes_Received( i_data, i_args)
 	for( var sc = 0; sc < walk.folders.length; sc++)
 	{
 		var fobj = walk.folders[sc];
-		if( sc_SkipFolder( fobj.name)) continue;
+		if( c_AuxFolder( fobj)) continue;
 
 		var elScene = document.createElement('div');
 		sc_elScenes.push( elScene);
-		elScene.m_hidden = false;
+		elScene.m_filtered = false;
 		elScene.m_elThumbnails = [];
 		elScene.m_elShots = [];
 		$('scenes_div').appendChild( elScene);
@@ -280,13 +288,13 @@ function scenes_Received( i_data, i_args)
 		for( var s = 0; s < walk.folders[sc].folders.length; s++)
 		{
 			var fobj = walk.folders[sc].folders[s];
-			if( sc_SkipFolder( fobj.name)) continue;
+			if( c_AuxFolder( fobj)) continue;
 
 			var elShot = document.createElement('div');
 			sc_elShots.push( elShot);
 			elScene.m_elShots.push( elShot);
 			elShot.m_status = fobj.status;
-			elShot.m_hidden = false;
+			elShot.m_filtered = false;
 			elScene.appendChild( elShot);
 			elScene.m_elThumbnails.push( elShot);
 			elShot.classList.add('shot');
@@ -326,6 +334,10 @@ function scenes_Received( i_data, i_args)
 			elSt.elProgress.appendChild( elSt.elProgressBar);
 			elSt.elProgressBar.classList.add('progressbar');
 
+			elSt.elFlags = document.createElement('div');
+			elShot.m_elStatus.appendChild( elSt.elFlags);
+			elSt.elFlags.classList.add('flags');
+
 			elSt.elTags = document.createElement('div');
 			elShot.m_elStatus.appendChild( elSt.elTags);
 			elSt.elTags.classList.add('tags');
@@ -346,10 +358,14 @@ function scenes_Received( i_data, i_args)
 				i_status.elShow = elShot.m_elStatus;
 			}
 
+			if( fobj.status && fobj.status.flags )
+				for( var f = 0; f < fobj.status.flags.length; f++)
+					elShot.classList.add( fobj.status.flags[f]);
+
 			var st_obj = new Status( fobj.status, {"path":elShot.m_path,"createGUI": st_CreateSceneShot});
 			elShot.m_status = st_obj;
-			elShot.ondblclick = sc_EditStatus;
 
+			elShot.ondblclick = sc_EditStatus;
 			elShot.onclick = sc_ShotClicked;
 		}
 	}
@@ -434,6 +450,9 @@ function sc_EditBodySave( i_e)
 
 	for( var i = 0; i < shots.length; i++)
 	{
+		if( shots[i].m_status.obj == null )
+			shots[i].m_status.obj = {};
+
 		n_Request({"send":{"save":{"file":c_GetRuFilePath( u_body_filename, shots[i].m_path),"data":text}},
 		"func":sc_EditBodyFinished,"elShot":shots[i],"info":'body save'});
 
@@ -575,20 +594,12 @@ function scenes_GetSelectedShots()
 		if( sc_elShots[i].m_selected != true )
 			continue;
 
-		if( sc_elShots[i].m_hidden )
+		if( sc_elShots[i].m_filtered )
 			continue;
 
 		shots.push( sc_elShots[i]);
 	}
 	return shots;
-}
-function sc_SkipFolder( i_name)
-{
-	var name = c_PathBase( i_name);
-	for( var i = 0; i < RULES.assets.shot.skip.length; i++)
-		if( name.toLowerCase().indexOf( RULES.assets.shot.skip[i]) === 0 )
-			return true;
-	return false;
 }
 
 function sc_FilterShots( i_args)
@@ -611,9 +622,6 @@ function sc_FilterShots( i_args)
 		for( var o = 0; o < anns_or.length; o++)
 			anns.push( anns_or[o].split(' '));
 	}
-
-	var scenes_count = 0;
-	var shots_count = 0;
 
 	for( var th = 0; th < sc_elShots.length; th++)
 	{
@@ -647,22 +655,43 @@ function sc_FilterShots( i_args)
 		}
 		else found = true;
 
+		if( i_args.flags && found )
+		{
+			found = false;
+			if( st_obj.flags && st_obj.flags.length )
+			{
+				for( i = 0; i < i_args.flags.length; i++ )
+					if( st_obj.flags.indexOf( i_args.flags[i]) != -1 )
+						{ found = true; break; }
+			}
+			else if( i_args.flags.indexOf('_null_') != -1)
+				found = true;
+		}
+
 		if( i_args.tags && found )
 		{
 			found = false;
-			if( st_obj.tags )
+			if( st_obj.tags && st_obj.tags.length )
+			{
 				for( i = 0; i < i_args.tags.length; i++ )
 					if( st_obj.tags.indexOf( i_args.tags[i]) != -1 )
 						{ found = true; break; }
+			}
+			else if( i_args.tags.indexOf('_null_') != -1)
+				found = true;
 		}
 
 		if( i_args.artists && found )
 		{
 			found = false;
-			if( st_obj.artists )
+			if( st_obj.artists && st_obj.artists.length )
+			{
 				for( i = 0; i < i_args.artists.length; i++ )
 					if( st_obj.artists.indexOf( i_args.artists[i]) != -1 )
 						{ found = true; break; }
+			}
+			else if( i_args.artists.indexOf('_null_') != -1)
+				found = true;
 		}
 
 		if( i_args.percent && found )
@@ -689,13 +718,12 @@ function sc_FilterShots( i_args)
 		if( found )
 		{
 			el.style.display = 'block';
-			el.m_hidden = false;
-			shots_count++;
+			el.m_filtered = false;
 		}
 		else
 		{
 			el.style.display = 'none';
-			el.m_hidden = true;
+			el.m_filtered = true;
 		}
 	}
 
@@ -705,7 +733,7 @@ function sc_FilterShots( i_args)
 			var oneShown = false;
 			for( var t = 0; t < sc_elScenes[f].m_elThumbnails.length; t++)
 			{
-				if( sc_elScenes[f].m_elThumbnails[t].m_hidden != true )
+				if( sc_elScenes[f].m_elThumbnails[t].m_filtered != true )
 				{
 					oneShown = true;
 					break;
@@ -714,13 +742,12 @@ function sc_FilterShots( i_args)
 			if( oneShown )
 			{
 				sc_elScenes[f].style.display = 'block';
-				sc_elScenes[f].m_hidden = false;
-				scenes_count++;
+				sc_elScenes[f].m_filtered = false;
 			}
 			else
 			{
 				sc_elScenes[f].style.display = 'none';
-				sc_elScenes[f].m_hidden = true;
+				sc_elScenes[f].m_filtered = true;
 			}
 		}
 
@@ -734,14 +761,14 @@ function sc_ShowAllShots()
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
 		sc_elShots[i].style.display = 'block';
-		sc_elShots[i].m_hidden = false;
+		sc_elShots[i].m_filtered = false;
 	}
 
 	if( sc_elScenes )
 		for( var i = 0; i < sc_elScenes.length; i++)
 		{
 			sc_elScenes[i].style.display = 'block';
-			sc_elScenes[i].m_hidden = false;
+			sc_elScenes[i].m_filtered = false;
 		}
 
 	sc_DisplayStatistics();
@@ -752,11 +779,16 @@ function sc_DisplayStatistics()
 	var selShots = scenes_GetSelectedShots();
 //	c_Info( selShots.length + ' shots selected.');
 
+	// Gather shots:
+	var filtered = 0;
 	var shots = [];
 	for( var i = 0; i < sc_elShots.length; i++)
 	{
-		if( sc_elShots[i].m_hidden == true )
+		if( sc_elShots[i].m_filtered == true )
+		{
+			filtered++;
 			continue;
+		}
 
 		if( selShots.length && ( sc_elShots[i].m_selected != true ))
 			continue;
@@ -766,6 +798,7 @@ function sc_DisplayStatistics()
 
 	// Shots count, progress, frames count:
 	//
+	var statuses = [];
 	var omits = 0;
 	var progress = 0;
 	var frames_count = 0;
@@ -774,24 +807,28 @@ function sc_DisplayStatistics()
 		var stat = shots[i].m_status.obj;
 		if( stat == null) continue;
 
-		if( stat && stat.tags && ( stat.tags.indexOf('omit') != -1 ))
+		if( stat && stat.flags && ( stat.flags.indexOf('omit') != -1 ))
 		{
 			omits++;
+			continue;
 		}
-		else
-		{
-			if( stat.progress && ( stat.progress > 0 ))
-				progress += stat.progress;
 
-			if( stat.frames_num )
-				frames_count += stat.frames_num;
-		}
+		statuses.push( stat);
+
+		if( stat.progress && ( stat.progress > 0 ))
+			progress += stat.progress;
+
+		if( stat.frames_num )
+			frames_count += stat.frames_num;
 	}
 
-	var info = 'shots count: ' + (shots.length - omits);
+	var info = 'Shots count: <big><b>' + (shots.length - omits) + '</big></b>';
 	if( omits ) info += ' (+' + omits + ' omits)';
+	if( filtered ) info += ' (+' + filtered + ' filtered)';
 	if( shots.length )
-		info += ', average progress: ' + Math.round(progress/shots.length) + '%';
+		info += '<br>Average progress: ' + Math.floor(progress/(shots.length-omits)) + '%';
+
+	info += '<br>Frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
 
 	if( ASSET.type == 'scenes')
 	{
@@ -807,22 +844,16 @@ function sc_DisplayStatistics()
 				}
 			}
 		}
-		info = 'scenes count: ' + scenes_count + '<br>' + info;
+		info += '<br>Scenes count: ' + scenes_count;
 	}
 
 	if( selShots.length )
-		info = 'selected ' + info;
-
-	info += '<br>frames count: ' + frames_count + ' = ' + c_DT_DurFromSec( frames_count / RULES.fps) + ' at ' + RULES.fps + ' FPS';
+		info = '<i><b>Selected</b></i> ' + info;
 
 	$('scenes_info').innerHTML = info;
 
 	// Statistics:
 	//
-	var statuses = [];
-	for( var i = 0; i < shots.length; i++)
-		statuses.push( shots[i].m_status.obj);
-
 	var args = {};
 	args.statuses = statuses;
 	args.elTasks = $('scenes_tasks');
@@ -945,5 +976,35 @@ function scenes_Convert()
 	args.results = true;
 
 	d_Convert( args);
+}
+
+function scenes_ExportTable()
+{
+	var args = {};
+	args.shots = [];
+
+	var elShots = scenes_GetSelectedShots();
+	if( elShots.length < 1 )
+		elShots = sc_elShots;
+
+	for( var i = 0; i < elShots.length; i++)
+	{
+		if( elShots[i].m_filtered )
+			continue;
+
+		var shot = {};
+		shot.path = elShots[i].m_path;
+		shot.status = elShots[i].m_status.obj;
+
+		args.shots.push( shot);
+	}
+
+	if( args.shots.length < 1 )
+	{
+		c_Error('No shots to export.');
+		return;
+	}
+
+	table_Export( args);
 }
 

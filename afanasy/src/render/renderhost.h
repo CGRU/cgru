@@ -2,10 +2,9 @@
 
 #include "../libafanasy/common/dlRWLock.h"
 
-#include "../libafanasy/msgclasses/mclistenaddress.h"
-
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
+#include "../libafanasy/renderupdate.h"
 
 #include "taskprocess.h"
 
@@ -14,76 +13,143 @@ class PyRes;
 
 class RenderHost: public af::Render
 {
-public:
+private:  // This is a singleton class
     RenderHost();
+
+public:
     ~RenderHost();
 
-    inline static int  getId() { return ms_obj->af::Render::getId();}
-    inline static const std::string & getName() { return ms_obj->af::Render::getName();}
+    /// Get singleton instance
+    static RenderHost * getInstance();
+	
+	/// Some getters and setters
+	inline bool noOutputRedirection() { return m_no_output_redirection; }
+	
+	void connectionEstablished();
 
-    static void setListeningPort( uint16_t i_port);
+	inline bool isConnected()  const { return          m_connected; }
+	inline bool notConnected() const { return false == m_connected; }
 
-    inline static bool isListening() { return ms_listening; }
+	/**
+	* @brief Some message was failed to send.
+	* At first it counts this function call.
+	* If count > af_render_connectretries connection is lost.
+	* @param i_any_case Do not count, connection os lost in any case.
+	*/
+	void connectionLost( bool i_any_case = false);
 
-	inline static bool noOutputRedirection() { return ms_no_output_redirection; }
+	/**
+	* @brief Render was successfuly registered on server and got good (>0) id.
+	* @param i_id Render ID from server to store.
+	*/
+	void setRegistered( int i_id);
 
-    inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
-    static void dispatchMessage( af::Msg * i_msg);
+	/**
+	* @brief Task monitoring cycle, checking how task processes are doing
+	*/
+	void refreshTasks();
 
-    inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
-    inline static af::Msg * acceptTry()  { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_no_wait); }
+	/**
+	* @brief Send message to server and receive answer
+	*/
+	af::Msg * updateServer();
 
-    static bool isConnected() { return ms_connected;  }
-    static void setRegistered( int i_id);
-    static void connectionLost();
+	/**
+	* @brief Get machine resources.
+	* Custom resources also called there.
+	*/
+	void getResources();
 
-    static void setUpdateMsgType( int i_type);
+	#ifdef WINNT
+	/**
+	* @brief Close windows on windows.
+	*/
+	void windowsMustDie();
+	#endif
 
-    static void refreshTasks();
+	/**
+	* @brief Create new TaskProcess.
+	* @param i_task Task data
+	*/
+	void runTask( af::TaskExec * i_task);
 
-    static void update();
+	/**
+	* @brief Stop task process.
+	* @param i_taskpos Index of the task
+	*/
+    void stopTask( const af::MCTaskPos & i_taskpos);
 
-    static void runTask( af::Msg * i_msg);
+	/**
+	* @brief Close (delete) class that controls child process.
+	* @param i_taskpos Index of the task
+	*/
+    void closeTask( const af::MCTaskPos & i_taskpos);
 
-    static void stopTask( const af::MCTaskPos & i_taskpos);
+	bool hasTasks() const { return m_taskprocesses.size(); }
+	int getTasksCount() const { return m_taskprocesses.size(); }
+	inline int getRunningTasksCount() const
+		{ int c = 0; for( int i = 0; i < m_taskprocesses.size(); i++) if( m_taskprocesses[i]->isRunning()) c++; return c;}
 
-    static void closeTask( const af::MCTaskPos & i_taskpos);
+	/**
+	* @brief Add task update data to send to server on next update.
+	* @param i_tup Task update data class
+	*/
+	inline void addTaskUp( af::MCTaskUp * i_tup) { m_up.addTaskUp( i_tup);}
 
-    static void getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg);
+	/**
+	* @brief Write task output on next update.
+	* This needed when you ask running task output from GUI.
+	* @param i_taskpos Index of the task
+	*/
+	void upTaskOutput( const af::MCTaskPos & i_taskpos);
 
-    static void listenTasks( const af::MCListenAddress & i_mcaddr);
+	/**
+	* @brief Start (or stop) to send task output on each update.
+	* @param i_tp Index of the task
+	* @param i_subscribe Turn listening on or off
+	*/
+	void listenTask( const af::MCTaskPos & i_tp, bool i_subscribe);
 
-    static void listenFailed( const af::Address & i_addr);
-
-//    inline static void   lockMutex() { ms_obj->m_mutex.WriteLock();  }
-//    inline static void unLockMutex() { ms_obj->m_mutex.WriteUnlock();}
-    inline static void   lockMutex() { ms_obj->m_mutex.Lock();  }
-    inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
-
-#ifdef WINNT
-    static void windowsMustDie();
-#endif
+	/**
+	* @brief Close windows on windows.
+	* @param i_str Render data for Python service class
+	*/
+	void wolSleep( const std::string & i_str);
 
 private:
-    static RenderHost * ms_obj;
+	/**
+	* @brief Set update message type.
+	* @param i_type New type to set.
+	*/
+	void setUpdateMsgType( int i_type);
 
-    static std::vector<std::string> ms_windowsmustdie;
+private:
+	/// Windows to kill on windows
+	/// Bad mswin applications like to raise a gui window with an error and waits for some 'Ok' button.
+    std::vector<std::string> m_windowsmustdie;
 
-    static std::vector<PyRes*> ms_pyres;
+	/// Custom resources classes
+    std::vector<PyRes*> m_pyres;
 
-    static af::MsgQueue * ms_msgAcceptQueue;
-    static af::MsgQueue * ms_msgDispatchQueue;
+	/// Whether the render is connected or not
+    bool m_connected;
+	/// Count times render failed to send update message to server
+	int  m_connection_lost_count;
 
-    static bool ms_connected;
+	/// Heartbeat message to sent at each update.
+	/// It is initially a `TRenderRegister` and as soon as the server
+	/// registered the render, it becomes a `TRenderUpdate`.
+    int m_updateMsgType;
 
-    static int ms_updateMsgType;
+	/// List of task processed being currently ran by the render
+    std::vector<TaskProcess*> m_taskprocesses;
 
-    static std::vector<TaskProcess*> ms_tasks;
+	/// Whether the task outputs must be redirected. Used essentially by TaskProcess
+	bool m_no_output_redirection;
 
-    static bool ms_listening;
+	/// Class to collect data to send to server on update.
+	af::RenderUpdate m_up;
 
-	static bool ms_no_output_redirection;
-
-    DlMutex m_mutex;
-//    DlRWLock m_mutex;
+	/// Time when render has at least on task:
+	time_t m_has_tasks_time;
 };

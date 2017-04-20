@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/taskexec.h"
 
 class Block;
 class RenderAf;
@@ -26,13 +27,15 @@ public:
             Block * taskBlock,
             RenderAf * render,
             MonitorContainer * monitoring,
-            int * runningtaskscounter
+            int32_t * i_running_tasks_counter,
+            int64_t * i_running_capacity_counter
             );
 
    virtual ~TaskRun();
 
 /// When running session finishes this class became a zombie - ready to delete.
-   inline bool isZombie() const { return m_zombie;}
+	inline bool isZombie()  const { return m_zombie;}
+	inline bool notZombie() const { return m_zombie == false;}
 
 /// Update task state by sent message, almost often from remote render host
    virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
@@ -46,15 +49,14 @@ public:
 /// Same as 'retart' function but with switch to 'skipped' state.
    virtual void skip(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
-/// Request to remote host to send output to specified address (or request not to do it).
-   void listen( af::MCListenAddress & mclisten, RenderContainer * renders);
-
-/// Return special message for request output from its running render.
-	virtual af::Msg * v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const;
+/// Return running render id:
+	virtual int v_getRunningRenderID( std::string & o_error) const;
 
    uint32_t getStopTime() const { return m_stopTime;}
    int        getHostId() const { return m_hostId;}
    bool isHostId( const int value) const { return m_hostId == value;}
+
+   const std::string & getTaskName() const { if( m_exec) return m_exec->getName(); else return ms_no_name;}
 
 /// Calculate memory totally allocated by class instance
    int calcWeight() const;
@@ -76,7 +78,11 @@ protected:
    int m_hostId;       ///< Task Host Id
 
 private:
-   int * m_counter;
+	int32_t * m_running_tasks_counter;
+	int64_t * m_running_capacity_counter;
+
    uint32_t m_stopTime;         ///< Time, when running task was asked to stop.
    bool m_zombie;
+
+   static std::string ms_no_name;
 };

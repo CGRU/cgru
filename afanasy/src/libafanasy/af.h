@@ -26,6 +26,9 @@ public:
 	virtual const std::string v_generateInfoString( bool full = false) const;
 	virtual void v_generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
+	friend std::ostream& operator<<( std::ostream& stream, const Af &obj) { stream << obj.v_generateInfoString(); return stream; }
+	friend std::ostream& operator<<( std::ostream& stream, const Af *obj_ptr) { stream << obj_ptr->v_generateInfoString(); return stream; }
+
 
 protected:
 	void read( Msg * msg );
@@ -49,6 +52,7 @@ protected:
 	static void rw_StringList(       std::list<std::string> & stringList, Msg * msg);
 	static void  w_StringList( const std::list<std::string> & stringList, Msg * msg);
 	static void rw_StringVect(     std::vector<std::string> & stringVect, Msg * msg);
+	static void rw_StringMap( std::map< std::string, std::string > & stringMap, Msg * msg);
 
 	static void rw_RegExp( RegExp & regExp, Msg * msg);
 

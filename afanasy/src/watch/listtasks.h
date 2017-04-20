@@ -14,6 +14,8 @@ class QListWidgetItem;
 class ItemJobBlock;
 class ItemJobTask;
 
+class WndTask;
+
 class ListTasks : public ListItems
 {
 	Q_OBJECT
@@ -22,7 +24,9 @@ public:
 	ListTasks( QWidget* parent, int JobId, const QString & JobName);
 	~ListTasks();
 
-	bool caseMessage( af::Msg * msg);
+	virtual bool v_caseMessage( af::Msg * msg);
+
+	virtual bool v_processEvents( const af::MonitorEvents & i_me);
 
 	bool mousePressed( QMouseEvent * event);
 
@@ -30,31 +34,33 @@ public:
 
 	bool v_filesReceived( const af::MCTaskUp & i_taskup );
 
-signals:
-	void changeMonitor( int type, int id);
-
+	void taskWindowClosed( WndTask * i_wndtask);
+	
+public:
+	void generateMenu(QMenu &o_menu, Item *item);
+	
 protected:
 	void contextMenuEvent(QContextMenuEvent *event);
+
 	void doubleClicked( Item * item);
+
 	void v_connectionLost();
 
 private slots:
 
 	void actBlockCommand();
 	void actBlockWorkingDir();
+	void actBlockEnvironment();
 	void actBlockFiles();
 	void actBlockCmdPost();
 	void actBlockService();
 	void actBlockParser();
 
 	void blockAction( int id_block, QString i_action);
+	void actBlockPreview( int num_cmd, int num_img);
 
-	void actTaskInfo();
-	void actTaskLog();
-	void actTaskStdOut( int number );
-	void actTaskErrorHosts();
+	void actTaskOpen();
 	void actTaskPreview( int num_cmd, int num_img);
-	void actTaskListen();
 	void actTasksRestart();
 	void actTasksSkip();
 
@@ -71,16 +77,22 @@ private:
 
 	bool constructed;
 
+	std::vector<WndTask*> m_wndtasks;
+
 private:
 	void construct( af::Job * job);
 
 	bool updateProgress( const af::JobProgress * progress);
-	bool updateTasks( af::MCTasksProgress * mctasksprogress);
+	bool updateTasks(
+		const std::vector<int32_t> & i_blocks,
+		const std::vector<int32_t> & i_tasks,
+		const std::vector<af::TaskProgress> & i_tps);
+
+	void openTask( ItemJobTask * i_itemTask);
 
 	int getRow( int block, int task = -1);
 
 	void blockAction( int id_block, const QString & i_action, bool i_query);
-	void tasksOpeation( const std::string & i_type);
-	void do_Info_StdOut(   int type, int number, Item * item = NULL);
+	void tasksOperation( const std::string & i_type);
 	void setWindowTitleProgress();
 };

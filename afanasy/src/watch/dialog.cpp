@@ -1,6 +1,7 @@
 #include "dialog.h"
 
 #include "../include/afanasy.h"
+#include "../include/afgui.h"
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -12,7 +13,6 @@
 #include "actionid.h"
 #include "buttonmonitor.h"
 #include "buttonout.h"
-#include "labelversion.h"
 #include "listitems.h"
 #include "listjobs.h"
 #include "listusers.h"
@@ -23,21 +23,23 @@
 #include "watch.h"
 #include "wnd.h"
 #include "wndcustomizegui.h"
-#include "wndcustomizesounds.h"
+#include "wndnotifications.h"
 #include "wndtask.h"
 #include "wndtext.h"
 #include "wndlist.h"
 
 #include <QtCore/QEvent>
-#include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
-#include <QtGui/QMenu>
 #include <QtGui/QPainter>
-#include <QtGui/QScrollArea>
+#include <QBoxLayout>
+#include <QMenu>
+#include <QMenuBar>
+#include <QScrollArea>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 int Dialog::ms_size_border_top   = 40;
 int Dialog::ms_size_border_bot   = 25;
@@ -46,25 +48,20 @@ int Dialog::ms_size_border_right = 75;
 
 Dialog::Dialog():
     m_connected(false),
-    m_uid(0),
     m_monitorType( Watch::WNONE),
-    m_qThreadClientUpdate( this, false, af::Environment::getMonitorUpdatePeriod(), af::Environment::getMonitorConnectRetries()),
-    m_qThreadSend( this, af::Environment::getMonitorConnectRetries()),
-    m_qServer( this),
+    m_qThreadClientUpdate( this, af::Environment::getWatchGetEventsSec(), af::Environment::getWatchConnectRetries()),
+    m_qThreadSend( this, af::Environment::getWatchConnectRetries()),
     m_listitems( NULL),
     m_offlinescreen( NULL),
     m_repaintTimer( this),
     m_initialized( false)
 {
-    if( m_qServer.isInitialized() == false )
-    {
-        AFERROR("Dialog::Dialog: Server initialization failed.")
-        return;
-    }
-
     for( int b = 0; b < Watch::WLAST; b++) m_btnMonitor[b] = NULL;
 
-    m_hlayout_a = new QHBoxLayout( this);
+	QWidget * cw = new QWidget( this);
+	setCentralWidget( cw);
+
+    m_hlayout_a = new QHBoxLayout( cw);
     m_vlayout_a = new QVBoxLayout();
     m_hlayout_b = new QHBoxLayout();
     m_vlayout_b = new QVBoxLayout();
@@ -76,7 +73,7 @@ Dialog::Dialog():
     m_hlayout_a->setSpacing( 0);
     m_vlayout_a->setSpacing( 0);
     m_hlayout_b->setSpacing( 0);
-    m_vlayout_b->setSpacing( 0);
+    m_vlayout_b->setSpacing( 3);
 
     m_btn_out_left = new ButtonOut( ButtonOut::Left,  this);
     m_btn_out_right = new ButtonOut( ButtonOut::Right, this);
@@ -97,7 +94,8 @@ Dialog::Dialog():
     m_labelversion = new LabelVersion(this);
     m_vlayout_b->addWidget( m_labelversion);
 
-    m_topleft  = new QWidget( this);
+//    m_topleft  = new QWidget( this);
+	m_topleft  = new QLabel("", this);
     m_topright = new QWidget( this);
     m_hlayout_b->addWidget( m_topleft);
     m_btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
@@ -108,19 +106,20 @@ Dialog::Dialog():
     m_hlayout_b->addWidget( m_btnMonitor[Watch::WUsers   ]);
     m_hlayout_b->addWidget( m_topright);
 
-    connect( &m_qServer,               SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &m_qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
     connect( &m_qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
 
-    m_monitor = new MonitorHost();
-
     connectionLost();
+
+	createMenus();
+	if( Watch::isSith())
+		menuBar()->hide();
 
     connect( &m_repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
 
-    setFocusPolicy(Qt::StrongFocus);
+//    setFocusPolicy(Qt::StrongFocus);
     setAutoFillBackground( true);
     QRect rect;
     if( afqt::QEnvironment::getRect( "Main", rect)) setGeometry( rect);
@@ -139,14 +138,13 @@ Dialog::~Dialog()
     AFINFO("Dialog::~Dialog:")
     Watch::destroy();
 	if( m_connected )
-		m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, m_monitor->getId()));
-    delete m_monitor;
+		m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, MonitorHost::id()));
 }
 
 void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}
 void Dialog::repaintFinish()             { m_repaintTimer.stop();}
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
-void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, m_monitor, true));}
+void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( MonitorHost::genRegisterMsg());}
 void Dialog::sendMsg( af::Msg * msg)
 {
 #ifdef AFOUTPUT
@@ -155,67 +153,143 @@ printf(" <<< Dialog::sendMsg: ");msg->v_stdOut();
     m_qThreadSend.send( msg);
 }
 
-void Dialog::contextMenuEvent(QContextMenuEvent *event)
+void Dialog::createMenus()
 {
-    QMenu menu(this);
-    QAction *action;
-    QMenu * submenu;
+	m_contextMenu = new QMenu( this);
 
-    submenu = new QMenu( "Choose Theme", this);
+	m_levelMenu = new QMenu("UI &Level", this);
+	menuBar()->addMenu( m_levelMenu);
+	m_contextMenu->addMenu( m_levelMenu);
+	connect( m_levelMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuLevel()));
+
+	m_themeMenu = new QMenu("Color &Theme", this);
+	menuBar()->addMenu( m_themeMenu);
+	m_contextMenu->addMenu( m_themeMenu);
+	connect( m_themeMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuTheme()));
+
+	m_contextMenu->addSeparator();
+
+    QAction *action;
+	QMenu * editMenu = menuBar()->addMenu("&Edit");
+    action = new QAction( "Customize GUI...", editMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
+    editMenu->addAction( action);
+	m_contextMenu->addAction( action);
+    action = new QAction( "Notifications...", editMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actNotifications() ));
+    editMenu->addAction( action);
+	m_contextMenu->addAction( action);
+    editMenu->addSeparator();
+
+	m_prefsMenu = new QMenu("&Preferences", this);
+	menuBar()->addMenu( m_prefsMenu);
+	m_contextMenu->addMenu( m_prefsMenu);
+	connect( m_prefsMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuPrefs()));
+
+	m_contextMenu->addSeparator();
+
+    action = new QAction( "Save Preferences", editMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferences() ));
+    editMenu->addAction( action);
+	m_contextMenu->addAction( action);
+
+	m_helpMenu = new QMenu("&Help", this);
+	menuBar()->addMenu( m_helpMenu);
+	m_contextMenu->addMenu( m_helpMenu);
+	connect( m_helpMenu, SIGNAL( aboutToShow()), this, SLOT( showMenuHelp()));
+}
+
+void Dialog::showMenuLevel()
+{
+	m_levelMenu->clear();
+
+	const char *jedi_names[] = {"Padawan","Jedi","Sith"};
+    for( int i = 0; i < AFGUI::SITH+1; i++)
+    {
+        ActionId * action_id = new ActionId( i, jedi_names[i], m_levelMenu);
+        action_id->setCheckable( true);
+        action_id->setChecked( afqt::QEnvironment::level.n == i);
+        connect( action_id, SIGNAL( triggeredId(int)), this, SLOT( actGuiLevel(int)));
+        m_levelMenu->addAction( action_id);
+    }
+
+}
+
+void Dialog::showMenuTheme()
+{
+	m_themeMenu->clear();
+
     QStringList themes = afqt::QEnvironment::getThemes();
     for( int i = 0; i < themes.size(); i++)
     {
-        ActionString * action_str = new ActionString( themes[i], themes[i], this);
+        ActionString * action_str = new ActionString( themes[i], themes[i], m_themeMenu);
         action_str->setCheckable( true);
         action_str->setChecked( afqt::QEnvironment::theme.str == themes[i]);
         connect( action_str, SIGNAL( triggeredString(QString)), this, SLOT( actGuiTheme(QString)));
-        submenu->addAction( action_str);
+        m_themeMenu->addAction( action_str);
     }
-    menu.addMenu( submenu);
+}
 
-    action = new QAction( "Customize GUI...", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
-    menu.addAction( action);
+void Dialog::showMenuPrefs()
+{
+	m_prefsMenu->clear();
+	QAction * action;
 
-    action = new QAction( "Sound Events...", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actSounds() ));
-    menu.addAction( action);
-
-    menu.addSeparator();
-
-    submenu = new QMenu( "Preferences", this);
-
-    action = new QAction( "Save Prefs on Exit", this);
+    action = new QAction( "Save Prefs on Exit", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::savePrefsOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferencesOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-    action = new QAction( "Save GUI", this);
+	m_prefsMenu->addSeparator();
+
+    action = new QAction( "Save GUI", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveGUIOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveGUIOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-    action = new QAction( "Save Windows Geometry", this);
+    action = new QAction( "Save Hotkeys", m_prefsMenu);
+    action->setCheckable( true);
+    action->setChecked( afqt::QEnvironment::saveHotkeysOnExit.n != 0);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actSaveHotkeysOnExit() ));
+    m_prefsMenu->addAction( action);
+
+    action = new QAction( "Save Windows Geometry", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::saveWndRectsOnExit.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actSaveWndRectsOnExit() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
 
-    action = new QAction( "Show Offline Noise", this);
+	m_prefsMenu->addSeparator();
+
+    action = new QAction( "Show Offline Noise", m_prefsMenu);
     action->setCheckable( true);
     action->setChecked( afqt::QEnvironment::showOfflineNoise.n != 0);
     connect( action, SIGNAL( triggered() ), this, SLOT( actShowOfflineNoise() ));
-    submenu->addAction( action);
+    m_prefsMenu->addAction( action);
+}
 
-    menu.addMenu( submenu);
+void Dialog::showMenuHelp()
+{
+	m_helpMenu->clear();
+	QAction * action;
 
-    action = new QAction( "Save Preferences", this);
-    connect( action, SIGNAL( triggered() ), this, SLOT( actSavePreferences() ));
-    menu.addAction( action);
+    action = new QAction("Documentation...", m_helpMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actShowDocs() ));
+    m_helpMenu->addAction( action);
 
-    menu.exec( event->globalPos());
+    action = new QAction("Forum...", m_helpMenu);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actShowForum() ));
+    m_helpMenu->addAction( action);
+}
+
+void Dialog::contextMenuEvent(QContextMenuEvent *event)
+{
+	if( Watch::isPadawan())
+		return;
+
+	m_contextMenu->exec( event->globalPos());
 }
 
 void Dialog::connectionLost()
@@ -233,9 +307,9 @@ void Dialog::connectionLost()
 
     displayError("Connection lost.");
     m_connected = false;
-    m_uid = 0;
-    m_monitor->setId( 0);
     setWindowTitle( "Watch - " + afqt::stoq( af::Environment::getUserName()) + " (connecting...)");
+
+	MonitorHost::connectionLost();
 
     sendRegister();
 
@@ -252,73 +326,54 @@ void Dialog::connectionEstablished()
     displayInfo("Connection established.");
     m_connected = true;
     setDefaultWindowTitle();
-    m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
-
-    Watch::connectionEstablished();
+//    m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
 }
 
 void Dialog::newMessage( af::Msg *msg)
 {
-    if( msg == NULL)
-    {
-        AFERROR("Dialog::caseMessage: msg == NULL")
-        return;
-    }
+	if( msg == NULL)
+	{
+		AF_ERR << "msg == NULL";
+		return;
+	}
     #ifdef AFOUTPUT
     printf(" >>> Dialog::newMessage: ");msg->v_stdOut();
     #endif
     switch( msg->type())
     {
-    case af::Msg::TClientExitRequest:
     case af::Msg::TVersionMismatch:
     {
         emit stop();
         break;
     }
+	case af::Msg::TMonitor:
+	{
+		af::Monitor monitor( msg);
+
+		idReceived( monitor.getId(), monitor.getUid());
+
+		break;
+	}
     case af::Msg::TMonitorId:
     {
-        if( m_monitor->getId() != 0 )
-        {
-            if( msg->int32() != m_monitor->getId()) connectionLost();
-        }
-        else
-        {
-            if( msg->int32() == 0)
-            {
-                connectionLost();
-            }
-            else
-            {
-                m_monitor->setId( msg->int32());
-                connectionEstablished();
-                af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, m_monitor->getId(), true);
-                m_qThreadClientUpdate.setUpMsg( msg);
-            }
-        }
+		idReceived( msg->int32());
         break;
     }
-    case af::Msg::TUserId:
-    {
-        m_uid = msg->int32();
-        if( m_uid == 0 )
-        {
-            if( m_monitorType == Watch::WJobs )
-            {
-                ButtonMonitor::unset();
-                closeList();
-            }
-            displayWarning("You do not exist.");
-        }
-        else
-        {
-            displayInfo("You have registered.");
-            if( m_monitorType == Watch::WNONE )
-            {
-                ButtonMonitor::pushButton( Watch::WJobs);
-            }
-        }
-        break;
-    }
+	case af::Msg::TInfo:
+	{
+		std::string kind, info;
+		if( msg->getInfo( kind, info))
+		{
+			QString qinfo = afqt::stoq( info);
+			if( kind == "info")
+				displayInfo( qinfo);
+			else if( kind == "warning")
+				displayWarning( qinfo);
+			else if( kind == "error")
+				displayError( qinfo);
+		}
+		break;
+	}
     case af::Msg::TDATA:
     {
         new WndText( "Data", msg);
@@ -329,18 +384,13 @@ void Dialog::newMessage( af::Msg *msg)
         new WndText( "List", msg);
         break;
     }
-    case af::Msg::TTask:
-    {
-        new WndTask( "Task", msg);
-        break;
-    }
     case af::Msg::TString:
     {
         std::string str = msg->getString();
         if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
-            m_labelversion->showMessage( str);
+            announce( str);
         else
-            new WndText( "Message", msg);
+			new WndText("Message", msg);
         break;
     }
 	case af::Msg::TTaskFiles:
@@ -349,12 +399,68 @@ void Dialog::newMessage( af::Msg *msg)
 		Watch::filesReceived( taskup);
         break;
 	}
+	case af::Msg::TJSON:
+	case af::Msg::TJSONBIN:
+	case af::Msg::THTTP:
+	case af::Msg::THTTPGET:
+	{
+		static int unused;
+		unused = ::write( 1, " >>> ", 5);
+		msg->stdOutData( false);
+		unused = ::write( 1, "\n", 1);
+		break;
+	}
     default:
         Watch::caseMessage( msg);
     }
-    AFINFO("Dialog::newMessage: Reaction finished deleting message.")
     delete msg;
-    AFINFO("Dialog::newMessage: Message successfully deleted.")
+}
+
+void Dialog::idReceived( int i_id, int i_uid)
+{
+	if( MonitorHost::id() > 0 )
+	{
+		if( i_id != MonitorHost::id())
+		{
+			connectionLost();
+		}
+	}
+	else
+	{
+		if( i_id == 0)
+		{
+			connectionLost();
+		}
+		else
+		{
+			AFINFA("Dialog::idReceived: ID=%d UID=%d\n", i_id, i_uid)
+
+			MonitorHost::connectionEstablished( i_id, i_uid);
+			connectionEstablished();
+			Watch::connectionEstablished();
+
+			if( i_uid == -1 )
+			{
+				if( m_monitorType == Watch::WJobs )
+				{
+					ButtonMonitor::unset();
+					closeList();
+				}
+				displayWarning("You do not exist.");
+			}
+			else
+			{
+				displayInfo("You have registered.");
+				if( m_monitorType == Watch::WNONE )
+				{
+					ButtonMonitor::pushButton( Watch::WJobs);
+				}
+			}
+
+			af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, i_id);
+			m_qThreadClientUpdate.setUpMsg( msg);
+		}
+	}
 }
 
 void Dialog::closeList()
@@ -375,11 +481,12 @@ bool Dialog::openMonitor( int type, bool open)
    }
 
    if( !m_connected ) return false;
-   if(( type == Watch::WJobs) && ( m_uid == 0 ) && ( af::Environment::VISOR() == false ))
+
+	if(( type == Watch::WJobs) && ( MonitorHost::getUid() < 0 ) && ( af::Environment::VISOR() == false ))
    {
       ButtonMonitor::unset();
-      displayWarning("You are not registered ( and have no jobs).");
-      m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
+      displayWarning("You are not registered (have no jobs).");
+//      m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
       return false;
    }
 
@@ -447,31 +554,33 @@ void Dialog::keyPressEvent( QKeyEvent * event)
    const QString key( event->text());
    if( key.isNull() || key.isEmpty() ) return;
 
-   if( af::Environment::checkKey( key.at(0).toAscii()))
+   if( af::Environment::checkKey( key.at(0).toLatin1()))
    {
       if( af::Environment::GOD())
       {
+			MonitorHost::setUid(0);
+
          m_btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
          m_hlayout_b->addWidget( m_btnMonitor[Watch::WMonitors]);
 
-         setBackgroundRole( QPalette::LinkVisited );
-         displayWarning("GOD MODE");
+			m_topleft->setText("GOD MODE");
       }
       else if( af::Environment::VISOR())
       {
-         setBackgroundRole( QPalette::Link );
-         displayWarning("VISOR MODE");
+			MonitorHost::setUid(0);
+
+			m_topleft->setText("VISOR MODE");
       }
       else
       {
+			MonitorHost::setUid(-1);
+
          if( m_btnMonitor[Watch::WMonitors])
          {
             delete m_btnMonitor[Watch::WMonitors];
             m_btnMonitor[Watch::WMonitors] = NULL;
          }
-
-         setBackgroundRole( QPalette::NoRole );
-         displayWarning("SUPER USER MODE OFF");
+			m_topleft->setText("");
       }
       int opened_type = m_monitorType ;
       closeList();
@@ -488,16 +597,19 @@ void Dialog::actColors()
     Watch::displayInfo("Opening 'GUI' Window");
 }
 
-void Dialog::actSounds()
+void Dialog::actNotifications()
 {
-    new WndCustomizeSounds();
-    Watch::displayInfo("Opening 'Sounds' Window");
+    new WndNotifications();
+    Watch::displayInfo("Opening 'Notifications' Window");
 }
 
 void Dialog::actSavePreferencesOnExit()   { afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;     }
 void Dialog::actSaveGUIOnExit()           { afqt::QEnvironment::saveGUIOnExit.n      = 1 - afqt::QEnvironment::saveGUIOnExit.n;       }
+void Dialog::actSaveHotkeysOnExit()       { afqt::QEnvironment::saveHotkeysOnExit.n  = 1 - afqt::QEnvironment::saveHotkeysOnExit.n;   }
 void Dialog::actSaveWndRectsOnExit()      { afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;  }
 void Dialog::actShowOfflineNoise()        { afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;    }
+void Dialog::actShowDocs()  { Watch::showDocs();  }
+void Dialog::actShowForum() { Watch::showForum(); }
 
 void Dialog::actSavePreferences()
 {
@@ -505,6 +617,37 @@ void Dialog::actSavePreferences()
       Watch::displayInfo(QString("Saved '%1'").arg( afqt::QEnvironment::getFileName()));
    else
       Watch::displayError(QString("Failed to save to'%1'").arg( afqt::QEnvironment::getFileName()));
+}
+
+void Dialog::actGuiLevel( int i_level)
+{
+	QString message;
+
+	switch( i_level)
+	{
+		case AFGUI::PADAWAN:
+			menuBar()->show();
+			message = "Patience you must have. My young Padawan.";
+			break;
+		case AFGUI::JEDI:
+			menuBar()->show();
+			message = "May the force be with you.";
+			break;
+		case AFGUI::SITH:
+			menuBar()->hide();
+			Watch::displayInfo("Welcome to the dark side.");
+			message = "Powerful you have become, the dark side I sense in you.";
+			break;
+		default:
+			Watch::displayError(QString("Invalid theme number: %1").arg( i_level));
+			return;
+	}
+
+	//Watch::displayInfo( message);
+	Watch::notify( message);
+
+	afqt::QEnvironment::level.n = i_level;
+	Watch::refreshGui();
 }
 
 void Dialog::actGuiTheme( QString theme)

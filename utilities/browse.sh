@@ -1,6 +1,6 @@
 #!/bin/bash
 
-browsers="caja thunar nautilus konqueror gnome-commander krusader"
+browsers="caja thunar nautilus konqueror gnome-commander krusader nemo"
 
 pushd `dirname $0` > /dev/null
 cd ..

@@ -12,7 +12,6 @@ CmdConfigLoad::CmdConfigLoad()
 	setInfo("Request server to reload config file.");
 	setHelp("cload Request server to reload configuration.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdConfigLoad::~CmdConfigLoad(){}
 bool CmdConfigLoad::v_processArguments( int argc, char** argv, af::Msg &msg)

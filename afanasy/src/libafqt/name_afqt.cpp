@@ -92,7 +92,7 @@ const QHostAddress afqt::toQAddress( const af::Address & address)
 bool afqt::sendMessage( QTcpSocket * qSocket, const af::Msg * msg)
 {
 #ifdef AFOUTPUT
-printf("afqt::sendMessage: "); msg->stdOut();
+printf("afqt::sendMessage: "); msg->v_stdOut();
 #endif
 //
 // sending message to server
@@ -108,35 +108,40 @@ printf("afqt::sendMessage: "); msg->stdOut();
 
 bool afqt::recvMessage( QTcpSocket * qSocket, af::Msg * msg)
 {
-   char * buffer = msg->buffer();
-   int bytes = readdata( qSocket, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer);
-   if( bytes < af::Msg::SizeHeader)
-   {
-      AFERROR("qtcom::recvMessage: read message header.\n");
-      return false;
-   }
+	char * buffer = msg->buffer();
+	int bytes = readdata( qSocket, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer);
+	if( bytes < af::Msg::SizeHeader)
+	{
+		AFERROR("qtcom::recvMessage: read message header.\n");
+		return false;
+	}
 
-   msg->readHeader( bytes);
+//	msg->readHeader( bytes);
+	// Header offset is variable on not binary header (for example HTTP)
+	int header_offset = af::processHeader( msg, bytes);
+	if( header_offset < 0)
+		return false;
 
-   int msgtype = msg->type();
-   int datalen = msg->int32();
-
-   if( msgtype >= af::Msg::TDATA)
-   {
-      buffer = msg->buffer(); // buffer may be changed to fit new size
-      int readlen = datalen - bytes + af::Msg::SizeHeader;
-      if( readlen > 0)
-      {
-         bytes = readdata( qSocket, buffer+bytes, readlen, readlen);
-         if( bytes < readlen)
-         {
-            AFERROR("qtcom::recvMessage: read message data.\n");
-            msg->setInvalid();
-            return false;
-         }
-      }
-   }
-   return true;
+	if( msg->type() >= af::Msg::TDATA)
+	{
+		buffer = msg->buffer(); // buffer may be changed to fit new size
+		bytes -= header_offset;
+//		int readlen = msg->dataLen() - bytes + af::Msg::SizeHeader;
+		int readlen = msg->dataLen() - bytes;
+		if( readlen > 0)
+		{
+			//bytes = readdata( qSocket, buffer+bytes, readlen, readlen);
+			bytes = readdata( qSocket, buffer + af::Msg::SizeHeader + bytes, readlen, readlen);
+			//bytes = ::readdata( desc, buffer + af::Msg::SizeHeader + bytes, readlen, readlen);
+			if( bytes < readlen)
+			{
+				AFERROR("qtcom::recvMessage: read message data.\n");
+				msg->setInvalid();
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 int afqt::readdata( QTcpSocket * qSocket, char* data, int len_min, int len_max)
@@ -178,6 +183,14 @@ const QString afqt::dtoq( const char * data, int size)
 const std::string afqt::qtos( const QString & str)
 {
    return std::string( str.toUtf8().data());
+}
+
+const QMap<QString,QString> afqt::stoq( const std::map<std::string, std::string> & i_map)
+{
+	QMap<QString,QString> map;
+	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		map[afqt::stoq(it->first)] = afqt::stoq(it->second);
+	return map;
 }
 
 const QString afqt::time2Qstr( time_t time_sec)

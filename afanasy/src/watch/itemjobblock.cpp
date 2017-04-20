@@ -2,9 +2,12 @@
 
 #include "itemjobtask.h"
 #include "listtasks.h"
+#include "watch.h"
 
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
+#include "../libafanasy/service.h"
+#include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -20,6 +23,7 @@ const int ItemJobBlock::HeightFooter = 14;
 
 ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
    Item( afqt::stoq( block->getName()), ItemId),
+	job_id( block->getJobId()),
    numblock( block->getBlockNum()),
    info( this, block->getBlockNum(), block->getJobId()),
    listtasks( list)
@@ -40,7 +44,6 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    switch( type)
    {
    case af::Msg::TJob:
-//   case af::Msg::TJobRegister:
    case af::Msg::TBlocks:
 
       numeric           = block->isNumeric();
@@ -57,11 +60,10 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
       command           = afqt::stoq( block->getCmd());
-      workingdir        = afqt::stoq( block->getWDir());
+      workingdir        = block->getWDir();
       files             = block->getFiles();
       cmdpre            = afqt::stoq( block->getCmdPre());
       cmdpost           = afqt::stoq( block->getCmdPost());
-      environment       = afqt::stoq( block->getEnvironment());
       service           = afqt::stoq( block->getService());
       tasksname         = afqt::stoq( block->getTasksName());
       parser            = afqt::stoq( block->getParser());
@@ -109,7 +111,7 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->setPen(  clrTextMain( option));
    painter->drawText( x+5, y+16, info.getName());
 
-   printfState( state, x+w-90, y+8, painter, option);
+	printfState( state, x+w-125, y+8, painter, option);
 
    painter->setFont( afqt::QEnvironment::f_info);
    painter->setPen(  clrTextInfo( option));
@@ -171,8 +173,6 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    linex -= WHost;
    painter->setOpacity( sorting_fields_line_opacity);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
-
-   drawPost( painter, option);
 }
 
 bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
@@ -246,3 +246,4 @@ case SState:   printf("State %d \n",   sort_ascending); break;
 
    return true;
 }
+

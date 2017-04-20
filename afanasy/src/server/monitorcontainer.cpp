@@ -5,75 +5,57 @@
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
 #include "../libafanasy/msg.h"
 
 #include "afcommon.h"
+#include "renderaf.h"
+#include "rendercontainer.h"
 #include "useraf.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 MonitorContainer::MonitorContainer():
-	ClientContainer( "Monitors", AFMONITOR::MAXCOUNT),
-	events( NULL),
-	jobEvents( NULL),
-	jobEventsUids( NULL),
-	jobEventsCount( 0)
+	AfContainer( "Monitors", AFMONITOR::MAXCOUNT),
+	m_events( NULL),
+	m_jobEvents( NULL),
+	m_jobEventsUids( NULL)
 {
 	MonitorAf::setMonitorContainer( this);
-	MonitorAf::setMsgQueue( ms_msg_queue);
 
-	events = new std::list<int32_t>[ af::Monitor::EventsCount];
-	jobEventsCount = af::Msg::TMonitorJobEvents_END - af::Msg::TMonitorJobEvents_BEGIN - 1;
-	jobEvents	  = new std::list<int32_t>[ jobEventsCount];
-	jobEventsUids = new std::list<int32_t>[ jobEventsCount];
-//AFINFA("MonitorContainer::MonitorContainer: Events Count = %d, Job Events = %d\n", eventsCount, jobEventsCount);
-AFINFA("MonitorContainer::MonitorContainer: Events Count = %d, Job Events = %d\n", af::Monitor::EventsCount, jobEventsCount);
+	m_events = new std::list<int32_t>[ af::Monitor::EVT_COUNT];
+	m_jobEvents	  = new std::list<int32_t>[ af::Monitor::EVT_JOBS_COUNT];
+	m_jobEventsUids = new std::list<int32_t>[ af::Monitor::EVT_JOBS_COUNT];
+AFINFA("MonitorContainer::MonitorContainer: Events Count = %d, Job Events = %d\n", af::Monitor::EVT_COUNT, af::Monitor::EVT_JOBS_COUNT);
 }
 
 MonitorContainer::~MonitorContainer()
 {
 AFINFO("MonitorContainer::~MonitorContainer:\n");
-	if( events		  != NULL ) delete [] events;
-	if( jobEvents	  != NULL ) delete [] jobEvents;
-	if( jobEventsUids != NULL ) delete [] jobEventsUids;
+	if( m_events        != NULL ) delete [] m_events;
+	if( m_jobEvents     != NULL ) delete [] m_jobEvents;
+	if( m_jobEventsUids != NULL ) delete [] m_jobEventsUids;
 }
 
-af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
+af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_binary)
 {
-	int id = 0;
-	if( i_json )
+	if( add( i_monitor))
 	{
-		// Considering that JSON monitors does not listening any port.
-		// So we do not need check whether another client with the same address exists.
-		id = add( i_monitor);
-		if( id == 0 )
-		{
-			delete i_monitor;
-		}
-		else
-		{
-			i_monitor->setRegisterTime();
-		}
+		i_monitor->setRegisterTime();
+		AFCommon::QueueLog("Monitor registered: " + i_monitor->v_generateInfoString( false));
+		addEvent( af::Monitor::EVT_monitors_add, i_monitor->getId());
 	}
 	else
 	{
-		// If client is listening a port, it has an address.
-		// We should delete older client with the same address,
-		// that is why monitor container pointer and event type is needed.
-		id = addClient( i_monitor, true, this, af::Msg::TMonitorMonitorsDel);
+		delete i_monitor;
 	}
 
-	if( id != 0 )
-	{
-		AFCommon::QueueLog("Monitor registered: " + i_monitor->v_generateInfoString( false));
-		addEvent( af::Msg::TMonitorMonitorsAdd, id);
-	}
-
-	if( i_json == false )
-		return new af::Msg( af::Msg::TMonitorId, id);
+	if( i_binary )
+		return new af::Msg( af::Msg::TMonitor, i_monitor);
 
 	std::ostringstream str;
 	str << "{\"monitor\":";
@@ -82,157 +64,133 @@ af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
 	return af::jsonMsg( str);
 }
 
-bool MonitorContainer::setInterest( int type, af::MCGeneral & ids)
+void MonitorContainer::addEvent( int i_type, int i_nodeId)
 {
-	int monitorId = ids.getId();
-	if( monitorId == 0 )
+	if(( i_type < 0 ) || ( i_type >= af::Monitor::EVT_COUNT))
 	{
-		AFCommon::QueueLogError("MonitorContainer::action: Zero monitor ID.");
-		return false;
-	}
-	MonitorContainerIt mIt( this);
-	MonitorAf * monitor = mIt.getMonitor( monitorId);
-	if( monitor == NULL )
-	{
-		AFCommon::QueueLogError("MonitorContainer::action: No monitor with id = " + af::itos( monitorId));
-		return false;
-	}
-
-	if( monitor->setInterest( type, ids) == false ) return false;
-
-	addEvent( af::Msg::TMonitorMonitorsChanged, monitorId);
-	return true;
-}
-
-void MonitorContainer::addEvent( int type, int id)
-{
-	if(( type <= af::Msg::TMonitorCommonEvents_BEGIN) || ( type >= af::Msg::TMonitorCommonEvents_END))
-	{
-		AFCommon::QueueLogError( std::string("MonitorContainer::addEvent: Invalid event type = ") + af::Msg::TNAMES[type]);
+		AFCommon::QueueLogError( std::string("MonitorContainer::addEvent: Invalid event type number: ") + af::itos(i_type));
 		return;
 	}
-//printf("MonitorContainer::addEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
-	int typeNum = type - af::Monitor::EventsShift;
-	af::addUniqueToList( events[typeNum], id);
+
+	af::addUniqueToList( m_events[i_type], i_nodeId);
 }
 
-void MonitorContainer::addJobEvent( int type, int id, int uid)
+void MonitorContainer::addJobEvent( int i_type, int i_jid, int i_uid)
 {
-	if(( type <= af::Msg::TMonitorJobEvents_BEGIN) || ( type >= af::Msg::TMonitorJobEvents_END))
+	if(( i_type < 0 ) || ( i_type >= af::Monitor::EVT_JOBS_COUNT ))
 	{
-		AFCommon::QueueLogError( std::string("MonitorContainer::addJobEvent: Invalid job event type = ") + af::Msg::TNAMES[type]);
+		AFCommon::QueueLogError( std::string("MonitorContainer::addJobEvent: Invalid job event type = ") + af::itos(i_type));
 		return;
 	}
-//printf("MonitorContainer::addJobEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
-	int typeNum = type - af::Msg::TMonitorJobEvents_BEGIN -1;
-	if( af::addUniqueToList( jobEvents[typeNum], id)) jobEventsUids[typeNum].push_back( uid);
+
+	if( af::addUniqueToList( m_jobEvents[i_type], i_jid))
+		m_jobEventsUids[i_type].push_back( i_uid);
 }
 
-void MonitorContainer::dispatch()
+void MonitorContainer::outputsReceived( const std::vector<af::MCTaskPos> & i_outspos, const std::vector<std::string> & i_outputs)
 {
-   //
-   // Common Events:
-   //
-   for( int e = 0; e < af::Monitor::EventsCount; e++)
-   {
-      if( events[e].size() < 1) continue;
+	if( i_outspos.size() != i_outputs.size())
+	{
+		AFERRAR("MonitorContainer::outputsReceived: i_outspos.size(%d) != i_outputs.size(%d)",
+			int( i_outspos.size()), int( i_outputs.size()))
+		return;
+	}
 
-//      int eventType = af::Msg::TMonitorCommonEvents_BEGIN+1 + e;
-      int eventType = e + af::Monitor::EventsShift;
-//printf("MonitorContainer::dispatch: [%s]\n", af::Msg::TNAMES[eventType]);
-      af::Msg * msg = NULL;
-      MonitorContainerIt monitorsIt( this);
-      for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-      {
-			if( monitor->hasEvent( eventType))
+	bool founded = false;
+	MonitorContainerIt monitorsIt( this);
+	for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+		for( int i = 0; i < i_outspos.size(); i++)
+			if( monitor->isWaintingOutput( i_outspos[i]))
 			{
-				if( monitor->collectingEvents())
-				{
-					monitor->addEvents( e, events[e]);
-				}
-				else
-				{
-					if( msg == NULL )
-					{
-						af::MCGeneral mcIds;
-						mcIds.setList( events[e]);
-						msg = new af::Msg( eventType, &mcIds );
-					}
-					msg->addAddress( monitor);
-				}
+				monitor->addOutput( i_outspos[i], i_outputs[i]);
+				founded = true;
 			}
-      }
-      if( msg )
-      {
-          ms_msg_queue->pushMsg( msg);
-      }
-   }
 
-   //
-   // Job Events, which depend on interested users ids:
-   //
-   for( int e = 0; e < jobEventsCount; e++)
-   {
-      if( jobEvents[e].size() < 1) continue;
-      int eventType = af::Msg::TMonitorJobEvents_BEGIN+1 + e;
-      if( jobEvents[e].size() != jobEventsUids[e].size())
-      {
-         AFCommon::QueueLogError( std::string("MonitorContainer::dispatch: \
-            jobEvents and jobEventsUids has different sizes fo [")
-            + af::Msg::TNAMES[eventType] + "] ( " + af::itos(jobEvents[e].size()) + " != " + af::itos(jobEventsUids[e].size()) + " )");
-         continue;
-      }
+	if( false == founded )
+		AFERROR("MonitorContainer::outputsReceived: No one waiting such outputs.")
+}
 
-      MonitorContainerIt monitorsIt( this);
-      for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-      {
-			std::list<int32_t> ids;
-         bool found = false;
-
-         std::list<int32_t>::const_iterator jIt = jobEvents[e].begin();
-         std::list<int32_t>::const_iterator jIt_end = jobEvents[e].end();
-         std::list<int32_t>::const_iterator uIt = jobEventsUids[e].begin();
-
-         while( jIt != jIt_end)
-         {
-            if( monitor->hasJobEvent( eventType, *uIt))
-            {
-               if( !found) found = true;
-						ids.push_back( *jIt);
-            }
-            jIt++;
-            uIt++;
-         }
-         if( ! found ) continue;
-
-			if( monitor->collectingEvents())
-			{
-				monitor->addEvents( eventType - af::Monitor::EventsShift, ids);
-			}
-			else
-			{
-				af::MCGeneral mcIds;
-				mcIds.setList( ids);
-				af::Msg * msg = new af::Msg( eventType, &mcIds );
-				msg->addAddress( monitor);
-				ms_msg_queue->pushMsg( msg);
-			}
+void MonitorContainer::addListened( const af::MCTask & i_mctask)
+{
+	for( int i = 0; i < m_listens.size(); i++)
+	{
+		if( m_listens[i].isSameTask( i_mctask))
+		{
+			m_listens[i].appendListened( i_mctask.getListened());
+			return;
 		}
 	}
 
-   //
-   // Tasks progress events:
-   //
-   std::list<af::MCTasksProgress*>::const_iterator tIt = tasks.begin();
-   while( tIt != tasks.end())
-   {
-      af::Msg * msg = NULL;
-      MonitorContainerIt monitorsIt( this);
-      for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-      {
-         if( monitor->hasJobId( (*tIt)->getJobId()))
-         {
-			if( monitor->collectingEvents())
+	m_listens.push_back( i_mctask);
+}
+
+void MonitorContainer::dispatch( RenderContainer * i_renders)
+{
+	//
+	// Common Events:
+	//
+	for( int e = 0; e < af::Monitor::EVT_COUNT; e++)
+	{
+		if( m_events[e].size() < 1) continue;
+
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+			if( monitor->hasEvent( e))
+				monitor->addEvents( e, m_events[e]);
+	}
+
+
+	//
+	// Job Events, which depends on uid:
+	//
+	for( int e = 0; e < af::Monitor::EVT_JOBS_COUNT; e++)
+	{
+		if( m_jobEvents[e].size() < 1) continue;
+		if( m_jobEvents[e].size() != m_jobEventsUids[e].size())
+		{
+			AFCommon::QueueLogError( std::string("MonitorContainer::dispatch: \
+				jobEvents and jobEventsUids has different sizes: ")
+				+ af::itos(m_jobEvents[e].size()) + " != " + af::itos(m_jobEventsUids[e].size()));
+			continue;
+		}
+
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+		{
+			std::list<int32_t> ids;
+			bool found = false;
+
+			std::list<int32_t>::const_iterator jIt = m_jobEvents[e].begin();
+			std::list<int32_t>::const_iterator jIt_end = m_jobEvents[e].end();
+			std::list<int32_t>::const_iterator uIt = m_jobEventsUids[e].begin();
+
+			while( jIt != jIt_end)
+			{
+				if( monitor->hasJobEvent( e, *uIt))
+				{
+					if( !found) found = true;
+						ids.push_back( *jIt);
+				}
+				jIt++;
+				uIt++;
+			}
+			if( ! found ) continue;
+
+			monitor->addEvents( e, ids);
+		}
+	}
+
+
+	//
+	// Tasks progress events:
+	//
+	std::list<af::MCTasksProgress*>::const_iterator tIt = m_tasks.begin();
+	while( tIt != m_tasks.end())
+	{
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+		{
+			if( monitor->hasJobId( (*tIt)->getJobId()))
 			{
 				const std::list<af::TaskProgress*> * progresses  = (*tIt)->getTasksRun();
 				std::list<int32_t>::const_iterator blocksIt = (*tIt)->getBlocks()->begin();
@@ -244,22 +202,9 @@ void MonitorContainer::dispatch()
 					blocksIt++; tasksIt++; progressIt++;
 				}
 			}
-			else
-			{
-	            if( msg == NULL)
-    	        {
-        	       msg = new af::Msg( af::Msg::TTasksRun, *tIt);
-            	}
-	            msg->addAddress( monitor);
-			}
-         }
-      }
-      if( msg )
-      {
-			ms_msg_queue->pushMsg( msg);
-      }
-      tIt++;
-   }
+		}
+		tIt++;
+	}
 
 	//
 	// Blocks changed:
@@ -268,30 +213,11 @@ void MonitorContainer::dispatch()
 	MonitorContainerIt monitorsIt( this);
 	for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
 	{
-		af::MCAfNodes mcblocks;
-		int type = 0;
-		std::list<af::BlockData*>::iterator bIt = blocks.begin();
-		std::list<int32_t>::iterator tIt = blocks_types.begin();
-		for( ; bIt != blocks.end(); bIt++, tIt++)
-		{
+		std::list<af::BlockData*>::iterator bIt = m_blocks.begin();
+		std::list<int32_t>::iterator tIt = m_blocks_types.begin();
+		for( ; bIt != m_blocks.end(); bIt++, tIt++)
 			if( monitor->hasJobId( (*bIt)->getJobId()))
-			{
-				if( monitor->collectingEvents())
-				{
-					monitor->addBlock( (*bIt)->getJobId(), (*bIt)->getBlockNum(), *tIt);
-				}
-				else
-				{
-		 			mcblocks.addNode( (*bIt));
-					if( type < *tIt) type = *tIt;
-				}
-			}
-		}
-		if( mcblocks.getCount() < 1) continue;
-
-		af::Msg * msg = new af::Msg( type, &mcblocks);
-		msg->setAddress( monitor);
-		ms_msg_queue->pushMsg( msg);
+				monitor->addBlock( (*bIt)->getJobId(), (*bIt)->getBlockNum(), *tIt);
 	}
 	}
 
@@ -299,54 +225,58 @@ void MonitorContainer::dispatch()
 	// Users jobs order:
 	//
 	{
-/*	MonitorContainerIt monitorsIt( this);
-	for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+	std::list<UserAf*>::iterator uIt = m_usersJobOrderChanged.begin();
+	while( uIt != m_usersJobOrderChanged.end())
 	{
-		std::list<UserAf*>::iterator uIt = usersJobOrderChanged.begin();
-		while( uIt != usersJobOrderChanged.end())
-		{
-			if( monitor->hasJobUid((*uIt)->getId()))
-			{
-				af::MCGeneral ids;
-				(*uIt)->generateJobsIds( ids);
-				af::Msg * msg = new af::Msg( af::Msg::TUserJobsOrder, &ids);
-				msg->setAddress( monitor);
-				AFCommon::QueueMsgDispatch( msg);
-			}
-			uIt++;
-		}
-	}*/
-	std::list<UserAf*>::iterator uIt = usersJobOrderChanged.begin();
-	while( uIt != usersJobOrderChanged.end())
-	{
-		af::Msg * msg = NULL;
-		std::vector<int32_t> ids = (*uIt)->generateJobsIds();
-		af::MCGeneral mcIds;
-		mcIds.setId( (*uIt)->getId());
-		mcIds.setList( ids);
+		std::vector<int32_t> jids = (*uIt)->generateJobsIds();
 
 		MonitorContainerIt monitorsIt( this);
 		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-			if( monitor->hasJobUid((*uIt)->getId()))
-			{
-				if( monitor->collectingEvents() )
-				{
-					monitor->addUserJobsOrder((*uIt)->getId(), ids);
-				}
-				else
-				{
-					if( msg == NULL )
-						msg = new af::Msg( af::Msg::TUserJobsOrder, &mcIds);
-					msg->addAddress( monitor);
-				}
-			}
-
-		if( msg )
-			ms_msg_queue->pushMsg( msg);
-
+			if( monitor->sameUid((*uIt)->getId()))
+				monitor->setUserJobsOrder( jids);
 		uIt++;
 	}
 	}
+
+	//
+	// Listening output:
+	//
+	for( int i = 0; i < m_listens.size(); i++)
+	{
+		bool founded = false;
+
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+		{
+			if( monitor->isListening( m_listens[i]))
+			{
+				monitor->addListened( m_listens[i]);
+				founded = true;
+			}
+		}
+
+		if( false == founded )
+		{
+			AFCommon::QueueLog( std::string("Removing not listening task: ") +
+					m_listens[i].m_task_name);
+
+			RenderContainerIt rIt( i_renders);
+			RenderAf * render = rIt.getRender( m_listens[i].m_render_id);
+			if( render )
+				render->listenTask( m_listens[i].getPos(), false);
+		}
+	}
+
+	//
+	// Annoncements:
+	//
+	if( m_announcement.size())
+	{
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+			monitor->sendMessage( m_announcement);
+	}
+	
 
 	//
 	// Delete all events:
@@ -356,74 +286,41 @@ void MonitorContainer::dispatch()
 
 void MonitorContainer::clearEvents()
 {
-	for( int e = 0; e < af::Monitor::EventsCount; e++) events[e].clear();
+	for( int e = 0; e < af::Monitor::EVT_COUNT; e++) m_events[e].clear();
 
-	for( int e = 0; e < jobEventsCount; e++)
+	for( int e = 0; e < af::Monitor::EVT_JOBS_COUNT; e++)
 	{
-		jobEvents[e].clear();
-		jobEventsUids[e].clear();
+		m_jobEvents[e].clear();
+		m_jobEventsUids[e].clear();
 	}
 
-	std::list<af::MCTasksProgress*>::iterator tIt = tasks.begin();
-	while( tIt != tasks.end())
+	std::list<af::MCTasksProgress*>::iterator tIt = m_tasks.begin();
+	while( tIt != m_tasks.end())
 	{
 		delete *tIt;
 		tIt++;
 	}
 
-	tasks.clear();
+	m_tasks.clear();
 
-	blocks.clear();
-	blocks_types.clear();
+	m_blocks.clear();
+	m_blocks_types.clear();
 
-	usersJobOrderChanged.clear();
+	m_usersJobOrderChanged.clear();
+
+	m_listens.clear();
+
+	m_announcement.clear();
 }
 
-void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
-{
-//printf("MonitorContainer::sendMessage:\n"); mcgeneral.stdOut( true);
-	int idscount = mcgeneral.getCount();
-	if( idscount < 1 ) return;
-
-	af::Msg * msg = new af::Msg;
-	bool found = false;
-	MonitorContainerIt mIt( this);
-	for( int i = 0; i < idscount; i++)
-	{
-		MonitorAf * monitor = mIt.getMonitor( mcgeneral.getId(i));
-		if( monitor == NULL) continue;
-		msg->addAddress( monitor);
-		if( !found) found = true;
-	}
-	if( found)
-	{
-		msg->setString( mcgeneral.getUserName() + ": " + mcgeneral.getString() );
-		ms_msg_queue->pushMsg( msg);
-	}
-	else delete msg;
-}
-
-void MonitorContainer::sendMessage( const std::string & str)
-{
-	af::Msg * msg = new af::Msg;
-	msg->setString( str);
-	MonitorContainerIt mIt( this);
-
-	for( MonitorAf * monitor = mIt.monitor(); monitor != NULL; mIt.next(), monitor = mIt.monitor())
-		msg->addAddress( monitor);
-	if( msg->addressesCount() )
-		ms_msg_queue->pushMsg( msg);
-	else delete msg;
-}
-
-void MonitorContainer::addTask( int jobid, int block, int task, af::TaskProgress * tp)
+void MonitorContainer::addTask( int i_jobid, int i_block, int i_task, af::TaskProgress * i_tp)
 {
 	af::MCTasksProgress * t = NULL;
 
-	std::list<af::MCTasksProgress*>::const_iterator tIt = tasks.begin();
-	while( tIt != tasks.end())
+	std::list<af::MCTasksProgress*>::const_iterator tIt = m_tasks.begin();
+	while( tIt != m_tasks.end())
 	{
-		if( (*tIt)->getJobId() == jobid)
+		if( (*tIt)->getJobId() == i_jobid)
 		{
 			t = (*tIt);
 			break;
@@ -433,41 +330,44 @@ void MonitorContainer::addTask( int jobid, int block, int task, af::TaskProgress
 
 	if( t == NULL )
 	{
-		t = new af::MCTasksProgress( jobid);
-		tasks.push_back( t);
+		t = new af::MCTasksProgress( i_jobid);
+		m_tasks.push_back( t);
 	}
 
-	t->add( block, task, tp);
+	t->add( i_block, i_task, i_tp);
 }
 
-void MonitorContainer::addBlock( int type, af::BlockData * block)
+void MonitorContainer::addBlock( int i_type, af::BlockData * i_block)
 {
-	std::list<af::BlockData*>::const_iterator bIt = blocks.begin();
-	std::list<int32_t>::iterator tIt = blocks_types.begin();
-	for( ; bIt != blocks.end(); bIt++, tIt++)
+	std::list<af::BlockData*>::const_iterator bIt = m_blocks.begin();
+	std::list<int32_t>::iterator tIt = m_blocks_types.begin();
+	for( ; bIt != m_blocks.end(); bIt++, tIt++)
 	{
-		if( block == *bIt)
+		if( i_block == *bIt)
 		{
-			if( type < *tIt ) *tIt = type;
+			// Greater type number has more information,
+			// that include all info of a smaller type.
+			if( i_type > *tIt ) *tIt = i_type;
 			return;
 		}
 	}
-	blocks.push_back( block);
-	blocks_types.push_back( type);
+	m_blocks.push_back( i_block);
+	m_blocks_types.push_back( i_type);
 }
 
-void MonitorContainer::addUser( UserAf * user)
+void MonitorContainer::addUser( UserAf * i_user)
 {
-	std::list<UserAf*>::const_iterator uIt = usersJobOrderChanged.begin();
-	while( uIt != usersJobOrderChanged.end())
-		if( *(uIt++) == user)
+	std::list<UserAf*>::const_iterator uIt = m_usersJobOrderChanged.begin();
+	while( uIt != m_usersJobOrderChanged.end())
+		if( *(uIt++) == i_user)
 			return;
-	usersJobOrderChanged.push_back( user);
+	m_usersJobOrderChanged.push_back( i_user);
+	AF_DEBUG << "m_usersJobOrderChanged.push_back( i_user)";
 }
 
 //##############################################################################
 MonitorContainerIt::MonitorContainerIt( MonitorContainer* container, bool skipZombies):
-   AfContainerIt( (AfContainer*)container, skipZombies)
+	AfContainerIt( (AfContainer*)container, skipZombies)
 {
 }
 

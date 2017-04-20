@@ -31,6 +31,7 @@ function FilesView( i_args)
 	this.path = i_args.path;
 	this.walk = i_args.walk;
 	this.masks = i_args.masks;
+	this.count_images = i_args.count_images;
 
 	this.can_refresh = ! ( i_args.can_refresh === false );
 	this.can_count   =     i_args.can_count;
@@ -79,7 +80,7 @@ convert images/movies,\n\
 put in other location (may be FTP),\n\
 genetate thumbnails.";
 
-	c_CreateOpenButton( this.elPanel, this.path);
+	c_CreateOpenButton({"parent":this.elPanel,"path":this.path});
 
 	var elPath = document.createElement('a');
 	this.elPanel.appendChild( elPath);
@@ -161,6 +162,38 @@ genetate thumbnails.";
 		el.m_path = this.path;
 		el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
 		el.title = 'Top secret feature.';
+	}
+
+	if( g_admin )
+	{
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/tmpfio.png)';
+		el.m_view = this;
+		el.onclick = function(e){ fu_TmpFio({"fview":e.currentTarget.m_view});}
+		el.title = 'Create a shared folder.';
+	}
+
+	if( g_admin )
+	{
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/buffer_add.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.bufferAdd();}
+		el.title = 'Add selected files to buffer.';
+
+		var el = document.createElement('div');
+		this.elPanel.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/buffer_take.png)';
+		el.m_view = this;
+		el.onclick = function(e){ e.currentTarget.m_view.bufferPut();}
+		el.title = 'Put files from buffer.';
+		el.style.display = 'none';
+		this.elBufferPut = el;
 	}
 
 	if( this.has_thumbs )
@@ -348,6 +381,14 @@ FilesView.prototype.show = function()
 
 	this.limitApply();
 	this.showCounts();
+
+	if( g_admin )
+	{
+		if( fu_BufferExists())
+			this.elBufferPut.style.display = 'block';
+		else
+			this.elBufferPut.style.display = 'none';
+	}
 }
 
 FilesView.prototype.showCounts = function()
@@ -356,6 +397,7 @@ FilesView.prototype.showCounts = function()
 	var files_count = 0;
 	var frames_count = 0;
 	var size_count = 0;
+	var space_count = 0;
 
 	if( this.walk.folders)
 		for( var i = 0; i < this.walk.folders.length; i++)
@@ -368,6 +410,9 @@ FilesView.prototype.showCounts = function()
 
 				if( this.walk.folders[i].num_files )
 					frames_count += this.walk.folders[i].num_files;
+
+				if( this.walk.folders[i].space )
+					space_count += this.walk.folders[i].space;
 			}
 
 	if( this.walk.files)
@@ -376,6 +421,9 @@ FilesView.prototype.showCounts = function()
 			{
 				if( this.walk.files[i].size )
 					size_count += this.walk.files[i].size;
+
+				if( this.walk.files[i].space )
+					space_count += this.walk.files[i].space;
 
 				files_count++;
 			}
@@ -386,13 +434,14 @@ FilesView.prototype.showCounts = function()
 	if( size_count ) counts += ' Size:' + c_Bytes2KMG( size_count);
 
 	this.elCounts.textContent = counts;
+	this.elCounts.title = 'Disk Usage: ' + c_Bytes2KMG( space_count);
 
 	if( frames_count )
 	{
 		var el = document.createElement('div');
 		this.elCounts.appendChild( el);
 		el.classList.add('frames_count');
-		el.textContent = 'F:' + frames_count;
+		el.textContent = 'sF:' + frames_count;
 		el.title = 'All folders files sum.\nDouble click to update status frames number.';
 		el.m_frames_count = frames_count;
 		el.onclick = function(e){e.stopPropagation();};
@@ -424,8 +473,9 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( i_el.m_el_mtime == null )
 		{
 			i_el.m_el_mtime = document.createElement('div');
-			i_el.appendChild( i_el.m_el_mtime);
+			i_el.m_elBody.appendChild( i_el.m_el_mtime);
 			i_el.m_el_mtime.classList.add('mtime');
+			i_el.m_el_mtime.classList.add('attr');
 		}
 
 		i_el.m_el_mtime.textContent = c_DT_FormStrFromSec( i_el.m_obj.mtime);
@@ -438,36 +488,57 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( i_el.m_el_size == null )
 		{
 			i_el.m_el_size = document.createElement('div');
-			i_el.appendChild( i_el.m_el_size);
+			i_el.m_elBody.appendChild( i_el.m_el_size);
 			i_el.m_el_size.classList.add('size');
+			i_el.m_el_size.classList.add('attr');
 		}
 
 		i_el.m_el_size.textContent = c_Bytes2KMG( size);
+
+		var title = '';
+
+		if( i_el.m_obj.space )
+			title += 'Disk usage: ' + c_Bytes2KMG( i_el.m_obj.space) + '\n';
+
 		if(( i_el.m_obj.size_total != null ) && ( i_el.m_obj.size != null ))
-			i_el.m_el_size.title = 'Files size without subfolders: ' + c_Bytes2KMG( i_el.m_obj.size);
+			title += 'Files size without subfolders: ' + c_Bytes2KMG( i_el.m_obj.size);
+
+		i_el.m_el_size.title = title;
 	}
 
 	var num_files = null;
-	if( i_el.m_obj.num_files != null )
-		num_files = i_el.m_obj.num_files;
 	if( i_el.m_obj.files && i_el.m_obj.files.length )
 		num_files = i_el.m_obj.files.length;
+	if( i_el.m_obj.num_files != null )
+		num_files = i_el.m_obj.num_files;
 	if( num_files != null )
 	{
 		if( i_el.m_el_num_files == null )
 		{
 			i_el.m_el_num_files = document.createElement('div');
-			i_el.appendChild( i_el.m_el_num_files);
+			i_el.m_elBody.appendChild( i_el.m_el_num_files);
 			i_el.m_el_num_files.classList.add('filesnum');
+			i_el.m_el_num_files.classList.add('attr');
 		}
 
-		i_el.m_el_num_files.textContent = 'F:' + num_files;
+		var f_count = num_files;
+		if( i_el.m_obj.num_images && this.count_images )
+		{
+			f_count = i_el.m_obj.num_images;
+			i_el.m_el_num_files.textContent = 'iF:' + f_count;
+		}
+		else
+			i_el.m_el_num_files.textContent = 'F:' + f_count;
 
-		var title = 'Files quantity: ' + num_files + ' (without subfolders)';
-		title += '\nDouble click to update status frames number.';
+		var title = 'Double click to update status frames number.\n';
+
+		title += '\nFiles quantity: ' + num_files + ' (without subfolders)';
+		if( i_el.m_obj.num_images )
+			title += '\nImages quantity: ' + i_el.m_obj.num_images;
+
 		if(( i_el.m_obj.num_folders_total != null ) && ( i_el.m_obj.num_files_total != null ))
 		{
-			title += '\nTotal count with subfolders:';
+			title += '\n\nTotal count with subfolders:';
 			title += '\nFolders: ' + i_el.m_obj.num_folders_total;
 			title += '\nFiles: ' + i_el.m_obj.num_files_total;
 		}
@@ -475,11 +546,11 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		if( RULES.status && ( RULES.status.frames_num != null ))
 		{
 			i_el.m_el_num_files.classList.add('correct');
-			if( num_files != RULES.status.frames_num )
+			if( f_count != RULES.status.frames_num )
 			{
 				i_el.m_el_num_files.classList.add('error');
-				title = 'ERROR: Shot and folder files number mismatch!\n' + title;
-				if( num_files > RULES.status.frames_num )
+				title = 'ERROR: Shot and folder files number mismatch!\n\n' + title;
+				if( f_count > RULES.status.frames_num )
 					i_el.m_el_num_files.classList.add('greater');
 				else
 					i_el.m_el_num_files.classList.remove('greater');
@@ -489,7 +560,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 		}
 
 		i_el.m_el_num_files.title = title;
-		i_el.m_el_num_files.m_num_files = num_files;
+		i_el.m_el_num_files.m_num_files = f_count;
 		i_el.m_el_num_files.onclick = function(e){e.stopPropagation();};
 		i_el.m_el_num_files.ondblclick = function(e){
 			e.stopPropagation();
@@ -510,6 +581,48 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			}
 		}
 	}
+
+    var video = i_el.m_obj.video;
+    if( video )
+    {
+        if( i_el.m_el_videoinfo == null )
+        {
+			i_el.m_el_videoinfo = document.createElement('div');
+			i_el.m_elBody.appendChild( i_el.m_el_videoinfo);
+			i_el.m_el_videoinfo.classList.add('videoinfo');
+        }
+        info = 'Video:';
+        if( video.width && video.height )
+            info += ' ' + video.width + 'x' + video.height;
+        if( video.frame_count && video.fps )
+            info += ' ' + c_TC_FromFrame( video.frame_count, video.fps, true);
+        if( video.fps )
+            info += ' ' + video.fps + 'fps';
+        if( video.codec )
+            info += ' ' + video.codec;
+        if( video.bitdepth )
+            info += ' ' + video.colorspace;
+        if( video.colorspace )
+            info += '/' + video.chromasubsampling;
+        if( video.chromasubsampling )
+            info += '/' + video.bitdepth;
+        if( video.frame_count )
+            info += ' ' + video.frame_count + 'f';
+        i_el.m_el_videoinfo.textContent = info;
+    }
+
+	if( i_el.m_obj.annotation )
+	{
+		if( i_el.m_el_annotation == null )
+		{
+			i_el.m_el_annotation = document.createElement('div');
+			i_el.appendChild( i_el.m_el_annotation);
+			i_el.m_el_annotation.classList.add('annotation');
+		}
+		i_el.m_el_annotation.textContent = i_el.m_obj.annotation;
+	}
+
+	fv_itemApplyColor( i_el, i_el.m_obj.color);
 /*
 	if( i_el.m_obj.checksum )
 	{
@@ -571,7 +684,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	var elAnchor = null;
 	if( i_isFolder )
 	{
-		elAnchor = c_CreateOpenButton( elItem, path, 'a');
+		elAnchor = c_CreateOpenButton({"parent":elItem,"path":path,"type":'a'});
 		if( elAnchor ) elAnchor.style.cssFloat = 'left';
 	}
 	if( elAnchor == null )
@@ -595,8 +708,13 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	if( this.has_thumbs )
 		this.makeThumbEl( elItem, path, type);
 
+	elBody = document.createElement('div');
+	elBody.classList.add('fbody');
+	elItem.appendChild( elBody);
+	elItem.m_elBody = elBody;
+
 	elItem.m_elName = document.createElement('a');
-	elItem.appendChild( elItem.m_elName);
+	elBody.appendChild( elItem.m_elName);
 	elItem.m_elName.classList.add('name');
 	elItem.m_elName.textContent = name;
 	if( i_isFolder )
@@ -609,7 +727,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 
 	// Menu show/hide button:
 	var el = document.createElement('div');
-	elItem.appendChild( el);
+	elBody.appendChild( el);
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/menu.png)';
 	el.title = 'Open menu';
@@ -621,7 +739,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	}
 	// Menu div:
 	elItem.m_elMenu = document.createElement('div');
-	elItem.appendChild( elItem.m_elMenu);
+	elBody.appendChild( elItem.m_elMenu);
 	el.m_elMenu = elItem.m_elMenu;
 	elItem.m_elMenu.style.display = 'none';
 	elItem.m_elMenu.classList.add('menu');
@@ -685,6 +803,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		el.m_view = this;
 		el.m_path = elItem.m_path;
 		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.rename( elItem.m_path)};
+
+		var el = document.createElement('div');
+		elItem.m_elMenu.appendChild( el);
+		el.classList.add('button');
+		el.style.backgroundImage = 'url(rules/icons/annotate.png)';
+		el.title = 'Annotate item';
+		el.m_view = this;
+		el.m_path = elItem.m_path;
+		el.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_view.annotate( elItem)};
 	}
 
 	// Delete button !!!
@@ -718,18 +845,15 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		var cmds = RULES.cmdexec.play_sequence;
 		if( cmds ) for( var c = 0; c < cmds.length; c++)
 		{
-			var elCmd = document.createElement('div');
-			if( cmds[c].submenu )
-				elItem.m_elMenu.appendChild( elCmd);
-			else
-				elItem.appendChild( elCmd);
-			elCmd.classList.add('cmdexec');
-			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
-			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
+			cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client( path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
-			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
-			if( cmds[c].tooltip ) elCmd.title = cmds[c].tooltip;
+
+			var elParent = elBody;
+			if( cmds[c].submenu )
+				elParent = elItem.m_elMenu;
+
+			cgru_CmdExecCreate({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
 
@@ -742,7 +866,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			out_path = ASSET.path+'/'+ASSET.dailies.path[0];
 
 		var el = document.createElement('div');
-		elItem.appendChild( el);
+		elBody.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/dailies.png)';
 		el.title = 'Make dailies';
@@ -770,22 +894,17 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		var cmds = RULES.cmdexec.play_movie;
 		if( cmds && ( RULES.has_filesystem !== false )) for( var c = 0; c < cmds.length; c++)
 		{
-			var elCmd = document.createElement('div');
-			if( cmds[c].submenu )
-				elItem.m_elMenu.appendChild( elCmd);
-			else
-				elItem.appendChild( elCmd);
-			elCmd.classList.add('cmdexec');
-			elCmd.textContent = cmds[c].name;
 			var cmd = cmds[c].cmd;
-			cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + path));
+			cmd = cmd.replace('@PATH@', c_PathPM_Rules2Client( path));
 			cmd = cmd.replace('@FPS@', RULES.fps);
-			elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
-			if( cmds[c].tooltip ) elCmd.title = cmds[c].tooltip;
+
+			var elParent = elBody;
+			if( cmds[c].submenu )
+				elParent = elItem.m_elMenu;
+
+			cgru_CmdExecCreate({"cmd":cmd,"parent":elParent,"label":cmds[c].name,"tooltip":cmds[c].tooltip});
 		}
 	}
-
-	this.showAttrs( elItem);
 
 	// Movie file preview:
 	if( i_isFolder == false )
@@ -807,7 +926,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		{
 			var el = document.createElement('div');
 			elItem.m_elPreviewBtn = el;
-			elItem.appendChild( el);
+			elBody.appendChild( el);
 			el.classList.add('preview_btn');
 			el.classList.add('button');
 			el.style.backgroundImage = 'url(rules/icons/play.png)';
@@ -816,6 +935,8 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 			el.onclick = function(e){ e.stopPropagation(); fv_PreviewOpen(e.currentTarget.m_el_file);};
 		}
 	}
+
+	this.showAttrs( elItem);
 }
 
 FilesView.prototype.onClick = function( i_evt)
@@ -904,7 +1025,7 @@ FilesView.prototype.getSelected = function()
 FilesView.prototype.countFiles = function( i_path, i_args)
 {
 	c_LoadingElSet( this.elRoot);
-	var cmd = 'rules/bin/walk.py "' + RULES.root + i_path + '"';
+	var cmd = 'rules/bin/walk.sh "' + RULES.root + i_path + '"';
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"this":this,"wpath":i_path,"post_args":i_args});
 }
 FilesView.prototype.countFilesFinished = function( i_data, i_args) { i_args.this.countFilesUpdate(i_data, i_args);}
@@ -1148,7 +1269,7 @@ FilesView.prototype.makeFolder = function()
 }
 FilesView.prototype.makeFolderDo = function( i_name)
 {
-	var path = cgru_PM( RULES.root + this.path + '/' + i_name, true);
+	var path = c_PathPM_Rules2Server( this.path + '/' + i_name);
 	n_Request({"send":{"makefolder":{"path":path}},"func":fv_makeFolderFinished,"fview":this});
 }
 function fv_makeFolderFinished( i_data, i_args)
@@ -1170,13 +1291,13 @@ FilesView.prototype.rename = function( i_path)
 FilesView.prototype.renameDo = function( i_value, i_path)
 {
 	new_path = RULES.root + c_PathDir( i_path) + '/' + i_value;
-	cmd = 'rules/bin/rename.py "' + RULES.root + i_path + '" "' + new_path + '"';
+	cmd = 'rules/bin/move.py "' + RULES.root + i_path + '" "' + new_path + '"';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.renameFinished,"this":this,"old_path":i_path,"new_path":new_path,"info":'rename'});
 }
 FilesView.prototype.renameFinished = function( i_data, i_args)
 {
-	if( c_NullOrErrorMsg( i_data)) return;
+	if( c_NullOrErrorCmd( i_data,'move')) return;
 
 	c_Info('Renamed: ' + c_PathBase(i_args.old_path) + ' -> ' + c_PathBase(i_args.new_path));
 
@@ -1209,6 +1330,194 @@ FilesView.prototype.filesDeleted = function( i_data, i_args)
 	c_Info('Deleted ' + i_args.delpath);
 
 	i_args.this.refresh();
+}
+
+FilesView.prototype.bufferAdd = function()
+{
+	var elItems = this.getSelected();
+	if( elItems.length == 0 )
+	{
+		c_Error('No items selected.');
+		return;
+	}
+
+	for( var i = 0; i < elItems.length; i++)
+		fu_BufferAdd( elItems[i].m_path);
+}
+FilesView.prototype.bufferAdded = function() { this.elBufferPut.style.display = 'block'; }
+FilesView.prototype.bufferEmpty = function() { this.elBufferPut.style.display = 'none';  }
+FilesView.prototype.bufferPut = function()
+{
+	var paths = fu_BufferTakeSelected();
+	if( paths.length == 0 )
+	{
+		c_Error('No buffer items selected.');
+		return;
+	}
+
+	var cmds = [];
+	var dest = c_PathPM_Rules2Server( this.path) + '/';
+	for( var i = 0; i < paths.length; i++)
+	{
+		// Remove parent folder from walk buffer:
+		var parent_path = c_PathDir(paths[i]);
+		if( parent_path == this.path )
+		{
+			c_Error('Buffer and destination folders are the same.');
+			continue;
+		}
+
+		n_walks[parent_path] = null;
+
+		var src = c_PathPM_Rules2Server( paths[i]);
+		cmd = 'rules/bin/move.py "' + src + '" "' + dest + '"';
+		cmds.push( cmd);
+	}
+
+	if( cmds.length == 0 )
+		return;
+
+	n_Request({"send":{"cmdexec":{"cmds":cmds}},"func":this.bufferPutFinished,"this":this,"info":'buffer move'});
+}
+FilesView.prototype.bufferPutFinished = function( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+
+	var invalid = false;
+
+	if( i_data && i_data.cmdexec )
+	{
+		for( var i = 0; i < i_data.cmdexec.length; i++)
+		{
+			var data = i_data.cmdexec[i];
+			if(( data == null ) || ( data.move == null ))
+			{
+				invalid = true;
+			}
+			else
+			{
+				var move = data.move;
+				if( move.error )
+					c_Error( move.error );
+				else
+					c_Info(move.src + ' -> ' + move.dst);
+			}
+		}
+	}
+
+	if( invalid )
+	{
+		c_Log( JSON.stringify( data));
+		c_Error('Invalid output received.');
+	}
+
+	fv_ReloadAll();
+}
+
+FilesView.prototype.annotate = function( i_elItem)
+{
+	if( i_elItem.m_el_edit_annotation != null )
+		i_elItem.removeChild( i_elItem.m_el_edit_annotation);
+
+	if( i_elItem.m_el_annotation != null )
+		i_elItem.m_el_annotation.style.display = 'none';
+
+	var elAnn = document.createElement('div');
+	i_elItem.m_el_edit_annotation = elAnn;
+	i_elItem.appendChild( elAnn);
+	elAnn.classList.add('edit_annotation');
+	elAnn.onclick = function(e){ e.stopPropagation(); return false; }
+
+	var elText = document.createElement('div');
+	i_elItem.m_el_edit_annotation.m_el_text = elText;
+	elAnn.appendChild( elText);
+	elText.contentEditable = 'true';
+	elText.classList.add('editing');
+	if( i_elItem.m_obj.annotation )
+		elText.textContent = i_elItem.m_obj.annotation;
+
+	var elPanel = document.createElement('div');
+	elAnn.appendChild( elPanel);
+	elPanel.classList.add('edit_panel');
+
+	var elBtnCancel = document.createElement('div');
+	elPanel.appendChild( elBtnCancel);
+	elBtnCancel.classList.add('button');
+	elBtnCancel.textContent = 'Cancel';
+	elBtnCancel.m_fv = this;
+	elBtnCancel.m_el = i_elItem;
+	elBtnCancel.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateCancel( el.m_el);}
+
+	var elBtnApply = document.createElement('div');
+	elPanel.appendChild( elBtnApply);
+	elBtnApply.classList.add('button');
+	elBtnApply.textContent = 'Apply';
+	elBtnApply.m_fv = this;
+	elBtnApply.m_el = i_elItem;
+	elBtnApply.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateApply( el.m_el);}
+
+	var elColors = document.createElement('div');
+	elPanel.appendChild( elColors);
+	u_DrawColorBars({"el":elColors,"onclick":fv_editColorOnClick,"data":{"el":i_elItem}});
+}
+function fv_editColorOnClick( i_clr, i_data)
+{
+	fv_itemApplyColor( i_data.el, i_clr);
+}
+function fv_itemApplyColor( i_el, i_clr)
+{
+	i_el.m_clr = i_clr;
+
+	if( i_clr == null )
+		i_el.style.backgroundColor = null;
+	else
+		i_el.style.backgroundColor = 'rgb('+i_clr[0]+','+i_clr[1]+','+i_clr[2]+')';
+}
+FilesView.prototype.annotateApply = function( i_elItem)
+{
+	var annotation = i_elItem.m_el_edit_annotation.m_el_text.textContent;
+
+	var filename = c_PathBase( i_elItem.m_path);
+	var fileobj = {};
+	fileobj.annotation = annotation;
+	fileobj.color = i_elItem.m_clr;
+
+	var walk = {};
+	if( i_elItem.m_isFolder )
+	{
+		walk.folders = {};
+		walk.folders[filename] = fileobj;
+	}
+	else
+	{
+		walk.files = {};
+		walk.files[filename] = fileobj;
+	}
+
+	var obj = {};
+	obj.add = true;
+	obj.object = walk;
+	obj.file = c_GetRuFilePath('walk.json', this.path);
+
+	n_Request({"send":{"editobj":obj},"func":fv_annotateFinished,"fv":this,"elItem":i_elItem});
+//console.log( JSON.stringify( obj));
+}
+function fv_annotateFinished( i_data, i_args)
+{
+	i_args.fv.refresh();
+}
+FilesView.prototype.annotateCancel = function( i_elItem)
+{
+	if( i_elItem.m_el_edit_annotation )
+	{
+		i_elItem.removeChild( i_elItem.m_el_edit_annotation);
+		i_elItem.m_el_edit_annotation = null;
+	}
+
+	if( i_elItem.m_el_annotation )
+		i_elItem.m_el_annotation.style.display = 'block';
+
+	fv_itemApplyColor( i_elItem, i_elItem.m_obj.color);
 }
 
 function fv_GetFileIcon( i_name, i_folder)
@@ -1365,6 +1674,8 @@ function fv_SkipFile( i_filename)
 function fv_ReloadAll()    { for( var i = 0; i < fv_views.length; i++) fv_views[i].refresh();      }
 function fv_refreshAttrs() { for( var i = 0; i < fv_views.length; i++) fv_views[i].refreshAttrs(); }
 function fv_SelectNone()   { for( var v = 0; v < fv_views.length; v++) fv_views[v].selectNone();   }
+function fv_BufferAdded()  { for( var v = 0; v < fv_views.length; v++) fv_views[v].bufferAdded();  }
+function fv_BufferEmpty()  { for( var v = 0; v < fv_views.length; v++) fv_views[v].bufferEmpty();  }
 function fv_RefreshPath( i_path)
 {
 //console.log('fv_RefreshPath: ' + i_path);

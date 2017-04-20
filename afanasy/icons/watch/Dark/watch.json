@@ -1,0 +1,73 @@
+{"watch":{
+"":"Afanasy Watch 'Dark' Theme",
+
+	"theme"                 :"Dark",
+
+	"image_back"            :"",
+
+	"image_border_top"      :"",
+	"image_border_topleft"  :"",
+	"image_border_topright" :"",
+	"image_border_bot"      :"",
+	"image_border_botleft"  :"",
+	"image_border_botright" :"",
+
+	"image_snap_leftoff"    :"",
+	"image_snap_lefton"     :"",
+	"image_snap_rightoff"   :"",
+	"image_snap_righton"    :"",
+
+	"star_numpoints"        : 5,
+	"star_radiusout"        : 100,
+	"star_radiusin"         : 50,
+	"star_rotate"           : 10,
+
+	"font_family"           :"SansSerif",
+	"font_sizename"         : 10,
+	"font_sizeinfo"         : 8,
+	"font_sizemin"          : 5,
+	"font_sizeplotter"      : 7,
+
+	"clr_Window"            :"333333",
+	"clr_WindowText"        :"CCCCCC",
+	"clr_DisabledText"      :"808070",
+	"clr_Base"              :"555555",
+	"clr_Text"              :"CCCCCC",
+	"clr_Button"            :"444444",
+	"clr_Light"             :"666666",
+	"clr_Midlight"          :"555555",
+	"clr_Mid"               :"333333",
+	"clr_Dark"              :"222222",
+	"clr_Shadow"            :"111111",
+	"clr_Highlight"         :"A37333",
+	"clr_HighlightedText"   :"FFFFFF",
+	"clr_Link"              :"402010",
+	"clr_LinkVisited"       :"CAFFB9",
+
+	"clr_item"              :"828282",
+	"clr_selected"          :"DCDCDC",
+	"clr_itemjob"           :"657652",
+	"clr_itemjoboff"        :"474747",
+	"clr_itemjobwtime"      :"477777",
+	"clr_itemjobwdep"       :"61546E",
+	"clr_itemjobdone"       :"486653",
+	"clr_itemjoberror"      :"7F6550",
+	"clr_itemrender"        :"637666",
+	"clr_itemrenderoff"     :"50544C",
+	"clr_itemrenderbusy"    :"667D55",
+	"clr_itemrendernimby"   :"5E778F",
+	"clr_itemrenderpltclr"  :"FAFA36",
+
+	"clr_running"           :"E6E65F",
+	"clr_done"              :"263224",
+	"clr_error"             :"FA320A",
+	"clr_star"              :"F1CB0A",
+	"clr_outline"           :"515151",
+	"clr_starline"          :"FFFFFF",
+	"clr_textbright"        :"E2E2E2",
+	"clr_textmuted"         :"5A5A5A",
+	"clr_textdone"          :"E3E3E3",
+	"clr_textstars"         :"323232",
+
+	"":""
+}}

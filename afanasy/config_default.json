@@ -4,7 +4,6 @@
 		"":"Afanasy server name or direct IP address literals",
 
 	"af_serverport":51000,
-	"af_clientport":51001,
 
 		"":"Afanasy server will use IPv6 if it is configured on server interface",
 	"af_ipv6_disable":1,
@@ -26,7 +25,7 @@
 		"":"@IP@  - will be replaced with render ip address:",
 
 	"OS_unix":{
-		"af_tempdirectory":"/var/tmp/afanasy",
+		"af_store_folder":"/var/tmp/afanasy",
 		"af_rendercmds":["vncviewer @ARG@","xterm -e \"ping @ARG@; read -s -n 1\"","xterm -e \"ping @IP@; read -s -n 1\""],
 		"af_rendercmds_admin":["xterm -e \"ssh @ARG@; read -s -n 1\"","xterm -e \"ssh @ARG@ \\\"@ASK@\\\"; read -s -n 1\""],
 		"":"Render:",
@@ -47,7 +46,7 @@
 	},
 	"OS_windows":{
 		"af_rendercmds":["vncviewer @ARG@","start ping /t @ARG@","start ping /t @IP@"],
-		"af_tempdirectory":"c:/temp/afanasy",
+		"af_store_folder":"c:/temp/afanasy",
 		"af_render_cmd_reboot":"shutdown /r",
 		"af_render_cmd_shutdown":"shutdown /s",
 		"af_render_cmd_wolsleep":"cmd.exe /c wolsleep",
@@ -71,17 +70,21 @@
 	"af_priority":99,
 	"af_maxrunningtasks":-1,
 
-	"af_serve_tasks_speed":-1,
-		"":"Server tasks solving speed limit (~tasks/second)",
-		"":"You can set this parameter to zero to pause job solving (see docs to reload config 'on-the-fly')",
-		"":"'-1' means unlimited.",
-
 "":"Job:",
 	"af_task_default_capacity":1000,
 	"af_task_default_service":"generic",
 	"af_task_log_linesmax":100,
 
 "":"Render:",
+	"af_render_heartbeat_sec":1,
+		"":"Render heartbeat in seconds.",
+		"":"It refresh tasks, update server, reveice an answer which can contain new tasks.",
+		"":"So every af_render_heartbeat_sec render connects, write, read and disconnects from server (TCP).",
+
+	"af_render_up_resources_period":5,
+		"":"Render resources update period.",
+		"":"If heartbeat is 3 and up_resources is 5, render will update resources every 15 seconds.",
+
 	"af_render_default_capacity":1000,
 		"":"Default render capacity value, if not set in farm config.",
 
@@ -120,19 +123,25 @@
 		"":"if( nice <   0 ) priority = ABOVE_NORMAL_PRIORITY_CLASS;",
 		"":"if( nice < -10 ) priority = HIGH_PRIORITY_CLASS;",
 
-	"af_render_update_sec":5,
-		"":"Render resources update interval.",
-
 	"af_render_zombietime":60,
 		"":"If render will not send update its resources for this time(seconds),",
-		"":"server will put it in 'OFFLINE' stated.",
+		"":"server will put it in 'OFFLINE' state.",
 
-	"af_render_updatetaskperiod":1,
-		"":"Period to render to update task state or percentage (even w/o a parser).",
+	"af_render_exit_no_task_time":-1,
+		"":"Program will exit if there will be no tasks for this time(seconds),",
+		"":"Negative value disables this feature",
 
-	"af_task_update_timeout":15,
+	"af_task_update_timeout":30,
 		"":"If task progress (state or percentage) has not been updated for this period,",
 		"":"It wiil considered as an error, and render will be push in error hosts list.",
+
+	"af_task_stop_timeout":30,
+		"":"If render was asked to stop a task, but it did not send task finish message,",
+		"":"it wiil be considered as not running any way.",
+
+	"af_task_progress_change_timeout":-1,
+		"":"If task progress did not change within this time, consider that it is erroneous.",
+		"":"A value of -1 will disable this feature.",
 
 	"af_render_connectretries":3,
 		"":"Connection fails number to consider that render can`t connect to server.",
@@ -145,7 +154,7 @@
 
 "":"Thumbnail:",
 	"af_thumbnail_extensions":["exr","dpx","jpg","jpeg","png","tif","tiff","tga"],
-	"af_thumbnail_cmd":"convert -identify \"%(image)s\" %(pre_args)s -thumbnail \"100x100^\" -gravity center -extent 100x100 -colorspace sRGB \"%(thumbnail)s\"",
+	"af_thumbnail_cmd":"convert -identify \"%(image)s\" %(pre_args)s -thumbnail \"100x100^\" -alpha Deactivate -gravity center -extent 100x100 -colorspace sRGB \"%(thumbnail)s\"",
 	"-af_thumbnail_naming":"%(job_id)d.%(block_id)d.%(task_id)d.%(thumbnail_filename)s",
 	"-af_thumbnail_http":"http://localhost:80/thumbnails/",
 	"-af_thumbnail_file":"//servername/sharename/thumbnails/",
@@ -156,21 +165,17 @@
 	"af_task_errors_same_host":3,
 	"af_errors_forgivetime":18000,
 
-"":"Monitor: (any gui)",
-	"af_monitor_render_idle_bar_max":3600,
-	"af_monitor_updateperiod":10,
+"":"Monitor: (server side - any gui)",
 	"af_monitor_zombietime":40,
-	"af_monitor_connectretries":3,
-	"af_monitor_waitforconnected":8000,
-	"af_monitor_waitforreadyread":8000,
-	"af_monitor_waitforbyteswritten":8000,
 
-"":"Watch",
+"":"Watch: (qt gui - client side)",
+	"af_watch_get_events_sec":1,
+	"af_watch_refresh_gui_sec":5,
 	"af_watch_connectretries":3,
 	"af_watch_waitforconnected":8000,
 	"af_watch_waitforreadyread":8000,
 	"af_watch_waitforbyteswritten":8000,
-	"af_watch_refreshinterval":5,
+	"af_watch_render_idle_bar_max":3600,
 
 "":"Database:",
 		"":"sting to pass to PQconnectdb http://www.postgresql.org/docs/current/static/libpq-connect.html",
@@ -187,16 +192,47 @@
 	"af_sysjob_events_service":"events",
 
 "":"Network:",
-		"":"Use -1 value not to set socket option at all",
-	"af_server_accept_so_rcvtimeo_sec":2,
-	"af_server_accept_so_sndtimeo_sec":2,
-	"af_server_dispatch_so_rcvtimeo_sec":2,
-	"af_server_dispatch_so_sndtimeo_sec":2,
-	"af_server_dispatch_tcp_nodelay":1,
- 
-	"af_client_dispatch_so_rcvtimeo_sec":8,
-	"af_client_dispatch_so_sndtimeo_sec":8,
-	"af_client_dispatch_tcp_nodelay":0,
+	"":"Server thread raised to process client connection stack.",
+	"af_server_process_conn_stack":32768,
+		"":"Zero, negative value or no parameter means to use system default",
+
+	"":"Use -1 value not to set socket option at all",
+	"af_so_server_RCVTIMEO_sec":12,
+	"af_so_server_SNDTIMEO_sec":12,
+	"af_so_server_TCP_NODELAY":-1,
+	"af_so_server_REUSEADDR":-1,
+	"af_so_server_TCP_CORK":-1,
+	"af_so_server_LINGER":-1,
+
+	"af_so_client_RCVTIMEO_sec":12,
+	"af_so_client_SNDTIMEO_sec":12,
+	"af_so_client_TCP_NODELAY":-1,
+	"af_so_client_REUSEADDR":-1,
+	"af_so_client_TCP_CORK":-1,
+	"af_so_client_LINGER":-1,
+
+"":"Solving:",
+	"af_solving_use_capacity":true,
+		"":"Calculate need using running tasks total capacity.",
+		"":"If not, use only running tasks number",
+
+	"af_solving_use_user_priority":true,
+		"":"Whether task solving takes user priority into account or not. If set on,",
+		"":"Jobs are sorted by user's priority first, then by job priority within a user.",
+		"":"If not, only job proirities are used.",
+
+	"af_solving_simpler":false,
+		"":"Use a simplified solving algorithm. No notion of 'need' is used: jobs are",
+		"":"sorted by priority first, and creation date then (older first).",
+
+	"af_solving_tasks_speed":-1,
+		"":"Server tasks solving speed limit (~tasks/second)",
+		"":"You can set this parameter to zero to pause job solving (see docs to reload config 'on-the-fly')",
+		"":"'-1' means unlimited.",
+
+	"af_solving_wake_per_cycle":1,
+		"":"Number of afrenders that can be waken per solve cycle (per second).",
+		"":"Zero or nagative value will disable Wake-On-Lan at all (in a default farm setup it is disabled).",
 
 	"":""
 }}

@@ -10,10 +10,10 @@
 #include "numberwidget.h"
 #include "watch.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QTabWidget>
+#include <QLabel>
+#include <QLayout>
+#include <QPushButton>
+#include <QTabWidget>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -75,6 +75,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Window          ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_WindowText      ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_DisabledText    ));
 	//vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_AlternateBase ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Base            ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Text            ));
@@ -88,6 +89,9 @@ WndCustomizeGUI::WndCustomizeGUI():
 
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Highlight       ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_HighlightedText ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Link            ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_LinkVisited     ));
+
 
 	label = new QLabel("Watch specific colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
@@ -110,26 +114,20 @@ WndCustomizeGUI::WndCustomizeGUI():
 	hlayout->addLayout( vlayout);
 
 
-	label = new QLabel("Qt not used palette:", this);
-	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
-	vlayout->addWidget( label);
-
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Link        ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_LinkVisited ));
-
 	label = new QLabel("Job Colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
 	vlayout->addWidget( label);
 
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoberror ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoboff   ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwtime ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwdep  ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobdone  ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjob      ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskskipped     ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningrun  ));
-	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningdone ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoberror   ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoboff     ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwtime   ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwdep    ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobdone    ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjob        ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwarning ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwarningrun ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskskipped    ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_taskwaitreconn ));
 
 	label = new QLabel("Render Colors:", this);
 	label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
@@ -139,6 +137,7 @@ WndCustomizeGUI::WndCustomizeGUI():
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderoff    ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderbusy   ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrendernimby  ));
+	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpaused ));
 	vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpltclr ));
 
 	label = new QLabel("Text Colors:", this);

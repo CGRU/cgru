@@ -68,6 +68,7 @@ Af* MCAfNodes::newNode( Msg * msg )
       case Msg::TMonitorsList:
          return new Monitor( msg);
 
+      case Msg::TJob:
       case Msg::TJobsList:
          return new Job( msg);
 

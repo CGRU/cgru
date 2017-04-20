@@ -1,4 +1,4 @@
-#include "../libafanasy/common/dlThread.h"
+//#include "../libafanasy/common/dlThread.h"
 
 #ifndef WINNT
 #include <sys/wait.h>
@@ -7,6 +7,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
 #include "../libafanasy/render.h"
+#include "../libafanasy/renderevents.h"
 
 #include "res.h"
 #include "renderhost.h"
@@ -14,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 
@@ -32,8 +34,10 @@ void sig_int(int signum)
 //#####################################################################################
 
 // Functions:
-void threadAcceptClient( void * i_arg );
-void msgCase( af::Msg * msg);
+//void threadAcceptClient( void * i_arg );
+void msgCase( af::Msg * i_msg, RenderHost & i_render);
+void processEvents( const af::RenderEvents & i_re, RenderHost & i_render);
+void launchAndExit( const std::string & i_str, bool i_exit);
 
 int main(int argc, char *argv[])
 {
@@ -126,187 +130,210 @@ int main(int argc, char *argv[])
 	}
 
 	// Create temp directory, if it does not exist:
-	if( af::pathMakePath( ENV.getTempDir(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakePath( ENV.getStoreFolder(), af::VerboseOn ) == false) return 1;
 
-	RenderHost * render = new RenderHost();
-
-	DlThread ServerAccept;
-	ServerAccept.Start( &threadAcceptClient, NULL);
+	RenderHost * render = RenderHost::getInstance();
 
 	uint64_t cycle = 0;
 	while( AFRunning)
 	{
-		if( false == RenderHost::isListening() )
-		{
-			// Wait accept thread to start to listen a port.
-			af::sleep_msec( 100);
-			continue;
-		}
+		// Update machine resources:
+		if( cycle % af::Environment::getRenderUpResourcesPeriod() == 0)
+			render->getResources();
 
-		// Collect all available incomming messages:
-		std::list<af::Msg*> in_msgs;
-		while( af::Msg * msg = RenderHost::acceptTry() )
-			in_msgs.push_back( msg);
-
-		// Lock render:
-		RenderHost::lockMutex();
-		// React on all incoming messages:
-		for( std::list<af::Msg*>::iterator it = in_msgs.begin(); it != in_msgs.end(); it++)
-			msgCase( *it);
 		// Let tasks to do their work:
-		RenderHost::refreshTasks();
-		// Unlock render:
-		RenderHost::unLockMutex();
+		render->refreshTasks();
 
-		// Update render resources:
-		if( cycle % af::Environment::getRenderUpdateSec() == 0)
-			RenderHost::update();
+		// Update server (send info and receive an answer):
+		af::Msg * answer = render->updateServer();
 
+		// React on a server answer:
+		msgCase( answer, *render);
+
+		// Close windows on windows:
+		#ifdef WINNT
+		render->windowsMustDie();
+		#endif
+
+		// Increment cycle:
 		cycle++;
+		#ifdef AFOUTPUT
+		printf("=============================================================\n\n");
+		#endif
 
+		// Sleep till the next heartbeat:
 		if( AFRunning )
-			af::sleep_sec(1);
+			af::sleep_sec( af::Environment::getRenderHeartbeatSec());
 	}
 
 	delete render;
 
 	Py_Finalize();
 
-	printf("Exiting render.\n");
+    AF_LOG << "Exiting render.";
 
 	return 0;
 }
 
-void msgCase( af::Msg * msg)
+void msgCase( af::Msg * i_msg, RenderHost & i_render)
 {
+	if( i_msg == NULL)
+	{
+		return;
+	}
+
 	if( false == AFRunning )
 		return;
 
-	if( msg == NULL)
-	{
-		return;
-	}
 #ifdef AFOUTPUT
-printf("msgCase: "); msg->stdOut();
+AF_LOG << " >>> " << i_msg;
 #endif
 
-	// Check not sended messages first, they were pushed back in accept quere:
-	if( msg->wasSendFailed())
-	{
-		if( msg->getAddress().equal( af::Environment::getServerAddress()))
-		{
-			// Message was failed to send to server
-			RenderHost::connectionLost();
-		}
-		else if( msg->type() == af::Msg::TTaskOutput )
-		{
-			RenderHost::listenFailed( msg->getAddress());
-		}
-		delete msg;
-		return;
-	}
-
-	switch( msg->type())
+	switch( i_msg->type())
 	{
 	case af::Msg::TRenderId:
 	{
-		int new_id = msg->int32();
+		int new_id = i_msg->int32();
 		// Server sends back -1 id if a render with the same hostname already exists:
 		if( new_id == -1)
 		{
-			AFERRAR("Render with this hostname '%s' already registered.", af::Environment::getHostName().c_str())
+			AF_ERR << "Render with this hostname '" << af::Environment::getHostName() << "' already registered.";
 			AFRunning = false;
 		}
 		// Render was trying to register (its id==0) and server has send id>0
 		// This is the situation when client was sucessfully registered
-		else if((new_id > 0) && (RenderHost::getId() == 0))
+//		else if((new_id > 0) && (i_render.getId() == 0))
+		else if((new_id > 0) && i_render.notConnected())
 		{
-			RenderHost::setRegistered( new_id);
+			i_render.setRegistered( new_id);
 		}
 		// Server sends back zero id on any error
 		else if ( new_id == 0 )
 		{
-			printf("Zero ID recieved, no such online render, re-connecting...\n");
-			RenderHost::connectionLost();
+			AF_ERR << "Zero ID recieved, no such online render, re-connecting...";
+			i_render.connectionLost( true);
 		}
 		// Bad case, should not ever happen, try to re-register.
-		else if ( RenderHost::getId() != new_id )
+		else if ( i_render.getId() != new_id )
 		{
-			AFERRAR("IDs mistatch: this %d != %d new, re-connecting...", RenderHost::getId(), new_id);
-			RenderHost::connectionLost();
+			AF_ERR << "IDs mistatch: this " << i_render.getId() << " != " << new_id << " new, re-connecting...";
+			i_render.connectionLost( true);
+		}
+		// Id, that returns from server is equals to stored on client.
+		// This is a normal case.
+		else
+		{
+			i_render.connectionEstablished();
 		}
 		break;
 	}
 	case af::Msg::TVersionMismatch:
-	case af::Msg::TClientExitRequest:
 	{
-		printf("Render exit request received.\n");
+		AF_LOG << "Render exit request received.";
 		AFRunning = false;
 		break;
 	}
-	case af::Msg::TTask:
+	case af::Msg::TRenderEvents:
 	{
-		RenderHost::runTask( msg);
-		break;
-	}
-	case af::Msg::TClientRestartRequest:
-	{
-		printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-		af::launchProgram(af::Environment::getRenderExec());
-		AFRunning = false;
-		break;
-	}
-//   case af::Msg::TClientStartRequest:
-//   {
-//	  printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-//	  af::launchProgram( af::Environment::getRenderExec());
-//	  break;
-//   }
-	case af::Msg::TClientRebootRequest:
-	{
-		AFRunning = false;
-		printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
-		af::launchProgram( af::Environment::getRenderCmdReboot());
-		break;
-	}
-	case af::Msg::TClientShutdownRequest:
-	{
-		AFRunning = false;
-		printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
-		af::launchProgram( af::Environment::getRenderCmdShutdown());
-		break;
-	}
-	case af::Msg::TClientWOLSleepRequest:
-	{
-		printf("Sleep request, executing command:\n%s\n", af::Environment::getRenderCmdWolSleep().c_str());
-		af::launchProgram( af::Environment::getRenderCmdWolSleep());
-		break;
-	}
-	case af::Msg::TRenderStopTask:
-	{
-		af::MCTaskPos taskpos( msg);
-		RenderHost::stopTask( taskpos);
-		break;
-	}
-	case af::Msg::TRenderCloseTask:
-	{
-		af::MCTaskPos taskpos( msg);
-		RenderHost::closeTask( taskpos);
-		break;
-	}
-	case af::Msg::TTaskListenOutput:
-	{
-		af::MCListenAddress mcaddr( msg);
-		RenderHost::listenTasks( mcaddr);
+		af::RenderEvents me( i_msg);
+		processEvents( me, i_render);
 		break;
 	}
 	default:
 	{
-		AFERROR("Unknown message recieved:")
-		msg->v_stdOut();
+        AF_ERR << "Unknown message recieved: " << *i_msg;
 		break;
 	}
 	}
 
-	delete msg;
+	delete i_msg;
 }
+
+void processEvents( const af::RenderEvents & i_re, RenderHost & i_render)
+{
+#ifdef AFOUTPUT
+AF_LOG << i_re;
+#endif
+
+	// Tasks to execute:
+	for( int i = 0; i < i_re.m_tasks.size(); i++)
+		i_render.runTask( i_re.m_tasks[i]);
+
+
+	// Tasks to close:
+	for( int i = 0; i < i_re.m_closes.size(); i++)
+		i_render.closeTask( i_re.m_closes[i]);
+
+
+	// Tasks to stop:
+	for( int i = 0; i < i_re.m_stops.size(); i++)
+		i_render.stopTask( i_re.m_stops[i]);
+
+
+	// Tasks to outputs:
+	for( int i = 0; i < i_re.m_outputs.size(); i++)
+		i_render.upTaskOutput( i_re.m_outputs[i]);
+
+	// Listens add:
+	for( int i = 0; i < i_re.m_listens_add.size(); i++)
+		i_render.listenTask( i_re.m_listens_add[i], true);
+
+	// Listens remove:
+	for( int i = 0; i < i_re.m_listens_rem.size(); i++)
+		i_render.listenTask( i_re.m_listens_rem[i], false);
+
+	// Instructions:
+	if( i_re.m_instruction.size())
+	{
+		if( i_re.m_instruction == "exit")
+		{
+			AF_LOG << "Render exit request received.";
+			AFRunning = false;
+		}
+		else if( i_re.m_instruction == "sleep")
+		{
+			AF_LOG << "Render sleep request received.";
+			i_render.wolSleep( i_re.m_command);
+		}
+		else if( i_re.m_instruction == "launch")
+		{
+			launchAndExit( i_re.m_command, false);
+		}
+		else if( i_re.m_instruction == "launch_exit")
+		{
+			launchAndExit( i_re.m_command, true);
+		}
+		else if( i_re.m_instruction == "reboot")
+		{
+			AFRunning = false;
+			AF_LOG << "Reboot request, executing command:\n"
+			       << af::Environment::getRenderCmdReboot();
+			af::launchProgram( af::Environment::getRenderCmdReboot());
+		}
+		else if( i_re.m_instruction == "shutdown")
+		{
+			AFRunning = false;
+			AF_LOG << "Shutdown request, executing command:\n"
+			       << af::Environment::getRenderCmdShutdown();
+			af::launchProgram( af::Environment::getRenderCmdShutdown());
+		}
+	}
+}
+
+void launchAndExit( const std::string & i_cmd, bool i_exit)
+{
+	if( i_exit )
+	{
+		AF_LOG << "Launching command and exiting:\n"
+		       << i_cmd;
+		AFRunning = false;
+	}
+	else
+	{
+		AF_LOG << "Launching command:\n"
+		       << i_cmd;
+	}
+
+	af::launchProgram( i_cmd);
+}
+

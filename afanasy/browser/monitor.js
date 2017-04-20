@@ -78,7 +78,8 @@ function Monitor( i_args)
 			'sub_menu':this.nodeConstructor.view_opts,'handle':'mh_Opt','always_active':true});
 	}
 
-	this.createCtrlBtn({"name":'log',"label":'LOG',"tooltip":'Show node log.',"handle":'mh_Get'});
+	if( this.type != 'tasks' )
+		this.createCtrlBtn({"name":'log',"label":'LOG',"tooltip":'Show node log.',"handle":'mh_Get'});
 
 	var el = document.createElement('div');
 	this.elPanelR.appendChild( el);
@@ -236,9 +237,9 @@ function Monitor( i_args)
 	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
 
-	for( var i = 0; i < g_recievers.length; i++)
+	for( var i = 0; i < g_receivers.length; i++)
 	{
-		if( g_recievers[i].name == this.name )
+		if( g_receivers[i].name == this.name )
 		{
 			g_Info('ERROR: Monitor[' + this.name + '] list already exists.');
 			return;
@@ -306,7 +307,7 @@ function Monitor( i_args)
 	this.selected_items = [];
 	this.cur_item = null;
 
-	g_recievers.push( this);
+	g_receivers.push( this);
 	g_monitors.push( this);
 	this.setWindowTitle();
 	g_cur_monitor = this;
@@ -330,7 +331,7 @@ Monitor.prototype.destroy = function()
 {
 	if( this.menu ) this.menu.destroy();
 	if( g_cur_monitor == this ) g_cur_monitor = null;
-	cm_ArrayRemove(	g_recievers, this);
+	cm_ArrayRemove(	g_receivers, this);
 	cm_ArrayRemove(	g_refreshers, this);
 	cm_ArrayRemove(	g_monitors, this);
 	if( this.type == 'tasks')
@@ -338,8 +339,9 @@ Monitor.prototype.destroy = function()
 	else
 		nw_Subscribe( this.type, false);
 
-//	for( var i = 0; i < this.items.length; i++)
-//		this.element.removeChild(this.items[i].element);
+	for( var i = 0; i < this.items.length; i++)
+		if( this.items[i].monitorDestroy )
+			this.items[i].monitorDestroy( this);
 
 	this.items = [];
 
@@ -406,9 +408,8 @@ Monitor.prototype.processMsg = function( obj)
 		if( ids.length > 0 )
 			nw_GetNodes( this.type, ids);
 
-		if(( this.type == 'jobs') && obj.events.jobs_order )
-			if( g_uid == obj.events.jobs_order.uids[0] )
-				this.sortByIds( obj.events.jobs_order.jids[0] );
+		if(( this.type == 'jobs') && obj.events.jobs_order_ids && obj.events.jobs_order_ids.length )
+			this.sortByIds( obj.events.jobs_order_ids);
 
 		return;
 	}
@@ -476,7 +477,7 @@ Monitor.prototype.processMsg = function( obj)
 		new_nodes.push( this.createNode( nodes[new_ids[i]]));
 
 	if(( this.type == 'jobs' ) && ( this.sortParm == 'order'))
-		if( new_ids.length || updated.length )
+		if( new_ids.length )//|| updated.length )
 			nw_GetNodes('users',[g_uid],'jobs_order');
 
 	if( false == this.hasSelection())
@@ -950,19 +951,19 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 			return;
 	}
 
-	if( i_action.mode == 'cmd')
+	if( i_action.mode == 'cgru_cmdexec')
 	{
 		var cmds = [];
 		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].selected == true )
 			{
-				cmd = i_action.handle;
+				var cmd = i_action.handle;
 				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
 				if( this.items[i].params.address.ip )
 					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
 				cmds.push( cmd);
 			}
-		i_menu.addItem({"name":i_action.name,"receiver":'cmdexec',"handle":cmds,"label":i_action.label});
+		i_menu.addItem({"name":i_action.name,"receiver":'cgru_cmdexec',"handle":cmds,"label":i_action.label});
 		return;
 	}
 

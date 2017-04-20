@@ -4,6 +4,8 @@ import re
 import sys
 import optparse
 
+from Qt import QtCore, QtWidgets
+
 # Parse arguments:
 Parser = optparse.OptionParser(usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
 Parser.add_option('-o', '--open', dest='open', action='store_true', default=False, help='Open Nuke and create read nodes.')
@@ -59,8 +61,7 @@ if Options.open:
 	nuke = __import__('nuke', globals(), locals(), [])
 if Options.copy:
 	CopyText = 'set cut_paste_input [stack 0]\n'
-	cgrupyqt = __import__('cgrupyqt', globals(), locals(), [])
-	qapp = cgrupyqt.QtGui.QApplication([])
+	qapp = QtWidgets.QApplication([])
 
 for i in range(len(Prefixes)):
 	print('%s[%d-%d/%d]%s' % (Prefixes[i], Starts[i], Ends[i], Paddings[i], Suffixes[i]))
@@ -86,10 +87,6 @@ if Options.copy:
 	print('Copying:')
 	print(CopyText)
 	qapp.clipboard().setText(CopyText)
-	cgrupyqt.QtCore.QTimer.singleShot(10000, qapp.quit)
-	# qapp.processEvents()
-	# qapp.sendPostedEvents()
-	# clipboard = cgrupyqt.QtGui.QApplication.clipboard()
-	# event = cgrupyqt.QtCore.QEvent( cgrupyqt.QtCore.QEvent.Clipboard)
-	# cgrupyqt.QtGui.QApplication.sendEvent( clipboard, event)
+	QtCore.QTimer.singleShot(10000, qapp.quit)
 	qapp.exec_()
+

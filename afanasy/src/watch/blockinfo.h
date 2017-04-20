@@ -28,8 +28,6 @@ public:
 		bool compact_display = false,
 		const QColor * backcolor = NULL ) const;
 
-	inline int getRunningTasksNumber()   const { return runningtasksnumber; }
-	inline int getPercentage()           const { return percentage;         }
 	inline int getErrorsAvoidHost()      const { return errors_avoidhost;   }
 	inline int getErrorsRetries()        const { return errors_retries;     }
 	inline int getErrorsTaskSameHost()   const { return errors_tasksamehost;}
@@ -45,30 +43,33 @@ public:
 
 	bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const;
 
-	int tasksdone;
-	int percentage;
+	int p_percentage;
+	int p_tasksready;
+	int p_tasksrunning;
+	int p_tasksdone;
+	int p_taskserror;
+	int p_tasksskipped;
+	int p_taskswarning;
+	int p_taskswaitrec;
+	int p_avoidhosts;
+	int p_errorhosts;
+	long long p_taskssumruntime;
 
 private:
 	uint32_t state;
 
-	int runningtasksnumber;
 
 	QString name;
 	QString service;
-	QString str_runtime;
+
+	QString str_info;
+	QString str_params;
 	QString str_progress;
-	QString str_percent;
-	QString str_compact;
-	QString str_properties;
 	QString str_avoiderrors;
 
 	int tasksnum;
-	int tasksready;
-	int taskserror;
-	long long taskssumruntime;
 
 	bool numeric;              ///< Whether the block is numeric.
-	bool nonsequential;
 	bool varcapacity;
 	bool multihost;
 	bool multihost_samemaster;
@@ -77,14 +78,13 @@ private:
 	long long frame_last;      ///< Last tasks frame.
 	long long frame_pertask;   ///< Tasks frames per task.
 	long long frame_inc;       ///< Tasks frames increment.
-
-	int avoidhostsnum;
-	int errorhostsnum;
+	long long sequential;
 
 	int errors_retries;
 	int errors_avoidhost;
 	int errors_tasksamehost;
 	int errors_forgivetime;
+	int task_progress_change_timeout;
 	uint32_t tasksmaxruntime;
 
 	char progress[AFJOB::ASCII_PROGRESS_LENGTH];

@@ -169,7 +169,9 @@ void ParserHost::parse( const std::string & i_mode, std::string & output)
 	bool _badresult       = false;
 	bool _finishedsuccess = false;
 
-	m_service->parse( i_mode, output, m_percent, m_frame, m_percentframe, m_activity, _warning, _error, _badresult, _finishedsuccess);
+	m_service->parse( i_mode, output, m_percent, m_frame, m_percentframe,
+		m_activity, m_report,
+		_warning, _error, _badresult, _finishedsuccess);
 
 	if ( _error           ) m_error           = true;
 	if ( _warning         ) m_warning         = true;

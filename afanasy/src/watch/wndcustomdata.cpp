@@ -2,10 +2,10 @@
 
 #include "../libafanasy/name_af.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QPlainTextEdit>
-#include <QtGui/QPushButton>
+#include <QLayout>
+#include <QLineEdit>
+#include <QPlainTextEdit>
+#include <QPushButton>
 
 #define AFOUTPUT
 #undef AFOUTPUT

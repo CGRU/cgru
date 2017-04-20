@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="Layer_1"
+   viewBox="0 0 274.9 272.2"
+   width="2500"
+   height="2475"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="max.svg">
+  <metadata
+     id="metadata11">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="852"
+     inkscape:window-height="726"
+     id="namedview7"
+     showgrid="false"
+     inkscape:zoom="0.38141414"
+     inkscape:cx="126.30428"
+     inkscape:cy="1347.4741"
+     inkscape:window-x="320"
+     inkscape:window-y="283"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1" />
+  <style
+     id="style3">.st0{opacity:.75}.st1{fill:#016b6b}</style>
+  <path
+     class="st1"
+     d="M156.4 129.9l7.9-25.2-42.4 17.6 34.5 7.6m92-47.6C216.1 49.7 137.8 55.7 107 63.4c-36 9.2-45.6 36.6-44.6 81 .4 25.5 11.5 48.1 33 55.8 43.8 15.2 81.4 13.1 120.9-24.7-20.2-21.8-37-29.4-64.6-27.4-26.8 1.3-42-2.9-61-23.7 23.2-22.3 37.4-33.1 65.4-36 31.3-3.2 59.2 10 71.3 22.3 11.3 11.6 17 38.1 14.3 70.2-2.1 26-10.4 41.3-29.5 46.8-24.6 7.6-60.4 11.3-93.3 10-38.9-1.6-59.3-9.5-65-15.5-12-13.4-20.8-41.8-22.8-74.4-2-32.6 3.1-63.4 13.2-80.2 10-16.8 47-28.7 101.5-32.1 45.5-2.6 87.7.8 88.2.8L231.2 0S133.9 11.3 119 12.6C82.9 16 34.2 23.9 18 51.3c-29.1 48.9-21.7 153.1 13.5 192 31.4 35 140.6 29.2 189.5 14.5 22-6.6 46.9-24.7 51.2-74.2 2.8-32.6-1.7-78.7-23.8-101.3zm-97.8 87.3l34.5 7.6-42.4 17.6 7.9-25.2z"
+     id="Layer_1_copy"
+     style="fill:#018181;fill-opacity:1" />
+</svg>

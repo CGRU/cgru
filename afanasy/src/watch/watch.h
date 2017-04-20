@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../include/afgui.h"
+
+#include "../libafqt/qenvironment.h"
 #include "../libafqt/name_afqt.h"
 
 #include <QtCore/QLinkedList>
@@ -11,9 +14,11 @@ class QPixmap;
 
 class ButtonMonitor;
 class Dialog;
+class ItemJob;
 class ListItems;
 class MonitorHost;
-class Reciever;
+class Popup;
+class Receiver;
 class Wnd;
 class WndList;
 
@@ -36,23 +41,35 @@ public:
 		WLAST
 	};
 
+	static bool isPadawan()  { return afqt::QEnvironment::level.n == AFGUI::PADAWAN; }
+	static bool notPadawan() { return afqt::QEnvironment::level.n != AFGUI::PADAWAN; }
+	static bool isJedi( )    { return afqt::QEnvironment::level.n == AFGUI::JEDI;    }
+	static bool isSith()     { return afqt::QEnvironment::level.n == AFGUI::SITH;    }
+	static bool notSith()    { return afqt::QEnvironment::level.n != AFGUI::SITH;    }
+
 	static const QString BtnName[WLAST];
 	static const QString WndName[WLAST];
 
 	static bool isInitialized();
 	static bool isConnected();
-	static int  getUid();
-	static int  getId();
 
 	static void connectionLost();
 	static void connectionEstablished();
 
 	static void sendMsg( af::Msg * msg);
 
+
+	static void get( const std::string & i_str);
+	static void get( const char * i_type,
+		const std::vector<int32_t> & i_ids,
+		const std::vector<std::string> & i_modes = std::vector<std::string>(),
+		const std::vector<int32_t> & i_blocks = std::vector<int32_t>());
+
+
 	static void addWindow(      Wnd      * wnd      );
 	static void removeWindow(   Wnd      * wnd      );
-	static void addReciever(    Reciever * reciever );
-	static void removeReciever( Reciever * reciever );
+	static void addReceiver(    Receiver * receiver );
+	static void removeReceiver( Receiver * receiver );
 
 	static void caseMessage( af::Msg * msg);
 
@@ -64,6 +81,9 @@ public:
 	static void displayWarning( const QString &message);
 	static void displayError(   const QString &message);
 
+	static void showDocs();
+	static void showForum();
+
 	static bool openMonitor( int type, bool open);
 
 	static void listenJob(  int id, const QString & name);
@@ -73,20 +93,11 @@ public:
 	static void listenTask( int jobid, int block, int task, const QString & name);
 
 	inline static Dialog * getDialog()  { return ms_d;}
-	static const af::Address & getClientAddress();
 	static void keyPressEvent( QKeyEvent * event);
 
-	static void   subscribe( const QList<int> & events);
-	static void unsubscribe( const QList<int> & events);
-
-	static void setUid(   int uid );
-
-	static void addJobId( int jId );
-	static void delJobId( int jId );
-
-	static void someJobAdded();
-	static void someJobDone();
-	static void someJobError();
+	static void ntf_JobAdded( const ItemJob * i_job);
+	static void ntf_JobDone(  const ItemJob * i_job);
+	static void ntf_JobError( const ItemJob * i_job);
 
 	static WndList* opened[WLAST];
 
@@ -96,7 +107,9 @@ public:
 	static void repaintStart();
 	static void repaintFinish();
 
-	static void startProcess( const QString & cmd, const QString & wdir = QString());
+	static void startProcess( const QString & i_cmd,
+			const QString & i_wdir = QString(),
+			const std::map<std::string,std::string> & i_env_map = std::map<std::string,std::string>());
 
 	inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return ms_services_icons_large.value( service_name, NULL);}
 	inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return ms_services_icons_small.value( service_name, NULL);}
@@ -105,18 +118,17 @@ public:
 
 	void static loadImage( QPixmap & o_pixmap, const QString & i_filename);
 
-	void static browseImages( const QString & i_image, const QString & i_wdir);
+	void static browseImages( const QString & i_image,  const QString & i_wdir);
+	void static browseFolder( const QString & i_folder, const QString & i_wdir = QString());
+
+	void static notify( const QString & i_title, const QString & i_msg = QString(), uint32_t i_state = 0);
 
 private:
-	static MonitorHost * ms_m;
 	static Dialog * ms_d;
 	static QApplication * ms_app;
 
 	static QLinkedList<Wnd*> ms_windows;
-	static QLinkedList<Reciever*> ms_recievers;
-
-	static QStringList ms_previewcmds;
-	static QStringList ms_rendercmds;
+	static QLinkedList<Receiver*> ms_receivers;
 
 	static QLinkedList<int> ms_listenjobids;
 	static QLinkedList<int> ms_watchtasksjobids;

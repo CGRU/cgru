@@ -9,114 +9,64 @@ using namespace afqt;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-QThreadClientUp::QThreadClientUp( QObject * Parent, bool Blocking, int Seconds, int NumConnLost):
-   QThreadClient( Parent, NumConnLost),
-   seconds(  Seconds),
-   blocking( Blocking),
-   update_handler_ptr( NULL),
-   toQuit( false)
+QThreadClientUp::QThreadClientUp( QObject * i_parent, int i_seconds, int i_numConnLost):
+	QThreadClient( i_parent, i_numConnLost),
+	m_seconds( i_seconds),
+	m_exiting( false)
 {
-   setObjectName("QObj_QThreadClientUp");
-   AFINFA("QThreadClientUp::QThreadClientUp: blocking=%d, seconds=%d, numconnlost=%d", blocking, seconds, NumConnLost)
-   if( ! blocking )
-   {
-      timer.setInterval( 1000 * seconds);
-      connect( &timer, SIGNAL( timeout()), this, SLOT( send()));
-   }
+	setObjectName("QObj_QThreadClientUp");
+	AFINFA("QThreadClientUp::QThreadClientUp: seconds=%d, numconnlost=%d", m_seconds, i_numConnLost)
 }
 
 QThreadClientUp::~QThreadClientUp()
 {
-AFINFO("QThreadClientUp::~QThreadClientUp()")
-   toQuit = true;
-   timer.stop();
-   cond.wakeOne();
-   wait();
-}
-
-void QThreadClientUp::setInterval( const int Seconds)
-{
-   seconds = Seconds;
-   if( ! blocking) timer.setInterval( Seconds * 1000 );
+	AFINFO("QThreadClientUp::~QThreadClientUp()")
+	m_exiting = true;
+	wait();
 }
 
 void QThreadClientUp::setUpMsg( af::Msg * msg)
 {
-   toQuit = false;
+	queue.push( msg);
 
-   queue.push( msg);
-
-   if( false == blocking )
-   {
-      if( false == timer.isActive() )
-      {
-         send();
-         timer.start();
-      }
-   }
-   else
-   {
-      if( false == isRunning() ) start();
-   }
-}
-
-void QThreadClientUp::send()
-{
-   if (!isRunning())
-      start();
-   else
-      cond.wakeOne();
+	if( false == isRunning() )
+		start();
 }
 
 af::Msg * afqt::QThreadClientUp::getMessage()
 {
-   while( queue.getCount() > 1)
-   {
-      //printf("QThreadClientUp::getMessage(): queue.getCount() > 1\n");
-      delete queue.pop();
-   }
-   return queue.getFirst();
+	while( queue.getCount() > 1)
+	{
+		//printf("QThreadClientUp::getMessage(): queue.getCount() > 1\n");
+		delete queue.pop();
+	}
+
+	return queue.getFirst();
 }
 
 void QThreadClientUp::run()
 {
-AFINFO("QThreadClientUp::run()")
-   QTcpSocket socket;
+	AFINFO("QThreadClientUp::run() BEGIN")
 
-   if( blocking)
-      while( ! toQuit )
-      {
-         af::Msg * message = getMessage();
-#ifdef AFOUTPUT
-printf("QThreadClientUp::run: (blocking) "); message->stdOut();
-#endif
-         if( message )
-         {
-            if( update_handler_ptr != NULL ) message = update_handler_ptr( message);
-            sendMessage( message, &socket);
-         }
-#ifdef WINNT
-         Sleep( seconds*1000);
-#else
-         sleep( seconds);
-#endif
-      }
-   else
-      while( ! toQuit )
-      {
-         af::Msg * message = getMessage();
-#ifdef AFOUTPUT
-printf("QThreadClientUp::run: (non-blocking) "); message->stdOut();
-#endif
-         if( message )
-         {
-            if( update_handler_ptr != NULL ) message = update_handler_ptr( message);
-            sendMessage( message, &socket);
-         }
+	QTcpSocket socket;
 
-         {
-            QMutexLocker locker(&mutex);
-            cond.wait(&mutex);
-         }
-      }
+	while( false == m_exiting )
+	{
+		af::Msg * message = getMessage();
+		if( message )
+		{
+			#ifdef AFOUTPUT
+			printf("QThreadClientUp:"); message->v_stdOut();
+			#endif
+
+			sendMessage( message, &socket);
+		}
+
+		if( m_exiting )
+			break;
+
+		QThread::sleep( m_seconds);
+	}
+	AFINFO("QThreadClientUp::run() END")
 }
+

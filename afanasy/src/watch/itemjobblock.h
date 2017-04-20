@@ -24,10 +24,9 @@ public:
 
    uint32_t state;
    QString  command;
-   QString  workingdir;
+   std::string workingdir;
    std::vector<std::string> files;
    QString  cmdpre;
-   QString  environment;
    QString  cmdpost;
    QString  tasksname;
    QString  service;
@@ -43,16 +42,20 @@ public:
    long long pertask;   ///< Tasks frames per task.
    long long inc;       ///< Tasks frames increment.
 
+	int32_t job_id;
+	int32_t numblock;
+
    QString description;
 
    static const int ItemId = 1;
 
    bool tasksHidded;
 
-   inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL)
-        { info.generateMenu( id_block, menu, qwidget, submenu);}
+	inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL)
+			{ info.generateMenu( id_block, menu, qwidget, submenu);}
 
-   inline bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
+
+	inline bool blockAction( std::ostringstream & i_str, int id_block, const QString & i_action, ListItems * listitems) const
 		{ return info.blockAction( i_str, id_block, i_action, listitems);}
 
    bool mousePressed( const QPoint & pos,const QRect & rect);
@@ -80,7 +83,7 @@ public:
 
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
-
+   
 private:
    static const int HeightHeader;
    static const int HeightFooter;
@@ -95,7 +98,6 @@ private:
    int height;
    int width;
 
-   int numblock;
    QString  blockToolTip;
 
    BlockInfo info;

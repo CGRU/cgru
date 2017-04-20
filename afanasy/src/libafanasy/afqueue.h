@@ -66,7 +66,7 @@ protected:
    bool push( AfQueueItem* item, bool i_front=false );
 
    /// Called from run thead to process item just poped from queue
-   virtual void processItem( AfQueueItem* item) = 0;
+   virtual void processItem( AfQueueItem* item);
 
    /*
       This function is called from a thread and waits on our

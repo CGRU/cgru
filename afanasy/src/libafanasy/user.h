@@ -2,7 +2,7 @@
 
 #include <time.h>
 
-#include "afnode.h"
+#include "afwork.h"
 #include "name_af.h"
 #include "regexp.h"
 
@@ -11,7 +11,7 @@ namespace af
 /// Afanasy user class
 /** When Afanasy register a new job, it register a new user, or add job to existing user (with the same name).
 **/
-class User : public Node
+class User : public Work
 {
 public:
 
@@ -27,9 +27,6 @@ public:
 	virtual ~User();                       ///< Destructor.
 
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
-
-	void generateErrorsSolvingStream( std::ostringstream & stream) const;
-	const std::string generateErrorsSolvingString() const;
 
 	inline bool hasHostsMask()        const { return m_hosts_mask.notEmpty();         }
 	inline bool hasHostsMaskExclude() const { return m_hosts_mask_exclude.notEmpty(); }
@@ -48,11 +45,12 @@ public:
 	inline const std::string & getHostName() const { return m_host_name;}
 	inline void  setHostName( const std::string & str) { m_host_name = str;}
 
-	inline int getMaxRunningTasks()    const { return m_max_running_tasks; } ///< Get maximum hosts.
-	inline int getNumJobs()            const { return m_jobs_num;          } ///< Get jobs quantity.
-	inline int getNumRunningJobs()     const { return m_running_jobs_num;  } ///< Get active jobs quantity.
-	inline int getRunningTasksNumber() const { return m_running_tasks_num; } ///< Get number of hosts used by user jobs.
-	inline int getJobsLifeTime()       const { return m_jobs_life_time;    } ///< Get jobs default life time.
+	inline int getMaxRunningTasks()      const { return m_max_running_tasks;      }
+	inline int getNumJobs()              const { return m_jobs_num;               }
+	inline int getNumRunningJobs()       const { return m_running_jobs_num;       }
+	inline int getRunningTasksNumber()   const { return m_running_tasks_num;      }
+	inline int getRunningCapacityTotal() const { return m_running_capacity_total; }
+	inline int getJobsLifeTime()         const { return m_jobs_life_time;         }
 
 	inline int getErrorsAvoidHost()    const { return m_errors_avoid_host;     }
 	inline int getErrorsRetries()      const { return m_errors_retries;        }
@@ -95,7 +93,8 @@ protected:
 
 	int32_t m_jobs_num;              ///< User jobs quantity.
 	int32_t m_running_jobs_num;       ///< User active jobs quantity.
-	int32_t m_running_tasks_num;      ///< User jobs hosts number.
+	int32_t m_running_tasks_num;      ///< User total running tasks number.
+	int64_t m_running_capacity_total;      ///< User total running tasks capacity number.
 
 private:
 

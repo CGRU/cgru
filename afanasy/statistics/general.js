@@ -23,6 +23,8 @@ g_args.folder = '/';
 
 g_folders = [];
 
+g_waiting = false;
+
 function g_Init()
 {
 	window.onhashchange = g_HashChanged;
@@ -80,6 +82,19 @@ function g_Reset()
 	document.location.hash = '';
 	document.location.reload();
 }
+
+function g_WaintingSet( i_on)
+{
+	g_waiting = true;
+	var display = 'block';
+	if( i_on === false )
+	{
+		display = 'none';
+		g_waiting = false;
+	}
+	$('waiting').style.display = display;
+}
+function g_WaintingReset() { g_WaintingSet( false); }
 
 function g_FoldersInit( i_data)
 {
@@ -213,7 +228,7 @@ function g_HashSet()
 
 function g_HashGet()
 {
-	var hash = document.location.hash;
+	var hash = decodeURI( document.location.hash);
 	if( hash.indexOf('#') == 0 ) hash = hash.substr(1);
 
 	var args = null;
@@ -227,6 +242,9 @@ function g_HashGet()
 
 function g_HashChanged()
 {
+	if( g_waiting ) return;
+
+	g_WaintingSet();
 	g_HashGet();
 
 	g_TimeShow();
@@ -365,7 +383,7 @@ function g_ShowTable( i_data, i_args)
 		send[i_args.service] = args;
 		g_Request({"send":send,"func":g_ShowTable,"args":args,'service':i_args.service});
 	}
-	if( select == 'service' )
+	else if( select == 'service' )
 	{
 		var args = i_args.args;
 		g_Info('Requesting ' + args.table + ' users statistics table...');
@@ -374,6 +392,10 @@ function g_ShowTable( i_data, i_args)
 		var send = {};
 		send[i_args.service] = args;
 		g_Request({"send":send,"func":g_ShowTable,"args":args,'service':i_args.service});
+	}
+	else
+	{
+		g_WaintingReset();
 	}
 }
 
@@ -391,6 +413,7 @@ function g_ShowGraph( i_data, i_args)
 //$('content').textContent = JSON.stringify( i_data).replace(/,/g,', ');
 //console.log( JSON.stringify( i_args));
 //console.log( JSON.stringify( i_data));
+	g_Info('Statistics received.');
 
 	var width = 1200;
 	var height = 300;
@@ -747,7 +770,21 @@ function g_ShowGraph( i_data, i_args)
 		g_Request({"send":{"get_tasks_graph":args},"func":g_ShowGraph,"args":args});
 	}
 	else
-		g_Info('Statistics received.');
+	{
+		g_WaintingReset();
+	}
+}
+
+function g_FolderDelete( i_evt)
+{
+	var folder = $('folder_delete').textContent;
+	g_Log('Deleting folder: ' + folder);
+	g_Request({"send":{"folder_delete":{"folder":folder}},"func":g_FoldersDeleted});
+}
+function g_FoldersDeleted( i_data, i_args)
+{
+//console.log( JSON.stringify( i_data));
+	g_HashChanged();
 }
 
 function g_TimeKeyDown( i_evt)

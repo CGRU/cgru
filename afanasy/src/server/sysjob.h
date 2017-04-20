@@ -35,10 +35,10 @@ public:
 	SysTask( af::TaskExec * i_taskexec, SysCmd * i_system_command, Block * i_block, int i_task_number);
 	virtual ~SysTask();
 
-	virtual void v_start( af::TaskExec * i_taskexec, int * i_runningtaskscounter, RenderAf * i_render, MonitorContainer * i_monitoring);
+	virtual void v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter);
 	virtual void v_refresh( time_t i_currentTime, RenderContainer * i_renders, MonitorContainer * i_monitoring, int & i_errorHostId);
 	virtual void v_updateState( const af::MCTaskUp & i_taskup, RenderContainer * i_renders, MonitorContainer * i_monitoring, bool & i_errorHost);
-	virtual void v_writeTaskOutput( const af::MCTaskUp & i_taskup) const;  ///< Write task output in tasksOutputDir.
+	virtual void v_writeTaskOutput( const char * i_data, int i_size) const;  ///< Write task output in tasksOutputDir.
 	virtual const std::string v_getInfo( bool i_full = false) const;
 	virtual void v_appendLog( const std::string & i_message);
 	virtual void v_monitor( MonitorContainer * i_monitoring) const;
@@ -117,17 +117,14 @@ public:
 	bool initSystem();
 
 	virtual bool v_canRun();
-	virtual bool v_solve( RenderAf *render, MonitorContainer * monitoring);
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
-	virtual void v_restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 	static void appendJobLog( const std::string & message);
 
 	// Functions than informate that it is a system task, and this info is not abailable:
-	virtual af::Msg * v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
-		std::string & o_filename, std::string & o_error) const;
-	virtual const std::string v_getErrorHostsListString( int b, int t) const;
+	virtual void v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const;
 
 protected:
 	virtual Block * v_newBlock( int numBlock);

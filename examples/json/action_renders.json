@@ -1,0 +1,16 @@
+{
+	"action":
+	{
+		"user_name"  : "jimmy",
+		"host_name"  : "pc01",
+		"mask"       : ".*",
+		"-ids"        : [4],
+		"type"       : "renders",
+		"operation" :
+		{
+			"type" : "launch_cmd",
+			"exit" : true,
+			"cmd"  : "gedit"
+		}
+	}
+}

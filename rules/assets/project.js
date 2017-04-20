@@ -32,9 +32,8 @@ function prj_ShotsDeploy()
 	wnd.elContent.classList.add('deploy_shots');
 
 	var params = {};
-	params.sources = g_CurPath() + '/deploy/src';
-//	params.references = g_CurPath() + '/deploy/ref';
-	params.template = RULES.assets.shot.template;
+	params.sources = c_PathPM_Rules2Client( g_CurPath() + '/IN');
+	params.template = c_PathPM_Server2Client( RULES.assets.shot.template);
 
 //console.log( JSON.stringify( g_elCurFolder.m_dir));
 	params.destination = RULES.assets.scenes.seek[0];
@@ -43,6 +42,7 @@ function prj_ShotsDeploy()
 			if( RULES.assets.scenes.seek[s].indexOf( g_elCurFolder.m_dir.folders[f]) != -1 )
 				params.destination = RULES.assets.scenes.seek[s];
 	params.destination = params.destination.replace('[project]', ASSETS.project.path) + '/deploy';
+	params.destination = c_PathPM_Rules2Client( params.destination);
 
 	gui_Create( wnd.elContent, prj_deploy_shots_params, [params]);
 
@@ -100,11 +100,11 @@ function prj_ShotsDeployDo( i_wnd, i_args)
 	var cmd = 'rules/bin/deploy_shots.sh';
 	var params = gui_GetParams( i_wnd.elContent, prj_deploy_shots_params);
 
-	cmd += ' -s "' + cgru_PM('/' + RULES.root + params.sources, true) + '"';
+	cmd += ' -s "' + c_PathPM_Client2Server( params.sources) + '"';
 	if( params.references.length )
-		cmd += ' -r "' + cgru_PM('/' + RULES.root + params.references, true) + '"';
-	cmd += ' -t "' + cgru_PM('/' + RULES.root + params.template, true) + '"';
-	cmd += ' -d "' + cgru_PM('/' + RULES.root + params.destination, true) + '"';
+		cmd += ' -r "' + c_PathPM_Client2Server( params.references) + '"';
+	cmd += ' -t "' + c_PathPM_Client2Server( params.template) + '"';
+	cmd += ' -d "' + c_PathPM_Client2Server( params.destination) + '"';
 	cmd += ' --shot_src "' + RULES.assets.shot.source.path[0] + '"'
 	cmd += ' --shot_ref "' + RULES.assets.shot.references.path[0] + '"'
 	if( params.sameshot ) cmd += ' --sameshot';
@@ -149,9 +149,8 @@ function prj_ShotsDeployFinished( i_data, i_args)
 	var deploy = i_data.cmdexec[0].deploy;
 //console.log(JSON.stringify(deploy));
 
-	var el = document.createElement('div');
-	elResults.appendChild( el);
-	el.textContent = deploy.length + ' shots founded:';
+	var elStat = document.createElement('div');
+	elResults.appendChild( elStat);
 
 	var elTable = document.createElement('table');
 	elResults.appendChild( elTable);
@@ -165,6 +164,9 @@ function prj_ShotsDeployFinished( i_data, i_args)
 	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Refs';
 	var el = document.createElement('th'); elTr.appendChild(el); el.textContent = 'Comments';
 
+	var shots_count = 0;
+	var paths = {};
+
 	for( var d = deploy.length - 1; d >= 0; d--)
 	{
 //console.log(JSON.stringify(deploy[d]));
@@ -177,6 +179,7 @@ function prj_ShotsDeployFinished( i_data, i_args)
 
 			if( key == 'shot' )
 			{
+				shots_count++;
 				var shot = deploy[d][key];
 //console.log(JSON.stringify(shot));
 
@@ -237,6 +240,11 @@ function prj_ShotsDeployFinished( i_data, i_args)
 //console.log( JSON.stringify( shot));
 				break;
 			}
+			else if( key == 'sources' || key == 'template' || key == 'dest')
+			{
+				paths[key] = c_PathPM_Server2Client( deploy[d][key]);
+				break;
+			}
 			else
 			{
 				var el = document.createElement('td');
@@ -245,5 +253,22 @@ function prj_ShotsDeployFinished( i_data, i_args)
 			}
 		}
 	}
+
+	elStat.textContent = shots_count + ' shots founded in "' + paths.sources + '":';
+
+	if( paths.dest )
+	{
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = 'Destination: ' + paths.dest;
+	}
+
+	if( paths.template )
+	{
+		var el = document.createElement('div');
+		elResults.appendChild( el);
+		el.textContent = 'Template: ' + paths.template;
+	}
+
 }
 

@@ -16,6 +16,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 JobContainer::JobContainer():
     AfContainer( "Jobs", AFJOB::MAXQUANTITY)
@@ -50,32 +51,81 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
 
     // Job does not exist!
     AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
-    if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
+            if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
 }
 
-int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring)
+void JobContainer::reconnectTask( af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
-//printf("Registering new job:\n");
+	#ifdef AFOUTPUT
+	AF_DEBUG << "Reconnecting task " << i_taskexec << " with " << i_render;
+	#endif
+
+	JobContainerIt jobsIt( this);
+	JobAf* job = jobsIt.getJob( i_taskexec->getJobId());
+	if( NULL == job )
+	{
+		AF_ERR << "Job with id=" << i_taskexec->getJobId() << " does not exists.";
+		delete i_taskexec;
+		return;
+	}
+
+	return job->reconnectTask( i_taskexec, i_render, i_monitoring);
+}
+
+af::Msg * JobContainer::registerJob( JSON & i_object, UserContainer * i_users, MonitorContainer * i_monitoring)
+{
+	JobAf * job = new JobAf( i_object);
+
+	int32_t id = 0; int64_t serial = 0; std::string err;
+	if( registerJob( job, err, i_users, i_monitoring))
+	{
+		id = job->getId();
+		serial = job->getSerial();
+	}
+	else
+		job = NULL;
+
+	std::ostringstream oss;
+	oss << "{";
+	oss << "\n\"id\":" << id;
+	oss << ",\n\"serial\":" << serial;
+
+	if( err.size())
+	{
+		oss << ",\n\"error\":\"" << err << "\"";
+	}
+	else if( job == NULL )
+	{
+		oss << ",\n\"error\":\"Job registration failed. See server log for details.\"";
+	}
+
+
+	oss << "\n}";
+
+	return af::jsonMsg( oss);
+}
+
+bool JobContainer::registerJob( JobAf *job, std::string & o_err, UserContainer *users, MonitorContainer * monitoring)
+{
+	if( job == NULL )
+	{
+		AF_ERR << "JobContainer::registerJob: Can't allocate memory for a new job.";
+		return false;
+	}
 
 	if( users == NULL )
 	{
-		AFERROR("JobContainer::job_register: Users container is not set.")
+		AF_ERR << "JobContainer::registerJob: Users container is not set.";
 		delete job;
-		return 0;
+		return false;
 	}
 
-	if( job == NULL )
-	{
-		AFERROR("JobContainer::job_register: Can't allocate memory for new job.")
-		return 0;
-	}
-
-	// Job from sore already checked for validness during afret reading files
+	// Job from store is already checked for validness
 	if(( job->isFromStore() == false ) && (job->isValidConstructed() == false ))
 	{
-		AFCommon::QueueLogError("Deleting invalid job.");
+		o_err = "Invalid job.";
 		delete job;
-		return 0;
+		return false;
 	}
 
 	UserAf *user;
@@ -86,49 +136,48 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 
 		if( monitoring) AfContainerLock mLock( monitoring, AfContainerLock::WRITELOCK  );
 
-		//AFINFA("JobContainer::job_register: Checking job user '%s'", job->getUserName().toUtf8().data())
-		AFINFA( "JobContainer::job_register: Checking job user '%s'", job->getUserName().c_str() )
+		AF_DEBUG << "JobContainer::registerJob: Checking job user: " << job->getUserName().c_str();
 		user = users->addUser( job->getUserName(), job->getHostName(), monitoring);
 		if( user == NULL )
 		{
 			delete job;
-			AFERROR("JobContainer::job_register: Can't register new user.")
-			return 0;
+			o_err = "JobContainer::registerJob: Can't register new user.";
+			return false;
 		}
 
 		// Add job node to container.
 		if( add( job) == false )
 		{
 			delete job;
-			AFERROR("JobContainer::job_register: Can't add job to container.")
-			return 0;
+			o_err = "JobContainer::registerJob: Can't add job to container.";
+			return false;
 		}
-		AFINFO("JobContainer::job_register: locking job.")
+		AF_DEBUG << "JobContainer::registerJob: locking job.";
 		job->lock();
 
-		AFINFO("JobContainer::job_register: locking user.")
+		AF_DEBUG << "JobContainer::registerJob: locking user.";
 		user->lock();
 		user->addJob( job);
 		if( monitoring )
 		{
-			AFINFO("JobContainer::job_register: monitor new job events.")
-			monitoring->addJobEvent( af::Msg::TMonitorJobsAdd, job->getId(), user->getId());
-			monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+			AF_DEBUG << "JobContainer::registerJob: monitor new job events.";
+			monitoring->addJobEvent( af::Monitor::EVT_jobs_add, job->getId(), user->getId());
+			monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 		}
 	}
 
 	// initialize job ( create tasks output root_dir, execute "pre"commands if any)
-	AFINFO("JobContainer::job_register: initiaizing new job with user.")
+	AF_DEBUG << "JobContainer::registerJob: initiaizing new job with user.";
 	if( job->initialize() == false)
 	{
-		AFERROR("JobContainer::job_register: Job initialization failed.")
+		AF_DEBUG << "JobContainer::registerJob: Job initialization failed.";
 
 		if( monitoring )
 		{
 			AfContainerLock mLock( monitoring,  AfContainerLock::WRITELOCK  );
 
-			monitoring->addJobEvent( af::Msg::TMonitorJobsDel, job->getId(), user->getId());
-			monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+			monitoring->addJobEvent( af::Monitor::EVT_jobs_del, job->getId(), user->getId());
+			monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 		}
 
 		{   // Set job to zombie:
@@ -138,22 +187,19 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 			job->deleteNode( NULL, NULL);
 		}
 
-		return 0;
+		return false;
 	}
 
 	if( monitoring )
 	{
 		AfContainerLock mLock( monitoring,  AfContainerLock::WRITELOCK  );
 
-		AFINFO("JobContainer::job_register: monitor unlock job and user events.")
-		monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, job->getId(), user->getId());
-		monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+		AF_DEBUG << "JobContainer::registerJob: monitor unlock job and user events.";
+		monitoring->addJobEvent( af::Monitor::EVT_jobs_change, job->getId(), user->getId());
+		monitoring->addEvent( af::Monitor::EVT_users_change, user->getId());
 	}
 
-	AFCommon::QueueLog("Job registered: " + job->v_generateInfoString());
-	int newJobId = job->getId();
-
-	AFINFO("JobContainer::job_register: unlocking user and job.")
+	AF_DEBUG << "JobContainer::registerJob: unlocking user and job.";
 
 	{
 		AfContainerLock jLock( this,  AfContainerLock::WRITELOCK);
@@ -162,7 +208,32 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 		job->unLock();
 	}
 
-	return newJobId;
+	AFCommon::QueueLog("Job registered: " + job->v_generateInfoString());
+
+	return true;
+}
+
+const std::vector<int32_t> JobContainer::getIdsBySerials( const std::vector<int64_t> & i_serials)
+{
+	std::vector<int32_t> ids;
+
+	JobContainerIt jobsIt( this);
+	for( JobAf *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
+	{
+		for( int i = 0; i < i_serials.size(); i++)
+		{
+			if( i_serials[i] == job->getSerial())
+			{
+				ids.push_back( job->getId());
+				break;
+			}
+		}
+	}
+
+	if( ids.size() == 0 )
+		ids.push_back(-1);
+
+	return ids;
 }
 
 void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )
@@ -181,6 +252,7 @@ void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )
          );
    }
 }
+
 
 //############################################################################
 //                               JobQueueIt

@@ -2,13 +2,14 @@ g_cycle = 0;
 g_last_msg_cycle = g_cycle;
 g_id = 0;
 g_uid = -1;
+g_uid_orig = -1;
 g_keysdown = '';
 
 g_auth = {};
 g_digest = null;
 
 g_windows = [];
-g_recievers = [];
+g_receivers = [];
 g_refreshers = [];
 g_monitors = [];
 g_cur_monitor = null;
@@ -29,6 +30,7 @@ function g_Init()
 {
 	g_Info('HTML body load.');
 	cgru_Init();
+	cm_Init();
 
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
@@ -73,6 +75,24 @@ function g_ConfigReceived( i_obj)
 			g_Error('Invalid config recieved.');
 			return;
 		}
+
+		if( cgru_Config.docs_url )
+			$('docs_link').href = cgru_Config.docs_url + '/afanasy/gui#web';
+		if( cgru_Config.forum_url )
+			$('forum_link').href = cgru_Config.forum_url + '/viewforum.php?f=17';
+
+		var title = 'CGRU version: ' + cgru_Environment.version;
+		title += '\nBuild at: ' + cgru_Environment.builddate;
+		$('version').textContent = cgru_Environment.version;
+		$('version').title = title;
+
+		var log = 'CGRU version: ' + cgru_Environment.version;
+		log += '<br>Build at: ' + cgru_Environment.builddate;
+		log += '<br>Build revision: ' + cgru_Environment.buildrevision;
+		log += '<br>Server: ' + cgru_Environment.username + '@' + cgru_Environment.hostname + ':' + cgru_Environment.location;
+		if( cgru_Environment.servedir && cgru_Environment.servedir.length )
+			log += '<br>HTTP root override: ' + cgru_Environment.servedir;
+		g_Log( log);
 	}
 
 	if( g_digest == null )
@@ -85,6 +105,8 @@ function g_ConfigReceived( i_obj)
 
 	cgru_ConstructSettingsGUI();
 	cgru_InitParameters();
+	cgru_Info = g_Info;
+	cgru_Error = g_Error;
 	cm_ApplyStyles();
 
 	nw_GetSoftwareIcons();
@@ -155,10 +177,9 @@ function g_RegisterSend()
 
 	var obj = {};
 	obj.monitor = {};
-	obj.monitor.gui_name = localStorage['gui_name'];
 	obj.monitor.user_name = localStorage['user_name'];
 	obj.monitor.host_name = localStorage['host_name'];
-	obj.monitor.engine = navigator.userAgent;
+	obj.monitor.engine = cgru_Browser;
 	nw_send(obj);
 
 	setTimeout('g_RegisterSend()', 5000);
@@ -166,7 +187,7 @@ function g_RegisterSend()
 
 function g_ProcessMsg( i_obj)
 {
-//g_Info( g_cycle+' Progessing '+g_recievers.length+' recieves');
+//g_Info( g_cycle+' Progessing '+g_receivers.length+' recieves');
 	g_last_msg_cycle = g_cycle;
 
 	// Realm is sended if message not authorized
@@ -204,19 +225,49 @@ function g_ProcessMsg( i_obj)
 		return;
 	}
 
-	if( i_obj.message || i_obj.object || i_obj.task_exec )
+	if( i_obj.message || i_obj.info || i_obj.object )
 	{
 		g_ShowObject( i_obj);
 		return;
 	}
 
+	if( i_obj.events && i_obj.events.tasks_outputs && i_obj.events.tasks_outputs.length )
+		for( var i = 0; i < i_obj.events.tasks_outputs.length; i++)
+			WndTaskShow({'task':i_obj.events.tasks_outputs[i]});
+	if( i_obj.events && i_obj.events.tasks_listens && i_obj.events.tasks_listens.length )
+		for( var i = 0; i < i_obj.events.tasks_listens.length; i++)
+			WndTaskShow({'task':i_obj.events.tasks_listens[i]});
+
 	if( g_id == 0 )
 		return;
 
-	for( var i = 0; i < g_recievers.length; i++)
+	for( var i = 0; i < g_receivers.length; i++)
 	{
-		g_recievers[i].processMsg( i_obj);
+		g_receivers[i].processMsg( i_obj);
 	}
+}
+
+function g_ReceiverAdd( i_obj)
+{
+	if( g_ReceiverExist( i_obj))
+		g_Error('g_ReceiverAdd: Receiver "' + i_obj.name + '" already exists.');
+	else
+		g_receivers.push( i_obj);
+
+}
+function g_ReceiverRemove( i_obj)
+{
+	if( g_ReceiverExist( i_obj ))
+		cm_ArrayRemove( g_receivers, i_obj);
+	else
+		g_Error('g_ReceiverRemove: Receiver "' + i_obj.name + '" does not exist.');
+}
+function g_ReceiverExist( i_obj)
+{
+	for( var i = 0; i < g_receivers.length; i++)
+		if( g_receivers[i] == i_obj )
+			return true;
+	return false;
 }
 
 function g_Refresh()
@@ -242,14 +293,17 @@ function g_RegisterRecieved( i_obj)
 {
 	g_id = i_obj.id;
 	if( i_obj.uid && ( i_obj.uid > 0 ))
-		g_uid = i_obj.uid;
+	{
+		g_uid_orig = i_obj.uid;
+		if( g_uid == -1 )
+			g_uid = g_uid_orig;
+	}
 
 	this.document.title = 'AF';
 	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
 	$('registered').textContent = 'Registered';
 	$('id').textContent = g_id;
 	$('uid').textContent = g_uid;
-	$('version').textContent = i_obj.version;
 
 	g_MButtonClicked( g_main_monitor_type);
 
@@ -264,6 +318,7 @@ function g_Deregistered()
 	this.document.title = 'AF (deregistered)';
 	g_id = 0;
 	g_uid = -1;
+	g_uid_orig = -1;
 	g_Info('Deregistered.');
 	$('registered').textContent = 'Deregistered';
 	$('id').textContent = g_id;
@@ -384,8 +439,20 @@ function g_CloseAllMonitors()
 		g_monitors[0].destroy();
 }
 
+
 function g_ShowObject( i_data, i_args)
 {
+	if( i_data.info )
+	{
+		if( i_data.info.kind == 'log')
+			g_Log( i_data.info.text);
+		else if( i_data.info.kind == 'error')
+			g_Error( i_data.info.text);
+		else
+			g_Info( i_data.info.text);
+			return;
+	}
+
 	var object = i_data;
 	var type = 'object';
 	if( i_data.object )
@@ -394,51 +461,21 @@ function g_ShowObject( i_data, i_args)
 	{
 		object = i_data.message;
 		type = 'message';
-	}
-	else if( i_data.task_exec )
-	{
-		object = i_data.task_exec;
-		type = 'task_exec';
+		g_Info('Message received.');
 	}
 
 	if( i_args == null )
 	{
-		g_Log('Global object received.');
 		i_args = {};
 	}
 
-	var new_wnd = false;
-	var wnd = window;
-	if( i_args.wnd )
-	{
-		wnd = i_args.wnd;
-	}
-	var doc = wnd.document;
-	if( i_args.evt )
-	{
-		if( i_args.evt.shiftKey ) new_wnd = true;
-		if( i_args.evt.ctrlKey ) new_wnd = true;
-		if( i_args.evt.altKey ) new_wnd = true;
-	}
 	var title = 'Object';
 	if( object.name ) title = object.name;
 	if( i_args.name ) title = i_args.name;
 	if( object.type ) title += ' ' + object.type;
+	i_args.title = title;
 
-	var elContent = null;
-	if( new_wnd )
-	{
-		wnd = g_OpenWindowWrite('window.html', title);
-		if( wnd == null ) return;
-		elContent = wnd.document.body;
-		doc = wnd.document;
-		wnd.document.title = title;
-	}
-	else
-	{
-		wnd = new cgru_Window({"name":title,"wnd":wnd});
-		elContent = wnd.elContent;
-	}
+	var wnd = g_OpenWindow( i_args);
 
 	if( type == 'message')
 	{
@@ -446,21 +483,48 @@ function g_ShowObject( i_data, i_args)
 		{
 			var el = document.createElement('p');
 			el.innerHTML = object.list[i].replace(/\n/g,'<br/>');
-			elContent.appendChild(el);
+			wnd.elContent.appendChild(el);
 		}
-	}
-	else if( type == 'task_exec')
-	{
-		t_ShowExec( object, elContent, doc);
 	}
 	else
 	{
 		var el = document.createElement('p');
 		el.innerHTML = JSON.stringify( object, null, '&nbsp&nbsp&nbsp&nbsp').replace(/\n/g,'<br/>');
-		elContent.appendChild(el);
+		wnd.elContent.appendChild(el);
 	}
 }
+function g_OpenWindow( i_args)
+{
+	var new_wnd = false;
+	var wnd = window;
+	if( i_args.wnd )
+	{
+		wnd = i_args.wnd;
+	}
+	if( i_args.evt )
+	{
+		if( i_args.evt.shiftKey ) new_wnd = true;
+		if( i_args.evt.ctrlKey ) new_wnd = true;
+		if( i_args.evt.altKey ) new_wnd = true;
+	}
 
+	var elContent = null;
+	if( new_wnd )
+	{
+		wnd = g_OpenWindowWrite( i_args.title);
+		if( wnd == null )
+			return;
+
+		wnd.elContent = wnd.document.body;
+		wnd.document.title = i_args.title;
+	}
+	else
+	{
+		wnd = new cgru_Window({"name":i_args.title,"wnd":wnd});
+	}
+
+	return wnd;
+}
 function g_OpenWindowLoad( i_file, i_name)
 {
 	for( var i = 0; i < g_windows.length; i++)
@@ -513,6 +577,7 @@ function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 		if( localStorage.text_color ) wnd.document.body.style.color = localStorage.text_color;
 	}
 	wnd.focus();
+	wnd.document.close();
 
 	return wnd;
 }
@@ -682,6 +747,7 @@ function g_CheckSequence()
 		localStorage.removeItem('visor');
 		localStorage.removeItem('god');
 		g_Info('USER MODE');
+		g_uid = g_uid_orig;
 	}
 	else
 	{
@@ -715,102 +781,33 @@ function g_SuperUserProcessGUI()
 //g_Info('g_SuperUserProcessGUI()')
 	if( g_GOD())
 	{
+		g_uid = 0;
 		$('header').classList.add('su_god');
 		$('footer').classList.add('su_god');
 	}
 	else if( g_VISOR())
 	{
+		g_uid = 0;
 		$('header').classList.add('su_visor');
 		$('footer').classList.add('su_visor');
 	}
 	else
 	{
+		g_uid = g_uid_orig;
 		$('header').classList.remove('su_visor');
 		$('header').classList.remove('su_god');
 		$('footer').classList.remove('su_visor');
 		$('footer').classList.remove('su_god');
 	}
+
+	if( g_uid == 0 )
+	{
+		var obj = nw_ConstructActionObject('monitors', [g_id]);
+		obj.action.operation = {};
+		obj.action.operation.type = 'watch';
+		obj.action.operation.class = 'perm';
+		obj.action.operation.uid = 0;
+
+		nw_send(obj);
+	}
 }
-/*
-function g_ShowTask( i_obj)
-{
-	var title = 'Task '+i_obj.name;
-	var wnd = g_OpenWindowWrite( title, title, true);
-	if( wnd == null ) return;
-	var doc = wnd.document;
-
-	var obj_str = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp');
-	var cmd = i_obj.command;
-	var cmdPM = cgru_PM( cmd);
-	var wdir = i_obj.working_directory;
-	var wdirPM = cgru_PM( wdir);
-
-	doc.write('</head><body class="task_exec">');
-	doc.write('<div><i>Name:</i> <b>'+i_obj.name+'</b></div>');
-	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
-	if( wdir == wdirPM )
-	{
-		doc.write('<div><i>Working Directory:</i></div>');
-		doc.write('<div class="param">'+wdir+'</div>');
-	}
-	else
-	{
-		doc.write('<div><i>Working Directory:</i></div>');
-		doc.write('<div class="param">'+wdir+'</div>');
-		doc.write('<div><i>Working Directory Client = "'+cgru_Platform+'":</i></div>');
-		doc.write('<div class="param">'+wdirPM+'</div>');
-	}
-	if( cmd == cmdPM )
-	{
-		doc.write('<div><i>Command:</i></div>');
-		doc.write('<div class="param">'+cmd+'</div>');
-	}
-	else
-	{
-		doc.write('<div><i>Command:</i></div>');
-		doc.write('<div class="param">'+cmd+'</div>');
-		doc.write('<div><i>Command Client = "'+cgru_Platform+'":</i></div>');
-		doc.write('<div class="param">'+cmdPM+'</div>');
-	}
-
-	if( i_obj.files && i_obj.files.length )
-	{
-		doc.write('<div><i>Files:</i></div>');
-		for( var f = 0; f < i_obj.files.length; f++)
-		{
-			doc.write('<div>');
-			doc.write('<div class="param">' + i_obj.files[f] + '</div>');
-			var cmds = cgru_Config.previewcmds;
-			for( var c = 0; c < cmds.length; c++ )
-			{
-				cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, i_obj.files[f]));
-				doc.write('<div class="cmdexec">'+cmd+'</div>');
-			}
-			doc.write('</div>');
-		}
-	}
-
-	if( i_obj.parsed_files && i_obj.parsed_files.length )
-	{
-		doc.write('<div style="overflow:auto">');
-		for( var f = 0; f < i_obj.parsed_files.length; f++)
-		{
-//			doc.write('<div>');
-			doc.write('<span class="param" id="task_parsed_file">' + cm_PathBase( i_obj.parsed_files[f]) + '</span>');
-//			doc.write('</div>');
-		}
-		doc.write('</div>');
-	}
-
-	doc.write('<div>Raw Object:</div><div class="task_data">');
-	doc.write( obj_str.replace(/\n/g,'<br/>'));
-	doc.write('</div>');
-
-	doc.write('</body></html>');
-	doc.close();
-	if( cgru_Browser == 'firefox')
-		wnd.location.reload();
-
-	$('task_parsed_file').oncontextmenu = function(e) { alert( e.id);};
-}
-*/

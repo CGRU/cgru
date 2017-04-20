@@ -21,6 +21,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
+extern char **environ;
 #endif
 
 #include "blockdata.h"
@@ -34,6 +35,7 @@ af::Farm* ferma = NULL;
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 #ifdef WINNT
 bool LaunchProgramV(
@@ -43,11 +45,12 @@ bool LaunchProgramV(
 	HANDLE * o_err,
 	const char * i_commanline,
     const char * i_wdir,
+	char * i_environ,
     DWORD i_flags,
 	bool alwaysCreateWindow);
 
 bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
-                       const std::string & i_commandline, const std::string & i_wdir,
+                       const std::string & i_commandline, const std::string & i_wdir, char * i_environ,
                        HANDLE * o_in, HANDLE * o_out, HANDLE * o_err,
 					   DWORD i_flags, bool alwaysCreateWindow)
 {
@@ -58,7 +61,7 @@ bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
 	std::string shell_commandline = af::Environment::getCmdShell() + " ";
 	shell_commandline += i_commandline;
 
-	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_flags, alwaysCreateWindow);
+	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_environ, i_flags, alwaysCreateWindow);
 }
 void af::launchProgram( const std::string & i_commandline, const std::string & i_wdir)
 {
@@ -72,9 +75,10 @@ int LaunchProgramV(
     FILE **o_err,
     const char * i_program,
     const char * i_args[],
-    const char * wdir = NULL);
+    const char * wdir = NULL,
+	char ** i_environ = NULL);
 
-int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir,
+int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir, char ** i_environ,
                        FILE ** o_in, FILE ** o_out, FILE ** o_err)
 {
     const char * wdir = NULL;
@@ -95,13 +99,13 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 		// Shell has one argunet - most common case:
 		// "bash -c" or "cmd.exe /c"
 		const char * args[] = { shellWithArgs.back().c_str(), i_commandline.c_str(), NULL};
-		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
+		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
 	}
 	else if( shellWithArgs.size() == 1)
 	{
 		// Shell has no arguments:
 		const char * args[] = { i_commandline.c_str(), NULL};
-		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
+		return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
 	}
 	else
 	{
@@ -114,12 +118,78 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 			args[i++] = (*(it++)).c_str();
 		args[shellWithArgs.size()-1] = i_commandline.c_str();
 		args[shellWithArgs.size()] = NULL;
-		int result = LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
+		int result = LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_environ);
 		delete [] args;
 		return result;
 	}
 }
 #endif
+
+#ifdef WINNT
+char *  af::processEnviron( const std::map<std::string, std::string> & i_env_map)
+#else
+char ** af::processEnviron( const std::map<std::string, std::string> & i_env_map)
+#endif
+{
+	if( i_env_map.empty())
+		return NULL;
+
+	std::vector<std::string> env_vec;
+	int env_size = 0;
+	#ifdef WINNT
+	char * env_str = GetEnvironmentStrings();
+	while( env_str[env_size] != '\0')
+	{
+		std::string str(env_str + env_size);
+		env_size += str.size() + 1; ///< For "name=value" '\0' termination
+		if( str.empty()) continue;
+		env_vec.push_back( str);
+	}
+	FreeEnvironmentStrings( env_str);
+	#else
+	for (char ** e = environ; *e != 0; e++)
+	{
+		std::string str(*e);
+		if (str.empty()) continue;
+		env_vec.push_back(str);
+		env_size += str.size() + 1; ///< For "name=value" '\0' termination
+	}
+	#endif
+
+	for( std::map<std::string,std::string>::const_iterator it = i_env_map.begin(); it != i_env_map.end(); it++)
+		if ((it->first).size() && (it->second).size())
+		{
+			std::string str = it->first + '=' + it->second;
+			env_vec.push_back( str);
+			env_size += str.size() + 1; ///< For "name=value" '\0' termination
+		}
+
+	env_size++; ///< For the last '\0' termination
+
+	#ifdef WINNT
+	char * o_environ = new char[env_size];
+	int pos = 0;
+	for (int i = 0; i < env_vec.size(); i++)
+	{
+		strncpy( o_environ + pos, env_vec[i].c_str(), env_vec[i].size());
+		pos += env_vec[i].size();
+		o_environ[pos] = '\0'; ///< "name=value" '\0' termination
+		pos += 1;
+	}
+	o_environ[env_size-1] = '\0'; /// The last '\0' termination
+	#else
+	char ** o_environ = new char*[env_vec.size()+1];
+	for( int i = 0; i < env_vec.size(); i++)
+	{
+		o_environ[i] = new char[env_vec[i].size()+1];
+		memcpy( o_environ[i], env_vec[i].c_str(), env_vec[i].size());
+		o_environ[i][env_vec[i].size()] = '\0'; ///< "name=value" '\0' termination
+	}
+	o_environ[env_vec.size()] = NULL; /// The last '\0' termination
+	#endif
+
+	return o_environ;
+}
 
 void af::outError( const char * errMsg, const char * baseMsg)
 {
@@ -134,8 +204,10 @@ bool af::init( uint32_t flags)
    AFINFO("af::init:\n");
    if( flags & InitFarm)
    {
-      AFINFO("af::init: trying to load farm\n");
-      if( loadFarm( flags & InitVerbose) == false)  return false;
+      AFINFO("af::init: trying to load farm.");
+
+      if( loadFarm( flags & InitVerbose ? VerboseOn : VerboseOff) == false)
+		  return false;
    }
    return true;
 }
@@ -145,42 +217,43 @@ af::Farm * af::farm()
    return ferma;
 }
 
-bool af::loadFarm( bool verbose)
+bool af::loadFarm( VerboseMode i_verbose)
 {
 	std::string filename = af::Environment::getAfRoot() + "/farm.json";
-	if( loadFarm( filename,  verbose) == false)
+	if( loadFarm( filename, i_verbose) == false)
 	{
 		filename = af::Environment::getAfRoot() + "/farm_example.json";
-		if( loadFarm( filename,  verbose) == false)
+		if( loadFarm( filename, i_verbose) == false)
 		{
-			AFERRAR("Can't load default farm settings file:\n%s\n", filename.c_str());
+			AF_ERR << "Can't load default farm settings file:\n" << filename;
 			return false;
 		}
 	}
 	return true;
 }
 
-bool af::loadFarm( const std::string & filename, bool verbose )
+bool af::loadFarm( const std::string & filename, VerboseMode i_verbose)
 {
-   af::Farm * new_farm = new Farm( filename);//, verbose);
-   if( new_farm == NULL)
-   {
-      AFERROR("af::loadServices: Can't allocate memory for farm settings")
-      return false;
-   }
-   if( false == new_farm->isValid())
-   {
-      delete new_farm;
-      return false;
-   }
-   if( ferma != NULL)
-   {
-      new_farm->servicesLimitsGetUsage( *ferma);
-      delete ferma;
-   }
-   ferma = new_farm;
-   if( verbose) ferma->stdOut( true);
-   return true;
+	af::Farm * new_farm = new Farm( filename);
+
+	if( false == new_farm->isValid())
+	{
+		delete new_farm;
+		return false;
+	}
+
+	if( ferma != NULL)
+	{
+		new_farm->servicesLimitsGetUsage( *ferma);
+		delete ferma;
+	}
+
+	ferma = new_farm;
+
+	if( i_verbose == VerboseOn)
+		ferma->stdOut( true);
+
+	return true;
 }
 
 void af::destroy()
@@ -304,6 +377,15 @@ bool af::addUniqueToVect( std::vector<int> & o_vect, int i_value)
 		if( o_vect[i] == i_value)
 			return false;
 	o_vect.push_back( i_value);
+	return true;
+}
+
+bool af::addUniqueToVect( std::vector<std::string> & o_vect, const std::string & i_str)
+{
+	for( int i = 0; i < o_vect.size(); i++)
+		if( o_vect[i] == i_str)
+			return false;
+	o_vect.push_back( i_str);
 	return true;
 }
 
@@ -455,12 +537,29 @@ int af::weigh( const std::vector<std::string> & i_list)
    return w;
 }
 
-const std::string af::getenv( const char * name)
+int af::weigh( const std::map<std::string, std::string> & i_map)
 {
-   std::string envvar;
-   char * ptr = ::getenv( name);
-   if( ptr != NULL ) envvar = ptr;
-   return envvar;
+	int w = 0;
+	for( std::map<std::string,std::string>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		w += weigh(it->first) + weigh(it->second);
+	return w;
+}
+
+int af::weigh( const std::map<std::string, int32_t> & i_map)
+{
+	int w = 0;
+	for( std::map<std::string,int32_t>::const_iterator it = i_map.begin(); it != i_map.end(); it++)
+		w += weigh(it->first) + sizeof(it->second);
+	return w;
+}
+
+const std::string af::getenv( const std::string & i_name) { return af::getenv( i_name.c_str()); }
+const std::string af::getenv( const char * i_name)
+{
+	std::string envvar;
+	char * ptr = ::getenv( i_name);
+	if( ptr != NULL ) envvar = ptr;
+	return envvar;
 }
 
 bool isDec( char c)

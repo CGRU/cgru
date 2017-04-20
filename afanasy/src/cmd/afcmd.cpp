@@ -3,12 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../libafanasy/msgclasses/mctask.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 AfCmd::AfCmd():
-	recieving( false),
 	command( NULL)
 {
 	RegisterCommands();
@@ -56,7 +57,8 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 							std::string str = command->getStreamString();
 							if( str.size())
 							{
-								msg.setJSON_headerBin( str);
+								msg.setData( str.size(), str.c_str(), af::Msg::TJSON);
+								msg.setJSONBIN();
 							}
 							else
 							{
@@ -64,7 +66,6 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 								continue;
 							}
 						}
-						recieving = command->isRecieving();
 						return true;
 					}
 				}
@@ -97,6 +98,7 @@ void AfCmd::msgOutput( af::Msg &msg)
 		{
 			case af::Msg::TDATA:
 			case af::Msg::TJSON:
+			case af::Msg::TJSONBIN:
 			case af::Msg::TString:
 			case af::Msg::TStringList:
 				msg.stdOutData( false);
@@ -109,6 +111,9 @@ void AfCmd::msgOutput( af::Msg &msg)
 				break;
 			case af::Msg::TInvalid:
 				printf("Invalid message.\n");
+				break;
+			case af::Msg::TTask:
+				af::MCTask(&msg).v_stdOut( true);
 				break;
 			default:
 				printf("Unknown (for afcmd) message recieved.\n");

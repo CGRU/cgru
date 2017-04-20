@@ -21,11 +21,24 @@ public:
 	JobContainer();
 	~JobContainer();
 
-	/// Register a new job, new id returned on success, else return 0.
-	int job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring);
+	/// Register a new job:
+	af::Msg * registerJob( JSON & i_object, UserContainer * i_users, MonitorContainer * i_monitoring);
+	bool registerJob( JobAf *job, std::string & o_err, UserContainer *users, MonitorContainer * monitoring);
 
 	/// Update some task state of some job.
 	void updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring);
+	
+	/**
+	 * @brief Reconnect a running task to the server.
+	 * This method taks the ownership of `i_taskexec`
+	 * @param taskexec: TaskExec to consider as running
+	 * @param running_render: Render claiming to be running this task
+	 * @param renders: renders pool
+	 * @param monitoring: monitors pool
+	 */
+	void reconnectTask(af::TaskExec * i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring);
+
+	const std::vector<int32_t> getIdsBySerials( const std::vector<int64_t> & i_serials);
 
 	void getWeight( af::MCJobsWeight & jobsWeight );
 };

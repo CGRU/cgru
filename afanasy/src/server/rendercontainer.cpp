@@ -10,21 +10,20 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 RenderContainer::RenderContainer():
-	ClientContainer( "Renders", AFRENDER::MAXCOUNT)
+	AfContainer( "Renders", AFRENDER::MAXCOUNT)
 {
 	RenderAf::setRenderContainer( this);
-	RenderAf::setMsgQueue( ms_msg_queue);
 }
 
 RenderContainer::~RenderContainer()
 {
-	delete ms_msg_queue;
 AFINFO("RenderContainer::~RenderContainer:")
 }
 
-af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * monitoring)
+af::Msg * RenderContainer::addRender( RenderAf *newRender, JobContainer * i_jobs, MonitorContainer * monitoring)
 {
    // Online render register request, from client, not from database:
    if( newRender->isOnline())
@@ -49,8 +48,9 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
                return new af::Msg( af::Msg::TRenderId, -1);
             }
             // Offline render with the same hostname found:
-            else if( render->online( newRender, monitoring))
-            {
+            else
+			{
+				render->online( newRender, i_jobs, monitoring);
                int id = render->getId();
                AFCommon::QueueLog("Render: " + render->v_generateInfoString( false));
                delete newRender;
@@ -60,27 +60,64 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
          }
       }
 
-      // Registering new render, no renders with this hostname exist:
-      int id = addClient( newRender);
-      if( id != 0 )
-      {
-			newRender->initialize();
-         if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersAdd, id);
-         AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
-//if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
-      }
-      // Return new render ID to render to tell that it was successfully registered:
-      return new af::Msg( af::Msg::TRenderId, id);
-   }
+		// Registering new render, no renders with this hostname exist:
+		int id = add( newRender);
+		if( id != 0 )
+		{
+			newRender->setRegistered();
+			if( monitoring )
+				monitoring->addEvent( af::Monitor::EVT_renders_add, id);
 
-   // Adding offline render from database:
-   if( addClient( newRender))
-   {
-      std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
-		newRender->initialize();
-   }
+			AFCommon::QueueLog("New Render registered: " + newRender->v_generateInfoString());
+		}
+		else
+		{
+			delete newRender;
+		}
+
+		// Return new render ID to render to tell that it was successfully registered:
+		return new af::Msg( af::Msg::TRenderId, id);
+	}
+
+	// Adding offline render from database:
+	if( add( newRender))
+	{
+		std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
+		newRender->setRegistered();
+	}
+	else
+	{
+		delete newRender;
+	}
 
    return NULL;
+}
+
+bool RenderContainer::farmLoad( std::string & o_status, MonitorContainer * i_monitors)
+{
+	AF_LOG << "Reloading farm.";
+
+	if( false == af::loadFarm( af::VerboseOn))
+	{
+		o_status = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
+		AF_ERR << o_status;
+
+		return false;
+	}
+
+	RenderContainerIt rendersIt( this);
+	for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+	{
+		render->getFarmHost();
+
+		if( i_monitors )
+			i_monitors->addEvent( af::Monitor::EVT_renders_change, render->getId());
+	}
+
+	o_status = "Farm reloaded successfully.";
+	AF_LOG << o_status;
+
+	return true;
 }
 
 //##############################################################################

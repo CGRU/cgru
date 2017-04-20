@@ -287,7 +287,7 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path)
 		return list;
 	}
 
-	while( de = readdir(dir))
+	while( (de = readdir(dir)) )
 	{
 		if( de->d_name[0] == '.' ) continue;
 		list.push_back( de->d_name);
@@ -348,7 +348,7 @@ bool af::removeDir( const std::string & i_folder )
 			}
 			else if( DeleteFile( filename.c_str()) == FALSE)
 			{
-				 AFERRPA("af::removeDir: Can't delete file:\n%s\n", filename.c_str())
+				 AFERRPA("af::removeDir: Can't delete file:\n%s", filename.c_str())
 				 return false;
 			}
 
@@ -357,13 +357,13 @@ bool af::removeDir( const std::string & i_folder )
 	}
 	else
 	{
-		  AFERRPA("af::removeDir: Can't open folder:\n%s\n", i_folder.c_str())
+		  AFERRPA("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
 		  return false;
 	}
 
 	if( RemoveDirectory( i_folder.c_str()) == FALSE)
 	{
-		AFERRPA("af::removeDir: Can't remove folder:\n%s\n", i_folder.c_str())
+		AFERRPA("af::removeDir: Can't remove folder:\n%s", i_folder.c_str())
 		return false;
 	}
 
@@ -374,29 +374,39 @@ bool af::removeDir( const std::string & i_folder )
 	DIR * dir = opendir( i_folder.c_str());
 	if( dir == NULL)
 	{
-		AFERRPA("af::removeDir: Can't open folder:\n%s\n", i_folder.c_str())
+		AFERRPA("af::removeDir: Can't open folder:\n%s", i_folder.c_str())
 		return false;
 	}
 
 	// Removing all files in folder
-	while( de = readdir(dir))
+	while( (de = readdir(dir)) )
 	{
 		std::string filename( de->d_name);
 		if(( filename == ".") || ( filename == ".."))
 			continue;
 
 		filename = i_folder + '/' + filename;
-		if( false == af::pathFileExists( filename))
+		struct stat st;
+		if( -1 == stat( filename.c_str(), &st))
+		{
+			AFERRPA("af::removeDir: %s", filename.c_str())
 			continue;
+		}
 
-		if( de->d_type == DT_DIR )
+		// From man readdir (2016.06.10):
+		//     Currently, only some filesystems
+		//     (among them: Btrfs, ext2, ext3, and ext4)
+		//     have full support for returning the file type in `d_type`
+		// So we should use `st_mode` for check
+		// (which is more expensive, but not for our needs)
+		if( S_ISDIR( st.st_mode))
 		{
 			if( false == af::removeDir( filename))
 				return false;
 		}
 		else if( unlink( filename.c_str()) != 0)
 		{
-			AFERRPA("af::removeDir: Can't delete file:\n%s\n", filename.c_str())
+			AFERRPA("af::removeDir: Can't delete file:\n%s", filename.c_str())
 			return false;
 		}
 	}

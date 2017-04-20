@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
+import json
 import os
+import re
 import shutil
 import signal
-import re
-import json
+import sys
 
 import af
 
@@ -17,13 +17,13 @@ Parser = OptionParser(
 	version="%prog 1.0"
 )
 
-Parser.add_option('-s', '--sources',  dest='sources',  type  ='string',     default='',    help='Sources')
-Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     default='',    help='Destination')
-Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default='',    help='References')
-Parser.add_option('-t', '--template', dest='template', type  ='string',     default='',    help='Shot template')
+Parser.add_option('-s', '--sources',  dest='sources',  type  ='string',     default=None,  help='Sources')
+Parser.add_option('-d', '--dest',     dest='dest',     type  ='string',     default=None,  help='Destination')
+Parser.add_option('-r', '--refs',     dest='refs',     type  ='string',     default=None,  help='References')
+Parser.add_option('-t', '--template', dest='template', type  ='string',     default=None,  help='Shot template')
 Parser.add_option(      '--prefix',   dest='prefix',   type  ='string',     default=None,  help='Shot renaming prefix')
 Parser.add_option(      '--regexp',   dest='regexp',   type  ='string',     default=None,  help='Shot renaming regexp')
-Parser.add_option(      '--substr',   dest='substr',   type  ='string',     default=None,  help='Shot renaming substr')
+Parser.add_option(      '--substr',   dest='substr',   type  ='string',     default='',    help='Shot renaming substr')
 Parser.add_option('-p', '--padding',  dest='padding',  type  ='string',     default=None,  help='Shot renaming padding (Ex:"432")')
 Parser.add_option(      '--extract',  dest='extract',  action='store_true', default=False, help='Extract source folder(s)')
 Parser.add_option(      '--sameshot', dest='sameshot', action='store_true', default=False, help='"NAME" and "NAME-1" will be one shot')
@@ -73,33 +73,34 @@ def isSameShot(i_shot, i_name):
 
 (Options, args) = Parser.parse_args()
 
-if Options.sources == '':
+if Options.sources is None:
 	errExit('Sources are not specified')
-
+Out.append({'sources': Options.sources})
 if not os.path.isdir(Options.sources):
-	errExit('Sources folder does not exist')
+	errExit('Sources folder does not exist: ' + Options.sources)
 
-if Options.template == '':
+if Options.template is None:
 	errExit('Shot template is not specified')
-
+Out.append({'template': Options.template})
 if not os.path.isdir(Options.template):
-	errExit('Shot template folder does not exist')
+	errExit('Shot template folder does not exist: ' + Options.template)
 
-if Options.dest == '':
+if Options.dest is None:
 	errExit('Destination is not specified')
-
+Out.append({'dest': Options.dest})
 if not os.path.isdir(Options.dest):
-	errExit('Destination folder does not exist')
+	errExit('Destination folder does not exist: ' + Options.dest)
 
 ExistingShots = os.listdir( Options.dest)
 
 References = []
-if Options.refs != '' and os.path.isdir(Options.refs):
-	References = os.listdir(Options.refs)
+if Options.refs is not None:
+    if os.path.isdir(Options.refs):
+    	References = os.listdir(Options.refs)
 # References.sort()
 
 RegExp = None
-if Options.regexp is not None and Options.substr is not None:
+if Options.regexp is not None:
 	RegExp = re.compile( Options.regexp, re.I|re.M)
 
 Sources = os.listdir(Options.sources)

@@ -24,6 +24,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 
@@ -70,10 +71,10 @@ int main(int argc, char *argv[])
 	if( ENV.isHelpMode()) return 0;
 
 	// create directories if it is not exists
-	if( af::pathMakePath( ENV.getTempDir(),    af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getJobsDir(),    af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getUsersDir(),   af::VerboseOn ) == false) return 1;
-	if( af::pathMakeDir(  ENV.getRendersDir(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakePath( ENV.getStoreFolder(),        af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderJobs(),    af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderRenders(), af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderUsers(),   af::VerboseOn ) == false) return 1;
 
 // Server for windows can be me more simple and not use signals at all.
 // Windows is not a server platform, so it designed for individual tests or very small companies with easy load.
@@ -123,7 +124,7 @@ int main(int argc, char *argv[])
 	
 	// Message Queue initialization, but without thread start.
 	// Run cycle queue will read this messages itself.
-	af::MsgQueue msgQueue("RunMsgQueue", af::AfQueue::e_no_thread);  
+	af::MsgQueue msgQueue("RunMsgQueue");
 	if( false == msgQueue.isInitialized()) 
 	  return 1;
 
@@ -154,10 +155,10 @@ int main(int argc, char *argv[])
 	// Get Renders from store:
 	//
 	{
-	printf("Getting renders from store...\n");
+	AF_LOG << "Getting renders from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getRendersDir());
-	printf("%d renders found.\n", (int)folders.size());
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getStoreFolderRenders());
+	AF_LOG << folders.size() << " renders found.";
 
 	for( int i = 0; i < folders.size(); i++)
 	{
@@ -168,19 +169,19 @@ int main(int argc, char *argv[])
 			delete render;
 			continue;
 		}
-		renders.addRender( render);
+		renders.addRender( render, NULL, NULL);
 	}
-	printf("%d renders registered.\n", renders.getCount());
+	AF_LOG << renders.getCount() << " renders registered.";
 	}
 
 	//
 	// Get Users from store:
 	//
 	{
-	printf("Getting users from store...\n");
+	AF_LOG << "Getting users from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getUsersDir());
-	printf("%d users found.\n", (int)folders.size());
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getStoreFolderUsers());
+	AF_LOG << folders.size() << " users found.";
 
 	for( int i = 0; i < folders.size(); i++)
 	{
@@ -194,19 +195,19 @@ int main(int argc, char *argv[])
 		if( users.addUser( user) == 0 )
 			delete user;
 	}
-	printf("%d users registered from store.\n", users.getCount());
+	AF_LOG << users.getCount() << " users registered from store.";
 	}
 	//
 	// Get Jobs from store:
 	//
 	bool hasSystemJob = false;
 	{
-	printf("Getting jobs from store...\n");
+	AF_LOG << "Getting jobs from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getJobsDir());
-	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getJobsDir(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
+	std::vector<std::string> folders = AFCommon::getStoredFolders( ENV.getStoreFolderJobs());
+	std::string sysjob_folder = AFCommon::getStoreDir( ENV.getStoreFolderJobs(), AFJOB::SYSJOB_ID, AFJOB::SYSJOB_NAME);
 
-	printf("%d jobs found.\n", (int)folders.size());
+	AF_LOG << folders.size() << " jobs found.";
 	for( int i = 0; i < folders.size(); i++)
 	{
 		JobAf * job = NULL;
@@ -227,12 +228,16 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					printf("System job retrieved from store is obsolete. Deleting it...\n");
+					AF_LOG << "System job retrieved from store is obsolete. Deleting it...";
 					delete job;
 					continue;
 				}
 			}
-			jobs.job_register( job, &users, NULL);
+
+			std::string err;
+			jobs.registerJob( job, err, &users, NULL);
+			if( err.size())
+				AF_ERR << err;
 		}
 		else
 		{
@@ -240,13 +245,13 @@ int main(int argc, char *argv[])
 			delete job;
 		}
 	}
-	printf("%d jobs registered from store.\n", jobs.getCount());
+	AF_LOG << jobs.getCount() << " jobs registered from store.";
 	}
 
 	// Disable new commands and editing:
 	if( af::Environment::hasArgument("-demo"))
 	{
-		printf("Demo mode, no new commands.\n");
+		AF_LOG << "Demo mode, no new commands.";
 		af::Environment::setDemoMode();
 	}
 
@@ -255,7 +260,11 @@ int main(int argc, char *argv[])
 	if( hasSystemJob == false )
 	{
 		SysJob* job = new SysJob();
-		jobs.job_register( job, &users, NULL);
+
+		std::string err;
+		jobs.registerJob( job, err, &users, NULL);
+		if( err.size())
+			AF_ERR << err;
 	}
 
 	/*
@@ -276,18 +285,20 @@ int main(int argc, char *argv[])
 		DlThread::Self()->Sleep( 1 );
 	}
 
-	AFINFO("afanasy::main: Waiting child threads.")
+	//AF_LOG << "Waiting child threads.";
 	//alarm(1);
 	/*FIXME: Why we don`t need to join accent thread? */
 	//ServerAccept.Cancel();
 	//ServerAccept.Join();
 
-	AFINFO("afanasy::main: Waiting Run.")
+	//AF_LOG << "Waiting Run.";
 	// No need to chanel run cycle thread as
 	// every new cycle it checks running external valiable
 	RunCycleThread.Join();
 
 	af::destroy();
+
+	AF_LOG << "Exiting process...";
 
 	return 0;
 }

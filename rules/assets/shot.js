@@ -63,31 +63,55 @@ function shot_InitHTML( i_data)
 {
 	$('asset').innerHTML = i_data;
 
-	// Set process buttons commands:
-	var path = cgru_PM('/' + RULES.root + g_CurPath());
+	// Show top buttons:
+	if( c_CanCreateShot())
+	{
+		var el = document.createElement('div');
+		$('asset_top_left').appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'NEW';
+		el.title = 'Create new shot.';
+		el.onclick = shot_Copy;
+	}
+	if( g_admin )
+	{
+		var el = document.createElement('div');
+		$('asset_top_left').appendChild(el);
+		el.classList.add('button');
+		el.textContent = 'RENAME';
+		el.title = 'Rename new shot.';
+		el.onclick = shot_Rename;
+	}
 
-	cmd = cgru_PM('/cgru/rules/bin/shot_process', true);
+	// Set process buttons commands:
+	var path = c_PathPM_Rules2Client( g_CurPath());
+
+	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_process');
 	if( ASSET.process )
-		cmd = cgru_PM( ASSET.process);
+		cmd = c_PathPM_Server2Client( ASSET.process);
 
 	cmd = cmd + ' -s nuke -r nuke';
 	if( ASSET.nuke_template )
-		cmd += ' -t ' + cgru_PM(ASSET.nuke_template);
+		cmd += ' -t ' + c_PathPM_Server2Client(ASSET.nuke_template);
+
+	if( RULES.colorspace )
+		cmd += ' -c ' + RULES.colorspace
 
 	cmd += ' ' + path;
 
 //console.log( cmd);
-	$('shot_nuke_new_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
+	cgru_CmdExecProcess({"element":$('shot_nuke_new_btn'),"cmd":cmd});
 
-	cmd = cgru_PM('/cgru/rules/bin/shot_open_latest', true);
+	cmd = c_PathPM_Server2Client('/cgru/rules/bin/shot_open_latest');
 	if( ASSET.open_latest )
-		cmd = cgru_PM( ASSET.open_latest);
+		cmd = c_PathPM_Server2Client( ASSET.open_latest);
 
 	cmd = cmd + ' -s nuke -e .nk -r nuke';
 
 	cmd += ' ' + path;
 //console.log( cmd);
-	$('shot_nuke_latest_btn').setAttribute('cmdexec', JSON.stringify([cmd]));
+
+	cgru_CmdExecProcess({"element":$('shot_nuke_latest_btn'),"cmd":cmd});
 
 	shot_ResultsRead( true);
 }
@@ -151,7 +175,7 @@ function shot_ResultsReceived( i_data, i_args)
 			shot_thumb_paths.push( path);
 
 		res_filesviews.push( new FilesView({"el":el,"path":path,"walk":i_data[i],
-			"show_walk":false,"can_count":true,"masks":shot_results_masks}));
+			"show_walk":false,"can_count":true,"masks":shot_results_masks,"count_images":true}));
 
 		found = true;
 	}
@@ -160,7 +184,7 @@ function shot_ResultsReceived( i_data, i_args)
 	{
 		var e = document.createElement('div');
 		el.appendChild( e);
-		e.textContent = 'No results founded in: ';
+		e.textContent = 'No results found in: ';
 		e.classList.add('shot_empty_result');
 
 		for( var i = 0; i < i_args.paths.length; i++)
@@ -200,15 +224,15 @@ function shot_ResultsReceived( i_data, i_args)
 		}
 		if( folder == null ) continue;
 
-		if( folder.num_files != null )
+		if( folder.num_images != null )
 		{
 			// if status frames numbers is undefined, but no update needed, we set status frames number:
 			if( r == ( res_filesviews.length - 1 ))
 			{
 				if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 				{
-					st_SetFramesNumber( folder.num_files);
-					c_Log('Shot length updated from "' + (fv.path+'/'+folder.name) + '": ' + folder.num_files);
+					st_SetFramesNumber( folder.num_images);
+					c_Log('Shot length updated from "' + (fv.path+'/'+folder.name) + '": ' + folder.num_images);
 				}
 			}
 
@@ -219,7 +243,7 @@ function shot_ResultsReceived( i_data, i_args)
 
 		// Update status frames number if it is still not defined:
 		var args = null;
-		if( RULES.status.frames_num == null )
+		if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 		{
 			args = {};
 			args.func = shot_FilesCounted;
@@ -240,10 +264,10 @@ function shot_Post()
 
 function shot_FilesCounted( i_args, i_walk)
 {
-	if( i_walk.num_files )
+	if( i_walk.num_images )
 	{
-		st_SetFramesNumber( i_walk.num_files);
-		c_Log('Shot length updated from "' + i_args.path + '": ' + i_walk.num_files);
+		st_SetFramesNumber( i_walk.num_images);
+		c_Log('Shot length updated from "' + i_args.path + '": ' + i_walk.num_images);
 		return;
 	}
 }
@@ -297,7 +321,7 @@ function shot_RefsReceived( i_data, i_args)
 			((  files == null ) || (   files.length == 0 )))
 			 continue;
 		not_empty_paths.push( walk.paths[i]);
-		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false})
+		new FilesView({"el":el,"path":walk.paths[i],"walk":walk.walks[i],"limits":false,"count_images":true})
 		found = true;
 	}
 	if( false == found )
@@ -353,14 +377,14 @@ function shot_SourcesReceived( i_data, i_args)
 		if(( RULES.status == null ) || ( RULES.status.frames_num == null ))
 		{
 			var frames_num = null;
-			// Update only if all ssource sequences have the same length:
+			// Update only if all source sequences have the same length:
 			for( var f = 0; f < walk.folders.length; f++)
 			{
 				if(( frames_num == null ) && walk.folders[f].files && walk.folders[f].files.length )
 				{
-					frames_num = walk.folders[f].files.length;
+					frames_num = walk.folders[f].num_images;
 				}
-				else if( walk.folders[f].files && walk.folders[f].files.length && ( frames_num != walk.folders[f].files.length ))
+				else if( walk.folders[f].num_images && ( frames_num != walk.folders[f].num_images ))
 				{
 					frames_num = null;
 					break;
@@ -373,7 +397,7 @@ function shot_SourcesReceived( i_data, i_args)
 
 		if( walk.folders.length || walk.files.length )
 		{
-			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"-thumbs":false,"can_refresh":false});
+			new FilesView({"el":el,"path":i_args.paths[i],"walk":walk,"limits":false,"count_images":true,"can_refresh":false});
 			not_empty_paths.push( i_args.paths[i]);
 			found = true;
 		}
@@ -386,7 +410,7 @@ function shot_SourcesReceived( i_data, i_args)
 	{
 		var e = document.createElement('div');
 		el.appendChild( e);
-		e.textContent = 'No sources founded in: ';
+		e.textContent = 'No sources found in: ';
 		e.classList.add('shot_empty_result');
 
 		for( var i = 0; i < ASSET.source.path.length; i++)
@@ -426,8 +450,14 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 			}
 
 			if( false == c_FileIsImage( name )) continue;
+
 			img_num++;
-			if( img_num < 2 ) continue;
+		}
+//			if( img_num < 2 ) continue;
+
+		if( img_num )
+		{
+			i_walk.num_images = img_num;
 
 			if( i_path )
 				i_walk.name = i_path;
@@ -442,7 +472,7 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 					if( o_walk.rufiles.indexOf( i_parent_walk.rufiles[r]) == -1 )
 						o_walk.rufiles.push( i_parent_walk.rufiles[r]);
 
-			break;
+//			break;
 		}
 	}
 
@@ -458,6 +488,89 @@ function shot_SourceWalkFind( i_walk, o_walk, i_path, i_parent_walk)
 
 		shot_SourceWalkFind( fobj, o_walk, path, i_walk);
 	}
+}
+
+function shot_Copy()
+{
+	var args = {};
+	args.template = RULES.assets.shot.template;
+	args.destination = c_PathDir( g_CurPath());
+	a_Copy( args);
+}
+
+shot_rename_params = {};
+shot_rename_params.new_name = {};
+function shot_Rename()
+{
+//	var args = {};
+	var wnd = new cgru_Window({"name":'rename',"title":'Rename Shot'});
+//	wnd.m_args = args;
+
+	var params = {};
+	params.new_name = c_PathBase( g_CurPath()) + '-01';
+
+	gui_Create( wnd.elContent, shot_rename_params, [params]);
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+	elBtns.style.clear = 'both';
+	elBtns.classList.add('buttons');
+
+	var elCreate = document.createElement('div');
+	elBtns.appendChild( elCreate);
+	elCreate.textContent = 'Rename';
+	elCreate.classList.add('button');
+	elCreate.m_wnd = wnd;
+	elCreate.onclick = function(e){ shot_RenameSend( e.currentTarget.m_wnd);}
+
+	var elResults = document.createElement('div');
+	wnd.elContent.appendChild( elResults);
+	wnd.m_elResults = elResults;
+	elResults.classList.add('output');
+}
+function shot_RenameSend( i_wnd)
+{
+	var params = gui_GetParams( i_wnd.elContent, shot_rename_params);
+//console.log(JSON.stringify(params));
+
+	var elWait = document.createElement('div');
+	i_wnd.elContent.appendChild( elWait);
+	i_wnd.m_elWait = elWait;
+	elWait.classList.add('wait');
+
+	var old_name = g_CurPath();
+	var new_name = c_PathDir( old_name) + '/' + params.new_name;
+
+	var cmd = 'rules/bin/move.py';
+	cmd += ' "' + c_PathPM_Rules2Server( old_name) + '"';
+	cmd += ' "' + c_PathPM_Rules2Server( new_name) + '"';
+
+	i_wnd.m_go_path = new_name;
+
+	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":shot_RenameReceived,"wnd":i_wnd});
+
+	// Clear walk cache, as we need to navigate there later:
+	n_walks[old_name] = null;
+	n_walks[new_name] = null;
+}
+function shot_RenameReceived( i_data, i_args)
+{
+//console.log(JSON.stringify(i_data));
+	i_args.wnd.elContent.removeChild( i_args.wnd.m_elWait);
+	var elResults = i_args.wnd.m_elResults;
+	elResults.textContent = '';
+
+	if(( i_data.cmdexec == null ) || ( ! i_data.cmdexec.length ))
+	{
+		elResults.textContent = ( JSON.stringify( i_data));
+		return;
+	}
+
+	i_args.wnd.destroy();
+
+	g_RemoveFolder( g_elCurFolder);
+
+	g_GO( i_args.wnd.m_go_path);
 }
 
 if( ASSETS.shot && ( ASSETS.shot.path == g_CurPath()))

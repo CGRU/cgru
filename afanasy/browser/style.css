@@ -43,10 +43,10 @@ left: 0; right: 0; bottom: 0; top: 200px;
 #headermain .mbutton {
 font: 16px Arial;
 font-weight: bold;
-position: relative;
-border: 1px solid #575757;
-border-radius: 6px;
-margin: 0px 10px;
+float: left;
+border: 2px solid #575757;
+border-radius: 2px 2px 16px 16px;
+margin: -8px 10px;
 padding: 6px 8px 3px 8px;
 cursor: pointer;
 text-transform: uppercase;
@@ -76,6 +76,15 @@ border: 2px solid #575757;
 #footeropenbutton, #headeropenbutton, #log_btn, #netlog_btn {
 cursor: pointer;
 text-align: center;
+}
+#header_panel_right {
+	float: right;
+	margin-right: 12px;
+}
+#header_panel_right > div {
+	margin: 2px;
+	padding: 4px 8px;
+	float: left;
 }
 #footeropenbutton, #headeropenbutton {
 border: 1px solid #575757;
@@ -117,6 +126,19 @@ border-radius: 2px;
 height: 190px;
 }
 #footer #log *, #footer #netlog * { margin: 4px 0px;}
+
+.button {
+cursor: pointer;
+text-align: center;
+border: 1px solid #575757;
+border-radius: 2px;
+margin: 2px;
+padding: 2px 6px;
+background-color: rgba(150,255,255,.1);
+-moz-user-select: none;
+-webkit-user-select: none;
+}
+.button:hover { background-color: rgba(150,255,255,.3); }
 
 .monitor {
 position: absolute;
@@ -180,9 +202,9 @@ display: none;
 .panel.right .section.folders .label {
 font-style: italic;
 }
-.panel.right .section.folders .cmdexec {
-font-weight: normal;
-background: inherit;
+.panel.right .section.folders .cgru_cmdexec {
+float: left;
+margin-right: 8px;
 }
 
 .monitor .ctrl,.info {
@@ -194,7 +216,6 @@ height: 28px;
 .monitor .ctrl { top: 0; border-bottom: 2px solid #575757;}
 .monitor .info { bottom: 0; border-top: 2px solid #575757;}
 .monitor .list {
-font-weight: bold;
 position: absolute;
 left: 0; right: 0;
 overflow: auto;
@@ -280,14 +301,19 @@ padding: 1px 7px;
 border-radius: 4px;
 cursor: default;
 }
+.item.ONL { background: #787;}
 .item.NbY { background: #88F;}
 .item.NBY { background: #77F;}
+.item.PAU { background: #888;}
 .item.DON { background: #486;}
+.item.WRN { background: #292;}
 .item.WDP { background: #969;}
 .item.PPA { background: #CC6;}
 .item.WTM { background: #599;}
 .item.RUN { background: #8A6;}
 .item.ERR { background: #965;}
+.item.RER { background: #F77;}
+.item.WRC { background: #4AC;}
 .item.OFF, .item.task.SKP { background: #777;}
 .item.DRT { border: 1px solid #955;}
 .item.hidden { display: none;}
@@ -295,6 +321,10 @@ cursor: default;
 .item.selected, .item.task.selected {
 background: #DFD;
 color: #000;
+}
+
+.lowercase {
+text-transform: lowercase;
 }
 
 .render .resources {
@@ -443,6 +473,7 @@ opacity: .3;
 
 /*.item.render .task {*/
 .rendertask {
+font-weight: bold;
 background: #DD5;
 margin: 1px;
 /*border: 1px solid #666;*/
@@ -485,6 +516,7 @@ color: #FF5;
 text-shadow: 0px 0px 2px #000;
 }
 .star .count {
+font-weight: bold;
 position: absolute;
 top: 0px; left: 10px; right: 0; bottom: 0;
 font-size: 18px;
@@ -501,42 +533,101 @@ text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 top: 150px; bottom: 50px; left: 10%; right: 10%;
 }
 
-.task_exec > div {
+/*####################### Task Window: ################## */
+.wnd_task > div {
 padding: 6px;
+clear: both;
 }
-.task_exec .attr {
-padding: 2px 0px;
+.wnd_task div {
+border-radius: 2px;
 }
-.task_exec .attr div {
-margin: 2px;
-padding: 2px 0px;
+.wnd_task .progress {
+margin: 4px 12px;
+padding: 4px 12px;
+background-color: rgba( 255, 255, 255, .5);
+border: 1px solid #777;
 }
-.task_exec .attr .label {
+.wnd_task .buttons_div .button { float: left; opacity: .5; }
+.wnd_task .buttons_div .button.active { opacity: 1.0; }
+.wnd_task .output_div { float: right; }
+.wnd_task .output_div > div { float: left; padding: 4px; }
+.wnd_task .output_num {
+min-width: 50px;
+height: 14px;
+background-color: rgba(255,255,255,.5);
+text-align: center;
+border: 1px solid #777;
+}
+.wnd_task .tab_btn {
 float: left;
-width: 60px;
+margin-bottom: 0px;
+border-bottom: 0px;
+border-radius: 6px 6px 0 0;
 }
-.task_exec .attr .value {
+.wnd_task .tab_btn.active { background-color: rgba(255,255,255,.3); }
+.wnd_task .tab_pages_div {
+clear: both;
+padding: 10px;
+border: 1px solid #777;
+background-color: rgba(255,255,255,.3);
+}
+.wnd_task .tab_page { display: none; }
+.wnd_task .tab_page.active { display: block; }
+
+.wnd_task .attr { padding: 2px 0px; }
+.wnd_task .attr div { margin: 2px; padding: 2px 0px; }
+.wnd_task .attr .label { float: left; width: 60px; }
+.wnd_task .attr .value {
 padding: 2px 8px;
 overflow: hidden;
 font-weight: bold;
-border-radius: 4px;
 box-shadow: 0px 0px 2px #555 inset;
 }
-.task_exec .raw .object, .task_exec .files {
+.wnd_task .raw .object, .wnd_task .files {
 padding: 6px;
-border-radius: 4px;
 box-shadow: 0px 0px 2px #555 inset;
 overflow: hidden;
 }
-.task_exec .files > div {
+.wnd_task .files > div {
 cursor: pointer;
 margin: 1px;
 padding: 1px 4px;
 float: left;
-border-radius: 2px;
 box-shadow: 0 0 2px #000, 0 0 2px #FFF inset;
 background: rgba(255,255,0,.2);
 }
-.task_exec .files > div.opened {
+.wnd_task .files > div.opened {
 clear: both; float: none;
 }
+
+/*####################### Listen Job Window: ################## */
+.listen .name {
+font-style: italic;
+font-weight: bold;
+margin: 0 0 0 40px;
+padding: 0;
+}
+.listen .output {
+margin-top: 0;
+padding-top: 0;
+}
+
+.ui_level_back {
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+text-align: center;
+background-color: rgba(50,50,50,.5);
+}
+.ui_level_text {
+margin: 128px;
+padding: 128px;
+font-weight: bolder;
+font-size: 32px;
+background-color: #AAAAAA;
+color: #303030;
+border: 8px solid #303030;
+border-radius: 24px;
+box-shadow: 0 0 32px #000000, 0 0 8px #000000 inset;
+text-shadow: 0px 0px 2px #FFFFFF;
+}
+

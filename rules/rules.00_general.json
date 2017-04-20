@@ -1,5 +1,7 @@
 {
 "root":"rules_root",
+"-root_link":"/data/prj",
+
 "rufolder":".rules",
 "company":"CGRU",
 "panel_logo_img":"rules/icons/rules.png",
@@ -12,13 +14,21 @@
 	"recent":99
 },
 
-"tags":{
-	"started" :{"title":"START",    "short":"St",  "tip":"Started"},
-	"error"   :{"title":"ERROR",    "short":"Err", "tip":"Error"},
-	"hold"    :{"title":"HOLD",     "short":"Hl",  "tip":"On hold"},
-	"omit"    :{"title":"OMIT",     "short":"Om",  "tip":"Omit"},
-	"done"    :{"title":"DONE",     "short":"D",   "tip":"Done"},
+"bookmarks":{
+	"refresh":300
+},
 
+"flags":{
+	"hold"    :{"title":"HOLD",                        "short":"Hl",                          "tip":"On hold"},
+	"error"   :{"title":"ERROR",   "clr":[255, 55, 55],"short":"Err", "p_max":99,             "tip":"Error"},
+	"comment" :{"title":"COMMENT", "clr":[222,111,222],"short":"Cmm", "p_max":99,             "tip":"Comment"},
+	"omit"    :{"title":"OMIT",    "clr":[ 99, 99, 99],"short":"Om",  "p_max":-1, "excl":true,"tip":"Omit"},
+	"done"    :{"title":"DONE",    "clr":[121,155,121],"short":"D",   "p_min":100,"excl":true,"tip":"Done"},
+	"closed"  :{"title":"CLOSED",  "clr":[ 11, 55, 11],"short":"CLS", "p_min":100,"excl":true,"tip":"Closed"},
+	"aux"     :{"title":"AUX",     "clr":[127,127,127],"short":"AUX", "p_max":-1, "excl":true,"tip":"Auxiliary"}
+},
+
+"tags":{
 	"wirem"   :{"title":"WiRem",    "short":"WR",  "tip":"Wire remove"},
 	"roto"    :{"title":"Roto",     "short":"Ro",  "tip":"Rotoscoping"},
 	"key"     :{"title":"Keying",   "short":"Key", "tip":"Keying"},
@@ -51,9 +61,15 @@
 	"message":{"title":"Message","color":[150,150,200]}
 },
 
+"aux_folders":[".","_","-","tmp","temp","tmp","common"],
+
 "assets":{
+	"projects_root":{
+		"play_folders":false,
+		"show_files":true
+	},
 	"project":{
-		"seek":["/"],
+		"seek":["[projects_root]/","/"],
 		"upload_dir":"_UPLOADS/@DATE@_@USER@",
 		"play_folders":false,
 		"scripts":["project.js"],
@@ -67,7 +83,7 @@
 				"folder":"_UPLOADS/@DATE@_@USER@"
 			}
 		},
-		"name":"",
+		"-name":"",
 		"filter":"sc_FilterShots",
 		"scripts":["scenes.js"]
 	},
@@ -84,7 +100,6 @@
 	},
 	"shot":{
 		"seek":["[scene]/"],
-		"skip":[".","_","-","tmp","temp","tmp","common","rnd"],
 		"uploads":{
 			"upload":{
 				"masks":[".*"],
@@ -117,7 +132,7 @@
 		"dailies":{
 			"path":["RESULT/DAILIES"]
 		},
-		"template":"/CG_PROJECT/SCENES/COMMON/_template",
+		"template":"rules/assets/shot",
 		"nuke_template":"/cgru/plugins/nuke/_template.nk"
 	}
 },
@@ -187,8 +202,8 @@
 "thumbnail":{
 	"filename":"thumbnail.jpg",
 	"colorspace":"auto",
-	"cmd_asset":"rules/bin/thumbnail.py -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
-	"create_file":"rules/bin/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
+	"cmd_asset":"rules/bin/thumbnail.sh -n 3 -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\"",
+	"create_file":"rules/bin/thumbnail.sh -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
 
 "avcmd":"ffmpeg",
@@ -204,6 +219,7 @@
 	"colorspace":"auto",
 	"template":"dailies_withlogo",
 	"slate":"dailies_slate",
+	"-font":"DejaVuSans",
 	"naming":"(s)_(v)_(d)",
 	"logo_slate_path":"logo.png",
 	"logo_slate_size":20,
@@ -222,10 +238,12 @@
 	},
 
 	"formats":{
+		"asis":   {"name":"As Is",   "value":null},
 		"pal":    {"name":"PAL",     "value":"720x576x1.09"},
 		"pal768": {"name":"PAL 768", "value":"768x576"},
 		"1k43":   {"name":"1k 4:3",  "value":"1024x768"},
-		"1k169":  {"name":"1k 16:9", "value":"1024x567"},
+		"sd360":  {"name":"640x360", "value":"640x360"},
+		"sd540":  {"name":"960x540", "value":"960x540"},
 		"hd720":  {"name":"HD720",   "value":"1280x720"},
 		"hd1080": {"name":"HD1080",  "value":"1920x1080"}
 	},
@@ -242,7 +260,8 @@
 		"theora_low":    {"name":"Th Lo" ,   "tooltip":"Theora Low [ogg]"},
 		"dnxhd185":      {"name":"DNxHD" ,   "tooltip":"AVID DNxHD 1920x1080x25:185 [mov]"},
 		"prores444":     {"name":"Pro444",   "tooltip":"Apple ProRes444 10Bit [mov]"},
-		"prores422":     {"name":"Pro422",   "tooltip":"Apple ProRes422 10Bit [mov]"}
+		"prores422":     {"name":"Pro422",   "tooltip":"Apple ProRes422 10Bit [mov]"},
+		"copy":          {"name":"COPY",     "tooltip":"Just copy stream [mp4]"}
 	},
 
 	"containers":{
@@ -272,9 +291,13 @@
 	"af_maxruntime":120
 },
 
+"tmpfio":{
+	"template":"rules/assets/tmpfio"
+},
+
 "put":{
 	"input":"RESULT/PNG,RESULT/TIF,RESULT/DPX",
-	"dest":"FINAL",
+	"dest":"OUT",
 	"-dest":"/incoming",
 	"cmd":"python /cgru/utilities/put.py",
 	"-ftp":{

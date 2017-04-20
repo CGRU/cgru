@@ -3,8 +3,8 @@ RULES = {};
 RULES.rufolder = 'rules';
 RULES_TOP = {};
 
-c_movieTypes = ['mpg','mpeg','mov','avi','mp4','m4v','ogg','ogv','mxf','flv'];
-c_movieTypesHTML = ['mp4','ogg'];
+c_movieTypes = ['mpg','mpeg','mov','avi','mp4','m4v','webm','ogg','ogv','mxf','flv'];
+c_movieTypesHTML = ['mp4','webm','ogg'];
 c_imageTypes = ['jpg','jpeg','png','exr','dpx','tga','tif','tiff','psd','xcf'];
 c_imageEditableTypes = ['jpg','jpeg','png'];
 c_archives = ['zip','rar','7z','001'];
@@ -20,6 +20,8 @@ function c_Init()
 {
 	cgru_ConstructSettingsGUI();
 	cgru_InitParameters();
+	cgru_Info = c_Info;
+	cgru_Error = c_Error;
 
 	document.getElementById('platform').textContent = cgru_Platform;
 	document.getElementById('browser').textContent = cgru_Browser;
@@ -27,9 +29,9 @@ function c_Init()
 	u_ApplyStyles();
 }
 
-function c_GetHashPath()
+function c_GetHash()
 {
-	var path = document.location.hash;
+	var path = decodeURI( document.location.hash);
 //window.console.log( 'hash = ' + path);
 	if( path.indexOf('#') == 0 )
 		path = path.substr(1);
@@ -68,14 +70,52 @@ function c_Parse( i_data)
 
 function c_NullOrErrorMsg( i_obj)
 {
-//	if( i_obj == null ) return true;
-//	if( i_obj.error )
-	if(( i_obj == null ) || ( i_obj.error ))
+//console.log(JSON.stringify(i_obj));
+	if( i_obj == null )
+	{
+		c_Error('No responce received.');
+		return true;
+	}
+	if( i_obj.error )
 	{
 		c_Error( i_obj.error);
 		return true;
 	}
 	return false;
+}
+function c_NullOrErrorCmd( i_obj, i_name)
+{
+//console.log(JSON.stringify(i_obj));
+	if( c_NullOrErrorMsg( i_obj ))
+		return true;
+
+	if( i_obj.cmdexec == null )
+	{
+		c_Error('Null command execution data.');
+		return true;
+	}
+
+	if( ! i_obj.cmdexec.length )
+	{
+		c_Error('Zero command execution data.');
+		return true;
+	}
+
+	var ret = false;
+	for( var i = 0; i < i_obj.cmdexec.length; i++)
+	{
+		var obj = i_obj.cmdexec[i];
+		if( obj[i_name] == null )
+		{
+			c_Error('Command execution has no "' + i_name + '" data.');
+			ret = true;
+		}
+
+		if( c_NullOrErrorMsg( obj[i_name]))
+			ret = true;
+	}
+
+	return ret;
 }
 
 function c_CloneObj( i_obj)
@@ -165,6 +205,28 @@ function c_Log( i_msg)
 	c_logCount++;
 }
 
+function c_AuxFolder( i_folder)
+{
+	if( i_folder.status )
+	{
+		if( i_folder.status.flags && ( i_folder.status.flags.indexOf('aux') != -1 ))
+			return true;
+
+		if( i_folder.status.progress && ( i_folder.status.progress < 0 ))
+			return true;
+	}
+
+	if( i_folder.name )
+	{
+		var name = c_PathBase( i_folder.name);
+		for( var i = 0; i < RULES.aux_folders.length; i++)
+			if( name.toLowerCase().indexOf( RULES.aux_folders[i]) === 0 )
+				return true;
+	}
+
+	return false;
+}
+
 function c_DT_StrFromSec( i_time, i_nosec) { if( i_time == null) return ''; return c_DT_StrFromMSec( i_time*1000, i_nosec);}
 function c_DT_StrFromMSec( i_time, i_nosec)
 {
@@ -221,14 +283,16 @@ function c_DT_DurFromSec( i_sec)
 	secs      = Math.round( secs - ( mins * 60 ));
 	return hours + ':' + c_PadZero( mins) + ':' + c_PadZero( secs);
 }
+function c_DT_DurFromNow( i_sec) { return c_DT_DurFromSec( (new Date()) / 1000 - i_sec); }
 function c_DT_DaysLeft( i_sec ) { return ( i_sec - (new Date()/1000) ) / ( 60 * 60 * 24 ); }
 
-function c_TC_FromFrame( i_frame)
+function c_TC_FromFrame( i_frame, fps, clamp)
 {
-	var fps = RULES.fps;
+    if( fps == null )
+        fps = RULES.fps;
 
 	var sec = Math.floor( i_frame / fps );
-	var frm = i_frame - sec * fps;
+	var frm = Math.round( i_frame - sec * fps);
 	var min = Math.floor( sec / 60);
 	sec = sec - min * 60;
 	var hrs = Math.floor( min / 60);
@@ -239,7 +303,11 @@ function c_TC_FromFrame( i_frame)
 	if( sec < 10 ) sec = '0' + sec;
 	if( frm < 10 ) frm = '0' + frm;
 
-	return hrs + ':' + min + ':' + sec + ':' + frm;
+    var tc = sec + ':' + frm;
+    if(( min != '00') || ( clamp !== true)) tc = min + ':' + tc;
+    if(( hrs != '00') || ( clamp !== true)) tc = hrs + ':' + tc;
+
+	return tc;
 }
 
 function c_TC_FromSting( i_str)
@@ -294,6 +362,15 @@ function c_IsUserStateSet(   i_user, i_state)
 	if( i_user.states == null ) return false;
 	if( i_user.states.indexOf( i_state) != -1 ) return true;
 
+	return false;
+}
+function c_CanCreateShot( i_user)
+{
+	if( i_user == null ) i_user = g_auth_user;
+	if( i_user == null ) return false;
+
+	if((['admin','coord','user']).indexOf( i_user.role ) != -1 )
+		return true;
 	return false;
 }
 
@@ -363,30 +440,21 @@ function c_GetUserTitle( i_uid, i_guest, i_short)
 	return title;
 }
 
-function c_GetTagTitle( i_tag)
+function c_GetFlagTitle( i_flag) { return c_GetTagProp( i_flag,'flag','title'); }
+function c_GetTagTitle(  i_tag ) { return c_GetTagProp( i_tag, 'tag', 'title'); }
+function c_GetFlagTip (  i_flag) { return c_GetTagProp( i_flag,'flag','tip'); }
+function c_GetTagTip(    i_tag ) { return c_GetTagProp( i_tag, 'tag', 'tip'); }
+function c_GetFlagShort( i_flag) { return c_GetTagProp( i_flag,'flag','short', 3); }
+function c_GetTagShort(  i_tag ) { return c_GetTagProp( i_tag, 'tag', 'short', 3); }
+function c_GetTagProp( i_name, i_type, i_key, i_clamp )
 {
-	var tag = i_tag;
-	if( RULES.tags[tag] && RULES.tags[tag].title )
-		tag = RULES.tags[tag].title;
-	return tag;
-}
-
-function c_GetTagTip( i_tag)
-{
-	var tag = i_tag;
-	if( RULES.tags[tag] && RULES.tags[tag].tip )
-		tag = RULES.tags[tag].tip;
-	return tag;
-}
-
-function c_GetTagShort( i_tag)
-{
-	var tag = i_tag;
-	if( RULES.tags[tag] && RULES.tags[tag].short )
-		tag = RULES.tags[tag].short;
-	else if( tag.length > 3 )
-		tag = tag.substr(0,3);
-	return tag;
+	var val = i_name;
+	var types = i_type + 's';
+	if( RULES[types][i_name] && RULES[types][i_name][i_key] )
+		val = RULES[types][i_name][i_key];
+	if( i_clamp && ( val.length > i_clamp ))
+		val = val.substr(0, i_clamp);
+	return val;
 }
 
 function c_CompareFiles(a,b)
@@ -402,6 +470,7 @@ function c_ElToggleSelected( i_e)
 	var el = i_e;
 	if( i_e.currentTarget ) el = i_e.currentTarget;
 	c_ElSetSelected( el, el.m_selected != true );
+	return el.m_selected;
 }
 
 function c_ElSetSelected( i_e, i_selected )
@@ -435,24 +504,10 @@ function c_GetElInteger( i_el)
 	return num;
 }
 
-function c_CreateOpenButton( i_el, i_path, i_type)
-{
-	if( RULES.has_filesystem === false ) return null;
-	if( i_type == null ) i_type = 'div';
-	var el = document.createElement( i_type);
-	i_el.appendChild( el);
-	el.classList.add('cmdexec');
-	el.classList.add('open');
-	var cmd = cgru_OpenFolderCmd( cgru_PM('/'+RULES.root + i_path))
-	el.setAttribute('cmdexec', JSON.stringify([cmd]));
-	el.title = 'Open location in a file browser.\nRMB "Run" menu item.'
-	return el;
-}
-
 function c_FileDragStart( i_evt, i_path)
 {
 	var el = i_evt.currentTarget;
-	var path = cgru_PM('/' + RULES.root + i_path);
+	var path = c_PathPM_Rules2Client( i_path);
 	if( cgru_Platform.indexOf('windows') == -1 )
 		path = 'file://' + path;
 	var dt = i_evt.dataTransfer;
@@ -552,6 +607,19 @@ function c_MakeThumbnail( i_file, i_func)
 
 function c_PathBase( i_file) { return i_file.substr( i_file.lastIndexOf('/')+1);}
 function c_PathDir( i_file) { return i_file.substr( 0, i_file.lastIndexOf('/'));}
+function c_PathPM_Rules2Server(  i_path) { if(RULES.root_link) return (RULES.root_link + i_path); else return ('/' + RULES.root + i_path); }
+function c_PathPM_Rules2Client(  i_path) { return cgru_PM( c_PathPM_Rules2Server( i_path)); }
+function c_PathPM_Client2Server( i_path) { return cgru_PM( i_path, true); }
+function c_PathPM_Server2Client( i_path) { return cgru_PM( i_path); }
+function c_CreateOpenButton( i_args)
+{
+    if( RULES.has_filesystem === false )
+        return null;
+
+    i_args.path = c_PathPM_Rules2Client( i_args.path);
+
+    return cgru_CmdExecCreateOpen( i_args);
+}
 
 function c_MD5( i_str) { return hex_md5( i_str);}
 
@@ -606,7 +674,7 @@ function c_GetAvatar( i_user_id, i_guest )
 		if( i_guest )
 			avatar = c_EmailDecode( avatar);
 		avatar = c_MD5( avatar.toLowerCase());
-		avatar = 'http://www.gravatar.com/avatar/' + avatar;
+		avatar = 'https://www.gravatar.com/avatar/' + avatar;
 	}
 
 	if( avatar && avatar.length )

@@ -18,3 +18,10 @@ public:
 	~CmdMonitorLog();
 	bool v_processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdMonitorMsg: public Cmd
+{
+public:
+   CmdMonitorMsg();
+   ~CmdMonitorMsg();
+   bool v_processArguments( int argc, char** argv, af::Msg &msg);
+};

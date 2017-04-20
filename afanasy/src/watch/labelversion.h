@@ -4,7 +4,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include <QtCore/QTimer>
-#include <QtGui/QWidget>
+#include <QWidget>
 
 class LabelVersion : public QWidget
 {

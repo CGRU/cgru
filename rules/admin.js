@@ -118,15 +118,15 @@ function ad_Logout()
 		window.location.reload();
 		return;
 	}
-//*
+/*
  	var obj = {};
 	obj.logout = {"realm":cgru_Config.realm};
 	n_Request({"send":obj,"func":ad_LogoutReceived,"info":'logout'});
 }
 function ad_LogoutReceived( i_data)
 {
-//c_Log( i_data);
-//	*/
+console.log( JSON.stringify( i_data));
+*/
 ///*
 	var xhr = new XMLHttpRequest;
 	xhr.open('GET', '/', true, 'null', 'null');
@@ -552,6 +552,12 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
+	el.textContent = 'Bmrs';
+	el.title = 'Bookmarks count.\nDouble click clear bookmarks.';
+	el.onclick = function(e) { ad_WndSortUsers('bookmarks'); };
+
+	var el = document.createElement('th');
+	elTr.appendChild( el);
 	el.textContent = 'Cnls';
 	el.title = 'News subscribed channels.\nDouble click clear channels.';
 	el.onclick = function(e) { ad_WndSortUsers('channels'); };
@@ -784,6 +790,14 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
+	if( i_user.bookmarks )
+		el.textContent = i_user.bookmarks.length;
+	el.m_user_id = i_user.id;
+	if( i_user.disabled !== true )
+		el.ondblclick = function(e){ad_UserBookmakrsClean( e.currentTarget.m_user_id);};
+
+	var el = document.createElement('td');
+	elTr.appendChild( el);
 	if( i_user.channels )
 		el.textContent = i_user.channels.length;
 	if( i_user.channels && i_user.channels.length )
@@ -820,7 +834,9 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
-	el.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
+	el.m_user = i_user;
+	ad_UserShowEntries( el);
+	el.ondblclick = function(e){ad_UserShowEntries( e.currentTarget, true);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -994,6 +1010,10 @@ function ad_ChangeEmail( i_email, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"email":i_email}, ad_WndRefresh);
 }
+function ad_UserBookmakrsClean( i_user_id)
+{
+	ad_SaveUser({"id":i_user_id,"bookmarks":[]}, ad_WndRefresh);
+}
 function ad_UserChannelsClean( i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"channels":[]}, ad_WndRefresh);
@@ -1016,6 +1036,26 @@ function ad_UserNewsLimitSet( i_limit, i_user_id)
 		return;
 	}
 	ad_SaveUser({"id":i_user_id,"news_limit":limit}, ad_WndRefresh);
+}
+function ad_UserShowEntries( i_el, i_show_ips)
+{
+	var user = i_el.m_user;
+
+	var text = c_DT_StrFromSec( user.rtime).substr(4);
+
+	if( user.ips && user.ips.length && i_show_ips && ( i_el.m_ips_shown != true ))
+	{
+		for( var i = 0; i < user.ips.length; i++)
+			text += '<br><br>' + user.ips[i].ip  + ' : ' + c_DT_StrFromSec(user.ips[i].time) + '<br>' + user.ips[i].url;
+
+		i_el.m_ips_shown = true;
+	}
+	else
+	{
+		i_el.m_ips_shown = false;
+	}
+
+	i_el.innerHTML = text;
 }
 function ad_SaveUser( i_user, i_func)
 {
@@ -1083,6 +1123,7 @@ function ad_DisableUser( i_user_id)
 	uobj.disabled = true;
 	delete uobj.news;
 	delete uobj.channels;
+	delete uobj.bookmarks;
 
 	n_Request({"send":{"disableuser":{"uid":i_user_id,"uobj":uobj}},"func":ad_ChangesFinished,
 			"ad_func":ad_WndRefresh,"ad_msg":'User "'+i_user_id+'" disabled.'});

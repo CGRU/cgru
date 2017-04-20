@@ -11,48 +11,46 @@
 #include "buttonmonitor.h"
 #include "dialog.h"
 #include "item.h"
+#include "itemjob.h"
 #include "monitorhost.h"
 #include "listtasks.h"
-#include "reciever.h"
+#include "popup.h"
+#include "receiver.h"
 #include "wndlist.h"
 #include "wndlistenjob.h"
 #include "wndlistentask.h"
+#include "wndtask.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
-#include <QtGui/QApplication>
 #include <QtGui/QPixmap>
-#include <QtGui/QSound>
+#include <QApplication>
+#include <QSound>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const QString Watch::BtnName[WLAST] = { "NULL","JOBS","USERS","RENDERS","M"};
+const QString Watch::BtnName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
 const QString Watch::WndName[WLAST] = { "null","Jobs","Users","Renders","Monitors"};
 WndList* Watch::opened[WLAST] = {0,0,0,0,0};
 
 QLinkedList<Wnd*>      Watch::ms_windows;
-QLinkedList<Reciever*> Watch::ms_recievers;
+QLinkedList<Receiver*> Watch::ms_receivers;
 QLinkedList<int>       Watch::ms_listenjobids;
 QLinkedList<int>       Watch::ms_watchtasksjobids;
 QLinkedList<QWidget*>  Watch::ms_watchtaskswindows;
-
-QStringList Watch::ms_previewcmds;
-QStringList Watch::ms_rendercmds;
 
 QMap<QString, QPixmap *> Watch::ms_services_icons_large;
 QMap<QString, QPixmap *> Watch::ms_services_icons_small;
 
 QApplication * Watch::ms_app = NULL;
 Dialog * Watch::ms_d = NULL;
-MonitorHost * Watch::ms_m = NULL;
 
 Watch::Watch( Dialog * pDialog, QApplication * pApplication)
 {
    ms_app = pApplication;
    ms_d = pDialog;
-   ms_m = ms_d->getMonitor();
 
 // Get services icons:
    QDir dir( afqt::stoq( af::Environment::getCGRULocation()) + "/icons/software");
@@ -81,16 +79,64 @@ Watch::~Watch()
    for( QMap<QString, QPixmap *>::iterator it = ms_services_icons_small.begin(); it != ms_services_icons_small.end(); it++) delete *it;
 }
 
-void Watch::destroy() { ms_d = NULL; ms_m = NULL;}
+void Watch::destroy() { ms_d = NULL; }
 
 void Watch::sendMsg( af::Msg * msg)
 {
 	if( msg->type() == af::Msg::TJSON )
 	{
-		std::string str( msg->data(), msg->dataLen());
-		printf("\n%s\n", str.c_str());
+		msg->setJSONBIN();
+
+		static int unused;
+		unused = ::write( 1, " <<< ", 5);
+		msg->stdOutData( false);
+		unused = ::write( 1, "\n", 1);
 	}
 	if( ms_d ) ms_d->sendMsg( msg);
+}
+
+void Watch::get( const std::string & i_str)
+{
+	std::string str = "{\"get\":{\"binary\":true,";
+	str += i_str + "}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	Watch::sendMsg( msg);
+}
+
+void Watch::get(
+		const char * i_type,
+		const std::vector<int32_t> & i_ids,
+		const std::vector<std::string> & i_modes,
+		const std::vector<int32_t> & i_blocks)
+{
+//	{"get":{"type":"jobs","ids":[6],"mode":["progress"],"block_ids":[0]}}
+	std::ostringstream str;
+
+	str << "\"type\":\"" << i_type << "\"";
+
+	if( i_ids.size())
+	{
+		str << ",\"ids\":[";
+		for( int i = 0; i < i_ids.size(); i++ ) { if(i) str << ','; str << i_ids[i]; }
+		str << "]";
+	}
+
+	if( i_modes.size())
+	{
+		str << ",\"mode\":[";
+		for( int i = 0; i < i_modes.size(); i++ ) { if(i) str << ','; str << '"' << i_modes[i] << '"'; }
+		str << "]";
+	}
+
+	if( i_blocks.size())
+	{
+		str << ",\"block_ids\":[";
+		for( int i = 0; i < i_blocks.size(); i++ ) { if(i) str << ','; str << i_blocks[i]; }
+		str << "]";
+	}
+
+	get( str.str());
 }
 
 void Watch::displayInfo(    const QString &message){if(ms_d){ms_d->displayInfo(    message);if(ms_d->isHidden())ms_d->show();}}
@@ -101,16 +147,6 @@ void Watch::keyPressEvent( QKeyEvent * event) { if(ms_d) ms_d->keyPressEvent( ev
 
 bool Watch::isInitialized() { if(ms_d) return ms_d->isInitialized(); else return false;  }
 bool Watch::isConnected()   { if(ms_d) return ms_d->isConnected();   else return false;  }
-int  Watch::getUid()        { if(ms_d) return ms_d->getUid();        else return 0;      }
-int  Watch::getId()         { if(ms_m) return ms_m->getId();         else return 0;      }
-
-const af::Address & Watch::getClientAddress() { return ms_m->getAddress();}
-
-void Watch::subscribe(   const QList<int> & events) { if(ms_m) ms_m->  subscribe( events );}
-void Watch::unsubscribe( const QList<int> & events) { if(ms_m) ms_m->unsubscribe( events );}
-void Watch::addJobId( int jId ) { if(ms_m) ms_m->addJobId( jId );}
-void Watch::delJobId( int jId ) { if(ms_m) ms_m->delJobId( jId );}
-void Watch::setUid(   int uid ) { if(ms_m) ms_m->setUid(   uid );}
 
 void Watch::addWindow( Wnd * wnd)
 {
@@ -120,36 +156,90 @@ void Watch::addWindow( Wnd * wnd)
    }
    else ms_windows.append( wnd);
 }
-void Watch::addReciever( Reciever * reciever)
+void Watch::addReceiver( Receiver * receiver)
 {
-   if( ms_recievers.contains( reciever))
+   if( ms_receivers.contains( receiver))
    {
-      AFERROR("Watch::addReciever: Reciever already exists.")
+      AFERROR("Watch::addReciever: Receiver already exists.")
    }
-   else ms_recievers.append( reciever);
+   else ms_receivers.append( receiver);
 }
 void Watch::removeWindow(   Wnd      * wnd      ) {   ms_windows.removeAll( wnd);      }
-void Watch::removeReciever( Reciever * reciever ) { ms_recievers.removeAll( reciever); }
+void Watch::removeReceiver( Receiver * receiver ) { ms_receivers.removeAll( receiver); }
 
 void Watch::caseMessage( af::Msg * msg)
 {
-   bool recieved = false;
-   QLinkedList<Reciever*>::iterator rIt;
-   for( rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+   bool received = false;
+
+	QLinkedList<Receiver*>::iterator rIt;
+	for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+	{
+		msg->resetWrittenSize();
+		if( (*rIt)->v_caseMessage( msg) && (false == received)) received = true;
+	}
+
+	if( msg->type() == af::Msg::TMonitorEvents )
+	{
+		msg->resetWrittenSize();
+		af::MonitorEvents me( msg);
+		me.v_stdOut();
+
+		// General instructions for an application:
+		if( me.m_instruction.size())
+		{
+			if( me.m_instruction == "exit")
+			{
+				printf("Received \"exit\" instrucion. Closing dialog.\n");
+				ms_d->close();
+				return;
+			}
+		}
+
+		// Let all receivers to process events:
+		for( rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
+		{
+			msg->resetWrittenSize();
+			if( (*rIt)->v_processEvents( me) && (false == received)) received = true;
+		}
+
+		for( int i = 0; i < me.m_outputs.size(); i++)
+		{
+			if( WndTask::showTask( me.m_outputs[i]))
+				received = true;
+		}
+
+		for( int i = 0; i < me.m_listens.size(); i++)
+		{
+			if( WndTask::showTask( me.m_listens[i]))
+				received = true;
+		}
+
+		if( me.m_message.size())
+		{
+			if( LabelVersion::getStringStatus( me.m_message) != LabelVersion::SS_None )
+				ms_d->announce( me.m_message);
+			else
+				new WndText("Message", me.m_message);
+
+			received = true;
+		}
+	}
+	else if( msg->type() == af::Msg::TTask )
+	{
+		af::MCTask mctask( msg);
+		received = WndTask::showTask( mctask);
+	}
+
+   if( false == received)
    {
-      msg->resetWrittenSize();
-      if( (*rIt)->caseMessage( msg) && (false == recieved)) recieved = true;
-   }
-   if( false == recieved)
-   {
-      AFERROR("Watch::caseMessage: Unknown message recieved:")
-      msg->v_stdOut();
+		printf("Unknown message received: ");
+		msg->v_stdOut();
    }
 }
 
 void Watch::filesReceived( const af::MCTaskUp & i_taskup)
 {
-	for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+	for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
 	{
 		if((*rIt)->v_filesReceived( i_taskup))
 			return;
@@ -222,16 +312,14 @@ void Watch::watchJodTasksWindowRem( int id)
 
 void Watch::connectionLost()
 {
-   for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+   for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionLost();
-   if(ms_m) ms_m->connectionLost();
 }
 
 void Watch::connectionEstablished()
 {
-   for( QLinkedList<Reciever*>::iterator rIt = ms_recievers.begin(); rIt != ms_recievers.end(); ++rIt)
+   for( QLinkedList<Receiver*>::iterator rIt = ms_receivers.begin(); rIt != ms_receivers.end(); ++rIt)
       (*rIt)->v_connectionEstablished();
-   if(ms_m) ms_m->connectionEstablished();
 }
 
 bool Watch::openMonitor( int type, bool open)
@@ -256,7 +344,7 @@ AFINFO("Watch::raiseWindow: trying to raise a window.")
 AFINFA("Watch::raiseWindow: \"%s\" window raised.", name->toUtf8().data())
 }
 
-void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
+void Watch::startProcess( const QString & i_cmd, const QString & i_wdir, const std::map<std::string,std::string> & i_env_map)
 {
 	printf("Starting '%s'", i_cmd.toUtf8().data());
 	if( false == i_wdir.isEmpty()) printf(" in '%s'", i_wdir.toUtf8().data());
@@ -265,35 +353,51 @@ void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
 #ifdef WINNT
 	PROCESS_INFORMATION pinfo;
 
-	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL,
-	    CREATE_NEW_CONSOLE, true);
+	char * env = af::processEnviron( i_env_map);
+	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(), env,
+		NULL, NULL, NULL,
+		CREATE_NEW_CONSOLE, true);
 
 	CloseHandle( pinfo.hThread);
 	CloseHandle( pinfo.hProcess);
 #else
-	af::launchProgram( i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL);
+	char ** env = af::processEnviron( i_env_map);
+	af::launchProgram( i_cmd.toStdString(), i_wdir.toStdString(), env);
 #endif
+
+	if( env )
+		delete [] env;
 }
 
-void Watch::someJobAdded()
+void Watch::ntf_JobAdded( const ItemJob * i_job)
 {
-    displayInfo("Job added.");
-    if( false == afqt::QEnvironment::soundJobAdded.str.isEmpty())
-        QSound::play( afqt::QEnvironment::soundJobAdded.str );
+	displayInfo("Job added.");
+	if( false == afqt::QEnvironment::ntf_job_added_sound.str.isEmpty())
+		QSound::play( afqt::QEnvironment::ntf_job_added_sound.str );
+
+	if( afqt::QEnvironment::ntf_job_added_alert.n )
+		Watch::notify("Job Added", i_job->getName(), i_job->state);
 }
 
-void Watch::someJobDone()
+void Watch::ntf_JobDone( const ItemJob * i_job)
 {
-    displayInfo("Job Done.");
-    if( false == afqt::QEnvironment::soundJobDone.str.isEmpty())
-        QSound::play( afqt::QEnvironment::soundJobDone.str );
+	displayInfo("Job Done.");
+
+	if( false == afqt::QEnvironment::ntf_job_done_sound.str.isEmpty())
+		QSound::play( afqt::QEnvironment::ntf_job_done_sound.str );
+
+	if( afqt::QEnvironment::ntf_job_added_alert.n )
+		Watch::notify("Job Done", i_job->getName(), i_job->state);
 }
 
-void Watch::someJobError()
+void Watch::ntf_JobError( const ItemJob * i_job)
 {
-    displayWarning("Job Error.");
-    if( false == afqt::QEnvironment::soundJobError.str.isEmpty())
-        QSound::play( afqt::QEnvironment::soundJobError.str );
+	displayWarning("Job Error.");
+	if( false == afqt::QEnvironment::ntf_job_error_sound.str.isEmpty())
+		QSound::play( afqt::QEnvironment::ntf_job_error_sound.str );
+
+	if( afqt::QEnvironment::ntf_job_added_alert.n )
+		Watch::notify("Job Error", i_job->getName(), i_job->state);
 }
 
 void Watch::repaintStart()  { if( ms_d) ms_d->repaintStart(100); }
@@ -354,11 +458,16 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
     if( folder == i_image )
         folder = i_wdir;
 
+	Watch::browseFolder( folder, i_wdir);
+}
+
+void Watch::browseFolder( const QString & i_folder, const QString & i_wdir)
+{
     QDir dir( i_wdir);
     if( dir.exists())
-        dir.cd( folder);
+        dir.cd( i_folder);
     else
-        dir.setPath( folder);
+        dir.setPath( i_folder);
 
     if( false == dir.exists())
     {
@@ -372,7 +481,7 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
 #else
 	QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
 #endif
-	cmd += " \"" + folder + "\"";
+	cmd += " \"" + i_folder + "\"";
 	Watch::startProcess( cmd, i_wdir);
 }
 
@@ -389,3 +498,12 @@ void Watch::repaint()
     for( QLinkedList<Wnd*>::iterator wIt = ms_windows.begin(); wIt != ms_windows.end(); wIt++) (*wIt)->update();
 //printf("Watch::repaint: finish\n");
 }
+
+void Watch::notify( const QString & i_title, const QString & i_msg, uint32_t i_state)
+{
+	new Popup( i_title, i_msg, i_state);
+}
+
+void Watch::showDocs() { Watch::startProcess("documentation \"afanasy/gui#watch\""); }
+void Watch::showForum() { Watch::startProcess("forum \"watch\""); }
+

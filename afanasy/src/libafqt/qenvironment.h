@@ -30,9 +30,12 @@ public:
 	static bool save();
 	static void saveWndRects( QByteArray & data);
 	static void saveGUI( QByteArray & data);
+	static void saveHotkeys( QByteArray & data);
 
 	static bool getRect( const QString & i_name, QRect & rect);
 	static void setRect( const QString & i_name, const QRect & rect);
+
+	static AttrNumber level;
 
 	static Attr theme;
 
@@ -53,17 +56,22 @@ public:
 	static AttrNumber star_radiusin;
 	static AttrNumber star_rotate;
 
-	static Attr soundJobAdded;
-	static Attr soundJobDone;
-	static Attr soundJobError;
+	static AttrNumber ntf_job_added_alert;
+	static Attr       ntf_job_added_sound;
+	static AttrNumber ntf_job_done_alert;
+	static Attr       ntf_job_done_sound;
+	static AttrNumber ntf_job_error_alert;
+	static Attr       ntf_job_error_sound;
 
 	static AttrNumber savePrefsOnExit;
 	static AttrNumber saveWndRectsOnExit;
 	static AttrNumber saveGUIOnExit;
+	static AttrNumber saveHotkeysOnExit;
 	static AttrNumber showOfflineNoise;
 
 	static AttrColor clr_Window;
 	static AttrColor clr_WindowText;
+	static AttrColor clr_DisabledText;
 	static AttrColor clr_Base;
 	// static   AttrColor clr_AlternateBase;
 	static AttrColor clr_Text;
@@ -89,15 +97,18 @@ public:
 	static AttrColor clr_itemjobwdep;
 	static AttrColor clr_itemjobdone;
 	static AttrColor clr_itemjoberror;
-	static AttrColor clr_taskskipped;
+	static AttrColor clr_itemjobwarning;
 	static AttrColor clr_taskwarningrun;
-	static AttrColor clr_taskwarningdone;
+	static AttrColor clr_taskskipped;
+	static AttrColor clr_taskwaitreconn;
 	static AttrColor clr_itemrender;
 	static AttrColor clr_itemrenderoff;
 	static AttrColor clr_itemrenderbusy;
 	static AttrColor clr_itemrendernimby;
+	static AttrColor clr_itemrenderpaused;
 	static AttrColor clr_itemrenderpltclr;
 	static AttrColor clr_error;
+	static AttrColor clr_errorready;
 	static AttrColor clr_running;
 	static AttrColor clr_done;
 	static AttrColor clr_outline;
@@ -140,6 +151,9 @@ public:
 
 	static bool loadAttrs( const QString & i_filename );
 
+	static void getHotkey( const QString & i_name, QString & o_str);
+	static void setHotkey( const QString & i_name, const QString & i_str);
+
 private:
    static void solveServerAddress();
 
@@ -158,4 +172,6 @@ private:
 	static QList<Attr*> ms_attrs_prefs;
 	static QList<AttrRect*> ms_attrs_wndrects;
 	static QList<Attr*> ms_attrs_gui;
+	static QMap<QString, Attr*> ms_attrs_hotkeys;
+	static QStringList ms_hotkeys_names;
 };

@@ -1,2 +1,2 @@
 DNxHD 115MBits
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec dnxhd -b 115M @AUXARGS@ -r @FPS@ "@OUTPUT@.mov"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec dnxhd -b 115M -r @FPS@ "@OUTPUT@.mov"

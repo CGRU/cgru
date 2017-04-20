@@ -3,7 +3,7 @@
 #include "af.h"
 #include "../include/afjob.h"
 
-#include "afnode.h"
+#include "afwork.h"
 #include "blockdata.h"
 #include "msg.h"
 #include "regexp.h"
@@ -11,7 +11,7 @@
 namespace af
 {
 /// Job class. Main structure Afanasy was written for.
-class Job : public Node
+class Job : public Work
 {
 public:
 	Job( int i_id = 0);
@@ -31,16 +31,18 @@ public:
 
     void v_generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
-	// NEW VERSION: flags should be 64 bit:
+	// First 32 flags are reserved for af::Node (zombie, hidden, ...)
 	enum JobFlags
 	{
-		FPPApproval = 1<<31
+		FPPApproval   = 1ULL << 32,
+		FMaintenance  = 1ULL << 33,
+		FIgnoreNimby  = 1ULL << 34,
+		FIgnorePaused = 1ULL << 35
 	};
 
-	//inline unsigned getFlags() const { return flags;}
-	inline unsigned getState() const { return m_state;}
+	inline int64_t getSerial() const { return m_serial; }
 
-	inline int getBlocksNum()           const { return m_blocks_num;                 }
+	inline int getBlocksNum()           const { return m_blocks_num;                }
 	inline int getTimeLife()            const { return m_time_life;                 }
 	inline int getUserListOrder()       const { return m_user_list_order;           }
 	inline int getMaxRunningTasks()     const { return m_max_running_tasks;         }
@@ -58,8 +60,12 @@ public:
 	inline const std::string & getDescription()  const { return m_description; }
 	inline const std::string & getCustomData()   const { return m_custom_data; }
 	inline const std::string & getThumbPath()    const { return m_thumb_path;  }
+	inline const std::string & getReport()       const { return m_report;      }
+	inline const std::string & getProject()      const { return m_project;     }
+	inline const std::string & getDepartment()   const { return m_department;  }
 
 	const std::string getFolder() const;
+	inline const std::map<std::string,std::string> & getFolders() const { return m_folders; }
 
 	inline bool isStarted()  const { return m_time_started != 0 ;                } ///< Whether a job is started.
 	inline bool isReady()    const { return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
@@ -71,6 +77,15 @@ public:
 
     inline bool isPPAFlag() const { return ( m_flags & FPPApproval ); }
     inline void setPPAFlag( bool i_ppa = true) { if( i_ppa ) m_flags = m_flags | FPPApproval; else m_flags = m_flags & (~FPPApproval); }
+
+    inline bool isMaintenanceFlag() const { return ( m_flags & FMaintenance ); }
+    inline void setMaintenanceFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FMaintenance; else m_flags = m_flags & (~FMaintenance); }
+
+    inline bool isIgnoreNimbyFlag() const { return ( m_flags & FIgnoreNimby ); }
+    inline void setIgnoreNimbyFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FIgnoreNimby; else m_flags = m_flags & (~FIgnoreNimby); }
+
+    inline bool isIgnorePausedFlag() const { return ( m_flags & FIgnorePaused ); }
+    inline void setIgnorePausedFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FIgnorePaused; else m_flags = m_flags & (~FIgnorePaused); }
 
 	inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_hosts_mask, str, "job hosts mask", errOutput);}
@@ -85,17 +100,17 @@ public:
 	inline bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_need_properties, str, "job need properties mask", errOutput);}
 
-	inline bool hasHostsMask()          const { return m_hosts_mask.notEmpty();          }
-	inline bool hasHostsMaskExclude()   const { return m_hosts_mask_exclude.notEmpty();  }
-	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();         }
-	inline bool hasDependMaskGlobal()   const { return m_depend_mask_global.notEmpty();  }
+	inline bool hasHostsMask()          const { return m_hosts_mask.notEmpty();         }
+	inline bool hasHostsMaskExclude()   const { return m_hosts_mask_exclude.notEmpty(); }
+	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();        }
+	inline bool hasDependMaskGlobal()   const { return m_depend_mask_global.notEmpty(); }
 	inline bool hasNeedOS()             const { return m_need_os.notEmpty();            }
 	inline bool hasNeedProperties()     const { return m_need_properties.notEmpty();    }
 
-	inline const std::string & getHostsMask()          const { return m_hosts_mask.getPattern();          }
-	inline const std::string & getHostsMaskExclude()   const { return m_hosts_mask_exclude.getPattern();  }
-	inline const std::string & getDependMask()         const { return m_depend_mask.getPattern();         }
-	inline const std::string & getDependMaskGlobal()   const { return m_depend_mask_global.getPattern();  }
+	inline const std::string & getHostsMask()          const { return m_hosts_mask.getPattern();         }
+	inline const std::string & getHostsMaskExclude()   const { return m_hosts_mask_exclude.getPattern(); }
+	inline const std::string & getDependMask()         const { return m_depend_mask.getPattern();        }
+	inline const std::string & getDependMaskGlobal()   const { return m_depend_mask_global.getPattern(); }
 	inline const std::string & getNeedOS()             const { return m_need_os.getPattern();            }
 	inline const std::string & getNeedProperties()     const { return m_need_properties.getPattern();    }
 
@@ -106,14 +121,17 @@ public:
 	inline bool checkNeedOS(            const std::string & str ) const { return m_need_os.match( str);           }
 	inline bool checkNeedProperties(    const std::string & str ) const { return m_need_properties.match( str);   }
 
-	inline int getRunningTasksNumber() const /// Get job running tasks.
-		{int n=0;for(int b=0;b<m_blocks_num;b++)n+=m_blocks_data[b]->getRunningTasksNumber();return n;}
+	inline int32_t getRunningTasksNumber() const /// Get job running tasks.
+		{int32_t n=0;for(int b=0;b<m_blocks_num;b++)n+=m_blocks_data[b]->getRunningTasksNumber();return n;}
+
+	inline int64_t getRunningCapacityTotal() const /// Get job running tasks.
+		{int64_t c=0;for(int b=0;b<m_blocks_num;b++)c+=m_blocks_data[b]->getRunningCapacityTotal();return c;}
 
 //	const std::string & getTasksOutputDir() const { return m_tasks_output_dir; }
 
 	/// Get block constant pointer.
 	inline BlockData* getBlock( int n) const { if(n<(m_blocks_num))return m_blocks_data[n];else return NULL;}
-
+	
 	virtual int v_calcWeight() const;                   ///< Calculate and return memory size.
 
 	bool jsonRead( const JSON & i_object, std::string * io_changes = NULL);
@@ -125,11 +143,15 @@ protected:
 	BlockData  ** m_blocks_data;    ///< Blocks pointer.
 	int32_t m_blocks_num;   ///< Number of blocks in job.
 
+	int64_t m_serial;
+
 	int32_t m_user_list_order;   ///< Job order in user jobs list.
 
 	std::string m_description; ///< Job description for statistics purposes only.
 
 	std::map< std::string, std::string > m_folders;
+
+	std::string m_report;
 
 	std::string m_thumb_path;
 	int32_t m_thumb_size;
@@ -164,7 +186,7 @@ protected:
 
 	/// set in JobAf::refresh(): if job was not done, but now is done we set job header time_done
 	int64_t m_time_done;
-
+	
 	/// Job hosts mask ( huntgroup ).
 	RegExp m_hosts_mask;
 	/// Job hosts exclude mask ( huntgroup ).
@@ -175,6 +197,12 @@ protected:
 	RegExp m_depend_mask_global;
 	RegExp m_need_os;
 	RegExp m_need_properties;
+	
+	// Here are coming a couple of metadata just use for display
+	/// Project to which this job is associated
+	std::string m_project;
+	/// Department responsible for this job
+	std::string m_department;
 
 private:
 	void initDefaultValues();

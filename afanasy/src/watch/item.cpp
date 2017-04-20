@@ -7,9 +7,11 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "watch.h"
+
 #include <QtCore/QEvent>
-#include <QtGui/QPainter>
 #include <QtCore/QTimer>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -41,7 +43,7 @@ QSize Item::sizeHint( const QStyleOptionViewItem &option) const
 
 bool Item::calcHeight()
 {
-	return true;
+    return true;
 }
 
 const QColor & Item::clrTextMain( const QStyleOptionViewItem &option) const
@@ -81,42 +83,20 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 	else   return (option.state & QStyle::State_Selected) ? afqt::QEnvironment::clr_textbright.c : afqt::QEnvironment::clr_textmuted.c;
 }
 
-void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option) const
+void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option, const QColor * i_clrItem, const QColor * i_clrBorder) const
 {
 	painter->setOpacity( 1.0);
-	painter->setRenderHint( QPainter::Antialiasing, false);
+	painter->setRenderHint(QPainter::Antialiasing);
+	painter->setRenderHint(QPainter::TextAntialiasing);
 
 	if( option.state & QStyle::State_Selected )
-		painter->fillRect( option.rect, afqt::QEnvironment::clr_selected.c);
-	else
-		painter->fillRect( option.rect, afqt::QEnvironment::clr_item.c);
-}
+		i_clrItem = &afqt::QEnvironment::clr_selected.c;
+	else if( i_clrItem == NULL )
+		i_clrItem = &afqt::QEnvironment::clr_item.c;
 
-void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option, float alpha) const
-{
-	painter->setRenderHint( QPainter::Antialiasing, false);
-
-	int x = option.rect.x();
-	int y = option.rect.y();
-	int w = option.rect.width();
-	int h = option.rect.height();
-
-	painter->setPen( afqt::QEnvironment::qclr_black );
-	painter->setOpacity( 0.7 * alpha);
-
-	painter->drawLine( x, y+h, x+w-1, y+h);
-
-	painter->setOpacity( 0.2 * alpha);
-
-	painter->drawLine( x, y+1, x, y+h-1);
-	painter->drawLine( x+w-1, y+1, x+w-1, y+h-1);
-
-	painter->setPen( afqt::QEnvironment::qclr_white );
-	painter->setOpacity( 0.5 * alpha);
-
-	painter->drawLine( x, y, x+w-1, y);
-
-	painter->setOpacity( 1.0);
+	painter->setPen( i_clrBorder ? (*i_clrBorder) : (afqt::QEnvironment::clr_outline.c));
+	painter->setBrush( *i_clrItem);
+	painter->drawRoundedRect( option.rect, 2, 2);
 }
 
 void Item::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -155,6 +135,9 @@ void Item::printfState( const uint32_t state, int posx, int posy, QPainter * pai
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_SKIPPED_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_SKIPPED_NAME_S); posx+=posx_d;
 
+	painter->setPen( clrTextState( option, state & AFJOB::STATE_WARNING_MASK));
+	painter->drawText( posx, posy, AFJOB::STATE_WARNING_NAME_S); posx+=posx_d;
+
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_WAITDEP_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_WAITDEP_NAME_S); posx+=posx_d;
 
@@ -166,6 +149,58 @@ void Item::printfState( const uint32_t state, int posx, int posy, QPainter * pai
 
 	painter->setPen( clrTextState( option, state & AFJOB::STATE_OFFLINE_MASK));
 	painter->drawText( posx, posy, AFJOB::STATE_OFFLINE_NAME_S); posx+=posx_d;
+}
+
+const QString Item::generateErrorsSolvingInfo( int i_block, int i_task, int i_retries)
+{
+	QString info;
+
+	if( Watch::isPadawan())
+	{
+		if( i_block >= 0 )
+		{
+			info += QString("Avoid:%1").arg( i_block);
+		}
+		if( i_task >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("Task:%1").arg( i_task);
+		}
+		if( i_retries >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("Retries:%1").arg( i_retries);
+		}
+		info = QString(" ErrorsSolving(%1)").arg( info);
+	}
+	else if( Watch::isJedi())
+	{
+		if( i_block >= 0 )
+		{
+			info += QString("%1B").arg( i_block);
+		}
+		if( i_task >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("%1T").arg( i_task);
+		}
+		if( i_retries >= 0 )
+		{
+			if( info.size())
+				info += ",";
+			info += QString("%1R").arg( i_retries);
+		}
+		info = QString(" ErrSlv:%1").arg( info);
+	}
+	else
+	{
+		info = QString(" es:%1b,%2t,%3r").arg( i_block).arg( i_task).arg( i_retries);
+	}
+
+	return info;
 }
 
 void Item::drawPercent

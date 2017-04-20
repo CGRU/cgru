@@ -1,12 +1,17 @@
 #include "itemjobtask.h"
 
 #include "../libafanasy/msgclasses/mctaskup.h"
+#include "../libafanasy/environment.h"
+#include "../libafanasy/service.h"
+#include "../include/afanasy.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "itemjobblock.h"
 #include "listtasks.h"
 #include "watch.h"
+#include "actionid.h"
+#include "monitorhost.h"
 
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
@@ -17,15 +22,18 @@
 
 const int ItemJobTask::WidthInfo = 98;
 
-ItemJobTask::ItemJobTask( ListTasks * i_list, const af::BlockData *pBlock, int numtask):
-	Item( afqt::stoq( pBlock->genTaskName( numtask)), ItemId),
+ItemJobTask::ItemJobTask( ListTasks * i_list, const ItemJobBlock * i_block, int i_numtask, const af::BlockData * i_bdata):
+	Item( afqt::stoq( i_bdata->genTaskName( i_numtask)), ItemId),
 	m_list( i_list),
-	m_blocknum( pBlock->getBlockNum()),
-	m_tasknum( numtask),
-	m_block( pBlock),
+	m_job_id( i_block->job_id),
+	m_blocknum( i_bdata->getBlockNum()),
+	m_tasknum( i_numtask),
+	m_block( i_block),
 	m_thumbs_num( 0),
 	m_thumbs_imgs( NULL)
 {
+	i_bdata->genNumbers( m_frame_last, m_frame_first, m_tasknum, &m_frames_num);
+	m_files = i_bdata->genFiles( m_tasknum);
 }
 
 ItemJobTask::~ItemJobTask()
@@ -60,14 +68,10 @@ const QVariant ItemJobTask::getToolTip() const
 
 const QString ItemJobTask::getSelectString() const
 {
-	return afqt::stoq( m_block->genTaskName( m_tasknum));
+	return m_name;
 }
 
-const std::string & ItemJobTask::getWDir() const { return m_block->getWDir(); }
-
-const std::vector<std::string> ItemJobTask::genFiles() const { return m_block->genFiles( m_tasknum); }
-
-int ItemJobTask::getFramesNum() const { return m_block->getFramePerTask();}
+const std::string & ItemJobTask::getWDir() const { return m_block->workingdir; }
 
 void ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
@@ -84,7 +88,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	int percent       = taskprogress.percent;
 	int frame         = taskprogress.frame;
 	int percentframe  = taskprogress.percentframe;
-	int frames_num    = m_block->getFramePerTask();
+	int frames_num    = m_block->pertask;
 
 	QString leftString = m_name;
 
@@ -108,7 +112,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 		if( frame        <   0 )        frame =   0;
 		if( percentframe <   0 ) percentframe =   0;
 		if( percentframe > 100 ) percentframe = 100;
-		if( m_block->isNumeric())
+		if( m_block->numeric)
 		{
 			if( frames_num > 1)
 				leftString = QString("%1 - f%2/%3-%4%").arg(leftString).arg(frames_num).arg(frame).arg(percentframe);
@@ -134,17 +138,26 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 		drawPercent ( painter, x, y, w - WidthInfo, Height-1,
 			100, percent, 0, 0 , !(taskprogress.state & AFJOB::STATE_DONE_MASK));
 	}
-	else if(( taskprogress.state & AFJOB::STATE_ERROR_MASK || taskprogress.state & AFJOB::STATE_DONE_MASK ))
+//	else if(( taskprogress.state & AFJOB::STATE_ERROR_MASK || taskprogress.state & AFJOB::STATE_DONE_MASK ))
+	else if( taskprogress.state &
+		( AFJOB::STATE_ERROR_MASK
+		| AFJOB::STATE_WAITRECONNECT_MASK
+		| AFJOB::STATE_DONE_MASK
+		| AFJOB::STATE_ERROR_READY_MASK ))
 	{
 		painter->setPen( Qt::NoPen );
 		painter->setBrush( QBrush( afqt::QEnvironment::clr_done.c, Qt::SolidPattern ));
 
 		if( taskprogress.state & AFJOB::STATE_ERROR_MASK )
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+		else if( taskprogress.state & AFJOB::STATE_ERROR_READY_MASK )
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_errorready.c, Qt::SolidPattern ));
 		else if( taskprogress.state & AFJOB::STATE_WARNING_MASK )
-			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwarningdone.c, Qt::SolidPattern ));
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_itemjobwarning.c, Qt::SolidPattern ));
 		else if( taskprogress.state & AFJOB::STATE_SKIPPED_MASK )
 			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskskipped.c, Qt::SolidPattern ));
+		else if( taskprogress.state & AFJOB::STATE_WAITRECONNECT_MASK )
+			painter->setBrush( QBrush( afqt::QEnvironment::clr_taskwaitreconn.c, Qt::SolidPattern ));
 
 		painter->drawRect( x, y, w - WidthInfo, Height-1);
 	}
@@ -167,7 +180,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	text_x -= ItemJobBlock::WErrors;
 
 	// Shift starts counter on a system job task:
-	if( m_block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 10;
+	if( m_job_id == AFJOB::SYSJOB_ID ) text_x -= 10;
 
 	painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
 	if( false == rightString.isEmpty() )
@@ -179,7 +192,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	}
 
 	// Shift starts counter on a system job task:
-	if( m_block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 60;
+	if( m_job_id == AFJOB::SYSJOB_ID ) text_x -= 60;
 
 	painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 
@@ -209,8 +222,6 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 	if( m_thumbs_num )
 		for( int i = 0; i < m_thumbs_num; i++ )	
 			painter->drawImage( x + 110*i, y + ItemJobTask::TaskHeight, * m_thumbs_imgs[i]);
-
-	drawPost( painter, option, .5);
 }
 
 bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) const
@@ -248,17 +259,8 @@ void ItemJobTask::showThumbnail()
 		m_list->itemsHeightChanged();
 		return;
 	}
-
-	std::ostringstream str;
-	str << "{\"get\":{\"type\":\"jobs\",\"mode\":\"files\"";
-	str << ",\"ids\":[" << m_block->getJobId() << "]";
-	str << ",\"block_ids\":[" << m_blocknum << "]";
-	str << ",\"task_ids\":[" << m_tasknum << "]";
-	str << ",\"binary\":true}}";
-
-	af::Msg * msg = af::jsonMsg( str);
-	msg->setReceiving( true);
-	Watch::sendMsg( msg);
+	
+	getTaskInfo("files");
 }
 
 void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
@@ -281,12 +283,30 @@ void ItemJobTask::taskFilesReceived( const af::MCTaskUp & i_taskup )
 		if( false == m_thumbs_imgs[i]->loadFromData( (const unsigned char *) i_taskup.getFileData(i), i_taskup.getFileSize(i)))
 		{
 			AFERRAR("Can't constuct an image '%s'[%d]", i_taskup.getFileName(i).c_str(), i_taskup.getFileSize(i))
+			Watch::displayError("Can't constuct an image.");
 			continue;
 		}
 	}
 
 	if( false == calcHeight())
 		m_list->itemsHeightChanged();
+}
+
+void ItemJobTask::getTaskInfo(const std::string &i_mode, int i_number)
+{
+	std::ostringstream str;
+	str << "{\"get\":{\"type\":\"jobs\"";
+	str << ",\"mode\":\"" << i_mode << "\"";
+	str << ",\"ids\":[" << m_job_id << "]";
+	str << ",\"block_ids\":[" << m_blocknum << "]";
+	str << ",\"task_ids\":[" << m_tasknum << "]";
+	if( i_number != -1 )
+		str << ",\"number\":" << i_number;
+	str << ",\"mon_id\":" << MonitorHost::id();
+	str << ",\"binary\":true}}";
+
+	af::Msg * msg = af::jsonMsg( str);
+	Watch::sendMsg( msg);
 }
 
 void ItemJobTask::thumbsCLear()
@@ -301,3 +321,4 @@ void ItemJobTask::thumbsCLear()
 
 	delete [] m_thumbs_imgs;
 }
+

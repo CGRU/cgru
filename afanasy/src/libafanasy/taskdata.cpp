@@ -55,15 +55,11 @@ void TaskData::jsonWrite( std::ostringstream & o_str) const
 
 void TaskData::v_readwrite( Msg * msg)
 {
-	static bool name_only = false;
-	rw_bool(    name_only,  msg);
-	rw_String(  m_name,       msg);
-	if( name_only) return;
-
+	rw_String( m_name,        msg);
 	rw_String( m_command,     msg);
-	rw_StringVect( m_files,   msg);
 	rw_String( m_depend_mask, msg);
 	rw_String( m_custom_data, msg);
+	rw_StringVect( m_files,   msg);
 }
 
 int TaskData::calcWeight() const

@@ -39,8 +39,8 @@ function d_Make( i_path, i_outfolder)
 	if( match )
 		params.version = match[match.length-1];
 
-	params.input = i_path;
-	params.output = i_outfolder;
+	params.input  = i_path;
+	params.output = c_PathPM_Rules2Client( i_outfolder);
 	params.activity = RULES.dailies.activity;
 
 	d_params.general.artist = {"width":'50%'};
@@ -105,7 +105,7 @@ function d_DailiesWalkReceived( i_data, i_args)
 			var pattern = file.substr( 0, pos);
 			for( var d = 0; d < match.length-1; d++ ) pattern += '#';
 			pattern += file.substr( pos-1 + match.length);
-			params.input += '/' + pattern;
+			params.input = c_PathPM_Rules2Client( params.input + '/' + pattern);
 			break;
 		}
 //window.console.log( match);
@@ -117,8 +117,15 @@ function d_DailiesWalkReceived( i_data, i_args)
 		gui_Create( wnd.elTabs[type], d_params[type], [params, RULES.dailies]);
 
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+
+	RULES.dailies.formats.asis.disabled = true;
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	RULES.dailies.formats.asis.disabled = false;
+
+	RULES.dailies.codecs.copy.disabled = true;
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	RULES.dailies.codecs.copy.disabled = false;
+
 	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	var elBtns = document.createElement('div');
@@ -175,15 +182,15 @@ function d_ProcessGUI( i_wnd)
 		job.depend_mask = params.af_depend_mask;
 
 	job.folders = {};
-	job.folders.input  = cgru_PM('/' + RULES.root + c_PathDir(params.input), true);
-	job.folders.output = cgru_PM('/' + RULES.root + params.output, true);
+	job.folders.input  = c_PathDir( c_PathPM_Client2Server( params.input));
+	job.folders.output = c_PathPM_Client2Server( params.output);
 
 	var block = {};
 	block.name = 'Dailies';
 	block.service = 'movgen';
 	block.parser = 'generic';
 	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
-	block.working_directory = cgru_PM('/' + RULES.root + g_CurPath(), true);
+	block.working_directory = c_PathPM_Rules2Server( g_CurPath());
 	job.blocks = [block];
 
 	var task = {}
@@ -204,12 +211,12 @@ function d_MakeCmd( i_params)
 	for( var parm in i_params )
 		params[parm] = i_params[parm];
 
-	var input = cgru_PM('/' + RULES.root+params.input, true);
-	var output = cgru_PM('/' + RULES.root+params.output + '/' + params.filename, true);
+	var input  = c_PathPM_Client2Server( params.input);
+	var output = c_PathPM_Client2Server( params.output) + '/' + params.filename;
 
 	var cmd = 'python';
 
-	cmd += ' "' + cgru_PM( d_makemovie, true) + '"';
+	cmd += ' "' + c_PathPM_Client2Server( d_makemovie) + '"';
 
 	cmd += ' -a "' + RULES.avcmd + '"';
 	cmd += ' -c "'+params.codec+'"';
@@ -217,6 +224,9 @@ function d_MakeCmd( i_params)
 	cmd += ' -r '+params.format;
 	cmd += ' -s '+params.slate;
 	cmd += ' -t '+params.template;
+
+	if( RULES.dailies.font )
+		cmd += ' --font "' + RULES.dailies.font + '"';
 
 	if( params.container != 'DEFAULT' )
 		cmd += ' -n ' + params.container;
@@ -277,30 +287,28 @@ function d_MakeCmd( i_params)
 
 
 d_cvtguiparams = {};
-d_cvtguiparams.cvtres       = {"label":'Resolution',"info":'WIDTH or WIDTHxHEIGHT ( e.g. 1280x720 ). On empty no changes.',"iwidth":"50%"};
-d_cvtguiparams.fps          = {"label":'FPS'};
-d_cvtguiparams.time_start   = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.duration     = {"default":'00:00:00',"width":'50%'};
-d_cvtguiparams.quality      = {"label":'JPEG Quality','type':'int',"default":100,'width':'50%'};
-d_cvtguiparams.padding      = {"label":'Padding','width':'50%'};
-d_cvtguiparams.af_capacity  = {'label':'Capacity',  'width':'20%','type':'int',};
-d_cvtguiparams.af_maxtasks  = {'label':'Max Tasks', 'width':'15%','lwidth':'80px','type':'int','default':-1};
-d_cvtguiparams.af_perhost   = {'label':'Per Host',  'width':'15%','lwidth':'80px','type':'int','default':1};
-d_cvtguiparams.af_hostsmask = {'label':'Hosts Mask','width':'20%'};
-d_cvtguiparams.af_fpt       = {'label':'FPT',       'width':'15%','lwidth':'50px','type':'int','default':10,'tooltip':'Frames Per Task'};
-d_cvtguiparams.af_paused    = {'label':'Paused',    'width':'15%','lwidth':'50px','type':'bool'};
+d_cvtguiparams.fps          = {"label":'FPS',"width":'33%'};
+d_cvtguiparams.time_start   = {"default":'00:00:00',"width":'33%'};
+d_cvtguiparams.duration     = {"default":'00:00:00',"width":'33%'};
+d_cvtguiparams.quality      = {"label":'JPEG Quality','type':'int',"default":100,'width':'33%'};
+d_cvtguiparams.padding      = {"label":'Padding','width':'33%'};
+d_cvtguiparams.af_capacity  = {'label':'Capacity',  'width':'33%','type':'int'};
+d_cvtguiparams.af_hostsmask = {'label':'Hosts Mask','width':'33%'};
+d_cvtguiparams.af_maxtasks  = {'label':'Max Tasks', 'width':'19%','type':'int','default':-1};
+d_cvtguiparams.af_perhost   = {'label':'Per Host',  'width':'16%','lwidth':'80px','type':'int','default':1};
+d_cvtguiparams.af_fpt       = {'label':'FPT',       'width':'16%','lwidth':'50px','type':'int','default':10,'tooltip':'Frames Per Task'};
+d_cvtguiparams.af_paused    = {'label':'Paused',    'width':'16%','lwidth':'50px','type':'bool'};
 
 d_cvtmulti_params = {};
 d_cvtmulti_params.input        = {"label":'Result Paths'};
-d_cvtmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'50%'};
-d_cvtmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'50%'};
+d_cvtmulti_params.skipexisting = {"label":'Skip Existing','type':"bool",'default':true, "width":'33%'};
+d_cvtmulti_params.skiperrors   = {"label":'Skip Errors',  'type':"bool",'default':false,"width":'33%'};
+d_cvtmulti_params.skipcheck    = {"label":'Skip Check',   'type':"bool",'default':false,"width":'34%'};
 d_cvtmulti_params.dest         = {"label":'Destination'};
 
 function d_Convert( i_args)
 {
 	var params = {};
-//	params.quality = 80;
-//	params.cvtres = '';
 
 	var title = 'Convert ';
 	if( i_args.images ) title += ' Images';
@@ -309,6 +317,7 @@ function d_Convert( i_args)
 	else if( i_args.results) title += ' Results';
 	var wnd = new cgru_Window({"name":'dailes',"title":title});
 	wnd.m_args = i_args;
+	wnd.onDestroy = d_CvtOnDestroy;
 
 	var img_types = {};
 	img_types.jpg = {"name":'JPG'};
@@ -319,18 +328,27 @@ function d_Convert( i_args)
 	if( i_args.movies !== true )
 		img_types.exr = {"name":'EXR'};
 
+	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":'asis',"label":'Formats:',"keys":RULES.dailies.formats});
+
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
+
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
+
 	if( i_args.movies !== true )
+	{
+		RULES.dailies.codecs.copy.disabled = true;
 		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	}
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	RULES.dailies.codecs.copy.disabled = false;
+
 	gui_CreateChoises({"wnd":wnd.elContent,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	if( i_args.results )
 	{
 		if( RULES.put.dest.indexOf('/') !== 0 )
 			if( ASSETS.project )
-				params.dest = cgru_PM('/' + RULES.root + ASSETS.project.path + '/' + RULES.put.dest, true);
+				params.dest = c_PathPM_Rules2Client( ASSETS.project.path + '/' + RULES.put.dest);
 		gui_Create( wnd.elContent, d_cvtmulti_params, [RULES.put,params]);
 	}
 
@@ -382,14 +400,28 @@ function d_Convert( i_args)
 	wnd.m_res_btns_show.push( elExpBtn);
 	if( i_args.results ) elExpBtn.style.display = 'none';
 
+	if( ! i_args.images )
+	{
+		var elWmBtn = document.createElement('div');
+		elBtns.appendChild(elWmBtn);
+		elWmBtn.textContent = 'Add Movie Watermark';
+		elWmBtn.classList.add('button');
+		elWmBtn.style.cssFloat = 'right';
+		elWmBtn.m_wnd = wnd;
+		elWmBtn.onclick = function(e){ d_WmDialog( e.currentTarget.m_wnd)};
+		wnd.elWmBtn = elWmBtn;
+	}
+
 	wnd.m_elResults = document.createElement('div');
 	wnd.elContent.appendChild( wnd.m_elResults);
 	if( i_args.results )
 		wnd.m_elResults.classList.add('output');
 	else
 		wnd.m_elResults.classList.add('source');
+
 	for( var i = 0; i < i_args.paths.length; i++)
 	{
+        i_args.paths[i] = c_PathPM_Rules2Client(i_args.paths[i]);
 		var el = document.createElement('div');
 		wnd.m_elResults.appendChild( el);
 		el.textContent = i_args.paths[i];
@@ -433,7 +465,7 @@ function d_CvtProcessGUI( i_wnd, i_to_sequence)
 	{
 		// Paths are just selected in filesview:
 		for( var i = 0; i < paths.length; i++ )
-			paths[i] = cgru_PM('/' + RULES.root + paths[i], true);
+			paths[i] = c_PathPM_Client2Server( paths[i]);
 	}
 
 	if( paths.length == 0 )
@@ -472,7 +504,7 @@ function d_CvtImages( i_wnd, i_params)
 	cmd += ' -c ' + i_params.colorspace;
 	cmd += ' -q ' + i_params.quality;
 	if( i_params.padding ) cmd += ' --renumpad ' + i_params.padding;
-	if( i_params.cvtres != '' ) cmd += ' -r ' + i_params.cvtres;
+	if( i_params.format && ( i_params.format != 'asis' )) cmd += ' -r ' + i_params.format;
 
 	var afanasy = false;
 	if( i_wnd.m_args.folders || ( paths.length > 1 ))
@@ -488,7 +520,7 @@ function d_CvtImages( i_wnd, i_params)
 		if( i_params.af_paused ) cmd += ' --afpaused';
 
 		if( i_wnd.m_args.results )
-			cmd += ' -o "' + i_wnd.m_result.dest + '"';
+			cmd += ' -o "' + c_PathPM_Client2Server( i_wnd.m_result.dest) + '"';
 	}
 
 	for( var i = 0; i < paths.length; i++)
@@ -567,7 +599,8 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 	job.folders = {};
 	job.folders.input = c_PathDir( paths[0]);
 
-	if( i_params.cvtres.length ) job.name += '-' + i_params.cvtres;
+	if( i_params.format && ( i_params.format != 'asis' ))
+		job.name += '-' + i_params.format;
 
 	if( i_to_sequence )
 		job.name = 'Explode ' + job.name;
@@ -592,7 +625,8 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 
 	var cmd = 'movconvert';
 	cmd += ' -a ' + RULES.avcmd;
-	if( i_params.cvtres.length ) cmd += ' -r ' + i_params.cvtres;
+	if( i_params.format && ( i_params.format != 'asis' ))
+		cmd += ' -r "' + i_params.format + '"';
 	if( i_params.time_start != d_cvtguiparams.time_start.default )
 		cmd += ' -s ' + i_params.time_start;
 	if( i_params.duration != d_cvtguiparams.duration.default )
@@ -623,6 +657,12 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 			block.name += '.' + i_params.container.toUpperCase();
 		}
 		cmd += ' -f ' + i_params.fps;
+
+		if( i_wnd.wm )
+		{
+			cmd += ' -w "' +  i_wnd.wm.file + '"';
+			cmd += ' -u "' +  i_wnd.wm.params.text + '"';
+		}
 	}
 
 	for( var i = 0; i < paths.length; i++)
@@ -641,6 +681,136 @@ function d_CvtMovies( i_wnd, i_params, i_to_sequence )
 
 	i_wnd.destroy();
 //console.log(JSON.stringify(job));
+}
+
+
+function d_CvtOnDestroy( i_wnd)
+{
+	// Destroy watermark window if any:
+	if( i_wnd.wm )
+		d_WmDiscard( i_wnd.wm)
+}
+
+// ######################### Watermark: ####################### //
+
+d_wm_params = {};
+d_wm_params.file = {};
+d_wm_params.text = {'width':'35%'};
+d_wm_params.color = {'width':'30%','default':'rgba(200,200,200,0.20)'};
+d_wm_params.pointsize = {'width':'15%','default':'300'};
+d_wm_params.size = {'width':'20%'};
+
+function d_WmDialog( i_wnd)
+{
+	var wm = {};
+	wm.wnd = i_wnd;
+	i_wnd.wm = wm;
+	i_wnd.elContent.style.display = 'none';
+
+	var file = 'watermark';
+	file += '_' + g_auth_user.id;
+	file += '.png';
+	file = g_CurPath() + '/.rules/' + file;
+
+	d_wm_params.file.default = file;
+
+	d_wm_params.size.default = RULES.dailies.format;
+
+	wm.elBack = document.createElement('div');
+	document.body.appendChild(wm.elBack);
+	wm.elBack.classList.add('watermark_back');
+
+	wm.elControls = document.createElement('div');
+	wm.elBack.appendChild( wm.elControls);
+	wm.elControls.classList.add('watermark_ctrls');
+
+	wm.elParams = document.createElement('div');
+	wm.elControls.appendChild( wm.elParams);
+	gui_Create( wm.elParams, d_wm_params);
+
+	wm.elBtns = document.createElement('div');
+	wm.elBtns.classList.add('watermark_btns')
+	wm.elControls.appendChild( wm.elBtns);
+
+	wm.elCreate = document.createElement('div');
+	wm.elBtns.appendChild( wm.elCreate);
+	wm.elCreate.classList.add('button');
+	wm.elCreate.textContent = 'Create & Show';
+	wm.elCreate.wm = wm;
+	wm.elCreate.onclick = function(e){ d_WmCreate( e.currentTarget.wm)};
+
+	wm.elEnable = document.createElement('div');
+	wm.elBtns.appendChild( wm.elEnable);
+	wm.elEnable.classList.add('button');
+	wm.elEnable.textContent = 'Enable & Exit';
+	wm.elEnable.wm = wm;
+	wm.elEnable.onclick = function(e){ d_WmEnable( e.currentTarget.wm)};
+	wm.elEnable.style.display = 'none';
+
+	wm.elDiscard = document.createElement('div');
+	wm.elBtns.appendChild( wm.elDiscard);
+	wm.elDiscard.classList.add('button');
+	wm.elDiscard.textContent = 'Discard Watermark';
+	wm.elDiscard.wm = wm;
+	wm.elDiscard.onclick = function(e){ d_WmDiscard( e.currentTarget.wm)};
+}
+
+function d_WmCreate( i_wm)
+{
+	var params = gui_GetParams( i_wm.elParams, d_wm_params);
+	i_wm.params = params;
+
+	if( params.text.length == 0 )
+		return;
+
+	i_wm.file = c_PathPM_Rules2Server( params.file);
+
+	var cmd = 'bin/convert';
+	cmd += ' -size "' + params.size + '"';
+	cmd += ' xc:none';
+	cmd += ' -gravity "center"';
+	cmd += ' -fill "' + params.color + '"';
+	cmd += ' -pointsize ' + params.pointsize;
+	cmd += ' -annotate 0';
+	cmd += ' "' + params.text + '"';
+	cmd += ' "' + i_wm.file + '"';
+
+	var folder = c_PathDir(i_wm.file);
+
+	n_Request({"send":{"makefolder":{"path":folder},"cmdexec":{"cmds":[cmd]}},"func":d_WmCreateFinished,"wm":i_wm,"info":'watermark'});
+//	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_WmCreateFinished,"wm":i_wm,"info":'watermark'});
+}
+
+function d_WmCreateFinished( i_data, i_args)
+{
+	var wm = i_args.wm;
+
+	if( wm.elImg )
+		wm.elBack.removeChild( wm.elImg);
+
+	wm.elImg = document.createElement('img');
+	wm.elBack.appendChild( wm.elImg);
+	wm.elImg.src = RULES.root + wm.params.file + '#' + (new Date().getTime());
+
+	wm.elEnable.style.display = 'block';
+}
+
+function d_WmEnable( i_wm)
+{
+	d_WmDiscard( i_wm);
+
+	i_wm.wnd.wm = i_wm;
+
+	i_wm.wnd.elWmBtn.classList.add('watermark_enabled');
+}
+
+function d_WmDiscard( i_wm)
+{
+	i_wm.wnd.wm = null;
+	i_wm.wnd.elContent.style.display = 'block';
+	i_wm.wnd.elWmBtn.classList.remove('watermark_enabled');
+
+	document.body.removeChild( i_wm.elBack);
 }
 
 //##############################################################################
@@ -666,7 +836,7 @@ function d_MakeCut( i_args)
 
 	var params = {};
 	params.cut_name = i_args.cut_name;
-	params.output = i_args.output;
+	params.output = c_PathPM_Rules2Client( i_args.output);
 	params.input = RULES.assets.shot.result.path.join(',');
 	if( RULES.cut.input ) params.input = RULES.cut.input;
 
@@ -738,17 +908,20 @@ function d_CutProcessGUI( i_wnd, i_test)
 	cmd += ' -c "' + params.codec + '"';
 	cmd += ' --colorspace "' + params.colorspace + '"';
 
+	if( RULES.dailies.font )
+		cmd += ' --font "' + RULES.dailies.font + '"';
+
 	cmd += ' --afcapacity ' + parseInt( params.af_capacity);
 	cmd += ' --afmaxtasks ' + parseInt( params.af_maxtasks);
 	cmd += ' --afperhost ' + parseInt( params.af_perhost);
 	cmd += ' --afpertask ' + parseInt( params.af_pertask);
 	cmd += ' --afmaxruntime ' + parseInt( params.af_maxruntime);
 
-	cmd += ' -o "' + cgru_PM('/' + RULES.root + params.output, true) + '"';
+	cmd += ' -o "' + c_PathPM_Client2Server( params.output) + '"';
 	if( i_test ) cmd += ' -t';
 
 	for( var i = 0; i < shots.length; i++)
-		cmd += ' "' + cgru_PM('/' + RULES.root + shots[i], true) + '"'
+		cmd += ' "' + c_PathPM_Rules2Server( shots[i]) + '"'
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":d_CutFinished,"wnd":i_wnd});
 }
@@ -791,4 +964,5 @@ function d_CutFinished( i_data, i_args)
 
 //	i_wnd.destroy();
 }
+
 

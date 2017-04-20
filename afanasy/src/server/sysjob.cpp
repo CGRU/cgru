@@ -72,7 +72,7 @@ std::string const SysTask::v_getInfo(bool full) const
 
 void SysTask::v_monitor( MonitorContainer * monitoring) const {}
 void SysTask::v_store() {}
-void SysTask::v_writeTaskOutput( const af::MCTaskUp& taskup) const {}
+void SysTask::v_writeTaskOutput( const char * i_data, int i_size) const {}
 
 void SysTask::v_appendLog( const std::string & message)
 {
@@ -88,16 +88,16 @@ void SysTask::appendSysJobLog( const std::string & message)
 	    + m_syscmd->command);
 }
 
-void SysTask::v_start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
+void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
 {
-	taskexec->setName(         m_syscmd->task_name        );
-	taskexec->setCommand(      m_syscmd->command          );
-	taskexec->setUserName(     m_syscmd->user_name        );
-	taskexec->setJobName(      m_syscmd->job_name         );
-	taskexec->setWDir(         m_syscmd->working_directory);
-	taskexec->setTaskNumber(   getNumber()                );
+	i_taskexec->setName(         m_syscmd->task_name        );
+	i_taskexec->setCommand(      m_syscmd->command          );
+	i_taskexec->setUserName(     m_syscmd->user_name        );
+	i_taskexec->setJobName(      m_syscmd->job_name         );
+	i_taskexec->setWDir(         m_syscmd->working_directory);
+	i_taskexec->setTaskNumber(   getNumber()                );
 
-	Task::v_start( taskexec, runningtaskscounter, render, monitoring);
+	Task::v_start( i_taskexec, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
 }
 
 void SysTask::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
@@ -232,7 +232,7 @@ bool SysBlock::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorC
 		return false;
 	}
 
-	systask->v_start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
+	systask->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
 
 	m_taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
 	m_taskprogress->starts_count++;
@@ -471,7 +471,7 @@ SysJob::SysJob( const std::string & i_folder):
 	JobAf( i_folder, true)
 {
 AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
-	m_id == AFJOB::SYSJOB_ID;
+	m_id = AFJOB::SYSJOB_ID;
 	ms_sysjob = this;
 
 	if( isFromStore())
@@ -561,13 +561,13 @@ bool SysJob::v_canRun()
 	return JobAf::v_canRun();
 }
 
-bool SysJob::v_solve( RenderAf *render, MonitorContainer * monitoring)
+RenderAf * SysJob::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring)
 {
 //printf("SysJob::solve():\n");
 	if( isReady())
-		return JobAf::v_solve( render, monitoring);
+		return JobAf::v_solve( i_renders_list, monitoring);
 
-	return false;
+	return NULL;
 }
 
 void SysJob::v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)
@@ -589,33 +589,9 @@ void SysJob::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 //AFINFO("SysJob::refresh:");
 	JobAf::v_refresh( currentTime, pointer, monitoring);
 }
-
-void SysJob::v_restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
-{
-//printf("SysJob::restartTasks:\n");
-	for( int p = 0; p < taskspos.getCount(); p++)
-	{
-		int b = taskspos.getNumBlock(p);
-		if( b >= m_blocks_num)
-		{
-			AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, m_blocks_num)
-			continue;
-		}
-		((SysBlock*)(m_blocks[b]))->clearCommands();
-	}
-	JobAf::v_restartTasks( taskspos, renders, monitoring);
-}
-
-const std::string SysJob::v_getErrorHostsListString( int b, int t) const
-{
-	return "This is an empty dummy task in s system job block.\nGet job error hosts list to see its tasks error hosts.";
-}
-
-af::Msg * SysJob::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
-	std::string & o_filename, std::string & o_error) const
+void SysJob::v_getTaskOutput( af::MCTask & io_mctask, std::string & o_error) const
 {
 	o_error = "This is an empty dummy task in a system job block.\nError tasks output are stored in this task log.";
-	return NULL;
 }
 
 void SysJob::appendJobLog( const std::string & message)

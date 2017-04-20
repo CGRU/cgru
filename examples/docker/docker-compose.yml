@@ -1,0 +1,46 @@
+version: '2'
+
+services:
+ afserver:
+  image: cgru/afserver
+  ports:
+   - "51000:51000"
+  # volumes:
+  #  - /Users/abuisine/Documents/cgru:/opt/cgru
+
+
+ afrender:
+  image: cgru/afrender
+  environment:
+   AF_SERVERNAME: "afserver"
+  links:
+   - afserver
+  volumes:
+   - datavolume:/data
+   # - /Users/abuisine/Documents/cgru:/opt/cgru
+
+ db:
+  image: postgres:9.5
+  environment:
+   POSTGRES_USER: afadmin
+   POSTGRES_PASSWORD: AfPassword
+   POSTGRES_DB: afanasy
+
+ afstatistics:
+  image: cgru/afstatistics
+  ports:
+   - "80:80"
+
+ # Uncomment the following to have a phppgadmin to look at the database
+
+ # phppgadmin:
+ #  image: zhajor/docker-phppgadmin
+ #  ports:
+ #   - "8080:80"
+ #  environment:
+ #   DB_HOST: db
+ #   DB_PORT: 5432
+ 
+volumes:
+ datavolume:
+  driver: 'local'

@@ -1,2 +1,2 @@
 PhotoJPG (mid)
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" -vcodec mjpeg -pix_fmt yuv420p -qmin 2 -qmax 4 @AUXARGS@ -r @FPS@ "@OUTPUT@.@CONTAINER@"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec mjpeg -pix_fmt yuv420p -qmin 2 -qmax 4 -r @FPS@ "@OUTPUT@.@CONTAINER@"

@@ -28,16 +28,16 @@ const int Msg::SizeDataMax       = Msg::SizeBufferLimit - Msg::SizeHeader;
 
 //
 //########################## Message constructors: (and destructor) ###########################
-Msg::Msg( int msgType, int msgInt, bool i_receiving)
+Msg::Msg( int msgType, int msgInt)
 {
 	construct();
-	set( msgType, msgInt, i_receiving);
+	set( msgType, msgInt);
 }
 
-Msg::Msg( int msgType, Af * afClass, bool i_receiving )
+Msg::Msg( int msgType, Af * afClass)
 {
 	construct();
-	set( msgType, afClass, i_receiving);
+	set( msgType, afClass);
 }
 
 Msg::Msg( const struct sockaddr_storage * ss):
@@ -47,8 +47,7 @@ Msg::Msg( const struct sockaddr_storage * ss):
 	set( TNULL);
 }
 
-Msg::Msg( const char * rawData, int rawDataLen, bool i_receiving):
-	m_receive( i_receiving),
+Msg::Msg( const char * rawData, int rawDataLen):
 	m_buffer( NULL),
 	// This message not for write any more data. All data will be written in this constuctor.
 	// We will only read node parameters to constuct af::Af based classes.
@@ -86,9 +85,6 @@ void Msg::construct()
 
 	m_header_offset = 0;
 
-	m_receive = false;
-	m_sendfailed = false;
-
 	m_writing = false;
 	m_writtensize = 0;
 
@@ -99,15 +95,17 @@ void Msg::construct()
 bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 {
 	if( m_type == Msg::TInvalid) return false;
-	if( i_size > Msg::SizeBufferLimit)
+
+    if( i_size < 0 || i_size > Msg::SizeBufferLimit)
 	{
 		AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)", i_size, Msg::SizeBufferLimit)
 		setInvalid();
 		return false;
 	}
+
 	char * old_buffer = m_buffer;
 	m_buffer_size = i_size;
-AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", i_size, written, old_buffer)
+	AFINFA("Msg::allocateBuffer(%s): trying %d bytes ( %d written at %p)", TNAMES[m_type], i_size, m_writtensize, old_buffer)
 	m_buffer = new char[m_buffer_size];
 	if( m_buffer == NULL )
 	{
@@ -115,7 +113,7 @@ AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", i_size, writt
 		setInvalid();
 		return false;
 	}
-AFINFA("Msg::allocateBuffer: new buffer at %p", m_buffer)
+
 	m_data         = m_buffer      + Msg::SizeHeader;
 	m_data_maxsize = m_buffer_size - Msg::SizeHeader;
 
@@ -160,9 +158,8 @@ bool Msg::checkZero( bool outerror )
 	return true;
 }
 
-bool Msg::set( int msgType, int msgInt, bool i_receiving)
+bool Msg::set( int msgType, int msgInt)
 {
-	m_receive = i_receiving;
 	if( msgType >= Msg::TDATA)
 	{
 		AFERROR("Msg::set: Trying to set data message with no data.")
@@ -204,6 +201,19 @@ bool Msg::setData( int i_size, const char * i_msgData, int i_type)
 	return true;
 }
 
+void Msg::setJSONBIN()
+{
+	if( m_type != TJSON )
+	{
+		AFERROR("Can't set JSON to binary, as message is not JSON:");
+		v_stdOut();
+		return;
+	}
+	m_type = TJSONBIN;
+	m_header_offset = 0;
+	rw_header( true);
+}
+/*
 bool Msg::setJSON_headerBin( const std::string & i_str)
 {
 	bool result = setData( i_str.size(), i_str.c_str(), TJSON);
@@ -213,12 +223,11 @@ bool Msg::setJSON_headerBin( const std::string & i_str)
 
 	return result;
 }
-
-bool Msg::set( int msgType, Af * afClass, bool i_receiving)
+*/
+bool Msg::set( int msgType, Af * afClass)
 {
 	if(checkZero( true) == false ) return false;
 
-	m_receive = i_receiving;
 	m_type = msgType;
 	if( m_type < TDATA)
 	{
@@ -254,6 +263,18 @@ bool Msg::setString( const std::string & str)
 	return true;
 }
 
+bool Msg::setInfo( const std::string & i_kind, const std::string & i_text)
+{
+	if(checkZero( true) == false ) return false;
+	m_type = TInfo;
+	m_writing = true;
+	w_String( i_kind, this);
+	w_String( i_text, this);
+	m_int32 = m_writtensize;
+	rw_header( true);
+	return true;
+}
+
 bool Msg::setStringList( const std::list<std::string> & stringlist)
 {
 	if(checkZero( true) == false ) return false;
@@ -282,6 +303,19 @@ const std::string Msg::getString()
 	std::string str;
 	getString( str);
 	return str;
+}
+bool Msg::getInfo( std::string & o_kind, std::string & o_text)
+{
+	if( m_type != TInfo)
+	{
+		AFERROR("Msg::getInfo: type is not TInfo.")
+		return false;
+	}
+	rw_String( o_kind, this);
+	rw_String( o_text, this);
+	// Reset written size to let to get string again.
+	resetWrittenSize();
+	return true;
 }
 
 bool Msg::getStringList( std::list<std::string> & stringlist)
@@ -426,7 +460,9 @@ void Msg::stdOutData( bool withHeader)
 	switch( m_type)
 	{
 	case Msg::TDATA:
+	case Msg::THTTP:
 	case Msg::TJSON:
+	case Msg::TJSONBIN:
 	{
 		if( m_data[0] == '/')
 			break;
@@ -476,59 +512,18 @@ const char * Msg::TNAMES[]=
 	/// Request messages, sizes, quantities statistics.
 	"TStatRequest",
 
-	"DEPRECATED_TConfigLoad",                ///< Reload config file
-	"DEPRECATED_TFarmLoad",                  ///< Reload farm file
-
-
-	"TClientExitRequest",         ///< Request to client to exit,
-	"TClientRestartRequest",      ///< Restart client application,
-	"TClientWOLSleepRequest",     ///< Request to client to fall a sleep,
-	"TClientRebootRequest",       ///< Reboot client host computer,
-	"TClientShutdownRequest",     ///< Shutdown client host computer,
-
-	/*- Talk messages -*/
-	"DEPRECATED_TTalkId",                    ///< Id for new Talk. Server sends it back when new Talk registered.
-	"DEPRECATED_TTalkUpdateId",              ///< Update Talk with given id ( No information for updating Talk needed).
-	"DEPRECATED_TTalksListRequest",          ///< Request online Talks list.
-	"DEPRECATED_TTalkDeregister",            ///< Deregister talk with given id.
-
-
 	/*- Monitor messages -*/
 	"TMonitorId",                 ///< Id for new Monitor. Server sends it back when new Talk registered.
 	"TMonitorUpdateId",           ///< Update Monitor with given id ( No information for updating Monitor needed).
-	"TMonitorsListRequest",       ///< Request online Monitors list.
 	"TMonitorDeregister",         ///< Deregister monitor with given id.
-	"TMonitorLogRequestId",       ///< Request a log of a Monitor with given id.
 
 	/*- Render messages -*/
 	/** When Server successfully registered new Render it's send back it's id.**/
 	"TRenderId",
-	"TRendersListRequest",        ///< Request online Renders list message.
-	"TRenderLogRequestId",        ///< Request a log of Render with given id.
-	"TRenderTasksLogRequestId",   ///< Request a log of Render with given id.
-	"TRenderInfoRequestId",       ///< Request a string information about a Render with given id.
 	"TRenderDeregister",          ///< Deregister Render with given id.
 
-
-	/*- Users messages -*/
-	"TUsersListRequest",          ///< Active users information.
-	/// Uset id. Afanasy sends it back as an answer on \c TUserIdRequest , which contains user name.
-	"TUserId",
-	"TUserLogRequestId",          ///< Request a log of User with given id.
-	"TUserJobsOrderRequestId",    ///< Request User(id) jobs ids in server list order.
-
-
 	/*- Job messages -*/
-	"TJobsListRequest",           ///< Request brief of jobs.
-	"TJobsListRequestUserId",     ///< Request brief of jobs of user with given id.
-	"TJobLogRequestId",           ///< Request a log of a job with given id.
-	"TJobErrorHostsRequestId",    ///< Request a list of hosts produced tasks with errors.
 	"TJobsWeightRequest",         ///< Request all jobs weight.
-
-	/// Request a job with given id. The answer is TJob. If there is no job with such id the answer is TJobRequestId.
-	"TJobRequestId",
-	/// Request a job progress with given id. The answer is TJobProgress. If there is no job with such id the answer is TJobProgressRequestId.
-	"TJobProgressRequestId",
 
 
 	"TRESERVED00",
@@ -549,109 +544,49 @@ const char * Msg::TNAMES[]=
 
 	"TDATA",                      ///< Some data.
 	"TTESTDATA",                  ///< Test some data transfer.
-	"TJSON",                      ///< JSON
+	"TJSON",                      ///< JSON with text header
+	"TJSONBIN",                   ///< JSON with binary header
 	"THTTP",                      ///< HTTP - with JSON POST data
 	"THTTPGET",                   ///< HTTP Get request.
 	"TString",                    ///< QString text message.
 	"TStringList",                ///< QStringList text message.
+	"TInfo",                      ///< Some info string for GUI to show.
 
 	"TStatData",                  ///< Statistics data.
 
-	/*- Client messages -*/
-
-	/*- Talk messages -*/
-	/// Register Talk. Send by Talk client to register. Server sends back its id \c TTalkId.
-	"DEPRECATED_TTalkRegister",
-	"DEPRECATED_TTalksListRequestIds",       ///< Request a list of Talks with given ids.
-	"DEPRECATED_TTalksList",                 ///< Message with a list of online Talks.
-	"DEPRECATED_TTalkDistributeData",        ///< Message with a list Talk's users and a text to send to them.
-	"DEPRECATED_TTalkData",                  ///< Message to Talk with text.
-
-
 	/*- Monitor messages -*/
-	/// Register Monitor. Send by Monitor client to register. Server sends back its id \c TMonitorId.
-	"TMonitorRegister",
-	"TMonitorsListRequestIds",    ///< Request a list of Monitors with given ids.
+	"TMonitor",                   ///< Server sends it for a new registered monitor.
 	"TMonitorsList",              ///< Message with a list of online Monitors.
-	"TMonitorSubscribe",          ///< Subscribe monitor on some events.
-	"TMonitorUnsubscribe",        ///< Unsubscribe monitor from some events.
-	"TMonitorUsersJobs",          ///< Set users ids to monitor their jobs.
-	"TMonitorJobsIdsAdd",         ///< Add jobs ids for monitoring.
-	"TMonitorJobsIdsSet",         ///< Set jobs ids for monitoring.
-	"TMonitorJobsIdsDel",         ///< Delete monitoring jobs ids.
-	"TMonitorMessage",            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
-
-	"TMonitorEvents_BEGIN",       ///< Events types start.
-
-	"TMonitorJobEvents_BEGIN",    ///< Job events types start.
-	"TMonitorJobsAdd",            ///< IDs of new jobs.
-	"TMonitorJobsChanged",        ///< IDs of changed jobs.
-	"TMonitorJobsDel",            ///< IDs of deleted jobs.
-	"TMonitorJobEvents_END",      ///< Job events types end.
-
-	"TMonitorCommonEvents_BEGIN", ///< Common events types start.
-	"TMonitorUsersAdd",           ///< IDs of new users.
-	"TMonitorUsersChanged",       ///< IDs of changed users.
-	"TMonitorUsersDel",           ///< IDs of deleted users.
-	"TMonitorRendersAdd",         ///< IDs of new renders.
-	"TMonitorRendersChanged",     ///< IDs of changed renders.
-	"TMonitorRendersDel",         ///< IDs of deleted renders.
-	"TMonitorMonitorsAdd",        ///< IDs of new monitors.
-	"TMonitorMonitorsChanged",    ///< IDs of changed monitors.
-	"TMonitorMonitorsDel",        ///< IDs of deleted monitors.
-	"TMonitorTalksAdd",           ///< IDs of new talks.
-	"TMonitorTalksDel",           ///< IDs of deleted talks.
-	"TMonitorCommonEvents_END",   ///< Common events types end.
-
-	"TMonitorEvents_END",         ///< Events types end.
-
+	"TMonitorEvents",             ///< Events.
 
 	/*- Render messages -*/
 	/** Sent by Render on start, when it's server begin to listen post.
 	And when Render can't connect to Afanasy. Afanasy register new Render and send back it's id \c TRenderId. **/
 	"TRenderRegister",
 	"TRenderUpdate",              ///< Update Render, message contains its resources.
-	"TRendersListRequestIds",     ///< Request a list of Renders with given ids.
+	"TRenderEvents",              ///< Server answer on render update, it contains what to do.
 	"TRendersResourcesRequestIds",///< Request a list of resources of Renders with given ids.
 	"TRendersList",               ///< Message with a list of Renders.
 	"TRendersResources",          ///< Message with a list of resources of Renders.
-	"TRenderStopTask",            ///< Signal from Afanasy to Render to stop task.
-	"TRenderCloseTask",           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
-
 
 	/*- Users messages -*/
-	"TUsersListRequestIds",       ///< Request a list of Users with given ids.
 	"TUsersList",                 ///< Active users information.
-	"DEPRECATED_TUserAdd",                   ///< Add a permatent user.
-	"TUserIdRequest",             ///< Request an id of user with given name.
 	"TUserJobsOrder",             ///< Jobs ids in server list order.
 
-
 	/*- Job messages -*/
-	"DEPRECATED_TJobRegister",               ///< Register job.
-	"TJobsListRequestIds",        ///< Request a list of Jobs with given ids.
-	"TJobsListRequestUsersIds",   ///< Request brief of jobs od users with given ids.
 	"TJobsList",                  ///< Jobs list information.
 	"TJobProgress",               ///< Jobs progress.
 	"TJobsWeight",                ///< All jobs weight data.
-	"TJob",                       ///< Job (all job data).
+	"TJob",                       ///< Job (job full data, with blocks and tasks full data).
 
 	"TBlocksProgress",            ///< Blocks running progress data.
 	"TBlocksProperties",          ///< Blocks progress and properties data.
 	"TBlocks",                    ///< Blocks data.
 
 	"TTask",                      ///< A task of some job.
-	"TTaskRequest",               ///< Get task information.
-	"TTaskLogRequest",            ///< Get task information log.
-	"TTaskErrorHostsRequest",     ///< Get task error hosts list.
-	"TTaskOutputRequest",         ///< Job task output request.
-	"TTaskUpdatePercent",         ///< New progress percentage for task.
-	"TTaskUpdateState",           ///< New state for task.
-	"TTaskListenOutput",          ///< Request to send task output to provided address.
 	"TTaskFiles",                 ///< Task (or entire job) files
-	"TTasksRun",                  ///< Job tasks run data.
 
-	"TTaskOutput",                ///< Job task output data (for task listening: from afrender directly to afwatch).
+	"TRESERVED10",
 	"TRESERVED11",
 	"TRESERVED12",
 	"TRESERVED13",

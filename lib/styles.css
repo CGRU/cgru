@@ -151,7 +151,12 @@ top: 0; left: 0;
 
 .cgru_error_back { background: #F77;}
 
-.cmdexec {
+
+.cgru_cmdexec {
+opacity: 0.8;
+padding: 3px 8px;
+border-radius: 2px;
+
 background: #DD8;
 /*box-shadow: 0px 0px 3px #000 inset;*/
 border: 1px solid rgba(0,0,0,.5);
@@ -159,5 +164,32 @@ padding: 4px 8px;
 font-weight: bold;
 color: #000000;
 cursor: pointer;
+-moz-user-select: none;
+-webkit-user-select: none;
 }
-.cmdexec:hover { border: 1px solid rgba(255,255,0,1); }
+.cgru_cmdexec.open {
+padding: 0px 0px;
+width: 30px; height: 20px;
+background-image: url(icons/open.png);
+background-size: 60%;
+background-repeat: no-repeat;
+background-position: center;
+}
+.cgru_menu_item.cgru_cmdexec {
+border: 1px solid #555;
+}
+.cgru_cmdexec:hover {
+border: 1px solid rgba(255,255,0,1);
+}
+.cgru_cmdexec.clicked {
+background-color: #0F0;
+}
+.cgru_cmdexec.error {
+background-color: #F00;
+}
+.cgru_cmdexec.timeout {
+-o-transition: background-color 1s ease-out;
+-moz-transition: background-color 1s ease-out;
+-webkit-transition: background-color 1s ease-out;
+}
+

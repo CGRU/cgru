@@ -8,7 +8,7 @@ store = ['FindPostgreSQL.cmake', '.gitignore', '.svn', 'build.sh',
 		 'clear.cmd', 'CMakeLists.txt', 'win_build_msvc_pyaf.cmd',
 		 'win_build_msvc.cmd']
 projects = ['libafanasy', 'libafqt', 'libafsql', 'cmd', 'server', 'render',
-			'watch']
+			'watch', 'fermer', 'qml']
 
 DEBUG = True
 DEBUG = False

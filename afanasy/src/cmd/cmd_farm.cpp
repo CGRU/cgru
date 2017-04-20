@@ -17,7 +17,7 @@ CmdFarm::~CmdFarm(){}
 bool CmdFarm::v_processArguments( int argc, char** argv, af::Msg &msg)
 {
 	std::string filename( argv[0]);
-	af::loadFarm( filename,  true);
+	af::loadFarm( filename, af::VerboseOn);
 	return true;
 }
 
@@ -27,7 +27,6 @@ CmdFarmLoad::CmdFarmLoad()
 	setInfo("Request server to reload farm file.");
 	setHelp("fload Request server to reload farm information.");
 	setMsgType( af::Msg::TJSON);
-	setRecieving();
 }
 CmdFarmLoad::~CmdFarmLoad(){}
 bool CmdFarmLoad::v_processArguments( int argc, char** argv, af::Msg &msg)
@@ -75,7 +74,7 @@ bool CmdFarmCheck::check( const std::string & hostname)
 {
 	if( hostname.empty() ) return false;
 	std::string name, description;
-	if( af::farm()->getHost( hostname, host, name, description))
+	if( af::farm()->getHost( hostname, host, name, description, /*verbose =*/ true))
 	{
 		std::cout << "\"" << name << " - " << description;
 		std::cout << std::endl;

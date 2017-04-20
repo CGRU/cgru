@@ -2,33 +2,38 @@
 
 #include "../libafanasy/common/dlScopeLocker.h"
 
-#include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/monitorevents.h"
 
 #include "action.h"
 #include "afcommon.h"
+#include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 MonitorContainer * MonitorAf::m_monitors = NULL;
 
-MonitorAf::MonitorAf( af::Msg * msg):
+MonitorAf::MonitorAf( af::Msg * msg, UserContainer * i_users):
 	af::Monitor( msg),
 	AfNodeSrv( this)
 {
+	UserAf * user = i_users->getUser( m_user_name);
+	if( user )
+	{
+		m_uid = user->getId();
+		user->updateTimeActivity();
+	}
 }
 
 MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 	AfNodeSrv( this),
 	af::Monitor( i_obj)
 {
-	m_event_nodeids.resize( af::Monitor::EventsCount);
-
 	UserAf * user = i_users->getUser( m_user_name);
 	if( user )
 	{
@@ -45,7 +50,7 @@ void MonitorAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorCon
 {
 	if( getTimeUpdate() < (currentTime - af::Environment::getMonitorZombieTime()))
 	{
-		if( monitoring) monitoring->addEvent( af::Msg::TMonitorMonitorsDel, m_id);
+		if( monitoring) monitoring->addEvent( af::Monitor::EVT_monitors_del, m_id);
 		{
 			AFCommon::QueueLog("Monitor zombie: " + v_generateInfoString( false));
 			setZombie();
@@ -57,7 +62,7 @@ void MonitorAf::deregister()
 {
 	AFCommon::QueueLog("Monitor deregister: " + v_generateInfoString( false));
 	setZombie();
-	m_monitors->addEvent( af::Msg::TMonitorMonitorsDel, getId());
+	m_monitors->addEvent( af::Monitor::EVT_monitors_del, getId());
 }
 
 void MonitorAf::v_action( Action & i_action)
@@ -69,16 +74,14 @@ void MonitorAf::v_action( Action & i_action)
 		af::jr_string("type", optype, operation);
 		if( optype == "exit")
 		{
-			af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
-			msg->setAddress( this);
-			ms_msg_queue->pushMsg( msg);
+			m_e.m_instruction = "exit";
 			return;
 		}
-		if( optype == "deregister")
+		else if( optype == "deregister")
 		{
 			deregister();
 		}
-		if( optype == "watch")
+		else if( optype == "watch")
 		{
 			std::string opclass, opstatus;
 			af::jr_string("class", opclass, operation);
@@ -89,19 +92,18 @@ void MonitorAf::v_action( Action & i_action)
 			if( opstatus == "subscribe")
 				subscribe = true;
 
-			if( opclass == "jobs")
+			if( opclass == "perm")
 			{
-				eids.push_back( af::Msg::TMonitorJobsAdd);
-				eids.push_back( af::Msg::TMonitorJobsChanged);
-				eids.push_back( af::Msg::TMonitorJobsDel);
-				af::jr_int32vec("uids", uids, operation);
-				if( uids.size())
-				{
-					// Set ids of user(s) whos jobs we are interested in
-					// Zero id means super user - interested in all jobs
-					setJobsUsersIds( uids);
-					appendLog("User ids set to: '" + af::vectToStr( uids) + "'");
-				}
+				int32_t new_uid = -1;
+				af::jr_int32("uid", new_uid, operation);
+				if( new_uid >= 0 )
+					m_uid = new_uid;
+			}
+			else if( opclass == "jobs")
+			{
+				eids.push_back( af::Monitor::EVT_jobs_add);
+				eids.push_back( af::Monitor::EVT_jobs_change);
+				eids.push_back( af::Monitor::EVT_jobs_del);
 			}
 			else if( opclass == "tasks")
 			{
@@ -114,21 +116,37 @@ void MonitorAf::v_action( Action & i_action)
 			}
 			else if( opclass == "renders")
 			{
-				eids.push_back( af::Msg::TMonitorRendersAdd);
-				eids.push_back( af::Msg::TMonitorRendersChanged);
-				eids.push_back( af::Msg::TMonitorRendersDel);
+				eids.push_back( af::Monitor::EVT_renders_add);
+				eids.push_back( af::Monitor::EVT_renders_change);
+				eids.push_back( af::Monitor::EVT_renders_del);
 			}
 			else if( opclass == "users")
 			{
-				eids.push_back( af::Msg::TMonitorUsersAdd);
-				eids.push_back( af::Msg::TMonitorUsersChanged);
-				eids.push_back( af::Msg::TMonitorUsersDel);
+				eids.push_back( af::Monitor::EVT_users_add);
+				eids.push_back( af::Monitor::EVT_users_change);
+				eids.push_back( af::Monitor::EVT_users_del);
 			}
 			else if( opclass == "monitors")
 			{
-				eids.push_back( af::Msg::TMonitorMonitorsAdd);
-				eids.push_back( af::Msg::TMonitorMonitorsChanged);
-				eids.push_back( af::Msg::TMonitorMonitorsDel);
+				eids.push_back( af::Monitor::EVT_monitors_add);
+				eids.push_back( af::Monitor::EVT_monitors_change);
+				eids.push_back( af::Monitor::EVT_monitors_del);
+			}
+			else if( opclass == "listen")
+			{
+				int32_t job_id = -1, block = -1, task = -1;
+				af::jr_int32("job",   job_id, operation);
+				af::jr_int32("block", block,  operation);
+				af::jr_int32("task",  task,   operation);
+
+				JobContainerIt jobsIt( i_action.jobs);
+				JobAf * job = jobsIt.getJob( job_id);
+				if( job )
+				{
+					af::MCTaskPos tp( job_id, block, task);
+					if( setListening( tp, subscribe))
+						job->listenOutput( i_action.renders, subscribe, block, task);
+				}
 			}
 			else
 			{
@@ -140,10 +158,17 @@ void MonitorAf::v_action( Action & i_action)
 				// Subscribe or unsubscibe common events:
 				setEvents( eids, subscribe);
 			}
-			m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
+			m_monitors->addEvent( af::Monitor::EVT_monitors_change, getId());
 			appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_action.author);
 			m_time_activity = time( NULL);
 			return;
+		}
+		else if( optype == "message")
+		{
+			std::string text;
+			af::jr_string("text", text, operation);
+			text += "\n - " + i_action.author;
+			sendMessage( text);
 		}
 		else
 		{
@@ -154,98 +179,37 @@ void MonitorAf::v_action( Action & i_action)
 	}
 }
 
-bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
-{
-	m_time_activity = time( NULL);
-
-//printf("MonitorAf::setInterest: [%s]:\n", af::Msg::TNAMES[type]);
-   switch(type)
-   {
-      case af::Msg::TMonitorSubscribe:
-      {
-         setEvents( ids.getList(), true);
-         break;
-      }
-      case af::Msg::TMonitorUnsubscribe:
-      {
-         setEvents( ids.getList(), false);
-         break;
-      }
-      case af::Msg::TMonitorUsersJobs:
-      {
-         setJobsUsersIds( ids.getList());
-         break;
-      }
-      case af::Msg::TMonitorJobsIdsAdd:
-      {
-         addJobIds( ids.getList());
-         break;
-      }
-      case af::Msg::TMonitorJobsIdsSet:
-      {
-         setJobIds( ids.getList());
-         break;
-      }
-      case af::Msg::TMonitorJobsIdsDel:
-      {
-         delJobIds( ids.getList());
-         break;
-      }
-      default:
-      {
-         AFERRAR("MonitorAf::action: Unknown action: %s\n", af::Msg::TNAMES[type]);
-         return false;
-      }
-   }
-   return true;
-}
-
-void MonitorAf::setJobsUsersIds( const std::vector<int32_t> & i_ids)
-{
-	jobsUsersIds.clear();
-	for( int i = 0; i < i_ids.size(); i++)
-		jobsUsersIds.push_back( i_ids[i]);
-}
-
 void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 {
 	for( int i = 0; i < i_ids.size(); i++)
 	{
-		int eventNum = i_ids[i] - EventsShift;
-		//printf("MonitorAf::setEvents: [%s] - %s\n", af::Msg::TNAMES[ids.getId(i)], value ? "ADD" : "DEL");
-		if((eventNum >= 0) && (eventNum < EventsCount))
+		int eventNum = i_ids[i];
+		if(( eventNum >= 0) && ( eventNum < EVT_COUNT))
 		{
-			events[eventNum] = value;
+			m_events[eventNum] = value;
 		}
 		else
 		{
-			AFERRAR("MonitorAf::addEvent: Invalid event: %d\n", i_ids[i]);
+			AFERRAR("MonitorAf::addEvent: Invalid event number: %d\n", eventNum);
 		}
 	}
-}
-
-bool MonitorAf::hasJobUid( int uid) const
-{
-   for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
-      if( *it == uid) return true;
-   return false;
+//printf("MonitorAf::setEvents:\n"); v_stdOut(true);
 }
 
 bool MonitorAf::hasJobEvent( int type, int uid) const
 {
-   int count = jobsUsersIds.size();
-   if( count < 1) return false;
-   if( hasEvent( type) == false) return false;
-
-   std::list<int32_t>::const_iterator it = jobsUsersIds.begin();
-   if(( count == 1 ) && ( *it == 0 )) return true;
-
-   return hasJobUid( uid);
+//printf("MonitorAf::hasJobEvent: hasEvent=%d, uid=%d, m_uid=%d\n", hasEvent(type), uid, m_uid);
+	if( hasEvent( type))
+	{
+		if( uid == m_uid ) return true;
+		if( m_uid == 0 ) return true;
+	}
+	return false;
 }
 
 bool MonitorAf::hasJobId( int id) const
 {
-	for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
+	for( std::list<int32_t>::const_iterator it = m_jobsIds.begin(); it != m_jobsIds.end(); it++)
 	{
 		if( *it == id) return true;
 	}
@@ -259,33 +223,20 @@ void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 	{
 		if( hasJobId( i_ids[i]) == false)
 		{
-			jobsIds.push_back( i_ids[i]);
+			m_jobsIds.push_back( i_ids[i]);
 		}
 	}
-}
-
-void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
-{
-//printf("MonitorAf::setJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
-	jobsIds.clear();
-	for( int i = 0; i < i_ids.size(); i++) jobsIds.push_back( i_ids[i]);
 }
 
 void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
 //printf("MonitorAf::delJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
-	for( int i = 0; i < i_ids.size(); i++) jobsIds.remove( i_ids[i]);
+	for( int i = 0; i < i_ids.size(); i++) m_jobsIds.remove( i_ids[i]);
 }
 
-void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
+void MonitorAf::addEvents( int i_type, const std::list<int32_t> & i_ids)
 {
-	if( m_event_nodeids.size() == 0)
-	{
-		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
-		return;
-	}
-
-	if(( i_type >= af::Monitor::EventsCount ) || ( i_type < 0 ))
+	if(( i_type >= af::Monitor::EVT_COUNT ) || ( i_type < 0 ))
 	{
 		AFERRAR("MonitorAf::addEvents: Event %d is invalid.", i_type)
 		return;
@@ -294,7 +245,7 @@ void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 	std::list<int32_t>::const_iterator it = i_ids.begin();
 	while( it != i_ids.end())
 	{
-		af::addUniqueToVect( m_event_nodeids[i_type], *it);
+		af::addUniqueToVect( m_e.m_events[i_type], *it);
 		it++;
 	}
 
@@ -305,233 +256,210 @@ void MonitorAf::addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgre
 {
 //std::ostringstream str;af::jw_state( i_tp->state, str);printf("MonitorAf::addTaskProgress():j=%d b=%d t=%d s='%s'\n", i_j, i_b, i_t, str.str().c_str());
 
-	for( int j = 0; j < m_tp.size(); j++)
+	for( int j = 0; j < m_e.m_tp.size(); j++)
 	{
-		if( m_tp[j].job_id != i_j ) continue;
+		if( m_e.m_tp[j].job_id != i_j ) continue;
 
-		for( int t = 0; t < m_tp[j].tp.size(); t++)
+		for( int t = 0; t < m_e.m_tp[j].tp.size(); t++)
 		{
-			if(( m_tp[j].blocks[t] == i_t ) && ( m_tp[j].tasks[t] == i_b ))
+			if(( m_e.m_tp[j].blocks[t] == i_t ) && ( m_e.m_tp[j].tasks[t] == i_b ))
 			{
-				m_tp[j].tp[t] = *i_tp;
+				m_e.m_tp[j].tp[t] = *i_tp;
 //printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
 				return;
 			}
 		}
 
-		m_tp[j].blocks.push_back( i_b);
-		m_tp[j].tasks.push_back(  i_t);
-		m_tp[j].tp.push_back( *i_tp);
+		m_e.m_tp[j].blocks.push_back( i_b);
+		m_e.m_tp[j].tasks.push_back(  i_t);
+		m_e.m_tp[j].tp.push_back( *i_tp);
 
 //printf("MonitorAf::addTaskProgress(): Task progress of the same job pushed.\n");
 		return;
 	}
 
-	const int last = m_tp.size();
-	m_tp.push_back( MTaskProgresses());
-	m_tp[last].job_id = i_j;
-	m_tp[last].blocks.push_back( i_b);
-	m_tp[last].tasks.push_back( i_t);
-	m_tp[last].tp.push_back( *i_tp);
+	const int last = m_e.m_tp.size();
+	m_e.m_tp.push_back( af::MonitorEvents::MTaskProgresses());
+	m_e.m_tp[last].job_id = i_j;
+	m_e.m_tp[last].blocks.push_back( i_b);
+	m_e.m_tp[last].tasks.push_back( i_t);
+	m_e.m_tp[last].tp.push_back( *i_tp);
 //printf("MonitorAf::addTaskProgress(): New job task progress pushed.\n");
 }
 
 void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 {
-	for( int i = 0; i < m_bids.size(); i++)
+	for( int i = 0; i < m_e.m_bids.size(); i++)
 	{
-		if(( m_bids[i].job_id == i_j ) && ( m_bids[i].block_num == i_b ))
+		if(( m_e.m_bids[i].job_id == i_j ) && ( m_e.m_bids[i].block_num == i_b ))
 		{
-			if( m_bids[i].mode < i_mode )
-				m_bids[i].mode = i_mode;
+			if( m_e.m_bids[i].mode < i_mode )
+				m_e.m_bids[i].mode = i_mode;
 			return;
 		}
 	}
 
-	int i = m_bids.size();
-	m_bids.push_back( MBlocksIds());
-	m_bids[i].job_id = i_j;
-	m_bids[i].block_num = i_b;
-	m_bids[i].mode = i_mode;
+	int i = m_e.m_bids.size();
+	m_e.m_bids.push_back( af::MonitorEvents::MBlocksIds());
+	m_e.m_bids[i].job_id = i_j;
+	m_e.m_bids[i].block_num = i_b;
+	m_e.m_bids[i].mode = i_mode;
 }
 
-void MonitorAf::addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids)
+bool MonitorAf::setListening( const af::MCTaskPos & i_tp, bool i_subscribe)
 {
-	for( int i = 0; i < m_jobs_order_uids.size(); i++)
-		if( m_jobs_order_uids[i] == i_uid )
+	std::list<af::MCTaskPos>::iterator it = m_listen_pos.begin();
+
+	for( ; it != m_listen_pos.end(); it++)
+	{
+		if( i_tp.isSameTask( *it))
 		{
-			m_jobs_order_jids[i] = i_jids;
-			return;
+			if( i_subscribe )
+				return false;
+
+			m_listen_pos.erase( it);
+
+			return true;
+		}
+	}
+
+	if( false == i_subscribe )
+		return false;
+
+	m_listen_pos.push_back( i_tp);
+
+	return true;
+}
+
+void MonitorAf::waitOutput( const af::MCTask & i_mctask)
+{
+	if( isWaintingOutput( i_mctask))
+		return;
+
+	m_wait_output.push_back( i_mctask);
+	//printf("MonitorAf::waitOutput: "); i_tp.v_stdOut();
+}
+
+void MonitorAf::addOutput( const af::MCTaskPos & i_tp, const std::string & i_output)
+{
+	if( false == isWaintingOutput( i_tp))
+	{
+		AF_ERR << "Not waiting for: " << i_tp;
+		return;
+	}
+
+	std::vector<af::MCTask>::iterator it = m_wait_output.begin();
+	while( it != m_wait_output.end())
+		if((*it).isSameTask( i_tp))
+		{
+			(*it).setOutput( i_output);
+			m_e.addOutput(*it);
+			m_wait_output.erase(it);
+			break;
+		}
+		else
+			it++;
+	//printf("MonitorAf::addOutput: "); i_tp.v_stdOut();
+}
+
+bool MonitorAf::isWaintingOutput( const af::MCTaskPos & i_tp) const
+{
+	for( int i = 0; i < m_wait_output.size(); i++)
+		if( m_wait_output[i].isSameTask( i_tp))
+			return true;
+
+	return false;
+}
+
+bool MonitorAf::isWaintingOutput( const af::MCTask & i_mctask) const
+{
+	for( int i = 0; i < m_wait_output.size(); i++)
+		if( m_wait_output[i].isSameTask( i_mctask))
+			return true;
+
+	return false;
+}
+
+bool MonitorAf::isListening( const af::MCTask & i_mctask) const
+{
+	std::list<af::MCTaskPos>::const_iterator it = m_listen_pos.begin();
+
+	for( ; it != m_listen_pos.end(); it++)
+		if((*it).getJobId() == i_mctask.getJobId())
+		{
+			if(((*it).getBlockNum() == -1 ) && ((*it).getTaskNum() == -1 ))
+				return true;
+			if( i_mctask.isSameTask(*it))
+				return true;
 		}
 
-	m_jobs_order_uids.push_back( i_uid);
-	m_jobs_order_jids.push_back( i_jids);
+	return false;
 }
 
-af::Msg * MonitorAf::getEvents()
+af::Msg * MonitorAf::getEventsBin()
+{
+	updateTime();
+
+	DlScopeLocker mutex( &m_mutex);
+
+	af::Msg * msg = NULL;
+
+	if( m_e.isEmpty())
+		msg = new af::Msg( af::Msg::TMonitorId, getId());
+	else
+	{
+		prepareEvents();
+		msg = new af::Msg( af::Msg::TMonitorEvents, &m_e);
+	}
+
+	m_e.clear();
+
+	return msg;
+}
+
+af::Msg * MonitorAf::getEventsJSON()
 {
 	updateTime();
 
 	af::Msg * msg = new af::Msg();
-	if( false == collectingEvents())
-	{
-		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
-		return msg;
-	}
 
 	std::ostringstream stream;
 	stream << "{\"events\":";
-	bool hasevents = false;
 
 	DlScopeLocker mutex( &m_mutex);
 
-	// Nodes events:
-	for( int e = 0; e < af::Monitor::EventsCount; e++)
-	{
-		if( m_event_nodeids[e].size() == 0 )
-			continue;
+	prepareEvents();
+	m_e.jsonWrite( stream);
 
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\n\"" << af::Monitor::EventsNames[e] << "\":";
-		stream << "[";
-
-		for( int i = 0; i < m_event_nodeids[e].size(); i++)
-		{
-			if( i )
-				stream << ",";
-			stream << m_event_nodeids[e][i];
-		}
-
-		stream << "]";
-		hasevents = true;
-		m_event_nodeids[e].clear();
-	}
-
-	// Tasks progress:
-	if( m_tp.size())
-	{
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\n\"tasks_progress\":[";
-		for( int j = 0; j < m_tp.size(); j++)
-		{
-			if( j > 0 ) stream << ",";
-			stream << "{\"job_id\":" << m_tp[j].job_id;
-			stream << ",\"blocks\":[";
-			for( int t = 0; t < m_tp[j].blocks.size(); t++)
-			{
-				if( t > 0 ) stream << ",";
-				stream << m_tp[j].blocks[t];
-			}
-			stream << "],\"tasks\":[";
-			for( int t = 0; t < m_tp[j].tasks.size(); t++)
-			{
-				if( t > 0 ) stream << ",";
-				stream << m_tp[j].tasks[t];
-			}
-			stream << "],\"progress\":[";
-			for( int t = 0; t < m_tp[j].tp.size(); t++)
-			{
-				if( t > 0 ) stream << ",";
-				m_tp[j].tp[t].jsonWrite( stream);
-			}	
-			stream << "]}";
-		}
-		stream << "]";
-		hasevents = true;
-		m_tp.clear();
-	}
-
-	// Blocks ids:
-	if( m_bids.size())
-	{
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\n\"block_ids\":{";
-
-		stream << "\"job_id\":[";
-		for( int i = 0; i < m_bids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << m_bids[i].job_id;
-		}
-		stream << "],";
-
-		stream << "\"block_num\":[";
-		for( int i = 0; i < m_bids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << m_bids[i].block_num;
-		}
-		stream << "],";
-
-		stream << "\"mode\":[";
-		for( int i = 0; i < m_bids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << '"' << af::BlockData::DataModeFromMsgType( m_bids[i].mode) << '"';
-		}
-		stream << "]}";
-
-		hasevents = true;
-
-		m_bids.clear();
-	}
-
-	if( m_jobs_order_uids.size())
-	{
-		if( hasevents )
-			stream << ",";
-		else
-			stream << "{";
-
-		stream << "\"jobs_order\":{\"uids\":[";
-		for( int i = 0; i < m_jobs_order_uids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << m_jobs_order_uids[i];
-		}
-		stream << "],\"jids\":[";
-		for( int i = 0; i < m_jobs_order_jids.size(); i++)
-		{
-			if( i > 0 ) stream << ",";
-			stream << "[";
-			for( int j = 0; j < m_jobs_order_jids[i].size(); j++)
-			{
-				if( j > 0 ) stream << ",";
-				stream << m_jobs_order_jids[i][j];
-			}
-			stream << "]";
-		}
-		stream << "]}";
-
-		hasevents = true;
-
-		m_jobs_order_uids.clear();
-		m_jobs_order_jids.clear();
-	}
-
-
-	if( false == hasevents )
-		stream << "\nnull";
-	else
-		stream << "\n}";
 	stream << "\n}";
 
 //if( hasevents ) printf("MonitorAf::getEvents():\n%s\n", stream.str().c_str());
 
 	msg->setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
 
+	m_e.clear();
+
 	return msg;
+}
+
+void MonitorAf::prepareEvents()
+{
+	//
+	// Removing deleted jobs from changed:
+	//
+	{
+	std::vector<int32_t>::const_iterator delIt = m_e.m_events[af::Monitor::EVT_jobs_del].begin();
+	for( ; delIt != m_e.m_events[af::Monitor::EVT_jobs_del].end(); delIt++)
+	{
+		std::vector<int32_t>::iterator it = m_e.m_events[af::Monitor::EVT_jobs_change].begin();
+		while( it != m_e.m_events[af::Monitor::EVT_jobs_change].end())
+		{
+			if( *it == *delIt )
+				it = m_e.m_events[af::Monitor::EVT_jobs_change].erase( it);
+			else
+				it++;
+		}
+	}
+	}
 }
 

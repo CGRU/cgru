@@ -8,28 +8,37 @@
 class MonitorHost: public af::Monitor
 {
 public:
-   MonitorHost();
-   ~MonitorHost();
+	MonitorHost();
+	~MonitorHost();
 
-   inline void setId( int new_id) { m_id = new_id;}
+	static af::Msg * genRegisterMsg();
 
-   inline void   subscribe( const QList<int> & eIds ) { setEvents( af::Msg::TMonitorSubscribe,   eIds);}
-   inline void unsubscribe( const QList<int> & eIds ) { setEvents( af::Msg::TMonitorUnsubscribe, eIds);}
+	static inline int id() { return m_->getId();}
 
-   inline void addJobId( int jId ) { setJobId( af::Msg::TMonitorJobsIdsAdd, jId);}
-   inline void delJobId( int jId ) { setJobId( af::Msg::TMonitorJobsIdsDel, jId);}
+	// Some operations needed an array of ids.
+	// This function simple returns an array with one id.
+	static inline const std::vector<int32_t> & ids() { return ms_ids;}
 
-   void setUid( int uid);
+	static void subscribe( const std::string & i_class, bool i_subscribe);
 
-   void connectionLost();
-   void connectionEstablished();
+	static const af::Address & getClientAddress() { return m_->getAddress();}
+
+	static inline void addJobId( int i_jid ) { setJobId( i_jid, true );}
+	static inline void delJobId( int i_jid ) { setJobId( i_jid, false);}
+
+	static void setUid( int i_uid);
+	static int getUid() { return ms_uid ;}
+
+	static void connectionLost();
+	static void connectionEstablished( int i_id, int i_uid);
 
 private:
-   int * events_counts;
-   std::list<int32_t> jobsUsersIds_counts;
-   std::list<int32_t> jobsIds_counts;
+	static MonitorHost * m_;
+
+	static int ms_uid;
+
+	static std::vector<int32_t> ms_ids;
 
 private:
-   void setEvents( int type, const QList<int> & eIds);
-   void setJobId(  int type, int m_id);
+	static void setJobId( int i_jid, bool i_add);
 };

@@ -4,10 +4,9 @@
 #include <fstream>
 #endif
 
-#include "../libafanasy/common/dlScopeLocker.h"
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
+#include "../libafanasy/taskexec.h"
 
 #include "pyres.h"
 #include "res.h"
@@ -15,32 +14,20 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 extern bool AFRunning;
 
-RenderHost * RenderHost::ms_obj = NULL;
-af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
-af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
-int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
-bool RenderHost::ms_connected = false;
-std::vector<PyRes*> RenderHost::ms_pyres;
-std::vector<TaskProcess*> RenderHost::ms_tasks;
-bool RenderHost::ms_listening = false;
-bool RenderHost::ms_no_output_redirection = false;
-std::vector<std::string> RenderHost::ms_windowsmustdie;
-
 RenderHost::RenderHost():
-	af::Render( Client::GetEnvironment)
+	af::Render( Client::GetEnvironment),
+	m_updateMsgType( af::Msg::TRenderRegister),
+	m_connected( false),
+	m_connection_lost_count( 0),
+	m_no_output_redirection( false)
 {
-    ms_obj = this;
+	m_has_tasks_time = time(NULL);
 
-	if( af::Environment::hasArgument("-nor")) ms_no_output_redirection = true;
-
-    ms_msgAcceptQueue   = new af::MsgQueue("Messages Accept Queue",   af::AfQueue::e_no_thread    );
-    ms_msgDispatchQueue = new af::MsgQueue("Messages Dispatch Queue", af::AfQueue::e_start_thread );
-    ms_msgDispatchQueue->setReturnQueue( ms_msgAcceptQueue);
-    ms_msgDispatchQueue->returnNotSended();
-    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
+	if( af::Environment::hasArgument("-nor")) m_no_output_redirection = true;
 
     setOnline();
 
@@ -52,24 +39,24 @@ RenderHost::RenderHost():
     {
         if( (*it).empty() ) continue;
         printf("Adding custom resource meter '%s'\n", (*it).c_str());
-        ms_pyres.push_back( new PyRes( *it, &m_hres));
+        m_pyres.push_back( new PyRes( *it, &m_hres));
     }
 
 #ifdef WINNT
     // Windows Must Die:
-	ms_windowsmustdie = af::Environment::getRenderWindowsMustDie();
-    if( ms_windowsmustdie.size())
+	m_windowsmustdie = af::Environment::getRenderWindowsMustDie();
+    if( m_windowsmustdie.size())
     {
         printf("Windows Must Die:\n");
-        for( int i = 0; i < ms_windowsmustdie.size(); i++)
-            printf("   %s\n", ms_windowsmustdie[i].c_str());
+        for( int i = 0; i < m_windowsmustdie.size(); i++)
+            printf("   %s\n", m_windowsmustdie[i].c_str());
     }
 #endif
 
 	af::sleep_msec( 100);
 
     GetResources( m_host, m_hres);
-    for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
+    for( int i = 0; i < m_pyres.size(); i++) m_pyres[i]->update();
 
     v_stdOut();
     m_host.v_stdOut( true);
@@ -79,83 +66,88 @@ RenderHost::RenderHost():
 RenderHost::~RenderHost()
 {
     // Delete custom python resources:
-    for( int i = 0; i < ms_pyres.size(); i++)
-        if( ms_pyres[i])
-            delete ms_pyres[i];
+    for( int i = 0; i < m_pyres.size(); i++)
+        if( m_pyres[i])
+            delete m_pyres[i];
 
     // Send deregister message if connected:
-    if( ms_connected )
+    if( m_connected )
     {
-        af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
-        msg.setAddress( af::Environment::getServerAddress());
+        af::Msg msg( af::Msg::TRenderDeregister, getId());
         bool ok;
-        af::msgsend( & msg, ok, af::VerboseOn);
-        ms_connected = false;
+		af::Msg * answer = af::sendToServer( & msg, ok, af::VerboseOn);
+		if( answer ) delete answer;
+        m_connected = false;
     }
 
     // Delete all tasks:
-    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); )
+    for( std::vector<TaskProcess*>::iterator it = m_taskprocesses.begin(); it != m_taskprocesses.end(); )
     {
         delete *it;
-        it = ms_tasks.erase( it);
+        it = m_taskprocesses.erase( it);
     }
-
-    // Delete queues:
-    delete ms_msgAcceptQueue;
-    delete ms_msgDispatchQueue;
 }
 
-void RenderHost::setListeningPort( uint16_t i_port)
+RenderHost * RenderHost::getInstance()
 {
-    ms_obj->m_address.setPort( i_port);
-    ms_listening = true;
-    if( af::Environment::isVerboseMode())
-        printf("RenderHost::setListeningPort = %d\n", i_port);
+	// Does not return a reference, although sometimes recommanded for a
+	// singleton, because we need to control when it is destroyed.
+	static RenderHost * ms_obj = new RenderHost();
+	return ms_obj;
 }
 
-void RenderHost::dispatchMessage( af::Msg * i_msg)
-{
-    if( false == AFRunning ) return;
+void RenderHost::connectionEstablished()
 
-    if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
-    {
-        // Assuming that message should be send to server if no address specified.
-        i_msg->setAddress( af::Environment::getServerAddress());
-    }
-    ms_msgDispatchQueue->pushMsg( i_msg);
+{
+	if (m_connection_lost_count > 0)
+	{
+		AF_LOG << "Reconnected to the server";
+	}
+	
+	m_connection_lost_count = 0;
+	
+	setUpdateMsgType( af::Msg::TRenderUpdate);
 }
 
 void RenderHost::setRegistered( int i_id)
 {
-    ms_connected = true;
-    ms_obj->m_id = i_id;
-    ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
-    setUpdateMsgType( af::Msg::TRenderUpdate);
-    printf("Render registered.\n");
+	m_connected = true;
+    m_id = i_id;
+    AF_LOG << "Render registered.";
+	RenderHost::connectionEstablished();
 }
 
-void RenderHost::connectionLost()
+void RenderHost::connectionLost( bool i_any_case)
 {
-    if( ms_connected == false ) return;
+    if( m_connected == false )
+		return;
 
-    ms_connected = false;
+	m_connection_lost_count++;
 
-    ms_obj->m_id = 0;
+	if( false == i_any_case )
+	{
+		AF_LOG << "Connection lost count = " << m_connection_lost_count
+			   << " of " << af::Environment::getRenderConnectRetries();
+		if( m_connection_lost_count <= af::Environment::getRenderConnectRetries() )
+		{
+			return;
+		}
+	}
 
-    // Stop all tasks:
-    for( int t = 0; t < ms_tasks.size(); t++) ms_tasks[t]->stop();
-
-    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
+	m_connected = false;
 
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
+    
+    AF_WARN << "Render connection lost, trying to reconnect...";
 
-    printf("Render connection lost, connecting...\n");
+	if( m_taskprocesses.size())
+		AF_LOG << m_taskprocesses.size() << " task(s) are still running.";
 }
 
 void RenderHost::setUpdateMsgType( int i_type)
 {
-    ms_updateMsgType = i_type;
+    m_updateMsgType = i_type;
 }
 
 void RenderHost::refreshTasks()
@@ -164,59 +156,107 @@ void RenderHost::refreshTasks()
         return;
 
     // Refresh tasks:
-    for( int t = 0; t < ms_tasks.size(); t++)
+    for( int t = 0; t < m_taskprocesses.size(); t++)
     {
-        ms_tasks[t]->refresh();
+        m_taskprocesses[t]->refresh();
     }
 
+	// Time render has task(s):
+	if( m_taskprocesses.size())
+	{
+		m_has_tasks_time = time(NULL);
+	}
+	else if(( af::Environment::getRenderExitNoTaskTime() >= 0 ) &&
+		( time(NULL) - m_has_tasks_time >= af::Environment::getRenderExitNoTaskTime()))
+	{
+		AF_LOG << "No tasks for " << af::Environment::getRenderExitNoTaskTime() << " seconds.";
+		AFRunning = false;
+	}
+
     // Remove zombies:
-    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); )
+    for( std::vector<TaskProcess*>::iterator it = m_taskprocesses.begin(); it != m_taskprocesses.end(); )
     {
         if((*it)->isZombie())
         {
             delete *it;
-            it = ms_tasks.erase( it);
+            it = m_taskprocesses.erase( it);
         }
         else
             it++;
     }
 }
 
-void RenderHost::update()
+void RenderHost::getResources()
 {
-    if( false == AFRunning )
-        return;
+	// Do this every update time, but not the first time, as at the begininng resources are already updated
+	static bool first_time = true;
+	if( first_time )
+	{
+		first_time = false;
+		return;
+	}
 
-    // Do this every update time, but not the first time, as at the begininng resources are already updated
-    static bool first_time = true;
+	GetResources( m_host, m_hres);
 
-    if( false == first_time )
-    {
-        GetResources( ms_obj->m_host, ms_obj->m_hres);
-        for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
-    }
-    else
-        first_time = false;
+	for( int i = 0; i < m_pyres.size(); i++)
+		m_pyres[i]->update();
 
-//hres.stdOut();
+	//hres.stdOut();
+	m_up.setResources( &m_hres);
+}
 
-#ifdef WINNT
-    windowsMustDie();
-#endif
+af::Msg * RenderHost::updateServer()
+{
+	if( false == AFRunning )
+		return NULL;
 
-    if( false == isListening())
-    {
-        // Port can't be zero!
-        // It seems that listening thread is not started to listen any port.
-        AFERROR("RenderHost::update(): Render is not listening any port.")
-        // This error is not fatal.
-        // Client was just started and we simple will wait next update.
-        return;
-    }
+	m_up.setId( getId());
+	
+	af::Msg * msg;
 
-    af::Msg * msg = new af::Msg( ms_updateMsgType, ms_obj);
-    msg->setReceiving();
-    dispatchMessage( msg);
+	#ifdef AFOUTPUT
+	AF_LOG << "Tasks size = " << m_taskprocesses.size();
+	#endif
+
+	if( m_updateMsgType == af::Msg::TRenderRegister )
+	{
+		m_tasks.clear();
+
+		// Fill tasksexecs array in parent class.
+		// This only needed on register to reconnect running tasks if any.
+		for( int i = 0; i < m_taskprocesses.size(); i++)
+			m_tasks.push_back( m_taskprocesses[i]->getTaskExec());
+
+		msg = new af::Msg( m_updateMsgType, this);
+
+		m_tasks.clear();
+	}
+	else if( m_updateMsgType == af::Msg::TRenderUpdate )
+	{
+		#ifdef AFOUTPUT
+		AF_LOG << m_up;
+		#endif
+		msg = new af::Msg( m_updateMsgType, &m_up);
+	}
+
+	#ifdef AFOUTPUT
+	AF_LOG << " <<< " << msg;
+	#endif
+
+	bool ok;
+	af::Msg * server_answer = af::sendToServer( msg, ok,
+		msg->type() == af::Msg::TRenderRegister ? af::VerboseOff : af::VerboseOn);
+
+	if( ok )
+		connectionEstablished();
+	else
+		connectionLost();
+
+	delete msg;
+
+	m_up.clear();
+
+	return server_answer;
 }
 
 #ifdef WINNT
@@ -224,97 +264,103 @@ void RenderHost::windowsMustDie()
 {
 // Windows Must Die:
     AFINFO("RenderHost::windowsMustDie():");
-    for( int i = 0; i < ms_windowsmustdie.size(); i++)
+    for( int i = 0; i < m_windowsmustdie.size(); i++)
     {
-        HWND WINAPI hw = FindWindow( NULL, TEXT( ms_windowsmustdie[i].c_str()));
+        HWND WINAPI hw = FindWindow( NULL, TEXT( m_windowsmustdie[i].c_str()));
         if( hw != NULL )
         {
-            printf("Window must die found:\n%s\n", ms_windowsmustdie[i].c_str());
+            printf("Window must die found:\n%s\n", m_windowsmustdie[i].c_str());
             SendMessage( hw, WM_CLOSE, 0, 0);
         }
     }
 }
 #endif
 
-void RenderHost::runTask( af::Msg * i_msg)
+void RenderHost::runTask( af::TaskExec * i_task)
 {
-    ms_tasks.push_back( new TaskProcess( new af::TaskExec( i_msg)));
+	// Check that this task is not exist:
+	for( int t = 0; t < m_taskprocesses.size(); t++)
+	{
+		// Skipping closed tasks
+		if( m_taskprocesses[t]->isClosed())
+			continue;
+
+		if( m_taskprocesses[t]->getTaskExec()->equals( *i_task))
+		{
+			AF_ERR << "Render asked to run task that is active: " << i_task;
+			return;
+		}
+	}
+
+	m_taskprocesses.push_back( new TaskProcess( i_task, this));
 }
 
 void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
+    for( int t = 0; t < m_taskprocesses.size(); t++)
     {
-        if( ms_tasks[t]->is( i_taskpos))
+        if( m_taskprocesses[t]->is( i_taskpos))
         {
-            ms_tasks[t]->stop();
+            m_taskprocesses[t]->stop();
             return;
         }
     }
-    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(ms_tasks.size()))
-    i_taskpos.v_stdOut();
+
+    AF_ERR << "RenderHost::stopTask: No such task: " << i_taskpos << " (now running " << int(m_taskprocesses.size()) << " tasks).";
 }
 
 void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
+    for( int t = 0; t < m_taskprocesses.size(); t++)
     {
-        if( ms_tasks[t]->is( i_taskpos))
+        if( m_taskprocesses[t]->is( i_taskpos))
         {
-			ms_tasks[t]->close();
+			m_taskprocesses[t]->close();
             return;
         }
     }
-    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(ms_tasks.size()))
+    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(m_taskprocesses.size()))
     i_taskpos.v_stdOut();
 }
 
-void RenderHost::listenTasks( const af::MCListenAddress & i_mcaddr)
+void RenderHost::upTaskOutput( const af::MCTaskPos & i_taskpos)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
-    {
-        if( i_mcaddr.justTask())
-        {
-            if( ms_tasks[t]->is( i_mcaddr.getJobId(), i_mcaddr.getNumBlock(), i_mcaddr.getNumTask(), 0))
-            {
-                if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
-                else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
-                i_mcaddr.v_stdOut();
-            }
-        }
-        else
-        {
-            if( ms_tasks[t]->is( i_mcaddr.getJobId()))
-            {
-                if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
-                else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
-                i_mcaddr.v_stdOut();
-            }
-        }
-    }
+	std::string str;
+	for( int t = 0; t < m_taskprocesses.size(); t++)
+	{
+		if( m_taskprocesses[t]->is( i_taskpos))
+		{
+			str = m_taskprocesses[t]->getOutput();
+			break;
+		}
+	}
+
+	if( str.size() == 0 )
+	{
+		str = "Render has no task:";
+		str += i_taskpos.v_generateInfoString();
+	}
+
+	m_up.addTaskOutput( i_taskpos, str);
 }
 
-void RenderHost::listenFailed( const af::Address & i_addr)
+void RenderHost::listenTask( const af::MCTaskPos & i_tp, bool i_subscribe)
 {
-    int lasttasknum = -1;
-    for( int t = 0; t < ms_tasks.size(); t++) if( (ms_tasks[t])->removeListenAddress( i_addr)) lasttasknum = t;
-    if( lasttasknum != -1)
-    {
-        af::MCListenAddress mclass( af::MCListenAddress::FROMRENDER, i_addr, ms_tasks[lasttasknum]->exec()->getJobId());
-        dispatchMessage( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
-    }
+	for( int t = 0; t < m_taskprocesses.size(); t++)
+	{
+		if( m_taskprocesses[t]->is( i_tp))
+		{
+			m_taskprocesses[t]->listenOutput( i_subscribe);
+			break;
+		}
+	}
 }
 
-void RenderHost::getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg)
+void RenderHost::wolSleep( const std::string & i_str)
 {
-    for( int t = 0; t < ms_tasks.size(); t++)
-    {
-        if( ms_tasks[t]->is( i_taskpos))
-        {
-            ms_tasks[t]->getOutput( o_msg);
-            return;
-        }
-    }
-    AFERROR("RenderHost::closeTask: No such task:\n")
-    i_taskpos.v_stdOut();
+	af::Service service( af::Environment::getSysWolService(),"SLEEP", i_str);
+	std::string cmd = service.getCommand();
+	printf("Sleep request, executing command:\n%s\n", cmd.c_str());
+	af::launchProgram( cmd);
 }
+
