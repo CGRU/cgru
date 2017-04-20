@@ -592,7 +592,7 @@ if __name__ == '__main__':
         # cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
 
         if cmd is None:
-            cmd = 'mayarender' + cmdextension
+            cmd = 'mayarender%s' % cmdextension
 
         if scenetype == 'maya_mental':
             cmd += ' -r mr'
@@ -625,11 +625,11 @@ if __name__ == '__main__':
 
         if proj:
             cmd += ' -proj "%s"' % os.path.normpath(proj)
-        else:
-            if pwd != '':
-                cmd += ' -proj "%s"' % os.path.normpath(pwd)
-            else:
-                cmd += ' -proj "%s"' % os.path.normpath(os.path.dirname(scene))
+        # else:
+        #     if pwd != '':
+        #         cmd += ' -proj "%s"' % os.path.normpath(pwd)
+        #     else:
+        #         cmd += ' -proj "%s"' % os.path.normpath(os.path.dirname(scene))
 
         if output != '':
             cmd += ' -rd "%s"' % os.path.normpath(output)
@@ -862,8 +862,7 @@ if __name__ == '__main__':
     if len(blockparsers) == 0 and blockparser != '':
         blockparsers.append(blockparser)
 
-    i = 0
-    for cmd in cmds:
+    for i, cmd in enumerate(cmds):
         block = af.Block(blocknames[i], blocktype)
 
         if len(blockparsers):
@@ -892,7 +891,6 @@ if __name__ == '__main__':
             )
 
         blocks.append(block)
-        i += 1
 
     if mname != '' and images != '':
         block = af.Block(mname + '-movie', 'movgen')
