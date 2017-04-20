@@ -200,7 +200,19 @@ if ds_node is not None:
 
     ds_node.parm('address').set( tracker_address)
     ds_node.parm('port'   ).set( tracker_port   )
-    ds_node.parm('slice'  ).set( sim_slice      )
+    # ds_node.parm('slice'  ).set( sim_slice      ) default value is $SLICE and can't be set with this
+
+    # Setting $SLICE environment variable
+    sli_var = "SLICE"
+
+    try:
+        hou.allowEnvironmentVariableToOverwriteVariable(sli_var, True)
+    except AttributeError:
+        # should be Houdini 12
+        hou.allowEnvironmentToOverwriteVariable(sli_var, True)
+
+    hscript_command = "set -g %s = '%s'" % (sli_var, sim_slice)
+    hou.hscript(str(hscript_command))
 
     print('ACTIVITY: %s:%d/%d' % (tracker_address, tracker_port, sim_slice))
 
