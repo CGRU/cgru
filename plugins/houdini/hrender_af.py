@@ -198,7 +198,7 @@ if ds_node is not None:
     print('Tracker: %s:%d' % ( tracker_address, tracker_port))
     print('Simulation slice = %d' % sim_slice)
 
-    ds_node.parm('address').set( tracker_address)
+    ds_node.parm('visaddress').set( tracker_address)
     ds_node.parm('port'   ).set( tracker_port   )
     # ds_node.parm('slice'  ).set( sim_slice      ) default value is $SLICE and can't be set with this
 
