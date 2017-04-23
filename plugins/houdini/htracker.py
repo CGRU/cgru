@@ -71,7 +71,7 @@ def startTracker():
     """Starts the tracker process.
     """
     # First spawn the tracker, turning off verbosity.
-    simtracker.setVerbosity(False)
+    simtracker.setVerbosity(True)
     tracker_thread = threading.Thread(target=lambda: simtracker.serve( Options.port, Options.webport))
     tracker_thread.start()
 

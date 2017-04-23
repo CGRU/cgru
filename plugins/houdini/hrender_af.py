@@ -17,10 +17,13 @@ parser.add_option('-t', '--take',          dest='take',          type='string', 
 parser.add_option('-o', '--out',           dest='output',        type='string', help='Output file.')
 parser.add_option(      '--diskfile',      dest='diskfile',      type='string', help='Set to generate this file only.')
 parser.add_option(      '--numcpus',       dest='numcpus',       type='int',    help='Number of CPUs.')
+parser.add_option(      '--ds_type',       dest='ds_type',       type='int',    help='Distribute simulation partitioning type.')
 parser.add_option(      '--ds_node',       dest='ds_node',       type='string', help='Distribute simulation control node.')
+parser.add_option(      '--dc_node',       dest='dc_node',       type='string', help='Distribute simulation cluster node.')
 parser.add_option(      '--ds_address',    dest='ds_address',    type='string', help='Distribute simulation tracker address.')
 parser.add_option(      '--ds_port',       dest='ds_port',       type='int',    help='Distribute simulation tracker port.')
 parser.add_option(      '--ds_slice',      dest='ds_slice',      type='int',    help='Distribute simulation slice number.')
+parser.add_option(      '--ds_cluster',    dest='ds_cluster',    type='int',    help='Distribute simulation cluster number.')
 parser.add_option('-i', '--ignore_inputs', dest='ignore_inputs', action='store_true', default=False, help='Ignore inputs')
 
 options, args = parser.parse_args()
@@ -173,48 +176,113 @@ elif drivertypename == "wedge":
                 progress.set(1)
 
 
-elif drivertypename == "arnold":
-    # Trying to set ROP to output progress
-    progress = ropnode.parm('ar_log_verbosity')
-    if progress is not None:
-        value = progress.eval()
-        if value == 'warnings':
-            print('Trying to set "Right Output Style Progress" on arnold')
-            try:
-                progress.set('info')
-            except:
-                print('Failed, frame progress not available.')
-
 #
 # Distribute simulation:
 #
-ds_node = hou.node( options.ds_node)
-if ds_node is not None:
-    tracker_address = os.getenv('TRACKER_ADDRESS', options.ds_address )
-    tracker_port = int( os.getenv('TRACKER_PORT', options.ds_port ))
-    sim_slice = options.ds_slice
 
-    print('Setting distributed simulation parameters:')
-    print('Tracker: %s:%d' % ( tracker_address, tracker_port))
-    print('Simulation slice = %d' % sim_slice)
+ds_type = options.ds_type
 
-    ds_node.parm('visaddress').set( tracker_address)
-    ds_node.parm('port'   ).set( tracker_port   )
-    # ds_node.parm('slice'  ).set( sim_slice      ) default value is $SLICE and can't be set with this
+if ds_type:
 
-    # Setting $SLICE environment variable
-    sli_var = "SLICE"
+    if ds_type == 1:
+        # Slicing
+        ds_node = hou.node(options.ds_node)
+        tracker_address = os.getenv('TRACKER_ADDRESS', options.ds_address )
+        tracker_port = int( os.getenv('TRACKER_PORT', options.ds_port ))
+        sim_slice = options.ds_slice
 
-    try:
-        hou.allowEnvironmentVariableToOverwriteVariable(sli_var, True)
-    except AttributeError:
-        # should be Houdini 12
-        hou.allowEnvironmentToOverwriteVariable(sli_var, True)
+        print('Setting distributed simulation parameters:')
+        print('Tracker: %s:%d' % ( tracker_address, tracker_port))
+        print('Simulation slice = %d' % sim_slice)
 
-    hscript_command = "set -g %s = '%s'" % (sli_var, sim_slice)
-    hou.hscript(str(hscript_command))
+        ds_node.parm('visaddress').set( tracker_address)
+        ds_node.parm('port'   ).set( tracker_port   )
+        #ds_node.parm('slice'  ).set( sim_slice      ) default value is $SLICE and can't be set with this
 
-    print('ACTIVITY: %s:%d/%d' % (tracker_address, tracker_port, sim_slice))
+        # Setting $SLICE environment variable
+        sli_var = "SLICE"
+
+        try:
+            hou.allowEnvironmentVariableToOverwriteVariable(sli_var, True)
+        except AttributeError:
+            # should be Houdini 12
+            hou.allowEnvironmentToOverwriteVariable(sli_var, True)
+
+        hscript_command = "set -g %s = '%s'" % (sli_var, sim_slice)
+        hou.hscript(str(hscript_command))
+
+        print('ACTIVITY: %s:%d/%d' % (tracker_address, tracker_port, sim_slice))
+
+    elif ds_type == 2:
+        # Clustering
+        dc_node = hou.node(options.dc_node)
+        cluster_num = options.ds_cluster
+
+        print('Setting distributed simulation parameters:')
+        print('Simulation cluster = %d' % cluster_num)
+
+        dc_node.parm('cluster_filter').set(str(cluster_num))
+
+        # Setting $CLUSTER environment variable
+        cls_var = "CLUSTER"
+
+        try:
+            hou.allowEnvironmentVariableToOverwriteVariable(cls_var, True)
+        except AttributeError:
+            # should be Houdini 12
+            hou.allowEnvironmentToOverwriteVariable(cls_var, True)
+
+        hscript_command = "set -g %s = '%s'" % (cls_var, cluster_num)
+        hou.hscript(str(hscript_command))
+
+        print('ACTIVITY: cluster:%d' % (cluster_num))
+
+    elif ds_type == 3:
+        # Clustering and slicing
+        dc_node = hou.node(options.dc_node)
+        cluster_num = options.ds_cluster
+
+        ds_node = hou.node(options.ds_node)
+        tracker_address = os.getenv('TRACKER_ADDRESS', options.ds_address)
+        tracker_port = int(os.getenv('TRACKER_PORT', options.ds_port))
+        sim_slice = options.ds_slice
+
+        print('Setting distributed simulation parameters:')
+        print('Simulation cluster = %d' % cluster_num)
+        print('Tracker: %s:%d' % (tracker_address, tracker_port))
+        print('Simulation slice = %d' % sim_slice)
+
+        dc_node.parm('cluster_filter').set(str(cluster_num))
+
+        # Setting $CLUSTER environment variable
+        cls_var = "CLUSTER"
+
+        try:
+            hou.allowEnvironmentVariableToOverwriteVariable(cls_var, True)
+        except AttributeError:
+            # should be Houdini 12
+            hou.allowEnvironmentToOverwriteVariable(cls_var, True)
+
+        hscript_command = "set -g %s = '%s'" % (cls_var, cluster_num)
+        hou.hscript(str(hscript_command))
+
+        ds_node.parm('visaddress').set(tracker_address)
+        ds_node.parm('port').set(tracker_port)
+        # ds_node.parm('slice'  ).set( sim_slice      ) default value is $SLICE and can't be set with this
+
+        # Setting $SLICE environment variable
+        sli_var = "SLICE"
+
+        try:
+            hou.allowEnvironmentVariableToOverwriteVariable(sli_var, True)
+        except AttributeError:
+            # should be Houdini 12
+            hou.allowEnvironmentToOverwriteVariable(sli_var, True)
+
+        hscript_command = "set -g %s = '%s'" % (sli_var, sim_slice)
+        hou.hscript(str(hscript_command))
+
+        print('ACTIVITY: %s:%d/%d/%d' % (tracker_address, tracker_port,cluster_num, sim_slice))
 
 # Set take, if specified:
 if take is not None and len(take) > 0:
