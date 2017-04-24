@@ -1068,7 +1068,7 @@ int BlockData::getReadyTaskNumber( TaskProgress ** i_tp, const int64_t & i_job_f
 		bool nodivision_needed = false;
 		if( powered >= m_tasks_num )
 		{
-			bool nodivision_needed = true;
+			nodivision_needed = true;
 			powered = m_tasks_num;
 		}
 
