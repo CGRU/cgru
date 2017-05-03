@@ -25,12 +25,31 @@ function stcs_Show( i_args)
 	{
 		if( i_statuses[s] == null ) continue;
 
+		// Get progress from status:
+		var done = false;
+		var progress = 0;
+		if( i_statuses[s].progress )
+		{
+			progress = i_statuses[s].progress;
+			if( i_statuses[s].progress >= 100 )
+				done = true;
+		}
+
 		// Tasks collection:
 		if( i_statuses[s].tasks )
 		for( var t = 0; t < i_statuses[s].tasks.length; t++)
 		{
 			var task = i_statuses[s].tasks[t];
 
+			// If task has no own progress,
+			// we set task progress from status progress:
+			if( task.done == null )
+				task.done = done;
+			if( task.progress == null )
+				task.progress = progress;
+
+			if(( task.duration == null ) || ( task.duration <= 0 ))
+				task.duration = 1;
 			if(( task.tags == null ) || ( task.tags.length == 0 ))
 				task.tags = ['other'];
 			if(( task.artists == null ) || ( task.tags.artists == 0 ))
@@ -48,17 +67,25 @@ function stcs_Show( i_args)
 				var tag = task.tags[g];
 
 				if( tasks_types[tag] == null )
-					tasks_types[tag] = {"tags":[tag],"duration":0,"price":0,"artists":[]};
+					tasks_types[tag] = {"tags":[tag],"duration":0,"done":0,"progress":0,"price":null,"artists":[]};
 
 				if( task.artists && task.artists.length )
 				for( var a = 0; a < task.artists.length; a++)
 					if( tasks_types[tag].artists.indexOf( task.artists[a]) == -1 )
 						tasks_types[tag].artists.push( task.artists[a]);
 
-				if( task.duration )
-					tasks_types[tag].duration += task.duration;
+				tasks_types[tag].duration += task.duration;
+				if( task.done )
+					tasks_types[tag].done += task.duration;
+				if( task.progress )
+					tasks_types[tag].progress += task.duration * task.progress;
+
 				if( task.price )
+				{
+					if( tasks_types[tag].price == null )
+						tasks_types[tag].price = 0;
 					tasks_types[tag].price += task.price;
+				}
 			}
 
 			for( var a = 0; a < task.artists.length; a++)
@@ -66,17 +93,25 @@ function stcs_Show( i_args)
 				var artist = task.artists[a];
 
 				if( tasks_artists[artist] == null )
-					tasks_artists[artist] = {"artists":[artist],"duration":0,"price":0,"tags":[]};
+					tasks_artists[artist] = {"artists":[artist],"duration":0,"done":0,"progress":0,"price":0,"tags":[]};
 
 				if( task.tags && task.tags.length )
 				for( var g = 0; g < task.tags.length; g++)
 					if( tasks_artists[artist].tags.indexOf( task.tags[g]) == -1 )
 						tasks_artists[artist].tags.push( task.tags[g]);
 
-				if( task.duration )
-					tasks_artists[artist].duration += task.duration;
+				tasks_artists[tag].duration += task.duration;
+				if( task.done )
+					tasks_artists[tag].done += task.duration;
+				if( task.progress )
+					tasks_artists[tag].progress += task.duration * task.progress;
+
 				if( task.price )
-					tasks_artists[artist].price += task.price;
+				{
+					if( tasks_artists[tag].price == null )
+						tasks_artists[tag].price = 0;
+					tasks_artists[tag].price += task.price;
+				}
 			}
 		}
 
@@ -86,6 +121,8 @@ function stcs_Show( i_args)
 		{
 			var report = i_statuses[s].reports[r];
 
+			if(( report.duration == null ) || ( report.duration <= 0 ))
+				report.duration = 1;
 			if(( report.tags == null ) || ( report.tags.length == 0 ))
 				report.tags = ['other'];
 
@@ -231,7 +268,7 @@ if( i_data[0] == null ) console.log( JSON.stringify( i_args));
 	else
 		elTr.appendChild( elTh);
 
-	var summs = {"duration":0,"price":0};
+	var summs = {"duration":0,"done":0,"progress":0,"price":0};
 	for( var r = 0; r < i_data.length; r++)
 	{
 		var elTr = document.createElement('tr');
@@ -240,8 +277,10 @@ if( i_data[0] == null ) console.log( JSON.stringify( i_args));
 		var elTdD = document.createElement('td');
 		elTr.appendChild( elTdD);
 		elTdD.classList.add('duration');
-		elTdD.textContent = i_data[r].duration;
-		elTdD.title = '/8 = ' + (i_data[r].duration/8.0).toPrecision(2);
+		var text = c_NumToStr( i_data[r].duration);
+		if( i_data[r].done  )
+			text += ' / ' + c_NumToStr( i_data[r].done);
+		elTdD.textContent = text;
 
 		if( has_price )
 		{
@@ -284,16 +323,20 @@ if( i_data[0] == null ) console.log( JSON.stringify( i_args));
 			elTr.appendChild( elTd);
 
 		summs.duration += i_data[r].duration;
-		summs.price += i_data[r].price;
+		summs.done     += i_data[r].done;
+		summs.progress += i_data[r].progress;
+		summs.price    += i_data[r].price;
 	}
 
 	var elTr = document.createElement('tr');
 	elTb.appendChild( elTr);
 
 	var elTdD = document.createElement('th');
-	elTdD.textContent = summs.duration;
-	elTdD.title = '/8 = ' + (summs.duration/8.0).toPrecision(2);
 	elTr.appendChild( elTdD);
+	var text = c_NumToStr( summs.duration);
+	if( summs.done )
+		text += ' / ' + c_NumToStr( summs.done);
+	elTdD.textContent = text;
 
 	var elTdT = document.createElement('th');
 	elTdT.textContent = 'total';
@@ -344,6 +387,14 @@ if( i_data[0] == null ) console.log( JSON.stringify( i_args));
 		elBar.appendChild( elBarRect);
 		elBarRect.classList.add('rect');
 		elBarRect.style.width =  rect_w + '%';
+
+		if(( sort == 'duration') && i_data[i]['duration'] && i_data[i]['done'])
+		{
+			var elBarRectDone = document.createElement('div');
+			elBarRect.appendChild( elBarRectDone);
+			elBarRectDone.classList.add('rect_done');
+			elBarRectDone.style.width =  Math.round( 100.0 * i_data[i]['done'] / i_data[i]['duration']) + '%';
+		}
 
 		var elBarInfo = document.createElement('div');
 		elBar.appendChild( elBarInfo);

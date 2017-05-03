@@ -589,6 +589,22 @@ function c_Bytes2KMG( i_bytes)
 	return (i_bytes/th).toFixed(1) + ' ' + lables[log];
 }
 
+function c_NumToStr( i_num, i_prec)
+{
+	if( i_prec == null )
+		i_prec = 2;
+
+	var str = '';
+	if( i_num.toFixed )
+		str = i_num.toFixed( i_prec);
+	else
+		str += i_num;
+
+	str = str.replace(/0*$/,'').replace(/\.$/,'');
+
+	return str;
+}
+
 function c_GetThumbFileName( i_file)
 {
 	var name = c_PathBase( i_file);
