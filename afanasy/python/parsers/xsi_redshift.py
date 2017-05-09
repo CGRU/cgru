@@ -3,62 +3,91 @@
 from parsers import parser
 
 import re
-
-# INFO : [Redshift] Block 32/48 (7,4) rendered by GPU 0 in 2ms
-#        [Redshift] Block 126/135 (14,0) rendered by GPU 1 in 12ms
-re_percent = re.compile(
-    r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU.*)'
-)
-re_frame = re.compile(r'Rendering.*frame [0-9]+')
-
+# INFO : [Redshift] 	Block 32/48 (7,4) rendered by GPU 0 in 2ms
+re_percent = re.compile(r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU)')
+# re_frame = re.compile(r'Rendering frame [0-9]+')
+re_frame = re.compile(r': Rendering frame [0-9]+')
+re_skip = re.compile(r' skipped')
 
 class xsi_redshift(parser.parser):
-    """Softimage Redshift
-    """
+	"""Softimage Redshift
+	"""
 
-    def __init__(self):
-        parser.parser.__init__(self)
-        self.data_all = ''
-        self.first_frame = True
+	def __init__(self):
+		parser.parser.__init__(self)
+		self.firstframe = True
+		self.data_all = ''
+		
+	def do(self, data, mode):
+		"""Missing DocString
 
-        self.str_error = ['Frame rendering aborted']
+		:param data:
+		:param mode:
+		:return:
+		"""
 
-        self.block = 0
-        self.block_count = 0
+		if len(data) < 1:
+			return
+		
+		frame = False
+		block = 0
+		blockCount = 0
+		
+		match = re_frame.search(data)
+		if match is not None:
+			frame = True
 
-    def do(self, data, mode):
-        """Missing DocString
+		if self.percentframe == 0:	
+			self.activity = 'loading..'			
+		
+		match = re_skip.findall(data)
+		if match is not None:
+			if len(match):
+				self.activity = 'skipping frames..'
+				print("skipping " + str(len(match)) + " frames...")
+				self.frame += int(len(match))
+				self.calculate()
+				return
 
-        :param data:
-        :param mode:
-        :return:
-        """
+			
+		#print("cur frame " + str(self.frame))
 
-        if len(data) < 1:
-            return
 
-        match = re_frame.search(data)
-        if match is not None:
-            if not self.first_frame:
-                self.frame += 1
-            else:
-                self.first_frame = False
-            self.block = 0
-            self.block_count = 0
-            self.percentframe = 0
+		match = re_percent.findall(data)
+		if match is not None:
+			if len(match):
+				# get current block
+				block = float(match[0][2])
+				# get blockCount
+				blockCount = float(match[0][4])
 
-        match = re_percent.findall(data)
-        if match:
-            # get current block
-            matched_block = float(match[0][2])
-            self.block = max(self.block, matched_block)
+				# calculate percentage
+				percentframe = float(100/(blockCount/block))
 
-            # get block_count
-            found_block_count = float(match[0][4])
-            self.block_count = max(self.block_count, found_block_count)
+				#print(str(percentframe))
+				
+				#somewhat a hack to avoid jumping percentages with multiple GPUs
+				if int(percentframe) > 20:
+					if int(percentframe) > self.percentframe:
+						self.percent = int(percentframe)
+						self.percentframe = int(percentframe)
+				else:
+					self.percent = int(percentframe)
+					self.percentframe = int(percentframe)
+					
+				#print("Redshift: " + str(self.percentframe) + "%" )
+					
+				# activity
+				if self.percentframe < 99:
+					self.activity = 'rendering..'
+				if self.percentframe > 99:
+					self.activity = 'finalizing..'
 
-            # calculate percentage
-            self.percentframe = \
-                int(100.0 * self.block / float(self.block_count))
+		
+		if frame:
+			if not self.firstframe:
+				self.frame += 1
 
-        self.calculate()
+			self.firstframe = False
+
+		self.calculate()

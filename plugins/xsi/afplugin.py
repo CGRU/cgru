@@ -8,8 +8,8 @@ def XSILoadPlugin(in_reg):
 
 	in_reg.Name = "CGRU Afanasy Submit"
 	in_reg.URL = "http://cgru.sourceforge.net/"
-	in_reg.Major = 1
-	in_reg.Minor = 5
+	in_reg.Major = 2
+	in_reg.Minor = 2
 
 	in_reg.RegisterCommand("SubmitToAfanasy_PY", "SubmitToAfanasy")
 	in_reg.RegisterMenu(constants.siMenuTbRenderRenderID , "AfanasyPYMenu", False, False)
