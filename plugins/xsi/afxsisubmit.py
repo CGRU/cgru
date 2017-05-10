@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+"""
+	Softimage submitter 2.2
+	original Author: Timur Hairulin
+
+	continued and extended by: Stephan Haidacher
+"""
 import os
 
 import win32com.client
@@ -42,7 +48,7 @@ def Main():
 	defaultVariRenderStep = 1
 	defaultVariRenderCount = 4
 	defaultArnoldWatermarked = 0
-	defaultUseTemp = 0
+	defaultUseTemp = 1
 	defaultTempScenePath = 'P:\\- RENDERTEMP -\\'
 	defaultArnoldAutoThread = 1
 	defaultSkipFrame = 0
@@ -51,6 +57,7 @@ def Main():
 	defaultBucket = 64
 	defaultStillimage = False
 	defaultProgressive = False
+	defaultRayReserved = 0
 
 
 	# Pass selection logic
@@ -115,6 +122,7 @@ def Main():
 		defaultBucket 				= int(	 GetOpSetValue( opSet, 'afBucket',				defaultBucket ))
 		defaultStillimage 			= 		 GetOpSetValue( opSet, 'afStillimage', 			defaultStillimage )
 		defaultProgressive 			= bool(  GetOpSetValue( opSet, 'afProgressive', 		defaultProgressive ))
+		defaultRayReserved 			= int(	 GetOpSetValue( opSet, 'afRayReserved',			defaultRayReserved ))
 
 		pSet = None
 		Application.ExecuteCommand('DeleteObj',[str(Application.ActiveSceneRoot) + '.afSubmitProperties'])
@@ -154,6 +162,7 @@ def Main():
 	opSet.AddParameter3('afBucket',		   		 constants.siInt2,	  defaultBucket, 8, 512, False)
 	opSet.AddParameter3('afStillimage',	  		 constants.siBool,	  defaultStillimage, 0, 1, False)
 	opSet.AddParameter3('afProgressive',	 	 constants.siBool,	  defaultProgressive, 0, 1, False)
+	opSet.AddParameter3('afRayReserved', 		 constants.siInt4, 	  defaultRayReserved, 0, 1000000, False)
 
 
 # CREATE Layout -------------------------------------------------------
@@ -206,6 +215,7 @@ def Main():
 
 	oPPGLayout.AddGroup('Redshift specific',True,100)
 	oPPGLayout.AddItem('afProgressive', 		 'Progressive rendering', constants.siControlBoolean)
+	oPPGLayout.AddItem('afRayReserved', 		 'RayReservedMemory', constants.siControlNumber)
 	oPPGLayout.EndGroup()
 
 # -------
