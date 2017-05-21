@@ -333,6 +333,10 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		{
 			o_msg_response = af::jsonMsg( af::farm()->getText());
 		}
+		else if( type == "services_limits" )
+		{
+			o_msg_response = af::jsonMsg( af::farm()->jsonWriteLimits() );
+		}
 		else
 		{
 			o_msg_response = af::jsonMsgError(std::string("Invalid get type = '") + type + "'");

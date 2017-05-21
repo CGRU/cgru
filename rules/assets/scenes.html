@@ -84,10 +84,17 @@ opacity:.9;
 #scenes_statistics > div > div { margin: 4px; }
 #scenes_statistics .bars .bar { height: 12px; margin: 2px 0px; }
 #scenes_statistics .bars .bar .rect {
-background: rgba(0,250,0,.3);
+background: rgba(0,250,0,.5);
 height: 11px;
 box-shadow: 0 0 2px #000 inset;
 border-radius: 2px;
+position: relative;
+}
+#scenes_statistics .bars .bar .rect .rect_done {
+background: rgba(0,70,0,.9);
+height: 100%;
+border-radius: 2px;
+position: relative;
 }
 #scenes_statistics .bars .bar .info  { font-size: 12px; padding: 0px 4px; }
 

@@ -22,13 +22,13 @@ bool JobProgress::construct( Job * job)
    m_blocks_num = job->getBlocksNum();
    if( m_blocks_num < 1)
    {
-      AFERRAR("JobProgress::JobProgress: invalid number if blocks = %d (job name: '%s')", m_blocks_num, job->getName().c_str())
+      AFERRAR("JobProgress::JobProgress: Invalid number if blocks = %d (job name: '%s')", m_blocks_num, job->getName().c_str())
       return false;
    }
 
    if( initBlocks() == false)
    {
-      AFERROR("JobProgress::JobProgress: blocks initalization failed.")
+      AFERROR("JobProgress::JobProgress: Blocks initalization failed.")
       return false;
    }
 
@@ -38,13 +38,13 @@ bool JobProgress::construct( Job * job)
       tasksnum[b] = block->getTasksNum();
       if( tasksnum[b] < 1)
       {
-         AFERRAR("JobProgress::JobProgress: invalud number of tasks = %d (m_job_id=%d,block=%d)", tasksnum[b], job->getId(), b)
+         AFERRAR("JobProgress::JobProgress: Invalid number of tasks = %d (m_job_id=%d,block=%d)", tasksnum[b], job->getId(), b)
          return false;
       }
 
       if( initTasks( b, tasksnum[b]) == false)
       {
-         AFERRAR("JobProgress::JobProgress: tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
+         AFERRAR("JobProgress::JobProgress: Tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
          return false;
       }
    }

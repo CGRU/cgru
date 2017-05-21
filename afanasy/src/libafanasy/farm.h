@@ -59,6 +59,7 @@ public:
 	const std::string serviceLimitsInfoString( bool full = false) const; /// Generate services limits information.
 
 	void jsonWriteLimits( std::ostringstream & o_str) const; /// Generate services limits information.
+	const std::string jsonWriteLimits( ) const; /// Generate services limits information.
 
 	inline const std::string & getText() const { return m_text; }
 

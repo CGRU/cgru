@@ -5,11 +5,76 @@ import time
 import logging
 import functools
 
+import af
+import afcommon
 import pymel.core as pm
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
+
+
+renderer_to_block_type = {
+    'arnold': 'maya_arnold',
+    'redshift': 'maya_redshift',
+    'mentalRay': 'maya_mental',
+    '3delight': 'maya_delight'
+}
+
+
+class MayaRenderCommandBuilder(object):
+    """Builds a render command from render flags
+    """
+
+    def __init__(self, name='', file_full_path='', render_engine='maya',
+                 render_layer=None, camera=None, outputs=None, project='',
+                 by_frame=1):
+        self.name = name
+        self.file_full_path = file_full_path
+        self.render_engine = render_engine
+        self.render_layer = render_layer  # -rl "%s"
+        self.camera = camera  # -cam "%s"
+        if outputs is None:
+            outputs = []
+        self.outputs = outputs
+        self.project = project  # -proj "%s"
+        self.by_frame = by_frame
+
+    def build_command(self):
+        """Builds the render command
+
+        :return str: The render command
+        """
+        cmd_buffer = ['mayarender%s' % os.getenv('AF_CMDEXTENSION', '')]
+
+        if self.render_engine == 'mentalRay':
+            cmd_buffer.append('-r mr')
+            cmd_buffer.append('-art -v 5')
+        elif self.render_engine == 'maya_delight':
+            cmd_buffer.append('-r 3delight')
+        elif self.render_engine == 'maya':
+            cmd_buffer.append('-r file')
+
+        if self.render_engine == '3delight':
+            cmd_buffer.append('-an 1 -s @#@ -e @#@ -inc %d' % self.by_frame)
+        else:
+            cmd_buffer.append('-s @#@ -e @#@ -b %d' % self.by_frame)
+
+        if self.camera:
+            cmd_buffer.append(' -cam "%s"' % self.camera)
+
+        if self.render_layer:
+            if self.render_engine == '3delight':
+                cmd_buffer.append('-rp "%s"' % self.render_layer)
+            else:
+                cmd_buffer.append('-rl "%s"' % self.render_layer)
+
+        if self.project:
+            cmd_buffer.append('-proj "%s"' % os.path.normpath(self.project))
+
+        cmd_buffer.append(self.file_full_path)
+
+        return ' '.join(cmd_buffer)
 
 
 class UI(object):
@@ -18,7 +83,9 @@ class UI(object):
 
     def __init__(self):
         self.windows_name = 'cgru_afanasy_wnd'
+        self.window = None
 
+    def show(self):
         if pm.window(self.windows_name, exists=True):
             pm.deleteUI(self.windows_name)
 
@@ -110,21 +177,28 @@ class UI(object):
                 pm.text(l='Host Mask')
                 pm.textField(
                     'cgru_afanasy__hosts_mask',
-                    text='""'
+                    text=pm.optionVar.get('cgru_afanasy__hosts_mask_ov', '')
                 )
 
             with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
                 pm.text(l='Host Exclude')
                 pm.textField(
                     'cgru_afanasy__hosts_exclude',
-                    text='""'
+                    text=pm.optionVar.get('cgru_afanasy__hosts_exclude_ov', '')
+                )
+
+            with pm.rowLayout(nc=2, adj=2, cw2=(labels_width, 50)):
+                pm.text(l='Life Time (hours)')
+                pm.intField(
+                    'cgru_afanasy__life_time',
+                    v=pm.optionVar.get('cgru_afanasy__life_time_ov', -1)
                 )
 
             pm.checkBox('cgru_afanasy__paused', l='Start Paused', v=0)
             pm.checkBox(
                 'cgru_afanasy__separate_layers',
                 l='Submit Render Layers as Separate Tasks',
-                v=1
+                v=pm.optionVar.get('cgru_afanasy__separate_layers_ov', 1)
             )
 
             pm.button(
@@ -171,13 +245,16 @@ class UI(object):
                 'ignoreMotionBlur'
             ]
 
-            attr_values = [dAO.getAttr(attr) for attr in ignore_attrs]
+            attr_values = [
+                (attr, dAO.getAttr(attr))
+                for attr in ignore_attrs
+                if dAO.getAttr(attr) is True
+            ]
 
             if any(attr_values):
                 msg_text = '<br>'.join(
                     map(
-                        lambda x, y: '%s: %s' % (x, y),
-                        ignore_attrs,
+                        lambda x: '%s: %s' % (x[0], x[1]),
                         attr_values
                     )
                 )
@@ -234,6 +311,16 @@ class UI(object):
 
                 if response == 'No':
                     return
+            elif len(renderable_cameras) == 0:
+                pm.confirmDialog(
+                    title='No <b>Renderable</b> camera!!!',
+                    message='There is no <b>renderable camera<b>!!!',
+                    button=['Ok'],
+                    defaultButton='Ok',
+                    cancelButton='Ok',
+                    dismissString='Ok'
+                )
+                return
 
         except pm.MayaNodeError:
             # no default render globals node
@@ -250,6 +337,7 @@ class UI(object):
         separate_layers = \
             pm.checkBox('cgru_afanasy__separate_layers', q=1, v=1)
         pause = pm.checkBox('cgru_afanasy__paused', q=1, v=1)
+        life_time = pm.intField('cgru_afanasy__life_time', q=1, v=1)
 
         # check values
         if start_frame > end_frame:
@@ -260,6 +348,10 @@ class UI(object):
         frames_per_task = max(1, frames_per_task)
         by_frame = max(1, by_frame)
 
+        # store without quota sign
+        hosts_mask = hosts_mask.replace('"', '')
+        hosts_exclude = hosts_exclude.replace('"', '')
+
         # store field values
         pm.optionVar['cgru_afanasy__start_frame_ov'] = start_frame
         pm.optionVar['cgru_afanasy__end_frame_ov'] = end_frame
@@ -267,7 +359,8 @@ class UI(object):
         pm.optionVar['cgru_afanasy__by_frame_ov'] = by_frame
         pm.optionVar['cgru_afanasy__hosts_mask_ov'] = hosts_mask
         pm.optionVar['cgru_afanasy__hosts_exclude_ov'] = hosts_exclude
-        pm.optionVar['cgru_afanasy__separate_layers'] = separate_layers
+        pm.optionVar['cgru_afanasy__separate_layers_ov'] = separate_layers
+        pm.optionVar['cgru_afanasy__life_time_ov'] = life_time
 
         # get paths
         scene_name = pm.sceneName()
@@ -280,9 +373,8 @@ class UI(object):
 
         project_path = pm.workspace(q=1, rootDirectory=1)
 
-        outputs = ','.join(
+        outputs = \
             pm.renderSettings(fullPath=1, firstImageName=1, lastImageName=1)
-        )
 
         job_name = os.path.basename(scene_name)
 
@@ -296,42 +388,13 @@ class UI(object):
         if pm.checkBox('cgru_afanasy__close', q=1, v=1):
             pm.deleteUI(self.window)
 
-        cmd_buffer = [
-            '"%(filename)s"',
-            '%(start)s',
-            '%(end)s',
-            '-by %(by_frame)s',
-            '-hostsmask %(msk)s',
-            '-hostsexcl %(exc)s',
-            '-fpt %(fpt)s',
-            '-name "%(name)s"',
-            '-pwd "%(pwd)s"',
-            '-proj "%(proj)s"',
-            '-images "%(images)s"',
-            '-deletescene'
-        ]
-
-        kwargs = {
-            'filename': filename,
-            'start': start_frame,
-            'end': end_frame,
-            'by_frame': by_frame,
-            'msk': hosts_mask,
-            'exc': hosts_exclude,
-            'fpt': frames_per_task,
-            'name': job_name,
-            'pwd': project_path,
-            'proj': project_path,
-            'images': outputs
-        }
-
         drg = pm.PyNode('defaultRenderGlobals')
         render_engine = drg.getAttr('currentRenderer')
+
+        job = af.Job(job_name)
+
         stored_log_level = None
-        if render_engine == 'mentalRay':
-            cmd_buffer.append('-type maya_mental')
-        elif render_engine == 'arnold':
-            cmd_buffer.append('-type maya_arnold')
+        if render_engine == 'arnold':
             # set the verbosity level to warning+info
             aro = pm.PyNode('defaultArnoldRenderOptions')
             stored_log_level = aro.getAttr('log_verbosity')
@@ -339,14 +402,10 @@ class UI(object):
             # set output to console
             aro.setAttr("log_to_console", 1)
         elif render_engine == 'redshift':
-            cmd_buffer.append('-type maya_redshift')
             # set the verbosity level to detailed+info
             redshift = pm.PyNode('redshiftOptions')
             stored_log_level = redshift.logLevel.get()
             redshift.logLevel.set(2)
-
-        if pause:
-            cmd_buffer.append('-pause')
 
         # save file
         pm.saveAs(
@@ -358,9 +417,15 @@ class UI(object):
         # rename back to original name
         pm.renameFile(scene_name)
 
-        cmds = []
+        # create the render command
+        mrc = MayaRenderCommandBuilder(
+            name=job_name, file_full_path=filename,
+            render_engine=render_engine, project=project_path,
+            by_frame=by_frame
+        )
 
         # submit renders
+        blocks = []
         if separate_layers:
             # render each layer separately
             rlm = pm.PyNode('renderLayerManager')
@@ -368,36 +433,69 @@ class UI(object):
                       if layer.renderable.get()]
 
             for layer in layers:
+                mrc_layer = copy.copy(mrc)
                 layer_name = layer.name()
-                kwargs['name'] = '%s:%s' % (job_name, layer_name)
+                mrc_layer.name = layer_name
+                mrc_layer.render_layer = layer_name
 
-                tmp_cmd_buffer = copy.copy(cmd_buffer)
-                tmp_cmd_buffer.append(
-                    '-take %s' % layer.name()
+                # create a new block for this layer
+                block = af.Block(
+                    layer_name,
+                    renderer_to_block_type.get(render_engine, 'maya')
                 )
 
-                # create one big command
-                afjob_cmd = ' '.join([
-                    os.environ['CGRU_PYTHONEXE'],
-                    '"%s/python/afjob.py"' % os.environ['AF_ROOT'],
-                    '%s' % ' '.join(tmp_cmd_buffer) % kwargs
-                ])
-                cmds.append(afjob_cmd)
+                block.setFiles(
+                    afcommon.patternFromDigits(
+                        afcommon.patternFromStdC(
+                            afcommon.patternFromPaths(outputs[0], outputs[1])
+                        )
+                    ).split(';')
+                )
+                block.setNumeric(
+                    start_frame, end_frame, frames_per_task, by_frame
+                )
+                block.setCommand(mrc_layer.build_command())
 
+                blocks.append(block)
         else:
-            # create one big command
-            afjob_cmd = ' '.join([
-                os.environ['CGRU_PYTHONEXE'],
-                '%s/python/afjob.py' % os.environ['AF_ROOT'],
-                '%s' % ' '.join(cmd_buffer) % kwargs
-            ])
-            cmds.append(afjob_cmd)
+            # create only one block
+            block = af.Block(
+                'All Layers',
+                renderer_to_block_type.get(render_engine, 'maya')
+            )
 
-        # call each command separately
-        for cmd in cmds:
-            print(cmds)
+            block.setFiles(
+                afcommon.patternFromDigits(
+                    afcommon.patternFromStdC(
+                        afcommon.patternFromPaths(outputs[0], outputs[1])
+                    )
+                ).split(';')
+            )
+            block.setNumeric(
+                start_frame, end_frame, frames_per_task, by_frame
+            )
+            block.setCommand(mrc.build_command())
 
-            os.system(cmd)
+            blocks.append(block)
+
+        job.setFolder('input', os.path.dirname(filename))
+        job.setFolder('output', os.path.dirname(outputs[0]))
+        job.setHostsMask(hosts_mask)
+        job.setHostsMaskExclude(hosts_exclude)
+        if life_time > 0:
+            job.setTimeLife(life_time * 3600)
+
+        job.setCmdPost('deletefiles "%s"' % os.path.abspath(filename))
+        if pause:
+            job.offline()
+
+        # add blocks
+        job.blocks.extend(blocks)
+
+        status, data = job.send()
+        if not status:
+            pm.PopupError('Something went wrong!')
+        print('data: %s' % data)
 
         # restore log level
         if render_engine == 'arnold':

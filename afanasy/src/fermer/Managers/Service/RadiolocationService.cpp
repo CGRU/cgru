@@ -120,6 +120,7 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
         return false;
     
     o_tasks.clear();
+    m_task_resources.clear();
 
     long long curtime = time(0);
 
@@ -240,8 +241,10 @@ bool RadiolocationService::get(QList<TaskObject> &o_tasks, int i_index)
 
 QList<int> RadiolocationService::getTasksRawTime(int i_index)
 {
-
     QList<int> o_tasks;
+
+    if (i_index == 0)
+        return o_tasks;
 
     long long curtime = time(0);
 
@@ -456,16 +459,6 @@ void RadiolocationService::taskCommand(QString& o_ret, int i_index)
 }
 
 
-
-void jobGroupShowErrorBlades(QString& o_ret, RadiolocationStation::Ptr station, int i_job_id)
-{
-    std::ostringstream str;
-    RadiolocationStation::getItemInfo(str, "error_hosts","jobs", i_job_id);
-    Waves::Ptr answer = station->push( str );
-
-    RadiolocationStation::QStringFromMsg(o_ret, answer); 
-}
-
 //////////////////////////////////// JOBS ///////////////////////////////////////////////////////////////
 int getAvalibleSlots(af::Render * i_render, int i_total_slots)
 {
@@ -515,12 +508,13 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
         return;
     }
 
-    long long curtime = time(0);
-
     for (int i = 0 ; i < count; ++i)
     {
         af::Job * itemjob = (af::Job*)((*list)[i]);
 
+        str.str("");
+        itemjob->v_jsonWrite(str,0);
+        
         int64_t group_state = itemjob->getState();
 
         int block_count = itemjob->getBlocksNum();
@@ -558,9 +552,6 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
         QString hosts_mask = QString::fromStdString( itemjob->getHostsMask() );
         QString time_creation = QDateTime::fromTime_t( time_created ).toString("dd/MM/yy hh:mm");
 
-        QString error_blades("");
-        jobGroupShowErrorBlades(error_blades, m_station, job_id);
-        
         int job_percentage = 0;
         for( int b = 0; b < block_count; b++)
         {
@@ -575,10 +566,9 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
             if (m_jobs->isDeleted(hash)) continue;
 
             const af::BlockData * block = itemjob->getBlock(block_num);
-            
+
             QList<QString> blades;
 
-            float percent=0;
             long long curtime = time(0);//block->getTasksNum()
 
             // for( int t = 0; t < block->getTasksNum(); t++)
@@ -598,7 +588,6 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
 
             int last_time_update = m_jobs->lastTimeUpdatePercent(hash, block_percentage, curtime);
             int block_state = block->getState();
-            int time_delta = 0;
             QString approx_time = "-"; 
 
             if( time_started && (( block_state & AFJOB::STATE_DONE_MASK) == false))
@@ -679,6 +668,8 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
             QString user_color;
             m_users->getUserColor(user_name, user_color);
 
+            std::string repr = str.str();
+
             m_jobs->insert(  user_name
                             ,status
                             ,time_creation
@@ -697,11 +688,11 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
                             ,job_id
                             ,blades_length
                             ,approx_time
-                            ,error_blades
                             ,depends
                             ,QString::fromStdString(output_folder)
                             ,user_color
                             ,block->getProgressErrorHostsNum()
+                            ,repr
                     ) ;
         } // for block_num
     }// for count
@@ -974,8 +965,12 @@ QString RadiolocationService::jobShowErrorBlades(int i_index)
 
     int job_id, block_id, task_id;
     unpack(i_index, &job_id, &block_id, &task_id);
-    
-    jobGroupShowErrorBlades(o_ret, m_station, job_id);
+
+    std::ostringstream str;
+    RadiolocationStation::getItemInfo(str, "error_hosts","jobs", job_id);
+    Waves::Ptr answer = m_station->push( str );
+
+    RadiolocationStation::QStringFromMsg(o_ret, answer); 
 
     return o_ret;
 }
@@ -1128,7 +1123,11 @@ void RadiolocationService::bladesUpdate()
         int total_slots = render->getCapacity();
         int avalible_slots = RadiolocationStation::getAvalibleSlotsAndJobNames(render, total_slots, job_names, job_hashes);
 
-        m_blade_indeces.insert( std::pair<int,QList<int> >(i,job_hashes) );
+        m_it_blades = m_blade_indeces.find(i);
+        if (m_it_blades == m_blade_indeces.end())
+            m_blade_indeces.insert( std::pair<int,QList<int> >(i,job_hashes) );
+        else
+            m_blade_indeces[i] = job_hashes;
 
         if (busy_time != 0)
             busy_time = curtime - busy_time;

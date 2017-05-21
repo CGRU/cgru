@@ -8,7 +8,12 @@ import BladeStateEnums 1.0
 Rectangle {
     id: node_view
     color: "transparent"
-    //anchors.fill: parent
+
+    signal linesUpdate
+    onLinesUpdate: {
+        lines.getContext("2d").reset()
+        lines.requestPaint()
+    }
 
     property real zoomCoeff: 1
     property real zoomStep: 0.3
@@ -17,7 +22,7 @@ Rectangle {
     property int offsetX1:120
     property int offsetY1: 120
 
-
+    focus: visible ? true : false
 
     function debug(x) {
         return x;
@@ -259,7 +264,7 @@ Rectangle {
                     running: loaded_cpu>1 ? true : false
                     NumberAnimation { target: cpu_led; property: "opacity"; to: 1; duration: 100 }
                     NumberAnimation { target: cpu_led; property: "opacity"; to: 0; duration: 100 }
-                    NumberAnimation { target: cpu_led; property: "opacity"; to: 0; duration: 1000-(loaded_cpu*10) }
+                    NumberAnimation { target: cpu_led; property: "opacity"; to: 0; duration: Math.max(1000-(loaded_cpu*10),0) }
                 }
                 SequentialAnimation {
                     loops : -1
@@ -488,8 +493,8 @@ Rectangle {
         onPaint: {
             var ctx = getContext("2d");
             ctx.lineWidth = 2;
+
             for (var i=0;i<JobsModel.totalJobs();i++){
-                //console.log(" width"+width)
                 //var cHeight = height;
                 //var cWidth = width;
                 ctx.strokeStyle = Qt.rgba(0,0.69,0.62,0.7)
@@ -514,6 +519,7 @@ Rectangle {
                 var startBladeX =(BladesModel.getNodePosx(ib)+1)*zoomCoeff+nodeContainer.x
                 var startBladeY = (BladesModel.getNodePosy(ib)+33)*zoomCoeff+nodeContainer.y
                 ctx.moveTo(startBladeX, startBladeY)
+                //console.log(" BladesModel.getJobDependencies(ib) "+ib+" "+BladesModel.getJobDependencies(ib))
                 for (var b=0;b<BladesModel.getJobDependencies(ib);b++){
                     var endBladeX = (BladesModel.getJobPosx(ib,b)+148)*zoomCoeff+nodeContainer.x
                     var endBladeY = (BladesModel.getJobPosy(ib,b)+20)*zoomCoeff+nodeContainer.y

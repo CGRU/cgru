@@ -26,10 +26,10 @@ int JobObject::blades_length() const
  { return m_blades_length; }
 QString JobObject::approxTime()
  { return m_block_name; }
-QString JobObject::error_blades() const
- { return m_error_blades; }
 QString JobObject::depends() const
  { return m_depends; }
+std::string JobObject::repr() const
+{  return m_json_represent; }
 
 void JobObject::update(const QString &user_name
                   ,JobState::State status
@@ -49,10 +49,10 @@ void JobObject::update(const QString &user_name
                   ,int job_id
                   ,int blades_length
                   ,const QString &approx_time
-                  ,const QString &error_blades
                   ,const QString &depends
                   ,const QString &user_color
-                  ,int errors_avoid_blades)
+                  ,int errors_avoid_blades
+                  ,const std::string& json_represent)
 {
 
     m_user_name = user_name;
@@ -73,10 +73,10 @@ void JobObject::update(const QString &user_name
          m_job_id = job_id;
          m_blades_length = blades_length;
          m_approx_time = approx_time;
-         m_error_blades = error_blades;
          m_depends = depends;
          m_user_color = user_color;
          m_errors_avoid_blades = errors_avoid_blades;
+         m_json_represent = json_represent;
 }
 
 

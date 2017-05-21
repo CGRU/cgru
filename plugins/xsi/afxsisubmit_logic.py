@@ -1,4 +1,4 @@
-import re, os, shutil, time
+import re, os, shutil, time, sys
 
 import webbrowser
 
@@ -36,7 +36,7 @@ def SubmitButton_OnClicked():
 	scene = Application.ActiveProject.ActiveScene
 	scenefile = scene.Filename.Value
 	if not os.path.isfile(scenefile):
-		Application.LogMessage('Error: you need to save first.')
+		Application.LogMessage('Error: you need to save first.', 2)
 		return
 	
 
@@ -73,6 +73,7 @@ def SubmitButton_OnClicked():
 	Bucket 				= opSet.Parameters('afBucket'          ).Value
 	Stillimage          = opSet.Parameters('afStillimage'      ).Value
 	Progressive  		= opSet.Parameters('afProgressive'     ).Value
+	RayReserved			= opSet.Parameters('afRayReserved'	   ).Value
 
 	if frame_end < frame_start: frame_end = frame_start
 	if frame_by  < 1: frame_by  = 1
@@ -99,10 +100,23 @@ def SubmitButton_OnClicked():
 	
 	Application.logmessage(sceneRenderer)
 
-
+	"""
+	# CHECK SETTINGS
+	# Frame Set
+	range_setting = Application.GetValue('Passes.RenderOptions.FrameRangeSource')
+	Application.logmessage('BLAAAAAA: %s' % range_setting)
+	if Application.GetValue('Passes.%s.FrameRangeSource' % cpass) == 1:
+		Application.LogMessage('Sorry _Frame Set_ is not yet supported....aborting..., Pass:%s ' % cpass, 2)
+		return
+	# Timeline
+	if Application.GetValue('Passes.%s.FrameRangeSource' % cpass) == 2:
+		Application.LogMessage('Sorry _Timeline_ is not supported....aborting..., Pass:%s ' % cpass, 2)
+		return
+	"""
 
 	#just run through to set new settings....
 	for cpass in passes:
+
 
 		# Get framebuffers:
 		for ps in scene.Passes:
@@ -114,8 +128,6 @@ def SubmitButton_OnClicked():
 								
 			Application.logmessage('Scene Renderer: %s' % curRenderer)
 
-			# GLOBAL
-			nudel = Application.SetValue('Passes.%s.mentalray.TileSize' % cpass, Bucket, '')
 
 			# SkipFrames
 			if (SkipFrame == True):
@@ -124,9 +136,14 @@ def SubmitButton_OnClicked():
 			else:
 				Application.SetValue('Passes.%s.FrameSkipRendered' % cpass, False, '')
 				Application.logmessage('skip frames: OFF')
-				
 
-			# ARNOLD SPECIFIC			
+
+			# MENTAL RAY SPECIFIC
+			if (curRenderer == 'Mental Ray'):
+				nudel = Application.SetValue('Passes.%s.mentalray.TileSize' % cpass, Bucket, '')
+
+
+			# ARNOLD SPECIFIC
 			if (curRenderer == 'Arnold Render'):
 				Application.logmessage('found Arnold pass, setting new values.....')
 								
@@ -152,9 +169,9 @@ def SubmitButton_OnClicked():
 						nudel = Application.SetValue('Passes.%s.Arnold_Render_Options.autodetect_threads' % cpass, 0, '')
 						nudel = Application.SetValue('Passes.%s.Arnold_Render_Options.threads' % cpass, ArnoldThreadsCount, '')
 
+				# bucketsize
 				Application.logmessage('forcing bucketsize....')
 				nudel = Application.SetValue('Passes.%s.Arnold_Render_Options.bucket_size' % cpass, Bucket, '')
-				nudel = Application.SetValue('Passes.%s.Redshift_Options.BucketSize' % cpass, Bucket, '')
 				
 				if Stillimage:
 					Application.logmessage('tiled EXRs, no autocrop, top tiles')
@@ -175,7 +192,8 @@ def SubmitButton_OnClicked():
 			# REDSHIFT SPECIFIC			
 			if (curRenderer == 'Redshift'):
 				Application.logmessage('found Redshift pass, setting new values.....')
-				
+
+
 				if Progressive:
 					nudel = Application.SetValue('Passes.%s.Redshift_Options.ProgressiveRenderingEnabled' % cpass, 1, '')
 				else:
@@ -192,8 +210,16 @@ def SubmitButton_OnClicked():
 					nudel = Application.SetValue('Passes.%s.Redshift_Options.Autocrop' % cpass, True, '')
 					nudel = Application.SetValue('Passes.%s.Redshift_Options.BucketOrder' % cpass, 1, '')
 
-					# force logging
-					nudel = Application.SetValue('Passes.%s.Redshift_Options.LogLevel' % cpass, 2, '')
+				# force logging
+				nudel = Application.SetValue('Passes.%s.Redshift_Options.LogLevel' % cpass, 2, '')
+
+				# bucketsize
+				Application.logmessage('forcing bucketsize....')
+				nudel = Application.SetValue('Passes.%s.Redshift_Options.BucketSize' % cpass, Bucket, '')
+
+				# rayreserved
+				Application.logmessage('forcing rayreservedmemory....')
+				nudel = Application.SetValue('Passes.%s.Redshift_Options.NumGPUMBToReserveForRays' % cpass, RayReserved, '')
 
 	# save the changes
 	Application.SaveScene()
@@ -221,7 +247,7 @@ def SubmitButton_OnClicked():
 				Application.LogMessage('found _Frame Range_ setting...')
 			# Frame Set
 			if Application.GetValue('Passes.%s.FrameRangeSource' % cpass) == 1:
-				Application.LogMessage('Sorry _Frame Set_ is not yet supported....aborting..., Pass:%s ' % cpass)
+				Application.LogMessage('Sorry _Frame Set_ is not yet supported....aborting..., Pass:%s ' % cpass, 2)
 				return
 			# Timeline
 			if Application.GetValue('Passes.%s.FrameRangeSource' % cpass) == 2:
@@ -229,7 +255,7 @@ def SubmitButton_OnClicked():
 				#cp_frame_end = Application.GetValue('PlayControl.Out')
 				#cp_frame_by = 1
 				#Application.LogMessage('found _Timeline_ setting...')
-				Application.LogMessage('Sorry _Timeline_ is not supported....aborting..., Pass:%s ' % cpass)
+				Application.LogMessage('Sorry _Timeline_ is not supported....aborting..., Pass:%s ' % cpass, 2)
 				return
 			# Scene Render Options
 			if Application.GetValue('Passes.%s.FrameRangeSource' % cpass) == 3:
@@ -275,7 +301,7 @@ def SubmitButton_OnClicked():
 							images_array.append(filename)
 							
 					else:
-						Application.LogMessage('Can`t solve "%s". Exiting.....' % filename)
+						Application.LogMessage('Can`t solve "%s". Exiting.....' % filename, 2)
 						return
 						
 		
@@ -290,14 +316,22 @@ def SubmitButton_OnClicked():
 		else:
 			tmpscene = scenefile + '.' + curjobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + '.scn'
 		try:
-			shutil.copyfile( scenefile, tmpscene)
+			# shutil.copyfile( scenefile, tmpscene)
+
+			if sys.platform == 'win32':
+				os.popen('cmd /C copy "%s" "%s" /Y' % (scenefile, tmpscene),'r')
+				Application.LogMessage('Windows platform detected.. using copy "%s" "%s" /Y' % (scenefile, tmpscene))
+			else:
+				shutil.copy(scenefile, tmpscene)
+
+
 		except:
-			Application.LogMessage('Unable to copy temporary scene:')
+			Application.LogMessage('Unable to copy temporary scene:', 2)
 			Application.LogMessage( tmpscene)
 			Application.LogMessage( str(sys.exc_info()[1]))
 			return
 		if not os.path.isfile( tmpscene):
-			Application.LogMessage('Error: Can\'t save temporary scene.')
+			Application.LogMessage('Error: Can\'t save temporary scene.', 2)
 			return
 
 

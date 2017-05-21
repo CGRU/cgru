@@ -53,6 +53,7 @@ public:
     QString m_user_color;
 };
 
+typedef std::vector<UserObject::Ptr>::iterator UserObjectPtrIt;
 
 
 #endif
