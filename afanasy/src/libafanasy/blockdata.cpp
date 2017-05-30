@@ -80,6 +80,8 @@ void BlockData::initDefaults()
 	m_multihost_max_wait = 0;
 	m_multihost_service_wait = 0;
 	m_parser_coeff = 1;
+	m_time_started = 0;
+	m_time_done    = 0;
 
 	p_percentage     = 0;
 	p_error_hosts    = 0;
@@ -174,6 +176,8 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_string("custom_data",           m_custom_data,           i_object, io_changes);
 	jr_int32 ("parser_coeff",          m_parser_coeff,          i_object, io_changes);
 	jr_int64 ("sequential",            m_sequential,            i_object, io_changes);
+	jr_int64 ("time_started",          m_time_started,          i_object, io_changes);
+	jr_int64 ("time_done",             m_time_done,             i_object, io_changes);
 	jr_stringmap("environment",        m_environment,           i_object, io_changes);
 
 
@@ -386,6 +390,10 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 			o_str << ",\n\"file_size_min\":" << m_file_size_min;
 		if( m_file_size_max > 0 )
 			o_str << ",\n\"file_size_max\":" << m_file_size_max;
+		if( m_time_started > 0 )
+			o_str << ",\n\"time_started\":" << m_time_started;
+		if( m_time_done > 0 )
+			o_str << ",\n\"time_done\":" << m_time_done;
 		if( m_max_running_tasks != -1 )
 			o_str << ",\n\"max_running_tasks\":"          << m_max_running_tasks;
 		if( m_max_running_tasks_per_host != -1 )
@@ -552,6 +560,8 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_String  ( m_custom_data,           msg);
 		rw_StringVect ( m_files,              msg);
 		rw_StringMap  ( m_environment,        msg);
+		rw_int64_t ( m_time_started,          msg);
+		rw_int64_t ( m_time_done,             msg);
 
 	case Msg::TJobsList:
 		rw_int64_t ( m_flags,                        msg);
@@ -588,6 +598,8 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int32_t ( m_errors_forgive_time,          msg);
 		rw_int32_t ( m_task_progress_change_timeout, msg);
 		rw_uint32_t( m_tasks_max_run_time,           msg);
+		rw_int64_t ( m_time_started,                 msg);
+		rw_int64_t ( m_time_done,                    msg);
 
 	case Msg::TBlocksProgress:
 
@@ -611,6 +623,8 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int64_t ( m_state,     msg);
 		rw_int32_t ( m_job_id,    msg);
 		rw_int32_t ( m_block_num, msg);
+		rw_int64_t ( m_time_started, msg);
+		rw_int64_t ( m_time_done,    msg);
 
 		rw_data( p_progressbar, msg, AFJOB::ASCII_PROGRESS_LENGTH);
 
@@ -1399,6 +1413,11 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
       if( full ) o_str << "\n Tasks Warning = " << p_tasks_warning;
       if( full ) o_str << "\n Tasks Wait Reconnect = " << p_tasks_waitrec;
 
+      static const char timeformat[] = "%Y.%m.%d %H:%M.%S";
+
+      if( full && (m_time_started > 0) ) o_str << "\n Start time = " << af::time2str( m_time_started, timeformat );
+      if( full && (m_time_done > 0) ) o_str << "\n Done time = " << af::time2str( m_time_done, timeformat );
+
       if( p_error_hosts ) o_str << "\n Error hosts count = " << p_error_hosts;
       if( p_avoid_hosts ) o_str << "\n Avoid hosts count = " << p_avoid_hosts;
 
@@ -1523,7 +1542,11 @@ bool BlockData::updateProgress( JobProgress * progress)
 		m_state = m_state | AFJOB::STATE_RUNNING_MASK;
 
 	if( new_tasks_done == m_tasks_num )
+	{
+		if (m_time_done == 0)
+			m_time_done = time(NULL);
 		m_state = m_state | AFJOB::STATE_DONE_MASK;
+	}
 
 	if( new_tasks_warning )
 		m_state = m_state | AFJOB::STATE_WARNING_MASK;
@@ -1589,4 +1612,19 @@ void BlockData::generateProgressStream( std::ostringstream & o_str) const
 {
 	o_str << std::string( p_progressbar, AFJOB::ASCII_PROGRESS_LENGTH);
 	o_str << std::endl;
+}
+
+
+void BlockData::setTimeStarted(long long value, bool reset) 
+{ 
+	if (m_time_started == 0)
+		m_time_started = value;
+
+	if (reset == true)
+		m_time_started = value;
+}
+
+void BlockData::setTimeDone(long long value) 
+{ 
+	m_time_done = value;
 }

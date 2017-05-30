@@ -957,6 +957,8 @@ bool JobAf::solveOnRender( RenderAf * i_render, MonitorContainer * i_monitoring)
 			delete task_exec;
 			continue;
 		}
+
+		m_blocks[task_exec->getBlockNum()]->m_data->setTimeStarted( time(NULL) );
 		
 		// If job was not started it became started
 		if( m_time_started == 0 )

@@ -277,6 +277,13 @@ public:
 	const std::string generateProgressString() const;
 	void stdOutProgress() const;
 
+
+	inline long long getTimeStarted()       const { return m_time_started;     }
+	inline long long getTimeDone()          const { return m_time_done;        }
+
+	void setTimeStarted(long long value, bool reset = false);
+	void setTimeDone(long long value);
+
 protected:
 	/// Read or write block.
 	virtual void v_readwrite( Msg * msg);
@@ -362,6 +369,9 @@ protected:
 	RegExp m_need_properties;
 
 	TaskData ** m_tasks_data;        ///< Tasks data pointer.
+
+	int64_t m_time_started;
+	int64_t m_time_done;
 
 private:
 	void initDefaults();  ///< Initialize default values
