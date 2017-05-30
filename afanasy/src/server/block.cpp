@@ -498,11 +498,11 @@ void Block::skipRestartTasks( bool i_skip, const std::string & i_message, const 
 		if( i_skip )
 			m_tasks[t]->skip( i_message, i_action.renders, i_action.monitors);
 		else
-      {
-         m_data->setTimeStarted(time(NULL), true);
-         m_data->setTimeDone(0);
-         m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
-      }
+		{
+			m_data->setTimeStarted(time(NULL), true);
+			m_data->setTimeDone(0);
+			m_tasks[t]->restart( i_message, i_action.renders, i_action.monitors, i_state);
+		}
 	}
 }
 
