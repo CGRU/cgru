@@ -1051,6 +1051,60 @@ class Cmd:
         self.data['operation'] = {'type': 'exit'}
         self._sendRequest()
 
+    def monitorRegister(self):
+        """Missing DocString
+        :return:
+        """
+        self.action = 'get'
+        self.data['type'] = 'monitors'
+        #print(self.data)
+        result = self._sendRequest()
+        monitorId = None
+        for monitor in result['monitors']:
+            if monitor['user_name'] == self.data['user_name'] and monitor['name'] == "%s@%s" % (self.data['user_name'], self.data['host_name']) and monitor['engine'] == "python":
+                monitorId = monitor['id']
+        
+        if monitorId == None:
+            self.__init__()
+            self.action = "monitor"
+            self.data['engine'] = 'python'
+            result = self._sendRequest()
+            monitorId = result['monitor']['id']
+        return monitorId
+    
+    def monitorUnregister(self, monitorId):
+        """Missing DocString
+        
+        :param monitorId:
+        :return:
+        """
+        self.action = "action"
+        self.data["type"] = "monitors"
+        self.data["ids"] = [monitorId]
+        self.data["operation"] = {"type": "deregister"}
+        return self._sendRequest()
+    
+    def monitorSubscribe(self, monitorId, classType):
+        """Missing DocString
+        
+        :param monitorId:
+        :return:
+        """
+        self.action = "action"
+        self.data["type"] = "monitors"
+        self.data["ids"] = [monitorId]
+        self.data["operation"] = {"type": "watch",
+                                  "class": classType,
+                                  "status": "subscribe"}
+        return self._sendRequest()
+    
+    def monitorEvents(self, monitorId):
+        self.action = 'get'
+        self.data['type'] = 'monitors'
+        self.data['ids'] = [monitorId]
+        self.data['mode'] = 'events'
+        return self._sendRequest()
+        
     def renderGetList(self, mask=None):
         """Missing DocString
 
