@@ -1088,6 +1088,7 @@ class Cmd:
         """Missing DocString
         
         :param monitorId:
+        :param classType:
         :return:
         """
         self.action = "action"
@@ -1099,6 +1100,11 @@ class Cmd:
         return self._sendRequest()
     
     def monitorEvents(self, monitorId):
+        """Missing DocString
+        
+        :param monitorId:
+        :return:
+        """
         self.action = 'get'
         self.data['type'] = 'monitors'
         self.data['ids'] = [monitorId]
