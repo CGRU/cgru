@@ -860,7 +860,7 @@ class Cmd:
         else:
             return None
 
-    def getJobList(self, verbose=False):
+    def getJobList(self, verbose=False, ids=None):
         """Missing DocString
 
         :param bool verbose:
@@ -868,6 +868,8 @@ class Cmd:
         """
         self.action = 'get'
         self.data['type'] = 'jobs'
+        if ids is not None:
+            self.data['ids'] = ids
         data = self._sendRequest()
         if data is not None:
             if 'jobs' in data:
