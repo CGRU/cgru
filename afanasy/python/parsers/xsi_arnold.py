@@ -6,7 +6,8 @@ import re
 # 00:00:15   325MB         |    20% done - 115 rays/pixel
 re_percent = re.compile(r'(\s*)(\d*)(%\s*done)')
 re_frame = re.compile(r': Rendering frame [0-9]+')
-re_skip = re.compile(r'Skipping Frame')
+re_skip = re.compile(r'Skipping Frame [0-9]+')
+re_exit = re.compile(r'Render completed ')
 
 class xsi_arnold(parser.parser):
 	"""Softimage Arnold
@@ -64,6 +65,12 @@ class xsi_arnold(parser.parser):
 					self.activity = 'rendering..'	
 				if self.percentframe > 99:
 					self.activity = 'finalizing..'
-			
+		
+		match = re_exit.findall(data)
+		if match is not None:
+			if len(match):
+				print("block should be complete...")
+				self.percent = 100
+				self.percentframe = 100
 		
 		self.calculate()

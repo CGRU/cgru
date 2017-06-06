@@ -5,9 +5,9 @@ from parsers import parser
 import re
 # INFO : [Redshift] 	Block 32/48 (7,4) rendered by GPU 0 in 2ms
 re_percent = re.compile(r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU)')
-# re_frame = re.compile(r'Rendering frame [0-9]+')
 re_frame = re.compile(r': Rendering frame [0-9]+')
-re_skip = re.compile(r' skipped')
+re_skip = re.compile(r'[0-9]+ skipped')
+re_exit = re.compile(r'Render completed ')
 
 class xsi_redshift(parser.parser):
 	"""Softimage Redshift
@@ -90,4 +90,12 @@ class xsi_redshift(parser.parser):
 
 			self.firstframe = False
 
+			
+		match = re_exit.findall(data)
+		if match is not None:
+			if len(match):
+				print("block should be complete...")
+				self.percent = 100
+				self.percentframe = 100
+			
 		self.calculate()
