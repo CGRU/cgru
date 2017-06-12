@@ -138,9 +138,9 @@ def copy_file(source_file, destination_file, delete_original=False, debug=False)
                 os.remove(source_file)
             except Exception as err:
                 if err.errno is errno.ENOENT:
-                     if debug:
-                         print('Debug: %s was already removed.' % source_file)
-                     return True
+                    if debug:
+                        print('Debug: %s was already removed.' % source_file)
+                    return True
                 elif err.errno is errno.EPERM or err.errno is errno.EACCES:
                     print('Warning! Could not remove %s, permission denied' % source_file)
                     return False
