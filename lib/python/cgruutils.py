@@ -356,28 +356,28 @@ def copyJobFile(fileName, jobName='', fileExtension=''):
             shutil.copyfile(fileName, copyFile)
         except Exception as err:
             if err.errno is errno.EPERM or err.errno is errno.EACCES:
-                print('Warning! Could not copy %s to %s, permission denied.' % (source_file, destination_file))
+                print('Warning! Could not copy %s to %s, permission denied.' % (fileName, copyFile))
             elif err.errno is errno.ENOSPC:
-                print('Warning! Could not copy %s to %s, no space left on device.' % (source_file, destination_file))
+                print('Warning! Could not copy %s to %s, no space left on device.' % (fileName, copyFile))
             elif err.errno is errno.ENOENT:
-                print('Warning! Could not copy %s to %s, folder not found.' % (source_file, destination_file))
-                print('Trying to create folder %s. ' % os.path.dirname(destination_file))
+                print('Warning! Could not copy %s to %s, folder not found.' % (fileName, copyFile))
+                print('Trying to create folder %s. ' % os.path.dirname(copyFile))
                 try:
-                    os.makedirs(os.path.dirname(destination_file))
+                    os.makedirs(os.path.dirname(copyFile))
                     print('Directory created, trying to copy file again.')
-                    copy_file(source_file, destination_file, delete_original, debug)
-                    return copyfile
+                    copyJobFile(fileName, jobName, fileExtension)
+                    return copyFile
                 except Exception as err:
                     if err.errno is errno.EPERM or err.errno is errno.EACCES:
-                        print('Warning! Could not create directory %s, permission denied' % os.path.dirname(destination_file))
+                        print('Warning! Could not create directory %s, permission denied' % os.path.dirname(copyFile))
                     elif err.errno is errno.ENOSPC:
-                        print('Warning! Could not create direcotry %s, no space left on device.' % os.path.dirname(destination_file))
+                        print('Warning! Could not create direcotry %s, no space left on device.' % os.path.dirname(copyFile))
                     elif err.errno is errno.EROFS:
-                        print('Warning! Could not create direcotry %s, read-only file system.' % os.path.dirname(destination_file))
+                        print('Warning! Could not create direcotry %s, read-only file system.' % os.path.dirname(copyFile))
                     else:
-                        print('Warning! Unexpected error while trying to remove %s' % source_file)
+                        print('Warning! Unexpected error while trying to remove %s' % fileName)
                         print('Error: %s' % err)
-                    copyfile = ''
+                    copyFile = ''
             copyFile = ''
     return copyFile
 
