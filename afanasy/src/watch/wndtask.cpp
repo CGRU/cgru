@@ -509,9 +509,9 @@ void WndTask::showExec( af::MCTask & i_mctask)
 	#endif
 
 	if( parsed_files.size())
-		layout->addWidget( new QLabel("Preview Files (parsed):", m_tab_exec));
+		layout->addWidget( new QLabel("Files (parsed):", m_tab_exec));
 	else
-		layout->addWidget( new QLabel("Preview Files:", m_tab_exec));
+		layout->addWidget( new QLabel("Files:", m_tab_exec));
 	QHBoxLayout * layoutH = new QHBoxLayout();
 	QVBoxLayout * layoutL = new QVBoxLayout();
 	QVBoxLayout * layoutR = new QVBoxLayout();

@@ -151,7 +151,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
                 if( preview_cmds.size())
                 {
-                    QMenu * submenu_cmd = new QMenu( "Preview", this);
+                    QMenu * submenu_cmd = new QMenu( "Launch", this);
                     for( int i = 0; i < itemBlock->files.size(); i++)
                     {
                         action = new QAction( afqt::stoq(itemBlock->files[i]).right(55), this);
@@ -240,7 +240,7 @@ void ListTasks::generateMenu(QMenu &o_menu, Item *item)
 				const std::vector<std::string> preview_cmds = af::Environment::getPreviewCmds();
 				if( preview_cmds.size())
                 {
-                    QMenu * submenu_cmd = new QMenu( "Preview", this);
+                    QMenu * submenu_cmd = new QMenu( "Launch", this);
                     for( int i = 0; i < files.size(); i++)
                     {
                         action = new QAction( afqt::stoq(files[i]).right(55), this);
