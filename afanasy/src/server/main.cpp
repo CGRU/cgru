@@ -15,6 +15,7 @@
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
+#include "socketsprocessing.h"
 #include "sysjob.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
@@ -267,6 +268,8 @@ int main(int argc, char *argv[])
 			AF_ERR << err;
 	}
 
+	SocketsProcessing * socketsProcessing = new SocketsProcessing( &threadArgs);
+
 	/*
 	  Start the thread that is responsible of listening to the port
 	  for incoming connections.
@@ -285,16 +288,16 @@ int main(int argc, char *argv[])
 		DlThread::Self()->Sleep( 1 );
 	}
 
-	//AF_LOG << "Waiting child threads.";
-	//alarm(1);
-	/*FIXME: Why we don`t need to join accent thread? */
-	//ServerAccept.Cancel();
-	//ServerAccept.Join();
+	AF_LOG << "Waiting child threads to exit...";
+	alarm(1);
+	ServerAccept.Cancel();
+	ServerAccept.Join();
 
-	//AF_LOG << "Waiting Run.";
 	// No need to chanel run cycle thread as
 	// every new cycle it checks running external valiable
 	RunCycleThread.Join();
+
+	delete socketsProcessing;
 
 	af::destroy();
 

@@ -72,6 +72,9 @@ void Profiler::processingFinished()
 
 void Profiler::Collect( Profiler * i_prof)
 {
+	if( NULL == i_prof )
+		return;
+
 	clock_gettime( CLOCK_MONOTONIC, &(i_prof->m_tcollect));
 
 	DlScopeLocker lock(&ms_mutex);

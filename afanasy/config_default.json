@@ -192,8 +192,14 @@
 	"af_sysjob_events_service":"events",
 
 "":"Network:",
-	"":"Server thread raised to process client connection stack.",
-	"af_server_process_conn_stack":32768,
+	"":"Number of threads to read/write clients connections.",
+	"af_server_sockets_readwrite_threads_num":10,
+	"":"Number of threads to process clients connections.",
+	"af_server_sockets_processing_threads_num":10,
+
+	"":"Server sockets processing stack size.",
+	"-af_server_sockets_readwrite_threads_stack":32768,
+	"-af_server_sockets_processing_threads_stack":32768,
 		"":"Zero, negative value or no parameter means to use system default",
 
 	"":"Use -1 value not to set socket option at all",

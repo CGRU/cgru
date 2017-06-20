@@ -99,7 +99,10 @@ std::string Environment::sysjob_events_service =      AFJOB::SYSJOB_EVENTS_SERVI
 
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
-int Environment::server_process_conn_stack = AFSERVER::PROCESS_CONN_STACK;
+int Environment::server_sockets_readwrite_threads_num    = AFSERVER::SOCKETS_READWRITE_THREADS_NUM;
+int Environment::server_sockets_readwrite_threads_stack  = AFSERVER::SOCKETS_READWRITE_THREADS_STACK;
+int Environment::server_sockets_processing_threads_num   = AFSERVER::SOCKETS_PROCESSING_THREADS_NUM;
+int Environment::server_sockets_processing_threads_stack = AFSERVER::SOCKETS_PROCESSING_THREADS_STACK;
 
 /// Socket Options:
 int Environment::so_server_LINGER       = AFNETWORK::SO_SERVER_LINGER;
@@ -219,7 +222,10 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, db_stringnamelen,                  "af_db_stringnamelen"                  );
 	getVar( i_obj, db_stringexprlen,                  "af_db_stringexprlen"                  );
 
-	getVar( i_obj, server_process_conn_stack,         "af_server_process_conn_stack"         );
+	getVar( i_obj, server_sockets_readwrite_threads_num,    "af_server_sockets_readwrite_threads_num"    );
+	getVar( i_obj, server_sockets_readwrite_threads_stack,  "af_server_sockets_readwrite_threads_stack"  );
+	getVar( i_obj, server_sockets_processing_threads_num,   "af_server_sockets_processing_threads_num"   );
+	getVar( i_obj, server_sockets_processing_threads_stack, "af_server_sockets_processing_threads_stack" );
 
 	/// Socket Options:
 	getVar( i_obj, so_server_LINGER,                  "af_so_server_LINGER"                  );

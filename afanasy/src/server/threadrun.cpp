@@ -133,7 +133,7 @@ void threadRunCycle( void * i_args)
 
 	// Save store on exit:
 	AFCommon::saveStore();
-	AF_LOG << "Main thread finished.";
+	AF_LOG << "Run thread finished.";
 
 }// - end of the thead function
 

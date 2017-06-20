@@ -13,6 +13,8 @@ class RenderContainer;
 class JobContainer;
 class UserContainer;
 
+class SocketsProcessing;
+
 struct ThreadArgs
 {
 	MonitorContainer  * monitors;
@@ -21,6 +23,5 @@ struct ThreadArgs
 	UserContainer     * users;
 	af::MsgQueue      * msgQueue;
 
-	int sd;
-	struct sockaddr_storage ss;
+	SocketsProcessing * socketsProcessing;
 };

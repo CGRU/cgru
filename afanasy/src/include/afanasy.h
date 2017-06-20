@@ -62,7 +62,10 @@ namespace AFSERVER
 	const int  SOLVING_TASKS_SPEED       = -1;
 	const int  SOLVING_WAKE_PER_CYCLE    = 1;
 
-	const int  PROCESS_CONN_STACK = 0; // Server thread to prcess client connection stack size
+	const int  SOCKETS_READWRITE_THREADS_NUM   = 10;
+	const int  SOCKETS_PROCESSING_THREADS_NUM  = 10;
+	const int  SOCKETS_READWRITE_THREADS_STACK  = 0;
+	const int  SOCKETS_PROCESSING_THREADS_STACK = 0;
 }
 
 /// Database options:

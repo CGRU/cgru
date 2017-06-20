@@ -169,7 +169,10 @@ public:
 	static inline int                 get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
 	static inline int                 get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
-	static inline int getServerProcessConnStack() { return server_process_conn_stack ;}
+	static inline int getServerSocketsReadWriteThreadsNum()    { return server_sockets_readwrite_threads_num;    }
+	static inline int getServerSocketsReadWriteThreadsStack()  { return server_sockets_readwrite_threads_stack;  }
+	static inline int getServerSocketsProcessingThreadsNum()   { return server_sockets_processing_threads_num;   }
+	static inline int getServerSocketsProcessingThreadsStack() { return server_sockets_processing_threads_stack; }
 
 	/// Socket Options:
 	static inline int getSO_LINGER()       { return m_server ? so_server_LINGER       : so_client_LINGER       ;}
@@ -333,7 +336,11 @@ private:
 	static int         db_stringnamelen;  ///< Database string name length
 	static int         db_stringexprlen;  ///< Database string expression length
 
-	static int server_process_conn_stack;
+	// Server incoming connections:
+	static int server_sockets_readwrite_threads_num;
+	static int server_sockets_readwrite_threads_stack;
+	static int server_sockets_processing_threads_num;
+	static int server_sockets_processing_threads_stack;
 
 	/// Socket Options:
 	static int so_server_LINGER;
