@@ -18,24 +18,19 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void threadRunJSON( ThreadArgs * i_args, const af::Msg * i_msg);
+af::Msg * threadRunJSON( ThreadArgs * i_args, const af::Msg * i_msg);
 
-void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
+af::Msg * threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
-switch ( i_msg->type())
-{
+	af::Msg * o_msg_response = NULL;
+
+	switch ( i_msg->type())
+	{
 	case af::Msg::THTTP:
 	case af::Msg::TJSON:
 	case af::Msg::TJSONBIN:
 	{
-		threadRunJSON( i_args, i_msg);
-		break;
-	}
-	case af::Msg::TRenderUpdate:
-	{
-		af::RenderUpdate rup( i_msg);
-		for( int i = 0; i < rup.m_taskups.size(); i++)
-			i_args->jobs->updateTaskState( *rup.m_taskups[i], i_args->renders, i_args->monitors);
+		o_msg_response = threadRunJSON( i_args, i_msg);
 		break;
 	}
 	case af::Msg::TMonitorDeregister:
@@ -62,6 +57,11 @@ switch ( i_msg->type())
 		AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + i_msg->v_generateInfoString( false));
 		break;
 	}
+	}
+
+	if( o_msg_response == NULL )
+		o_msg_response = af::jsonMsgInfo("log","Message was processed by Run thread with no answer.");
+
+	return o_msg_response;
 }
-delete i_msg;
-}
+

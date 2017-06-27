@@ -9,6 +9,7 @@
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
+#include "socketsprocessing.h"
 #include "solver.h"
 #include "threadargs.h"
 #include "usercontainer.h"
@@ -28,7 +29,7 @@ void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg);
 **/
 void threadRunCycle( void * i_args)
 {
-	AF_LOG << "Main thread started.";
+	AF_LOG << "Run thread started.";
 
 	ThreadArgs * a = (ThreadArgs*)i_args;
 
@@ -76,11 +77,22 @@ void threadRunCycle( void * i_args)
 		the Sleep() function below.
 	*/
 
-	af::Msg *message;
-	while( (message = a->msgQueue->popMsg( af::AfQueue::e_no_wait)) )
+	//
+	// Update tasks from render updates:
+	//
+	af::RenderUpdate * rup;
+	while( (rup = a->rupQueue->popUp( af::AfQueue::e_no_wait)) )
 	{
-		threadRunCycleCase( a, message );
+		for( int i = 0; i < rup->m_taskups.size(); i++)
+			a->jobs->updateTaskState( *(rup->m_taskups[i]), a->renders, a->monitors);
+
+		delete rup;
 	}
+
+	//
+	// React on incomming connections:
+	//
+	a->socketsProcessing->processRun();
 
 	//
 	// Refresh data:

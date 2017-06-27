@@ -344,16 +344,16 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	else if( document.HasMember("action"))
 	{
-		i_args->msgQueue->pushMsg( i_msg);
-		// To not to detele it, set to NULL, as it pushed to another queue
-		i_msg = NULL;
-		o_msg_response = af::jsonMsgInfo("log","JSON message pushed to run queue.");
+		// This message for Run thread:
+		return NULL;
 	}
 	else if( document.HasMember("job"))
 	{
 		if( af::Environment::isDemoMode() )
 		{
-			AFCommon::QueueLogError("Job registration is not allowed: Server demo mode.");
+			std::string errlog = "Job registration is not allowed: Server demo mode.";
+			AFCommon::QueueLogError( errlog);
+			o_msg_response = af::jsonMsgError( errlog);
 		}
 		else
 		{
@@ -424,7 +424,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 
 	delete [] data;
-	if( i_msg ) delete i_msg;
 
 	return o_msg_response;
 }

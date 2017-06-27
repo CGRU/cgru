@@ -8,6 +8,8 @@
 
 #include "../libafanasy/name_af.h"
 
+namespace af { class RenderUpdatetQueue; }
+
 class MonitorContainer;
 class RenderContainer;
 class JobContainer;
@@ -21,7 +23,9 @@ struct ThreadArgs
 	RenderContainer   * renders;
 	JobContainer      * jobs;
 	UserContainer     * users;
-	af::MsgQueue      * msgQueue;
 
 	SocketsProcessing * socketsProcessing;
+
+	af::RenderUpdatetQueue * rupQueue;
 };
+

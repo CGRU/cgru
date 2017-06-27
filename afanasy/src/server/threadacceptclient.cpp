@@ -194,7 +194,6 @@ void threadAcceptPort( void * i_arg, int i_port)
 
 			if( false == AFRunning )
 			{
-				delete threadArgs;
 				break;
 			}
 

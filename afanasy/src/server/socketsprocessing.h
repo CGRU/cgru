@@ -30,7 +30,8 @@ public:
 	inline bool isZombie() const { return m_zombie;}
 
 	bool readSocket();
-	void processMsg( ThreadArgs * i_args);
+	bool processMsg( ThreadArgs * i_args);
+	void processRun( ThreadArgs * i_args);
 	void writeSocket();
 	void closeSocket();
 
@@ -66,6 +67,8 @@ public:
 
 	void acceptSocket( int i_sfd, sockaddr_storage * i_sas);
 
+	void processRun();
+
 private:
 	static SocketsProcessing * ms_this;
 
@@ -74,6 +77,7 @@ private:
 
 	SocketQueue * m_queue_io;
 	SocketQueue * m_queue_proc;
+	SocketQueue * m_queue_run;
 
 	std::vector<DlThread*> m_threads_io;
 	static void ThreadFuncIO( void * i_args);

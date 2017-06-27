@@ -123,11 +123,8 @@ int main(int argc, char *argv[])
 	MonitorContainer monitors;
 	if( false == monitors.isInitialized()) return 1;
 	
-	// Message Queue initialization, but without thread start.
-	// Run cycle queue will read this messages itself.
-	af::MsgQueue msgQueue("RunMsgQueue");
-	if( false == msgQueue.isInitialized()) 
-	  return 1;
+	af::RenderUpdatetQueue rupQueue("RenderUpdatetQueue");
+	if( false == rupQueue.isInitialized()) return 1;
 
 	// Thread aruguments.
 	ThreadArgs threadArgs;
@@ -135,7 +132,7 @@ int main(int argc, char *argv[])
 	threadArgs.renders   = &renders;
 	threadArgs.users     = &users;
 	threadArgs.monitors  = &monitors;
-	threadArgs.msgQueue  = &msgQueue;
+	threadArgs.rupQueue  = &rupQueue;
 
 	/*
 	  Creating the afcommon object will actually create many message queues

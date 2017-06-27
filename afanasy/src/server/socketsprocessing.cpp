@@ -15,6 +15,7 @@ extern bool AFRunning;
 
 af::Msg * httpGet( const af::Msg * i_msg);
 af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
+af::Msg * threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg);
 
 SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 	m_state( SSReading),
@@ -66,9 +67,10 @@ AF_DEBUG << m_sfd;
 	return true;
 }
 
-void SocketItem::processMsg( ThreadArgs * i_args)
+bool SocketItem::processMsg( ThreadArgs * i_args)
 {
 AF_DEBUG << m_sfd;
+	m_state = SSProcessing;
 	m_profiler->processingStarted();
 
 	if( m_msg_req->type() == af::Msg::THTTPGET )
@@ -76,7 +78,7 @@ AF_DEBUG << m_sfd;
 		m_msg_ans = httpGet( m_msg_req);
 		m_profiler->processingFinished();
 		m_state = SSWriting;
-		return;
+		return true;
 	}
 /*
 	// Check message IP trust mask:
@@ -91,17 +93,26 @@ AF_DEBUG << m_sfd;
 	}
 */
 
-	// React on message, may be with response to the same opened socket.
-	// If request not needed any more it will be deleted there.
 	m_msg_ans = threadProcessMsgCase( i_args, m_msg_req);
-	m_msg_req = NULL;
-
-	// It should be an answer in any case:
+	
 	if( m_msg_ans == NULL)
 	{
-		AF_ERR << "SERVER CODING ERROR: Message with no answer:";
+		return false;
+//		AF_ERR << "SERVER CODING ERROR: Message with no answer:\n" << m_msg_req;
 	}
 
+	if( m_msg_ans )
+	{
+		m_profiler->processingFinished();
+		m_state = SSWriting;
+	}
+
+	return true;
+}
+
+void SocketItem::processRun( ThreadArgs * i_args)
+{
+	m_msg_ans = threadRunCycleCase( i_args, m_msg_req);
 	m_profiler->processingFinished();
 	m_state = SSWriting;
 }
@@ -168,6 +179,7 @@ SocketsProcessing::SocketsProcessing( ThreadArgs * i_args):
 
 	m_queue_io   = new SocketQueue("SocketsIO");
 	m_queue_proc = new SocketQueue("SocketsProcess");
+	m_queue_run  = new SocketQueue("SocketsRun");
 
 	// Raising icoming connections threads:
 	AF_LOG << "Raising " << af::Environment::getServerSocketsProcessingThreadsNum() << " threads to read/write incoming connections...";
@@ -227,6 +239,7 @@ SocketsProcessing::~SocketsProcessing()
 	AF_DEBUG;
 
 	// Make queues to emit NULLs to awake wainting threads
+	m_queue_run->releaseNull();
 	for( int i = 0; i < m_threads_io.size(); i++)
 		m_queue_io->releaseNull();
 	for( int i = 0; i < m_threads_proc.size(); i++)
@@ -250,6 +263,7 @@ SocketsProcessing::~SocketsProcessing()
 		delete *it;
 	}
 
+	delete m_queue_run;
 	delete m_queue_proc;
 	delete m_queue_io;
 
@@ -324,8 +338,19 @@ void SocketsProcessing::doProc()
 
 	if( NULL == si ) return;
 
-	si->processMsg( m_threadargs);
+	if( si->processMsg( m_threadargs))
+		m_queue_io->pushSI( si);
+	else
+		m_queue_run->pushSI( si);
+}
 
-	m_queue_io->pushSI( si);
+void SocketsProcessing::processRun()
+{
+	SocketItem * si;
+	while( (si = m_queue_run->popSI( af::AfQueue::e_no_wait)) )
+	{
+		si->processRun( m_threadargs);
+		m_queue_io->pushSI( si);
+	}	
 }
 
