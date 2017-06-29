@@ -2,8 +2,7 @@
 
 #include "../libafanasy/msgclasses/msgclassuserhost.h"
 
-#include "../libafqt/qthreadclientsend.h"
-#include "../libafqt/qthreadclientup.h"
+#include "../libafqt/qafclient.h"
 
 #include "infoline.h"
 #include "labelversion.h"
@@ -107,8 +106,7 @@ private:
 
     int m_monitorType;
 
-    afqt::QThreadClientUp   m_qThreadClientUpdate;
-    afqt::QThreadClientSend m_qThreadSend;
+	afqt::QAfClient m_qafclient;
 
     ListItems * m_listitems;
     OfflineScreen * m_offlinescreen;

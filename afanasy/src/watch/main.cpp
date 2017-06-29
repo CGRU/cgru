@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
       exit(1);
    }
 
-   afqt::init( ENV.getWatchWaitForConnected(), ENV.getWatchWaitForReadyRead(), ENV.getWatchWaitForBytesWritten());
    afqt::QEnvironment QENV( "watch");
    if( !QENV.isValid())
    {
