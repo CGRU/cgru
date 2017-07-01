@@ -2,11 +2,8 @@
 
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msg.h"
 
 #include "../libafqt/qenvironment.h"
-
-#include <QtNetwork/QTcpSocket>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -15,10 +12,10 @@
 
 using namespace afqt;
 
-QAfSocket::QAfSocket( QObject * i_parent, af::Msg * i_msg_req, bool i_delete_after):
+QAfSocket::QAfSocket( QObject * i_parent, af::Msg * i_msg_req, bool i_updater):
 	QObject( i_parent),
 	m_msg_req( i_msg_req),
-	m_delete_after( i_delete_after),
+	m_updater( i_updater),
 	m_bytes_read( 0),
 	m_header_read( false),
 	m_reading_finished( false)
@@ -39,9 +36,7 @@ QAfSocket::QAfSocket( QObject * i_parent, af::Msg * i_msg_req, bool i_delete_aft
 
 void QAfSocket::slot_error( QAbstractSocket::SocketError socketError)
 {
-	AF_ERR << "SocketError: " << afqt::qtos( m_qsocket->errorString());
-
-	emit sig_error();
+	emit sig_error( this);
 
 	if( m_qsocket->state() != QAbstractSocket::UnconnectedState )
 		m_qsocket->disconnectFromHost();
@@ -82,7 +77,8 @@ void QAfSocket::slot_readyRead()
 		int header_offset = af::processHeader( m_msg_ans, m_bytes_read);
 		if( header_offset < 0 )
 		{
-			emit sig_error();
+			// Negative offset means an invalid header.
+			// This connection and its messages not needed any more.
 			m_qsocket->disconnectFromHost();
 			return;
 		}
@@ -129,39 +125,44 @@ QAfSocket::~QAfSocket()
 {
 	AF_DEBUG;
 
-	if( m_qsocket ) delete m_qsocket;
-	if( m_msg_req && m_delete_after ) delete m_msg_req;
-	if( m_msg_ans ) delete m_msg_ans;
+	if( m_qsocket )
+		delete m_qsocket;
+
+	// On server update the same is send periodically, so should not be deleted:
+	if( false == m_updater )
+		if( m_msg_req )
+			delete m_msg_req;
+
+	// Delete server answer if it not NULL on some error:
+	if( m_msg_ans )
+		delete m_msg_ans;
 }
 
 QAfClient::QAfClient( QObject * i_qparent, int i_num_conn_lost):
 	QObject( i_qparent),
 	m_up_timer( NULL),
 	m_up_msg( NULL),
+	m_up_processing( false),
 	m_numconnlost( i_num_conn_lost),
 	m_connlostcount( 0)
 {
-	connect( this, SIGNAL( sig_sendMsg( af::Msg*)), this, SLOT( slot_sendMsg( af::Msg*)));
 }
 
 QAfClient::~QAfClient()
 {
-	AFINFO("QAfClient::~QAfClient()")
 }
 
-void QAfClient::sendMsg( af::Msg * i_msg, bool i_delete_after)
+void QAfClient::sendMsg( af::Msg * i_msg, bool i_updater)
 {
 	if( i_msg == NULL ) return;
 
 	AF_DEBUG << i_msg;
 
-	QAfSocket * qas = new QAfSocket( this, i_msg, i_delete_after);
+	QAfSocket * qas = new QAfSocket( this, i_msg, i_updater);
 
 	connect( qas, SIGNAL( sig_newMsg( af::Msg*)),   this, SLOT( slot_newMsg( af::Msg*)));
-	connect( qas, SIGNAL( sig_error()),             this, SLOT( slot_sendError()));
+	connect( qas, SIGNAL( sig_error( QAfSocket*)),  this, SLOT( slot_sendError( QAfSocket*)));
 	connect( qas, SIGNAL( sig_zombie( QAfSocket*)), this, SLOT( slot_zombie( QAfSocket*)));
-
-	m_qsockets_list.push_back( qas);
 }
 
 void QAfClient::slot_newMsg( af::Msg * i_msg)
@@ -171,13 +172,17 @@ void QAfClient::slot_newMsg( af::Msg * i_msg)
 	emit sig_newMsg( i_msg);
 }
 
-void QAfClient::slot_sendError()
+void QAfClient::slot_sendError( QAfSocket * i_qas)
 {
-	if(( m_numconnlost != 0 ) && ( m_connlostcount <= m_numconnlost )) m_connlostcount++;
+	if(( m_numconnlost != 0 ) && ( m_connlostcount <= m_numconnlost ))
+		m_connlostcount++;
+
 	if(( m_numconnlost  > 1 ) && ( m_connlostcount <= m_numconnlost ))
 	{
+		AF_ERR << "SocketError: " << i_qas->getSocketErrorStr();
 		AF_ERR << "Connection lost count: " << m_connlostcount << " of " << m_numconnlost;
 	}
+
 	if( m_connlostcount == m_numconnlost )
 	{
 		AF_ERR << "Connection Lost!";
@@ -187,7 +192,19 @@ void QAfClient::slot_sendError()
 
 void QAfClient::slot_zombie( QAfSocket * i_qas)
 {
-	m_qsockets_list.removeOne( i_qas);
+	if( i_qas->isUpdater())
+	{
+		// Client finished to update server.
+		m_up_processing = false;
+
+		// If update message chabged
+		if( i_qas->getReqestMsg() != m_up_msg )
+		{
+			// We should delete the old one
+			AF_DEBUG << "Deleteing an old update message.";
+			i_qas->delRequestMsg();
+		}
+	}
 
 	i_qas->deleteLater();
 }
@@ -202,7 +219,8 @@ void QAfClient::setUpMsg( af::Msg * i_msg, int i_seconds)
 		connect( m_up_timer, SIGNAL( timeout()), this, SLOT( slot_up_timeout()));
 		m_up_timer->start( 1000 * i_seconds);
 
-		sendMsg( m_up_msg, false);
+		m_up_processing = true;
+		sendMsg( m_up_msg, true);
 	}
 	else
 	{
@@ -212,6 +230,17 @@ void QAfClient::setUpMsg( af::Msg * i_msg, int i_seconds)
 
 void QAfClient::slot_up_timeout()
 {
-	sendMsg( m_up_msg, false);
+	if( m_up_processing )
+	{
+		// We shuold not sent 2 update messages at the same time.
+		// It is probably some system/network overload.
+		AF_WARN << "Attempt to send second update message, skipping.";
+
+		// Just skip the second update.
+		return;
+	}
+
+	m_up_processing = true;
+	sendMsg( m_up_msg, true);
 }
 

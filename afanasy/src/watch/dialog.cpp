@@ -448,6 +448,7 @@ void Dialog::idReceived( int i_id, int i_uid)
 			else
 			{
 				displayInfo("You have registered.");
+				AF_LOG << "Registered, ID=" << i_id;
 				if( m_monitorType == Watch::WNONE )
 				{
 					ButtonMonitor::pushButton( Watch::WJobs);
