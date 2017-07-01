@@ -172,9 +172,6 @@
 	"af_watch_get_events_sec":1,
 	"af_watch_refresh_gui_sec":5,
 	"af_watch_connectretries":3,
-	"af_watch_waitforconnected":8000,
-	"af_watch_waitforreadyread":8000,
-	"af_watch_waitforbyteswritten":8000,
 	"af_watch_render_idle_bar_max":3600,
 
 "":"Database:",

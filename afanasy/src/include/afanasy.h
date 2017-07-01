@@ -113,9 +113,6 @@ namespace AFWATCH
 {
     const int  GET_EVENTS_SEC      = 1;        ///< Server connection & update status period ( seconds).
     const int  CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
-    const int  WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
-    const int  WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
-    const int  WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
     const int  REFRESH_GUI_SEC     = 5;        ///< Node items update interval time in seconds.
 
     const char CMDS_ARGUMENT[]     = "@ARG@";     ///< Commands argument.

@@ -54,9 +54,6 @@ int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
 
 int     Environment::watch_get_events_sec =            AFWATCH::GET_EVENTS_SEC;
 int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
-int     Environment::watch_waitforconnected =          AFWATCH::WAITFORCONNECTED;
-int     Environment::watch_waitforreadyread =          AFWATCH::WAITFORREADYREAD;
-int     Environment::watch_waitforbyteswritten =       AFWATCH::WAITFORBYTESWRITTEN;
 int     Environment::watch_refresh_gui_sec =           AFWATCH::REFRESH_GUI_SEC;
 int     Environment::watch_render_idle_bar_max =       AFWATCH::RENDER_IDLE_BAR_MAX;
 
@@ -278,9 +275,6 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, watch_get_events_sec,              "af_watch_get_events_sec"              );
 	getVar( i_obj, watch_refresh_gui_sec,             "af_watch_refresh_gui_sec"             );
 	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
-	getVar( i_obj, watch_waitforconnected,            "af_watch_waitforconnected"            );
-	getVar( i_obj, watch_waitforreadyread,            "af_watch_waitforreadyread"            );
-	getVar( i_obj, watch_waitforbyteswritten,         "af_watch_waitforbyteswritten"         );
 	getVar( i_obj, watch_render_idle_bar_max,         "af_watch_render_idle_bar_max"         );
 
 	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );

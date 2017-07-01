@@ -97,9 +97,6 @@ public:
 	static inline int getWatchGetEventsSec()           { return watch_get_events_sec;      }
 	static inline int getWatchRefreshGuiSec()          { return watch_refresh_gui_sec;     }
 	static inline int getWatchConnectRetries()         { return watch_connectretries;      }
-	static inline int getWatchWaitForConnected()       { return watch_waitforconnected;    }
-	static inline int getWatchWaitForReadyRead()       { return watch_waitforreadyread;    }
-	static inline int getWatchWaitForBytesWritten()    { return watch_waitforbyteswritten; }
 	static inline int getWatchRenderIdleBarMax()       { return watch_render_idle_bar_max; }
 
 	static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
@@ -271,9 +268,6 @@ private:
 	static int watch_get_events_sec;
 	static int watch_refresh_gui_sec;
 	static int watch_connectretries;
-	static int watch_waitforconnected;
-	static int watch_waitforreadyread;
-	static int watch_waitforbyteswritten;
 	static int watch_render_idle_bar_max;
 
 	static int monitor_zombietime;
