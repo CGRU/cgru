@@ -21,7 +21,6 @@ SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 	m_state( SSReading),
 	m_sfd( i_sfd),
 	m_sas( i_sas),
-	m_msg_req_type(-1),
 	m_msg_req( NULL),
 	m_msg_ans( NULL),
 	m_zombie( false)
@@ -62,8 +61,6 @@ AF_DEBUG << m_sfd;
 		return false;
 	}
 
-	m_msg_req_type = m_msg_req->type();
-
 	return true;
 }
 
@@ -97,8 +94,9 @@ AF_DEBUG << m_sfd;
 	
 	if( m_msg_ans == NULL)
 	{
+		// No answer means that message was not processed.
+		// And it will be pushed to run thread queue.
 		return false;
-//		AF_ERR << "SERVER CODING ERROR: Message with no answer:\n" << m_msg_req;
 	}
 
 	if( m_msg_ans )
@@ -129,9 +127,9 @@ AF_DEBUG << m_sfd;
 
 	// Set HTTP message type.
 	// On writing header will be send first for web browsers.
-	if( m_msg_req_type == af::Msg::THTTP )
+	if( m_msg_req->type() == af::Msg::THTTP )
 		m_msg_ans->setTypeHTTP();
-	else if(( m_msg_req_type == af::Msg::TJSONBIN ) && ( m_msg_ans->type() == af::Msg::TJSON ))
+	else if(( m_msg_req->type() == af::Msg::TJSONBIN ) && ( m_msg_ans->type() == af::Msg::TJSON ))
 		m_msg_ans->setJSONBIN();
 
 	// Write response message back to client socket

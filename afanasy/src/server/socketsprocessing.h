@@ -41,7 +41,6 @@ private:
 	int m_sfd;
 	struct sockaddr_storage * m_sas;
 
-	int m_msg_req_type;
 	af::Msg * m_msg_req;
 	af::Msg * m_msg_ans;
 
