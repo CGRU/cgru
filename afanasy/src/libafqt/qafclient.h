@@ -59,7 +59,12 @@ public:
 
 	void sendMsg( af::Msg * msg, bool i_updater = false);
 
+	// Set message to send to server periodically.
 	void setUpMsg( af::Msg * i_msg, int i_seconds);
+
+	// Client stops to send any messages, but still process existing.
+	// After last messsage has sent sig_finished() emitted.
+	void setClosing();
 
 public slots:
 	void slot_newMsg( af::Msg * i_msg);
@@ -69,13 +74,17 @@ public slots:
 signals:
 	void sig_newMsg( af::Msg * i_msg);
 	void sig_connectionLost();
+	void sig_finished();
 
 private slots:
 	void slot_up_timeout();
 
 private:
-	int m_numconnlost;
-	int m_connlostcount;
+	QList<QAfSocket*> m_qafsockets_list;
+
+	int  m_numconnlost;
+	int  m_connlostcount;
+	bool m_closing;
 
 	QTimer  * m_up_timer;
 	af::Msg * m_up_msg;

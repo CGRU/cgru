@@ -107,6 +107,7 @@ Dialog::Dialog():
 	
 	connect( &m_qafclient, SIGNAL( sig_newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
 	connect( &m_qafclient, SIGNAL( sig_connectionLost()),  this, SLOT( connectionLost()));
+	connect( &m_qafclient, SIGNAL( sig_finished()),        this, SLOT( close()));
 
     connectionLost();
 
@@ -128,14 +129,29 @@ Dialog::Dialog():
     Watch::refreshGui();
 }
 
-void Dialog::closeEvent( QCloseEvent * event) { afqt::QEnvironment::setRect( "Main", geometry());}
+void Dialog::closeEvent( QCloseEvent * event)
+{
+	static bool s_closing = false;
+	if( s_closing ) return;
+	s_closing = true;
+
+	// Ignore event to not exit Qt event loop,
+	// as it needed for signal -> slot events processing.
+	event->ignore();
+
+	if( m_connected )
+	{
+		AF_LOG << "Sending deregister request.";
+		m_qafclient.sendMsg( new af::Msg( af::Msg::TMonitorDeregister, MonitorHost::id()));
+		m_qafclient.setClosing();
+	}
+
+	afqt::QEnvironment::setRect( "Main", geometry());
+}
 
 Dialog::~Dialog()
 {
-    AFINFO("Dialog::~Dialog:")
-    Watch::destroy();
-	if( m_connected )
-		m_qafclient.sendMsg( new af::Msg( af::Msg::TMonitorDeregister, MonitorHost::id()));
+	AF_DEBUG;
 }
 
 void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}

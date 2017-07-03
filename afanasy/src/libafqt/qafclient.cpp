@@ -6,7 +6,7 @@
 #include "../libafqt/qenvironment.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -144,7 +144,8 @@ QAfClient::QAfClient( QObject * i_qparent, int i_num_conn_lost):
 	m_up_msg( NULL),
 	m_up_processing( false),
 	m_numconnlost( i_num_conn_lost),
-	m_connlostcount( 0)
+	m_connlostcount( 0),
+	m_closing( false)
 {
 }
 
@@ -154,11 +155,20 @@ QAfClient::~QAfClient()
 
 void QAfClient::sendMsg( af::Msg * i_msg, bool i_updater)
 {
-	if( i_msg == NULL ) return;
+	if( NULL == i_msg )
+		return;
+
+	if( m_closing )
+	{
+		delete i_msg;
+		return;
+	}
 
 	AF_DEBUG << i_msg;
 
 	QAfSocket * qas = new QAfSocket( this, i_msg, i_updater);
+
+	m_qafsockets_list.append( qas);
 
 	connect( qas, SIGNAL( sig_newMsg( af::Msg*)),   this, SLOT( slot_newMsg( af::Msg*)));
 	connect( qas, SIGNAL( sig_error( QAfSocket*)),  this, SLOT( slot_sendError( QAfSocket*)));
@@ -206,7 +216,12 @@ void QAfClient::slot_zombie( QAfSocket * i_qas)
 		}
 	}
 
+	m_qafsockets_list.removeAll( i_qas);
+
 	i_qas->deleteLater();
+
+	if( m_closing && ( m_qafsockets_list.size() == 0 ))
+		emit sig_finished();
 }
 
 void QAfClient::setUpMsg( af::Msg * i_msg, int i_seconds)
@@ -230,6 +245,9 @@ void QAfClient::setUpMsg( af::Msg * i_msg, int i_seconds)
 
 void QAfClient::slot_up_timeout()
 {
+	if( m_closing )
+		return;
+
 	if( m_up_processing )
 	{
 		// We shuold not sent 2 update messages at the same time.
@@ -242,5 +260,19 @@ void QAfClient::slot_up_timeout()
 
 	m_up_processing = true;
 	sendMsg( m_up_msg, true);
+}
+
+void QAfClient::setClosing()
+{
+	if( m_closing )
+		return;
+
+	m_closing = true;
+
+	if( m_up_timer )
+		m_up_timer->stop();
+
+	if( m_qafsockets_list.size() == 0 )
+		emit sig_finished();
 }
 
