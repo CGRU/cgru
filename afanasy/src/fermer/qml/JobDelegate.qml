@@ -19,11 +19,12 @@ Rectangle {
     property var    v_blades:blades
     property string v_block_name:block_name
     property string v_blades_mask:blades_mask
+    property string v_blades_mask_exlude:blades_mask_exlude
     property int    v_priority: priority
-    //property int    v_blades_length:blades_length
     property int    v_group_size: group_size
     property string v_approx_time:approx_time
     property string v_depends:depends
+    signal jobClicked
 
       MouseArea {
           id: mouseArea
@@ -37,7 +38,6 @@ Rectangle {
                   JobsModel.setSelected(index)
                   if (root.side_state=="Tasks"){
                         TasksModel.updateTasksByJobID(v_job_id)
-
                   }
               }
 
@@ -50,7 +50,10 @@ Rectangle {
                   JobsModel.addToSelected(index)
                   JobsModel.shiftSelected()
               }
-              jobClicked()
+              jobClicked.call()
+              //if (group_size!=1){
+              //  JobsModel.setExpand(index,true)
+              //}
           }
           onReleased: {
                   if (mouse.button === Qt.RightButton) {
@@ -69,7 +72,14 @@ Rectangle {
       property string item_active_color: group_size>1 ? Qt.rgba(0.168+(group_rand_red/40)+0.035,0.215+(group_rand_green/40)+0.043,0.239+(group_rand_blue/35)+0.046,1) : Qt.rgba(0.203,0.258,0.286,1)
       property string ico_path: "icons/soft/"
 
-      width: parent.width
+      property int height_origin:44
+      property int v_expand: expand ? height_origin : 15
+      property real expand_height: 15
+      onV_expandChanged: PropertyAnimation {id: animateCPU; target: delegateItem; properties: 'expand_height'; to: v_expand; duration: 200}
+
+
+      height: block_number<1 ? height_origin : expand_height
+      //height: block_number==(group_size-1) ? height_origin : expand_height
       anchors.right:parent.right
       color: selected ? item_active_color
                      : mouseArea.containsMouse ? item_active_color
@@ -141,8 +151,8 @@ Rectangle {
 
       RowLayout {
           id: layout
-          anchors.fill: parent
-          anchors.topMargin: -(parent.height-42)
+          anchors.fill: delegateItem
+          anchors.topMargin: -2
 
           Item{
               Layout.preferredWidth: jobs_view.job_minimum_Width.progress
@@ -154,11 +164,13 @@ Rectangle {
 
               Rectangle {
                   id: progress_fill
+                  anchors.verticalCenter: parent.verticalCenter
                   width: parent.width*0.8
                   height: 2
                   color:"white"
                   opacity: 0.27
                   layer.enabled: false
+                  //visible: false//block_number<1 ? true : expand
               }
               Rectangle {
                   anchors.verticalCenter: parent.verticalCenter
@@ -169,7 +181,8 @@ Rectangle {
                                 : JobState.RUNNING==v_state ? "#81ccc4"
                                 : JobState.OFFLINE==v_state ? "#375753"
                                 : JobState.READY==v_state ? "#fe9400"
-                                : JobState.ERROR==v_state ? "#f14c22" : "white"
+                                : JobState.ERROR==v_state ? "#f14c22"
+                                : v_depends.length> 0 ? "#5e90ff" : "white"
               }
               /*
               Repeater {
@@ -212,7 +225,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: 10.5
+                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
                 text: elapsed
           }
 
@@ -232,6 +245,7 @@ Rectangle {
                    border.width: 1
                    radius: width*0.5
                    opacity: 0.4
+                   visible: block_number<1 ? true : expand
                 }
                 Text {
                     layer.enabled: false
@@ -242,10 +256,12 @@ Rectangle {
                     font.family:robotoRegular.name
                     font.pointSize: 12
                     opacity: 0.8
+                    visible: block_number<1 ? true : expand
                 }
           }
           Item{
               Layout.preferredWidth: jobs_view.job_minimum_Width.job_name
+              anchors.verticalCenter: parent.verticalCenter
               Text {
                     layer.enabled: true
                     color: "white"
@@ -258,7 +274,7 @@ Rectangle {
 
                     font.family:robotoRegular.name
                     font.weight: Font.Normal
-                    font.pointSize: 10.5
+                    font.pointSize: block_number<1 ? 10.5 : 9.5
                     font.letterSpacing: 2
                     clip:true
                     width: parent.width
@@ -270,13 +286,14 @@ Rectangle {
                     opacity: 0.6
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: -15
+                    anchors.verticalCenterOffset: -height_origin/3.5
                     font.family:robotoRegular.name
                     font.letterSpacing: 1.7
                     font.pointSize: 8
                     clip:true
                     width: parent.width
                     text: swap_jobs_name ? block_name : job_name
+                    visible: block_number<1 ? true : expand
               }
           }
           Text {
@@ -288,7 +305,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: 10.5
+                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
                 text: approx_time
           }
 
@@ -301,7 +318,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: 10.5
+                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
                 text: slots
           }
           Text {
@@ -313,7 +330,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: 10.5
+                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
                 text: priority
           }
           Text {
@@ -325,11 +342,12 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: 10.5
+                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
                 text: started
           }
           Item{
               Layout.preferredWidth: jobs_view.job_minimum_Width.software
+              anchors.verticalCenter: parent.verticalCenter
               Image {
                   id: soft_icon
                   anchors.centerIn: parent
@@ -337,8 +355,8 @@ Rectangle {
                   sourceSize.height: 35
                   opacity: 0.8
                   source:ico_path+software+".svg"
+                  visible:block_number<1 ? true : expand
               }
-              state:software
           }
       }
 

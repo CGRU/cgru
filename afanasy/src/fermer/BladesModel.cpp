@@ -24,7 +24,6 @@ BladesModel* BladesModel::bladesModel()
 void BladesModel::updateInteraction(const QString& i_filter)
 {
     m_blade->update();
-
     //----Search Engine
     if (i_filter.size()){
         QVector<int> finded_ids;
@@ -67,6 +66,7 @@ QString BladesModel::getBladeInfoByIndex(int i , const QString& i_key)
 
 bool BladesModel::setBladeService(int i_index, bool i_enable, const QString& i_name) { return m_blade->setBladeService(i_index, i_enable, i_name); }
 bool BladesModel::actLaunchCmd(int i_index, bool i_exit, const QString& i_cmd) { return m_blade->actLaunchCmd(i_index, i_exit, i_cmd); }
+bool BladesModel::isMyBlade(int id){return m_blade->isMyBlade(id);}
 QString BladesModel::actRequestLog(int i_index) 
 { 
     QString ret;

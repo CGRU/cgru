@@ -6,35 +6,25 @@ import QtQuick.Controls.Styles 1.4
 
 Item{
     id: job_timegraph_
-    property var job_selected_ids: JobsModel.getSelectedIds()//2097404//11534588
+    property var job_selected_ids: JobsModel.getSelectedIds() //2097404//11534588
     property int tasks_size: TasksModel.tasksSize(job_selected_ids[0])
     property int max:TasksModel.maxTasksTimes(job_selected_ids)
     property real task_h: tasks_size*task_height
-    signal jobClicked
-    onJobClicked: {
-        if (job_timegraph_.visible==true) {
-            job_selected_ids=JobsModel.getSelectedIds()
-            tasks_size=TasksModel.tasksSize(job_selected_ids[0])
-            task_h=tasks_size*task_height
-            canvas_graph.getContext("2d").reset()
-            canvas_graph.requestPaint()
 
+    Connections {
+        target: jobs_ListView.currentItem
+        onJobClicked: {
+            console.log(" job_timegraph_ "+job_timegraph_.visible)
+            console.log(" tasks_size "+tasks_size)
+            if (job_timegraph_.visible==true) {
+//                job_selected_ids=JobsModel.getSelectedIds()
+//                tasks_size=TasksModel.tasksSize(job_selected_ids[0])
+//                task_h=tasks_size*task_height
+//                canvas_graph.getContext("2d").reset()
+//                canvas_graph.requestPaint()
+            }
         }
     }
-
-    /*
-    onVisibleChanged: {
-        if (job_timegraph_.visible==true) {
-            job_selected_ids=JobsModel.getSelectedIds()
-            tasks_size=TasksModel.tasksSize(job_selected_ids)
-            task_h=tasks_size*task_height
-            canvas_graph.getContext("2d").reset()
-            //fit_work.height=task_h
-            //canvas_graph.requestPaint()
-            //scroll_graph.height=task_h
-            console.log(" onVisibleChanged ")
-        }
-    }*/
 
     ScrollView {
         id: scroll_graph
@@ -132,6 +122,7 @@ Item{
                     anchors.top: parent.top
                     anchors.topMargin: task_height/2+25
                     anchors.rightMargin: 5
+
                     Canvas {
                         id: canvas_graph
                         anchors.fill: parent

@@ -1,9 +1,10 @@
-#ifndef __USERCONT__
-#define __USERCONT__
+#pragma once
+
+#include "common.h"
+
 
 #include "Managers/Service/RadiolocationService.h"
 #include "Managers/Lorries/UserObjectsLorry.h"
-#include "common.h"
 
 
 namespace afermer
@@ -38,4 +39,3 @@ struct UserObjectsManager
 
 }
 
-#endif

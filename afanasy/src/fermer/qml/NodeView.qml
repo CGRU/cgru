@@ -154,6 +154,7 @@ Rectangle {
                                       : JobState.RUNNING==job_state ? "#81ccc4"
                                       : JobState.OFFLINE==job_state ? "#fe9400"
                                       : JobState.READY==job_state ? "#fe9400"
+                                      : depends.lenght!= 0 ? "#5e90ff"
                                       : JobState.ERROR==job_state ? "#f14c22" : "white"
                     }
                 }

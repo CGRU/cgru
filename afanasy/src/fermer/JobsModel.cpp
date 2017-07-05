@@ -14,6 +14,7 @@ JobsModel::JobsModel(QObject *i_parent)
     m_state_sort =false;
     m_job_size=0;
     m_pass_update=false;
+    m_pass_notify_update=false;
     m_draw_selection=false;
     m_show_all_jobs=true;
     updateInteraction();
@@ -121,7 +122,18 @@ void JobsModel::skipJobs()               {m_job->skip(getSelectedIds());}
 void JobsModel::pauseJob()               {m_job->pause(getSelectedIds());}
 void JobsModel::startJob()               {m_job->start(getSelectedIds());}
 void JobsModel::stopJob()                {m_job->stop(getSelectedIds());}
-void JobsModel::restartJob()             {m_job->restart(getSelectedIds());}
+void JobsModel::restartJob()             {QList<int> temp_ids=getSelectedIds();
+                                          m_job->restart(temp_ids);
+                                          for (int i=0;i<m_job->size();i++){
+                                              for (int id=0;id<temp_ids.size();id++){
+                                                  if (m_job->at(i)->m_id==temp_ids[id]){
+                                                      qDebug()<<"m_job_id: "<<m_job->at(i)->m_id<<" "<<temp_ids[id];
+                                                      m_job->at(i)->m_notify_showed=false;
+                                                  }
+                                              }
+                                          }
+                                         m_pass_notify_update=true;
+                                         }
 void JobsModel::restartJobErrors()       {m_job->restartErrors(getSelectedIds());}
 void JobsModel::jobRestartRunning()      {m_job->restartRunning(getSelectedIds());}
 void JobsModel::jobRestartSkipped()      {m_job->restartSkipped(getSelectedIds());}
@@ -129,11 +141,13 @@ void JobsModel::jobRestartDone()         {m_job->restartDone(getSelectedIds());}
 void JobsModel::jobResetErrorHosts()     {m_job->resetErrorHosts(getSelectedIds());}
 void JobsModel::jobRestartPause()        {m_job->restartPause(getSelectedIds());}
 void JobsModel::setPriority(int i_value) {m_job->setPriority(getSelectedIds(),i_value);}
-void JobsModel::setHostMask(const QString& i_value) {m_job->setHostMask(getSelectedIds(),i_value);}
-QString JobsModel::jobOutputFolder()     {return m_job->outputFolder(getSelectedIds()[0]);}
+void JobsModel::setBladeMask       (const QString& i_value) {m_job->setBladeMask(getSelectedIds(),i_value);}
+void JobsModel::setBladeMaskExclude(const QString& i_value) {m_job->setExcludeBladeMask(getSelectedIds(),i_value);}
+QString JobsModel::jobOpenOutputFolder()     {return m_job->openOutputFolder(getSelectedIds()[0]);}
+QString JobsModel::jobGetOutputFolder()     {return m_job->getOutputFolder(getSelectedIds()[0]);}
 QString JobsModel::jobLog()              {return m_job->log(getSelectedIds()[0]);}
 QString JobsModel::jobShowErrorBlades()  {return m_job->showErrorBlades(getSelectedIds()[0]);}
-QString JobsModel::getHostMask()         {return m_job->getHostMask(getSelectedIds()[0]);}
+QString JobsModel::getBladeMask()         {return m_job->getBladeMask(getSelectedIds()[0]);}
 
 
 //-------------------Sorting-----------------
@@ -241,6 +255,8 @@ void JobsModel::setSelected(int i_index){
     clearSelected();
     m_job->at(i_index)->m_selected=1;
     m_multiselected_state=false;
+    setExpand(i_index);
+
     emit dataChanged(index(0, 0), index(rowCount()-1, 0));
 }
 
@@ -319,6 +335,7 @@ QList<int> JobsModel::getSelectedIds(){
     for (int i=0;i<m_job->size();i++){
         if (m_job->at(i)->m_selected==1){
             temp_ids.append(m_job->at(i)->id());
+            //qDebug()<<"temp_ids "<<temp_ids;
         }
     }
     if (temp_ids.size()==0)
@@ -484,7 +501,9 @@ int JobsModel::getCenterNodePosY(){
 
 void JobsModel::firstInitialize(){
     for (int i=0;i<m_job->size();i++){
-        m_job->at(i)->m_notify_showed=true;
+        if (m_job->at(i)->m_status==3){
+            m_job->at(i)->m_notify_showed=true;
+        }
     }
 }
 
@@ -497,8 +516,8 @@ void JobsModel::clearNotify(){
 }
 
 QString JobsModel::areJobsDone(){
-
     QString temp_users;
+    if (m_pass_notify_update==true){m_pass_notify_update=false;return temp_users;}
 
     std::string username;
     m_RLS->getUserName(username);
@@ -515,6 +534,27 @@ QString JobsModel::areJobsDone(){
         }
     }
     return temp_users;
+}
+
+void JobsModel::setExpand(int index_){
+    if (m_job->at(index_)->m_blocks_num==1){
+        for (int i=0;i<m_job->size();i++){
+            m_job->at(i)->m_expand = false;
+        }
+        return;
+    }
+    qDebug()<<"setExpand::";
+
+    int s_id=m_job->at(index_)->m_job_id;
+
+    for (int i=0;i<m_job->size();i++){
+        if (m_job->at(i)->m_job_id==s_id){
+            m_job->at(i)->m_expand = true;
+        }
+    }
+
+    //m_pass_update=true;
+    //emit dataChanged(index(0, 0), index(rowCount()-1, 0));
 }
 
 //-------------------------------------------
@@ -573,7 +613,9 @@ QVariant JobsModel::data(const QModelIndex &i_index, int i_role) const
         case BlockNumberRole:
             return QVariant::fromValue(dobj->m_block_order);
         case BladesMaskRole:
-            return QVariant::fromValue(dobj->m_hosts_mask);
+            return QVariant::fromValue(dobj->m_blade_mask);
+        case BladesMaskExludeRole:
+            return QVariant::fromValue(dobj->m_exclude_blade_mask);
         case BladesRole:
             return QVariant::fromValue(dobj->m_blades);
         case GroupSizeRole:
@@ -610,6 +652,8 @@ QVariant JobsModel::data(const QModelIndex &i_index, int i_role) const
             return QVariant::fromValue(dobj->m_group_node_height);
         case ErrorsAvoidBladesRole:
             return QVariant::fromValue(dobj->m_errors_avoid_blades);
+        case ExpandRole:
+            return QVariant::fromValue(dobj->m_expand);
         default:
             return QVariant();
     }
@@ -631,6 +675,7 @@ QHash<int, QByteArray> JobsModel::roleNames() const {
     roles[SoftwareRole] = "software";
     roles[BlockNumberRole] = "block_number";
     roles[BladesMaskRole] = "blades_mask";
+    roles[BladesMaskExludeRole] = "blades_mask_exlude";
     roles[BladesRole] = "blades";
     roles[GroupSizeRole] = "group_size";
     roles[GroupIDRole] = "group_id";
@@ -649,5 +694,6 @@ QHash<int, QByteArray> JobsModel::roleNames() const {
     roles[GroupNodePoseYRole] = "group_node_posey";
     roles[GroupNodeWidthXRole] = "group_node_width";
     roles[GroupNodeHeightXRole] = "group_node_height";
+    roles[ExpandRole] = "expand";
     return roles;
 }

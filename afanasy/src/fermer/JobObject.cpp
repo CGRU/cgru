@@ -1,6 +1,7 @@
 #include <iostream>
 #include "JobObject.h"
-
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string.hpp>
 
 QString JobObject::user_name() const
  { return m_user_name; }
@@ -36,7 +37,8 @@ void JobObject::update(const QString &user_name
                   ,const QString &time_creation
                   ,int blocks_num
                   ,const QString &time_elapsed
-                  ,const QString &hosts_mask
+                  ,const QString &blade_mask
+                  ,const QString &exclude_blade_mask
                   ,const QString &software
                   ,int priority
                   ,int slot
@@ -60,7 +62,8 @@ void JobObject::update(const QString &user_name
          m_time_creation = time_creation;
          m_blocks_num = blocks_num;
          m_time_elapsed = time_elapsed;
-         m_hosts_mask = hosts_mask;
+         m_blade_mask = blade_mask;
+         m_exclude_blade_mask = exclude_blade_mask;
          m_software = software;
          m_priority = priority;
          m_slot = slot;

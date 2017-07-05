@@ -16,6 +16,11 @@ JobObject::Ptr JobObjectsManager::at(int index)
     return m_lorry->m_objects[index];
 }
 
+JobObject::Ptr JobObjectsManager::get(int i_id)
+{
+    return m_lorry->get(i_id);
+}
+
 void JobObjectsManager::removeAt(int index)
 {
     std::vector<JobObject::Ptr>::iterator it = m_lorry->m_objects.begin() + index;
@@ -60,14 +65,25 @@ void JobObjectsManager::restartDone(const QList<int>& i_ids)      {m_RLS->jobRes
 void JobObjectsManager::resetErrorHosts(const QList<int>& i_ids)   {m_RLS->jobResetErrorHosts(i_ids);}
 void JobObjectsManager::restartPause(const QList<int>& i_ids)     {m_RLS->jobRestartPause(i_ids);}
 void JobObjectsManager::setPriority(const QList<int>& i_ids, int i_value) {m_RLS->jobSetPriority(i_ids,i_value);}
-void JobObjectsManager::setHostMask(const QList<int>& i_ids, const QString& i_value) {m_RLS->jobSetHostMask(i_ids,i_value);}
-QString JobObjectsManager::outputFolder(int i_id)    {return m_RLS->jobOutputFolder(i_id);}
+void JobObjectsManager::setBladeMask(const QList<int>& i_ids, const QString& i_value) {m_RLS->jobSetBladeMask(i_ids,i_value);}
+void JobObjectsManager::setExcludeBladeMask(const QList<int>& i_ids, const QString& i_value) {m_RLS->jobSetExcludeBladeMask(i_ids,i_value);}
+QString JobObjectsManager::openOutputFolder(int i_id)    {return m_RLS->jobOpenOutputFolder(i_id);}
+QString JobObjectsManager::getOutputFolder(int i_id)    {return m_RLS->jobGetOutputFolder(i_id);}
 QString JobObjectsManager::log(int i_id)          {return m_RLS->jobLog(i_id);}
 QString JobObjectsManager::showErrorBlades(int i_id)  {return m_RLS->jobShowErrorBlades(i_id);}
-QString JobObjectsManager::getHostMask(int i_id)    {return m_RLS->jobGetHostMask(i_id);}
+QString JobObjectsManager::getBladeMask(int i_id)    {return m_RLS->jobGetBladeMask(i_id);}
 int JobObjectsManager::total()     {return m_RLS->totalJobs();}
 int JobObjectsManager::running()     {return m_RLS->runningJobs();}
 int JobObjectsManager::error()    {return m_RLS->errorJobs();}
 int JobObjectsManager::done()   {return m_RLS->doneJobs();}
 int JobObjectsManager::offline()    {return m_RLS->offlineJobs();}
 int JobObjectsManager::ready()      {return m_RLS->readyJobs();}
+
+QString JobObjectsManager::info(int i_id)          
+{
+    QString ret("");
+    JobObject::Ptr obj = m_lorry->get(i_id);
+    if (obj != NULL) 
+        ret = QString::fromStdString(obj->information);
+    return ret;
+}

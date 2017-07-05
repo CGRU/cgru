@@ -7,8 +7,7 @@ import JobStateEnums 1.0
 Item{
     ColumnLayout {
 	id:info_title
-    anchors.top: parent.top
-    anchors.topMargin: 130
+
     anchors.left: parent.left
     anchors.leftMargin: 15
     Layout.alignment:Qt.AlignRight
@@ -107,6 +106,14 @@ Item{
         color: "white"
         }
     Text {
+        text: "Blades Mask Exclude"
+        anchors.right: parent.right
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
+    Text {
         text: "Appr. Time To Finish"
         anchors.right: parent.right
         font.pixelSize: parent.custom_font_size
@@ -137,8 +144,7 @@ Item{
 
     ColumnLayout {
 	id:info_value
-	anchors.top: parent.top
-    anchors.topMargin: 130
+
 	anchors.left: info_title.right
 	anchors.leftMargin: 20
     opacity:0.8
@@ -231,6 +237,14 @@ Item{
         }
     Text {
         text: jobs_ListView.currentItem.v_blades_mask
+        anchors.left: parent.left
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
+    Text {
+        text: jobs_ListView.currentItem.v_blades_mask_exlude
         anchors.left: parent.left
         font.pixelSize: parent.custom_font_size
         font.family:parent.custom_font

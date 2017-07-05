@@ -9,7 +9,7 @@ Item{
     ColumnLayout {
 	id:info_title
 	anchors.top: parent.top
-    anchors.topMargin: 130
+    anchors.topMargin: 50
 	anchors.left: parent.left
 	anchors.leftMargin: 15
 	Layout.alignment:Qt.AlignRight
@@ -59,7 +59,7 @@ Item{
     ColumnLayout {
         id:info_value
         anchors.top: parent.top
-        anchors.topMargin: 130
+        anchors.topMargin: 50
         anchors.left: info_title.right
         anchors.leftMargin: 20
         opacity:0.8

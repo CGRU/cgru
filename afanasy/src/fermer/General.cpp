@@ -53,16 +53,7 @@ QString General::executeSelected(QString selected_text) const
 
 void General::terminalText(QQuickTextDocument *raw_text) const{
     QTextDocument *textDocument = raw_text->textDocument();
-    QTextOption textOptions = textDocument->defaultTextOption();
-    //textOptions.setTabStop(4);
-    //textDocument->setDefaultTextOption(textOptions);
-    //void QTextBlockFormat::setIndent ( int indentation );
-    //void QTextCursor::setBlockFormat ( const QTextBlockFormat & format );
 
-    QString text=raw_text->textDocument()->toPlainText();
     highlighter->setDocument(textDocument);
-    //Highlighter highlighter(textDocument);
-
-    //textDocument->setHtml("\n<b></b> <i>"+ textDocument->toHtml()+ "</i>");
 }
 

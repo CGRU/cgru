@@ -35,13 +35,36 @@ using namespace afermer;
 struct HasIpAddress
 {
     QString ip_address;
-    HasIpAddress(const QString& n ) : ip_address(n) { }
+    explicit HasIpAddress(const QString& n ) : ip_address(n) { }
     bool operator() (BladeObject::CPtr n) { return n->m_ip_address == ip_address; }
+};
+
+struct HasId
+{
+    int id;
+    explicit HasId(int i) : id(i) { }
+    bool operator() (BladeObject::CPtr n) { return n->m_id == id; }
 };
 
 BladeObjectPtrIt BladeObjectsLorry::find(const QString& ip_address)
 {
     return std::find_if( std::begin(m_objects), std::end(m_objects), HasIpAddress(ip_address) );
+}
+
+BladeObjectPtrIt BladeObjectsLorry::find(int id)
+{
+    return std::find_if( std::begin(m_objects), std::end(m_objects), HasId(id) );
+}
+
+BladeObject::Ptr BladeObjectsLorry::get(int id)
+{
+    BladeObject::Ptr ret;
+
+    BladeObjectPtrIt it = find(id);
+    if( it != m_objects.end() )
+        ret = (*it);
+    
+    return ret;
 }
 
 void BladeObjectsLorry::refresh()
@@ -76,6 +99,7 @@ void BladeObjectsLorry::insert(const QString &name,
                     size_t capacity,
                     int blade_id,
                     const QString &job_names,
+                    const QString &user,
                     
                     const std::string& properties, const std::string& resources, 
                     const std::string& data, size_t cpu_num, size_t cpu_mhz, 
@@ -104,7 +128,8 @@ void BladeObjectsLorry::insert(const QString &name,
                     capacity,
                     blade_id,
                     job_names,
-                    hdd_busy
+                    hdd_busy,
+                    user
             );
         (*it)->set_refreshed = true;
 
@@ -145,7 +170,8 @@ void BladeObjectsLorry::insert(const QString &name,
                     capacity,
                     blade_id,
                     job_names,
-                    hdd_busy
+                    hdd_busy,
+                    user
             );
         b->set_refreshed = true;
 

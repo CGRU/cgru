@@ -1,14 +1,13 @@
-#ifndef __FERMI_ROTATEVALUE__
-#define __FERMI_ROTATEVALUE__
-
+#pragma once
 
 #include <map>
-#include <QtCore>
-#include "common.h"
-
 #include <iostream>
 #include <functional>
 #include <string>
+
+#include "common.h"
+
+#include <QtCore>
 
 namespace afermer
 {
@@ -39,4 +38,4 @@ protected:
 
 }
 
-#endif
+

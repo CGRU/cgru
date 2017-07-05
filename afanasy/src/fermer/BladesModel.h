@@ -1,10 +1,13 @@
+#pragma once
+
+#include <time.h>
+#include <boost/numeric/conversion/cast.hpp>
+
 #include "Managers/BladeObjectsManager.h"
+
 #include <QAbstractListModel>
 #include <QStringList>
 
-#include <time.h>
-
-#include <boost/numeric/conversion/cast.hpp>
 
 namespace afermer
 {
@@ -52,6 +55,7 @@ public:
 
     Q_INVOKABLE bool setBladeService(int, bool, const QString&);
     Q_INVOKABLE bool actLaunchCmd(int, bool, const QString&);
+    Q_INVOKABLE bool isMyBlade(int);
     Q_INVOKABLE QString actRequestLog(int);
     Q_INVOKABLE QString actRequestTasksLog(int);
     Q_INVOKABLE QString actRequestInfo(int);

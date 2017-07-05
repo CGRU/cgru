@@ -10,6 +10,13 @@ Menu {
        }
    }
    MenuItem {
+       text: "Free Only For Me"
+       onTriggered:{
+            BladesModel.actNimby(blades_ListView.currentItem.v_blade_id)
+       }
+       visible:BladesModel.isMyBlade(blades_ListView.currentItem.v_blade_id)
+   }
+   MenuItem {
        text: "Skip"
        onTriggered:{
            BladesModel.actNIMBY(blades_ListView.currentItem.v_blade_id)
@@ -22,6 +29,7 @@ Menu {
            BladesModel.actEjectTasks(blades_ListView.currentItem.v_blade_id)
        }
    }
+   /*
    MenuItem {
        text: "Set Max Slots"
        onTriggered:{
@@ -29,7 +37,7 @@ Menu {
            popBladeSetMaxSlots.show();
            //BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id)
        }
-   }
+   }*/
    MenuItem {
        text: "Reboot"
        onTriggered:{

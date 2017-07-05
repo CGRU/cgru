@@ -36,12 +36,12 @@ void UserObjectsManager::setUserColor(const QString& user_name,const QString& co
         (*it)->m_user_color = color;
 }
 
-UserObjectPtrIt UserObjectsManager::begin()
+afermer::UserObjectPtrIt UserObjectsManager::begin()
 {
     return m_lorry->m_objects.begin();
 }
 
-UserObjectPtrIt UserObjectsManager::end()
+afermer::UserObjectPtrIt UserObjectsManager::end()
 {
     return m_lorry->m_objects.end();
 }

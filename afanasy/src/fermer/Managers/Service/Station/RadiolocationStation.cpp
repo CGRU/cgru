@@ -1,14 +1,22 @@
+#include "libafanasy/name_af.h"
+
+#include <boost/filesystem.hpp>
 #include "RadiolocationStation.h"
-#include <QEventLoop>
+
 // #include <QSplashScreen>
+#include "libafanasy/environment.h"
+#include "libafqt/qenvironment.h"
 #include "libafanasy/monitorevents.h"
 #include "libafanasy/taskexec.h"
-#include <boost/filesystem.hpp>
+#include <QEventLoop>
+
+
 using namespace afermer;
 
 namespace fs = boost::filesystem;
 
 int combine(int a, int b, int c);
+
 
 void RadiolocationStation::getItemInfo( std::ostringstream& o_str, const std::string & i_mode, const std::string & i_type, int i_item_id)
 {
@@ -19,7 +27,6 @@ void RadiolocationStation::getItemInfo( std::ostringstream& o_str, const std::st
     o_str << ",\"ids\":[" << i_item_id << "]";
     o_str << ",\"mode\":\"" << i_mode << "\"";
     o_str << "}}";
-
 }
 
 
@@ -75,6 +82,11 @@ void RadiolocationStation::getUserName(std::string& o_username)
     o_username.assign(user_name);
 }
 
+void RadiolocationStation::getComputerName(std::string& o_compname)
+{
+    o_compname.assign(comp_name);
+}
+
 bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
 {
     switch (i_answer.get()->type())
@@ -114,18 +126,18 @@ bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
 
 RadiolocationStation::~RadiolocationStation()
 {
-    Waves::Ptr query4 = Waves::create( af::Msg::TMonitorDeregister, monitor_id );
+	Waves::Ptr query4 = Waves::create(af::Msg::TMonitorDeregister, monitor_id);
     push(query4);
 }
 
 
 RadiolocationStation::RadiolocationStation():
-    m_qThreadClientUpdate( this, af::Environment::getWatchGetEventsSec(), af::Environment::getWatchConnectRetries())
+      m_qThreadClientUpdate( this, af::Environment::getWatchGetEventsSec(), af::Environment::getWatchConnectRetries())
     , m_qThreadSend( this, af::Environment::getWatchConnectRetries())
     , m_connected(false)
     , user_id(0)
 {
-
+#ifdef UNIX
     std::streambuf* oldCoutStreamBuf = std::cerr.rdbuf();
     std::ostringstream strCout;
     std::cerr.rdbuf( strCout.rdbuf() );
@@ -138,14 +150,14 @@ RadiolocationStation::RadiolocationStation():
     fs::path temp = fs::unique_path();
     freopen (temp.native().c_str(),"w",stderr);
     // ************************************
-
+#endif
 
     int argc = 1;
     char* argv[] = {"afermer"};
 
     uint32_t env_flags = af::Environment::Quiet | af::Environment::SolveServerName;  //   Silent environment initialization
-
-    ENV = new af::Environment ( env_flags, argc, argv); 
+	
+	af::Environment* ENV = new af::Environment ( env_flags, argc, argv);
 
     if( !ENV->isValid())
     {
@@ -156,8 +168,10 @@ RadiolocationStation::RadiolocationStation():
     afqt::init( ENV->getWatchWaitForConnected(), ENV->getWatchWaitForReadyRead(), ENV->getWatchWaitForBytesWritten());
     addresses = ENV->getServerAddress() ;
     user_name = ENV->getUserName();
+    comp_name = ENV->getComputerName();
     afqt::QEnvironment QENV( "watch" );
 
+#ifdef UNIX
     // ************************************ UNIX variant for printf
     fflush(stderr);
     dup2(fd, fileno(stderr));
@@ -168,7 +182,7 @@ RadiolocationStation::RadiolocationStation():
     // ************************************
 
     std::cerr.rdbuf( oldCoutStreamBuf );
-    
+#endif
 
     connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
     connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
@@ -192,21 +206,21 @@ size_t RadiolocationStation::getUserId()
 
 Waves::Ptr RadiolocationStation::push(const std::ostringstream& body)
 {
-    Waves::Ptr query( af::jsonMsg( body ) );
+	Waves::Ptr query( af::jsonMsg( body ) );
     return push(query);
 }
 
 Waves::Ptr RadiolocationStation::push(Waves::Ptr msg_up)
 {
-    // if( msg_up->type() == af::Msg::TJSON )
-    // {
-    //     msg_up->setJSONBIN();
+     /*if( msg_up->type() == af::Msg::TJSON )
+     {
+         msg_up->setJSONBIN();
 
-    //     static int unused;
-    //     unused = ::write( 1, " <<< ", 5);
-    //     msg_up->stdOutData( false);
-    //     unused = ::write( 1, "\n", 1);
-    // }
+         static int unused;
+         unused = ::write( 1, " <<< ", 5);
+         msg_up->stdOutData( false);
+         unused = ::write( 1, "\n", 1);
+     }*/
 
     afqt::connect( addresses, &socket );
     afqt::sendMessage( &socket, msg_up.get() );

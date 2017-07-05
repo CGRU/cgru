@@ -89,7 +89,7 @@ Rectangle {
                   color: state_machine==BladeState.BUSY ? "#fa9201"
                                                         : state_machine==BladeState.OFFLINE ? "#82898d"
                                                         : state_machine==BladeState.READY ? "#80cbc4"
-                                                        : state_machine==BladeState.NIMBY ? "#5e90ff"
+                                                        : state_machine==BladeState.NIMBY ? "#bc5eff"
                                                         : state_machine==BladeState.BIG_NIMBY ? "#5e90ff"
                                                         : state_machine==BladeState.DIRTY ? "red"
                                                         : "#ffffff"

@@ -1,12 +1,16 @@
-#ifndef __PYAFERMER_H__
-#define __PYAFERMER_H__
+#pragma once
 
+#ifdef WINNT
+#define BOOST_PYTHON_STATIC_LIB
+#endif
+
+#undef slots
+#include <boost/python.hpp>
+#define slots
+
+#include "Py/PythonStdIoRedirect.hpp"
 #include "common.h"
 #include <QString>
-
-#include <boost/python.hpp>
-#include "Py/PythonStdIoRedirect.hpp"
-
 
 namespace afermer
 {
@@ -28,4 +32,3 @@ private:
 };
 }
 
-#endif

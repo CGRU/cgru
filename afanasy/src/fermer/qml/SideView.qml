@@ -7,19 +7,15 @@ import QtQuick.Controls.Styles 1.4
 Rectangle {
     id: side_view
     color: "#32434a"
-    Layout.fillWidth: true
-    layer.enabled: true
     layer.effect: DropShadow {
-	transparentBorder: true
-	samples: 17
-	radius:2
+        transparentBorder: true
+        samples: 17
+        radius:2
     }
-    signal jobClicked
     property alias terminal_output:terminal_side_view
-    onJobClicked: {
-        jobs_side_view.jobClicked.call()
-        //jobs_side_view.job_timegraph_.jobClicked.call()
-    }
+    property int button_bar: 33
+    property int top_marg_data: (parent.height-button_bar)-15
+
     states: [
         State {
           name: "JobView"
@@ -67,10 +63,6 @@ Rectangle {
     Item{
         id: jobs_side_view
         anchors.fill: parent
-        signal jobClicked
-        onJobClicked: {
-            job_timegraph_.jobClicked.call()
-        }
 
         state:"Info"
         states: [
@@ -107,8 +99,8 @@ Rectangle {
         ]
         Rectangle {
             width:parent.width
-            height:33
-            anchors.topMargin: 84
+            height:button_bar
+            anchors.topMargin: 5
             anchors.top: parent.top
 
             Layout.fillWidth: true
@@ -180,6 +172,7 @@ Rectangle {
                     onClicked: {
                         jobs_side_view.state = "Tasks"
                         root.side_state="Tasks"
+                        TasksModel.updateTasksByJobID(jobs_ListView.currentItem.v_job_id)
                     }
                 }
             }
@@ -212,37 +205,42 @@ Rectangle {
                     onClicked: {
                         jobs_side_view.state = "Timegraph"
                         root.side_state="Timegraph"
-                        jobClicked.call()
                     }
                 }
             }
         }
         Loader {
             id: job_info_
-            anchors.fill: parent
+            width: parent.width
+            height: top_marg_data
+            anchors.bottom: parent.bottom
             source: jobs_ListView.currentIndex!=-1 ? "JobInfo.qml" : ""
-            //source: "JobInfo.qml"
         }
-        JobTasks{
-            id:job_task_
-            anchors.fill: parent
-            anchors.topMargin: job_tasks.height+main_menu.height
+        Loader {
+            id: job_task_
+            width: parent.width
+            height: top_marg_data
+            anchors.bottom: parent.bottom
+            source: jobs_side_view.state=="Tasks" ? "JobTasks.qml" : ""
         }
-        JobTimeGraph{
-            id:job_timegraph_
-
-            anchors.fill: parent
-            anchors.topMargin: job_tasks.height+main_menu.height
+        Loader {
+            id: job_timegraph_
+            width: parent.width
+            height: top_marg_data
+            anchors.bottom: parent.bottom
+            source: jobs_side_view.state=="Timegraph" ? "JobTimeGraph.qml" : ""
         }
     }
     Item{
         id: blades_side_view
-        anchors.fill: parent
+        width: parent.width
+        height: top_marg_data
+        anchors.top: parent.top
         Rectangle {
             id: button_info
             width:parent.width
             height:33
-            anchors.topMargin: 84
+            anchors.topMargin: 5
             anchors.top: parent.top
 
             Layout.fillWidth: true
@@ -282,17 +280,19 @@ Rectangle {
 
         Loader {
             id: blades_info
-            anchors.fill: parent
+            //anchors.fill: parent
             source: blades_ListView.currentIndex!=-1 ? "BladesInfo.qml" : ""
         }
     }
     Item{
         id: users_side_view
-        anchors.fill: parent
+        width: parent.width
+        height: top_marg_data
+        anchors.top: parent.top
         Rectangle {
             width:parent.width
             height:33
-            anchors.topMargin: 84
+            anchors.topMargin: 5
             anchors.top: parent.top
 
             Layout.fillWidth: true

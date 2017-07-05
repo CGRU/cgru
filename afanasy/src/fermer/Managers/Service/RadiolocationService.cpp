@@ -20,6 +20,8 @@
 
 #include <boost/lexical_cast.hpp>
 
+#include "Managers/Service/Station/RadiolocationStation.h"
+
 #undef max
 
 using namespace afermer;
@@ -32,7 +34,7 @@ void unpack(int combined, int *a, int *b, int *c);
 void unpack(size_t combined, int *a, int *b, int *c, int *d);
 
 
-
+static RadiolocationStation::Ptr m_station;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////// RadiolocationService::RadiolocationService/////////////////////////////////////////////////////////////
@@ -43,7 +45,6 @@ bool RadiolocationService::getJobsStatistic(QList<int> &o_stat)
 {
     // TODO redo this testing variant
     o_stat.clear();
-    std::map<size_t, int>::iterator it_start = m_tasks_per_day.begin();
 
     std::vector<int> lst;
     for (std::map<size_t, int>::iterator it=m_tasks_per_day.begin(); it!=m_tasks_per_day.end(); ++it)
@@ -86,6 +87,11 @@ void RadiolocationService::getServerIPAddress(std::string& o_address)
 void RadiolocationService::getUserName(std::string& o_ret)
 {
     m_station->getUserName(o_ret);
+}
+
+void RadiolocationService::getComputerName(std::string& o_ret)
+{
+    m_station->getComputerName(o_ret);
 }
 
 bool RadiolocationService::isConnected()
@@ -350,7 +356,7 @@ QList<QString> RadiolocationService::getTasksFrame(int i_index)
 
 void RadiolocationService::taskLog(QString& o_ret, int i_index) { tasksGetOut(o_ret, "log", i_index ); }
 void RadiolocationService::taskErrorHosts(QString& o_ret, int i_index) { tasksGetOut(o_ret, "error_hosts" , i_index ); }
-void RadiolocationService::taskStdOut(QString& o_ret, int i_index, TaskState::State state) 
+void RadiolocationService::taskOutput(QString& o_ret, int i_index, TaskState::State state) 
 { 
     if ( !checkIndexInTaskResources(i_index) )
         return;
@@ -485,7 +491,7 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
     if (show_all_users_job != previos_show_all_users_job)
     {
         previos_show_all_users_job = show_all_users_job;
-        m_jobs->clear();
+        m_jobs->cache();
     }
 
     if (show_all_users_job == true)
@@ -494,19 +500,21 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
     }
     else
     {
-        size_t user_id = m_station->getUserId();
+        int user_id = m_station->getUserId();
+        if (user_id < 0) 
+        {
+            m_jobs->cache();
+            return;
+        }
         str << "{\"get\":{\"binary\":true,\"type\":\"jobs\",\"uids\":[" << user_id << "]}}";
     }
-
     Waves::Ptr answer4 =  m_station->push( str );
 
     af::MCAfNodes mcNodes( answer4.get() );
     std::vector<af::Af*> * list = mcNodes.getList();
 
     int count = int( list->size() );
-    if (count<1){
-        return;
-    }
+    if ( count < 1 ) return;
 
     for (int i = 0 ; i < count; ++i)
     {
@@ -549,15 +557,9 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
         int priority = itemjob->getPriority();
         QString user_name = QString::fromStdString( itemjob->getUserName() );
         QString job_name = QString::fromStdString( itemjob->getName() );
-        QString hosts_mask = QString::fromStdString( itemjob->getHostsMask() );
-        QString time_creation = QDateTime::fromTime_t( time_created ).toString("dd/MM/yy hh:mm");
-
-        int job_percentage = 0;
-        for( int b = 0; b < block_count; b++)
-        {
-            const af::BlockData * block = itemjob->getBlock(b);
-            job_percentage += block->getProgressPercentage();
-        }
+        QString blade_mask = QString::fromStdString( itemjob->getHostsMask() );
+        QString exclude_blade_mask = QString::fromStdString( itemjob->getHostsMaskExclude() );
+        QString time_creation = QDateTime::fromTime_t( time_created ).toString("yy/MM/dd hh:mm");
 
         for( int block_num = 0; block_num < block_count; ++block_num)
         {
@@ -566,6 +568,8 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
             if (m_jobs->isDeleted(hash)) continue;
 
             const af::BlockData * block = itemjob->getBlock(block_num);
+
+            size_t time_started = block->getTimeStarted();
 
             QList<QString> blades;
 
@@ -588,11 +592,11 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
 
             int last_time_update = m_jobs->lastTimeUpdatePercent(hash, block_percentage, curtime);
             int block_state = block->getState();
-            QString approx_time = "-"; 
+            QString eta_time = "-"; 
 
             if( time_started && (( block_state & AFJOB::STATE_DONE_MASK) == false))
             {
-                int percentage = job_percentage / block_count;
+                int percentage = block_percentage;
                 if(( percentage > 0 ) && ( percentage < 100 ))
                 {
                     int sec_run = last_time_update - time_started;
@@ -601,12 +605,12 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
                     int time_delta = curtime - last_time_update;
                     eta -= time_delta;
                     if( eta > 0 )
-                        approx_time =  QString::fromStdString( Time2strHMS( eta, false ) );
+                        eta_time =  QString::fromStdString( Time2strHMS( eta, false ) );
                 }
             }
 
             if( time_wait > curtime )
-                approx_time = QString::fromStdString(Time2strHMS( time_wait - curtime, false  ) );
+                eta_time = QString::fromStdString(Time2strHMS( time_wait - curtime, false  ) );
             
             QString service = afqt::stoq( block->getService() );
             if (service=="postcmd") continue;
@@ -622,40 +626,55 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
             if ( group_state & AFJOB::STATE_OFFLINE_MASK)
             {
                 status = JobState::State::OFFLINE;
-                approx_time="Stop";
+                eta_time="Stop";
             }
             else
             {
+
                 if ( block_state & AFJOB::STATE_RUNNING_MASK )
                 {
-                    m_total_running_jobs++;
                     status = JobState::State::RUNNING;
                     elapsed_time_counter = curtime - time_started - time_wait;
+                    m_total_running_jobs++;
                 }
                 else if ( block_state & AFJOB::STATE_DONE_MASK )
                 {
                     m_total_done_jobs++;
                     status = JobState::State::DONE;
-                    approx_time="Done";
+                    eta_time="Done";
                     elapsed_time_counter = block->getProgressTasksSumRunTime();
                 }
                 else if ( block_state & AFJOB::STATE_OFFLINE_MASK )
                 {
                     m_total_offline_jobs++;
                     status = JobState::State::OFFLINE;
-                    approx_time="Stopped";
+                    eta_time="Stopped";
                 }
                 else if (  block_state & AFJOB::STATE_ERROR_MASK )
                 {
                     status = JobState::State::ERROR;
                     m_total_error_jobs++;
-                    approx_time="Error";
+                    eta_time="Error";
                 }
                 else if (  block_state & AFJOB::STATE_READY_MASK )
                 {
                     m_total_ready_jobs++;
+                    
+                    if ( group_state & AFJOB::STATE_WAITTIME_MASK)
+                    {
+                        eta_time="Timer";
+                        elapsed_time_counter = time_wait - curtime;
+                    }
+                    else
+                    {
+                        eta_time="Waiting";
+                    }
+
                     status = JobState::State::READY;
-                    approx_time="Waiting";
+                }
+                else if ( block_state & AFJOB::STATE_WAITDEP_MASK )
+                {
+                    eta_time="Dep.";
                 }
             }
 
@@ -670,12 +689,13 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
 
             std::string repr = str.str();
 
-            m_jobs->insert(  user_name
+            JobObject::Ptr job = m_jobs->insert(  user_name
                             ,status
                             ,time_creation
                             ,block_count
                             ,time_elapsed
-                            ,hosts_mask
+                            ,blade_mask
+                            ,exclude_blade_mask
                             ,service
                             ,priority
                             ,block_capacity
@@ -687,16 +707,18 @@ void RadiolocationService::jobsUpdate(bool show_all_users_job)
                             ,block_name
                             ,job_id
                             ,blades_length
-                            ,approx_time
+                            ,eta_time
                             ,depends
                             ,QString::fromStdString(output_folder)
                             ,user_color
                             ,block->getProgressErrorHostsNum()
                             ,repr
                     ) ;
+
+            job->information = block->generateInfoStringTyped( af::Msg::TBlocksProgress, true);
+
         } // for block_num
     }// for count
-
 }
 
 int RadiolocationService::totalJobs() { return m_total_jobs; }
@@ -744,7 +766,7 @@ bool RadiolocationService::jobSetWaitTime(int i_index, const QString& i_waittime
 }
 
 
-QString RadiolocationService::jobGetHostMask(int i_index)
+QString RadiolocationService::jobGetBladeMask(int i_index)
 {
     int job_id, block_id, task_id;
     unpack(i_index, &job_id, &block_id, &task_id);
@@ -756,7 +778,7 @@ QString RadiolocationService::jobGetHostMask(int i_index)
 
     af::Job job( answer.get() );
     
-    QString current = afqt::stoq( job.getHostsMask() );
+	QString current = afqt::stoq( job.getHostsMask() );
     return current;
 }
 
@@ -889,7 +911,7 @@ bool RadiolocationService::jobSetPriority(const QList<int>& i_indeces, int i_val
 }
 
 
-bool RadiolocationService::jobSetHostMask(const QList<int>& i_indeces, const QString& i_mask)
+bool RadiolocationService::jobSetBladeMask(const QList<int>& i_indeces, const QString& i_mask)
 {
     QRegExp rx( i_mask, Qt::CaseInsensitive );
     if( rx.isValid() == false )
@@ -921,7 +943,39 @@ bool RadiolocationService::jobSetHostMask(const QList<int>& i_indeces, const QSt
 }
 
 
-QString RadiolocationService::jobOutputFolder(int i_index)
+bool RadiolocationService::jobSetExcludeBladeMask(const QList<int>& i_indeces, const QString& i_mask)
+{
+    QRegExp rx( i_mask, Qt::CaseInsensitive );
+    if( rx.isValid() == false )
+        return false;
+
+    std::vector<int>::iterator index_it;
+    std::vector<int> jobs_ids;
+    
+    for (size_t i = 0; i < i_indeces.size(); ++i)
+    {
+        int index = i_indeces[i];
+        if (!m_jobs->contain(index))
+            continue;
+
+        index_it = find (jobs_ids.begin(), jobs_ids.end(), index);
+        if ( index_it != jobs_ids.end() )
+            continue;
+
+
+        int job_id, block_id, task_id;
+        unpack(index, &job_id, &block_id, &task_id);
+
+        jobs_ids.push_back(job_id);
+    }
+    
+    m_station->setParameter("jobs", jobs_ids, "hosts_mask_exclude", afqt::qtos( i_mask ), true);
+
+    return true;
+}
+
+
+QString RadiolocationService::jobOpenOutputFolder(int i_index)
 {
     QString o_ret("");
 
@@ -950,6 +1004,23 @@ QString RadiolocationService::jobOutputFolder(int i_index)
 #endif
 
     }
+
+    return o_ret;
+}
+
+QString RadiolocationService::jobGetOutputFolder(int i_index)
+{
+    QString o_ret("");
+
+    if (!m_jobs->contain(i_index))
+        return o_ret;
+
+    int job_id, block_id, task_id;
+    unpack(i_index, &job_id, &block_id, &task_id);
+
+    o_ret = m_jobs->get(i_index)->m_output_folder;
+
+    std::string folder = o_ret.toStdString();
 
     return o_ret;
 }
@@ -1154,6 +1225,8 @@ void RadiolocationService::bladesUpdate()
                 state = BladeState::State::DIRTY;
         }
 
+        QString username  = QString::fromStdString(render->getUserName());
+
         m_blades->insert(host_name
                 ,ip_address
                 ,os
@@ -1169,6 +1242,7 @@ void RadiolocationService::bladesUpdate()
                 ,host.m_capacity
                 ,render->getId()
                 ,job_names
+                ,username
 
                 ,host.m_properties
                 ,host.m_resources

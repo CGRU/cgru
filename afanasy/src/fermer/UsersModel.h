@@ -1,13 +1,14 @@
-#include "Managers/UserObjectsManager.h"
-#include <QAbstractListModel>
-#include <QStringList>
-#include "UserObject.h"
-#include <time.h>
+#pragma once
 
+#include <time.h>
 #include "common.h"
 
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string.hpp>
+
+#include "Managers/UserObjectsManager.h"
+#include "UserObject.h"
+#include <QAbstractListModel>
+#include <QStringList>
+
 
 namespace afermer
 {

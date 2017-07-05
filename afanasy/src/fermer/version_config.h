@@ -1,1 +1,1 @@
-#define PKG_VERSION "0.8.3"
+#define PKG_VERSION "0.8.4"
