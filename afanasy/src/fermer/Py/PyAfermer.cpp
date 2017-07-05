@@ -1,12 +1,16 @@
+
+
 #include "Py/PyAfermer.h"
 #include "Py/pyqstring.hpp"
 #include "Py/pyqlist.hpp"
+
+PythonStdIoRedirect::ContainerType PythonStdIoRedirect::m_outputs;
 
 #include "Managers/JobObjectsManager.h"
 #include "Managers/BladeObjectsManager.h"
 #include "Managers/UserObjectsManager.h"
 
-PythonStdIoRedirect::ContainerType PythonStdIoRedirect::m_outputs;
+
 
 using namespace afermer;
 
@@ -121,10 +125,19 @@ jobStop(JobObject::Ptr self)
 }
 
 bool
-jobSetHostMask(JobObject::Ptr self, const QString& i_value)
+jobSetBladeMask(JobObject::Ptr self, const QString& i_value)
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
-    m_manager->setHostMask( QList<int>( { 1, self->id() } ), i_value );
+    m_manager->setBladeMask( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+
+bool
+jobSetExcludeBladeMask(JobObject::Ptr self, const QString& i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setExcludeBladeMask( QList<int>( { 1, self->id() } ), i_value );
     return true;
 }
 
@@ -141,6 +154,13 @@ jobLog(JobObject::Ptr self)
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
     return m_manager->log( self->id() );
+}
+
+QString
+jobInfo(JobObject::Ptr self)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    return m_manager->info( self->id() );
 }
 
 
@@ -160,7 +180,7 @@ usersAll()
 {
     UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
     QList<UserObject::Ptr> ret;
-    for (UserObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
+    for (afermer::UserObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
         ret.append(*it);
     return ret;
 }
@@ -196,9 +216,11 @@ BOOST_PYTHON_MODULE(afermer)
                 .def("pause", &::jobPause)
                 .def("start", &::jobStart)
                 .def("stop", &::jobStop)
-                .def("setHostMask", &::jobSetHostMask)
+                .def("setBladeMask", &::jobSetBladeMask)
+                .def("setExcludeBladeMask", &::jobSetExcludeBladeMask)
                 .def("setPriority", &::jobSetPriority)
                 .def("log", &::jobLog)
+                .def("info", &::jobInfo)
                 .def("__repr__", &JobObject::repr)
             ;
 
@@ -227,15 +249,35 @@ PyAfermer::~PyAfermer()
     Py_Finalize();
 }
 
+#if PY_MAJOR_VERSION >= 3
+wchar_t *GetWC(const char *c)
+{
+	const size_t cSize = strlen(c) + 1;
+	wchar_t* wc = new wchar_t[cSize];
+	mbstowcs(wc, c, cSize);
+
+	return wc;
+}
+#else
+char *GetWC(const char *c)
+{
+	return c;
+}
+#endif
+
 PyAfermer::PyAfermer()
 {
     char * python_root = getenv("REZ_PYTHON_ROOT");
     if (python_root)
-        Py_SetPythonHome(python_root);
-    
-    PyImport_AppendInittab( "afermer", &initafermer );
+        Py_SetPythonHome(GetWC(python_root));
 
-    Py_Initialize();
+#if PY_MAJOR_VERSION >= 3    
+    PyImport_AppendInittab( "afermer", &PyInit_afermer );
+#else  
+	PyImport_AppendInittab("afermer", &initafermer);
+#endif
+
+	Py_Initialize();
     using namespace boost::python;
     initializeQStringConverters();
     initializeQListConverters< QList<int> >();
@@ -274,7 +316,7 @@ void PyAfermer::run_String(QString& o_ret, const QString& pytxt)
     {
         PyErr_Print();
     }
-    std::string captured_python_output = python_stdio_redirector.GetOutput();
+	std::string captured_python_output = python_stdio_redirector.GetOutput();
 
     o_ret = QString::fromStdString(captured_python_output);
 }

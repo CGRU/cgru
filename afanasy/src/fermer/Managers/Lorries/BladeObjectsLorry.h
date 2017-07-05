@@ -1,5 +1,4 @@
-#ifndef __BLADEOBJECTMED__
-#define __BLADEOBJECTMED__
+#pragma once
 
 #include "BladeObject.h"
 #include "common.h"
@@ -29,6 +28,7 @@ struct BladeObjectsLorry
                     size_t capacity,
                     int blade_id,
                     const QString &job_names,
+                    const QString &user,
                     
                     const std::string& properties, const std::string& resources, 
                     const std::string& data, size_t cpu_num, size_t cpu_mhz, 
@@ -43,6 +43,8 @@ struct BladeObjectsLorry
     size_t size();
     void refresh();
     BladeObjectPtrIt find(const QString&);
+    BladeObjectPtrIt find(int);
+    BladeObject::Ptr get(int);
 
     std::vector<BladeObject::Ptr> m_objects;
     std::vector<size_t> m_deleted_objects;
@@ -51,4 +53,3 @@ struct BladeObjectsLorry
 
 }
 
-#endif

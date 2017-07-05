@@ -1,15 +1,28 @@
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem.hpp>
 #ifndef WINNT
 #include <unistd.h>
 #endif
+
+#ifdef WINNT
+#define BOOST_PYTHON_STATIC_LIB
+#endif
+
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 
 #include <iostream>
 #include <stdlib.h>     /* getenv */
 #include <stdio.h>
 
 #include "libafanasy/name_af.h"
+
+#include "General.h"
+#include "BladesModel.h"
+#include "JobsModel.h"
+#include "UsersModel.h"
+#include "TasksModel.h"
+#include "state.hpp"
 
 #include <QtQuick/QQuickView>
 #include <QGuiApplication>
@@ -19,14 +32,81 @@
 #include <QtCore>
 #include <QTimer>
 
-#include "General.h"
-#include "BladesModel.h"
-#include "JobsModel.h"
-#include "UsersModel.h"
-#include "TasksModel.h"
-#include "state.hpp"
 
-#include <Python.h>
+
+
+#ifdef WINNT
+
+#include <QQmlExtensionPlugin>
+#include <QtPlugin>
+#pragma comment( lib, "Winmm.lib" )
+#pragma comment( lib, "OpenGL32.lib" )
+#pragma comment( lib, "imm32.lib" )
+#pragma comment( lib, "qtaudio_windows.lib" )
+#pragma comment( lib, "qtmain.lib" )
+#pragma comment( lib, "Qt5PlatformSupport.lib" )
+#pragma comment( lib, "Qt5OpenGL.lib" )
+#pragma comment( lib, "qwindows.lib" )
+#pragma comment( lib, "qtpcred.lib" )
+#pragma comment( lib, "qtharfbuzzng.lib" )
+#pragma comment( lib, "qtfreetype.lib" )
+#pragma comment( lib, "Qt5QuickControls2.lib" )
+#pragma comment( lib, "Qt5QuickTemplates2.lib" )
+#pragma comment( lib, "Qt5Svg.lib" )
+
+#pragma comment( lib, "qdds.lib" )
+#pragma comment( lib, "qicns.lib" )
+#pragma comment( lib, "qico.lib" )
+#pragma comment( lib, "qsvg.lib" )
+#pragma comment( lib, "qtga.lib" )
+#pragma comment( lib, "qtiff.lib" )
+#pragma comment( lib, "qwbmp.lib" )
+#pragma comment( lib, "qwebp.lib" )
+
+#pragma comment( lib, "dialogplugin.lib" )
+#pragma comment( lib, "qquicklayoutsplugin.lib" )
+#pragma comment( lib, "qtquickextrasplugin.lib" )
+#pragma comment( lib, "windowplugin.lib" )
+#pragma comment( lib, "qtquick2plugin.lib" )
+#pragma comment( lib, "qtquickcontrolsplugin.lib" )
+#pragma comment( lib, "qtquickcontrols2plugin.lib" )
+#pragma comment( lib, "qtgraphicaleffectsplugin.lib" )
+#pragma comment( lib, "qtgraphicaleffectsprivate.lib" )
+#pragma comment( lib, "qmlsettingsplugin.lib" )
+
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin)
+Q_IMPORT_PLUGIN(QtQuick2Plugin)
+
+Q_IMPORT_PLUGIN(QtQuick2WindowPlugin)
+Q_IMPORT_PLUGIN(QtQuickLayoutsPlugin)
+Q_IMPORT_PLUGIN(QtQuickExtrasPlugin)
+Q_IMPORT_PLUGIN(QtQuickControls1Plugin)
+Q_IMPORT_PLUGIN(QtQuickControls2Plugin)
+Q_IMPORT_PLUGIN(QtGraphicalEffectsPlugin)
+Q_IMPORT_PLUGIN(QtGraphicalEffectsPrivatePlugin)
+Q_IMPORT_PLUGIN(QmlSettingsPlugin)
+Q_IMPORT_PLUGIN(QtQuick2DialogsPlugin)
+Q_IMPORT_PLUGIN(QSvgPlugin)
+
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+wchar_t *GetWC(char *c)
+{
+	const size_t cSize = strlen(c) + 1;
+	wchar_t* wc = new wchar_t[cSize];
+	mbstowcs(wc, c, cSize);
+
+	return wc;
+}
+#else
+char *GetWC(char *c)
+{
+	return c;
+}
+#endif
+
+
 
 namespace fs = boost::filesystem;
 
@@ -34,7 +114,7 @@ using namespace afermer;
 
 int main(int argc, char *argv[])
 {
-    Py_SetProgramName(argv[0]);
+    Py_SetProgramName(GetWC(argv[0]));
 
     qDebug()<<"Version Of QT: "<<qVersion();
     //  Load env from QML path

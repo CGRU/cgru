@@ -13,6 +13,15 @@ Rectangle {
     property var aligntype: Text.AlignLeft
     property var v_state: status
 
+    Rectangle {
+        anchors.bottom: parent.bottom
+        width: parent.width
+        height: 1
+        color:"white"
+        opacity: 0.05
+        layer.enabled: true
+    }
+
       MouseArea {
           id: mouseArea
           anchors.fill: parent
@@ -27,10 +36,7 @@ Rectangle {
                       task_context_menu.popup()
                   }
           }
-          InfoDialog {
-              id: popTaskOutputDialog
-              title: "Task Output"
-          }
+
           onDoubleClicked: {
               popTaskOutputDialog.text="Retrieving running task output from render..."
               popTaskOutputDialog.show()

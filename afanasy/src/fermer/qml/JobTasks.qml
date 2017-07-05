@@ -8,7 +8,8 @@ import TaskStateEnums 1.0
 
 Item{
     id: job_task_
-    property var task_minimum_Width: { "frame": 70,
+
+    property var task_minimum_Width: { "frame": 80,
                                       "progress": 80,
                                       "elapsed": 53,
                                       "blade": 100}
@@ -16,8 +17,9 @@ Item{
     Item{
         id: header_layout
         width:parent.width
-        height:35
+        height:20
         anchors.top: parent.top
+        //anchors.topMargin: -10
         RowLayout {
             id: layout
             anchors.fill: parent
@@ -72,7 +74,7 @@ Item{
     Component{
         id:task_delegate
         TaskDelegate{
-            width: parent.width
+            width: job_task_.width
             height: task_height
             aligntype: custom_aligntype
         }
@@ -107,14 +109,14 @@ Item{
                 opacity: 0.3
             }
         }
-            ListView {
-              id: task_ListView
-              anchors.fill: parent
-              delegate:task_delegate
-              model: TasksModel.tasksModel
-              focus: true
-              cacheBuffer:40
-            }
+        ListView {
+          id: task_ListView
+          anchors.fill: parent
+          delegate:task_delegate
+          model: TasksModel.tasksModel
+          focus: true
+          cacheBuffer:40
+        }
     }
 
     InfoDialog {
@@ -152,7 +154,7 @@ Item{
            }
        }
        MenuItem {
-           text: "Info"
+           text: "Command"
            onTriggered:{
                popTaskInfoDialog.text=TasksModel.taskInfo(task_ListView.currentItem.v_id)
                popTaskInfoDialog.show()

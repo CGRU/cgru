@@ -1,10 +1,9 @@
-#ifndef __USEROBJECTMED__
-#define __USEROBJECTMED__
+#pragma once
 
-#include <QtCore>
 #include "common.h"
-#include "UserObject.h"
 
+#include "UserObject.h"
+#include <QtCore>
 
 namespace afermer
 {
@@ -38,4 +37,4 @@ public:
 
 }
 
-#endif
+

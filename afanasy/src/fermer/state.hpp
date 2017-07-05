@@ -56,7 +56,7 @@ class JobState : public QObject
     public:
         enum State
         {
-            STARTED, READY, RUNNING, DONE, OFFLINE, ERROR 
+            STARTED, READY, RUNNING, DONE, OFFLINE, ERROR, WAITTIME
         };
         Q_ENUMS(State)
 

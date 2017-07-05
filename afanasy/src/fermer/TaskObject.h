@@ -1,8 +1,8 @@
-#ifndef __TASKOBJECT__
-#define __TASKOBJECT__
+#pragma once
 
-#include <QStringList>
 #include "state.hpp"
+#include <QStringList>
+
 
 class TaskObject
 {
@@ -43,6 +43,3 @@ public:
 
 };
 
-
-
-#endif

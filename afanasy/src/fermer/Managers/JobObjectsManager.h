@@ -1,5 +1,4 @@
-#ifndef __JOBOBJECTCONT__
-#define __JOBOBJECTCONT__
+#pragma once
 
 #include "common.h"
 #include "Managers/Service/RadiolocationService.h"
@@ -17,6 +16,7 @@ struct JobObjectsManager
     JobObjectsLorry::Ptr m_lorry;
     
     JobObject::Ptr at(int);
+    JobObject::Ptr get(int);
     void removeAt(int);
     size_t size();
     void update(bool);
@@ -43,11 +43,14 @@ public:
     void resetErrorHosts(const QList<int>& i_ids);
     void restartPause(const QList<int>& i_ids);
     void setPriority(const QList<int>& i_ids, int i_value);
-    void setHostMask(const QList<int>& i_ids, const QString& i_value);
-    QString outputFolder(int i_id);
+    void setBladeMask(const QList<int>& i_ids, const QString& i_value);
+    void setExcludeBladeMask(const QList<int>& i_ids, const QString& i_value);
+    QString openOutputFolder(int i_id);
+    QString getOutputFolder(int i_id);
     QString log(int i_id);
+    QString info(int i_id);
     QString showErrorBlades(int i_id);
-    QString getHostMask(int i_id);
+    QString getBladeMask(int i_id);
     int total();
     int running();
     int error();
@@ -62,4 +65,3 @@ public:
 
 }
 
-#endif

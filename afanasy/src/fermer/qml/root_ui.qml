@@ -71,7 +71,6 @@ Item {
                   PropertyChanges {target: jobs_view; visible: true}
                   PropertyChanges {target: terminal_view; visible: false}
                   PropertyChanges {target: root; update_state: 0}
-                  PropertyChanges {target: not_implemented_view; visible: false}
             },
             State {
               name: "BladeView"
@@ -84,14 +83,12 @@ Item {
                   PropertyChanges {target: jobs_view; visible: false}
                   PropertyChanges {target: terminal_view; visible: false}
                   PropertyChanges {target: root; update_state: 1}
-                  PropertyChanges {target: not_implemented_view; visible: false}
             },
             State {
                name: "NodeView"
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"NodeView"}
                     PropertyChanges {target: side_view; state:"NodeView"}
-                    PropertyChanges {target: not_implemented_view; visible: false}
                     PropertyChanges {target: users_view; visible: false}
                     PropertyChanges {target: node_view; visible: true}
                     PropertyChanges {target: metrics_view; visible: false}
@@ -109,7 +106,6 @@ Item {
                     PropertyChanges {target: metrics_view; visible: false}
                     PropertyChanges {target: jobs_view; visible: false}
                     PropertyChanges {target: terminal_view; visible: false}
-                    PropertyChanges {target: not_implemented_view; visible: false}
                     PropertyChanges {target: root; update_state: 3}
             },
             State {
@@ -123,14 +119,12 @@ Item {
                     PropertyChanges {target: jobs_view; visible: false}
                     PropertyChanges {target: terminal_view; visible: false}
                     PropertyChanges {target: root; update_state: 4}
-                    PropertyChanges {target: not_implemented_view; visible: false}
             },
             State {
                 name: "TerminalView"
                     PropertyChanges {target: blades_view; visible: false}
                     PropertyChanges {target: main_menu; state:"TerminalView"}
                     PropertyChanges {target: side_view; state:"TerminalView"}
-                    PropertyChanges {target: not_implemented_view; visible: false}
                     PropertyChanges {target: terminal_view; visible: true}
                     PropertyChanges {target: node_view; visible: false}
                     PropertyChanges {target: users_view; visible: false}
@@ -166,11 +160,9 @@ Item {
     property alias job_context_menu: job_context_menu_.item
     property bool swap_jobs_name: false
     property bool show_all_jobs: false
+    property bool expand_jobs_goups: false
 
     property string python_output: "empty"
-
-    signal jobClicked
-    //
 
     property int totalJobs
     property int doneJobs
@@ -204,7 +196,13 @@ Item {
             }
         ]
     }
+    /*
+    WorkerScript {
+        id: myWorker
+        source: "timeChange.js"
 
+        onMessage: console.log("gg "+messageObject.reply)
+    }*/
     function timeChanged()  {
         if (General.serverExist()){
             if (update_state==0){
@@ -233,7 +231,7 @@ Item {
                 }
             }
             if (update_state==1){
-                BladesModel.updateInteraction(filtered_text)
+                //BladesModel.updateInteraction(filtered_text)
             }
             if (update_state==2){
                 JobsModel.updateInteraction(filtered_text)
@@ -258,6 +256,8 @@ Item {
             background.source = "NoConnection.qml"
         }
 
+        BladesModel.updateInteraction(filtered_text)
+
         totalJobs=JobsModel.totalJobs();
         doneJobs=JobsModel.doneJobs();
         waitingJobs=JobsModel.readyJobs();
@@ -271,457 +271,535 @@ Item {
         repeat: true;
         onTriggered: timeChanged()
     }
-    JobsView{
-        id:jobs_view
-        width: root.width-side_view.width-18
-        height: root.height-85
 
+    Component {
+        id: comp_spliter
 
-        anchors.right: side_view.left
-        anchors.rightMargin: 10
-        anchors.top:main_menu.bottom
-        anchors.topMargin: 0
-
-        property var job_minimum_Width: {"progress": 130,
-                                         "elapsed": 100,
-                                         "user": 35,
-                                         "job_name": root.width-side_view.width-750,
-                                         "slots": 40,
-                                         "priority": 60,
-                                         "started": 100,
-                                         "software": 100,
-                                         "approximate_time": 70}
-        property int selection
-
-        Component{
-            id:job_delegate
-            JobDelegate{
-                aligntype: custom_aligntype
-                height: 45
-
-            }
-        }
-        ScrollView {
-            anchors.fill: parent
-            anchors.topMargin: 35
-            highlightOnFocus:true
-            style: ScrollViewStyle {
-                transientScrollBars: root.transient_toggl
-                scrollBarBackground: Item {
-                    implicitWidth: 12
-                    implicitHeight: 26
-                }
-                handle: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 26
-                    color: "white"
-                    opacity: 0.4
-                }
-                decrementControl: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 2
-                    color: "white"
-                    opacity: 0.3
-                }
-                incrementControl: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 1
-                    color: "white"
-                    opacity: 0.3
-                }
-            }
-                ListView {
-                  id: jobs_ListView
-                  anchors.fill: parentss
-                  delegate:job_delegate
-                  model: JobsModel.jobsModel
-                  focus: true
-                  cacheBuffer:40
-                }
-        }
-
-
-        InputDialog {
-            id: popJobSetPriority
-            title: "Set Priority"
-
-            TextInput {
-                id: set_priority_text_input_dialog
-                anchors.top: parent.top
-                anchors.topMargin: 28
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width*0.85
-                height: 20
-                text: "99"
-                opacity: 0.9
-                selectByMouse: true
-                inputMethodHints:Qt.ImhDigitsOnly
-
-                color: "white"
-                Keys.onReturnPressed: {
-                    popJobSetPriority.close();
-                    JobsModel.setPriority(set_priority_text_input_dialog.text)
-                }
-            }
-            Rectangle {
-                height: 25
-                width:59
-                color: "#374a52"
-
-                anchors.bottom: parent.bottom
-                anchors.left: parent.horizontalCenter
-                anchors.leftMargin: 10
-                anchors.bottomMargin: 10
-                opacity:0.85
-                layer.enabled: true
-                layer.effect: DropShadow {
-                transparentBorder: true
-                samples: 12
-                radius:4
-                }
-                Text {
-                    text: "Ok"
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        popJobSetPriority.close();
-                        JobsModel.setPriority(set_priority_text_input_dialog.text)
-                    }
-                }
-            }
-        }
-        InputDialog {
-            id: popJobSetHostsMask
-            title: "Set Hosts Mask"
-
-            TextInput {
-                id: set_host_mask_text_input_dialog
-                anchors.top: parent.top
-                anchors.topMargin: 28
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width*0.85
-                height: 20
-                text: "99"
-                opacity: 0.9
-                selectByMouse: true
-                inputMethodHints:Qt.ImhDigitsOnly
-
-                color: "white"
-                Keys.onReturnPressed: {
-                    popJobSetHostsMask.close();
-                    JobsModel.setHostMask(set_host_mask_text_input_dialog.text)
-                }
-            }
-            Rectangle {
-                height: 25
-                width:59
-                color: "#374a52"
-
-                anchors.bottom: parent.bottom
-                anchors.left: parent.horizontalCenter
-                anchors.leftMargin: 10
-                anchors.bottomMargin: 10
-                opacity:0.85
-                layer.enabled: true
-                layer.effect: DropShadow {
-                transparentBorder: true
-                samples: 12
-                radius:4
-                }
-                Text {
-                    text: "Ok"
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        popJobSetHostsMask.close();
-                        JobsModel.setHostMask(set_host_mask_text_input_dialog.text)
-                    }
-                }
-            }
-        }
-
-
-        InfoDialog {
-            id: popJobLogDialog
-            title: "Job Log"
-        }
-        InfoDialog {
-            id: popJobErrorDialog
-            title: "Error Blades"
-        }
-        Loader {
-            id: job_context_menu_
-            anchors.fill: parent
-            source: jobs_ListView.currentIndex!=-1 ? "JobContextMenu.qml" : ""
-        }
-    }
-
-
-    BladesView{
-        id:blades_view
-        width: jobs_view.width
-        height: root.height-85
-
-
-        anchors.right: side_view.left
-        anchors.rightMargin: 10
-        anchors.top:main_menu.bottom
-        anchors.topMargin: 0
-
-        property var blade_minimum_Width: { "header_base": 100,
-                                                                      "state": 45,
-                                                                      "name": 120,
-                                                                        "blades_group": 80,
-                                                                        "cpu": 40,
-                                                                        "memory": 90,
-                                                                        "network": 90,
-                                                                        "slots": 40,
-                                                                        "av_slots": 65,
-                                                                        "eplased": 90,
-                                                                        "address": 120}
-
-
-        Component{
-            id:blade_delegate
-            BladeDelegate{
-                aligntype: custom_aligntype
-                width: parent.width
-                height: 45
-            }
-        }
-        ScrollView {
-            anchors.fill: parent
-            anchors.topMargin: 35
-            highlightOnFocus:true
-            style: ScrollViewStyle {
-                transientScrollBars: root.transient_toggl
-                scrollBarBackground: Item {
-                    implicitWidth: 12
-                    implicitHeight: 26
-                }
-                handle: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 26
-                    color: "white"
-                    opacity: 0.4
-                }
-                decrementControl: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 2
-                    color: "white"
-                    opacity: 0.3
-                }
-                incrementControl: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 1
-                    color: "white"
-                    opacity: 0.3
-                }
-            }
-                ListView {
-                  id: blades_ListView
-                  anchors.fill: parent
-                  highlightFollowsCurrentItem: false
-                  delegate:blade_delegate
-                  model: BladesModel.bladesModel
-                  cacheBuffer:40
-                }
-        }
-        InputDialog {
-            id: popBladeSetMaxSlots
-            title: "Set Max Slots"
-
-            TextInput {
-                id: set_max_slots_input_dialog
-                anchors.top: parent.top
-                anchors.topMargin: 28
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width*0.85
-                height: 20
-                text: "99"
-                opacity: 0.9
-                selectByMouse: true
-                inputMethodHints:Qt.ImhDigitsOnly
-
-                color: "white"
-
-                Keys.onReturnPressed: {
-                    popBladeSetMaxSlots.close();
-                    BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
-                }
-            }
-            Rectangle {
-                height: 25
-                width:59
-                color: "#374a52"
-
-                anchors.bottom: parent.bottom
-                anchors.left: parent.horizontalCenter
-                anchors.leftMargin: 10
-                anchors.bottomMargin: 10
-                opacity:0.85
-                layer.enabled: true
-                layer.effect: DropShadow {
-                transparentBorder: true
-                samples: 12
-                radius:4
-                }
-                Text {
-                    text: "Ok"
-                    anchors.centerIn: parent
-                    color: "white"
-                }
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: {
-                        popBladeSetMaxSlots.close();
-                        BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
-                    }
-                }
-            }
-        }
-        BladeContextMenu{
-            id: blade_context_menu
-        }
-    }
-
-    NodeView{
-        id:node_view
-        width:jobs_view.width+18
-        height: root.height-85
-
-        anchors.right: side_view.left
-        anchors.rightMargin: 10
-        anchors.top:main_menu.bottom
-
-        //signal linesUpdate
-    }
-
-    UsersView{
-        id:users_view
-        width: root.width-side_view.width-18
-        height: root.height-85
-
-        anchors.right: side_view.left
-        anchors.rightMargin: 10
-        anchors.top:main_menu.bottom
-        anchors.topMargin: 0
-
-        property var user_minimum_Width: {"user_machine_ip": 140,
-                                         "user": 45,
-                                         "tasks_running": root.width-side_view.width-400,
-                                         "jobs_size": 85,
-                                         "priority": 80}
-        property int selection
-
-        Component{
-            id:user_delegate
-            UserDelegate{
-                aligntype: custom_aligntype
-                height: 45
-
-            }
-        }
-        ScrollView {
-            anchors.fill: parent
-            anchors.topMargin: 35
-            highlightOnFocus:true
-            style: ScrollViewStyle {
-                transientScrollBars: root.transient_toggl
-                scrollBarBackground: Item {
-                    implicitWidth: 12
-                    implicitHeight: 26
-                }
-                handle: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 26
-                    color: "white"
-                    opacity: 0.4
-                }
-                decrementControl: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 2
-                    color: "white"
-                    opacity: 0.3
-                }
-                incrementControl: Rectangle {
-                    implicitWidth: 12
-                    implicitHeight: 1
-                    color: "white"
-                    opacity: 0.3
-                }
-            }
-                ListView {
-                  id: users_ListView
-                  anchors.fill: parentss
-                  delegate:user_delegate
-                  model: UsersModel.usersModel
-                  focus: true
-                  cacheBuffer:40
-                }
-        }
-        UserContextMenu{
-            id: user_context_menu
-        }
-        ColorDialog {
-            id: color_dialog
-            visible: false
-            modality: Qt.WindowModal
-            title: "Choose a color"
-            onAccepted: {
-                UsersModel.setUserColor(users_ListView.currentItem.v_user_name,color_dialog.color)
-            }
-        }
-    }
-
-    MetricsView{
-        id:metrics_view
-        width:jobs_view.width
-        height: 400
-
-        anchors.right: side_view.left
-        anchors.rightMargin: 10
-        anchors.top:main_menu.top
-        anchors.topMargin: 50
-    }
-
-    TerminalView{
-        id:terminal_view
-        width:jobs_view.width
-        height: root.height-85
-        anchors.right: side_view.left
-        anchors.rightMargin: 10
-        anchors.top:main_menu.bottom
-    }
-
-
-    Item{
-        id:not_implemented_view
-        width: 200
-        height:100
-
-        anchors.centerIn: blades_view
-
-
-        Text {
-            anchors.centerIn: parent
+        Rectangle {
             color: "white"
-            opacity: 0.45
-            text:"Not Implemented Yet"
-            font.letterSpacing:1.2
-            font { family: robotoRegular.name; pixelSize: 18}
+            width: 1
+            height: 1
+            opacity: 0.3
         }
     }
 
-    onJobClicked: {
-        side_view.jobClicked.call()
+    SplitView {
+        orientation: Qt.Horizontal
+        height:root.height-main_menu.height+5
+        handleDelegate:comp_spliter
+        width:root.width
+        anchors.top:main_menu.bottom
+        anchors.topMargin: -5
+        Item{
+            width: root.width/1.35
+            height: parent.height
+            JobsView{
+                id:jobs_view
+                width: parent.width
+                height: parent.height
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+
+                property var job_minimum_Width: {"progress": 130,
+                                                 "elapsed": 100,
+                                                 "user": 35,
+                                                 "job_name": root.width-side_view.width-750,
+                                                 "slots": 40,
+                                                 "priority": 60,
+                                                 "started": 100,
+                                                 "software": 100,
+                                                 "approximate_time": 70}
+                property int selection
+
+                Component{
+                    id:job_delegate
+                    JobDelegate{
+                        aligntype: custom_aligntype
+                        //height: 45
+                        width: parent.width
+                    }
+                }
+                ScrollView {
+                    anchors.fill: parent
+                    anchors.topMargin: 35
+                    highlightOnFocus:true
+                    style: ScrollViewStyle {
+                        transientScrollBars: root.transient_toggl
+                        scrollBarBackground: Item {
+                            implicitWidth: 12
+                            implicitHeight: 26
+                        }
+                        handle: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 26
+                            color: "white"
+                            opacity: 0.4
+                        }
+                        decrementControl: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 2
+                            color: "white"
+                            opacity: 0.3
+                        }
+                        incrementControl: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 1
+                            color: "white"
+                            opacity: 0.3
+                        }
+                    }
+                        ListView {
+                          id: jobs_ListView
+                          anchors.fill: parentss
+                          delegate:job_delegate
+                          model: JobsModel.jobsModel
+                          focus: true
+                          cacheBuffer:40
+                        }
+                }
+
+
+                InputDialog {
+                    id: popJobSetPriority
+                    title: "Set Priority"
+
+                    TextInput {
+                        id: set_priority_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetPriority.close();
+                            JobsModel.setPriority(set_priority_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetPriority.close();
+                                JobsModel.setPriority(set_priority_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetHostsMask
+                    title: "Set Hosts Mask"
+
+                    TextInput {
+                        id: set_host_mask_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetHostsMask.close();
+                            JobsModel.setBladeMask(set_host_mask_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetHostsMask.close();
+                                JobsModel.setBladeMask(set_host_mask_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetHostsMaskExclude
+                    title: "Set Hosts Mask Exclude"
+
+                    TextInput {
+                        id: set_host_mask_exclude_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetHostsMaskExclude.close();
+                            JobsModel.setBladeMaskExclude(set_host_mask_exclude_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetHostsMaskExclude.close();
+                                JobsModel.setBladeMaskExclude(set_host_mask_exclude_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+
+                InfoDialog {
+                    id: popJobFolderIsNotExistDialog
+                    title: "Folder Is Not Exist"
+                }
+                InfoDialog {
+                    id: popJobLogDialog
+                    title: "Job Log"
+                }
+                InfoDialog {
+                    id: popJobErrorDialog
+                    title: "Error Blades"
+                }
+                Loader {
+                    id: job_context_menu_
+                    anchors.fill: parent
+                    source: jobs_ListView.currentIndex!=-1 ? "JobContextMenu.qml" : ""
+                }
+            }
+
+
+            BladesView{
+                id:blades_view
+
+                width: parent.width
+                height: parent.height
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+
+                property var blade_minimum_Width: { "header_base": 100,
+                                                                              "state": 45,
+                                                                              "name": 120,
+                                                                                "blades_group": 80,
+                                                                                "cpu": 40,
+                                                                                "memory": 90,
+                                                                                "network": 90,
+                                                                                "slots": 40,
+                                                                                "av_slots": 65,
+                                                                                "eplased": 90,
+                                                                                "address": 120}
+
+
+                Component{
+                    id:blade_delegate
+                    BladeDelegate{
+                        aligntype: custom_aligntype
+                        width: parent.width
+                        height: 45
+                    }
+                }
+                ScrollView {
+                    anchors.fill: parent
+                    anchors.topMargin: 35
+                    highlightOnFocus:true
+                    style: ScrollViewStyle {
+                        transientScrollBars: root.transient_toggl
+                        scrollBarBackground: Item {
+                            implicitWidth: 12
+                            implicitHeight: 26
+                        }
+                        handle: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 26
+                            color: "white"
+                            opacity: 0.4
+                        }
+                        decrementControl: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 2
+                            color: "white"
+                            opacity: 0.3
+                        }
+                        incrementControl: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 1
+                            color: "white"
+                            opacity: 0.3
+                        }
+                    }
+                        ListView {
+                          id: blades_ListView
+                          anchors.fill: parent
+                          highlightFollowsCurrentItem: false
+                          delegate:blade_delegate
+                          model: BladesModel.bladesModel
+                          cacheBuffer:40
+                        }
+                }
+                InputDialog {
+                    id: popBladeSetMaxSlots
+                    title: "Set Max Slots"
+
+                    TextInput {
+                        id: set_max_slots_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+
+                        Keys.onReturnPressed: {
+                            popBladeSetMaxSlots.close();
+                            BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popBladeSetMaxSlots.close();
+                                BladesModel.actCapacity(blades_ListView.currentItem.v_blade_id,set_max_slots_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                BladeContextMenu{
+                    id: blade_context_menu
+                }
+            }
+
+            NodeView{
+                id:node_view
+
+                width: parent.width
+                height: parent.height
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+            }
+
+            UsersView{
+                id:users_view
+
+                width: parent.width
+                height: parent.height
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+
+                property var user_minimum_Width: {"user_machine_ip": 140,
+                                                 "user": 45,
+                                                 "tasks_running": root.width-side_view.width-400,
+                                                 "jobs_size": 85,
+                                                 "priority": 80}
+                property int selection
+
+                Component{
+                    id:user_delegate
+                    UserDelegate{
+                        aligntype: custom_aligntype
+                        height: 45
+
+                    }
+                }
+                ScrollView {
+                    anchors.fill: parent
+                    anchors.topMargin: 35
+                    highlightOnFocus:true
+                    style: ScrollViewStyle {
+                        transientScrollBars: root.transient_toggl
+                        scrollBarBackground: Item {
+                            implicitWidth: 12
+                            implicitHeight: 26
+                        }
+                        handle: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 26
+                            color: "white"
+                            opacity: 0.4
+                        }
+                        decrementControl: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 2
+                            color: "white"
+                            opacity: 0.3
+                        }
+                        incrementControl: Rectangle {
+                            implicitWidth: 12
+                            implicitHeight: 1
+                            color: "white"
+                            opacity: 0.3
+                        }
+                    }
+                        ListView {
+                          id: users_ListView
+                          anchors.fill: parentss
+                          delegate:user_delegate
+                          model: UsersModel.usersModel
+                          focus: true
+                          cacheBuffer:40
+                        }
+                }
+                UserContextMenu{
+                    id: user_context_menu
+                }
+                ColorDialog {
+                    id: color_dialog
+                    visible: false
+                    modality: Qt.WindowModal
+                    title: "Choose a color"
+                    onAccepted: {
+                        UsersModel.setUserColor(users_ListView.currentItem.v_user_name,color_dialog.color)
+                    }
+                }
+            }
+
+            MetricsView{
+                id:metrics_view
+
+                width: parent.width
+                height: parent.height
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+            }
+
+            TerminalView{
+                id:terminal_view
+
+                width: parent.width
+                height: parent.height
+                anchors.left: parent.left
+                anchors.leftMargin: 5
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+            }
+        }/*
+        Rectangle {
+            id: side_view
+            width: 200
+            height: parent.height
+            //anchors.left: parent.right
+            //anchors.leftMargin: 5
+            //x:side_view.x-5
+
+            color: "lightblue"
+            Text {
+                text: "View 1"
+                anchors.centerIn: parent
+            }
+        }
+*/
+        SideView{
+            id: side_view
+            width: 300
+            height: parent.height
+            Layout.minimumWidth: 200
+            //x:parent.width-parent.width/4
+        }
     }
+
+
     /*
     Loader {
         id: side_view
@@ -731,22 +809,16 @@ Item {
         //source: jobs_ListView.currentIndex!=-1 ? "SideView.qml" : ""
         source: "SideView.qml"
     }
-    */
-    SideView{
-        id: side_view
-        width: parent.width/4
-        height: parent.height
-        x:parent.width-parent.width/4
-    }
+*/
 
     MainMenu{
         id: main_menu
     }
 
     UsageBar{
-        width:blades_view.width
-        anchors.left: blades_view.left
-        anchors.bottom:  blades_view.bottom
+        width:blades_view.width+10
+        anchors.left: parent.left
+        anchors.bottom:  parent.bottom
         visible: farm_usage_toggl
     }
 
@@ -906,6 +978,15 @@ Item {
            checked:swap_jobs_name
            onToggled: {
                swap_jobs_name=swap_jobs_names_menuitem.checked
+           }
+       }
+       MenuItem {
+           id: expand_jobs_goups_menuitem
+           checkable: true
+           text: "Expand Jobs Group (not impl.)"
+           checked:expand_jobs_goups
+           onToggled: {
+               expand_jobs_goups=swap_jobs_names_menuitem.checked
            }
        }
        MenuSeparator { }

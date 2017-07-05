@@ -85,19 +85,27 @@ bool JobObjectsLorry::isDeleted(int hash)
     return ( std::find(m_deleted_jobs.begin(), m_deleted_jobs.end(), hash) != m_deleted_jobs.end() );
 }
 
-void JobObjectsLorry::clear()
+void JobObjectsLorry::cache()
 {
+    size_t len = m_objects.size();
+    for(int i = 0; i < len; ++i)
+        m_cache.push_back( m_objects[i] );
     m_objects.clear();
-    m_deleted_jobs.clear();
+}
+
+JobObjectPtrIt JobObjectsLorry::search(int hash)
+{
+    return std::find_if( std::begin(m_cache), std::end(m_cache), HasHash(hash) );
 }
 
 
-void JobObjectsLorry::insert(const QString& user_name
+JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                   ,JobState::State status
                   ,const QString &time_creation
                   ,int blocks_num
                   ,const QString &working_time
-                  ,const QString &hosts_mask
+                  ,const QString &blade_mask
+                  ,const QString &exclude_blade_mask
                   ,const QString &software
                   ,int priority
                   ,int slot
@@ -116,18 +124,22 @@ void JobObjectsLorry::insert(const QString& user_name
                   ,int errors_avoid_blades
                   ,const std::string& json_represent)
 {
-    // if ( isDeleted(id) ) return;
+    JobObject::Ptr ret;
+    if ( isDeleted(id) ) return ret;
 
     JobObjectPtrIt it = find(id);
+    JobObjectPtrIt it_cached = search(id);
 
     if( it != m_objects.end() )
     {
+        ret = (*it);
         (*it)->update(user_name
                 ,status
                 ,time_creation
                 ,blocks_num
                 ,working_time
-                ,hosts_mask
+                ,blade_mask
+                ,exclude_blade_mask
                 ,software
                 ,priority
                 ,slot
@@ -148,6 +160,38 @@ void JobObjectsLorry::insert(const QString& user_name
         (*it)->m_output_folder = output_folder;
         (*it)->set_refreshed = true;
     }
+    else if ( it_cached != m_cache.end() )
+    {
+        ret = (*it_cached);
+        (*it_cached)->update(user_name
+                ,status
+                ,time_creation
+                ,blocks_num
+                ,working_time
+                ,blade_mask
+                ,exclude_blade_mask
+                ,software
+                ,priority
+                ,slot
+                ,progress
+                ,name
+                ,id
+                ,block_order
+                ,blades
+                ,block_name
+                ,job_id
+                ,blades_length
+                ,approx_time
+                ,depends
+                ,user_color
+                ,errors_avoid_blades
+                ,json_represent
+            );
+        (*it_cached)->m_output_folder = output_folder;
+        (*it_cached)->set_refreshed = true;
+        m_objects.push_back( (*it_cached) );
+        m_cache.erase(it_cached);
+    }
     else
     {
         JobObject::Ptr b = JobObject::create( user_name
@@ -155,7 +199,8 @@ void JobObjectsLorry::insert(const QString& user_name
                 ,time_creation
                 ,blocks_num
                 ,working_time
-                ,hosts_mask
+                ,blade_mask
+                ,exclude_blade_mask
                 ,software
                 ,priority
                 ,slot
@@ -176,7 +221,9 @@ void JobObjectsLorry::insert(const QString& user_name
         b->m_output_folder = output_folder;
         b->set_refreshed = true;
         m_objects.push_back(b);
+        ret = b;
     }
+    return ret;
 }
 
 

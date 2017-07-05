@@ -6,20 +6,49 @@ using namespace afermer;
 BladeObjectsManager::Ptr BladeObjectsManager::m_single = NULL;
 
 
+
+bool BladeObjectsManager::isMyBlade(int i_id)
+{
+    BladeObject::Ptr object = m_lorry->get(i_id);
+    if (object == NULL) return false;
+    
+    std::string username;
+    m_RLS->getUserName(username);
+    QString user = QString::fromStdString(username);
+
+    std::string compname;
+    m_RLS->getComputerName(compname);
+    QString comp = QString::fromStdString(compname);
+
+    if ( object->name().contains(comp) ||  object->user() == user )
+        return true;
+
+    return false;
+}
+
+
 BladeObject::Ptr BladeObjectsManager::at(int i_index)
 {
-    return m_lorry->m_objects[i_index];
+    if ( m_lorry->m_objects.size() > 0)
+        return m_lorry->m_objects[i_index];
+    BladeObject::Ptr ret;
+    return ret;
 }
 
 void BladeObjectsManager::removeAt(int i_index)
 {
+    if ( m_lorry->m_objects.size() < 1)
+        return;
     std::vector<BladeObject::Ptr>::iterator it = m_lorry->m_objects.begin() + i_index;
     m_lorry->m_objects.erase(it);
 }
 
 QString BladeObjectsManager::getInfo(int i_index, const QString& i_key)
 {
-    return m_lorry->m_objects[i_index]->m_resource_map[i_key];
+    if ( m_lorry->m_objects.size() > 0)
+        return m_lorry->m_objects[i_index]->m_resource_map[i_key];
+    QString ret("");
+    return ret;
 }
 
 size_t BladeObjectsManager::size()

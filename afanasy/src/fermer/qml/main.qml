@@ -66,7 +66,7 @@ ApplicationWindow {
         anchors.centerIn: parent
         color: "white"
         opacity: 0.45
-        text:"Loading ..."
+        text:"..."
         font.letterSpacing:1.2
         font { family: robotoRegular.name; pixelSize: 18}
     }

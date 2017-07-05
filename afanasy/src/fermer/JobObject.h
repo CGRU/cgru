@@ -1,10 +1,10 @@
-#ifndef __JOBOBJECT__
-#define __JOBOBJECT__
+#pragma once
 
-#include <QStringList>
+
 #include "state.hpp"
 #include "common.h"
 
+#include <QStringList>
 
 
 class JobObject
@@ -12,10 +12,11 @@ class JobObject
 public:
 
     AFERMER_TYPEDEF_SMART_PTRS(JobObject);
-    AFERMER_DEFINE_CREATE_FUNC_22_ARGS(JobObject, const QString&,
+    AFERMER_DEFINE_CREATE_FUNC_23_ARGS(JobObject, const QString&,
                   JobState::State,
                   const QString &
                   ,int
+                  ,const QString&
                   ,const QString&
                   ,const QString&
                   ,const QString&
@@ -40,7 +41,8 @@ public:
                   ,const QString &time_creation
                   ,int blocks_num
                   ,const QString &time_elapsed
-                  ,const QString &hosts_mask
+                  ,const QString &blade_mask
+                  ,const QString &exclude_blade_mask
                   ,const QString &software
                   ,int priority
                   ,int slot
@@ -63,7 +65,8 @@ public:
         , m_time_creation(time_creation)
         , m_blocks_num(blocks_num)
         , m_time_elapsed(time_elapsed)
-        , m_hosts_mask(hosts_mask)
+        , m_blade_mask(blade_mask)
+        , m_exclude_blade_mask(exclude_blade_mask)
         , m_software(software)
         , m_priority(priority)
         , m_slot(slot)
@@ -80,6 +83,7 @@ public:
         , m_user_color(user_color)
         , m_errors_avoid_blades(errors_avoid_blades)
         , m_json_represent(json_represent)
+        , m_expand(false)
 {m_selected=0;m_notify_showed=false;}
 
 
@@ -102,7 +106,8 @@ public:
                   ,const QString &time_creation
                   ,int blocks_num
                   ,const QString &time_elapsed
-                  ,const QString &hosts_mask
+                  ,const QString &blade_mask
+                  ,const QString &exclude_blade_mask
                   ,const QString &software
                   ,int priority
                   ,int slot
@@ -127,7 +132,8 @@ public:
     QString m_time_creation;
     int m_blocks_num;
     QString m_time_elapsed;
-    QString m_hosts_mask;
+    QString m_blade_mask;
+    QString m_exclude_blade_mask;
     QString m_software;
     int m_priority;
     int m_slot;
@@ -154,7 +160,9 @@ public:
     QString m_user_color;
     int m_errors_avoid_blades;
     bool m_notify_showed;
+    bool m_expand;
     std::string m_json_represent;
+    std::string information;
 };
 
 
@@ -172,4 +180,3 @@ struct JobTimeApproximationManager
 };
 
 
-#endif

@@ -14,14 +14,21 @@ Menu {
    MenuItem {
        text: "Open Folder"
        onTriggered:{
-           JobsModel.jobOutputFolder()
+           if  (!JobsModel.jobGetOutputFolder().length){
+               popJobFolderIsNotExistDialog.text="Can`t To Find Folder"
+               popJobFolderIsNotExistDialog.show()
+           }
+           else{
+               JobsModel.jobOpenOutputFolder()
+           }
        }
        visible: !multiselected
    }
+   /*
    MenuItem {
        text: "Open In RV (not impl.)"
        visible: !multiselected
-   }
+   }*/
    MenuItem {
        text: "Show Log"
        onTriggered:{
@@ -46,14 +53,22 @@ Menu {
            popJobSetPriority.show();
        }
    }
+   /*
    MenuItem {
        text: "Set Max Running Tasks (not impl.)"
-   }
+   }*/
    MenuItem {
        text: "Set Blades Mask"
        onTriggered:{
            set_host_mask_text_input_dialog.text=jobs_ListView.currentItem.v_blades_mask
            popJobSetHostsMask.show();
+       }
+   }
+   MenuItem {
+       text: "Set Blades Mask Exclude"
+       onTriggered:{
+           set_host_mask_exclude_text_input_dialog.text=jobs_ListView.currentItem.v_blades_mask_exlude
+           popJobSetHostsMaskExclude.show();
        }
    }
    MenuSeparator { }
@@ -104,6 +119,7 @@ Menu {
        text: jobs_ListView.currentItem.v_group_size>1 ? "Delete Group" : "Delete"
        onTriggered:{
             JobsModel.deleteJobGroup()
+            JobsModel.passUpdate()
        }
    }
    style: MenuStyle {

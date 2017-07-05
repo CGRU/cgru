@@ -9,7 +9,7 @@ Item{
     ColumnLayout {
 	id:info_title
 	anchors.top: parent.top
-    anchors.topMargin: 130
+    anchors.topMargin: 50
 	anchors.left: parent.left
 	anchors.leftMargin: 15
 	Layout.alignment:Qt.AlignRight
@@ -258,8 +258,8 @@ Item{
 
     ColumnLayout {
 	id:info_value
-	anchors.top: parent.top
-    anchors.topMargin: 130
+    anchors.top: parent.top
+    anchors.topMargin: 50
 	anchors.left: info_title.right
 	anchors.leftMargin: 20
 	opacity:0.8
@@ -277,7 +277,7 @@ Item{
         text: blades_ListView.currentItem.v_state==BladeState.BUSY ? "Working"
                                               : blades_ListView.currentItem.v_state==BladeState.OFFLINE ? "Offline"
                                               : blades_ListView.currentItem.v_state==BladeState.READY ? "Idle"
-                                              : blades_ListView.currentItem.v_state==BladeState.NIMBY ? "Skip"
+                                              : blades_ListView.currentItem.v_state==BladeState.NIMBY ? "Free For Owner"
                                               : blades_ListView.currentItem.v_state==BladeState.BIG_NIMBY ? "Skip"
                                               : blades_ListView.currentItem.v_state==BladeState.DIRTY ? "DIRTY"
                                               : "else"

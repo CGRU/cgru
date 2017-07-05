@@ -1,22 +1,17 @@
-#ifndef __FERMERMESSAGE__
-#define __FERMERMESSAGE__
+#pragma once
 
-#include "libafanasy/name_af.h"
 
-#include <QtNetwork/QTcpSocket>
-#include <boost/shared_ptr.hpp>
-
-#include "libafanasy/environment.h"
-#include "libafqt/qenvironment.h"
 #include "libafanasy/msg.h"
 #include "watch/monitorhost.h"
-
 #include "libafqt/qthreadclientsend.h"
 #include "libafqt/qthreadclientup.h"
 
 
 #include "common.h"
 #include "state.hpp"
+
+#include <QtNetwork/QTcpSocket>
+#include <QObject>
 
 namespace afermer
 {
@@ -53,11 +48,8 @@ public:
     static int getAvalibleSlotsAndJobNames(af::Render *, int, QString&, QList<int>&);
     static void getItemInfo( std::ostringstream&, const std::string &, const std::string &, int);
 
-
     bool setParameter(const std::string&, const std::vector<int>&, const std::string&, const std::string&, bool);
     bool setOperation(const std::string&, const std::vector<int>&, const std::string&);
-
-    af::Environment* ENV;
 
     RadiolocationStation();
     ~RadiolocationStation();
@@ -68,6 +60,7 @@ public:
     size_t getUserId();
     void getServerIPAddress(std::string&);
     void getUserName(std::string&);
+    void getComputerName(std::string&);
 
     MonitorHost* m_monitor;
     size_t monitor_id;
@@ -87,10 +80,11 @@ private:
 
     size_t user_id;
     std::string user_name;
+    std::string comp_name;
 
     af::Msg* msg_monitor_id;
-
 };
 
 }
-#endif
+
+

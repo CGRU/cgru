@@ -6,6 +6,7 @@ TasksModel::TasksModel(QObject *i_parent)
     : QAbstractListModel(i_parent)
 {
     m_RLS = RadiolocationService::create();
+    m_previos_job_id = 0;
 }
 
 TasksModel* TasksModel::tasksModel()
@@ -14,7 +15,15 @@ TasksModel* TasksModel::tasksModel()
 }
 
 void TasksModel::updateTasksByJobID(int i_job_id)
-{
+{/*
+    if (m_previos_job_id!=i_job_id){
+        m_task.clear();
+        TaskState::State t_status;
+        TaskObject loading(0,"",0,"Loading",t_status,"","");
+        m_task.append(loading);
+        emit dataChanged(index(0, 0), index(rowCount() - 1, 0));
+    }*/
+
     m_RLS->get(m_task, i_job_id);
     
     if (m_tasks_size!=m_task.size())
@@ -22,12 +31,25 @@ void TasksModel::updateTasksByJobID(int i_job_id)
 
     m_tasks_size=m_task.size();
     emit dataChanged(index(0, 0), index(rowCount() - 1, 0));
+
+    /*
+    Thread *thread = new Thread(m_task);
+    Task   *task   = new Task();
+    //t->start();
+    task->moveToThread(thread);
+    connect( thread, SIGNAL(started()), task, SLOT(doWork()) );
+    connect( task, SIGNAL(workFinished()), thread, SLOT(quit()) );
+    //automatically delete thread and task object when work is done:
+    connect( thread, SIGNAL(finished()), task, SLOT(deleteLater()) );
+    connect( thread, SIGNAL(finished()), thread, SLOT(deleteLater()) );
+    thread->start();*/
 }
 
 void TasksModel::clear()
 {
     beginResetModel();
     endResetModel();
+    emit afterReset();
 }
 
 void TasksModel::removeAll()
@@ -75,7 +97,7 @@ QVariant TasksModel::data(const QModelIndex &i_index, int i_role) const
 QString TasksModel::taskOutput(int i_index, TaskState::State state)
 {
     QString info;
-    m_RLS->taskStdOut(info, i_index, state);
+    m_RLS->taskOutput(info, i_index, state);
     return info;
 }
 

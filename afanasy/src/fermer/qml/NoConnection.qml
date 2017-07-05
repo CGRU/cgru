@@ -22,4 +22,22 @@ Rectangle {
         font { family: robotoRegular.name; pixelSize: 18}
     }
 
+    function checkConnection()  {
+        console.log("checkConnection to server ")
+        if (General.serverExist()){
+                background.source = "root_ui.qml"
+            }
+        else{
+            background.source = "NoConnection.qml"
+        }
+    }
+
+    Timer  {
+        id: elapsedTimer
+        interval: 1000;
+        running: true;
+        repeat: true;
+        onTriggered: checkConnection()
+    }
+
 }

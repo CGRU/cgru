@@ -1,10 +1,9 @@
-#ifndef __USEROBJECT__
-#define __USEROBJECT__
+#pragma once
+
+#include "common.h"
+#include <vector>
 
 #include <QStringList>
-#include "common.h"
-
-
 
 class UserObject
 {
@@ -56,4 +55,3 @@ public:
 typedef std::vector<UserObject::Ptr>::iterator UserObjectPtrIt;
 
 
-#endif

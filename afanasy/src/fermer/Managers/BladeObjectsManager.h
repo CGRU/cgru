@@ -1,5 +1,4 @@
-#ifndef __BLADEOBJECTCONT__
-#define __BLADEOBJECTCONT__
+#pragma once
 
 #include "common.h"
 #include "JobObject.h"
@@ -27,6 +26,8 @@ struct BladeObjectsManager
 
 
     void getJobDependencies(int, QList<JobObject::Ptr> & );
+
+    bool isMyBlade(int);
 
 
     bool setBladeService(int, bool, const QString&);
@@ -61,4 +62,3 @@ struct BladeObjectsManager
 };
 
 }
-#endif

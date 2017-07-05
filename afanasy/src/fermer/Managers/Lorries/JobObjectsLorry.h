@@ -1,8 +1,8 @@
-#ifndef __JOBOBJECTMED__
-#define __JOBOBJECTMED__
+#pragma once
 
-#include "JobObject.h"
 #include "common.h"
+#include "JobObject.h"
+
 
 namespace afermer
 {
@@ -17,12 +17,13 @@ struct JobObjectsLorry
 
     JobObjectsLorry() { }
 
-    void insert(const QString &user_name
+    JobObject::Ptr insert(const QString &user_name
                   ,JobState::State status
                   ,const QString &time_creation
                   ,int blocks_num
                   ,const QString &time_done
-                  ,const QString &hosts_mask
+                  ,const QString &blade_mask
+                  ,const QString &exclude_blade_mask
                   ,const QString &software
                   ,int priority
                   ,int slot
@@ -47,7 +48,6 @@ struct JobObjectsLorry
     size_t size();
     bool contain(int);
     void refresh();
-    void clear();
     JobObject::Ptr get(int hash);
 
     void markToDelete(const QList<int>&);
@@ -57,8 +57,11 @@ struct JobObjectsLorry
     std::map<size_t, JobTimeApproximationManager::Ptr > m_job_time;
 
 
+    void cache();
+    JobObjectPtrIt search(int);
     
     std::vector<JobObject::Ptr> m_objects;
+    std::vector<JobObject::Ptr> m_cache;
     std::vector<size_t> m_deleted_jobs;
 
 };
@@ -66,4 +69,3 @@ struct JobObjectsLorry
 
 }
 
-#endif

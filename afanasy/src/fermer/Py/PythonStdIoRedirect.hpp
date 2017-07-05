@@ -1,4 +1,4 @@
-#include <boost/python.hpp>
+#include <sstream>
 #include <boost/circular_buffer.hpp>
 
 // https://onegazhang.wordpress.com/2008/09/30/redirect-python-stdoutstderr-via-boost-python/
@@ -27,3 +27,4 @@ public:
 private:
     static ContainerType m_outputs; // must be static, otherwise output is missing
 };
+

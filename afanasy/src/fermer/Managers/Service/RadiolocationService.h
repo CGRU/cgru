@@ -1,7 +1,9 @@
-#ifndef __FERMER_MONITOR__
-#define __FERMER_MONITOR__
+#pragma once
 
-#include "Managers/Service/Station/RadiolocationStation.h"
+#include <string>
+#include <vector>
+#include <iostream>
+
 
 #include "common.h"
 #include "TaskObject.h"
@@ -12,13 +14,8 @@
 #include "Managers/Lorries/JobObjectsLorry.h"
 #include "Managers/Lorries/BladeObjectsLorry.h"
 #include "RotateValue.h"
-
 #include <QtCore>
-#include <string>
-#include <vector>
-#include <iostream>
 #include <QPixmap>
-
 
 namespace afermer
 {
@@ -47,12 +44,8 @@ public:
 
     bool get(QList<TaskObject>&, int);
     
-    void getBladeInfo(QMap<QString,QString>&, int);
     bool getJobsStatistic(QList<int>&);
     void getJobDependencies(int index, QList<JobObject::Ptr> &);
-    bool blockBlades(QList<QString>&, int);
-
-    bool setGodMode(bool);
 
     // BLADES
     bool setBladeService(int, bool, const QString&);
@@ -81,9 +74,10 @@ public:
     // JOBS
     QString jobLog(int);
     bool jobSetPriority(const QList<int>&, int);
-    bool jobSetHostMask(const QList<int>&, const QString&);
+    bool jobSetBladeMask(const QList<int>&, const QString&);
+    bool jobSetExcludeBladeMask(const QList<int>&, const QString&);
     bool jobSetWaitTime(int, const QString&);
-    QString jobGetHostMask(int);
+    QString jobGetBladeMask(int);
     bool jobRestartErrors(const QList<int>&);
     bool jobRestartRunning(const QList<int>&);
     bool jobRestartSkipped(const QList<int>&);
@@ -92,10 +86,11 @@ public:
     bool jobRestartPause(const QList<int>&);
     bool jobSkipJobs(const QList<int>&);
 
-    QString jobOutputFolder(int);
+    QString jobOpenOutputFolder(int);
+    QString jobGetOutputFolder(int);
     QString jobShowErrorBlades(int);
 
-    void taskStdOut(QString&, int, TaskState::State);
+    void taskOutput(QString&, int, TaskState::State);
     void taskCommand(QString&, int);
     void taskLog(QString&, int);
     void taskErrorHosts(QString&, int);
@@ -138,6 +133,7 @@ public:
 
     void getServerIPAddress(std::string&);
     void getUserName(std::string&);
+    void getComputerName(std::string&);
 
 
 private:
@@ -166,7 +162,7 @@ private:
 
 protected:
 
-    RadiolocationStation::Ptr m_station;
+    
 
     size_t subscribed_job;
 
@@ -179,4 +175,3 @@ protected:
 
 }
 
-#endif

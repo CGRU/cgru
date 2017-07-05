@@ -1,12 +1,16 @@
-#include "Managers/Service/RadiolocationService.h"
+#pragma once
 
-#include <QAbstractListModel>
-#include <QStringList>
-#include "TaskObject.h"
 #include <time.h>
 #include <algorithm>
 #include <cstdio>
 #include <ctime>
+
+#include "TaskObject.h"
+#include "Managers/Service/RadiolocationService.h"
+
+#include <QAbstractListModel>
+#include <QStringList>
+#include <QtCore>
 
 
 
@@ -17,7 +21,6 @@ class TasksModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(TasksModel *tasksModel READ tasksModel CONSTANT)
-
 public:
     enum JobsRoles {
         FrameRole,
@@ -39,6 +42,9 @@ public:
     Q_INVOKABLE void removeAll();
 
     QVariant data(const QModelIndex & i_index, int i_role = Qt::DisplayRole) const;
+
+signals:
+    void afterReset();
 
 public slots:
     Q_INVOKABLE void updateTasksByJobID(int i_job_index);
@@ -70,7 +76,43 @@ private:
 
     std::clock_t start;
     double duration;
+
+    int m_previos_job_id;
 //![2]
 };
+} // namespace afermer
 
-}
+/*
+class Thread : public QThread
+{
+public:
+    Thread(QList<TaskObject> &task):
+        m_task(task)
+    {}
+
+    void run()
+    {
+        //sleep(2);
+        //m_RLS->get(m_task, 81788928);
+        //qDebug()<<"From worker thread: "<<currentThreadId();
+    }
+private:
+    QList<TaskObject> m_task;
+    RadiolocationService::Ptr m_RLS;
+};
+
+class Task : public QObject
+{
+Q_OBJECT
+public:
+    Task(){m_RLS = RadiolocationService::create();}
+private:
+    RadiolocationService::Ptr m_RLS;
+    QList<TaskObject> m_task;
+public slots:
+    void doWork(){qDebug()<<"From worker thread: ";m_RLS->get(m_task, 81788928);}
+signals:
+    void workFinished();
+};
+} // namespace afermer
+*/

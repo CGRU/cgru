@@ -1,13 +1,16 @@
-#include "Managers/JobObjectsManager.h"
+#pragma once
 
-#include <QAbstractListModel>
-#include <QStringList>
-#include "JobObject.h"
 #include <time.h>
 #include "common.h"
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
+
+#include "JobObject.h"
+#include "Managers/JobObjectsManager.h"
+
+#include <QAbstractListModel>
+#include <QStringList>
 
 namespace afermer
 {
@@ -33,6 +36,7 @@ public:
         SoftwareRole,
         BlockNumberRole,
         BladesMaskRole,
+        BladesMaskExludeRole,
         BladesRole,
         GroupSizeRole,
         GroupIDRole,
@@ -51,7 +55,8 @@ public:
         GroupNodePoseYRole,
         GroupNodeWidthXRole,
         GroupNodeHeightXRole,
-        ErrorsAvoidBladesRole
+        ErrorsAvoidBladesRole,
+        ExpandRole
     };
 
     JobsModel(QObject *parent = 0);
@@ -74,14 +79,16 @@ public:
     Q_INVOKABLE void setPriority(int);
     Q_INVOKABLE void restartJobErrors();
     Q_INVOKABLE QString jobShowErrorBlades();
-    Q_INVOKABLE QString jobOutputFolder();
+    Q_INVOKABLE QString jobOpenOutputFolder();
+    Q_INVOKABLE QString jobGetOutputFolder();
     Q_INVOKABLE void jobRestartRunning();
     Q_INVOKABLE void jobRestartSkipped();
     Q_INVOKABLE void jobRestartDone();
     Q_INVOKABLE void jobResetErrorHosts();
     Q_INVOKABLE void jobRestartPause();
-    Q_INVOKABLE QString getHostMask();
-    Q_INVOKABLE void setHostMask(const QString&);
+    Q_INVOKABLE QString getBladeMask();
+    Q_INVOKABLE void setBladeMask(const QString&);
+    Q_INVOKABLE void setBladeMaskExclude(const QString&);
     Q_INVOKABLE void passUpdate();
 
     Q_INVOKABLE void multiSorting(int);
@@ -118,6 +125,7 @@ public:
 
     Q_INVOKABLE QString areJobsDone();
     Q_INVOKABLE void clearNotify();
+    Q_INVOKABLE void setExpand(int);
     void firstInitialize();
 
 
@@ -136,6 +144,7 @@ private:
     QMap<QString,QString> m_map;
     int m_job_size;
     bool m_pass_update;
+    bool m_pass_notify_update;
     int  m_sort_type;
     bool m_state_sort;
     bool m_multiselected_state;

@@ -11,7 +11,7 @@ struct HasUserName
 };
 
 
-UserObjectPtrIt UserObjectsLorry::find(const QString& user_name)
+afermer::UserObjectPtrIt UserObjectsLorry::find(const QString& user_name)
 {
     return std::find_if( std::begin(m_objects), std::end(m_objects), HasUserName(user_name) );
 }
@@ -25,7 +25,7 @@ void UserObjectsLorry::insert(const QString &user_name,
                  int priority,
                  int id)
 {
-    UserObjectPtrIt it = find(user_name);
+	afermer::UserObjectPtrIt it = find(user_name);
 
     if( it != m_objects.end() )
     {

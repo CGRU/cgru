@@ -48,8 +48,7 @@
 **
 ****************************************************************************/
 
-#ifndef HIGHLIGHTER_H
-#define HIGHLIGHTER_H
+#pragma once
 
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
@@ -90,4 +89,4 @@ private:
 };
 //! [0]
 
-#endif // HIGHLIGHTER_H
+

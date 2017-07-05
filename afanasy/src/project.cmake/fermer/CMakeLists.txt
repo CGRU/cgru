@@ -70,8 +70,37 @@ set (watch_cpp_src
 		"../..//watch/offlinescreen.cpp"
 		 )
 
+if(WIN32)
+	# build qt statically http://amin-ahmadi.com/2016/09/22/how-to-build-qt-5-7-statically-using-msvc14-microsoft-visual-studio-2015/
+	# https://bugreports.qt.io/browse/QTBUG-55279?page=com.atlassian.jira.plugin.system.issuetabpanels%3Aall-tabpanel
+	# KNOWN ISSUE: 
+	#           cgru\afanasy\src\project.cmake\fermer\moc_state.cpp(66): error C2589: 'constant': illegal token on right side of '::'
+	# please open the moc_state.cpp file and add line 
+	#			#undef ERROR
+	# after it compiled properly
+	link_directories( ${_qt5Core_install_prefix}/plugins/imageformats
+					${_qt5Core_install_prefix}/plugins/audio
+					${_qt5Core_install_prefix}/plugins/platforms
+					${_qt5Core_install_prefix}/lib
+					${_qt5Core_install_prefix}/qml/QtGraphicalEffects/private
+					${_qt5Core_install_prefix}/qml/QtQuick/Controls
+					${_qt5Core_install_prefix}/qml/QtQuick/Layouts
+					${_qt5Core_install_prefix}/qml/QtQuick/Controls/Styles/Flat
+					${_qt5Core_install_prefix}/qml/QtQuick/Dialogs
+					${_qt5Core_install_prefix}/qml/QtQuick/Window.2
+					${_qt5Core_install_prefix}/qml/QtQuick/PrivateWidgets
+					${_qt5Core_install_prefix}/qml/QtQuick/Extras
+					${_qt5Core_install_prefix}/qml/QtQuick/Controls.2
+					${_qt5Core_install_prefix}/qml/QtQuick/Controls.2/Material
+					${_qt5Core_install_prefix}/qml/QtQuick/Controls.2/Universal
+					${_qt5Core_install_prefix}/qml/QtQuick.2
+					${_qt5Core_install_prefix}/qml/QtQuick/Templates.2
+					${_qt5Core_install_prefix}/qml/QtGraphicalEffects
+					${_qt5Core_install_prefix}/qml/Qt/labs/settings
+				)
+endif(WIN32)
 
-add_executable(afermer ${src} ${inc} ${inc2} ${watch_cpp_src} )
+add_executable(afermer ${watch_cpp_src} ${src} ${inc} ${inc2} )
 
 if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
    set_target_properties(afermer PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
@@ -84,8 +113,9 @@ endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../fermer")
 
+
 if(WIN32)
-   target_link_libraries(afermer Ws2_32.lib)
+	target_link_libraries(afermer Ws2_32.lib)
 endif(WIN32)
 
 target_link_libraries(afermer afqt ${Qt5Multimedia_LIBRARIES} 

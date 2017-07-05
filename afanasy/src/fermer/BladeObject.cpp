@@ -65,6 +65,13 @@ int BladeObject::hdd_busy() const
 }
 
 
+QString BladeObject::user() const
+{
+    return m_user;
+}
+
+
+
 void BladeObject::update(   const QString& name,
             const QString& ip_address,
             const QString& base_os,
@@ -80,7 +87,8 @@ void BladeObject::update(   const QString& name,
             size_t capacity,
             int blade_id,
             const QString& job_names,
-            size_t hdd_busy
+            size_t hdd_busy,
+            const QString& user
     ) 
 {
     m_name = name;
@@ -101,4 +109,5 @@ void BladeObject::update(   const QString& name,
     m_job_names = job_names;
     m_selected=0;
     m_hdd_busy = hdd_busy;
+    m_user = user;
 }

@@ -1,17 +1,19 @@
-#ifndef __GENERAL_H__
-#define __GENERAL_H__
+#pragma once
 
-#include "Managers/Service/RadiolocationService.h"
-#include <QStringList>
+
+#include "Py/PyAfermer.h"
+
 #include <time.h>
-#include <QtQuick/QQuickTextDocument>
-#include "highlighter.h"
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem.hpp>
 
-#include "Py/PyAfermer.h"
+#include "Managers/Service/RadiolocationService.h"
+#include <QStringList>
+#include <QtQuick/QQuickTextDocument>
+#include "highlighter.h"
+
 
 namespace afermer
 {
@@ -34,4 +36,4 @@ namespace afermer
     };
 }
 
-#endif
+
