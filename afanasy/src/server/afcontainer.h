@@ -39,7 +39,7 @@ public:
 	void refresh( AfContainer * pointer, MonitorContainer * monitoring);
 
 	/// Perform an aciton:
-	void action( Action & i_action);
+	af::Msg * action( Action & i_action);
 
 	void ReadLock( void ) { m_rw_lock.ReadLock(); }
 	void WriteLock( void ) { m_rw_lock.WriteLock(); }

@@ -111,6 +111,8 @@ AF_DEBUG << m_sfd;
 void SocketItem::processRun( ThreadArgs * i_args)
 {
 	m_msg_ans = threadRunCycleCase( i_args, m_msg_req);
+	// Even if there is no answer, we should not close socket in RUN thread, as it is a blocking opeartion.
+
 	m_profiler->processingFinished();
 	m_state = SSWriting;
 }
@@ -120,7 +122,8 @@ void SocketItem::writeSocket()
 AF_DEBUG << m_sfd;
 	if( NULL == m_msg_ans )
 	{
-		AF_ERR << "SocketItem has no answer to write.";
+		// No answer exist means no answer needed.
+		// For example on browser close (monitor deregister) it will not wait any answer
 		closeSocket();
 		return;
 	}
@@ -137,6 +140,7 @@ AF_DEBUG << m_sfd;
 	{
 		AF_ERR << "Can't write answer back to client.";
 		af::printAddress( m_sas);
+		m_msg_req->stdOutData();
 		m_msg_ans->stdOutData();
 	}
 

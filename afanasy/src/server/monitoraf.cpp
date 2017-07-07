@@ -80,6 +80,8 @@ void MonitorAf::v_action( Action & i_action)
 		else if( optype == "deregister")
 		{
 			deregister();
+			// On web browser close it will wait no answer.
+			i_action.without_answer = true;
 		}
 		else if( optype == "watch")
 		{

@@ -4,6 +4,7 @@ g_id = 0;
 g_uid = -1;
 g_uid_orig = -1;
 g_keysdown = '';
+g_closing = false;
 
 g_auth = {};
 g_digest = null;
@@ -689,12 +690,14 @@ function g_Error( i_err, i_log)
 
 function g_OnClose()
 {
-	localStorage.main_monitor = g_main_monitor_type
-;
+	localStorage.main_monitor = g_main_monitor_type;
+
 	var operation = {};
 	operation.type = 'deregister';
 	if( g_id)
 		nw_Action('monitors', [g_id], operation);
+
+	g_closing = true;
 
 	g_CloseAllWindows();
 	g_CloseAllMonitors();

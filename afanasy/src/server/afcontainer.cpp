@@ -368,45 +368,72 @@ void AfContainer::freeZombies()
 	}
 }
 
-void AfContainer::action( Action & i_action)
+af::Msg * AfContainer::action( Action & i_action)
 {
+	bool found = false;
 	if( i_action.ids.size())
 	{
 		for( int i = 0; i < i_action.ids.size(); i++)
 		{
 			if( i_action.ids[i] >= m_capacity)
 			{
-				AF_ERR << "position >= size (" << i_action.ids[i] << " >= " << m_capacity << ")";
+				std::string errlog = std::string("Action node ID above container capacity: ") + af::itos(i_action.ids[i]) + " >= " + af::itos(m_capacity);
+				AFCommon::QueueLogError( errlog);
 				continue;
 			}
+
 			AfNodeSrv * node = m_nodes_table[i_action.ids[i]];
-			if( NULL == node) continue;
+			if( NULL == node)
+			{
+				std::string errlog = std::string("Action node ID not found: ") + af::itos(i_action.ids[i]);
+				AFCommon::QueueLogError( errlog);
+				continue;
+			}
+
 			node->action( i_action);
+			found = true;
 		}
-		return;
 	}
 
-	if( i_action.mask.size())
+	if(( false == found ) && i_action.mask.size())
 	{
 		std::string err_msg;
 		af::RegExp rx;
 		rx.setPattern( i_action.mask, &err_msg);
 		if( rx.empty())
 		{
-			AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + i_action.mask + ("\" is invalid: ") + err_msg);
-			return;
+			std::string errlog = "AfContainer::action: Name pattern '" + i_action.mask + ("' is invalid: ") + err_msg;
+			AFCommon::QueueLogError( errlog);
 		}
-		bool name_found = false;
-		for( AfNodeSrv * node = m_first_ptr; node != NULL; node = node->m_next_ptr )
+		else
 		{
-			if( rx.match( node->m_node->m_name))
+			for( AfNodeSrv * node = m_first_ptr; node != NULL; node = node->m_next_ptr )
 			{
-				node->action( i_action);
-				name_found = true;
+				if( rx.match( node->m_node->m_name))
+				{
+					node->action( i_action);
+					found = true;
+				}
+			}
+
+			if( false == found )
+			{
+				std::string errlog = m_name + ": No node matches '" + i_action.mask + "' found.";
+				AFCommon::QueueLogError( errlog);
 			}
 		}
-		if( false == name_found )
-			AFCommon::QueueLog( m_name + ": No node matches \"" + i_action.mask + "\" found.");
+	}
+
+	if( found )
+	{
+		if( i_action.without_answer )
+			return NULL;
+		else
+			return af::jsonMsgInfo("log","Action processed.");
+	}
+	else
+	{
+		return af::jsonMsgError("Action node(s) not found.");
 	}
 }
 

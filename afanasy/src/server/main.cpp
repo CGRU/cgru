@@ -286,9 +286,12 @@ int main(int argc, char *argv[])
 	}
 
 	AF_LOG << "Waiting child threads to exit...";
-	alarm(1);
 	ServerAccept.Cancel();
-	ServerAccept.Join();
+	// TODO: Make accept thread to finish and join it.
+	// Just Cancel(), close listening socket and Join() does not work.
+	//af::socketDisconnect( af::Environment::getServerPort());
+	//AF_LOG << "Waiting accept socket exit...";
+	//ServerAccept.Join();
 
 	// No need to chanel run cycle thread as
 	// every new cycle it checks running external valiable

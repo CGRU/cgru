@@ -10,6 +10,9 @@ function nw_send( obj)
 
 function nw_request( i_args)
 {
+	if( g_closing )
+		return;
+
 	var obj = i_args.send;
 	if( g_digest )
 	{

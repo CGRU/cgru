@@ -24,6 +24,7 @@ public:
 	std::string author;
 
 	std::string log;
+	bool without_answer;
 
 	JobContainer     * jobs;
 	MonitorContainer * monitors;
