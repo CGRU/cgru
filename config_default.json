@@ -26,6 +26,8 @@
 	"previewcmds":[
 		"Nuke|nuke -v \"@ARG@\"",
 		"Mplay|mplay \"@ARG@\"",
+        "Mplay *|mplay `dirname \"@ARG@\"`/*",
+        "DJV|djv_view \"@ARG@\"",
 		"IMDisplay|display \"@ARG@\"",
 		"XTerm Folder|cd `dirname @ARG@` && xterm"
     ],
