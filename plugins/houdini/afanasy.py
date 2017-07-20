@@ -698,7 +698,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 
     # Process frame range:
     if frame_range is None:
-        frame_first = hou.frame()
+        frame_first = int(hou.frame())
         frame_last = frame_first
         frame_inc = 1
     else:
