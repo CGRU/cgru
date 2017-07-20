@@ -373,8 +373,8 @@ class BlockParameters:
         if self.afnode.parm('render_temp_hip').eval():
             # Calculate temporary hip name:
             ftime = time.time()
-            renderhip = '%s_%s%s%s.hip' % (
-                renderhip,
+            renderhip = '%s/%s%s%s.hip' % (
+                os.path.dirname(renderhip),
                 afcommon.filterFileName(self.job_name),
                 time.strftime('.%m%d-%H%M%S-'),
                 str(ftime - int(ftime))[2:5]
