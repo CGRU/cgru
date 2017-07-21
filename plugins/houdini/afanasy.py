@@ -147,6 +147,10 @@ class BlockParameters:
             roptype = ropnode.type().name()
 
             if roptype == 'ifd':
+                if ropnode.node(ropnode.parm('camera').eval())==None:
+                    hou.ui.displayMessage("Camera in "+ropnode.name()+" is not valid",severity = hou.severityType.Error)
+                    return
+
                 if not ropnode.parm('soho_outputmode').eval():
                     self.service = 'hbatch_mantra'
 
