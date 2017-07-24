@@ -147,6 +147,10 @@ class BlockParameters:
             roptype = ropnode.type().name()
 
             if roptype == 'ifd':
+                if ropnode.node(ropnode.parm('camera').eval())==None:
+                    hou.ui.displayMessage("Camera in "+ropnode.name()+" is not valid",severity = hou.severityType.Error)
+                    return
+
                 if not ropnode.parm('soho_outputmode').eval():
                     self.service = 'hbatch_mantra'
 
@@ -173,6 +177,14 @@ class BlockParameters:
                             ar_picture.evalAsStringAtFrame(self.frame_first),
                             ar_picture.evalAsStringAtFrame(self.frame_last)
                         )
+                        
+            elif roptype == 'alembic':
+                self.numeric = False
+                taskname = ropnode.name()
+                taskname += ' ' + str(self.frame_first)
+                taskname += '-' + str(self.frame_last)
+                self.tasks_names.append(taskname)
+                self.tasks_cmds.append(self.frame_first)
 
             # Block command:
             self.cmd = 'hrender_af'

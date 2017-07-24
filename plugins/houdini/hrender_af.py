@@ -185,6 +185,18 @@ elif drivertypename == "arnold":
             except:
                 print('Failed, frame progress not available.')
 
+elif drivertypename == "alembic":
+    ropnode.parm('lpostframe').set('python')
+    expr = r'''import sys
+f = hou.parmTuple('f').eval()
+percent = int(100*(hou.frame()-f[0])/(f[1]-f[0]))
+
+out = 'ABC_PROGRESS ' + str(percent) + '%\n'
+
+sys.stdout.write(out)
+sys.stdout.flush()'''
+    ropnode.parm('postframe').set(expr)
+
 #
 # Distribute simulation:
 #
