@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from parsers import parser
+import re
 
+p = re.compile(".*(?:ABC_PROGRESS (\d+))", re.S)
 keyframe = 'RopNode.render: frame '
 
 
@@ -41,3 +43,7 @@ class hbatch(parser.parser):
                 self.percentframe = 0
                 self.calculate()
 
+        m = p.match(data)
+        if m:
+            self.percentframe = int(m.group(1))
+            self.calculate()
