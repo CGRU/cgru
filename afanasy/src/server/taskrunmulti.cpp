@@ -48,6 +48,11 @@ TaskRunMulti::TaskRunMulti( Task * i_runningTask,
 			m_block->m_job->getName().c_str(), m_block->m_data->getBlockNum())
 		return;
 	}
+
+	// Increase capacity counter in multihost task class,
+	// as TaskRun parent class do not have tasks exec here, so have no capacity info.
+	(*m_running_capacity_counter) += i_taskExec->getCapResult();
+
 	m_has_service = ( m_block->m_data->getMultiHostService().empty() == false);
 	m_tasknum = i_taskExec->getTaskNum();
 	m_task->v_appendLog("Starting to capture hosts:");

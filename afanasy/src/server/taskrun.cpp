@@ -43,7 +43,6 @@ TaskRun::TaskRun( Task * runningTask,
 {
 	AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
 	(*m_running_tasks_counter)++;
-	(*m_running_capacity_counter) += m_exec->getCapResult();
 
    m_progress->percent = -1;
    m_progress->frame = -1;
@@ -53,6 +52,9 @@ TaskRun::TaskRun( Task * runningTask,
 
 	// Skip starting task if executable is not set (multihost task)
 	if( m_exec == NULL) return;
+
+	(*m_running_capacity_counter) += m_exec->getCapResult();
+	// - Multihost task will increase capacity counter itself.
 
    m_progress->state = AFJOB::STATE_RUNNING_MASK;
    m_progress->starts_count++;
