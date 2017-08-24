@@ -177,7 +177,7 @@ class BlockParameters:
                             ar_picture.evalAsStringAtFrame(self.frame_first),
                             ar_picture.evalAsStringAtFrame(self.frame_last)
                         )
-                        
+
             elif roptype == 'alembic':
                 self.numeric = False
                 taskname = ropnode.name()
@@ -198,13 +198,13 @@ class BlockParameters:
                 self.frame_inc, afnode.parm('take').eval()
             )
 
-            numWedges = computeWedge(ropnode, roptype)
-            if numWedges:
-                self.frame_first = 0
-                self.frame_last = numWedges - 1
-                self.frame_inc = 1
-                self.frame_pertask = 1
-                self.parser = "mantra"
+#            numWedges = computeWedge(ropnode, roptype)
+#            if numWedges:
+#                self.frame_first = 0
+#                self.frame_last = numWedges - 1
+#                self.frame_inc = 1
+#                self.frame_pertask = 1
+#                self.parser = "mantra"
 
             self.cmd += '%(auxargs)s'
             self.cmd += ' "%(hipfilename)s"'
@@ -765,6 +765,32 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
 
             if newparams is None:
                 return None
+
+        elif node and node.type().name() == "wedge":
+            wedgednode = None
+            if node.inputs():
+                wedgednode = node.inputs()[0]
+            else:
+                wedgednode = node.node(node.parm("driver").eval())
+            if wedgednode == None:
+                return None
+
+            numWedges = computeWedge( node, node.type().name()) # we can remove nodetype check
+            names = node.hdaModule().getwedgenames(node)
+            for wedge in range(numWedges):
+                # switching wedges like houdini do to get valid filenames
+                hou.hscript('set WEDGE = ' + names[wedge])
+                hou.hscript('set WEDGENUM = ' + str(wedge))
+                hou.hscript('varchange')
+                #add wedged node to next block
+                block = getBlockParameters(afnode, wedgednode, subblock, "{}_{}".format(node.name(),wedge), frame_range)[0]
+                block.auxargs += " --wedge " + node.path() + " --wedgenum " + str(wedge)
+                newparams.append(block)
+            # clear environment
+            hou.hscript('set WEDGE = ')
+            hou.hscript('set WEDGENUM = ')
+            hou.hscript('varchange')
+
         else:
             newparams = \
                 getBlockParameters(afnode, node, subblock, prefix, frame_range)
