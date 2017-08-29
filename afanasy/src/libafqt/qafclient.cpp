@@ -207,7 +207,7 @@ void QAfClient::slot_zombie( QAfSocket * i_qas)
 		// Client finished to update server.
 		m_up_processing = false;
 
-		// If update message chabged
+		// If update message changed
 		if( i_qas->getReqestMsg() != m_up_msg )
 		{
 			// We should delete the old one

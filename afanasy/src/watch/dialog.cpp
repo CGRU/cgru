@@ -356,6 +356,7 @@ void Dialog::newMessage( af::Msg *msg)
     {
     case af::Msg::TVersionMismatch:
     {
+		AF_WARN << "Server version mismatch, exiting.";
         emit stop();
         break;
     }

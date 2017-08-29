@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
    af::destroy();
    Py_Finalize();
 
-	AF_LOG << "QApplication::exec: returned status = " << status;
+	AF_DEBUG << "QApplication::exec: returned status = " << status;
 
    return status;
 }
