@@ -39,6 +39,13 @@ Rectangle{
                 text: "Progress"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.sortingChangeState()
+                        JobsModel.multiSorting(1)
+                    }
+                }
             }
             Text {
                 Layout.preferredWidth: jobs_view.job_minimum_Width.elapsed
@@ -50,6 +57,13 @@ Rectangle{
                 text: "Elapsed"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.sortingChangeState()
+                        JobsModel.multiSorting(2)
+                    }
+                }
             }
             Text {
                 Layout.preferredWidth: jobs_view.job_minimum_Width.user
@@ -61,6 +75,13 @@ Rectangle{
                 text: "User"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.sortingChangeState()
+                        JobsModel.multiSorting(3)
+                    }
+                }
             }
             Text {
                 Layout.preferredWidth: jobs_view.job_minimum_Width.job_name
@@ -90,6 +111,13 @@ Rectangle{
                 text: "ETA"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.sortingChangeState()
+                        JobsModel.multiSorting(5)
+                    }
+                }
             }
             Text {
                 Layout.preferredWidth: jobs_view.job_minimum_Width.slots
@@ -101,6 +129,13 @@ Rectangle{
                 text: "Slots"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.sortingChangeState()
+                        JobsModel.multiSorting(6)
+                    }
+                }
             }
             Text {
                 Layout.preferredWidth: jobs_view.job_minimum_Width.priority
@@ -116,7 +151,7 @@ Rectangle{
                     anchors.fill: parent
                     onClicked: {
                         JobsModel.sortingChangeState()
-                        JobsModel.multiSorting(6)
+                        JobsModel.multiSorting(7)
                     }
                 }
             }
@@ -134,7 +169,7 @@ Rectangle{
                     anchors.fill: parent
                     onClicked: {
                         JobsModel.sortingChangeState()
-                        JobsModel.multiSorting(7)
+                        JobsModel.multiSorting(8)
                     }
                 }
             }
@@ -148,6 +183,13 @@ Rectangle{
                 text: "Software"
                 font.letterSpacing:1.2
                 font { family: robotoRegular.name; pixelSize: 14}
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        JobsModel.sortingChangeState()
+                        JobsModel.multiSorting(9)
+                    }
+                }
             }
         }
     }

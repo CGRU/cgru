@@ -1,14 +1,18 @@
 #pragma once
+#ifdef WINNT
+#define BOOST_PYTHON_STATIC_LIB
+#endif
+
 
 
 #include "libafanasy/msg.h"
 #include "watch/monitorhost.h"
-#include "libafqt/qthreadclientsend.h"
-#include "libafqt/qthreadclientup.h"
+#include "libafqt/qafclient.h"
 
 
 #include "common.h"
 #include "state.hpp"
+
 
 #include <QtNetwork/QTcpSocket>
 #include <QObject>
@@ -48,8 +52,10 @@ public:
     static int getAvalibleSlotsAndJobNames(af::Render *, int, QString&, QList<int>&);
     static void getItemInfo( std::ostringstream&, const std::string &, const std::string &, int);
 
+
     bool setParameter(const std::string&, const std::vector<int>&, const std::string&, const std::string&, bool);
     bool setOperation(const std::string&, const std::vector<int>&, const std::string&);
+
 
     RadiolocationStation();
     ~RadiolocationStation();
@@ -70,8 +76,9 @@ public:
     bool isConnected();
 
 private:
-    afqt::QThreadClientUp   m_qThreadClientUpdate;
-    afqt::QThreadClientSend m_qThreadSend;
+
+    afqt::QAfClient m_qafclient;
+
     Waves::Ptr push(Waves::Ptr);
     
     std::string task_output_body;
@@ -83,8 +90,7 @@ private:
     std::string comp_name;
 
     af::Msg* msg_monitor_id;
+
 };
 
 }
-
-

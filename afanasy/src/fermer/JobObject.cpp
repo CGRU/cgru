@@ -1,7 +1,9 @@
 #include <iostream>
 #include "JobObject.h"
+
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
+
 
 QString JobObject::user_name() const
  { return m_user_name; }
@@ -31,6 +33,10 @@ QString JobObject::depends() const
  { return m_depends; }
 std::string JobObject::repr() const
 {  return m_json_represent; }
+int JobObject::elapsed_time_int() const
+{  return m_elapsed_time_int; }
+QString JobObject::annotation() const
+ { return m_annotation; }
 
 void JobObject::update(const QString &user_name
                   ,JobState::State status
@@ -54,10 +60,12 @@ void JobObject::update(const QString &user_name
                   ,const QString &depends
                   ,const QString &user_color
                   ,int errors_avoid_blades
-                  ,const std::string& json_represent)
+                  ,const std::string& json_represent
+                  ,int elapsed_time_int
+                  ,const QString &annotation)
 {
 
-    m_user_name = user_name;
+         m_user_name = user_name;
          m_status = status;
          m_time_creation = time_creation;
          m_blocks_num = blocks_num;
@@ -80,6 +88,8 @@ void JobObject::update(const QString &user_name
          m_user_color = user_color;
          m_errors_avoid_blades = errors_avoid_blades;
          m_json_represent = json_represent;
+         m_elapsed_time_int = elapsed_time_int;
+         m_annotation = annotation;
 }
 
 

@@ -27,4 +27,3 @@ public:
 private:
     static ContainerType m_outputs; // must be static, otherwise output is missing
 };
-

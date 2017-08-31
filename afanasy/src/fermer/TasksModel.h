@@ -13,7 +13,6 @@
 #include <QtCore>
 
 
-
 namespace afermer
 {
 

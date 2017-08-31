@@ -52,6 +52,14 @@ Item{
 		font.letterSpacing:1
 		color: "white"
 	    }
+    Text {
+        text: "Running Tasks"
+        anchors.right: parent.right
+        font.pixelSize: parent.custom_font_size
+        font.family:parent.custom_font
+        font.letterSpacing:1
+        color: "white"
+        }
 
     }
 
@@ -96,7 +104,14 @@ Item{
             font.family:parent.custom_font
             font.letterSpacing:1
             color: "white"
-
+            }
+        Text {
+            text: users_ListView.currentItem.v_tasks_size
+            anchors.left: parent.left
+            font.pixelSize: parent.custom_font_size
+            font.family:parent.custom_font
+            font.letterSpacing:1
+            color: "white"
             }
     }
 } 

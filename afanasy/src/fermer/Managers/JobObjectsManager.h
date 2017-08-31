@@ -58,6 +58,25 @@ public:
     int offline();
     int ready();
 
+    QString getInfo(int, const QString&);
+
+    bool setAnnotation(const QList<int>& i_ids, const QString& );
+    bool setDependMask(const QList<int>& i_ids, const QString& );
+    bool setOS(const QList<int>& i_ids, const QString& );
+    bool setWaitTime(const QList<int>& i_ids, const QString& );
+    bool setPostCommand(const QList<int>& i_ids, const QString& );
+    bool setLifeTime(const QList<int>& i_ids, int);
+    bool setTasksErrorRetries(const QList<int>& i_ids, int);
+    bool setTasksMaxRunTime(const QList<int>& i_ids, int);
+    bool setErrorForgiveTime(const QList<int>& i_ids, int);
+    bool setMaxRunningTasks(const QList<int>& i_ids, int);
+    bool setMaxRunningTaskPerBlades(const QList<int>& i_ids, int);
+    bool setSlots(const QList<int>& i_ids, int);
+    bool setNeedMemory(const QList<int>& i_ids, int);
+    bool setNeedHdd(const QList<int>& i_ids, int);
+    bool setNeedPower(const QList<int>& i_ids, int);
+    bool setErrorAvoidHost(const QList<int>& i_ids, int);
+
     JobObjectPtrIt begin();
     JobObjectPtrIt end();
 

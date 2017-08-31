@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "common.h"
 
 #include "UserObject.h"
@@ -20,7 +21,7 @@ public:
 
     UserObjectsLorry() {}
 
-    void insert(const QString &user_name,
+    UserObject::Ptr insert(const QString &user_name,
                  int jobs_size,
                  int tasks_size,
                  const QString &user_machine_name,
@@ -31,10 +32,12 @@ public:
     void getUserColor(const QString&, QString&);
 
     UserObjectPtrIt find(const QString&);
+    UserObjectPtrIt find(int);
+
+    UserObject::Ptr at(int);
 
     std::vector<UserObject::Ptr> m_objects;
 };
 
 }
-
 

@@ -1,11 +1,10 @@
-#ifndef WINNT
-#include <unistd.h>
-#endif
-
 #ifdef WINNT
 #define BOOST_PYTHON_STATIC_LIB
 #endif
 
+#ifndef WINNT
+#include <unistd.h>
+#endif
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
@@ -24,6 +23,8 @@
 #include "TasksModel.h"
 #include "state.hpp"
 
+
+
 #include <QtQuick/QQuickView>
 #include <QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
@@ -31,8 +32,6 @@
 #include <QDebug>
 #include <QtCore>
 #include <QTimer>
-
-
 
 
 #ifdef WINNT
@@ -91,21 +90,10 @@ Q_IMPORT_PLUGIN(QSvgPlugin)
 #endif
 
 #if PY_MAJOR_VERSION >= 3
-wchar_t *GetWC(char *c)
-{
-	const size_t cSize = strlen(c) + 1;
-	wchar_t* wc = new wchar_t[cSize];
-	mbstowcs(wc, c, cSize);
-
-	return wc;
-}
+wchar_t *GetWC(const char *c);
 #else
-char *GetWC(char *c)
-{
-	return c;
-}
+char *GetWC(char *c);
 #endif
-
 
 
 namespace fs = boost::filesystem;

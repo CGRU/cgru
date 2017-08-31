@@ -1,5 +1,3 @@
-
-
 #include "Py/PyAfermer.h"
 #include "Py/pyqstring.hpp"
 #include "Py/pyqlist.hpp"
@@ -26,7 +24,7 @@ jobsAll()
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
     QList<JobObject::Ptr> ret;
-    for (JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
+    for (afermer::JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
         ret.append(*it);
     return ret;
 }
@@ -37,7 +35,7 @@ jobsSelected()
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
     QList<JobObject::Ptr> ret;
-    for (JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
+    for (afermer::JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
     {
         JobObject::Ptr ptr = *it;
         if ( ptr->m_selected )
@@ -52,7 +50,7 @@ jobsFromName(const QString& name)
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
     QList<JobObject::Ptr> ret;
-    for (JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
+    for (afermer::JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
     {
         JobObject::Ptr ptr = *it;
         if ( ptr->m_name == name )
@@ -68,7 +66,7 @@ jobsFromUser(const QString& user)
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
     QList<JobObject::Ptr> ret;
-    for (JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
+    for (afermer::JobObjectPtrIt it = m_manager->begin(); it != m_manager->end(); ++it)
     {
         JobObject::Ptr ptr = *it;
         if ( ptr->m_user_name == user )
@@ -132,6 +130,128 @@ jobSetBladeMask(JobObject::Ptr self, const QString& i_value)
     return true;
 }
 
+bool
+jobSetAnnotation(JobObject::Ptr self, const QString& i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setAnnotation( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetDependMask(JobObject::Ptr self, const QString& i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setDependMask( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+
+bool
+jobSetOS(JobObject::Ptr self, const QString& i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setOS( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetPostCommand(JobObject::Ptr self, const QString& i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setPostCommand( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+
+bool
+jobSetLifeTime(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setLifeTime( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetTasksErrorRetries(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setTasksErrorRetries( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetTasksMaxRunTime(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setTasksMaxRunTime( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+
+bool
+jobSetErrorForgiveTime(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setErrorForgiveTime( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetMaxRunningTasks(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setMaxRunningTasks( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetMaxRunningTaskPerBlades(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setMaxRunningTaskPerBlades( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetSlots(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setSlots( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetNeedMemory(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setNeedMemory( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetNeedHdd(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setNeedHdd( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetNeedPower(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setNeedPower( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+jobSetErrorAvoidHost(JobObject::Ptr self, int i_value)
+{
+    JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
+    m_manager->setErrorAvoidHost( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
 
 bool
 jobSetExcludeBladeMask(JobObject::Ptr self, const QString& i_value)
@@ -146,6 +266,66 @@ jobSetPriority(JobObject::Ptr self, int i_value)
 {
     JobObjectsManager::Ptr m_manager = JobObjectsManager::create();
     m_manager->setPriority( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+userSetPriority(UserObject::Ptr self, int i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    return m_manager->setPriority( QList<int>( { 1, self->id() } ), i_value );
+}
+
+QString
+userShowLog(UserObject::Ptr self)
+{
+    QString ret;
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    return m_manager->log( self->id() );
+}
+
+bool
+userSetAnnotate(UserObject::Ptr self, const QString& i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    return m_manager->setAnnotate( QList<int>( { 1, self->id() } ), i_value );
+}
+
+bool
+userSetMaxRunningTask(UserObject::Ptr self, int i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    return m_manager->setMaxRunningTask( QList<int>( { 1, self->id() } ), i_value );
+}
+
+bool
+userSetBladeMask(UserObject::Ptr self, const QString& i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    return m_manager->setBladeMask( QList<int>( { 1, self->id() } ), i_value );
+}
+
+bool
+userSetBladeExcludeMask(UserObject::Ptr self, const QString& i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    m_manager->setBladeExcludeMask( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+userSetTaskErrorRetries(UserObject::Ptr self, int i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    m_manager->setTaskErrorRetries( QList<int>( { 1, self->id() } ), i_value );
+    return true;
+}
+
+bool
+userSetJobsSolvingMethod(UserObject::Ptr self, UserTypeSolveJobs::Type i_value)
+{
+    UserObjectsManager::Ptr m_manager = UserObjectsManager::create();
+    m_manager->setJobsSolvingMethod( QList<int>( { 1, self->id() } ), i_value );
     return true;
 }
 
@@ -219,6 +399,21 @@ BOOST_PYTHON_MODULE(afermer)
                 .def("setBladeMask", &::jobSetBladeMask)
                 .def("setExcludeBladeMask", &::jobSetExcludeBladeMask)
                 .def("setPriority", &::jobSetPriority)
+                .def("setAnnotation", &::jobSetAnnotation)
+                .def("setDependMask", &::jobSetDependMask)
+                .def("setOS", &::jobSetOS)
+                .def("setPostCommand", &::jobSetPostCommand)
+                .def("setLifeTime", &::jobSetLifeTime)
+                .def("setTasksErrorRetries", &::jobSetTasksErrorRetries)
+                .def("setTasksMaxRunTime", &::jobSetTasksMaxRunTime)
+                .def("setErrorForgiveTime", &::jobSetErrorForgiveTime)
+                .def("setMaxRunningTasks", &::jobSetMaxRunningTasks)
+                .def("setMaxRunningTaskPerBlades", &::jobSetMaxRunningTaskPerBlades)
+                .def("setErrorAvoidHost", &::jobSetErrorAvoidHost)
+                .def("setSlots", &::jobSetSlots)
+                .def("setNeedMemory", &::jobSetNeedMemory)
+                .def("setNeedPower", &::jobSetNeedPower)
+                .def("setNeedHdd", &::jobSetNeedHdd)
                 .def("log", &::jobLog)
                 .def("info", &::jobInfo)
                 .def("__repr__", &JobObject::repr)
@@ -241,7 +436,21 @@ BOOST_PYTHON_MODULE(afermer)
                 ("_UserObject", no_init)
                 .def("id", &UserObject::id)
                 .def("name", &UserObject::user_name)
+                .def("setPriority", &::userSetPriority)
+                .def("showLog", &::userShowLog)
+                .def("setAnnotate", &::userSetAnnotate)
+                .def("setMaxRunningTask", &::userSetMaxRunningTask)
+                .def("setBladeMask", &::userSetBladeMask)
+                .def("setBladeExcludeMask", &::userSetBladeExcludeMask)
+                .def("setTaskErrorRetries", &::userSetTaskErrorRetries)
+                .def("setJobsSolvingMethod", &::userSetJobsSolvingMethod )
             ;
+
+    enum_<UserTypeSolveJobs::Type>("UserTypeSolveJobs")
+                .value("BYORDER", UserTypeSolveJobs::BYORDER)
+                .value("PARALLEL", UserTypeSolveJobs::PARALLEL)
+            ;
+
 }
 
 PyAfermer::~PyAfermer()
@@ -252,16 +461,16 @@ PyAfermer::~PyAfermer()
 #if PY_MAJOR_VERSION >= 3
 wchar_t *GetWC(const char *c)
 {
-	const size_t cSize = strlen(c) + 1;
-	wchar_t* wc = new wchar_t[cSize];
-	mbstowcs(wc, c, cSize);
+   const size_t cSize = strlen(c) + 1;
+   wchar_t* wc = new wchar_t[cSize];
+   mbstowcs(wc, c, cSize);
 
-	return wc;
+   return wc;
 }
 #else
-char *GetWC(const char *c)
+char *GetWC( char *c)
 {
-	return c;
+   return c;
 }
 #endif
 
@@ -270,14 +479,14 @@ PyAfermer::PyAfermer()
     char * python_root = getenv("REZ_PYTHON_ROOT");
     if (python_root)
         Py_SetPythonHome(GetWC(python_root));
-
+    
 #if PY_MAJOR_VERSION >= 3    
     PyImport_AppendInittab( "afermer", &PyInit_afermer );
 #else  
-	PyImport_AppendInittab("afermer", &initafermer);
+    PyImport_AppendInittab("afermer", &initafermer);
 #endif
 
-	Py_Initialize();
+    Py_Initialize();
     using namespace boost::python;
     initializeQStringConverters();
     initializeQListConverters< QList<int> >();
@@ -316,7 +525,7 @@ void PyAfermer::run_String(QString& o_ret, const QString& pytxt)
     {
         PyErr_Print();
     }
-	std::string captured_python_output = python_stdio_redirector.GetOutput();
+    std::string captured_python_output = python_stdio_redirector.GetOutput();
 
     o_ret = QString::fromStdString(captured_python_output);
 }

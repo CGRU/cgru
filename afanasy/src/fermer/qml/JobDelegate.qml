@@ -7,6 +7,7 @@ import JobStateEnums 1.0
 
 Rectangle {
     id: delegateItem
+    property string v_annotation:annotation
     property string v_progress:progress
     property string v_elapsed:elapsed
     property int    v_state:job_state
@@ -208,7 +209,7 @@ Rectangle {
                   anchors.topMargin: 5
                   font.family:robotoRegular.name
                   font.letterSpacing: 1.5
-                  font.pointSize: 8
+                  font.pointSize: 8*mult_size
                   color:"#f14c22"
                   text:"Avoiding Blades:"+avoiding_blades
                   visible:avoiding_blades
@@ -225,7 +226,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
+                font.pointSize: block_number<1 ? 10.5*mult_size : expand ? 10.5*mult_size : 9.5*mult_size
                 text: elapsed
           }
 
@@ -254,7 +255,7 @@ Rectangle {
                     text: user_name[0]+user_name[1]
                     font.capitalization: Font.AllUppercase
                     font.family:robotoRegular.name
-                    font.pointSize: 12
+                    font.pointSize: 12*root.mult_size
                     opacity: 0.8
                     visible: block_number<1 ? true : expand
                 }
@@ -289,7 +290,7 @@ Rectangle {
                     anchors.verticalCenterOffset: -height_origin/3.5
                     font.family:robotoRegular.name
                     font.letterSpacing: 1.7
-                    font.pointSize: 8
+                    font.pointSize: 8*mult_size
                     clip:true
                     width: parent.width
                     text: swap_jobs_name ? block_name : job_name
@@ -305,7 +306,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
+                font.pointSize: block_number<1 ? 10.5*mult_size : expand ? 10.5*mult_size : 9.5*mult_size
                 text: approx_time
           }
 
@@ -318,7 +319,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
+                font.pointSize: block_number<1 ? 10.5*mult_size : expand ? 10.5*mult_size : 9.5*mult_size
                 text: slots
           }
           Text {
@@ -330,7 +331,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
+                font.pointSize: block_number<1 ? 10.5*mult_size : expand ? 10.5*mult_size : 9.5*mult_size
                 text: priority
           }
           Text {
@@ -342,7 +343,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment : aligntype
                 font.family:robotoRegular.name
-                font.pointSize: block_number<1 ? 10.5 : expand ? 10.5 : 9.5
+                font.pointSize: block_number<1 ? 10.5*mult_size : expand ? 10.5*mult_size : 9.5*mult_size
                 text: started
           }
           Item{

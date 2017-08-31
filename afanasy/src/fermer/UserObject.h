@@ -1,9 +1,11 @@
 #pragma once
 
+
 #include "common.h"
 #include <vector>
-
+#include <QMap>
 #include <QStringList>
+
 
 class UserObject
 {
@@ -50,8 +52,9 @@ public:
     int m_priority;
     int m_id;
     QString m_user_color;
+    
+    QMap<QString, QString> m_resource_map;
 };
 
 typedef std::vector<UserObject::Ptr>::iterator UserObjectPtrIt;
-
 

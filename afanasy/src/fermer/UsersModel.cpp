@@ -68,6 +68,18 @@ void UsersModel::loadSettings(){
     emit dataChanged(index(0, 0), index(rowCount()-1, 0));
 }
 
+
+void UsersModel::setSelected(int i_index){
+
+    m_ids.clear();
+    m_ids.append(m_users->at(i_index)->id());
+}
+QList<int> UsersModel::getSelectedIds(){
+
+    //qDebug()<<"temp_ids "<<m_ids;
+    return m_ids;
+}
+
 //-------Context Functions-----
 void UsersModel::setUserColor(const QString& name,const QString& color)
 {
@@ -91,6 +103,14 @@ void UsersModel::setUserColor(const QString& name,const QString& color)
      }
     settings.endGroup();
 }
+
+QString UsersModel::userLog()             {return m_users->log(getSelectedIds()[0]);}
+void UsersModel::setPriority(int i_value) {m_users->setPriority(getSelectedIds(),i_value);}
+void UsersModel::setMaxRunningTask(int i_value) {m_users->setMaxRunningTask(getSelectedIds(),i_value);}
+void UsersModel::setBladeMask(const QString& i_value) {m_users->setBladeMask(getSelectedIds(),i_value);}
+void UsersModel::setBladeExcludeMask(const QString& i_value) {m_users->setBladeExcludeMask(getSelectedIds(),i_value);}
+
+QString UsersModel::getUserInfo       (const QString& i_value) {return m_users->getInfo(getSelectedIds()[0],i_value);}
 
 
 //-------------------Sorting-----------------

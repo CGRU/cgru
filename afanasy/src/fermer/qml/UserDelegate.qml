@@ -11,6 +11,7 @@ Rectangle {
     property string v_user_name:user_name
     property string v_user_id:user_id
     property string v_priority:priority
+    property string v_tasks_size:tasks_size
 
       MouseArea {
           id: mouseArea
@@ -19,6 +20,7 @@ Rectangle {
           hoverEnabled: true
           onClicked: {
                 delegateItem.ListView.view.currentIndex = index
+                UsersModel.setSelected(index)
           }
           onReleased: {
                 if (mouse.button === Qt.RightButton) {

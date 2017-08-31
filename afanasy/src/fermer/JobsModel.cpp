@@ -134,20 +134,71 @@ void JobsModel::restartJob()             {QList<int> temp_ids=getSelectedIds();
                                           }
                                          m_pass_notify_update=true;
                                          }
-void JobsModel::restartJobErrors()       {m_job->restartErrors(getSelectedIds());}
-void JobsModel::jobRestartRunning()      {m_job->restartRunning(getSelectedIds());}
-void JobsModel::jobRestartSkipped()      {m_job->restartSkipped(getSelectedIds());}
-void JobsModel::jobRestartDone()         {m_job->restartDone(getSelectedIds());}
+void JobsModel::jobRestarErrorsTasks()       {m_job->restartErrors(getSelectedIds());}
+void JobsModel::jobRestartRunningTasks()      {m_job->restartRunning(getSelectedIds());}
+void JobsModel::jobRestartSkippedTasks()      {m_job->restartSkipped(getSelectedIds());}
+void JobsModel::jobRestartDoneTasks()         {m_job->restartDone(getSelectedIds());}
 void JobsModel::jobResetErrorHosts()     {m_job->resetErrorHosts(getSelectedIds());}
 void JobsModel::jobRestartPause()        {m_job->restartPause(getSelectedIds());}
 void JobsModel::setPriority(int i_value) {m_job->setPriority(getSelectedIds(),i_value);}
 void JobsModel::setBladeMask       (const QString& i_value) {m_job->setBladeMask(getSelectedIds(),i_value);}
 void JobsModel::setBladeMaskExclude(const QString& i_value) {m_job->setExcludeBladeMask(getSelectedIds(),i_value);}
+void JobsModel::setJobDependMask       (const QString& i_value) {m_job->setDependMask(getSelectedIds(),i_value);}
+void JobsModel::setJobSetAnnotation       (const QString& i_value) {m_job->setAnnotation(getSelectedIds(),i_value);}
+void JobsModel::setJobWaitTime       (const QString& i_value) {m_job->setWaitTime(getSelectedIds(),i_value);}
+void JobsModel::setJobOS       (const QString& i_value) {m_job->setOS (getSelectedIds(),i_value);}
+void JobsModel::setJobPostCommand       (const QString& i_value) {m_job->setPostCommand(getSelectedIds(),i_value);}
+void JobsModel::setJobLifeTime       (int i_value) {m_job->setLifeTime(getSelectedIds(),i_value);}
+void JobsModel::setTasksErrorRetries       (int i_value) {m_job->setTasksErrorRetries(getSelectedIds(),i_value);}
+void JobsModel::setTaskMaxRunTime       (int i_value) {m_job->setTasksMaxRunTime (getSelectedIds(),i_value);}
+void JobsModel::setTasksErrorForgiveTime       (int i_value) {m_job->setErrorForgiveTime(getSelectedIds(),i_value);}
+void JobsModel::setErrorAvoidBlade       (int i_value) {m_job->setErrorAvoidHost(getSelectedIds(),i_value);}
+void JobsModel::setTasksRunningMax       (int i_value) {m_job->setMaxRunningTasks(getSelectedIds(),i_value);}
+void JobsModel::setTasksRunningPerBlades       (int i_value) {m_job->setMaxRunningTaskPerBlades(getSelectedIds(),i_value);}
+void JobsModel::setJobSlots       (int i_value) {m_job->setSlots(getSelectedIds(),i_value);}
+void JobsModel::setJobNeedMemory       (int i_value) {m_job->setNeedMemory(getSelectedIds(),i_value);}
+void JobsModel::setJobNeedHDD       (int i_value) {m_job->setNeedHdd(getSelectedIds(),i_value);}
+
 QString JobsModel::jobOpenOutputFolder()     {return m_job->openOutputFolder(getSelectedIds()[0]);}
 QString JobsModel::jobGetOutputFolder()     {return m_job->getOutputFolder(getSelectedIds()[0]);}
 QString JobsModel::jobLog()              {return m_job->log(getSelectedIds()[0]);}
 QString JobsModel::jobShowErrorBlades()  {return m_job->showErrorBlades(getSelectedIds()[0]);}
 QString JobsModel::getBladeMask()         {return m_job->getBladeMask(getSelectedIds()[0]);}
+
+QString JobsModel::getJobInfo       (const QString& i_value) {return m_job->getInfo(getSelectedIds()[0],i_value);}
+
+int JobsModel::getCurrentItemProgress() {
+    int temp_name=0;
+    for (int i=0;i<m_job->size();i++){
+        if (m_job->at(i)->m_selected==1){
+            temp_name=m_job->at(i)->progress();
+            break;
+        }
+    }
+    return temp_name;
+}
+
+QString JobsModel::getCurrentItemName() {
+    QString temp_name="null";
+    for (int i=0;i<m_job->size();i++){
+        if (m_job->at(i)->m_selected==1){
+            temp_name=m_job->at(i)->block_name();
+            break;
+        }
+    }
+    return temp_name;
+}
+
+JobState::State JobsModel::getCurrentItemState() {
+    JobState::State temp_name=JobState::State::READY;
+    for (int i=0;i<m_job->size();i++){
+        if (m_job->at(i)->m_selected==1){
+            temp_name=m_job->at(i)->m_status;
+            break;
+        }
+    }
+    return temp_name;
+}
 
 
 //-------------------Sorting-----------------
@@ -205,31 +256,178 @@ bool nameCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
     return (i->name()>j->name());
 }
 
+bool progressCompare(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->progress()==j->progress() )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->progress()<j->progress();
+}
+bool progressCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->progress()==j->progress() )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->progress()>j->progress();
+}
 
+bool elapsedCompare(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->m_time_elapsed==j->m_time_elapsed )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_time_elapsed<j->m_time_elapsed;
+}
+bool elapsedCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->m_time_elapsed==j->m_time_elapsed )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_time_elapsed>j->m_time_elapsed;
+}
+bool userCompare(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->name()==j->name() )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->name()<j->name();
+}
+bool userCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->name()==j->name() )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->name()>j->name();
+}
+
+bool approximateTimeCompare(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->m_approx_time==j->m_approx_time )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_approx_time<j->m_approx_time;
+}
+bool approximateTimeCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->m_approx_time==j->m_approx_time )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_approx_time>j->m_approx_time;
+}
+
+bool slotsCompare(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->m_slot==j->m_slot )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_slot<j->m_slot;
+}
+bool slotsCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->m_slot==j->m_slot )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_slot>j->m_slot;
+}
+
+bool softwareCompare(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->software()==j->software() )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->m_slot<j->m_slot;
+}
+bool softwareCompareInvert(JobObject::CPtr i,JobObject::CPtr j)
+{
+    if( i->software()==j->software() )
+    {
+        if( i->id()==j->id() ) return i->block_order()<j->block_order();
+        return i->id()<j->id();
+    }
+    return i->software()>j->software();
+}
 void JobsModel::multiSorting(int i_sort_type){
         m_sort_type=i_sort_type;
         switch(i_sort_type){
-            case 0:
+            case 0  :
                std::sort (m_job->begin(), m_job->end(), blockCompare);
                break;
-            case 6:
-               if (m_state_sort)
-                    {std::sort (m_job->begin(), m_job->end(), priorityCompare);}
-               else
-                    {std::sort (m_job->begin(), m_job->end(), priorityCompareInvert);}
-               break;
-            case 7:
-               if (m_state_sort)
-                    {std::sort (m_job->begin(), m_job->end(), createdCompare);}
-               else
-                    {std::sort (m_job->begin(), m_job->end(), createdCompareInvert);}
-               break;
+            case 1  :
+                if (m_state_sort)
+                     {std::sort (m_job->begin(), m_job->end(), progressCompare);}
+                else
+                     {std::sort (m_job->begin(), m_job->end(), progressCompareInvert);}
+                break;
+            case 2  :
+                if (m_state_sort)
+                     {std::sort (m_job->begin(), m_job->end(), elapsedCompare);}
+                else
+                     {std::sort (m_job->begin(), m_job->end(), elapsedCompareInvert);}
+                break;
+            case 3  :
+                if (m_state_sort)
+                     {std::sort (m_job->begin(), m_job->end(), userCompare);}
+                else
+                     {std::sort (m_job->begin(), m_job->end(), userCompareInvert);}
+                break;
             case 4  :
                 if (m_state_sort)
                      {std::sort (m_job->begin(), m_job->end(), nameCompare);}
                 else
                      {std::sort (m_job->begin(), m_job->end(), nameCompareInvert);}
                 break;
+            case 5  :
+                if (m_state_sort)
+                     {std::sort (m_job->begin(), m_job->end(), approximateTimeCompare);}
+                else
+                     {std::sort (m_job->begin(), m_job->end(), approximateTimeCompareInvert);}
+                break;
+            case 6  :
+                if (m_state_sort)
+                     {std::sort (m_job->begin(), m_job->end(), slotsCompare);}
+                else
+                     {std::sort (m_job->begin(), m_job->end(), slotsCompareInvert);}
+                break;
+            case 7:
+               if (m_state_sort)
+                    {std::sort (m_job->begin(), m_job->end(), priorityCompare);}
+               else
+                    {std::sort (m_job->begin(), m_job->end(), priorityCompareInvert);}
+               break;
+            case 8:
+               if (m_state_sort)
+                    {std::sort (m_job->begin(), m_job->end(), createdCompare);}
+               else
+                    {std::sort (m_job->begin(), m_job->end(), createdCompareInvert);}
+               break;
+            case 9:
+               if (m_state_sort)
+                    {std::sort (m_job->begin(), m_job->end(), softwareCompare);}
+               else
+                    {std::sort (m_job->begin(), m_job->end(), softwareCompareInvert);}
+               break;
             default :
                qDebug()<<"JobsModel::multiSorting default";
         }
@@ -344,6 +542,7 @@ QList<int> JobsModel::getSelectedIds(){
         if (obj != NULL)
             temp_ids.append(obj->id());
     }
+    //qDebug()<<"temp_ids "<<temp_ids;
     return temp_ids;
 }
 
@@ -543,7 +742,7 @@ void JobsModel::setExpand(int index_){
         }
         return;
     }
-    qDebug()<<"setExpand::";
+    //qDebug()<<"setExpand::";
 
     int s_id=m_job->at(index_)->m_job_id;
 
@@ -590,6 +789,8 @@ QVariant JobsModel::data(const QModelIndex &i_index, int i_role) const
     {
         case StateRole:
             return QVariant::fromValue(dobj->m_status);
+        case AnnotationRole:
+            return QVariant::fromValue(dobj->m_annotation);
         case ProgressRole:
             return QVariant::fromValue(dobj->m_progress);
         case ElapsedRole:
@@ -663,6 +864,7 @@ QVariant JobsModel::data(const QModelIndex &i_index, int i_role) const
 QHash<int, QByteArray> JobsModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[StateRole] = "job_state";
+    roles[AnnotationRole] = "annotation";
     roles[ProgressRole] = "progress";
     roles[ElapsedRole] = "elapsed";
     roles[UserNameRole] = "user_name";

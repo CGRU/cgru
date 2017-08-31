@@ -1,8 +1,8 @@
 #pragma once
 
 #include "state.hpp"
-#include <QStringList>
 
+#include <QStringList>
 
 class TaskObject
 {
@@ -42,4 +42,6 @@ public:
 
 
 };
+
+
 

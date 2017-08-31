@@ -8,15 +8,14 @@
 #include "libafqt/qenvironment.h"
 #include "libafanasy/monitorevents.h"
 #include "libafanasy/taskexec.h"
-#include <QEventLoop>
 
+#include <QEventLoop>
 
 using namespace afermer;
 
 namespace fs = boost::filesystem;
 
 int combine(int a, int b, int c);
-
 
 void RadiolocationStation::getItemInfo( std::ostringstream& o_str, const std::string & i_mode, const std::string & i_type, int i_item_id)
 {
@@ -27,6 +26,7 @@ void RadiolocationStation::getItemInfo( std::ostringstream& o_str, const std::st
     o_str << ",\"ids\":[" << i_item_id << "]";
     o_str << ",\"mode\":\"" << i_mode << "\"";
     o_str << "}}";
+
 }
 
 
@@ -126,17 +126,19 @@ bool RadiolocationStation::QStringFromMsg(QString& o_ret, Waves::Ptr i_answer)
 
 RadiolocationStation::~RadiolocationStation()
 {
-	Waves::Ptr query4 = Waves::create(af::Msg::TMonitorDeregister, monitor_id);
+    Waves::Ptr query4 = Waves::create( af::Msg::TMonitorDeregister, monitor_id );
     push(query4);
+
+    m_qafclient.setClosing();
 }
 
 
 RadiolocationStation::RadiolocationStation():
-      m_qThreadClientUpdate( this, af::Environment::getWatchGetEventsSec(), af::Environment::getWatchConnectRetries())
-    , m_qThreadSend( this, af::Environment::getWatchConnectRetries())
+      m_qafclient( this, af::Environment::getWatchConnectRetries())
     , m_connected(false)
     , user_id(0)
 {
+
 #ifdef UNIX
     std::streambuf* oldCoutStreamBuf = std::cerr.rdbuf();
     std::ostringstream strCout;
@@ -156,8 +158,8 @@ RadiolocationStation::RadiolocationStation():
     char* argv[] = {"afermer"};
 
     uint32_t env_flags = af::Environment::Quiet | af::Environment::SolveServerName;  //   Silent environment initialization
-	
-	af::Environment* ENV = new af::Environment ( env_flags, argc, argv);
+
+    af::Environment* ENV = new af::Environment ( env_flags, argc, argv); 
 
     if( !ENV->isValid())
     {
@@ -165,7 +167,6 @@ RadiolocationStation::RadiolocationStation():
         return;
     }
 
-    afqt::init( ENV->getWatchWaitForConnected(), ENV->getWatchWaitForReadyRead(), ENV->getWatchWaitForBytesWritten());
     addresses = ENV->getServerAddress() ;
     user_name = ENV->getUserName();
     comp_name = ENV->getComputerName();
@@ -182,15 +183,14 @@ RadiolocationStation::RadiolocationStation():
     // ************************************
 
     std::cerr.rdbuf( oldCoutStreamBuf );
-#endif
+#endif   
 
-    connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
-    connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
-    connect( &m_qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
-    connect( &m_qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
-
-    m_qThreadClientUpdate.setUpMsg( MonitorHost::genRegisterMsg() );
+    connect( &m_qafclient, SIGNAL( sig_newMsg( af::Msg*)), this, SLOT( pullMessage( af::Msg*)));
+    connect( &m_qafclient, SIGNAL( sig_connectionLost()),  this, SLOT( connectionLost())); 
     
+    m_qafclient.setUpMsg( MonitorHost::genRegisterMsg(), af::Environment::getWatchGetEventsSec());
+
+    delete ENV;
 }
 
 size_t RadiolocationStation::getId()
@@ -206,36 +206,31 @@ size_t RadiolocationStation::getUserId()
 
 Waves::Ptr RadiolocationStation::push(const std::ostringstream& body)
 {
-	Waves::Ptr query( af::jsonMsg( body ) );
+    Waves::Ptr query( af::jsonMsg( body ) );
     return push(query);
 }
 
 Waves::Ptr RadiolocationStation::push(Waves::Ptr msg_up)
 {
-     /*if( msg_up->type() == af::Msg::TJSON )
-     {
-         msg_up->setJSONBIN();
+    if( msg_up->type() == af::Msg::TJSON )
+    {
+        msg_up->setJSONBIN();
 
-         static int unused;
-         unused = ::write( 1, " <<< ", 5);
-         msg_up->stdOutData( false);
-         unused = ::write( 1, "\n", 1);
-     }*/
+        static int unused;
+        unused = ::write( 1, " <<< ", 5);
+        msg_up->stdOutData( false);
+        unused = ::write( 1, "\n", 1);
+    }
 
-    afqt::connect( addresses, &socket );
-    afqt::sendMessage( &socket, msg_up.get() );
-    af::Msg * answer3;
-    answer3 = new af::Msg;
-    afqt::recvMessage( &socket, answer3);
+    bool r;
+    af::Msg * answer3 = af::sendToServer(msg_up.get(), r, af::VerboseMode::VerboseOn);
 
     boost::shared_ptr<af::Msg> ret(answer3);
 
-
-    socket.disconnectFromHost();
-    if( socket.state() != QAbstractSocket::UnconnectedState ) 
-        socket.waitForDisconnected();
     return ret;
 }
+
+
 
 
 bool RadiolocationStation::isConnected()
@@ -254,7 +249,7 @@ void RadiolocationStation::connectionLost()
 void RadiolocationStation::pullMessage( af::Msg *msg)
 {
     m_connected = true;
-                
+
     switch( msg->type() )
     {
         case af::Msg::TMonitor:
@@ -263,14 +258,14 @@ void RadiolocationStation::pullMessage( af::Msg *msg)
                 monitor_id = monitor.getId();
                 user_id = monitor.getUid();
                 msg_monitor_id = new af::Msg( af::Msg::TMonitorUpdateId, monitor_id);
-                m_qThreadClientUpdate.setUpMsg( msg_monitor_id );
+                m_qafclient.setUpMsg( msg_monitor_id,  af::Environment::getWatchGetEventsSec());
 
                 break;
             }
         case af::Msg::TMonitorId:
             {
                 msg_monitor_id = new af::Msg( af::Msg::TMonitorUpdateId, monitor_id);
-                m_qThreadClientUpdate.setUpMsg( msg_monitor_id );
+                m_qafclient.setUpMsg( msg_monitor_id, af::Environment::getWatchGetEventsSec());
 
                 break;
             }
@@ -381,7 +376,7 @@ void RadiolocationStation::getTaskOutput(QString& o_str, int i_job_id, int i_blo
     str << ",\"binary\":true}}";
 
     af::Msg * msg = af::jsonMsg( str );
-    m_qThreadSend.send( msg );
+    m_qafclient.sendMsg( msg );
 
     QEventLoop loop;
     loop.connect(this, SIGNAL(outputComplited()), SLOT(quit()));
@@ -408,3 +403,4 @@ void RadiolocationStation::addJobId( int i_jid, bool i_add)
 
     push( str);
 }
+

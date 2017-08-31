@@ -84,7 +84,7 @@ void BladeObjectsLorry::refresh()
 
 
 
-void BladeObjectsLorry::insert(const QString &name,
+BladeObject::Ptr BladeObjectsLorry::insert(const QString &name,
                     const QString &ip_address,
                     const QString &base_os,
                     const QString &blades_group,
@@ -100,16 +100,11 @@ void BladeObjectsLorry::insert(const QString &name,
                     int blade_id,
                     const QString &job_names,
                     const QString &user,
-                    
-                    const std::string& properties, const std::string& resources, 
-                    const std::string& data, size_t cpu_num, size_t cpu_mhz, 
-                    size_t mem_total_mb, size_t mem_free_mb, size_t mem_cached_mb, 
-                    size_t mem_buffers_mb, size_t swap_used_mb, size_t hdd_total_gb, 
-                    size_t hdd_free_gb, size_t hdd_rd_kbsec, size_t 
-                    hdd_wr_kbsec, size_t hdd_busy, size_t net_recv_kbsec, 
-                    size_t net_send_kbsec)
+                    int hdd_busy
+                )
 {
     BladeObjectPtrIt it = find(ip_address);
+    BladeObject::Ptr ret;
 
     if( it != m_objects.end() )
     {
@@ -133,25 +128,7 @@ void BladeObjectsLorry::insert(const QString &name,
             );
         (*it)->set_refreshed = true;
 
-        (*it)->m_resource_map["performance_slots"] = QString::number( performance_slots);
-        (*it)->m_resource_map["avalible_performance_slots"] = QString::number( avalible_performance_slots );
-        (*it)->m_resource_map["properties"] = QString::fromStdString( properties );
-        (*it)->m_resource_map["resources"] = QString::fromStdString( resources );
-        (*it)->m_resource_map["data"] = QString::fromStdString( data );
-        (*it)->m_resource_map["cpu_num"] = QString::number( cpu_num );
-        (*it)->m_resource_map["cpu_mhz"] = QString::number( cpu_mhz );
-        (*it)->m_resource_map["mem_total_mb"] = QString::number( mem_total_mb );
-        (*it)->m_resource_map["mem_free_mb"] = QString::number( mem_free_mb );
-        (*it)->m_resource_map["mem_cached_mb"] = QString::number( mem_cached_mb );
-        (*it)->m_resource_map["mem_buffers_mb"] = QString::number( mem_buffers_mb );
-        (*it)->m_resource_map["swap_used_mb"] = QString::number( swap_used_mb );
-        (*it)->m_resource_map["hdd_total_gb"] = QString::number( hdd_total_gb );
-        (*it)->m_resource_map["hdd_free_gb"] = QString::number( hdd_free_gb );
-        (*it)->m_resource_map["hdd_rd_kbsec"] = QString::number( hdd_rd_kbsec );
-        (*it)->m_resource_map["hdd_wr_kbsec"] = QString::number( hdd_wr_kbsec );
-        (*it)->m_resource_map["hdd_busy"] = QString::number( hdd_busy );
-        (*it)->m_resource_map["net_recv_kbsec"] = QString::number( net_recv_kbsec );
-        (*it)->m_resource_map["net_send_kbsec"] = QString::number( net_send_kbsec );
+        ret = (*it);
     }
     else
     {
@@ -175,26 +152,10 @@ void BladeObjectsLorry::insert(const QString &name,
             );
         b->set_refreshed = true;
 
-        b->m_resource_map["performance_slots"] = QString::number( performance_slots);
-        b->m_resource_map["avalible_performance_slots"] = QString::number( avalible_performance_slots );
-        b->m_resource_map["properties"] = QString::fromStdString( properties );
-        b->m_resource_map["resources"] = QString::fromStdString( resources );
-        b->m_resource_map["data"] = QString::fromStdString( data );
-        b->m_resource_map["cpu_num"] = QString::number( cpu_num );
-        b->m_resource_map["cpu_mhz"] = QString::number( cpu_mhz );
-        b->m_resource_map["mem_total_mb"] = QString::number( mem_total_mb );
-        b->m_resource_map["mem_free_mb"] = QString::number( mem_free_mb );
-        b->m_resource_map["mem_cached_mb"] = QString::number( mem_cached_mb );
-        b->m_resource_map["mem_buffers_mb"] = QString::number( mem_buffers_mb );
-        b->m_resource_map["swap_used_mb"] = QString::number( swap_used_mb );
-        b->m_resource_map["hdd_total_gb"] = QString::number( hdd_total_gb );
-        b->m_resource_map["hdd_free_gb"] = QString::number( hdd_free_gb );
-        b->m_resource_map["hdd_rd_kbsec"] = QString::number( hdd_rd_kbsec );
-        b->m_resource_map["hdd_wr_kbsec"] = QString::number( hdd_wr_kbsec );
-        b->m_resource_map["hdd_busy"] = QString::number( hdd_busy );
-        b->m_resource_map["net_recv_kbsec"] = QString::number( net_recv_kbsec );
-        b->m_resource_map["net_send_kbsec"] = QString::number( net_send_kbsec );
+        ret = b;
 
         m_objects.push_back(b);
     }
+
+    return ret;
 }

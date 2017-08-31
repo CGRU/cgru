@@ -87,3 +87,28 @@ QString JobObjectsManager::info(int i_id)
         ret = QString::fromStdString(obj->information);
     return ret;
 }
+
+bool JobObjectsManager::setAnnotation(const QList<int>& i_ids, const QString& i_text) {return m_RLS->jobSetAnnotation(i_ids, i_text);}
+bool JobObjectsManager::setDependMask(const QList<int>& i_ids, const QString& i_text) {return m_RLS->jobSetDependMask(i_ids, i_text);}
+bool JobObjectsManager::setOS(const QList<int>& i_ids, const QString& i_text) {return m_RLS->jobSetOS(i_ids, i_text);}
+bool JobObjectsManager::setWaitTime(const QList<int>& i_ids, const QString& i_text) {return m_RLS->jobSetWaitTime(i_ids[0], i_text);}
+bool JobObjectsManager::setPostCommand(const QList<int>& i_ids, const QString& i_text) {return m_RLS->jobSetPostCommand(i_ids, i_text);}
+bool JobObjectsManager::setLifeTime(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetLifeTime(i_ids, i_value);}
+bool JobObjectsManager::setTasksErrorRetries(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetTasksErrorRetries(i_ids, i_value);}
+bool JobObjectsManager::setTasksMaxRunTime(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetTasksMaxRunTime(i_ids, i_value);}
+bool JobObjectsManager::setErrorForgiveTime(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetErrorForgiveTime(i_ids, i_value);}
+bool JobObjectsManager::setMaxRunningTasks(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetMaxRunningTasks(i_ids, i_value);}
+bool JobObjectsManager::setMaxRunningTaskPerBlades(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetMaxRunningTaskPerBlades(i_ids, i_value);}
+bool JobObjectsManager::setSlots(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetSlots(i_ids, i_value);}
+bool JobObjectsManager::setNeedMemory(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedMemory(i_ids, i_value);}
+bool JobObjectsManager::setNeedHdd(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedHdd(i_ids, i_value);}
+bool JobObjectsManager::setNeedPower(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetNeedMemory(i_ids, i_value);}
+bool JobObjectsManager::setErrorAvoidHost(const QList<int>& i_ids, int i_value) {return m_RLS->jobSetErrorAvoidHost(i_ids, i_value);}
+
+QString JobObjectsManager::getInfo(int i_id, const QString& i_key)
+{
+    if ( m_lorry->m_objects.size() > 0)
+         return m_lorry->get(i_id)->m_resource_map[i_key];
+    QString ret("");
+    return ret;
+}
