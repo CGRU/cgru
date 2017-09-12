@@ -32,7 +32,9 @@
 
 #include "profiler.h"
 
-#ifndef WINNT
+#ifdef WINNT
+#define MSG_DONTWAIT 0
+#else
 #define closesocket close
 #endif
 
@@ -58,8 +60,8 @@ SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 	m_sas( i_sas),
 	m_msg_req( NULL),
 	m_msg_ans( NULL),
-	m_zombie( false),
 
+	#ifdef LINUX
 	m_epoll_added( false),
 	m_bytes_read( 0),
 	m_header_reading_finished( false),
@@ -68,6 +70,9 @@ SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 	m_write_buffer( NULL),
 	m_write_size(0),
 	m_bytes_written(0)
+	#endif // LINUX
+
+	m_zombie(false)
 {
 	m_msg_req = new af::Msg( m_sas);
 
@@ -75,6 +80,7 @@ SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 
 	af::setSocketOptions( m_sfd);
 
+	#ifdef LINUX
 	if( SocketsProcessing::UsingEpoll())
 	{
 		// Set descriptor non-blocking:
@@ -86,6 +92,7 @@ SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 		if( fcntl( m_sfd, F_SETFL, flags | O_NONBLOCK) == -1 )
 			AF_ERR << "fcntl: F_SETFL: " << strerror(errno);
 	}
+	#endif // LINUX
 }
 
 SocketItem::~SocketItem()
@@ -102,8 +109,10 @@ SocketItem::~SocketItem()
 	if( m_msg_req ) delete m_msg_req;
 	if( m_msg_ans ) delete m_msg_ans;
 
+	#ifdef LINUX
 	if( m_write_buffer )
 		delete [] m_write_buffer;
+	#endif // LINUX
 
 	// Delete profiler. 
 	// If it was collected, pointer will be == NULL
@@ -113,8 +122,10 @@ SocketItem::~SocketItem()
 
 bool SocketItem::readMsg()
 {
+	#ifdef LINUX
 	if( SocketsProcessing::UsingEpoll())
 		return readData();
+	#endif
 
 	// Read message data from socket
 	if( false == af::msgread( m_sfd, m_msg_req))
@@ -226,11 +237,13 @@ void SocketItem::writeMsg()
 	else if(( m_msg_req->type() == af::Msg::TJSONBIN ) && ( m_msg_ans->type() == af::Msg::TJSON ))
 		m_msg_ans->setJSONBIN();
 
+	#ifdef LINUX
 	if( SocketsProcessing::UsingEpoll())
 	{
 		writeData();
 		return;
 	}
+	#endif
 
 	// Write response message back to client socket
 	if( false == af::msgwrite( m_sfd, m_msg_ans))
@@ -246,6 +259,7 @@ void SocketItem::writeMsg()
 	waitClose();
 }
 
+#ifdef LINUX
 bool SocketItem::processIO( int i_events)
 {
 	if( m_zombie )
@@ -452,6 +466,7 @@ void SocketItem::writeData()
 
 	return;
 }
+#endif // LINUX
 
 void SocketItem::waitClose()
 {
@@ -470,6 +485,14 @@ void SocketItem::waitClose()
 
 	m_state = SSWaiting;
 	m_wait_time = time( NULL);
+
+	#ifdef WINNT
+	// Set socket non-blocking on Windows:
+	u_long iMode = 1;
+	int iResult = ioctlsocket( m_sfd, FIONBIO, &iMode);
+	if (iResult != NO_ERROR)
+		AF_ERR << "ioctlsocket failed with error: " << iResult;
+	#endif
 }
 
 void SocketItem::checkClosed()
@@ -509,8 +532,10 @@ void SocketItem::closeSocket()
 
 	m_state = SSClosed;
 
+	#ifdef LINUX
 	if( false == SocketsProcessing::UsingEpoll())
 		SocketsProcessing::EpollDel( m_sfd);
+	#endif // LINUX
 
 	closesocket( m_sfd);
 
@@ -522,7 +547,9 @@ void SocketItem::closeSocket()
 	m_zombie = true;
 }
 
+#ifdef LINUX
 bool SocketsProcessing::ms_epoll_enabled = false;
+#endif
 SocketsProcessing * SocketsProcessing::ms_this = NULL;
 SocketsProcessing::SocketsProcessing( ThreadArgs * i_args):
 	m_threadargs( i_args)
@@ -563,9 +590,11 @@ SocketsProcessing::SocketsProcessing( ThreadArgs * i_args):
 		}
 	}
 
+	#ifdef LINUX
 	if( UsingEpoll())
 		initEpoll();
 	else
+	#endif
 		initThreadingIO();
 }
 
@@ -618,6 +647,7 @@ SocketsProcessing::~SocketsProcessing()
 	for( int i = 0; i < m_threads_proc.size(); i++)
 		delete m_threads_proc[i];
 
+	#ifdef LINUX
 	if( UsingEpoll())
 	{
 		AF_LOG << "Finishing EPOLL...";
@@ -625,6 +655,7 @@ SocketsProcessing::~SocketsProcessing()
 		m_epoll_thread->Join();
 		delete m_epoll_thread;
 	}
+	#endif
 
 	AF_LOG << "Deleting remaining " << m_sockets.size() << " socket items...";
 	std::list<SocketItem*>::iterator it = m_sockets.begin();
@@ -644,11 +675,13 @@ void SocketsProcessing::acceptSocket( int i_sfd, sockaddr_storage * i_sas)
 {
 	SocketItem * si = new SocketItem( i_sfd, i_sas);
 
+	#ifdef LINUX
 	if( UsingEpoll())
 	{
 		m_queue_io->pushSI( si);
 		return;
 	}
+	#endif
 
 
 	// Process waiting sockets:
@@ -734,7 +767,7 @@ void SocketsProcessing::processRun()
 		m_queue_io->pushSI( si);
 	}	
 }
-
+#ifdef LINUX
 void SocketsProcessing::initEpoll()
 {
 	// Create EPOLL:
@@ -872,4 +905,4 @@ void SocketsProcessing::EpollDel( int i_sfd)
 {
 	epoll_ctl( ms_this->m_epoll_fd, EPOLL_CTL_DEL, i_sfd, NULL);
 }
-
+#endif LINUX

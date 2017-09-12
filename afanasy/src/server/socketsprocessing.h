@@ -37,10 +37,12 @@ public:
 	void writeMsg();
 	void checkClosed();
 
+	#ifdef LINUX
 	// For non-blocking IO:
 	bool processIO( int i_events);
 	inline void setEpollAdded() { m_epoll_added = true; }
 	inline bool isEpollAdded() const { return m_epoll_added; }
+	#endif
 
 private:
 	void waitClose();
@@ -60,6 +62,7 @@ private:
 	time_t m_wait_time;
 	bool m_zombie;
 
+	#ifdef LINUX
 	// For non-blocking IO:
 	bool readData();
 	int  m_bytes_read;
@@ -71,6 +74,7 @@ private:
 	char * m_write_buffer;
 	int    m_write_size;
 	int    m_bytes_written;
+	#endif
 };
 
 class SocketQueue: public af::AfQueue
@@ -92,8 +96,10 @@ public:
 
 	void processRun();
 
+	#ifdef LINUX
 	inline static bool UsingEpoll() { return ms_epoll_enabled; }
 	static void EpollDel( int i_sfd);
+	#endif
 
 private:
 	static void ThreadFuncProc( void * i_args);
@@ -119,6 +125,7 @@ private:
 	void doBlockingIO();
 
 
+	#ifdef LINUX
 	// Non-Blocking/EPOLL IO:
 	static void ThreadFuncEpoll( void * i_args);
 	void initEpoll();
@@ -128,5 +135,5 @@ private:
 	static bool ms_epoll_enabled;
 	int m_epoll_fd;
 	DlThread * m_epoll_thread;
+	#endif
 };
-
