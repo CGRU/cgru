@@ -253,7 +253,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 
 	#ifdef WINNT
 	// On Windows we can't rename file in the existing one:
-	if( af::pathFileExists( filename.c_str())
+	if( af::pathFileExists( filename.c_str()))
 		remove( filename.c_str());
 	#endif
 	rename( filetemp.c_str(), filename.c_str());
