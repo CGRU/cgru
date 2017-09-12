@@ -1413,10 +1413,8 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
       if( full ) o_str << "\n Tasks Warning = " << p_tasks_warning;
       if( full ) o_str << "\n Tasks Wait Reconnect = " << p_tasks_waitrec;
 
-      static const char timeformat[] = "%Y.%m.%d %H:%M.%S";
-
-      if( full && (m_time_started > 0) ) o_str << "\n Start time = " << af::time2str( m_time_started, timeformat );
-      if( full && (m_time_done > 0) ) o_str << "\n Done time = " << af::time2str( m_time_done, timeformat );
+      if( full && (m_time_started > 0) ) o_str << "\n Start time = " << af::time2str( m_time_started);
+      if( full && (m_time_done > 0) ) o_str << "\n Done time = " << af::time2str( m_time_done);
 
       if( p_error_hosts ) o_str << "\n Error hosts count = " << p_error_hosts;
       if( p_avoid_hosts ) o_str << "\n Avoid hosts count = " << p_avoid_hosts;
