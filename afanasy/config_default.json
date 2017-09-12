@@ -199,6 +199,10 @@
 	"-af_server_sockets_processing_threads_stack":32768,
 		"":"Zero, negative value or no parameter means to use system default",
 
+	"":"You can use non-blocking IO on Linux server, based on Linux epoll facility",
+	"af_server_linux_epoll":0,
+		"":"If it is disabled (by default), Linux server will use blocking IO based on threads, like other platforms",
+
 	"":"Use -1 value not to set socket option at all",
 	"af_so_server_RCVTIMEO_sec":12,
 	"af_so_server_SNDTIMEO_sec":12,

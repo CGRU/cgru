@@ -101,6 +101,8 @@ int Environment::server_sockets_readwrite_threads_stack  = AFSERVER::SOCKETS_REA
 int Environment::server_sockets_processing_threads_num   = AFSERVER::SOCKETS_PROCESSING_THREADS_NUM;
 int Environment::server_sockets_processing_threads_stack = AFSERVER::SOCKETS_PROCESSING_THREADS_STACK;
 
+int Environment::server_linux_epoll                      = AFSERVER::LINUX_EPOLL;
+
 /// Socket Options:
 int Environment::so_server_LINGER       = AFNETWORK::SO_SERVER_LINGER;
 int Environment::so_server_REUSEADDR    = AFNETWORK::SO_SERVER_REUSEADDR;
@@ -223,6 +225,8 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, server_sockets_readwrite_threads_stack,  "af_server_sockets_readwrite_threads_stack"  );
 	getVar( i_obj, server_sockets_processing_threads_num,   "af_server_sockets_processing_threads_num"   );
 	getVar( i_obj, server_sockets_processing_threads_stack, "af_server_sockets_processing_threads_stack" );
+
+	getVar( i_obj, server_linux_epoll,                "af_server_linux_epoll"                );
 
 	/// Socket Options:
 	getVar( i_obj, so_server_LINGER,                  "af_so_server_LINGER"                  );

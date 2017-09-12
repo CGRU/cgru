@@ -51,8 +51,8 @@ void sig_alrm(int signum)
 }
 void sig_pipe(int signum)
 {
-	char msg [] = "SIG PIPE\n";
-	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
+//	char msg [] = "SIG PIPE\n";
+//	int u = ::write( STDERR_FILENO, msg, sizeof(msg)-1);
 }
 
 //######################################## main #########################################
