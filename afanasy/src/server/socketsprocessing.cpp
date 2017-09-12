@@ -69,7 +69,7 @@ SocketItem::SocketItem( int i_sfd, sockaddr_storage * i_sas):
 
 	m_write_buffer( NULL),
 	m_write_size(0),
-	m_bytes_written(0)
+	m_bytes_written(0),
 	#endif // LINUX
 
 	m_zombie(false)
@@ -905,4 +905,5 @@ void SocketsProcessing::EpollDel( int i_sfd)
 {
 	epoll_ctl( ms_this->m_epoll_fd, EPOLL_CTL_DEL, i_sfd, NULL);
 }
-#endif LINUX
+#endif // LINUX
+
