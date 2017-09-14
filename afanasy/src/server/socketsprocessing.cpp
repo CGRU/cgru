@@ -424,7 +424,7 @@ void SocketItem::writeData()
 		if( header_buf )
 		{
 			memcpy( m_write_buffer, header_buf, header_len);
-			delete header_buf;
+			delete [] header_buf;
 		}
 		memcpy( m_write_buffer + header_len, m_msg_ans->buffer() + m_msg_ans->getHeaderOffset(), m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset());
 	}

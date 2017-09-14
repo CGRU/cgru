@@ -345,6 +345,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	else if( document.HasMember("action"))
 	{
 		// This message for Run thread:
+		delete [] data;
 		return NULL;
 	}
 	else if( document.HasMember("job"))
