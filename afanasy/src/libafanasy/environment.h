@@ -173,6 +173,8 @@ public:
 
 	static inline int getServerLinuxEpoll() { return server_linux_epoll; }
 
+	static inline int getServerProfilingSec() { return server_profiling_sec; }
+
 	/// Socket Options:
 	static inline int getSO_LINGER()       { return m_server ? so_server_LINGER       : so_client_LINGER       ;}
 	static inline int getSO_REUSEADDR()    { return m_server ? so_server_REUSEADDR    : so_client_REUSEADDR    ;}
@@ -339,6 +341,8 @@ private:
 	static int server_sockets_processing_threads_stack;
 
 	static int server_linux_epoll;
+
+	static int server_profiling_sec;
 
 	/// Socket Options:
 	static int so_server_LINGER;

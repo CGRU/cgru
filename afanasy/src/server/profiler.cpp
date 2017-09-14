@@ -116,6 +116,25 @@ void Profiler::Profile()
 
 
 	//
+	// Print:
+	//
+	static const char M[] = "\033[1;36m";
+	static const char C[] = "\033[0m";
+	static char buffer[1024];
+	std::string log;
+	sprintf( buffer,"%sServer load profiling%s:\n", M, C);
+	log += buffer;
+	sprintf( buffer,"Clients per second: %s%4.2f%s, Now: %s%d%s (processed %d connections in last %4.2f seconds).\n",
+			M, per_second, C, M, ms_meter, C, ms_stat_count, seconds);
+	log += buffer;
+	sprintf( buffer,"Prep: %s%4.2f%s, Proc: %s%4.2f%s, Post: %s%4.2f%s, Total: %s%4.2f%s ms.\n",
+			M, prep, C, M, proc, C, M, post, C, M, (prep + proc + post), C);
+	log += buffer;
+
+	AFCommon::QueueLog( log);
+
+
+	//
 	// Reset:
 	//
 	for( int i = 0; i < ms_profiles.size(); i++)
@@ -125,25 +144,10 @@ void Profiler::Profile()
 	ms_stat_count = 0;
 	ms_stat_time = stat_time;
 
-	if( seconds < 10.0 )
-		ms_stat_period *= 10;
-	else if(( seconds > 100.0 ) && ( ms_stat_period > 100 ))
-		ms_stat_period /= 10;
-
-
-	//
-	// Print:
-	//
-	static char buffer[1024];
-	std::string log;
-	sprintf( buffer,"Server load profiling:\n");
-	log += buffer;
-	sprintf( buffer,"Clients per second: %4.2f, Now: %d\n", per_second, ms_meter);
-	log += buffer;
-	sprintf( buffer,"Prep: %4.2f, Proc: %4.2f, Post: %4.2f, Total: %4.2f ms.\n", prep, proc, post, (prep + proc + post));
-	log += buffer;
-
-	AFCommon::QueueLog( log);
+	if( seconds < af::Environment::getServerProfilingSec())
+		ms_stat_period *= 2;
+	else if( seconds > af::Environment::getServerProfilingSec())
+		ms_stat_period /= 2;
 }
 #else
 Profiler::Profiler(){}

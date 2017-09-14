@@ -218,6 +218,9 @@
 	"af_so_client_TCP_CORK":-1,
 	"af_so_client_LINGER":-1,
 
+	"af_server_profiling_sec":1024,
+		"":"Server will output some network statistics by this period",
+
 "":"Solving:",
 	"af_solving_use_capacity":true,
 		"":"Calculate need using running tasks total capacity.",

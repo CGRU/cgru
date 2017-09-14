@@ -164,9 +164,11 @@ void threadAcceptPort( void * i_arg, int i_port)
 	static const int error_wait_min = 1 << 3;    // Minimum timeout value
 	error_wait = error_wait_min;
 
+	#ifdef WINNT
 	int64_t accepts_count = 0;
 	time_t  accepts_stat_count = 100;
 	time_t  accepts_stat_time = time( NULL);
+	#endif
 
 	while( AFRunning )
 	{
@@ -209,8 +211,11 @@ void threadAcceptPort( void * i_arg, int i_port)
 		// Add a new socket to process:
 		threadArgs->socketsProcessing->acceptSocket( sfd, sas);
 
+		#ifdef WINNT
 		//
-		// Server load statistics:
+		// Server load statistics.
+		// This is for MS Windows only.
+		// For other platforms more deatiled profiling used (provided by Profiler class).
 		//
 		accepts_count++;
 		if( accepts_count >= accepts_stat_count )
@@ -220,25 +225,17 @@ void threadAcceptPort( void * i_arg, int i_port)
 			if( seconds > 0 )
 			{
 				int accepts_per_second = accepts_count / seconds;
-
-				#ifndef WINNT
-				printf("\033[1;36m");
-				#endif
-				printf("Served connections per second: %d", accepts_per_second);
-				#ifndef WINNT
-				printf("\033[0m");
-				#endif
-				printf("\n");
-
+				printf("Served connections per second: %d ( %ld in %d s )\n", accepts_per_second, accepts_count, seconds);
 				accepts_count = 0;
 				accepts_stat_time = cur_time;
 			}
 
-			if( seconds < 10 )
-				accepts_stat_count *= 10;
-			else if(( seconds > 100 ) && ( accepts_stat_count > 100 ))
-				accepts_stat_count /= 10;
+			if( seconds < af::Environment::getServerProfilingSec())
+				accepts_stat_count *= 2;
+			else if( seconds > af::Environment::getServerProfilingSec())
+				accepts_stat_count /= 2;
 		}
+		#endif // WINNT
 	}
 
 	close( server_sd);

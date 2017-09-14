@@ -154,7 +154,7 @@ void SocketItem::generateInfoStream( std::ostringstream & o_str, bool i_full) co
 	}
 	if( m_zombie  ) o_str << " - ZOMBIE";
 	if( m_msg_req ) o_str << " REQ: " << m_msg_req;
-	if( m_msg_ans ) o_str << " ANS: " << m_msg_req;
+	if( m_msg_ans ) o_str << " ANS: " << m_msg_ans;
 }
 
 bool SocketItem::processMsg( ThreadArgs * i_args)
