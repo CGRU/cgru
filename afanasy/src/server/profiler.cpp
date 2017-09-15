@@ -60,6 +60,13 @@ Profiler::Profiler()
 
 Profiler::~Profiler(){}
 
+void Profiler::Destroy()
+{
+	DlScopeLocker lock(&ms_mutex);
+	for( int i = 0; i < ms_profiles.size(); i++)
+		delete ms_profiles[i];
+}
+
 void Profiler::processingStarted()
 {
 	clock_gettime( CLOCK_MONOTONIC, &m_tstart);

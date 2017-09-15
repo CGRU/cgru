@@ -18,6 +18,8 @@ public:
 public:
 	static void Collect( Profiler * i_prof);
 
+	static void Destroy(); //< Called on program exit to free mem
+
 private:
 	static void Profile();
 

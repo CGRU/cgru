@@ -664,6 +664,9 @@ SocketsProcessing::~SocketsProcessing()
 		delete *it;
 	}
 
+	AF_LOG << "Clearing profiling data...";
+	Profiler::Destroy();
+
 	delete m_queue_run;
 	delete m_queue_proc;
 	delete m_queue_io;

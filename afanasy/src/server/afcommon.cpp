@@ -181,6 +181,8 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			if( false == af::pathIsFolder( job_dir)) continue;
 			o_folders.push_back( job_dir);
 		}
+
+		closedir( job_dir_handle);
 	}
 
 	closedir(thousand_dir_handle);
