@@ -205,6 +205,8 @@ bool Farm::getFarm( const JSON & i_obj)
 		jr_int32("maxtasks", host.m_max_tasks, patterns[i]);
 		jr_int32("wol_idlesleep_time", host.m_wol_idlesleep_time, patterns[i]);
 
+		jr_int32("register_nimby",  host.m_register_nimby,  patterns[i]);
+		jr_int32("register_paused", host.m_register_paused, patterns[i]);
 
 		jr_int32("nimby_idlefree_time", host.m_nimby_idlefree_time, patterns[i]);
 		jr_int32("nimby_busyfree_time", host.m_nimby_busyfree_time, patterns[i]);
