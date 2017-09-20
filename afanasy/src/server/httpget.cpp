@@ -75,7 +75,7 @@ af::Msg * httpGet( const af::Msg * i_msg)
 	if( file_data )
 	{
 		char buffer[1024];
-		sprintf( buffer, "HTTP/1.1 200 OK\r\nContent-Length: %d\r\n\r\n", file_size);
+		sprintf( buffer, "HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: %d\r\n\r\n", file_size);
 		int buffer_len = strlen( buffer);
 
 //		int msg_datalen = header_OK_len + file_size;
@@ -93,7 +93,7 @@ af::Msg * httpGet( const af::Msg * i_msg)
 	}
 	else
 	{
-		std::string error("HTTP/1.1 404 Not Found\r\n\r\n");
+		std::string error("HTTP/1.1 404 Not Found\r\nConnection: close\r\n\r\n");
 		error += "File not found: ";
 		error += file_name;
 		o_msg->setData( error.size(), error.c_str(), af::Msg::THTTPGET);

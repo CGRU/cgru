@@ -173,6 +173,8 @@ public:
 
 	static inline int getServerLinuxEpoll() { return server_linux_epoll; }
 
+	static inline int getServerHTTPWaitClose() { return server_http_wait_close; }
+
 	static inline int getServerProfilingSec() { return server_profiling_sec; }
 
 	/// Socket Options:
@@ -341,7 +343,7 @@ private:
 	static int server_sockets_processing_threads_stack;
 
 	static int server_linux_epoll;
-
+	static int server_http_wait_close;
 	static int server_profiling_sec;
 
 	/// Socket Options:
