@@ -189,21 +189,31 @@
 	"af_sysjob_events_service":"events",
 
 "":"Network:",
-	"":"Number of threads to read/write clients connections.",
-	"af_server_sockets_readwrite_threads_num":10,
 	"":"Number of threads to process clients connections.",
 	"af_server_sockets_processing_threads_num":10,
+		"":"Ten threads to process should be enough for any situation.",
+
+	"":"Number of threads to read/write clients connections.",
+	"af_server_sockets_readwrite_threads_num":10,
+		"":"Ten threads does not mean that server can handle only about 10 clients.",
+		"":"This only means that it can read/write to 10 clients at the same time.",
+		"":"Other clients will just wait in IO queue.",
+		"":"For a fast networks designed for rendering 10 IO threads should be enough for any farm size.",
 
 	"":"Server sockets processing stack size.",
-	"-af_server_sockets_readwrite_threads_stack":32768,
 	"-af_server_sockets_processing_threads_stack":32768,
+	"-af_server_sockets_readwrite_threads_stack":32768,
 		"":"Zero, negative value or no parameter means to use system default",
 
 	"":"You can use non-blocking IO on Linux server, based on Linux epoll facility",
 	"af_server_linux_epoll":0,
 		"":"If it is disabled (by default), Linux server will use blocking IO based on threads, like other platforms",
 
-	"":"Use -1 value not to set socket option at all",
+	"":"Server waits client close socket first. Web browsers do it, only if we ask it in HTTP header by special header",
+	"af_server_http_wait_close":1,
+		"":"If you browser ignores 'Connection: close' header, you can make server not to wait it.",
+
+	"":"Socket options that can be set to play with:",
 	"af_so_server_RCVTIMEO_sec":12,
 	"af_so_server_SNDTIMEO_sec":12,
 	"af_so_server_TCP_NODELAY":-1,
@@ -217,6 +227,8 @@
 	"af_so_client_REUSEADDR":-1,
 	"af_so_client_TCP_CORK":-1,
 	"af_so_client_LINGER":-1,
+		"":"Use -1 value not to set socket option at all",
+		"":"See man socket for details.",
 
 	"af_server_profiling_sec":1024,
 		"":"Server will output some network statistics by this period",
