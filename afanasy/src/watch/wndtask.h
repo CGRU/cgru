@@ -14,6 +14,7 @@ class QCloseEvent;
 class QContextMenuEvent;
 
 class ListTasks;
+class QAfTextWidget;
 
 /// This class designed to request and show any task information
 
@@ -56,7 +57,7 @@ protected:
 
 private:
 
-	void createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** o_te);
+	void createTab( const QString & i_name, QWidget ** o_tab, QAfTextWidget ** o_te);
 
 	bool show( af::MCTask & i_mctask);
 
@@ -104,10 +105,10 @@ private:
 	QWidget * m_tab_errhosts;
 	QWidget * m_tab_listen;
 
-	QTextEdit * m_log_te;
-	QTextEdit * m_errhosts_te;
-	QTextEdit * m_output_te;
-	QTextEdit * m_listen_te;
+	QAfTextWidget * m_log_te;
+	QAfTextWidget * m_errhosts_te;
+	QAfTextWidget * m_output_te;
+	QAfTextWidget * m_listen_te;
 
 	QWidget * m_tab_current;
 

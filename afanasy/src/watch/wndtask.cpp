@@ -10,8 +10,9 @@
 #include "../libafqt/name_afqt.h"
 
 #include "actionid.h"
-#include "monitorhost.h"
 #include "listtasks.h"
+#include "monitorhost.h"
+#include "qaftextwidget.h"
 #include "watch.h"
 
 #include <QtGui/QContextMenuEvent>
@@ -139,7 +140,7 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 //	slot_currentChanged(0);
 }
 
-void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** o_te)
+void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QAfTextWidget ** o_te)
 {
 	*o_tab = new QWidget( m_tab_widget);
 	m_tab_widget->addTab( *o_tab, i_name);
@@ -148,7 +149,7 @@ void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** 
 	{
 		QVBoxLayout * layout = new QVBoxLayout( *o_tab);
 
-		*o_te = new QTextEdit( *o_tab);
+		*o_te = new QAfTextWidget( *o_tab);
 		layout->addWidget( *o_te);
 		(*o_te)->setLineWrapMode( QTextEdit::NoWrap);
 		(*o_te)->setReadOnly( true);
