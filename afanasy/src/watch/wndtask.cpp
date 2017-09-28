@@ -12,6 +12,7 @@
 #include "actionid.h"
 #include "listtasks.h"
 #include "monitorhost.h"
+#include "buttondblclick.h"
 #include "qaftextwidget.h"
 #include "watch.h"
 
@@ -96,18 +97,17 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	//
 	QHBoxLayout * layoutB = new QHBoxLayout();
 	layout->addLayout( layoutB);
+	layoutB->setSpacing(4);
 
-	m_btn_skip = new QPushButton("Skip", this);
+	m_btn_skip = new ButtonDblClick("Skip", this);
 	layoutB->addWidget( m_btn_skip);
 	m_btn_skip->setEnabled( false);
-	m_btn_skip->setFixedWidth( 88);
-	connect( m_btn_skip, SIGNAL( pressed()), this, SLOT( slot_skip()));
+	connect( m_btn_skip, SIGNAL( sig_dblClicked()), this, SLOT( slot_skip()));
 
-	m_btn_restart = new QPushButton("Restart", this);
+	m_btn_restart = new ButtonDblClick("Restart", this);
 	layoutB->addWidget( m_btn_restart);
 	m_btn_restart->setEnabled( false);
-	m_btn_restart->setFixedWidth( 88);
-	connect( m_btn_restart, SIGNAL( pressed()), this, SLOT( slot_restart()));
+	connect( m_btn_restart, SIGNAL( sig_dblClicked()), this, SLOT( slot_restart()));
 
 	layoutB->addStretch();
 
@@ -294,17 +294,19 @@ void WndTask::updateProgress( const af::TaskProgress & i_progress)
 	//
 	// Update buttons state:
 	//
-	m_btn_skip->setEnabled( false);
-	m_btn_restart->setEnabled( false);
 
 	if( ( m_progress.state & AFJOB::STATE_READY_MASK ) ||
 		( m_progress.state & AFJOB::STATE_RUNNING_MASK ))
 		m_btn_skip->setEnabled( true);
+	else
+		m_btn_skip->setEnabled( false);
 
 	if( ( m_progress.state & AFJOB::STATE_RUNNING_MASK ) ||
 		( m_progress.state & AFJOB::STATE_DONE_MASK ) ||
 		( m_progress.state & AFJOB::STATE_ERROR_MASK ))
 		m_btn_restart->setEnabled( true);
+	else
+		m_btn_restart->setEnabled( false);
 
 	//
 	// Process outputs count:

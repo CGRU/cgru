@@ -13,6 +13,7 @@
 class QCloseEvent;
 class QContextMenuEvent;
 
+class ButtonDblClick;
 class ListTasks;
 class QAfTextWidget;
 
@@ -89,8 +90,8 @@ private:
 	af::TaskProgress m_progress;
 	QTextEdit * m_progress_te;
 
-	QPushButton * m_btn_skip;
-	QPushButton * m_btn_restart;
+	ButtonDblClick * m_btn_skip;
+	ButtonDblClick * m_btn_restart;
 	QPushButton * m_btn_output;
 
 	QMenu * m_output_menu;
