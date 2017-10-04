@@ -124,7 +124,9 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	//
 	m_tab_widget = new QTabWidget( this);
 	layout->addWidget( m_tab_widget);
-	//m_tab_widget->setTabsClosable( true);
+	QPushButton * refresh = new QPushButton("refresh");
+	m_tab_widget->setCornerWidget( refresh);
+	connect( refresh, SIGNAL( pressed()), this, SLOT( slot_refresh()));
 
 	createTab("Executable",  &m_tab_exec,      NULL          ); 
 	createTab("Output",      &m_tab_output,   &m_output_te   ); 
@@ -137,7 +139,6 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	connect( m_tab_widget, SIGNAL( currentChanged( int)), this, SLOT( slot_currentChanged( int)));
 
 	getTaskInfo("info");
-//	slot_currentChanged(0);
 }
 
 void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QAfTextWidget ** o_te)
@@ -189,15 +190,34 @@ void WndTask::slot_currentChanged( int i_index)
 	m_tab_current = tab;
 
 	if( m_tab_current == m_tab_output)
-		getTaskInfo("output", m_output_current);
+	{
+		if( m_output_te->isEmpty())
+			getTaskInfo("output", m_output_current);
+	}
 	else if( m_tab_current == m_tab_log)
-		getTaskInfo("log");
+	{
+		if( m_log_te->isEmpty())
+			getTaskInfo("log");
+	}
 	else if( m_tab_current == m_tab_errhosts)
-		getTaskInfo("error_hosts");
+	{
+		if( m_errhosts_te->isEmpty())
+			getTaskInfo("error_hosts");
+	}
 	else if( m_tab_current == m_tab_listen)
 		listen( true);
 //	else if( m_tab_current == m_tab_exec)
 //		getTaskInfo("info");
+}
+
+void WndTask::slot_refresh()
+{
+	m_output_te->clearText();
+	m_log_te->clearText();
+	m_errhosts_te->clearText();
+
+	m_tab_current = NULL;
+	slot_currentChanged( m_tab_widget->currentIndex());
 }
 
 void WndTask::getTaskInfo( const std::string & i_mode, int i_number) const

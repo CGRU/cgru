@@ -10,6 +10,7 @@
 
 QAfTextWidget::QAfTextWidget( QWidget * i_parent):
 	QWidget( i_parent),
+	m_empty( true),
 	m_find_opened( false)
 {
 	QVBoxLayout * layout = new QVBoxLayout( this);

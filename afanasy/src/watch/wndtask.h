@@ -81,6 +81,7 @@ private slots:
 	void slot_skip();
 	void slot_restart();
 	void slot_outputChanged( int i_index);
+	void slot_refresh();
 
 private:
 	ListTasks * m_parent;
