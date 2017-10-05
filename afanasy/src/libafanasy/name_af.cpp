@@ -309,7 +309,7 @@ void af::sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storag
 	{
 		const struct sockaddr_in6 * sa = (const struct sockaddr_in6*)(i_ss);
 		port = sa->sin6_port;
-		addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
+		addr_str = inet_ntop( AF_INET6, PVOID(&(sa->sin6_addr)), buffer, buffer_len);
 		break;
 	}
 	default:

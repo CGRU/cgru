@@ -162,4 +162,5 @@ Profiler::~Profiler(){}
 void Profiler::processingStarted(){}
 void Profiler::processingFinished(){}
 void Profiler::Collect( Profiler * i_prof){ delete i_prof;}
+void Profiler::Destroy(){}
 #endif
