@@ -301,7 +301,8 @@ bool SocketItem::processIO( int i_events)
 		AF_WARN << "EPOLL event on a closed socket item: " << this;
 		break;
 	case SSProcessing:
-		AF_WARN << "EPOLL event on processing socket item: " << this;
+		// This is not an error or even a warning.
+		// Event can be generated after all data was read from previous event.
 		break;
 	default:
 		AF_ERR << "EPOLL event on unknown socket item state: " << this;
