@@ -868,7 +868,7 @@ JobBlock.prototype.update = function( i_displayFull)
 		this.elDepends.innerHTML = deps;
 
 		//
-		// Errros solving:
+		// Errors solving:
 		var eah = -1, eth = -1, ert = -1;
 		if( this.params.errors_avoid_host ) eah = this.params.errors_avoid_host;
 		if( this.params.errors_task_same_host) eth = this.params.errors_task_same_host;
@@ -1125,7 +1125,7 @@ JobBlock.prototype.update = function( i_displayFull)
 			else this.elTasksWrn.textContent = '';
 
 			if( this.params.p_tasks_waitrec )
-				this.elTasksWrc.innerHTML = 'WaintingReconnect:<b>'+this.params.p_tasks_waitrec + '</b>';
+				this.elTasksWrc.innerHTML = 'WaitingReconnect:<b>'+this.params.p_tasks_waitrec + '</b>';
 			else this.elTasksWrc.textContent = '';
 
 			var he_txt = '';
@@ -1213,7 +1213,7 @@ JobBlock.prototype.update = function( i_displayFull)
 		}
 
 		// Show/Hire error hosts counter as it has a special style.
-		// And set an empty string (like on other counters) is not anough.
+		// And set an empty string (like on other counters) is not enough.
 		if( tasks_err )
 			this.elTasksErr.style.display = 'inline';
 		else
@@ -1502,7 +1502,7 @@ JobNode.createPanels = function( i_monitor)
 	}
 
 	var el = elCaption;
-	el.title = 'Click to edit all paramters.';
+	el.title = 'Click to edit all parameters.';
 	el.m_elBlocks = elPanelR.m_elBlocks;
 	el.onclick = function(e){
 		var el = e.currentTarget;
@@ -1560,7 +1560,7 @@ JobNode.params = {};
 JobNode.params.priority =                   {"type":'num', "label":'Priority'};
 JobNode.params.depend_mask =                {"type":'reg', "label":'Depend Mask'};
 JobNode.params.depend_mask_global =         {"type":'reg', "label":'Global Depend Mask'};
-JobNode.params.max_running_tasks =          {"type":'num', "label":'Max Runnig Tasks'};
+JobNode.params.max_running_tasks =          {"type":'num', "label":'Max Running Tasks'};
 JobNode.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
 JobNode.params.hosts_mask =                 {"type":'reg', "label":'Hosts Mask'};
 JobNode.params.hosts_mask_exclude =         {"type":'reg', "label":'Exclude Hosts Mask'};
@@ -1581,7 +1581,7 @@ JobNode.view_opts.jobs_thumbs_height = {"type":'num',"label":"THE","tooltip":'Th
 JobBlock.params = {};
 JobBlock.params.capacity                   = {"type":'num', "label":'Capacity'};
 JobBlock.params.sequential                 = {"type":'num', "label":'Sequential'};
-JobBlock.params.max_running_tasks          = {"type":'num', "label":'Max Runnig Tasks'};
+JobBlock.params.max_running_tasks          = {"type":'num', "label":'Max Running Tasks'};
 JobBlock.params.max_running_tasks_per_host = {"type":'num', "label":'Max Run Tasks Per Host'};
 JobBlock.params.errors_retries             = {"type":'num', "label":'Errors Retries'};
 JobBlock.params.errors_avoid_host          = {"type":'num', "label":'Errors Avoid Host'};

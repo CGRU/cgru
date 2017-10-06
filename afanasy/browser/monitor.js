@@ -95,7 +95,7 @@ function Monitor( i_args)
 	this.elPanelR.m_elParams = el;
 	this.elPanelR.m_elParams.m_elPMap = {};
 	el.classList.add('section');
-	// Show raw JSON onject:
+	// Show raw JSON object:
 	this.createCtrlBtn({"name":'obj',"label":'OBJ',"tooltip":'Show object.',
 		"handle":'showObject','elParent':this.elPanelR.m_elParams,'always_active':true});
 	// Label:
@@ -103,7 +103,7 @@ function Monitor( i_args)
 	this.elPanelR.m_elParams.appendChild( el);
 	el.textContent = 'Parameters';
 	el.classList.add('caption');
-	el.title = 'Click to edit all paramters.';
+	el.title = 'Click to edit all parameters.';
 	el.m_elParams = this.elPanelR.m_elParams;
 	el.onclick = function(e){
 		var el = e.currentTarget;
