@@ -18,9 +18,11 @@ popd > /dev/null
 options=""
 sql="REQUIRED"
 gui="YES"
+fermer="YES"
 for arg in "$@"; do
 	[ $arg == "--nosql" ] && sql="NO" && shift
 	[ $arg == "--nogui" ] && gui="NO" && shift
+	[ $arg == "--nofermer" ] && fermer="NO" && shift
 	[ $arg == "--debug" ] && debug="-g" && shift
 done
 
@@ -29,6 +31,7 @@ export AF_POSTGRESQL=$sql
 
 # Configure GUI:
 export AF_GUI=$gui
+export AF_FERMER=$fermer
 export AF_QT_VER="4"
 
 # Configure building:

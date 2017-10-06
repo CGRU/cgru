@@ -10,8 +10,10 @@
 #include "../libafqt/name_afqt.h"
 
 #include "actionid.h"
-#include "monitorhost.h"
 #include "listtasks.h"
+#include "monitorhost.h"
+#include "buttondblclick.h"
+#include "qaftextwidget.h"
 #include "watch.h"
 
 #include <QtGui/QContextMenuEvent>
@@ -95,18 +97,17 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	//
 	QHBoxLayout * layoutB = new QHBoxLayout();
 	layout->addLayout( layoutB);
+	layoutB->setSpacing(4);
 
-	m_btn_skip = new QPushButton("Skip", this);
+	m_btn_skip = new ButtonDblClick("Skip", this);
 	layoutB->addWidget( m_btn_skip);
 	m_btn_skip->setEnabled( false);
-	m_btn_skip->setFixedWidth( 88);
-	connect( m_btn_skip, SIGNAL( pressed()), this, SLOT( slot_skip()));
+	connect( m_btn_skip, SIGNAL( sig_dblClicked()), this, SLOT( slot_skip()));
 
-	m_btn_restart = new QPushButton("Restart", this);
+	m_btn_restart = new ButtonDblClick("Restart", this);
 	layoutB->addWidget( m_btn_restart);
 	m_btn_restart->setEnabled( false);
-	m_btn_restart->setFixedWidth( 88);
-	connect( m_btn_restart, SIGNAL( pressed()), this, SLOT( slot_restart()));
+	connect( m_btn_restart, SIGNAL( sig_dblClicked()), this, SLOT( slot_restart()));
 
 	layoutB->addStretch();
 
@@ -123,7 +124,9 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	//
 	m_tab_widget = new QTabWidget( this);
 	layout->addWidget( m_tab_widget);
-	//m_tab_widget->setTabsClosable( true);
+	QPushButton * refresh = new QPushButton("refresh");
+	m_tab_widget->setCornerWidget( refresh);
+	connect( refresh, SIGNAL( pressed()), this, SLOT( slot_refresh()));
 
 	createTab("Executable",  &m_tab_exec,      NULL          ); 
 	createTab("Output",      &m_tab_output,   &m_output_te   ); 
@@ -136,10 +139,9 @@ WndTask::WndTask( const af::MCTaskPos & i_tp, ListTasks * i_parent):
 	connect( m_tab_widget, SIGNAL( currentChanged( int)), this, SLOT( slot_currentChanged( int)));
 
 	getTaskInfo("info");
-//	slot_currentChanged(0);
 }
 
-void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** o_te)
+void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QAfTextWidget ** o_te)
 {
 	*o_tab = new QWidget( m_tab_widget);
 	m_tab_widget->addTab( *o_tab, i_name);
@@ -148,7 +150,7 @@ void WndTask::createTab( const QString & i_name, QWidget ** o_tab, QTextEdit ** 
 	{
 		QVBoxLayout * layout = new QVBoxLayout( *o_tab);
 
-		*o_te = new QTextEdit( *o_tab);
+		*o_te = new QAfTextWidget( *o_tab);
 		layout->addWidget( *o_te);
 		(*o_te)->setLineWrapMode( QTextEdit::NoWrap);
 		(*o_te)->setReadOnly( true);
@@ -188,15 +190,34 @@ void WndTask::slot_currentChanged( int i_index)
 	m_tab_current = tab;
 
 	if( m_tab_current == m_tab_output)
-		getTaskInfo("output", m_output_current);
+	{
+		if( m_output_te->isEmpty())
+			getTaskInfo("output", m_output_current);
+	}
 	else if( m_tab_current == m_tab_log)
-		getTaskInfo("log");
+	{
+		if( m_log_te->isEmpty())
+			getTaskInfo("log");
+	}
 	else if( m_tab_current == m_tab_errhosts)
-		getTaskInfo("error_hosts");
+	{
+		if( m_errhosts_te->isEmpty())
+			getTaskInfo("error_hosts");
+	}
 	else if( m_tab_current == m_tab_listen)
 		listen( true);
 //	else if( m_tab_current == m_tab_exec)
 //		getTaskInfo("info");
+}
+
+void WndTask::slot_refresh()
+{
+	m_output_te->clearText();
+	m_log_te->clearText();
+	m_errhosts_te->clearText();
+
+	m_tab_current = NULL;
+	slot_currentChanged( m_tab_widget->currentIndex());
 }
 
 void WndTask::getTaskInfo( const std::string & i_mode, int i_number) const
@@ -293,17 +314,19 @@ void WndTask::updateProgress( const af::TaskProgress & i_progress)
 	//
 	// Update buttons state:
 	//
-	m_btn_skip->setEnabled( false);
-	m_btn_restart->setEnabled( false);
 
 	if( ( m_progress.state & AFJOB::STATE_READY_MASK ) ||
 		( m_progress.state & AFJOB::STATE_RUNNING_MASK ))
 		m_btn_skip->setEnabled( true);
+	else
+		m_btn_skip->setEnabled( false);
 
 	if( ( m_progress.state & AFJOB::STATE_RUNNING_MASK ) ||
 		( m_progress.state & AFJOB::STATE_DONE_MASK ) ||
 		( m_progress.state & AFJOB::STATE_ERROR_MASK ))
 		m_btn_restart->setEnabled( true);
+	else
+		m_btn_restart->setEnabled( false);
 
 	//
 	// Process outputs count:

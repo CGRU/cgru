@@ -101,6 +101,10 @@ int Environment::server_sockets_readwrite_threads_stack  = AFSERVER::SOCKETS_REA
 int Environment::server_sockets_processing_threads_num   = AFSERVER::SOCKETS_PROCESSING_THREADS_NUM;
 int Environment::server_sockets_processing_threads_stack = AFSERVER::SOCKETS_PROCESSING_THREADS_STACK;
 
+int Environment::server_linux_epoll      = AFSERVER::LINUX_EPOLL;
+int Environment::server_http_wait_close  = AFSERVER::HTTP_WAIT_CLOSE;
+int Environment::server_profiling_sec    = AFSERVER::PROFILING_SEC;
+
 /// Socket Options:
 int Environment::so_server_LINGER       = AFNETWORK::SO_SERVER_LINGER;
 int Environment::so_server_REUSEADDR    = AFNETWORK::SO_SERVER_REUSEADDR;
@@ -223,6 +227,10 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, server_sockets_readwrite_threads_stack,  "af_server_sockets_readwrite_threads_stack"  );
 	getVar( i_obj, server_sockets_processing_threads_num,   "af_server_sockets_processing_threads_num"   );
 	getVar( i_obj, server_sockets_processing_threads_stack, "af_server_sockets_processing_threads_stack" );
+
+	getVar( i_obj, server_linux_epoll,                "af_server_linux_epoll"                );
+	getVar( i_obj, server_http_wait_close,            "af_server_http_wait_close"            );
+	getVar( i_obj, server_profiling_sec,              "af_server_profiling_sec"              );
 
 	/// Socket Options:
 	getVar( i_obj, so_server_LINGER,                  "af_so_server_LINGER"                  );

@@ -163,10 +163,9 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 				i_args->rupQueue->pushUp( rup);
 				return o_msg_response;
 			}
-
 		}
-		else
-			delete rup;
+
+		delete rup;
 
 		break;
 	}

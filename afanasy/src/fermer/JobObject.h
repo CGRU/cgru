@@ -6,13 +6,12 @@
 
 #include <QStringList>
 
-
 class JobObject
 {
 public:
 
     AFERMER_TYPEDEF_SMART_PTRS(JobObject);
-    AFERMER_DEFINE_CREATE_FUNC_23_ARGS(JobObject, const QString&,
+    AFERMER_DEFINE_CREATE_FUNC_24_ARGS(JobObject, const QString&,
                   JobState::State,
                   const QString &
                   ,int
@@ -34,8 +33,8 @@ public:
                   ,const QString&
                   ,const QString&
                   ,int
-                  ,const std::string&);
-
+                  ,const std::string&
+                  ,int);
       JobObject(   const QString &user_name
                   ,JobState::State status
                   ,const QString &time_creation
@@ -59,6 +58,7 @@ public:
                   ,const QString &user_color
                   ,int errors_avoid_blades
                   ,const std::string& json_represent
+                  ,int elapsed_time_int
             ) :
           m_user_name(user_name)
         , m_status(status)
@@ -84,6 +84,7 @@ public:
         , m_errors_avoid_blades(errors_avoid_blades)
         , m_json_represent(json_represent)
         , m_expand(false)
+        , m_elapsed_time_int(elapsed_time_int)
 {m_selected=0;m_notify_showed=false;}
 
 
@@ -101,6 +102,9 @@ public:
     int blades_length() const;
     QString depends() const;
     std::string repr() const;
+    int elapsed_time_int() const;
+    QString annotation() const;
+
     void update(const QString &user_name
                   ,JobState::State status
                   ,const QString &time_creation
@@ -123,7 +127,10 @@ public:
                   ,const QString &depends
                   ,const QString &user_color
                   ,int errors_avoid_blades
-                  ,const std::string& json_represent);
+                  ,const std::string& json_represent
+                  ,int elapsed_time_int
+                  ,const QString &annotation
+            );
 
 
 
@@ -163,6 +170,10 @@ public:
     bool m_expand;
     std::string m_json_represent;
     std::string information;
+    int m_elapsed_time_int;
+    QString m_annotation;
+
+    QMap<QString, QString> m_resource_map;
 };
 
 
@@ -178,5 +189,4 @@ struct JobTimeApproximationManager
     JobTimeApproximationManager(int p, int t): m_progress(p), m_time(t) {}
     
 };
-
 

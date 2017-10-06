@@ -1,16 +1,17 @@
 #pragma once
 
+#include "Managers/JobObjectsManager.h"
+
+#include "state.hpp"
 #include <time.h>
 #include "common.h"
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "JobObject.h"
-#include "Managers/JobObjectsManager.h"
-
 #include <QAbstractListModel>
 #include <QStringList>
+#include "JobObject.h"
 
 namespace afermer
 {
@@ -24,6 +25,7 @@ class JobsModel : public QAbstractListModel
 public:
     enum JobsRoles {
         StateRole,
+        AnnotationRole,
         ProgressRole,
         ElapsedRole,
         UserNameRole,
@@ -77,19 +79,39 @@ public:
     Q_INVOKABLE void restartJob();
     Q_INVOKABLE QString jobLog();
     Q_INVOKABLE void setPriority(int);
-    Q_INVOKABLE void restartJobErrors();
+    Q_INVOKABLE void jobRestarErrorsTasks();
+    Q_INVOKABLE void jobRestartRunningTasks();
+    Q_INVOKABLE void jobRestartSkippedTasks();
+    Q_INVOKABLE void jobRestartDoneTasks();
     Q_INVOKABLE QString jobShowErrorBlades();
     Q_INVOKABLE QString jobOpenOutputFolder();
     Q_INVOKABLE QString jobGetOutputFolder();
-    Q_INVOKABLE void jobRestartRunning();
-    Q_INVOKABLE void jobRestartSkipped();
-    Q_INVOKABLE void jobRestartDone();
     Q_INVOKABLE void jobResetErrorHosts();
     Q_INVOKABLE void jobRestartPause();
     Q_INVOKABLE QString getBladeMask();
     Q_INVOKABLE void setBladeMask(const QString&);
     Q_INVOKABLE void setBladeMaskExclude(const QString&);
+    Q_INVOKABLE void setJobDependMask(const QString& i_value);
+    Q_INVOKABLE void setJobSetAnnotation(const QString& i_value);
+    Q_INVOKABLE void setJobWaitTime(const QString& i_value);
+    Q_INVOKABLE void setJobOS(const QString& i_value);
+    Q_INVOKABLE void setJobPostCommand(const QString& i_value);
+    Q_INVOKABLE void setJobLifeTime(int);
+    Q_INVOKABLE void setTasksErrorRetries(int);
+    Q_INVOKABLE void setErrorAvoidBlade(int);
+    Q_INVOKABLE void setTaskMaxRunTime(int);
+    Q_INVOKABLE void setTasksErrorForgiveTime(int);
+    Q_INVOKABLE void setTasksRunningMax(int);
+    Q_INVOKABLE void setTasksRunningPerBlades(int);
+    Q_INVOKABLE void setJobSlots(int);
+    Q_INVOKABLE void setJobNeedMemory(int);
+    Q_INVOKABLE void setJobNeedHDD(int);
+    Q_INVOKABLE QString getJobInfo(const QString&);
     Q_INVOKABLE void passUpdate();
+
+    Q_INVOKABLE int     getCurrentItemProgress();
+    Q_INVOKABLE QString getCurrentItemName();
+    Q_INVOKABLE JobState::State getCurrentItemState();
 
     Q_INVOKABLE void multiSorting(int);
     Q_INVOKABLE void sortingChangeState();

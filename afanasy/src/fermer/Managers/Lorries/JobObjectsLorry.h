@@ -40,7 +40,11 @@ struct JobObjectsLorry
                   ,const QString &output_folder
                   ,const QString &user_color
                   ,int errors_avoid_blades
-                  ,const std::string& json_represent);
+                  ,const std::string& json_represent
+                  ,int elapsed_time_int
+                  ,const QString &annotation
+            );
+    
     JobObjectPtrIt find(int);
     JobObjectPtrIt find(const QString&);
 

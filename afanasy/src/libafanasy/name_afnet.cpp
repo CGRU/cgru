@@ -255,7 +255,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 		AFERRAR("af::msgsendtoaddress: can't send message to client: %s",
 				i_address.v_generateInfoString().c_str())
 
-		af::socketDisconnect( socketfd);
+		closesocket( socketfd);
 
 		o_ok = false;
 		return NULL;
@@ -293,7 +293,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 			o_ok = false;
 		}
 
-		af::socketDisconnect( socketfd);
+		closesocket( socketfd);
 		return o_msg;
 	}
 
@@ -303,13 +303,13 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
 	if( false == af::msgread( socketfd, o_msg))
 	{
 	   AFERROR("msgsendtoaddress: Reading binary answer failed.")
-		af::socketDisconnect( socketfd);
+		closesocket( socketfd);
 	   delete o_msg;
 	   o_ok = false;
 	   return NULL;
 	}
 
-	af::socketDisconnect( socketfd);
+	closesocket( socketfd);
 
 	return o_msg;
 }
@@ -515,30 +515,32 @@ AFINFO("af::msgread:\n");
 	return true;
 }
 
-bool af::msgwrite( int i_desc, const af::Msg * i_msg)
+char * af::msgMakeWriteHeader( const af::Msg * i_msg)
 {
+	char * buffer = NULL;
+
 	if( i_msg->type() == af::Msg::THTTP )
 	{
-		char buffer[1024];
+		buffer = new char[512];
 		sprintf( buffer, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: %d\r\n\r\n",
-			i_msg->writeSize() - i_msg->getHeaderOffset());
-		//printf("%s\n", buffer);
-		::writedata( i_desc, buffer, strlen( buffer));
-/*
-		::writedata( i_desc, "HTTP/1.1 200 OK\r\n", 17);
-		::writedata( i_desc, "Content-Type: application/json\r\n", 32);
-//		                      1234567890123456789012345678901234567890
-//		                      0         1         2         3
-		::writedata( i_desc, "\r\n", 2);
-*/
+				i_msg->writeSize() - i_msg->getHeaderOffset());
 	}
 	else if( i_msg->type() == af::Msg::TJSON )
 	{
-		char buffer[1024];
-		sprintf( buffer, "AFANASY %d JSON",
-			i_msg->writeSize() - i_msg->getHeaderOffset());
-		//printf("%s\n", buffer);
+		buffer = new char[128];
+		sprintf( buffer, "AFANASY %d JSON", i_msg->writeSize() - i_msg->getHeaderOffset());
+	}
+
+	return buffer;
+}
+
+bool af::msgwrite( int i_desc, const af::Msg * i_msg)
+{
+	char * buffer = af::msgMakeWriteHeader( i_msg);
+	if( NULL != buffer )
+	{
 		::writedata( i_desc, buffer, strlen( buffer));
+		delete buffer;
 	}
 
 	if( false == ::writedata( i_desc, i_msg->buffer() + i_msg->getHeaderOffset(), i_msg->writeSize() - i_msg->getHeaderOffset() ))
@@ -555,39 +557,6 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 af::Msg * af::sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose )
 {
 	return ::msgsendtoaddress( i_msg, af::Environment::getServerAddress(), o_ok, i_verbose);
-}
-
-void af::socketDisconnect( int i_sd, uint32_t i_response_type)
-{
-//	if(0)
-	if( af::Environment::isServer() && 
-		( i_response_type  > 0 ) &&
-		( i_response_type != af::Msg::THTTP ) &&
-		( i_response_type != af::Msg::THTTPGET ))
-	{
-		// Server waits client have closed socket first:
-		char buf[256];
-		int r = 1;
-		//printf("Server socket wait...\n");
-		while( r > 0 )
-		{
-			#ifdef WINNT
-			r = recv( i_sd, buf, af::Msg::SizeHeader, 0);
-			#else
-			r = read( i_sd, buf, af::Msg::SizeHeader);
-			#endif
-		/*	if( r > 0 )
-			{
-				printf("Server socket wait: %d\n", r);
-				int n = write( 1, buf, r);
-				printf("\n\n");
-			}*/
-		}
-		//printf("Server socket closed.\n");
-	}
-	//else{ printf("closing socket w/0 waiting other side %s.\n", af::Msg::TNAMES[i_response_type]); }
-
-	closesocket( i_sd);
 }
 
 af::Msg * af::msgString( const std::string & i_str)

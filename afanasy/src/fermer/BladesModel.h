@@ -4,7 +4,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "Managers/BladeObjectsManager.h"
-
 #include <QAbstractListModel>
 #include <QStringList>
 

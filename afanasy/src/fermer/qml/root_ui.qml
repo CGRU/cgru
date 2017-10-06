@@ -39,7 +39,7 @@
 ****************************************************************************/
 
 import QtQuick 2.7
-import QtQuick.Controls 1.0
+import QtQuick.Controls 1.4
 import QtGraphicalEffects 1.0
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
@@ -161,6 +161,9 @@ Item {
     property bool swap_jobs_name: false
     property bool show_all_jobs: false
     property bool expand_jobs_goups: false
+    property int selcted_id
+    property var job_state
+    property real mult_size: 1.0
 
     property string python_output: "empty"
 
@@ -206,28 +209,33 @@ Item {
     function timeChanged()  {
         if (General.serverExist()){
             if (update_state==0){
-                if (jobs_ListView.currentIndex!=-1){
+                selcted_id=JobsModel.getSelectedIds()[0]
+                if (selcted_id!=0){
                     JobsModel.updateInteraction(filtered_text)
                     JobsModel.setShowAllJobs(show_all_jobs)
                     //console.log("gg "+JobsModel.areJobsDone().length)
+
+                    //console.log("selcted_id "+selcted_id)
                     if (root.side_state=="Tasks"){
-                        TasksModel.updateTasksByJobID(jobs_ListView.currentItem.v_job_id)
+                        TasksModel.updateTasksByJobID(selcted_id)
                     }
                     //--- Title State Info
-                    window_root.title=jobs_ListView.currentItem.v_progress+"%"+" - "+jobs_ListView.currentItem.v_block_name+"  ::  AFermer  ::  Render Manager"
+                    window_root.title=JobsModel.getCurrentItemProgress()+"%"+" - "+JobsModel.getCurrentItemName()+"  ::  AFermer  ::  Render Manager"
 
-                    if (JobState.OFFLINE==jobs_ListView.currentItem.v_state){
+                    job_state=JobsModel.getCurrentItemState()
+                    if (JobState.OFFLINE==job_state){
                         window_root.title="Stop  ::  AFermer  ::  Render Manager"
                     }
-                    if (JobState.ERROR==jobs_ListView.currentItem.v_state){
+                    if (JobState.ERROR==job_state){
                         window_root.title="Error  ::  AFermer  ::  Render Manager"
                     }
-                    if (JobState.READY==jobs_ListView.currentItem.v_state){
+                    if (JobState.READY==job_state){
                         window_root.title="Waiting  ::  AFermer  ::  Render Manager"
                     }
+                    //-------------------------------------
                 }
                 else{
-                    window_root.title="No Jobs"
+                    window_root.title="No Jobs Selected"
                 }
             }
             if (update_state==1){
@@ -427,7 +435,6 @@ Item {
                         text: "99"
                         opacity: 0.9
                         selectByMouse: true
-                        inputMethodHints:Qt.ImhDigitsOnly
 
                         color: "white"
                         Keys.onReturnPressed: {
@@ -479,7 +486,6 @@ Item {
                         text: "99"
                         opacity: 0.9
                         selectByMouse: true
-                        inputMethodHints:Qt.ImhDigitsOnly
 
                         color: "white"
                         Keys.onReturnPressed: {
@@ -517,7 +523,772 @@ Item {
                         }
                     }
                 }
+                InputDialog {
+                    id: popJobSetDependMask
+                    title: "Set Depend Mask"
 
+                    TextInput {
+                        id: set_depend_mask_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetDependMask.close();
+                            JobsModel.setJobDependMask(set_depend_mask_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetDependMask.close();
+                                JobsModel.setJobDependMask(set_depend_mask_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetErrorAvoidBlade
+                    title: "Set Error Avoid Blade"
+
+                    TextInput {
+                        id: set_error_avoid_blade_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetErrorAvoidBlade.close();
+                            JobsModel.setErrorAvoidBlade(set_error_avoid_blade_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetErrorAvoidBlade.close();
+                                JobsModel.setErrorAvoidBlade(set_error_avoid_blade_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetErrorRetries
+                    title: "Set Error Retries"
+
+                    TextInput {
+                        id: set_error_retries_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetErrorRetries.close();
+                            JobsModel.setTasksErrorRetries(set_error_retries_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetErrorRetries.close();
+                                JobsModel.setTasksErrorRetries(set_error_retries_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetErrorForgiveTime
+                    title: "Set Error Forgive Time"
+
+                    TextInput {
+                        id: set_error_forgive_time_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetErrorForgiveTime.close();
+                            JobsModel.setTasksErrorForgiveTime(set_error_forgive_time_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetErrorForgiveTime.close();
+                                JobsModel.setTasksErrorForgiveTime(set_error_forgive_time_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetMaxRunTime
+                    title: "Set Tasks Max Run Time"
+
+                    TextInput {
+                        id: set_max_run_time_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetMaxRunTime.close();
+                            JobsModel.setTaskMaxRunTime(set_max_run_time_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetMaxRunTime.close();
+                                JobsModel.setTaskMaxRunTime(set_max_run_time_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+
+                InputDialog {
+                    id: popJobSetMaxRunningTask
+                    title: "Set Max Running Tasks"
+
+                    TextInput {
+                        id: set_max_running_task_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetMaxRunningTask.close();
+                            JobsModel.setTasksRunningMax(set_max_running_task_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetMaxRunningTask.close();
+                                JobsModel.setTasksRunningMax(set_max_running_task_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetMaxRunningTaskPerBlade
+                    title: "Set Max Running Task Per Blade"
+
+                    TextInput {
+                        id: set_max_running_task_per_blade_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetMaxRunningTaskPerBlade.close();
+                            JobsModel.setTasksRunningPerBlades(set_max_running_task_per_blade_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetMaxRunningTaskPerBlade.close();
+                                JobsModel.setTasksRunningPerBlades(set_max_running_task_per_blade_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetSlots
+                    title: "Set Slots"
+
+                    TextInput {
+                        id: set_slots_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetSlots.close();
+                            JobsModel.setJobSlots(set_slots_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetSlots.close();
+                                JobsModel.setJobSlots(set_slots_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetLifeTime
+                    title: "Set Life Time"
+
+                    TextInput {
+                        id: set_life_time_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetLifeTime.close();
+                            JobsModel.setJobLifeTime(set_life_time_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetLifeTime.close();
+                                JobsModel.setJobLifeTime(set_life_time_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetWaitTime
+                    title: "Set Wait Time"
+
+                    TextInput {
+                        id: set_wait_time_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetLifeTime.close();
+                            JobsModel.setJobWaitTime(set_wait_time_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetWaitTime.close();
+                                JobsModel.setJobWaitTime(set_wait_time_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetAnnotation
+                    title: "Set Annotation"
+
+                    TextInput {
+                        id: set_annotation_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetAnnotation.close();
+                            JobsModel.setJobSetAnnotation(set_annotation_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetAnnotation.close();
+                                JobsModel.setJobSetAnnotation(set_annotation_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetOS
+                    title: "Set OS Needed"
+
+                    TextInput {
+                        id: set_os_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetOS.close();
+                            JobsModel.setJobOS(set_os_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetOS.close();
+                                JobsModel.setJobOS(set_os_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetMemory
+                    title: "Set Need Memory"
+
+                    TextInput {
+                        id: set_memory_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetMemory.close();
+                            JobsModel.setJobNeedMemory(set_memory_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetMemory.close();
+                                JobsModel.setJobNeedMemory(set_memory_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetHDD
+                    title: "Set Need HDD"
+
+                    TextInput {
+                        id: set_hdd_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetHDD.close();
+                            JobsModel.setJobNeedHDD(set_hdd_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetHDD.close();
+                                JobsModel.setJobNeedHDD(set_hdd_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popJobSetPostCommand
+                    title: "Set Post Command"
+
+                    TextInput {
+                        id: set_post_command_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popJobSetPostCommand.close();
+                            JobsModel.setJobPostCommand(set_post_command_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popJobSetPostCommand.close();
+                                JobsModel.setJobPostCommand(set_post_command_input_dialog.text)
+                            }
+                        }
+                    }
+                }
                 InfoDialog {
                     id: popJobFolderIsNotExistDialog
                     title: "Folder Is Not Exist"
@@ -660,6 +1431,63 @@ Item {
                         }
                     }
                 }
+                InputDialog {
+                    id: popBladeSetMaxTasks
+                    title: "Set Max Tasks"
+
+                    TextInput {
+                        id: set_max_tasks_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+
+                        Keys.onReturnPressed: {
+                            popBladeSetMaxTasks.close();
+                            BladesModel.actMaxTasks(blades_ListView.currentItem.v_blade_id,set_max_tasks_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popBladeSetMaxTasks.close();
+                                BladesModel.actMaxTasks(blades_ListView.currentItem.v_blade_id,set_max_tasks_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InfoDialog {
+                    id: popBladeLogDialog
+                    title: "Blade Log"
+                }
                 BladeContextMenu{
                     id: blade_context_menu
                 }
@@ -751,6 +1579,218 @@ Item {
                         UsersModel.setUserColor(users_ListView.currentItem.v_user_name,color_dialog.color)
                     }
                 }
+                InfoDialog {
+                    id: popUserLogDialog
+                    title: "User Log"
+                }
+                InputDialog {
+                    id: popUserSetPriority
+                    title: "Set Priority"
+
+                    TextInput {
+                        id: set_user_priority_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popUserSetPriority.close();
+                            UsersModel.setPriority(set_user_priority_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popUserSetPriority.close();
+                                UsersModel.setPriority(set_user_priority_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popUserMaxRunningTasks
+                    title: "Set Max Running Tasks"
+
+                    TextInput {
+                        id: set_user_max_running_tasks_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popUserMaxRunningTasks.close();
+                            UsersModel.setMaxRunningTask(set_user_max_running_tasks_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popUserMaxRunningTasks.close();
+                                UsersModel.setMaxRunningTask(set_user_max_running_tasks_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popUserBladesMask
+                    title: "Set Blades Mask"
+
+                    TextInput {
+                        id: set_user_blades_mask_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popUserBladesMask.close();
+                            UsersModel.setBladeMask(set_user_blades_mask_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popUserBladesMask.close();
+                                UsersModel.setBladeMask(set_user_blades_mask_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
+                InputDialog {
+                    id: popUserBladesMaskExlude
+                    title: "Set Exlude Blades Mask"
+
+                    TextInput {
+                        id: set_user_exlude_blades_mask_text_input_dialog
+                        anchors.top: parent.top
+                        anchors.topMargin: 28
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width*0.85
+                        height: 20
+                        text: "99"
+                        opacity: 0.9
+                        selectByMouse: true
+                        inputMethodHints:Qt.ImhDigitsOnly
+
+                        color: "white"
+                        Keys.onReturnPressed: {
+                            popUserBladesMaskExlude.close();
+                            UsersModel.setBladeExcludeMask(set_user_exlude_blades_mask_text_input_dialog.text)
+                        }
+                    }
+                    Rectangle {
+                        height: 25
+                        width:59
+                        color: "#374a52"
+
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.horizontalCenter
+                        anchors.leftMargin: 10
+                        anchors.bottomMargin: 10
+                        opacity:0.85
+                        layer.enabled: true
+                        layer.effect: DropShadow {
+                        transparentBorder: true
+                        samples: 12
+                        radius:4
+                        }
+                        Text {
+                            text: "Ok"
+                            anchors.centerIn: parent
+                            color: "white"
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                popUserBladesMaskExlude.close();
+                                UsersModel.setBladeExcludeMask(set_user_exlude_blades_mask_text_input_dialog.text)
+                            }
+                        }
+                    }
+                }
             }
 
             MetricsView{
@@ -768,7 +1808,9 @@ Item {
                 id:terminal_view
 
                 width: parent.width
-                height: parent.height
+                height: parent.height-5
+                anchors.top:parent.top
+                anchors.topMargin: 5
                 anchors.left: parent.left
                 anchors.leftMargin: 5
                 anchors.right: parent.right
@@ -908,6 +1950,57 @@ Item {
         }
     }
 
+
+    InputDialog {
+        title: "popSizeMultDialog"
+        id: size_mult_dialog
+
+        TextInput {
+            id: set_size_mult_input_dialog
+            anchors.top: parent.top
+            anchors.topMargin: 28
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width*0.85
+            height: 20
+            text: "99"
+            opacity: 0.9
+            selectByMouse: true
+
+            color: "white"
+            Keys.onReturnPressed: {
+                root.mult_size=set_size_mult_input_dialog.text
+            }
+        }
+        Rectangle {
+            height: 25
+            width:59
+            color: "#374a52"
+
+            anchors.bottom: parent.bottom
+            anchors.left: parent.horizontalCenter
+            anchors.leftMargin: 10
+            anchors.bottomMargin: 10
+            opacity:0.85
+            layer.enabled: true
+            layer.effect: DropShadow {
+            transparentBorder: true
+            samples: 12
+            radius:4
+            }
+            Text {
+                text: "Ok"
+                anchors.centerIn: parent
+                color: "white"
+            }
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    root.mult_size=set_size_mult_input_dialog.text
+                }
+            }
+        }
+    }
+
     Menu {
        id: main_contextMenu
        title: "More Stuff"
@@ -989,6 +2082,14 @@ Item {
                expand_jobs_goups=swap_jobs_names_menuitem.checked
            }
        }
+       MenuItem {
+           id: size_multiplier_menuitem
+           text: "Size Multiplier (not impl.)"
+           onTriggered:{
+                set_size_mult_input_dialog.text=root.mult_size
+                size_mult_dialog.show()
+           }
+       }
        MenuSeparator { }
        MenuItem {
            id: notif_my_jobs_complete_menuitem
@@ -1012,6 +2113,7 @@ Item {
            }
        }
        MenuSeparator { }
+       /*
        MenuItem {
            checkable: true
            text: "Show Afanasy Jobs (not impl.)"
@@ -1028,7 +2130,7 @@ Item {
            checkable: true
            text: "Show Qube Blades (not impl.)"
        }
-       MenuSeparator { }
+       MenuSeparator { }*/
        MenuItem {
            text: "Help (not impl.)"
        }
@@ -1038,6 +2140,6 @@ Item {
                popAboutDialog.show()
            }
        }
-       
+
     }
 }

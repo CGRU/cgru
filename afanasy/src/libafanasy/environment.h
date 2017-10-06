@@ -171,6 +171,12 @@ public:
 	static inline int getServerSocketsProcessingThreadsNum()   { return server_sockets_processing_threads_num;   }
 	static inline int getServerSocketsProcessingThreadsStack() { return server_sockets_processing_threads_stack; }
 
+	static inline int getServerLinuxEpoll() { return server_linux_epoll; }
+
+	static inline int getServerHTTPWaitClose() { return server_http_wait_close; }
+
+	static inline int getServerProfilingSec() { return server_profiling_sec; }
+
 	/// Socket Options:
 	static inline int getSO_LINGER()       { return m_server ? so_server_LINGER       : so_client_LINGER       ;}
 	static inline int getSO_REUSEADDR()    { return m_server ? so_server_REUSEADDR    : so_client_REUSEADDR    ;}
@@ -335,6 +341,10 @@ private:
 	static int server_sockets_readwrite_threads_stack;
 	static int server_sockets_processing_threads_num;
 	static int server_sockets_processing_threads_stack;
+
+	static int server_linux_epoll;
+	static int server_http_wait_close;
+	static int server_profiling_sec;
 
 	/// Socket Options:
 	static int so_server_LINGER;

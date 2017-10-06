@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "Py/PyAfermer.h"
 
 #include <time.h>
@@ -13,6 +12,8 @@
 #include <QStringList>
 #include <QtQuick/QQuickTextDocument>
 #include "highlighter.h"
+
+
 
 
 namespace afermer
@@ -35,5 +36,4 @@ namespace afermer
         PyAfermer::Ptr m_pyafermer;
     };
 }
-
 

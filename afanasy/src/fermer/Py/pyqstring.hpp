@@ -30,11 +30,10 @@ struct QString_from_python_str
   static void* convertible(PyObject* obj_ptr)
   {
 #if PY_MAJOR_VERSION >= 3
-	  if (!PyBytes_Check(obj_ptr)) return 0;
+   if (!PyBytes_Check(obj_ptr)) return 0;
 #else
-	  if (!PyString_Check(obj_ptr)) return 0;
+   if (!PyString_Check(obj_ptr)) return 0;
 #endif
-    
     return obj_ptr;
   }
 
@@ -44,11 +43,10 @@ struct QString_from_python_str
       boost::python::converter::rvalue_from_python_stage1_data* data)
   {
     // Extract the character data from the python string
-
 #if PY_MAJOR_VERSION >= 3
-	  const char* value = PyBytes_AS_STRING(obj_ptr);
+     const char* value = PyBytes_AS_STRING(obj_ptr);
 #else
-    const char* value = PyString_AsString(obj_ptr);
+     const char* value = PyString_AsString(obj_ptr);
 #endif
 
     // Verify that obj_ptr is a string (should be ensured by convertible())

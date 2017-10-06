@@ -12,6 +12,8 @@ Host::Host():
 	m_capacity( 0),
 	m_max_tasks( 0),
 	m_power(0),
+	m_register_nimby( -1),
+	m_register_paused( -1),
 	m_os(""),
 	m_properties(""),
 	m_wol_idlesleep_time(-1),
@@ -108,6 +110,9 @@ void Host::mergeParameters( const Host & other)
 	if( other.m_max_tasks     ) m_max_tasks = other.m_max_tasks;
 	if( other.m_capacity      ) m_capacity = other.m_capacity;
 	if( other.m_power         ) m_power    = other.m_power;
+
+	if( other.m_register_nimby  != -1 ) m_register_nimby  = other.m_register_nimby;
+	if( other.m_register_paused != -1 ) m_register_paused = other.m_register_paused;
 
 	if( other.m_os.size()        ) m_os           = other.m_os;
 	if( other.m_properties.size()) m_properties   = other.m_properties;
@@ -250,6 +255,11 @@ void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
 		if( m_nimby_idle_netmbs > 0 ) stream << "\n   Idle Net = " << m_nimby_idle_netmbs << " Mb/s";
 		if( m_nimby_busy_netmbs > 0 ) stream << "\n   Busy Net = " << m_nimby_busy_netmbs << " Mb/s";
 
+		if( m_register_nimby == 0 ) stream << "\n Register Nimby OFF";
+		else if( m_register_nimby > 0 ) stream << "\n Register Nimby";
+	
+		if( m_register_paused == 0 ) stream << "\n Register Paused OFF";
+		else if( m_register_paused > 0 ) stream << "\n Register Paused";
    }
    else
    {
@@ -260,6 +270,11 @@ void Host::v_generateInfoStream( std::ostringstream & stream, bool full) const
 	  stream << " WOL" << time2str( m_wol_idlesleep_time );
 	  stream << " NIF" << time2str( m_nimby_idlefree_time );
 	  stream << " FBN" << time2str( m_nimby_busyfree_time );
+		if( m_register_nimby == 0 ) stream << " NbyOFF";
+		else if( m_register_nimby > 0 ) stream << " Nby";
+	
+		if( m_register_paused == 0 ) stream << " PsdOFF";
+		else if( m_register_paused > 0 ) stream << " Psd";
    }
 }
 

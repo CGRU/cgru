@@ -284,39 +284,42 @@ void af::printTime( time_t time_sec, const char * time_format)
    std::cout << time2str( time_sec, time_format);
 }
 
-void af::printAddress( struct sockaddr_storage * i_ss )
+const std::string af::sockAddrToStr( const struct sockaddr_storage * i_ss )
 {
-   static const int buffer_len = 256;
-   char buffer[buffer_len];
-   const char * addr_str = NULL;
-   uint16_t port = 0;
-   printf("Address = ");
-   switch( i_ss->ss_family)
-   {
-   case AF_INET:
-   {
-      struct sockaddr_in * sa = (struct sockaddr_in*)(i_ss);
-      port = sa->sin_port;
-      addr_str = inet_ntoa( sa->sin_addr );
-      break;
-   }
-   case AF_INET6:
-   {
-      struct sockaddr_in6 * sa = (struct sockaddr_in6*)(i_ss);
-      port = sa->sin6_port;
-      addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
-      break;
-   }
-   default:
-      printf("Unknown protocol");
-      return;
-   }
-   if( addr_str )
-   {
-      printf("%s", addr_str);
-      printf(" Port = %d", ntohs(port));
-   }
-   printf("\n");
+	std::ostringstream str;
+	af::sockAddrToStr( str, i_ss);
+	return str.str();
+}
+void af::sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storage * i_ss )
+{
+	static const int buffer_len = 256;
+	char buffer[buffer_len];
+	const char * addr_str = NULL;
+	uint16_t port = 0;
+	switch( i_ss->ss_family)
+	{
+	case AF_INET:
+	{
+		const struct sockaddr_in * sa = (const struct sockaddr_in*)(i_ss);
+		port = sa->sin_port;
+		addr_str = inet_ntoa( sa->sin_addr );
+		break;
+	}
+	case AF_INET6:
+	{
+		const struct sockaddr_in6 * sa = (const struct sockaddr_in6*)(i_ss);
+		port = sa->sin6_port;
+		addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
+		break;
+	}
+	default:
+		o_str << "Unknown protocol";
+	}
+	if( addr_str ) o_str << addr_str << ":" << port;
+}
+void af::printAddress( const struct sockaddr_storage * i_ss )
+{
+	printf("Address = %s\n", af::sockAddrToStr( i_ss).c_str());
 }
 
 bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)

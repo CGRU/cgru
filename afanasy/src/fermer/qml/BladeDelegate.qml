@@ -20,6 +20,7 @@ Rectangle {
     property string v_avalible_performance_slots:avalible_performance_slots
     property string v_jobsIn: ""+jobsIn
     property int v_hdd_busy: loaded_hdd
+    property int v_max_tasks: max_tasks
 
 
     MouseArea {

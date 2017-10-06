@@ -76,10 +76,10 @@ protected:
    af::TaskProgress * m_progress;
    int m_tasknum;
    int m_hostId;       ///< Task Host Id
+	int64_t * m_running_capacity_counter;
 
 private:
 	int32_t * m_running_tasks_counter;
-	int64_t * m_running_capacity_counter;
 
    uint32_t m_stopTime;         ///< Time, when running task was asked to stop.
    bool m_zombie;

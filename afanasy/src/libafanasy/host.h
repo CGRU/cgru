@@ -32,6 +32,9 @@ public:
 	int32_t m_max_tasks;
 	int32_t m_power;
 
+	int32_t m_register_nimby;
+	int32_t m_register_paused;
+
 	std::string m_os;
 	std::string m_properties;
 	std::string m_resources;

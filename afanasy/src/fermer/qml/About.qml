@@ -27,7 +27,7 @@ Window {
         source:"icons/logo.png"
         sourceSize.width: 100
         sourceSize.height: 126
-    }
+    }/*
     Text{
         anchors.bottom:parent.bottom
         anchors.bottomMargin: 10
@@ -35,5 +35,5 @@ Window {
         color:"white"
         opacity: 0.8
         text: "Developed In 'Platige Image'\n        www.platige.com"
-    }
+    }*/
 }

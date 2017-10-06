@@ -154,7 +154,9 @@ namespace af
 
 	void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
-	void printAddress( struct sockaddr_storage * i_ss );
+	void sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storage * i_ss );
+	const std::string sockAddrToStr( const struct sockaddr_storage * i_ss );
+	void printAddress( const struct sockaddr_storage * i_ss );
 
 	bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
@@ -253,12 +255,10 @@ namespace af
 	/// Send message \c msg to given file discriptor
 	/** Return true if success.**/
 	bool msgwrite( int i_desc, const af::Msg * i_msg);
+	char * msgMakeWriteHeader( const af::Msg * i_msg);
 
 	/// Send a message to all its addresses and receive an answer if needed
 	Msg * sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
-
-	/// Close socket
-	void socketDisconnect( int i_sd, uint32_t i_response_type = -1);
 
 
 	// Python:

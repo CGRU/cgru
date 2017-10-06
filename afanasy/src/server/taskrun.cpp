@@ -43,7 +43,6 @@ TaskRun::TaskRun( Task * runningTask,
 {
 	AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
 	(*m_running_tasks_counter)++;
-	(*m_running_capacity_counter) += m_exec->getCapResult();
 
    m_progress->percent = -1;
    m_progress->frame = -1;
@@ -51,8 +50,16 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress->hostname.clear();
 	m_progress->activity.clear();
 
+	// Let block increase renders counters.
+	// Needed to max run tasks per host limit.
+	// This block function also adds counts on its job.
+	m_block->addRenderCounts( render);
+
 	// Skip starting task if executable is not set (multihost task)
 	if( m_exec == NULL) return;
+
+	(*m_running_capacity_counter) += m_exec->getCapResult();
+	// - Multihost task will increase capacity counter itself.
 
    m_progress->state = AFJOB::STATE_RUNNING_MASK;
    m_progress->starts_count++;
@@ -306,22 +313,21 @@ void TaskRun::stop( const std::string & message, RenderContainer * renders, Moni
 
 void TaskRun::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
-//printf("TaskRun::finish: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
-   if( m_zombie ) return;
+	if( m_zombie ) return;
 
-   m_stopTime = 0;
-   m_progress->state = m_progress->state & (~AFJOB::STATE_RUNNING_MASK);
+	m_stopTime = 0;
+	m_progress->state = m_progress->state & (~AFJOB::STATE_RUNNING_MASK);
 	m_progress->activity.clear();
 
-   if((m_hostId != 0) && m_exec)
-   {
-      RenderContainerIt rendersIt( renders);
-      RenderAf * render = rendersIt.getRender( m_hostId);
-      if( render )
-      {
-         render->taskFinished( m_exec, monitoring);
-         m_block->taskFinished( m_exec, render, monitoring);
-      }
+	if((m_hostId != 0) && m_exec)
+	{
+		RenderContainerIt rendersIt( renders);
+		RenderAf * render = rendersIt.getRender( m_hostId);
+		if( render )
+		{
+			render->taskFinished( m_exec, monitoring);
+			m_block->remRenderCounts( render);
+		}
 
 	  	// Write database for statistics:
 		AFCommon::DBAddTask( m_exec, m_progress, m_block->m_job, render);

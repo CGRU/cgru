@@ -191,7 +191,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
                 firsthost = False
             else:
                 hosts += self.str_hostseparator
-            hosts += host
+            hosts += str(host)
         command = command.replace(self.str_hosts, hosts)
         print('Hosts list "%s" applied:' % str(hosts))
         print(command)

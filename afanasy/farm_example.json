@@ -119,6 +119,12 @@
 		"remservices":["afterfx","max","xsi"]
 
 	},{
+		"name":"Remote",
+		"mask":"remote.*|cloud.*",
+		"pool":"remote",
+		"maxtasks":1,
+		"register_nimby":1
+	},{
 
 		"name":"Server",
 		"mask":"server.*|srv.*",

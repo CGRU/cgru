@@ -67,4 +67,24 @@ class JobState : public QObject
 
 Q_DECLARE_METATYPE(JobState::State)
 
+
+
+class UserTypeSolveJobs : public QObject
+{
+    Q_OBJECT
+
+    public:
+        enum Type
+        {
+            BYORDER, PARALLEL
+        };
+        Q_ENUMS(Type)
+
+        static void declareQML() {
+            qmlRegisterType<UserTypeSolveJobs>("UserTypeSolveJobsEnums", 1, 0, "UserTypeSolveJobs");
+        }
+};
+
+Q_DECLARE_METATYPE(UserTypeSolveJobs::Type)
+
 #endif    // STATE_HPP

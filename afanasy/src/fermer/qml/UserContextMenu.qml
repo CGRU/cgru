@@ -4,6 +4,14 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Dialogs 1.1
 
 Menu {
+    MenuItem {
+        text: "Show Log"
+        onTriggered:{
+            popUserLogDialog.text=UsersModel.userLog()
+            popUserLogDialog.show()
+        }
+    }
+   MenuSeparator { }
    MenuItem {
        text: "Set User Color"
        onTriggered:{
@@ -11,9 +19,31 @@ Menu {
        }
    }
    MenuItem {
-       text: "Set Priority (not impl.)"
+       text: "Set Priority"
        onTriggered:{
-           //BladesModel.actReboot(blades_ListView.currentItem.v_blade_id)
+           set_user_priority_text_input_dialog.text=users_ListView.currentItem.v_priority;
+           popUserSetPriority.show();
+       }
+   }
+   MenuItem {
+       text: "Set Max Running Tasks"
+       onTriggered:{
+           set_user_max_running_tasks_text_input_dialog.text=UsersModel.getUserInfo("max_running_tasks");
+           popUserMaxRunningTasks.show();
+       }
+   }
+   MenuItem {
+       text: "Set Blades Mask"
+       onTriggered:{
+           set_user_blades_mask_text_input_dialog.text=UsersModel.getUserInfo("blade_mask");
+           popUserBladesMask.show();
+       }
+   }
+   MenuItem {
+       text: "Set Exlude Blades Mask"
+       onTriggered:{
+           set_user_exlude_blades_mask_text_input_dialog.text=UsersModel.getUserInfo("blade_mask_exclude");
+           popUserBladesMaskExlude.show();
        }
    }
    style: MenuStyle {

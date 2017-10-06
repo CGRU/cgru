@@ -200,9 +200,6 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
       }
    }
 
-   // Store render pointer:
-   addRenderCounts( render);
-
    m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
 
    return true;
@@ -212,11 +209,6 @@ void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, Monitor
 {
 	Task * task = m_tasks[i_taskexec->getTaskNum()];
 	task->reconnect( i_taskexec, &i_render, i_monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
-}
-
-void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
-{
-   remRenderCounts( render);
 }
 
 bool Block::canRunOn( RenderAf * render)

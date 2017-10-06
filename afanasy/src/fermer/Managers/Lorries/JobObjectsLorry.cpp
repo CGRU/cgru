@@ -103,7 +103,7 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                   ,JobState::State status
                   ,const QString &time_creation
                   ,int blocks_num
-                  ,const QString &working_time
+                  ,const QString &elapsed_time
                   ,const QString &blade_mask
                   ,const QString &exclude_blade_mask
                   ,const QString &software
@@ -122,7 +122,10 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                   ,const QString &output_folder
                   ,const QString &user_color
                   ,int errors_avoid_blades
-                  ,const std::string& json_represent)
+                  ,const std::string& json_represent
+                  ,int elapsed_time_int
+                  ,const QString &annotation
+                  )
 {
     JobObject::Ptr ret;
     if ( isDeleted(id) ) return ret;
@@ -137,7 +140,7 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                 ,status
                 ,time_creation
                 ,blocks_num
-                ,working_time
+                ,elapsed_time
                 ,blade_mask
                 ,exclude_blade_mask
                 ,software
@@ -156,9 +159,13 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                 ,user_color
                 ,errors_avoid_blades
                 ,json_represent
+                ,elapsed_time_int
+                ,annotation
             );
         (*it)->m_output_folder = output_folder;
         (*it)->set_refreshed = true;
+
+
     }
     else if ( it_cached != m_cache.end() )
     {
@@ -167,7 +174,7 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                 ,status
                 ,time_creation
                 ,blocks_num
-                ,working_time
+                ,elapsed_time
                 ,blade_mask
                 ,exclude_blade_mask
                 ,software
@@ -186,6 +193,8 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                 ,user_color
                 ,errors_avoid_blades
                 ,json_represent
+                ,elapsed_time_int
+                ,annotation
             );
         (*it_cached)->m_output_folder = output_folder;
         (*it_cached)->set_refreshed = true;
@@ -198,7 +207,7 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                 ,status
                 ,time_creation
                 ,blocks_num
-                ,working_time
+                ,elapsed_time
                 ,blade_mask
                 ,exclude_blade_mask
                 ,software
@@ -217,12 +226,14 @@ JobObject::Ptr JobObjectsLorry::insert(const QString& user_name
                 ,user_color
                 ,errors_avoid_blades
                 ,json_represent
+                ,elapsed_time_int
             );
         b->m_output_folder = output_folder;
         b->set_refreshed = true;
         m_objects.push_back(b);
         ret = b;
     }
+
     return ret;
 }
 
@@ -237,7 +248,7 @@ int JobObjectsLorry::lastTimeUpdatePercent(int hash, int percentage, int curtime
     }
     else
     {
-        if (m_job_time[hash]->m_progress != percentage)
+        if (m_job_time[hash]->m_progress < percentage)
             m_job_time[hash] = JobTimeApproximationManager::create(percentage, curtime);
     }
 

@@ -181,6 +181,8 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			if( false == af::pathIsFolder( job_dir)) continue;
 			o_folders.push_back( job_dir);
 		}
+
+		closedir( job_dir_handle);
 	}
 
 	closedir(thousand_dir_handle);
@@ -253,7 +255,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 
 	#ifdef WINNT
 	// On Windows we can't rename file in the existing one:
-	if( af::pathFileExists( filename.c_str())
+	if( af::pathFileExists( filename.c_str()))
 		remove( filename.c_str());
 	#endif
 	rename( filetemp.c_str(), filename.c_str());

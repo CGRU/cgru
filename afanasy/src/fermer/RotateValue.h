@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <map>
 #include <iostream>
 #include <functional>
@@ -37,5 +38,4 @@ protected:
 };
 
 }
-
 

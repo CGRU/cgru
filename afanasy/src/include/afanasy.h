@@ -66,6 +66,10 @@ namespace AFSERVER
 	const int  SOCKETS_PROCESSING_THREADS_NUM  = 10;
 	const int  SOCKETS_READWRITE_THREADS_STACK  = 0;
 	const int  SOCKETS_PROCESSING_THREADS_STACK = 0;
+
+	const int  LINUX_EPOLL = 0;
+	const int  HTTP_WAIT_CLOSE = 0;
+	const int  PROFILING_SEC = 1024;
 }
 
 /// Database options:

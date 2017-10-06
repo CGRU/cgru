@@ -448,9 +448,11 @@ void Msg::setInvalid()
 
 void Msg::v_generateInfoStream( std::ostringstream & stream, bool full) const
 {
-	if( m_type <= Msg::TLAST) stream << Msg::TNAMES[m_type];
-	else stream << "!UNKNOWN!";
-	stream << ": Length=" << writeSize() << ", type=" << m_type;
+	if( m_type <= Msg::TLAST)
+		stream << Msg::TNAMES[m_type];
+	else
+		stream << "!UNKNOWN!(" << m_type << ")";
+	stream << "[" << writeSize() << "]";
 }
 
 void Msg::stdOutData( bool withHeader)

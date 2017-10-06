@@ -343,7 +343,7 @@ Rectangle {
             id:terminal_side_view_header
             width:parent.width
             height:33
-            anchors.topMargin: 84
+            anchors.topMargin: 5
             anchors.top: parent.top
 
             Layout.fillWidth: true

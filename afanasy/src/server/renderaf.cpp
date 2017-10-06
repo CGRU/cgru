@@ -87,10 +87,23 @@ void RenderAf::setRegistered()
 	}
 	else
 	{
-		m_time_register = time( NULL);
+		std::string log = "Registered";
+
+		if( m_host.m_register_nimby > 0 )
+		{
+			setNimby();
+			log += " nimby";
+		}
+		if( m_host.m_register_paused > 0 )
+		{
+			setPaused( true);
+			log += " paused";
+		}
+
 		setStoreDir( AFCommon::getStoreDirRender( *this));
 		store();
-		appendLog("Registered.");
+
+		appendLog( log + ".");
 	}
 
 	af::Client::setRegisterTime();
@@ -99,9 +112,6 @@ void RenderAf::setRegistered()
 	m_wol_operation_time = 0;
 	m_idle_time = time(NULL);
 	m_busy_time = m_idle_time;
-
-	if( isOnline()) appendLog("Registered online.");
-	else appendLog("Registered offline.");
 }
 
 void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
