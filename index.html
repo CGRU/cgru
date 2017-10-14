@@ -50,12 +50,12 @@ if( document.location.host.indexOf('rules.cgru.info') != -1 )
 	<div id="navig_loading" oncontextmenu="return false"></div>
 	<div id="navig_panel">
 		<div class="infotooltip" style="float: left; margin: 1px 4px;" title="Navigation Controls:
-LMB - goto folder (set current)
+LMB - go to folder (set current)
 LMB on the current folder - open/close
 RMB - open/close folder (faster)
 
 Use [ART],[TAG],[ANN] buttons
-to show/hige folder status info."
+to show/hide folder status info."
 			></div>
 		<div class="button" style="width:16px;" title="Scroll to current" onclick="g_NavigScrollCurrent()">&gt;&lt;</div>
 		<div class="button" id="navig_show_artists"    title="Show artists"    onclick="g_NavigShowInfo(this)">ART</div>
@@ -99,7 +99,7 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 		<div id="search_artists_div" class="search_grp" style="display:none">
 			<div class="search_grp_ctrl">
 				<div>Artists:</div>
-				<div class="button" onclick="s_ShowDisabledArtists(this)" title="Show disabled artitst.">Dis</div>
+				<div class="button" onclick="s_ShowDisabledArtists(this)" title="Show disabled artists.">Dis</div>
 				<div class="button" onclick="s_ShowNotArtists(this)" title="Show not only artists.">All</div>
 				<div class="button" id="search_artists_notassigned"
 					title="Search shots that not assigned to any artist.">
@@ -167,7 +167,7 @@ Only if it was calculated" onclick="g_NavigShowInfo(this)">F</div>
 		<div id="status_show">
 			<div class="infotooltip" style="float: left;" title="Info:
 This is current location (folder,shot,project) status.
-Artist, working whith the shot, should be assigned here.
+Artist, working with the shot, should be assigned here.
 Supervisor can assign artist by creating a task."
 				></div>
 			<div id="status_edit_btn" class="button edit" title="Edit status" style="display:none; float:right;"></div>
@@ -220,7 +220,7 @@ Supervisor can assign artist by creating a task."
 			<div class="button openclose" onclick="u_OpenCloseView('files')"
 				title="Hide files"></div>
 			<div class="infotooltip" style="float: left; margin: 2px 4px;" title="Info:
-Here are shown curret location files.
+Here are shown current location files.
 "			></div>
 			<div id="files_label" style="text-align:center; margin-top: 4px;">Files</div>
 			<div id="files" class="view_view"></div>
@@ -334,7 +334,7 @@ Remember any delete operation buttons in RULES requires double-click.
 					<div class="button" title="Double click to delete all news"
 						style="background-image:url(rules/icons/delete_all.png);"
 						ondblclick="nw_DeleteNews()"></div>
-					<div class="button" title="Double click to delete visble news"
+					<div class="button" title="Double click to delete visible news"
 						style="background-image:url(rules/icons/delete_visible.png);"
 						ondblclick="nw_DeleteFiltered(true)"></div>
 					<div class="button" title="Double click to delete hidden news"
@@ -545,7 +545,7 @@ Hidden folders increase system speed.">
 		<div style="position:absolute; left: 700px; width: 200px; top:5px;bottom:0; /*border: 1px solid #000;*/">
 			<div class="button" id="admin_button"
 				style="display:none; background: rgba(200,0,0,.2)"
-				title="Admnistrate all users"
+				title="Administrate all users"
 				onclick="ad_OpenWindow()">Administrate</div>
 			<div class="button" id="profile_button" style="display:none"
 				title="Edit my profile settings"

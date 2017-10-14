@@ -127,7 +127,7 @@ UserNode.prototype.update = function( i_obj)
 		this.elJobs.innerHTML = jobs;
 
 		if( this.params.solve_parallel )
-			this.elSolving.innerHTML = 'Solving:<b>Parrallel</b>';
+			this.elSolving.innerHTML = 'Solving:<b>Parallel</b>';
 		else
 			this.elSolving.innerHTML = 'Solving:<b>Ordered</b>';
 	}
@@ -249,7 +249,7 @@ UserNode.prototype.update = function( i_obj)
 
 	var title = '';
 	title += 'Time Registered: ' + cm_DateTimeStrFromSec( this.params.time_register) + '\n';
-	title += 'Last Acitvity: ' + cm_DateTimeStrFromSec( this.params.time_activity) + '\n';
+	title += 'Last Activity: ' + cm_DateTimeStrFromSec( this.params.time_activity) + '\n';
 	title += 'ID = ' + this.params.id + '\n';
 	this.element.title = title;
 
@@ -309,7 +309,7 @@ UserNode.prototype.onDoubleClick = function( e) { g_ShowObject({"object":this.pa
 
 UserNode.params = {};
 UserNode.params.priority              = {'type':'num','label':'Priority'};
-UserNode.params.max_running_tasks     = {'type':'num','label':'Max Runnig Tasks'};
+UserNode.params.max_running_tasks     = {'type':'num','label':'Max Running Tasks'};
 UserNode.params.hosts_mask            = {'type':'reg','label':'Hosts Mask'};
 UserNode.params.hosts_mask_exclude    = {'type':'reg','label':'Exclude Hosts Mask'};
 UserNode.params.errors_retries        = {'type':'num','label':'Errors Retries'};

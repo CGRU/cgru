@@ -382,7 +382,7 @@ function cm_CheckBlockFlag( i_flags, i_name)
 	if( cm_blockFlags[i_name] )
 		return cm_blockFlags[i_name] & i_flags;
 
-	g_Error('Block flag "' + i_name + '" does not exitst.');
+	g_Error('Block flag "' + i_name + '" does not exist.');
 	g_Log('Valid flags are: ' + JSON.stringify( cm_blockFlags));
 
 	return false;

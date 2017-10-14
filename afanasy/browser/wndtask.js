@@ -77,7 +77,7 @@ function WndTask( i_args)
 	this.elBtnRestart.m_window= this;
 	this.elBtnRestart.ondblclick = function(e){ var el = e.currentTarget; el.m_window.doOperation( el);}
 
-	// Ouput:
+	// Output:
 	var elOutputDiv = document.createElement('div');
 	divBtns.appendChild( elOutputDiv);
 	elOutputDiv.classList.add('output_div');
@@ -85,7 +85,7 @@ function WndTask( i_args)
 	var elOutputLabel = document.createElement('div');
 	elOutputDiv.appendChild( elOutputLabel);
 	elOutputLabel.classList.add('output_label');
-	elOutputLabel.textContent = 'Ouput Number:';
+	elOutputLabel.textContent = 'Output Number:';
 
 	this.elOutputNum = document.createElement('div');
 	elOutputDiv.appendChild( this.elOutputNum);
