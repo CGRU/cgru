@@ -50,7 +50,7 @@ function fu_Put( i_args)
 	elAfDiv.appendChild( elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-	elSend.onclick = function(e){ fu_PutDo( e.currentTarget.m_wnd);}
+	elSend.onclick = function(e){ fu_PutDo( e.currentTarget.m_wnd);};
 	elSend.m_wnd = wnd;
 
 	var elResults = document.createElement('div');
@@ -107,7 +107,7 @@ function fu_PutDo( i_wnd)
 	if( RULES.put.af_capacity ) block.capacity = RULES.put.af_capacity;
 	job.blocks = [block];
 
-	var task = {}
+	var task = {};
 	task.name = name;
 	block.tasks = [task];
 
@@ -182,7 +182,7 @@ function fu_Checksum( i_args)
 	elAfDiv.appendChild( elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-	elSend.onclick = function(e){ fu_ChecksumDo( e.currentTarget.m_wnd);}
+	elSend.onclick = function(e){ fu_ChecksumDo( e.currentTarget.m_wnd);};
 	elSend.m_wnd = wnd;
 
 	var elRules = document.createElement('div');
@@ -297,7 +297,7 @@ function fu_PutMultiDialog( i_args)
 	elSendJob.classList.add('button');
 	elSendJob.style.display = 'none';
 	elSendJob.m_wnd = wnd;
-	elSendJob.onclick = function(e){ fu_PutMultiDo( e.currentTarget.m_wnd);}
+	elSendJob.onclick = function(e){ fu_PutMultiDo( e.currentTarget.m_wnd);};
 	wnd.m_res_btns_show = [elSendJob];
 
 	var elFind = document.createElement('div');
@@ -306,7 +306,7 @@ function fu_PutMultiDialog( i_args)
 	elFind.classList.add('button');
 	elFind.style.cssFloat = 'right';
 	elFind.m_wnd = wnd;
-	elFind.onclick = function(e){ fu_ResultsFind( e.currentTarget.m_wnd);}
+	elFind.onclick = function(e){ fu_ResultsFind( e.currentTarget.m_wnd);};
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild( elResults);
@@ -550,7 +550,7 @@ function fu_Archive( i_args)
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.m_wnd = wnd;
-	elSend.onclick = function(e){ fu_ArchivateProcessGUI( e.currentTarget.m_wnd);}
+	elSend.onclick = function(e){ fu_ArchivateProcessGUI( e.currentTarget.m_wnd);};
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild( elResults);
@@ -691,7 +691,7 @@ function fu_Walk( i_args)
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.m_wnd = wnd;
-	elSend.onclick = function(e){ fu_WalkProcessGUI( e.currentTarget.m_wnd);}
+	elSend.onclick = function(e){ fu_WalkProcessGUI( e.currentTarget.m_wnd);};
 
 	var elRules = document.createElement('div');
 	wnd.elContent.appendChild( elRules);
@@ -713,7 +713,7 @@ function fu_WalkProcessGUI( i_wnd)
 	block.capacity = RULES.walk.af_capacity;
 	job.blocks = [block];
 
-	var task = {}
+	var task = {};
 	task.name = params.path;
 	block.tasks = [task];
 

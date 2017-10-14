@@ -102,8 +102,8 @@ function Comment( i_obj)
 	this.elSave = document.createElement('div');
 	this.elEditBtnsDiv.appendChild( this.elSave);
 	this.elSave.classList.add('button');
-	this.elSave.innerHTML = '<b>Save</b> <small>(CRTL+ENTER)</small>';
-	this.elSave.title = 'Save comment.\n(CRTL+ENTER)';
+	this.elSave.innerHTML = '<b>Save</b> <small>(CTRL+ENTER)</small>';
+	this.elSave.title = 'Save comment.\n(CTRL+ENTER)';
 	this.elSave.m_comment = this;
 	this.elSave.onclick = function(e){ e.currentTarget.m_comment.save();};
 
@@ -340,7 +340,7 @@ Comment.prototype.init = function()
 
 	if( this.obj.deleted )
 		this.el.style.display = 'none';
-}
+};
 
 Comment.prototype.setElType = function( i_type)
 {
@@ -368,7 +368,7 @@ Comment.prototype.setElType = function( i_type)
 		this.elType.textContent = 'Comment';
 		st_SetElColor( null, this.el);
 	}
-}
+};
 
 Comment.prototype.edit = function()
 {
@@ -481,7 +481,7 @@ Comment.prototype.edit = function()
 	this.elText.style.color = '#000000';
 	this.elText.contentEditable = 'true';
 	this.elText.focus();
-}
+};
 
 function cm_ColorOnclick( i_clr, i_data) { i_data.setColor( i_clr); }
 Comment.prototype.setColor = function( i_clr)
@@ -489,14 +489,14 @@ Comment.prototype.setColor = function( i_clr)
 	this.color = i_clr;
 	this.setElType( this.type);
 	st_SetElColor({"color":this.color}, this.el, null, false);
-}
+};
 
 Comment.prototype.setType = function( i_type)
 {
 	this.type = i_type;
 	this.setElType( i_type);
 	st_SetElColor({"color":this.color}, this.el, null, false);
-}
+};
 
 Comment.prototype.editCancel = function()
 {
@@ -504,7 +504,7 @@ Comment.prototype.editCancel = function()
 		$('comments').removeChild( this.el);
 	else
 		this.init();
-}
+};
 
 Comment.prototype.textOnKeyDown = function( i_e)
 {
@@ -516,13 +516,13 @@ Comment.prototype.textOnKeyDown = function( i_e)
 			this.elText.blur();
 		}
 	}
-}
+};
 
 Comment.prototype.destroy = function()
 {
 	this.obj.deleted = true;
 	this.save();
-}
+};
 
 Comment.prototype.save = function()
 {
@@ -583,7 +583,8 @@ Comment.prototype.save = function()
 	edit.file = file;
 
 	n_Request({"send":{"editobj":edit},"func":this.saveFinished,"this":this});
-}
+};
+
 Comment.prototype.saveFinished = function( i_data, i_args)
 {
 	if( c_NullOrErrorMsg( i_data)) return;
@@ -599,7 +600,7 @@ Comment.prototype.saveFinished = function( i_data, i_args)
 	i_args.this.updateStatus();
 
 	i_args.this.sendEmails();
-}
+};
 
 Comment.prototype.sendEmails = function()
 {
@@ -629,7 +630,7 @@ Comment.prototype.sendEmails = function()
 
 		n_SendMail( email, subject, body);
 	}
-}
+};
 
 Comment.prototype.updateStatus = function()
 {
@@ -665,7 +666,7 @@ Comment.prototype.updateStatus = function()
 
 		for( var t = 0; t < obj.tags.length; t++ )
 			if( reps_tags.indexOf( obj.tags[t] ) == -1 )
-				reps_tags.push( obj.tags[t] )
+				reps_tags.push( obj.tags[t] );
 
 		reps_arts.push( obj.user_name);
 
@@ -674,16 +675,16 @@ Comment.prototype.updateStatus = function()
 
 	for( var t = 0; t < reps_tags.length; t++ )
 		if( RULES.status.tags.indexOf( reps_tags[t] ) == -1 )
-			RULES.status.tags.push( reps_tags[t] )
+			RULES.status.tags.push( reps_tags[t] );
 
 	for( var t = 0; t < reps_arts.length; t++ )
 		if( RULES.status.artists.indexOf( reps_arts[t] ) == -1 )
-			RULES.status.artists.push( reps_arts[t] )
+			RULES.status.artists.push( reps_arts[t] );
 
 	RULES.status.reports = reports;
 	st_Save();
 	st_Show( RULES.status);
-}
+};
 
 Comment.prototype.processUploads = function()
 {
@@ -723,7 +724,7 @@ Comment.prototype.processUploads = function()
 
 //console.log( JSON.stringify( uploads));
 	this.obj.uploads = uploads;
-}
+};
 
 Comment.prototype.showFile = function( i_path, i_file)
 {
@@ -753,12 +754,12 @@ Comment.prototype.showFile = function( i_path, i_file)
 	elGoto.classList.add('goto');
 	elGoto.textContent = i_file.name;
 	elGoto.href = '#' + i_path + '?' + JSON.stringify({"fv_Goto":i_path+'/'+i_file.name});
-}
+};
 
 Comment.prototype.getLink = function( i_absolute)
 {
 	return g_GetLocationArgs({"cm_Goto":this.obj.key}, i_absolute);
-}
+};
 
 function cm_Goto( i_key)
 {

@@ -134,7 +134,7 @@ genetate thumbnails.";
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/convert.png)';
 	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.convert();}
+	el.onclick = function(e){ e.currentTarget.m_view.convert();};
 	el.title = 'Convert selected sequences (folders) or movies (files)';
 
 	var el = document.createElement('div');
@@ -142,7 +142,7 @@ genetate thumbnails.";
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/archive.png)';
 	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.archivate();}
+	el.onclick = function(e){ e.currentTarget.m_view.archivate();};
 	el.title = 'Archive foles and folders';
 
 	var el = document.createElement('div');
@@ -150,7 +150,7 @@ genetate thumbnails.";
 	el.classList.add('button');
 	el.style.backgroundImage = 'url(rules/icons/put.png)';
 	el.m_view = this;
-	el.onclick = function(e){ e.currentTarget.m_view.put();}
+	el.onclick = function(e){ e.currentTarget.m_view.put();};
 	el.title = 'Put selected folders';
 
 	if( this.show_walk )
@@ -160,7 +160,7 @@ genetate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/walk.png)';
 		el.m_path = this.path;
-		el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});}
+		el.onclick = function(e){ fu_Walk({"path":e.currentTarget.m_path});};
 		el.title = 'Top secret feature.';
 	}
 
@@ -171,7 +171,7 @@ genetate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/tmpfio.png)';
 		el.m_view = this;
-		el.onclick = function(e){ fu_TmpFio({"fview":e.currentTarget.m_view});}
+		el.onclick = function(e){ fu_TmpFio({"fview":e.currentTarget.m_view});};
 		el.title = 'Create a shared folder.';
 	}
 
@@ -182,7 +182,7 @@ genetate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/buffer_add.png)';
 		el.m_view = this;
-		el.onclick = function(e){ e.currentTarget.m_view.bufferAdd();}
+		el.onclick = function(e){ e.currentTarget.m_view.bufferAdd();};
 		el.title = 'Add selected files to buffer.';
 
 		var el = document.createElement('div');
@@ -190,7 +190,7 @@ genetate thumbnails.";
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/buffer_take.png)';
 		el.m_view = this;
-		el.onclick = function(e){ e.currentTarget.m_view.bufferPut();}
+		el.onclick = function(e){ e.currentTarget.m_view.bufferPut();};
 		el.title = 'Put files from buffer.';
 		el.style.display = 'none';
 		this.elBufferPut = el;
@@ -267,7 +267,7 @@ genetate thumbnails.";
 FilesView.prototype.destroy = function()
 {
 	this.elParent.removeChild( this.elRoot);
-}
+};
 
 FilesView.prototype.limitsAdd = function()
 {
@@ -300,7 +300,7 @@ FilesView.prototype.limitsAdd = function()
 			e.currentTarget.m_view.limitApply();
 		}
 	}
-}
+};
 
 FilesView.prototype.limitApply = function()
 {
@@ -327,13 +327,13 @@ FilesView.prototype.limitApply = function()
 			this.elItems[f].style.display = 'none';
 		else
 			this.elItems[f].style.display = 'block';
-}
+};
 
 FilesView.prototype.refresh = function()
 {
 	n_WalkDir({"paths":[this.path],"wfunc":this.walkReceived,"this":this});
 	c_LoadingElSet( this.elRoot);
-}
+};
 FilesView.prototype.walkReceived = function( i_data, i_args)
 {
 	fv_cur_item = null;
@@ -350,7 +350,7 @@ FilesView.prototype.walkReceived = function( i_data, i_args)
 	for( var i = 0; i < i_args.this.elItems.length; i++)
 		if( sel_paths.indexOf( i_args.this.elItems[i].m_path) != -1 )
 			i_args.this.selectItem( i_args.this.elItems[i]);
-}
+};
 
 FilesView.prototype.show = function()
 {
@@ -389,7 +389,7 @@ FilesView.prototype.show = function()
 		else
 			this.elBufferPut.style.display = 'none';
 	}
-}
+};
 
 FilesView.prototype.showCounts = function()
 {
@@ -451,9 +451,9 @@ FilesView.prototype.showCounts = function()
 			fv_refreshAttrs();
 		}
 	}
-}
+};
 
-FilesView.prototype.refreshAttrs = function() { for( var i = 0; i < this.elItems.length; i++) this.showAttrs( this.elItems[i]); }
+FilesView.prototype.refreshAttrs = function() { for( var i = 0; i < this.elItems.length; i++) this.showAttrs( this.elItems[i]); };
 
 FilesView.prototype.showAttrs = function( i_el, i_obj)
 {
@@ -566,7 +566,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			e.stopPropagation();
 			st_SetFramesNumber( e.currentTarget.m_num_files);
 			fv_refreshAttrs();
-		}
+		};
 
 		// Folder count files on middle mouse button:
 		if( this.can_count )
@@ -648,7 +648,7 @@ FilesView.prototype.showAttrs = function( i_el, i_obj)
 			elSums[i].title = c_DT_FormStrFromSec( time);
 	}
 */
-}
+};
 
 FilesView.prototype.showItem = function( i_obj, i_isFolder)
 {
@@ -678,7 +678,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 
 	// Drag&Drop:
 	elItem.draggable = 'true';
-	elItem.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);}
+	elItem.ondragstart = function(e){ c_FileDragStart( e, e.currentTarget.m_path);};
 
 	// Anchor Icon:
 	var elAnchor = null;
@@ -736,7 +736,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		var el = e.currentTarget;
 		el.classList.toggle('pushed');
 		c_ElDisplayToggle( el.m_elMenu);
-	}
+	};
 	// Menu div:
 	elItem.m_elMenu = document.createElement('div');
 	elBody.appendChild( elItem.m_elMenu);
@@ -788,7 +788,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 		el.onclick = function(e){
 			e.stopPropagation();
 			u_ThumbnailMake({"paths":[e.currentTarget.m_path],"info":'filesview',"no_cache":true});
-		}
+		};
 		el.title = 'Generate location thumbnail from this folder.';
 	}
 
@@ -937,7 +937,7 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	}
 
 	this.showAttrs( elItem);
-}
+};
 
 FilesView.prototype.onClick = function( i_evt)
 {
@@ -969,7 +969,7 @@ FilesView.prototype.onClick = function( i_evt)
 		if( this.elItems[i].m_selected )
 			sel_count++;
 	c_Info(sel_count + ' items selected.');
-}
+};
 FilesView.prototype.selectItem = function( i_el, i_select)
 {
 	if( i_select === false )
@@ -982,7 +982,7 @@ FilesView.prototype.selectItem = function( i_el, i_select)
 		i_el.m_selected = true;
 		i_el.classList.add('selected');
 	}
-}
+};
 FilesView.prototype.selectAll = function( i_select)
 {
 	if( i_select == null )
@@ -1003,32 +1003,32 @@ FilesView.prototype.selectAll = function( i_select)
 	}
 	else
 		c_Info('All items selected.');
-}
+};
 FilesView.prototype.selectInvert = function()
 {
 	for( var i = 0; i < this.elItems.length; i++)
 		this.selectItem( this.elItems[i], this.elItems[i].m_selected != true );
 
 	c_Info('Unselected items selected.');
-}
-FilesView.prototype.selectNone = function() { this.selectAll( false); }
+};
+FilesView.prototype.selectNone = function() { this.selectAll( false); };
 
 FilesView.prototype.getSelected = function()
 {
-	var o_items = []
+	var o_items = [];
 	for( var i = 0; i < this.elItems.length; i++)
 		if( this.elItems[i].m_selected )
 			o_items.push( this.elItems[i]);
 	return o_items;
-}
+};
 
 FilesView.prototype.countFiles = function( i_path, i_args)
 {
 	c_LoadingElSet( this.elRoot);
 	var cmd = 'rules/bin/walk.sh "' + RULES.root + i_path + '"';
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.countFilesFinished,"this":this,"wpath":i_path,"post_args":i_args});
-}
-FilesView.prototype.countFilesFinished = function( i_data, i_args) { i_args.this.countFilesUpdate(i_data, i_args);}
+};
+FilesView.prototype.countFilesFinished = function( i_data, i_args) { i_args.this.countFilesUpdate(i_data, i_args);};
 FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 {
 	c_LoadingElReset( this.elRoot);
@@ -1047,7 +1047,7 @@ FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 	for( key in data )
 		if( key != 'walk')
 			if( key.indexOf('error') != -1 )
-				c_Error('Walk[' + key + ']: ' + data[key])
+				c_Error('Walk[' + key + ']: ' + data[key]);
 
 	if( data.error )
 	{
@@ -1078,7 +1078,7 @@ FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 	for( var i = 0; i < this.walk.folders.length; i++)
 	{
 		if( this.walk.folders[i].name != name )
-			continue
+			continue;
 
 		for( var key in data.walk )
 			this.walk.folders[i][key] = data.walk[key]
@@ -1090,7 +1090,7 @@ FilesView.prototype.countFilesUpdate = function( i_data, i_args)
 
 	if( i_args.post_args && i_args.post_args.func )
 		i_args.post_args.func( i_args.post_args, data.walk);	
-}
+};
 FilesView.prototype.put = function()
 {
 	var args = {};
@@ -1102,7 +1102,7 @@ FilesView.prototype.put = function()
 		c_Error('No items selected.');
 	else
 		fu_Put( args);
-}
+};
 FilesView.prototype.convert = function()
 {
 	var args = {};
@@ -1141,7 +1141,7 @@ FilesView.prototype.convert = function()
 		c_Error('No items selected.');
 	else
 		d_Convert( args);
-}
+};
 
 FilesView.prototype.archivate = function()
 {
@@ -1183,7 +1183,7 @@ FilesView.prototype.archivate = function()
 		c_Error('No items selected.');
 	else
 		fu_Archive( args);
-}
+};
 
 FilesView.prototype.getItemPath = function( i_path)
 {
@@ -1191,7 +1191,7 @@ FilesView.prototype.getItemPath = function( i_path)
 		if( this.elItems[i].m_path == i_path )
 			return this.elItems[i];
 	return null;
-}
+};
 
 FilesView.prototype.makeThumbEl = function( i_el, i_path, i_type)
 {
@@ -1216,7 +1216,7 @@ FilesView.prototype.makeThumbEl = function( i_el, i_path, i_type)
 
 	fv_FileThumbResize( elImg);
 	elImg.onload = fv_FileThumbOnLoad;
-}
+};
 
 FilesView.prototype.thumbsBigger = function( i_bigger)
 {
@@ -1230,8 +1230,8 @@ FilesView.prototype.thumbsBigger = function( i_bigger)
 
 	localStorage.thumb_file_size = ''+ns;
 	this.thumbsResize();
-}
-FilesView.prototype.thumbsSmaller = function() { this.thumbsBigger( false); }
+};
+FilesView.prototype.thumbsSmaller = function() { this.thumbsBigger( false); };
 FilesView.prototype.thumbsCrop = function()
 {
 	if( localStorage.thumb_file_crop === 'true' )
@@ -1239,12 +1239,12 @@ FilesView.prototype.thumbsCrop = function()
 	else
 		localStorage.thumb_file_crop = 'true';
 	this.thumbsResize();
-}
+};
 FilesView.prototype.thumbsResize = function()
 {
 	for( var i = 0; i < this.elThumbnails.length; i++)
 		fv_FileThumbResize( this.elThumbnails[i].m_elImg);
-}
+};
 
 FilesView.prototype.thumbsMake = function()
 {
@@ -1261,17 +1261,17 @@ FilesView.prototype.thumbsMake = function()
 		fv_thumbnails_tomake_files.push( this.elThumbnails[i].m_path);
 
 	fv_MakeThumbnail();
-}
+};
 FilesView.prototype.makeFolder = function()
 {
 	new cgru_Dialog({"receiver":this,"handle":'makeFolderDo',
 		"name":'make_folder',"title":'Make Folder',"info":'Ender new folder name:'});
-}
+};
 FilesView.prototype.makeFolderDo = function( i_name)
 {
 	var path = c_PathPM_Rules2Server( this.path + '/' + i_name);
 	n_Request({"send":{"makefolder":{"path":path}},"func":fv_makeFolderFinished,"fview":this});
-}
+};
 function fv_makeFolderFinished( i_data, i_args)
 {
 	if(( i_data == null ) || ( i_data.error))
@@ -1287,14 +1287,14 @@ FilesView.prototype.rename = function( i_path)
 {
 	new cgru_Dialog({"receiver":this,"handle":'renameDo',"param":i_path,"value":c_PathBase(i_path),
 		"name":'rename',"title":'Rename',"info":'Ender a new name.'});
-}
+};
 FilesView.prototype.renameDo = function( i_value, i_path)
 {
 	new_path = RULES.root + c_PathDir( i_path) + '/' + i_value;
 	cmd = 'rules/bin/move.py "' + RULES.root + i_path + '" "' + new_path + '"';
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.renameFinished,"this":this,"old_path":i_path,"new_path":new_path,"info":'rename'});
-}
+};
 FilesView.prototype.renameFinished = function( i_data, i_args)
 {
 	if( c_NullOrErrorCmd( i_data,'move')) return;
@@ -1302,13 +1302,13 @@ FilesView.prototype.renameFinished = function( i_data, i_args)
 	c_Info('Renamed: ' + c_PathBase(i_args.old_path) + ' -> ' + c_PathBase(i_args.new_path));
 
 	i_args.this.refresh();
-}
+};
 
 FilesView.prototype.deleteFilesDialog = function( i_path)
 {
 	new cgru_Dialog({"receiver":this,"handle":'deleteFiles',"param":i_path,
 		"name":'delete',"title":'Delete',"info":'<span style="font-size:20px;font-weight:bold;">'+i_path+'</span><br>Are You Sure?<br>Type "yes".'});
-}
+};
 FilesView.prototype.deleteFiles = function( i_value, i_path)
 {
 	if( i_value != 'yes' ) return;
@@ -1317,7 +1317,7 @@ FilesView.prototype.deleteFiles = function( i_value, i_path)
 //console.log(cmd);
 
 	n_Request({"send":{"cmdexec":{"cmds":[cmd]}},"func":this.filesDeleted,"this":this,"delpath":i_path,"info":'delete',"wait":false,"parse":true});
-}
+};
 FilesView.prototype.filesDeleted = function( i_data, i_args)
 {
 //console.log( JSON.stringify( i_args.delpath));
@@ -1330,7 +1330,7 @@ FilesView.prototype.filesDeleted = function( i_data, i_args)
 	c_Info('Deleted ' + i_args.delpath);
 
 	i_args.this.refresh();
-}
+};
 
 FilesView.prototype.bufferAdd = function()
 {
@@ -1343,9 +1343,9 @@ FilesView.prototype.bufferAdd = function()
 
 	for( var i = 0; i < elItems.length; i++)
 		fu_BufferAdd( elItems[i].m_path);
-}
-FilesView.prototype.bufferAdded = function() { this.elBufferPut.style.display = 'block'; }
-FilesView.prototype.bufferEmpty = function() { this.elBufferPut.style.display = 'none';  }
+};
+FilesView.prototype.bufferAdded = function() { this.elBufferPut.style.display = 'block'; };
+FilesView.prototype.bufferEmpty = function() { this.elBufferPut.style.display = 'none';  };
 FilesView.prototype.bufferPut = function()
 {
 	var paths = fu_BufferTakeSelected();
@@ -1378,7 +1378,7 @@ FilesView.prototype.bufferPut = function()
 		return;
 
 	n_Request({"send":{"cmdexec":{"cmds":cmds}},"func":this.bufferPutFinished,"this":this,"info":'buffer move'});
-}
+};
 FilesView.prototype.bufferPutFinished = function( i_data, i_args)
 {
 //console.log( JSON.stringify( i_data));
@@ -1412,7 +1412,7 @@ FilesView.prototype.bufferPutFinished = function( i_data, i_args)
 	}
 
 	fv_ReloadAll();
-}
+};
 
 FilesView.prototype.annotate = function( i_elItem)
 {
@@ -1426,7 +1426,7 @@ FilesView.prototype.annotate = function( i_elItem)
 	i_elItem.m_el_edit_annotation = elAnn;
 	i_elItem.appendChild( elAnn);
 	elAnn.classList.add('edit_annotation');
-	elAnn.onclick = function(e){ e.stopPropagation(); return false; }
+	elAnn.onclick = function(e){ e.stopPropagation(); return false; };
 
 	var elText = document.createElement('div');
 	i_elItem.m_el_edit_annotation.m_el_text = elText;
@@ -1446,7 +1446,7 @@ FilesView.prototype.annotate = function( i_elItem)
 	elBtnCancel.textContent = 'Cancel';
 	elBtnCancel.m_fv = this;
 	elBtnCancel.m_el = i_elItem;
-	elBtnCancel.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateCancel( el.m_el);}
+	elBtnCancel.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateCancel( el.m_el);};
 
 	var elBtnApply = document.createElement('div');
 	elPanel.appendChild( elBtnApply);
@@ -1454,12 +1454,12 @@ FilesView.prototype.annotate = function( i_elItem)
 	elBtnApply.textContent = 'Apply';
 	elBtnApply.m_fv = this;
 	elBtnApply.m_el = i_elItem;
-	elBtnApply.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateApply( el.m_el);}
+	elBtnApply.onclick = function(e){ var el = e.currentTarget; el.m_fv.annotateApply( el.m_el);};
 
 	var elColors = document.createElement('div');
 	elPanel.appendChild( elColors);
 	u_DrawColorBars({"el":elColors,"onclick":fv_editColorOnClick,"data":{"el":i_elItem}});
-}
+};
 function fv_editColorOnClick( i_clr, i_data)
 {
 	fv_itemApplyColor( i_data.el, i_clr);
@@ -1501,7 +1501,7 @@ FilesView.prototype.annotateApply = function( i_elItem)
 
 	n_Request({"send":{"editobj":obj},"func":fv_annotateFinished,"fv":this,"elItem":i_elItem});
 //console.log( JSON.stringify( obj));
-}
+};
 function fv_annotateFinished( i_data, i_args)
 {
 	i_args.fv.refresh();
@@ -1518,7 +1518,7 @@ FilesView.prototype.annotateCancel = function( i_elItem)
 		i_elItem.m_el_annotation.style.display = 'block';
 
 	fv_itemApplyColor( i_elItem, i_elItem.m_obj.color);
-}
+};
 
 function fv_GetFileIcon( i_name, i_folder)
 {
@@ -1543,7 +1543,7 @@ function fv_PreviewOpen( i_el)
 	elPreview.classList.add('preview');
 	elPreview.onclick = function(e){e.stopPropagation();};
 
-	var el = document.createElement('div')
+	var el = document.createElement('div');
 	elPreview.appendChild( el);
 	el.classList.add('close');
 	el.classList.add('button');
@@ -1688,7 +1688,7 @@ function fv_Goto( i_path )
 	fv_SelectNone();
 	for( var v = 0; v < fv_views.length; v++)
 	{
-		var el = fv_views[v].getItemPath( i_path )
+		var el = fv_views[v].getItemPath( i_path );
 		if( el )
 		{
 			fv_views[v].selectItem( el);

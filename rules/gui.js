@@ -117,7 +117,7 @@ function gui_Create( i_wnd, i_params, i_values)
 
 		var values = [];
 		if( i_params[p].default )
-			values.push( i_params[p].default )
+			values.push( i_params[p].default );
 		if( i_values )
 			for( var v = 0; v < i_values.length; v++)
 				if( i_values[v] && ( i_values[v][p] != null ))
@@ -441,7 +441,7 @@ function gui_CreateTabs( i_args)
 			el.classList.add('active');
 			if( i_args.name )
 				localStorage[i_args.name] = el.m_tab;
-		}
+		};
 
 		elLabels.push( elLabel);
 	}

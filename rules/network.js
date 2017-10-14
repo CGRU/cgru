@@ -25,7 +25,7 @@ function n_WalkDir( i_args)
 		)
 			continue;
 		else
-			n_walks[i_args.paths[i]] = null
+			n_walks[i_args.paths[i]] = null;
 
 		if( RULES.root )
 			paths.push( RULES.root + i_args.paths[i]);
@@ -97,7 +97,7 @@ function n_Request( i_args)
 {
 	if( i_args.send == null )
 	{
-		c_Error('Network reqest: send object is null.');
+		c_Error('Network request: send object is null.');
 		return;
 	}
 

@@ -299,10 +299,10 @@ function p_WalkSequenceReceived( i_data)
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
 		img.src = RULES.root + p_path + '/' + file;
-		img.onload = function(e){p_ImgLoaded(e);}
-		img.onerror = function(e){p_ImgLoadError(e);}
+		img.onload = function(e){p_ImgLoaded(e);};
+		img.onerror = function(e){p_ImgLoadError(e);};
 		img.m_file = walk.files[i];
-		p_filenames.push( file)
+		p_filenames.push( file);
 		p_images.push( img);
 	}
 
@@ -473,7 +473,7 @@ function p_CreateImages()
 		elImg.src = RULES.root + p_path + '/' + p_filenames[i];
 		if( localStorage.player_precreate == 'ON' )
 			elImg.style.display = 'none';
-		elImg.onmousedown = function(){return false;}
+		elImg.onmousedown = function(){return false;};
 		p_elImg.push( elImg);
 	}
 }

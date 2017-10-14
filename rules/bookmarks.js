@@ -265,7 +265,7 @@ function bm_ProjectClicked( i_evt)
 	el.classList.toggle('opened');
 	el.classList.toggle('closed');
 
-	var list = ''
+	var list = '';
 	for( var p = 0; p < bm_projects.length; p++)
 	{
 		if( bm_projects[p].el.classList.contains('closed'))

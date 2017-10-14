@@ -356,7 +356,7 @@ background-position: left;
 #sidepanel.opened #sidepanel_hide { display: block;}
 #sidepanel .label {
 font-size: 14px;
-font-family: Verdana;
+font-family: Verdana, serif;
 width: 13px;
 word-wrap: break-word;
 letter-spacing: 4px;

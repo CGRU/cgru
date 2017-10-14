@@ -189,7 +189,7 @@ function nw_Subscribe( i_path)
 
 	for( var i = 0; i < g_auth_user.channels.length; i++)
 	{
-		var path = g_auth_user.channels[i].id
+		var path = g_auth_user.channels[i].id;
 		if(  path == i_path )
 		{
 			c_Error('Already subscribed on: ' + path);
@@ -428,7 +428,7 @@ function nw_MakeNewsFinished( i_data, i_args)
 		return;
 	}
 
-	var info = 'Subscibed users:';
+	var info = 'Subscribed users:';
 	for( var i = 0; i < i_data.users.length; i++)
 		info += ' '+i_data.users[i];
 	c_Log( info);
@@ -709,7 +709,7 @@ function nw_DeleteFiltered( i_visible)
 function nw_DeleteNewsUser( i_news)
 {
 	var elNews = $('news').m_elArray;
-	var ids = []
+	var ids = [];
 	for( var i = 0; i < elNews.length; i++)
 		if( elNews[i].m_news.user == i_news.user )
 			ids.push( elNews[i].m_news.id);

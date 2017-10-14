@@ -73,7 +73,7 @@ function c_NullOrErrorMsg( i_obj)
 //console.log(JSON.stringify(i_obj));
 	if( i_obj == null )
 	{
-		c_Error('No responce received.');
+		c_Error('No response received.');
 		return true;
 	}
 	if( i_obj.error )

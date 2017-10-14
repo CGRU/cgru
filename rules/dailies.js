@@ -13,11 +13,11 @@ d_params.general.activity = {"width":'25%',"lwidth":'70px'};
 d_params.general.version = {"width":'25%',"lwidth":'70px'};
 d_params.general.input = {};
 d_params.general.output = {};
-d_params.general.filename = {"width":'75%'}
+d_params.general.filename = {"width":'75%'};
 d_params.general.fps = {"label":'FPS',"width":'25%',"lwidth":'70px'};
 
-d_params.settings.audio_file = {"label":'Audio',"default":"REF/sound.flac","tooltip":'Sound file'}
-d_params.settings.af_depend_mask = {"label":'Depends',"tooltip":'Afanasy job depend mask'}
+d_params.settings.audio_file = {"label":'Audio',"default":"REF/sound.flac","tooltip":'Sound file'};
+d_params.settings.af_depend_mask = {"label":'Depends',"tooltip":'Afanasy job depend mask'};
 d_params.settings.fffirst = {"label":"F.F.First","tooltip":'First frame is "1"\nNo matter image file name number.'};
 d_params.settings.aspect_in = {"label":'Aspect In'};
 d_params.settings.gamma = {};
@@ -145,7 +145,7 @@ function d_DailiesWalkReceived( i_data, i_args)
 	elAfDiv.appendChild( elSend);
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
-	elSend.onclick = function(e){ d_ProcessGUI( e.currentTarget.m_wnd);}
+	elSend.onclick = function(e){ d_ProcessGUI( e.currentTarget.m_wnd);};
 	elSend.m_wnd = wnd;
 
 	wnd.elContent.focus();
@@ -193,7 +193,7 @@ function d_ProcessGUI( i_wnd)
 	block.working_directory = c_PathPM_Rules2Server( g_CurPath());
 	job.blocks = [block];
 
-	var task = {}
+	var task = {};
 	task.name = params.filename;
 	task.command = d_MakeCmd( params);
 	block.tasks = [task];
@@ -382,7 +382,7 @@ function d_Convert( i_args)
 		elBtns.appendChild( elCvtBtn);
 		elCvtBtn.textContent = title + ' To Movies';
 		elCvtBtn.classList.add('button');
-		elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);}
+		elCvtBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, false);};
 		elCvtBtn.m_wnd = wnd;
 		wnd.m_res_btns_show.push( elCvtBtn);
 		if( i_args.results ) elCvtBtn.style.display = 'none';
@@ -395,7 +395,7 @@ function d_Convert( i_args)
 	else
 		elExpBtn.textContent = title + ' To Sequences';
 	elExpBtn.classList.add('button');
-	elExpBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, true);}
+	elExpBtn.onclick = function(e){ d_CvtProcessGUI( e.currentTarget.m_wnd, true);};
 	elExpBtn.m_wnd = wnd;
 	wnd.m_res_btns_show.push( elExpBtn);
 	if( i_args.results ) elExpBtn.style.display = 'none';
@@ -729,7 +729,7 @@ function d_WmDialog( i_wnd)
 	gui_Create( wm.elParams, d_wm_params);
 
 	wm.elBtns = document.createElement('div');
-	wm.elBtns.classList.add('watermark_btns')
+	wm.elBtns.classList.add('watermark_btns');
 	wm.elControls.appendChild( wm.elBtns);
 
 	wm.elCreate = document.createElement('div');
@@ -864,14 +864,14 @@ function d_MakeCut( i_args)
 	elSend.textContent = 'Send Job';
 	elSend.classList.add('button');
 	elSend.m_wnd = wnd;
-	elSend.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, false);}
+	elSend.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, false);};
 
 	var elTest = document.createElement('div');
 	elAfDiv.appendChild( elTest);
 	elTest.textContent = 'Test Inputs';
 	elTest.classList.add('button');
 	elTest.m_wnd = wnd;
-	elTest.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, true);}
+	elTest.onclick = function(e){ d_CutProcessGUI( e.currentTarget.m_wnd, true);};
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild( elResults);

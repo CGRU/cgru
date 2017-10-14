@@ -281,7 +281,7 @@ function g_WalksReceived( i_data, i_args)
 		{
 			if( RULES.annotations == null )
 				RULES.annotations = {};
-			var name = c_PathBase( walk.paths[i-1] )
+			var name = c_PathBase( walk.paths[i-1] );
 			if( name == '' ) name = '/';
 			RULES.annotations[name] = RULES.status.annotation;
 		}

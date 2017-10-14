@@ -2,7 +2,7 @@ u_elements = ['asset','assets','info','log','navig','cycle','thumbnail'];
 u_el = {};
 u_views = ['asset','files','body','comments'];
 
-u_guest_attrs = []
+u_guest_attrs = [];
 u_guest_attrs.push({"name":'id',        "label":'Login Name',"required":true});
 u_guest_attrs.push({"name":'title',     "label":'Full Name'});
 u_guest_attrs.push({"name":'email',     "label":'Email',  "info":'gravarar, hidden'});
@@ -564,7 +564,7 @@ function u_BodyEditSaveFinished( i_data, i_args)
 {
 	if(( i_data == null ) || ( i_data.error ))
 	{
-		c_Error( i_data.error)
+		c_Error( i_data.error);
 		return;
 	}
 //console.log('DAT'+JSON.stringify( i_data));
