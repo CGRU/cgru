@@ -1249,14 +1249,14 @@ function ad_ProfileOpen()
 	elBtns.appendChild( el);
 	el.textContent = 'Save';
 	el.classList.add('button');
-	el.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);}
+	el.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);};
 	el.m_wnd = wnd;
 
 	var el = document.createElement('div');
 	elBtns.appendChild( el);
 	el.textContent = 'Cancel';
 	el.classList.add('button');
-	el.onclick = function(e){ e.currentTarget.m_wnd.destroy();}
+	el.onclick = function(e){ e.currentTarget.m_wnd.destroy();};
 	el.m_wnd = wnd;
 
 //	if( g_auth_user.states.indexOf('passwd') != -1 )
@@ -1265,7 +1265,7 @@ function ad_ProfileOpen()
 		elBtns.appendChild( el);
 		el.textContent = 'Set Password';
 		el.classList.add('button');
-		el.onclick = function(e){ ad_SetPasswordDialog( g_auth_user.id);}
+		el.onclick = function(e){ ad_SetPasswordDialog( g_auth_user.id);};
 		el.m_wnd = wnd;
 	}
 }

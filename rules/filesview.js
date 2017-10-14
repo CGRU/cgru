@@ -75,10 +75,10 @@ function FilesView( i_args)
 //	el.style.cssFloat = 'left';
 	el.title = "This is files view.\n\
 You can create folder,\n\
-arhive and unpack,\n\
+archive and unpack,\n\
 convert images/movies,\n\
 put in other location (may be FTP),\n\
-genetate thumbnails.";
+generate thumbnails.";
 
 	c_CreateOpenButton({"parent":this.elPanel,"path":this.path});
 
@@ -143,7 +143,7 @@ genetate thumbnails.";
 	el.style.backgroundImage = 'url(rules/icons/archive.png)';
 	el.m_view = this;
 	el.onclick = function(e){ e.currentTarget.m_view.archivate();};
-	el.title = 'Archive foles and folders';
+	el.title = 'Archive files and folders';
 
 	var el = document.createElement('div');
 	this.elPanel.appendChild( el);
@@ -1195,24 +1195,24 @@ FilesView.prototype.getItemPath = function( i_path)
 
 FilesView.prototype.makeThumbEl = function( i_el, i_path, i_type)
 {
-	var elThumbnal = document.createElement('span');
-	i_el.appendChild( elThumbnal);
-	this.elThumbnails.push( elThumbnal);
-	elThumbnal.classList.add('thumbnail');
-	elThumbnal.m_type = i_type;
+	var elThumbnail = document.createElement('span');
+	i_el.appendChild( elThumbnail);
+	this.elThumbnails.push( elThumbnail);
+	elThumbnail.classList.add('thumbnail');
+	elThumbnail.m_type = i_type;
 
-	elThumbnal.m_path = i_path;
+	elThumbnail.m_path = i_path;
 	var thumbFile = RULES.root + c_GetThumbFileName( i_path);
 	var thumbName = c_PathBase( thumbFile);
-	elThumbnal.m_thumbFile = thumbFile;
+	elThumbnail.m_thumbFile = thumbFile;
 
 	var elImg = document.createElement('img');
-	elThumbnal.appendChild( elImg);
-	elThumbnal.m_elImg = elImg;
+	elThumbnail.appendChild( elImg);
+	elThumbnail.m_elImg = elImg;
 	if( this.walk.rufiles && ( this.walk.rufiles.indexOf( thumbName) != -1))
 		elImg.src = thumbFile;
 	else
-		elThumbnal.style.display = 'none';
+		elThumbnail.style.display = 'none';
 
 	fv_FileThumbResize( elImg);
 	elImg.onload = fv_FileThumbOnLoad;
@@ -1265,7 +1265,7 @@ FilesView.prototype.thumbsMake = function()
 FilesView.prototype.makeFolder = function()
 {
 	new cgru_Dialog({"receiver":this,"handle":'makeFolderDo',
-		"name":'make_folder',"title":'Make Folder',"info":'Ender new folder name:'});
+		"name":'make_folder',"title":'Make Folder',"info":'Enter new folder name:'});
 };
 FilesView.prototype.makeFolderDo = function( i_name)
 {
@@ -1286,7 +1286,7 @@ function fv_makeFolderFinished( i_data, i_args)
 FilesView.prototype.rename = function( i_path)
 {
 	new cgru_Dialog({"receiver":this,"handle":'renameDo',"param":i_path,"value":c_PathBase(i_path),
-		"name":'rename',"title":'Rename',"info":'Ender a new name.'});
+		"name":'rename',"title":'Rename',"info":'Enter a new name.'});
 };
 FilesView.prototype.renameDo = function( i_value, i_path)
 {

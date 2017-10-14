@@ -239,10 +239,10 @@ function u_CalcGUI( i_toggle_scrollbars)
 	}
 }
 
-function u_ResizeGUIStart( i_name, i_koeff)
+function u_ResizeGUIStart( i_name, i_coeff)
 {
 	u_resizing_name = i_name;
-	u_resizing_koeff = i_koeff;
+	u_resizing_koeff = i_coeff;
 	u_resizing_x = null;
 	document.onmousemove = u_ResizeGUI;
 	document.onmouseup = u_ResizeGUIFinish;

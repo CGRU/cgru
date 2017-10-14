@@ -249,9 +249,9 @@ function n_SendJob( job)
 	obj.sender_id = 0;
 	obj.magick_number = 1;
 	
-	n_Request({"send":obj,"func":n_JobSended});
+	n_Request({"send":obj,"func":n_JobSent});
 }
-function n_JobSended( i_data)
+function n_JobSent(i_data)
 {
 	if( i_data.error )
 		c_Error('Failed to connect AFANASY: ' + i_data.error);
@@ -273,9 +273,9 @@ function n_Get( i_path)
 }
 
 // not used
-function n_GetRuFile( i_file, i_nockeck )
+function n_GetRuFile( i_file, i_noCheck )
 {
-	if( i_nockeck != true )
+	if( i_noCheck != true )
 		if( false == c_RuFileExists( i_file)) return null;
 	return n_Request({"send":{"getfile":c_GetRuFilePath( i_file)}});
 //	return n_Get( c_GetRuFilePath( i_file));

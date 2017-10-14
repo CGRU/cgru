@@ -404,7 +404,7 @@ function bm_ThumbnailsShowHide()
 }
 function bm_ThumbnailsShow()
 {
-	c_ElSetSelected( $('bookmakrs_thumbs_btn'), true);
+	c_ElSetSelected( $('bookmarks_thumbs_btn'), true);
 
 	for( var i = 0; i < bm_elements.length; i++)
 	{
@@ -428,7 +428,7 @@ function bm_ThumbnailsShow()
 }
 function bm_ThumbnailsHide()
 {
-	c_ElSetSelected( $('bookmakrs_thumbs_btn'), false);
+	c_ElSetSelected( $('bookmarks_thumbs_btn'), false);
 
 	for( var i = 0; i < bm_elements.length; i++)
 	{

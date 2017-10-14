@@ -584,9 +584,13 @@ function c_Bytes2KMG( i_bytes)
 {
 	var lables = ['B','KB','MB','GB','TB'];
 	var th = 1, log = 0;
-	while( th*1024 < i_bytes ) { th *= 1024, log++ };
-//console.log( i_bytes + ': ' + th + ', ' + log);
-	return (i_bytes/th).toFixed(1) + ' ' + lables[log];
+	while (th * 1024 < i_bytes)
+	{
+		th *= 1024;
+		log++;
+	}
+	// console.log( i_bytes + ': ' + th + ', ' + log);
+	return (i_bytes / th).toFixed(1) + ' ' + lables[log];
 }
 
 function c_NumToStr( i_num, i_prec)

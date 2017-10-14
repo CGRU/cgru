@@ -433,7 +433,7 @@ function g_OpenFolderDo( i_data, i_args)
 
 		var elFolder = g_AppendFolder( el, fobject);
 
-		// This can happen if the parent of the curretn folder was closed and than opened
+		// This can happen if the parent of the current folder was closed and than opened
 		// without current folder change
 		if( elFolder.m_path == g_CurPath())
 		{

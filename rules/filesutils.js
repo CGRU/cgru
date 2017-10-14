@@ -529,7 +529,7 @@ function fu_Archive( i_args)
 
 	gui_Create( wnd.elContent, fu_arch_params,[RULES.archive]);
 	if( i_args.archive )
-		gui_CreateChoises({"wnd":wnd.elContent,"name":'type',"value":RULES.archive.default,"label":'Type:',"keys":RULES.archive.types});
+		gui_CreateChoices({"wnd":wnd.elContent,"name":'type',"value":RULES.archive.default,"label":'Type:',"keys":RULES.archive.types});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);

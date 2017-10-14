@@ -94,9 +94,9 @@ function p_StartReceived( i_data)
 		return;
 	}
 
-	n_Request({"send":{"initialize":{}},"func":p_InitializeReveived,"info":'init'});
+	n_Request({"send":{"initialize":{}},"func":p_InitializeReceived,"info":'init'});
 }
-function p_InitializeReveived( i_data)
+function p_InitializeReceived(i_data)
 {
 	if( i_data == null ) return;
 	for( var file in i_data.i_data )
@@ -359,7 +359,7 @@ function p_ImgLoaded(e)
 	c_Info( info, false);
 	p_el.play_slider.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
 
-//	if( img.complete != true ) c_Error('Image load imcopleted: ' + img.m_file.name);
+//	if( img.complete != true ) c_Error('Image load incomplete: ' + img.m_file.name);
 
 	// Show loaded image, but not more often than half a second (500ms)
 	if(( p_loadLastMS == null ) || ( now_ms - p_loadLastMS > 500 ))

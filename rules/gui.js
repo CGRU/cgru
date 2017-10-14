@@ -342,7 +342,7 @@ function gui_GetParams( i_wnd, i_params, o_params)
 }
 
 
-function gui_CreateChoises( i_args)
+function gui_CreateChoices(i_args)
 {
 	var wnd = i_args.wnd;
 	var name = i_args.name;
@@ -367,21 +367,21 @@ function gui_CreateChoises( i_args)
 	elLabel.textContent = label;
 	elLabel.classList.add('label');
 
-	var elChoises = document.createElement('div');
-	elDiv.appendChild( elChoises);
+	var elChoices = document.createElement('div');
+	elDiv.appendChild( elChoices);
 
 	for( var key in keys)
 	{
 		if( keys[key].disabled ) continue;
 
 		var el = document.createElement('div');
-		elChoises.appendChild( el);
-		el.classList.add('choise');
+		elChoices.appendChild( el);
+		el.classList.add('choice');
 		el.classList.add('button');
 		el.textContent = keys[key].name;
 		if( keys[key].tooltip ) el.title = keys[key].tooltip;
 		else if( keys[key].value ) el.title = keys[key].value;
-		el.onclick = gui_ChoiseOnClick;
+		el.onclick = gui_ChoiceOnClick;
 		var value = key;
 		if( keys[key].value ) value = keys[key].value;
 		if( value == def_val ) el.classList.add('selected');
@@ -393,7 +393,7 @@ function gui_CreateChoises( i_args)
 		wnd.m_choises[name].elements.push( el);
 	}
 }
-function gui_ChoiseOnClick( i_evt)
+function gui_ChoiceOnClick(i_evt)
 {
 	var el = i_evt.currentTarget;
 	var wnd = el.m_wnd;

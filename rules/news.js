@@ -617,13 +617,13 @@ function nw_HighlightChannels()
 {
 	if( g_CurPath() == null ) return;
 
-	var elChans = $('channels').m_elChan;
-	for( var i = 0; i < elChans.length; i++)
+	var elChannels = $('channels').m_elChan;
+	for( var i = 0; i < elChannels.length; i++)
 	{
-		if( g_CurPath().indexOf( elChans[i].m_path) == 0 )
-			elChans[i].classList.add('current');
+		if( g_CurPath().indexOf( elChannels[i].m_path) == 0 )
+			elChannels[i].classList.add('current');
 		else
-			elChans[i].classList.remove('current');
+			elChannels[i].classList.remove('current');
 	}
 }
 

@@ -83,7 +83,7 @@ function d_Make( i_path, i_outfolder)
 	filename = filename.replace('(U)', params.artist.toUpperCase());
 	params.filename = filename;
 
-	var wnd = new cgru_Window({"name":'dailes',"title":'Make Dailies'});
+	var wnd = new cgru_Window({"name":'dailies',"title":'Make Dailies'});
 
 	n_WalkDir({"paths":[i_path],"wfunc":d_DailiesWalkReceived,"info":'walk dailies',"d_params":params,"d_wnd":wnd});
 }
@@ -116,17 +116,17 @@ function d_DailiesWalkReceived( i_data, i_args)
 	for( var type in d_params_types )
 		gui_Create( wnd.elTabs[type], d_params[type], [params, RULES.dailies]);
 
-	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoices({"wnd":wnd.elTabs.general,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	RULES.dailies.formats.asis.disabled = true;
-	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	gui_CreateChoices({"wnd":wnd.elTabs.general,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
 	RULES.dailies.formats.asis.disabled = false;
 
 	RULES.dailies.codecs.copy.disabled = true;
-	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	gui_CreateChoices({"wnd":wnd.elTabs.general,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
 	RULES.dailies.codecs.copy.disabled = false;
 
-	gui_CreateChoises({"wnd":wnd.elTabs.general,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
+	gui_CreateChoices({"wnd":wnd.elTabs.general,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);
@@ -315,7 +315,7 @@ function d_Convert( i_args)
 	else if( i_args.folders ) title += ' Sequences';
 	else if( i_args.movies) title += ' Movies';
 	else if( i_args.results) title += ' Results';
-	var wnd = new cgru_Window({"name":'dailes',"title":title});
+	var wnd = new cgru_Window({"name":'dailies',"title":title});
 	wnd.m_args = i_args;
 	wnd.onDestroy = d_CvtOnDestroy;
 
@@ -328,21 +328,21 @@ function d_Convert( i_args)
 	if( i_args.movies !== true )
 		img_types.exr = {"name":'EXR'};
 
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":'asis',"label":'Formats:',"keys":RULES.dailies.formats});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'format',"value":'asis',"label":'Formats:',"keys":RULES.dailies.formats});
 
 	gui_Create( wnd.elContent, d_cvtguiparams, [params, RULES.dailies]);
 
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'imgtype',"value":'jpg',"label":'Image Type:',"keys":img_types});
 
 	if( i_args.movies !== true )
 	{
 		RULES.dailies.codecs.copy.disabled = true;
-		gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+		gui_CreateChoices({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 	}
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codec:',"keys":RULES.dailies.codecs});
 	RULES.dailies.codecs.copy.disabled = false;
 
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'container',"value":RULES.dailies.container,"label":'Container:',"keys":RULES.dailies.containers});
 
 	if( i_args.results )
 	{
@@ -476,7 +476,7 @@ function d_CvtProcessGUI( i_wnd, i_to_sequence)
 
 	i_wnd.m_args.cvt_paths = paths;
 
-	// Run specific funtions:
+	// Run specific functions:
 	if( i_wnd.m_args.movies || ( i_to_sequence == false ))
 	{
 		d_CvtMovies( i_wnd, params, i_to_sequence );
@@ -824,7 +824,7 @@ d_cutparams.fps = {"label":'FPS','width':'50%'};
 d_cutparams.af_pertask = {"label":'Frames Per Task','width':'50%','lwidth':'140px'};
 d_cutparams.af_capacity = {"label":'Capacity','width':'25%'};
 d_cutparams.af_maxtasks = {"label":'Max Run Tasks','width':'25%','lwidth':'120px'};
-d_cutparams.af_perhost = {"label":'Max Taks Per Host','width':'25%','lwidth':'140px'};
+d_cutparams.af_perhost = {"label":'Max Tasks Per Host','width':'25%','lwidth':'140px'};
 d_cutparams.af_maxruntime = {"label":'Max Run Time','width':'25%','lwidth':'120px'};
 d_cutparams.output = {};
 
@@ -841,9 +841,9 @@ function d_MakeCut( i_args)
 	if( RULES.cut.input ) params.input = RULES.cut.input;
 
 	gui_Create( wnd.elContent, d_cutparams, [RULES.dailies, RULES.cut, params]);
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
-	gui_CreateChoises({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'format',"value":RULES.dailies.format,"label":'Formats:',"keys":RULES.dailies.formats});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'colorspace',"value":RULES.dailies.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoices({"wnd":wnd.elContent,"name":'codec',"value":RULES.dailies.codec,"label":'Codecs:',"keys":RULES.dailies.codecs});
 
 	var elBtns = document.createElement('div');
 	wnd.elContent.appendChild( elBtns);

@@ -177,7 +177,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 	if( i_elProgressHide )
 	{
 		i_elProgressHide.classList.remove('done');
-		i_elProgressHide.classList.remove('startred');
+		i_elProgressHide.classList.remove('started');
 		i_elProgressHide.classList.add('notstarted');
 	}
 
@@ -194,7 +194,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elProgressBar.style.width = i_status.progress+'%';
 			if( i_status.progress > 0 )
 			{
-				i_elProgressBar.classList.add('startred');
+				i_elProgressBar.classList.add('started');
 				i_elProgressBar.classList.remove('notstarted');
 			}
 			if( i_status.progress >= 100 )
@@ -206,7 +206,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elPercentage.textContent = i_status.progress+'%';
 			if( i_status.progress > 0 )
 			{
-				i_elPercentage.classList.add('startred');
+				i_elPercentage.classList.add('started');
 				i_elPercentage.classList.remove('notstarted');
 			}
 			if( i_status.progress >= 100 )
@@ -218,7 +218,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elProgressHide.title = i_status.progress+'%';
 			if( i_status.progress > 0 )
 			{
-				i_elProgressHide.classList.add('startred');
+				i_elProgressHide.classList.add('started');
 				i_elProgressHide.classList.remove('notstarted');
 			}
 			if( i_status.progress >= 100 )
@@ -1323,7 +1323,7 @@ Status.prototype.editSave = function( i_args)
 				{
 					if( RULES.flags[id])
 					{
-						// Flag can limit minium and maximum progress percentage:
+						// Flag can limit minimum and maximum progress percentage:
 						var p_min = RULES.flags[id].p_min;
 						var p_max = RULES.flags[id].p_max;
 						var progress = statuses[i].obj.progress;
@@ -1338,7 +1338,7 @@ Status.prototype.editSave = function( i_args)
 						{
 							statuses[i].obj.progress = progress;
 
-							// This needed to update upper pogresses:
+							// This is needed to update upper progress:
 							progresses[statuses[i].path] = progress;
 							some_progress_changed = true;
 						}
@@ -1421,7 +1421,7 @@ Status.prototype.editSave = function( i_args)
 		statuses[i].save();
 		statuses[i].show();
 		//^ Status showing causes values redraw,
-		// and destoys edit GUI if any.
+		// and destroys edit GUI if any.
 	}
 
 	// News & Bookmarks:
@@ -1560,7 +1560,7 @@ function st_UpdateProgresses( i_path, i_progresses)
 //console.log(JSON.stringify(i_progresses));
 	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,
 		"progresses":progresses,"paths_skip_save":paths_skip_save,
-		"info":'walk upstatuses',"rufiles":['status'],"lookahead":['status']});
+		"info":'walk up statuses',"rufiles":['status'],"lookahead":['status']});
 }
 function st_UpdateProgressesWalkReceived( i_walks, i_args)
 {
@@ -1570,7 +1570,7 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 	var paths = i_args.paths;
 	var progresses = i_args.progresses;
 
-	// Update only progess in navig:
+	// Update only progress in navig:
 	var navig_params_update = {};
 	navig_params_update.progress = true;
 

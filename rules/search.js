@@ -7,7 +7,7 @@ function s_SearchOnClick()
 		$('search').m_constcted = true;
 		$('search_artists').m_elArtists = [];
 
-		// Constuct atrists just once, as they are not depending on location:
+		// Construct artists just once, as they are not depending on location:
 		var roles = c_GetRolesArtists( g_users);
 
 		for( var r = 0; r < roles.length; r++)

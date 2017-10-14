@@ -463,7 +463,7 @@ Comment.prototype.edit = function()
 	{
 		var el = document.createElement('div');
 		elDurationDiv.appendChild( el);
-		el.classList.add('sample')
+		el.classList.add('sample');
 		el.textContent = cm_durations[i];
 		el.m_elDrtn = this.elEditDuration;
 		el.onclick = function(e){ e.currentTarget.m_elDrtn.textContent = e.currentTarget.textContent;}
