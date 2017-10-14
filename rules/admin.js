@@ -794,7 +794,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.textContent = i_user.bookmarks.length;
 	el.m_user_id = i_user.id;
 	if( i_user.disabled !== true )
-		el.ondblclick = function(e){ad_UserBookmakrsClean( e.currentTarget.m_user_id);};
+		el.ondblclick = function(e){ad_UserBookmarksClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
