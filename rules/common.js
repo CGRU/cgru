@@ -73,7 +73,7 @@ function c_NullOrErrorMsg( i_obj)
 //console.log(JSON.stringify(i_obj));
 	if( i_obj == null )
 	{
-		c_Error('No responce received.');
+		c_Error('No response received.');
 		return true;
 	}
 	if( i_obj.error )
@@ -584,9 +584,13 @@ function c_Bytes2KMG( i_bytes)
 {
 	var lables = ['B','KB','MB','GB','TB'];
 	var th = 1, log = 0;
-	while( th*1024 < i_bytes ) { th *= 1024, log++ };
-//console.log( i_bytes + ': ' + th + ', ' + log);
-	return (i_bytes/th).toFixed(1) + ' ' + lables[log];
+	while (th * 1024 < i_bytes)
+	{
+		th *= 1024;
+		log++;
+	}
+	// console.log( i_bytes + ': ' + th + ', ' + log);
+	return (i_bytes / th).toFixed(1) + ' ' + lables[log];
 }
 
 function c_NumToStr( i_num, i_prec)

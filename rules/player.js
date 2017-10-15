@@ -94,9 +94,9 @@ function p_StartReceived( i_data)
 		return;
 	}
 
-	n_Request({"send":{"initialize":{}},"func":p_InitializeReveived,"info":'init'});
+	n_Request({"send":{"initialize":{}},"func":p_InitializeReceived,"info":'init'});
 }
-function p_InitializeReveived( i_data)
+function p_InitializeReceived(i_data)
 {
 	if( i_data == null ) return;
 	for( var file in i_data.i_data )
@@ -299,10 +299,10 @@ function p_WalkSequenceReceived( i_data)
 		if( p_imgTypes.indexOf( type ) == -1 ) continue;
 		var img = new Image();
 		img.src = RULES.root + p_path + '/' + file;
-		img.onload = function(e){p_ImgLoaded(e);}
-		img.onerror = function(e){p_ImgLoadError(e);}
+		img.onload = function(e){p_ImgLoaded(e);};
+		img.onerror = function(e){p_ImgLoadError(e);};
 		img.m_file = walk.files[i];
-		p_filenames.push( file)
+		p_filenames.push( file);
 		p_images.push( img);
 	}
 
@@ -359,7 +359,7 @@ function p_ImgLoaded(e)
 	c_Info( info, false);
 	p_el.play_slider.style.width = Math.round(100.0*p_numloaded/p_filenames.length) + '%';
 
-//	if( img.complete != true ) c_Error('Image load imcopleted: ' + img.m_file.name);
+//	if( img.complete != true ) c_Error('Image load incomplete: ' + img.m_file.name);
 
 	// Show loaded image, but not more often than half a second (500ms)
 	if(( p_loadLastMS == null ) || ( now_ms - p_loadLastMS > 500 ))
@@ -473,7 +473,7 @@ function p_CreateImages()
 		elImg.src = RULES.root + p_path + '/' + p_filenames[i];
 		if( localStorage.player_precreate == 'ON' )
 			elImg.style.display = 'none';
-		elImg.onmousedown = function(){return false;}
+		elImg.onmousedown = function(){return false;};
 		p_elImg.push( elImg);
 	}
 }

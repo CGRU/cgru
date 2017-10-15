@@ -7,7 +7,7 @@ function s_SearchOnClick()
 		$('search').m_constcted = true;
 		$('search_artists').m_elArtists = [];
 
-		// Constuct atrists just once, as they are not depending on location:
+		// Construct artists just once, as they are not depending on location:
 		var roles = c_GetRolesArtists( g_users);
 
 		for( var r = 0; r < roles.length; r++)
@@ -27,7 +27,7 @@ function s_SearchOnClick()
 				var el = e.currentTarget;
 				for( var a = 0; a < el.m_elArtists.length; a++) c_ElToggleSelected(el.m_elArtists[a]);
 				if( ASSET && ASSET.filter ) s_ProcessGUI();
-			}
+			};
 
 			var role_has_one_artist = false;
 			var role_has_enabled = false;

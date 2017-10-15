@@ -356,7 +356,7 @@ background-position: left;
 #sidepanel.opened #sidepanel_hide { display: block;}
 #sidepanel .label {
 font-size: 14px;
-font-family: Verdana;
+font-family: Verdana, serif;
 width: 13px;
 word-wrap: break-word;
 letter-spacing: 4px;
@@ -922,8 +922,8 @@ border-radius: 2px;
 .gui .list .ctrl .button { float: left; text-transform: capitalize; font-size: small; padding: 2px 8px; }
 .gui .source { border: 1px solid rgba(98,98,98,.5); font: 12px monospace; border-radius: 2px; margin: 8px; padding: 8px; text-align: center; }
 .gui .rules { border: 1px solid rgba(98,98,98,.5); font: 12px monospace; padding: 12px; margin: 4px 0px;  border-radius: 2px;}
-.gui .choise { float: left; /*box-shadow: 0 0 2px #000;*/ border-radius: 2px; font-size: 14px; margin: 0px 2px; }
-.gui .choise.selected { /*box-shadow: 0 0 4px #FFF inset;*/ }
+.gui .choice { float: left; /*box-shadow: 0 0 2px #000;*/ border-radius: 2px; font-size: 14px; margin: 0px 2px; }
+.gui .choice.selected { /*box-shadow: 0 0 4px #FFF inset;*/ }
 .gui .tablabel { padding: 2px 8px; margin: 2px 8px 0px; border-radius: 2px 2px 0 0; border: 1px solid rgba(98,98,98,.5); border-bottom: 0; cursor: pointer; float: left; }
 .gui .tablabel.active { background: rgba(100,255,255,.2); }
 .gui .tabpanel { padding: 2px 8px; border-radius: 2px; border: 1px solid rgba(98,98,98,.5); clear: both; }

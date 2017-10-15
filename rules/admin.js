@@ -134,7 +134,7 @@ console.log( JSON.stringify( i_data));
 	xhr.onreadystatechange = function()
 	{
 		if (xhr.readyState == 4) { g_GO('/'); window.location.reload(); }
-	}
+	};
 //*/
 //c_Log( i_data);
 }
@@ -275,7 +275,7 @@ function ad_PermissionsGrpAddOnClick()
 function ad_PermissionsUsrAddOnClick()
 {
 	new cgru_Dialog({"handle":'ad_PermissionsAdd',"param":'users',
-		"name":'permssions',"title":'Add User',"info":'Enter User ID'});
+		"name":'permissions',"title":'Add User',"info":'Enter User ID'});
 }
 function ad_PermissionsAdd( i_id, i_type)
 {
@@ -392,7 +392,7 @@ function ad_OpenWindow()
 		el.textContent = ad_states[st].label;
 		el.title = ad_states[st].tooltip;
 		el.m_state = st;
-		el.onclick = function(e){ad_WndStateSelect(e.currentTarget);}
+		el.onclick = function(e){ad_WndStateSelect(e.currentTarget);};
 		if( st == ad_wnd_curstate )
 			el.classList.add('selected');
 	}
@@ -519,25 +519,25 @@ function ad_WndDrawUsers()
 	elTr.appendChild( el);
 	el.textContent = 'Title';
 	el.title = 'User full name.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('title'); }
+	el.onclick = function(e) { ad_WndSortUsers('title'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Role';
 	el.title = 'Needed for sorting.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('role'); }
+	el.onclick = function(e) { ad_WndSortUsers('role'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'DOS';
 	el.title = 'Dossier record.';
-	el.onclick = function(e) { ad_WndSortUsers('dossier'); }
+	el.onclick = function(e) { ad_WndSortUsers('dossier'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
 	el.textContent = 'Tag';
 	el.title = 'Default tag.\nDouble click to edit.';
-	el.onclick = function(e) { ad_WndSortUsers('tag'); }
+	el.onclick = function(e) { ad_WndSortUsers('tag'); };
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
@@ -588,7 +588,7 @@ function ad_WndDrawUsers()
 
 	var el = document.createElement('th');
 	elTr.appendChild( el);
-	el.textContent = 'Lastest News';
+	el.textContent = 'Latest News';
 	el.title = 'Last news time';
 	el.onclick = function(e) { ad_WndSortUsers('ntime'); };
 
@@ -732,7 +732,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	el.textContent = 'G';
 	el.style.cursor = 'pointer';
 	el.m_user = i_user;
-	el.ondblclick = function(e){ad_WndUserGroupOnCkick( e.currentTarget.m_user);};
+	el.ondblclick = function(e){ad_WndUserGroupOnClick( e.currentTarget.m_user);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -741,7 +741,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( avatar )
 		el.style.backgroundImage = 'url(' + avatar + ')';
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_ChangeAvatarOnCkick(e.currentTarget.m_user_id);};
+	el.ondblclick = function(e){ad_ChangeAvatarOnClick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -751,13 +751,13 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	elTr.appendChild( el);
 	el.textContent = i_user.title;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_ChangeTitleOnCkick(e.currentTarget.m_user_id);};
+	el.ondblclick = function(e){ad_ChangeTitleOnClick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = i_user.role;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
+	el.ondblclick = function(e){ad_ChangeRoleOnClick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -765,19 +765,19 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	if( i_user.dossier ) dossier = i_user.dossier.split(' ')[0].split('\u00a0')[0];
 	el.innerHTML = dossier;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_ChangeDossierOnCkick(e.currentTarget.m_user_id);};
+	el.ondblclick = function(e){ad_ChangeDossierOnClick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = i_user.tag;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_ChangeTagOnCkick(e.currentTarget.m_user_id);};
+	el.ondblclick = function(e){ad_ChangeTagOnClick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
 	el.textContent = i_user.email;
 	el.m_user_id = i_user.id;
-	el.ondblclick = function(e){ad_ChangeEmailOnCkick(e.currentTarget.m_user_id);};
+	el.ondblclick = function(e){ad_ChangeEmailOnClick(e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -794,7 +794,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.textContent = i_user.bookmarks.length;
 	el.m_user_id = i_user.id;
 	if( i_user.disabled !== true )
-		el.ondblclick = function(e){ad_UserBookmakrsClean( e.currentTarget.m_user_id);};
+		el.ondblclick = function(e){ad_UserBookmarksClean( e.currentTarget.m_user_id);};
 
 	var el = document.createElement('td');
 	elTr.appendChild( el);
@@ -917,7 +917,7 @@ function ad_DeleteGroup( i_group)
 	ad_WriteGroups();
 }
 
-function ad_WndUserGroupOnCkick( i_user)
+function ad_WndUserGroupOnClick( i_user)
 {
 	var grp = ad_wnd_curgroup;
 	if( grp == null )
@@ -949,9 +949,9 @@ function ad_WndUserGroupOnCkick( i_user)
 }
 function ad_WriteGroups()
 {
-	n_Request({"send":{"writegroups":g_groups},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'Grounps written.',"info":'writegroups'});
+	n_Request({"send":{"writegroups":g_groups},"func":ad_ChangesFinished,"ad_func":ad_WndRefresh,"ad_msg":'Groups written.',"info":'writegroups'});
 }
-function ad_ChangeAvatarOnCkick( i_user_id)
+function ad_ChangeAvatarOnClick( i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeAvatar',"param":i_user_id,"value":g_users[i_user_id].avatar,
 		"name":'users',"title":'Change Avatar',"info":'Enter new avatar link for ' + c_GetUserTitle(i_user_id)});
@@ -960,7 +960,7 @@ function ad_ChangeAvatar( i_avatar, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"avatar":i_avatar}, ad_WndRefresh);
 }
-function ad_ChangeTitleOnCkick( i_user_id)
+function ad_ChangeTitleOnClick(i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeTitle',"param":i_user_id,"value":g_users[i_user_id].title,
 		"name":'users',"title":'Change Title',"info":'Enter new title for ' + c_GetUserTitle(i_user_id)});
@@ -969,7 +969,7 @@ function ad_ChangeTitle( i_title, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"title":i_title}, ad_WndRefresh);
 }
-function ad_ChangeRoleOnCkick( i_user_id)
+function ad_ChangeRoleOnClick(i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeRole',"param":i_user_id,"value":g_users[i_user_id].role,
 		"name":'users',"title":'Change Role',"info":'Enter new role for ' + c_GetUserTitle(i_user_id)});
@@ -978,7 +978,7 @@ function ad_ChangeRole( i_role, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"role":i_role}, ad_WndRefresh);
 }
-function ad_ChangeDossierOnCkick( i_user_id)
+function ad_ChangeDossierOnClick(i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeDossier',"param":i_user_id,"value":g_users[i_user_id].dossier,
 		"name":'users',"title":'Edit Dossier',"type":'text',"info":c_GetUserTitle(i_user_id) + ' dossier:'});
@@ -987,7 +987,7 @@ function ad_ChangeDossier( i_dossier, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"dossier":i_dossier}, ad_WndRefresh);
 }
-function ad_ChangeTagOnCkick( i_user_id)
+function ad_ChangeTagOnClick(i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeTag',"param":i_user_id,"value":g_users[i_user_id].tag,
 		"name":'users',"title":'Change Role',"info":'Enter new tag for ' + c_GetUserTitle(i_user_id)});
@@ -1001,7 +1001,7 @@ function ad_ChangeTag( i_tag, i_user_id)
 	}
 	ad_SaveUser({"id":i_user_id,"tag":i_tag}, ad_WndRefresh);
 }
-function ad_ChangeEmailOnCkick( i_user_id)
+function ad_ChangeEmailOnClick(i_user_id)
 {
 	new cgru_Dialog({"handle":'ad_ChangeEmail',"param":i_user_id,"value":g_users[i_user_id].email,
 		"name":'users',"title":'Change Email',"info":'Enter new email for ' + c_GetUserTitle(i_user_id)});
@@ -1010,7 +1010,7 @@ function ad_ChangeEmail( i_email, i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"email":i_email}, ad_WndRefresh);
 }
-function ad_UserBookmakrsClean( i_user_id)
+function ad_UserBookmarksClean( i_user_id)
 {
 	ad_SaveUser({"id":i_user_id,"bookmarks":[]}, ad_WndRefresh);
 }
@@ -1188,7 +1188,7 @@ function ad_SetPasswordFinished( i_data)
 {
 	if( i_data.user && g_auth_user && ( i_data.user == g_auth_user.id ))
 	{
-		// We have just chnged own password and should reload page:
+		// We have just changed own password and should reload page:
 		document.body.textContent = '';
 		window.location.reload();
 	}
@@ -1249,14 +1249,14 @@ function ad_ProfileOpen()
 	elBtns.appendChild( el);
 	el.textContent = 'Save';
 	el.classList.add('button');
-	el.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);}
+	el.onclick = function(e){ ad_ProfileSave( e.currentTarget.m_wnd);};
 	el.m_wnd = wnd;
 
 	var el = document.createElement('div');
 	elBtns.appendChild( el);
 	el.textContent = 'Cancel';
 	el.classList.add('button');
-	el.onclick = function(e){ e.currentTarget.m_wnd.destroy();}
+	el.onclick = function(e){ e.currentTarget.m_wnd.destroy();};
 	el.m_wnd = wnd;
 
 //	if( g_auth_user.states.indexOf('passwd') != -1 )
@@ -1265,7 +1265,7 @@ function ad_ProfileOpen()
 		elBtns.appendChild( el);
 		el.textContent = 'Set Password';
 		el.classList.add('button');
-		el.onclick = function(e){ ad_SetPasswordDialog( g_auth_user.id);}
+		el.onclick = function(e){ ad_SetPasswordDialog( g_auth_user.id);};
 		el.m_wnd = wnd;
 	}
 }
@@ -1280,7 +1280,7 @@ function ad_ProfileSave( i_wnd)
 	params.news_limit = parseInt( params.news_limit);
 	if( isNaN(params.news_limit))
 	{
-		c_Error('Invalud news limit number.');
+		c_Error('Invalid news limit number.');
 		return;
 	}
 
