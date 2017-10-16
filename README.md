@@ -1,8 +1,10 @@
-##CGRU
-It is a Computer Graphics Tools Pack.
-Main its tools is Afanasy and Rules.
-Other tools are satellites for that ones,
-	like dailies encoding scripts and software submission plug-ins.
+## CGRU <img src="https://raw.githubusercontent.com/CGRU/cgru/master/favicon.ico" align="right" width="90">
+
+CGRU is the Computer Graphics Tools Pack.
+
+It consists of the main tools _Afanasy_ and _Rules_.
+Other tools are arranged as satellites around these two,
+like _dailies encoding scripts_ and _software submission plug-ins_.
 
 **Afanasy** is a render farm manager.
 
@@ -12,11 +14,11 @@ Other tools are satellites for that ones,
 
 [Forum](http://forum.cgru.info)
 
-You can ask any questions on a CGRU forum.
+You can ask any questions on the CGRU forum.
 
-GitHub issues are designed for code developing.
+GitHub issues are used for code development and bug tracking.
 
-###Coding rules:
+### Coding rules:
 
 - Indentation - TABS. You can vary tab length, default 4 spaces length is normal.
 	- Python Indentation - SPACES(4). It is not a problem to tune any modern text editor for each file type.
@@ -31,12 +33,12 @@ GitHub issues are designed for code developing.
 	- `ms_` - Static class members.
 	- `g_` - External variables.
 	- `v_` - Virtual functions.
-- Do not use "!" as NOT, it is not noticeable while code passing view, much more easy to notice `false == `.
-- Use `false == var` and `NULL == val` and not `var == false` or `var == NULL`.
+- Do not use "!" as NOT, since it is not noticeable for doing code review. It is much more easy to notice `false == `.
+- Use `false == var` and `NULL == val` instead of `var == false` or `var == NULL`.
 As if you miss one '=' character, it will not be an error, it will be assignment, not comparison.
 - Use `const &` to pass complex types as function parameters to not to copy class instance.
 
-####Example:
+#### Example:
 
 	// Function with long parameters list:
 	bool someFunction(
@@ -58,7 +60,7 @@ As if you miss one '=' character, it will not be an error, it will be assignment
 		return true;
 	}
 
-You will notice, that some parts of the code is not following these rules. This
+You will notice, that some parts of the code are not following these rules. This
 is mostly because such code has been written before these rules were created or
 changed.
 
@@ -70,5 +72,4 @@ changed.
 
 **Rules** - simple came from rules! This project tracker is based on defined rules.
 Mostly project structure rules, where to store sources, references, dailies, outputs.
-As Rules has not its own database, it walks file-server folders structure.
-
+As Rules does not have its own database, it walks file-server folders structure.
