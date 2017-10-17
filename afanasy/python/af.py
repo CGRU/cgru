@@ -943,8 +943,8 @@ class Cmd:
             if 'job_progress' in data:
                 return data['job_progress']
         return None
-    
-    def setBlockState(self, jobId, blockNum, state, verbose=False):
+
+    def setBlockState(self, jobId, blockNum, state, taskIds=[], verbose=False):
         """Missing DocString
 
         :param jobId:
@@ -957,7 +957,8 @@ class Cmd:
         self.data['type'] = 'jobs'
         self.data['ids'] = [jobId]
         self.data['block_ids'] = [blockNum]
-        self.data['operation'] = {'type': state}
+        self.data['operation'] = {'type': state,
+                                  'task_ids': taskIds}
         return self._sendRequest(verbose)
 
     def renderSetUserName(self, i_user_name):
