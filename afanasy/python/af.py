@@ -944,6 +944,22 @@ class Cmd:
                 return data['job_progress']
         return None
     
+    def setBlockState(self, jobId, blockNum, state, verbose=False):
+        """Missing DocString
+
+        :param jobId:
+        :param blockNum:
+        :param str state:
+        :param bool verbose:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['ids'] = [jobId]
+        self.data['block_ids'] = [blockNum]
+        self.data['operation'] = {'type': state}
+        return self._sendRequest(verbose)
+
     def renderSetUserName(self, i_user_name):
         """Missing DocString
 
