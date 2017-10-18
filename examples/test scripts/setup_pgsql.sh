@@ -19,14 +19,19 @@ if [ ! -f $pg_conf ]; then
    exit 1
 fi
 
-# Add required config line to the PostgreSQL configuration:
-su - $pg_user -c "echo \"# Afanasy:\" >> $pg_conf; echo \"local afanasy afadmin password\" >> $pg_conf"
+# Add required config line to the PostgreSQL configuration, if not yet exists
+afanasyConfigGrep=$(grep 'Afanasy Database' $pg_conf)
+if [[ "$afanasyConfigGrep" == "" ]]; then
+  su - $pg_user -c "echo \"\" >> $pg_conf"
+  su - $pg_user -c "echo \"##### Afanasy Database ######\" >> $pg_conf"
+  su - $pg_user -c "echo \"local afanasy afadmin password\" >> $pg_conf"
+fi
 
 # Start PostgreSQL service:
 systemctl start postgresql
 
 # Create database and user
-su - $pg_user -c "psql -d $db_name -c \"CREATE DATABASE IF NOT EXISTS ${db_name};\""
+su - $pg_user -c "createdb $db_name;"
 su - $pg_user -c "psql -d $db_name -c \"CREATE USER ${db_user} PASSWORD '${db_passwd}';\""
 
 # Check connection and create tables
