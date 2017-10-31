@@ -312,7 +312,7 @@ void af::sockAddrToStr( std::ostringstream & o_str, const struct sockaddr_storag
 		#ifdef WINNT
 		addr_str = inet_ntop( AF_INET6, PVOID(&(sa->sin6_addr)), buffer, buffer_len);
 		#else
-		addr_str = inet_ntop( AF_INET6, PVOID(&(sa->sin6_addr)), buffer, buffer_len);
+		addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
 		#endif
 		break;
 	}
