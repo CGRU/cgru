@@ -515,32 +515,42 @@ AFINFO("af::msgread:\n");
 	return true;
 }
 
-char * af::msgMakeWriteHeader( const af::Msg * i_msg)
+std::string af::msgMakeWriteHeader( const af::Msg * i_msg)
 {
-	char * buffer = NULL;
-
+	int size = i_msg->writeSize() - i_msg->getHeaderOffset();
+	std::string header;
 	if( i_msg->type() == af::Msg::THTTP )
 	{
-		buffer = new char[512];
-		sprintf( buffer, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: %d\r\n\r\n",
-				i_msg->writeSize() - i_msg->getHeaderOffset());
+		header = af::getHttpHeader(size, "application/json", "200 OK");
 	}
 	else if( i_msg->type() == af::Msg::TJSON )
 	{
-		buffer = new char[128];
-		sprintf( buffer, "AFANASY %d JSON", i_msg->writeSize() - i_msg->getHeaderOffset());
+		header = std::string("AFANASY ") + std::to_string(size) + " JSON";
 	}
+	return header;
+}
 
-	return buffer;
+std::string af::getHttpHeader(int file_size, const std::string &mimeType, const std::string &status)
+{
+	int maxAge = 0;
+	if (mimeType == "text/css" || mimeType == "text/javascript" || mimeType.find("image/") != -1)
+		maxAge = 60 * 60; // enable caching for all static resources (css, js, images)
+
+	return "HTTP/1.1 " + status + "\r\n"  // set the http status code
+			 + "Connection: close" + "\r\n"   // instruct browser to close the connection after receiving data
+			 + "Content-Length: " + std::to_string(file_size) + "\r\n"         // tell how long the content is
+			 + "Content-Type: " + mimeType + "\r\n"                            // set the mime type of the result
+			 + "Cache-Control: max-age=" + std::to_string(maxAge) + "\r\n"     // optional browser caching
+			 + "Server: afanasy/" + af::Environment::getVersionCGRU() + "\r\n" // identify server
+			 + "\r\n";
 }
 
 bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 {
-	char * buffer = af::msgMakeWriteHeader( i_msg);
-	if( NULL != buffer )
+	std::string header = af::msgMakeWriteHeader( i_msg);
+	if( NULL != header.c_str() )
 	{
-		::writedata( i_desc, buffer, strlen( buffer));
-		delete buffer;
+		::writedata( i_desc, header.c_str(), header.size());
 	}
 
 	if( false == ::writedata( i_desc, i_msg->buffer() + i_msg->getHeaderOffset(), i_msg->writeSize() - i_msg->getHeaderOffset() ))
