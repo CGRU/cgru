@@ -1,3 +1,17 @@
+/***********   _    ****************************************************************************************\
+ **********   ]KH   This file is part CGRU - The Free And Open Source CG Tools Pack.
+ *********   ,KKB@   The project is licensed under the terms of the LGPLv3,      ____   [CGRU]      __ \   /
+ *          .#KKKB@           see also COPYING file in this folder.         /\  |__  /\  |\ |  /\  /__` \ /
+ *   g##NKKKBKKKKKBKKKNN#W   Project-Homepage: http://cgru.info            /  \ |   /__\ | \| /__\    \  |
+ **   ?KKKKKKKKKKKKKKKKRP   Sourcecode: https://github.com/CGRU/cgru      /----\|  /    \|  |/    \.__/  |
+ ****   `*KKKKKKKKKKKM*                                                  /      \
+ ******   #KKKKKKKKKN    Copyright © 2012-17 by Timur Hairulin
+ ******  jKKKKKKBKKKKH
+ *****   #KKM*   *RKBK   * common.js - common structures, misc formatting and user permission functions
+ *****   ""    _    `*   * used throughout all browser/*.js files
+ *****       ******      *
+ ***********************************************************************************************************/
+
 cm_Attrs = [];
 cm_Attrs.push(['name',            'Name',     'Name']);
 cm_Attrs.push(['user_name',       'User',     'User Name']);
