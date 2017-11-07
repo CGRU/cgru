@@ -156,7 +156,7 @@ Status.prototype.show = function( i_status)
 	args.elTasksDiv = this.elTasksDiv;
 
 	stcs_Show( args);
-}
+};
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
@@ -177,7 +177,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 	if( i_elProgressHide )
 	{
 		i_elProgressHide.classList.remove('done');
-		i_elProgressHide.classList.remove('startred');
+		i_elProgressHide.classList.remove('started');
 		i_elProgressHide.classList.add('notstarted');
 	}
 
@@ -194,7 +194,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elProgressBar.style.width = i_status.progress+'%';
 			if( i_status.progress > 0 )
 			{
-				i_elProgressBar.classList.add('startred');
+				i_elProgressBar.classList.add('started');
 				i_elProgressBar.classList.remove('notstarted');
 			}
 			if( i_status.progress >= 100 )
@@ -206,7 +206,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elPercentage.textContent = i_status.progress+'%';
 			if( i_status.progress > 0 )
 			{
-				i_elPercentage.classList.add('startred');
+				i_elPercentage.classList.add('started');
 				i_elPercentage.classList.remove('notstarted');
 			}
 			if( i_status.progress >= 100 )
@@ -218,7 +218,7 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 			i_elProgressHide.title = i_status.progress+'%';
 			if( i_status.progress > 0 )
 			{
-				i_elProgressHide.classList.add('startred');
+				i_elProgressHide.classList.add('started');
 				i_elProgressHide.classList.remove('notstarted');
 			}
 			if( i_status.progress >= 100 )
@@ -716,7 +716,7 @@ Status.prototype.edit = function( i_args)
 	}
 
 	this.elEdit_annotation.focus();
-}
+};
 Status.prototype.editTasksShow = function( i_evt, i_args)
 {
 	// Show tasks only once:
@@ -747,16 +747,16 @@ Status.prototype.editTasksShow = function( i_evt, i_args)
 	}
 
 	this.editTasksShowTasks();
-}
+};
 Status.prototype.editOnKeyDown = function(e, i_args)
 {
 	if( e.keyCode == 27 ) this.show();                 // ESC
 	if( e.keyCode == 13 ) this.editSave( i_args);      // ENTER
-}
+};
 function st_EditColorOnClick( i_clr, i_data)
 {
 	i_data.elEdit_Color.m_color = i_clr;
-	i_data.elEdit_Color.m_color_changed = true
+	i_data.elEdit_Color.m_color_changed = true;
 	st_SetElColor({"color": i_clr}, i_data.elColor);
 }
 Status.prototype.getMultiVale = function( i_key, i_statuses)
@@ -781,7 +781,7 @@ Status.prototype.getMultiVale = function( i_key, i_statuses)
 		}
 	}
 	return value;
-}
+};
 Status.prototype.editListShow = function( i_args)
 {
 	var elRoot = document.createElement('div');
@@ -844,7 +844,7 @@ Status.prototype.editListShow = function( i_args)
 		else
 			el.classList.add('selected');
 	}
-}
+};
 Status.prototype.editListEdit = function( i_args)
 {
 	if( i_args.elRoot.m_edit ) return;
@@ -902,7 +902,7 @@ Status.prototype.editListEdit = function( i_args)
 		el.onclick = status_elToggleSelection;
 		i_args.elEdit[i_args.name].push( el);
 	}
-}
+};
 Status.prototype.editArtistsEdit = function( i_args)
 {
 	var roles = c_GetRolesArtists( i_args.list);
@@ -966,7 +966,7 @@ Status.prototype.editArtistsEdit = function( i_args)
 			i_args.elEdit[i_args.name].push( el);
 		}
 	}
-}
+};
 function status_elToggleSelection( e)
 {
 	var el = e.currentTarget;
@@ -1004,13 +1004,13 @@ Status.prototype.addTaskOnClick = function()
 	task.artists = [];
 
 	this.editTasksShowTasks({"new":task});
-}
+};
 
 Status.prototype.editTasksShowTasks = function( i_args)
 {
 	var tasks = this.obj.tasks;
 	if( i_args && i_args.new )
-		tasks = [i_args.new]
+		tasks = [i_args.new];
 
 	if( tasks == null ) return;
 
@@ -1033,7 +1033,7 @@ Status.prototype.editTasksShowTasks = function( i_args)
 			var el = e.currentTarget.m_elTask;
 			st.elEdit_tasks.elTasks.splice( st.elEdit_tasks.elTasks.indexOf(el),1);
 			st.elEdit_tasks.removeChild( el);
-		}
+		};
 
 		var elDurDiv = document.createElement('div');
 		el.appendChild( elDurDiv);
@@ -1105,7 +1105,7 @@ Status.prototype.editTasksShowTasks = function( i_args)
 		el.m_elArtists = elArtists;
 		this.elEdit_tasks.elTasks.push( el);
 	}
-}
+};
 
 Status.prototype.editCancel = function()
 {
@@ -1117,7 +1117,7 @@ Status.prototype.editCancel = function()
 		this.elParent.classList.remove('status_editing');
 	}
 	this.elEdit = null;
-}
+};
 
 Status.prototype.editSave = function( i_args)
 {
@@ -1323,7 +1323,7 @@ Status.prototype.editSave = function( i_args)
 				{
 					if( RULES.flags[id])
 					{
-						// Flag can limit minium and maximum progress percentage:
+						// Flag can limit minimum and maximum progress percentage:
 						var p_min = RULES.flags[id].p_min;
 						var p_max = RULES.flags[id].p_max;
 						var progress = statuses[i].obj.progress;
@@ -1338,7 +1338,7 @@ Status.prototype.editSave = function( i_args)
 						{
 							statuses[i].obj.progress = progress;
 
-							// This needed to update upper pogresses:
+							// This is needed to update upper progress:
 							progresses[statuses[i].path] = progress;
 							some_progress_changed = true;
 						}
@@ -1421,7 +1421,7 @@ Status.prototype.editSave = function( i_args)
 		statuses[i].save();
 		statuses[i].show();
 		//^ Status showing causes values redraw,
-		// and destoys edit GUI if any.
+		// and destroys edit GUI if any.
 	}
 
 	// News & Bookmarks:
@@ -1431,7 +1431,7 @@ Status.prototype.editSave = function( i_args)
 		st_UpdateProgresses( this.path, progresses);
 
 	c_Info('Status(es) saved.');
-}
+};
 
 Status.prototype.save = function()
 {
@@ -1442,7 +1442,7 @@ Status.prototype.save = function()
 		RULES.status = this.obj;
 
 	st_Save( this.obj, this.path);
-}
+};
 
 function st_Save( i_status, i_path, i_func, i_args, i_navig_params_update)
 {
@@ -1560,7 +1560,7 @@ function st_UpdateProgresses( i_path, i_progresses)
 //console.log(JSON.stringify(i_progresses));
 	n_WalkDir({"paths":paths,"wfunc":st_UpdateProgressesWalkReceived,
 		"progresses":progresses,"paths_skip_save":paths_skip_save,
-		"info":'walk upstatuses',"rufiles":['status'],"lookahead":['status']});
+		"info":'walk up statuses',"rufiles":['status'],"lookahead":['status']});
 }
 function st_UpdateProgressesWalkReceived( i_walks, i_args)
 {
@@ -1570,7 +1570,7 @@ function st_UpdateProgressesWalkReceived( i_walks, i_args)
 	var paths = i_args.paths;
 	var progresses = i_args.progresses;
 
-	// Update only progess in navig:
+	// Update only progress in navig:
 	var navig_params_update = {};
 	navig_params_update.progress = true;
 

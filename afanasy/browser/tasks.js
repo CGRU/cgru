@@ -52,7 +52,7 @@ TaskItem.prototype.init = function()
 	this.elThumbBtn.classList.add('thumbs_btn');
 	this.elThumbBtn.textContent = 'T';
 	this.elThumbBtn.m_task = this;
-	this.elThumbBtn.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_task.showTumbs();};
+	this.elThumbBtn.onclick = function(e){ e.stopPropagation(); e.currentTarget.m_task.showThumbs();};
 
 	this.elStar = this.monitor.document.createElement('div');
 	this.element.appendChild( this.elStar);
@@ -291,7 +291,7 @@ TaskItem.prototype.monitorDestroy = function()
 		this.wndtask.close();
 }
 
-TaskItem.prototype.showTumbs = function()
+TaskItem.prototype.showThumbs = function()
 {
 	if( this.elThumbs )
 	{

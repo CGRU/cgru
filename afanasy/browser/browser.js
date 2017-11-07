@@ -73,7 +73,7 @@ function g_ConfigReceived( i_obj)
 	{
 		if( false == cgru_ConfigLoad( i_obj.cgru_config))
 		{
-			g_Error('Invalid config recieved.');
+			g_Error('Invalid config received.');
 			return;
 		}
 
@@ -188,10 +188,10 @@ function g_RegisterSend()
 
 function g_ProcessMsg( i_obj)
 {
-//g_Info( g_cycle+' Progessing '+g_receivers.length+' recieves');
+//g_Info( g_cycle+' Progressing '+g_receivers.length+' receives');
 	g_last_msg_cycle = g_cycle;
 
-	// Realm is sended if message not authorized
+	// Realm is sent if message not authorized
 	if( i_obj.realm )
 	{
 		g_Error('Authentication problems...');
@@ -214,13 +214,13 @@ function g_ProcessMsg( i_obj)
 	{
 		if(( g_id == 0 ) && ( i_obj.monitor.id > 0 ))
 		{
-			// Monitor is not registered and recieved an ID:
-			g_RegisterRecieved( i_obj.monitor);
+			// Monitor is not registered and received an ID:
+			g_RegisterReceived( i_obj.monitor);
 		}
 		else if( i_obj.monitor.id != g_id )
 		{
-			// Recieved ID does not match:
-			g_Info('This ID = '+g_id+' != '+i_obj.monitor.id+' recieved.');
+			// Received ID does not match:
+			g_Info('This ID = '+g_id+' != '+i_obj.monitor.id+' received.');
 			g_Deregistered();
 		}
 		return;
@@ -290,7 +290,7 @@ function g_Refresh()
 	}
 }
 
-function g_RegisterRecieved( i_obj)
+function g_RegisterReceived( i_obj)
 {
 	g_id = i_obj.id;
 	if( i_obj.uid && ( i_obj.uid > 0 ))
@@ -301,7 +301,7 @@ function g_RegisterRecieved( i_obj)
 	}
 
 	this.document.title = 'AF';
-	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
+	g_Info('Registered: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
 	$('registered').textContent = 'Registered';
 	$('id').textContent = g_id;
 	$('uid').textContent = g_uid;

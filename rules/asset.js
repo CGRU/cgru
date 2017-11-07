@@ -269,7 +269,7 @@ function a_Copy( i_args)
 	elCreate.textContent = 'Create';
 	elCreate.classList.add('button');
 	elCreate.m_wnd = wnd;
-	elCreate.onclick = function(e){ a_CopySend( e.currentTarget.m_wnd);}
+	elCreate.onclick = function(e){ a_CopySend( e.currentTarget.m_wnd);};
 
 	var elResults = document.createElement('div');
 	wnd.elContent.appendChild( elResults);

@@ -183,7 +183,7 @@ function up_Start( i_el)
 				return;
 			}
 		}
-	}
+	};
 
 	i_el.m_elProgress.style.display = 'block';
 }
@@ -225,7 +225,7 @@ function up_Finished( i_el, i_status, i_xhr)
 	if( info == null )
 		info = '';
 	else
-		info += ': '
+		info += ': ';
 
 	var time = (new Date()) / 1000 - i_el.m_time;
 	var speed = i_el.m_upfile.size;

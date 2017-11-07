@@ -88,7 +88,7 @@ MonitorNode.prototype.update = function( i_obj)
 	var title = '';
 	title += 'Launched at: ' + cm_DateTimeStrFromSec( this.params.time_launch) + '\n';
 	title += 'Registered at: ' + cm_DateTimeStrFromSec( this.params.time_register) + '\n';
-	title += 'Last acitvity at: ' + cm_DateTimeStrFromSec( this.params.time_activity) + '\n';
+	title += 'Last activity at: ' + cm_DateTimeStrFromSec( this.params.time_activity) + '\n';
 	title += 'ID = ' + this.params.id + '\n';
 //	this.elName.title = title;
 	this.element.title = title;
@@ -118,7 +118,7 @@ MonitorNode.prototype.updatePanels = function()
 
 	info += '<br>Launched at:<br>' + cm_DateTimeStrFromSec( this.params.time_launch);
 	info += '<br>Registered at:<br>' + cm_DateTimeStrFromSec( this.params.time_register);
-	info += '<br>Last acitvity at:<br>' + cm_DateTimeStrFromSec( this.params.time_activity);
+	info += '<br>Last activity at:<br>' + cm_DateTimeStrFromSec( this.params.time_activity);
 
 	this.monitor.setPanelInfo( info);
 }

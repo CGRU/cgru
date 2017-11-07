@@ -472,7 +472,7 @@ RenderNode.prototype.onDoubleClick = function( e)
 RenderNode.setService = function( i_args)
 {
 	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'serviceApply',"param":i_args.name,
-		"name":'serivce',"title":(i_args.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
+		"name":'service',"title":(i_args.name == 'enable' ? 'Enable':'Disable') + ' Service',"info":'Enter Service Name:'});
 }
 RenderNode.prototype.serviceApply = function( i_value, i_name)
 {
@@ -561,7 +561,7 @@ RenderNode.launchCmdExit = function( i_args)
 {
 //console.log( i_args);
 	new cgru_Dialog({"wnd":i_args.monitor.window,"receiver":i_args.monitor.cur_item,"handle":'launchCmdExitDo',"param":i_args.name,
-		"name":'serivce',"title":'Launch Command' + (i_args.name == 'lcex' ? ' And Exit':''),"info":'Enter command:'});
+		"name":'service',"title":'Launch Command' + (i_args.name == 'lcex' ? ' And Exit':''),"info":'Enter command:'});
 }
 RenderNode.prototype.launchCmdExitDo = function( i_value, i_name)
 {

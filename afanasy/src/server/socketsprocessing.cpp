@@ -1,4 +1,5 @@
 #include "socketsprocessing.h"
+#include "httpget.hpp"
 
 //######################################################################################################
 //
@@ -13,8 +14,8 @@
 // This is the reason  why server should not call close() first.
 // On a big amount of clients (1000), application can reach 2^16 ports limit.
 // Here we wait for about 2sec to client to close socket first.
-// To check socket connected state we just wry to write in it.
-// SIGPIPE is gnored in main.cpp
+// To check socket connected state we just try to write in it.
+// SIGPIPE is ignored in main.cpp
 //
 //
 // To check sockets state you can:
@@ -50,7 +51,6 @@ extern bool AFRunning;
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-af::Msg * httpGet( const af::Msg * i_msg);
 af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
 af::Msg * threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg);
 
@@ -170,7 +170,7 @@ bool SocketItem::processMsg( ThreadArgs * i_args)
 
 	if( m_msg_req->type() == af::Msg::THTTPGET )
 	{
-		m_msg_ans = httpGet( m_msg_req);
+		m_msg_ans = HttpGet::process(m_msg_req);
 		m_profiler->processingFinished();
 		return true;
 	}
@@ -206,7 +206,7 @@ bool SocketItem::processMsg( ThreadArgs * i_args)
 void SocketItem::processRun( ThreadArgs * i_args)
 {
 	m_msg_ans = threadRunCycleCase( i_args, m_msg_req);
-	// Even if there is no answer, we should not close socket in RUN thread, as it can be a blocking opeartion.
+	// Even if there is no answer, we should not close socket in RUN thread, as it can be a blocking operation.
 	// It can block because we prefer to wait client closes socket first, to prevent TIME_WAIT socket state.
 
 	m_profiler->processingFinished();
@@ -301,7 +301,8 @@ bool SocketItem::processIO( int i_events)
 		AF_WARN << "EPOLL event on a closed socket item: " << this;
 		break;
 	case SSProcessing:
-		AF_WARN << "EPOLL event on processing socket item: " << this;
+		// This is not an error or even a warning.
+		// Event can be generated after all data was read from previous event.
 		break;
 	default:
 		AF_ERR << "EPOLL event on unknown socket item state: " << this;
@@ -393,7 +394,7 @@ bool SocketItem::readData()
 
 	if( m_reading_finished )
 	{
-		// TRUE meand that reading is successfully finished.
+		// TRUE means that reading is successfully finished.
 		// And this item will be pushed in the processing queue.
 		m_state = SSProcessing;
 		return true;
@@ -414,19 +415,14 @@ void SocketItem::writeData()
 	{
 		// This is the first writing call.
 		// We should allocate and fill in write buffer.
-		int header_len = 0;
-		char * header_buf = af::msgMakeWriteHeader( m_msg_ans );
-		if( header_buf )
-			header_len = strlen( header_buf);
-
-		m_write_size = header_len + m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset();
+		std::string header = af::msgMakeWriteHeader( m_msg_ans);
+		m_write_size = header.size() + m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset();
 		m_write_buffer = new char[m_write_size];
-		if( header_buf )
+		if( NULL != header.c_str() )
 		{
-			memcpy( m_write_buffer, header_buf, header_len);
-			delete [] header_buf;
+			memcpy( m_write_buffer, header.c_str(), header.size());
 		}
-		memcpy( m_write_buffer + header_len, m_msg_ans->buffer() + m_msg_ans->getHeaderOffset(), m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset());
+		memcpy( m_write_buffer + header.size(), m_msg_ans->buffer() + m_msg_ans->getHeaderOffset(), m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset());
 	}
 
 	if( m_bytes_written >= m_write_size )
@@ -470,13 +466,38 @@ void SocketItem::writeData()
 
 void SocketItem::waitClose()
 {
-//closeSocket();
-//return;
+	// This function needed to wait for client closes socket first.
+	// It is needed to prevent TIME-WAIT socket state on server side.
+	// See this file top comments for details.
+
 	if( SSClosed == m_state )
 	{
 		AF_WARN << "Asking to wait for close already closed SocketItem: " << this;
 		return;
 	}
+
+	if( m_msg_ans == NULL )
+	{
+		// We will not wait client close if there is no answer.
+		// There is no answer only in special cases.
+		// For now there is only one "normal" case with no answer needed - web browser page close.
+		// There is no way to ask browser to wait something when user closes page.
+		closeSocket();
+		return;
+	}
+
+	if(( false == af::Environment::getServerHTTPWaitClose()) &&
+			(( m_msg_ans->type() == af::Msg::THTTP    ) ||
+			(  m_msg_ans->type() == af::Msg::THTTPGET )))
+	{
+		// Web browsers do not prefer to close socket connection first.
+		// To ask browser to close connection first we write a special HTTP header:
+		// Connection: close
+		// If your browser ignores this header, you can configure environment to not to wait it.
+		closeSocket();
+		return;
+	}
+
 	if( SSWaiting == m_state )
 	{
 		AF_WARN << "Asking to wait for close already waiting SocketItem: " << this;
@@ -565,7 +586,7 @@ SocketsProcessing::SocketsProcessing( ThreadArgs * i_args):
 	m_queue_proc = new SocketQueue("SocketsProcess");
 	m_queue_run  = new SocketQueue("SocketsRun");
 
-	// Raising processings connections threads:
+	// Raising processing connections threads:
 	AF_LOG << "Raising " << af::Environment::getServerSocketsProcessingThreadsNum() << " threads to process incoming connections...";
 	for( int i = 0; i < af::Environment::getServerSocketsProcessingThreadsNum(); i++)
 	{
@@ -629,7 +650,7 @@ void SocketsProcessing::initThreadingIO()
 
 SocketsProcessing::~SocketsProcessing()
 {
-	// Make queues to emit NULLs to awake wainting threads
+	// Make queues to emit NULLs to awake waiting threads
 	m_queue_run->releaseNull();
 	for( int i = 0; i < m_threads_io.size(); i++)
 		m_queue_io->releaseNull();
@@ -860,7 +881,7 @@ void SocketsProcessing::doEpoll()
 		switch( errno)
 		{
 		case EINTR:
-			AF_WARN << "epoll_wait: iterrupted";
+			AF_WARN << "epoll_wait: interrupted";
 			return;
 		default:
 			AF_ERR << "epoll_wait: " << strerror( errno);

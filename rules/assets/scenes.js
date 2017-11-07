@@ -40,7 +40,7 @@ function sc_InitHTML( i_data)
 	$('asset').innerHTML = i_data;
 
 	gui_Create( $('scenes_make_thumbnails'), sc_thumb_params);
-	gui_CreateChoises({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
+	gui_CreateChoices({"wnd":$('scenes_make_thumbnails'),"name":'colorspace',"value":RULES.thumbnail.colorspace,"label":'Colorspace:',"keys":RULES.dailies.colorspaces});
 
 	if( sc_scenes )
 	{

@@ -211,7 +211,7 @@ function shot_ResultsReceived( i_data, i_args)
 		if( fv.walk.folders == null ) continue;
 		if( fv.walk.folders.length == 0 ) continue;
 
-		// Count frames numner only in the last folder:
+		// Count frames number only in the last folder:
 		// Find the last folder, but not '.commented':
 		var folder = null;
 		for( var f = fv.walk.folders.length-1; f >= 0; f--)

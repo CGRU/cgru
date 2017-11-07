@@ -255,7 +255,9 @@ namespace af
 	/// Send message \c msg to given file discriptor
 	/** Return true if success.**/
 	bool msgwrite( int i_desc, const af::Msg * i_msg);
-	char * msgMakeWriteHeader( const af::Msg * i_msg);
+
+	std::string msgMakeWriteHeader( const af::Msg * i_msg);
+	std::string getHttpHeader(int file_size, const std::string &mimeType, const std::string &status);
 
 	/// Send a message to all its addresses and receive an answer if needed
 	Msg * sendToServer( Msg * i_msg, bool & o_ok, VerboseMode i_verbose);
