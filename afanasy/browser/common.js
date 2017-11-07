@@ -1,7 +1,7 @@
 /***********   _    ****************************************************************************************\
  **********   ]KH   This file is part CGRU - The Free And Open Source CG Tools Pack.
- *********   ,KKB@   The project is licensed under the terms of the LGPLv3,      ____   [CGRU]      __ \   /
- *          .#KKKB@           see also COPYING file in this folder.         /\  |__  /\  |\ |  /\  /__` \ /
+ *********   ,KKB@   CGRU is licensed under the terms of LGPLv3, see files       ____   [CGRU]      __ \   /
+ *          .#KKKB@           COPYING and COPYING.lesser in this folder.    /\  |__  /\  |\ |  /\  /__` \ /
  *   g##NKKKBKKKKKBKKKNN#W   Project-Homepage: http://cgru.info            /  \ |   /__\ | \| /__\    \  |
  **   ?KKKKKKKKKKKKKKKKRP   Sourcecode: https://github.com/CGRU/cgru      /----\|  /    \|  |/    \.__/  |
  ****   `*KKKKKKKKKKKM*                                                  /      \
