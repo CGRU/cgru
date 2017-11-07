@@ -747,7 +747,8 @@ FilesView.prototype.showItem = function( i_obj, i_isFolder)
 	// Button to add a comment with a link to this item:
 	{
 		var el = document.createElement('div');
-		elItem.m_elMenu.appendChild( el);
+//		elItem.m_elMenu.appendChild( el);
+		elBody.appendChild( el);
 		el.classList.add('button');
 		el.style.backgroundImage = 'url(rules/icons/comment_add.png)';
 		el.title = 'Comment item';

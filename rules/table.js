@@ -396,7 +396,7 @@ function table_CommentsReceived( i_data, i_args)
 
 		if( cm_array.length )
 		{
-			cm_array.sort( function(a,b){if(a.key<b.key)return -1;if(a.key>b.key)return 1;return 0;});
+			cm_array.sort( function(a,b){if(a.key>b.key)return -1;if(a.key<b.key)return 1;return 0;});
 			text = cm_array[0].text;
 			text = text.replace(/<(?:.|\n)*?>/gm, '');
 		}
