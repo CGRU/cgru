@@ -185,6 +185,17 @@ class BlockParameters:
                 taskname += '-' + str(self.frame_last)
                 self.tasks_names.append(taskname)
                 self.tasks_cmds.append(self.frame_first)
+                
+            elif roptype == 'Redshift_ROP':
+                self.service = 'hbatch_redshift'
+                rs_picture = ropnode.parm('RS_outputFileNamePrefix')
+
+                if rs_picture is not None:
+                    self.preview = \
+                        afcommon.patternFromPaths(
+                            rs_picture.evalAsStringAtFrame(self.frame_first),
+                            rs_picture.evalAsStringAtFrame(self.frame_last)
+                        )
 
             # Block command:
             self.cmd = 'hrender_af'
