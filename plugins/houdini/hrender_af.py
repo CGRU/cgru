@@ -206,6 +206,10 @@ elif drivertypename == "arnold":
 elif drivertypename == "alembic":
     ropnode.parm('lpostframe').set('python')
     expr = r'''import sys
+    
+elif drivertypename == "Redshift_ROP":
+    print('Frame progress for Redshift is not available now.')
+    
 f = hou.parmTuple('f').eval()
 percent = int(100*(hou.frame()-f[0])/(f[1]-f[0]))
 

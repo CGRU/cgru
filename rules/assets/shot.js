@@ -90,7 +90,7 @@ function shot_InitHTML( i_data)
 	if( ASSET.process )
 		cmd = c_PathPM_Server2Client( ASSET.process);
 
-	cmd = cmd + ' -s nuke -r nuke';
+	cmd = cmd + ' -s nuke -r nuke -f ' + RULES.fps;
 	if( ASSET.nuke_template )
 		cmd += ' -t ' + c_PathPM_Server2Client(ASSET.nuke_template);
 
