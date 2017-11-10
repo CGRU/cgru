@@ -208,7 +208,12 @@ elif drivertypename == "alembic":
     expr = r'''import sys
     
 elif drivertypename == "Redshift_ROP":
-    print('Frame progress for Redshift is not available now.')
+    # Trying to set ROP to output progress
+    print('Trying to set Redshift log level to "Debug"')
+    try:
+        hou.hscript("Redshift_setLogLevel -L 5")
+    except:
+        print('Failed, frame progress not available.')
     
 f = hou.parmTuple('f').eval()
 percent = int(100*(hou.frame()-f[0])/(f[1]-f[0]))
