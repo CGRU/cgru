@@ -1,74 +1,92 @@
-nw_connected = false;
-nw_error_count = 0;
-nw_error_count_max = 5;
-nw_error_total = 0;
+/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    '          '
+ * network.js - network request and response handlers
+ * ....................................................................................................... */
 
-function nw_send( obj)
+"use strict";
+
+var nw_connected = false;
+var nw_error_count = 0;
+var nw_error_count_max = 5;
+var nw_error_total = 0;
+
+function nw_send(obj)
 {
-	nw_request({"send":obj});
+	nw_request({"send": obj});
 }
 
-function nw_request( i_args)
+function nw_request(i_args)
 {
-	if( g_closing )
+	if (g_closing)
 		return;
 
 	var obj = i_args.send;
-	if( g_digest )
+	if (g_digest)
 	{
 		g_auth.nc++;
-		g_auth.response = hex_md5( g_digest + ':' + g_auth.nonce + ':' + g_auth.nc);
+		g_auth.response = hex_md5(g_digest + ':' + g_auth.nonce + ':' + g_auth.nc);
 		obj.auth = g_auth;
 	}
 
-	var obj_str = JSON.stringify( obj);
+	var obj_str = JSON.stringify(obj);
 
 	var xhr = new XMLHttpRequest();
 	xhr.overrideMimeType('application/json');
-//	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
+	//xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 	xhr.open('POST', '/', true);
 
 	xhr.setRequestHeader('AFANASY', obj_str.length);
-	xhr.setRequestHeader('Connection','close');
+	// xhr.setRequestHeader('Connection', 'close'); < not allowed in the request, but only in server response
 
-	xhr.m_log = '<b><i>send:</i></b> '+ obj_str;
+	xhr.m_log = '<b><i>send:</i></b> ' + obj_str;
 	xhr.m_args = i_args;
 
-	xhr.send( obj_str);
+	xhr.send(obj_str);
 
 	xhr.onreadystatechange = n_XHRHandler;
 }
 
 function n_XHRHandler()
 {
-	if( this.readyState == 4 )
+	if (this.readyState == 4)
 	{
-		if( this.status == 200 )
+		if (this.status == 200)
 		{
-			if( this.responseText.length )
-				this.m_log += '<br><b><i>recv:</i></b> '+ this.responseText;
-			g_Log( this.m_log, 'netlog');
+			if (this.responseText.length)
+				this.m_log += '<br><b><i>recv:</i></b> ' + this.responseText;
+			g_Log(this.m_log, 'netlog');
 
 			nw_error_count = 0;
 			nw_connected = true;
 
-			if( this.responseText.length )
+			if (this.responseText.length)
 			{
 				var recv_obj = null;
-				try { recv_obj = JSON.parse( this.responseText);}
-				catch( err)
+				try
+				{
+					recv_obj = JSON.parse(this.responseText);
+				}
+				catch (err)
 				{
 					g_Error('JSON.parse:');
-					g_Log( err.message+'<br>'+this.responseText);
+					g_Log(err.message + '<br>' + this.responseText);
 					recv_obj = null;
 				}
 
-				if( recv_obj )
+				if (recv_obj)
 				{
-					if( this.m_args.func )
-						this.m_args.func( recv_obj, this.m_args);
+					if (this.m_args.func)
+						this.m_args.func(recv_obj, this.m_args);
 					else
-						g_ProcessMsg( recv_obj);
+						g_ProcessMsg(recv_obj);
 				}
 			}
 		}
@@ -76,7 +94,7 @@ function n_XHRHandler()
 		{
 			nw_error_count++;
 			nw_error_total++;
-			if(( nw_error_count > nw_error_count_max ) && nw_connected )
+			if ((nw_error_count > nw_error_count_max) && nw_connected)
 			{
 				nw_connected = false;
 				g_Error('Connection lost.');
@@ -86,35 +104,37 @@ function n_XHRHandler()
 	}
 }
 
-function nw_Subscribe( i_class, i_subscribe, i_ids)
+function nw_Subscribe(i_class, i_subscribe, i_ids)
 {
-	if( g_id == 0 ) return;
+	if (g_id == 0)
+		return;
 
 	var obj = nw_ConstructActionObject('monitors', [g_id]);
 	obj.action.operation = {};
 	obj.action.operation.type = 'watch';
 	obj.action.operation.class = i_class;
-	if( i_subscribe )
+	if (i_subscribe)
 		obj.action.operation.status = 'subscribe';
 	else
 		obj.action.operation.status = 'unsubscribe';
-	if( i_ids != null )
+	if (i_ids != null)
 		obj.action.operation.ids = i_ids;
-/*	if( i_class == 'jobs' )
-	{
-		var uid = g_uid;
-		if( g_VISOR() || g_GOD() || ( uid < 0 ))
-			uid = 0
-		obj.action.operation.uids = [uid];
-	}*/
+	/*	if( i_class == 'jobs' )
+		{
+			var uid = g_uid;
+			if( g_VISOR() || g_GOD() || ( uid < 0 ))
+				uid = 0
+			obj.action.operation.uids = [uid];
+		}*/
 
 	nw_send(obj);
 }
 
 function nw_GetEvents()
 {
-	if( g_id == 0 ) return;
-//info('c' + g_cycle + ' getting events...');
+	if (g_id == 0)
+		return;
+	// info('c' + g_cycle + ' getting events...');
 	var obj = {};
 	obj.get = {};
 	obj.get.type = 'monitors';
@@ -124,32 +144,32 @@ function nw_GetEvents()
 	nw_send(obj);
 }
 
-function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number, i_func)
+function nw_GetNodes(i_type, i_ids, i_mode, i_blocks, i_tasks, i_number, i_func)
 {
 	var obj = {};
 	obj.get = {};
 	obj.get.type = i_type;
 
-	if(( i_ids != null ) && ( i_ids.length > 0 ))
+	if ((i_ids != null) && (i_ids.length > 0))
 		obj.get.ids = i_ids;
-	else if(( i_type == 'jobs') && ( false == ( g_VISOR() || g_GOD() )))
+	else if ((i_type == 'jobs') && (false == (g_VISOR() || g_GOD())))
 		obj.get.uids = [g_uid];
 
-	if( i_mode )
+	if (i_mode)
 		obj.get.mode = i_mode;
-	if( i_blocks )
+	if (i_blocks)
 		obj.get.block_ids = i_blocks;
-	if( i_tasks )
+	if (i_tasks)
 		obj.get.task_ids = i_tasks;
-	if( i_number )
+	if (i_number)
 		obj.get.number = i_number;
 
-	nw_request({"send":obj,"func":i_func});
+	nw_request({"send": obj, "func": i_func});
 }
 
-function nw_GetBlocks( i_job_id, i_blocks, i_modes)
+function nw_GetBlocks(i_job_id, i_blocks, i_modes)
 {
-	nw_GetNodes( 'jobs', [i_job_id], i_modes, i_blocks);
+	nw_GetNodes('jobs', [i_job_id], i_modes, i_blocks);
 }
 
 function nw_GetSoftwareIcons()
@@ -162,7 +182,7 @@ function nw_GetSoftwareIcons()
 	nw_send(obj);
 }
 
-function nw_ConstructActionObject( i_type, i_ids)
+function nw_ConstructActionObject(i_type, i_ids)
 {
 	var obj = {};
 	obj.action = {};
@@ -174,20 +194,22 @@ function nw_ConstructActionObject( i_type, i_ids)
 	return obj;
 }
 
-function nw_Action( i_type, i_ids, i_operation, i_params, i_block_ids)
+function nw_Action(i_type, i_ids, i_operation, i_params, i_block_ids)
 {
-	if( i_ids.length == 0 )
+	if (i_ids.length == 0)
 	{
-		g_Error( i_type + ' Action: IDs are empty.');
+		g_Error(i_type + ' Action: IDs are empty.');
 		return;
 	}
 
-	var obj = nw_ConstructActionObject( i_type, i_ids);
+	var obj = nw_ConstructActionObject(i_type, i_ids);
 
-	if( i_params    ) obj.action.params = i_params;
-	if( i_operation ) obj.action.operation = i_operation;
-	if( i_block_ids ) obj.action.block_ids = i_block_ids;
+	if (i_params)
+		obj.action.params = i_params;
+	if (i_operation)
+		obj.action.operation = i_operation;
+	if (i_block_ids)
+		obj.action.block_ids = i_block_ids;
 
-	nw_send( obj);
+	nw_send(obj);
 }
-
