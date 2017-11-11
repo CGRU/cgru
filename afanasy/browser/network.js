@@ -44,7 +44,7 @@ function nw_request(i_args)
 	xhr.open('POST', '/', true);
 
 	xhr.setRequestHeader('AFANASY', obj_str.length);
-	xhr.setRequestHeader('Connection', 'close');
+	// xhr.setRequestHeader('Connection', 'close'); < not allowed in the request, but only in server response
 
 	xhr.m_log = '<b><i>send:</i></b> ' + obj_str;
 	xhr.m_args = i_args;
