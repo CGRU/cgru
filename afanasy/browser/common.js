@@ -1,16 +1,17 @@
-/***********   _    ****************************************************************************************\
- **********   ]KH   This file is part CGRU - The Free And Open Source CG Tools Pack.
- *********   ,KKB@   CGRU is licensed under the terms of LGPLv3, see files       ____   [CGRU]      __ \   /
- *          .#KKKB@           COPYING and COPYING.lesser in this folder.    /\  |__  /\  |\ |  /\  /__` \ /
- *   g##NKKKBKKKKKBKKKNN#W   Project-Homepage: http://cgru.info            /  \ |   /__\ | \| /__\    \  |
- **   ?KKKKKKKKKKKKKKKKRP   Sourcecode: https://github.com/CGRU/cgru      /----\|  /    \|  |/    \.__/  |
- ****   `*KKKKKKKKKKKM*                                                  /      \
- ******   #KKKKKKKKKN    Copyright © 2012-17 by Timur Hairulin
- ******  jKKKKKKBKKKKH
- *****   #KKM*   *RKBK   * common.js - common structures, misc formatting and user permission functions
- *****   ""    _    `*   * used throughout all browser/*.js files
- *****       ******      *
- ***********************************************************************************************************/
+/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    '          '
+ * common.js - common js stuff for the afanasy web-page
+ * This file contains common structures, misc formatting and user permission functions used throughout
+ * all afanasy/browser/*.js files.
+ * ....................................................................................................... */
 
 "use strict";
 

@@ -67,7 +67,7 @@ DisableFormat:   false
 ---
 BasedOnStyle: Google
 Language: JavaScript
-ColumnLimit: 120
+ColumnLimit: 110
 # BinPackArguments: false
 # BinPackParameters: false
 IndentWidth:     4
