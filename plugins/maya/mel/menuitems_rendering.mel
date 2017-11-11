@@ -6,7 +6,7 @@
 
 if(`getenv AF_ROOT`!="")
 {
-    menuItem -l "Afanasy (Maya Batch)..." -ecr 0 -c "python(\"import afanasy; afanasy.UI();\");" -ann "Run maya batch.";
+    menuItem -l "Afanasy (Maya Batch)..." -ecr 0 -c "python(\"import afanasy; ui = afanasy.UI(); ui.show();\");" -ann "Run maya batch.";
     menuItem -l "MentalRay To Afanasy..." -ecr 0 -c "from afanasy import meMentalRayRender; meMentalRayRender=meMentalRayRender.meMentalRayRender()" -stp "python";
     menuItem -l "VRay To Afanasy..." -ecr 0 -c "from afanasy import meVRayRender; meVRayRender=meVRayRender.meVRayRender()" -stp "python";
     menuItem -l "Arnold To Afanasy..." -ecr 0 -c "from afanasy import meArnoldRender; meArnoldRender=meArnoldRender.meArnoldRender()" -stp "python";

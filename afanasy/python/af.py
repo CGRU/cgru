@@ -1091,6 +1091,20 @@ class Cmd:
             monitorId = result['monitor']['id']
         return monitorId
     
+    def monitorChangeUid(self, monitorId, uid):
+        """Missing DocString
+        :param monitorId:
+        :param uid:
+        :return:
+        """
+        self.action = "action"
+        self.data["type"] = "monitors"
+        self.data["ids"] = [monitorId]
+        self.data["operation"] = {"type": "watch",
+                                  "class": "perm",
+                                  "uid": uid}
+        return self._sendRequest()
+    
     def monitorUnregister(self, monitorId):
         """Missing DocString
         

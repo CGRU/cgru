@@ -19,13 +19,13 @@
 },
 
 "flags":{
-	"hold"    :{"title":"HOLD",                        "short":"Hl",                          "tip":"On hold"},
-	"error"   :{"title":"ERROR",   "clr":[255, 55, 55],"short":"Err", "p_max":99,             "tip":"Error"},
-	"comment" :{"title":"COMMENT", "clr":[222,111,222],"short":"Cmm", "p_max":99,             "tip":"Comment"},
-	"omit"    :{"title":"OMIT",    "clr":[ 99, 99, 99],"short":"Om",  "p_max":-1, "excl":true,"tip":"Omit"},
-	"done"    :{"title":"DONE",    "clr":[121,155,121],"short":"D",   "p_min":100,"excl":true,"tip":"Done"},
-	"closed"  :{"title":"CLOSED",  "clr":[ 11, 55, 11],"short":"CLS", "p_min":100,"excl":true,"tip":"Closed"},
-	"aux"     :{"title":"AUX",     "clr":[127,127,127],"short":"AUX", "p_max":-1, "excl":true,"tip":"Auxiliary"}
+	"hold"    :{"title":"HOLD",                        "short":"Hl",              "excl":true, "tip":"On hold"},
+	"error"   :{"title":"ERROR",   "clr":[255, 55, 55],"short":"Err", "p_max":99, "excl":false,"tip":"Error"},
+	"comment" :{"title":"COMMENT", "clr":[222,111,222],"short":"Cmm", "p_max":99, "excl":true, "tip":"Comment"},
+	"omit"    :{"title":"OMIT",    "clr":[ 99, 99, 99],"short":"Om",  "p_max":-1, "excl":true, "tip":"Omit"},
+	"done"    :{"title":"DONE",    "clr":[121,155,121],"short":"D",   "p_min":100,"excl":true, "tip":"Done"},
+	"closed"  :{"title":"CLOSED",  "clr":[ 11, 55, 11],"short":"CLS", "p_min":100,"excl":true, "tip":"Closed"},
+	"aux"     :{"title":"AUX",     "clr":[127,127,127],"short":"AUX", "p_max":-1, "excl":true, "tip":"Auxiliary"}
 },
 
 "tags":{
