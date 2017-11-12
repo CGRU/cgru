@@ -40,7 +40,7 @@ function nw_request(i_args)
 
 	var xhr = new XMLHttpRequest();
 	xhr.overrideMimeType('application/json');
-	//xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
+	// xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 	xhr.open('POST', '/', true);
 
 	xhr.setRequestHeader('AFANASY', obj_str.length);

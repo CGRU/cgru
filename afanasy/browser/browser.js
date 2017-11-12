@@ -62,8 +62,9 @@ function g_Init()
 
 	var header = $('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
-	for (var i = 0; i < g_monitor_buttons.length; i++) {
-		g_monitor_buttons[i].onclick = function (e) {
+	for (var i = 0; i < g_monitor_buttons.length; i++)
+	{
+		g_monitor_buttons[i].onclick = function(e) {
 			return g_MButtonClicked(e.currentTarget.textContent, e);
 		};
 	}

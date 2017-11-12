@@ -6,7 +6,7 @@
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    -Mmo.  -omM:                                                      Copyright © 2016-17 by The CGRU team
  *    '          '
  * listen.js - TODO description
  * ....................................................................................................... */

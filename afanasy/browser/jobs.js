@@ -1385,7 +1385,9 @@ JobBlock.prototype.update = function(i_displayFull) {
 				{
 					case 'r':
 						continue;  // RDY
-					case 'D': rgb = BarDONrgb; break;
+					case 'D':
+						rgb = BarDONrgb;
+						break;
 					case 'S':
 						rgb = BarSKPrgb;
 						break;  // SKP
