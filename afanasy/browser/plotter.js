@@ -173,7 +173,8 @@ Plotter.prototype.addValues = function(i_vals, i_hot) {
 		}
 
 		this.colors[v][this.pos] = clrs[v];
-		for (var c = 0; c < 3; c++) this.colors[v][this.pos][c] *= Plotter_TailClrFade;
+		for (var c = 0; c < 3; c++)
+			this.colors[v][this.pos][c] *= Plotter_TailClrFade;
 	}
 
 	this.cycle++;
@@ -193,7 +194,8 @@ Plotter.prototype.addValues = function(i_vals, i_hot) {
 			if (p == -1)
 				p = this.values[0].length - 1;
 			var sum_values = 0;
-			for (var v = 0; v < this.values.length; v++) sum_values += this.values[v][p];
+			for (var v = 0; v < this.values.length; v++)
+				sum_values += this.values[v][p];
 			if (max_value < sum_values)
 				max_value = sum_values;
 			p--;

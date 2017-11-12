@@ -18,6 +18,7 @@ define('WILDCARD', '*');
 
 $filesToCheckJS = array();
 $filesToCheckJS[] = PROJECT_PATH . "afanasy/browser/" . WILDCARD . ".js";
+$filesToCheckJS[] = PROJECT_PATH . "lib/js/cgru.js";
 
 // TODO
 $filesToCheckSource = array();

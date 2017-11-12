@@ -378,7 +378,8 @@ RenderNode.prototype.plottersCsDelete = function() {
 };
 
 RenderNode.prototype.clearTasks = function() {
-	for (var t = 0; t < this.tasks.length; t++) this.tasks[t].destroy();
+	for (var t = 0; t < this.tasks.length; t++)
+		this.tasks[t].destroy();
 	this.tasks = [];
 };
 
@@ -493,12 +494,14 @@ RenderNode.prototype.refresh = function() {
 	this.elStateTime.innerHTML = stateTime;
 	this.elStateTime.title = stateTimeTitle;
 
-	for (var t = 0; t < this.tasks.length; t++) this.tasks[t].refresh();
+	for (var t = 0; t < this.tasks.length; t++)
+		this.tasks[t].refresh();
 };
 
 RenderNode.prototype.updateTasksPercents = function() {
 	if (this.params.tasks_percents)
-		for (var t = 0; t < this.tasks.length; t++) this.tasks[t].setPercent(this.params.tasks_percents[t]);
+		for (var t = 0; t < this.tasks.length; t++)
+			this.tasks[t].setPercent(this.params.tasks_percents[t]);
 };
 
 RenderNode.prototype.onDoubleClick = function(e) {

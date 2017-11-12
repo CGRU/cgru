@@ -145,7 +145,8 @@ function Monitor(i_args)
 			return;
 		el.m_elParams.m_all_shown = true;
 		var elParams = el.m_elParams.m_elPMap;
-		for (var p in elParams) elParams[p].style.display = 'block';
+		for (var p in elParams)
+			elParams[p].style.display = 'block';
 		return false;
 	};
 	el.oncontextmenu = el.onclick;
@@ -421,7 +422,8 @@ Monitor.prototype.refresh = function() {
 			nw_GetNodes('renders', ids, 'resources');
 	}
 
-	for (var i = 0; i < this.items.length; i++) this.items[i].refresh();
+	for (var i = 0; i < this.items.length; i++)
+		this.items[i].refresh();
 
 	this.cycle++;
 };
@@ -509,10 +511,12 @@ Monitor.prototype.processMsg = function(obj) {
 	}
 
 	if (this.sortParm != 'order')
-		for (var i = 0; i < updated.length; i++) this.sortItem(updated[i]);
+		for (var i = 0; i < updated.length; i++)
+			this.sortItem(updated[i]);
 
 	var new_nodes = [];
-	for (var i = 0; i < new_ids.length; i++) new_nodes.push(this.createNode(nodes[new_ids[i]]));
+	for (var i = 0; i < new_ids.length; i++)
+		new_nodes.push(this.createNode(nodes[new_ids[i]]));
 
 	if ((this.type == 'jobs') && (this.sortParm == 'order'))
 		if (new_ids.length)  //|| updated.length )
@@ -887,7 +891,8 @@ Monitor.prototype.resetPanels = function(i_args) {
 	{
 		this.elPanelR.m_elParams.m_all_shown = false;
 		var elParams = this.elPanelR.m_elParams.m_elPMap;
-		for (var p in elParams) elParams[p].style.display = 'none';
+		for (var p in elParams)
+			elParams[p].style.display = 'none';
 	}
 
 	if (this.nodeConstructor.resetPanels)
@@ -911,9 +916,11 @@ Monitor.prototype.updatePanels = function(i_item, i_args) {
 	this.elPanelR.m_elName.style.display = 'block';
 
 	var els = this.elPanelL.getElementsByClassName('ctrl_button');
-	for (var i = 0; i < els.length; i++) els[i].classList.add('active');
+	for (var i = 0; i < els.length; i++)
+		els[i].classList.add('active');
 	var els = this.elPanelR.getElementsByClassName('section');
-	for (var i = 0; i < els.length; i++) els[i].classList.add('active');
+	for (var i = 0; i < els.length; i++)
+		els[i].classList.add('active');
 
 	var elParams = this.elPanelR.m_elParams.m_elPMap;
 	for (var p in elParams)
@@ -981,7 +988,8 @@ Monitor.prototype.addMenuItem = function(i_menu, i_action) {
 	}
 
 	var item = {};
-	for (var key in i_action) item[key] = i_action[key];
+	for (var key in i_action)
+		item[key] = i_action[key];
 	item.receiver = this;
 	if (this.cur_item && this.cur_item[item.handle])
 		item.receiver = this.cur_item;
@@ -1118,13 +1126,15 @@ Monitor.prototype.setOption = function(i_value, i_param) {
 
 Monitor.prototype.getSelectedItems = function() {
 	var items = [];
-	for (var i = 0; i < this.selected_items.length; i++) items.push(this.selected_items[i]);
+	for (var i = 0; i < this.selected_items.length; i++)
+		items.push(this.selected_items[i]);
 	return items;
 };
 
 Monitor.prototype.getSelectedIds = function() {
 	var ids = [];
-	for (var i = 0; i < this.selected_items.length; i++) ids.push(this.selected_items[i].params.id);
+	for (var i = 0; i < this.selected_items.length; i++)
+		ids.push(this.selected_items[i].params.id);
 	return ids;
 };
 
@@ -1212,7 +1222,8 @@ Monitor.prototype.sortByIds = function(i_ids) {
 
 	var items = this.items.slice();
 
-	for (var i = 0; i < this.items.length; i++) this.elList.removeChild(this.items[i].element);
+	for (var i = 0; i < this.items.length; i++)
+		this.elList.removeChild(this.items[i].element);
 	this.items = [];
 
 	for (var i = 0; i < i_ids.length; i++)
@@ -1490,7 +1501,8 @@ Monitor.prototype.filterItems = function() {
 	{
 		this.elCtrlFilter.classList.remove('filtering');
 	}
-	for (var i = 0; i < this.items.length; i++) this.filterItem(this.items[i]);
+	for (var i = 0; i < this.items.length; i++)
+		this.filterItem(this.items[i]);
 };
 
 /* ---- [ Job, Tasks and Blocks specific functions: ] -----------------------------------------------------*/

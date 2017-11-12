@@ -486,7 +486,8 @@ function g_CloseAllMonitors()
 	//	for( var i = 0; i < g_monitor_buttons.length; i++)
 	//		g_monitor_buttons[i].classList.remove('pushed');
 
-	while (g_monitors.length > 0) g_monitors[0].destroy();
+	while (g_monitors.length > 0)
+		g_monitors[0].destroy();
 }
 
 function g_ShowObject(i_data, i_args)
@@ -643,7 +644,8 @@ function g_OpenWindowWrite(i_name, i_title, i_notFinishWrite)
 
 function g_CloseAllWindows()
 {
-	for (var i = 0; i < g_windows.length; i++) g_windows[i].close();
+	for (var i = 0; i < g_windows.length; i++)
+		g_windows[i].close();
 }
 
 function g_HeaderButtonClicked()
@@ -774,7 +776,8 @@ function g_OnKeyDown(e)
 	{
 		if (cgru_EscapePopus())
 			return;
-		for (var i = 0; i < g_monitors.length; i++) g_monitors[i].selectAll(false);
+		for (var i = 0; i < g_monitors.length; i++)
+			g_monitors[i].selectAll(false);
 		return;
 	}
 

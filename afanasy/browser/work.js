@@ -40,7 +40,8 @@ function w_ResetPanels(i_monitor)
 
 	// Pools:
 	var elPools = elPanelR.m_elPools;
-	for (var i = 0; i < elPools.m_elArray.length; i++) elPools.removeChild(elPools.m_elArray[i]);
+	for (var i = 0; i < elPools.m_elArray.length; i++)
+		elPools.removeChild(elPools.m_elArray[i]);
 	elPools.m_elArray = [];
 	elPools.style.display = 'none';
 }

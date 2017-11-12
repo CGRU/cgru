@@ -108,7 +108,8 @@ TaskItem.prototype.updateProgress = function(i_progress) {
 	if (i_progress.per == null)
 		i_progress.per = 0;
 
-	for (var attr in i_progress) this.params[attr] = i_progress[attr];
+	for (var attr in i_progress)
+		this.params[attr] = i_progress[attr];
 
 	if (this.params.str == null)
 		this.params.str = 0;

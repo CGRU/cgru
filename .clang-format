@@ -74,4 +74,6 @@ IndentWidth:     4
 TabWidth:        4
 UseTab:          Always
 BreakBeforeBraces: Allman
+AllowShortLoopsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true

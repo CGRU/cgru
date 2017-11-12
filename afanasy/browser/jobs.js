@@ -553,7 +553,8 @@ JobBlock.prototype.onContextMenu = function(i_e) {
 					blocks_to_deselect.push(blocks[j]);
 		}
 
-		for (var b = 0; b < blocks_to_deselect.length; b++) blocks_to_deselect[b].setSelected(false);
+		for (var b = 0; b < blocks_to_deselect.length; b++)
+			blocks_to_deselect[b].setSelected(false);
 	}
 
 	// If selected, we deselecting it and exit:
@@ -575,7 +576,8 @@ JobBlock.prototype.onContextMenu = function(i_e) {
 	{
 		this.job.monitor.selectAll(false);
 		for (var j = 0; j < jobs.length; j++)
-			for (var b = 0; b < jobs[j].blocks.length; b++) jobs[j].blocks[b].setSelected(true);
+			for (var b = 0; b < jobs[j].blocks.length; b++)
+				jobs[j].blocks[b].setSelected(true);
 	}
 
 	// Update panels info:
@@ -650,7 +652,8 @@ JobBlock.prototype.setSelected = function(i_select) {
 
 JobBlock.prototype.deselectAll = function(i_monitor) {
 	if (i_monitor.selected_blocks)
-		while (i_monitor.selected_blocks.length) i_monitor.selected_blocks[0].setSelected(false);
+		while (i_monitor.selected_blocks.length)
+			i_monitor.selected_blocks[0].setSelected(false);
 
 	JobBlock.resetPanels(i_monitor);
 };
@@ -1385,9 +1388,7 @@ JobBlock.prototype.update = function(i_displayFull) {
 				{
 					case 'r':
 						continue;  // RDY
-					case 'D':
-						rgb = BarDONrgb;
-						break;
+					case 'D': rgb = BarDONrgb; break;
 					case 'S':
 						rgb = BarSKPrgb;
 						break;  // SKP
@@ -1674,7 +1675,8 @@ JobNode.prototype.createPanels = function(i_monitor) {
 		if (el.m_elBlocks.classList.contains('active') != true)
 			return false;
 		var elParams = el.m_elBlocks.m_elParams;
-		for (var p in elParams) elParams[p].style.display = 'block';
+		for (var p in elParams)
+			elParams[p].style.display = 'block';
 		return false;
 	}
 };
