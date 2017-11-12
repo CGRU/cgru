@@ -1366,7 +1366,7 @@ Monitor.prototype.ctrlBtnRelease = function(i_el) {
 	i_el.classList.remove('clicked');
 };
 
-/* ------- [ Sorting functions] -------------------------------------------------------------------------- */
+/* ------- [ Sorting functions ] ------------------------------------------------------------------------- */
 
 Monitor.prototype.sortDirChanged = function(i_evt) {
 	if (this.sortParm == 'order')
@@ -1414,7 +1414,7 @@ Monitor.prototype.sortParmChanged = function(i_name) {
 	this.sortItems();
 };
 
-/* ------- [ Filtering functions] ------------------------------------------------------------------------ */
+/* ------- [ Filtering functions ] ----------------------------------------------------------------------- */
 
 Monitor.prototype.filterExcludeChanged = function(i_evt) {
 	if (this.filterExclude)
@@ -1505,7 +1505,7 @@ Monitor.prototype.filterItems = function() {
 		this.filterItem(this.items[i]);
 };
 
-/* ---- [ Job, Tasks and Blocks specific functions: ] -----------------------------------------------------*/
+/* ------- [ Job, Tasks and Blocks specific functions ] -------------------------------------------------- */
 
 Monitor.prototype.jobConstruct = function(job) {
 	this.job = job;

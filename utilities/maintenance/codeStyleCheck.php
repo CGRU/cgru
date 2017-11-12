@@ -40,6 +40,7 @@ foreach ($jsFiles as $i => $filePath) {
 
 	if ($success) $success = checkFileHeader($filePath, $sourceContent, $status);
 	if ($success) $success = checkClang($sourceContent, $status, 'js');
+	if ($success) $success = checkComment($sourceContent, $status);
 
 	if ($success && !isDryRun() && count($status) > 0) {
 		file_put_contents($filePath, $sourceContent);
@@ -94,6 +95,28 @@ function checkClang(&$fileContent, &$status, $extension)
 
 	if ($contentsBefore != $fileContent) {
 		$status[] = noticeString('checkClang changed');
+	}
+	return true;
+}
+
+function checkComment(&$fileContent, &$status)
+{
+	$contentsBefore = $fileContent;
+	$search = '/\/\*\s*-{3}-*\s*\[\s*([a-zA-Z0-9-_ ,;]+)\s*\]\s*-{3}-*\s*\*\//';
+	$lines = explode(PHP_EOL, $fileContent);
+	foreach($lines as &$line){	
+		$line = preg_replace_callback(
+	    	$search,
+		    function ($match) {
+			$title = trim($match[1]);
+		      return '/* ------- [ ' . $title . ' ] -----' . str_repeat('-', 85 - strlen($title)) . ' */';
+		    },
+		    $line
+	  	);
+	}
+	$fileContent = implode(PHP_EOL, $lines);
+	if ($contentsBefore != $fileContent) {
+		$status[] = noticeString('checkComment changed');
 	}
 	return true;
 }
