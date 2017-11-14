@@ -1178,14 +1178,14 @@ class Cmd:
                 return data['renders']
         return None
     
-    def renderGetRessources(self):
+    def renderGetResources(self):
         """Missing DocString
 
         :return:
         """
         self.action = 'get'
         self.data['type'] = 'renders'
-        self.data['mode'] = 'ressources'
+        self.data['mode'] = 'resources'
         data = self._sendRequest()
         if data is not None:
             if 'renders' in data:
