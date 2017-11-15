@@ -16,22 +16,15 @@ printStart();
 
 define('WILDCARD', '*');
 
-$filesToCheckJS = array();
-$filesToCheckJS[] = PROJECT_PATH . "afanasy/browser/" . WILDCARD . ".js";
-$filesToCheckJS[] = PROJECT_PATH . "lib/js/cgru.js";
-
-// TODO
-$filesToCheckSource = array();
-
-// TODO
-$filesToCheckHeader = array();
+$filesToCheckJS = getAutoFormatFiles(array('js'));
+$filesToCheckSource = getAutoFormatFiles(array('c', 'cpp', 'h', 'hpp'));
 
 $jsFiles = glob("{" . implode(",", $filesToCheckJS) . "}", GLOB_BRACE);
-// $sourceFiles = glob("{" . implode(",", $filesToCheckSource) . "}", GLOB_BRACE);
-// $headerFiles = glob("{" . implode(",", $filesToCheckHeader) . "}", GLOB_BRACE);
+$sourceFiles = glob("{" . implode(",", $filesToCheckSource) . "}", GLOB_BRACE);
 
 printStartGroup('RUNNING CHECKS ON JS FILES');
-foreach ($jsFiles as $i => $filePath) {
+foreach ($jsFiles as $i => $filePath)
+{
 	$fileName = basename($filePath);
 	$folderName = basename(str_replace($fileName, '', $filePath));
 	$status = array();
@@ -39,10 +32,32 @@ foreach ($jsFiles as $i => $filePath) {
 	$sourceContent = file_get_contents($filePath);
 
 	if ($success) $success = checkFileHeader($filePath, $sourceContent, $status);
-	if ($success) $success = checkClang($sourceContent, $status, 'js');
+	if ($success) $success = checkClang($filePath, $sourceContent, $status);
 	if ($success) $success = checkComment($sourceContent, $status);
 
-	if ($success && !isDryRun() && count($status) > 0) {
+	if ($success && !isDryRun() && count($status) > 0)
+	{
+		file_put_contents($filePath, $sourceContent);
+	}
+	printResultLine($folderName . '/' . $fileName, $success, $status, $i / count($jsFiles));
+}
+printEndGroup();
+
+printStartGroup('RUNNING CHECKS ON SOURCE AND HEADER FILES');
+foreach ($sourceFiles as $i => $filePath)
+{
+	$fileName = basename($filePath);
+	$folderName = basename(str_replace($fileName, '', $filePath));
+	$status = array();
+	$success = true;
+	$sourceContent = file_get_contents($filePath);
+
+	if ($success) $success = checkFileHeader($filePath, $sourceContent, $status);
+	if ($success) $success = checkClang($filePath, $sourceContent, $status);
+	if ($success) $success = checkComment($sourceContent, $status);
+
+	if ($success && !isDryRun() && count($status) > 0)
+	{
 		file_put_contents($filePath, $sourceContent);
 	}
 	printResultLine($folderName . '/' . $fileName, $success, $status, $i / count($jsFiles));
@@ -55,45 +70,55 @@ exit;
 function checkFileHeader($filePath, &$fileContent, &$status)
 {
 	$headerRegex = '/^(\/\*\*?[\s\S]*?\*\/)([\s\S]*)$/';
-	if (preg_match($headerRegex, $fileContent, $matchHeader)) {
+	$modificationString = getModificationInterval($filePath);
+	if (preg_match($headerRegex, $fileContent, $matchHeader))
+	{
 		$fileHeader = $matchHeader[1];
 		// $fileSourceCode = $matchHeader[2];
-		$modificationString = getModificationInterval($filePath);
 
-		if (strpos($fileHeader, '<yMMMMMMMMMMMMMMy>') === false) {
+		if (strpos($fileHeader, '<yMMMMMMMMMMMMMMy>') === false)
+		{
 			// not a recent proper file header, try other known formats
-            		$status[] = errorString('header unknown!');
-		} else {
+			$status[] = errorString('header unknown!');
+		} else
+		{
 			$regexParseHeader = '/^[\s\S]+\*\s*\'\s*\'([\s\S]*?)\.*\s*\*\/([\s\S]+)$/';
-			if (preg_match($regexParseHeader, $fileContent, $matchHeaderNew)) {
+			if (preg_match($regexParseHeader, $fileContent, $matchHeaderNew))
+			{
 				$newFileContent = getFileHeader($matchHeaderNew[1], $modificationString) . $matchHeaderNew[2];
-				if ($newFileContent != $fileContent) {
+				if ($newFileContent != $fileContent)
+				{
 					$status[] = noticeString('header has changed!');
 					$fileContent = $newFileContent;
 				}
 				return true;
-			} else {
+			} else
+			{
 				$status[] = errorString('header unknown!');
 			}
 		}
 
-	} else {
-		$status[] = errorString('No header found!');
+	} else
+	{
+		$status[] = noticeString('No header found, inserting dummy header');
+		$fileContent = getFileHeader(basename($filePath) . ' - TODO: description', $modificationString) . PHP_EOL . PHP_EOL . trim($fileContent);
+		return true;
 	}
 	return false;
 }
 
-function checkClang(&$fileContent, &$status, $extension)
+function checkClang($filePath, &$fileContent, &$status)
 {
 	$contentsBefore = $fileContent;
-
+	$extension = substr($filePath, strrpos($filePath, '.') + 1);
 	$filepathTemp = PROJECT_PATH . '/.tmp.' . $extension;
 	file_put_contents($filepathTemp, $fileContent);
 	shell_exec(CLANG_FORMAT_EXEC_PATH . ' -i --style=file ' . escapeshellarg($filepathTemp));
 	$fileContent = file_get_contents($filepathTemp);
 	unlink($filepathTemp); // nothing to see here :)
 
-	if ($contentsBefore != $fileContent) {
+	if ($contentsBefore != $fileContent)
+	{
 		$status[] = noticeString('checkClang changed');
 	}
 	return true;
@@ -104,18 +129,24 @@ function checkComment(&$fileContent, &$status)
 	$contentsBefore = $fileContent;
 	$search = '/\/\*\s*-{3}-*\s*\[\s*([a-zA-Z0-9-_ ,;]+)\s*\]\s*-{3}-*\s*\*\//';
 	$lines = explode(PHP_EOL, $fileContent);
-	foreach($lines as &$line){	
-		$line = preg_replace_callback(
-	    	$search,
-		    function ($match) {
-			$title = trim($match[1]);
-		      return '/* ------- [ ' . $title . ' ] -----' . str_repeat('-', 85 - strlen($title)) . ' */';
-		    },
-		    $line
-	  	);
+	foreach ($lines as &$line)
+	{
+		if (substr($line, 0, 2) == '/*')
+		{
+			$line = preg_replace_callback(
+				$search,
+				function ($match)
+				{
+					$title = trim($match[1]);
+					return '/* ------- [ ' . $title . ' ] -----' . str_repeat('-', 85 - strlen($title)) . ' */';
+				},
+				$line
+			);
+		}
 	}
 	$fileContent = implode(PHP_EOL, $lines);
-	if ($contentsBefore != $fileContent) {
+	if ($contentsBefore != $fileContent)
+	{
 		$status[] = noticeString('checkComment changed');
 	}
 	return true;
@@ -140,17 +171,20 @@ EOT;
 	$lines = explode(PHP_EOL, $description);
 	$nonEmptyLines = array();
 	$firstFound = false;
-	foreach ($lines as $line) {
+	foreach ($lines as $line)
+	{
 		$l = trim($line);
 		if (!$firstFound && ($l == '*' || empty($l))) continue;
 		$regexCommentStart = '/^\*\s?(.*)$/';
-		if (preg_match($regexCommentStart, $l, $match)) {
+		if (preg_match($regexCommentStart, $l, $match))
+		{
 			$l = $match[1];
 		}
 		$nonEmptyLines[] = rtrim(($firstFound ? ' * ' : '') . $l);
 		$firstFound = true;
 	}
-	if ($nonEmptyLines[count($nonEmptyLines) - 1] == ' *') {
+	if ($nonEmptyLines[count($nonEmptyLines) - 1] == ' *')
+	{
 		unset($nonEmptyLines[count($nonEmptyLines) - 1]);
 	}
 
@@ -158,6 +192,22 @@ EOT;
 	return str_replace(array('__description__', '__date__'),
 		array($description, $modificationString), $out);
 }
+
+function getAutoFormatFiles($extensions)
+{
+	// all changed files since introduction of autoformat in commit b078a1 (includes uncommited changes)
+	$files = shell_exec('git diff --name-only b078a1');
+	$fileListAll = explode(PHP_EOL, $files);
+	$fileList = array();
+	foreach ($fileListAll as $file)
+	{
+		$extension = substr($file, strrpos($file, '.') + 1);
+		if (in_array($extension, $extensions))
+			$fileList[] = PROJECT_PATH . $file;
+	}
+	return $fileList;
+}
+
 
 ?>
 
