@@ -8,7 +8,8 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2016-17 by The CGRU team
  *    '          '
- * listen.js - TODO description
+ * listen.js - window for monitoring (tail -f) all output of an entity
+ * This is used for monitoring all output for a job, or inside the task to see the task output
  * ....................................................................................................... */
 
 "use strict";

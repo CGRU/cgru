@@ -8,7 +8,9 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
  *    '          '
- * jobs.js - TODO description
+ * jobs.js - methods and structs for monitoring and handling of render jobs
+ *    JobBlock - a block if job nodes
+ *    JobNode  - the representation of a job (one committed work-payload)
  * ....................................................................................................... */
 
 "use strict";

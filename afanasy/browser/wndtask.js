@@ -8,15 +8,15 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2016-17 by The CGRU team
  *    '          '
- * wndtask.js - TODO: description
+ * wndtask.js - contains the detail window for a task
  * ....................................................................................................... */
 
 "use strict";
 
 var wt_windows = [];
 
-var wt_types = ['TExec', 'TOutput', 'TLog', 'TErrorHosts', 'TListen'];
-var wt_labels = ['Executable', 'Output', 'Log', 'Error Hosts', 'Listen'];
+var wt_types = ['TExec' /***/, 'TOutput' /**/, 'TLog' /**/, 'TErrorHosts', 'TListen'];
+var wt_labels = ['Executable', 'Output' /***/, 'Log' /***/, 'Error Hosts', 'Listen'];
 
 function wt_same(i_a, i_b)
 {

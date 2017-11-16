@@ -8,7 +8,9 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
  *    '          '
- * tasks.js - TODO: description
+ * tasks.js - methods and structs for monitoring and handling of tasks
+ *   BlockItem - a block of task items
+ *   TaskItem  - an atomic representation of work (e.g. rendering of one frame)
  * ....................................................................................................... */
 
 "use strict";

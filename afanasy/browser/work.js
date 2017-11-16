@@ -8,7 +8,7 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2017 by The CGRU team
  *    '          '
- * work.js - TODO: description
+ * work.js - work related methods for the jobs.js
  * ....................................................................................................... */
 
 "use strict";

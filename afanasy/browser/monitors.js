@@ -8,7 +8,8 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2013-17 by The CGRU team
  *    '          '
- * monitors.js - TODO description
+ * monitors.js - methods and structs for monitoring and handling of running monitor instances
+ * These are the monitor sessions with username, ip, ...
  * ....................................................................................................... */
 
 "use strict";

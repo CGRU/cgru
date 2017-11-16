@@ -8,7 +8,11 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
  *    '          '
- * monitor.js - TODO description
+ * monitor.js - A monitor of an entity (all, job, render, user, task, monitor[session])
+ * The full window to display the entity contains
+ *   left column   - list of buttons with actions to be run on the entity
+ *   center screen - custom content provided by the entity
+ *   right column  - meta data and key-value pairs associated with the entity
  * ....................................................................................................... */
 
 "use strict";

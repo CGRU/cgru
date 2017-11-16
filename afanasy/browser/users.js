@@ -8,7 +8,7 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
  *    '          '
- * users.js - TODO: description
+ * users.js - methods and structs for monitoring and handling of users
  * ....................................................................................................... */
 
 "use strict";

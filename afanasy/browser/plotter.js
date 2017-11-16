@@ -8,7 +8,8 @@
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
  *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
  *    '          '
- * plotter.js - TODO: description
+ * plotter.js - bar graph to live monitor render performance stats (mem, cpu, ...)
+ * This view is used inside the render node
  * ....................................................................................................... */
 
 "use strict";
