@@ -61,8 +61,10 @@ is mostly because such code has been written before these rules were created or
 changed.
 
 The typical file header and code style for C++ and JS files can automatically be applied with the script 
-utilities/maintenance/codeStyleCheck.php see the file for instructions of setup and usage.
+[utilities/maintenance/codeStyleCheck.php](https://github.com/CGRU/cgru/blob/master/utilities/maintenance/codeStyleCheck.php) see the file for instructions of setup and usage. 
 
+The file header shall contain as much information as possible about the file, you can find a good example here:
+[afanasy/browser/monitor.js](https://github.com/CGRU/cgru/blob/master/afanasy/browser/monitor.js)
 ### Some names:
 **CGRU** - came from CG - Rules. It has two meanings: computer graphics principles and computer graphics is a cool thing.
 
