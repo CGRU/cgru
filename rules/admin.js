@@ -11,15 +11,17 @@
  * admin.js - user administration page
  * ....................................................................................................... */
 
-ad_initialized = false;
-ad_permissions = null;
-ad_wnd = null;
-ad_wnd_curgroup = null;
-ad_wnd_curstate = null;
-ad_wnd_sort_prop = 'role';
-ad_wnd_sort_dir = 0;
+"use strict";
 
-ad_states = {
+var ad_initialized = false;
+var ad_permissions = null;
+var ad_wnd = null;
+var ad_wnd_curgroup = null;
+var ad_wnd_curstate = null;
+var ad_wnd_sort_prop = 'role';
+var ad_wnd_sort_dir = 0;
+
+var ad_states = {
 	notart /*****/: {"short": 'NA', "label": 'NotArt' /*****/, "tooltip": 'Not an artist.'},
 	passwd /*****/: {"short": 'PS', "label": 'Passwd' /*****/, "tooltip": 'Can change password.'},
 	playlist /***/: {"short": 'PL', "label": 'Playlist' /***/, "tooltip": 'Can edit playlist.'},
@@ -28,7 +30,7 @@ ad_states = {
 	editbody /***/: {"short": 'BD', "label": 'EditBody' /***/, "tooltip": 'Can edit body.'}
 };
 
-ad_prof_props = {
+var ad_prof_props = {
 	id /**********/: {"disabled": true, "lwidth": '170px', "label": 'ID'},
 	title /*******/: {"disabled": true, "lwidth": '170px'},
 	role /********/: {"disabled": true, "lwidth": '170px'},
@@ -1508,7 +1510,7 @@ function ad_ProfileSave(i_wnd)
 		return;
 	}
 
-	for (p in params)
+	for (var p in params)
 		g_auth_user[p] = params[p];
 	ad_SaveUser();
 	i_wnd.destroy();
