@@ -37,7 +37,7 @@ function cgru_params_OnChange(i_param, i_value)
 	u_ApplyStyles();
 }
 
-/* ------- [ init functions ] ---------------------------------------------------------------------------- */
+/* ---------------- [ init functions ] ------------------------------------------------------------------- */
 
 function g_Init()
 {
@@ -132,7 +132,7 @@ function g_Init_Rules(i_data)
 	$('navigate_root').href = document.location.href.replace(/#.*/, '');
 }
 
-/* ------- [ path functions ] ---------------------------------------------------------------------------- */
+/* ---------------- [ path functions ] ------------------------------------------------------------------- */
 
 function g_CurPath()
 {
@@ -167,7 +167,7 @@ function g_GO(i_path)
 	window.location.hash = i_path;
 }
 
-/* ------- [ location args functions ] ------------------------------------------------------------------- */
+/* ---------------- [ location args functions ] ---------------------------------------------------------- */
 
 function g_GetLocationArgs(i_args, i_absolute, i_path)
 {
@@ -441,7 +441,7 @@ function g_Goto(i_folder, i_path, i_walk)
 	return true;
 }
 
-/* ------- [ folder functions ] -------------------------------------------------------------------------- */
+/* ---------------- [ folder functions ] ----------------------------------------------------------------- */
 
 function g_OpenCloseFolder(i_elFolder)
 {

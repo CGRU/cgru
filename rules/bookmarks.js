@@ -421,7 +421,7 @@ function bm_DeleteObsoleteOnClick()
 	bm_Delete(paths);
 }
 
-/* ------- [ thumbnail functions ] ----------------------------------------------------------------------- */
+/* ---------------- [ thumbnail functions ] -------------------------------------------------------------- */
 
 function bm_ThumbnailsOnClick()
 {

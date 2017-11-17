@@ -15,6 +15,7 @@ require_once(dirname(__FILE__) . '/common.inc.php');
 printStart();
 
 define('WILDCARD', '*');
+define('LINE_LENGTH', 110);
 
 $filesToCheckJS = getAutoFormatFiles(array('js'));
 $filesToCheckSource = getAutoFormatFiles(array('c', 'cpp', 'h', 'hpp'));
@@ -126,25 +127,35 @@ function checkClang($filePath, &$fileContent, &$status)
 
 function checkComment(&$fileContent, &$status)
 {
+	
 	$contentsBefore = $fileContent;
-	$search = '/\/\*\s*-{3}-*\s*\[\s*([a-zA-Z0-9-_ ,;]+)\s*\]\s*-{3}-*\s*\*\//';
-	$lines = explode(PHP_EOL, $fileContent);
-	foreach ($lines as &$line)
-	{
-		if (substr($line, 0, 2) == '/*')
+	// superheading	
+	$search = array(
+		'/\/\/\s*####+\n\/\/\s*####+\s*([a-zA-Z0-9-_ ,;]+)\s*####+\n\/\/\s*####+/',
+		'/\/\*\s*####+\n\s*####+\s*\[\s*([a-zA-Z0-9-_ ,;]+)\s*\]\s*####+\n\s*####+\s\*\//',
+	);
+	$fileContent = preg_replace_callback(
+		$search,
+		function ($match)
 		{
-			$line = preg_replace_callback(
-				$search,
-				function ($match)
-				{
-					$title = trim($match[1]);
-					return '/* ------- [ ' . $title . ' ] -----' . str_repeat('-', 85 - strlen($title)) . ' */';
-				},
-				$line
-			);
-		}
-	}
-	$fileContent = implode(PHP_EOL, $lines);
+			$title = trim($match[1]);
+			return '/* ' . str_repeat('#', LINE_LENGTH - 3) . PHP_EOL
+				. '################### [ ' . $title . ' ] #####' . str_repeat('#', (LINE_LENGTH - 30) - strlen($title)) . PHP_EOL
+				. str_repeat('#', LINE_LENGTH - 3) . ' */';
+		},
+		$fileContent
+	);
+	// subheading	
+	$search = '/\/\*\s*-{3}-*\s*\[\s*([a-zA-Z0-9-_ ,;]+)\s*\]\s*-{3}-*\s*\*\//';
+	$fileContent = preg_replace_callback(
+		$search,
+		function ($match)
+		{
+			$title = trim($match[1]);
+			return '/* ---------------- [ ' . $title . ' ] -----' . str_repeat('-', (LINE_LENGTH - 34) - strlen($title)) . ' */';
+		},
+		$fileContent
+	);
 	if ($contentsBefore != $fileContent)
 	{
 		$status[] = noticeString('checkComment changed');

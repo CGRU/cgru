@@ -286,7 +286,7 @@ function c_DT_StrFromMSec(i_time, i_nosec)
 	return date;
 }
 
-/* ------- [ Time and format functions ] ----------------------------------------------------------------- */
+/* ---------------- [ Time and format functions ] -------------------------------------------------------- */
 
 function c_DT_CurSeconds()
 {
@@ -434,7 +434,7 @@ function c_ElDisplayToggle(i_el)
 		i_el.style.display = 'none';
 }
 
-/* ------- [ User information functions ] ---------------------------------------------------------------- */
+/* ---------------- [ User information functions ] ------------------------------------------------------- */
 
 function c_IsNotAnArtist(i_user)
 {
@@ -670,7 +670,7 @@ function c_FileDragStart(i_evt, i_path)
 	// console.log(path);
 }
 
-/* ------- [ RU file functions ] ------------------------------------------------------------------------- */
+/* ---------------- [ RU file functions ] ---------------------------------------------------------------- */
 
 function c_GetRuFilePath(i_file, i_path)
 {
@@ -707,7 +707,7 @@ function c_RuFileAdd(i_file)
 		g_elCurFolder.m_dir.rufiles.push(i_file);
 }
 
-/* ------- [ File functions ] ---------------------------------------------------------------------------- */
+/* ---------------- [ File functions ] ------------------------------------------------------------------- */
 
 function c_FileIsMovie(i_file)
 {
@@ -804,7 +804,7 @@ function c_MakeThumbnail(i_file, i_func)
 	n_Request({"send": {"cmdexec": {"cmds": [cmd]}}, "func": i_func, "file": i_file, "info": 'thumbnail'});
 }
 
-/* ------- [ Path transposing functions ] ---------------------------------------------------------------- */
+/* ---------------- [ Path transposing functions ] ------------------------------------------------------- */
 
 function c_PathBase(i_file)
 {
@@ -855,7 +855,7 @@ function c_MD5(i_str)
 	return hex_md5(i_str);
 }
 
-/* ------- [ Email functions ] --------------------------------------------------------------------------- */
+/* ---------------- [ Email functions ] ------------------------------------------------------------------ */
 
 function c_EmailFromTitle()
 {

@@ -13,7 +13,7 @@
 
 "use strict";
 
-/* ------- [ Put structs and functions ] ----------------------------------------------------------------- */
+/* ---------------- [ Put structs and functions ] -------------------------------------------------------- */
 var fu_put_params = {
 	// src : {"label":'Source', "disabled":true},
 	dest: {"label": 'Destination'}
@@ -163,7 +163,7 @@ function fu_PutDo(i_wnd)
 }
 
 
-/* ------- [ Checksum structs and functions ] ------------------------------------------------------------ */
+/* ---------------- [ Checksum structs and functions ] --------------------------------------------------- */
 var fu_sum_params = {
 	path /********/: {"label": 'Path', "disabled": true},
 	type /********/: {"label": 'Type', "disabled": true},
@@ -259,7 +259,7 @@ function fu_ChecksumDo(i_wnd)
 	n_SendJob(job);
 }
 
-/* ------- [ Multi Put structs and functions ] ----------------------------------------------------------- */
+/* ---------------- [ Multi Put structs and functions ] -------------------------------------------------- */
 var fu_putmulti_params = {
 	input /*********/: {"label": 'Result Paths'},
 	skipexisting /**/: {"label": 'Skip Existing', 'type': "bool", 'default': true, "width": '33%'},
@@ -539,7 +539,7 @@ function fu_PutMultiDo(i_wnd)
 	// console.log(JSON.stringify(job));
 }
 
-/* ------- [ Archive structs and functions ] ------------------------------------------------------------- */
+/* ---------------- [ Archive structs and functions ] ---------------------------------------------------- */
 var fu_arch_params = {
 	dest: {'label': 'Destination'},
 	split: {'tooltip': 'Split archive size.'},
@@ -700,7 +700,7 @@ function fu_ArchivateProcessGUI(i_wnd)
 	i_wnd.destroy();
 }
 
-/* ------- [ Walk structs and functions ] ---------------------------------------------------------------- */
+/* ---------------- [ Walk structs and functions ] ------------------------------------------------------- */
 var fu_walk_params = {
 	path: {},
 	verbose: {"label": 'Verbose Level', "default": 2, "lwidth": '170px', "width": '33%'},
@@ -788,7 +788,7 @@ function fu_WalkProcessGUI(i_wnd)
 }
 
 
-/* ------- [ TMPFIO function ] --------------------------------------------------------------------------- */
+/* ---------------- [ TMPFIO function ] ------------------------------------------------------------------ */
 function fu_TmpFio(i_args)
 {
 	console.log(JSON.stringify(i_args.fview.path));
@@ -802,7 +802,7 @@ function fu_TmpFio(i_args)
 	a_Copy(args);
 }
 
-/* ------- [ BUFFER structs and functions ] -------------------------------------------------------------- */
+/* ---------------- [ BUFFER structs and functions ] ----------------------------------------------------- */
 var fu_bufferItems = [];
 
 function fu_BufferAdd(i_path)
