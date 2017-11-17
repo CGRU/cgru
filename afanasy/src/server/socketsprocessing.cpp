@@ -1,4 +1,5 @@
 #include "socketsprocessing.h"
+#include "httpget.hpp"
 
 //######################################################################################################
 //
@@ -50,7 +51,6 @@ extern bool AFRunning;
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-af::Msg * httpGet( const af::Msg * i_msg);
 af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
 af::Msg * threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg);
 
@@ -170,7 +170,7 @@ bool SocketItem::processMsg( ThreadArgs * i_args)
 
 	if( m_msg_req->type() == af::Msg::THTTPGET )
 	{
-		m_msg_ans = httpGet( m_msg_req);
+		m_msg_ans = HttpGet::process(m_msg_req);
 		m_profiler->processingFinished();
 		return true;
 	}
@@ -415,19 +415,14 @@ void SocketItem::writeData()
 	{
 		// This is the first writing call.
 		// We should allocate and fill in write buffer.
-		int header_len = 0;
-		char * header_buf = af::msgMakeWriteHeader( m_msg_ans );
-		if( header_buf )
-			header_len = strlen( header_buf);
-
-		m_write_size = header_len + m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset();
+		std::string header = af::msgMakeWriteHeader( m_msg_ans);
+		m_write_size = header.size() + m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset();
 		m_write_buffer = new char[m_write_size];
-		if( header_buf )
+		if( NULL != header.c_str() )
 		{
-			memcpy( m_write_buffer, header_buf, header_len);
-			delete [] header_buf;
+			memcpy( m_write_buffer, header.c_str(), header.size());
 		}
-		memcpy( m_write_buffer + header_len, m_msg_ans->buffer() + m_msg_ans->getHeaderOffset(), m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset());
+		memcpy( m_write_buffer + header.size(), m_msg_ans->buffer() + m_msg_ans->getHeaderOffset(), m_msg_ans->writeSize() - m_msg_ans->getHeaderOffset());
 	}
 
 	if( m_bytes_written >= m_write_size )

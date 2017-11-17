@@ -1268,7 +1268,7 @@ function makenews( $i_args, &$io_users, &$o_out)
 
 	// Ensure that path last character is not '/' (if path is not just '/' root):
 	if(( $path != '/') && ( $path[strlen($path-1)] == '/'))
-		$path = substr( $path, 0, $strlen($path)-1);
+		$path = substr( $path, 0, strlen($path)-1);
 
 	// Process recent for current and each parent folders till root:
 	for( $i = 0; $i <= 100; $i++)

@@ -298,9 +298,9 @@ function table_Gen_picture( i_shot)
 		reader.onloadend = function()
 		{
 			table_PictureReceived( reader.result, i_shot);
-		}
+		};
 		reader.readAsDataURL( xhr.response);
-	}
+	};
 	xhr.open('GET', url);
 	xhr.send();
 }
@@ -309,7 +309,7 @@ function table_PictureReceived( i_data, i_shot)
 	//console.log( i_data);
 	//console.log( i_shot);
 
-	var args = {}
+	var args = {};
 	args.data = '';
 
 	if( i_data )
@@ -366,7 +366,7 @@ function table_BodyReceived( i_data, i_args)
 	{
 		var body = i_data.replace(/<(?:.|\n)*?>/gm, '');
 
-		info += '<div style="text-align: left">'
+		info += '<div style="text-align: left">';
 		info += body;
 		info += '</div>'
 	}
@@ -396,7 +396,7 @@ function table_CommentsReceived( i_data, i_args)
 
 		if( cm_array.length )
 		{
-			cm_array.sort( function(a,b){if(a.key<b.key)return -1;if(a.key>b.key)return 1;return 0;});
+			cm_array.sort( function(a,b){if(a.key>b.key)return -1;if(a.key<b.key)return 1;return 0;});
 			text = cm_array[0].text;
 			text = text.replace(/<(?:.|\n)*?>/gm, '');
 		}

@@ -943,7 +943,24 @@ class Cmd:
             if 'job_progress' in data:
                 return data['job_progress']
         return None
-    
+
+    def setBlockState(self, jobId, blockNum, state, taskIds=[], verbose=False):
+        """Missing DocString
+
+        :param jobId:
+        :param blockNum:
+        :param str state:
+        :param bool verbose:
+        :return:
+        """
+        self.action = 'action'
+        self.data['type'] = 'jobs'
+        self.data['ids'] = [jobId]
+        self.data['block_ids'] = [blockNum]
+        self.data['operation'] = {'type': state,
+                                  'task_ids': taskIds}
+        return self._sendRequest(verbose)
+
     def renderSetUserName(self, i_user_name):
         """Missing DocString
 
@@ -1074,6 +1091,20 @@ class Cmd:
             monitorId = result['monitor']['id']
         return monitorId
     
+    def monitorChangeUid(self, monitorId, uid):
+        """Missing DocString
+        :param monitorId:
+        :param uid:
+        :return:
+        """
+        self.action = "action"
+        self.data["type"] = "monitors"
+        self.data["ids"] = [monitorId]
+        self.data["operation"] = {"type": "watch",
+                                  "class": "perm",
+                                  "uid": uid}
+        return self._sendRequest()
+    
     def monitorUnregister(self, monitorId):
         """Missing DocString
         
@@ -1147,14 +1178,14 @@ class Cmd:
                 return data['renders']
         return None
     
-    def renderGetRessources(self):
+    def renderGetResources(self):
         """Missing DocString
 
         :return:
         """
         self.action = 'get'
         self.data['type'] = 'renders'
-        self.data['mode'] = 'ressources'
+        self.data['mode'] = 'resources'
         data = self._sendRequest()
         if data is not None:
             if 'renders' in data:

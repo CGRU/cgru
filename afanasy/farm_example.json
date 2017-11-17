@@ -76,6 +76,7 @@
 			{"name":"hbatch"},
 			{"name":"hbatch_prman"},
 			{"name":"hbatch_mantra"},
+			{"name":"hbatch_redshift","count":1},
 			{"name":"houdinitoarnold"},
 			{"name":"htracker"},
 			{"name":"mantra"},

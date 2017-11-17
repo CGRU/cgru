@@ -6,6 +6,8 @@ import re
 
 # INFO : [Redshift] Block 32/48 (7,4) rendered by GPU 0 in 2ms
 #        [Redshift] Block 126/135 (14,0) rendered by GPU 1 in 12ms
+# // Error:  [Redshift] License error: (RLM) All licenses in use (-22) //
+
 re_percent = re.compile(
     r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU.*)'
 )
@@ -22,6 +24,7 @@ class maya_redshift(parser.parser):
         self.first_frame = True
 
         self.str_error = ['Frame rendering aborted']
+        self.str_badresult = ['License error']
 
         self.block = 0
         self.block_count = 0

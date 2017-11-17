@@ -7,7 +7,7 @@ function stcs_Show( i_args)
 	var i_elTasksDiv   = i_args.elTasksDiv;
 	var i_elDiffer     = i_args.elDiffer;
 	var i_elDifferDiv  = i_args.elDifferDiv;
-	var i_main_atrists = i_args.main_artists;
+	var i_main_artists = i_args.main_artists;
 	var i_draw_bars    = i_args.draw_bars;
 
 	if( i_elTasks == null ) return;
@@ -148,11 +148,10 @@ function stcs_Show( i_args)
 					rtype.artists.push( report.artist);
 			}
 
-			var rartist;
-			var rartist;
+			var report_artist;
 			if( reps_artists[report.artist])
 			{
-				rartist = reps_types[report.artist];
+				report_artist = reps_types[report.artist];
 			}
 			else
 			{
@@ -182,7 +181,7 @@ function stcs_Show( i_args)
 		i_elTasksDiv.style.display = 'block';
 		if( tasks_t.length )
 			stcs_ShowTable({"el":i_elTasks,"data":tasks_t,"draw_bars":i_draw_bars,"main":"tags"});
-		if( tasks_a.length && i_main_atrists )
+		if( tasks_a.length && i_main_artists )
 			stcs_ShowTable({"el":i_elTasks,"data":tasks_a,"draw_bars":i_draw_bars,"main":"artists"});
 	}
 	else
@@ -199,7 +198,7 @@ function stcs_Show( i_args)
 		i_elReportsDiv.style.display = 'block';
 		if( reports_t.length )
 			stcs_ShowTable({"el":i_elReports,"data":reports_t,"draw_bars":i_draw_bars,"main":"tags"});
-		if( reports_a.length && i_main_atrists )
+		if( reports_a.length && i_main_artists )
 			stcs_ShowTable({"el":i_elReports,"data":reports_a,"draw_bars":i_draw_bars,"main":"artists"});
 	}
 	else
