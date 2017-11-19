@@ -1741,7 +1741,7 @@ JobNode.params = {
 };
 
 JobNode.view_opts = {
-	obs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},
+	jobs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},
 	jobs_thumbs_height: {"type": 'num', "label": "THE", "tooltip": 'Thumbnails height.', "default": 100}
 };
 
