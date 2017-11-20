@@ -337,7 +337,7 @@ function g_RegisterReceived(i_obj)
 			g_uid = g_uid_orig;
 	}
 
-	this.document.title = 'AF';
+	document.title = 'AF';
 	g_Info('Registered: ID = ' + g_id + ' User = "' + localStorage['user_name'] + '"[' + g_uid + "]");
 	$('registered').textContent = 'Registered';
 	$('id').textContent = g_id;

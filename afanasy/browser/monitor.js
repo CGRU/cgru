@@ -1333,7 +1333,7 @@ Monitor.prototype.createCtrlBtn = function(i_args) {
 	return elBtn;
 };
 
-Monitor.prototype.ctrlBtnClicked = function(e) {
+Monitor.ctrlBtnClicked = function(e) {
 	e.stopPropagation();
 
 	var el = e.currentTarget;
@@ -1366,7 +1366,7 @@ Monitor.prototype.ctrlBtnClicked = function(e) {
 	return false;
 };
 
-Monitor.prototype.ctrlBtnRelease = function(i_el) {
+Monitor.ctrlBtnRelease = function(i_el) {
 	i_el.classList.remove('clicked');
 };
 

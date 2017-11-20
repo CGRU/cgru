@@ -607,7 +607,7 @@ JobBlock.prototype.updatePanels = function() {
 	this.job.monitor.setPanelInfo(this.params.name);
 };
 
-JobBlock.prototype.resetPanels = function(i_monitor) {
+JobBlock.resetPanels = function(i_monitor) {
 	var elBlocks = i_monitor.elPanelR.m_elBlocks;
 	if (elBlocks.m_cur_block == null)
 		return;
@@ -652,7 +652,7 @@ JobBlock.prototype.setSelected = function(i_select) {
 	}
 };
 
-JobBlock.prototype.deselectAll = function(i_monitor) {
+JobBlock.deselectAll = function(i_monitor) {
 	if (i_monitor.selected_blocks)
 		while (i_monitor.selected_blocks.length)
 			i_monitor.selected_blocks[0].setSelected(false);
@@ -660,7 +660,7 @@ JobBlock.prototype.deselectAll = function(i_monitor) {
 	JobBlock.resetPanels(i_monitor);
 };
 
-JobBlock.prototype.setDialog = function(i_args) {
+JobBlock.setDialog = function(i_args) {
 	var block = i_args.monitor.elPanelR.m_elBlocks.m_cur_block;
 
 	if (block == null)
@@ -1426,21 +1426,6 @@ JobBlock.prototype.update = function(i_displayFull) {
 	}
 };
 
-JobNode.prototype.resetPanels = function(i_monitor) {
-	i_monitor.ctrl_btns.errors.classList.remove('errors');
-	i_monitor.ctrl_btns.errors.classList.add('hide_childs');
-
-	// Remove folders items:
-	var elFolders = i_monitor.elPanelR.m_elFolders;
-	if (elFolders.m_elFolders)
-		for (var i = 0; i < elFolders.m_elFolders.length; i++)
-			elFolders.removeChild(elFolders.m_elFolders[i]);
-	elFolders.m_elFolders = [];
-	elFolders.m_elRules.style.display = 'none';
-
-	w_ResetPanels(i_monitor);
-};
-
 JobNode.prototype.updatePanels = function() {
 	var elPanelR = this.monitor.elPanelR;
 
@@ -1536,7 +1521,22 @@ JobNode.prototype.updatePanels = function() {
 	}
 };
 
-JobNode.prototype.createPanels = function(i_monitor) {
+JobNode.resetPanels = function(i_monitor) {
+	i_monitor.ctrl_btns.errors.classList.remove('errors');
+	i_monitor.ctrl_btns.errors.classList.add('hide_childs');
+
+	// Remove folders items:
+	var elFolders = i_monitor.elPanelR.m_elFolders;
+	if (elFolders.m_elFolders)
+		for (var i = 0; i < elFolders.m_elFolders.length; i++)
+			elFolders.removeChild(elFolders.m_elFolders[i]);
+	elFolders.m_elFolders = [];
+	elFolders.m_elRules.style.display = 'none';
+
+	w_ResetPanels(i_monitor);
+};
+
+JobNode.createPanels = function(i_monitor) {
 	// Left Panel:
 
 
@@ -1683,12 +1683,12 @@ JobNode.prototype.createPanels = function(i_monitor) {
 	}
 };
 
-JobNode.prototype.moveJobs = function(i_args) {
+JobNode.moveJobs = function(i_args) {
 	nw_Action('users', [g_uid], {'type': i_args.name, 'jids': i_args.monitor.getSelectedIds()});
 	i_args.monitor.info('Moving Jobs');
 };
 
-JobNode.prototype.delDoneJobs = function(i_args) {
+JobNode.delDoneJobs = function(i_args) {
 	var ids = [];
 	for (var i = 0; i < i_args.monitor.items.length; i++)
 	{
@@ -1707,7 +1707,7 @@ JobNode.prototype.delDoneJobs = function(i_args) {
 	i_args.monitor.info('Deleting all done jobs.');
 };
 
-JobNode.prototype.listen = function(i_args) {
+JobNode.listen = function(i_args) {
 	var job = i_args.monitor.cur_item;
 	if (job == null)
 	{
@@ -1741,7 +1741,7 @@ JobNode.params = {
 };
 
 JobNode.view_opts = {
-	obs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},
+	jobs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},
 	jobs_thumbs_height: {"type": 'num', "label": "THE", "tooltip": 'Thumbnails height.', "default": 100}
 };
 
