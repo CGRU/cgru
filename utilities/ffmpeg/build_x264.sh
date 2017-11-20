@@ -1,10 +1,10 @@
 #!/bin/bash
 
-yasm_ver=1.2.0
-yasm_folder=$PWD/yasm-$yasm_ver
-if [ -d $yasm_folder ]; then
-   echo "Using $yasm_folder"
-   export PATH="$yasm_folder:$PATH"
+nasm_ver=2.13.01
+nasm_folder=$PWD/nasm-$nasm_ver
+if [ -d $nasm_folder ]; then
+   echo "Using $nasm_folder"
+   export PATH="$nasm_folder:$PATH"
 fi
 
 prefix=$PWD
