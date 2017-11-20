@@ -40,31 +40,31 @@ As if you miss one '=' character, it will not be an error, it will be assignment
 
 #### Example:
 
-	// Function with long parameters list:
-	bool someFunction(
-			std::string & o_status,
-			const std::string & i_param1,
-			const std::string & i_param2,
-			const std::string & i_param3,
-			const std::string & i_param4
-		)
+```c
+// Function with long parameters list:
+bool someFunction(std::string &o_status, const std::string &i_param1, const std::string &i_param2,
+	const std::string &i_param3, const std::string &i_param4)
+{
+	...
+
+	if (false == variable_name)
 	{
-		...
-
-		if( false == variable_name )
-		{
-			o_status = "error";
-			return false;
-		}
-
-		return true;
+		o_status = "error";
+		return false;
 	}
+	return true;
+}
+```
 
 You will notice, that some parts of the code are not following these rules. This
 is mostly because such code has been written before these rules were created or
 changed.
 
+The typical file header and code style for C++ and JS files can automatically be applied with the script 
+[utilities/maintenance/codeStyleCheck.php](https://github.com/CGRU/cgru/blob/master/utilities/maintenance/codeStyleCheck.php) see the file for instructions of setup and usage. 
 
+The file header shall contain as much information as possible about the file, you can find a good example here:
+[afanasy/browser/monitor.js](https://github.com/CGRU/cgru/blob/master/afanasy/browser/monitor.js)
 ### Some names:
 **CGRU** - came from CG - Rules. It has two meanings: computer graphics principles and computer graphics is a cool thing.
 

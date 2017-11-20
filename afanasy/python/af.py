@@ -1091,6 +1091,20 @@ class Cmd:
             monitorId = result['monitor']['id']
         return monitorId
     
+    def monitorChangeUid(self, monitorId, uid):
+        """Missing DocString
+        :param monitorId:
+        :param uid:
+        :return:
+        """
+        self.action = "action"
+        self.data["type"] = "monitors"
+        self.data["ids"] = [monitorId]
+        self.data["operation"] = {"type": "watch",
+                                  "class": "perm",
+                                  "uid": uid}
+        return self._sendRequest()
+    
     def monitorUnregister(self, monitorId):
         """Missing DocString
         
@@ -1164,14 +1178,14 @@ class Cmd:
                 return data['renders']
         return None
     
-    def renderGetRessources(self):
+    def renderGetResources(self):
         """Missing DocString
 
         :return:
         """
         self.action = 'get'
         self.data['type'] = 'renders'
-        self.data['mode'] = 'ressources'
+        self.data['mode'] = 'resources'
         data = self._sendRequest()
         if data is not None:
             if 'renders' in data:
