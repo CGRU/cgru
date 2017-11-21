@@ -6,7 +6,6 @@ ini_set('memory_limit', '16G');
 ini_set('max_input_time', 36000);
 ini_set('max_execution_time', 600);
 
-
 $GuestSites = array('rules.cgru.info', '127.0.0.1');
 $CONF = array();
 $CONF['AUTH_RULES'] = false;
@@ -36,18 +35,6 @@ $Recv = array();
 
 # Encode "Pretty" JSON data:
 if (false == defined('JSON_PRETTY_PRINT')) define('JSON_PRETTY_PRINT', 0);
-function jsonEncode(&$i_obj)
-{
-	if (phpversion() >= "5.3")
-		return json_encode($i_obj, JSON_PRETTY_PRINT);
-	else
-		return json_encode($i_obj);
-}
-
-function _flock_(&$i_handle, $i_type)
-{
-//	flock( $i_handle, $i_type);
-}
 
 $InputData = file_get_contents('php://input');
 
@@ -127,7 +114,24 @@ else if (count($Recv))
 if (false == is_null($Out))
 	echo json_encode($Out);
 
-# Functions:
+exit; // only function definitions after this point
+
+
+/* ---------------- [ Functions ] -------------------------------------------------------------------------*/
+
+function jsonEncode(&$i_obj)
+{
+	if (phpversion() >= "5.3")
+		return json_encode($i_obj, JSON_PRETTY_PRINT);
+	else
+		return json_encode($i_obj);
+}
+
+function _flock_(&$i_handle, $i_type)
+{
+//	flock( $i_handle, $i_type);
+}
+
 function jsf_start($i_arg, &$o_out)
 {
 	global $CONF, $FileMaxLength;
@@ -152,22 +156,20 @@ function jsf_start($i_arg, &$o_out)
 
 function get_client_ip()
 {
-	$ipaddress = '';
 	if (isset($_SERVER['HTTP_CLIENT_IP']))
-		$ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+		return $_SERVER['HTTP_CLIENT_IP'];
 	else if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-		$ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		return $_SERVER['HTTP_X_FORWARDED_FOR'];
 	else if (isset($_SERVER['HTTP_X_FORWARDED']))
-		$ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+		return $_SERVER['HTTP_X_FORWARDED'];
 	else if (isset($_SERVER['HTTP_FORWARDED_FOR']))
-		$ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+		return $_SERVER['HTTP_FORWARDED_FOR'];
 	else if (isset($_SERVER['HTTP_FORWARDED']))
-		$ipaddress = $_SERVER['HTTP_FORWARDED'];
+		return $_SERVER['HTTP_FORWARDED'];
 	else if (isset($_SERVER['REMOTE_ADDR']))
-		$ipaddress = $_SERVER['REMOTE_ADDR'];
-	else
-		$ipaddress = 'UNKNOWN';
-	return $ipaddress;
+		return $_SERVER['REMOTE_ADDR'];
+
+	return 'UNKNOWN';
 }
 
 function jsf_initialize($i_arg, &$o_out)
@@ -1258,7 +1260,7 @@ function makenews($i_args, &$io_users, &$o_out)
 	if (false == array_key_exists('path', $news))
 	{
 		$o_out['error'] = 'News can`t be without a path.';
-		return;
+		return false;
 	}
 
 	$path = $news['path'];
@@ -1267,7 +1269,7 @@ function makenews($i_args, &$io_users, &$o_out)
 	if (strlen($path) == 0)
 	{
 		$o_out['error'] = 'Path is an empty string.';
-		return;
+		return false;
 	}
 
 	// Ensure that the first path character is '/':
