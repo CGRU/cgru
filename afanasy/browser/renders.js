@@ -513,7 +513,7 @@ RenderNode.prototype.onDoubleClick = function(e) {
 	});
 };
 
-RenderNode.prototype.setService = function(i_args) {
+RenderNode.setService = function(i_args) {
 	new cgru_Dialog({
 		"wnd": i_args.monitor.window,
 		"receiver": i_args.monitor.cur_item,
@@ -607,7 +607,7 @@ RenderTask.prototype.destroy = function() {
 	this.elParent.removeChild(this.elRoot);
 };
 
-RenderNode.prototype.launchCmdExit = function(i_args) {
+RenderNode.launchCmdExit = function(i_args) {
 	// console.log( i_args);
 	new cgru_Dialog({
 		"wnd": i_args.monitor.window,
@@ -630,7 +630,7 @@ RenderNode.prototype.launchCmdExitDo = function(i_value, i_name) {
 	nw_Action('renders', this.monitor.getSelectedIds(), operation, null);
 };
 
-RenderNode.prototype.createPanels = function(i_monitor) {
+RenderNode.createPanels = function(i_monitor) {
 	// Info:
 	var acts = {};
 	acts.tasks_log = {'label': 'TSK', 'tooltip': 'Get tasks Log.'};
@@ -798,7 +798,7 @@ RenderNode.filter = ['user_name', 'name', 'host_name'];
 
 RenderNode.actions = [];
 RenderNode.actionsCreated = false;
-RenderNode.prototype.createActions = function() {
+RenderNode.createActions = function() {
 	if (RenderNode.actionsCreated)
 		return;
 

@@ -259,7 +259,7 @@ TaskItem.prototype.getBlockTasksIds = function(o_bids, o_tids) {
 	// console.log('bids='+o_bids+' tids='+o_tids);
 };
 
-TaskItem.prototype.mh_Oper = function(i_param) {
+TaskItem.mh_Oper = function(i_param) {
 	var task = i_param.monitor.cur_item;
 	if (task == null)
 	{
@@ -354,7 +354,7 @@ TaskItem.prototype.thumbsReceived = function(i_obj) {
 	}
 };
 
-TaskItem.prototype.createPanels = function(i_monitor) {
+TaskItem.createPanels = function(i_monitor) {
 	var acts = {};
 	acts.skip = {
 		'handle': 'mh_Oper',

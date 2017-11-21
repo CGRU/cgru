@@ -318,7 +318,7 @@ UserNode.prototype.refresh = function() {
 	this.elBar.innerHTML = label;
 };
 
-UserNode.prototype.createPanels = function(i_monitor) {
+UserNode.createPanels = function(i_monitor) {
 	// Jobs solving:
 	var acts = {};
 	acts.solve_ord = {
