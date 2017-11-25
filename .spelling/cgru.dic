@@ -244,3 +244,12 @@ upfile
 withlogo
 MMMMMMMMMMMMM
 MMMMMMMM
+filesize
+htaccess
+htgroups
+walkdir
+ADDR
+dirname
+nonce
+cnonce
+hget

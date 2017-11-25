@@ -20,7 +20,8 @@ var RULES = {};
 RULES.rufolder = 'rules';
 var RULES_TOP = {};
 
-var c_movieTypes = ['mpg', 'mpeg', 'mov', 'avi', 'mp4', 'm4v', 'webm', 'ogg', 'ogv', 'mxf', 'flv', 'mkv', 'cine'];
+var c_movieTypes =
+	['mpg', 'mpeg', 'mov', 'avi', 'mp4', 'm4v', 'webm', 'ogg', 'ogv', 'mxf', 'flv', 'mkv', 'cine'];
 var c_movieTypesHTML = ['mp4', 'webm', 'ogg'];
 var c_imageTypes = ['jpg', 'jpeg', 'png', 'exr', 'dpx', 'tga', 'tif', 'tiff', 'psd', 'xcf'];
 var c_imageEditableTypes = ['jpg', 'jpeg', 'png'];

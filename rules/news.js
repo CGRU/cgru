@@ -68,7 +68,7 @@ function nw_InitConfigured()
 	setInterval(nw_NewsLoad, RULES.news.refresh * 1000);
 }
 
-/* ---------------- [ Toggle functions ] --------------------------------------------------------------- */
+/* ---------------- [ Toggle functions ] ----------------------------------------------------------------- */
 
 function nw_DisableNewsToggle(i_toggle)
 {
@@ -200,7 +200,7 @@ function nw_Finish(i_finish_recent)
 	$('subscribe_btn').style.display = 'block';
 }
 
-/* ---------------- [ Subscribe functions ] --------------------------------------------------------------- */
+/* ---------------- [ Subscribe functions ] -------------------------------------------------------------- */
 
 function nw_Subscribe(i_path)
 {
@@ -325,7 +325,8 @@ function nw_NewsOpen(i_refresh)
 	nw_NewsLoad(i_refresh);
 }
 
-/* ---------------- [ News creation functions ] --------------------------------------------------------------- */
+/* ---------------- [ News creation functions ]
+ * --------------------------------------------------------------- */
 
 function nw_MakeNewsDialog()
 {
@@ -787,7 +788,7 @@ function nw_DeleteNewsUser(i_news)
 	nw_DeleteNews(ids);
 }
 
-/* ---------------- [ Delete functions ] --------------------------------------------------------------- */
+/* ---------------- [ Delete functions ] ----------------------------------------------------------------- */
 
 function nw_DeleteNews(i_ids)
 {
@@ -830,7 +831,7 @@ function nw_DeleteNewsFinished(i_data)
 	nw_NewsLoad();
 }
 
-/* ---------------- [ Recent functions ] --------------------------------------------------------------- */
+/* ---------------- [ Recent functions ] ----------------------------------------------------------------- */
 
 function nw_RecentOnClick()
 {
