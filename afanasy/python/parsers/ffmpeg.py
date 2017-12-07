@@ -15,7 +15,8 @@ class ffmpeg(parser.parser):
 
 	def __init__(self):
 		parser.parser.__init__(self)
-		self.str_badresult = ['Output file is empty']
+		self.str_badresult	= ['Output file is empty']
+		self.str_error		= ['Invalid']
 		self.duration		= 0.1
 
 	def parseTime(self, time):
