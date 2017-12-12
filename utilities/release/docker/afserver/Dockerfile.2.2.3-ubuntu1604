@@ -2,7 +2,6 @@ FROM cgru/afcommon:2.2.3-ubuntu1604
 
 LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>" version="1.0.0"
 
-USER root
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
  && apt-get -yqq --no-install-recommends install \
     postgresql-client \
@@ -17,6 +16,6 @@ ENV AF_DB_HOST="db" \
  AF_DB_PASSWORD="AfPassword"
 
 EXPOSE 51000
-USER render
 
+USER render
 CMD ["/opt/cgru/afanasy/bin/afserver"]

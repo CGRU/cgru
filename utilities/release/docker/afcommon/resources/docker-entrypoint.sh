@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eo pipefail
 
 export CGRU_LOCATION=/opt/cgru
 
@@ -28,14 +28,5 @@ export CGRU_PYTHONEXE="python3"
 export PYTHONPATH="${CGRU_PYTHON}:${AF_PYTHON}"
 
 /usr/local/bin/ep -v "/opt/cgru/afanasy/config_default.json"
-
-if [ "${AF_SERVER_WAIT}x" == "yesx" ]
-then 
-	while ! ping -c 1 $AF_SERVERNAME 2> /dev/null
-	do
-		echo "Waiting for $AF_SERVERNAME ..."
-		sleep 1
-	done
-fi
 
 exec "$@"
