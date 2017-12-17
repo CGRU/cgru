@@ -1,3 +1,20 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	environment.h - CGRU environment.
+	Environment class describes an interface for any environment.
+	This is not only system environment variables, this is all config files, command arguments and all other.
+*/
 #pragma once
 
 #include <map>
@@ -157,6 +174,7 @@ public:
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
 	static inline const std::string & getStoreFolder()        { return store_folder;         }
+	static inline const std::string & getStoreFolderBranches(){ return store_folder_branches;}
 	static inline const std::string & getStoreFolderJobs()    { return store_folder_jobs;    }
 	static inline const std::string & getStoreFolderRenders() { return store_folder_renders; }
 	static inline const std::string & getStoreFolderUsers()   { return store_folder_users;   }
@@ -325,8 +343,9 @@ private:
 	static std::string sysjob_events_service;
 
 
-	/// Temp directory
+	/// Store folders:
 	static std::string store_folder;
+	static std::string store_folder_branches;
 	static std::string store_folder_jobs;
 	static std::string store_folder_renders;
 	static std::string store_folder_users;

@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	jobcontainer.h - Jobs server container.
+*/
 #pragma once
 
 #include "../include/afjob.h"
@@ -12,6 +27,7 @@
 #include "jobaf.h"
 
 class MsgAf;
+class BranchesContainer;
 class UserContainer;
 
 /// All Afanasy jobs store in this container.
@@ -22,8 +38,8 @@ public:
 	~JobContainer();
 
 	/// Register a new job:
-	af::Msg * registerJob( JSON & i_object, UserContainer * i_users, MonitorContainer * i_monitoring);
-	bool registerJob( JobAf *job, std::string & o_err, UserContainer *users, MonitorContainer * monitoring);
+	af::Msg * registerJob(JSON & i_object, BranchesContainer * i_branches, UserContainer * i_users, MonitorContainer * i_monitoring);
+	bool registerJob(JobAf *job, std::string & o_err, BranchesContainer * i_branches, UserContainer *users, MonitorContainer * monitoring);
 
 	/// Update some task state of some job.
 	void updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring);

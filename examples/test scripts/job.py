@@ -1,6 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+'''
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
 
+This is testing job.
+
+'''
 import json
 import os
 import random
@@ -50,6 +65,7 @@ parser.add_option(      '--env',          dest='environment',  type='string', de
 parser.add_option(      '--folder',       dest='folder',       type='string', default=None, help='add a folder')
 parser.add_option(      '--nofolder',     dest='nofolder',     action='store_true', default=False, help='do not set any folders')
 parser.add_option(      '--pools',        dest='pools',        type='string', default=None, help='Set job render pools [/local/blender:90,/local/natron:10].')
+parser.add_option(      '--branch',       dest='branch',       type='string', default=None, help='Set job branch.')
 parser.add_option(      '--seq',          dest='sequential',   type='int',    default=None, help='Sequential running')
 parser.add_option(      '--ppa',          dest='ppapproval',   action='store_true', default=False, help='Preview pending approval')
 parser.add_option('-e', '--exitstatus',   dest='exitstatus',   type='int',    default=0,  help='good exit status')
@@ -97,6 +113,11 @@ if Options.pools is not None:
         pool = pool.split(':')
         pools[pool[0]] = int(pool[1])
     job.setPools( pools)
+
+if Options.branch is not None:
+    job.setBranch( Options.branch)
+else:
+    job.setBranch( os.getcwd())
 
 blocknames = []
 if Options.labels != '':

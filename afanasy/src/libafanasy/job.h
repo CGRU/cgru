@@ -1,3 +1,19 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	job.h - Afanasy job.
+	Libafanasy job designed only to get/set job data.
+*/
 #pragma once
 
 #include "af.h"
@@ -63,6 +79,7 @@ public:
 	inline const std::string & getReport()       const { return m_report;      }
 	inline const std::string & getProject()      const { return m_project;     }
 	inline const std::string & getDepartment()   const { return m_department;  }
+	inline const std::string & getBranch()       const { return m_branch;      }
 
 	const std::string getFolder() const;
 	inline const std::map<std::string,std::string> & getFolders() const { return m_folders; }
@@ -148,6 +165,8 @@ protected:
 	int32_t m_user_list_order;   ///< Job order in user jobs list.
 
 	std::string m_description; ///< Job description for statistics purposes only.
+
+	std::string m_branch;
 
 	std::map< std::string, std::string > m_folders;
 

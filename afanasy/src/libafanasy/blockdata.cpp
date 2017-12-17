@@ -1,3 +1,21 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Block is an array of job tasks.
+	Job tasks dependency is descibed via tasks blocks dependency.
+	Also block contains some tasks properties, that are ususally the same for an array of tasks.
+	For example working directory and capacity are usualy thre same for a whole tasks sequence (frame range).
+*/
 
 #include "blockdata.h"
 
@@ -560,6 +578,7 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_String  ( m_custom_data,           msg);
 		rw_StringVect ( m_files,              msg);
 		rw_StringMap  ( m_environment,        msg);
+		/// NEW VERSION
 		rw_int64_t ( m_time_started,          msg);
 		rw_int64_t ( m_time_done,             msg);
 
@@ -598,6 +617,7 @@ void BlockData::v_readwrite( Msg * msg)
 		rw_int32_t ( m_errors_forgive_time,          msg);
 		rw_int32_t ( m_task_progress_change_timeout, msg);
 		rw_uint32_t( m_tasks_max_run_time,           msg);
+		/// NEW VERSION
 		rw_int64_t ( m_time_started,                 msg);
 		rw_int64_t ( m_time_done,                    msg);
 

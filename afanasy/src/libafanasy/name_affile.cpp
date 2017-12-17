@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	This is a set of a common libafanasy functions related to filesystem, paths.
+*/
 #include "name_af.h"
 
 #include <fcntl.h>
@@ -24,6 +39,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 void af::pathFilter( std::string & path)
 {
@@ -137,17 +153,18 @@ const std::string af::pathHome()
 
 bool af::pathMakeDir( const std::string & i_path, VerboseMode i_verbose)
 {
-	AFINFA("af::pathMakeDir: path=\"%s\"", i_path.c_str())
+	AF_DEBUG << "af::pathMakeDir: " << i_path;
 	if( false == af::pathIsFolder( i_path))
 	{
-		if( i_verbose == VerboseOn) std::cout << "Creating folder:\n" << i_path << std::endl;
+		if( i_verbose == VerboseOn)
+			AF_LOG << "Creating folder: " << i_path;
 #ifdef WINNT
 		if( _mkdir( i_path.c_str()) == -1)
 #else
 		if( mkdir( i_path.c_str(), 0777) == -1)
 #endif
 		{
-			AFERRPA("af::pathMakeDir - \"%s\": ", i_path.c_str())
+			AF_ERR << "af::pathMakeDir: " << strerror(errno) << ": " <<  i_path;
 			return false;
 		}
 #ifndef WINNT

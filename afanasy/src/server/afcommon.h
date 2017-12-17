@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	afcommon.h - common server functions.
+*/
 #pragma once
 
 #include "../libafanasy/environment.h"
@@ -37,21 +52,24 @@ public:
 	//
 	// Store folders:
 	//
-	static const std::string getStoreDir( const std::string & i_root, int i_id, const std::string & i_name);
+	static const std::string getStoreDir(const std::string & i_root, int i_id, const std::string & i_name);
 
-	inline static const std::string getStoreDir( const std::string & i_root, const af::Node & i_node)
-		{ return getStoreDir( i_root, i_node.getId(), i_node.getName());}
+	inline static const std::string getStoreDir(const std::string & i_root, const af::Node & i_node)
+		{ return getStoreDir(i_root, i_node.getId(), i_node.getName());}
 
-	inline static const std::string getStoreDirJob( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getStoreFolderJobs(), i_node);}
+	inline static const std::string getStoreDirJob(const af::Node & i_node)
+		{ return getStoreDir(af::Environment::getStoreFolderJobs(), i_node);}
 
-	inline static const std::string getStoreDirRender( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getStoreFolderRenders(), i_node);}
+	inline static const std::string getStoreDirRender(const af::Node & i_node)
+		{ return getStoreDir(af::Environment::getStoreFolderRenders(), i_node);}
 
-	inline static const std::string getStoreDirUser( const af::Node & i_node)
-		{ return getStoreDir( af::Environment::getStoreFolderUsers(), i_node);}
+	inline static const std::string getStoreDirUser(const af::Node & i_node)
+		{ return getStoreDir(af::Environment::getStoreFolderUsers(), i_node);}
 
-	static const std::vector<std::string> getStoredFolders( const std::string & i_root);
+	inline static const std::string getStoreDirBranch(const af::Node & i_node)
+		{ return getStoreDir(af::Environment::getStoreFolderBranches(), i_node);}
+
+	static const std::vector<std::string> getStoredFolders(const std::string & i_root);
 
 	//
 	// Store operations:

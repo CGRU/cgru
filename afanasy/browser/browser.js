@@ -1,4 +1,4 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -6,11 +6,13 @@
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * browser.js - structures and functions directly related to the entities in the browser
- * ....................................................................................................... */
+\* ....................................................................................................... */
 
+/*
+	browser.js - structures and functions directly related to the entities in the browser
+*/
 "use strict";
 
 var g_cycle = 0;
@@ -353,7 +355,7 @@ function g_Deregistered()
 	if (g_id == 0)
 		return;
 
-	this.document.title = 'AF (deregistered)';
+	window.document.title = 'AF (deregistered)';
 	g_id = 0;
 	g_uid = -1;
 	g_uid_orig = -1;

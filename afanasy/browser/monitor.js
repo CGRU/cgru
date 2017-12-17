@@ -1,4 +1,4 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -6,14 +6,17 @@
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * monitor.js - A monitor of an entity (all, job, render, user, task, monitor[session])
- * The full window to display the entity contains
- *   left column   - list of buttons with actions to be run on the entity
- *   center screen - custom content provided by the entity
- *   right column  - meta data and key-value pairs associated with the entity
- * ....................................................................................................... */
+\* ....................................................................................................... */
+
+/*
+	monitor.js - A monitor of an entity (all, job, render, user, task, monitor[session])
+	The full window to display the entity contains
+		left column   - list of buttons with actions to be run on the entity
+		center screen - custom content provided by the entity
+		right column  - meta data and key-value pairs associated with the entity
+*/
 
 "use strict";
 
@@ -36,6 +39,8 @@ function Monitor(i_args)
 		this.nodeConstructor = UserNode;
 	else if (this.type == 'tasks')
 		this.nodeConstructor = TaskItem;
+	else if (this.type == 'branches')
+		this.nodeConstructor = BranchNode;
 	else if (this.type == 'monitors')
 		this.nodeConstructor = MonitorNode;
 

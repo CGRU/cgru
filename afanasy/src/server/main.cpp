@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Main data structures and threadsinitialization.
+*/
 #include <memory.h>
 #include <signal.h>
 #include <stdio.h>
@@ -13,6 +28,7 @@
 #include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
+#include "branchescontainer.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "socketsprocessing.h"
@@ -73,6 +89,7 @@ int main(int argc, char *argv[])
 
 	// create directories if it is not exists
 	if( af::pathMakePath( ENV.getStoreFolder(),        af::VerboseOn ) == false) return 1;
+	if( af::pathMakeDir(  ENV.getStoreFolderBranches(),af::VerboseOn ) == false) return 1;
 	if( af::pathMakeDir(  ENV.getStoreFolderJobs(),    af::VerboseOn ) == false) return 1;
 	if( af::pathMakeDir(  ENV.getStoreFolderRenders(), af::VerboseOn ) == false) return 1;
 	if( af::pathMakeDir(  ENV.getStoreFolderUsers(),   af::VerboseOn ) == false) return 1;
@@ -110,7 +127,10 @@ int main(int argc, char *argv[])
 	if( pthread_sigmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
 #endif
 
-	// containers initialization
+	// Containers initialization
+	BranchesContainer branches;
+	if( false == branches.isInitialized()) return 1;
+
 	JobContainer jobs;
 	if( false == jobs.isInitialized()) return 1;
 
@@ -128,6 +148,7 @@ int main(int argc, char *argv[])
 
 	// Thread aruguments.
 	ThreadArgs threadArgs;
+	threadArgs.branches  = &branches;
 	threadArgs.jobs      = &jobs;
 	threadArgs.renders   = &renders;
 	threadArgs.users     = &users;
@@ -196,6 +217,29 @@ int main(int argc, char *argv[])
 	AF_LOG << users.getCount() << " users registered from store.";
 	}
 	//
+	// Get Branches from store:
+	//
+	{
+	AF_LOG << "Getting branches from store...";
+
+	std::vector<std::string> folders = AFCommon::getStoredFolders(ENV.getStoreFolderBranches());
+	AF_LOG << folders.size() << " branches found.";
+
+	for (int i = 0; i < folders.size(); i++)
+	{
+		BranchSrv * branch = new BranchSrv(folders[i]);
+		if (branch->isStoredOk() != true )
+		{
+			af::removeDir(branch->getStoreDir());
+			delete branch;
+			continue;
+		}
+		if (branches.addBranch(branch) == 0)
+			delete branch;
+	}
+	AF_LOG << branches.getCount() << " branches registered from store.";
+	}
+	//
 	// Get Jobs from store:
 	//
 	bool hasSystemJob = false;
@@ -233,7 +277,7 @@ int main(int argc, char *argv[])
 			}
 
 			std::string err;
-			jobs.registerJob( job, err, &users, NULL);
+			jobs.registerJob( job, err, &branches, &users, NULL);
 			if( err.size())
 				AF_ERR << err;
 		}
@@ -260,7 +304,7 @@ int main(int argc, char *argv[])
 		SysJob* job = new SysJob();
 
 		std::string err;
-		jobs.registerJob( job, err, &users, NULL);
+		jobs.registerJob( job, err, &branches, &users, NULL);
 		if( err.size())
 			AF_ERR << err;
 	}

@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Methods to get all environment on start, store all for a further queries.
+*/
 #include "environment.h"
 
 #ifdef WINNT
@@ -132,6 +147,7 @@ int Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
 int Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
 
 std::string Environment::store_folder = AFGENERAL::STORE_FOLDER;
+std::string Environment::store_folder_branches;
 std::string Environment::store_folder_jobs;
 std::string Environment::store_folder_renders;
 std::string Environment::store_folder_users;
@@ -749,6 +765,7 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 bool Environment::initAfterLoad()
 {
 	// Store folders:
+	store_folder_branches= store_folder + AFGENERAL::PATH_SEPARATOR + AFBRANCH::STORE_FOLDER;
 	store_folder_jobs    = store_folder + AFGENERAL::PATH_SEPARATOR +    AFJOB::STORE_FOLDER;
 	store_folder_renders = store_folder + AFGENERAL::PATH_SEPARATOR + AFRENDER::STORE_FOLDER;
 	store_folder_users   = store_folder + AFGENERAL::PATH_SEPARATOR +   AFUSER::STORE_FOLDER;

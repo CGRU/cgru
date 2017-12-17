@@ -618,6 +618,9 @@ class Job:
     def setPools( self, i_pools):
         self.data['pools'] = i_pools
 
+    def setBranch( self, i_branch):
+        self.data['branch'] = i_branch
+
     def fillBlocks(self):
         """Missing DocString
 

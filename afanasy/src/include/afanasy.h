@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	afanasy.h - Global includes.
+*/
 #pragma once
 
 #include <string.h>
@@ -38,10 +53,17 @@ namespace AFADDR
 	const uint16_t SERVER_PORT  = 50000;
 }
 
+/// Branches options:
+namespace AFBRANCH
+{
+	const int  MAXCOUNT         = 10000;
+	const char STORE_FOLDER[]   = "branches";
+}
+
 /// Users options:
 namespace AFUSER
 {
-    const int  MAXCOUNT         = 100000;     ///< Maximum number or users.
+    const int  MAXCOUNT         = 10000;     ///< Maximum number or users.
     const char PSWD_VISOR[]     = "1832116180fdc61b64fd978401e462e9";  ///< Default Visor password.
     const char PSWD_GOD[]       = "73bcaaa458bff0d27989ed331b68b64d";  ///< Default GOD password.
     const char STORE_FOLDER[]        = "users";    ///< Users store directory, relative to AFSERVER::TEMP_DIRECTORY

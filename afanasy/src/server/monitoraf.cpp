@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	MonitorAf class stands for a serve side monitors data collection.
+*/
 #include "monitoraf.h"
 
 #include "../libafanasy/common/dlScopeLocker.h"
@@ -127,6 +142,12 @@ void MonitorAf::v_action( Action & i_action)
 				eids.push_back( af::Monitor::EVT_users_add);
 				eids.push_back( af::Monitor::EVT_users_change);
 				eids.push_back( af::Monitor::EVT_users_del);
+			}
+			else if( opclass == "branches")
+			{
+				eids.push_back( af::Monitor::EVT_branches_add);
+				eids.push_back( af::Monitor::EVT_branches_change);
+				eids.push_back( af::Monitor::EVT_branches_del);
 			}
 			else if( opclass == "monitors")
 			{

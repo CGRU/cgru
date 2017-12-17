@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Common server functions.
+*/
 #include "afcommon.h"
 
 #include <fcntl.h>
@@ -19,6 +34,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 Store * AFCommon::ms_store = NULL;
 
@@ -111,7 +127,7 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 			}
 			else
 			{
-				AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", thousand_dir.c_str())
+				AF_ERR << "Can't open folder: " << thousand_dir.c_str();
 				return o_folders;
 			}
 
@@ -120,7 +136,7 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 	}
 	else
 	{
-		AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", i_root.c_str())
+		AF_ERR << "Can't open folder: " << i_root.c_str();
 		return o_folders;
 	}
 
@@ -129,7 +145,7 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 	DIR * thousand_dir_handle = opendir( i_root.c_str());
 	if( thousand_dir_handle == NULL)
 	{
-		AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", i_root.c_str())
+		AF_ERR << "Can't open folder:" << i_root.c_str();
 		return o_folders;
 	}
 
@@ -159,7 +175,7 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 		DIR * job_dir_handle = opendir( thousand_dir.c_str());
 		if( job_dir_handle == NULL)
 		{
-			AFERRAR("JobContainer::getStoredIds: Can't open folder:\n%s", thousand_dir.c_str())
+			AF_ERR << "Can't open folder:" << thousand_dir.c_str();
 			return o_folders;
 		}
 

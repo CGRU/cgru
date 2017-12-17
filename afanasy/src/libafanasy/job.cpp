@@ -1,11 +1,27 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Afanasy job.
+*/
 #include "job.h"
 
 #include "../include/afanasy.h"
 
 #include "blockdata.h"
+#include "branch.h"
 #include "environment.h"
-#include "msg.h"
 #include "jobprogress.h"
+#include "msg.h"
 
 using namespace af;
 
@@ -110,6 +126,9 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_string("project",    m_project,    i_object);
 	jr_string("department", m_department, i_object);
 
+	jr_string("branch", m_branch, i_object);
+	m_branch = Branch::FilterPath(m_branch);
+
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
 	{
@@ -185,6 +204,8 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"project\":\""      << af::strEscape( m_project      ) << "\"";
 	if( m_department.size())
 		o_str << ",\n\"department\":\""   << af::strEscape( m_department   ) << "\"";
+	if( m_branch.size())
+		o_str << ",\n\"branch\":\"" << m_branch << "\"";
 
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
@@ -246,6 +267,8 @@ void Job::initDefaultValues()
 	m_time_done = 0;
 	m_user_list_order = -1; // On update, if old index == -1 storing is skipped (new job registration)
 	m_time_life = -1;
+
+	m_branch = "/";
 
 	m_thumb_size = 0;
 	m_thumb_data = NULL;
@@ -339,6 +362,9 @@ void Job::v_readwrite( Msg * msg)
 	rw_String ( m_thumb_path,   msg);
 	rw_String ( m_project,      msg);
 	rw_String ( m_department,   msg);
+	/* NEW VERSION
+	rw_String ( m_branch,       msg);
+	*/
 
 	rw_RegExp ( m_hosts_mask,         msg);
 	rw_RegExp ( m_hosts_mask_exclude, msg);
@@ -495,6 +521,7 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
       return;
    }
 
+	if (m_branch.size()) o_str << "\n Branch = " << m_branch;
    if( m_annotation.size())  o_str << "\n    " << m_annotation;
    if( m_report.size())      o_str << "\n    " << m_report;
    if( m_description.size()) o_str << "\n    " << m_description;
