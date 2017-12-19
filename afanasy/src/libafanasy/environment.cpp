@@ -33,6 +33,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "logger.h"
 
 #define PRINT if(m_verbose_init)printf
 #define QUIET if(!m_quiet_init)printf
@@ -192,6 +193,7 @@ std::vector<std::string> Environment::cmdarguments;
 std::map<std::string,std::string> Environment::cmdarguments_usage;
 
 std::string Environment::version_revision;
+std::string Environment::version_compiled;
 std::string Environment::version_cgru;
 std::string Environment::version_python;
 std::string Environment::version_gcc;
@@ -595,6 +597,8 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	PRINT("Platform: '%s'\n", af::strJoin( platform).c_str());
 //
 //############ Versions: ########################
+	#define STRINGIFY(x) #x
+	#define EXPAND(x) STRINGIFY(x)
 
 	// Date:
 	build_date = std::string(__DATE__) + " " __TIME__;
@@ -604,10 +608,12 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	version_cgru = af::getenv("CGRU_VERSION");
 	QUIET("CGRU version = '%s'\n", version_cgru.c_str());
 
-	// Build Revision:
+	// Build-in version and revision:
+	version_compiled = EXPAND(CGRU_VERSION);
+	QUIET("Afanasy build version = '%s'\n", version_compiled.c_str());
+	if (version_cgru.find(version_compiled) == std::string::npos)
+		AF_ERR << "CGRU environment and Afanasy compiled versions mismatch.";
 	#ifdef CGRU_REVISION
-	#define STRINGIFY(x) #x
-	#define EXPAND(x) STRINGIFY(x)
 	version_revision = EXPAND(CGRU_REVISION);
 	QUIET("Afanasy build revision = '%s'\n", version_revision.c_str());
 	#endif

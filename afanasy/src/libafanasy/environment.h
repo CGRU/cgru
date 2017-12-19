@@ -249,6 +249,7 @@ private:
 
 	static std::string version_revision;///< Sources version, will be compiled in binaries
 	static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup
+	static std::string version_compiled;///< CGRU version, that libafanasy was compiled
 	static std::string version_python;  ///< Compiled Python version
 	static std::string version_gcc;     ///< GCC version
 	static std::string build_date;      ///< Build date

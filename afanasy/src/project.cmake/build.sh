@@ -4,9 +4,11 @@
 pushd .. > /dev/null
 src=$PWD
 
-# Get distribution variables:
+# Setup CGRU:
 cd ../..
-cgru=$PWD
+source setup.sh
+
+# Get distribution variables:
 cd utilities
 source ./getrevision.sh $src
 [ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh
