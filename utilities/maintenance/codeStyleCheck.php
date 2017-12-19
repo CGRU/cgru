@@ -72,6 +72,11 @@ function checkFileHeader($filePath, &$fileContent, &$status)
 {
 	$headerRegex = '/^(\/\*\*?[\s\S]*?\*\/)([\s\S]*)$/';
 	$modificationString = getModificationInterval($filePath);
+	if (preg_match('/\.\.\ \*\/\n\n\/\*/', $fileContent, $matchHeader))
+	{
+		$status[] = errorString('skipping new format for the time being!');
+		return false;
+	}
 	if (preg_match($headerRegex, $fileContent, $matchHeader))
 	{
 		$fileHeader = $matchHeader[1];
@@ -166,7 +171,7 @@ function checkComment(&$fileContent, &$status)
 function getFileHeader($description, $modificationString)
 {
 	$out = <<<EOT
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -174,10 +179,13 @@ function getFileHeader($description, $modificationString)
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © __date__ by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * __description__
- * ....................................................................................................... */
+\* ....................................................................................................... */
+
+/*
+	__description__
+*/
 EOT;
 	$lines = explode(PHP_EOL, $description);
 	$nonEmptyLines = array();
@@ -191,7 +199,7 @@ EOT;
 		{
 			$l = $match[1];
 		}
-		$nonEmptyLines[] = rtrim(($firstFound ? ' * ' : '') . $l);
+		$nonEmptyLines[] = rtrim(($firstFound ? "\t" : '') . $l);
 		$firstFound = true;
 	}
 	if ($nonEmptyLines[count($nonEmptyLines) - 1] == ' *')
@@ -199,7 +207,7 @@ EOT;
 		unset($nonEmptyLines[count($nonEmptyLines) - 1]);
 	}
 
-	$description = implode(PHP_EOL, $nonEmptyLines);
+	$description = trim(implode(PHP_EOL, $nonEmptyLines));
 	return str_replace(array('__description__', '__date__'),
 		array($description, $modificationString), $out);
 }

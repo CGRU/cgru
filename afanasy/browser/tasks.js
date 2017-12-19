@@ -1,4 +1,4 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -6,12 +6,15 @@
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * tasks.js - methods and structs for monitoring and handling of tasks
- *   BlockItem - a block of task items
- *   TaskItem  - an atomic representation of work (e.g. rendering of one frame)
- * ....................................................................................................... */
+\* ....................................................................................................... */
+
+/*
+	tasks.js - methods and structs for monitoring and handling of tasks
+	  BlockItem - a block of task items
+	  TaskItem  - an atomic representation of work (e.g. rendering of one frame)
+*/
 
 "use strict";
 

@@ -1,4 +1,4 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -6,12 +6,15 @@
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © 2012-17 by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * jobs.js - methods and structs for monitoring and handling of render jobs
- *    JobBlock - a block if job nodes
- *    JobNode  - the representation of a job (one committed work-payload)
- * ....................................................................................................... */
+\* ....................................................................................................... */
+
+/*
+	jobs.js - methods and structs for monitoring and handling of render jobs
+	   JobBlock - a block if job nodes
+	   JobNode  - the representation of a job (one committed work-payload)
+*/
 
 "use strict";
 
