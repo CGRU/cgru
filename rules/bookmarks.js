@@ -1,4 +1,4 @@
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -6,10 +6,13 @@
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © 2016-17 by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * bookmarks.js - TODO: description
- * ....................................................................................................... */
+\* ....................................................................................................... */
+
+/*
+	bookmarks.js - TODO: description
+*/
 
 "use strict";
 

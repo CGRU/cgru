@@ -83,7 +83,7 @@ function checkFileHeader($filePath, &$fileContent, &$status)
 			$status[] = errorString('header unknown!');
 		} else
 		{
-			$regexParseHeader = '/^[\s\S]+\*\s*\'\s*\'([\s\S]*?)\.*\s*\*\/([\s\S]+)$/';
+			$regexParseHeader = '/\.\.\ \*\/\n\n\/\*([\S\s]+?)\*\/([\S\s]+)$/';
 			if (preg_match($regexParseHeader, $fileContent, $matchHeaderNew))
 			{
 				$newFileContent = getFileHeader($matchHeaderNew[1], $modificationString) . $matchHeaderNew[2];
@@ -166,7 +166,7 @@ function checkComment(&$fileContent, &$status)
 function getFileHeader($description, $modificationString)
 {
 	$out = <<<EOT
-/** '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
  *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
  *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
  *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
@@ -174,34 +174,16 @@ function getFileHeader($description, $modificationString)
  *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
  *     :MMMMMMMM:    \_____\_____|_|  \_\\\____/        Sourcecode: https://github.com/CGRU/cgru
  *     dMMMdmMMMd     A   F   A   N   A   S   Y
- *    -Mmo.  -omM:                                                      Copyright © __date__ by The CGRU team
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
  *    '          '
- * __description__
- * ....................................................................................................... */
-EOT;
-	$lines = explode(PHP_EOL, $description);
-	$nonEmptyLines = array();
-	$firstFound = false;
-	foreach ($lines as $line)
-	{
-		$l = trim($line);
-		if (!$firstFound && ($l == '*' || empty($l))) continue;
-		$regexCommentStart = '/^\*\s?(.*)$/';
-		if (preg_match($regexCommentStart, $l, $match))
-		{
-			$l = $match[1];
-		}
-		$nonEmptyLines[] = rtrim(($firstFound ? ' * ' : '') . $l);
-		$firstFound = true;
-	}
-	if ($nonEmptyLines[count($nonEmptyLines) - 1] == ' *')
-	{
-		unset($nonEmptyLines[count($nonEmptyLines) - 1]);
-	}
+\* ....................................................................................................... */
 
-	$description = implode(PHP_EOL, $nonEmptyLines);
+/*
+	__description__
+*/
+EOT;
 	return str_replace(array('__description__', '__date__'),
-		array($description, $modificationString), $out);
+		array(trim($description), $modificationString), $out);
 }
 
 function getAutoFormatFiles($extensions)

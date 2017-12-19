@@ -374,4 +374,3 @@ BranchNode.params = {
 
 BranchNode.sort = ['priority', 'name'];
 BranchNode.filter = ['name'];
-
