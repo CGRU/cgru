@@ -222,7 +222,9 @@ int main(int argc, char *argv[])
 	{
 	AF_LOG << "Getting branches from store...";
 
-	std::vector<std::string> folders = AFCommon::getStoredFolders(ENV.getStoreFolderBranches());
+	// We need to get branches folders by the way that childs go after parents.
+	// And there is a special function for it:
+	std::vector<std::string> folders = AFCommon::getStoredFoldersBranches();
 	AF_LOG << folders.size() << " branches found.";
 
 	for (int i = 0; i < folders.size(); i++)
@@ -234,7 +236,7 @@ int main(int argc, char *argv[])
 			delete branch;
 			continue;
 		}
-		if (branches.addBranch(branch) == 0)
+		if (false == branches.addBranchFromStore(branch))
 			delete branch;
 	}
 	AF_LOG << branches.getCount() << " branches registered from store.";

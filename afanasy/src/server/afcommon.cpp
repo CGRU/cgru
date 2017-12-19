@@ -207,6 +207,46 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 	return o_folders;
 }
 
+const std::string trim_branch_folder(const std::string & i_f)
+{
+	size_t p;
+	std::string f(i_f);
+
+	// Trim last slash to cut store folder root
+	p = f.rfind('/');
+	if (std::string::npos == p)
+		p = f.rfind('\\');
+	if (std::string::npos != p)
+		f = std::string(f, p);
+
+	// Trim first dot to cut ID
+	p = f.find('.');
+	if (std::string::npos != p)
+		f = std::string(f, p);
+
+	return f;
+}
+bool sort_branches_folders(const std::string & i_a,const std::string & i_b)
+{
+	// We need to extract branch name from a store folder full path
+	std::string a(trim_branch_folder(i_a));
+	std::string b(trim_branch_folder(i_b));
+	//printf("\"%s\" <> \"%s\"\n", a.c_str(), b.c_str());
+
+	// Parent branch always has less path size
+	return (a.size() < b.size());
+}
+const std::vector<std::string> AFCommon::getStoredFoldersBranches()
+{
+	std::vector<std::string> folders = getStoredFolders(af::Environment::getStoreFolderBranches());
+
+	// We need to sort branches the way that parent branch goes first
+	std::sort(folders.begin(), folders.end(), sort_branches_folders);
+	//for (int i = 0; i < folders.size(); i++) printf("%s\n", folders[i].c_str());
+
+	return folders;
+}
+
 void AFCommon::executeCmd( const std::string & cmd)
 {
 	std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;

@@ -159,7 +159,7 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 
 		// Process branch:
 		AF_DEBUG << "JobContainer::registerJob: Checking job branch: " << i_job->getBranch();
-		branch = i_branches->addBranch(i_job->getBranch(), i_monitors);
+		branch = i_branches->addBranchFromPath(i_job->getBranch(), i_monitors);
 		if (branch == NULL)
 		{
 			delete i_job;

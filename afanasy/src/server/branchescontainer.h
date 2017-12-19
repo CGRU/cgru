@@ -32,10 +32,10 @@ public:
 	~BranchesContainer();
 
 	/// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
-	BranchSrv * addBranch(const std::string & i_path, MonitorContainer * i_monitors);
+	BranchSrv * addBranchFromPath(const std::string & i_path, MonitorContainer * i_monitors);
 
 	/// Add user, called on start with user created from batadase
-	int addBranch(BranchSrv * i_branch);
+	bool addBranchFromStore(BranchSrv * i_branch);
 
 	BranchSrv * getBranch(const std::string & i_path);
 
@@ -43,6 +43,9 @@ public:
 	af::Msg * generateJobsList(int id);
 	/// Generate MCJobs message for users with provided ids:
 	af::Msg * generateJobsList(const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json = false);
+
+private:
+	int addBranchToContainer(BranchSrv * i_branch);
 };
 
 //########################## Iterator ##############################

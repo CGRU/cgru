@@ -71,6 +71,8 @@ public:
 
 	static const std::vector<std::string> getStoredFolders(const std::string & i_root);
 
+	static const std::vector<std::string> getStoredFoldersBranches();
+
 	//
 	// Store operations:
 	//
