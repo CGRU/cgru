@@ -1,3 +1,19 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	httpget.cpp - get delivered simple webserver for static assets, like html, js and css files
+*/
+
 #include "httpget.hpp"
 
 #include "../include/afanasy.h"
@@ -137,14 +153,14 @@ bool HttpGet::getValidateFileName(const std::string &i_name)
 std::string HttpGet::get404Content(const std::string &filename)
 {
 	return std::string("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>AFANASY 404</title>")
-				 + "<link type=\"text/css\" rel=\"stylesheet\" href=\"lib/styles.css\">"
-				 + "<link type=\"text/css\" rel=\"stylesheet\" href=\"afanasy/browser/style.css\">"
-				 + "</head><body id=\"afbody\" style=\"position: absolute; top: 50%;"
-				 + "transform: translateY(-50%); text-align: center; width: 100%\">"
-				 + "<span style=\"font-size: 30px;\">Arghh, page not found!</span><br>"
-				 + "<span style=\"font-size: 100px; font-weight: bold;\">¯\\_(ツ)_/¯<br>404 Error</span><br>"
-				 + "<span style=\"font-size: 20px;\">The requested file (" + filename
-				 + ") could not be found on the server.</span><br>"
-				 + "<span style=\"font-size: 15px;\">Contact the <a href=\"http://forum.cgru.info/\">forum</a>, "
-				 + "if you think this is an error.</span></body></html>";
+		   + "<link type=\"text/css\" rel=\"stylesheet\" href=\"lib/styles.css\">"
+		   + "<link type=\"text/css\" rel=\"stylesheet\" href=\"afanasy/browser/style.css\">"
+		   + "</head><body id=\"afbody\" style=\"position: absolute; top: 50%;"
+		   + "transform: translateY(-50%); text-align: center; width: 100%\">"
+		   + "<span style=\"font-size: 30px;\">Arghh, page not found!</span><br>"
+		   + "<span style=\"font-size: 100px; font-weight: bold;\">¯\\_(ツ)_/¯<br>404 Error</span><br>"
+		   + "<span style=\"font-size: 20px;\">The requested file (" + filename
+		   + ") could not be found on the server.</span><br>"
+		   + "<span style=\"font-size: 15px;\">Contact the <a href=\"http://forum.cgru.info/\">forum</a>, "
+		   + "if you think this is an error.</span></body></html>";
 }
