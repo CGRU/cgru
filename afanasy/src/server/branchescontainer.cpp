@@ -59,8 +59,9 @@ AF_DEBUG << i_path;
 	// Look for a parent branch
 	BranchSrv * parent = NULL;
 	std::string up_path = af::pathUp(i_path);
+AF_DEBUG << "up_path: " << up_path;
 	if (up_path != i_path)
-		parent = addBranch(af::pathUp(i_path), i_monitors);
+		parent = addBranch(up_path, i_monitors);
 
 	// Create new Branch
 	branch = new BranchSrv(parent, i_path);

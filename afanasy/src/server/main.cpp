@@ -11,7 +11,7 @@
 \* ....................................................................................................... */
 
 /*
-	Main data structures and threadsinitialization.
+	Main data structures and threads initialization.
 */
 #include <memory.h>
 #include <signal.h>

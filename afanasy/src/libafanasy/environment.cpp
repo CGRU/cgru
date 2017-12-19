@@ -433,8 +433,8 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	{
 		 afroot = argv[0];
 		 afroot = af::pathAbsolute( afroot);
-		 afroot = af::pathUp( afroot);
-		 afroot = af::pathUp( afroot);
+		 afroot = af::pathUp(afroot, true);
+		 afroot = af::pathUp(afroot, true);
 		 QUIET("Setting Afanasy root to \"%s\"\n", afroot.c_str());
 	}
 	else
@@ -453,10 +453,10 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	if( cgrulocation.size() == 0 )
 	{
 		 cgrulocation = afroot;
-		 cgrulocation = af::pathUp( cgrulocation);
+		 cgrulocation = af::pathUp(cgrulocation, true);
 		 std::string version_txt = cgrulocation + AFGENERAL::PATH_SEPARATOR + "version.txt";
 		 if( false == af::pathFileExists( version_txt))
-			   cgrulocation = af::pathUp( cgrulocation);
+			   cgrulocation = af::pathUp(cgrulocation, true);
 		 QUIET("Setting CRGU location to \"%s\"\n", cgrulocation.c_str());
 	}
 	else
@@ -740,7 +740,7 @@ void Environment::loadFile( const std::string & i_filename)
 		{
 			std::string filename = include[i];
 			if( false == pathIsAbsolute( filename ))
-				filename = pathUp( i_filename) + AFGENERAL::PATH_SEPARATOR + filename;
+				filename = pathUp(i_filename, true) + AFGENERAL::PATH_SEPARATOR + filename;
 			loadFile( filename);
 		}
 	}

@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Commands to check path related library
+*/
 #include "cmd_path.h"
 
 #define AFOUTPUT
@@ -35,9 +50,9 @@ bool CmdPath::v_processArguments( int argc, char** argv, af::Msg &msg)
 	{
 		std::cout << "Home = \"" << af::pathHome() << "\"" << std::endl;
 	}
-	else if( operation == "up")
+	else if (operation == "up")
 	{
-		std::cout << af::pathUp( path) << std::endl;
+		std::cout << af::pathUp(path, true) << std::endl;
 	}
 	else if( operation == "isdir")
 	{

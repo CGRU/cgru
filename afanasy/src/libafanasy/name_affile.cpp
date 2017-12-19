@@ -63,41 +63,90 @@ bool af::pathIsAbsolute( const std::string & path)
 	return false;
 }
 
-const std::string af::pathAbsolute( const std::string & path)
+const std::string af::pathCurrent()
 {
-	std::string absPath( path);
-	if( false == pathIsAbsolute( absPath))
+	static const int buffer_len = 4096;
+	char buffer[buffer_len];
+	char * ptr = getcwd(buffer, buffer_len);
+	if (ptr == NULL)
 	{
-		static const int buffer_len = 4096;
-		char buffer[buffer_len];
-		char * ptr = getcwd( buffer, buffer_len);
-		if( ptr == NULL )
-		{
-			AFERRPE("af::pathAbsolute:")
-			return absPath;
-		}
-		absPath = ptr;
-		absPath += AFGENERAL::PATH_SEPARATOR + path;
+        AF_ERR << "af::pathCurrent: " << strerror(errno);
+		return "";
 	}
-	pathFilter( absPath);
+	return std::string(ptr);
+}
+
+const std::string af::pathAbsolute(const std::string & i_path)
+{
+	std::string absPath(i_path);
+	if (false == pathIsAbsolute(absPath))
+	{
+		absPath = af::pathCurrent();
+		absPath += AFGENERAL::PATH_SEPARATOR + i_path;
+	}
+	pathFilter(absPath);
 	return absPath;
 }
 
-const std::string af::pathUp( const std::string & path)
+const std::string af::pathUp(const std::string & i_path, bool i_use_cwd)
 {
-	std::string pathUp( path);
-	pathFilter( pathUp);
-	if(( path.find('/', 2) == std::string::npos) && ( path.find('\\', 2) == std::string::npos))
+	// Null path is considered as root
+	if (i_path.size() == 0)
+		return "/";
+
+	// Filter double slashes
+	std::string up_path(i_path);
+	pathFilter(up_path);
+
+	// Root path parent considered as root
+	if (up_path.size() == 1)
 	{
-		std::string absPath = pathAbsolute( path);
-		if(( absPath.find('/', 2) == std::string::npos) && ( absPath.find('\\', 2) == std::string::npos)) return pathUp;
-		pathUp = absPath;
+		if (up_path[0] == '/')
+			return "/";
+		if (up_path[0] == '\\')
+			return "\\";
 	}
-	size_t pos = pathUp.rfind('/', pathUp.size() - 2);
-	if( pos == std::string::npos ) pos = pathUp.rfind('\\', pathUp.size() - 2);
-	if(( pos == 0 ) || ( pos == std::string::npos )) return pathUp;
-	pathUp.resize( pos );
-	return pathUp;
+
+	// Remove slash from the end if exists
+	if (up_path.back() == '/')
+		up_path.pop_back();
+	if (up_path.back() == '\\')
+		up_path.pop_back();
+
+	// It is can be link to the current folder
+	if (up_path == ".")
+	{
+		if (i_use_cwd)
+			return af::pathUp(af::pathCurrent(), false);
+		else
+			return "/";
+	}
+
+	// This can  be a relative path that consists of a single folder
+	if ((up_path.find('/') == std::string::npos) && (up_path.find('\\') == std::string::npos))
+	{
+		if (i_use_cwd)
+			return af::pathCurrent();
+		else
+			return "/";
+	}
+
+	// Cut string from right to the first slash
+	size_t pos = up_path.rfind('/');
+	if (pos == 0)
+		return "/";
+
+	if (pos == std::string::npos)
+		pos = up_path.rfind('\\');
+	if (pos == 0)
+		return "\\";
+
+	if (pos == std::string::npos)
+		return up_path;
+
+	up_path.resize(pos);
+
+	return up_path;
 }
 
 const std::string af::pathFilterFileName( const std::string & i_filename)

@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	name_af.h - Header for functions that are common for an entire project (afserver, afrender, afwatch, afcmd).
+*/
 #pragma once
 
 #include <algorithm>
@@ -191,9 +206,11 @@ namespace af
 
 	bool pathIsFolder( const std::string & path);
 
-	const std::string pathAbsolute( const std::string & path);
+	const std::string pathCurrent();
 
-	const std::string pathUp( const std::string & path);
+	const std::string pathAbsolute(const std::string & i_path);
+
+	const std::string pathUp(const std::string & i_path, bool i_use_cwd = false);
 
 	const std::string pathHome();
 
