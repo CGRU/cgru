@@ -41,7 +41,7 @@ public:
 
 	~BranchSrv();
 
-	bool initialize();
+	bool initialize( BranchSrv * i_parent);
 
 	void addJob(JobAf * i_job);
 	void removeJob(JobAf * i_job);
@@ -89,6 +89,7 @@ private:
 	void deleteNode(MonitorContainer * i_monitoring);
 
 private:
+	BranchSrv * m_parent;
 	AfList m_branches_list;
 	AfList m_jobslist; ///< Jobs list.
 

@@ -34,6 +34,8 @@ public:
 
 	virtual ~Branch();
 
+	inline const std::string & getParentPath() const {return m_parent_path;}
+
 	void v_generateInfoStream(std::ostringstream & stream, bool full = false) const;
 
 	virtual void v_jsonWrite(std::ostringstream & o_str, int i_type) const;
@@ -43,6 +45,8 @@ public:
 	static const std::string FilterPath(const std::string & i_path);
 
 protected:
+
+	std::string m_parent_path;
 
 	int64_t m_time_creation;
 	int64_t m_time_empty;

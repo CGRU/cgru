@@ -50,6 +50,8 @@ void Branch::v_readwrite(Msg * msg)
 	rw_int64_t(m_time_creation, msg);
 	rw_int64_t(m_time_empty,    msg);
 	rw_int32_t(m_branches_num,  msg);
+
+	rw_String(m_parent_path, msg);
 }
 
 void Branch::v_jsonWrite(std::ostringstream & o_str, int i_type) const
@@ -63,6 +65,8 @@ void Branch::v_jsonWrite(std::ostringstream & o_str, int i_type) const
 	o_str << ",\n\"time_creation\":" << m_time_creation;
 	o_str << ",\n\"time_empty\":" << m_time_empty;
 	o_str << ",\n\"branches_num\":" << m_branches_num;
+
+	o_str << ",\n\"m_parent\":\"" << m_parent_path << "\"";
 
 	o_str << "\n}";
 }
@@ -86,8 +90,10 @@ bool Branch::jsonRead(const JSON &i_object, std::string * io_changes)
 		return true;
 
 	jr_int64("time_creation", m_time_creation, i_object);
-	jr_int64("time_empty", m_time_empty, i_object);
-	jr_int32("branches_num", m_branches_num, i_object);
+	jr_int64("time_empty",    m_time_empty,    i_object);
+	jr_int32("branches_num",  m_branches_num,  i_object);
+
+	jr_string("parent",       m_parent_path,   i_object);
 
 	Node::jsonRead(i_object);
 
