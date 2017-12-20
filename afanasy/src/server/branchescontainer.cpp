@@ -73,7 +73,7 @@ AF_DEBUG << i_path;
 
 	// Create new Branch
 	branch = new BranchSrv(parent, i_path);
-	if (addBranchToContainer(branch, NULL) == 0)
+	if (addBranchToContainer(branch) == 0)
 	{
 		AF_ERR << "Can't add branch to container: " << i_path;
 		delete branch;
@@ -89,30 +89,30 @@ AF_DEBUG << i_path;
 
 bool BranchesContainer::addBranchFromStore(BranchSrv * i_branch)
 {
-	BranchSrv * parent = NULL;
 	std::string path = i_branch->getName();
 	if (path != "/")
 	{
 		std::string up_path = af::pathUp(path);
-		parent = getBranch(up_path);
+		BranchSrv * parent = getBranch(up_path);
 		if (NULL == parent)
 		{
 			AF_ERR << "Can't process parent of a stored branch:\n" << path << "\n" << up_path;
 			return false;
 		}
+		i_branch->setParent(parent);
 	}
 
-	return (addBranchToContainer(i_branch, parent) != 0);
+	return (addBranchToContainer(i_branch) != 0);
 }
 
-int BranchesContainer::addBranchToContainer(BranchSrv * i_branch, BranchSrv * i_parent)
+int BranchesContainer::addBranchToContainer(BranchSrv * i_branch)
 {
 	// Add node to container
 	if (false == add(i_branch))
 		return 0;
 
 	// Initialize branch
-	if (false == i_branch->initialize(i_parent))
+	if (false == i_branch->initialize())
 		return 0;
 
 	return i_branch->getId();

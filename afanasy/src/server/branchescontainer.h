@@ -45,7 +45,7 @@ public:
 	af::Msg * generateJobsList(const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json = false);
 
 private:
-	int addBranchToContainer(BranchSrv * i_branch, BranchSrv * i_parent);
+	int addBranchToContainer(BranchSrv * i_branch);
 };
 
 //########################## Iterator ##############################

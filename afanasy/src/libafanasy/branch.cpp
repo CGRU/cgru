@@ -66,7 +66,7 @@ void Branch::v_jsonWrite(std::ostringstream & o_str, int i_type) const
 	o_str << ",\n\"time_empty\":" << m_time_empty;
 	o_str << ",\n\"branches_num\":" << m_branches_num;
 
-	o_str << ",\n\"m_parent\":\"" << m_parent_path << "\"";
+	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
 
 	o_str << "\n}";
 }

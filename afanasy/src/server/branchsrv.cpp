@@ -43,15 +43,6 @@ BranchSrv::BranchSrv(BranchSrv * i_parent, const std::string & i_path):
 	appendLog("Created from job.");
 }
 
-BranchSrv::BranchSrv(JSON & i_object):
-	af::Branch(),
-	m_parent(NULL),
-	AfNodeSolve(this)
-{
-	jsonRead(i_object);
-	appendLog("Created from JSON request.");
-}
-
 BranchSrv::BranchSrv(const std::string & i_store_dir):
 	af::Branch(),
 	m_parent(NULL),
@@ -76,19 +67,25 @@ BranchSrv::BranchSrv(const std::string & i_store_dir):
 	delete [] data;
 }
 
-bool BranchSrv::initialize(BranchSrv * i_parent)
+bool BranchSrv::setParent(BranchSrv * i_parent)
 {
-	// Parent is set on creation from job,
-	// or is set on initialization from store
-	// Other cases should not happen.
 	if (NULL != m_parent)
 	{
-		AF_ERR << "BranchSrv::initialize: Branch['" << m_name << "'] parent already set.";
+		AF_ERR << "BranchSrv::setParent: Branch['" << m_name << "'] already has a parent.";
+		return false;
+	}
+
+	if (m_name == "/")
+	{
+		AF_ERR << "BranchSrv::setParent: Root branch should not have any parent.";
 		return false;
 	}
 
 	m_parent = i_parent;
+}
 
+bool BranchSrv::initialize()
+{
 	// Non root branch should have a parent
 	if ((m_name != "/") && (NULL == m_parent))
 	{
@@ -98,7 +95,7 @@ bool BranchSrv::initialize(BranchSrv * i_parent)
 
 	if (NULL != m_parent)
 	{
-		m_parent_path = i_parent->getName();
+		m_parent_path = m_parent->getName();
 	}
 
 	if (isFromStore())

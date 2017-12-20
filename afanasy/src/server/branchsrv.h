@@ -33,15 +33,14 @@ public:
 	/// Create a new branch on a new job.
 	BranchSrv(BranchSrv * i_parent, const std::string & i_path);
 
-	/// Construct from JSON.
-	BranchSrv(JSON & i_object);
-
 	/// Construct from store.
 	BranchSrv(const std::string & i_store_dir);
 
 	~BranchSrv();
 
-	bool initialize( BranchSrv * i_parent);
+	bool setParent(BranchSrv * i_parent);
+
+	bool initialize();
 
 	void addJob(JobAf * i_job);
 	void removeJob(JobAf * i_job);
