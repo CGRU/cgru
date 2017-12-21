@@ -100,16 +100,17 @@ bool BranchSrv::initialize()
 
 	if (isFromStore())
 	{
-//		if(( getTimeRegister() == 0 ) || ( getTimeActivity() == 0 ))
-//		{
-//			if( getTimeRegister() == 0 ) setTimeRegister();
-//			store();
-//		}
+		if (m_time_creation == 0 )
+		{
+			m_time_creation = time(NULL);
+			store();
+		}
 		appendLog("Initialized from store.");
 	}
 	else
 	{
-//		setTimeRegister();
+		m_time_creation = time(NULL);
+		m_time_empty = 0;
 		setStoreDir(AFCommon::getStoreDirBranch(*this));
 		store();
 		appendLog("Initialized.");
@@ -146,7 +147,7 @@ void BranchSrv::v_action(Action & i_action)
 	if (i_action.log.size())
 	{
 		store();
-		i_action.monitors->addEvent(af::Monitor::EVT_users_change, m_id);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
 }
 
@@ -169,7 +170,7 @@ void BranchSrv::deleteNode(MonitorContainer * i_monitoring)
 {
 	setZombie();
 
-//if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_users_del, m_id);
+	if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_branches_del, m_id);
 }
 
 void BranchSrv::addJob(JobAf * i_job)
@@ -245,7 +246,7 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 	bool changed = refreshCounters();
 
 	if (changed && monitoring)
-		monitoring->addEvent(af::Monitor::EVT_users_change, m_id);
+		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
 
 	// Update solving parameters:
 	v_calcNeed();

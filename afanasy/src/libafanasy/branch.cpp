@@ -25,17 +25,26 @@ using namespace af;
 
 Branch::Branch(const std::string & i_path)
 {
+	initDefaultValues();
 	m_name = i_path;
 }
 
 Branch::Branch(Msg * msg)
 {
+	initDefaultValues();
 	read(msg);
 }
 
 Branch::Branch(int i_id)
 {
+	initDefaultValues();
 	m_id = i_id;
+}
+
+void Branch::initDefaultValues()
+{
+	m_time_creation = 0;
+	m_time_empty = 0;
 }
 
 Branch::~Branch()

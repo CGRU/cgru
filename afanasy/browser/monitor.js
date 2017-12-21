@@ -44,8 +44,8 @@ function Monitor(i_args)
 	else if (this.type == 'monitors')
 		this.nodeConstructor = MonitorNode;
 
-	if (this.nodeConstructor.createActions)
-		this.nodeConstructor.createActions();
+	if (this.nodeConstructor.onMonitorCreate)
+		this.nodeConstructor.onMonitorCreate();
 
 	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild(this.elMonitor);
@@ -1058,8 +1058,9 @@ Monitor.prototype.showMenu = function(i_evt, i_name, i_need_selection) {
 		i_name = 'set';
 
 	var menu = this.createMenu(i_evt, 'set');
-	//	var actions = this.cur_item.constructor.actions;
 	var actions = this.nodeConstructor.actions;
+	if (actions == null)
+		return;
 	for (var i = 0; i < actions.length; i++)
 		if (actions[i].mode == i_name)
 			this.addMenuItem(menu, actions[i]);

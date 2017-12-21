@@ -57,9 +57,7 @@ private:
 
 	void v_readwrite(Msg * msg);
 
-
-private:
-
+	void initDefaultValues();
 };
 }
 

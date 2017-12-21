@@ -16,6 +16,10 @@
 
 "use strict";
 
+RenderNode.onMonitorCreate = function() {
+	RenderNode.createActions();
+}
+
 function RenderNode()
 {
 }
