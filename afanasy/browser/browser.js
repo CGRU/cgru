@@ -13,6 +13,7 @@
 /*
 	browser.js - structures and functions directly related to the entities in the browser
 */
+
 "use strict";
 
 var g_cycle = 0;

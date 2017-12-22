@@ -18,7 +18,7 @@
 
 RenderNode.onMonitorCreate = function() {
 	RenderNode.createActions();
-}
+};
 
 function RenderNode()
 {

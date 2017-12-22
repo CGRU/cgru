@@ -13,6 +13,7 @@
 /*
 	This data structures pointers are shared across server threads.
 */
+
 #pragma once
 
 #ifdef WINNT
@@ -23,7 +24,10 @@
 
 #include "../libafanasy/name_af.h"
 
-namespace af { class RenderUpdatetQueue; }
+namespace af
+{
+class RenderUpdatetQueue;
+}
 
 class BranchesContainer;
 class JobContainer;
@@ -35,14 +39,13 @@ class SocketsProcessing;
 
 struct ThreadArgs
 {
-	BranchesContainer * branches;
-	JobContainer      * jobs;
-	MonitorContainer  * monitors;
-	RenderContainer   * renders;
-	UserContainer     * users;
+	BranchesContainer /**/ *branches;
+	JobContainer /*******/ *jobs;
+	MonitorContainer /***/ *monitors;
+	RenderContainer /****/ *renders;
+	UserContainer /******/ *users;
 
-	SocketsProcessing * socketsProcessing;
+	SocketsProcessing *socketsProcessing;
 
-	af::RenderUpdatetQueue * rupQueue;
+	af::RenderUpdatetQueue *rupQueue;
 };
-

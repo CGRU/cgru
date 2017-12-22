@@ -13,13 +13,14 @@
 /*
 	branches.js - methods and structs for monitoring and handling of branches
 */
+
 "use strict";
 
 var branches = null;
 
 BranchNode.onMonitorCreate = function() {
 	branches = {};
-}
+};
 
 function BranchNode()
 {

@@ -86,7 +86,8 @@ function checkFileHeader($filePath, &$fileContent, &$status)
 			$regexParseHeader = '/\.\.\ \*\/\n\n\/\*([\S\s]+?)\*\/([\S\s]+)$/';
 			if (preg_match($regexParseHeader, $fileContent, $matchHeaderNew))
 			{
-				$newFileContent = getFileHeader($matchHeaderNew[1], $modificationString) . $matchHeaderNew[2];
+				$newFileContent = getFileHeader($matchHeaderNew[1], $modificationString)
+					. PHP_EOL . PHP_EOL . trim($matchHeaderNew[2]) . PHP_EOL;
 				if ($newFileContent != $fileContent)
 				{
 					$status[] = noticeString('header has changed!');
