@@ -5,10 +5,8 @@ call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
 REM Locate C4D:
 set "MAXON=%SystemDrive%\Program Files\MAXON"
-if not exist "%MAXON%" set "MAXON=%SystemDrive%\Program Files (x86)\MAXON"
 For /F "Tokens=*" %%I in ('dir /b "%MAXON%\CINEMA 4D*"') Do set APP_DIR=%MAXON%\%%I
-set APP_EXE=CINEMA 4D 64 Bit.exe
-if not exist "%APP_DIR%\%APP_EXE%" set "APP_EXE=CINEMA 4D.exe"
+set "APP_EXE=%APP_DIR%\CINEMA 4D.exe"
 REM Customize C4D location:
 set "locate_file=%CGRU_LOCATION%\software_setup\locate_c4d.cmd"
 if exist "%locate_file%" call "%locate_file%"
@@ -40,5 +38,5 @@ IF EXIST "%C4D_PREFERENCES_LOCATION%\python" (
     echo "       Please set C4D_USER_FOLDER to point to the User-Directory!"
 )
 
-set "C4D_EXEC=%APP_DIR%\%APP_EXE%"
+set "C4D_EXEC=%APP_EXE%"
 echo C4D_EXEC=%C4D_EXEC%
