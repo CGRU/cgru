@@ -36,6 +36,7 @@ private:
 	int32_t m_error;
 	int32_t m_starts_count;
 	int32_t m_errors_count;
+	int32_t m_frame_pertask;
 
 	int64_t m_time_done;
 	int64_t m_time_start;
