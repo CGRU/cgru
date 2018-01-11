@@ -35,6 +35,10 @@ var BarRERrgb = '#F77';
 var BarERRrgb = '#F00';
 var BarWRCrgb = '#4AC';
 
+JobNode.onMonitorCreate = function() {
+	JobNode.createParams();
+};
+
 JobNode.prototype.init = function() {
 	this.element.classList.add('job');
 
@@ -55,23 +59,17 @@ JobNode.prototype.init = function() {
 	this.elState.title = 'Job State';
 	this.elState.classList.add('prestar');
 
-	this.elTime = cm_ElCreateFloatText(this.element, 'right', 'Running Time');
-	this.elLifeTime = cm_ElCreateFloatText(this.element, 'right', 'Life Time');
-	this.elPPApproval = cm_ElCreateFloatText(this.element, 'right', 'Preview Pending Approval', '<b>PPA</b>');
-	this.elMaintenance = cm_ElCreateFloatText(this.element, 'right', 'Maintenance', '<b>MNT</b>');
-	this.elIgnoreNimby =
-		cm_ElCreateFloatText(this.element, 'right', 'Ignore render "Nimby" state.', '<b>INB</b>');
-	this.elIgnorePaused =
-		cm_ElCreateFloatText(this.element, 'right', 'Ignore render "Paused" state.', '<b>IPS</b>');
-	this.elPriority = cm_ElCreateFloatText(this.element, 'right', 'Priority');
-	this.elDependMask = cm_ElCreateFloatText(this.element, 'right', 'Depend Mask');
-	this.elDependMaskGlobal = cm_ElCreateFloatText(this.element, 'right', 'Global Depend Mask');
-	this.elHostsMask = cm_ElCreateFloatText(this.element, 'right', 'Hosts Mask');
-	this.elHostsMaskExclude = cm_ElCreateFloatText(this.element, 'right', 'Exclude Hosts Mask');
-	this.elMaxRunTasks = cm_ElCreateFloatText(this.element, 'right', 'Maximum Running Tasks');
-	this.elMaxRunTasksPH = cm_ElCreateFloatText(this.element, 'right', 'Maximum Running Tasks Per Host');
-	this.elNeedProperties = cm_ElCreateFloatText(this.element, 'right', 'Properties');
-	this.elNeedOS = cm_ElCreateFloatText(this.element, 'right', 'OS Needed');
+	this.elTime = cm_ElCreateFloatText(this.element,'right','Running Time');
+	this.elWork = cm_ElCreateFloatText(this.element,'right');
+	this.elLifeTime = cm_ElCreateFloatText(this.element,'right','Life Time');
+	this.elPPApproval = cm_ElCreateFloatText(this.element,'right','Preview Pending Approval','<b>PPA</b>');
+	this.elMaintenance = cm_ElCreateFloatText(this.element,'right','Maintenance', '<b>MNT</b>');
+	this.elIgnoreNimby = cm_ElCreateFloatText(this.element,'right','Ignore render "Nimby" state.','<b>INB</b>');
+	this.elIgnorePaused = cm_ElCreateFloatText(this.element,'right','Ignore render "Paused" state.','<b>IPS</b>');
+	this.elDependMask = cm_ElCreateFloatText(this.element,'right','Depend Mask');
+	this.elDependMaskGlobal = cm_ElCreateFloatText(this.element,'right','Global Depend Mask');
+	this.elNeedProperties = cm_ElCreateFloatText(this.element,'right','Properties');
+	this.elNeedOS = cm_ElCreateFloatText(this.element,'right','OS Needed');
 
 	if (cm_IsSith())
 	{
@@ -152,10 +150,10 @@ JobNode.prototype.update = function(i_obj) {
 	if (this.params.thumb_path)
 		this.showThumb(this.params.thumb_path);
 
+	this.elWork.innerHTML = BranchNode.generateParamsString(this.params,'job');
+
 	if (cm_IsPadawan())
 	{
-		this.elPriority.innerHTML = 'Priority:<b>' + this.params.priority + '</b>';
-
 		if (this.params.time_life)
 			this.elLifeTime.innerHTML =
 				'LifeTime(<b>' + cm_TimeStringFromSeconds(this.params.time_life) + '</b>)';
@@ -173,27 +171,6 @@ JobNode.prototype.update = function(i_obj) {
 		else
 			this.elDependMaskGlobal.textContent = '';
 
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'HostsMask(<b>' + this.params.hosts_mask + '</b>)';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'ExcludeHosts(<b>' + this.params.hosts_mask_exclude + '</b>)';
-		else
-			this.elHostsMaskExclude.textContent = '';
-
-		if (this.params.max_running_tasks != null)
-			this.elMaxRunTasks.innerHTML = 'MaxTasks:<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunTasks.textContent = '';
-
-		if (this.params.max_running_tasks_per_host != null)
-			this.elMaxRunTasksPH.innerHTML =
-				'MaxPerHost:<b>' + this.params.max_running_tasks_per_host + '</b>';
-		else
-			this.elMaxRunTasksPH.textContent = '';
-
 		if (this.params.need_properties)
 			this.elNeedProperties.innerHTML = 'Properties(<b>' + this.params.need_properties + '</b>)';
 		else
@@ -206,8 +183,6 @@ JobNode.prototype.update = function(i_obj) {
 	}
 	else if (cm_IsJedi())
 	{
-		this.elPriority.innerHTML = 'Pri:<b>' + this.params.priority + '</b>';
-
 		if (this.params.time_life)
 			this.elLifeTime.innerHTML =
 				'Life(<b>' + cm_TimeStringFromSeconds(this.params.time_life) + '</b>)';
@@ -224,26 +199,6 @@ JobNode.prototype.update = function(i_obj) {
 		else
 			this.elDependMaskGlobal.textContent = '';
 
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'Hosts(<b>' + this.params.hosts_mask + '</b>)';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'Exclude(<b>' + this.params.hosts_mask_exclude + '</b>)';
-		else
-			this.elHostsMaskExclude.textContent = '';
-
-		if (this.params.max_running_tasks != null)
-			this.elMaxRunTasks.innerHTML = 'Max:<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunTasks.textContent = '';
-
-		if (this.params.max_running_tasks_per_host != null)
-			this.elMaxRunTasksPH.innerHTML = 'MPH:<b>' + this.params.max_running_tasks_per_host + '</b>';
-		else
-			this.elMaxRunTasksPH.textContent = '';
-
 		if (this.params.need_properties)
 			this.elNeedProperties.innerHTML = 'Props(<b>' + this.params.need_properties + '</b>)';
 		else
@@ -256,8 +211,6 @@ JobNode.prototype.update = function(i_obj) {
 	}
 	else
 	{
-		this.elPriority.innerHTML = 'p<b>' + this.params.priority + '</b>';
-
 		if (this.params.time_life)
 			this.elLifeTime.innerHTML = 'l(<b>' + cm_TimeStringFromSeconds(this.params.time_life) + '</b>)';
 		else
@@ -272,26 +225,6 @@ JobNode.prototype.update = function(i_obj) {
 			this.elDependMaskGlobal.innerHTML = 'g(<b>' + this.params.depend_mask_global + '</b>)';
 		else
 			this.elDependMaskGlobal.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'h(<b>' + this.params.hosts_mask + '</b>)';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'e(<b>' + this.params.hosts_mask_exclude + '</b>)';
-		else
-			this.elHostsMaskExclude.textContent = '';
-
-		if (this.params.max_running_tasks != null)
-			this.elMaxRunTasks.innerHTML = 'm<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunTasks.textContent = '';
-
-		if (this.params.max_running_tasks_per_host != null)
-			this.elMaxRunTasksPH.innerHTML = 'mph<b>' + this.params.max_running_tasks_per_host + '</b>';
-		else
-			this.elMaxRunTasksPH.textContent = '';
 
 		if (this.params.need_properties)
 			this.elNeedProperties.innerHTML = '<b>' + this.params.need_properties + '</b>';
@@ -522,10 +455,6 @@ function JobBlock(i_elParent, i_block)
 	this.elErrSolving = cm_ElCreateFloatText(this.element, 'right');
 	this.elForgiveTime = cm_ElCreateFloatText(this.element, 'right', 'Errors Forgive Time');
 	this.elMaxRunTime = cm_ElCreateFloatText(this.element, 'right', 'Task Maximum Run Time');
-	this.elMaxRunTasks = cm_ElCreateFloatText(this.element, 'right', 'Maximum Running Tasks');
-	this.elMaxRunTasksPH = cm_ElCreateFloatText(this.element, 'right', 'Maximum Running Tasks Per Host');
-	this.elHostsMask = cm_ElCreateFloatText(this.element, 'right', 'Hosts Mask');
-	this.elHostsMaskExclude = cm_ElCreateFloatText(this.element, 'right', 'Exclude Hosts Mask');
 	this.elNeedMem = cm_ElCreateFloatText(this.element, 'right', 'Required Memory');
 	this.elNeedHDD = cm_ElCreateFloatText(this.element, 'right', 'Required HDD Space');
 	this.elNeedPower = cm_ElCreateFloatText(this.element, 'right', 'Needed Power');
@@ -1003,28 +932,6 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elMaxRunTime.textContent = '';
 
-			if (this.params.max_running_tasks != null)
-				this.elMaxRunTasks.innerHTML = 'MaxRunTasks:<b>' + this.params.max_running_tasks + '</b>';
-			else
-				this.elMaxRunTasks.textContent = '';
-
-			if (this.params.max_running_tasks_per_host != null)
-				this.elMaxRunTasksPH.innerHTML =
-					'MaxPerHost:<b>' + this.params.max_running_tasks_per_host + '</b>';
-			else
-				this.elMaxRunTasksPH.textContent = '';
-
-			if (this.params.hosts_mask)
-				this.elHostsMask.innerHTML = 'HostsMask(<b>' + this.params.hosts_mask + '</b>)';
-			else
-				this.elHostsMask.textContent = '';
-
-			if (this.params.hosts_mask_exclude)
-				this.elHostsMaskExclude.innerHTML =
-					'ExcludeHosts(<b>' + this.params.hosts_mask_exclude + '</b>)';
-			else
-				this.elHostsMaskExclude.textContent = '';
-
 			if (this.params.need_memory)
 				this.elNeedMem.innerHTML = 'Memory><b>' + this.params.need_memory + '</b>';
 			else
@@ -1076,27 +983,6 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elMaxRunTime.textContent = '';
 
-			if (this.params.max_running_tasks != null)
-				this.elMaxRunTasks.innerHTML = 'MaxTasks:<b>' + this.params.max_running_tasks + '</b>';
-			else
-				this.elMaxRunTasks.textContent = '';
-
-			if (this.params.max_running_tasks_per_host != null)
-				this.elMaxRunTasksPH.innerHTML =
-					'PerHost:<b>' + this.params.max_running_tasks_per_host + '</b>';
-			else
-				this.elMaxRunTasksPH.textContent = '';
-
-			if (this.params.hosts_mask)
-				this.elHostsMask.innerHTML = 'Hosts(<b>' + this.params.hosts_mask + '</b>)';
-			else
-				this.elHostsMask.textContent = '';
-
-			if (this.params.hosts_mask_exclude)
-				this.elHostsMaskExclude.innerHTML = 'Exclude(<b>' + this.params.hosts_mask_exclude + '</b>)';
-			else
-				this.elHostsMaskExclude.textContent = '';
-
 			if (this.params.need_memory)
 				this.elNeedMem.innerHTML = 'Mem><b>' + this.params.need_memory + '</b>';
 			else
@@ -1146,26 +1032,6 @@ JobBlock.prototype.update = function(i_displayFull) {
 					'mrt<b>' + cm_TimeStringFromSeconds(this.params.tasks_max_run_time) + '</b>';
 			else
 				this.elMaxRunTime.textContent = '';
-
-			if (this.params.max_running_tasks != null)
-				this.elMaxRunTasks.innerHTML = 'm<b>' + this.params.max_running_tasks + '</b>';
-			else
-				this.elMaxRunTasks.textContent = '';
-
-			if (this.params.max_running_tasks_per_host != null)
-				this.elMaxRunTasksPH.innerHTML = 'mph<b>' + this.params.max_running_tasks_per_host + '</b>';
-			else
-				this.elMaxRunTasksPH.textContent = '';
-
-			if (this.params.hosts_mask)
-				this.elHostsMask.innerHTML = 'h(<b>' + this.params.hosts_mask + '</b>)';
-			else
-				this.elHostsMask.textContent = '';
-
-			if (this.params.hosts_mask_exclude)
-				this.elHostsMaskExclude.innerHTML = 'e(<b>' + this.params.hosts_mask_exclude + '</b>)';
-			else
-				this.elHostsMaskExclude.textContent = '';
 
 			if (this.params.need_memory)
 				this.elNeedMem.innerHTML = 'm><b>' + this.params.need_memory + '</b>';
@@ -1725,23 +1591,30 @@ JobNode.listen = function(i_args) {
 	listen_Start(args);
 };
 
-JobNode.params = {
-	priority /***************/: {"type": 'num', "label": 'Priority'},
+JobNode.params_job = {
 	depend_mask /************/: {"type": 'reg', "label": 'Depend Mask'},
 	depend_mask_global /*****/: {"type": 'reg', "label": 'Global Depend Mask'},
-	max_running_tasks /******/: {"type": 'num', "label": 'Max Running Tasks'},
-	max_running_tasks_per_host: {"type": 'num', "label": 'Max Run Tasks Per Host'},
-	hosts_mask /*************/: {"type": 'reg', "label": 'Hosts Mask'},
-	hosts_mask_exclude /*****/: {"type": 'reg', "label": 'Exclude Hosts Mask'},
 	time_wait /**************/: {"type": 'tim', "label": 'Time Wait'},
 	need_os /****************/: {"type": 'reg', "label": 'OS Needed'},
 	need_properties /********/: {"type": 'reg', "label": 'Need Properties'},
 	time_life /**************/: {"type": 'hrs', "label": 'Life Time'},
-	annotation /*************/: {"type": 'str', "label": 'Annotation'},
 	hidden /*****************/: {"type": 'bl1', "label": 'Hidden'},
 	ppa /********************/: {"type": 'bl1', "label": 'Preview Pending Approval'},
 	user_name /**************/: {"type": 'str', "label": 'Owner', "permissions": 'visor'}
 };
+
+JobNode.createParams = function(){
+	if (JobNode.params_created)
+		return;
+
+	JobNode.params = {};
+	for (var p in BranchNode.params)
+		JobNode.params[p] = BranchNode.params[p];
+	for (var p in JobNode.params_job)
+		JobNode.params[p] = JobNode.params_job[p];
+
+	JobNode.params_created = true;
+}
 
 JobNode.view_opts = {
 	jobs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},

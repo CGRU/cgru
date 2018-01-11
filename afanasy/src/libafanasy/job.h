@@ -61,8 +61,6 @@ public:
 	inline int getBlocksNum()           const { return m_blocks_num;                }
 	inline int getTimeLife()            const { return m_time_life;                 }
 	inline int getUserListOrder()       const { return m_user_list_order;           }
-	inline int getMaxRunningTasks()     const { return m_max_running_tasks;         }
-	inline int getMaxRunTasksPerHost()  const { return m_max_running_tasks_per_host;}
 
 	inline long long getTimeCreation()      const { return m_time_creation;    }
 	inline long long getTimeStarted()       const { return m_time_started;     }
@@ -104,10 +102,6 @@ public:
     inline bool isIgnorePausedFlag() const { return ( m_flags & FIgnorePaused ); }
     inline void setIgnorePausedFlag( bool i_on = true) { if( i_on ) m_flags = m_flags | FIgnorePaused; else m_flags = m_flags & (~FIgnorePaused); }
 
-	inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
-		{ return setRegExp( m_hosts_mask, str, "job hosts mask", errOutput);}
-	inline bool setHostsMaskExclude(  const std::string & str, std::string * errOutput = NULL)
-		{ return setRegExp( m_hosts_mask_exclude, str, "job exclude hosts mask", errOutput);}
 	inline bool setDependMask(        const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_depend_mask, str, "job depend mask", errOutput);}
 	inline bool setDependMaskGlobal(  const std::string & str, std::string * errOutput = NULL)
@@ -117,22 +111,16 @@ public:
 	inline bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_need_properties, str, "job need properties mask", errOutput);}
 
-	inline bool hasHostsMask()          const { return m_hosts_mask.notEmpty();         }
-	inline bool hasHostsMaskExclude()   const { return m_hosts_mask_exclude.notEmpty(); }
 	inline bool hasDependMask()         const { return m_depend_mask.notEmpty();        }
 	inline bool hasDependMaskGlobal()   const { return m_depend_mask_global.notEmpty(); }
 	inline bool hasNeedOS()             const { return m_need_os.notEmpty();            }
 	inline bool hasNeedProperties()     const { return m_need_properties.notEmpty();    }
 
-	inline const std::string & getHostsMask()          const { return m_hosts_mask.getPattern();         }
-	inline const std::string & getHostsMaskExclude()   const { return m_hosts_mask_exclude.getPattern(); }
 	inline const std::string & getDependMask()         const { return m_depend_mask.getPattern();        }
 	inline const std::string & getDependMaskGlobal()   const { return m_depend_mask_global.getPattern(); }
 	inline const std::string & getNeedOS()             const { return m_need_os.getPattern();            }
 	inline const std::string & getNeedProperties()     const { return m_need_properties.getPattern();    }
 
-	inline bool checkHostsMask(         const std::string & str ) const { return m_hosts_mask.match( str );        }
-	inline bool checkHostsMaskExclude(  const std::string & str ) const { return m_hosts_mask_exclude.match( str); }
 	inline bool checkDependMask(        const std::string & str ) const { return m_depend_mask.match( str);        }
 	inline bool checkDependMaskGlobal(  const std::string & str ) const { return m_depend_mask_global.match( str );}
 	inline bool checkNeedOS(            const std::string & str ) const { return m_need_os.match( str);           }
@@ -185,12 +173,6 @@ protected:
 	/// Job post command (executed by server on job deletion)
 	std::string m_command_post;
 
-	/// Maximum number of running tasks
-	int32_t m_max_running_tasks;
-
-	/// Maximum number of running tasks per host
-	int32_t m_max_running_tasks_per_host;
-
 	/// Life time, after this time job will be automatically deleted.
 	int32_t m_time_life;
 
@@ -206,10 +188,6 @@ protected:
 	/// set in JobAf::refresh(): if job was not done, but now is done we set job header time_done
 	int64_t m_time_done;
 	
-	/// Job hosts mask ( huntgroup ).
-	RegExp m_hosts_mask;
-	/// Job hosts exclude mask ( huntgroup ).
-	RegExp m_hosts_mask_exclude;
 	/// Jobs names mask current job depends on ( wait until they will be done).
 	RegExp m_depend_mask;
 	/// Jobs names mask current job depends on ( wait until they will be done).

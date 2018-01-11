@@ -20,6 +20,10 @@ function UserNode()
 {
 }
 
+UserNode.onMonitorCreate = function() {
+	UserNode.createParams();
+};
+
 UserNode.prototype.init = function() {
 	this.element.classList.add('user');
 
@@ -31,40 +35,17 @@ UserNode.prototype.init = function() {
 	this.elName.title = 'User Name';
 	this.elName.classList.add('prestar');
 
-	if (false == cm_IsPadawan())
-	{
-		this.elPriority = document.createElement('span');
-		this.element.appendChild(this.elPriority);
-		this.elPriority.title = 'Priority';
-	}
-
-	this.elHostName = cm_ElCreateFloatText(this.element, 'right', 'Host Name');
-	this.elHostName.classList.add('name');
-
-	this.elCenter = document.createElement('div');
-	this.element.appendChild(this.elCenter);
-	this.elCenter.style.position = 'absolute';
-	this.elCenter.style.left = '0';
-	this.elCenter.style.right = '0';
-	this.elCenter.style.top = '1px';
-	this.elCenter.style.textAlign = 'center';
-	this.elCenter.classList.add('prestar');
-
-	if (cm_IsPadawan())
-		this.elPriority = cm_ElCreateText(this.elCenter, 'Priority');
-	this.elMaxRunningTasks = cm_ElCreateText(this.elCenter, 'Maximum Running Tasks');
-	this.elHostsMask = cm_ElCreateText(this.elCenter, 'Hosts Mask');
-	this.elHostsMaskExclude = cm_ElCreateText(this.elCenter, 'Exclude Hosts Mask');
-	this.elErrors = cm_ElCreateText(this.elCenter);
-	this.elForgive = cm_ElCreateText(this.elCenter, 'Errors Forgive Time');
-	this.elJobsLifeTime = cm_ElCreateText(this.elCenter, 'Jobs Life Time');
+	this.elWork = cm_ElCreateFloatText(this.element,'right');
+	this.elErrors = cm_ElCreateFloatText(this.element,'right');
+	this.elForgive = cm_ElCreateFloatText(this.element,'right','Errors Forgive Time');
+	this.elJobsLifeTime = cm_ElCreateFloatText(this.element,'right','Jobs Life Time');
 
 	this.element.appendChild(document.createElement('br'));
 
-	this.elJobs = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
+	this.elJobs = cm_ElCreateFloatText(this.element,'left','Jobs: All/Running');
 	this.elJobs.classList.add('prestar');
 
-	this.elSolving = cm_ElCreateFloatText(this.element, 'right');
+	this.elHostName = cm_ElCreateFloatText(this.element,'right','Host Name');
 
 	this.element.appendChild(document.createElement('br'));
 
@@ -101,30 +82,15 @@ UserNode.prototype.update = function(i_obj) {
 	else
 		this.elStar.style.display = 'none';
 
+	this.elWork.innerHTML = BranchNode.generateParamsString(this.params,'user');
+
 	if (cm_IsPadawan())
 	{
-		this.elPriority.innerHTML = 'Priority:<b>' + this.params.priority + '</b>';
-
 		if (this.params.host_name)
 			this.elHostName.innerHTML =
 				'<small>Latest Activity Host:</small><b>' + this.params.host_name + '</b>';
 		else
 			this.elHostName.textContent = '';
-
-		if (this.params.max_running_tasks)
-			this.elMaxRunningTasks.innerHTML = 'MaxRunTasks:<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunningTasks.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'HostsMask(<b>' + this.params.hosts_mask + '</b>)';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'ExcludeHosts(<b>' + this.params.hosts_mask_exclude + '</b>)';
-		else
-			this.elHostsMaskExclude.textContent = '';
 
 		if (this.params.errors_forgive_time)
 			this.elForgive.innerHTML =
@@ -153,35 +119,13 @@ UserNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
 		this.elJobs.innerHTML = jobs;
-
-		if (this.params.solve_parallel)
-			this.elSolving.innerHTML = 'Solving:<b>Parallel</b>';
-		else
-			this.elSolving.innerHTML = 'Solving:<b>Ordered</b>';
 	}
 	else if (cm_IsJedi())
 	{
-		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
-
 		if (this.params.host_name)
 			this.elHostName.innerHTML = '<b>' + this.params.host_name + '</b>';
 		else
 			this.elHostName.textContent = '';
-
-		if (this.params.max_running_tasks)
-			this.elMaxRunningTasks.innerHTML = 'Max:<b>' + this.params.max_running_tasks + ')</b>';
-		else
-			this.elMaxRunningTasks.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'Hosts(<b>' + this.params.hosts_mask + ')</b>';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'Exclude(<b>' + this.params.hosts_mask_exclude + ')</b>';
-		else
-			this.elHostsMaskExclude.textContent = '';
 
 		if (this.params.errors_forgive_time)
 			this.elForgive.innerHTML =
@@ -210,35 +154,13 @@ UserNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b>Run';
 		this.elJobs.innerHTML = jobs;
-
-		if (this.params.solve_parallel)
-			this.elSolving.innerHTML = '<b>Parallel</b>';
-		else
-			this.elSolving.innerHTML = '<b>Ordered</b>';
 	}
 	else
 	{
-		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
-
 		if (this.params.host_name)
 			this.elHostName.innerHTML = '<b>' + this.params.host_name + '</b>';
 		else
 			this.elHostName.textContent = '';
-
-		if (this.params.max_running_tasks)
-			this.elMaxRunningTasks.innerHTML = 'm<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunningTasks.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'h(<b>' + this.params.hosts_mask + ')</b>';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'e(<b>' + this.params.hosts_mask_exclude + ')</b>';
-		else
-			this.elHostsMaskExclude.textContent = '';
 
 		if (this.params.errors_forgive_time)
 			this.elForgive.innerHTML =
@@ -266,19 +188,7 @@ UserNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += '/<b>' + this.params.running_jobs_num + '</b>r';
 		this.elJobs.innerHTML = jobs;
-
-		if (this.params.solve_parallel)
-			this.elSolving.innerHTML = '<b>par</b>';
-		else
-			this.elSolving.innerHTML = '<b>ord</b>';
 	}
-
-	var solving = 'User jobs solving method:';
-	if (this.params.solve_parallel)
-		solving += '\nParallel: All together according to jobs priority.\n';
-	else
-		solving += '\nOrdered: Queued by jobs priority and order.\n';
-	this.elSolving.title = solving;
 
 	var errtit = 'Errors solving:';
 	errtit += '\nJob blocks to avoid host: ' + this.params.errors_avoid_host;
@@ -360,19 +270,25 @@ UserNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
 };
 
-UserNode.params = {
-	priority /***************/: {'type': 'num', 'label': 'Priority'},
-	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
-	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
-	hosts_mask_exclude /*****/: {'type': 'reg', 'label': 'Exclude Hosts Mask'},
+UserNode.params_user = {
 	errors_retries /*********/: {'type': 'num', 'label': 'Errors Retries'},
 	errors_avoid_host /******/: {'type': 'num', 'label': 'Errors Avoid Host'},
 	errors_task_same_host /**/: {'type': 'num', 'label': 'Errors Task Same Host'},
 	errors_forgive_time /****/: {'type': 'hrs', 'label': 'Errors Forgive Time'},
-	jobs_life_time /*********/: {'type': 'hrs', 'label': 'Jobs Life Time'},
-	annotation /*************/: {'type': 'str', 'label': 'Annotation'}
+	jobs_life_time /*********/: {'type': 'hrs', 'label': 'Jobs Life Time'}
 };
-// UserNode.params.custom_data           = {'type':'json','label':'Custom Data'};
+UserNode.createParams = function(){
+	if (UserNode.params_created)
+		return;
+
+	UserNode.params = {};
+	for (var p in BranchNode.params)
+		UserNode.params[p] = BranchNode.params[p];
+	for (var p in UserNode.params_user)
+		UserNode.params[p] = UserNode.params_user[p];
+
+	UserNode.params_created = true;
+}
 
 UserNode.sort = ['priority', 'name', 'host_name'];
 UserNode.filter = ['name', 'host_name'];

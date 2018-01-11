@@ -66,13 +66,9 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		jr_string("command_post", m_command_post, i_object, io_changes);
 	}
 
-	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
-	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
 	jr_int32 ("time_life",          m_time_life,           i_object, io_changes);
 	jr_int64 ("time_wait",          m_time_wait,           i_object, io_changes);
 
-	jr_regexp("hosts_mask",         m_hosts_mask,          i_object, io_changes);
-	jr_regexp("hosts_mask_exclude", m_hosts_mask_exclude,  i_object, io_changes);
 	jr_regexp("depend_mask",        m_depend_mask,         i_object, io_changes);
 	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object, io_changes);
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
@@ -210,10 +206,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( m_user_list_order != -1 )
 		o_str << ",\n\"user_list_order\":"            << m_user_list_order;
 	o_str << ",\n\"time_creation\":"                  << m_time_creation;
-	if( m_max_running_tasks != -1 )
-		o_str << ",\n\"max_running_tasks\":"          << m_max_running_tasks;
-	if( m_max_running_tasks_per_host != -1 )
-		o_str << ",\n\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
 	if( m_time_wait != 0 )
 		o_str << ",\n\"time_wait\":"                  << m_time_wait;
 	if( m_time_started != 0 )
@@ -226,10 +218,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 	if( m_folders.size())
 		af::jw_stringmap("folders", m_folders, o_str);
 
-	if( hasHostsMask())
-		o_str << ",\n\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
-	if( hasHostsMaskExclude())
-		o_str << ",\n\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 	if( hasDependMask())
 		o_str << ",\n\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
 	if( hasDependMaskGlobal())
@@ -260,8 +248,6 @@ void Job::initDefaultValues()
 	m_id = 0;
 	m_serial = 0;
 	m_blocks_num = 0;
-	m_max_running_tasks = -1;
-	m_max_running_tasks_per_host = -1;
 	m_time_wait = 0;
 	m_time_started = 0;
 	m_time_done = 0;
@@ -274,9 +260,6 @@ void Job::initDefaultValues()
 	m_thumb_data = NULL;
 	m_blocks_data = NULL;
 
-	m_hosts_mask.setCaseInsensitive();
-	m_hosts_mask_exclude.setCaseInsensitive();
-	m_hosts_mask_exclude.setExclude();
 	m_depend_mask.setCaseSensitive();
 	m_depend_mask_global.setCaseSensitive();
 	m_need_os.setCaseInsensitive();
@@ -447,8 +430,6 @@ int Job::v_calcWeight() const
 	weight += weigh( m_project);
 	weight += weigh( m_department);
 	weight += weigh( m_folders);
-	weight += m_hosts_mask.weigh();
-	weight += m_hosts_mask_exclude.weigh();
 	weight += m_depend_mask.weigh();
 	weight += m_depend_mask_global.weigh();
 	weight += m_need_os.weigh();

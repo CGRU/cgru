@@ -43,6 +43,8 @@ Branch::Branch(int i_id)
 
 void Branch::initDefaultValues()
 {
+	m_solve_method = Work::SolveByPriority;
+
 	m_time_creation = 0;
 	m_time_empty = 0;
 }

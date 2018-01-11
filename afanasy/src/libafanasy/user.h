@@ -1,3 +1,19 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	user.h - Afanasy user.
+	af::User class represents jobs users.
+ */
 #pragma once
 
 #include <time.h>
@@ -28,24 +44,9 @@ public:
 
 	void v_generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-	inline bool hasHostsMask()        const { return m_hosts_mask.notEmpty();         }
-	inline bool hasHostsMaskExclude() const { return m_hosts_mask_exclude.notEmpty(); }
-
-	inline const std::string & getHostsMask()        const { return m_hosts_mask.getPattern();         }
-	inline const std::string & getHostsMaskExclude() const { return m_hosts_mask_exclude.getPattern(); }
-
-	inline bool checkHostsMask(         const std::string & str  ) const { return m_hosts_mask.match( str);        }
-	inline bool checkHostsMaskExclude(  const std::string & str  ) const { return m_hosts_mask_exclude.match( str);}
-
-	inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
-		{ return setRegExp( m_hosts_mask, str, "user hosts mask", errOutput);}
-	inline bool setHostsMaskExclude(  const std::string & str, std::string * errOutput = NULL)
-		{ return setRegExp( m_hosts_mask_exclude, str, "user exclude hosts mask", errOutput);}
-
 	inline const std::string & getHostName() const { return m_host_name;}
 	inline void  setHostName( const std::string & str) { m_host_name = str;}
 
-	inline int getMaxRunningTasks()      const { return m_max_running_tasks;      }
 	inline int getNumJobs()              const { return m_jobs_num;               }
 	inline int getNumRunningJobs()       const { return m_running_jobs_num;       }
 	inline int getRunningTasksNumber()   const { return m_running_tasks_num;      }
@@ -63,10 +64,6 @@ public:
 	inline void setTimeRegister()    { m_time_register = time( NULL ); m_time_activity = m_time_register; }
 	inline void updateTimeActivity() { m_time_activity = time( NULL ); }
 
-	inline bool solveJobsParallel() const { return m_state & SolveJobsParallel; }
-
-	void setJobsSolveMethod( int i_method );
-
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
@@ -75,10 +72,6 @@ public:
 
 protected:
 	std::string m_host_name;          ///< User host name.
-	int32_t  m_max_running_tasks;   ///< User maximum running tasks number hosts.
-
-	RegExp m_hosts_mask;
-	RegExp m_hosts_mask_exclude;
 
 	/// Maximum number of errors in task to retry it automatically
 	uint8_t m_errors_retries;
@@ -100,11 +93,6 @@ private:
 
 	int64_t m_time_register;        ///< User registration time.
 	int64_t m_time_activity;        ///< User last activity time.
-
-   enum State
-   {
-	  SolveJobsParallel = 1
-   };
 
 private:
    void initDefaultValues();

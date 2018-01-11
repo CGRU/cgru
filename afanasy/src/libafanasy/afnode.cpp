@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	af::Node is a base class for any node that server stores in containers.
+ */
 #include "afnode.h"
 
 #include <stdio.h>
@@ -13,13 +28,14 @@
 using namespace af;
 
 Node::Node():
-    /// Containers does not use zero id, just created node has no container.
-    m_id( 0),
-    m_state(0),
-    m_flags(0),
-    m_priority( AFGENERAL::DEFAULT_PRIORITY),
-    m_locked( false)
+	/// Containers does not use zero id, just created node has no container.
+	m_id(0),
+	m_state(0),
+	m_flags(0),
+	m_priority(AFGENERAL::DEFAULT_PRIORITY),
+	m_locked(false)
 {
+	m_priority = af::Environment::getPriority();
 }
 
 Node::~Node()
@@ -27,12 +43,12 @@ Node::~Node()
 AFINFO("Node::~Node():")
 }
 
-void Node::v_readwrite( Msg * msg)
+void Node::v_readwrite(Msg * msg)
 {
 	rw_int32_t( m_id,        msg);
 	rw_uint8_t( m_priority,  msg);
 	rw_bool   ( m_locked,    msg);
-	rw_String(  m_name,      msg);
+	rw_String ( m_name,      msg);
 }
 
 void Node::v_priorityChanged( MonitorContainer * i_monitoring ){}

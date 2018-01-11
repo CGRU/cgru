@@ -26,6 +26,58 @@ function BranchNode()
 {
 }
 
+BranchNode.generateParamsString = function(i_p, i_type) {
+	var str = '';
+
+	if (i_type == null)
+		i_type = 'branch';
+
+	if (cm_IsPadawan())
+	{
+		if ((i_p.max_running_tasks != null) && (i_p.max_running_tasks != -1))
+			str += " MaxRunTasks:<b>" + i_p.max_running_tasks + "</b>"
+		if ((i_p.max_running_tasks_per_host != null) && (i_p.max_running_tasks_per_host != -1))
+			str += " MaxPerHost:<b>" + i_p.max_running_tasks_per_host + "</b>"
+		if (i_p.hosts_mask)
+			str += " HostsMask:<b>" + i_p.hosts_mask + "</b>"
+		if (i_p.hosts_mask_exclude)
+			str += " ExcludeHosts:<b>" + i_p.hosts_mask + "</b>"
+		if (i_type != 'job')
+			str += " Solving:<b>" + i_p.solve_method + "</b>"
+		str += " Priority:<b>" + i_p.priority + "</b>"
+	}
+	else if (cm_IsJedi())
+	{
+		if ((i_p.max_running_tasks != null) && (i_p.max_running_tasks != -1))
+			str += " Max:<b>" + i_p.max_running_tasks + "</b>"
+		if ((i_p.max_running_tasks_per_host != null) && (i_p.max_running_tasks_per_host != -1))
+			str += " MPH:<b>" + i_p.max_running_tasks_per_host + "</b>"
+		if (i_p.hosts_mask)
+			str += " Hosts:<b>" + i_p.hosts_mask + "</b>"
+		if (i_p.hosts_mask_exclude)
+			str += " Exclude:<b>" + i_p.hosts_mask + "</b>"
+		if (i_type != 'job')
+			str += " Slv:<b>" + i_p.solve_method + "</b>"
+		str += " Pri:<b>" + i_p.priority + "</b>"
+	}
+	else
+	{
+		if ((i_p.max_running_tasks != null) && (i_p.max_running_tasks != -1))
+			str += " m:<b>" + i_p.max_running_tasks + "</b>"
+		if ((i_p.max_running_tasks_per_host != null) && (i_p.max_running_tasks_per_host != -1))
+			str += " mph:<b>" + i_p.max_running_tasks_per_host + "</b>"
+		if (i_p.hosts_mask)
+			str += " h:<b>" + i_p.hosts_mask + "</b>"
+		if (i_p.hosts_mask_exclude)
+			str += " e:<b>" + i_p.hosts_mask + "</b>"
+		if (i_type != 'job')
+			str += " <b>" + i_p.solve_method + "</b>"
+		str += " <b>" + i_p.priority + "</b>"
+	}
+
+	return str;
+}
+
 BranchNode.prototype.init = function() {
 	this.element.classList.add('branch');
 
@@ -34,32 +86,11 @@ BranchNode.prototype.init = function() {
 	this.element.appendChild(this.elName);
 	this.elName.title = 'User Name';
 
-	if (false == cm_IsPadawan())
-	{
-		this.elPriority = document.createElement('span');
-		this.element.appendChild(this.elPriority);
-		this.elPriority.title = 'Priority';
-	}
-
-	this.elCenter = document.createElement('div');
-	this.element.appendChild(this.elCenter);
-	this.elCenter.style.position = 'absolute';
-	this.elCenter.style.left = '0';
-	this.elCenter.style.right = '0';
-	this.elCenter.style.top = '1px';
-	this.elCenter.style.textAlign = 'center';
-
-	if (cm_IsPadawan())
-		this.elPriority = cm_ElCreateText(this.elCenter, 'Priority');
-	this.elMaxRunningTasks = cm_ElCreateText(this.elCenter, 'Maximum Running Tasks');
-	this.elHostsMask = cm_ElCreateText(this.elCenter, 'Hosts Mask');
-	this.elHostsMaskExclude = cm_ElCreateText(this.elCenter, 'Exclude Hosts Mask');
+	this.elWork = cm_ElCreateFloatText(this.element,'right');
 
 	this.element.appendChild(document.createElement('br'));
 
 	this.elJobs = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
-
-	this.elSolving = cm_ElCreateFloatText(this.element, 'right');
 
 	this.element.appendChild(document.createElement('br'));
 
@@ -99,25 +130,10 @@ BranchNode.prototype.update = function(i_obj) {
 		name = cm_PathBase(name);
 	this.elName.innerHTML = '<b>' + name + '/</b>';
 
+	this.elWork.innerHTML = BranchNode.generateParamsString(this.params,'branch');
+
 	if (cm_IsPadawan())
 	{
-		this.elPriority.innerHTML = 'Priority:<b>' + this.params.priority + '</b>';
-
-		if (this.params.max_running_tasks)
-			this.elMaxRunningTasks.innerHTML = 'MaxRunTasks:<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunningTasks.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'HostsMask(<b>' + this.params.hosts_mask + '</b>)';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'ExcludeHosts(<b>' + this.params.hosts_mask_exclude + '</b>)';
-		else
-			this.elHostsMaskExclude.textContent = '';
-
 		var jobs = 'Jobs Total:';
 		if (this.params.jobs_num)
 			jobs += ' <b>' + this.params.jobs_num + '</b>';
@@ -126,31 +142,9 @@ BranchNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
 		this.elJobs.innerHTML = jobs;
-
-		if (this.params.solve_parallel)
-			this.elSolving.innerHTML = 'Solving:<b>Parallel</b>';
-		else
-			this.elSolving.innerHTML = 'Solving:<b>Ordered</b>';
 	}
 	else if (cm_IsJedi())
 	{
-		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
-
-		if (this.params.max_running_tasks)
-			this.elMaxRunningTasks.innerHTML = 'Max:<b>' + this.params.max_running_tasks + ')</b>';
-		else
-			this.elMaxRunningTasks.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'Hosts(<b>' + this.params.hosts_mask + ')</b>';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'Exclude(<b>' + this.params.hosts_mask_exclude + ')</b>';
-		else
-			this.elHostsMaskExclude.textContent = '';
-
 		var jobs = 'Jobs:';
 		if (this.params.jobs_num)
 			jobs += '<b>' + this.params.jobs_num + '</b>';
@@ -159,31 +153,9 @@ BranchNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b>Run';
 		this.elJobs.innerHTML = jobs;
-
-		if (this.params.solve_parallel)
-			this.elSolving.innerHTML = '<b>Parallel</b>';
-		else
-			this.elSolving.innerHTML = '<b>Ordered</b>';
 	}
 	else
 	{
-		this.elPriority.innerHTML = '-<b>' + this.params.priority + '</b>';
-
-		if (this.params.max_running_tasks)
-			this.elMaxRunningTasks.innerHTML = 'm<b>' + this.params.max_running_tasks + '</b>';
-		else
-			this.elMaxRunningTasks.textContent = '';
-
-		if (this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'h(<b>' + this.params.hosts_mask + ')</b>';
-		else
-			this.elHostsMask.textContent = '';
-
-		if (this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'e(<b>' + this.params.hosts_mask_exclude + ')</b>';
-		else
-			this.elHostsMaskExclude.textContent = '';
-
 		var jobs = 'j';
 		if (this.params.jobs_num)
 			jobs += '<b>' + this.params.jobs_num + '</b>';
@@ -193,18 +165,7 @@ BranchNode.prototype.update = function(i_obj) {
 			jobs += '/<b>' + this.params.running_jobs_num + '</b>r';
 		this.elJobs.innerHTML = jobs;
 
-		if (this.params.solve_parallel)
-			this.elSolving.innerHTML = '<b>par</b>';
-		else
-			this.elSolving.innerHTML = '<b>ord</b>';
 	}
-
-	var solving = 'User jobs solving method:';
-	if (this.params.solve_parallel)
-		solving += '\nParallel: All together according to jobs priority.\n';
-	else
-		solving += '\nOrdered: Queued by jobs priority and order.\n';
-	this.elSolving.title = solving;
 
 	if (this.params.annotation)
 		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</i></b>';
@@ -275,6 +236,7 @@ BranchNode.prototype.onDoubleClick = function(e) {
 BranchNode.params = {
 	priority /***************/: {'type': 'num', 'label': 'Priority'},
 	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
+	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'},
 	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
 	hosts_mask_exclude /*****/: {'type': 'reg', 'label': 'Exclude Hosts Mask'},
 	annotation /*************/: {'type': 'str', 'label': 'Annotation'}
