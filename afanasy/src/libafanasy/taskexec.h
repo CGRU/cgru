@@ -60,6 +60,7 @@ public:
 	// Get task data:
 	inline int getTaskNum()  const { return m_task_num;    }///< Get task number in block.
 	inline int getNumber()   const { return m_number;     }///< Get task number (aux).
+	inline int getFramesNumber() const { return m_frames_num; }///< Get task number of frames.
 
 	// Get block data:
 	inline const std::string & getBlockName() const { return m_block_name; }
