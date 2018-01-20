@@ -67,7 +67,7 @@ while True:
 
     printMuted( data)
 
-    parser.parse( data,'mode')
+    parser.parse( data,'mode', 0)
 
     info = 'Parse:'
     info += ' %d%%: %d frame %d%%;' % (parser.percent, parser.frame, parser.percentframe)

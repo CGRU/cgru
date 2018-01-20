@@ -200,17 +200,18 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
     def hasParser( self):
         return self.parser is not None
 
-    def parse(self, data, mode):
+    def parse(self, data, mode, pid):
         """Missing DocString
 
         :param data:
         :param mode:
+        :param pid:
         :return:
         """
         if self.parser is None:
             return None
 
-        self.parser.parse(data, mode)
+        self.parser.parse(data, mode, pid)
 
         thumb_cmds = self.generateThumbnail( True)
         for cmd in thumb_cmds:

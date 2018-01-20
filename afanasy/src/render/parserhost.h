@@ -12,7 +12,7 @@ public:
 	ParserHost( af::Service * i_service);
 	~ParserHost();
 
-	void read( const std::string & i_mode, std::string & output);
+	void read( const std::string & i_mode, std::string & output, int pid);
 
 	inline int getPercent()           const { return m_percent;         }
 	inline int getFrame()             const { return m_frame;           }
@@ -48,5 +48,5 @@ private:
 	int                m_overload_string_length;
 
 private:
-	void parse( const std::string & i_mode, std::string & output);
+	void parse( const std::string & i_mode, std::string & output, int pid);
 };
