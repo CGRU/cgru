@@ -133,7 +133,7 @@ class parser(object):
                 line = line[8:]
                 self.appendFile(line.strip(), True)
 
-    def parse(self, data, mode, pid):
+    def parse(self, data, mode, pid=0):
         """Missing DocString
 
         :param data:
