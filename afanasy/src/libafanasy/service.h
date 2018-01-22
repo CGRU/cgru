@@ -44,6 +44,7 @@ public:
 
 	void parse( const std::string & i_mode,
 				std::string & data,
+				int pid,
 				int & percent, int & frame, int & percentframe,
 				std::string & activity, std::string & report,
 				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;

@@ -288,14 +288,15 @@ bool Service::hasParser() const
 	return result;
 }
 
-void Service::parse( const std::string & i_mode, std::string & i_data,
+void Service::parse( const std::string & i_mode, std::string & i_data, int pid,
 							int & percent, int & frame, int & percentframe,
 							std::string & activity, std::string & report,
 							bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const
 {
-	PyObject * pArgs = PyTuple_New( 2);
+	PyObject * pArgs = PyTuple_New( 3);
 	PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( i_data.data(), i_data.size()));
 	PyTuple_SetItem( pArgs, 1, PyBytes_FromStringAndSize( i_mode.data(), i_mode.size()));
+	PyTuple_SetItem( pArgs, 2, PyLong_FromLong( pid ));
 
 	PyObject * pClass = PyObject_CallObject( m_PyObj_FuncParse, pArgs);
 	if( pClass != NULL)

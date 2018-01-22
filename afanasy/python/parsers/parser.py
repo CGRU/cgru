@@ -29,6 +29,7 @@ class parser(object):
         self.log = None
         self.numframes = 0
         self.taskInfo = {}
+        self.pid = 0
 
         self.files = []
         self.files_onthefly = []
@@ -132,16 +133,18 @@ class parser(object):
                 line = line[8:]
                 self.appendFile(line.strip(), True)
 
-    def parse(self, data, mode):
+    def parse(self, data, mode, pid):
         """Missing DocString
 
         :param data:
         :param mode:
+        :param pid:
         :return:
         """
 
         data = cgruutils.toStr(data)
         mode = cgruutils.toStr(mode)
+        self.pid = pid
 
         if len(data):
             self.doBaseCheck(data, mode)
