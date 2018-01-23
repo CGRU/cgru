@@ -11,6 +11,7 @@
 
 class Action;
 class Block;
+class BranchSrv;
 class JobContainer;
 class JobPy;
 class MsgAf;
@@ -85,7 +86,8 @@ public:
 
 	virtual void v_action( Action & i_action);
 
-	void setUser( UserAf * i_user);
+	void setUser(UserAf * i_user);
+	void setBranch(BranchSrv * i_branch);
 
 	/// Initialize new job, came to Afanasy container.
 	bool initialize();
@@ -138,6 +140,7 @@ private:
 	std::list<int> renders_counts;
 
 	UserAf * m_user;
+	BranchSrv * m_branch_srv;
 
 	std::string m_store_dir_tasks; ///< Tasks store directory.
 

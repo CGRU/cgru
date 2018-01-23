@@ -42,6 +42,9 @@ public:
 
 	bool initialize();
 
+	void addBranch(BranchSrv * i_branch);
+	void removeBranch(BranchSrv * i_branch);
+
 	void addJob(JobAf * i_job);
 	void removeJob(JobAf * i_job);
 

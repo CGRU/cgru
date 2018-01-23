@@ -10,6 +10,7 @@
 #include "action.h"
 #include "afcommon.h"
 #include "block.h"
+#include "branchsrv.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "renderaf.h"
@@ -98,6 +99,7 @@ void JobAf::readStore()
 
 void JobAf::initializeValues()
 {
+	m_branch_srv       = NULL;
 	m_user             = NULL;
 	m_blocks           = NULL;
 	m_progress         = NULL;
@@ -198,6 +200,12 @@ void JobAf::setUser( UserAf * i_user)
 		m_blocks[b]->setUser( i_user);
 	}
 	m_user_name = i_user->getName();
+}
+
+void JobAf::setBranch(BranchSrv * i_branch)
+{
+	m_branch_srv = i_branch;
+	m_branch = m_branch_srv->getName();
 }
 
 bool JobAf::initialize()
@@ -347,8 +355,15 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 	setZombie();
 	
 	AFCommon::DBAddJob( this);
+
+	m_branch_srv->removeJob(this);
 	
-	if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_del, getId(), getUid());
+	if(monitoring)
+	{
+		monitoring->addJobEvent(af::Monitor::EVT_jobs_del, getId(), getUid());
+		monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+	}
+
 	AFCommon::QueueLog("Deleting a job: " + v_generateInfoString());
 	unLock();
 }
@@ -513,16 +528,16 @@ void JobAf::v_action( Action & i_action)
 		{
 			return;
 		}
-		
+
 		i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_del, getId(), m_user->getId());
-		
+
 		m_user->removeJob( this);
-		user->addJob( this);
-		
+		user->addJob( this);  //< UserAf::addJob() updates JobAf::m_user
+
 		i_action.monitors->addEvent(    af::Monitor::EVT_users_change, m_user->getId());
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_add, getId(), m_user->getId());
-		
+
 		store();
 
 		return;

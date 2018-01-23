@@ -43,6 +43,9 @@ Branch::Branch(int i_id)
 
 void Branch::initDefaultValues()
 {
+	m_branches_num = 0;
+	m_jobs_num = 0;
+
 	m_solve_method = Work::SolveByPriority;
 
 	m_time_creation = 0;
@@ -78,6 +81,11 @@ void Branch::v_jsonWrite(std::ostringstream & o_str, int i_type) const
 	o_str << ",\n\"branches_num\":" << m_branches_num;
 
 	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
+
+	if( m_jobs_num > 0 )
+		o_str << ",\n\"jobs_num\":" << m_jobs_num;
+	if( m_branches_num > 0 )
+		o_str << ",\n\"branches_num\":" << m_branches_num;;
 
 	o_str << "\n}";
 }

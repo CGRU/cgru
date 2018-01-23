@@ -96,6 +96,7 @@ bool BranchSrv::initialize()
 	if (NULL != m_parent)
 	{
 		m_parent_path = m_parent->getName();
+		m_parent->addBranch(this);
 	}
 
 	if (isFromStore())
@@ -173,13 +174,33 @@ void BranchSrv::deleteNode(MonitorContainer * i_monitoring)
 	if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_branches_del, m_id);
 }
 
+void BranchSrv::addBranch(BranchSrv * i_branch)
+{
+	appendLog(std::string("Adding a branch: ") + i_branch->getName());
+
+	m_branches_list.add(i_branch);
+
+	m_branches_num++;
+}
+
+void BranchSrv::removeBranch(BranchSrv * i_branch)
+{
+	appendLog(std::string("Removing a branch: ") + i_branch->getName());
+
+	m_branches_list.remove(i_branch);
+
+	m_branches_num--;
+}
+
 void BranchSrv::addJob(JobAf * i_job)
 {
 	appendLog(std::string("Adding a job: ") + i_job->getName());
 
 	m_jobslist.add(i_job);
 
-//m_jobs_num++;
+	i_job->setBranch(this);
+
+	m_jobs_num++;
 }
 
 void BranchSrv::removeJob(JobAf * i_job)
@@ -188,7 +209,7 @@ void BranchSrv::removeJob(JobAf * i_job)
 
 	m_jobslist.remove(i_job);
 
-//m_jobs_num--;
+	m_jobs_num--;
 }
 
 bool BranchSrv::getJobs(std::ostringstream & o_str)

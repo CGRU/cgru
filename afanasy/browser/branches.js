@@ -90,6 +90,7 @@ BranchNode.prototype.init = function() {
 
 	this.element.appendChild(document.createElement('br'));
 
+	this.elBranches = cm_ElCreateFloatText(this.element, 'left', 'Branches: All/Running');
 	this.elJobs = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
 
 	this.element.appendChild(document.createElement('br'));
@@ -142,6 +143,15 @@ BranchNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
 		this.elJobs.innerHTML = jobs;
+
+		var counts = 'Branches Total:';
+		if (this.params.branches_num)
+			 counts += ' <b>' + this.params.branches_num + '</b>';
+		else
+			counts += ' <b>0</b>';
+		if (this.params.running_branches_num)
+			counts += ' / <b>' + this.params.running_branches_num + '</b> Running';
+		this.elBranches.innerHTML = counts;
 	}
 	else if (cm_IsJedi())
 	{
