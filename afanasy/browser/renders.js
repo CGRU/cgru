@@ -70,7 +70,7 @@ RenderNode.prototype.init = function() {
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
-	this.elAnnotation.style.textAlign = 'center';
+	this.elAnnotation.classList.add('annotation');
 
 	this.plotters = [];
 	this.plotterC = new Plotter(this.elResources, 'C', 'CPU');
@@ -294,7 +294,7 @@ RenderNode.prototype.update = function(i_obj) {
 	this.elUserName.innerHTML = user;
 
 	if (this.params.annotation)
-		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</b></i>';
+		this.elAnnotation.innerHTML = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
 

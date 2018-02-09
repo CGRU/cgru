@@ -97,7 +97,7 @@ JobNode.prototype.init = function() {
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
-	this.elAnnotation.style.textAlign = 'center';
+	this.elAnnotation.classList.add('annotation');
 
 	this.state = {};
 	this.running_tasks = 0;
@@ -243,7 +243,7 @@ JobNode.prototype.update = function(i_obj) {
 		this.elReport.textContent = '';
 
 	if (this.params.annotation)
-		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</i></b>';
+		this.elAnnotation.innerHTML = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
 

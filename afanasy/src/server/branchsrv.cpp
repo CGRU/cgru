@@ -155,7 +155,7 @@ void BranchSrv::v_action(Action & i_action)
 void BranchSrv::jobPriorityChanged(JobAf * i_job, MonitorContainer * i_monitoring)
 {
 	AF_DEBUG << "BranchSrv::jobPriorityChanged:";
-	m_jobslist.sortPriority(i_job);
+	m_jobs_list.sortPriority(i_job);
 //i_monitoring->addUser( this);
 }
 
@@ -196,7 +196,7 @@ void BranchSrv::addJob(JobAf * i_job)
 {
 	appendLog(std::string("Adding a job: ") + i_job->getName());
 
-	m_jobslist.add(i_job);
+	m_jobs_list.add(i_job);
 
 	i_job->setBranch(this);
 
@@ -207,14 +207,14 @@ void BranchSrv::removeJob(JobAf * i_job)
 {
 	appendLog(std::string("Removing a job: ") + i_job->getName());
 
-	m_jobslist.remove(i_job);
+	m_jobs_list.remove(i_job);
 
 	m_jobs_num--;
 }
 
 bool BranchSrv::getJobs(std::ostringstream & o_str)
 {
-	AfListIt jobsListIt(&m_jobslist);
+	AfListIt jobsListIt(&m_jobs_list);
 	bool first = true;
 	bool has_jobs = false;
 	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
@@ -230,7 +230,7 @@ bool BranchSrv::getJobs(std::ostringstream & o_str)
 
 void BranchSrv::jobsinfo(af::MCAfNodes &mcjobs)
 {
-	AfListIt jobsListIt(&m_jobslist);
+	AfListIt jobsListIt(&m_jobs_list);
 	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
 		mcjobs.addNode(job->node());
 }
@@ -246,7 +246,7 @@ af::Msg * BranchSrv::writeJobdsOrder(bool i_binary) const
 	}
 
 
-	std::vector<int32_t> jids = m_jobslist.generateIdsList();
+	std::vector<int32_t> jids = m_jobs_list.generateIdsList();
 	std::ostringstream str;
 
 	str << "{\"events\":{\"jobs_order\":{\"uids\":[";
@@ -264,13 +264,34 @@ af::Msg * BranchSrv::writeJobdsOrder(bool i_binary) const
 
 void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-	bool changed = refreshCounters();
+//	bool changed = refreshCounters();
+	bool changed = false;
+
+	std::list<af::Job*> _active_jobs_list;
+	AfListIt it(&m_jobs_list);
+	for (AfNodeSrv *node = it.node(); node != NULL; it.next(), node = it.node())
+	{
+		JobAf * job = (JobAf*)node;
+
+		if (job->isDone())
+			continue;
+
+		if (job->isOffline())
+			continue;
+
+		_active_jobs_list.push_back((af::Job*)job);
+	}
+
+	if (_active_jobs_list != m_active_jobs_list)
+		changed = true;
+
+	m_active_jobs_list = _active_jobs_list;
 
 	if (changed && monitoring)
 		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
 
 	// Update solving parameters:
-	v_calcNeed();
+//	v_calcNeed();
 }
 
 bool BranchSrv::refreshCounters()

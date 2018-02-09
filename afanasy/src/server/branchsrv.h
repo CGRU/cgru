@@ -69,9 +69,9 @@ public:
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
-	inline AfList * getJobsList() { return &m_jobslist; }
+	inline AfList * getJobsList() { return &m_jobs_list; }
 
-	inline const std::vector<int32_t> generateJobsIds() const { return m_jobslist.generateIdsList();}
+	inline const std::vector<int32_t> generateJobsIds() const { return m_jobs_list.generateIdsList();}
 
 	void jobPriorityChanged(JobAf * i_job, MonitorContainer * i_monitoring);
 
@@ -93,7 +93,7 @@ private:
 private:
 	BranchSrv * m_parent;
 	AfList m_branches_list;
-	AfList m_jobslist; ///< Jobs list.
+	AfList m_jobs_list; ///< Jobs list.
 
 private:
    static BranchesContainer * ms_branches;

@@ -15,6 +15,7 @@
 */
 
 #include "branch.h"
+#include "job.h"
 
 #define AFOUTPUT
 //#undef AFOUTPUT
@@ -86,6 +87,20 @@ void Branch::v_jsonWrite(std::ostringstream & o_str, int i_type) const
 		o_str << ",\n\"jobs_num\":" << m_jobs_num;
 	if( m_branches_num > 0 )
 		o_str << ",\n\"branches_num\":" << m_branches_num;;
+
+	o_str << ",\n\"active_jobs\":[";
+	std::list<Job*>::const_iterator it = m_active_jobs_list.begin();
+	for (; it != m_active_jobs_list.end(); it++)
+	{
+		if (it != m_active_jobs_list.begin())
+			o_str << ",";
+
+		o_str << "\n{";
+		o_str << "\n\"id\":" << (*it)->getId();
+		o_str << ",\n\"name\":\"" << (*it)->getName() << "\"";
+		o_str << "\n}";
+	}
+	o_str << "\n]";
 
 	o_str << "\n}";
 }

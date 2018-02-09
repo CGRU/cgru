@@ -6,6 +6,7 @@
 
 #include "afcommon.h"
 #include "auth.h"
+#include "branchescontainer.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
@@ -58,6 +59,7 @@ void threadRunCycle( void * i_args)
 	// Lock containers:
 	//
 	AFINFO("ThreadRun::run: Locking containers...")
+	AfContainerLock bLock( a->branches, AfContainerLock::WRITELOCK);
 	AfContainerLock jLock( a->jobs,     AfContainerLock::WRITELOCK);
 	AfContainerLock lLock( a->renders,  AfContainerLock::WRITELOCK);
 	AfContainerLock mlock( a->monitors, AfContainerLock::WRITELOCK);
@@ -100,6 +102,7 @@ void threadRunCycle( void * i_args)
 	AFINFO("ThreadRun::run: Refreshing data:")
 	a->monitors ->refresh( NULL,        a->monitors);
 	a->jobs     ->refresh( a->renders,  a->monitors);
+	a->branches ->refresh( NULL,        a->monitors);
 	a->renders  ->refresh( a->jobs,     a->monitors);
 	a->users    ->refresh( NULL,        a->monitors);
 
@@ -122,6 +125,7 @@ void threadRunCycle( void * i_args)
 	a->monitors ->freeZombies();
 	a->renders  ->freeZombies();
 	a->jobs     ->freeZombies();
+	a->branches ->freeZombies();
 	a->users    ->freeZombies();
 
 	}// - lock containers

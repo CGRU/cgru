@@ -51,6 +51,8 @@ protected:
 	int32_t m_branches_num;
 	int32_t m_jobs_num;
 
+	std::list<af::Job*> m_active_jobs_list;
+
 	int64_t m_time_creation;
 	int64_t m_time_empty;
 

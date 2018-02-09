@@ -52,7 +52,7 @@ UserNode.prototype.init = function() {
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
-	this.elAnnotation.style.textAlign = 'center';
+	this.elAnnotation.classList.add('annotation');
 	this.elAnnotation.classList.add('prestar');
 
 	this.elBarParent = document.createElement('div');
@@ -197,7 +197,7 @@ UserNode.prototype.update = function(i_obj) {
 	this.elErrors.title = errtit;
 
 	if (this.params.annotation)
-		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</i></b>';
+		this.elAnnotation.innerHTML = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
 

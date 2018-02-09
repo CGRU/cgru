@@ -90,15 +90,17 @@ BranchNode.prototype.init = function() {
 
 	this.element.appendChild(document.createElement('br'));
 
-	this.elBranches = cm_ElCreateFloatText(this.element, 'left', 'Branches: All/Running');
-	this.elJobs = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
-
-	this.element.appendChild(document.createElement('br'));
+	this.elBranchedCounts = cm_ElCreateFloatText(this.element, 'left', 'Branches: All/Running');
+	this.elJobsCounts = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
+	this.elAnnotation.classList.add('annotation');
 	this.elAnnotation.title = 'Annotation';
-	this.elAnnotation.style.textAlign = 'center';
+
+	this.elActiveJobs = document.createElement('div');
+	this.elActiveJobs.classList.add('active_jobs_div');
+	this.element.appendChild(this.elActiveJobs);
 
 	this.elBarParent = document.createElement('div');
 	this.element.appendChild(this.elBarParent);
@@ -142,7 +144,7 @@ BranchNode.prototype.update = function(i_obj) {
 			jobs += ' <b>0</b>';
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Running';
-		this.elJobs.innerHTML = jobs;
+		this.elJobsCounts.innerHTML = jobs;
 
 		var counts = 'Branches Total:';
 		if (this.params.branches_num)
@@ -151,7 +153,7 @@ BranchNode.prototype.update = function(i_obj) {
 			counts += ' <b>0</b>';
 		if (this.params.running_branches_num)
 			counts += ' / <b>' + this.params.running_branches_num + '</b> Running';
-		this.elBranches.innerHTML = counts;
+		this.elBranchedCounts.innerHTML = counts;
 	}
 	else if (cm_IsJedi())
 	{
@@ -162,7 +164,7 @@ BranchNode.prototype.update = function(i_obj) {
 			jobs += '<b>0</b>';
 		if (this.params.running_jobs_num)
 			jobs += ' / <b>' + this.params.running_jobs_num + '</b>Run';
-		this.elJobs.innerHTML = jobs;
+		this.elJobsCounts.innerHTML = jobs;
 	}
 	else
 	{
@@ -173,12 +175,30 @@ BranchNode.prototype.update = function(i_obj) {
 			jobs += '<b>0</b>';
 		if (this.params.running_jobs_num)
 			jobs += '/<b>' + this.params.running_jobs_num + '</b>r';
-		this.elJobs.innerHTML = jobs;
+		this.elJobsCounts.innerHTML = jobs;
 
 	}
 
+	for (var j = 0; j < this.params.active_jobs.length; j++)
+	{
+//		this.blocks.push(new BranchJob(this.elActiveJobs, this.params.active_jobs[j]));
+//		continue;
+
+		var elJob = document.createElement('div');
+		this.elActiveJobs.appendChild(elJob);
+		var job = this.params.active_jobs[j];
+	
+		elJob.params = job;
+		elJob.textContent = job.name + '[' + job.id + ']';
+		elJob.oncontextmenu = function(e) {
+			e.stopPropagation();
+//			e.currentTarget.block.onContextMenu(e);
+			return false;
+		};
+	}
+
 	if (this.params.annotation)
-		this.elAnnotation.innerHTML = '<b><i>' + this.params.annotation + '</i></b>';
+		this.elAnnotation.innerHTML = this.params.annotation;
 	else
 		this.elAnnotation.textContent = '';
 
@@ -254,3 +274,12 @@ BranchNode.params = {
 
 BranchNode.sort = ['priority', 'name'];
 BranchNode.filter = ['name'];
+
+
+// ###################### Branch Job ###################################
+
+function BranchJob(i_elParent, i_params)
+{
+}
+
+

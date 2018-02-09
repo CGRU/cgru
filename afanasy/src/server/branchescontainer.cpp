@@ -32,8 +32,6 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-using namespace af;
-
 BranchesContainer::BranchesContainer():
 	AfContainer("Branches", AFBRANCH::MAXCOUNT)
 {
@@ -134,7 +132,7 @@ af::Msg* BranchesContainer::generateJobsList(int id)
 	if (branch == NULL)
 		return af::jsonMsgError("Branch with such ID does not exist.");
 
-	MCAfNodes mcjobs;
+	af::MCAfNodes mcjobs;
 	branch->jobsinfo(mcjobs);
 
 	return new af::Msg(af::Msg::TJobsList, &mcjobs);
@@ -142,7 +140,7 @@ af::Msg* BranchesContainer::generateJobsList(int id)
 
 af::Msg * BranchesContainer::generateJobsList(const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json)
 {
-	MCAfNodes mcjobs;
+	af::MCAfNodes mcjobs;
 	std::ostringstream stream;
 	bool has_jobs = false;
 
