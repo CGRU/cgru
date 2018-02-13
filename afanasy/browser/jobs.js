@@ -500,9 +500,6 @@ JobBlock.prototype.onContextMenu = function(i_e) {
 		return;
 	}
 
-	// Select block:
-	this.setSelected(true);
-
 	// If jobs selected, select all selected jobs blocks,
 	// as server can manipulate all blocks of a several blocks (not special blocks of a selected jobs)
 	var jobs = this.job.monitor.getSelectedItems();
@@ -513,6 +510,9 @@ JobBlock.prototype.onContextMenu = function(i_e) {
 			for (var b = 0; b < jobs[j].blocks.length; b++)
 				jobs[j].blocks[b].setSelected(true);
 	}
+
+	// Select block:
+	this.setSelected(true);
 
 	// Update panels info:
 	this.updatePanels();

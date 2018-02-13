@@ -542,9 +542,18 @@ top: 150px; bottom: 50px; left: 10%; right: 10%;
 
 .item.branch .active_jobs_div {
 clear: both;
-border-top: 1px solid #777;
+border-top: 1px solid #555;
 margin: 2px;
 padding: 2px;
+}
+.branch_active_job {
+border: 1px solid #999;
+border-radius: 2px;
+margin: 1px;
+padding: 1px;
+}
+.branch_active_job.selected {
+background-color: #DFD;
 }
 
 /*####################### Task Window: ################## */

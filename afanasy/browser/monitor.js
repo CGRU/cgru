@@ -833,8 +833,12 @@ Monitor.prototype.selectAll = function(on) {
 		this.setSelected(this.items[i], on);
 	}
 
+	// Deselecting sub-items:
 	if (this.type == 'jobs')
 		JobBlock.deselectAll(this);
+
+	if (this.type == 'branches')
+		BranchActiveJob.deselectAll(this);
 };
 
 Monitor.prototype.selectNext = function(i_evt, previous) {

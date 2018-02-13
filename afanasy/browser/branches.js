@@ -98,6 +98,7 @@ BranchNode.prototype.init = function() {
 	this.elAnnotation.classList.add('annotation');
 	this.elAnnotation.title = 'Annotation';
 
+	this.active_jobs = [];
 	this.elActiveJobs = document.createElement('div');
 	this.elActiveJobs.classList.add('active_jobs_div');
 	this.element.appendChild(this.elActiveJobs);
@@ -179,23 +180,14 @@ BranchNode.prototype.update = function(i_obj) {
 
 	}
 
-	for (var j = 0; j < this.params.active_jobs.length; j++)
-	{
-//		this.blocks.push(new BranchJob(this.elActiveJobs, this.params.active_jobs[j]));
-//		continue;
+	// Clear previous active jobs:
+	for (var j = 0; j < this.active_jobs.length; j++)
+		this.elActiveJobs.removeChild(this.active_jobs[j].el);
+	this.active_jobs = [];
 
-		var elJob = document.createElement('div');
-		this.elActiveJobs.appendChild(elJob);
-		var job = this.params.active_jobs[j];
-	
-		elJob.params = job;
-		elJob.textContent = job.name + '[' + job.id + ']';
-		elJob.oncontextmenu = function(e) {
-			e.stopPropagation();
-//			e.currentTarget.block.onContextMenu(e);
-			return false;
-		};
-	}
+	for (var j = 0; j < this.params.active_jobs.length; j++)
+		this.active_jobs.push(new BranchActiveJob(this, this.elActiveJobs, this.params.active_jobs[j]));
+
 
 	if (this.params.annotation)
 		this.elAnnotation.innerHTML = this.params.annotation;
@@ -257,6 +249,8 @@ BranchNode.prototype.updatePanels = function() {
 	if (this.params.time_activity)
 		info += '<br>Last Activity:<br> ' + cm_DateTimeStrFromSec(this.params.time_activity);
 	this.monitor.setPanelInfo(info);
+
+	BranchActiveJob.deselectAll(this.monitor);
 };
 
 BranchNode.prototype.onDoubleClick = function(e) {
@@ -276,10 +270,136 @@ BranchNode.sort = ['priority', 'name'];
 BranchNode.filter = ['name'];
 
 
-// ###################### Branch Job ###################################
+// ###################### Branch Active Job ###################################
 
-function BranchJob(i_elParent, i_params)
-{
-}
+function BranchActiveJob(i_branch, i_elParent, i_params) {
+	this.branch = i_branch;
+	this.params = i_params;
+	this.elParent = i_elParent;
 
+	this.el = document.createElement('div');
+	this.el.classList.add('branch_active_job');
+	this.elParent.appendChild(this.el);
+	this.el.active_job = this;
+
+	this.el.oncontextmenu = function(e) {
+		e.stopPropagation();
+		e.currentTarget.active_job.onContextMenu();
+		return false;
+	};
+
+	this.update(i_params);
+};
+
+BranchActiveJob.prototype.update = function(i_params) {
+	this.params = i_params;
+
+	var info = this.params.name + '[' + this.params.id + ']';
+	this.el.textContent = info;
+};
+
+BranchActiveJob.prototype.onContextMenu = function() {
+	g_cur_monitor = this.branch.monitor;
+
+	BranchActiveJob.resetPanels(this.branch.monitor);
+
+	var sele
+
+	if (this.selected)
+	{
+		this.setSelected(false);
+
+		if (this.branch.monitor.selected_jobs.length)
+			this.branch.monitor.selected_jobs[this.branch.monitor.selected_jobs.length - 1].updatePanels();
+
+		return;
+	}
+
+	// If branches selected, select all selected branches active jobs.
+	var selected_branches = this.branch.monitor.getSelectedItems();
+	if (selected_branches.length)
+	{
+		this.branch.monitor.selectAll(false);
+		for (var b = 0; b < selected_branches.length; b++)
+			for (var j = 0; j < selected_branches[b].active_jobs.length; j++)
+				selected_branches[b].active_jobs[j].setSelected(true);
+	}
+
+	this.setSelected(true);
+
+	this.updatePanels();
+};
+
+BranchActiveJob.prototype.setSelected = function(i_select) {
+	if (this.branch.monitor.selected_jobs == null)
+		this.branch.monitor.selected_jobs = [];
+
+	if (i_select)
+	{
+		if (this.selected)
+			return;
+
+		this.selected = true;
+		this.el.classList.add('selected');
+
+		this.branch.monitor.selected_jobs.push(this);
+	}
+	else
+	{
+		if (this.selected != true)
+			return;
+
+		this.selected = false;
+		this.el.classList.remove('selected');
+
+		this.branch.monitor.selected_jobs.splice(this.branch.monitor.selected_jobs.indexOf(this), 1);
+	}
+};
+
+BranchActiveJob.deselectAll = function(i_monitor) {
+	if (i_monitor.selected_jobs)
+		while (i_monitor.selected_jobs.length)
+			i_monitor.selected_jobs[0].setSelected(false);
+
+	BranchActiveJob.resetPanels(i_monitor);
+};
+
+BranchActiveJob.prototype.updatePanels = function() {
+	var monitor = this.branch.monitor;
+//	monitor.m_cur_acrive_job = this;
+	var elPanelR = monitor.elPanelR;
+
+	var elActiveJob = document.createElement('div');
+	elPanelR.appendChild(elActiveJob);
+	elPanelR.m_elActiveJob = elActiveJob;
+	elActiveJob.m_active_job = this;
+	elActiveJob.classList.add('section');
+	elActiveJob.classList.add('active');
+
+	var elCaption = document.createElement('div');
+	elActiveJob.appendChild(elCaption);
+	elCaption.textContent = 'Active Job:';
+	elCaption.classList.add('caption');
+
+	var elName = document.createElement('div');
+	elActiveJob.appendChild(elName);
+	elName.classList.add('name');
+	elName.textContent = this.params.name;
+};
+
+BranchActiveJob.resetPanels = function(i_monitor) {
+	if (i_monitor.elPanelR.m_elActiveJob == null)
+		return;
+
+	i_monitor.elPanelR.removeChild(i_monitor.elPanelR.m_elActiveJob);
+	i_monitor.elPanelR.m_elActiveJob = null;
+//	i_monitor.resetPanelInfo();
+//	i_monitor.m_cur_acrive_job = null;
+};
+
+BranchActiveJob.params = {
+	priority /***************/: {'type': 'num', 'label': 'Priority'},
+	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
+	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'}
+};
 
