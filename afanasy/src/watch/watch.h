@@ -33,6 +33,7 @@ public:
 	enum MonType{
 		WNONE,
 
+        WBranches,
 		WJobs,
 		WUsers,
 		WRenders,
