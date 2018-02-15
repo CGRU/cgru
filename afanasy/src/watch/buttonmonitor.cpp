@@ -54,6 +54,9 @@ void ButtonMonitor::createImage()
            + "/icons/watch/" + afqt::QEnvironment::theme.str + "/buttons/";
    switch( type)
    {
+      case Watch::WBranches:
+         img_filename += "branches";
+         break;
       case Watch::WJobs:
          img_filename += "jobs";
          break;

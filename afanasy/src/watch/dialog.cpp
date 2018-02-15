@@ -14,6 +14,7 @@
 #include "buttonmonitor.h"
 #include "buttonout.h"
 #include "listitems.h"
+#include "listbranches.h"
 #include "listjobs.h"
 #include "listusers.h"
 #include "listrenders.h"
@@ -97,12 +98,14 @@ Dialog::Dialog():
 	m_topleft  = new QLabel("", this);
     m_topright = new QWidget( this);
     m_hlayout_b->addWidget( m_topleft);
-    m_btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
-    m_hlayout_b->addWidget( m_btnMonitor[Watch::WJobs    ]);
-    m_btnMonitor[Watch::WRenders] = new ButtonMonitor( Watch::WRenders, this);
-    m_hlayout_b->addWidget( m_btnMonitor[Watch::WRenders ]);
-    m_btnMonitor[Watch::WUsers]   = new ButtonMonitor( Watch::WUsers,   this);
-    m_hlayout_b->addWidget( m_btnMonitor[Watch::WUsers   ]);
+    m_btnMonitor[Watch::WBranches] = new ButtonMonitor( Watch::WBranches, this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WBranches ]);
+    m_btnMonitor[Watch::WJobs]     = new ButtonMonitor( Watch::WJobs,     this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WJobs     ]);
+    m_btnMonitor[Watch::WRenders]  = new ButtonMonitor( Watch::WRenders,  this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WRenders  ]);
+    m_btnMonitor[Watch::WUsers]    = new ButtonMonitor( Watch::WUsers,    this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WUsers    ]);
     m_hlayout_b->addWidget( m_topright);
 	
 	connect( &m_qafclient, SIGNAL( sig_newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
@@ -520,6 +523,12 @@ bool Dialog::openMonitor( int type, bool open)
 
    switch( type)
    {
+   case Watch::WBranches:
+   {
+      newlist = new ListBranches( parent);
+      displayInfo("Your branches list.");
+      break;
+   }
    case Watch::WJobs:
    {
       newlist = new ListJobs( parent);
