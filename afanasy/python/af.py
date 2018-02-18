@@ -283,7 +283,7 @@ class Block:
         :param i_value:
         :return:
         """
-        if not "environment" in self.data:
+        if self.data not in ["environment"]:
             self.data["environment"] = dict()
 
         self.data["environment"][i_name] = i_value
@@ -615,10 +615,10 @@ class Job:
 
         self.data["folders"][i_name] = i_folder
 
-    def setPools( self, i_pools):
+    def setPools(self, i_pools):
         self.data['pools'] = i_pools
 
-    def setBranch( self, i_branch):
+    def setBranch(self, i_branch):
         self.data['branch'] = i_branch
 
     def fillBlocks(self):
@@ -855,7 +855,7 @@ class Cmd:
             return None
 
         obj = {self.action: self.data}
-        #print(json.dumps( obj))
+        # print(json.dumps( obj))
         output = afnetwork.sendServer(json.dumps(obj), verbose)
         self.__init__()
         if output[0] is True:
@@ -904,7 +904,7 @@ class Cmd:
         self.data['ids'] = [jobId]
         self.data['operation'] = {'type': 'delete'}
         return self._sendRequest(verbose)
-    
+
     def setJobState(self, jobId, state, verbose=False):
         """Missing DocString
 
@@ -929,7 +929,7 @@ class Cmd:
         self.data['ids'] = [jobId]
         self.data['mode'] = 'full'
         return self.getJobList(verbose)
-    
+
     def getJobProgress(self, jobId, verbose=False):
         """Missing DocString
 
@@ -1021,7 +1021,7 @@ class Cmd:
         self.action = 'action'
         self.data['type'] = 'renders'
         self.data['mask'] = cgruconfig.VARS['HOSTNAME']
-        self.data['params'] = {'nimby':False,'paused':False}
+        self.data['params'] = {'nimby': False, 'paused': False}
         self._sendRequest()
 
     def renderEjectTasks(self, text):
@@ -1068,8 +1068,7 @@ class Cmd:
         """
         self.action = 'action'
         self.data['type'] = 'monitors'
-        self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + \
-                            cgruconfig.VARS['HOSTNAME'] + '.*'
+        self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + cgruconfig.VARS['HOSTNAME'] + '.*'
         self.data['operation'] = {'type': 'exit'}
         self._sendRequest()
 
@@ -1079,21 +1078,21 @@ class Cmd:
         """
         self.action = 'get'
         self.data['type'] = 'monitors'
-        #print(self.data)
+        # print(self.data)
         result = self._sendRequest()
         monitorId = None
         for monitor in result['monitors']:
             if monitor['user_name'] == self.data['user_name'] and monitor['name'] == "%s@%s" % (self.data['user_name'], self.data['host_name']) and monitor['engine'] == "python":
                 monitorId = monitor['id']
-        
-        if monitorId == None:
+
+        if monitorId is not None:
             self.__init__()
             self.action = "monitor"
             self.data['engine'] = 'python'
             result = self._sendRequest()
             monitorId = result['monitor']['id']
         return monitorId
-    
+
     def monitorChangeUid(self, monitorId, uid):
         """Missing DocString
         :param monitorId:
@@ -1107,10 +1106,10 @@ class Cmd:
                                   "class": "perm",
                                   "uid": uid}
         return self._sendRequest()
-    
+
     def monitorUnregister(self, monitorId):
         """Missing DocString
-        
+
         :param monitorId:
         :return:
         """
@@ -1119,10 +1118,10 @@ class Cmd:
         self.data["ids"] = [monitorId]
         self.data["operation"] = {"type": "deregister"}
         return self._sendRequest()
-    
+
     def monitorSubscribe(self, monitorId, classType):
         """Missing DocString
-        
+
         :param monitorId:
         :param classType:
         :return:
@@ -1134,10 +1133,10 @@ class Cmd:
                                   "class": classType,
                                   "status": "subscribe"}
         return self._sendRequest()
-    
+
     def monitorEvents(self, monitorId):
         """Missing DocString
-        
+
         :param monitorId:
         :return:
         """
@@ -1146,7 +1145,7 @@ class Cmd:
         self.data['ids'] = [monitorId]
         self.data['mode'] = 'events'
         return self._sendRequest()
-        
+
     def renderGetList(self, mask=None):
         """Missing DocString
 
@@ -1162,7 +1161,7 @@ class Cmd:
             if 'renders' in data:
                 return data['renders']
         return None
-    
+
     def renderGetId(self, i_id, i_mode=None):
         """Missing DocString
         :param i_id:
@@ -1180,7 +1179,7 @@ class Cmd:
             if 'renders' in data:
                 return data['renders']
         return None
-    
+
     def renderGetResources(self):
         """Missing DocString
 
