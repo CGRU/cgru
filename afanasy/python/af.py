@@ -28,7 +28,7 @@ def checkRegExp(pattern):
     result = True
     try:
         re.compile(pattern)
-    except:  # TODO: Too broad exception clause
+    except re.error:
         print('Error: Invalid regular expression pattern "%s"' % pattern)
         print(str(sys.exc_info()[1]))
         result = False
