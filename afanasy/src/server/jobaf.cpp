@@ -10,6 +10,7 @@
 #include "action.h"
 #include "afcommon.h"
 #include "block.h"
+#include "branchescontainer.h"
 #include "branchsrv.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -505,6 +506,7 @@ void JobAf::v_action( Action & i_action)
 		else
 		{
 			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
+			i_action.answer = "Unknown operation '" + type + "\"";
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
@@ -513,19 +515,23 @@ void JobAf::v_action( Action & i_action)
 		return;
 	}
 
-	// Store user name before parameters read, to check whether it changed
-	const std::string user_name = m_user_name;
+	// Store some parameters before read, to check whether it changed
+	const std::string _user_name = m_user_name;
+	const std::string _branch = m_branch;
 
 	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
 		jsonRead( params, &i_action.log);
 
-	if( m_user_name != user_name )
+	if( m_user_name != _user_name )
 	{
 		// User name was changed
+
 		UserAf * user = i_action.users->getUser( m_user_name);
 		if( user == NULL )
 		{
+			i_action.answer = "User does not exist: '" + m_user_name + "'";
+			m_user_name = _user_name;
 			return;
 		}
 
@@ -543,8 +549,28 @@ void JobAf::v_action( Action & i_action)
 		return;
 	}
 
-	if( i_action.log.size() )
+	if (m_branch != _branch)
 	{
+		// Branch was changed
+
+		BranchSrv * new_branch_srv = i_action.branches->getBranch(m_branch);
+		if (new_branch_srv == NULL)
+		{
+			i_action.answer = "New job branch not found: '" + m_branch + "'";
+			m_branch = _branch;
+			return;
+		}
+
+		m_branch_srv->removeJob(this);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+
+		new_branch_srv->addJob(this);
+		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+	}
+
+	if (i_action.log.size())
+	{
+		// Not empty log means some parameter change:
 		store();
 		i_action.monitors->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 	}

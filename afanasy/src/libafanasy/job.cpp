@@ -76,6 +76,9 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("user_name",     m_user_name,     i_object, io_changes);
 
+	jr_string("branch", m_branch, i_object, io_changes);
+	m_branch = Branch::FilterPath(m_branch);
+
 	jr_stringmap("folders", m_folders, i_object, io_changes);
 
 	bool offline = false;
@@ -121,9 +124,6 @@ bool Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	
 	jr_string("project",    m_project,    i_object);
 	jr_string("department", m_department, i_object);
-
-	jr_string("branch", m_branch, i_object);
-	m_branch = Branch::FilterPath(m_branch);
 
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())

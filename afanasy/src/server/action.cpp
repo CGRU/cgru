@@ -6,6 +6,7 @@
 
 Action::Action( const af::Msg * i_msg, ThreadArgs * i_args):
 	without_answer( false),
+	branches(i_args->branches),
 	jobs( i_args->jobs),
 	monitors( i_args->monitors),
 	renders( i_args->renders),
