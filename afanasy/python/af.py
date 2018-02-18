@@ -12,7 +12,6 @@ import cgrupathmap
 
 import afcommon
 import afnetwork
-import services  # this seems unneccessary not used
 
 Pathmap = cgrupathmap.PathMap()
 
