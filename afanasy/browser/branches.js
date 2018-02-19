@@ -183,11 +183,10 @@ BranchNode.prototype.update = function(i_obj) {
 	}
 
 	// Set all current active jobs as not updated.
+	// Later all not updated active jobs will be deleted.
+	// This needed as we are not "listening" job_deleted event.
 	for (var j = 0; j < this.active_jobs.length; j++)
-	{
-		this.active_jobs[j].updated = false;
-		this.active_jobs[j].el.style.display = 'none';
-	}
+		this.active_jobs[j].setNotUpdated();
 
 	for (var j = 0; j < this.params.active_jobs.length; j++)
 	{
@@ -216,8 +215,6 @@ BranchNode.prototype.update = function(i_obj) {
 			branches_active_jobs[jparams.id] = active_job;
 			this.active_jobs.push(active_job);
 		}
-
-		this.active_jobs[j].el.style.display = 'block';
 	}
 
 	if (this.params.annotation)
@@ -322,19 +319,25 @@ function BranchActiveJob(i_branch, i_elParent, i_params) {
 	this.update(i_params);
 };
 
+BranchActiveJob.prototype.setNotUpdated = function() {
+	this.el.style.display = 'none';
+	this.updated = false;
+}
+
 BranchActiveJob.prototype.update = function(i_params) {
 	this.params = i_params;
 
 	var info = this.params.name + '[' + this.params.id + ']';
 	this.el.textContent = info;
 
+	this.el.style.display = 'block';
 	this.updated = true;
+	if (this.branch.monitor.m_cur_acrive_job == this)
+		this.updatePanels();
 };
 
 BranchActiveJob.prototype.onContextMenu = function() {
 	g_cur_monitor = this.branch.monitor;
-
-	BranchActiveJob.resetPanels(this.branch.monitor);
 
 	// Clear not updated (deleted) jobs:
 	for (var jid in branches_active_jobs)
@@ -355,6 +358,7 @@ BranchActiveJob.prototype.onContextMenu = function() {
 	{
 		this.setSelected(false);
 
+		// If several active jobs were selected, we should show panels info of a previously selected jobs:
 		if (branches_active_jobs_selected.length)
 			branches_active_jobs_selected[branches_active_jobs_selected.length - 1].updatePanels();
 
@@ -377,9 +381,6 @@ BranchActiveJob.prototype.onContextMenu = function() {
 };
 
 BranchActiveJob.prototype.setSelected = function(i_select) {
-//	if (this.branch.monitor.selected_jobs == null)
-//		this.branch.monitor.selected_jobs = [];
-
 	if (i_select)
 	{
 		if (this.selected)
@@ -410,9 +411,10 @@ BranchActiveJob.deselectAll = function(i_monitor) {
 };
 
 BranchActiveJob.prototype.updatePanels = function() {
-	var monitor = this.branch.monitor;
-//	monitor.m_cur_acrive_job = this;
-	var elPanelR = monitor.elPanelR;
+	BranchActiveJob.resetPanels(this.branch.monitor);
+	this.branch.monitor.m_cur_acrive_job = this;
+
+	var elPanelR = this.branch.monitor.elPanelR;
 
 	var elActiveJob = document.createElement('div');
 	elPanelR.appendChild(elActiveJob);
@@ -453,13 +455,12 @@ BranchActiveJob.prototype.updatePanels = function() {
 };
 
 BranchActiveJob.resetPanels = function(i_monitor) {
-	if (i_monitor.elPanelR.m_elActiveJob == null)
+	if (i_monitor.m_cur_acrive_job == null)
 		return;
 
 	i_monitor.elPanelR.removeChild(i_monitor.elPanelR.m_elActiveJob);
 	i_monitor.elPanelR.m_elActiveJob = null;
-//	i_monitor.resetPanelInfo();
-//	i_monitor.m_cur_acrive_job = null;
+	i_monitor.m_cur_acrive_job = null;
 };
 
 BranchActiveJob.prototype.changeBranch = function() {
