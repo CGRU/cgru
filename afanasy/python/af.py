@@ -521,10 +521,9 @@ class Job:
     """Missing DocString
 
     :param jobname:
-    :param verbose:
     """
 
-    def __init__(self, jobname=None, verbose=False):
+    def __init__(self, jobname=None):
         self.data = dict()
         self.data["name"] = "noname"
         self.data["user_name"] = cgruconfig.VARS['USERNAME']
@@ -630,10 +629,9 @@ class Job:
             block.fillTasks()
             self.data["blocks"].append(block.data)
 
-    def output(self, full=False):
+    def output(self):
         """Missing DocString
 
-        :param full:
         :return:
         """
         self.fillBlocks()
@@ -872,7 +870,7 @@ class Cmd:
         self.data['type'] = 'jobs'
         if ids is not None:
             self.data['ids'] = ids
-        data = self._sendRequest()
+        data = self._sendRequest(verbose)
         if data is not None:
             if 'jobs' in data:
                 return data['jobs']
@@ -940,7 +938,7 @@ class Cmd:
         self.data['mode'] = 'progress'
         self.action = 'get'
         self.data['type'] = 'jobs'
-        data = self._sendRequest()
+        data = self._sendRequest(verbose)
         if data is not None:
             if 'job_progress' in data:
                 return data['job_progress']
@@ -975,10 +973,9 @@ class Cmd:
         self.data['params'] = {'user_name': i_user_name}
         self._sendRequest()
 
-    def renderSetNimby(self, text):
+    def renderSetNimby(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -987,10 +984,9 @@ class Cmd:
         self.data['params'] = {'nimby': True}
         self._sendRequest()
 
-    def renderSetNIMBY(self, text):
+    def renderSetNIMBY(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -999,10 +995,9 @@ class Cmd:
         self.data['params'] = {'NIMBY': True}
         self._sendRequest()
 
-    def renderSetFree(self, text):
+    def renderSetFree(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -1011,10 +1006,9 @@ class Cmd:
         self.data['params'] = {'nimby': False}
         self._sendRequest()
 
-    def renderSetFreeUnpause(self, text):
+    def renderSetFreeUnpause(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -1023,10 +1017,9 @@ class Cmd:
         self.data['params'] = {'nimby': False, 'paused': False}
         self._sendRequest()
 
-    def renderEjectTasks(self, text):
+    def renderEjectTasks(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -1035,10 +1028,9 @@ class Cmd:
         self.data['operation'] = {'type': 'eject_tasks'}
         self._sendRequest()
 
-    def renderEjectNotMyTasks(self, text):
+    def renderEjectNotMyTasks(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -1047,10 +1039,9 @@ class Cmd:
         self.data['operation'] = {'type': 'eject_tasks_keep_my'}
         self._sendRequest()
 
-    def renderExit(self, text):
+    def renderExit(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
@@ -1059,10 +1050,9 @@ class Cmd:
         self.data['operation'] = {'type': 'exit'}
         self._sendRequest()
 
-    def monitorExit(self, text):
+    def monitorExit(self):
         """Missing DocString
 
-        :param text:
         :return:
         """
         self.action = 'action'
