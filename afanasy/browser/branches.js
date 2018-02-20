@@ -22,62 +22,11 @@ var branches_active_jobs_selected = [];
 
 BranchNode.onMonitorCreate = function() {
 	branches = {};
+	BranchNode.createParams();
 };
 
 function BranchNode()
 {
-}
-
-BranchNode.generateParamsString = function(i_p, i_type) {
-	var str = '';
-
-	if (i_type == null)
-		i_type = 'branch';
-
-	if (cm_IsPadawan())
-	{
-		if ((i_p.max_running_tasks != null) && (i_p.max_running_tasks != -1))
-			str += " MaxRunTasks:<b>" + i_p.max_running_tasks + "</b>"
-		if ((i_p.max_running_tasks_per_host != null) && (i_p.max_running_tasks_per_host != -1))
-			str += " MaxPerHost:<b>" + i_p.max_running_tasks_per_host + "</b>"
-		if (i_p.hosts_mask)
-			str += " HostsMask:<b>" + i_p.hosts_mask + "</b>"
-		if (i_p.hosts_mask_exclude)
-			str += " ExcludeHosts:<b>" + i_p.hosts_mask + "</b>"
-		if (i_type != 'job')
-			str += " Solving:<b>" + i_p.solve_method + "</b>"
-		str += " Priority:<b>" + i_p.priority + "</b>"
-	}
-	else if (cm_IsJedi())
-	{
-		if ((i_p.max_running_tasks != null) && (i_p.max_running_tasks != -1))
-			str += " Max:<b>" + i_p.max_running_tasks + "</b>"
-		if ((i_p.max_running_tasks_per_host != null) && (i_p.max_running_tasks_per_host != -1))
-			str += " MPH:<b>" + i_p.max_running_tasks_per_host + "</b>"
-		if (i_p.hosts_mask)
-			str += " Hosts:<b>" + i_p.hosts_mask + "</b>"
-		if (i_p.hosts_mask_exclude)
-			str += " Exclude:<b>" + i_p.hosts_mask + "</b>"
-		if (i_type != 'job')
-			str += " Slv:<b>" + i_p.solve_method + "</b>"
-		str += " Pri:<b>" + i_p.priority + "</b>"
-	}
-	else
-	{
-		if ((i_p.max_running_tasks != null) && (i_p.max_running_tasks != -1))
-			str += " m:<b>" + i_p.max_running_tasks + "</b>"
-		if ((i_p.max_running_tasks_per_host != null) && (i_p.max_running_tasks_per_host != -1))
-			str += " mph:<b>" + i_p.max_running_tasks_per_host + "</b>"
-		if (i_p.hosts_mask)
-			str += " h:<b>" + i_p.hosts_mask + "</b>"
-		if (i_p.hosts_mask_exclude)
-			str += " e:<b>" + i_p.hosts_mask + "</b>"
-		if (i_type != 'job')
-			str += " <b>" + i_p.solve_method + "</b>"
-		str += " <b>" + i_p.priority + "</b>"
-	}
-
-	return str;
 }
 
 BranchNode.prototype.init = function() {
@@ -136,7 +85,7 @@ BranchNode.prototype.update = function(i_obj) {
 		name = cm_PathBase(name);
 	this.elName.innerHTML = '<b>' + name + '/</b>';
 
-	this.elWork.innerHTML = BranchNode.generateParamsString(this.params,'branch');
+	this.elWork.innerHTML = work_generateParamsString(this.params,'branch');
 
 	if (cm_IsPadawan())
 	{
@@ -252,23 +201,8 @@ BranchNode.prototype.refresh = function() {
 };
 
 BranchNode.createPanels = function(i_monitor) {
-	// Jobs solving:
-	var acts = {};
-	acts.solve_ord = {
-		'name': 'solve_parallel',
-		'value': false,
-		'label': 'ORD',
-		'tooltip': 'Solve jobs by order.',
-		'handle': 'mh_Param'
-	};
-	acts.solve_par = {
-		'name': 'solve_parallel',
-		'value': true,
-		'label': 'PAR',
-		'tooltip': 'Solve jobs parallel.',
-		'handle': 'mh_Param'
-	};
-	i_monitor.createCtrlBtns(acts);
+	// Work:
+	work_CreatePanels(i_monitor,'branches');
 };
 
 BranchNode.prototype.updatePanels = function() {
@@ -285,14 +219,21 @@ BranchNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
 };
 
-BranchNode.params = {
-	priority /***************/: {'type': 'num', 'label': 'Priority'},
-	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
-	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'},
-	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
-	hosts_mask_exclude /*****/: {'type': 'reg', 'label': 'Exclude Hosts Mask'},
-	annotation /*************/: {'type': 'str', 'label': 'Annotation'}
+BranchNode.params_branch = {
 };
+
+BranchNode.createParams = function(){
+	if (BranchNode.params_created)
+		return;
+
+	BranchNode.params = {};
+	for (var p in work_params)
+		BranchNode.params[p] = work_params[p];
+	for (var p in BranchNode.params_branch)
+		BranchNode.params[p] = BranchNode.params_branch[p];
+
+	BranchNode.params_created = true;
+}
 
 BranchNode.sort = ['priority', 'name'];
 BranchNode.filter = ['name'];
@@ -361,6 +302,8 @@ BranchActiveJob.prototype.onContextMenu = function() {
 		// If several active jobs were selected, we should show panels info of a previously selected jobs:
 		if (branches_active_jobs_selected.length)
 			branches_active_jobs_selected[branches_active_jobs_selected.length - 1].updatePanels();
+		else
+			BranchActiveJob.resetPanels(this.branch.monitor);
 
 		return;
 	}

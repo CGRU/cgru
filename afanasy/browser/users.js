@@ -82,7 +82,7 @@ UserNode.prototype.update = function(i_obj) {
 	else
 		this.elStar.style.display = 'none';
 
-	this.elWork.innerHTML = BranchNode.generateParamsString(this.params,'user');
+	this.elWork.innerHTML = work_generateParamsString(this.params,'user');
 
 	if (cm_IsPadawan())
 	{
@@ -232,23 +232,8 @@ UserNode.prototype.refresh = function() {
 };
 
 UserNode.createPanels = function(i_monitor) {
-	// Jobs solving:
-	var acts = {};
-	acts.solve_ord = {
-		'name': 'solve_parallel',
-		'value': false,
-		'label': 'ORD',
-		'tooltip': 'Solve jobs by order.',
-		'handle': 'mh_Param'
-	};
-	acts.solve_par = {
-		'name': 'solve_parallel',
-		'value': true,
-		'label': 'PAR',
-		'tooltip': 'Solve jobs parallel.',
-		'handle': 'mh_Param'
-	};
-	i_monitor.createCtrlBtns(acts);
+	// Work:
+	work_CreatePanels(i_monitor,'users');
 
 
 	// Custom data:
@@ -282,8 +267,8 @@ UserNode.createParams = function(){
 		return;
 
 	UserNode.params = {};
-	for (var p in BranchNode.params)
-		UserNode.params[p] = BranchNode.params[p];
+	for (var p in work_params)
+		UserNode.params[p] = work_params[p];
 	for (var p in UserNode.params_user)
 		UserNode.params[p] = UserNode.params_user[p];
 

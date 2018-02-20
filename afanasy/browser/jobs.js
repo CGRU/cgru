@@ -150,7 +150,7 @@ JobNode.prototype.update = function(i_obj) {
 	if (this.params.thumb_path)
 		this.showThumb(this.params.thumb_path);
 
-	this.elWork.innerHTML = BranchNode.generateParamsString(this.params,'job');
+	this.elWork.innerHTML = work_generateParamsString(this.params,'job');
 
 	if (cm_IsPadawan())
 	{
@@ -1298,7 +1298,7 @@ JobBlock.prototype.update = function(i_displayFull) {
 JobNode.prototype.updatePanels = function() {
 	var elPanelR = this.monitor.elPanelR;
 
-	w_UpdatePanels(this.monitor, this);
+	work_UpdatePanels(this.monitor, this);
 
 	// Admin can't move jobs:
 	if (g_VISOR())
@@ -1402,7 +1402,7 @@ JobNode.resetPanels = function(i_monitor) {
 	elFolders.m_elFolders = [];
 	elFolders.m_elRules.style.display = 'none';
 
-	w_ResetPanels(i_monitor);
+	work_ResetPanels(i_monitor);
 };
 
 JobNode.createPanels = function(i_monitor) {
@@ -1487,7 +1487,7 @@ JobNode.createPanels = function(i_monitor) {
 
 
 	// Work:
-	w_CreatePanels(i_monitor);
+	work_CreatePanels(i_monitor,'jobs');
 
 
 	// Blocks:
@@ -1608,8 +1608,8 @@ JobNode.createParams = function(){
 		return;
 
 	JobNode.params = {};
-	for (var p in BranchNode.params)
-		JobNode.params[p] = BranchNode.params[p];
+	for (var p in work_params)
+		JobNode.params[p] = work_params[p];
 	for (var p in JobNode.params_job)
 		JobNode.params[p] = JobNode.params_job[p];
 

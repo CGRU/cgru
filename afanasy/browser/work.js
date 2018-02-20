@@ -16,27 +16,114 @@
 
 "use strict";
 
-function w_CreatePanels(i_monitor)
+var work_params = {
+	priority /***************/: {'type': 'num', 'label': 'Priority'},
+	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
+	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'},
+	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
+	hosts_mask_exclude /*****/: {'type': 'reg', 'label': 'Exclude Hosts Mask'},
+	annotation /*************/: {'type': 'str', 'label': 'Annotation'}
+};
+
+function work_generateParamsString(i_params, i_type)
+{
+	var str = '';
+
+	if (i_type == null)
+		i_type = 'branch';
+
+	if (cm_IsPadawan())
+	{
+		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
+			str += " MaxRunTasks:<b>" + i_params.max_running_tasks + "</b>"
+		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
+			str += " MaxPerHost:<b>" + i_params.max_running_tasks_per_host + "</b>"
+		if (i_params.hosts_mask)
+			str += " HostsMask:<b>" + i_params.hosts_mask + "</b>"
+		if (i_params.hosts_mask_exclude)
+			str += " ExcludeHosts:<b>" + i_params.hosts_mask + "</b>"
+		if (i_type != 'job')
+			str += " Solving:<b>" + i_params.solve_method + "</b>"
+		str += " Priority:<b>" + i_params.priority + "</b>"
+	}
+	else if (cm_IsJedi())
+	{
+		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
+			str += " Max:<b>" + i_params.max_running_tasks + "</b>"
+		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
+			str += " MPH:<b>" + i_params.max_running_tasks_per_host + "</b>"
+		if (i_params.hosts_mask)
+			str += " Hosts:<b>" + i_params.hosts_mask + "</b>"
+		if (i_params.hosts_mask_exclude)
+			str += " Exclude:<b>" + i_params.hosts_mask + "</b>"
+		if (i_type != 'job')
+			str += " Slv:<b>" + i_params.solve_method + "</b>"
+		str += " Pri:<b>" + i_params.priority + "</b>"
+	}
+	else
+	{
+		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
+			str += " m:<b>" + i_params.max_running_tasks + "</b>"
+		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
+			str += " mph:<b>" + i_params.max_running_tasks_per_host + "</b>"
+		if (i_params.hosts_mask)
+			str += " h:<b>" + i_params.hosts_mask + "</b>"
+		if (i_params.hosts_mask_exclude)
+			str += " e:<b>" + i_params.hosts_mask + "</b>"
+		if (i_type != 'job')
+			str += " <b>" + i_params.solve_method + "</b>"
+		str += " <b>" + i_params.priority + "</b>"
+	}
+
+	return str;
+}
+
+function work_CreatePanels(i_monitor, i_type)
 {
 	var elPanelL = i_monitor.elPanelL;
 	var elPanelR = i_monitor.elPanelR;
 
+
+	// Pools:
 	var el = document.createElement('div');
 	el.classList.add('section');
 	elPanelR.appendChild(el);
 	elPanelR.m_elPools = el;
 	el.style.display = 'none';
 
-	// Pools:
 	var elPools = elPanelR.m_elPools;
 	el = document.createElement('div');
 	el.classList.add('caption');
 	el.textContent = 'Pools:';
 	elPools.appendChild(el);
 	elPools.m_elArray = [];
+
+
+	// Work parameters below are not available for jobs
+	if (i_type == 'jobs')
+		return;
+
+
+	// Solving:
+	var acts = {};
+	acts.solve_ord = {
+		'name': 'solve_method',
+		'value': 'order',
+		'label': 'ORD',
+		'tooltip': 'Solve jobs by order.',
+		'handle': 'mh_Param'
+	};
+	acts.solve_pri = {
+		'name': 'solve_method',
+		'value': 'priority',
+		'label': 'PRI',
+		'tooltip': 'Solve jobs by priority.',
+		'handle': 'mh_Param'
+	};
+	i_monitor.createCtrlBtns(acts);
 }
 
-function w_ResetPanels(i_monitor)
+function work_ResetPanels(i_monitor)
 {
 	var elPanelL = i_monitor.elPanelL;
 	var elPanelR = i_monitor.elPanelR;
@@ -49,7 +136,7 @@ function w_ResetPanels(i_monitor)
 	elPools.style.display = 'none';
 }
 
-function w_UpdatePanels(i_monitor, i_node)
+function work_UpdatePanels(i_monitor, i_node)
 {
 	var elPanelL = i_monitor.elPanelL;
 	var elPanelR = i_monitor.elPanelR;
@@ -72,12 +159,12 @@ function w_UpdatePanels(i_monitor, i_node)
 			el.m_node = i_node;
 			el.m_pname = pool;
 			el.m_pval = pools[pool];
-			el.ondblclick = function(e) { w_PoolDblClicked(e.currentTarget) }
+			el.ondblclick = function(e) { work_PoolDblClicked(e.currentTarget) }
 		}
 	}
 }
 
-function w_PoolDblClicked(i_el)
+function work_PoolDblClicked(i_el)
 {
 	var value = i_el.m_pname + ':' + i_el.m_pval;
 
@@ -87,7 +174,7 @@ function w_PoolDblClicked(i_el)
 	args.type = 'str';
 	args.receiver = this.window;
 	args.wnd = this.window;
-	args.handle = 'w_PoolSet';
+	args.handle = 'work_PoolSet';
 	args.value = value;
 	args.name = 'pool_parameter';
 	args.info = 'Edit pool:';
@@ -95,7 +182,7 @@ function w_PoolDblClicked(i_el)
 	new cgru_Dialog(args);
 }
 
-function w_PoolSet(i_value, i_param)
+function work_PoolSet(i_value, i_param)
 {
 	console.log('i_value = ' + i_value);
 	console.log('i_param = ' + i_param);
