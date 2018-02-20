@@ -3,7 +3,9 @@
 
 import afnetwork
 
-import time, os, sys
+import time
+import os
+import sys
 
 from optparse import OptionParser
 
@@ -15,30 +17,29 @@ Parser.add_option('-V', '--verbose', dest='verbose', action='store_true', defaul
 Options, Args = Parser.parse_args()
 
 if len(Args) < 1:
-	print('Send file to Afanasy server.')
-	print('Usage: %s file' % sys.argv[0])
-	sys.exit(1)
+    print('Send file to Afanasy server.')
+    print('Usage: %s file' % sys.argv[0])
+    sys.exit(1)
 
 File = Args[0]
 
 if not os.path.isfile(File):
-	print('File not found:')
-	print(File)
-	sys.exit(1)
+    print('File not found:')
+    print(File)
+    sys.exit(1)
 
 with open(File, 'rb') as f:
-	data = f.read(os.path.getsize(File))
+    data = f.read(os.path.getsize(File))
 
 for i in range(0, Options.cycles):
 
-	status, answer = afnetwork.sendServer(data, Options.verbose)
+    status, answer = afnetwork.sendServer(data, Options.verbose)
 
-	if not status:
-		sys.exit(1)
+    if not status:
+        sys.exit(1)
 
-	if answer:
-		print(answer)
+    if answer:
+        print(answer)
 
-	if Options.time > 0:
-		time.sleep(Options.time)
-
+    if Options.time > 0:
+        time.sleep(Options.time)
