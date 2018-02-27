@@ -37,7 +37,7 @@ BranchNode.prototype.init = function() {
 	this.element.appendChild(this.elName);
 	this.elName.title = 'User Name';
 
-	this.elWork = cm_ElCreateFloatText(this.element,'right');
+	this.elWork = cm_ElCreateFloatText(this.element, 'right');
 
 	this.element.appendChild(document.createElement('br'));
 
@@ -85,7 +85,7 @@ BranchNode.prototype.update = function(i_obj) {
 		name = cm_PathBase(name);
 	this.elName.innerHTML = '<b>' + name + '/</b>';
 
-	this.elWork.innerHTML = work_generateParamsString(this.params,'branch');
+	this.elWork.innerHTML = work_generateParamsString(this.params, 'branch');
 
 	if (cm_IsPadawan())
 	{
@@ -100,7 +100,7 @@ BranchNode.prototype.update = function(i_obj) {
 
 		var counts = 'Branches Total:';
 		if (this.params.branches_num)
-			 counts += ' <b>' + this.params.branches_num + '</b>';
+			counts += ' <b>' + this.params.branches_num + '</b>';
 		else
 			counts += ' <b>0</b>';
 		if (this.params.running_branches_num)
@@ -128,7 +128,6 @@ BranchNode.prototype.update = function(i_obj) {
 		if (this.params.running_jobs_num)
 			jobs += '/<b>' + this.params.running_jobs_num + '</b>r';
 		this.elJobsCounts.innerHTML = jobs;
-
 	}
 
 	// Set all current active jobs as not updated.
@@ -202,7 +201,7 @@ BranchNode.prototype.refresh = function() {
 
 BranchNode.createPanels = function(i_monitor) {
 	// Work:
-	work_CreatePanels(i_monitor,'branches');
+	work_CreatePanels(i_monitor, 'branches');
 };
 
 BranchNode.prototype.updatePanels = function() {
@@ -219,10 +218,9 @@ BranchNode.prototype.onDoubleClick = function(e) {
 	g_ShowObject({"object": this.params}, {"evt": e, "wnd": this.monitor.window});
 };
 
-BranchNode.params_branch = {
-};
+BranchNode.params_branch = {};
 
-BranchNode.createParams = function(){
+BranchNode.createParams = function() {
 	if (BranchNode.params_created)
 		return;
 
@@ -233,7 +231,7 @@ BranchNode.createParams = function(){
 		BranchNode.params[p] = BranchNode.params_branch[p];
 
 	BranchNode.params_created = true;
-}
+};
 
 BranchNode.sort = ['priority', 'name'];
 BranchNode.filter = ['name'];
@@ -241,7 +239,8 @@ BranchNode.filter = ['name'];
 
 // ###################### Branch Active Job ###################################
 
-function BranchActiveJob(i_branch, i_elParent, i_params) {
+function BranchActiveJob(i_branch, i_elParent, i_params)
+{
 	this.branch = i_branch;
 	this.params = i_params;
 	this.elParent = i_elParent;
@@ -263,7 +262,7 @@ function BranchActiveJob(i_branch, i_elParent, i_params) {
 BranchActiveJob.prototype.setNotUpdated = function() {
 	this.el.style.display = 'none';
 	this.updated = false;
-}
+};
 
 BranchActiveJob.prototype.update = function(i_params) {
 	this.params = i_params;
@@ -392,9 +391,7 @@ BranchActiveJob.prototype.updatePanels = function() {
 	elChange.classList.add('button');
 	elChange.textContent = 'Change Branch';
 	elChange.m_active_job = this;
-	elChange.onclick = function(e) {
-		e.currentTarget.m_active_job.changeBranch();
-	};
+	elChange.onclick = function(e) { e.currentTarget.m_active_job.changeBranch(); };
 };
 
 BranchActiveJob.resetPanels = function(i_monitor) {
@@ -445,4 +442,3 @@ BranchActiveJob.params = {
 	max_running_tasks /******/: {'type': 'num', 'label': 'Max Running Tasks'},
 	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'}
 };
-

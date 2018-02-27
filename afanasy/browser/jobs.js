@@ -59,17 +59,19 @@ JobNode.prototype.init = function() {
 	this.elState.title = 'Job State';
 	this.elState.classList.add('prestar');
 
-	this.elTime = cm_ElCreateFloatText(this.element,'right','Running Time');
-	this.elWork = cm_ElCreateFloatText(this.element,'right');
-	this.elLifeTime = cm_ElCreateFloatText(this.element,'right','Life Time');
-	this.elPPApproval = cm_ElCreateFloatText(this.element,'right','Preview Pending Approval','<b>PPA</b>');
-	this.elMaintenance = cm_ElCreateFloatText(this.element,'right','Maintenance', '<b>MNT</b>');
-	this.elIgnoreNimby = cm_ElCreateFloatText(this.element,'right','Ignore render "Nimby" state.','<b>INB</b>');
-	this.elIgnorePaused = cm_ElCreateFloatText(this.element,'right','Ignore render "Paused" state.','<b>IPS</b>');
-	this.elDependMask = cm_ElCreateFloatText(this.element,'right','Depend Mask');
-	this.elDependMaskGlobal = cm_ElCreateFloatText(this.element,'right','Global Depend Mask');
-	this.elNeedProperties = cm_ElCreateFloatText(this.element,'right','Properties');
-	this.elNeedOS = cm_ElCreateFloatText(this.element,'right','OS Needed');
+	this.elTime = cm_ElCreateFloatText(this.element, 'right', 'Running Time');
+	this.elWork = cm_ElCreateFloatText(this.element, 'right');
+	this.elLifeTime = cm_ElCreateFloatText(this.element, 'right', 'Life Time');
+	this.elPPApproval = cm_ElCreateFloatText(this.element, 'right', 'Preview Pending Approval', '<b>PPA</b>');
+	this.elMaintenance = cm_ElCreateFloatText(this.element, 'right', 'Maintenance', '<b>MNT</b>');
+	this.elIgnoreNimby =
+		cm_ElCreateFloatText(this.element, 'right', 'Ignore render "Nimby" state.', '<b>INB</b>');
+	this.elIgnorePaused =
+		cm_ElCreateFloatText(this.element, 'right', 'Ignore render "Paused" state.', '<b>IPS</b>');
+	this.elDependMask = cm_ElCreateFloatText(this.element, 'right', 'Depend Mask');
+	this.elDependMaskGlobal = cm_ElCreateFloatText(this.element, 'right', 'Global Depend Mask');
+	this.elNeedProperties = cm_ElCreateFloatText(this.element, 'right', 'Properties');
+	this.elNeedOS = cm_ElCreateFloatText(this.element, 'right', 'OS Needed');
 
 	if (cm_IsSith())
 	{
@@ -150,7 +152,7 @@ JobNode.prototype.update = function(i_obj) {
 	if (this.params.thumb_path)
 		this.showThumb(this.params.thumb_path);
 
-	this.elWork.innerHTML = work_generateParamsString(this.params,'job');
+	this.elWork.innerHTML = work_generateParamsString(this.params, 'job');
 
 	if (cm_IsPadawan())
 	{
@@ -1487,7 +1489,7 @@ JobNode.createPanels = function(i_monitor) {
 
 
 	// Work:
-	work_CreatePanels(i_monitor,'jobs');
+	work_CreatePanels(i_monitor, 'jobs');
 
 
 	// Blocks:
@@ -1603,7 +1605,7 @@ JobNode.params_job = {
 	user_name /**************/: {"type": 'str', "label": 'Owner', "permissions": 'visor'}
 };
 
-JobNode.createParams = function(){
+JobNode.createParams = function() {
 	if (JobNode.params_created)
 		return;
 
@@ -1614,7 +1616,7 @@ JobNode.createParams = function(){
 		JobNode.params[p] = JobNode.params_job[p];
 
 	JobNode.params_created = true;
-}
+};
 
 JobNode.view_opts = {
 	jobs_thumbs_num: {"type": 'num', "label": "TQU", "tooltip": 'Thumbnails quantity.', "default": 12},

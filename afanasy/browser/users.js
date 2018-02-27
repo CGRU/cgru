@@ -35,17 +35,17 @@ UserNode.prototype.init = function() {
 	this.elName.title = 'User Name';
 	this.elName.classList.add('prestar');
 
-	this.elWork = cm_ElCreateFloatText(this.element,'right');
-	this.elErrors = cm_ElCreateFloatText(this.element,'right');
-	this.elForgive = cm_ElCreateFloatText(this.element,'right','Errors Forgive Time');
-	this.elJobsLifeTime = cm_ElCreateFloatText(this.element,'right','Jobs Life Time');
+	this.elWork = cm_ElCreateFloatText(this.element, 'right');
+	this.elErrors = cm_ElCreateFloatText(this.element, 'right');
+	this.elForgive = cm_ElCreateFloatText(this.element, 'right', 'Errors Forgive Time');
+	this.elJobsLifeTime = cm_ElCreateFloatText(this.element, 'right', 'Jobs Life Time');
 
 	this.element.appendChild(document.createElement('br'));
 
-	this.elJobs = cm_ElCreateFloatText(this.element,'left','Jobs: All/Running');
+	this.elJobs = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
 	this.elJobs.classList.add('prestar');
 
-	this.elHostName = cm_ElCreateFloatText(this.element,'right','Host Name');
+	this.elHostName = cm_ElCreateFloatText(this.element, 'right', 'Host Name');
 
 	this.element.appendChild(document.createElement('br'));
 
@@ -82,7 +82,7 @@ UserNode.prototype.update = function(i_obj) {
 	else
 		this.elStar.style.display = 'none';
 
-	this.elWork.innerHTML = work_generateParamsString(this.params,'user');
+	this.elWork.innerHTML = work_generateParamsString(this.params, 'user');
 
 	if (cm_IsPadawan())
 	{
@@ -233,8 +233,7 @@ UserNode.prototype.refresh = function() {
 
 UserNode.createPanels = function(i_monitor) {
 	// Work:
-	work_CreatePanels(i_monitor,'users');
-
+	work_CreatePanels(i_monitor, 'users');
 
 	// Custom data:
 	var acts = {};
@@ -262,7 +261,7 @@ UserNode.params_user = {
 	errors_forgive_time /****/: {'type': 'hrs', 'label': 'Errors Forgive Time'},
 	jobs_life_time /*********/: {'type': 'hrs', 'label': 'Jobs Life Time'}
 };
-UserNode.createParams = function(){
+UserNode.createParams = function() {
 	if (UserNode.params_created)
 		return;
 
@@ -273,7 +272,7 @@ UserNode.createParams = function(){
 		UserNode.params[p] = UserNode.params_user[p];
 
 	UserNode.params_created = true;
-}
+};
 
 UserNode.sort = ['priority', 'name', 'host_name'];
 UserNode.filter = ['name', 'host_name'];

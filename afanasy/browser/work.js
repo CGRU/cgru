@@ -35,43 +35,43 @@ function work_generateParamsString(i_params, i_type)
 	if (cm_IsPadawan())
 	{
 		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
-			str += " MaxRunTasks:<b>" + i_params.max_running_tasks + "</b>"
+			str += " MaxRunTasks:<b>" + i_params.max_running_tasks + "</b>";
 		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
-			str += " MaxPerHost:<b>" + i_params.max_running_tasks_per_host + "</b>"
+			str += " MaxPerHost:<b>" + i_params.max_running_tasks_per_host + "</b>";
 		if (i_params.hosts_mask)
-			str += " HostsMask:<b>" + i_params.hosts_mask + "</b>"
+			str += " HostsMask:<b>" + i_params.hosts_mask + "</b>";
 		if (i_params.hosts_mask_exclude)
-			str += " ExcludeHosts:<b>" + i_params.hosts_mask + "</b>"
+			str += " ExcludeHosts:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
-			str += " Solving:<b>" + i_params.solve_method + "</b>"
-		str += " Priority:<b>" + i_params.priority + "</b>"
+			str += " Solving:<b>" + i_params.solve_method + "</b>";
+		str += " Priority:<b>" + i_params.priority + "</b>";
 	}
 	else if (cm_IsJedi())
 	{
 		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
-			str += " Max:<b>" + i_params.max_running_tasks + "</b>"
+			str += " Max:<b>" + i_params.max_running_tasks + "</b>";
 		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
-			str += " MPH:<b>" + i_params.max_running_tasks_per_host + "</b>"
+			str += " MPH:<b>" + i_params.max_running_tasks_per_host + "</b>";
 		if (i_params.hosts_mask)
-			str += " Hosts:<b>" + i_params.hosts_mask + "</b>"
+			str += " Hosts:<b>" + i_params.hosts_mask + "</b>";
 		if (i_params.hosts_mask_exclude)
-			str += " Exclude:<b>" + i_params.hosts_mask + "</b>"
+			str += " Exclude:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
-			str += " Slv:<b>" + i_params.solve_method + "</b>"
+			str += " Slv:<b>" + i_params.solve_method + "</b>";
 		str += " Pri:<b>" + i_params.priority + "</b>"
 	}
 	else
 	{
 		if ((i_params.max_running_tasks != null) && (i_params.max_running_tasks != -1))
-			str += " m:<b>" + i_params.max_running_tasks + "</b>"
+			str += " m:<b>" + i_params.max_running_tasks + "</b>";
 		if ((i_params.max_running_tasks_per_host != null) && (i_params.max_running_tasks_per_host != -1))
-			str += " mph:<b>" + i_params.max_running_tasks_per_host + "</b>"
+			str += " mph:<b>" + i_params.max_running_tasks_per_host + "</b>";
 		if (i_params.hosts_mask)
-			str += " h:<b>" + i_params.hosts_mask + "</b>"
+			str += " h:<b>" + i_params.hosts_mask + "</b>";
 		if (i_params.hosts_mask_exclude)
-			str += " e:<b>" + i_params.hosts_mask + "</b>"
+			str += " e:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
-			str += " <b>" + i_params.solve_method + "</b>"
+			str += " <b>" + i_params.solve_method + "</b>";
 		str += " <b>" + i_params.priority + "</b>"
 	}
 
