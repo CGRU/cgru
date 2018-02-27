@@ -16,6 +16,7 @@
 #include "afwork.h"
 
 #include "environment.h"
+#include "taskexec.h"
 
 #define AFOUTPUT
 //#undef AFOUTPUT
@@ -33,6 +34,10 @@ Work::Work():
 	m_hosts_mask.setCaseInsensitive();
 	m_hosts_mask_exclude.setCaseInsensitive();
 	m_hosts_mask_exclude.setExclude();
+
+
+	m_running_tasks_num      = 0;
+	m_running_capacity_total = 0;
 }
 
 Work::~Work()
@@ -86,6 +91,30 @@ void Work::jsonWrite( std::ostringstream & o_str, int i_type) const
 		case SolveByPriority: o_str << "priority"; break;
 	}
 	o_str << "\"";
+
+	if (m_running_tasks_num > 0)
+		o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
+	if (m_running_capacity_total> 0)
+		o_str << ",\n\"m_running_capacity_total\":" << m_running_capacity_total;
+}
+
+void Work::addRunTasksCounts(TaskExec * i_exec)
+{
+	m_running_tasks_num ++;
+	m_running_capacity_total += i_exec->getCapResult();
+}
+
+void Work::remRunTasksCounts(TaskExec * i_exec)
+{
+	if (m_running_tasks_num <= 0)
+		AF_ERR << "Tasks counter is zero or negative: " << m_running_tasks_num;
+	else
+		m_running_tasks_num--;
+
+	if (m_running_capacity_total <= 0)
+		AF_ERR << "Tasks capacity counter is zero or negative: " << m_running_capacity_total;
+	else
+		m_running_capacity_total -= i_exec->getCapResult();
 }
 
 void Work::generateInfoStream( std::ostringstream & o_str, bool full) const

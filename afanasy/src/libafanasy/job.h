@@ -126,12 +126,6 @@ public:
 	inline bool checkNeedOS(            const std::string & str ) const { return m_need_os.match( str);           }
 	inline bool checkNeedProperties(    const std::string & str ) const { return m_need_properties.match( str);   }
 
-	inline int32_t getRunningTasksNumber() const /// Get job running tasks.
-		{int32_t n=0;for(int b=0;b<m_blocks_num;b++)n+=m_blocks_data[b]->getRunningTasksNumber();return n;}
-
-	inline int64_t getRunningCapacityTotal() const /// Get job running tasks.
-		{int64_t c=0;for(int b=0;b<m_blocks_num;b++)c+=m_blocks_data[b]->getRunningCapacityTotal();return c;}
-
 //	const std::string & getTasksOutputDir() const { return m_tasks_output_dir; }
 
 	/// Get block constant pointer.

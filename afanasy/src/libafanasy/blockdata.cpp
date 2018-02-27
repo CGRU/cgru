@@ -1466,6 +1466,24 @@ void BlockData::v_generateInfoStream( std::ostringstream & o_str, bool full) con
    generateInfoStreamTyped( o_str, Msg::TBlocksProperties, full);
 }
 
+void BlockData::addSolveCounts(TaskExec * i_exec)
+{
+	m_running_tasks_counter ++;
+	m_running_capacity_counter += i_exec->getCapResult();
+}
+
+void BlockData::remSolveCounts(TaskExec * i_exec)
+{
+	if (m_running_tasks_counter <= 0)
+		AF_ERR << "Tasks counter is zero or negative: " << m_running_tasks_counter;
+	else
+		m_running_tasks_counter--;
+
+	if (m_running_capacity_counter <= 0)
+		AF_ERR << "Tasks capacity counter is zero or negative: " << m_running_capacity_counter;
+	else
+		m_running_capacity_counter -= i_exec->getCapResult();
+}
 
 // Functions to update tasks progress and block progress bar:
 // (for monitoring purpoces only, no meaning for server)

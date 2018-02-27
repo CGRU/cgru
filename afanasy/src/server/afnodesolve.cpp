@@ -5,6 +5,7 @@
 #include "../libafanasy/environment.h"
 
 #include "aflist.h"
+#include "renderaf.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -36,6 +37,50 @@ void AfNodeSolve::setZombie()
 	AfNodeSrv::setZombie();
 }
 
+void AfNodeSolve::addSolveCounts(af::TaskExec * i_exec, RenderAf * i_render)
+{
+	m_work->addRunTasksCounts(i_exec);
+	addRenderCount(i_render);
+}
+
+void AfNodeSolve::remSolveCounts(af::TaskExec * i_exec, RenderAf * i_render)
+{
+	m_work->remRunTasksCounts(i_exec);
+	remRenderCount(i_render);
+}
+
+void AfNodeSolve::addRenderCount(RenderAf * i_render)
+{
+	// Add render count, on task start:
+	std::map<int,int>::iterator it = m_renders_counts.find(i_render->getId());
+	if (it != m_renders_counts.end())
+		(*it).second++;
+	else
+		m_renders_counts[i_render->getId()] = 1;
+}
+
+int AfNodeSolve::getRenderCount(RenderAf * i_render) const
+{
+	// Get render count, to check max run tasks per host limit:
+	std::map<int,int>::const_iterator it = m_renders_counts.find(i_render->getId());
+	if (it != m_renders_counts.end())
+		return (*it).second;
+	return 0;
+}
+
+void AfNodeSolve::remRenderCount(RenderAf * i_render)
+{
+	// Remove one render count, on task finish:
+	std::map<int,int>::iterator it = m_renders_counts.find(i_render->getId());
+	if (it != m_renders_counts.end())
+	{
+		if ((*it).second > 1)
+			(*it).second--;
+		else
+			m_renders_counts.erase(it);
+	}
+}
+
 /// Solving function should be implemented in child classes (if solving needed):
 RenderAf * AfNodeSolve::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
@@ -47,12 +92,66 @@ void AfNodeSolve::v_calcNeed()
 	AF_ERR << "AfNodeSolve::calcNeed(): Not implememted: " << m_node->getName().c_str();
 	calcNeedResouces(-1);
 }
+
+bool AfNodeSolve::canRun()
+{
+	if (m_work->getPriority() == 0)
+	{
+		// Zero priority turns solving off
+		return false;
+	}
+
+	if (m_work->getMaxRunningTasks() == 0)
+	{
+		// Can't have running tasks at all, turns solving off
+		return false;
+	}
+
+	if (m_work->getMaxRunTasksPerHost() == 0)
+	{
+		// Can't run tasks on any host at all, turns solving off
+		return false;
+	}
+
+	// Check maximum running tasks:
+	if ((m_work->getMaxRunningTasks() > 0) && (m_work->getRunningTasksNum() >= m_work->getMaxRunningTasks()))
+	{
+		return false;
+	}
+
+	// Perform each node type scpecific check
+	return v_canRun();
+}
 bool AfNodeSolve::v_canRun()
 {
 	AF_ERR << "AfNodeSolve::canRun(): Not implememted: " << m_node->getName().c_str();
 	return false;
 }
-bool AfNodeSolve::v_canRunOn( RenderAf * i_render)
+
+bool AfNodeSolve::canRunOn(RenderAf * i_render)
+{
+	// Check maximum running tasks per host
+	if ((m_work->getMaxRunTasksPerHost() > 0) && (getRenderCount(i_render) >= m_work->getMaxRunTasksPerHost()))
+	{
+		return false;
+	}
+
+	// Check hosts mask
+	if (false == m_work->checkHostsMask(i_render->getName()))
+	{
+		return false;
+	}
+
+	// Check exclude hosts mask
+	if (false == m_work->checkHostsMaskExclude(i_render->getName()))
+	{
+		return false;
+	}
+
+	// Perform each node type scpecific check
+	return v_canRunOn(i_render);
+}
+bool AfNodeSolve::v_canRunOn(RenderAf * i_render)
 {
 	AF_ERR << "AfNodeSolve::canRunOn(): Not implememted: " << m_node->getName().c_str();
 	return false;
@@ -85,7 +184,6 @@ bool AfNodeSolve::greaterPriorityThenOlderCreation( const AfNodeSolve * i_other)
 	return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-/// Try so solve a Node
 RenderAf * AfNodeSolve::trySolve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
 	RenderAf * render = v_solve( i_renders_list, i_monitoring);

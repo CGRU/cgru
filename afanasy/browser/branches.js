@@ -288,7 +288,7 @@ BranchActiveJob.prototype.onContextMenu = function() {
 		if (active_job.updated)
 			continue;
 
-		branches_active_jobs[jid] == null;
+		branches_active_jobs[jid] = null;
 		var i = branches_active_jobs_selected.indexOf(active_job);
 		if (i != -1)
 			branches_active_jobs_selected.splice(i, 1);

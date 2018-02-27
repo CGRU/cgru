@@ -103,10 +103,6 @@ public:
 
 	void setUserListOrder( int index, bool updateDtabase);
 
-	void addRenderCounts( RenderAf * render);
-	int  getRenderCounts( RenderAf * render) const;
-	void remRenderCounts( RenderAf * render);
-
 	const std::string & getTasksDir() const { return m_store_dir_tasks; }
 
 	void setThumbnail( const std::string & i_path, int i_size, const char * i_data );
@@ -114,6 +110,9 @@ public:
 
 	/// Just fill in job, block, task and other names:
 	void fillTaskNames( af::MCTask & o_mctask) const;
+
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
 public:
 	/// Set Jobs Container.

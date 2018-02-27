@@ -88,7 +88,7 @@ void SysTask::appendSysJobLog( const std::string & message)
 	    + m_syscmd->command);
 }
 
-void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	i_taskexec->setName(         m_syscmd->task_name        );
 	i_taskexec->setCommand(      m_syscmd->command          );
@@ -97,7 +97,7 @@ void SysTask::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorCo
 	i_taskexec->setWDir(         m_syscmd->working_directory);
 	i_taskexec->setTaskNumber(   getNumber()                );
 
-	Task::v_start( i_taskexec, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+	Task::v_start( i_taskexec, i_render, i_monitoring);
 }
 
 void SysTask::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
@@ -232,7 +232,7 @@ bool SysBlock::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorC
 		return false;
 	}
 
-	systask->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
+	systask->v_start( taskexec, render, monitoring);
 
 	m_taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
 	m_taskprogress->starts_count++;
