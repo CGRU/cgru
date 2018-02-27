@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-import os
 import socket
 import sys
 
@@ -90,12 +89,12 @@ def sendServer(i_data, i_verbose=False):
     data = b''
     msg_len = None
     while True:
-        buffer = s.recv(4096)
+        data_buffer = s.recv(4096)
 
-        if not buffer:
+        if not data_buffer:
             break
 
-        data += buffer
+        data += data_buffer
 
         if msg_len is None:
             dataStr = cgruutils.toStr(data)

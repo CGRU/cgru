@@ -5,6 +5,6 @@ parser = 'generic'
 
 
 class generic(service.service):
-	"""Simple service for anything
-	"""
-	pass
+    """Simple service for anything
+    """
+    pass

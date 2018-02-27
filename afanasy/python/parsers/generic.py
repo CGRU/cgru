@@ -26,7 +26,6 @@ class generic(parser.parser):
 
         self.firstframe = True
 
-
     def do(self, data, mode):
         """Missing DocString
 

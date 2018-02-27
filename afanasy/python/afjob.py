@@ -871,7 +871,7 @@ if __name__ == '__main__':
         block.setWorkingDirectory(pwd)
         block.setNumeric(s, e, fpt, by)
         if seq != 1:
-            block.setSequential( seq)
+            block.setSequential(seq)
 
         if scenetype == 'max':
             block.setCommand(cmd, False, False)

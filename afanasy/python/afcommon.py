@@ -16,7 +16,7 @@ BlockFlags = {
 
 
 def checkBlockFlag(i_flags, i_name):
-    if not i_name in BlockFlags:
+    if i_name not in BlockFlags:
         print('AFERROR: block flag "%s" does not exist.' % i_name)
         print('Existing flags are: ' + str(BlockFlags))
         return False
@@ -24,7 +24,7 @@ def checkBlockFlag(i_flags, i_name):
 
 
 def setBlockFlag(i_flags, i_name):
-    if not i_name in BlockFlags:
+    if i_name not in BlockFlags:
         print('AFERROR: block flag "%s" does not exist.' % i_name)
         print('Existing flags are: ' + str(BlockFlags))
         return i_flags
