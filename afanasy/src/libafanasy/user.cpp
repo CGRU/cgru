@@ -58,8 +58,6 @@ void User::initDefaultValues()
 	m_jobs_life_time    = 0;
 	m_jobs_num          = 0;
 	m_running_jobs_num  = 0;
-	m_running_tasks_num = 0;
-	m_running_capacity_total = 0;
 
 	m_time_register = 0;
 	m_time_activity = 0;
@@ -148,6 +146,8 @@ void User::v_readwrite( Msg * msg)
 	rw_int32_t ( m_errors_forgive_time,   msg);
 	rw_int64_t ( m_time_register,         msg);
 	rw_int32_t ( m_jobs_life_time,        msg);
+
+	// NEW VERSION
 	rw_int32_t ( m_jobs_num,              msg);
 	rw_int32_t ( m_running_jobs_num,      msg);
 	rw_int32_t ( m_running_tasks_num,     msg);

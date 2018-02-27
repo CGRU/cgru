@@ -59,6 +59,12 @@ public:
 	inline bool setHostsMaskExclude(const std::string & str, std::string * errOutput = NULL)
 		{ return setRegExp( m_hosts_mask_exclude, str, "exclude hosts mask", errOutput);}
 
+	inline int getRunningTasksNum() const { return m_running_tasks_num;}
+	inline int getRunningCapacityTotal() const { return m_running_capacity_total;}
+
+	void addRunTasksCounts(af::TaskExec * i_exec);
+	void remRunTasksCounts(af::TaskExec * i_exec);
+
 	int calcWeight() const;       ///< Calculate and return memory size.
 
 protected:
@@ -66,11 +72,18 @@ protected:
 
 protected:
 	int32_t m_solve_method;
+
+
 	int32_t m_max_running_tasks;
 	int32_t m_max_running_tasks_per_host;
 
 	RegExp m_hosts_mask;
 	RegExp m_hosts_mask_exclude;
+
+
+	int32_t m_running_tasks_num;
+	int64_t m_running_capacity_total;
+
 
 private:
 	std::map< std::string, int32_t > m_pools;

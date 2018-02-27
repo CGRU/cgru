@@ -180,7 +180,7 @@ RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<Render
 	// Remove nodes that need no solving at all (done, offline, ...)
 	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
-		if((*it)->v_canRun())
+		if((*it)->canRun())
 			it++;
 		else
 			it = i_list.erase( it);
@@ -204,7 +204,7 @@ RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<Render
 		for( std::list<RenderAf*>::iterator rIt = i_renders.begin(); rIt != i_renders.end(); rIt++)
 		{
 			// Check that the node can run this render:
-			if( false == (*it)->v_canRunOn( *rIt))
+			if( false == (*it)->canRunOn( *rIt))
 				continue;
 
 			renders.push_back( *rIt);

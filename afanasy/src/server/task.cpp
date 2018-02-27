@@ -96,14 +96,14 @@ af::TaskExec * Task::genExec() const
 	return exec;
 }
 
-void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
    if( m_block->m_data->isMultiHost())
    {
       if( m_run )
          ((TaskRunMulti*)(m_run))->addHost( i_taskexec, i_render, i_monitoring);
       else
-         m_run = new TaskRunMulti( this, i_taskexec, m_progress, m_block, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+         m_run = new TaskRunMulti( this, i_taskexec, m_progress, m_block, i_render, i_monitoring);
       return;
    }
 
@@ -116,16 +116,16 @@ void Task::v_start( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorConta
 
 	i_taskexec->listenOutput( m_listen_count > 0);
 
-	m_run = new TaskRun( this, i_taskexec, m_progress, m_block, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+	m_run = new TaskRun( this, i_taskexec, m_progress, m_block, i_render, i_monitoring);
 }
 
-void Task::reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring, int32_t * io_running_tasks_counter, int64_t * io_running_capacity_counter)
+void Task::reconnect( af::TaskExec * i_taskexec, RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 	if( m_progress->state & AFJOB::STATE_WAITRECONNECT_MASK )
 	{
 		v_appendLog("Reconnecting previously run...");
 		AF_LOG << "Reconnecting task: \"" << *i_taskexec << "\" with\nRender: " << *i_render;
-		v_start( i_taskexec, i_render, i_monitoring, io_running_tasks_counter, io_running_capacity_counter);
+		v_start( i_taskexec, i_render, i_monitoring);
 	}
 	else
 	{

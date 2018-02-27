@@ -62,9 +62,8 @@ public:
 
 	bool tasksDependsOn( int block);
 
-	void addRenderCounts( RenderAf * render);
-	int  getRenderCounts( RenderAf * render) const;
-	void remRenderCounts( RenderAf * render);
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
 public:
 	JobAf * m_job;
@@ -96,4 +95,10 @@ private:
 	const std::string getStoreTasksFileName() const;
 
 	void skipRestartTasks( bool i_skip, const std::string & i_message, const Action & i_action, const JSON & i_operation, uint32_t i_state = 0);
+
+	void addRenderCount(RenderAf * i_render);
+	int  getRenderCount(RenderAf * i_render) const;
+	void remRenderCount(RenderAf * i_render);
+
 };
+

@@ -26,9 +26,7 @@ public:
             af::TaskProgress * taskProgress,
             Block * taskBlock,
             RenderAf * render,
-            MonitorContainer * monitoring,
-            int32_t * i_running_tasks_counter,
-            int64_t * i_running_capacity_counter
+            MonitorContainer * monitoring
             );
 
    virtual ~TaskRun();

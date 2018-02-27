@@ -260,7 +260,7 @@ bool UserAf::refreshCounters()
 			if( ((JobAf*)job)->isRunning())
 			{
 				_numrunningjobs++;
-				_runningtasksnumber += ((JobAf*)job)->getRunningTasksNumber();
+				_runningtasksnumber += ((JobAf*)job)->getRunningTasksNum();
 				_runningcapacitytotal += ((JobAf*)job)->getRunningCapacityTotal();
 			}
 		}
@@ -294,27 +294,9 @@ void UserAf::v_calcNeed()
 
 bool UserAf::v_canRun()
 {
-	if( m_priority == 0 )
-	{
-		// Zero priority - turns user jobs solving off
-		return false;
-	}
-
-	if( m_max_running_tasks == 0 )
-	{
-		// Can't run tasks at all - turns user jobs solving off
-		return false;
-	}
-
 	if( m_jobs_num < 1 )
 	{
 		// Nothing to run
-		return false;
-	}
-
-	// Check maximum running tasks:
-	if(( m_max_running_tasks > 0 ) && ( m_running_tasks_num >= m_max_running_tasks ))
-	{
 		return false;
 	}
 
@@ -324,13 +306,9 @@ bool UserAf::v_canRun()
 
 bool UserAf::v_canRunOn( RenderAf * i_render)
 {
-// check hosts mask:
-	if( false == checkHostsMask( i_render->getName())) return false;
-// check exclude hosts mask:
-	if( false == checkHostsMaskExclude( i_render->getName())) return false;
-
-// Returning that user is able to run on specified render
+	// Returning that user is able to run on specified render
 	return true;
+	//^No more checks above AfNodeSolve::canRunOn() needed
 }
 
 RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
@@ -343,7 +321,7 @@ RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContai
 	}
 
 	std::list<AfNodeSolve*> solve_list( m_jobslist.getStdList());
-
+/*
 	RenderAf * render = Solver::SolveList( solve_list, i_renders_list, solve_method);
 
 	if( render )
@@ -359,6 +337,8 @@ RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContai
 
 	// Node was not solved
 	return NULL;
+*/
+	return Solver::SolveList( solve_list, i_renders_list, solve_method);
 }
 
 int UserAf::v_calcWeight() const

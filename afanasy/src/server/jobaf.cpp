@@ -326,16 +326,16 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 			emitEvents(events);
 		}
 		
-		if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
+		if (getRunningTasksNum() && (renders != NULL) && (monitoring != NULL))
 		{
 			restartAllTasks("Job deletion.", renders, monitoring, AFJOB::STATE_RUNNING_MASK);
 			if( monitoring ) monitoring->addJobEvent( af::Monitor::EVT_jobs_change, getId(), getUid());
 			return;
 		}
 	}
-	if( getRunningTasksNumber() )
+	if (getRunningTasksNum())
 	{
-		AF_ERR << "runningtaskscounter = " << getRunningTasksNumber();
+		AF_ERR << "runningtaskscounter = " << getRunningTasksNum();
 		return;
 	}
 	
@@ -631,47 +631,6 @@ void JobAf::checkDepends()
 	if( depend_local || depend_global ) m_state = m_state | AFJOB::STATE_WAITDEP_MASK;
 }
 
-void JobAf::addRenderCounts( RenderAf * render)
-{
-	std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
-	std::list<int>::iterator cit = renders_counts.begin();
-	for( ; rit != renders_ptrs.end(); rit++, cit++)
-		if( render == *rit )
-		{
-			(*cit)++;
-			return;
-		}
-	renders_ptrs.push_back( render);
-	renders_counts.push_back( 1);
-}
-
-int JobAf::getRenderCounts( RenderAf * render) const
-{
-	std::list<RenderAf*>::const_iterator rit = renders_ptrs.begin();
-	std::list<int>::const_iterator cit = renders_counts.begin();
-	for( ; rit != renders_ptrs.end(); rit++, cit++)
-		if( render == *rit ) return *cit;
-	return 0;
-}
-
-void JobAf::remRenderCounts( RenderAf * render)
-{
-	std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
-	std::list<int>::iterator cit = renders_counts.begin();
-	for( ; rit != renders_ptrs.end(); rit++, cit++)
-		if( render == *rit )
-		{
-			if( *cit > 1 )
-				(*cit)--;
-			else
-			{
-				renders_ptrs.erase( rit);
-				renders_counts.erase( cit);
-			}
-			return;
-		}
-}
-
 af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring)
 {
 	// Job can set offline itself on some error in this recursive function
@@ -823,24 +782,6 @@ bool JobAf::v_canRun()
 		return false;
 	}
 	
-	// Zero priority turns job off:
-	if( m_priority == 0 )
-	{
-		return false;
-	}
-	
-	// check maximum running tasks:
-	if(( m_max_running_tasks >= 0 ) && ( getRunningTasksNumber() >= m_max_running_tasks ))
-	{
-		return false;
-	}
-	
-	// check maximum running tasks per host:
-	if(  m_max_running_tasks_per_host == 0 )
-	{
-		return false;
-	}
-	
 	return true;
 }
 
@@ -864,12 +805,6 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 			return false;
 	}
 
-	// check maximum running tasks per host:
-	if(( m_max_running_tasks_per_host  > 0 ) && ( getRenderCounts(i_render) >= m_max_running_tasks_per_host ))
-	{
-		return false;
-	}
-	
 	// check at least one block can run on render
 	bool blockCanRunOn = false;
 	for( int b = 0; b < m_blocks_num; b++)
@@ -882,18 +817,6 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	}
 	if( false == blockCanRunOn )
 		return false;
-	
-	// check hosts mask:
-	if( false == checkHostsMask( i_render->getName()))
-	{
-		return false;
-	}
-	
-	// check exclude hosts mask:
-	if( false == checkHostsMaskExclude( i_render->getName()))
-	{
-		return false;
-	}
 	
 	// check needed os:
 	if( false == checkNeedOS( i_render->getHost().m_os))
@@ -908,6 +831,30 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 	}
 	
 	return true;
+}
+
+void JobAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	AfNodeSolve::addSolveCounts(i_exec, i_render);
+	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
+
+	m_user->addSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_users_change, m_user->getId());
+
+	m_branch_srv->addSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
+}
+
+void JobAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	AfNodeSolve::remSolveCounts(i_exec, i_render);
+	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
+
+	m_user->remSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_users_change, m_user->getId());
+
+	m_branch_srv->remSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
 }
 
 RenderAf * JobAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
@@ -1053,7 +1000,7 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	{
 		for( int b = 0; b < m_blocks_num; b++)
 			m_blocks[b]->v_refresh( currentTime, renders, monitoring);
-		if( getRunningTasksNumber() == 0 ) deleteNode( NULL, monitoring);
+		if( getRunningTasksNum() == 0 ) deleteNode( NULL, monitoring);
 	}
 	if( isLocked() ) return;
 	
@@ -1232,10 +1179,10 @@ void JobAf::emitEvents(std::vector<std::string> events)
 void JobAf::v_calcNeed()
 {
 	// Need calculation based on running tasks number
-	if( af::Environment::getSolvingUseCapacity())
-		calcNeedResouces( getRunningCapacityTotal());
+	if (af::Environment::getSolvingUseCapacity())
+		calcNeedResouces(getRunningCapacityTotal());
 	else
-		calcNeedResouces( getRunningTasksNumber());
+		calcNeedResouces(getRunningTasksNum());
 }
 void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {

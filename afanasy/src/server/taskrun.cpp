@@ -26,9 +26,7 @@ TaskRun::TaskRun( Task * runningTask,
                   af::TaskProgress * taskProgress,
                   Block * taskBlock,
                   RenderAf * render,
-                  MonitorContainer * monitoring,
-                  int32_t * i_running_tasks_counter,
-                  int64_t * i_running_capacity_counter
+                  MonitorContainer * monitoring
                   ):
    m_task( runningTask),
    m_block( taskBlock),
@@ -36,13 +34,10 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress( taskProgress),
    m_tasknum( 0),
    m_hostId( 0),
-	m_running_tasks_counter( i_running_tasks_counter),
-	m_running_capacity_counter( i_running_capacity_counter),
    m_stopTime( 0),
    m_zombie( false)
 {
 	AF_DEBUG << "TaskRun::TaskRun: " << m_block->m_job->getName() << "[" << m_block->m_data->getBlockNum() << "][" << m_tasknum << "]:";
-	(*m_running_tasks_counter)++;
 
    m_progress->percent = -1;
    m_progress->frame = -1;
@@ -50,16 +45,14 @@ TaskRun::TaskRun( Task * runningTask,
    m_progress->hostname.clear();
 	m_progress->activity.clear();
 
-	// Let block increase renders counters.
-	// Needed to max run tasks per host limit.
-	// This block function also adds counts on its job.
-	m_block->addRenderCounts( render);
-
 	// Skip starting task if executable is not set (multihost task)
 	if( m_exec == NULL) return;
 
-	(*m_running_capacity_counter) += m_exec->getCapResult();
-	// - Multihost task will increase capacity counter itself.
+	// Let block increase renders counters.
+	// Needed to max run tasks per host limit.
+	// This block function also adds counts on its job.
+	m_block->addSolveCounts(monitoring, m_exec, render);
+	//^Multihost task will increase capacity counter itself.
 
    m_progress->state = AFJOB::STATE_RUNNING_MASK;
    m_progress->starts_count++;
@@ -326,22 +319,11 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
 		if( render )
 		{
 			render->taskFinished( m_exec, monitoring);
-			m_block->remRenderCounts( render);
+			m_block->remSolveCounts(monitoring, m_exec, render);
 		}
 
 	  	// Write database for statistics:
 		AFCommon::DBAddTask( m_exec, m_progress, m_block->m_job, render);
-
-		// Decrement counters:
-		if( *m_running_tasks_counter <= 0)
-			AF_ERR << "Tasks counter is zero or negative: " << *m_running_tasks_counter;
-		else
-			( *m_running_tasks_counter )--;
-
-		if( *m_running_capacity_counter <= 0)
-			AF_ERR << "Tasks capacity counter is zero or negative: " << *m_running_capacity_counter;
-		else
-			( *m_running_capacity_counter ) -= m_exec->getCapResult();
 
 		// Delete task executable:
 		delete m_exec;

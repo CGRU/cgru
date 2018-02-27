@@ -36,7 +36,7 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 	hostname             = afqt::stoq( user->getHostName());
 	numjobs              = user->getNumJobs();
-	numrunningtasks      = user->getRunningTasksNumber();
+	numrunningtasks      = user->getRunningTasksNum();
 	maxrunningtasks      = user->getMaxRunningTasks();
 	hostsmask            = afqt::stoq( user->getHostsMask());
 	hostsmask_exclude    = afqt::stoq( user->getHostsMaskExclude());

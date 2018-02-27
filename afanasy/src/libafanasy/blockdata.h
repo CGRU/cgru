@@ -239,11 +239,11 @@ public:
 	inline int getErrorsForgiveTime()         const { return m_errors_forgive_time;          }
 	inline int getTaskProgressChangeTimeout() const { return m_task_progress_change_timeout; }
 
-	inline int32_t * getRunningTasksCounter()      { return &m_running_tasks_counter;}
-	inline int32_t   getRunningTasksNumber() const { return  m_running_tasks_counter;}
+	inline int32_t getRunningTasksNumber()   const { return m_running_tasks_counter;    }
+	inline int64_t getRunningCapacityTotal() const { return m_running_capacity_counter; }
 
-	inline int64_t * getRunningCapacityCounter()      { return &m_running_capacity_counter;}
-	inline int64_t   getRunningCapacityTotal()  const { return  m_running_capacity_counter;}
+	void addSolveCounts(TaskExec * i_exec);
+	void remSolveCounts(TaskExec * i_exec);
 
 	bool updateProgress( JobProgress * progress);
 	inline const char * getProgressBar()          const { return p_progressbar;    }

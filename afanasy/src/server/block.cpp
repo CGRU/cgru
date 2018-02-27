@@ -15,6 +15,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
    m_job( blockJob),
@@ -200,7 +201,7 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
       }
    }
 
-   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
+   m_tasks[taskexec->getTaskNum()]->v_start( taskexec, render, monitoring);
 
    return true;
 }
@@ -208,14 +209,14 @@ bool Block::v_startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCont
 void Block::reconnectTask(af::TaskExec *i_taskexec, RenderAf & i_render, MonitorContainer * i_monitoring)
 {
 	Task * task = m_tasks[i_taskexec->getTaskNum()];
-	task->reconnect( i_taskexec, &i_render, i_monitoring, m_data->getRunningTasksCounter(), m_data->getRunningCapacityCounter());
+	task->reconnect( i_taskexec, &i_render, i_monitoring);
 }
 
 bool Block::canRunOn( RenderAf * render)
 {
    // check max running tasks on the same host:
    if(  m_data->getMaxRunTasksPerHost() == 0 ) return false;
-   if(( m_data->getMaxRunTasksPerHost()  > 0 ) && ( getRenderCounts(render) >= m_data->getMaxRunTasksPerHost() )) return false;
+	if((m_data->getMaxRunTasksPerHost() > 0) && (getRenderCount(render) >= m_data->getMaxRunTasksPerHost())) return false;
    // check available capacity:
    if( false == render->hasCapacity( m_data->getCapMinResult())) return false;
    // render services:
@@ -241,47 +242,64 @@ bool Block::canRunOn( RenderAf * render)
    return true;
 }
 
-void Block::addRenderCounts( RenderAf * render)
+void Block::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
-   m_job->addRenderCounts( render);
-   std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
-   std::list<int>::iterator cit = m_renders_counts.begin();
-   for( ; rit != m_renders_ptrs.end(); rit++, cit++)
-      if( render == *rit )
-      {
-         (*cit)++;
-         return;
-      }
-   m_renders_ptrs.push_back( render);
-   m_renders_counts.push_back( 1);
+	addRenderCount(i_render);
+
+	m_data->addSolveCounts(i_exec);
+
+	m_job->addSolveCounts(i_monitoring, i_exec, i_render);
 }
 
-int Block::getRenderCounts( RenderAf * render) const
+void Block::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
-   std::list<RenderAf*>::const_iterator rit = m_renders_ptrs.begin();
-   std::list<int>::const_iterator cit = m_renders_counts.begin();
-   for( ; rit != m_renders_ptrs.end(); rit++, cit++)
-      if( render == *rit ) return *cit;
-   return 0;
+	remRenderCount(i_render);
+
+	m_data->remSolveCounts(i_exec);
+
+	m_job->remSolveCounts(i_monitoring, i_exec, i_render);
 }
 
-void Block::remRenderCounts( RenderAf * render)
+void Block::addRenderCount(RenderAf * i_render)
 {
-   m_job->remRenderCounts( render);
-   std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
-   std::list<int>::iterator cit = m_renders_counts.begin();
-   for( ; rit != m_renders_ptrs.end(); rit++, cit++)
-      if( render == *rit )
-      {
-         if( *cit > 1 )
-            (*cit)--;
-         else
-         {
-			m_renders_ptrs.erase( rit);
-			m_renders_counts.erase( cit);
-         }
-         return;
-      }
+	std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
+	std::list<int>::iterator cit = m_renders_counts.begin();
+	for ( ; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit )
+		{
+			(*cit)++;
+			return;
+		}
+	m_renders_ptrs.push_back(i_render);
+	m_renders_counts.push_back(1);
+}
+
+int Block::getRenderCount(RenderAf * i_render) const
+{
+	std::list<RenderAf*>::const_iterator rit = m_renders_ptrs.begin();
+	std::list<int>::const_iterator cit = m_renders_counts.begin();
+	for ( ; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit)
+			return *cit;
+	return 0;
+}
+
+void Block::remRenderCount(RenderAf * i_render)
+{
+	std::list<RenderAf*>::iterator rit = m_renders_ptrs.begin();
+	std::list<int>::iterator cit = m_renders_counts.begin();
+	for( ; rit != m_renders_ptrs.end(); rit++, cit++)
+		if (i_render == *rit)
+		{
+			if (*cit > 1)
+				(*cit)--;
+			else
+			{
+				m_renders_ptrs.erase(rit);
+				m_renders_counts.erase(cit);
+			}
+			return;
+		}
 }
 
 bool Block::v_refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
