@@ -174,34 +174,24 @@ else:
     if Options.duration != '':
         auxargs.extend(['-t', Options.duration])
 
-    cmd_enc = cmd_enc.split(' ')
-    for arg_enc in cmd_enc:
-        if arg_enc[0] == '"':
-            arg_enc = arg_enc[1:]
-        if arg_enc[-1] == '"':
-            arg_enc = arg_enc[:-1]
+    avcmd = Options.avcmd
+    if StartNumber:
+        avcmd += ' -start_number ' + str(StartNumber)
 
-        arg_enc = arg_enc.replace('@MOVIEMAKER@', MOVIEMAKER)
-        arg_enc = arg_enc.replace('@CODECSDIR@', CODECSDIR)
-        arg_enc = arg_enc.replace('@FPS@', Options.fps)
-        arg_enc = arg_enc.replace('@CONTAINER@', Options.container)
-        arg_enc = arg_enc.replace('@OUTPUT@', Output)
+    cmd_enc = cmd_enc.replace('@AVCMD@', avcmd)
+    cmd_enc = cmd_enc.replace('@INPUT@', Input)
+    cmd_enc = cmd_enc.replace('@MOVIEMAKER@', MOVIEMAKER)
+    cmd_enc = cmd_enc.replace('@CODECSDIR@', CODECSDIR)
+    cmd_enc = cmd_enc.replace('@FPS@', Options.fps)
+    cmd_enc = cmd_enc.replace('@CONTAINER@', Options.container)
+    cmd_enc = cmd_enc.replace('@AUXARGS@', ' '.join(auxargs))
+    cmd_enc = cmd_enc.replace('@OUTPUT@', Output)
 
-        if arg_enc == '@AVCMD@':
-            args.append(Options.avcmd)
-            if StartNumber:
-                args.extend(['-start_number', str(StartNumber)])
-        elif arg_enc == '@INPUT@':
-            args.append( Input)
-        elif arg_enc == '@AUXARGS@':
-            args.extend(auxargs)
-        elif len(arg_enc):
-            args.append(arg_enc)
 
-print(' '.join(args))
+print(cmd_enc)
 
 try:
-    process = subprocess.Popen(args, shell=False, stderr=subprocess.PIPE)
+    process = subprocess.Popen(cmd_enc, shell=True, stderr=subprocess.PIPE)
 except Exception as e:
     print('Command execution error:')
     print(str(e))
