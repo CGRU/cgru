@@ -121,6 +121,7 @@ if Codec is None:
     Output = os.path.join(Output, imgname + '.%0' + str(Options.padding) + 'd.' + Options.type)
 
     args.append(Output)
+    cmd = ' '.join(args)
 
 else:
     args = []
@@ -135,8 +136,8 @@ else:
     with open(Codec) as f:
         lines = f.readlines()
 
-    cmd_enc = lines[len(lines) - 1].strip()
-    if len(cmd_enc) < 2:
+    cmd = lines[len(lines) - 1].strip()
+    if len(cmd) < 2:
         print('Invalid encode file "%s"' % Codec)
         sys.exit(1)
 
@@ -178,20 +179,20 @@ else:
     if StartNumber:
         avcmd += ' -start_number ' + str(StartNumber)
 
-    cmd_enc = cmd_enc.replace('@AVCMD@', avcmd)
-    cmd_enc = cmd_enc.replace('@INPUT@', Input)
-    cmd_enc = cmd_enc.replace('@MOVIEMAKER@', MOVIEMAKER)
-    cmd_enc = cmd_enc.replace('@CODECSDIR@', CODECSDIR)
-    cmd_enc = cmd_enc.replace('@FPS@', Options.fps)
-    cmd_enc = cmd_enc.replace('@CONTAINER@', Options.container)
-    cmd_enc = cmd_enc.replace('@AUXARGS@', ' '.join(auxargs))
-    cmd_enc = cmd_enc.replace('@OUTPUT@', Output)
+    cmd = cmd.replace('@AVCMD@', avcmd)
+    cmd = cmd.replace('@INPUT@', Input)
+    cmd = cmd.replace('@MOVIEMAKER@', MOVIEMAKER)
+    cmd = cmd.replace('@CODECSDIR@', CODECSDIR)
+    cmd = cmd.replace('@FPS@', Options.fps)
+    cmd = cmd.replace('@CONTAINER@', Options.container)
+    cmd = cmd.replace('@AUXARGS@', ' '.join(auxargs))
+    cmd = cmd.replace('@OUTPUT@', Output)
 
 
-print(cmd_enc)
+print(cmd)
 
 try:
-    process = subprocess.Popen(cmd_enc, shell=True, stderr=subprocess.PIPE)
+    process = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
 except Exception as e:
     print('Command execution error:')
     print(str(e))
