@@ -37,12 +37,14 @@ BranchNode.prototype.init = function() {
 	this.element.appendChild(this.elName);
 	this.elName.title = 'User Name';
 
-	this.elWork = cm_ElCreateFloatText(this.element,'right');
+	this.elWorkParams = cm_ElCreateFloatText(this.element,'right');
 
 	this.element.appendChild(document.createElement('br'));
 
 	this.elBranchedCounts = cm_ElCreateFloatText(this.element, 'left', 'Branches: All/Running');
 	this.elJobsCounts = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
+
+	this.elRunningCounts = cm_ElCreateFloatText(this.element,'right');
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
@@ -85,7 +87,9 @@ BranchNode.prototype.update = function(i_obj) {
 		name = cm_PathBase(name);
 	this.elName.innerHTML = '<b>' + name + '/</b>';
 
-	this.elWork.innerHTML = work_generateParamsString(this.params,'branch');
+	this.elWorkParams.innerHTML = work_generateParamsString(this.params,'branch');
+
+	this.elRunningCounts.innerHTML = work_generateRunningCountsString(this.params,'branch');
 
 	if (cm_IsPadawan())
 	{

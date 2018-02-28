@@ -264,41 +264,41 @@ af::Msg * BranchSrv::writeJobdsOrder(bool i_binary) const
 
 void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-//	bool changed = refreshCounters();
 	bool changed = false;
 
 	std::list<af::Job*> _active_jobs_list;
+
+	int32_t _running_tasks_num = 0;
+	int64_t _running_capacity_total = 0;
+
 	AfListIt it(&m_jobs_list);
 	for (AfNodeSrv *node = it.node(); node != NULL; it.next(), node = it.node())
 	{
 		JobAf * job = (JobAf*)node;
 
-		if (job->isDone())
+		if(job->getRunningTasksNum() == 0)
 			continue;
 
-		if (job->isOffline())
-			continue;
+		_running_tasks_num += job->getRunningTasksNum();
+		_running_capacity_total += job->getRunningCapacityTotal();
 
 		_active_jobs_list.push_back((af::Job*)job);
 	}
 
-	if (_active_jobs_list != m_active_jobs_list)
+	if ((_running_capacity_total != m_running_capacity_total) ||
+		(     _running_tasks_num != m_running_tasks_num     ) ||
+		(      _active_jobs_list != m_active_jobs_list      ))
 		changed = true;
 
-	m_active_jobs_list = _active_jobs_list;
+	m_running_tasks_num      = _running_tasks_num;
+	m_running_capacity_total = _running_capacity_total;
+	m_active_jobs_list       = _active_jobs_list;
 
 	if (changed && monitoring)
 		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
 
 	// Update solving parameters:
 //	v_calcNeed();
-}
-
-bool BranchSrv::refreshCounters()
-{
-	bool changed = false;
-
-	return changed;
 }
 
 void BranchSrv::v_calcNeed()

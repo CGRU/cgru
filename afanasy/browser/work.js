@@ -78,6 +78,30 @@ function work_generateParamsString(i_params, i_type)
 	return str;
 }
 
+function work_generateRunningCountsString(i_params, i_type)
+{
+	var str = '';
+
+	if (i_type == null)
+		i_type = 'branch';
+
+	if (cm_IsPadawan())
+	{
+		if (i_params.running_tasks_num)
+			str += "Running Tasks:<b>" + i_params.running_tasks_num + "</b>"
+		if (i_params.running_capacity_total)
+			str += " Capacity:<b>" + i_params.running_capacity_total + "</b>"
+	}
+	else if (cm_IsJedi())
+	{
+	}
+	else
+	{
+	}
+
+	return str;
+}
+
 function work_CreatePanels(i_monitor, i_type)
 {
 	var elPanelL = i_monitor.elPanelL;

@@ -86,8 +86,6 @@ protected:
 	void v_calcNeed();
 
 private:
-	bool refreshCounters();
-
 	void deleteNode(MonitorContainer * i_monitoring);
 
 private:

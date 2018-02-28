@@ -95,7 +95,7 @@ void Work::jsonWrite( std::ostringstream & o_str, int i_type) const
 	if (m_running_tasks_num > 0)
 		o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
 	if (m_running_capacity_total> 0)
-		o_str << ",\n\"m_running_capacity_total\":" << m_running_capacity_total;
+		o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;
 }
 
 void Work::addRunTasksCounts(TaskExec * i_exec)
