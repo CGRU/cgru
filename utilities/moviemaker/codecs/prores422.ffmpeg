@@ -1,2 +1,2 @@
 ProRes422 10Bit
-@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec prores_ks -profile:v 3 -pix_fmt yuv422p10le -r @FPS@ "@OUTPUT@.mov"
+@AVCMD@ -y -r @FPS@ -i "@INPUT@" @AUXARGS@ -vcodec prores -profile:v 3 -pix_fmt yuv422p10le -metadata:s:v encoder="Apple ProRes 422" -r @FPS@ "@OUTPUT@.mov"
