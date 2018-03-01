@@ -58,7 +58,7 @@ function work_generateParamsString(i_params, i_type)
 			str += " Exclude:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
 			str += " Slv:<b>" + i_params.solve_method + "</b>";
-		str += " Pri:<b>" + i_params.priority + "</b>"
+        str += " Pri:<b>" + i_params.priority + "</b>";
 	}
 	else
 	{
@@ -72,7 +72,7 @@ function work_generateParamsString(i_params, i_type)
 			str += " e:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
 			str += " <b>" + i_params.solve_method + "</b>";
-		str += " <b>" + i_params.priority + "</b>"
+        str += " <b>" + i_params.priority + "</b>";
 	}
 
 	return str;
@@ -88,9 +88,9 @@ function work_generateRunningCountsString(i_params, i_type)
 	if (cm_IsPadawan())
 	{
 		if (i_params.running_tasks_num)
-			str += "Running Tasks:<b>" + i_params.running_tasks_num + "</b>"
+			str += "Running Tasks:<b>" + i_params.running_tasks_num + "</b>";
 		if (i_params.running_capacity_total)
-			str += " Capacity:<b>" + i_params.running_capacity_total + "</b>"
+            str += " Capacity:<b>" + i_params.running_capacity_total + "</b>";
 	}
 	else if (cm_IsJedi())
 	{

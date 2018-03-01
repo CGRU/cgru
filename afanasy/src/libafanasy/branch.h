@@ -21,31 +21,29 @@
 
 namespace af
 {
-class Branch: public Work
+class Branch : public Work
 {
 public:
+	Branch(const std::string &i_path);
 
-	Branch(const std::string & i_path);
-
-	Branch(Msg * msg);
+	Branch(Msg *msg);
 
 	// To construct from store:
 	Branch(int i_id = 0);
 
 	virtual ~Branch();
 
-	inline const std::string & getParentPath() const {return m_parent_path;}
+	inline const std::string &getParentPath() const { return m_parent_path; }
 
-	void v_generateInfoStream(std::ostringstream & stream, bool full = false) const;
+	void v_generateInfoStream(std::ostringstream &stream, bool full = false) const;
 
-	virtual void v_jsonWrite(std::ostringstream & o_str, int i_type) const;
+	virtual void v_jsonWrite(std::ostringstream &o_str, int i_type) const;
 
-	bool jsonRead(const JSON & i_object, std::string * io_changes = NULL);
+	bool jsonRead(const JSON &i_object, std::string *io_changes = NULL);
 
-	static const std::string FilterPath(const std::string & i_path);
+	static const std::string FilterPath(const std::string &i_path);
 
 protected:
-
 	std::string m_parent_path;
 
 	int32_t m_branches_num;
@@ -53,16 +51,14 @@ protected:
 	int32_t m_jobs_num;
 	int32_t m_jobs_total;
 
-	std::list<af::Job*> m_active_jobs_list;
+	std::list<af::Job *> m_active_jobs_list;
 
 	int64_t m_time_creation;
 	int64_t m_time_empty;
 
 private:
-
-	void v_readwrite(Msg * msg);
+	void v_readwrite(Msg *msg);
 
 	void initDefaultValues();
 };
 }
-

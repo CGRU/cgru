@@ -44,7 +44,7 @@ BranchNode.prototype.init = function() {
 	this.elBranchedCounts = cm_ElCreateFloatText(this.element, 'left', 'Branches: All/Running');
 	this.elJobsCounts = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
 
-	this.elRunningCounts = cm_ElCreateFloatText(this.element,'right');
+	this.elRunningCounts = cm_ElCreateFloatText(this.element, 'right');
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild(this.elAnnotation);
