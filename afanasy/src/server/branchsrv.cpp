@@ -266,39 +266,60 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 {
 	bool changed = false;
 
-	std::list<af::Job*> _active_jobs_list;
-
+	int32_t _branches_num = 0;
+	int32_t _branches_total = 0;
+	int32_t _jobs_num = 0;
+	int32_t _jobs_total = 0;
 	int32_t _running_tasks_num = 0;
 	int64_t _running_capacity_total = 0;
+	std::list<af::Job*> _active_jobs_list;
 
-	AfListIt it(&m_jobs_list);
-	for (AfNodeSrv *node = it.node(); node != NULL; it.next(), node = it.node())
+	AfListIt bIt(&m_branches_list);
+	for (AfNodeSrv * node = bIt.node(); node != NULL; bIt.next(), node = bIt.node())
+	{
+		BranchSrv * branch = (BranchSrv*)node;
+
+		_branches_num++;
+		_branches_total++;
+		_running_tasks_num += branch->getRunningTasksNum();
+		_running_capacity_total += branch->getRunningCapacityTotal();
+	}
+
+	AfListIt jIt(&m_jobs_list);
+	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
 	{
 		JobAf * job = (JobAf*)node;
+
+		_jobs_num++;
+		_jobs_total++;
 
 		if(job->getRunningTasksNum() == 0)
 			continue;
 
 		_running_tasks_num += job->getRunningTasksNum();
 		_running_capacity_total += job->getRunningCapacityTotal();
-
 		_active_jobs_list.push_back((af::Job*)job);
 	}
 
-	if ((_running_capacity_total != m_running_capacity_total) ||
-		(     _running_tasks_num != m_running_tasks_num     ) ||
-		(      _active_jobs_list != m_active_jobs_list      ))
+	if ((_branches_num           != m_branches_num          ) ||
+		(_branches_total         != m_branches_total        ) ||
+		(_jobs_num               != m_jobs_num              ) ||
+		(_jobs_total             != m_jobs_total            ) ||
+		(_running_capacity_total != m_running_capacity_total) ||
+		(_running_tasks_num      != m_running_tasks_num     ) ||
+		(_active_jobs_list       != m_active_jobs_list      ))
 		changed = true;
 
+	m_branches_num           = _branches_num;
+	m_branches_total         = _branches_total;
+	m_jobs_num               = _jobs_num;
+	m_jobs_total             = _jobs_total;
 	m_running_tasks_num      = _running_tasks_num;
 	m_running_capacity_total = _running_capacity_total;
 	m_active_jobs_list       = _active_jobs_list;
 
 	if (changed && monitoring)
 		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
-
-	// Update solving parameters:
-//	v_calcNeed();
 }
 
 void BranchSrv::v_calcNeed()
@@ -320,6 +341,23 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 	// Node was not solved
 	return NULL;
 }
+
+void BranchSrv::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	AfNodeSolve::addSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_branches_change, getId());
+	if (m_parent)
+		m_parent->addSolveCounts(i_monitoring, i_exec, i_render);
+}
+
+void BranchSrv::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	AfNodeSolve::remSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_branches_change, getId());
+	if (m_parent)
+		m_parent->remSolveCounts(i_monitoring, i_exec, i_render);
+}
+
 
 int BranchSrv::v_calcWeight() const
 {

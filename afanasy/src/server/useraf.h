@@ -66,6 +66,9 @@ public:
 
 	void logAction( const Action & i_action, const std::string & i_node_name);
 
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+
 protected:
 	void v_calcNeed();
 

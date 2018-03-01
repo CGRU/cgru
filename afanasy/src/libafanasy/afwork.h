@@ -40,7 +40,7 @@ public:
 	void jsonRead(const JSON & i_object, std::string * io_changes = NULL);
 	void jsonWrite(std::ostringstream & o_str, int i_type) const;
 
-	inline bool solveJobsParallel() const { return SolveByPriority == m_solve_method; }
+	inline int getSolveMethod() const { return m_solve_method; }
 
 	inline int getMaxRunningTasks()    const { return m_max_running_tasks;}
 	inline int getMaxRunTasksPerHost() const { return m_max_running_tasks_per_host;}

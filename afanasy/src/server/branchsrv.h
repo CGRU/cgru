@@ -59,6 +59,9 @@ public:
 	/// Generate task for \c render from list, return \c render if task generated or NULL.
 	virtual RenderAf * v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring); 
 
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+
 	void jobsinfo(af::MCAfNodes &mcjobs); ///< Generate all branch jobs information.
 	
 	bool getJobs(std::ostringstream & o_str);

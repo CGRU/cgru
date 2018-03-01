@@ -199,10 +199,6 @@ RenderAf * AfNodeSolve::trySolve( std::list<RenderAf*> & i_renders_list, Monitor
 	// Store solve cycle
 	m_solve_cycle = sm_solve_cycle;
 
-	// Calculace new need value as node got some more resource
-	// ( nodes shoud increment resource value in solve function )
-	v_calcNeed();
-
 	// Icrement solve cycle
 	sm_solve_cycle++;
 

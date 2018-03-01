@@ -241,9 +241,6 @@ void UserAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContai
 
 	if( changed && monitoring )
 		monitoring->addEvent( af::Monitor::EVT_users_change, m_id);
-
-	// Update solving parameters:
-	v_calcNeed();
 }
 
 bool UserAf::refreshCounters()
@@ -313,32 +310,20 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 
 RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
-	af::Work::SolvingMethod solve_method = af::Work::SolveByOrder;
+	std::list<AfNodeSolve*> solve_list(m_jobslist.getStdList());
+	return Solver::SolveList(solve_list, i_renders_list, m_solve_method);
+}
 
-	if( solveJobsParallel())
-	{
-		solve_method = af::Work::SolveByPriority;
-	}
+void UserAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	AfNodeSolve::addSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_users_change, getId());
+}
 
-	std::list<AfNodeSolve*> solve_list( m_jobslist.getStdList());
-/*
-	RenderAf * render = Solver::SolveList( solve_list, i_renders_list, solve_method);
-
-	if( render )
-	{
-		// Increase running tasks / total capacity if render is online
-		// It can be offline for WOL wake test
-		if( render->isOnline())
-			refreshCounters();
-
-		// Return solved render
-		return render;
-	}
-
-	// Node was not solved
-	return NULL;
-*/
-	return Solver::SolveList( solve_list, i_renders_list, solve_method);
+void UserAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+{
+	AfNodeSolve::remSolveCounts(i_exec, i_render);
+	i_monitoring->addEvent(af::Monitor::EVT_users_change, getId());
 }
 
 int UserAf::v_calcWeight() const

@@ -175,13 +175,16 @@ void Solver::solve()
 		render->solvingFinished();
 }
 
-RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Work::SolvingMethod i_method)
+RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, int32_t i_method)
 {
 	// Remove nodes that need no solving at all (done, offline, ...)
 	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
 		if((*it)->canRun())
+		{
+			(*it)->v_calcNeed();
 			it++;
+		}
 		else
 			it = i_list.erase( it);
 	}

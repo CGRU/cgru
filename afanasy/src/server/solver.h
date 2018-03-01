@@ -24,7 +24,7 @@ public:
 
 	void solve();
 
-	static RenderAf * SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, af::Work::SolvingMethod i_method);
+	static RenderAf * SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, int32_t i_method);
 
 private:
 	static JobContainer     * ms_jobcontainer;

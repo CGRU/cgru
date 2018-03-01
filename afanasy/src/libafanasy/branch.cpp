@@ -45,7 +45,9 @@ Branch::Branch(int i_id)
 void Branch::initDefaultValues()
 {
 	m_branches_num = 0;
+	m_branches_total = 0;
 	m_jobs_num = 0;
+	m_jobs_total = 0;
 
 	m_solve_method = Work::SolveByPriority;
 
@@ -79,14 +81,17 @@ void Branch::v_jsonWrite(std::ostringstream & o_str, int i_type) const
 
 	o_str << ",\n\"time_creation\":" << m_time_creation;
 	o_str << ",\n\"time_empty\":" << m_time_empty;
-	o_str << ",\n\"branches_num\":" << m_branches_num;
 
 	o_str << ",\n\"parent\":\"" << m_parent_path << "\"";
 
-	if( m_jobs_num > 0 )
+	if (m_branches_num > 0 )
+		o_str << ",\n\"branches_num\":" << m_branches_num;
+	if (m_branches_total > 0 )
+		o_str << ",\n\"branches_total\":" << m_branches_total;
+	if (m_jobs_num > 0 )
 		o_str << ",\n\"jobs_num\":" << m_jobs_num;
-	if( m_branches_num > 0 )
-		o_str << ",\n\"branches_num\":" << m_branches_num;;
+	if (m_jobs_total > 0 )
+		o_str << ",\n\"jobs_total\":" << m_jobs_total;
 
 	o_str << ",\n\"active_jobs\":[";
 	std::list<Job*>::const_iterator it = m_active_jobs_list.begin();
@@ -125,7 +130,6 @@ bool Branch::jsonRead(const JSON &i_object, std::string * io_changes)
 
 	jr_int64("time_creation", m_time_creation, i_object);
 	jr_int64("time_empty",    m_time_empty,    i_object);
-	jr_int32("branches_num",  m_branches_num,  i_object);
 
 	jr_string("parent",       m_parent_path,   i_object);
 

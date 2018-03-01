@@ -835,26 +835,20 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 
 void JobAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
+	m_user->addSolveCounts(i_monitoring, i_exec, i_render);
+	m_branch_srv->addSolveCounts(i_monitoring, i_exec, i_render);
+
 	AfNodeSolve::addSolveCounts(i_exec, i_render);
 	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
-
-	m_user->addSolveCounts(i_exec, i_render);
-	i_monitoring->addEvent(af::Monitor::EVT_users_change, m_user->getId());
-
-	m_branch_srv->addSolveCounts(i_exec, i_render);
-	i_monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
 }
 
 void JobAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
+	m_user->remSolveCounts(i_monitoring, i_exec, i_render);
+	m_branch_srv->remSolveCounts(i_monitoring, i_exec, i_render);
+
 	AfNodeSolve::remSolveCounts(i_exec, i_render);
 	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
-
-	m_user->remSolveCounts(i_exec, i_render);
-	i_monitoring->addEvent(af::Monitor::EVT_users_change, m_user->getId());
-
-	m_branch_srv->remSolveCounts(i_exec, i_render);
-	i_monitoring->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
 }
 
 RenderAf * JobAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
@@ -1142,9 +1136,6 @@ void JobAf::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContain
 	}
 	
 	if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
-	
-	// Update solving parameters:
-	v_calcNeed();
 }
 
 void JobAf::emitEvents(std::vector<std::string> events)

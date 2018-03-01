@@ -25,6 +25,10 @@ public:
 	/// Virtual function to tune for each node type:
 	virtual bool v_canRunOn(RenderAf * i_render);
 
+	/// Virtual function to calculate need.
+	/** Node should define what resource shoud be passed for need calculation.**/
+	virtual void v_calcNeed();
+
 	// Try to solve a node, v_solve is called there:
 	RenderAf * trySolve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring);
 
@@ -47,10 +51,6 @@ protected:
 	/// General need calculation function,
 	/** Some resources should be passed to its algorithm.**/
 	void calcNeedResouces( int i_resourcesquantity);
-
-	/// Virtual function to calculate need.
-	/** Node should define what resource shoud be passed for need calculation.**/
-	virtual void v_calcNeed();
 
 private:
 	/// Renders counts manipulations (for max run tasks per host)

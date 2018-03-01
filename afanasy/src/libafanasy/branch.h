@@ -49,7 +49,9 @@ protected:
 	std::string m_parent_path;
 
 	int32_t m_branches_num;
+	int32_t m_branches_total;
 	int32_t m_jobs_num;
+	int32_t m_jobs_total;
 
 	std::list<af::Job*> m_active_jobs_list;
 

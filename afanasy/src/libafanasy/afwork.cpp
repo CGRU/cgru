@@ -107,12 +107,12 @@ void Work::addRunTasksCounts(TaskExec * i_exec)
 void Work::remRunTasksCounts(TaskExec * i_exec)
 {
 	if (m_running_tasks_num <= 0)
-		AF_ERR << "Tasks counter is zero or negative: " << m_running_tasks_num;
+		AF_ERR << getName() << "[" << getId() << "]: Tasks counter is zero or negative: " << m_running_tasks_num;
 	else
 		m_running_tasks_num--;
 
 	if (m_running_capacity_total <= 0)
-		AF_ERR << "Tasks capacity counter is zero or negative: " << m_running_capacity_total;
+		AF_ERR << getName() << "[" << getId() << "]: Tasks capacity counter is zero or negative: " << m_running_capacity_total;
 	else
 		m_running_capacity_total -= i_exec->getCapResult();
 }
