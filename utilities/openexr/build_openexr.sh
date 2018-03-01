@@ -9,7 +9,7 @@ LDFLAGS="-L/lib64 -L/usr/lib64 -L$prefix/lib -L$prefix/lib64 -lpthread"
 export CPPFLAGS
 export LDFLAGS
 
-cd openexr*
+cd openexr*/
 
 if [ ! -z $1 ] ; then
    ./configure -h; exit
