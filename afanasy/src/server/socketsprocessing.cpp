@@ -524,7 +524,7 @@ void SocketItem::checkClosed()
 		return;
 	}
 
-	static const char buf[] = "AFCLOSE";
+	static const char buf[] = " \n";
 	int r = send( m_sfd, buf, 1, MSG_DONTWAIT);
 //AF_DEBUG << "r=" << r << " : " << this;
 	if( r == -1 )
