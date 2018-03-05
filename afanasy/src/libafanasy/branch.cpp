@@ -44,12 +44,13 @@ Branch::Branch(int i_id)
 
 void Branch::initDefaultValues()
 {
+	m_flags_branch = 0;
+	m_solve_method = Work::SolveByPriority;
+
 	m_branches_num = 0;
 	m_branches_total = 0;
 	m_jobs_num = 0;
 	m_jobs_total = 0;
-
-	m_solve_method = Work::SolveByPriority;
 
 	m_time_creation = 0;
 	m_time_empty = 0;
@@ -64,11 +65,14 @@ void Branch::v_readwrite(Msg *msg)
 	Node::v_readwrite(msg);
 	Work::readwrite(msg);
 
-	rw_int64_t(m_time_creation, msg);
-	rw_int64_t(m_time_empty, msg);
+	rw_int8_t(m_flags_branch, msg);
+
 	rw_int32_t(m_branches_num, msg);
 
 	rw_String(m_parent_path, msg);
+
+	rw_int64_t(m_time_creation, msg);
+	rw_int64_t(m_time_empty,    msg);
 }
 
 void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -78,6 +82,8 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 	Node::v_jsonWrite(o_str, i_type);
 
 	Work::jsonWrite(o_str, i_type);
+
+	if(isCreateChilds()) o_str << ",\n\"create_childs\":true";
 
 	o_str << ",\n\"time_creation\":" << m_time_creation;
 	o_str << ",\n\"time_empty\":" << m_time_empty;
@@ -120,6 +126,10 @@ bool Branch::jsonRead(const JSON &i_object, std::string *io_changes)
 	// jr_int32 ("jobs_life_time",        m_jobs_life_time,        i_object, io_changes);
 
 	Work::jsonRead(i_object, io_changes);
+
+	bool _createChilds = false;
+	jr_bool("create_childs", _createChilds, i_object, io_changes);
+	setCreateChilds(_createChilds);
 
 	// Paramers below are not editable and read only on creation
 	// When use edit parameters, log provided to store changes

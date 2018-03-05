@@ -1336,7 +1336,9 @@ JobNode.prototype.updatePanels = function() {
 
 
 	// Info:
-	var info = 'S/N: ' + this.params.serial;
+	var info = 'ID:' + this.params.id;
+	info += ' S/N:' + this.params.serial;
+	info += '<br>Branch:<br> ' + this.params.branch;
 	info += '<br>Created:<br> ' + cm_DateTimeStrFromSec(this.params.time_creation);
 	if (this.params.time_started)
 		info += '<br>Started:<br> ' + cm_DateTimeStrFromSec(this.params.time_started);

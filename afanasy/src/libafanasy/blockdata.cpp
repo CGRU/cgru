@@ -544,9 +544,6 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_String(m_custom_data, msg);
 			rw_StringVect(m_files, msg);
 			rw_StringMap(m_environment, msg);
-			/// NEW VERSION
-			rw_int64_t(m_time_started, msg);
-			rw_int64_t(m_time_done, msg);
 
 		case Msg::TJobsList:
 			rw_int64_t(m_flags, msg);
@@ -583,17 +580,11 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int32_t(m_errors_forgive_time, msg);
 			rw_int32_t(m_task_progress_change_timeout, msg);
 			rw_uint32_t(m_tasks_max_run_time, msg);
-			/// NEW VERSION
-			rw_int64_t(m_time_started, msg);
-			rw_int64_t(m_time_done, msg);
 
 		case Msg::TBlocksProgress:
 
 			rw_int32_t(m_running_tasks_counter, msg);
-
-			/* NEW VERSION
-			rw_int64_t ( m_running_capacity_counter, msg);
-			*/
+			rw_int64_t(m_running_capacity_counter, msg);
 
 			rw_uint8_t(p_percentage, msg);
 			rw_int32_t(p_error_hosts, msg);

@@ -575,6 +575,9 @@ const char * Msg::TNAMES[]=
 	"TUsersList",                 ///< Active users information.
 	"TUserJobsOrder",             ///< Jobs ids in server list order.
 
+	/*- Branches messages -*/
+	"TBranchesList",              ///< Branches nodes list.
+
 	/*- Job messages -*/
 	"TJobsList",                  ///< Jobs list information.
 	"TJobProgress",               ///< Jobs progress.

@@ -45,9 +45,16 @@ Work::~Work()
 
 void Work::readwrite(Msg *msg)
 {
-	/*
-	   NEW VERSION
-	*/
+	rw_int32_t(m_solve_method, msg);
+
+	rw_int32_t(m_max_running_tasks,          msg);
+	rw_int32_t(m_max_running_tasks_per_host, msg);
+
+	rw_RegExp(m_hosts_mask,            msg);
+	rw_RegExp(m_hosts_mask_exclude,    msg);
+
+	rw_int32_t(m_running_tasks_num,      msg);
+	rw_int64_t(m_running_capacity_total, msg);
 }
 
 void Work::jsonRead(const JSON &i_object, std::string *io_changes)

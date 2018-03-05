@@ -41,6 +41,7 @@ BranchNode.prototype.init = function() {
 
 	this.element.appendChild(document.createElement('br'));
 
+	this.elFlags = cm_ElCreateFloatText(this.element, 'left', 'Flags');
 	this.elBranchedCounts = cm_ElCreateFloatText(this.element, 'left', 'Branches: All/Running');
 	this.elJobsCounts = cm_ElCreateFloatText(this.element, 'left', 'Jobs: All/Running');
 
@@ -90,6 +91,11 @@ BranchNode.prototype.update = function(i_obj) {
 	this.elWorkParams.innerHTML = work_generateParamsString(this.params, 'branch');
 
 	this.elRunningCounts.innerHTML = work_generateRunningCountsString(this.params, 'branch');
+
+	var flags = '';
+	if (this.params.create_childs)
+		flags += ' <b>CC</b>';
+	this.elFlags.innerHTML = flags;
 
 	if (cm_IsPadawan())
 	{
@@ -206,6 +212,28 @@ BranchNode.prototype.refresh = function() {
 BranchNode.createPanels = function(i_monitor) {
 	// Work:
 	work_CreatePanels(i_monitor, 'branches');
+
+	// Solving:
+	var acts = {};
+	acts.create_childs = {
+		'name': 'create_childs',
+		'value': true,
+		'label': 'CC',
+		'tooltip': 'Create childs.',
+		'handle': 'mh_Param'
+	};
+
+	acts.do_not_create_childs = {
+		'name': 'create_childs',
+		'value': false,
+		'label': 'DNC',
+		'tooltip': 'Do not create childs.',
+		'handle': 'mh_Param'
+	};
+
+	acts.delete = {"label": "DEL", "tooltip": 'Double click to delete branch.', "ondblclick": true};
+
+	i_monitor.createCtrlBtns(acts);
 };
 
 BranchNode.prototype.updatePanels = function() {

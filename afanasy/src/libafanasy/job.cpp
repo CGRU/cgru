@@ -317,48 +317,42 @@ Job::~Job()
 void Job::v_readwrite( Msg * msg)
 {
 	Node::v_readwrite( msg);
-	Work::readwrite( msg);
-	/* NEW VERSION
-	rw_int64_t ( m_serial, msg);
-	*/
+	Work::readwrite(   msg);
 
-	rw_int32_t ( m_blocks_num,                 msg);
-	rw_int64_t ( m_flags,                      msg);
-	rw_int64_t ( m_state,                      msg);
-	rw_int32_t ( m_max_running_tasks,          msg);
-	rw_int32_t ( m_max_running_tasks_per_host, msg);
-	rw_int32_t ( m_user_list_order,            msg);
-	rw_int64_t ( m_time_creation,              msg);
-	rw_int64_t ( m_time_wait,                  msg);
-	rw_int64_t ( m_time_started,               msg);
-	rw_int64_t ( m_time_done,                  msg);
-	rw_int32_t ( m_time_life,                  msg);
+	rw_int64_t(m_serial,     msg);
+	rw_int64_t(m_flags,      msg);
+	rw_int64_t(m_state,      msg);
 
-	rw_String ( m_user_name,    msg);
-	rw_String ( m_host_name,    msg);
-	rw_String ( m_command_pre,  msg);
-	rw_String ( m_command_post, msg);
-	rw_String ( m_annotation,   msg);
-	rw_String ( m_report,       msg);
-	rw_String ( m_description,  msg);
-	rw_String ( m_custom_data,  msg);
-	rw_String ( m_thumb_path,   msg);
-	rw_String ( m_project,      msg);
-	rw_String ( m_department,   msg);
-	/* NEW VERSION
-	rw_String ( m_branch,       msg);
-	*/
+	rw_int32_t(m_blocks_num,      msg);
+	rw_int32_t(m_user_list_order, msg);
 
-	rw_RegExp ( m_hosts_mask,         msg);
-	rw_RegExp ( m_hosts_mask_exclude, msg);
-	rw_RegExp ( m_depend_mask,        msg);
-	rw_RegExp ( m_depend_mask_global, msg);
-	rw_RegExp ( m_need_os,            msg);
-	rw_RegExp ( m_need_properties,    msg);
+	rw_int64_t(m_time_creation, msg);
+	rw_int64_t(m_time_wait,     msg);
+	rw_int64_t(m_time_started,  msg);
+	rw_int64_t(m_time_done,     msg);
+	rw_int32_t(m_time_life,     msg);
 
-	rw_StringMap( m_folders, msg);
+	rw_String(m_user_name,    msg);
+	rw_String(m_host_name,    msg);
+	rw_String(m_command_pre,  msg);
+	rw_String(m_command_post, msg);
+	rw_String(m_annotation,   msg);
+	rw_String(m_report,       msg);
+	rw_String(m_description,  msg);
+	rw_String(m_custom_data,  msg);
+	rw_String(m_thumb_path,   msg);
+	rw_String(m_project,      msg);
+	rw_String(m_department,   msg);
+	rw_String(m_branch,       msg);
 
-	rw_blocks(  msg);
+	rw_RegExp(m_depend_mask,        msg);
+	rw_RegExp(m_depend_mask_global, msg);
+	rw_RegExp(m_need_os,            msg);
+	rw_RegExp(m_need_properties,    msg);
+
+	rw_StringMap(m_folders, msg);
+
+	rw_blocks(msg);
 }
 
 void Job::rw_blocks( Msg * msg)

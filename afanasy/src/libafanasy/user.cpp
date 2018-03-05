@@ -139,7 +139,6 @@ void User::v_readwrite( Msg * msg)
 	rw_int64_t ( m_flags,                 msg);
 	rw_int64_t ( m_time_activity,         msg);
 	rw_String  ( m_host_name,             msg);
-	rw_int32_t ( m_max_running_tasks,     msg);
 	rw_uint8_t ( m_errors_retries,        msg);
 	rw_uint8_t ( m_errors_avoid_host,     msg);
 	rw_uint8_t ( m_errors_task_same_host, msg);
@@ -147,17 +146,11 @@ void User::v_readwrite( Msg * msg)
 	rw_int64_t ( m_time_register,         msg);
 	rw_int32_t ( m_jobs_life_time,        msg);
 
-	// NEW VERSION
-	rw_int32_t ( m_jobs_num,              msg);
-	rw_int32_t ( m_running_jobs_num,      msg);
-	rw_int32_t ( m_running_tasks_num,     msg);
-	/* NEW VERSION
-	rw_int64_t ( m_running_capacity_total,msg);
-	*/
-	rw_RegExp  ( m_hosts_mask,            msg);
-	rw_RegExp  ( m_hosts_mask_exclude,    msg);
 	rw_String  ( m_annotation,            msg);
 	rw_String  ( m_custom_data,           msg);
+
+	rw_int32_t ( m_jobs_num,              msg);
+	rw_int32_t ( m_running_jobs_num,      msg);
 }
 
 int User::v_calcWeight() const

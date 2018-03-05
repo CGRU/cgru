@@ -110,8 +110,12 @@ bool BranchSrv::initialize()
 	}
 	else
 	{
+		if (NULL == m_parent)
+			setCreateChilds(true);
+
 		m_time_creation = time(NULL);
 		m_time_empty = 0;
+
 		setStoreDir(AFCommon::getStoreDirBranch(*this));
 		store();
 		appendLog("Initialized.");
@@ -136,7 +140,7 @@ void BranchSrv::v_action(Action & i_action)
 		{
 //if( m_jobs_num != 0 ) return;
 			appendLog(std::string("Deleted by ") + i_action.author);
-			deleteNode(i_action.monitors);
+			deleteBranch(i_action, i_action.monitors);
 			return;
 		}
 	}
@@ -167,11 +171,26 @@ void BranchSrv::logAction(const Action & i_action, const std::string & i_node_na
 	appendLog(std::string("Action[") + i_action.type + "][" +  i_node_name + "]: " + i_action.log);
 }
 
-void BranchSrv::deleteNode(MonitorContainer * i_monitoring)
+void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 {
+	if (NULL == m_parent)
+	{
+		o_action.answer_kind = "error";
+		o_action.answer = "Can`t delete ROOT branch.";
+		return;
+	}
+
+	if (m_branches_num || m_jobs_num)
+	{
+		o_action.answer_kind = "error";
+		o_action.answer = "Branch['" + m_name + "'] has child branches/jobs.";
+		return;
+	}
+
 	setZombie();
 
-	if( i_monitoring ) i_monitoring->addEvent( af::Monitor::EVT_branches_del, m_id);
+	if (i_monitoring)
+		i_monitoring->addEvent(af::Monitor::EVT_branches_del, m_id);
 }
 
 void BranchSrv::addBranch(BranchSrv * i_branch)

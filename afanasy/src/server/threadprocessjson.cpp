@@ -320,9 +320,9 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						o_msg_response = branch->writeLog(binary);
 				}
 			}
-/// NEW VERSION
+
 			if (o_msg_response == NULL)
-				o_msg_response = i_args->branches->generateList(af::Msg::TUsersList, type, ids, mask, json);
+				o_msg_response = i_args->branches->generateList(af::Msg::TBranchesList, type, ids, mask, json);
 		}
 		else if( type == "monitors")
 		{

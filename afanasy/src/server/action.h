@@ -28,6 +28,7 @@ public:
 
 	// This is a newtork answer on the action
 	std::string answer;
+	std::string answer_kind;
 
 	// Just Web Browser asks to deregister, and on page close it can't wait an answer
 	bool without_answer;

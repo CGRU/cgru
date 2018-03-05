@@ -43,8 +43,18 @@ public:
 
 	static const std::string FilterPath(const std::string &i_path);
 
+	enum FlagsBranch
+	{
+		FB_CreateChilds = 1 << 0
+	};
+
+	inline bool isCreateChilds() const { return m_flags_branch & FB_CreateChilds; }
+	inline void setCreateChilds(bool i_on) { m_flags_branch = i_on ? m_flags_branch | FB_CreateChilds : m_flags_branch & (~FB_CreateChilds); }
+
 protected:
 	std::string m_parent_path;
+
+	int8_t m_flags_branch;
 
 	int32_t m_branches_num;
 	int32_t m_branches_total;

@@ -433,7 +433,16 @@ af::Msg * AfContainer::action( Action & i_action)
 			if (i_action.answer.empty())
 				return af::jsonMsgInfo("log","Action processed.");
 			else
-				return af::jsonMsgInfo("log", i_action.answer);
+			{
+				if (i_action.answer_kind.empty())
+				{
+					return af::jsonMsgInfo("log", i_action.answer);
+				}
+				else
+				{
+					return af::jsonMsgInfo(i_action.answer_kind, i_action.answer);
+				}
+			}
 		}
 	}
 	else
