@@ -94,7 +94,7 @@ BranchNode.prototype.update = function(i_obj) {
 
 	var flags = '';
 	if (this.params.create_childs)
-		flags += ' <b>CC</b>';
+		flags += ' <b>ACC</b>';
 	this.elFlags.innerHTML = flags;
 
 	if (cm_IsPadawan())
@@ -218,8 +218,8 @@ BranchNode.createPanels = function(i_monitor) {
 	acts.create_childs = {
 		'name': 'create_childs',
 		'value': true,
-		'label': 'CC',
-		'tooltip': 'Create childs.',
+		'label': 'ACC',
+		'tooltip': 'Auto create childs.',
 		'handle': 'mh_Param'
 	};
 
