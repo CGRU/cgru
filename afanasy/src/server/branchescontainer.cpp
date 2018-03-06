@@ -69,17 +69,23 @@ AF_DEBUG << i_path;
 		}
 	}
 
-	// Create new Branch
-	branch = new BranchSrv(parent, i_path);
-	if (addBranchToContainer(branch) == 0)
+	// Create new Branch if parent can,
+	// or we should to create the first root branch
+	if (parent->isCreateChilds() || (i_path == "/"))
 	{
-		AF_ERR << "Can't add branch to container: " << i_path;
-		delete branch;
-		return NULL;
-	}
+		branch = new BranchSrv(parent, i_path);
+		if (addBranchToContainer(branch) == 0)
+		{
+			AF_ERR << "Can't add branch to container: " << i_path;
+			delete branch;
+			return NULL;
+		}
 
-	if (i_monitors)
-		i_monitors->addEvent(af::Monitor::EVT_branches_add, branch->getId());
+		if (i_monitors)
+			i_monitors->addEvent(af::Monitor::EVT_branches_add, branch->getId());
+	}
+	else
+		branch = parent;
 
 	AFCommon::QueueLog("New branch registered: " + branch->v_generateInfoString(false));
 	return branch;
