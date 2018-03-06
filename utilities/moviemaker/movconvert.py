@@ -21,8 +21,8 @@ Parser.add_option('-n', '--container', dest='container', type  ='string', defaul
 Parser.add_option('-t', '--type',      dest='type',      type  ='string', default='png',    help='Images type (png)')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string', default=None,     help='Output movie or images folder (auto)')
 Parser.add_option('-q', '--qscale',    dest='qscale',    type  ='int',    default=5,        help='JPEG compression rate (5)')
-Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default='',       help='Time start')
-Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default='',       help='Duration')
+Parser.add_option('-s', '--timestart', dest='timestart', type  ='string', default=None,     help='Time start')
+Parser.add_option('-d', '--duration',  dest='duration',  type  ='string', default=None,     help='Duration')
 Parser.add_option('-p', '--padding',   dest='padding' ,  type  ='int',    default=7,        help='Padding')
 Parser.add_option('-w', '--watermark', dest='watermark', type  ='string', default=None,     help='Add watermark')
 Parser.add_option('-u', '--suffix',    dest='suffix',    type  ='string', default=None,     help='Add suffix to ouput file name')
@@ -74,31 +74,34 @@ CODECSDIR = os.path.join(MOVIEMAKER, 'codecs')
 
 Codec = Options.codec
 
+cmd = ''
+
 if Codec is None:
-    args = [Options.avcmd, '-y']
-    if Options.timestart != '':
-        args.extend(['-ss', Options.timestart])
-    args.extend(['-i', Input])
-    if Options.duration != '':
-        args.extend(['-t', Options.duration])
-    args.extend(['-an', '-f', 'image2'])
+    cmd = Options.avcmd
+    cmd += ' -y'
+    if Options.timestart:
+        cmd += ' -ss "%s"' % Options.timestart
+    cmd += ' -i "%s"' % Input
+    if Options.duration:
+        cmd += ' -t "%s"' % Options.duration
+    cmd += ' -an -f image2'
     if Options.type == 'jpg':
-        args.extend(['-qscale', str(Options.qscale)])
+        cmd += ' -q:v ' + str(Options.qscale)
         Output += '.q' + str(Options.qscale)
     elif Options.type == 'dpx':
-        args.extend(['-pix_fmt','gbrp10be'])
+        cmd += ' -pix_fmt gbrp10be'
     elif Options.type == 'tif' or Options.type == 'tif8':
-        args.extend(['-pix_fmt','rgb24'])
+        cmd += ' -pix_fmt rgb24'
         Options.type = 'tif'
     elif Options.type == 'tif16':
-        args.extend(['-pix_fmt','rgb48le'])
+        cmd += ' -pix_fmt rgb48le'
         Options.type = 'tif'
 
     if Options.resize is not None:
         resize = Options.resize.split('x')
         if len(resize) < 2:
             resize.append('-1')
-        args.extend(['-vf','scale=%s:%s' % (resize[0], resize[1])])
+        cmd += ' -vf "%s"' % ('scale=%s:%s' % (resize[0], resize[1]))
         Output += '.r%s' % Options.resize
 
     # Add images type (extension,format) to output:
@@ -120,11 +123,9 @@ if Codec is None:
         imgname,ext = os.path.splitext( imgname)
     Output = os.path.join(Output, imgname + '.%0' + str(Options.padding) + 'd.' + Options.type)
 
-    args.append(Output)
-    cmd = ' '.join(args)
+    cmd += ' "%s"' % Output
 
 else:
-    args = []
     if Codec.find('.') == -1:
         Codec += '.ffmpeg'
     if os.path.dirname(Codec) == '':
@@ -153,7 +154,7 @@ else:
     if Options.suffix is not None:
         Output += '.' + Options.suffix
 
-    auxargs = []
+    auxargs = ''
     if Options.resize is not None or Options.watermark is not None:
         filter_complex = ''
         if Options.resize is not None:
@@ -166,14 +167,14 @@ else:
             if not os.path.isfile( Options.watermark):
                 print('ERROR: Watermark file does not exist:\n' + Options.watermark)
                 sys.exit(1)
-            auxargs.extend(['-i',Options.watermark])
+            auxargs += ' -i "%s"' % Options.watermark
             if len(filter_complex): filter_complex += ','
             filter_complex += 'overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2'
-        auxargs.extend(['-filter_complex', filter_complex])
-    if Options.timestart != '':
-        auxargs.extend(['-ss', Options.timestart])
-    if Options.duration != '':
-        auxargs.extend(['-t', Options.duration])
+        auxargs += ' -filter_complex "%s"' % filter_complex
+    if Options.timestart:
+        auxargs += ' -ss "%s"' % Options.timestart
+    if Options.duration:
+        auxargs += ' -t "%s"' % Options.duration
 
     avcmd = Options.avcmd
     if StartNumber:
@@ -185,7 +186,7 @@ else:
     cmd = cmd.replace('@CODECSDIR@', CODECSDIR)
     cmd = cmd.replace('@FPS@', Options.fps)
     cmd = cmd.replace('@CONTAINER@', Options.container)
-    cmd = cmd.replace('@AUXARGS@', ' '.join(auxargs))
+    cmd = cmd.replace('@AUXARGS@', auxargs)
     cmd = cmd.replace('@OUTPUT@', Output)
 
 
