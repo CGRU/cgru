@@ -17,11 +17,8 @@ printStart();
 define('WILDCARD', '*');
 define('LINE_LENGTH', 110);
 
-$filesToCheckJS = getAutoFormatFiles(array('js'));
-$filesToCheckSource = getAutoFormatFiles(array('c', 'cpp', 'h', 'hpp'));
-
-$jsFiles = glob("{" . implode(",", $filesToCheckJS) . "}", GLOB_BRACE);
-$sourceFiles = glob("{" . implode(",", $filesToCheckSource) . "}", GLOB_BRACE);
+$jsFiles = getAutoFormatFiles(array('js'));
+$sourceFiles = getAutoFormatFiles(array('c', 'cpp', 'h', 'hpp'));
 
 printStartGroup('RUNNING CHECKS ON JS FILES');
 foreach ($jsFiles as $i => $filePath)
@@ -61,7 +58,7 @@ foreach ($sourceFiles as $i => $filePath)
 	{
 		file_put_contents($filePath, $sourceContent);
 	}
-	printResultLine($folderName . '/' . $fileName, $success, $status, $i / count($jsFiles));
+	printResultLine($folderName . '/' . $fileName, $success, $status, $i / count($sourceFiles));
 }
 printEndGroup();
 printFinish();
@@ -103,7 +100,8 @@ function checkFileHeader($filePath, &$fileContent, &$status)
 	} else
 	{
 		$status[] = noticeString('No header found, inserting dummy header');
-		$fileContent = getFileHeader(basename($filePath) . ' - TODO: description', $modificationString) . PHP_EOL . PHP_EOL . trim($fileContent);
+		$fileHeaderLine = basename(dirname($filePath)) . '/' . basename($filePath) . ' - TODO: description';
+		$fileContent = getFileHeader($fileHeaderLine, $modificationString) . PHP_EOL . PHP_EOL . trim($fileContent);
 		return true;
 	}
 	return false;

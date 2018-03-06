@@ -13,6 +13,7 @@
 /*
 	Common server functions.
 */
+
 #include "afcommon.h"
 
 #include <fcntl.h>
@@ -36,21 +37,21 @@
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
-Store * AFCommon::ms_store = NULL;
+Store *AFCommon::ms_store = NULL;
 
-FileQueue * AFCommon::FileWriteQueue = NULL;
-DBQueue   * AFCommon::ms_DBQueue     = NULL;
-LogQueue  * AFCommon::OutputLogQueue = NULL;
+FileQueue *AFCommon::FileWriteQueue = NULL;
+DBQueue *AFCommon::ms_DBQueue = NULL;
+LogQueue *AFCommon::OutputLogQueue = NULL;
 
 /*
    This ctor will start the various job queues. Note that threads
    are started inside the constructors of these queues.
 */
-AFCommon::AFCommon( ThreadArgs * i_threadArgs)
+AFCommon::AFCommon(ThreadArgs *i_threadArgs)
 {
 	FileWriteQueue = new FileQueue("Writing Files");
 	OutputLogQueue = new LogQueue("Log Output");
-	ms_DBQueue     = new DBQueue("AFDB_update", i_threadArgs->monitors);
+	ms_DBQueue = new DBQueue("AFDB_update", i_threadArgs->monitors);
 
 	ms_store = new Store();
 }
@@ -69,8 +70,8 @@ bool AFCommon::detach()
    if( pid  >  0 ) return true;
    if( pid == -1 )
    {
-      AFERRPE("AFCommon::detach: fork:");
-      return true;
+	  AFERRPE("AFCommon::detach: fork:");
+	  return true;
    }
    return false;
 }
@@ -80,50 +81,51 @@ void AFCommon::catchDetached()
    int status;
    pid_t pid;
    while(( pid=waitpid(-1,&status,WNOHANG)) > 0)
-      printf("AFCommon::catchDetached: Child execution finish catched, pid=%d.\n", pid);
+	  printf("AFCommon::catchDetached: Child execution finish catched, pid=%d.\n", pid);
 }
 */
 
-const std::string AFCommon::getStoreDir( const std::string & i_root, int i_id, const std::string & i_name)
+const std::string AFCommon::getStoreDir(const std::string &i_root, int i_id, const std::string &i_name)
 {
-	std::string store_dir = af::itos( i_id);
-	store_dir = af::itos( i_id / 1000 ) + AFGENERAL::PATH_SEPARATOR + store_dir;
+	std::string store_dir = af::itos(i_id);
+	store_dir = af::itos(i_id / 1000) + AFGENERAL::PATH_SEPARATOR + store_dir;
 	store_dir = i_root + AFGENERAL::PATH_SEPARATOR + store_dir;
-	store_dir += '.' + af::pathFilterFileName( i_name);
+	store_dir += '.' + af::pathFilterFileName(i_name);
 	return store_dir;
 }
 
-const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i_root)
+const std::vector<std::string> AFCommon::getStoredFolders(const std::string &i_root)
 {
 	std::vector<std::string> o_folders;
 
 #ifdef WINNT
 	HANDLE thousand_dir_handle;
 	WIN32_FIND_DATA thousand_dir_data;
-	if(( thousand_dir_handle = FindFirstFile(( i_root + "\\*").c_str(), &thousand_dir_data)) != INVALID_HANDLE_VALUE)
+	if ((thousand_dir_handle = FindFirstFile((i_root + "\\*").c_str(), &thousand_dir_data))
+		!= INVALID_HANDLE_VALUE)
 	{
 		do
 		{
-			std::string thousand_dir( thousand_dir_data.cFileName);
-			if( thousand_dir.find(".") == 0 ) continue;
+			std::string thousand_dir(thousand_dir_data.cFileName);
+			if (thousand_dir.find(".") == 0) continue;
 			thousand_dir = i_root + '\\' + thousand_dir;
-			if( false == af::pathIsFolder( thousand_dir)) continue;
+			if (false == af::pathIsFolder(thousand_dir)) continue;
 
 			HANDLE job_dir_handle;
 			WIN32_FIND_DATA node_dir_data;
-			if(( job_dir_handle = FindFirstFile(( thousand_dir + "\\*").c_str(), &node_dir_data)) != INVALID_HANDLE_VALUE)
+			if ((job_dir_handle = FindFirstFile((thousand_dir + "\\*").c_str(), &node_dir_data))
+				!= INVALID_HANDLE_VALUE)
 			{
 				do
 				{
-					std::string job_dir( node_dir_data.cFileName);
-					if( job_dir.find('.') == 0 ) continue;
+					std::string job_dir(node_dir_data.cFileName);
+					if (job_dir.find('.') == 0) continue;
 					job_dir = thousand_dir + '\\' + job_dir;
-					if( false == af::pathIsFolder( job_dir)) continue;
-					o_folders.push_back( job_dir);
-				}
-				while ( FindNextFile( job_dir_handle, &node_dir_data));
+					if (false == af::pathIsFolder(job_dir)) continue;
+					o_folders.push_back(job_dir);
+				} while (FindNextFile(job_dir_handle, &node_dir_data));
 
-				FindClose( job_dir_handle);
+				FindClose(job_dir_handle);
 			}
 			else
 			{
@@ -131,8 +133,8 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 				return o_folders;
 			}
 
-		} while ( FindNextFile( thousand_dir_handle, &thousand_dir_data));
-		FindClose( thousand_dir_handle);
+		} while (FindNextFile(thousand_dir_handle, &thousand_dir_data));
+		FindClose(thousand_dir_handle);
 	}
 	else
 	{
@@ -142,63 +144,61 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 
 #else
 
-	DIR * thousand_dir_handle = opendir( i_root.c_str());
-	if( thousand_dir_handle == NULL)
+	DIR *thousand_dir_handle = opendir(i_root.c_str());
+	if (thousand_dir_handle == NULL)
 	{
 		AF_ERR << "Can't open folder:" << i_root.c_str();
 		return o_folders;
 	}
 
 	struct dirent thousand_dir_data;
-	struct dirent * thousand_dir_ptr = NULL;
+	struct dirent *thousand_dir_ptr = NULL;
 
 	struct dirent node_dir_data;
-	struct dirent * node_dir_ptr = NULL;
+	struct dirent *node_dir_ptr = NULL;
 
-	for(;;)
+	for (;;)
 	{
-		int error = readdir_r( thousand_dir_handle, &thousand_dir_data, &thousand_dir_ptr);
-		if( error != 0 )
+		int error = readdir_r(thousand_dir_handle, &thousand_dir_data, &thousand_dir_ptr);
+		if (error != 0)
 		{
 			AFERRPE("JobContainer::getStoredIds: readdir_r:")
 			return o_folders;
 		}
 
 		// The end of directory:
-		if( NULL == thousand_dir_ptr )
-			break;
+		if (NULL == thousand_dir_ptr) break;
 
-		if( thousand_dir_ptr->d_name[0] == '.' ) continue;
+		if (thousand_dir_ptr->d_name[0] == '.') continue;
 		std::string thousand_dir = i_root + '/' + thousand_dir_ptr->d_name;
-		if( false == af::pathIsFolder( thousand_dir )) continue;
+		if (false == af::pathIsFolder(thousand_dir)) continue;
 
-		DIR * job_dir_handle = opendir( thousand_dir.c_str());
-		if( job_dir_handle == NULL)
+		DIR *job_dir_handle = opendir(thousand_dir.c_str());
+		if (job_dir_handle == NULL)
 		{
 			AF_ERR << "Can't open folder:" << thousand_dir.c_str();
 			return o_folders;
 		}
 
-		for(;;)
+		for (;;)
 		{
-			int error = readdir_r( job_dir_handle, &node_dir_data, &node_dir_ptr);
-			if( error != 0 )
+			int error = readdir_r(job_dir_handle, &node_dir_data, &node_dir_ptr);
+			if (error != 0)
 			{
 				AFERRPE("JobContainer::getStoredIds: readdir_r:")
 				return o_folders;
 			}
 
 			// The end of directory:
-			if( NULL == node_dir_ptr )
-				break;
+			if (NULL == node_dir_ptr) break;
 
-			if( node_dir_ptr->d_name[0] == '.' ) continue;
-			std::string job_dir( thousand_dir + '/' + node_dir_ptr->d_name);
-			if( false == af::pathIsFolder( job_dir)) continue;
-			o_folders.push_back( job_dir);
+			if (node_dir_ptr->d_name[0] == '.') continue;
+			std::string job_dir(thousand_dir + '/' + node_dir_ptr->d_name);
+			if (false == af::pathIsFolder(job_dir)) continue;
+			o_folders.push_back(job_dir);
 		}
 
-		closedir( job_dir_handle);
+		closedir(job_dir_handle);
 	}
 
 	closedir(thousand_dir_handle);
@@ -207,31 +207,28 @@ const std::vector<std::string> AFCommon::getStoredFolders( const std::string & i
 	return o_folders;
 }
 
-const std::string trim_branch_folder(const std::string & i_f)
+const std::string trim_branch_folder(const std::string &i_f)
 {
 	size_t p;
 	std::string f(i_f);
 
 	// Trim last slash to cut store folder root
 	p = f.rfind('/');
-	if (std::string::npos == p)
-		p = f.rfind('\\');
-	if (std::string::npos != p)
-		f = std::string(f, p);
+	if (std::string::npos == p) p = f.rfind('\\');
+	if (std::string::npos != p) f = std::string(f, p);
 
 	// Trim first dot to cut ID
 	p = f.find('.');
-	if (std::string::npos != p)
-		f = std::string(f, p);
+	if (std::string::npos != p) f = std::string(f, p);
 
 	return f;
 }
-bool sort_branches_folders(const std::string & i_a,const std::string & i_b)
+bool sort_branches_folders(const std::string &i_a, const std::string &i_b)
 {
 	// We need to extract branch name from a store folder full path
 	std::string a(trim_branch_folder(i_a));
 	std::string b(trim_branch_folder(i_b));
-	//printf("\"%s\" <> \"%s\"\n", a.c_str(), b.c_str());
+	// printf("\"%s\" <> \"%s\"\n", a.c_str(), b.c_str());
 
 	// Parent branch always has less path size
 	return (a.size() < b.size());
@@ -242,41 +239,42 @@ const std::vector<std::string> AFCommon::getStoredFoldersBranches()
 
 	// We need to sort branches the way that parent branch goes first
 	std::sort(folders.begin(), folders.end(), sort_branches_folders);
-	//for (int i = 0; i < folders.size(); i++) printf("%s\n", folders[i].c_str());
+	// for (int i = 0; i < folders.size(); i++) printf("%s\n", folders[i].c_str());
 
 	return folders;
 }
 
-void AFCommon::executeCmd( const std::string & cmd)
+void AFCommon::executeCmd(const std::string &cmd)
 {
 	std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;
-	if( system( cmd.c_str()))
+	if (system(cmd.c_str()))
 	{
 		AFERRPE("AFCommon::executeCmd: system: ")
 	}
 }
 
-void AFCommon::saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename)
+void AFCommon::saveLog(
+	const std::list<std::string> &log, const std::string &dirname, const std::string &filename)
 {
 	int lines = log.size();
-	if( lines < 1) return;
+	if (lines < 1) return;
 	std::string bytes;
-	for( std::list<std::string>::const_iterator it = log.begin(); it != log.end(); it++)
+	for (std::list<std::string>::const_iterator it = log.begin(); it != log.end(); it++)
 	{
 		bytes += *it;
 		bytes += "\n";
 	}
 
-	std::string path = af::pathFilterFileName( filename);
+	std::string path = af::pathFilterFileName(filename);
 	path = dirname + '/' + path;
 
-	FileData * filedata = new FileData( bytes.data(), bytes.length(), path);
-	FileWriteQueue->pushFile( filedata);
+	FileData *filedata = new FileData(bytes.data(), bytes.length(), path);
+	FileWriteQueue->pushFile(filedata);
 }
 
-bool AFCommon::writeFile( const char * data, const int length, const std::string & filename)
+bool AFCommon::writeFile(const char *data, const int length, const std::string &filename)
 {
-	if( filename.size() == 0)
+	if (filename.size() == 0)
 	{
 		QueueLogError("AFCommon::writeFile: File name is empty.");
 		return false;
@@ -284,37 +282,36 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 
 	std::string filetemp = filename + ".tmp";
 
-	#ifdef WINNT
-	int fd = _open( filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
-	#else
-	int fd = open( filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	#endif
-	if( fd == -1 )
+#ifdef WINNT
+	int fd = _open(filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0644);
+#else
+	int fd = open(filetemp.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+#endif
+	if (fd == -1)
 	{
-		QueueLogErrno( std::string("AFCommon::writeFile: ") + filetemp);
+		QueueLogErrno(std::string("AFCommon::writeFile: ") + filetemp);
 		return false;
 	}
 	int bytes = 0;
-	while( bytes < length )
+	while (bytes < length)
 	{
-		int written = write( fd, data+bytes, length-bytes);
-		if( written == -1 )
+		int written = write(fd, data + bytes, length - bytes);
+		if (written == -1)
 		{
-			QueueLogErrno( std::string("AFCommon::writeFile: ") + filetemp);
-			close( fd);
+			QueueLogErrno(std::string("AFCommon::writeFile: ") + filetemp);
+			close(fd);
 			return false;
 		}
 		bytes += written;
 	}
 
-	close( fd);
+	close(fd);
 
-	#ifdef WINNT
+#ifdef WINNT
 	// On Windows we can't rename file in the existing one:
-	if( af::pathFileExists( filename.c_str()))
-		remove( filename.c_str());
-	#endif
-	rename( filetemp.c_str(), filename.c_str());
+	if (af::pathFileExists(filename.c_str())) remove(filename.c_str());
+#endif
+	rename(filetemp.c_str(), filename.c_str());
 
 	/* FIXME: do we need this chmod() ? If so, in what case ? */
 	// chmod( filename.c_str(), 0644);
@@ -322,4 +319,3 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
 	AFINFA("AFCommon::writeFile - \"%s\"", filename.c_str())
 	return true;
 }
-
