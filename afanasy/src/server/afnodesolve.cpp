@@ -1,3 +1,19 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	afnodesolve.cpp - TODO: description
+*/
+
 #include "afnodesolve.h"
 
 #include "../include/afanasy.h"
@@ -16,11 +32,11 @@
 // it means that node was not solved at all.
 unsigned long long AfNodeSolve::sm_solve_cycle = 1;
 
-AfNodeSolve::AfNodeSolve( af::Work * i_work, const std::string & i_store_dir):
-	AfNodeSrv( i_work, i_store_dir),
-	m_work( i_work),
-    m_solve_need(0.0),
-	m_solve_cycle(0) // 0 means that it was not solved at all
+AfNodeSolve::AfNodeSolve(af::Work *i_work, const std::string &i_store_dir)
+	: AfNodeSrv(i_work, i_store_dir),
+	  m_work(i_work),
+	  m_solve_need(0.0),
+	  m_solve_cycle(0) // 0 means that it was not solved at all
 {
 }
 
@@ -30,48 +46,48 @@ AfNodeSolve::~AfNodeSolve()
 
 void AfNodeSolve::setZombie()
 {
-	std::list<AfList*>::iterator it = m_lists.begin();
-	std::list<AfList*>::iterator end_it = m_lists.end();
-	while( it != end_it) (*it++)->remove( this);
+	std::list<AfList *>::iterator it = m_lists.begin();
+	std::list<AfList *>::iterator end_it = m_lists.end();
+	while (it != end_it)
+		(*it++)->remove(this);
 
 	AfNodeSrv::setZombie();
 }
 
-void AfNodeSolve::addSolveCounts(af::TaskExec * i_exec, RenderAf * i_render)
+void AfNodeSolve::addSolveCounts(af::TaskExec *i_exec, RenderAf *i_render)
 {
 	m_work->addRunTasksCounts(i_exec);
 	addRenderCount(i_render);
 }
 
-void AfNodeSolve::remSolveCounts(af::TaskExec * i_exec, RenderAf * i_render)
+void AfNodeSolve::remSolveCounts(af::TaskExec *i_exec, RenderAf *i_render)
 {
 	m_work->remRunTasksCounts(i_exec);
 	remRenderCount(i_render);
 }
 
-void AfNodeSolve::addRenderCount(RenderAf * i_render)
+void AfNodeSolve::addRenderCount(RenderAf *i_render)
 {
 	// Add render count, on task start:
-	std::map<int,int>::iterator it = m_renders_counts.find(i_render->getId());
+	std::map<int, int>::iterator it = m_renders_counts.find(i_render->getId());
 	if (it != m_renders_counts.end())
 		(*it).second++;
 	else
 		m_renders_counts[i_render->getId()] = 1;
 }
 
-int AfNodeSolve::getRenderCount(RenderAf * i_render) const
+int AfNodeSolve::getRenderCount(RenderAf *i_render) const
 {
 	// Get render count, to check max run tasks per host limit:
-	std::map<int,int>::const_iterator it = m_renders_counts.find(i_render->getId());
-	if (it != m_renders_counts.end())
-		return (*it).second;
+	std::map<int, int>::const_iterator it = m_renders_counts.find(i_render->getId());
+	if (it != m_renders_counts.end()) return (*it).second;
 	return 0;
 }
 
-void AfNodeSolve::remRenderCount(RenderAf * i_render)
+void AfNodeSolve::remRenderCount(RenderAf *i_render)
 {
 	// Remove one render count, on task finish:
-	std::map<int,int>::iterator it = m_renders_counts.find(i_render->getId());
+	std::map<int, int>::iterator it = m_renders_counts.find(i_render->getId());
 	if (it != m_renders_counts.end())
 	{
 		if ((*it).second > 1)
@@ -82,10 +98,10 @@ void AfNodeSolve::remRenderCount(RenderAf * i_render)
 }
 
 /// Solving function should be implemented in child classes (if solving needed):
-RenderAf * AfNodeSolve::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
+RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring)
 {
-    AF_ERR << "AfNodeSrv::solve(): Not implemented: " <<  m_node->getName().c_str();
-    return NULL;
+	AF_ERR << "AfNodeSrv::solve(): Not implemented: " << m_node->getName().c_str();
+	return NULL;
 }
 void AfNodeSolve::v_calcNeed()
 {
@@ -128,10 +144,11 @@ bool AfNodeSolve::v_canRun()
 	return false;
 }
 
-bool AfNodeSolve::canRunOn(RenderAf * i_render)
+bool AfNodeSolve::canRunOn(RenderAf *i_render)
 {
 	// Check maximum running tasks per host
-	if ((m_work->getMaxRunTasksPerHost() > 0) && (getRenderCount(i_render) >= m_work->getMaxRunTasksPerHost()))
+	if ((m_work->getMaxRunTasksPerHost() > 0)
+		&& (getRenderCount(i_render) >= m_work->getMaxRunTasksPerHost()))
 	{
 		return false;
 	}
@@ -151,27 +168,25 @@ bool AfNodeSolve::canRunOn(RenderAf * i_render)
 	// Perform each node type scpecific check
 	return v_canRunOn(i_render);
 }
-bool AfNodeSolve::v_canRunOn(RenderAf * i_render)
+bool AfNodeSolve::v_canRunOn(RenderAf *i_render)
 {
 	AF_ERR << "AfNodeSolve::canRunOn(): Not implememted: " << m_node->getName().c_str();
 	return false;
 }
 
 /// Compare nodes need for solve:
-bool AfNodeSolve::greaterNeed( const AfNodeSolve * i_other) const
+bool AfNodeSolve::greaterNeed(const AfNodeSolve *i_other) const
 {
-	if( m_solve_need > i_other->m_solve_need )
-		return true;
+	if (m_solve_need > i_other->m_solve_need) return true;
 
-	if( m_solve_need < i_other->m_solve_need )
-		return false;
+	if (m_solve_need < i_other->m_solve_need) return false;
 
 	/// If need parameters are equal,
 	/// Greater node is a node that was solved earlier
 	return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-bool AfNodeSolve::greaterPriorityThenOlderCreation( const AfNodeSolve * i_other) const
+bool AfNodeSolve::greaterPriorityThenOlderCreation(const AfNodeSolve *i_other) const
 {
 	if (m_node->getPriority() != i_other->m_node->getPriority())
 		return m_node->getPriority() > i_other->m_node->getPriority();
@@ -180,15 +195,16 @@ bool AfNodeSolve::greaterPriorityThenOlderCreation( const AfNodeSolve * i_other)
 	if (m_node->getTimeCreation() != i_other->m_node->getTimeCreation())
 		return m_node->getTimeCreation() < i_other->m_node->getTimeCreation();
 
-	// If creation time is the same too (likely because this type of node does not implement getTimeCreation), use the earliest solved node
+	// If creation time is the same too (likely because this type of node does not implement getTimeCreation),
+	// use the earliest solved node
 	return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-RenderAf * AfNodeSolve::trySolve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
+RenderAf *AfNodeSolve::trySolve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring)
 {
-	RenderAf * render = v_solve( i_renders_list, i_monitoring);
+	RenderAf *render = v_solve(i_renders_list, i_monitoring);
 
-	if( NULL == render )
+	if (NULL == render)
 	{
 		// Was not solved
 		return NULL;
@@ -206,17 +222,17 @@ RenderAf * AfNodeSolve::trySolve( std::list<RenderAf*> & i_renders_list, Monitor
 	return render;
 }
 
-void AfNodeSolve::calcNeedResouces( int i_resourcesquantity)
+void AfNodeSolve::calcNeedResouces(int i_resourcesquantity)
 {
 	m_solve_need = 0.0;
 
 	// Need calculation no need as there is no need at all for some reason.
-	if( i_resourcesquantity < 0)
+	if (i_resourcesquantity < 0)
 	{
 		return;
 	}
 
-	if( false == v_canRun())
+	if (false == v_canRun())
 	{
 		// Cannot run at all - no solving needed
 		return;
@@ -224,6 +240,5 @@ void AfNodeSolve::calcNeedResouces( int i_resourcesquantity)
 
 	// Main solving function:
 	// ( each priority point gives 10% more resources )
-	m_solve_need = pow( 1.1, m_node->getPriority()) / (i_resourcesquantity + 1.0);
+	m_solve_need = pow(1.1, m_node->getPriority()) / (i_resourcesquantity + 1.0);
 }
-
