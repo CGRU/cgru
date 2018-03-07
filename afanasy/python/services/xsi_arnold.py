@@ -3,5 +3,6 @@ from services import service
 
 parser = 'xsi_arnold'
 
+
 class xsi_arnold(service.service):
     'Arnold'
