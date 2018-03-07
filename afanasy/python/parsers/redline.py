@@ -6,34 +6,34 @@ import re
 
 
 class redline(parser.parser):
-	"""redline command parser
-	"""
+    """redline command parser
+    """
 
-	def __init__(self):
-		parser.parser.__init__(self)
+    def __init__(self):
+        parser.parser.__init__(self)
 
-	# print('redline parser instanced')
+    # print('redline parser instanced')
 
-	def do(self, data, mode):
-		"""Missing DocString
+    def do(self, data, mode):
+        """Missing DocString
 
-		:param data:
-		:param mode:
-		:return:
-		"""
-		# print(data)
+        :param data:
+        :param mode:
+        :return:
+        """
+        # print(data)
 
-		data = re.findall(r'\b 0\.\d\d', data)
-		if len(data) == 0:
-			return
-		data = data[0]
-                print('output = ' + data)
-#		if data.find('%') <= 0:
-#			return
+        data = re.findall(r'\b 0\.\d\d', data)
+        if len(data) == 0:
+            return
+        data = data[0]
+        print('output = ' + data)
+#        if data.find('%') <= 0:
+#            return
 
-		data = data.replace('0.', '')
-		self.percentframe = int(data)
+        data = data.replace('0.', '')
+        self.percentframe = int(data)
 
-		# print('percent = ' + data)
+        # print('percent = ' + data)
 
-		self.calculate()
+        self.calculate()

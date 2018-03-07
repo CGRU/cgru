@@ -91,4 +91,3 @@ class fusion(parser.parser):
                     os.remove(self.log_file)
                 except (OSError, IOError):
                     pass
-

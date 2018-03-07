@@ -47,4 +47,3 @@ class clarisse(parser.parser):
 
         if need_calc:
             self.calculate()
-

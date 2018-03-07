@@ -23,7 +23,6 @@ class hbatch(parser.parser):
             'OpenCL Exception',
             'Failed to create']
 
-
     def do(self, data, mode):
         """Missing DocString
 
