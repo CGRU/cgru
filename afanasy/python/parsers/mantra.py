@@ -14,6 +14,7 @@ ErrorsRE = [re.compile(r'Error loading geometry .* from stdin')]
 # Will be used in 'mantrafilter.py' to ask parser to stop a process:
 ParserErrorStr = '[ PARSER ERROR ]'
 
+
 class mantra(parser.parser):
     """Houdini mantra with "Alfred Style Progress"
     """

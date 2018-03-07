@@ -10,6 +10,7 @@ re_percent = re.compile(
     r'(Block*)(\s*)(\d*)(\/)(\d*)(\s*)(\S*)(\s*)(rendered by GPU.*)'
 )
 
+
 class redshift(parser.parser):
 
     def __init__(self):
@@ -25,7 +26,6 @@ class redshift(parser.parser):
 
         self.str_badresult = [
             'Frame rendering aborted']
-            
 
     def do(self, data, mode):
         """Missing DocString

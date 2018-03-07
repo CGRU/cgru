@@ -4,6 +4,7 @@ from parsers import parser
 
 FRAME = "FumeFX: Frame: "
 
+
 class mayafumefx(parser.parser):
     """Maya FumeFX simulation
     """

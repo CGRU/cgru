@@ -11,6 +11,7 @@ re_frames            = re.compile(r'Frames: *(\d+)')
 re_position_time    = re.compile(r'time=(\d{2}:\d{2}:\d{2}.\d{2})')
 re_position_frame    = re.compile(r'frame= *(\d+) ')
 
+
 class ffmpeg(parser.parser):
     """ffmpeg command parser
     """
@@ -49,7 +50,7 @@ class ffmpeg(parser.parser):
 
         position_frame    = 0
         position_time    = 0
-        if ( self.frames ):
+        if (self.frames):
             res = re_position_frame.findall(data)
             if len(res):
                 position_frame = int(res[0])
@@ -58,10 +59,10 @@ class ffmpeg(parser.parser):
             if len(res):
                 position_time = self.parseTime(res[-1])
 
-        if ( position_frame ):
+        if (position_frame):
             self.percentframe = int(position_frame / float(self.frames) * 100)
             self.calculate()
 
-        if ( position_time ):
+        if (position_time):
             self.percentframe = int(position_time / float(self.duration) * 100)
             self.calculate()

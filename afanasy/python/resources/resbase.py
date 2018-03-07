@@ -48,19 +48,18 @@ class resbase:  # TODO: Class names should follow CamelCase naming convention
             print(str(sys.exc_info()[1]))
             self.label = 'Error'
         return self.value, self.valuemax, self.width, self.height, \
-               self.graphr, self.graphg, self.graphb, self.label, \
-               self.labelsize, self.labelr, self.labelg, self.labelb, \
-               self.bgcolorr, self.bgcolorg, self.bgcolorb, self.tooltip
+            self.graphr, self.graphg, self.graphb, self.label, \
+            self.labelsize, self.labelr, self.labelg, self.labelb, \
+            self.bgcolorr, self.bgcolorg, self.bgcolorb, self.tooltip
 
     def output(self):
         """Missing DocString
         """
         print(self.label)
-        print(
-        '%d (of %d) wh(%d,%d) l%d gc(%d,%d,%d) lc(%d,%d,%d) bc(%d,%d,%d)' %
-        (self.value, self.valuemax, self.width, self.height,
-         self.labelsize, self.graphr, self.graphg, self.graphb,
-         self.labelr, self.labelg, self.labelb, self.bgcolorr,
-         self.bgcolorg, self.bgcolorb))
+        print('%d (of %d) wh(%d,%d) l%d gc(%d,%d,%d) lc(%d,%d,%d) bc(%d,%d,%d)' %
+              (self.value, self.valuemax, self.width, self.height,
+               self.labelsize, self.graphr, self.graphg, self.graphb,
+               self.labelr, self.labelg, self.labelb, self.bgcolorr,
+               self.bgcolorg, self.bgcolorb))
         if self.tooltip != '':
             print(self.tooltip)

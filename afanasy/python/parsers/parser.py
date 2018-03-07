@@ -223,4 +223,3 @@ class parser(object):
         :return: converted line
         """
         return i_line
-        

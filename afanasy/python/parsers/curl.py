@@ -6,6 +6,7 @@ import re
 
 re_progress    = re.compile(r'([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)\s+([\d\.:]+\w?)')
 
+
 class curl(parser.parser):
     """curl command parser
     """

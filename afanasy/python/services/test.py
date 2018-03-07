@@ -5,6 +5,7 @@ import random
 
 parser = 'generic'
 
+
 class test(service.service):
     """Test service
     """
@@ -17,4 +18,4 @@ class test(service.service):
         ver = .03
         if r  < ver:
             self.taskInfo['command'] = ''
-            self.log = ('%f < %f') % ( r, ver)
+            self.log = ('%f < %f') % (r, ver)

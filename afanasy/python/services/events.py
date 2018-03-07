@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-import os
 import sys
 
 import cgruconfig
@@ -35,7 +34,7 @@ class events(service.service):
             return
 
         # Check received events:
-        if not 'events' in objects:
+        if 'events' not in objects:
             print('ERROR: Received data does not contain events.')
             print('Event data:\n%s' % data)
             return
@@ -73,11 +72,11 @@ class events(service.service):
         # print(json.dumps(obj))
 
         if len(obj) == 0:
-            #print('No configured data found.')
+            # print('No configured data found.')
             return
 
-        if not 'events' in obj:
-            #print('No configured events found.')
+        if 'events' not in obj:
+            # print('No configured events found.')
             return
 
         email_events = []
@@ -85,8 +84,8 @@ class events(service.service):
         # Iterate all interested events:
         for event in obj['events']:
 
-            if not event in objects['events']:
-                #print('Skipping not received event "%s"' % event)
+            if event not in objects['events']:
+                # print('Skipping not received event "%s"' % event)
                 continue
 
             event_obj = obj['events'][event]
@@ -97,7 +96,7 @@ class events(service.service):
                 print('Event data:\n%s' % data)
                 return
 
-            if not 'methods' in event_obj:
+            if 'methods' not in event_obj:
                 print('ERROR: Configured event["%s"] does not have methods.' % event)
                 print('Event data:\n%s' % data)
                 continue
@@ -112,7 +111,7 @@ class events(service.service):
                 print('EVENT: %s:%s %s:%s' %
                       (event, task_info['job_name'], task_info['user_name'],
                        obj['email'])
-                )
+                      )
                 email_events.append(event)
 
             # Essentially for debugging

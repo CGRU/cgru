@@ -44,7 +44,6 @@ class vray(parser.parser):
                 if quotes[1] != "":
                     self.appendFile(quotes[1].strip())
 
-
         match = re_percent.findall(data)
         if len(match):
             percentframe = float(match[-1][1])

@@ -6,7 +6,7 @@ import re
 
 re_percent = re.compile(r'Progress for .*: \d+%')
 re_percent_number = re.compile(r'\d+')
-    
+
 re_frame = re.compile(r'Saving Image:')
 
 re_image = re.compile(r'File \'(.*)\'')
@@ -31,7 +31,7 @@ class clarisse(parser.parser):
         # Search for frame percent:
         match = re_percent.search(data)
         if match is not None:
-            self.percentframe = int( re_percent_number.findall(match.group(0))[-1])
+            self.percentframe = int(re_percent_number.findall(match.group(0))[-1])
             need_calc = True
 
         # Search for frame number:
@@ -43,7 +43,7 @@ class clarisse(parser.parser):
         # Search for an image for thumbnail:
         match = re_image.search(data)
         if match is not None:
-            self.appendFile( match.group(1))
+            self.appendFile(match.group(1))
 
         if need_calc:
             self.calculate()

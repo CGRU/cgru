@@ -26,13 +26,14 @@ re_match_frame = re.compile(
 )
 re_match_complete = re.compile('Render completed.*')
 
+
 class fusion(parser.parser):
     """fusion parser
     """
 
     def __init__(self):
         parser.parser.__init__(self)
-        
+
         self.str_error = ['[mtoa] Failed batch render']
         self.log_file = \
             ('%s/fusion_render.log' % tempfile.gettempdir()).replace('\\', '/')
@@ -40,7 +41,6 @@ class fusion(parser.parser):
         self.last_read_line = 0
 
         # delete the log file beforehand
-        import shutil
         import os
         try:
             os.remove(self.log_file)

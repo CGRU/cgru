@@ -5,6 +5,7 @@ import re
 
 IMAGE = r'mode = rgba'
 
+
 class prman(parser.parser):
     """PIXAR's RenderMan
     """
@@ -24,7 +25,7 @@ class prman(parser.parser):
         for line in lines:
             pattern = re.compile(IMAGE)
             res = pattern.search(line)
-            if res != None:
+            if res is not None:
                 quotes = re.split("\"", line)
                 if quotes[1] != "":
                     self.appendFile(quotes[1].strip())

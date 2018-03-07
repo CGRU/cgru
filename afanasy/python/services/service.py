@@ -2,7 +2,6 @@
 
 import os
 import sys
-import re
 
 import traceback
 
@@ -59,8 +58,8 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             allFilesExist = True
             for i in range(0, len(self.taskInfo['files'])):
                 afile = self.taskInfo['files'][i]
-                afile = os.path.join( taskInfo['wdir'], afile)
-                if not os.path.isfile( afile):
+                afile = os.path.join(taskInfo['wdir'], afile)
+                if not os.path.isfile(afile):
                     allFilesExist = False
                     break
                 # Check files size:
@@ -103,7 +102,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             print(taskInfo)
 
     def isSkippingExistingFiles(self):
-        return afcommon.checkBlockFlag( self.taskInfo['block_flags'], 'skipexistingfiles')
+        return afcommon.checkBlockFlag(self.taskInfo['block_flags'], 'skipexistingfiles')
 
     def getWDir(self):
         """Missing DocString
@@ -144,7 +143,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         else:
             return []
 
-    def getLog( self):
+    def getLog(self):
         """
             This string will appear in server task log
         """
@@ -197,7 +196,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         print(command)
         return command
 
-    def hasParser( self):
+    def hasParser(self):
         return self.parser is not None
 
     def parse(self, data, mode, pid):
@@ -213,16 +212,15 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
         self.parser.parse(data, mode, pid)
 
-        thumb_cmds = self.generateThumbnail( True)
+        thumb_cmds = self.generateThumbnail(True)
         for cmd in thumb_cmds:
             print('Generating thumbnail "on-the-fly":')
-            print( cmd)
+            print(cmd)
             os.system(cmd)
 
         return self.parser
 
-
-    def toHTML( self, i_data):
+    def toHTML(self, i_data):
         """ Convert data to HTML.
             Designed for GUIs for escape sequences, errors highlighting.
         :param i_data: input data
@@ -232,8 +230,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             print('Servie.toHTML(): parser is None.')
             return i_data
 
-        return self.parser.toHTML( i_data)
-
+        return self.parser.toHTML(i_data)
 
     def checkExitStatus(self, i_status):
         """ This function needed to check task process exit status.
@@ -259,8 +256,8 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
         """
         post_cmds = []
 
-        if not afcommon.checkBlockFlag( self.taskInfo['block_flags'],'skipthumbnails'):
-            post_cmds.extend(self.generateThumbnail( False))
+        if not afcommon.checkBlockFlag(self.taskInfo['block_flags'], 'skipthumbnails'):
+            post_cmds.extend(self.generateThumbnail(False))
 
         # post_cmds.extend(['ls -la > ' + self.taskInfo['store_dir'] + '/afile'])
 
@@ -309,7 +306,7 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
             if len(ext) < 2:
                 continue
             ext = ext.lower()[1:]
-            if not ext in cgruconfig.VARS['af_thumbnail_extensions']:
+            if ext not in cgruconfig.VARS['af_thumbnail_extensions']:
                 continue
 
             store_dir = cgruutils.toStr(self.taskInfo['store_dir'])
@@ -341,10 +338,10 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
 
         for i in range(0, len(self.taskInfo['files'])):
             afile = self.taskInfo['files'][i]
-            afile = os.path.join( self.taskInfo['wdir'], afile)
-            #print('Checking for "%s" %d-%d' %( afile, file_size_min, file_size_max ))
+            afile = os.path.join(self.taskInfo['wdir'], afile)
+            # print('Checking for "%s" %d-%d' %( afile, file_size_min, file_size_max ))
 
-            if not os.path.isfile( afile):
+            if not os.path.isfile(afile):
                 self.log = 'File does not exist:\n' + afile
                 return False
 
@@ -352,11 +349,11 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
                 size = os.path.getsize(afile)
 
                 if file_size_min > 0 and size < file_size_min:
-                    self.log = 'File size less than minimum (%d < %d):\n%s' % ( size, file_size_min, afile)
+                    self.log = 'File size less than minimum (%d < %d):\n%s' % (size, file_size_min, afile)
                     return False
 
                 if file_size_max > 0 and size > file_size_max:
-                    self.log = 'File size greater than maximum (%d < %d):\n%s' % ( size, file_size_max, afile)
+                    self.log = 'File size greater than maximum (%d < %d):\n%s' % (size, file_size_max, afile)
                     return False
 
         return True

@@ -2,9 +2,6 @@
 
 import resbase
 
-import os
-import subprocess
-
 
 class example(resbase.resbase):
     """Example of custom resource meter class

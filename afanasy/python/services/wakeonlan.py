@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import json
-import os
 import sys
 
 import cgruconfig
@@ -19,7 +18,7 @@ class wakeonlan(service.service):
         data = self.taskInfo['command']
         self.taskInfo['command'] = ''
 
-        #print('Task data:\n%s' % data)
+        # print('Task data:\n%s' % data)
 
         render = None
         try:
@@ -36,15 +35,15 @@ class wakeonlan(service.service):
             return
 
         # Check received render:a
-        if not 'address' in render:
+        if 'address' not in render:
             print('ERROR: Received data does not contain address.')
             print('Task data:\n%s' % data)
             return
-        if not 'ip' in render['address']:
+        if 'ip' not in render['address']:
             print('ERROR: Received data address does not contain IP.')
             print('Task data:\n%s' % data)
             return
-        if not 'netifs' in render:
+        if 'netifs' not in render:
             print('ERROR: Received data does not contain network interfaces info.')
             print('Task data:\n%s' % data)
             return
@@ -68,7 +67,7 @@ class wakeonlan(service.service):
         cmd += ' --hostname "%s"' % render['name']
 
         for netif in render['netifs']:
-            cmd += ' %s' % netif['mac'].replace(':','')
+            cmd += ' %s' % netif['mac'].replace(':', '')
 
         # print(cmd)
         # Set task command:
