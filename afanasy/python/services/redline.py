@@ -5,6 +5,6 @@ parser = 'redline'
 
 
 class redline(service.service):
-	"""redline
-	"""
-	pass
+    """redline
+    """
+    pass

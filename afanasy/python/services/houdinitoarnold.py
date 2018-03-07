@@ -5,6 +5,6 @@ parser = 'houdinitoarnold'
 
 
 class houdinitoarnold(service.service):
-	"""Houdini to Arnold Standalone
-	"""
-	pass
+    """Houdini to Arnold Standalone
+    """
+    pass

@@ -5,6 +5,6 @@ parser = 'xsi_redshift'
 
 
 class xsi_redshift(service.service):
-	"""Redshift
-	"""
-	pass
+    """Redshift
+    """
+    pass

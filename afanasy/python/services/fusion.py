@@ -5,6 +5,6 @@ from services import service
 parser = 'fusion'
 
 class fusion(service.service):
-	""" Fusion
-	"""
-	pass
+    """ Fusion
+    """
+    pass

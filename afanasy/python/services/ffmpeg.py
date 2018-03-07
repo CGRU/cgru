@@ -5,6 +5,6 @@ parser = 'ffmpeg'
 
 
 class ffmpeg(service.service):
-	"""Process through ffmpeg
-	"""
-	pass
+    """Process through ffmpeg
+    """
+    pass

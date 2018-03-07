@@ -5,6 +5,6 @@ parser = 'generic'
 
 
 class checksum(service.service):
-	"""Calculate checksum
-	"""
-	pass
+    """Calculate checksum
+    """
+    pass

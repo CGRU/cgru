@@ -8,4 +8,3 @@ class clarisse(service.service):
     """Isotropix Clarisse
     """
     pass
-

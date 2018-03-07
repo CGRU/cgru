@@ -360,4 +360,3 @@ class service(object):  # TODO: Class names should follow CamelCase naming conve
                     return False
 
         return True
-

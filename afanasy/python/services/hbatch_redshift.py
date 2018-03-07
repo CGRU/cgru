@@ -6,6 +6,6 @@ parser = 'hbatch_redshift'
 
 
 class hbatch_redshift(service.service):
-	"""Houdini batch executes redshift
-	"""
-	pass
+    """Houdini batch executes redshift
+    """
+    pass

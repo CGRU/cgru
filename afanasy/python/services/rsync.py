@@ -5,6 +5,6 @@ parser = 'rsync'
 
 
 class rsync(service.service):
-	"""rsync
-	"""
-	pass
+    """rsync
+    """
+    pass
