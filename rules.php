@@ -2139,7 +2139,32 @@ function upload($i_path, &$o_out)
 		}
 		else if ($_FILES[$key]['error'] != UPLOAD_ERR_OK)
 		{
-			$fileObj['error'] = 'Error upload';
+			switch ($_FILES[$key]['error'])
+			{
+				case UPLOAD_ERR_INI_SIZE:
+					$fileObj['error'] = 'ERROR: Max files size reached (php.ini)';
+					break;
+				case UPLOAD_ERR_FORM_SIZE:
+					$fileObj['error'] = 'ERROR: Max files size reached (HTML form)';
+					break;
+				case UPLOAD_ERR_PARTIAL:
+					$fileObj['error'] = 'ERROR: Files was only partially uploaded';
+					break;
+				case UPLOAD_ERR_NO_FILE:
+					$fileObj['error'] = 'ERROR: No file was uploaded';
+					break;
+				case UPLOAD_ERR_NO_TMP_DIR:
+					$fileObj['error'] = 'ERROR: Missing a temporary folder';
+					break;
+				case UPLOAD_ERR_CANT_WRITE:
+					$fileObj['error'] = 'ERROR: Failed to write file to disk';
+					break;
+				case UPLOAD_ERR_EXTENSION:
+					$fileObj['error'] = 'ERROR: A PHP extension stopped the file upload';
+					break;
+				default:
+					$fileObj['error'] = 'Unknown error';
+			}
 		}
 		else if (false == is_uploaded_file($_FILES[$key]['tmp_name']))
 		{
