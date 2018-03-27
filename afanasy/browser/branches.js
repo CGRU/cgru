@@ -100,8 +100,8 @@ BranchNode.prototype.update = function(i_obj) {
 	if (cm_IsPadawan())
 	{
 		var jobs = 'Jobs Total:';
-		if (this.params.jobs_num)
-			jobs += ' <b>' + this.params.jobs_num + '</b>';
+		if (this.params.jobs_total)
+			jobs += ' <b>' + this.params.jobs_total + '</b>';
 		else
 			jobs += ' <b>0</b>';
 		if (this.params.running_jobs_num)
@@ -109,8 +109,8 @@ BranchNode.prototype.update = function(i_obj) {
 		this.elJobsCounts.innerHTML = jobs;
 
 		var counts = 'Branches Total:';
-		if (this.params.branches_num)
-			counts += ' <b>' + this.params.branches_num + '</b>';
+		if (this.params.branches_total)
+			counts += ' <b>' + this.params.branches_total + '</b>';
 		else
 			counts += ' <b>0</b>';
 		if (this.params.running_branches_num)
@@ -282,6 +282,12 @@ function BranchActiveJob(i_branch, i_elParent, i_params)
 	this.elParent.appendChild(this.el);
 	this.el.active_job = this;
 
+	this.elName = document.createElement('span');
+	this.el.appendChild(this.elName);
+	this.elName.textContent = this.params.name + '[' + this.params.id + ']';
+
+	this.elRunningCounts = cm_ElCreateFloatText(this.el, 'right');
+
 	this.el.oncontextmenu = function(e) {
 		e.stopPropagation();
 		e.currentTarget.active_job.onContextMenu();
@@ -299,8 +305,7 @@ BranchActiveJob.prototype.setNotUpdated = function() {
 BranchActiveJob.prototype.update = function(i_params) {
 	this.params = i_params;
 
-	var info = this.params.name + '[' + this.params.id + ']';
-	this.el.textContent = info;
+	this.elRunningCounts.innerHTML = work_generateRunningCountsString(this.params, 'branch');
 
 	this.el.style.display = 'block';
 	this.updated = true;

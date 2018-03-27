@@ -33,6 +33,7 @@
 #include "../libafanasy/logger.h"
 
 BranchesContainer::BranchesContainer():
+	m_root_branch(NULL),
 	AfContainer("Branches", AFBRANCH::MAXCOUNT)
 {
 	BranchSrv::setBranchesContainer(this);
@@ -81,6 +82,13 @@ AF_DEBUG << i_path;
 			return NULL;
 		}
 
+		// Store root branch if it was not:
+		if ((m_root_branch == NULL) && (i_path == "/"))
+		{
+			m_root_branch = branch;
+			AF_LOG << "Root branch created.";
+		}
+
 		if (i_monitors)
 			i_monitors->addEvent(af::Monitor::EVT_branches_add, branch->getId());
 	}
@@ -104,6 +112,12 @@ bool BranchesContainer::addBranchFromStore(BranchSrv * i_branch)
 			return false;
 		}
 		i_branch->setParent(parent);
+	}
+	else if (m_root_branch == NULL)
+	{
+		// Store root branch if it was not:
+		m_root_branch = i_branch;
+		AF_LOG << "Root branch created from store.";
 	}
 
 	return (addBranchToContainer(i_branch) != 0);

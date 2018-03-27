@@ -464,17 +464,3 @@ af::Msg *AfContainer::action(Action &i_action)
 		return af::jsonMsgError("Action node(s) not found.");
 	}
 }
-
-const std::list<AfNodeSrv *> AfContainer::getNodesStdList()
-{
-	std::list<AfNodeSrv *> list;
-
-	for (AfNodeSrv *node = m_first_ptr; node != NULL; node = node->m_next_ptr)
-	{
-		if (node->m_node->isZombie()) continue;
-
-		list.push_back(node);
-	}
-
-	return list;
-}

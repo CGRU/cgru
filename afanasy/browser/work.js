@@ -90,7 +90,7 @@ function work_generateRunningCountsString(i_params, i_type)
 		if (i_params.running_tasks_num)
 			str += "Running Tasks:<b>" + i_params.running_tasks_num + "</b>";
 		if (i_params.running_capacity_total)
-			str += " Capacity:<b>" + i_params.running_capacity_total + "</b>";
+			str += " Capacity:<b>" + cm_ToKMG(i_params.running_capacity_total) + "</b>";
 	}
 	else if (cm_IsJedi())
 	{

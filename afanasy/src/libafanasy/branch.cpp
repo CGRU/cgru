@@ -108,6 +108,13 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 		o_str << "\n{";
 		o_str << "\n\"id\":" << (*it)->getId();
 		o_str << ",\n\"name\":\"" << (*it)->getName() << "\"";
+
+		if ((*it)->getRunningTasksNum() > 0)
+			o_str << ",\n\"running_tasks_num\":" << (*it)->getRunningTasksNum();
+
+		if ((*it)->getRunningCapacityTotal() > 0)
+			o_str << ",\n\"running_capacity_total\":" << (*it)->getRunningCapacityTotal();
+
 		o_str << "\n}";
 	}
 	o_str << "\n]";

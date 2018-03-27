@@ -1,3 +1,20 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Afanasy server system job.
+	It is designed for afsever to execute special commands on afrenders:
+	Post Commannds, Events, Wake-On-Lan.
+*/
 #include "sysjob.h"
 
 #include "../include/afanasy.h"
@@ -15,6 +32,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+#include "../libafanasy/logger.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////   COMMAND    ///////////////////////////////////////////////////////
@@ -477,7 +495,7 @@ AFINFA("SysJob::SysJob: folder = '%s'", i_folder.c_str())
 	if( isFromStore())
 	{
 		readStore();
-		printf("System job retrieved from store.\n");
+		AF_LOG << "System job retrieved from store.";
 		return;
 	}
 

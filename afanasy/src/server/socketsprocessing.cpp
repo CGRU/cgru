@@ -1,5 +1,19 @@
-#include "socketsprocessing.h"
-#include "httpget.hpp"
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Process a new socket connection in a blocking manner using a threads pull workflow.
+	On Linux, EPOLL facility can be enabled, non-blocking sockets will be used and just one thread.
+*/
 
 //######################################################################################################
 //
@@ -26,6 +40,9 @@
 // ss -tan 'sport = :51000' | awk '{print $(NF)" "$(NF-1)}' | sed 's/:[^ ]*//g' | sort | uniq -c
 //
 //######################################################################################################
+
+#include "socketsprocessing.h"
+#include "httpget.hpp"
 
 #include "../libafanasy/common/dlThread.h"
 #include "../libafanasy/environment.h"

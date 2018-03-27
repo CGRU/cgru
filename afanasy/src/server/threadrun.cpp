@@ -35,7 +35,7 @@ void threadRunCycle( void * i_args)
 	ThreadArgs * a = (ThreadArgs*)i_args;
 
 	// Jobs solving class:
-	Solver solver( a->jobs, a->renders, a->users, a->monitors);
+	Solver solver(a->branches, a->jobs, a->renders, a->users, a->monitors);
 
 	// Save store to store start time:
 	AFCommon::saveStore();
@@ -58,6 +58,11 @@ void threadRunCycle( void * i_args)
 	//
 	// Lock containers:
 	//
+	/*
+		We should alaways lock containers in alphabetical order.
+		Thread mutex lock can happer it one thread tries to lock A than B,
+		and other thread tries to lock B at first, than A.
+	*/
 	AFINFO("ThreadRun::run: Locking containers...")
 	AfContainerLock bLock( a->branches, AfContainerLock::WRITELOCK);
 	AfContainerLock jLock( a->jobs,     AfContainerLock::WRITELOCK);

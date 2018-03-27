@@ -44,7 +44,10 @@ public:
 	/// Generate MCJobs message for users with provided ids:
 	af::Msg * generateJobsList(const std::vector<int32_t> & ids, const std::string & i_type_name, bool i_json = false);
 
+	BranchSrv * getRootBranch() {return m_root_branch;}
+
 private:
+	BranchSrv * m_root_branch;
 	int addBranchToContainer(BranchSrv * i_branch);
 };
 

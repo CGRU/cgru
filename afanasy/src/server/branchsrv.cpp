@@ -300,6 +300,8 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 
 		_branches_num++;
 		_branches_total++;
+		_branches_total += branch->m_branches_total;
+		_jobs_total += branch->m_jobs_total;
 		_running_tasks_num += branch->getRunningTasksNum();
 		_running_capacity_total += branch->getRunningCapacityTotal();
 	}
@@ -343,10 +345,17 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 
 void BranchSrv::v_calcNeed()
 {
+	calcNeedResouces( m_running_capacity_total);
 }
 
 bool BranchSrv::v_canRun()
 {
+	if (m_jobs_total == 0)
+	{
+		// Nothing to run
+		return false;
+	}
+
 	return true;
 }
 
@@ -355,10 +364,56 @@ bool BranchSrv::v_canRunOn(RenderAf * i_render)
 	return true;
 }
 
+// Functor for sorting algorithm
+struct GreaterNeed : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
+{
+	inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
+	{
+		return a->greaterNeed( b);
+	}
+};
 RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
-	// Node was not solved
-	return NULL;
+	std::list<AfNodeSolve*> solve_list;
+
+	if (m_branches_num)
+	{
+		// Iterate child branches
+		std::list<AfNodeSolve*> & list(m_branches_list.getStdList());
+		for (std::list<AfNodeSolve*>::iterator it = list.begin(); it != list.end(); it++)
+		{
+			if (false == (*it)->canRun())
+				continue;
+
+			(*it)->v_calcNeed();
+
+			solve_list.push_back(*it);
+		}
+	}
+
+	if (m_jobs_num)
+	{
+		// Iterate child jobs
+		std::list<AfNodeSolve*> & jList(m_jobs_list.getStdList());
+		for (std::list<AfNodeSolve*>::iterator it = jList.begin(); it != jList.end(); it++)
+		{
+			if (false == (*it)->canRun())
+				continue;
+
+			(*it)->v_calcNeed();
+
+			solve_list.push_back(*it);
+		}
+	}
+
+	solve_list.sort( GreaterNeed());
+//	std::list<AfNodeSolve*> solve_list(m_branches_list.getStdList());
+//	std::list<AfNodeSolve*> jobs_list(m_jobs_list.getStdList());
+
+	// Add jobs list to a branches list:
+//	solve_list.splice(solve_list.end(), jobs_list);
+
+	return Solver::SolveList(solve_list, i_renders_list, m_solve_method);
 }
 
 void BranchSrv::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
