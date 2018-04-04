@@ -354,24 +354,25 @@ function d_MakeCmd(i_params)
 
 
 var d_cvtguiparams = {
-	fps /**********/: {"label": 'FPS', "width": '33%'},
-	time_start /***/: {"default": '00:00:00', "width": '33%'},
-	duration /*****/: {"default": '00:00:00', "width": '33%'},
-	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '33%'},
-	padding /******/: {"label": 'Padding', 'width': '33%'},
-	af_capacity /**/: {'label': 'Capacity', 'width': '33%', 'type': 'int'},
-	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '33%'},
-	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '19%', 'type': 'int', 'default': -1},
-	af_perhost /****/: {'label': 'Per Host', 'width': '16%', 'lwidth': '80px', 'type': 'int', 'default': 1},
+	fps /**********/: {"label": 'FPS', "width": '20%'},
+	time_start /***/: {"default": '00:00:00', "width": '20%'},
+	duration /*****/: {"default": '00:00:00', "width": '20%'},
+	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%'},
+	sar /**********/: {"label": 'Source pixel aspect', "width": '20%',"lwidth":'160px'},
+	padding /******/: {"label": 'Padding', 'width': '20%'},
+	af_capacity /**/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
+	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '20%', 'type': 'int', 'default': -1},
+	af_perhost /****/: {'label': 'Per Host', 'width': '20%', 'type': 'int', 'default': 1},
 	af_fpt /********/: {
-		'label': 'FPT',
-		'width': '16%',
-		'lwidth': '50px',
+		'label': 'Frames Per Task',
+		'width': '20%',
+		'lwidth': '160px',
 		'type': 'int',
 		'default': 10,
 		'tooltip': 'Frames Per Task'
 	},
-	af_paused /*****/: {'label': 'Paused', 'width': '16%', 'lwidth': '50px', 'type': 'bool'}
+	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '80%'},
+	af_paused /*****/: {'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool'}
 };
 
 var d_cvtmulti_params = {
@@ -782,6 +783,9 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 			block.name += '.' + i_params.container.toUpperCase();
 		}
 		cmd += ' -f ' + i_params.fps;
+
+		if (i_params.sar)
+			cmd += ' --sar ' + i_params.sar;
 
 		if (i_wnd.wm)
 		{
