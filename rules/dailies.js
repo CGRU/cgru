@@ -358,7 +358,7 @@ var d_cvtguiparams = {
 	time_start /***/: {"default": '00:00:00', "width": '20%'},
 	duration /*****/: {"default": '00:00:00', "width": '20%'},
 	quality /******/: {"label": 'JPEG Quality', 'type': 'int', "default": 100, 'width': '20%'},
-	sar /**********/: {"label": 'Source pixel aspect', "width": '20%',"lwidth":'160px'},
+	ipar /*********/: {"label": 'Input pixel aspect', "width": '20%',"lwidth":'160px'},
 	padding /******/: {"label": 'Padding', 'width': '20%'},
 	af_capacity /**/: {'label': 'Capacity', 'width': '20%', 'type': 'int'},
 	af_maxtasks /***/: {'label': 'Max Tasks', 'width': '20%', 'type': 'int', 'default': -1},
@@ -784,8 +784,8 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 		}
 		cmd += ' -f ' + i_params.fps;
 
-		if (i_params.sar)
-			cmd += ' --sar ' + i_params.sar;
+		if (i_params.ipar)
+			cmd += ' --ipar ' + i_params.ipar;
 
 		if (i_wnd.wm)
 		{
