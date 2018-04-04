@@ -14,6 +14,8 @@ Parser = OptionParser(
 )
 
 Parser.add_option('-a', '--avcmd',     dest='avcmd',     type  ='string', default='ffmpeg', help='AV convert command')
+Parser.add_option(      '--sar',       dest='sar',       type  ='string', default=None,     help='Set source pixel aspect ratio')
+Parser.add_option(      '--dar',       dest='dar',       type  ='string', default=None,     help='Set destination pixel aspect ratio')
 Parser.add_option('-r', '--resize',    dest='resize',    type  ='string', default=None,     help='Resize (1280x720)')
 Parser.add_option('-c', '--codec',     dest='codec',     type  ='string', default=None,     help='Movie codec')
 Parser.add_option('-f', '--fps'  ,     dest='fps',       type  ='string', default='24',     help='Movie FPS (24)')
@@ -157,7 +159,14 @@ else:
     auxargs = ''
     if Options.resize is not None or Options.watermark is not None:
         filter_complex = ''
+        if Options.sar is not None:
+            if len(filter_complex): filter_complex += ','
+            filter_complex += 'setsar=%s' % Options.sar
+        if Options.dar is not None:
+            if len(filter_complex): filter_complex += ','
+            filter_complex += 'setdar=%s' % Options.dar
         if Options.resize is not None:
+            if len(filter_complex): filter_complex += ','
             resize = Options.resize.split('x')
             if len(resize) < 2:
                 hresize.append('-1')
