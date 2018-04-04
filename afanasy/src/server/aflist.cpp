@@ -11,7 +11,8 @@
 \* ....................................................................................................... */
 
 /*
-	List of afanasy nodes that can be solved (prodeuce a task).
+	List with an std::list<AfNodeSolve*> and some functions to manipulate it.
+	This list is always sorted by priority keeping item adding order.
 */
 
 #include "aflist.h"
@@ -43,6 +44,14 @@ AfList::~AfList()
 	   while( it != end_it)
 		  (*it++)->m_lists.remove( this);
 	*/
+}
+
+bool AfList::has(const AfNodeSolve * i_node)
+{
+	for (std::list<AfNodeSolve *>::const_iterator it = m_nodes_list.begin(); it != m_nodes_list.end(); it++)
+		if (*it == i_node)
+			return true;
+	return false;
 }
 
 int AfList::add(AfNodeSolve *node)

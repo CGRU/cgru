@@ -27,7 +27,7 @@
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -160,7 +160,7 @@ void Solver::solve()
 
 		// Function exits on each solve success (just 1 task solved),
 		// removes nodes that was not solved from list.
-		RenderAf * render = SolveList( solve_list, renders_list, af::Work::SolveByPriority);
+		RenderAf * render = SolveList( solve_list, renders_list);
 		if( render )
 		{
 			// Check Wake-On-LAN:
@@ -183,15 +183,9 @@ void Solver::solve()
 	}
 
 	AF_DEBUG << "Solved " << tasks_solved << " tasks within " << solve_cycle << " cycles.";
-
-	// This needed to set render not busy if has no tasks.
-	// This prevents not to reset render busy state if it runs tasks one by one.
-	RenderContainerIt rendersIt( ms_rendercontainer);
-	for( RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-		render->solvingFinished();
 }
 
-RenderAf * Solver::SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, int32_t i_method)
+RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders)
 {
 /*
 	// Remove nodes that need no solving at all (done, offline, ...)

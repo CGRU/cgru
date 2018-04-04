@@ -74,8 +74,8 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 		switch(user->getSolveMethod())
 		{
-			case af::Work::SolveByPriority: strRightBottom = "Priority Jobs Solving"; break;
-			case af::Work::SolveByOrder:    strRightBottom = "Ordered Jobs Solving";  break;
+			case af::Work::SolveJobsByPriority: strRightBottom = "Priority Jobs Solving"; break;
+			case af::Work::SolveJobsByOrder:    strRightBottom = "Ordered Jobs Solving";  break;
 		}
 	}
 	else if( Watch::isJedi())
@@ -99,8 +99,8 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 		switch(user->getSolveMethod())
 		{
-			case af::Work::SolveByPriority: strRightBottom = "Priority"; break;
-			case af::Work::SolveByOrder:    strRightBottom = "Ordered";  break;
+			case af::Work::SolveJobsByPriority: strRightBottom = "Priority"; break;
+			case af::Work::SolveJobsByOrder:    strRightBottom = "Ordered";  break;
 		}
 	}
 	else
@@ -121,8 +121,8 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 		switch(user->getSolveMethod())
 		{
-			case af::Work::SolveByPriority: strRightBottom = "par"; break;
-			case af::Work::SolveByOrder:    strRightBottom = "ord";  break;
+			case af::Work::SolveJobsByPriority: strRightBottom = "par"; break;
+			case af::Work::SolveJobsByOrder:    strRightBottom = "ord";  break;
 		}
 	}
 

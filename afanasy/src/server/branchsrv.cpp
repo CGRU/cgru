@@ -22,11 +22,12 @@
 
 #include "action.h"
 #include "afcommon.h"
+#include "branchescontainer.h"
 #include "jobaf.h"
+#include "monitorcontainer.h"
 #include "renderaf.h"
 #include "solver.h"
-#include "monitorcontainer.h"
-#include "branchescontainer.h"
+#include "useraf.h"
 
 #define AFOUTPUT
 //#undef AFOUTPUT
@@ -138,8 +139,6 @@ void BranchSrv::v_action(Action & i_action)
 
 		if (type == "delete")
 		{
-//if( m_jobs_num != 0 ) return;
-			appendLog(std::string("Deleted by ") + i_action.author);
 			deleteBranch(i_action, i_action.monitors);
 			return;
 		}
@@ -154,13 +153,6 @@ void BranchSrv::v_action(Action & i_action)
 		store();
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_id);
 	}
-}
-
-void BranchSrv::jobPriorityChanged(JobAf * i_job, MonitorContainer * i_monitoring)
-{
-	AF_DEBUG << "BranchSrv::jobPriorityChanged:";
-	m_jobs_list.sortPriority(i_job);
-//i_monitoring->addUser( this);
 }
 
 void BranchSrv::logAction(const Action & i_action, const std::string & i_node_name)
@@ -187,6 +179,7 @@ void BranchSrv::deleteBranch(Action & o_action, MonitorContainer * i_monitoring)
 		return;
 	}
 
+	appendLog(std::string("Deleted by ") + o_action.author);
 	setZombie();
 
 	if (i_monitoring)
@@ -211,22 +204,49 @@ void BranchSrv::removeBranch(BranchSrv * i_branch)
 	m_branches_num--;
 }
 
-void BranchSrv::addJob(JobAf * i_job)
+void BranchSrv::addJob(JobAf * i_job, UserAf * i_user)
 {
+	if (m_jobs_list.has(i_job))
+	{
+		AF_ERR << "Branch[" << getName() << "] already has a job[" << i_job->getName() << "]";
+		return;
+	}
+
 	appendLog(std::string("Adding a job: ") + i_job->getName());
 
 	m_jobs_list.add(i_job);
 
 	i_job->setBranch(this);
 
+	// Add job to user (create new branch user if not exists)
+	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
+	if (it == m_users.end())
+		m_users[i_user] = new BranchSrvUserData(i_job);
+	else
+		((*it).second)->jobs.add(i_job);
+
 	m_jobs_num++;
 }
 
-void BranchSrv::removeJob(JobAf * i_job)
+void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 {
 	appendLog(std::string("Removing a job: ") + i_job->getName());
 
 	m_jobs_list.remove(i_job);
+
+	// Remove job from user (and remove user if it has not any more jobs)
+	std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
+	if (it != m_users.end())
+	{
+		(*it).second->jobs.remove(i_job);
+		 if ((*it).second->jobs.getCount() == 0)
+		 {
+			 delete (*it).second;
+			 m_users.erase(it);
+		 }
+	}
+	else
+		AF_ERR << "Branch[" << getName() << "] already has no user[" << i_user->getName() << "]";
 
 	m_jobs_num--;
 }
@@ -254,33 +274,6 @@ void BranchSrv::jobsinfo(af::MCAfNodes &mcjobs)
 		mcjobs.addNode(job->node());
 }
 
-af::Msg * BranchSrv::writeJobdsOrder(bool i_binary) const
-{
-	if (i_binary)
-	{
-		af::MCGeneral ids;
-		ids.setId(getId());
-		ids.setList(generateJobsIds());
-		return new af::Msg(af::Msg::TUserJobsOrder, &ids);
-	}
-
-
-	std::vector<int32_t> jids = m_jobs_list.generateIdsList();
-	std::ostringstream str;
-
-	str << "{\"events\":{\"jobs_order\":{\"uids\":[";
-	str << getId();
-	str << "],\"jids\":[[";
-	for (int j = 0; j < jids.size(); j++)
-	{
-		if (j > 0) str << ",";
-		str << jids[j];
-	}
-	str << "]]}}}";
-
-	return af::jsonMsg(str);
-}
-
 void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
 	bool changed = false;
@@ -289,10 +282,8 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 	int32_t _branches_total = 0;
 	int32_t _jobs_num = 0;
 	int32_t _jobs_total = 0;
-	int32_t _running_tasks_num = 0;
-	int64_t _running_capacity_total = 0;
-	std::list<af::Job*> _active_jobs_list;
 
+	// Iterate branches
 	AfListIt bIt(&m_branches_list);
 	for (AfNodeSrv * node = bIt.node(); node != NULL; bIt.next(), node = bIt.node())
 	{
@@ -302,42 +293,29 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 		_branches_total++;
 		_branches_total += branch->m_branches_total;
 		_jobs_total += branch->m_jobs_total;
-		_running_tasks_num += branch->getRunningTasksNum();
-		_running_capacity_total += branch->getRunningCapacityTotal();
 	}
 
+	// Iterate jobs
 	AfListIt jIt(&m_jobs_list);
 	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
 	{
-		JobAf * job = (JobAf*)node;
-
 		_jobs_num++;
 		_jobs_total++;
-
-		if(job->getRunningTasksNum() == 0)
-			continue;
-
-		_running_tasks_num += job->getRunningTasksNum();
-		_running_capacity_total += job->getRunningCapacityTotal();
-		_active_jobs_list.push_back((af::Job*)job);
 	}
 
-	if ((_branches_num           != m_branches_num          ) ||
-		(_branches_total         != m_branches_total        ) ||
-		(_jobs_num               != m_jobs_num              ) ||
-		(_jobs_total             != m_jobs_total            ) ||
-		(_running_capacity_total != m_running_capacity_total) ||
-		(_running_tasks_num      != m_running_tasks_num     ) ||
-		(_active_jobs_list       != m_active_jobs_list      ))
+	// Compare changes
+	if ((_branches_num   != m_branches_num  ) ||
+		(_branches_total != m_branches_total) ||
+		(_jobs_num       != m_jobs_num      ) ||
+		(_jobs_total     != m_jobs_total    ))
 		changed = true;
 
-	m_branches_num           = _branches_num;
-	m_branches_total         = _branches_total;
-	m_jobs_num               = _jobs_num;
-	m_jobs_total             = _jobs_total;
-	m_running_tasks_num      = _running_tasks_num;
-	m_running_capacity_total = _running_capacity_total;
-	m_active_jobs_list       = _active_jobs_list;
+	// Store new calculations
+	m_branches_num   = _branches_num;
+	m_branches_total = _branches_total;
+	m_jobs_num       = _jobs_num;
+	m_jobs_total     = _jobs_total;
+
 
 	if (changed && monitoring)
 		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
@@ -407,29 +385,108 @@ RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorCont
 	}
 
 	solve_list.sort( GreaterNeed());
+
+
 //	std::list<AfNodeSolve*> solve_list(m_branches_list.getStdList());
 //	std::list<AfNodeSolve*> jobs_list(m_jobs_list.getStdList());
-
 	// Add jobs list to a branches list:
 //	solve_list.splice(solve_list.end(), jobs_list);
 
-	return Solver::SolveList(solve_list, i_renders_list, m_solve_method);
+
+	return Solver::SolveList(solve_list, i_renders_list);
 }
 
-void BranchSrv::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+void BranchSrv::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
 {
+	// Generate a new active jobs list:
+	m_active_jobs_list.clear();
+	AfListIt jIt(&m_jobs_list);
+	for (AfNodeSrv * node = jIt.node(); node != NULL; jIt.next(), node = jIt.node())
+	{
+		JobAf * job = (JobAf*)node;
+		if(job->getRunningTasksNum() == 0)
+			continue;
+		m_active_jobs_list.push_back(job);
+	}
+
+
+	// Clear active users (and delete users data)
+	for (std::list<BranchUserData*>::iterator it = m_active_users_list.begin(); it != m_active_users_list.end(); it++)
+		delete (*it);
+	m_active_users_list.clear();
+
+	// Generate a new active users list:
+	std::map<UserAf*, BranchSrvUserData*>::iterator uIt = m_users.begin();
+	for (; uIt != m_users.end(); uIt++)
+	{
+		if ((*uIt).second->running_tasks_num == 0)
+			continue;
+
+		m_active_users_list.push_back(
+			new BranchUserData((*uIt).first, (*uIt).second->running_tasks_num, (*uIt).second->running_capacity_total));
+	}
+}
+
+void BranchSrv::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user)
+{
+	if (i_user)
+	{
+		std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
+		if (it == m_users.end())
+		{
+			AF_ERR << "Branch [" << getName() << "] has no user[" << i_user->getName() << "]";
+		}
+		else
+		{
+			(*it).second->running_tasks_num++;
+			(*it).second->running_capacity_total += i_exec->getCapResult();
+		}
+	}
+
 	AfNodeSolve::addSolveCounts(i_exec, i_render);
+
 	i_monitoring->addEvent(af::Monitor::EVT_branches_change, getId());
+
 	if (m_parent)
-		m_parent->addSolveCounts(i_monitoring, i_exec, i_render);
+		m_parent->addSolveCounts(i_monitoring, i_exec, i_render, NULL);
 }
 
-void BranchSrv::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
+void BranchSrv::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user)
 {
+	if (i_user)
+	{
+		std::map<UserAf*, BranchSrvUserData*>::iterator it = m_users.find(i_user);
+		if (it == m_users.end())
+		{
+			AF_ERR << "Branch [" << getName() << "] has no user[" << i_user->getName() << "]";
+		}
+		else
+		{
+			BranchSrvUserData * udata = (*it).second;
+			udata->running_tasks_num--;
+			udata->running_capacity_total -= i_exec->getCapResult();
+
+			if (udata->running_tasks_num < 0)
+			{
+				AF_WARN << "Branch [" << getName() << "] user[" << i_user->getName()
+					<< "] has running_tasks_num = " << udata->running_tasks_num;
+				udata->running_tasks_num = 0;
+			}
+			if (udata->running_capacity_total < 0)
+			{
+				AF_WARN << "Branch [" << getName() << "] user[" << i_user->getName()
+					<< "] has running_capacity_total = " << udata->running_capacity_total;
+				udata->running_capacity_total = 0;
+			}
+		}
+	}
+
 	AfNodeSolve::remSolveCounts(i_exec, i_render);
+
 	i_monitoring->addEvent(af::Monitor::EVT_branches_change, getId());
+
 	if (m_parent)
-		m_parent->remSolveCounts(i_monitoring, i_exec, i_render);
+		m_parent->remSolveCounts(i_monitoring, i_exec, i_render, NULL);
 }
 
 

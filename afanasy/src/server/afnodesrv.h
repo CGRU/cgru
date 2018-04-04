@@ -30,6 +30,9 @@ public:
 	/// Refresh node information
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
+	// Perform post solving calculations:
+	virtual void v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring);
+
 	// Friends for container:
 	friend class AfContainer;
 	friend class AfContainerIt;

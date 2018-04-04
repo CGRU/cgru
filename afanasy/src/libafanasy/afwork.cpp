@@ -26,7 +26,7 @@
 
 using namespace af;
 
-Work::Work() : m_solve_method(SolveByOrder)
+Work::Work() : m_solve_method(SolveJobsByPriority)
 {
 	m_max_running_tasks = af::Environment::getMaxRunningTasksNumber();
 	m_max_running_tasks_per_host = -1;
@@ -69,10 +69,12 @@ void Work::jsonRead(const JSON &i_object, std::string *io_changes)
 
 	std::string solve_method;
 	jr_string("solve_method", solve_method, i_object, io_changes);
-	if (solve_method == "priority")
-		m_solve_method = SolveByPriority;
+	if (solve_method == "users_priority")
+		m_solve_method = SolveUsersByPriority;
+	else if (solve_method == "jobs_priority")
+		m_solve_method = SolveJobsByPriority;
 	else
-		m_solve_method = SolveByOrder;
+		m_solve_method = SolveJobsByOrder;
 }
 
 void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
@@ -90,8 +92,9 @@ void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
 	o_str << ",\n\"solve_method\":\"";
 	switch (m_solve_method)
 	{
-		case SolveByOrder: o_str << "order"; break;
-		case SolveByPriority: o_str << "priority"; break;
+		case SolveJobsByOrder:     o_str << "jobs_order";     break;
+		case SolveJobsByPriority:  o_str << "jobs_priority";  break;
+		case SolveUsersByPriority: o_str << "users_priority"; break;
 	}
 	o_str << "\"";
 

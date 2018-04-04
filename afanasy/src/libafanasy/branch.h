@@ -63,6 +63,21 @@ protected:
 
 	std::list<af::Job *> m_active_jobs_list;
 
+	struct BranchUserData
+	{
+		User * user;
+		int32_t running_tasks_num;
+		int64_t running_capacity_total;
+
+		BranchUserData(User * i_user, int32_t i_running_tasks_num, int64_t i_running_capacity_total):
+			user(i_user),
+			running_tasks_num(i_running_tasks_num),
+			running_capacity_total(i_running_capacity_total)
+		{
+		}
+	};
+	std::list<BranchUserData*> m_active_users_list;
+
 	int64_t m_time_creation;
 	int64_t m_time_empty;
 

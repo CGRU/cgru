@@ -42,7 +42,7 @@ public:
 
 	void solve();
 
-	static RenderAf * SolveList( std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, int32_t i_method);
+	static RenderAf * SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders);
 
 private:
 	static BranchesContainer * ms_branchescontainer;

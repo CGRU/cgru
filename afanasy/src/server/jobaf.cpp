@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	This is a server side of an Afanasy job.
+*/
 #include "jobaf.h"
 
 #include "../include/afanasy.h"
@@ -357,7 +372,7 @@ void JobAf::deleteNode( RenderContainer * renders, MonitorContainer * monitoring
 	
 	AFCommon::DBAddJob( this);
 
-	m_branch_srv->removeJob(this);
+	m_branch_srv->removeJob(this, m_user);
 	
 	if(monitoring)
 	{
@@ -561,10 +576,10 @@ void JobAf::v_action( Action & i_action)
 			return;
 		}
 
-		m_branch_srv->removeJob(this);
+		m_branch_srv->removeJob(this, m_user);
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
 
-		new_branch_srv->addJob(this);
+		new_branch_srv->addJob(this, m_user);
 		i_action.monitors->addEvent(af::Monitor::EVT_branches_change, m_branch_srv->getId());
 	}
 
@@ -836,7 +851,7 @@ bool JobAf::v_canRunOn( RenderAf * i_render)
 void JobAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
 	m_user->addSolveCounts(i_monitoring, i_exec, i_render);
-	m_branch_srv->addSolveCounts(i_monitoring, i_exec, i_render);
+	m_branch_srv->addSolveCounts(i_monitoring, i_exec, i_render, m_user);
 
 	AfNodeSolve::addSolveCounts(i_exec, i_render);
 	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
@@ -845,7 +860,7 @@ void JobAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exe
 void JobAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
 {
 	m_user->remSolveCounts(i_monitoring, i_exec, i_render);
-	m_branch_srv->remSolveCounts(i_monitoring, i_exec, i_render);
+	m_branch_srv->remSolveCounts(i_monitoring, i_exec, i_render, m_user);
 
 	AfNodeSolve::remSolveCounts(i_exec, i_render);
 	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());

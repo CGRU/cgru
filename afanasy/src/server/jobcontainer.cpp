@@ -191,7 +191,7 @@ bool JobContainer::registerJob(JobAf * i_job, std::string & o_err, BranchesConta
 
 		AF_DEBUG << "JobContainer::registerJob: locking branch.";
 		branch->lock();
-		branch->addJob(i_job);
+		branch->addJob(i_job, user);
 
 		AF_DEBUG << "JobContainer::registerJob: locking user.";
 		user->lock();

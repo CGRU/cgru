@@ -53,6 +53,8 @@ public:
 	/// Refresh container nodes.
 	void refresh(AfContainer *pointer, MonitorContainer *monitoring);
 
+	void postSolve(MonitorContainer * i_monitoring); 
+
 	/// Perform an aciton:
 	af::Msg *action(Action &i_action);
 

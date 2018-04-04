@@ -27,10 +27,14 @@ AfNodeSrv::AfNodeSrv( af::Node * i_node, const std::string & i_store_dir):
 	}
 }
 
-void AfNodeSrv::v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
+void AfNodeSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-	AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->getName().c_str(), m_node->getId())
-	return;
+	AF_ERR << "Not imlemented on \"" << m_node->getName() << "\"";
+}
+
+void AfNodeSrv::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
+{
+	AF_ERR << "Not imlemented on \"" << m_node->getName() << "\"";
 }
 
 AfNodeSrv::~AfNodeSrv()

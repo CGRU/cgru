@@ -52,6 +52,11 @@ BranchNode.prototype.init = function() {
 	this.elAnnotation.classList.add('annotation');
 	this.elAnnotation.title = 'Annotation';
 
+	this.elActiveUsers = document.createElement('div');
+	this.element.appendChild(this.elActiveUsers);
+	this.elActiveUsers.classList.add('active_users_div');
+	this.elActiveUsers.title = 'Active usrers';
+
 	this.active_jobs = [];
 	this.elActiveJobs = document.createElement('div');
 	this.elActiveJobs.classList.add('active_jobs_div');
@@ -139,6 +144,18 @@ BranchNode.prototype.update = function(i_obj) {
 			jobs += '/<b>' + this.params.running_jobs_num + '</b>r';
 		this.elJobsCounts.innerHTML = jobs;
 	}
+
+
+	var active_users_info = '';
+	for (var u = 0; u < this.params.active_users.length; u++)
+	{
+		var usr = this.params.active_users[u];
+		active_users_info += ' ' + usr.name;
+		active_users_info += ':' + usr.running_tasks_num;
+		active_users_info += '[' + usr.running_capacity_total + ']';
+	}
+	this.elActiveUsers.innerHTML = active_users_info;
+
 
 	// Set all current active jobs as not updated.
 	// Later all not updated active jobs will be deleted.
@@ -284,7 +301,7 @@ function BranchActiveJob(i_branch, i_elParent, i_params)
 
 	this.elName = document.createElement('span');
 	this.el.appendChild(this.elName);
-	this.elName.textContent = this.params.name + '[' + this.params.id + ']';
+	this.elName.textContent = this.params.name;
 
 	this.elRunningCounts = cm_ElCreateFloatText(this.el, 'right');
 

@@ -22,9 +22,10 @@
 #include "afnodesolve.h"
 
 class Action;
+class BranchesContainer;
 class JobAf;
 class RenderAf;
-class BranchesContainer;
+class UserAf;
 
 /// Server side of Afanasy user.
 class BranchSrv : public af::Branch, public AfNodeSolve
@@ -45,8 +46,8 @@ public:
 	void addBranch(BranchSrv * i_branch);
 	void removeBranch(BranchSrv * i_branch);
 
-	void addJob(JobAf * i_job);
-	void removeJob(JobAf * i_job);
+	void addJob(JobAf * i_job, UserAf * i_user);
+	void removeJob(JobAf * i_job, UserAf * i_user);
 
 	/// Whether the branch can produce a task
 	/** Used to limit nodes for heavy solve algorithm **/
@@ -59,14 +60,17 @@ public:
 	/// Generate task for \c render from list, return \c render if task generated or NULL.
 	virtual RenderAf * v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring); 
 
-	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
-	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
+	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user);
+	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user);
 
 	void jobsinfo(af::MCAfNodes &mcjobs); ///< Generate all branch jobs information.
 	
 	bool getJobs(std::ostringstream & o_str);
 
 	void v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+
+	// Perform post solving calculations:
+	void v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring);
 
 	virtual void v_action(Action & i_action);
 
@@ -75,10 +79,6 @@ public:
 	inline AfList * getJobsList() { return &m_jobs_list; }
 
 	inline const std::vector<int32_t> generateJobsIds() const { return m_jobs_list.generateIdsList();}
-
-	void jobPriorityChanged(JobAf * i_job, MonitorContainer * i_monitoring);
-
-	af::Msg * writeJobdsOrder(bool i_binary) const;
 
 	/// Set container.
 	inline static void setBranchesContainer(BranchesContainer * i_branches ) { ms_branches = i_branches;}
@@ -95,6 +95,21 @@ private:
 	BranchSrv * m_parent;
 	AfList m_branches_list;
 	AfList m_jobs_list; ///< Jobs list.
+
+	struct BranchSrvUserData
+	{
+		AfList jobs;
+		int32_t running_tasks_num;
+		int64_t running_capacity_total;
+
+		BranchSrvUserData(JobAf * i_job):
+			running_tasks_num(0),
+			running_capacity_total(0)
+		{
+			jobs.add((AfNodeSolve*)(i_job));
+		}
+	};
+	std::map<UserAf*, BranchSrvUserData*> m_users;
 
 private:
    static BranchesContainer * ms_branches;

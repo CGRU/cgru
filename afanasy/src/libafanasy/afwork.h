@@ -33,8 +33,9 @@ public:
 
 	enum SolvingMethod
 	{
-		SolveByOrder = 0,
-		SolveByPriority = 1
+		SolveJobsByOrder     = 0,
+		SolveJobsByPriority  = 1,
+		SolveUsersByPriority = 2
 	};
 
 	void generateInfoStream(std::ostringstream &o_str, bool full = false) const; /// Generate information.

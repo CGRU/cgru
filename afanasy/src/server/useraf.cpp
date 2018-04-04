@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	This is a server side of an Afanasy user.
+*/
 #include "useraf.h"
 
 #include <math.h>
@@ -311,7 +326,7 @@ bool UserAf::v_canRunOn( RenderAf * i_render)
 RenderAf * UserAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
 {
 	std::list<AfNodeSolve*> solve_list(m_jobslist.getStdList());
-	return Solver::SolveList(solve_list, i_renders_list, m_solve_method);
+	return Solver::SolveList(solve_list, i_renders_list);
 }
 
 void UserAf::addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render)
@@ -329,8 +344,6 @@ void UserAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_ex
 int UserAf::v_calcWeight() const
 {
 	int weight = User::v_calcWeight();
-//printf("UserAf::calcWeight: User::calcWeight: %d bytes\n", weight);
 	weight += sizeof(UserAf) - sizeof( User);
-//printf("UserAf::calcWeight: %d bytes ( sizeof UserAf = %d)\n", weight, sizeof( UserAf));
 	return weight;
 }

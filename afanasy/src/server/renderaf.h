@@ -54,8 +54,11 @@ public:
 /// Releases the ownership of taskexec (Render will not own it any more)
 	void taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring);
 
-/// Refresh parameters.
+	/// Refresh parameters.
 	void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+
+	// Perform post solving calculations:
+	void v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring);
 
 	af::Msg * writeTasksLog( bool i_binary);
 
@@ -77,9 +80,6 @@ public:
 
 	// Update render and send instructions back:
 	af::Msg * update( const af::RenderUpdate & i_up);
-
-	// Called directly from solve cycle if it was not solved.
-	void solvingFinished();
 
 	// Need for server to write some farm parameters (gui double-click):
 	af::Msg * writeFullInfo( bool binary) const;

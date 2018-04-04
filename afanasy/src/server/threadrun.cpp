@@ -1,3 +1,18 @@
+/* ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''' *\
+ *        .NN.        _____ _____ _____  _    _                 This file is part of CGRU
+ *        hMMh       / ____/ ____|  __ \| |  | |       - The Free And Open Source CG Tools Pack.
+ *       sMMMMs     | |   | |  __| |__) | |  | |  CGRU is licensed under the terms of LGPLv3, see files
+ * <yMMMMMMMMMMMMMMy> |   | | |_ |  _  /| |  | |    COPYING and COPYING.lesser inside of this folder.
+ *   `+mMMMMMMMMNo` | |___| |__| | | \ \| |__| |          Project-Homepage: http://cgru.info
+ *     :MMMMMMMM:    \_____\_____|_|  \_\\____/        Sourcecode: https://github.com/CGRU/cgru
+ *     dMMMdmMMMd     A   F   A   N   A   S   Y
+ *    -Mmo.  -omM:                                           Copyright © by The CGRU team
+ *    '          '
+\* ....................................................................................................... */
+
+/*
+	Here is the main (run) thread function.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -117,6 +132,12 @@ void threadRunCycle( void * i_args)
 	//
 	solver.solve();
 	
+	//
+	// Perform post solving calculations.
+	// Some data for guis needed to be refreshed after solving (after new tasks started).
+	a->branches ->postSolve(a->monitors);
+	a->renders  ->postSolve(a->monitors);
+
 	//
 	// Dispatch events to monitors:
 	//

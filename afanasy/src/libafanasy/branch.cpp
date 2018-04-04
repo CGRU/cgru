@@ -16,9 +16,10 @@
 
 #include "branch.h"
 #include "job.h"
+#include "user.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -45,7 +46,7 @@ Branch::Branch(int i_id)
 void Branch::initDefaultValues()
 {
 	m_flags_branch = 0;
-	m_solve_method = Work::SolveByPriority;
+	m_solve_method = Work::SolveUsersByPriority;
 
 	m_branches_num = 0;
 	m_branches_total = 0;
@@ -100,8 +101,7 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 		o_str << ",\n\"jobs_total\":" << m_jobs_total;
 
 	o_str << ",\n\"active_jobs\":[";
-	std::list<Job *>::const_iterator it = m_active_jobs_list.begin();
-	for (; it != m_active_jobs_list.end(); it++)
+	for (std::list<Job *>::const_iterator it = m_active_jobs_list.begin(); it != m_active_jobs_list.end(); it++)
 	{
 		if (it != m_active_jobs_list.begin()) o_str << ",";
 
@@ -114,6 +114,25 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 
 		if ((*it)->getRunningCapacityTotal() > 0)
 			o_str << ",\n\"running_capacity_total\":" << (*it)->getRunningCapacityTotal();
+
+		o_str << "\n}";
+	}
+	o_str << "\n]";
+
+	o_str << ",\n\"active_users\":[";
+	for (std::list<BranchUserData*>::const_iterator it = m_active_users_list.begin(); it != m_active_users_list.end(); it++)
+	{
+		if (it != m_active_users_list.begin()) o_str << ",";
+
+		o_str << "\n{";
+		o_str << "\n\"id\":" << (*it)->user->getId();;
+		o_str << ",\n\"name\":\"" << (*it)->user->getName() << "\"";
+
+		if ((*it)->running_tasks_num > 0)
+			o_str << ",\n\"running_tasks_num\":" << (*it)->running_tasks_num;
+
+		if ((*it)->running_capacity_total > 0)
+			o_str << ",\n\"running_capacity_total\":" << (*it)->running_capacity_total;
 
 		o_str << "\n}";
 	}
