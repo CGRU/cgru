@@ -11,7 +11,8 @@
 \* ....................................................................................................... */
 
 /*
-	dailies.js - TODO: description
+	dailies.js
+	Make dailies, convert sequences and movies.
 */
 
 "use strict";
@@ -39,6 +40,7 @@ d_params.general = {
 d_params.settings = {
 	audio_file /******/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file'},
 	af_depend_mask /**/: {"label": 'Depends', "tooltip": 'Afanasy job depend mask'},
+	af_hostsmask /****/: {'label': 'Hosts Mask'},
 	fffirst /*********/:
 		{"label": "F.F.First", "tooltip": 'First frame is "1"\nNo matter image file name number.'},
 	aspect_in /*******/: {"label": 'Aspect In'},
@@ -239,6 +241,8 @@ function d_ProcessGUI(i_wnd)
 	job.name = params.filename;
 	if (params.af_depend_mask.length)
 		job.depend_mask = params.af_depend_mask;
+	if (params.af_hostsmask.length)
+		job.hosts_mask = params.af_hostsmask;
 
 	job.folders = {};
 	job.folders.input = c_PathDir(c_PathPM_Client2Server(params.input));
@@ -299,14 +303,7 @@ function d_MakeCmd(i_params)
 		cmd += ' --fffirst';
 
 	if (params.audio_file != '')
-	{
 		cmd += ' --audio "' + params.audio_file + '"';
-		cmd += ' --acodec "' +
-			'libfaac' +
-			'"';
-		cmd += ' --afreq ' + 22000;
-		cmd += ' --akbits ' + 128;
-	}
 
 	cmd += ' --lgspath "' + params.logo_slate_path + '"';
 	cmd += ' --lgssize ' + params.logo_slate_size;

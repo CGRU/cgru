@@ -533,17 +533,16 @@ name_precomp = []
 
 # Extract audio track(s) from file to flac if it is not flac already:
 if Audio is not None:
-	if not os.path.isfile(Audio):
-		print('Audio file "%s" does not exist.' % Audio)
-		Audio = None
-	elif len(Audio) >= 5:
-		if Audio[-5:] != '.flac':
-			cmd_precomp.append(
-				'ffmpeg -y -i "%(audio)s" -vn -acodec flac "%(audio)s.flac"' %
-				{'audio': Audio}
-			)
-			name_precomp.append('Audio "%s"' % os.path.basename(Audio))
-			Audio += '.flac'
+    if not os.path.isfile(Audio):
+        print('Audio file "%s" does not exist.' % Audio)
+        Audio = None
+    else:
+        audio_name, audio_ext = os.path.splitext(Audio)
+        if audio_ext != '.flac':
+            audio_flac = '%s.%s' % (audio_name,'flac')
+            cmd_precomp.append('ffmpeg -y -i "%s" -vn -acodec flac "%s"' % (Audio,audio_flac))
+            name_precomp.append('Audio "%s"' % os.path.basename(Audio))
+            Audio = audio_flac
 
 # Reformat logo:
 logopath = [Options.lgspath, Options.lgfpath]
