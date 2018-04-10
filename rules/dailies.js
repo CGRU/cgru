@@ -368,7 +368,8 @@ var d_cvtguiparams = {
 		'default': 10,
 		'tooltip': 'Frames Per Task'
 	},
-	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '80%'},
+	audio_file /****/: {"label": 'Audio', "default": "REF/sound.flac", "tooltip": 'Sound file', 'width': '40%'},
+	af_hostsmask /**/: {'label': 'Hosts Mask', 'width': '40%'},
 	af_paused /*****/: {'label': 'Start Job Paused', 'width': '20%', 'lwidth': '160px', 'type': 'bool'}
 };
 
@@ -783,6 +784,9 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 
 		if (i_params.ipar)
 			cmd += ' --ipar ' + i_params.ipar;
+
+		if (i_params.audio_file != '')
+			cmd += ' --audio "' + i_params.audio_file + '"';
 
 		if (i_wnd.wm)
 		{
