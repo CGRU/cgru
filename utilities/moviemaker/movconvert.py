@@ -29,12 +29,29 @@ Parser.add_option('-p', '--padding',   dest='padding' ,  type  ='int',    defaul
 Parser.add_option('-w', '--watermark', dest='watermark', type  ='string', default=None,     help='Add watermark')
 Parser.add_option('-u', '--suffix',    dest='suffix',    type  ='string', default=None,     help='Add suffix to ouput file name')
 Parser.add_option(      '--imgname',   dest='imgname',   type  ='string', default=None,     help='Images files name (frame)')
+Parser.add_option(      '--audio',     dest='audio',     type  ='string', default=None,     help='Add sound from an audio file')
+Parser.add_option(      '--acodec',    dest='acodec',    type  ='string', default='aac',    help='Audio codec')
 
 Options, argv = Parser.parse_args()
 
 if len(argv) < 1:
     print('ERROR: Movie file not specified.')
     sys.exit(0)
+
+# Extract audio track(s) from file to flac if it is not flac already:
+if Options.audio is not None:
+    if not os.path.isfile(Options.audio):
+        print('Audio file "%s" does not exist.' % Options.audio)
+        Options.audio = None
+    else:
+        audio_name, audio_ext = os.path.splitext(Options.audio)
+        if audio_ext != '.flac':
+            audio_flac = '%s.%s' % (audio_name,'flac')
+            print('Executing command to convert audio:')
+            cmd_audio = 'ffmpeg -y -i "%s" -vn -acodec flac "%s"' % (Options.audio,audio_flac)
+            print(cmd_audio)
+            subprocess.call(cmd_audio,shell=True)
+            Options.audio = audio_flac
 
 Input = argv[0]
 Output = Options.output
@@ -186,6 +203,8 @@ else:
         auxargs += ' -ss "%s"' % Options.timestart
     if Options.duration:
         auxargs += ' -t "%s"' % Options.duration
+    if Options.audio is not None:
+        auxargs += ' -i "%s" -shortest -codec:a %s' % (Options.audio,Options.acodec)
 
     avcmd = Options.avcmd
     if StartNumber:
