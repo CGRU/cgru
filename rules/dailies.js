@@ -742,6 +742,7 @@ function d_CvtMovies(i_wnd, i_params, i_to_sequence)
 	block.parser = 'generic';
 	block.capacity = i_params.af_capacity;
 	block.working_directory = c_PathDir(paths[0]);
+	block.working_directory = c_PathPM_Rules2Server(g_CurPath());
 	block.tasks = [];
 	job.blocks = [block];
 
