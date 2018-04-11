@@ -1,6 +1,6 @@
 FROM ubuntu:14.04
 
-ENV CGRU_VERSION="2.2.3" CGRU_UBUNTU_VERSION="14.04.5"
+ENV CGRU_VERSION=2.2.3 CGRU_UBUNTU_VERSION=14.04.5
 LABEL maintainer="Alexandre Buisine <alexandrejabuisine@gmail.com>" cgru_version=$CGRU_VERSION
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -qq update \
@@ -30,10 +30,13 @@ RUN chmod +rx /usr/local/bin/ep /usr/local/bin/docker-entrypoint.sh \
  && sed -i 's/"af_thumbnail_extensions":.\+,/"af_thumbnail_extensions":${AF_THUMBNAIL_EXTENSIONS},/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_thumbnail_cmd":".\+",/"af_thumbnail_cmd":"${AF_THUMBNAIL_CMD}",/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_render_zombietime":.\+,/"af_render_zombietime":${AF_RENDER_ZOMBIETIME},/' /opt/cgru/afanasy/config_default.json \
- && sed -i 's/"af_render_connectretries":.\+,/"af_render_connectretries":${AF_RENDER_CONNECTRETRIES},/' /opt/cgru/afanasy/config_default.json
+ && sed -i 's/"af_render_connectretries":.\+,/"af_render_connectretries":${AF_RENDER_CONNECTRETRIES},/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"af_render_connectretries":.\+,/"af_render_connectretries":${AF_RENDER_CONNECTRETRIES},/' /opt/cgru/afanasy/config_default.json \
+ && sed -i 's/"cmd_shell":"\/bin\/sh -c"/"cmd_shell":"${CGRU_CMD_SHELL}"/' /opt/cgru/config_default.json
 
 VOLUME /var/tmp/afanasy
-ENV AF_USERNAME="render" \
+ENV CGRU_CMD_SHELL="/bin/sh -c" \
+ AF_USERNAME="render" \
  AF_SERVERNAME="afrender" \
  AF_SERVERPORT=51000 \
  AF_RENDER_ZOMBIETIME=60 \

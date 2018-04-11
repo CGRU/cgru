@@ -28,5 +28,6 @@ export CGRU_PYTHONEXE="python3"
 export PYTHONPATH="${CGRU_PYTHON}:${AF_PYTHON}"
 
 /usr/local/bin/ep -v "/opt/cgru/afanasy/config_default.json"
+/usr/local/bin/ep -v "/opt/cgru/config_default.json"
 
 exec "$@"
