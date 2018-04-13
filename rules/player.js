@@ -16,7 +16,7 @@
 
 "use strict";
 
-p_PLAYER = true;
+var p_PLAYER = true;
 
 // TODO: not pollute the global scope with so much vars, should be bundled into struct objects
 var p_savepath = '.commented';
@@ -59,6 +59,7 @@ var p_paintColor = [255, 255, 0];
 var p_paintSize = 5;
 var p_paintCtx = null;
 
+var p_bar_ctx = null;
 var p_bar_clr_canvas = [255, 255, 0];
 var p_bar_clr_edited = [255, 0, 0];
 var p_bar_clr_saved = [0, 255, 0];
@@ -82,8 +83,8 @@ var p_el = {};
 var p_buttons = ['play', 'prev', 'next', 'reverse', 'rewind', 'forward'];
 var p_elb = {};
 
-g_auth_user = null;
-g_users = null;
+var g_auth_user = null;
+var g_users = null;
 
 function p_OpenCloseHeader()
 {
@@ -430,7 +431,7 @@ function p_ImgLoaded(e)
 	// Initialize frames bar canvas context:
 	$('bar_canvas').width = p_frame_bar_width;
 	$('bar_canvas').height = p_frame_bar_height;
-	var p_bar_ctx = $('bar_canvas').getContext('2d');
+	p_bar_ctx = $('bar_canvas').getContext('2d');
 	p_bar_ctx.globalCompositeOperation = 'source-over';
 
 	if (localStorage.player_usewebgl == 'ON')

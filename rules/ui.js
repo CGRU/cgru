@@ -77,7 +77,7 @@ function u_Init()
 	if ( localStorage.footer_opened == 'true' )
 		 u_OpenCloseFooter();
 
-	if (p_PLAYER == true)
+	if (p_PLAYER)
 		return;
 
 	if (localStorage.navig_width == null)
