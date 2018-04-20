@@ -1,5 +1,5 @@
 rem @echo off
-set CMAKE_GENERATOR=Visual Studio 14 2015 Win64
+set CMAKE_GENERATOR=Visual Studio 15 2017 Win64
 
 pushd ..\..\..
 call setup.cmd
@@ -8,11 +8,9 @@ popd
 setlocal EnableDelayedExpansion
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-SET "cgru_qt_install_dir=C:\Qt"
-For /F "Tokens=*" %%I in ('dir /b "%cgru_qt_install_dir%\Qt5.8*"') Do SET "cgru_qt=%%I"
-if defined cgru_qt (
-	SET "cgru_qt=!cgru_qt_install_dir!\!cgru_qt!\5.8\msvc2015_64"
-	echo Adding "!cgru_qt!" to PATH
+SET "cgru_qt=C:\Qt\Qt5.10.1\5.10.1\msvc2017_64"
+if exist !cgru_qt! (
+	echo Adding "!cgru_qt!\bin" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
 )
 set "AF_GUI=YES"
