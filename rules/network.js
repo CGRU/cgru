@@ -273,6 +273,16 @@ function n_SendJob(job)
 		job.folders = {};
 	job.folders.rules = c_PathPM_Rules2Server(g_CurPath());
 
+	if (job.branch == null)
+	{
+		if (job.folders.output)
+			job.branch = job.folders.output;
+		else if (job.folders.input)
+			job.branch = job.folders.input;
+		else
+			job.branch = job.folders.rules;
+	}
+
 	var obj = {};
 	obj.afanasy = 1;
 	obj.job = job;
