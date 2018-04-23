@@ -10,32 +10,32 @@ nimby_set = False
 free_set = False
 
 
-def setnimby(text='(keeper)'):
-	cmd = af.Cmd().renderSetNimby(text)
+def setnimby():
+	cmd = af.Cmd().renderSetNimby()
 	render.refreshAfter()
 
 
-def setNIMBY(text='(keeper)'):
-	cmd = af.Cmd().renderSetNIMBY(text)
+def setNIMBY():
+	cmd = af.Cmd().renderSetNIMBY()
 	render.refreshAfter()
 
 
-def setFree(text='(keeper)'):
-	cmd = af.Cmd().renderSetFree(text)
+def setFree():
+	cmd = af.Cmd().renderSetFree()
 	render.refreshAfter()
 
-def setFreeUnpause(text='(keeper)'):
-	cmd = af.Cmd().renderSetFreeUnpause(text)
-	render.refreshAfter()
-
-
-def ejectTasks(text='(keeper)'):
-	cmd = af.Cmd().renderEjectTasks(text)
+def setFreeUnpause():
+	cmd = af.Cmd().renderSetFreeUnpause()
 	render.refreshAfter()
 
 
-def ejectNotMyTasks(text='(keeper)'):
-	cmd = af.Cmd().renderEjectNotMyTasks(text)
+def ejectTasks():
+	cmd = af.Cmd().renderEjectTasks()
+	render.refreshAfter()
+
+
+def ejectNotMyTasks():
+	cmd = af.Cmd().renderEjectNotMyTasks()
 	render.refreshAfter()
 
 
@@ -99,13 +99,13 @@ def refresh(reset=False):
 	if toset_nimby:
 		if not nimby_set:
 			if toallow_tasks:
-				setnimby('(keeper nimby schedule)')
+				setnimby()
 				if toeject_tasks:
-					ejectNotMyTasks('(keeper nimby schedule)')
+					ejectNotMyTasks()
 			else:
-				setNIMBY('(keeper nimby schedule)')
+				setNIMBY()
 				if toeject_tasks:
-					ejectTasks('(keeper nimby schedule)')
+					ejectTasks()
 			nimby_set = True
 			free_set = False
 	elif toset_free:
