@@ -28,7 +28,7 @@
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -46,7 +46,7 @@ AFINFO("BranchesContainer::~BranchesContainer:\n");
 
 BranchSrv * BranchesContainer::addBranchFromPath(const std::string & i_path, MonitorContainer * i_monitors)
 {
-AF_DEBUG << i_path;
+//AF_DEBUG << i_path;
 //Filter branch path
 //std::string path = Branch::FilterPath(i_path);
 
@@ -82,6 +82,8 @@ AF_DEBUG << i_path;
 			return NULL;
 		}
 
+		AFCommon::QueueLog("New branch registered: " + branch->v_generateInfoString(false));
+
 		// Store root branch if it was not:
 		if ((m_root_branch == NULL) && (i_path == "/"))
 		{
@@ -95,7 +97,6 @@ AF_DEBUG << i_path;
 	else
 		branch = parent;
 
-	AFCommon::QueueLog("New branch registered: " + branch->v_generateInfoString(false));
 	return branch;
 }
 
