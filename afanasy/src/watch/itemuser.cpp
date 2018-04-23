@@ -72,11 +72,15 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( hostname.size())
 			strRightTop = QString("Latest Activity Host: %1").arg( hostname);
 
-		switch(user->getSolveMethod())
-		{
-			case af::Work::SolveJobsByPriority: strRightBottom = "Priority Jobs Solving"; break;
-			case af::Work::SolveJobsByOrder:    strRightBottom = "Ordered Jobs Solving";  break;
-		}
+		if (user->isSolvePriority())
+			strRightBottom = "Solving: Priority";
+		else
+			strRightBottom = "Solving: Ordered";
+
+		if (user->isSolveCapacity())
+			strRightBottom += ", Capacity";
+		else
+			strRightBottom += ", MaxTasks";
 	}
 	else if( Watch::isJedi())
 	{
@@ -97,11 +101,15 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 		if( hostname.size())
 			strRightTop = QString("Host:%1").arg( hostname);
 
-		switch(user->getSolveMethod())
-		{
-			case af::Work::SolveJobsByPriority: strRightBottom = "Priority"; break;
-			case af::Work::SolveJobsByOrder:    strRightBottom = "Ordered";  break;
-		}
+		if (user->isSolvePriority())
+			strRightBottom = "Priority";
+		else
+			strRightBottom = "Ordered";
+
+		if (user->isSolveCapacity())
+			strRightBottom += " Capacity";
+		else
+			strRightBottom += " MaxTasks";
 	}
 	else
 	{
@@ -119,11 +127,16 @@ void ItemUser::updateValues( af::Node * i_node, int i_type)
 
 		strRightTop = hostname;
 
-		switch(user->getSolveMethod())
-		{
-			case af::Work::SolveJobsByPriority: strRightBottom = "par"; break;
-			case af::Work::SolveJobsByOrder:    strRightBottom = "ord";  break;
-		}
+
+		if (user->isSolvePriority())
+			strRightBottom = "pri";
+		else
+			strRightBottom = "ord";
+
+		if (user->isSolveCapacity())
+			strRightBottom += " cap";
+		else
+			strRightBottom += " mt";
 	}
 
 	if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;

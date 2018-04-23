@@ -191,6 +191,16 @@ void AfContainer::refresh(AfContainer *pointer, MonitorContainer *monitoring)
 	}
 }
 
+void AfContainer::preSolve(MonitorContainer * i_monitoring)
+{
+	time_t currnet_time = time(NULL);
+	for (AfNodeSrv * node = m_first_ptr; node != NULL; node = node->m_next_ptr)
+	{
+		if (node->m_node->isZombie()) continue;
+		node->v_preSolve(currnet_time, i_monitoring);
+	}
+}
+
 void AfContainer::postSolve(MonitorContainer * i_monitoring)
 {
 	time_t currnet_time = time(NULL);

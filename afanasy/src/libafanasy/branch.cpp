@@ -14,6 +14,8 @@
 	Branch can contain jobs and other branches. Branch is designed to control a pack of jobs.
 */
 
+#include "../include/afanasy.h"
+
 #include "branch.h"
 #include "job.h"
 #include "user.h"
@@ -46,7 +48,10 @@ Branch::Branch(int i_id)
 void Branch::initDefaultValues()
 {
 	m_flags_branch = 0;
-	m_solve_method = Work::SolveUsersByPriority;
+
+	setSolveJobs(false);
+	setSolvePriority();
+	setSolveCapacity();
 
 	m_branches_num = 0;
 	m_branches_total = 0;
@@ -84,7 +89,8 @@ void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	Work::jsonWrite(o_str, i_type);
 
-	if(isCreateChilds()) o_str << ",\n\"create_childs\":true";
+	if (isCreateChilds()) o_str << ",\n\"create_childs\":true";
+	if (isSolveJobs()) o_str << ",\n\"solve_jobs\":true";
 
 	o_str << ",\n\"time_creation\":" << m_time_creation;
 	o_str << ",\n\"time_empty\":" << m_time_empty;
@@ -149,17 +155,21 @@ bool Branch::jsonRead(const JSON &i_object, std::string *io_changes)
 		return false;
 	}
 
-	// jr_int32 ("jobs_life_time",        m_jobs_life_time,        i_object, io_changes);
-
 	Work::jsonRead(i_object, io_changes);
 
-	bool _createChilds = false;
-	jr_bool("create_childs", _createChilds, i_object, io_changes);
-	setCreateChilds(_createChilds);
+	bool _createChilds;
+	if (jr_bool("create_childs", _createChilds, i_object, io_changes))
+		setCreateChilds(_createChilds);
 
-	// Paramers below are not editable and read only on creation
-	// When use edit parameters, log provided to store changes
+	bool _solveJobs;
+	if (jr_bool("solve_jobs", _solveJobs, i_object, io_changes))
+		setSolveJobs(_solveJobs);
+
+	//
+	// Paramers below are not editable and are read only on creation.
 	if (io_changes) return true;
+	// Log provided to store changes, on parameters editing.
+	//
 
 	jr_int64("time_creation", m_time_creation, i_object);
 	jr_int64("time_empty",    m_time_empty,    i_object);

@@ -17,6 +17,8 @@
 
 #include <math.h>
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
@@ -30,7 +32,7 @@
 #include "useraf.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -112,7 +114,12 @@ bool BranchSrv::initialize()
 	else
 	{
 		if (NULL == m_parent)
+		{
+			// The root branch is just created for the first time (not from store)
 			setCreateChilds(true);
+			setSolveJobs(true);
+			m_max_tasks_per_second = AFBRANCH::TASKSPERSECOND_ROOT;
+		}
 
 		m_time_creation = time(NULL);
 		m_time_empty = 0;
@@ -246,7 +253,7 @@ void BranchSrv::removeJob(JobAf * i_job, UserAf * i_user)
 		 }
 	}
 	else
-		AF_ERR << "Branch[" << getName() << "] already has no user[" << i_user->getName() << "]";
+		AF_ERR << "Branch[" << getName() << "] has no user[" << i_user->getName() << "]";
 
 	m_jobs_num--;
 }
@@ -256,12 +263,12 @@ bool BranchSrv::getJobs(std::ostringstream & o_str)
 	AfListIt jobsListIt(&m_jobs_list);
 	bool first = true;
 	bool has_jobs = false;
-	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+	for (AfNodeSrv * node = jobsListIt.node(); node != NULL; jobsListIt.next(), node = jobsListIt.node())
 	{
 		if (false == first)
 			o_str << ",\n";
 		first = false;
-		((JobAf*)(job))->v_jsonWrite(o_str, af::Msg::TJobsList);
+		static_cast<JobAf*>(node)->v_jsonWrite(o_str, af::Msg::TJobsList);
 		has_jobs = true;
 	}
 	return has_jobs;
@@ -270,8 +277,8 @@ bool BranchSrv::getJobs(std::ostringstream & o_str)
 void BranchSrv::jobsinfo(af::MCAfNodes &mcjobs)
 {
 	AfListIt jobsListIt(&m_jobs_list);
-	for (AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-		mcjobs.addNode(job->node());
+	for (AfNodeSrv *node = jobsListIt.node(); node != NULL; jobsListIt.next(), node = jobsListIt.node())
+		mcjobs.addNode(node->node());
 }
 
 void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -321,11 +328,6 @@ void BranchSrv::v_refresh(time_t currentTime, AfContainer * pointer, MonitorCont
 		monitoring->addEvent(af::Monitor::EVT_branches_change, m_id);
 }
 
-void BranchSrv::v_calcNeed()
-{
-	calcNeedResouces( m_running_capacity_total);
-}
-
 bool BranchSrv::v_canRun()
 {
 	if (m_jobs_total == 0)
@@ -342,58 +344,60 @@ bool BranchSrv::v_canRunOn(RenderAf * i_render)
 	return true;
 }
 
-// Functor for sorting algorithm
-struct GreaterNeed : public std::binary_function<AfNodeSolve*,AfNodeSolve*,bool>
-{
-	inline bool operator()(const AfNodeSolve * a, const AfNodeSolve * b)
-	{
-		return a->greaterNeed( b);
-	}
-};
-RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
+RenderAf * BranchSrv::v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch)
 {
 	std::list<AfNodeSolve*> solve_list;
 
 	if (m_branches_num)
 	{
 		// Iterate child branches
-		std::list<AfNodeSolve*> & list(m_branches_list.getStdList());
-		for (std::list<AfNodeSolve*>::iterator it = list.begin(); it != list.end(); it++)
+		AfListIt it(&m_branches_list);
+		for (AfNodeSolve * node = it.node(); node != NULL; it.next(), node = it.node())
 		{
-			if (false == (*it)->canRun())
+			if (false == node->canRun())
 				continue;
 
-			(*it)->v_calcNeed();
+			node->calcNeed(m_solving_flags);
 
-			solve_list.push_back(*it);
+			solve_list.push_back(node);
 		}
 	}
 
-	if (m_jobs_num)
+	if (isSolveJobs() && m_jobs_num)
 	{
 		// Iterate child jobs
-		std::list<AfNodeSolve*> & jList(m_jobs_list.getStdList());
-		for (std::list<AfNodeSolve*>::iterator it = jList.begin(); it != jList.end(); it++)
+		AfListIt it(&m_jobs_list);
+		for (AfNodeSolve * node = it.node(); node != NULL; it.next(), node = it.node())
 		{
-			if (false == (*it)->canRun())
+			if (false == node->canRun())
 				continue;
 
-			(*it)->v_calcNeed();
+			node->calcNeed(m_solving_flags);
 
-			solve_list.push_back(*it);
+			solve_list.push_back(node);
+		}
+	}
+	else if(m_users.size())
+	{
+		std::map<UserAf*,BranchSrvUserData*>::iterator it = m_users.begin();
+		for(; it != m_users.end(); it++)
+		{
+			UserAf * user = (*it).first;
+			if (false == user->canRun())
+				continue;
+
+			if (isSolveCapacity())
+				user->calcNeed(-1,(*it).second->running_capacity_total);
+			else
+				user->calcNeed(-1,(*it).second->running_tasks_num);
+
+			solve_list.push_back(user);
 		}
 	}
 
-	solve_list.sort( GreaterNeed());
+	Solver::SortList(solve_list, m_solving_flags);
 
-
-//	std::list<AfNodeSolve*> solve_list(m_branches_list.getStdList());
-//	std::list<AfNodeSolve*> jobs_list(m_jobs_list.getStdList());
-	// Add jobs list to a branches list:
-//	solve_list.splice(solve_list.end(), jobs_list);
-
-
-	return Solver::SolveList(solve_list, i_renders_list);
+	return Solver::SolveList(solve_list, i_renders_list, this);
 }
 
 void BranchSrv::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)

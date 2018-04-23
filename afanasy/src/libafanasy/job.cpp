@@ -406,7 +406,7 @@ const std::string Job::getFolder() const
 	std::map<std::string,std::string>::const_iterator it = m_folders.begin();
 
 	if( it == m_folders.end())
-		return folder;
+		return m_branch;
 
 	folder = (*it).second;
 

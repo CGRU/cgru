@@ -37,6 +37,11 @@ void AfNodeSrv::v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring)
 	AF_ERR << "Not imlemented on \"" << m_node->getName() << "\"";
 }
 
+void AfNodeSrv::v_preSolve(time_t i_curtime, MonitorContainer * i_monitoring)
+{
+	AF_ERR << "Not imlemented on \"" << m_node->getName() << "\"";
+}
+
 AfNodeSrv::~AfNodeSrv()
 {
 }

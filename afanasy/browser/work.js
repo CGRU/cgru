@@ -22,6 +22,7 @@ var work_params = {
 	max_running_tasks_per_host: {'type': 'num', 'label': 'Max Running Tasks Per Host'},
 	hosts_mask /*************/: {'type': 'reg', 'label': 'Hosts Mask'},
 	hosts_mask_exclude /*****/: {'type': 'reg', 'label': 'Exclude Hosts Mask'},
+	max_tasks_per_second /***/: {'type': 'num', 'label': 'Max Tasks Per Second'},
 	annotation /*************/: {'type': 'str', 'label': 'Annotation'}
 };
 
@@ -43,7 +44,19 @@ function work_generateParamsString(i_params, i_type)
 		if (i_params.hosts_mask_exclude)
 			str += " ExcludeHosts:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
-			str += " Solving:<b>" + i_params.solve_method + "</b>";
+		{
+			str += " Solving:";
+			str += (i_params.solve_method == 'solve_priority') ? ' <b>Priority</b>' : ' <b>Order</b>';
+			str += (i_params.solve_need   == 'solve_capacity') ? ', <b>Capacity</b>' : ', <b>RunTasks</b>';
+		}
+		if (i_params.max_tasks_per_second != null)
+		{
+			if (i_params.max_tasks_per_second == 0)
+				str += ' <b style="color:darkred">MTPS:' + i_params.max_tasks_per_second + '</b>';
+			else
+				str += ' MTPS:<b>' + i_params.max_tasks_per_second + '</b>';
+		}
+
 		str += " Priority:<b>" + i_params.priority + "</b>";
 	}
 	else if (cm_IsJedi())
@@ -132,16 +145,30 @@ function work_CreatePanels(i_monitor, i_type)
 	var acts = {};
 	acts.solve_ord = {
 		'name': 'solve_method',
-		'value': 'order',
+		'value': 'solve_order',
 		'label': 'ORD',
 		'tooltip': 'Solve jobs by order.',
 		'handle': 'mh_Param'
 	};
 	acts.solve_pri = {
 		'name': 'solve_method',
-		'value': 'priority',
+		'value': 'solve_priority',
 		'label': 'PRI',
 		'tooltip': 'Solve jobs by priority.',
+		'handle': 'mh_Param'
+	};
+	acts.solve_cap = {
+		'name': 'solve_need',
+		'value': 'solve_capacity',
+		'label': 'CAP',
+		'tooltip': 'Solve need by running capacity total.',
+		'handle': 'mh_Param'
+	};
+	acts.solve_tsk = {
+		'name': 'solve_need',
+		'value': 'solve_tasksnum',
+		'label': 'TKS',
+		'tooltip': 'Solve need by running tasks number.',
 		'handle': 'mh_Param'
 	};
 	i_monitor.createCtrlBtns(acts);

@@ -233,28 +233,8 @@
 	"af_server_profiling_sec":1024,
 		"":"Server will output some network statistics by this period",
 
-"":"Solving:",
-	"af_solving_use_capacity":true,
-		"":"Calculate need using running tasks total capacity.",
-		"":"If not, use only running tasks number",
-
-	"af_solving_use_user_priority":true,
-		"":"Whether task solving takes user priority into account or not. If set on,",
-		"":"Jobs are sorted by user's priority first, then by job priority within a user.",
-		"":"If not, only job proirities are used.",
-
-	"af_solving_simpler":false,
-		"":"Use a simplified solving algorithm. No notion of 'need' is used: jobs are",
-		"":"sorted by priority first, and creation date then (older first).",
-
-	"af_solving_tasks_speed":-1,
-		"":"Server tasks solving speed limit (~tasks/second)",
-		"":"You can set this parameter to zero to pause job solving (see docs to reload config 'on-the-fly')",
-		"":"'-1' means unlimited.",
-
-	"af_solving_wake_per_cycle":1,
-		"":"Number of afrenders that can be waken per solve cycle (per second).",
-		"":"Zero or nagative value will disable Wake-On-Lan at all (in a default farm setup it is disabled).",
+	"af_wolwake_interval":10,
+		"":"Number of cycles (seconds) between waking each render",
 
 	"":""
 }}

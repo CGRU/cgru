@@ -53,6 +53,7 @@ public:
 	/// Refresh container nodes.
 	void refresh(AfContainer *pointer, MonitorContainer *monitoring);
 
+	void preSolve(MonitorContainer * i_monitoring);
 	void postSolve(MonitorContainer * i_monitoring); 
 
 	/// Perform an aciton:

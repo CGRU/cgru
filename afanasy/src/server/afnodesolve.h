@@ -20,6 +20,8 @@
 
 #include "afnodesrv.h"
 
+class BranchSrv;
+
 class AfNodeSolve : public AfNodeSrv
 {
 public:
@@ -28,6 +30,8 @@ public:
 
 	// Just interesting - good to show server load
 	static unsigned long long getSolvesCount() { return sm_solve_cycle; }
+
+	void v_preSolve(time_t i_curtime, MonitorContainer * i_monitors);
 
 	/// Can node run
 	/** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
@@ -41,16 +45,17 @@ public:
 	/// Virtual function to tune for each node type:
 	virtual bool v_canRunOn(RenderAf *i_render);
 
-	/// Virtual function to calculate need.
-	/** Node should define what resource shoud be passed for need calculation.**/
-	virtual void v_calcNeed();
+	/// Calc node need for solving.
+	/// i_flags - solving flags (to use running_capacity_total or running_tasks_num)
+	/// i_resourcesquantity - to use specified resources quantinity (if != -1), i_flags will be ignored
+	void calcNeed(int i_flags, int i_resourcesquantity = -1);
 
 	// Try to solve a node, v_solve is called there:
-	RenderAf *trySolve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring);
+	RenderAf *solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch);
 
 	/// Solving function should be implemented in child classes (if solving needed):
 	/// Generate task for \c some render from list, return \c render if task generated or NULL.
-	virtual RenderAf *v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring);
+	virtual RenderAf *v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch);
 
 	/// Compare nodes solving need:
 	bool greaterNeed(const AfNodeSolve *i_other) const;
@@ -62,11 +67,6 @@ public:
 	void setZombie();
 
 	friend class AfList;
-
-protected:
-	/// General need calculation function,
-	/** Some resources should be passed to its algorithm.**/
-	void calcNeedResouces(int i_resourcesquantity);
 
 private:
 	/// Renders counts manipulations (for max run tasks per host)
@@ -97,4 +97,7 @@ private:
 	/// Last solved cycle.
 	/** Needed to jobs (users) solving, to compare nodes solving order.**/
 	unsigned long long m_solve_cycle;
+
+	/// Number of time node was sucessfuly solved on a last run cycle.
+	int m_solves_count;
 };

@@ -30,6 +30,9 @@ public:
 	/// Refresh node information
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
+	// Perform pre solving calculations:
+	virtual void v_preSolve(time_t i_curtime, MonitorContainer * i_monitoring);
+
 	// Perform post solving calculations:
 	virtual void v_postSolve(time_t i_curtime, MonitorContainer * i_monitoring);
 

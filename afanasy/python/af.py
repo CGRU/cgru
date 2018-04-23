@@ -657,6 +657,15 @@ class Job:
                 if "files" in block.data and len(block.data["files"]):
                     self.data["folders"][block.data['name']] = os.path.dirname(block.data["files"][0])
 
+        # Set branch if empty:
+        if 'branch' not in self.data:
+            if 'output' in self.data['folders']:
+                self.data['branch'] = self.data['folders']['output']
+            elif 'input' in self.data['folders']:
+                self.data['branch'] = self.data['folders']['input']
+            else:
+                self.data['branch'] = self.blocks[0].data['working_directory']
+
         obj = {"job": self.data}
         # print(json.dumps( obj))
 

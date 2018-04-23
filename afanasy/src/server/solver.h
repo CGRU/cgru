@@ -21,6 +21,7 @@
 
 class AfNodeSolve;
 class BranchesContainer;
+class BranchSrv;
 class JobContainer;
 class MonitorContainer;
 class RenderAf;
@@ -42,7 +43,8 @@ public:
 
 	void solve();
 
-	static RenderAf * SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders);
+	static void SortList(std::list<AfNodeSolve*> & i_list, int i_solving_flags);
+	static RenderAf * SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, BranchSrv * i_branch);
 
 private:
 	static BranchesContainer * ms_branchescontainer;
@@ -51,7 +53,9 @@ private:
 	static UserContainer     * ms_usercontainer;
 	static MonitorContainer  * ms_monitorcontaier;
 
-	static int ms_solve_cycles_limit;
+	static uint64_t ms_run_cycle;
+	static const int ms_solve_cycles_limit;
 	static int ms_awaken_renders;
+	static const int ms_awaken_renders_max;
 };
 

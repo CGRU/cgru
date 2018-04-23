@@ -117,7 +117,7 @@ public:
 	bool initSystem();
 
 	virtual bool v_canRun();
-	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring);
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring, BranchSrv * i_branch);
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 	virtual void v_refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 

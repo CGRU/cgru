@@ -13,11 +13,8 @@ class Action;
 class Block;
 class BranchSrv;
 class JobContainer;
-class JobPy;
-class MsgAf;
 class RenderAf;
 class RenderContainer;
-class Task;
 class UserAf;
 
 /// Server side of Afanasy job.
@@ -69,7 +66,7 @@ public:
 	bool v_canRunOn( RenderAf * i_render);
 
 	/// Solve a job. Job send ready task to Render, if any.
-	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring);
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch);
 
 	/// Update task state.
 	virtual void v_updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
@@ -88,6 +85,8 @@ public:
 
 	void setUser(UserAf * i_user);
 	void setBranch(BranchSrv * i_branch);
+
+	const BranchSrv * getBranchPtr() const { return m_branch_srv;}
 
 	/// Initialize new job, came to Afanasy container.
 	bool initialize();
@@ -125,8 +124,6 @@ protected:
 	void readStore();
 	
 	virtual Block * v_newBlock( int numBlock); ///< Virtual function to create system blocks in a system job
-	
-	void v_calcNeed();
 	
 protected:
 	af::JobProgress * m_progress; ///< Tasks progress.

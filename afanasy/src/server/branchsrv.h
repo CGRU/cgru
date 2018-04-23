@@ -18,6 +18,7 @@
 #include "../libafanasy/branch.h"
 #include "../libafanasy/msg.h"
 
+#include "jobaf.h"
 #include "aflist.h"
 #include "afnodesolve.h"
 
@@ -58,7 +59,7 @@ public:
 	bool v_canRunOn(RenderAf * i_render);
 
 	/// Generate task for \c render from list, return \c render if task generated or NULL.
-	virtual RenderAf * v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring); 
+	virtual RenderAf * v_solve(std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch); 
 
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render, UserAf * i_user);
@@ -85,9 +86,6 @@ public:
 
 	void logAction(const Action & i_action, const std::string & i_node_name);
 
-protected:
-	void v_calcNeed();
-
 private:
 	void deleteBranch(Action & o_action, MonitorContainer * i_monitoring);
 
@@ -106,7 +104,7 @@ private:
 			running_tasks_num(0),
 			running_capacity_total(0)
 		{
-			jobs.add((AfNodeSolve*)(i_job));
+			jobs.add(i_job);
 		}
 	};
 	std::map<UserAf*, BranchSrvUserData*> m_users;

@@ -866,7 +866,7 @@ void JobAf::remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exe
 	i_monitoring->addJobEvent(af::Monitor::EVT_jobs_change, getId(), m_user->getId());
 }
 
-RenderAf * JobAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring)
+RenderAf * JobAf::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv * i_branch)
 {
 	for( std::list<RenderAf*>::iterator rIt = i_renders_list.begin(); rIt != i_renders_list.end(); rIt++)
 	{
@@ -1182,14 +1182,6 @@ void JobAf::emitEvents(std::vector<std::string> events)
 		m_user_name, m_name, events[0]);
 }
 
-void JobAf::v_calcNeed()
-{
-	// Need calculation based on running tasks number
-	if (af::Environment::getSolvingUseCapacity())
-		calcNeedResouces(getRunningCapacityTotal());
-	else
-		calcNeedResouces(getRunningTasksNum());
-}
 void JobAf::restartAllTasks( const std::string & i_message, RenderContainer * i_renders, MonitorContainer * i_monitoring, uint32_t i_state)
 {
 	for( int b = 0; b < m_blocks_num; b++)

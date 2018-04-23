@@ -58,6 +58,8 @@ const uint16_t SERVER_PORT = 50000;
 namespace AFBRANCH
 {
 const int MAXCOUNT = 10000;
+const int TASKSPERSECOND_ROOT = 100;
+const int TASKSPERSECOND_MAX = 10000;
 const char STORE_FOLDER[] = "branches";
 }
 
@@ -79,12 +81,8 @@ const int TASK_ERRORS_SAME_HOST = 3; ///< Maximum number or errors on same host 
 namespace AFSERVER
 {
 const char STORE_FILE[] = "server.json";
-const bool SOLVING_USE_CAPACITY = true;
-///< Use running tasks total capacity or simple running tasks number to calculate "Need"
-const bool SOLVING_USE_USER_PRIORITY = true; ///< Whether task solving takes user priority into account or not
-const bool SOLVING_SIMPLER = false; ///< Sort jobs by priority and creation time instead of using the "Need"
-const int SOLVING_TASKS_SPEED = -1;
-const int SOLVING_WAKE_PER_CYCLE = 1;
+
+const int WOLWAKE_INTERVAL = 10;
 
 const int SOCKETS_READWRITE_THREADS_NUM = 10;
 const int SOCKETS_PROCESSING_THREADS_NUM = 10;

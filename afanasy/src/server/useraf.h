@@ -41,7 +41,7 @@ public:
 	bool v_canRunOn( RenderAf * i_render);
 
 	/// Generate task for \c render from list, return \c render if task generated or NULL.
-	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring); 
+	virtual RenderAf * v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * i_monitoring, BranchSrv* i_branch); 
 
 	void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 	
@@ -53,9 +53,9 @@ public:
 
 	virtual int v_calcWeight() const; ///< Calculate and return memory size.
 
-	inline AfList * getJobsList() { return &m_jobslist; }
+	inline AfList * getJobsList() { return &m_jobs_list; }
 
-	inline const std::vector<int32_t> generateJobsIds() const { return m_jobslist.generateIdsList();}
+	inline const std::vector<int32_t> generateJobsIds() const { return m_jobs_list.generateIdsList();}
 
 	void jobPriorityChanged( JobAf * i_job, MonitorContainer * i_monitoring);
 
@@ -69,9 +69,6 @@ public:
 	void addSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 	void remSolveCounts(MonitorContainer * i_monitoring, af::TaskExec * i_exec, RenderAf * i_render);
 
-protected:
-	void v_calcNeed();
-
 private:
 	bool refreshCounters();
 
@@ -80,7 +77,7 @@ private:
 	void deleteNode( MonitorContainer * i_monitoring);
 
 private:
-	AfList m_jobslist; ///< Jobs list.
+	AfList m_jobs_list; ///< Jobs list.
 
 private:
    static UserContainer * ms_users;

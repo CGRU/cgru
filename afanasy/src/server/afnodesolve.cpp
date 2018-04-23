@@ -36,7 +36,8 @@ AfNodeSolve::AfNodeSolve(af::Work *i_work, const std::string &i_store_dir)
 	: AfNodeSrv(i_work, i_store_dir),
 	  m_work(i_work),
 	  m_solve_need(0.0),
-	  m_solve_cycle(0) // 0 means that it was not solved at all
+	  m_solve_cycle(0), // 0 means that it was not solved at all
+	  m_solves_count(0)
 {
 }
 
@@ -97,20 +98,50 @@ void AfNodeSolve::remRenderCount(RenderAf *i_render)
 	}
 }
 
+void AfNodeSolve::v_preSolve(time_t i_curtime, MonitorContainer * i_monitors)
+{
+	// Resets solves count to max_tasks_per_second limit
+	m_solves_count = 0;
+}
+
 /// Solving function should be implemented in child classes (if solving needed):
-RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring)
+RenderAf *AfNodeSolve::v_solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
 {
 	AF_ERR << "AfNodeSrv::solve(): Not implemented: " << m_node->getName().c_str();
 	return NULL;
 }
-void AfNodeSolve::v_calcNeed()
+void AfNodeSolve::calcNeed(int i_flags, int i_resourcesquantity)
 {
-	AF_ERR << "AfNodeSolve::calcNeed(): Not implememted: " << m_node->getName().c_str();
-	calcNeedResouces(-1);
+	int resourcesquantity = i_resourcesquantity;
+
+	if (resourcesquantity < 0)
+	{
+		if (i_flags & af::Work::SolveCapacity)
+			resourcesquantity = m_work->getRunningCapacityTotal();
+		else
+			resourcesquantity = m_work->getRunningTasksNum();
+	}
+
+
+	// Less resources less need
+	m_solve_need = pow(1.1, m_node->getPriority()) / (resourcesquantity + 1.0);
+	/// each priority point gives 10% more resources
 }
 
 bool AfNodeSolve::canRun()
 {
+	if (m_work->getMaxTasksPerSecond() == 0)
+	{
+		// Solving is off totally for this node
+		return false;
+	}
+
+	if ((m_work->getMaxTasksPerSecond() > 0) && (m_solves_count >= m_work->getMaxTasksPerSecond()))
+	{
+		// Solving speed (tasks per second) reached the limit
+		return false;
+	}
+
 	if (m_work->getPriority() == 0)
 	{
 		// Zero priority turns solving off
@@ -200,9 +231,9 @@ bool AfNodeSolve::greaterPriorityThenOlderCreation(const AfNodeSolve *i_other) c
 	return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-RenderAf *AfNodeSolve::trySolve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring)
+RenderAf *AfNodeSolve::solve(std::list<RenderAf *> &i_renders_list, MonitorContainer *i_monitoring, BranchSrv * i_branch)
 {
-	RenderAf *render = v_solve(i_renders_list, i_monitoring);
+	RenderAf *render = v_solve(i_renders_list, i_monitoring, i_branch);
 
 	if (NULL == render)
 	{
@@ -215,30 +246,12 @@ RenderAf *AfNodeSolve::trySolve(std::list<RenderAf *> &i_renders_list, MonitorCo
 	// Store solve cycle
 	m_solve_cycle = sm_solve_cycle;
 
-	// Icrement solve cycle
+	// Icrement a global (static) solve cycle
 	sm_solve_cycle++;
+
+	// Increment solves count (local, per run cycle)
+	m_solves_count++;
 
 	// Returning that node was solved
 	return render;
-}
-
-void AfNodeSolve::calcNeedResouces(int i_resourcesquantity)
-{
-	m_solve_need = 0.0;
-
-	// Need calculation no need as there is no need at all for some reason.
-	if (i_resourcesquantity < 0)
-	{
-		return;
-	}
-
-	if (false == v_canRun())
-	{
-		// Cannot run at all - no solving needed
-		return;
-	}
-
-	// Main solving function:
-	// ( each priority point gives 10% more resources )
-	m_solve_need = pow(1.1, m_node->getPriority()) / (i_resourcesquantity + 1.0);
 }

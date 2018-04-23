@@ -14,20 +14,25 @@
 	af::Work is a base class for any node that can be solved (branch, user, job).
 */
 
+#include "../include/afanasy.h"
+
 #include "afwork.h"
 
 #include "environment.h"
 #include "taskexec.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
 using namespace af;
 
-Work::Work() : m_solve_method(SolveJobsByPriority)
+Work::Work()
 {
+	m_solving_flags = 0;
+	m_max_tasks_per_second = -1;
+
 	m_max_running_tasks = af::Environment::getMaxRunningTasksNumber();
 	m_max_running_tasks_per_host = -1;
 
@@ -45,7 +50,9 @@ Work::~Work()
 
 void Work::readwrite(Msg *msg)
 {
-	rw_int32_t(m_solve_method, msg);
+	rw_int8_t(m_solving_flags, msg);
+
+	rw_int32_t(m_max_tasks_per_second, msg);
 
 	rw_int32_t(m_max_running_tasks,          msg);
 	rw_int32_t(m_max_running_tasks_per_host, msg);
@@ -59,6 +66,10 @@ void Work::readwrite(Msg *msg)
 
 void Work::jsonRead(const JSON &i_object, std::string *io_changes)
 {
+	jr_int32("max_tasks_per_second", m_max_tasks_per_second, i_object, io_changes);
+	if (m_max_tasks_per_second  > AFBRANCH::TASKSPERSECOND_MAX)
+		m_max_tasks_per_second == AFBRANCH::TASKSPERSECOND_MAX;
+
 	jr_int32("max_running_tasks", m_max_running_tasks, i_object, io_changes);
 	jr_int32("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
 
@@ -68,17 +79,29 @@ void Work::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_intmap("pools", m_pools, i_object, io_changes);
 
 	std::string solve_method;
-	jr_string("solve_method", solve_method, i_object, io_changes);
-	if (solve_method == "users_priority")
-		m_solve_method = SolveUsersByPriority;
-	else if (solve_method == "jobs_priority")
-		m_solve_method = SolveJobsByPriority;
-	else
-		m_solve_method = SolveJobsByOrder;
+	if (jr_string("solve_method", solve_method, i_object, io_changes))
+	{
+		if (solve_method == "solve_priority")
+			setSolvePriority();
+		else
+			setSolveOrder();
+	}
+
+	std::string solve_need;
+	if (jr_string("solve_need", solve_need, i_object, io_changes))
+	{
+		if (solve_need == "solve_capacity")
+			setSolveCapacity();
+		else
+			setSolveTasksNum();
+	}
 }
 
 void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
 {
+	if (m_max_tasks_per_second > -1)
+		o_str << ",\n\"max_tasks_per_second\":" << m_max_tasks_per_second;
+
 	if (m_max_running_tasks != -1) o_str << ",\n\"max_running_tasks\":" << m_max_running_tasks;
 	if (m_max_running_tasks_per_host != -1)
 		o_str << ",\n\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
@@ -89,14 +112,8 @@ void Work::jsonWrite(std::ostringstream &o_str, int i_type) const
 
 	if (m_pools.size()) af::jw_intmap("pools", m_pools, o_str);
 
-	o_str << ",\n\"solve_method\":\"";
-	switch (m_solve_method)
-	{
-		case SolveJobsByOrder:     o_str << "jobs_order";     break;
-		case SolveJobsByPriority:  o_str << "jobs_priority";  break;
-		case SolveUsersByPriority: o_str << "users_priority"; break;
-	}
-	o_str << "\"";
+	o_str << ",\n\"solve_method\":\"" << (isSolvePriority() ? "solve_priority" : "solve_order")    << "\"";
+	o_str << ",\n\"solve_need\":\""   << (isSolveCapacity() ? "solve_capacity" : "solve_tasksnum") << "\"";
 
 	if (m_running_tasks_num > 0) o_str << ",\n\"running_tasks_num\":" << m_running_tasks_num;
 	if (m_running_capacity_total > 0) o_str << ",\n\"running_capacity_total\":" << m_running_capacity_total;

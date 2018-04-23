@@ -27,7 +27,7 @@
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -37,8 +37,10 @@ RenderContainer   * Solver::ms_rendercontainer   = NULL;
 UserContainer     * Solver::ms_usercontainer     = NULL;
 MonitorContainer  * Solver::ms_monitorcontaier   = NULL;
 
-int Solver::ms_solve_cycles_limit = 100000;
-int Solver::ms_awaken_renders;
+uint64_t Solver::ms_run_cycle = 0;
+const int Solver::ms_solve_cycles_limit = 11000;
+int Solver::ms_awaken_renders = 0;
+const int Solver::ms_awaken_renders_max = 1;
 
 Solver::Solver(
 		BranchesContainer * i_branchescontainer,
@@ -107,11 +109,20 @@ struct GreaterPriorityThenOlderCreation : public std::binary_function<AfNodeSolv
 	}
 };
 
+void Solver::SortList(std::list<AfNodeSolve*> & i_list, int i_solving_flags)
+{
+	if (i_solving_flags & af::Work::SolvePriority)
+		i_list.sort(GreaterNeed());
+	else
+		i_list.sort(GreaterPriorityThenOlderCreation());
+}
+
 void Solver::solve()
 {
 	//
 	// Jobs solving:
 	//
+	ms_run_cycle++;
 	AF_DEBUG << "Solving jobs...";
 
 	// To start solving we need to solve the root branch:
@@ -140,27 +151,34 @@ void Solver::solve()
 			break;
 		}
 
+		// Check that the root branch can run,
+		// may be solving is off by some limit for maintenance.
+		if (false == ms_branchescontainer->getRootBranch()->canRun())
+			break;
+
 		// Get ready renders:
 		std::list<RenderAf*> renders_list;
-		RenderContainerIt rendersIt( ms_rendercontainer);
-		for( RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+		RenderContainerIt rendersIt(ms_rendercontainer);
+		for (RenderAf * render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
 		{
 			// Check that render is ready to run a task:
-			if( false == render->isReady())
+			if (false == render->isReady())
 			{
-				// Render is not ready, but may be we can wake it up
-				if(( false == render->isWOLWakeAble()) || ( ms_awaken_renders >= af::Environment::getSolvingWakePerCycle() ))
+				// Render is not ready, but may be we should wake it up
+				if ((false == render->isWOLWakeAble()) ||
+					(ms_awaken_renders >= ms_awaken_renders_max) ||
+					(ms_run_cycle % af::Environment::getWOLWakeInterval() != 0))
 				{
-					continue; ///< - We can't
+					continue; ///< - We don't
 				}
 			}
 
-			renders_list.push_back( render);
+			renders_list.push_back(render);
 		}
 
 		// Function exits on each solve success (just 1 task solved),
 		// removes nodes that was not solved from list.
-		RenderAf * render = SolveList( solve_list, renders_list);
+		RenderAf * render = SolveList(solve_list, renders_list, ms_branchescontainer->getRootBranch());
 		if( render )
 		{
 			// Check Wake-On-LAN:
@@ -173,43 +191,13 @@ void Solver::solve()
 			else
 				tasks_solved++;
 		}
-
-		// Check tasks solving speed limit:
-		if(( af::Environment::getSolvingTasksSpeed() >= 0 ) &&
-			( tasks_solved >= af::Environment::getSolvingTasksSpeed()))
-		{
-			break;
-		}
 	}
 
 	AF_DEBUG << "Solved " << tasks_solved << " tasks within " << solve_cycle << " cycles.";
 }
 
-RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders)
+RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderAf*> & i_renders, BranchSrv * i_branch)
 {
-/*
-	// Remove nodes that need no solving at all (done, offline, ...)
-	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
-	{
-		if((*it)->canRun())
-		{
-			(*it)->v_calcNeed();
-			it++;
-		}
-		else
-			it = i_list.erase( it);
-	}
-
-	// Sort list if needed.
-	// ( there is not need to sort when solving user jobs by list order )
-	if( i_method != af::Work::SolveByOrder )
-	{
-		if( af::Environment::getSolvingSimpler())
-			i_list.sort( GreaterPriorityThenOlderCreation());
-		else
-			i_list.sort( GreaterNeed());
-	}
-*/
 	// Iterate solving nodes list:
 	for( std::list<AfNodeSolve*>::iterator it = i_list.begin(); it != i_list.end(); )
 	{
@@ -227,7 +215,7 @@ RenderAf * Solver::SolveList(std::list<AfNodeSolve*> & i_list, std::list<RenderA
 		// Sort renders:
 		renders.sort( MostReadyRender());
 
-		RenderAf * render = (*it)->trySolve( renders, ms_monitorcontaier);
+		RenderAf * render = (*it)->solve(renders, ms_monitorcontaier, i_branch);
 
 		if( render )
 			return render;

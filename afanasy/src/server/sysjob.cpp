@@ -579,11 +579,11 @@ bool SysJob::v_canRun()
 	return JobAf::v_canRun();
 }
 
-RenderAf * SysJob::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring)
+RenderAf * SysJob::v_solve( std::list<RenderAf*> & i_renders_list, MonitorContainer * monitoring, BranchSrv * i_branch)
 {
 //printf("SysJob::solve():\n");
 	if( isReady())
-		return JobAf::v_solve( i_renders_list, monitoring);
+		return JobAf::v_solve( i_renders_list, monitoring, i_branch);
 
 	return NULL;
 }

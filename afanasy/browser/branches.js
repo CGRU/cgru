@@ -35,7 +35,7 @@ BranchNode.prototype.init = function() {
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild(this.elName);
-	this.elName.title = 'User Name';
+	this.elName.title = 'Branch name (path)';
 
 	this.elWorkParams = cm_ElCreateFloatText(this.element, 'right');
 
@@ -98,9 +98,28 @@ BranchNode.prototype.update = function(i_obj) {
 	this.elRunningCounts.innerHTML = work_generateRunningCountsString(this.params, 'branch');
 
 	var flags = '';
+	var flags_tip = 'Flags:';
 	if (this.params.create_childs)
+	{
 		flags += ' <b>ACC</b>';
+		flags_tip += '\nAuto create childs';
+	}
+	else
+	{
+		flags_tip += '\nDo not create childs';
+	}
+	if (this.params.solve_jobs)
+	{
+		flags += ' <b>JOBS</b>';
+		flags_tip += '\nSolve jobs';
+	}
+	else
+	{
+		flags += ' <b>USR<b/>';
+		flags_tip += '\nSolve users';
+	}
 	this.elFlags.innerHTML = flags;
+	this.elFlags.title = flags_tip;
 
 	if (cm_IsPadawan())
 	{
@@ -230,7 +249,7 @@ BranchNode.createPanels = function(i_monitor) {
 	// Work:
 	work_CreatePanels(i_monitor, 'branches');
 
-	// Solving:
+	// Create child branches:
 	var acts = {};
 	acts.create_childs = {
 		'name': 'create_childs',
@@ -245,6 +264,21 @@ BranchNode.createPanels = function(i_monitor) {
 		'value': false,
 		'label': 'DNC',
 		'tooltip': 'Do not create childs.',
+		'handle': 'mh_Param'
+	};
+	acts.solve_jobs = {
+		'name': 'solve_jobs',
+		'value': true,
+		'label': 'JOBS',
+		'tooltip': 'Solve jobs.',
+		'handle': 'mh_Param'
+	};
+
+	acts.solve_users = {
+		'name': 'solve_jobs',
+		'value': false,
+		'label': 'USR',
+		'tooltip': 'Solve users.',
 		'handle': 'mh_Param'
 	};
 

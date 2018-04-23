@@ -45,11 +45,15 @@ public:
 
 	enum FlagsBranch
 	{
-		FB_CreateChilds = 1 << 0
+		CreateChilds = 1 << 0,
+		SolveJobs    = 1 << 1
 	};
 
-	inline bool isCreateChilds() const { return m_flags_branch & FB_CreateChilds; }
-	inline void setCreateChilds(bool i_on) { m_flags_branch = i_on ? m_flags_branch | FB_CreateChilds : m_flags_branch & (~FB_CreateChilds); }
+	inline bool isCreateChilds() const { return m_flags_branch & CreateChilds; }
+	inline void setCreateChilds(bool i_on) { m_flags_branch = i_on ? m_flags_branch | CreateChilds : m_flags_branch & (~CreateChilds); }
+
+	inline bool isSolveJobs() const { return m_flags_branch & SolveJobs; }
+	inline void setSolveJobs(bool i_on) { m_flags_branch = i_on ? m_flags_branch | SolveJobs : m_flags_branch & (~SolveJobs); }
 
 protected:
 	std::string m_parent_path;

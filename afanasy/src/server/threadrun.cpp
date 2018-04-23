@@ -128,15 +128,20 @@ void threadRunCycle( void * i_args)
 
 
 	//
-	// Jobs sloving:
+	// Jobs sloving.
 	//
+	// Perform pre solving calculations.
+	a->branches->preSolve(a->monitors);
+	a->jobs    ->preSolve(a->monitors);
+	a->users   ->preSolve(a->monitors);
+	//
+	// Sloving.
 	solver.solve();
-	
 	//
 	// Perform post solving calculations.
 	// Some data for guis needed to be refreshed after solving (after new tasks started).
-	a->branches ->postSolve(a->monitors);
-	a->renders  ->postSolve(a->monitors);
+	a->branches->postSolve(a->monitors);
+	a->renders ->postSolve(a->monitors);
 
 	//
 	// Dispatch events to monitors:

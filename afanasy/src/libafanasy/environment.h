@@ -129,13 +129,6 @@ public:
 	static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
 	static inline int getTaskProgressChangeTimeout()     { return task_progress_change_timeout; }
 
-	/// Task solving options
-	static inline bool getSolvingUseCapacity()     { return solving_use_capacity;      }
-	static inline bool getSolvingUseUserPriority() { return solving_use_user_priority; }
-	static inline bool getSolvingSimpler()         { return solving_simpler;           }
-	static inline int  getSolvingTasksSpeed()      { return solving_tasks_speed;       }
-	static inline int  getSolvingWakePerCycle()    { return solving_wake_per_cycle;    }
-
 	static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
 	static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
 	static inline int getTaskErrorRetries()              { return task_error_retries;           }
@@ -146,6 +139,8 @@ public:
 	static inline const std::string & getSysWolService()     { return sysjob_wol_service;        }
 	static inline const std::string & getSysPostCmdService() { return sysjob_postcmd_service;    }
 	static inline const std::string & getSysEventsService()  { return sysjob_events_service;     }
+
+	static inline int getWOLWakeInterval() { return wolwake_interval; }
 
 	static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
 	static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
@@ -305,13 +300,6 @@ private:
 	static int task_log_linesmax;
 	static int task_progress_change_timeout; ///< If task progress did not change within this time, consider that it is erroneous
 
-	/// Task solving options
-	static bool solving_use_capacity;       ///< Use running tasks total capacity or simpe running tasks number to calculate "Need"
-	static bool solving_use_user_priority;  ///< Whether task solving takes user priority into account or not
-	static bool solving_simpler;            ///< Sort jobs by priority and creation time instead of using the "Need"
-	static int  solving_tasks_speed;
-	static int  solving_wake_per_cycle;
-
 	static int render_heartbeat_sec;
 	static int render_up_resources_period;
 	static int render_default_capacity;
@@ -343,6 +331,7 @@ private:
 	static std::string sysjob_postcmd_service;
 	static std::string sysjob_events_service;
 
+	static int wolwake_interval;
 
 	/// Store folders:
 	static std::string store_folder;

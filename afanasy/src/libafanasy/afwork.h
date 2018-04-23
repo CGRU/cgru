@@ -31,20 +31,30 @@ public:
 	Work();
 	virtual ~Work();
 
-	enum SolvingMethod
+
+	enum SolvingFlags
 	{
-		SolveJobsByOrder     = 0,
-		SolveJobsByPriority  = 1,
-		SolveUsersByPriority = 2
+		SolvePriority = 1 << 0,   ///< Solve by order or prioruty
+		SolveCapacity = 1 << 1    ///< Solve by running tasks number or total capacity
 	};
+
+	inline void setSolvePriority() { m_solving_flags |= SolvePriority; }
+	inline void setSolveOrder()    { m_solving_flags &=~SolvePriority; }
+	inline void setSolveCapacity() { m_solving_flags |= SolveCapacity; }
+	inline void setSolveTasksNum() { m_solving_flags &=~SolveCapacity; }
+
+	inline bool isSolvePriority() const { return m_solving_flags & SolvePriority; }
+	inline bool isSolveOrder()    const { return m_solving_flags & SolvePriority == false; }
+	inline bool isSolveCapacity() const { return m_solving_flags & SolveCapacity; }
+	inline bool isSolveTasksNum() const { return m_solving_flags & SolveCapacity == false; }
+
 
 	void generateInfoStream(std::ostringstream &o_str, bool full = false) const; /// Generate information.
 
 	void jsonRead(const JSON &i_object, std::string *io_changes = NULL);
 	void jsonWrite(std::ostringstream &o_str, int i_type) const;
 
-	inline int getSolveMethod() const { return m_solve_method; }
-
+	inline int getMaxTasksPerSecond() const { return m_max_tasks_per_second; }
 	inline int getMaxRunningTasks() const { return m_max_running_tasks; }
 	inline int getMaxRunTasksPerHost() const { return m_max_running_tasks_per_host; }
 
@@ -81,7 +91,9 @@ protected:
 	void readwrite(Msg *msg); ///< Read or write node attributes in message
 
 protected:
-	int32_t m_solve_method;
+	int8_t m_solving_flags;
+
+	int32_t m_max_tasks_per_second;
 
 	int32_t m_max_running_tasks;
 	int32_t m_max_running_tasks_per_host;

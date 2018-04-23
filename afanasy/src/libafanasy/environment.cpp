@@ -57,13 +57,6 @@ int     Environment::task_stop_timeout =               AFJOB::TASK_STOP_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 int     Environment::task_progress_change_timeout =    AFJOB::TASK_PROGRESS_CHANGE_TIMEOUT;
 
-/// Jobs solving options:
-bool    Environment::solving_use_capacity =            AFSERVER::SOLVING_USE_CAPACITY;
-bool    Environment::solving_use_user_priority =       AFSERVER::SOLVING_USE_USER_PRIORITY;
-bool    Environment::solving_simpler =                 AFSERVER::SOLVING_SIMPLER;
-int     Environment::solving_tasks_speed =             AFSERVER::SOLVING_TASKS_SPEED;
-int     Environment::solving_wake_per_cycle =          AFSERVER::SOLVING_WAKE_PER_CYCLE;
-
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 
 int     Environment::monitor_zombietime =              AFMONITOR::ZOMBIETIME;
@@ -109,6 +102,8 @@ int         Environment::sysjob_tasksmax =            AFJOB::SYSJOB_TASKSMAX;
 std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_SERVICE;
 std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_SERVICE;
 std::string Environment::sysjob_events_service =      AFJOB::SYSJOB_EVENTS_SERVICE;
+
+int Environment::wolwake_interval =                   AFSERVER::WOLWAKE_INTERVAL;
 
 int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
 
@@ -272,12 +267,6 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, task_log_linesmax,                 "af_task_log_linesmax"                 );
 	getVar( i_obj, task_progress_change_timeout,      "af_task_progress_change_timeout"      );
 
-	getVar( i_obj, solving_use_capacity,              "af_solving_use_capacity"              );
-	getVar( i_obj, solving_use_user_priority,         "af_solving_use_user_priority"         );
-	getVar( i_obj, solving_simpler,                   "af_solving_simpler"                   );
-	getVar( i_obj, solving_tasks_speed,               "af_solving_tasks_speed"               );
-	getVar( i_obj, solving_wake_per_cycle,            "af_solving_wake_per_cycle"            );
-
 	getVar( i_obj, render_heartbeat_sec,              "af_render_heartbeat_sec"              );
 	getVar( i_obj, render_up_resources_period,        "af_render_up_resources_period"        );
 	getVar( i_obj, render_default_capacity,           "af_render_default_capacity"           );
@@ -315,6 +304,8 @@ void Environment::getVars( const JSON * i_obj)
 	getVar( i_obj, sysjob_postcmd_service,            "af_sysjob_postcmd_service"            );
 	getVar( i_obj, sysjob_wol_service,                "af_sysjob_wol_service"                );
 	getVar( i_obj, sysjob_events_service,             "af_sysjob_events_service"             );
+
+	getVar( i_obj, wolwake_interval,                  "af_wolwake_interval"                  );
 }
 
 const std::string Environment::getVarEnv( const char * i_name)

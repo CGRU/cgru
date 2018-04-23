@@ -48,8 +48,9 @@ User::User( Msg * msg)
 
 void User::initDefaultValues()
 {
-	m_solve_method = Work::SolveJobsByOrder;
-		
+	setSolveOrder();
+	setSolveCapacity();
+
 	m_errors_retries        = af::Environment::getTaskErrorRetries();
 	m_errors_avoid_host     = af::Environment::getErrorsAvoidHost();
 	m_errors_task_same_host = af::Environment::getTaskErrorsSameHost();
