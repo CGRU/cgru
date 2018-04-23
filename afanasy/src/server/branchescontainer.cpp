@@ -28,7 +28,7 @@
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 #include "../libafanasy/logger.h"
 
@@ -72,7 +72,7 @@ AF_DEBUG << i_path;
 
 	// Create new Branch if parent can,
 	// or we should to create the first root branch
-	if (parent->isCreateChilds() || (i_path == "/"))
+	if ((i_path == "/") || parent->isCreateChilds())
 	{
 		branch = new BranchSrv(parent, i_path);
 		if (addBranchToContainer(branch) == 0)
