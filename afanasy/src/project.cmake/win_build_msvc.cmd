@@ -8,7 +8,7 @@ popd
 setlocal EnableDelayedExpansion
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-SET "cgru_qt=C:\Qt\Qt5.10.1\5.10.1\msvc2017_64"
+SET "cgru_qt=C:\Qt\5.10.1\msvc2017_64"
 if exist !cgru_qt! (
 	echo Adding "!cgru_qt!\bin" to PATH
 	SET "PATH=!cgru_qt!\bin;%PATH%"
