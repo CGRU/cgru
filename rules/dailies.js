@@ -62,9 +62,9 @@ function d_Make(i_path, i_outfolder)
 
 	params.version = i_path.split('/');
 	params.version = params.version[params.version.length - 1];
-	var match = params.version.match(/v\d{2,}.*/gi);
+	var match = params.version.match(/_v\d{3,3}.*/g);
 	if (match)
-		params.version = match[match.length - 1];
+		params.version = match[match.length - 1].substr(1);
 
 	params.input = i_path;
 	params.output = c_PathPM_Rules2Client(i_outfolder);
