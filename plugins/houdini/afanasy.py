@@ -391,8 +391,31 @@ class BlockParameters:
                   self.afnode.name())
             return
 
-        renderhip = hou.hipFile.name()
+        job = af.Job()
+        job.setName(self.job_name)
 
+        if self.afnode.parm('wait_time').eval():
+            hours = int(self.afnode.parm('wait_time_hours').eval())
+            minutes = int(self.afnode.parm('wait_time_minutes').eval())
+            hours = max(0,min(hours,23))
+            minutes = max(0,min(minutes,59))
+            now_sec = int(time.time())
+            now_day = int((now_sec - time.timezone) / (24*3600)) * (24*3600) + time.timezone
+            sec = now_sec % 60
+            wait_sec = now_day + (hours * 3600) + (minutes * 60) + sec
+            if wait_sec <= now_sec:
+                if hou.ui.displayMessage(
+                            ('Now is greater than %d:%d\nOffset by 1 day?' % (hours,minutes)),
+                            buttons=('Offset', 'Abort'),
+                            default_choice=0, close_choice=1,
+                            title=('Wait Time')
+                        ) == 0:
+                    wait_sec += (24*3600)
+                else:
+                    return
+            job.setWaitTime(wait_sec)
+
+        renderhip = hou.hipFile.name()
         if self.afnode.parm('render_temp_hip').eval():
             # Calculate temporary hip name:
             ftime = time.time()
@@ -407,9 +430,6 @@ class BlockParameters:
             # changes current scene file name to renderhip,
             # at least in version 9.1.115
             hou.hscript('mwrite -n "%s"' % renderhip)
-
-        job = af.Job()
-        job.setName(self.job_name)
 
         if self.start_paused:
             job.offLine()
@@ -500,6 +520,7 @@ def getBlockParameters(afnode, ropnode, subblock, prefix, frame_range):
         block_generate.name += '-G'
 
         if not block_generate.valid:
+            block_generate.doPost()
             return None
 
         run_rop = afnode.parm('sep_run_rop').eval()
@@ -812,6 +833,7 @@ def getJobParameters(afnode, subblock=False, frame_range=None, prefix=''):
             dependmask = newparams[0].name
             for param in newparams:
                 if not param.valid:
+                    param.doPost()
                     return None
 
         if len(newparams):
