@@ -25,7 +25,7 @@ RUN curl -Lks "https://downloads.sourceforge.net/project/cgru/${CGRU_VERSION}/cg
 ADD https://github.com/kreuzwerker/envplate/releases/download/v0.0.8/ep-linux /usr/local/bin/ep
 COPY resources/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +rx /usr/local/bin/ep /usr/local/bin/docker-entrypoint.sh \
- && chmod 666 /opt/cgru/afanasy/config_default.json \
+ && chown render /opt/cgru/afanasy/config_default.json /opt/cgru/config_default.json \
  && sed -i 's/"af_servername":".\+",/"af_servername":"${AF_SERVERNAME}",/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_serverport":[0-9]\+,/"af_serverport":${AF_SERVERPORT},/' /opt/cgru/afanasy/config_default.json \
  && sed -i 's/"af_clientport":[0-9]\+,/"af_clientport":${AF_CLIENTPORT},/' /opt/cgru/afanasy/config_default.json \
