@@ -154,7 +154,7 @@ public:
 	/// Set block post commnand.
 	inline void setCmdPost(const std::string &str) { m_command_post = str; }
 	/// Set tasks maximum run time, after this time task will be restart as error task
-	inline void setTasksMaxRunTime(const int secs) { m_tasks_max_run_time = secs; }
+//	inline void setTasksMaxRunTime(const int secs) { m_tasks_max_run_time = secs; }
 	/// Set maximum running tasks
 	inline void setMaxRunningTasks(const int value) { m_max_running_tasks = value; }
 	/// Set maximum running tasks on the same host
@@ -220,8 +220,6 @@ public:
 	inline void setErrorsTaskSameHost(int8_t value) { m_errors_task_same_host = value; }
 	/// Set time to forgive error host
 	inline void setErrorsForgiveTime(int value) { m_errors_forgive_time = value; }
-	/// Set task progress change timeout
-	inline void setTaskProgressChangeTimeout(int value) { m_task_progress_change_timeout = value; }
 
 	bool setNumeric(long long start, long long end, long long perTask = 1, long long increment = 1);
 	void setFramesPerTask(long long perTask); ///< For string tasks and per tasr dependency solve
@@ -295,22 +293,12 @@ public:
 	inline int getBlockNum() const { return m_block_num; }			   ///< Get block number in job.
 	inline const std::string &getService() const { return m_service; } ///< Get tasks type description.
 	inline const std::string &getParser() const { return m_parser; }   ///< Get tasks parser type.
-	inline uint32_t getTasksMaxRunTime() const
-	{
-		return m_tasks_max_run_time;
-	} ///< Get tasks maximum run time.
-	inline int getMaxRunningTasks() const
-	{
-		return m_max_running_tasks;
-	} ///< Get block maximum number of running tasks.
-	inline int getMaxRunTasksPerHost() const
-	{
-		return m_max_running_tasks_per_host;
-	} ///< Get block maximum number of running tasks on the same host.
-	inline const std::string &getMultiHostService() const
-	{
-		return m_multihost_service;
-	} ///< Get tasks parser type.
+	inline uint32_t getTaskMaxRunTime()             const { return m_task_max_run_time;            }
+	inline uint32_t getTaskMinRunTime()             const { return m_task_min_run_time;            }
+	inline int getTaskProgressChangeTimeout()       const { return m_task_progress_change_timeout; }
+	inline int getMaxRunningTasks()                 const { return m_max_running_tasks;            }
+	inline int getMaxRunTasksPerHost()              const { return m_max_running_tasks_per_host;   }
+	inline const std::string &getMultiHostService() const { return m_multihost_service;            }
 
 	inline long long getFrameFirst() const { return m_frame_first; } ///< Get first task frame ( if numeric).
 	inline long long getFrameLast() const { return m_frame_last; }   ///< Get last task frame  ( if numeric).
@@ -340,7 +328,6 @@ public:
 	inline int getErrorsRetries() const { return m_errors_retries; }
 	inline int getErrorsTaskSameHost() const { return m_errors_task_same_host; }
 	inline int getErrorsForgiveTime() const { return m_errors_forgive_time; }
-	inline int getTaskProgressChangeTimeout() const { return m_task_progress_change_timeout; }
 
 	inline int32_t getRunningTasksNumber() const { return m_running_tasks_counter; }
 	inline int64_t getRunningCapacityTotal() const { return m_running_capacity_counter; }
@@ -415,7 +402,10 @@ protected:
 	/// Maximum number of running tasks on the same host
 	int32_t m_max_running_tasks_per_host;
 
-	uint32_t m_tasks_max_run_time; ///< Tasks maximum run time.
+	int32_t m_task_max_run_time; ///< Tasks maximum run time.
+	int32_t m_task_min_run_time; ///< Tasks minimum run time.
+	/// If task progress did not change within this time, consider that it is erroneous.
+	int32_t m_task_progress_change_timeout;
 
 	int32_t m_capacity;
 
@@ -447,8 +437,6 @@ protected:
 	int8_t m_errors_task_same_host;
 	/// Time from last error to remove host from error list
 	int32_t m_errors_forgive_time;
-	/// If task progress did not change within this time, consider that it is erroneous.
-	int32_t m_task_progress_change_timeout;
 
 	int64_t m_file_size_min;
 	int64_t m_file_size_max;

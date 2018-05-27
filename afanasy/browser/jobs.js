@@ -457,6 +457,8 @@ function JobBlock(i_elParent, i_block)
 	this.elErrSolving = cm_ElCreateFloatText(this.element, 'right');
 	this.elForgiveTime = cm_ElCreateFloatText(this.element, 'right', 'Errors Forgive Time');
 	this.elMaxRunTime = cm_ElCreateFloatText(this.element, 'right', 'Task Maximum Run Time');
+	this.elMinRunTime = cm_ElCreateFloatText(this.element, 'right', 'Task Minimum Run Time');
+	this.elProgressTimeout = cm_ElCreateFloatText(this.element, 'right', 'Task Progress Change Timeout');
 	this.elNeedMem = cm_ElCreateFloatText(this.element, 'right', 'Required Memory');
 	this.elNeedHDD = cm_ElCreateFloatText(this.element, 'right', 'Required HDD Space');
 	this.elNeedPower = cm_ElCreateFloatText(this.element, 'right', 'Needed Power');
@@ -928,11 +930,23 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elForgiveTime.textContent = '';
 
-			if (this.params.tasks_max_run_time != null)
+			if (this.params.task_max_run_time != null)
 				this.elMaxRunTime.innerHTML =
-					'TaskMaxRunTime:<b>' + cm_TimeStringFromSeconds(this.params.tasks_max_run_time) + '</b>';
+					'TaskMaxRunTime:<b>' + cm_TimeStringFromSeconds(this.params.task_max_run_time) + '</b>';
 			else
 				this.elMaxRunTime.textContent = '';
+
+			if (this.params.task_min_run_time != null)
+				this.elMinRunTime.innerHTML =
+					'TaskMinRunTime:<b>' + cm_TimeStringFromSeconds(this.params.task_min_run_time) + '</b>';
+			else
+				this.elMinRunTime.textContent = '';
+
+			if (this.params.task_progress_change_timeout != null)
+				this.elProgressTimeout.innerHTML =
+					'TaskProgessTimeout:<b>' + cm_TimeStringFromSeconds(this.params.task_progress_change_timeout) + '</b>';
+			else
+				this.elProgressTimeout.textContent = '';
 
 			if (this.params.need_memory)
 				this.elNeedMem.innerHTML = 'Memory><b>' + this.params.need_memory + '</b>';
@@ -979,11 +993,17 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elForgiveTime.textContent = '';
 
-			if (this.params.tasks_max_run_time != null)
+			if (this.params.task_max_run_time != null)
 				this.elMaxRunTime.innerHTML =
-					'MaxRun:<b>' + cm_TimeStringFromSeconds(this.params.tasks_max_run_time) + '</b>';
+					'MaxRun:<b>' + cm_TimeStringFromSeconds(this.params.task_max_run_time) + '</b>';
 			else
 				this.elMaxRunTime.textContent = '';
+
+			if (this.params.task_min_run_time != null)
+				this.elMinRunTime.innerHTML =
+					'MinRun:<b>' + cm_TimeStringFromSeconds(this.params.task_min_run_time) + '</b>';
+			else
+				this.elMinRunTime.textContent = '';
 
 			if (this.params.need_memory)
 				this.elNeedMem.innerHTML = 'Mem><b>' + this.params.need_memory + '</b>';
@@ -1029,11 +1049,17 @@ JobBlock.prototype.update = function(i_displayFull) {
 			else
 				this.elForgiveTime.textContent = '';
 
-			if (this.params.tasks_max_run_time != null)
+			if (this.params.task_max_run_time != null)
 				this.elMaxRunTime.innerHTML =
-					'mrt<b>' + cm_TimeStringFromSeconds(this.params.tasks_max_run_time) + '</b>';
+					'mrt<b>' + cm_TimeStringFromSeconds(this.params.task_max_run_time) + '</b>';
 			else
 				this.elMaxRunTime.textContent = '';
+
+			if (this.params.task_min_run_time != null)
+				this.elMinRunTime.innerHTML =
+					'mrt<b>' + cm_TimeStringFromSeconds(this.params.task_min_run_time) + '</b>';
+			else
+				this.elMinRunTime.textContent = '';
 
 			if (this.params.need_memory)
 				this.elNeedMem.innerHTML = 'm><b>' + this.params.need_memory + '</b>';
@@ -1635,7 +1661,9 @@ JobBlock.params = {
 	errors_avoid_host /******/: {"type": 'num', "label": 'Errors Avoid Host'},
 	errors_task_same_host /**/: {"type": 'num', "label": 'Errors Task Same Host'},
 	errors_forgive_time /****/: {"type": 'hrs', "label": 'Errors Forgive Time'},
-	tasks_max_run_time /*****/: {"type": 'hrs', "label": 'Tasks Max Run Time'},
+	task_max_run_time /******/: {"type": 'hrs', "label": 'Task Max Run Time'},
+	task_min_run_time /******/: {"type": 'num', "label": 'Task Min Run Time'},
+	task_progress_change_timeout:{"type":'hrs', "label": 'Task Progress Change Timeout'},
 	hosts_mask /*************/: {"type": 'reg', "label": 'Hosts Mask'},
 	hosts_mask_exclude /*****/: {"type": 'reg', "label": 'Exclude Hosts Mask'},
 	depend_mask /************/: {"type": 'reg', "label": 'Depend Mask'},

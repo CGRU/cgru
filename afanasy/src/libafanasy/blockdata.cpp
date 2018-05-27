@@ -79,7 +79,8 @@ void BlockData::initDefaults()
 	m_sequential /*************/ = 1;
 	m_max_running_tasks /******/ = -1;
 	m_max_running_tasks_per_host = -1;
-	m_tasks_max_run_time /******/ = 0;
+	m_task_max_run_time /******/ = 0;
+	m_task_min_run_time /******/ = 0;
 	m_capacity = AFJOB::TASK_DEFAULT_CAPACITY;
 	m_need_memory /************/ = 0;
 	m_need_power /*************/ = 0;
@@ -178,7 +179,8 @@ void BlockData::jsonRead(const JSON &i_object, std::string *io_changes)
 	jr_int8("errors_task_same_host" /**/, m_errors_task_same_host /**/, i_object, io_changes);
 	jr_int32("errors_forgive_time" /***/, m_errors_forgive_time /****/, i_object, io_changes);
 	jr_int32("task_progress_change_timeout", m_task_progress_change_timeout, i_object, io_changes);
-	jr_uint32("tasks_max_run_time" /***/, m_tasks_max_run_time /*****/, i_object, io_changes);
+	jr_int32("task_max_run_time" /*****/, m_task_max_run_time /******/, i_object, io_changes);
+	jr_int32("task_min_run_time" /*****/, m_task_min_run_time /******/, i_object, io_changes);
 	jr_string("tasks_name" /***********/, m_tasks_name /*************/, i_object, io_changes);
 	jr_string("parser" /***************/, m_parser /*****************/, i_object, io_changes);
 	if (af::Environment::notDemoMode())
@@ -412,7 +414,8 @@ void BlockData::jsonWrite(std::ostringstream &o_str, int i_type) const
 				o_str << ",\n\"errors_forgive_time\":" << int(m_errors_forgive_time);
 			if (m_task_progress_change_timeout != -1)
 				o_str << ",\n\"task_progress_change_timeout\":" << int(m_task_progress_change_timeout);
-			if (m_tasks_max_run_time > 0) o_str << ",\n\"tasks_max_run_time\":" << int(m_tasks_max_run_time);
+			if (m_task_max_run_time > 0) o_str << ",\n\"task_max_run_time\":" << int(m_task_max_run_time);
+			if (m_task_min_run_time > 0) o_str << ",\n\"task_min_run_time\":" << int(m_task_min_run_time);
 
 			if (hasDependMask()) o_str << ",\n\"depend_mask\":\"" << m_depend_mask.getPattern() << "\"";
 			if (hasTasksDependMask())
@@ -579,7 +582,10 @@ void BlockData::v_readwrite(Msg *msg)
 			rw_int8_t(m_errors_task_same_host, msg);
 			rw_int32_t(m_errors_forgive_time, msg);
 			rw_int32_t(m_task_progress_change_timeout, msg);
-			rw_uint32_t(m_tasks_max_run_time, msg);
+			rw_int32_t(m_task_max_run_time, msg);
+
+			// NEW VERSION
+			//rw_int32_t(m_task_min_run_time, msg);
 
 		case Msg::TBlocksProgress:
 
@@ -1356,9 +1362,9 @@ void BlockData::generateInfoStreamTyped(std::ostringstream &o_str, int type, boo
 			if (full || (m_errors_forgive_time != -1))
 				o_str << "\n Errors forgive time = " << m_errors_forgive_time << " seconds";
 			if (full && (m_errors_forgive_time == -1)) o_str << " (infinite)";
-			if (full || (m_task_progress_change_timeout != -1))
+			if (full || (m_task_progress_change_timeout > 0))
 				o_str << "\n Task progress change timeout = " << m_task_progress_change_timeout << " seconds";
-			if (full && (m_task_progress_change_timeout == -1)) o_str << " (infinite)";
+			if (full && (m_task_progress_change_timeout <= 0)) o_str << " (infinite)";
 
 			break;
 

@@ -75,10 +75,20 @@ void Branch::v_readwrite(Msg *msg)
 
 	rw_int32_t(m_branches_num, msg);
 
+	// NEW_VERSION
+	/*
+	rw_int32_t(m_branches_total, msg);
+	rw_int32_t(m_jobs_num,       msg);
+	rw_int32_t(m_jobs_total,     msg);
+	*/
+
 	rw_String(m_parent_path, msg);
 
 	rw_int64_t(m_time_creation, msg);
 	rw_int64_t(m_time_empty,    msg);
+
+	// NEW_VERSION
+	// RW Active jobs.
 }
 
 void Branch::v_jsonWrite(std::ostringstream &o_str, int i_type) const

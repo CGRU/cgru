@@ -33,7 +33,7 @@ AFINFO("SysBlockData_CmdPost::SysBlockData_CmdPost:")
    m_name = "post_commands";
    m_service = af::Environment::getSysPostCmdService();
 
-   m_tasks_max_run_time = AFJOB::SYSJOB_TASKMAXRUNTIME;
+   m_task_max_run_time = AFJOB::SYSJOB_TASKMAXRUNTIME;
 
 /// Maximum number or errors on same host for block NOT to avoid host
    m_errors_avoid_host = AFJOB::SYSJOB_ERRORS_AVIODHOST;

@@ -33,7 +33,7 @@ AFINFA("SysBlockData_Events::SysBlockData_Events: BlockNum=%d, JobId=%d", BlockN
 	m_name = "events";
 	m_service = af::Environment::getSysEventsService();
 
-	m_tasks_max_run_time = AFJOB::SYSJOB_TASKMAXRUNTIME;
+	m_task_max_run_time = AFJOB::SYSJOB_TASKMAXRUNTIME;
 
 /// Maximum number or errors on same host for block NOT to avoid host
 	m_errors_avoid_host = AFJOB::SYSJOB_ERRORS_AVIODHOST;

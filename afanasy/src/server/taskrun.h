@@ -36,7 +36,7 @@ public:
 	inline bool notZombie() const { return m_zombie == false;}
 
 /// Update task state by sent message, almost often from remote render host
-   virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
+	virtual void update(const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & o_error_host);
 
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);

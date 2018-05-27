@@ -42,7 +42,7 @@ BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
 	errors_retries(-1),
 	errors_avoidhost(-1),
 	errors_tasksamehost(-1),
-	tasksmaxruntime( 0),
+	task_max_run_time( 0),
 
 	item( qItem),
 	blocknum( BlockNumber),
@@ -77,12 +77,12 @@ bool BlockInfo::update( const af::BlockData* block, int type)
 		sequential                   = block->getSequential();
 
 		tasksnum                     = block->getTasksNum();
-		tasksmaxruntime              = block->getTasksMaxRunTime();
+		task_max_run_time               = block->getTaskMaxRunTime();
+		task_progress_change_timeout = block->getTaskProgressChangeTimeout();
 		errors_retries               = block->getErrorsRetries();
 		errors_avoidhost             = block->getErrorsAvoidHost();
 		errors_tasksamehost          = block->getErrorsTaskSameHost();
 		errors_forgivetime           = block->getErrorsForgiveTime();
-		task_progress_change_timeout = block->getTaskProgressChangeTimeout();
 		maxrunningtasks              = block->getMaxRunningTasks();
 		maxruntasksperhost           = block->getMaxRunTasksPerHost();
 		need_memory                  = block->getNeedMemory();
@@ -270,7 +270,7 @@ void BlockInfo::refresh()
 			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
 		if( errors_forgivetime >= 0 ) str_params += QString(" ErrorsForgiveTime:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-		if( tasksmaxruntime) str_params += QString(" MaxRunTime:%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
+		if( task_max_run_time) str_params += QString(" MaxRunTime:%1").arg( af::time2strHMS( task_max_run_time, true).c_str());
 
 		if( maxrunningtasks    != -1 ) str_params += QString(" MaxRunTasks:%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) str_params += QString(" MaxPerHost:%1").arg( maxruntasksperhost);
@@ -294,7 +294,7 @@ void BlockInfo::refresh()
 		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
 		str_params += QString("%1").arg( capacity);
 		
-		if( task_progress_change_timeout != -1) str_params += QString(" NoProgessFor:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
+		if( task_progress_change_timeout != -1) str_params += QString(" TasksProgessTimeout:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 	}
 	else if( Watch::isJedi())
 	{
@@ -306,7 +306,7 @@ void BlockInfo::refresh()
 			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
 		if( errors_forgivetime >= 0 ) str_params += QString(" Forgive:%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-		if( tasksmaxruntime) str_params += QString(" MaxTime:%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
+		if( task_max_run_time) str_params += QString(" MaxTime:%1").arg( af::time2strHMS( task_max_run_time, true).c_str());
 
 		if( maxrunningtasks    != -1 ) str_params += QString(" Max:%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) str_params += QString(" PerHost:%1").arg( maxruntasksperhost);
@@ -330,7 +330,7 @@ void BlockInfo::refresh()
 		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
 		str_params += QString("%1]").arg( capacity);
 		
-		if( task_progress_change_timeout != -1) str_params += QString(" NPF:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
+		if( task_progress_change_timeout != -1) str_params += QString(" NoProgress:%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 	}
 	else
 	{
@@ -342,7 +342,7 @@ void BlockInfo::refresh()
 			str_params += Item::generateErrorsSolvingInfo( errors_avoidhost, errors_tasksamehost, errors_retries);
 		if( errors_forgivetime >= 0 ) str_params += QString(" f%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-		if( tasksmaxruntime) str_params += QString(" mrt%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
+		if( task_max_run_time) str_params += QString(" mrt%1").arg( af::time2strHMS( task_max_run_time, true).c_str());
 
 		if( maxrunningtasks    != -1 ) str_params += QString(" m%1").arg( maxrunningtasks);
 		if( maxruntasksperhost != -1 ) str_params += QString(" mph%1").arg( maxruntasksperhost);
@@ -366,7 +366,7 @@ void BlockInfo::refresh()
 		if( varcapacity   ) str_params += QString("(%1-%2)*").arg( capcoeff_min).arg( capcoeff_max);
 		str_params += QString("%1]").arg( capacity);
 		
-		if( task_progress_change_timeout != -1) str_params += QString(" npf%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
+		if( task_progress_change_timeout != -1) str_params += QString(" tpt%1").arg(af::time2strHMS( task_progress_change_timeout, true).c_str());
 	}
 
 
@@ -677,7 +677,7 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
 	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
 	menu->addAction( action);
 
-	action = new ActionIdString( id_block, "tasks_max_run_time", "Set Tasks MaxRunTime", qwidget);
+	action = new ActionIdString( id_block, "task_max_run_time", "Set Tasks MaxRunTime", qwidget);
 	QObject::connect( action, SIGNAL( triggeredId( int, QString) ), qwidget, SLOT( blockAction( int, QString) ));
 	menu->addAction( action);
 
@@ -840,11 +840,11 @@ bool BlockInfo::blockAction( std::ostringstream & i_str, int id_block, const QSt
 		set_number = int( hours * 60*60 );
 		if( set_number <= 0) set_number = -1;
 	}
-	else if( i_action == "tasks_max_run_time" )
+	else if( i_action == "task_max_run_time" )
 	{
 		double cur = 0;
-		if( id_block == blocknum ) cur = double(tasksmaxruntime) / (60*60);
-		double hours = QInputDialog::getDouble( listitems, "Tasks Maximum Run Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 4, &ok);
+		if( id_block == blocknum ) cur = double(task_max_run_time) / (60*60);
+		double hours = QInputDialog::getDouble( listitems, "Task Maximum Run Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 4, &ok);
 		set_number = int( hours * 60*60 );
 	}
 	else if( i_action == "max_running_tasks" )

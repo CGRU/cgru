@@ -373,14 +373,32 @@ class Block:
         """
         self.data['flags'] = afcommon.setBlockFlag(self.data['flags'], 'dependsubtask')
 
-    def setTasksMaxRunTime(self, value):
+    def setTasksMaxRunTime(self, value): self.setTaskMaxRunTime(value)
+    def setTaskMaxRunTime(self, value):
         """Missing DocString
 
         :param value:
         :return:
         """
         if value > 0:
-            self.data["tasks_max_run_time"] = value
+            self.data["task_max_run_time"] = value
+
+    def setTaskMinRunTime(self, value):
+        """Missing DocString
+
+        :param value:
+        :return:
+        """
+        if value > 0:
+            self.data["task_min_run_time"] = value
+
+    def setTaskProgressChangeTimeout(self, value):
+        """If running task will not change its progress (percentage)
+            for this time, it will be stopped with an error.
+        :param value: timeout in seconds
+        """
+        if value > 0:
+            self.data["task_progress_change_timeout"] = value
 
     def setMaxRunningTasks(self, value):
         """Missing DocString

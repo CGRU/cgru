@@ -31,7 +31,7 @@ public:
 	inline int getErrorsAvoidHost()      const { return errors_avoidhost;   }
 	inline int getErrorsRetries()        const { return errors_retries;     }
 	inline int getErrorsTaskSameHost()   const { return errors_tasksamehost;}
-	inline uint32_t getTasksMaxRunTime() const { return tasksmaxruntime;    }
+	inline uint32_t getTasksMaxRunTime() const { return task_max_run_time;    }
 
 	void setName( const QString & str) { name = str;}
 	inline const QString & getName() const { return name;}
@@ -85,7 +85,7 @@ private:
 	int errors_tasksamehost;
 	int errors_forgivetime;
 	int task_progress_change_timeout;
-	uint32_t tasksmaxruntime;
+	int task_max_run_time;
 
 	char progress[AFJOB::ASCII_PROGRESS_LENGTH];
 
