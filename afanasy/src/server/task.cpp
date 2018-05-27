@@ -460,25 +460,7 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 		
 		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_stored_files[i];
 
-		i_str << "\n{\"name\":\"" << filename << "\"";
-/*
-		int readsize = -1;
-		char * data = af::fileRead( filename, &readsize, af::Msg::SizeDataMax, &error);
-		if( data )
-		{
-			i_str << ",\n\"data\":\"";
-			i_str << af::base64encode( data, readsize);
-			i_str << "\"";
-			delete [] data;
-		}
-		else
-		{
-			i_str << "\n,\"error\":\"" << af::strEscape( error) << "\"";
-		}
-
-		i_str << ",\n\"size\":" << readsize;
-*/
-		i_str << "}";
+		i_str << "\n{\"name\":\"" << af::strEscape(filename) << "\""  << "}";
 	}
 
 	i_str << "\n]}";
