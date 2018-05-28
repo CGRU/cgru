@@ -70,7 +70,18 @@ function work_generateParamsString(i_params, i_type)
 		if (i_params.hosts_mask_exclude)
 			str += " Exclude:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
-			str += " Slv:<b>" + i_params.solve_method + "</b>";
+		{
+			str += " Slv:";
+			str += (i_params.solve_method == 'solve_priority') ? '<b>Priority</b>' : '<b>Order</b>';
+			str += (i_params.solve_need   == 'solve_capacity') ? ',<b>Capacity</b>' : ',<b>RunTasks</b>';
+		}
+		if (i_params.max_tasks_per_second != null)
+		{
+			if (i_params.max_tasks_per_second == 0)
+				str += ' <b style="color:darkred">MTPS:' + i_params.max_tasks_per_second + '</b>';
+			else
+				str += ' MTPS:<b>' + i_params.max_tasks_per_second + '</b>';
+		}
 		str += " Pri:<b>" + i_params.priority + "</b>";
 	}
 	else
@@ -84,7 +95,18 @@ function work_generateParamsString(i_params, i_type)
 		if (i_params.hosts_mask_exclude)
 			str += " e:<b>" + i_params.hosts_mask + "</b>";
 		if (i_type != 'job')
-			str += " <b>" + i_params.solve_method + "</b>";
+		{
+			str += " s:";
+			str += (i_params.solve_method == 'solve_priority') ? '<b>pri</b>' : '<b>ord</b>';
+			str += (i_params.solve_need   == 'solve_capacity') ? ',<b>cap</b>' : ',<b>tasts</b>';
+		}
+		if (i_params.max_tasks_per_second != null)
+		{
+			if (i_params.max_tasks_per_second == 0)
+				str += ' <b style="color:darkred">MTPS:' + i_params.max_tasks_per_second + '</b>';
+			else
+				str += ' MTPS:<b>' + i_params.max_tasks_per_second + '</b>';
+		}
 		str += " <b>" + i_params.priority + "</b>";
 	}
 

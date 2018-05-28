@@ -86,6 +86,21 @@ BranchNode.prototype.update = function(i_obj) {
 		this.branch_depth = parent_branch.branch_depth + 1;
 	this.element.style.marginLeft = (this.branch_depth * 32 + 2) + 'px';
 
+	// Add/Remove CSS classes to highlight/colorize/mute:
+	if (this.params.jobs_total == null)
+		this.element.classList.add('empty');
+	else
+		this.element.classList.remove('empty');
+	if (this.params.running_tasks_num)
+		this.element.classList.add('running');
+	else
+		this.element.classList.remove('running');
+	if (this.params.active_jobs && this.params.active_jobs.length)
+		this.element.classList.add('active');
+	else
+		this.element.classList.remove('active');
+
+
 	var name = this.params.name;
 	if (name == '/')
 		name = 'ROOT';
@@ -144,24 +159,42 @@ BranchNode.prototype.update = function(i_obj) {
 	else if (cm_IsJedi())
 	{
 		var jobs = 'Jobs:';
-		if (this.params.jobs_num)
-			jobs += '<b>' + this.params.jobs_num + '</b>';
+		if (this.params.jobs_total)
+			jobs += ' <b>' + this.params.jobs_total + '</b>';
 		else
-			jobs += '<b>0</b>';
+			jobs += ' <b>0</b>';
 		if (this.params.running_jobs_num)
-			jobs += ' / <b>' + this.params.running_jobs_num + '</b>Run';
+			jobs += ' / <b>' + this.params.running_jobs_num + '</b> Run';
 		this.elJobsCounts.innerHTML = jobs;
+
+		var counts = 'Branches:';
+		if (this.params.branches_total)
+			counts += ' <b>' + this.params.branches_total + '</b>';
+		else
+			counts += ' <b>0</b>';
+		if (this.params.running_branches_num)
+			counts += ' / <b>' + this.params.running_branches_num + '</b> Run';
+		this.elBranchedCounts.innerHTML = counts;
 	}
 	else
 	{
-		var jobs = 'j';
-		if (this.params.jobs_num)
-			jobs += '<b>' + this.params.jobs_num + '</b>';
+		var jobs = 'j:';
+		if (this.params.jobs_total)
+			jobs += ' <b>' + this.params.jobs_total + '</b>';
 		else
-			jobs += '<b>0</b>';
+			jobs += ' <b>0</b>';
 		if (this.params.running_jobs_num)
-			jobs += '/<b>' + this.params.running_jobs_num + '</b>r';
+			jobs += ' / <b>' + this.params.running_jobs_num + '</b>r';
 		this.elJobsCounts.innerHTML = jobs;
+
+		var counts = 'b:';
+		if (this.params.branches_total)
+			counts += ' <b>' + this.params.branches_total + '</b>';
+		else
+			counts += ' <b>0</b>';
+		if (this.params.running_branches_num)
+			counts += ' / <b>' + this.params.running_branches_num + '</b>r';
+		this.elBranchedCounts.innerHTML = counts;
 	}
 
 
