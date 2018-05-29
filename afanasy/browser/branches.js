@@ -279,6 +279,10 @@ BranchNode.prototype.refresh = function() {
 	this.elBar.innerHTML = label;
 };
 
+BranchNode.updatingFinished = function() {
+	BranchNode.clearNotUpdated();
+}
+
 BranchNode.createPanels = function(i_monitor) {
 	// Work:
 	work_CreatePanels(i_monitor, 'branches');
@@ -401,20 +405,7 @@ BranchActiveJob.prototype.update = function(i_params) {
 BranchActiveJob.prototype.onContextMenu = function() {
 	g_cur_monitor = this.branch.monitor;
 
-	// Clear not updated (deleted) jobs:
-	for (var jid in branches_active_jobs)
-	{
-		var active_job = branches_active_jobs[jid];
-		if (active_job == null)
-			continue;
-		if (active_job.updated)
-			continue;
-
-		branches_active_jobs[jid] = null;
-		var i = branches_active_jobs_selected.indexOf(active_job);
-		if (i != -1)
-			branches_active_jobs_selected.splice(i, 1);
-	}
+	BranchActiveJob.clearNotUpdated();
 
 	if (this.selected)
 	{
@@ -466,6 +457,23 @@ BranchActiveJob.prototype.setSelected = function(i_select) {
 		branches_active_jobs_selected.splice(branches_active_jobs_selected.indexOf(this), 1);
 	}
 };
+
+BranchActiveJob.clearNotUpdated = function() {
+	// Clear not updated (deleted) jobs:
+	for (var jid in branches_active_jobs)
+	{
+		var active_job = branches_active_jobs[jid];
+		if (active_job == null)
+			continue;
+		if (active_job.updated)
+			continue;
+
+		branches_active_jobs[jid] = null;
+		var i = branches_active_jobs_selected.indexOf(active_job);
+		if (i != -1)
+			branches_active_jobs_selected.splice(i, 1);
+	}
+}
 
 BranchActiveJob.deselectAll = function(i_monitor) {
 	while (branches_active_jobs_selected.length)

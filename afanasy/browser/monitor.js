@@ -553,6 +553,9 @@ Monitor.prototype.processMsg = function(obj) {
 		this.firstNodesReceived = true;
 	}
 
+	if (this.nodeConstructor.updatingFinished)
+		this.nodeConstructor.updatingFinished();
+
 	this.setWindowTitle();
 	// this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:'
 	// + updated.length);
