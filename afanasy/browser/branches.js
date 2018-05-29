@@ -20,9 +20,10 @@ var branches = null;
 var branches_active_jobs = {};
 var branches_active_jobs_selected = [];
 
-BranchNode.onMonitorCreate = function() {
+BranchNode.onMonitorCreate = function(i_monitor) {
 	branches = {};
 	BranchNode.createParams();
+	i_monitor.sortDirection = true;
 };
 
 function BranchNode()
@@ -349,7 +350,7 @@ BranchNode.createParams = function() {
 	BranchNode.params_created = true;
 };
 
-BranchNode.sort = ['priority', 'name'];
+BranchNode.sort = ['name'];
 BranchNode.filter = ['name'];
 
 

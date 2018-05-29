@@ -44,9 +44,6 @@ function Monitor(i_args)
 	else if (this.type == 'monitors')
 		this.nodeConstructor = MonitorNode;
 
-	if (this.nodeConstructor.onMonitorCreate)
-		this.nodeConstructor.onMonitorCreate();
-
 	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild(this.elMonitor);
 	this.elMonitor.classList.add('monitor');
@@ -83,6 +80,24 @@ function Monitor(i_args)
 	this.elList.monitor = this;
 	this.elList.oncontextmenu = function(e) { return e.currentTarget.monitor.noneSelected(e); };
 	this.elList.onmousedown = function(e) { return e.currentTarget.monitor.noneSelected(e); };
+
+
+	// Sorting direction (can be overriden later in onMonitorCreate function):
+	if (localStorage[this.type + '_sort_dir'] == 'ON')
+		this.sortDirection = true;
+	else
+		this.sortDirection = false;
+	if (this.sortParm == 'order')
+		this.sortDirection = true;
+
+
+	// Here we launch node specific function.
+	// Later we ask node for some params, sort, filter.
+	// They can be altered in this function.
+	// So all previous code can't be affected by spectific node type.
+	if (this.nodeConstructor.onMonitorCreate)
+		this.nodeConstructor.onMonitorCreate(this);
+
 
 	this.view_opts = {};
 	if (this.nodeConstructor.view_opts)
@@ -320,13 +335,6 @@ function Monitor(i_args)
 	for (var i = 0; i < cm_Attrs.length; i++)
 		if (cm_Attrs[i][0] == this.sortParm)
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
-
-	if (localStorage[this.type + '_sort_dir'] == 'ON')
-		this.sortDirection = true;
-	else
-		this.sortDirection = false;
-	if (this.sortParm == 'order')
-		this.sortDirection = true;
 
 	if (this.nodeConstructor.filterVisor && g_VISOR())
 	{
@@ -1397,14 +1405,26 @@ Monitor.prototype.sortDirChanged = function(i_evt) {
 Monitor.prototype.sortFilterParmMenu = function(i_evt, i_type) {
 	var menu = this.createMenu(i_evt, i_type);
 	for (var i = 0; i < this.nodeConstructor[i_type].length; i++)
+	{
+		var parm = this.nodeConstructor[i_type][i];
+		var item = {};
+		item.name = parm;
+		item.label = parm;
+		item.receiver = this;
+		item.handle = i_type + 'ParmChanged';
+
+		// Look for a common attributes description
+		// to find a better name and label
 		for (var j = 0; j < cm_Attrs.length; j++)
-			if (this.nodeConstructor[i_type][i] == cm_Attrs[j][0])
-				menu.addItem({
-					"name": cm_Attrs[j][0],
-					"receiver": this,
-					"handle": i_type + 'ParmChanged',
-					"label": cm_Attrs[j][2]
-				});
+		{
+			if (parm == cm_Attrs[j][0])
+			{
+				item.name = cm_Attrs[j][0];
+				item.label = cm_Attrs[j][2];
+			}
+		}
+		menu.addItem(item);
+	}
 	menu.show();
 	i_evt.stopPropagation();
 	return false;

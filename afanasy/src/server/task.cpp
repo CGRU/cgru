@@ -460,7 +460,7 @@ void Task::getStoredFiles( std::ostringstream & i_str) const
 		
 		std::string filename = m_store_dir_files + AFGENERAL::PATH_SEPARATOR + m_stored_files[i];
 
-		i_str << "\n{\"name\":\"" << af::strEscape(filename) << "\""  << "}";
+		i_str << "\n{\"name\":\"" << af::strEscape(filename) << "\"}";
 	}
 
 	i_str << "\n]}";
