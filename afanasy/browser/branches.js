@@ -280,7 +280,7 @@ BranchNode.prototype.refresh = function() {
 };
 
 BranchNode.updatingFinished = function() {
-	BranchNode.clearNotUpdated();
+	BranchActiveJob.clearNotUpdated();
 }
 
 BranchNode.createPanels = function(i_monitor) {
